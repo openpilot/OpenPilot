@@ -39,4 +39,3 @@ int32_t AltitudeInitialize();
  * @}
  * @}
  */
-

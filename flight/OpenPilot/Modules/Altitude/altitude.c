@@ -37,7 +37,7 @@
  */
 
 #include "openpilot.h"
-#include "baroaltitude.h" // object that will be updated by the module
+#include "baroaltitude.h"	// object that will be updated by the module
 
 // Private constants
 #define STACK_SIZE configMINIMAL_STACK_SIZE
@@ -50,7 +50,7 @@
 static xTaskHandle taskHandle;
 
 // Private functions
-static void altitudeTask(void* parameters);
+static void altitudeTask(void *parameters);
 
 /**
  * Initialise the module, called on startup
@@ -59,7 +59,7 @@ static void altitudeTask(void* parameters);
 int32_t AltitudeInitialize()
 {
 	// Start main task
-	xTaskCreate(altitudeTask, (signed char*)"Altitude", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+	xTaskCreate(altitudeTask, (signed char *)"Altitude", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 
 	return 0;
 }
@@ -67,7 +67,7 @@ int32_t AltitudeInitialize()
 /**
  * Module thread, should not return.
  */
-static void altitudeTask(void* parameters)
+static void altitudeTask(void *parameters)
 {
 	BaroAltitudeData data;
 	portTickType lastSysTime;
@@ -76,8 +76,7 @@ static void altitudeTask(void* parameters)
 
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
-	while (1)
-	{
+	while (1) {
 		// Update the temperature data
 		PIOS_BMP085_StartADC(TemperatureConv);
 		xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
@@ -95,13 +94,13 @@ static void altitudeTask(void* parameters)
 		data.Pressure = PIOS_BMP085_GetPressure() / 1000.0;
 
 		// Compute the current altitude (all pressures in kPa)
-		data.Altitude = 44330.0 * (1.0 - powf((data.Pressure/ (BMP085_P0 / 1000.0)), (1.0/5.255)));
+		data.Altitude = 44330.0 * (1.0 - powf((data.Pressure / (BMP085_P0 / 1000.0)), (1.0 / 5.255)));
 
 		// Update the AltitudeActual UAVObject
 		BaroAltitudeSet(&data);
 
 		// Delay until it is time to read the next sample
-		vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD / portTICK_RATE_MS );
+		vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD / portTICK_RATE_MS);
 	}
 }
 

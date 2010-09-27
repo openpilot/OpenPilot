@@ -59,12 +59,10 @@
 //#define ENABLE_DEBUG_MSG
 
 #ifdef ENABLE_DEBUG_MSG
-	#define DEBUG_MSG(format, ...) PIOS_COM_SendFormattedString(DEBUG_PORT, format, ## __VA_ARGS__)
+#define DEBUG_MSG(format, ...) PIOS_COM_SendFormattedString(DEBUG_PORT, format, ## __VA_ARGS__)
 #else
-	#define DEBUG_MSG(format, ...)
+#define DEBUG_MSG(format, ...)
 #endif
-
-
 
 // Private types
 
@@ -72,7 +70,7 @@
 static xTaskHandle taskHandle;
 
 // Private functions
-static void task(void* parameters);
+static void task(void *parameters);
 
 /**
  * Initialise the module, called on startup
@@ -81,7 +79,7 @@ static void task(void* parameters);
 int32_t BatteryInitialize(void)
 {
 	// Start main task
-	xTaskCreate(task, (signed char*)"Battery", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+	xTaskCreate(task, (signed char *)"Battery", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 
 	return 0;
 }
@@ -89,7 +87,7 @@ int32_t BatteryInitialize(void)
 /**
  * Module thread, should not return.
  */
-static void task(void* parameters)
+static void task(void *parameters)
 {
 	uint cnt = 0;
 	uint32_t mAs = 0;
@@ -101,21 +99,20 @@ static void task(void* parameters)
 	DEBUG_MSG("Battery Started\n");
 
 	lastSysTime = xTaskGetTickCount();
-	while(1)
-	{
+	while (1) {
 		// TODO: Compare with floating point calculations
 
 		uint32_t mV, mA;
 
-		mV = PIOS_ADC_PinGet(2)*1257/100;
-		mA = (PIOS_ADC_PinGet(1)-28)*4871/100;
-		mAs += mA * SAMPLE_PERIOD_MS / 1000;		// FIXME: Use real time between samples
+		mV = PIOS_ADC_PinGet(2) * 1257 / 100;
+		mA = (PIOS_ADC_PinGet(1) - 28) * 4871 / 100;
+		mAs += mA * SAMPLE_PERIOD_MS / 1000;	// FIXME: Use real time between samples
 
-		DEBUG_MSG("%03d %06d => %06dmV   %06d => %06dmA  %06dmAh\n", cnt,  PIOS_ADC_PinGet(2), mV, PIOS_ADC_PinGet(1), mA, mAs/3600);
+		DEBUG_MSG("%03d %06d => %06dmV   %06d => %06dmA  %06dmAh\n", cnt, PIOS_ADC_PinGet(2), mV, PIOS_ADC_PinGet(1), mA, mAs / 3600);
 		cnt++;
 
-		flightBatteryData.Voltage = (float)mV/1000;
-		flightBatteryData.Current = (float)mA/1000;
+		flightBatteryData.Voltage = (float)mV / 1000;
+		flightBatteryData.Current = (float)mA / 1000;
 		flightBatteryData.ConsumedEnergy = mAs / 3600;
 		FlightBatteryStateSet(&flightBatteryData);
 

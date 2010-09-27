@@ -46,9 +46,9 @@
 
 #include "openpilot.h"
 #include "examplemodevent.h"
-#include "exampleobject1.h" // object the module will listen for updates (input)
-#include "exampleobject2.h" // object the module will update (output)
-#include "examplesettings.h" // object holding module settings (input)
+#include "exampleobject1.h"	// object the module will listen for updates (input)
+#include "exampleobject2.h"	// object the module will update (output)
+#include "examplesettings.h"	// object holding module settings (input)
 
 // Private constants
 
@@ -57,7 +57,7 @@
 // Private variables
 
 // Private functions
-static void ObjectUpdatedCb(UAVObjEvent* ev);
+static void ObjectUpdatedCb(UAVObjEvent * ev);
 
 /**
  * Initialise the module, called on startup.
@@ -81,7 +81,7 @@ int32_t ExampleModEventInitialize()
  * important since all callbacks are executed from the same thread, so other
  * queued events can not be executed until the currently active callback returns.
  */
-static void ObjectUpdatedCb(UAVObjEvent* ev)
+static void ObjectUpdatedCb(UAVObjEvent * ev)
 {
 	ExampleSettingsData settings;
 	ExampleObject1Data data1;
@@ -92,8 +92,7 @@ static void ObjectUpdatedCb(UAVObjEvent* ev)
 	// This is redundant in this case since this callback will
 	// only be called for a single object, it is however possible
 	// to use the same callback for multiple object updates.
-	if ( ev->obj == ExampleObject1Handle() )
-	{
+	if (ev->obj == ExampleObject1Handle()) {
 		// Update settings with latest value
 		ExampleSettingsGet(&settings);
 
@@ -101,12 +100,9 @@ static void ObjectUpdatedCb(UAVObjEvent* ev)
 		ExampleObject1Get(&data1);
 
 		// Determine how to update the output object
-		if ( settings.StepDirection == EXAMPLESETTINGS_STEPDIRECTION_UP )
-		{
+		if (settings.StepDirection == EXAMPLESETTINGS_STEPDIRECTION_UP) {
 			step = settings.StepSize;
-		}
-		else
-		{
+		} else {
 			step = -settings.StepSize;
 		}
 
@@ -125,5 +121,3 @@ static void ObjectUpdatedCb(UAVObjEvent* ev)
 		ExampleObject2Set(&data2);
 	}
 }
-
-

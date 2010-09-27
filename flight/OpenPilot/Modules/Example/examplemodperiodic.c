@@ -46,8 +46,8 @@
 
 #include "openpilot.h"
 #include "examplemodperiodic.h"
-#include "exampleobject2.h" // object that will be updated by the module
-#include "examplesettings.h" // object holding module settings
+#include "exampleobject2.h"	// object that will be updated by the module
+#include "examplesettings.h"	// object holding module settings
 
 // Private constants
 #define STACK_SIZE configMINIMAL_STACK_SIZE
@@ -59,7 +59,7 @@
 static xTaskHandle taskHandle;
 
 // Private functions
-static void exampleTask(void* parameters);
+static void exampleTask(void *parameters);
 
 /**
  * Initialise the module, called on startup
@@ -68,7 +68,7 @@ static void exampleTask(void* parameters);
 int32_t ExampleModPeriodicInitialize()
 {
 	// Start main task
-	xTaskCreate(exampleTask, (signed char*)"ExamplePeriodic", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+	xTaskCreate(exampleTask, (signed char *)"ExamplePeriodic", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 
 	return 0;
 }
@@ -76,7 +76,7 @@ int32_t ExampleModPeriodicInitialize()
 /**
  * Module thread, should not return.
  */
-static void exampleTask(void* parameters)
+static void exampleTask(void *parameters)
 {
 	ExampleSettingsData settings;
 	ExampleObject2Data data;
@@ -85,8 +85,7 @@ static void exampleTask(void* parameters)
 
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
-	while (1)
-	{
+	while (1) {
 		// Update settings with latest value
 		ExampleSettingsGet(&settings);
 
@@ -94,12 +93,9 @@ static void exampleTask(void* parameters)
 		ExampleObject2Get(&data);
 
 		// Determine how to update the data
-		if ( settings.StepDirection == EXAMPLESETTINGS_STEPDIRECTION_UP )
-		{
+		if (settings.StepDirection == EXAMPLESETTINGS_STEPDIRECTION_UP) {
 			step = settings.StepSize;
-		}
-		else
-		{
+		} else {
 			step = -settings.StepSize;
 		}
 
@@ -121,6 +117,6 @@ static void exampleTask(void* parameters)
 		// block the task until it is time for the next update.
 		// The settings field is in ms, to convert to RTOS ticks we need
 		// to divide by portTICK_RATE_MS.
-		vTaskDelayUntil(&lastSysTime, settings.UpdatePeriod / portTICK_RATE_MS );
+		vTaskDelayUntil(&lastSysTime, settings.UpdatePeriod / portTICK_RATE_MS);
 	}
 }

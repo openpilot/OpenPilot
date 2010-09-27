@@ -43,10 +43,9 @@
 #include "objectpersistence.h"
 #include "systemstats.h"
 
-
 // Private constants
 #define SYSTEM_UPDATE_PERIOD_MS 1000
-#define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998 // calibrated by running tests/test_cpuload.c
+#define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998	// calibrated by running tests/test_cpuload.c
 											  // must be updated if the FreeRTOS or compiler
 											  // optimisation options are changed.
 #define STACK_SIZE configMINIMAL_STACK_SIZE
@@ -66,10 +65,10 @@ static xTaskHandle systemTaskHandle;
 static int32_t stackOverflow;
 
 // Private functions
-static void objectUpdatedCb(UAVObjEvent* ev);
+static void objectUpdatedCb(UAVObjEvent * ev);
 static void updateStats();
 static void updateSystemAlarms();
-static void systemTask(void* parameters);
+static void systemTask(void *parameters);
 
 /**
  * Initialise the module, called on startup.
@@ -80,14 +79,14 @@ int32_t SystemModInitialize(void)
 	// Initialize vars
 	stackOverflow = 0;
 	// Create system task
-	xTaskCreate(systemTask, (signed char*)"System", STACK_SIZE, NULL, TASK_PRIORITY, &systemTaskHandle);
+	xTaskCreate(systemTask, (signed char *)"System", STACK_SIZE, NULL, TASK_PRIORITY, &systemTaskHandle);
 	return 0;
 }
 
 /**
  * System task, periodically executes every SYSTEM_UPDATE_PERIOD_MS
  */
-static void systemTask(void* parameters)
+static void systemTask(void *parameters)
 {
 	portTickType lastSysTime;
 
@@ -103,8 +102,7 @@ static void systemTask(void* parameters)
 	ObjectPersistenceConnectCallback(&objectUpdatedCb);
 
 	// Main system loop
-	while (1)
-	{
+	while (1) {
 		// Update the system statistics
 		updateStats();
 
@@ -115,12 +113,9 @@ static void systemTask(void* parameters)
 		PIOS_LED_Toggle(LED1);
 
 		// Turn on the error LED if an alarm is set
-		if ( AlarmsHasWarnings() )
-		{
+		if (AlarmsHasWarnings()) {
 			PIOS_LED_On(LED2);
-		}
-		else
-		{
+		} else {
 			PIOS_LED_Off(LED2);
 		}
 
@@ -132,81 +127,63 @@ static void systemTask(void* parameters)
 /**
  * Function called in response to object updates
  */
-static void objectUpdatedCb(UAVObjEvent* ev)
+static void objectUpdatedCb(UAVObjEvent * ev)
 {
 	ObjectPersistenceData objper;
 	UAVObjHandle obj;
 
 	// If the object updated was the ObjectPersistence execute requested action
-	if ( ev->obj == ObjectPersistenceHandle() )
-	{
+	if (ev->obj == ObjectPersistenceHandle()) {
 		// Get object data
 		ObjectPersistenceGet(&objper);
 
 		// Execute action
-		if ( objper.Operation == OBJECTPERSISTENCE_OPERATION_LOAD)
-		{
-			if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT )
-			{
+		if (objper.Operation == OBJECTPERSISTENCE_OPERATION_LOAD) {
+			if (objper.Selection == OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT) {
 				// Get selected object
 				obj = UAVObjGetByID(objper.ObjectID);
-				if ( obj == 0)
-				{
+				if (obj == 0) {
 					return;
 				}
 				// Load selected instance
 				UAVObjLoad(obj, objper.InstanceID);
-			}
-			else if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLSETTINGS || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS)
-			{
+			} else if (objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLSETTINGS
+				   || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS) {
 				UAVObjLoadSettings();
-			}
-			else if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLMETAOBJECTS || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS)
-			{
+			} else if (objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLMETAOBJECTS
+				   || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS) {
 				UAVObjLoadMetaobjects();
 			}
-		}
-		else if ( objper.Operation == OBJECTPERSISTENCE_OPERATION_SAVE)
-		{
-			if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT )
-			{
+		} else if (objper.Operation == OBJECTPERSISTENCE_OPERATION_SAVE) {
+			if (objper.Selection == OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT) {
 				// Get selected object
 				obj = UAVObjGetByID(objper.ObjectID);
-				if ( obj == 0)
-				{
+				if (obj == 0) {
 					return;
 				}
 				// Save selected instance
 				UAVObjSave(obj, objper.InstanceID);
-			}
-			else if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLSETTINGS || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS)
-			{
+			} else if (objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLSETTINGS
+				   || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS) {
 				UAVObjSaveSettings();
-			}
-			else if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLMETAOBJECTS || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS)
-			{
+			} else if (objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLMETAOBJECTS
+				   || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS) {
 				UAVObjSaveMetaobjects();
 			}
-		}
-		else if ( objper.Operation == OBJECTPERSISTENCE_OPERATION_DELETE)
-		{
-			if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT )
-			{
+		} else if (objper.Operation == OBJECTPERSISTENCE_OPERATION_DELETE) {
+			if (objper.Selection == OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT) {
 				// Get selected object
 				obj = UAVObjGetByID(objper.ObjectID);
-				if ( obj == 0)
-				{
+				if (obj == 0) {
 					return;
 				}
 				// Delete selected instance
 				UAVObjDelete(obj, objper.InstanceID);
-			}
-			else if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLSETTINGS || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS)
-			{
+			} else if (objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLSETTINGS
+				   || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS) {
 				UAVObjDeleteSettings();
-			}
-			else if ( objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLMETAOBJECTS || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS)
-			{
+			} else if (objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLMETAOBJECTS
+				   || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS) {
 				UAVObjDeleteMetaobjects();
 			}
 		}
@@ -222,14 +199,15 @@ static void updateStats()
 
 	// Get stats and update
 	SystemStatsGet(&stats);
-	stats.FlightTime = xTaskGetTickCount()*portTICK_RATE_MS;
+	stats.FlightTime = xTaskGetTickCount() * portTICK_RATE_MS;
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
 	// POSIX port of FreeRTOS doesn't have xPortGetFreeHeapSize()
 	stats.HeapRemaining = 10240;
 #else
 	stats.HeapRemaining = xPortGetFreeHeapSize();
 #endif
-	stats.CPULoad = 100 - (uint8_t)round(100.0*((float)idleCounter/(float)(SYSTEM_UPDATE_PERIOD_MS/1000))/(float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
+	stats.CPULoad =
+	    100 - (uint8_t) round(100.0 * ((float)idleCounter / (float)(SYSTEM_UPDATE_PERIOD_MS / 1000)) / (float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
 	idleCounterClear = 1;
 	SystemStatsSet(&stats);
 }
@@ -245,50 +223,34 @@ static void updateSystemAlarms()
 	SystemStatsGet(&stats);
 
 	// Check heap
-	if ( stats.HeapRemaining < HEAP_LIMIT_CRITICAL )
-	{
+	if (stats.HeapRemaining < HEAP_LIMIT_CRITICAL) {
 		AlarmsSet(SYSTEMALARMS_ALARM_OUTOFMEMORY, SYSTEMALARMS_ALARM_CRITICAL);
-	}
-	else if ( stats.HeapRemaining < HEAP_LIMIT_WARNING )
-	{
+	} else if (stats.HeapRemaining < HEAP_LIMIT_WARNING) {
 		AlarmsSet(SYSTEMALARMS_ALARM_OUTOFMEMORY, SYSTEMALARMS_ALARM_WARNING);
-	}
-	else
-	{
+	} else {
 		AlarmsClear(SYSTEMALARMS_ALARM_OUTOFMEMORY);
 	}
 
 	// Check CPU load
-	if ( stats.CPULoad > CPULOAD_LIMIT_CRITICAL )
-	{
+	if (stats.CPULoad > CPULOAD_LIMIT_CRITICAL) {
 		AlarmsSet(SYSTEMALARMS_ALARM_CPUOVERLOAD, SYSTEMALARMS_ALARM_CRITICAL);
-	}
-	else if ( stats.CPULoad > CPULOAD_LIMIT_WARNING )
-	{
+	} else if (stats.CPULoad > CPULOAD_LIMIT_WARNING) {
 		AlarmsSet(SYSTEMALARMS_ALARM_CPUOVERLOAD, SYSTEMALARMS_ALARM_WARNING);
-	}
-	else
-	{
+	} else {
 		AlarmsClear(SYSTEMALARMS_ALARM_CPUOVERLOAD);
 	}
 
 	// Check for stack overflow
-	if ( stackOverflow == 1 )
-	{
+	if (stackOverflow == 1) {
 		AlarmsSet(SYSTEMALARMS_ALARM_STACKOVERFLOW, SYSTEMALARMS_ALARM_CRITICAL);
-	}
-	else
-	{
+	} else {
 		AlarmsClear(SYSTEMALARMS_ALARM_STACKOVERFLOW);
 	}
 
 	// Check for SD card
-	if ( POIS_SDCARD_IsMounted() == 0 )
-	{
+	if (POIS_SDCARD_IsMounted() == 0) {
 		AlarmsSet(SYSTEMALARMS_ALARM_SDCARD, SYSTEMALARMS_ALARM_WARNING);
-	}
-	else
-	{
+	} else {
 		AlarmsClear(SYSTEMALARMS_ALARM_SDCARD);
 	}
 
@@ -297,12 +259,9 @@ static void updateSystemAlarms()
 	EventGetStats(&evStats);
 	UAVObjClearStats();
 	EventClearStats();
-	if ( objStats.eventErrors > 0 || evStats.eventErrors > 0 )
-	{
+	if (objStats.eventErrors > 0 || evStats.eventErrors > 0) {
 		AlarmsSet(SYSTEMALARMS_ALARM_EVENTSYSTEM, SYSTEMALARMS_ALARM_WARNING);
-	}
-	else
-	{
+	} else {
 		AlarmsClear(SYSTEMALARMS_ALARM_EVENTSYSTEM);
 	}
 }
@@ -313,12 +272,9 @@ static void updateSystemAlarms()
 void vApplicationIdleHook(void)
 {
 	// Called when the scheduler has no tasks to run
-	if (idleCounterClear == 0)
-	{
+	if (idleCounterClear == 0) {
 		++idleCounter;
-	}
-	else
-	{
+	} else {
 		idleCounter = 0;
 		idleCounterClear = 0;
 	}
@@ -327,7 +283,7 @@ void vApplicationIdleHook(void)
 /**
  * Called by the RTOS when a stack overflow is detected.
  */
-void vApplicationStackOverflowHook( xTaskHandle *pxTask, signed portCHAR *pcTaskName )
+void vApplicationStackOverflowHook(xTaskHandle * pxTask, signed portCHAR * pcTaskName)
 {
 	stackOverflow = 1;
 }

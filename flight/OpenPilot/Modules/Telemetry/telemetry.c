@@ -61,15 +61,15 @@ static TelemetrySettingsData settings;
 static uint32_t timeOfLastObjectUpdate;
 
 // Private functions
-static void telemetryTxTask(void* parameters);
-static void telemetryTxPriTask(void* parameters);
-static void telemetryRxTask(void* parameters);
-static int32_t transmitData(uint8_t* data, int32_t length);
+static void telemetryTxTask(void *parameters);
+static void telemetryTxPriTask(void *parameters);
+static void telemetryRxTask(void *parameters);
+static int32_t transmitData(uint8_t * data, int32_t length);
 static void registerObject(UAVObjHandle obj);
 static void updateObject(UAVObjHandle obj);
 static int32_t addObject(UAVObjHandle obj);
 static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs);
-static void processObjEvent(UAVObjEvent* ev);
+static void processObjEvent(UAVObjEvent * ev);
 static void updateTelemetryStats();
 static void gcsTelemetryStatsUpdated();
 static void updateSettings();
@@ -110,9 +110,9 @@ int32_t TelemetryInitialize(void)
 	TelemetrySettingsConnectQueue(priorityQueue);
 
 	// Start telemetry tasks
-	xTaskCreate(telemetryTxTask, (signed char*)"TelTx", STACK_SIZE, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
-	xTaskCreate(telemetryTxPriTask, (signed char*)"TelPriTx", STACK_SIZE, NULL, TASK_PRIORITY_TXPRI, &telemetryTxPriTaskHandle);
-	xTaskCreate(telemetryRxTask, (signed char*)"TelRx", STACK_SIZE, NULL, TASK_PRIORITY_RX, &telemetryRxTaskHandle);
+	xTaskCreate(telemetryTxTask, (signed char *)"TelTx", STACK_SIZE, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
+	xTaskCreate(telemetryTxPriTask, (signed char *)"TelPriTx", STACK_SIZE, NULL, TASK_PRIORITY_TXPRI, &telemetryTxPriTaskHandle);
+	xTaskCreate(telemetryRxTask, (signed char *)"TelRx", STACK_SIZE, NULL, TASK_PRIORITY_RX, &telemetryRxTaskHandle);
 
 	return 0;
 }
@@ -144,44 +144,34 @@ static void updateObject(UAVObjHandle obj)
 	UAVObjGetMetadata(obj, &metadata);
 
 	// Setup object depending on update mode
-	if(metadata.telemetryUpdateMode == UPDATEMODE_PERIODIC)
-	{
+	if (metadata.telemetryUpdateMode == UPDATEMODE_PERIODIC) {
 		// Set update period
 		setUpdatePeriod(obj, metadata.telemetryUpdatePeriod);
 		// Connect queue
 		eventMask = EV_UPDATED_MANUAL | EV_UPDATE_REQ;
-		if(UAVObjIsMetaobject(obj))
-		{
-			eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
+		if (UAVObjIsMetaobject(obj)) {
+			eventMask |= EV_UNPACKED;	// we also need to act on remote updates (unpack events)
 		}
 		UAVObjConnectQueue(obj, priorityQueue, eventMask);
-	}
-	else if(metadata.telemetryUpdateMode == UPDATEMODE_ONCHANGE)
-	{
+	} else if (metadata.telemetryUpdateMode == UPDATEMODE_ONCHANGE) {
 		// Set update period
 		setUpdatePeriod(obj, 0);
 		// Connect queue
 		eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
-		if(UAVObjIsMetaobject(obj))
-		{
-			eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
+		if (UAVObjIsMetaobject(obj)) {
+			eventMask |= EV_UNPACKED;	// we also need to act on remote updates (unpack events)
 		}
 		UAVObjConnectQueue(obj, priorityQueue, eventMask);
-	}
-	else if(metadata.telemetryUpdateMode == UPDATEMODE_MANUAL)
-	{
+	} else if (metadata.telemetryUpdateMode == UPDATEMODE_MANUAL) {
 		// Set update period
 		setUpdatePeriod(obj, 0);
 		// Connect queue
 		eventMask = EV_UPDATED_MANUAL | EV_UPDATE_REQ;
-		if(UAVObjIsMetaobject(obj))
-		{
-			eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
+		if (UAVObjIsMetaobject(obj)) {
+			eventMask |= EV_UNPACKED;	// we also need to act on remote updates (unpack events)
 		}
 		UAVObjConnectQueue(obj, priorityQueue, eventMask);
-	}
-	else if(metadata.telemetryUpdateMode == UPDATEMODE_NEVER)
-	{
+	} else if (metadata.telemetryUpdateMode == UPDATEMODE_NEVER) {
 		// Set update period
 		setUpdatePeriod(obj, 0);
 		// Disconnect queue
@@ -192,70 +182,54 @@ static void updateObject(UAVObjHandle obj)
 /**
  * Processes queue events
  */
-static void processObjEvent(UAVObjEvent* ev)
+static void processObjEvent(UAVObjEvent * ev)
 {
 	UAVObjMetadata metadata;
 	FlightTelemetryStatsData flightStats;
 	int32_t retries;
 	int32_t success;
 
-	if ( ev->obj == 0 )
-	{
+	if (ev->obj == 0) {
 		updateTelemetryStats();
-	}
-	else if ( ev->obj == GCSTelemetryStatsHandle() )
-	{
+	} else if (ev->obj == GCSTelemetryStatsHandle()) {
 		gcsTelemetryStatsUpdated();
-	}
-	else if ( ev->obj == TelemetrySettingsHandle() )
-	{
+	} else if (ev->obj == TelemetrySettingsHandle()) {
 		updateSettings();
-	}
-	else
-	{
+	} else {
 		// Only process event if connected to GCS or if object FlightTelemetryStats is updated
 		FlightTelemetryStatsGet(&flightStats);
-		if ( flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED || ev->obj == FlightTelemetryStatsHandle() )
-		{
+		if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED || ev->obj == FlightTelemetryStatsHandle()) {
 			// Get object metadata
 			UAVObjGetMetadata(ev->obj, &metadata);
 			// Act on event
 			retries = 0;
 			success = -1;
-			if(ev->event == EV_UPDATED || ev->event == EV_UPDATED_MANUAL)
-			{
+			if (ev->event == EV_UPDATED || ev->event == EV_UPDATED_MANUAL) {
 				// Send update to GCS (with retries)
-				while(retries < MAX_RETRIES && success == -1)
-				{
-					success = UAVTalkSendObject(ev->obj, ev->instId, metadata.telemetryAcked, REQ_TIMEOUT_MS); // call blocks until ack is received or timeout
+				while (retries < MAX_RETRIES && success == -1) {
+					success = UAVTalkSendObject(ev->obj, ev->instId, metadata.telemetryAcked, REQ_TIMEOUT_MS);	// call blocks until ack is received or timeout
 					++retries;
 				}
 				// Update stats
-				txRetries += (retries-1);
-				if ( success == -1 )
-				{
+				txRetries += (retries - 1);
+				if (success == -1) {
 					++txErrors;
 				}
-			}
-			else if(ev->event == EV_UPDATE_REQ)
-			{
+			} else if (ev->event == EV_UPDATE_REQ) {
 				// Request object update from GCS (with retries)
-				while(retries < MAX_RETRIES && success == -1)
-				{
-					success = UAVTalkSendObjectRequest(ev->obj, ev->instId, REQ_TIMEOUT_MS); // call blocks until update is received or timeout
+				while (retries < MAX_RETRIES && success == -1) {
+					success = UAVTalkSendObjectRequest(ev->obj, ev->instId, REQ_TIMEOUT_MS);	// call blocks until update is received or timeout
 					++retries;
 				}
 				// Update stats
-				txRetries += (retries-1);
-				if ( success == -1 )
-				{
+				txRetries += (retries - 1);
+				if (success == -1) {
 					++txErrors;
 				}
 			}
 			// If this is a metaobject then make necessary telemetry updates
-			if(UAVObjIsMetaobject(ev->obj))
-			{
-				updateObject(UAVObjGetLinkedObj(ev->obj)); // linked object will be the actual object the metadata are for
+			if (UAVObjIsMetaobject(ev->obj)) {
+				updateObject(UAVObjGetLinkedObj(ev->obj));	// linked object will be the actual object the metadata are for
 			}
 		}
 	}
@@ -264,16 +238,14 @@ static void processObjEvent(UAVObjEvent* ev)
 /**
  * Telemetry transmit task, regular priority
  */
-static void telemetryTxTask(void* parameters)
+static void telemetryTxTask(void *parameters)
 {
 	UAVObjEvent ev;
 
 	// Loop forever
-	while(1)
-	{
+	while (1) {
 		// Wait for queue message
-		if(xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE)
-		{
+		if (xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE) {
 			// Process event
 			processObjEvent(&ev);
 		}
@@ -283,16 +255,14 @@ static void telemetryTxTask(void* parameters)
 /**
  * Telemetry transmit task, high priority
  */
-static void telemetryTxPriTask(void* parameters)
+static void telemetryTxPriTask(void *parameters)
 {
 	UAVObjEvent ev;
 
 	// Loop forever
-	while(1)
-	{
+	while (1) {
 		// Wait for queue message
-		if(xQueueReceive(priorityQueue, &ev, portMAX_DELAY) == pdTRUE)
-		{
+		if (xQueueReceive(priorityQueue, &ev, portMAX_DELAY) == pdTRUE) {
 			// Process event
 			processObjEvent(&ev);
 		}
@@ -302,21 +272,18 @@ static void telemetryTxPriTask(void* parameters)
 /**
  * Telemetry transmit task. Processes queue events and periodic updates.
  */
-static void telemetryRxTask(void* parameters)
+static void telemetryRxTask(void *parameters)
 {
 	uint8_t inputPort;
 	int32_t len;
 
 	// Task loop
-	while (1)
-	{
+	while (1) {
 #if defined(PIOS_INCLUDE_USB_HID)
 		// Determine input port (USB takes priority over telemetry port)
-		if(PIOS_USB_HID_CheckAvailable(0))
-		{
+		if (PIOS_USB_HID_CheckAvailable(0)) {
 			inputPort = PIOS_COM_TELEM_USB;
-		}
-		else
+		} else
 #endif /* PIOS_INCLUDE_USB_HID */
 		{
 			inputPort = telemetryPort;
@@ -325,11 +292,10 @@ static void telemetryRxTask(void* parameters)
 		// Block until data are available
 		// TODO: Currently we periodically check the buffer for data, update once the PIOS_COM is made blocking
 		len = PIOS_COM_ReceiveBufferUsed(inputPort);
-		for (int32_t n = 0; n < len; ++n)
-		{
+		for (int32_t n = 0; n < len; ++n) {
 			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(inputPort));
 		}
-		vTaskDelay(5); // <- remove when blocking calls are implemented
+		vTaskDelay(5);	// <- remove when blocking calls are implemented
 
 	}
 }
@@ -340,17 +306,15 @@ static void telemetryRxTask(void* parameters)
  * \param[in] length Length of buffer
  * \return 0 Success
  */
-static int32_t transmitData(uint8_t* data, int32_t length)
+static int32_t transmitData(uint8_t * data, int32_t length)
 {
 	uint8_t outputPort;
 
 	// Determine input port (USB takes priority over telemetry port)
 #if defined(PIOS_INCLUDE_USB_HID)
-	if(PIOS_USB_HID_CheckAvailable(0))
-	{
+	if (PIOS_USB_HID_CheckAvailable(0)) {
 		outputPort = PIOS_COM_TELEM_USB;
-	}
-	else
+	} else
 #endif /* PIOS_INCLUDE_USB_HID */
 	{
 		outputPort = telemetryPort;
@@ -407,9 +371,7 @@ static void gcsTelemetryStatsUpdated()
 	GCSTelemetryStatsData gcsStats;
 	FlightTelemetryStatsGet(&flightStats);
 	GCSTelemetryStatsGet(&gcsStats);
-	if ( flightStats.Status != FLIGHTTELEMETRYSTATS_STATUS_CONNECTED ||
-		 gcsStats.Status != GCSTELEMETRYSTATS_STATUS_CONNECTED )
-	{
+	if (flightStats.Status != FLIGHTTELEMETRYSTATS_STATUS_CONNECTED || gcsStats.Status != GCSTELEMETRYSTATS_STATUS_CONNECTED) {
 		updateTelemetryStats();
 	}
 }
@@ -435,18 +397,15 @@ static void updateTelemetryStats()
 	GCSTelemetryStatsGet(&gcsStats);
 
 	// Update stats object
-	if ( flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED )
-	{
-		flightStats.RxDataRate = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS/1000.0);
-		flightStats.TxDataRate = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS/1000.0);
+	if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
+		flightStats.RxDataRate = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0);
+		flightStats.TxDataRate = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0);
 		flightStats.RxFailures += utalkStats.rxErrors;
 		flightStats.TxFailures += txErrors;
 		flightStats.TxRetries += txRetries;
 		txErrors = 0;
 		txRetries = 0;
-	}
-	else
-	{
+	} else {
 		flightStats.RxDataRate = 0;
 		flightStats.TxDataRate = 0;
 		flightStats.RxFailures = 0;
@@ -457,65 +416,44 @@ static void updateTelemetryStats()
 	}
 
 	// Check for connection timeout
-	timeNow = xTaskGetTickCount()*portTICK_RATE_MS;
-	if ( utalkStats.rxObjects > 0 )
-	{
+	timeNow = xTaskGetTickCount() * portTICK_RATE_MS;
+	if (utalkStats.rxObjects > 0) {
 		timeOfLastObjectUpdate = timeNow;
 	}
-	if ( (timeNow - timeOfLastObjectUpdate) > CONNECTION_TIMEOUT_MS )
-	{
+	if ((timeNow - timeOfLastObjectUpdate) > CONNECTION_TIMEOUT_MS) {
 		connectionTimeout = 1;
-	}
-	else
-	{
+	} else {
 		connectionTimeout = 0;
 	}
 
-    // Update connection state
+	// Update connection state
 	forceUpdate = 1;
-	if ( flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED )
-	{
+	if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED) {
 		// Wait for connection request
-		if ( gcsStats.Status == GCSTELEMETRYSTATS_STATUS_HANDSHAKEREQ  )
-		{
+		if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_HANDSHAKEREQ) {
 			flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEACK;
 		}
-	}
-	else if ( flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEACK )
-	{
+	} else if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEACK) {
 		// Wait for connection
-		if ( gcsStats.Status == GCSTELEMETRYSTATS_STATUS_CONNECTED  )
-		{
+		if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_CONNECTED) {
 			flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_CONNECTED;
-		}
-		else if ( gcsStats.Status == GCSTELEMETRYSTATS_STATUS_DISCONNECTED )
-		{
+		} else if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_DISCONNECTED) {
 			flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED;
 		}
-	}
-	else if ( flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED )
-	{
-		if ( gcsStats.Status != GCSTELEMETRYSTATS_STATUS_CONNECTED || connectionTimeout )
-		{
+	} else if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
+		if (gcsStats.Status != GCSTELEMETRYSTATS_STATUS_CONNECTED || connectionTimeout) {
 			flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED;
-		}
-		else
-		{
+		} else {
 			forceUpdate = 0;
 		}
-	}
-	else
-	{
+	} else {
 		flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED;
 	}
 
 	// Update the telemetry alarm
-	if ( flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED )
-	{
+	if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
 		AlarmsClear(SYSTEMALARMS_ALARM_TELEMETRY);
-	}
-	else
-	{
+	} else {
 		AlarmsSet(SYSTEMALARMS_ALARM_TELEMETRY, SYSTEMALARMS_ALARM_ERROR);
 	}
 
@@ -523,8 +461,7 @@ static void updateTelemetryStats()
 	FlightTelemetryStatsSet(&flightStats);
 
 	// Force telemetry update if not connected
-	if ( forceUpdate )
-	{
+	if (forceUpdate) {
 		FlightTelemetryStatsUpdated();
 	}
 }
@@ -542,13 +479,14 @@ static void updateSettings()
 	TelemetrySettingsGet(&settings);
 
 	// Set port speed
-	if (settings.Speed == TELEMETRYSETTINGS_SPEED_9600) PIOS_COM_ChangeBaud(telemetryPort, 9600);
-	else
-	if (settings.Speed == TELEMETRYSETTINGS_SPEED_38400) PIOS_COM_ChangeBaud(telemetryPort, 38400);
-	else
-	if (settings.Speed == TELEMETRYSETTINGS_SPEED_57600) PIOS_COM_ChangeBaud(telemetryPort, 57600);
-	else
-	if (settings.Speed == TELEMETRYSETTINGS_SPEED_115200) PIOS_COM_ChangeBaud(telemetryPort, 115200);
+	if (settings.Speed == TELEMETRYSETTINGS_SPEED_9600)
+		PIOS_COM_ChangeBaud(telemetryPort, 9600);
+	else if (settings.Speed == TELEMETRYSETTINGS_SPEED_38400)
+		PIOS_COM_ChangeBaud(telemetryPort, 38400);
+	else if (settings.Speed == TELEMETRYSETTINGS_SPEED_57600)
+		PIOS_COM_ChangeBaud(telemetryPort, 57600);
+	else if (settings.Speed == TELEMETRYSETTINGS_SPEED_115200)
+		PIOS_COM_ChangeBaud(telemetryPort, 115200);
 }
 
 /**

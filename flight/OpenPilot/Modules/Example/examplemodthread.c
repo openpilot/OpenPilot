@@ -45,9 +45,9 @@
 
 #include "openpilot.h"
 #include "examplemodthread.h"
-#include "exampleobject1.h" // object the module will listen for updates (input)
-#include "exampleobject2.h" // object the module will update (output)
-#include "examplesettings.h" // object holding module settings (input)
+#include "exampleobject1.h"	// object the module will listen for updates (input)
+#include "exampleobject2.h"	// object the module will update (output)
+#include "examplesettings.h"	// object holding module settings (input)
 
 // Private constants
 #define MAX_QUEUE_SIZE 20
@@ -61,7 +61,7 @@ static xQueueHandle queue;
 static xTaskHandle taskHandle;
 
 // Private functions
-static void exampleTask(void* parameters);
+static void exampleTask(void *parameters);
 
 /**
  * Initialise the module, called on startup
@@ -76,7 +76,7 @@ int32_t ExampleModThreadInitialize()
 	ExampleObject1ConnectQueue(queue);
 
 	// Start main task
-	xTaskCreate(exampleTask, (signed char*)"ExampleThread", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+	xTaskCreate(exampleTask, (signed char *)"ExampleThread", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 
 	return 0;
 }
@@ -84,7 +84,7 @@ int32_t ExampleModThreadInitialize()
 /**
  * Module thread, should not return.
  */
-static void exampleTask(void* parameters)
+static void exampleTask(void *parameters)
 {
 	UAVObjEvent ev;
 	ExampleSettingsData settings;
@@ -93,22 +93,20 @@ static void exampleTask(void* parameters)
 	int32_t step;
 
 	// Main task loop
-	while (1)
-	{
+	while (1) {
 		// Check the event queue for any object updates. In this case
 		// we are only listening for the ExampleSettings object. However
 		// the module could listen to multiple objects.
 		// Since this object only executes on object updates, the task
 		// will block until an object event is pushed in the queue.
-		while ( xQueueReceive(queue, &ev, portMAX_DELAY) != pdTRUE );
+		while (xQueueReceive(queue, &ev, portMAX_DELAY) != pdTRUE) ;
 
 		// Make sure that the object update is for ExampleObject1
 		// This is redundant in this example since we have only
 		// registered a single object in the queue, however
 		// in most practical cases there will be more than one
 		// object connected in the queue.
-		if ( ev.obj == ExampleObject1Handle() )
-		{
+		if (ev.obj == ExampleObject1Handle()) {
 			// Update settings with latest value
 			ExampleSettingsGet(&settings);
 
@@ -116,12 +114,9 @@ static void exampleTask(void* parameters)
 			ExampleObject1Get(&data1);
 
 			// Determine how to update the output object
-			if ( settings.StepDirection == EXAMPLESETTINGS_STEPDIRECTION_UP )
-			{
+			if (settings.StepDirection == EXAMPLESETTINGS_STEPDIRECTION_UP) {
 				step = settings.StepSize;
-			}
-			else
-			{
+			} else {
 				step = -settings.StepSize;
 			}
 
@@ -141,5 +136,3 @@ static void exampleTask(void* parameters)
 		}
 	}
 }
-
-

@@ -49,7 +49,7 @@
 static xTaskHandle taskHandle;
 
 // Private functions
-static void watchdogTask(void* parameters);
+static void watchdogTask(void *parameters);
 
 /**
  * Initialise the module, called on startup
@@ -58,8 +58,8 @@ static void watchdogTask(void* parameters);
 int32_t WatchdogInitialize()
 {
 	// Start main task
-	xTaskCreate(watchdogTask, (signed char*)"Watchdog", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
-  
+	xTaskCreate(watchdogTask, (signed char *)"Watchdog", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+
 	return 0;
 }
 
@@ -68,20 +68,18 @@ int32_t WatchdogInitialize()
  * 
  * Initializes the PIOS watchdog and periodically resets it
  */
-static void watchdogTask(void* parameters)
+static void watchdogTask(void *parameters)
 {
 	uint32_t delay;
 	portTickType lastSysTime;
-  
-  delay = PIOS_WDG_Init( WATCHDOG_TIMEOUT ) / portTICK_RATE_MS;
-  
+
+	delay = PIOS_WDG_Init(WATCHDOG_TIMEOUT) / portTICK_RATE_MS;
+
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
-	while (1)
-	{
-    PIOS_WDG_Clear();
-    
-		vTaskDelayUntil(&lastSysTime, delay );
+	while (1) {
+		PIOS_WDG_Clear();
+
+		vTaskDelayUntil(&lastSysTime, delay);
 	}
 }
-

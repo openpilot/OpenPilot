@@ -29,6 +29,7 @@
 #define GCSControlGADGET_H_
 
 #include <coreplugin/iuavgadget.h>
+#include <uavobjects/manualcontrolcommand.h>
 
 namespace Core {
 class IUAVGadget;
@@ -51,9 +52,20 @@ public:
     QString contextHelpId() const { return QString(); }
 
     void loadConfiguration(IUAVGadgetConfiguration* config);
+
 private:
-        QWidget *m_widget;
-	QList<int> m_context;
+    ManualControlCommand* getManualControlCommand();
+
+    QWidget *m_widget;
+    QList<int> m_context;
+    UAVObject::Metadata mccInitialData;
+
+signals:
+    void sticksChangedRemotely(double leftX, double leftY, double rightX, double rightY);
+
+protected slots:
+    void manualControlCommandUpdated(UAVObject *);
+    void sticksChangedLocally(double leftX, double leftY, double rightX, double rightY);
 };
 
 

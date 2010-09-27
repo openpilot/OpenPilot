@@ -39,19 +39,29 @@ class GCSControlGadgetWidget : public QLabel
 
 public:
     GCSControlGadgetWidget(QWidget *parent = 0);
-   ~GCSControlGadgetWidget();
+    ~GCSControlGadgetWidget();
 
-private slots:
-   void gcsControlToggle(int state);
-   void flightModeChanged(int state);
+signals:
+    void sticksChanged(double leftX, double leftY, double rightX, double rightY);
+
+public slots:
+    // signals from parent gadget indicating change from flight
+    void updateSticks(double leftX, double leftY, double rightX, double rightY);
+
+    // signals from children widgets indicating a local change
+    void leftStickClicked(double X, double Y);
+    void rightStickClicked(double X, double Y);
 
 protected slots:
-    void mccChanged(UAVObject*);
+    void toggleControl(int state);
+    void toggleArmed(int state);
+    void selectFlightMode(int state);
+    void mccChanged(UAVObject *);
 
 private:
-       Ui_GCSControl *m_gcscontrol;
-       ManualControlCommand* getMCC();
-       UAVObject::Metadata mccInitialData;
+    Ui_GCSControl *m_gcscontrol;
+    UAVObject::Metadata mccInitialData;
+    double leftX,leftY,rightX,rightY;
 };
 
 #endif /* GCSControlGADGETWIDGET_H_ */

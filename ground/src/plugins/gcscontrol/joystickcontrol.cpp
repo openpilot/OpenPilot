@@ -48,10 +48,6 @@ JoystickControl::JoystickControl(QWidget *parent) :
     setScene(new QGraphicsScene(this));
     setRenderHints(QPainter::Antialiasing);
 
-    // Connect object updated event from UAVObject to also animate sticks
-    connect(getMCC(), SIGNAL(objectUpdated(UAVObject*)), this, SLOT(mccChanged(UAVObject*)));
-
-
     m_renderer = new QSvgRenderer();
     bool test = m_renderer->load(QString(":/gcscontrol/images/joystick.svg"));
     Q_ASSERT( test );
@@ -78,58 +74,37 @@ JoystickControl::~JoystickControl()
 }
 
 /**
-  * @brief Draw stick positions when ManualControlCommand gets updated
+  * @brief Update the displayed position based on an MCC update
   */
-void JoystickControl::mccChanged(UAVObject*)
+void JoystickControl::changePosition(double X, double Y)
 {
-    QPen pen;
-    pen.setColor(QColor(Qt::white));
-    pen.setWidth(2);
-
-    // draw stick positions
-    if( this->objectName() == QString("widgetLeftStick"))
-    {
-        ManualControlCommand::DataFields data = getMCC()->getData();
-        double x = (data.Yaw + 1) / 2 * scene()->sceneRect().width();
-        double y = (data.Pitch + 1) / 2 * scene()->sceneRect().height();
-        m_joystickEnd->setPos(x-m_joystickEnd->boundingRect().width()/2,y-m_joystickEnd->boundingRect().height()/2);
-    }
-    else if( this->objectName() == QString("widgetRightStick"))
-    {
-        ManualControlCommand::DataFields data = getMCC()->getData();
-        double x = (data.Roll + 1) / 2 * scene()->sceneRect().width();
-        double y = data.Throttle * scene()->sceneRect().height();
-        m_joystickEnd->setPos(x-m_joystickEnd->boundingRect().width()/2,scene()->sceneRect().height()-y - 200/scene()->sceneRect().height());
-    }
+    QRectF sceneSize = scene()->sceneRect();
+    m_joystickEnd->setPos((X+1)/2*sceneSize.width(),(-Y+1)/2*sceneSize.height());
 }
 
 /**
-  * @brief Get the Manual Control Command UAV Object
-  */
-ManualControlCommand* JoystickControl::getMCC()
-{
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    ManualControlCommand* obj = dynamic_cast<ManualControlCommand*>( objManager->getObject(QString("ManualControlCommand")) );
-    return obj;
-}
-
-/**
-  * @brief Redirect mouse move events to control joystick position
+  * @brief Redirect mouse move events to control position
   */
 void JoystickControl::mouseMoveEvent(QMouseEvent *event)
 {
-    updateMCC(mapToScene(event->pos()));
+    QPointF point = mapToScene(event->pos());
+    QRectF sceneSize = scene()->sceneRect();
+
+    double Y = - (point.y() / sceneSize.height() - .5) * 2;
+    double X = (point.x() / sceneSize.width() - .5) * 2;
+    emit positionClicked(X, Y);
 }
 
 /**
-  * @brief Redirect mouse move clicks to control joystick position
+  * @brief Redirect mouse move clicks to control position
   */
 void JoystickControl::mousePressEvent(QMouseEvent *event)
 {
-    if( event->button() == Qt::LeftButton )
-        updateMCC(mapToScene(event->pos()));
+    if( event->button() == Qt::LeftButton ) {
+        mouseMoveEvent(event);
+    }
 }
+
 
 void JoystickControl::paint()
 {
@@ -140,8 +115,7 @@ void JoystickControl::paintEvent(QPaintEvent *event)
 {
     // Skip painting until the dial file is loaded
     if (! m_renderer->isValid()) {
-        qDebug()<<"Dial file not loaded, not rendering";
-//        return;
+        qDebug()<<"Image file not loaded, not rendering";
     }
 
     QGraphicsView::paintEvent(event);
@@ -149,40 +123,10 @@ void JoystickControl::paintEvent(QPaintEvent *event)
 
 void JoystickControl::resizeEvent(QResizeEvent *event)
 {
-    fitInView(m_background, Qt::KeepAspectRatio );
+    Q_UNUSED(event);
+    fitInView(m_background, Qt::IgnoreAspectRatio );
 }
 
-/**
-  * @brief Update the roll,pitch,yaw,throttle for the Manual Control Command based on stick position (from mouse event)
-  */
-void JoystickControl::updateMCC(QPointF point)
-{
-    QRectF sceneSize = scene()->sceneRect();
-
-    double x = 2 * ( point.x() / sceneSize.width() - .5 );
-    x = qBound( (double) -1, x, (double) 1);
-    if( this->objectName() == QString("widgetLeftStick"))
-    {
-        double y = 2 * ( point.y() / sceneSize.height() - .5);
-        y = qBound( (double) -1, y, (double) 1);
-
-        ManualControlCommand::DataFields data = getMCC()->getData();
-        data.Pitch = y;
-        data.Yaw = x;
-        getMCC()->setData(data);
-    }
-
-    if( this->objectName() == QString("widgetRightStick"))
-    {
-        double y = 1-( point.y() / sceneSize.height());
-        y = qBound( (double) 0, y, (double) 1);
-
-        ManualControlCommand::DataFields data = getMCC()->getData();
-        data.Throttle = y;
-        data.Roll = x;
-        getMCC()->setData(data);
-    }
-}
 
 /**
   * @}

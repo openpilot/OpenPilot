@@ -54,11 +54,11 @@ protected:
      void paintEvent(QPaintEvent *event);
      void resizeEvent(QResizeEvent *event);
 
-     void updateMCC(QPointF);
-     ManualControlCommand* getMCC();
+public slots:
+     void changePosition (double X, double Y);
 
- protected slots:
-     void mccChanged(UAVObject*);
+signals:
+    void positionClicked(double X, double Y);
 
 private:
      QSvgRenderer *m_renderer;

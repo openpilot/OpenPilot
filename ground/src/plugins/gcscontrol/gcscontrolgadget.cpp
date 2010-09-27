@@ -30,11 +30,17 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavobject.h"
+#include <QDebug>
 
 GCSControlGadget::GCSControlGadget(QString classId, GCSControlGadgetWidget *widget, QWidget *parent) :
         IUAVGadget(classId, parent),
         m_widget(widget)
 {
+    connect(getManualControlCommand(),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(manualControlCommandUpdated(UAVObject*)));
+    connect(widget,SIGNAL(sticksChanged(double,double,double,double)),this,SLOT(sticksChangedLocally(double,double,double,double)));
+    connect(this,SIGNAL(sticksChangedRemotely(double,double,double,double)),widget,SLOT(updateSticks(double,double,double,double)));
+
+    manualControlCommandUpdated(getManualControlCommand());
 }
 
 GCSControlGadget::~GCSControlGadget()
@@ -48,4 +54,27 @@ void GCSControlGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(QString("ManualControlCommand")) );
+}
+
+ManualControlCommand* GCSControlGadget::getManualControlCommand() {
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    return dynamic_cast<ManualControlCommand*>( objManager->getObject(QString("ManualControlCommand")) );
+}
+
+void GCSControlGadget::manualControlCommandUpdated(UAVObject * obj) {
+    double roll = obj->getField("Roll")->getDouble();
+    double pitch = obj->getField("Pitch")->getDouble();
+    double yaw = obj->getField("Yaw")->getDouble();
+    double throttle = obj->getField("Throttle")->getDouble();
+    emit sticksChangedRemotely(yaw,-pitch,roll,throttle);
+}
+
+void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double rightX, double rightY) {
+    ManualControlCommand * obj = getManualControlCommand();
+    obj->getField("Roll")->setDouble(rightX);
+    obj->getField("Pitch")->setDouble(-leftY);
+    obj->getField("Yaw")->setDouble(leftX);
+    obj->getField("Throttle")->setDouble(rightY);
+    obj->updated();
 }

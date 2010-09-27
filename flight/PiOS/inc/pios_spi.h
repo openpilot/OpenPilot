@@ -48,8 +48,8 @@ extern int32_t PIOS_SPI_Init(void);
 extern int32_t PIOS_SPI_SetClockSpeed(uint8_t spi, SPIPrescalerTypeDef spi_prescaler);
 extern int32_t PIOS_SPI_RC_PinSet(uint8_t spi, uint8_t pin_value);
 extern int32_t PIOS_SPI_TransferByte(uint8_t spi, uint8_t b);
-extern int32_t PIOS_SPI_TransferBlock(uint8_t spi, const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len, void *callback);
-extern void    PIOS_SPI_IRQ_Handler(uint8_t spi);
+extern int32_t PIOS_SPI_TransferBlock(uint8_t spi, const uint8_t * send_buffer, uint8_t * receive_buffer, uint16_t len, void *callback);
+extern void PIOS_SPI_IRQ_Handler(uint8_t spi);
 
 #endif /* PIOS_SPI_H */
 

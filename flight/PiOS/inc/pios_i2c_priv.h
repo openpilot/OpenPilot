@@ -32,70 +32,70 @@
 #include <stdbool.h>
 
 struct pios_i2c_adapter_cfg {
-  I2C_TypeDef           * regs;
-  I2C_InitTypeDef         init;
+	I2C_TypeDef *regs;
+	I2C_InitTypeDef init;
 
-  uint32_t                transfer_timeout_ms;
-  struct stm32_gpio       scl;
-  struct stm32_gpio       sda;
-  struct stm32_irq        event;
-  struct stm32_irq        error;
+	uint32_t transfer_timeout_ms;
+	struct stm32_gpio scl;
+	struct stm32_gpio sda;
+	struct stm32_irq event;
+	struct stm32_irq error;
 };
 
 enum i2c_adapter_state {
-  I2C_STATE_FSM_FAULT = 0, /* Must be zero so undefined transitions land here */
+	I2C_STATE_FSM_FAULT = 0,	/* Must be zero so undefined transitions land here */
 
-  I2C_STATE_BUS_ERROR,
+	I2C_STATE_BUS_ERROR,
 
-  I2C_STATE_STOPPED,
-  I2C_STATE_STOPPING,
-  I2C_STATE_STARTING,
+	I2C_STATE_STOPPED,
+	I2C_STATE_STOPPING,
+	I2C_STATE_STARTING,
 
-  I2C_STATE_R_MORE_TXN_ADDR,
-  I2C_STATE_R_MORE_TXN_PRE_ONE,
-  I2C_STATE_R_MORE_TXN_PRE_FIRST,
-  I2C_STATE_R_MORE_TXN_PRE_MIDDLE,
-  I2C_STATE_R_MORE_TXN_PRE_LAST,
-  I2C_STATE_R_MORE_TXN_POST_LAST,
+	I2C_STATE_R_MORE_TXN_ADDR,
+	I2C_STATE_R_MORE_TXN_PRE_ONE,
+	I2C_STATE_R_MORE_TXN_PRE_FIRST,
+	I2C_STATE_R_MORE_TXN_PRE_MIDDLE,
+	I2C_STATE_R_MORE_TXN_PRE_LAST,
+	I2C_STATE_R_MORE_TXN_POST_LAST,
 
-  I2C_STATE_R_LAST_TXN_ADDR,
-  I2C_STATE_R_LAST_TXN_PRE_ONE,
-  I2C_STATE_R_LAST_TXN_PRE_FIRST,
-  I2C_STATE_R_LAST_TXN_PRE_MIDDLE,
-  I2C_STATE_R_LAST_TXN_PRE_LAST,
-  I2C_STATE_R_LAST_TXN_POST_LAST,
+	I2C_STATE_R_LAST_TXN_ADDR,
+	I2C_STATE_R_LAST_TXN_PRE_ONE,
+	I2C_STATE_R_LAST_TXN_PRE_FIRST,
+	I2C_STATE_R_LAST_TXN_PRE_MIDDLE,
+	I2C_STATE_R_LAST_TXN_PRE_LAST,
+	I2C_STATE_R_LAST_TXN_POST_LAST,
 
-  I2C_STATE_W_MORE_TXN_ADDR,
-  I2C_STATE_W_MORE_TXN_MIDDLE,
-  I2C_STATE_W_MORE_TXN_LAST,
+	I2C_STATE_W_MORE_TXN_ADDR,
+	I2C_STATE_W_MORE_TXN_MIDDLE,
+	I2C_STATE_W_MORE_TXN_LAST,
 
-  I2C_STATE_W_LAST_TXN_ADDR,
-  I2C_STATE_W_LAST_TXN_MIDDLE,
-  I2C_STATE_W_LAST_TXN_LAST,
+	I2C_STATE_W_LAST_TXN_ADDR,
+	I2C_STATE_W_LAST_TXN_MIDDLE,
+	I2C_STATE_W_LAST_TXN_LAST,
 
-  I2C_STATE_NUM_STATES	/* Must be last */
+	I2C_STATE_NUM_STATES	/* Must be last */
 };
 
 struct pios_i2c_adapter {
-  const struct pios_i2c_adapter_cfg * const cfg;
-  void                                (*callback)(uint8_t, uint8_t);
+	const struct pios_i2c_adapter_cfg *const cfg;
+	void (*callback) (uint8_t, uint8_t);
 #ifdef PIOS_INCLUDE_FREERTOS
-  xSemaphoreHandle                    sem_busy;
-  xSemaphoreHandle                    sem_ready;
+	xSemaphoreHandle sem_busy;
+	xSemaphoreHandle sem_ready;
 #endif
 
-  bool                                bus_error;
+	bool bus_error;
 
-  volatile enum i2c_adapter_state     curr_state;
-  const struct pios_i2c_txn         * first_txn;
-  const struct pios_i2c_txn         * active_txn;
-  const struct pios_i2c_txn         * last_txn;
+	volatile enum i2c_adapter_state curr_state;
+	const struct pios_i2c_txn *first_txn;
+	const struct pios_i2c_txn *active_txn;
+	const struct pios_i2c_txn *last_txn;
 
-  uint8_t                           * active_byte;
-  uint8_t                           * last_byte;
+	uint8_t *active_byte;
+	uint8_t *last_byte;
 };
 
 extern struct pios_i2c_adapter pios_i2c_adapters[];
-extern uint8_t                 pios_i2c_num_adapters;
+extern uint8_t pios_i2c_num_adapters;
 
 #endif /* PIOS_I2C_PRIV_H */

@@ -19,15 +19,14 @@
 
 /* Includes ------------------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
-typedef enum _HID_REQUESTS
-{
-  GET_REPORT = 1,
-  GET_IDLE,
-  GET_PROTOCOL,
+typedef enum _HID_REQUESTS {
+	GET_REPORT = 1,
+	GET_IDLE,
+	GET_PROTOCOL,
 
-  SET_REPORT = 9,
-  SET_IDLE,
-  SET_PROTOCOL
+	SET_REPORT = 9,
+	SET_IDLE,
+	SET_PROTOCOL
 } HID_REQUESTS;
 
 /* Exported constants --------------------------------------------------------*/
@@ -36,13 +35,13 @@ typedef enum _HID_REQUESTS
 void PIOS_HID_init(void);
 void PIOS_HID_Reset(void);
 void PIOS_HID_SetConfiguration(void);
-void PIOS_HID_SetDeviceAddress (void);
-void PIOS_HID_Status_In (void);
-void PIOS_HID_Status_Out (void);
+void PIOS_HID_SetDeviceAddress(void);
+void PIOS_HID_Status_In(void);
+void PIOS_HID_Status_Out(void);
 RESULT PIOS_HID_Data_Setup(uint8_t);
 RESULT PIOS_HID_NoData_Setup(uint8_t);
 RESULT PIOS_HID_Get_Interface_Setting(uint8_t Interface, uint8_t AlternateSetting);
-uint8_t *PIOS_HID_GetDeviceDescriptor(uint16_t );
+uint8_t *PIOS_HID_GetDeviceDescriptor(uint16_t);
 uint8_t *PIOS_HID_GetConfigDescriptor(uint16_t);
 uint8_t *PIOS_HID_GetStringDescriptor(uint16_t);
 RESULT PIOS_HID_SetProtocol(void);
@@ -50,7 +49,6 @@ uint8_t *PIOS_HID_GetProtocolValue(uint16_t Length);
 RESULT PIOS_HID_SetProtocol(void);
 uint8_t *PIOS_HID_GetReportDescriptor(uint16_t Length);
 uint8_t *PIOS_HID_GetHIDDescriptor(uint16_t Length);
-
 
 /* Exported define -----------------------------------------------------------*/
 #define PIOS_HID_GetConfiguration          NOP_Process

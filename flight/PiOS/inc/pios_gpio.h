@@ -31,7 +31,6 @@
 #ifndef PIOS_GPIO_H
 #define PIOS_GPIO_H
 
-
 /* Public Functions */
 extern void PIOS_GPIO_Init(void);
 extern void PIOS_GPIO_Enable(uint8_t Pin);

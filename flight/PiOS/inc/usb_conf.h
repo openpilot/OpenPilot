@@ -110,22 +110,22 @@
 /* Uncomment the define to enable the selected interrupt */
 //#define INTR_MODEMISMATCH
 #define INTR_SOFINTR
-#define INTR_RXSTSQLVL           /* Mandatory */
+#define INTR_RXSTSQLVL		/* Mandatory */
 //#define INTR_NPTXFEMPTY
 //#define INTR_GINNAKEFF
 //#define INTR_GOUTNAKEFF
 //#define INTR_ERLYSUSPEND
-#define INTR_USBSUSPEND          /* Mandatory */
-#define INTR_USBRESET            /* Mandatory */
-#define INTR_ENUMDONE            /* Mandatory */
+#define INTR_USBSUSPEND		/* Mandatory */
+#define INTR_USBRESET		/* Mandatory */
+#define INTR_ENUMDONE		/* Mandatory */
 //#define INTR_ISOOUTDROP
 //#define INTR_EOPFRAME
 //#define INTR_EPMISMATCH
-#define INTR_INEPINTR            /* Mandatory */
-#define INTR_OUTEPINTR           /* Mandatory */
+#define INTR_INEPINTR		/* Mandatory */
+#define INTR_OUTEPINTR		/* Mandatory */
 //#define INTR_INCOMPLISOIN
 //#define INTR_INCOMPLISOOUT
-#define INTR_WKUPINTR            /* Mandatory */
+#define INTR_WKUPINTR		/* Mandatory */
 
 /* OTGD-FS-DEVICE IP interrupts subroutines */
 /* Comment the define to enable the selected interrupt subroutine and replace it
@@ -151,7 +151,7 @@
 #define  INTR_WKUPINTR_Callback          NOP_Process
 
 /* Isochronous data update */
-#define  INTR_RXSTSQLVL_ISODU_Callback   NOP_Process  
+#define  INTR_RXSTSQLVL_ISODU_Callback   NOP_Process
 
 /* Isochronous transfer parameters */
 /* Size of a single Isochronous buffer (size of a single transfer) */
@@ -160,7 +160,6 @@
 #define NUM_SUB_BUFFERS                  2
 
 #endif /* STM32F10X_CL */
-
 
 /* CTR service routines */
 /* associated to defined endpoints */
@@ -183,4 +182,3 @@
 #endif /*__USB_CONF_H*/
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
-

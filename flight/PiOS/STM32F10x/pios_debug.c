@@ -28,12 +28,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 /* Project Includes */
 #include "pios.h"
 
 // Global variables
-const char* PIOS_DEBUG_AssertMsg = "ASSERT FAILED";
+const char *PIOS_DEBUG_AssertMsg = "ASSERT FAILED";
 
 /* Private Function Prototypes */
 
@@ -66,7 +65,7 @@ void PIOS_DEBUG_Init(void)
 void PIOS_DEBUG_PinHigh(uint8_t Pin)
 {
 #ifdef PIOS_ENABLE_DEBUG_PINS
-	if(Pin < 4) {
+	if (Pin < 4) {
 		PIOS_SERVO_GPIO_PORT_1TO4->BSRR = (PIOS_SERVO_GPIO_PIN_1 << Pin);
 	} else if (Pin <= 7) {
 		PIOS_SERVO_GPIO_PORT_5TO8->BSRR = (PIOS_SERVO_GPIO_PIN_5 << (Pin - 4));
@@ -81,9 +80,9 @@ void PIOS_DEBUG_PinHigh(uint8_t Pin)
 void PIOS_DEBUG_PinLow(uint8_t Pin)
 {
 #ifdef PIOS_ENABLE_DEBUG_PINS
-	if(Pin < 4) {
+	if (Pin < 4) {
 		PIOS_SERVO_GPIO_PORT_1TO4->BRR = (PIOS_SERVO_GPIO_PIN_1 << Pin);
-	} else if(Pin <= 7) {
+	} else if (Pin <= 7) {
 		PIOS_SERVO_GPIO_PORT_5TO8->BRR = (PIOS_SERVO_GPIO_PIN_5 << (Pin - 4));
 	}
 #endif // PIOS_ENABLE_DEBUG_PINS
@@ -92,15 +91,15 @@ void PIOS_DEBUG_PinLow(uint8_t Pin)
 /**
  * Report a serious error and halt
  */
-void PIOS_DEBUG_Panic(const char* msg)
+void PIOS_DEBUG_Panic(const char *msg)
 {
 #ifdef PIOS_COM_DEBUG
-	register int *lr asm ("lr");	// Link-register holds the PC of the caller
+	register int *lr asm("lr");	// Link-register holds the PC of the caller
 	PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, "\r%s @0x%x\r", msg, lr);
 #endif
 
 	// Stay put
-	while(1);
+	while (1) ;
 }
 
 /**

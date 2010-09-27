@@ -34,71 +34,67 @@ __IO uint8_t EXTI_Enable;
 /*  Structures initializations */
 /* -------------------------------------------------------------------------- */
 
-DEVICE Device_Table =
-  {
-    EP_NUM,
-    1
-  };
+DEVICE Device_Table = {
+	EP_NUM,
+	1
+};
 
-DEVICE_PROP Device_Property =
-  {
-    PIOS_HID_init,
-    PIOS_HID_Reset,
-    PIOS_HID_Status_In,
-    PIOS_HID_Status_Out,
-    PIOS_HID_Data_Setup,
-    PIOS_HID_NoData_Setup,
-    PIOS_HID_Get_Interface_Setting,
-    PIOS_HID_GetDeviceDescriptor,
-    PIOS_HID_GetConfigDescriptor,
-    PIOS_HID_GetStringDescriptor,
-    0,
-    0x40 /*MAX PACKET SIZE*/
-  };
-USER_STANDARD_REQUESTS User_Standard_Requests =
-  {
-    PIOS_HID_GetConfiguration,
-    PIOS_HID_SetConfiguration,
-    PIOS_HID_GetInterface,
-    PIOS_HID_SetInterface,
-    PIOS_HID_GetStatus,
-    PIOS_HID_ClearFeature,
-    PIOS_HID_SetEndPointFeature,
-    PIOS_HID_SetDeviceFeature,
-    PIOS_HID_SetDeviceAddress
-  };
+DEVICE_PROP Device_Property = {
+	PIOS_HID_init,
+	PIOS_HID_Reset,
+	PIOS_HID_Status_In,
+	PIOS_HID_Status_Out,
+	PIOS_HID_Data_Setup,
+	PIOS_HID_NoData_Setup,
+	PIOS_HID_Get_Interface_Setting,
+	PIOS_HID_GetDeviceDescriptor,
+	PIOS_HID_GetConfigDescriptor,
+	PIOS_HID_GetStringDescriptor,
+	0,
+	0x40			/*MAX PACKET SIZE */
+};
 
-ONE_DESCRIPTOR Device_Descriptor =
-  {
-    (uint8_t*)PIOS_HID_DeviceDescriptor,
-    PIOS_HID_SIZ_DEVICE_DESC
-  };
+USER_STANDARD_REQUESTS User_Standard_Requests = {
+	PIOS_HID_GetConfiguration,
+	PIOS_HID_SetConfiguration,
+	PIOS_HID_GetInterface,
+	PIOS_HID_SetInterface,
+	PIOS_HID_GetStatus,
+	PIOS_HID_ClearFeature,
+	PIOS_HID_SetEndPointFeature,
+	PIOS_HID_SetDeviceFeature,
+	PIOS_HID_SetDeviceAddress
+};
 
-ONE_DESCRIPTOR Config_Descriptor =
-  {
-    (uint8_t*)PIOS_HID_ConfigDescriptor,
-    PIOS_HID_SIZ_CONFIG_DESC
-  };
+ONE_DESCRIPTOR Device_Descriptor = {
+	(uint8_t *) PIOS_HID_DeviceDescriptor,
+	PIOS_HID_SIZ_DEVICE_DESC
+};
 
-ONE_DESCRIPTOR PIOS_HID_Report_Descriptor =
-  {
-    (uint8_t *)PIOS_HID_ReportDescriptor,
-    PIOS_HID_SIZ_REPORT_DESC
-  };
+ONE_DESCRIPTOR Config_Descriptor = {
+	(uint8_t *) PIOS_HID_ConfigDescriptor,
+	PIOS_HID_SIZ_CONFIG_DESC
+};
 
-ONE_DESCRIPTOR PIOS_HID_Hid_Descriptor =
-  {
-    (uint8_t*)PIOS_HID_ConfigDescriptor + PIOS_HID_OFF_HID_DESC,
-    PIOS_HID_SIZ_HID_DESC
-  };
+ONE_DESCRIPTOR PIOS_HID_Report_Descriptor = {
+	(uint8_t *) PIOS_HID_ReportDescriptor,
+	PIOS_HID_SIZ_REPORT_DESC
+};
 
-ONE_DESCRIPTOR String_Descriptor[4] =
-  {
-    {(uint8_t*)PIOS_HID_StringLangID, PIOS_HID_SIZ_STRING_LANGID},
-    {(uint8_t*)PIOS_HID_StringVendor, PIOS_HID_SIZ_STRING_VENDOR},
-    {(uint8_t*)PIOS_HID_StringProduct, PIOS_HID_SIZ_STRING_PRODUCT},
-    {(uint8_t*)PIOS_HID_StringSerial, PIOS_HID_SIZ_STRING_SERIAL}
-  };
+ONE_DESCRIPTOR PIOS_HID_Hid_Descriptor = {
+	(uint8_t *) PIOS_HID_ConfigDescriptor + PIOS_HID_OFF_HID_DESC,
+	PIOS_HID_SIZ_HID_DESC
+};
+
+ONE_DESCRIPTOR String_Descriptor[4] = {
+	{(uint8_t *) PIOS_HID_StringLangID, PIOS_HID_SIZ_STRING_LANGID}
+	,
+	{(uint8_t *) PIOS_HID_StringVendor, PIOS_HID_SIZ_STRING_VENDOR}
+	,
+	{(uint8_t *) PIOS_HID_StringProduct, PIOS_HID_SIZ_STRING_PRODUCT}
+	,
+	{(uint8_t *) PIOS_HID_StringSerial, PIOS_HID_SIZ_STRING_SERIAL}
+};
 
 /* Extern variables ----------------------------------------------------------*/
 /* Private function prototypes -----------------------------------------------*/
@@ -114,18 +110,18 @@ ONE_DESCRIPTOR String_Descriptor[4] =
 *******************************************************************************/
 void PIOS_HID_init(void)
 {
-  /* Update the serial number string descriptor with the data from the unique 
-  ID*/
-  //Get_SerialNum();
-    
-  pInformation->Current_Configuration = 0;
-  /* Connect the device */
-  PowerOn();
+	/* Update the serial number string descriptor with the data from the unique 
+	   ID */
+	//Get_SerialNum();
 
-  /* Perform basic device initialization operations */
-  USB_SIL_Init();
+	pInformation->Current_Configuration = 0;
+	/* Connect the device */
+	PowerOn();
 
-  bDeviceState = UNCONNECTED;
+	/* Perform basic device initialization operations */
+	USB_SIL_Init();
+
+	bDeviceState = UNCONNECTED;
 }
 
 /*******************************************************************************
@@ -137,48 +133,49 @@ void PIOS_HID_init(void)
 *******************************************************************************/
 void PIOS_HID_Reset(void)
 {
-  /* Set Joystick_DEVICE as not configured */
-  pInformation->Current_Configuration = 0;
-  pInformation->Current_Interface = 0;/*the default Interface*/
-  
-  /* Current Feature initialization */
-  pInformation->Current_Feature = PIOS_HID_ConfigDescriptor[7];
-  
-#ifdef STM32F10X_CL   
-  /* EP0 is already configured in DFU_Init() by USB_SIL_Init() function */
-  
-  /* Init EP1 IN as Interrupt endpoint */
-  OTG_DEV_EP_Init(EP1_IN, OTG_DEV_EP_TYPE_INT, 2);
-  
-  /* Init EP1 OUT as Interrupt endpoint */
-  OTG_DEV_EP_Init(EP1_OUT, OTG_DEV_EP_TYPE_INT, 2);
-#else 
-  SetBTABLE(BTABLE_ADDRESS);
+	/* Set Joystick_DEVICE as not configured */
+	pInformation->Current_Configuration = 0;
+	pInformation->Current_Interface = 0;	/*the default Interface */
 
-  /* Initialize Endpoint 0 */
-  SetEPType(ENDP0, EP_CONTROL);
-  SetEPTxStatus(ENDP0, EP_TX_STALL);
-  SetEPRxAddr(ENDP0, ENDP0_RXADDR);
-  SetEPTxAddr(ENDP0, ENDP0_TXADDR);
-  Clear_Status_Out(ENDP0);
-  SetEPRxCount(ENDP0, Device_Property.MaxPacketSize);
-  SetEPRxValid(ENDP0);
+	/* Current Feature initialization */
+	pInformation->Current_Feature = PIOS_HID_ConfigDescriptor[7];
 
-  /* Initialize Endpoint 1 */
-  SetEPType(ENDP1, EP_INTERRUPT);
-  SetEPTxAddr(ENDP1, ENDP1_TXADDR);
-  SetEPRxAddr(ENDP1, ENDP1_RXADDR);
-  SetEPTxCount(ENDP1, PIOS_USB_HID_DATA_LENGTH+2);  /* add two for indicating report id and valid data length */
-  SetEPRxCount(ENDP1, PIOS_USB_HID_DATA_LENGTH+2);
-  SetEPRxStatus(ENDP1, EP_RX_VALID);
-  SetEPTxStatus(ENDP1, EP_TX_NAK);
+#ifdef STM32F10X_CL
+	/* EP0 is already configured in DFU_Init() by USB_SIL_Init() function */
 
-  /* Set this device to response on default address */
-  SetDeviceAddress(0);
+	/* Init EP1 IN as Interrupt endpoint */
+	OTG_DEV_EP_Init(EP1_IN, OTG_DEV_EP_TYPE_INT, 2);
+
+	/* Init EP1 OUT as Interrupt endpoint */
+	OTG_DEV_EP_Init(EP1_OUT, OTG_DEV_EP_TYPE_INT, 2);
+#else
+	SetBTABLE(BTABLE_ADDRESS);
+
+	/* Initialize Endpoint 0 */
+	SetEPType(ENDP0, EP_CONTROL);
+	SetEPTxStatus(ENDP0, EP_TX_STALL);
+	SetEPRxAddr(ENDP0, ENDP0_RXADDR);
+	SetEPTxAddr(ENDP0, ENDP0_TXADDR);
+	Clear_Status_Out(ENDP0);
+	SetEPRxCount(ENDP0, Device_Property.MaxPacketSize);
+	SetEPRxValid(ENDP0);
+
+	/* Initialize Endpoint 1 */
+	SetEPType(ENDP1, EP_INTERRUPT);
+	SetEPTxAddr(ENDP1, ENDP1_TXADDR);
+	SetEPRxAddr(ENDP1, ENDP1_RXADDR);
+	SetEPTxCount(ENDP1, PIOS_USB_HID_DATA_LENGTH + 2);	/* add two for indicating report id and valid data length */
+	SetEPRxCount(ENDP1, PIOS_USB_HID_DATA_LENGTH + 2);
+	SetEPRxStatus(ENDP1, EP_RX_VALID);
+	SetEPTxStatus(ENDP1, EP_TX_NAK);
+
+	/* Set this device to response on default address */
+	SetDeviceAddress(0);
 #endif /* STM32F10X_CL */
 
-  bDeviceState = ATTACHED;
+	bDeviceState = ATTACHED;
 }
+
 /*******************************************************************************
 * Function Name  : PIOS_HID_SetConfiguration.
 * Description    : Udpade the device state to configured and command the ADC 
@@ -189,15 +186,15 @@ void PIOS_HID_Reset(void)
 *******************************************************************************/
 void PIOS_HID_SetConfiguration(void)
 {
-  if (pInformation->Current_Configuration != 0)
-  {
-    /* Device configured */
-    bDeviceState = CONFIGURED;
-  }
+	if (pInformation->Current_Configuration != 0) {
+		/* Device configured */
+		bDeviceState = CONFIGURED;
+	}
 
-  /* Enable transfers */
-  PIOS_USB_HID_ChangeConnectionState(pInformation->Current_Configuration != 0);
+	/* Enable transfers */
+	PIOS_USB_HID_ChangeConnectionState(pInformation->Current_Configuration != 0);
 }
+
 /*******************************************************************************
 * Function Name  : PIOS_HID_SetConfiguration.
 * Description    : Udpade the device state to addressed.
@@ -205,10 +202,11 @@ void PIOS_HID_SetConfiguration(void)
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
-void PIOS_HID_SetDeviceAddress (void)
+void PIOS_HID_SetDeviceAddress(void)
 {
-  bDeviceState = ADDRESSED;
+	bDeviceState = ADDRESSED;
 }
+
 /*******************************************************************************
 * Function Name  : PIOS_HID_Status_In.
 * Description    : Joystick status IN routine.
@@ -227,7 +225,7 @@ void PIOS_HID_Status_In(void)
 * Output         : None.
 * Return         : None.
 *******************************************************************************/
-void PIOS_HID_Status_Out (void)
+void PIOS_HID_Status_Out(void)
 {
 }
 
@@ -240,42 +238,37 @@ void PIOS_HID_Status_Out (void)
 *******************************************************************************/
 RESULT PIOS_HID_Data_Setup(uint8_t RequestNo)
 {
-  uint8_t *(*CopyRoutine)(uint16_t);
+	uint8_t *(*CopyRoutine) (uint16_t);
 
-  CopyRoutine = NULL;
+	CopyRoutine = NULL;
 
-  if ((RequestNo == GET_DESCRIPTOR)
-      && (Type_Recipient == (STANDARD_REQUEST | INTERFACE_RECIPIENT))
-      && (pInformation->USBwIndex0 == 0))
-  {
+	if ((RequestNo == GET_DESCRIPTOR)
+	    && (Type_Recipient == (STANDARD_REQUEST | INTERFACE_RECIPIENT))
+	    && (pInformation->USBwIndex0 == 0)) {
 
-    if (pInformation->USBwValue1 == REPORT_DESCRIPTOR)
-    {
-      CopyRoutine = PIOS_HID_GetReportDescriptor;
-    }
-    else if (pInformation->USBwValue1 == HID_DESCRIPTOR_TYPE)
-    {
-      CopyRoutine = PIOS_HID_GetHIDDescriptor;
-    }
+		if (pInformation->USBwValue1 == REPORT_DESCRIPTOR) {
+			CopyRoutine = PIOS_HID_GetReportDescriptor;
+		} else if (pInformation->USBwValue1 == HID_DESCRIPTOR_TYPE) {
+			CopyRoutine = PIOS_HID_GetHIDDescriptor;
+		}
 
-  } /* End of GET_DESCRIPTOR */
+	}
 
-  /*** GET_PROTOCOL ***/
-  else if ((Type_Recipient == (CLASS_REQUEST | INTERFACE_RECIPIENT))
-           && RequestNo == GET_PROTOCOL)
-  {
-    CopyRoutine = PIOS_HID_GetProtocolValue;
-  }
+	/* End of GET_DESCRIPTOR */
+ /*** GET_PROTOCOL ***/
+	else if ((Type_Recipient == (CLASS_REQUEST | INTERFACE_RECIPIENT))
+		 && RequestNo == GET_PROTOCOL) {
+		CopyRoutine = PIOS_HID_GetProtocolValue;
+	}
 
-  if (CopyRoutine == NULL)
-  {
-    return USB_UNSUPPORT;
-  }
+	if (CopyRoutine == NULL) {
+		return USB_UNSUPPORT;
+	}
 
-  pInformation->Ctrl_Info.CopyData = CopyRoutine;
-  pInformation->Ctrl_Info.Usb_wOffset = 0;
-  (*CopyRoutine)(0);
-  return USB_SUCCESS;
+	pInformation->Ctrl_Info.CopyData = CopyRoutine;
+	pInformation->Ctrl_Info.Usb_wOffset = 0;
+	(*CopyRoutine) (0);
+	return USB_SUCCESS;
 }
 
 /*******************************************************************************
@@ -287,16 +280,14 @@ RESULT PIOS_HID_Data_Setup(uint8_t RequestNo)
 *******************************************************************************/
 RESULT PIOS_HID_NoData_Setup(uint8_t RequestNo)
 {
-  if ((Type_Recipient == (CLASS_REQUEST | INTERFACE_RECIPIENT))
-      && (RequestNo == SET_PROTOCOL))
-  {
-    return PIOS_HID_SetProtocol();
-  }
+	if ((Type_Recipient == (CLASS_REQUEST | INTERFACE_RECIPIENT))
+	    && (RequestNo == SET_PROTOCOL)) {
+		return PIOS_HID_SetProtocol();
+	}
 
-  else
-  {
-    return USB_UNSUPPORT;
-  }
+	else {
+		return USB_UNSUPPORT;
+	}
 }
 
 /*******************************************************************************
@@ -308,7 +299,7 @@ RESULT PIOS_HID_NoData_Setup(uint8_t RequestNo)
 *******************************************************************************/
 uint8_t *PIOS_HID_GetDeviceDescriptor(uint16_t Length)
 {
-  return Standard_GetDescriptorData(Length, &Device_Descriptor);
+	return Standard_GetDescriptorData(Length, &Device_Descriptor);
 }
 
 /*******************************************************************************
@@ -320,7 +311,7 @@ uint8_t *PIOS_HID_GetDeviceDescriptor(uint16_t Length)
 *******************************************************************************/
 uint8_t *PIOS_HID_GetConfigDescriptor(uint16_t Length)
 {
-  return Standard_GetDescriptorData(Length, &Config_Descriptor);
+	return Standard_GetDescriptorData(Length, &Config_Descriptor);
 }
 
 /*******************************************************************************
@@ -332,15 +323,12 @@ uint8_t *PIOS_HID_GetConfigDescriptor(uint16_t Length)
 *******************************************************************************/
 uint8_t *PIOS_HID_GetStringDescriptor(uint16_t Length)
 {
-  uint8_t wValue0 = pInformation->USBwValue0;
-  if (wValue0 > 4)
-  {
-    return NULL;
-  }
-  else 
-  {
-    return Standard_GetDescriptorData(Length, &String_Descriptor[wValue0]);
-  }
+	uint8_t wValue0 = pInformation->USBwValue0;
+	if (wValue0 > 4) {
+		return NULL;
+	} else {
+		return Standard_GetDescriptorData(Length, &String_Descriptor[wValue0]);
+	}
 }
 
 /*******************************************************************************
@@ -352,7 +340,7 @@ uint8_t *PIOS_HID_GetStringDescriptor(uint16_t Length)
 *******************************************************************************/
 uint8_t *PIOS_HID_GetReportDescriptor(uint16_t Length)
 {
-  return Standard_GetDescriptorData(Length, &PIOS_HID_Report_Descriptor);
+	return Standard_GetDescriptorData(Length, &PIOS_HID_Report_Descriptor);
 }
 
 /*******************************************************************************
@@ -364,7 +352,7 @@ uint8_t *PIOS_HID_GetReportDescriptor(uint16_t Length)
 *******************************************************************************/
 uint8_t *PIOS_HID_GetHIDDescriptor(uint16_t Length)
 {
-  return Standard_GetDescriptorData(Length, &PIOS_HID_Hid_Descriptor);
+	return Standard_GetDescriptorData(Length, &PIOS_HID_Hid_Descriptor);
 }
 
 /*******************************************************************************
@@ -378,15 +366,12 @@ uint8_t *PIOS_HID_GetHIDDescriptor(uint16_t Length)
 *******************************************************************************/
 RESULT PIOS_HID_Get_Interface_Setting(uint8_t Interface, uint8_t AlternateSetting)
 {
-  if (AlternateSetting > 0)
-  {
-    return USB_UNSUPPORT;
-  }
-  else if (Interface > 0)
-  {
-    return USB_UNSUPPORT;
-  }
-  return USB_SUCCESS;
+	if (AlternateSetting > 0) {
+		return USB_UNSUPPORT;
+	} else if (Interface > 0) {
+		return USB_UNSUPPORT;
+	}
+	return USB_SUCCESS;
 }
 
 /*******************************************************************************
@@ -398,9 +383,9 @@ RESULT PIOS_HID_Get_Interface_Setting(uint8_t Interface, uint8_t AlternateSettin
 *******************************************************************************/
 RESULT PIOS_HID_SetProtocol(void)
 {
-  uint8_t wValue0 = pInformation->USBwValue0;
-  ProtocolValue = wValue0;
-  return USB_SUCCESS;
+	uint8_t wValue0 = pInformation->USBwValue0;
+	ProtocolValue = wValue0;
+	return USB_SUCCESS;
 }
 
 /*******************************************************************************
@@ -412,15 +397,12 @@ RESULT PIOS_HID_SetProtocol(void)
 *******************************************************************************/
 uint8_t *PIOS_HID_GetProtocolValue(uint16_t Length)
 {
-  if (Length == 0)
-  {
-    pInformation->Ctrl_Info.Usb_wLength = 1;
-    return NULL;
-  }
-  else
-  {
-    return (uint8_t *)(&ProtocolValue);
-  }
+	if (Length == 0) {
+		pInformation->Ctrl_Info.Usb_wLength = 1;
+		return NULL;
+	} else {
+		return (uint8_t *) (&ProtocolValue);
+	}
 }
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

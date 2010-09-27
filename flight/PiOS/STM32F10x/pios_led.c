@@ -28,7 +28,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 /* Project Includes */
 #include "pios.h"
 
@@ -36,12 +35,10 @@
 
 /* Private Function Prototypes */
 
-
 /* Local Variables */
-static GPIO_TypeDef* LED_GPIO_PORT[PIOS_LED_NUM] = PIOS_LED_PORTS;
+static GPIO_TypeDef *LED_GPIO_PORT[PIOS_LED_NUM] = PIOS_LED_PORTS;
 static const uint32_t LED_GPIO_PIN[PIOS_LED_NUM] = PIOS_LED_PINS;
 static const uint32_t LED_GPIO_CLK[PIOS_LED_NUM] = PIOS_LED_CLKS;
-
 
 /**
 * Initialises all the LED's
@@ -49,10 +46,10 @@ static const uint32_t LED_GPIO_CLK[PIOS_LED_NUM] = PIOS_LED_CLKS;
 void PIOS_LED_Init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	
-	for(int LEDNum = 0; LEDNum < PIOS_LED_NUM; LEDNum++) {
+
+	for (int LEDNum = 0; LEDNum < PIOS_LED_NUM; LEDNum++) {
 		RCC_APB2PeriphClockCmd(LED_GPIO_CLK[LEDNum], ENABLE);
 		GPIO_InitStructure.GPIO_Pin = LED_GPIO_PIN[LEDNum];
 		GPIO_Init(LED_GPIO_PORT[LEDNum], &GPIO_InitStructure);
@@ -61,7 +58,6 @@ void PIOS_LED_Init(void)
 		LED_GPIO_PORT[LEDNum]->BSRR = LED_GPIO_PIN[LEDNum];
 	}
 }
-
 
 /**
 * Turn on LED
@@ -72,7 +68,6 @@ void PIOS_LED_On(LedTypeDef LED)
 	LED_GPIO_PORT[LED]->BRR = LED_GPIO_PIN[LED];
 }
 
-
 /**
 * Turn off LED
 * \param[in] LED LED Name (LED1, LED2)
@@ -81,7 +76,6 @@ void PIOS_LED_Off(LedTypeDef LED)
 {
 	LED_GPIO_PORT[LED]->BSRR = LED_GPIO_PIN[LED];
 }
-
 
 /**
 * Toggle LED on/off

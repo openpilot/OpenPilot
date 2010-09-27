@@ -51,7 +51,7 @@
 #endif
 
 #ifndef PIOS_USB_VERSION_ID
-#define PIOS_USB_VERSION_ID		0x0200        /* v2.00 */
+#define PIOS_USB_VERSION_ID		0x0200	/* v2.00 */
 #endif
 
 /* Internal defines which are used by PIOS USB HID (don't touch) */
@@ -68,10 +68,9 @@
 #define PIOS_USB_ENDP1_TXADDR		0x0C0
 #define PIOS_USB_ENDP1_RXADDR		0x100
 
-
 /* Global Variables */
-extern void (*pEpInt_IN[7])(void);
-extern void (*pEpInt_OUT[7])(void);
+extern void (*pEpInt_IN[7]) (void);
+extern void (*pEpInt_OUT[7]) (void);
 
 /* Public Functions */
 extern int32_t PIOS_USB_Init(uint32_t mode);

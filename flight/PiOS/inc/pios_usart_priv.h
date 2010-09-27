@@ -36,29 +36,29 @@
 #include <pios_stm32.h>
 
 struct pios_usart_cfg {
-  USART_TypeDef               * regs;
-  uint32_t                      remap; /* GPIO_Remap_* */
-  USART_InitTypeDef             init;
-  struct stm32_gpio             rx;
-  struct stm32_gpio             tx;
-  struct stm32_irq              irq;
+	USART_TypeDef *regs;
+	uint32_t remap;		/* GPIO_Remap_* */
+	USART_InitTypeDef init;
+	struct stm32_gpio rx;
+	struct stm32_gpio tx;
+	struct stm32_irq irq;
 };
 
 struct pios_usart_buffer {
-  uint8_t   buf[PIOS_USART_RX_BUFFER_SIZE];
-  uint16_t  head;
-  uint16_t  tail;
-  uint16_t  size;
+	uint8_t buf[PIOS_USART_RX_BUFFER_SIZE];
+	uint16_t head;
+	uint16_t tail;
+	uint16_t size;
 };
 
 struct pios_usart_dev {
-  const struct pios_usart_cfg * const cfg;
-  struct pios_usart_buffer      rx;
-  struct pios_usart_buffer      tx;
+	const struct pios_usart_cfg *const cfg;
+	struct pios_usart_buffer rx;
+	struct pios_usart_buffer tx;
 };
 
 extern struct pios_usart_dev pios_usart_devs[];
-extern uint8_t             pios_usart_num_devices;
+extern uint8_t pios_usart_num_devices;
 
 #endif /* PIOS_USART_PRIV_H */
 

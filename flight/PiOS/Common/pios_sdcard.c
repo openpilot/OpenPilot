@@ -29,12 +29,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 /* Project Includes */
 #include "pios.h"
 
 #if defined(PIOS_INCLUDE_SDCARD)
-
 
 /* Global Variables */
 VOLINFO PIOS_SDCARD_VolInfo;
@@ -42,8 +40,8 @@ uint8_t PIOS_SDCARD_Sector[SECTOR_SIZE];
 
 /* Local Definitions */
 #if !defined(SDCARD_MUTEX_TAKE)
-	#define SDCARD_MUTEX_TAKE {}
-	#define SDCARD_MUTEX_GIVE {}
+#define SDCARD_MUTEX_TAKE {}
+#define SDCARD_MUTEX_GIVE {}
 #endif
 
 /* Definitions for MMC/SDC command */
@@ -115,7 +113,6 @@ int32_t PIOS_SDCARD_Init(void)
 	return 0;
 }
 
-
 /**
 * Connects to SD Card
 * \return < 0 if initialisation sequence failed
@@ -127,41 +124,41 @@ int32_t PIOS_SDCARD_PowerOn(void)
 
 	SDCARD_MUTEX_TAKE;
 	/* Ensure that chip select line deactivated */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1); /* spi, pin_value */
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
 
 	/* Init SPI port for slow frequency access (ca. 0.3 MBit/s) */
 	PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_256);
 
 	/* Send 80 clock cycles to start up */
-	for(i=0; i<10; ++i) {
+	for (i = 0; i < 10; ++i) {
 		PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 	}
 
 	/* Activate chip select */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0); /* spi, pin_value */
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0);	/* spi, pin_value */
 
 	/* wait for 1 mS */
 	PIOS_DELAY_WaituS(1000);
 
 	/* Send CMD0 to reset the media */
-	if((status = PIOS_SDCARD_SendSDCCmd(SDCMD_GO_IDLE_STATE, 0, SDCMD_GO_IDLE_STATE_CRC)) < 0) {
+	if ((status = PIOS_SDCARD_SendSDCCmd(SDCMD_GO_IDLE_STATE, 0, SDCMD_GO_IDLE_STATE_CRC)) < 0) {
 		goto error;
 	}
 
 	CardType = 0;
 
 	/* A card is detected, what type is it? Use SEND_IF_COND (CMD8) to find out */
-	if((status = PIOS_SDCARD_SendSDCCmd(SDCMD_SEND_IF_COND, 0x1AA, SDCMD_SEND_IF_COND_CRC)) == 0x01aa) {
+	if ((status = PIOS_SDCARD_SendSDCCmd(SDCMD_SEND_IF_COND, 0x1AA, SDCMD_SEND_IF_COND_CRC)) == 0x01aa) {
 		/* SDHC Card Detected. */
 
 		/* We now check to see if we should use block mode or byte mode. Command is SEND_OP_COND_SDC (ACMD41) with HCS (bit 30) set */
-		for (i=0;i<16384;i++)
-		if((status = PIOS_SDCARD_SendSDCCmd(SDCMD_SEND_OP_COND_SDC, 0x01<<30, SDCMD_SEND_OP_COND_SDC_CRC)) == 0 )
-		break;
+		for (i = 0; i < 16384; i++)
+			if ((status = PIOS_SDCARD_SendSDCCmd(SDCMD_SEND_OP_COND_SDC, 0x01 << 30, SDCMD_SEND_OP_COND_SDC_CRC)) == 0)
+				break;
 
-		if(i < 16384) {
+		if (i < 16384) {
 			status = PIOS_SDCARD_SendSDCCmd(SDCMD_READ_OCR, 0, SDCMD_READ_OCR_CRC);
-			CardType = ((status>>24) & 0x40) ? CT_SD2 | CT_BLOCK : CT_SD2;
+			CardType = ((status >> 24) & 0x40) ? CT_SD2 | CT_BLOCK : CT_SD2;
 			status = 0;
 		} else {
 			/* We waited long enough! */
@@ -171,13 +168,13 @@ int32_t PIOS_SDCARD_PowerOn(void)
 		/* Card is SDv1 or MMC. */
 
 		/* MMC will accept ACMD41 (SDv1 won't and requires CMD1) so send ACMD41 first and then CMD1 if that fails */
-		if((status = PIOS_SDCARD_SendSDCCmd(SDCMD_SEND_OP_COND_SDC, 0, SDCMD_SEND_OP_COND_SDC_CRC)) <= 1) {
+		if ((status = PIOS_SDCARD_SendSDCCmd(SDCMD_SEND_OP_COND_SDC, 0, SDCMD_SEND_OP_COND_SDC_CRC)) <= 1) {
 			CardType = CT_SD1;
 		} else {
 			CardType = CT_MMC;
 		}
 
-		for (i=0;i<16384;i++) {
+		for (i = 0; i < 16384; i++) {
 			if (CardType == CT_SD1) {
 				status = PIOS_SDCARD_SendSDCCmd(SDCMD_SEND_OP_COND_SDC, 0, SDCMD_SEND_OP_COND_SDC_CRC);
 			} else {
@@ -187,7 +184,7 @@ int32_t PIOS_SDCARD_PowerOn(void)
 			if (status < 0) {
 				break;
 			}
-			if(status==0) {
+			if (status == 0) {
 				break;
 			}
 		}
@@ -196,22 +193,20 @@ int32_t PIOS_SDCARD_PowerOn(void)
 		PIOS_SDCARD_SendSDCCmd(SDCMD_SET_BLOCKLEN, 512, SDCMD_SEND_OP_COND_CRC);
 	}
 
-
-	if(i == 16384 || CardType == 0) {
+	if (i == 16384 || CardType == 0) {
 		/* The last loop timed out or the cardtype was not detected... */
 		status = -2;
 	}
 
-	error:
+error:
 	/* Deactivate chip select */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1); /* spi, pin_value */
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
 
 	/* Send dummy byte once deactivated to drop cards DO */
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 	SDCARD_MUTEX_GIVE;
-	return status; /* Status should be 0 if nothing went wrong! */
+	return status;		/* Status should be 0 if nothing went wrong! */
 }
-
 
 /**
 * Disconnects from SD Card
@@ -219,9 +214,8 @@ int32_t PIOS_SDCARD_PowerOn(void)
 */
 int32_t PIOS_SDCARD_PowerOff(void)
 {
-	return 0; // no error
+	return 0;		// no error
 }
-
 
 /**
 * If SD card was previously available: Checks if the SD Card is still
@@ -270,13 +264,13 @@ int32_t PIOS_SDCARD_CheckAvailable(uint8_t was_available)
 	int32_t ret;
 	SDCARD_MUTEX_TAKE;
 
-	if(was_available) {
+	if (was_available) {
 		/* Init SPI port for fast frequency access (ca. 18 MBit/s) */
 		/* This is required for the case that the SPI port is shared with other devices */
 		PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_4);
 
 		/* Activate chip select */
-		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0); /* spi, pin_value */
+		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0);	/* spi, pin_value */
 
 		/* Send STATUS command to check if media is available */
 		ret = PIOS_SDCARD_SendSDCCmd(SDCMD_SEND_STATUS, 0, SDCMD_SEND_STATUS_CRC);
@@ -285,39 +279,38 @@ int32_t PIOS_SDCARD_CheckAvailable(uint8_t was_available)
 		PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_256);
 
 		/* Deactivate chip select */
-		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1); /* spi, pin_value */
+		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
 		/* send 80 clock cycles to start up */
 		uint8_t i;
-		for(i = 0; i < 10; ++i) {
+		for (i = 0; i < 10; ++i) {
 			PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 		}
 
 		/* Activate chip select */
-		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0); /* spi, pin_value */
+		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0);	/* spi, pin_value */
 
 		/* Send CMD0 to reset the media */
-		if((ret = (PIOS_SDCARD_SendSDCCmd(SDCMD_GO_IDLE_STATE, 0, SDCMD_GO_IDLE_STATE_CRC))) < 0 ) {
+		if ((ret = (PIOS_SDCARD_SendSDCCmd(SDCMD_GO_IDLE_STATE, 0, SDCMD_GO_IDLE_STATE_CRC))) < 0) {
 			goto not_available;
 		}
 
 		/* Deactivate chip select */
-		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1); /* spi, pin_value */
+		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
 
 		SDCARD_MUTEX_GIVE;
 		/* Run power-on sequence (negative return = not available) */
 		ret = PIOS_SDCARD_PowerOn();
 	}
 
-	not_available:
+not_available:
 	/* Deactivate chip select */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1); /* spi, pin_value */
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
 	/* Send dummy byte once deactivated to drop cards DO */
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 	SDCARD_MUTEX_GIVE;
 
-	return (ret == 0) ? 1 : 0; /* 1 = available, 0 = not available. */
+	return (ret == 0) ? 1 : 0;	/* 1 = available, 0 = not available. */
 }
-
 
 /**
 * Sends command to SD card
@@ -332,28 +325,28 @@ int32_t PIOS_SDCARD_SendSDCCmd(uint8_t cmd, uint32_t addr, uint8_t crc)
 	int i;
 	int32_t ret;
 
-	if(cmd & 0x80) { /* ACMD<n> is the command sequence of CMD55-CMD<n> */
+	if (cmd & 0x80) {	/* ACMD<n> is the command sequence of CMD55-CMD<n> */
 		cmd &= 0x7F;
-		ret = PIOS_SDCARD_SendSDCCmd(SDCMD_APP_CMD, 0,SDCMD_APP_CMD_CRC);
-		if(ret > 1) {
+		ret = PIOS_SDCARD_SendSDCCmd(SDCMD_APP_CMD, 0, SDCMD_APP_CMD_CRC);
+		if (ret > 1) {
 			return ret;
 		}
 	}
 
 	/* Activate chip select */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0); /* spi, pin_value */
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0);	/* spi, pin_value */
 
 	/* Transfer to card */
-	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, (uint8_t)cmd);
+	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, (uint8_t) cmd);
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, (addr >> 24) & 0xff);
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, (addr >> 16) & 0xff);
-	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, (addr >>  8) & 0xff);
-	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, (addr >>  0) & 0xff);
+	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, (addr >> 8) & 0xff);
+	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, (addr >> 0) & 0xff);
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, crc);
 
 	uint8_t timeout = 0;
 
-	if(cmd == SDCMD_SEND_STATUS) {
+	if (cmd == SDCMD_SEND_STATUS) {
 		/* One dummy read */
 		PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 
@@ -362,22 +355,22 @@ int32_t PIOS_SDCARD_SendSDCCmd(uint8_t cmd, uint32_t addr, uint8_t crc)
 		ret = PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 
 		/* All-one read: we expect that SD card is not connected: notify timeout! */
-		if(ret == 0xff) {
+		if (ret == 0xff) {
 			timeout = 1;
 		}
 	} else {
 		/* Wait for standard R1 response */
-		for(i = 0; i < 8; ++i) {
-		  if(!((ret = PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff)) & 0x80) ) {
+		for (i = 0; i < 8; ++i) {
+			if (!((ret = PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff)) & 0x80)) {
 				break;
 			}
 		}
-		if(i == 8) {
+		if (i == 8) {
 			timeout = 1;
 		}
 	}
 
-	if ((cmd == SDCMD_SEND_IF_COND || cmd == SDCMD_READ_OCR) && timeout!=1) {
+	if ((cmd == SDCMD_SEND_IF_COND || cmd == SDCMD_READ_OCR) && timeout != 1) {
 		/* This is a 4 byte R3 or R7 response. */
 		ret = (PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff) << 24);
 		ret |= (PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff) << 16);
@@ -389,8 +382,8 @@ int32_t PIOS_SDCARD_SendSDCCmd(uint8_t cmd, uint32_t addr, uint8_t crc)
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 
 	/* Deactivate chip-select on timeout, and return error code */
-	if(timeout) {
-		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1); /* spi, pin_value */
+	if (timeout) {
+		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
 
 		/* Send dummy byte once deactivated to drop cards DO */
 		PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
@@ -400,7 +393,6 @@ int32_t PIOS_SDCARD_SendSDCCmd(uint8_t cmd, uint32_t addr, uint8_t crc)
 	/* Else return received value - don't deactivate chip select or mutex (for continuous access) */
 	return ret;
 }
-
 
 /**
 * Reads 512 bytes from selected sector
@@ -421,11 +413,11 @@ int32_t PIOS_SDCARD_SendSDCCmd(uint8_t cmd, uint32_t addr, uint8_t crc)
 * \return -256 if timeout during command has been sent
 * \return -257 if timeout while waiting for start token
 */
-int32_t PIOS_SDCARD_SectorRead(uint32_t sector, uint8_t *buffer)
+int32_t PIOS_SDCARD_SectorRead(uint32_t sector, uint8_t * buffer)
 {
 	int32_t status;
 	int i;
-	if(!(CardType & CT_BLOCK)) {
+	if (!(CardType & CT_BLOCK)) {
 		sector *= 512;
 	}
 
@@ -435,19 +427,19 @@ int32_t PIOS_SDCARD_SectorRead(uint32_t sector, uint8_t *buffer)
 	/* this is required for the case that the SPI port is shared with other devices */
 	PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_4);
 
-	if((status=PIOS_SDCARD_SendSDCCmd(SDCMD_READ_SINGLE_BLOCK, sector, SDCMD_READ_SINGLE_BLOCK_CRC))) {
-		status = (status < 0) ? -256 : status; /* return timeout indicator or error flags */
+	if ((status = PIOS_SDCARD_SendSDCCmd(SDCMD_READ_SINGLE_BLOCK, sector, SDCMD_READ_SINGLE_BLOCK_CRC))) {
+		status = (status < 0) ? -256 : status;	/* return timeout indicator or error flags */
 		goto error;
 	}
 
 	/* Wait for start token of the data block */
-	for(i=0; i<65536; ++i) { // TODO: check if sufficient
+	for (i = 0; i < 65536; ++i) {	// TODO: check if sufficient
 		uint8_t ret = PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
-		if( ret != 0xff )
-		break;
+		if (ret != 0xff)
+			break;
 	}
 
-	if(i == 65536) {
+	if (i == 65536) {
 		status = -257;
 		goto error;
 	}
@@ -462,16 +454,15 @@ int32_t PIOS_SDCARD_SectorRead(uint32_t sector, uint8_t *buffer)
 	/* Required for clocking (see spec) */
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 
-	error:
+error:
 	/* Deactivate chip select */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1); // spi, pin_value
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	// spi, pin_value
 
 	/* Send dummy byte once deactivated to drop cards DO */
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 	SDCARD_MUTEX_GIVE;
 	return status;
 }
-
 
 /**
 * Writes 512 bytes into selected sector
@@ -493,14 +484,14 @@ int32_t PIOS_SDCARD_SectorRead(uint32_t sector, uint8_t *buffer)
 * \return -257 if write operation not accepted
 * \return -258 if timeout during write operation
 */
-int32_t PIOS_SDCARD_SectorWrite(uint32_t sector, uint8_t *buffer)
+int32_t PIOS_SDCARD_SectorWrite(uint32_t sector, uint8_t * buffer)
 {
 	int32_t status;
 	int i;
 
 	SDCARD_MUTEX_TAKE;
 
-	if(!(CardType & CT_BLOCK)) {
+	if (!(CardType & CT_BLOCK)) {
 		sector *= 512;
 	}
 
@@ -508,8 +499,8 @@ int32_t PIOS_SDCARD_SectorWrite(uint32_t sector, uint8_t *buffer)
 	/* This is required for the case that the SPI port is shared with other devices */
 	PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_4);
 
-	if((status=PIOS_SDCARD_SendSDCCmd(SDCMD_WRITE_SINGLE_BLOCK, sector, SDCMD_WRITE_SINGLE_BLOCK_CRC))) {
-		status = (status < 0) ? -256 : status; /* Return timeout indicator or error flags */
+	if ((status = PIOS_SDCARD_SendSDCCmd(SDCMD_WRITE_SINGLE_BLOCK, sector, SDCMD_WRITE_SINGLE_BLOCK_CRC))) {
+		status = (status < 0) ? -256 : status;	/* Return timeout indicator or error flags */
 		goto error;
 	}
 
@@ -525,29 +516,29 @@ int32_t PIOS_SDCARD_SectorWrite(uint32_t sector, uint8_t *buffer)
 
 	/* Read response */
 	uint8_t response = PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
-	if((response & 0x0f) != 0x5) {
-		status= -257;
+	if ((response & 0x0f) != 0x5) {
+		status = -257;
 		goto error;
 	}
 
 	/* Wait for write completion */
-	for(i=0; i < 32*65536; ++i) { /* TODO: check if sufficient */
+	for (i = 0; i < 32 * 65536; ++i) {	/* TODO: check if sufficient */
 		uint8_t ret = PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
-		if(ret != 0x00) {
+		if (ret != 0x00) {
 			break;
 		}
 	}
-	if(i == 32*65536) {
-		status= -258;
+	if (i == 32 * 65536) {
+		status = -258;
 		goto error;
 	}
 
 	/* Required for clocking (see spec) */
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 
-	error:
+error:
 	/* Deactivate chip select */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1); /* spi, pin_value */
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
 	/* Send dummy byte once deactivated to drop cards DO */
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 
@@ -555,7 +546,6 @@ int32_t PIOS_SDCARD_SectorWrite(uint32_t sector, uint8_t *buffer)
 
 	return status;
 }
-
 
 /**
 * Reads the CID informations from SD Card
@@ -565,7 +555,7 @@ int32_t PIOS_SDCARD_SectorWrite(uint32_t sector, uint8_t *buffer)
 * \return -256 if timeout during command has been sent
 * \return -257 if timeout while waiting for start token
 */
-int32_t PIOS_SDCARD_CIDRead(SDCARDCidTypeDef *cid)
+int32_t PIOS_SDCARD_CIDRead(SDCARDCidTypeDef * cid)
 {
 	int32_t status;
 	int i;
@@ -576,22 +566,21 @@ int32_t PIOS_SDCARD_CIDRead(SDCARDCidTypeDef *cid)
 
 	PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_4);
 
-	if((status = PIOS_SDCARD_SendSDCCmd(SDCMD_SEND_CID, 0, SDCMD_SEND_CID_CRC))) {
-		status = (status < 0) ? -256 : status; /* return timeout indicator or error flags */
+	if ((status = PIOS_SDCARD_SendSDCCmd(SDCMD_SEND_CID, 0, SDCMD_SEND_CID_CRC))) {
+		status = (status < 0) ? -256 : status;	/* return timeout indicator or error flags */
 		goto error;
 	}
 
 	/* Wait for start token of the data block */
-	for(i=0; i<65536; ++i) { /* TODO: check if sufficient */
+	for (i = 0; i < 65536; ++i) {	/* TODO: check if sufficient */
 		uint8_t ret = PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
-		if( ret != 0xff ) {
+		if (ret != 0xff) {
 			break;
 		}
 	}
-	if(i == 65536) {
-		status= -257;
+	if (i == 65536) {
+		status = -257;
 	}
-
 
 	/* Read 16 bytes via DMA */
 	uint8_t cid_buffer[16];
@@ -604,7 +593,6 @@ int32_t PIOS_SDCARD_CIDRead(SDCARDCidTypeDef *cid)
 	/* Required for clocking (see spec) */
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 
-
 	/* Sort returned informations into CID structure */
 	/* From STM Mass Storage example */
 	/* Byte 0 */
@@ -614,9 +602,9 @@ int32_t PIOS_SDCARD_CIDRead(SDCARDCidTypeDef *cid)
 	/* Byte 2 */
 	cid->OEM_AppliID |= cid_buffer[2];
 	/* Byte 3..7 */
-	for(i=0; i<5; ++i)
-	cid->ProdName[i] = cid_buffer[3+i];
-	cid->ProdName[5] = 0; /* string terminator */
+	for (i = 0; i < 5; ++i)
+		cid->ProdName[i] = cid_buffer[3 + i];
+	cid->ProdName[5] = 0;	/* string terminator */
 	/* Byte 8 */
 	cid->ProdRev = cid_buffer[8];
 	/* Byte 9 */
@@ -637,9 +625,9 @@ int32_t PIOS_SDCARD_CIDRead(SDCARDCidTypeDef *cid)
 	cid->msd_CRC = (cid_buffer[15] & 0xFE) >> 1;
 	cid->Reserved2 = 1;
 
-	error:
+error:
 	/* deactivate chip select */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1); /* spi, pin_value */
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
 	/* Send dummy byte once deactivated to drop cards DO */
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 	SDCARD_MUTEX_GIVE;
@@ -655,7 +643,7 @@ int32_t PIOS_SDCARD_CIDRead(SDCARDCidTypeDef *cid)
 * \return -256 if timeout during command has been sent
 * \return -257 if timeout while waiting for start token
 */
-int32_t PIOS_SDCARD_CSDRead(SDCARDCsdTypeDef *csd)
+int32_t PIOS_SDCARD_CSDRead(SDCARDCsdTypeDef * csd)
 {
 	int32_t status;
 	int i;
@@ -666,18 +654,18 @@ int32_t PIOS_SDCARD_CSDRead(SDCARDCsdTypeDef *csd)
 	/* This is required for the case that the SPI port is shared with other devices */
 	PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_4);
 
-	if((status = PIOS_SDCARD_SendSDCCmd(SDCMD_SEND_CSD, 0, SDCMD_SEND_CSD_CRC))) {
-		status = (status < 0) ? -256 : status; /* Return timeout indicator or error flags */
+	if ((status = PIOS_SDCARD_SendSDCCmd(SDCMD_SEND_CSD, 0, SDCMD_SEND_CSD_CRC))) {
+		status = (status < 0) ? -256 : status;	/* Return timeout indicator or error flags */
 		goto error;
 	}
 	// wait for start token of the data block
-	for(i=0; i<65536; ++i) { /* TODO: check if sufficient */
+	for (i = 0; i < 65536; ++i) {	/* TODO: check if sufficient */
 		uint8_t ret = PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
-		if(ret != 0xff) {
+		if (ret != 0xff) {
 			break;
 		}
 	}
-	if(i == 65536) {
+	if (i == 65536) {
 		status = -257;
 		goto error;
 	}
@@ -715,7 +703,7 @@ int32_t PIOS_SDCARD_CSDRead(SDCARDCsdTypeDef *csd)
 	csd->WrBlockMisalign = (csd_buffer[6] & 0x40) >> 6;
 	csd->RdBlockMisalign = (csd_buffer[6] & 0x20) >> 5;
 	csd->DSRImpl = (csd_buffer[6] & 0x10) >> 4;
-	csd->Reserved2 = 0; /* Reserved */
+	csd->Reserved2 = 0;	/* Reserved */
 	csd->DeviceSize = (csd_buffer[6] & 0x03) << 10;
 	/* Byte 7 */
 	csd->DeviceSize |= (csd_buffer[7]) << 2;
@@ -755,9 +743,9 @@ int32_t PIOS_SDCARD_CSDRead(SDCARDCsdTypeDef *csd)
 	csd->msd_CRC = (csd_buffer[15] & 0xFE) >> 1;
 	csd->Reserved4 = 1;
 
-	error:
+error:
 	/* Deactivate chip select */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1); /* spi, pin_value */
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
 	/* Send dummy byte once deactivated to drop cards DO */
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 	SDCARD_MUTEX_GIVE;
@@ -779,21 +767,21 @@ int32_t PIOS_SDCARD_StartupLog(void)
 	uint32_t Cache;
 
 	/* Delete the file if it exists - ignore errors */
-	DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t *)LOG_FILENAME, PIOS_SDCARD_Sector);
+	DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t *) LOG_FILENAME, PIOS_SDCARD_Sector);
 
-	if(DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *)LOG_FILENAME, DFS_WRITE, PIOS_SDCARD_Sector, &File)) {
+	if (DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *) LOG_FILENAME, DFS_WRITE, PIOS_SDCARD_Sector, &File)) {
 		/* Error opening file */
 		return -2;
 	}
 
 	sprintf(Buffer, "PiOS Startup Log\r\n\r\nLog file creation completed.\r\n");
-	if(DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *)Buffer, &Cache, strlen(Buffer))) {
+	if (DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer))) {
 		/* Error writing to file */
 		return -3;
 	}
 
 	sprintf(Buffer, "------------------------------\r\nSD Card Information\r\n------------------------------\r\n");
-	if(DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *)Buffer, &Cache, strlen(Buffer))) {
+	if (DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer))) {
 		/* Error writing to file */
 		return -2;
 	}
@@ -801,8 +789,8 @@ int32_t PIOS_SDCARD_StartupLog(void)
 	/* Disabled because it takes ca. 7 seconds with my 2GB card */
 	/* sprintf(Buffer, "Total Space: %u MB\r\nFree Space: %u MB\r\n", (uint16_t)((VolInfo.numclusters * (VolInfo.secperclus / 2)) / 1024), (uint16_t)(PIOS_SDCARD_GetFree() / 1048576)); */
 
-	sprintf(Buffer, "Total Space: %u MB\r\n\r\n", (uint16_t)((PIOS_SDCARD_VolInfo.numclusters * (PIOS_SDCARD_VolInfo.secperclus / 2)) / 1024));
-	if(DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *)Buffer, &Cache, strlen(Buffer))) {
+	sprintf(Buffer, "Total Space: %u MB\r\n\r\n", (uint16_t) ((PIOS_SDCARD_VolInfo.numclusters * (PIOS_SDCARD_VolInfo.secperclus / 2)) / 1024));
+	if (DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer))) {
 		/* Error writing to file */
 		return -2;
 	}
@@ -833,12 +821,12 @@ int32_t POIS_SDCARD_IsMounted()
 int32_t PIOS_SDCARD_MountFS(uint32_t CreateStartupLog)
 {
 	uint32_t pstart, psize;
-	uint8_t  pactive, ptype;
+	uint8_t pactive, ptype;
 	uint8_t sdcard_available = 0;
 
 	sdcard_available = PIOS_SDCARD_CheckAvailable(0);
 
-	if(!sdcard_available) {
+	if (!sdcard_available) {
 		/* Disconnected */
 		return -1;
 	}
@@ -849,13 +837,13 @@ int32_t PIOS_SDCARD_MountFS(uint32_t CreateStartupLog)
 		return -2;
 	}
 
-	if(DFS_GetVolInfo(0, PIOS_SDCARD_Sector, pstart, &PIOS_SDCARD_VolInfo) != DFS_OK) {
+	if (DFS_GetVolInfo(0, PIOS_SDCARD_Sector, pstart, &PIOS_SDCARD_VolInfo) != DFS_OK) {
 		/* No volume information */
 		return -3;
 	}
 
-	if(CreateStartupLog == 1) {
-		if(PIOS_SDCARD_StartupLog()) {
+	if (CreateStartupLog == 1) {
+		if (PIOS_SDCARD_StartupLog()) {
 			/* Error writing startup log file */
 			return -4;
 		}
@@ -879,8 +867,8 @@ int32_t PIOS_SDCARD_GetFree(void)
 	/* It takes ca. 7 seconds to determine free clusters out of ~47000 (2Gb) */
 
 	/* Scan all the clusters */
-	for(uint32_t i = 2; i < PIOS_SDCARD_VolInfo.numclusters; ++i) {
-		if(!DFS_GetFAT(&PIOS_SDCARD_VolInfo, PIOS_SDCARD_Sector, &ScratchCache, i)) {
+	for (uint32_t i = 2; i < PIOS_SDCARD_VolInfo.numclusters; ++i) {
+		if (!DFS_GetFAT(&PIOS_SDCARD_VolInfo, PIOS_SDCARD_Sector, &ScratchCache, i)) {
 			VolFreeBytes += PIOS_SDCARD_VolInfo.secperclus * SECTOR_SIZE;
 		}
 	}
@@ -894,15 +882,15 @@ int32_t PIOS_SDCARD_GetFree(void)
 * return -1 DFS_ReadFile failed
 * return -2 Less bytes read than expected
 */
-int32_t PIOS_SDCARD_ReadBuffer(PFILEINFO fileinfo, uint8_t *buffer, uint32_t len)
+int32_t PIOS_SDCARD_ReadBuffer(PFILEINFO fileinfo, uint8_t * buffer, uint32_t len)
 {
 	uint32_t SuccessCount;
 
-	if(DFS_ReadFile(fileinfo, PIOS_SDCARD_Sector, buffer, &SuccessCount, len)) {
+	if (DFS_ReadFile(fileinfo, PIOS_SDCARD_Sector, buffer, &SuccessCount, len)) {
 		/* DFS_ReadFile failed */
 		return -1;
 	}
-	if(SuccessCount != len) {
+	if (SuccessCount != len) {
 		/* Less bytes read than expected */
 		return -2;
 	}
@@ -915,25 +903,25 @@ int32_t PIOS_SDCARD_ReadBuffer(PFILEINFO fileinfo, uint8_t *buffer, uint32_t len
 * Read a line from file
 * returns Number of bytes read
 */
-int32_t PIOS_SDCARD_ReadLine(PFILEINFO fileinfo, uint8_t *buffer, uint32_t max_len)
+int32_t PIOS_SDCARD_ReadLine(PFILEINFO fileinfo, uint8_t * buffer, uint32_t max_len)
 {
 	int32_t status;
 	uint32_t num_read = 0;
 
-	while(fileinfo->pointer < fileinfo->filelen) {
+	while (fileinfo->pointer < fileinfo->filelen) {
 		status = PIOS_SDCARD_ReadBuffer(fileinfo, buffer, 1);
 
-		if(status < 0) {
+		if (status < 0) {
 			return status;
 		}
 
 		++num_read;
 
-		if(*buffer == '\n' || *buffer == '\r') {
+		if (*buffer == '\n' || *buffer == '\r') {
 			break;
 		}
 
-		if(num_read < max_len) {
+		if (num_read < max_len) {
 			++buffer;
 		}
 	}
@@ -962,14 +950,14 @@ int32_t PIOS_SDCARD_FileCopy(char *Source, char *Destination)
 	/* Disable caching to avoid file inconsistencies while using different sector buffers! */
 	DFS_CachingEnabledSet(0);
 
-	if(DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *)Source, DFS_READ, PIOS_SDCARD_Sector, &SourceFile)) {
+	if (DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *) Source, DFS_READ, PIOS_SDCARD_Sector, &SourceFile)) {
 		/* Source file doesn't exist */
 		return -1;
 	} else {
 		/* Delete destination file if it already exists - ignore errors */
-		DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t *)Destination, PIOS_SDCARD_Sector);
+		DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t *) Destination, PIOS_SDCARD_Sector);
 
-		if(DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *)Destination, DFS_WRITE, PIOS_SDCARD_Sector, &DestFile)) {
+		if (DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *) Destination, DFS_WRITE, PIOS_SDCARD_Sector, &DestFile)) {
 			/* Failed to create destination file */
 			return -2;
 		}
@@ -980,14 +968,14 @@ int32_t PIOS_SDCARD_FileCopy(char *Source, char *Destination)
 	uint32_t SuccessCountRead;
 	uint32_t SuccessCountWrite;
 	do {
-		if(DFS_ReadFile(&SourceFile, PIOS_SDCARD_Sector, WriteBuffer, &SuccessCountRead, SECTOR_SIZE)) {
+		if (DFS_ReadFile(&SourceFile, PIOS_SDCARD_Sector, WriteBuffer, &SuccessCountRead, SECTOR_SIZE)) {
 			/* DFS_ReadFile failed */
 			return -3;
-		} else if(DFS_WriteFile(&DestFile, PIOS_SDCARD_Sector, WriteBuffer, &SuccessCountWrite, SuccessCountRead)) {
+		} else if (DFS_WriteFile(&DestFile, PIOS_SDCARD_Sector, WriteBuffer, &SuccessCountWrite, SuccessCountRead)) {
 			/* DFS_WriteFile failed */
 			return -4;
 		}
-	} while(SuccessCountRead > 0);
+	} while (SuccessCountRead > 0);
 
 	/* No errors */
 	return 0;
@@ -1001,7 +989,7 @@ int32_t PIOS_SDCARD_FileCopy(char *Source, char *Destination)
 */
 int32_t PIOS_SDCARD_FileDelete(char *Filename)
 {
-	if(DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t *)Filename, PIOS_SDCARD_Sector)) {
+	if (DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t *) Filename, PIOS_SDCARD_Sector)) {
 		/* Error deleting file */
 		return -1;
 	}

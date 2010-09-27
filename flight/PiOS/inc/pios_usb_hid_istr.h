@@ -27,9 +27,9 @@
 /* Exported functions ------------------------------------------------------- */
 
 #ifndef STM32F10X_CL
- void USB_Istr(void);
+void USB_Istr(void);
 #else /* STM32F10X_CL */
- u32 STM32_PCD_OTG_ISR_Handler(void);
+u32 STM32_PCD_OTG_ISR_Handler(void);
 #endif /* STM32F10X_CL */
 
 /* function prototypes Automatically built defining related macros */
@@ -90,7 +90,7 @@ void ESOF_Callback(void);
    These callbacks are called into the respective interrupt sunroutine functinos
    and can be tailored for various user application purposes.
      Note: Make sure that the correspondant interrupt is enabled through the 
-     definition in usb_conf.h file */ 
+     definition in usb_conf.h file */
 void INTR_MODEMISMATCH_Callback(void);
 void INTR_SOFINTR_Callback(void);
 void INTR_RXSTSQLVL_Callback(void);
@@ -111,10 +111,9 @@ void INTR_INCOMPLISOOUT_Callback(void);
 void INTR_WKUPINTR_Callback(void);
 
 /* Isochronous data update */
-void INTR_RXSTSQLVL_ISODU_Callback(void); 
+void INTR_RXSTSQLVL_ISODU_Callback(void);
 
 #endif /* STM32F10X_CL */
-
 
 #endif /*__USB_ISTR_H*/
 

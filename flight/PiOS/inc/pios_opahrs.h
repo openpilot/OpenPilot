@@ -33,9 +33,9 @@
 #include "pios_opahrs_proto.h"	/* opahrs message structs */
 
 enum opahrs_result {
-  OPAHRS_RESULT_OK = 0,
-  OPAHRS_RESULT_TIMEOUT,
-  OPAHRS_RESULT_FAILED,
+	OPAHRS_RESULT_OK = 0,
+	OPAHRS_RESULT_TIMEOUT,
+	OPAHRS_RESULT_FAILED,
 };
 
 extern void PIOS_OPAHRS_Init(void);
@@ -44,14 +44,14 @@ extern void PIOS_OPAHRS_Init(void);
  * Protocol V0 messages used to talk to bootloaders
  */
 
-extern enum opahrs_result PIOS_OPAHRS_bl_GetVersions(struct opahrs_msg_v0 * rsp);
-extern enum opahrs_result PIOS_OPAHRS_bl_GetSerial(struct opahrs_msg_v0 * rsp);
-extern enum opahrs_result PIOS_OPAHRS_bl_FwupStart(struct opahrs_msg_v0 * rsp);
-extern enum opahrs_result PIOS_OPAHRS_bl_FwupStatus(struct opahrs_msg_v0 * rsp);
-extern enum opahrs_result PIOS_OPAHRS_bl_FwupData(struct opahrs_msg_v0 * req, struct opahrs_msg_v0 * rsp);
-extern enum opahrs_result PIOS_OPAHRS_bl_FwupVerify(struct opahrs_msg_v0 * rsp);
+extern enum opahrs_result PIOS_OPAHRS_bl_GetVersions(struct opahrs_msg_v0 *rsp);
+extern enum opahrs_result PIOS_OPAHRS_bl_GetSerial(struct opahrs_msg_v0 *rsp);
+extern enum opahrs_result PIOS_OPAHRS_bl_FwupStart(struct opahrs_msg_v0 *rsp);
+extern enum opahrs_result PIOS_OPAHRS_bl_FwupStatus(struct opahrs_msg_v0 *rsp);
+extern enum opahrs_result PIOS_OPAHRS_bl_FwupData(struct opahrs_msg_v0 *req, struct opahrs_msg_v0 *rsp);
+extern enum opahrs_result PIOS_OPAHRS_bl_FwupVerify(struct opahrs_msg_v0 *rsp);
 extern enum opahrs_result PIOS_OPAHRS_bl_resync(void);
-extern enum opahrs_result PIOS_OPAHRS_bl_GetMemMap(struct opahrs_msg_v0 * rsp);
+extern enum opahrs_result PIOS_OPAHRS_bl_GetMemMap(struct opahrs_msg_v0 *rsp);
 extern enum opahrs_result PIOS_OPAHRS_bl_reset(uint32_t delay);
 extern enum opahrs_result PIOS_OPAHRS_bl_boot(uint32_t delay);
 /*

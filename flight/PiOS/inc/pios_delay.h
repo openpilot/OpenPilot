@@ -32,12 +32,10 @@
 #ifndef PIOS_DELAY_H
 #define PIOS_DELAY_H
 
-
 /* Public Functions */
 extern int32_t PIOS_DELAY_Init(void);
 extern int32_t PIOS_DELAY_WaituS(uint16_t uS);
 extern int32_t PIOS_DELAY_WaitmS(uint16_t mS);
-
 
 #endif /* PIOS_DELAY_H */
 

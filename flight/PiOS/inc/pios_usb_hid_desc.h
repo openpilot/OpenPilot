@@ -38,7 +38,7 @@
 #define PIOS_HID_SIZ_STRING_LANGID             4
 #define PIOS_HID_SIZ_STRING_VENDOR             28
 #define PIOS_HID_SIZ_STRING_PRODUCT            20
-#define PIOS_HID_SIZ_STRING_SERIAL             52 /* 96 bits, 12 bytes, 24 characters, 48 in unicode */
+#define PIOS_HID_SIZ_STRING_SERIAL             52	/* 96 bits, 12 bytes, 24 characters, 48 in unicode */
 
 #define STANDARD_ENDPOINT_DESC_SIZE             0x09
 

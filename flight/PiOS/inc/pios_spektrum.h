@@ -31,7 +31,6 @@
 #ifndef PIOS_SPEKTRUM_H
 #define PIOS_SPEKTRUM_H
 
-
 /* Global Types */
 
 /* Public Functions */

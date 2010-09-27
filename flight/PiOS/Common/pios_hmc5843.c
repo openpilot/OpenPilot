@@ -92,20 +92,19 @@
 
 /* Global Variables */
 
-
 /* Local Types */
 typedef struct {
-	uint8_t M_ODR;       /* OUTPUT DATA RATE --> here below the relative define (See datasheet page 11 for more details) */
-	uint8_t Meas_Conf;   /* Measurement Configuration,: Normal, positive bias, or negative bias --> here below the relative define */
-	uint8_t Gain;        /* Gain Configuration, select the full scale --> here below the relative define (See datasheet page 11 for more details) */
+	uint8_t M_ODR;		/* OUTPUT DATA RATE --> here below the relative define (See datasheet page 11 for more details) */
+	uint8_t Meas_Conf;	/* Measurement Configuration,: Normal, positive bias, or negative bias --> here below the relative define */
+	uint8_t Gain;		/* Gain Configuration, select the full scale --> here below the relative define (See datasheet page 11 for more details) */
 	uint8_t Mode;
 } PIOS_HMC5843_ConfigTypeDef;
 
 /* Local Variables */
 volatile bool pios_hmc5843_data_ready;
 
-static void PIOS_HMC5843_Config(PIOS_HMC5843_ConfigTypeDef *HMC5843_Config_Struct);
-static bool PIOS_HMC5843_Read(uint8_t address, uint8_t *buffer, uint8_t len);
+static void PIOS_HMC5843_Config(PIOS_HMC5843_ConfigTypeDef * HMC5843_Config_Struct);
+static bool PIOS_HMC5843_Read(uint8_t address, uint8_t * buffer, uint8_t len);
 static bool PIOS_HMC5843_Write(uint8_t address, uint8_t buffer);
 
 /**
@@ -124,7 +123,7 @@ void PIOS_HMC5843_Init(void)
 	GPIO_InitStructure.GPIO_Pin = PIOS_HMC5843_DRDY_GPIO_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
 	GPIO_Init(PIOS_HMC5843_DRDY_GPIO_PORT, &GPIO_InitStructure);
-	
+
 	/* Configure the End Of Conversion (EOC) interrupt */
 	GPIO_EXTILineConfig(PIOS_HMC5843_DRDY_PORT_SOURCE, PIOS_HMC5843_DRDY_PIN_SOURCE);
 	EXTI_InitStructure.EXTI_Line = PIOS_HMC5843_DRDY_EXTI_LINE;
@@ -132,7 +131,7 @@ void PIOS_HMC5843_Init(void)
 	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructure);
-	
+
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
 	NVIC_InitStructure.NVIC_IRQChannel = PIOS_HMC5843_DRDY_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_HMC5843_DRDY_PRIO;
@@ -208,7 +207,7 @@ void PIOS_HMC5843_Init(void)
 *              1  |  0   |  Negative Bias
 *              1  |  1   |  Sleep Mode
 */
-static void PIOS_HMC5843_Config(PIOS_HMC5843_ConfigTypeDef *HMC5843_Config_Struct)
+static void PIOS_HMC5843_Config(PIOS_HMC5843_ConfigTypeDef * HMC5843_Config_Struct)
 {
 	uint8_t CRTLA = 0x00;
 	uint8_t CRTLB = 0x00;
@@ -216,16 +215,16 @@ static void PIOS_HMC5843_Config(PIOS_HMC5843_ConfigTypeDef *HMC5843_Config_Struc
 
 	CRTLA |= (uint8_t) (HMC5843_Config_Struct->M_ODR | HMC5843_Config_Struct->Meas_Conf);
 	CRTLB |= (uint8_t) (HMC5843_Config_Struct->Gain);
-	MODE  |= (uint8_t) (HMC5843_Config_Struct->Mode);
+	MODE |= (uint8_t) (HMC5843_Config_Struct->Mode);
 
 	// CRTL_REGA
-	while(!PIOS_HMC5843_Write(PIOS_HMC5843_CONFIG_REG_A, CRTLA));
+	while (!PIOS_HMC5843_Write(PIOS_HMC5843_CONFIG_REG_A, CRTLA)) ;
 
 	// CRTL_REGB
-	while(!PIOS_HMC5843_Write(PIOS_HMC5843_CONFIG_REG_B, CRTLB));
+	while (!PIOS_HMC5843_Write(PIOS_HMC5843_CONFIG_REG_B, CRTLB)) ;
 
 	// Mode register
-	while(!PIOS_HMC5843_Write(PIOS_HMC5843_MODE_REG, MODE));
+	while (!PIOS_HMC5843_Write(PIOS_HMC5843_MODE_REG, MODE)) ;
 }
 
 /**
@@ -238,58 +237,50 @@ void PIOS_HMC5843_ReadMag(int16_t out[3])
 
 	pios_hmc5843_data_ready = false;
 
-	while(!PIOS_HMC5843_Read(PIOS_HMC5843_CONFIG_REG_B, &crtlB, 1));
-	while(!PIOS_HMC5843_Read(PIOS_HMC5843_DATAOUT_XMSB_REG, buffer, 6));
+	while (!PIOS_HMC5843_Read(PIOS_HMC5843_CONFIG_REG_B, &crtlB, 1)) ;
+	while (!PIOS_HMC5843_Read(PIOS_HMC5843_DATAOUT_XMSB_REG, buffer, 6)) ;
 
-	switch(crtlB & 0xE0) {
-		case 0x00:
-			for(int i = 0; i < 3; i++)
-				out[i] = ((int16_t) ((uint16_t) buffer[2 * i] << 8)
-						+ buffer[2 * i + 1]) * 1000
-						/ PIOS_HMC5843_Sensitivity_0_7Ga;
-			break;
-		case 0x20:
-			for(int i = 0; i < 3; i++)
-				out[i] = ((int16_t) ((uint16_t) buffer[2 * i] << 8)
-						+ buffer[2 * i + 1]) * 1000
-						/ PIOS_HMC5843_Sensitivity_1Ga;
-			break;
-		case 0x40:
-			for(int i = 0; i < 3; i++)
-				out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
-						+ buffer[2 * i + 1]) * 1000
-						/ PIOS_HMC5843_Sensitivity_1_5Ga;
-			break;
-		case 0x60:
-			for(int i = 0; i < 3; i++)
-				out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
-						+ buffer[2 * i + 1]) * 1000
-						/ PIOS_HMC5843_Sensitivity_2Ga;
-			break;
-		case 0x80:
-			for(int i = 0; i < 3; i++)
-				out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
-						+ buffer[2 * i + 1]) * 1000
-						/ PIOS_HMC5843_Sensitivity_3_2Ga;
-			break;
-		case 0xA0:
-			for(int i = 0; i < 3; i++)
-				out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
-						+ buffer[2 * i + 1]) * 1000
-						/ PIOS_HMC5843_Sensitivity_3_8Ga;
-			break;
-		case 0xC0:
-			for(int i = 0; i < 3; i++)
-				out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
-						+ buffer[2 * i + 1]) * 1000
-						/ PIOS_HMC5843_Sensitivity_4_5Ga;
-			break;
-		case 0xE0:
-			for(int i = 0; i < 3; i++)
-				out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
-						+ buffer[2 * i + 1]) * 1000
-						/ PIOS_HMC5843_Sensitivity_6_5Ga;
-			break;
+	switch (crtlB & 0xE0) {
+	case 0x00:
+		for (int i = 0; i < 3; i++)
+			out[i] = ((int16_t) ((uint16_t) buffer[2 * i] << 8)
+				  + buffer[2 * i + 1]) * 1000 / PIOS_HMC5843_Sensitivity_0_7Ga;
+		break;
+	case 0x20:
+		for (int i = 0; i < 3; i++)
+			out[i] = ((int16_t) ((uint16_t) buffer[2 * i] << 8)
+				  + buffer[2 * i + 1]) * 1000 / PIOS_HMC5843_Sensitivity_1Ga;
+		break;
+	case 0x40:
+		for (int i = 0; i < 3; i++)
+			out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
+					    + buffer[2 * i + 1]) * 1000 / PIOS_HMC5843_Sensitivity_1_5Ga;
+		break;
+	case 0x60:
+		for (int i = 0; i < 3; i++)
+			out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
+					    + buffer[2 * i + 1]) * 1000 / PIOS_HMC5843_Sensitivity_2Ga;
+		break;
+	case 0x80:
+		for (int i = 0; i < 3; i++)
+			out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
+					    + buffer[2 * i + 1]) * 1000 / PIOS_HMC5843_Sensitivity_3_2Ga;
+		break;
+	case 0xA0:
+		for (int i = 0; i < 3; i++)
+			out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
+					    + buffer[2 * i + 1]) * 1000 / PIOS_HMC5843_Sensitivity_3_8Ga;
+		break;
+	case 0xC0:
+		for (int i = 0; i < 3; i++)
+			out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
+					    + buffer[2 * i + 1]) * 1000 / PIOS_HMC5843_Sensitivity_4_5Ga;
+		break;
+	case 0xE0:
+		for (int i = 0; i < 3; i++)
+			out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
+					    + buffer[2 * i + 1]) * 1000 / PIOS_HMC5843_Sensitivity_6_5Ga;
+		break;
 	}
 }
 
@@ -298,15 +289,14 @@ void PIOS_HMC5843_ReadMag(int16_t out[3])
 */
 void PIOS_HMC5843_ReadID(uint8_t out[4])
 {
-	while(!PIOS_HMC5843_Read(PIOS_HMC5843_DATAOUT_IDA_REG, out, 3));
+	while (!PIOS_HMC5843_Read(PIOS_HMC5843_DATAOUT_IDA_REG, out, 3)) ;
 	out[3] = '\0';
 }
 
 bool PIOS_HMC5843_NewDataAvailable(void)
 {
-	return(pios_hmc5843_data_ready);
+	return (pios_hmc5843_data_ready);
 }
-
 
 /**
 * Reads one or more bytes into a buffer
@@ -317,32 +307,32 @@ bool PIOS_HMC5843_NewDataAvailable(void)
 * \return -1 if error during I2C transfer
 * \return -4 if invalid length
 */
-static bool PIOS_HMC5843_Read(uint8_t address, uint8_t *buffer, uint8_t len)
+static bool PIOS_HMC5843_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 {
-  uint8_t addr_buffer[] = {
-    address,
-  };
+	uint8_t addr_buffer[] = {
+		address,
+	};
 
-  const struct pios_i2c_txn txn_list[] = {
-    {
-      .info = __func__,
-      .addr = PIOS_HMC5843_I2C_ADDR,
-      .rw   = PIOS_I2C_TXN_WRITE,
-      .len  = sizeof(addr_buffer),
-      .buf  = addr_buffer,
-    },
-    {
-      .info = __func__,
-      .addr = PIOS_HMC5843_I2C_ADDR,
-      .rw   = PIOS_I2C_TXN_READ,
-      .len  = len,
-      .buf  = buffer,
-    }
-  };
+	const struct pios_i2c_txn txn_list[] = {
+		{
+		 .info = __func__,
+		 .addr = PIOS_HMC5843_I2C_ADDR,
+		 .rw = PIOS_I2C_TXN_WRITE,
+		 .len = sizeof(addr_buffer),
+		 .buf = addr_buffer,
+		 }
+		,
+		{
+		 .info = __func__,
+		 .addr = PIOS_HMC5843_I2C_ADDR,
+		 .rw = PIOS_I2C_TXN_READ,
+		 .len = len,
+		 .buf = buffer,
+		 }
+	};
 
-  return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
 }
-
 
 /**
 * Writes one or more bytes to the HMC5843
@@ -353,24 +343,24 @@ static bool PIOS_HMC5843_Read(uint8_t address, uint8_t *buffer, uint8_t len)
 */
 static bool PIOS_HMC5843_Write(uint8_t address, uint8_t buffer)
 {
-  uint8_t data[] = {
-    address,
-    buffer,
-  };
+	uint8_t data[] = {
+		address,
+		buffer,
+	};
 
-  const struct pios_i2c_txn txn_list[] = {
-    {
-      .info = __func__,
-      .addr = PIOS_HMC5843_I2C_ADDR,
-      .rw   = PIOS_I2C_TXN_WRITE,
-      .len  = sizeof(data),
-      .buf  = data,
-    },
-  };
+	const struct pios_i2c_txn txn_list[] = {
+		{
+		 .info = __func__,
+		 .addr = PIOS_HMC5843_I2C_ADDR,
+		 .rw = PIOS_I2C_TXN_WRITE,
+		 .len = sizeof(data),
+		 .buf = data,
+		 }
+		,
+	};
 
-  return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
 }
-
 
 void PIOS_HMC5843_IRQHandler(void)
 {

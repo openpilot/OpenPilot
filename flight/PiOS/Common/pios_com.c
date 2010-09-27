@@ -27,8 +27,7 @@
  * You should have received a copy of the GNU General Public License along 
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- */		
-
+ */
 
 /* Project Includes */
 #include "pios.h"
@@ -37,15 +36,15 @@
 
 #include <pios_com_priv.h>
 
-static struct pios_com_dev * find_com_dev_by_id (uint8_t port)
+static struct pios_com_dev *find_com_dev_by_id(uint8_t port)
 {
-  if (port >= pios_com_num_devices) {
-    /* Undefined COM port for this board (see pios_board.c) */
-    return NULL;
-  }
+	if (port >= pios_com_num_devices) {
+		/* Undefined COM port for this board (see pios_board.c) */
+		return NULL;
+	}
 
-  /* Get a handle for the device configuration */
-  return &(pios_com_devs[port]);
+	/* Get a handle for the device configuration */
+	return &(pios_com_devs[port]);
 }
 
 /**
@@ -78,21 +77,21 @@ int32_t PIOS_COM_Init(void)
 */
 int32_t PIOS_COM_ChangeBaud(uint8_t port, uint32_t baud)
 {
-  struct pios_com_dev * com_dev;
+	struct pios_com_dev *com_dev;
 
-  com_dev = find_com_dev_by_id (port);
+	com_dev = find_com_dev_by_id(port);
 
-  if (!com_dev) {
-    /* Undefined COM port for this board (see pios_board.c) */
-    return -1;
-  }
+	if (!com_dev) {
+		/* Undefined COM port for this board (see pios_board.c) */
+		return -1;
+	}
 
-  /* Invoke the driver function if it exists */
-  if (com_dev->driver->set_baud) {
-    com_dev->driver->set_baud(com_dev->id, baud);
-  }
+	/* Invoke the driver function if it exists */
+	if (com_dev->driver->set_baud) {
+		com_dev->driver->set_baud(com_dev->id, baud);
+	}
 
-  return 0;
+	return 0;
 }
 
 /**
@@ -105,23 +104,23 @@ int32_t PIOS_COM_ChangeBaud(uint8_t port, uint32_t baud)
 *            caller should retry until buffer is free again
 * \return 0 on success
 */
-int32_t PIOS_COM_SendBufferNonBlocking(uint8_t port, const uint8_t *buffer, uint16_t len)
+int32_t PIOS_COM_SendBufferNonBlocking(uint8_t port, const uint8_t * buffer, uint16_t len)
 {
-  struct pios_com_dev * com_dev;
+	struct pios_com_dev *com_dev;
 
-  com_dev = find_com_dev_by_id (port);
+	com_dev = find_com_dev_by_id(port);
 
-  if (!com_dev) {
-    /* Undefined COM port for this board (see pios_board.c) */
-    return -1;
-  }
+	if (!com_dev) {
+		/* Undefined COM port for this board (see pios_board.c) */
+		return -1;
+	}
 
-  /* Invoke the driver function if it exists */
-  if (com_dev->driver->tx_nb) {
-    return com_dev->driver->tx_nb(com_dev->id, buffer, len);
-  }
+	/* Invoke the driver function if it exists */
+	if (com_dev->driver->tx_nb) {
+		return com_dev->driver->tx_nb(com_dev->id, buffer, len);
+	}
 
-  return 0;
+	return 0;
 }
 
 /**
@@ -133,23 +132,23 @@ int32_t PIOS_COM_SendBufferNonBlocking(uint8_t port, const uint8_t *buffer, uint
 * \return -1 if port not available
 * \return 0 on success
 */
-int32_t PIOS_COM_SendBuffer(uint8_t port, const uint8_t *buffer, uint16_t len)
+int32_t PIOS_COM_SendBuffer(uint8_t port, const uint8_t * buffer, uint16_t len)
 {
-  struct pios_com_dev * com_dev;
+	struct pios_com_dev *com_dev;
 
-  com_dev = find_com_dev_by_id (port);
+	com_dev = find_com_dev_by_id(port);
 
-  if (!com_dev) {
-    /* Undefined COM port for this board (see pios_board.c) */
-    return -1;
-  }
+	if (!com_dev) {
+		/* Undefined COM port for this board (see pios_board.c) */
+		return -1;
+	}
 
-  /* Invoke the driver function if it exists */
-  if (com_dev->driver->tx) {
-    return com_dev->driver->tx(com_dev->id, buffer, len);
-  }
+	/* Invoke the driver function if it exists */
+	if (com_dev->driver->tx) {
+		return com_dev->driver->tx(com_dev->id, buffer, len);
+	}
 
-  return 0;
+	return 0;
 }
 
 /**
@@ -163,7 +162,7 @@ int32_t PIOS_COM_SendBuffer(uint8_t port, const uint8_t *buffer, uint16_t len)
 */
 int32_t PIOS_COM_SendCharNonBlocking(uint8_t port, char c)
 {
-	return PIOS_COM_SendBufferNonBlocking(port, (uint8_t *)&c, 1);
+	return PIOS_COM_SendBufferNonBlocking(port, (uint8_t *) & c, 1);
 }
 
 /**
@@ -176,7 +175,7 @@ int32_t PIOS_COM_SendCharNonBlocking(uint8_t port, char c)
 */
 int32_t PIOS_COM_SendChar(uint8_t port, char c)
 {
-	return PIOS_COM_SendBuffer(port, (uint8_t *)&c, 1);
+	return PIOS_COM_SendBuffer(port, (uint8_t *) & c, 1);
 }
 
 /**
@@ -190,7 +189,7 @@ int32_t PIOS_COM_SendChar(uint8_t port, char c)
 */
 int32_t PIOS_COM_SendStringNonBlocking(uint8_t port, const char *str)
 {
-	return PIOS_COM_SendBufferNonBlocking(port, (uint8_t *)str, (uint16_t)strlen(str));
+	return PIOS_COM_SendBufferNonBlocking(port, (uint8_t *) str, (uint16_t) strlen(str));
 }
 
 /**
@@ -203,7 +202,7 @@ int32_t PIOS_COM_SendStringNonBlocking(uint8_t port, const char *str)
 */
 int32_t PIOS_COM_SendString(uint8_t port, const char *str)
 {
-	return PIOS_COM_SendBuffer(port, (uint8_t *)str, strlen(str));
+	return PIOS_COM_SendBuffer(port, (uint8_t *) str, strlen(str));
 }
 
 /**
@@ -218,13 +217,13 @@ int32_t PIOS_COM_SendString(uint8_t port, const char *str)
 */
 int32_t PIOS_COM_SendFormattedStringNonBlocking(uint8_t port, const char *format, ...)
 {
-	uint8_t buffer[128]; // TODO: tmp!!! Provide a streamed COM method later!
+	uint8_t buffer[128];	// TODO: tmp!!! Provide a streamed COM method later!
 
 	va_list args;
 
 	va_start(args, format);
 	vsprintf((char *)buffer, format, args);
-	return PIOS_COM_SendBufferNonBlocking(port, buffer, (uint16_t)strlen((char *)buffer));
+	return PIOS_COM_SendBufferNonBlocking(port, buffer, (uint16_t) strlen((char *)buffer));
 }
 
 /**
@@ -238,12 +237,12 @@ int32_t PIOS_COM_SendFormattedStringNonBlocking(uint8_t port, const char *format
 */
 int32_t PIOS_COM_SendFormattedString(uint8_t port, const char *format, ...)
 {
-	uint8_t buffer[128]; // TODO: tmp!!! Provide a streamed COM method later!
+	uint8_t buffer[128];	// TODO: tmp!!! Provide a streamed COM method later!
 	va_list args;
 
 	va_start(args, format);
 	vsprintf((char *)buffer, format, args);
-	return PIOS_COM_SendBuffer(port, buffer, (uint16_t)strlen((char *)buffer));
+	return PIOS_COM_SendBuffer(port, buffer, (uint16_t) strlen((char *)buffer));
 }
 
 /**
@@ -253,13 +252,13 @@ int32_t PIOS_COM_SendFormattedString(uint8_t port, const char *format, ...)
 */
 uint8_t PIOS_COM_ReceiveBuffer(uint8_t port)
 {
-  struct pios_com_dev * com_dev;
+	struct pios_com_dev *com_dev;
 
-  com_dev = find_com_dev_by_id (port);
-  PIOS_DEBUG_Assert(com_dev);
-  PIOS_DEBUG_Assert(com_dev->driver->rx);
+	com_dev = find_com_dev_by_id(port);
+	PIOS_DEBUG_Assert(com_dev);
+	PIOS_DEBUG_Assert(com_dev->driver->rx);
 
-  return com_dev->driver->rx(com_dev->id);
+	return com_dev->driver->rx(com_dev->id);
 }
 
 /**
@@ -269,20 +268,20 @@ uint8_t PIOS_COM_ReceiveBuffer(uint8_t port)
 */
 int32_t PIOS_COM_ReceiveBufferUsed(uint8_t port)
 {
-  struct pios_com_dev * com_dev;
+	struct pios_com_dev *com_dev;
 
-  com_dev = find_com_dev_by_id (port);
+	com_dev = find_com_dev_by_id(port);
 
-  if (!com_dev) {
-    /* Undefined COM port for this board (see pios_board.c) */
-    return 0;
-  }
+	if (!com_dev) {
+		/* Undefined COM port for this board (see pios_board.c) */
+		return 0;
+	}
 
-  if (!com_dev->driver->rx_avail) {
-    return 0;
-  }
+	if (!com_dev->driver->rx_avail) {
+		return 0;
+	}
 
-  return com_dev->driver->rx_avail(com_dev->id);
+	return com_dev->driver->rx_avail(com_dev->id);
 }
 
 #endif

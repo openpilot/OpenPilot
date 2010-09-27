@@ -29,7 +29,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 /* Project Includes */
 #include "pios.h"
 
@@ -43,11 +42,11 @@
 
 /* Global Variables */
 
-
 /* Local Variables, use pios_usart */
 static uint16_t CaptureValue[12];
-static uint8_t prev_byte=0xFF,sync=0,bytecount=0,byte_array[20]={0};
-uint8_t sync_of=0;
+static uint8_t prev_byte = 0xFF, sync = 0, bytecount = 0, byte_array[20] = { 0 };
+
+uint8_t sync_of = 0;
 
 /**
 * Initialise the onboard USARTs
@@ -55,11 +54,9 @@ uint8_t sync_of=0;
 void PIOS_SPEKTRUM_Init(void)
 {
 	// TODO: need setting flag for bind on next powerup
-	if(0)
-	{
+	if (0) {
 		PIOS_SPEKTRUM_Bind();
 	}
-
 
 	/* spektrum "watchdog" timer */
 	NVIC_InitTypeDef NVIC_InitStructure;
@@ -77,7 +74,7 @@ void PIOS_SPEKTRUM_Init(void)
 	/* Time base configuration */
 	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
 	TIM_TimeBaseStructure.TIM_Period = ((1000000 / PIOS_SPEKTRUM_SUPV_HZ) - 1);
-	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1; /* For 1 uS accuracy */
+	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;	/* For 1 uS accuracy */
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 	TIM_TimeBaseInit(PIOS_PPM_SUPV_TIMER, &TIM_TimeBaseStructure);
@@ -92,7 +89,6 @@ void PIOS_SPEKTRUM_Init(void)
 	TIM_Cmd(PIOS_SPEKTRUM_SUPV_TIMER, ENABLE);
 }
 
-
 /**
 * Get the value of an input channel
 * \param[in] Channel Number of the channel desired
@@ -102,7 +98,7 @@ void PIOS_SPEKTRUM_Init(void)
 int16_t PIOS_SPEKTRUM_Get(int8_t Channel)
 {
 	/* Return error if channel not available */
-	if(Channel >= 12) {
+	if (Channel >= 12) {
 		return -1;
 	}
 	return CaptureValue[Channel];
@@ -162,7 +158,6 @@ uint8_t PIOS_SPEKTRUM_Bind(void)
 	return 1;
 }
 
-
 /**
 * Decodes a byte
 * \param[in] b byte which should be spektrum decoded
@@ -173,44 +168,37 @@ uint8_t PIOS_SPEKTRUM_Bind(void)
 */
 int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 {
-	static uint16_t channel=0,sync_word=0;
-	uint8_t channeln=0,frame=0;
-	uint16_t data=0;
-	byte_array[bytecount]=b;
+	static uint16_t channel = 0, sync_word = 0;
+	uint8_t channeln = 0, frame = 0;
+	uint16_t data = 0;
+	byte_array[bytecount] = b;
 	bytecount++;
-	if(sync==0)
-	{
-		sync_word=(prev_byte<<8)+b;
-		if(((sync_word&0x00FE)==0) && (bytecount == 2))
-		{
+	if (sync == 0) {
+		sync_word = (prev_byte << 8) + b;
+		if (((sync_word & 0x00FE) == 0) && (bytecount == 2)) {
 			/* sync low byte always 0x01, high byte seems to be random when switching TX on off on, loss counter??? */
-			if(sync_word&0x01)
-			{
-				sync=1;
-				bytecount=2;
+			if (sync_word & 0x01) {
+				sync = 1;
+				bytecount = 2;
 			}
 		}
-	}
-	else
-	{
-		if((bytecount%2)==0)
-		{
-			channel=(prev_byte<<8)+b;
-			frame=channel>>15;
-			channeln=(channel>>10)&0x0F;
-			data=channel&0x03FF;
-			if(channeln < 12)
-				CaptureValue[channeln]=data;
+	} else {
+		if ((bytecount % 2) == 0) {
+			channel = (prev_byte << 8) + b;
+			frame = channel >> 15;
+			channeln = (channel >> 10) & 0x0F;
+			data = channel & 0x03FF;
+			if (channeln < 12)
+				CaptureValue[channeln] = data;
 		}
 	}
-	if(bytecount==16)
-	{
+	if (bytecount == 16) {
 		//PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEM_RF,byte_array,16); //00 2c 58 84 b0 dc ff
-		bytecount=0;
-		sync=0;
-		sync_of=0;
+		bytecount = 0;
+		sync = 0;
+		sync_of = 0;
 	}
-	prev_byte=b;
+	prev_byte = b;
 	return 0;
 }
 
@@ -218,44 +206,41 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 void SPEKTRUM_IRQHandler(void)
 {
 	/* check if RXNE flag is set */
-	if(USART1->SR & (1 << 5)) {
+	if (USART1->SR & (1 << 5)) {
 		uint8_t b = USART1->DR;
-		if(PIOS_SPEKTRUM_Decode(b) < 0) {
+		if (PIOS_SPEKTRUM_Decode(b) < 0) {
 			/* Here we could add some error handling */
 		}
 	}
 
-	if(USART1->SR & (1 << 7)) { // check if TXE flag is set
+	if (USART1->SR & (1 << 7)) {	// check if TXE flag is set
 		/* Disable TXE interrupt (TXEIE=0) */
 		USART1->CR1 &= ~(1 << 7);
 	}
 	/* clear "watchdog" timer */
-	TIM_SetCounter(PIOS_SPEKTRUM_SUPV_TIMER,0);
+	TIM_SetCounter(PIOS_SPEKTRUM_SUPV_TIMER, 0);
 }
 
 /**
 * This function handles TIM6 global interrupt request.
 */
-PIOS_SPEKTRUM_SUPV_IRQ_FUNC
-{
+PIOS_SPEKTRUM_SUPV_IRQ_FUNC {
 	/* Clear timer interrupt pending bit */
 	TIM_ClearITPendingBit(PIOS_SPEKTRUM_SUPV_TIMER, TIM_IT_Update);
 
 	/* sync between frames, TODO! DX7SE */
-	sync=0;
-	bytecount=0;
-	prev_byte=0xFF;
+	sync = 0;
+	bytecount = 0;
+	prev_byte = 0xFF;
 	sync_of++;
 	/* watchdog activated */
-	if(sync_of>1)
-	{
+	if (sync_of > 1) {
 		/* signal lost */
-		sync_of=0;
-		for(int i=0;i<12;i++)
-			CaptureValue[i]=0;
+		sync_of = 0;
+		for (int i = 0; i < 12; i++)
+			CaptureValue[i] = 0;
 	}
 }
-
 
 #endif
 

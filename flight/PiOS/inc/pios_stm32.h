@@ -32,26 +32,26 @@
 #define PIOS_STM32_H
 
 struct stm32_irq {
-  void               (*handler)(void);
-  uint32_t           flags;
-  NVIC_InitTypeDef   init;
+	void (*handler) (void);
+	uint32_t flags;
+	NVIC_InitTypeDef init;
 };
 
 struct stm32_dma_chan {
-  DMA_Channel_TypeDef   * channel;
-  DMA_InitTypeDef         init;
+	DMA_Channel_TypeDef *channel;
+	DMA_InitTypeDef init;
 };
 
 struct stm32_dma {
-  uint32_t                ahb_clk;
-  struct stm32_irq        irq;
-  struct stm32_dma_chan   rx;
-  struct stm32_dma_chan   tx;
+	uint32_t ahb_clk;
+	struct stm32_irq irq;
+	struct stm32_dma_chan rx;
+	struct stm32_dma_chan tx;
 };
 
 struct stm32_gpio {
-  GPIO_TypeDef          * gpio;
-  GPIO_InitTypeDef        init;
+	GPIO_TypeDef *gpio;
+	GPIO_InitTypeDef init;
 };
 
 /**

@@ -30,7 +30,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 /* Project Includes */
 #include "pios.h"
 
@@ -43,7 +42,6 @@
 * \return < 0 if initialisation failed
 */
 
-
 int32_t PIOS_DELAY_Init(void)
 {
 	/* Enable timer clock */
@@ -52,8 +50,8 @@ int32_t PIOS_DELAY_Init(void)
 	/* Time base configuration */
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
 	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-	TIM_TimeBaseStructure.TIM_Period = 65535; // maximum value
-	TIM_TimeBaseStructure.TIM_Prescaler = 72-1; // for 1 uS accuracy fixed to 72Mhz
+	TIM_TimeBaseStructure.TIM_Period = 65535;	// maximum value
+	TIM_TimeBaseStructure.TIM_Prescaler = 72 - 1;	// for 1 uS accuracy fixed to 72Mhz
 	TIM_TimeBaseStructure.TIM_ClockDivision = 0;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 	TIM_TimeBaseInit(PIOS_DELAY_TIMER, &TIM_TimeBaseStructure);
@@ -80,12 +78,11 @@ int32_t PIOS_DELAY_WaituS(uint16_t uS)
 	uint16_t start = PIOS_DELAY_TIMER->CNT;
 
 	/* Note that this event works on 16bit counter wrap-arounds */
-	while((uint16_t)(PIOS_DELAY_TIMER->CNT - start) <= uS);
+	while ((uint16_t) (PIOS_DELAY_TIMER->CNT - start) <= uS) ;
 
 	/* No error */
 	return 0;
 }
-
 
 /**
 * Waits for a specific number of mS<BR>
@@ -99,7 +96,7 @@ int32_t PIOS_DELAY_WaituS(uint16_t uS)
 */
 int32_t PIOS_DELAY_WaitmS(uint16_t mS)
 {
-	for(int i = 0; i < mS; i++) {
+	for (int i = 0; i < mS; i++) {
 		PIOS_DELAY_WaituS(1000);
 	}
 

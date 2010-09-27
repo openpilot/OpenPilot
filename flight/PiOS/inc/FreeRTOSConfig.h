@@ -21,12 +21,12 @@
   * @{
   */
 
-/* Notes: We use 5 task priorities */  
+/* Notes: We use 5 task priorities */
 
 #define configUSE_PREEMPTION		1
 #define configUSE_IDLE_HOOK		1
 #define configUSE_TICK_HOOK		0
-#define configCPU_CLOCK_HZ		( ( unsigned long ) 72000000 )	
+#define configCPU_CLOCK_HZ		( ( unsigned long ) 72000000 )
 #define configTICK_RATE_HZ		( ( portTickType ) 1000 )
 #define configMAX_PRIORITIES		( ( unsigned portBASE_TYPE ) 5 )
 #define configMINIMAL_STACK_SIZE	( ( unsigned short ) 256 )
@@ -41,7 +41,6 @@
 #define configUSE_ALTERNATIVE_API	0
 #define configCHECK_FOR_STACK_OVERFLOW	2
 #define configQUEUE_REGISTRY_SIZE	10
-
 
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES 		0
@@ -61,14 +60,10 @@ to exclude the API function. */
 #define INCLUDE_xTaskGetCurrentTaskHandle	1
 #define INCLUDE_uxTaskGetStackHighWaterMark	0
 
-
-
-
 /* This is the raw value as per the Cortex-M3 NVIC.  Values can be 255
 (lowest) to 1 (highest maskable) to 0 (highest non-maskable). */
-#define configKERNEL_INTERRUPT_PRIORITY 	15 << 4 /* equivalent to NVIC priority 15 */
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY 	 3 << 4 /* equivalent to NVIC priority  3 */
-
+#define configKERNEL_INTERRUPT_PRIORITY 	15 << 4	/* equivalent to NVIC priority 15 */
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY 	 3 << 4	/* equivalent to NVIC priority  3 */
 
 /* This is the value being used as per the ST library which permits 16
 priority values, 0 to 15.  This must correspond to the
@@ -81,4 +76,3 @@ NVIC value of 255. */
   */
 
 #endif /* FREERTOS_CONFIG_H */
-

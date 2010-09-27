@@ -33,21 +33,24 @@
 #if defined(PIOS_INCLUDE_BL_HELPER)
 #include "stm32f10x_flash.h"
 
-uint8_t *FLASH_If_Read(uint32_t SectorAddress) {
-	return (uint8_t*) (SectorAddress);
+uint8_t *FLASH_If_Read(uint32_t SectorAddress)
+{
+	return (uint8_t *) (SectorAddress);
 }
 
-uint8_t FLASH_Ini() {
+uint8_t FLASH_Ini()
+{
 	FLASH_Unlock();
 	return 1;
 }
 
-uint8_t FLASH_Start() {
+uint8_t FLASH_Start()
+{
 	uint32_t pageAdress;
 	pageAdress = START_OF_USER_CODE;
 	uint8_t fail = FALSE;
 	while ((pageAdress < START_OF_USER_CODE + SIZE_OF_CODE + SIZE_OF_DESCRIPTION)
-			|| (fail == TRUE)) {
+	       || (fail == TRUE)) {
 		for (int retry = 0; retry < MAX_DEL_RETRYS; ++retry) {
 			if (FLASH_ErasePage(pageAdress) == FLASH_COMPLETE) {
 				fail = FALSE;
@@ -77,13 +80,13 @@ uint32_t crc_memory_calc()
 
 void read_description(uint8_t * array)
 {
-	uint8_t x=0;
-	for(uint32_t i=START_OF_USER_CODE+SIZE_OF_CODE;i<START_OF_USER_CODE+SIZE_OF_CODE+SIZE_OF_DESCRIPTION;++i)
-	{
-		array[x]=*FLASH_If_Read(i);
+	uint8_t x = 0;
+	for (uint32_t i = START_OF_USER_CODE + SIZE_OF_CODE; i < START_OF_USER_CODE + SIZE_OF_CODE + SIZE_OF_DESCRIPTION; ++i) {
+		array[x] = *FLASH_If_Read(i);
 		++x;
 	}
 }
+
 void CRC_Ini()
 {
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);

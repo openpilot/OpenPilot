@@ -19,26 +19,24 @@
 
 /* Includes ------------------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
-typedef enum _RESUME_STATE
-{
-  RESUME_EXTERNAL,
-  RESUME_INTERNAL,
-  RESUME_LATER,
-  RESUME_WAIT,
-  RESUME_START,
-  RESUME_ON,
-  RESUME_OFF,
-  RESUME_ESOF
+typedef enum _RESUME_STATE {
+	RESUME_EXTERNAL,
+	RESUME_INTERNAL,
+	RESUME_LATER,
+	RESUME_WAIT,
+	RESUME_START,
+	RESUME_ON,
+	RESUME_OFF,
+	RESUME_ESOF
 } RESUME_STATE;
 
-typedef enum _DEVICE_STATE
-{
-  UNCONNECTED,
-  ATTACHED,
-  POWERED,
-  SUSPENDED,
-  ADDRESSED,
-  CONFIGURED
+typedef enum _DEVICE_STATE {
+	UNCONNECTED,
+	ATTACHED,
+	POWERED,
+	SUSPENDED,
+	ADDRESSED,
+	CONFIGURED
 } DEVICE_STATE;
 
 /* Exported constants --------------------------------------------------------*/
@@ -50,9 +48,9 @@ void Resume(RESUME_STATE eResumeSetVal);
 RESULT PowerOn(void);
 RESULT PowerOff(void);
 /* External variables --------------------------------------------------------*/
-extern  __IO uint32_t bDeviceState; /* USB device status */
-extern __IO bool fSuspendEnabled;  /* true when suspend is possible */
+extern __IO uint32_t bDeviceState;	/* USB device status */
+extern __IO bool fSuspendEnabled;	/* true when suspend is possible */
 
-#endif  /*__USB_PWR_H*/
+#endif	/*__USB_PWR_H*/
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

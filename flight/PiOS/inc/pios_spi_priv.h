@@ -36,25 +36,25 @@
 #include <pios_stm32.h>
 
 struct pios_spi_cfg {
-  SPI_TypeDef           * regs;
-  SPI_InitTypeDef         init;
-  bool                    use_crc;
-  struct stm32_dma        dma;
-  struct stm32_gpio       ssel;
-  struct stm32_gpio       sclk;
-  struct stm32_gpio       miso;
-  struct stm32_gpio       mosi;
+	SPI_TypeDef *regs;
+	SPI_InitTypeDef init;
+	bool use_crc;
+	struct stm32_dma dma;
+	struct stm32_gpio ssel;
+	struct stm32_gpio sclk;
+	struct stm32_gpio miso;
+	struct stm32_gpio mosi;
 };
 
 struct pios_spi_dev {
-  const struct pios_spi_cfg * const cfg;
-  void                        (*callback)(uint8_t, uint8_t);
-  uint8_t                     tx_dummy_byte;
-  uint8_t                     rx_dummy_byte;
+	const struct pios_spi_cfg *const cfg;
+	void (*callback) (uint8_t, uint8_t);
+	uint8_t tx_dummy_byte;
+	uint8_t rx_dummy_byte;
 };
 
 extern struct pios_spi_dev pios_spi_devs[];
-extern uint8_t             pios_spi_num_devices;
+extern uint8_t pios_spi_num_devices;
 
 #endif /* PIOS_SPI_PRIV_H */
 

@@ -32,7 +32,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 #include "pios.h"
 #include "stm32f10x_iwdg.h"
 #include "stm32f10x_dbgmcu.h"
@@ -56,17 +55,18 @@
  */
 uint16_t PIOS_WDG_Init(uint16_t delayMs)
 {
-  uint16_t delay = ((uint32_t)delayMs * 60) / 16;
-  if (delay > 0x0fff) delay = 0x0fff;
+	uint16_t delay = ((uint32_t) delayMs * 60) / 16;
+	if (delay > 0x0fff)
+		delay = 0x0fff;
 
-  DBGMCU_Config(DBGMCU_IWDG_STOP, ENABLE);  // make the watchdog stop counting in debug mode
-  IWDG_WriteAccessCmd( IWDG_WriteAccess_Enable );
-  IWDG_SetPrescaler( IWDG_Prescaler_16 );
-  IWDG_SetReload( delay );
-  IWDG_ReloadCounter();
-  IWDG_Enable();
+	DBGMCU_Config(DBGMCU_IWDG_STOP, ENABLE);	// make the watchdog stop counting in debug mode
+	IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
+	IWDG_SetPrescaler(IWDG_Prescaler_16);
+	IWDG_SetReload(delay);
+	IWDG_ReloadCounter();
+	IWDG_Enable();
 
-  return ((((uint32_t)delay * 16) / 60) * .75f);
+	return ((((uint32_t) delay * 16) / 60) * .75f);
 }
 
 /**
@@ -76,5 +76,5 @@ uint16_t PIOS_WDG_Init(uint16_t delayMs)
  */
 void PIOS_WDG_Clear(void)
 {
-  IWDG_ReloadCounter();
+	IWDG_ReloadCounter();
 }

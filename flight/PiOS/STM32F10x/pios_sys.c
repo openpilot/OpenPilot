@@ -29,12 +29,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 /* Project Includes */
 #include "pios.h"
 
 #if defined(PIOS_INCLUDE_SYS)
-
 
 /* Private Function Prototypes */
 void NVIC_Configuration(void);
@@ -52,9 +50,10 @@ void PIOS_SYS_Init(void)
 {
 	/* Setup STM32 system (RCC, clock, PLL and Flash configuration) - CMSIS Function */
 	SystemInit();
-	
+
 	/* Enable GPIOA, GPIOB, GPIOC, GPIOD, GPIOE and AFIO clocks */
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE | RCC_APB2Periph_AFIO, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE |
+			       RCC_APB2Periph_AFIO, ENABLE);
 
 	/* Activate pull-ups on all pins by default */
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -64,7 +63,7 @@ void PIOS_SYS_Init(void)
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 	GPIO_Init(GPIOD, &GPIO_InitStructure);
 #if (PIOS_USB_ENABLED)
-	GPIO_InitStructure.GPIO_Pin = 0xffff & ~GPIO_Pin_11 & ~GPIO_Pin_12; /* Exclude USB pins */
+	GPIO_InitStructure.GPIO_Pin = 0xffff & ~GPIO_Pin_11 & ~GPIO_Pin_12;	/* Exclude USB pins */
 #endif
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
 
@@ -106,14 +105,12 @@ int32_t PIOS_SYS_Reset(void)
 	PIOS_IRQ_Disable();
 
 	// turn off all board LEDs
-	#if (PIOS_LED_NUM == 1)
+#if (PIOS_LED_NUM == 1)
 	PIOS_LED_Off(LED1);
-	#elif (PIOS_LED_NUM == 2)
+#elif (PIOS_LED_NUM == 2)
 	PIOS_LED_Off(LED1);
 	PIOS_LED_Off(LED2);
-	#endif
-
-
+#endif
 
 	/* Reset STM32 */
 	//RCC_APB2PeriphResetCmd(0xfffffff8, ENABLE); /* MBHP_CORE_STM32: don't reset GPIOA/AF due to USB pins */
@@ -123,7 +120,7 @@ int32_t PIOS_SYS_Reset(void)
 	RCC_APB1PeriphResetCmd(0xffffffff, DISABLE);
 	SCB->AIRCR = NVIC_AIRCR_VECTKEY | (1 << NVIC_VECTRESET);
 
-	while(1);
+	while (1) ;
 
 	/* We will never reach this point */
 	return -1;
@@ -134,7 +131,7 @@ int32_t PIOS_SYS_Reset(void)
 */
 uint32_t PIOS_SYS_getCPUFlashSize(void)
 {
-	return ((uint32_t)MEM16(0x1FFFF7E0) * 1000);
+	return ((uint32_t) MEM16(0x1FFFF7E0) * 1000);
 }
 
 /**
@@ -148,13 +145,13 @@ int32_t PIOS_SYS_SerialNumberGet(char *str)
 	int i;
 
 	/* Stored in the so called "electronic signature" */
-	for(i=0; i<24; ++i) {
-		uint8_t b = MEM8(0x1ffff7e8 + (i/2));
-		if( !(i & 1) )
-		b >>= 4;
+	for (i = 0; i < 24; ++i) {
+		uint8_t b = MEM8(0x1ffff7e8 + (i / 2));
+		if (!(i & 1))
+			b >>= 4;
 		b &= 0x0f;
 
-		str[i] = ((b > 9) ? ('A'-10) : '0') + b;
+		str[i] = ((b > 9) ? ('A' - 10) : '0') + b;
 	}
 	str[i] = '\0';
 
@@ -185,7 +182,7 @@ void NVIC_Configuration(void)
 * \param[in]  line assert_param error line source number
 * \retval None
 */
-void assert_failed(uint8_t* file, uint32_t line)
+void assert_failed(uint8_t * file, uint32_t line)
 {
 	/* When serial debugging is implemented, use something like this. */
 	/* printf("Wrong parameters value: file %s on line %d\r\n", file, line); */
@@ -195,11 +192,10 @@ void assert_failed(uint8_t* file, uint32_t line)
 	PIOS_LED_Off(LED2);
 
 	/* Infinite loop */
-	while (1)
-	{
+	while (1) {
 		PIOS_LED_Toggle(LED1);
 		PIOS_LED_Toggle(LED2);
-		for(int i = 0; i < 1000000; i++);
+		for (int i = 0; i < 1000000; i++) ;
 	}
 }
 #endif

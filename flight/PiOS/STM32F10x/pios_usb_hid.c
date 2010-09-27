@@ -54,8 +54,8 @@ const struct pios_com_driver pios_usb_com_driver = {
 static volatile uint8_t rx_buffer_new_data_ctr = 0;
 static volatile uint8_t rx_buffer_ix;
 static uint8_t transfer_possible = 0;
-static uint8_t rx_buffer[PIOS_USB_HID_DATA_LENGTH+2] = {0};
-static uint8_t tx_buffer[PIOS_USB_HID_DATA_LENGTH+2] = {0};
+static uint8_t rx_buffer[PIOS_USB_HID_DATA_LENGTH + 2] = { 0 };
+static uint8_t tx_buffer[PIOS_USB_HID_DATA_LENGTH + 2] = { 0 };
 
 #define TX_BUFFER_SIZE 512
 #define RX_BUFFER_SIZE 512
@@ -72,7 +72,7 @@ static uint8_t txBufferSpace[RX_BUFFER_SIZE];
 int32_t PIOS_USB_HID_Init(uint32_t mode)
 {
 	/* Currently only mode 0 supported */
-	if(mode != 0) {
+	if (mode != 0) {
 		/* Unsupported mode */
 		return -1;
 	}
@@ -99,15 +99,15 @@ int32_t PIOS_USB_HID_Init(uint32_t mode)
 
 	/* Update the USB serial number from the chip */
 	uint8_t sn[25];
-	PIOS_SYS_SerialNumberGet((char *) sn);
-	for(uint8_t i = 0; sn[i] != '\0' && (2 * i) < PIOS_HID_StringSerial[0]; i ++) {
-		PIOS_HID_StringSerial[2+2*i] = sn[i];
+	PIOS_SYS_SerialNumberGet((char *)sn);
+	for (uint8_t i = 0; sn[i] != '\0' && (2 * i) < PIOS_HID_StringSerial[0]; i++) {
+		PIOS_HID_StringSerial[2 + 2 * i] = sn[i];
 	}
 
 	USB_Init();
 	USB_SIL_Init();
 
-	return 0; /* No error */
+	return 0;		/* No error */
 }
 
 /**
@@ -119,23 +119,20 @@ int32_t PIOS_USB_HID_Init(uint32_t mode)
 int32_t PIOS_USB_HID_ChangeConnectionState(uint32_t Connected)
 {
 	// In all cases: re-initialise USB HID driver
-	if (Connected)
-	{
+	if (Connected) {
 		transfer_possible = 1;
 
 		//TODO: Check SetEPRxValid(ENDP1);
 
 #if defined(USB_LED_ON)
-		USB_LED_ON; // turn the USB led on
+		USB_LED_ON;	// turn the USB led on
 #endif
-	}
-	else
-	{
+	} else {
 		// Cable disconnected: disable transfers
 		transfer_possible = 0;
 
 #if defined(USB_LED_OFF)
-		USB_LED_OFF; // turn the USB led off
+		USB_LED_OFF;	// turn the USB led off
 #endif
 	}
 
@@ -193,29 +190,27 @@ void sendChunk()
 {
 
 	uint32_t size = bufferBufferedData(&txBuffer);
-	if(size > 0)
-	{
-		if(size > PIOS_USB_HID_DATA_LENGTH)
-		size = PIOS_USB_HID_DATA_LENGTH;
+	if (size > 0) {
+		if (size > PIOS_USB_HID_DATA_LENGTH)
+			size = PIOS_USB_HID_DATA_LENGTH;
 #ifdef USB_HID
-		bufferGetChunkFromFront(&txBuffer, &tx_buffer[1], size+1);
-		tx_buffer[0] = 1; /* report ID */
+		bufferGetChunkFromFront(&txBuffer, &tx_buffer[1], size + 1);
+		tx_buffer[0] = 1;	/* report ID */
 #else
 		bufferGetChunkFromFront(&txBuffer, &tx_buffer[2], size);
-		tx_buffer[0] = 1; /* report ID */
-		tx_buffer[1] = size; /* valid data length */
+		tx_buffer[0] = 1;	/* report ID */
+		tx_buffer[1] = size;	/* valid data length */
 
 #endif
 		/* Wait for any pending transmissions to complete */
-		while(GetEPTxStatus(ENDP1) == EP_TX_VALID)
-		{
+		while (GetEPTxStatus(ENDP1) == EP_TX_VALID) {
 #if defined(PIOS_INCLUDE_FREERTOS)
 			taskYIELD();
 #endif
 		}
 
-		UserToPMABufferCopy((uint8_t*) tx_buffer, GetEPTxAddr(EP1_IN & 0x7F), size+2);
-		SetEPTxCount((EP1_IN & 0x7F), PIOS_USB_HID_DATA_LENGTH+2);
+		UserToPMABufferCopy((uint8_t *) tx_buffer, GetEPTxAddr(EP1_IN & 0x7F), size + 2);
+		SetEPTxCount((EP1_IN & 0x7F), PIOS_USB_HID_DATA_LENGTH + 2);
 
 		/* Send Buffer */
 		SetEPTxValid(ENDP1);
@@ -231,22 +226,22 @@ void sendChunk()
  * \return -1 if too many bytes to be send
  * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
  */
-int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t *buffer, uint16_t len)
+int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t * buffer, uint16_t len)
 {
 	/*if( len > PIOS_USB_HID_DATA_LENGTH )
-	 return - 1;*/
+	   return - 1; */
 
 	uint8_t previous_data = bufferBufferedData(&txBuffer);
 
-	if(len > bufferRemainingSpace(&txBuffer))
-	return -1; /* Cannot send all requested bytes */
+	if (len > bufferRemainingSpace(&txBuffer))
+		return -1;	/* Cannot send all requested bytes */
 
-	if(bufferAddChunkToEnd(&txBuffer, buffer, len) == 0)
-	return -1;
+	if (bufferAddChunkToEnd(&txBuffer, buffer, len) == 0)
+		return -1;
 
 	/* If no previous data queued and not sending, then TX complete interrupt not likely so send manually */
-	if(previous_data == 0 && GetEPTxStatus(ENDP1) != EP_TX_VALID)
-	sendChunk();
+	if (previous_data == 0 && GetEPTxStatus(ENDP1) != EP_TX_VALID)
+		sendChunk();
 
 	return 0;
 }
@@ -260,14 +255,13 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t *buffe
  * \return -1 if too many bytes to be send
  * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
  */
-int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t id, const uint8_t *buffer, uint16_t len)
+int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t id, const uint8_t * buffer, uint16_t len)
 {
 	uint32_t error;
-	if((error = PIOS_USB_HID_TxBufferPutMoreNonBlocking(id, buffer, len)) != 0)
-	return error;
+	if ((error = PIOS_USB_HID_TxBufferPutMoreNonBlocking(id, buffer, len)) != 0)
+		return error;
 
-	while( bufferBufferedData(&txBuffer) )
-	{
+	while (bufferBufferedData(&txBuffer)) {
 #if defined(PIOS_INCLUDE_FREERTOS)
 		taskYIELD();
 #endif
@@ -286,9 +280,9 @@ int32_t PIOS_USB_HID_RxBufferGet(uint8_t id)
 {
 	uint8_t read = bufferGetFromFront(&rxBuffer);
 	// If endpoint was stalled and there is now space make it valid
-	if((GetEPRxStatus(ENDP1) == EP_RX_STALL) && (bufferRemainingSpace(&rxBuffer) > 62)) {
+	if ((GetEPRxStatus(ENDP1) == EP_RX_STALL) && (bufferRemainingSpace(&rxBuffer) > 62)) {
 		SetEPRxStatus(ENDP1, EP_RX_VALID);
-	}	
+	}
 	return read;
 }
 
@@ -328,13 +322,13 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 
 	/* The first byte is report ID (not checked), the second byte is the valid data length */
 #ifdef USB_HID
-	bufferAddChunkToEnd(&rxBuffer, &rx_buffer[1], PIOS_USB_HID_DATA_LENGTH+1);
+	bufferAddChunkToEnd(&rxBuffer, &rx_buffer[1], PIOS_USB_HID_DATA_LENGTH + 1);
 #else
 	bufferAddChunkToEnd(&rxBuffer, &rx_buffer[2], rx_buffer[1]);
 #endif
-	
+
 	// Only reactivate endpoint if available space in buffer
-	if(bufferRemainingSpace(&rxBuffer) > 62) {
+	if (bufferRemainingSpace(&rxBuffer) > 62) {
 		SetEPRxStatus(ENDP1, EP_RX_VALID);
 	} else {
 		SetEPRxStatus(ENDP1, EP_RX_STALL);

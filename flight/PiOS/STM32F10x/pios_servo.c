@@ -28,19 +28,15 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 /* Project Includes */
 #include "pios.h"
 
 #if defined(PIOS_INCLUDE_SERVO)
 
-
 /* Private Function Prototypes */
-
 
 /* Local Variables */
 static volatile uint16_t ServoPosition[PIOS_SERVO_NUM_TIMERS];
-
 
 /**
 * Initialise Servos
@@ -54,13 +50,13 @@ void PIOS_Servo_Init(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_InitStructure.GPIO_Pin = PIOS_SERVO_GPIO_PIN_3 | PIOS_SERVO_GPIO_PIN_4;
-	#ifndef PIOS_COM_AUX
+#ifndef PIOS_COM_AUX
 	GPIO_InitStructure.GPIO_Pin |= PIOS_SERVO_GPIO_PIN_1 | PIOS_SERVO_GPIO_PIN_2;
-	#endif
+#endif
 	GPIO_Init(PIOS_SERVO_GPIO_PORT_1TO4, &GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Pin = PIOS_SERVO_GPIO_PIN_5 | PIOS_SERVO_GPIO_PIN_6 | PIOS_SERVO_GPIO_PIN_7 | PIOS_SERVO_GPIO_PIN_8;
 	GPIO_Init(PIOS_SERVO_GPIO_PORT_5TO8, &GPIO_InitStructure);
-	
+
 	/* Initialise RCC Clocks (TIM4 and TIM8) */
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
@@ -96,7 +92,7 @@ void PIOS_Servo_Init(void)
 	TIM_ARRPreloadConfig(TIM4, ENABLE);
 	TIM_CtrlPWMOutputs(TIM4, ENABLE);
 	TIM_Cmd(TIM4, ENABLE);
-	
+
 	/* TIM8 */
 	TIM_OCStructInit(&TIM_OCInitStructure);
 	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
@@ -126,20 +122,20 @@ void PIOS_Servo_SetHz(uint16_t onetofour, uint16_t fivetoeight)
 {
 #ifndef PIOS_ENABLE_DEBUG_PINS
 	/* (Re)-Initialise Timers TIM4 and TIM8 */
-	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
 	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 
-	#if 0
+#if 0
 	/* Clipping */
-	if(onetofour > 500) {
+	if (onetofour > 500) {
 		onetofour = 500;
 	}
-	if(fivetoeight > 500) {
+	if (fivetoeight > 500) {
 		fivetoeight = 500;
 	}
-	#endif
+#endif
 
 	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
 	TIM_TimeBaseStructure.TIM_Period = ((1000000 / onetofour) - 1);
@@ -160,37 +156,35 @@ void PIOS_Servo_Set(uint8_t Servo, uint16_t Position)
 {
 #ifndef PIOS_ENABLE_DEBUG_PINS
 	/* Make sure servo exists */
-	if (Servo < PIOS_SERVO_NUM_OUTPUTS && Servo >= 0)
-	{
+	if (Servo < PIOS_SERVO_NUM_OUTPUTS && Servo >= 0) {
 		/* Update the position */
 		ServoPosition[Servo] = Position;
 
-		switch(Servo)
-		{
-			case 0:
-				TIM_SetCompare1(TIM4, Position);
-				break;
-			case 1:
-				TIM_SetCompare2(TIM4, Position);
-				break;
-			case 2:
-				TIM_SetCompare3(TIM4, Position);
-				break;
-			case 3:
-				TIM_SetCompare4(TIM4, Position);
-				break;
-			case 4:
-				TIM_SetCompare1(TIM8, Position);
-				break;
-			case 5:
-				TIM_SetCompare2(TIM8, Position);
-				break;
-			case 6:
-				TIM_SetCompare3(TIM8, Position);
-				break;
-			case 7:
-				TIM_SetCompare4(TIM8, Position);
-				break;
+		switch (Servo) {
+		case 0:
+			TIM_SetCompare1(TIM4, Position);
+			break;
+		case 1:
+			TIM_SetCompare2(TIM4, Position);
+			break;
+		case 2:
+			TIM_SetCompare3(TIM4, Position);
+			break;
+		case 3:
+			TIM_SetCompare4(TIM4, Position);
+			break;
+		case 4:
+			TIM_SetCompare1(TIM8, Position);
+			break;
+		case 5:
+			TIM_SetCompare2(TIM8, Position);
+			break;
+		case 6:
+			TIM_SetCompare3(TIM8, Position);
+			break;
+		case 7:
+			TIM_SetCompare4(TIM8, Position);
+			break;
 		}
 	}
 #endif // PIOS_ENABLE_DEBUG_PINS

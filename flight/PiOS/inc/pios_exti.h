@@ -33,7 +33,6 @@
 
 /* Public Functions */
 
-
 #endif /* PIOS_EXTI_H */
 
 /**

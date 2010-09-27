@@ -30,7 +30,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 /* Project Includes */
 #include "pios.h"
 
@@ -46,7 +45,7 @@ void EXTI15_10_IRQHandler(void)
 #endif
 
 #if defined(PIOS_INCLUDE_BMP085)
-	if(EXTI_GetITStatus(PIOS_BMP085_EOC_EXTI_LINE) != RESET) {
+	if (EXTI_GetITStatus(PIOS_BMP085_EOC_EXTI_LINE) != RESET) {
 		/* Read the ADC Value */
 		xSemaphoreGiveFromISR(PIOS_BMP085_EOC, &xHigherPriorityTaskWoken);
 
@@ -61,7 +60,6 @@ void EXTI15_10_IRQHandler(void)
 #endif
 }
 
-
 /**
 * Handle external lines 9 to 5 interrupt requests
 */
@@ -69,7 +67,7 @@ extern void PIOS_HMC5843_IRQHandler(void);
 void EXTI9_5_IRQHandler(void)
 {
 #if defined(PIOS_INCLUDE_HMC5843)
-	if(EXTI_GetITStatus(PIOS_HMC5843_DRDY_EXTI_LINE) != RESET) {
+	if (EXTI_GetITStatus(PIOS_HMC5843_DRDY_EXTI_LINE) != RESET) {
 		PIOS_HMC5843_IRQHandler();
 		EXTI_ClearITPendingBit(PIOS_HMC5843_DRDY_EXTI_LINE);
 	}
@@ -82,7 +80,7 @@ void EXTI9_5_IRQHandler(void)
 #if defined(PIOS_INCLUDE_USB)
 void EXTI4_IRQHandler(void)
 {
-	if(EXTI_GetITStatus(PIOS_USB_DETECT_EXTI_LINE) != RESET) {
+	if (EXTI_GetITStatus(PIOS_USB_DETECT_EXTI_LINE) != RESET) {
 		/* Clear the EXTI line pending bit */
 		EXTI_ClearITPendingBit(PIOS_USB_DETECT_EXTI_LINE);
 	}

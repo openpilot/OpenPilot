@@ -28,7 +28,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 /* Project Includes */
 #include "pios.h"
 
@@ -47,7 +46,6 @@ static uint8_t SupervisorState = 0;
 static uint32_t CapCounter[PIOS_PPM_NUM_INPUTS];
 static uint32_t CapCounterPrev[PIOS_PPM_NUM_INPUTS];
 
-
 /**
 * Initialises all the LED's
 */
@@ -61,7 +59,7 @@ void PIOS_PPM_Init(void)
 	CurrentValue = 0;
 	CapturedValue = 0;
 
-	for(i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
+	for (i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
 		CaptureValue[i] = 0;
 	}
 
@@ -101,7 +99,7 @@ void PIOS_PPM_Init(void)
 	TIM_InternalClockConfig(PIOS_PPM_TIM_PORT);
 	TIM_TimeBaseInit(PIOS_PPM_TIM_PORT, &TIM_TimeBaseStructure);
 
-		/* Enable the Capture Compare Interrupt Request */
+	/* Enable the Capture Compare Interrupt Request */
 	TIM_ITConfig(PIOS_PPM_TIM_PORT, PIOS_PPM_TIM_CCR, ENABLE);
 
 	/* Enable timers */
@@ -110,10 +108,10 @@ void PIOS_PPM_Init(void)
 	/* Supervisor Setup */
 #if (PIOS_PPM_SUPV_ENABLED)
 	/* Flush counter variables */
-	for(i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
+	for (i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
 		CapCounter[i] = 0;
 	}
-	for(i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
+	for (i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
 		CapCounterPrev[i] = 0;
 	}
 
@@ -130,7 +128,7 @@ void PIOS_PPM_Init(void)
 	/* Time base configuration */
 	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
 	TIM_TimeBaseStructure.TIM_Period = ((1000000 / PIOS_PPM_SUPV_HZ) - 1);
-	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1; /* For 1 uS accuracy */
+	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;	/* For 1 uS accuracy */
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 	TIM_TimeBaseInit(PIOS_PPM_SUPV_TIMER, &TIM_TimeBaseStructure);
@@ -161,7 +159,7 @@ void PIOS_PPM_Init(void)
 int32_t PIOS_PPM_Get(int8_t Channel)
 {
 	/* Return error if channel not available */
-	if(Channel >= PIOS_PPM_NUM_INPUTS) {
+	if (Channel >= PIOS_PPM_NUM_INPUTS) {
 		return -1;
 	}
 	return CaptureValue[Channel];
@@ -175,7 +173,7 @@ int32_t PIOS_PPM_Get(int8_t Channel)
 void TIM1_CC_IRQHandler(void)
 {
 	/* Do this as it's more efficient */
-	if(TIM_GetITStatus(PIOS_PPM_TIM_PORT, PIOS_PPM_TIM_CCR) == SET) {
+	if (TIM_GetITStatus(PIOS_PPM_TIM_PORT, PIOS_PPM_TIM_CCR) == SET) {
 		PreviousValue = CurrentValue;
 		CurrentValue = TIM_GetCapture2(PIOS_PPM_TIM_PORT);
 	}
@@ -191,11 +189,11 @@ void TIM1_CC_IRQHandler(void)
 	}
 
 	/* sync pulse */
-	if(CapturedValue > 8000) {
+	if (CapturedValue > 8000) {
 		PulseIndex = 0;
-	/* trying to detect bad pulses, not sure this is working correctly yet. I need a scope :P */
-	} else if(CapturedValue > 750 && CapturedValue < 2500) {
-		if(PulseIndex < PIOS_PPM_NUM_INPUTS) {
+		/* trying to detect bad pulses, not sure this is working correctly yet. I need a scope :P */
+	} else if (CapturedValue > 750 && CapturedValue < 2500) {
+		if (PulseIndex < PIOS_PPM_NUM_INPUTS) {
 			CaptureValue[PulseIndex] = CapturedValue;
 			CapCounter[PulseIndex]++;
 			PulseIndex++;
@@ -206,15 +204,14 @@ void TIM1_CC_IRQHandler(void)
 /**
 * This function handles TIM3 global interrupt request.
 */
-PIOS_PPM_SUPV_IRQ_FUNC
-{
+PIOS_PPM_SUPV_IRQ_FUNC {
 	/* Clear timer interrupt pending bit */
 	TIM_ClearITPendingBit(PIOS_PPM_SUPV_TIMER, TIM_IT_Update);
 
 	/* Simple state machine */
-	if(SupervisorState == 0) {
+	if (SupervisorState == 0) {
 		/* Save this states values */
-		for(int32_t i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
+		for (int32_t i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
 			CapCounterPrev[i] = CapCounter[i];
 		}
 
@@ -222,8 +219,8 @@ PIOS_PPM_SUPV_IRQ_FUNC
 		SupervisorState = 1;
 	} else {
 		/* See what channels have been updated */
-		for(int32_t i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
-			if(CapCounter[i] == CapCounterPrev[i]) {
+		for (int32_t i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
+			if (CapCounter[i] == CapCounterPrev[i]) {
 				CaptureValue[i] = 0;
 			}
 		}

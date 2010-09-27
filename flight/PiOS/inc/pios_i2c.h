@@ -35,16 +35,16 @@
 
 /* Global Types */
 enum pios_i2c_txn_direction {
-  PIOS_I2C_TXN_READ,
-  PIOS_I2C_TXN_WRITE
+	PIOS_I2C_TXN_READ,
+	PIOS_I2C_TXN_WRITE
 };
 
 struct pios_i2c_txn {
-  const char                  * info;
-  uint16_t                      addr;
-  enum pios_i2c_txn_direction   rw;
-  uint32_t                      len;
-  uint8_t                     * buf;
+	const char *info;
+	uint16_t addr;
+	enum pios_i2c_txn_direction rw;
+	uint32_t len;
+	uint8_t *buf;
 };
 
 /* Public Functions */

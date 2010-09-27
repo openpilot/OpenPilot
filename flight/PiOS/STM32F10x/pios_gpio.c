@@ -28,7 +28,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 /* Project Includes */
 #include "pios.h"
 
@@ -36,12 +35,10 @@
 
 /* Private Function Prototypes */
 
-
 /* Local Variables */
-static GPIO_TypeDef* GPIO_PORT[PIOS_GPIO_NUM] = PIOS_GPIO_PORTS;
+static GPIO_TypeDef *GPIO_PORT[PIOS_GPIO_NUM] = PIOS_GPIO_PORTS;
 static const uint32_t GPIO_PIN[PIOS_GPIO_NUM] = PIOS_GPIO_PINS;
 static const uint32_t GPIO_CLK[PIOS_GPIO_NUM] = PIOS_GPIO_CLKS;
-
 
 /**
 * Initialises all the GPIO's

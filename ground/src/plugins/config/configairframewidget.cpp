@@ -208,26 +208,44 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->fwElevator1Label->setEnabled(true);
         //m_aircraft->fwElevator2Channel->setEnabled(true);
         //m_aircraft->fwElevator2Label->setEnabled(true);
+        m_aircraft->fwAileron1Label->setText("Aileron 1");
+        m_aircraft->fwAileron2Label->setText("Aileron 2");
+        m_aircraft->fwElevator1Label->setText("Elevator 1");
+        m_aircraft->fwElevator2Label->setText("Elevator 2");
+        m_aircraft->elevonMixBox->setHidden(true);
 
     } else if (frameType == "FixedWingElevon" || frameType == "Elevon") {
         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Fixed Wing"));
         m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Elevon"));
+        m_aircraft->fwAileron1Label->setText("Elevon 1");
+        m_aircraft->fwAileron2Label->setText("Elevon 2");
         m_aircraft->fwElevator1Channel->setEnabled(false);
         m_aircraft->fwElevator1Label->setEnabled(false);
         m_aircraft->fwElevator2Channel->setEnabled(false);
         m_aircraft->fwElevator2Label->setEnabled(false);
         m_aircraft->fwRudderChannel->setEnabled(true);
         m_aircraft->fwRudderLabel->setEnabled(true);
+        m_aircraft->fwElevator1Label->setText("Elevator 1");
+        m_aircraft->fwElevator2Label->setText("Elevator 2");
+        m_aircraft->elevonMixBox->setHidden(false);
+        m_aircraft->elevonLabel1->setText("Roll / Pitch");
 
-            } else if (frameType == "FixedWingVtail" || frameType == "Vtail") {
+     } else if (frameType == "FixedWingVtail" || frameType == "Vtail") {
         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Fixed Wing"));
         m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Vtail"));
         m_aircraft->fwRudderChannel->setEnabled(false);
         m_aircraft->fwRudderLabel->setEnabled(false);
         m_aircraft->fwElevator1Channel->setEnabled(true);
         m_aircraft->fwElevator1Label->setEnabled(true);
+        m_aircraft->fwElevator1Label->setText("Vtail 1");
+        m_aircraft->fwElevator2Label->setText("Vtail 2");
+        m_aircraft->elevonMixBox->setHidden(false);
         //m_aircraft->fwElevator2Channel->setEnabled(true);
         //m_aircraft->fwElevator2Label->setEnabled(true);
+        m_aircraft->fwAileron1Label->setText("Aileron 1");
+        m_aircraft->fwAileron2Label->setText("Aileron 2");
+        m_aircraft->elevonLabel1->setText("Rudder / Pitch");
+
     }
 
 }
@@ -511,6 +529,51 @@ bool ConfigAirframeWidget::setupFrameElevon()
     m_aircraft->fwStatusLabel->setText("Mixer generated");
     return true;
 }
+
+
+/**
+  Set up a Quad-X
+
+#ifdef MATRIX_QUAD_X
+#define MATRIX_OUTPUTS 4
+#define MATRIX_QUAD
+
+//Note the offset is 0 for a servo (zero in the middle) and -1
+//for a motor (zero at min pulse width)
+
+//Throttle needs to be double because normal throttle range is 0 to +1 instead of -1 to +1
+//as with pitch, roll, yaw. The final output range is -1 to +1
+const float matrixGains[MATRIX_OUTPUTS][MAX_COMMANDS + 1]=
+{
+// pitch   roll    yaw  throttle  offset
+    {0.5    ,0.5    ,0.5    ,1.8   ,-1  }, //Front left motor (CW)
+    {0.5    ,-0.5   ,-0.5   ,1.8   ,-1  }, //Front right motor(CCW)
+    {-0.5  ,-0.5    ,0.5    ,1.8   ,-1  }, //rear right motor (CW)
+    {-0.5   ,0.5    ,-0.5   ,1.8   ,-1  }, //Rear left motor  (CCW)
+};
+
+
+#ifdef MATRIX_QUAD_PLUS
+#define MATRIX_OUTPUTS 4
+#define MATRIX_QUAD
+
+//Note the offset is 0 for a servo (zero in the middle) and -1
+//for a motor (zero at min pulse width)
+
+//Throttle needs to be double because normal throttle range is 0 to +1 instead of -1 to +1
+//as with pitch, roll, yaw. The final output range is -1 to +1
+const float matrixGains[MATRIX_OUTPUTS][MAX_COMMANDS + 1]=
+{
+// pitch   roll    yaw  throttle  offset
+    {1      ,0      ,0.5    ,1.8   ,-1  }, //Front motor (CW)
+    {0      ,-1     ,-0.5   ,1.8   ,-1  }, //Right  motor(CCW)
+    {-1     ,0      ,0.5    ,1.8   ,-1  }, //Rear motor  (CW)
+    {0      ,1      ,-0.5   ,1.8   ,-1  }, //Left motor  (CCW)
+};
+
+#endif
+
+*/
 
 
 /**

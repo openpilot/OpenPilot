@@ -277,22 +277,40 @@ void ConfigAirframeWidget::requestAircraftUpdate()
             Q_ASSERT(field);
             m_aircraft->multiMotor4->setCurrentIndex(m_aircraft->multiMotor4->findText(field->getValue().toString()));
         } else if (frameType == "QuadX") {
-            // Motors 1/2/3/4 are: NE / SE / SW / NW
-            field = obj->getField(QString("VTOLMotorNE"));
+            // Motors 1/2/3/4 are: NW / NE / SE / SW
+            field = obj->getField(QString("VTOLMotorNW"));
             Q_ASSERT(field);
             m_aircraft->multiMotor1->setCurrentIndex(m_aircraft->multiMotor1->findText(field->getValue().toString()));
-            field = obj->getField(QString("VTOLMotorSE"));
+            field = obj->getField(QString("VTOLMotorNE"));
             Q_ASSERT(field);
             m_aircraft->multiMotor2->setCurrentIndex(m_aircraft->multiMotor2->findText(field->getValue().toString()));
-            field = obj->getField(QString("VTOLMotorSW"));
+            field = obj->getField(QString("VTOLMotorSE"));
             Q_ASSERT(field);
             m_aircraft->multiMotor3->setCurrentIndex(m_aircraft->multiMotor3->findText(field->getValue().toString()));
-            field = obj->getField(QString("VTOLMotorNW"));
+            field = obj->getField(QString("VTOLMotorSW"));
             Q_ASSERT(field);
             m_aircraft->multiMotor4->setCurrentIndex(m_aircraft->multiMotor4->findText(field->getValue().toString()));
 
         } else if (frameType == "Hexa") {
-            // Motors 1/2/3 4/5/6 are: ???
+            // Motors 1/2/3 4/5/6 are: NW / N / NE and SE / S / SW
+            field = obj->getField(QString("VTOLMotorNW"));
+            Q_ASSERT(field);
+            m_aircraft->multiMotor1->setCurrentIndex(m_aircraft->multiMotor1->findText(field->getValue().toString()));
+            field = obj->getField(QString("VTOLMotorN"));
+            Q_ASSERT(field);
+            m_aircraft->multiMotor2->setCurrentIndex(m_aircraft->multiMotor2->findText(field->getValue().toString()));
+            field = obj->getField(QString("VTOLMotorNE"));
+            Q_ASSERT(field);
+            m_aircraft->multiMotor3->setCurrentIndex(m_aircraft->multiMotor3->findText(field->getValue().toString()));
+            field = obj->getField(QString("VTOLMotorSE"));
+            Q_ASSERT(field);
+            m_aircraft->multiMotor4->setCurrentIndex(m_aircraft->multiMotor4->findText(field->getValue().toString()));
+            field = obj->getField(QString("VTOLMotorS"));
+            Q_ASSERT(field);
+            m_aircraft->multiMotor5->setCurrentIndex(m_aircraft->multiMotor4->findText(field->getValue().toString()));
+            field = obj->getField(QString("VTOLMotorSW"));
+            Q_ASSERT(field);
+            m_aircraft->multiMotor6->setCurrentIndex(m_aircraft->multiMotor4->findText(field->getValue().toString()));
         } else if (frameType == "Octo") {
             // Motors 1 to 8 are N / NE / E / etc
             field = obj->getField(QString("VTOLMotorN"));
@@ -402,6 +420,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
         m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Quad X"));
         quad->setElementId("quad-X");
+        m_aircraft->quadShape->setSceneRect(quad->boundingRect());
         m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
         m_aircraft->multiMotor5->setEnabled(false);
         m_aircraft->multiMotor6->setEnabled(false);
@@ -411,6 +430,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
         m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Quad +"));
         quad->setElementId("quad-plus");
+        m_aircraft->quadShape->setSceneRect(quad->boundingRect());
         m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
         m_aircraft->multiMotor5->setEnabled(false);
         m_aircraft->multiMotor6->setEnabled(false);
@@ -419,6 +439,9 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
     } else if (frameType == "Hexa" || frameType == "Hexacopter") {
         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
         m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Hexacopter"));
+        quad->setElementId("quad-hexa");
+        m_aircraft->quadShape->setSceneRect(quad->boundingRect());
+        m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
         m_aircraft->multiMotor5->setEnabled(true);
         m_aircraft->multiMotor6->setEnabled(true);
         m_aircraft->multiMotor7->setEnabled(false);
@@ -426,6 +449,9 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
     } else if (frameType == "Octo" || frameType == "Octocopter") {
         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
         m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Octocopter"));
+        quad->setElementId("quad-octo");
+        m_aircraft->quadShape->setSceneRect(quad->boundingRect());
+        m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
         m_aircraft->multiMotor5->setEnabled(true);
         m_aircraft->multiMotor6->setEnabled(true);
         m_aircraft->multiMotor7->setEnabled(true);

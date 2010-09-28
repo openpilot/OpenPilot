@@ -49,12 +49,17 @@ private:
     Ui_AircraftWidget *m_aircraft;
     bool setupFrameFixedWing();
     bool setupFrameElevon();
+    bool setupFrameVtail();
+    bool setupQuad(bool pLayout);
+
     void resetField(UAVObjectField * field);
     void resetActuators();
+    //void setMixerChannel(int channelNumber, bool channelIsMotor, QList<double> vector);
+    void setupQuadMotor(int channel, double roll, double pitch, double yaw);
+
     QStringList mixerTypes;
     QStringList mixerVectors;
-
-
+    QGraphicsSvgItem *quad;
 
 private slots:
     void requestAircraftUpdate();
@@ -63,6 +68,11 @@ private slots:
     void setupAirframeUI(QString type);
     void toggleAileron2(int index);
     void toggleElevator2(int index);
+
+protected:
+    void showEvent(QShowEvent *event);
+    void resizeEvent(QResizeEvent *event);
+
 
 };
 

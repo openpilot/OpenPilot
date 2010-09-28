@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>720</width>
-    <height>480</height>
+    <height>508</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -69,7 +69,7 @@
       <item>
        <widget class="QStackedWidget" name="stackedWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="fixedWing">
          <property name="enabled">
@@ -248,48 +248,82 @@
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_13">
                  <item>
-                  <widget class="QLabel" name="elevonLabel1">
-                   <property name="text">
-                    <string>Roll / Pitch</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_8">
                    <item>
-                    <widget class="QSlider" name="elevonSlider1">
-                     <property name="maximum">
-                      <number>100</number>
-                     </property>
-                     <property name="value">
-                      <number>50</number>
-                     </property>
-                     <property name="orientation">
-                      <enum>Qt::Vertical</enum>
-                     </property>
-                    </widget>
+                    <layout class="QVBoxLayout" name="verticalLayout_14">
+                     <item>
+                      <widget class="QLabel" name="elevonLabel1">
+                       <property name="minimumSize">
+                        <size>
+                         <width>65</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Rudder %</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QSlider" name="elevonSlider1">
+                       <property name="maximum">
+                        <number>100</number>
+                       </property>
+                       <property name="value">
+                        <number>50</number>
+                       </property>
+                       <property name="orientation">
+                        <enum>Qt::Vertical</enum>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="label_18">
+                       <property name="text">
+                        <string>50</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </item>
                    <item>
-                    <widget class="QSlider" name="elevonSlider2">
-                     <property name="maximum">
-                      <number>100</number>
-                     </property>
-                     <property name="value">
-                      <number>50</number>
-                     </property>
-                     <property name="orientation">
-                      <enum>Qt::Vertical</enum>
-                     </property>
-                    </widget>
+                    <layout class="QVBoxLayout" name="verticalLayout_15">
+                     <item>
+                      <widget class="QLabel" name="elevonLabel2">
+                       <property name="minimumSize">
+                        <size>
+                         <width>50</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Pitch %</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QSlider" name="elevonSlider2">
+                       <property name="maximum">
+                        <number>100</number>
+                       </property>
+                       <property name="value">
+                        <number>50</number>
+                       </property>
+                       <property name="orientation">
+                        <enum>Qt::Vertical</enum>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="label_25">
+                       <property name="text">
+                        <string>50</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </item>
                   </layout>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="elevonLabel2">
-                   <property name="text">
-                    <string>Pitch 0%</string>
-                   </property>
-                  </widget>
                  </item>
                  <item>
                   <spacer name="verticalSpacer_2">
@@ -444,15 +478,8 @@
                   <property name="fieldGrowthPolicy">
                    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
                   </property>
-                  <item row="0" column="0">
-                   <widget class="QLabel" name="label_20">
-                    <property name="text">
-                     <string>Feed Forward</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="1">
-                   <widget class="QSlider" name="horizontalSlider">
+                  <item row="2" column="1">
+                   <widget class="QSlider" name="feedForwardSlider">
                     <property name="maximum">
                      <number>100</number>
                     </property>
@@ -467,25 +494,57 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="0">
+                  <item row="4" column="0">
                    <widget class="QLabel" name="label_21">
                     <property name="text">
                      <string>Accel Time Constant</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="1">
-                   <widget class="QLineEdit" name="lineEdit_4"/>
-                  </item>
-                  <item row="2" column="0">
+                  <item row="5" column="0">
                    <widget class="QLabel" name="label_22">
                     <property name="text">
                      <string>Decel Time Constant</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="1">
-                   <widget class="QLineEdit" name="lineEdit_5"/>
+                  <item row="2" column="0">
+                   <layout class="QHBoxLayout" name="horizontalLayout_12">
+                    <item>
+                     <widget class="QLabel" name="label_20">
+                      <property name="text">
+                       <string>FeedForward </string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="feedForwardValue">
+                      <property name="minimumSize">
+                       <size>
+                        <width>30</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>000</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QDoubleSpinBox" name="accelTime">
+                    <property name="maximum">
+                     <double>1000.000000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QDoubleSpinBox" name="decelTime">
+                    <property name="maximum">
+                     <double>1000.000000000000000</double>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </item>
@@ -528,7 +587,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="MixerCurveWidget" name="widget" native="true">
+                 <widget class="MixerCurveWidget" name="multiThrottleCurve" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                     <horstretch>0</horstretch>
@@ -640,7 +699,7 @@
                     </widget>
                    </item>
                    <item row="0" column="1">
-                    <widget class="QComboBox" name="comboBox">
+                    <widget class="QComboBox" name="multiMotor1">
                      <property name="font">
                       <font>
                        <pointsize>8</pointsize>
@@ -656,7 +715,7 @@
                     </widget>
                    </item>
                    <item row="1" column="1">
-                    <widget class="QComboBox" name="comboBox_2">
+                    <widget class="QComboBox" name="multiMotor2">
                      <property name="font">
                       <font>
                        <pointsize>8</pointsize>
@@ -672,7 +731,7 @@
                     </widget>
                    </item>
                    <item row="2" column="1">
-                    <widget class="QComboBox" name="comboBox_3">
+                    <widget class="QComboBox" name="multiMotor3">
                      <property name="font">
                       <font>
                        <pointsize>8</pointsize>
@@ -688,7 +747,7 @@
                     </widget>
                    </item>
                    <item row="3" column="1">
-                    <widget class="QComboBox" name="comboBox_4">
+                    <widget class="QComboBox" name="multiMotor4">
                      <property name="font">
                       <font>
                        <pointsize>8</pointsize>
@@ -714,7 +773,7 @@
                     </widget>
                    </item>
                    <item row="0" column="1">
-                    <widget class="QComboBox" name="comboBox_5">
+                    <widget class="QComboBox" name="multiMotor5">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                        <horstretch>0</horstretch>
@@ -736,7 +795,7 @@
                     </widget>
                    </item>
                    <item row="1" column="1">
-                    <widget class="QComboBox" name="comboBox_6">
+                    <widget class="QComboBox" name="multiMotor6">
                      <property name="font">
                       <font>
                        <pointsize>8</pointsize>
@@ -752,7 +811,7 @@
                     </widget>
                    </item>
                    <item row="2" column="1">
-                    <widget class="QComboBox" name="comboBox_7">
+                    <widget class="QComboBox" name="multiMotor7">
                      <property name="font">
                       <font>
                        <pointsize>8</pointsize>
@@ -768,7 +827,7 @@
                     </widget>
                    </item>
                    <item row="3" column="1">
-                    <widget class="QComboBox" name="comboBox_8">
+                    <widget class="QComboBox" name="multiMotor8">
                      <property name="font">
                       <font>
                        <pointsize>8</pointsize>
@@ -913,6 +972,54 @@
     <hint type="destinationlabel">
      <x>187</x>
      <y>112</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>elevonSlider2</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_25</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>127</x>
+     <y>105</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>127</x>
+     <y>105</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>elevonSlider1</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_18</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>127</x>
+     <y>105</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>127</x>
+     <y>105</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>feedForwardSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>feedForwardValue</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>214</x>
+     <y>157</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>144</x>
+     <y>161</y>
     </hint>
    </hints>
   </connection>

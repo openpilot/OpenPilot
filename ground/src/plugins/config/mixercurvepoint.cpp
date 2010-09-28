@@ -30,6 +30,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QStyleOption>
+#include <QDebug>
 
 #include "mixercurveline.h"
 #include "mixercurvepoint.h"
@@ -111,9 +112,11 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
             // Stay inside graph
             if (newPos.y() < 0)
                 newPos.setY(0);
-            if (newPos.y() > graph->height())
-                newPos.setY(graph->height());
-            return newPos;
+            double h = graph->sceneRect().height();
+            //qDebug() << h << " - " << newPos.y();
+            if (newPos.y() > h)
+                newPos.setY(h);
+              return newPos;
     }
     case ItemPositionHasChanged:
         foreach (Edge *edge, edgeList)

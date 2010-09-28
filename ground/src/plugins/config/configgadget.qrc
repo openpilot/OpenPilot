@@ -7,5 +7,6 @@
         <file>images/AHRS-v1.3.png</file>
         <file>images/paper-plane.svg</file>
         <file>images/curve-bg.svg</file>
+        <file>images/quad-shapes.svg</file>
     </qresource>
 </RCC>

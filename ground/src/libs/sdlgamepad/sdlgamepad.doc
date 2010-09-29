@@ -1,0 +1,114 @@
+/*!
+ * @file sdlgamepad.h
+ * @brief Headerfile for the SDLGamepad class.
+ *
+ * <p>
+ * In this file there are only prottyped functions and other
+ * global stuff. The real implemention of the functions and the
+ * class is in sdlgamepad.cpp. This file is not listed here because all
+ * documentation is inside the header file.
+ * </p>
+ */
+
+/*!
+ * @mainpage SDLGamepad API Documentation
+ *
+ * @section intro_sec Introduction
+ *
+ * <p>
+ * This is the API Documentation for the SDLGamepad library.
+ * </p>
+ *
+ * <p>
+ * This library makes use of the SDL-1.2 library to send / receive
+ * information from a gamepad / joystick that is compatible with the
+ * SDL system. It is written in QT. Because of the fact that SDL and QT
+ * are avaliable on many platforms you can use this library on every
+ * platform that supports SDL and qt!
+ * </p>
+ *
+ * @section install_sec Installation
+ *
+ * @subsection step1 Step 1: Requirements
+ *
+ * <p>
+ * You need a QT 4.5.x and SDL-1.2 to compile this library.
+ * </p>
+ *
+ * <p>
+ * For further information check http://qt.nokia.com and
+ * http://www.libsdl.org
+ * </p>
+ *
+ * @subsection step2 Step 2: Getting the code..
+ *
+ * <p>
+ * You can get the source code via svn:<br>
+ * <i>svn co http://www.nalla.de/svn/tank/sdlgamepad/trunk
+ * sdlgamepad</i>
+ * </p>
+ *
+ * @subsection step3 Step 3: Compile the code!
+ *
+ * <p>
+ * If you want debug information you should run:
+ * </p>
+ *
+ * <p>
+ * <i>qmake CONFIG+=debug</i><br>
+ * <i>make</i>
+ * </p>
+ *
+ * <p>
+ * You should now have .so files or a .dll file in the build
+ * subdirectory.
+ * </p>
+ *
+ * <p>
+ * For a release build just run qmake without the CONFIG+=debug!
+ * </p>
+ *
+ * @section add_sec Additional information
+ *
+ * <p>
+ * You need to have SDL installed globally in the mingw directory on
+ * windows. This is due to the fact that on unix systems sdl is mostly
+ * in the distributions repository system avaliable and therefore a
+ * global install.
+ * </p>
+ *
+ * @section ex_sec Implemention example
+ *
+ * @code
+ * #include <QCoreApplication>
+ * #include <QMetaType>
+ * #include "otherclass.h"
+ * #include "sdlgamepad.h"
+ *
+ * int main(int argc, char *argv[])
+ * {
+ *   QCoreApplication a(argc, argv);
+ *   OtherClass other;
+ *   SDLGamepad sdl;
+ *
+ *   a.connect(&a, SIGNAL(aboutToQuit()), &sdl, SLOT(quit()));
+ *
+ *   if(sdl.init())
+ *   {
+ *     sdl.start();
+ *     qRegisterMetaType<QListInt16>("QListInt16");
+ *     qRegisterMetaType<ButtonNumber>("ButtonNumber");
+ *
+ *     a.connect(&sdl, SIGNAL(axesValues(QListInt16)),
+ *               &other, SLOT(someSlot(QListInt16)));
+ *     a.connect(&sdl, SIGNAL(buttonState(ButtonNumber, bool)),
+ *               &other, SLOT(someOtherSlot(ButtonNumber, bool)));
+ *
+ *     return a.exec();
+ *   }
+ *
+ *   qFatal("Init of SDLGamepad failed! Shutting down..");
+ *   a.exit();
+ * }
+ * @endcode
+ */

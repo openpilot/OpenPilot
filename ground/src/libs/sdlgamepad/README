@@ -1,0 +1,22 @@
+
+                               SDLGamepad
+                                   1.0
+
+---
+
+This is the SDLGamepad library, used to receive gamepad activity from
+a SDL supported gamepad.
+
+SDLGamepad is written in C++ with the QT bindings backing it up. It
+is was tested on Windows XP, Windows Vista 32/64 bit,
+Windows 7 32/64 bit, Mac OSX, Ubuntu 32/64 bit. The SDL Framework is
+used to get gamepad input, so you need a working SDL Framework install
+on your system! For more information see www.libsdl.org
+
+This program is distributed under GNU LGPL version 3, which can be
+found in the file  "COPYING".  This license allows you to use
+tank-gamepad freely in commercial programs.
+
+Enjoy!
+  Manuel Blanquett (mail.nalla@gmail.com)
+

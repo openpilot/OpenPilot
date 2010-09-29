@@ -52,7 +52,7 @@
 
 
 // Private variables
-static xQueueHandle queue;
+//static xQueueHandle queue;
 static xTaskHandle taskHandle;
 
 // Private functions
@@ -73,10 +73,10 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
 int32_t ActuatorInitialize()
 {
 	// Create object queue
-	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+	//queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 	
 	// Listen for ExampleObject1 updates
-	ActuatorDesiredConnectQueue(queue);
+	//ActuatorDesiredConnectQueue(queue);
 	
 	// Start main task
 	xTaskCreate(actuatorTask, (signed char*)"Actuator", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);

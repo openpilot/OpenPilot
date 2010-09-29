@@ -70,7 +70,7 @@
 #include "pios_opahrs_proto.h"
 
 // Private constants
-#define STACK_SIZE 400
+#define STACK_SIZE 450
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 
 // Private types

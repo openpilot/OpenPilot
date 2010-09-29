@@ -5,6 +5,7 @@ QT += svg
 include(../../openpilotgcsplugin.pri) 
 include(../../plugins/coreplugin/coreplugin.pri) 
 include(../../plugins/uavobjects/uavobjects.pri)
+include(../../libs/sdlgamepad/sdlgamepad.pri)
 
 HEADERS += gcscontrolgadget.h
 HEADERS += joystickcontrol.h

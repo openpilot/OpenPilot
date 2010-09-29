@@ -30,6 +30,7 @@
 
 #include <coreplugin/iuavgadget.h>
 #include <uavobjects/manualcontrolcommand.h>
+#include "sdlgamepad/sdlgamepad.h"
 
 namespace Core {
 class IUAVGadget;
@@ -55,6 +56,7 @@ public:
 
 private:
     ManualControlCommand* getManualControlCommand();
+    SDLGamepad sdlGamepad;
 
     QWidget *m_widget;
     QList<int> m_context;
@@ -66,6 +68,11 @@ signals:
 protected slots:
     void manualControlCommandUpdated(UAVObject *);
     void sticksChangedLocally(double leftX, double leftY, double rightX, double rightY);
+
+    // signals from joystick
+    void gamepads(quint8 count);
+    void buttonState(ButtonNumber number, bool pressed);
+    void axesValues(QListInt16 values);
 };
 
 

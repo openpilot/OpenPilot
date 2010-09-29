@@ -26,11 +26,10 @@
  */
 #include "gcscontrolgadget.h"
 #include "gcscontrolgadgetwidget.h"
-
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavobject.h"
-#include <QDebug>
+    #include <QDebug>
 
 GCSControlGadget::GCSControlGadget(QString classId, GCSControlGadgetWidget *widget, QWidget *parent) :
         IUAVGadget(classId, parent),
@@ -41,6 +40,20 @@ GCSControlGadget::GCSControlGadget(QString classId, GCSControlGadgetWidget *widg
     connect(this,SIGNAL(sticksChangedRemotely(double,double,double,double)),widget,SLOT(updateSticks(double,double,double,double)));
 
     manualControlCommandUpdated(getManualControlCommand());
+
+    connect(this, SIGNAL(aboutToQuit()), &sdlGamepad, SLOT(quit()));
+    if(sdlGamepad.init()) {
+        qDebug() << "SDL Initialized";
+        sdlGamepad.start();
+        qRegisterMetaType<QListInt16>("QListInt16");
+        qRegisterMetaType<ButtonNumber>("ButtonNumber");
+
+        connect(&sdlGamepad,SIGNAL(gamepads(quint8)),this,SLOT(gamepads(quint8)));
+        connect(&sdlGamepad,SIGNAL(buttonState(ButtonNumber,bool)),this,SLOT(buttonState(ButtonNumber,bool)));
+        connect(&sdlGamepad,SIGNAL(axesValues(QListInt16)),this,SLOT(axesValues(QListInt16)));
+    }
+    qDebug() << "Axes: " << sdlGamepad.getAxes() << " ButtonsL " << sdlGamepad.getButtons();
+
 }
 
 GCSControlGadget::~GCSControlGadget()
@@ -77,4 +90,25 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
     obj->getField("Yaw")->setDouble(leftX);
     obj->getField("Throttle")->setDouble(rightY);
     obj->updated();
+}
+
+void GCSControlGadget::gamepads(quint8 count)
+{
+    qDebug() << count << " gamepads found";
+    sdlGamepad.setGamepad(0);
+}
+
+void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
+{
+}
+
+void GCSControlGadget::axesValues(QListInt16 values)
+{
+    double leftX = values[0];
+    double leftY = values[1];
+    double rightX = values[2];
+    double rightY = values[3];
+    double max = 32767;
+
+    sticksChangedLocally(leftX/max,-leftY/max,rightX/max,-rightY/max);
 }

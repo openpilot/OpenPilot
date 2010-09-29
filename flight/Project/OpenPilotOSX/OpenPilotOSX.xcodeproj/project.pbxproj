@@ -34,6 +34,11 @@
 		655268BC121FBD2900410C6E /* ahrscalibration.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrscalibration.xml; sourceTree = "<group>"; };
 		65632CBF124E09D900469B77 /* guidance.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = guidance.c; sourceTree = "<group>"; };
 		65632CC1124E09D900469B77 /* guidance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = guidance.h; sourceTree = "<group>"; };
+		65632DF0125146E100469B77 /* actuator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actuator.c; sourceTree = "<group>"; };
+		65632DF2125146E100469B77 /* actuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = actuator.h; sourceTree = "<group>"; };
+		65632DF51251650300469B77 /* pios_board.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_board.h; sourceTree = "<group>"; };
+		65632DF61251650300469B77 /* STM32103CB_AHRS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STM32103CB_AHRS.h; sourceTree = "<group>"; };
+		65632DF71251650300469B77 /* STM3210E_OP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STM3210E_OP.h; sourceTree = "<group>"; };
 		657CEEAD121DB6C8007A1FBE /* homelocation.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = homelocation.xml; sourceTree = "<group>"; };
 		657CEEB7121DBC63007A1FBE /* CoordinateConversions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CoordinateConversions.c; sourceTree = "<group>"; };
 		657CEEB9121DBC63007A1FBE /* CoordinateConversions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoordinateConversions.h; sourceTree = "<group>"; };
@@ -2582,7 +2587,6 @@
 		65B7E6AE120DF1E2000C1123 /* ahrs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs.c; path = ../../AHRS/ahrs.c; sourceTree = SOURCE_ROOT; };
 		65B7E6B0120DF1E2000C1123 /* ahrs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs.h; sourceTree = "<group>"; };
 		65B7E6B1120DF1E2000C1123 /* ahrs_fsm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_fsm.h; sourceTree = "<group>"; };
-		65B7E6B3120DF1E2000C1123 /* pios_board.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_board.h; sourceTree = "<group>"; };
 		65B7E6B4120DF1E2000C1123 /* pios_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_config.h; sourceTree = "<group>"; };
 		65B7E6B6120DF1E2000C1123 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../AHRS/Makefile; sourceTree = SOURCE_ROOT; };
 		65B7E6B7120DF1E2000C1123 /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_board.c; path = ../../AHRS/pios_board.c; sourceTree = SOURCE_ROOT; };
@@ -2943,6 +2947,41 @@
 				65632CC1124E09D900469B77 /* guidance.h */,
 			);
 			path = inc;
+			sourceTree = "<group>";
+		};
+		65632DEE125146E100469B77 /* matrixmixer */ = {
+			isa = PBXGroup;
+			children = (
+				65632DEF125146E100469B77 /* Actuator */,
+			);
+			path = matrixmixer;
+			sourceTree = "<group>";
+		};
+		65632DEF125146E100469B77 /* Actuator */ = {
+			isa = PBXGroup;
+			children = (
+				65632DF0125146E100469B77 /* actuator.c */,
+				65632DF1125146E100469B77 /* inc */,
+			);
+			path = Actuator;
+			sourceTree = "<group>";
+		};
+		65632DF1125146E100469B77 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65632DF2125146E100469B77 /* actuator.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		65632DF41251650300469B77 /* Boards */ = {
+			isa = PBXGroup;
+			children = (
+				65632DF51251650300469B77 /* pios_board.h */,
+				65632DF61251650300469B77 /* STM32103CB_AHRS.h */,
+				65632DF71251650300469B77 /* STM3210E_OP.h */,
+			);
+			path = Boards;
 			sourceTree = "<group>";
 		};
 		657CEEB5121DBC49007A1FBE /* flight */ = {
@@ -6787,7 +6826,6 @@
 				6543304F121980300063F913 /* insgps.h */,
 				65B7E6B0120DF1E2000C1123 /* ahrs.h */,
 				65B7E6B1120DF1E2000C1123 /* ahrs_fsm.h */,
-				65B7E6B3120DF1E2000C1123 /* pios_board.h */,
 				65B7E6B4120DF1E2000C1123 /* pios_config.h */,
 			);
 			name = inc;
@@ -6835,6 +6873,7 @@
 		65E8EF2211EEA61E00BBF654 /* Actuator */ = {
 			isa = PBXGroup;
 			children = (
+				65632DEE125146E100469B77 /* matrixmixer */,
 				65E8EF2311EEA61E00BBF654 /* actuator.c */,
 				65E8EF2411EEA61E00BBF654 /* inc */,
 			);
@@ -7228,6 +7267,7 @@
 		65E8F02F11EFF25C00BBF654 /* PiOS */ = {
 			isa = PBXGroup;
 			children = (
+				65632DF41251650300469B77 /* Boards */,
 				65E8F03011EFF25C00BBF654 /* Common */,
 				65E8F03811EFF25C00BBF654 /* inc */,
 				65E8F05711EFF25C00BBF654 /* pios.h */,

@@ -89,6 +89,8 @@ void GpsDisplayGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 #endif
                 m_widget->connectButton->setEnabled(true);
                 m_widget->disconnectButton->setEnabled(false);
+                m_widget->connectButton->setHidden(false);
+                m_widget->disconnectButton->setHidden(false);
 
                 connect(port, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
             }
@@ -97,8 +99,8 @@ void GpsDisplayGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     } else if (gpsDisplayConfig->connectionMode() == "Telemetry") {
         qDebug() << "Using Telemetry parser";
         parser = new TelemetryParser();
-        m_widget->connectButton->setEnabled(false);
-        m_widget->disconnectButton->setEnabled(false);
+        m_widget->disconnectButton->setHidden(true);
+        m_widget->connectButton->setHidden(true);
         m_widget->dataStreamGroupBox->setHidden(true);
     } else if (gpsDisplayConfig->connectionMode() == "Network") {
        // Not implemented for now...

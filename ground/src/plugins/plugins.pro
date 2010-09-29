@@ -147,7 +147,7 @@ plugin_gcscontrol.subdir = gcscontrol
 plugin_gcscontrol.depends = plugin_coreplugin
 plugin_gcscontrol.depends += plugin_uavobjects
 plugin_gcscontrol.depends += plugin_uavtalk
-SUBDIRS += plugin_gcscontrol
+#SUBDIRS += plugin_gcscontrol
 
 # Empty UAVGadget - Default for new splits
 plugin_magicwaypoint.subdir = magicwaypoint

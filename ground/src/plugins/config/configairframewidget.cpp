@@ -219,21 +219,25 @@ void ConfigAirframeWidget::requestAircraftUpdate()
             obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
             Q_ASSERT(obj);
             int chMixerNumber = m_aircraft->fwAileron1Channel->currentIndex()-1;
-            field = obj->getField(mixerVectors.at(chMixerNumber));
-            int ti = field->getElementNames().indexOf("Roll");
-            m_aircraft->elevonSlider1->setValue(field->getDouble(ti)*100);
-            ti = field->getElementNames().indexOf("Pitch");
-            m_aircraft->elevonSlider2->setValue(field->getDouble(ti)*100);
+            if (chMixerNumber >= 0) { // If for some reason the actuators were incoherent, we might fail here, hence the check.
+                field = obj->getField(mixerVectors.at(chMixerNumber));
+                int ti = field->getElementNames().indexOf("Roll");
+                m_aircraft->elevonSlider1->setValue(field->getDouble(ti)*100);
+                ti = field->getElementNames().indexOf("Pitch");
+                m_aircraft->elevonSlider2->setValue(field->getDouble(ti)*100);
+            }
         }
         if (frameType == "FixedWingVtail") {
             obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
             Q_ASSERT(obj);
             int chMixerNumber = m_aircraft->fwElevator1Channel->currentIndex()-1;
-            field = obj->getField(mixerVectors.at(chMixerNumber));
-            int ti = field->getElementNames().indexOf("Yaw");
-            m_aircraft->elevonSlider1->setValue(field->getDouble(ti)*100);
-            ti = field->getElementNames().indexOf("Pitch");
-            m_aircraft->elevonSlider2->setValue(field->getDouble(ti)*100);
+            if (chMixerNumber >=0) {
+                field = obj->getField(mixerVectors.at(chMixerNumber));
+                int ti = field->getElementNames().indexOf("Yaw");
+                m_aircraft->elevonSlider1->setValue(field->getDouble(ti)*100);
+                ti = field->getElementNames().indexOf("Pitch");
+                m_aircraft->elevonSlider2->setValue(field->getDouble(ti)*100);
+            }
         }
     } else if (frameType == "QuadX" || frameType == "QuadP" ||
                frameType == "Hexa" || frameType == "Octo" ) {

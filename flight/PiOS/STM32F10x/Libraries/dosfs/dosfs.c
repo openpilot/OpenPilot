@@ -40,6 +40,12 @@ uint32_t DFS_GetPtnStart(uint8_t unit, uint8_t *scratchsector, uint8_t pnum, uin
                 return DFS_ERRMISC;
         }
 
+        // check if jump to boot, VBR
+        if(mbr->bootcode[0]==0xEB || mbr->bootcode[0]==0xE9){
+                // MBR is actually VBR
+                return 0;
+        }
+
         result = (uint32_t) mbr->ptable[pnum].start_0 |
           (((uint32_t) mbr->ptable[pnum].start_1) << 8) |
           (((uint32_t) mbr->ptable[pnum].start_2) << 16) |

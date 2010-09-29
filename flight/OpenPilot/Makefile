@@ -57,11 +57,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Telemetry GPS ManualControl Altitude AHRSComms Stabilization/simple/Stabilization Watchdog
-#matrix based actuator mixer
-#MODULES += Actuator/matrix/Actuator
-#original actuator with separate mixers for fixed wing, heli and VTOL
-MODULES += Actuator
+MODULES =  Actuator Telemetry GPS ManualControl Altitude AHRSComms Stabilization/simple/Stabilization Watchdog
 
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial

@@ -547,10 +547,22 @@ void ConfigAHRSWidget::computeScaleBias()
     field->setDouble(sign(S[1]) * b[1], 1);
     field->setDouble(sign(S[2]) * b[2], 2);
 
+    // Go ahead and fix gyro scale here
     field = obj->getField(QString("gyro_bias"));
-    field->setDouble(-listMean(gyro_accum_x),0);
-    field->setDouble(-listMean(gyro_accum_y),1);
-    field->setDouble(-listMean(gyro_accum_z),2);
+    double a = field->getDouble(0);
+    field->setDouble(-sign(a) * a, 0);
+    a = field->getDouble(1);
+    field->setDouble(sign(a) * a, 1);
+    a = field->getDouble(2);
+    field->setDouble(-sign(a) * a, 2);
+
+    field = obj->getField(QString("gyro_bias"));
+    a = listMean(gyro_accum_x);
+    field->setDouble(sign(a)*a,0);
+    a = listMean(gyro_accum_y);
+    field->setDouble(-sign(a)*a,1);
+    a = listMean(gyro_accum_z);
+    field->setDouble(sign(a)*a,2);
 
     obj->updated();
 

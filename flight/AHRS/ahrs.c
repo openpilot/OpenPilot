@@ -556,6 +556,8 @@ void downsample_data()
  * sense for the z accel so make sure 6 point calibration is also run and those values set
  * after these read.
  */
+#define NBIAS 100
+#define NVAR  500
 void calibrate_sensors()
 {
 	int i,j;
@@ -563,16 +565,35 @@ void calibrate_sensors()
 	float gyro_bias[3] = {0, 0, 0};
 	float mag_bias[3] = {0, 0, 0};
 
-	// run few loops to get mean
-	gyro_data.calibration.bias[0] = 0;
-	gyro_data.calibration.bias[1] = 0;
-	gyro_data.calibration.bias[2] = 0;
-	accel_data.calibration.bias[0] = 0;
-	accel_data.calibration.bias[1] = 0;
-	accel_data.calibration.bias[2] = 0;
-	mag_data.calibration.bias[0] = 0;
-	mag_data.calibration.bias[1] = 0;
-	mag_data.calibration.bias[2] = 0;
+	for (i = 0, j = 0; i < NBIAS; i++) {
+		while (ahrs_state != AHRS_DATA_READY) ;
+		ahrs_state = AHRS_PROCESSING;
+		downsample_data();
+		gyro_bias[0] += gyro_data.filtered.x / NBIAS;
+		gyro_bias[1] += gyro_data.filtered.y / NBIAS;
+		gyro_bias[2] += gyro_data.filtered.z / NBIAS;
+		accel_bias[0] += accel_data.filtered.x / NBIAS;
+		accel_bias[1] += accel_data.filtered.y / NBIAS;
+		accel_bias[2] += accel_data.filtered.z / NBIAS;
+		ahrs_state = AHRS_IDLE;
+		
+#if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
+		if(PIOS_HMC5843_NewDataAvailable()) {
+			j ++;
+			PIOS_HMC5843_ReadMag(mag_data.raw.axis);
+			mag_data.scaled.axis[0] = (mag_data.raw.axis[0] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
+			mag_data.scaled.axis[1] = (mag_data.raw.axis[1] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
+			mag_data.scaled.axis[2] = (mag_data.raw.axis[2] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
+			mag_bias[0] += mag_data.scaled.axis[0];
+			mag_bias[1] += mag_data.scaled.axis[1];
+			mag_bias[2] += mag_data.scaled.axis[2];
+		}
+#endif
+		process_spi_request();
+	}
+	mag_bias[0] /= j;
+	mag_bias[1] /= j;
+	mag_bias[2] /= j;
 	
 	gyro_data.calibration.variance[0] = 0;
 	gyro_data.calibration.variance[1] = 0;
@@ -584,24 +605,17 @@ void calibrate_sensors()
 	accel_data.calibration.variance[1] = 0;
 	accel_data.calibration.variance[2] = 0;
 	
-	for (i = 0, j = 0; i < 250; i++) {
+	for (i = 0, j = 0; j < NVAR; j++) {
 		while (ahrs_state != AHRS_DATA_READY) ;
 		ahrs_state = AHRS_PROCESSING;
 		downsample_data();
-		gyro_bias[0] += gyro_data.filtered.x;
-		gyro_bias[1] += gyro_data.filtered.y;
-		gyro_bias[2] += gyro_data.filtered.z;
-		accel_bias[0] += accel_data.filtered.x;
-		accel_bias[1] += accel_data.filtered.y;
-		accel_bias[2] += accel_data.filtered.z;
-		gyro_data.calibration.variance[0] += pow(gyro_data.filtered.x,2);
-		gyro_data.calibration.variance[1] += pow(gyro_data.filtered.y,2);
-		gyro_data.calibration.variance[2] += pow(gyro_data.filtered.z,2);
-		accel_data.calibration.variance[0] += pow(accel_data.filtered.x,2);
-		accel_data.calibration.variance[1] += pow(accel_data.filtered.y,2);
-		accel_data.calibration.variance[2] += pow(accel_data.filtered.z,2);
+		gyro_data.calibration.variance[0] += pow(gyro_data.filtered.x-gyro_bias[0],2) / NVAR;
+		gyro_data.calibration.variance[1] += pow(gyro_data.filtered.y-gyro_bias[1],2) / NVAR;
+		gyro_data.calibration.variance[2] += pow(gyro_data.filtered.z-gyro_bias[2],2) / NVAR;
+		accel_data.calibration.variance[0] += pow(accel_data.filtered.x-accel_bias[0],2) / NVAR;
+		accel_data.calibration.variance[1] += pow(accel_data.filtered.y-accel_bias[1],2) / NVAR;
+		accel_data.calibration.variance[2] += pow(accel_data.filtered.z-accel_bias[2],2) / NVAR;
 		ahrs_state = AHRS_IDLE;
-		
 #if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
 		if(PIOS_HMC5843_NewDataAvailable()) {
 			j ++;
@@ -609,38 +623,17 @@ void calibrate_sensors()
 			mag_data.scaled.axis[0] = (mag_data.raw.axis[0] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
 			mag_data.scaled.axis[1] = (mag_data.raw.axis[1] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
 			mag_data.scaled.axis[2] = (mag_data.raw.axis[2] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
-			
-			mag_bias[0] += mag_data.scaled.axis[0];
-			mag_bias[1] += mag_data.scaled.axis[1];
-			mag_bias[2] += mag_data.scaled.axis[2];
-			mag_data.calibration.variance[0] += pow(mag_data.scaled.axis[0],2);
-			mag_data.calibration.variance[1] += pow(mag_data.scaled.axis[1],2);
-			mag_data.calibration.variance[2] += pow(mag_data.scaled.axis[2],2);
-		}			
+			mag_data.calibration.variance[0] += pow(mag_data.scaled.axis[0]-mag_bias[0],2);
+			mag_data.calibration.variance[1] += pow(mag_data.scaled.axis[1]-mag_bias[1],2);
+			mag_data.calibration.variance[2] += pow(mag_data.scaled.axis[2]-mag_bias[2],2);
+		}
 #endif
-
 		process_spi_request();
 	}
-	gyro_data.calibration.bias[0]  = gyro_bias[0] / i;
-	gyro_data.calibration.bias[1]  = gyro_bias[1] / i;
-	gyro_data.calibration.bias[2]  = gyro_bias[2] / i;
-	accel_data.calibration.bias[0] = accel_bias[0] / i;
-	accel_data.calibration.bias[1] = accel_bias[1] / i;
-	accel_data.calibration.bias[2] = accel_bias[2] / i;
-	mag_data.calibration.bias[0]   = mag_bias[0] / j;
-	mag_data.calibration.bias[1]   = mag_bias[1] / j;
-	mag_data.calibration.bias[2]   = mag_bias[2] / j;
-
-	// more iterations for variance
-	gyro_data.calibration.variance[0] = gyro_data.calibration.variance[0] / i - pow(gyro_data.calibration.bias[0],2);
-	gyro_data.calibration.variance[1] = gyro_data.calibration.variance[1] / i - pow(gyro_data.calibration.bias[1],2);
-	gyro_data.calibration.variance[2] = gyro_data.calibration.variance[2] / i - pow(gyro_data.calibration.bias[2],2);
-	accel_data.calibration.variance[0] = accel_data.calibration.variance[0] / i - pow(accel_data.calibration.bias[0],2);
-	accel_data.calibration.variance[1] = accel_data.calibration.variance[1] / i - pow(accel_data.calibration.bias[1],2);
-	accel_data.calibration.variance[2] = accel_data.calibration.variance[2] / i - pow(accel_data.calibration.bias[2],2);
-	mag_data.calibration.variance[0] = mag_data.calibration.variance[0] / j - pow(mag_data.calibration.bias[0],2);
-	mag_data.calibration.variance[1] = mag_data.calibration.variance[1] / j - pow(mag_data.calibration.bias[1],2);
-	mag_data.calibration.variance[2] = mag_data.calibration.variance[2] / j - pow(mag_data.calibration.bias[2],2);
+	
+	mag_data.calibration.variance[0] /= j;
+	mag_data.calibration.variance[1] /= j;
+	mag_data.calibration.variance[2] /= j;
 }
 
 /**

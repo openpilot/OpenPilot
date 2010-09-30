@@ -43,7 +43,6 @@
 
 MagicWaypointGadgetWidget::MagicWaypointGadgetWidget(QWidget *parent) : QLabel(parent)
 {
-    qDebug() << "MagicWaypointGadgetWidget constructor";
     m_magicwaypoint = new Ui_MagicWaypoint();
     m_magicwaypoint->setupUi(this);
 

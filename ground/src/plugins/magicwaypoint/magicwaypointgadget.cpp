@@ -36,7 +36,6 @@ MagicWaypointGadget::MagicWaypointGadget(QString classId, MagicWaypointGadgetWid
         IUAVGadget(classId, parent),
         m_widget(widget)
 {
-    qDebug() << "Class id" << classId;
 }
 
 MagicWaypointGadget::~MagicWaypointGadget()

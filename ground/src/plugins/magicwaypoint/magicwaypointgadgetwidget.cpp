@@ -56,7 +56,7 @@ MagicWaypointGadgetWidget::MagicWaypointGadgetWidget(QWidget *parent) : QLabel(p
     connect(this, SIGNAL(positionDesiredObjectChanged(double,double)), m_magicwaypoint->widgetPosition, SLOT(updateDesiredIndicator(double,double)));
 
     // Catch changes in scale for visualization
-    connect(m_magicwaypoint->horizontalSliderScale, SIGNAL(valueChanged(int)), this, SLOT(scaleChanged(double)));
+    connect(m_magicwaypoint->horizontalSliderScale, SIGNAL(valueChanged(int)), this, SLOT(scaleChanged(int)));
 }
 
 MagicWaypointGadgetWidget::~MagicWaypointGadgetWidget()

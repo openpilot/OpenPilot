@@ -38,7 +38,7 @@
 #define sign(x) ((x < 0) ? -1 : 1)
 
 const double ConfigAHRSWidget::maxVarValue = 0.1;
-const int ConfigAHRSWidget::calibrationDelay = 5; // Time to wait for the AHRS to do its calibration
+const int ConfigAHRSWidget::calibrationDelay = 7; // Time to wait for the AHRS to do its calibration
 
 ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
@@ -375,6 +375,7 @@ void ConfigAHRSWidget::attitudeRawUpdated(UAVObject * obj)
             obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
             obj->getField(QString("UpdateRaw"))->setValue(initialUpdateRaw);
             obj->getField(QString("UpdateFiltered"))->setValue(initialUpdateFiltered);
+            obj->updated();
             getObjectManager()->getObject(QString("AttitudeRaw"))->setMetadata(initialMdata);
         }
     }

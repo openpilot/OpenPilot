@@ -76,10 +76,13 @@ JoystickControl::~JoystickControl()
 /**
   * @brief Update the displayed position based on an MCC update
   */
-void JoystickControl::changePosition(double X, double Y)
+void JoystickControl::changePosition(double x, double y)
 {
     QRectF sceneSize = scene()->sceneRect();
-    m_joystickEnd->setPos((X+1)/2*sceneSize.width(),(-Y+1)/2*sceneSize.height());
+
+    m_joystickEnd->setPos(
+            (x+1) / 2*sceneSize.width() - m_joystickEnd->boundingRect().width() / 2,
+            (-y+1) / 2*sceneSize.height() - m_joystickEnd->boundingRect().height() / 2);
 }
 
 /**

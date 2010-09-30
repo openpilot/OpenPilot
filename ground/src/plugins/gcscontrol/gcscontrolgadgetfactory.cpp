@@ -31,7 +31,7 @@
 
 GCSControlGadgetFactory::GCSControlGadgetFactory(QObject *parent) :
         IUAVGadgetFactory(QString("GCSControlGadget"),
-                          tr("UAV Control"),
+                          tr("Controller"),
                           parent)
 {
 }

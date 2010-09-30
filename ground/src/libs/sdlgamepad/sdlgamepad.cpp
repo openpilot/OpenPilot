@@ -48,8 +48,6 @@ bool SDLGamepad::init()
   if(SDL_Init(SDL_INIT_JOYSTICK) < 0)
     return false;
 
-  qDebug("SDL initzialized!");
-
   if(SDL_NumJoysticks() > 0)
   {
     emit gamepads(SDL_NumJoysticks());
@@ -62,7 +60,6 @@ bool SDLGamepad::init()
   }
   else
   {
-    qFatal("No gamepads present!");
     return false;
   }
 

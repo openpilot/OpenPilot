@@ -52,8 +52,6 @@ GCSControlGadget::GCSControlGadget(QString classId, GCSControlGadgetWidget *widg
         connect(&sdlGamepad,SIGNAL(buttonState(ButtonNumber,bool)),this,SLOT(buttonState(ButtonNumber,bool)));
         connect(&sdlGamepad,SIGNAL(axesValues(QListInt16)),this,SLOT(axesValues(QListInt16)));
     }
-    qDebug() << "Axes: " << sdlGamepad.getAxes() << " ButtonsL " << sdlGamepad.getButtons();
-
 }
 
 GCSControlGadget::~GCSControlGadget()
@@ -94,7 +92,6 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
 
 void GCSControlGadget::gamepads(quint8 count)
 {
-    qDebug() << count << " gamepads found";
     sdlGamepad.setGamepad(0);
 }
 

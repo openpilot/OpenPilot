@@ -27,8 +27,9 @@ D: Initial GCS Settings Gadget work
 
 N: Jose Barros
 E: josembarros (at) hotmail (dot) com
-D: Next-Gen OP Map Lib, GCS Y-Modem Plugin, OP Bootloader 
-
+D: Next-Gen OP Map Lib, Y-Modem Library, Uploader Plugin
+D: OP Bootloader, AHRS Bootloader, OPUploadTool
+ 
 N: David "Buzz" Carlson 
 E: chebuzz (plus) openpilot (at) gmail (dot) com
 D: 3D ModelView GCS Plugin, sponsor of HITL merge work and XPlane addition

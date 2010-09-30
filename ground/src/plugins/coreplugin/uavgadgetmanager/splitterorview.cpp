@@ -435,38 +435,3 @@ void SplitterOrView::restoreState(QSettings* qSettings)
         }
     }
 }
-
-void SplitterOrView::restoreState(const QByteArray &state)
-{
-    QDataStream stream(state);
-    QByteArray mode;
-    stream >> mode;
-    if (mode == "splitter") {
-        qint32 orientation;
-        QByteArray splitter, first, second;
-        stream >> orientation >> splitter >> first >> second;
-        split((Qt::Orientation)orientation);
-        m_splitter->restoreState(splitter);
-
-        // TODO: Lots of ugly, but this whole method should dissapear ASAP,
-        // It's here only for temporary backwards compatability.
-        m_sizes.clear();
-        QDataStream stream(&splitter, QIODevice::ReadOnly);
-        qint32 marker;
-        qint32 v;
-        stream >> marker;
-        stream >> v;
-        stream >> m_sizes;
-
-
-        static_cast<SplitterOrView*>(m_splitter->widget(0))->restoreState(first);
-        static_cast<SplitterOrView*>(m_splitter->widget(1))->restoreState(second);
-    } else if (mode == "uavGadget") {
-        QString classId;
-        QByteArray uavGadgetState;
-        stream >> classId >> uavGadgetState;
-        int index = m_view->indexOfClassId(classId);
-        m_view->listSelectionActivated(index);
-        gadget()->restoreState(uavGadgetState);
-    }
-}

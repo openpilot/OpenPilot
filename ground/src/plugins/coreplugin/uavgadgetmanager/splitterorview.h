@@ -61,7 +61,6 @@ public:
     UAVGadgetView *takeView();
 
     void saveState(QSettings*) const;
-    void restoreState(const QByteArray &);
     void restoreState(QSettings*);
 
     SplitterOrView *findView(Core::IUAVGadget *uavGadget);

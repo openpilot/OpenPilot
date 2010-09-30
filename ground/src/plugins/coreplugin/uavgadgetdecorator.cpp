@@ -129,16 +129,3 @@ void UAVGadgetDecorator::restoreState(QSettings* qSetting)
         }
     }
 }
-
-void UAVGadgetDecorator::restoreState(QByteArray state)
-{
-    QDataStream stream(state);
-    QByteArray configName;
-    stream >> configName;
-    foreach (IUAVGadgetConfiguration *config, *m_configurations) {
-        if (config->name() == configName) {
-            m_activeConfiguration = config;
-            loadConfiguration(config);
-        }
-    }
-}

@@ -465,55 +465,13 @@ bool UAVGadgetManager::restoreState(QSettings* qSettings)
     return true;
 }
 
-bool UAVGadgetManager::restoreState(const QByteArray &state)
-{
-    removeAllSplits();
-
-    UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
-    IUAVGadget *gadget = m_d->m_splitterOrView->view()->gadget();
-    emptyView(m_d->m_splitterOrView->view());
-    im->removeGadget(gadget);
-    QDataStream stream(state);
-
-    QByteArray version;
-    stream >> version;
-
-    if (version != "UAVGadgetManagerV1")
-        return false;
-
-    stream >> m_showToolbars;
-
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-
-    QByteArray splitterstates;
-    stream >> splitterstates;
-    m_d->m_splitterOrView->restoreState(splitterstates);
-
-    QApplication::restoreOverrideCursor();
-    return true;
-}
-
 void UAVGadgetManager::saveSettings(QSettings *qs)
 {
     qs->beginGroup("UAVGadgetManager");
     qs->beginGroup(m_uavGadgetMode->uniqueModeName());
 
-    QString defaultUAVGadgetManagerKey =  "DefaultSettings";
-    QString uavGadgetManagerKey = "Settings";
-
-    // The default group can be done in a better way,
-    // remove them for now. Since we no longer have two
-    // possible groups, we can remove the non default one too.
-    // TODO: Remove this code, and support for reading default group.
-    if (qs->childKeys().contains(defaultUAVGadgetManagerKey) ||
-        qs->childGroups().contains(defaultUAVGadgetManagerKey)) {
-        qs->remove(defaultUAVGadgetManagerKey);
-    }
-
-    if (qs->allKeys().contains(uavGadgetManagerKey) ||
-        qs->childGroups().contains(uavGadgetManagerKey)) {
-        qs->remove(uavGadgetManagerKey);
-    }
+    // Make sure the old tree is wiped.
+    qs->remove("");
 
     // Do actual saving
     saveState(qs);
@@ -536,29 +494,7 @@ void UAVGadgetManager::readSettings(QSettings *qs)
     }
     qs->beginGroup(m_uavGadgetMode->uniqueModeName());
 
-    QString defaultUAVGadgetManagerKey = "DefaultSettings";
-    QString uavGadgetManagerKey = "Settings";
-
-    if (qs->childGroups().contains(uavGadgetManagerKey)) {
-        // TODO: Remove.
-        qs->beginGroup(uavGadgetManagerKey);
-        restoreState(qs);
-        qs->endGroup();
-    } else if (qs->childGroups().contains(defaultUAVGadgetManagerKey)) {
-        // TODO: Remove.
-        qs->beginGroup(defaultUAVGadgetManagerKey);
-        restoreState(qs);
-        qs->endGroup();
-    } else if (qs->contains(uavGadgetManagerKey)) {
-        // TODO: Remove.
-        restoreState(QByteArray::fromBase64(qs->value(uavGadgetManagerKey).toByteArray()));
-    } else if (qs->contains(defaultUAVGadgetManagerKey)) {
-        // TODO: Remove.
-        restoreState(QByteArray::fromBase64(qs->value(defaultUAVGadgetManagerKey).toByteArray()));
-    } else {
-        // TODO: Make this the only way of loading.
-        restoreState(qs);
-    }
+    restoreState(qs);
 
     showToolbars(m_showToolbars);
     updateActions();

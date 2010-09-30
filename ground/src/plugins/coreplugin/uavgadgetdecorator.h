@@ -45,7 +45,6 @@ public:
     IUAVGadgetConfiguration *activeConfiguration() { return m_activeConfiguration; }
     void loadConfiguration(IUAVGadgetConfiguration *config);
     void saveState(QSettings* qSettings);
-    void restoreState(QByteArray state);
     void restoreState(QSettings* qSettings);
 public slots:
     void configurationChanged(IUAVGadgetConfiguration* config);

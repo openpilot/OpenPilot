@@ -429,72 +429,67 @@
     <message>
         <location/>
         <source>Airplane type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип планера:</translation>
     </message>
     <message>
         <location/>
         <source>Mixer OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Миксер в порядке</translation>
     </message>
     <message>
         <location/>
         <source>Channel Assignment</source>
-        <translation type="unfinished"></translation>
+        <translation>Назначение каналов</translation>
     </message>
     <message>
         <location/>
         <source>Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>Двигатель</translation>
     </message>
     <message>
         <location/>
         <source>Aileron 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Элерон 1</translation>
     </message>
     <message>
         <location/>
         <source>Aileron 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Элерон 2</translation>
     </message>
     <message>
         <location/>
         <source>Elevator 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Руль высоты 1</translation>
     </message>
     <message>
         <location/>
         <source>Rudder</source>
-        <translation type="unfinished"></translation>
+        <translation>Руль направления</translation>
     </message>
     <message>
         <location/>
         <source>Elevator 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Руль высоты 2</translation>
     </message>
     <message>
         <location/>
         <source>Throttle Curve</source>
-        <translation type="unfinished"></translation>
+        <translation>Кривая газа</translation>
     </message>
     <message>
         <location/>
         <source>Frame type:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Idle Throttle</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип корпуса:</translation>
     </message>
     <message>
         <location/>
         <source>Cyclic Rate</source>
-        <translation type="unfinished"></translation>
+        <translation>Темп</translation>
     </message>
     <message>
         <location/>
         <source>Tricopter Yaw Ch</source>
-        <translation type="unfinished"></translation>
+        <translation>Канал рыскания трикоптера</translation>
     </message>
     <message>
         <location/>
@@ -513,58 +508,213 @@
     </message>
     <message>
         <location/>
-        <source>Motor 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor 3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor 4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor 5</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor 6</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor 7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motor 8</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>CCPM Heli</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>This is not implemented yet, sorry</source>
+        <translation>Это пока не реализовано, извините</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Elevon Mix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Custom / Advanced setup UI</source>
+        <source>Rudder %</source>
+        <translation>Руль направления %</translation>
+    </message>
+    <message>
+        <location/>
+        <source>50</source>
+        <translation>50</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch %</source>
+        <translation>Тангаж %</translation>
+    </message>
+    <message>
+        <location/>
+        <source>FeedForward </source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>000</source>
+        <translation>000</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Test</source>
+        <translation>Тест</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motors</source>
+        <translation>Моторы</translation>
+    </message>
+    <message>
+        <location/>
+        <source>1</source>
+        <translation>1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>2</source>
+        <translation>2</translation>
+    </message>
+    <message>
+        <location/>
+        <source>3</source>
+        <translation>3</translation>
+    </message>
+    <message>
+        <location/>
+        <source>4</source>
+        <translation>4</translation>
+    </message>
+    <message>
+        <location/>
+        <source>5</source>
+        <translation>5</translation>
+    </message>
+    <message>
+        <location/>
+        <source>6</source>
+        <translation>6</translation>
+    </message>
+    <message>
+        <location/>
+        <source>7</source>
+        <translation>7</translation>
+    </message>
+    <message>
+        <location/>
+        <source>8</source>
+        <translation>8</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel1</source>
+        <translation>Канал 1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 2</source>
+        <translation>Канал 2</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 3</source>
+        <translation>Канал 3</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 4</source>
+        <translation>Канал 4</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 5</source>
+        <translation>Канал 5</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 6</source>
+        <translation>Канал 6</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 7</source>
+        <translation>Канал 7</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel 8</source>
+        <translation>Каналы 8</translation>
+    </message>
+    <message>
+        <location/>
+        <source>FeedForward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>AccelTime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>DecelTime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Curve 1</source>
+        <translation>Кривизна 1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Curve 2</source>
+        <translation>Кривизна 2</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll</source>
+        <translation>Крен</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch</source>
+        <translation>Тангаж</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Yaw</source>
+        <translation>Рыскание</translation>
+    </message>
+    <message>
+        <location/>
+        <source>C0</source>
+        <translation>К0</translation>
+    </message>
+    <message>
+        <location/>
+        <source>C1</source>
+        <translation>К1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>C2</source>
+        <translation>К2</translation>
+    </message>
+    <message>
+        <location/>
+        <source>C3</source>
+        <translation>К3</translation>
+    </message>
+    <message>
+        <location/>
+        <source>C4</source>
+        <translation>К4</translation>
+    </message>
+    <message>
+        <location/>
+        <source>C5</source>
+        <translation>К5</translation>
+    </message>
+    <message>
+        <location/>
+        <source>C6</source>
+        <translation>К6</translation>
+    </message>
+    <message>
+        <location/>
+        <source>C7</source>
+        <translation>К7</translation>
     </message>
 </context>
 <context>
@@ -1564,16 +1714,6 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>This is experimental. Use at own risk.</source>
-        <translation>Это экспериментальный функционал. Используйте на свой риск.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Please report bugs!</source>
-        <translation>Пожалуйста сообщайте об ошибках!</translation>
-    </message>
-    <message>
-        <location/>
         <source>Config File</source>
         <translation>Файл конфигурации</translation>
     </message>
@@ -2295,7 +2435,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>labelUAVPos</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -2305,7 +2445,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>labelMapPos</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -2315,17 +2455,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>labelMousePos</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>%v</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>labelMapZoom</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2735,17 +2875,17 @@ Update</source>
     <message>
         <location line="+5"/>
         <source>Unable to send command line arguments to the already running instance. It appears to be not responding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удается отправить аргументы командной строки в уже запущенную программу. Похоже, что она не отвечает.</translation>
     </message>
     <message>
         <location line="+135"/>
         <source>Could not find &apos;Core.pluginspec&apos; in %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось найти &apos;Core.pluginspec&apos; в %1</translation>
     </message>
     <message>
         <location line="+36"/>
         <source>OpenPilot GCS - Plugin loader messages</source>
-        <translation type="unfinished"></translation>
+        <translation>Сообщения загрузчика плагинов</translation>
     </message>
 </context>
 <context>
@@ -2782,82 +2922,82 @@ Update</source>
     <message>
         <location filename="../../../src/libs/extensionsystem/pluginerrorview.cpp" line="+78"/>
         <source>Invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>Некорректно</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Description file found, but error on read</source>
-        <translation type="unfinished"></translation>
+        <translation>Файл описания найден, но произошла ошибка при чтении</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Read</source>
-        <translation type="unfinished"></translation>
+        <translation>Чтение</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Description successfully read</source>
-        <translation type="unfinished"></translation>
+        <translation>Описание успешно прочитано</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Resolved</source>
-        <translation type="unfinished"></translation>
+        <translation>Урегулирование</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Dependencies are successfully resolved</source>
-        <translation type="unfinished"></translation>
+        <translation>Зависимости успешно разрешены</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Загружено</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Library is loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Библиотека загружена</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Initialized</source>
-        <translation type="unfinished"></translation>
+        <translation>Инициализировано</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Plugin&apos;s initialization method succeeded</source>
-        <translation type="unfinished"></translation>
+        <translation>Плагин удачно инициализирован</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Running</source>
-        <translation type="unfinished"></translation>
+        <translation>Запуск</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Plugin successfully loaded and running</source>
-        <translation type="unfinished"></translation>
+        <translation>Плагин успешно загружен и запущен</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Остановлен</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Plugin was shut down</source>
-        <translation type="unfinished"></translation>
+        <translation>Плагин был остановлен</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Deleted</source>
-        <translation type="unfinished"></translation>
+        <translation>Удален</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Plugin ended its life cycle and was deleted</source>
-        <translation type="unfinished"></translation>
+        <translation>Плагин завергил работу и был удален</translation>
     </message>
 </context>
 <context>
@@ -6803,7 +6943,19 @@ Reason: %3</source>
 <context>
     <name>Core::UAVGadgetInstanceManager</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/uavgadgetinstancemanager.cpp" line="+132"/>
+        <location filename="../../../src/plugins/coreplugin/uavgadgetinstancemanager.cpp" line="+87"/>
+        <source>Migrating UAVGadgetConfigurations from version 1.1.0 to </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>You might want to save your old config NOW since it might be replaced by broken one when you exit the GCS!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+53"/>
+        <location line="+1"/>
+        <location line="+48"/>
         <location line="+1"/>
         <source>default</source>
         <translation>по умолчанию</translation>
@@ -6812,7 +6964,7 @@ Reason: %3</source>
 <context>
     <name>Core::UAVGadgetManager</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/uavgadgetmanager/uavgadgetmanager.cpp" line="+196"/>
+        <location filename="../../../src/plugins/coreplugin/uavgadgetmanager/uavgadgetmanager.cpp" line="+203"/>
         <source>Edit Gadgets Mode</source>
         <translation>Режим настройки экрана</translation>
     </message>
@@ -6885,7 +7037,7 @@ Reason: %3</source>
 <context>
     <name>Core::Internal::UAVGadgetView</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/uavgadgetmanager/uavgadgetview.cpp" line="+124"/>
+        <location filename="../../../src/plugins/coreplugin/uavgadgetmanager/uavgadgetview.cpp" line="+122"/>
         <source>Active</source>
         <translation>Активная</translation>
     </message>
@@ -6948,14 +7100,6 @@ Reason: %3</source>
         <location line="+1"/>
         <source>Maybe you first have to choose Edit Gadgets Mode in the Window menu.</source>
         <translation>     Возможно, сначала нужно выбрать &quot;Режим настройки экрана&quot;, в меню окна.</translation>
-    </message>
-</context>
-<context>
-    <name>GCSControlGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/gcscontrol/gcscontrolgadgetfactory.cpp" line="+34"/>
-        <source>UAV Control</source>
-        <translation>Управление БПЛА</translation>
     </message>
 </context>
 <context>
@@ -7065,7 +7209,7 @@ Reason: %3</source>
         <translation>Домашняя позиция</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+5"/>
         <source>UAV</source>
         <translation>БПЛА</translation>
     </message>
@@ -7075,12 +7219,12 @@ Reason: %3</source>
         <translation>Точки маршрута</translation>
     </message>
     <message>
-        <location line="+258"/>
+        <location line="+268"/>
         <source>OpenPilot GCS</source>
         <translation>OpenPilot НСУ (Наземная Система Управления)</translation>
     </message>
     <message>
-        <location line="+241"/>
+        <location line="+284"/>
         <source>&amp;Close menu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7141,13 +7285,13 @@ Reason: %3</source>
     </message>
     <message>
         <location line="+1"/>
-        <location line="+51"/>
+        <location line="+47"/>
         <location line="+7"/>
         <source>Ctrl+F</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-57"/>
+        <location line="-53"/>
         <source>Find a location</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7239,16 +7383,6 @@ Reason: %3</source>
     <message>
         <location line="+1"/>
         <source>Center the map onto the UAV location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Set Home location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Set the current UAV location as the HOME location</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7788,7 +7922,7 @@ new home location unless it is in indoor mode.</source>
 <context>
     <name>Core::UAVConfigInfo</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/uavconfiginfo.cpp" line="+77"/>
+        <location filename="../../../src/plugins/coreplugin/uavconfiginfo.cpp" line="+180"/>
         <source>Do you want to continue the import?</source>
         <translation>Вы хотите продолжить импорт?</translation>
     </message>
@@ -7808,7 +7942,7 @@ new home location unless it is in indoor mode.</source>
         <translation>ОШИБКА: </translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <source>Unknown compatibility level: </source>
         <translation>Неизвестный уровень совместимости:</translation>
     </message>
@@ -7818,27 +7952,27 @@ new home location unless it is in indoor mode.</source>
     <message>
         <location filename="../../../src/plugins/logging/logging.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Форма</translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location/>
         <source>Play</source>
-        <translation type="unfinished">Воспроизвести</translation>
+        <translation>Воспроизведение</translation>
     </message>
     <message>
         <location/>
         <source>Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>Пауза</translation>
     </message>
     <message>
         <location/>
         <source>Status: </source>
-        <translation type="unfinished"></translation>
+        <translation>Статус:</translation>
     </message>
     <message>
         <location/>
         <source>Idle</source>
-        <translation type="unfinished"></translation>
+        <translation>в холостую</translation>
     </message>
 </context>
 <context>
@@ -7846,6 +7980,35 @@ new home location unless it is in indoor mode.</source>
     <message>
         <location filename="../../../src/plugins/logging/logginggadgetfactory.cpp" line="+34"/>
         <source>Logging</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MagicWaypoint</name>
+    <message>
+        <location filename="../../../src/plugins/magicwaypoint/magicwaypoint.ui"/>
+        <source>Form</source>
+        <translation>Форма</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Scale:</source>
+        <translation>Масштаб:</translation>
+    </message>
+</context>
+<context>
+    <name>MagicWaypointGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/magicwaypoint/magicwaypointgadgetfactory.cpp" line="+35"/>
+        <source>Magic Waypoint</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GCSControlGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/gcscontrol/gcscontrolgadgetfactory.cpp" line="+34"/>
+        <source>Controller</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

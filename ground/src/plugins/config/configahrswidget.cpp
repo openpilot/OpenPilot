@@ -35,6 +35,8 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 
+#define sign(x) ((x < 0) ? -1 : 1)
+
 const double ConfigAHRSWidget::maxVarValue = 0.1;
 const int ConfigAHRSWidget::calibrationDelay = 5; // Time to wait for the AHRS to do its calibration
 
@@ -330,7 +332,6 @@ void ConfigAHRSWidget::attitudeRawUpdated(UAVObject * obj)
         gyro_accum_z.append(gyro_field->getValue(2).toDouble());
     }
 
-    qDebug() << "Size: " << accel_accum_x.size();
     if(accel_accum_x.size() >= 20 && collectingData == true) {
         collectingData = false;
         disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(attitudeRawUpdated(UAVObject*)));
@@ -342,9 +343,6 @@ void ConfigAHRSWidget::attitudeRawUpdated(UAVObject * obj)
         mag_data_x[position] = listMean(mag_accum_x);
         mag_data_y[position] = listMean(mag_accum_y);
         mag_data_z[position] = listMean(mag_accum_z);
-
-        qDebug() << accel_data_x[position] << " " << accel_data_y[position] << " " << accel_data_z[position];
-        qDebug() << mag_data_x[position] << " " << mag_data_y[position] << " " << mag_data_z[position];
 
         position = (position + 1) % 6;
         if(position == 1) {
@@ -529,25 +527,25 @@ void ConfigAHRSWidget::computeScaleBias()
     field->setDouble(listMean(gyro_accum_z),2);
 
     field = obj->getField(QString("accel_scale"));
-    field->setDouble(S[0],0);
-    field->setDouble(S[1],1);
-    field->setDouble(S[2],2);
+    field->setDouble(sign(S[0]) * S[0],0);
+    field->setDouble(sign(S[1]) * S[1],1);
+    field->setDouble(-sign(S[2]) * S[2],2);
 
     field = obj->getField(QString("accel_bias"));
-    field->setDouble(b[0],0);
-    field->setDouble(b[1],1);
-    field->setDouble(b[2],2);
+    field->setDouble(sign(S[0]) * b[0],0);
+    field->setDouble(sign(S[1]) * b[1],1);
+    field->setDouble(-sign(S[2]) * b[2],2);
 
     SixPointInConstFieldCal( 1, mag_data_x, mag_data_y, mag_data_z, S, b);
     field = obj->getField(QString("mag_scale"));
-    field->setDouble(S[0],0);
-    field->setDouble(S[1],1);
-    field->setDouble(S[2],2);
+    field->setDouble(sign(S[0]) * S[0],0);
+    field->setDouble(sign(S[1]) * S[1],1);
+    field->setDouble(sign(S[2]) * S[2],2);
 
     field = obj->getField(QString("mag_bias"));
-    field->setDouble(b[0], 0);
-    field->setDouble(b[1], 1);
-    field->setDouble(b[2], 2);
+    field->setDouble(sign(S[0]) * b[0], 0);
+    field->setDouble(sign(S[1]) * b[1], 1);
+    field->setDouble(sign(S[2]) * b[2], 2);
 
     field = obj->getField(QString("gyro_bias"));
     field->setDouble(-listMean(gyro_accum_x),0);

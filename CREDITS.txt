@@ -56,6 +56,10 @@ N: Bani Greyling
 E: bani (dot) greyling (plus) openpilot (at) gmail (dot) com
 D: GCS Scope plugin
 
+N: Nuno Guedes
+E: muralha (plus) openpilot (at) gmail (dot) com
+D: 3D artwork, moving surfaces and work on ModelView
+
 N: Peter Gunnarsson
 E: peter (at) pyne (dot) se
 D: GCS Core Developer
@@ -77,6 +81,10 @@ D: Artwork including display dials
 N: Matt Lipski
 E: mattlipski (plus) openpilot (at) gmail (dot) com
 D: Deluxe Dials Set artwork, (Artificial Horizon, Compass, Turn Indicator)  
+
+N: Les Newell
+E: les (dot) newell (at) fastmail (dot) co (dot) uk
+D: Advanced mixer matrix
 
 N: Ken Northup
 E: helos360 (at) bellsouth (dot) net

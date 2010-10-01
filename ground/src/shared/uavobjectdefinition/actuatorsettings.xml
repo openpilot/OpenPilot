@@ -31,7 +31,6 @@
         <field name="CCPMServoZ" units="channel" type="enum" elements="1" options="Channel0,Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,None" defaultvalue="None"/>
         <field name="CCPMThrottle" units="channel" type="enum" elements="1" options="Channel0,Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,None" defaultvalue="None"/>
         <field name="CCPMTailRotor" units="channel" type="enum" elements="1" options="Channel0,Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,None" defaultvalue="None"/>
-        <field name="UpdatePeriod" units="ms" type="uint16" elements="1" defaultvalue="5"/>
         <field name="ChannelUpdateFreq" units="Hz" type="int16" elements="2" defaultvalue="50"/>
         <field name="ChannelMax" units="us" type="int16" elements="8" defaultvalue="2000"/>
         <field name="ChannelNeutral" units="us" type="int16" elements="8" defaultvalue="1500"/>

@@ -346,9 +346,6 @@ ActuatorSettings::ActuatorSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTI
     CCPMTailRotorEnumOptions.append("Channel7");
     CCPMTailRotorEnumOptions.append("None");
     fields.append( new UAVObjectField(QString("CCPMTailRotor"), QString("channel"), UAVObjectField::ENUM, CCPMTailRotorElemNames, CCPMTailRotorEnumOptions) );
-    QStringList UpdatePeriodElemNames;
-    UpdatePeriodElemNames.append("0");
-    fields.append( new UAVObjectField(QString("UpdatePeriod"), QString("ms"), UAVObjectField::UINT16, UpdatePeriodElemNames, QStringList()) );
     QStringList ChannelUpdateFreqElemNames;
     ChannelUpdateFreqElemNames.append("0");
     ChannelUpdateFreqElemNames.append("1");
@@ -454,7 +451,6 @@ void ActuatorSettings::setDefaultFieldValues()
     data.CCPMServoZ = 8;
     data.CCPMThrottle = 8;
     data.CCPMTailRotor = 8;
-    data.UpdatePeriod = 5;
     data.ChannelUpdateFreq[0] = 50;
     data.ChannelUpdateFreq[1] = 50;
     data.ChannelMax[0] = 2000;

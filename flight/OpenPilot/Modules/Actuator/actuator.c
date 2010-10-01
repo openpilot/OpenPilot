@@ -47,6 +47,7 @@
 #define STACK_SIZE configMINIMAL_STACK_SIZE
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 #define FAILSAFE_TIMEOUT_MS 100
+#define MAX_MIX_ACTUATORS ACTUATORCOMMAND_CHANNEL_NUMELEM
 
 // Private types
 
@@ -57,13 +58,19 @@ static xTaskHandle taskHandle;
 
 // Private functions
 static void actuatorTask(void* parameters);
-static int32_t RunMixers(ActuatorCommandData * command, ActuatorSettingsData* settings);
 static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutral);
 static void setFailsafe();
 static float MixerCurve(const float throttle, const float* curve);
 float ProcessMixer(const int index, const float curve1, const float curve2,
 		   MixerSettingsData* mixerSettings, ActuatorDesiredData* desired,
 		   const float period);
+
+
+//this structure is equivalent to the UAVObjects for one mixer.
+typedef struct {
+	uint8_t type;
+	float matrix[5];
+} __attribute__((packed)) Mixer_t;
 
 
 /**
@@ -84,23 +91,45 @@ int32_t ActuatorInitialize()
 	return 0;
 }
 
+
+
 /**
- * @brief Main module task
+ * @brieft Main Actuator module task
+ *
+ * Universal matrix based mixer for VTOL, helis and fixed wing.
+ * Converts desired roll,pitch,yaw and throttle to servo/ESC outputs.
+ *
+ * Because of how the Throttle ranges from 0 to 1, the motors should too!
+ *
+ * Note this code depends on the UAVObjects for the mixers being all being the same
+ * and in sequence. If you change the object definition, make sure you check the code!
+ *
+ * @return -1 if error, 0 if success
  */
 static void actuatorTask(void* parameters)
 {
 	UAVObjEvent ev;
 	portTickType lastSysTime;
+	portTickType thisSysTime;
+	float dT;
 	ActuatorCommandData command;
 	ActuatorSettingsData settings;
 	
-	// Set servo update frequency (done only on start-up)
+	SystemSettingsData sysSettings;
+	MixerSettingsData mixerSettings;
+	ActuatorDesiredData desired;
+	MixerStatusData mixerStatus;
+	ManualControlCommandData manualControl;
+	
 	ActuatorSettingsGet(&settings);
+	// Set servo update frequency (done only on start-up)
 	PIOS_Servo_SetHz(settings.ChannelUpdateFreq[0], settings.ChannelUpdateFreq[1]);
+		
+	float * status = (float *)&mixerStatus; //access status objects as an array of floats		
 	
 	// Go to the neutral (failsafe) values until an ActuatorDesired update is received
 	setFailsafe();
-	
+
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1)
@@ -112,18 +141,62 @@ static void actuatorTask(void* parameters)
                         continue;
                 }
 		
+		// Check how long since last update
+		thisSysTime = xTaskGetTickCount();
+		if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
+			dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;		
+		lastSysTime = thisSysTime;
 		
 		
+		ManualControlCommandGet(&manualControl);
+		SystemSettingsGet(&sysSettings);
+		MixerStatusGet(&mixerStatus);
+		MixerSettingsGet (&mixerSettings);
+		ActuatorDesiredGet(&desired);
 		ActuatorCommandGet(&command);
 		ActuatorSettingsGet(&settings);
-		if ( RunMixers(&command, &settings) == -1 )
+		
+		int nMixers = 0;
+		Mixer_t * mixers = (Mixer_t *)&mixerSettings.Mixer0Type;
+		for(int ct=0; ct < MAX_MIX_ACTUATORS; ct++)
 		{
-			AlarmsSet(SYSTEMALARMS_ALARM_ACTUATOR, SYSTEMALARMS_ALARM_CRITICAL);
+			if(mixers[ct].type != MIXERSETTINGS_MIXER0TYPE_DISABLED)
+			{
+				nMixers ++;
+			}
 		}
-		else
+		if(nMixers < 2) //Nothing can fly with less than two mixers.
 		{
-			AlarmsClear(SYSTEMALARMS_ALARM_ACTUATOR);
+			AlarmsSet(SYSTEMALARMS_ALARM_ACTUATOR, SYSTEMALARMS_ALARM_WARNING);
+			continue;			
 		}
+		
+		
+		bool armed = manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE;
+		armed &= desired.Throttle > 0.05; //zero throttle stops the motors
+				
+		float curve1 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve1);
+		float curve2 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve2);
+		for(int ct=0; ct < MAX_MIX_ACTUATORS; ct++)
+		{
+			if(mixers[ct].type != MIXERSETTINGS_MIXER0TYPE_DISABLED)
+			{
+				status[ct] = ProcessMixer(ct, curve1, curve2, &mixerSettings, &desired, dT);
+
+				if(!armed &&
+				   mixers[ct].type == MIXERSETTINGS_MIXER0TYPE_MOTOR)
+				{
+					command.Channel[ct] = settings.ChannelMin[ct]; //force zero throttle
+				}else
+				{
+					command.Channel[ct] = scaleChannel(status[ct],
+									   settings.ChannelMax[ct],
+									   settings.ChannelMin[ct],
+									   settings.ChannelNeutral[ct]);
+				}
+			}
+		}
+		MixerStatusSet(&mixerStatus);		
 		
 		// Update output object
 		ActuatorCommandSet(&command);
@@ -138,86 +211,7 @@ static void actuatorTask(void* parameters)
 	}
 }
 
-/**
- * Universal matrix based mixer for VTOL, helis and fixed wing.
- * Converts desired roll,pitch,yaw and throttle to servo/ESC outputs.
- *
- * Because of how the Throttle ranges from 0 to 1, the motors should too!
- *
- * Note this code depends on the UAVObjects for the mixers being all being the same
- * and in sequence. If you change the object definition, make sure you check the code!
- *
- * @return -1 if error, 0 if success
- */
 
-//this structure is equivalent to the UAVObjects for one mixer.
-typedef struct {
-	uint8_t type;
-	float matrix[5];
-} __attribute__((packed)) Mixer_t;
-
-
-#define MAX_MIX_ACTUATORS ACTUATORCOMMAND_CHANNEL_NUMELEM
-
-static int32_t RunMixers(ActuatorCommandData* command, ActuatorSettingsData* settings)
-{
-	SystemSettingsData sysSettings;
-	MixerSettingsData mixerSettings;
-	ActuatorDesiredData desired;
-	MixerStatusData mixerStatus;
-	
-	SystemSettingsGet(&sysSettings);
-	MixerStatusGet(&mixerStatus);
-	MixerSettingsGet (&mixerSettings);
-	ActuatorDesiredGet(&desired);
-	
-	float * status = (float *)&mixerStatus; //access status objects as an array of floats
-	
-	
-	int nMixers = 0;
-	Mixer_t * mixers = (Mixer_t *)&mixerSettings.Mixer0Type;
-	for(int ct=0; ct < MAX_MIX_ACTUATORS; ct++)
-	{
-		if(mixers[ct].type != MIXERSETTINGS_MIXER0TYPE_DISABLED)
-		{
-			nMixers ++;
-		}
-	}
-	if(nMixers < 2) //Nothing can fly with less than two mixers.
-	{
-		return(-1);
-	}
-	
-	ManualControlCommandData manualControl;
-	ManualControlCommandGet(&manualControl);
-	
-	bool armed = manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE;
-	armed &= desired.Throttle > 0.05; //zero throttle stops the motors
-	
-	
-	float curve1 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve1);
-	float curve2 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve2);
-	for(int ct=0; ct < MAX_MIX_ACTUATORS; ct++)
-	{
-		if(mixers[ct].type != MIXERSETTINGS_MIXER0TYPE_DISABLED)
-		{
-			status[ct] = scaleChannel(ProcessMixer(ct, curve1, curve2, &mixerSettings, &desired, settings->UpdatePeriod),
-						  settings->ChannelMax[ct],
-						  settings->ChannelMin[ct],
-						  settings->ChannelNeutral[ct]);
-			if(!armed &&
-			   mixers[ct].type == MIXERSETTINGS_MIXER0TYPE_MOTOR)
-			{
-				command->Channel[ct] = settings->ChannelMin[ct]; //force zero throttle
-			}else
-			{
-				command->Channel[ct] = status[ct]; //servos always follow command
-			}
-		}
-	}
-	MixerStatusSet(&mixerStatus);
-	return(0);
-}
 
 /**
  *Process mixing for one actuator

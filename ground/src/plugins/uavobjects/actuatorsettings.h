@@ -73,7 +73,6 @@ public:
         quint8 CCPMServoZ;
         quint8 CCPMThrottle;
         quint8 CCPMTailRotor;
-        quint16 UpdatePeriod;
         qint16 ChannelUpdateFreq[2];
         qint16 ChannelMax[8];
         qint16 ChannelNeutral[8];
@@ -160,7 +159,6 @@ public:
     // Field CCPMTailRotor information
     /* Enumeration options for field CCPMTailRotor */
     typedef enum { CCPMTAILROTOR_CHANNEL0=0, CCPMTAILROTOR_CHANNEL1=1, CCPMTAILROTOR_CHANNEL2=2, CCPMTAILROTOR_CHANNEL3=3, CCPMTAILROTOR_CHANNEL4=4, CCPMTAILROTOR_CHANNEL5=5, CCPMTAILROTOR_CHANNEL6=6, CCPMTAILROTOR_CHANNEL7=7, CCPMTAILROTOR_NONE=8 } CCPMTailRotorOptions;
-    // Field UpdatePeriod information
     // Field ChannelUpdateFreq information
     /* Number of elements for field ChannelUpdateFreq */
     static const quint32 CHANNELUPDATEFREQ_NUMELEM = 2;
@@ -176,7 +174,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 562991684U;
+    static const quint32 OBJID = 3352303420U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

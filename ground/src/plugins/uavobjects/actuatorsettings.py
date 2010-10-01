@@ -530,16 +530,6 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'UpdatePeriod',
-		'H',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
 		'ChannelUpdateFreq',
 		'h',
 		2,
@@ -606,7 +596,7 @@ _fields = [ \
 
 class ActuatorSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 562991684
+    OBJID        = 3352303420
     NAME         = "ActuatorSettings"
     METANAME     = "ActuatorSettingsMeta"
     ISSINGLEINST = 1

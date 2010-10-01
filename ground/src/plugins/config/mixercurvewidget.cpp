@@ -152,8 +152,8 @@ void MixerCurveWidget::resizeEvent(QResizeEvent* event)
 
 
 
-void MixerCurveWidget::itemMoved()
+void MixerCurveWidget::itemMoved(double itemValue)
 {
     QList<double> list = getCurve();
-    emit curveUpdated(list);
+    emit curveUpdated(list, itemValue);
 }

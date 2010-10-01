@@ -102,17 +102,17 @@ void Node::verticalMove(bool flag){
 QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 {
 
+    QPointF newPos = value.toPointF();
+    double h = graph->sceneRect().height();
     switch (change) {
     case ItemPositionChange: {
             if (!vertical)
                     break;
             // Force node to move vertically
-            QPointF newPos = value.toPointF();
             newPos.setX(pos().x());
             // Stay inside graph
             if (newPos.y() < 0)
                 newPos.setY(0);
-            double h = graph->sceneRect().height();
             //qDebug() << h << " - " << newPos.y();
             if (newPos.y() > h)
                 newPos.setY(h);
@@ -121,7 +121,7 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
     case ItemPositionHasChanged:
         foreach (Edge *edge, edgeList)
             edge->adjust();
-        graph->itemMoved();
+        graph->itemMoved((h-newPos.y())/h);
         break;
     default:
         break;

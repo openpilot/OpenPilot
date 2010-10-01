@@ -42,13 +42,12 @@ class MixerCurveWidget : public QGraphicsView
 public:
     MixerCurveWidget(QWidget *parent = 0);
    ~MixerCurveWidget();
-   void itemMoved(); // Callback when a point is moved, to be updated
+   void itemMoved(double itemValue); // Callback when a point is moved, to be updated
    void initCurve (QList<double> points);
    QList<double> getCurve();
 
 signals:
-    // Shall create a "curve updated" signal here, maybe ?
-   void curveUpdated(QList<double> );
+   void curveUpdated(QList<double>, double );
 
 private slots:
 

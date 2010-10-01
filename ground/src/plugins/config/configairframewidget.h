@@ -53,6 +53,7 @@ private:
     bool setupQuad(bool pLayout);
 
     void resetField(UAVObjectField * field);
+    void resetMixer (MixerCurveWidget *mixer, int numElements);
     void resetActuators();
     //void setMixerChannel(int channelNumber, bool channelIsMotor, QList<double> vector);
     void setupQuadMotor(int channel, double roll, double pitch, double yaw);
@@ -69,6 +70,10 @@ private slots:
     void toggleAileron2(int index);
     void toggleElevator2(int index);
     void switchAirframeType(int index);
+    void resetFwMixer();
+    void resetMrMixer();
+    void updateFwThrottleCurveValue(QList<double> list, double value);
+    void updateMrThrottleCurveValue(QList<double> list, double value);
 
 protected:
     void showEvent(QShowEvent *event);

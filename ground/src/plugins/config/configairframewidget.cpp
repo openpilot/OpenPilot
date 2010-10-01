@@ -101,6 +101,11 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     connect(m_aircraft->aircraftType, SIGNAL(currentIndexChanged(int)), this, SLOT(switchAirframeType(int)));
     requestAircraftUpdate();
 
+    connect(m_aircraft->fwThrottleReset, SIGNAL(clicked()), this, SLOT(resetFwMixer()));
+    connect(m_aircraft->mrThrottleCurveReset, SIGNAL(clicked()), this, SLOT(resetMrMixer()));
+    connect(m_aircraft->fixedWingThrottle, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateFwThrottleCurveValue(QList<double>,double)));
+    connect(m_aircraft->multiThrottleCurve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateMrThrottleCurveValue(QList<double>,double)));
+
 //    connect(m_aircraft->fwAileron1Channel, SIGNAL(currentIndexChanged(int)), this, SLOT(toggleAileron2(int)));
 //    connect(m_aircraft->fwElevator1Channel, SIGNAL(currentIndexChanged(int)), this, SLOT(toggleElevator2(int)));
 
@@ -165,6 +170,58 @@ void ConfigAirframeWidget::toggleElevator2(int index)
     }
 }
 
+/**
+  Resets Fixed wing throttle mixer
+  */
+void ConfigAirframeWidget::resetFwMixer()
+{
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    UAVObjectField* field = obj->getField(QString("ThrottleCurve1"));
+    resetMixer(m_aircraft->fixedWingThrottle, field->getNumElements());
+}
+
+/**
+  Resets Multirotor throttle mixer
+  */
+void ConfigAirframeWidget::resetMrMixer()
+{
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    UAVObjectField* field = obj->getField(QString("ThrottleCurve1"));
+    resetMixer(m_aircraft->multiThrottleCurve, field->getNumElements());
+}
+
+/**
+  Resets a mixer curve
+  */
+void ConfigAirframeWidget::resetMixer(MixerCurveWidget *mixer, int numElements)
+{
+    QList<double> curveValues;
+    for (double i=0; i<numElements; i++) {
+        curveValues.append(i/(numElements-1));
+    }
+    // Setup all Throttle1 curves for all types of airframes
+    mixer->initCurve(curveValues);
+}
+
+/**
+  Updates the currently moved throttle curve item value
+  */
+void ConfigAirframeWidget::updateFwThrottleCurveValue(QList<double> list, double value)
+{
+    Q_UNUSED(list);
+    m_aircraft->fwThrottleCurveItemValue->setText(QString().sprintf("Val: %.2f",value));
+}
+
+/**
+  Updates the currently moved throttle curve item value
+  */
+void ConfigAirframeWidget::updateMrThrottleCurveValue(QList<double> list, double value)
+{
+    Q_UNUSED(list);
+    m_aircraft->mrThrottleCurveItemValue->setText(QString().sprintf("Val: %.2f",value));
+}
+
+
 /**************************
   * Aircraft settings
   **************************/
@@ -173,11 +230,8 @@ void ConfigAirframeWidget::toggleElevator2(int index)
   */
 void ConfigAirframeWidget::requestAircraftUpdate()
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-
     // Get the Airframe type from the system settings:
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
     Q_ASSERT(obj);
     obj->requestUpdate();
     UAVObjectField *field = obj->getField(QString("AirframeType"));
@@ -187,7 +241,7 @@ void ConfigAirframeWidget::requestAircraftUpdate()
     QString frameType = field->getValue().toString();
     setupAirframeUI(frameType);
 
-    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(obj);
     obj->requestUpdate();
     field = obj->getField(QString("ThrottleCurve1"));
@@ -211,7 +265,7 @@ void ConfigAirframeWidget::requestAircraftUpdate()
     // Load the Settings for fixed wing frames:
     if (frameType.startsWith("FixedWing")) {
          // Then retrieve how channels are setup
-        obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
+        obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
         Q_ASSERT(obj);
         field = obj->getField(QString("FixedWingThrottle"));
         Q_ASSERT(field);
@@ -265,7 +319,7 @@ void ConfigAirframeWidget::requestAircraftUpdate()
         // Retrieve Multirotor settings
         //////////////////////////////////////////////////////////////////
 
-        obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
+        obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
         Q_ASSERT(obj);
         if (frameType == "QuadP") {
             // Motors 1/2/3/4 are: N / E / S / W
@@ -344,7 +398,7 @@ void ConfigAirframeWidget::requestAircraftUpdate()
             m_aircraft->multiMotor8->setCurrentIndex(m_aircraft->multiMotor4->findText(field->getValue().toString()));
         }
 
-        obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));
+        obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
         Q_ASSERT(obj);
         // Now, retrieve the Feedforward values:
         field = obj->getField(QString("FeedForward"));
@@ -1022,9 +1076,7 @@ void ConfigAirframeWidget::saveAircraftUpdate()
 {
     // Send update so that the latest value is saved
     sendAircraftUpdate();
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
     Q_ASSERT(obj);
     saveObjectToSD(obj);
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));

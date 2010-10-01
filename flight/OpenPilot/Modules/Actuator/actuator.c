@@ -265,7 +265,7 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
 		
 		//acceleration limit
 		float dt = result - lastFilteredResult[index];
-		float maxDt = mixerSettings->MaxAccel * (period / 1000);
+		float maxDt = mixerSettings->MaxAccel * period;
 		if(dt > maxDt) //we are accelerating too hard
 		{
 			result = lastFilteredResult[index] + maxDt;

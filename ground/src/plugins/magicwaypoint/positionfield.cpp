@@ -85,14 +85,18 @@ void PositionField::updateDesiredIndicator(double north, double east)
 {
     QRectF sceneSize = scene()->sceneRect();
 
-    m_positiondesired->setPos((east+1)/2*sceneSize.width(),(-north+1)/2*sceneSize.height());
+    m_positiondesired->setPos(
+            (east+1)/2*sceneSize.width() - m_positiondesired->boundingRect().width() / 2,
+            (-north+1)/2*sceneSize.height() - m_positiondesired->boundingRect().height() / 2);
 }
 
 void PositionField::updateActualIndicator(double north, double east)
 {
     QRectF sceneSize = scene()->sceneRect();
 
-    m_positionactual->setPos((east+1)/2*sceneSize.width(),(-north+1)/2*sceneSize.height());
+    m_positionactual->setPos(
+            (east+1)/2*sceneSize.width() - m_positionactual->boundingRect().width() / 2,
+            (-north+1)/2*sceneSize.height() - m_positionactual->boundingRect().height() / 2);
 }
 
 /**

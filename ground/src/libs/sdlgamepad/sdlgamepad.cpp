@@ -29,6 +29,7 @@ SDLGamepad::SDLGamepad()
   index = -1;
   loop = false;
   tick = MIN_RATE;
+  gamepad = 0;
 }
 
 /**********************************************************************/

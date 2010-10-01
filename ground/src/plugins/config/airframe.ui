@@ -522,6 +522,9 @@
                   </item>
                   <item row="2" column="1">
                    <widget class="QSlider" name="feedForwardSlider">
+                    <property name="enabled">
+                     <bool>true</bool>
+                    </property>
                     <property name="maximum">
                      <number>100</number>
                     </property>
@@ -546,7 +549,7 @@
                   <item row="3" column="1">
                    <widget class="QDoubleSpinBox" name="accelTime">
                     <property name="enabled">
-                     <bool>false</bool>
+                     <bool>true</bool>
                     </property>
                     <property name="maximum">
                      <double>1000.000000000000000</double>
@@ -563,7 +566,7 @@
                   <item row="4" column="1">
                    <widget class="QDoubleSpinBox" name="decelTime">
                     <property name="enabled">
-                     <bool>false</bool>
+                     <bool>true</bool>
                     </property>
                     <property name="maximum">
                      <double>1000.000000000000000</double>

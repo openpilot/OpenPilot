@@ -967,30 +967,30 @@ bool ConfigAirframeWidget::setupQuad(bool pLayout)
     // and set only the relevant channels:
 
     // Motor 1 to 4, X Layout:
-    //     pitch   roll    yaw  throttle  offset
-    //    {0.5    ,0.5    ,0.5    ,1.8   ,-1  }, //Front left motor (CW)
-    //    {0.5    ,-0.5   ,-0.5   ,1.8   ,-1  }, //Front right motor(CCW)
-    //    {-0.5  ,-0.5    ,0.5    ,1.8   ,-1  }, //rear right motor (CW)
-    //    {-0.5   ,0.5    ,-0.5   ,1.8   ,-1  }, //Rear left motor  (CCW)
+    //     pitch   roll    yaw
+    //    {0.5    ,0.5    ,-0.5     //Front left motor (CW)
+    //    {0.5    ,-0.5   ,0.5   //Front right motor(CCW)
+    //    {-0.5  ,-0.5    ,-0.5    //rear right motor (CW)
+    //    {-0.5   ,0.5    ,0.5   //Rear left motor  (CCW)
     //
     // Motor 1 to 4, P Layout:
-    // pitch   roll    yaw  throttle  offset
-    //  {1      ,0      ,0.5    ,1.8   ,-1  }, //Front motor (CW)
-    //  {0      ,-1     ,-0.5   ,1.8   ,-1  }, //Right  motor(CCW)
-    //  {-1     ,0      ,0.5    ,1.8   ,-1  }, //Rear motor  (CW)
-    //  {0      ,1      ,-0.5   ,1.8   ,-1  }, //Left motor  (CCW)
+    // pitch   roll    yaw
+    //  {1      ,0      ,-0.5    //Front motor (CW)
+    //  {0      ,-1     ,0.5   //Right  motor(CCW)
+    //  {-1     ,0      ,-0.5    //Rear motor  (CW)
+    //  {0      ,1      ,0.5   //Left motor  (CCW)
     int channel = m_aircraft->multiMotor1->currentIndex()-1;
-    pLayout ? setupQuadMotor(channel, 1, 0, 0.5)
-            : setupQuadMotor(channel, 0.5, 0.5, 0.5);
+    pLayout ? setupQuadMotor(channel, 1, 0, -0.5)
+            : setupQuadMotor(channel, 0.5, 0.5, -0.5);
     channel = m_aircraft->multiMotor2->currentIndex()-1;
-    pLayout ? setupQuadMotor(channel, 0, -1, -0.5)
-            : setupQuadMotor(channel, 0.5, -0.5, -0.5);
+    pLayout ? setupQuadMotor(channel, 0, -1, 0.5)
+            : setupQuadMotor(channel, 0.5, -0.5, 0.5);
     channel = m_aircraft->multiMotor3->currentIndex()-1;
-    pLayout ? setupQuadMotor(channel, -1, 0, 0.5)
-            : setupQuadMotor(channel, -0.5, -0.5, 0.5);
+    pLayout ? setupQuadMotor(channel, -1, 0, -0.5)
+            : setupQuadMotor(channel, -0.5, -0.5, -0.5);
     channel = m_aircraft->multiMotor4->currentIndex()-1;
-    pLayout ? setupQuadMotor(channel, 0, 1, -0.5)
-            : setupQuadMotor(channel, -0.5, 0.5, -0.5);
+    pLayout ? setupQuadMotor(channel, 0, 1, 0.5)
+            : setupQuadMotor(channel, -0.5, 0.5, 0.5);
 
     obj->updated();
     m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");

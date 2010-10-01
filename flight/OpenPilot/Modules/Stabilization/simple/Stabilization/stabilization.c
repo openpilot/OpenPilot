@@ -108,6 +108,7 @@ static void stabilizationTask(void* parameters)
 	pitchErrorLast = 0.0;
 	rollErrorLast = 0.0;
 	yawErrorLast = 0.0;
+	yawPrevious = 0.0;
 
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
@@ -149,7 +150,12 @@ static void stabilizationTask(void* parameters)
 		rollErrorLast = rollError;
 
 		// Yaw stabilization control loop (only enabled on VTOL airframes)
-		if (( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL )||( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HELICP))
+		if (( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL )||
+		    ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADX)||
+		    ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADP)||
+		    ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HEXA) ||
+		    ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_OCTO) ||
+		    ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HELICP))
 		{
 			if(stabSettings.YawMode == STABILIZATIONSETTINGS_YAWMODE_RATE) {  // rate stabilization on yaw
 				yawChange = (attitudeActual.Yaw - yawPrevious) / dT;

@@ -36,6 +36,7 @@
 #include "ahrscalibration.h"
 #include "ahrssettings.h"
 #include "ahrsstatus.h"
+#include "ahrsstatus2.h"
 #include "attitudeactual.h"
 #include "attitudedesired.h"
 #include "attituderaw.h"
@@ -82,6 +83,7 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new AHRSCalibration() );
     objMngr->registerObject( new AHRSSettings() );
     objMngr->registerObject( new AhrsStatus() );
+    objMngr->registerObject( new AhrsStatus2() );
     objMngr->registerObject( new AttitudeActual() );
     objMngr->registerObject( new AttitudeDesired() );
     objMngr->registerObject( new AttitudeRaw() );

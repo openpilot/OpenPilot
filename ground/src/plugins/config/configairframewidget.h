@@ -68,6 +68,7 @@ private slots:
     void setupAirframeUI(QString type);
     void toggleAileron2(int index);
     void toggleElevator2(int index);
+    void switchAirframeType(int index);
 
 protected:
     void showEvent(QShowEvent *event);

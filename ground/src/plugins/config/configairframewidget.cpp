@@ -93,12 +93,14 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     m_aircraft->quadShape->setScene(scene);
     
 
-    requestAircraftUpdate();
     connect(m_aircraft->saveAircraftToSD, SIGNAL(clicked()), this, SLOT(saveAircraftUpdate()));
     connect(m_aircraft->saveAircraftToRAM, SIGNAL(clicked()), this, SLOT(sendAircraftUpdate()));
     connect(m_aircraft->getAircraftCurrent, SIGNAL(clicked()), this, SLOT(requestAircraftUpdate()));
     connect(m_aircraft->fixedWingType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupAirframeUI(QString)));
     connect(m_aircraft->multirotorFrameType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupAirframeUI(QString)));
+    connect(m_aircraft->aircraftType, SIGNAL(currentIndexChanged(int)), this, SLOT(switchAirframeType(int)));
+    requestAircraftUpdate();
+
 //    connect(m_aircraft->fwAileron1Channel, SIGNAL(currentIndexChanged(int)), this, SLOT(toggleAileron2(int)));
 //    connect(m_aircraft->fwElevator1Channel, SIGNAL(currentIndexChanged(int)), this, SLOT(toggleElevator2(int)));
 
@@ -109,6 +111,19 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
 ConfigAirframeWidget::~ConfigAirframeWidget()
 {
    // Do nothing
+}
+
+/**
+  Slot for switching the airframe type. We do it explicitely
+  rather than a signal in the UI, because we want to force a fitInView of the quad shapes.
+  This is because this method (fitinview) only works when the widget is shown.
+  */
+void ConfigAirframeWidget::switchAirframeType(int index){
+    m_aircraft->airframesWidget->setCurrentIndex(index);
+    m_aircraft->quadShape->setSceneRect(quad->boundingRect());
+    m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
+
+
 }
 
 void ConfigAirframeWidget::showEvent(QShowEvent *event)
@@ -124,6 +139,7 @@ void ConfigAirframeWidget::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
     m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
+
 }
 
 
@@ -171,27 +187,30 @@ void ConfigAirframeWidget::requestAircraftUpdate()
     QString frameType = field->getValue().toString();
     setupAirframeUI(frameType);
 
+    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));
+    Q_ASSERT(obj);
+    obj->requestUpdate();
+    field = obj->getField(QString("ThrottleCurve1"));
+    Q_ASSERT(field);
+    QList<double> curveValues;
+    // If the 1st element of the curve is <= -10, then the curve
+    // is a straight line (that's how the mixer works on the mainboard):
+    if (field->getValue(0).toInt() <= -10) {
+        for (double i=0; i<field->getNumElements(); i++) {
+            curveValues.append(-1.0 + 2*i/(field->getNumElements()-1));
+        }
+    } else {
+        for (unsigned int i=0; i < field->getNumElements(); i++) {
+            curveValues.append(field->getValue(i).toDouble());
+        }
+    }
+    // Setup all Throttle1 curves for all types of airframes
+    m_aircraft->fixedWingThrottle->initCurve(curveValues);
+    m_aircraft->multiThrottleCurve->initCurve(curveValues);
+
     // Load the Settings for fixed wing frames:
     if (frameType.startsWith("FixedWing")) {
-        obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));
-        Q_ASSERT(obj);
-        obj->requestUpdate();
-        field = obj->getField(QString("ThrottleCurve1"));
-        Q_ASSERT(field);
-        QList<double> curveValues;
-        // If the 1st element of the curve is <= -10, then the curve
-        // is a straight line (that's how the mixer works on the mainboard):
-        if (field->getValue(0).toInt() <= -10) {
-            for (double i=0; i<field->getNumElements(); i++) {
-                curveValues.append(-1.0 + 2*i/(field->getNumElements()-1));
-            }
-        } else {
-            for (unsigned int i=0; i < field->getNumElements(); i++) {
-                curveValues.append(field->getValue(i).toDouble());
-            }
-        }
-        m_aircraft->fixedWingThrottle->initCurve(curveValues);
-        // Then retrieve how channels are setup
+         // Then retrieve how channels are setup
         obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
         Q_ASSERT(obj);
         field = obj->getField(QString("FixedWingThrottle"));
@@ -239,31 +258,13 @@ void ConfigAirframeWidget::requestAircraftUpdate()
                 m_aircraft->elevonSlider2->setValue(field->getDouble(ti)*100);
             }
         }
+
     } else if (frameType == "QuadX" || frameType == "QuadP" ||
                frameType == "Hexa" || frameType == "Octo" ) {
         //////////////////////////////////////////////////////////////////
         // Retrieve Multirotor settings
         //////////////////////////////////////////////////////////////////
 
-        // First of all, curve settings:
-        obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));
-        Q_ASSERT(obj);
-        obj->requestUpdate();
-        field = obj->getField(QString("ThrottleCurve1"));
-        Q_ASSERT(field);
-        QList<double> curveValues;
-        // If the 1st element of the curve is <= -10, then the curve
-        // is a straight line (that's how the mixer works on the mainboard):
-        if (field->getValue(0).toInt() <= -10) {
-            for (double i=0; i<field->getNumElements(); i++) {
-                curveValues.append(-1.0 + 2*i/(field->getNumElements()-1));
-            }
-        } else {
-            for (unsigned int i=0; i < field->getNumElements(); i++) {
-                curveValues.append(field->getValue(i).toDouble());
-            }
-        }
-        m_aircraft->multiThrottleCurve->initCurve(curveValues);
         obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
         Q_ASSERT(obj);
         if (frameType == "QuadP") {
@@ -1025,6 +1026,11 @@ void ConfigAirframeWidget::saveAircraftUpdate()
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
     Q_ASSERT(obj);
-    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+    saveObjectToSD(obj);
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    saveObjectToSD(obj);
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
+    saveObjectToSD(obj);
+
 }
 

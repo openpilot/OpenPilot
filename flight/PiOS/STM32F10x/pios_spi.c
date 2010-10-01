@@ -244,7 +244,7 @@ int32_t PIOS_SPI_TransferByte(uint8_t spi, uint8_t b)
 	spi_dev = find_spi_dev_by_id(spi);
 	PIOS_DEBUG_Assert(spi_dev);
 
-	/* 
+	/*
 	 * Procedure taken from STM32F10xxx Reference Manual section 23.3.5
 	 */
 
@@ -315,8 +315,8 @@ int32_t PIOS_SPI_TransferBlock(uint8_t spi, const uint8_t * send_buffer, uint8_t
 	/* Set callback function */
 	spi_dev->callback = callback;
 
-	/* 
-	 * Configure Rx channel 
+	/*
+	 * Configure Rx channel
 	 */
 
 	/* Start with the default configuration for this peripheral */
@@ -340,8 +340,8 @@ int32_t PIOS_SPI_TransferBlock(uint8_t spi, const uint8_t * send_buffer, uint8_t
 	dma_init.DMA_BufferSize = len;
 	DMA_Init(spi_dev->cfg->dma.rx.channel, &(dma_init));
 
-	/* 
-	 * Configure Tx channel 
+	/*
+	 * Configure Tx channel
 	 */
 
 	/* Start with the default configuration for this peripheral */
@@ -415,6 +415,41 @@ int32_t PIOS_SPI_TransferBlock(uint8_t spi, const uint8_t * send_buffer, uint8_t
 	/* No error */
 	return 0;
 }
+
+/**
+* Check if a transfer is in progress
+* \param[in] spi SPI number (0 or 1)
+* \return >= 0 if no transfer is in progress
+* \return -1 if disabled SPI port selected
+* \return -2 if unsupported SPI port selected
+* \return -3 if function has been called during an ongoing DMA transfer
+*/
+int32_t PIOS_SPI_Busy(uint8_t spi)
+{
+	struct pios_spi_dev * spi_dev;
+
+	/* Get a handle for the device configuration */
+	spi_dev = find_spi_dev_by_id(spi);
+
+	if (!spi_dev) {
+		/* Undefined SPI port for this board (see pios_board.c) */
+		return -2;
+	}
+
+	/* DMA buffer has data or SPI transmit register not empty or SPI is busy*/
+	if (DMA_GetCurrDataCounter(spi_dev->cfg->dma.rx.channel) ||
+		!SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_TXE) ||
+		SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_BSY))
+	{
+		return -3;
+	}
+
+	return(0);
+}
+
+
+
+
 
 void PIOS_SPI_IRQ_Handler(uint8_t spi)
 {

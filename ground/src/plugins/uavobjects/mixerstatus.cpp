@@ -44,28 +44,28 @@ MixerStatus::MixerStatus(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     QList<UAVObjectField*> fields;
     QStringList Mixer0ElemNames;
     Mixer0ElemNames.append("0");
-    fields.append( new UAVObjectField(QString("Mixer0"), QString("us"), UAVObjectField::FLOAT32, Mixer0ElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Mixer0"), QString(""), UAVObjectField::FLOAT32, Mixer0ElemNames, QStringList()) );
     QStringList Mixer1ElemNames;
     Mixer1ElemNames.append("0");
-    fields.append( new UAVObjectField(QString("Mixer1"), QString("us"), UAVObjectField::FLOAT32, Mixer1ElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Mixer1"), QString(""), UAVObjectField::FLOAT32, Mixer1ElemNames, QStringList()) );
     QStringList Mixer2ElemNames;
     Mixer2ElemNames.append("0");
-    fields.append( new UAVObjectField(QString("Mixer2"), QString("us"), UAVObjectField::FLOAT32, Mixer2ElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Mixer2"), QString(""), UAVObjectField::FLOAT32, Mixer2ElemNames, QStringList()) );
     QStringList Mixer3ElemNames;
     Mixer3ElemNames.append("0");
-    fields.append( new UAVObjectField(QString("Mixer3"), QString("us"), UAVObjectField::FLOAT32, Mixer3ElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Mixer3"), QString(""), UAVObjectField::FLOAT32, Mixer3ElemNames, QStringList()) );
     QStringList Mixer4ElemNames;
     Mixer4ElemNames.append("0");
-    fields.append( new UAVObjectField(QString("Mixer4"), QString("us"), UAVObjectField::FLOAT32, Mixer4ElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Mixer4"), QString(""), UAVObjectField::FLOAT32, Mixer4ElemNames, QStringList()) );
     QStringList Mixer5ElemNames;
     Mixer5ElemNames.append("0");
-    fields.append( new UAVObjectField(QString("Mixer5"), QString("us"), UAVObjectField::FLOAT32, Mixer5ElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Mixer5"), QString(""), UAVObjectField::FLOAT32, Mixer5ElemNames, QStringList()) );
     QStringList Mixer6ElemNames;
     Mixer6ElemNames.append("0");
-    fields.append( new UAVObjectField(QString("Mixer6"), QString("us"), UAVObjectField::FLOAT32, Mixer6ElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Mixer6"), QString(""), UAVObjectField::FLOAT32, Mixer6ElemNames, QStringList()) );
     QStringList Mixer7ElemNames;
     Mixer7ElemNames.append("0");
-    fields.append( new UAVObjectField(QString("Mixer7"), QString("us"), UAVObjectField::FLOAT32, Mixer7ElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Mixer7"), QString(""), UAVObjectField::FLOAT32, Mixer7ElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

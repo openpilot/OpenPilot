@@ -81,7 +81,7 @@ MixerSettings::MixerSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, N
     Mixer0VectorElemNames.append("Roll");
     Mixer0VectorElemNames.append("Pitch");
     Mixer0VectorElemNames.append("Yaw");
-    fields.append( new UAVObjectField(QString("Mixer0Vector"), QString(""), UAVObjectField::FLOAT32, Mixer0VectorElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Mixer0Vector"), QString(""), UAVObjectField::INT8, Mixer0VectorElemNames, QStringList()) );
     QStringList Mixer1TypeElemNames;
     Mixer1TypeElemNames.append("0");
     QStringList Mixer1TypeEnumOptions;
@@ -95,7 +95,7 @@ MixerSettings::MixerSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, N
     Mixer1VectorElemNames.append("Roll");
     Mixer1VectorElemNames.append("Pitch");
     Mixer1VectorElemNames.append("Yaw");
-    fields.append( new UAVObjectField(QString("Mixer1Vector"), QString(""), UAVObjectField::FLOAT32, Mixer1VectorElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Mixer1Vector"), QString(""), UAVObjectField::INT8, Mixer1VectorElemNames, QStringList()) );
     QStringList Mixer2TypeElemNames;
     Mixer2TypeElemNames.append("0");
     QStringList Mixer2TypeEnumOptions;
@@ -109,7 +109,7 @@ MixerSettings::MixerSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, N
     Mixer2VectorElemNames.append("Roll");
     Mixer2VectorElemNames.append("Pitch");
     Mixer2VectorElemNames.append("Yaw");
-    fields.append( new UAVObjectField(QString("Mixer2Vector"), QString(""), UAVObjectField::FLOAT32, Mixer2VectorElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Mixer2Vector"), QString(""), UAVObjectField::INT8, Mixer2VectorElemNames, QStringList()) );
     QStringList Mixer3TypeElemNames;
     Mixer3TypeElemNames.append("0");
     QStringList Mixer3TypeEnumOptions;
@@ -123,7 +123,7 @@ MixerSettings::MixerSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, N
     Mixer3VectorElemNames.append("Roll");
     Mixer3VectorElemNames.append("Pitch");
     Mixer3VectorElemNames.append("Yaw");
-    fields.append( new UAVObjectField(QString("Mixer3Vector"), QString(""), UAVObjectField::FLOAT32, Mixer3VectorElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Mixer3Vector"), QString(""), UAVObjectField::INT8, Mixer3VectorElemNames, QStringList()) );
     QStringList Mixer4TypeElemNames;
     Mixer4TypeElemNames.append("0");
     QStringList Mixer4TypeEnumOptions;
@@ -137,7 +137,7 @@ MixerSettings::MixerSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, N
     Mixer4VectorElemNames.append("Roll");
     Mixer4VectorElemNames.append("Pitch");
     Mixer4VectorElemNames.append("Yaw");
-    fields.append( new UAVObjectField(QString("Mixer4Vector"), QString(""), UAVObjectField::FLOAT32, Mixer4VectorElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Mixer4Vector"), QString(""), UAVObjectField::INT8, Mixer4VectorElemNames, QStringList()) );
     QStringList Mixer5TypeElemNames;
     Mixer5TypeElemNames.append("0");
     QStringList Mixer5TypeEnumOptions;
@@ -151,7 +151,7 @@ MixerSettings::MixerSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, N
     Mixer5VectorElemNames.append("Roll");
     Mixer5VectorElemNames.append("Pitch");
     Mixer5VectorElemNames.append("Yaw");
-    fields.append( new UAVObjectField(QString("Mixer5Vector"), QString(""), UAVObjectField::FLOAT32, Mixer5VectorElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Mixer5Vector"), QString(""), UAVObjectField::INT8, Mixer5VectorElemNames, QStringList()) );
     QStringList Mixer6TypeElemNames;
     Mixer6TypeElemNames.append("0");
     QStringList Mixer6TypeEnumOptions;
@@ -165,7 +165,7 @@ MixerSettings::MixerSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, N
     Mixer6VectorElemNames.append("Roll");
     Mixer6VectorElemNames.append("Pitch");
     Mixer6VectorElemNames.append("Yaw");
-    fields.append( new UAVObjectField(QString("Mixer6Vector"), QString(""), UAVObjectField::FLOAT32, Mixer6VectorElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Mixer6Vector"), QString(""), UAVObjectField::INT8, Mixer6VectorElemNames, QStringList()) );
     QStringList Mixer7TypeElemNames;
     Mixer7TypeElemNames.append("0");
     QStringList Mixer7TypeEnumOptions;
@@ -179,7 +179,7 @@ MixerSettings::MixerSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, N
     Mixer7VectorElemNames.append("Roll");
     Mixer7VectorElemNames.append("Pitch");
     Mixer7VectorElemNames.append("Yaw");
-    fields.append( new UAVObjectField(QString("Mixer7Vector"), QString(""), UAVObjectField::FLOAT32, Mixer7VectorElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Mixer7Vector"), QString(""), UAVObjectField::INT8, Mixer7VectorElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

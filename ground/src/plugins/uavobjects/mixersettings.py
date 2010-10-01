@@ -120,7 +120,7 @@ _fields = [ \
 	),
 	uavobject.UAVObjectField(
 		'Mixer0Vector',
-		'f',
+		'b',
 		5,
 		[
 			'ThrottleCurve1',
@@ -147,7 +147,7 @@ _fields = [ \
 	),
 	uavobject.UAVObjectField(
 		'Mixer1Vector',
-		'f',
+		'b',
 		5,
 		[
 			'ThrottleCurve1',
@@ -174,7 +174,7 @@ _fields = [ \
 	),
 	uavobject.UAVObjectField(
 		'Mixer2Vector',
-		'f',
+		'b',
 		5,
 		[
 			'ThrottleCurve1',
@@ -201,7 +201,7 @@ _fields = [ \
 	),
 	uavobject.UAVObjectField(
 		'Mixer3Vector',
-		'f',
+		'b',
 		5,
 		[
 			'ThrottleCurve1',
@@ -228,7 +228,7 @@ _fields = [ \
 	),
 	uavobject.UAVObjectField(
 		'Mixer4Vector',
-		'f',
+		'b',
 		5,
 		[
 			'ThrottleCurve1',
@@ -255,7 +255,7 @@ _fields = [ \
 	),
 	uavobject.UAVObjectField(
 		'Mixer5Vector',
-		'f',
+		'b',
 		5,
 		[
 			'ThrottleCurve1',
@@ -282,7 +282,7 @@ _fields = [ \
 	),
 	uavobject.UAVObjectField(
 		'Mixer6Vector',
-		'f',
+		'b',
 		5,
 		[
 			'ThrottleCurve1',
@@ -309,7 +309,7 @@ _fields = [ \
 	),
 	uavobject.UAVObjectField(
 		'Mixer7Vector',
-		'f',
+		'b',
 		5,
 		[
 			'ThrottleCurve1',
@@ -326,7 +326,7 @@ _fields = [ \
 
 class MixerSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 3818217990
+    OBJID        = 1945801048
     NAME         = "MixerSettings"
     METANAME     = "MixerSettingsMeta"
     ISSINGLEINST = 1

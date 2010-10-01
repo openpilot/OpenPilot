@@ -41,7 +41,7 @@
 #define MIXERSETTINGS_H
 
 // Object constants
-#define MIXERSETTINGS_OBJID 3818217990U
+#define MIXERSETTINGS_OBJID 1945801048U
 #define MIXERSETTINGS_NAME "MixerSettings"
 #define MIXERSETTINGS_METANAME "MixerSettingsMeta"
 #define MIXERSETTINGS_ISSINGLEINST 1
@@ -78,21 +78,21 @@ typedef struct {
     float ThrottleCurve1[5];
     float ThrottleCurve2[5];
     uint8_t Mixer0Type;
-    float Mixer0Vector[5];
+    int8_t Mixer0Vector[5];
     uint8_t Mixer1Type;
-    float Mixer1Vector[5];
+    int8_t Mixer1Vector[5];
     uint8_t Mixer2Type;
-    float Mixer2Vector[5];
+    int8_t Mixer2Vector[5];
     uint8_t Mixer3Type;
-    float Mixer3Vector[5];
+    int8_t Mixer3Vector[5];
     uint8_t Mixer4Type;
-    float Mixer4Vector[5];
+    int8_t Mixer4Vector[5];
     uint8_t Mixer5Type;
-    float Mixer5Vector[5];
+    int8_t Mixer5Vector[5];
     uint8_t Mixer6Type;
-    float Mixer6Vector[5];
+    int8_t Mixer6Vector[5];
     uint8_t Mixer7Type;
-    float Mixer7Vector[5];
+    int8_t Mixer7Vector[5];
 
 } __attribute__((packed)) MixerSettingsData;
 

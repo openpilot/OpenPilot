@@ -50,21 +50,21 @@ public:
         float ThrottleCurve1[5];
         float ThrottleCurve2[5];
         quint8 Mixer0Type;
-        float Mixer0Vector[5];
+        qint8 Mixer0Vector[5];
         quint8 Mixer1Type;
-        float Mixer1Vector[5];
+        qint8 Mixer1Vector[5];
         quint8 Mixer2Type;
-        float Mixer2Vector[5];
+        qint8 Mixer2Vector[5];
         quint8 Mixer3Type;
-        float Mixer3Vector[5];
+        qint8 Mixer3Vector[5];
         quint8 Mixer4Type;
-        float Mixer4Vector[5];
+        qint8 Mixer4Vector[5];
         quint8 Mixer5Type;
-        float Mixer5Vector[5];
+        qint8 Mixer5Vector[5];
         quint8 Mixer6Type;
-        float Mixer6Vector[5];
+        qint8 Mixer6Vector[5];
         quint8 Mixer7Type;
-        float Mixer7Vector[5];
+        qint8 Mixer7Vector[5];
 
     } __attribute__((packed)) DataFields;
 
@@ -150,7 +150,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 3818217990U;
+    static const quint32 OBJID = 1945801048U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

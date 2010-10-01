@@ -69,7 +69,7 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
 //this structure is equivalent to the UAVObjects for one mixer.
 typedef struct {
 	uint8_t type;
-	float matrix[5];
+	int8_t matrix[5];
 } __attribute__((packed)) Mixer_t;
 
 
@@ -226,11 +226,11 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
 	static float filterAccumulator[MAX_MIX_ACTUATORS]={0,0,0,0,0,0,0,0};
 	Mixer_t * mixers = (Mixer_t *)&mixerSettings->Mixer0Type; //pointer to array of mixers in UAVObjects
 	Mixer_t * mixer = &mixers[index];
-	float result = (mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_THROTTLECURVE1] * curve1) +
-	(mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_THROTTLECURVE2] * curve2) +
-	(mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_ROLL] * desired->Roll) +
-	(mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_PITCH] * desired->Pitch) +
-	(mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_YAW] * desired->Yaw);
+	float result = (mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_THROTTLECURVE1] / 128.0f * curve1) +
+	(mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_THROTTLECURVE2] / 128.0f * curve2) +
+	(mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_ROLL] / 128.0f * desired->Roll) +
+	(mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_PITCH] / 128.0f * desired->Pitch) +
+	(mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_YAW] / 128.0f * desired->Yaw);
 	if(mixer->type == MIXERSETTINGS_MIXER0TYPE_MOTOR)
 	{
 		if(result < 0) //idle throttle

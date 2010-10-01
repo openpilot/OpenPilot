@@ -910,13 +910,13 @@ void ConfigAirframeWidget::setupQuadMotor(int channel, double pitch, double roll
     // First of all reset the vector
     resetField(field);
     int ti = field->getElementNames().indexOf("ThrottleCurve1");
-    field->setValue(1, ti);
+    field->setValue(127, ti);
     ti = field->getElementNames().indexOf("Roll");
-    field->setValue(roll,ti);
+    field->setValue(roll*127,ti);
     ti = field->getElementNames().indexOf("Pitch");
-    field->setValue(pitch,ti);
+    field->setValue(pitch*127,ti);
     ti = field->getElementNames().indexOf("Yaw");
-    field->setValue(yaw,ti);
+    field->setValue(yaw*127,ti);
 }
 
 /**

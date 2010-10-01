@@ -197,7 +197,7 @@ void ConfigAirframeWidget::requestAircraftUpdate()
     // is a straight line (that's how the mixer works on the mainboard):
     if (field->getValue(0).toInt() <= -10) {
         for (double i=0; i<field->getNumElements(); i++) {
-            curveValues.append(-1.0 + 2*i/(field->getNumElements()-1));
+            curveValues.append(i/(field->getNumElements()-1));
         }
     } else {
         for (unsigned int i=0; i < field->getNumElements(); i++) {

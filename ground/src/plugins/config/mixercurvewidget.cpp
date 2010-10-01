@@ -78,7 +78,7 @@ MixerCurveWidget::~MixerCurveWidget()
   Init curve: create a (flat) curve with a specified number of points.
 
   If a curve exists already, resets it.
-  Points should be between -1 and 1.
+  Points should be between 0 and 1.
   */
 void MixerCurveWidget::initCurve(QList<double> points)
 {
@@ -98,7 +98,7 @@ void MixerCurveWidget::initCurve(QList<double> points)
 
     // Create the nodes
     qreal w = plot->boundingRect().width()/(points.length()-1);
-    qreal h = plot->boundingRect().height()/2;
+    qreal h = plot->boundingRect().height();
     for (int i=0; i<points.length(); i++) {
         Node *node = new Node(this);
         scene()->addItem(node);
@@ -106,8 +106,8 @@ void MixerCurveWidget::initCurve(QList<double> points)
         double val = points.at(i);
         if (val>1)
                 val=1;
-        if (val<-1)
-                val=-1;
+        if (val<0)
+                val=0;
         node->setPos(w*i,h-val*h);
         node->verticalMove(true);
     }
@@ -126,7 +126,7 @@ void MixerCurveWidget::initCurve(QList<double> points)
 QList<double> MixerCurveWidget::getCurve() {
     QList<double> list;
 
-    qreal h = plot->boundingRect().height()/2;
+    qreal h = plot->boundingRect().height();
     foreach(Node *node, nodeList) {
         list.append((h-node->pos().y())/h);
     }

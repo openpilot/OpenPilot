@@ -40,14 +40,16 @@
 #include "manualcontrolcommand.h"
 #include "systemsettings.h"
 
-
 // Private constants
+#define MAX_QUEUE_SIZE 2
 #define STACK_SIZE configMINIMAL_STACK_SIZE
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
+#define FAILSAFE_TIMEOUT_MS 100
 
 // Private types
 
 // Private variables
+static xQueueHandle queue;
 static xTaskHandle taskHandle;
 
 // Private functions
@@ -59,8 +61,12 @@ static float bound(float val, float min, float max);
  */
 int32_t StabilizationInitialize()
 {
-	// Initialize variables
-
+	// Create object queue
+	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+	
+	// Listen for AttitudeActual updates.
+	AttitudeActualConnectQueue(queue);
+	
 	// Start main task
 	xTaskCreate(stabilizationTask, (signed char*)"Stabilization", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 
@@ -72,6 +78,8 @@ int32_t StabilizationInitialize()
  */
 static void stabilizationTask(void* parameters)
 {
+	UAVObjEvent ev;
+
 	StabilizationSettingsData stabSettings;
 	ActuatorDesiredData actuatorDesired;
 	AttitudeDesiredData attitudeDesired;
@@ -103,6 +111,13 @@ static void stabilizationTask(void* parameters)
 	lastSysTime = xTaskGetTickCount();
 	while (1)
 	{
+		// Wait until the ActuatorDesired object is updated, if a timeout then go to failsafe
+                if ( xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )
+                {
+                        AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION,SYSTEMALARMS_ALARM_WARNING);
+
+                }
+		
 		// Read settings and other objects
 		StabilizationSettingsGet(&stabSettings);
 		SystemSettingsGet(&systemSettings);
@@ -171,9 +186,6 @@ static void stabilizationTask(void* parameters)
 
 		// Clear alarms
 		AlarmsClear(SYSTEMALARMS_ALARM_STABILIZATION);
-
-		// Wait until next update
-		vTaskDelayUntil(&lastSysTime, stabSettings.UpdatePeriod / portTICK_RATE_MS );
 	}
 }
 

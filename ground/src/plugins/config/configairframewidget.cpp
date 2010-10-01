@@ -410,6 +410,9 @@ void ConfigAirframeWidget::requestAircraftUpdate()
         field = obj->getField(QString("DecelTime"));
         Q_ASSERT(field);
         m_aircraft->decelTime->setValue(field->getDouble());
+        field = obj->getField(QString("MaxAccel"));
+        Q_ASSERT(field);
+        m_aircraft->maxAccelSlider->setValue(field->getDouble());
 
     }
 
@@ -1038,6 +1041,9 @@ void ConfigAirframeWidget::sendAircraftUpdate()
         field = obj->getField(QString("DecelTime"));
         Q_ASSERT(field);
         field->setDouble(m_aircraft->decelTime->value());
+        field = obj->getField(QString("MaxAccel"));
+        Q_ASSERT(field);
+        field->setDouble(m_aircraft->maxAccelSlider->value());
 
         // Curve is also common to all quads:
         field = obj->getField("ThrottleCurve1");

@@ -496,36 +496,6 @@
                   <property name="fieldGrowthPolicy">
                    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
                   </property>
-                  <item row="2" column="1">
-                   <widget class="QSlider" name="feedForwardSlider">
-                    <property name="maximum">
-                     <number>100</number>
-                    </property>
-                    <property name="singleStep">
-                     <number>1</number>
-                    </property>
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="tickPosition">
-                     <enum>QSlider::NoTicks</enum>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="4" column="0">
-                   <widget class="QLabel" name="label_21">
-                    <property name="text">
-                     <string>Accel Time Constant</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="5" column="0">
-                   <widget class="QLabel" name="label_22">
-                    <property name="text">
-                     <string>Decel Time Constant</string>
-                    </property>
-                   </widget>
-                  </item>
                   <item row="2" column="0">
                    <layout class="QHBoxLayout" name="horizontalLayout_12">
                     <item>
@@ -550,17 +520,90 @@
                     </item>
                    </layout>
                   </item>
-                  <item row="4" column="1">
+                  <item row="2" column="1">
+                   <widget class="QSlider" name="feedForwardSlider">
+                    <property name="maximum">
+                     <number>100</number>
+                    </property>
+                    <property name="singleStep">
+                     <number>1</number>
+                    </property>
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="tickPosition">
+                     <enum>QSlider::NoTicks</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="label_21">
+                    <property name="text">
+                     <string>Accel Time Constant</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
                    <widget class="QDoubleSpinBox" name="accelTime">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
                     <property name="maximum">
                      <double>1000.000000000000000</double>
                     </property>
                    </widget>
                   </item>
-                  <item row="5" column="1">
+                  <item row="4" column="0">
+                   <widget class="QLabel" name="label_22">
+                    <property name="text">
+                     <string>Decel Time Constant</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="1">
                    <widget class="QDoubleSpinBox" name="decelTime">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
                     <property name="maximum">
                      <double>1000.000000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="0">
+                   <layout class="QHBoxLayout" name="horizontalLayout_16">
+                    <item>
+                     <widget class="QLabel" name="label_37">
+                      <property name="text">
+                       <string>MaxAccel</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_33">
+                      <property name="text">
+                       <string>1000</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QSlider" name="maxAccelSlider">
+                    <property name="toolTip">
+                     <string>Limits how much the engines can accelerate or decelerate. In 'units per second', a sound default is 1000.</string>
+                    </property>
+                    <property name="minimum">
+                     <number>500</number>
+                    </property>
+                    <property name="maximum">
+                     <number>2000</number>
+                    </property>
+                    <property name="value">
+                     <number>1000</number>
+                    </property>
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
                     </property>
                    </widget>
                   </item>
@@ -569,10 +612,17 @@
                 <item>
                  <layout class="QHBoxLayout" name="horizontalLayout_9">
                   <item>
-                   <widget class="QComboBox" name="comboBox_10"/>
+                   <widget class="QComboBox" name="feedForwardTestChannel">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
                   </item>
                   <item>
                    <widget class="QPushButton" name="pushButton">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
                     <property name="text">
                      <string>Test</string>
                     </property>
@@ -682,6 +732,9 @@
                 </item>
                 <item>
                  <widget class="QLineEdit" name="lineEdit_2">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -705,6 +758,9 @@
                 </item>
                 <item>
                  <widget class="QComboBox" name="comboBox_9">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -1320,12 +1376,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>309</x>
-     <y>277</y>
+     <x>78</x>
+     <y>116</y>
     </hint>
     <hint type="destinationlabel">
-     <x>341</x>
-     <y>300</y>
+     <x>78</x>
+     <y>118</y>
     </hint>
    </hints>
   </connection>
@@ -1336,12 +1392,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>236</x>
-     <y>277</y>
+     <x>74</x>
+     <y>116</y>
     </hint>
     <hint type="destinationlabel">
-     <x>283</x>
-     <y>300</y>
+     <x>74</x>
+     <y>118</y>
     </hint>
    </hints>
   </connection>
@@ -1352,12 +1408,28 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>118</x>
-     <y>96</y>
+     <x>284</x>
+     <y>171</y>
     </hint>
     <hint type="destinationlabel">
-     <x>118</x>
-     <y>96</y>
+     <x>156</x>
+     <y>170</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>maxAccelSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_33</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>198</x>
+     <y>234</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>127</x>
+     <y>235</y>
     </hint>
    </hints>
   </connection>

@@ -57,21 +57,32 @@ void LLA2ECEF(double LLA[3], double ECEF[3])
 // ****** convert ECEF to Lat,Lon,Alt (ITERATIVE!) *********
 uint16_t ECEF2LLA(double ECEF[3], double LLA[3])
 {
+	/**
+	 * LLA parameter is used to prime the iteration.
+	 * A position within 1 meter of the specified LLA
+	 * will be calculated within at most 3 iterations.
+	 * If unknown: Call with any valid LLA coordinate
+	 * will compute within at most 5 iterations.
+	 * Suggestion: [0,0,0]
+	 **/
+
 	const double a = 6378137.0;	// Equatorial Radius
 	const double e = 8.1819190842622e-2;	// Eccentricity
 	double x = ECEF[0], y = ECEF[1], z = ECEF[2];
 	double Lat, N, NplusH, delta, esLat;
 	uint16_t iter;
-#define MAX_ITER 100
+#define MAX_ITER 10 // should not take more than 5 for valid coordinates
+#define ACCURACY 1.0e-11 // used to be e-14, but we don't need sub micrometer exact calculations
 
 	LLA[1] = RAD2DEG * atan2(y, x);
-	N = a;
-	NplusH = N;
+	Lat = DEG2RAD * LLA[0];
+	esLat = e * sin(Lat);
+	N = a / sqrt(1 - esLat * esLat);
+	NplusH = N + LLA[2];
 	delta = 1;
-	Lat = 1;
 	iter = 0;
 
-	while (((delta > 1.0e-14) || (delta < -1.0e-14))
+	while (((delta > ACCURACY) || (delta < -ACCURACY))
 	       && (iter < MAX_ITER)) {
 		delta =
 		    Lat -

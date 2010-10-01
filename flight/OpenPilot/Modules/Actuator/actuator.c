@@ -171,6 +171,7 @@ static void actuatorTask(void* parameters)
 			continue;			
 		}
 		
+		AlarmsClear(SYSTEMALARMS_ALARM_ACTUATOR);
 		
 		bool armed = manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE;
 		armed &= desired.Throttle > 0.05; //zero throttle stops the motors

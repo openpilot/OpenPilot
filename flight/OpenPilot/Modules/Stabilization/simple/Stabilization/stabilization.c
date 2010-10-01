@@ -72,6 +72,7 @@ int32_t StabilizationInitialize()
 
 	return 0;
 }
+float dT = 1;
 
 /**
  * Module task
@@ -87,6 +88,7 @@ static void stabilizationTask(void* parameters)
 	ManualControlCommandData manualControl;
 	SystemSettingsData systemSettings;
 	portTickType lastSysTime;
+	portTickType thisSysTime;
 	float pitchError, pitchErrorLast;
 	float rollError, rollErrorLast;
 	float yawError, yawErrorLast;
@@ -115,8 +117,13 @@ static void stabilizationTask(void* parameters)
                 if ( xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )
                 {
                         AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION,SYSTEMALARMS_ALARM_WARNING);
-
                 }
+		
+		// Check how long since last update
+		thisSysTime = xTaskGetTickCount();
+		if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
+			dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;		
+		lastSysTime = thisSysTime;
 		
 		// Read settings and other objects
 		StabilizationSettingsGet(&stabSettings);
@@ -127,16 +134,16 @@ static void stabilizationTask(void* parameters)
 
 		// Pitch stabilization control loop
 		pitchError = attitudeDesired.Pitch - attitudeActual.Pitch;
-		pitchDerivative = ((pitchError - pitchErrorLast) * 1000) / stabSettings.UpdatePeriod;
-		pitchIntegral = bound(pitchIntegral+(pitchError * stabSettings.UpdatePeriod) / 1000, -stabSettings.PitchIntegralLimit, stabSettings.PitchIntegralLimit);
+		pitchDerivative = (pitchError - pitchErrorLast) / dT;
+		pitchIntegral = bound(pitchIntegral + pitchError * dT, -stabSettings.PitchIntegralLimit, stabSettings.PitchIntegralLimit);
 		actuatorDesired.Pitch = stabSettings.PitchKp*pitchError + stabSettings.PitchKi*pitchIntegral + stabSettings.PitchKd*pitchDerivative;
 		actuatorDesired.Pitch = bound(actuatorDesired.Pitch, -1.0, 1.0);
 		pitchErrorLast = pitchError;
 
 		// Roll stabilization control loop
 		rollError = attitudeDesired.Roll - attitudeActual.Roll;
-		rollDerivative = ((rollError - rollErrorLast) * 1000) / stabSettings.UpdatePeriod;
-		rollIntegral = bound(rollIntegral+(rollError * stabSettings.UpdatePeriod) / 1000, -stabSettings.RollIntegralLimit, stabSettings.RollIntegralLimit);
+		rollDerivative = (rollError - rollErrorLast) / dT;
+		rollIntegral = bound(rollIntegral + rollError * dT, -stabSettings.RollIntegralLimit, stabSettings.RollIntegralLimit);
 		actuatorDesired.Roll = stabSettings.RollKp*rollError + stabSettings.RollKi*rollIntegral + stabSettings.RollKd*rollDerivative;
 		actuatorDesired.Roll = bound(actuatorDesired.Roll, -1.0, 1.0);
 		rollErrorLast = rollError;
@@ -145,7 +152,7 @@ static void stabilizationTask(void* parameters)
 		if (( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL )||( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HELICP))
 		{
 			if(stabSettings.YawMode == STABILIZATIONSETTINGS_YAWMODE_RATE) {  // rate stabilization on yaw
-				yawChange = ((attitudeActual.Yaw - yawPrevious) * 1000) / stabSettings.UpdatePeriod;
+				yawChange = (attitudeActual.Yaw - yawPrevious) / dT;
 				yawPrevious = attitudeActual.Yaw;
 				yawError = bound(attitudeDesired.Yaw, -stabSettings.YawMax, stabSettings.YawMax) - yawChange;
 			} else { // heading stabilization
@@ -155,8 +162,8 @@ static void stabilizationTask(void* parameters)
 			//this should make it take the quickest path to reach the desired yaw
 			if (yawError>180.0)yawError -= 360;
 			if (yawError<-180.0)yawError += 360;
-			yawDerivative = ((yawError - yawErrorLast) * 1000) / stabSettings.UpdatePeriod;
-			yawIntegral = bound(yawIntegral+(yawError * stabSettings.UpdatePeriod) / 1000, -stabSettings.YawIntegralLimit, stabSettings.YawIntegralLimit);
+			yawDerivative = (yawError - yawErrorLast) / dT;
+			yawIntegral = bound(yawIntegral + yawError * dT, -stabSettings.YawIntegralLimit, stabSettings.YawIntegralLimit);
 			actuatorDesired.Yaw = stabSettings.YawKp*yawError + stabSettings.YawKi*yawIntegral + stabSettings.YawKd*yawDerivative;;
 			actuatorDesired.Yaw = bound(actuatorDesired.Yaw, -1.0, 1.0);
 			yawErrorLast = yawError;

@@ -38,16 +38,6 @@ from collections import namedtuple
 # This is a list of instances of the data fields contained in this object
 _fields = [ \
 	uavobject.UAVObjectField(
-		'UpdatePeriod',
-		'B',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
 		'RollMax',
 		'B',
 		1,
@@ -234,7 +224,7 @@ _fields = [ \
 
 class StabilizationSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 117768092
+    OBJID        = 1346414844
     NAME         = "StabilizationSettings"
     METANAME     = "StabilizationSettingsMeta"
     ISSINGLEINST = 1

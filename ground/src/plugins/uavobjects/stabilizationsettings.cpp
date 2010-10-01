@@ -42,9 +42,6 @@ StabilizationSettings::StabilizationSettings(): UAVDataObject(OBJID, ISSINGLEINS
 {
     // Create fields
     QList<UAVObjectField*> fields;
-    QStringList UpdatePeriodElemNames;
-    UpdatePeriodElemNames.append("0");
-    fields.append( new UAVObjectField(QString("UpdatePeriod"), QString("ms"), UAVObjectField::UINT8, UpdatePeriodElemNames, QStringList()) );
     QStringList RollMaxElemNames;
     RollMaxElemNames.append("0");
     fields.append( new UAVObjectField(QString("RollMax"), QString("degrees"), UAVObjectField::UINT8, RollMaxElemNames, QStringList()) );
@@ -135,7 +132,6 @@ UAVObject::Metadata StabilizationSettings::getDefaultMetadata()
  */
 void StabilizationSettings::setDefaultFieldValues()
 {
-    data.UpdatePeriod = 10;
     data.RollMax = 35;
     data.PitchMax = 35;
     data.YawMax = 35;

@@ -80,7 +80,6 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	// Initialize object fields to their default values
 	UAVObjGetInstanceData(obj, instId, &data);
 	memset(&data, 0, sizeof(StabilizationSettingsData));
-	data.UpdatePeriod = 10;
 	data.RollMax = 35;
 	data.PitchMax = 35;
 	data.YawMax = 35;

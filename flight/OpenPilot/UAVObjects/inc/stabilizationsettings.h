@@ -41,7 +41,7 @@
 #define STABILIZATIONSETTINGS_H
 
 // Object constants
-#define STABILIZATIONSETTINGS_OBJID 117768092U
+#define STABILIZATIONSETTINGS_OBJID 1346414844U
 #define STABILIZATIONSETTINGS_NAME "StabilizationSettings"
 #define STABILIZATIONSETTINGS_METANAME "StabilizationSettingsMeta"
 #define STABILIZATIONSETTINGS_ISSINGLEINST 1
@@ -71,7 +71,6 @@
 
 // Object data
 typedef struct {
-    uint8_t UpdatePeriod;
     uint8_t RollMax;
     uint8_t PitchMax;
     uint8_t YawMax;
@@ -94,7 +93,6 @@ typedef struct {
 } __attribute__((packed)) StabilizationSettingsData;
 
 // Field information
-// Field UpdatePeriod information
 // Field RollMax information
 // Field PitchMax information
 // Field YawMax information

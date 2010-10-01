@@ -1,7 +1,6 @@
 <xml>
     <object name="StabilizationSettings" singleinstance="true" settings="true">
         <description>PID settings used by the Stabilization module to combine the @ref AttitudeActual and @ref AttitudeDesired to compute @ref ActuatorDesired</description>
-        <field name="UpdatePeriod" units="ms" type="uint8" elements="1" defaultvalue="10"/>
         <field name="RollMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>
         <field name="PitchMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>
         <field name="YawMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>

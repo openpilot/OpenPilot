@@ -52,7 +52,7 @@
 
 
 // Private variables
-//static xQueueHandle queue;
+static xQueueHandle queue;
 static xTaskHandle taskHandle;
 
 // Private functions
@@ -73,10 +73,10 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
 int32_t ActuatorInitialize()
 {
 	// Create object queue
-	//queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 	
 	// Listen for ExampleObject1 updates
-	//ActuatorDesiredConnectQueue(queue);
+	ActuatorDesiredConnectQueue(queue);
 	
 	// Start main task
 	xTaskCreate(actuatorTask, (signed char*)"Actuator", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
@@ -89,7 +89,7 @@ int32_t ActuatorInitialize()
  */
 static void actuatorTask(void* parameters)
 {
-	//	UAVObjEvent ev;
+	UAVObjEvent ev;
 	portTickType lastSysTime;
 	ActuatorCommandData command;
 	ActuatorSettingsData settings;
@@ -105,6 +105,14 @@ static void actuatorTask(void* parameters)
 	lastSysTime = xTaskGetTickCount();
 	while (1)
 	{
+                // Wait until the ActuatorDesired object is updated, if a timeout then go to failsafe
+                if ( xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )
+                {
+                        setFailsafe();
+                        continue;
+                }
+		
+		
 		
 		ActuatorCommandGet(&command);
 		ActuatorSettingsGet(&settings);
@@ -127,9 +135,6 @@ static void actuatorTask(void* parameters)
 		{
 			PIOS_Servo_Set( n, command.Channel[n] );
 		}
-		// Wait until next update
-		vTaskDelayUntil(&lastSysTime, settings.UpdatePeriod / portTICK_RATE_MS );
-		
 	}
 }
 

@@ -177,8 +177,6 @@ uint32_t counter_val;
 //! Filter coefficients used in decimation.  Limited order so filter can't run between samples
 int16_t fir_coeffs[50];
 
-//! Indicates the communications are requesting a calibration
-uint8_t calibration_pending = FALSE;
 
 //! The oversampling rate, ekf is 2k / this
 static uint8_t adc_oversampling = 17;
@@ -313,10 +311,6 @@ for all data to be up to date before doing anything*/
 		if ((total_conversion_blocks % 100) == 0)
 			PIOS_LED_Toggle(LED1);
 
-		if (calibration_pending) {
-			calibrate_sensors();
-			calibration_pending = FALSE;
-		}
 #if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
 		// Get magnetic readings
 		if (PIOS_HMC5843_NewDataAvailable()) {
@@ -694,10 +688,6 @@ void calibrate_sensors()
 	gyro_data.calibration.bias[0] -= gyro_bias[0];
 	gyro_data.calibration.bias[1] -= gyro_bias[1];
 	gyro_data.calibration.bias[2] -= gyro_bias[2];
-	AHRSCalibrationData cal;
-	AHRSCalibrationGet(&cal);
-	cal.measure_var = AHRSCALIBRATION_MEASURE_VAR_SET;
-	AHRSCalibrationSet(&cal);
 }
 
 /**
@@ -787,7 +777,12 @@ void calibration_callback(AhrsObjHandle obj)
 			mag_data.calibration.variance[ct] = cal.mag_var[ct];
 		}
 	}else if(cal.measure_var == AHRSCALIBRATION_MEASURE_VAR_MEASURE){
-		calibration_pending = true;
+		calibrate_sensors();
+		AHRSCalibrationData cal;
+		AHRSCalibrationGet(&cal);
+		cal.measure_var = AHRSCALIBRATION_MEASURE_VAR_SET;
+		AHRSCalibrationSet(&cal);
+
 	}else if(cal.measure_var == AHRSCALIBRATION_MEASURE_VAR_ECHO){
 		send_calibration();
 	}

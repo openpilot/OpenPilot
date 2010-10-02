@@ -55,8 +55,8 @@
 #include "ahrs_spi_comm.h"
 
 // Private constants
-#define STACK_SIZE 1400
-#define TASK_PRIORITY (tskIDLE_PRIORITY+4)
+#define STACK_SIZE configMINIMAL_STACK_SIZE-128
+#define TASK_PRIORITY (tskIDLE_PRIORITY+1)
 
 // Private types
 
@@ -86,7 +86,6 @@ int32_t AHRSCommsInitialize(void)
 static void ahrscommsTask(void *parameters)
 {
 	portTickType lastSysTime;
-	AhrsStatusData data;
 
 	AlarmsSet(SYSTEMALARMS_ALARM_AHRSCOMMS, SYSTEMALARMS_ALARM_CRITICAL);
 

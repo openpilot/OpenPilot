@@ -177,7 +177,6 @@ SRC += $(OPUAVOBJ)/attituderaw.c
 SRC += $(OPUAVOBJ)/homelocation.c
 SRC += $(OPUAVOBJ)/attitudesettings.c
 SRC += $(OPUAVOBJ)/vtolsettings.c
-SRC += $(OPUAVOBJ)/vtolstatus.c
 SRC += $(OPUAVOBJ)/mixersettings.c
 SRC += $(OPUAVOBJ)/mixerstatus.c
 #SRC += $(OPUAVOBJ)/lesstabilizationsettings.c

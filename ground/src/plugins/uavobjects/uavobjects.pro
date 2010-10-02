@@ -41,7 +41,6 @@ HEADERS += uavobjects_global.h \
     flightbatterystate.h \
     homelocation.h \
     vtolsettings.h \
-    vtolstatus.h \
     mixersettings.h \
     mixerstatus.h \
     velocitydesired.h \
@@ -87,7 +86,6 @@ SOURCES += uavobject.cpp \
     flightbatterystate.cpp \
     homelocation.cpp \
     vtolsettings.cpp \
-    vtolstatus.cpp \
     mixersettings.cpp \
     mixerstatus.cpp \
     velocitydesired.cpp \

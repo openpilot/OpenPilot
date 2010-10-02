@@ -65,7 +65,6 @@
 #include "velocityactual.h"
 #include "velocitydesired.h"
 #include "vtolsettings.h"
-#include "vtolstatus.h"
 
 
 /**
@@ -111,6 +110,5 @@ void UAVObjectsInitializeAll()
     VelocityActualInitialize();
     VelocityDesiredInitialize();
     VTOLSettingsInitialize();
-    VTOLStatusInitialize();
 
 }

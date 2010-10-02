@@ -54,6 +54,9 @@ ActuatorDesired::ActuatorDesired(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
     QStringList ThrottleElemNames;
     ThrottleElemNames.append("0");
     fields.append( new UAVObjectField(QString("Throttle"), QString("%"), UAVObjectField::FLOAT32, ThrottleElemNames, QStringList()) );
+    QStringList UpdateTimeElemNames;
+    UpdateTimeElemNames.append("0");
+    fields.append( new UAVObjectField(QString("UpdateTime"), QString("ms"), UAVObjectField::FLOAT32, UpdateTimeElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

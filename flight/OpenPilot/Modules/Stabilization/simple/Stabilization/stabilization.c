@@ -182,6 +182,9 @@ static void stabilizationTask(void* parameters)
 		// Setup throttle
 		actuatorDesired.Throttle = bound(attitudeDesired.Throttle, stabSettings.ThrottleMin, stabSettings.ThrottleMax);
 
+		// Save dT
+		actuatorDesired.UpdateTime = dT;
+		
 		// Write actuator desired (if not in manual mode)
 		if ( manualControl.FlightMode != MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL )
 		{

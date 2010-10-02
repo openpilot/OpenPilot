@@ -67,7 +67,6 @@
 #include "velocityactual.h"
 #include "velocitydesired.h"
 #include "vtolsettings.h"
-#include "vtolstatus.h"
 
 
 /**
@@ -113,6 +112,5 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new VelocityActual() );
     objMngr->registerObject( new VelocityDesired() );
     objMngr->registerObject( new VTOLSettings() );
-    objMngr->registerObject( new VTOLStatus() );
 
 }

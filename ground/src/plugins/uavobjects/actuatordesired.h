@@ -47,6 +47,7 @@ public:
         float Pitch;
         float Yaw;
         float Throttle;
+        float UpdateTime;
 
     } __attribute__((packed)) DataFields;
 
@@ -55,10 +56,11 @@ public:
     // Field Pitch information
     // Field Yaw information
     // Field Throttle information
+    // Field UpdateTime information
 
   
     // Constants
-    static const quint32 OBJID = 123085850U;
+    static const quint32 OBJID = 2919796710U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

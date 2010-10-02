@@ -77,12 +77,22 @@ _fields = [ \
 		{
 		}
 	),
+	uavobject.UAVObjectField(
+		'UpdateTime',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
 ]
 
 
 class ActuatorDesired(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 123085850
+    OBJID        = 2919796710
     NAME         = "ActuatorDesired"
     METANAME     = "ActuatorDesiredMeta"
     ISSINGLEINST = 1

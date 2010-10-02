@@ -47,7 +47,6 @@ _fields = [ \
 		{
 			'0' : 'SET',
 			'1' : 'MEASURE',
-			'2' : 'ECHO',
 		}
 	),
 	uavobject.UAVObjectField(

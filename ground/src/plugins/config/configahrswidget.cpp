@@ -279,13 +279,9 @@ void ConfigAHRSWidget::calibPhase2()
           m_ahrs->calibInstructions->setText("Getting results...");
           connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(calibPhase2()));
           //  We need to echo back the results of calibration before changing to set mode
-          field->setValue("ECHO");
-          obj->updated();
+          obj->requestUpdate();
           break;
-      case 1:  // this is where we end up with the update just above
-          phaseCounter++;
-          break;
-      case 2:  // This is the update with the right values (coming from the board)
+      case 1:  // This is the update with the right values (coming from the board)
           disconnect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(calibPhase2()));
           // Now update size of all the graphs
           drawVariancesGraph();

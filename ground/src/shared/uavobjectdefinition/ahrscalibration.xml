@@ -1,7 +1,7 @@
 <xml>
     <object name="AHRSCalibration" singleinstance="true" settings="true">
         <description>Contains the calibration settings for the @ref AHRSCommsModule</description>
-        <field name="measure_var" units="" type="enum" elements="1" options="SET,MEASURE,ECHO" defaultvalue="SET"/>
+        <field name="measure_var" units="" type="enum" elements="1" options="SET,MEASURE" defaultvalue="SET"/>
         <field name="accel_bias" units="raw" type="float" elementnames="X,Y,Z" defaultvalue="24"/>
         <field name="accel_scale" units="m/s" type="float" elementnames="X,Y,Z" defaultvalue="0.012"/>
         <field name="accel_var" units="m^2/s^s" type="float" elementnames="X,Y,Z" defaultvalue="5e-5"/>

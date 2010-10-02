@@ -779,12 +779,6 @@ void calibration_callback(AhrsObjHandle obj)
 		}
 	}else if(cal.measure_var == AHRSCALIBRATION_MEASURE_VAR_MEASURE){
 		calibrate_sensors();
-		AHRSCalibrationData cal;
-		AHRSCalibrationGet(&cal);
-		cal.measure_var = AHRSCALIBRATION_MEASURE_VAR_SET;
-		AHRSCalibrationSet(&cal);
-
-	}else if(cal.measure_var == AHRSCALIBRATION_MEASURE_VAR_ECHO){
 		send_calibration();
 	}
 }

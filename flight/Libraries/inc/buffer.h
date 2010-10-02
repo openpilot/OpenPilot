@@ -77,8 +77,7 @@ uint8_t bufferGetFromFront(cBuffer * buffer);
 uint32_t bufferBufferedData(cBuffer * buffer);
 
 //! copy number of elements into another buffer
-uint8_t bufferGetChunkFromFront(cBuffer * buffer, uint8_t * dest,
-				uint32_t size);
+uint8_t bufferGetChunkFromFront(cBuffer * buffer, uint8_t * dest, uint32_t size);
 
 //! dump (discard) the first numbytes from the front of the buffer
 void bufferDumpFromFront(cBuffer * buffer, uint32_t numbytes);
@@ -91,8 +90,7 @@ uint8_t bufferGetAtIndex(cBuffer * buffer, uint32_t index);
 uint8_t bufferAddToEnd(cBuffer * buffer, uint8_t data);
 
 //! queue a block of character to end of buffer
-uint8_t bufferAddChunkToEnd(cBuffer * buffer, const uint8_t * data,
-			    uint32_t size);
+uint8_t bufferAddChunkToEnd(cBuffer * buffer, const uint8_t * data, uint32_t size);
 
 //! check if the buffer is full/not full (returns non-zero value if not full)
 uint8_t bufferIsNotFull(cBuffer * buffer);

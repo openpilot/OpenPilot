@@ -3,7 +3,7 @@
 #include "ahrs_spi_program.h"
 
 //TODO:Implement programming protocol
-void AhrsProgramReceive( void )
+void AhrsProgramReceive(void)
 {
 
 }

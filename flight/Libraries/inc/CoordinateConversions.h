@@ -48,11 +48,9 @@ void RPY2Quaternion(float rpy[3], float q[4]);
 void Quaternion2R(float q[4], float Rbe[3][3]);
 
 	// ****** Express LLA in a local NED Base Frame ********
-void LLA2Base(double LLA[3], double BaseECEF[3], float Rne[3][3],
-	      float NED[3]);
+void LLA2Base(double LLA[3], double BaseECEF[3], float Rne[3][3], float NED[3]);
 
 	// ****** Express ECEF in a local NED Base Frame ********
-void ECEF2Base(double ECEF[3], double BaseECEF[3], float Rne[3][3],
-	       float NED[3]);
+void ECEF2Base(double ECEF[3], double BaseECEF[3], float Rne[3][3], float NED[3]);
 
 #endif // COORDINATECONVERSIONS_H_

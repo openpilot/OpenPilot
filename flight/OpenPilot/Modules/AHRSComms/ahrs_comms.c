@@ -63,10 +63,8 @@
 // Private variables
 static xTaskHandle taskHandle;
 
-
 // Private functions
-static void ahrscommsTask(void* parameters);
-
+static void ahrscommsTask(void *parameters);
 
 /**
  * Initialise the module, called on startup
@@ -74,45 +72,41 @@ static void ahrscommsTask(void* parameters);
  */
 int32_t AHRSCommsInitialize(void)
 {
-    AhrsInitComms();
+	AhrsInitComms();
 
-    // Start main task
-    xTaskCreate(ahrscommsTask, (signed char*)"AHRSComms", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+	// Start main task
+	xTaskCreate(ahrscommsTask, (signed char *)"AHRSComms", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 
-    return 0;
+	return 0;
 }
-
 
 /**
  * Module thread, should not return.
  */
-static void ahrscommsTask(void* parameters)
+static void ahrscommsTask(void *parameters)
 {
-    portTickType lastSysTime;
-    AhrsStatusData data;
+	portTickType lastSysTime;
+	AhrsStatusData data;
 
-    AlarmsSet(SYSTEMALARMS_ALARM_AHRSCOMMS, SYSTEMALARMS_ALARM_CRITICAL);
+	AlarmsSet(SYSTEMALARMS_ALARM_AHRSCOMMS, SYSTEMALARMS_ALARM_CRITICAL);
 
-    /*Until AHRS connects, assume it doesn't know home */
-    AhrsStatusGet(&data);
-    data.HomeSet = AHRSSTATUS_HOMESET_FALSE;
-    //data.CalibrationSet = AHRSSTATUS_CALIBRATIONSET_FALSE;
-    data.AlgorithmSet = AHRSSTATUS_CALIBRATIONSET_FALSE;
-    AhrsStatusSet(&data);
+	/*Until AHRS connects, assume it doesn't know home */
+	AhrsStatusGet(&data);
+	data.HomeSet = AHRSSTATUS_HOMESET_FALSE;
+	//data.CalibrationSet = AHRSSTATUS_CALIBRATIONSET_FALSE;
+	data.AlgorithmSet = AHRSSTATUS_CALIBRATIONSET_FALSE;
+	AhrsStatusSet(&data);
 
-    // Main task loop
-    while (1)
-    {
-        AHRSSettingsData settings;
-        AHRSSettingsGet(&settings);
+	// Main task loop
+	while (1) {
+		AHRSSettingsData settings;
+		AHRSSettingsGet(&settings);
 
-        AhrsSendObjects();
+		AhrsSendObjects();
 		AhrsCommStatus stat = AhrsGetStatus();
-		if(stat.linkOk)
-		{
+		if (stat.linkOk) {
 			AlarmsClear(SYSTEMALARMS_ALARM_AHRSCOMMS);
-		}else
-		{
+		} else {
 			AlarmsSet(SYSTEMALARMS_ALARM_AHRSCOMMS, SYSTEMALARMS_ALARM_WARNING);
 		}
 		AhrsStatusData sData;
@@ -128,13 +122,11 @@ static void ahrscommsTask(void* parameters)
 		sData.OpInvalidPackets = stat.local.invalidPacket;
 
 		AhrsStatusSet(&sData);
-        /* Wait for the next update interval */
-        vTaskDelayUntil(&lastSysTime, settings.UpdatePeriod / portTICK_RATE_MS );
+		/* Wait for the next update interval */
+		vTaskDelayUntil(&lastSysTime, settings.UpdatePeriod / portTICK_RATE_MS);
 
-    }
+	}
 }
-
-
 
 /**
   * @}

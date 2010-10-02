@@ -118,8 +118,7 @@ uint8_t bufferGetFromFront(cBuffer * buffer)
  *  @arg -1 for success
  *  @arg 0 error 
  */
-uint8_t bufferGetChunkFromFront(cBuffer * buffer, uint8_t * dest,
-				uint32_t size)
+uint8_t bufferGetChunkFromFront(cBuffer * buffer, uint8_t * dest, uint32_t size)
 {
 	if (size > buffer->datalength)
 		return -1;
@@ -163,8 +162,7 @@ void bufferDumpFromFront(cBuffer * buffer, uint32_t numbytes)
 uint8_t bufferGetAtIndex(cBuffer * buffer, uint32_t index)
 {
 	// return character at index in buffer
-	return buffer->dataptr[(buffer->dataindex + index) %
-			       (buffer->size)];
+	return buffer->dataptr[(buffer->dataindex + index) % (buffer->size)];
 }
 
 /**
@@ -180,8 +178,7 @@ uint8_t bufferAddToEnd(cBuffer * buffer, uint8_t data)
 	// make sure the buffer has room
 	if (buffer->datalength < buffer->size) {
 		// save data byte at end of buffer
-		buffer->dataptr[(buffer->dataindex + buffer->datalength) %
-				buffer->size] = data;
+		buffer->dataptr[(buffer->dataindex + buffer->datalength) % buffer->size] = data;
 		// increment the length
 		buffer->datalength++;
 		// return success
@@ -199,8 +196,7 @@ uint8_t bufferAddToEnd(cBuffer * buffer, uint8_t data)
  *  @arg -1 for success
  *  @arg 0 error 
  */
-uint8_t bufferAddChunkToEnd(cBuffer * buffer, const uint8_t * data,
-			    uint32_t size)
+uint8_t bufferAddChunkToEnd(cBuffer * buffer, const uint8_t * data, uint32_t size)
 {
 	// TODO: replace with memcpy and logic, for now keeping it simple
 	for (uint32_t i = 0; i < size; i++) {

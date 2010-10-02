@@ -1,8 +1,7 @@
 #ifndef AHRSCOMMS_H_INCLUDED
 #define AHRSCOMMS_H_INCLUDED
 
-
-#ifdef IN_AHRS  //AHRS only
+#ifdef IN_AHRS			//AHRS only
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -30,15 +29,14 @@ typedef void *UAVObjHandle;
 
 #endif
 
-
 #define AHRS_NO_OBJECT 0xff
 
 #include "ahrs_comm_objects.h"
 
 /** Status of each end of the link
 */
-typedef struct { //try to keep this short and in multiples of 4 bytes
-	uint8_t kickStarts; //AHRS end only
+typedef struct {		//try to keep this short and in multiples of 4 bytes
+	uint8_t kickStarts;	//AHRS end only
 	uint8_t crcErrors;
 	uint8_t retries;
 	uint8_t invalidPacket;
@@ -54,30 +52,29 @@ typedef struct {
 
 /** Event callback, this function is called when an object changes.
  */
-typedef void ( *AhrsEventCallback )( AhrsObjHandle obj );
+typedef void (*AhrsEventCallback) (AhrsObjHandle obj);
 
 /** Initialise comms.
 Note: this must be called before you do anything else.
 Comms will not start until the first call to AhrsPoll() or
 AhrsSendObjects()
  */
-void AhrsInitComms( void );
-
+void AhrsInitComms(void);
 
 /** AHRS version of UAVObject  xxxSetData.
 Returns: 0 if ok, -1 if an error
  */
-int32_t AhrsSetData( AhrsObjHandle obj, const void *dataIn );
+int32_t AhrsSetData(AhrsObjHandle obj, const void *dataIn);
 
 /** AHRS version of UAVObject  xxxGetData.
 Returns: 0 if ok, -1 if an error
  */
-int32_t AhrsGetData( AhrsObjHandle obj, void *dataOut );
+int32_t AhrsGetData(AhrsObjHandle obj, void *dataOut);
 
 /** Connect a callback for any changes to AHRS data.
 Returns: 0 if ok, -1 if an error
  */
-int32_t AhrsConnectCallBack( AhrsObjHandle obj, AhrsEventCallback cb );
+int32_t AhrsConnectCallBack(AhrsObjHandle obj, AhrsEventCallback cb);
 
 /** Get the current link status.
 Returns: the status.
@@ -85,7 +82,7 @@ Note: the remote status will only be valid if the link is up and running
  */
 AhrsCommStatus AhrsGetStatus();
 
-#ifdef IN_AHRS  //slave only
+#ifdef IN_AHRS			//slave only
 /** Send the latest objects to the OP
 This also polls any pending events and kick starts the DMA
 if needed
@@ -99,12 +96,10 @@ bool AhrsLinkReady();
 
 #else //master only
 
-
-
 /** Send the latest objects to the AHRS
 This also polls any pending events
 */
-void AhrsSendObjects( void );
+void AhrsSendObjects(void);
 
 #endif
 

@@ -26,17 +26,16 @@ typedef union {
 	PositionActualData PositionActual;
 	HomeLocationData HomeLocation;
 	AHRSSettingsData AHRSSettings;
-} __attribute__(( packed ) ) AhrsSharedData;
+} __attribute__ ((packed)) AhrsSharedData;
 
 /** The number of UAVObjects we will be dealing with.
 */
 #define MAX_AHRS_OBJECTS 10
 
-
 /** Our own version of a UAVObject.
 */
 typedef struct {
-	void * data;
+	void *data;
 	int size;
 	uint8_t index;
 #ifndef IN_AHRS
@@ -44,24 +43,23 @@ typedef struct {
 #endif
 } AhrsSharedObject;
 
-typedef  AhrsSharedObject * AhrsObjHandle;
+typedef AhrsSharedObject *AhrsObjHandle;
 
 /** Initialise the object mapping.
 It is important that this is called before any of the following functions.
 */
-void AhrsInitHandles( void );
-
+void AhrsInitHandles(void);
 
 /** the AHRS object related to the given index.
 Returns the AHRS object or NULL if not found
 */
-AhrsObjHandle AhrsFromIndex( uint8_t index );
+AhrsObjHandle AhrsFromIndex(uint8_t index);
 
 #ifndef IN_AHRS
 /** Get the AHRS object associated with the UAVObject.
 Returns the AHRS object or NULL if not found
 */
-AhrsObjHandle AhrsFromUAV( UAVObjHandle obj );
+AhrsObjHandle AhrsFromUAV(UAVObjHandle obj);
 #endif
 
 #endif //#ifndef AHRS_COMMS_OBJECTS_H

@@ -71,8 +71,8 @@ uint16_t ECEF2LLA(double ECEF[3], double LLA[3])
 	double x = ECEF[0], y = ECEF[1], z = ECEF[2];
 	double Lat, N, NplusH, delta, esLat;
 	uint16_t iter;
-#define MAX_ITER 10 // should not take more than 5 for valid coordinates
-#define ACCURACY 1.0e-11 // used to be e-14, but we don't need sub micrometer exact calculations
+#define MAX_ITER 10		// should not take more than 5 for valid coordinates
+#define ACCURACY 1.0e-11	// used to be e-14, but we don't need sub micrometer exact calculations
 
 	LLA[1] = RAD2DEG * atan2(y, x);
 	Lat = DEG2RAD * LLA[0];
@@ -84,11 +84,7 @@ uint16_t ECEF2LLA(double ECEF[3], double LLA[3])
 
 	while (((delta > ACCURACY) || (delta < -ACCURACY))
 	       && (iter < MAX_ITER)) {
-		delta =
-		    Lat -
-		    atan(z /
-			 (sqrt(x * x + y * y) *
-			  (1 - (N * e * e / NplusH))));
+		delta = Lat - atan(z / (sqrt(x * x + y * y) * (1 - (N * e * e / NplusH))));
 		Lat = Lat - delta;
 		esLat = e * sin(Lat);
 		N = a / sqrt(1 - esLat * esLat);
@@ -176,8 +172,7 @@ void RPY2Quaternion(float rpy[3], float q[4])
 void Quaternion2R(float q[4], float Rbe[3][3])
 {
 
-	float q0s = q[0] * q[0], q1s = q[1] * q[1], q2s =
-	    q[2] * q[2], q3s = q[3] * q[3];
+	float q0s = q[0] * q[0], q1s = q[1] * q[1], q2s = q[2] * q[2], q3s = q[3] * q[3];
 
 	Rbe[0][0] = q0s + q1s - q2s - q3s;
 	Rbe[0][1] = 2 * (q[1] * q[2] + q[0] * q[3]);
@@ -191,8 +186,7 @@ void Quaternion2R(float q[4], float Rbe[3][3])
 }
 
 // ****** Express LLA in a local NED Base Frame ********
-void LLA2Base(double LLA[3], double BaseECEF[3], float Rne[3][3],
-	      float NED[3])
+void LLA2Base(double LLA[3], double BaseECEF[3], float Rne[3][3], float NED[3])
 {
 	double ECEF[3];
 	float diff[3];
@@ -203,20 +197,13 @@ void LLA2Base(double LLA[3], double BaseECEF[3], float Rne[3][3],
 	diff[1] = (float)(ECEF[1] - BaseECEF[1]);
 	diff[2] = (float)(ECEF[2] - BaseECEF[2]);
 
-	NED[0] =
-	    Rne[0][0] * diff[0] + Rne[0][1] * diff[1] +
-	    Rne[0][2] * diff[2];
-	NED[1] =
-	    Rne[1][0] * diff[0] + Rne[1][1] * diff[1] +
-	    Rne[1][2] * diff[2];
-	NED[2] =
-	    Rne[2][0] * diff[0] + Rne[2][1] * diff[1] +
-	    Rne[2][2] * diff[2];
+	NED[0] = Rne[0][0] * diff[0] + Rne[0][1] * diff[1] + Rne[0][2] * diff[2];
+	NED[1] = Rne[1][0] * diff[0] + Rne[1][1] * diff[1] + Rne[1][2] * diff[2];
+	NED[2] = Rne[2][0] * diff[0] + Rne[2][1] * diff[1] + Rne[2][2] * diff[2];
 }
 
 // ****** Express ECEF in a local NED Base Frame ********
-void ECEF2Base(double ECEF[3], double BaseECEF[3], float Rne[3][3],
-	       float NED[3])
+void ECEF2Base(double ECEF[3], double BaseECEF[3], float Rne[3][3], float NED[3])
 {
 	float diff[3];
 
@@ -224,13 +211,7 @@ void ECEF2Base(double ECEF[3], double BaseECEF[3], float Rne[3][3],
 	diff[1] = (float)(ECEF[1] - BaseECEF[1]);
 	diff[2] = (float)(ECEF[2] - BaseECEF[2]);
 
-	NED[0] =
-	    Rne[0][0] * diff[0] + Rne[0][1] * diff[1] +
-	    Rne[0][2] * diff[2];
-	NED[1] =
-	    Rne[1][0] * diff[0] + Rne[1][1] * diff[1] +
-	    Rne[1][2] * diff[2];
-	NED[2] =
-	    Rne[2][0] * diff[0] + Rne[2][1] * diff[1] +
-	    Rne[2][2] * diff[2];
+	NED[0] = Rne[0][0] * diff[0] + Rne[0][1] * diff[1] + Rne[0][2] * diff[2];
+	NED[1] = Rne[1][0] * diff[0] + Rne[1][1] * diff[1] + Rne[1][2] * diff[2];
+	NED[2] = Rne[2][0] * diff[0] + Rne[2][1] * diff[1] + Rne[2][2] * diff[2];
 }

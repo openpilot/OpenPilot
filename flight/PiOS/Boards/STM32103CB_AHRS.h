@@ -27,7 +27,6 @@
 #ifndef STM32103CB_AHRS_H_
 #define STM32103CB_AHRS_H_
 
-
 //------------------------
 // Timers and Channels Used
 //------------------------

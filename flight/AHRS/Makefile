@@ -82,7 +82,10 @@ STMUSBDIR = $(STMLIBDIR)/STM32_USB-FS-Device_Driver
 STMSPDSRCDIR = $(STMSPDDIR)/src
 STMSPDINCDIR = $(STMSPDDIR)/inc
 CMSISDIR  = $(STMLIBDIR)/CMSIS/Core/CM3
-
+OPDIR = ../OpenPilot
+OPUAVOBJ = $(OPDIR)/UAVObjects
+OPUAVOBJINC = $(OPUAVOBJ)/inc
+OPSYSINC = $(OPDIR)/System/inc
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
@@ -91,8 +94,10 @@ CMSISDIR  = $(STMLIBDIR)/CMSIS/Core/CM3
 SRC = ahrs.c
 SRC += pios_board.c
 SRC += ahrs_adc.c
-SRC += ahrs_fsm.c
 SRC += ahrs_timer.c
+SRC += $(FLIGHTLIB)/ahrs_spi_comm.c
+SRC += $(FLIGHTLIB)/ahrs_comm_objects.c
+SRC += $(FLIGHTLIB)/ahrs_spi_program_slave.c
 SRC += insgps.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 
@@ -110,7 +115,6 @@ SRC += $(PIOSSTM32F10X)/pios_exti.c
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_hmc5843.c
-SRC += $(PIOSCOMMON)/pios_opahrs_proto.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 
 ## CMSIS for STM32
@@ -172,6 +176,7 @@ EXTRAINCDIRS  += $(PIOSBOARDS)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
 EXTRAINCDIRS  += $(CMSISDIR)
 EXTRAINCDIRS  += $(AHRSINC)
+EXTRAINCDIRS  += $(OPUAVOBJINC)
 
 # List any extra directories to look for library files here.
 # Also add directories where the linker should search for
@@ -216,6 +221,7 @@ DEBUGF = dwarf-2
 CDEFS = -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
+CDEFS += -DIN_AHRS
 ifeq ($(USE_BOOTLOADER), YES)
 CDEFS += -DUSE_BOOTLOADER
 endif

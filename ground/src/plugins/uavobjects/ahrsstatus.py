@@ -40,7 +40,7 @@ _fields = [ \
 	uavobject.UAVObjectField(
 		'SerialNumber',
 		'B',
-		25,
+		8,
 		[
 			'0',
 			'1',
@@ -50,23 +50,6 @@ _fields = [ \
 			'5',
 			'6',
 			'7',
-			'8',
-			'9',
-			'10',
-			'11',
-			'12',
-			'13',
-			'14',
-			'15',
-			'16',
-			'17',
-			'18',
-			'19',
-			'20',
-			'21',
-			'22',
-			'23',
-			'24',
 		],
 		{
 		}
@@ -112,32 +95,6 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'CommErrors',
-		'B',
-		5,
-		[
-			'Algorithm',
-			'Update',
-			'AttitudeRaw',
-			'HomeLocation',
-			'Calibration',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'Initialized',
-		'b',
-		1,
-		[
-			'0',
-		],
-		{
-			'0' : 'FALSE',
-			'1' : 'TRUE',
-		}
-	),
-	uavobject.UAVObjectField(
 		'AlgorithmSet',
 		'b',
 		1,
@@ -173,12 +130,94 @@ _fields = [ \
 			'1' : 'TRUE',
 		}
 	),
+	uavobject.UAVObjectField(
+		'LinkRunning',
+		'b',
+		1,
+		[
+			'0',
+		],
+		{
+			'0' : 'FALSE',
+			'1' : 'TRUE',
+		}
+	),
+	uavobject.UAVObjectField(
+		'AhrsKickstarts',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'AhrsCrcErrors',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'AhrsRetries',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'AhrsInvalidPackets',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'OpCrcErrors',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'OpRetries',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'OpInvalidPackets',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
 ]
 
 
 class AhrsStatus(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 4061809000
+    OBJID        = 188215176
     NAME         = "AhrsStatus"
     METANAME     = "AhrsStatusMeta"
     ISSINGLEINST = 1

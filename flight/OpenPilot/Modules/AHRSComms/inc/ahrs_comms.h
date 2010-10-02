@@ -35,3 +35,4 @@
 int32_t AHRSCommsInitialize(void);
 
 #endif // AHRS_COMMS_H
+

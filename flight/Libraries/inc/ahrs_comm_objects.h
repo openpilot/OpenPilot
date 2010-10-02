@@ -4,7 +4,7 @@
 #include "attitudeactual.h"
 #include "attituderaw.h"
 #include "attitudesettings.h"
-#include "ahrsstatus2.h"
+#include "ahrsstatus.h"
 #include "baroaltitude.h"
 #include "gpsposition.h"
 #include "positionactual.h"
@@ -20,7 +20,7 @@ typedef union {
 	AttitudeActualData AttitudeActual;
 	AHRSCalibrationData AHRSCalibration;
 	AttitudeSettingsData AttitudeSettings;
-	AhrsStatus2Data AhrsStatus2;
+	AhrsStatusData AhrsStatus;
 	BaroAltitudeData BaroAltitude;
 	GPSPositionData GPSPosition;
 	PositionActualData PositionActual;

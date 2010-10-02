@@ -43,35 +43,33 @@ class UAVOBJECTS_EXPORT AhrsStatus: public UAVDataObject
 public:
     // Field structure
     typedef struct {
-        quint8 SerialNumber[25];
+        quint8 SerialNumber[8];
         quint8 CPULoad;
         quint8 IdleTimePerCyle;
         quint8 RunningTimePerCyle;
         quint8 DroppedUpdates;
-        quint8 CommErrors[5];
-        quint8 Initialized;
         quint8 AlgorithmSet;
         quint8 CalibrationSet;
         quint8 HomeSet;
+        quint8 LinkRunning;
+        quint8 AhrsKickstarts;
+        quint8 AhrsCrcErrors;
+        quint8 AhrsRetries;
+        quint8 AhrsInvalidPackets;
+        quint8 OpCrcErrors;
+        quint8 OpRetries;
+        quint8 OpInvalidPackets;
 
     } __attribute__((packed)) DataFields;
 
     // Field information
     // Field SerialNumber information
     /* Number of elements for field SerialNumber */
-    static const quint32 SERIALNUMBER_NUMELEM = 25;
+    static const quint32 SERIALNUMBER_NUMELEM = 8;
     // Field CPULoad information
     // Field IdleTimePerCyle information
     // Field RunningTimePerCyle information
     // Field DroppedUpdates information
-    // Field CommErrors information
-    /* Array element names for field CommErrors */
-    typedef enum { COMMERRORS_ALGORITHM=0, COMMERRORS_UPDATE=1, COMMERRORS_ATTITUDERAW=2, COMMERRORS_HOMELOCATION=3, COMMERRORS_CALIBRATION=4 } CommErrorsElem;
-    /* Number of elements for field CommErrors */
-    static const quint32 COMMERRORS_NUMELEM = 5;
-    // Field Initialized information
-    /* Enumeration options for field Initialized */
-    typedef enum { INITIALIZED_FALSE=0, INITIALIZED_TRUE=1 } InitializedOptions;
     // Field AlgorithmSet information
     /* Enumeration options for field AlgorithmSet */
     typedef enum { ALGORITHMSET_FALSE=0, ALGORITHMSET_TRUE=1 } AlgorithmSetOptions;
@@ -81,10 +79,20 @@ public:
     // Field HomeSet information
     /* Enumeration options for field HomeSet */
     typedef enum { HOMESET_FALSE=0, HOMESET_TRUE=1 } HomeSetOptions;
+    // Field LinkRunning information
+    /* Enumeration options for field LinkRunning */
+    typedef enum { LINKRUNNING_FALSE=0, LINKRUNNING_TRUE=1 } LinkRunningOptions;
+    // Field AhrsKickstarts information
+    // Field AhrsCrcErrors information
+    // Field AhrsRetries information
+    // Field AhrsInvalidPackets information
+    // Field OpCrcErrors information
+    // Field OpRetries information
+    // Field OpInvalidPackets information
 
   
     // Constants
-    static const quint32 OBJID = 4061809000U;
+    static const quint32 OBJID = 188215176U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

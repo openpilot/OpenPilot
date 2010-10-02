@@ -3,31 +3,31 @@
  * @addtogroup AHRS AHRS
  * @brief The AHRS Modules perform
  *
- * @{ 
+ * @{
  * @addtogroup AHRS_Main
  * @brief Main function which does the hardware dependent stuff
- * @{ 
+ * @{
  *
  *
  * @file       ahrs.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      INSGPS Test Program
  * @see        The GNU Public License (GPL) Version 3
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -36,9 +36,10 @@
 #include "ahrs_adc.h"
 #include "ahrs_timer.h"
 #include "pios_opahrs_proto.h"
-#include "ahrs_fsm.h"		/* lfsm_state */
+//#include "ahrs_fsm.h"		/* lfsm_state */
 #include "insgps.h"
 #include "CoordinateConversions.h"
+#include "ahrs_spi_comm.h"
 
 // For debugging the raw sensors
 //#define DUMP_RAW
@@ -59,7 +60,7 @@ extern float K[NUMX][NUMV];	// feedback gain matrix
 volatile enum algorithms ahrs_algorithm;
 
 /**
- * @addtogroup AHRS_Structures Local Structres 
+ * @addtogroup AHRS_Structures Local Structres
  * @{
  */
 
@@ -156,6 +157,11 @@ void process_spi_request(void);
 void downsample_data(void);
 void calibrate_sensors(void);
 void reset_values();
+void send_calibration(void);
+void altitude_callback(AhrsObjHandle obj);
+void calibration_callback(AhrsObjHandle obj);
+void gps_callback(AhrsObjHandle obj);
+void settings_callback(AhrsObjHandle obj);
 
 volatile uint32_t last_counter_idle_start = 0;
 volatile uint32_t last_counter_idle_end = 0;
@@ -171,14 +177,10 @@ uint32_t counter_val;
 //! Filter coefficients used in decimation.  Limited order so filter can't run between samples
 int16_t fir_coeffs[50];
 
-//! Indicates the communications are requesting a calibration
-uint8_t calibration_pending = FALSE;
 
 //! The oversampling rate, ekf is 2k / this
-static uint8_t adc_oversampling = 25;
+static uint8_t adc_oversampling = 17;
 
-//! Flag for OP to check if AHRS has been initialized yet
-enum initialized_mode initialized = 0;
 
 /**
  * @}
@@ -214,19 +216,38 @@ int main()
 	/* Magnetic sensor system */
 	PIOS_I2C_Init();
 	PIOS_HMC5843_Init();
-
 	// Get 3 ID bytes
 	strcpy((char *)mag_data.id, "ZZZ");
 	PIOS_HMC5843_ReadID(mag_data.id);
 #endif
 
 	/* SPI link to master */
-	PIOS_SPI_Init();
+//	PIOS_SPI_Init();
 
-	lfsm_init();
+//	lfsm_init();
 	reset_values();
-	
+
 	ahrs_state = AHRS_IDLE;
+	AhrsInitComms();
+	ahrs_state = AHRS_IDLE;
+	while(!AhrsLinkReady()) {
+		AhrsPoll();
+		while(ahrs_state != AHRS_DATA_READY) ;
+		ahrs_state = AHRS_PROCESSING;
+		downsample_data();
+		ahrs_state = AHRS_IDLE;
+		if((total_conversion_blocks % 10) == 0)
+			PIOS_LED_Toggle(LED1);
+	}
+/* we didn't connect the callbacks before because we have to wait
+for all data to be up to date before doing anything*/
+	AHRSCalibrationConnectCallback(calibration_callback);
+	GPSPositionConnectCallback(gps_callback);
+	BaroAltitudeConnectCallback(altitude_callback);
+	AHRSSettingsConnectCallback(settings_callback);
+
+	calibration_callback(AHRSCalibrationHandle()); //force an update
+
 
 	/* Use simple averaging filter for now */
 	for (int i = 0; i < adc_oversampling; i++)
@@ -235,12 +256,10 @@ int main()
 
 	INSGPSInit();
 
-	while(initialized != AHRS_INITIALIZED)
-		process_spi_request();
-	
 #ifdef DUMP_RAW
 	int previous_conversion;
 	while (1) {
+		AhrsPoll();
 		int result;
 		uint8_t framing[16] =
 		    { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
@@ -277,16 +296,21 @@ int main()
 	timer_start();
 
 	/******************* Main EKF loop ****************************/
-	while (1) {
+	while(1) {
+		AhrsPoll();
+		AhrsStatusData status;
+		AhrsStatusGet(&status);
+		status.CPULoad = ((float)running_counts /
+						  (float)(idle_counts + running_counts)) * 100;
+		status.IdleTimePerCyle = idle_counts / (TIMER_RATE / 10000);
+		status.RunningTimePerCyle = running_counts / (TIMER_RATE / 10000);
+		status.DroppedUpdates = ekf_too_slow;
+		AhrsStatusSet(&status);
 
 		// Alive signal
 		if ((total_conversion_blocks % 100) == 0)
 			PIOS_LED_Toggle(LED1);
 
-		if (calibration_pending) {
-			calibrate_sensors();
-			calibration_pending = FALSE;
-		}
 #if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
 		// Get magnetic readings
 		if (PIOS_HMC5843_NewDataAvailable()) {
@@ -296,6 +320,7 @@ int main()
 			mag_data.scaled.axis[2] = (mag_data.raw.axis[2] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
 			mag_data.updated = 1;
 		}
+
 #endif
 		// Delay for valid data
 
@@ -323,7 +348,7 @@ int main()
 			accel[0] = accel_data.filtered.x,
 			accel[1] = accel_data.filtered.y,
 			accel[2] = accel_data.filtered.z,
-			// Note: The magnetometer driver returns registers X,Y,Z from the chip which are 
+			// Note: The magnetometer driver returns registers X,Y,Z from the chip which are
 			// (left, backward, up).  Remapping to (forward, right, down).
 			mag[0] = -mag_data.scaled.axis[1];
 			mag[1] = -mag_data.scaled.axis[0];
@@ -494,7 +519,7 @@ int main()
  * for offset for each sample before the multiplication if filter not a boxcar.  Could
  * precompute fixed offset as sum[fir_coeffs[i]] * ACCEL_OFFSET.  Puts data into global
  * data structures @ref accel_data and @ref gyro_data.
- * 
+ *
  * The accel_data values are converted into a coordinate system where X is forwards along
  * the fuselage, Y is along right the wing, and Z is down.
  */
@@ -508,47 +533,71 @@ void downsample_data()
 		accel_data.filtered.y += valid_data_buffer[0 + i * PIOS_ADC_NUM_PINS] * fir_coeffs[i];
 	accel_data.filtered.y /= (float) fir_coeffs[adc_oversampling];
 	accel_data.filtered.y = (accel_data.filtered.y * accel_data.calibration.scale[1]) + accel_data.calibration.bias[1];
-	
+
 	// Get the X data which projects forward/backwards.  Fifth byte in.  Convert to m/s
 	accel_data.filtered.x = 0;
 	for (i = 0; i < adc_oversampling; i++)
 		accel_data.filtered.x += valid_data_buffer[2 + i * PIOS_ADC_NUM_PINS] * fir_coeffs[i];
 	accel_data.filtered.x /= (float) fir_coeffs[adc_oversampling];
 	accel_data.filtered.x = (accel_data.filtered.x * accel_data.calibration.scale[0]) + accel_data.calibration.bias[0];
-	
+
 	// Get the Z data.  Third byte in.  Convert to m/s
 	accel_data.filtered.z = 0;
 	for (i = 0; i < adc_oversampling; i++)
 		accel_data.filtered.z += valid_data_buffer[4 + i * PIOS_ADC_NUM_PINS] * fir_coeffs[i];
 	accel_data.filtered.z /= (float) fir_coeffs[adc_oversampling];
 	accel_data.filtered.z = (accel_data.filtered.z * accel_data.calibration.scale[2]) + accel_data.calibration.bias[2];
-	
+
 	// Get the X gyro data.  Seventh byte in.  Convert to deg/s.
 	gyro_data.filtered.x = 0;
 	for (i = 0; i < adc_oversampling; i++)
 		gyro_data.filtered.x  += valid_data_buffer[1 + i * PIOS_ADC_NUM_PINS] * fir_coeffs[i];
 	gyro_data.filtered.x /= fir_coeffs[adc_oversampling];
 	gyro_data.filtered.x = (gyro_data.filtered.x * gyro_data.calibration.scale[0]) + gyro_data.calibration.bias[0];
-	
+
 	// Get the Y gyro data.  Second byte in.  Convert to deg/s.
 	gyro_data.filtered.y = 0;
 	for (i = 0; i < adc_oversampling; i++)
 		gyro_data.filtered.y += valid_data_buffer[3 + i * PIOS_ADC_NUM_PINS] * fir_coeffs[i];
 	gyro_data.filtered.y /= fir_coeffs[adc_oversampling];
 	gyro_data.filtered.y = (gyro_data.filtered.y * gyro_data.calibration.scale[1]) + gyro_data.calibration.bias[1];
-	
+
 	// Get the Z gyro data.  Fifth byte in.  Convert to deg/s.
 	gyro_data.filtered.z = 0;
 	for (i = 0; i < adc_oversampling; i++)
 		gyro_data.filtered.z += valid_data_buffer[5 + i * PIOS_ADC_NUM_PINS] * fir_coeffs[i];
 	gyro_data.filtered.z /= fir_coeffs[adc_oversampling];
 	gyro_data.filtered.z = (gyro_data.filtered.z * gyro_data.calibration.scale[2]) + gyro_data.calibration.bias[2];
+
+	AttitudeRawData raw;
+
+	raw.gyros[0] = valid_data_buffer[1];
+	raw.gyros[1] = valid_data_buffer[3];
+	raw.gyros[2] = valid_data_buffer[5];
+
+	raw.gyros_filtered[0] = gyro_data.filtered.x;
+	raw.gyros_filtered[1] = gyro_data.filtered.y;
+	raw.gyros_filtered[2] = gyro_data.filtered.z;
+
+	raw.accels[0] = valid_data_buffer[2];
+	raw.accels[1] = valid_data_buffer[0];
+	raw.accels[2] = valid_data_buffer[4];
+
+	raw.accels_filtered[0] = accel_data.filtered.x;
+	raw.accels_filtered[1] = accel_data.filtered.y;
+	raw.accels_filtered[2] = accel_data.filtered.z;
+
+	raw.magnetometers[0] = mag_data.scaled.axis[0];
+	raw.magnetometers[1] = mag_data.scaled.axis[1];
+	raw.magnetometers[2] = mag_data.scaled.axis[2];
+
+	AttitudeRawSet(&raw);
 }
 
 /**
  * @brief Assumes board is not moving computes biases and variances of sensors
  * @returns None
- * 
+ *
  * All data is stored in global structures.  This function should be called from OP when
  * aircraft is in stable state and then the data stored to SD card.
  *
@@ -565,6 +614,7 @@ void calibrate_sensors()
 	float gyro_bias[3] = {0, 0, 0};
 	float mag_bias[3] = {0, 0, 0};
 
+
 	for (i = 0, j = 0; i < NBIAS; i++) {
 		while (ahrs_state != AHRS_DATA_READY) ;
 		ahrs_state = AHRS_PROCESSING;
@@ -576,7 +626,7 @@ void calibrate_sensors()
 		accel_bias[1] += accel_data.filtered.y / NBIAS;
 		accel_bias[2] += accel_data.filtered.z / NBIAS;
 		ahrs_state = AHRS_IDLE;
-		
+
 #if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
 		if(PIOS_HMC5843_NewDataAvailable()) {
 			j ++;
@@ -589,12 +639,12 @@ void calibrate_sensors()
 			mag_bias[2] += mag_data.scaled.axis[2];
 		}
 #endif
-		process_spi_request();
+
 	}
 	mag_bias[0] /= j;
 	mag_bias[1] /= j;
 	mag_bias[2] /= j;
-	
+
 	gyro_data.calibration.variance[0] = 0;
 	gyro_data.calibration.variance[1] = 0;
 	gyro_data.calibration.variance[2] = 0;
@@ -604,7 +654,7 @@ void calibrate_sensors()
 	accel_data.calibration.variance[0] = 0;
 	accel_data.calibration.variance[1] = 0;
 	accel_data.calibration.variance[2] = 0;
-	
+
 	for (i = 0, j = 0; j < NVAR; j++) {
 		while (ahrs_state != AHRS_DATA_READY) ;
 		ahrs_state = AHRS_PROCESSING;
@@ -628,12 +678,16 @@ void calibrate_sensors()
 			mag_data.calibration.variance[2] += pow(mag_data.scaled.axis[2]-mag_bias[2],2);
 		}
 #endif
-		process_spi_request();
+
 	}
-	
+
 	mag_data.calibration.variance[0] /= j;
 	mag_data.calibration.variance[1] /= j;
 	mag_data.calibration.variance[2] /= j;
+
+	gyro_data.calibration.bias[0] -= gyro_bias[0];
+	gyro_data.calibration.bias[1] -= gyro_bias[1];
+	gyro_data.calibration.bias[2] -= gyro_bias[2];
 }
 
 /**
@@ -668,259 +722,131 @@ void reset_values() {
 	mag_data.calibration.variance[1] = 1;
 	mag_data.calibration.variance[2] = 1;
 }
- 
-/**
- * @addtogroup AHRS_SPI SPI Messaging 
- * @{
- * @brief SPI protocol handling requests for data from OP mainboard
- */
 
-static struct opahrs_msg_v1 link_tx_v1;
-static struct opahrs_msg_v1 link_rx_v1;
-static struct opahrs_msg_v1 user_rx_v1;
-static struct opahrs_msg_v1 user_tx_v1;
 
 void process_spi_request(void)
 {
-	bool msg_to_process = FALSE;
+	AttitudeActualData attitude;
+	attitude.q1 = attitude_data.quaternion.q1;
+	attitude.q2 = attitude_data.quaternion.q2;
+	attitude.q3 = attitude_data.quaternion.q3;
+	attitude.q4 = attitude_data.quaternion.q4;
+	float rpy[3];
+	Quaternion2RPY(&attitude_data.quaternion.q1, rpy);
+	attitude.Roll = rpy[0];
+	attitude.Pitch = rpy[1];
+	attitude.Yaw = rpy[2];
+	AttitudeActualSet(&attitude);
+}
 
-	PIOS_IRQ_Disable();
-	/* Figure out if we're in an interesting stable state */
-	switch (lfsm_get_state()) {
-	case LFSM_STATE_USER_BUSY:
-		msg_to_process = TRUE;
-		break;
-	case LFSM_STATE_INACTIVE:
-		/* Queue up a receive buffer */
-		lfsm_user_set_rx_v1(&user_rx_v1);
-		lfsm_user_done();
-		break;
-	case LFSM_STATE_STOPPED:
-		/* Get things going */
-		lfsm_set_link_proto_v1(&link_tx_v1, &link_rx_v1);
-		break;
-	default:
-		/* Not a stable state */
-		break;
+void send_calibration(void)
+{
+	AHRSCalibrationData cal;
+	AHRSCalibrationGet(&cal);
+	for(int ct=0; ct<3; ct++)
+	{
+		cal.accel_var[ct] = accel_data.calibration.variance[ct];
+		cal.gyro_bias[ct] = gyro_data.calibration.bias[ct];
+		cal.gyro_var[ct] = gyro_data.calibration.variance[ct];
+		cal.mag_var[ct] = mag_data.calibration.variance[ct];
 	}
-	PIOS_IRQ_Enable();
+	cal.measure_var = AHRSCALIBRATION_MEASURE_VAR_SET;
+	AHRSCalibrationSet(&cal);
+}
 
-	if (!msg_to_process) {
-		/* Nothing to do */
+/**
+ * @brief AHRS calibration callback
+ *
+ * Called when the OP board sets the calibration
+ */
+void calibration_callback(AhrsObjHandle obj)
+{
+	AHRSCalibrationData cal;
+	AHRSCalibrationGet(&cal);
+	if(cal.measure_var == AHRSCALIBRATION_MEASURE_VAR_SET){
+		for(int ct=0; ct<3; ct++)
+		{
+			accel_data.calibration.scale[ct] = cal.accel_scale[ct];
+			accel_data.calibration.bias[ct] = cal.accel_bias[ct];
+			accel_data.calibration.variance[ct] = cal.accel_var[ct];
+			gyro_data.calibration.scale[ct] = cal.gyro_scale[ct];
+			gyro_data.calibration.bias[ct] = cal.gyro_bias[ct];
+			gyro_data.calibration.variance[ct] = cal.gyro_var[ct];
+			mag_data.calibration.bias[ct] = cal.mag_bias[ct];
+			mag_data.calibration.scale[ct] = cal.mag_scale[ct];
+			mag_data.calibration.variance[ct] = cal.mag_var[ct];
+		}
+	}else if(cal.measure_var == AHRSCALIBRATION_MEASURE_VAR_MEASURE){
+		calibrate_sensors();
+		AHRSCalibrationData cal;
+		AHRSCalibrationGet(&cal);
+		cal.measure_var = AHRSCALIBRATION_MEASURE_VAR_SET;
+		AHRSCalibrationSet(&cal);
+
+	}else if(cal.measure_var == AHRSCALIBRATION_MEASURE_VAR_ECHO){
+		send_calibration();
+	}
+}
+
+void gps_callback(AhrsObjHandle obj)
+{
+	GPSPositionData pos;
+	GPSPositionGet(&pos);
+	HomeLocationData home;
+	HomeLocationGet(&home);
+
+	if(home.Set == HOMELOCATION_SET_FALSE || home.Indoor == HOMELOCATION_INDOOR_TRUE) {
+		gps_data.NED[0] = 0;
+		gps_data.NED[1] = 0;
+		gps_data.NED[2] = 0;
+		gps_data.groundspeed = 0;
+		gps_data.heading = 0;
+		gps_data.quality = -1; // indicates indoor mode, high variance zeros update
+		gps_data.updated = true;
 		return;
 	}
 
-	switch (user_rx_v1.payload.user.t) {
-	case OPAHRS_MSG_V1_REQ_RESET:
-		PIOS_DELAY_WaitmS(user_rx_v1.payload.user.v.req.reset.
-				  reset_delay_in_ms);
-		PIOS_SYS_Reset();
-		break;
-	case OPAHRS_MSG_V1_REQ_SERIAL:
-		opahrs_msg_v1_init_user_tx(&user_tx_v1,OPAHRS_MSG_V1_RSP_SERIAL);
-		PIOS_SYS_SerialNumberGet((char *) &(user_tx_v1.payload.user.v.rsp.
-					   serial.serial_bcd));
-		lfsm_user_set_tx_v1(&user_tx_v1);
-		break;
-	case OPAHRS_MSG_V1_REQ_ALGORITHM:
-		opahrs_msg_v1_init_user_tx(&user_tx_v1,OPAHRS_MSG_V1_RSP_ALGORITHM);
-		ahrs_algorithm = user_rx_v1.payload.user.v.req.algorithm.algorithm;
-		lfsm_user_set_tx_v1(&user_tx_v1);
-		break;
-	case OPAHRS_MSG_V1_REQ_NORTH:
-		opahrs_msg_v1_init_user_tx(&user_tx_v1,OPAHRS_MSG_V1_RSP_NORTH);
-		INSSetMagNorth(user_rx_v1.payload.user.v.req.north.Be);
-		lfsm_user_set_tx_v1(&user_tx_v1);
-		break;
-	case OPAHRS_MSG_V1_REQ_CALIBRATION:
-		if (user_rx_v1.payload.user.v.req.calibration.
-		    measure_var == AHRS_MEASURE) {
-			calibration_pending = TRUE;
-		} else if (user_rx_v1.payload.user.v.req.calibration.measure_var == AHRS_SET) {
-			
-			// Set the accel calibration
-			accel_data.calibration.variance[0] = user_rx_v1.payload.user.v.req.calibration.accel_var[0];
-			accel_data.calibration.variance[1] = user_rx_v1.payload.user.v.req.calibration.accel_var[1];
-			accel_data.calibration.variance[2] = user_rx_v1.payload.user.v.req.calibration.accel_var[2];
-			accel_data.calibration.scale[0] = user_rx_v1.payload.user.v.req.calibration.accel_scale[0];
-			accel_data.calibration.scale[1] = user_rx_v1.payload.user.v.req.calibration.accel_scale[1];
-			accel_data.calibration.scale[2] = user_rx_v1.payload.user.v.req.calibration.accel_scale[2];
-			accel_data.calibration.bias[0] = user_rx_v1.payload.user.v.req.calibration.accel_bias[0];
-			accel_data.calibration.bias[1] = user_rx_v1.payload.user.v.req.calibration.accel_bias[1];
-			accel_data.calibration.bias[2] = user_rx_v1.payload.user.v.req.calibration.accel_bias[2];
-
-			// Set the gyro calibration
-			gyro_data.calibration.variance[0] = user_rx_v1.payload.user.v.req.calibration.gyro_var[0];
-			gyro_data.calibration.variance[1] = user_rx_v1.payload.user.v.req.calibration.gyro_var[1];
-			gyro_data.calibration.variance[2] = user_rx_v1.payload.user.v.req.calibration.gyro_var[2];
-			gyro_data.calibration.scale[0] = user_rx_v1.payload.user.v.req.calibration.gyro_scale[0];
-			gyro_data.calibration.scale[1] = user_rx_v1.payload.user.v.req.calibration.gyro_scale[1];
-			gyro_data.calibration.scale[2] = user_rx_v1.payload.user.v.req.calibration.gyro_scale[2];
-			gyro_data.calibration.bias[0] = user_rx_v1.payload.user.v.req.calibration.gyro_bias[0];
-			gyro_data.calibration.bias[1] = user_rx_v1.payload.user.v.req.calibration.gyro_bias[1];
-			gyro_data.calibration.bias[2] = user_rx_v1.payload.user.v.req.calibration.gyro_bias[2];
-
-			// Set the mag calibration
-			mag_data.calibration.variance[0] = user_rx_v1.payload.user.v.req.calibration.mag_var[0];
-			mag_data.calibration.variance[1] = user_rx_v1.payload.user.v.req.calibration.mag_var[1];
-			mag_data.calibration.variance[2] = user_rx_v1.payload.user.v.req.calibration.mag_var[2];
-			mag_data.calibration.scale[0] = user_rx_v1.payload.user.v.req.calibration.mag_scale[0];
-			mag_data.calibration.scale[1] = user_rx_v1.payload.user.v.req.calibration.mag_scale[1];
-			mag_data.calibration.scale[2] = user_rx_v1.payload.user.v.req.calibration.mag_scale[2];
-			mag_data.calibration.bias[0] = user_rx_v1.payload.user.v.req.calibration.mag_bias[0];
-			mag_data.calibration.bias[1] = user_rx_v1.payload.user.v.req.calibration.mag_bias[1];
-			mag_data.calibration.bias[2] = user_rx_v1.payload.user.v.req.calibration.mag_bias[2];
-
-			float zeros[3] = { 0, 0, 0 };
-			INSSetGyroBias(zeros);	//gyro bias corrects in preprocessing
-			INSSetAccelVar(accel_data.calibration.variance);
-			INSSetGyroVar(gyro_data.calibration.variance);
-			float mag_var[3] = {mag_data.calibration.variance[1], mag_data.calibration.variance[0], mag_data.calibration.variance[2]};
-			INSSetMagVar(mag_var);
-		}
-
-		// echo back the values used
-		opahrs_msg_v1_init_user_tx(&user_tx_v1,
-					   OPAHRS_MSG_V1_RSP_CALIBRATION);
-		user_tx_v1.payload.user.v.rsp.calibration.accel_var[0] = accel_data.calibration.variance[0];
-		user_tx_v1.payload.user.v.rsp.calibration.accel_var[1] = accel_data.calibration.variance[1];
-		user_tx_v1.payload.user.v.rsp.calibration.accel_var[2] = accel_data.calibration.variance[2];
-		user_tx_v1.payload.user.v.rsp.calibration.gyro_var[0] = gyro_data.calibration.variance[0];
-		user_tx_v1.payload.user.v.rsp.calibration.gyro_var[1] = gyro_data.calibration.variance[1];
-		user_tx_v1.payload.user.v.rsp.calibration.gyro_var[2] = gyro_data.calibration.variance[2];
-		user_tx_v1.payload.user.v.rsp.calibration.mag_var[0] = mag_data.calibration.variance[0];
-		user_tx_v1.payload.user.v.rsp.calibration.mag_var[1] = mag_data.calibration.variance[1];
-		user_tx_v1.payload.user.v.rsp.calibration.mag_var[2] = mag_data.calibration.variance[2];
-
-		lfsm_user_set_tx_v1(&user_tx_v1);
-		break;
-	case OPAHRS_MSG_V1_REQ_ATTITUDERAW:
-		opahrs_msg_v1_init_user_tx(&user_tx_v1,
-					   OPAHRS_MSG_V1_RSP_ATTITUDERAW);
-
-		// Grab one sample from buffer to populate this
-		accel_data.raw.x = valid_data_buffer[0];
-		accel_data.raw.y = valid_data_buffer[2];
-		accel_data.raw.z = valid_data_buffer[4];
-		
-		gyro_data.raw.x = valid_data_buffer[1];
-		gyro_data.raw.y = valid_data_buffer[3];
-		gyro_data.raw.z = valid_data_buffer[5];
-		
-		gyro_data.temp.xy = valid_data_buffer[6];
-		gyro_data.temp.z = valid_data_buffer[7];
-		
-		user_tx_v1.payload.user.v.rsp.attituderaw.mags.x =
-		    mag_data.raw.axis[0];
-		user_tx_v1.payload.user.v.rsp.attituderaw.mags.y =
-		    mag_data.raw.axis[1];
-		user_tx_v1.payload.user.v.rsp.attituderaw.mags.z =
-		    mag_data.raw.axis[2];
-
-		user_tx_v1.payload.user.v.rsp.attituderaw.gyros.x =
-		    gyro_data.raw.x;
-		user_tx_v1.payload.user.v.rsp.attituderaw.gyros.y =
-		    gyro_data.raw.y;
-		user_tx_v1.payload.user.v.rsp.attituderaw.gyros.z =
-		    gyro_data.raw.z;
-
-		user_tx_v1.payload.user.v.rsp.attituderaw.gyros_filtered.
-		    x = gyro_data.filtered.x;
-		user_tx_v1.payload.user.v.rsp.attituderaw.gyros_filtered.
-		    y = gyro_data.filtered.y;
-		user_tx_v1.payload.user.v.rsp.attituderaw.gyros_filtered.
-		    z = gyro_data.filtered.z;
-
-		user_tx_v1.payload.user.v.rsp.attituderaw.gyros.xy_temp =
-		    gyro_data.temp.xy;
-		user_tx_v1.payload.user.v.rsp.attituderaw.gyros.z_temp =
-		    gyro_data.temp.z;
-
-		user_tx_v1.payload.user.v.rsp.attituderaw.accels.x =
-		    accel_data.raw.x;
-		user_tx_v1.payload.user.v.rsp.attituderaw.accels.y =
-		    accel_data.raw.y;
-		user_tx_v1.payload.user.v.rsp.attituderaw.accels.z =
-		    accel_data.raw.z;
-
-		user_tx_v1.payload.user.v.rsp.attituderaw.accels_filtered.
-		    x = accel_data.filtered.x;
-		user_tx_v1.payload.user.v.rsp.attituderaw.accels_filtered.
-		    y = accel_data.filtered.y;
-		user_tx_v1.payload.user.v.rsp.attituderaw.accels_filtered.
-		    z = accel_data.filtered.z;
-
-		lfsm_user_set_tx_v1(&user_tx_v1);
-		break;
-	case OPAHRS_MSG_V1_REQ_UPDATE:
-		// process incoming data
-		opahrs_msg_v1_init_user_tx(&user_tx_v1,
-					   OPAHRS_MSG_V1_RSP_UPDATE);
-		if (user_rx_v1.payload.user.v.req.update.barometer.updated) {
-			altitude_data.altitude =
-			    user_rx_v1.payload.user.v.req.update.barometer.
-			    altitude;
-			altitude_data.updated =
-			    user_rx_v1.payload.user.v.req.update.barometer.
-			    updated;
-		}
-		if (user_rx_v1.payload.user.v.req.update.gps.updated) {
-			gps_data.updated = true;
-			gps_data.NED[0] = user_rx_v1.payload.user.v.req.update.gps.NED[0];
-			gps_data.NED[1] = user_rx_v1.payload.user.v.req.update.gps.NED[1];
-			gps_data.NED[2] = user_rx_v1.payload.user.v.req.update.gps.NED[2];
-			gps_data.heading = user_rx_v1.payload.user.v.req.update.gps.heading;
-			gps_data.groundspeed = user_rx_v1.payload.user.v.req.update.gps.groundspeed;
-			gps_data.quality = user_rx_v1.payload.user.v.req.update.gps.quality;
-		}
-		// send out attitude/position estimate
-		user_tx_v1.payload.user.v.rsp.update.quaternion.q1 =
-		    attitude_data.quaternion.q1;
-		user_tx_v1.payload.user.v.rsp.update.quaternion.q2 =
-		    attitude_data.quaternion.q2;
-		user_tx_v1.payload.user.v.rsp.update.quaternion.q3 =
-		    attitude_data.quaternion.q3;
-		user_tx_v1.payload.user.v.rsp.update.quaternion.q4 =
-		    attitude_data.quaternion.q4;
-
-		// convert all to cm/s
-		user_tx_v1.payload.user.v.rsp.update.NED[0] = Nav.Pos[0]*100;
-		user_tx_v1.payload.user.v.rsp.update.NED[1] = Nav.Pos[1]*100;
-		user_tx_v1.payload.user.v.rsp.update.NED[2] = Nav.Pos[2]*100;
-		user_tx_v1.payload.user.v.rsp.update.Vel[0] = Nav.Vel[0]*100;
-		user_tx_v1.payload.user.v.rsp.update.Vel[1] = Nav.Vel[1]*100;
-		user_tx_v1.payload.user.v.rsp.update.Vel[2] = Nav.Vel[2]*100;
-			
-			// compute the idle fraction
-		user_tx_v1.payload.user.v.rsp.update.load =
-		    ((float)running_counts /
-		     (float)(idle_counts + running_counts)) * 100;
-		user_tx_v1.payload.user.v.rsp.update.idle_time =
-		    idle_counts / (TIMER_RATE / 10000);
-		user_tx_v1.payload.user.v.rsp.update.run_time =
-		    running_counts / (TIMER_RATE / 10000);
-		user_tx_v1.payload.user.v.rsp.update.dropped_updates =
-		    ekf_too_slow;
-		lfsm_user_set_tx_v1(&user_tx_v1);
-		break;
-	case OPAHRS_MSG_V1_REQ_INITIALIZED:
-		// process incoming data
-		opahrs_msg_v1_init_user_tx(&user_tx_v1,OPAHRS_MSG_V1_RSP_INITIALIZED);
-		user_tx_v1.payload.user.v.rsp.initialized.initialized = initialized;
-		if(user_rx_v1.payload.user.v.req.initialized.initialized == AHRS_INITIALIZED)
-			initialized = AHRS_INITIALIZED;
-		else if(user_rx_v1.payload.user.v.req.initialized.initialized == AHRS_UNINITIALIZED)
-			initialized = AHRS_UNINITIALIZED;			
-		lfsm_user_set_tx_v1(&user_tx_v1);
-		break;
-	default:
-		break;
+	if(pos.Status != GPSPOSITION_STATUS_FIX3D) //FIXME: Will this work? the old ahrs_comms does it differently.
+	{
+		gps_data.quality = 0;
+		gps_data.updated = true;
+		return;
 	}
 
-	/* Finished processing the received message, requeue it */
-	lfsm_user_set_rx_v1(&user_rx_v1);
-	lfsm_user_done();
+	double LLA[3] = {(double) pos.Latitude / 1e7, (double) pos.Longitude / 1e7, (double) (pos.GeoidSeparation + pos.Altitude)};
+	// convert from cm back to meters
+	double ECEF[3] = {(double) (home.ECEF[0] / 100), (double) (home.ECEF[1] / 100), (double) (home.ECEF[2] / 100)};
+		LLA2Base(LLA, ECEF, (float (*)[3]) home.RNE, gps_data.NED);
+
+	gps_data.heading = pos.Heading;
+	gps_data.groundspeed = pos.Groundspeed;
+	gps_data.quality = 1;
+	gps_data.updated = true;
 }
+
+void altitude_callback(AhrsObjHandle obj)
+{
+	BaroAltitudeData alt;
+	BaroAltitudeGet(&alt);
+	altitude_data.altitude = alt.Altitude;
+	altitude_data.updated = true;
+}
+
+void settings_callback(AhrsObjHandle obj)
+{
+	AHRSSettingsData settings;
+	AHRSSettingsGet(&settings);
+
+	if(settings.Algorithm ==  AHRSSETTINGS_ALGORITHM_INSGPS)
+	{
+		ahrs_algorithm = INSGPS_Algo;
+	}else
+	{
+		ahrs_algorithm = SIMPLE_Algo;
+	}
+}
+
+
 
 /**
  * @}

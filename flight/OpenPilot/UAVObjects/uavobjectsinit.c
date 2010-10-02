@@ -34,7 +34,6 @@
 #include "ahrscalibration.h"
 #include "ahrssettings.h"
 #include "ahrsstatus.h"
-#include "ahrsstatus2.h"
 #include "attitudeactual.h"
 #include "attitudedesired.h"
 #include "attituderaw.h"
@@ -81,7 +80,6 @@ void UAVObjectsInitializeAll()
     AHRSCalibrationInitialize();
     AHRSSettingsInitialize();
     AhrsStatusInitialize();
-    AhrsStatus2Initialize();
     AttitudeActualInitialize();
     AttitudeDesiredInitialize();
     AttitudeRawInitialize();

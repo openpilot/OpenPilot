@@ -153,11 +153,11 @@ struct gps_sensor {
  */
 
 /* Function Prototypes */
-void process_spi_request(void);
 void downsample_data(void);
 void calibrate_sensors(void);
 void reset_values();
 void send_calibration(void);
+void send_attitude(void);
 void altitude_callback(AhrsObjHandle obj);
 void calibration_callback(AhrsObjHandle obj);
 void gps_callback(AhrsObjHandle obj);
@@ -179,7 +179,7 @@ int16_t fir_coeffs[50];
 
 
 //! The oversampling rate, ekf is 2k / this
-static uint8_t adc_oversampling = 17;
+static uint8_t adc_oversampling = 20;
 
 
 /**
@@ -355,7 +355,7 @@ for all data to be up to date before doing anything*/
 			mag[2] = -mag_data.scaled.axis[2];
 
 			INSStatePrediction(gyro, accel, 1 / (float)EKF_RATE);
-			process_spi_request();  // get message out quickly
+			send_attitude();  // get message out quickly
 			INSCovariancePrediction(1 / (float)EKF_RATE);
 
 			if (gps_data.updated && gps_data.quality == 1) {
@@ -432,7 +432,7 @@ for all data to be up to date before doing anything*/
 			attitude_data.quaternion.q2 = q[1];
 			attitude_data.quaternion.q3 = q[2];
 			attitude_data.quaternion.q4 = q[3];
-			process_spi_request();
+			send_attitude();
 
 		}
 
@@ -724,7 +724,7 @@ void reset_values() {
 }
 
 
-void process_spi_request(void)
+void send_attitude(void)
 {
 	AttitudeActualData attitude;
 	attitude.q1 = attitude_data.quaternion.q1;

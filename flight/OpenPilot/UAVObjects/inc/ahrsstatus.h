@@ -41,7 +41,7 @@
 #define AHRSSTATUS_H
 
 // Object constants
-#define AHRSSTATUS_OBJID 188215176U
+#define AHRSSTATUS_OBJID 3773703778U
 #define AHRSSTATUS_NAME "AhrsStatus"
 #define AHRSSTATUS_METANAME "AhrsStatusMeta"
 #define AHRSSTATUS_ISSINGLEINST 1
@@ -76,9 +76,6 @@ typedef struct {
     uint8_t IdleTimePerCyle;
     uint8_t RunningTimePerCyle;
     uint8_t DroppedUpdates;
-    uint8_t AlgorithmSet;
-    uint8_t CalibrationSet;
-    uint8_t HomeSet;
     uint8_t LinkRunning;
     uint8_t AhrsKickstarts;
     uint8_t AhrsCrcErrors;
@@ -98,15 +95,6 @@ typedef struct {
 // Field IdleTimePerCyle information
 // Field RunningTimePerCyle information
 // Field DroppedUpdates information
-// Field AlgorithmSet information
-/* Enumeration options for field AlgorithmSet */
-typedef enum { AHRSSTATUS_ALGORITHMSET_FALSE=0, AHRSSTATUS_ALGORITHMSET_TRUE=1 } AhrsStatusAlgorithmSetOptions;
-// Field CalibrationSet information
-/* Enumeration options for field CalibrationSet */
-typedef enum { AHRSSTATUS_CALIBRATIONSET_FALSE=0, AHRSSTATUS_CALIBRATIONSET_TRUE=1 } AhrsStatusCalibrationSetOptions;
-// Field HomeSet information
-/* Enumeration options for field HomeSet */
-typedef enum { AHRSSTATUS_HOMESET_FALSE=0, AHRSSTATUS_HOMESET_TRUE=1 } AhrsStatusHomeSetOptions;
 // Field LinkRunning information
 /* Enumeration options for field LinkRunning */
 typedef enum { AHRSSTATUS_LINKRUNNING_FALSE=0, AHRSSTATUS_LINKRUNNING_TRUE=1 } AhrsStatusLinkRunningOptions;

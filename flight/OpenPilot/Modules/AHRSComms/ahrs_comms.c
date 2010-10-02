@@ -90,13 +90,6 @@ static void ahrscommsTask(void *parameters)
 
 	AlarmsSet(SYSTEMALARMS_ALARM_AHRSCOMMS, SYSTEMALARMS_ALARM_CRITICAL);
 
-	/*Until AHRS connects, assume it doesn't know home */
-	AhrsStatusGet(&data);
-	data.HomeSet = AHRSSTATUS_HOMESET_FALSE;
-	//data.CalibrationSet = AHRSSTATUS_CALIBRATIONSET_FALSE;
-	data.AlgorithmSet = AHRSSTATUS_CALIBRATIONSET_FALSE;
-	AhrsStatusSet(&data);
-
 	// Main task loop
 	while (1) {
 		AHRSSettingsData settings;

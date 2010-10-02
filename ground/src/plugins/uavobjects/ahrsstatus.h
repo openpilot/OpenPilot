@@ -48,9 +48,6 @@ public:
         quint8 IdleTimePerCyle;
         quint8 RunningTimePerCyle;
         quint8 DroppedUpdates;
-        quint8 AlgorithmSet;
-        quint8 CalibrationSet;
-        quint8 HomeSet;
         quint8 LinkRunning;
         quint8 AhrsKickstarts;
         quint8 AhrsCrcErrors;
@@ -70,15 +67,6 @@ public:
     // Field IdleTimePerCyle information
     // Field RunningTimePerCyle information
     // Field DroppedUpdates information
-    // Field AlgorithmSet information
-    /* Enumeration options for field AlgorithmSet */
-    typedef enum { ALGORITHMSET_FALSE=0, ALGORITHMSET_TRUE=1 } AlgorithmSetOptions;
-    // Field CalibrationSet information
-    /* Enumeration options for field CalibrationSet */
-    typedef enum { CALIBRATIONSET_FALSE=0, CALIBRATIONSET_TRUE=1 } CalibrationSetOptions;
-    // Field HomeSet information
-    /* Enumeration options for field HomeSet */
-    typedef enum { HOMESET_FALSE=0, HOMESET_TRUE=1 } HomeSetOptions;
     // Field LinkRunning information
     /* Enumeration options for field LinkRunning */
     typedef enum { LINKRUNNING_FALSE=0, LINKRUNNING_TRUE=1 } LinkRunningOptions;
@@ -92,7 +80,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 188215176U;
+    static const quint32 OBJID = 3773703778U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

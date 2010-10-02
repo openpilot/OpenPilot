@@ -6,9 +6,6 @@
         <field name="IdleTimePerCyle" units="10x ms" type="uint8" elements="1"/>
         <field name="RunningTimePerCyle" units="10x ms" type="uint8" elements="1"/>
         <field name="DroppedUpdates" units="count" type="uint8" elements="1"/>
-        <field name="AlgorithmSet" units="" type="enum" elements="1" options="FALSE,TRUE"/>
-        <field name="CalibrationSet" units="" type="enum" elements="1" options="FALSE,TRUE"/>
-        <field name="HomeSet" units="" type="enum" elements="1" options="FALSE,TRUE"/>
 
         <field name="LinkRunning" units="" type="enum" elements="1" options="FALSE,TRUE"/>
         <field name="AhrsKickstarts" units="count" type="uint8" elements="1"/>

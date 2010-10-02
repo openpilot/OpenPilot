@@ -95,42 +95,6 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'AlgorithmSet',
-		'b',
-		1,
-		[
-			'0',
-		],
-		{
-			'0' : 'FALSE',
-			'1' : 'TRUE',
-		}
-	),
-	uavobject.UAVObjectField(
-		'CalibrationSet',
-		'b',
-		1,
-		[
-			'0',
-		],
-		{
-			'0' : 'FALSE',
-			'1' : 'TRUE',
-		}
-	),
-	uavobject.UAVObjectField(
-		'HomeSet',
-		'b',
-		1,
-		[
-			'0',
-		],
-		{
-			'0' : 'FALSE',
-			'1' : 'TRUE',
-		}
-	),
-	uavobject.UAVObjectField(
 		'LinkRunning',
 		'b',
 		1,
@@ -217,7 +181,7 @@ _fields = [ \
 
 class AhrsStatus(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 188215176
+    OBJID        = 3773703778
     NAME         = "AhrsStatus"
     METANAME     = "AhrsStatusMeta"
     ISSINGLEINST = 1

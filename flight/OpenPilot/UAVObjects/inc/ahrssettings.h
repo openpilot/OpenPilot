@@ -41,7 +41,7 @@
 #define AHRSSETTINGS_H
 
 // Object constants
-#define AHRSSETTINGS_OBJID 1565605328U
+#define AHRSSETTINGS_OBJID 4141274898U
 #define AHRSSETTINGS_NAME "AHRSSettings"
 #define AHRSSETTINGS_METANAME "AHRSSettingsMeta"
 #define AHRSSETTINGS_ISSINGLEINST 1
@@ -72,6 +72,7 @@
 // Object data
 typedef struct {
     uint8_t Algorithm;
+    uint8_t Downsampling;
     uint8_t UpdateRaw;
     uint8_t UpdateFiltered;
     int32_t UpdatePeriod;
@@ -81,7 +82,8 @@ typedef struct {
 // Field information
 // Field Algorithm information
 /* Enumeration options for field Algorithm */
-typedef enum { AHRSSETTINGS_ALGORITHM_SIMPLE=0, AHRSSETTINGS_ALGORITHM_INSGPS=1 } AHRSSettingsAlgorithmOptions;
+typedef enum { AHRSSETTINGS_ALGORITHM_SIMPLE=0, AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR_NOMAG=1, AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR=2, AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR=3 } AHRSSettingsAlgorithmOptions;
+// Field Downsampling information
 // Field UpdateRaw information
 /* Enumeration options for field UpdateRaw */
 typedef enum { AHRSSETTINGS_UPDATERAW_FALSE=0, AHRSSETTINGS_UPDATERAW_TRUE=1 } AHRSSettingsUpdateRawOptions;

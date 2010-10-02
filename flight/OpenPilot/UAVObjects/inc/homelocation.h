@@ -41,7 +41,7 @@
 #define HOMELOCATION_H
 
 // Object constants
-#define HOMELOCATION_OBJID 316455980U
+#define HOMELOCATION_OBJID 3590360786U
 #define HOMELOCATION_NAME "HomeLocation"
 #define HOMELOCATION_METANAME "HomeLocationMeta"
 #define HOMELOCATION_ISSINGLEINST 1
@@ -72,7 +72,6 @@
 // Object data
 typedef struct {
     uint8_t Set;
-    uint8_t Indoor;
     int32_t Latitude;
     int32_t Longitude;
     float Altitude;
@@ -86,9 +85,6 @@ typedef struct {
 // Field Set information
 /* Enumeration options for field Set */
 typedef enum { HOMELOCATION_SET_FALSE=0, HOMELOCATION_SET_TRUE=1 } HomeLocationSetOptions;
-// Field Indoor information
-/* Enumeration options for field Indoor */
-typedef enum { HOMELOCATION_INDOOR_FALSE=0, HOMELOCATION_INDOOR_TRUE=1 } HomeLocationIndoorOptions;
 // Field Latitude information
 // Field Longitude information
 // Field Altitude information

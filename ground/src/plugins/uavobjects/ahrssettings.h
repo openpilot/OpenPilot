@@ -44,6 +44,7 @@ public:
     // Field structure
     typedef struct {
         quint8 Algorithm;
+        quint8 Downsampling;
         quint8 UpdateRaw;
         quint8 UpdateFiltered;
         qint32 UpdatePeriod;
@@ -53,7 +54,8 @@ public:
     // Field information
     // Field Algorithm information
     /* Enumeration options for field Algorithm */
-    typedef enum { ALGORITHM_SIMPLE=0, ALGORITHM_INSGPS=1 } AlgorithmOptions;
+    typedef enum { ALGORITHM_SIMPLE=0, ALGORITHM_INSGPS_INDOOR_NOMAG=1, ALGORITHM_INSGPS_INDOOR=2, ALGORITHM_INSGPS_OUTDOOR=3 } AlgorithmOptions;
+    // Field Downsampling information
     // Field UpdateRaw information
     /* Enumeration options for field UpdateRaw */
     typedef enum { UPDATERAW_FALSE=0, UPDATERAW_TRUE=1 } UpdateRawOptions;
@@ -64,7 +66,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 1565605328U;
+    static const quint32 OBJID = 4141274898U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

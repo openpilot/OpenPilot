@@ -294,23 +294,6 @@ Disabled if there is no GPS fix.</string>
      <string>Save Position</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="indoorFlight">
-    <property name="geometry">
-     <rect>
-      <x>380</x>
-      <y>400</y>
-      <width>201</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Check this box if you are flying indoors and have no GPS fix.
-Only makes sense with the &quot;INSGPS&quot; algorithm.</string>
-    </property>
-    <property name="text">
-     <string>Indoor flight mode</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="ahrsSettingsSaveRAM">
     <property name="geometry">
      <rect>

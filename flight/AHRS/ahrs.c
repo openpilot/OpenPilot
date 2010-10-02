@@ -41,6 +41,7 @@
 #include "CoordinateConversions.h"
 #include "ahrs_spi_comm.h"
 
+#define MAX_OVERSAMPLING 50
 // For debugging the raw sensors
 //#define DUMP_RAW
 //#define DUMP_FRIENDLY
@@ -57,7 +58,7 @@ extern float Q[NUMW], R[NUMV];	// input noise and measurement noise variances
 extern float K[NUMX][NUMV];	// feedback gain matrix
 #endif
 
-volatile enum algorithms ahrs_algorithm;
+volatile int8_t ahrs_algorithm;
 
 /**
  * @addtogroup AHRS_Structures Local Structres
@@ -175,7 +176,7 @@ uint32_t counter_val;
  * Public data.  Used by both EKF and the sender
  */
 //! Filter coefficients used in decimation.  Limited order so filter can't run between samples
-int16_t fir_coeffs[50];
+int16_t fir_coeffs[MAX_OVERSAMPLING];
 
 
 //! The oversampling rate, ekf is 2k / this
@@ -339,7 +340,7 @@ for all data to be up to date before doing anything*/
 		downsample_data();
 
 		/******************** INS ALGORITHM **************************/
-		if (ahrs_algorithm == INSGPS_Algo) {
+		if (ahrs_algorithm != AHRSSETTINGS_ALGORITHM_SIMPLE) {
 
 			// format data for INS algo
 			gyro[0] = gyro_data.filtered.x;
@@ -358,7 +359,7 @@ for all data to be up to date before doing anything*/
 			send_attitude();  // get message out quickly
 			INSCovariancePrediction(1 / (float)EKF_RATE);
 
-			if (gps_data.updated && gps_data.quality == 1) {
+			if (gps_data.updated && ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) {
 				// Compute velocity from Heading and groundspeed
 				vel[0] =
 				    gps_data.groundspeed *
@@ -384,7 +385,7 @@ for all data to be up to date before doing anything*/
 
 				gps_data.updated = false;
 				mag_data.updated = 0;
-			} else if (gps_data.quality != -1
+			} else if (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR
 				   && mag_data.updated == 1) {
 				float mag_var[3] = {mag_data.calibration.variance[1], mag_data.calibration.variance[0], mag_data.calibration.variance[2]};
 				INSSetMagVar(mag_var);
@@ -397,7 +398,7 @@ for all data to be up to date before doing anything*/
 				vel[1] = 0;
 				vel[2] = 0;
 
-				if(mag_data.updated == 1) {
+				if((mag_data.updated == 1) && (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
 					float mag_var[3] = {10,10,10};
 					INSSetMagVar(mag_var);
 					MagVelBaroCorrection(mag,vel,altitude_data.altitude);  // only trust mags if outdoors
@@ -795,14 +796,7 @@ void gps_callback(AhrsObjHandle obj)
 	HomeLocationData home;
 	HomeLocationGet(&home);
 
-	if(home.Set == HOMELOCATION_SET_FALSE || home.Indoor == HOMELOCATION_INDOOR_TRUE) {
-		gps_data.NED[0] = 0;
-		gps_data.NED[1] = 0;
-		gps_data.NED[2] = 0;
-		gps_data.groundspeed = 0;
-		gps_data.heading = 0;
-		gps_data.quality = -1; // indicates indoor mode, high variance zeros update
-		gps_data.updated = true;
+	if(ahrs_algorithm != AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) {
 		return;
 	}
 
@@ -837,12 +831,22 @@ void settings_callback(AhrsObjHandle obj)
 	AHRSSettingsData settings;
 	AHRSSettingsGet(&settings);
 
-	if(settings.Algorithm ==  AHRSSETTINGS_ALGORITHM_INSGPS)
-	{
-		ahrs_algorithm = INSGPS_Algo;
-	}else
-	{
-		ahrs_algorithm = SIMPLE_Algo;
+	ahrs_algorithm = settings.Algorithm;
+	
+	if(settings.Downsampling != adc_oversampling) {
+		adc_oversampling = settings.Downsampling;
+		if(adc_oversampling > MAX_OVERSAMPLING) {
+			adc_oversampling = MAX_OVERSAMPLING;
+			settings.Downsampling = MAX_OVERSAMPLING;
+			AHRSSettingsSet(&settings);
+		}
+		AHRS_ADC_Config(adc_oversampling);
+		
+		/* Use simple averaging filter for now */
+		for (int i = 0; i < adc_oversampling; i++)
+			fir_coeffs[i] = 1;
+		fir_coeffs[adc_oversampling] = adc_oversampling;
+		
 	}
 }
 

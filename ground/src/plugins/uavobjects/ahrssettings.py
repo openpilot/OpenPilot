@@ -46,7 +46,19 @@ _fields = [ \
 		],
 		{
 			'0' : 'SIMPLE',
-			'1' : 'INSGPS',
+			'1' : 'INSGPS_INDOOR_NOMAG',
+			'2' : 'INSGPS_INDOOR',
+			'3' : 'INSGPS_OUTDOOR',
+		}
+	),
+	uavobject.UAVObjectField(
+		'Downsampling',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
 		}
 	),
 	uavobject.UAVObjectField(
@@ -88,7 +100,7 @@ _fields = [ \
 
 class AHRSSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 1565605328
+    OBJID        = 4141274898
     NAME         = "AHRSSettings"
     METANAME     = "AHRSSettingsMeta"
     ISSINGLEINST = 1

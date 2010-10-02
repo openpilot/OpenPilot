@@ -48,12 +48,6 @@ HomeLocation::HomeLocation(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAM
     SetEnumOptions.append("FALSE");
     SetEnumOptions.append("TRUE");
     fields.append( new UAVObjectField(QString("Set"), QString(""), UAVObjectField::ENUM, SetElemNames, SetEnumOptions) );
-    QStringList IndoorElemNames;
-    IndoorElemNames.append("0");
-    QStringList IndoorEnumOptions;
-    IndoorEnumOptions.append("FALSE");
-    IndoorEnumOptions.append("TRUE");
-    fields.append( new UAVObjectField(QString("Indoor"), QString(""), UAVObjectField::ENUM, IndoorElemNames, IndoorEnumOptions) );
     QStringList LatitudeElemNames;
     LatitudeElemNames.append("0");
     fields.append( new UAVObjectField(QString("Latitude"), QString("deg * 10e6"), UAVObjectField::INT32, LatitudeElemNames, QStringList()) );
@@ -118,7 +112,6 @@ UAVObject::Metadata HomeLocation::getDefaultMetadata()
 void HomeLocation::setDefaultFieldValues()
 {
     data.Set = 0;
-    data.Indoor = 0;
     data.Latitude = 0;
     data.Longitude = 0;
     data.Altitude = 0;

@@ -1,7 +1,8 @@
 <xml>
     <object name="AHRSSettings" singleinstance="true" settings="true">
         <description>Settings for the @ref AHRSCommsModule to control the algorithm and what is updated</description>
-        <field name="Algorithm" units="" type="enum" elements="1" options="SIMPLE,INSGPS" defaultvalue="INSGPS"/>
+        <field name="Algorithm" units="" type="enum" elements="1" options="SIMPLE,INSGPS_INDOOR_NOMAG,INSGPS_INDOOR,INSGPS_OUTDOOR" defaultvalue="INSGPS_INDOOR_NOMAG"/>
+        <field name="Downsampling" units="" type="uint8" elements="1" defaultvalue="20"/>
         <field name="UpdateRaw" units="raw" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
         <field name="UpdateFiltered" units="raw" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
         <field name="UpdatePeriod" units="ms" type="int32" elements="1" defaultvalue="20"/>

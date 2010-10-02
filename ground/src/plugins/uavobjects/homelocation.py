@@ -50,18 +50,6 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'Indoor',
-		'b',
-		1,
-		[
-			'0',
-		],
-		{
-			'0' : 'FALSE',
-			'1' : 'TRUE',
-		}
-	),
-	uavobject.UAVObjectField(
 		'Latitude',
 		'i',
 		1,
@@ -138,7 +126,7 @@ _fields = [ \
 
 class HomeLocation(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 316455980
+    OBJID        = 3590360786
     NAME         = "HomeLocation"
     METANAME     = "HomeLocationMeta"
     ISSINGLEINST = 1

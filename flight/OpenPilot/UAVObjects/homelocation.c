@@ -81,7 +81,6 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	UAVObjGetInstanceData(obj, instId, &data);
 	memset(&data, 0, sizeof(HomeLocationData));
 	data.Set = 0;
-	data.Indoor = 0;
 	data.Latitude = 0;
 	data.Longitude = 0;
 	data.Altitude = 0;

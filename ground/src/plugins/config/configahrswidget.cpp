@@ -689,9 +689,6 @@ void ConfigAHRSWidget::ahrsSettingsRequest()
     drawVariancesGraph();
 
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("HomeLocation")));
-    field = obj->getField(QString("Indoor"));
-    if (field)
-        m_ahrs->indoorFlight->setChecked(field->getValue().toBool());
     field = obj->getField(QString("Set"));
     if (field)
         m_ahrs->homeLocationSet->setEnabled(field->getValue().toBool());
@@ -712,10 +709,6 @@ void ConfigAHRSWidget::enableHomeLocSave(UAVObject * obj)
     if (field) {
         m_ahrs->homeLocationSet->setEnabled(field->getValue().toBool());
     }
-    // While we're at it, ensure the 'indoor' flag is consistent:
-    field = obj->getField(QString("Indoor"));
-    if (field)
-        m_ahrs->indoorFlight->setChecked(field->getValue().toBool());
 }
 
 
@@ -729,11 +722,6 @@ void ConfigAHRSWidget::ahrsSettingsSaveRAM()
     field->setValue(m_ahrs->algorithm->currentText());
     obj->updated();
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("HomeLocation")));
-    field = obj->getField(QString("Indoor"));
-    if (m_ahrs->indoorFlight->isChecked())
-        field->setValue(QString("TRUE"));
-    else
-        field->setValue(QString("FALSE"));
     field = obj->getField(QString("Set"));
     if (m_ahrs->homeLocationSet->isChecked())
         field->setValue(QString("TRUE"));

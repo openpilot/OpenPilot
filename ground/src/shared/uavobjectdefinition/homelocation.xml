@@ -2,7 +2,6 @@
     <object name="HomeLocation" singleinstance="true" settings="true">
         <description>HomeLocation setting which contains the constants to tranlate from longitutde and latitude to NED reference frame.  Automatically set by @ref GPSModule after acquiring a 3D lock.  Used by @ref AHRSCommsModule.</description>
         <field name="Set" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
-        <field name="Indoor" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
         <field name="Latitude" units="deg * 10e6" type="int32" elements="1" defaultvalue="0"/>
         <field name="Longitude" units="deg * 10e6" type="int32" elements="1" defaultvalue="0"/>
         <field name="Altitude" units="m over geoid" type="float" elements="1" defaultvalue="0"/>

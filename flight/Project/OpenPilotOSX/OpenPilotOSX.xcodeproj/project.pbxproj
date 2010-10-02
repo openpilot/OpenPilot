@@ -18,6 +18,7 @@
 		6519133C1256C52B0039C0A3 /* ahrs_spi_program_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program_master.h; sourceTree = "<group>"; };
 		6519133D1256C52B0039C0A3 /* ahrs_spi_program_slave.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program_slave.h; sourceTree = "<group>"; };
 		6519133E1256C52B0039C0A3 /* ahrs_spi_program.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program.h; sourceTree = "<group>"; };
+		651913571256D0030039C0A3 /* ahrssettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrssettings.h; sourceTree = "<group>"; };
 		651CF9E5120B5D8300EEFD70 /* pios_usb_hid_desc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_usb_hid_desc.c; sourceTree = "<group>"; };
 		651CF9E6120B5D8300EEFD70 /* pios_usb_hid_istr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_usb_hid_istr.c; sourceTree = "<group>"; };
 		651CF9E7120B5D8300EEFD70 /* pios_usb_hid_prop.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_usb_hid_prop.c; sourceTree = "<group>"; };
@@ -7224,6 +7225,7 @@
 		65E8EF8011EEA61E00BBF654 /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				651913571256D0030039C0A3 /* ahrssettings.h */,
 				65E8EF8111EEA61E00BBF654 /* actuatorcommand.h */,
 				65E8EF8211EEA61E00BBF654 /* actuatordesired.h */,
 				65E8EF8311EEA61E00BBF654 /* actuatorsettings.h */,

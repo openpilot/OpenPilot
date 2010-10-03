@@ -202,28 +202,29 @@ void AHRS_ADC_DMA_Handler(void)
 	if (ahrs_state == AHRS_IDLE) {
 		// Ideally this would have a mutex, but I think we can avoid it (and don't have RTOS features)
 
-		if (DMA_GetFlagStatus(DMA1_IT_TC1))	// whole double buffer filled
+		if (DMA_GetFlagStatus(DMA1_IT_TC1)) {	// whole double buffer filled 
 			valid_data_buffer =
 			    &raw_data_buffer[1 * PIOS_ADC_NUM_CHANNELS *
 					     adc_oversample];
-		else if (DMA_GetFlagStatus(DMA1_IT_HT1))
+			DMA_ClearFlag(DMA1_IT_TC1);
+		}
+		else if (DMA_GetFlagStatus(DMA1_IT_HT1)) {
 			valid_data_buffer =
 			    &raw_data_buffer[0 * PIOS_ADC_NUM_CHANNELS *
 					     adc_oversample];
+			DMA_ClearFlag(DMA1_IT_HT1);
+		}
 		else {
-			// lets cause a seg fault and catch whatever is going on
-			valid_data_buffer = 0;
+			// This should not happen, probably due to transfer errors
+			DMA_ClearFlag(DMA1_FLAG_GL1);
 		}
 
 		ahrs_state = AHRS_DATA_READY;
 	} else {
 		// Track how many times an interrupt occurred before EKF finished processing
 		ekf_too_slow++;
+		DMA_ClearFlag(DMA1_IT_GL1);
 	}
 
 	total_conversion_blocks++;
-
-	// Clear all interrupt from DMA 1 - regardless if buffer swapped
-	DMA_ClearFlag(DMA1_IT_GL1);
-
 }

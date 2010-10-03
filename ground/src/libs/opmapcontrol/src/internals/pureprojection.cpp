@@ -43,7 +43,7 @@ const double PureProjection::DBLLONG= 4.61168601e18;
 const double PureProjection::R2D=180/M_PI;
 const double PureProjection::D2R=M_PI/180;
 
-Point PureProjection::FromLatLngToPixel(const PointLatLng::PointLatLng &p,const int &zoom)
+Point PureProjection::FromLatLngToPixel(const PointLatLng &p,const int &zoom)
       {
          return FromLatLngToPixel(p.Lat(), p.Lng(), zoom);
       }

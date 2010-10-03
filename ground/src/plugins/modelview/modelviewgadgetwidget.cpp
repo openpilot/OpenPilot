@@ -38,7 +38,11 @@ ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent)
 , m_MoverController()
 , m_ModelBoundingBox()
 , m_MotionTimer()
+, vboEnable(false)
 {
+    // Prevent crash on non-VBO enabled systems during GLC geometry creation
+    GLC_State::setVboUsage(vboEnable);
+
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     mvInitGLSuccess = false;
 
@@ -82,9 +86,11 @@ void ModelViewGadgetWidget::initializeGL()
         return;
     // OpenGL initialization
     m_GlView.initGl();
-    if (!vboEnable) 
+
+    // Enable VBO usage if configured (default is to disable)
+    GLC_State::setVboUsage(vboEnable);
+    if (!vboEnable)
     {
-	GLC_State::setVboUsage(false); 
 	qDebug("VBOs disabled.  Enable for better performance if GPU supports it. (Most do)");
     }
 
@@ -184,6 +190,10 @@ void ModelViewGadgetWidget::mousePressEvent(QMouseEvent *e)
                 updateGL();
                 break;
         case (Qt::RightButton):
+		printf("VBO enabled: %s, VBO supported: %s, VBO used: %s\n",
+			vboEnable ? "yes" : "no",
+			GLC_State::vboSupported() ? "yes" : "no",
+			GLC_State::vboUsed() ? "yes" : "no");
 		printf("Renderer - %s \n", (char*)glGetString(GL_RENDERER));
 		printf("Extensions - %s\n", (char*)glGetString(GL_EXTENSIONS));
                 break;

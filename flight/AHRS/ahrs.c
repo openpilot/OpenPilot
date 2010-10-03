@@ -397,10 +397,8 @@ for all data to be up to date before doing anything*/
 				vel[1] = 0;
 				vel[2] = 0;
 
-				if(/*(mag_data.updated == 1) &&*/ (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
-//					MagVelBaroCorrection(mag,vel,altitude_data.altitude);  // only trust mags if outdoors
-					VelBaroCorrection(vel, altitude_data.altitude);
-					MagCorrection(mag);
+				if((mag_data.updated == 1) && (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
+					MagVelBaroCorrection(mag,vel,altitude_data.altitude);  // only trust mags if outdoors
 					mag_data.updated = 0;
 				} else {
 					VelBaroCorrection(vel, altitude_data.altitude);
@@ -856,7 +854,11 @@ void homelocation_callback(AhrsObjHandle obj)
 {
 	HomeLocationData data;
 	HomeLocationGet(&data);
-	INSSetMagNorth(data.Be);
+
+	float Bmag = sqrt(pow(data.Be[0],2) + pow(data.Be[1],2) + pow(data.Be[2],2));
+	float Be[3] = {data.Be[0] / Bmag, data.Be[1] / Bmag, data.Be[2] / Bmag};
+	
+	INSSetMagNorth(Be);
 }
 
 

@@ -42,16 +42,20 @@
 
 
 // Private constants
+#define MAX_QUEUE_SIZE 2
 #define STACK_SIZE configMINIMAL_STACK_SIZE
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 #define PITCH_INTEGRAL_LIMIT 0.5
 #define ROLL_INTEGRAL_LIMIT 0.5
 #define YAW_INTEGRAL_LIMIT 0.5
 #define DEG2RAD ( M_PI / 180.0 )
+#define FAILSAFE_TIMEOUT_MS 100
+
 
 // Private types
 
 // Private variables
+static xQueueHandle queue;
 static xTaskHandle taskHandle;
 
 // Private functions
@@ -64,19 +68,26 @@ static float angleDifference(float val);
  */
 int32_t StabilizationInitialize()
 {
-	// Initialize variables
+	// Create object queue
+	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+
+	// Listen for AttitudeActual updates.
+	AttitudeActualConnectQueue(queue);
 
 	// Start main task
 	xTaskCreate(stabilizationTask, (signed char*)"Stabilization", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 
 	return 0;
 }
+float dT = 1;
 
 /**
  * Module task
  */
 static void stabilizationTask(void* parameters)
 {
+	UAVObjEvent ev;
+
 	StabilizationSettingsData stabSettings;
 	ActuatorDesiredData actuatorDesired;
 	AttitudeDesiredData attitudeDesired;
@@ -84,6 +95,7 @@ static void stabilizationTask(void* parameters)
 	ManualControlCommandData manualControl;
 	SystemSettingsData systemSettings;
 	portTickType lastSysTime;
+	portTickType thisSysTime;
 	float pitchErrorGlobal, pitchErrorLastGlobal;
 	float yawErrorGlobal, yawErrorLastGlobal;
 	float pitchError, pitchErrorLast;
@@ -95,6 +107,8 @@ static void stabilizationTask(void* parameters)
 	float pitchIntegral, pitchIntegralLimit;
 	float yawIntegral, yawIntegralLimit;
 	float rollIntegral, rollIntegralLimit;
+	float yawPrevious;
+	float yawChange;
 
 	// Initialize
 	pitchIntegral = 0.0;
@@ -103,11 +117,24 @@ static void stabilizationTask(void* parameters)
 	pitchErrorLastGlobal = 0.0;
 	yawErrorLastGlobal = 0.0;
 	rollErrorLast = 0.0;
+	yawPrevious = 0.0;
 
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1)
 	{
+		// Wait until the ActuatorDesired object is updated, if a timeout then go to failsafe
+                if ( xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )
+                {
+                        AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION,SYSTEMALARMS_ALARM_WARNING);
+                }
+
+		// Check how long since last update
+		thisSysTime = xTaskGetTickCount();
+		if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
+			dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
+		lastSysTime = thisSysTime;
+
 		// Read settings and other objects
 		StabilizationSettingsGet(&stabSettings);
 		SystemSettingsGet(&systemSettings);
@@ -132,10 +159,21 @@ static void stabilizationTask(void* parameters)
 		}
 
 		// global yaw error
-		if ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL || manualControl.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO )
+		if (( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL )||
+		    ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADX)||
+		    ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADP)||
+		    ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HEXA) ||
+		    ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_OCTO) ||
+		    ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HELICP))
 		{
 			// VTOLS consider yaw. AUTO mode considers YAW, too.
-			yawErrorGlobal = angleDifference(attitudeDesired.Yaw - attitudeActual.Yaw);
+			if(stabSettings.YawMode == STABILIZATIONSETTINGS_YAWMODE_RATE) {  // rate stabilization on yaw
+					yawChange = (attitudeActual.Yaw - yawPrevious) / dT;
+					yawPrevious = attitudeActual.Yaw;
+					yawErrorGlobal = angleDifference(bound(attitudeDesired.Yaw, -stabSettings.YawMax, stabSettings.YawMax) - yawChange);
+				} else { // heading stabilization
+					yawError = angleDifference(attitudeDesired.Yaw - attitudeActual.Yaw);
+				}
 		} else {
 			// FIXED WING STABILIZATION however does not.
 			yawErrorGlobal = 0;
@@ -174,25 +212,30 @@ static void stabilizationTask(void* parameters)
 		// local Pitch stabilization control loop
 		pitchDerivative = pitchError - pitchErrorLast;
 		pitchIntegralLimit = PITCH_INTEGRAL_LIMIT / stabSettings.PitchKi;
-		pitchIntegral = bound(pitchIntegral+pitchError*stabSettings.UpdatePeriod, -pitchIntegralLimit, pitchIntegralLimit);
+		pitchIntegral = bound(pitchIntegral+pitchError*dT, -pitchIntegralLimit, pitchIntegralLimit);
 		actuatorDesired.Pitch = stabSettings.PitchKp*pitchError + stabSettings.PitchKi*pitchIntegral + stabSettings.PitchKd*pitchDerivative;
 		actuatorDesired.Pitch = bound(actuatorDesired.Pitch, -1.0, 1.0);
 
 		// local Roll stabilization control loop
 		rollDerivative = rollError - rollErrorLast;
 		rollIntegralLimit = ROLL_INTEGRAL_LIMIT / stabSettings.RollKi;
-		rollIntegral = bound(rollIntegral+rollError*stabSettings.UpdatePeriod, -rollIntegralLimit, rollIntegralLimit);
+		rollIntegral = bound(rollIntegral+rollError*dT, -rollIntegralLimit, rollIntegralLimit);
 		actuatorDesired.Roll = stabSettings.RollKp*rollError + stabSettings.RollKi*rollIntegral + stabSettings.RollKd*rollDerivative;
 		actuatorDesired.Roll = bound(actuatorDesired.Roll, -1.0, 1.0);
 		rollErrorLast = rollError;
 
 
 		// local Yaw stabilization control loop (only enabled on VTOL airframes)
-		if (( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL )||( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HELICP))
+		if (( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL )||
+		    ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADX)||
+		    ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADP)||
+		    ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HEXA) ||
+		    ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_OCTO) ||
+		    ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HELICP))
 		{
 			yawDerivative = yawError - yawErrorLast;
 			yawIntegralLimit = YAW_INTEGRAL_LIMIT / stabSettings.YawKi;
-			yawIntegral = bound(yawIntegral+yawError*stabSettings.UpdatePeriod, -yawIntegralLimit, yawIntegralLimit);
+			yawIntegral = bound(yawIntegral+yawError*dT, -yawIntegralLimit, yawIntegralLimit);
 			actuatorDesired.Yaw = stabSettings.YawKp*yawError + stabSettings.YawKi*yawIntegral + stabSettings.YawKd*yawDerivative;;
 			actuatorDesired.Yaw = bound(actuatorDesired.Yaw, -1.0, 1.0);
 		}
@@ -204,6 +247,9 @@ static void stabilizationTask(void* parameters)
 
 		// Setup throttle
 		actuatorDesired.Throttle = bound(attitudeDesired.Throttle, 0.0, stabSettings.ThrottleMax);
+
+		// Save dT
+		actuatorDesired.UpdateTime = dT * 1000;
 
 		// Write actuator desired (if not in manual mode)
 		if ( manualControl.FlightMode != MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL )
@@ -222,9 +268,6 @@ static void stabilizationTask(void* parameters)
 
 		// Clear alarms
 		AlarmsClear(SYSTEMALARMS_ALARM_STABILIZATION);
-
-		// Wait until next update
-		vTaskDelayUntil(&lastSysTime, stabSettings.UpdatePeriod / portTICK_RATE_MS );
 	}
 }
 

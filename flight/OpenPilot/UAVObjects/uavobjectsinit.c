@@ -64,7 +64,6 @@
 #include "telemetrysettings.h"
 #include "velocityactual.h"
 #include "velocitydesired.h"
-#include "vtolsettings.h"
 
 
 /**
@@ -109,6 +108,5 @@ void UAVObjectsInitializeAll()
     TelemetrySettingsInitialize();
     VelocityActualInitialize();
     VelocityDesiredInitialize();
-    VTOLSettingsInitialize();
 
 }

@@ -83,16 +83,29 @@ void GCSControlGadget::manualControlCommandUpdated(UAVObject * obj) {
 
 void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double rightX, double rightY) {
     ManualControlCommand * obj = getManualControlCommand();
-    obj->getField("Roll")->setDouble(rightX);
-    obj->getField("Pitch")->setDouble(-leftY);
-    obj->getField("Yaw")->setDouble(leftX);
-    obj->getField("Throttle")->setDouble(rightY);
-    obj->updated();
+    double oldRoll = obj->getField("Roll")->getDouble();
+    double oldPitch = obj->getField("Pitch")->getDouble();
+    double oldYaw = obj->getField("Yaw")->getDouble();
+    double oldThrottle = obj->getField("Throttle")->getDouble();
+
+    double newRoll = rightX;
+    double newPitch = -leftY;
+    double newYaw = leftX;
+    double newThrottle = rightY;
+
+    if((newThrottle != oldThrottle) || (newPitch != oldPitch) || (newYaw != oldYaw) || (newRoll != oldRoll)) {
+        obj->getField("Roll")->setDouble(newRoll);
+        obj->getField("Pitch")->setDouble(newPitch);
+        obj->getField("Yaw")->setDouble(newYaw);
+        obj->getField("Throttle")->setDouble(newThrottle);
+        obj->updated();
+    }
 }
 
 void GCSControlGadget::gamepads(quint8 count)
 {
     sdlGamepad.setGamepad(0);
+    sdlGamepad.setTickRate(40);
 }
 
 void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)

@@ -45,9 +45,10 @@ public:
     typedef struct {
         quint8 Algorithm;
         quint8 Downsampling;
-        quint8 UpdateRaw;
-        quint8 UpdateFiltered;
-        qint32 UpdatePeriod;
+        quint8 UpdatePeriod;
+        float YawBias;
+        float PitchBias;
+        float RollBias;
 
     } __attribute__((packed)) DataFields;
 
@@ -56,17 +57,14 @@ public:
     /* Enumeration options for field Algorithm */
     typedef enum { ALGORITHM_SIMPLE=0, ALGORITHM_INSGPS_INDOOR_NOMAG=1, ALGORITHM_INSGPS_INDOOR=2, ALGORITHM_INSGPS_OUTDOOR=3 } AlgorithmOptions;
     // Field Downsampling information
-    // Field UpdateRaw information
-    /* Enumeration options for field UpdateRaw */
-    typedef enum { UPDATERAW_FALSE=0, UPDATERAW_TRUE=1 } UpdateRawOptions;
-    // Field UpdateFiltered information
-    /* Enumeration options for field UpdateFiltered */
-    typedef enum { UPDATEFILTERED_FALSE=0, UPDATEFILTERED_TRUE=1 } UpdateFilteredOptions;
     // Field UpdatePeriod information
+    // Field YawBias information
+    // Field PitchBias information
+    // Field RollBias information
 
   
     // Constants
-    static const quint32 OBJID = 4141274898U;
+    static const quint32 OBJID = 1456050280U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

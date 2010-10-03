@@ -82,9 +82,10 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	memset(&data, 0, sizeof(AHRSSettingsData));
 	data.Algorithm = 1;
 	data.Downsampling = 20;
-	data.UpdateRaw = 0;
-	data.UpdateFiltered = 1;
-	data.UpdatePeriod = 20;
+	data.UpdatePeriod = 1;
+	data.YawBias = 0;
+	data.PitchBias = 0;
+	data.RollBias = 0;
 
 	UAVObjSetInstanceData(obj, instId, &data);
 

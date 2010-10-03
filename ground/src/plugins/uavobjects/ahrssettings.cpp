@@ -53,21 +53,18 @@ AHRSSettings::AHRSSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAM
     QStringList DownsamplingElemNames;
     DownsamplingElemNames.append("0");
     fields.append( new UAVObjectField(QString("Downsampling"), QString(""), UAVObjectField::UINT8, DownsamplingElemNames, QStringList()) );
-    QStringList UpdateRawElemNames;
-    UpdateRawElemNames.append("0");
-    QStringList UpdateRawEnumOptions;
-    UpdateRawEnumOptions.append("FALSE");
-    UpdateRawEnumOptions.append("TRUE");
-    fields.append( new UAVObjectField(QString("UpdateRaw"), QString("raw"), UAVObjectField::ENUM, UpdateRawElemNames, UpdateRawEnumOptions) );
-    QStringList UpdateFilteredElemNames;
-    UpdateFilteredElemNames.append("0");
-    QStringList UpdateFilteredEnumOptions;
-    UpdateFilteredEnumOptions.append("FALSE");
-    UpdateFilteredEnumOptions.append("TRUE");
-    fields.append( new UAVObjectField(QString("UpdateFiltered"), QString("raw"), UAVObjectField::ENUM, UpdateFilteredElemNames, UpdateFilteredEnumOptions) );
     QStringList UpdatePeriodElemNames;
     UpdatePeriodElemNames.append("0");
-    fields.append( new UAVObjectField(QString("UpdatePeriod"), QString("ms"), UAVObjectField::INT32, UpdatePeriodElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("UpdatePeriod"), QString("ms"), UAVObjectField::UINT8, UpdatePeriodElemNames, QStringList()) );
+    QStringList YawBiasElemNames;
+    YawBiasElemNames.append("0");
+    fields.append( new UAVObjectField(QString("YawBias"), QString(""), UAVObjectField::FLOAT32, YawBiasElemNames, QStringList()) );
+    QStringList PitchBiasElemNames;
+    PitchBiasElemNames.append("0");
+    fields.append( new UAVObjectField(QString("PitchBias"), QString(""), UAVObjectField::FLOAT32, PitchBiasElemNames, QStringList()) );
+    QStringList RollBiasElemNames;
+    RollBiasElemNames.append("0");
+    fields.append( new UAVObjectField(QString("RollBias"), QString(""), UAVObjectField::FLOAT32, RollBiasElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -103,9 +100,10 @@ void AHRSSettings::setDefaultFieldValues()
 {
     data.Algorithm = 1;
     data.Downsampling = 20;
-    data.UpdateRaw = 0;
-    data.UpdateFiltered = 1;
-    data.UpdatePeriod = 20;
+    data.UpdatePeriod = 1;
+    data.YawBias = 0;
+    data.PitchBias = 0;
+    data.RollBias = 0;
 
 }
 

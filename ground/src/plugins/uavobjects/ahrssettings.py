@@ -62,32 +62,38 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'UpdateRaw',
-		'b',
-		1,
-		[
-			'0',
-		],
-		{
-			'0' : 'FALSE',
-			'1' : 'TRUE',
-		}
-	),
-	uavobject.UAVObjectField(
-		'UpdateFiltered',
-		'b',
-		1,
-		[
-			'0',
-		],
-		{
-			'0' : 'FALSE',
-			'1' : 'TRUE',
-		}
-	),
-	uavobject.UAVObjectField(
 		'UpdatePeriod',
-		'i',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'YawBias',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'PitchBias',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'RollBias',
+		'f',
 		1,
 		[
 			'0',
@@ -100,7 +106,7 @@ _fields = [ \
 
 class AHRSSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 4141274898
+    OBJID        = 1456050280
     NAME         = "AHRSSettings"
     METANAME     = "AHRSSettingsMeta"
     ISSINGLEINST = 1

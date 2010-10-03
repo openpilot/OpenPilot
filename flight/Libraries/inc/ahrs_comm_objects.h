@@ -3,7 +3,6 @@
 
 #include "attitudeactual.h"
 #include "attituderaw.h"
-#include "attitudesettings.h"
 #include "ahrsstatus.h"
 #include "baroaltitude.h"
 #include "gpsposition.h"
@@ -19,7 +18,6 @@ typedef union {
 	AttitudeRawData AttitudeRaw;
 	AttitudeActualData AttitudeActual;
 	AHRSCalibrationData AHRSCalibration;
-	AttitudeSettingsData AttitudeSettings;
 	AhrsStatusData AhrsStatus;
 	BaroAltitudeData BaroAltitude;
 	GPSPositionData GPSPosition;
@@ -30,7 +28,7 @@ typedef union {
 
 /** The number of UAVObjects we will be dealing with.
 */
-#define MAX_AHRS_OBJECTS 10
+#define MAX_AHRS_OBJECTS 9
 
 /** Our own version of a UAVObject.
 */

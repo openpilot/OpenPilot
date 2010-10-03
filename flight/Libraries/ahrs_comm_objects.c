@@ -4,7 +4,6 @@
 static AttitudeRawData AttitudeRaw;
 static AttitudeActualData AttitudeActual;
 static AHRSCalibrationData AHRSCalibration;
-static AttitudeSettingsData AttitudeSettings;
 static AhrsStatusData AhrsStatus;
 static BaroAltitudeData BaroAltitude;
 static GPSPositionData GPSPosition;
@@ -27,15 +26,14 @@ AhrsSharedObject objectHandles[MAX_AHRS_OBJECTS];
 CREATEHANDLE(0, AttitudeRaw);
 CREATEHANDLE(1, AttitudeActual);
 CREATEHANDLE(2, AHRSCalibration);
-CREATEHANDLE(3, AttitudeSettings);
-CREATEHANDLE(4, AhrsStatus);
-CREATEHANDLE(5, BaroAltitude);
-CREATEHANDLE(6, GPSPosition);
-CREATEHANDLE(7, PositionActual);
-CREATEHANDLE(8, HomeLocation);
-CREATEHANDLE(9, AHRSSettings);
+CREATEHANDLE(3, AhrsStatus);
+CREATEHANDLE(4, BaroAltitude);
+CREATEHANDLE(5, GPSPosition);
+CREATEHANDLE(6, PositionActual);
+CREATEHANDLE(7, HomeLocation);
+CREATEHANDLE(8, AHRSSettings);
 
-#if 10 != MAX_AHRS_OBJECTS	//sanity check
+#if 9 != MAX_AHRS_OBJECTS	//sanity check
 #error We did not create the correct number of xxxHandle() functions
 #endif
 
@@ -68,7 +66,6 @@ void AhrsInitHandles(void)
 	ADDHANDLE(idx++, AttitudeRaw);
 	ADDHANDLE(idx++, AttitudeActual);
 	ADDHANDLE(idx++, AHRSCalibration);
-	ADDHANDLE(idx++, AttitudeSettings);
 	ADDHANDLE(idx++, AhrsStatus);
 	ADDHANDLE(idx++, BaroAltitude);
 	ADDHANDLE(idx++, GPSPosition);

@@ -35,11 +35,9 @@
 #include "ahrs.h"
 #include "ahrs_adc.h"
 #include "ahrs_timer.h"
-#include "pios_opahrs_proto.h"
-//#include "ahrs_fsm.h"		/* lfsm_state */
+#include "ahrs_spi_comm.h"
 #include "insgps.h"
 #include "CoordinateConversions.h"
-#include "ahrs_spi_comm.h"
 
 #define MAX_OVERSAMPLING 50
 // For debugging the raw sensors
@@ -198,7 +196,7 @@ int main()
 	float vel[3] = { 0, 0, 0 };
 	gps_data.quality = -1;
 
-	ahrs_algorithm = INSGPS_Algo;
+	ahrs_algorithm = AHRSSETTINGS_ALGORITHM_SIMPLE;
 
 	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
@@ -245,6 +243,7 @@ int main()
 	}
 /* we didn't connect the callbacks before because we have to wait
 for all data to be up to date before doing anything*/
+	
 	AHRSCalibrationConnectCallback(calibration_callback);
 	GPSPositionConnectCallback(gps_callback);
 	BaroAltitudeConnectCallback(altitude_callback);
@@ -412,7 +411,7 @@ for all data to be up to date before doing anything*/
 			attitude_data.quaternion.q2 = Nav.q[1];
 			attitude_data.quaternion.q3 = Nav.q[2];
 			attitude_data.quaternion.q4 = Nav.q[3];
-		} else if (ahrs_algorithm == SIMPLE_Algo) {
+		} else if (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_SIMPLE) {
 			float q[4];
 			float rpy[3];
 	    /***************** SIMPLE ATTITUDE FROM NORTH AND ACCEL ************/
@@ -728,15 +727,20 @@ void reset_values() {
 void send_attitude(void)
 {
 	AttitudeActualData attitude;
+	AHRSSettingsData settings;
+	AHRSSettingsGet(&settings);
+	
 	attitude.q1 = attitude_data.quaternion.q1;
 	attitude.q2 = attitude_data.quaternion.q2;
 	attitude.q3 = attitude_data.quaternion.q3;
 	attitude.q4 = attitude_data.quaternion.q4;
 	float rpy[3];
 	Quaternion2RPY(&attitude_data.quaternion.q1, rpy);
-	attitude.Roll = rpy[0];
-	attitude.Pitch = rpy[1];
-	attitude.Yaw = rpy[2];
+	attitude.Roll = rpy[0] + settings.RollBias;
+	attitude.Pitch = rpy[1] + settings.PitchBias;
+	attitude.Yaw = rpy[2] + settings.YawBias;
+	if(attitude.Yaw > 360)
+		attitude.Yaw -= 360;
 	AttitudeActualSet(&attitude);
 }
 

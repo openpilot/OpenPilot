@@ -40,7 +40,7 @@
 #include "manualcontrolcommand.h"
 #include "actuatordesired.h"
 #include "attitudedesired.h"
-#include "attitudesettings.h"
+#include "ahrssettings.h"
 
 // Private constants
 #define STACK_SIZE configMINIMAL_STACK_SIZE
@@ -260,12 +260,12 @@ static void manualControlTask(void *parameters)
 		}
 
 		if (cmd.Accessory3 < -.5) {	//TODO: Make what happens here depend on GCS
-			AttitudeSettingsData attitudeSettings;
-			AttitudeSettingsGet(&attitudeSettings);
+			AHRSSettingsData attitudeSettings;
+			AHRSSettingsGet(&attitudeSettings);
 			// Hard coding a maximum bias of 15 for now... maybe mistake
 			attitudeSettings.PitchBias = cmd.Accessory1 * 15;
 			attitudeSettings.RollBias = cmd.Accessory2 * 15;
-			AttitudeSettingsSet(&attitudeSettings);
+			AHRSSettingsSet(&attitudeSettings);
 		} else if (cmd.Accessory3 > .9) {
 			// REALLY don't want to end up here accidentally.  I've also saved by meta for Stabilization setting to be
 			// flight read only by default

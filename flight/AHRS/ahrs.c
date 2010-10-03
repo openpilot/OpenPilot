@@ -576,9 +576,9 @@ void downsample_data()
 	raw.gyros[1] = valid_data_buffer[3];
 	raw.gyros[2] = valid_data_buffer[5];
 
-	raw.gyros_filtered[0] = gyro_data.filtered.x;
-	raw.gyros_filtered[1] = gyro_data.filtered.y;
-	raw.gyros_filtered[2] = gyro_data.filtered.z;
+	raw.gyros_filtered[0] = gyro_data.filtered.x * 180 / M_PI;
+	raw.gyros_filtered[1] = gyro_data.filtered.y * 180 / M_PI;
+	raw.gyros_filtered[2] = gyro_data.filtered.z * 180 / M_PI;
 
 	raw.accels[0] = valid_data_buffer[2];
 	raw.accels[1] = valid_data_buffer[0];

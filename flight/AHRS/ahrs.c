@@ -191,9 +191,10 @@ static uint8_t adc_oversampling = 20;
 /**
  * @brief AHRS Main function
  */
+float mag[3];
 int main()
 {
-	float gyro[3], accel[3], mag[3];
+	float gyro[3], accel[3];
 	float vel[3] = { 0, 0, 0 };
 	gps_data.quality = -1;
 
@@ -228,6 +229,7 @@ int main()
 
 //	lfsm_init();
 	reset_values();
+	INSGPSInit();
 
 	ahrs_state = AHRS_IDLE;
 	AhrsInitComms();
@@ -256,8 +258,6 @@ for all data to be up to date before doing anything*/
 	for (int i = 0; i < adc_oversampling; i++)
 		fir_coeffs[i] = 1;
 	fir_coeffs[adc_oversampling] = adc_oversampling;
-
-	INSGPSInit();
 
 #ifdef DUMP_RAW
 	int previous_conversion;
@@ -389,8 +389,6 @@ for all data to be up to date before doing anything*/
 				mag_data.updated = 0;
 			} else if (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR
 				   && mag_data.updated == 1) {
-				float mag_var[3] = {mag_data.calibration.variance[1], mag_data.calibration.variance[0], mag_data.calibration.variance[2]};
-				INSSetMagVar(mag_var);
 				MagCorrection(mag);	// only trust mags if outdoors
 				mag_data.updated = 0;
 			} else {
@@ -400,10 +398,10 @@ for all data to be up to date before doing anything*/
 				vel[1] = 0;
 				vel[2] = 0;
 
-				if((mag_data.updated == 1) && (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
-					float mag_var[3] = {10,10,10};
-					INSSetMagVar(mag_var);
-					MagVelBaroCorrection(mag,vel,altitude_data.altitude);  // only trust mags if outdoors
+				if(/*(mag_data.updated == 1) &&*/ (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
+//					MagVelBaroCorrection(mag,vel,altitude_data.altitude);  // only trust mags if outdoors
+					VelBaroCorrection(vel, altitude_data.altitude);
+					MagCorrection(mag);
 					mag_data.updated = 0;
 				} else {
 					VelBaroCorrection(vel, altitude_data.altitude);
@@ -779,6 +777,10 @@ void calibration_callback(AhrsObjHandle obj)
 			mag_data.calibration.scale[ct] = cal.mag_scale[ct];
 			mag_data.calibration.variance[ct] = cal.mag_var[ct];
 		}
+		float mag_var[3] = {mag_data.calibration.variance[1], mag_data.calibration.variance[0], mag_data.calibration.variance[2]};
+		INSSetMagVar(mag_var);
+		INSSetAccelVar(accel_data.calibration.variance);
+		INSSetGyroVar(gyro_data.calibration.variance);
 	}else if(cal.measure_var == AHRSCALIBRATION_MEASURE_VAR_MEASURE){
 		calibrate_sensors();
 		send_calibration();

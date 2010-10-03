@@ -28,6 +28,7 @@
  */
 #include "importexportgadgetwidget.h"
 #include "ui_importexportgadgetwidget.h"
+#include "xmlconfig.h"
 #include "coreplugin/uavgadgetinstancemanager.h"
 #include "coreplugin/icore.h"
 #include <QtDebug>
@@ -75,6 +76,20 @@ void ImportExportGadgetWidget::on_exportButton_clicked()
     QString file = ui->configFile->text();
     qDebug() << "Export pressed! Write to file " << QFileInfo(file).absoluteFilePath();
 
+    if ( QFileInfo(file).exists() ){
+        QMessageBox msgBox;
+        msgBox.setText(tr("File already exists."));
+        msgBox.setInformativeText(tr("Do you want to overwrite the existing file?"));
+        msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        if ( msgBox.exec() == QMessageBox::Ok ){
+            QFileInfo(file).absoluteDir().remove(QFileInfo(file).fileName());
+        }
+        else{
+            qDebug() << "Export canceled!";
+            return;
+        }
+    }
     QMessageBox msgBox;
     QDir dir = QFileInfo(file).absoluteDir();
     if (! dir.exists()) {
@@ -96,8 +111,19 @@ void ImportExportGadgetWidget::exportConfiguration(const QString& fileName)
 {
     bool general = ui->checkBoxGeneral->isChecked();
     bool allGadgets = ui->checkBoxAllGadgets->isChecked();
+    QSettings::Format format;
+    if ( ui->radioButtonIniFormat->isChecked() ){
+        format = QSettings::IniFormat;
+    }
+    else if ( ui->radioButtonXmlFormat->isChecked() ){
+        format = XmlConfig::XmlSettingsFormat;
+    }
+    else {
+        qWarning() << "Program Error in ImportExportGadgetWidget::exportConfiguration: unknown format. Assume XML!";
+        format = XmlConfig::XmlSettingsFormat;
+    }
 
-    QSettings qs(fileName, QSettings::IniFormat);
+    QSettings qs(fileName, format);
 
     if (general) {
         Core::ICore::instance()->saveMainSettings(&qs);
@@ -137,8 +163,19 @@ void ImportExportGadgetWidget::importConfiguration(const QString& fileName)
 {
     bool general = ui->checkBoxGeneral->isChecked();
     bool allGadgets = ui->checkBoxAllGadgets->isChecked();
+    QSettings::Format format;
+    if ( ui->radioButtonIniFormat->isChecked() ){
+        format = QSettings::IniFormat;
+    }
+    else if ( ui->radioButtonXmlFormat->isChecked() ){
+        format = XmlConfig::XmlSettingsFormat;
+    }
+    else {
+        qWarning() << "Program Error in ImportExportGadgetWidget::exportConfiguration: unknown format. Assume XML!";
+        format = XmlConfig::XmlSettingsFormat;
+    }
 
-    QSettings qs(fileName, QSettings::defaultFormat());
+    QSettings qs(fileName, format);
 
     if (allGadgets) {
         Core::ICore::instance()->uavGadgetInstanceManager()->readConfigurations(&qs);

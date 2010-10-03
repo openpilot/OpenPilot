@@ -23,33 +23,35 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef IMPORTEXPORTDIALOG_H
-#define IMPORTEXPORTDIALOG_H
+#ifndef XMLCONFIG_H
+#define XMLCONFIG_H
 
-#include <QDialog>
-#include "importexportgadgetconfiguration.h"
+#include "importexport_global.h"
 
-namespace Ui {
-    class ImportExportDialog;
-}
+#include <QSettings>
+#include <QDomElement>
+#include <QObject>
 
-class ImportExportDialog : public QDialog
+class IMPORTEXPORT_EXPORT XmlConfig : QObject
 {
-    Q_OBJECT
 
 public:
-    explicit ImportExportDialog( ImportExportGadgetConfiguration *config, QWidget *parent = 0);
-    ~ImportExportDialog();
+    static const QSettings::Format XmlSettingsFormat;
 
-protected:
-    void changeEvent(QEvent *e);
+    static bool readXmlFile(QIODevice &device, QSettings::SettingsMap &map);
+    static bool writeXmlFile(QIODevice &device, const QSettings::SettingsMap &map);
 
 private:
-    Ui::ImportExportDialog *ui;
+    static QString rootName;
+
+    static void handleNode(QDomElement* node, QSettings::SettingsMap &map, QString path = "");
+    static QSettings::SettingsMap settingsToMap(QSettings& qs);
+    static QString variantToString(const QVariant &v);
+    static QVariant stringToVariant(const QString &s);
+    static QStringList splitArgs(const QString &s, int idx);
 };
 
-#endif // IMPORTEXPORTDIALOG_H
-
+#endif // XMLCONFIG_H
 /**
  * @}
  * @}

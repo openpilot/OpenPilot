@@ -27,7 +27,7 @@ typedef enum { COMMS_NULL, COMMS_OBJECT, COMMS_PROGRAM } COMMSCOMMAND;
 
 //The maximum number of objects that can be updated in one cycle.
 //Currently the link is capable of sending 3 packets per cycle but 2 is enough
-#define MAX_UPDATE_OBJECTS 3
+#define MAX_UPDATE_OBJECTS 2
 
 //Number of transmissions + 1 before we expect to see the data acknowledge
 //This is controlled by the SPI hardware.
@@ -65,14 +65,14 @@ static void SendPacket(void);
 static void AhrsUpdatedCb(AhrsObjHandle handle);
 #endif
 
-/** Transmit data buffer
-*/
-static CommsDataPacket txPacket;
-
 /** Receive data buffer
 */
 static CommsDataPacket rxPacket;
 
+/** Transmit data buffer
+*/
+
+static CommsDataPacket txPacket;
 /** Objects that have changed and so should be transmitted
 */
 static unsigned int dirtyObjects[MAX_AHRS_OBJECTS];
@@ -115,7 +115,7 @@ void AhrsInitComms(void)
 #ifdef IN_AHRS
 	PIOS_SPI_Init();
 #else
-	PIOS_SPI_SetClockSpeed(PIOS_OPAHRS_SPI, PIOS_SPI_PRESCALER_8);	//72MHz/16 = 4.5MHz
+	PIOS_SPI_SetClockSpeed(PIOS_OPAHRS_SPI, PIOS_SPI_PRESCALER_8);	//36MHz/16 = 2.25MHz
 	for (int ct = 0; ct < MAX_AHRS_OBJECTS; ct++) {
 		AhrsObjHandle hdl = AhrsFromIndex(ct);
 		if (hdl) {
@@ -158,7 +158,6 @@ void SetObjectDirty(const int idx)
 	}
 	dirtyObjects[idx] = ACK_LATENCY;
 }
-
 /** Work out what data needs to be sent.
 	If an object was not sent it will be retried 4 frames later
 */
@@ -177,8 +176,8 @@ void FillObjectPacket()
 					AhrsObjHandle hdl = AhrsFromIndex(idx);
 					if (hdl) {
 						memcpy(&txPacket.objects[ct].object, hdl->data, hdl->size);
+						break;
 					}
-					break;
 				} else {
 					dirtyObjects[idx]--;
 					if (dirtyObjects[idx] == 0) {	//timed out
@@ -186,6 +185,15 @@ void FillObjectPacket()
 						txPacket.status.retries++;
 					}
 				}
+			}
+		}
+	}
+	for (; idx < MAX_AHRS_OBJECTS; idx++) {
+		if (dirtyObjects[idx] > 0 && dirtyObjects[idx] != ACK_LATENCY) {
+			dirtyObjects[idx]--;
+			if (dirtyObjects[idx] == 0) {	//timed out
+				dirtyObjects[idx] = ACK_LATENCY;
+				txPacket.status.retries++;
 			}
 		}
 	}
@@ -277,6 +285,8 @@ void CommsCallback(uint8_t crc_ok, uint8_t crc_val)
 	if (rxPacket.magicNumber != RXMAGIC) {
 		crc_ok = false;
 	}
+
+
 	rxPacket.magicNumber = 0;
 	if (crc_ok) {
 		if (!linkOk && okCount > 0) {

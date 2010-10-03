@@ -368,10 +368,6 @@ void ConfigAHRSWidget::attitudeRawUpdated(UAVObject * obj)
             saveAHRSCalibration(); // Saves the result to SD.
 
             /* Cleanup original settings */
-            obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
-            obj->getField(QString("UpdateRaw"))->setValue(initialUpdateRaw);
-            obj->getField(QString("UpdateFiltered"))->setValue(initialUpdateFiltered);
-            obj->updated();
             getObjectManager()->getObject(QString("AttitudeRaw"))->setMetadata(initialMdata);
         }
     }
@@ -596,21 +592,12 @@ void ConfigAHRSWidget::sixPointCalibrationMode()
     gyro_accum_y.clear();
     gyro_accum_z.clear();
 
-    /* Make sure we get AttitudeRaw updates, and skip AttitudeActual (for speed) */
-    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
-    field = obj->getField(QString("UpdateRaw"));
-    initialUpdateRaw = field->getValue().toString();
-    field->setValue("TRUE");
-    field = obj->getField(QString("UpdateFiltered"));
-    initialUpdateFiltered = field->getValue().toString();
-    field->setValue("FALSE");
-    obj->updated();
-
     /* Need to get as many AttitudeRaw updates as possible */
     obj = getObjectManager()->getObject(QString("AttitudeRaw"));
     initialMdata = obj->getMetadata();
     UAVObject::Metadata mdata = initialMdata;
-    mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+    mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+    mdata.flightTelemetryUpdatePeriod = 20;
     obj->setMetadata(mdata);
 
     /* Show instructions and enable controls */

@@ -92,8 +92,6 @@ private:
     int position;
 
     UAVObject::Metadata initialMdata;
-    QString initialUpdateRaw;
-    QString initialUpdateFiltered;
 
     double listMean(QList<double> list);
 

@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="400"
+   height="400"
+   id="svg2816"
+   version="1.1"
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="ccpm_setup.svg">
+  <defs
+     id="defs2818">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 200 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="400 : 200 : 1"
+       inkscape:persp3d-origin="200 : 133.33333 : 1"
+       id="perspective2854" />
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#000000"
+     bordercolor="#000000"
+     borderopacity="1.0"
+     inkscape:pageopacity="1.0"
+     inkscape:pageshadow="0"
+     inkscape:zoom="1.8725"
+     inkscape:cx="121.49533"
+     inkscape:cy="328.17089"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer3"
+     id="namedview2820"
+     showgrid="false"
+     showguides="true"
+     inkscape:snap-global="true"
+     inkscape:window-width="1680"
+     inkscape:window-height="994"
+     inkscape:window-x="-4"
+     inkscape:window-y="-4"
+     inkscape:window-maximized="1"
+     inkscape:guide-bbox="true">
+    <sodipodi:guide
+       position="0,0"
+       orientation="0,744.09448"
+       id="guide2827" />
+    <sodipodi:guide
+       position="744.09448,0"
+       orientation="-1052.3622,0"
+       id="guide2829" />
+    <sodipodi:guide
+       position="744.09448,1052.3622"
+       orientation="0,-744.09448"
+       id="guide2831" />
+    <sodipodi:guide
+       position="0,1052.3622"
+       orientation="1052.3622,0"
+       id="guide2833" />
+    <sodipodi:guide
+       position="0,0"
+       orientation="0,400"
+       id="guide2835" />
+    <sodipodi:guide
+       position="400,0"
+       orientation="-400,0"
+       id="guide2837" />
+    <sodipodi:guide
+       position="400,400"
+       orientation="0,-400"
+       id="guide2839" />
+    <sodipodi:guide
+       position="0,400"
+       orientation="400,0"
+       id="guide2841" />
+    <inkscape:grid
+       type="xygrid"
+       id="grid2843"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata2822">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="SwashPlate"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-652.36218)"
+     style="display:inline" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Rotor"
+     style="display:inline">
+    <g
+       id="Swashplate"
+       inkscape:label="#g4001">
+      <g
+         id="g4008">
+        <path
+           transform="matrix(0.99009901,0,0,0.99009901,-198.0198,201.9802)"
+           sodipodi:type="arc"
+           style="fill:#00003d;fill-opacity:1;stroke:#0000ff;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+           id="Ring"
+           sodipodi:cx="200"
+           sodipodi:cy="200"
+           sodipodi:rx="200"
+           sodipodi:ry="200"
+           d="m 400,200 a 200,200 0 1 1 -400,0 200,200 0 1 1 400,0 z"
+           inkscape:label="#path2847" />
+        <path
+           sodipodi:type="arc"
+           style="color:#000000;fill:#9796ab;fill-opacity:0.80813958;fill-rule:evenodd;stroke:#b5b5bb;stroke-width:2.37170815;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+           id="Rotor"
+           sodipodi:cx="220"
+           sodipodi:cy="207.5"
+           sodipodi:rx="45"
+           sodipodi:ry="12.5"
+           d="m 265,207.5 a 45,12.5 0 1 1 -90,0 45,12.5 0 1 1 90,0 z"
+           transform="matrix(0.52910053,0,0,1.9047619,-116.40212,4.7619059)"
+           inkscape:label="#path3622" />
+      </g>
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="ServoWlayer"
+     style="display:inline">
+    <path
+       sodipodi:type="arc"
+       style="color:#000000;fill:#d86415;fill-opacity:1;fill-rule:evenodd;stroke:#00ff00;stroke-width:1.0002594;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="ServoW"
+       sodipodi:cx="0"
+       sodipodi:cy="397.5"
+       sodipodi:rx="10"
+       sodipodi:ry="7.5"
+       d="m 10,397.5 a 10,7.5 0 1 1 -20,0 10,7.5 0 1 1 20,0 z"
+       transform="matrix(0.94540297,0,0,1.2605373,140.4225,-455.65278)"
+       inkscape:label="#path3635" />
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-weight:normal;fill:#1f5f00;fill-opacity:1;stroke:#00ff00;stroke-width:0.5;stroke-miterlimit:0.1;stroke-opacity:1;stroke-dasharray:none;font-family:Bitstream Vera Sans"
+       x="158"
+       y="41"
+       id="ServoWtext"
+       inkscape:label="#text3637"><tspan
+         sodipodi:role="line"
+         id="tspan3639"
+         x="158"
+         y="41">ServoW</tspan></text>
+  </g>
+  <g
+     style="display:inline"
+     inkscape:label="ServoXlayer"
+     id="g3925"
+     inkscape:groupmode="layer">
+    <path
+       transform="matrix(0.94540297,0,0,1.2605373,142.4225,-424.81942)"
+       d="m 10,397.5 a 10,7.5 0 1 1 -20,0 10,7.5 0 1 1 20,0 z"
+       sodipodi:ry="7.5"
+       sodipodi:rx="10"
+       sodipodi:cy="397.5"
+       sodipodi:cx="0"
+       id="ServoX"
+       style="color:#000000;fill:#d89615;fill-opacity:1;fill-rule:evenodd;stroke:#00ff00;stroke-width:1.0002594;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       sodipodi:type="arc"
+       inkscape:label="#path3927" />
+    <text
+       id="ServoXtext"
+       y="75.666656"
+       x="158"
+       style="font-size:16px;font-style:normal;font-weight:normal;fill:#1f5f00;fill-opacity:1;stroke:#00ff00;stroke-width:0.5;stroke-miterlimit:0.1;stroke-opacity:1;stroke-dasharray:none;font-family:Bitstream Vera Sans"
+       xml:space="preserve"
+       inkscape:label="#text3929"><tspan
+         y="75.666656"
+         x="158"
+         id="tspan3931"
+         sodipodi:role="line">ServoX</tspan></text>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="g3943"
+     inkscape:label="ServoYlayer"
+     style="display:inline">
+    <path
+       sodipodi:type="arc"
+       style="color:#000000;fill:#d8c815;fill-opacity:1;fill-rule:evenodd;stroke:#00ff00;stroke-width:1.0002594;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="ServoY"
+       sodipodi:cx="0"
+       sodipodi:cy="397.5"
+       sodipodi:rx="10"
+       sodipodi:ry="7.5"
+       d="m 10,397.5 a 10,7.5 0 1 1 -20,0 10,7.5 0 1 1 20,0 z"
+       transform="matrix(0.94540298,0,0,1.2605373,142.4225,-390.15277)"
+       inkscape:label="#path3947" />
+    <text
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-weight:normal;fill:#1f5f00;fill-opacity:1;stroke:#00ff00;stroke-width:0.5;stroke-miterlimit:0.1;stroke-opacity:1;stroke-dasharray:none;font-family:Bitstream Vera Sans"
+       x="158"
+       y="110.33333"
+       id="ServoYtext"
+       inkscape:label="#text3949"><tspan
+         sodipodi:role="line"
+         id="tspan3951"
+         x="158"
+         y="110.33333">ServoY</tspan></text>
+  </g>
+  <g
+     style="display:inline"
+     inkscape:label="ServoZlayer"
+     id="g3953"
+     inkscape:groupmode="layer">
+    <path
+       transform="matrix(0.94540298,0,0,1.2605373,142.4225,-355.4861)"
+       d="m 10,397.5 a 10,7.5 0 1 1 -20,0 10,7.5 0 1 1 20,0 z"
+       sodipodi:ry="7.5"
+       sodipodi:rx="10"
+       sodipodi:cy="397.5"
+       sodipodi:cx="0"
+       id="ServoZ"
+       style="color:#000000;fill:#d8f915;fill-opacity:1;fill-rule:evenodd;stroke:#00ff00;stroke-width:1.0002594;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       sodipodi:type="arc"
+       inkscape:label="#path3957" />
+    <text
+       id="ServoZtext"
+       y="145"
+       x="158"
+       style="font-size:16px;font-style:normal;font-weight:normal;fill:#1f5f00;fill-opacity:1;stroke:#00ff00;stroke-width:0.5;stroke-miterlimit:0.1;stroke-opacity:1;stroke-dasharray:none;font-family:Bitstream Vera Sans"
+       xml:space="preserve"
+       inkscape:label="#text3959"><tspan
+         id="tspan3963"
+         y="145"
+         x="158"
+         sodipodi:role="line">ServoZ</tspan><tspan
+         id="tspan3967"
+         y="165"
+         x="158"
+         sodipodi:role="line" /></text>
+    <path
+       style="fill:#ff6e00;stroke:#ff6e00;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
+       d="M 185.60761,186.1126 150.1962,151.94369"
+       id="RadialZ"
+       inkscape:connector-type="polyline"
+       inkscape:connection-start="#path3622"
+       inkscape:connection-end="#path3957"
+       inkscape:label="#path3981" />
+  </g>
+</svg>

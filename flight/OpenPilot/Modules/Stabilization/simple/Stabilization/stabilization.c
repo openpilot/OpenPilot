@@ -158,7 +158,11 @@ static void stabilizationTask(void* parameters)
 		    ( systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_HELICP))
 		{
 			if(stabSettings.YawMode == STABILIZATIONSETTINGS_YAWMODE_RATE) {  // rate stabilization on yaw
-				yawChange = (attitudeActual.Yaw - yawPrevious) / dT;
+				// Avoid a huge (wrong) change if we crossed 0/360
+				yawChange = attitudeActual.Yaw - yawPrevious;
+				if (yawChange>180.0) yawChange -= 360;
+				if (yawChange<-180.0) yawChange += 360;
+				yawChange = yawChange / dT;
 				yawPrevious = attitudeActual.Yaw;
 				yawError = bound(attitudeDesired.Yaw, -stabSettings.YawMax, stabSettings.YawMax) - yawChange;
 			} else { // heading stabilization

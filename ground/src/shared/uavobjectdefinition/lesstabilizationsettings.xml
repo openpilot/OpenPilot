@@ -1,0 +1,24 @@
+<xml>
+	<object name="LesStabilizationSettings" singleinstance="true" settings="true">
+        <description>PID settings used by the Stabilization module to combine the @ref AttitudeActual and @ref AttitudeDesired to compute @ref ActuatorDesired</description>
+        <field name="UpdatePeriod" units="ms" type="uint8" elements="1" defaultvalue="10"/>
+        <field name="RollMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>
+        <field name="PitchMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>
+        <field name="YawMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>
+        <field name="YawMode" units="" type="enum" elements="1" options="rate,heading" defaultvalue="rate"/>
+        <field name="ManualYawRate" units="Degrees/sec" type="float" elements="1" defaultvalue="200"/>
+        <field name="MaximumRate" units="Degrees/sec" type="float" elements="3" elementnames="Roll,Pitch,Yaw" defaultvalue="300"/>
+
+        <field name="RollRateP" units="" type="float" elements="1" defaultvalue="0.0015"/>
+        <field name="PitchRateP" units="" type="float" elements="1" defaultvalue="0.0015"/>
+        <field name="YawRatePI" units="" type="float" elements="2" elementnames="Kp,Ki,ILimit" defaultvalue="0.003"/>
+        <field name="RollPI" units="" type="float" elements="4" elementnames="Kp,Ki,ILimit" defaultvalue="0"/>
+        <field name="PitchPI" units="" type="float" elements="4" elementnames="Kp,Ki,ILimit" defaultvalue="0"/>
+        <field name="YawPI" units="" type="float" elements="4" elementnames="Kp,Ki,ILimit" defaultvalue="0"/>
+
+		<access gcs="readwrite" flight="readwrite"/>
+		<telemetrygcs acked="true" updatemode="onchange" period="0"/>
+		<telemetryflight acked="true" updatemode="onchange" period="0"/>
+		<logging updatemode="never" period="0"/>
+	</object>
+</xml>

@@ -40,12 +40,15 @@ HEADERS += uavobjects_global.h \
     positionactual.h \
     flightbatterystate.h \
     homelocation.h \
+    vtolsettings.h \
     mixersettings.h \
     mixerstatus.h \
     velocitydesired.h \
     velocityactual.h \
     guidancesettings.h \
-    positiondesired.h
+    positiondesired.h \
+    attitudesettings.h \
+    lesstabilizationsettings.h
 
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
@@ -83,10 +86,13 @@ SOURCES += uavobject.cpp \
     positionactual.cpp \
     flightbatterystate.cpp \
     homelocation.cpp \
+    vtolsettings.cpp \
     mixersettings.cpp \
     mixerstatus.cpp \
     velocitydesired.cpp \
     velocityactual.cpp \
     guidancesettings.cpp \
-    positiondesired.cpp
+    positiondesired.cpp \
+    attitudesettings.cpp \
+    lesstabilizationsettings.cpp
 OTHER_FILES += UAVObjects.pluginspec

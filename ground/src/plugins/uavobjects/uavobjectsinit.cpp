@@ -51,6 +51,7 @@
 #include "gpstime.h"
 #include "guidancesettings.h"
 #include "homelocation.h"
+#include "lesstabilizationsettings.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
 #include "mixersettings.h"
@@ -94,6 +95,7 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new GPSTime() );
     objMngr->registerObject( new GuidanceSettings() );
     objMngr->registerObject( new HomeLocation() );
+    objMngr->registerObject( new LesStabilizationSettings() );
     objMngr->registerObject( new ManualControlCommand() );
     objMngr->registerObject( new ManualControlSettings() );
     objMngr->registerObject( new MixerSettings() );

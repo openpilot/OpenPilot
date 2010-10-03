@@ -159,6 +159,7 @@ void calibrate_sensors(void);
 void reset_values();
 void send_calibration(void);
 void send_attitude(void);
+void homelocation_callback(AhrsObjHandle obj);
 void altitude_callback(AhrsObjHandle obj);
 void calibration_callback(AhrsObjHandle obj);
 void gps_callback(AhrsObjHandle obj);
@@ -246,6 +247,7 @@ for all data to be up to date before doing anything*/
 	GPSPositionConnectCallback(gps_callback);
 	BaroAltitudeConnectCallback(altitude_callback);
 	AHRSSettingsConnectCallback(settings_callback);
+	HomeLocationConnectCallback(homelocation_callback);
 
 	calibration_callback(AHRSCalibrationHandle()); //force an update
 
@@ -842,6 +844,13 @@ void settings_callback(AhrsObjHandle obj)
 		fir_coeffs[adc_oversampling] = adc_oversampling;
 		
 	}
+}
+
+void homelocation_callback(AhrsObjHandle obj) 
+{
+	HomeLocationData data;
+	HomeLocationGet(&data);
+	INSSetMagNorth(data.Be);
 }
 
 

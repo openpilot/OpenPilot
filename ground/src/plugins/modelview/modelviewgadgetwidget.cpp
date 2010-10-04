@@ -101,6 +101,7 @@ void ModelViewGadgetWidget::initializeGL()
     glEnable(GL_MULTISAMPLE);
 
     m_MotionTimer.start(100);
+    setFocusPolicy(Qt::StrongFocus); // keyboard capture for camera switching
 }
 
 void ModelViewGadgetWidget::paintGL()
@@ -217,6 +218,65 @@ void ModelViewGadgetWidget::mouseReleaseEvent(QMouseEvent*)
         updateGL();
 }
 
+void ModelViewGadgetWidget::keyPressEvent(QKeyEvent * e) // switch between camera
+{
+    if (e->key() == Qt::Key_1)
+    {
+        m_GlView.cameraHandle()->setIsoView();
+        updateGL();
+    }
+    if (e->key() == Qt::Key_2)
+    {
+        m_GlView.cameraHandle()->setFrontView();
+        updateGL();
+    }
+    if (e->key() == Qt::Key_3)
+    {
+        m_GlView.cameraHandle()->setIsoView();
+        m_GlView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS,glc::toRadian(90));
+        updateGL();
+    }
+    if (e->key() == Qt::Key_4)
+    {
+        m_GlView.cameraHandle()->setLeftView();
+        updateGL();
+    }
+    if (e->key() == Qt::Key_5)
+    {
+        m_GlView.cameraHandle()->setTopView();
+        m_GlView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS,glc::toRadian(180));
+        updateGL();
+    }
+    if (e->key() == Qt::Key_6)
+    {
+        m_GlView.cameraHandle()->setRightView();;
+        updateGL();
+    }
+    if (e->key() == Qt::Key_7)
+    {
+        m_GlView.cameraHandle()->setIsoView();
+        m_GlView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS,glc::toRadian(-90));
+        updateGL();
+    }
+    if (e->key() == Qt::Key_8)
+    {
+        m_GlView.cameraHandle()->setRearView();;
+        updateGL();
+    }
+    if (e->key() == Qt::Key_9)
+    {
+        m_GlView.cameraHandle()->setIsoView();
+        m_GlView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS,glc::toRadian(180));
+        updateGL();
+    }
+    if (e->key() == Qt::Key_0)
+    {
+        m_GlView.cameraHandle()->setBottomView();
+        m_GlView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS,glc::toRadian(180));
+        updateGL();
+    }
+}
+
 //////////////////////////////////////////////////////////////////////
 // Private slots Functions
 //////////////////////////////////////////////////////////////////////
@@ -225,9 +285,9 @@ void ModelViewGadgetWidget::updateAttitude()
     AttitudeActual::DataFields data = attActual->getData();
     GLC_StructOccurence* rootObject= m_World.rootOccurence();
     GLC_Matrix4x4 rootObjectPosition(0, 0, 0); // will be changed when the acceleration movement is tested
-    double pitch= glc::toRadian(data.Pitch);
+    double pitch= glc::toRadian(-data.Pitch);
     double roll= glc::toRadian(data.Roll);
-    double yaw= glc::toRadian(data.Yaw);
+    double yaw= glc::toRadian(-data.Yaw);
     GLC_Matrix4x4 rootObjectRotation(GLC_Matrix4x4().fromEuler(pitch, roll, yaw));
     rootObject->structInstance()->setMatrix(rootObjectPosition * rootObjectRotation);
     rootObject->updateChildrenAbsoluteMatrix();

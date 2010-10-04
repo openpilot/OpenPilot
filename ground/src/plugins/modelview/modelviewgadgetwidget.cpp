@@ -51,9 +51,8 @@ ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent)
     m_Light.setPosition(4000.0, 40000.0, 80000.0);
     m_Light.setAmbientColor(Qt::lightGray);
 
-    m_GlView.cameraHandle()->setDefaultUpVector(glc::Y_AXIS);
-    m_GlView.cameraHandle()->setRightView();
-    //m_GlView.cameraHandle()->setIsoView();
+    m_GlView.cameraHandle()->setDefaultUpVector(glc::Z_AXIS);
+    m_GlView.cameraHandle()->setFrontView();
 
     QColor repColor;
     repColor.setRgbF(1.0, 0.11372, 0.11372, 0.0);
@@ -223,16 +222,15 @@ void ModelViewGadgetWidget::mouseReleaseEvent(QMouseEvent*)
 //////////////////////////////////////////////////////////////////////
 void ModelViewGadgetWidget::updateAttitude()
 {
-    // Reset view to zero angles
-    // NOTE: Some aircraft 3D models have different orientation and axis
-    m_GlView.cameraHandle()->setTopView();
-    m_GlView.cameraHandle()->rotateAroundTarget(glc::X_AXIS, 180.0*glc::PI/180.0);
-    m_GlView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS, 90.0*glc::PI/180.0);
-    // Rotate to the actual angles (if a gimbal lock at yaw 90/270 deg, change sequence of rotations)
     AttitudeActual::DataFields data = attActual->getData();
-    m_GlView.cameraHandle()->rotateAroundTarget(glc::Z_AXIS, data.Yaw*glc::PI/180.0);
-    m_GlView.cameraHandle()->rotateAroundTarget(glc::Y_AXIS, data.Roll*glc::PI/180.0);
-    m_GlView.cameraHandle()->rotateAroundTarget(glc::X_AXIS, data.Pitch*glc::PI/180.0);
+    GLC_StructOccurence* rootObject= m_World.rootOccurence();
+    GLC_Matrix4x4 rootObjectPosition(0, 0, 0); // will be changed when the acceleration movement is tested
+    double pitch= glc::toRadian(data.Pitch);
+    double roll= glc::toRadian(data.Roll);
+    double yaw= glc::toRadian(data.Yaw);
+    GLC_Matrix4x4 rootObjectRotation(GLC_Matrix4x4().fromEuler(pitch, roll, yaw));
+    rootObject->structInstance()->setMatrix(rootObjectPosition * rootObjectRotation);
+    rootObject->updateChildrenAbsoluteMatrix();
     updateGL();
 }
 

@@ -115,6 +115,21 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
+		'StabilizationSettings',
+		'b',
+		3,
+		[
+			'Roll',
+			'Pitch',
+			'Yaw',
+		],
+		{
+			'0' : 'None',
+			'1' : 'Rate',
+			'2' : 'Position',
+		}
+	),
+	uavobject.UAVObjectField(
 		'Accessory1',
 		'f',
 		1,
@@ -166,7 +181,7 @@ _fields = [ \
 
 class ManualControlCommand(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 9594768
+    OBJID        = 2841592332
     NAME         = "ManualControlCommand"
     METANAME     = "ManualControlCommandMeta"
     ISSINGLEINST = 1

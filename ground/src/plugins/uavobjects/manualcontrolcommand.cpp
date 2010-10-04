@@ -73,6 +73,15 @@ ManualControlCommand::ManualControlCommand(): UAVDataObject(OBJID, ISSINGLEINST,
     FlightModeEnumOptions.append("Stabilized");
     FlightModeEnumOptions.append("Auto");
     fields.append( new UAVObjectField(QString("FlightMode"), QString(""), UAVObjectField::ENUM, FlightModeElemNames, FlightModeEnumOptions) );
+    QStringList StabilizationSettingsElemNames;
+    StabilizationSettingsElemNames.append("Roll");
+    StabilizationSettingsElemNames.append("Pitch");
+    StabilizationSettingsElemNames.append("Yaw");
+    QStringList StabilizationSettingsEnumOptions;
+    StabilizationSettingsEnumOptions.append("None");
+    StabilizationSettingsEnumOptions.append("Rate");
+    StabilizationSettingsEnumOptions.append("Position");
+    fields.append( new UAVObjectField(QString("StabilizationSettings"), QString(""), UAVObjectField::ENUM, StabilizationSettingsElemNames, StabilizationSettingsEnumOptions) );
     QStringList Accessory1ElemNames;
     Accessory1ElemNames.append("0");
     fields.append( new UAVObjectField(QString("Accessory1"), QString("%"), UAVObjectField::FLOAT32, Accessory1ElemNames, QStringList()) );

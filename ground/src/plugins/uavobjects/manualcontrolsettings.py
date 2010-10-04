@@ -203,6 +203,90 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
+		'Pos1StabilizationSettings',
+		'b',
+		3,
+		[
+			'Roll',
+			'Pitch',
+			'Yaw',
+		],
+		{
+			'0' : 'None',
+			'1' : 'Rate',
+			'2' : 'Position',
+		}
+	),
+	uavobject.UAVObjectField(
+		'Pos2StabilizationSettings',
+		'b',
+		3,
+		[
+			'Roll',
+			'Pitch',
+			'Yaw',
+		],
+		{
+			'0' : 'None',
+			'1' : 'Rate',
+			'2' : 'Position',
+		}
+	),
+	uavobject.UAVObjectField(
+		'Pos3StabilizationSettings',
+		'b',
+		3,
+		[
+			'Roll',
+			'Pitch',
+			'Yaw',
+		],
+		{
+			'0' : 'None',
+			'1' : 'Rate',
+			'2' : 'Position',
+		}
+	),
+	uavobject.UAVObjectField(
+		'Pos1FlightMode',
+		'b',
+		1,
+		[
+			'0',
+		],
+		{
+			'0' : 'Manual',
+			'1' : 'Stabilized',
+			'2' : 'Auto',
+		}
+	),
+	uavobject.UAVObjectField(
+		'Pos2FlightMode',
+		'b',
+		1,
+		[
+			'0',
+		],
+		{
+			'0' : 'Manual',
+			'1' : 'Stabilized',
+			'2' : 'Auto',
+		}
+	),
+	uavobject.UAVObjectField(
+		'Pos3FlightMode',
+		'b',
+		1,
+		[
+			'0',
+		],
+		{
+			'0' : 'Manual',
+			'1' : 'Stabilized',
+			'2' : 'Auto',
+		}
+	),
+	uavobject.UAVObjectField(
 		'ChannelMax',
 		'h',
 		8,
@@ -258,7 +342,7 @@ _fields = [ \
 
 class ManualControlSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 1845767664
+    OBJID        = 3505967188
     NAME         = "ManualControlSettings"
     METANAME     = "ManualControlSettingsMeta"
     ISSINGLEINST = 1

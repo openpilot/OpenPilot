@@ -8,6 +8,7 @@
         <field name="Yaw" units="%" type="float" elements="1"/>
         <field name="Throttle" units="%" type="float" elements="1"/>
         <field name="FlightMode" units="" type="enum" elements="1" options="Manual,Stabilized,Auto"/>
+        <field name="StabilizationSettings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Position"/>
         <field name="Accessory1" units="%" type="float" elements="1"/>
         <field name="Accessory2" units="%" type="float" elements="1"/>
         <field name="Accessory3" units="%" type="float" elements="1"/>

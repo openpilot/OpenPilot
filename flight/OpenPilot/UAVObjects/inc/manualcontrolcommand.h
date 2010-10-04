@@ -41,7 +41,7 @@
 #define MANUALCONTROLCOMMAND_H
 
 // Object constants
-#define MANUALCONTROLCOMMAND_OBJID 9594768U
+#define MANUALCONTROLCOMMAND_OBJID 2841592332U
 #define MANUALCONTROLCOMMAND_NAME "ManualControlCommand"
 #define MANUALCONTROLCOMMAND_METANAME "ManualControlCommandMeta"
 #define MANUALCONTROLCOMMAND_ISSINGLEINST 1
@@ -78,6 +78,7 @@ typedef struct {
     float Yaw;
     float Throttle;
     uint8_t FlightMode;
+    uint8_t StabilizationSettings[3];
     float Accessory1;
     float Accessory2;
     float Accessory3;
@@ -99,6 +100,13 @@ typedef enum { MANUALCONTROLCOMMAND_ARMED_FALSE=0, MANUALCONTROLCOMMAND_ARMED_TR
 // Field FlightMode information
 /* Enumeration options for field FlightMode */
 typedef enum { MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL=0, MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED=1, MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO=2 } ManualControlCommandFlightModeOptions;
+// Field StabilizationSettings information
+/* Enumeration options for field StabilizationSettings */
+typedef enum { MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE=0, MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE=1, MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_POSITION=2 } ManualControlCommandStabilizationSettingsOptions;
+/* Array element names for field StabilizationSettings */
+typedef enum { MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ROLL=0, MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_PITCH=1, MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_YAW=2 } ManualControlCommandStabilizationSettingsElem;
+/* Number of elements for field StabilizationSettings */
+#define MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NUMELEM 3
 // Field Accessory1 information
 // Field Accessory2 information
 // Field Accessory3 information

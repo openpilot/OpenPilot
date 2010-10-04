@@ -41,7 +41,7 @@
 #define MANUALCONTROLSETTINGS_H
 
 // Object constants
-#define MANUALCONTROLSETTINGS_OBJID 1845767664U
+#define MANUALCONTROLSETTINGS_OBJID 3505967188U
 #define MANUALCONTROLSETTINGS_NAME "ManualControlSettings"
 #define MANUALCONTROLSETTINGS_METANAME "ManualControlSettingsMeta"
 #define MANUALCONTROLSETTINGS_ISSINGLEINST 1
@@ -80,6 +80,12 @@ typedef struct {
     uint8_t Accessory1;
     uint8_t Accessory2;
     uint8_t Accessory3;
+    uint8_t Pos1StabilizationSettings[3];
+    uint8_t Pos2StabilizationSettings[3];
+    uint8_t Pos3StabilizationSettings[3];
+    uint8_t Pos1FlightMode;
+    uint8_t Pos2FlightMode;
+    uint8_t Pos3FlightMode;
     int16_t ChannelMax[8];
     int16_t ChannelNeutral[8];
     int16_t ChannelMin[8];
@@ -114,6 +120,36 @@ typedef enum { MANUALCONTROLSETTINGS_ACCESSORY2_CHANNEL0=0, MANUALCONTROLSETTING
 // Field Accessory3 information
 /* Enumeration options for field Accessory3 */
 typedef enum { MANUALCONTROLSETTINGS_ACCESSORY3_CHANNEL0=0, MANUALCONTROLSETTINGS_ACCESSORY3_CHANNEL1=1, MANUALCONTROLSETTINGS_ACCESSORY3_CHANNEL2=2, MANUALCONTROLSETTINGS_ACCESSORY3_CHANNEL3=3, MANUALCONTROLSETTINGS_ACCESSORY3_CHANNEL4=4, MANUALCONTROLSETTINGS_ACCESSORY3_CHANNEL5=5, MANUALCONTROLSETTINGS_ACCESSORY3_CHANNEL6=6, MANUALCONTROLSETTINGS_ACCESSORY3_CHANNEL7=7, MANUALCONTROLSETTINGS_ACCESSORY3_NONE=8 } ManualControlSettingsAccessory3Options;
+// Field Pos1StabilizationSettings information
+/* Enumeration options for field Pos1StabilizationSettings */
+typedef enum { MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE=0, MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_RATE=1, MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_POSITION=2 } ManualControlSettingsPos1StabilizationSettingsOptions;
+/* Array element names for field Pos1StabilizationSettings */
+typedef enum { MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_ROLL=0, MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_PITCH=1, MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_YAW=2 } ManualControlSettingsPos1StabilizationSettingsElem;
+/* Number of elements for field Pos1StabilizationSettings */
+#define MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NUMELEM 3
+// Field Pos2StabilizationSettings information
+/* Enumeration options for field Pos2StabilizationSettings */
+typedef enum { MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_NONE=0, MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_RATE=1, MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_POSITION=2 } ManualControlSettingsPos2StabilizationSettingsOptions;
+/* Array element names for field Pos2StabilizationSettings */
+typedef enum { MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_ROLL=0, MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_PITCH=1, MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_YAW=2 } ManualControlSettingsPos2StabilizationSettingsElem;
+/* Number of elements for field Pos2StabilizationSettings */
+#define MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_NUMELEM 3
+// Field Pos3StabilizationSettings information
+/* Enumeration options for field Pos3StabilizationSettings */
+typedef enum { MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_NONE=0, MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_RATE=1, MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_POSITION=2 } ManualControlSettingsPos3StabilizationSettingsOptions;
+/* Array element names for field Pos3StabilizationSettings */
+typedef enum { MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_ROLL=0, MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_PITCH=1, MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_YAW=2 } ManualControlSettingsPos3StabilizationSettingsElem;
+/* Number of elements for field Pos3StabilizationSettings */
+#define MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_NUMELEM 3
+// Field Pos1FlightMode information
+/* Enumeration options for field Pos1FlightMode */
+typedef enum { MANUALCONTROLSETTINGS_POS1FLIGHTMODE_MANUAL=0, MANUALCONTROLSETTINGS_POS1FLIGHTMODE_STABILIZED=1, MANUALCONTROLSETTINGS_POS1FLIGHTMODE_AUTO=2 } ManualControlSettingsPos1FlightModeOptions;
+// Field Pos2FlightMode information
+/* Enumeration options for field Pos2FlightMode */
+typedef enum { MANUALCONTROLSETTINGS_POS2FLIGHTMODE_MANUAL=0, MANUALCONTROLSETTINGS_POS2FLIGHTMODE_STABILIZED=1, MANUALCONTROLSETTINGS_POS2FLIGHTMODE_AUTO=2 } ManualControlSettingsPos2FlightModeOptions;
+// Field Pos3FlightMode information
+/* Enumeration options for field Pos3FlightMode */
+typedef enum { MANUALCONTROLSETTINGS_POS3FLIGHTMODE_MANUAL=0, MANUALCONTROLSETTINGS_POS3FLIGHTMODE_STABILIZED=1, MANUALCONTROLSETTINGS_POS3FLIGHTMODE_AUTO=2 } ManualControlSettingsPos3FlightModeOptions;
 // Field ChannelMax information
 /* Number of elements for field ChannelMax */
 #define MANUALCONTROLSETTINGS_CHANNELMAX_NUMELEM 8

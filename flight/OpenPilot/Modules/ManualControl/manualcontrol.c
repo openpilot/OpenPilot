@@ -166,12 +166,52 @@ static void manualControlTask(void *parameters)
 			// Update flight mode
 			flightMode = scaleChannel(cmd.Channel[settings.FlightMode], settings.ChannelMax[settings.FlightMode],
 						  settings.ChannelMin[settings.FlightMode], settings.ChannelNeutral[settings.FlightMode]);
-			if (flightMode < -FLIGHT_MODE_LIMIT) {
-				cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL;
-			} else if (flightMode > FLIGHT_MODE_LIMIT) {
-				cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;
-			} else {
-				cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED;
+
+			if (flightMode < -FLIGHT_MODE_LIMIT) {       // Position 1
+				for(int i = 0; i < 3; i++) {
+					if(settings.Pos1StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE)
+						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE;
+					else if(settings.Pos1StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_RATE)
+						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE;
+					else if(settings.Pos1StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_POSITION)
+						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_POSITION;
+				}
+				if(settings.Pos1FlightMode == MANUALCONTROLSETTINGS_POS1FLIGHTMODE_MANUAL)
+					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL;
+				else if(settings.Pos1FlightMode == MANUALCONTROLSETTINGS_POS1FLIGHTMODE_STABILIZED)
+					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED;
+				else if(settings.Pos1FlightMode == MANUALCONTROLSETTINGS_POS1FLIGHTMODE_AUTO)
+					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;				
+			} else if (flightMode > FLIGHT_MODE_LIMIT) { // Position 3
+				for(int i = 0; i < 3; i++) {
+					if(settings.Pos3StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_NONE)
+						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE;
+					else if(settings.Pos3StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_RATE)
+						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE;
+					else if(settings.Pos3StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_POSITION)
+						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_POSITION;
+				}
+				if(settings.Pos3FlightMode == MANUALCONTROLSETTINGS_POS3FLIGHTMODE_MANUAL)
+					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL;
+				else if(settings.Pos3FlightMode == MANUALCONTROLSETTINGS_POS3FLIGHTMODE_STABILIZED)
+					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED;
+				else if(settings.Pos3FlightMode == MANUALCONTROLSETTINGS_POS3FLIGHTMODE_AUTO)
+					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;				
+			} else {                                     // Position 2
+				for(int i = 0; i < 3; i++) {
+					if(settings.Pos2StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_NONE)
+						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE;
+					else if(settings.Pos2StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_RATE)
+						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE;
+					else if(settings.Pos2StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_POSITION)
+						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_POSITION;
+				}
+				if(settings.Pos2FlightMode == MANUALCONTROLSETTINGS_POS2FLIGHTMODE_MANUAL)
+					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL;
+				else if(settings.Pos2FlightMode == MANUALCONTROLSETTINGS_POS2FLIGHTMODE_STABILIZED)
+					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED;
+				else if(settings.Pos2FlightMode == MANUALCONTROLSETTINGS_POS2FLIGHTMODE_AUTO)
+					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;				
 			}
 			// Update the ManualControlCommand object
 			ManualControlCommandSet(&cmd);

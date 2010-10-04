@@ -52,6 +52,12 @@ public:
         quint8 Accessory1;
         quint8 Accessory2;
         quint8 Accessory3;
+        quint8 Pos1StabilizationSettings[3];
+        quint8 Pos2StabilizationSettings[3];
+        quint8 Pos3StabilizationSettings[3];
+        quint8 Pos1FlightMode;
+        quint8 Pos2FlightMode;
+        quint8 Pos3FlightMode;
         qint16 ChannelMax[8];
         qint16 ChannelNeutral[8];
         qint16 ChannelMin[8];
@@ -86,6 +92,36 @@ public:
     // Field Accessory3 information
     /* Enumeration options for field Accessory3 */
     typedef enum { ACCESSORY3_CHANNEL0=0, ACCESSORY3_CHANNEL1=1, ACCESSORY3_CHANNEL2=2, ACCESSORY3_CHANNEL3=3, ACCESSORY3_CHANNEL4=4, ACCESSORY3_CHANNEL5=5, ACCESSORY3_CHANNEL6=6, ACCESSORY3_CHANNEL7=7, ACCESSORY3_NONE=8 } Accessory3Options;
+    // Field Pos1StabilizationSettings information
+    /* Enumeration options for field Pos1StabilizationSettings */
+    typedef enum { POS1STABILIZATIONSETTINGS_NONE=0, POS1STABILIZATIONSETTINGS_RATE=1, POS1STABILIZATIONSETTINGS_POSITION=2 } Pos1StabilizationSettingsOptions;
+    /* Array element names for field Pos1StabilizationSettings */
+    typedef enum { POS1STABILIZATIONSETTINGS_ROLL=0, POS1STABILIZATIONSETTINGS_PITCH=1, POS1STABILIZATIONSETTINGS_YAW=2 } Pos1StabilizationSettingsElem;
+    /* Number of elements for field Pos1StabilizationSettings */
+    static const quint32 POS1STABILIZATIONSETTINGS_NUMELEM = 3;
+    // Field Pos2StabilizationSettings information
+    /* Enumeration options for field Pos2StabilizationSettings */
+    typedef enum { POS2STABILIZATIONSETTINGS_NONE=0, POS2STABILIZATIONSETTINGS_RATE=1, POS2STABILIZATIONSETTINGS_POSITION=2 } Pos2StabilizationSettingsOptions;
+    /* Array element names for field Pos2StabilizationSettings */
+    typedef enum { POS2STABILIZATIONSETTINGS_ROLL=0, POS2STABILIZATIONSETTINGS_PITCH=1, POS2STABILIZATIONSETTINGS_YAW=2 } Pos2StabilizationSettingsElem;
+    /* Number of elements for field Pos2StabilizationSettings */
+    static const quint32 POS2STABILIZATIONSETTINGS_NUMELEM = 3;
+    // Field Pos3StabilizationSettings information
+    /* Enumeration options for field Pos3StabilizationSettings */
+    typedef enum { POS3STABILIZATIONSETTINGS_NONE=0, POS3STABILIZATIONSETTINGS_RATE=1, POS3STABILIZATIONSETTINGS_POSITION=2 } Pos3StabilizationSettingsOptions;
+    /* Array element names for field Pos3StabilizationSettings */
+    typedef enum { POS3STABILIZATIONSETTINGS_ROLL=0, POS3STABILIZATIONSETTINGS_PITCH=1, POS3STABILIZATIONSETTINGS_YAW=2 } Pos3StabilizationSettingsElem;
+    /* Number of elements for field Pos3StabilizationSettings */
+    static const quint32 POS3STABILIZATIONSETTINGS_NUMELEM = 3;
+    // Field Pos1FlightMode information
+    /* Enumeration options for field Pos1FlightMode */
+    typedef enum { POS1FLIGHTMODE_MANUAL=0, POS1FLIGHTMODE_STABILIZED=1, POS1FLIGHTMODE_AUTO=2 } Pos1FlightModeOptions;
+    // Field Pos2FlightMode information
+    /* Enumeration options for field Pos2FlightMode */
+    typedef enum { POS2FLIGHTMODE_MANUAL=0, POS2FLIGHTMODE_STABILIZED=1, POS2FLIGHTMODE_AUTO=2 } Pos2FlightModeOptions;
+    // Field Pos3FlightMode information
+    /* Enumeration options for field Pos3FlightMode */
+    typedef enum { POS3FLIGHTMODE_MANUAL=0, POS3FLIGHTMODE_STABILIZED=1, POS3FLIGHTMODE_AUTO=2 } Pos3FlightModeOptions;
     // Field ChannelMax information
     /* Number of elements for field ChannelMax */
     static const quint32 CHANNELMAX_NUMELEM = 8;
@@ -98,7 +134,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 1845767664U;
+    static const quint32 OBJID = 3505967188U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

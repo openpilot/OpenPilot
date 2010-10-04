@@ -46,7 +46,6 @@ HEADERS += uavobjects_global.h \
     velocityactual.h \
     guidancesettings.h \
     positiondesired.h \
-    attitudesettings.h \
     lesstabilizationsettings.h
 
 SOURCES += uavobject.cpp \
@@ -91,6 +90,5 @@ SOURCES += uavobject.cpp \
     velocityactual.cpp \
     guidancesettings.cpp \
     positiondesired.cpp \
-    attitudesettings.cpp \
     lesstabilizationsettings.cpp
 OTHER_FILES += UAVObjects.pluginspec

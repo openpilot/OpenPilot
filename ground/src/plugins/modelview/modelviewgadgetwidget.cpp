@@ -157,6 +157,8 @@ void ModelViewGadgetWidget::CreateScene()
 	    QFile aircraft(acFilename);
             m_World= GLC_Factory::instance()->createWorldFromFile(aircraft);
             m_ModelBoundingBox= m_World.boundingBox();
+            m_GlView.reframe(m_ModelBoundingBox); // center 3d models in the scene
+            m_GlView.setDistMinAndMax(m_World.boundingBox());
             loadError = false;
             if (!mvInitGLSuccess)
                 initializeGL();

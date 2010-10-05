@@ -1,12 +1,12 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
+ * @{
  * @addtogroup ManualControlModule Manual Control Module
  * @brief Provide manual control or allow it alter flight mode.
  * @{
  *
- * Reads in the ManualControlCommand FlightMode setting from receiver then either 
+ * Reads in the ManualControlCommand FlightMode setting from receiver then either
  * pass the settings straght to ActuatorDesired object (manual mode) or to
  * AttitudeDesired object (stabilized mode)
  *
@@ -48,6 +48,8 @@
 #define UPDATE_PERIOD_MS 20
 #define THROTTLE_FAILSAFE -0.1
 #define FLIGHT_MODE_LIMIT 1.0/3.0
+//safe band to allow a bit of calibration error or trim offset (in microseconds)
+#define CONNECTION_OFFSET 150
 
 // Private types
 
@@ -181,7 +183,7 @@ static void manualControlTask(void *parameters)
 				else if(settings.Pos1FlightMode == MANUALCONTROLSETTINGS_POS1FLIGHTMODE_STABILIZED)
 					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED;
 				else if(settings.Pos1FlightMode == MANUALCONTROLSETTINGS_POS1FLIGHTMODE_AUTO)
-					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;				
+					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;
 			} else if (flightMode > FLIGHT_MODE_LIMIT) { // Position 3
 				for(int i = 0; i < 3; i++) {
 					if(settings.Pos3StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_NONE)
@@ -196,7 +198,7 @@ static void manualControlTask(void *parameters)
 				else if(settings.Pos3FlightMode == MANUALCONTROLSETTINGS_POS3FLIGHTMODE_STABILIZED)
 					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED;
 				else if(settings.Pos3FlightMode == MANUALCONTROLSETTINGS_POS3FLIGHTMODE_AUTO)
-					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;				
+					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;
 			} else {                                     // Position 2
 				for(int i = 0; i < 3; i++) {
 					if(settings.Pos2StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_NONE)
@@ -211,11 +213,11 @@ static void manualControlTask(void *parameters)
 				else if(settings.Pos2FlightMode == MANUALCONTROLSETTINGS_POS2FLIGHTMODE_STABILIZED)
 					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED;
 				else if(settings.Pos2FlightMode == MANUALCONTROLSETTINGS_POS2FLIGHTMODE_AUTO)
-					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;				
+					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;
 			}
 			// Update the ManualControlCommand object
 			ManualControlCommandSet(&cmd);
-			// This seems silly to set then get, but the reason is if the GCS is 
+			// This seems silly to set then get, but the reason is if the GCS is
 			// the control input, the set command will be blocked by the read only
 			// setting and the get command will pull the right values from telemetry
 		} else
@@ -224,8 +226,8 @@ static void manualControlTask(void *parameters)
 		// Implement hysteresis loop on connection status
 		// Must check both Max and Min in case they reversed
 		if (!ManualControlCommandReadOnly(&cmd) &&
-		    cmd.Channel[settings.Throttle] < settings.ChannelMax[settings.Throttle] &&
-		    cmd.Channel[settings.Throttle] < settings.ChannelMin[settings.Throttle]) {
+		    cmd.Channel[settings.Throttle] < settings.ChannelMax[settings.Throttle] - CONNECTION_OFFSET &&
+		    cmd.Channel[settings.Throttle] < settings.ChannelMin[settings.Throttle] - CONNECTION_OFFSET) {
 			if (disconnected_count++ > 10) {
 				connection_state = DISCONNECTED;
 				connected_count = 0;

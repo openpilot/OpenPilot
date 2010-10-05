@@ -31,11 +31,21 @@ using namespace std;
 
 BOOST_AUTO_TEST_CASE( test_display )
 {
+	int count = 0;
+	
+	#ifdef HAVE_MODULE_QDISPLAY
 	display::ViewerQt vqt;
+	JFR_CHECK_EQUAL(vqt.id(), count);
+	count++;
+	#endif
+	
+	#ifdef HAVE_MODULE_GDHE
 	display::ViewerGdhe vgdhe;
-	JFR_CHECK_EQUAL(vqt.id(), 0);
-	JFR_CHECK_EQUAL(vgdhe.id(), 1);
-	JFR_CHECK_EQUAL(display::ViewerAbstract::idFactory().countUsed(), 2);
+	JFR_CHECK_EQUAL(vgdhe.id(), count);
+	count++;
+	#endif
+	
+	JFR_CHECK_EQUAL(display::ViewerAbstract::idFactory().countUsed(), count);
 
 	
 	/*

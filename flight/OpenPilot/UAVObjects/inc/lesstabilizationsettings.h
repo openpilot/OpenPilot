@@ -41,7 +41,7 @@
 #define LESSTABILIZATIONSETTINGS_H
 
 // Object constants
-#define LESSTABILIZATIONSETTINGS_OBJID 2839831188U
+#define LESSTABILIZATIONSETTINGS_OBJID 3247121950U
 #define LESSTABILIZATIONSETTINGS_NAME "LesStabilizationSettings"
 #define LESSTABILIZATIONSETTINGS_METANAME "LesStabilizationSettingsMeta"
 #define LESSTABILIZATIONSETTINGS_ISSINGLEINST 1
@@ -75,11 +75,10 @@ typedef struct {
     uint8_t RollMax;
     uint8_t PitchMax;
     uint8_t YawMax;
-    uint8_t YawMode;
-    float ManualYawRate;
+    float ManualRate[3];
     float MaximumRate[3];
-    float RollRateP;
-    float PitchRateP;
+    float RollRatePI[3];
+    float PitchRatePI[3];
     float YawRatePI[3];
     float RollPI[3];
     float PitchPI[3];
@@ -92,17 +91,26 @@ typedef struct {
 // Field RollMax information
 // Field PitchMax information
 // Field YawMax information
-// Field YawMode information
-/* Enumeration options for field YawMode */
-typedef enum { LESSTABILIZATIONSETTINGS_YAWMODE_RATE=0, LESSTABILIZATIONSETTINGS_YAWMODE_HEADING=1 } LesStabilizationSettingsYawModeOptions;
-// Field ManualYawRate information
+// Field ManualRate information
+/* Array element names for field ManualRate */
+typedef enum { LESSTABILIZATIONSETTINGS_MANUALRATE_ROLL=0, LESSTABILIZATIONSETTINGS_MANUALRATE_PITCH=1, LESSTABILIZATIONSETTINGS_MANUALRATE_YAW=2 } LesStabilizationSettingsManualRateElem;
+/* Number of elements for field ManualRate */
+#define LESSTABILIZATIONSETTINGS_MANUALRATE_NUMELEM 3
 // Field MaximumRate information
 /* Array element names for field MaximumRate */
 typedef enum { LESSTABILIZATIONSETTINGS_MAXIMUMRATE_ROLL=0, LESSTABILIZATIONSETTINGS_MAXIMUMRATE_PITCH=1, LESSTABILIZATIONSETTINGS_MAXIMUMRATE_YAW=2 } LesStabilizationSettingsMaximumRateElem;
 /* Number of elements for field MaximumRate */
 #define LESSTABILIZATIONSETTINGS_MAXIMUMRATE_NUMELEM 3
-// Field RollRateP information
-// Field PitchRateP information
+// Field RollRatePI information
+/* Array element names for field RollRatePI */
+typedef enum { LESSTABILIZATIONSETTINGS_ROLLRATEPI_KP=0, LESSTABILIZATIONSETTINGS_ROLLRATEPI_KI=1, LESSTABILIZATIONSETTINGS_ROLLRATEPI_ILIMIT=2 } LesStabilizationSettingsRollRatePIElem;
+/* Number of elements for field RollRatePI */
+#define LESSTABILIZATIONSETTINGS_ROLLRATEPI_NUMELEM 3
+// Field PitchRatePI information
+/* Array element names for field PitchRatePI */
+typedef enum { LESSTABILIZATIONSETTINGS_PITCHRATEPI_KP=0, LESSTABILIZATIONSETTINGS_PITCHRATEPI_KI=1, LESSTABILIZATIONSETTINGS_PITCHRATEPI_ILIMIT=2 } LesStabilizationSettingsPitchRatePIElem;
+/* Number of elements for field PitchRatePI */
+#define LESSTABILIZATIONSETTINGS_PITCHRATEPI_NUMELEM 3
 // Field YawRatePI information
 /* Array element names for field YawRatePI */
 typedef enum { LESSTABILIZATIONSETTINGS_YAWRATEPI_KP=0, LESSTABILIZATIONSETTINGS_YAWRATEPI_KI=1, LESSTABILIZATIONSETTINGS_YAWRATEPI_ILIMIT=2 } LesStabilizationSettingsYawRatePIElem;

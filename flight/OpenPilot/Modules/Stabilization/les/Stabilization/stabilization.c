@@ -142,15 +142,30 @@ static void stabilizationTask(void* parameters)
 		SystemSettingsGet(&systemSettings);
 
 
+		float *manualAxis = &manualControl.Roll;
+		float *attitudeDesiredAxis = &attitudeDesired.Roll;
+		float *attitudeActualAxis = &attitudeActual.Roll;
+		float *actuatorDesiredAxis = &actuatorDesired.Roll;
+
+		//Calculate desired rate
 		float rates[MAX_AXES]= {0,0,0};
-		rates[ROLL]  = ApplyPid(&pids[PID_ROLL],  attitudeDesired.Roll,  attitudeActual.Roll ,false);
-		rates[PITCH] = ApplyPid(&pids[PID_PITCH], attitudeDesired.Pitch, attitudeActual.Pitch,false);
-		if(settings.YawMode == LESSTABILIZATIONSETTINGS_YAWMODE_RATE) {  // rate stabilization on yaw
-			rates[YAW] = manualControl.Yaw * settings.ManualYawRate;
-		}else{
-			rates[YAW] = ApplyPid(&pids[PID_YAW], attitudeDesired.Yaw, attitudeActual.Yaw,true);
+		for(int ct=0; ct< MAX_AXES; ct++)
+		{
+			switch(manualControl.StabilizationSettings[ct])
+			{
+			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE:
+				rates[ct] = manualAxis[ct] * settings.ManualRate[ct];
+				break;
+
+			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_POSITION:
+				rates[ct] = ApplyPid(&pids[PID_ROLL + ct],  attitudeDesiredAxis[ct],  attitudeActualAxis[ct], true);
+				break;
+			}
 		}
 
+		bool shouldUpdate = false;
+		ActuatorDesiredGet(&actuatorDesired);
+		//Calculate desired command
 		for(int ct=0; ct< MAX_AXES; ct++)
 		{
 			if(fabs(rates[ct]) > settings.MaximumRate[ct])
@@ -164,39 +179,38 @@ static void stabilizationTask(void* parameters)
 				}
 
 			}
+			switch(manualControl.StabilizationSettings[ct])
+			{
+			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE:
+			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_POSITION:
+				{
+					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rates[ct],  attitudeRaw.gyros_filtered[ct], false);
+					actuatorDesiredAxis[ct] = bound(command);
+					shouldUpdate = true;
+					break;
+				}
+			}
+		}
+		if(manualControl.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL)
+		{
+			shouldUpdate = false;
 		}
 
-		float commands[MAX_AXES];
-		commands[ROLL] = ApplyPid(&pids[PID_RATE_ROLL], attitudeRaw.gyros_filtered[ROLL], rates[ROLL],false);
-		commands[PITCH] = ApplyPid(&pids[PID_RATE_PITCH], attitudeRaw.gyros_filtered[PITCH], rates[PITCH],false);
-		commands[YAW] = ApplyPid(&pids[PID_RATE_YAW], attitudeRaw.gyros_filtered[YAW], rates[YAW],false);
 
-
-		// On fixed wing we don't try to stabilizew yaw
-		if ( systemSettings.AirframeType < SYSTEMSETTINGS_AIRFRAMETYPE_VTOL)
+		if(shouldUpdate)
 		{
-			commands[YAW] = -manualControl.Yaw;
-		}
-
-		actuatorDesired.Pitch = bound(-commands[PITCH]);
-		actuatorDesired.Roll = bound(-commands[ROLL]);
-		actuatorDesired.Yaw = bound(-commands[YAW]);
-		// Setup throttle
-		actuatorDesired.Throttle = attitudeDesired.Throttle;
-
-		// Save dT
-		actuatorDesired.UpdateTime = dT * 1000;
-
-		// Write actuator desired (if not in manual mode)
-		if ( manualControl.FlightMode != MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL )
-		{
+			actuatorDesired.Throttle = attitudeDesired.Throttle;
 			ActuatorDesiredSet(&actuatorDesired);
 		}
-		else
+
+		if(manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_FALSE ||
+			!shouldUpdate)
 		{
 			ZeroPids();
 		}
 
+		// Save dT
+		actuatorDesired.UpdateTime = dT * 1000;
 		// Clear alarms
 		AlarmsClear(SYSTEMALARMS_ALARM_STABILIZATION);
 	}
@@ -258,15 +272,9 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 {
 	memset(pids,0,sizeof (pid_type) * PID_MAX);
 	LesStabilizationSettingsGet(&settings);
-	pids[PID_RATE_ROLL].p = settings.RollRateP;
-	pids[PID_RATE_PITCH].p = settings.PitchRateP;
-	pids[PID_RATE_YAW].p = settings.YawRatePI[LESSTABILIZATIONSETTINGS_YAWRATEPI_KP];
-	pids[PID_RATE_YAW].i = settings.YawRatePI[LESSTABILIZATIONSETTINGS_YAWRATEPI_KI];
-	pids[PID_RATE_YAW].iLim = settings.YawRatePI[LESSTABILIZATIONSETTINGS_YAWRATEPI_ILIMIT];
 
-
-	float * data = settings.RollPI;
-	for(int pid=PID_ROLL; pid < PID_MAX; pid++)
+	float * data = settings.RollRatePI;
+	for(int pid=0; pid < PID_MAX; pid++)
 	{
 		pids[pid].p = *data++;
 		pids[pid].i = *data++;

@@ -47,11 +47,10 @@ public:
         quint8 RollMax;
         quint8 PitchMax;
         quint8 YawMax;
-        quint8 YawMode;
-        float ManualYawRate;
+        float ManualRate[3];
         float MaximumRate[3];
-        float RollRateP;
-        float PitchRateP;
+        float RollRatePI[3];
+        float PitchRatePI[3];
         float YawRatePI[3];
         float RollPI[3];
         float PitchPI[3];
@@ -64,17 +63,26 @@ public:
     // Field RollMax information
     // Field PitchMax information
     // Field YawMax information
-    // Field YawMode information
-    /* Enumeration options for field YawMode */
-    typedef enum { YAWMODE_RATE=0, YAWMODE_HEADING=1 } YawModeOptions;
-    // Field ManualYawRate information
+    // Field ManualRate information
+    /* Array element names for field ManualRate */
+    typedef enum { MANUALRATE_ROLL=0, MANUALRATE_PITCH=1, MANUALRATE_YAW=2 } ManualRateElem;
+    /* Number of elements for field ManualRate */
+    static const quint32 MANUALRATE_NUMELEM = 3;
     // Field MaximumRate information
     /* Array element names for field MaximumRate */
     typedef enum { MAXIMUMRATE_ROLL=0, MAXIMUMRATE_PITCH=1, MAXIMUMRATE_YAW=2 } MaximumRateElem;
     /* Number of elements for field MaximumRate */
     static const quint32 MAXIMUMRATE_NUMELEM = 3;
-    // Field RollRateP information
-    // Field PitchRateP information
+    // Field RollRatePI information
+    /* Array element names for field RollRatePI */
+    typedef enum { ROLLRATEPI_KP=0, ROLLRATEPI_KI=1, ROLLRATEPI_ILIMIT=2 } RollRatePIElem;
+    /* Number of elements for field RollRatePI */
+    static const quint32 ROLLRATEPI_NUMELEM = 3;
+    // Field PitchRatePI information
+    /* Array element names for field PitchRatePI */
+    typedef enum { PITCHRATEPI_KP=0, PITCHRATEPI_KI=1, PITCHRATEPI_ILIMIT=2 } PitchRatePIElem;
+    /* Number of elements for field PitchRatePI */
+    static const quint32 PITCHRATEPI_NUMELEM = 3;
     // Field YawRatePI information
     /* Array element names for field YawRatePI */
     typedef enum { YAWRATEPI_KP=0, YAWRATEPI_KI=1, YAWRATEPI_ILIMIT=2 } YawRatePIElem;
@@ -98,7 +106,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 2839831188U;
+    static const quint32 OBJID = 3247121950U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

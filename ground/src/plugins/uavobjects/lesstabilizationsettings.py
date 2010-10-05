@@ -78,23 +78,13 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'YawMode',
-		'b',
-		1,
-		[
-			'0',
-		],
-		{
-			'0' : 'rate',
-			'1' : 'heading',
-		}
-	),
-	uavobject.UAVObjectField(
-		'ManualYawRate',
+		'ManualRate',
 		'f',
-		1,
+		3,
 		[
-			'0',
+			'Roll',
+			'Pitch',
+			'Yaw',
 		],
 		{
 		}
@@ -112,21 +102,25 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'RollRateP',
+		'RollRatePI',
 		'f',
-		1,
+		3,
 		[
-			'0',
+			'Kp',
+			'Ki',
+			'ILimit',
 		],
 		{
 		}
 	),
 	uavobject.UAVObjectField(
-		'PitchRateP',
+		'PitchRatePI',
 		'f',
-		1,
+		3,
 		[
-			'0',
+			'Kp',
+			'Ki',
+			'ILimit',
 		],
 		{
 		}
@@ -184,7 +178,7 @@ _fields = [ \
 
 class LesStabilizationSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 2839831188
+    OBJID        = 3247121950
     NAME         = "LesStabilizationSettings"
     METANAME     = "LesStabilizationSettingsMeta"
     ISSINGLEINST = 1

@@ -357,10 +357,22 @@ static void setFailsafe()
 
 	ActuatorCommandGet(&command);
 	ActuatorSettingsGet(&settings);
-	// Reset ActuatorCommand to neutral values
+
+	MixerSettingsData mixerSettings;
+	MixerSettingsGet (&mixerSettings);
+	Mixer_t * mixers = (Mixer_t *)&mixerSettings.Mixer0Type; //pointer to array of mixers in UAVObjects
+
+	// Reset ActuatorCommand to safe values
 	for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n)
 	{
-		command.Channel[n] = settings.ChannelNeutral[n];
+		if(mixers[n].type == MIXERSETTINGS_MIXER0TYPE_MOTOR)
+		{
+			command.Channel[n] = settings.ChannelMin[n];
+		}
+		else
+		{
+			command.Channel[n] = settings.ChannelNeutral[n];
+		}
 	}
 
 	// Set alarm

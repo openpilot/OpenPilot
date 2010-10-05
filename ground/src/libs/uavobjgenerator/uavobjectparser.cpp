@@ -377,7 +377,7 @@ QString UAVObjectParser::processObjectAccess(QDomNode& childNode, ObjectInfo* in
         return QString("Object:access:gcs attribute is missing");
     }
     else
-    {   
+    {
         int index = accessModeStrXML.indexOf( elemAttr.nodeValue() );
         if (index >= 0)
         {
@@ -513,15 +513,32 @@ QString UAVObjectParser::processObjectFields(QDomNode& childNode, ObjectInfo* in
         if ( info->isSettings )
         {
             return QString("Object:field:defaultvalue attribute is missing (required for settings objects)");
-        }
-        else
+        }else
         {
-            field->defaultValue = QString();
+        	field->defaultValues = QStringList();
         }
     }
     else
     {
-        field->defaultValue = elemAttr.nodeValue().trimmed();
+		QStringList defaults = elemAttr.nodeValue().split(",", QString::SkipEmptyParts);
+		for (int n = 0; n < defaults.length(); ++n)
+		{
+			defaults[n] = defaults[n].trimmed();
+		}
+		if(defaults.length() != field->numElements)
+		{
+			if(defaults.length() != 1)
+			{
+				return QString("Object:field:incorrect number of default values");
+			}
+			/*support legacy single default for multiple elements
+			We sould really issue a warning*/
+			for(int ct=1; ct< field->numElements; ct++)
+			{
+				defaults.append(defaults[0]);
+			}
+		}
+		field->defaultValues = defaults;
     }
     // Add field to object
     info->fields.append(field);
@@ -630,7 +647,7 @@ void UAVObjectParser::replaceCommonTags(QString& out, ObjectInfo* info)
     out.replace(QString("$(ISSINGLEINST)"), value);
     // Replace $(ISSETTINGS) tag
     value = boolToString( info->isSettings );
-    out.replace(QString("$(ISSETTINGS)"), value);  
+    out.replace(QString("$(ISSETTINGS)"), value);
     // Replace $(GCSACCESS) tag
     value = accessModeStr[info->gcsAccess];
     out.replace(QString("$(GCSACCESS)"), value);
@@ -776,7 +793,7 @@ bool UAVObjectParser::generateFlightObject(int objIndex, const QString& template
     QString initfields;
     for (int n = 0; n < info->fields.length(); ++n)
     {
-        if ( !info->fields[n]->defaultValue.isNull() && !info->fields[n]->defaultValue.isEmpty() )
+        if (!info->fields[n]->defaultValues.isEmpty() )
         {
             // For non-array fields
             if ( info->fields[n]->numElements == 1)
@@ -785,19 +802,19 @@ bool UAVObjectParser::generateFlightObject(int objIndex, const QString& template
                 {
                     initfields.append( QString("\tdata.%1 = %2;\n")
                                 .arg( info->fields[n]->name )
-                                .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValue ) ) );
+                                .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValues[0] ) ) );
                 }
                 else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
                 {
                     initfields.append( QString("\tdata.%1 = %2;\n")
                                 .arg( info->fields[n]->name )
-                                .arg( info->fields[n]->defaultValue.toFloat() ) );
+                                .arg( info->fields[n]->defaultValues[0].toFloat() ) );
                 }
                 else
                 {
                     initfields.append( QString("\tdata.%1 = %2;\n")
                                 .arg( info->fields[n]->name )
-                                .arg( info->fields[n]->defaultValue.toInt() ) );
+                                .arg( info->fields[n]->defaultValues[0].toInt() ) );
                 }
             }
             else
@@ -810,21 +827,21 @@ bool UAVObjectParser::generateFlightObject(int objIndex, const QString& template
                         initfields.append( QString("\tdata.%1[%2] = %3;\n")
                                     .arg( info->fields[n]->name )
                                     .arg( idx )
-                                    .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValue ) ) );
+                                    .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValues[idx] ) ) );
                     }
                     else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
                     {
                         initfields.append( QString("\tdata.%1[%2] = %3;\n")
                                     .arg( info->fields[n]->name )
                                     .arg( idx )
-                                    .arg( info->fields[n]->defaultValue.toFloat() ) );
+                                    .arg( info->fields[n]->defaultValues[idx].toFloat() ) );
                     }
                     else
                     {
                         initfields.append( QString("\tdata.%1[%2] = %3;\n")
                                     .arg( info->fields[n]->name )
                                     .arg( idx )
-                                    .arg( info->fields[n]->defaultValue.toInt() ) );
+                                    .arg( info->fields[n]->defaultValues[idx].toInt() ) );
                     }
                 }
             }
@@ -887,7 +904,7 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
             finit.append( QString("    %1.append(\"%2\");\n")
                           .arg(varElemName)
                           .arg(elemNames[m]) );
-        }        
+        }
         // Only for enum types
         if (info->fields[n]->type == FIELDTYPE_ENUM)
         {
@@ -977,7 +994,7 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
     QString initfields;
     for (int n = 0; n < info->fields.length(); ++n)
     {
-        if ( !info->fields[n]->defaultValue.isNull() && !info->fields[n]->defaultValue.isEmpty() )
+        if (!info->fields[n]->defaultValues.isEmpty() )
         {
             // For non-array fields
             if ( info->fields[n]->numElements == 1)
@@ -986,19 +1003,19 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
                 {
                     initfields.append( QString("    data.%1 = %2;\n")
                                 .arg( info->fields[n]->name )
-                                .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValue ) ) );
+                                .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValues[0] ) ) );
                 }
                 else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
                 {
                     initfields.append( QString("    data.%1 = %2;\n")
                                 .arg( info->fields[n]->name )
-                                .arg( info->fields[n]->defaultValue.toFloat() ) );
+                                .arg( info->fields[n]->defaultValues[0].toFloat() ) );
                 }
                 else
                 {
                     initfields.append( QString("    data.%1 = %2;\n")
                                 .arg( info->fields[n]->name )
-                                .arg( info->fields[n]->defaultValue.toInt() ) );
+                                .arg( info->fields[n]->defaultValues[0].toInt() ) );
                 }
             }
             else
@@ -1011,21 +1028,21 @@ bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInc
                         initfields.append( QString("    data.%1[%2] = %3;\n")
                                     .arg( info->fields[n]->name )
                                     .arg( idx )
-                                    .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValue ) ) );
+                                    .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValues[idx] ) ) );
                     }
                     else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
                     {
                         initfields.append( QString("    data.%1[%2] = %3;\n")
                                     .arg( info->fields[n]->name )
                                     .arg( idx )
-                                    .arg( info->fields[n]->defaultValue.toFloat() ) );
+                                    .arg( info->fields[n]->defaultValues[idx].toFloat() ) );
                     }
                     else
                     {
                         initfields.append( QString("    data.%1[%2] = %3;\n")
                                     .arg( info->fields[n]->name )
                                     .arg( idx )
-                                    .arg( info->fields[n]->defaultValue.toInt() ) );
+                                    .arg( info->fields[n]->defaultValues[idx].toInt() ) );
                     }
                 }
             }

@@ -72,7 +72,7 @@ public:
         QStringList elementNames;
         QStringList options; // for enums only
         bool defaultElementNames;
-        QString defaultValue;
+        QStringList defaultValues;
     } FieldInfo;
 
     typedef struct {

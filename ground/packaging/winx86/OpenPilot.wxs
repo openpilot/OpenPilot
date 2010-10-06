@@ -1,0 +1,1189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+    <Product Id="C5857D7A-D0D7-4EF7-87CC-16E8CCA618CE" Name="OpenPilot GCS" Language="1033" Version="0.0.0.1" Manufacturer="OpenPilot" UpgradeCode="C72FD8FA-A9FD-483C-890E-A2FDB6C8025F">
+        <Package Description="Test file in a Product" Comments="Simple test" InstallerVersion="200" Compressed="yes" Keywords="Installer OpenPilot" />
+        <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder" Name="PFiles">
+                <Directory Name="OpenPilot" Id="OpenPilot">
+                    <Directory Id="bin" Name="bin">
+                        <Component Id="Aggregation.dll" DiskId="1" Guid="B460AF0D-717A-4167-868C-BDF0DF432CB8">
+                            <File Id="Aggregation.dll" Name="Aggregation.dll" Source="..\..\bin\Aggregation.dll" />
+                        </Component>
+                        <Component Id="ExtensionSystem.dll" DiskId="1" Guid="A8CD73A5-DF35-4AB2-8809-D747D20B3AFE">
+                            <File Id="ExtensionSystem.dll" Name="ExtensionSystem.dll" Source="..\..\bin\ExtensionSystem.dll" />
+                        </Component>
+                        <Component Id="GLC_lib.dll" DiskId="1" Guid="7FFF8319-ED58-4382-8BC3-DF82EED4558D">
+                            <File Id="GLC_lib.dll" Name="GLC_lib.dll" Source="..\..\bin\GLC_lib.dll" />
+                        </Component>
+                        <Component Id="libgcc_s_dw2_1.dll" DiskId="1" Guid="F8C09358-8621-4807-9B09-9A44DD20C235">
+                            <File Id="libgcc_s_dw2_1.dll" Name="libgcc_s_dw2-1.dll" Source="..\..\bin\libgcc_s_dw2-1.dll" />
+                        </Component>
+                        <Component Id="mingwm10.dll" DiskId="1" Guid="F0997472-AA20-48CE-A8D3-4B821783E51C">
+                            <File Id="mingwm10.dll" Name="mingwm10.dll" Source="..\..\bin\mingwm10.dll" />
+                        </Component>
+                        <Component Id="openpilotgcs.exe" DiskId="1" Guid="A054384C-94FE-4CA1-A995-61826B1B9B0F">
+                            <File Id="openpilotgcs.exe" Name="openpilotgcs.exe" Source="..\..\bin\openpilotgcs.exe">
+                                <Shortcut Id="desktopShortcut" Directory="DesktopFolder" Name="OpenPilot GCS" WorkingDirectory="INSTALLDIR" Advertise="yes" Icon="DesktopIcon.exe" IconIndex="0" />
+                                <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="OpenPilot GCS" Advertise="yes" Icon="StartMenuIcon.exe" IconIndex="0" />
+                            </File>
+                        </Component>
+                        <Component Id="opmapwidget.dll" DiskId="1" Guid="1D66F762-3D4E-4F4C-A1B3-90EAD9C5728B">
+                            <File Id="opmapwidget.dll" Name="opmapwidget.dll" Source="..\..\bin\opmapwidget.dll" />
+                        </Component>
+                        <Component Id="phonon4.dll" DiskId="1" Guid="9586CEB7-29A8-4CFE-9161-0570990F1C9D">
+                            <File Id="phonon4.dll" Name="phonon4.dll" Source="..\..\bin\phonon4.dll" />
+                        </Component>
+                        <Component Id="QExtSerialPort.dll" DiskId="1" Guid="04FA7063-4FE6-48E9-AE09-E08AE1C6941F">
+                            <File Id="QExtSerialPort.dll" Name="QExtSerialPort.dll" Source="..\..\bin\QExtSerialPort.dll" />
+                        </Component>
+                        <Component Id="qgif4.dll" DiskId="1" Guid="3AAB8604-A6DB-4705-B65E-5713843B886E">
+                            <File Id="qgif4.dll" Name="qgif4.dll" Source="..\..\bin\qgif4.dll" />
+                        </Component>
+                        <Component Id="qico4.dll" DiskId="1" Guid="B6EF1C6B-1E58-4127-9511-4B26CC5AA3A8">
+                            <File Id="qico4.dll" Name="qico4.dll" Source="..\..\bin\qico4.dll" />
+                        </Component>
+                        <Component Id="qjpeg4.dll" DiskId="1" Guid="0B4335EB-AF5D-40BC-B9DB-C49E711B1754">
+                            <File Id="qjpeg4.dll" Name="qjpeg4.dll" Source="..\..\bin\qjpeg4.dll" />
+                        </Component>
+                        <Component Id="qmng4.dll" DiskId="1" Guid="5FFED681-3F4D-4D3D-8A93-32E60CCA656D">
+                            <File Id="qmng4.dll" Name="qmng4.dll" Source="..\..\bin\qmng4.dll" />
+                        </Component>
+                        <Component Id="qsvg4.dll" DiskId="1" Guid="22C8BDAF-B1AC-435C-930E-BDCCAB5EE7F7">
+                            <File Id="qsvg4.dll" Name="qsvg4.dll" Source="..\..\bin\qsvg4.dll" />
+                        </Component>
+                        <Component Id="qsvgicon4.dll" DiskId="1" Guid="AB7E00D8-ADD2-4AE0-B778-A828211273FF">
+                            <File Id="qsvgicon4.dll" Name="qsvgicon4.dll" Source="..\..\bin\qsvgicon4.dll" />
+                        </Component>
+                        <Component Id="QtConcurrent.dll" DiskId="1" Guid="DA887E82-83C6-4304-A5FB-1DC2B8227FC4">
+                            <File Id="QtConcurrent.dll" Name="QtConcurrent.dll" Source="..\..\bin\QtConcurrent.dll" />
+                        </Component>
+                        <Component Id="QtCore4.dll" DiskId="1" Guid="0521ED03-1627-4C2C-95B6-3DA559032F3A">
+                            <File Id="QtCore4.dll" Name="QtCore4.dll" Source="..\..\bin\QtCore4.dll" />
+                        </Component>
+                        <Component Id="QtGui4.dll" DiskId="1" Guid="63DBAE46-9E3D-4D85-B55B-B93F7A74A124">
+                            <File Id="QtGui4.dll" Name="QtGui4.dll" Source="..\..\bin\QtGui4.dll" />
+                        </Component>
+                        <Component Id="qtiff4.dll" DiskId="1" Guid="AE6AF17B-9006-486D-AB37-B30105A9C52F">
+                            <File Id="qtiff4.dll" Name="qtiff4.dll" Source="..\..\bin\qtiff4.dll" />
+                        </Component>
+                        <Component Id="QtNetwork4.dll" DiskId="1" Guid="7A137591-24FA-48C0-BDF9-FE40AEEB89FD">
+                            <File Id="QtNetwork4.dll" Name="QtNetwork4.dll" Source="..\..\bin\QtNetwork4.dll" />
+                        </Component>
+                        <Component Id="QtOpenGL4.dll" DiskId="1" Guid="835C1F43-C61A-4930-9123-BAE93B7A3791">
+                            <File Id="QtOpenGL4.dll" Name="QtOpenGL4.dll" Source="..\..\bin\QtOpenGL4.dll" />
+                        </Component>
+                        <Component Id="QtSql4.dll" DiskId="1" Guid="16DA303A-6AA3-47F1-A2B2-089FA57A9CD4">
+                            <File Id="QtSql4.dll" Name="QtSql4.dll" Source="..\..\bin\QtSql4.dll" />
+                        </Component>
+                        <Component Id="QtSvg4.dll" DiskId="1" Guid="85F8D78A-4B24-4AA2-BCEC-CE2A60355DEC">
+                            <File Id="QtSvg4.dll" Name="QtSvg4.dll" Source="..\..\bin\QtSvg4.dll" />
+                        </Component>
+                        <Component Id="QtTest4.dll" DiskId="1" Guid="C75EE0C3-9175-4DA6-91F8-CC9807E47C40">
+                            <File Id="QtTest4.dll" Name="QtTest4.dll" Source="..\..\bin\QtTest4.dll" />
+                        </Component>
+                        <Component Id="QtXml4.dll" DiskId="1" Guid="809CE372-F514-443F-9D55-8AAB5A2295B2">
+                            <File Id="QtXml4.dll" Name="QtXml4.dll" Source="..\..\bin\QtXml4.dll" />
+                        </Component>
+                        <Component Id="Qwt.dll" DiskId="1" Guid="6CEFB80B-D9E9-48E2-85B5-A237F10456B0">
+                            <File Id="Qwt.dll" Name="Qwt.dll" Source="..\..\bin\Qwt.dll" />
+                        </Component>
+                        <Component Id="QxtCore.dll" DiskId="1" Guid="7381C507-F59B-42AF-AA04-55ED1E0D3E18">
+                            <File Id="QxtCore.dll" Name="QxtCore.dll" Source="..\..\bin\QxtCore.dll" />
+                        </Component>
+                        <Component Id="QYmodem.dll" DiskId="1" Guid="8ED965D6-C959-471C-BD5F-E09C93776D06">
+                            <File Id="QYmodem.dll" Name="QYmodem.dll" Source="..\..\bin\QYmodem.dll" />
+                        </Component>
+                        <Component Id="SDL.dll" DiskId="1" Guid="A3E4745A-114A-4C12-A466-0FC9E82B9800">
+                            <File Id="SDL.dll" Name="SDL.dll" Source="..\..\bin\SDL.dll" />
+                        </Component>
+                        <Component Id="sdlgamepad.dll" DiskId="1" Guid="EB711FDE-97D6-4A18-AF73-69FC15489709">
+                            <File Id="sdlgamepad.dll" Name="sdlgamepad.dll" Source="..\..\bin\sdlgamepad.dll" />
+                        </Component>
+                        <Component Id="Utils.dll" DiskId="1" Guid="F242BE36-CD31-46BF-914A-898EBBA04B4D">
+                            <File Id="Utils.dll" Name="Utils.dll" Source="..\..\bin\Utils.dll" />
+                        </Component>
+                        <Directory Id="sqldrivers" Name="sqldrivers">
+                            <Component Id="qsqlite4.dll" DiskId="1" Guid="3F3C7F53-B87E-42BC-8831-94E2EFDF9D03">
+                                <File Id="qsqlite4.dll" Name="qsqlite4.dll" Source="..\..\bin\sqldrivers\qsqlite4.dll" />
+                            </Component>
+                        </Directory>
+                    </Directory>
+                    <Directory Id="lib" Name="lib">
+                        <Directory Id="openpilotgcs" Name="openpilotgcs">
+                            <Component Id="Aggregation.dll_1" DiskId="1" Guid="37EE4B99-300F-47CF-9207-E51320B652BD">
+                                <File Id="Aggregation.dll_1" Name="Aggregation.dll" Source="..\..\lib\openpilotgcs\Aggregation.dll" />
+                            </Component>
+                            <Component Id="ExtensionSystem.dll_1" DiskId="1" Guid="8DD29AF1-E1CF-4CD9-9E23-8FE8430BBB57">
+                                <File Id="ExtensionSystem.dll_1" Name="ExtensionSystem.dll" Source="..\..\lib\openpilotgcs\ExtensionSystem.dll" />
+                            </Component>
+                            <Component Id="GLC_lib.dll_1" DiskId="1" Guid="E46CCB86-5C8C-42DC-8879-5E9C7CD28793">
+                                <File Id="GLC_lib.dll_1" Name="GLC_lib.dll" Source="..\..\lib\openpilotgcs\GLC_lib.dll" />
+                            </Component>
+                            <Component Id="opmapwidget.dll_1" DiskId="1" Guid="0CCF3E66-C0C6-4D6B-AD05-41D298C10939">
+                                <File Id="opmapwidget.dll_1" Name="opmapwidget.dll" Source="..\..\lib\openpilotgcs\opmapwidget.dll" />
+                            </Component>
+                            <Component Id="QExtSerialPort.dll_1" DiskId="1" Guid="B8D77090-5556-4BDB-B93A-80EA73F6F7AF">
+                                <File Id="QExtSerialPort.dll_1" Name="QExtSerialPort.dll" Source="..\..\lib\openpilotgcs\QExtSerialPort.dll" />
+                            </Component>
+                            <Component Id="QtConcurrent.dll_1" DiskId="1" Guid="460EC705-590B-4FA1-BC33-721FC1066076">
+                                <File Id="QtConcurrent.dll_1" Name="QtConcurrent.dll" Source="..\..\lib\openpilotgcs\QtConcurrent.dll" />
+                            </Component>
+                            <Component Id="Qwt.dll_1" DiskId="1" Guid="309BA891-4DA5-4429-BB75-A0ABB979B097">
+                                <File Id="Qwt.dll_1" Name="Qwt.dll" Source="..\..\lib\openpilotgcs\Qwt.dll" />
+                            </Component>
+                            <Component Id="QxtCore.dll_1" DiskId="1" Guid="F0E1AF99-01D7-46DE-89E6-350FFA3B3375">
+                                <File Id="QxtCore.dll_1" Name="QxtCore.dll" Source="..\..\lib\openpilotgcs\QxtCore.dll" />
+                            </Component>
+                            <Component Id="QYmodem.dll_1" DiskId="1" Guid="7C880986-54B1-4C7E-ACFB-33118F86AF15">
+                                <File Id="QYmodem.dll_1" Name="QYmodem.dll" Source="..\..\lib\openpilotgcs\QYmodem.dll" />
+                            </Component>
+                            <Component Id="sdlgamepad.dll_1" DiskId="1" Guid="31D3C5C6-A149-40F9-8AA5-FB18CCF7BE87">
+                                <File Id="sdlgamepad.dll_1" Name="sdlgamepad.dll" Source="..\..\lib\openpilotgcs\sdlgamepad.dll" />
+                            </Component>
+                            <Component Id="Utils.dll_1" DiskId="1" Guid="7A801131-E6F3-437D-AC54-0A0D12E31701">
+                                <File Id="Utils.dll_1" Name="Utils.dll" Source="..\..\lib\openpilotgcs\Utils.dll" />
+                            </Component>
+                            <Directory Id="plugins" Name="plugins">
+                                <Directory Id="OpenPilot_1" Name="OpenPilot">
+                                    <Component Id="Config.dll" DiskId="1" Guid="45B55394-5664-4E85-B76B-3C5B6B17BB94">
+                                        <File Id="Config.dll" Name="Config.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Config.dll" />
+                                    </Component>
+                                    <Component Id="Config.pluginspec" DiskId="1" Guid="94D34810-5C0D-4A69-A4F8-C5BBA0F5F6A7">
+                                        <File Id="Config.pluginspec" Name="Config.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Config.pluginspec" />
+                                    </Component>
+                                    <Component Id="Core.dll" DiskId="1" Guid="38DC6640-A52D-4339-91EA-B8844BFDEDEE">
+                                        <File Id="Core.dll" Name="Core.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Core.dll" />
+                                    </Component>
+                                    <Component Id="Core.pluginspec" DiskId="1" Guid="0BB2EDA0-F6BF-4991-A82D-E899662969CF">
+                                        <File Id="Core.pluginspec" Name="Core.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Core.pluginspec" />
+                                    </Component>
+                                    <Component Id="DialGadget.dll" DiskId="1" Guid="788C67D8-D4A7-408B-A74D-8244B293790F">
+                                        <File Id="DialGadget.dll" Name="DialGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\DialGadget.dll" />
+                                    </Component>
+                                    <Component Id="DialGadget.pluginspec" DiskId="1" Guid="5B276737-9F63-47A1-8DEA-0232A084C2F4">
+                                        <File Id="DialGadget.pluginspec" Name="DialGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\DialGadget.pluginspec" />
+                                    </Component>
+                                    <Component Id="EmptyGadget.dll" DiskId="1" Guid="8B93C81E-8F86-4AE4-A25E-DDD7D98029A5">
+                                        <File Id="EmptyGadget.dll" Name="EmptyGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\EmptyGadget.dll" />
+                                    </Component>
+                                    <Component Id="EmptyGadget.pluginspec" DiskId="1" Guid="B144310D-2381-41BC-BA69-BA9F08086E03">
+                                        <File Id="EmptyGadget.pluginspec" Name="EmptyGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\EmptyGadget.pluginspec" />
+                                    </Component>
+                                    <Component Id="GCSControl.dll" DiskId="1" Guid="0FE38AE0-65F8-43E1-BB8D-54588FA41A0E">
+                                        <File Id="GCSControl.dll" Name="GCSControl.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\GCSControl.dll" />
+                                    </Component>
+                                    <Component Id="GCSControl.pluginspec" DiskId="1" Guid="9D3A26A1-135D-4A19-90D0-140B94110711">
+                                        <File Id="GCSControl.pluginspec" Name="GCSControl.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\GCSControl.pluginspec" />
+                                    </Component>
+                                    <Component Id="GpsDisplayGadget.dll" DiskId="1" Guid="AB8F7712-7A03-43D0-B89A-DC009D0D8094">
+                                        <File Id="GpsDisplayGadget.dll" Name="GpsDisplayGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\GpsDisplayGadget.dll" />
+                                    </Component>
+                                    <Component Id="GpsDisplayGadget.pluginspec" DiskId="1" Guid="A3BC86B2-E76A-414E-B382-F77B51426113">
+                                        <File Id="GpsDisplayGadget.pluginspec" Name="GpsDisplayGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\GpsDisplayGadget.pluginspec" />
+                                    </Component>
+                                    <Component Id="HITLNEW.dll" DiskId="1" Guid="5C12FE77-E547-44C6-B895-407C9561B122">
+                                        <File Id="HITLNEW.dll" Name="HITLNEW.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\HITLNEW.dll" />
+                                    </Component>
+                                    <Component Id="HITLNEW.pluginspec" DiskId="1" Guid="9791342F-693A-4D75-8984-CD3787E35764">
+                                        <File Id="HITLNEW.pluginspec" Name="HITLNEW.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\HITLNEW.pluginspec" />
+                                    </Component>
+                                    <Component Id="ImportExportGadget.dll" DiskId="1" Guid="B254E3A0-C5ED-4DDF-9739-630DA69F48C0">
+                                        <File Id="ImportExportGadget.dll" Name="ImportExportGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\ImportExportGadget.dll" />
+                                    </Component>
+                                    <Component Id="ImportExportGadget.pluginspec" DiskId="1" Guid="7728DE8F-38E3-48BA-8F52-CAF5048E6AE4">
+                                        <File Id="ImportExportGadget.pluginspec" Name="ImportExportGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\ImportExportGadget.pluginspec" />
+                                    </Component>
+                                    <Component Id="IPconnection.dll" DiskId="1" Guid="7583AD40-6E82-47CD-B0D8-714B56C4B7B5">
+                                        <File Id="IPconnection.dll" Name="IPconnection.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\IPconnection.dll" />
+                                    </Component>
+                                    <Component Id="IPconnection.pluginspec" DiskId="1" Guid="DAC2DDC2-AF7E-40C6-ACD7-0E5ED3ACCF7B">
+                                        <File Id="IPconnection.pluginspec" Name="IPconnection.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\IPconnection.pluginspec" />
+                                    </Component>
+                                    <Component Id="LineardialGadget.dll" DiskId="1" Guid="FDEA4734-B9EB-4CC5-ADB0-E6A8F2BA2BE0">
+                                        <File Id="LineardialGadget.dll" Name="LineardialGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\LineardialGadget.dll" />
+                                    </Component>
+                                    <Component Id="LineardialGadget.pluginspec" DiskId="1" Guid="2AEE49AA-FD70-49A8-90E5-A0DD4F75FCC1">
+                                        <File Id="LineardialGadget.pluginspec" Name="LineardialGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\LineardialGadget.pluginspec" />
+                                    </Component>
+                                    <Component Id="LoggingGadget.dll" DiskId="1" Guid="1C7A44DB-6539-4D04-B2CC-BB1AD2658135">
+                                        <File Id="LoggingGadget.dll" Name="LoggingGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\LoggingGadget.dll" />
+                                    </Component>
+                                    <Component Id="LoggingGadget.pluginspec" DiskId="1" Guid="4DE31798-E062-4FCB-A9DE-A7BB4EE11C96">
+                                        <File Id="LoggingGadget.pluginspec" Name="LoggingGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\LoggingGadget.pluginspec" />
+                                    </Component>
+                                    <Component Id="MagicWaypoint.dll" DiskId="1" Guid="E26969D5-3D8A-4E21-A204-D76F7D3362E2">
+                                        <File Id="MagicWaypoint.dll" Name="MagicWaypoint.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\MagicWaypoint.dll" />
+                                    </Component>
+                                    <Component Id="MagicWaypoint.pluginspec" DiskId="1" Guid="4194D658-2B8B-4C5A-8DD1-A7012D40E171">
+                                        <File Id="MagicWaypoint.pluginspec" Name="MagicWaypoint.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\MagicWaypoint.pluginspec" />
+                                    </Component>
+                                    <Component Id="ModelViewGadget.dll" DiskId="1" Guid="44BB3AE1-1814-4F7C-B32B-E5527AB5A4E0">
+                                        <File Id="ModelViewGadget.dll" Name="ModelViewGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\ModelViewGadget.dll" />
+                                    </Component>
+                                    <Component Id="ModelViewGadget.pluginspec" DiskId="1" Guid="5900D2E9-533E-4235-A508-F67B64DCAB0C">
+                                        <File Id="ModelViewGadget.pluginspec" Name="ModelViewGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\ModelViewGadget.pluginspec" />
+                                    </Component>
+                                    <Component Id="NotifyPlugin.dll" DiskId="1" Guid="61C7C712-F3EA-431B-A3CA-7F9CB10DD76C">
+                                        <File Id="NotifyPlugin.dll" Name="NotifyPlugin.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\NotifyPlugin.dll" />
+                                    </Component>
+                                    <Component Id="NotifyPlugin.pluginspec" DiskId="1" Guid="5EC03A27-BD2F-44B7-B62D-9E2620E71D18">
+                                        <File Id="NotifyPlugin.pluginspec" Name="NotifyPlugin.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\NotifyPlugin.pluginspec" />
+                                    </Component>
+                                    <Component Id="OPMapGadget.dll" DiskId="1" Guid="E2102204-E3CD-41CA-A50B-FFB37B63FF37">
+                                        <File Id="OPMapGadget.dll" Name="OPMapGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\OPMapGadget.dll" />
+                                    </Component>
+                                    <Component Id="OPMapGadget.pluginspec" DiskId="1" Guid="5AB522E9-1964-4CC6-8A55-8D89642D8683">
+                                        <File Id="OPMapGadget.pluginspec" Name="OPMapGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\OPMapGadget.pluginspec" />
+                                    </Component>
+                                    <Component Id="PFDGadget.dll" DiskId="1" Guid="3E0207FB-C1DF-4BD1-A7DB-721B5769DBC1">
+                                        <File Id="PFDGadget.dll" Name="PFDGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\PFDGadget.dll" />
+                                    </Component>
+                                    <Component Id="PFDGadget.pluginspec" DiskId="1" Guid="5EE5BF55-5FFB-402E-8436-5AE3EA9CA258">
+                                        <File Id="PFDGadget.pluginspec" Name="PFDGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\PFDGadget.pluginspec" />
+                                    </Component>
+                                    <Component Id="RawHID.dll" DiskId="1" Guid="9375A460-934C-40D3-B2D3-AFD8D8D5B396">
+                                        <File Id="RawHID.dll" Name="RawHID.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\RawHID.dll" />
+                                    </Component>
+                                    <Component Id="RawHID.pluginspec" DiskId="1" Guid="86EE9142-2FEA-4820-8C30-7E108D875DDB">
+                                        <File Id="RawHID.pluginspec" Name="RawHID.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\RawHID.pluginspec" />
+                                    </Component>
+                                    <Component Id="ScopeGadget.dll" DiskId="1" Guid="4B529440-20C5-4E08-9C96-F1A838F8F763">
+                                        <File Id="ScopeGadget.dll" Name="ScopeGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\ScopeGadget.dll" />
+                                    </Component>
+                                    <Component Id="ScopeGadget.pluginspec" DiskId="1" Guid="B6FBB1F0-4910-4CB2-B656-8CDF80C9D56A">
+                                        <File Id="ScopeGadget.pluginspec" Name="ScopeGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\ScopeGadget.pluginspec" />
+                                    </Component>
+                                    <Component Id="Serial.dll" DiskId="1" Guid="9C10B9D0-31DF-4A40-89EE-1DF90588E0B8">
+                                        <File Id="Serial.dll" Name="Serial.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Serial.dll" />
+                                    </Component>
+                                    <Component Id="Serial.pluginspec" DiskId="1" Guid="33012F12-454D-4697-96B8-516F22C48F95">
+                                        <File Id="Serial.pluginspec" Name="Serial.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Serial.pluginspec" />
+                                    </Component>
+                                    <Component Id="SystemHealthGadget.dll" DiskId="1" Guid="AF171E42-24E2-4609-8F24-7069C7043EB4">
+                                        <File Id="SystemHealthGadget.dll" Name="SystemHealthGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\SystemHealthGadget.dll" />
+                                    </Component>
+                                    <Component Id="SystemHealthGadget.pluginspec" DiskId="1" Guid="A6E71F18-7301-46D8-8950-D172C5C6D440">
+                                        <File Id="SystemHealthGadget.pluginspec" Name="SystemHealthGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\SystemHealthGadget.pluginspec" />
+                                    </Component>
+                                    <Component Id="UAVObjectBrowser.dll" DiskId="1" Guid="A2B17448-D09A-4AA3-BBA1-FA70E95630B4">
+                                        <File Id="UAVObjectBrowser.dll" Name="UAVObjectBrowser.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\UAVObjectBrowser.dll" />
+                                    </Component>
+                                    <Component Id="UAVObjectBrowser.pluginspec" DiskId="1" Guid="4F084D6F-FAAE-4A9B-BC49-D1D665A62432">
+                                        <File Id="UAVObjectBrowser.pluginspec" Name="UAVObjectBrowser.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\UAVObjectBrowser.pluginspec" />
+                                    </Component>
+                                    <Component Id="UAVObjects.dll" DiskId="1" Guid="71416D8F-EDE1-4652-B990-040676C9EA54">
+                                        <File Id="UAVObjects.dll" Name="UAVObjects.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\UAVObjects.dll" />
+                                    </Component>
+                                    <Component Id="UAVObjects.pluginspec" DiskId="1" Guid="235EFEFE-D3D2-47E7-A338-10F7C36E3FF4">
+                                        <File Id="UAVObjects.pluginspec" Name="UAVObjects.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\UAVObjects.pluginspec" />
+                                    </Component>
+                                    <Component Id="UAVTalk.dll" DiskId="1" Guid="56DF47D7-ED76-4D89-8A69-368978C61213">
+                                        <File Id="UAVTalk.dll" Name="UAVTalk.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\UAVTalk.dll" />
+                                    </Component>
+                                    <Component Id="UAVTalk.pluginspec" DiskId="1" Guid="0CD3982A-1E7C-4345-AD25-E28D1D4430CE">
+                                        <File Id="UAVTalk.pluginspec" Name="UAVTalk.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\UAVTalk.pluginspec" />
+                                    </Component>
+                                    <Component Id="Uploader.dll" DiskId="1" Guid="DC011D48-68C7-47ED-BC3B-604C1325FC2A">
+                                        <File Id="Uploader.dll" Name="Uploader.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Uploader.dll" />
+                                    </Component>
+                                    <Component Id="Uploader.pluginspec" DiskId="1" Guid="30779301-D502-4DC3-A158-2C39096BD599">
+                                        <File Id="Uploader.pluginspec" Name="Uploader.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Uploader.pluginspec" />
+                                    </Component>
+                                    <Component Id="Welcome.dll" DiskId="1" Guid="145BF7A2-F076-456E-9F9A-7F366F0C0CB8">
+                                        <File Id="Welcome.dll" Name="Welcome.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Welcome.dll" />
+                                    </Component>
+                                    <Component Id="Welcome.pluginspec" DiskId="1" Guid="46028922-F2C1-4226-BCC9-DF114B04B718">
+                                        <File Id="Welcome.pluginspec" Name="Welcome.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Welcome.pluginspec" />
+                                    </Component>
+                                </Directory>
+                            </Directory>
+                        </Directory>
+                    </Directory>
+                    <Directory Id="share" Name="share">
+                        <Directory Id="openpilotgcs_1" Name="openpilotgcs">
+                            <Directory Id="diagrams" Name="diagrams">
+                                <Directory Id="default" Name="default">
+                                    <Component Id="system_health.svg" DiskId="1" Guid="AF4E2022-875C-4EAF-9C82-351E0917E0B7">
+                                        <File Id="system_health.svg" Name="system-health.svg" Source="..\..\share\openpilotgcs\diagrams\default\system-health.svg" />
+                                    </Component>
+                                </Directory>
+                            </Directory>
+                            <Directory Id="dials" Name="dials">
+                                <Directory Id="default_1" Name="default">
+                                    <Component Id="altimeter.svg" DiskId="1" Guid="B192AC40-0A24-4640-A892-09C34F104E28">
+                                        <File Id="altimeter.svg" Name="altimeter.svg" Source="..\..\share\openpilotgcs\dials\default\altimeter.svg" />
+                                    </Component>
+                                    <Component Id="arm_status.svg" DiskId="1" Guid="BD4799E3-E948-460A-8E33-D42241590C80">
+                                        <File Id="arm_status.svg" Name="arm-status.svg" Source="..\..\share\openpilotgcs\dials\default\arm-status.svg" />
+                                    </Component>
+                                    <Component Id="attitude.svg" DiskId="1" Guid="D8845B81-D918-47A7-9D76-D723DDA28DA9">
+                                        <File Id="attitude.svg" Name="attitude.svg" Source="..\..\share\openpilotgcs\dials\default\attitude.svg" />
+                                    </Component>
+                                    <Component Id="compass.svg" DiskId="1" Guid="961408C3-0941-4DB1-B9FC-E256BD0BF462">
+                                        <File Id="compass.svg" Name="compass.svg" Source="..\..\share\openpilotgcs\dials\default\compass.svg" />
+                                    </Component>
+                                    <Component Id="flightmode_status.svg" DiskId="1" Guid="33C8AA47-E1DE-445F-B24A-0ED150CEE396">
+                                        <File Id="flightmode_status.svg" Name="flightmode-status.svg" Source="..\..\share\openpilotgcs\dials\default\flightmode-status.svg" />
+                                    </Component>
+                                    <Component Id="gps_signal.svg" DiskId="1" Guid="4EE42023-B724-4251-9B0A-1D03454C75AB">
+                                        <File Id="gps_signal.svg" Name="gps-signal.svg" Source="..\..\share\openpilotgcs\dials\default\gps-signal.svg" />
+                                    </Component>
+                                    <Component Id="gps_status.svg" DiskId="1" Guid="EA0D1214-1064-4B8D-B348-758CD89FCB71">
+                                        <File Id="gps_status.svg" Name="gps-status.svg" Source="..\..\share\openpilotgcs\dials\default\gps-status.svg" />
+                                    </Component>
+                                    <Component Id="lineardial_horizontal.svg" DiskId="1" Guid="DE1D4B50-1C2F-47EA-AF70-81ECABC82533">
+                                        <File Id="lineardial_horizontal.svg" Name="lineardial-horizontal.svg" Source="..\..\share\openpilotgcs\dials\default\lineardial-horizontal.svg" />
+                                    </Component>
+                                    <Component Id="lineardial_vertical.svg" DiskId="1" Guid="A0264FD4-A16C-4F1A-87DA-7ADDA4E0317D">
+                                        <File Id="lineardial_vertical.svg" Name="lineardial-vertical.svg" Source="..\..\share\openpilotgcs\dials\default\lineardial-vertical.svg" />
+                                    </Component>
+                                    <Component Id="Readme.txt" DiskId="1" Guid="C3172322-0F08-4D6E-B194-D1651C597354">
+                                        <File Id="Readme.txt" Name="Readme.txt" Source="..\..\share\openpilotgcs\dials\default\Readme.txt" />
+                                    </Component>
+                                    <Component Id="speed.svg" DiskId="1" Guid="BCCBBA9A-D8D9-409D-8948-83C61C6E9232">
+                                        <File Id="speed.svg" Name="speed.svg" Source="..\..\share\openpilotgcs\dials\default\speed.svg" />
+                                    </Component>
+                                    <Component Id="textonly.svg" DiskId="1" Guid="DD164EB0-0EF0-4AB3-8BCF-93E34DB77D9D">
+                                        <File Id="textonly.svg" Name="textonly.svg" Source="..\..\share\openpilotgcs\dials\default\textonly.svg" />
+                                    </Component>
+                                    <Component Id="thermometer.svg" DiskId="1" Guid="AF9F8C7E-B96C-4695-BE5E-BB0A86B07292">
+                                        <File Id="thermometer.svg" Name="thermometer.svg" Source="..\..\share\openpilotgcs\dials\default\thermometer.svg" />
+                                    </Component>
+                                    <Component Id="vsi.svg" DiskId="1" Guid="2C798124-DB38-4134-97BF-C3EDD65502F3">
+                                        <File Id="vsi.svg" Name="vsi.svg" Source="..\..\share\openpilotgcs\dials\default\vsi.svg" />
+                                    </Component>
+                                </Directory>
+                                <Directory Id="deluxe" Name="deluxe">
+                                    <Component Id="altimeter.svg_1" DiskId="1" Guid="8C11CA4E-81D6-407E-B77F-5DFBA26F41EB">
+                                        <File Id="altimeter.svg_1" Name="altimeter.svg" Source="..\..\share\openpilotgcs\dials\deluxe\altimeter.svg" />
+                                    </Component>
+                                    <Component Id="compass.svg_1" DiskId="1" Guid="5F45F400-0324-4394-9F87-995F5E033A2C">
+                                        <File Id="compass.svg_1" Name="compass.svg" Source="..\..\share\openpilotgcs\dials\deluxe\compass.svg" />
+                                    </Component>
+                                    <Component Id="speed.svg_1" DiskId="1" Guid="F06C2BDD-ED07-421E-A813-FF3F772564D8">
+                                        <File Id="speed.svg_1" Name="speed.svg" Source="..\..\share\openpilotgcs\dials\deluxe\speed.svg" />
+                                    </Component>
+                                    <Component Id="vsi.svg_1" DiskId="1" Guid="3EB42492-18C2-42E4-A852-6B0FEED26668">
+                                        <File Id="vsi.svg_1" Name="vsi.svg" Source="..\..\share\openpilotgcs\dials\deluxe\vsi.svg" />
+                                    </Component>
+                                </Directory>
+                                <Directory Id="hi_contrast" Name="hi-contrast">
+                                    <Component Id="altimeter.svg_2" DiskId="1" Guid="F0BFA8D8-7043-48B6-96D5-4362CF3699E0">
+                                        <File Id="altimeter.svg_2" Name="altimeter.svg" Source="..\..\share\openpilotgcs\dials\hi-contrast\altimeter.svg" />
+                                    </Component>
+                                    <Component Id="attitude.svg_1" DiskId="1" Guid="A3A55234-CB0A-4C74-8F96-80B89B0DFED0">
+                                        <File Id="attitude.svg_1" Name="attitude.svg" Source="..\..\share\openpilotgcs\dials\hi-contrast\attitude.svg" />
+                                    </Component>
+                                    <Component Id="compass.svg_2" DiskId="1" Guid="93E816A6-6698-4F64-B78F-CE78C9B61EA1">
+                                        <File Id="compass.svg_2" Name="compass.svg" Source="..\..\share\openpilotgcs\dials\hi-contrast\compass.svg" />
+                                    </Component>
+                                    <Component Id="flightmode_status.svg_1" DiskId="1" Guid="3F0C48D6-92F4-4742-B78E-C007B4E9C6C8">
+                                        <File Id="flightmode_status.svg_1" Name="flightmode-status.svg" Source="..\..\share\openpilotgcs\dials\hi-contrast\flightmode-status.svg" />
+                                    </Component>
+                                    <Component Id="gps_signal.svg_1" DiskId="1" Guid="7C316F56-BE70-449D-B6CB-81CB33BBE110">
+                                        <File Id="gps_signal.svg_1" Name="gps-signal.svg" Source="..\..\share\openpilotgcs\dials\hi-contrast\gps-signal.svg" />
+                                    </Component>
+                                    <Component Id="gps_status.svg_1" DiskId="1" Guid="1F9BD6BC-FF23-494E-864A-1D8A43265C78">
+                                        <File Id="gps_status.svg_1" Name="gps-status.svg" Source="..\..\share\openpilotgcs\dials\hi-contrast\gps-status.svg" />
+                                    </Component>
+                                    <Component Id="lineardial_horizontal.svg_1" DiskId="1" Guid="FC5D74FD-C41A-495C-9229-BAF423E805C1">
+                                        <File Id="lineardial_horizontal.svg_1" Name="lineardial-horizontal.svg" Source="..\..\share\openpilotgcs\dials\hi-contrast\lineardial-horizontal.svg" />
+                                    </Component>
+                                    <Component Id="lineardial_vertical.svg_1" DiskId="1" Guid="BA7CED37-2ECF-4DDF-91CB-34A7F95A33E5">
+                                        <File Id="lineardial_vertical.svg_1" Name="lineardial-vertical.svg" Source="..\..\share\openpilotgcs\dials\hi-contrast\lineardial-vertical.svg" />
+                                    </Component>
+                                    <Component Id="speed.svg_2" DiskId="1" Guid="03D7BA6C-ECC2-4AC1-95E7-DA7EF0617D3C">
+                                        <File Id="speed.svg_2" Name="speed.svg" Source="..\..\share\openpilotgcs\dials\hi-contrast\speed.svg" />
+                                    </Component>
+                                    <Component Id="textonly.svg_1" DiskId="1" Guid="4B26F84D-C9D9-450D-B23A-83E8D7738E0C">
+                                        <File Id="textonly.svg_1" Name="textonly.svg" Source="..\..\share\openpilotgcs\dials\hi-contrast\textonly.svg" />
+                                    </Component>
+                                    <Component Id="thermometer.svg_1" DiskId="1" Guid="2827E721-C3B1-4544-A60B-8C17DF9663A7">
+                                        <File Id="thermometer.svg_1" Name="thermometer.svg" Source="..\..\share\openpilotgcs\dials\hi-contrast\thermometer.svg" />
+                                    </Component>
+                                    <Component Id="vsi.svg_2" DiskId="1" Guid="B5877E01-803C-48BA-82BA-E3B0C2D95AA8">
+                                        <File Id="vsi.svg_2" Name="vsi.svg" Source="..\..\share\openpilotgcs\dials\hi-contrast\vsi.svg" />
+                                    </Component>
+                                </Directory>
+                            </Directory>
+                            <Directory Id="mapicons" Name="mapicons">
+                                <Component Id="easystar.png" DiskId="1" Guid="5990DBA8-9661-42E7-9EA0-EF5ED2BAFE1F">
+                                    <File Id="easystar.png" Name="easystar.png" Source="..\..\share\openpilotgcs\mapicons\easystar.png" />
+                                </Component>
+                                <Component Id="quad.png" DiskId="1" Guid="86580CD7-6553-4066-99A6-F3A9D44A8C9E">
+                                    <File Id="quad.png" Name="quad.png" Source="..\..\share\openpilotgcs\mapicons\quad.png" />
+                                </Component>
+                            </Directory>
+                            <Directory Id="models" Name="models">
+                                <Component Id="default_background.png" DiskId="1" Guid="5726DB43-3808-449D-A577-5723FE282C89">
+                                    <File Id="default_background.png" Name="default_background.png" Source="..\..\share\openpilotgcs\models\default_background.png" />
+                                </Component>
+                                <Directory Id="helis" Name="helis">
+                                    <Directory Id="t_rex" Name="t-rex">
+                                        <Component Id="t_rex_450_xl.3ds" DiskId="1" Guid="67BC7C89-D842-4DC9-AD34-7542E2014801">
+                                            <File Id="t_rex_450_xl.3ds" Name="t-rex_450_xl.3ds" Source="..\..\share\openpilotgcs\models\helis\t-rex\t-rex_450_xl.3ds" />
+                                        </Component>
+                                        <Component Id="t_rex_450_xl.jpg" DiskId="1" Guid="A43792AA-C05B-4111-98CE-4F7BCBED3849">
+                                            <File Id="t_rex_450_xl.jpg" Name="t-rex_450_xl.jpg" Source="..\..\share\openpilotgcs\models\helis\t-rex\t-rex_450_xl.jpg" />
+                                        </Component>
+                                        <Component Id="t_rex_450_xl.wav" DiskId="1" Guid="6122482E-AEB9-4819-8412-1110CE78F82A">
+                                            <File Id="t_rex_450_xl.wav" Name="t-rex_450_xl.wav" Source="..\..\share\openpilotgcs\models\helis\t-rex\t-rex_450_xl.wav" />
+                                        </Component>
+                                        <Component Id="TEXTURE.JPG" DiskId="1" Guid="0DBA8B2F-26B6-43D4-B97D-6A33E1326BDD">
+                                            <File Id="TEXTURE.JPG" Name="TEXTURE.JPG" Source="..\..\share\openpilotgcs\models\helis\t-rex\TEXTURE.JPG" />
+                                        </Component>
+                                    </Directory>
+                                </Directory>
+                                <Directory Id="multi" Name="multi">
+                                    <Directory Id="aeroquad" Name="aeroquad">
+                                        <Component Id="aeroquad.jpg" DiskId="1" Guid="FC5423CF-6308-4ED0-B7E9-7A0AE17D2E81">
+                                            <File Id="aeroquad.jpg" Name="aeroquad.jpg" Source="..\..\share\openpilotgcs\models\multi\aeroquad\aeroquad.jpg" />
+                                        </Component>
+                                        <Component Id="aeroquad__.3ds" DiskId="1" Guid="3C0A27FE-B5FC-44BA-9C53-7DFCFD3F6379">
+                                            <File Id="aeroquad__.3ds" Name="aeroquad_+.3ds" Source="..\..\share\openpilotgcs\models\multi\aeroquad\aeroquad_+.3ds" />
+                                        </Component>
+                                        <Component Id="TEXTURE.JPG_1" DiskId="1" Guid="5DCFCB52-57E4-4161-BC4D-E42419EF33E8">
+                                            <File Id="TEXTURE.JPG_1" Name="TEXTURE.JPG" Source="..\..\share\openpilotgcs\models\multi\aeroquad\TEXTURE.JPG" />
+                                        </Component>
+                                    </Directory>
+                                    <Directory Id="easy_quad" Name="easy_quad">
+                                        <Component Id="boards.jpg" DiskId="1" Guid="21E470A2-F1D9-4FEF-AAE9-05A2F04C0697">
+                                            <File Id="boards.jpg" Name="boards.jpg" Source="..\..\share\openpilotgcs\models\multi\easy_quad\boards.jpg" />
+                                        </Component>
+                                        <Component Id="easy_quad_X.3ds" DiskId="1" Guid="CBB4F369-4CEF-4C6B-AF5D-4BF8F5B78C4A">
+                                            <File Id="easy_quad_X.3ds" Name="easy_quad_X.3ds" Source="..\..\share\openpilotgcs\models\multi\easy_quad\easy_quad_X.3ds" />
+                                        </Component>
+                                        <Component Id="easy_quad_X.jpg" DiskId="1" Guid="6EE65486-ADAF-4C79-8387-4AFD34FA5A9B">
+                                            <File Id="easy_quad_X.jpg" Name="easy_quad_X.jpg" Source="..\..\share\openpilotgcs\models\multi\easy_quad\easy_quad_X.jpg" />
+                                        </Component>
+                                        <Component Id="logo.jpg" DiskId="1" Guid="5B81B536-4931-4448-8262-1F81D43ADA9B">
+                                            <File Id="logo.jpg" Name="logo.jpg" Source="..\..\share\openpilotgcs\models\multi\easy_quad\logo.jpg" />
+                                        </Component>
+                                        <Component Id="TEXTURE.JPG_2" DiskId="1" Guid="D8F64B98-FF48-4B3E-A5C4-B790DA996B5B">
+                                            <File Id="TEXTURE.JPG_2" Name="TEXTURE.JPG" Source="..\..\share\openpilotgcs\models\multi\easy_quad\TEXTURE.JPG" />
+                                        </Component>
+                                    </Directory>
+                                    <Directory Id="mikrokopter" Name="mikrokopter">
+                                        <Component Id="MK_Hexa.3ds" DiskId="1" Guid="A297428C-2829-44EE-804D-9B7A0A6E1DD3">
+                                            <File Id="MK_Hexa.3ds" Name="MK_Hexa.3ds" Source="..\..\share\openpilotgcs\models\multi\mikrokopter\MK_Hexa.3ds" />
+                                        </Component>
+                                        <Component Id="MK_Hexa.jpg" DiskId="1" Guid="7559ABF2-94AD-43C0-BF09-E242064A11B9">
+                                            <File Id="MK_Hexa.jpg" Name="MK_Hexa.jpg" Source="..\..\share\openpilotgcs\models\multi\mikrokopter\MK_Hexa.jpg" />
+                                        </Component>
+                                        <Component Id="MK_L4_ME.3ds" DiskId="1" Guid="3CAA331C-47AE-437A-A5B2-0685D6966177">
+                                            <File Id="MK_L4_ME.3ds" Name="MK_L4-ME.3ds" Source="..\..\share\openpilotgcs\models\multi\mikrokopter\MK_L4-ME.3ds" />
+                                        </Component>
+                                        <Component Id="MK_L4_ME.jpg" DiskId="1" Guid="B18856EA-DE8F-4638-BA96-8A4E6746A28D">
+                                            <File Id="MK_L4_ME.jpg" Name="MK_L4-ME.jpg" Source="..\..\share\openpilotgcs\models\multi\mikrokopter\MK_L4-ME.jpg" />
+                                        </Component>
+                                        <Component Id="MK_Okto.3ds" DiskId="1" Guid="B2A4CCEB-AD1E-4E8D-BF4F-8F2320E67966">
+                                            <File Id="MK_Okto.3ds" Name="MK_Okto.3ds" Source="..\..\share\openpilotgcs\models\multi\mikrokopter\MK_Okto.3ds" />
+                                        </Component>
+                                        <Component Id="MK_Okto.jpg" DiskId="1" Guid="94B173D6-6774-48F5-A038-7BB9B01C47D5">
+                                            <File Id="MK_Okto.jpg" Name="MK_Okto.jpg" Source="..\..\share\openpilotgcs\models\multi\mikrokopter\MK_Okto.jpg" />
+                                        </Component>
+                                        <Component Id="MK_Okto2.3ds" DiskId="1" Guid="5BBE9F80-3687-4DDB-9121-AD30811766BC">
+                                            <File Id="MK_Okto2.3ds" Name="MK_Okto2.3ds" Source="..\..\share\openpilotgcs\models\multi\mikrokopter\MK_Okto2.3ds" />
+                                        </Component>
+                                        <Component Id="MK_Okto2.jpg" DiskId="1" Guid="93367438-FC6E-4424-8D29-7D4B1FAB3B0A">
+                                            <File Id="MK_Okto2.jpg" Name="MK_Okto2.jpg" Source="..\..\share\openpilotgcs\models\multi\mikrokopter\MK_Okto2.jpg" />
+                                        </Component>
+                                        <Component Id="TEXTURE.JPG_3" DiskId="1" Guid="44E212B1-532E-4D28-8112-97E80DC35E69">
+                                            <File Id="TEXTURE.JPG_3" Name="TEXTURE.JPG" Source="..\..\share\openpilotgcs\models\multi\mikrokopter\TEXTURE.JPG" />
+                                        </Component>
+                                    </Directory>
+                                </Directory>
+                                <Directory Id="planes" Name="planes">
+                                    <Directory Id="Easystar" Name="Easystar">
+                                        <Component Id="easystar.3ds" DiskId="1" Guid="C24029DF-5D3B-4CB3-A63C-899E4EEE3AFF">
+                                            <File Id="easystar.3ds" Name="easystar.3ds" Source="..\..\share\openpilotgcs\models\planes\Easystar\easystar.3ds" />
+                                        </Component>
+                                        <Component Id="easystar.jpg" DiskId="1" Guid="812F9F90-33B0-43EE-BC2D-7A9B0163E357">
+                                            <File Id="easystar.jpg" Name="easystar.jpg" Source="..\..\share\openpilotgcs\models\planes\Easystar\easystar.jpg" />
+                                        </Component>
+                                        <Component Id="TEXTURE.JPG_4" DiskId="1" Guid="B9D603E5-AAD8-4607-808B-1DADA8D77F30">
+                                            <File Id="TEXTURE.JPG_4" Name="TEXTURE.JPG" Source="..\..\share\openpilotgcs\models\planes\Easystar\TEXTURE.JPG" />
+                                        </Component>
+                                    </Directory>
+                                    <Directory Id="firecracker" Name="firecracker">
+                                        <Component Id="firecracker.3ds" DiskId="1" Guid="0E2147E9-4565-405B-B6DF-E3DA68E82AC5">
+                                            <File Id="firecracker.3ds" Name="firecracker.3ds" Source="..\..\share\openpilotgcs\models\planes\firecracker\firecracker.3ds" />
+                                        </Component>
+                                        <Component Id="firecracker.jpg" DiskId="1" Guid="CFA28429-5147-462B-B58B-BEF68172E72E">
+                                            <File Id="firecracker.jpg" Name="firecracker.jpg" Source="..\..\share\openpilotgcs\models\planes\firecracker\firecracker.jpg" />
+                                        </Component>
+                                        <Component Id="TEXTURE.JPG_5" DiskId="1" Guid="590F6F7F-D1D5-4779-9666-F9E5C1D5E619">
+                                            <File Id="TEXTURE.JPG_5" Name="TEXTURE.JPG" Source="..\..\share\openpilotgcs\models\planes\firecracker\TEXTURE.JPG" />
+                                        </Component>
+                                    </Directory>
+                                    <Directory Id="funjet" Name="funjet">
+                                        <Component Id="funjet.3ds" DiskId="1" Guid="0FF765C4-63D0-4C63-A309-5D3DEDB4D8B5">
+                                            <File Id="funjet.3ds" Name="funjet.3ds" Source="..\..\share\openpilotgcs\models\planes\funjet\funjet.3ds" />
+                                        </Component>
+                                        <Component Id="funjet.jpg" DiskId="1" Guid="AACB8BB0-B1B6-443D-8AD3-5C16AB920848">
+                                            <File Id="funjet.jpg" Name="funjet.jpg" Source="..\..\share\openpilotgcs\models\planes\funjet\funjet.jpg" />
+                                        </Component>
+                                        <Component Id="funjet.wav" DiskId="1" Guid="39438426-5055-4117-AA71-72D5C715E731">
+                                            <File Id="funjet.wav" Name="funjet.wav" Source="..\..\share\openpilotgcs\models\planes\funjet\funjet.wav" />
+                                        </Component>
+                                        <Component Id="TEXTURE.JPG_6" DiskId="1" Guid="C45CB883-9DB9-452F-9288-FF9B39B15B6D">
+                                            <File Id="TEXTURE.JPG_6" Name="TEXTURE.JPG" Source="..\..\share\openpilotgcs\models\planes\funjet\TEXTURE.JPG" />
+                                        </Component>
+                                    </Directory>
+                                </Directory>
+                            </Directory>
+                            <Directory Id="pfd" Name="pfd">
+                                <Directory Id="default_2" Name="default">
+                                    <Component Id="pfd.svg" DiskId="1" Guid="23CA1224-C973-4843-9473-7D6F84387EA5">
+                                        <File Id="pfd.svg" Name="pfd.svg" Source="..\..\share\openpilotgcs\pfd\default\pfd.svg" />
+                                    </Component>
+                                </Directory>
+                            </Directory>
+                            <Directory Id="sounds" Name="sounds">
+                                <Component Id="Complete_sound_set.txt" DiskId="1" Guid="7F442112-B2AF-43BD-9CEA-A175630C3B82">
+                                    <File Id="Complete_sound_set.txt" Name="Complete sound set.txt" Source="..\..\share\openpilotgcs\sounds\Complete sound set.txt" />
+                                </Component>
+                                <Component Id="License.txt" DiskId="1" Guid="9698EBB3-17D4-4F18-8B79-F09A48000A2D">
+                                    <File Id="License.txt" Name="License.txt" Source="..\..\share\openpilotgcs\sounds\License.txt" />
+                                </Component>
+                                <Directory Id="default_3" Name="default">
+                                    <Component Id="_0.wav" DiskId="1" Guid="52E8125C-2897-44EE-953B-78A625A80669">
+                                        <File Id="_0.wav" Name="0.wav" Source="..\..\share\openpilotgcs\sounds\default\0.wav" />
+                                    </Component>
+                                    <Component Id="_1.wav" DiskId="1" Guid="05347111-7C04-44D2-BFA9-48CE25ED4C91">
+                                        <File Id="_1.wav" Name="1.wav" Source="..\..\share\openpilotgcs\sounds\default\1.wav" />
+                                    </Component>
+                                    <Component Id="_10.wav" DiskId="1" Guid="FDEA84D0-486B-4424-A96C-83FBE9687BFB">
+                                        <File Id="_10.wav" Name="10.wav" Source="..\..\share\openpilotgcs\sounds\default\10.wav" />
+                                    </Component>
+                                    <Component Id="_100.wav" DiskId="1" Guid="41451DFD-0420-4092-A74D-00C073799404">
+                                        <File Id="_100.wav" Name="100.wav" Source="..\..\share\openpilotgcs\sounds\default\100.wav" />
+                                    </Component>
+                                    <Component Id="_1000.wav" DiskId="1" Guid="E28EB666-D7BE-4DF0-A2F4-66944E1DC282">
+                                        <File Id="_1000.wav" Name="1000.wav" Source="..\..\share\openpilotgcs\sounds\default\1000.wav" />
+                                    </Component>
+                                    <Component Id="_11.wav" DiskId="1" Guid="5473AF77-CB57-42E9-9D84-519237CFBE76">
+                                        <File Id="_11.wav" Name="11.wav" Source="..\..\share\openpilotgcs\sounds\default\11.wav" />
+                                    </Component>
+                                    <Component Id="_12.wav" DiskId="1" Guid="9BC02539-B97C-451C-B5D6-AE8D31FA5197">
+                                        <File Id="_12.wav" Name="12.wav" Source="..\..\share\openpilotgcs\sounds\default\12.wav" />
+                                    </Component>
+                                    <Component Id="_13.wav" DiskId="1" Guid="BF8AEEAB-7763-484D-8A1D-E88A80C1DAB5">
+                                        <File Id="_13.wav" Name="13.wav" Source="..\..\share\openpilotgcs\sounds\default\13.wav" />
+                                    </Component>
+                                    <Component Id="_14.wav" DiskId="1" Guid="35BAC87C-D35B-4711-8838-E9B3C1F4166B">
+                                        <File Id="_14.wav" Name="14.wav" Source="..\..\share\openpilotgcs\sounds\default\14.wav" />
+                                    </Component>
+                                    <Component Id="_15.wav" DiskId="1" Guid="4EDAD921-4B1C-4070-9934-8CCDB83CAEC4">
+                                        <File Id="_15.wav" Name="15.wav" Source="..\..\share\openpilotgcs\sounds\default\15.wav" />
+                                    </Component>
+                                    <Component Id="_16.wav" DiskId="1" Guid="925FB8F4-3C32-4439-A454-742F0DB06CC2">
+                                        <File Id="_16.wav" Name="16.wav" Source="..\..\share\openpilotgcs\sounds\default\16.wav" />
+                                    </Component>
+                                    <Component Id="_17.wav" DiskId="1" Guid="261E5E96-1FFD-404B-98AF-5857F00F13FB">
+                                        <File Id="_17.wav" Name="17.wav" Source="..\..\share\openpilotgcs\sounds\default\17.wav" />
+                                    </Component>
+                                    <Component Id="_18.wav" DiskId="1" Guid="818ED333-BCC7-4EE1-93C0-EB437472CF73">
+                                        <File Id="_18.wav" Name="18.wav" Source="..\..\share\openpilotgcs\sounds\default\18.wav" />
+                                    </Component>
+                                    <Component Id="_19.wav" DiskId="1" Guid="6C358E0E-7DDA-40F1-8140-5401137C5057">
+                                        <File Id="_19.wav" Name="19.wav" Source="..\..\share\openpilotgcs\sounds\default\19.wav" />
+                                    </Component>
+                                    <Component Id="_2.wav" DiskId="1" Guid="5F2031A1-2FB7-413C-B3B1-E5E57148C3FA">
+                                        <File Id="_2.wav" Name="2.wav" Source="..\..\share\openpilotgcs\sounds\default\2.wav" />
+                                    </Component>
+                                    <Component Id="_20.wav" DiskId="1" Guid="738BEBC4-C5F7-4C8A-AFD7-C01CFC4E6BF0">
+                                        <File Id="_20.wav" Name="20.wav" Source="..\..\share\openpilotgcs\sounds\default\20.wav" />
+                                    </Component>
+                                    <Component Id="_3.wav" DiskId="1" Guid="C415B122-8A6C-4BAE-9B0E-8073204D37DC">
+                                        <File Id="_3.wav" Name="3.wav" Source="..\..\share\openpilotgcs\sounds\default\3.wav" />
+                                    </Component>
+                                    <Component Id="_30.wav" DiskId="1" Guid="F761745A-0CF4-4A8D-99BB-71F0A108B7FD">
+                                        <File Id="_30.wav" Name="30.wav" Source="..\..\share\openpilotgcs\sounds\default\30.wav" />
+                                    </Component>
+                                    <Component Id="_4.wav" DiskId="1" Guid="CBCD6C58-003A-4FC5-B243-BE4C14CB1B76">
+                                        <File Id="_4.wav" Name="4.wav" Source="..\..\share\openpilotgcs\sounds\default\4.wav" />
+                                    </Component>
+                                    <Component Id="_40.wav" DiskId="1" Guid="05728B83-71A1-4E54-92E8-81C72CBA13A3">
+                                        <File Id="_40.wav" Name="40.wav" Source="..\..\share\openpilotgcs\sounds\default\40.wav" />
+                                    </Component>
+                                    <Component Id="_5.wav" DiskId="1" Guid="915117F7-D1DB-488B-B31A-7A9F176908FC">
+                                        <File Id="_5.wav" Name="5.wav" Source="..\..\share\openpilotgcs\sounds\default\5.wav" />
+                                    </Component>
+                                    <Component Id="_50.wav" DiskId="1" Guid="34BB64A7-CF53-4CE7-9D65-BD29DB036AA1">
+                                        <File Id="_50.wav" Name="50.wav" Source="..\..\share\openpilotgcs\sounds\default\50.wav" />
+                                    </Component>
+                                    <Component Id="_6.wav" DiskId="1" Guid="F72D20A0-A0C5-4EC8-B214-715732957A76">
+                                        <File Id="_6.wav" Name="6.wav" Source="..\..\share\openpilotgcs\sounds\default\6.wav" />
+                                    </Component>
+                                    <Component Id="_60.wav" DiskId="1" Guid="7386508A-10C5-4F9E-BFAC-EE79723AC399">
+                                        <File Id="_60.wav" Name="60.wav" Source="..\..\share\openpilotgcs\sounds\default\60.wav" />
+                                    </Component>
+                                    <Component Id="_7.wav" DiskId="1" Guid="B286F76F-DF56-4725-9BE9-DEECF741D95F">
+                                        <File Id="_7.wav" Name="7.wav" Source="..\..\share\openpilotgcs\sounds\default\7.wav" />
+                                    </Component>
+                                    <Component Id="_70.wav" DiskId="1" Guid="01FE8C6A-16C4-494B-852F-AFA31D821522">
+                                        <File Id="_70.wav" Name="70.wav" Source="..\..\share\openpilotgcs\sounds\default\70.wav" />
+                                    </Component>
+                                    <Component Id="_8.wav" DiskId="1" Guid="013456CD-37D0-4FE0-956E-65DE6C01C20E">
+                                        <File Id="_8.wav" Name="8.wav" Source="..\..\share\openpilotgcs\sounds\default\8.wav" />
+                                    </Component>
+                                    <Component Id="_80.wav" DiskId="1" Guid="BC872F26-6581-491D-810A-7624F94B8D6A">
+                                        <File Id="_80.wav" Name="80.wav" Source="..\..\share\openpilotgcs\sounds\default\80.wav" />
+                                    </Component>
+                                    <Component Id="_9.wav" DiskId="1" Guid="E7A5A575-A8EA-4164-B7B5-8505E449A7A3">
+                                        <File Id="_9.wav" Name="9.wav" Source="..\..\share\openpilotgcs\sounds\default\9.wav" />
+                                    </Component>
+                                    <Component Id="_90.wav" DiskId="1" Guid="CF772292-7424-4D5B-97AE-923D4D0EBCF4">
+                                        <File Id="_90.wav" Name="90.wav" Source="..\..\share\openpilotgcs\sounds\default\90.wav" />
+                                    </Component>
+                                    <Component Id="aborted.wav" DiskId="1" Guid="2290F4C5-7A00-403F-9404-CDF6629E7290">
+                                        <File Id="aborted.wav" Name="aborted.wav" Source="..\..\share\openpilotgcs\sounds\default\aborted.wav" />
+                                    </Component>
+                                    <Component Id="active.wav" DiskId="1" Guid="D7B717F6-865D-43B7-AC23-95956E2D7EE2">
+                                        <File Id="active.wav" Name="active.wav" Source="..\..\share\openpilotgcs\sounds\default\active.wav" />
+                                    </Component>
+                                    <Component Id="alarmsound.wav" DiskId="1" Guid="7DE4517F-5C30-4C86-8D3E-C7E2FA288676">
+                                        <File Id="alarmsound.wav" Name="alarmsound.wav" Source="..\..\share\openpilotgcs\sounds\default\alarmsound.wav" />
+                                    </Component>
+                                    <Component Id="alert.wav" DiskId="1" Guid="2AB6B619-868B-41B5-B0F9-BDC7BB865D42">
+                                        <File Id="alert.wav" Name="alert.wav" Source="..\..\share\openpilotgcs\sounds\default\alert.wav" />
+                                    </Component>
+                                    <Component Id="altitude.wav" DiskId="1" Guid="5B5B7375-7C63-41AC-9101-6DE69E9CF834">
+                                        <File Id="altitude.wav" Name="altitude.wav" Source="..\..\share\openpilotgcs\sounds\default\altitude.wav" />
+                                    </Component>
+                                    <Component Id="amps.wav" DiskId="1" Guid="8E8BDBB4-8EAD-4277-8121-484367475FA3">
+                                        <File Id="amps.wav" Name="amps.wav" Source="..\..\share\openpilotgcs\sounds\default\amps.wav" />
+                                    </Component>
+                                    <Component Id="aquired.wav" DiskId="1" Guid="B3A01E54-96A3-4699-B331-8CCD760940E2">
+                                        <File Id="aquired.wav" Name="aquired.wav" Source="..\..\share\openpilotgcs\sounds\default\aquired.wav" />
+                                    </Component>
+                                    <Component Id="auto_flight.wav" DiskId="1" Guid="3877E834-6AC1-45BD-8A10-24C1501C4DD2">
+                                        <File Id="auto_flight.wav" Name="auto flight.wav" Source="..\..\share\openpilotgcs\sounds\default\auto flight.wav" />
+                                    </Component>
+                                    <Component Id="battery.wav" DiskId="1" Guid="6D4D9143-8BFA-454A-9E42-F1D3CDC7DE64">
+                                        <File Id="battery.wav" Name="battery.wav" Source="..\..\share\openpilotgcs\sounds\default\battery.wav" />
+                                    </Component>
+                                    <Component Id="beepsound.wav" DiskId="1" Guid="3F0A0926-9982-4F73-9C22-EC95A82F43AD">
+                                        <File Id="beepsound.wav" Name="beepsound.wav" Source="..\..\share\openpilotgcs\sounds\default\beepsound.wav" />
+                                    </Component>
+                                    <Component Id="camera.wav" DiskId="1" Guid="5E21A310-00C0-4F83-A0EF-0C9266A62485">
+                                        <File Id="camera.wav" Name="camera.wav" Source="..\..\share\openpilotgcs\sounds\default\camera.wav" />
+                                    </Component>
+                                    <Component Id="cancelled.wav" DiskId="1" Guid="D4FC13FA-1CF3-4EE2-A904-C780763BB948">
+                                        <File Id="cancelled.wav" Name="cancelled.wav" Source="..\..\share\openpilotgcs\sounds\default\cancelled.wav" />
+                                    </Component>
+                                    <Component Id="changed.wav" DiskId="1" Guid="31721B64-20E6-41D8-97B3-8A016E0DA14D">
+                                        <File Id="changed.wav" Name="changed.wav" Source="..\..\share\openpilotgcs\sounds\default\changed.wav" />
+                                    </Component>
+                                    <Component Id="circle_position.wav" DiskId="1" Guid="2FA6BF89-C2FB-4DE7-8CBE-F6CA2E771B16">
+                                        <File Id="circle_position.wav" Name="circle position.wav" Source="..\..\share\openpilotgcs\sounds\default\circle position.wav" />
+                                    </Component>
+                                    <Component Id="cleared.wav" DiskId="1" Guid="E7B88C91-21EA-4B61-89D7-BCEB8E90E95B">
+                                        <File Id="cleared.wav" Name="cleared.wav" Source="..\..\share\openpilotgcs\sounds\default\cleared.wav" />
+                                    </Component>
+                                    <Component Id="complete.wav" DiskId="1" Guid="F4712FEC-8FBC-41C8-BEC4-F3E1D84BD2DB">
+                                        <File Id="complete.wav" Name="complete.wav" Source="..\..\share\openpilotgcs\sounds\default\complete.wav" />
+                                    </Component>
+                                    <Component Id="connected.wav" DiskId="1" Guid="82A58EF2-04C2-4E1E-BB6D-D344F62295F4">
+                                        <File Id="connected.wav" Name="connected.wav" Source="..\..\share\openpilotgcs\sounds\default\connected.wav" />
+                                    </Component>
+                                    <Component Id="connection.wav" DiskId="1" Guid="21C94858-5D55-49BF-99FE-3C2582D4B1DD">
+                                        <File Id="connection.wav" Name="connection.wav" Source="..\..\share\openpilotgcs\sounds\default\connection.wav" />
+                                    </Component>
+                                    <Component Id="control.wav" DiskId="1" Guid="49E0120E-9DFB-4774-A54B-D4834675F8E4">
+                                        <File Id="control.wav" Name="control.wav" Source="..\..\share\openpilotgcs\sounds\default\control.wav" />
+                                    </Component>
+                                    <Component Id="disabled.wav" DiskId="1" Guid="BB0E17B1-8B63-41CE-9105-0CAC176173C8">
+                                        <File Id="disabled.wav" Name="disabled.wav" Source="..\..\share\openpilotgcs\sounds\default\disabled.wav" />
+                                    </Component>
+                                    <Component Id="disconnected.wav" DiskId="1" Guid="0DE74301-AE63-4509-887B-DB28C4F02CD1">
+                                        <File Id="disconnected.wav" Name="disconnected.wav" Source="..\..\share\openpilotgcs\sounds\default\disconnected.wav" />
+                                    </Component>
+                                    <Component Id="feet.wav" DiskId="1" Guid="9CA20A1D-8D9C-438A-9B8A-ABFF8B8F099C">
+                                        <File Id="feet.wav" Name="feet.wav" Source="..\..\share\openpilotgcs\sounds\default\feet.wav" />
+                                    </Component>
+                                    <Component Id="figure_eight.wav" DiskId="1" Guid="149B58D4-1E31-4445-95A7-BF25F75C53AD">
+                                        <File Id="figure_eight.wav" Name="figure eight.wav" Source="..\..\share\openpilotgcs\sounds\default\figure eight.wav" />
+                                    </Component>
+                                    <Component Id="flight.wav" DiskId="1" Guid="CF5DCF3A-476E-4DA2-8A08-9FB39440F79E">
+                                        <File Id="flight.wav" Name="flight.wav" Source="..\..\share\openpilotgcs\sounds\default\flight.wav" />
+                                    </Component>
+                                    <Component Id="geofence.wav" DiskId="1" Guid="0841B1F8-D5C1-4D5D-81AB-F229E4C6CDA8">
+                                        <File Id="geofence.wav" Name="geofence.wav" Source="..\..\share\openpilotgcs\sounds\default\geofence.wav" />
+                                    </Component>
+                                    <Component Id="gps.wav" DiskId="1" Guid="CF64B618-31D9-44D5-B04B-8F9924EE437C">
+                                        <File Id="gps.wav" Name="gps.wav" Source="..\..\share\openpilotgcs\sounds\default\gps.wav" />
+                                    </Component>
+                                    <Component Id="ground_station.wav" DiskId="1" Guid="6D504000-3F49-4DA0-A916-60E53F50D2BB">
+                                        <File Id="ground_station.wav" Name="ground station.wav" Source="..\..\share\openpilotgcs\sounds\default\ground station.wav" />
+                                    </Component>
+                                    <Component Id="heading.wav" DiskId="1" Guid="2A53EE68-6396-478D-9686-6C17C78A18A1">
+                                        <File Id="heading.wav" Name="heading.wav" Source="..\..\share\openpilotgcs\sounds\default\heading.wav" />
+                                    </Component>
+                                    <Component Id="height.wav" DiskId="1" Guid="85719DF9-9710-4A6B-903A-DCA9D7017471">
+                                        <File Id="height.wav" Name="height.wav" Source="..\..\share\openpilotgcs\sounds\default\height.wav" />
+                                    </Component>
+                                    <Component Id="high.wav" DiskId="1" Guid="FD12414E-2D7F-4FB0-87A9-A4A88CFFC465">
+                                        <File Id="high.wav" Name="high.wav" Source="..\..\share\openpilotgcs\sounds\default\high.wav" />
+                                    </Component>
+                                    <Component Id="hippodrome.wav" DiskId="1" Guid="8EC9664B-47DB-4D12-9578-CAD207BB3C62">
+                                        <File Id="hippodrome.wav" Name="hippodrome.wav" Source="..\..\share\openpilotgcs\sounds\default\hippodrome.wav" />
+                                    </Component>
+                                    <Component Id="hold_position.wav" DiskId="1" Guid="16363C1E-CA96-4F85-8F4B-CC17665B9E11">
+                                        <File Id="hold_position.wav" Name="hold position.wav" Source="..\..\share\openpilotgcs\sounds\default\hold position.wav" />
+                                    </Component>
+                                    <Component Id="home_location.wav" DiskId="1" Guid="D4665F18-4C27-4670-8C01-C4951A0BC943">
+                                        <File Id="home_location.wav" Name="home location.wav" Source="..\..\share\openpilotgcs\sounds\default\home location.wav" />
+                                    </Component>
+                                    <Component Id="initialised.wav" DiskId="1" Guid="35D929C3-B5EE-4B85-B062-5C28A8B84074">
+                                        <File Id="initialised.wav" Name="initialised.wav" Source="..\..\share\openpilotgcs\sounds\default\initialised.wav" />
+                                    </Component>
+                                    <Component Id="initiated.wav" DiskId="1" Guid="5D4B25C7-8A82-4788-A481-0BA76DF3425A">
+                                        <File Id="initiated.wav" Name="initiated.wav" Source="..\..\share\openpilotgcs\sounds\default\initiated.wav" />
+                                    </Component>
+                                    <Component Id="KPH.wav" DiskId="1" Guid="F8097DC4-0B66-4673-BF39-FDFE42883592">
+                                        <File Id="KPH.wav" Name="KPH.wav" Source="..\..\share\openpilotgcs\sounds\default\KPH.wav" />
+                                    </Component>
+                                    <Component Id="landing.wav" DiskId="1" Guid="35E8E081-7353-4260-AAC9-0D330AADAA2D">
+                                        <File Id="landing.wav" Name="landing.wav" Source="..\..\share\openpilotgcs\sounds\default\landing.wav" />
+                                    </Component>
+                                    <Component Id="launch.wav" DiskId="1" Guid="DAF857D2-F864-4FA3-B235-A5AAAD33AC20">
+                                        <File Id="launch.wav" Name="launch.wav" Source="..\..\share\openpilotgcs\sounds\default\launch.wav" />
+                                    </Component>
+                                    <Component Id="left.wav" DiskId="1" Guid="6AD41B7D-2EAE-4C78-B6F7-7FB397A028D3">
+                                        <File Id="left.wav" Name="left.wav" Source="..\..\share\openpilotgcs\sounds\default\left.wav" />
+                                    </Component>
+                                    <Component Id="logging.wav" DiskId="1" Guid="F600208A-06C7-4E9D-905B-699B1EB74AF1">
+                                        <File Id="logging.wav" Name="logging.wav" Source="..\..\share\openpilotgcs\sounds\default\logging.wav" />
+                                    </Component>
+                                    <Component Id="lost.wav" DiskId="1" Guid="4803EF5A-031C-467E-BBB0-70B3240B88D8">
+                                        <File Id="lost.wav" Name="lost.wav" Source="..\..\share\openpilotgcs\sounds\default\lost.wav" />
+                                    </Component>
+                                    <Component Id="low_altitude.wav" DiskId="1" Guid="E5B83F69-73F5-4613-B028-8CEC8CCA3D38">
+                                        <File Id="low_altitude.wav" Name="low altitude.wav" Source="..\..\share\openpilotgcs\sounds\default\low altitude.wav" />
+                                    </Component>
+                                    <Component Id="low_battery.wav" DiskId="1" Guid="025AE308-480F-4235-87B8-E45D0C45076A">
+                                        <File Id="low_battery.wav" Name="low battery.wav" Source="..\..\share\openpilotgcs\sounds\default\low battery.wav" />
+                                    </Component>
+                                    <Component Id="low_gps_quality.wav" DiskId="1" Guid="F55F5143-8638-48C8-8A93-26E335A5BF84">
+                                        <File Id="low_gps_quality.wav" Name="low gps quality.wav" Source="..\..\share\openpilotgcs\sounds\default\low gps quality.wav" />
+                                    </Component>
+                                    <Component Id="manual_flight.wav" DiskId="1" Guid="3BEC781A-9CE6-4704-9F1F-6B79670F898E">
+                                        <File Id="manual_flight.wav" Name="manual flight.wav" Source="..\..\share\openpilotgcs\sounds\default\manual flight.wav" />
+                                    </Component>
+                                    <Component Id="maximum.wav" DiskId="1" Guid="1CCC8AB9-7783-4B59-A914-C9E14E45DE78">
+                                        <File Id="maximum.wav" Name="maximum.wav" Source="..\..\share\openpilotgcs\sounds\default\maximum.wav" />
+                                    </Component>
+                                    <Component Id="meters.wav" DiskId="1" Guid="6A09C5C3-589C-4E87-9F36-F954A4E9DEAC">
+                                        <File Id="meters.wav" Name="meters.wav" Source="..\..\share\openpilotgcs\sounds\default\meters.wav" />
+                                    </Component>
+                                    <Component Id="minimum.wav" DiskId="1" Guid="4B9DA93F-0940-4DF7-858E-6BCF922E1C6E">
+                                        <File Id="minimum.wav" Name="minimum.wav" Source="..\..\share\openpilotgcs\sounds\default\minimum.wav" />
+                                    </Component>
+                                    <Component Id="mode.wav" DiskId="1" Guid="15C9983C-3C86-4BDD-A6E1-984521035839">
+                                        <File Id="mode.wav" Name="mode.wav" Source="..\..\share\openpilotgcs\sounds\default\mode.wav" />
+                                    </Component>
+                                    <Component Id="MPH.wav" DiskId="1" Guid="CAD57587-549B-4D60-A482-040D368E14A8">
+                                        <File Id="MPH.wav" Name="MPH.wav" Source="..\..\share\openpilotgcs\sounds\default\MPH.wav" />
+                                    </Component>
+                                    <Component Id="navigation.wav" DiskId="1" Guid="563F9807-38F5-45ED-ABB9-0424CAE13907">
+                                        <File Id="navigation.wav" Name="navigation.wav" Source="..\..\share\openpilotgcs\sounds\default\navigation.wav" />
+                                    </Component>
+                                    <Component Id="openpilot.wav" DiskId="1" Guid="CDA6753C-A3D2-4296-A375-403DE94FE078">
+                                        <File Id="openpilot.wav" Name="openpilot.wav" Source="..\..\share\openpilotgcs\sounds\default\openpilot.wav" />
+                                    </Component>
+                                    <Component Id="point.wav" DiskId="1" Guid="B1D02EA4-6B1D-4430-A12C-1E427A6AC22B">
+                                        <File Id="point.wav" Name="point.wav" Source="..\..\share\openpilotgcs\sounds\default\point.wav" />
+                                    </Component>
+                                    <Component Id="range.wav" DiskId="1" Guid="4A215F6C-D617-4164-A701-8605243CEB64">
+                                        <File Id="range.wav" Name="range.wav" Source="..\..\share\openpilotgcs\sounds\default\range.wav" />
+                                    </Component>
+                                    <Component Id="reached.wav" DiskId="1" Guid="4D26E622-042A-4CCE-9878-3C99A661A888">
+                                        <File Id="reached.wav" Name="reached.wav" Source="..\..\share\openpilotgcs\sounds\default\reached.wav" />
+                                    </Component>
+                                    <Component Id="ready_for_flight.wav" DiskId="1" Guid="2655D5CF-CC37-4A4C-830C-A5AC544B00EA">
+                                        <File Id="ready_for_flight.wav" Name="ready for flight.wav" Source="..\..\share\openpilotgcs\sounds\default\ready for flight.wav" />
+                                    </Component>
+                                    <Component Id="return_home.wav" DiskId="1" Guid="0AF31A1E-1843-4F5D-9CFF-A52610B257B0">
+                                        <File Id="return_home.wav" Name="return home.wav" Source="..\..\share\openpilotgcs\sounds\default\return home.wav" />
+                                    </Component>
+                                    <Component Id="right.wav" DiskId="1" Guid="F185E89C-850F-4A16-AD55-C7592044F2A2">
+                                        <File Id="right.wav" Name="right.wav" Source="..\..\share\openpilotgcs\sounds\default\right.wav" />
+                                    </Component>
+                                    <Component Id="set.wav" DiskId="1" Guid="9A5D1CA9-3B00-4A53-BBB7-4698230BD5C2">
+                                        <File Id="set.wav" Name="set.wav" Source="..\..\share\openpilotgcs\sounds\default\set.wav" />
+                                    </Component>
+                                    <Component Id="speed.wav" DiskId="1" Guid="8951CFFD-EA5C-46D9-8C6E-49036AA08AA9">
+                                        <File Id="speed.wav" Name="speed.wav" Source="..\..\share\openpilotgcs\sounds\default\speed.wav" />
+                                    </Component>
+                                    <Component Id="stabilization.wav" DiskId="1" Guid="311D31A5-B667-4C19-BE03-DDF10D08668F">
+                                        <File Id="stabilization.wav" Name="stabilization.wav" Source="..\..\share\openpilotgcs\sounds\default\stabilization.wav" />
+                                    </Component>
+                                    <Component Id="started.wav" DiskId="1" Guid="5770FF2A-4228-43E4-9CBC-413887E922D7">
+                                        <File Id="started.wav" Name="started.wav" Source="..\..\share\openpilotgcs\sounds\default\started.wav" />
+                                    </Component>
+                                    <Component Id="stopped.wav" DiskId="1" Guid="F86160FF-2993-41E9-BDC7-5A4AE383973C">
+                                        <File Id="stopped.wav" Name="stopped.wav" Source="..\..\share\openpilotgcs\sounds\default\stopped.wav" />
+                                    </Component>
+                                    <Component Id="takeoff.wav" DiskId="1" Guid="045B9BAF-35C3-4258-B4E7-879E78BB41AA">
+                                        <File Id="takeoff.wav" Name="takeoff.wav" Source="..\..\share\openpilotgcs\sounds\default\takeoff.wav" />
+                                    </Component>
+                                    <Component Id="telemetry.wav" DiskId="1" Guid="AEA8B21A-8715-4C35-9ED8-B7A208F78BD7">
+                                        <File Id="telemetry.wav" Name="telemetry.wav" Source="..\..\share\openpilotgcs\sounds\default\telemetry.wav" />
+                                    </Component>
+                                    <Component Id="time.wav" DiskId="1" Guid="EE0D4EAD-6EE1-49E8-B1A0-8B29327E3A16">
+                                        <File Id="time.wav" Name="time.wav" Source="..\..\share\openpilotgcs\sounds\default\time.wav" />
+                                    </Component>
+                                    <Component Id="triggered.wav" DiskId="1" Guid="85306772-46F0-4B72-81DE-7DAA12588791">
+                                        <File Id="triggered.wav" Name="triggered.wav" Source="..\..\share\openpilotgcs\sounds\default\triggered.wav" />
+                                    </Component>
+                                    <Component Id="uav.wav" DiskId="1" Guid="A95678BF-20C7-452C-AFD8-205944301907">
+                                        <File Id="uav.wav" Name="uav.wav" Source="..\..\share\openpilotgcs\sounds\default\uav.wav" />
+                                    </Component>
+                                    <Component Id="volts.wav" DiskId="1" Guid="DB177A17-9C43-410B-9D4E-D6A889504CB3">
+                                        <File Id="volts.wav" Name="volts.wav" Source="..\..\share\openpilotgcs\sounds\default\volts.wav" />
+                                    </Component>
+                                    <Component Id="warning.wav" DiskId="1" Guid="C356809F-EC4B-4FE0-B565-AFAC25CB875D">
+                                        <File Id="warning.wav" Name="warning.wav" Source="..\..\share\openpilotgcs\sounds\default\warning.wav" />
+                                    </Component>
+                                    <Component Id="waypoint.wav" DiskId="1" Guid="8BE201EE-E730-41D2-AC67-50ED5C941A2B">
+                                        <File Id="waypoint.wav" Name="waypoint.wav" Source="..\..\share\openpilotgcs\sounds\default\waypoint.wav" />
+                                    </Component>
+                                    <Component Id="whoopsound.wav" DiskId="1" Guid="0A2C4E32-8A9C-4FE3-B922-103D6858D1F7">
+                                        <File Id="whoopsound.wav" Name="whoopsound.wav" Source="..\..\share\openpilotgcs\sounds\default\whoopsound.wav" />
+                                    </Component>
+                                </Directory>
+                            </Directory>
+                            <Directory Id="translations" Name="translations">
+                                <Component Id="openpilotgcs_de.qm" DiskId="1" Guid="CDD0D1D4-4750-4916-9E8C-3A68AD9C33EB">
+                                    <File Id="openpilotgcs_de.qm" Name="openpilotgcs_de.qm" Source="..\..\share\openpilotgcs\translations\openpilotgcs_de.qm" />
+                                </Component>
+                                <Component Id="openpilotgcs_es.qm" DiskId="1" Guid="B67708FA-7F84-4711-976F-8C90CE18769C">
+                                    <File Id="openpilotgcs_es.qm" Name="openpilotgcs_es.qm" Source="..\..\share\openpilotgcs\translations\openpilotgcs_es.qm" />
+                                </Component>
+                                <Component Id="openpilotgcs_fr.qm" DiskId="1" Guid="715F0768-8D9B-4919-8438-00F1689DFB3B">
+                                    <File Id="openpilotgcs_fr.qm" Name="openpilotgcs_fr.qm" Source="..\..\share\openpilotgcs\translations\openpilotgcs_fr.qm" />
+                                </Component>
+                                <Component Id="openpilotgcs_ru.qm" DiskId="1" Guid="D207314F-8A91-46EC-81B5-C3A61B60BF98">
+                                    <File Id="openpilotgcs_ru.qm" Name="openpilotgcs_ru.qm" Source="..\..\share\openpilotgcs\translations\openpilotgcs_ru.qm" />
+                                </Component>
+                                <Component Id="openpilotgcs_zh_CN.qm" DiskId="1" Guid="FA77BEF6-9F5B-49EE-B24F-7F15D51C82EC">
+                                    <File Id="openpilotgcs_zh_CN.qm" Name="openpilotgcs_zh_CN.qm" Source="..\..\share\openpilotgcs\translations\openpilotgcs_zh_CN.qm" />
+                                </Component>
+                                <Component Id="qt_de.qm" DiskId="1" Guid="0DF8B05F-39CE-49E3-9978-924D3E8D2746">
+                                    <File Id="qt_de.qm" Name="qt_de.qm" Source="..\..\share\openpilotgcs\translations\qt_de.qm" />
+                                </Component>
+                                <Component Id="qt_es.qm" DiskId="1" Guid="2734BCFD-BD32-4D94-907F-588E4BBB94E6">
+                                    <File Id="qt_es.qm" Name="qt_es.qm" Source="..\..\share\openpilotgcs\translations\qt_es.qm" />
+                                </Component>
+                                <Component Id="qt_fr.qm" DiskId="1" Guid="A69BD98D-3A3F-42DD-A9E7-4738D0F85AB1">
+                                    <File Id="qt_fr.qm" Name="qt_fr.qm" Source="..\..\share\openpilotgcs\translations\qt_fr.qm" />
+                                </Component>
+                                <Component Id="qt_ru.qm" DiskId="1" Guid="706B6F8C-2C50-4C7A-BFF7-1756D24F411D">
+                                    <File Id="qt_ru.qm" Name="qt_ru.qm" Source="..\..\share\openpilotgcs\translations\qt_ru.qm" />
+                                </Component>
+                                <Component Id="qt_zh_CN.qm" DiskId="1" Guid="106A77BA-A063-4A43-8947-DD7C44A72452">
+                                    <File Id="qt_zh_CN.qm" Name="qt_zh_CN.qm" Source="..\..\share\openpilotgcs\translations\qt_zh_CN.qm" />
+                                </Component>
+                            </Directory>
+                        </Directory>
+                    </Directory>
+                </Directory>
+            </Directory>
+            <Directory Id="DesktopFolder" />
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="ProgramMenuDir" Name="OpenPilot">
+                    <Component Id="StartMenuShortcuts" Guid="29F82A41-C87C-4FE0-A1F2-EE6161AB918A">
+                        <RemoveFolder Id="ProgramMenuDir" On="uninstall" />
+                        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Type="string" Value="" />
+                        <Shortcut Id="UninstallProduct" Name="Uninstall" Description="Uninstalls the application" Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
+                        <util:InternetShortcut Id="WebsiteShortcut" Name="OpenPilot Site" Target="http://openpilot.org" />
+                    </Component>
+                </Directory>
+            </Directory>
+        </Directory>
+        <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
+            <ComponentRef Id="Aggregation.dll" />
+            <ComponentRef Id="ExtensionSystem.dll" />
+            <ComponentRef Id="GLC_lib.dll" />
+            <ComponentRef Id="libgcc_s_dw2_1.dll" />
+            <ComponentRef Id="mingwm10.dll" />
+            <ComponentRef Id="openpilotgcs.exe" />
+            <ComponentRef Id="opmapwidget.dll" />
+            <ComponentRef Id="phonon4.dll" />
+            <ComponentRef Id="QExtSerialPort.dll" />
+            <ComponentRef Id="qgif4.dll" />
+            <ComponentRef Id="qico4.dll" />
+            <ComponentRef Id="qjpeg4.dll" />
+            <ComponentRef Id="qmng4.dll" />
+            <ComponentRef Id="qsvg4.dll" />
+            <ComponentRef Id="qsvgicon4.dll" />
+            <ComponentRef Id="QtConcurrent.dll" />
+            <ComponentRef Id="QtCore4.dll" />
+            <ComponentRef Id="QtGui4.dll" />
+            <ComponentRef Id="qtiff4.dll" />
+            <ComponentRef Id="QtNetwork4.dll" />
+            <ComponentRef Id="QtOpenGL4.dll" />
+            <ComponentRef Id="QtSql4.dll" />
+            <ComponentRef Id="QtSvg4.dll" />
+            <ComponentRef Id="QtTest4.dll" />
+            <ComponentRef Id="QtXml4.dll" />
+            <ComponentRef Id="Qwt.dll" />
+            <ComponentRef Id="QxtCore.dll" />
+            <ComponentRef Id="QYmodem.dll" />
+            <ComponentRef Id="SDL.dll" />
+            <ComponentRef Id="sdlgamepad.dll" />
+            <ComponentRef Id="Utils.dll" />
+            <ComponentRef Id="qsqlite4.dll" />
+            <ComponentRef Id="Aggregation.dll_1" />
+            <ComponentRef Id="ExtensionSystem.dll_1" />
+            <ComponentRef Id="GLC_lib.dll_1" />
+            <ComponentRef Id="opmapwidget.dll_1" />
+            <ComponentRef Id="QExtSerialPort.dll_1" />
+            <ComponentRef Id="QtConcurrent.dll_1" />
+            <ComponentRef Id="Qwt.dll_1" />
+            <ComponentRef Id="QxtCore.dll_1" />
+            <ComponentRef Id="QYmodem.dll_1" />
+            <ComponentRef Id="sdlgamepad.dll_1" />
+            <ComponentRef Id="Utils.dll_1" />
+            <ComponentRef Id="Config.dll" />
+            <ComponentRef Id="Config.pluginspec" />
+            <ComponentRef Id="Core.dll" />
+            <ComponentRef Id="Core.pluginspec" />
+            <ComponentRef Id="DialGadget.dll" />
+            <ComponentRef Id="DialGadget.pluginspec" />
+            <ComponentRef Id="EmptyGadget.dll" />
+            <ComponentRef Id="EmptyGadget.pluginspec" />
+            <ComponentRef Id="GCSControl.dll" />
+            <ComponentRef Id="GCSControl.pluginspec" />
+            <ComponentRef Id="GpsDisplayGadget.dll" />
+            <ComponentRef Id="GpsDisplayGadget.pluginspec" />
+            <ComponentRef Id="HITLNEW.dll" />
+            <ComponentRef Id="HITLNEW.pluginspec" />
+            <ComponentRef Id="ImportExportGadget.dll" />
+            <ComponentRef Id="ImportExportGadget.pluginspec" />
+            <ComponentRef Id="IPconnection.dll" />
+            <ComponentRef Id="IPconnection.pluginspec" />
+            <ComponentRef Id="LineardialGadget.dll" />
+            <ComponentRef Id="LineardialGadget.pluginspec" />
+            <ComponentRef Id="LoggingGadget.dll" />
+            <ComponentRef Id="LoggingGadget.pluginspec" />
+            <ComponentRef Id="MagicWaypoint.dll" />
+            <ComponentRef Id="MagicWaypoint.pluginspec" />
+            <ComponentRef Id="ModelViewGadget.dll" />
+            <ComponentRef Id="ModelViewGadget.pluginspec" />
+            <ComponentRef Id="NotifyPlugin.dll" />
+            <ComponentRef Id="NotifyPlugin.pluginspec" />
+            <ComponentRef Id="OPMapGadget.dll" />
+            <ComponentRef Id="OPMapGadget.pluginspec" />
+            <ComponentRef Id="PFDGadget.dll" />
+            <ComponentRef Id="PFDGadget.pluginspec" />
+            <ComponentRef Id="RawHID.dll" />
+            <ComponentRef Id="RawHID.pluginspec" />
+            <ComponentRef Id="ScopeGadget.dll" />
+            <ComponentRef Id="ScopeGadget.pluginspec" />
+            <ComponentRef Id="Serial.dll" />
+            <ComponentRef Id="Serial.pluginspec" />
+            <ComponentRef Id="SystemHealthGadget.dll" />
+            <ComponentRef Id="SystemHealthGadget.pluginspec" />
+            <ComponentRef Id="UAVObjectBrowser.dll" />
+            <ComponentRef Id="UAVObjectBrowser.pluginspec" />
+            <ComponentRef Id="UAVObjects.dll" />
+            <ComponentRef Id="UAVObjects.pluginspec" />
+            <ComponentRef Id="UAVTalk.dll" />
+            <ComponentRef Id="UAVTalk.pluginspec" />
+            <ComponentRef Id="Uploader.dll" />
+            <ComponentRef Id="Uploader.pluginspec" />
+            <ComponentRef Id="Welcome.dll" />
+            <ComponentRef Id="Welcome.pluginspec" />
+            <ComponentRef Id="system_health.svg" />
+            <ComponentRef Id="altimeter.svg" />
+            <ComponentRef Id="arm_status.svg" />
+            <ComponentRef Id="attitude.svg" />
+            <ComponentRef Id="compass.svg" />
+            <ComponentRef Id="flightmode_status.svg" />
+            <ComponentRef Id="gps_signal.svg" />
+            <ComponentRef Id="gps_status.svg" />
+            <ComponentRef Id="lineardial_horizontal.svg" />
+            <ComponentRef Id="lineardial_vertical.svg" />
+            <ComponentRef Id="Readme.txt" />
+            <ComponentRef Id="speed.svg" />
+            <ComponentRef Id="textonly.svg" />
+            <ComponentRef Id="thermometer.svg" />
+            <ComponentRef Id="vsi.svg" />
+            <ComponentRef Id="altimeter.svg_1" />
+            <ComponentRef Id="compass.svg_1" />
+            <ComponentRef Id="speed.svg_1" />
+            <ComponentRef Id="vsi.svg_1" />
+            <ComponentRef Id="altimeter.svg_2" />
+            <ComponentRef Id="attitude.svg_1" />
+            <ComponentRef Id="compass.svg_2" />
+            <ComponentRef Id="flightmode_status.svg_1" />
+            <ComponentRef Id="gps_signal.svg_1" />
+            <ComponentRef Id="gps_status.svg_1" />
+            <ComponentRef Id="lineardial_horizontal.svg_1" />
+            <ComponentRef Id="lineardial_vertical.svg_1" />
+            <ComponentRef Id="speed.svg_2" />
+            <ComponentRef Id="textonly.svg_1" />
+            <ComponentRef Id="thermometer.svg_1" />
+            <ComponentRef Id="vsi.svg_2" />
+            <ComponentRef Id="easystar.png" />
+            <ComponentRef Id="quad.png" />
+            <ComponentRef Id="default_background.png" />
+            <ComponentRef Id="t_rex_450_xl.3ds" />
+            <ComponentRef Id="t_rex_450_xl.jpg" />
+            <ComponentRef Id="t_rex_450_xl.wav" />
+            <ComponentRef Id="TEXTURE.JPG" />
+            <ComponentRef Id="aeroquad.jpg" />
+            <ComponentRef Id="aeroquad__.3ds" />
+            <ComponentRef Id="TEXTURE.JPG_1" />
+            <ComponentRef Id="boards.jpg" />
+            <ComponentRef Id="easy_quad_X.3ds" />
+            <ComponentRef Id="easy_quad_X.jpg" />
+            <ComponentRef Id="logo.jpg" />
+            <ComponentRef Id="TEXTURE.JPG_2" />
+            <ComponentRef Id="MK_Hexa.3ds" />
+            <ComponentRef Id="MK_Hexa.jpg" />
+            <ComponentRef Id="MK_L4_ME.3ds" />
+            <ComponentRef Id="MK_L4_ME.jpg" />
+            <ComponentRef Id="MK_Okto.3ds" />
+            <ComponentRef Id="MK_Okto.jpg" />
+            <ComponentRef Id="MK_Okto2.3ds" />
+            <ComponentRef Id="MK_Okto2.jpg" />
+            <ComponentRef Id="TEXTURE.JPG_3" />
+            <ComponentRef Id="easystar.3ds" />
+            <ComponentRef Id="easystar.jpg" />
+            <ComponentRef Id="TEXTURE.JPG_4" />
+            <ComponentRef Id="firecracker.3ds" />
+            <ComponentRef Id="firecracker.jpg" />
+            <ComponentRef Id="TEXTURE.JPG_5" />
+            <ComponentRef Id="funjet.3ds" />
+            <ComponentRef Id="funjet.jpg" />
+            <ComponentRef Id="funjet.wav" />
+            <ComponentRef Id="TEXTURE.JPG_6" />
+            <ComponentRef Id="pfd.svg" />
+            <ComponentRef Id="Complete_sound_set.txt" />
+            <ComponentRef Id="License.txt" />
+            <ComponentRef Id="_0.wav" />
+            <ComponentRef Id="_1.wav" />
+            <ComponentRef Id="_10.wav" />
+            <ComponentRef Id="_100.wav" />
+            <ComponentRef Id="_1000.wav" />
+            <ComponentRef Id="_11.wav" />
+            <ComponentRef Id="_12.wav" />
+            <ComponentRef Id="_13.wav" />
+            <ComponentRef Id="_14.wav" />
+            <ComponentRef Id="_15.wav" />
+            <ComponentRef Id="_16.wav" />
+            <ComponentRef Id="_17.wav" />
+            <ComponentRef Id="_18.wav" />
+            <ComponentRef Id="_19.wav" />
+            <ComponentRef Id="_2.wav" />
+            <ComponentRef Id="_20.wav" />
+            <ComponentRef Id="_3.wav" />
+            <ComponentRef Id="_30.wav" />
+            <ComponentRef Id="_4.wav" />
+            <ComponentRef Id="_40.wav" />
+            <ComponentRef Id="_5.wav" />
+            <ComponentRef Id="_50.wav" />
+            <ComponentRef Id="_6.wav" />
+            <ComponentRef Id="_60.wav" />
+            <ComponentRef Id="_7.wav" />
+            <ComponentRef Id="_70.wav" />
+            <ComponentRef Id="_8.wav" />
+            <ComponentRef Id="_80.wav" />
+            <ComponentRef Id="_9.wav" />
+            <ComponentRef Id="_90.wav" />
+            <ComponentRef Id="aborted.wav" />
+            <ComponentRef Id="active.wav" />
+            <ComponentRef Id="alarmsound.wav" />
+            <ComponentRef Id="alert.wav" />
+            <ComponentRef Id="altitude.wav" />
+            <ComponentRef Id="amps.wav" />
+            <ComponentRef Id="aquired.wav" />
+            <ComponentRef Id="auto_flight.wav" />
+            <ComponentRef Id="battery.wav" />
+            <ComponentRef Id="beepsound.wav" />
+            <ComponentRef Id="camera.wav" />
+            <ComponentRef Id="cancelled.wav" />
+            <ComponentRef Id="changed.wav" />
+            <ComponentRef Id="circle_position.wav" />
+            <ComponentRef Id="cleared.wav" />
+            <ComponentRef Id="complete.wav" />
+            <ComponentRef Id="connected.wav" />
+            <ComponentRef Id="connection.wav" />
+            <ComponentRef Id="control.wav" />
+            <ComponentRef Id="disabled.wav" />
+            <ComponentRef Id="disconnected.wav" />
+            <ComponentRef Id="feet.wav" />
+            <ComponentRef Id="figure_eight.wav" />
+            <ComponentRef Id="flight.wav" />
+            <ComponentRef Id="geofence.wav" />
+            <ComponentRef Id="gps.wav" />
+            <ComponentRef Id="ground_station.wav" />
+            <ComponentRef Id="heading.wav" />
+            <ComponentRef Id="height.wav" />
+            <ComponentRef Id="high.wav" />
+            <ComponentRef Id="hippodrome.wav" />
+            <ComponentRef Id="hold_position.wav" />
+            <ComponentRef Id="home_location.wav" />
+            <ComponentRef Id="initialised.wav" />
+            <ComponentRef Id="initiated.wav" />
+            <ComponentRef Id="KPH.wav" />
+            <ComponentRef Id="landing.wav" />
+            <ComponentRef Id="launch.wav" />
+            <ComponentRef Id="left.wav" />
+            <ComponentRef Id="logging.wav" />
+            <ComponentRef Id="lost.wav" />
+            <ComponentRef Id="low_altitude.wav" />
+            <ComponentRef Id="low_battery.wav" />
+            <ComponentRef Id="low_gps_quality.wav" />
+            <ComponentRef Id="manual_flight.wav" />
+            <ComponentRef Id="maximum.wav" />
+            <ComponentRef Id="meters.wav" />
+            <ComponentRef Id="minimum.wav" />
+            <ComponentRef Id="mode.wav" />
+            <ComponentRef Id="MPH.wav" />
+            <ComponentRef Id="navigation.wav" />
+            <ComponentRef Id="openpilot.wav" />
+            <ComponentRef Id="point.wav" />
+            <ComponentRef Id="range.wav" />
+            <ComponentRef Id="reached.wav" />
+            <ComponentRef Id="ready_for_flight.wav" />
+            <ComponentRef Id="return_home.wav" />
+            <ComponentRef Id="right.wav" />
+            <ComponentRef Id="set.wav" />
+            <ComponentRef Id="speed.wav" />
+            <ComponentRef Id="stabilization.wav" />
+            <ComponentRef Id="started.wav" />
+            <ComponentRef Id="stopped.wav" />
+            <ComponentRef Id="takeoff.wav" />
+            <ComponentRef Id="telemetry.wav" />
+            <ComponentRef Id="time.wav" />
+            <ComponentRef Id="triggered.wav" />
+            <ComponentRef Id="uav.wav" />
+            <ComponentRef Id="volts.wav" />
+            <ComponentRef Id="warning.wav" />
+            <ComponentRef Id="waypoint.wav" />
+            <ComponentRef Id="whoopsound.wav" />
+            <ComponentRef Id="openpilotgcs_de.qm" />
+            <ComponentRef Id="openpilotgcs_es.qm" />
+            <ComponentRef Id="openpilotgcs_fr.qm" />
+            <ComponentRef Id="openpilotgcs_ru.qm" />
+            <ComponentRef Id="openpilotgcs_zh_CN.qm" />
+            <ComponentRef Id="qt_de.qm" />
+            <ComponentRef Id="qt_es.qm" />
+            <ComponentRef Id="qt_fr.qm" />
+            <ComponentRef Id="qt_ru.qm" />
+            <ComponentRef Id="qt_zh_CN.qm" />
+            <ComponentRef Id="StartMenuShortcuts" />
+        </Feature>
+        <WixVariable Id="WixUILicenseRtf" Overridable="yes" Value="GPLv3_en.rtf"/>
+        <UI />
+        <UIRef Id="WixUI_Mondo" />
+        <Icon Id="DesktopIcon.exe" SourceFile="..\..\bin\openpilotgcs.exe" />
+        <Icon Id="StartMenuIcon.exe" SourceFile="..\..\bin\openpilotgcs.exe" />
+    </Product>
+</Wix>

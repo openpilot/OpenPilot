@@ -529,7 +529,7 @@ void ConfigAHRSWidget::computeScaleBias()
     field->setDouble(sign(S[1]) * b[1],1);
     field->setDouble(-sign(S[2]) * b[2],2);
 
-    SixPointInConstFieldCal( 1, mag_data_x, mag_data_y, mag_data_z, S, b);
+    SixPointInConstFieldCal( 1000, mag_data_x, mag_data_y, mag_data_z, S, b);
     field = obj->getField(QString("mag_scale"));
     field->setDouble(sign(S[0]) * S[0],0);
     field->setDouble(sign(S[1]) * S[1],1);
@@ -586,6 +586,17 @@ void ConfigAHRSWidget::sixPointCalibrationMode()
     field->setDouble(0,0);
     field->setDouble(0,1);
     field->setDouble(0,2);
+
+    field = obj->getField(QString("mag_scale"));
+    field->setDouble(1,0);
+    field->setDouble(1,1);
+    field->setDouble(1,2);
+
+    field = obj->getField(QString("mag_bias"));
+    field->setDouble(0,0);
+    field->setDouble(0,1);
+    field->setDouble(0,2);
+
     obj->updated();
 
     gyro_accum_x.clear();
@@ -597,7 +608,7 @@ void ConfigAHRSWidget::sixPointCalibrationMode()
     initialMdata = obj->getMetadata();
     UAVObject::Metadata mdata = initialMdata;
     mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-    mdata.flightTelemetryUpdatePeriod = 20;
+    mdata.flightTelemetryUpdatePeriod = 50;
     obj->setMetadata(mdata);
 
     /* Show instructions and enable controls */

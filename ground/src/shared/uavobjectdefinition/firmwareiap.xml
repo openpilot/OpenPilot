@@ -1,0 +1,14 @@
+<xml>
+    <object name="FirmwareIAPObj" singleinstance="true" settings="false">
+        <description>Firmware IAP</description>
+        <field name="Command" units="na" type="uint16" elements="1"/>
+        <field name="Port" units="na" type="uint32" elements="1"/>
+		<field name="Version" units="na" type="uint8" elements="3"/>
+		<field name="SVN" units="na" type="uint16" elements="1"/>
+        <field name="crc" units="na" type="uint32" elements="1"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="manual" period="0"/>
+        <telemetryflight acked="true" updatemode="manual" period="0"/>
+        <logging updatemode="never" period="0"/>
+	</object>
+</xml>

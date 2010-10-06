@@ -392,7 +392,9 @@ for all data to be up to date before doing anything*/
 				mag_data.updated = 0;
 			} else {
 				// Indoors, update with zero position and velocity and high covariance
-				INSSetPosVelVar(0.1);
+				AHRSSettingsData settings;
+				AHRSSettingsGet(&settings);
+				INSSetPosVelVar(settings.IndoorVelocityVariance);
 				vel[0] = 0;
 				vel[1] = 0;
 				vel[2] = 0;

@@ -134,8 +134,14 @@ private:
    UAVDataObject* obj2;
    UAVDataObject* obj3;
    QString field1;
+   QString subfield1;
+   bool haveSubField1;
    QString field2;
+   QString subfield2;
+   bool haveSubField2;
    QString field3;
+   QString subfield3;
+   bool haveSubField3;
 
    // Rotation timer
    QTimer dialTimer;

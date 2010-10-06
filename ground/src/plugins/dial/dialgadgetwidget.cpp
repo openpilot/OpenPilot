@@ -86,7 +86,18 @@ void DialGadgetWidget::connectNeedles(QString object1, QString nfield1,
         if (obj1 != NULL ) {
             // qDebug() << "Connected Object 1 (" << object1 << ").";
             connect(obj1, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedle1(UAVObject*)));
-            field1 = nfield1;
+            if(nfield1.contains("-"))
+            {
+                QStringList fieldSubfield = nfield1.split("-", QString::SkipEmptyParts);
+                field1 = fieldSubfield.at(0);
+                subfield1 = fieldSubfield.at(1);
+                haveSubField1 = true;
+            }
+            else
+            {
+                field1=  nfield1;
+                haveSubField1 = false;
+            }
         } else {
             qDebug() << "Error: Object is unknown (" << object1 << ").";
         }
@@ -98,7 +109,18 @@ void DialGadgetWidget::connectNeedles(QString object1, QString nfield1,
         if (obj2 != NULL ) {
             // qDebug() << "Connected Object 2 (" << object2 << ").";
             connect(obj2, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedle2(UAVObject*)));
-            field2 = nfield2;
+            if(nfield2.contains("-"))
+            {
+                QStringList fieldSubfield = nfield2.split("-", QString::SkipEmptyParts);
+                field2 = fieldSubfield.at(0);
+                subfield2 = fieldSubfield.at(1);
+                haveSubField2 = true;
+            }
+            else
+            {
+                field2=  nfield2;
+                haveSubField2 = false;
+            }
         } else {
             qDebug() << "Error: Object is unknown (" << object2 << ").";
         }
@@ -110,7 +132,18 @@ void DialGadgetWidget::connectNeedles(QString object1, QString nfield1,
         if (obj3 != NULL ) {
             // qDebug() << "Connected Object 3 (" << object3 << ").";
             connect(obj3, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateNeedle3(UAVObject*)));
-            field3 = nfield3;
+            if(nfield3.contains("-"))
+            {
+                QStringList fieldSubfield = nfield3.split("-", QString::SkipEmptyParts);
+                field3 = fieldSubfield.at(0);
+                subfield3 = fieldSubfield.at(1);
+                haveSubField3 = true;
+            }
+            else
+            {
+                field3=  nfield3;
+                haveSubField3 = false;
+            }
         } else {
             qDebug() << "Error: Object is unknown (" << object3 << ").";
         }
@@ -122,9 +155,15 @@ void DialGadgetWidget::connectNeedles(QString object1, QString nfield1,
   */
 void DialGadgetWidget::updateNeedle1(UAVObject *object1) {
     // Double check that the field exists:
+    double value;
     UAVObjectField* field = object1->getField(field1);
     if (field) {
-        setNeedle1(field->getDouble());
+        if(haveSubField1){
+            int indexOfSubField = field->getElementNames().indexOf(QRegExp(subfield1, Qt::CaseSensitive, QRegExp::FixedString));
+            value = field->getDouble(indexOfSubField);
+        }else
+            value = field->getDouble();
+        setNeedle1(value);
     } else {
         qDebug() << "Wrong field, maybe an issue with object disconnection ?";
     }
@@ -134,9 +173,15 @@ void DialGadgetWidget::updateNeedle1(UAVObject *object1) {
   \brief Called by the UAVObject which got updated
   */
 void DialGadgetWidget::updateNeedle2(UAVObject *object2) {
+    double value;
     UAVObjectField* field = object2->getField(field2);
     if (field) {
-        setNeedle2(field->getDouble());
+        if(haveSubField2){
+            int indexOfSubField = field->getElementNames().indexOf(QRegExp(subfield2, Qt::CaseSensitive, QRegExp::FixedString));
+            value = field->getDouble(indexOfSubField);
+        }else
+            value = field->getDouble();
+        setNeedle2(value);
     } else {
         qDebug() << "Wrong field, maybe an issue with object disconnection ?";
     }
@@ -146,9 +191,15 @@ void DialGadgetWidget::updateNeedle2(UAVObject *object2) {
   \brief Called by the UAVObject which got updated
   */
 void DialGadgetWidget::updateNeedle3(UAVObject *object3) {
+    double value;
     UAVObjectField* field = object3->getField(field3);
     if (field) {
-        setNeedle3(field->getDouble());
+        if(haveSubField3){
+            int indexOfSubField = field->getElementNames().indexOf(QRegExp(subfield3, Qt::CaseSensitive, QRegExp::FixedString));
+            value = field->getDouble(indexOfSubField);
+        }else
+            value = field->getDouble();
+        setNeedle3(value);
     } else {
         qDebug() << "Wrong field, maybe an issue with object disconnection ?";
     }

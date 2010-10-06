@@ -16,6 +16,9 @@ equals(copydata, 1) {
     # copying required for installer QT DLLs
     win32 {
         CONFIG(release, debug|release) {
+            # copy packaging dir (with Wix script for build installer)
+            data_copy.commands += $(COPY_DIR) $$targetPath(\"$$GCS_SOURCE_TREE/packaging/winx86\") $$targetPath(\"$$GCS_BUILD_TREE/packaging/winx86\") $$addNewline()
+
             QT_DLLs = libgcc_s_dw2-1.dll mingwm10.dll phonon4.dll QtCore4.dll QtGui4.dll QtNetwork4.dll QtOpenGL4.dll QtSql4.dll QtSvg4.dll QtTest4.dll QtXml4.dll
             for(dll, QT_DLLs) {
                 data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_BINS]/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()

@@ -182,6 +182,7 @@ SRC += $(OPUAVOBJ)/positiondesired.c
 SRC += $(OPUAVOBJ)/velocitydesired.c
 SRC += $(OPUAVOBJ)/velocityactual.c
 SRC += $(OPUAVOBJ)/guidancesettings.c
+SRC += $(OPUAVOBJ)/firmwareiapobj.c
 endif
 
 ## PIOS Hardware (STM32F10x)
@@ -202,6 +203,7 @@ SRC += $(PIOSSTM32F10X)/pios_gpio.c
 SRC += $(PIOSSTM32F10X)/pios_exti.c
 SRC += $(PIOSSTM32F10X)/pios_wdg.c
 
+
 # PIOS USB related files (seperated to make code maintenance more easy)
 SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_desc.c
@@ -214,6 +216,7 @@ SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
 SRC += $(PIOSCOMMON)/pios_sdcard.c
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_bmp085.c
+SRC += $(PIOSCOMMON)/pios_iap.c
 #SRC += $(PIOSCOMMON)/pios_opahrs.c
 #SRC += $(PIOSCOMMON)/pios_opahrs_proto.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c

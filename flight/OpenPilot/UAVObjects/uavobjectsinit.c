@@ -41,6 +41,7 @@
 #include "exampleobject1.h"
 #include "exampleobject2.h"
 #include "examplesettings.h"
+#include "firmwareiapobj.h"
 #include "flightbatterystate.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
@@ -85,6 +86,7 @@ void UAVObjectsInitializeAll()
     ExampleObject1Initialize();
     ExampleObject2Initialize();
     ExampleSettingsInitialize();
+    FirmwareIAPObjInitialize();
     FlightBatteryStateInitialize();
     FlightTelemetryStatsInitialize();
     GCSTelemetryStatsInitialize();

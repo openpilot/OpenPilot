@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Include>
+
+  <Component Id="Aggregation.dll" DiskId="1" Guid="B460AF0D-717A-4167-868C-BDF0DF432CB8">
+    <File Id="Aggregation.dll" Name="Aggregation.dll" Source="..\..\bin\Aggregation.dll" />
+  </Component>
+  <Component Id="ExtensionSystem.dll" DiskId="1" Guid="A8CD73A5-DF35-4AB2-8809-D747D20B3AFE">
+    <File Id="ExtensionSystem.dll" Name="ExtensionSystem.dll" Source="..\..\bin\ExtensionSystem.dll" />
+  </Component>
+  <Component Id="GLC_lib.dll" DiskId="1" Guid="7FFF8319-ED58-4382-8BC3-DF82EED4558D">
+    <File Id="GLC_lib.dll" Name="GLC_lib.dll" Source="..\..\bin\GLC_lib.dll" />
+  </Component>
+  <Component Id="libgcc_s_dw2_1.dll" DiskId="1" Guid="F8C09358-8621-4807-9B09-9A44DD20C235">
+    <File Id="libgcc_s_dw2_1.dll" Name="libgcc_s_dw2-1.dll" Source="..\..\bin\libgcc_s_dw2-1.dll" />
+  </Component>
+  <Component Id="mingwm10.dll" DiskId="1" Guid="F0997472-AA20-48CE-A8D3-4B821783E51C">
+    <File Id="mingwm10.dll" Name="mingwm10.dll" Source="..\..\bin\mingwm10.dll" />
+  </Component>
+  <Component Id="openpilotgcs.exe" DiskId="1" Guid="A054384C-94FE-4CA1-A995-61826B1B9B0F">
+    <File Id="openpilotgcs.exe" Name="openpilotgcs.exe" Source="..\..\bin\openpilotgcs.exe">
+      <Shortcut Id="desktopShortcut" Directory="DesktopFolder" Name="OpenPilot GCS" WorkingDirectory="INSTALLDIR" Advertise="yes" Icon="DesktopIcon.exe" IconIndex="0" />
+      <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="OpenPilot GCS" Advertise="yes" Icon="StartMenuIcon.exe" IconIndex="0" />
+    </File>
+  </Component>
+  <Component Id="opmapwidget.dll" DiskId="1" Guid="1D66F762-3D4E-4F4C-A1B3-90EAD9C5728B">
+    <File Id="opmapwidget.dll" Name="opmapwidget.dll" Source="..\..\bin\opmapwidget.dll" />
+  </Component>
+  <Component Id="phonon4.dll" DiskId="1" Guid="9586CEB7-29A8-4CFE-9161-0570990F1C9D">
+    <File Id="phonon4.dll" Name="phonon4.dll" Source="..\..\bin\phonon4.dll" />
+  </Component>
+  <Component Id="QExtSerialPort.dll" DiskId="1" Guid="04FA7063-4FE6-48E9-AE09-E08AE1C6941F">
+    <File Id="QExtSerialPort.dll" Name="QExtSerialPort.dll" Source="..\..\bin\QExtSerialPort.dll" />
+  </Component>
+  <Component Id="qgif4.dll" DiskId="1" Guid="3AAB8604-A6DB-4705-B65E-5713843B886E">
+    <File Id="qgif4.dll" Name="qgif4.dll" Source="..\..\bin\qgif4.dll" />
+  </Component>
+  <Component Id="qico4.dll" DiskId="1" Guid="B6EF1C6B-1E58-4127-9511-4B26CC5AA3A8">
+    <File Id="qico4.dll" Name="qico4.dll" Source="..\..\bin\qico4.dll" />
+  </Component>
+  <Component Id="qjpeg4.dll" DiskId="1" Guid="0B4335EB-AF5D-40BC-B9DB-C49E711B1754">
+    <File Id="qjpeg4.dll" Name="qjpeg4.dll" Source="..\..\bin\qjpeg4.dll" />
+  </Component>
+  <Component Id="qmng4.dll" DiskId="1" Guid="5FFED681-3F4D-4D3D-8A93-32E60CCA656D">
+    <File Id="qmng4.dll" Name="qmng4.dll" Source="..\..\bin\qmng4.dll" />
+  </Component>
+  <Component Id="qsvg4.dll" DiskId="1" Guid="22C8BDAF-B1AC-435C-930E-BDCCAB5EE7F7">
+    <File Id="qsvg4.dll" Name="qsvg4.dll" Source="..\..\bin\qsvg4.dll" />
+  </Component>
+  <Component Id="qsvgicon4.dll" DiskId="1" Guid="AB7E00D8-ADD2-4AE0-B778-A828211273FF">
+    <File Id="qsvgicon4.dll" Name="qsvgicon4.dll" Source="..\..\bin\qsvgicon4.dll" />
+  </Component>
+  <Component Id="QtConcurrent.dll" DiskId="1" Guid="DA887E82-83C6-4304-A5FB-1DC2B8227FC4">
+    <File Id="QtConcurrent.dll" Name="QtConcurrent.dll" Source="..\..\bin\QtConcurrent.dll" />
+  </Component>
+  <Component Id="QtCore4.dll" DiskId="1" Guid="0521ED03-1627-4C2C-95B6-3DA559032F3A">
+    <File Id="QtCore4.dll" Name="QtCore4.dll" Source="..\..\bin\QtCore4.dll" />
+  </Component>
+  <Component Id="QtGui4.dll" DiskId="1" Guid="63DBAE46-9E3D-4D85-B55B-B93F7A74A124">
+    <File Id="QtGui4.dll" Name="QtGui4.dll" Source="..\..\bin\QtGui4.dll" />
+  </Component>
+  <Component Id="qtiff4.dll" DiskId="1" Guid="AE6AF17B-9006-486D-AB37-B30105A9C52F">
+    <File Id="qtiff4.dll" Name="qtiff4.dll" Source="..\..\bin\qtiff4.dll" />
+  </Component>
+  <Component Id="QtNetwork4.dll" DiskId="1" Guid="7A137591-24FA-48C0-BDF9-FE40AEEB89FD">
+    <File Id="QtNetwork4.dll" Name="QtNetwork4.dll" Source="..\..\bin\QtNetwork4.dll" />
+  </Component>
+  <Component Id="QtOpenGL4.dll" DiskId="1" Guid="835C1F43-C61A-4930-9123-BAE93B7A3791">
+    <File Id="QtOpenGL4.dll" Name="QtOpenGL4.dll" Source="..\..\bin\QtOpenGL4.dll" />
+  </Component>
+  <Component Id="QtSql4.dll" DiskId="1" Guid="16DA303A-6AA3-47F1-A2B2-089FA57A9CD4">
+    <File Id="QtSql4.dll" Name="QtSql4.dll" Source="..\..\bin\QtSql4.dll" />
+  </Component>
+  <Component Id="QtSvg4.dll" DiskId="1" Guid="85F8D78A-4B24-4AA2-BCEC-CE2A60355DEC">
+    <File Id="QtSvg4.dll" Name="QtSvg4.dll" Source="..\..\bin\QtSvg4.dll" />
+  </Component>
+  <Component Id="QtTest4.dll" DiskId="1" Guid="C75EE0C3-9175-4DA6-91F8-CC9807E47C40">
+    <File Id="QtTest4.dll" Name="QtTest4.dll" Source="..\..\bin\QtTest4.dll" />
+  </Component>
+  <Component Id="QtXml4.dll" DiskId="1" Guid="809CE372-F514-443F-9D55-8AAB5A2295B2">
+    <File Id="QtXml4.dll" Name="QtXml4.dll" Source="..\..\bin\QtXml4.dll" />
+  </Component>
+  <Component Id="Qwt.dll" DiskId="1" Guid="6CEFB80B-D9E9-48E2-85B5-A237F10456B0">
+    <File Id="Qwt.dll" Name="Qwt.dll" Source="..\..\bin\Qwt.dll" />
+  </Component>
+  <Component Id="QxtCore.dll" DiskId="1" Guid="7381C507-F59B-42AF-AA04-55ED1E0D3E18">
+    <File Id="QxtCore.dll" Name="QxtCore.dll" Source="..\..\bin\QxtCore.dll" />
+  </Component>
+  <Component Id="QYmodem.dll" DiskId="1" Guid="8ED965D6-C959-471C-BD5F-E09C93776D06">
+    <File Id="QYmodem.dll" Name="QYmodem.dll" Source="..\..\bin\QYmodem.dll" />
+  </Component>
+  <Component Id="SDL.dll" DiskId="1" Guid="A3E4745A-114A-4C12-A466-0FC9E82B9800">
+    <File Id="SDL.dll" Name="SDL.dll" Source="..\..\bin\SDL.dll" />
+  </Component>
+  <Component Id="sdlgamepad.dll" DiskId="1" Guid="EB711FDE-97D6-4A18-AF73-69FC15489709">
+    <File Id="sdlgamepad.dll" Name="sdlgamepad.dll" Source="..\..\bin\sdlgamepad.dll" />
+  </Component>
+  <Component Id="Utils.dll" DiskId="1" Guid="F242BE36-CD31-46BF-914A-898EBBA04B4D">
+    <File Id="Utils.dll" Name="Utils.dll" Source="..\..\bin\Utils.dll" />
+  </Component>
+  <Directory Id="sqldrivers" Name="sqldrivers">
+    <Component Id="qsqlite4.dll" DiskId="1" Guid="3F3C7F53-B87E-42BC-8831-94E2EFDF9D03">
+      <File Id="qsqlite4.dll" Name="qsqlite4.dll" Source="..\..\bin\sqldrivers\qsqlite4.dll" />
+    </Component>
+  </Directory>
+
+</Include>

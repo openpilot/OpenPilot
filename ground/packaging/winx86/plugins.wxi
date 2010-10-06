@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Include>
+
+  <Directory Id="OpenPilot_1" Name="OpenPilot">
+    <Component Id="Config.dll" DiskId="1" Guid="45B55394-5664-4E85-B76B-3C5B6B17BB94">
+      <File Id="Config.dll" Name="Config.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Config.dll" />
+    </Component>
+    <Component Id="Config.pluginspec" DiskId="1" Guid="94D34810-5C0D-4A69-A4F8-C5BBA0F5F6A7">
+      <File Id="Config.pluginspec" Name="Config.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Config.pluginspec" />
+    </Component>
+    <Component Id="Core.dll" DiskId="1" Guid="38DC6640-A52D-4339-91EA-B8844BFDEDEE">
+      <File Id="Core.dll" Name="Core.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Core.dll" />
+    </Component>
+    <Component Id="Core.pluginspec" DiskId="1" Guid="0BB2EDA0-F6BF-4991-A82D-E899662969CF">
+      <File Id="Core.pluginspec" Name="Core.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Core.pluginspec" />
+    </Component>
+    <Component Id="DialGadget.dll" DiskId="1" Guid="788C67D8-D4A7-408B-A74D-8244B293790F">
+      <File Id="DialGadget.dll" Name="DialGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\DialGadget.dll" />
+    </Component>
+    <Component Id="DialGadget.pluginspec" DiskId="1" Guid="5B276737-9F63-47A1-8DEA-0232A084C2F4">
+      <File Id="DialGadget.pluginspec" Name="DialGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\DialGadget.pluginspec" />
+    </Component>
+    <Component Id="EmptyGadget.dll" DiskId="1" Guid="8B93C81E-8F86-4AE4-A25E-DDD7D98029A5">
+      <File Id="EmptyGadget.dll" Name="EmptyGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\EmptyGadget.dll" />
+    </Component>
+    <Component Id="EmptyGadget.pluginspec" DiskId="1" Guid="B144310D-2381-41BC-BA69-BA9F08086E03">
+      <File Id="EmptyGadget.pluginspec" Name="EmptyGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\EmptyGadget.pluginspec" />
+    </Component>
+    <Component Id="GCSControl.dll" DiskId="1" Guid="0FE38AE0-65F8-43E1-BB8D-54588FA41A0E">
+      <File Id="GCSControl.dll" Name="GCSControl.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\GCSControl.dll" />
+    </Component>
+    <Component Id="GCSControl.pluginspec" DiskId="1" Guid="9D3A26A1-135D-4A19-90D0-140B94110711">
+      <File Id="GCSControl.pluginspec" Name="GCSControl.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\GCSControl.pluginspec" />
+    </Component>
+    <Component Id="GpsDisplayGadget.dll" DiskId="1" Guid="AB8F7712-7A03-43D0-B89A-DC009D0D8094">
+      <File Id="GpsDisplayGadget.dll" Name="GpsDisplayGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\GpsDisplayGadget.dll" />
+    </Component>
+    <Component Id="GpsDisplayGadget.pluginspec" DiskId="1" Guid="A3BC86B2-E76A-414E-B382-F77B51426113">
+      <File Id="GpsDisplayGadget.pluginspec" Name="GpsDisplayGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\GpsDisplayGadget.pluginspec" />
+    </Component>
+    <Component Id="HITLNEW.dll" DiskId="1" Guid="5C12FE77-E547-44C6-B895-407C9561B122">
+      <File Id="HITLNEW.dll" Name="HITLNEW.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\HITLNEW.dll" />
+    </Component>
+    <Component Id="HITLNEW.pluginspec" DiskId="1" Guid="9791342F-693A-4D75-8984-CD3787E35764">
+      <File Id="HITLNEW.pluginspec" Name="HITLNEW.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\HITLNEW.pluginspec" />
+    </Component>
+    <Component Id="ImportExportGadget.dll" DiskId="1" Guid="B254E3A0-C5ED-4DDF-9739-630DA69F48C0">
+      <File Id="ImportExportGadget.dll" Name="ImportExportGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\ImportExportGadget.dll" />
+    </Component>
+    <Component Id="ImportExportGadget.pluginspec" DiskId="1" Guid="7728DE8F-38E3-48BA-8F52-CAF5048E6AE4">
+      <File Id="ImportExportGadget.pluginspec" Name="ImportExportGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\ImportExportGadget.pluginspec" />
+    </Component>
+    <Component Id="IPconnection.dll" DiskId="1" Guid="7583AD40-6E82-47CD-B0D8-714B56C4B7B5">
+      <File Id="IPconnection.dll" Name="IPconnection.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\IPconnection.dll" />
+    </Component>
+    <Component Id="IPconnection.pluginspec" DiskId="1" Guid="DAC2DDC2-AF7E-40C6-ACD7-0E5ED3ACCF7B">
+      <File Id="IPconnection.pluginspec" Name="IPconnection.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\IPconnection.pluginspec" />
+    </Component>
+    <Component Id="LineardialGadget.dll" DiskId="1" Guid="FDEA4734-B9EB-4CC5-ADB0-E6A8F2BA2BE0">
+      <File Id="LineardialGadget.dll" Name="LineardialGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\LineardialGadget.dll" />
+    </Component>
+    <Component Id="LineardialGadget.pluginspec" DiskId="1" Guid="2AEE49AA-FD70-49A8-90E5-A0DD4F75FCC1">
+      <File Id="LineardialGadget.pluginspec" Name="LineardialGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\LineardialGadget.pluginspec" />
+    </Component>
+    <Component Id="LoggingGadget.dll" DiskId="1" Guid="1C7A44DB-6539-4D04-B2CC-BB1AD2658135">
+      <File Id="LoggingGadget.dll" Name="LoggingGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\LoggingGadget.dll" />
+    </Component>
+    <Component Id="LoggingGadget.pluginspec" DiskId="1" Guid="4DE31798-E062-4FCB-A9DE-A7BB4EE11C96">
+      <File Id="LoggingGadget.pluginspec" Name="LoggingGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\LoggingGadget.pluginspec" />
+    </Component>
+    <Component Id="MagicWaypoint.dll" DiskId="1" Guid="E26969D5-3D8A-4E21-A204-D76F7D3362E2">
+      <File Id="MagicWaypoint.dll" Name="MagicWaypoint.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\MagicWaypoint.dll" />
+    </Component>
+    <Component Id="MagicWaypoint.pluginspec" DiskId="1" Guid="4194D658-2B8B-4C5A-8DD1-A7012D40E171">
+      <File Id="MagicWaypoint.pluginspec" Name="MagicWaypoint.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\MagicWaypoint.pluginspec" />
+    </Component>
+    <Component Id="ModelViewGadget.dll" DiskId="1" Guid="44BB3AE1-1814-4F7C-B32B-E5527AB5A4E0">
+      <File Id="ModelViewGadget.dll" Name="ModelViewGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\ModelViewGadget.dll" />
+    </Component>
+    <Component Id="ModelViewGadget.pluginspec" DiskId="1" Guid="5900D2E9-533E-4235-A508-F67B64DCAB0C">
+      <File Id="ModelViewGadget.pluginspec" Name="ModelViewGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\ModelViewGadget.pluginspec" />
+    </Component>
+    <Component Id="NotifyPlugin.dll" DiskId="1" Guid="61C7C712-F3EA-431B-A3CA-7F9CB10DD76C">
+      <File Id="NotifyPlugin.dll" Name="NotifyPlugin.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\NotifyPlugin.dll" />
+    </Component>
+    <Component Id="NotifyPlugin.pluginspec" DiskId="1" Guid="5EC03A27-BD2F-44B7-B62D-9E2620E71D18">
+      <File Id="NotifyPlugin.pluginspec" Name="NotifyPlugin.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\NotifyPlugin.pluginspec" />
+    </Component>
+    <Component Id="OPMapGadget.dll" DiskId="1" Guid="E2102204-E3CD-41CA-A50B-FFB37B63FF37">
+      <File Id="OPMapGadget.dll" Name="OPMapGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\OPMapGadget.dll" />
+    </Component>
+    <Component Id="OPMapGadget.pluginspec" DiskId="1" Guid="5AB522E9-1964-4CC6-8A55-8D89642D8683">
+      <File Id="OPMapGadget.pluginspec" Name="OPMapGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\OPMapGadget.pluginspec" />
+    </Component>
+    <Component Id="PFDGadget.dll" DiskId="1" Guid="3E0207FB-C1DF-4BD1-A7DB-721B5769DBC1">
+      <File Id="PFDGadget.dll" Name="PFDGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\PFDGadget.dll" />
+    </Component>
+    <Component Id="PFDGadget.pluginspec" DiskId="1" Guid="5EE5BF55-5FFB-402E-8436-5AE3EA9CA258">
+      <File Id="PFDGadget.pluginspec" Name="PFDGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\PFDGadget.pluginspec" />
+    </Component>
+    <Component Id="RawHID.dll" DiskId="1" Guid="9375A460-934C-40D3-B2D3-AFD8D8D5B396">
+      <File Id="RawHID.dll" Name="RawHID.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\RawHID.dll" />
+    </Component>
+    <Component Id="RawHID.pluginspec" DiskId="1" Guid="86EE9142-2FEA-4820-8C30-7E108D875DDB">
+      <File Id="RawHID.pluginspec" Name="RawHID.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\RawHID.pluginspec" />
+    </Component>
+    <Component Id="ScopeGadget.dll" DiskId="1" Guid="4B529440-20C5-4E08-9C96-F1A838F8F763">
+      <File Id="ScopeGadget.dll" Name="ScopeGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\ScopeGadget.dll" />
+    </Component>
+    <Component Id="ScopeGadget.pluginspec" DiskId="1" Guid="B6FBB1F0-4910-4CB2-B656-8CDF80C9D56A">
+      <File Id="ScopeGadget.pluginspec" Name="ScopeGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\ScopeGadget.pluginspec" />
+    </Component>
+    <Component Id="Serial.dll" DiskId="1" Guid="9C10B9D0-31DF-4A40-89EE-1DF90588E0B8">
+      <File Id="Serial.dll" Name="Serial.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Serial.dll" />
+    </Component>
+    <Component Id="Serial.pluginspec" DiskId="1" Guid="33012F12-454D-4697-96B8-516F22C48F95">
+      <File Id="Serial.pluginspec" Name="Serial.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Serial.pluginspec" />
+    </Component>
+    <Component Id="SystemHealthGadget.dll" DiskId="1" Guid="AF171E42-24E2-4609-8F24-7069C7043EB4">
+      <File Id="SystemHealthGadget.dll" Name="SystemHealthGadget.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\SystemHealthGadget.dll" />
+    </Component>
+    <Component Id="SystemHealthGadget.pluginspec" DiskId="1" Guid="A6E71F18-7301-46D8-8950-D172C5C6D440">
+      <File Id="SystemHealthGadget.pluginspec" Name="SystemHealthGadget.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\SystemHealthGadget.pluginspec" />
+    </Component>
+    <Component Id="UAVObjectBrowser.dll" DiskId="1" Guid="A2B17448-D09A-4AA3-BBA1-FA70E95630B4">
+      <File Id="UAVObjectBrowser.dll" Name="UAVObjectBrowser.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\UAVObjectBrowser.dll" />
+    </Component>
+    <Component Id="UAVObjectBrowser.pluginspec" DiskId="1" Guid="4F084D6F-FAAE-4A9B-BC49-D1D665A62432">
+      <File Id="UAVObjectBrowser.pluginspec" Name="UAVObjectBrowser.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\UAVObjectBrowser.pluginspec" />
+    </Component>
+    <Component Id="UAVObjects.dll" DiskId="1" Guid="71416D8F-EDE1-4652-B990-040676C9EA54">
+      <File Id="UAVObjects.dll" Name="UAVObjects.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\UAVObjects.dll" />
+    </Component>
+    <Component Id="UAVObjects.pluginspec" DiskId="1" Guid="235EFEFE-D3D2-47E7-A338-10F7C36E3FF4">
+      <File Id="UAVObjects.pluginspec" Name="UAVObjects.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\UAVObjects.pluginspec" />
+    </Component>
+    <Component Id="UAVTalk.dll" DiskId="1" Guid="56DF47D7-ED76-4D89-8A69-368978C61213">
+      <File Id="UAVTalk.dll" Name="UAVTalk.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\UAVTalk.dll" />
+    </Component>
+    <Component Id="UAVTalk.pluginspec" DiskId="1" Guid="0CD3982A-1E7C-4345-AD25-E28D1D4430CE">
+      <File Id="UAVTalk.pluginspec" Name="UAVTalk.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\UAVTalk.pluginspec" />
+    </Component>
+    <Component Id="Uploader.dll" DiskId="1" Guid="DC011D48-68C7-47ED-BC3B-604C1325FC2A">
+      <File Id="Uploader.dll" Name="Uploader.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Uploader.dll" />
+    </Component>
+    <Component Id="Uploader.pluginspec" DiskId="1" Guid="30779301-D502-4DC3-A158-2C39096BD599">
+      <File Id="Uploader.pluginspec" Name="Uploader.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Uploader.pluginspec" />
+    </Component>
+    <Component Id="Welcome.dll" DiskId="1" Guid="145BF7A2-F076-456E-9F9A-7F366F0C0CB8">
+      <File Id="Welcome.dll" Name="Welcome.dll" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Welcome.dll" />
+    </Component>
+    <Component Id="Welcome.pluginspec" DiskId="1" Guid="46028922-F2C1-4226-BCC9-DF114B04B718">
+      <File Id="Welcome.pluginspec" Name="Welcome.pluginspec" Source="..\..\lib\openpilotgcs\plugins\OpenPilot\Welcome.pluginspec" />
+    </Component>
+  </Directory>
+
+</Include>

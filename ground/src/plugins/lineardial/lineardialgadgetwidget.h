@@ -116,6 +116,8 @@ private:
    // Name of the fields to read when an update is received:
    UAVDataObject* obj1;
    QString field1;
+   QString subfield1;
+   bool haveSubField1;
 
 };
 #endif /* LINEARDIALGADGETWIDGET_H_ */

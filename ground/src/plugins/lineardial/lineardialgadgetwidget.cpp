@@ -77,7 +77,18 @@ void LineardialGadgetWidget::connectInput(QString object1, QString nfield1) {
         obj1 = dynamic_cast<UAVDataObject*>( objManager->getObject(object1) );
         if (obj1 != NULL ) {
             connect(obj1, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateIndex(UAVObject*)));
-            field1 = nfield1;
+            if(nfield1.contains("-"))
+            {
+                QStringList fieldSubfield = nfield1.split("-", QString::SkipEmptyParts);
+                field1 = fieldSubfield.at(0);
+                subfield1 = fieldSubfield.at(1);
+                haveSubField1 = true;
+            }
+            else
+            {
+                field1=  nfield1;
+                haveSubField1 = false;
+            }
             if (fieldName)
                 fieldName->setPlainText(nfield1);
             updateIndex(obj1);
@@ -99,7 +110,12 @@ void LineardialGadgetWidget::updateIndex(UAVObject *object1) {
     if (field) {
         QString s;
         if (field->isNumeric()) {
-            double v = field->getDouble()*factor;
+            double v;
+            if(haveSubField1){
+                int indexOfSubField = field->getElementNames().indexOf(QRegExp(subfield1, Qt::CaseSensitive, QRegExp::FixedString));
+                v = field->getDouble(indexOfSubField)*factor;
+            }else
+                v = field->getDouble()*factor;
             setIndex(v);
             s.sprintf("%.*f",places,v);
         }
@@ -115,6 +131,7 @@ void LineardialGadgetWidget::updateIndex(UAVObject *object1) {
                 }
             }
         }
+
         if (fieldValue)
             fieldValue->setPlainText(s);
 

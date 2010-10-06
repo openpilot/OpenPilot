@@ -86,10 +86,7 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
         // Now load the object field values:
         UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(m_config->getSourceDataObject()) );
         if (obj != NULL ) {
-                QList<UAVObjectField*> fieldList = obj->getFields();
-                foreach (UAVObjectField* field, fieldList) {
-                   options_page->objectField->addItem(field->getName());
-                }
+                on_objectName_currentIndexChanged(m_config->getSourceDataObject());
                 // And set the highlighed value from the settings:
                 options_page->objectField->setCurrentIndex(options_page->objectField->findText(m_config->getSourceObjectField()));
         }
@@ -143,7 +140,15 @@ void LineardialGadgetOptionsPage::on_objectName_currentIndexChanged(QString val)
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(val) );
     QList<UAVObjectField*> fieldList = obj->getFields();
     foreach (UAVObjectField* field, fieldList) {
-        options_page->objectField->addItem(field->getName());
+        if(field->getElementNames().count() > 1)
+        {
+            foreach(QString elemName , field->getElementNames())
+            {
+                options_page->objectField->addItem(field->getName() + "-" + elemName);
+            }
+        }
+        else
+            options_page->objectField->addItem(field->getName());
     }
 }
 

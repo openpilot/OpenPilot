@@ -92,6 +92,7 @@
 #if defined(PIOS_INCLUDE_HMC5843)
 #include <pios_hmc5843.h>
 #endif
+#include <pios_iap.h>
 
 #if defined(PIOS_INCLUDE_BL_HELPER)
 #include <pios_bl_helper.h>

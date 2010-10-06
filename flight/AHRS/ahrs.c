@@ -212,7 +212,7 @@ int main()
 
 	/* Setup the Accelerometer FS (Full-Scale) GPIO */
 	PIOS_GPIO_Enable(0);
-	SET_ACCEL_2G;
+	SET_ACCEL_6G;
 #if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
 	/* Magnetic sensor system */
 	PIOS_I2C_Init();

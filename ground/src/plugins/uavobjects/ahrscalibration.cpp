@@ -52,7 +52,7 @@ AHRSCalibration::AHRSCalibration(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
     accel_biasElemNames.append("X");
     accel_biasElemNames.append("Y");
     accel_biasElemNames.append("Z");
-    fields.append( new UAVObjectField(QString("accel_bias"), QString("raw"), UAVObjectField::FLOAT32, accel_biasElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("accel_bias"), QString("m/s"), UAVObjectField::FLOAT32, accel_biasElemNames, QStringList()) );
     QStringList accel_scaleElemNames;
     accel_scaleElemNames.append("X");
     accel_scaleElemNames.append("Y");
@@ -67,7 +67,7 @@ AHRSCalibration::AHRSCalibration(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
     gyro_biasElemNames.append("X");
     gyro_biasElemNames.append("Y");
     gyro_biasElemNames.append("Z");
-    fields.append( new UAVObjectField(QString("gyro_bias"), QString("raw"), UAVObjectField::FLOAT32, gyro_biasElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("gyro_bias"), QString("deg/s"), UAVObjectField::FLOAT32, gyro_biasElemNames, QStringList()) );
     QStringList gyro_scaleElemNames;
     gyro_scaleElemNames.append("X");
     gyro_scaleElemNames.append("Y");
@@ -127,20 +127,20 @@ UAVObject::Metadata AHRSCalibration::getDefaultMetadata()
 void AHRSCalibration::setDefaultFieldValues()
 {
     data.measure_var = 0;
-    data.accel_bias[0] = 24;
-    data.accel_bias[1] = 24;
-    data.accel_bias[2] = 24;
-    data.accel_scale[0] = 0.012;
-    data.accel_scale[1] = 0.012;
-    data.accel_scale[2] = 0.012;
+    data.accel_bias[0] = -72;
+    data.accel_bias[1] = -72;
+    data.accel_bias[2] = 72;
+    data.accel_scale[0] = 0.003;
+    data.accel_scale[1] = 0.003;
+    data.accel_scale[2] = -0.003;
     data.accel_var[0] = 5e-05;
     data.accel_var[1] = 5e-05;
     data.accel_var[2] = 5e-05;
     data.gyro_bias[0] = 23;
-    data.gyro_bias[1] = 23;
+    data.gyro_bias[1] = -23;
     data.gyro_bias[2] = 23;
     data.gyro_scale[0] = -0.014;
-    data.gyro_scale[1] = -0.014;
+    data.gyro_scale[1] = 0.014;
     data.gyro_scale[2] = -0.014;
     data.gyro_var[0] = 0.0001;
     data.gyro_var[1] = 0.0001;

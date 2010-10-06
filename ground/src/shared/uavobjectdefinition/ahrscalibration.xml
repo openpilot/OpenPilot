@@ -2,11 +2,11 @@
     <object name="AHRSCalibration" singleinstance="true" settings="true">
         <description>Contains the calibration settings for the @ref AHRSCommsModule</description>
         <field name="measure_var" units="" type="enum" elements="1" options="SET,MEASURE" defaultvalue="SET"/>
-        <field name="accel_bias" units="raw" type="float" elementnames="X,Y,Z" defaultvalue="24"/>
-        <field name="accel_scale" units="m/s" type="float" elementnames="X,Y,Z" defaultvalue="0.012"/>
+        <field name="accel_bias" units="m/s" type="float" elementnames="X,Y,Z" defaultvalue="-72,-72,72"/>
+        <field name="accel_scale" units="m/s" type="float" elementnames="X,Y,Z" defaultvalue="0.003,0.003,-0.003"/>
         <field name="accel_var" units="m^2/s^s" type="float" elementnames="X,Y,Z" defaultvalue="5e-5"/>
-        <field name="gyro_bias" units="raw" type="float" elementnames="X,Y,Z" defaultvalue="23"/>
-        <field name="gyro_scale" units="deg/s" type="float" elementnames="X,Y,Z" defaultvalue="-0.0140"/>
+        <field name="gyro_bias" units="deg/s" type="float" elementnames="X,Y,Z" defaultvalue="23,-23,23"/>
+        <field name="gyro_scale" units="deg/s" type="float" elementnames="X,Y,Z" defaultvalue="-0.0140,0.014,-0.014"/>
         <field name="gyro_var" units="deg^s/s^2" type="float" elementnames="X,Y,Z" defaultvalue="1e-4"/>
         <field name="mag_bias" units="mGau" type="float" elementnames="X,Y,Z" defaultvalue="0"/>
         <field name="mag_scale" units="mGau" type="float" elementnames="X,Y,Z" defaultvalue="1"/>

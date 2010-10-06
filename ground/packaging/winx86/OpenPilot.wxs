@@ -102,8 +102,24 @@
                     </Component>
                 </Directory>
             </Directory>
+            <Directory Id="AppDataFolder">
+                <Directory Id="DefaultSettings" Name="OpenPilot">
+                    
+                    <Component Id="OpenPilotGCS.db" DiskId="1" Guid="8AEE7FF5-ABC0-4C0B-B17E-7E671B2A127E">
+                        <RemoveFolder Id="DefaultSettings" On="uninstall" />
+                        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]\OpenPilotGCSdb" Type="string" Value="OpenPilotGCS.db" />
+                        <File Id="OpenPilotGCS.db" Name="OpenPilotGCS.db" Source="DefaultSettings\OpenPilotGCS.db" />
+                    </Component>
+                    <Component Id="OpenPilotGCS.ini" DiskId="1" Guid="EF02D380-C484-49ED-AE31-01410AB68ACA">
+                        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]\OpenPilotGCSini" Type="string" Value="OpenPilotGCS.ini" />
+                        <File Id="OpenPilotGCS.ini" Name="OpenPilotGCS.ini" Source="DefaultSettings\OpenPilotGCS.ini" />
+                    </Component>
+                </Directory>
+            </Directory>
         </Directory>
         <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
+            <ComponentRef Id="OpenPilotGCS.db" />
+            <ComponentRef Id="OpenPilotGCS.ini" />
             <ComponentRef Id="Aggregation.dll" />
             <ComponentRef Id="ExtensionSystem.dll" />
             <ComponentRef Id="GLC_lib.dll" />

@@ -79,7 +79,7 @@ void PIOS_Board_Init(void) {
 	PIOS_USB_HID_Init(0);
 #endif
 	PIOS_I2C_Init();
-
+	PIOS_IAP_Init();
 }
 
 /* MicroSD Interface

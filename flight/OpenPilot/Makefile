@@ -146,9 +146,6 @@ endif
 
 ## UAVOBJECTS
 ifndef TESTAPP
-SRC += $(OPUAVOBJ)/exampleobject1.c
-SRC += $(OPUAVOBJ)/exampleobject2.c
-SRC += $(OPUAVOBJ)/examplesettings.c
 SRC += $(OPUAVOBJ)/objectpersistence.c
 SRC += $(OPUAVOBJ)/positionactual.c
 SRC += $(OPUAVOBJ)/gpsposition.c

@@ -102,6 +102,8 @@ namespace mapcontrol
             coord=map->FromLocalToLatLng(this->pos().x(),this->pos().y());
             isDragging=false;
             RefreshToolTip();
+
+            emit WPValuesChanged(this);
         }
         QGraphicsItem::mouseReleaseEvent(event);
     }
@@ -114,6 +116,8 @@ namespace mapcontrol
             QString coord_str = " " + QString::number(coord.Lat(), 'f', 6) + "   " + QString::number(coord.Lng(), 'f', 6);
             text->setText(coord_str);
             textBG->setRect(text->boundingRect());
+
+            emit WPValuesChanged(this);
         }
             QGraphicsItem::mouseMoveEvent(event);
     }

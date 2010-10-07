@@ -140,6 +140,7 @@ public:
                 QWidget *widget);
     void RefreshPos();
     void RefreshToolTip();
+    QPixmap picture;
 ~WayPointItem();
 
     static int snumber;
@@ -150,7 +151,6 @@ protected:
 
 
 private:
-    QPixmap picture;
     internals::PointLatLng coord;//coordinates of this WayPoint
     bool reached;
     QString description;

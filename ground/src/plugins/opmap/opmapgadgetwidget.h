@@ -145,8 +145,8 @@ private slots:
     void on_toolButtonPrevWaypoint_clicked();
     void on_toolButtonHoldPosition_clicked();
     void on_toolButtonGo_clicked();
-    void on_toolButtonMapModeLeft_clicked();
-    void on_toolButtonMapModeRight_clicked();
+    void on_toolButtonMagicWaypointMapMode_clicked();
+    void on_toolButtonNormalMapMode_clicked();
 
     /**
     * @brief signals received from the map object

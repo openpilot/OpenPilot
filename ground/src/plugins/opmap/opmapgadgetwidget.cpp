@@ -161,15 +161,19 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     switch (m_map_mode)
     {
         case Normal_MapMode:
-            m_widget->labelMapMode->setText("Normal mode");
+            m_widget->toolButtonMagicWaypointMapMode->setChecked(false);
+            m_widget->toolButtonNormalMapMode->setChecked(true);
             break;
 
         case MagicWaypoint_MapMode:
-            m_widget->labelMapMode->setText("Magic Waypoint mode");
+            m_widget->toolButtonNormalMapMode->setChecked(false);
+            m_widget->toolButtonMagicWaypointMapMode->setChecked(true);
             break;
 
         default:
-            m_widget->labelMapMode->setText("Unknown mode");
+            m_map_mode = Normal_MapMode;
+            m_widget->toolButtonMagicWaypointMapMode->setChecked(false);
+            m_widget->toolButtonNormalMapMode->setChecked(true);
             break;
     }
 
@@ -994,40 +998,14 @@ void OPMapGadgetWidget::on_treeViewWaypoints_clicked(QModelIndex index)
     // to do
 }
 
-void OPMapGadgetWidget::on_toolButtonMapModeLeft_clicked()
+void OPMapGadgetWidget::on_toolButtonNormalMapMode_clicked()
 {
-    switch (m_map_mode)
-    {
-        case Normal_MapMode:
-            setMapMode(MagicWaypoint_MapMode);
-            break;
-
-        case MagicWaypoint_MapMode:
-            setMapMode(Normal_MapMode);
-            break;
-
-        default:
-            setMapMode(Normal_MapMode);
-            break;
-    }
+    setMapMode(Normal_MapMode);
 }
 
-void OPMapGadgetWidget::on_toolButtonMapModeRight_clicked()
+void OPMapGadgetWidget::on_toolButtonMagicWaypointMapMode_clicked()
 {
-    switch (m_map_mode)
-    {
-        case Normal_MapMode:
-            setMapMode(MagicWaypoint_MapMode);
-            break;
-
-        case MagicWaypoint_MapMode:
-            setMapMode(Normal_MapMode);
-            break;
-
-        default:
-            setMapMode(Normal_MapMode);
-            break;
-    }
+    setMapMode(MagicWaypoint_MapMode);
 }
 
 // *************************************************************************************
@@ -1181,7 +1159,8 @@ void OPMapGadgetWidget::setMapMode(opMapModeType mode)
         case Normal_MapMode:
             m_map_mode = Normal_MapMode;
 
-            m_widget->labelMapMode->setText("Normal mode");
+            m_widget->toolButtonMagicWaypointMapMode->setChecked(false);
+            m_widget->toolButtonNormalMapMode->setChecked(true);
 
             // delete the magic waypoint from the map
             if (magic_waypoint.map_wp_item)
@@ -1214,7 +1193,8 @@ void OPMapGadgetWidget::setMapMode(opMapModeType mode)
         case MagicWaypoint_MapMode:
             m_map_mode = MagicWaypoint_MapMode;
 
-            m_widget->labelMapMode->setText("Magic Waypoint mode");
+            m_widget->toolButtonNormalMapMode->setChecked(false);
+            m_widget->toolButtonMagicWaypointMapMode->setChecked(true);
 
             // delete the normal waypoints from the map
             m_waypoint_list_mutex.lock();

@@ -1,0 +1,9 @@
+CMakeFiles/
+cmake_install.cmake
+Makefile
+CTestTestfile.cmake
+data
+code
+src/ruby/*_wrap.cpp
+src/tcl
+test_suite/

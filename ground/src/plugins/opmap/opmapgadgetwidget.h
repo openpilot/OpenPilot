@@ -28,12 +28,15 @@
 #ifndef OPMAP_GADGETWIDGET_H_
 #define OPMAP_GADGETWIDGET_H_
 
+// ******************************************************
+
 #include <QtGui/QWidget>
 #include <QtGui/QMenu>
 #include <QStringList>
 #include <QStandardItemModel>
 #include <QList>
 #include <QMutex>
+#include <QMutexLocker>
 #include <QPointF>
 
 #include "opmapcontrol/opmapcontrol.h"
@@ -51,6 +54,8 @@
 
 #include "utils/coordinateconversions.h"
 
+// ******************************************************
+
 namespace Ui
 {
     class OPMap_Widget;
@@ -63,10 +68,19 @@ using namespace mapcontrol;
 // local waypoint list item structure
 typedef struct t_waypoint
 {
-    mapcontrol::WayPointItem *item;
+    mapcontrol::WayPointItem *map_wp_item;
+    internals::PointLatLng coord;
+    double altitude;
+    QString description;
+    bool locked;
     int time_seconds;
     int hold_time_seconds;
 } t_waypoint;
+
+// ******************************************************
+
+enum opMapModeType { Normal_MapMode = 0,
+                     MagicWaypoint_MapMode = 1};
 
 // ******************************************************
 
@@ -92,6 +106,7 @@ public:
     void setAccessMode(QString accessMode);
     void setUseMemoryCache(bool useMemoryCache);
     void setCacheLocation(QString cacheLocation);
+    void setMapMode(opMapModeType mode);
 
 public slots:
 
@@ -122,7 +137,6 @@ private slots:
     void on_toolButtonMapUAV_clicked();
     void on_toolButtonMapUAVheading_clicked();
     void on_toolButtonShowUAVtrail_clicked();
-    void on_toolButtonClearUAVtrail_clicked();
     void on_horizontalSliderZoom_sliderMoved(int position);
     void on_toolButtonAddWaypoint_clicked();
     void on_treeViewWaypoints_clicked(QModelIndex index);
@@ -131,6 +145,8 @@ private slots:
     void on_toolButtonPrevWaypoint_clicked();
     void on_toolButtonHoldPosition_clicked();
     void on_toolButtonGo_clicked();
+    void on_toolButtonMapModeLeft_clicked();
+    void on_toolButtonMapModeRight_clicked();
 
     /**
     * @brief signals received from the map object
@@ -179,6 +195,7 @@ private slots:
     void onLockWayPointAct_triggered();
     void onDeleteWayPointAct_triggered();
     void onClearWayPointsAct_triggered();
+    void onMapModeActGroup_triggered(QAction *action);
     void onZoomActGroup_triggered(QAction *action);
 
 private:
@@ -190,6 +207,8 @@ private:
     internals::PointLatLng mouse_lat_lon;
 
     int prev_tile_number;
+
+    opMapModeType m_map_mode;
 
     QStringList findPlaceWordList;
     QCompleter *findPlaceCompleter;
@@ -219,8 +238,12 @@ private:
 
     mapcontrol::WayPointItem *m_mouse_waypoint;
 
-    QList<t_waypoint> m_waypoint_list;
+    QList<t_waypoint *> m_waypoint_list;
     QMutex m_waypoint_list_mutex;
+
+    t_waypoint magic_waypoint;
+
+    QMutex m_map_mutex;
 
     void createActions();
 
@@ -248,6 +271,9 @@ private:
     QAction *lockWayPointAct;
     QAction *deleteWayPointAct;
     QAction *clearWayPointsAct;
+
+    QActionGroup *mapModeActGroup;
+    QList<QAction *> mapModeAct;
 
     QActionGroup *zoomActGroup;
     QList<QAction *> zoomAct;

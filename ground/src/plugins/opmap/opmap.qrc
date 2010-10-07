@@ -3,8 +3,6 @@
         <file>images/ok.png</file>
         <file>images/uav.png</file>
         <file>images/gcs.png</file>
-        <file>images/plus.png</file>
-        <file>images/minus.png</file>
         <file>images/waypoint.png</file>
         <file>images/right_but.png</file>
         <file>images/left_but.png</file>
@@ -21,5 +19,8 @@
         <file>images/uav_heading.png</file>
         <file>images/uav_trail.png</file>
         <file>images/uav_trail_clear.png</file>
+        <file>images/minus.png</file>
+        <file>images/plus.png</file>
+        <file>images/waypoint_marker3.png</file>
     </qresource>
 </RCC>

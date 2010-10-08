@@ -51,7 +51,7 @@ namespace mapcontrol
         bool ShowSafeArea()const{return showsafearea;}
         void SetShowSafeArea(bool const& value){showsafearea=value;}
         int SafeArea()const{return safearea;}
-        void SetSafeArea(bool const& value){safearea=value;}
+        void SetSafeArea(int const& value){safearea=value;}
         bool safe;
         void SetCoord(internals::PointLatLng const& value){coord=value;}
         internals::PointLatLng Coord()const{return coord;}

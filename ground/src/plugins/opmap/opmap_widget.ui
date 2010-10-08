@@ -82,6 +82,23 @@ color: rgb(255, 255, 255);
 border-radius: 0px;
 /*border-radius: 3px;*/
 }
+QToolButton:disabled {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(128, 128, 128, 128), stop:1 rgba(128, 128, 128, 128));
+color: rgba(255, 255, 255, 128);
+
+/*height: 24px;*/
+
+border: none;
+border-radius: 0px;
+/*
+border: 1px  solid rgb(255, 255, 255); 
+border-radius: 0px;
+border-top-color: rgba(0, 0, 0, 64);
+border-right-color: rgba(0, 0, 0, 64);
+border-bottom-color: rgba(255, 255, 255, 64);
+border-left-color: rgba(255, 255, 255, 64);
+*/
+}
 QToolButton:hover {
 background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(255, 255, 255,128), stop:1 rgba(180, 180, 180, 128));
 color: rgb(255, 255, 255);
@@ -128,6 +145,62 @@ border-left-color: rgba(255, 255, 255, 64);
 */
 }
 
+QPushButton {
+background-color: transparent;
+color: rgb(255, 255, 255);
+
+/*height: 24px;*/
+
+/*border-style: none;*/
+/* border: 1px solid rgba(0, 0, 0, 64);  */
+/* border: 0px; */
+border-radius: 0px;
+/*border-radius: 3px;*/
+}
+QPushButton:disabled {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(128, 128, 128, 128), stop:1 rgba(128, 128, 128, 128));
+color: rgb(255, 255, 255);
+
+/*height: 24px;*/
+
+border: none;
+border-radius: 0px;
+/*
+border: 1px  solid rgb(255, 255, 255); 
+border-radius: 0px;
+border-top-color: rgba(0, 0, 0, 64);
+border-right-color: rgba(0, 0, 0, 64);
+border-bottom-color: rgba(255, 255, 255, 64);
+border-left-color: rgba(255, 255, 255, 64);
+*/
+}
+QPushButton:hover {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(255, 255, 255,128), stop:1 rgba(180, 180, 180, 128));
+color: rgb(255, 255, 255);
+
+/*height: 24px;*/
+
+border: 0px; 
+border-radius: 0px;
+/*border-radius: 3px;*/
+}
+QPushButton:pressed {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(64, 64, 64, 255));
+color: rgb(255, 255, 255);
+
+/*height: 24px;*/
+
+border: none;
+border-radius: 0px;
+/*
+border: 1px  solid rgb(255, 255, 255); 
+border-radius: 0px;
+border-top-color: rgba(0, 0, 0, 64);
+border-right-color: rgba(0, 0, 0, 64);
+border-bottom-color: rgba(255, 255, 255, 64);
+border-left-color: rgba(255, 255, 255, 64);
+*/
+}
 
 QComboBox {
 background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(48, 48, 48, 255), stop:1 rgba(120, 120, 120, 255));
@@ -199,8 +272,11 @@ border-radius: 2px;
           </property>
           <property name="font">
            <font>
-            <pointsize>9</pointsize>
+            <pointsize>8</pointsize>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>Normal Map Mode</string>
           </property>
           <property name="text">
            <string>   Normal   </string>
@@ -251,6 +327,9 @@ border-radius: 2px;
             <pointsize>8</pointsize>
            </font>
           </property>
+          <property name="toolTip">
+           <string>Magic Waypoint Map Mode</string>
+          </property>
           <property name="text">
            <string>   Magic Waypoint   </string>
           </property>
@@ -292,6 +371,68 @@ border-radius: 2px;
          </spacer>
         </item>
         <item>
+         <widget class="Line" name="line_5">
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButtonHomeWaypoint">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string>Move the magic waypoint to the home position</string>
+          </property>
+          <property name="text">
+           <string>Home WP</string>
+          </property>
+          <property name="icon">
+           <iconset resource="opmap.qrc">
+            <normaloff>:/opmap/images/home_wp.png</normaloff>:/opmap/images/home_wp.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>28</width>
+            <height>28</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButtonCenterWaypoint">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string>Move the magic waypoint to center of map</string>
+          </property>
+          <property name="text">
+           <string>Center WP</string>
+          </property>
+          <property name="icon">
+           <iconset resource="opmap.qrc">
+            <normaloff>:/opmap/images/center_wp.png</normaloff>:/opmap/images/center_wp.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>28</width>
+            <height>28</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="Line" name="line_8">
           <property name="frameShadow">
            <enum>QFrame::Plain</enum>
@@ -311,9 +452,6 @@ border-radius: 2px;
           </property>
           <property name="toolTip">
            <string>Center map over home position</string>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
           </property>
           <property name="text">
            <string>Home</string>
@@ -349,9 +487,6 @@ border-radius: 2px;
           </property>
           <property name="toolTip">
            <string>Center map over UAV position</string>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
           </property>
           <property name="text">
            <string>UAV</string>
@@ -391,9 +526,6 @@ border-radius: 2px;
           <property name="toolTip">
            <string>Map rotation follows UAV heading</string>
           </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
           <property name="text">
            <string>Heading</string>
           </property>
@@ -431,9 +563,6 @@ border-radius: 2px;
           </property>
           <property name="toolTip">
            <string>Show/Hide the UAV trail</string>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
           </property>
           <property name="text">
            <string>Trail</string>

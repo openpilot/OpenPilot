@@ -22,5 +22,7 @@
         <file>images/minus.png</file>
         <file>images/plus.png</file>
         <file>images/waypoint_marker3.png</file>
+        <file>images/center_wp.png</file>
+        <file>images/home_wp.png</file>
     </qresource>
 </RCC>

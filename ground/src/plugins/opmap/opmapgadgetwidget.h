@@ -65,6 +65,13 @@ using namespace mapcontrol;
 
 // ******************************************************
 
+typedef struct t_home
+{
+    internals::PointLatLng coord;
+    double altitude;
+    bool locked;
+} t_home;
+
 // local waypoint list item structure
 typedef struct t_waypoint
 {
@@ -97,6 +104,8 @@ public:
     *
     * @param
     */
+    void setHome(QPointF pos);
+    void setHome(internals::PointLatLng pos_lat_lon);
     void goHome();
     void setZoom(int zoom);
     void setPosition(QPointF pos);
@@ -147,6 +156,8 @@ private slots:
     void on_toolButtonGo_clicked();
     void on_toolButtonMagicWaypointMapMode_clicked();
     void on_toolButtonNormalMapMode_clicked();
+    void on_toolButtonHomeWaypoint_clicked();
+    void on_toolButtonCenterWaypoint_clicked();
 
     /**
     * @brief signals received from the map object
@@ -183,6 +194,7 @@ private slots:
     void onGoZoomInAct_triggered();
     void onGoZoomOutAct_triggered();
     void onGoMouseClickAct_triggered();
+    void onSetHomeAct_triggered();
     void onGoHomeAct_triggered();
     void onGoUAVAct_triggered();
     void onFollowUAVpositionAct_toggled(bool checked);
@@ -197,6 +209,8 @@ private slots:
     void onClearWayPointsAct_triggered();
     void onMapModeActGroup_triggered(QAction *action);
     void onZoomActGroup_triggered(QAction *action);
+    void onHomeMagicWaypointAct_triggered();
+    void onCenterMagicWaypointAct_triggered();
 
 private:
     int min_zoom;
@@ -209,6 +223,10 @@ private:
     int prev_tile_number;
 
     opMapModeType m_map_mode;
+
+    t_home home_position;
+
+    t_waypoint magic_waypoint;
 
     QStringList findPlaceWordList;
     QCompleter *findPlaceCompleter;
@@ -241,8 +259,6 @@ private:
     QList<t_waypoint *> m_waypoint_list;
     QMutex m_waypoint_list_mutex;
 
-    t_waypoint magic_waypoint;
-
     QMutex m_map_mutex;
 
     void createActions();
@@ -259,6 +275,7 @@ private:
     QAction *zoomInAct;
     QAction *zoomOutAct;
     QAction *goMouseClickAct;
+    QAction *setHomeAct;
     QAction *goHomeAct;
     QAction *goUAVAct;
     QAction *followUAVpositionAct;
@@ -271,12 +288,17 @@ private:
     QAction *lockWayPointAct;
     QAction *deleteWayPointAct;
     QAction *clearWayPointsAct;
+    QAction *homeMagicWaypointAct;
+    QAction *centerMagicWaypointAct;
 
     QActionGroup *mapModeActGroup;
     QList<QAction *> mapModeAct;
 
     QActionGroup *zoomActGroup;
     QList<QAction *> zoomAct;
+
+    void homeMagicWaypoint();
+    void centerMagicWaypoint();
 
     void loadComboBoxLines(QComboBox *comboBox, QString filename);
     void saveComboBoxLines(QComboBox *comboBox, QString filename);

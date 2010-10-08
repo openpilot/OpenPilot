@@ -68,20 +68,33 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_map_mode = Normal_MapMode;
 
-    // default magic waypoint params
-    magic_waypoint.map_wp_item = NULL;
-    magic_waypoint.coord = internals::PointLatLng(0.0, 0.0);
-    magic_waypoint.altitude = 0.0;
-    magic_waypoint.description = "Magic waypoint";
-    magic_waypoint.locked = false;
-    magic_waypoint.time_seconds = 0;
-    magic_waypoint.hold_time_seconds = 0;
-
     // **************
     // fetch required UAVObjects
 
     m_plugin_manager = ExtensionSystem::PluginManager::instance();
     m_objManager = m_plugin_manager->getObject<UAVObjectManager>();
+
+    // current position
+    QPointF pos = getLatLon();
+    internals::PointLatLng pos_lat_lon = internals::PointLatLng(pos.x(), pos.y());
+
+    // **************
+    // default home position
+
+    home_position.coord = pos_lat_lon;
+    home_position.altitude = 0.0;
+    home_position.locked = false;
+
+    // **************
+    // default magic waypoint params
+
+    magic_waypoint.map_wp_item = NULL;
+    magic_waypoint.coord = home_position.coord;
+    magic_waypoint.altitude = 0.0;
+    magic_waypoint.description = "Magic waypoint";
+    magic_waypoint.locked = false;
+    magic_waypoint.time_seconds = 0;
+    magic_waypoint.hold_time_seconds = 0;
 
     // **************
     // create the widget that holds the user controls and the map
@@ -163,17 +176,20 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
         case Normal_MapMode:
             m_widget->toolButtonMagicWaypointMapMode->setChecked(false);
             m_widget->toolButtonNormalMapMode->setChecked(true);
+            m_widget->toolButtonCenterWaypoint->setEnabled(false);
             break;
 
         case MagicWaypoint_MapMode:
             m_widget->toolButtonNormalMapMode->setChecked(false);
             m_widget->toolButtonMagicWaypointMapMode->setChecked(true);
+            m_widget->toolButtonCenterWaypoint->setEnabled(true);
             break;
 
         default:
             m_map_mode = Normal_MapMode;
             m_widget->toolButtonMagicWaypointMapMode->setChecked(false);
             m_widget->toolButtonNormalMapMode->setChecked(true);
+            m_widget->toolButtonCenterWaypoint->setEnabled(false);
             break;
     }
 
@@ -317,8 +333,9 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_map, SIGNAL(WPInserted(int const&, WayPointItem*)), this, SLOT(WPInserted(int const&, WayPointItem*)));
     connect(m_map, SIGNAL(WPDeleted(int const&)), this, SLOT(WPDeleted(int const&)));
 
-    QPointF pos = getLatLon();
-    m_map->SetCurrentPosition(internals::PointLatLng(pos.x(), pos.y()));	    // set the default map position
+    m_map->SetCurrentPosition(home_position.coord);         // set the map position
+    m_map->Home->SetCoord(home_position.coord);             // set the HOME position
+    m_map->UAV->SetUAVPos(home_position.coord, 0.0);        // set the UAV position
 
     // **************
     // create various context menu (mouse right click menu) actions
@@ -327,8 +344,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     // **************
     // create the desired timers
-
-    // Pip .. I don't like polling, I prefer an efficient event driven system (signal/slot) but this will do for now
 
     m_updateTimer = new QTimer();
     m_updateTimer->setInterval(200);
@@ -503,6 +518,7 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     menu.addSeparator()->setText(tr("HOME"));
 
+    menu.addAction(setHomeAct);
     menu.addAction(showHomeAct);
     menu.addAction(goHomeAct);
 
@@ -518,29 +534,37 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     // *********
 
-    if (m_map_mode == Normal_MapMode)
-    {   // only show the waypoint stuff if not in 'magic waypoint' mode
+    switch (m_map_mode)
+    {
+        case Normal_MapMode:    // only show the waypoint stuff if not in 'magic waypoint' mode
+            menu.addSeparator()->setText(tr("Waypoints"));
 
-        menu.addSeparator()->setText(tr("Waypoints"));
+            menu.addAction(wayPointEditorAct);
+            menu.addAction(addWayPointAct);
 
-        menu.addAction(wayPointEditorAct);
-        menu.addAction(addWayPointAct);
+            if (m_mouse_waypoint)
+            {	// we have a waypoint under the mouse
+                menu.addAction(editWayPointAct);
 
-        if (m_mouse_waypoint)
-        {	// we have a waypoint under the mouse
-            menu.addAction(editWayPointAct);
+                lockWayPointAct->setChecked(waypoint_locked);
+                menu.addAction(lockWayPointAct);
 
-            lockWayPointAct->setChecked(waypoint_locked);
-            menu.addAction(lockWayPointAct);
+                if (!waypoint_locked)
+                    menu.addAction(deleteWayPointAct);
+            }
 
-            if (!waypoint_locked)
-                menu.addAction(deleteWayPointAct);
-        }
+            m_waypoint_list_mutex.lock();
+            if (m_waypoint_list.count() > 0)
+                menu.addAction(clearWayPointsAct);	// we have waypoints
+            m_waypoint_list_mutex.unlock();
 
-        m_waypoint_list_mutex.lock();
-        if (m_waypoint_list.count() > 0)
-            menu.addAction(clearWayPointsAct);	// we have waypoints
-        m_waypoint_list_mutex.unlock();
+            break;
+
+        case MagicWaypoint_MapMode:
+            menu.addSeparator()->setText(tr("Waypoints"));
+            menu.addAction(homeMagicWaypointAct);
+            menu.addAction(centerMagicWaypointAct);
+            break;
     }
 
     // *********
@@ -608,9 +632,9 @@ void OPMapGadgetWidget::updatePosition()
     QPointF pos = getLatLon();
 
     internals::PointLatLng uav_pos = internals::PointLatLng(pos.x(), pos.y());	// current UAV position
-    float uav_heading = 0; //data.Heading;								// current UAV heading
-    float uav_altitude_meters = 0; //data.Altitude;							// current UAV height
-    float uav_ground_speed_meters_per_second = 0; //data.Groundspeed;				// current UAV ground speed
+    float uav_heading = 0; //data.Heading;                              		// current UAV heading
+    float uav_altitude_meters = 0; //data.Altitude;                 			// current UAV height
+    float uav_ground_speed_meters_per_second = 0; //data.Groundspeed;			// current UAV ground speed
 
     // display the UAV lat/lon position
     QString str =   "lat: " + QString::number(uav_pos.Lat(), 'f', 7) +
@@ -620,7 +644,7 @@ void OPMapGadgetWidget::updatePosition()
 		    "  " + QString::number(uav_ground_speed_meters_per_second, 'f', 1) + "m/s";
     m_widget->labelUAVPos->setText(str);
 
-    m_map->UAV->SetUAVPos(uav_pos, uav_altitude_meters);					// set the maps UAV position
+    m_map->UAV->SetUAVPos(uav_pos, uav_altitude_meters);			// set the maps UAV position
     m_map->UAV->SetUAVHeading(uav_heading);							// set the maps UAV heading
 }
 
@@ -1008,8 +1032,37 @@ void OPMapGadgetWidget::on_toolButtonMagicWaypointMapMode_clicked()
     setMapMode(MagicWaypoint_MapMode);
 }
 
+void OPMapGadgetWidget::on_toolButtonHomeWaypoint_clicked()
+{
+    homeMagicWaypoint();
+}
+
+void OPMapGadgetWidget::on_toolButtonCenterWaypoint_clicked()
+{
+    centerMagicWaypoint();
+}
+
 // *************************************************************************************
 // public functions
+
+void OPMapGadgetWidget::setHome(QPointF pos)
+{
+    if (!m_widget || !m_map)
+        return;
+
+    setHome(internals::PointLatLng(pos.x(), pos.y()));
+}
+
+void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon)
+{
+    if (!m_widget || !m_map)
+        return;
+
+    home_position.coord = pos_lat_lon;
+
+    m_map->Home->SetCoord(home_position.coord);
+    m_map->Home->RefreshPos();
+}
 
 void OPMapGadgetWidget::goHome()
 {
@@ -1018,8 +1071,8 @@ void OPMapGadgetWidget::goHome()
 
     followUAVpositionAct->setChecked(false);
 
-    internals::PointLatLng home_pos = m_map->Home->Coord();	// get the home location
-    m_map->SetCurrentPosition(home_pos);			// center the map onto the home location
+    internals::PointLatLng home_pos = home_position.coord;	// get the home location
+    m_map->SetCurrentPosition(home_pos);                    // center the map onto the home location
 }
 
 
@@ -1162,6 +1215,8 @@ void OPMapGadgetWidget::setMapMode(opMapModeType mode)
             m_widget->toolButtonMagicWaypointMapMode->setChecked(false);
             m_widget->toolButtonNormalMapMode->setChecked(true);
 
+            m_widget->toolButtonCenterWaypoint->setEnabled(false);
+
             // delete the magic waypoint from the map
             if (magic_waypoint.map_wp_item)
             {
@@ -1195,6 +1250,8 @@ void OPMapGadgetWidget::setMapMode(opMapModeType mode)
 
             m_widget->toolButtonNormalMapMode->setChecked(false);
             m_widget->toolButtonMagicWaypointMapMode->setChecked(true);
+
+            m_widget->toolButtonCenterWaypoint->setEnabled(true);
 
             // delete the normal waypoints from the map
             m_waypoint_list_mutex.lock();
@@ -1289,6 +1346,10 @@ void OPMapGadgetWidget::createActions()
     goMouseClickAct->setStatusTip(tr("Center the map onto where you right clicked the mouse"));
     connect(goMouseClickAct, SIGNAL(triggered()), this, SLOT(onGoMouseClickAct_triggered()));
 
+    setHomeAct = new QAction(tr("Set the home location"), this);
+    setHomeAct->setStatusTip(tr("Set the home location to where you clicked"));
+    connect(setHomeAct, SIGNAL(triggered()), this, SLOT(onSetHomeAct_triggered()));
+
     goHomeAct = new QAction(tr("Go to &Home location"), this);
     goHomeAct->setShortcut(tr("Ctrl+H"));
     goHomeAct->setStatusTip(tr("Center the map onto the home location"));
@@ -1354,6 +1415,14 @@ void OPMapGadgetWidget::createActions()
     clearWayPointsAct->setShortcut(tr("Ctrl+C"));
     clearWayPointsAct->setStatusTip(tr("Clear waypoints"));
     connect(clearWayPointsAct, SIGNAL(triggered()), this, SLOT(onClearWayPointsAct_triggered()));
+
+    homeMagicWaypointAct = new QAction(tr("Home magic waypoint"), this);
+    homeMagicWaypointAct->setStatusTip(tr("Move the magic waypoint to the home position"));
+    connect(homeMagicWaypointAct, SIGNAL(triggered()), this, SLOT(onHomeMagicWaypointAct_triggered()));
+
+    centerMagicWaypointAct = new QAction(tr("Center magic waypoint"), this);
+    centerMagicWaypointAct->setStatusTip(tr("Move the magic waypoint to the center of the map"));
+    connect(centerMagicWaypointAct, SIGNAL(triggered()), this, SLOT(onCenterMagicWaypointAct_triggered()));
 
     mapModeActGroup = new QActionGroup(this);
     connect(mapModeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onMapModeActGroup_triggered(QAction *)));
@@ -1502,6 +1571,14 @@ void OPMapGadgetWidget::onGoMouseClickAct_triggered()
         return;
 
     m_map->SetCurrentPosition(m_map->currentMousePosition());   // center the map onto the mouse position
+}
+
+void OPMapGadgetWidget::onSetHomeAct_triggered()
+{
+    if (!m_widget || !m_map)
+        return;
+
+    setHome(mouse_lat_lon);
 }
 
 void OPMapGadgetWidget::onGoHomeAct_triggered()
@@ -1722,6 +1799,52 @@ void OPMapGadgetWidget::onClearWayPointsAct_triggered()
     }
 
     m_waypoint_list.clear();
+}
+
+void OPMapGadgetWidget::onHomeMagicWaypointAct_triggered()
+{
+    // center the magic waypoint on the home position
+    homeMagicWaypoint();
+}
+
+void OPMapGadgetWidget::onCenterMagicWaypointAct_triggered()
+{
+    // center the magic waypoint on the map
+    centerMagicWaypoint();
+}
+
+// *************************************************************************************
+// move the magic waypoint to the home position
+
+void OPMapGadgetWidget::homeMagicWaypoint()
+{
+    if (!m_widget || !m_map)
+        return;
+
+    if (m_map_mode != MagicWaypoint_MapMode)
+        return;
+
+    magic_waypoint.coord = home_position.coord;
+
+    if (magic_waypoint.map_wp_item)
+        magic_waypoint.map_wp_item->SetCoord(magic_waypoint.coord);
+}
+
+// *************************************************************************************
+// move the magic waypoint to the center of the map
+
+void OPMapGadgetWidget::centerMagicWaypoint()
+{
+    if (!m_widget || !m_map)
+        return;
+
+    if (m_map_mode != MagicWaypoint_MapMode)
+        return;
+
+    magic_waypoint.coord = m_map->CurrentPosition();
+
+    if (magic_waypoint.map_wp_item)
+        magic_waypoint.map_wp_item->SetCoord(magic_waypoint.coord);
 }
 
 // *************************************************************************************

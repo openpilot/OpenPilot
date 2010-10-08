@@ -40,6 +40,8 @@
 
 #define	max_digital_zoom   3	// maximum allowed digital zoom level
 
+const int safe_area_radius_list[] = {5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000};
+
 // *************************************************************************************
 
 // constructor
@@ -127,8 +129,11 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_map->SetShowHome(true);					    // display the HOME position on the map
     m_map->SetShowUAV(true);					    // display the UAV position on the map
 
+    m_map->Home->SetSafeArea(safe_area_radius_list[3]); // set radius (meters)
+    m_map->Home->SetShowSafeArea(true);                 // show the safe area
+
     m_map->UAV->SetTrailTime(0.5);				    // seconds
-    m_map->UAV->SetTrailDistance(0.01);				    // kilometers
+    m_map->UAV->SetTrailDistance(0.01);				// kilometers
 
 //  m_map->UAV->SetTrailType(UAVTrailType::ByTimeElapsed);
     m_map->UAV->SetTrailType(UAVTrailType::ByDistance);
@@ -176,12 +181,14 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
         case Normal_MapMode:
             m_widget->toolButtonMagicWaypointMapMode->setChecked(false);
             m_widget->toolButtonNormalMapMode->setChecked(true);
+            m_widget->toolButtonHomeWaypoint->setEnabled(false);
             m_widget->toolButtonCenterWaypoint->setEnabled(false);
             break;
 
         case MagicWaypoint_MapMode:
             m_widget->toolButtonNormalMapMode->setChecked(false);
             m_widget->toolButtonMagicWaypointMapMode->setChecked(true);
+            m_widget->toolButtonHomeWaypoint->setEnabled(true);
             m_widget->toolButtonCenterWaypoint->setEnabled(true);
             break;
 
@@ -189,6 +196,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
             m_map_mode = Normal_MapMode;
             m_widget->toolButtonMagicWaypointMapMode->setChecked(false);
             m_widget->toolButtonNormalMapMode->setChecked(true);
+            m_widget->toolButtonHomeWaypoint->setEnabled(false);
             m_widget->toolButtonCenterWaypoint->setEnabled(false);
             break;
     }
@@ -497,6 +505,14 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     menu.addSeparator();
 
     menu.addAction(findPlaceAct);
+
+    menu.addSeparator();
+
+    menu.addAction(showSafeAreaAct);
+    QMenu safeAreaSubMenu(tr("Safe Area") + " (" + QString::number(m_map->Home->SafeArea()) + "m)", this);
+    for (int i = 0; i < safeAreaAct.count(); i++)
+        safeAreaSubMenu.addAction(safeAreaAct.at(i));
+    menu.addMenu(&safeAreaSubMenu);
 
     menu.addSeparator();
 
@@ -1215,6 +1231,7 @@ void OPMapGadgetWidget::setMapMode(opMapModeType mode)
             m_widget->toolButtonMagicWaypointMapMode->setChecked(false);
             m_widget->toolButtonNormalMapMode->setChecked(true);
 
+            m_widget->toolButtonHomeWaypoint->setEnabled(false);
             m_widget->toolButtonCenterWaypoint->setEnabled(false);
 
             // delete the magic waypoint from the map
@@ -1251,6 +1268,7 @@ void OPMapGadgetWidget::setMapMode(opMapModeType mode)
             m_widget->toolButtonNormalMapMode->setChecked(false);
             m_widget->toolButtonMagicWaypointMapMode->setChecked(true);
 
+            m_widget->toolButtonHomeWaypoint->setEnabled(true);
             m_widget->toolButtonCenterWaypoint->setEnabled(true);
 
             // delete the normal waypoints from the map
@@ -1453,6 +1471,30 @@ void OPMapGadgetWidget::createActions()
         zoom_act->setData(i);
         zoomAct.append(zoom_act);
     }
+
+    // *****
+    // safe area
+
+    showSafeAreaAct = new QAction(tr("Show Safe Area"), this);
+    showSafeAreaAct->setStatusTip(tr("Show/Hide the Safe Area around the home location"));
+    showSafeAreaAct->setCheckable(true);
+    showSafeAreaAct->setChecked(m_map->Home->ShowSafeArea());
+    connect(showSafeAreaAct, SIGNAL(toggled(bool)), this, SLOT(onShowSafeAreaAct_toggled(bool)));
+
+    safeAreaActGroup = new QActionGroup(this);
+    connect(safeAreaActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onSafeAreaActGroup_triggered(QAction *)));
+    safeAreaAct.clear();
+    for (int i = 0; i < sizeof(safe_area_radius_list) / sizeof(safe_area_radius_list[0]); i++)
+    {
+        int safeArea = safe_area_radius_list[i];
+        QAction *safeArea_act = new QAction(QString::number(safeArea) + "m", safeAreaActGroup);
+        safeArea_act->setCheckable(true);
+        safeArea_act->setChecked(safeArea == m_map->Home->SafeArea());
+        safeArea_act->setData(safeArea);
+        safeAreaAct.append(safeArea_act);
+    }
+
+    // *****
 
     // ***********************
 }
@@ -1811,6 +1853,26 @@ void OPMapGadgetWidget::onCenterMagicWaypointAct_triggered()
 {
     // center the magic waypoint on the map
     centerMagicWaypoint();
+}
+
+void OPMapGadgetWidget::onShowSafeAreaAct_toggled(bool show)
+{
+    if (!m_widget || !m_map)
+        return;
+
+    m_map->Home->SetShowSafeArea(show);             // show the safe area
+    m_map->Home->RefreshPos();
+}
+
+void OPMapGadgetWidget::onSafeAreaActGroup_triggered(QAction *action)
+{
+    if (!m_widget || !m_map)
+        return;
+
+    int radius = action->data().toInt();
+
+    m_map->Home->SetSafeArea(radius);               // set the radius (meters)
+    m_map->Home->RefreshPos();
 }
 
 // *************************************************************************************

@@ -211,6 +211,8 @@ private slots:
     void onZoomActGroup_triggered(QAction *action);
     void onHomeMagicWaypointAct_triggered();
     void onCenterMagicWaypointAct_triggered();
+    void onShowSafeAreaAct_toggled(bool show);
+    void onSafeAreaActGroup_triggered(QAction *action);
 
 private:
     int min_zoom;
@@ -290,6 +292,10 @@ private:
     QAction *clearWayPointsAct;
     QAction *homeMagicWaypointAct;
     QAction *centerMagicWaypointAct;
+
+    QAction *showSafeAreaAct;
+    QActionGroup *safeAreaActGroup;
+    QList<QAction *> safeAreaAct;
 
     QActionGroup *mapModeActGroup;
     QList<QAction *> mapModeAct;

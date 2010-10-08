@@ -41,7 +41,7 @@
 #define STABILIZATIONSETTINGS_H
 
 // Object constants
-#define STABILIZATIONSETTINGS_OBJID 1346414844U
+#define STABILIZATIONSETTINGS_OBJID 3792991236U
 #define STABILIZATIONSETTINGS_NAME "StabilizationSettings"
 #define STABILIZATIONSETTINGS_METANAME "StabilizationSettingsMeta"
 #define STABILIZATIONSETTINGS_ISSINGLEINST 1
@@ -74,21 +74,14 @@ typedef struct {
     uint8_t RollMax;
     uint8_t PitchMax;
     uint8_t YawMax;
-    uint8_t YawMode;
-    float ThrottleMax;
-    float ThrottleMin;
-    float RollIntegralLimit;
-    float PitchIntegralLimit;
-    float YawIntegralLimit;
-    float PitchKp;
-    float PitchKi;
-    float PitchKd;
-    float RollKp;
-    float RollKi;
-    float RollKd;
-    float YawKp;
-    float YawKi;
-    float YawKd;
+    float ManualRate[3];
+    float MaximumRate[3];
+    float RollRatePI[3];
+    float PitchRatePI[3];
+    float YawRatePI[3];
+    float RollPI[3];
+    float PitchPI[3];
+    float YawPI[3];
 
 } __attribute__((packed)) StabilizationSettingsData;
 
@@ -96,23 +89,46 @@ typedef struct {
 // Field RollMax information
 // Field PitchMax information
 // Field YawMax information
-// Field YawMode information
-/* Enumeration options for field YawMode */
-typedef enum { STABILIZATIONSETTINGS_YAWMODE_RATE=0, STABILIZATIONSETTINGS_YAWMODE_HEADING=1 } StabilizationSettingsYawModeOptions;
-// Field ThrottleMax information
-// Field ThrottleMin information
-// Field RollIntegralLimit information
-// Field PitchIntegralLimit information
-// Field YawIntegralLimit information
-// Field PitchKp information
-// Field PitchKi information
-// Field PitchKd information
-// Field RollKp information
-// Field RollKi information
-// Field RollKd information
-// Field YawKp information
-// Field YawKi information
-// Field YawKd information
+// Field ManualRate information
+/* Array element names for field ManualRate */
+typedef enum { STABILIZATIONSETTINGS_MANUALRATE_ROLL=0, STABILIZATIONSETTINGS_MANUALRATE_PITCH=1, STABILIZATIONSETTINGS_MANUALRATE_YAW=2 } StabilizationSettingsManualRateElem;
+/* Number of elements for field ManualRate */
+#define STABILIZATIONSETTINGS_MANUALRATE_NUMELEM 3
+// Field MaximumRate information
+/* Array element names for field MaximumRate */
+typedef enum { STABILIZATIONSETTINGS_MAXIMUMRATE_ROLL=0, STABILIZATIONSETTINGS_MAXIMUMRATE_PITCH=1, STABILIZATIONSETTINGS_MAXIMUMRATE_YAW=2 } StabilizationSettingsMaximumRateElem;
+/* Number of elements for field MaximumRate */
+#define STABILIZATIONSETTINGS_MAXIMUMRATE_NUMELEM 3
+// Field RollRatePI information
+/* Array element names for field RollRatePI */
+typedef enum { STABILIZATIONSETTINGS_ROLLRATEPI_KP=0, STABILIZATIONSETTINGS_ROLLRATEPI_KI=1, STABILIZATIONSETTINGS_ROLLRATEPI_ILIMIT=2 } StabilizationSettingsRollRatePIElem;
+/* Number of elements for field RollRatePI */
+#define STABILIZATIONSETTINGS_ROLLRATEPI_NUMELEM 3
+// Field PitchRatePI information
+/* Array element names for field PitchRatePI */
+typedef enum { STABILIZATIONSETTINGS_PITCHRATEPI_KP=0, STABILIZATIONSETTINGS_PITCHRATEPI_KI=1, STABILIZATIONSETTINGS_PITCHRATEPI_ILIMIT=2 } StabilizationSettingsPitchRatePIElem;
+/* Number of elements for field PitchRatePI */
+#define STABILIZATIONSETTINGS_PITCHRATEPI_NUMELEM 3
+// Field YawRatePI information
+/* Array element names for field YawRatePI */
+typedef enum { STABILIZATIONSETTINGS_YAWRATEPI_KP=0, STABILIZATIONSETTINGS_YAWRATEPI_KI=1, STABILIZATIONSETTINGS_YAWRATEPI_ILIMIT=2 } StabilizationSettingsYawRatePIElem;
+/* Number of elements for field YawRatePI */
+#define STABILIZATIONSETTINGS_YAWRATEPI_NUMELEM 3
+// Field RollPI information
+/* Array element names for field RollPI */
+typedef enum { STABILIZATIONSETTINGS_ROLLPI_KP=0, STABILIZATIONSETTINGS_ROLLPI_KI=1, STABILIZATIONSETTINGS_ROLLPI_ILIMIT=2 } StabilizationSettingsRollPIElem;
+/* Number of elements for field RollPI */
+#define STABILIZATIONSETTINGS_ROLLPI_NUMELEM 3
+// Field PitchPI information
+/* Array element names for field PitchPI */
+typedef enum { STABILIZATIONSETTINGS_PITCHPI_KP=0, STABILIZATIONSETTINGS_PITCHPI_KI=1, STABILIZATIONSETTINGS_PITCHPI_ILIMIT=2 } StabilizationSettingsPitchPIElem;
+/* Number of elements for field PitchPI */
+#define STABILIZATIONSETTINGS_PITCHPI_NUMELEM 3
+// Field YawPI information
+/* Array element names for field YawPI */
+typedef enum { STABILIZATIONSETTINGS_YAWPI_KP=0, STABILIZATIONSETTINGS_YAWPI_KI=1, STABILIZATIONSETTINGS_YAWPI_ILIMIT=2 } StabilizationSettingsYawPIElem;
+/* Number of elements for field YawPI */
+#define STABILIZATIONSETTINGS_YAWPI_NUMELEM 3
 
 
 // Generic interface functions

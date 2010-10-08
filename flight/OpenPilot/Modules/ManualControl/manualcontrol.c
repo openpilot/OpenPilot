@@ -283,21 +283,8 @@ static void manualControlTask(void *parameters)
 		} else if (cmd.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED) {
 			attitude.Roll = cmd.Roll * stabSettings.RollMax;
 			attitude.Pitch = cmd.Pitch * stabSettings.PitchMax;
-			if (stabSettings.YawMode == STABILIZATIONSETTINGS_YAWMODE_RATE) {
-				/* rate stabilization */
-				attitude.Yaw = cmd.Yaw * stabSettings.YawMax;
-			} else {
-				/* heading stabilization */
-				if (cmd.Yaw < 0) {
-					attitude.Yaw = 360 + (cmd.Yaw * 180.0);
-				} else {
-					attitude.Yaw = (cmd.Yaw * 180.0);
-				}
-			}
-			if (cmd.Throttle < 0)
-				attitude.Throttle = -1;
-			else
-				attitude.Throttle = cmd.Throttle * stabSettings.ThrottleMax;
+			attitude.Yaw = fmod(cmd.Yaw * 180.0, 360);
+			attitude.Throttle =  (cmd.Throttle < 0) ? -1 : cmd.Throttle;
 			AttitudeDesiredSet(&attitude);
 		}
 
@@ -308,17 +295,7 @@ static void manualControlTask(void *parameters)
 			attitudeSettings.PitchBias = cmd.Accessory1 * 15;
 			attitudeSettings.RollBias = cmd.Accessory2 * 15;
 			AHRSSettingsSet(&attitudeSettings);
-		} else if (cmd.Accessory3 > .9) {
-			// REALLY don't want to end up here accidentally.  I've also saved by meta for Stabilization setting to be
-			// flight read only by default
-			StabilizationSettingsData stabSettings;
-			StabilizationSettingsGet(&stabSettings);
-			if (cmd.Accessory1 > 0)
-				stabSettings.PitchKp = cmd.Accessory1 * 0.05;
-			if (cmd.Accessory2 > 0)
-				stabSettings.RollKp = cmd.Accessory2 * 0.05;
-			StabilizationSettingsSet(&stabSettings);
-		}
+		} 
 	}
 }
 

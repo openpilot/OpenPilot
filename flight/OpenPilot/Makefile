@@ -57,7 +57,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Actuator Telemetry GPS ManualControl Altitude AHRSComms Stabilization/simple/Stabilization Watchdog FirmwareIAP
+MODULES =  Actuator Telemetry GPS ManualControl Altitude AHRSComms Stabilization Watchdog FirmwareIAP
 
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
@@ -174,7 +174,6 @@ SRC += $(OPUAVOBJ)/attituderaw.c
 SRC += $(OPUAVOBJ)/homelocation.c
 SRC += $(OPUAVOBJ)/mixersettings.c
 SRC += $(OPUAVOBJ)/mixerstatus.c
-SRC += $(OPUAVOBJ)/lesstabilizationsettings.c
 SRC += $(OPUAVOBJ)/positiondesired.c
 SRC += $(OPUAVOBJ)/velocitydesired.c
 SRC += $(OPUAVOBJ)/velocityactual.c

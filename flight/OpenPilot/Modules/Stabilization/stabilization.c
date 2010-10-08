@@ -33,7 +33,7 @@
 
 #include "openpilot.h"
 #include "stabilization.h"
-#include "lesstabilizationsettings.h"
+#include "stabilizationsettings.h"
 #include "actuatordesired.h"
 #include "attitudedesired.h"
 #include "attitudeactual.h"
@@ -66,7 +66,7 @@ typedef struct {
 
 // Private variables
 static xTaskHandle taskHandle;
-static LesStabilizationSettingsData settings;
+static StabilizationSettingsData settings;
 static xQueueHandle queue;
 float dT = 1;
 pid_type pids[PID_MAX];
@@ -75,7 +75,7 @@ pid_type pids[PID_MAX];
 
 // Private functions
 static void stabilizationTask(void* parameters);
-static float ApplyPid(pid_type * pid, const float desired, const float actual, const bool angular);
+static float ApplyPid(pid_type * pid, const float desired, const float actual, const uint8_t angular);
 static float bound(float val);
 static void ZeroPids(void);
 static void SettingsUpdatedCb(UAVObjEvent * ev);
@@ -94,8 +94,8 @@ int32_t StabilizationInitialize()
 	AttitudeActualConnectQueue(queue);
 	AttitudeRawConnectQueue(queue);
 
-	LesStabilizationSettingsConnectCallback(SettingsUpdatedCb);
-	SettingsUpdatedCb(LesStabilizationSettingsHandle());
+	StabilizationSettingsConnectCallback(SettingsUpdatedCb);
+	SettingsUpdatedCb(StabilizationSettingsHandle());
 	// Start main task
 	xTaskCreate(stabilizationTask, (signed char*)"Stabilization", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 
@@ -119,6 +119,8 @@ static void stabilizationTask(void* parameters)
 	SystemSettingsData systemSettings;
 	ManualControlCommandData manualControl;
 
+	SettingsUpdatedCb((UAVObjEvent *) NULL);
+	
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	ZeroPids();
@@ -140,7 +142,7 @@ static void stabilizationTask(void* parameters)
 		AttitudeActualGet(&attitudeActual);
 		AttitudeRawGet(&attitudeRaw);
 		SystemSettingsGet(&systemSettings);
-
+		
 
 		float *manualAxis = &manualControl.Roll;
 		float *attitudeDesiredAxis = &attitudeDesired.Roll;
@@ -149,7 +151,7 @@ static void stabilizationTask(void* parameters)
 
 		//Calculate desired rate
 		float rates[MAX_AXES]= {0,0,0};
-		for(int ct=0; ct< MAX_AXES; ct++)
+		for(int8_t ct=0; ct< MAX_AXES; ct++)
 		{
 			switch(manualControl.StabilizationSettings[ct])
 			{
@@ -158,15 +160,15 @@ static void stabilizationTask(void* parameters)
 				break;
 
 			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_POSITION:
-				rates[ct] = ApplyPid(&pids[PID_ROLL + ct],  attitudeDesiredAxis[ct],  attitudeActualAxis[ct], true);
+				rates[ct] = ApplyPid(&pids[PID_ROLL + ct],  attitudeDesiredAxis[ct],  attitudeActualAxis[ct], 1);
 				break;
 			}
 		}
 
-		bool shouldUpdate = false;
+		uint8_t shouldUpdate = 0;
 		ActuatorDesiredGet(&actuatorDesired);
 		//Calculate desired command
-		for(int ct=0; ct< MAX_AXES; ct++)
+		for(int8_t ct=0; ct< MAX_AXES; ct++)
 		{
 			if(fabs(rates[ct]) > settings.MaximumRate[ct])
 			{
@@ -184,16 +186,16 @@ static void stabilizationTask(void* parameters)
 			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE:
 			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_POSITION:
 				{
-					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rates[ct],  attitudeRaw.gyros_filtered[ct], false);
+					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rates[ct],  attitudeRaw.gyros_filtered[ct], 0);
 					actuatorDesiredAxis[ct] = bound(command);
-					shouldUpdate = true;
+					shouldUpdate = 1;
 					break;
 				}
 			}
 		}
 		if(manualControl.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL)
 		{
-			shouldUpdate = false;
+			shouldUpdate = 0;
 		}
 
 
@@ -216,7 +218,7 @@ static void stabilizationTask(void* parameters)
 	}
 }
 
-float ApplyPid(pid_type * pid, const float desired, const float actual, const bool angular)
+float ApplyPid(pid_type * pid, const float desired, const float actual, const uint8_t angular)
 {
 	float err = desired - actual;
 	if(angular) //take shortest route to desired position
@@ -247,7 +249,7 @@ float ApplyPid(pid_type * pid, const float desired, const float actual, const bo
 
 static void ZeroPids(void)
 {
-	for(int ct = 0; ct < PID_MAX; ct++) {
+	for(int8_t ct = 0; ct < PID_MAX; ct++) {
 		pids[ct].iAccumulator = 0;
 		pids[ct].lastErr = 0;
 	}
@@ -271,10 +273,10 @@ static float bound(float val)
 static void SettingsUpdatedCb(UAVObjEvent * ev)
 {
 	memset(pids,0,sizeof (pid_type) * PID_MAX);
-	LesStabilizationSettingsGet(&settings);
+	StabilizationSettingsGet(&settings);
 
 	float * data = settings.RollRatePI;
-	for(int pid=0; pid < PID_MAX; pid++)
+	for(int8_t pid=0; pid < PID_MAX; pid++)
 	{
 		pids[pid].p = *data++;
 		pids[pid].i = *data++;

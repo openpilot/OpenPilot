@@ -46,21 +46,14 @@ public:
         quint8 RollMax;
         quint8 PitchMax;
         quint8 YawMax;
-        quint8 YawMode;
-        float ThrottleMax;
-        float ThrottleMin;
-        float RollIntegralLimit;
-        float PitchIntegralLimit;
-        float YawIntegralLimit;
-        float PitchKp;
-        float PitchKi;
-        float PitchKd;
-        float RollKp;
-        float RollKi;
-        float RollKd;
-        float YawKp;
-        float YawKi;
-        float YawKd;
+        float ManualRate[3];
+        float MaximumRate[3];
+        float RollRatePI[3];
+        float PitchRatePI[3];
+        float YawRatePI[3];
+        float RollPI[3];
+        float PitchPI[3];
+        float YawPI[3];
 
     } __attribute__((packed)) DataFields;
 
@@ -68,27 +61,50 @@ public:
     // Field RollMax information
     // Field PitchMax information
     // Field YawMax information
-    // Field YawMode information
-    /* Enumeration options for field YawMode */
-    typedef enum { YAWMODE_RATE=0, YAWMODE_HEADING=1 } YawModeOptions;
-    // Field ThrottleMax information
-    // Field ThrottleMin information
-    // Field RollIntegralLimit information
-    // Field PitchIntegralLimit information
-    // Field YawIntegralLimit information
-    // Field PitchKp information
-    // Field PitchKi information
-    // Field PitchKd information
-    // Field RollKp information
-    // Field RollKi information
-    // Field RollKd information
-    // Field YawKp information
-    // Field YawKi information
-    // Field YawKd information
+    // Field ManualRate information
+    /* Array element names for field ManualRate */
+    typedef enum { MANUALRATE_ROLL=0, MANUALRATE_PITCH=1, MANUALRATE_YAW=2 } ManualRateElem;
+    /* Number of elements for field ManualRate */
+    static const quint32 MANUALRATE_NUMELEM = 3;
+    // Field MaximumRate information
+    /* Array element names for field MaximumRate */
+    typedef enum { MAXIMUMRATE_ROLL=0, MAXIMUMRATE_PITCH=1, MAXIMUMRATE_YAW=2 } MaximumRateElem;
+    /* Number of elements for field MaximumRate */
+    static const quint32 MAXIMUMRATE_NUMELEM = 3;
+    // Field RollRatePI information
+    /* Array element names for field RollRatePI */
+    typedef enum { ROLLRATEPI_KP=0, ROLLRATEPI_KI=1, ROLLRATEPI_ILIMIT=2 } RollRatePIElem;
+    /* Number of elements for field RollRatePI */
+    static const quint32 ROLLRATEPI_NUMELEM = 3;
+    // Field PitchRatePI information
+    /* Array element names for field PitchRatePI */
+    typedef enum { PITCHRATEPI_KP=0, PITCHRATEPI_KI=1, PITCHRATEPI_ILIMIT=2 } PitchRatePIElem;
+    /* Number of elements for field PitchRatePI */
+    static const quint32 PITCHRATEPI_NUMELEM = 3;
+    // Field YawRatePI information
+    /* Array element names for field YawRatePI */
+    typedef enum { YAWRATEPI_KP=0, YAWRATEPI_KI=1, YAWRATEPI_ILIMIT=2 } YawRatePIElem;
+    /* Number of elements for field YawRatePI */
+    static const quint32 YAWRATEPI_NUMELEM = 3;
+    // Field RollPI information
+    /* Array element names for field RollPI */
+    typedef enum { ROLLPI_KP=0, ROLLPI_KI=1, ROLLPI_ILIMIT=2 } RollPIElem;
+    /* Number of elements for field RollPI */
+    static const quint32 ROLLPI_NUMELEM = 3;
+    // Field PitchPI information
+    /* Array element names for field PitchPI */
+    typedef enum { PITCHPI_KP=0, PITCHPI_KI=1, PITCHPI_ILIMIT=2 } PitchPIElem;
+    /* Number of elements for field PitchPI */
+    static const quint32 PITCHPI_NUMELEM = 3;
+    // Field YawPI information
+    /* Array element names for field YawPI */
+    typedef enum { YAWPI_KP=0, YAWPI_KI=1, YAWPI_ILIMIT=2 } YawPIElem;
+    /* Number of elements for field YawPI */
+    static const quint32 YAWPI_NUMELEM = 3;
 
   
     // Constants
-    static const quint32 OBJID = 1346414844U;
+    static const quint32 OBJID = 3792991236U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

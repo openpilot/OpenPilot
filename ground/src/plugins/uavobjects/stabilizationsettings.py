@@ -68,153 +68,97 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'YawMode',
-		'b',
-		1,
-		[
-			'0',
-		],
-		{
-			'0' : 'rate',
-			'1' : 'heading',
-		}
-	),
-	uavobject.UAVObjectField(
-		'ThrottleMax',
+		'ManualRate',
 		'f',
-		1,
+		3,
 		[
-			'0',
+			'Roll',
+			'Pitch',
+			'Yaw',
 		],
 		{
 		}
 	),
 	uavobject.UAVObjectField(
-		'ThrottleMin',
+		'MaximumRate',
 		'f',
-		1,
+		3,
 		[
-			'0',
+			'Roll',
+			'Pitch',
+			'Yaw',
 		],
 		{
 		}
 	),
 	uavobject.UAVObjectField(
-		'RollIntegralLimit',
+		'RollRatePI',
 		'f',
-		1,
+		3,
 		[
-			'0',
+			'Kp',
+			'Ki',
+			'ILimit',
 		],
 		{
 		}
 	),
 	uavobject.UAVObjectField(
-		'PitchIntegralLimit',
+		'PitchRatePI',
 		'f',
-		1,
+		3,
 		[
-			'0',
+			'Kp',
+			'Ki',
+			'ILimit',
 		],
 		{
 		}
 	),
 	uavobject.UAVObjectField(
-		'YawIntegralLimit',
+		'YawRatePI',
 		'f',
-		1,
+		3,
 		[
-			'0',
+			'Kp',
+			'Ki',
+			'ILimit',
 		],
 		{
 		}
 	),
 	uavobject.UAVObjectField(
-		'PitchKp',
+		'RollPI',
 		'f',
-		1,
+		3,
 		[
-			'0',
+			'Kp',
+			'Ki',
+			'ILimit',
 		],
 		{
 		}
 	),
 	uavobject.UAVObjectField(
-		'PitchKi',
+		'PitchPI',
 		'f',
-		1,
+		3,
 		[
-			'0',
+			'Kp',
+			'Ki',
+			'ILimit',
 		],
 		{
 		}
 	),
 	uavobject.UAVObjectField(
-		'PitchKd',
+		'YawPI',
 		'f',
-		1,
+		3,
 		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'RollKp',
-		'f',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'RollKi',
-		'f',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'RollKd',
-		'f',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'YawKp',
-		'f',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'YawKi',
-		'f',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'YawKd',
-		'f',
-		1,
-		[
-			'0',
+			'Kp',
+			'Ki',
+			'ILimit',
 		],
 		{
 		}
@@ -224,7 +168,7 @@ _fields = [ \
 
 class StabilizationSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 1346414844
+    OBJID        = 3792991236
     NAME         = "StabilizationSettings"
     METANAME     = "StabilizationSettingsMeta"
     ISSINGLEINST = 1

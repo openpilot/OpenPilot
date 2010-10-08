@@ -157,6 +157,8 @@ void calibrate_sensors(void);
 void reset_values();
 void send_calibration(void);
 void send_attitude(void);
+void send_velocity(void);
+void send_position(void);
 void homelocation_callback(AhrsObjHandle obj);
 void altitude_callback(AhrsObjHandle obj);
 void calibration_callback(AhrsObjHandle obj);
@@ -358,6 +360,8 @@ for all data to be up to date before doing anything*/
 
 			INSStatePrediction(gyro, accel, 1 / (float)EKF_RATE);
 			send_attitude();  // get message out quickly
+			send_velocity();
+			send_position();
 			INSCovariancePrediction(1 / (float)EKF_RATE);
 
 			if (gps_data.updated && ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) {
@@ -744,6 +748,32 @@ void send_attitude(void)
 	if(attitude.Yaw > 360)
 		attitude.Yaw -= 360;
 	AttitudeActualSet(&attitude);
+}
+
+void send_velocity(void)
+{
+	VelocityActualData velocityActual;
+	VelocityActualGet(&velocityActual);
+	
+	// convert into cm
+	velocityActual.North = Nav.Vel[0] * 100;
+	velocityActual.East = Nav.Vel[1] * 100;
+	velocityActual.Down = Nav.Vel[2] * 100;	
+	
+	VelocityActualSet(&velocityActual);
+}
+
+void send_position(void)
+{
+	PositionActualData positionActual;
+	PositionActualGet(&positionActual);
+	
+	// convert into cm
+	positionActual.North = Nav.Pos[0] * 100;
+	positionActual.East = Nav.Pos[1] * 100;
+	positionActual.Down = Nav.Pos[2] * 100;	
+	
+	PositionActualSet(&positionActual);
 }
 
 void send_calibration(void)

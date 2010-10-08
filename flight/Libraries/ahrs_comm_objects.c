@@ -34,6 +34,7 @@ static AhrsStatusData AhrsStatus;
 static BaroAltitudeData BaroAltitude;
 static GPSPositionData GPSPosition;
 static PositionActualData PositionActual;
+static VelocityActualData VelocityActual;
 static HomeLocationData HomeLocation;
 static AHRSSettingsData AHRSSettings;
 
@@ -56,10 +57,11 @@ CREATEHANDLE(3, AhrsStatus);
 CREATEHANDLE(4, BaroAltitude);
 CREATEHANDLE(5, GPSPosition);
 CREATEHANDLE(6, PositionActual);
-CREATEHANDLE(7, HomeLocation);
-CREATEHANDLE(8, AHRSSettings);
+CREATEHANDLE(7, VelocityActual);
+CREATEHANDLE(8, HomeLocation);
+CREATEHANDLE(9, AHRSSettings);
 
-#if 9 != MAX_AHRS_OBJECTS	//sanity check
+#if 10 != MAX_AHRS_OBJECTS	//sanity check
 #error We did not create the correct number of xxxHandle() functions
 #endif
 
@@ -96,6 +98,7 @@ void AhrsInitHandles(void)
 	ADDHANDLE(idx++, BaroAltitude);
 	ADDHANDLE(idx++, GPSPosition);
 	ADDHANDLE(idx++, PositionActual);
+	ADDHANDLE(idx++, VelocityActual);
 	ADDHANDLE(idx++, HomeLocation);
 	ADDHANDLE(idx++, AHRSSettings);
 	if (idx != MAX_AHRS_OBJECTS) {

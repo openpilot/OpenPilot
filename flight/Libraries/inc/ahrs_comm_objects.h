@@ -33,6 +33,7 @@
 #include "baroaltitude.h"
 #include "gpsposition.h"
 #include "positionactual.h"
+#include "velocityactual.h"
 #include "homelocation.h"
 #include "ahrscalibration.h"
 #include "ahrssettings.h"
@@ -48,13 +49,14 @@ typedef union {
 	BaroAltitudeData BaroAltitude;
 	GPSPositionData GPSPosition;
 	PositionActualData PositionActual;
+	VelocityActualData VelocityActual;
 	HomeLocationData HomeLocation;
 	AHRSSettingsData AHRSSettings;
 } __attribute__ ((packed)) AhrsSharedData;
 
 /** The number of UAVObjects we will be dealing with.
 */
-#define MAX_AHRS_OBJECTS 9
+#define MAX_AHRS_OBJECTS 10
 
 /** Our own version of a UAVObject.
 */

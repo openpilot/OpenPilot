@@ -193,6 +193,10 @@ static void stabilizationTask(void* parameters)
 				}
 			}
 		}
+		
+		// Save dT
+		actuatorDesired.UpdateTime = dT * 1000;
+		
 		if(manualControl.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL)
 		{
 			shouldUpdate = 0;
@@ -211,8 +215,6 @@ static void stabilizationTask(void* parameters)
 			ZeroPids();
 		}
 
-		// Save dT
-		actuatorDesired.UpdateTime = dT * 1000;
 		// Clear alarms
 		AlarmsClear(SYSTEMALARMS_ALARM_STABILIZATION);
 	}

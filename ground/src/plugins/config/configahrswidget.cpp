@@ -515,10 +515,10 @@ void ConfigAHRSWidget::computeScaleBias()
     SixPointInConstFieldCal( 9.81, accel_data_x, accel_data_y, accel_data_z, S, b);
 
     field = obj->getField(QString("gyro_bias"));
-    field->setDouble(listMean(gyro_accum_x),0);
-    field->setDouble(listMean(gyro_accum_y),1);
-    field->setDouble(listMean(gyro_accum_z),2);
-
+    field->setDouble(-listMean(gyro_accum_x) * M_PI / 180.0f,0);
+    field->setDouble(-listMean(gyro_accum_y) * M_PI / 180.0f,1);
+    field->setDouble(-listMean(gyro_accum_z) * M_PI / 180.0f,2);
+qDebug() << listMean(gyro_accum_x) * M_PI / 180.0f << listMean(gyro_accum_y) * M_PI / 180.0f << listMean(gyro_accum_x) * M_PI / 180.0f;
     field = obj->getField(QString("accel_scale"));
     field->setDouble(sign(S[0]) * S[0],0);
     field->setDouble(sign(S[1]) * S[1],1);
@@ -539,23 +539,6 @@ void ConfigAHRSWidget::computeScaleBias()
     field->setDouble(sign(S[0]) * b[0], 0);
     field->setDouble(sign(S[1]) * b[1], 1);
     field->setDouble(sign(S[2]) * b[2], 2);
-
-    // Go ahead and fix gyro scale here
-    field = obj->getField(QString("gyro_bias"));
-    double a = field->getDouble(0);
-    field->setDouble(-sign(a) * a, 0);
-    a = field->getDouble(1);
-    field->setDouble(sign(a) * a, 1);
-    a = field->getDouble(2);
-    field->setDouble(-sign(a) * a, 2);
-
-    field = obj->getField(QString("gyro_bias"));
-    a = listMean(gyro_accum_x);
-    field->setDouble(sign(a)*a,0);
-    a = listMean(gyro_accum_y);
-    field->setDouble(-sign(a)*a,1);
-    a = listMean(gyro_accum_z);
-    field->setDouble(sign(a)*a,2);
 
     obj->updated();
 

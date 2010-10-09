@@ -221,6 +221,7 @@ private:
     double m_heading;	// uav heading
 
     internals::PointLatLng mouse_lat_lon;
+    internals::PointLatLng context_menu_lat_lon;
 
     int prev_tile_number;
 

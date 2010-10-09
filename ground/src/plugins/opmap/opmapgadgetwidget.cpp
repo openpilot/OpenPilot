@@ -70,6 +70,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_map_mode = Normal_MapMode;
 
+    context_menu_lat_lon = mouse_lat_lon = internals::PointLatLng(0, 0);
+
     // **************
     // fetch required UAVObjects
 
@@ -359,11 +361,13 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_updateTimer->start();
 
     m_statusUpdateTimer = new QTimer();
-    m_statusUpdateTimer->setInterval(200);
+    m_statusUpdateTimer->setInterval(50);
     connect(m_statusUpdateTimer, SIGNAL(timeout()), this, SLOT(updateMousePos()));
     m_statusUpdateTimer->start();
 
     // **************
+
+    m_map->setFocus();
 }
 
 // destructor
@@ -403,40 +407,34 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 }
 
 // *************************************************************************************
-// widget signals
+// widget signals .. the mouseMoveEvent does not get called - don't yet know why
 
 void OPMapGadgetWidget::resizeEvent(QResizeEvent *event)
 {
-//    update();
+    qDebug("opmap: resizeEvent");
+
     QWidget::resizeEvent(event);
 }
 
 void OPMapGadgetWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    if (m_map)
+    qDebug("opmap: mouseMoveEvent");
+
+    if (m_widget && m_map)
     {
-//	mouse_lat_lon = m_map->currentMousePosition();			    // fetch the current mouse lat/longitude position
-//	if (mouse_lat_lon != lat_lon)
-//	{	// the mouse has moved
-//	    mouse_lat_lon = lat_lon;
-//
-//	    QString coord_str = " " + QString::number(mouse_lat_lon.Lat(), 'f', 7) + "   " + QString::number(mouse_lat_lon.Lng(), 'f', 7) + " ";
-//
-//	    statusLabel.setText(coord_str);
-//	    widget->labelStatus->setText(coord_str);
-//	}
     }
 
     if (event->buttons() & Qt::LeftButton)
     {
-	 QPoint pos = event->pos();
+        QPoint pos = event->pos();
     }
 
     QWidget::mouseMoveEvent(event);
 }
 
 void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
-{
+{   // the user has right clicked on the map - create the pop-up context menu and display it
+
     QString s;
 
     if (!m_widget || !m_map)
@@ -446,13 +444,17 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
         return;	// not a mouse click event
 
     // current mouse position
-    QPoint p = m_map->mapFromGlobal(QCursor::pos());
-
-    // save the current lat/lon mouse position
-    mouse_lat_lon = m_map->currentMousePosition();
+//    QPoint p = m_map->mapFromGlobal(QCursor::pos());
+    QPoint p = m_map->mapFromGlobal(event->globalPos());
+    context_menu_lat_lon = m_map->GetFromLocalToLatLng(p);
+//    context_menu_lat_lon = m_map->currentMousePosition();
 
     if (!m_map->contentsRect().contains(p))
         return;					    // the mouse click was not on the map
+
+    // show the mouse position
+    s = QString::number(context_menu_lat_lon.Lat(), 'f', 7) + "  " + QString::number(context_menu_lat_lon.Lng(), 'f', 7);
+    m_widget->labelMousePos->setText(s);
 
     // find out if we have a waypoint under the mouse cursor
     QGraphicsItem *item = m_map->itemAt(p);
@@ -509,7 +511,7 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     menu.addSeparator();
 
     menu.addAction(showSafeAreaAct);
-    QMenu safeAreaSubMenu(tr("Safe Area") + " (" + QString::number(m_map->Home->SafeArea()) + "m)", this);
+    QMenu safeAreaSubMenu(tr("Safe Area Radius") + " (" + QString::number(m_map->Home->SafeArea()) + "m)", this);
     for (int i = 0; i < safeAreaAct.count(); i++)
         safeAreaSubMenu.addAction(safeAreaAct.at(i));
     menu.addMenu(&safeAreaSubMenu);
@@ -594,44 +596,36 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
 void OPMapGadgetWidget::keyPressEvent(QKeyEvent* event)
 {
-    if (event->key() == Qt::Key_Escape) // ESC
+    qDebug() << "opmap: keyPressEvent, key =" << event->key() << endl;
+
+    switch (event->key())
     {
-    }
-    else
-    if (event->key() == Qt::Key_F1) // F1
-    {
-    }
-    else
-    if (event->key() == Qt::Key_F2) // F2
-    {
-    }
-    else
-    if (event->key() == Qt::Key_Up)
-    {
-    }
-    else
-    if (event->key() == Qt::Key_Down)
-    {
-    }
-    else
-    if (event->key() == Qt::Key_Left)
-    {
-    }
-    else
-    if (event->key() == Qt::Key_Right)
-    {
-    }
-    else
-    if (event->key() == Qt::Key_PageUp)
-    {
-    }
-    else
-    if (event->key() == Qt::Key_PageDown)
-    {
-    }
-    else
-    {
-	qDebug() << event->key() << endl;
+        case Qt::Key_Escape:
+            break;
+
+        case Qt::Key_F1:
+            break;
+
+        case Qt::Key_F2:
+            break;
+
+        case Qt::Key_Up:
+            break;
+
+        case Qt::Key_Down:
+            break;
+
+        case Qt::Key_Left:
+            break;
+
+        case Qt::Key_Right:
+            break;
+
+        case Qt::Key_PageUp:
+            break;
+
+        case Qt::Key_PageDown:
+            break;
     }
 }
 
@@ -671,17 +665,21 @@ void OPMapGadgetWidget::updateMousePos()
 
     QMutexLocker locker(&m_map_mutex);
 
-    internals::PointLatLng lat_lon = m_map->currentMousePosition();				// fetch the current lat/lon mouse position
+    QPoint p = m_map->mapFromGlobal(QCursor::pos());
+    internals::PointLatLng lat_lon = m_map->GetFromLocalToLatLng(p);    // fetch the current lat/lon mouse position
+
+    if (!m_map->contentsRect().contains(p))
+        return;					    // the mouse is not on the map
+
+//    internals::PointLatLng lat_lon = m_map->currentMousePosition();     // fetch the current lat/lon mouse position
 
     if (mouse_lat_lon == lat_lon)
-        return; // the mouse has not moved
+        return;                 // the mouse has not moved
 
-    // yes it has!
+    mouse_lat_lon = lat_lon;    // yes it has!
 
-     mouse_lat_lon = lat_lon;
-
-     QString str = QString::number(mouse_lat_lon.Lat(), 'f', 7) + "  " + QString::number(mouse_lat_lon.Lng(), 'f', 7);
-     m_widget->labelMousePos->setText(str);
+    QString str = QString::number(mouse_lat_lon.Lat(), 'f', 7) + "  " + QString::number(mouse_lat_lon.Lng(), 'f', 7);
+    m_widget->labelMousePos->setText(str);
 }
 
 // *************************************************************************************
@@ -784,7 +782,7 @@ void OPMapGadgetWidget::WPNumberChanged(int const &oldnumber, int const &newnumb
 
 void OPMapGadgetWidget::WPValuesChanged(WayPointItem *waypoint)
 {
-    qDebug("WPValuesChanged");
+//    qDebug("opmap: WPValuesChanged");
 
     switch (m_map_mode)
     {
@@ -1207,7 +1205,7 @@ void OPMapGadgetWidget::setCacheLocation(QString cacheLocation)
         if (!dir.mkpath(cacheLocation))
             return;
 
-//    qDebug() << "map cache dir: " << cacheLocation;
+//    qDebug() << "opmap: map cache dir: " << cacheLocation;
 
     m_map->configuration->SetCacheLocation(cacheLocation);
 }
@@ -1511,21 +1509,21 @@ void OPMapGadgetWidget::onCopyMouseLatLonToClipAct_triggered()
 {
 //    QClipboard *clipboard = qApp->clipboard();
     QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(QString::number(mouse_lat_lon.Lat(), 'f', 7) + ", " + QString::number(mouse_lat_lon.Lng(), 'f', 7), QClipboard::Clipboard);
+    clipboard->setText(QString::number(context_menu_lat_lon.Lat(), 'f', 7) + ", " + QString::number(context_menu_lat_lon.Lng(), 'f', 7), QClipboard::Clipboard);
 }
 
 void OPMapGadgetWidget::onCopyMouseLatToClipAct_triggered()
 {
 //    QClipboard *clipboard = qApp->clipboard();
     QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(QString::number(mouse_lat_lon.Lat(), 'f', 7), QClipboard::Clipboard);
+    clipboard->setText(QString::number(context_menu_lat_lon.Lat(), 'f', 7), QClipboard::Clipboard);
 }
 
 void OPMapGadgetWidget::onCopyMouseLonToClipAct_triggered()
 {
 //    QClipboard *clipboard = qApp->clipboard();
     QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(QString::number(mouse_lat_lon.Lng(), 'f', 7), QClipboard::Clipboard);
+    clipboard->setText(QString::number(context_menu_lat_lon.Lng(), 'f', 7), QClipboard::Clipboard);
 }
 
 void OPMapGadgetWidget::onFindPlaceAct_triggered()
@@ -1620,7 +1618,7 @@ void OPMapGadgetWidget::onSetHomeAct_triggered()
     if (!m_widget || !m_map)
         return;
 
-    setHome(mouse_lat_lon);
+    setHome(context_menu_lat_lon);
 }
 
 void OPMapGadgetWidget::onGoHomeAct_triggered()
@@ -1705,7 +1703,7 @@ void OPMapGadgetWidget::onAddWayPointAct_triggered()
 	// create a waypoint on the map at the last known mouse position
     t_waypoint *wp = new t_waypoint;
     wp->map_wp_item = NULL;
-    wp->coord = mouse_lat_lon;
+    wp->coord = context_menu_lat_lon;
     wp->altitude = 0;
     wp->description = "";
     wp->locked = false;

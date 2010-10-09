@@ -37,6 +37,7 @@
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/actuatordesired.h"
 // #include "uavobjects/altitudeactual.h"
+#include "uavobjects/velocityactual.h"
 #include "uavobjects/baroaltitude.h"
 #include "uavobjects/attitudeactual.h"
 #include "uavobjects/gpsposition.h"
@@ -145,6 +146,7 @@ protected:
 	ActuatorDesired* actDesired;
         BaroAltitude* altActual;
 	AttitudeActual* attActual;
+	VelocityActual* velActual;
         GPSPosition* gpsPos;
 	GCSTelemetryStats* telStats;
 

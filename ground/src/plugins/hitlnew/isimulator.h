@@ -11,6 +11,7 @@
 #include "uavobjects/actuatordesired.h"
 #include "uavobjects/altitudeactual.h"
 #include "uavobjects/attitudeactual.h"
+#include "uavobjects/velocityactual.h"
 #include "uavobjects/positionactual.h"
 #include "uavobjects/gcstelemetrystats.h"
 
@@ -49,6 +50,7 @@ private:
 	QUdpSocket* outSocket;
 	ActuatorDesired* actDesired;
 	AltitudeActual* altActual;
+	VelocityActual* velActual;
 	AttitudeActual* attActual;
 	PositionActual* posActual;
 	GCSTelemetryStats* telStats;

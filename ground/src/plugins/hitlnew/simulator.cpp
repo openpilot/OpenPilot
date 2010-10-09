@@ -116,6 +116,7 @@ void Simulator::onStart()
 	ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
 	UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
 	actDesired = ActuatorDesired::GetInstance(objManager);
+	velActual = VelocityActual::GetInstance(objManager);
         altActual = BaroAltitude::GetInstance(objManager);
 	attActual = AttitudeActual::GetInstance(objManager);
         gpsPos = GPSPosition::GetInstance(objManager);

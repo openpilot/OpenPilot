@@ -33,6 +33,8 @@
 const float FGSimulator::FT2M = 0.3048;
 const float FGSimulator::KT2MPS = 0.514444444;
 const float FGSimulator::INHG2KPA = 3.386;
+const float FGSimulator::FPS2CMPS = 30.48;
+
 
 //FGSimulator::FGSimulator(QString hostAddr, int outPort, int inPort, bool manual, QString binPath, QString dataPath) :
 //		Simulator(hostAddr, outPort, inPort,  manual, binPath, dataPath),
@@ -102,11 +104,11 @@ bool FGSimulator::setupProcess()
 	// Note: The input generic protocol is set to update at a much higher rate than the actual updates are sent by the GCS.
 	// If this is not done then a lag will be introduced by FlightGear, likelly because the receive socket buffer builds up during startup.
         QString args("--fg-root=\"" + settings.dataPath + "\" " +
-                     "--timeofday=dusk " +
+                     "--timeofday=noon " +
                      "--httpd=5400 " +
                      "--enable-hud " +
                      "--in-air " +
-                     "--altitude=2000 " +
+                     "--altitude=3000 " +
                      "--vc=100 " +
                      "--generic=socket,out,50,localhost," + QString::number(settings.inPort) + ",udp,opfgprotocol");
 	if(!settings.manual)
@@ -198,7 +200,21 @@ void FGSimulator::processUpdate(const QByteArray& inp)
 	float temperature = fields[19].toFloat();
 	// Get pressure (kpa)
 	float pressure = fields[20].toFloat() * INHG2KPA;
-
+	// Get VelocityActual Down (cm/s)
+	float velocityActualDown = fields[21].toFloat() * FPS2CMPS;
+	// Get VelocityActual East (cm/s)
+	float velocityActualEast = fields[22].toFloat() * FPS2CMPS;	
+	// Get VelocityActual Down (cm/s)
+	float velocityActualNorth = fields[23].toFloat() * FPS2CMPS;
+	
+	// Update VelocityActual.{Nort,East,Down}
+	VelocityActual::DataFields velocityActualData;
+	memset(&velocityActualData, 0, sizeof(VelocityActual::DataFields));
+	velocityActualData.North = velocityActualNorth;
+	velocityActualData.East = velocityActualEast;
+	velocityActualData.Down = velocityActualDown;
+	velActual->setData(velocityActualData);
+	
 	// Update AltitudeActual object
         BaroAltitude::DataFields altActualData;
         memset(&altActualData, 0, sizeof(BaroAltitude::DataFields));

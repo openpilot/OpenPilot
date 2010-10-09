@@ -182,15 +182,29 @@
       </chunk>
 
       <chunk>
-         <name>Temperature</name>
-         <node>/environment/temperature-degc</node>
+         <name>Pressure</name>
+         <node>/environment/pressure-inhg</node>
          <type>float</type>
          <format>%f</format>
       </chunk>
 
       <chunk>
-         <name>Pressure</name>
-         <node>/environment/pressure-inhg</node>
+         <name>velocityActualDown</name>
+         <node>velocities/speed-down-fps</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>velocityActualEast</name>
+         <node>velocities/speed-east-fps</node>
+         <type>float</type>
+         <format>%f</format>
+      </chunk>
+
+      <chunk>
+         <name>velocityActualNorth</name>
+         <node>velocities/speed-north-fps</node>
          <type>float</type>
          <format>%f</format>
       </chunk>

@@ -324,6 +324,10 @@ private:
     void hideMagicWaypointControls();
     void showMagicWaypointControls();
 
+    double distance(internals::PointLatLng from, internals::PointLatLng to);
+    double bearing(internals::PointLatLng from, internals::PointLatLng to);
+    internals::PointLatLng destPoint(internals::PointLatLng source, double bear, double dist);
+
     QPointF getLatLon();
 
     void setMapFollowingMode();

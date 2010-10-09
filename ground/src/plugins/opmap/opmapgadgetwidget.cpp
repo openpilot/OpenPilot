@@ -36,9 +36,16 @@
 #include <QDir>
 #include <QFile>
 
+#include <math.h>
+
 // *************************************************************************************
 
-#define	max_digital_zoom   3	// maximum allowed digital zoom level
+#define deg_to_rad          ((double)M_PI / 180.0)
+#define rad_to_deg          (180.0 / (double)M_PI)
+
+#define earth_mean_radius   6371    // kilometers
+
+#define	max_digital_zoom    3       // maximum allowed digital zoom level
 
 const int safe_area_radius_list[] = {5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000};   // meters
 
@@ -712,12 +719,41 @@ void OPMapGadgetWidget::updateMousePos()
 
     mouse_lat_lon = lat_lon;    // yes it has!
 
+    internals::PointLatLng home_lat_lon = m_map->Home->Coord();
+
     QString s = QString::number(mouse_lat_lon.Lat(), 'f', 7) + "  " + QString::number(mouse_lat_lon.Lng(), 'f', 7);
-    if (wp) s += "  wp[" + QString::number(wp->Number()) + "]";
+    if (wp)
+    {
+        s += "  wp[" + QString::number(wp->Number()) + "]";
+
+        double dist = distance(home_lat_lon, wp->Coord());
+        double bear = bearing(home_lat_lon, wp->Coord());
+        s += "  " + QString::number(dist * 1000, 'f', 1) + "m";
+        s += "  " + QString::number(bear, 'f', 1) + "deg";
+    }
     else
-    if (home) s += "  home";
+    if (home)
+    {
+        s += "  home";
+
+        double dist = distance(home_lat_lon, mouse_lat_lon);
+        double bear = bearing(home_lat_lon, mouse_lat_lon);
+        s += "  " + QString::number(dist * 1000, 'f', 1) + "m";
+        s += "  " + QString::number(bear, 'f', 1) + "deg";
+    }
     else
-    if (uav) s += "  uav";
+    if (uav)
+    {
+        s += "  uav";
+
+        QPointF pos = getLatLon();
+        internals::PointLatLng uav_pos = internals::PointLatLng(pos.x(), pos.y());	// current UAV position
+
+//        double dist = distance(home_lat_lon, uav_pos);
+//        double bear = bearing(home_lat_lon, uav_pos);
+//        s += "  " + QString::number(dist * 1000, 'f', 1) + "m";
+//        s += "  " + QString::number(bear, 'f', 1) + "deg";
+    }
     m_widget->labelMousePos->setText(s);
 }
 
@@ -2082,6 +2118,81 @@ void OPMapGadgetWidget::showMagicWaypointControls()
     m_widget->toolButtonHomeWaypoint->setVisible(true);
     m_widget->toolButtonCenterWaypoint->setVisible(true);
     m_widget->toolButtonMoveToWP->setVisible(true);
+}
+
+// *************************************************************************************
+// return the distance between two points .. in kilometers
+
+double OPMapGadgetWidget::distance(internals::PointLatLng from, internals::PointLatLng to)
+{
+    double lat1 = from.Lat() * deg_to_rad;
+    double lon1 = from.Lng() * deg_to_rad;
+
+    double lat2 = to.Lat() * deg_to_rad;
+    double lon2 = to.Lng() * deg_to_rad;
+
+    // ***********************
+    // Haversine formula
+/*
+    double delta_lat = lat2 - lat1;
+    double delta_lon = lon2 - lon1;
+
+    double t1 = sin(delta_lat / 2);
+    double t2 = sin(delta_lon / 2);
+    double a = (t1 * t1) + cos(lat1) * cos(lat2) * (t2 * t2);
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    return (earth_mean_radius * c);
+*/
+    // ***********************
+    // Spherical Law of Cosines
+
+    return (acos(sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lon2 - lon1)) * earth_mean_radius);
+
+    // ***********************
+}
+
+// *************************************************************************************
+// return the bearing from one point to another .. in degrees
+
+double OPMapGadgetWidget::bearing(internals::PointLatLng from, internals::PointLatLng to)
+{
+    double lat1 = from.Lat() * deg_to_rad;
+    double lon1 = from.Lng() * deg_to_rad;
+
+    double lat2 = to.Lat() * deg_to_rad;
+    double lon2 = to.Lng() * deg_to_rad;
+
+//    double delta_lat = lat2 - lat1;
+    double delta_lon = lon2 - lon1;
+
+    double y = sin(delta_lon) * cos(lat2);
+    double x = cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(delta_lon);
+    double bear = atan2(y, x) * rad_to_deg;
+
+    bear += 360;
+    while (bear < 0) bear += 360;
+    while (bear >= 360) bear -= 360;
+
+    return bear;
+}
+
+// *************************************************************************************
+// return a destination lat/lon point given a source lat/lon point and the bearing and distance from the source point
+
+internals::PointLatLng OPMapGadgetWidget::destPoint(internals::PointLatLng source, double bear, double dist)
+{
+    double lat1 = source.Lat() * deg_to_rad;
+    double lon1 = source.Lng() * deg_to_rad;
+
+    bear *= deg_to_rad;
+
+    double ad = dist / earth_mean_radius;
+
+    double lat2 = asin(sin(lat1) * cos(ad) + cos(lat1) * sin(ad) * cos(bear));
+    double lon2 = lon1 + atan2(sin(bear) * sin(ad) * cos(lat1), cos(ad) - sin(lat1) * sin(lat2));
+
+    return internals::PointLatLng(lat2 * rad_to_deg, lon2 * rad_to_deg);
 }
 
 // *************************************************************************************

@@ -157,6 +157,7 @@ private slots:
     void on_toolButtonNormalMapMode_clicked();
     void on_toolButtonHomeWaypoint_clicked();
     void on_toolButtonCenterWaypoint_clicked();
+    void on_toolButtonMoveToWP_clicked();
 
     /**
     * @brief signals received from the map object
@@ -267,7 +268,8 @@ private:
 
     void createActions();
 
-    QAction *closeAct;
+    QAction *closeAct1;
+    QAction *closeAct2;
     QAction *reloadAct;
     QAction *copyMouseLatLonToClipAct;
     QAction *copyMouseLatToClipAct;
@@ -313,6 +315,8 @@ private:
 
     void homeMagicWaypoint();
     void centerMagicWaypoint();
+
+    void moveToMagicWaypointPosition();
 
     void loadComboBoxLines(QComboBox *comboBox, QString filename);
     void saveComboBoxLines(QComboBox *comboBox, QString filename);

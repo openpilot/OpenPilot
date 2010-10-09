@@ -189,6 +189,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
             m_widget->toolButtonNormalMapMode->setChecked(true);
             m_widget->toolButtonHomeWaypoint->setEnabled(false);
             m_widget->toolButtonCenterWaypoint->setEnabled(false);
+            m_widget->toolButtonMoveToWP->setEnabled(false);
             break;
 
         case MagicWaypoint_MapMode:
@@ -196,6 +197,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
             m_widget->toolButtonMagicWaypointMapMode->setChecked(true);
             m_widget->toolButtonHomeWaypoint->setEnabled(true);
             m_widget->toolButtonCenterWaypoint->setEnabled(true);
+            m_widget->toolButtonMoveToWP->setEnabled(true);
             break;
 
         default:
@@ -204,6 +206,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
             m_widget->toolButtonNormalMapMode->setChecked(true);
             m_widget->toolButtonHomeWaypoint->setEnabled(false);
             m_widget->toolButtonCenterWaypoint->setEnabled(false);
+            m_widget->toolButtonMoveToWP->setEnabled(false);
             break;
     }
 
@@ -446,7 +449,6 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
         return;	// not a mouse click event
 
     // current mouse position
-//    QPoint p = m_map->mapFromGlobal(QCursor::pos());
     QPoint p = m_map->mapFromGlobal(event->globalPos());
     context_menu_lat_lon = m_map->GetFromLocalToLatLng(p);
 //    context_menu_lat_lon = m_map->currentMousePosition();
@@ -472,7 +474,7 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     QMenu menu(this);
 
-    menu.addAction(closeAct);
+    menu.addAction(closeAct1);
 
     menu.addSeparator();
 
@@ -610,7 +612,9 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     // *********
 
-//    menu.addSeparator();
+    menu.addSeparator();
+
+    menu.addAction(closeAct2);
 
     menu.exec(event->globalPos());  // popup the menu
 
@@ -832,6 +836,9 @@ void OPMapGadgetWidget::WPValuesChanged(WayPointItem *waypoint)
                 magic_waypoint.coord = waypoint->Coord();
                 magic_waypoint.altitude = waypoint->Altitude();
                 magic_waypoint.description = waypoint->Description();
+
+                // move the UAV to the magic waypoint position
+//                moveToMagicWaypointPosition();
             }
             break;
     }
@@ -1069,6 +1076,11 @@ void OPMapGadgetWidget::on_toolButtonCenterWaypoint_clicked()
     centerMagicWaypoint();
 }
 
+void OPMapGadgetWidget::on_toolButtonMoveToWP_clicked()
+{
+    moveToMagicWaypointPosition();
+}
+
 // *************************************************************************************
 // public functions
 
@@ -1244,6 +1256,7 @@ void OPMapGadgetWidget::setMapMode(opMapModeType mode)
 
             m_widget->toolButtonHomeWaypoint->setEnabled(false);
             m_widget->toolButtonCenterWaypoint->setEnabled(false);
+            m_widget->toolButtonMoveToWP->setEnabled(false);
 
             // delete the magic waypoint from the map
             if (magic_waypoint.map_wp_item)
@@ -1281,6 +1294,7 @@ void OPMapGadgetWidget::setMapMode(opMapModeType mode)
 
             m_widget->toolButtonHomeWaypoint->setEnabled(true);
             m_widget->toolButtonCenterWaypoint->setEnabled(true);
+            m_widget->toolButtonMoveToWP->setEnabled(true);
 
             // delete the normal waypoints from the map
             m_waypoint_list_mutex.lock();
@@ -1317,9 +1331,11 @@ void OPMapGadgetWidget::createActions()
     // ***********************
     // create menu actions
 
-    closeAct = new QAction(tr("&Close menu"), this);
-//    closeAct->setShortcuts(QKeySequence::New);
-    closeAct->setStatusTip(tr("Close the context menu"));
+    closeAct1 = new QAction(tr("Close menu"), this);
+    closeAct1->setStatusTip(tr("Close the context menu"));
+
+    closeAct2 = new QAction(tr("Close menu"), this);
+    closeAct2->setStatusTip(tr("Close the context menu"));
 
     reloadAct = new QAction(tr("&Reload map"), this);
     reloadAct->setShortcut(tr("F5"));
@@ -1977,6 +1993,25 @@ void OPMapGadgetWidget::centerMagicWaypoint()
 
     if (magic_waypoint.map_wp_item)
         magic_waypoint.map_wp_item->SetCoord(magic_waypoint.coord);
+}
+
+// *************************************************************************************
+// move the UAV to the magic waypoint position
+
+void OPMapGadgetWidget::moveToMagicWaypointPosition()
+{
+    if (!m_widget || !m_map)
+        return;
+
+    if (m_map_mode != MagicWaypoint_MapMode)
+        return;
+
+//    internals::PointLatLng coord = magic_waypoint.coord;
+//    double altitude = magic_waypoint.altitude;
+
+
+    // ToDo:
+
 }
 
 // *************************************************************************************

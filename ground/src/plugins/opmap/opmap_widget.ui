@@ -381,6 +381,32 @@ border-radius: 2px;
          </widget>
         </item>
         <item>
+         <widget class="QToolButton" name="toolButtonMoveToWP">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string>Click to move the UAV to the magic waypoint position</string>
+          </property>
+          <property name="text">
+           <string>Move to WP</string>
+          </property>
+          <property name="icon">
+           <iconset resource="opmap.qrc">
+            <normaloff>:/opmap/images/move_to_wp.png</normaloff>:/opmap/images/move_to_wp.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>28</width>
+            <height>28</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QToolButton" name="toolButtonHomeWaypoint">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">

@@ -321,6 +321,9 @@ private:
     void loadComboBoxLines(QComboBox *comboBox, QString filename);
     void saveComboBoxLines(QComboBox *comboBox, QString filename);
 
+    void hideMagicWaypointControls();
+    void showMagicWaypointControls();
+
     QPointF getLatLon();
 
     void setMapFollowingMode();

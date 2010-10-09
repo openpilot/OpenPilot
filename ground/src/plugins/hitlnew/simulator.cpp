@@ -117,6 +117,7 @@ void Simulator::onStart()
 	UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
 	actDesired = ActuatorDesired::GetInstance(objManager);
 	velActual = VelocityActual::GetInstance(objManager);
+	posActual = PositionActual::GetInstance(objManager);
         altActual = BaroAltitude::GetInstance(objManager);
 	attActual = AttitudeActual::GetInstance(objManager);
         gpsPos = GPSPosition::GetInstance(objManager);

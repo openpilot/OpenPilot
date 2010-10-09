@@ -30,6 +30,10 @@
 #include "coreplugin/icore.h"
 #include "coreplugin/threadmanager.h"
 
+#ifndef M_PI
+#define M_PI           3.14159265358979323846
+#endif
+
 const float FGSimulator::FT2M = 0.3048;
 const float FGSimulator::KT2MPS = 0.514444444;
 const float FGSimulator::INHG2KPA = 3.386;
@@ -215,6 +219,14 @@ void FGSimulator::processUpdate(const QByteArray& inp)
 	velocityActualData.Down = velocityActualDown;
 	velActual->setData(velocityActualData);
 	
+	// Update PositionActual.{Nort,East,Down}
+	PositionActual::DataFields positionActualData;
+	memset(&positionActualData, 0, sizeof(PositionActual::DataFields));
+	positionActualData.North = 0; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
+	positionActualData.East = 0; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
+	positionActualData.Down = (altitude * 100); //Multiply by 100 because positionActual expects input in Centimeters.
+	posActual->setData(positionActualData);
+
 	// Update AltitudeActual object
         BaroAltitude::DataFields altActualData;
         memset(&altActualData, 0, sizeof(BaroAltitude::DataFields));

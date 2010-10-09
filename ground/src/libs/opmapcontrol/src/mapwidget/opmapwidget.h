@@ -244,6 +244,8 @@ namespace mapcontrol
         void SetFollowMouse(bool const& value){followmouse=value;this->setMouseTracking(followmouse);}
         bool FollowMouse(){return followmouse;}
 
+        internals::PointLatLng GetFromLocalToLatLng(QPointF p) {return map->FromLocalToLatLng(p.x(),p.y());}
+
         /**
         * @brief Creates a new WayPoint on the center of the map
         *

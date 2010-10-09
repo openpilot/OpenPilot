@@ -145,7 +145,6 @@ private slots:
     void on_toolButtonMapHome_clicked();
     void on_toolButtonMapUAV_clicked();
     void on_toolButtonMapUAVheading_clicked();
-    void on_toolButtonShowUAVtrail_clicked();
     void on_horizontalSliderZoom_sliderMoved(int position);
     void on_toolButtonAddWaypoint_clicked();
     void on_treeViewWaypoints_clicked(QModelIndex index);
@@ -199,8 +198,6 @@ private slots:
     void onGoUAVAct_triggered();
     void onFollowUAVpositionAct_toggled(bool checked);
     void onFollowUAVheadingAct_toggled(bool checked);
-    void onShowUAVtrailAct_toggled(bool checked);
-    void onClearUAVtrailAct_triggered();
     void onOpenWayPointEditorAct_triggered();
     void onAddWayPointAct_triggered();
     void onEditWayPointAct_triggered();
@@ -213,6 +210,10 @@ private slots:
     void onCenterMagicWaypointAct_triggered();
     void onShowSafeAreaAct_toggled(bool show);
     void onSafeAreaActGroup_triggered(QAction *action);
+    void onUAVTrailTypeActGroup_triggered(QAction *action);
+    void onClearUAVtrailAct_triggered();
+    void onUAVTrailTimeActGroup_triggered(QAction *action);
+    void onUAVTrailDistanceActGroup_triggered(QAction *action);
 
 private:
     int min_zoom;
@@ -283,8 +284,6 @@ private:
     QAction *goUAVAct;
     QAction *followUAVpositionAct;
     QAction *followUAVheadingAct;
-    QAction *showUAVtrailAct;
-    QAction *clearUAVtrailAct;
     QAction *wayPointEditorAct;
     QAction *addWayPointAct;
     QAction *editWayPointAct;
@@ -297,6 +296,14 @@ private:
     QAction *showSafeAreaAct;
     QActionGroup *safeAreaActGroup;
     QList<QAction *> safeAreaAct;
+
+    QActionGroup *uavTrailTypeActGroup;
+    QList<QAction *> uavTrailTypeAct;
+    QAction *clearUAVtrailAct;
+    QActionGroup *uavTrailTimeActGroup;
+    QList<QAction *> uavTrailTimeAct;
+    QActionGroup *uavTrailDistanceActGroup;
+    QList<QAction *> uavTrailDistanceAct;
 
     QActionGroup *mapModeActGroup;
     QList<QAction *> mapModeAct;

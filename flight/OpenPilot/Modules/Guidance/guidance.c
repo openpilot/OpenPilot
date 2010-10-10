@@ -109,7 +109,9 @@ static void guidanceTask(void *parameters)
 		GuidanceSettingsGet(&guidanceSettings);
 
 		if ((manualControl.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO) &&
-		    (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL)) {
+		    ((systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL) ||
+		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADP) ||
+		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADX))){
 			updateVtolDesiredVelocity();
 			updateVtolDesiredAttitude();
 		} else {

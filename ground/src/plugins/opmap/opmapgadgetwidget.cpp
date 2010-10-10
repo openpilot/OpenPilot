@@ -609,7 +609,6 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
         case MagicWaypoint_MapMode:
             menu.addSeparator()->setText(tr("Waypoints"));
             menu.addAction(homeMagicWaypointAct);
-            menu.addAction(centerMagicWaypointAct);
             break;
     }
 
@@ -1111,11 +1110,6 @@ void OPMapGadgetWidget::on_toolButtonHomeWaypoint_clicked()
     homeMagicWaypoint();
 }
 
-void OPMapGadgetWidget::on_toolButtonCenterWaypoint_clicked()
-{
-    centerMagicWaypoint();
-}
-
 void OPMapGadgetWidget::on_toolButtonMoveToWP_clicked()
 {
     moveToMagicWaypointPosition();
@@ -1141,6 +1135,9 @@ void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon)
 
     m_map->Home->SetCoord(home_position.coord);
     m_map->Home->RefreshPos();
+
+    // move the magic waypoint to keep it within the safe area boundry
+    keepMagicWaypointWithInSafeArea();
 }
 
 void OPMapGadgetWidget::goHome()
@@ -1492,10 +1489,6 @@ void OPMapGadgetWidget::createActions()
     homeMagicWaypointAct = new QAction(tr("Home magic waypoint"), this);
     homeMagicWaypointAct->setStatusTip(tr("Move the magic waypoint to the home position"));
     connect(homeMagicWaypointAct, SIGNAL(triggered()), this, SLOT(onHomeMagicWaypointAct_triggered()));
-
-    centerMagicWaypointAct = new QAction(tr("Center magic waypoint"), this);
-    centerMagicWaypointAct->setStatusTip(tr("Move the magic waypoint to the center of the map"));
-    connect(centerMagicWaypointAct, SIGNAL(triggered()), this, SLOT(onCenterMagicWaypointAct_triggered()));
 
     mapModeActGroup = new QActionGroup(this);
     connect(mapModeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onMapModeActGroup_triggered(QAction *)));
@@ -1975,12 +1968,6 @@ void OPMapGadgetWidget::onHomeMagicWaypointAct_triggered()
     homeMagicWaypoint();
 }
 
-void OPMapGadgetWidget::onCenterMagicWaypointAct_triggered()
-{
-    // center the magic waypoint on the map
-    centerMagicWaypoint();
-}
-
 void OPMapGadgetWidget::onShowSafeAreaAct_toggled(bool show)
 {
     if (!m_widget || !m_map)
@@ -1999,6 +1986,9 @@ void OPMapGadgetWidget::onSafeAreaActGroup_triggered(QAction *action)
 
     m_map->Home->SetSafeArea(radius);               // set the radius (meters)
     m_map->Home->RefreshPos();
+
+    // move the magic waypoint if need be to keep it within the safe area around the home position
+    keepMagicWaypointWithInSafeArea();
 }
 
 // *************************************************************************************
@@ -2013,23 +2003,6 @@ void OPMapGadgetWidget::homeMagicWaypoint()
         return;
 
     magic_waypoint.coord = home_position.coord;
-
-    if (magic_waypoint.map_wp_item)
-        magic_waypoint.map_wp_item->SetCoord(magic_waypoint.coord);
-}
-
-// *************************************************************************************
-// move the magic waypoint to the center of the map
-
-void OPMapGadgetWidget::centerMagicWaypoint()
-{
-    if (!m_widget || !m_map)
-        return;
-
-    if (m_map_mode != MagicWaypoint_MapMode)
-        return;
-
-    magic_waypoint.coord = m_map->CurrentPosition();
 
     if (magic_waypoint.map_wp_item)
         magic_waypoint.map_wp_item->SetCoord(magic_waypoint.coord);
@@ -2108,7 +2081,6 @@ void OPMapGadgetWidget::hideMagicWaypointControls()
 {
     m_widget->lineWaypoint->setVisible(false);
     m_widget->toolButtonHomeWaypoint->setVisible(false);
-    m_widget->toolButtonCenterWaypoint->setVisible(false);
     m_widget->toolButtonMoveToWP->setVisible(false);
 }
 
@@ -2116,8 +2088,36 @@ void OPMapGadgetWidget::showMagicWaypointControls()
 {
     m_widget->lineWaypoint->setVisible(true);
     m_widget->toolButtonHomeWaypoint->setVisible(true);
-    m_widget->toolButtonCenterWaypoint->setVisible(true);
     m_widget->toolButtonMoveToWP->setVisible(true);
+}
+
+// *************************************************************************************
+// move the magic waypoint to keep it within the safe area boundry
+
+void OPMapGadgetWidget::keepMagicWaypointWithInSafeArea()
+{
+
+    // calcute the bearing and distance from the home position to the magic waypoint
+    double dist = distance(home_position.coord, magic_waypoint.coord);
+    double bear = bearing(home_position.coord, magic_waypoint.coord);
+
+    // get the maximum safe distance - in kilometers
+    double boundry_dist = (double)m_map->Home->SafeArea() / 1000;
+
+//    if (dist <= boundry_dist)
+//        return; // the magic waypoint is still within the safe area, don't move it
+
+    if (dist > boundry_dist) dist = boundry_dist;
+
+    // move the magic waypoint
+
+    magic_waypoint.coord = destPoint(home_position.coord, bear, dist);
+
+    if (m_map_mode == MagicWaypoint_MapMode)
+    {   // move the on-screen waypoint
+        if (magic_waypoint.map_wp_item)
+            magic_waypoint.map_wp_item->SetCoord(magic_waypoint.coord);
+    }
 }
 
 // *************************************************************************************

@@ -156,7 +156,6 @@ private slots:
     void on_toolButtonMagicWaypointMapMode_clicked();
     void on_toolButtonNormalMapMode_clicked();
     void on_toolButtonHomeWaypoint_clicked();
-    void on_toolButtonCenterWaypoint_clicked();
     void on_toolButtonMoveToWP_clicked();
 
     /**
@@ -208,7 +207,6 @@ private slots:
     void onMapModeActGroup_triggered(QAction *action);
     void onZoomActGroup_triggered(QAction *action);
     void onHomeMagicWaypointAct_triggered();
-    void onCenterMagicWaypointAct_triggered();
     void onShowSafeAreaAct_toggled(bool show);
     void onSafeAreaActGroup_triggered(QAction *action);
     void onUAVTrailTypeActGroup_triggered(QAction *action);
@@ -293,7 +291,6 @@ private:
     QAction *deleteWayPointAct;
     QAction *clearWayPointsAct;
     QAction *homeMagicWaypointAct;
-    QAction *centerMagicWaypointAct;
 
     QAction *showSafeAreaAct;
     QActionGroup *safeAreaActGroup;
@@ -314,7 +311,6 @@ private:
     QList<QAction *> zoomAct;
 
     void homeMagicWaypoint();
-    void centerMagicWaypoint();
 
     void moveToMagicWaypointPosition();
 
@@ -323,6 +319,8 @@ private:
 
     void hideMagicWaypointControls();
     void showMagicWaypointControls();
+
+    void keepMagicWaypointWithInSafeArea();
 
     double distance(internals::PointLatLng from, internals::PointLatLng to);
     double bearing(internals::PointLatLng from, internals::PointLatLng to);

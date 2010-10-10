@@ -34,11 +34,25 @@
 #include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
+#include <QThread>
 
 #define sign(x) ((x < 0) ? -1 : 1)
 
 const double ConfigAHRSWidget::maxVarValue = 0.1;
 const int ConfigAHRSWidget::calibrationDelay = 7; // Time to wait for the AHRS to do its calibration
+
+// *****************
+
+class Thread : public QThread
+{
+public:
+    static void usleep(unsigned long usecs)
+    {
+        QThread::usleep(usecs);
+    }
+};
+
+// *****************
 
 ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
@@ -582,7 +596,7 @@ void ConfigAHRSWidget::sixPointCalibrationMode()
 
     obj->updated();
 
-    usleep(100000);
+    Thread::usleep(100000);
 
     gyro_accum_x.clear();
     gyro_accum_y.clear();

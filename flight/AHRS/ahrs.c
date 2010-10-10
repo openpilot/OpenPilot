@@ -191,7 +191,6 @@ static uint8_t adc_oversampling = 20;
 /**
  * @brief AHRS Main function
  */
-float mag[3];
 int main()
 {
 	float gyro[3], accel[3];
@@ -319,8 +318,9 @@ for all data to be up to date before doing anything*/
 		// Get magnetic readings
 		if (PIOS_HMC5843_NewDataAvailable()) {
 			PIOS_HMC5843_ReadMag(mag_data.raw.axis);
-			mag_data.scaled.axis[0] = (mag_data.raw.axis[0] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
-			mag_data.scaled.axis[1] = (mag_data.raw.axis[1] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
+			// Swap the axis here to acount for orientation of mag chip (notice 0 and 1 swapped in raw)
+			mag_data.scaled.axis[0] = (mag_data.raw.axis[1] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
+			mag_data.scaled.axis[1] = (mag_data.raw.axis[0] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
 			mag_data.scaled.axis[2] = (mag_data.raw.axis[2] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
 			mag_data.updated = 1;
 		}
@@ -352,11 +352,6 @@ for all data to be up to date before doing anything*/
 			accel[0] = accel_data.filtered.x,
 			accel[1] = accel_data.filtered.y,
 			accel[2] = accel_data.filtered.z,
-			// Note: The magnetometer driver returns registers X,Y,Z from the chip which are
-			// (left, backward, up).  Remapping to (forward, right, down).
-			mag[0] = -mag_data.scaled.axis[1];
-			mag[1] = -mag_data.scaled.axis[0];
-			mag[2] = -mag_data.scaled.axis[2];
 
 			INSStatePrediction(gyro, accel, 1 / (float)EKF_RATE);
 			send_attitude();  // get message out quickly
@@ -374,13 +369,14 @@ for all data to be up to date before doing anything*/
 				    sin(gps_data.heading * M_PI / 180);
 
 				INSSetPosVelVar(0.004);
-				if (gps_data.updated) {
+				if (mag_data.updated) {
 					//TOOD: add check for altitude updates
-					FullCorrection(mag, gps_data.NED,
+					FullCorrection(mag_data.scaled.axis,
+						       gps_data.NED,
 						       vel,
 						       altitude_data.
 						       altitude);
-					gps_data.updated = 0;
+					mag_data.updated = 0;
 				} else {
 					GpsBaroCorrection(gps_data.NED,
 							  vel,
@@ -389,10 +385,9 @@ for all data to be up to date before doing anything*/
 				}
 
 				gps_data.updated = false;
-				mag_data.updated = 0;
 			} else if (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR
 				   && mag_data.updated == 1) {
-				MagCorrection(mag);	// only trust mags if outdoors
+				MagCorrection(mag_data.scaled.axis);	// only trust mags if outdoors
 				mag_data.updated = 0;
 			} else {
 				// Indoors, update with zero position and velocity and high covariance
@@ -404,7 +399,8 @@ for all data to be up to date before doing anything*/
 				vel[2] = 0;
 
 				if((mag_data.updated == 1) && (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
-					MagVelBaroCorrection(mag,vel,altitude_data.altitude);  // only trust mags if outdoors
+					MagVelBaroCorrection(mag_data.scaled.axis,
+							     vel,altitude_data.altitude);  // only trust mags if outdoors
 					mag_data.updated = 0;
 				} else {
 					VelBaroCorrection(vel, altitude_data.altitude);
@@ -813,7 +809,11 @@ void calibration_callback(AhrsObjHandle obj)
 			mag_data.calibration.scale[ct] = cal.mag_scale[ct];
 			mag_data.calibration.variance[ct] = cal.mag_var[ct];
 		}
-		float mag_var[3] = {mag_data.calibration.variance[1], mag_data.calibration.variance[0], mag_data.calibration.variance[2]};
+		// Note: We need the divided by 1000^2 since we scale mags to have a norm of 1000 and they are scaled to 
+		// one in code
+		float mag_var[3] = {mag_data.calibration.variance[0] / 1000 / 1000, 
+			mag_data.calibration.variance[1] / 1000 / 1000, 
+			mag_data.calibration.variance[2] / 1000 / 1000};
 		INSSetMagVar(mag_var);
 		INSSetAccelVar(accel_data.calibration.variance);
 		INSSetGyroVar(gyro_data.calibration.variance);

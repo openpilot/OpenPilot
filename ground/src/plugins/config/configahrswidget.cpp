@@ -518,7 +518,7 @@ void ConfigAHRSWidget::computeScaleBias()
     field->setDouble(-listMean(gyro_accum_x) * M_PI / 180.0f,0);
     field->setDouble(-listMean(gyro_accum_y) * M_PI / 180.0f,1);
     field->setDouble(-listMean(gyro_accum_z) * M_PI / 180.0f,2);
-qDebug() << listMean(gyro_accum_x) * M_PI / 180.0f << listMean(gyro_accum_y) * M_PI / 180.0f << listMean(gyro_accum_x) * M_PI / 180.0f;
+
     field = obj->getField(QString("accel_scale"));
     field->setDouble(sign(S[0]) * S[0],0);
     field->setDouble(sign(S[1]) * S[1],1);
@@ -531,14 +531,14 @@ qDebug() << listMean(gyro_accum_x) * M_PI / 180.0f << listMean(gyro_accum_y) * M
 
     SixPointInConstFieldCal( 1000, mag_data_x, mag_data_y, mag_data_z, S, b);
     field = obj->getField(QString("mag_scale"));
-    field->setDouble(sign(S[0]) * S[0],0);
-    field->setDouble(sign(S[1]) * S[1],1);
-    field->setDouble(sign(S[2]) * S[2],2);
+    field->setDouble(-sign(S[0]) * S[0],0);
+    field->setDouble(-sign(S[1]) * S[1],1);
+    field->setDouble(-sign(S[2]) * S[2],2);
 
     field = obj->getField(QString("mag_bias"));
-    field->setDouble(sign(S[0]) * b[0], 0);
-    field->setDouble(sign(S[1]) * b[1], 1);
-    field->setDouble(sign(S[2]) * b[2], 2);
+    field->setDouble(-sign(S[0]) * b[0], 0);
+    field->setDouble(-sign(S[1]) * b[1], 1);
+    field->setDouble(-sign(S[2]) * b[2], 2);
 
     obj->updated();
 
@@ -582,6 +582,8 @@ void ConfigAHRSWidget::sixPointCalibrationMode()
 
     obj->updated();
 
+    usleep(100000);
+
     gyro_accum_x.clear();
     gyro_accum_y.clear();
     gyro_accum_z.clear();
@@ -591,7 +593,7 @@ void ConfigAHRSWidget::sixPointCalibrationMode()
     initialMdata = obj->getMetadata();
     UAVObject::Metadata mdata = initialMdata;
     mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-    mdata.flightTelemetryUpdatePeriod = 50;
+    mdata.flightTelemetryUpdatePeriod = 100;
     obj->setMetadata(mdata);
 
     /* Show instructions and enable controls */

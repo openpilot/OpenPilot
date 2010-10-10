@@ -36,13 +36,13 @@ VariableSizeLinearLeastSquares2::VariableSizeLinearLeastSquares2(size_t _modelSi
 void VariableSizeLinearLeastSquares2::addMeasure(jblas::vec const& A_row, double b_val)
 {
   JFR_PRECOND(A_row.size() == m_modelSize,
-							"VariableSizeLinearLeastSquares::addMeasure: invalid A_row size: " << A_row.size())
+							"VariableSizeLinearLeastSquares::addMeasure: invalid A_row size: " << A_row.size());
 	if(m_dataSetSize == 0) {
 		m_A.resize(m_countValues+1, m_modelSize);
 		m_b.resize(m_countValues+1);
 	} else {
 		if(m_countValues > m_dataSetSize)
-			JFR_ERROR(JmathException, JmathException::SYSTEM_FULL, "system is full!")
+			JFR_ERROR(JmathException, JmathException::SYSTEM_FULL, "system is full!");
 	}
   row(m_A, m_countValues).assign(A_row);
   m_b(m_countValues) = b_val;

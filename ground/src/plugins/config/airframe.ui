@@ -69,7 +69,7 @@
       <item>
        <widget class="QStackedWidget" name="airframesWidget">
         <property name="currentIndex">
-         <number>2</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="fixedWing">
          <property name="enabled">
@@ -444,7 +444,11 @@
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="multirotorFrameType"/>
+               <widget class="QComboBox" name="multirotorFrameType">
+                <property name="toolTip">
+                 <string>Select the Multirotor frame type here.</string>
+                </property>
+               </widget>
               </item>
               <item>
                <spacer name="horizontalSpacer_5">
@@ -475,7 +479,163 @@
              </layout>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="5,2">
+             <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,5,2">
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_20">
+                <item>
+                 <widget class="QLabel" name="label_4">
+                  <property name="font">
+                   <font>
+                    <weight>75</weight>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Mix Level</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_19">
+                  <item>
+                   <layout class="QVBoxLayout" name="verticalLayout_22">
+                    <item>
+                     <widget class="QLabel" name="label_43">
+                      <property name="text">
+                       <string>100</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QSlider" name="mrRollMixLevel">
+                      <property name="toolTip">
+                       <string>Weight of Roll mixing in percent. Typical values are 100% for + configuration and 50% for X configuration on quads.</string>
+                      </property>
+                      <property name="maximum">
+                       <number>100</number>
+                      </property>
+                      <property name="value">
+                       <number>100</number>
+                      </property>
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_42">
+                      <property name="text">
+                       <string>R</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="checkBox_3">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
+                      <property name="toolTip">
+                       <string>All checked sliders will move together.</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QVBoxLayout" name="verticalLayout_23">
+                    <item>
+                     <widget class="QLabel" name="label_44">
+                      <property name="text">
+                       <string>100</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QSlider" name="mrPitchMixLevel">
+                      <property name="toolTip">
+                       <string>Weight of Pitch mixing in percent. Typical values are 100% for + configuration and 50% for X configuration on quads.</string>
+                      </property>
+                      <property name="maximum">
+                       <number>100</number>
+                      </property>
+                      <property name="value">
+                       <number>100</number>
+                      </property>
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_40">
+                      <property name="text">
+                       <string>P</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="checkBox_2">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QVBoxLayout" name="verticalLayout_21">
+                    <item>
+                     <widget class="QLabel" name="label_45">
+                      <property name="text">
+                       <string>50</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QSlider" name="mrYawMixLevel">
+                      <property name="toolTip">
+                       <string>Weight of Yaw mixing in percent. Typical value is 50% for + or X configuration on quads.</string>
+                      </property>
+                      <property name="maximum">
+                       <number>100</number>
+                      </property>
+                      <property name="value">
+                       <number>50</number>
+                      </property>
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_6">
+                      <property name="text">
+                       <string>Y</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="checkBox">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </item>
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_11" stretch="0,1,0,0">
                 <item>
@@ -1487,12 +1647,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>284</x>
+     <x>496</x>
      <y>171</y>
     </hint>
     <hint type="destinationlabel">
-     <x>156</x>
-     <y>170</y>
+     <x>271</x>
+     <y>171</y>
     </hint>
    </hints>
   </connection>
@@ -1503,12 +1663,60 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>198</x>
-     <y>234</y>
+     <x>488</x>
+     <y>262</y>
     </hint>
     <hint type="destinationlabel">
-     <x>127</x>
-     <y>235</y>
+     <x>249</x>
+     <y>262</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mrPitchMixLevel</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_44</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>76</x>
+     <y>210</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>80</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mrYawMixLevel</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_45</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>119</x>
+     <y>199</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>108</x>
+     <y>151</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mrRollMixLevel</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_43</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>39</x>
+     <y>217</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>43</x>
+     <y>149</y>
     </hint>
    </hints>
   </connection>

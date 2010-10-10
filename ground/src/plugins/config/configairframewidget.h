@@ -51,6 +51,8 @@ private:
     bool setupFrameElevon();
     bool setupFrameVtail();
     bool setupQuad(bool pLayout);
+    bool setupHexa();
+    bool setupOcto();
 
     void resetField(UAVObjectField * field);
     void resetMixer (MixerCurveWidget *mixer, int numElements);

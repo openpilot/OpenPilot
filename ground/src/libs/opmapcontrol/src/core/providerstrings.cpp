@@ -38,19 +38,19 @@ namespace core {
     ProviderStrings::ProviderStrings()
     {
 //        VersionGoogleMap = "m@132";
-//        VersionGoogleSatellite = "69";
+//        VersionGoogleSatellite = "71";
 //        VersionGoogleLabels = "h@132";
 //        VersionGoogleTerrain = "t@125,r@132";
         // Google version strings
         VersionGoogleMap = "m@132";
-        VersionGoogleSatellite = "69";
+        VersionGoogleSatellite = "71";
         VersionGoogleLabels = "h@132";
         VersionGoogleTerrain = "t@125,r@132";
         SecGoogleWord = "Galileo";
 
         // Google (China) version strings
         VersionGoogleMapChina = "m@132";
-        VersionGoogleSatelliteChina = "s@69";
+        VersionGoogleSatelliteChina = "s@71";
         VersionGoogleLabelsChina = "h@132";
         VersionGoogleTerrainChina = "t@125,r@132";
 
@@ -71,11 +71,11 @@ namespace core {
         VersionYahooLabels = "4.3";
 
         // BingMaps
-        VersionBingMaps = "517";
+        VersionBingMaps = "563";
 
         // YandexMap
-        VersionYandexMap = "2.15.0";
-        //VersionYandexSatellite = "1.18.0";
+        VersionYandexMap = "2.16.0";
+        //VersionYandexSatellite = "1.19.0";
         ////////////////////
 
         /// <summary>

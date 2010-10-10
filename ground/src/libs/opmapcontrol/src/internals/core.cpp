@@ -219,7 +219,7 @@ namespace internals {
     }
     void Core::SetZoom(const int &value)
     {
-        if (zoom!=value && !isDragging)
+        if (!isDragging)
         {
             zoom=value;
             minOfTiles=Projection()->GetTileMatrixMinXY(value);

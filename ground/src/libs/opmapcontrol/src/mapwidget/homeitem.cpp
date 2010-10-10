@@ -73,7 +73,7 @@ namespace mapcontrol
         localposition=map->FromLatLngToLocal(coord);
         this->setPos(localposition.X(),localposition.Y());
         if(showsafearea)
-            localsafearea=safearea/map->Projection()->GetGroundResolution(map->Zoom(),coord.Lat());
+            localsafearea=safearea/map->Projection()->GetGroundResolution(map->ZoomTotal(),coord.Lat());
 
     }
 

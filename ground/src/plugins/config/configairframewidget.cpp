@@ -667,7 +667,7 @@ bool ConfigAirframeWidget::setupFrameFixedWing()
     // First of all reset the vector
     resetField(field);
     int ti = field->getElementNames().indexOf("ThrottleCurve1");
-    field->setValue(1, ti);
+    field->setValue(127, ti);
 
     // Rudder
     eng = m_aircraft->fwRudderChannel->currentIndex()-1;
@@ -678,7 +678,7 @@ bool ConfigAirframeWidget::setupFrameFixedWing()
         field = obj->getField(mixerVectors.at(eng));
         resetField(field);
         ti = field->getElementNames().indexOf("Yaw");
-        field->setValue(1, ti);
+        field->setValue(127, ti);
     } // Else: we have no rudder, only ailerons, we're fine with it.
 
     // Ailerons
@@ -689,7 +689,7 @@ bool ConfigAirframeWidget::setupFrameFixedWing()
         field = obj->getField(mixerVectors.at(eng));
         resetField(field);
         ti = field->getElementNames().indexOf("Roll");
-        field->setValue(1, ti);
+        field->setValue(127, ti);
         // Only set Aileron 2 if Aileron 1 is defined
         eng = m_aircraft->fwAileron2Channel->currentIndex()-1;
         if (eng > -1) {
@@ -698,7 +698,7 @@ bool ConfigAirframeWidget::setupFrameFixedWing()
             field = obj->getField(mixerVectors.at(eng));
             resetField(field);
             ti = field->getElementNames().indexOf("Roll");
-            field->setValue(1, ti);
+            field->setValue(127, ti);
         }
     } // Else we have no ailerons. Our consistency check guarantees we have
       // rudder in this case, so we're fine with it too.
@@ -710,7 +710,7 @@ bool ConfigAirframeWidget::setupFrameFixedWing()
     field = obj->getField(mixerVectors.at(eng));
     resetField(field);
     ti = field->getElementNames().indexOf("Pitch");
-    field->setValue(1, ti);
+    field->setValue(127, ti);
     // Only set Elevator 2 if it is defined
     eng = m_aircraft->fwElevator2Channel->currentIndex()-1;
     if (eng > -1) {
@@ -719,7 +719,7 @@ bool ConfigAirframeWidget::setupFrameFixedWing()
         field = obj->getField(mixerVectors.at(eng));
         resetField(field);
         ti = field->getElementNames().indexOf("Pitch");
-        field->setValue(1, ti);
+        field->setValue(127, ti);
     }
 
     obj->updated();
@@ -789,7 +789,7 @@ bool ConfigAirframeWidget::setupFrameElevon()
     // First of all reset the vector
     resetField(field);
     int ti = field->getElementNames().indexOf("ThrottleCurve1");
-    field->setValue(1, ti);
+    field->setValue(127, ti);
 
     // Rudder
     eng = m_aircraft->fwRudderChannel->currentIndex()-1;
@@ -800,7 +800,7 @@ bool ConfigAirframeWidget::setupFrameElevon()
         field = obj->getField(mixerVectors.at(eng));
         resetField(field);
         ti = field->getElementNames().indexOf("Yaw");
-        field->setValue(1, ti);
+        field->setValue(127, ti);
     } // Else: we have no rudder, only elevons, we're fine with it.
 
     eng = m_aircraft->fwAileron1Channel->currentIndex()-1;
@@ -810,9 +810,9 @@ bool ConfigAirframeWidget::setupFrameElevon()
         field = obj->getField(mixerVectors.at(eng));
         resetField(field);
         ti = field->getElementNames().indexOf("Pitch");
-        field->setDouble((double)m_aircraft->elevonSlider2->value()/100, ti);
+        field->setValue((double)m_aircraft->elevonSlider2->value()*1.27, ti);
         ti = field->getElementNames().indexOf("Roll");
-        field->setDouble((double)m_aircraft->elevonSlider1->value()/100,ti);
+        field->setValue((double)m_aircraft->elevonSlider1->value()*1.27,ti);
     }
 
     eng = m_aircraft->fwAileron2Channel->currentIndex()-1;
@@ -822,9 +822,9 @@ bool ConfigAirframeWidget::setupFrameElevon()
         field = obj->getField(mixerVectors.at(eng));
         resetField(field);
         ti = field->getElementNames().indexOf("Pitch");
-        field->setDouble((double)m_aircraft->elevonSlider2->value()/100, ti);
+        field->setValue((double)m_aircraft->elevonSlider2->value()*1.27, ti);
         ti = field->getElementNames().indexOf("Roll");
-        field->setDouble(-(double)m_aircraft->elevonSlider1->value()/100,ti);
+        field->setValue(-(double)m_aircraft->elevonSlider1->value()*1.27,ti);
     }
 
     obj->updated();
@@ -894,7 +894,7 @@ bool ConfigAirframeWidget::setupFrameVtail()
     // First of all reset the vector
     resetField(field);
     int ti = field->getElementNames().indexOf("ThrottleCurve1");
-    field->setValue(1, ti);
+    field->setValue(127, ti);
 
     eng = m_aircraft->fwAileron1Channel->currentIndex()-1;
     if (eng > -1) {
@@ -903,7 +903,7 @@ bool ConfigAirframeWidget::setupFrameVtail()
         field = obj->getField(mixerVectors.at(eng));
         resetField(field);
         ti = field->getElementNames().indexOf("Roll");
-        field->setDouble(1,ti);
+        field->setValue(127,ti);
     }
 
     eng = m_aircraft->fwAileron2Channel->currentIndex()-1;
@@ -913,7 +913,7 @@ bool ConfigAirframeWidget::setupFrameVtail()
         field = obj->getField(mixerVectors.at(eng));
         resetField(field);
         ti = field->getElementNames().indexOf("Roll");
-        field->setDouble(-1,ti);
+        field->setValue(-127,ti);
     }
 
     // Now compute the VTail
@@ -923,9 +923,9 @@ bool ConfigAirframeWidget::setupFrameVtail()
     field = obj->getField(mixerVectors.at(eng));
     resetField(field);
     ti = field->getElementNames().indexOf("Pitch");
-    field->setDouble((double)m_aircraft->elevonSlider2->value()/100, ti);
+    field->setValue((double)m_aircraft->elevonSlider2->value()*1.27, ti);
     ti = field->getElementNames().indexOf("Yaw");
-    field->setDouble((double)m_aircraft->elevonSlider1->value()/100,ti);
+    field->setValue((double)m_aircraft->elevonSlider1->value()*1.27,ti);
 
     eng = m_aircraft->fwElevator2Channel->currentIndex()-1;
     field = obj->getField(mixerTypes.at(eng));
@@ -933,9 +933,9 @@ bool ConfigAirframeWidget::setupFrameVtail()
     field = obj->getField(mixerVectors.at(eng));
     resetField(field);
     ti = field->getElementNames().indexOf("Pitch");
-    field->setDouble((double)m_aircraft->elevonSlider2->value()/100, ti);
+    field->setValue((double)m_aircraft->elevonSlider2->value()*1.27, ti);
     ti = field->getElementNames().indexOf("Yaw");
-    field->setDouble(-(double)m_aircraft->elevonSlider1->value()/100,ti);
+    field->setValue(-(double)m_aircraft->elevonSlider1->value()*1.27,ti);
 
     obj->updated();
     m_aircraft->fwStatusLabel->setText("Mixer generated");

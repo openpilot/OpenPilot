@@ -210,7 +210,7 @@ static void stabilizationTask(void* parameters)
 		}
 
 		if(manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_FALSE ||
-			!shouldUpdate)
+			!shouldUpdate || (attitudeDesired.Throttle < 0))
 		{
 			ZeroPids();
 		}

@@ -289,9 +289,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	// 2. Create robots.
 	robot_ptr_t robPtr1;
-#ifdef HAVE_MTI
 	if (intOpts[iRobot] == 0)
-#endif
 	{
 		robconstvel_ptr_t robPtr1_(new RobotConstantVelocity(mapPtr));
 		robPtr1_->setVelocityStd(UNCERT_VLIN, UNCERT_VANG);
@@ -313,7 +311,6 @@ void demo_slam01_main(world_ptr_t *world) {
 			floatOpts[fFreq] = hardEst1.getFreq();
 		}
 	}
-#ifdef HAVE_MTI
 	else
 	if (intOpts[iRobot] == 1)
 	{
@@ -348,7 +345,6 @@ void demo_slam01_main(world_ptr_t *world) {
 
 		robPtr1 = robPtr1_;
 	}
-#endif
 
 	robPtr1->setId();
 	robPtr1->linkToParentMap(mapPtr);
@@ -725,6 +721,7 @@ void demo_slam01_display(world_ptr_t *world) {
 				(*world)->display_condition.wait(display_lock);
 		} else
 		{
+			#ifdef HAVE_MODULE_QDISPLAY
 			int nwait = std::max(1,display_period/10-1);
 			for(int i = 0; (*world)->display_rendered && i < nwait; ++i)
 			{
@@ -734,6 +731,7 @@ void demo_slam01_display(world_ptr_t *world) {
 				display_lock.lock();
 			}
 			if ((*world)->display_rendered) break;
+			#endif
 		}
 		display_lock.unlock();
 // cout << "DISPLAY: ok data here, let's start!" << endl;
@@ -761,16 +759,20 @@ void demo_slam01_display(world_ptr_t *world) {
 			
 			if ((intOpts[iReplay] || intOpts[iSimu]) && intOpts[iDump] && (*world)->display_t+1 != 0)
 			{
+				#ifdef HAVE_MODULE_QDISPLAY
 				if (intOpts[iDispQt])
 				{
 					std::ostringstream oss; oss << strOpts[sDataPath] << "/rendered-2D_%d-" << std::setw(6) << std::setfill('0') << (*world)->display_t << ".png";
 					viewerQt->dump(oss.str());
 				}
+				#endif
+				#ifdef HAVE_MODULE_GDHE
 				if (intOpts[iDispGdhe])
 				{
 					std::ostringstream oss; oss << strOpts[sDataPath] << "/rendered-3D_" << std::setw(6) << std::setfill('0') << (*world)->display_t << ".png";
 					viewerGdhe->dump(oss.str());
 				}
+				#endif
 //				if (intOpts[iRenderAll])
 //					(*world)->display_mutex.unlock();
 			}
@@ -951,10 +953,17 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 					std::cerr << "Unknown option " << c << std::endl;
 				}
 			}
-			
-		if (intOpts[iReplay]) mode = 2; else
+
+			// consistency
+			if (intOpts[iReplay]) mode = 2; else
 				if (intOpts[iDump]) mode = 1; else
 					mode = 0;
-			
+			#ifndef HAVE_MODULE_QDISPLAY
+			intOpts[iDispQt] = 0;
+			#endif
+			#ifndef HAVE_MODULE_GDHE
+			intOpts[iDispGdhe] = 0;
+			#endif
+
 			demo_slam01();
 		}

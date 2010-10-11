@@ -17,10 +17,6 @@
 
 #include "image/Image.hpp"
 
-#include "qdisplay/Viewer.hpp"
-#include "qdisplay/ViewerManager.hpp"
-#include "qdisplay/ImageView.hpp"
-
 namespace jafar {
 	namespace rtslam {
 		using namespace std;

@@ -20,6 +20,9 @@
 //#include "rtslam/FeaturePoint.hpp"
 
 #include <iostream>
+
+#ifdef HAVE_MODULE_QDISPLAY
+
 #include "image/Image.hpp"
 #include "qdisplay/init.hpp"
 #include "qdisplay/ImageView.hpp"
@@ -65,8 +68,12 @@ void test_raw01(void) {
 
 }
 
+#endif
+
 BOOST_AUTO_TEST_CASE( test_raw )
 {
+	#ifdef HAVE_MODULE_QDISPLAY
 	test_raw01();
+	#endif
 }
 

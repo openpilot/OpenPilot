@@ -61,6 +61,13 @@ using namespace jafar::jmath::ublasExtra;
 using namespace jafar::rtslam;
 using namespace boost;
 
+jblas::vec sqrt(jblas::vec x)
+{
+	jblas::vec res(x.size());
+	for(int i = 0; i < x.size(); ++i) res(i) = sqrt(x(i));
+	return res;
+}
+
 typedef ImagePointObservationMaker<ObservationPinHoleEuclideanPoint, SensorPinHole, LandmarkEuclideanPoint,
 	 AppearanceImagePoint, SensorAbstract::PINHOLE, LandmarkAbstract::PNT_EUC> PinholeEucpObservationMaker;
 typedef ImagePointObservationMaker<ObservationPinHoleEuclideanPoint, SensorPinHole, LandmarkEuclideanPoint,
@@ -149,21 +156,32 @@ const double PERT_VANG = 2.0; // rad/s per sqrt(s)
 
 // inertial robot initial uncertainties and perturbations - in addition to constant velocity option UNCERT_VLIN.
 //if (intOpts[iRobot] == 1) // == robot inertial
-const double UNCERT_GRAVITY = 0.1; // m/s^2
+const double UNCERT_GRAVITY = 1; // m/s^2
 const double UNCERT_ABIAS = 0.05*17.0; // 5% of full scale
 const double UNCERT_WBIAS = 0.05*jmath::degToRad(300.0); // 5% of full scale
-const double PERT_AERR = 0.2*0.001*sqrt(30.0/100.0); // m/s per sqrt(s), IMU acc error (MTI = 0.001*sqrt(40Hz/100Hz))
-const double PERT_WERR = 0.2*jmath::degToRad(0.05)*sqrt(40.0/100.0); // rad per sqrt(s), IMU gyro error (MTI = 0.05*sqrt(30Hz/100Hz))
+const double PERT_AERR = 0.001*sqrt(30.0/100.0); // m/s per sqrt(s), IMU acc error (MTI = 0.001*sqrt(40Hz/100Hz))
+const double PERT_WERR = jmath::degToRad(0.05)*sqrt(40.0/100.0); // rad per sqrt(s), IMU gyro error (MTI = 0.05*sqrt(30Hz/100Hz))
 const double PERT_RANWALKACC = 0; // m/s^2 per sqrt(s), IMU a_bias random walk
 const double PERT_RANWALKGYRO = 0; // rad/s^2 per sqrt(s), IMU w_bias random walk
 
 // pin-hole:
+// flea2 with original obj
+
 const unsigned IMG_WIDTH = 640;
 const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
 const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
+
+// jmcodol's robot
+/*const unsigned IMG_WIDTH = 640;
+const unsigned IMG_HEIGHT = 480;
+const double INTRINSIC[4] = { 327.53722,   222.40418,   533.18050,   531.56182 };
+//const double DISTORTION[2] = { 0.08577,   -0.22006 };
+const double DISTORTION[2] = { 0.0, 0.0};
+*/
+
 const unsigned CORRECTION_SIZE = 4;
-const double PIX_NOISE = .25;
+const double PIX_NOISE = 1.0;
 const double PIX_NOISE_SIMUFACTOR = 1.0;
 
 // lmk management
@@ -178,8 +196,8 @@ const unsigned PATCH_DESC = 45;
 
 // data manager: zncc matcher and one-point-ransac
 const unsigned PATCH_SIZE = 13; // in pixels
-const unsigned MAX_SEARCH_SIZE = 50000; // TODO: In which units???
-const unsigned KILL_SEARCH_SIZE = 100000;
+const unsigned MAX_SEARCH_SIZE = 50000; // in number of pixels
+const unsigned KILL_SEARCH_SIZE = 100000; // in number of pixels
 const double MATCH_TH = 0.90;
 const double MAHALANOBIS_TH = 3; // in n_sigmas
 const unsigned N_UPDATES_TOTAL = 25;
@@ -381,6 +399,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	//senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(IMG_WIDTH, IMG_HEIGHT);
 	senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, CORRECTION_SIZE);
+	//JFR_DEBUG("Correction params: " << senPtr11->params.correction);
 	senPtr11->params.setMiscellaneous(PIX_NOISE, D_MIN);
 
 	if (intOpts[iSimu] == 1)
@@ -545,7 +564,9 @@ JFR_DEBUG("                 FRAME : " << (*world)->t);
 				// move the filter time to the data raw.
 				robPtr->move(senPtr->getRaw()->timestamp);
 JFR_DEBUG("Robot state after move " << robPtr1->state.x());
-JFR_DEBUG("Robot state cov after move " << ublas::matrix_vector_range<jblas::sym_mat_indirect>(robPtr1->state.P(), ublas::range(0, robPtr1->state.P().size1()), ublas::range (0, robPtr1->state.P().size2())));
+JFR_DEBUG("Robot state stdev after move " << sqrt(ublas::matrix_vector_range<jblas::sym_mat_indirect>(robPtr1->state.P(), ublas::range(0, robPtr1->state.P().size1()), ublas::range (0, robPtr1->state.P().size2()))));
+
+
 robot_prediction = robPtr->state.x();
 
 				// foreach dataManager
@@ -566,7 +587,7 @@ n_innovation++;
 		if (had_data)
 		{
 JFR_DEBUG("Robot state after corrections " << robPtr1->state.x());
-JFR_DEBUG("Robot state cov after corrections " << ublas::matrix_vector_range<jblas::sym_mat_indirect>(robPtr1->state.P(), ublas::range(0, robPtr1->state.P().size1()), ublas::range (0, robPtr1->state.P().size2())));
+JFR_DEBUG("Robot state stdev after corrections " << sqrt(ublas::matrix_vector_range<jblas::sym_mat_indirect>(robPtr1->state.P(), ublas::range(0, robPtr1->state.P().size1()), ublas::range (0, robPtr1->state.P().size2()))));
 			if (robPtr1->dt_or_dx > max_dt) max_dt = robPtr1->dt_or_dx;
 
 			// Output info

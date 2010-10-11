@@ -166,7 +166,7 @@ namespace jafar {
 					JFR_ASSERT(x_ct.size() == size(), "Continuous-time values not yet initialized.");
 					x(x_ct * sqrt(_dt)); // perturbation is random => mean is linear with square root of time
 					P(P_ct * _dt); // perturbation is random => variance is linear with time
-//cout << "setting P: " << P() << " using P_ct: " << P_ct << " and dt " << _dt << endl;
+//JFR_DEBUG("setting P: " << P() << " using P_ct: " << P_ct << " and dt " << _dt);
 				}
 				/**
 				 * Discrete perturbation from continuous specifications.

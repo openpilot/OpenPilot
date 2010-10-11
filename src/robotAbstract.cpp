@@ -78,6 +78,9 @@ namespace jafar {
 
 		void RobotAbstract::computeStatePerturbation() {
 			Q = jmath::ublasExtra::prod_JPJt(perturbation.P(), XNEW_pert);
+//JFR_DEBUG("P " << perturbation.P());
+//JFR_DEBUG("XNEW_pert " << XNEW_pert);
+//JFR_DEBUG("Q " << Q);
 		}
 
 		void RobotAbstract::move(double time){
@@ -127,7 +130,7 @@ namespace jafar {
 						
 						if (next_time-prev_time < 1e-6) a = 0; else a = (after_time-prev_time)/(next_time-prev_time);
 						u_increment = a*next_u_increment;
-	// JFR_DEBUG("elementary move between " << std::setprecision(19) << cur_time << " and " << after_time << " (dt " << dt_or_dx << std::setprecision(6) << ") with command " << u << " between " << prev_u << " at " << std::setprecision(19) << prev_time << std::setprecision(6) << " (" << (1-a) << ") and " << next_u << " at " << std::setprecision(19) << next_time << std::setprecision(6) << " (" << a << ")");
+//JFR_DEBUG("elementary move between " << std::setprecision(19) << cur_time << " and " << after_time << " (dt " << dt_or_dx << std::setprecision(6) << ") with command " << u << " between " << prev_u << " at " << std::setprecision(19) << prev_time << std::setprecision(6) << " (" << (1-a) << ") and " << next_u << " at " << std::setprecision(19) << next_time << std::setprecision(6) << " (" << a << ")");
 						move(u);
 						
 						prev_time = cur_time = next_time;

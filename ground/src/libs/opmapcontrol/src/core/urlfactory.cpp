@@ -25,7 +25,7 @@
 * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 #include "urlfactory.h"
-
+#include <QRegExp>
  
 namespace core {
 
@@ -126,116 +126,49 @@ void UrlFactory::TryCorrectGoogleVersions()
             qDebug()<<"Try corrected version withou abort or error:"<<reply->errorString();
 #endif //DEBUG_URLFACTORY
             QString html=QString(reply->readAll());
-            // find it
-            // apiCallback(["http://mt0.google.com/vt/v\x3dw2.106\x26hl\x3dlt\x26","http://mt1.google.com/vt/v\x3dw2.106\x26hl\x3dlt\x26","http://mt2.google.com/vt/v\x3dw2.106\x26hl\x3dlt\x26","http://mt3.google.com/vt/v\x3dw2.106\x26hl\x3dlt\x26"],
-            // ["http://khm0.google.com/kh/v\x3d45\x26","http://khm1.google.com/kh/v\x3d45\x26","http://khm2.google.com/kh/v\x3d45\x26","http://khm3.google.com/kh/v\x3d45\x26"],
-            // ["http://mt0.google.com/vt/v\x3dw2t.106\x26hl\x3dlt\x26","http://mt1.google.com/vt/v\x3dw2t.106\x26hl\x3dlt\x26","http://mt2.google.com/vt/v\x3dw2t.106\x26hl\x3dlt\x26","http://mt3.google.com/vt/v\x3dw2t.106\x26hl\x3dlt\x26"],
-            // "","","",false,"G",opts,["http://mt0.google.com/vt/v\x3dw2p.106\x26hl\x3dlt\x26","http://mt1.google.com/vt/v\x3dw2p.106\x26hl\x3dlt\x26","http://mt2.google.com/vt/v\x3dw2p.106\x26hl\x3dlt\x26","http://mt3.google.com/vt/v\x3dw2p.106\x26hl\x3dlt\x26"],jslinker,pageArgs);
-
-            int id = html.lastIndexOf("apiCallback([");
-            if(id > 0)
+            QRegExp reg("\"*http://mt0.google.com/vt/lyrs=m@(\\d*)",Qt::CaseInsensitive);
+            if(reg.indexIn(html)!=-1)
             {
-                int idEnd = html.indexOf("jslinker,pageArgs", id);
-                if(idEnd > id)
-                {
-                    QString api = html.mid(id, idEnd - id);
-                    if(!(api.isNull()|api.isEmpty()))
-                    {
-                        int i = 0;
-                        QStringList opts = api.split("["); //"[\""
-                        QString opt;
-                        foreach( opt ,opts)
-                        {
-                            if(opt.contains("http://"))
-                            {
-                                int start = opt.indexOf("x3d");
-                                if(start > 0)
-                                {
-                                    int end = opt.indexOf("\\x26", start);
-                                    if(end > start)
-                                    {
-                                        start += 3;
-                                        QString u = opt.mid(start, end - start);
-
-                                        if(i == 0)
-                                        {
-                                            if(u.startsWith("m@"))
-                                            {
+                QStringList gc=reg.capturedTexts();
+                VersionGoogleMap = QString("m@%1").arg(gc[1]);
+                VersionGoogleMapChina = VersionGoogleMap;
 #ifdef DEBUG_URLFACTORY
-                                                qDebug()<<("TryCorrectGoogleVersions[map]: " + u);
+            qDebug()<<"TryCorrectGoogleVersions, VersionGoogleMap: "<<VersionGoogleMap;
 #endif //DEBUG_URLFACTORY
-                                                VersionGoogleMap = u;
-                                            }
-                                            else
-                                            {
-#ifdef DEBUG_URLFACTORY
-                                                qDebug()<<("TryCorrectGoogleVersions[map FAILED]: " + u);
-#endif //DEBUG_URLFACTORY
-                                            }
-                                        }
-                                        else
-                                            if(i == 1)
-                                            {
-                                            // 45
-                                            if(u[0].isDigit())
-                                            {
-#ifdef DEBUG_URLFACTORY
-                                                qDebug()<<("TryCorrectGoogleVersions[satelite]: " + u);
-#endif //DEBUG_URLFACTORY
-                                                VersionGoogleSatellite = u;
-                                            }
-                                            else
-                                            {
-#ifdef DEBUG_URLFACTORY
-                                                qDebug()<<("TryCorrectGoogleVersions[satelite FAILED]: " + u);
-#endif //DEBUG_URLFACTORY
-                                            }
-                                        }
-                                        else
-                                            if(i == 2)
-                                            {
-                                            if(u.startsWith("h@"))
-                                            {
-#ifdef DEBUG_URLFACTORY
-                                                qDebug()<<("TryCorrectGoogleVersions[labels]: " + u);
-#endif //DEBUG_URLFACTORY
-                                                VersionGoogleLabels = u;
-                                            }
-                                            else
-                                            {
-#ifdef DEBUG_URLFACTORY
-                                                qDebug()<<("TryCorrectGoogleVersions[labels FAILED]: " + u);
-#endif //DEBUG_URLFACTORY
-                                            }
-                                        }
-                                        else
-                                            if(i == 3)
-                                            {
-                                            // t@108,r@120
-                                            if(u.startsWith("t@"))
-                                            {
-#ifdef DEBUG_URLFACTORY
-                                                qDebug()<<("TryCorrectGoogleVersions[terrain]: " + u);
-#endif //DEBUG_URLFACTORY
-                                                VersionGoogleTerrain = u;
-                                                VersionGoogleTerrainChina = u;
-                                            }
-                                            else
-                                            {
-#ifdef DEBUG_URLFACTORY
-                                                qDebug()<<("TryCorrectGoogleVersions[terrain FAILED]: " + u);
-#endif //DEBUG_URLFACTORY
-                                            }
-                                            break;
-                                        }
-                                        i++;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
             }
+
+            reg=QRegExp("\"*http://mt0.google.com/vt/lyrs=h@(\\d*)",Qt::CaseInsensitive);
+            if(reg.indexIn(html)!=-1)
+            {
+                QStringList gc=reg.capturedTexts();
+                VersionGoogleLabels = QString("h@%1").arg(gc[1]);
+                VersionGoogleLabelsChina = VersionGoogleLabels;
+#ifdef DEBUG_URLFACTORY
+            qDebug()<<"TryCorrectGoogleVersions, VersionGoogleLabels: "<<VersionGoogleLabels;
+#endif //DEBUG_URLFACTORY
+            }
+            reg=QRegExp("\"*http://khm0.google.com/kh/v=(\\d*)",Qt::CaseInsensitive);
+            if(reg.indexIn(html)!=-1)
+            {
+                QStringList gc=reg.capturedTexts();
+                VersionGoogleSatellite = gc[1];
+                VersionGoogleSatelliteKorea = VersionGoogleSatellite;
+                VersionGoogleSatelliteChina = "s@" + VersionGoogleSatellite;
+#ifdef DEBUG_URLFACTORY
+            qDebug()<<"TryCorrectGoogleVersions, VersionGoogleSatellite: "<<VersionGoogleSatellite;
+#endif //DEBUG_URLFACTORY
+            }
+            reg=QRegExp("\"*http://mt0.google.com/vt/lyrs=t@(\\d*),r@(\\d*)",Qt::CaseInsensitive);
+            if(reg.indexIn(html)!=-1)
+            {
+                QStringList gc=reg.capturedTexts();
+                VersionGoogleTerrain = QString("t@%1,r@%2").arg(gc[1]).arg(gc[2]);
+                VersionGoogleTerrainChina = VersionGoogleTerrain;
+#ifdef DEBUG_URLFACTORY
+            qDebug()<<"TryCorrectGoogleVersions, VersionGoogleTerrain: "<<VersionGoogleTerrain;
+#endif //DEBUG_URLFACTORY
+            }
+
         }
         reply->deleteLater();
     }

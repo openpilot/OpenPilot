@@ -589,6 +589,9 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->multiMotor6->setEnabled(true);
         m_aircraft->multiMotor7->setEnabled(true);
         m_aircraft->multiMotor8->setEnabled(true);
+        m_aircraft->mrRollMixLevel->setValue(33);
+        m_aircraft->mrPitchMixLevel->setValue(33);
+        m_aircraft->mrYawMixLevel->setValue(12);
     }
 }
 

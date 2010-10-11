@@ -55,6 +55,7 @@ private:
         int mccDataRate;
         UAVObject::Metadata accInitialData;
         QList<QSlider*> outSliders;
+        QList<QSlider*> inSliders;
         QList<QSpinBox*> outMin;
         QList<QSpinBox*> outMax;
         QList<QCheckBox*> reversals;

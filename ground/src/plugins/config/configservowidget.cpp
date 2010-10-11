@@ -82,7 +82,14 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
             << m_config->ch5Rev
             << m_config->ch6Rev
             << m_config->ch7Rev;
-
+    inSliders << m_config->ch0Slider
+            << m_config->ch1Slider
+            << m_config->ch2Slider
+            << m_config->ch3Slider
+            << m_config->ch4Slider
+            << m_config->ch5Slider
+            << m_config->ch6Slider
+            << m_config->ch7Slider;
 
 
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
@@ -129,6 +136,25 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_config->ch6Output->addItem("None");
     m_config->ch7Output->addItem("None");
 
+    // And the flight mode settings:
+    field = obj->getField(QString("Pos1FlightMode"));
+    m_config->fmsModePos1->addItems(field->getOptions());
+    m_config->fmsModePos2->addItems(field->getOptions());
+    m_config->fmsModePos3->addItems(field->getOptions());
+    field = obj->getField(QString("Pos1StabilizationSettings"));
+    channelsList.clear();
+    channelsList.append(field->getOptions());
+    m_config->fmsSsPos1Roll->addItems(channelsList);
+    m_config->fmsSsPos1Pitch->addItems(channelsList);
+    m_config->fmsSsPos1Yaw->addItems(channelsList);
+    m_config->fmsSsPos2Roll->addItems(channelsList);
+    m_config->fmsSsPos2Pitch->addItems(channelsList);
+    m_config->fmsSsPos2Yaw->addItems(channelsList);
+    m_config->fmsSsPos3Roll->addItems(channelsList);
+    m_config->fmsSsPos3Pitch->addItems(channelsList);
+    m_config->fmsSsPos3Yaw->addItems(channelsList);
+
+
     obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
     fieldList = obj->getFields();
     foreach (UAVObjectField* field, fieldList) {
@@ -137,7 +163,7 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
             m_config->ch1Output->addItem(field->getName());
             m_config->ch2Output->addItem(field->getName());
             m_config->ch3Output->addItem(field->getName());
-            m_config->ch4Output->addItem(field->getName());
+           m_config->ch4Output->addItem(field->getName());
             m_config->ch5Output->addItem(field->getName());
             m_config->ch6Output->addItem(field->getName());
             m_config->ch7Output->addItem(field->getName());
@@ -160,6 +186,12 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_config->saveRCInputToSD, SIGNAL(clicked()), this, SLOT(saveRCInputObject()));
     connect(m_config->saveRCInputToRAM, SIGNAL(clicked()), this, SLOT(sendRCInputUpdate()));
     connect(m_config->getRCInputCurrent, SIGNAL(clicked()), this, SLOT(requestRCInputUpdate()));
+
+       // Flightmode panel is connected to the same as rcinput because
+    // the underlying object is the same!
+    connect(m_config->saveFmsToSD, SIGNAL(clicked()), this, SLOT(saveRCInputObject()));
+    connect(m_config->saveFmsToRAM, SIGNAL(clicked()), this, SLOT(sendRCInputUpdate()));
+    connect(m_config->getFmsCurrent, SIGNAL(clicked()), this, SLOT(requestRCInputUpdate()));
 
     connect(m_config->saveRCOutputToSD, SIGNAL(clicked()), this, SLOT(saveRCOutputObject()));
     connect(m_config->saveRCOutputToRAM, SIGNAL(clicked()), this, SLOT(sendRCOutputUpdate()));
@@ -197,17 +229,8 @@ void ConfigServoWidget::sendChannelTest(int value)
     if (!m_config->channelOutTest->isChecked())
         return;
 
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
 
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorCommand")));
-
-/*
-    QStringList channelsList;
-    channelsList << "ch0OutSlider" << "ch1OutSlider" << "ch2OutSlider" << "ch3OutSlider" << "ch4OutSlider"
-            << "ch5OutSlider" << "ch6OutSlider" << "ch7OutSlider";
-    int idx = channelsList.indexOf(QRegExp(ob->objectName()));
-    */
     UAVObjectField * channel = obj->getField("Channel");
     channel->setValue(value,index);
     obj->updated();
@@ -485,10 +508,6 @@ void ConfigServoWidget::reverseChannel(bool state)
 }
 
 
-
-
-
-
 /********************************
   *  Input settings
   *******************************/
@@ -498,9 +517,7 @@ void ConfigServoWidget::reverseChannel(bool state)
   */
 void ConfigServoWidget::requestRCInputUpdate()
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ManualControlSettings")));
     Q_ASSERT(obj);
     obj->requestUpdate();
 
@@ -569,7 +586,6 @@ void ConfigServoWidget::requestRCInputUpdate()
     m_config->ch6Assign->setCurrentIndex(0);
     m_config->ch7Assign->setCurrentIndex(0);
 
-
     // Update all channels assignements
     QList<UAVObjectField*> fieldList = obj->getFields();
     foreach (UAVObjectField* field, fieldList) {
@@ -577,6 +593,35 @@ void ConfigServoWidget::requestRCInputUpdate()
             assignChannel(obj, field, field->getName());
         }
     }
+
+    // Update all the flight mode settingsin the relevant tab
+    field = obj->getField(QString("Pos1FlightMode"));
+    m_config->fmsModePos1->setCurrentIndex((m_config->fmsModePos1->findText(field->getValue().toString())));
+    field = obj->getField(QString("Pos2FlightMode"));
+    m_config->fmsModePos2->setCurrentIndex((m_config->fmsModePos2->findText(field->getValue().toString())));
+    field = obj->getField(QString("Pos3FlightMode"));
+    m_config->fmsModePos3->setCurrentIndex((m_config->fmsModePos3->findText(field->getValue().toString())));
+    field = obj->getField(QString("Pos1StabilizationSettings"));
+    m_config->fmsSsPos1Roll->setCurrentIndex(m_config->fmsSsPos1Roll->findText(
+            field->getValue(field->getElementNames().indexOf("Roll")).toString()));
+    m_config->fmsSsPos1Pitch->setCurrentIndex(m_config->fmsSsPos1Pitch->findText(
+            field->getValue(field->getElementNames().indexOf("Pitch")).toString()));
+    m_config->fmsSsPos1Yaw->setCurrentIndex(m_config->fmsSsPos1Yaw->findText(
+            field->getValue(field->getElementNames().indexOf("Yaw")).toString()));
+    field = obj->getField(QString("Pos2StabilizationSettings"));
+    m_config->fmsSsPos2Roll->setCurrentIndex(m_config->fmsSsPos2Roll->findText(
+            field->getValue(field->getElementNames().indexOf("Roll")).toString()));
+    m_config->fmsSsPos2Pitch->setCurrentIndex(m_config->fmsSsPos2Pitch->findText(
+            field->getValue(field->getElementNames().indexOf("Pitch")).toString()));
+    m_config->fmsSsPos2Yaw->setCurrentIndex(m_config->fmsSsPos2Yaw->findText(
+            field->getValue(field->getElementNames().indexOf("Yaw")).toString()));
+    field = obj->getField(QString("Pos3StabilizationSettings"));
+    m_config->fmsSsPos3Roll->setCurrentIndex(m_config->fmsSsPos3Roll->findText(
+            field->getValue(field->getElementNames().indexOf("Roll")).toString()));
+    m_config->fmsSsPos3Pitch->setCurrentIndex(m_config->fmsSsPos3Pitch->findText(
+            field->getValue(field->getElementNames().indexOf("Pitch")).toString()));
+    m_config->fmsSsPos3Yaw->setCurrentIndex(m_config->fmsSsPos3Yaw->findText(
+            field->getValue(field->getElementNames().indexOf("Yaw")).toString()));
 
 }
 
@@ -634,11 +679,11 @@ void ConfigServoWidget::sendRCInputUpdate()
     // will get the setting.
 
     // First, reset all channel assignements:
-    QStringList channelsList;
-    channelsList << "Roll" << "Pitch" << "Yaw" << "Throttle" << "FlightMode";
-    foreach (QString channel, channelsList) {
-        field = obj->getField(channel);
-        field->setValue(field->getOptions().last());
+    QList<UAVObjectField*> fieldList = obj->getFields();
+    foreach (UAVObjectField* field, fieldList) {
+        if (field->getUnits().contains("channel")) {
+            field->setValue(field->getOptions().last());
+        }
     }
 
     // Then assign according to current GUI state:
@@ -674,6 +719,27 @@ void ConfigServoWidget::sendRCInputUpdate()
         field = obj->getField(m_config->ch7Assign->currentText());
         field->setValue(field->getOptions().at(7));
     }
+
+    // Send all the flight mode settings
+    field = obj->getField(QString("Pos1FlightMode"));
+    field->setValue(m_config->fmsModePos1->currentText());
+    field = obj->getField(QString("Pos2FlightMode"));
+    field->setValue(m_config->fmsModePos2->currentText());
+    field = obj->getField(QString("Pos3FlightMode"));
+    field->setValue(m_config->fmsModePos3->currentText());
+
+    field = obj->getField(QString("Pos1StabilizationSettings"));
+    field->setValue(m_config->fmsSsPos1Roll->currentText(), field->getElementNames().indexOf("Roll"));
+    field->setValue(m_config->fmsSsPos1Pitch->currentText(), field->getElementNames().indexOf("Pitch"));
+    field->setValue(m_config->fmsSsPos1Yaw->currentText(), field->getElementNames().indexOf("Yaw"));
+    field = obj->getField(QString("Pos2StabilizationSettings"));
+    field->setValue(m_config->fmsSsPos2Roll->currentText(), field->getElementNames().indexOf("Roll"));
+    field->setValue(m_config->fmsSsPos2Pitch->currentText(), field->getElementNames().indexOf("Pitch"));
+    field->setValue(m_config->fmsSsPos2Yaw->currentText(), field->getElementNames().indexOf("Yaw"));
+    field = obj->getField(QString("Pos3StabilizationSettings"));
+    field->setValue(m_config->fmsSsPos3Roll->currentText(), field->getElementNames().indexOf("Roll"));
+    field->setValue(m_config->fmsSsPos3Pitch->currentText(), field->getElementNames().indexOf("Pitch"));
+    field->setValue(m_config->fmsSsPos3Yaw->currentText(), field->getElementNames().indexOf("Yaw"));
 
     // ... and send to the OP Board
     obj->updated();
@@ -838,6 +904,21 @@ void ConfigServoWidget::updateChannels(UAVObject* controlCommand)
         }
         firstUpdate = true;
     }
+    //Update the Flight mode channel slider
+    UAVObject* obj = getObjectManager()->getObject("ManualControlSettings");
+    // Find the channel currently assigned to flightmode
+    field = obj->getField("FlightMode");
+    int chIndex = field->getOptions().indexOf(field->getValue().toString());
+    if ( chIndex < field->getOptions().length()) {
+        int chMin = inSliders.at(chIndex)->minimum();
+        int chMax = inSliders.at(chIndex)->maximum();
+        if ((chMax-chMin) > 0) {
+            int val = controlCommand->getField("Channel")->getValue(chIndex).toInt();
+            int chCur = (val-chMin)*100/(chMax-chMin);
+            m_config->fmsSlider->setValue(chCur);
+        }
+    }
+
 }
 
 

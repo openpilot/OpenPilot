@@ -17,6 +17,8 @@
 #include "boost/shared_ptr.hpp"
 #include "rtslam/robotAbstract.hpp"
 
+//#define AVGSPEED
+
 namespace jafar {
 	namespace rtslam {
 		using namespace std;
@@ -37,21 +39,25 @@ namespace jafar {
 		 * 		- x+ = move_func(x,u)  -- which is implemented with internal variables, see move_func().
 		 *
 		 * with \a u=control.x() the control vector
-		 * 		- u = [am, wm, ar, wr]
+		 * 		- u = [am, wm, abi, wbi]
 		 *
 		 * stacking:
 		 * - \a am: the acceleration measurements, with noise
 		 * - \a wm: the gyrometer measurements, with noise
-		 * - \a ar: the accelerometer bias random walk noise
-		 * - \a wr: the gyrometer bias random walk noise
+		 * - \a abi: the accelerometer bias random walk noise (impulse)
+		 * - \a wbi: the gyrometer bias random walk noise (impulse)
 		 *
 		 * The motion model equation x+ = f(x,u) is decomposed as:
+		 * #ifdef AVGSPEED
 		 * - p+  = p + (v + v+)/2*dt
-		 * - v+  = v + (R(q)*(am - ab) + g)*dt <-- am and wm: IMU measurements
-		 * - q+  = q**((wm - wb)*dt)           <-- ** : quaternion product
-		 * - ab+ = ab + ar                     <-- ar : random walk in acc bias with ar perturbation
-		 * - wb+ = wb + wr                     <-- wr : random walk of gyro bias with wr perturbation
-		 * - g+  = g                           <-- g  : gravity vector, constant but unknown
+		 * #else
+		 * - p+  = p + v*dt
+		 * #endif
+		 * - q+  = q**((wm - wb)*dt + ti)           <-- ** : quaternion product
+		 * - v+  = v + (R(q)*(am - ab) + g)*dt + vi <-- am and wm: IMU measurements
+		 * - ab+ = ab + abi                         <-- abi : random walk in acc bias with abi impulse perturbation
+		 * - wb+ = wb + wbi                         <-- wbi : random walk of gyro bias with wbi impulse perturbation
+		 * - g+  = g                                <-- g  : gravity vector, constant but unknown
 		 *
 		 * \sa See the extense comments on move_func() in file robotInertial.cpp for algebraic details.
 		 */
@@ -80,13 +86,17 @@ namespace jafar {
 				 *
 				 * - The state vector, x = [p q v ab wb g] , of size 19.
 				 *
-				 * - The transition equation x+ = move(x,u), with u = [am, wm, ar, wr] the control impulse, is decomposed as:
+				 * - The transition equation x+ = move(x,u), with u = [vi, ti, abi, wbi] the control impulse, is decomposed as:
+				 * #ifdef AVGSPEED
 				 * - p+  = p + (v + v+)/2*dt
-				 * - v+  = v + (R(q)*(am - ab) + g)*dt <-- am and wm: IMU measurements
-				 * - q+  = q**((wm - wb)*dt)           <-- ** : quaternion product
-				 * - ab+ = ab + ar                     <-- ar : random walk in acc bias with ar perturbation
-				 * - wb+ = wb + wr                     <-- wr : random walk of gyro bias with wr perturbation
-				 * - g+  = g                           <-- g  : gravity vector, constant but unknown
+				 * #else
+				 * - p+  = p + v*dt
+				 * #endif
+				 * - q+  = q**((wm - wb)*dt + ti)           <-- ** : quaternion product
+				 * - v+  = v + (R(q)*(am - ab) + g)*dt + vi <-- am and wm: IMU measurements
+				 * - ab+ = ab + abi                         <-- abi : random walk in acc bias with abi impulse perturbation
+				 * - wb+ = wb + wbi                         <-- wbi : random walk of gyro bias with wbi impulse perturbation
+				 * - g+  = g                                <-- g  : gravity vector, constant but unknown
 				 *
 				 * \sa See the extense comments on move_func() in file robotInertial.cpp for algebraic details.
 				 */

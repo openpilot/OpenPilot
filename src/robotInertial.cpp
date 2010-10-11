@@ -49,14 +49,18 @@ namespace jafar {
 		 * - x+ = move_func(x,u,n),
 		 *
 		 * with u = [am, wm] the IMU measurements (the control input)
-		 *  and n = [an, wn, ar, wr] the perturbation impulse.
+		 *  and n = [vi, ti, abi, wbi] the perturbation impulse.
 		 *
 		 * the transition equation f() is decomposed as:
+		 * #ifdef AVGSPEED
 		 * - p+  = p + (v + v+)/2*dt
-		 * - v+  = v + (R(q)*(am - ab) + g)*dt + vi <-- am and wm: IMU measurements
-		 * - q+  = q**((wm - wb)*dt + wi)           <-- ** : quaternion product
-		 * - ab+ = ab + ar                          <-- ar : random walk in acc bias with ar perturbation
-		 * - wb+ = wb + wr                          <-- wr : random walk of gyro bias with wr perturbation
+		 * #else
+		 * - p+  = p + v*dt
+		 * #endif
+		 * - q+  = q**((wm - wb)*dt + ti)           <-- ** : quaternion product ; ti : theta impulse
+		 * - v+  = v + (R(q)*(am - ab) + g)*dt + vi <-- am and wm: IMU measurements ; vi : v impulse
+		 * - ab+ = ab + abi                         <-- abi : random walk in acc bias with abi impulse perturbation
+		 * - wb+ = wb + wbi                         <-- wbi : random walk of gyro bias with wbi impulse perturbation
 		 * - g+  = g                                <-- g  : gravity vector, constant but unknown
 		 * -----------------------------------------------------------------------------
 		 *
@@ -64,7 +68,11 @@ namespace jafar {
 		 *   var    |  p       q        v        ab       wb       g
 		 *      pos |  0       3        7        10       13       16
 		 *   -------+----------------------------------------------------
+		 * #ifdef AVGSPEED
 		 *   p   0  |  I  VNEW_q*dt/2  I*dt -R*dt*dt/2    0     I*dt*dt/2
+		 * #else
+		 *   p   0  |  I       0       I*dt      0        0        0
+		 * #endif
 		 *   q   3  |  0     QNEW_q     0        0      QNEW_wb    0
 		 *   v   7  |  0     VNEW_q     I      -R*dt      0       I*dt
 		 *   ab  10 |  0       0        0        I        0        0
@@ -73,11 +81,15 @@ namespace jafar {
 		 * -----------------------------------------------------------------------------
 		 *
 		 * The Jacobian XNEW_pert is built with
-		 *   var    |  an    wn    ar    wr
+		 *   var    |  vi    ti   abi  wbi
 		 *      pos |  0     3     6     9
 		 *   -------+----------------------
+		 * #ifdef AVGSPEED
+		 *   p   0  |I.dt/2  0     0     0
+		 * #else
 		 *   p   0  |  0     0     0     0
-		 *   q   3  |  0  QNEW_wn  0     0
+		 * #endif
+		 *   q   3  |  0  QNEW_ti  0     0
 		 *   v   7  |  I     0     0     0
 		 *   ab  10 |  0     0     I     0
 		 *   wb  13 |  0     0     0     I
@@ -86,7 +98,6 @@ namespace jafar {
 		 */
 		void RobotInertial::move_func(const vec & _x, const vec & _u, const vec & _n, double _dt, vec & _xnew, mat & _XNEW_x,
 		    mat & _XNEW_pert) {
-
 
 			// Separate things out to make it clearer
 			vec3 p, v, ab, wb, g;
@@ -100,19 +111,16 @@ namespace jafar {
 			splitControl(_u, am, wm);
 			splitPert(_n, an, wn, ar, wr);
 
-
 			// It is useful to start obtaining a nice rotation matrix and the product R*dt
 			Rold = q2R(q);
 			Rdt = Rold * _dt;
-
 
 			// Invert sensor functions. Get true acc. and ang. rates
 			// a = R(q)(asens - ab) + g     true acceleration
 			// w = wsens - wb               true angular rate
 			vec3 atrue, wtrue;
-			atrue = prod(Rold, (am - ab + an)) + g;
+			atrue = prod(Rold, (am - ab + an)) + g; // could have done rotate(q, instead of prod(Rold, ; jac/q is Rold...
 			wtrue = wm - wb + wn;
-
 
 			// Get new state vector
 			vec3 pnew, vnew, abnew, wbnew, gnew;
@@ -123,7 +131,11 @@ namespace jafar {
 			vec4 qwdt = v2q(wtrue * _dt);
 			qnew = qProd(q, qwdt); //    orientation
 			vnew = v + atrue * _dt; //    velocity
+			#ifdef AVGSPEED
 			pnew = p + (v+vnew)/2 * _dt; //     position
+			#else
+			pnew = p + v * _dt; //     position
+			#endif
 			abnew = ab + ar; //          acc bias
 			wbnew = wb + wr; //          gyro bias
 			gnew = g; //                 gravity does not change
@@ -131,8 +143,6 @@ namespace jafar {
 			// normalize quaternion
 			ublasExtra::normalizeJac(qnew, QNORM_qnew);
 			ublasExtra::normalize(qnew);
-
-
 
 			// Put it all together - this is the output state
 			unsplitState(pnew, qnew, vnew, abnew, wbnew, gnew, _xnew);
@@ -143,7 +153,11 @@ namespace jafar {
 			// var    |  p       q        v        ab       wb       g
 			//    pos |  0       3        7        10       13       16
 			// -------+----------------------------------------------------
+			//#ifdef AVGSPEED
 			// p   0  |  I  VNEW_q*dt/2  I*dt -R*dt*dt/2    0     I*dt*dt/2
+			//#else
+			// p   0  |  I       0       I*dt      0        0        0
+			//#endif
 			// q   3  |  0     QNEW_q     0        0      QNEW_wb    0
 			// v   7  |  0     VNEW_q     I      -R*dt      0       I*dt
 			// ab  10 |  0       0        0        I        0        0
@@ -152,20 +166,19 @@ namespace jafar {
 
 			_XNEW_x.assign(identity_mat(state.size()));
 
-
 			// Fill in XNEW_v: VNEW_g and PNEW_v = I * dt
 			identity_mat I(3);
 			Idt = I * _dt;
 			subrange(_XNEW_x, 0, 3, 7, 10) = Idt;
+			#ifdef AVGSPEED
 			subrange(_XNEW_x, 0, 3, 16, 19) = Idt*_dt/2;
+			#endif
 			subrange(_XNEW_x, 7, 10, 16, 19) = Idt;
-
 
 			// Fill in QNEW_q
 			// qnew = qold ** qwdt  ( qnew = q1 ** q2 = qProd(q1, q2) in rtslam/quatTools.hpp )
 			qProd_by_dq1(qwdt, QNEW_q);
 			subrange(_XNEW_x, 3, 7, 3, 7) = prod(QNORM_qnew, QNEW_q);
-
 
 			// Fill in QNEW_wb
 			// QNEW_wb = QNEW_qwdt * QWDT_wdt * WDT_w * W_wb
@@ -173,32 +186,39 @@ namespace jafar {
 			//         = QNEW_qwdt * QWDT_w * (-1)
 			qProd_by_dq2(q, QNEW_qwdt);
 			// Here we get the derivative of qwdt wrt wtrue, so we consider dt = 1 and call for the derivative of v2q() with v = w*dt
-			v2q_by_dv(wtrue, QWDT_w);
+//			v2q_by_dv(wtrue, QWDT_w);
+			v2q_by_dv(wtrue*_dt, QWDT_w); QWDT_w *= _dt;
 			QNEW_w = prod ( QNEW_qwdt, QWDT_w);
 			subrange(_XNEW_x, 3, 7, 13, 16) = -prod(QNORM_qnew,QNEW_w);
-
 
 			// Fill VNEW_q
 			// VNEW_q = d(R(q)*v) / dq
 			rotate_by_dq(q, v, VNEW_q);
 			subrange(_XNEW_x, 7, 10, 3, 7) = VNEW_q;
+			#ifdef AVGSPEED
 			subrange(_XNEW_x, 0, 3, 3, 7) = VNEW_q*_dt/2;
-
+			#endif
 
 			// Fill in VNEW_ab
 			subrange(_XNEW_x, 7, 10, 10, 13) = -Rdt;
+			#ifdef AVGSPEED
 			subrange(_XNEW_x, 0, 3, 10, 13) = -Rdt*_dt/2;
+			#endif
 
 
 			// Now on to the perturbation Jacobian XNEW_pert
 
 			// Form of Jacobian XNEW_pert
 			// It is like this:
-			// var    |  an    wn    ar    wr
+			// var    |  vi    ti    abi    wbi
 			//    pos |  0     3     6     9
 			// -------+----------------------
-			// r   0  |  0     0     0     0
-			// q   3  |  0   QNEW_wn 0     0
+			//#ifdef AVGSPEED
+			// p   0  |I.dt/2  0     0     0
+			//#else
+			// p   0  |  0     0     0     0
+			//#endif
+			// q   3  |  0   QNEW_ti 0     0
 			// v   7  |  I     0     0     0
 			// ab  10 |  0     0     I     0
 			// wb  13 |  0     0     0     I
@@ -206,20 +226,21 @@ namespace jafar {
 
 			// Fill in the easy bits first
 			_XNEW_pert.clear();
+			#ifdef AVGSPEED
+			ublas::subrange(_XNEW_pert, 0, 3, 0, 3) = Idt/2;
+			#endif
 			ublas::subrange(_XNEW_pert, 7, 10, 0, 3) = I;
 			ublas::subrange(_XNEW_pert, 10, 13, 6, 9) = I;
 			ublas::subrange(_XNEW_pert, 13, 16, 9, 12) = I;
 
-
-			// Tricky bit is QNEW_w = d(qnew)/d(wi)
-			// Here, wi is the integral of the perturbation, wi = integral_tau=0^dt (wn(t) * dtau),
+			// Tricky bit is QNEW_ti = d(qnew)/d(ti)
+			// Here, ti is the integral of the perturbation, ti = integral_{tau=0}^dt (wn(t) * dtau),
 			// with: wn: the angular rate measurement noise
 			//       dt: the integration period
-			//       wi: the resulting angular impulse
-			// We have: QNEW_wi = QNEW_qwdt * QWDT_wi
-			//                  = QNEW_qwdt * QWDT_wdt // Hey! wdt is the integral when w is deterministic. The jacobians *_wdt and *_wi are the same!!!
-			//                  = QNEW_w * W_wdt
-			//                  = QNEW_w / dt,
+			//       ti: the resulting angular impulse
+			// The integral of the dynamic equation is:
+			// q+ = q ** v2q((wm - wb)*dt + ti)
+			// We have: QNEW_ti = QNEW_w / dt
 			//    with: QNEW_w computed before.
 			// The time dependence needs to be included in perturbation.P(), proportional to perturbation.dt:
 			//   U = perturbation.P() = U_continuous_time * dt
@@ -227,7 +248,6 @@ namespace jafar {
 			//   (Use perturbation.set_P_from_continuous() helper if necessary.)
 			//
 			subrange(_XNEW_pert, 3, 7, 3, 6) = prod (QNORM_qnew, QNEW_w) * (1 / _dt);
-
 		}
 
 		void RobotInertial::init_func(const vec & _x, const vec & _u, vec & _xnew) {

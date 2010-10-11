@@ -85,10 +85,16 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     QStringList channels;
     channels << "Channel0" << "Channel1" << "Channel2" <<
             "Channel3" << "Channel4" << "Channel5" << "Channel6" << "Channel7" << "None" ;
+    m_ccpm->ccpmEngineChannel->addItems(channels);
+    m_ccpm->ccpmTailChannel->addItems(channels);
+    m_ccpm->ccpmServoWChannel->addItems(channels);
+    m_ccpm->ccpmServoXChannel->addItems(channels);
+    m_ccpm->ccpmServoYChannel->addItems(channels);
+    m_ccpm->ccpmServoZChannel->addItems(channels);
 
-    m_ccpm->ccpmThrottle->addItems(channels);
-    m_ccpm->ccpmTailRotor->addItems(channels);
-
+    QStringList Types;
+    Types << "CCPM 90º" << "CCPM 120º" << "CCPM 140º" ;
+    m_ccpm->ccpmType->addItems(Types);
 
     requestccpmUpdate();
     UpdateCurveSettings();

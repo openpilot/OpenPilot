@@ -160,7 +160,7 @@ ManualControlSettings::ManualControlSettings(): UAVDataObject(OBJID, ISSINGLEINS
     QStringList Pos1StabilizationSettingsEnumOptions;
     Pos1StabilizationSettingsEnumOptions.append("None");
     Pos1StabilizationSettingsEnumOptions.append("Rate");
-    Pos1StabilizationSettingsEnumOptions.append("Position");
+    Pos1StabilizationSettingsEnumOptions.append("Attitude");
     fields.append( new UAVObjectField(QString("Pos1StabilizationSettings"), QString(""), UAVObjectField::ENUM, Pos1StabilizationSettingsElemNames, Pos1StabilizationSettingsEnumOptions) );
     QStringList Pos2StabilizationSettingsElemNames;
     Pos2StabilizationSettingsElemNames.append("Roll");
@@ -169,7 +169,7 @@ ManualControlSettings::ManualControlSettings(): UAVDataObject(OBJID, ISSINGLEINS
     QStringList Pos2StabilizationSettingsEnumOptions;
     Pos2StabilizationSettingsEnumOptions.append("None");
     Pos2StabilizationSettingsEnumOptions.append("Rate");
-    Pos2StabilizationSettingsEnumOptions.append("Position");
+    Pos2StabilizationSettingsEnumOptions.append("Attitude");
     fields.append( new UAVObjectField(QString("Pos2StabilizationSettings"), QString(""), UAVObjectField::ENUM, Pos2StabilizationSettingsElemNames, Pos2StabilizationSettingsEnumOptions) );
     QStringList Pos3StabilizationSettingsElemNames;
     Pos3StabilizationSettingsElemNames.append("Roll");
@@ -178,7 +178,7 @@ ManualControlSettings::ManualControlSettings(): UAVDataObject(OBJID, ISSINGLEINS
     QStringList Pos3StabilizationSettingsEnumOptions;
     Pos3StabilizationSettingsEnumOptions.append("None");
     Pos3StabilizationSettingsEnumOptions.append("Rate");
-    Pos3StabilizationSettingsEnumOptions.append("Position");
+    Pos3StabilizationSettingsEnumOptions.append("Attitude");
     fields.append( new UAVObjectField(QString("Pos3StabilizationSettings"), QString(""), UAVObjectField::ENUM, Pos3StabilizationSettingsElemNames, Pos3StabilizationSettingsEnumOptions) );
     QStringList Pos1FlightModeElemNames;
     Pos1FlightModeElemNames.append("0");

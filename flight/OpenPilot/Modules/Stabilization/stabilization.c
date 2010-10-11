@@ -120,7 +120,7 @@ static void stabilizationTask(void* parameters)
 	ManualControlCommandData manualControl;
 
 	SettingsUpdatedCb((UAVObjEvent *) NULL);
-	
+
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	ZeroPids();
@@ -142,7 +142,7 @@ static void stabilizationTask(void* parameters)
 		AttitudeActualGet(&attitudeActual);
 		AttitudeRawGet(&attitudeRaw);
 		SystemSettingsGet(&systemSettings);
-		
+
 
 		float *manualAxis = &manualControl.Roll;
 		float *attitudeDesiredAxis = &attitudeDesired.Roll;
@@ -159,7 +159,7 @@ static void stabilizationTask(void* parameters)
 				rates[ct] = manualAxis[ct] * settings.ManualRate[ct];
 				break;
 
-			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_POSITION:
+			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE:
 				rates[ct] = ApplyPid(&pids[PID_ROLL + ct],  attitudeDesiredAxis[ct],  attitudeActualAxis[ct], 1);
 				break;
 			}
@@ -184,7 +184,7 @@ static void stabilizationTask(void* parameters)
 			switch(manualControl.StabilizationSettings[ct])
 			{
 			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE:
-			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_POSITION:
+			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE:
 				{
 					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rates[ct],  attitudeRaw.gyros_filtered[ct], 0);
 					actuatorDesiredAxis[ct] = bound(command);
@@ -193,10 +193,10 @@ static void stabilizationTask(void* parameters)
 				}
 			}
 		}
-		
+
 		// Save dT
 		actuatorDesired.UpdateTime = dT * 1000;
-		
+
 		if(manualControl.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL)
 		{
 			shouldUpdate = 0;

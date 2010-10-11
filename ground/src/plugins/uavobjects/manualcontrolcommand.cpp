@@ -80,7 +80,7 @@ ManualControlCommand::ManualControlCommand(): UAVDataObject(OBJID, ISSINGLEINST,
     QStringList StabilizationSettingsEnumOptions;
     StabilizationSettingsEnumOptions.append("None");
     StabilizationSettingsEnumOptions.append("Rate");
-    StabilizationSettingsEnumOptions.append("Position");
+    StabilizationSettingsEnumOptions.append("Attitude");
     fields.append( new UAVObjectField(QString("StabilizationSettings"), QString(""), UAVObjectField::ENUM, StabilizationSettingsElemNames, StabilizationSettingsEnumOptions) );
     QStringList Accessory1ElemNames;
     Accessory1ElemNames.append("0");

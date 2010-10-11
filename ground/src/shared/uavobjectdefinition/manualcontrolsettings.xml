@@ -10,9 +10,9 @@
         <field name="Accessory1" units="channel" type="enum" elements="1" options="Channel0,Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,None" defaultvalue="None"/>
         <field name="Accessory2" units="channel" type="enum" elements="1" options="Channel0,Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,None" defaultvalue="None"/>
         <field name="Accessory3" units="channel" type="enum" elements="1" options="Channel0,Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,None" defaultvalue="None"/>
-        <field name="Pos1StabilizationSettings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Position" defaultvalue="Position"/>
-        <field name="Pos2StabilizationSettings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Position" defaultvalue="Position"/>
-        <field name="Pos3StabilizationSettings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Position" defaultvalue="Position"/>
+        <field name="Pos1StabilizationSettings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Attitude" defaultvalue="Attitude"/>
+        <field name="Pos2StabilizationSettings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Attitude" defaultvalue="Attitude"/>
+        <field name="Pos3StabilizationSettings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Attitude" defaultvalue="Attitude"/>
         <field name="Pos1FlightMode" units="" type="enum" elements="1" options="Manual,Stabilized,Auto" defaultvalue="Manual"/>
         <field name="Pos2FlightMode" units="" type="enum" elements="1" options="Manual,Stabilized,Auto" defaultvalue="Stabilized"/>
         <field name="Pos3FlightMode" units="" type="enum" elements="1" options="Manual,Stabilized,Auto" defaultvalue="Auto"/>

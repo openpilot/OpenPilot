@@ -175,8 +175,8 @@ static void manualControlTask(void *parameters)
 						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE;
 					else if(settings.Pos1StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_RATE)
 						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE;
-					else if(settings.Pos1StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_POSITION)
-						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_POSITION;
+					else if(settings.Pos1StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_ATTITUDE)
+						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE;
 				}
 				if(settings.Pos1FlightMode == MANUALCONTROLSETTINGS_POS1FLIGHTMODE_MANUAL)
 					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL;
@@ -190,8 +190,8 @@ static void manualControlTask(void *parameters)
 						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE;
 					else if(settings.Pos3StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_RATE)
 						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE;
-					else if(settings.Pos3StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_POSITION)
-						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_POSITION;
+					else if(settings.Pos3StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_ATTITUDE)
+						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE;
 				}
 				if(settings.Pos3FlightMode == MANUALCONTROLSETTINGS_POS3FLIGHTMODE_MANUAL)
 					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL;
@@ -205,8 +205,8 @@ static void manualControlTask(void *parameters)
 						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE;
 					else if(settings.Pos2StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_RATE)
 						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE;
-					else if(settings.Pos2StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_POSITION)
-						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_POSITION;
+					else if(settings.Pos2StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_ATTITUDE)
+						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE;
 				}
 				if(settings.Pos2FlightMode == MANUALCONTROLSETTINGS_POS2FLIGHTMODE_MANUAL)
 					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL;
@@ -295,7 +295,7 @@ static void manualControlTask(void *parameters)
 			attitudeSettings.PitchBias = cmd.Accessory1 * 15;
 			attitudeSettings.RollBias = cmd.Accessory2 * 15;
 			AHRSSettingsSet(&attitudeSettings);
-		} 
+		}
 	}
 }
 

@@ -126,7 +126,7 @@ _fields = [ \
 		{
 			'0' : 'None',
 			'1' : 'Rate',
-			'2' : 'Position',
+			'2' : 'Attitude',
 		}
 	),
 	uavobject.UAVObjectField(

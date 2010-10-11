@@ -94,21 +94,21 @@ public:
     typedef enum { ACCESSORY3_CHANNEL0=0, ACCESSORY3_CHANNEL1=1, ACCESSORY3_CHANNEL2=2, ACCESSORY3_CHANNEL3=3, ACCESSORY3_CHANNEL4=4, ACCESSORY3_CHANNEL5=5, ACCESSORY3_CHANNEL6=6, ACCESSORY3_CHANNEL7=7, ACCESSORY3_NONE=8 } Accessory3Options;
     // Field Pos1StabilizationSettings information
     /* Enumeration options for field Pos1StabilizationSettings */
-    typedef enum { POS1STABILIZATIONSETTINGS_NONE=0, POS1STABILIZATIONSETTINGS_RATE=1, POS1STABILIZATIONSETTINGS_POSITION=2 } Pos1StabilizationSettingsOptions;
+    typedef enum { POS1STABILIZATIONSETTINGS_NONE=0, POS1STABILIZATIONSETTINGS_RATE=1, POS1STABILIZATIONSETTINGS_ATTITUDE=2 } Pos1StabilizationSettingsOptions;
     /* Array element names for field Pos1StabilizationSettings */
     typedef enum { POS1STABILIZATIONSETTINGS_ROLL=0, POS1STABILIZATIONSETTINGS_PITCH=1, POS1STABILIZATIONSETTINGS_YAW=2 } Pos1StabilizationSettingsElem;
     /* Number of elements for field Pos1StabilizationSettings */
     static const quint32 POS1STABILIZATIONSETTINGS_NUMELEM = 3;
     // Field Pos2StabilizationSettings information
     /* Enumeration options for field Pos2StabilizationSettings */
-    typedef enum { POS2STABILIZATIONSETTINGS_NONE=0, POS2STABILIZATIONSETTINGS_RATE=1, POS2STABILIZATIONSETTINGS_POSITION=2 } Pos2StabilizationSettingsOptions;
+    typedef enum { POS2STABILIZATIONSETTINGS_NONE=0, POS2STABILIZATIONSETTINGS_RATE=1, POS2STABILIZATIONSETTINGS_ATTITUDE=2 } Pos2StabilizationSettingsOptions;
     /* Array element names for field Pos2StabilizationSettings */
     typedef enum { POS2STABILIZATIONSETTINGS_ROLL=0, POS2STABILIZATIONSETTINGS_PITCH=1, POS2STABILIZATIONSETTINGS_YAW=2 } Pos2StabilizationSettingsElem;
     /* Number of elements for field Pos2StabilizationSettings */
     static const quint32 POS2STABILIZATIONSETTINGS_NUMELEM = 3;
     // Field Pos3StabilizationSettings information
     /* Enumeration options for field Pos3StabilizationSettings */
-    typedef enum { POS3STABILIZATIONSETTINGS_NONE=0, POS3STABILIZATIONSETTINGS_RATE=1, POS3STABILIZATIONSETTINGS_POSITION=2 } Pos3StabilizationSettingsOptions;
+    typedef enum { POS3STABILIZATIONSETTINGS_NONE=0, POS3STABILIZATIONSETTINGS_RATE=1, POS3STABILIZATIONSETTINGS_ATTITUDE=2 } Pos3StabilizationSettingsOptions;
     /* Array element names for field Pos3StabilizationSettings */
     typedef enum { POS3STABILIZATIONSETTINGS_ROLL=0, POS3STABILIZATIONSETTINGS_PITCH=1, POS3STABILIZATIONSETTINGS_YAW=2 } Pos3StabilizationSettingsElem;
     /* Number of elements for field Pos3StabilizationSettings */

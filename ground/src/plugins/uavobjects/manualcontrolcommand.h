@@ -74,7 +74,7 @@ public:
     typedef enum { FLIGHTMODE_MANUAL=0, FLIGHTMODE_STABILIZED=1, FLIGHTMODE_AUTO=2 } FlightModeOptions;
     // Field StabilizationSettings information
     /* Enumeration options for field StabilizationSettings */
-    typedef enum { STABILIZATIONSETTINGS_NONE=0, STABILIZATIONSETTINGS_RATE=1, STABILIZATIONSETTINGS_POSITION=2 } StabilizationSettingsOptions;
+    typedef enum { STABILIZATIONSETTINGS_NONE=0, STABILIZATIONSETTINGS_RATE=1, STABILIZATIONSETTINGS_ATTITUDE=2 } StabilizationSettingsOptions;
     /* Array element names for field StabilizationSettings */
     typedef enum { STABILIZATIONSETTINGS_ROLL=0, STABILIZATIONSETTINGS_PITCH=1, STABILIZATIONSETTINGS_YAW=2 } StabilizationSettingsElem;
     /* Number of elements for field StabilizationSettings */

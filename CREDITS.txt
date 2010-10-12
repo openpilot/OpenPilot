@@ -44,6 +44,10 @@ D: Multiplatform HID implementation (firmware & GCS), GCS Joystick control
 D: Posix OpenPilot work and Mac implementation 
 D: Firmware implementation of Professor Schinstock's INS/GPS
 
+N: Piotr Esden-Tempski
+E: esden (at) esden (dot) net
+D: Floss-JTAG Rev a 4-layer design
+
 N: Frederic Goddeeris
 E: fredericgoddeeris (at) hotmail (dot) com
 D: I2C work and FreeRTOS work, MK integration
@@ -144,7 +148,8 @@ D: PPM inputs
 
 N: Rowan Taubitz
 E: rowan (at) zantek (dot) com (dot) au
-D: Hardware debugging and testing, creation of 2-layer Floss-JTAG board
+D: Hardware debugging and testing, creation of 2-layer Floss-JTAG Rev B.
+D: Creation of Next-Gen FOSS-JTAG board
 
 N: Andrew Thoms
 E: electronics (at) andrewspizza (dot) net

@@ -3,3 +3,17 @@
 www.calamedesign.com
 
 Free for non-commercial use.
+
+***
+
+OPenPilot Symbol Font
+(c) 2010 The OpenPilot Project
+www.openpilot.org
+
+Creative Commons Attribution-ShareAlike 3.0 Australia License.
+
+Symbols:
+
+Capital A = OpenPilot Logo
+
+ 

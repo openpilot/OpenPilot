@@ -509,7 +509,8 @@
                     <item>
                      <widget class="QSlider" name="mrRollMixLevel">
                       <property name="toolTip">
-                       <string>Weight of Roll mixing in percent. Typical values are 100% for + configuration and 50% for X configuration on quads.</string>
+                       <string>Weight of Roll mixing in percent.
+Typical values are 100% for + configuration and 50% for X configuration on quads.</string>
                       </property>
                       <property name="maximum">
                        <number>100</number>
@@ -556,7 +557,8 @@
                     <item>
                      <widget class="QSlider" name="mrPitchMixLevel">
                       <property name="toolTip">
-                       <string>Weight of Pitch mixing in percent. Typical values are 100% for + configuration and 50% for X configuration on quads.</string>
+                       <string>Weight of Pitch mixing in percent.
+Typical values are 100% for + configuration and 50% for X configuration on quads.</string>
                       </property>
                       <property name="maximum">
                        <number>100</number>
@@ -600,7 +602,8 @@
                     <item>
                      <widget class="QSlider" name="mrYawMixLevel">
                       <property name="toolTip">
-                       <string>Weight of Yaw mixing in percent. Typical value is 50% for + or X configuration on quads.</string>
+                       <string>Weight of Yaw mixing in percent.
+Typical value is 50% for + or X configuration on quads.</string>
                       </property>
                       <property name="maximum">
                        <number>100</number>
@@ -637,7 +640,7 @@
                </layout>
               </item>
               <item>
-               <layout class="QVBoxLayout" name="verticalLayout_11" stretch="0,1,0,0">
+               <layout class="QVBoxLayout" name="verticalLayout_11" stretch="0,1,0,0,0">
                 <item>
                  <widget class="QLabel" name="label_19">
                   <property name="font">
@@ -685,6 +688,9 @@
                     <property name="enabled">
                      <bool>true</bool>
                     </property>
+                    <property name="toolTip">
+                     <string>Overall level of feed forward (in percentage).</string>
+                    </property>
                     <property name="maximum">
                      <number>100</number>
                     </property>
@@ -711,6 +717,11 @@
                     <property name="enabled">
                      <bool>true</bool>
                     </property>
+                    <property name="toolTip">
+                     <string>When tuning: Slowly raise accel time from zero to just
+under the level where the motor starts to overshoot
+its target speed.</string>
+                    </property>
                     <property name="maximum">
                      <double>1000.000000000000000</double>
                     </property>
@@ -727,6 +738,13 @@
                    <widget class="QDoubleSpinBox" name="decelTime">
                     <property name="enabled">
                      <bool>true</bool>
+                    </property>
+                    <property name="toolTip">
+                     <string>When tuning: Slowly raise decel time from zero to just
+under the level where the motor starts to undershoot
+its target speed when decelerating.
+
+Do it after accel time is setup.</string>
                     </property>
                     <property name="maximum">
                      <double>1000.000000000000000</double>
@@ -754,7 +772,8 @@
                   <item row="5" column="1">
                    <widget class="QSlider" name="maxAccelSlider">
                     <property name="toolTip">
-                     <string>Limits how much the engines can accelerate or decelerate. In 'units per second', a sound default is 1000.</string>
+                     <string>Limits how much the engines can accelerate or decelerate.
+In 'units per second', a sound default is 1000.</string>
                     </property>
                     <property name="minimum">
                      <number>500</number>
@@ -779,19 +798,86 @@
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
+                    <property name="toolTip">
+                     <string>Select the test channel for tuning feed forward.</string>
+                    </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QPushButton" name="pushButton">
-                    <property name="enabled">
-                     <bool>false</bool>
+                   <widget class="QCheckBox" name="ffTestBox1">
+                    <property name="toolTip">
+                     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Beware! Check &lt;span style=&quot; font-weight:600;&quot;&gt;all three&lt;/span&gt; checkboxes to test the&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;selected channel.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;It will run even if your airframe is not armed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                     <property name="text">
-                     <string>Test</string>
+                     <string/>
                     </property>
                    </widget>
                   </item>
+                  <item>
+                   <widget class="QCheckBox" name="ffTestBox2">
+                    <property name="toolTip">
+                     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Beware! Check &lt;span style=&quot; font-weight:600;&quot;&gt;all three&lt;/span&gt; checkboxes to test the&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;selected channel.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;It will run even if your airframe is not armed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QCheckBox" name="ffTestBox3">
+                    <property name="toolTip">
+                     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Beware! Check &lt;span style=&quot; font-weight:600;&quot;&gt;all three&lt;/span&gt; checkboxes to test the&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;selected channel.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;It will run even if your airframe is not armed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="text">
+                     <string>Enable FF tuning</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_7">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
                  </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
                 <item>
                  <spacer name="verticalSpacer_3">
@@ -987,6 +1073,14 @@
                        <pointsize>8</pointsize>
                       </font>
                      </property>
+                     <property name="toolTip">
+                      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Assign your motor channels using the drawing&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;on the right as a reference. Respect propeller rotation!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     </property>
                     </widget>
                    </item>
                    <item row="1" column="0">
@@ -1171,112 +1265,6 @@
          <layout class="QVBoxLayout" name="verticalLayout_9">
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_16">
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_13">
-              <item>
-               <layout class="QFormLayout" name="formLayout_8">
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_2">
-                  <property name="text">
-                   <string>Channel1</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QComboBox" name="comboBox"/>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="label_29">
-                  <property name="text">
-                   <string>Channel 2</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QComboBox" name="comboBox_5"/>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QFormLayout" name="formLayout_9">
-                <property name="fieldGrowthPolicy">
-                 <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-                </property>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_26">
-                  <property name="text">
-                   <string>Channel 3</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QComboBox" name="comboBox_3"/>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="label_30">
-                  <property name="text">
-                   <string>Channel 4</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QComboBox" name="comboBox_6"/>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QFormLayout" name="formLayout_11">
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_28">
-                  <property name="text">
-                   <string>Channel 5</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QComboBox" name="comboBox_4"/>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="label_31">
-                  <property name="text">
-                   <string>Channel 6</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QComboBox" name="comboBox_7"/>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QFormLayout" name="formLayout_5">
-                <property name="fieldGrowthPolicy">
-                 <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-                </property>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_27">
-                  <property name="text">
-                   <string>Channel 7</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QComboBox" name="comboBox_2"/>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="label_32">
-                  <property name="text">
-                   <string>Channel 8</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QComboBox" name="comboBox_8"/>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_14">
               <item>

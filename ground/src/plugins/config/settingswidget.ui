@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -1729,6 +1729,10 @@ Be sure to set the Neutral position on all sliders before sending!</string>
         <height>27</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
+Leave at 50Hz for fixed wing.</string>
+      </property>
       <property name="maximum">
        <number>9999</number>
       </property>
@@ -1754,6 +1758,10 @@ Be sure to set the Neutral position on all sliders before sending!</string>
         <width>55</width>
         <height>27</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
+Leave at 50Hz for fixed wing.</string>
       </property>
       <property name="maximum">
        <number>9999</number>

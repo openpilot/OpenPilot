@@ -910,15 +910,32 @@ void ConfigServoWidget::updateChannels(UAVObject* controlCommand)
     field = obj->getField("FlightMode");
     int chIndex = field->getOptions().indexOf(field->getValue().toString());
     if ( chIndex < field->getOptions().length()) {
+        float valueScaled;
         int chMin = inSliders.at(chIndex)->minimum();
         int chMax = inSliders.at(chIndex)->maximum();
-        if ((chMax-chMin) > 0) {
-            int val = controlCommand->getField("Channel")->getValue(chIndex).toInt();
-            int chCur = (val-chMin)*100/(chMax-chMin);
-            m_config->fmsSlider->setValue(chCur);
+        int chNeutral = inSliders.at(chIndex)->value();
+        int value = controlCommand->getField("Channel")->getValue(chIndex).toInt();
+        if ((chMax > chMin && value >= chNeutral) || (chMin > chMax && value <= chNeutral)) {
+                if (chMax != chNeutral) {
+                        valueScaled = (float)(value - chNeutral) / (float)(chMax - chNeutral);
+                } else {
+                        valueScaled = 0;
+                }
+        } else {
+                if (chMin != chNeutral) {
+                        valueScaled = (float)(value - chNeutral) / (float)(chNeutral - chMin);
+                } else {
+                        valueScaled = 0;
+                }
         }
-    }
-
+        // Bound
+        if (valueScaled > 1.0) {
+                valueScaled = 1.0;
+        } else if (valueScaled < -1.0) {
+                valueScaled = -1.0;
+        }
+        m_config->fmsSlider->setValue(valueScaled*100);
+        }
 }
 
 

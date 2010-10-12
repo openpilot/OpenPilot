@@ -56,6 +56,8 @@ private:
         QGraphicsSvgItem *ServoY;
         QGraphicsSvgItem *ServoZ;
 
+        int MixerChannelData[6];
+
     private slots:
         void requestccpmUpdate();
         void sendccpmUpdate();
@@ -63,6 +65,8 @@ private:
         void ccpmSwashplateUpdate();
         void UpdateCurveSettings();
         void GenerateCurve();
+        void UpdateMixer();
+        void UpdateType();
 
 };
 

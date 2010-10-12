@@ -46,7 +46,7 @@ D: Firmware implementation of Professor Schinstock's INS/GPS
 
 N: Piotr Esden-Tempski
 E: esden (at) esden (dot) net
-D: Floss-JTAG Rev a 4-layer design
+D: Floss-JTAG Rev A, 4-layer initial design
 
 N: Frederic Goddeeris
 E: fredericgoddeeris (at) hotmail (dot) com

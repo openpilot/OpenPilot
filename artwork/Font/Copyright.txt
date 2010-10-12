@@ -15,5 +15,6 @@ Creative Commons Attribution-ShareAlike 3.0 Australia License.
 Symbols:
 
 Capital A = OpenPilot Logo
+Capital B = CC-BY-SA
 
  

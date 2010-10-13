@@ -55,6 +55,10 @@ private:
         QGraphicsSvgItem *ServoX;
         QGraphicsSvgItem *ServoY;
         QGraphicsSvgItem *ServoZ;
+        QGraphicsTextItem *ServoWText;
+        QGraphicsTextItem *ServoXText;
+        QGraphicsTextItem *ServoYText;
+        QGraphicsTextItem *ServoZText;
 
         int MixerChannelData[6];
 

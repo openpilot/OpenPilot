@@ -292,7 +292,17 @@
                </item>
                <item>
                 <property name="text">
+                 <string>Right</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
                  <string>Rear</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Left</string>
                 </property>
                </item>
               </widget>
@@ -668,10 +678,10 @@
              <number>0</number>
             </property>
             <property name="verticalScrollBarPolicy">
-             <enum>Qt::ScrollBarAlwaysOff</enum>
+             <enum>Qt::ScrollBarAlwaysOn</enum>
             </property>
             <property name="horizontalScrollBarPolicy">
-             <enum>Qt::ScrollBarAlwaysOff</enum>
+             <enum>Qt::ScrollBarAlwaysOn</enum>
             </property>
             <property name="backgroundBrush">
              <brush brushstyle="SolidPattern">
@@ -679,6 +689,15 @@
                <red>220</red>
                <green>220</green>
                <blue>220</blue>
+              </color>
+             </brush>
+            </property>
+            <property name="foregroundBrush">
+             <brush brushstyle="NoBrush">
+              <color alpha="255">
+               <red>0</red>
+               <green>0</green>
+               <blue>0</blue>
               </color>
              </brush>
             </property>
@@ -978,6 +997,12 @@
        <layout class="QFormLayout" name="formLayout_5">
         <item row="0" column="0">
          <widget class="QTableWidget" name="CurveSettings">
+          <property name="minimumSize">
+           <size>
+            <width>260</width>
+            <height>323</height>
+           </size>
+          </property>
           <property name="font">
            <font>
             <pointsize>8</pointsize>
@@ -1278,6 +1303,18 @@
      </property>
      <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
+     </property>
+     <property name="wordWrap">
+      <bool>false</bool>
+     </property>
+     <property name="cornerButtonEnabled">
+      <bool>true</bool>
      </property>
      <row>
       <property name="text">

@@ -63,6 +63,9 @@ private:
     QStringList mixerTypes;
     QStringList mixerVectors;
     QGraphicsSvgItem *quad;
+    bool ffTuningInProgress;
+    bool ffTuningPhase;
+    UAVObject::Metadata accInitialData;
 
 private slots:
     void requestAircraftUpdate();
@@ -76,6 +79,7 @@ private slots:
     void resetMrMixer();
     void updateFwThrottleCurveValue(QList<double> list, double value);
     void updateMrThrottleCurveValue(QList<double> list, double value);
+    void enableFFTest();
 
 protected:
     void showEvent(QShowEvent *event);

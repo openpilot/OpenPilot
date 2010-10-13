@@ -28,6 +28,7 @@
 
 #include <QDebug>
 #include <QStringList>
+#include <QTimer>
 #include <QtGui/QWidget>
 #include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
@@ -40,6 +41,9 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
 {
     m_aircraft = new Ui_AircraftWidget();
     m_aircraft->setupUi(this);
+
+    ffTuningInProgress = false;
+    ffTuningPhase = false;
 
     mixerTypes << "Mixer0Type" << "Mixer1Type" << "Mixer2Type" << "Mixer3Type"
             << "Mixer4Type" << "Mixer5Type" << "Mixer6Type" << "Mixer7Type";
@@ -110,6 +114,11 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
 //    connect(m_aircraft->fwAileron1Channel, SIGNAL(currentIndexChanged(int)), this, SLOT(toggleAileron2(int)));
 //    connect(m_aircraft->fwElevator1Channel, SIGNAL(currentIndexChanged(int)), this, SLOT(toggleElevator2(int)));
 
+    // Now connect the three feed forward test checkboxes
+    connect(m_aircraft->ffTestBox1, SIGNAL(clicked(bool)), this, SLOT(enableFFTest()));
+    connect(m_aircraft->ffTestBox2, SIGNAL(clicked(bool)), this, SLOT(enableFFTest()));
+    connect(m_aircraft->ffTestBox3, SIGNAL(clicked(bool)), this, SLOT(enableFFTest()));
+
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestAircraftUpdate()));
 
 }
@@ -128,8 +137,6 @@ void ConfigAirframeWidget::switchAirframeType(int index){
     m_aircraft->airframesWidget->setCurrentIndex(index);
     m_aircraft->quadShape->setSceneRect(quad->boundingRect());
     m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
-
-
 }
 
 void ConfigAirframeWidget::showEvent(QShowEvent *event)
@@ -145,7 +152,6 @@ void ConfigAirframeWidget::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
     m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
-
 }
 
 
@@ -170,6 +176,80 @@ void ConfigAirframeWidget::toggleElevator2(int index)
         m_aircraft->fwElevator2Label->setEnabled(false);
     }
 }
+
+/////////////////////////////////////////////////////////
+/// Feed Forward Testing
+/////////////////////////////////////////////////////////
+
+/**
+  Enables and runs feed forward testing
+  */
+void ConfigAirframeWidget::enableFFTest()
+{
+    // Role:
+    // - Check if all three checkboxes are checked
+    // - Every other timer event: toggle engine from 1/3 to 2/3
+    // - Every other time event: send FF settings to flight FW
+    if (m_aircraft->ffTestBox1->isChecked() &&
+        m_aircraft->ffTestBox2->isChecked() &&
+        m_aircraft->ffTestBox3->isChecked()) {
+        if (!ffTuningInProgress)
+        {
+            // Initiate tuning:
+            // Setup a special mixer with all channels disabled but one
+            // and no RPY dependency.
+            UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ManualControlCommand")));
+            UAVObject::Metadata mdata = obj->getMetadata();
+            accInitialData = mdata;
+            mdata.flightAccess = UAVObject::ACCESS_READONLY;
+/*
+            mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+            mdata.gcsTelemetryAcked = false;
+            mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+            // NOTE: if actuators not updated at least every 100ms, then the
+            // flight sw goes into failsafe, hence this very low update period:
+            mdata.gcsTelemetryUpdatePeriod = 25;
+            */
+            obj->setMetadata(mdata);
+        }
+        // Depending on phase, either move actuator or send FF settings:
+        if (ffTuningPhase) {
+            // Send FF settings to the board
+            // We can already setup the feedforward here, as it is common to all platforms
+            UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+            UAVObjectField* field = obj->getField(QString("FeedForward"));
+            field->setDouble((double)m_aircraft->feedForwardSlider->value()/100);
+            field = obj->getField(QString("AccelTime"));
+            field->setDouble(m_aircraft->accelTime->value());
+            field = obj->getField(QString("DecelTime"));
+            field->setDouble(m_aircraft->decelTime->value());
+            field = obj->getField(QString("MaxAccel"));
+            field->setDouble(m_aircraft->maxAccelSlider->value());
+            obj->updated();
+        } else  {
+            // Toggle motor state
+            UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ManualControlCommand")));
+            double value = obj->getField("Throttle")->getDouble();
+            double target = (value < 0.5) ? 0.55 : 0.45;
+            obj->getField("Throttle")->setValue(target);
+            obj->updated();
+        }
+        ffTuningPhase = !ffTuningPhase;
+        ffTuningInProgress = true;
+        QTimer::singleShot(1000, this, SLOT(enableFFTest()));
+    } else {
+        // - If no: disarm timer, restore actuatorcommand metadata
+        // Disarm!
+        if (ffTuningInProgress) {
+            ffTuningInProgress = false;
+            UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ManualControlCommand")));
+            UAVObject::Metadata mdata = obj->getMetadata();
+            mdata = accInitialData; // Restore metadata
+            obj->setMetadata(mdata);
+        }
+    }
+}
+
 
 /**
   Resets Fixed wing throttle mixer

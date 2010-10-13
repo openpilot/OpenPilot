@@ -72,10 +72,6 @@ ScopeGadgetConfiguration::ScopeGadgetConfiguration(QString classId, QSettings* q
 
             qSettings->endGroup();
         }
-
-        //The value is converted to milliseconds, so if it is < 100, it is still seconds
-        if(m_refreshInterval < 100)
-            m_refreshInterval *= 1000;
     }
 }
 

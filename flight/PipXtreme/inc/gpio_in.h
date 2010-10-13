@@ -1,10 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       pios_config.h
+ * @file       gpio_in.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      PiOS configuration header.
- *                 - Central compile time config for the project.
+ * @brief      GPIO functions header.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -24,21 +23,19 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#ifndef __GPIO_IN_H__
+#define __GPIO_IN_H__
 
-#ifndef PIOS_CONFIG_H
-#define PIOS_CONFIG_H
+// *****************************************************************
 
-/* Enable/Disable PiOS Modules */
-#define PIOS_INCLUDE_ADC
-#define PIOS_INCLUDE_DELAY
-#define PIOS_INCLUDE_IRQ
-#define PIOS_INCLUDE_LED
-#define PIOS_INCLUDE_SPI
-#define PIOS_INCLUDE_SYS
-#define PIOS_INCLUDE_USART
-#define PIOS_INCLUDE_COM
-#define PIOS_INCLUDE_GPIO
-#define PIOS_INCLUDE_EXTI
-//#define PIOS_INCLUDE_USB_HID
+void GPIO_IN_Init(void);
+bool GPIO_IN(uint8_t num);
 
-#endif /* PIOS_CONFIG_H */
+// *****************************************************************
+
+#endif
+
+/**
+  * @}
+  * @}
+  */

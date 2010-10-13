@@ -1,10 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       pios_config.h
+ * @file       stopwatch.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      PiOS configuration header.
- *                 - Central compile time config for the project.
+ * @brief      Stop watch function
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -24,21 +23,18 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#ifndef __STOPWATCH_H__
+#define __STOPWATCH_H__
 
-#ifndef PIOS_CONFIG_H
-#define PIOS_CONFIG_H
+#include "stm32f10x.h"
 
-/* Enable/Disable PiOS Modules */
-#define PIOS_INCLUDE_ADC
-#define PIOS_INCLUDE_DELAY
-#define PIOS_INCLUDE_IRQ
-#define PIOS_INCLUDE_LED
-#define PIOS_INCLUDE_SPI
-#define PIOS_INCLUDE_SYS
-#define PIOS_INCLUDE_USART
-#define PIOS_INCLUDE_COM
-#define PIOS_INCLUDE_GPIO
-#define PIOS_INCLUDE_EXTI
-//#define PIOS_INCLUDE_USB_HID
+// *****************************************************************************
 
-#endif /* PIOS_CONFIG_H */
+void STOPWATCH_init(uint32_t resolution);
+void STOPWATCH_reset(void);
+uint32_t STOPWATCH_get_count(void);
+uint32_t STOPWATCH_get_us(void);
+
+// *****************************************************************************
+
+#endif

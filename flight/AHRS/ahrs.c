@@ -39,8 +39,12 @@
 #include "insgps.h"
 #include "CoordinateConversions.h"
 
-#define MAX_OVERSAMPLING 50  /* cannot have more than 50 samples      */
-#define INSGPS_GPS_TIMEOUT 2 /* 2 seconds triggers reinit of position */
+#define MAX_OVERSAMPLING 50    /* cannot have more than 50 samples      */
+#define INSGPS_GPS_TIMEOUT 2   /* 2 seconds triggers reinit of position */
+#define INSGPS_GPS_MINSAT  7   /* 2 seconds triggers reinit of position */
+#define INSGPS_GPS_MINPDOP 3.5 /* minimum PDOP for postition updates    */
+#define INSGPS_MAGLEN       1000
+#define INSGPS_MAGTOL      0.2 /* error in magnetic vector length to use  */
 
 // For debugging the raw sensors
 //#define DUMP_RAW
@@ -198,8 +202,10 @@ int main()
 	float gyro[3], accel[3];
 	float vel[3] = { 0, 0, 0 };
 	uint8_t gps_dirty = 1;
+	uint8_t indoor_dirty = 1;
 	gps_data.quality = -1;
 	uint32_t last_gps_time = 0;
+	uint32_t last_indoor_time = 0;
 
 	ahrs_algorithm = AHRSSETTINGS_ALGORITHM_SIMPLE;
 
@@ -316,13 +322,25 @@ for all data to be up to date before doing anything*/
 
 #if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
 		// Get magnetic readings
-		if (PIOS_HMC5843_NewDataAvailable()) {
+		// For now don't use mags until the magnetic field is set AND until 5 seconds
+		// after initialization otherwise it seems to have problems
+		// TODO: Follow up this initialization issue
+		HomeLocationData home;
+		HomeLocationGet(&home);
+		if (PIOS_HMC5843_NewDataAvailable() && 
+		    (home.Set = HOMELOCATION_SET_TRUE) && 
+		    ((home.Be[0] != 0) || (home.Be[1] != 0) || (home.Be[2] != 0)) &&
+		    ((float) timer_count() / timer_rate() > 5)) {
 			PIOS_HMC5843_ReadMag(mag_data.raw.axis);
 			// Swap the axis here to acount for orientation of mag chip (notice 0 and 1 swapped in raw)
 			mag_data.scaled.axis[0] = (mag_data.raw.axis[1] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
 			mag_data.scaled.axis[1] = (mag_data.raw.axis[0] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
 			mag_data.scaled.axis[2] = (mag_data.raw.axis[2] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
-			mag_data.updated = 1;
+			
+			// Only use if magnetic length reasonable
+			float Blen = sqrt(pow(mag_data.scaled.axis[0],2) + pow(mag_data.scaled.axis[1],2) + pow(mag_data.scaled.axis[2],2));
+			if((Blen < INSGPS_MAGLEN * (1 + INSGPS_MAGTOL)) && (Blen > INSGPS_MAGLEN * (1 - INSGPS_MAGTOL)))
+				mag_data.updated = 1;
 		}
 
 #endif
@@ -414,6 +432,23 @@ for all data to be up to date before doing anything*/
 				vel[0] = 0;
 				vel[1] = 0;
 				vel[2] = 0;
+				
+				uint32_t this_indoor_time = timer_count();
+				float indoor_delay;
+				
+				// Detect if greater than certain time since last gps update and if so
+				// reset EKF to that position since probably drifted too far for safe
+				// update
+				if (this_indoor_time < last_indoor_time)
+					indoor_delay = ((0xFFFF - last_indoor_time) - this_indoor_time) / timer_rate();
+				else 
+					indoor_delay = (this_indoor_time - last_indoor_time) / timer_rate();
+				last_indoor_time = this_indoor_time;
+				
+				indoor_dirty = indoor_delay > INSGPS_GPS_TIMEOUT;
+				
+				if(indoor_dirty)
+					INSPosVelReset(vel,vel);					
 
 				if((mag_data.updated == 1) && (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
 					MagVelBaroCorrection(mag_data.scaled.axis,
@@ -828,9 +863,9 @@ void calibration_callback(AhrsObjHandle obj)
 		}
 		// Note: We need the divided by 1000^2 since we scale mags to have a norm of 1000 and they are scaled to 
 		// one in code
-		float mag_var[3] = {mag_data.calibration.variance[0] / 1000 / 1000, 
-			mag_data.calibration.variance[1] / 1000 / 1000, 
-			mag_data.calibration.variance[2] / 1000 / 1000};
+		float mag_var[3] = {mag_data.calibration.variance[0] / INSGPS_MAGLEN / INSGPS_MAGLEN, 
+			mag_data.calibration.variance[1] / INSGPS_MAGLEN / INSGPS_MAGLEN, 
+			mag_data.calibration.variance[2] / INSGPS_MAGLEN / INSGPS_MAGLEN};
 		INSSetMagVar(mag_var);
 		INSSetAccelVar(accel_data.calibration.variance);
 		INSSetGyroVar(gyro_data.calibration.variance);
@@ -848,9 +883,10 @@ void gps_callback(AhrsObjHandle obj)
 	HomeLocationGet(&home);
 
 	if((ahrs_algorithm != AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) ||
-	   (pos.Status != GPSPOSITION_STATUS_FIX3D) || 
-	   (pos.Satellites < 7) || 
-	   (pos.PDOP < 3.5))
+	   (pos.Satellites < INSGPS_GPS_MINSAT) || 
+	   (pos.PDOP >= INSGPS_GPS_MINPDOP) || 
+	   (home.Set == FALSE) ||
+	   ((home.ECEF[0] == 0) && (home.ECEF[1] == 0) && (home.ECEF[2] == 0)))
 	{
 		gps_data.quality = 0;
 		gps_data.updated = false;

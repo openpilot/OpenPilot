@@ -39,7 +39,9 @@
 #include "insgps.h"
 #include "CoordinateConversions.h"
 
-#define MAX_OVERSAMPLING 50
+#define MAX_OVERSAMPLING 50  /* cannot have more than 50 samples      */
+#define INSGPS_GPS_TIMEOUT 2 /* 2 seconds triggers reinit of position */
+
 // For debugging the raw sensors
 //#define DUMP_RAW
 //#define DUMP_FRIENDLY
@@ -195,7 +197,9 @@ int main()
 {
 	float gyro[3], accel[3];
 	float vel[3] = { 0, 0, 0 };
+	uint8_t gps_dirty = 1;
 	gps_data.quality = -1;
+	uint32_t last_gps_time = 0;
 
 	ahrs_algorithm = AHRSSETTINGS_ALGORITHM_SIMPLE;
 
@@ -223,10 +227,6 @@ int main()
 	PIOS_HMC5843_ReadID(mag_data.id);
 #endif
 
-	/* SPI link to master */
-//	PIOS_SPI_Init();
-
-//	lfsm_init();
 	reset_values();
 	INSGPSInit();
 
@@ -360,16 +360,31 @@ for all data to be up to date before doing anything*/
 			INSCovariancePrediction(1 / (float)EKF_RATE);
 
 			if (gps_data.updated && ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) {
-				// Compute velocity from Heading and groundspeed
-				vel[0] =
-				    gps_data.groundspeed *
-				    cos(gps_data.heading * M_PI / 180);
-				vel[1] =
-				    gps_data.groundspeed *
-				    sin(gps_data.heading * M_PI / 180);
+				uint32_t this_gps_time = timer_count();
+				float gps_delay;
+				
+				// Detect if greater than certain time since last gps update and if so
+				// reset EKF to that position since probably drifted too far for safe
+				// update
+				if (this_gps_time < last_gps_time)
+					gps_delay = ((0xFFFF - last_gps_time) - this_gps_time) / timer_rate();
+				else 
+					gps_delay = (this_gps_time - last_gps_time) / timer_rate();
+				last_gps_time = this_gps_time;
+				
+				gps_dirty = gps_delay > INSGPS_GPS_TIMEOUT;
 
+				// Compute velocity from Heading and groundspeed
+				vel[0] = gps_data.groundspeed *
+					cos(gps_data.heading * M_PI / 180);
+				vel[1] = gps_data.groundspeed *
+					sin(gps_data.heading * M_PI / 180);
+				vel[2] = 0;
+				
+				
 				INSSetPosVelVar(0.004);
-				if (mag_data.updated) {
+				
+				if (mag_data.updated && !gps_dirty) {
 					//TOOD: add check for altitude updates
 					FullCorrection(mag_data.scaled.axis,
 						       gps_data.NED,
@@ -377,11 +392,13 @@ for all data to be up to date before doing anything*/
 						       altitude_data.
 						       altitude);
 					mag_data.updated = 0;
-				} else {
+				} else if (!gps_dirty) {
 					GpsBaroCorrection(gps_data.NED,
 							  vel,
 							  altitude_data.
 							  altitude);
+				} else { // GPS hasn't updated for a bit
+					INSPosVelReset(gps_data.NED,vel);					
 				}
 
 				gps_data.updated = false;
@@ -830,14 +847,13 @@ void gps_callback(AhrsObjHandle obj)
 	HomeLocationData home;
 	HomeLocationGet(&home);
 
-	if(ahrs_algorithm != AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) {
-		return;
-	}
-
-	if(pos.Status != GPSPOSITION_STATUS_FIX3D) //FIXME: Will this work? the old ahrs_comms does it differently.
+	if((ahrs_algorithm != AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) ||
+	   (pos.Status != GPSPOSITION_STATUS_FIX3D) || 
+	   (pos.Satellites < 7) || 
+	   (pos.PDOP < 3.5))
 	{
 		gps_data.quality = 0;
-		gps_data.updated = true;
+		gps_data.updated = false;
 		return;
 	}
 
@@ -848,8 +864,8 @@ void gps_callback(AhrsObjHandle obj)
 
 	gps_data.heading = pos.Heading;
 	gps_data.groundspeed = pos.Groundspeed;
-	gps_data.quality = 1;
-	gps_data.updated = true;
+	gps_data.quality = 1;  /* currently unused */
+	gps_data.updated = true;	
 }
 
 void altitude_callback(AhrsObjHandle obj)

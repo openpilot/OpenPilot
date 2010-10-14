@@ -76,6 +76,12 @@ void INSGPSInit()		//pretty much just a place holder for now
 	Be[1] = 0;
 	Be[2] = 0;		// local magnetic unit vector
 
+	for (int i = 0; i < NUMX; i++) {
+		for (int j = 0; j < NUMX; j++) {
+			P[i][j] = 0; // zero all terms
+		}
+	}
+	
 	P[0][0] = P[1][1] = P[2][2] = 25;	// initial position variance (m^2)
 	P[3][3] = P[4][4] = P[5][5] = 5;	// initial velocity variance (m/s)^2
 	P[6][6] = P[7][7] = P[8][8] = P[9][9] = 1e-5;	// initial quaternion variance
@@ -96,6 +102,26 @@ void INSGPSInit()		//pretty much just a place holder for now
 	R[5] = 100;		// High freq GPS vertical velocity noise variance (m/s)^2
 	R[6] = R[7] = R[8] = 0.005;	// magnetometer unit vector noise variance
 	R[9] = .05;		// High freq altimeter noise variance (m^2)
+}
+
+void INSPosVelReset(float pos[3], float vel[3]) 
+{
+	for (int i = 0; i < 6; i++) {
+		for(int j = i; j < NUMX; j++) {
+			P[i][j] = 0;  // zero the first 6 rows and columns
+			P[j][i] = 0; 
+		}
+	}
+	
+	P[0][0] = P[1][1] = P[2][2] = 25;	// initial position variance (m^2)
+	P[3][3] = P[4][4] = P[5][5] = 5;	// initial velocity variance (m/s)^2
+	
+	X[0] = pos[0];
+	X[1] = pos[1];
+	X[2] = pos[2];
+	X[3] = vel[0];
+	X[4] = vel[1];
+	X[5] = vel[2];	
 }
 
 void INSSetPosVelVar(float PosVar)

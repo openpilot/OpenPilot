@@ -188,7 +188,7 @@ void ConfigAirframeWidget::enableFFTest()
 {
     // Role:
     // - Check if all three checkboxes are checked
-    // - Every other timer event: toggle engine from 1/3 to 2/3
+    // - Every other timer event: toggle engine from 45% to 55%
     // - Every other time event: send FF settings to flight FW
     if (m_aircraft->ffTestBox1->isChecked() &&
         m_aircraft->ffTestBox2->isChecked() &&
@@ -196,26 +196,15 @@ void ConfigAirframeWidget::enableFFTest()
         if (!ffTuningInProgress)
         {
             // Initiate tuning:
-            // Setup a special mixer with all channels disabled but one
-            // and no RPY dependency.
             UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ManualControlCommand")));
             UAVObject::Metadata mdata = obj->getMetadata();
             accInitialData = mdata;
             mdata.flightAccess = UAVObject::ACCESS_READONLY;
-/*
-            mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
-            mdata.gcsTelemetryAcked = false;
-            mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-            // NOTE: if actuators not updated at least every 100ms, then the
-            // flight sw goes into failsafe, hence this very low update period:
-            mdata.gcsTelemetryUpdatePeriod = 25;
-            */
             obj->setMetadata(mdata);
         }
         // Depending on phase, either move actuator or send FF settings:
         if (ffTuningPhase) {
             // Send FF settings to the board
-            // We can already setup the feedforward here, as it is common to all platforms
             UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
             UAVObjectField* field = obj->getField(QString("FeedForward"));
             field->setDouble((double)m_aircraft->feedForwardSlider->value()/100);
@@ -342,6 +331,7 @@ void ConfigAirframeWidget::requestAircraftUpdate()
     // Setup all Throttle1 curves for all types of airframes
     m_aircraft->fixedWingThrottle->initCurve(curveValues);
     m_aircraft->multiThrottleCurve->initCurve(curveValues);
+    m_aircraft->customThrottle1Curve->initCurve(curveValues);
 
     // Load the Settings for fixed wing frames:
     if (frameType.startsWith("FixedWing")) {
@@ -1240,22 +1230,79 @@ bool ConfigAirframeWidget::setupHexa()
     return true;
 }
 
+/**
+  Updates the custom airframe settings based on the current airframe
+  */
+void ConfigAirframeWidget::updateCustomAirframeUI()
+{
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    UAVObjectField* field = obj->getField(QString("ThrottleCurve1"));
+    QList<double> curveValues;
+    // If the 1st element of the curve is <= -10, then the curve
+    // is a straight line (that's how the mixer works on the mainboard):
+    if (field->getValue(0).toInt() <= -10) {
+        for (double i=0; i<field->getNumElements(); i++) {
+            curveValues.append(i/(field->getNumElements()-1));
+        }
+    } else {
+        for (unsigned int i=0; i < field->getNumElements(); i++) {
+            curveValues.append(field->getValue(i).toDouble());
+        }
+    }
+    m_aircraft->customThrottle1Curve->initCurve(curveValues);
+
+    field = obj->getField(QString("ThrottleCurve2"));
+    curveValues.clear();;
+    // If the 1st element of the curve is <= -10, then the curve
+    // is a straight line (that's how the mixer works on the mainboard):
+    if (field->getValue(0).toInt() <= -10) {
+        for (double i=0; i<field->getNumElements(); i++) {
+            curveValues.append(i/(field->getNumElements()-1));
+        }
+    } else {
+        for (unsigned int i=0; i < field->getNumElements(); i++) {
+            curveValues.append(field->getValue(i).toDouble());
+        }
+    }
+    m_aircraft->customThrottle2Curve->initCurve(curveValues);
+
+    // Retrieve Feed Forward:
+    field = obj->getField(QString("FeedForward"));
+    m_aircraft->customFFSlider->setValue(field->getDouble()*100);
+    field = obj->getField(QString("AccelTime"));
+    m_aircraft->customFFaccel->setValue(field->getDouble());
+    field = obj->getField(QString("DecelTime"));
+    m_aircraft->customFFdecel->setValue(field->getDouble());
+    field = obj->getField(QString("MaxAccel"));
+    m_aircraft->customFFMaxAccel->setValue(field->getDouble());
+
+    // Update the table:
+    for (int i=0; i<8; i++) {
+
+    }
+
+}
+
+
+
 
 /**
   Sends the config to the board (airframe type)
 
-  We do all the tasks commong to all airframes, or family of airframes, and
+  We do all the tasks common to all airframes, or family of airframes, and
   we call additional methods for specific frames, so that we do not have a code
   that is too heavy.
-  */
+*/
 void ConfigAirframeWidget::sendAircraftUpdate()
 {
     QString airframeType;
     if (m_aircraft->aircraftType->currentText() == "Fixed Wing") {
         // Save the curve (common to all Fixed wing frames)
         UAVDataObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-        Q_ASSERT(obj);
-        UAVObjectField* field = obj->getField("ThrottleCurve1");
+        // Remove Feed Forward, it is pointless on a plane:
+        UAVObjectField* field = obj->getField(QString("FeedForward"));
+        field->setDouble(0);
+        field = obj->getField("ThrottleCurve1");
         QList<double> curve = m_aircraft->fixedWingThrottle->getCurve();
         for (int i=0;i<curve.length();i++) {
             field->setValue(curve.at(i),i);
@@ -1274,18 +1321,13 @@ void ConfigAirframeWidget::sendAircraftUpdate()
     } else if (m_aircraft->aircraftType->currentText() == "Multirotor") {
         // We can already setup the feedforward here, as it is common to all platforms
         UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-        Q_ASSERT(obj);
         UAVObjectField* field = obj->getField(QString("FeedForward"));
-        Q_ASSERT(field);
         field->setDouble((double)m_aircraft->feedForwardSlider->value()/100);
         field = obj->getField(QString("AccelTime"));
-        Q_ASSERT(field);
         field->setDouble(m_aircraft->accelTime->value());
         field = obj->getField(QString("DecelTime"));
-        Q_ASSERT(field);
         field->setDouble(m_aircraft->decelTime->value());
         field = obj->getField(QString("MaxAccel"));
-        Q_ASSERT(field);
         field->setDouble(m_aircraft->maxAccelSlider->value());
 
         // Curve is also common to all quads:
@@ -1308,8 +1350,10 @@ void ConfigAirframeWidget::sendAircraftUpdate()
             airframeType = "Octo";
         }
 
+        // Now reflect those settings in the "Custom" panel as well
+        updateCustomAirframeUI();
     } else {
-        airframeType = "FixedWing";
+        airframeType = "Custom";
     }
 
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));

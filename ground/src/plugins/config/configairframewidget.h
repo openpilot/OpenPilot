@@ -53,6 +53,7 @@ private:
     bool setupQuad(bool pLayout);
     bool setupHexa();
     bool setupOcto();
+    void updateCustomAirframeUI();
 
     void resetField(UAVObjectField * field);
     void resetMixer (MixerCurveWidget *mixer, int numElements);

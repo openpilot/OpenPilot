@@ -69,7 +69,7 @@
       <item>
        <widget class="QStackedWidget" name="airframesWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="fixedWing">
          <property name="enabled">
@@ -1280,7 +1280,10 @@ p, li { white-space: pre-wrap; }
         <widget class="QWidget" name="custom">
          <layout class="QVBoxLayout" name="verticalLayout_9">
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_16">
+           <layout class="QVBoxLayout" name="verticalLayout_16" stretch="1,2">
+            <property name="spacing">
+             <number>2</number>
+            </property>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_14">
               <item>
@@ -1304,7 +1307,7 @@ p, li { white-space: pre-wrap; }
                  </layout>
                 </item>
                 <item>
-                 <widget class="MixerCurveWidget" name="widget" native="true">
+                 <widget class="MixerCurveWidget" name="customThrottle1Curve" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                     <horstretch>0</horstretch>
@@ -1313,8 +1316,8 @@ p, li { white-space: pre-wrap; }
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>150</width>
-                    <height>150</height>
+                    <width>100</width>
+                    <height>100</height>
                    </size>
                   </property>
                   <property name="maximumSize">
@@ -1323,6 +1326,7 @@ p, li { white-space: pre-wrap; }
                     <height>200</height>
                    </size>
                   </property>
+                  <zorder></zorder>
                  </widget>
                 </item>
                 <item>
@@ -1355,7 +1359,7 @@ p, li { white-space: pre-wrap; }
                  </layout>
                 </item>
                 <item>
-                 <widget class="MixerCurveWidget" name="widget_2" native="true">
+                 <widget class="MixerCurveWidget" name="customThrottle2Curve" native="true">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                     <horstretch>0</horstretch>
@@ -1364,8 +1368,8 @@ p, li { white-space: pre-wrap; }
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>150</width>
-                    <height>150</height>
+                    <width>100</width>
+                    <height>100</height>
                    </size>
                   </property>
                   <property name="maximumSize">
@@ -1395,7 +1399,7 @@ p, li { white-space: pre-wrap; }
                  </widget>
                 </item>
                 <item row="0" column="1">
-                 <widget class="QSlider" name="horizontalSlider">
+                 <widget class="QSlider" name="customFFSlider">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
@@ -1409,7 +1413,7 @@ p, li { white-space: pre-wrap; }
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+                 <widget class="QDoubleSpinBox" name="customFFaccel"/>
                 </item>
                 <item row="2" column="0">
                  <widget class="QLabel" name="label_36">
@@ -1419,7 +1423,7 @@ p, li { white-space: pre-wrap; }
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
+                 <widget class="QDoubleSpinBox" name="customFFdecel"/>
                 </item>
                 <item row="3" column="0">
                  <widget class="QLabel" name="label_38">
@@ -1429,7 +1433,7 @@ p, li { white-space: pre-wrap; }
                  </widget>
                 </item>
                 <item row="3" column="1">
-                 <widget class="QSlider" name="horizontalSlider_2">
+                 <widget class="QSlider" name="customFFMaxAccel">
                   <property name="minimum">
                    <number>500</number>
                   </property>
@@ -1449,7 +1453,13 @@ p, li { white-space: pre-wrap; }
              </layout>
             </item>
             <item>
-             <widget class="QTableWidget" name="tableWidget">
+             <widget class="QTableWidget" name="customMixerTable">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -1461,6 +1471,11 @@ p, li { white-space: pre-wrap; }
               <attribute name="horizontalHeaderDefaultSectionSize">
                <number>50</number>
               </attribute>
+              <row>
+               <property name="text">
+                <string>Type</string>
+               </property>
+              </row>
               <row>
                <property name="text">
                 <string>Curve 1</string>
@@ -1488,50 +1503,50 @@ p, li { white-space: pre-wrap; }
               </row>
               <column>
                <property name="text">
-                <string>C0</string>
+                <string>Ch 0</string>
                </property>
               </column>
               <column>
                <property name="text">
-                <string>C1</string>
+                <string>Ch 1</string>
                </property>
               </column>
               <column>
                <property name="text">
-                <string>C2</string>
+                <string>Ch 2</string>
                </property>
               </column>
               <column>
                <property name="text">
-                <string>C3</string>
+                <string>Ch 3</string>
                </property>
               </column>
               <column>
                <property name="text">
-                <string>C4</string>
+                <string>Ch 4</string>
                </property>
               </column>
               <column>
                <property name="text">
-                <string>C5</string>
+                <string>Ch 5</string>
                </property>
               </column>
               <column>
                <property name="text">
-                <string>C6</string>
+                <string>Ch 6</string>
                </property>
               </column>
               <column>
                <property name="text">
-                <string>C7</string>
+                <string>Ch 7</string>
                </property>
               </column>
-              <item row="0" column="0">
+              <item row="1" column="0">
                <property name="text">
                 <string/>
                </property>
               </item>
-              <item row="1" column="0">
+              <item row="2" column="0">
                <property name="text">
                 <string/>
                </property>

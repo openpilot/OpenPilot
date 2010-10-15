@@ -403,7 +403,7 @@ JFR_DEBUG_END();
 		void DataManagerOnePointRansac<RawSpec,SensorSpec,FeatureSpec,RoiSpec,FeatureManagerSpec,DetectorSpec,MatcherSpec>::
 		detectNewObs(boost::shared_ptr<RawSpec> rawData)
 		{
-			for(int i = 0; i < algorithmParams.n_init; ++i)
+			for(int i = 0; i < algorithmParams.n_init; )
 			if (mapManagerPtr()->mapSpaceForInit()) {
 				//boost::shared_ptr<RawImage> rawDataSpec = SPTR_CAST<RawImage>(rawData);
 				RoiSpec roi;
@@ -436,6 +436,7 @@ JFR_DEBUG_END();
 						detector->fillDataObs(featPtr, obsPtr);
 
 						featMan->addObs(obsPtr->measurement.x());
+						++i;
 					} else // create&init
 					{
 						featMan->setFailed(roi);

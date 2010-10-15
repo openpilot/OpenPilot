@@ -436,7 +436,10 @@ JFR_DEBUG_END();
 						detector->fillDataObs(featPtr, obsPtr);
 
 						featMan->addObs(obsPtr->measurement.x());
-					} // create&init
+					} else // create&init
+					{
+						featMan->setFailed(roi);
+					}
 				} else break; // getRoi()
 			} else break; // if space in map
 		} // detect()

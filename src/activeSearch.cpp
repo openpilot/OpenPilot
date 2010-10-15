@@ -49,9 +49,8 @@ namespace jafar {
 		// Functions to fill in cells
 		void ActiveSearchGrid::addObs(const vec2 & p) {
 			veci2 cell = pix2cell(p);
-			addToCell(cell);
-		}
-		void ActiveSearchGrid::addToCell(const veci2 & cell) {
+			if (projectionsCount(cell(0), cell(1)) == -1)
+				projectionsCount(cell(0), cell(1)) = 0;
 			projectionsCount(cell(0), cell(1))++;
 		}
 
@@ -75,7 +74,7 @@ namespace jafar {
 				for (int j = 1; j < gridSize(1) - 1; j++) {
 					cell0(0) = i;
 					cell0(1) = j;
-					if (isEmpty(cell0)) {
+					if (projectionsCount(cell0(0), cell0(1)) == 0) {
 						ublas::row(emptyCellsTile_tmp, k) = cell0;
 						k++;
 					}
@@ -91,11 +90,6 @@ namespace jafar {
 			else
 				return false;
 		}
-
-		bool ActiveSearchGrid::isEmpty(const veci2 & cell) {
-			return (projectionsCount(cell(0), cell(1)) == 0);
-		}
-
 
 		/*
 		 * Get cell origin (exact pixel)
@@ -139,6 +133,12 @@ namespace jafar {
 				return false;
 		}
 
+		void ActiveSearchGrid::setFailed(const image::ConvexRoi & roi)
+		{
+			vec2 p; p(0) = roi.x()+roi.w()/2; p(1) = roi.y()+roi.h()/2;
+			veci2 cell = pix2cell(p);
+			projectionsCount(cell(0), cell(1)) = -1;
+		}
 
 		////////////////////////////////////////////////////////
 		//    ACTIVE SEARCH ALGORITHMS

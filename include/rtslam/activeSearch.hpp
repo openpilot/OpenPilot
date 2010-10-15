@@ -158,12 +158,15 @@ namespace jafar {
 				 */
 				bool getRoi(image::ConvexRoi & roi);
 
-			private:
 				/**
-				 * increment cell counter
+				 * Call this after getRoi if no point was found in the roi
+				 * in order to avoid searching again in it.
+				 * \param roi the ROI where nothing was found
 				 */
-				void addToCell(const veci2 & cell);
+				void setFailed(const image::ConvexRoi & roi);
 
+				
+			private:
 				/**
 				 * Get cell corresponding to pixel
 				 */
@@ -184,11 +187,6 @@ namespace jafar {
 				 * Get cell center (can be decimal if size of cell is an odd number of pixels)
 				 */
 				vec2 cellCenter(const veci2 & cell);
-
-				/**
-				 * Is Cell empty?
-				 */
-				bool isEmpty(const veci2 & cell);
 
 				/**
 				 * Get one random empty cell

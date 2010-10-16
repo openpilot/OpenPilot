@@ -41,6 +41,7 @@
 #include <QtNetwork/QTcpSocket>
 #include <QtNetwork/QUdpSocket>
 #include <QWaitCondition>
+#include <QMutex>
 #include <coreplugin/threadmanager.h>
 
 #include <QDebug>
@@ -48,7 +49,9 @@
 //Communication between IPconnectionConnection::OpenDevice() and IPConnection::onOpenDevice()
 QString errorMsg;
 QWaitCondition openDeviceWait;
-QReadWriteLock dummyLock;
+QWaitCondition closeDeviceWait;
+//QReadWriteLock dummyLock;
+QMutex ipConMutex;
 QAbstractSocket *ret;
 
 IPConnection::IPConnection(IPconnectionConnection *connection) : QObject()
@@ -72,6 +75,7 @@ void IPConnection::onOpenDevice(QString HostName, int Port, bool UseTCP)
     const int Timeout = 5 * 1000;
     int state;
 
+    ipConMutex.lock();
     if (UseTCP) {
         ipSocket = new QTcpSocket(this);
     } else {
@@ -91,6 +95,7 @@ void IPConnection::onOpenDevice(QString HostName, int Port, bool UseTCP)
         if (ipSocket->waitForConnected(Timeout)) {
             ret = ipSocket;
             openDeviceWait.wakeAll();
+            ipConMutex.unlock();
             return;
         }
         //tell user something went wrong
@@ -100,12 +105,16 @@ void IPConnection::onOpenDevice(QString HostName, int Port, bool UseTCP)
     * someone needs to debug this, I got lost in the calling chain.*/
     ret = NULL;
     openDeviceWait.wakeAll();
+    ipConMutex.unlock();
 }
 
 void IPConnection::onCloseDevice(QAbstractSocket *ipSocket)
 {
+    ipConMutex.lock();
     ipSocket->close ();
     delete(ipSocket);
+    closeDeviceWait.wakeAll();
+    ipConMutex.unlock();
 }
 
 
@@ -175,13 +184,17 @@ QIODevice *IPconnectionConnection::openDevice(const QString &deviceName)
 
     if (ipSocket){
         //Andrew: close any existing socket... this should never occur
+        ipConMutex.lock();
         emit CloseSocket(ipSocket);
+        closeDeviceWait.wait(&ipConMutex);
+        ipConMutex.unlock();
         ipSocket = NULL;
     }
 
-    dummyLock.lockForRead();
+    ipConMutex.lock();
     emit CreateSocket(HostName, Port, UseTCP);
-    openDeviceWait.wait(&dummyLock);
+    openDeviceWait.wait(&ipConMutex);
+    ipConMutex.unlock();
     ipSocket = ret;
     if(ipSocket == NULL)
     {
@@ -194,7 +207,10 @@ QIODevice *IPconnectionConnection::openDevice(const QString &deviceName)
 void IPconnectionConnection::closeDevice(const QString &deviceName)
 {
     if (ipSocket){
+        ipConMutex.lock();
         emit CloseSocket(ipSocket);
+        closeDeviceWait.wait(&ipConMutex);
+        ipConMutex.unlock();
         ipSocket = NULL;
     }
 }

@@ -100,9 +100,15 @@ namespace core {
             }
             if(accessmode!=AccessMode::CacheOnly)
             {
+                QEventLoop q;
                 QNetworkReply *reply;
                 QNetworkRequest qheader;
                 QNetworkAccessManager network;
+                QTimer tT;
+                tT.setSingleShot(true);
+                connect(&network, SIGNAL(finished(QNetworkReply*)),
+                            &q, SLOT(quit()));
+                connect(&tT, SIGNAL(timeout()), &q, SLOT(quit()));
                 network.setProxy(Proxy);
 #ifdef DEBUG_GMAPS
                 qDebug()<<"Try Tile from the Internet";
@@ -189,28 +195,13 @@ namespace core {
                     break;
                 }
                 reply=network.get(qheader);
-#ifdef DEBUG_GMAPS
-                qDebug()<<"Starting get response ";//<<pos.X()+","+pos.Y();
-#endif //DEBUG_GMAPS
-                QTime time;
-                time.restart();
-                while( !(reply->isFinished() || (time.elapsed()>(Timeout))) ){QCoreApplication::processEvents(QEventLoop::AllEvents);}
-#ifdef DEBUG_TIMINGS
-                qDebug()<<"Network time:"<<time.elapsed();
-#endif
-#ifdef DEBUG_GMAPS
-                qDebug()<<"Finished?"<<reply->error()<<" abort?"<<(time.elapsed()>Timeout);
-#endif //DEBUG_GMAPS
-                if( (reply->error()!=QNetworkReply::NoError) || (time.elapsed()>Timeout))
-                {
-#ifdef DEBUG_GMAPS
-                    qDebug()<<"Request timed out ";//<<pos.x+","+pos.y;
-#endif //DEBUG_GMAPS
+                tT.start(Timeout);
+                q.exec();
+
+                if(!tT.isActive()){
                     return ret;
-                }
-#ifdef DEBUG_GMAPS
-                qDebug()<<"Response OK ";//<<pos.x+","+pos.y;
-#endif //DEBUG_GMAPS
+                        }
+                tT.stop();
                 ret=reply->readAll();
                 reply->deleteLater();//TODO can't this be global??
                 if(ret.isEmpty())

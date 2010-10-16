@@ -27,5 +27,9 @@
  #ifndef AHRS_SPI_PROGRAM_SLAVE_H
 #define AHRS_SPI_PROGRAM_SLAVE_H
 
+/** Check if OpenPilot is trying to program AHRS
+* If so, it will program the FLASH then return
+* If not it just returns.
+*/
 void AhrsProgramReceive(void);
 #endif //AHRS_PROGRAM_SLAVE_H

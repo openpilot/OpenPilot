@@ -117,6 +117,8 @@ RTOSDIR = $(APPLIBDIR)/FreeRTOS
 RTOSSRCDIR = $(RTOSDIR)/Source
 RTOSINCDIR = $(RTOSSRCDIR)/include
 DOXYGENDIR = ../Doc/Doxygen
+AHRSBOOTLOADER = ../Bootloaders/AHRS/
+AHRSBOOTLOADERINC = $(AHRSBOOTLOADER)/inc
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
@@ -268,6 +270,10 @@ SRC += $(RTOSSRCDIR)/portable/MemMang/heap_2.c
 SRC += $(DOSFSDIR)/dosfs.c
 SRC += $(DOSFSDIR)/dfs_sdcard.c
 
+## AHRS boot loader comms
+SRC += $(AHRSBOOTLOADER)/ahrs_spi_program_master.c
+SRC += $(AHRSBOOTLOADER)/ahrs_spi_program.c
+
 ## Mass Storage Device
 #SRC += $(MSDDIR)/msd.c
 #SRC += $(MSDDIR)/msd_bot.c
@@ -324,6 +330,7 @@ EXTRAINCDIRS  += $(MSDDIR)
 EXTRAINCDIRS  += $(RTOSINCDIR)
 EXTRAINCDIRS  += $(APPLIBDIR)
 EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/ARM_CM3
+EXTRAINCDIRS  += $(AHRSBOOTLOADERINC)
 
 EXTRAINCDIRS += ${foreach MOD, ${MODULES}, Modules/${MOD}/inc} ${OPMODULEDIR}/System/inc
 

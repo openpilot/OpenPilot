@@ -24,13 +24,41 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
- #ifndef AHRS_PROGRAM_MASTER_H
+#ifndef AHRS_PROGRAM_MASTER_H
 #define AHRS_PROGRAM_MASTER_H
 
+typedef enum {PROGRAM_ERR_OK, //OK
+	PROGRAM_ERR_LINK, //comms error
+	PROGRAM_ERR_FUNCTION, //function failed
+} PROGERR;
+
+
 /** Connect to AHRS and request programming mode
-* returns: 0 if connected, -1 if failed.
+* returns: false if failed.
 */
-uint32_t AhrsProgramConnect(void);
+bool AhrsProgramConnect(void);
+
+/** Write data to AHRS
+* size must be between 1 and SPI_MAX_PROGRAM_DATA_SIZE
+* returns: error status
+*/
+
+PROGERR AhrsProgramWrite(uint32_t address, void * data, uint32_t size);
+
+/** Read data from AHRS
+* size must be between 1 and SPI_MAX_PROGRAM_DATA_SIZE
+* returns: error status
+*/
+
+PROGERR AhrsProgramRead(uint32_t address, void * data, uint32_t size);
+
+
+/** reboot AHRS
+* returns: error status
+*/
+
+PROGERR AhrsProgramReboot(void);
+
 
 //TODO: Implement programming protocol
 

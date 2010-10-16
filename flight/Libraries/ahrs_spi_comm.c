@@ -23,7 +23,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
+#include <pios.h>
 #include "ahrs_spi_comm.h"
 #include "ahrs_spi_program.h"
 
@@ -49,7 +49,7 @@ CRC8 does not always catch noise from cross-coupling between data lines.
 #endif
 
 //packet types
-typedef enum { COMMS_NULL, COMMS_OBJECT, COMMS_PROGRAM } COMMSCOMMAND;
+typedef enum { COMMS_NULL, COMMS_OBJECT } COMMSCOMMAND;
 
 //The maximum number of objects that can be updated in one cycle.
 //Currently the link is capable of sending 3 packets per cycle but 2 is enough
@@ -78,6 +78,7 @@ typedef struct {
 	union {			//allow for expansion to other packet types.
 		ObjectPacketData objects[MAX_UPDATE_OBJECTS];
 	};
+	uint8_t dummy; //For some reason comms trashes the last byte
 } CommsDataPacket;
 
 static void FillObjectPacket();
@@ -125,9 +126,11 @@ static bool callbackPending[MAX_AHRS_OBJECTS];
 static uint8_t linkOk = false;
 static int okCount = MIN_OK_FRAMES;
 static int emptyCount = MIN_EMPTY_OBJECTS;
+static bool programReceive = false;
 
 void AhrsInitComms(void)
 {
+	programReceive = false;
 	AhrsInitHandles();
 	memset(objCallbacks, 0, sizeof(AhrsEventCallback) * MAX_AHRS_OBJECTS);
 	memset(callbackPending, 0, sizeof(bool) * MAX_AHRS_OBJECTS);
@@ -237,9 +240,6 @@ void HandleRxPacket()
 		HandleObjectPacket();
 		break;
 
-	case COMMS_PROGRAM:	//TODO: programming protocol
-		break;
-
 	default:
 		txPacket.status.invalidPacket++;
 	}
@@ -313,7 +313,6 @@ void CommsCallback(uint8_t crc_ok, uint8_t crc_val)
 	}
 
 
-	rxPacket.magicNumber = 0;
 	if (crc_ok) {
 		if (!linkOk && okCount > 0) {
 			okCount--;
@@ -326,8 +325,11 @@ void CommsCallback(uint8_t crc_ok, uint8_t crc_val)
 		HandleRxPacket();
 	} else {
 #ifdef IN_AHRS			//AHRS - do we neeed to enter program mode?
-		if (memcmp(&rxPacket, SPI_PROGRAM_REQUEST, SPI_PROGRAM_REQUEST_LENGTH) == 0) {
-			AhrsProgramReceive();
+		if (memcmp(&rxPacket, SPI_PROGRAM_REQUEST, SPI_PROGRAM_REQUEST_LENGTH) == 0)
+		{
+			rxPacket.magicNumber = 0;
+			programReceive = true; //flag it to be executed in program space
+			return;
 		}
 #endif
 		txPacket.status.crcErrors++;
@@ -339,6 +341,7 @@ void CommsCallback(uint8_t crc_ok, uint8_t crc_val)
 			}
 		}
 	}
+	rxPacket.magicNumber = 0;
 #ifdef IN_AHRS
 	/*queue next frame
 	   If PIOS_SPI_TransferBlock() fails for any reason, comms will stop working.
@@ -367,6 +370,11 @@ void PollEvents(void)
 #ifdef IN_AHRS
 void AhrsPoll()
 {
+	if(programReceive)
+	{
+		AhrsProgramReceive();
+		programReceive = false;
+	}
 	PollEvents();
 	if (PIOS_SPI_Busy(PIOS_SPI_OP) != 0) {	//Everything is working correctly
 		return;

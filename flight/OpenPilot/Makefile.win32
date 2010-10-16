@@ -53,7 +53,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Telemetry Stabilization/experimental/Stabilization ManualControl
+MODULES =  Telemetry Stabilization ManualControl
 #MODULES =  Telemetry GPS ManualControl Actuator Altitude Attitude Stabilization
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
@@ -126,9 +126,6 @@ endif
 
 ## UAVOBJECTS
 ifndef TESTAPP
-SRC += $(OPUAVOBJ)/exampleobject1.c
-SRC += $(OPUAVOBJ)/exampleobject2.c
-SRC += $(OPUAVOBJ)/examplesettings.c
 SRC += $(OPUAVOBJ)/objectpersistence.c
 SRC += $(OPUAVOBJ)/positionactual.c
 SRC += $(OPUAVOBJ)/gpsposition.c
@@ -155,15 +152,13 @@ SRC += $(OPUAVOBJ)/ahrssettings.c
 SRC += $(OPUAVOBJ)/flightbatterystate.c
 SRC += $(OPUAVOBJ)/attituderaw.c
 SRC += $(OPUAVOBJ)/homelocation.c
-SRC += $(OPUAVOBJ)/attitudesettings.c
-SRC += $(OPUAVOBJ)/vtolsettings.c
 SRC += $(OPUAVOBJ)/mixersettings.c
 SRC += $(OPUAVOBJ)/mixerstatus.c
-#SRC += $(OPUAVOBJ)/lesstabilizationsettings.c
 SRC += $(OPUAVOBJ)/positiondesired.c
 SRC += $(OPUAVOBJ)/velocitydesired.c
 SRC += $(OPUAVOBJ)/velocityactual.c
 SRC += $(OPUAVOBJ)/guidancesettings.c
+SRC += $(OPUAVOBJ)/firmwareiapobj.c
 endif
 
 ## PIOS Hardware (win32)

@@ -116,6 +116,7 @@ void Simulator::onStart()
 	ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
 	UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
 	actDesired = ActuatorDesired::GetInstance(objManager);
+	posHome = HomeLocation::GetInstance(objManager);
 	velActual = VelocityActual::GetInstance(objManager);
 	posActual = PositionActual::GetInstance(objManager);
         altActual = BaroAltitude::GetInstance(objManager);
@@ -205,6 +206,9 @@ void Simulator::setupObjects()
 	setupOutputObject(altActual, 250);
 	setupOutputObject(attActual, 75);
         setupOutputObject(gpsPos, 250);
+        setupOutputObject(posActual, 250);
+        setupOutputObject(velActual, 250);
+        setupOutputObject(posHome, 1000);
 }
 
 void Simulator::setupInputObject(UAVObject* obj, int updatePeriod)

@@ -229,21 +229,53 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
 	attActualData.q4 = 0;
 	attActual->setData(attActualData);
 
+	// Update positionActual objects
+	PositionActual::DataFields posData;
+	posData.North =  current.Y*100;
+	posData.East = current.X*100;
+	posData.Down = current.Z*-100;
+	posActual->setData(posData);
+
+	// Update velocityActual objects
+	VelocityActual::DataFields velData;
+	velData.North = current.dY*100;
+	velData.East = current.dX*100;
+	velData.Down = current.dZ*100;
+	velActual->setData(velData);
+
+	// Update homelocation
+	HomeLocation::DataFields homeData;
+	homeData.Latitude = settings.latitude.toFloat() * 10e6;
+	homeData.Longitude = settings.longitude.toFloat() * 10e6;
+	homeData.Altitude = 0;
+	double LLA[3];
+	LLA[0]=settings.latitude.toFloat();
+	LLA[1]=settings.longitude.toFloat();
+	LLA[2]=0;
+	double ECEF[3];
+	Utils::CoordinateConversions().RneFromLLA(LLA,(double(*)[3])homeData.RNE);
+	Utils::CoordinateConversions().LLA2ECEF(LLA,ECEF);
+	homeData.ECEF[0]=ECEF[0]*100;
+	homeData.ECEF[1]=ECEF[1]*100;
+	homeData.ECEF[2]=ECEF[2]*100;
+	homeData.Be[0]=0;
+	homeData.Be[1]=0;
+	homeData.Be[2]=0;
+	posHome->setData(homeData);
+
 	// Update gps objects
         GPSPosition::DataFields gpsData;
         memset(&gpsData, 0, sizeof(GPSPosition::DataFields));
         gpsData.Altitude = current.Z;
 	gpsData.Heading = current.azimuth;
 	gpsData.Groundspeed = current.groundspeed;
-	gpsData.Latitude = settings.latitude.toFloat() + current.Y * DEG2M;
-	if (gpsData.Latitude<-89.0 or gpsData.Latitude>89.0) {
-		// oops - this is rare enough to just prevent overflow here...
-	// IL2 has no north pole map anyway
-	gpsData.Latitude=0.0;
-	}
-	gpsData.Longitude = settings.longitude.toFloat() + current.X * (1.0/cos(gpsData.Latitude*DEG2RAD)) * DEG2M;
-	while (gpsData.Longitude<-180.0) gpsData.Longitude+=360.0;
-	while (gpsData.Longitude>180.0) gpsData.Longitude-=360.0;
+	double NED[3];
+	NED[0] = current.Y;
+	NED[1] = current.X;
+	NED[2] = -current.Z;
+	Utils::CoordinateConversions().GetLLA(ECEF,NED,LLA);
+	gpsData.Latitude = LLA[0];
+	gpsData.Longitude = LLA[1];
 	gpsData.Satellites = 7;
         gpsData.Status = GPSPosition::STATUS_FIX3D;
         gpsPos->setData(gpsData);
@@ -251,6 +283,9 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
 	// issue manual update
 	attActual->updated();
 	altActual->updated();
+	posActual->updated();
+	velActual->updated();
+        posHome->updated();
         gpsPos->updated();
 }
 

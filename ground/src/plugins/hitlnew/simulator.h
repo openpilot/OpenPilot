@@ -42,8 +42,10 @@
 #include "uavobjects/baroaltitude.h"
 #include "uavobjects/attitudeactual.h"
 #include "uavobjects/gpsposition.h"
+#include "uavobjects/homelocation.h"
 #include "uavobjects/gcstelemetrystats.h"
 
+#include "utils/coordinateconversions.h"
 
 /**
  * just imagine this was a class without methods and all public properties
@@ -149,6 +151,7 @@ protected:
 	AttitudeActual* attActual;
 	VelocityActual* velActual;
 	PositionActual* posActual;
+	HomeLocation* posHome;
         GPSPosition* gpsPos;
 	GCSTelemetryStats* telStats;
 

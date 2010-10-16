@@ -72,10 +72,20 @@
 	float dY;
 	float dZ;
 
+	// acceleration (absolute)
+	float ddX;
+	float ddY;
+	float ddZ;
+
 	//angle
 	float azimuth;
 	float pitch;
 	float roll;
+	
+	//rotation speed
+	float dAzimuth;
+	float dPitch;
+	float dRoll;
 
 } FLIGHT_PARAM;
 

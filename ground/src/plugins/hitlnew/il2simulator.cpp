@@ -209,6 +209,18 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
 	current.X = old.X + (current.dX*current.dT);
 	current.Y = old.Y + (current.dY*current.dT);
 
+	// accelerations (filtered)
+#define SPEED_FILTER 2
+	current.ddX = ((current.dX-old.dX) + SPEED_FILTER * (old.ddX)) / (SPEED_FILTER+1);
+	current.ddY = ((current.dY-old.dY) + SPEED_FILTER * (old.ddY)) / (SPEED_FILTER+1);
+	current.ddZ = ((current.dZ-old.dZ) + SPEED_FILTER * (old.ddZ)) / (SPEED_FILTER+1);
+
+#define TURN_FILTER 2
+	// turn speeds (filtered)
+	current.dAzimuth = ((current.azimuth-old.azimuth) + TURN_FILTER * (old.dAzimuth)) / (TURN_FILTER+1);
+	current.dPitch   = ((current.pitch-old.pitch)     + TURN_FILTER * (old.dPitch))   / (TURN_FILTER+1);
+	current.dRoll    = ((current.roll-old.roll)       + TURN_FILTER * (old.dRoll))    / (TURN_FILTER+1);
+
 	// Update AltitudeActual object
 	BaroAltitude::DataFields altActualData;
 	memset(&altActualData, 0, sizeof(BaroAltitude::DataFields));
@@ -242,6 +254,13 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
 	velData.East = current.dX*100;
 	velData.Down = current.dZ*100;
 	velActual->setData(velData);
+
+	// Update AttitudeRaw object (filtered gyros only for now)
+	AttitudeRaw::DataFields rawData;
+	rawData.gyros_filtered[0] = current.dRoll;
+	rawData.gyros_filtered[1] = cos(DEG2RAD * current.roll) * current.dPitch + sin(DEG2RAD * current.roll) * current.dAzimuth;
+	rawData.gyros_filtered[2] = cos(DEG2RAD * current.roll) * current.dAzimuth - sin(DEG2RAD * current.roll) * current.dPitch;
+	attRaw->setData(rawData);
 
 	// Update homelocation
 	HomeLocation::DataFields homeData;
@@ -287,5 +306,6 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
 	velActual->updated();
         posHome->updated();
         gpsPos->updated();
+        attRaw->updated();
 }
 

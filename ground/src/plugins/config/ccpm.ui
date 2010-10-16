@@ -6,21 +6,48 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>821</width>
-    <height>606</height>
+    <width>730</width>
+    <height>500</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>500</width>
+    <height>500</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
   <widget class="QTabWidget" name="TabObject">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>791</width>
-     <height>551</height>
+     <x>0</x>
+     <y>30</y>
+     <width>731</width>
+     <height>470</height>
     </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>692</width>
+     <height>419</height>
+    </size>
    </property>
    <property name="currentIndex">
     <number>0</number>
@@ -29,47 +56,16 @@
     <attribute name="title">
      <string>Basic settings</string>
     </attribute>
-    <widget class="QComboBox" name="ccpmType">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
-       <x>110</x>
+       <x>0</x>
        <y>10</y>
-       <width>551</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="toolTip">
-      <string>Select aircraft type here</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>91</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Swashplate config:</string>
-     </property>
-    </widget>
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>11</x>
-       <y>60</y>
-       <width>764</width>
+       <width>721</width>
        <height>427</height>
       </rect>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
        <layout class="QFormLayout" name="formLayout">
         <property name="fieldGrowthPolicy">
@@ -486,136 +482,284 @@
        </layout>
       </item>
       <item>
-       <widget class="QGroupBox" name="ccpmPitchMixingBox">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="title">
-         <string>CCPM Mixing</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_18">
-         <item>
-          <widget class="QSplitter" name="splitter_2">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
+       <layout class="QFormLayout" name="formLayout_7">
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="ccpmPitchMixingBox">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>250</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>250</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>8</pointsize>
+           </font>
+          </property>
+          <property name="title">
+           <string>CCPM</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <widget class="QWidget" name="">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>20</y>
+             <width>48</width>
+             <height>218</height>
+            </rect>
            </property>
-           <widget class="QLabel" name="label_15">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string>Collective</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-           <widget class="QSlider" name="ccpmCollectiveSlider">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximum">
-             <number>100</number>
-            </property>
-            <property name="singleStep">
-             <number>5</number>
-            </property>
-            <property name="value">
-             <number>50</number>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-           </widget>
-           <widget class="QLabel" name="label_16">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string>Cyclic</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <widget class="QLabel" name="label_15">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Collective</string>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <item>
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>5</width>
+                  <height>25</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QSlider" name="ccpmCollectiveSlider">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>150</height>
+                 </size>
+                </property>
+                <property name="maximum">
+                 <number>100</number>
+                </property>
+                <property name="singleStep">
+                 <number>5</number>
+                </property>
+                <property name="value">
+                 <number>50</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>5</width>
+                  <height>25</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_16">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>Cyclic</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="ccpmCollectivespinBox">
+              <property name="maximum">
+               <number>100</number>
+              </property>
+              <property name="singleStep">
+               <number>5</number>
+              </property>
+              <property name="value">
+               <number>50</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="ccpmCollectivespinBox">
-           <property name="maximum">
-            <number>100</number>
+          <zorder>splitter_2</zorder>
+          <zorder>ccpmCollectivespinBox</zorder>
+          <zorder>ccpmCollectiveSlider</zorder>
+          <zorder>label_15</zorder>
+          <zorder>ccpmCollectivespinBox</zorder>
+          <zorder>label_16</zorder>
+          <zorder></zorder>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QGroupBox" name="ccpmRevoMixingBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>250</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>250</height>
+           </size>
+          </property>
+          <property name="title">
+           <string>REVO</string>
+          </property>
+          <widget class="QWidget" name="">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>20</y>
+             <width>47</width>
+             <height>218</height>
+            </rect>
            </property>
-           <property name="singleStep">
-            <number>5</number>
-           </property>
-           <property name="value">
-            <number>50</number>
-           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <widget class="QLabel" name="label_14">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>100%</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item>
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>5</width>
+                  <height>25</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QSlider" name="ccpmRevoSlider">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>150</height>
+                 </size>
+                </property>
+                <property name="maximum">
+                 <number>100</number>
+                </property>
+                <property name="singleStep">
+                 <number>5</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>5</width>
+                  <height>25</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_13">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>0%</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="ccpmREVOspinBox"/>
+            </item>
+           </layout>
           </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QGroupBox" name="ccpmRevoMixingBox">
-        <property name="title">
-         <string>REVO Mixing</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_17">
-         <item>
-          <widget class="QSplitter" name="splitter">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <widget class="QLabel" name="label_14">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>100%</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-           <widget class="QSlider" name="ccpmRevoSlider">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="maximum">
-             <number>100</number>
-            </property>
-            <property name="singleStep">
-             <number>5</number>
-            </property>
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-           </widget>
-           <widget class="QLabel" name="label_13">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>0%</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="ccpmREVOspinBox"/>
-         </item>
-        </layout>
-       </widget>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QGroupBox" name="ccpmRevoMixingBox_2">
@@ -712,6 +856,19 @@
          </item>
         </layout>
        </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_6">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>5</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>
@@ -1667,53 +1824,39 @@
     </widget>
    </widget>
   </widget>
-  <widget class="QPushButton" name="getccpmCurrent">
+  <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>570</y>
-     <width>93</width>
-     <height>27</height>
+     <x>170</x>
+     <y>0</y>
+     <width>421</width>
+     <height>26</height>
     </rect>
    </property>
-   <property name="toolTip">
-    <string>Retrieve settings from OpenPilot</string>
-   </property>
-   <property name="text">
-    <string>Get Current</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="saveccpmToRAM">
-   <property name="geometry">
-    <rect>
-     <x>510</x>
-     <y>570</y>
-     <width>93</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string>Send to OpenPilot but don't write in SD.</string>
-   </property>
-   <property name="text">
-    <string>Save to RAM</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="saveccpmToSD">
-   <property name="geometry">
-    <rect>
-     <x>620</x>
-     <y>570</y>
-     <width>93</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string>Applies and Saves all settings to SD</string>
-   </property>
-   <property name="text">
-    <string>Save to SD</string>
-   </property>
+   <layout class="QFormLayout" name="formLayout_6">
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Swashplate config:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QComboBox" name="ccpmType">
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Select aircraft type here</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <customwidgets>
@@ -1739,14 +1882,10 @@
   <tabstop>ccpmAngleY</tabstop>
   <tabstop>ccpmAngleZ</tabstop>
   <tabstop>ccpmCorrectionAngle</tabstop>
-  <tabstop>ccpmCollectiveSlider</tabstop>
   <tabstop>ccpmCollectivespinBox</tabstop>
   <tabstop>ccpmRevoSlider</tabstop>
   <tabstop>ccpmREVOspinBox</tabstop>
   <tabstop>SwashplateImage</tabstop>
-  <tabstop>getccpmCurrent</tabstop>
-  <tabstop>saveccpmToRAM</tabstop>
-  <tabstop>saveccpmToSD</tabstop>
   <tabstop>CurveType</tabstop>
   <tabstop>NumCurvePoints</tabstop>
   <tabstop>CurveValue1</tabstop>
@@ -1772,8 +1911,8 @@
      <y>309</y>
     </hint>
     <hint type="destinationlabel">
-     <x>228</x>
-     <y>501</y>
+     <x>259</x>
+     <y>467</y>
     </hint>
    </hints>
   </connection>
@@ -1784,8 +1923,8 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>247</x>
-     <y>496</y>
+     <x>259</x>
+     <y>467</y>
     </hint>
     <hint type="destinationlabel">
      <x>243</x>
@@ -1800,8 +1939,8 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>320</x>
-     <y>498</y>
+     <x>344</x>
+     <y>467</y>
     </hint>
     <hint type="destinationlabel">
      <x>326</x>
@@ -1820,8 +1959,8 @@
      <y>222</y>
     </hint>
     <hint type="destinationlabel">
-     <x>308</x>
-     <y>496</y>
+     <x>344</x>
+     <y>467</y>
     </hint>
    </hints>
   </connection>

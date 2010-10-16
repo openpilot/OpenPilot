@@ -140,9 +140,9 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     UpdateType();
 
-    connect(m_ccpm->saveccpmToSD, SIGNAL(clicked()), this, SLOT(saveccpmUpdate()));
-    connect(m_ccpm->saveccpmToRAM, SIGNAL(clicked()), this, SLOT(sendccpmUpdate()));
-    connect(m_ccpm->getccpmCurrent, SIGNAL(clicked()), this, SLOT(requestccpmUpdate()));
+    //connect(m_ccpm->saveccpmToSD, SIGNAL(clicked()), this, SLOT(saveccpmUpdate()));
+    //connect(m_ccpm->saveccpmToRAM, SIGNAL(clicked()), this, SLOT(sendccpmUpdate()));
+    //connect(m_ccpm->getccpmCurrent, SIGNAL(clicked()), this, SLOT(requestccpmUpdate()));
     connect(m_ccpm->ccpmGenerateCurve, SIGNAL(clicked()), this, SLOT(GenerateCurve()));
     connect(m_ccpm->NumCurvePoints, SIGNAL(valueChanged(int)), this, SLOT(UpdateCurveSettings()));
     connect(m_ccpm->CurveType, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateCurveSettings()));
@@ -437,6 +437,7 @@ void ConfigccpmWidget::ccpmSwashplateUpdate()
 
     //m_ccpm->SwashplateImage->centerOn (CenterX, CenterY);
 
+    //m_ccpm->SwashplateImage->fitInView(SwashplateImg, Qt::KeepAspectRatio);
 
     UpdateMixer();
 
@@ -553,15 +554,151 @@ void ConfigccpmWidget::UpdateMixer()
   */
 void ConfigccpmWidget::requestccpmUpdate()
 {
-    //ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    //UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    int MixerDataFromHeli[8][5];
+    QString MixerOutputType[8];
+    int EngineChannel,TailRotorChannel,ServoChannels[4],ServoAngles[4],ServoCurve2[4];
+    int NumServos=0;
+    double Collective=0.0;
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    int i,j;
+    UAVObjectField *field;
+    UAVDataObject* obj;
+    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));
+    Q_ASSERT(obj);
+
+    //go through the user data and update the mixer matrix
+    for (i=0;i<8;i++)
+    {
+            field = obj->getField(tr( "Mixer%1Vector" ).arg(i));
+            //config the vector
+            for (j=0;j<5;j++)
+            {
+                MixerDataFromHeli[i][j] = field->getValue(j).toInt();
+                //field->setValue(m_ccpm->ccpmAdvancedSettingsTable->item(i,j+1)->text().toInt(),j);
+            }
+    }
+    for (i=0;i<8;i++)
+    {
+            field = obj->getField(tr( "Mixer%1Type" ).arg(i));
+            MixerOutputType[i] = field->getValue().toString();
+    }
+
+    EngineChannel =-1;
+    TailRotorChannel =-1;
+    for (j=0;j<5;j++)
+    {
+        ServoChannels[j]=8;
+        ServoCurve2[j]=0;
+        ServoAngles[j]=350;
+    }
+
+    NumServos=0;
+    //process the data from Heli and try to figure out the settings...
+    for (i=0;i<8;i++)
+    {
+        //check if this is the engine... Throttle only
+        if ((MixerOutputType[i].compare("Motor")==0)&&
+            (MixerDataFromHeli[i][0]>0)&&//ThrottleCurve1
+            (MixerDataFromHeli[i][1]==0)&&//ThrottleCurve2
+            (MixerDataFromHeli[i][2]==0)&&//Roll
+            (MixerDataFromHeli[i][3]==0)&&//Pitch
+            (MixerDataFromHeli[i][4]==0))//Yaw
+        {
+            EngineChannel = i;
+            m_ccpm->ccpmEngineChannel->setCurrentIndex(i);
+
+        }
+        //check if this is the tail rotor... REVO and YAW
+        if ((MixerOutputType[i].compare("Servo")==0)&&
+            //(MixerDataFromHeli[i][0]!=0)&&//ThrottleCurve1
+            (MixerDataFromHeli[i][1]==0)&&//ThrottleCurve2
+            (MixerDataFromHeli[i][2]==0)&&//Roll
+            (MixerDataFromHeli[i][3]==0)&&//Pitch
+            (MixerDataFromHeli[i][4]!=0))//Yaw
+        {
+            TailRotorChannel = i;
+            m_ccpm->ccpmTailChannel->setCurrentIndex(i);
+            m_ccpm->ccpmRevoSlider->setValue((MixerDataFromHeli[i][0]*100)/127);
+            m_ccpm->ccpmREVOspinBox->setValue((MixerDataFromHeli[i][0]*100)/127);
+        }
+        //check if this is a swashplate servo... Throttle is zero
+        if ((MixerOutputType[i].compare("Servo")==0)&&
+            (MixerDataFromHeli[i][0]==0)&&//ThrottleCurve1
+            //(MixerDataFromHeli[i][1]==0)&&//ThrottleCurve2
+            //(MixerDataFromHeli[i][2]==0)&&//Roll
+            //(MixerDataFromHeli[i][3]==0)&&//Pitch
+            (MixerDataFromHeli[i][4]==0))//Yaw
+        {
+            ServoChannels[NumServos] = i;//record the channel for this servo
+            ServoCurve2[NumServos]=MixerDataFromHeli[i][1];//record the ThrottleCurve2 contribution to this servo
+            ServoAngles[NumServos]=NumServos*45;//make this 0 for the final version
+
+            //if (NumServos==0)m_ccpm->ccpmServoWChannel->setCurrentIndex(i);
+            //if (NumServos==1)m_ccpm->ccpmServoXChannel->setCurrentIndex(i);
+            //if (NumServos==2)m_ccpm->ccpmServoYChannel->setCurrentIndex(i);
+            //if (NumServos==3)m_ccpm->ccpmServoZChannel->setCurrentIndex(i);
+            NumServos++;
+        }
+
+    }
+    m_ccpm->ccpmServoWChannel->setCurrentIndex(ServoChannels[0]);
+    m_ccpm->ccpmServoXChannel->setCurrentIndex(ServoChannels[1]);
+    m_ccpm->ccpmServoYChannel->setCurrentIndex(ServoChannels[2]);
+    m_ccpm->ccpmServoZChannel->setCurrentIndex(ServoChannels[3]);
+
+    m_ccpm->ccpmAngleW->setValue(ServoAngles[0]);
+    m_ccpm->ccpmAngleX->setValue(ServoAngles[1]);
+    m_ccpm->ccpmAngleY->setValue(ServoAngles[2]);
+    m_ccpm->ccpmAngleZ->setValue(ServoAngles[3]);
+
+    if (NumServos>1)
+    {
+        if((ServoCurve2[0]==0)&&(ServoCurve2[1]==0)&&(ServoCurve2[2]==0)&&(ServoCurve2[3]==0))
+        {
+            //fixed pitch heli
+            m_ccpm->ccpmCollectiveSlider->setValue(0);
+        }
+        if(ServoCurve2[0]==ServoCurve2[1])
+        {
+            if ((NumServos<3)||(ServoCurve2[1]==ServoCurve2[2]))
+            {
+                if ((NumServos<4)||(ServoCurve2[2]==ServoCurve2[3]))
+                {//all the servos have the same ThrottleCurve2 setting so this must be a CCPM config
+                    Collective = ((double)ServoCurve2[0]*100.00)/127.00;
+                    m_ccpm->ccpmCollectiveSlider->setValue((int)Collective);
+                    m_ccpm->ccpmCollectivespinBox->setValue((int)Collective);
+
+                    //just call it user angles for now....
+                    m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("Custom - User Angles"));
+                }
+            }
+        }
+    }
+    else
+    {//must be a custom config... "Custom - Advanced Settings"
+        m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("Custom - Advanced Settings"));
+    }
 
 
-    //UAVObjectField *field;
-    //QTableWidgetItem *newItem;// = new QTableWidgetItem();
+
+    //get the settings for the curve from the mixer settings
+    field = obj->getField(QString("ThrottleCurve1"));
+    for (i=0;i<5;i++)
+    {
+        m_ccpm->CurveSettings->item(i, 0)->setText(field->getValue(i).toString());
+        //field->setValue(m_ccpm->CurveSettings->item(i, 0)->text().toDouble(),i);
+    }
+    field = obj->getField(QString("ThrottleCurve2"));
+    for (i=0;i<5;i++)
+    {
+        m_ccpm->CurveSettings->item(i, 1)->setText(field->getValue(i).toString());
+        //field->setValue(m_ccpm->CurveSettings->item(i, 1)->text().toDouble(),i);
+    }
 
 
-	//not doing anything yet
+
 
 
     ccpmSwashplateUpdate();
@@ -617,7 +754,7 @@ void ConfigccpmWidget::sendccpmUpdate()
                 //config the vector
                 for (j=0;j<5;j++)
                 {
-                    //field->setValue(j,m_ccpm->ccpmAdvancedSettingsTable->item(i,j+1)->text().toInt());
+                    field->setValue(m_ccpm->ccpmAdvancedSettingsTable->item(i,j+1)->text().toInt(),j);
                 }
 
             }

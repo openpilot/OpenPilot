@@ -63,14 +63,15 @@ private:
         int MixerChannelData[6];
 
     private slots:
-        void requestccpmUpdate();
-        void sendccpmUpdate();
-        void saveccpmUpdate();
         void ccpmSwashplateUpdate();
         void UpdateCurveSettings();
         void GenerateCurve();
         void UpdateMixer();
         void UpdateType();
+    public slots:
+        void requestccpmUpdate();
+        void sendccpmUpdate();
+        void saveccpmUpdate();
 
 };
 

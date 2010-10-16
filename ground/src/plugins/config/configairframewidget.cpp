@@ -546,8 +546,10 @@ void ConfigAirframeWidget::requestAircraftUpdate()
         Q_ASSERT(field);
         m_aircraft->maxAccelSlider->setValue(field->getDouble());
 
+    } else if (frameType == "HeliCP") {
+        m_aircraft->widget_3->requestccpmUpdate();
+         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Helicopter"));//"Helicopter"
     }
-
 }
 
 /**
@@ -1352,6 +1354,9 @@ void ConfigAirframeWidget::sendAircraftUpdate()
 
         // Now reflect those settings in the "Custom" panel as well
         updateCustomAirframeUI();
+    } else  if (m_aircraft->aircraftType->currentText() == "Helicopter") {
+        airframeType = "HeliCP";
+        m_aircraft->widget_3->sendccpmUpdate();
     } else {
         airframeType = "Custom";
     }

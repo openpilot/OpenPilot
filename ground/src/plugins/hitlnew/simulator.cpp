@@ -121,6 +121,7 @@ void Simulator::onStart()
 	posActual = PositionActual::GetInstance(objManager);
         altActual = BaroAltitude::GetInstance(objManager);
 	attActual = AttitudeActual::GetInstance(objManager);
+	attRaw = AttitudeRaw::GetInstance(objManager);
         gpsPos = GPSPosition::GetInstance(objManager);
 	telStats = GCSTelemetryStats::GetInstance(objManager);
 
@@ -202,13 +203,14 @@ void Simulator::receiveUpdate()
 
 void Simulator::setupObjects()
 {
-	setupInputObject(actDesired, 75);
+	setupInputObject(actDesired, 50);
 	setupOutputObject(altActual, 250);
-	setupOutputObject(attActual, 75);
+	setupOutputObject(attActual, 50);
         setupOutputObject(gpsPos, 250);
         setupOutputObject(posActual, 250);
         setupOutputObject(velActual, 250);
         setupOutputObject(posHome, 1000);
+        setupOutputObject(attRaw, 50);
 }
 
 void Simulator::setupInputObject(UAVObject* obj, int updatePeriod)

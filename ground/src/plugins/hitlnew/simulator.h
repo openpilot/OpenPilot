@@ -43,6 +43,7 @@
 #include "uavobjects/attitudeactual.h"
 #include "uavobjects/gpsposition.h"
 #include "uavobjects/homelocation.h"
+#include "uavobjects/attituderaw.h"
 #include "uavobjects/gcstelemetrystats.h"
 
 #include "utils/coordinateconversions.h"
@@ -152,6 +153,7 @@ protected:
 	VelocityActual* velActual;
 	PositionActual* posActual;
 	HomeLocation* posHome;
+	AttitudeRaw* attRaw;
         GPSPosition* gpsPos;
 	GCSTelemetryStats* telStats;
 

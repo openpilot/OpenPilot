@@ -151,7 +151,7 @@
          <rect>
           <x>10</x>
           <y>10</y>
-          <width>454</width>
+          <width>478</width>
           <height>151</height>
          </rect>
         </property>
@@ -300,6 +300,9 @@
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="decimals">
+              <number>5</number>
+             </property>
              <property name="minimum">
               <double>-100000.000000000000000</double>
              </property>
@@ -370,7 +373,7 @@
          <rect>
           <x>10</x>
           <y>10</y>
-          <width>449</width>
+          <width>473</width>
           <height>139</height>
          </rect>
         </property>
@@ -504,6 +507,9 @@
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="decimals">
+              <number>5</number>
+             </property>
              <property name="minimum">
               <double>-100000.000000000000000</double>
              </property>
@@ -574,7 +580,7 @@
          <rect>
           <x>10</x>
           <y>10</y>
-          <width>449</width>
+          <width>473</width>
           <height>139</height>
          </rect>
         </property>
@@ -707,6 +713,9 @@
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="decimals">
+              <number>5</number>
              </property>
              <property name="minimum">
               <double>-100000.000000000000000</double>

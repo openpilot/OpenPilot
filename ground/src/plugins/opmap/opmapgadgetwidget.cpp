@@ -45,7 +45,7 @@
 
 
 
-#define allow_manual_home_location_move
+//#define allow_manual_home_location_move
 
 
 // *************************************************************************************

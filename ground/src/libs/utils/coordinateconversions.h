@@ -45,6 +45,7 @@ public:
     void RneFromLLA(double LLA[3], double Rne[3][3]);
     void LLA2ECEF(double LLA[3], double ECEF[3]);
     int ECEF2LLA(double ECEF[3], double LLA[3]);
+    void LLA2Base(double LLA[3], double BaseECEF[3], float Rne[3][3], float NED[3]);
 };
 
 }

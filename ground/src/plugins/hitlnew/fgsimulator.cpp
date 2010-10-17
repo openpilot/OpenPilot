@@ -213,7 +213,7 @@ void FGSimulator::processUpdate(const QByteArray& inp)
 	float velocityActualNorth = fields[23].toFloat() * FPS2CMPS;
 
         //run once
-        HomeLocation::DataFields homeData;
+        HomeLocation::DataFields homeData = posHome->getData();
         if(!once)
         {
             memset(&homeData, 0, sizeof(HomeLocation::DataFields));
@@ -226,7 +226,11 @@ void FGSimulator::processUpdate(const QByteArray& inp)
             LLA[1]=longitude;
             LLA[2]=0;
             double ECEF[3];
-            Utils::CoordinateConversions().RneFromLLA(LLA,(double(*)[3])homeData.RNE);
+            double RNE[9];
+            Utils::CoordinateConversions().RneFromLLA(LLA,(double (*)[3])RNE);
+            for (int t=0;t<9;t++) {
+                    homeData.RNE[t]=RNE[t];
+            }
             Utils::CoordinateConversions().LLA2ECEF(LLA,ECEF);
             homeData.ECEF[0]=ECEF[0]*100;
             homeData.ECEF[1]=ECEF[1]*100;
@@ -286,15 +290,15 @@ void FGSimulator::processUpdate(const QByteArray& inp)
         gpsData.Status = GPSPosition::STATUS_FIX3D;
         gpsPos->setData(gpsData);
 
-        /*float NED[3];
+        float NED[3];
         double LLA[3] = {(double) gpsData.Latitude / 1e7, (double) gpsData.Longitude / 1e7, (double) (gpsData.GeoidSeparation + gpsData.Altitude)};
         // convert from cm back to meters
         double ECEF[3] = {(double) (homeData.ECEF[0] / 100), (double) (homeData.ECEF[1] / 100), (double) (homeData.ECEF[2] / 100)};
                 Utils::CoordinateConversions().LLA2Base(LLA, ECEF, (float (*)[3]) homeData.RNE, NED);
 
-        positionActualData.North = NED[0]; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
-        positionActualData.East = NED[1]; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
-        positionActualData.Down = NED[2]; //Multiply by 100 because positionActual expects input in Centimeters.
-        posActual->setData(positionActualData);*/
+        positionActualData.North = NED[0]*100; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
+        positionActualData.East = NED[1]*100; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
+        positionActualData.Down = NED[2]*100; //Multiply by 100 because positionActual expects input in Centimeters.
+        posActual->setData(positionActualData);
 }
 

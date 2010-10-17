@@ -151,4 +151,20 @@ int CoordinateConversions::GetLLA(double BaseECEFcm[3], double NED[3], double po
     return 0;
 }
 
+void CoordinateConversions::LLA2Base(double LLA[3], double BaseECEF[3], float Rne[3][3], float NED[3])
+{
+        double ECEF[3];
+        float diff[3];
+
+        LLA2ECEF(LLA, ECEF);
+
+        diff[0] = (float)(ECEF[0] - BaseECEF[0]);
+        diff[1] = (float)(ECEF[1] - BaseECEF[1]);
+        diff[2] = (float)(ECEF[2] - BaseECEF[2]);
+
+        NED[0] = Rne[0][0] * diff[0] + Rne[0][1] * diff[1] + Rne[0][2] * diff[2];
+        NED[1] = Rne[1][0] * diff[0] + Rne[1][1] * diff[1] + Rne[1][2] * diff[2];
+        NED[2] = Rne[2][0] * diff[0] + Rne[2][1] * diff[1] + Rne[2][2] * diff[2];
+}
+
 }

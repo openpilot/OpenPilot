@@ -65,6 +65,7 @@ private:
 	float TAS(float ias,float alt);
 
 	void processUpdate(const QByteArray& data);
+	float angleDifference(float a,float b);
 
 };
 

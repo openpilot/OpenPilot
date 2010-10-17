@@ -56,6 +56,7 @@
 	// time
 	float T;
 	float dT;
+	unsigned int i;
 
 	// speed (relative)
 	float ias;

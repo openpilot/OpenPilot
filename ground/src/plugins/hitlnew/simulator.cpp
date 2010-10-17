@@ -172,6 +172,7 @@ void Simulator::onStart()
 	time = new QTime();
 	time->start();
 	current.T=0;
+	current.i=0;
 }
 
 void Simulator::receiveUpdate()

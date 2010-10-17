@@ -43,6 +43,11 @@
 #include "uavobjects/homelocation.h"
 #include "extensionsystem/pluginmanager.h"
 
+
+
+#define allow_manual_home_location_move
+
+
 // *************************************************************************************
 
 #define deg_to_rad          ((double)M_PI / 180.0)
@@ -680,20 +685,21 @@ void OPMapGadgetWidget::updatePosition()
     float yaw = getUAV_Yaw();                                                       // get current UAV heading
 
     internals::PointLatLng uav_pos = internals::PointLatLng(latitude, longitude);	// current UAV position
-    float uav_heading = yaw;                                                        // current UAV heading
+    float uav_heading_degrees = yaw;                                                // current UAV heading
     float uav_altitude_meters = altitude;                                           // current UAV height
     float uav_ground_speed_meters_per_second = 0; //data.Groundspeed;               // current UAV ground speed
 
     // display the UAV lat/lon position
-    QString str =   "lat: " + QString::number(uav_pos.Lat(), 'f', 7) +
-		    "  lon: " + QString::number(uav_pos.Lng(), 'f', 7) +
-		    "  " + QString::number(uav_heading, 'f', 1) + "deg" +
-		    "  " + QString::number(uav_altitude_meters, 'f', 1) + "m" +
-		    "  " + QString::number(uav_ground_speed_meters_per_second, 'f', 1) + "m/s";
+    QString str =
+            "lat: " + QString::number(uav_pos.Lat(), 'f', 7) +
+            " lon: " + QString::number(uav_pos.Lng(), 'f', 7) +
+            " " + QString::number(uav_heading_degrees, 'f', 1) + "deg" +
+            " " + QString::number(uav_altitude_meters, 'f', 1) + "m" +
+            " " + QString::number(uav_ground_speed_meters_per_second, 'f', 1) + "m/s";
     m_widget->labelUAVPos->setText(str);
 
-    m_map->UAV->SetUAVPos(uav_pos, uav_altitude_meters);			// set the maps UAV position
-    m_map->UAV->SetUAVHeading(uav_heading);							// set the maps UAV heading
+    m_map->UAV->SetUAVPos(uav_pos, uav_altitude_meters);                            // set the maps UAV position
+    m_map->UAV->SetUAVHeading(uav_heading_degrees);                                 // set the maps UAV heading
 }
 
 void OPMapGadgetWidget::updateMousePos()
@@ -895,7 +901,7 @@ void OPMapGadgetWidget::WPValuesChanged(WayPointItem *waypoint)
                 magic_waypoint.description = waypoint->Description();
 
                 // move the UAV to the magic waypoint position
-//                moveToMagicWaypointPosition();
+                // moveToMagicWaypointPosition();
             }
             break;
     }
@@ -1502,6 +1508,9 @@ void OPMapGadgetWidget::createActions()
 
     homeMagicWaypointAct = new QAction(tr("Home magic waypoint"), this);
     homeMagicWaypointAct->setStatusTip(tr("Move the magic waypoint to the home position"));
+    #if !defined(allow_manual_home_location_move)
+        homeMagicWaypointAct->setEnabled(false);
+    #endif
     connect(homeMagicWaypointAct, SIGNAL(triggered()), this, SLOT(onHomeMagicWaypointAct_triggered()));
 
     mapModeActGroup = new QActionGroup(this);
@@ -2020,10 +2029,12 @@ void OPMapGadgetWidget::homeMagicWaypoint()
     if (m_map_mode != MagicWaypoint_MapMode)
         return;
 
-    magic_waypoint.coord = home_position.coord;
+    #if defined(allow_manual_home_location_move)
+        magic_waypoint.coord = home_position.coord;
 
-    if (magic_waypoint.map_wp_item)
-        magic_waypoint.map_wp_item->SetCoord(magic_waypoint.coord);
+        if (magic_waypoint.map_wp_item)
+            magic_waypoint.map_wp_item->SetCoord(magic_waypoint.coord);
+    #endif
 }
 
 // *************************************************************************************
@@ -2043,6 +2054,7 @@ void OPMapGadgetWidget::moveToMagicWaypointPosition()
 
     // ToDo:
 
+    // see ConfigAHRSWidget::launchAHRSCalibration()
 }
 
 // *************************************************************************************
@@ -2106,7 +2118,12 @@ void OPMapGadgetWidget::showMagicWaypointControls()
 {
     m_widget->lineWaypoint->setVisible(true);
     m_widget->toolButtonHomeWaypoint->setVisible(true);
-    m_widget->toolButtonMoveToWP->setVisible(true);
+
+    #if defined(allow_manual_home_location_move)
+        m_widget->toolButtonMoveToWP->setVisible(true);
+    #else
+        m_widget->toolButtonMoveToWP->setVisible(false);
+    #endif
 }
 
 // *************************************************************************************
@@ -2250,7 +2267,6 @@ bool OPMapGadgetWidget::getUAV_LLA(double &latitude, double &longitude, double &
     altitude = LLA[2];
 
     return true;
-//    return QPointF(LLA[0], LLA[1]);
 }
 
 double OPMapGadgetWidget::getUAV_Yaw()

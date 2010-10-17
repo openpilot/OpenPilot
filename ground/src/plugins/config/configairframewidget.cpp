@@ -97,6 +97,7 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     scene->addItem(quad);
     scene->setSceneRect(quad->boundingRect());
     m_aircraft->quadShape->setScene(scene);
+
     
 
     connect(m_aircraft->saveAircraftToSD, SIGNAL(clicked()), this, SLOT(saveAircraftUpdate()));
@@ -147,12 +148,24 @@ void ConfigAirframeWidget::showEvent(QShowEvent *event)
     // widget is shown, otherwise it cannot compute its values and
     // the result is usually a ahrsbargraph that is way too small.
     m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
+    m_aircraft->customMixerTable->resizeColumnsToContents();
+    for (int i=0;i<8;i++) {
+        m_aircraft->customMixerTable->setColumnWidth(i,(m_aircraft->customMixerTable->width()-
+                                                        m_aircraft->customMixerTable->verticalHeader()->width())/8);
+    }
 }
 
 void ConfigAirframeWidget::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
     m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
+    // Make the custom table columns autostretch:
+    m_aircraft->customMixerTable->resizeColumnsToContents();
+    for (int i=0;i<8;i++) {
+        m_aircraft->customMixerTable->setColumnWidth(i,(m_aircraft->customMixerTable->width()-
+                                                        m_aircraft->customMixerTable->verticalHeader()->width())/8);
+    }
+
 }
 
 
@@ -1327,6 +1340,19 @@ void ConfigAirframeWidget::updateCustomAirframeUI()
 
     // Update the table:
     for (int i=0; i<8; i++) {
+        field = obj->getField(mixerTypes.at(i));
+        m_aircraft->customMixerTable->item(0,i)->setText(field->getValue().toString());;
+        field = obj->getField(mixerVectors.at(i));
+        int ti = field->getElementNames().indexOf("ThrottleCurve1");
+        m_aircraft->customMixerTable->item(1,i)->setText(field->getValue(ti).toString());
+        ti = field->getElementNames().indexOf("ThrottleCurve2");
+        m_aircraft->customMixerTable->item(2,i)->setText(field->getValue(ti).toString());
+        ti = field->getElementNames().indexOf("Roll");
+        m_aircraft->customMixerTable->item(3,i)->setText(field->getValue(ti).toString());
+        ti = field->getElementNames().indexOf("Pitch");
+        m_aircraft->customMixerTable->item(4,i)->setText(field->getValue(ti).toString());
+        ti = field->getElementNames().indexOf("Yaw");
+        m_aircraft->customMixerTable->item(5,i)->setText(field->getValue(ti).toString());
 
     }
 
@@ -1367,7 +1393,9 @@ void ConfigAirframeWidget::sendAircraftUpdate()
             airframeType = "FixedWingVtail";
             setupFrameVtail();
         }
-    } else if (m_aircraft->aircraftType->currentText() == "Multirotor") {
+        // Now reflect those settings in the "Custom" panel as well
+        updateCustomAirframeUI();
+     } else if (m_aircraft->aircraftType->currentText() == "Multirotor") {
         // We can already setup the feedforward here, as it is common to all platforms
         UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
         UAVObjectField* field = obj->getField(QString("FeedForward"));
@@ -1398,9 +1426,9 @@ void ConfigAirframeWidget::sendAircraftUpdate()
         } else if (m_aircraft->multirotorFrameType->currentText() == "Octocopter") {
             airframeType = "Octo";
         }
-
         // Now reflect those settings in the "Custom" panel as well
         updateCustomAirframeUI();
+
     } else  if (m_aircraft->aircraftType->currentText() == "Helicopter") {
         airframeType = "HeliCP";
         m_aircraft->widget_3->sendccpmUpdate();

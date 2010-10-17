@@ -41,11 +41,6 @@
 
 #include "opmapcontrol/opmapcontrol.h"
 
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/positionactual.h"
-#include "uavobjects/homelocation.h"
-#include "extensionsystem/pluginmanager.h"
-
 #include "opmap_overlay_widget.h"
 #include "opmap_zoom_slider_widget.h"
 #include "opmap_statusbar_widget.h"
@@ -237,9 +232,6 @@ private:
     QTimer *m_updateTimer;
     QTimer *m_statusUpdateTimer;
 
-    ExtensionSystem::PluginManager *m_plugin_manager;
-    UAVObjectManager *m_objManager;
-
     Ui::OPMap_Widget *m_widget;
 
     mapcontrol::OPMapWidget *m_map;
@@ -326,7 +318,8 @@ private:
     double bearing(internals::PointLatLng from, internals::PointLatLng to);
     internals::PointLatLng destPoint(internals::PointLatLng source, double bear, double dist);
 
-    QPointF getLatLon();
+    QPointF getUAVLatLon();
+    double getUAVYaw();
 
     void setMapFollowingMode();
 };

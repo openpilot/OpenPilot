@@ -38,6 +38,11 @@
 
 #include <math.h>
 
+#include "uavobjects/uavobjectmanager.h"
+#include "uavobjects/positionactual.h"
+#include "uavobjects/homelocation.h"
+#include "extensionsystem/pluginmanager.h"
+
 // *************************************************************************************
 
 #define deg_to_rad          ((double)M_PI / 180.0)
@@ -70,9 +75,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_zoom_slider_widget = NULL;
     m_statusbar_widget = NULL;
 
-    m_plugin_manager = NULL;
-    m_objManager = NULL;
-
     m_mouse_waypoint = NULL;
 
     prev_tile_number = 0;
@@ -88,11 +90,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // **************
     // fetch required UAVObjects
 
-    m_plugin_manager = ExtensionSystem::PluginManager::instance();
-    m_objManager = m_plugin_manager->getObject<UAVObjectManager>();
-
     // current position
-    QPointF pos = getLatLon();
+    QPointF pos = getUAVLatLon();
     internals::PointLatLng pos_lat_lon = internals::PointLatLng(pos.x(), pos.y());
 
     // **************
@@ -668,10 +667,11 @@ void OPMapGadgetWidget::updatePosition()
 
     QMutexLocker locker(&m_map_mutex);
 
-    QPointF pos = getLatLon();
+    QPointF pos = getUAVLatLon();                                               // get current UAV lat/lon
+    float yaw = getUAVYaw();                                                    // get current UAV heading
 
     internals::PointLatLng uav_pos = internals::PointLatLng(pos.x(), pos.y());	// current UAV position
-    float uav_heading = 0; //data.Heading;                              		// current UAV heading
+    float uav_heading = yaw;                                                    // current UAV heading
     float uav_altitude_meters = 0; //data.Altitude;                 			// current UAV height
     float uav_ground_speed_meters_per_second = 0; //data.Groundspeed;			// current UAV ground speed
 
@@ -745,7 +745,7 @@ void OPMapGadgetWidget::updateMousePos()
     {
         s += "  uav";
 
-        QPointF pos = getLatLon();
+        QPointF pos = getUAVLatLon();
         internals::PointLatLng uav_pos = internals::PointLatLng(pos.x(), pos.y());	// current UAV position
 
 //        double dist = distance(home_lat_lon, uav_pos);
@@ -1731,7 +1731,7 @@ void OPMapGadgetWidget::onGoUAVAct_triggered()
     if (!m_widget || !m_map)
         return;
 
-    QPointF pos = getLatLon();
+    QPointF pos = getUAVLatLon();
 
     internals::PointLatLng uav_pos = internals::PointLatLng(pos.x(), pos.y());	// current UAV position
     internals::PointLatLng map_pos = m_map->CurrentPosition();				// current MAP position
@@ -2197,25 +2197,48 @@ internals::PointLatLng OPMapGadgetWidget::destPoint(internals::PointLatLng sourc
 
 // *************************************************************************************
 
-QPointF OPMapGadgetWidget::getLatLon()
+QPointF OPMapGadgetWidget::getUAVLatLon()
 {
     double BaseECEF[3];
     double NED[3];
     double LLA[3];
     UAVObject *obj;
 
-    obj = dynamic_cast<UAVDataObject*>(m_objManager->getObject(QString("HomeLocation")));
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    if (!pm) return QPointF(0, 0);
+    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+    if (!om) return QPointF(0, 0);
+
+    obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("HomeLocation")));
+    if (!obj) return QPointF(0, 0);
     BaseECEF[0] = obj->getField(QString("ECEF"))->getDouble(0) / 100;
     BaseECEF[1] = obj->getField(QString("ECEF"))->getDouble(1) / 100;
     BaseECEF[2] = obj->getField(QString("ECEF"))->getDouble(2) / 100;
 
-    obj = dynamic_cast<UAVDataObject*>(m_objManager->getObject(QString("PositionActual")));
+    obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("PositionActual")));
+    if (!obj) return QPointF(0, 0);
     NED[0] = obj->getField(QString("North"))->getDouble() / 100;
     NED[1] = obj->getField(QString("East"))->getDouble() / 100;
     NED[2] = obj->getField(QString("Down"))->getDouble() / 100;
 
+//    obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("PositionDesired")));
+
+//    obj = dynamic_cast<UAVDataObject*>(objManager->getObject("VelocityActual"));      // air speed
+
     Utils::CoordinateConversions().GetLLA(BaseECEF, NED, LLA);
-    return QPointF(LLA[0],LLA[1]);
+
+    return QPointF(LLA[0], LLA[1]);
+}
+
+double OPMapGadgetWidget::getUAVYaw()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    if (!pm) return 0.0;
+    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+    if (!om) return 0.0;
+
+    UAVObject *obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("AttitudeActual")));
+    return obj->getField(QString("Yaw"))->getDouble();
 }
 
 // *************************************************************************************

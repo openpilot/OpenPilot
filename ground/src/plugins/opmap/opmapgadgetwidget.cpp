@@ -541,7 +541,7 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     menu.addAction(zoomInAct);
     menu.addAction(zoomOutAct);
 
-    QMenu zoomSubMenu(tr("&Zoom ") + "(" + QString::number(m_map->ZoomReal()) + ")", this);
+    QMenu zoomSubMenu(tr("&Zoom ") + "(" + QString::number(m_map->ZoomTotal()) + ")", this);
     for (int i = 0; i < zoomAct.count(); i++)
         zoomSubMenu.addAction(zoomAct.at(i));
     menu.addMenu(&zoomSubMenu);
@@ -1145,7 +1145,20 @@ void OPMapGadgetWidget::setHome(QPointF pos)
     if (!m_widget || !m_map)
         return;
 
-    setHome(internals::PointLatLng(pos.x(), pos.y()));
+    double latitude = pos.x();
+    double longitude = pos.y();
+
+    if (latitude >  90) latitude =  90;
+    else
+    if (latitude < -90) latitude = -90;
+
+    if (longitude != longitude) longitude = 0; // nan detection
+    else
+    if (longitude >  180) longitude =  180;
+    else
+    if (longitude < -180) longitude = -180;
+
+    setHome(internals::PointLatLng(latitude, longitude));
 }
 
 void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon)
@@ -1153,8 +1166,30 @@ void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon)
     if (!m_widget || !m_map)
         return;
 
+    // *********
+
+    if (pos_lat_lon.Lat() != pos_lat_lon.Lat() || pos_lat_lon.Lng() != pos_lat_lon.Lng())
+        return;; // nan prevention
+
+    double latitude = pos_lat_lon.Lat();
+    double longitude = pos_lat_lon.Lng();
+
+    if (latitude != latitude) latitude = 0; // nan detection
+    else
+    if (latitude >  90) latitude =  90;
+    else
+    if (latitude < -90) latitude = -90;
+
+    if (longitude != longitude) longitude = 0; // nan detection
+    else
+    if (longitude >  180) longitude =  180;
+    else
+    if (longitude < -180) longitude = -180;
+
+    // *********
+
     #if defined(allow_manual_home_location_move)
-        home_position.coord = pos_lat_lon;
+        home_position.coord = internals::PointLatLng(latitude, longitude);
 
         m_map->Home->SetCoord(home_position.coord);
         m_map->Home->RefreshPos();
@@ -1226,7 +1261,21 @@ void OPMapGadgetWidget::setPosition(QPointF pos)
     if (!m_widget || !m_map)
         return;
 
-    m_map->SetCurrentPosition(internals::PointLatLng(pos.y(), pos.x()));
+    double latitude = pos.y();
+    double longitude = pos.x();
+
+    if (latitude != latitude || longitude != longitude)
+        return; // nan prevention
+
+    if (latitude >  90) latitude =  90;
+    else
+    if (latitude < -90) latitude = -90;
+
+    if (longitude >  180) longitude =  180;
+    else
+    if (longitude < -180) longitude = -180;
+
+    m_map->SetCurrentPosition(internals::PointLatLng(latitude, longitude));
 }
 
 void OPMapGadgetWidget::setMapProvider(QString provider)
@@ -2063,13 +2112,12 @@ void OPMapGadgetWidget::moveToMagicWaypointPosition()
     if (m_map_mode != MagicWaypoint_MapMode)
         return;
 
-//    internals::PointLatLng coord = magic_waypoint.coord;
-//    double altitude = magic_waypoint.altitude;
+    internals::PointLatLng coord = magic_waypoint.coord;
+    double altitude = magic_waypoint.altitude;
 
 
     // ToDo:
 
-    // see ConfigAHRSWidget::launchAHRSCalibration()
 }
 
 // *************************************************************************************

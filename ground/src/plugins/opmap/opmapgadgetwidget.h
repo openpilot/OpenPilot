@@ -318,8 +318,8 @@ private:
     double bearing(internals::PointLatLng from, internals::PointLatLng to);
     internals::PointLatLng destPoint(internals::PointLatLng source, double bear, double dist);
 
-    QPointF getUAVLatLon();
-    double getUAVYaw();
+    bool getUAV_LLA(double &latitude, double &longitude, double &altitude);
+    double getUAV_Yaw();
 
     void setMapFollowingMode();
 };

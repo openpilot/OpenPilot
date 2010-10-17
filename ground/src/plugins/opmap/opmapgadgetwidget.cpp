@@ -91,8 +91,11 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // fetch required UAVObjects
 
     // current position
-    QPointF pos = getUAVLatLon();
-    internals::PointLatLng pos_lat_lon = internals::PointLatLng(pos.x(), pos.y());
+    double latitude;
+    double longitude;
+    double altitude;
+    getUAV_LLA(latitude, longitude, altitude);
+    internals::PointLatLng pos_lat_lon = internals::PointLatLng(latitude, longitude);
 
     // **************
     // default home position
@@ -667,13 +670,19 @@ void OPMapGadgetWidget::updatePosition()
 
     QMutexLocker locker(&m_map_mutex);
 
-    QPointF pos = getUAVLatLon();                                               // get current UAV lat/lon
-    float yaw = getUAVYaw();                                                    // get current UAV heading
+    double latitude;
+    double longitude;
+    double altitude;
 
-    internals::PointLatLng uav_pos = internals::PointLatLng(pos.x(), pos.y());	// current UAV position
-    float uav_heading = yaw;                                                    // current UAV heading
-    float uav_altitude_meters = 0; //data.Altitude;                 			// current UAV height
-    float uav_ground_speed_meters_per_second = 0; //data.Groundspeed;			// current UAV ground speed
+    if (!getUAV_LLA(latitude, longitude, altitude))                                 // get current UAV position
+        return;
+
+    float yaw = getUAV_Yaw();                                                       // get current UAV heading
+
+    internals::PointLatLng uav_pos = internals::PointLatLng(latitude, longitude);	// current UAV position
+    float uav_heading = yaw;                                                        // current UAV heading
+    float uav_altitude_meters = altitude;                                           // current UAV height
+    float uav_ground_speed_meters_per_second = 0; //data.Groundspeed;               // current UAV ground speed
 
     // display the UAV lat/lon position
     QString str =   "lat: " + QString::number(uav_pos.Lat(), 'f', 7) +
@@ -745,13 +754,18 @@ void OPMapGadgetWidget::updateMousePos()
     {
         s += "  uav";
 
-        QPointF pos = getUAVLatLon();
-        internals::PointLatLng uav_pos = internals::PointLatLng(pos.x(), pos.y());	// current UAV position
+        double latitude;
+        double longitude;
+        double altitude;
+        if (getUAV_LLA(latitude, longitude, altitude))  // get current UAV position
+        {
+            internals::PointLatLng uav_pos = internals::PointLatLng(latitude, longitude);
 
-//        double dist = distance(home_lat_lon, uav_pos);
-//        double bear = bearing(home_lat_lon, uav_pos);
-//        s += "  " + QString::number(dist * 1000, 'f', 1) + "m";
-//        s += "  " + QString::number(bear, 'f', 1) + "deg";
+//          double dist = distance(home_lat_lon, uav_pos);
+//          double bear = bearing(home_lat_lon, uav_pos);
+//          s += "  " + QString::number(dist * 1000, 'f', 1) + "m";
+//          s += "  " + QString::number(bear, 'f', 1) + "deg";
+        }
     }
     m_widget->labelMousePos->setText(s);
 }
@@ -1731,11 +1745,15 @@ void OPMapGadgetWidget::onGoUAVAct_triggered()
     if (!m_widget || !m_map)
         return;
 
-    QPointF pos = getUAVLatLon();
-
-    internals::PointLatLng uav_pos = internals::PointLatLng(pos.x(), pos.y());	// current UAV position
-    internals::PointLatLng map_pos = m_map->CurrentPosition();				// current MAP position
-    if (map_pos != uav_pos) m_map->SetCurrentPosition(uav_pos);				// center the map onto the UAV
+    double latitude;
+    double longitude;
+    double altitude;
+    if (getUAV_LLA(latitude, longitude, altitude))  // get current UAV position
+    {
+        internals::PointLatLng uav_pos = internals::PointLatLng(latitude, longitude);	// current UAV position
+        internals::PointLatLng map_pos = m_map->CurrentPosition();                      // current MAP position
+        if (map_pos != uav_pos) m_map->SetCurrentPosition(uav_pos);                     // center the map onto the UAV
+    }
 }
 
 void OPMapGadgetWidget::onFollowUAVpositionAct_toggled(bool checked)
@@ -2197,7 +2215,7 @@ internals::PointLatLng OPMapGadgetWidget::destPoint(internals::PointLatLng sourc
 
 // *************************************************************************************
 
-QPointF OPMapGadgetWidget::getUAVLatLon()
+bool OPMapGadgetWidget::getUAV_LLA(double &latitude, double &longitude, double &altitude)
 {
     double BaseECEF[3];
     double NED[3];
@@ -2205,18 +2223,18 @@ QPointF OPMapGadgetWidget::getUAVLatLon()
     UAVObject *obj;
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm) return QPointF(0, 0);
+    if (!pm) return false;
     UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-    if (!om) return QPointF(0, 0);
+    if (!om) return false;
 
     obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("HomeLocation")));
-    if (!obj) return QPointF(0, 0);
+    if (!obj) return false;
     BaseECEF[0] = obj->getField(QString("ECEF"))->getDouble(0) / 100;
     BaseECEF[1] = obj->getField(QString("ECEF"))->getDouble(1) / 100;
     BaseECEF[2] = obj->getField(QString("ECEF"))->getDouble(2) / 100;
 
     obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("PositionActual")));
-    if (!obj) return QPointF(0, 0);
+    if (!obj) return false;
     NED[0] = obj->getField(QString("North"))->getDouble() / 100;
     NED[1] = obj->getField(QString("East"))->getDouble() / 100;
     NED[2] = obj->getField(QString("Down"))->getDouble() / 100;
@@ -2227,10 +2245,15 @@ QPointF OPMapGadgetWidget::getUAVLatLon()
 
     Utils::CoordinateConversions().GetLLA(BaseECEF, NED, LLA);
 
-    return QPointF(LLA[0], LLA[1]);
+    latitude = LLA[0];
+    longitude = LLA[1];
+    altitude = LLA[2];
+
+    return true;
+//    return QPointF(LLA[0], LLA[1]);
 }
 
-double OPMapGadgetWidget::getUAVYaw()
+double OPMapGadgetWidget::getUAV_Yaw()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     if (!pm) return 0.0;

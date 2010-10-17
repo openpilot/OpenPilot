@@ -2282,7 +2282,10 @@ bool OPMapGadgetWidget::getUAV_LLA(double &latitude, double &longitude, double &
     altitude = LLA[2];
 
     if (latitude != latitude) latitude = 0; // nan detection
+//    if (isNan(latitude)) latitude = 0; // nan detection
     else
+//    if (!isFinite(latitude)) latitude = 0;
+//    else
     if (latitude >  90) latitude =  90;
     else
     if (latitude < -90) latitude = -90;
@@ -2296,6 +2299,8 @@ bool OPMapGadgetWidget::getUAV_LLA(double &latitude, double &longitude, double &
     if (longitude >  180) longitude =  180;
     else
     if (longitude < -180) longitude = -180;
+
+    if (altitude != altitude) altitude = 0; // nan detection
 
     return true;
 }

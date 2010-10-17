@@ -60,7 +60,8 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     m_aircraft->fixedWingType->addItems(fixedWingTypes);
 
     QStringList multiRotorTypes;
-    multiRotorTypes << "Quad +" << "Quad X" << "Hexacopter" << "Octocopter";
+    multiRotorTypes << "Quad +" << "Quad X" << "Hexacopter" << "Octocopter" << "Hexacopter X" << "Octocopter V" << "Octo Coax +"
+            << "Octo Coax X" << "Hexacopter Y6" << "Tricopter Y";
     m_aircraft->multirotorFrameType->addItems(multiRotorTypes);
 
 
@@ -616,8 +617,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
         m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Quad X"));
         quad->setElementId("quad-X");
-        m_aircraft->quadShape->setSceneRect(quad->boundingRect());
-        m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
+        m_aircraft->multiMotor4->setEnabled(true);
         m_aircraft->multiMotor5->setEnabled(false);
         m_aircraft->multiMotor6->setEnabled(false);
         m_aircraft->multiMotor7->setEnabled(false);
@@ -629,8 +629,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
         m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Quad +"));
         quad->setElementId("quad-plus");
-        m_aircraft->quadShape->setSceneRect(quad->boundingRect());
-        m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
+        m_aircraft->multiMotor4->setEnabled(true);
         m_aircraft->multiMotor5->setEnabled(false);
         m_aircraft->multiMotor6->setEnabled(false);
         m_aircraft->multiMotor7->setEnabled(false);
@@ -642,8 +641,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
         m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Hexacopter"));
         quad->setElementId("quad-hexa");
-        m_aircraft->quadShape->setSceneRect(quad->boundingRect());
-        m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
+        m_aircraft->multiMotor4->setEnabled(true);
         m_aircraft->multiMotor5->setEnabled(true);
         m_aircraft->multiMotor6->setEnabled(true);
         m_aircraft->multiMotor7->setEnabled(false);
@@ -655,8 +653,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
         m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Octocopter"));
         quad->setElementId("quad-octo");
-        m_aircraft->quadShape->setSceneRect(quad->boundingRect());
-        m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
+        m_aircraft->multiMotor4->setEnabled(true);
         m_aircraft->multiMotor5->setEnabled(true);
         m_aircraft->multiMotor6->setEnabled(true);
         m_aircraft->multiMotor7->setEnabled(true);
@@ -664,7 +661,57 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->mrRollMixLevel->setValue(33);
         m_aircraft->mrPitchMixLevel->setValue(33);
         m_aircraft->mrYawMixLevel->setValue(12);
+    } else if (frameType == "HexaX" || frameType == "Hexacopter X" ) {
+        quad->setElementId("quad-hexa-X");
+        m_aircraft->multiMotor4->setEnabled(true);
+        m_aircraft->multiMotor5->setEnabled(true);
+        m_aircraft->multiMotor6->setEnabled(true);
+        m_aircraft->multiMotor7->setEnabled(false);
+        m_aircraft->multiMotor8->setEnabled(false);
+
+    } else if (frameType == "OctoV" || frameType == "Octocopter V") {
+        quad->setElementId("quad-octo-v");
+        m_aircraft->multiMotor4->setEnabled(true);
+        m_aircraft->multiMotor5->setEnabled(true);
+        m_aircraft->multiMotor6->setEnabled(true);
+        m_aircraft->multiMotor7->setEnabled(true);
+        m_aircraft->multiMotor8->setEnabled(true);
+
+    } else if (frameType == "OctoCoaxP" || frameType == "Octo Coax +") {
+        quad->setElementId("octo-coax-P");
+        m_aircraft->multiMotor4->setEnabled(true);
+        m_aircraft->multiMotor5->setEnabled(true);
+        m_aircraft->multiMotor6->setEnabled(true);
+        m_aircraft->multiMotor7->setEnabled(true);
+        m_aircraft->multiMotor8->setEnabled(true);
+
+    } else if (frameType == "OctoCoaxX" || frameType == "Octo Coax X") {
+        quad->setElementId("octo-coax-X");
+        m_aircraft->multiMotor4->setEnabled(true);
+        m_aircraft->multiMotor5->setEnabled(true);
+        m_aircraft->multiMotor6->setEnabled(true);
+        m_aircraft->multiMotor7->setEnabled(true);
+        m_aircraft->multiMotor8->setEnabled(true);
+
+    } else if (frameType == "HexaCoax" || frameType == "Hexacopter Y6") {
+        quad->setElementId("hexa-coax");
+        m_aircraft->multiMotor4->setEnabled(true);
+        m_aircraft->multiMotor5->setEnabled(true);
+        m_aircraft->multiMotor6->setEnabled(true);
+        m_aircraft->multiMotor7->setEnabled(false);
+        m_aircraft->multiMotor8->setEnabled(false);
+
+    } else if (frameType == "Tri" || frameType == "Tricopter Y") {
+        quad->setElementId("tri");
+        m_aircraft->multiMotor4->setEnabled(false);
+        m_aircraft->multiMotor5->setEnabled(false);
+        m_aircraft->multiMotor6->setEnabled(false);
+        m_aircraft->multiMotor7->setEnabled(false);
+        m_aircraft->multiMotor8->setEnabled(false);
+
     }
+    m_aircraft->quadShape->setSceneRect(quad->boundingRect());
+    m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
 }
 
 /**

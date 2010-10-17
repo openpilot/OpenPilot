@@ -358,7 +358,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_map, SIGNAL(WPInserted(int const&, WayPointItem*)), this, SLOT(WPInserted(int const&, WayPointItem*)));
     connect(m_map, SIGNAL(WPDeleted(int const&)), this, SLOT(WPDeleted(int const&)));
 
-    m_map->SetCurrentPosition(home_position.coord);         // set the map position
+//    m_map->SetCurrentPosition(home_position.coord);         // set the map position
     m_map->Home->SetCoord(home_position.coord);             // set the HOME position
     m_map->UAV->SetUAVPos(home_position.coord, 0.0);        // set the UAV position
 
@@ -1151,13 +1151,15 @@ void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon)
     if (!m_widget || !m_map)
         return;
 
-    home_position.coord = pos_lat_lon;
+    #if defined(allow_manual_home_location_move)
+        home_position.coord = pos_lat_lon;
 
-    m_map->Home->SetCoord(home_position.coord);
-    m_map->Home->RefreshPos();
+        m_map->Home->SetCoord(home_position.coord);
+        m_map->Home->RefreshPos();
 
-    // move the magic waypoint to keep it within the safe area boundry
-    keepMagicWaypointWithInSafeArea();
+        // move the magic waypoint to keep it within the safe area boundry
+        keepMagicWaypointWithInSafeArea();
+    #endif
 }
 
 void OPMapGadgetWidget::goHome()
@@ -1301,7 +1303,20 @@ void OPMapGadgetWidget::setMapMode(opMapModeType mode)
         mode = Normal_MapMode;  // fix error
 
     if (m_map_mode == mode)
-        return;     // no change in map mode
+    {   // no change in map mode
+        switch (mode)
+        {   // make sure the UI buttons are set correctly
+            case Normal_MapMode:
+                m_widget->toolButtonMagicWaypointMapMode->setChecked(false);
+                m_widget->toolButtonNormalMapMode->setChecked(true);
+                break;
+            case MagicWaypoint_MapMode:
+                m_widget->toolButtonNormalMapMode->setChecked(false);
+                m_widget->toolButtonMagicWaypointMapMode->setChecked(true);
+                break;
+        }
+        return;
+    }
 
     switch (mode)
     {
@@ -1448,6 +1463,9 @@ void OPMapGadgetWidget::createActions()
 
     setHomeAct = new QAction(tr("Set the home location"), this);
     setHomeAct->setStatusTip(tr("Set the home location to where you clicked"));
+    #if !defined(allow_manual_home_location_move)
+        setHomeAct->setEnabled(false);
+    #endif
     connect(setHomeAct, SIGNAL(triggered()), this, SLOT(onSetHomeAct_triggered()));
 
     goHomeAct = new QAction(tr("Go to &Home location"), this);
@@ -1508,9 +1526,6 @@ void OPMapGadgetWidget::createActions()
 
     homeMagicWaypointAct = new QAction(tr("Home magic waypoint"), this);
     homeMagicWaypointAct->setStatusTip(tr("Move the magic waypoint to the home position"));
-    #if !defined(allow_manual_home_location_move)
-        homeMagicWaypointAct->setEnabled(false);
-    #endif
     connect(homeMagicWaypointAct, SIGNAL(triggered()), this, SLOT(onHomeMagicWaypointAct_triggered()));
 
     mapModeActGroup = new QActionGroup(this);
@@ -2029,12 +2044,10 @@ void OPMapGadgetWidget::homeMagicWaypoint()
     if (m_map_mode != MagicWaypoint_MapMode)
         return;
 
-    #if defined(allow_manual_home_location_move)
-        magic_waypoint.coord = home_position.coord;
+    magic_waypoint.coord = home_position.coord;
 
-        if (magic_waypoint.map_wp_item)
-            magic_waypoint.map_wp_item->SetCoord(magic_waypoint.coord);
-    #endif
+    if (magic_waypoint.map_wp_item)
+        magic_waypoint.map_wp_item->SetCoord(magic_waypoint.coord);
 }
 
 // *************************************************************************************

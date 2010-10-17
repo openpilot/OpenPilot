@@ -159,6 +159,7 @@ void FGSimulator::transmitUpdate()
 
 void FGSimulator::processUpdate(const QByteArray& inp)
 {
+        static char once=0;
 	// Split
 	QString data(inp);
 	QStringList fields = data.split(",");
@@ -205,11 +206,37 @@ void FGSimulator::processUpdate(const QByteArray& inp)
 	// Get pressure (kpa)
 	float pressure = fields[20].toFloat() * INHG2KPA;
 	// Get VelocityActual Down (cm/s)
-	float velocityActualDown = fields[21].toFloat() * FPS2CMPS;
+        float velocityActualDown = fields[21].toFloat() * FPS2CMPS;
 	// Get VelocityActual East (cm/s)
 	float velocityActualEast = fields[22].toFloat() * FPS2CMPS;	
 	// Get VelocityActual Down (cm/s)
 	float velocityActualNorth = fields[23].toFloat() * FPS2CMPS;
+
+        //run once
+        HomeLocation::DataFields homeData;
+        if(!once)
+        {
+            memset(&homeData, 0, sizeof(HomeLocation::DataFields));
+            // Update homelocation
+            homeData.Latitude = latitude * 10e6;
+            homeData.Longitude = longitude * 10e6;
+            homeData.Altitude = 0;
+            double LLA[3];
+            LLA[0]=latitude;
+            LLA[1]=longitude;
+            LLA[2]=0;
+            double ECEF[3];
+            Utils::CoordinateConversions().RneFromLLA(LLA,(double(*)[3])homeData.RNE);
+            Utils::CoordinateConversions().LLA2ECEF(LLA,ECEF);
+            homeData.ECEF[0]=ECEF[0]*100;
+            homeData.ECEF[1]=ECEF[1]*100;
+            homeData.ECEF[2]=ECEF[2]*100;
+            homeData.Be[0]=0;
+            homeData.Be[1]=0;
+            homeData.Be[2]=0;
+            posHome->setData(homeData);
+            once=1;
+        }
 	
 	// Update VelocityActual.{Nort,East,Down}
 	VelocityActual::DataFields velocityActualData;
@@ -222,10 +249,10 @@ void FGSimulator::processUpdate(const QByteArray& inp)
 	// Update PositionActual.{Nort,East,Down}
 	PositionActual::DataFields positionActualData;
 	memset(&positionActualData, 0, sizeof(PositionActual::DataFields));
-	positionActualData.North = 0; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
+        positionActualData.North = 0; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
 	positionActualData.East = 0; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
 	positionActualData.Down = (altitude * 100); //Multiply by 100 because positionActual expects input in Centimeters.
-	posActual->setData(positionActualData);
+        posActual->setData(positionActualData);
 
 	// Update AltitudeActual object
         BaroAltitude::DataFields altActualData;
@@ -251,12 +278,23 @@ void FGSimulator::processUpdate(const QByteArray& inp)
         GPSPosition::DataFields gpsData;
         memset(&gpsData, 0, sizeof(GPSPosition::DataFields));
         gpsData.Altitude = altitude;
-	gpsData.Heading = heading;
+        gpsData.Heading = heading;
 	gpsData.Groundspeed = groundspeed;
-	gpsData.Latitude = latitude;
-	gpsData.Longitude = longitude;
+        gpsData.Latitude = latitude*1e7;
+        gpsData.Longitude = longitude*1e7;
 	gpsData.Satellites = 10;
         gpsData.Status = GPSPosition::STATUS_FIX3D;
         gpsPos->setData(gpsData);
+
+        /*float NED[3];
+        double LLA[3] = {(double) gpsData.Latitude / 1e7, (double) gpsData.Longitude / 1e7, (double) (gpsData.GeoidSeparation + gpsData.Altitude)};
+        // convert from cm back to meters
+        double ECEF[3] = {(double) (homeData.ECEF[0] / 100), (double) (homeData.ECEF[1] / 100), (double) (homeData.ECEF[2] / 100)};
+                Utils::CoordinateConversions().LLA2Base(LLA, ECEF, (float (*)[3]) homeData.RNE, NED);
+
+        positionActualData.North = NED[0]; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
+        positionActualData.East = NED[1]; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
+        positionActualData.Down = NED[2]; //Multiply by 100 because positionActual expects input in Centimeters.
+        posActual->setData(positionActualData);*/
 }
 

@@ -55,6 +55,12 @@ SystemSettings::SystemSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
     AirframeTypeEnumOptions.append("Hexa");
     AirframeTypeEnumOptions.append("Octo");
     AirframeTypeEnumOptions.append("Custom");
+    AirframeTypeEnumOptions.append("HexaX");
+    AirframeTypeEnumOptions.append("OctoV");
+    AirframeTypeEnumOptions.append("OctoCoaxP");
+    AirframeTypeEnumOptions.append("OctoCoaxX");
+    AirframeTypeEnumOptions.append("HexaCoax");
+    AirframeTypeEnumOptions.append("Tri");
     fields.append( new UAVObjectField(QString("AirframeType"), QString(""), UAVObjectField::ENUM, AirframeTypeElemNames, AirframeTypeEnumOptions) );
 
     // Initialize object

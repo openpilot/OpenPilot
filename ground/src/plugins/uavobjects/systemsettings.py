@@ -55,6 +55,12 @@ _fields = [ \
 			'7' : 'Hexa',
 			'8' : 'Octo',
 			'9' : 'Custom',
+			'10' : 'HexaX',
+			'11' : 'OctoV',
+			'12' : 'OctoCoaxP',
+			'13' : 'OctoCoaxX',
+			'14' : 'HexaCoax',
+			'15' : 'Tri',
 		}
 	),
 ]

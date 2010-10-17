@@ -93,20 +93,22 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     setMouseTracking(true);
 
     // **************
-    // fetch required UAVObjects
+    // get current location
+
+    double latitude = 0;
+    double longitude = 0;
+    double altitude = 0;
 
     // current position
-    double latitude;
-    double longitude;
-    double altitude;
     getUAV_LLA(latitude, longitude, altitude);
+
     internals::PointLatLng pos_lat_lon = internals::PointLatLng(latitude, longitude);
 
     // **************
     // default home position
 
     home_position.coord = pos_lat_lon;
-    home_position.altitude = 0.0;
+    home_position.altitude = altitude;
     home_position.locked = false;
 
     // **************
@@ -114,7 +116,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     magic_waypoint.map_wp_item = NULL;
     magic_waypoint.coord = home_position.coord;
-    magic_waypoint.altitude = 0.0;
+    magic_waypoint.altitude = altitude;
     magic_waypoint.description = "Magic waypoint";
     magic_waypoint.locked = false;
     magic_waypoint.time_seconds = 0;
@@ -358,7 +360,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_map, SIGNAL(WPInserted(int const&, WayPointItem*)), this, SLOT(WPInserted(int const&, WayPointItem*)));
     connect(m_map, SIGNAL(WPDeleted(int const&)), this, SLOT(WPDeleted(int const&)));
 
-//    m_map->SetCurrentPosition(home_position.coord);         // set the map position
+    m_map->SetCurrentPosition(home_position.coord);         // set the map position
     m_map->Home->SetCoord(home_position.coord);             // set the HOME position
     m_map->UAV->SetUAVPos(home_position.coord, 0.0);        // set the UAV position
 
@@ -2279,6 +2281,22 @@ bool OPMapGadgetWidget::getUAV_LLA(double &latitude, double &longitude, double &
     longitude = LLA[1];
     altitude = LLA[2];
 
+    if (latitude != latitude) latitude = 0; // nan detection
+    else
+    if (latitude >  90) latitude =  90;
+    else
+    if (latitude < -90) latitude = -90;
+
+    if (longitude != longitude) longitude = 0; // nan detection
+    else
+//    if (longitude > std::numeric_limits<double>::max()) longitude = 0;  // +infinite
+//    else
+//    if (longitude < -std::numeric_limits<double>::max()) longitude = 0;  // -infinite
+//    else
+    if (longitude >  180) longitude =  180;
+    else
+    if (longitude < -180) longitude = -180;
+
     return true;
 }
 
@@ -2290,7 +2308,14 @@ double OPMapGadgetWidget::getUAV_Yaw()
     if (!om) return 0.0;
 
     UAVObject *obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("AttitudeActual")));
-    return obj->getField(QString("Yaw"))->getDouble();
+    double yaw = obj->getField(QString("Yaw"))->getDouble();
+
+    if (yaw != yaw) yaw = 0; // nan detection
+
+    while (yaw < 0) yaw += 360;
+    while (yaw >= 360) yaw -= 360;
+
+    return yaw;
 }
 
 // *************************************************************************************

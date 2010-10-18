@@ -129,6 +129,7 @@ namespace jafar {
 		 */
 		void SensorAbstract::globalPose(jblas::vec7 & senGlobalPos,
 		    jblas::mat & SG_rs) {
+			using boost::numeric::ublas::range;
 			jblas::vec7 robotPose = robotPtr()->pose.x();
 			jblas::vec7 sensorPose = pose.x();
 

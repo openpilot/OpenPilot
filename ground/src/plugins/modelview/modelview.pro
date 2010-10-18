@@ -19,3 +19,6 @@ SOURCES += modelviewplugin.cpp \
     modelviewgadgetoptionspage.cpp
 OTHER_FILES += ModelViewGadget.pluginspec
 FORMS += modelviewoptionspage.ui
+
+RESOURCES += \
+    modelview.qrc

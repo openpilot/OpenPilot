@@ -48,11 +48,12 @@ ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent)
 
     CreateScene();
 
-    m_Light.setPosition(4000.0, 40000.0, 80000.0);
+    m_Light.setPosition(4000.0, -40000.0, 80000.0);
     m_Light.setAmbientColor(Qt::lightGray);
 
     m_GlView.cameraHandle()->setDefaultUpVector(glc::Z_AXIS);
     m_GlView.cameraHandle()->setFrontView();
+    m_GlView.setToOrtho(true); // orthogonal view
 
     QColor repColor;
     repColor.setRgbF(1.0, 0.11372, 0.11372, 0.0);
@@ -141,23 +142,27 @@ void ModelViewGadgetWidget::resizeGL(int width, int height)
 // Create GLC_Object to display
 void ModelViewGadgetWidget::CreateScene()
 {
+    // put a black background if the 3D model is invalid or if the background image is also invalid
+    if (acFilename == ":/modelview/models/warning_sign.obj" or !QFile::exists(bgFilename))
+        bgFilename= ":/modelview/models/black.jpg";
+
     try 
     {
         m_GlView.loadBackGroundImage(bgFilename);
     }
     catch(GLC_Exception e)
     {
-        qDebug("ModelView background image file loading failed.");
+        qDebug("ModelView: background image file loading failed.");
     }
 
     try
     {
         if(QFile::exists(acFilename))
 	{
-	    QFile aircraft(acFilename);
+            QFile aircraft(acFilename);
             m_World= GLC_Factory::instance()->createWorldFromFile(aircraft);
             m_ModelBoundingBox= m_World.boundingBox();
-            m_GlView.reframe(m_ModelBoundingBox); // center 3d models in the scene
+            m_GlView.reframe(m_ModelBoundingBox); // center 3D model in the scene
             m_GlView.setDistMinAndMax(m_World.boundingBox());
             loadError = false;
             if (!mvInitGLSuccess)
@@ -168,7 +173,7 @@ void ModelViewGadgetWidget::CreateScene()
     }
     catch(GLC_Exception e)
     {
-	qDebug("ModelView aircraft texture file loading failed.");
+        qDebug("ModelView: aircraft file loading failed.");
         loadError = true;
     }
 }

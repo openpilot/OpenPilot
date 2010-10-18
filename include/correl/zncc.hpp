@@ -113,7 +113,8 @@ namespace jafar {
 			
 			// start the loops
 			double zncc_sum = 0.;
-			double best_score1 = 1.0, best_score2 = 1.0;
+			double best_score1 = 1.0;
+			//double best_score2 = 1.0;
 			for(int i = 0; i < height; ++i, im1ptr += step1, im2ptr += step2) 
 			{
 				for(int j = 0; j < width; ++j) 

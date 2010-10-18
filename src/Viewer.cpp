@@ -109,9 +109,9 @@ void Viewer::createCursor()
 { /*{{{*/
 	// Creating a custom cursor 32x32 px. Drawing a simple cross
 	// on 31x31 pixels and setting the hotspot in this 31x31 center
-	int cursorSquareSize = 32;
+	const int cursorSquareSize = 32;
 	// Preparing a PPM P6 format
-	int offset = 13;
+	const int offset = 13;
 	unsigned char cursorData[offset+cursorSquareSize*cursorSquareSize*3];
 	snprintf((char*)cursorData, offset, "P6 %d %d 255\n", cursorSquareSize, cursorSquareSize);
 

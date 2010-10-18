@@ -23,7 +23,7 @@ namespace qdisplay {
  * the command addShape
  */
 class ImageView : public QObject, public QGraphicsItemGroup {
-  Q_OBJECT;
+  Q_OBJECT
   public:
     ImageView();
     /**

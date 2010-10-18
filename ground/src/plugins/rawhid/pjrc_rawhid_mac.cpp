@@ -42,6 +42,7 @@
 #include <unistd.h>
 #include <IOKit/IOKitLib.h>
 #include <IOKit/hid/IOHIDLib.h>
+#include <CoreFoundation/CFString.h>
 #include <QString>
 
 #define BUFFER_SIZE 64
@@ -283,8 +284,11 @@ QString pjrc_rawhid::getserial(int num) {
     CFTypeRef serialnum = IOHIDDeviceGetProperty(hid->ref, CFSTR(kIOHIDSerialNumberKey));
     if(serialnum && CFGetTypeID(serialnum) == CFStringGetTypeID())
     {
-        /* For some reason the first 9 bytes of 'serialnum' are useless (a struct?) */
-        return QString().fromAscii((char *)serialnum+9);
+        //Note: I'm not sure it will always succeed if encoded as MacRoman but that
+        //is a superset of UTF8 so I think this is fine
+        CFStringRef str = (CFStringRef)serialnum;
+        const char * buf = CFStringGetCStringPtr(str, kCFStringEncodingMacRoman);
+        return QString(buf);
     }
 
     return QString("Error");

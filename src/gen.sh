@@ -3,12 +3,16 @@
 if [ `which moc-qt4 2> /dev/null` ]; then
 	UIC_CMD=uic-qt4
 	MOC_CMD=moc-qt4
+else if [ `which moc-mac 2> /dev/null` ]; then
+	UIC_CMD=uic-mac
+	MOC_CMD=moc-mac
 else if [ `which moc 2> /dev/null` ]; then
 	UIC_CMD=uic
 	MOC_CMD=moc
 else
 	echo Missing moc and/or uic
 	exit
+fi
 fi
 fi
 

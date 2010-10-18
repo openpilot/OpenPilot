@@ -57,7 +57,7 @@ namespace rtslam {
 				params.measVar = measStd * measStd;
 			}
 
-			bool match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, const image::ConvexRoi & roi, Measurement & measure, appearance_ptr_t & app)
+			void match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, const image::ConvexRoi & roi, Measurement & measure, appearance_ptr_t & app)
 			{
 				app_img_pnt_ptr_t targetAppSpec = SPTR_CAST<AppearanceImagePoint>(targetApp);
 				app_img_pnt_ptr_t appSpec = SPTR_CAST<AppearanceImagePoint>(app);

@@ -152,7 +152,7 @@ JFR_DEBUG("robot EULER: " << uncertEuler);*/
 		for(LandmarkAbstract::ObservationList::iterator obs = slamLmk_->observationList().begin(); obs != slamLmk_->observationList().end(); ++obs)
 		{
 			uchar *obsevents = (uchar*)&((*obs)->events);
-			for(int i = 0; i < sizeof(ObservationAbstract::Events); i++) events[i] |= obsevents[i];
+			for(size_t i = 0; i < sizeof(ObservationAbstract::Events); i++) events[i] |= obsevents[i];
 		}
 /*		
 		events_.predicted_ = events_.visible_ = events_.measured_ = events_.matched_ = events_.updated_ = false;
@@ -171,7 +171,7 @@ JFR_DEBUG("robot EULER: " << uncertEuler);*/
 	
 	void LandmarkGdhe::render()
 	{
-		const double sph_radius = 0.01;
+		//const double sph_radius = 0.01;
 		switch (lmkType_)
 		{
 			case LandmarkAbstract::PNT_EUC:

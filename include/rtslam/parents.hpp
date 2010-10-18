@@ -564,6 +564,6 @@ public:
 	try { ChildOf<Parent>::parentPtr()->WeakParentOf<Child>::cleanExpired(); } \
 	catch(const char *e) { if (strcmp(e,"WEAK")) throw e; }
 
-	};}; // namespace jafar/rtslam
+	}} // namespace jafar/rtslam
 
 #endif // #ifndef __rtslam_parents_H__

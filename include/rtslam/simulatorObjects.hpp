@@ -77,7 +77,7 @@ namespace simu {
 			@return whether the point was coherent and was accepted
 			*/
 			bool hasEnded(double t) const { if (traj.size() == 0) return false; return (t > traj.back().t); }
-			bool addWaypoint(double x, double y, double z, double yaw, double pitch, double roll,
+			void addWaypoint(double x, double y, double z, double yaw, double pitch, double roll,
 			                 double vx, double vy, double vz, double vyaw, double vpitch, double vroll)
 			{
 				double pose_[12] = {x, y, z, yaw, pitch, roll, vx, vy, vz, vyaw, vpitch, vroll};
@@ -182,6 +182,7 @@ namespace simu {
 			{
 				std::map<size_t,simu::Sensor*>::const_iterator itSen = sensors.find(senId);
 				if (itSen == sensors.end()) return jblas::vec();
+				return itSen->second->getPose(t);
 			}
 			
 			friend class AdhocSimulator;

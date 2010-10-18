@@ -84,8 +84,6 @@ namespace jafar {
 		};
 
 	}
-	;
 }
-;
 
 #endif // #ifndef MAPMANAGER_HPP_

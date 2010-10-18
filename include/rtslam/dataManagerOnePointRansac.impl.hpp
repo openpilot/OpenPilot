@@ -626,5 +626,5 @@ JFR_DEBUG_END();
 
 
 	} // namespace ::rtslam
-}; // namespace jafar::
+} // namespace jafar::
 

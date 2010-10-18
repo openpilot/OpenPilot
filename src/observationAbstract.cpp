@@ -271,7 +271,7 @@ namespace jafar {
 			this->counters = obs->counters;
 			this->events = obs->events;
 			this->searchSize = obs->searchSize;
-		};
+		}
 
 	} // namespace rtslam
 } // namespace jafar

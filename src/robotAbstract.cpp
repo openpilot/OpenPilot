@@ -97,7 +97,7 @@ namespace jafar {
 					dt_or_dx = 0.;
 					jblas::vec avg_u(readings.size2()-1); avg_u.clear();
 					
-					for(int i = 0; i < readings.size1(); i++)
+					for(size_t i = 0; i < readings.size1(); i++)
 						avg_u += ublas::subrange(ublas::matrix_row<mat_indirect>(readings, i),1,readings.size2());
 					
 					if (readings.size1()) avg_u /= readings.size1();
@@ -115,7 +115,7 @@ namespace jafar {
 					double a, cur_time = self_time, after_time, prev_time = readings(0, 0), next_time, average_time;
 					prev_u = ublas::subrange(ublas::matrix_row<mat_indirect>(readings, 0),1,readings.size2());
 				
-					for(int i = 0; i < readings.size1(); i++)
+					for(size_t i = 0; i < readings.size1(); i++)
 					{
 						next_time = after_time = readings(i, 0);
 						if (after_time > time || i == readings.size1()-1) after_time = time;

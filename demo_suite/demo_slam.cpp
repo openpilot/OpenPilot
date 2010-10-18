@@ -64,7 +64,7 @@ using namespace boost;
 jblas::vec sqrt(jblas::vec x)
 {
 	jblas::vec res(x.size());
-	for(int i = 0; i < x.size(); ++i) res(i) = sqrt(x(i));
+	for(size_t i = 0; i < x.size(); ++i) res(i) = sqrt(x(i));
 	return res;
 }
 
@@ -667,7 +667,7 @@ JFR_DEBUG("Robot state stdev after corrections " << sqrt(ublas::matrix_vector_ra
 //		worldPtr->display_mutex.unlock();
 
 		bool doPause = (intOpts[iPause] != 0);
-		int pose_start = intOpts[iPause];
+		unsigned pose_start = intOpts[iPause];
 		if (pose_start == 1) pose_start = 0;
 		if (doPause && (*world)->t >= pose_start && had_data && !(*world)->exit())
 		{
@@ -875,6 +875,7 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 			boost::thread *thread_disp = new boost::thread(boost::bind(demo_slam01_display,&worldPtr));
 			kernel::setCurrentThreadPriority(slam_priority);
 			demo_slam01_main(&worldPtr);
+			delete thread_disp;
 			#else
 			std::cout << "Please install gdhe module if you want 3D display" << std::endl;
 			#endif

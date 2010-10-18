@@ -32,7 +32,7 @@ namespace jafar {
 			///size of data size
 			std::size_t m_dataSetSize;
 			///number of entries present in the system
-      int m_countValues;
+      std::size_t m_countValues;
       /// design matrix
       jblas::mat_column_major m_A;
       /// rhs vector

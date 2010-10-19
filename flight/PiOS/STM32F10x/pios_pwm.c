@@ -53,7 +53,7 @@ static uint32_t CapCounter[PIOS_PWM_NUM_INPUTS];
 static uint32_t CapCounterPrev[PIOS_PWM_NUM_INPUTS];
 
 /**
-* Initialises all the LED's
+* Initialises all the pins
 */
 void PIOS_PWM_Init(void)
 {

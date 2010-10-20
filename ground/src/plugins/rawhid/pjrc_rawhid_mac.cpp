@@ -245,6 +245,16 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
     // Note: packet processing done in OS indepdent code
     IOReturn ret = IOHIDDeviceSetReport(hid->ref, kIOHIDReportTypeOutput, 2, (uint8_t *)report_buf, len);
     result = (ret == kIOReturnSuccess) ? len : -1;
+    if (err_get_system(ret) == err_get_system(sys_iokit))
+    {
+
+        // The error was in the I/O Kit system
+        UInt32 codeValue = err_get_code(ret);
+        qDebug("Returned: %x", codeValue);
+        // Can now perform test on error code, display it to user, or whatever.
+        usleep(1000000);
+    }
+
 #endif
 #if 0
     // No matter what I tried this never actually sends an output

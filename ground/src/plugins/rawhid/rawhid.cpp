@@ -133,6 +133,7 @@ RawHIDReadThread::~RawHIDReadThread()
 
 void RawHIDReadThread::run()
 {
+    qDebug() << "Read thread started";
     while(m_running)
     {
         //here we use a temporary buffer so we don't need to lock
@@ -206,7 +207,7 @@ void RawHIDWriteThread::run()
         char buffer[WRITE_SIZE] = {0};
 
         m_writeBufMtx.lock();
-        int size = qMin(WRITE_SIZE, m_writeBuffer.size());
+        int size = qMin(WRITE_SIZE-2, m_writeBuffer.size());
         while(size <= 0)
         {
             //wait on new data to write condition, the timeout
@@ -327,12 +328,14 @@ void RawHID::close()
 {
     if(m_readThread)
     {
+        m_readThread->terminate();
         delete m_readThread;
         m_readThread = NULL;
     }
 
     if(m_writeThread)
     {
+        m_writeThread->terminate();
         delete m_writeThread;
         m_writeThread = NULL;
     }

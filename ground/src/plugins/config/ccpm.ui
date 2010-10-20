@@ -56,7 +56,7 @@
     <attribute name="title">
      <string>Basic settings</string>
     </attribute>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -517,7 +517,7 @@
           <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
-          <widget class="QWidget" name="">
+          <widget class="QWidget" name="layoutWidget">
            <property name="geometry">
             <rect>
              <x>0</x>
@@ -632,13 +632,6 @@
             </item>
            </layout>
           </widget>
-          <zorder>splitter_2</zorder>
-          <zorder>ccpmCollectivespinBox</zorder>
-          <zorder>ccpmCollectiveSlider</zorder>
-          <zorder>label_15</zorder>
-          <zorder>ccpmCollectivespinBox</zorder>
-          <zorder>label_16</zorder>
-          <zorder></zorder>
          </widget>
         </item>
         <item row="0" column="1">
@@ -664,7 +657,7 @@
           <property name="title">
            <string>REVO</string>
           </property>
-          <widget class="QWidget" name="">
+          <widget class="QWidget" name="layoutWidget">
            <property name="geometry">
             <rect>
              <x>0</x>
@@ -1053,14 +1046,7 @@
             <item>
              <widget class="QLabel" name="label_41">
               <property name="text">
-               <string>Throttle Curve 2</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_3">
-              <property name="text">
-               <string>Reset</string>
+               <string>Blade Pitch Curve</string>
               </property>
              </widget>
             </item>
@@ -1104,14 +1090,7 @@
             <item>
              <widget class="QLabel" name="label_39">
               <property name="text">
-               <string>Throttle Curve 1</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_2">
-              <property name="text">
-               <string>Reset</string>
+               <string>Throttle Curve</string>
               </property>
              </widget>
             </item>
@@ -1156,8 +1135,14 @@
          <widget class="QTableWidget" name="CurveSettings">
           <property name="minimumSize">
            <size>
-            <width>260</width>
-            <height>323</height>
+            <width>243</width>
+            <height>273</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>243</width>
+            <height>273</height>
            </size>
           </property>
           <property name="font">
@@ -1166,7 +1151,7 @@
            </font>
           </property>
           <property name="verticalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOn</enum>
+           <enum>Qt::ScrollBarAlwaysOff</enum>
           </property>
           <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -1177,6 +1162,18 @@
           <property name="alternatingRowColors">
            <bool>true</bool>
           </property>
+          <attribute name="verticalHeaderDefaultSectionSize">
+           <number>25</number>
+          </attribute>
+          <attribute name="verticalHeaderMinimumSectionSize">
+           <number>25</number>
+          </attribute>
+          <attribute name="verticalHeaderDefaultSectionSize">
+           <number>25</number>
+          </attribute>
+          <attribute name="verticalHeaderMinimumSectionSize">
+           <number>25</number>
+          </attribute>
           <row>
            <property name="text">
             <string>0%</string>
@@ -1824,10 +1821,10 @@
     </widget>
    </widget>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>0</x>
      <y>0</y>
      <width>421</width>
      <height>26</height>
@@ -1893,8 +1890,6 @@
   <tabstop>CurveValue3</tabstop>
   <tabstop>CurveToGenerate</tabstop>
   <tabstop>ccpmGenerateCurve</tabstop>
-  <tabstop>pushButton_3</tabstop>
-  <tabstop>pushButton_2</tabstop>
   <tabstop>CurveSettings</tabstop>
   <tabstop>ccpmAdvancedSettingsTable</tabstop>
  </tabstops>

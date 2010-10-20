@@ -129,7 +129,7 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
 
     QStringList Types;
-    Types << "CCPM 2 Servo 90º" << "CCPM 3 Servo 120º" << "CCPM 3 Servo 140º" << "Custom - User Angles" << "Custom - Advanced Settings"  ;
+    Types << "CCPM 2 Servo 90º" << "CCPM 3 Servo 120º" << "CCPM 3 Servo 140º" << "FP 2 Servo 90º"  << "Custom - User Angles" << "Custom - Advanced Settings"  ;
     m_ccpm->ccpmType->addItems(Types);
     m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->count() - 1);
     requestccpmUpdate();
@@ -181,6 +181,7 @@ void ConfigccpmWidget::UpdateType()
 {
     int TypeInt,SingleServoIndex;
     QString TypeText;
+    double AdjustmentAngle=0;
 
 
     TypeInt = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
@@ -210,40 +211,80 @@ void ConfigccpmWidget::UpdateType()
     m_ccpm->ccpmRevoSlider->setEnabled(TypeInt>0);
     m_ccpm->ccpmREVOspinBox->setEnabled(TypeInt>0);
 
+    AdjustmentAngle=SingleServoIndex*90;
+
+    m_ccpm->CurveToGenerate->setEnabled(1);
+    m_ccpm->CurveSettings->setColumnHidden(1,0);
+    m_ccpm->widget_2->setVisible(1);
+    m_ccpm->customThrottleCurve2Value->setVisible(1);
+    m_ccpm->label_41->setVisible(1);
 
     //set values for pre defined heli types
         if (TypeText.compare(QString("CCPM 2 Servo 90º"), Qt::CaseInsensitive)==0)
         {
-            m_ccpm->ccpmAngleW->setValue(0);
-            m_ccpm->ccpmAngleX->setValue(90);
+            m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
+            m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
             m_ccpm->ccpmAngleY->setValue(0);
             m_ccpm->ccpmAngleZ->setValue(0);
             m_ccpm->ccpmAngleY->setEnabled(0);
             m_ccpm->ccpmAngleZ->setEnabled(0);
+            m_ccpm->ccpmServoYChannel->setCurrentIndex(8);
+            m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
             m_ccpm->ccpmServoYChannel->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            m_ccpm->ccpmCorrectionAngle->setValue(SingleServoIndex*90);
+            m_ccpm->ccpmCorrectionAngle->setValue(0);
+
         }
         if (TypeText.compare(QString("CCPM 3 Servo 120º"), Qt::CaseInsensitive)==0)
         {
-            m_ccpm->ccpmAngleW->setValue(0);
-            m_ccpm->ccpmAngleX->setValue(120);
-            m_ccpm->ccpmAngleY->setValue(240);
+            m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
+            m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 120,360));
+            m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 240,360));
             m_ccpm->ccpmAngleZ->setValue(0);
             m_ccpm->ccpmAngleZ->setEnabled(0);
+            m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            m_ccpm->ccpmCorrectionAngle->setValue(SingleServoIndex*90);
+            m_ccpm->ccpmCorrectionAngle->setValue(0);
+
         }
         if (TypeText.compare(QString("CCPM 3 Servo 140º"), Qt::CaseInsensitive)==0)
         {
-            m_ccpm->ccpmAngleW->setValue(0);
-            m_ccpm->ccpmAngleX->setValue(140);
-            m_ccpm->ccpmAngleY->setValue(220);
+            m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
+            m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 140,360));
+            m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 220,360));
             m_ccpm->ccpmAngleZ->setValue(0);
             m_ccpm->ccpmAngleZ->setEnabled(0);
+            m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            m_ccpm->ccpmCorrectionAngle->setValue(SingleServoIndex*90);
+            m_ccpm->ccpmCorrectionAngle->setValue(0);
+
         }
+        if (TypeText.compare(QString("FP 2 Servo 90º"), Qt::CaseInsensitive)==0)
+        {
+            m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
+            m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
+            m_ccpm->ccpmAngleY->setValue(0);
+            m_ccpm->ccpmAngleZ->setValue(0);
+            m_ccpm->ccpmAngleY->setEnabled(0);
+            m_ccpm->ccpmAngleZ->setEnabled(0);
+            m_ccpm->ccpmServoYChannel->setCurrentIndex(8);
+            m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
+            m_ccpm->ccpmServoYChannel->setEnabled(0);
+            m_ccpm->ccpmServoZChannel->setEnabled(0);
+            m_ccpm->ccpmCorrectionAngle->setValue(0);
+
+            m_ccpm->ccpmCollectivespinBox->setEnabled(0);
+            m_ccpm->ccpmCollectiveSlider->setEnabled(0);
+            m_ccpm->ccpmCollectivespinBox->setValue(0);
+            m_ccpm->ccpmCollectiveSlider->setValue(0);
+            m_ccpm->CurveToGenerate->setCurrentIndex(0);
+            m_ccpm->CurveToGenerate->setEnabled(0);
+            m_ccpm->CurveSettings->setColumnHidden(1,1);
+            m_ccpm->widget_2->setVisible(0);
+            m_ccpm->customThrottleCurve2Value->setVisible(0);
+            m_ccpm->label_41->setVisible(0);
+        }
+
 
 
     //update UI
@@ -495,7 +536,7 @@ void ConfigccpmWidget::UpdateMixer()
                 data.Mixer0Vector[4] = 0;//Yaw
 
             */
-            if ((MixerChannelData[i]<8)&&(ThisEnable[i]))
+            if ((MixerChannelData[i]<8)&&((ThisEnable[i])||(i<2)))
             {
                 m_ccpm->ccpmAdvancedSettingsTable->item(i,0)->setText(QString("%1").arg( MixerChannelData[i] ));
                  //config the vector
@@ -554,11 +595,15 @@ void ConfigccpmWidget::UpdateMixer()
   */
 void ConfigccpmWidget::requestccpmUpdate()
 {
+#define MaxAngleError 2
     int MixerDataFromHeli[8][5];
     QString MixerOutputType[8];
-    int EngineChannel,TailRotorChannel,ServoChannels[4],ServoAngles[4],ServoCurve2[4];
+    int EngineChannel,TailRotorChannel,ServoChannels[4],ServoAngles[4],SortAngles[4],CalcAngles[4],ServoCurve2[4];
     int NumServos=0;
     double Collective=0.0;
+    double a1,a2;
+    int HeadRotation,temp;
+    int isCCPM=0;
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -591,7 +636,8 @@ void ConfigccpmWidget::requestccpmUpdate()
     {
         ServoChannels[j]=8;
         ServoCurve2[j]=0;
-        ServoAngles[j]=350;
+        ServoAngles[j]=0;
+        SortAngles[j]=j;
     }
 
     NumServos=0;
@@ -643,22 +689,21 @@ void ConfigccpmWidget::requestccpmUpdate()
         }
 
     }
-    m_ccpm->ccpmServoWChannel->setCurrentIndex(ServoChannels[0]);
-    m_ccpm->ccpmServoXChannel->setCurrentIndex(ServoChannels[1]);
-    m_ccpm->ccpmServoYChannel->setCurrentIndex(ServoChannels[2]);
-    m_ccpm->ccpmServoZChannel->setCurrentIndex(ServoChannels[3]);
 
-    m_ccpm->ccpmAngleW->setValue(ServoAngles[0]);
-    m_ccpm->ccpmAngleX->setValue(ServoAngles[1]);
-    m_ccpm->ccpmAngleY->setValue(ServoAngles[2]);
-    m_ccpm->ccpmAngleZ->setValue(ServoAngles[3]);
+
+
+
+    //just call it user angles for now....
+    m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("Custom - User Angles"));
 
     if (NumServos>1)
     {
         if((ServoCurve2[0]==0)&&(ServoCurve2[1]==0)&&(ServoCurve2[2]==0)&&(ServoCurve2[3]==0))
         {
             //fixed pitch heli
+            isCCPM=0;
             m_ccpm->ccpmCollectiveSlider->setValue(0);
+            Collective = 0.0;
         }
         if(ServoCurve2[0]==ServoCurve2[1])
         {
@@ -666,13 +711,12 @@ void ConfigccpmWidget::requestccpmUpdate()
             {
                 if ((NumServos<4)||(ServoCurve2[2]==ServoCurve2[3]))
                 {//all the servos have the same ThrottleCurve2 setting so this must be a CCPM config
+                    isCCPM=1;
                     Collective = ((double)ServoCurve2[0]*100.00)/127.00;
                     m_ccpm->ccpmCollectiveSlider->setValue((int)Collective);
                     m_ccpm->ccpmCollectivespinBox->setValue((int)Collective);
 
-                    //just call it user angles for now....
-                    m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("Custom - User Angles"));
-                }
+                 }
             }
         }
     }
@@ -680,6 +724,119 @@ void ConfigccpmWidget::requestccpmUpdate()
     {//must be a custom config... "Custom - Advanced Settings"
         m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("Custom - Advanced Settings"));
     }
+
+    HeadRotation=0;
+    //calculate the angles
+    for(j=0;j<NumServos;j++)
+    {
+        //MixerDataFromHeli[i][2]=(127.0*(1-CollectiveConstant)*sin((CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Roll
+        //MixerDataFromHeli[i][3]=(127.0*(1-CollectiveConstant)*cos((CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Pitch
+        a1=((double)MixerDataFromHeli[ServoChannels[j]][2]/(1.27*(100.0-Collective)));
+        a2=((double)MixerDataFromHeli[ServoChannels[j]][3]/(1.27*(100.0-Collective)));
+        ServoAngles[j]=fmod(360.0+atan2(a1,a2)/(Pi/180.00),360.0);
+        //check the angles for one being a multiple of 90deg
+        if (fmod(ServoAngles[j],90)<MaxAngleError)
+        {
+            HeadRotation=ServoAngles[j]/90;
+        }
+
+    }
+    //set the head rotation
+    m_ccpm->ccpmSingleServo->setCurrentIndex(HeadRotation);
+
+    //calculate the un rotated angles
+    for(j=0;j<NumServos;j++)
+    {
+      CalcAngles[j] = fmod(360.0+ServoAngles[j]-(double)HeadRotation*90.0,360.0);
+    }
+    //sort the calc angles do the smallest is first...brute force...
+    for(i=0;i<5;i++)
+    for(j=0;j<NumServos-1;j++)
+    {
+      if (CalcAngles[SortAngles[j]] > CalcAngles[SortAngles[j+1]])
+      {//swap the sorted angles
+        temp = SortAngles[j];
+        SortAngles[j]=SortAngles[j+1];
+        SortAngles[j+1]=temp;
+      }
+
+    }
+
+    m_ccpm->ccpmAngleW->setValue(ServoAngles[SortAngles[0]]);
+    m_ccpm->ccpmAngleX->setValue(ServoAngles[SortAngles[1]]);
+    m_ccpm->ccpmAngleY->setValue(ServoAngles[SortAngles[2]]);
+    m_ccpm->ccpmAngleZ->setValue(ServoAngles[SortAngles[3]]);
+
+    m_ccpm->ccpmServoWChannel->setCurrentIndex(ServoChannels[SortAngles[0]]);
+    m_ccpm->ccpmServoXChannel->setCurrentIndex(ServoChannels[SortAngles[1]]);
+    m_ccpm->ccpmServoYChannel->setCurrentIndex(ServoChannels[SortAngles[2]]);
+    m_ccpm->ccpmServoZChannel->setCurrentIndex(ServoChannels[SortAngles[3]]);
+
+
+    //Types << "CCPM 2 Servo 90º" << "CCPM 3 Servo 120º" << "CCPM 3 Servo 140º" << "FP 2 Servo 90º"  << "Custom - User Angles" << "Custom - Advanced Settings"  ;
+
+
+    //check this against known combinations
+    if (NumServos==2)
+    {
+        if ((fabs(CalcAngles[SortAngles[0]])<MaxAngleError)&&
+            (fabs(CalcAngles[SortAngles[1]]-90)<MaxAngleError))
+        {// two servo 90º
+            if (isCCPM)
+            {
+                m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("CCPM 2 Servo 90º"));
+                UpdateType();
+            }
+            else
+            {
+                m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("FP 2 Servo 90º"));
+                UpdateType();
+            }
+
+        }
+    }
+    if (NumServos==3)
+    {
+        if ((fabs(CalcAngles[SortAngles[0]])<MaxAngleError)&&
+            (fabs(CalcAngles[SortAngles[1]]-120)<MaxAngleError)&&
+            (fabs(CalcAngles[SortAngles[2]]-240)<MaxAngleError))
+        {// three servo 120º
+            if (isCCPM)
+            {
+                m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("CCPM 3 Servo 120º"));
+                UpdateType();
+
+            }
+            else
+            {
+                m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("FP 3 Servo 120º"));
+                UpdateType();
+            }
+
+        }
+        else if ((fabs(CalcAngles[SortAngles[0]])<MaxAngleError)&&
+            (fabs(CalcAngles[SortAngles[1]]-140)<MaxAngleError)&&
+            (fabs(CalcAngles[SortAngles[2]]-220)<MaxAngleError))
+        {// three servo 140º
+            if (isCCPM)
+            {
+                m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("CCPM 3 Servo 140º"));
+                UpdateType();
+            }
+            else
+            {
+                m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("FP 3 Servo 140º"));
+                UpdateType();
+            }
+
+        }
+
+    }
+    if (NumServos==4)
+    {
+
+    }
+
 
 
 
@@ -722,6 +879,15 @@ void ConfigccpmWidget::sendccpmUpdate()
         Q_ASSERT(obj);
 
         UpdateMixer();
+
+        //clear the output types
+        for (i=0;i<8;i++)
+        {
+            field = obj->getField(tr( "Mixer%1Type" ).arg( i ));
+            //clear the mixer type
+            field->setValue("Disabled");
+        }
+
 
         //go through the user data and update the mixer matrix
         for (i=0;i<6;i++)

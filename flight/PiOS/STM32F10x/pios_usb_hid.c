@@ -280,7 +280,7 @@ int32_t PIOS_USB_HID_RxBufferGet(uint8_t id)
 {
 	uint8_t read = bufferGetFromFront(&rxBuffer);
 	// If endpoint was stalled and there is now space make it valid
-	if ((GetEPRxStatus(ENDP1) == EP_RX_STALL) && (bufferRemainingSpace(&rxBuffer) > 62)) {
+	if ((GetEPRxStatus(ENDP1) != EP_RX_VALID) && (bufferRemainingSpace(&rxBuffer) > 62)) {
 		SetEPRxStatus(ENDP1, EP_RX_VALID);
 	}
 	return read;
@@ -319,19 +319,19 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 
 	/* Use the memory interface function to write to the selected endpoint */
 	PMAToUserBufferCopy((uint8_t *) rx_buffer, GetEPRxAddr(ENDP1 & 0x7F), DataLength);
-
+	
 	/* The first byte is report ID (not checked), the second byte is the valid data length */
 #ifdef USB_HID
 	bufferAddChunkToEnd(&rxBuffer, &rx_buffer[1], PIOS_USB_HID_DATA_LENGTH + 1);
 #else
 	bufferAddChunkToEnd(&rxBuffer, &rx_buffer[2], rx_buffer[1]);
 #endif
-
+	
 	// Only reactivate endpoint if available space in buffer
 	if (bufferRemainingSpace(&rxBuffer) > 62) {
 		SetEPRxStatus(ENDP1, EP_RX_VALID);
 	} else {
-		SetEPRxStatus(ENDP1, EP_RX_STALL);
+		SetEPRxStatus(ENDP1, EP_RX_NAK);
 	}
 }
 

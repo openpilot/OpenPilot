@@ -100,7 +100,7 @@ const uint8_t PIOS_HID_ConfigDescriptor[PIOS_HID_SIZ_CONFIG_DESC] = {
 	0x03,			/* bmAttributes: Interrupt endpoint */
 	0x40,			/* wMaxPacketSize: 2 Bytes max */
 	0x00,
-	0x01,			/* bInterval: Polling Interval (32 ms) */
+	0x04,			/* bInterval: Polling Interval (32 ms) */
 	/* 34 */
 
 	0x07,			/* bLength: Endpoint Descriptor size */
@@ -111,7 +111,7 @@ const uint8_t PIOS_HID_ConfigDescriptor[PIOS_HID_SIZ_CONFIG_DESC] = {
 	0x03,			/* bmAttributes: Interrupt endpoint */
 	0x40,			/* wMaxPacketSize: 2 Bytes max  */
 	0x00,
-	0x01,			/* bInterval: Polling Interval (20 ms) */
+	0x04,			/* bInterval: Polling Interval (20 ms) */
 	/* 41 */
 }
 

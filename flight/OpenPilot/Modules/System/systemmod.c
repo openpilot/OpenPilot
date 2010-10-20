@@ -41,6 +41,7 @@
 #include "openpilot.h"
 #include "systemmod.h"
 #include "objectpersistence.h"
+#include "manualcontrolcommand.h"
 #include "systemstats.h"
 
 // Private constants
@@ -119,8 +120,15 @@ static void systemTask(void *parameters)
 			PIOS_LED_Off(LED2);
 		}
 
+		ManualControlCommandData manualControlCommandData;
+		ManualControlCommandGet(&manualControlCommandData);
+
 		// Wait until next period
-		vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS);
+		if(manualControlCommandData.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE) {
+			vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / 2);
+		} else {
+			vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS);
+		}
 	}
 }
 

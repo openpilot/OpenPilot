@@ -165,12 +165,19 @@ const double PERT_RANWALKACC = 0; // m/s^2 per sqrt(s), IMU a_bias random walk
 const double PERT_RANWALKGYRO = 0; // rad/s^2 per sqrt(s), IMU w_bias random walk
 
 // pin-hole:
-// flea2 with original obj
 
+// simu:
 const unsigned IMG_WIDTH = 640;
+const unsigned IMG_HEIGHT = 480;
+const double INTRINSIC[4] = { 320.0,   240.0,   500.0,   500.0 };
+const double DISTORTION[2] = { -0.25,   0.10 };
+
+// flea2 with original obj
+/*const unsigned IMG_WIDTH = 640;
 const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
 const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
+*/
 
 // jmcodol's robot
 /*const unsigned IMG_WIDTH = 640;
@@ -294,11 +301,21 @@ void demo_slam01_main(world_ptr_t *world) {
 	{
 		simulator.reset(new simu::AdhocSimulator());
 		jblas::vec3 pose;
-		for(int z = -1; z <= 1; ++z)
-		for(int y = -3; y <= 7; ++y)
-		for(int x = -6; x <= 6; ++x)
+		
+		/*// regular grid
+		const int npoints = 3*11*13;
+		double points[npoints][3];
+		for(int i, z = -1; z <= 1; ++z) for(int y = -3; y <= 7; ++y) for(int x = -6; x <= 6; ++x, ++i)
+			{ points[i][0] = x*1.0; points[i][1] = y*1.0; points[i][2] = z*1.0; }
+		*/
+		// square
+		const int npoints = 5;
+		double points[npoints][3] = { {4,-1,-1}, {4,-1,1}, {4,1,1}, {4,1,-1}, {4,0,0} };
+		
+		// add landmarks
+		for(int i = 0; i < npoints; ++i)
 		{
-			pose(0) = x*1.0; pose(1) = y*1.0; pose(2) = z*1.0;
+			pose(0) = points[i][0]; pose(1) = points[i][1]; pose(2) = points[i][2];
 			simu::Landmark *lmk = new simu::Landmark(LandmarkAbstract::POINT, pose);
 			simulator->addLandmark(lmk);
 		}
@@ -371,6 +388,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	if (intOpts[iSimu] == 1)
 	{
+		/*
 		simu::Robot *rob = new simu::Robot(robPtr1->id(), 6);
 		double VEL = 0.5;
 		rob->addWaypoint(0,0,0, 0,0,0, 0,0,0, 0,0,0);
@@ -382,6 +400,26 @@ void demo_slam01_main(world_ptr_t *world) {
 		rob->addWaypoint(-1,0,0, 0,0,0, VEL,0,0, 0,0,0);
 		rob->addWaypoint(0,0,0, 0,0,0, 0,0,0, 0,0,0);
 		simulator->addRobot(rob);
+		*/
+		
+		// TODO
+		simu::Robot *rob = new simu::Robot(robPtr1->id(), 6);
+		double VEL = 0.5;
+		
+		rob->addWaypoint(0 ,+1,0 , 0,0,0, 0,0   ,+VEL, 0,0,0);
+		rob->addWaypoint(0 ,0 ,+1, 0,0,0, 0,-VEL,0   , 0,0,0);
+		rob->addWaypoint(0 ,-1,0 , 0,0,0, 0,0   ,-VEL, 0,0,0);
+		rob->addWaypoint(0 ,0 ,-1, 0,0,0, 0,+VEL,0   , 0,0,0);
+		
+		rob->addWaypoint(0 ,+1,0 , 0,0,0, 0,0   ,+VEL, 0,0,0);
+		rob->addWaypoint(0 ,0 ,+1, 0,0,0, 0,-VEL,0   , 0,0,0);
+		rob->addWaypoint(0 ,-1,0 , 0,0,0, 0,0   ,-VEL, 0,0,0);
+		rob->addWaypoint(0 ,0 ,-1, 0,0,0, 0,+VEL,0   , 0,0,0);
+		
+		rob->addWaypoint(0 ,+1,0 , 0,0,0, 0,0   ,+VEL, 0,0,0);
+		
+		simulator->addRobot(rob);
+		
 	}
 	
 	

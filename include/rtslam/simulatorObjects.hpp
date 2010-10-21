@@ -14,6 +14,7 @@
 #ifndef SIMUOBJECTS_HPP_
 #define SIMUOBJECTS_HPP_
 
+#include "kernel/dataLog.hpp"
 #include "jmath/jblas.hpp"
 
 namespace jafar {
@@ -47,9 +48,10 @@ namespace simu {
 	};
 	typedef std::vector<Waypoint> Trajectory;
 	
-	class MobileObject: public simu::MapObject
+	class MobileObject: public simu::MapObject, public kernel::DataLoggable
 	{
 		private:
+			mutable double _t;
 			Trajectory traj;
 			void getWaypointsIndexes(double t, int &i_before, int &i_after) const
 			{
@@ -112,6 +114,7 @@ namespace simu {
 			
 			jblas::vec getPose(double t) const
 			{
+				_t = t;
 				int a, b;
 				getWaypointsIndexes(t,a,b);
 				if (a == b) return ublas::subrange(traj[b].pose,0,6);
@@ -125,6 +128,7 @@ namespace simu {
 			}
 			jblas::vec getSpeed(double t) const
 			{
+				_t = t;
 				int a, b;
 				getWaypointsIndexes(t,a,b);
 				if (a == b) return ublas::subrange(traj[b].pose,6,12);
@@ -134,6 +138,7 @@ namespace simu {
 			}
 			jblas::vec getAcc(double t) const
 			{
+				_t = t;
 				int a, b;
 				getWaypointsIndexes(t,a,b);
 				if (a == b) return jblas::zero_vec(6);
@@ -142,6 +147,18 @@ namespace simu {
 				return (ublas::subrange(traj[b].pose,6,12) - ublas::subrange(traj[a].pose,6,12)) / dt;
 			}
 		
+		
+			virtual void writeLogHeader(kernel::DataLogger& log) const
+			{
+				log.writeLegendTokens("simu_x simu_y simu_z");
+				log.writeLegendTokens("simu_yaw simu_pitch simu_roll");
+			}
+			virtual void writeLogData(kernel::DataLogger& log) const
+			{
+				jblas::vec pose = getPose(_t);
+				for(int i = 0 ; i < 6 ; ++i) log.writeData(pose(i));
+			}
+
 	};
 	
 	

@@ -404,6 +404,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		
 		// TODO
 		simu::Robot *rob = new simu::Robot(robPtr1->id(), 6);
+		if (dataLogger) dataLogger->addLoggable(*rob);
 		double VEL = 0.5;
 		
 		rob->addWaypoint(0 ,+1,0 , 0,0,0, 0,0   ,+VEL, 0,0,0);

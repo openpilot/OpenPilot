@@ -161,6 +161,8 @@ void RawHIDReadThread::run()
         }
         else // < 0 => error
         {
+            //TODO! make proper error handling, this only quick hack for unplug freeze
+            m_running=false;
         }
     }
 }
@@ -242,6 +244,8 @@ void RawHIDWriteThread::run()
         }
         else if(ret < 0) // < 0 => error
         {
+            //TODO! make proper error handling, this only quick hack for unplug freeze
+            m_running=false;
             qDebug() << "Error writing to device";
         }
         else

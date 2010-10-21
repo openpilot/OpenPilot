@@ -51,9 +51,11 @@ private:
     bool setupFrameElevon();
     bool setupFrameVtail();
     bool setupQuad(bool pLayout);
-    bool setupHexa();
+    bool setupHexa(bool pLayout);
     bool setupOcto();
     void updateCustomAirframeUI();
+    bool setupMixer(double mixerFactors[8][3]);
+    void setupMotors(QList<QString> motorList);
 
     void resetField(UAVObjectField * field);
     void resetMixer (MixerCurveWidget *mixer, int numElements);

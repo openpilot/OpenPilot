@@ -141,6 +141,16 @@ void ConnectionManager::onConnectPressed()
             if(m_ioDev)
             {
                 m_ioDev->open(QIODevice::ReadWrite);
+
+                // check if opening the device worked
+                if (!m_ioDev->isOpen())
+                {
+                    qDebug() << "could not connect to " << m_connectionDevice.devName;
+                    // TODO: inform the user that something went wrong
+                    m_ioDev = NULL;
+                    return;
+                }
+
                 //signal interested plugins that the user wants to connect to the device
                 emit deviceConnected(m_ioDev);
                 m_connectBtn->setText("Disconnect");

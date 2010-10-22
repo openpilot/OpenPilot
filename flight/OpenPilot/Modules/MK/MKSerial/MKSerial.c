@@ -527,6 +527,7 @@ static void MkSerialTask(void *parameters)
 		}
 
 		// Dependent on version, decide it we are connected to NC or FC
+                // TODO: use slave-addr to distinguish FC/NC -> much safer 
 		if (version < 60) {
 			DoConnectedToNC();	// Will only return after an error
 		} else {

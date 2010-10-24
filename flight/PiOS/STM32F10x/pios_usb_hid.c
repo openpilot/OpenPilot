@@ -63,6 +63,8 @@ cBuffer rxBuffer;
 cBuffer txBuffer;
 static uint8_t rxBufferSpace[TX_BUFFER_SIZE];
 static uint8_t txBufferSpace[RX_BUFFER_SIZE];
+
+volatile uint8_t in_irq = 0;
 /**
  * Initialises USB COM layer
  * \param[in] mode currently only mode 0 supported
@@ -231,12 +233,20 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t * buff
 	/*if( len > PIOS_USB_HID_DATA_LENGTH )
 	   return - 1; */
 
+	uint16_t ret;
 	uint8_t previous_data = bufferBufferedData(&txBuffer);
 
 	if (len > bufferRemainingSpace(&txBuffer))
 		return -1;	/* Cannot send all requested bytes */
 
-	if (bufferAddChunkToEnd(&txBuffer, buffer, len) == 0)
+	while(in_irq);
+	PIOS_IRQ_Disable();
+	if(!in_irq) 
+		ret = bufferAddChunkToEnd(&txBuffer, buffer, len);
+	else
+		ret = 0;
+	PIOS_IRQ_Enable();
+	if (ret == 0)
 		return -1;
 
 	/* If no previous data queued and not sending, then TX complete interrupt not likely so send manually */
@@ -261,7 +271,16 @@ int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t id, const uint8_t * buffer, uint16_
 	if ((error = PIOS_USB_HID_TxBufferPutMoreNonBlocking(id, buffer, len)) != 0)
 		return error;
 
-	while (bufferBufferedData(&txBuffer)) {
+	error = 1;
+	while (error) {
+		while(in_irq);
+		PIOS_IRQ_Disable();
+		if(!in_irq)
+			error = bufferBufferedData(&txBuffer);
+		else
+			error = 1;
+		PIOS_IRQ_Enable();
+
 #if defined(PIOS_INCLUDE_FREERTOS)
 		taskYIELD();
 #endif
@@ -278,7 +297,16 @@ int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t id, const uint8_t * buffer, uint16_
  */
 int32_t PIOS_USB_HID_RxBufferGet(uint8_t id)
 {
-	uint8_t read = bufferGetFromFront(&rxBuffer);
+	uint8_t read;
+	
+	while(in_irq);
+	PIOS_IRQ_Disable();
+	if(!in_irq)
+		read = bufferGetFromFront(&rxBuffer);
+	else
+		read = -1;
+	PIOS_IRQ_Enable();
+	
 	// If endpoint was stalled and there is now space make it valid
 	if ((GetEPRxStatus(ENDP1) != EP_RX_VALID) && (bufferRemainingSpace(&rxBuffer) > 62)) {
 		SetEPRxStatus(ENDP1, EP_RX_VALID);
@@ -303,14 +331,18 @@ int32_t PIOS_USB_HID_RxBufferUsed(uint8_t id)
  */
 void PIOS_USB_HID_EP1_IN_Callback(void)
 {
+	in_irq = 1;
 	sendChunk();
+	in_irq = 0;
 }
 
+int hid_rec = 0;
 /**
  * EP1 OUT Callback Routine
  */
 void PIOS_USB_HID_EP1_OUT_Callback(void)
 {
+	in_irq = 1;
 	uint32_t DataLength = 0;
 
 	/* Read received data (63 bytes) */
@@ -324,6 +356,7 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 #ifdef USB_HID
 	bufferAddChunkToEnd(&rxBuffer, &rx_buffer[1], PIOS_USB_HID_DATA_LENGTH + 1);
 #else
+	hid_rec += rx_buffer[1];
 	bufferAddChunkToEnd(&rxBuffer, &rx_buffer[2], rx_buffer[1]);
 #endif
 	
@@ -333,6 +366,7 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 	} else {
 		SetEPRxStatus(ENDP1, EP_RX_NAK);
 	}
+	in_irq = 0;
 }
 
 #endif

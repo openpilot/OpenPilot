@@ -152,6 +152,7 @@ void RawHIDReadThread::run()
             // Note: Preprocess the USB packets in this OS independent code
             // First byte is report ID, second byte is the number of valid bytes
             m_readBuffer.append(&buffer[2], buffer[1]);
+            qDebug() << buffer[1];
             m_readBufMtx.unlock();
 
             emit m_hid->readyRead();
@@ -208,7 +209,6 @@ void RawHIDWriteThread::run()
     {
         char buffer[WRITE_SIZE] = {0};
 
-        m_writeBufMtx.lock();
         int size = qMin(WRITE_SIZE-2, m_writeBuffer.size());
         while(size <= 0)
         {
@@ -217,27 +217,28 @@ void RawHIDWriteThread::run()
             m_newDataToWrite.wait(&m_writeBufMtx, 200);
             if(!m_running)
                 return;
-            else
-                size = qMin(WRITE_SIZE-2, m_writeBuffer.size());
-            //NOTE: data size is limited to 2 bytes less than the
-            //usb packet size (64 bytes for interrupt) to make room
-            //for the reportID and valid data length
+
+            size = m_writeBuffer.size();
         }
 
-        //make a temporary copy so we don't need to lock the mutex
-        //during actual device access
+        //NOTE: data size is limited to 2 bytes less than the
+        //usb packet size (64 bytes for interrupt) to make room
+        //for the reportID and valid data length
+        m_writeBufMtx.lock();
+        size = qMin(WRITE_SIZE-2, m_writeBuffer.size());
         memcpy(&buffer[2], m_writeBuffer.constData(), size);
         buffer[1] = size; //valid data length
         buffer[0] = 2;    //reportID
         m_writeBufMtx.unlock();
 
+        // must hold lock through the send to know how much was sent
         int ret = hiddev->send(hidno, buffer, WRITE_SIZE, WRITE_TIMEOUT);
 
         if(ret > 0)
         {
-            //only remove the size actually written to the device
+            //only remove the size actually written to the device            
             m_writeBufMtx.lock();
-            m_writeBuffer.remove(0, ret - 2);
+            m_writeBuffer.remove(0, size);
             m_writeBufMtx.unlock();
 
             emit m_hid->bytesWritten(ret - 2);
@@ -251,16 +252,19 @@ void RawHIDWriteThread::run()
         else
         {
             qDebug() << "No data written to device ??";
+            m_writeBufMtx.unlock();
+
         }
     }
 }
 
 int RawHIDWriteThread::pushDataToWrite(const char *data, int size)
 {
-    //QMutexLocker lock(&m_writeBufMtx);
+    QMutexLocker lock(&m_writeBufMtx);
 
     m_writeBuffer.append(data, size);
     m_newDataToWrite.wakeOne(); //signal that new data arrived
+
     return size;
 }
 

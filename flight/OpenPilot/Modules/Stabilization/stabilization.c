@@ -48,7 +48,7 @@
 #define MAX_QUEUE_SIZE 2
 #define STACK_SIZE configMINIMAL_STACK_SIZE
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
-#define FAILSAFE_TIMEOUT_MS 100
+#define FAILSAFE_TIMEOUT_MS 30
 
 enum {PID_RATE_ROLL, PID_RATE_PITCH, PID_RATE_YAW, PID_ROLL, PID_PITCH, PID_YAW, PID_MAX};
 
@@ -93,7 +93,7 @@ int32_t StabilizationInitialize()
 
 	// Listen for updates.
 	AttitudeActualConnectQueue(queue);
-	AttitudeRawConnectQueue(queue);
+//	AttitudeRawConnectQueue(queue);
 
 	StabilizationSettingsConnectCallback(SettingsUpdatedCb);
 	SettingsUpdatedCb(StabilizationSettingsHandle());

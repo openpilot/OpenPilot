@@ -2873,6 +2873,9 @@
 		65E8F0ED11EFF25C00BBF654 /* pios_usb_hid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_usb_hid.c; path = ../../PiOS/STM32F10x/pios_usb_hid.c; sourceTree = SOURCE_ROOT; };
 		65E8F0EE11EFF25C00BBF654 /* startup_stm32f10x_HD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_HD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_HD.S; sourceTree = SOURCE_ROOT; };
 		65E8F0F111EFF25C00BBF654 /* startup_stm32f10x_MD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_MD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_MD.S; sourceTree = SOURCE_ROOT; };
+		65EA2E171273C55200636061 /* ratedesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ratedesired.xml; sourceTree = "<group>"; };
+		65EA2E1D1273C6E900636061 /* ratedesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ratedesired.c; sourceTree = "<group>"; };
+		65EA2E1E1273C73000636061 /* ratedesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ratedesired.h; sourceTree = "<group>"; };
 		65EF3930123AF97D00D1B036 /* gpssatellites.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gpssatellites.c; sourceTree = "<group>"; };
 		65EF3931123AF97D00D1B036 /* gpstime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gpstime.c; sourceTree = "<group>"; };
 		65FC65BE123F209400B04F74 /* ahrs_adc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs_adc.c; path = ../../AHRS/ahrs_adc.c; sourceTree = SOURCE_ROOT; };
@@ -6776,6 +6779,7 @@
 				65B367F5121C2620003EAD18 /* manualcontrolsettings.xml */,
 				65B367F8121C2620003EAD18 /* objectpersistence.xml */,
 				65B367F9121C2620003EAD18 /* positionactual.xml */,
+				65EA2E171273C55200636061 /* ratedesired.xml */,
 				65B367FA121C2620003EAD18 /* stabilizationsettings.xml */,
 				65B367FB121C2620003EAD18 /* systemalarms.xml */,
 				65B367FC121C2620003EAD18 /* systemsettings.xml */,
@@ -7147,6 +7151,7 @@
 		65E8EF6E11EEA61E00BBF654 /* UAVObjects */ = {
 			isa = PBXGroup;
 			children = (
+				65EA2E1D1273C6E900636061 /* ratedesired.c */,
 				65D38AAC125F6B8200112AEB /* firmwareiapobj.c */,
 				65D38AAD125F6B8200112AEB /* guidancesettings.c */,
 				65D38AAE125F6B8200112AEB /* mixersettings.c */,
@@ -7194,6 +7199,7 @@
 		65E8EF8011EEA61E00BBF654 /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				65EA2E1E1273C73000636061 /* ratedesired.h */,
 				65D38A9E125F6B6B00112AEB /* ahrscalibration.h */,
 				65D38A9F125F6B6B00112AEB /* attituderaw.h */,
 				65D38AA0125F6B6B00112AEB /* baroaltitude.h */,

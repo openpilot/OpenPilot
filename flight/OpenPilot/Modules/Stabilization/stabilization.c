@@ -35,6 +35,7 @@
 #include "stabilization.h"
 #include "stabilizationsettings.h"
 #include "actuatordesired.h"
+#include "ratedesired.h"
 #include "attitudedesired.h"
 #include "attitudeactual.h"
 #include "attituderaw.h"
@@ -114,6 +115,7 @@ static void stabilizationTask(void* parameters)
 
 	ActuatorDesiredData actuatorDesired;
 	AttitudeDesiredData attitudeDesired;
+	RateDesiredData rateDesired;
 	AttitudeActualData attitudeActual;
 	AttitudeRawData attitudeRaw;
 	SystemSettingsData systemSettings;
@@ -141,6 +143,7 @@ static void stabilizationTask(void* parameters)
 		AttitudeDesiredGet(&attitudeDesired);
 		AttitudeActualGet(&attitudeActual);
 		AttitudeRawGet(&attitudeRaw);
+		RateDesiredGet(&rateDesired);
 		SystemSettingsGet(&systemSettings);
 
 
@@ -148,36 +151,37 @@ static void stabilizationTask(void* parameters)
 		float *attitudeDesiredAxis = &attitudeDesired.Roll;
 		float *attitudeActualAxis = &attitudeActual.Roll;
 		float *actuatorDesiredAxis = &actuatorDesired.Roll;
+		float *rateDesiredAxis = &rateDesired.Roll;
 
 		//Calculate desired rate
-		float rates[MAX_AXES]= {0,0,0};
 		for(int8_t ct=0; ct< MAX_AXES; ct++)
 		{
 			switch(manualControl.StabilizationSettings[ct])
 			{
 			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE:
-				rates[ct] = manualAxis[ct] * settings.ManualRate[ct];
+				rateDesiredAxis[ct] = manualAxis[ct] * settings.ManualRate[ct];
 				break;
 
 			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE:
-				rates[ct] = ApplyPid(&pids[PID_ROLL + ct],  attitudeDesiredAxis[ct],  attitudeActualAxis[ct], 1);
+				rateDesiredAxis[ct] = ApplyPid(&pids[PID_ROLL + ct],  attitudeDesiredAxis[ct],  attitudeActualAxis[ct], 1);
 				break;
 			}
 		}
 
 		uint8_t shouldUpdate = 0;
+		RateDesiredSet(&rateDesired);
 		ActuatorDesiredGet(&actuatorDesired);
 		//Calculate desired command
 		for(int8_t ct=0; ct< MAX_AXES; ct++)
 		{
-			if(fabs(rates[ct]) > settings.MaximumRate[ct])
+			if(fabs(rateDesiredAxis[ct]) > settings.MaximumRate[ct])
 			{
-				if(rates[ct] > 0)
+				if(rateDesiredAxis[ct] > 0)
 				{
-					rates[ct] = settings.MaximumRate[ct];
+					rateDesiredAxis[ct] = settings.MaximumRate[ct];
 				}else
 				{
-					rates[ct] = -settings.MaximumRate[ct];
+					rateDesiredAxis[ct] = -settings.MaximumRate[ct];
 				}
 
 			}
@@ -186,7 +190,7 @@ static void stabilizationTask(void* parameters)
 			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE:
 			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE:
 				{
-					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rates[ct],  attitudeRaw.gyros_filtered[ct], 0);
+					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rateDesiredAxis[ct],  attitudeRaw.gyros_filtered[ct], 0);
 					actuatorDesiredAxis[ct] = bound(command);
 					shouldUpdate = 1;
 					break;

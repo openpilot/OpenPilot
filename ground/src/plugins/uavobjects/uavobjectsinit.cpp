@@ -56,6 +56,7 @@
 #include "objectpersistence.h"
 #include "positionactual.h"
 #include "positiondesired.h"
+#include "ratedesired.h"
 #include "stabilizationsettings.h"
 #include "systemalarms.h"
 #include "systemsettings.h"
@@ -97,6 +98,7 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new ObjectPersistence() );
     objMngr->registerObject( new PositionActual() );
     objMngr->registerObject( new PositionDesired() );
+    objMngr->registerObject( new RateDesired() );
     objMngr->registerObject( new StabilizationSettings() );
     objMngr->registerObject( new SystemAlarms() );
     objMngr->registerObject( new SystemSettings() );

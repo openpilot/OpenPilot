@@ -54,6 +54,7 @@
 #include "objectpersistence.h"
 #include "positionactual.h"
 #include "positiondesired.h"
+#include "ratedesired.h"
 #include "stabilizationsettings.h"
 #include "systemalarms.h"
 #include "systemsettings.h"
@@ -95,6 +96,7 @@ void UAVObjectsInitializeAll()
     ObjectPersistenceInitialize();
     PositionActualInitialize();
     PositionDesiredInitialize();
+    RateDesiredInitialize();
     StabilizationSettingsInitialize();
     SystemAlarmsInitialize();
     SystemSettingsInitialize();

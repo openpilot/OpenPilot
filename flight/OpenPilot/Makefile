@@ -181,6 +181,7 @@ SRC += $(OPUAVOBJ)/velocitydesired.c
 SRC += $(OPUAVOBJ)/velocityactual.c
 SRC += $(OPUAVOBJ)/guidancesettings.c
 SRC += $(OPUAVOBJ)/firmwareiapobj.c
+SRC += $(OPUAVOBJ)/ratedesired.c
 endif
 
 ## PIOS Hardware (STM32F10x)

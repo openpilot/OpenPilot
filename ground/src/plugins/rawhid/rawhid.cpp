@@ -28,10 +28,13 @@
 #include "rawhid.h"
 
 #include "rawhid_const.h"
-
+#include "coreplugin/connectionmanager.h"
+#include <extensionsystem/pluginmanager.h>
 #include <QtGlobal>
 #include <QMutexLocker>
 #include <QWaitCondition>
+
+class IConnection;
 
 //timeout value used when we want to return directly without waiting
 static const int READ_TIMEOUT = 200;
@@ -57,6 +60,11 @@ public:
 
     /** return the bytes buffered */
     qint64 getBytesAvailable();
+
+public slots:
+    void terminate() {
+        m_running = false;
+    }
 
 protected:
     void run();
@@ -91,6 +99,11 @@ public:
 
     /** Return the number of bytes buffered */
     qint64 getBytesToWrite();
+
+public slots:
+    void terminate() {
+        m_running = false;
+    }
 
 protected:
     void run();
@@ -144,6 +157,7 @@ void RawHIDReadThread::run()
         // although it would be nice if the device had a different report to
         // configure this
         char buffer[READ_SIZE] = {0};
+
         int ret = hiddev->receive(hidno, buffer, READ_SIZE, READ_TIMEOUT);
 
         if(ret > 0) //read some data
@@ -152,7 +166,6 @@ void RawHIDReadThread::run()
             // Note: Preprocess the USB packets in this OS independent code
             // First byte is report ID, second byte is the number of valid bytes
             m_readBuffer.append(&buffer[2], buffer[1]);
-            qDebug() << buffer[1];
             m_readBufMtx.unlock();
 
             emit m_hid->readyRead();
@@ -332,24 +345,23 @@ bool RawHID::open(OpenMode mode)
     return true;
 }
 
+
 void RawHID::close()
 {
-    if(m_readThread)
-    {
+    emit aboutToClose();
+    if(m_readThread) {
         m_readThread->terminate();
-        delete m_readThread;
+        delete m_readThread; // calls wait
         m_readThread = NULL;
     }
 
-    if(m_writeThread)
-    {
+    if(m_writeThread) {
         m_writeThread->terminate();
         delete m_writeThread;
         m_writeThread = NULL;
     }
 
     dev.close(m_deviceNo);
-
     QIODevice::close();
 }
 

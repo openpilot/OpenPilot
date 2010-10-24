@@ -162,11 +162,10 @@ void RawHIDReadThread::run()
 
         if(ret > 0) //read some data
         {
-            m_readBufMtx.lock();
+            QMutexLocker lock(&m_readBufMtx);
             // Note: Preprocess the USB packets in this OS independent code
             // First byte is report ID, second byte is the number of valid bytes
             m_readBuffer.append(&buffer[2], buffer[1]);
-            m_readBufMtx.unlock();
 
             emit m_hid->readyRead();
         }
@@ -222,6 +221,7 @@ void RawHIDWriteThread::run()
     {
         char buffer[WRITE_SIZE] = {0};
 
+        m_writeBufMtx.lock();
         int size = qMin(WRITE_SIZE-2, m_writeBuffer.size());
         while(size <= 0)
         {
@@ -237,7 +237,6 @@ void RawHIDWriteThread::run()
         //NOTE: data size is limited to 2 bytes less than the
         //usb packet size (64 bytes for interrupt) to make room
         //for the reportID and valid data length
-        m_writeBufMtx.lock();
         size = qMin(WRITE_SIZE-2, m_writeBuffer.size());
         memcpy(&buffer[2], m_writeBuffer.constData(), size);
         buffer[1] = size; //valid data length
@@ -250,9 +249,8 @@ void RawHIDWriteThread::run()
         if(ret > 0)
         {
             //only remove the size actually written to the device            
-            m_writeBufMtx.lock();
+            QMutexLocker lock(&m_writeBufMtx);
             m_writeBuffer.remove(0, size);
-            m_writeBufMtx.unlock();
 
             emit m_hid->bytesWritten(ret - 2);
         }
@@ -265,8 +263,6 @@ void RawHIDWriteThread::run()
         else
         {
             qDebug() << "No data written to device ??";
-            m_writeBufMtx.unlock();
-
         }
     }
 }

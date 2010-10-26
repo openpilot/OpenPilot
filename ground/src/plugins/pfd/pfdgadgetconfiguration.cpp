@@ -34,13 +34,15 @@
  */
 PFDGadgetConfiguration::PFDGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
-    m_defaultDial("Unknown")
+    m_defaultDial("Unknown"),
+    beSmooth(true)
 {
     //if a saved configuration exists load it
     if(qSettings != 0) {
         QString dialFile = qSettings->value("dialFile").toString();
         useOpenGLFlag = qSettings->value("useOpenGLFlag").toBool();
         hqFonts = qSettings->value("hqFonts").toBool();
+        beSmooth = qSettings->value("beSmooth").toBool();
         m_defaultDial=Utils::PathUtils().InsertDataPath(dialFile);
     }
 }
@@ -55,6 +57,7 @@ IUAVGadgetConfiguration *PFDGadgetConfiguration::clone()
     m->m_defaultDial=m_defaultDial;
     m->useOpenGLFlag = useOpenGLFlag;
     m->hqFonts = hqFonts;
+    m->beSmooth = beSmooth;
     return m;
 }
 
@@ -67,4 +70,5 @@ void PFDGadgetConfiguration::saveConfig(QSettings* qSettings) const {
     qSettings->setValue("dialFile", dialFile);
     qSettings->setValue("useOpenGLFlag", useOpenGLFlag);
     qSettings->setValue("hqFonts", hqFonts);
+    qSettings->setValue("beSmooth", beSmooth);
 }

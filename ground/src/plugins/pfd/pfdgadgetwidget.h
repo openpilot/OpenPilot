@@ -52,6 +52,7 @@ public:
    void connectNeedles();
    void enableOpenGL(bool flag);
    void setHqFonts(bool flag) { hqFonts = flag; }
+   void enableSmoothUpdates(bool flag) { beSmooth = flag; }
 
 public slots:
    void updateAttitude(UAVObject *object1);
@@ -144,6 +145,7 @@ private:
    bool pfdError;
    // Flag to enable better rendering of fonts in OpenGL
    bool hqFonts;
+   bool beSmooth;
 
 };
 #endif /* PFDGADGETWIDGET_H_ */

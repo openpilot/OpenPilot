@@ -824,7 +824,7 @@ void PFDGadgetWidget::moveSky() {
     //////
     if (rollValue != rollTarget) {
         double rollDiff;
-        if ((abs((rollValue-rollTarget)*10) > 5)) {
+        if ((abs((rollValue-rollTarget)*10) > 5) && beSmooth ) {
             rollDiff =(rollTarget - rollValue)/2;
         } else {
             rollDiff = rollTarget - rollValue;
@@ -842,7 +842,7 @@ void PFDGadgetWidget::moveSky() {
     //////
     if (pitchValue != pitchTarget) {
         double pitchDiff;
-        if ((abs((pitchValue-pitchTarget)*10) > 5)) {
+        if ((abs((pitchValue-pitchTarget)*10) > 5) && beSmooth ) {
   //      if (0) {
             pitchDiff = (pitchTarget - pitchValue)/2;
         } else {
@@ -892,7 +892,7 @@ void PFDGadgetWidget::moveNeedles()
     //////
     if (headingValue != headingTarget) {
         double headingDiff;
-        if ((abs((headingValue-headingTarget)*10) > 5)) {
+        if ((abs((headingValue-headingTarget)*10) > 5) && beSmooth ) {
             headingDiff = (headingTarget - headingValue)/5;
         } else {
             headingDiff = headingTarget-headingValue;
@@ -921,7 +921,7 @@ void PFDGadgetWidget::moveNeedles()
     // Speed
     //////
     if (groundspeedValue != groundspeedTarget) {
-        if (abs(groundspeedValue-groundspeedTarget) > speedScaleHeight/100) {
+        if ((abs(groundspeedValue-groundspeedTarget) > speedScaleHeight/100) && beSmooth ) {
             groundspeedValue += (groundspeedTarget-groundspeedValue)/2;
         } else {
             groundspeedValue = groundspeedTarget;
@@ -960,7 +960,7 @@ void PFDGadgetWidget::moveNeedles()
     // Altitude
     //////
     if (altitudeValue != altitudeTarget) {
-        if (abs(altitudeValue-altitudeTarget) > altitudeScaleHeight/100) {
+        if ((abs(altitudeValue-altitudeTarget) > altitudeScaleHeight/100) && beSmooth ) {
             altitudeValue += (altitudeTarget-altitudeValue)/2;
         } else {
             altitudeValue = altitudeTarget;

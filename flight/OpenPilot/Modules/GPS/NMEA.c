@@ -15,6 +15,7 @@
 #define NMEA_DEBUG_GSA		///< define to enable debug of GSA messages
 #define NMEA_DEBUG_GSV		///< define to enable debug of GSV messages
 #define NMEA_DEBUG_ZDA		///< define to enable debug of ZDA messages
+#define NMEA_DEBUG_PGTOP	///< define to enable debug of PGTOP messages
 #endif
 
 /* Utility functions */
@@ -34,6 +35,7 @@ static bool nmeaProcessGPVTG(GPSPositionData * GpsData, char *sentence);
 static bool nmeaProcessGPGSA(GPSPositionData * GpsData, char *sentence);
 static bool nmeaProcessGPZDA(GPSPositionData * GpsData, char *sentence);
 static bool nmeaProcessGPGSV(GPSPositionData * GpsData, char *sentence);
+static bool nmeaProcessPGTOP(GPSPositionData * GpsData, char *sentence);
 
 static struct nmea_parser nmea_parsers[] = {
 	{
@@ -60,6 +62,10 @@ static struct nmea_parser nmea_parsers[] = {
 	 .prefix = "GPGSV",
 	 .handler = nmeaProcessGPGSV,
 	 },
+        {
+         .prefix = "PGTOP",
+         .handler = nmeaProcessPGTOP,
+         },
 };
 
 static struct nmea_parser *NMEA_find_parser_by_prefix(char *prefix)
@@ -183,7 +189,7 @@ static bool nmeaProcessGPGGA(GPSPositionData * GpsData, char *sentence)
 		return false;
 	}
 	// next field: N/S indicator
-	// correct latitute for N/S
+        // correct latitude for N/S
 	tokens = strsep(&next, delimiter);
 	if (tokens[0] == 'S')
 		GpsData->Latitude = -GpsData->Latitude;
@@ -277,7 +283,7 @@ static bool nmeaProcessGPRMC(GPSPositionData * GpsData, char *sentence)
 		return false;
 	}
 	// next field: N/S indicator
-	// correct latitute for N/S
+        // correct latitude for N/S
 	tokens = strsep(&next, delimiter);
 	if (tokens[0] == 'S')
 		GpsData->Latitude = -GpsData->Latitude;
@@ -289,7 +295,7 @@ static bool nmeaProcessGPRMC(GPSPositionData * GpsData, char *sentence)
 		return false;
 	}
 	// next field: E/W indicator
-	// correct latitute for E/W
+        // correct longitude for E/W
 	tokens = strsep(&next, delimiter);
 	if (tokens[0] == 'W')
 		GpsData->Longitude = -GpsData->Longitude;
@@ -298,7 +304,8 @@ static bool nmeaProcessGPRMC(GPSPositionData * GpsData, char *sentence)
 	// get speed in knots
 	tokens = strsep(&next, delimiter);
 	GpsData->Groundspeed = NMEA_real_to_float(tokens);
-	GpsData->Groundspeed *= 0.51444;
+        // to m/s
+        GpsData->Groundspeed *= 0.51444;
 
 	// next field: True course
 	// get True course
@@ -348,6 +355,7 @@ static bool nmeaProcessGPVTG(GPSPositionData * GpsData, char *sentence)
 
 	// get course (true north ref) in degrees [ddd.dd]
 	tokens = strsep(&next, delimiter);
+        GpsData->Heading = NMEA_real_to_float(tokens);
 
 	// next field: 'T'
 	tokens = strsep(&next, delimiter);
@@ -361,6 +369,10 @@ static bool nmeaProcessGPVTG(GPSPositionData * GpsData, char *sentence)
 	// next field: speed (knots)
 	// get speed in knots
 	tokens = strsep(&next, delimiter);
+        GpsData->Groundspeed = NMEA_real_to_float(tokens);
+        // to m/s
+        GpsData->Groundspeed *= 0.51444;
+
 	// next field: 'N'
 	tokens = strsep(&next, delimiter);
 
@@ -581,6 +593,123 @@ static bool nmeaProcessGPGSA(GPSPositionData * GpsData, char *sentence)
 	tokens = strsep(&next, delimiter);
 
 	return true;
+}
+
+/**
+ * Parse an NMEA PGTOP sentence and update the given UAVObject
+ * \param[in] A pointer to a GPSPosition UAVObject to be updated.
+ * \param[in] An NMEA sentence with a valid checksum
+ */
+static bool nmeaProcessPGTOP(GPSPositionData * GpsData, char *sentence)
+{
+        char *next = sentence;
+        char *tokens;
+        char *delimiter = ",*";
+
+#ifdef NMEA_DEBUG_PGTOP
+        PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "$%s\r\n", sentence);
+#endif
+        GPSTimeData gpst;
+        GPSTimeGet(&gpst);
+
+        // get UTC time [hhmmss.sss]
+        tokens = strsep(&next, delimiter);
+        float hms = NMEA_real_to_float(tokens);
+        gpst.Second = (int)hms % 100;
+        gpst.Minute = (((int)hms - gpst.Second) / 100) % 100;
+        gpst.Hour = (int)hms / 10000;
+
+        // next field: latitude
+        // get latitude [ddmm.mmmmm]
+        tokens = strsep(&next, delimiter);
+        if (!NMEA_latlon_to_fixed_point(&GpsData->Latitude, tokens)) {
+                return false;
+        }
+        // next field: N/S indicator
+        // correct latitude for N/S
+        tokens = strsep(&next, delimiter);
+        if (tokens[0] == 'S')
+                GpsData->Latitude = -GpsData->Latitude;
+
+        // next field: longitude
+        // get longitude [dddmm.mmmmm]
+        tokens = strsep(&next, delimiter);
+        if (!NMEA_latlon_to_fixed_point(&GpsData->Longitude, tokens)) {
+                return false;
+        }
+        // next field: E/W indicator
+        // correct longitude for E/W
+        tokens = strsep(&next, delimiter);
+        if (tokens[0] == 'W')
+                GpsData->Longitude = -GpsData->Longitude;
+
+        // next field: Fix Quality
+        // Mode: 0=Fix not available, 1=GPS fix, 2=DGPS fix
+        tokens = strsep(&next, delimiter);
+
+        // next field: satellites used
+        // get number of satellites used in GPS solution
+        tokens = strsep(&next, delimiter);
+        GpsData->Satellites = atoi(tokens);
+
+        // next field: HDOP
+        tokens = strsep(&next, delimiter);
+        GpsData->HDOP = NMEA_real_to_float(tokens);
+
+        // next field: altitude
+        // get altitude (in meters mm.m)
+        tokens = strsep(&next, delimiter);
+        GpsData->Altitude = NMEA_real_to_float(tokens);
+
+        // next field: geoid separation
+        tokens = strsep(&next, delimiter);
+        GpsData->GeoidSeparation = NMEA_real_to_float(tokens);
+
+        // next field: Fix Type
+        // Mode: 1=Fix not available, 2=2D, 3=3D
+        tokens = strsep(&next, delimiter);
+        switch (atoi(tokens)) {
+        case 1:
+                GpsData->Status = GPSPOSITION_STATUS_NOFIX;
+                break;
+        case 2:
+                GpsData->Status = GPSPOSITION_STATUS_FIX2D;
+                break;
+        case 3:
+                GpsData->Status = GPSPOSITION_STATUS_FIX3D;
+                break;
+        default:
+                /* Unhandled */
+                return false;
+                break;
+        }
+
+        // get course over ground in degrees [ddd.dd]
+        tokens = strsep(&next, delimiter);
+        GpsData->Heading = NMEA_real_to_float(tokens);
+
+        // next field: speed (km/h)
+        // get speed in km/h
+        tokens = strsep(&next, delimiter);
+        GpsData->Groundspeed = NMEA_real_to_float(tokens);
+        // to m/s
+        GpsData->Groundspeed /= 3.6;
+
+        tokens = strsep(&next, delimiter);
+        gpst.Day = (uint8_t) NMEA_real_to_float(next);
+
+        tokens = strsep(&next, delimiter);
+        gpst.Month = (uint8_t) NMEA_real_to_float(next);
+
+        tokens = strsep(&next, delimiter);
+        gpst.Year = (uint16_t) NMEA_real_to_float(next);
+
+        GPSTimeSet(&gpst);
+
+        // next field: checksum
+        tokens = strsep(&next, delimiter);
+
+        return true;
 }
 
 /* Parse a number encoded in a string of the format:

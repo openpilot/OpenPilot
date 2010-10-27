@@ -84,6 +84,7 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     m_aircraft->multiMotor6->addItems(channels);
     m_aircraft->multiMotor7->addItems(channels);
     m_aircraft->multiMotor8->addItems(channels);
+    m_aircraft->triYawChannel->addItems(channels);
 
     // Setup the Multirotor picture in the Quad settings interface
     m_aircraft->quadShape->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -808,6 +809,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->multiMotor6->setEnabled(false);
         m_aircraft->multiMotor7->setEnabled(false);
         m_aircraft->multiMotor8->setEnabled(false);
+        m_aircraft->triYawChannel->setEnabled(false);
         m_aircraft->mrRollMixLevel->setValue(50);
         m_aircraft->mrPitchMixLevel->setValue(50);
         m_aircraft->mrYawMixLevel->setValue(50);
@@ -820,7 +822,8 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->multiMotor6->setEnabled(false);
         m_aircraft->multiMotor7->setEnabled(false);
         m_aircraft->multiMotor8->setEnabled(false);
-        m_aircraft->mrRollMixLevel->setValue(100);
+        m_aircraft->triYawChannel->setEnabled(false);
+                m_aircraft->mrRollMixLevel->setValue(100);
         m_aircraft->mrPitchMixLevel->setValue(100);
         m_aircraft->mrYawMixLevel->setValue(50);
     } else if (frameType == "Hexa" || frameType == "Hexacopter") {
@@ -832,6 +835,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->multiMotor6->setEnabled(true);
         m_aircraft->multiMotor7->setEnabled(false);
         m_aircraft->multiMotor8->setEnabled(false);
+        m_aircraft->triYawChannel->setEnabled(false);
         m_aircraft->mrRollMixLevel->setValue(50);
         m_aircraft->mrPitchMixLevel->setValue(33);
         m_aircraft->mrYawMixLevel->setValue(33);
@@ -844,6 +848,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->multiMotor6->setEnabled(true);
         m_aircraft->multiMotor7->setEnabled(true);
         m_aircraft->multiMotor8->setEnabled(true);
+        m_aircraft->triYawChannel->setEnabled(false);
         m_aircraft->mrRollMixLevel->setValue(33);
         m_aircraft->mrPitchMixLevel->setValue(33);
         m_aircraft->mrYawMixLevel->setValue(25);
@@ -856,6 +861,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->multiMotor6->setEnabled(true);
         m_aircraft->multiMotor7->setEnabled(false);
         m_aircraft->multiMotor8->setEnabled(false);
+        m_aircraft->triYawChannel->setEnabled(false);
         m_aircraft->mrRollMixLevel->setValue(33);
         m_aircraft->mrPitchMixLevel->setValue(50);
         m_aircraft->mrYawMixLevel->setValue(33);
@@ -869,6 +875,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->multiMotor6->setEnabled(true);
         m_aircraft->multiMotor7->setEnabled(true);
         m_aircraft->multiMotor8->setEnabled(true);
+        m_aircraft->triYawChannel->setEnabled(false);
         m_aircraft->mrRollMixLevel->setValue(25);
         m_aircraft->mrPitchMixLevel->setValue(25);
         m_aircraft->mrYawMixLevel->setValue(25);
@@ -882,6 +889,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->multiMotor6->setEnabled(true);
         m_aircraft->multiMotor7->setEnabled(true);
         m_aircraft->multiMotor8->setEnabled(true);
+        m_aircraft->triYawChannel->setEnabled(false);
         m_aircraft->mrRollMixLevel->setValue(100);
         m_aircraft->mrPitchMixLevel->setValue(100);
         m_aircraft->mrYawMixLevel->setValue(50);
@@ -895,6 +903,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->multiMotor6->setEnabled(true);
         m_aircraft->multiMotor7->setEnabled(true);
         m_aircraft->multiMotor8->setEnabled(true);
+        m_aircraft->triYawChannel->setEnabled(false);
         m_aircraft->mrRollMixLevel->setValue(50);
         m_aircraft->mrPitchMixLevel->setValue(50);
         m_aircraft->mrYawMixLevel->setValue(50);
@@ -908,6 +917,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->multiMotor6->setEnabled(true);
         m_aircraft->multiMotor7->setEnabled(false);
         m_aircraft->multiMotor8->setEnabled(false);
+        m_aircraft->triYawChannel->setEnabled(false);
         m_aircraft->mrRollMixLevel->setValue(100);
         m_aircraft->mrPitchMixLevel->setValue(50);
         m_aircraft->mrYawMixLevel->setValue(66);
@@ -921,6 +931,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->multiMotor6->setEnabled(false);
         m_aircraft->multiMotor7->setEnabled(false);
         m_aircraft->multiMotor8->setEnabled(false);
+        m_aircraft->triYawChannel->setEnabled(true);
 
     }
     m_aircraft->quadShape->setSceneRect(quad->boundingRect());
@@ -1707,6 +1718,7 @@ void ConfigAirframeWidget::sendAircraftUpdate()
                {  1,  1,  1}
            };
            setupMixer(mixer);
+           m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");
 
         } else if (m_aircraft->multirotorFrameType->currentText() == "Hexacopter X") {
             airframeType = "HexaX";
@@ -1741,6 +1753,7 @@ void ConfigAirframeWidget::sendAircraftUpdate()
                {  0.33,  1,  1}
            };
            setupMixer(mixer);
+           m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");
 
         } else if (m_aircraft->multirotorFrameType->currentText() == "Octo Coax +") {
             airframeType = "OctoCoaxP";
@@ -1771,6 +1784,7 @@ void ConfigAirframeWidget::sendAircraftUpdate()
                {  0,  1,  1}
            };
            setupMixer(mixer);
+           m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");
 
         } else if (m_aircraft->multirotorFrameType->currentText() == "Octo Coax X") {
             airframeType = "OctoCoaxX";
@@ -1801,6 +1815,7 @@ void ConfigAirframeWidget::sendAircraftUpdate()
                { -1,  1,  1}
            };
            setupMixer(mixer);
+           m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");
 
         } else if (m_aircraft->multirotorFrameType->currentText() == "Hexacopter Y6") {
             airframeType = "HexaCoax";
@@ -1830,13 +1845,18 @@ void ConfigAirframeWidget::sendAircraftUpdate()
                {  0,    0,  0}
            };
            setupMixer(mixer);
+           m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");
 
-        } else if (m_aircraft->multirotorFrameType->currentText() == "Tricopter") {
+        } else if (m_aircraft->multirotorFrameType->currentText() == "Tricopter Y") {
             airframeType = "Tri";
             if (m_aircraft->multiMotor1->currentText() == "None" ||
                 m_aircraft->multiMotor2->currentText() == "None" ||
                 m_aircraft->multiMotor3->currentText() == "None" ) {
                 m_aircraft->mrStatusLabel->setText("ERROR: Assign 3 motor channels");
+                return;
+            }
+            if (m_aircraft->triYawChannel->currentText() == "None") {
+                m_aircraft->mrStatusLabel->setText("Error: Assign a Yaw channel");
                 return;
             }
             motorList << "VTOLMotorNW" << "VTOLMotorNE" << "VTOLMotorS";
@@ -1857,6 +1877,16 @@ void ConfigAirframeWidget::sendAircraftUpdate()
            setupMixer(mixer);
 
            // TODO: enable tricopter yaw channel!!
+           int eng = m_aircraft->triYawChannel->currentIndex()-1;
+           obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+           field = obj->getField(mixerTypes.at(eng));
+           field->setValue("Servo");
+           field = obj->getField(mixerVectors.at(eng));
+           resetField(field);
+           int ti = field->getElementNames().indexOf("Yaw");
+           field->setValue(127,ti);
+           m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");
+
         }
         // Now reflect those settings in the "Custom" panel as well
         updateCustomAirframeUI();

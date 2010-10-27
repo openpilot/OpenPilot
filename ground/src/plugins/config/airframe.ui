@@ -1017,7 +1017,7 @@ p, li { white-space: pre-wrap; }
                  </widget>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="comboBox_9">
+                 <widget class="QComboBox" name="triYawChannel">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>

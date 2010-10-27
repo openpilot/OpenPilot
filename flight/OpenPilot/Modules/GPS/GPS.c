@@ -103,6 +103,11 @@ static void gpsTask(void *parameters)
 	GPSPositionData GpsData;
 	uint32_t timeNowMs;
 
+//#define	DISABLE_GPS_TRESHOLD
+#ifdef DISABLE_GPS_TRESHOLD
+	PIOS_COM_SendStringNonBlocking(gpsPort,"$PMTK397,0*23\r\n");
+#endif
+
 	// Loop forever
 	while (1) {
 		/* This blocks the task until there is something on the buffer */

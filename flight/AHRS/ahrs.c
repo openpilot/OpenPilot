@@ -523,50 +523,22 @@ for all data to be up to date before doing anything*/
 							(int16_t) (Nav.q[3] * 1000));
 #endif
 #ifdef DUMP_EKF
-		uint8_t framing[16] =
-		    { 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,
-	  0 };
-		extern float F[NUMX][NUMX], G[NUMX][NUMW], H[NUMV][NUMX];	// linearized system matrices
-		extern float P[NUMX][NUMX], X[NUMX];	// covariance matrix and state vector
-		extern float Q[NUMW], R[NUMV];	// input noise and measurement noise variances
-		extern float K[NUMX][NUMV];	// feedback gain matrix
-
+		uint8_t framing[16] = { 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
 		// Dump raw buffer
-		int8_t result;
-		result = PIOS_COM_SendBuffer(PIOS_COM_AUX, &framing[0], 16);	// framing header
-		result += PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & total_conversion_blocks, sizeof(total_conversion_blocks));	// dump block number
-		result +=
-		    PIOS_COM_SendBuffer(PIOS_COM_AUX,
-					(uint8_t *) & mag_data,
-					sizeof(mag_data));
-		result +=
-		    PIOS_COM_SendBuffer(PIOS_COM_AUX,
-					(uint8_t *) & gps_data,
-					sizeof(gps_data));
-		result +=
-		    PIOS_COM_SendBuffer(PIOS_COM_AUX,
-					(uint8_t *) & accel_data,
-					sizeof(accel_data));
-		result +=
-		    PIOS_COM_SendBuffer(PIOS_COM_AUX,
-					(uint8_t *) & gyro_data,
-					sizeof(gyro_data));
-		result +=
-		    PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & Q,
-					sizeof(float) * NUMX * NUMX);
-		result +=
-		    PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & K,
-					sizeof(float) * NUMX * NUMV);
-		result +=
-		    PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & X,
-					sizeof(float) * NUMX * NUMX);
-
-		if (result == 0)
-			PIOS_LED_Off(LED1);
-		else {
-			PIOS_LED_On(LED1);
-		}
-#endif
+		PIOS_COM_SendBuffer(PIOS_COM_AUX, &framing[0], 16);                                                         // framing header (1:16)
+		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & total_conversion_blocks, sizeof(total_conversion_blocks));  // dump block number (17:20)
+		
+		PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, (uint8_t *) & accel_data.filtered.x, 4*3);                     // accel data (21:32)
+		PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, (uint8_t *) & gyro_data.filtered.x, 4*3);                      // gyro data (33:44)
+		
+		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & mag_data.updated, 1);                                       // mag update (45)
+		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & mag_data.scaled.axis, 3*4);                                 // mag data (46:57)
+		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & gps_data, sizeof(gps_data));                                // gps data (58:82)
+		
+		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & X, 4 * NUMX);                                               // X (83:134)
+		for(uint8_t i = 0; i < NUMX; i++) 
+			PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &(P[i][i]), 4);                                       // diag(P) (135:186)
+#endif  
 
 	}
 

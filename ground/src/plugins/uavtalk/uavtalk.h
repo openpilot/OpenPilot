@@ -81,7 +81,7 @@ private:
     static const quint8 crc_table[256];
 
     // Types
-    typedef enum {STATE_SYNC, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS} RxStateType;
+    typedef enum {STATE_SYNC, STATE_TYPE, STATE_SIZE, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS} RxStateType;
 
     // Variables
     QIODevice* io;
@@ -97,8 +97,10 @@ private:
     quint32 rxObjId;
     quint16 rxInstId;
     quint16 rxLength;
+
     quint8 rxCSPacket, rxCS;
     qint32 rxCount;
+    qint32 packetSize;
     RxStateType rxState;
     ComStats stats;
 

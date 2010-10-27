@@ -26,6 +26,9 @@
  */
 #include "uavtalk.h"
 #include <QtEndian>
+#include <QDebug>
+
+#define SYNC_VAL 0x3C
 
 const quint8 UAVTalk::crc_table[256] = {
     0x00, 0x07, 0x0e, 0x09, 0x1c, 0x1b, 0x12, 0x15, 0x38, 0x3f, 0x36, 0x31, 0x24, 0x23, 0x2a, 0x2d,
@@ -188,12 +191,35 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
     // Receive state machine
     switch (rxState) {
     case STATE_SYNC:
+        if (rxbyte == SYNC_VAL) {
+            rxCS = updateCRC(0, &rxbyte, 1);
+            rxState = STATE_TYPE;
+        }
+        break;
+    case STATE_TYPE:
         if ((rxbyte & TYPE_MASK) == TYPE_VER )
         {
-            rxCS = updateCRC(0, &rxbyte, 1);
+            rxCS = updateCRC(rxCS, &rxbyte, 1);
             rxType = rxbyte;
-            rxState = STATE_OBJID;
+            packetSize = 0;
+            rxState = STATE_SIZE;
             rxCount = 0;
+        } else {
+            rxState = STATE_SYNC;
+        }
+        break;
+    case STATE_SIZE:
+        if(rxCount++ == 0) {
+            rxCS = updateCRC(rxCS, &rxbyte, 1);
+            packetSize += rxbyte;
+            rxCount++;
+        }
+        else {
+            rxCS = updateCRC(rxCS, &rxbyte, 1);
+            rxCount++;
+            packetSize += rxbyte << 8;
+            rxCount = 0;
+            rxState = STATE_OBJID;
         }
         break;
     case STATE_OBJID:
@@ -536,27 +562,28 @@ bool UAVTalk::transmitSingleObject(UAVObject* obj, quint8 type, bool allInstance
 
     // Setup type and object id fields
     objId = obj->getObjID();
-    txBuffer[0] = type;
-    qToLittleEndian<quint32>(objId, &txBuffer[1]);
+    txBuffer[0] = SYNC_VAL;
+    txBuffer[1] = type;
+    qToLittleEndian<quint32>(objId, &txBuffer[4]);
 
     // Setup instance ID if one is required
     if ( obj->isSingleInstance() )
     {
-        dataOffset = 5;
+        dataOffset = 8;
     }
     else
     {
         // Check if all instances are requested
         if (allInstances)
         {
-            qToLittleEndian<quint16>(allInstId, &txBuffer[5]);
+            qToLittleEndian<quint16>(allInstId, &txBuffer[8]);
         }
         else
         {
             instId = obj->getInstID();
-            qToLittleEndian<quint16>(instId, &txBuffer[5]);
+            qToLittleEndian<quint16>(instId, &txBuffer[8]);
         }
-        dataOffset = 7;
+        dataOffset = 10;
     }
 
     // Determine data length
@@ -583,6 +610,8 @@ bool UAVTalk::transmitSingleObject(UAVObject* obj, quint8 type, bool allInstance
             return false;
         }
     }
+
+    qToLittleEndian<quint16>(dataOffset + length, &txBuffer[2]);
 
     // Calculate checksum
     txBuffer[dataOffset+length] = updateCRC(0, txBuffer, dataOffset+length);

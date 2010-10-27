@@ -32,6 +32,7 @@
 #include "openpilot.h"
 
 // Private constants
+#define SYNC_VAL 0x3C
 #define TYPE_MASK 0xFC
 #define TYPE_VER 0x10
 #define TYPE_OBJ (TYPE_VER | 0x00)
@@ -65,7 +66,7 @@ static const uint8_t crc_table[256] = {
 };
 
 // Private types
-typedef enum {STATE_SYNC, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS} RxState;
+typedef enum {STATE_SYNC, STATE_TYPE, STATE_SIZE, STATE_OBJID, STATE_INSTID, STATE_DATA, STATE_CS} RxState;
 
 // Private variables
 static UAVTalkOutputStream outStream;
@@ -239,6 +240,7 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
     static uint8_t tmpBuffer[4];
     static UAVObjHandle obj;
     static uint8_t type;
+    static uint16_t packet_size;
     static uint32_t objId;
     static uint16_t instId;
     static uint32_t length;
@@ -250,14 +252,35 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
     ++stats.rxBytes;
     switch (state) {
     case STATE_SYNC:
+	if (rxbyte == SYNC_VAL) {
+		cs = updateCRC(0, &rxbyte, 1);			    
+		state = STATE_TYPE;
+	}
+        break;
+    case STATE_TYPE:
         if ((rxbyte & TYPE_MASK) == TYPE_VER )
         {
-            cs = updateCRC(0, &rxbyte, 1);
+            cs = updateCRC(cs, &rxbyte, 1);
             type = rxbyte;
-            state = STATE_OBJID;
+	    packet_size = 0;
+            state = STATE_SIZE;
             rxCount = 0;
-        }
+        } else {
+	    state = STATE_SYNC;
+	}
         break;
+    case STATE_SIZE:
+	if(rxCount++ == 0) {
+		cs = updateCRC(cs, &rxbyte, 1);
+		packet_size += rxbyte;
+	}
+	else {
+		cs = updateCRC(cs, &rxbyte, 1);
+		packet_size += rxbyte << 8;
+		rxCount = 0;
+		state = STATE_OBJID;
+	}
+	break;		    		    
     case STATE_OBJID:
         tmpBuffer[rxCount++] = rxbyte;
         if (rxCount == 4)
@@ -526,22 +549,24 @@ static int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
 
     // Setup type and object id fields
     objId = UAVObjGetID(obj);
-    txBuffer[0] = type;
-    txBuffer[1] = (uint8_t)(objId & 0xFF);
-    txBuffer[2] = (uint8_t)((objId >> 8) & 0xFF);
-    txBuffer[3] = (uint8_t)((objId >> 16) & 0xFF);
-    txBuffer[4] = (uint8_t)((objId >> 24) & 0xFF);
+    txBuffer[0] = SYNC_VAL;  // sync byte
+    txBuffer[1] = type;
+	// data length inserted here below
+    txBuffer[4] = (uint8_t)(objId & 0xFF);
+    txBuffer[5] = (uint8_t)((objId >> 8) & 0xFF);
+    txBuffer[6] = (uint8_t)((objId >> 16) & 0xFF);
+    txBuffer[7] = (uint8_t)((objId >> 24) & 0xFF);
 
     // Setup instance ID if one is required
     if (UAVObjIsSingleInstance(obj))
     {
-    	dataOffset = 5;
+    	dataOffset = 8;
     }
     else
     {
-    	txBuffer[5] = (uint8_t)(instId & 0xFF);
-    	txBuffer[6] = (uint8_t)((instId >> 8) & 0xFF);
-    	dataOffset = 7;
+    	txBuffer[8] = (uint8_t)(instId & 0xFF);
+    	txBuffer[9] = (uint8_t)((instId >> 8) & 0xFF);
+    	dataOffset = 10;
     }
 
     // Determine data length
@@ -568,6 +593,10 @@ static int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
     		return -1;
     	}
     }
+
+    // Store the packet length
+    txBuffer[2] = (uint8_t)((dataOffset+length) & 0xFF);
+    txBuffer[3] = (uint8_t)(((dataOffset+length) >> 8) & 0xFF);
 
     // Calculate checksum
     txBuffer[dataOffset+length] = updateCRC(0, txBuffer, dataOffset+length);

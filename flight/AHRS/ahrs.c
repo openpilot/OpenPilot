@@ -206,6 +206,9 @@ int main()
 	gps_data.quality = -1;
 	uint32_t last_gps_time = 0;
 	uint32_t last_indoor_time = 0;
+	uint32_t up_time_real = 0;
+	uint32_t up_time = 0;
+	uint32_t last_up_time = 0;
 
 	ahrs_algorithm = AHRSSETTINGS_ALGORITHM_SIMPLE;
 
@@ -311,9 +314,16 @@ for all data to be up to date before doing anything*/
 		AhrsStatusGet(&status);
 		status.CPULoad = ((float)running_counts /
 						  (float)(idle_counts + running_counts)) * 100;
-		status.IdleTimePerCyle = idle_counts / (TIMER_RATE / 10000);
-		status.RunningTimePerCyle = running_counts / (TIMER_RATE / 10000);
+		status.IdleTimePerCyle = idle_counts / (timer_rate() / 10000);
+		status.RunningTimePerCyle = running_counts / (timer_rate() / 10000);
 		status.DroppedUpdates = ekf_too_slow;
+		up_time = timer_count();
+		if(up_time >= last_up_time) // normal condition
+			up_time_real += ((up_time - last_up_time) * 1000) / timer_rate();
+		else
+			up_time_real += ((0xFFFF - last_up_time + up_time) * 1000) / timer_rate(); 
+		last_up_time = up_time;
+		status.RunningTime = up_time_real;
 		AhrsStatusSet(&status);
 
 		// Alive signal

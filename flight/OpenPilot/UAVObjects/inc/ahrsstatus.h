@@ -41,7 +41,7 @@
 #define AHRSSTATUS_H
 
 // Object constants
-#define AHRSSTATUS_OBJID 3773703778U
+#define AHRSSTATUS_OBJID 933623714U
 #define AHRSSTATUS_NAME "AhrsStatus"
 #define AHRSSTATUS_METANAME "AhrsStatusMeta"
 #define AHRSSTATUS_ISSINGLEINST 1
@@ -73,6 +73,7 @@
 typedef struct {
     uint8_t SerialNumber[8];
     uint8_t CPULoad;
+    uint32_t RunningTime;
     uint8_t IdleTimePerCyle;
     uint8_t RunningTimePerCyle;
     uint8_t DroppedUpdates;
@@ -92,6 +93,7 @@ typedef struct {
 /* Number of elements for field SerialNumber */
 #define AHRSSTATUS_SERIALNUMBER_NUMELEM 8
 // Field CPULoad information
+// Field RunningTime information
 // Field IdleTimePerCyle information
 // Field RunningTimePerCyle information
 // Field DroppedUpdates information

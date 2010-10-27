@@ -45,6 +45,7 @@ public:
     typedef struct {
         quint8 SerialNumber[8];
         quint8 CPULoad;
+        quint32 RunningTime;
         quint8 IdleTimePerCyle;
         quint8 RunningTimePerCyle;
         quint8 DroppedUpdates;
@@ -64,6 +65,7 @@ public:
     /* Number of elements for field SerialNumber */
     static const quint32 SERIALNUMBER_NUMELEM = 8;
     // Field CPULoad information
+    // Field RunningTime information
     // Field IdleTimePerCyle information
     // Field RunningTimePerCyle information
     // Field DroppedUpdates information
@@ -80,7 +82,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 3773703778U;
+    static const quint32 OBJID = 933623714U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

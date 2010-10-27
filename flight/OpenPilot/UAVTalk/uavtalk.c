@@ -34,13 +34,13 @@
 // Private constants
 #define SYNC_VAL 0x3C
 #define TYPE_MASK 0xFC
-#define TYPE_VER 0x10
+#define TYPE_VER 0x20
 #define TYPE_OBJ (TYPE_VER | 0x00)
 #define TYPE_OBJ_REQ (TYPE_VER | 0x01)
 #define TYPE_OBJ_ACK (TYPE_VER | 0x02)
 #define TYPE_ACK (TYPE_VER | 0x03)
 
-#define HEADER_LENGTH 7 // type (1), object ID (4), instance ID (2, not used in single objects)
+#define HEADER_LENGTH 10 // sync(1), type (1), size (2), object ID (4), instance ID (2, not used in single objects)
 #define CHECKSUM_LENGTH 1
 #define MAX_PAYLOAD_LENGTH 256
 #define MAX_PACKET_LENGTH (HEADER_LENGTH+MAX_PAYLOAD_LENGTH+CHECKSUM_LENGTH)

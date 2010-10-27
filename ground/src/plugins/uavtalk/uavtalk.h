@@ -67,12 +67,12 @@ private slots:
 private:
     // Constants
     static const int TYPE_MASK = 0xFC;
-    static const int TYPE_VER = 0x10;
+    static const int TYPE_VER = 0x20;
     static const int TYPE_OBJ = (TYPE_VER | 0x00);
     static const int TYPE_OBJ_REQ = (TYPE_VER | 0x01);
     static const int TYPE_OBJ_ACK = (TYPE_VER | 0x02);
     static const int TYPE_ACK = (TYPE_VER | 0x03);
-    static const int HEADER_LENGTH = 7; // type (1), object ID (4), instance ID (2, not used in single objects)
+    static const int HEADER_LENGTH = 10; // sync(1), type (1), size(2), object ID (4), instance ID (2, not used in single objects)
     static const int CHECKSUM_LENGTH = 1;
     static const int MAX_PAYLOAD_LENGTH = 256;
     static const int MAX_PACKET_LENGTH = (HEADER_LENGTH+MAX_PAYLOAD_LENGTH+CHECKSUM_LENGTH);

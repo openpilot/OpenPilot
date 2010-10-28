@@ -30,6 +30,11 @@
 // *****************************************************************************
 // circular buffer functions
 
+uint16_t fifoBuf_size(t_fifo_buffer *buf)
+{	// return the size of the buffer
+	return buf->buf_size;
+}
+
 uint16_t fifoBuf_getUsed(t_fifo_buffer *buf)
 {	// return the number of bytes available in the rx buffer
 

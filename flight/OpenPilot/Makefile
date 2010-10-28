@@ -223,6 +223,7 @@ SRC += $(FLIGHTLIB)/ahrs_spi_comm.c
 SRC += $(FLIGHTLIB)/ahrs_comm_objects.c
 ## Libraries for flight calculations
 SRC += $(FLIGHTLIB)/buffer.c
+SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/WorldMagModel.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 

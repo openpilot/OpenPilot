@@ -36,7 +36,7 @@
 #include "usb_lib.h"
 #include "pios_usb_hid_desc.h"
 #include "stm32f10x.h"
-#include "buffer.h"
+#include "fifo_buffer.h"
 
 #if defined(PIOS_INCLUDE_USB_HID)
 
@@ -51,20 +51,12 @@ const struct pios_com_driver pios_usb_com_driver = {
 // so there isn't hte 64 byte cap in place by the USB interrupt packet definition
 
 /* Rx/Tx status */
-static volatile uint8_t rx_buffer_new_data_ctr = 0;
-static volatile uint8_t rx_buffer_ix;
 static uint8_t transfer_possible = 0;
-static uint8_t rx_buffer[PIOS_USB_HID_DATA_LENGTH + 2] = { 0 };
-static uint8_t tx_buffer[PIOS_USB_HID_DATA_LENGTH + 2] = { 0 };
+static uint8_t rx_packet_buffer[PIOS_USB_HID_DATA_LENGTH + 2] = { 0 };
+static uint8_t tx_packet_buffer[PIOS_USB_HID_DATA_LENGTH + 2] = { 0 };
 
-#define TX_BUFFER_SIZE 512
-#define RX_BUFFER_SIZE 512
-cBuffer rxBuffer;
-cBuffer txBuffer;
-static uint8_t rxBufferSpace[TX_BUFFER_SIZE];
-static uint8_t txBufferSpace[RX_BUFFER_SIZE];
-
-volatile uint8_t in_irq = 0;
+t_fifo_buffer rx_pios_fifo_buffer;
+t_fifo_buffer tx_pios_fifo_buffer;
 /**
  * Initialises USB COM layer
  * \param[in] mode currently only mode 0 supported
@@ -79,8 +71,8 @@ int32_t PIOS_USB_HID_Init(uint32_t mode)
 		return -1;
 	}
 
-	bufferInit(&rxBuffer, &rxBufferSpace[0], RX_BUFFER_SIZE);
-	bufferInit(&txBuffer, &txBufferSpace[0], TX_BUFFER_SIZE);
+	fifoBuf_init(&rx_pios_fifo_buffer);
+	fifoBuf_init(&tx_pios_fifo_buffer);
 
 	PIOS_USB_HID_Reenumerate();
 
@@ -191,17 +183,17 @@ int32_t PIOS_USB_HID_CheckAvailable(uint8_t id)
 void sendChunk()
 {
 
-	uint32_t size = bufferBufferedData(&txBuffer);
+	uint32_t size = fifoBuf_getUsed(&tx_pios_fifo_buffer);
 	if (size > 0) {
 		if (size > PIOS_USB_HID_DATA_LENGTH)
 			size = PIOS_USB_HID_DATA_LENGTH;
 #ifdef USB_HID
-		bufferGetChunkFromFront(&txBuffer, &tx_buffer[1], size + 1);
-		tx_buffer[0] = 1;	/* report ID */
+		fifoBuf_getData(&tx_pios_fifo_buffer, &tx_packet_buffer[1], size + 1);
+		tx_packet_buffer[0] = 1;	/* report ID */
 #else
-		bufferGetChunkFromFront(&txBuffer, &tx_buffer[2], size);
-		tx_buffer[0] = 1;	/* report ID */
-		tx_buffer[1] = size;	/* valid data length */
+		fifoBuf_getData(&tx_pios_fifo_buffer, &tx_packet_buffer[2], size);
+		tx_packet_buffer[0] = 1;	/* report ID */
+		tx_packet_buffer[1] = size;	/* valid data length */
 
 #endif
 		/* Wait for any pending transmissions to complete */
@@ -211,7 +203,7 @@ void sendChunk()
 #endif
 		}
 
-		UserToPMABufferCopy((uint8_t *) tx_buffer, GetEPTxAddr(EP1_IN & 0x7F), size + 2);
+		UserToPMABufferCopy((uint8_t *) tx_packet_buffer, GetEPTxAddr(EP1_IN & 0x7F), size + 2);
 		SetEPTxCount((EP1_IN & 0x7F), PIOS_USB_HID_DATA_LENGTH + 2);
 
 		/* Send Buffer */
@@ -236,20 +228,15 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t * buff
 	if(!transfer_possible)
 		return -1;
 	
-	uint8_t previous_data = bufferBufferedData(&txBuffer);
+	uint8_t previous_data = fifoBuf_getUsed(&tx_pios_fifo_buffer);
 
-	if (len > bufferRemainingSpace(&txBuffer))
+	if (len > fifoBuf_getFree(&tx_pios_fifo_buffer))
 		return -2;	/* Cannot send all requested bytes */
 
-	while(in_irq);
-	PIOS_IRQ_Disable();
-	if(!in_irq) 
-		ret = bufferAddChunkToEnd(&txBuffer, buffer, len);
-	else
-		ret = 0;
-	PIOS_IRQ_Enable();
-	if (ret == 0)
-		return -2;
+	/* don't check returned bytes because it should always succeed  */
+	/* after previous thread and no meaningful way to deal with the */
+	/* case it only buffers half the bytes                          */
+	ret = fifoBuf_putData(&tx_pios_fifo_buffer, buffer, len);
 
 	/* If no previous data queued and not sending, then TX complete interrupt not likely so send manually */
 	if (previous_data == 0 && GetEPTxStatus(ENDP1) != EP_TX_VALID)
@@ -269,7 +256,7 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t * buff
  */
 int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t id, const uint8_t * buffer, uint16_t len)
 {
-	if(len > TX_BUFFER_SIZE)
+	if(len > (fifoBuf_getUsed(&tx_pios_fifo_buffer) + fifoBuf_getFree(&tx_pios_fifo_buffer)))
 		return -1;
 	
 	uint32_t error;
@@ -279,7 +266,7 @@ int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t id, const uint8_t * buffer, uint16_
 #endif
 	}
 
-	return 0;
+	return error;
 }
 
 /**
@@ -292,16 +279,13 @@ int32_t PIOS_USB_HID_RxBufferGet(uint8_t id)
 {
 	uint8_t read;
 	
-	while(in_irq);
-	PIOS_IRQ_Disable();
-	if(!in_irq)
-		read = bufferGetFromFront(&rxBuffer);
-	else
-		read = -1;
-	PIOS_IRQ_Enable();
+	if(fifoBuf_getUsed(&rx_pios_fifo_buffer) == 0)
+		return -1;
+	
+	read = fifoBuf_getByte(&rx_pios_fifo_buffer);
 	
 	// If endpoint was stalled and there is now space make it valid
-	if ((GetEPRxStatus(ENDP1) != EP_RX_VALID) && (bufferRemainingSpace(&rxBuffer) > 62)) {
+	if ((GetEPRxStatus(ENDP1) != EP_RX_VALID) && (fifoBuf_getFree(&rx_pios_fifo_buffer) > 62)) {
 		SetEPRxStatus(ENDP1, EP_RX_VALID);
 	}
 	return read;
@@ -315,7 +299,7 @@ int32_t PIOS_USB_HID_RxBufferGet(uint8_t id)
  */
 int32_t PIOS_USB_HID_RxBufferUsed(uint8_t id)
 {
-	return bufferBufferedData(&rxBuffer);
+	return fifoBuf_getUsed(&rx_pios_fifo_buffer);
 }
 
 /**
@@ -324,18 +308,14 @@ int32_t PIOS_USB_HID_RxBufferUsed(uint8_t id)
  */
 void PIOS_USB_HID_EP1_IN_Callback(void)
 {
-	in_irq = 1;
 	sendChunk();
-	in_irq = 0;
 }
 
-int hid_rec = 0;
 /**
  * EP1 OUT Callback Routine
  */
 void PIOS_USB_HID_EP1_OUT_Callback(void)
 {
-	in_irq = 1;
 	uint32_t DataLength = 0;
 
 	/* Read received data (63 bytes) */
@@ -343,23 +323,21 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 	DataLength = GetEPRxCount(ENDP1 & 0x7F);
 
 	/* Use the memory interface function to write to the selected endpoint */
-	PMAToUserBufferCopy((uint8_t *) rx_buffer, GetEPRxAddr(ENDP1 & 0x7F), DataLength);
+	PMAToUserBufferCopy((uint8_t *) &rx_packet_buffer[0], GetEPRxAddr(ENDP1 & 0x7F), DataLength);
 	
 	/* The first byte is report ID (not checked), the second byte is the valid data length */
 #ifdef USB_HID
-	bufferAddChunkToEnd(&rxBuffer, &rx_buffer[1], PIOS_USB_HID_DATA_LENGTH + 1);
+	fifoBuf_putData(&rx_pios_fifo_buffer, &rx_packet_buffer[1], PIOS_USB_HID_DATA_LENGTH + 1);
 #else
-	hid_rec += rx_buffer[1];
-	bufferAddChunkToEnd(&rxBuffer, &rx_buffer[2], rx_buffer[1]);
+	fifoBuf_putData(&rx_pios_fifo_buffer, &rx_packet_buffer[2], rx_packet_buffer[1]);
 #endif
 	
 	// Only reactivate endpoint if available space in buffer
-	if (bufferRemainingSpace(&rxBuffer) > 62) {
+	if (fifoBuf_getFree(&rx_pios_fifo_buffer) > 62) {
 		SetEPRxStatus(ENDP1, EP_RX_VALID);
 	} else {
 		SetEPRxStatus(ENDP1, EP_RX_NAK);
 	}
-	in_irq = 0;
 }
 
 #endif

@@ -35,7 +35,6 @@
 typedef struct
 {
 	uint8_t buffer[FIFO_BUFFER_SIZE] __attribute__ ((aligned(4)));
-//	uint8_t buffer[FIFO_BUFFER_SIZE];
 	volatile uint16_t rd;
 	volatile uint16_t wr;
 	uint16_t buf_size;
@@ -43,7 +42,7 @@ typedef struct
 
 // *********************
 
-uint16_t fifoBuf_size(t_fifo_buffer *buf);
+uint16_t fifoBuf_getSize(t_fifo_buffer *buf);
 
 uint16_t fifoBuf_getUsed(t_fifo_buffer *buf);
 uint16_t fifoBuf_getFree(t_fifo_buffer *buf);

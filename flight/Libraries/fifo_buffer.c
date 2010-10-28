@@ -30,9 +30,15 @@
 // *****************************************************************************
 // circular buffer functions
 
-uint16_t fifoBuf_size(t_fifo_buffer *buf)
-{	// return the size of the buffer
-	return buf->buf_size;
+uint16_t fifoBuf_getSize(t_fifo_buffer *buf)
+{	// return the usable size of the buffer
+
+	uint16_t buf_size = buf->buf_size;
+
+	if (buf_size > 0)
+		return (buf_size - 1);
+	else
+		return 0;
 }
 
 uint16_t fifoBuf_getUsed(t_fifo_buffer *buf)
@@ -77,7 +83,7 @@ void fifoBuf_removeData(t_fifo_buffer *buf, uint16_t len)
 		num_bytes = len;
 
 	if (num_bytes < 1)
-		return;
+		return;				// nothing to remove
 
 	rd += num_bytes;
 	if (rd >= buf_size)
@@ -95,9 +101,9 @@ int16_t fifoBuf_getBytePeek(t_fifo_buffer *buf)
 	uint16_t num_bytes = fifoBuf_getUsed(buf);
 
 	if (num_bytes < 1)
-		return -1;
+		return -1;			// no byte retuened
 
-	return buf->buffer[rd];
+	return buf->buffer[rd];	// return the byte
 }
 
 int16_t fifoBuf_getByte(t_fifo_buffer *buf)
@@ -110,7 +116,7 @@ int16_t fifoBuf_getByte(t_fifo_buffer *buf)
 	uint16_t num_bytes = fifoBuf_getUsed(buf);
 
 	if (num_bytes < 1)
-		return -1;
+		return -1;			// no byte returned
 
 	uint8_t b = buf->buffer[rd];
 	if (++rd >= buf_size)
@@ -118,7 +124,7 @@ int16_t fifoBuf_getByte(t_fifo_buffer *buf)
 
 	buf->rd = rd;
 
-	return b;
+	return b;				// return the byte
 }
 
 uint16_t fifoBuf_getDataPeek(t_fifo_buffer *buf, void *data, uint16_t len)
@@ -219,7 +225,7 @@ uint16_t fifoBuf_putByte(t_fifo_buffer *buf, const uint8_t b)
 
 	buf->wr = wr;
 
-	return 1;
+	return 1;			// return number of bytes copied
 }
 
 uint16_t fifoBuf_putData(t_fifo_buffer *buf, const void *data, uint16_t len)
@@ -253,7 +259,7 @@ uint16_t fifoBuf_putData(t_fifo_buffer *buf, const void *data, uint16_t len)
 
 	buf->wr = wr;
 
-	return i;
+	return i;			// return number of bytes copied
 }
 
 void fifoBuf_init(t_fifo_buffer *buf)

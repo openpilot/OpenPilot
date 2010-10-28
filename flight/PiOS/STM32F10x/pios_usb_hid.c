@@ -225,19 +225,21 @@ void sendChunk()
  * \param[in] *buffer pointer to buffer which should be transmitted
  * \param[in] len number of bytes which should be transmitted
  * \return 0 if no error
- * \return -1 if too many bytes to be send
+ * \return -1 if port unavailable (disconnected)
+ * \return -2 if too many bytes to be send
  * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
  */
 int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t * buffer, uint16_t len)
 {
-	/*if( len > PIOS_USB_HID_DATA_LENGTH )
-	   return - 1; */
-
 	uint16_t ret;
+	
+	if(!transfer_possible)
+		return -1;
+	
 	uint8_t previous_data = bufferBufferedData(&txBuffer);
 
 	if (len > bufferRemainingSpace(&txBuffer))
-		return -1;	/* Cannot send all requested bytes */
+		return -2;	/* Cannot send all requested bytes */
 
 	while(in_irq);
 	PIOS_IRQ_Disable();
@@ -247,7 +249,7 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t * buff
 		ret = 0;
 	PIOS_IRQ_Enable();
 	if (ret == 0)
-		return -1;
+		return -2;
 
 	/* If no previous data queued and not sending, then TX complete interrupt not likely so send manually */
 	if (previous_data == 0 && GetEPTxStatus(ENDP1) != EP_TX_VALID)
@@ -267,20 +269,11 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t * buff
  */
 int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t id, const uint8_t * buffer, uint16_t len)
 {
+	if(len > TX_BUFFER_SIZE)
+		return -1;
+	
 	uint32_t error;
-	if ((error = PIOS_USB_HID_TxBufferPutMoreNonBlocking(id, buffer, len)) != 0)
-		return error;
-
-	error = 1;
-	while (error) {
-		while(in_irq);
-		PIOS_IRQ_Disable();
-		if(!in_irq)
-			error = bufferBufferedData(&txBuffer);
-		else
-			error = 1;
-		PIOS_IRQ_Enable();
-
+	while ((error = PIOS_USB_HID_TxBufferPutMoreNonBlocking(id, buffer, len)) == -2) {
 #if defined(PIOS_INCLUDE_FREERTOS)
 		taskYIELD();
 #endif

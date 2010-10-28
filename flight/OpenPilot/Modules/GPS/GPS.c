@@ -105,12 +105,16 @@ static void gpsTask(void *parameters)
 
 //#define	DISABLE_GPS_TRESHOLD
 //#define	ENABLE_GPS_ONESENTENCE
+//#define	ENABLE_DEFAULT_NMEA
 
 #ifdef DISABLE_GPS_TRESHOLD
 	PIOS_COM_SendStringNonBlocking(gpsPort,"$PMTK397,0*23\r\n");
 #endif
 #ifdef ENABLE_GPS_ONESENTENCE
 	PIOS_COM_SendStringNonBlocking(gpsPort,"$PGCMD,21,2*6C\r\n");
+#endif
+#ifdef ENABLE_DEFAULT_NMEA
+	PIOS_COM_SendStringNonBlocking(gpsPort,"$PGCMD,21,3*6D\r\n");
 #endif
 
 	// Loop forever

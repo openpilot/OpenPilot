@@ -620,11 +620,10 @@ static bool nmeaProcessPGTOP(GPSPositionData * GpsData, char *sentence)
         gpst.Hour = (int)hms / 10000;
 
         // next field: latitude
-        // get latitude [ddmm.mmmmm]
+        // get latitude decimal degrees
         tokens = strsep(&next, delimiter);
-        if (!NMEA_latlon_to_fixed_point(&GpsData->Latitude, tokens)) {
-                return false;
-        }
+        GpsData->Latitude = NMEA_real_to_float(tokens)*1e7;
+
         // next field: N/S indicator
         // correct latitude for N/S
         tokens = strsep(&next, delimiter);
@@ -632,11 +631,10 @@ static bool nmeaProcessPGTOP(GPSPositionData * GpsData, char *sentence)
                 GpsData->Latitude = -GpsData->Latitude;
 
         // next field: longitude
-        // get longitude [dddmm.mmmmm]
+        // get longitude decimal degrees
         tokens = strsep(&next, delimiter);
-        if (!NMEA_latlon_to_fixed_point(&GpsData->Longitude, tokens)) {
-                return false;
-        }
+        GpsData->Longitude = NMEA_real_to_float(tokens)*1e7;
+
         // next field: E/W indicator
         // correct longitude for E/W
         tokens = strsep(&next, delimiter);

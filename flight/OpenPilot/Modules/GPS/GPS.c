@@ -104,8 +104,13 @@ static void gpsTask(void *parameters)
 	uint32_t timeNowMs;
 
 //#define	DISABLE_GPS_TRESHOLD
+//#define	ENABLE_GPS_ONESENTENCE
+
 #ifdef DISABLE_GPS_TRESHOLD
 	PIOS_COM_SendStringNonBlocking(gpsPort,"$PMTK397,0*23\r\n");
+#endif
+#ifdef ENABLE_GPS_ONESENTENCE
+	PIOS_COM_SendStringNonBlocking(gpsPort,"$PGCMD,21,2*6C\r\n");
 #endif
 
 	// Loop forever

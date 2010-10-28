@@ -400,7 +400,7 @@ static bool nmeaProcessGPZDA(GPSPositionData * GpsData, char *sentence)
 	char *tokens;
 	char *delimiter = ",*";
 
-#ifdef NMEA_DEBUG_VZDA
+#ifdef NMEA_DEBUG_ZDA
 	PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "$%s\r\n", sentence);
 #endif
 
@@ -415,13 +415,13 @@ static bool nmeaProcessGPZDA(GPSPositionData * GpsData, char *sentence)
 	gpst.Hour = (int)hms / 10000;
 
 	tokens = strsep(&next, delimiter);
-	gpst.Day = (uint8_t) NMEA_real_to_float(next);
+	gpst.Day = atoi(tokens);
 
 	tokens = strsep(&next, delimiter);
-	gpst.Month = (uint8_t) NMEA_real_to_float(next);
+	gpst.Month = atoi(tokens);
 
 	tokens = strsep(&next, delimiter);
-	gpst.Year = (uint16_t) NMEA_real_to_float(next);
+	gpst.Year = atoi(tokens);
 
 	GPSTimeSet(&gpst);
 
@@ -696,13 +696,13 @@ static bool nmeaProcessPGTOP(GPSPositionData * GpsData, char *sentence)
         GpsData->Groundspeed /= 3.6;
 
         tokens = strsep(&next, delimiter);
-        gpst.Day = (uint8_t) NMEA_real_to_float(next);
+        gpst.Day = atoi(tokens);
 
         tokens = strsep(&next, delimiter);
-        gpst.Month = (uint8_t) NMEA_real_to_float(next);
+        gpst.Month = atoi(tokens);
 
         tokens = strsep(&next, delimiter);
-        gpst.Year = (uint16_t) NMEA_real_to_float(next);
+        gpst.Year = atoi(tokens);
 
         GPSTimeSet(&gpst);
 

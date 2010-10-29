@@ -35,6 +35,53 @@
 #include <QtGui/QPushButton>
 #include <math.h>
 
+/**
+  Helper delegate for the custom mixer editor table.
+  Taken straight from Qt examples, thanks!
+  */
+SpinBoxDelegate::SpinBoxDelegate(QObject *parent)
+     : QItemDelegate(parent)
+ {
+ }
+
+QWidget *SpinBoxDelegate::createEditor(QWidget *parent,
+    const QStyleOptionViewItem &/* option */,
+    const QModelIndex &/* index */) const
+{
+    QSpinBox *editor = new QSpinBox(parent);
+    editor->setMinimum(-127);
+    editor->setMaximum(127);
+
+    return editor;
+}
+
+void SpinBoxDelegate::setEditorData(QWidget *editor,
+                                    const QModelIndex &index) const
+{
+    int value = index.model()->data(index, Qt::EditRole).toInt();
+
+    QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
+    spinBox->setValue(value);
+}
+
+void SpinBoxDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
+                                   const QModelIndex &index) const
+{
+    QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
+    spinBox->interpretText();
+    int value = spinBox->value();
+
+    model->setData(index, value, Qt::EditRole);
+}
+
+void SpinBoxDelegate::updateEditorGeometry(QWidget *editor,
+    const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
+{
+    editor->setGeometry(option.rect);
+}
+
+/**********************************************************************************/
+
 
 
 ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(parent)
@@ -108,7 +155,11 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
         qb->addItems(list);
         m_aircraft->customMixerTable->setCellWidget(0,i,qb);
     }
-    
+
+    SpinBoxDelegate *sbd = new SpinBoxDelegate();
+    for (int i=1;i<8; i++) {
+        m_aircraft->customMixerTable->setItemDelegateForRow(i, sbd);
+    }
 
     connect(m_aircraft->saveAircraftToSD, SIGNAL(clicked()), this, SLOT(saveAircraftUpdate()));
     connect(m_aircraft->saveAircraftToRAM, SIGNAL(clicked()), this, SLOT(sendAircraftUpdate()));
@@ -762,7 +813,9 @@ void ConfigAirframeWidget::requestAircraftUpdate()
     } else if (frameType == "HeliCP") {
         m_aircraft->widget_3->requestccpmUpdate();
          m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Helicopter"));//"Helicopter"
-    }
+     } else if (frameType == "Custom") {
+         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Custom"));
+     }
 
     updateCustomAirframeUI();
 }
@@ -1584,7 +1637,7 @@ bool ConfigAirframeWidget::setupHexa(bool pLayout)
 /**
   Updates the custom airframe settings based on the current airframe.
 
-  Note: doe NOT ask for an object refresh itself!
+  Note: does NOT ask for an object refresh itself!
   */
 void ConfigAirframeWidget::updateCustomAirframeUI()
 {
@@ -1886,6 +1939,12 @@ void ConfigAirframeWidget::sendAircraftUpdate()
                 m_aircraft->mrStatusLabel->setText("Error: Assign a Yaw channel");
                 return;
             }
+            obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
+            Q_ASSERT(obj);
+            field = obj->getField("FixedWingYaw");
+            field->setValue(m_aircraft->triYawChannel->currentText());
+            // No need to send a obj->updated() here because setupMotors
+            // will do it.
             motorList << "VTOLMotorNW" << "VTOLMotorNE" << "VTOLMotorS";
             setupMotors(motorList);
 
@@ -1912,11 +1971,6 @@ void ConfigAirframeWidget::sendAircraftUpdate()
            int ti = field->getElementNames().indexOf("Yaw");
            field->setValue(127,ti);
 
-           obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
-           Q_ASSERT(obj);
-           field = obj->getField("FixedWingYaw");
-           field->setValue(m_aircraft->triYawChannel->currentText());
-
            m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");
 
         }
@@ -1928,6 +1982,50 @@ void ConfigAirframeWidget::sendAircraftUpdate()
         m_aircraft->widget_3->sendccpmUpdate();
     } else {
         airframeType = "Custom";
+
+        UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+        UAVObjectField* field = obj->getField(QString("FeedForward"));
+        field->setDouble((double)m_aircraft->customFFSlider->value()/100);
+        field = obj->getField(QString("AccelTime"));
+        field->setDouble(m_aircraft->customFFaccel->value());
+        field = obj->getField(QString("DecelTime"));
+        field->setDouble(m_aircraft->customFFdecel->value());
+        field = obj->getField(QString("MaxAccel"));
+        field->setDouble(m_aircraft->customFFMaxAccel->value());
+
+        // Curve is also common to all quads:
+        field = obj->getField("ThrottleCurve1");
+        QList<double> curve = m_aircraft->customThrottle1Curve->getCurve();
+        for (int i=0;i<curve.length();i++) {
+            field->setValue(curve.at(i),i);
+        }
+
+        field = obj->getField("ThrottleCurve2");
+        curve.clear();
+        curve = m_aircraft->customThrottle2Curve->getCurve();
+        for (int i=0;i<curve.length();i++) {
+            field->setValue(curve.at(i),i);
+        }
+
+        // Update the table:
+        for (int i=0; i<8; i++) {
+            field = obj->getField(mixerTypes.at(i));
+            QComboBox* q = (QComboBox*)m_aircraft->customMixerTable->cellWidget(0,i);
+            field->setValue(q->currentText());
+            field = obj->getField(mixerVectors.at(i));
+            int ti = field->getElementNames().indexOf("ThrottleCurve1");
+            field->setValue(m_aircraft->customMixerTable->item(1,i)->text(),ti);
+            ti = field->getElementNames().indexOf("ThrottleCurve2");
+            field->setValue(m_aircraft->customMixerTable->item(2,i)->text(),ti);
+            ti = field->getElementNames().indexOf("Roll");
+            field->setValue(m_aircraft->customMixerTable->item(3,i)->text(),ti);
+            ti = field->getElementNames().indexOf("Pitch");
+            field->setValue(m_aircraft->customMixerTable->item(4,i)->text(),ti);
+            ti = field->getElementNames().indexOf("Yaw");
+            field->setValue(m_aircraft->customMixerTable->item(5,i)->text(),ti);
+        }
+
+        obj->updated();
     }
 
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));

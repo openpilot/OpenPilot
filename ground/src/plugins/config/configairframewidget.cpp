@@ -418,7 +418,7 @@ void ConfigAirframeWidget::requestAircraftUpdate()
                frameType == "Hexa" || frameType == "Octo" ||
                frameType == "HexaCoax" || frameType == "OctoV" ||
                frameType == "HexaX" || frameType == "OctoCoaxP" ||
-               frameType == "OctoCoaxX") {
+               frameType == "OctoCoaxX" || frameType == "Tri") {
         //////////////////////////////////////////////////////////////////
         // Retrieve Multirotor settings
         //////////////////////////////////////////////////////////////////
@@ -714,8 +714,35 @@ void ConfigAirframeWidget::requestAircraftUpdate()
                      val = floor(field->getDouble(i)/1.27);
                      m_aircraft->mrRollMixLevel->setValue(val);
                  }
-        }
+        } else if (frameType == "Tri") {
+            // Motors 1 to 8 are N / NE / E / etc
+            field = obj->getField(QString("VTOLMotorNW"));
+            Q_ASSERT(field);
+            m_aircraft->multiMotor1->setCurrentIndex(m_aircraft->multiMotor1->findText(field->getValue().toString()));
+            field = obj->getField(QString("VTOLMotorNE"));
+            Q_ASSERT(field);
+            m_aircraft->multiMotor2->setCurrentIndex(m_aircraft->multiMotor2->findText(field->getValue().toString()));
+            field = obj->getField(QString("VTOLMotorS"));
+            Q_ASSERT(field);
+            m_aircraft->multiMotor3->setCurrentIndex(m_aircraft->multiMotor3->findText(field->getValue().toString()));
+            field = obj->getField(QString("FixedWingYaw"));
+            Q_ASSERT(field);
+            m_aircraft->triYawChannel->setCurrentIndex(m_aircraft->multiMotor3->findText(field->getValue().toString()));
 
+            obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+            int eng= m_aircraft->multiMotor1->currentIndex()-1;
+            // eng will be -1 if value is set to "None"
+            if (eng > -1) {
+                field = obj->getField(mixerVectors.at(eng));
+                int i = field->getElementNames().indexOf("Pitch");
+                double val = floor(2*field->getDouble(i)/1.27);
+                m_aircraft->mrPitchMixLevel->setValue(val);
+                i = field->getElementNames().indexOf("Roll");
+                val = floor(field->getDouble(i)/1.27);
+                m_aircraft->mrRollMixLevel->setValue(val);
+            }
+
+        }
         obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
         Q_ASSERT(obj);
         // Now, retrieve the Feedforward values:
@@ -1876,7 +1903,6 @@ void ConfigAirframeWidget::sendAircraftUpdate()
            };
            setupMixer(mixer);
 
-           // TODO: enable tricopter yaw channel!!
            int eng = m_aircraft->triYawChannel->currentIndex()-1;
            obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
            field = obj->getField(mixerTypes.at(eng));
@@ -1885,6 +1911,12 @@ void ConfigAirframeWidget::sendAircraftUpdate()
            resetField(field);
            int ti = field->getElementNames().indexOf("Yaw");
            field->setValue(127,ti);
+
+           obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
+           Q_ASSERT(obj);
+           field = obj->getField("FixedWingYaw");
+           field->setValue(m_aircraft->triYawChannel->currentText());
+
            m_aircraft->mrStatusLabel->setText("SUCCESS: Mixer Saved OK");
 
         }

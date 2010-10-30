@@ -29,7 +29,6 @@
  */
 
 #include "openpilot.h"
-#include "buffer.h"
 #include "GPS.h"
 #include <stdbool.h>
 #include "NMEA.h"
@@ -46,7 +45,6 @@
 
 // Private functions
 
-static bool GPS_copy_sentence_from_cbuffer(char *dest, uint32_t dest_len, cBuffer * rxBuffer);
 static void gpsTask(void *parameters);
 static void setHomeLocation(GPSPositionData * gpsData);
 
@@ -62,9 +60,7 @@ static void setHomeLocation(GPSPositionData * gpsData);
 // Private variables
 static uint8_t gpsPort;
 static xTaskHandle gpsTaskHandle;
-static cBuffer gpsRxBuffer;
-static char gpsRxData[512];
-static char NmeaPacket[NMEA_BUFFERSIZE];
+static char gps_rx_buffer[NMEA_BUFFERSIZE];
 
 static uint32_t timeOfLastUpdateMs;
 static uint32_t numUpdates;
@@ -83,9 +79,6 @@ int32_t GPSInitialize(void)
 	// TODO: Get gps settings object
 	gpsPort = PIOS_COM_GPS;
 
-	// Init input buffer size 512
-	bufferInit(&gpsRxBuffer, (unsigned char *)gpsRxData, 512);
-
 	// Start gps task
 	xReturn = xTaskCreate(gpsTask, (signed char *)"GPS", STACK_SIZE, NULL, TASK_PRIORITY, &gpsTaskHandle);
 
@@ -102,11 +95,15 @@ static void gpsTask(void *parameters)
 	portTickType xDelay = 100 / portTICK_RATE_MS;
 	GPSPositionData GpsData;
 	uint32_t timeNowMs;
-
-//#define	DISABLE_GPS_TRESHOLD
-//#define	ENABLE_GPS_ONESENTENCE
-//#define	ENABLE_DEFAULT_NMEA
-
+	
+	bool start_flag = false;
+	bool found_cr = false;
+	uint8_t rx_count = 0;
+	
+	//#define	DISABLE_GPS_TRESHOLD
+	//#define	ENABLE_GPS_ONESENTENCE
+	//#define	ENABLE_DEFAULT_NMEA
+	
 #ifdef DISABLE_GPS_TRESHOLD
 	PIOS_COM_SendStringNonBlocking(gpsPort,"$PMTK397,0*23\r\n");
 #endif
@@ -116,39 +113,75 @@ static void gpsTask(void *parameters)
 #ifdef ENABLE_DEFAULT_NMEA
 	PIOS_COM_SendStringNonBlocking(gpsPort,"$PGCMD,21,3*6D\r\n");
 #endif
-
+	
 	// Loop forever
 	while (1) {
 		/* This blocks the task until there is something on the buffer */
 		while (PIOS_COM_ReceiveBufferUsed(gpsPort) > 0) {
+			
 			c = PIOS_COM_ReceiveBuffer(gpsPort);
-			if (!bufferAddToEnd(&gpsRxBuffer, c)) {
+			
+			/* detect start while acquiring stream */
+			if(!start_flag && (c == '$')) {
+				start_flag = true;
+				found_cr = false;
+				rx_count = 0;
+			} else if (!start_flag)
+				continue;
+			
+			if(rx_count >= NMEA_BUFFERSIZE) {
 				/* 
 				 * The buffer is already full and we haven't found a valid NMEA sentence.
 				 * Flush the buffer and note the overflow event.
 				 */
 				gpsRxOverflow++;
-				bufferFlush(&gpsRxBuffer);
+				start_flag = false;
+				found_cr = false;
+				rx_count = 0;
 			} else {
-				/* Grab the next available complete NMEA sentence from the Rx buffer */
-				if (GPS_copy_sentence_from_cbuffer(NmeaPacket, sizeof(NmeaPacket), &gpsRxBuffer)) {
-					/* Validate the checksum over the sentence */
-					if (!NMEA_checksum(NmeaPacket)) {
-						/* Invalid checksum.  May indicate dropped characters on Rx. */
-						++numChecksumErrors;
+				gps_rx_buffer[rx_count] = c;
+				rx_count++;
+			}
+			
+			
+			/* look for ending '\r\n' sequence */
+			if (!found_cr && (c == '\r') )
+				found_cr = true; 
+			else if (found_cr && (c != '\n') )
+				found_cr = false;  // false end flag
+			else if (found_cr && (c == '\n') ) {
+				
+				/* prepare to parse next sentence */				
+				start_flag = false;
+				found_cr = false;
+				rx_count = 0;
+				
+				/*
+				 * Our rxBuffer must look like this now:
+				 *   [0]           = '$'
+				 *   ...           = zero or more bytes of sentence payload
+				 *   [end_pos - 1] = '\r'
+				 *   [end_pos]     = '\n'
+				 *
+				 * Prepare to consume the sentence from the buffer
+				 */
+				
+				/* Validate the checksum over the sentence */
+				if (!NMEA_checksum(&gps_rx_buffer[1])) {
+					/* Invalid checksum.  May indicate dropped characters on Rx. */
+					++numChecksumErrors;
+				} else {
+					/* Valid checksum, use this packet to update the GPS position */
+					if (!NMEA_update_position(&gps_rx_buffer[1])) {
+						++numParsingErrors;
 					} else {
-						/* Valid checksum, use this packet to update the GPS position */
-						if (!NMEA_update_position(NmeaPacket)) {
-							++numParsingErrors;
-						} else {
-							++numUpdates;
-						}
-						timeOfLastUpdateMs = xTaskGetTickCount() * portTICK_RATE_MS;
+						++numUpdates;
 					}
+					timeOfLastUpdateMs = xTaskGetTickCount() * portTICK_RATE_MS;
 				}
 			}
 		}
-
+		
 		// Check for GPS timeout
 		timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
 		if ((timeNowMs - timeOfLastUpdateMs) > GPS_TIMEOUT_MS) {
@@ -159,92 +192,16 @@ static void gpsTask(void *parameters)
 			// Had an update
 			HomeLocationData home;
 			HomeLocationGet(&home);
-
+			
 			GPSPositionGet(&GpsData);
 			if ((GpsData.Status == GPSPOSITION_STATUS_FIX3D) && (home.Set == HOMELOCATION_SET_FALSE)) {
 				setHomeLocation(&GpsData);
 			}
 		}
-
+		
 		// Block task until next update
 		vTaskDelay(xDelay);
 	}
-}
-
-static bool GPS_copy_sentence_from_cbuffer(char *dest, uint32_t dest_len, cBuffer * rxBuffer)
-{
-	/* Throw away all initial characters from the Rx buffer that are not the NMEA start flag '$' */
-	bool startFlag = false;
-	while (rxBuffer->datalength && !startFlag) {
-		if (bufferGetAtIndex(rxBuffer, 0) == '$') {
-			startFlag = true;
-		} else {
-			bufferGetFromFront(rxBuffer);
-		}
-	}
-
-	if (!startFlag) {
-		/* No start of sentence located, bail out */
-		return false;
-	}
-
-	/* rxBuffer is now positioned at the start of sentence marker */
-
-	/* Start of sentence located, look for an end of sentence marker '\r\n' */
-	bool endFlag = false;
-	uint16_t end_pos;
-	for (end_pos = 2; end_pos < rxBuffer->datalength; end_pos++) {
-		// check for end of NMEA sentence '\r\n'
-		if ((bufferGetAtIndex(rxBuffer, end_pos - 1) == '\r') && (bufferGetAtIndex(rxBuffer, end_pos) == '\n')) {
-			/* Found the end of the packet */
-			endFlag = true;
-		}
-	}
-
-	if (!endFlag) {
-		/* No end of sentence located, bail out and wait for more data */
-		return false;
-	}
-
-	/*
-	 * Our rxBuffer must look like this now:
-	 *   [0]           = '$'
-	 *   ...           = zero or more bytes of sentence payload
-	 *   [end_pos - 1] = '\r'
-	 *   [end_pos]     = '\n'
-	 *
-	 * Prepare to consume the sentence from the buffer
-	 */
-	uint32_t payload_len = end_pos - 2;	/* not counting the '$' or '\r\n' */
-
-	/* Drop the start flag '$' */
-	(void)bufferGetFromFront(rxBuffer);
-
-	bool truncated = false;
-	while (payload_len--) {
-		if (dest_len > 1) {
-			/* Put the payload data into the buffer as long as there is room */
-			*dest = bufferGetFromFront(rxBuffer);
-			dest++;
-			dest_len--;
-		} else {
-			/* 
-			 * No more room in the dest buffer.  Note that the sentence was truncated and
-			 * continue to flush the rxBuffer.
-			 */
-			truncated = true;
-			(void)bufferGetFromFront(rxBuffer);
-		}
-	}
-
-	/* Drop the end marker '\r\n' */
-	(void)bufferGetFromFront(rxBuffer);
-	(void)bufferGetFromFront(rxBuffer);
-
-	/* NULL terminate the dest buffer.  We left 1 byte at the end (see 'dest_len > 1' above) */
-	*dest = '\0';
-
-	return (!truncated);
 }
 
 static void setHomeLocation(GPSPositionData * gpsData)

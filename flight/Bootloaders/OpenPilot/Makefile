@@ -160,7 +160,6 @@ SRC += $(PIOSCOMMON)/pios_opahrs_proto.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 
 ## Libraries for flight calculations
-SRC += $(FLIGHTLIB)/buffer.c
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 
 ## CMSIS for STM32

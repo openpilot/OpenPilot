@@ -1315,17 +1315,17 @@ void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],
 				HPHR += HP[k] * H[m][k];
 
 			for (k = 0; k < NUMX; k++)
-				K[m][k] = HP[k] / HPHR;	// find K = HP/HPHR
+				K[k][m] = HP[k] / HPHR;	// find K = HP/HPHR
 
 			for (i = 0; i < NUMX; i++) {	// Find P(m)= P(m-1) + K*HP
 				for (j = i; j < NUMX; j++)
 					P[i][j] = P[j][i] =
-					    P[i][j] - K[m][i] * HP[j];
+					    P[i][j] - K[i][m] * HP[j];
 			}
 
 			Error = Z[m] - Y[m];
 			for (i = 0; i < NUMX; i++)	// Find X(m)= X(m-1) + K*Error
-				X[i] = X[i] + K[m][i] * Error;
+				X[i] = X[i] + K[i][m] * Error;
 
 		}
 	}

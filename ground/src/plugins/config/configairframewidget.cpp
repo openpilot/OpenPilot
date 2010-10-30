@@ -171,8 +171,12 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
 
     connect(m_aircraft->fwThrottleReset, SIGNAL(clicked()), this, SLOT(resetFwMixer()));
     connect(m_aircraft->mrThrottleCurveReset, SIGNAL(clicked()), this, SLOT(resetMrMixer()));
+    connect(m_aircraft->customReset1, SIGNAL(clicked()), this, SLOT(resetCt1Mixer()));
+    connect(m_aircraft->customReset2, SIGNAL(clicked()), this, SLOT(resetCt2Mixer()));
     connect(m_aircraft->fixedWingThrottle, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateFwThrottleCurveValue(QList<double>,double)));
     connect(m_aircraft->multiThrottleCurve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateMrThrottleCurveValue(QList<double>,double)));
+    connect(m_aircraft->customThrottle1Curve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateCustomThrottle1CurveValue(QList<double>,double)));
+    connect(m_aircraft->customThrottle2Curve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateCustomThrottle2CurveValue(QList<double>,double)));
 
 //    connect(m_aircraft->fwAileron1Channel, SIGNAL(currentIndexChanged(int)), this, SLOT(toggleAileron2(int)));
 //    connect(m_aircraft->fwElevator1Channel, SIGNAL(currentIndexChanged(int)), this, SLOT(toggleElevator2(int)));
@@ -343,6 +347,27 @@ void ConfigAirframeWidget::resetMrMixer()
 }
 
 /**
+  Resets Custom throttle 1 mixer
+  */
+void ConfigAirframeWidget::resetCt1Mixer()
+{
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    UAVObjectField* field = obj->getField(QString("ThrottleCurve1"));
+    resetMixer(m_aircraft->customThrottle1Curve, field->getNumElements());
+}
+
+/**
+  Resets Custom throttle 2 mixer
+  */
+void ConfigAirframeWidget::resetCt2Mixer()
+{
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    UAVObjectField* field = obj->getField(QString("ThrottleCurve2"));
+    resetMixer(m_aircraft->customThrottle2Curve, field->getNumElements());
+}
+
+
+/**
   Resets a mixer curve
   */
 void ConfigAirframeWidget::resetMixer(MixerCurveWidget *mixer, int numElements)
@@ -371,6 +396,24 @@ void ConfigAirframeWidget::updateMrThrottleCurveValue(QList<double> list, double
 {
     Q_UNUSED(list);
     m_aircraft->mrThrottleCurveItemValue->setText(QString().sprintf("Val: %.2f",value));
+}
+
+/**
+  Updates the currently moved throttle curve item value (Custom throttle 1)
+  */
+void ConfigAirframeWidget::updateCustomThrottle1CurveValue(QList<double> list, double value)
+{
+    Q_UNUSED(list);
+    m_aircraft->customThrottleCurve1Value->setText(QString().sprintf("Val: %.2f",value));
+}
+
+/**
+  Updates the currently moved throttle curve item value (Custom throttle 2)
+  */
+void ConfigAirframeWidget::updateCustomThrottle2CurveValue(QList<double> list, double value)
+{
+    Q_UNUSED(list);
+    m_aircraft->customThrottleCurve2Value->setText(QString().sprintf("Val: %.2f",value));
 }
 
 

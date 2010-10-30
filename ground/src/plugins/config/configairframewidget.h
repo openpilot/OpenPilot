@@ -81,8 +81,12 @@ private slots:
     void switchAirframeType(int index);
     void resetFwMixer();
     void resetMrMixer();
+    void resetCt1Mixer();
+    void resetCt2Mixer();
     void updateFwThrottleCurveValue(QList<double> list, double value);
     void updateMrThrottleCurveValue(QList<double> list, double value);
+    void updateCustomThrottle1CurveValue(QList<double> list, double value);
+    void updateCustomThrottle2CurveValue(QList<double> list, double value);
     void enableFFTest();
 
 protected:

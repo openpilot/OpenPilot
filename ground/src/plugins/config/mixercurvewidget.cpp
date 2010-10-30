@@ -87,12 +87,17 @@ void MixerCurveWidget::initCurve(QList<double> points)
         return; // We need at least 2 points on a curve!
 
     // First of all, reset the list
-    // TODO: we probably need to actually delete some objects too there?
+    // TODO: one edge might not get deleted properly, small mem leak maybe...
         foreach (Node *node, nodeList ) {
             QList<Edge*> edges = node->edges();
-            foreach(Edge *edge, edges)
-                scene()->removeItem(edge);
+            foreach(Edge *edge, edges) {
+                if (scene()->items().contains(edge))
+                        scene()->removeItem(edge);
+                else
+                    delete edge;
+            }
         scene()->removeItem(node);
+        delete node;
     }
     nodeList.clear();
 

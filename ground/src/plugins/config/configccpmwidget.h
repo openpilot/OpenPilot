@@ -68,6 +68,8 @@ private:
         void GenerateCurve();
         void UpdateMixer();
         void UpdateType();
+        void resetMixer(MixerCurveWidget *mixer, int numElements);
+        void UpdateCurveWidgets();
     public slots:
         void requestccpmUpdate();
         void sendccpmUpdate();

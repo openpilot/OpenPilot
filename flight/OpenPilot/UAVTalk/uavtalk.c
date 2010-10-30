@@ -32,18 +32,22 @@
 #include "openpilot.h"
 
 // Private constants
-#define SYNC_VAL 0x3C
-#define TYPE_MASK 0xFC
-#define TYPE_VER 0x20
-#define TYPE_OBJ (TYPE_VER | 0x00)
-#define TYPE_OBJ_REQ (TYPE_VER | 0x01)
-#define TYPE_OBJ_ACK (TYPE_VER | 0x02)
-#define TYPE_ACK (TYPE_VER | 0x03)
+#define SYNC_VAL			0x3C
+#define TYPE_MASK			0xFC
+#define TYPE_VER			0x20
+#define TYPE_OBJ			(TYPE_VER | 0x00)
+#define TYPE_OBJ_REQ		(TYPE_VER | 0x01)
+#define TYPE_OBJ_ACK		(TYPE_VER | 0x02)
+#define TYPE_ACK			(TYPE_VER | 0x03)
 
-#define HEADER_LENGTH 10 // sync(1), type (1), size (2), object ID (4), instance ID (2, not used in single objects)
-#define CHECKSUM_LENGTH 1
-#define MAX_PAYLOAD_LENGTH 256
-#define MAX_PACKET_LENGTH (HEADER_LENGTH+MAX_PAYLOAD_LENGTH+CHECKSUM_LENGTH)
+#define MIN_HEADER_LENGTH	8	// sync(1), type (1), size (2), object ID (4)
+#define MAX_HEADER_LENGTH	10	// sync(1), type (1), size (2), object ID (4), instance ID (2, not used in single objects)
+
+#define CHECKSUM_LENGTH		1
+
+#define MAX_PAYLOAD_LENGTH	256
+
+#define MAX_PACKET_LENGTH	(MAX_HEADER_LENGTH + MAX_PAYLOAD_LENGTH + CHECKSUM_LENGTH)
 
 // CRC lookup table
 static const uint8_t crc_table[256] = {
@@ -80,6 +84,7 @@ static uint8_t txBuffer[MAX_PACKET_LENGTH];
 static UAVTalkStats stats;
 
 // Private functions
+static uint8_t updateCRCbyte(uint8_t crc, const uint8_t data);
 static uint8_t updateCRC(uint8_t crc, const uint8_t* data, int32_t length);
 static int32_t objectTransaction(UAVObjHandle objectId, uint16_t instId, uint8_t type, int32_t timeout);
 static int32_t sendObject(UAVObjHandle obj, uint16_t instId, uint8_t type);
@@ -247,142 +252,196 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
     static uint8_t cs, csRx;
     static int32_t rxCount;
     static RxState state = STATE_SYNC;
+    static uint16_t rxPacketLength = 0;
+
+    ++stats.rxBytes;
+
+    if (rxPacketLength < 0xffff)
+    	rxPacketLength++;   // update packet byte count
 
     // Receive state machine
-    ++stats.rxBytes;
-    switch (state) {
-    case STATE_SYNC:
-	if (rxbyte == SYNC_VAL) {
-		cs = updateCRC(0, &rxbyte, 1);			    
-		state = STATE_TYPE;
-	}
-        break;
-    case STATE_TYPE:
-        if ((rxbyte & TYPE_MASK) == TYPE_VER )
-        {
-            cs = updateCRC(cs, &rxbyte, 1);
-            type = rxbyte;
-	    packet_size = 0;
-            state = STATE_SIZE;
-            rxCount = 0;
-        } else {
-	    state = STATE_SYNC;
-	}
-        break;
-    case STATE_SIZE:
-	if(rxCount++ == 0) {
-		cs = updateCRC(cs, &rxbyte, 1);
-		packet_size += rxbyte;
-	}
-	else {
-		cs = updateCRC(cs, &rxbyte, 1);
-		packet_size += rxbyte << 8;
-		rxCount = 0;
-		state = STATE_OBJID;
-	}
-	break;		    		    
-    case STATE_OBJID:
-        tmpBuffer[rxCount++] = rxbyte;
-        if (rxCount == 4)
-        {
-            // Search for object, if not found reset state machine
-            objId = (tmpBuffer[3] << 24) | (tmpBuffer[2] << 16) | (tmpBuffer[1] << 8) | (tmpBuffer[0]);
-            obj = UAVObjGetByID(objId);
+    switch (state)
+    {
+		case STATE_SYNC:
+			if (rxbyte != SYNC_VAL)
+				break;
+
+			// Initialize and update the CRC
+			cs = updateCRCbyte(0, rxbyte);
+
+			rxPacketLength = 1;
+
+			state = STATE_TYPE;
+			break;
+
+		case STATE_TYPE:
+
+			// update the CRC
+			cs = updateCRCbyte(cs, rxbyte);
+
+			if ((rxbyte & TYPE_MASK) != TYPE_VER)
+			{
+				state = STATE_SYNC;
+				break;
+			}
+
+			type = rxbyte;
+
+			packet_size = 0;
+
+			state = STATE_SIZE;
+			rxCount = 0;
+			break;
+
+		case STATE_SIZE:
+
+			// update the CRC
+			cs = updateCRCbyte(cs, rxbyte);
+
+			if (rxCount == 0)
+			{
+				packet_size += rxbyte;
+				rxCount++;
+				break;
+			}
+
+			packet_size += rxbyte << 8;
+
+            if (packet_size < MIN_HEADER_LENGTH || packet_size > MAX_HEADER_LENGTH + MAX_PAYLOAD_LENGTH)
+            {   // incorrect packet size
+                state = STATE_SYNC;
+                break;
+            }
+
+			rxCount = 0;
+			state = STATE_OBJID;
+			break;
+
+		case STATE_OBJID:
+
+			// update the CRC
+			cs = updateCRCbyte(cs, rxbyte);
+
+			tmpBuffer[rxCount++] = rxbyte;
+			if (rxCount < 4)
+				break;
+
+			// Search for object, if not found reset state machine
+			objId = (tmpBuffer[3] << 24) | (tmpBuffer[2] << 16) | (tmpBuffer[1] << 8) | (tmpBuffer[0]);
+			obj = UAVObjGetByID(objId);
             if (obj == 0)
             {
+                stats.rxErrors++;
                 state = STATE_SYNC;
-                ++stats.rxErrors;
+                break;
             }
+
+            // Determine data length
+            if (type == TYPE_OBJ_REQ || type == TYPE_ACK)
+            	length = 0;
             else
-            {
-            	// Update checksum
-                cs = updateCRC(cs, tmpBuffer, 4);
-                // Determine data length
-                if (type == TYPE_OBJ_REQ || type == TYPE_ACK)
-                {
-                	length = 0;
-                }
-                else
-                {
-					length = UAVObjGetNumBytes(obj);
-                }
-                // Check length and determine next state
-				if (length >= MAX_PAYLOAD_LENGTH)
-				{
-					state = STATE_SYNC;
-					++stats.rxErrors;
-				}
-				else
-				{
-					// Check if this is a single instance object (i.e. if the instance ID field is coming next)
-					if ( UAVObjIsSingleInstance(obj) )
-					{
-						// If there is a payload get it, otherwise receive checksum
-			        	if (length > 0)
-			        	{
-			        		state = STATE_DATA;
-			        	}
-			        	else
-			        	{
-			        		state = STATE_CS;
-			        	}
-						instId = 0;
-						rxCount = 0;
-					}
-					else
-					{
-						state = STATE_INSTID;
-						rxCount = 0;
-					}
-				}
+				length = UAVObjGetNumBytes(obj);
+
+            // Check length and determine next state
+            if (length >= MAX_PAYLOAD_LENGTH)
+			{
+				stats.rxErrors++;
+				state = STATE_SYNC;
+				break;
+			}
+
+            // Check the lengths match
+            if ((rxPacketLength + length) != packet_size)
+            {   // packet error - mismatched packet size
+                stats.rxErrors++;
+                state = STATE_SYNC;
+                break;
             }
-        }
-        break;
-    case STATE_INSTID:
-        tmpBuffer[rxCount++] = rxbyte;
-        if (rxCount == 2)
-        {
+
+            // Check if this is a single instance object (i.e. if the instance ID field is coming next)
+			if (UAVObjIsSingleInstance(obj))
+			{
+				// If there is a payload get it, otherwise receive checksum
+	        	if (length > 0)
+	        		state = STATE_DATA;
+	        	else
+	        		state = STATE_CS;
+				instId = 0;
+				rxCount = 0;
+			}
+			else
+			{
+				state = STATE_INSTID;
+				rxCount = 0;
+			}
+
+			break;
+
+		case STATE_INSTID:
+
+			// update the CRC
+			cs = updateCRCbyte(cs, rxbyte);
+
+			tmpBuffer[rxCount++] = rxbyte;
+			if (rxCount < 2)
+				break;
+
         	instId = (tmpBuffer[1] << 8) | (tmpBuffer[0]);
-        	cs = updateCRC(cs, tmpBuffer, 2);
+
         	rxCount = 0;
+
         	// If there is a payload get it, otherwise receive checksum
         	if (length > 0)
-        	{
         		state = STATE_DATA;
-        	}
         	else
-        	{
         		state = STATE_CS;
-        	}
-        }
-        break;
-    case STATE_DATA:
-        rxBuffer[rxCount++] = rxbyte;
-        if (rxCount == length)
-        {
-            cs = updateCRC(cs, rxBuffer, length);
+
+        	break;
+
+		case STATE_DATA:
+
+			// update the CRC
+			cs = updateCRCbyte(cs, rxbyte);
+
+			rxBuffer[rxCount++] = rxbyte;
+			if (rxCount < length)
+				break;
+
             state = STATE_CS;
             rxCount = 0;
-        }
-        break;
-    case STATE_CS:
-    	csRx = rxbyte;
-        if (csRx == cs)
-        {
+            break;
+
+		case STATE_CS:
+
+			// the CRC byte
+			csRx = rxbyte;
+
+			if (csRx != cs)
+			{   // packet error - faulty CRC
+				stats.rxErrors++;
+		        state = STATE_SYNC;
+				break;
+			}
+
+            if (rxPacketLength != (packet_size + 1))
+            {   // packet error - mismatched packet size
+                stats.rxErrors++;
+                state = STATE_SYNC;
+                break;
+            }
+
         	xSemaphoreTakeRecursive(lock, portMAX_DELAY);
-            receiveObject(type, obj, instId, rxBuffer, length);
-            ++stats.rxObjects;
-            stats.rxObjectBytes += length;
+				receiveObject(type, obj, instId, rxBuffer, length);
+				stats.rxObjectBytes += length;
+				stats.rxObjects++;
             xSemaphoreGiveRecursive(lock);
-        }
-        else
-        {
-        	++stats.rxErrors;
-        }
-        state = STATE_SYNC;
-        break;
-    default:
-        state = STATE_SYNC;
+
+            state = STATE_SYNC;
+            break;
+
+		default:
+			stats.rxErrors++;
+			state = STATE_SYNC;
     }
 
     // Done
@@ -631,16 +690,21 @@ static int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
  * \param length   Number of bytes in the \a data buffer.
  * \return         The updated crc value.
  */
+static uint8_t updateCRCbyte(uint8_t crc, const uint8_t data)
+{
+	return crc_table[crc ^ data];
+}
 static uint8_t updateCRC(uint8_t crc, const uint8_t* data, int32_t length)
 {
-    uint32_t tbl_idx;
+	// use registers for speed
+	register int32_t len = length;
+	register uint8_t crc8 = crc;
+	register const uint8_t *p = data;
 
-    while (length--) {
-        tbl_idx = ((crc >> 0) ^ *data) & 0xff;
-        crc = (crc_table[tbl_idx] ^ (crc << 8)) & 0xff;
-        data++;
-    }
-    return crc;
+    while (len--)
+        crc8 = crc_table[crc8 ^ *p++];
+
+    return crc8;
 }
 
 /**

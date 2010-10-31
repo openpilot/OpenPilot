@@ -70,6 +70,8 @@ private:
         void UpdateType();
         void resetMixer(MixerCurveWidget *mixer, int numElements);
         void UpdateCurveWidgets();
+        void updatePitchCurveValue(QList<double>,double);
+        void updateThrottleCurveValue(QList<double>,double);
     public slots:
         void requestccpmUpdate();
         void sendccpmUpdate();

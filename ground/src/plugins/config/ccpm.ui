@@ -33,24 +33,24 @@
     <rect>
      <x>0</x>
      <y>30</y>
-     <width>731</width>
+     <width>681</width>
      <height>470</height>
     </rect>
    </property>
    <property name="sizePolicy">
-    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+    <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
    <property name="minimumSize">
     <size>
-     <width>692</width>
+     <width>660</width>
      <height>419</height>
     </size>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -61,7 +61,7 @@
       <rect>
        <x>0</x>
        <y>10</y>
-       <width>721</width>
+       <width>657</width>
        <height>427</height>
       </rect>
      </property>
@@ -482,7 +482,7 @@
        </layout>
       </item>
       <item>
-       <layout class="QFormLayout" name="formLayout_7">
+       <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
          <widget class="QGroupBox" name="ccpmPitchMixingBox">
           <property name="enabled">
@@ -497,13 +497,13 @@
           <property name="minimumSize">
            <size>
             <width>50</width>
-            <height>250</height>
+            <height>200</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>50</width>
-            <height>250</height>
+            <height>200</height>
            </size>
           </property>
           <property name="font">
@@ -522,12 +522,12 @@
             <rect>
              <x>0</x>
              <y>20</y>
-             <width>48</width>
-             <height>218</height>
+             <width>54</width>
+             <height>168</height>
             </rect>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_3">
-            <item>
+           <layout class="QFormLayout" name="formLayout_5">
+            <item row="0" column="0">
              <widget class="QLabel" name="label_15">
               <property name="enabled">
                <bool>true</bool>
@@ -543,7 +543,7 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="1" column="0">
              <layout class="QHBoxLayout" name="horizontalLayout">
               <item>
                <spacer name="horizontalSpacer_3">
@@ -564,7 +564,7 @@
                  <bool>true</bool>
                 </property>
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
@@ -572,7 +572,7 @@
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>150</height>
+                  <height>100</height>
                  </size>
                 </property>
                 <property name="maximum">
@@ -604,7 +604,7 @@
               </item>
              </layout>
             </item>
-            <item>
+            <item row="2" column="0">
              <widget class="QLabel" name="label_16">
               <property name="enabled">
                <bool>true</bool>
@@ -617,7 +617,7 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="3" column="0">
              <widget class="QSpinBox" name="ccpmCollectivespinBox">
               <property name="maximum">
                <number>100</number>
@@ -634,7 +634,7 @@
           </widget>
          </widget>
         </item>
-        <item row="0" column="1">
+        <item row="1" column="0">
          <widget class="QGroupBox" name="ccpmRevoMixingBox">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -645,13 +645,13 @@
           <property name="minimumSize">
            <size>
             <width>50</width>
-            <height>250</height>
+            <height>200</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
             <width>50</width>
-            <height>250</height>
+            <height>200</height>
            </size>
           </property>
           <property name="title">
@@ -662,12 +662,12 @@
             <rect>
              <x>0</x>
              <y>20</y>
-             <width>47</width>
-             <height>218</height>
+             <width>53</width>
+             <height>168</height>
             </rect>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_4">
-            <item>
+           <layout class="QFormLayout" name="formLayout_7">
+            <item row="0" column="0">
              <widget class="QLabel" name="label_14">
               <property name="enabled">
                <bool>false</bool>
@@ -680,7 +680,7 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="1" column="0">
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
                <spacer name="horizontalSpacer_5">
@@ -700,10 +700,16 @@
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>150</height>
+                  <height>100</height>
                  </size>
                 </property>
                 <property name="maximum">
@@ -732,7 +738,7 @@
               </item>
              </layout>
             </item>
-            <item>
+            <item row="2" column="0">
              <widget class="QLabel" name="label_13">
               <property name="enabled">
                <bool>false</bool>
@@ -745,7 +751,7 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="3" column="0">
              <widget class="QSpinBox" name="ccpmREVOspinBox"/>
             </item>
            </layout>
@@ -796,7 +802,7 @@
             <property name="minimumSize">
              <size>
               <width>400</width>
-              <height>0</height>
+              <height>400</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -815,10 +821,10 @@
              <number>0</number>
             </property>
             <property name="verticalScrollBarPolicy">
-             <enum>Qt::ScrollBarAlwaysOn</enum>
+             <enum>Qt::ScrollBarAlwaysOff</enum>
             </property>
             <property name="horizontalScrollBarPolicy">
-             <enum>Qt::ScrollBarAlwaysOn</enum>
+             <enum>Qt::ScrollBarAlwaysOff</enum>
             </property>
             <property name="backgroundBrush">
              <brush brushstyle="SolidPattern">
@@ -875,8 +881,8 @@
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>670</width>
-       <height>390</height>
+       <width>631</width>
+       <height>387</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -1052,9 +1058,15 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0">
          <widget class="QTableWidget" name="CurveSettings">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
             <width>243</width>
@@ -1063,7 +1075,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>243</width>
+            <width>250</width>
             <height>273</height>
            </size>
           </property>
@@ -1324,91 +1336,107 @@
           </item>
          </widget>
         </item>
-        <item>
+        <item row="0" column="1">
          <layout class="QVBoxLayout" name="verticalLayout_20">
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_17">
             <item>
-             <widget class="QLabel" name="label_39">
-              <property name="text">
+             <widget class="QGroupBox" name="ThrottleCurveBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>160</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="title">
                <string>Throttle Curve</string>
               </property>
+              <widget class="MixerCurveWidget" name="ThrottleCurve" native="true">
+               <property name="geometry">
+                <rect>
+                 <x>5</x>
+                 <y>20</y>
+                 <width>150</width>
+                 <height>150</height>
+                </rect>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>150</width>
+                 <height>150</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>200</width>
+                 <height>200</height>
+                </size>
+               </property>
+              </widget>
              </widget>
             </item>
            </layout>
           </item>
-          <item>
-           <widget class="MixerCurveWidget" name="ThrottleCurve" native="true">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>150</width>
-              <height>150</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>200</width>
-              <height>200</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="customThrottleCurve1Value">
-            <property name="text">
-             <string>Val: 0.00</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
-        <item>
+        <item row="0" column="2">
          <layout class="QVBoxLayout" name="verticalLayout_21">
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_18">
             <item>
-             <widget class="QLabel" name="label_41">
-              <property name="text">
-               <string>Blade Pitch Curve</string>
+             <widget class="QGroupBox" name="PitchCurveBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
               </property>
+              <property name="title">
+               <string>Pitch Curve</string>
+              </property>
+              <widget class="MixerCurveWidget" name="PitchCurve" native="true">
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>20</y>
+                 <width>150</width>
+                 <height>150</height>
+                </rect>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>150</width>
+                 <height>150</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>200</width>
+                 <height>200</height>
+                </size>
+               </property>
+              </widget>
              </widget>
             </item>
            </layout>
-          </item>
-          <item>
-           <widget class="MixerCurveWidget" name="PitchCurve" native="true">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>150</width>
-              <height>150</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>200</width>
-              <height>200</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="customThrottleCurve2Value">
-            <property name="text">
-             <string>Val: 0.00</string>
-            </property>
-           </widget>
           </item>
          </layout>
         </item>
@@ -1426,8 +1454,8 @@
       <rect>
        <x>15</x>
        <y>21</y>
-       <width>661</width>
-       <height>211</height>
+       <width>651</width>
+       <height>201</height>
       </rect>
      </property>
      <property name="sizePolicy">
@@ -1441,6 +1469,9 @@
      </property>
      <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="autoScroll">
+      <bool>false</bool>
      </property>
      <property name="alternatingRowColors">
       <bool>true</bool>

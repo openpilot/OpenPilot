@@ -172,6 +172,8 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
 
 
+    connect(m_ccpm->PitchCurve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updatePitchCurveValue(QList<double>,double)));
+    connect(m_ccpm->ThrottleCurve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateThrottleCurveValue(QList<double>,double)));
 
 
 
@@ -223,8 +225,8 @@ void ConfigccpmWidget::UpdateType()
     m_ccpm->CurveToGenerate->setEnabled(1);
     m_ccpm->CurveSettings->setColumnHidden(1,0);
     m_ccpm->PitchCurve->setVisible(1);
-    m_ccpm->customThrottleCurve2Value->setVisible(1);
-    m_ccpm->label_41->setVisible(1);
+    //m_ccpm->customThrottleCurve2Value->setVisible(1);
+    //m_ccpm->label_41->setVisible(1);
 
     //set values for pre defined heli types
         if (TypeText.compare(QString("CCPM 2 Servo 90º"), Qt::CaseInsensitive)==0)
@@ -288,8 +290,8 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->CurveToGenerate->setEnabled(0);
             m_ccpm->CurveSettings->setColumnHidden(1,1);
             m_ccpm->PitchCurve->setVisible(0);
-            m_ccpm->customThrottleCurve2Value->setVisible(0);
-            m_ccpm->label_41->setVisible(0);
+            //m_ccpm->customThrottleCurve2Value->setVisible(0);
+            //m_ccpm->label_41->setVisible(0);
         }
 
 
@@ -314,29 +316,79 @@ void ConfigccpmWidget::resetMixer(MixerCurveWidget *mixer, int numElements)
 
 void ConfigccpmWidget::UpdateCurveWidgets()
 {
-    int NumCurvePoints,i;
+    int NumCurvePoints,i,Changed;
     QList<double> curveValues;
+    QList<double> OldCurveValues;
+    double ThisValue;
     //get the user settings
     NumCurvePoints=m_ccpm->NumCurvePoints->value();
 
     curveValues.clear();
+    Changed=0;
+    OldCurveValues=m_ccpm->ThrottleCurve->getCurve();
     for (i=0; i<NumCurvePoints; i++)
     {
-        curveValues.append(m_ccpm->CurveSettings->item(i, 0 )->text().toDouble());
+        ThisValue=m_ccpm->CurveSettings->item(i, 0 )->text().toDouble();
+        curveValues.append(ThisValue);
+        if (ThisValue!=OldCurveValues.at(i))Changed=1;
     }
     // Setup all Throttle1 curves for all types of airframes
-    m_ccpm->ThrottleCurve->initCurve(curveValues);
+    if (Changed==1)m_ccpm->ThrottleCurve->setCurve(curveValues);
 
     curveValues.clear();
+    Changed=0;
+    OldCurveValues=m_ccpm->PitchCurve->getCurve();
     for (i=0; i<NumCurvePoints; i++)
     {
-        curveValues.append(m_ccpm->CurveSettings->item(i, 1 )->text().toDouble());
+        ThisValue=m_ccpm->CurveSettings->item(i, 1 )->text().toDouble();
+        curveValues.append(ThisValue);
+        if (ThisValue!=OldCurveValues.at(i))Changed=1;
     }
     // Setup all Throttle1 curves for all types of airframes
-    m_ccpm->PitchCurve->initCurve(curveValues);
+    if (Changed==1)m_ccpm->PitchCurve->setCurve(curveValues);
 }
 
+void ConfigccpmWidget::updatePitchCurveValue(QList<double> curveValues,double Value)
+{
+    int NumCurvePoints,i;
+    double CurrentValue;
+    QList<double> internalCurveValues;
+    //get the user settings
+    NumCurvePoints=m_ccpm->NumCurvePoints->value();
+    internalCurveValues=m_ccpm->PitchCurve->getCurve();
 
+    for (i=0; i<internalCurveValues.length(); i++)
+    {
+        CurrentValue=m_ccpm->CurveSettings->item(i, 1 )->text().toDouble();
+        if (CurrentValue!=internalCurveValues[i])
+        {
+            //m_ccpm->CurveSettings->item(i, 1)->setText(tr( "%1" ).arg(internalCurveValues[i]));
+            m_ccpm->CurveSettings->item(i, 1)->setText(QString().sprintf("%.3f",internalCurveValues.at(i)));
+        }
+
+    }
+
+}
+
+void ConfigccpmWidget::updateThrottleCurveValue(QList<double> curveValues,double Value)
+{
+    int NumCurvePoints,i;
+    double CurrentValue;
+    //get the user settings
+    NumCurvePoints=m_ccpm->NumCurvePoints->value();
+
+    for (i=0; i<curveValues.length(); i++)
+    {
+        CurrentValue=m_ccpm->CurveSettings->item(i, 1 )->text().toDouble();
+        if (CurrentValue!=curveValues[i])
+        {
+            //m_ccpm->CurveSettings->item(i, 0)->setText(tr( "%1" ).arg(curveValues[i]));
+            m_ccpm->CurveSettings->item(i, 0)->setText(QString().sprintf("%.3f",curveValues.at(i)));
+        }
+
+    }
+
+}
 
 
 void ConfigccpmWidget::UpdateCurveSettings()
@@ -475,6 +527,7 @@ void ConfigccpmWidget::GenerateCurve()
    double value1, value2, value3, scale;
    QString CurveType;
    QTableWidgetItem *item;
+   double newValue;
 
 
    //get the user settings
@@ -494,30 +547,39 @@ void ConfigccpmWidget::GenerateCurve()
 
        if ( CurveType.compare("Flat")==0)
        {
-           item->setText( tr( "%1" ).arg( value1 ) );
+           //item->setText( tr( "%1" ).arg( value1 ) );
+           item->setText(QString().sprintf("%.3f",value1));
        }
        if ( CurveType.compare("Linear")==0)
        {
-           item->setText( tr( "%1" ).arg(value1 +(scale*(value2-value1))) );
+           newValue =value1 +(scale*(value2-value1));
+           //item->setText( tr( "%1" ).arg(value1 +(scale*(value2-value1))) );
+           item->setText(QString().sprintf("%.3f",newValue));
        }
        if ( CurveType.compare("Step")==0)
        {
            if (scale*100<value3)
            {
-               item->setText( tr( "%1" ).arg(value1) );
+               //item->setText( tr( "%1" ).arg(value1) );
+               item->setText(QString().sprintf("%.3f",value1));
            }
            else
            {
-               item->setText( tr( "%1" ).arg(value2) );
+               //item->setText( tr( "%1" ).arg(value2) );
+               item->setText(QString().sprintf("%.3f",value2));
            }
        }
        if ( CurveType.compare("Exp")==0)
        {
-           item->setText( tr( "%1" ).arg(value1 +(((exp(scale*(value3/10))-1))/(exp((value3/10))-1)*(value2-value1))) );
+           newValue =value1 +(((exp(scale*(value3/10))-1))/(exp((value3/10))-1)*(value2-value1));
+           //item->setText( tr( "%1" ).arg(value1 +(((exp(scale*(value3/10))-1))/(exp((value3/10))-1)*(value2-value1))) );
+           item->setText(QString().sprintf("%.3f",newValue));
        }
        if ( CurveType.compare("Log")==0)
        {
-           item->setText( tr( "%1" ).arg(value1 +(((log(scale*(value3*2)+1))/(log(1+(value3*2))))*(value2-value1))) );
+           newValue = value1 +(((log(scale*(value3*2)+1))/(log(1+(value3*2))))*(value2-value1));
+           //item->setText( tr( "%1" ).arg(value1 +(((log(scale*(value3*2)+1))/(log(1+(value3*2))))*(value2-value1))) );
+           item->setText(QString().sprintf("%.3f",newValue));
        }
    }
    for (i=NumCurvePoints;i<10;i++)

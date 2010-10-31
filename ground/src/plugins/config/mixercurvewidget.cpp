@@ -139,6 +139,31 @@ QList<double> MixerCurveWidget::getCurve() {
     return list;
 }
 
+/**
+  Setd the current curve settings
+  */
+void MixerCurveWidget::setCurve(QList<double> points)
+{
+    if (nodeList.length()<1)
+    {
+        initCurve(points);
+    }
+    else
+    {
+        qreal w = plot->boundingRect().width()/(points.length()-1);
+        qreal h = plot->boundingRect().height();
+        for (int i=0; i<points.length(); i++) {
+            double val = points.at(i);
+            if (val>1)
+                    val=1;
+            if (val<0)
+                    val=0;
+            nodeList.at(i)->setPos(w*i,h-val*h);
+        }
+    }
+}
+
+
 void MixerCurveWidget::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event)

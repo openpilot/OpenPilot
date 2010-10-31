@@ -28,52 +28,10 @@
 
 UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 {
-    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    m_config = new Ui_UploaderWidget();
+    m_config->setupUi(this);
 
-    //main layout
-    QVBoxLayout *layout = new QVBoxLayout;
-    //choose file layout and widget
-    QHBoxLayout *FileLayout = new QHBoxLayout;
-    QWidget *FileWidget = new QWidget;
-    FileWidget->setLayout(FileLayout);
-    openFileNameLE=new QLineEdit();
-    QPushButton* loadfile = new QPushButton("Load File");
-    loadfile->setMaximumWidth(80);
-    FileLayout->addWidget(openFileNameLE);
-    FileLayout->addWidget(loadfile);
 
-    //send file layout and widget
-    QHBoxLayout *SendLayout = new QHBoxLayout;
-    QWidget *SendWidget = new QWidget;
-    SendWidget->setLayout(SendLayout);
-    progressBar=new QProgressBar();
-    progressBar->setMaximum(100);
-    QPushButton* sendBt = new QPushButton("Send");
-    sendBt->setMaximumWidth(80);
-    SendLayout->addWidget(progressBar);
-    SendLayout->addWidget(sendBt);
-
-    //status layout and widget
-    QHBoxLayout *StatusLayout = new QHBoxLayout;
-    QWidget *StatusWidget = new QWidget;
-    StatusWidget->setLayout(StatusLayout);
-    status=new QLabel();
-    StatusLayout->addWidget(status);
-
-    //add partial widgets to main widget
-    layout->addWidget(FileWidget);
-    layout->addWidget(SendWidget);
-    layout->addWidget(StatusWidget);
-    setLayout(layout);
-
-    //connect signals to slots
-
-    //fires when the user presses file button
-    connect(loadfile, SIGNAL(clicked(bool)),
-            this,SLOT(setOpenFileName()));
-    //fires when the user presses send button
-    connect(sendBt, SIGNAL(clicked(bool)),
-            this,SLOT(send()));
 }
 //user pressed send, send file using a new thread with qymodem library
 void UploaderGadgetWidget::send()

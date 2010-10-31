@@ -28,22 +28,20 @@
 #ifndef UPLOADERGADGETWIDGET_H
 #define UPLOADERGADGETWIDGET_H
 
-//#include "qmapcontrol/qmapcontrol.h"
+#include "ui_uploader.h"
 #include <QtGui/QWidget>
 #include <qextserialport/src/qextserialport.h>
 #include <qymodem/src/qymodemsend.h>
 #include <QLabel>
 #include <QLineEdit>
 #include <QThread>
-# include <QProgressBar>
+#include <QProgressBar>
 #include <QStringList>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QPushButton>
 #include <QFileDialog>
 #include <QMessageBox>
 //using namespace qmapcontrol;
 
+class Ui_UploaderWidget;
 
 class UploaderGadgetWidget : public QWidget
 {
@@ -57,6 +55,7 @@ public:
 
 
 private:
+     Ui_UploaderWidget *m_config;
 
      QLineEdit* openFileNameLE;
      QextSerialPort *Port;

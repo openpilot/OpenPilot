@@ -9,11 +9,18 @@ HEADERS += uploadergadget.h \
     uploadergadgetfactory.h \
     uploadergadgetoptionspage.h \
     uploadergadgetwidget.h \
-    uploaderplugin.h
+    uploaderplugin.h \
+    op_dfu.h \
+    delay.h
 SOURCES += uploadergadget.cpp \
     uploadergadgetconfiguration.cpp \
     uploadergadgetfactory.cpp \
     uploadergadgetoptionspage.cpp \
     uploadergadgetwidget.cpp \
-    uploaderplugin.cpp
+    uploaderplugin.cpp \
+    op_dfu.cpp \
+    delay.cpp
 OTHER_FILES += Uploader.pluginspec
+
+FORMS += \
+    uploader.ui

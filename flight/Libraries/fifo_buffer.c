@@ -131,8 +131,8 @@ uint16_t fifoBuf_getDataPeek(t_fifo_buffer *buf, void *data, uint16_t len)
 {	// get data from the buffer without removing it
 
 	uint16_t rd = buf->rd;
-	uint16_t wr = buf->wr;
 	uint16_t buf_size = buf->buf_size;
+	uint8_t *buff = buf->buffer;
 
 	// get number of bytes available
 	uint16_t num_bytes = fifoBuf_getUsed(buf);
@@ -144,35 +144,30 @@ uint16_t fifoBuf_getDataPeek(t_fifo_buffer *buf, void *data, uint16_t len)
 		return 0;		// return number of bytes copied
 
 	uint8_t *p = (uint8_t *)data;
-	uint16_t i = num_bytes;
+	uint16_t i = 0;
 
-	if (wr < rd)
-	{	// we're going to do a rap-around
+	while (num_bytes > 0)
+	{
 		uint16_t j = buf_size - rd;
 		if (j > num_bytes)
 			j = num_bytes;
-		memcpy(p, (void *)&buf->buffer[rd], j);
-		p += j;
-		i -= j;
-		rd = 0;
-	}
-	if (i > 0)
-	{
-		memcpy(p, (void *)&buf->buffer[rd], i);
-		rd += i;
+		memcpy(p + i, buff + rd, j);
+		i += j;
+		num_bytes -= j;
+		rd += j;
 		if (rd >= buf_size)
 			rd = 0;
 	}
 
-	return num_bytes;	// return number of bytes copied
+	return i;	// return number of bytes copied
 }
 
 uint16_t fifoBuf_getData(t_fifo_buffer *buf, void *data, uint16_t len)
 {	// get data from our rx buffer
 
 	uint16_t rd = buf->rd;
-	uint16_t wr = buf->wr;
 	uint16_t buf_size = buf->buf_size;
+	uint8_t *buff = buf->buffer;
 
 	// get number of bytes available
 	uint16_t num_bytes = fifoBuf_getUsed(buf);
@@ -184,29 +179,24 @@ uint16_t fifoBuf_getData(t_fifo_buffer *buf, void *data, uint16_t len)
 		return 0;		// return number of bytes copied
 
 	uint8_t *p = (uint8_t *)data;
-	uint16_t i = num_bytes;
+	uint16_t i = 0;
 
-	if (wr < rd)
-	{	// we're going to do a rap-around
+	while (num_bytes > 0)
+	{
 		uint16_t j = buf_size - rd;
 		if (j > num_bytes)
 			j = num_bytes;
-		memcpy(p, (void *)&buf->buffer[rd], j);
-		p += j;
-		i -= j;
-		rd = 0;
-	}
-	if (i > 0)
-	{
-		memcpy(p, (void *)&buf->buffer[rd], i);
-		rd += i;
+		memcpy(p + i, buff + rd, j);
+		i += j;
+		num_bytes -= j;
+		rd += j;
 		if (rd >= buf_size)
 			rd = 0;
 	}
 
 	buf->rd = rd;
 
-	return num_bytes;	// return number of bytes copied
+	return i;	// return number of bytes copied
 }
 
 uint16_t fifoBuf_putByte(t_fifo_buffer *buf, const uint8_t b)
@@ -233,6 +223,7 @@ uint16_t fifoBuf_putData(t_fifo_buffer *buf, const void *data, uint16_t len)
 
 	uint16_t wr = buf->wr;
 	uint16_t buf_size = buf->buf_size;
+	uint8_t *buff = buf->buffer;
 
 	uint16_t num_bytes = fifoBuf_getFree(buf);
 	if (num_bytes > len)
@@ -249,7 +240,7 @@ uint16_t fifoBuf_putData(t_fifo_buffer *buf, const void *data, uint16_t len)
 		uint16_t j = buf_size - wr;
 		if (j > num_bytes)
 			j = num_bytes;
-		memcpy((void *)&buf->buffer[wr], p + i, j);
+		memcpy(buff + wr, p + i, j);
 		i += j;
 		num_bytes -= j;
 		wr += j;

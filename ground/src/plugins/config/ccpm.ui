@@ -50,7 +50,7 @@
     </size>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab">
     <attribute name="title">
@@ -61,24 +61,21 @@
       <rect>
        <x>0</x>
        <y>10</y>
-       <width>657</width>
-       <height>427</height>
+       <width>656</width>
+       <height>422</height>
       </rect>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <item>
-       <layout class="QFormLayout" name="formLayout">
-        <property name="fieldGrowthPolicy">
-         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-        </property>
-        <item row="1" column="1">
+     <layout class="QGridLayout" name="gridLayout_9">
+      <item row="0" column="0">
+       <layout class="QGridLayout" name="gridLayout_8">
+        <item row="0" column="0">
          <widget class="QGroupBox" name="SwashplateBox_2">
           <property name="title">
            <string>Outputs</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_16">
            <item>
-            <layout class="QFormLayout" name="formLayout_3">
+            <layout class="QGridLayout" name="gridLayout_11">
              <item row="0" column="0">
               <widget class="QLabel" name="ccpmEngineLabel">
                <property name="text">
@@ -110,17 +107,14 @@
           </layout>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="1" column="0">
          <widget class="QGroupBox" name="SwashplateBox">
           <property name="title">
            <string>Swashplate Outputs</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_13">
            <item>
-            <layout class="QFormLayout" name="formLayout_2">
-             <property name="fieldGrowthPolicy">
-              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-             </property>
+            <layout class="QGridLayout" name="gridLayout_10">
              <item row="0" column="0">
               <widget class="QLabel" name="ccpmServoWLabel">
                <property name="enabled">
@@ -159,6 +153,31 @@
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="ccpmServoXLabel">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                 <horstretch>1</horstretch>
+                 <verstretch>1</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>50</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>85</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Servo X</string>
                </property>
               </widget>
              </item>
@@ -248,8 +267,8 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="ccpmServoXLabel">
+             <item row="4" column="0">
+              <widget class="QLabel" name="ccpmServoZLabel_3">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
                  <horstretch>1</horstretch>
@@ -269,7 +288,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>Servo X</string>
+                <string>Single Servo</string>
                </property>
               </widget>
              </item>
@@ -303,48 +322,20 @@
                </item>
               </widget>
              </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="ccpmServoZLabel_3">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-                 <horstretch>1</horstretch>
-                 <verstretch>1</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>50</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>85</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>Single Servo</string>
-               </property>
-              </widget>
-             </item>
             </layout>
            </item>
           </layout>
          </widget>
         </item>
-        <item row="3" column="1">
+        <item row="2" column="0">
          <widget class="QGroupBox" name="SwashplateBox_3">
           <property name="title">
            <string>Swashplate Servo Angles</string>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_15">
            <item>
-            <layout class="QFormLayout" name="formLayout_4">
-             <property name="fieldGrowthPolicy">
-              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-             </property>
-             <item row="1" column="0">
+            <layout class="QGridLayout" name="gridLayout_12">
+             <item row="0" column="0">
               <widget class="QLabel" name="ccpmServoWLabel_2">
                <property name="enabled">
                 <bool>true</bool>
@@ -360,7 +351,7 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
+             <item row="0" column="1">
               <widget class="QDoubleSpinBox" name="ccpmAngleW">
                <property name="decimals">
                 <number>0</number>
@@ -373,7 +364,7 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
+             <item row="1" column="0">
               <widget class="QLabel" name="ccpmServoXLabel_2">
                <property name="minimumSize">
                 <size>
@@ -386,7 +377,20 @@
                </property>
               </widget>
              </item>
-             <item row="3" column="0">
+             <item row="1" column="1">
+              <widget class="QDoubleSpinBox" name="ccpmAngleX">
+               <property name="decimals">
+                <number>0</number>
+               </property>
+               <property name="maximum">
+                <double>360.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>15.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
               <widget class="QLabel" name="ccpmServoYLabel_2">
                <property name="enabled">
                 <bool>true</bool>
@@ -402,27 +406,7 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="ccpmServoZLabel_2">
-               <property name="text">
-                <string>Angle Z</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1">
-              <widget class="QDoubleSpinBox" name="ccpmAngleZ">
-               <property name="decimals">
-                <number>0</number>
-               </property>
-               <property name="maximum">
-                <double>360.000000000000000</double>
-               </property>
-               <property name="singleStep">
-                <double>15.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
+             <item row="2" column="1">
               <widget class="QDoubleSpinBox" name="ccpmAngleY">
                <property name="decimals">
                 <number>0</number>
@@ -435,8 +419,15 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
-              <widget class="QDoubleSpinBox" name="ccpmAngleX">
+             <item row="3" column="0">
+              <widget class="QLabel" name="ccpmServoZLabel_2">
+               <property name="text">
+                <string>Angle Z</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QDoubleSpinBox" name="ccpmAngleZ">
                <property name="decimals">
                 <number>0</number>
                </property>
@@ -448,7 +439,7 @@
                </property>
               </widget>
              </item>
-             <item row="5" column="0">
+             <item row="4" column="0">
               <widget class="QLabel" name="label_10">
                <property name="enabled">
                 <bool>true</bool>
@@ -458,7 +449,7 @@
                </property>
               </widget>
              </item>
-             <item row="5" column="1">
+             <item row="4" column="1">
               <widget class="QDoubleSpinBox" name="ccpmCorrectionAngle">
                <property name="enabled">
                 <bool>true</bool>
@@ -481,7 +472,7 @@
         </item>
        </layout>
       </item>
-      <item>
+      <item row="0" column="1">
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0">
          <widget class="QGroupBox" name="ccpmPitchMixingBox">
@@ -489,7 +480,7 @@
            <bool>true</bool>
           </property>
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -522,11 +513,11 @@
             <rect>
              <x>0</x>
              <y>20</y>
-             <width>54</width>
+             <width>48</width>
              <height>168</height>
             </rect>
            </property>
-           <layout class="QFormLayout" name="formLayout_5">
+           <layout class="QGridLayout" name="gridLayout_6">
             <item row="0" column="0">
              <widget class="QLabel" name="label_15">
               <property name="enabled">
@@ -637,7 +628,7 @@
         <item row="1" column="0">
          <widget class="QGroupBox" name="ccpmRevoMixingBox">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -662,11 +653,11 @@
             <rect>
              <x>0</x>
              <y>20</y>
-             <width>53</width>
+             <width>47</width>
              <height>168</height>
             </rect>
            </property>
-           <layout class="QFormLayout" name="formLayout_7">
+           <layout class="QGridLayout" name="gridLayout_7">
             <item row="0" column="0">
              <widget class="QLabel" name="label_14">
               <property name="enabled">
@@ -760,7 +751,7 @@
         </item>
        </layout>
       </item>
-      <item>
+      <item row="0" column="2">
        <widget class="QGroupBox" name="ccpmRevoMixingBox_2">
         <property name="minimumSize">
          <size>
@@ -856,7 +847,7 @@
         </layout>
        </widget>
       </item>
-      <item>
+      <item row="0" column="3">
        <spacer name="horizontalSpacer_6">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -1354,8 +1345,14 @@
                 <height>0</height>
                </size>
               </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
               <property name="title">
                <string>Throttle Curve</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
               </property>
               <widget class="MixerCurveWidget" name="ThrottleCurve" native="true">
                <property name="geometry">
@@ -1367,7 +1364,7 @@
                 </rect>
                </property>
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>

@@ -43,6 +43,7 @@
 #define NMEA_GPGSV		4	// GPS satellites in view
 #define NMEA_GPGSA		5	// GPS DOP and active satellites
 #define NMEA_GPRMC		6	// Recommended minimum specific GPS data
+#define NMEA_GPZDA		7	// Time and Date
 #define NMEA_UNKNOWN	0xFF// Packet received but not known
 
 #define GPS_TIMEOUT_MS 500
@@ -58,6 +59,7 @@
         #define NMEA_DEBUG_VTG	///< define to enable debug of VTG messages
         #define NMEA_DEBUG_RMC	///< define to enable debug of RMC messages
         #define NMEA_DEBUG_GSA	///< define to enable debug of GSA messages
+        #define NMEA_DEBUG_ZDA	///< define to enable debug of ZDA messages
 #endif
 
 /**
@@ -255,6 +257,13 @@ uint8_t NMEAParser::nmeaProcess(cBuffer* rxBuffer)
                         // rerpot packet type
                         foundpacket = NMEA_GPGSV;
                 }
+                else if(!strncmp(NmeaPacket, "GPZDA", 5))
+                {
+                        // Process packet of this type
+                        nmeaProcessGPZDA(NmeaPacket);
+                        // rerpot packet type
+                        foundpacket = NMEA_GPZDA;
+                }
         }
         else if(rxBuffer->datalength >= rxBuffer->size)
         {
@@ -412,6 +421,11 @@ void NMEAParser::nmeaProcessGPVTG(char* packet)
 
         QString nmeaString( packet );
         QStringList tokenslist = nmeaString.split(",");
+
+        GpsData.Heading = tokenslist.at(1).toDouble();
+        GpsData.Groundspeed = tokenslist.at(7).toDouble();
+        GpsData.Groundspeed = GpsData.Groundspeed/3.6;
+        emit speedheading(GpsData.Groundspeed,GpsData.Heading);
 }
 
 /**
@@ -470,4 +484,32 @@ void NMEAParser::nmeaProcessGPGSA(char* packet)
         GpsData.HDOP = tokenslist.at(16).toDouble();
         GpsData.VDOP = tokenslist.at(17).toDouble();
         emit dop(GpsData.HDOP, GpsData.VDOP, GpsData.PDOP);
+}
+
+/**
+ * Prosesses NMEA GPZDA sentences
+ * \param[in] Buffer for parsed nmea GPZDA sentence
+ */
+void NMEAParser::nmeaProcessGPZDA(char* packet)
+{
+        // start parsing just after "GPZDA,"
+        // attempt to reject empty packets right away
+        if(packet[6]==',' && packet[7]==',')
+                return;
+
+        if(!nmeaChecksum(packet)) {
+            // checksum not valid
+            return;
+        }
+        nmeaTerminateAtChecksum(packet);
+
+        QString nmeaString( packet );
+        QStringList tokenslist = nmeaString.split(",");
+
+        GpsData.GPStime = tokenslist.at(1).toDouble();
+        int day = tokenslist.at(2).toInt();
+        int month = tokenslist.at(3).toInt();
+        int year = tokenslist.at(4).toInt();
+        GpsData.GPSdate = day*10000+month*100+(year-2000);
+        emit datetime(GpsData.GPSdate,GpsData.GPStime);
 }

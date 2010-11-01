@@ -77,6 +77,7 @@ RawHIDConnection::RawHIDConnection()
 {
     //added by andrew
     RawHidHandle = NULL;
+    enablePolling = true;
 
 
     QObject::connect(&m_enumerateThread, SIGNAL(enumerationChanged()),
@@ -99,14 +100,16 @@ QStringList RawHIDConnection::availableDevices()
     QStringList devices;
     pjrc_rawhid dev;
 
-    //open all device we can
-    int opened = dev.open(MAX_DEVICES, VID, PID, USAGE_PAGE, USAGE);
+    if (enablePolling) {
+        //open all device we can
+        int opened = dev.open(MAX_DEVICES, VID, PID, USAGE_PAGE, USAGE);
 
-    //for each devices found, get serial number and close it back
-    for(int i=0; i<opened; i++)
-    {
-        devices.append(dev.getserial(i));
-        dev.close(i);
+        //for each devices found, get serial number and close it back
+        for(int i=0; i<opened; i++)
+        {
+            devices.append(dev.getserial(i));
+            dev.close(i);
+        }
     }
 
     return devices;
@@ -149,6 +152,23 @@ QString RawHIDConnection::shortName()
     return QString("USB");
 }
 
+/**
+ Tells the Raw HID plugin to stop polling for USB devices
+ */
+bool RawHIDConnection::suspendPolling()
+{
+    enablePolling = false;
+    return true;
+}
+
+/**
+ Tells the Raw HID plugin to resume polling for USB devices
+ */
+bool RawHIDConnection::resumePolling()
+{
+    enablePolling = true;
+    return true;
+}
 
 
 
@@ -201,7 +221,8 @@ RawHIDPlugin::~RawHIDPlugin()
 
 void RawHIDPlugin::extensionsInitialized()
 {
-    addAutoReleasedObject(new RawHIDConnection);
+    hidConnection = new RawHIDConnection();
+    addAutoReleasedObject(hidConnection);
 
     //temp for test
     //addAutoReleasedObject(new RawHIDTestThread);
@@ -214,6 +235,5 @@ bool RawHIDPlugin::initialize(const QStringList & arguments, QString * errorStri
 
     return true;
 }
-
 
 Q_EXPORT_PLUGIN(RawHIDPlugin)

@@ -83,6 +83,8 @@ public:
 
     virtual QString connectionName();
     virtual QString shortName();
+    bool suspendPolling();
+    bool resumePolling();
 
     bool deviceOpened() {return m_deviceOpened;}
 
@@ -91,6 +93,7 @@ protected slots:
 
 private:
     RawHID *RawHidHandle;
+    bool enablePolling;
 
 protected:
     QMutex m_enumMutex;
@@ -109,6 +112,8 @@ public:
 
     virtual bool initialize(const QStringList &arguments, QString *error_message);
     virtual void extensionsInitialized();
+private:
+    RawHIDConnection *hidConnection;
 };
 
 

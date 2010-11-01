@@ -29,6 +29,13 @@
 #define UPLOADERGADGETWIDGET_H
 
 #include "ui_uploader.h"
+#include "delay.h"
+
+#include "extensionsystem/pluginmanager.h"
+#include "uavobjects/uavobjectmanager.h"
+#include "uavobjects/uavobject.h"
+
+#include "rawhid/rawhidplugin.h"
 #include <QtGui/QWidget>
 #include <qextserialport/src/qextserialport.h>
 #include <qymodem/src/qymodemsend.h>
@@ -41,7 +48,6 @@
 #include <QMessageBox>
 //using namespace qmapcontrol;
 
-class Ui_UploaderWidget;
 
 class UploaderGadgetWidget : public QWidget
 {
@@ -50,12 +56,16 @@ class UploaderGadgetWidget : public QWidget
 public:
     UploaderGadgetWidget(QWidget *parent = 0);
    ~UploaderGadgetWidget();
+    typedef enum { IAP_STATE_READY, IAP_STATE_STEP_1, IAP_STATE_STEP_2, IAP_STEP_RESET} IAPStep;
 
    void setPort(QextSerialPort* port);
 
 
 private:
      Ui_UploaderWidget *m_config;
+     IAPStep currentStep;
+     bool resetOnly;
+     void log(QString str);
 
      QLineEdit* openFileNameLE;
      QextSerialPort *Port;
@@ -70,6 +80,8 @@ private slots:
     void error(QString errorString,int errorNumber);
     void info(QString infoString,int infoNumber);
     void updatePercSlot(int);
+    void goToBootloader(UAVObject* = NULL, bool = false);
+    void systemReset();
 };
 
 #endif // UPLOADERGADGETWIDGET_H

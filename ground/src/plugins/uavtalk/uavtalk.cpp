@@ -73,7 +73,9 @@ UAVTalk::UAVTalk(QIODevice* iodev, UAVObjectManager* objMngr)
 
 UAVTalk::~UAVTalk()
 {
-    disconnect(io, SIGNAL(readyRead()), this, SLOT(processInputStream()));
+    // According to Qt, it is not necessary to disconnect upon
+    // object deletion.
+    //disconnect(io, SIGNAL(readyRead()), this, SLOT(processInputStream()));
 }
 
 /**

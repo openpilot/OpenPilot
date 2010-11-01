@@ -2,7 +2,9 @@ TEMPLATE = lib
 TARGET = Uploader
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
+include(../../plugins/uavobjects/uavobjects.pri)
 include(../../libs/qextserialport/qextserialport.pri)
+include(../../plugins/rawhid/rawhid.pri)
 include(../../libs/qymodem/qymodem.pri)
 HEADERS += uploadergadget.h \
     uploadergadgetconfiguration.h \

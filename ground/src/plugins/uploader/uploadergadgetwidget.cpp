@@ -30,9 +30,109 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     m_config = new Ui_UploaderWidget();
     m_config->setupUi(this);
+    currentStep = IAP_STATE_READY;
+    resetOnly=false;
+
+    connect(m_config->haltButton, SIGNAL(clicked()), this, SLOT(goToBootloader()));
+    connect(m_config->resetButton, SIGNAL(clicked()), this, SLOT(systemReset()));
 
 
 }
+
+/**
+  Tell the mainboard to go to bootloader:
+   - Send the relevant IAP commands
+   - setup callback for MoBo acknowledge
+   */
+void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    UAVObject *fwIAP = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("FirmwareIAPObj")));
+
+    switch (currentStep) {
+    case IAP_STATE_READY:
+        // The board is running, send the 1st IAP Reset order:
+        fwIAP->getField("Command")->setValue("1122");
+        connect(fwIAP,SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
+        currentStep = IAP_STATE_STEP_1;
+        fwIAP->updated();
+        log(QString("IAP Step 1"));
+        break;
+    case IAP_STATE_STEP_1:
+        if (!success)  {
+            log(QString("Oops, failure step 1"));
+            currentStep == IAP_STATE_READY;
+            break;
+        }
+        delay::msleep(600);
+        fwIAP->getField("Command")->setValue("2233");
+        currentStep = IAP_STATE_STEP_2;
+        fwIAP->updated();
+        log(QString("IAP Step 2"));
+        break;
+    case IAP_STATE_STEP_2:
+        if (!success) {
+            log(QString("Oops, failure step 2"));
+            currentStep == IAP_STATE_READY;
+            break;
+        }
+        delay::msleep(600);
+        fwIAP->getField("Command")->setValue("3344");
+        currentStep = IAP_STEP_RESET;
+        fwIAP->updated();
+        log(QString("IAP Step 3"));
+        break;
+    case IAP_STEP_RESET: {
+        currentStep = IAP_STATE_READY;
+        if (success) {
+            log("Oops, unexpected success step 3");
+            log("Reset did NOT happen");
+            break;
+        }
+        // The board is now reset: we have to disconnect telemetry
+        Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+        cm->disconnectDevice();
+        log(QString("Board Reset"));
+
+        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+        disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
+        if (resetOnly) {
+            resetOnly=false;
+            break;
+        }
+        // stop the polling thread: otherwise it will mess up DFU
+        RawHIDConnection *cnx =  pm->getObject<RawHIDConnection>();
+        cnx->suspendPolling();
+
+    }
+
+    }
+
+}
+
+/**
+  Tell the mainboard to reset:
+   - Send the relevant IAP commands
+   - setup callback for MoBo acknowledge
+   */
+void UploaderGadgetWidget::systemReset()
+{
+    resetOnly = true;
+    m_config->textBrowser->clear();
+    log("Board Reset initiated.");
+    goToBootloader();
+}
+
+/**
+  Update status
+  */
+void UploaderGadgetWidget::log(QString str)
+{
+   m_config->textBrowser->append(str);
+
+}
+
 //user pressed send, send file using a new thread with qymodem library
 void UploaderGadgetWidget::send()
 {

@@ -29,7 +29,34 @@
 deviceWidget::deviceWidget(QWidget *parent) :
     QWidget(parent)
 {
-
     myDevice = new Ui_deviceWidget();
     myDevice->setupUi(this);
+}
+
+void deviceWidget::setDeviceID(int devID){
+    deviceID = devID;
+}
+
+void deviceWidget::setDfu(OP_DFU *dfu)
+{
+    m_dfu = dfu;
+}
+
+/**
+  Fills the various fields for the device
+  */
+void deviceWidget::populate()
+{
+    int id = m_dfu->devices[deviceID].ID;
+    myDevice->deviceID->setText(QString("ID: ") + QString::number(id));
+    bool r = m_dfu->devices[deviceID].Readable;
+    bool w = m_dfu->devices[deviceID].Writable;
+    myDevice->deviceACL->setText(r ? "R" : "-" +  w ? "W" : "-");
+    int size=((OP_DFU::device)m_dfu->devices[deviceID]).SizeOfDesc;
+    m_dfu->enterDFU(deviceID);
+    QString str = m_dfu->DownloadDescription(size);
+    myDevice->description->setMaxLength(size);
+    myDevice->description->setText(str.left(str.indexOf(QChar(255))));
+
+
 }

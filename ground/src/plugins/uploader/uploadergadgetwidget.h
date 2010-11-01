@@ -68,6 +68,7 @@ private:
      IAPStep currentStep;
      bool resetOnly;
      void log(QString str);
+     void clearLog();
 
      QLineEdit* openFileNameLE;
      QextSerialPort *Port;

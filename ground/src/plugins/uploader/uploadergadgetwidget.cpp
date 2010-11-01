@@ -39,7 +39,6 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_config->resetButton, SIGNAL(clicked()), this, SLOT(systemReset()));
     connect(m_config->bootButton, SIGNAL(clicked()), this, SLOT(systemBoot()));
 
-
 }
 
 /**
@@ -60,6 +59,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         connect(fwIAP,SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
         currentStep = IAP_STATE_STEP_1;
         fwIAP->updated();
+        clearLog();
         log(QString("IAP Step 1"));
         break;
     case IAP_STATE_STEP_1:
@@ -120,7 +120,9 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         if(!dfu.enterDFU(0))
         {
             log("Could not enter DFU mode.");
+            return;
         }
+        m_config->boardStatus->setText("Bootloader");
         currentStep = IAP_STATE_BOOTLOADER;
         OP_DFU::Status ret=dfu.StatusRequest();
         dfu.findDevices();
@@ -132,9 +134,14 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
              delete qw;
         }
         for(int i=0;i<dfu.numberOfDevices;i++) {
-            deviceWidget* dw = new deviceWidget();
+            deviceWidget* dw = new deviceWidget(this);
+            dw->setDeviceID(i);
+            dw->setDfu(&dfu);
+            dw->populate();
             m_config->systemElements->addTab(dw, QString("Device") + QString::number(i));
         }
+        m_config->haltButton->setEnabled(false);
+        m_config->resetButton->setEnabled(false);
         m_config->bootButton->setEnabled(true);
     }
     }
@@ -159,11 +166,13 @@ void UploaderGadgetWidget::systemReset()
 void UploaderGadgetWidget::systemBoot()
 {
     if (currentStep == IAP_STATE_BOOTLOADER) {
+        clearLog();
         OP_DFU dfu(true);
         dfu.AbortOperation();
         if(!dfu.enterDFU(0))
         {
             log("Could not enter DFU mode.");
+            return;
         }
         log("Booting system...");
         dfu.JumpToApp();
@@ -173,6 +182,10 @@ void UploaderGadgetWidget::systemBoot()
         RawHIDConnection *cnx =  pm->getObject<RawHIDConnection>();
         cnx->resumePolling();
         m_config->bootButton->setEnabled(false);
+        m_config->haltButton->setEnabled(true);
+        m_config->resetButton->setEnabled(true);
+        m_config->boardStatus->setText("Running");
+
     } else {
         log("Not in bootloader mode!");
     }
@@ -180,12 +193,17 @@ void UploaderGadgetWidget::systemBoot()
 }
 
 /**
-  Update status
+  Update log entry
   */
 void UploaderGadgetWidget::log(QString str)
 {
    m_config->textBrowser->append(str);
 
+}
+
+void UploaderGadgetWidget::clearLog()
+{
+    m_config->textBrowser->clear();
 }
 
 //user pressed send, send file using a new thread with qymodem library

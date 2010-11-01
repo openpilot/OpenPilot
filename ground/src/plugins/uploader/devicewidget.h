@@ -29,16 +29,22 @@
 #define DEVICEWIDGET_H
 
 #include "ui_devicewidget.h"
+#include "op_dfu.h"
 #include <QWidget>
 
 class deviceWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit deviceWidget(QWidget *parent = 0);
+    deviceWidget(QWidget *parent = 0);
+    void setDeviceID(int devID);
+    void setDfu(OP_DFU* dfu);
+    void populate();
 
 private:
     Ui_deviceWidget *myDevice;
+    int deviceID;
+    OP_DFU *m_dfu;
 
 signals:
 

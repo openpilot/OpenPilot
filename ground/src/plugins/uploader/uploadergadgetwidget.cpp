@@ -37,6 +37,7 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 
     connect(m_config->haltButton, SIGNAL(clicked()), this, SLOT(goToBootloader()));
     connect(m_config->resetButton, SIGNAL(clicked()), this, SLOT(systemReset()));
+    connect(m_config->bootButton, SIGNAL(clicked()), this, SLOT(systemBoot()));
 
 
 }
@@ -120,6 +121,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         {
             log("Could not enter DFU mode.");
         }
+        currentStep = IAP_STATE_BOOTLOADER;
         OP_DFU::Status ret=dfu.StatusRequest();
         dfu.findDevices();
         log(QString("Found ") + QString::number(dfu.numberOfDevices) + QString(" device(s)."));
@@ -132,11 +134,10 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         for(int i=0;i<dfu.numberOfDevices;i++) {
             deviceWidget* dw = new deviceWidget();
             m_config->systemElements->addTab(dw, QString("Device") + QString::number(i));
-
         }
+        m_config->bootButton->setEnabled(true);
     }
     }
-
 }
 
 /**
@@ -150,6 +151,32 @@ void UploaderGadgetWidget::systemReset()
     m_config->textBrowser->clear();
     log("Board Reset initiated.");
     goToBootloader();
+}
+
+/**
+  Tells the system to boot (from Bootloader state)
+  */
+void UploaderGadgetWidget::systemBoot()
+{
+    if (currentStep == IAP_STATE_BOOTLOADER) {
+        OP_DFU dfu(true);
+        dfu.AbortOperation();
+        if(!dfu.enterDFU(0))
+        {
+            log("Could not enter DFU mode.");
+        }
+        log("Booting system...");
+        dfu.JumpToApp();
+        currentStep = IAP_STATE_READY;
+        // stop the polling thread: otherwise it will mess up DFU
+        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+        RawHIDConnection *cnx =  pm->getObject<RawHIDConnection>();
+        cnx->resumePolling();
+        m_config->bootButton->setEnabled(false);
+    } else {
+        log("Not in bootloader mode!");
+    }
+
 }
 
 /**

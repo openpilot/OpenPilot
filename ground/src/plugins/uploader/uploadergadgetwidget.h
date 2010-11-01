@@ -58,7 +58,7 @@ class UploaderGadgetWidget : public QWidget
 public:
     UploaderGadgetWidget(QWidget *parent = 0);
    ~UploaderGadgetWidget();
-    typedef enum { IAP_STATE_READY, IAP_STATE_STEP_1, IAP_STATE_STEP_2, IAP_STEP_RESET} IAPStep;
+    typedef enum { IAP_STATE_READY, IAP_STATE_STEP_1, IAP_STATE_STEP_2, IAP_STEP_RESET, IAP_STATE_BOOTLOADER} IAPStep;
 
    void setPort(QextSerialPort* port);
 
@@ -84,6 +84,7 @@ private slots:
     void updatePercSlot(int);
     void goToBootloader(UAVObject* = NULL, bool = false);
     void systemReset();
+    void systemBoot();
 };
 
 #endif // UPLOADERGADGETWIDGET_H

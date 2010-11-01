@@ -124,6 +124,35 @@ void ConnectionManager::aboutToRemoveObject(QObject *obj)
 }
 
 /**
+*   Method called by plugins who want to force a disconnection. Used
+*   by Uploader gadget for instance.
+*/
+bool ConnectionManager::disconnectDevice()
+{
+
+    // Check if we are currently connected or not
+    if(!m_ioDev)
+    {
+        return false; // We were not connected
+    }
+    else
+    {
+        //signal interested plugins that we are disconnecting the device
+        emit deviceDisconnected();
+        if(m_connectionDevice.connection)
+        {
+            m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
+            m_ioDev = NULL;
+            m_connectionDevice.connection = NULL;
+        }
+
+        m_connectBtn->setText("Connect");
+        m_availableDevList->setEnabled(true);
+    }
+}
+
+
+/**
 *   Slot called when the user pressed the connect/disconnect button
 */
 void ConnectionManager::onConnectPressed()

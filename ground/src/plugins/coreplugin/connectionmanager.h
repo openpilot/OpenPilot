@@ -69,6 +69,7 @@ public:
     void init();
 
     QIODevice *getCurrentConnection();
+    bool disconnectDevice();
 
 protected:
     void unregisterAll(IConnection *connection);

@@ -8,32 +8,29 @@ OP_DFU::OP_DFU(bool _debug): debug(_debug)
     send_delay=10;
     use_delay=true;
     int numDevices=0;
-    cout<<"Please connect device now\n";
     int count=0;
     while(numDevices==0)
     {
-        cout<<".";
+        if (debug)
+            qDebug() << ".";
         delay::msleep(500);
         numDevices = hidHandle.open(1,0x20a0,0x4117,0,0); //0xff9c,0x0001);
         if(++count==10)
         {
-            cout<<"\r";
-            cout<<"           ";
-            cout<<"\r";
             count=0;
         }
     }
     if(debug)
         qDebug() << numDevices << " device(s) opened";
 }
+
 bool OP_DFU::SaveByteArrayToFile(QString const & sfile, const QByteArray &array)
 {
     QFile file(sfile);
-    //QFile file("in.txt");
     if (!file.open(QIODevice::WriteOnly))
     {
         if(debug)
-            qDebug()<<"Cant open file";
+            qDebug()<<"Can't open file";
         return false;
     }
     file.write(array);
@@ -59,7 +56,7 @@ bool OP_DFU::enterDFU(int const &devNumber)
     if(result<1)
         return false;
     if(debug)
-        qDebug() << result << " bytes sent";
+        qDebug() << "EnterDFU: " << result << " bytes sent";
     return true;
 }
 bool OP_DFU::StartUpload(qint32 const & numberOfBytes, TransferTypes const & type,quint32 crc)
@@ -324,6 +321,7 @@ void OP_DFU::JumpToApp()
 
     int result = hidHandle.send(0,buf, BUF_LEN, 500);
 }
+
 OP_DFU::Status OP_DFU::StatusRequest()
 {
     char buf[BUF_LEN];
@@ -340,19 +338,18 @@ OP_DFU::Status OP_DFU::StatusRequest()
 
     int result = hidHandle.send(0,buf, BUF_LEN, 10000);
     if(debug)
-        qDebug() << result << " bytes sent";
+        qDebug() << "StatusRequest: " << result << " bytes sent";
     result = hidHandle.receive(0,buf,BUF_LEN,10000);
     if(debug)
-        qDebug() << result << " bytes received";
+        qDebug() << "StatusRequest: " << result << " bytes received";
     if(buf[1]==OP_DFU::Status_Rep)
     {
         return (OP_DFU::Status)buf[6];
     }
     else
         return OP_DFU::abort;
-
-
 }
+
 bool OP_DFU::findDevices()
 {
     devices.clear();

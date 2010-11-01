@@ -13,7 +13,8 @@ HEADERS += uploadergadget.h \
     uploadergadgetwidget.h \
     uploaderplugin.h \
     op_dfu.h \
-    delay.h
+    delay.h \
+    devicewidget.h
 SOURCES += uploadergadget.cpp \
     uploadergadgetconfiguration.cpp \
     uploadergadgetfactory.cpp \
@@ -21,8 +22,10 @@ SOURCES += uploadergadget.cpp \
     uploadergadgetwidget.cpp \
     uploaderplugin.cpp \
     op_dfu.cpp \
-    delay.cpp
+    delay.cpp \
+    devicewidget.cpp
 OTHER_FILES += Uploader.pluginspec
 
 FORMS += \
-    uploader.ui
+    uploader.ui \
+    devicewidget.ui

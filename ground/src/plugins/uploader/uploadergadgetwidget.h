@@ -30,6 +30,8 @@
 
 #include "ui_uploader.h"
 #include "delay.h"
+#include "devicewidget.h"
+#include "op_dfu.h"
 
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"

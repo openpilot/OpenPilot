@@ -33,8 +33,9 @@
 #include <stdint.h>
 #include <QDebug>
 #include <QString>
+#include "rawhid_global.h"
 
-class pjrc_rawhid
+class RAWHID_EXPORT pjrc_rawhid
 {
 public:
     pjrc_rawhid();

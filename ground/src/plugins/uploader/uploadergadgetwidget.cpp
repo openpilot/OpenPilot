@@ -33,6 +33,8 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     currentStep = IAP_STATE_READY;
     resetOnly=false;
 
+    //m_config->systemElements->addTab((QWidget*)new deviceWidget(),QString("Device"));
+
     connect(m_config->haltButton, SIGNAL(clicked()), this, SLOT(goToBootloader()));
     connect(m_config->resetButton, SIGNAL(clicked()), this, SLOT(systemReset()));
 
@@ -62,7 +64,9 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
     case IAP_STATE_STEP_1:
         if (!success)  {
             log(QString("Oops, failure step 1"));
+            log("Reset did NOT happen");
             currentStep == IAP_STATE_READY;
+            disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
             break;
         }
         delay::msleep(600);
@@ -74,7 +78,9 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
     case IAP_STATE_STEP_2:
         if (!success) {
             log(QString("Oops, failure step 2"));
+            log("Reset did NOT happen");
             currentStep == IAP_STATE_READY;
+            disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
             break;
         }
         delay::msleep(600);
@@ -88,12 +94,13 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         if (success) {
             log("Oops, unexpected success step 3");
             log("Reset did NOT happen");
+            disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
             break;
         }
         // The board is now reset: we have to disconnect telemetry
         Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
         cm->disconnectDevice();
-        log(QString("Board Reset"));
+        log("Board Reset");
 
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
         disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
@@ -105,8 +112,29 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         RawHIDConnection *cnx =  pm->getObject<RawHIDConnection>();
         cnx->suspendPolling();
 
-    }
+        // Tell the mainboard to get into bootloader state:
+        log("Going into Bootloader mode...");
+        OP_DFU dfu(true);
+        dfu.AbortOperation();
+        if(!dfu.enterDFU(0))
+        {
+            log("Could not enter DFU mode.");
+        }
+        OP_DFU::Status ret=dfu.StatusRequest();
+        dfu.findDevices();
+        log(QString("Found ") + QString::number(dfu.numberOfDevices) + QString(" device(s)."));
+        // Delete all previous tabs:
+        for (int i=0; i< m_config->systemElements->count(); i++) {
+             QWidget *qw = m_config->systemElements->widget(i);
+             m_config->systemElements->removeTab(i);
+             delete qw;
+        }
+        for(int i=0;i<dfu.numberOfDevices;i++) {
+            deviceWidget* dw = new deviceWidget();
+            m_config->systemElements->addTab(dw, QString("Device") + QString::number(i));
 
+        }
+    }
     }
 
 }

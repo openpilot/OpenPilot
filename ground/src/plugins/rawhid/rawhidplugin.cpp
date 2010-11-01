@@ -98,9 +98,9 @@ QStringList RawHIDConnection::availableDevices()
     QMutexLocker locker(&m_enumMutex);
 
     QStringList devices;
-    pjrc_rawhid dev;
 
     if (enablePolling) {
+        pjrc_rawhid dev;
         //open all device we can
         int opened = dev.open(MAX_DEVICES, VID, PID, USAGE_PAGE, USAGE);
 

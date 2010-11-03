@@ -58,6 +58,7 @@ void deviceWidget::populate()
     myDevice->deviceACL->setText(QString("Access: ") + QString(r ? "R" : "-") + QString(w ? "W" : "-"));
     myDevice->maxCodeSize->setText(QString("Max code size: ") +QString::number(m_dfu->devices[deviceID].SizeOfCode));
     myDevice->fwCRC->setText(QString("FW CRC: ") + QString::number(m_dfu->devices[deviceID].FW_CRC));
+    myDevice->BLVersion->setText(QString("BL Version: ") + QString::number(m_dfu->devices[deviceID].BL_Version));
 
     int size=((OP_DFU::device)m_dfu->devices[deviceID]).SizeOfDesc;
     m_dfu->enterDFU(deviceID);
@@ -67,6 +68,26 @@ void deviceWidget::populate()
 
     myDevice->statusLabel->setText(QString("Ready..."));
 
+}
+
+/**
+  Freezes the contents of the widget so that a user cannot
+  try to modify the contents
+  */
+void deviceWidget::freeze()
+{
+   myDevice->description->setEnabled(false);
+   myDevice->updateButton->setEnabled(false);
+   myDevice->verifyButton->setEnabled(false);
+   myDevice->retrieveButton->setEnabled(false);
+}
+
+/**
+  Updates status message
+  */
+void deviceWidget::status(QString str)
+{
+    myDevice->statusLabel->setText(str);
 }
 
 /**
@@ -88,27 +109,29 @@ void deviceWidget::uploadFirmware()
     }
 
     bool verify = true;
+    QString filename = setOpenFileName();
 
+    if (filename.isEmpty()) {
+        status("Empty filename");
+        return;
+    }
 
-
-    /*
-                OP_DFU::Status retstatus=dfu.UploadFirmware(file.toAscii(),verify, device);
-                if(retstatus!=OP_DFU::Last_operation_Success)
-                {
-                    cout<<"Upload failed with code:"<<dfu.StatusToString(retstatus).toLatin1().data();
-                    return -1;
-                }
-                if(!description.isEmpty())
-                {
-                    retstatus=dfu.UploadDescription(description);
-                    if(retstatus!=OP_DFU::Last_operation_Success)
-                    {
-                        cout<<"Upload failed with code:"<<dfu.StatusToString(retstatus).toLatin1().data();
-                        return -1;
-                    }
-                }
-                cout<<"Uploading Succeded!\n";
-*/
+    status("Uploading firmware to device");
+    repaint(); // FW Upload is not threaded and will mostly freeze the UI...
+    connect(m_dfu, SIGNAL(progressUpdated(int)), this, SLOT(setProgress(int)));
+    OP_DFU::Status retstatus = m_dfu->UploadFirmware(filename.toAscii(),verify, deviceID);
+    if(retstatus != OP_DFU::Last_operation_Success) {
+        status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data());
+        return;
+    } else
+    if(!myDevice->description->text().isEmpty()) {
+        retstatus = m_dfu->UploadDescription(myDevice->description->text());
+        if( retstatus != OP_DFU::Last_operation_Success) {
+            status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data());
+            return;
+        }
+    }
+    status("Uploading Succeded!");
 }
 
 /**
@@ -126,4 +149,30 @@ void deviceWidget::downloadFirmware()
                 bool ret=dfu.SaveByteArrayToFile(file.toAscii(),dfu.StartDownload(size,OP_DFU::FW));
                 return ret;
 */
+}
+
+/**
+  Slot to update the progress bar
+  */
+void deviceWidget::setProgress(int percent)
+{
+    myDevice->progressBar->setValue(percent);
+}
+
+/**
+
+Opens an open file dialog.
+
+*/
+QString deviceWidget::setOpenFileName()
+{
+    QFileDialog::Options options;
+    QString selectedFilter;
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Select firmware file"),
+                                                    "",
+                                                    tr("All Files (*);;Firmware Files (*.bin)"),
+                                                    &selectedFilter,
+                                                    options);
+    return fileName;
 }

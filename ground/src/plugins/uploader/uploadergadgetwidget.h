@@ -42,7 +42,6 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QThread>
-#include <QFileDialog>
 #include <QMessageBox>
 
 
@@ -58,6 +57,7 @@ public:
 
 private:
      Ui_UploaderWidget *m_config;
+     OP_DFU *dfu;
      IAPStep currentStep;
      bool resetOnly;
      void log(QString str);
@@ -66,8 +66,6 @@ private:
      QLineEdit* openFileNameLE;
 
 private slots:
-    void setOpenFileName();
-    void send();
     void error(QString errorString,int errorNumber);
     void info(QString infoString,int infoNumber);
     void goToBootloader(UAVObject* = NULL, bool = false);

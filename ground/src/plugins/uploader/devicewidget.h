@@ -31,6 +31,8 @@
 #include "ui_devicewidget.h"
 #include "op_dfu.h"
 #include <QWidget>
+#include <QFileDialog>
+
 
 class deviceWidget : public QWidget
 {
@@ -40,11 +42,14 @@ public:
     void setDeviceID(int devID);
     void setDfu(OP_DFU* dfu);
     void populate();
+    void freeze();
+    QString setOpenFileName();
 
 private:
     Ui_deviceWidget *myDevice;
     int deviceID;
     OP_DFU *m_dfu;
+    void status(QString str);
 
 signals:
 
@@ -52,6 +57,7 @@ public slots:
     void verifyFirmware();
     void uploadFirmware();
     void downloadFirmware();
+    void setProgress(int);
 
 };
 

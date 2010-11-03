@@ -12,23 +12,13 @@
 using namespace std;
 #define BUF_LEN 64
 
-//Command Line Options
-#define DOWNLOAD            "-dn"    //done
-#define DEVICE              "-d"     //done
-//#define DOWNDESCRIPTION     "-dd"    //done
-#define PROGRAMFW           "-p"     //done
-#define PROGRAMDESC         "-w"     //done
-#define VERIFY              "-v"     //done
-#define COMPARECRC         "-cc"
-#define COMPAREALL          "-ca"
-#define STATUSREQUEST       "-s"    //done
-#define LISTDEVICES         "-ls"   //done
-#define RESET               "-r"
-#define JUMP                "-j"
 
-class OP_DFU
+class OP_DFU : public QObject
 {
-public:
+    Q_OBJECT;
+
+    public:
+
     enum TransferTypes
     {
         FW,
@@ -99,12 +89,15 @@ public:
             bool Writable;
     };
 
-    void JumpToApp();
-    void ResetDevice(void);
+    OP_DFU(bool debug);
+    ~OP_DFU();
+
+    int JumpToApp();
+    int ResetDevice(void);
     bool enterDFU(int const &devNumber);
     bool StartUpload(qint32  const &numberOfBytes, TransferTypes const & type,quint32 crc);
     bool UploadData(qint32 const & numberOfPackets,QByteArray  & data);
-    Status UploadDescription(QString  & description);
+    Status UploadDescription(QString description);
     Status UploadFirmware(const QString &sfile, const bool &verify,int device);
     Status StatusRequest();
     bool EndOperation();
@@ -114,7 +107,6 @@ public:
     bool SaveByteArrayToFile(QString const & file,QByteArray const &array);
     void CopyWords(char * source, char* destination, int count);
    // QByteArray DownloadData(int devNumber,int numberOfPackets);
-    OP_DFU(bool debug);
     bool findDevices();
     QList<device> devices;
     int numberOfDevices;
@@ -122,14 +114,17 @@ public:
     OP_DFU::Status CompareFirmware(const QString &sfile, const CompareType &type,int device);
     quint32 CRC32WideFast(quint32 Crc, quint32 Size, quint32 *Buffer);
     quint32 CRCFromQBArray(QByteArray array, quint32 Size);
-    void test();
+
     int send_delay;
     bool use_delay;
-    void AbortOperation(void);
+    int AbortOperation(void);
+
+signals:
+   void progressUpdated(int);
+
 private:
     bool debug;
     int RWFlags;
-
     pjrc_rawhid hidHandle;
     int setStartBit(int command){return command|0x20;}
 };

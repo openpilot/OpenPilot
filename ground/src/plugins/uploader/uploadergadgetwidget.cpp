@@ -32,6 +32,7 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     m_config->setupUi(this);
     currentStep = IAP_STATE_READY;
     resetOnly=false;
+    dfu = NULL;
 
     //m_config->systemElements->addTab((QWidget*)new deviceWidget(),QString("Device"));
 
@@ -118,28 +119,28 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
 
         // Tell the mainboard to get into bootloader state:
         log("Going into Bootloader mode...");
-        OP_DFU dfu(true);
-        dfu.AbortOperation();
-        if(!dfu.enterDFU(0))
+        dfu = new OP_DFU(false);
+        dfu->AbortOperation();
+        if(!dfu->enterDFU(0))
         {
             log("Could not enter DFU mode.");
             return;
         }
         m_config->boardStatus->setText("Bootloader");
         currentStep = IAP_STATE_BOOTLOADER;
-        //OP_DFU::Status ret=dfu.StatusRequest();
-        dfu.findDevices();
-        log(QString("Found ") + QString::number(dfu.numberOfDevices) + QString(" device(s)."));
+        //dfu.StatusRequest();
+        dfu->findDevices();
+        log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
         // Delete all previous tabs:
         for (int i=0; i< m_config->systemElements->count(); i++) {
              QWidget *qw = m_config->systemElements->widget(i);
              m_config->systemElements->removeTab(i);
              delete qw;
         }
-        for(int i=0;i<dfu.numberOfDevices;i++) {
+        for(int i=0;i<dfu->numberOfDevices;i++) {
             deviceWidget* dw = new deviceWidget(this);
             dw->setDeviceID(i);
-            dw->setDfu(&dfu);
+            dw->setDfu(dfu);
             dw->populate();
             m_config->systemElements->addTab(dw, QString("Device") + QString::number(i));
         }
@@ -175,15 +176,16 @@ void UploaderGadgetWidget::systemBoot()
 {
     if (currentStep == IAP_STATE_BOOTLOADER) {
         clearLog();
-        OP_DFU dfu(true);
-        dfu.AbortOperation();
-        if(!dfu.enterDFU(0))
+        if (!dfu)
+            dfu = new OP_DFU(true);
+        dfu->AbortOperation();
+        if(!dfu->enterDFU(0))
         {
             log("Could not enter DFU mode.");
             return;
         }
         log("Booting system...");
-        dfu.JumpToApp();
+        dfu->JumpToApp();
         currentStep = IAP_STATE_READY;
         // stop the polling thread: otherwise it will mess up DFU
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -193,6 +195,14 @@ void UploaderGadgetWidget::systemBoot()
         m_config->haltButton->setEnabled(true);
         m_config->resetButton->setEnabled(true);
         m_config->boardStatus->setText("Running");
+        // Freeze the tabs, they are not useful anymore and their buttons
+        // will cause segfaults or weird stuff if we use them.
+        for (int i=0; i< m_config->systemElements->count(); i++) {
+             deviceWidget *qw = (deviceWidget*)m_config->systemElements->widget(i);
+             qw->freeze();
+        }
+
+        delete dfu;
 
     } else {
         log("Not in bootloader mode!");
@@ -214,35 +224,12 @@ void UploaderGadgetWidget::clearLog()
     m_config->textBrowser->clear();
 }
 
-//user pressed send, send file using a new thread with qymodem library
-void UploaderGadgetWidget::send()
-{
-
-}
-//destructor !!?! do I need to delete something else?
 UploaderGadgetWidget::~UploaderGadgetWidget()
 {
-}
-
-
-/**
-
-Opens an open file dialog.
-
-*/
-void UploaderGadgetWidget::setOpenFileName()
-{
-    QFileDialog::Options options;
-    QString selectedFilter;
-    QString fileName = QFileDialog::getOpenFileName(this,
-                                                    tr("QFileDialog::getOpenFileName()"),
-                                                    openFileNameLE->text(),
-                                                    tr("All Files (*);;Text Files (*.bin)"),
-                                                    &selectedFilter,
-                                                    options);
-    if (!fileName.isEmpty()) openFileNameLE->setText(fileName);
 
 }
+
+
 /**
 Shows a message box with an error string.
 

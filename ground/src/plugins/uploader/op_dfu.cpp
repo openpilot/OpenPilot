@@ -24,6 +24,11 @@ OP_DFU::OP_DFU(bool _debug): debug(_debug)
         qDebug() << numDevices << " device(s) opened";
 }
 
+OP_DFU::~OP_DFU()
+{
+
+}
+
 bool OP_DFU::SaveByteArrayToFile(QString const & sfile, const QByteArray &array)
 {
     QFile file(sfile);
@@ -147,7 +152,7 @@ bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray  & data)
         //        }
         // qDebug()<<" Data0="<<(int)data[0]<<" Data0="<<(int)data[1]<<" Data0="<<(int)data[2]<<" Data0="<<(int)data[3]<<" buf6="<<(int)buf[6]<<" buf7="<<(int)buf[7]<<" buf8="<<(int)buf[8]<<" buf9="<<(int)buf[9];
         //delay::msleep(send_delay);
-        if(int ret=StatusRequest()!=OP_DFU::uploading) return false;
+        if(StatusRequest()!=OP_DFU::uploading) return false;
         int result = hidHandle.send(0,buf, BUF_LEN, 5000);
      //   qDebug()<<"sent:"<<result;
         if(result<1)
@@ -162,7 +167,7 @@ bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray  & data)
     // while(true){}
     return true;
 }
-OP_DFU::Status OP_DFU::UploadDescription(QString  & description)
+OP_DFU::Status OP_DFU::UploadDescription(QString description)
 {
      cout<<"Starting uploading description\n";
     if(description.length()%4!=0)
@@ -191,6 +196,9 @@ OP_DFU::Status OP_DFU::UploadDescription(QString  & description)
         qDebug()<<"Upload description Status="<<ret;
     return (OP_DFU::Status)ret;
 }
+
+
+
 QString OP_DFU::DownloadDescription(int const & numberOfChars)
 {
     // enterDFU(devNumber);
@@ -199,26 +207,7 @@ QString OP_DFU::DownloadDescription(int const & numberOfChars)
     return str;
 
 }
-void OP_DFU::test()
-{
-    char buf[BUF_LEN];
-    int result;
-    buf[0]=0x02;
-    buf[1]=11;
-    buf[2]=11;
-    buf[63]=333;
-    while(true)
-    {
-        buf[0]=0x02;
-        ++buf[1];
-        ++buf[2];
-        ++buf[63];
-        hidHandle.send(0,buf,BUF_LEN,5000);
-        result = hidHandle.receive(0,buf,BUF_LEN,5000);
 
-        qDebug()<<"Result="<<result;
-        qDebug()<<(int)buf[0]<<":"<<(int)buf[1]<<":"<<(int)buf[2]<<":"<<(int)buf[63];
-    }}
 
 QByteArray OP_DFU::StartDownload(qint32 const & numberOfBytes, TransferTypes const & type)
 {
@@ -275,7 +264,8 @@ QByteArray OP_DFU::StartDownload(qint32 const & numberOfBytes, TransferTypes con
     StatusRequest();
     return ret;
 }
-void OP_DFU::ResetDevice(void)
+
+int OP_DFU::ResetDevice(void)
 {
     char buf[BUF_LEN];
     buf[0] =0x02;//reportID
@@ -288,9 +278,10 @@ void OP_DFU::ResetDevice(void)
     buf[7] = 0;
     buf[8] = 0;
     buf[9] = 0;
-    int result = hidHandle.send(0,buf, BUF_LEN, 500);
+    return hidHandle.send(0,buf, BUF_LEN, 500);
 }
-void OP_DFU::AbortOperation(void)
+
+int OP_DFU::AbortOperation(void)
 {
     char buf[BUF_LEN];
     buf[0] =0x02;//reportID
@@ -303,9 +294,10 @@ void OP_DFU::AbortOperation(void)
     buf[7] = 0;
     buf[8] = 0;
     buf[9] = 0;
-    int result = hidHandle.send(0,buf, BUF_LEN, 500);
+    return hidHandle.send(0,buf, BUF_LEN, 500);
 }
-void OP_DFU::JumpToApp()
+
+int OP_DFU::JumpToApp()
 {
     char buf[BUF_LEN];
     buf[0] =0x02;//reportID
@@ -319,7 +311,7 @@ void OP_DFU::JumpToApp()
     buf[8] = 0;
     buf[9] = 0;
 
-    int result = hidHandle.send(0,buf, BUF_LEN, 500);
+    return hidHandle.send(0,buf, BUF_LEN, 500);
 }
 
 OP_DFU::Status OP_DFU::StatusRequest()
@@ -658,6 +650,8 @@ QString OP_DFU::StatusToString(OP_DFU::Status const & status)
 }
 void OP_DFU::printProgBar( int const & percent,QString const& label){
     std::string bar;
+
+    emit(progressUpdated(percent));
 
     for(int i = 0; i < 50; i++){
         if( i < (percent/2)){

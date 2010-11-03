@@ -108,6 +108,7 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     ServoZText->setFont(serifFont);
     m_ccpm->SwashplateImage->scene()->addItem(ServoZText);
 
+    m_ccpm->PitchCurve->setMin(-1);
 
     resetMixer(m_ccpm->PitchCurve, 5);
     resetMixer(m_ccpm->ThrottleCurve, 5);
@@ -138,6 +139,7 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->count() - 1);
     requestccpmUpdate();
     UpdateCurveSettings();
+
 
     //disable changing number of points in curves until UAVObjects have more than 5
     m_ccpm->NumCurvePoints->setEnabled(0);
@@ -348,7 +350,7 @@ void ConfigccpmWidget::UpdateCurveWidgets()
     if (Changed==1)m_ccpm->PitchCurve->setCurve(curveValues);
 }
 
-void ConfigccpmWidget::updatePitchCurveValue(QList<double> curveValues,double Value)
+void ConfigccpmWidget::updatePitchCurveValue(QList<double> curveValues0,double Value0)
 {
     int NumCurvePoints,i;
     double CurrentValue;
@@ -362,7 +364,6 @@ void ConfigccpmWidget::updatePitchCurveValue(QList<double> curveValues,double Va
         CurrentValue=m_ccpm->CurveSettings->item(i, 1 )->text().toDouble();
         if (CurrentValue!=internalCurveValues[i])
         {
-            //m_ccpm->CurveSettings->item(i, 1)->setText(tr( "%1" ).arg(internalCurveValues[i]));
             m_ccpm->CurveSettings->item(i, 1)->setText(QString().sprintf("%.3f",internalCurveValues.at(i)));
         }
 
@@ -370,20 +371,21 @@ void ConfigccpmWidget::updatePitchCurveValue(QList<double> curveValues,double Va
 
 }
 
-void ConfigccpmWidget::updateThrottleCurveValue(QList<double> curveValues,double Value)
+void ConfigccpmWidget::updateThrottleCurveValue(QList<double> curveValues0,double Value0)
 {
     int NumCurvePoints,i;
     double CurrentValue;
+    QList<double> internalCurveValues;
     //get the user settings
     NumCurvePoints=m_ccpm->NumCurvePoints->value();
+    internalCurveValues=m_ccpm->ThrottleCurve->getCurve();
 
-    for (i=0; i<curveValues.length(); i++)
+    for (i=0; i<internalCurveValues.length(); i++)
     {
         CurrentValue=m_ccpm->CurveSettings->item(i, 1 )->text().toDouble();
-        if (CurrentValue!=curveValues[i])
+        if (CurrentValue!=internalCurveValues[i])
         {
-            //m_ccpm->CurveSettings->item(i, 0)->setText(tr( "%1" ).arg(curveValues[i]));
-            m_ccpm->CurveSettings->item(i, 0)->setText(QString().sprintf("%.3f",curveValues.at(i)));
+            m_ccpm->CurveSettings->item(i, 0)->setText(QString().sprintf("%.3f",internalCurveValues.at(i)));
         }
 
     }
@@ -518,7 +520,7 @@ void ConfigccpmWidget::UpdateCurveSettings()
         m_ccpm->ccpmGenerateCurve->setVisible(false);
         m_ccpm->CurveToGenerate->setVisible(false);
     }
-
+UpdateCurveWidgets();
 
 }
 void ConfigccpmWidget::GenerateCurve()
@@ -1017,14 +1019,14 @@ void ConfigccpmWidget::requestccpmUpdate()
     field = obj->getField(QString("ThrottleCurve1"));
     for (i=0;i<5;i++)
     {
-        m_ccpm->CurveSettings->item(i, 0)->setText(field->getValue(i).toString());
-        //field->setValue(m_ccpm->CurveSettings->item(i, 0)->text().toDouble(),i);
+        m_ccpm->CurveSettings->item(i, 0)->setText(QString().sprintf("%.3f",field->getValue(i).toDouble()));
+        //m_ccpm->CurveSettings->item(i, 0)->setText(field->getValue(i).toString());
     }
     field = obj->getField(QString("ThrottleCurve2"));
     for (i=0;i<5;i++)
     {
-        m_ccpm->CurveSettings->item(i, 1)->setText(field->getValue(i).toString());
-        //field->setValue(m_ccpm->CurveSettings->item(i, 1)->text().toDouble(),i);
+        m_ccpm->CurveSettings->item(i, 1)->setText(QString().sprintf("%.3f",field->getValue(i).toDouble()));
+        //m_ccpm->CurveSettings->item(i, 1)->setText(field->getValue(i).toString());
     }
 
 

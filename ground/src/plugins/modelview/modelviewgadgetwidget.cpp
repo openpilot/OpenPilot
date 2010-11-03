@@ -289,17 +289,37 @@ void ModelViewGadgetWidget::keyPressEvent(QKeyEvent * e) // switch between camer
 //////////////////////////////////////////////////////////////////////
 void ModelViewGadgetWidget::updateAttitude()
 {
-    AttitudeActual::DataFields data = attActual->getData();
-    GLC_StructOccurence* rootObject= m_World.rootOccurence();
-    GLC_Matrix4x4 rootObjectPosition(0, 0, 0); // will be changed when the acceleration movement is tested
-    double pitch= glc::toRadian(-data.Pitch);
-    double roll= glc::toRadian(data.Roll);
-    double yaw= glc::toRadian(-data.Yaw);
-    GLC_Matrix4x4 rootObjectRotation(GLC_Matrix4x4().fromEuler(pitch, roll, yaw));
-    rootObject->structInstance()->setMatrix(rootObjectPosition * rootObjectRotation);
+    AttitudeActual::DataFields data = attActual->getData(); // get attitude data
+    GLC_StructOccurence* rootObject= m_World.rootOccurence(); // get the full 3D model
+    // create quaternions rotations for each axis
+    QQuaternion qX= QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),data.Pitch);
+    QQuaternion qY= QQuaternion::fromAxisAndAngle(QVector3D(0,1,0),data.Roll);
+    QQuaternion qZ= QQuaternion::fromAxisAndAngle(QVector3D(0,0,1),data.Yaw);
+    QQuaternion quat= qX * qY * qZ; // create the quaternion of all the rotations
+    // pass values to simpler variables
+    double x= quat.vector().x();
+    double y= quat.vector().y();
+    double z= quat.vector().z();
+    double w= quat.scalar();
+    // create and gives the product of 2 4x4 matrices to get the rotation of the 3D model's matrix
+    QMatrix4x4 m1;
+    m1.setRow(0, QVector4D(w,z,-y,x));
+    m1.setRow(1, QVector4D(-z,w,x,y));
+    m1.setRow(2, QVector4D(y,-x,w,z));
+    m1.setRow(3, QVector4D(-x,-y,-z,w));
+    QMatrix4x4 m2;
+    m2.setRow(0, QVector4D(w,z,-y,-x));
+    m2.setRow(1, QVector4D(-z,w,x,-y));
+    m2.setRow(2, QVector4D(y,-x,w,-z));
+    m2.setRow(3, QVector4D(x,y,z,w));
+    QMatrix4x4 m0= m1 * m2;
+    // convert QMatrix4x4 to GLC_Matrix4x4
+    GLC_Matrix4x4 rootObjectRotation;
+    for (int i=0; i<16; i++){
+        rootObjectRotation.data()[i]= m0.data()[i];
+    }
+    // sets and updates the 3D model's matrix
+    rootObject->structInstance()->setMatrix(rootObjectRotation);
     rootObject->updateChildrenAbsoluteMatrix();
     updateGL();
 }
-
-
-

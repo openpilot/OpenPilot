@@ -72,6 +72,8 @@ SUBDIRS += plugin_modelview
 #Uploader Gadget
 plugin_uploader.subdir = uploader
 plugin_uploader.depends = plugin_coreplugin
+plugin_modelview.depends = plugin_uavobjects
+plugin_modelview.depends = plugin_rawhid
 SUBDIRS += plugin_uploader
 
 #Dial Gadget

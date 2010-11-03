@@ -49,6 +49,9 @@ private:
 signals:
 
 public slots:
+    void verifyFirmware();
+    void uploadFirmware();
+    void downloadFirmware();
 
 };
 

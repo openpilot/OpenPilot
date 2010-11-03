@@ -26,10 +26,10 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="0" colspan="2">
+     <item row="7" column="0" colspan="2">
       <widget class="QProgressBar" name="progressBar">
        <property name="value">
-        <number>24</number>
+        <number>0</number>
        </property>
       </widget>
      </item>
@@ -40,28 +40,14 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="6" column="1">
       <widget class="QLabel" name="maxCodeSize">
        <property name="text">
         <string>MaxCodeSize</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="fwCRC">
-       <property name="text">
-        <string>fwCRC</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLabel" name="BLVersion">
-       <property name="text">
-        <string>BootLoaderVersion</string>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="0" colspan="4">
+     <item row="8" column="0" colspan="4">
       <widget class="QLabel" name="statusLabel">
        <property name="font">
         <font>
@@ -74,7 +60,7 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="2">
+     <item row="3" column="2" rowspan="2">
       <widget class="QGraphicsView" name="devicePicture">
        <property name="maximumSize">
         <size>
@@ -84,24 +70,38 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="2">
+     <item row="5" column="2">
       <widget class="QPushButton" name="verifyButton">
        <property name="text">
         <string>Verify...</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="2">
+     <item row="6" column="2">
       <widget class="QPushButton" name="updateButton">
        <property name="text">
         <string>Update...</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="2">
+     <item row="7" column="2">
       <widget class="QPushButton" name="retrieveButton">
        <property name="text">
         <string>Retrieve...</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="BLVersion">
+       <property name="text">
+        <string>BootLoaderVersion</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="fwCRC">
+       <property name="text">
+        <string>fwCRC</string>
        </property>
       </widget>
      </item>

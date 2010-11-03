@@ -10,7 +10,6 @@ SUBDIRS   = \
     qextserialport \
     utils \
     glc_lib\
-    qymodem \
     sdlgamepad \
     libqxt
 

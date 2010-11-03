@@ -48,6 +48,8 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
    */
 void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
 {
+    Q_UNUSED(callerObj);
+
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     UAVObject *fwIAP = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("FirmwareIAPObj")));
@@ -66,7 +68,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         if (!success)  {
             log(QString("Oops, failure step 1"));
             log("Reset did NOT happen");
-            currentStep == IAP_STATE_READY;
+            currentStep = IAP_STATE_READY;
             disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
             break;
         }
@@ -80,7 +82,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         if (!success) {
             log(QString("Oops, failure step 2"));
             log("Reset did NOT happen");
-            currentStep == IAP_STATE_READY;
+            currentStep = IAP_STATE_READY;
             disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
             break;
         }
@@ -90,7 +92,8 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         fwIAP->updated();
         log(QString("IAP Step 3"));
         break;
-    case IAP_STEP_RESET: {
+    case IAP_STEP_RESET:
+    {
         currentStep = IAP_STATE_READY;
         if (success) {
             log("Oops, unexpected success step 3");
@@ -124,7 +127,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         }
         m_config->boardStatus->setText("Bootloader");
         currentStep = IAP_STATE_BOOTLOADER;
-        OP_DFU::Status ret=dfu.StatusRequest();
+        //OP_DFU::Status ret=dfu.StatusRequest();
         dfu.findDevices();
         log(QString("Found ") + QString::number(dfu.numberOfDevices) + QString(" device(s)."));
         // Delete all previous tabs:
@@ -144,7 +147,12 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         m_config->resetButton->setEnabled(false);
         m_config->bootButton->setEnabled(true);
     }
+        break;
+    case IAP_STATE_BOOTLOADER:
+        // We should never end up here anyway.
+        break;
     }
+
 }
 
 /**
@@ -209,49 +217,14 @@ void UploaderGadgetWidget::clearLog()
 //user pressed send, send file using a new thread with qymodem library
 void UploaderGadgetWidget::send()
 {
-    Ymodem->SendFileT(openFileNameLE->text());
+
 }
 //destructor !!?! do I need to delete something else?
 UploaderGadgetWidget::~UploaderGadgetWidget()
 {
-    delete Port;
-    delete Ymodem;
 }
 
-//from load configuration, creates a new qymodemsend class with the the port
-/**
-Cteates a new qymodemsend class.
 
-@param port	The serial port to use.
-
-
-*/
-void UploaderGadgetWidget::setPort(QextSerialPort* port)
-{
-
-    Port=port;
-    Ymodem=new QymodemSend(*Port);
-    //only now can we connect this signals
-    //signals errors
-    connect(Ymodem,SIGNAL(Error(QString,int))
-            ,this,SLOT(error(QString,int)));
-    //signals new information
-    connect(Ymodem,SIGNAL(Information(QString,int)),
-            this,SLOT(info(QString,int)));
-    //signals new percentage value
-    connect(Ymodem,SIGNAL(Percent(int)),
-            this,SLOT(updatePercSlot(int)));
-}
-/**
-Updates progress bar value.
-
-@param i	New percentage value.
-
-*/
-void UploaderGadgetWidget::updatePercSlot(int i)
-{
-    progressBar->setValue(i);
-}
 /**
 
 Opens an open file dialog.
@@ -280,11 +253,12 @@ Shows a message box with an error string.
 */
 void UploaderGadgetWidget::error(QString errorString, int errorNumber)
 {
+    Q_UNUSED(errorNumber);
     QMessageBox msgBox;
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.setText(errorString);
     msgBox.exec();
-    status->setText(errorString);
+    m_config->boardStatus->setText(errorString);
 }
 /**
 Shows a message box with an information string.
@@ -296,5 +270,6 @@ Shows a message box with an information string.
 */
 void UploaderGadgetWidget::info(QString infoString, int infoNumber)
 {
-    status->setText(infoString);
+    Q_UNUSED(infoNumber);
+    m_config->boardStatus->setText(infoString);
 }

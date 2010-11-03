@@ -39,16 +39,11 @@
 
 #include "rawhid/rawhidplugin.h"
 #include <QtGui/QWidget>
-#include <qextserialport/src/qextserialport.h>
-#include <qymodem/src/qymodemsend.h>
 #include <QLabel>
 #include <QLineEdit>
 #include <QThread>
-#include <QProgressBar>
-#include <QStringList>
 #include <QFileDialog>
 #include <QMessageBox>
-//using namespace qmapcontrol;
 
 
 class UploaderGadgetWidget : public QWidget
@@ -60,8 +55,6 @@ public:
    ~UploaderGadgetWidget();
     typedef enum { IAP_STATE_READY, IAP_STATE_STEP_1, IAP_STATE_STEP_2, IAP_STEP_RESET, IAP_STATE_BOOTLOADER} IAPStep;
 
-   void setPort(QextSerialPort* port);
-
 
 private:
      Ui_UploaderWidget *m_config;
@@ -71,18 +64,12 @@ private:
      void clearLog();
 
      QLineEdit* openFileNameLE;
-     QextSerialPort *Port;
-     QLabel* status;
-     QymodemSend * Ymodem;
-     QProgressBar *progressBar;
-     QTimer *timer;
 
 private slots:
     void setOpenFileName();
     void send();
     void error(QString errorString,int errorNumber);
     void info(QString infoString,int infoNumber);
-    void updatePercSlot(int);
     void goToBootloader(UAVObject* = NULL, bool = false);
     void systemReset();
     void systemBoot();

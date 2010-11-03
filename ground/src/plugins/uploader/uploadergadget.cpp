@@ -27,8 +27,6 @@
 #include "uploadergadget.h"
 #include "uploadergadgetwidget.h"
 #include "uploadergadgetconfiguration.h"
-#include <qextserialport/src/qextserialport.h>
-#include <qextserialport/src/qextserialenumerator.h>
 
 UploaderGadget::UploaderGadget(QString classId,  UploaderGadgetWidget *widget, QWidget *parent) :
         IUAVGadget(classId, parent),
@@ -47,15 +45,5 @@ UploaderGadget::~UploaderGadget()
 void UploaderGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
     UploaderGadgetConfiguration *m = qobject_cast< UploaderGadgetConfiguration*>(config);
-    PortSettings portsettings;
-    portsettings.BaudRate=m->Speed();
-    portsettings.DataBits=m->DataBits();
-    portsettings.FlowControl=m->Flow();
-    portsettings.Parity=m->Parity();
-    portsettings.StopBits=m->StopBits();
-    portsettings.Timeout_Millisec=m->TimeOut();
-    //Creates new serial port with the user configuration and passes it to the widget
-    QextSerialPort *port=new QextSerialPort(m->Port(),portsettings,QextSerialPort::Polling);
-    m_widget->setPort(port);
 }
 

@@ -31,6 +31,10 @@ deviceWidget::deviceWidget(QWidget *parent) :
 {
     myDevice = new Ui_deviceWidget();
     myDevice->setupUi(this);
+
+    connect(myDevice->verifyButton, SIGNAL(clicked()), this, SLOT(verifyFirmware()));
+    connect(myDevice->retrieveButton, SIGNAL(clicked()), this, SLOT(downloadFirmware()));
+    connect(myDevice->updateButton, SIGNAL(clicked()), this, SLOT(uploadFirmware()));
 }
 
 void deviceWidget::setDeviceID(int devID){
@@ -48,15 +52,78 @@ void deviceWidget::setDfu(OP_DFU *dfu)
 void deviceWidget::populate()
 {
     int id = m_dfu->devices[deviceID].ID;
-    myDevice->deviceID->setText(QString("ID: ") + QString::number(id));
+    myDevice->deviceID->setText(QString("Device ID: ") + QString::number(id));
     bool r = m_dfu->devices[deviceID].Readable;
     bool w = m_dfu->devices[deviceID].Writable;
-    myDevice->deviceACL->setText(r ? "R" : "-" +  w ? "W" : "-");
+    myDevice->deviceACL->setText(QString("Access: ") + QString(r ? "R" : "-") + QString(w ? "W" : "-"));
+    myDevice->maxCodeSize->setText(QString("Max code size: ") +QString::number(m_dfu->devices[deviceID].SizeOfCode));
+    myDevice->fwCRC->setText(QString("FW CRC: ") + QString::number(m_dfu->devices[deviceID].FW_CRC));
+
     int size=((OP_DFU::device)m_dfu->devices[deviceID]).SizeOfDesc;
     m_dfu->enterDFU(deviceID);
     QString str = m_dfu->DownloadDescription(size);
     myDevice->description->setMaxLength(size);
     myDevice->description->setText(str.left(str.indexOf(QChar(255))));
 
+    myDevice->statusLabel->setText(QString("Ready..."));
 
+}
+
+/**
+  Verifies the firmware CRC
+  */
+void deviceWidget::verifyFirmware()
+{
+
+}
+
+/**
+  Sends a firmware to the device
+  */
+void deviceWidget::uploadFirmware()
+{
+    if (!m_dfu->devices[deviceID].Writable) {
+        myDevice->statusLabel->setText(QString("Device not writable!"));
+        return;
+    }
+
+    bool verify = true;
+
+
+
+    /*
+                OP_DFU::Status retstatus=dfu.UploadFirmware(file.toAscii(),verify, device);
+                if(retstatus!=OP_DFU::Last_operation_Success)
+                {
+                    cout<<"Upload failed with code:"<<dfu.StatusToString(retstatus).toLatin1().data();
+                    return -1;
+                }
+                if(!description.isEmpty())
+                {
+                    retstatus=dfu.UploadDescription(description);
+                    if(retstatus!=OP_DFU::Last_operation_Success)
+                    {
+                        cout<<"Upload failed with code:"<<dfu.StatusToString(retstatus).toLatin1().data();
+                        return -1;
+                    }
+                }
+                cout<<"Uploading Succeded!\n";
+*/
+}
+
+/**
+  Retrieves the firmware from the device
+  */
+void deviceWidget::downloadFirmware()
+{
+    if (!m_dfu->devices[deviceID].Readable) {
+        myDevice->statusLabel->setText(QString("Device not readable!"));
+        return;
+    }
+
+    /*
+                qint32 size=((OP_DFU::device)dfu.devices[device]).SizeOfCode;
+                bool ret=dfu.SaveByteArrayToFile(file.toAscii(),dfu.StartDownload(size,OP_DFU::FW));
+                return ret;
+*/
 }

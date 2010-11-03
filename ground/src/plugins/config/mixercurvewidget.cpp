@@ -56,6 +56,11 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setRenderHint(QPainter::Antialiasing);
 
+    curveMin=0.0;
+    curveMax=1.0;
+
+
+
     QGraphicsScene *scene = new QGraphicsScene(this);
     QSvgRenderer *renderer = new QSvgRenderer();
     plot = new QGraphicsSvgItem();
@@ -109,10 +114,12 @@ void MixerCurveWidget::initCurve(QList<double> points)
         scene()->addItem(node);
         nodeList.append(node);
         double val = points.at(i);
-        if (val>1)
-                val=1;
-        if (val<0)
-                val=0;
+        if (val>curveMax)
+                val=curveMax;
+        if (val<curveMin)
+                val=curveMin;
+        val+=curveMin;
+        val/=(curveMax-curveMin);
         node->setPos(w*i,h-val*h);
         node->verticalMove(true);
     }
@@ -133,7 +140,7 @@ QList<double> MixerCurveWidget::getCurve() {
 
     qreal h = plot->boundingRect().height();
     foreach(Node *node, nodeList) {
-        list.append((h-node->pos().y())/h);
+        list.append(((curveMax-curveMin)*(h-node->pos().y())/h)+curveMin);
     }
 
     return list;
@@ -154,10 +161,12 @@ void MixerCurveWidget::setCurve(QList<double> points)
         qreal h = plot->boundingRect().height();
         for (int i=0; i<points.length(); i++) {
             double val = points.at(i);
-            if (val>1)
-                    val=1;
-            if (val<0)
-                    val=0;
+            if (val>curveMax)
+                    val=curveMax;
+            if (val<curveMin)
+                    val=curveMin;
+            val-=curveMin;
+            val/=(curveMax-curveMin);
             nodeList.at(i)->setPos(w*i,h-val*h);
         }
     }
@@ -186,4 +195,18 @@ void MixerCurveWidget::itemMoved(double itemValue)
 {
     QList<double> list = getCurve();
     emit curveUpdated(list, itemValue);
+}
+
+void MixerCurveWidget::setMin(double value)
+{
+    curveMin = value;
+}
+void MixerCurveWidget::setMax(double value)
+{
+    curveMax = value;
+}
+void MixerCurveWidget::setRange(double min, double max)
+{
+    curveMin = min;
+    curveMax = max;
 }

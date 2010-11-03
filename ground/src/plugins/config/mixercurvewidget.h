@@ -46,6 +46,9 @@ public:
    void initCurve (QList<double> points);
    QList<double> getCurve();
    void setCurve(QList<double>);
+   void setMin(double value);
+   void setMax(double value);
+   void setRange(double min, double max);
 
 signals:
    void curveUpdated(QList<double>, double );
@@ -55,6 +58,8 @@ private slots:
 private:
    QGraphicsSvgItem *plot;
    QList<Node*> nodeList;
+   double curveMin;
+   double curveMax;
 
 protected:
     void showEvent(QShowEvent *event);

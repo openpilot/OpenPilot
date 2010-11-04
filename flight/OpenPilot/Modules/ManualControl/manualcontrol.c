@@ -48,6 +48,8 @@
 #define UPDATE_PERIOD_MS 20
 #define THROTTLE_FAILSAFE -0.1
 #define FLIGHT_MODE_LIMIT 1.0/3.0
+#define ARMED_TIMEOUT_MS   30000
+#define ARMED_TIME_MS      1000
 //safe band to allow a bit of calibration error or trim offset (in microseconds)
 #define CONNECTION_OFFSET 150
 
@@ -59,6 +61,7 @@ static xTaskHandle taskHandle;
 // Private functions
 static void manualControlTask(void *parameters);
 static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutral);
+static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time);
 
 /**
  * Module initialization
@@ -83,6 +86,9 @@ static void manualControlTask(void *parameters)
 	AttitudeDesiredData attitude;
 	portTickType lastSysTime;
 	portTickType armedDisarmStart = 0;
+	portTickType lowThrottleStart = 0;
+	uint8_t lowThrottleDetected = 0;
+	
 	float flightMode;
 
 	uint8_t disconnected_count = 0;
@@ -222,6 +228,7 @@ static void manualControlTask(void *parameters)
 			// setting and the get command will pull the right values from telemetry
 		} else
 			ManualControlCommandGet(&cmd);	/* Under GCS control */
+		
 
 		// Implement hysteresis loop on connection status
 		// Must check both Max and Min in case they reversed
@@ -258,6 +265,14 @@ static void manualControlTask(void *parameters)
 			ManualControlCommandSet(&cmd);
 		}
 
+		if(cmd.Throttle < 0 && !lowThrottleDetected) {
+			lowThrottleDetected = 1;
+			lowThrottleStart = lastSysTime;
+		} else if (cmd.Throttle)  
+			lowThrottleDetected = 0;
+		else if((cmd.Throttle < 0) && (timeDifferenceMs(lowThrottleStart, lastSysTime) > ARMED_TIMEOUT_MS)) 
+			cmd.Armed = MANUALCONTROLCOMMAND_ARMED_FALSE;
+			
 		/* Look for arm or disarm signal */
 		if ((cmd.Throttle <= 0.05) && (cmd.Roll <= -0.95)) {
 			if ((armedDisarmStart == 0) || (lastSysTime < armedDisarmStart))	// store when started, deal with rollover
@@ -327,6 +342,13 @@ static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutr
 	}
 	return valueScaled;
 }
+
+static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time) {
+	if(end_time > start_time) 
+		return (end_time - start_time) / portTICK_RATE_MS;
+	return ((((portTICK_RATE_MS) -1) - start_time) + end_time) / portTICK_RATE_MS;		
+}
+			   
 
 /**
   * @}

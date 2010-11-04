@@ -1,0 +1,58 @@
+This is the Milestones file of the OpenPilot project, its intent is to record the major accomplishments achieved by people using the OpenPilot platform and who gets the karma for performing them.  
+
+
+The CREDITS.txt in SVN records the developers and the achievements made by each individual; this file is different as it is aimed at recording and giving credit to the people who achieve milestones in the use of OpenPilot. 
+
+
+The fields are: 
+
+Milestone description (M) 
+Credited to (C)
+Date (D)
+Video (V) - Optional link to video showing milestone
+
+
+M: OpenPilot driving EagleTree OSD
+C: Frederic Goddeeris
+D: August 2010
+V: http://vimeo.com/13659819
+
+M: First stabilised fixed wing flight
+C: Edouard Lafargue 
+D: September 2010
+
+M: First stabilised Quad flight
+C: James Cotton
+D: September 2010
+
+M: First stabilised Tri-Copter flight
+C: Gary Mortimer
+D: October 2010
+
+M: First communication between by PipX modems
+C: Cathy Moss
+D: October 2010
+
+M: First OpenPilot night flight
+C: Dale Schintock
+D: October 2010
+V: http://www.youtube.com/watch?v=yk8ckeRMV8U
+
+An incomplete list of some future Milestones is below:
+
+* First Helicopter flight with OpenPilot 
+* First Hexa flight with OpenPilot
+* First Octo flight with OpenPilot
+* First successful position hold
+* First successful flight using the GCS only and no RC TX
+* First use of Magic Waypoint
+* First Flybarless Helicopter flight with OpenPilot
+* First intentional Quad flip with OpenPilot
+* First flight with CopterControl
+* First fixed wing navigation flight
+* First Multirotor navigation flight
+* First Helicopter navigation flight
+* First over 1km navigation flight
+* First over 5km navigation flight
+* First "Follow Me" navigation flight
+

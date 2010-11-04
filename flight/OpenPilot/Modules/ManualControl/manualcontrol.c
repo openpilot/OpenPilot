@@ -275,14 +275,14 @@ static void manualControlTask(void *parameters)
 			
 		/* Look for arm or disarm signal */
 		if ((cmd.Throttle <= 0.05) && (cmd.Roll <= -0.95)) {
-			if ((armedDisarmStart == 0) || (lastSysTime < armedDisarmStart))	// store when started, deal with rollover
+			if (armedDisarmStart == 0)	// store when started, deal with rollover
 				armedDisarmStart = lastSysTime;
-			else if ((lastSysTime - armedDisarmStart) > (1000 * portTICK_RATE_MS))
+			else if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
 				cmd.Armed = MANUALCONTROLCOMMAND_ARMED_TRUE;
 		} else if ((cmd.Throttle <= 0.05) && (cmd.Roll >= 0.95)) {
-			if ((armedDisarmStart == 0) || (lastSysTime < armedDisarmStart))	// store when started, deal with rollover
+			if (armedDisarmStart == 0)
 				armedDisarmStart = lastSysTime;
-			else if ((lastSysTime - armedDisarmStart) > (1000 * portTICK_RATE_MS))
+			else if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
 				cmd.Armed = MANUALCONTROLCOMMAND_ARMED_FALSE;
 		} else {
 			armedDisarmStart = 0;

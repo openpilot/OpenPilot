@@ -36,6 +36,7 @@
 //#include "vtolsettings.h"
 #include "systemsettings.h"
 #include "actuatordesired.h"
+#include "flighttelemetrystats.h"
 #include "actuatorcommand.h"
 #include "manualcontrolcommand.h"
 #include "mixersettings.h"
@@ -179,6 +180,14 @@ static void actuatorTask(void* parameters)
 		AlarmsClear(SYSTEMALARMS_ALARM_ACTUATOR);
 
 		bool armed = manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE;
+		if(ManualControlCommandReadOnly(&manualControl)) {
+			/* when being controlled by GCS check for connection still intact */
+			/* eventually this lost connection (like lost RX) will trigger    */
+			/* a failsafe flight pattern */
+			FlightTelemetryStatsData flightStats;
+			FlightTelemetryStatsGet(&flightStats);
+			armed &= (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED); 
+		}
 		armed &= desired.Throttle > 0.05; //zero throttle stops the motors
 
 		float curve1 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve1);

@@ -41,6 +41,7 @@
 #include "actuatordesired.h"
 #include "attitudedesired.h"
 #include "ahrssettings.h"
+#include "flighttelemetrystats.h"
 
 // Private constants
 #define STACK_SIZE configMINIMAL_STACK_SIZE
@@ -110,6 +111,18 @@ static void manualControlTask(void *parameters)
 		ManualControlSettingsGet(&settings);
 		StabilizationSettingsGet(&stabSettings);
 
+		if (ManualControlCommandReadOnly(&cmd)) {
+			FlightTelemetryStatsData flightTelemStats;
+			FlightTelemetryStatsGet(&flightTelemStats);
+			if(flightTelemStats.Status != FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) { 
+				/* trying to fly via GCS and lost connection.  fall back to transmitter */
+				UAVObjMetadata metadata;
+				UAVObjGetMetadata(&cmd, &metadata);
+				metadata.access = ACCESS_READWRITE;
+				UAVObjSetMetadata(&cmd, &metadata);				
+			}
+		}
+			
 		if (!ManualControlCommandReadOnly(&cmd)) {
 			// Check settings, if error raise alarm
 			if (settings.Roll >= MANUALCONTROLSETTINGS_ROLL_NONE ||

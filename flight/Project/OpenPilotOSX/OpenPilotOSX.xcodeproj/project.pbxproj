@@ -28,6 +28,8 @@
 		651CF9F1120B700D00EEFD70 /* pios_usb_hid_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usb_hid_prop.h; sourceTree = "<group>"; };
 		651CF9F2120B700D00EEFD70 /* pios_usb_hid_pwr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usb_hid_pwr.h; sourceTree = "<group>"; };
 		651CF9F3120B700D00EEFD70 /* usb_conf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = usb_conf.h; sourceTree = "<group>"; };
+		651F32ED1281DE7E00D065F8 /* firmwareiap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = firmwareiap.c; sourceTree = "<group>"; };
+		651F32EF1281DE7E00D065F8 /* firmwareiap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = firmwareiap.h; sourceTree = "<group>"; };
 		65209A1812208B0600453371 /* baroaltitude.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = baroaltitude.xml; sourceTree = "<group>"; };
 		65209A1912208B0600453371 /* gpsposition.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gpsposition.xml; sourceTree = "<group>"; };
 		6526645A122DF972006F9A3C /* pios_i2c_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_i2c_priv.h; sourceTree = "<group>"; };
@@ -2916,6 +2918,23 @@
 			isa = PBXGroup;
 			children = (
 				65003B2D1212499100C183DD /* watchdog.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		651F32EC1281DE7E00D065F8 /* FirmwareIAP */ = {
+			isa = PBXGroup;
+			children = (
+				651F32ED1281DE7E00D065F8 /* firmwareiap.c */,
+				651F32EE1281DE7E00D065F8 /* inc */,
+			);
+			path = FirmwareIAP;
+			sourceTree = "<group>";
+		};
+		651F32EE1281DE7E00D065F8 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				651F32EF1281DE7E00D065F8 /* firmwareiap.h */,
 			);
 			path = inc;
 			sourceTree = "<group>";
@@ -6846,6 +6865,7 @@
 				65E8EF2E11EEA61E00BBF654 /* Attitude */,
 				65E8EF3011EEA61E00BBF654 /* Battery */,
 				65E8EF3411EEA61E00BBF654 /* Example */,
+				651F32EC1281DE7E00D065F8 /* FirmwareIAP */,
 				65E8EF3D11EEA61E00BBF654 /* GPS */,
 				65632CBE124E09D900469B77 /* Guidance */,
 				65E8EF4311EEA61E00BBF654 /* ManualControl */,

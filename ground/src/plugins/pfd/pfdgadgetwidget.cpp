@@ -119,14 +119,14 @@ void PFDGadgetWidget::connectNeedles() {
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
     airspeedObj = dynamic_cast<UAVDataObject*>(objManager->getObject("VelocityActual"));
-    if (attitudeObj != NULL ) {
+    if (airspeedObj != NULL ) {
         connect(airspeedObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateAirspeed(UAVObject*)));
     } else {
-         qDebug() << "Error: Object is unknown (PositionActual).";
+         qDebug() << "Error: Object is unknown (VelocityActual).";
     }
 
     altitudeObj = dynamic_cast<UAVDataObject*>(objManager->getObject("PositionActual"));
-    if (attitudeObj != NULL ) {
+    if (altitudeObj != NULL ) {
         connect(altitudeObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateAltitude(UAVObject*)));
     } else {
          qDebug() << "Error: Object is unknown (PositionActual).";
@@ -292,7 +292,10 @@ void PFDGadgetWidget::updateAirspeed(UAVObject *object) {
     UAVObjectField* eastField = object->getField("East");
     if (northField && eastField) {
         double val = floor(sqrt(pow(northField->getDouble(),2) + pow(eastField->getDouble(),2))*10)/10;
-        groundspeedTarget = 3.6*val*speedScaleHeight/30;
+        groundspeedTarget = 3.6*val*speedScaleHeight/3000;
+
+        if (!dialTimer.isActive())
+            dialTimer.start(); // Rearm the dial Timer which might be stopped.
 
     } else {
         qDebug() << "UpdateHeading: Wrong field, maybe an issue with object disconnection ?";
@@ -306,7 +309,10 @@ void PFDGadgetWidget::updateAltitude(UAVObject *object) {
     UAVObjectField* downField = object->getField("Down");
     if (downField) {
         // The altitude scale represents 30 meters
-        altitudeTarget = -floor(downField->getDouble(3)*10)/10*altitudeScaleHeight/30;
+        altitudeTarget = -floor(downField->getDouble()*10)/10*altitudeScaleHeight/3000;
+        if (!dialTimer.isActive())
+            dialTimer.start(); // Rearm the dial Timer which might be stopped.
+
     } else {
         qDebug() << "Unable to get field for altitude update.  Obj: " << object->getName();
     }

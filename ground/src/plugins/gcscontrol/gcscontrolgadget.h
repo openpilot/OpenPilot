@@ -31,6 +31,7 @@
 #include <coreplugin/iuavgadget.h>
 #include <uavobjects/manualcontrolcommand.h>
 #include "sdlgamepad/sdlgamepad.h"
+#include <QTime>
 
 namespace Core {
 class IUAVGadget;
@@ -57,7 +58,7 @@ public:
 private:
     ManualControlCommand* getManualControlCommand();
     SDLGamepad sdlGamepad;
-
+    QTime joystickTime;
     QWidget *m_widget;
     QList<int> m_context;
     UAVObject::Metadata mccInitialData;

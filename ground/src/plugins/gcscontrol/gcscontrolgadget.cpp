@@ -29,7 +29,8 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavobject.h"
-    #include <QDebug>
+
+#define JOYSTICK_UPDATE_RATE 50
 
 GCSControlGadget::GCSControlGadget(QString classId, GCSControlGadgetWidget *widget, QWidget *parent) :
         IUAVGadget(classId, parent),
@@ -43,7 +44,7 @@ GCSControlGadget::GCSControlGadget(QString classId, GCSControlGadgetWidget *widg
 
     connect(this, SIGNAL(aboutToQuit()), &sdlGamepad, SLOT(quit()));
     if(sdlGamepad.init()) {
-        qDebug() << "SDL Initialized";
+        joystickTime.start();
         sdlGamepad.start();
         qRegisterMetaType<QListInt16>("QListInt16");
         qRegisterMetaType<ButtonNumber>("ButtonNumber");
@@ -105,7 +106,7 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
 void GCSControlGadget::gamepads(quint8 count)
 {
     sdlGamepad.setGamepad(0);
-    sdlGamepad.setTickRate(40);
+    sdlGamepad.setTickRate(JOYSTICK_UPDATE_RATE);
 }
 
 void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
@@ -119,6 +120,8 @@ void GCSControlGadget::axesValues(QListInt16 values)
     double rightX = values[2];
     double rightY = values[3];
     double max = 32767;
-
-    sticksChangedLocally(leftX/max,-leftY/max,rightX/max,-rightY/max);
+    if(joystickTime.elapsed() > JOYSTICK_UPDATE_RATE) {
+        joystickTime.restart();
+        sticksChangedLocally(leftX/max,-leftY/max,rightX/max,-rightY/max);
+    }
 }

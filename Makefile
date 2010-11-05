@@ -133,8 +133,8 @@ openocd_install: openocd_clean $(TOOLS_DIR)
 	( \
 	  cd $(DL_DIR)/openocd-build/openocd-0.4.0 ; \
 	  ./configure --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi ; \
-	  make ; \
-	  make install ; \
+	  $(MAKE) ; \
+	  $(MAKE) install ; \
 	)
 
 	# delete the extracted source when we're done
@@ -194,7 +194,7 @@ openpilotgcs:  #uavobjects
 	mkdir -p $(BUILD_DIR)/$@
 	( cd $(BUILD_DIR)/$@ ; \
 	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
-	  make -w ; \
+	  $(MAKE) -w ; \
 	)
 
 .PHONY: uavobjgenerator
@@ -202,7 +202,7 @@ uavobjgenerator:
 	mkdir -p $(BUILD_DIR)/$@
 	( cd $(BUILD_DIR)/$@ ; \
 	  $(QMAKE) $(ROOT_DIR)/ground/src/libs/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
-	  make -w ; \
+	  $(MAKE) -w ; \
 	)
 
 .PHONY: uavobjects
@@ -229,14 +229,14 @@ openpilot: openpilot_elf
 
 openpilot_%: #uavobjects
 	mkdir -p $(BUILD_DIR)/openpilot
-	make OUTDIR="$(BUILD_DIR)/openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/OpenPilot $*
+	$(MAKE) OUTDIR="$(BUILD_DIR)/openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/OpenPilot $*
 
 .PHONY: ahrs
 ahrs: ahrs_elf
 
 ahrs_%:
 	mkdir -p $(BUILD_DIR)/ahrs
-	make OUTDIR="$(BUILD_DIR)/ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/AHRS $*
+	$(MAKE) OUTDIR="$(BUILD_DIR)/ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/AHRS $*
 
 .PHONY: sim_posix
 sim_posix: sim_posix_elf
@@ -245,5 +245,5 @@ sim_posix: sim_posix_elf
 
 sim_posix_%: #uavobjects
 	mkdir -p $(BUILD_DIR)/simulation
-	make OUTDIR="$(BUILD_DIR)/simulation" -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.posix $*
+	$(MAKE) OUTDIR="$(BUILD_DIR)/simulation" -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.posix $*
 

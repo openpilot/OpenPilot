@@ -43,7 +43,6 @@
 #include "systemsettings.h"
 #include "ahrssettings.h"
 
-
 // Private constants
 #define MAX_QUEUE_SIZE 2
 #define STACK_SIZE configMINIMAL_STACK_SIZE
@@ -72,14 +71,15 @@ static xQueueHandle queue;
 float dT = 1;
 pid_type pids[PID_MAX];
 
-
-
 // Private functions
 static void stabilizationTask(void* parameters);
 static float ApplyPid(pid_type * pid, const float desired, const float actual, const uint8_t angular);
 static float bound(float val);
 static void ZeroPids(void);
 static void SettingsUpdatedCb(UAVObjEvent * ev);
+
+// Global updated variable
+volatile uint8_t stabilization_updated;
 
 /**
  * Module initialization
@@ -132,6 +132,8 @@ static void stabilizationTask(void* parameters)
 		{
 			AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION,SYSTEMALARMS_ALARM_WARNING);
 		}
+		
+		stabilization_updated = 1;
 
 		// Check how long since last update
 		thisSysTime = xTaskGetTickCount();

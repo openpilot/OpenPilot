@@ -64,6 +64,9 @@ static void manualControlTask(void *parameters);
 static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutral);
 static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time);
 
+// Global updated variable
+volatile uint8_t manual_updated;
+
 /**
  * Module initialization
  */
@@ -107,6 +110,8 @@ static void manualControlTask(void *parameters)
 		// Wait until next update
 		vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD_MS / portTICK_RATE_MS);
 
+		manual_updated = 1;
+		
 		// Read settings
 		ManualControlSettingsGet(&settings);
 		StabilizationSettingsGet(&stabSettings);

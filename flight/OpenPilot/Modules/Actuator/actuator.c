@@ -70,6 +70,8 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
 		   MixerSettingsData* mixerSettings, ActuatorDesiredData* desired,
 		   const float period);
 
+// External watchdog update flag
+volatile uint8_t actuator_updated;
 
 //this structure is equivalent to the UAVObjects for one mixer.
 typedef struct {
@@ -125,7 +127,7 @@ static void actuatorTask(void* parameters)
 	ActuatorDesiredData desired;
 	MixerStatusData mixerStatus;
 	ManualControlCommandData manualControl;
-
+	
 	ActuatorSettingsGet(&settings);
 	// Set servo update frequency (done only on start-up)
 	PIOS_Servo_SetHz(settings.ChannelUpdateFreq[0], settings.ChannelUpdateFreq[1]);
@@ -145,6 +147,8 @@ static void actuatorTask(void* parameters)
 			setFailsafe();
 			continue;
 		}
+		
+		actuator_updated = 1;
 
 		// Check how long since last update
 		thisSysTime = xTaskGetTickCount();

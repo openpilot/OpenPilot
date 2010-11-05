@@ -44,6 +44,7 @@
 #include "manualcontrolcommand.h"
 #include "systemstats.h"
 
+
 // Private constants
 #define SYSTEM_UPDATE_PERIOD_MS 1000
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998	// calibrated by running tests/test_cpuload.c

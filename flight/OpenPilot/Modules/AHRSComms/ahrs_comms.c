@@ -51,7 +51,6 @@
  */
 
 #include "ahrs_comms.h"
-
 #include "ahrs_spi_comm.h"
 
 // Private constants
@@ -65,6 +64,9 @@ static xTaskHandle taskHandle;
 
 // Private functions
 static void ahrscommsTask(void *parameters);
+
+// Global update flag
+volatile uint8_t ahrs_updated;
 
 /**
  * Initialise the module, called on startup
@@ -91,6 +93,8 @@ static void ahrscommsTask(void *parameters)
 
 	// Main task loop
 	while (1) {
+		ahrs_updated = 1;
+		
 		AHRSSettingsData settings;
 		AHRSSettingsGet(&settings);
 

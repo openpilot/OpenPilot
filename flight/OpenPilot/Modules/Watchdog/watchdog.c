@@ -34,8 +34,8 @@
  */
 
 #include "openpilot.h"
-#include "watchdog.h"
 #include "pios_wdg.h"
+#include "watchdog.h"
 
 // Private constants
 // TODO: Look up maximum task priority and set this to it.  Not trying to replicate CPU load.
@@ -51,12 +51,18 @@ static xTaskHandle taskHandle;
 // Private functions
 static void watchdogTask(void *parameters);
 
+
 /**
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
 int32_t WatchdogInitialize()
 {
+	actuator_updated = 0;
+	stabilization_updated = 0;
+	ahrs_updated = 0;
+	manual_updated = 0;
+	
 	// Start main task
 	xTaskCreate(watchdogTask, (signed char *)"Watchdog", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 
@@ -78,7 +84,14 @@ static void watchdogTask(void *parameters)
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1) {
-		PIOS_WDG_Clear();
+		if(actuator_updated && stabilization_updated && 
+		   ahrs_updated && manual_updated) {
+			PIOS_WDG_Clear();
+			actuator_updated = 0;
+			stabilization_updated = 0;
+			ahrs_updated = 0;
+			manual_updated = 0;
+		}
 
 		vTaskDelayUntil(&lastSysTime, delay);
 	}

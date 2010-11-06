@@ -33,6 +33,7 @@
 #include <QWidget>
 #include <QFileDialog>
 
+using namespace OP_DFU;
 
 class deviceWidget : public QWidget
 {
@@ -40,7 +41,7 @@ class deviceWidget : public QWidget
 public:
     deviceWidget(QWidget *parent = 0);
     void setDeviceID(int devID);
-    void setDfu(OP_DFU* dfu);
+    void setDfu(DFUObject* dfu);
     void populate();
     void freeze();
     QString setOpenFileName();
@@ -48,8 +49,9 @@ public:
 private:
     Ui_deviceWidget *myDevice;
     int deviceID;
-    OP_DFU *m_dfu;
-    void status(QString str);
+    DFUObject *m_dfu;
+    QByteArray downloadedFirmware;
+    QString filename;
 
 signals:
 
@@ -58,6 +60,9 @@ public slots:
     void uploadFirmware();
     void downloadFirmware();
     void setProgress(int);
+    void downloadFinished();
+    void uploadFinished(OP_DFU::Status);
+    void status(QString str);
 
 };
 

@@ -119,7 +119,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
 
         // Tell the mainboard to get into bootloader state:
         log("Going into Bootloader mode...");
-        dfu = new OP_DFU(false);
+        dfu = new DFUObject(false);
         dfu->AbortOperation();
         if(!dfu->enterDFU(0))
         {
@@ -177,7 +177,7 @@ void UploaderGadgetWidget::systemBoot()
     if (currentStep == IAP_STATE_BOOTLOADER) {
         clearLog();
         if (!dfu)
-            dfu = new OP_DFU(true);
+            dfu = new DFUObject(true);
         dfu->AbortOperation();
         if(!dfu->enterDFU(0))
         {

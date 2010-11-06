@@ -44,6 +44,8 @@ UploaderGadget::~UploaderGadget()
  */
 void UploaderGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
-    UploaderGadgetConfiguration *m = qobject_cast< UploaderGadgetConfiguration*>(config);
+    Q_UNUSED(config);
+/*    UploaderGadgetConfiguration *m = qobject_cast< UploaderGadgetConfiguration*>(config);
+  */
 }
 

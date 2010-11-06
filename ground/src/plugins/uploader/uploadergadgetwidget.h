@@ -45,6 +45,8 @@
 #include <QMessageBox>
 
 
+using namespace OP_DFU;
+
 class UploaderGadgetWidget : public QWidget
 {
     Q_OBJECT
@@ -57,7 +59,7 @@ public:
 
 private:
      Ui_UploaderWidget *m_config;
-     OP_DFU *dfu;
+     DFUObject *dfu;
      IAPStep currentStep;
      bool resetOnly;
      void log(QString str);

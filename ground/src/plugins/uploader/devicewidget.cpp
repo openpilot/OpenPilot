@@ -41,7 +41,7 @@ void deviceWidget::setDeviceID(int devID){
     deviceID = devID;
 }
 
-void deviceWidget::setDfu(OP_DFU *dfu)
+void deviceWidget::setDfu(DFUObject *dfu)
 {
     m_dfu = dfu;
 }
@@ -116,22 +116,16 @@ void deviceWidget::uploadFirmware()
         return;
     }
 
-    status("Uploading firmware to device");
-    repaint(); // FW Upload is not threaded and will mostly freeze the UI...
+    status("Starting firmware upload.");
     connect(m_dfu, SIGNAL(progressUpdated(int)), this, SLOT(setProgress(int)));
-    OP_DFU::Status retstatus = m_dfu->UploadFirmware(filename.toAscii(),verify, deviceID);
-    if(retstatus != OP_DFU::Last_operation_Success) {
-        status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data());
+    connect(m_dfu, SIGNAL(operationProgress(QString)), this, SLOT(status(QString)));
+    connect(m_dfu, SIGNAL(uploadFinished(OP_DFU::Status)), this, SLOT(uploadFinished(OP_DFU::Status)));
+    bool retstatus = m_dfu->UploadFirmware(filename.toAscii(),verify, deviceID);
+    if(!retstatus ) {
+        status("Could not start upload");
         return;
-    } else
-    if(!myDevice->description->text().isEmpty()) {
-        retstatus = m_dfu->UploadDescription(myDevice->description->text());
-        if( retstatus != OP_DFU::Last_operation_Success) {
-            status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data());
-            return;
-        }
     }
-    status("Uploading Succeded!");
+    status("Uploading, please wait...");
 }
 
 /**
@@ -144,12 +138,61 @@ void deviceWidget::downloadFirmware()
         return;
     }
 
-    /*
-                qint32 size=((OP_DFU::device)dfu.devices[device]).SizeOfCode;
-                bool ret=dfu.SaveByteArrayToFile(file.toAscii(),dfu.StartDownload(size,OP_DFU::FW));
-                return ret;
-*/
+    myDevice->retrieveButton->setEnabled(false);
+    filename = setOpenFileName();
+
+    if (filename.isEmpty()) {
+        status("Empty filename");
+        return;
+    }
+
+    status("Downloading firmware from device");
+    connect(m_dfu, SIGNAL(progressUpdated(int)), this, SLOT(setProgress(int)));
+    connect(m_dfu, SIGNAL(downloadFinished()), this, SLOT(downloadFinished()));
+    downloadedFirmware.clear(); // Empty the byte array
+    bool ret = m_dfu->DownloadFirmware(&downloadedFirmware,deviceID);
+    if(!ret) {
+        status(QString("Could not start download!"));
+        return;
+    }
+    status("Download started, please wait");
 }
+
+/**
+  Callback for the firmware download result
+  */
+void deviceWidget::downloadFinished()
+{
+    disconnect(m_dfu, SIGNAL(downloadFinished()), this, SLOT(downloadFinished()));
+    status("Download successful");
+    // Now save the result (use the utility function from OP_DFU)
+    m_dfu->SaveByteArrayToFile(filename, downloadedFirmware);
+    myDevice->retrieveButton->setEnabled(true);
+}
+
+/**
+  Callback for the firmware upload result
+  */
+void deviceWidget::uploadFinished(OP_DFU::Status retstatus)
+{
+    disconnect(m_dfu, SIGNAL(uploadFinished(OP_DFU::Status)), this, SLOT(uploadFinished(OP_DFU::Status)));
+    if(retstatus != OP_DFU::Last_operation_Success) {
+        status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data());
+        return;
+    } else
+    if(!myDevice->description->text().isEmpty()) {
+        status(QString("Updating description"));
+        repaint(); // Make sure the text above shows right away
+        retstatus = m_dfu->UploadDescription(myDevice->description->text());
+        if( retstatus != OP_DFU::Last_operation_Success) {
+            status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data());
+            return;
+        }
+    }
+    status("Upload successful");
+
+}
+
 
 /**
   Slot to update the progress bar

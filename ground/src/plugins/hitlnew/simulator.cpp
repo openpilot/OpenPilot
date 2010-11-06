@@ -204,14 +204,14 @@ void Simulator::receiveUpdate()
 
 void Simulator::setupObjects()
 {
-	setupInputObject(actDesired, 50);
+	setupInputObject(actDesired, 100);
 	setupOutputObject(altActual, 250);
-	setupOutputObject(attActual, 50);
+	setupOutputObject(attActual, 100);
         setupOutputObject(gpsPos, 250);
         setupOutputObject(posActual, 250);
         setupOutputObject(velActual, 250);
         setupOutputObject(posHome, 1000);
-        setupOutputObject(attRaw, 50);
+        setupOutputObject(attRaw, 100);
 }
 
 void Simulator::setupInputObject(UAVObject* obj, int updatePeriod)

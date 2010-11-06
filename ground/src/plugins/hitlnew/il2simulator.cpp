@@ -220,6 +220,9 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
         current.Y = old.Y + (current.dY*current.dT);
 
         // accelerations (filtered)
+	if (isnan(old.ddX) || isinf(old.ddX)) old.ddX=0;
+	if (isnan(old.ddY) || isinf(old.ddY)) old.ddY=0;
+	if (isnan(old.ddZ) || isinf(old.ddZ)) old.ddZ=0;
 #define SPEED_FILTER 10
         current.ddX = ((current.dX-old.dX)/current.dT + SPEED_FILTER * (old.ddX)) / (SPEED_FILTER+1);
         current.ddY = ((current.dY-old.dY)/current.dT + SPEED_FILTER * (old.ddY)) / (SPEED_FILTER+1);
@@ -227,6 +230,9 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
 
 #define TURN_FILTER 10
         // turn speeds (filtered)
+	if (isnan(old.dAzimuth) || isinf(old.dAzimuth)) old.dAzimuth=0;
+	if (isnan(old.dPitch) || isinf(old.dPitch)) old.dPitch=0;
+	if (isnan(old.dRoll) || isinf(old.dRoll)) old.dRoll=0;
         current.dAzimuth = (angleDifference(current.azimuth,old.azimuth)/current.dT + TURN_FILTER * (old.dAzimuth)) / (TURN_FILTER+1);
         current.dPitch   = (angleDifference(current.pitch,old.pitch)/current.dT     + TURN_FILTER * (old.dPitch))   / (TURN_FILTER+1);
         current.dRoll    = (angleDifference(current.roll,old.roll)/current.dT       + TURN_FILTER * (old.dRoll))    / (TURN_FILTER+1);

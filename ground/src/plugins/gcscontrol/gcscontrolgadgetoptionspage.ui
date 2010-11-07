@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>587</width>
-    <height>359</height>
+    <height>379</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -36,7 +36,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="connectionMode">
+         <widget class="QComboBox" name="controlsMode">
           <item>
            <property name="text">
             <string>Mode 1</string>
@@ -81,8 +81,11 @@
         </item>
         <item>
          <widget class="QComboBox" name="comboBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="toolTip">
-           <string>Define the external input device you want to use here.</string>
+           <string>Only joystick is implemented at this stage, so this control is disabled.</string>
           </property>
           <item>
            <property name="text">
@@ -110,7 +113,7 @@
         <property name="currentIndex">
          <number>0</number>
         </property>
-        <widget class="QWidget" name="tabWidgetPage2" native="true">
+        <widget class="QWidget" name="tabWidgetPage2">
          <attribute name="title">
           <string>Joystick</string>
          </attribute>
@@ -121,7 +124,7 @@
           <item>
            <layout class="QGridLayout" name="gridLayout_2">
             <item row="2" column="0">
-             <widget class="QComboBox" name="comboBox_2"/>
+             <widget class="QComboBox" name="channel0"/>
             </item>
             <item row="2" column="2">
              <widget class="QCheckBox" name="checkBox">
@@ -138,77 +141,77 @@
              </widget>
             </item>
             <item row="3" column="0">
-             <widget class="QComboBox" name="comboBox_3"/>
+             <widget class="QComboBox" name="channel1"/>
             </item>
             <item row="4" column="0">
-             <widget class="QComboBox" name="comboBox_4"/>
+             <widget class="QComboBox" name="channel2"/>
             </item>
             <item row="5" column="0">
-             <widget class="QComboBox" name="comboBox_5"/>
+             <widget class="QComboBox" name="channel3"/>
             </item>
             <item row="6" column="0">
-             <widget class="QComboBox" name="comboBox_6"/>
+             <widget class="QComboBox" name="channel4"/>
             </item>
             <item row="7" column="0">
-             <widget class="QComboBox" name="comboBox_7"/>
+             <widget class="QComboBox" name="channel5"/>
             </item>
             <item row="8" column="0">
-             <widget class="QComboBox" name="comboBox_8"/>
+             <widget class="QComboBox" name="channel6"/>
             </item>
             <item row="9" column="0">
-             <widget class="QComboBox" name="comboBox_9"/>
+             <widget class="QComboBox" name="channel7"/>
             </item>
             <item row="3" column="1">
-             <widget class="QProgressBar" name="progressBar">
+             <widget class="QProgressBar" name="joyCh1">
               <property name="value">
                <number>24</number>
               </property>
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="QProgressBar" name="progressBar_2">
+             <widget class="QProgressBar" name="joyCh0">
               <property name="value">
                <number>24</number>
               </property>
              </widget>
             </item>
             <item row="4" column="1">
-             <widget class="QProgressBar" name="progressBar_3">
+             <widget class="QProgressBar" name="joyCh2">
               <property name="value">
                <number>24</number>
               </property>
              </widget>
             </item>
             <item row="5" column="1">
-             <widget class="QProgressBar" name="progressBar_4">
+             <widget class="QProgressBar" name="joyCh3">
               <property name="value">
                <number>24</number>
               </property>
              </widget>
             </item>
             <item row="6" column="1">
-             <widget class="QProgressBar" name="progressBar_5">
+             <widget class="QProgressBar" name="joyCh4">
               <property name="value">
                <number>24</number>
               </property>
              </widget>
             </item>
             <item row="7" column="1">
-             <widget class="QProgressBar" name="progressBar_6">
+             <widget class="QProgressBar" name="joyCh5">
               <property name="value">
                <number>24</number>
               </property>
              </widget>
             </item>
             <item row="8" column="1">
-             <widget class="QProgressBar" name="progressBar_7">
+             <widget class="QProgressBar" name="joyCh6">
               <property name="value">
                <number>24</number>
               </property>
              </widget>
             </item>
             <item row="9" column="1">
-             <widget class="QProgressBar" name="progressBar_8">
+             <widget class="QProgressBar" name="joyCh7">
               <property name="value">
                <number>24</number>
               </property>
@@ -267,7 +270,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tabWidgetPage3" native="true">
+        <widget class="QWidget" name="tabWidgetPage3">
          <attribute name="title">
           <string>Audio</string>
          </attribute>

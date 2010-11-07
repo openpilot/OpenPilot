@@ -29,8 +29,8 @@
 #define GCSCONTROLGADGETOPTIONSPAGE_H
 
 #include "coreplugin/dialogs/ioptionspage.h"
-#include "QString"
-#include <QStringList>
+#include "gcscontrolplugin.h"
+#include "sdlgamepad/sdlgamepad.h"
 #include <QDebug>
 
 namespace Core {
@@ -50,6 +50,7 @@ class GCSControlGadgetOptionsPage : public IOptionsPage
 Q_OBJECT
 public:
     explicit GCSControlGadgetOptionsPage(GCSControlGadgetConfiguration *config, QObject *parent = 0);
+    ~GCSControlGadgetOptionsPage();
 
     QWidget *createPage(QWidget *parent);
     void apply();
@@ -58,20 +59,14 @@ public:
 private:
     Ui::GCSControlGadgetOptionsPage *options_page;
     GCSControlGadgetConfiguration *m_config;
+    SDLGamepad *sdlGamepad;
 
-    /*
-    QStringList BaudRateTypeString;
-    QStringList BaudRateTypeStringALL;
-    QStringList DataBitsTypeStringALL;
-    QStringList ParityTypeStringALL;
-    QStringList StopBitsTypeStringALL;
-    QStringList DataBitsTypeString;
-    QStringList ParityTypeString;
-    QStringList StopBitsTypeString;
-    QStringList FlowTypeString;
-    */
+protected slots:
+    // signals from joystick
+    void gamepads(quint8 count);
+    void buttonState(ButtonNumber number, bool pressed);
+    void axesValues(QListInt16 values);
 
-private slots:
 };
 
 #endif // GCSCONTROLGADGETOPTIONSPAGE_H

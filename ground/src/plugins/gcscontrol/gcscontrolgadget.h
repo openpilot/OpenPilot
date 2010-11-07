@@ -32,6 +32,7 @@
 #include <uavobjects/manualcontrolcommand.h>
 #include "sdlgamepad/sdlgamepad.h"
 #include <QTime>
+#include "gcscontrolplugin.h"
 
 namespace Core {
 class IUAVGadget;
@@ -46,7 +47,7 @@ class GCSControlGadget : public Core::IUAVGadget
 {
     Q_OBJECT
 public:
-    GCSControlGadget(QString classId, GCSControlGadgetWidget *widget, QWidget *parent = 0);
+    GCSControlGadget(QString classId, GCSControlGadgetWidget *widget, QWidget *parent = 0, QObject *plugin=0);
     ~GCSControlGadget();
 
     QList<int> context() const { return m_context; }
@@ -57,11 +58,15 @@ public:
 
 private:
     ManualControlCommand* getManualControlCommand();
-    SDLGamepad sdlGamepad;
     QTime joystickTime;
     QWidget *m_widget;
     QList<int> m_context;
     UAVObject::Metadata mccInitialData;
+    int rollChannel;
+    int pitchChannel;
+    int yawChannel;
+    int throttleChannel;
+    int controlsMode;
 
 signals:
     void sticksChangedRemotely(double leftX, double leftY, double rightX, double rightY);

@@ -78,7 +78,11 @@ GCSControlGadgetWidget::~GCSControlGadgetWidget()
    // Do nothing
 }
 
-void GCSControlGadgetWidget::updateSticks(double leftX, double leftY, double rightX, double rightY) {
+void GCSControlGadgetWidget::updateSticks(double nleftX, double nleftY, double nrightX, double nrightY) {
+    leftX = nleftX;
+    leftY = nleftY;
+    rightX = nrightX;
+    rightY = nrightY;
     m_gcscontrol->widgetLeftStick->changePosition(leftX,leftY);
     m_gcscontrol->widgetRightStick->changePosition(rightX,rightY);
 }

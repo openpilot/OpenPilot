@@ -38,43 +38,24 @@ class GCSControlGadgetConfiguration : public IUAVGadgetConfiguration
     public:
         explicit GCSControlGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
 
-    /*
-        void setConnectionMode(QString mode) { m_connectionMode = mode; }
-        QString connectionMode() { return m_connectionMode; }
+    void setControlsMode(int mode) { controlsMode = mode; }
+    void setRPYTchannels(int roll, int pitch, int yaw, int throttle);
+    int getControlsMode() { return controlsMode; }
+    QList<int>  getChannelsMapping();
 
-        //set port configuration functions
-        void setSpeed(BaudRateType speed) {m_defaultSpeed=speed;}
-        void setDataBits(DataBitsType databits) {m_defaultDataBits=databits;}
-        void setFlow(FlowType flow) {m_defaultFlow=flow;}
-        void setParity(ParityType parity) {m_defaultParity=parity;}
-        void setStopBits(StopBitsType stopbits) {m_defaultStopBits=stopbits;}
-        void setPort(QString port){m_defaultPort=port;}
-        void setTimeOut(long timeout){m_defaultTimeOut=timeout;}
 
-        //get port configuration functions
-        QString port(){return m_defaultPort;}
-        BaudRateType speed() {return m_defaultSpeed;}
-        FlowType flow() {return m_defaultFlow;}
-        DataBitsType dataBits() {return m_defaultDataBits;}
-        StopBitsType stopBits() {return m_defaultStopBits;}
-        ParityType parity() {return m_defaultParity;}
-        long timeOut(){return m_defaultTimeOut;}
-        */
+
 
         void saveConfig(QSettings* settings) const;
         IUAVGadgetConfiguration *clone();
 
     private:
-        /*
-        QString m_connectionMode;
-        QString m_defaultPort;
-        BaudRateType m_defaultSpeed;
-        DataBitsType m_defaultDataBits;
-        FlowType m_defaultFlow;
-        ParityType m_defaultParity;
-        StopBitsType m_defaultStopBits;
-        long m_defaultTimeOut;
-        */
+        int controlsMode; // Mode1 to Mode4
+        // Joystick mappings for roll/pitch/yaw/throttle:
+        int rollChannel;
+        int pitchChannel;
+        int yawChannel;
+        int throttleChannel;
 
 };
 

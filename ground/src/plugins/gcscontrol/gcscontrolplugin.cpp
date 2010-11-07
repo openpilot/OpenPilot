@@ -46,6 +46,12 @@ bool GCSControlPlugin::initialize(const QStringList& args, QString *errMsg)
 {
    Q_UNUSED(args);
    Q_UNUSED(errMsg);
+    sdlGamepad = new SDLGamepad();
+   if(sdlGamepad->init()) {
+       sdlGamepad->start();
+       qRegisterMetaType<QListInt16>("QListInt16");
+       qRegisterMetaType<ButtonNumber>("ButtonNumber");
+   }
    mf = new GCSControlGadgetFactory(this);
    addAutoReleasedObject(mf);
 

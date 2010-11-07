@@ -29,19 +29,23 @@
 #define GCSControlPLUGIN_H_
 
 #include <extensionsystem/iplugin.h>
+#include "sdlgamepad/sdlgamepad.h"
 
 class GCSControlGadgetFactory;
 
 class GCSControlPlugin : public ExtensionSystem::IPlugin
 {
 public:
-        GCSControlPlugin();
+    GCSControlPlugin();
    ~GCSControlPlugin();
 
    void extensionsInitialized();
    bool initialize(const QStringList & arguments, QString * errorString);
    void shutdown();
+   SDLGamepad *sdlGamepad;
+
 private:
    GCSControlGadgetFactory *mf;
+
 };
 #endif /* GCSControlPLUGIN_H_ */

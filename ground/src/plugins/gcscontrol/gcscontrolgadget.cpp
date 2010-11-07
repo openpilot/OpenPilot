@@ -26,13 +26,15 @@
  */
 #include "gcscontrolgadget.h"
 #include "gcscontrolgadgetwidget.h"
+#include "gcscontrolgadgetconfiguration.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavobject.h"
+#include <QDebug>
 
 #define JOYSTICK_UPDATE_RATE 50
 
-GCSControlGadget::GCSControlGadget(QString classId, GCSControlGadgetWidget *widget, QWidget *parent) :
+GCSControlGadget::GCSControlGadget(QString classId, GCSControlGadgetWidget *widget, QWidget *parent, QObject *plugin) :
         IUAVGadget(classId, parent),
         m_widget(widget)
 {
@@ -42,17 +44,12 @@ GCSControlGadget::GCSControlGadget(QString classId, GCSControlGadgetWidget *widg
 
     manualControlCommandUpdated(getManualControlCommand());
 
-    connect(this, SIGNAL(aboutToQuit()), &sdlGamepad, SLOT(quit()));
-    if(sdlGamepad.init()) {
-        joystickTime.start();
-        sdlGamepad.start();
-        qRegisterMetaType<QListInt16>("QListInt16");
-        qRegisterMetaType<ButtonNumber>("ButtonNumber");
+    joystickTime.start();
+    GCSControlPlugin *pl = dynamic_cast<GCSControlPlugin*>(plugin);
+    connect(pl->sdlGamepad,SIGNAL(gamepads(quint8)),this,SLOT(gamepads(quint8)));
+    connect(pl->sdlGamepad,SIGNAL(buttonState(ButtonNumber,bool)),this,SLOT(buttonState(ButtonNumber,bool)));
+    connect(pl->sdlGamepad,SIGNAL(axesValues(QListInt16)),this,SLOT(axesValues(QListInt16)));
 
-        connect(&sdlGamepad,SIGNAL(gamepads(quint8)),this,SLOT(gamepads(quint8)));
-        connect(&sdlGamepad,SIGNAL(buttonState(ButtonNumber,bool)),this,SLOT(buttonState(ButtonNumber,bool)));
-        connect(&sdlGamepad,SIGNAL(axesValues(QListInt16)),this,SLOT(axesValues(QListInt16)));
-    }
 }
 
 GCSControlGadget::~GCSControlGadget()
@@ -62,10 +59,16 @@ GCSControlGadget::~GCSControlGadget()
 
 void GCSControlGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    GCSControlGadgetConfiguration *GCSControlConfig = qobject_cast< GCSControlGadgetConfiguration*>(config);
 
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(QString("ManualControlCommand")) );
+    QList<int> ql = GCSControlConfig->getChannelsMapping();
+    rollChannel = ql.at(0);
+    pitchChannel = ql.at(1);
+    yawChannel = ql.at(2);
+    throttleChannel = ql.at(3);
+
+    controlsMode = GCSControlConfig->getControlsMode();
+
 }
 
 ManualControlCommand* GCSControlGadget::getManualControlCommand() {
@@ -79,9 +82,30 @@ void GCSControlGadget::manualControlCommandUpdated(UAVObject * obj) {
     double pitch = obj->getField("Pitch")->getDouble();
     double yaw = obj->getField("Yaw")->getDouble();
     double throttle = obj->getField("Throttle")->getDouble();
-    emit sticksChangedRemotely(yaw,-pitch,roll,throttle);
+    // Remap RPYT to left X/Y and right X/Y depending on mode
+    switch (controlsMode) {
+    case 1:
+        // Mode 1: LeftX = Yaw, LeftY = Pitch, RightX = Roll, RightY = Throttle
+        emit sticksChangedRemotely(yaw,pitch,roll,throttle);
+        break;
+    case 2:
+        // Mode 2: LeftX = Yaw, LeftY = Throttle, RightX = Roll, RightY = Pitch
+        emit sticksChangedRemotely(yaw,throttle,roll,pitch);
+        break;
+    case 3:
+        // Mode 3: LeftX = Roll, LeftY = Pitch, RightX = Yaw, RightY = Throttle
+        emit sticksChangedRemotely(roll,pitch,yaw,throttle);
+        break;
+    case 4:
+        // Mode 4: LeftX = Roll, LeftY = Throttle, RightX = Yaw, RightY = Pitch;
+        emit sticksChangedRemotely(roll,throttle,yaw,pitch);
+        break;
+    }
 }
 
+/**
+  Update the manual commands - maps depending on mode
+  */
 void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double rightX, double rightY) {
     ManualControlCommand * obj = getManualControlCommand();
     double oldRoll = obj->getField("Roll")->getDouble();
@@ -89,10 +113,42 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
     double oldYaw = obj->getField("Yaw")->getDouble();
     double oldThrottle = obj->getField("Throttle")->getDouble();
 
-    double newRoll = rightX;
-    double newPitch = -leftY;
-    double newYaw = leftX;
-    double newThrottle = rightY;
+    double newRoll;
+    double newPitch;
+    double newYaw;
+    double newThrottle;
+
+    // Remap left X/Y and right X/Y to RPYT depending on mode
+    switch (controlsMode) {
+    case 1:
+        // Mode 1: LeftX = Yaw, LeftY = Pitch, RightX = Roll, RightY = Throttle
+        newRoll = rightX;
+        newPitch = leftY;
+        newYaw = leftX;
+        newThrottle = rightY;
+        break;
+    case 2:
+        // Mode 2: LeftX = Yaw, LeftY = Throttle, RightX = Roll, RightY = Pitch
+        newRoll = rightX;
+        newPitch = rightY;
+        newYaw = leftX;
+        newThrottle = leftY;
+        break;
+    case 3:
+        // Mode 3: LeftX = Roll, LeftY = Pitch, RightX = Yaw, RightY = Throttle
+        newRoll = leftX;
+        newPitch = leftY;
+        newYaw = rightX;
+        newThrottle = rightY;
+        break;
+    case 4:
+        // Mode 4: LeftX = Roll, LeftY = Throttle, RightX = Yaw, RightY = Pitch;
+        newRoll = leftX;
+        newPitch = rightY;
+        newYaw = rightX;
+        newThrottle = leftY;
+        break;
+    }
 
     if((newThrottle != oldThrottle) || (newPitch != oldPitch) || (newYaw != oldYaw) || (newRoll != oldRoll)) {
         obj->getField("Roll")->setDouble(newRoll);
@@ -105,8 +161,8 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
 
 void GCSControlGadget::gamepads(quint8 count)
 {
-    sdlGamepad.setGamepad(0);
-    sdlGamepad.setTickRate(JOYSTICK_UPDATE_RATE);
+//    sdlGamepad.setGamepad(0);
+//    sdlGamepad.setTickRate(JOYSTICK_UPDATE_RATE);
 }
 
 void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
@@ -115,13 +171,38 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
 
 void GCSControlGadget::axesValues(QListInt16 values)
 {
-    double leftX = values[0];
-    double leftY = values[1];
-    double rightX = values[2];
-    double rightY = values[3];
+    int chMax = values.length();
+    if (rollChannel > chMax || pitchChannel > chMax ||
+            yawChannel > chMax || throttleChannel > chMax ) {
+        qDebug() << "GCSControl: configuration is inconsistent with current joystick! Aborting update.";
+        return;
+    }
+
+    double rValue = (rollChannel > -1) ? values[rollChannel] : 0;
+    double pValue = (pitchChannel > -1) ? values[pitchChannel] : 0;
+    double yValue = (yawChannel > -1) ? values[yawChannel] : 0;
+    double tValue = (throttleChannel > -1) ? values[throttleChannel] : 0;
     double max = 32767;
     if(joystickTime.elapsed() > JOYSTICK_UPDATE_RATE) {
         joystickTime.restart();
-        sticksChangedLocally(leftX/max,-leftY/max,rightX/max,-rightY/max);
+        // Remap RPYT to left X/Y and right X/Y depending on mode
+        // Mode 1: LeftX = Yaw, LeftY = Pitch, RightX = Roll, RightY = Throttle
+        // Mode 2: LeftX = Yaw, LeftY = THrottle, RightX = Roll, RightY = Pitch
+        // Mode 3: LeftX = Roll, LeftY = Pitch, RightX = Yaw, RightY = Throttle
+        // Mode 4: LeftX = Roll, LeftY = Throttle, RightX = Yaw, RightY = Pitch;
+        switch (controlsMode) {
+        case 1:
+            sticksChangedLocally(yValue/max,-pValue/max,rValue/max,-tValue/max);
+            break;
+        case 2:
+            sticksChangedLocally(yValue/max,-tValue/max,rValue/max,-pValue/max);
+            break;
+        case 3:
+            sticksChangedLocally(rValue/max,-pValue/max,yValue/max,-tValue/max);
+            break;
+        case 4:
+            sticksChangedLocally(rValue/max,-tValue/max,yValue/max,-pValue/max);
+            break;
+        }
     }
 }

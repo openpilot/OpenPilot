@@ -32,41 +32,37 @@
  *
  */
 GCSControlGadgetConfiguration::GCSControlGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
-    IUAVGadgetConfiguration(classId, parent)
+    IUAVGadgetConfiguration(classId, parent),
+    rollChannel(-1),
+    pitchChannel(-1),
+    yawChannel(-1),
+    throttleChannel(-1)
 {
     //if a saved configuration exists load it
     if(qSettings != 0) {
-        /*
-        BaudRateType speed;
-        DataBitsType databits;
-        FlowType flow;
-        ParityType parity;
-        StopBitsType stopbits;
-
-        int ispeed = qSettings->value("defaultSpeed").toInt();
-        int idatabits = qSettings->value("defaultDataBits").toInt();
-        int iflow = qSettings->value("defaultFlow").toInt();
-        int iparity = qSettings->value("defaultParity").toInt();
-        int istopbits = qSettings->value("defaultStopBits").toInt();
-        QString port = qSettings->value("defaultPort").toString();
-        QString conMode = qSettings->value("connectionMode").toString();
-
-        databits = (DataBitsType) idatabits;
-        flow = (FlowType)iflow;
-        parity = (ParityType)iparity;
-        stopbits = (StopBitsType)istopbits;
-        speed = (BaudRateType)ispeed;
-        m_defaultPort = port;
-        m_defaultSpeed = speed;
-        m_defaultDataBits = databits;
-        m_defaultFlow = flow;
-        m_defaultParity = parity;
-        m_defaultStopBits = stopbits;
-        m_connectionMode = conMode;
-        */
+        controlsMode = qSettings->value("controlsMode").toInt();
+        rollChannel = qSettings->value("rollChannel").toInt();
+        pitchChannel = qSettings->value("pitchChannel").toInt();
+        yawChannel = qSettings->value("yawChannel").toInt();
+        throttleChannel = qSettings->value("throttleChannel").toInt();
     }
 
 }
+
+void GCSControlGadgetConfiguration::setRPYTchannels(int roll, int pitch, int yaw, int throttle) {
+    rollChannel = roll;
+    pitchChannel = pitch;
+    yawChannel = yaw;
+    throttleChannel = throttle;
+}
+
+QList<int> GCSControlGadgetConfiguration::getChannelsMapping()
+{
+    QList<int> ql;
+    ql << rollChannel << pitchChannel << yawChannel << throttleChannel;
+    return ql;
+}
+
 
 /**
  * Clones a configuration.
@@ -76,16 +72,12 @@ IUAVGadgetConfiguration *GCSControlGadgetConfiguration::clone()
 {
     GCSControlGadgetConfiguration *m = new GCSControlGadgetConfiguration(this->classId());
 
-    /*
+    m->controlsMode = controlsMode;
+    m->rollChannel = rollChannel;
+    m->pitchChannel = pitchChannel;
+    m->yawChannel = yawChannel;
+    m->throttleChannel = throttleChannel;
 
-    m->m_defaultSpeed = m_defaultSpeed;
-    m->m_defaultDataBits = m_defaultDataBits;
-    m->m_defaultFlow = m_defaultFlow;
-    m->m_defaultParity = m_defaultParity;
-    m->m_defaultStopBits = m_defaultStopBits;
-    m->m_defaultPort = m_defaultPort;
-    m->m_connectionMode = m_connectionMode;
-    */
     return m;
 }
 
@@ -94,13 +86,9 @@ IUAVGadgetConfiguration *GCSControlGadgetConfiguration::clone()
  *
  */
 void GCSControlGadgetConfiguration::saveConfig(QSettings* settings) const {
-    /*
- settings->setValue("defaultSpeed", m_defaultSpeed);
- settings->setValue("defaultDataBits", m_defaultDataBits);
- settings->setValue("defaultFlow", m_defaultFlow);
- settings->setValue("defaultParity", m_defaultParity);
- settings->setValue("defaultStopBits", m_defaultStopBits);
- settings->setValue("defaultPort", m_defaultPort);
- settings->setValue("connectionMode", m_connectionMode);
-*/
+    settings->setValue("controlsMode", controlsMode);
+    settings->setValue("rollChannel", rollChannel);
+    settings->setValue("pitchChannel", pitchChannel);
+    settings->setValue("yawChannel", yawChannel);
+    settings->setValue("throttleChannel", throttleChannel);
 }

@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       GCSControlgadgetfactory.h
+ * @file       gcscontrolgadgetoptionspage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup GCSControlGadgetPlugin GCSControl Gadget Plugin
  * @{
- * @brief A gadget to control the UAV, either from the keyboard or a joystick
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -25,31 +25,44 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef GCSControlGADGETFACTORY_H_
-#define GCSControlGADGETFACTORY_H_
-
-#include <coreplugin/iuavgadgetfactory.h>
-#include "gcscontrolgadgetconfiguration.h"
 #include "gcscontrolgadgetoptionspage.h"
+#include "gcscontrolgadgetconfiguration.h"
+#include "ui_gcscontrolgadgetoptionspage.h"
 
-namespace Core {
-class IUAVGadget;
-class IUAVGadgetFactory;
+#include <QFileDialog>
+#include <QtAlgorithms>
+#include <QStringList>
+
+GCSControlGadgetOptionsPage::GCSControlGadgetOptionsPage(GCSControlGadgetConfiguration *config, QObject *parent) :
+        IOptionsPage(parent),
+        m_config(config)
+{
+
 }
 
-using namespace Core;
 
-class GCSControlGadgetFactory : public IUAVGadgetFactory
+//creates options page widget (uses the UI file)
+QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
 {
-    Q_OBJECT
-public:
-    GCSControlGadgetFactory(QObject *parent = 0);
-    ~GCSControlGadgetFactory();
+    options_page = new Ui::GCSControlGadgetOptionsPage();
+    QWidget *optionsPageWidget = new QWidget;
+    options_page->setupUi(optionsPageWidget);
 
-    IUAVGadget *createGadget(QWidget *parent);
-    IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
-    IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
+    return optionsPageWidget;
+}
 
-};
+/**
+ * Called when the user presses apply or OK.
+ *
+ * Saves the current values
+ *
+ */
+void GCSControlGadgetOptionsPage::apply()
+{
 
-#endif // GCSControlGADGETFACTORY_H_
+}
+
+void GCSControlGadgetOptionsPage::finish()
+{
+    delete options_page;
+}

@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GCSControlGadgetOptionsPage</class>
+ <widget class="QWidget" name="GCSControlGadgetOptionsPage">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>587</width>
+    <height>359</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Control Mode:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="connectionMode">
+          <item>
+           <property name="text">
+            <string>Mode 1</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Mode 2</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Mode 3</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Mode 4</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>External input Device:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox">
+          <property name="toolTip">
+           <string>Define the external input device you want to use here.</string>
+          </property>
+          <item>
+           <property name="text">
+            <string>Joystick</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Audio</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="tabWidgetPage2" native="true">
+         <attribute name="title">
+          <string>Joystick</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="2" column="0">
+             <widget class="QComboBox" name="comboBox_2"/>
+            </item>
+            <item row="2" column="2">
+             <widget class="QCheckBox" name="checkBox">
+              <property name="text">
+               <string>Rev</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2">
+             <widget class="QCheckBox" name="checkBox_2">
+              <property name="text">
+               <string>Rev</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QComboBox" name="comboBox_3"/>
+            </item>
+            <item row="4" column="0">
+             <widget class="QComboBox" name="comboBox_4"/>
+            </item>
+            <item row="5" column="0">
+             <widget class="QComboBox" name="comboBox_5"/>
+            </item>
+            <item row="6" column="0">
+             <widget class="QComboBox" name="comboBox_6"/>
+            </item>
+            <item row="7" column="0">
+             <widget class="QComboBox" name="comboBox_7"/>
+            </item>
+            <item row="8" column="0">
+             <widget class="QComboBox" name="comboBox_8"/>
+            </item>
+            <item row="9" column="0">
+             <widget class="QComboBox" name="comboBox_9"/>
+            </item>
+            <item row="3" column="1">
+             <widget class="QProgressBar" name="progressBar">
+              <property name="value">
+               <number>24</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QProgressBar" name="progressBar_2">
+              <property name="value">
+               <number>24</number>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QProgressBar" name="progressBar_3">
+              <property name="value">
+               <number>24</number>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="1">
+             <widget class="QProgressBar" name="progressBar_4">
+              <property name="value">
+               <number>24</number>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="1">
+             <widget class="QProgressBar" name="progressBar_5">
+              <property name="value">
+               <number>24</number>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="1">
+             <widget class="QProgressBar" name="progressBar_6">
+              <property name="value">
+               <number>24</number>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="1">
+             <widget class="QProgressBar" name="progressBar_7">
+              <property name="value">
+               <number>24</number>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="1">
+             <widget class="QProgressBar" name="progressBar_8">
+              <property name="value">
+               <number>24</number>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="2">
+             <widget class="QCheckBox" name="checkBox_3">
+              <property name="text">
+               <string>Rev</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="2">
+             <widget class="QCheckBox" name="checkBox_4">
+              <property name="text">
+               <string>Rev</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="2">
+             <widget class="QCheckBox" name="checkBox_5">
+              <property name="text">
+               <string>Rev</string>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="2">
+             <widget class="QCheckBox" name="checkBox_6">
+              <property name="text">
+               <string>Rev</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="2">
+             <widget class="QCheckBox" name="checkBox_7">
+              <property name="text">
+               <string>Rev</string>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="2">
+             <widget class="QCheckBox" name="checkBox_8">
+              <property name="text">
+               <string>Rev</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Move your joystick controls to identify channels</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tabWidgetPage3" native="true">
+         <attribute name="title">
+          <string>Audio</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="telemetryLabel">
+            <property name="text">
+             <string>Audio: soundcard-based PPM decoding for trainer port. Not implemented yet.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>276</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

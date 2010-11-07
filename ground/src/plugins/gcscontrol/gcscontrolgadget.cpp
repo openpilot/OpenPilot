@@ -118,7 +118,7 @@ void GCSControlGadget::axesValues(QListInt16 values)
     double leftX = values[0];
     double leftY = values[1];
     double rightX = values[2];
-    double rightY = 0; // values[3];
+    double rightY = values[3];
     double max = 32767;
     if(joystickTime.elapsed() > JOYSTICK_UPDATE_RATE) {
         joystickTime.restart();

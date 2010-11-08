@@ -22,6 +22,7 @@ Features
   * slam-config: description of robots, sensors, hardware, calib, with uncertainties and their simu-factor
   * env-config: a simulated environment with description of landmarks, robots and sensors trajectories
   * [or] a file defines preset trajectories, and we make reference to them in env-config
+  * [or] simu-lmk and simu-traj
   * display-config: colors...
 - when doing replay, allow to have a sequence without missing images and simulate "real-time" (ignoring image loading of course)
 
@@ -30,7 +31,7 @@ Organization
 - move QuickHarrisDetector to fdetect: attention to the prototype of detectIn() !!!
 - move ExtendedKalmanFilterIndirect to filter
 - move Gaussian to jmath
-- move dma branch to master
+- [ok] move dma branch to master
 - is it possible to set up subdirectories with jafar/cmake ?
 
 

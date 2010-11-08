@@ -149,10 +149,10 @@ const unsigned N_FRAMES = 500000;
 const unsigned MAP_SIZE = 500;
 
 // constant velocity robot uncertainties and perturbations
-const double UNCERT_VLIN = .1; // m/s
-const double UNCERT_VANG = .1; // rad/s
-const double PERT_VLIN = 2.0; // m/s per sqrt(s)
-const double PERT_VANG = 2.0; // rad/s per sqrt(s)
+const double UNCERT_VLIN = .3; // m/s
+const double UNCERT_VANG = .3; // rad/s
+const double PERT_VLIN = 0.5; // m/s per sqrt(s)
+const double PERT_VANG = 0.5; // rad/s per sqrt(s)
 
 // inertial robot initial uncertainties and perturbations - in addition to constant velocity option UNCERT_VLIN.
 //if (intOpts[iRobot] == 1) // == robot inertial
@@ -167,26 +167,34 @@ const double PERT_RANWALKGYRO = 0; // rad/s^2 per sqrt(s), IMU w_bias random wal
 // pin-hole:
 
 // simu:
-const unsigned IMG_WIDTH = 640;
-const unsigned IMG_HEIGHT = 480;
-const double INTRINSIC[4] = { 320.0,   240.0,   500.0,   500.0 };
-const double DISTORTION[2] = { -0.25,   0.10 };
+const unsigned IMG_WIDTH_SIMU = 640;
+const unsigned IMG_HEIGHT_SIMU = 480;
+const double INTRINSIC_SIMU[4] = { 320.0,   240.0,   500.0,   500.0 };
+const double DISTORTION_SIMU[3] = { -0.25,   0.10, 0.0 };
 
 // flea2 with original obj
 /*const unsigned IMG_WIDTH = 640;
 const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
-const double DISTORTION[2] = { -0.23193,   0.11306 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
+const double DISTORTION[3] = { -0.23193,   0.11306, 0.0 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
 */
 
 // jmcodol's robot
 /*const unsigned IMG_WIDTH = 640;
 const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 327.53722,   222.40418,   533.18050,   531.56182 };
-//const double DISTORTION[2] = { 0.08577,   -0.22006 };
-const double DISTORTION[2] = { 0.0, 0.0};
+//const double DISTORTION[2] = { 0.08577,   -0.22006, 0.0 };
+const double DISTORTION[3] = { 0.0, 0.0};
 */
 
+// saragosse sequence
+const unsigned IMG_WIDTH = 512;
+const unsigned IMG_HEIGHT = 384;
+const double INTRINSIC[4] = { 281.647017175628, 198.770772126498,   534.760390823972,   535.280428739968 };
+const double DISTORTION[3] = { -0.27546592313146917, 0.12644899941674098, 0.036648747902512463 };
+
+
+//
 const unsigned CORRECTION_SIZE = 4;
 const double PIX_NOISE = 1.0;
 const double PIX_NOISE_SIMUFACTOR = 1.0;
@@ -218,7 +226,7 @@ const unsigned RANSAC_NTRIES = 6;
 #else
 const unsigned RANSAC_NTRIES = 0;
 #endif
-const double MIN_SCORE = 0.8;
+const double MIN_SCORE = 0.9;
 const double PARTIAL_POSITION = 0.25;
 
 // data manager: active search tesselation grid for new features detection
@@ -232,6 +240,27 @@ const unsigned GRID_SEPAR = 20;
 
 
 void demo_slam01_main(world_ptr_t *world) {
+	
+	vec intrinsic, distortion;
+	int img_width, img_height;
+	if (intOpts[iSimu] != 0)
+	{
+		img_width = IMG_WIDTH_SIMU;
+		img_height = IMG_HEIGHT_SIMU;
+		intrinsic = createVector<4> (INTRINSIC_SIMU);
+		distortion = createVector<sizeof(DISTORTION_SIMU)/sizeof(double)> (DISTORTION);
+		
+	} else
+	{
+		img_width = IMG_WIDTH;
+		img_height = IMG_HEIGHT;
+		intrinsic = createVector<4> (INTRINSIC);
+		distortion = createVector<sizeof(DISTORTION)/sizeof(double)> (DISTORTION);
+	}
+	
+	
+	
+	
 	boost::condition_variable rawdata_condition;
 	boost::mutex rawdata_mutex;
 	//boost::mutex rawdata_condmutex;
@@ -265,11 +294,8 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	
 	// pin-hole parameters in BOOST format
-	vec intrinsic = createVector<4> (INTRINSIC);
-	vec distortion = createVector<sizeof(DISTORTION)/sizeof(double)> (DISTORTION);
-
 	boost::shared_ptr<ObservationFactory> obsFact(new ObservationFactory());
-	if (intOpts[iSimu] == 1)
+	if (intOpts[iSimu] != 0)
 	{
 		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpSimuObservationMaker(REPARAM_TH, KILL_SEARCH_SIZE, 30, 0.5, 0.5, D_MIN, PATCH_SIZE)));
 		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpSimuObservationMaker(REPARAM_TH, KILL_SEARCH_SIZE, 30, 0.5, 0.5, D_MIN, PATCH_SIZE)));
@@ -297,20 +323,40 @@ void demo_slam01_main(world_ptr_t *world) {
 	mmPoint->linkToParentMap(mapPtr);
 
 	boost::shared_ptr<simu::AdhocSimulator> simulator;
-	if (intOpts[iSimu] == 1)
+	if (intOpts[iSimu] != 0)
 	{
 		simulator.reset(new simu::AdhocSimulator());
 		jblas::vec3 pose;
 		
-		/*// regular grid
-		const int npoints = 3*11*13;
-		double points[npoints][3];
-		for(int i, z = -1; z <= 1; ++z) for(int y = -3; y <= 7; ++y) for(int x = -6; x <= 6; ++x, ++i)
-			{ points[i][0] = x*1.0; points[i][1] = y*1.0; points[i][2] = z*1.0; }
-		*/
-		// square
-		const int npoints = 5;
-		double points[npoints][3] = { {4,-1,-1}, {4,-1,1}, {4,1,1}, {4,1,-1}, {4,0,0} };
+		const int maxnpoints = 1000;
+		int npoints = 0;
+		double points[maxnpoints][3];
+		
+		switch (intOpts[iSimu]/10)
+		{
+			case 1: {
+				// regular grid
+				const int npoints_ = 3*11*13; npoints = npoints_;
+				for(int i, z = -1; z <= 1; ++z) for(int y = -3; y <= 7; ++y) for(int x = -6; x <= 6; ++x, ++i)
+					{ points[i][0] = x*1.0; points[i][1] = y*1.0; points[i][2] = z*1.0; }
+				break;
+			}
+			case 2: {
+				// flat square
+				const int npoints_ = 5; npoints = npoints_;
+				double tmp[npoints_][3] = { {5,-1,-1}, {5,-1,1}, {5,1,1}, {5,1,-1}, {5,0,0} };
+				memcpy(points, tmp, npoints*3*sizeof(double));
+				break;
+			}
+			case 3: {
+				// square
+				const int npoints_ = 5; npoints = npoints_;
+				double tmp[npoints_][3] = { {5,-1,-1}, {5,-1,1}, {5,1,1}, {5,1,-1}, {4,0,0} };
+				memcpy(points, tmp, npoints*3*sizeof(double));
+				break;
+			}
+			default: npoints = 0;
+		}
 		
 		// add landmarks
 		for(int i = 0; i < npoints; ++i)
@@ -324,7 +370,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	// 2. Create robots.
 	robot_ptr_t robPtr1;
-	if (intOpts[iRobot] == 0)
+	if (intOpts[iRobot] == 0) // constant velocity
 	{
 		robconstvel_ptr_t robPtr1_(new RobotConstantVelocity(mapPtr));
 		robPtr1_->setVelocityStd(UNCERT_VLIN, UNCERT_VANG);
@@ -347,7 +393,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		}
 	}
 	else
-	if (intOpts[iRobot] == 1)
+	if (intOpts[iRobot] == 1) // inertial
 	{
 		robinertial_ptr_t robPtr1_(new RobotInertial(mapPtr));
 		robPtr1_->setInitialStd(UNCERT_VLIN, UNCERT_ABIAS, UNCERT_WBIAS, UNCERT_GRAVITY);
@@ -362,7 +408,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		robPtr1_->constantPerturbation = false;
 
 		hardware::hardware_estimator_ptr_t hardEst1;
-		if (intOpts[iSimu] == 1)
+		if (intOpts[iSimu] != 0)
 		{
 			// TODO
 			//boost::shared_ptr<hardware::HardwareEstimatorSimu> hardEst1_(new hardware::HardwareEstimatorSimu(
@@ -386,39 +432,83 @@ void demo_slam01_main(world_ptr_t *world) {
 	robPtr1->pose.x(quaternion::originFrame());
 	if (dataLogger) dataLogger->addLoggable(*robPtr1.get());
 
-	if (intOpts[iSimu] == 1)
+	if (intOpts[iSimu] != 0)
 	{
-		/*
-		simu::Robot *rob = new simu::Robot(robPtr1->id(), 6);
-		double VEL = 0.5;
-		rob->addWaypoint(0,0,0, 0,0,0, 0,0,0, 0,0,0);
-		rob->addWaypoint(1,0,0, 0,0,0, VEL,0,0, 0,0,0);
-		rob->addWaypoint(3,2,0, 0,0,0, 0,VEL,0, 0,0,0);
-		rob->addWaypoint(1,4,0, 0,0,0, -VEL,0,0, 0,0,0);
-		rob->addWaypoint(-1,4,0, 0,0,0, -VEL,0,0, 0,0,0);
-		rob->addWaypoint(-3,2,0, 0,0,0, 0,-VEL,0, 0,0,0);
-		rob->addWaypoint(-1,0,0, 0,0,0, VEL,0,0, 0,0,0);
-		rob->addWaypoint(0,0,0, 0,0,0, 0,0,0, 0,0,0);
-		simulator->addRobot(rob);
-		*/
-		
-		// TODO
 		simu::Robot *rob = new simu::Robot(robPtr1->id(), 6);
 		if (dataLogger) dataLogger->addLoggable(*rob);
-		double VEL = 0.5;
 		
-		rob->addWaypoint(0 ,+1,0 , 0,0,0, 0,0   ,+VEL, 0,0,0);
-		rob->addWaypoint(0 ,0 ,+1, 0,0,0, 0,-VEL,0   , 0,0,0);
-		rob->addWaypoint(0 ,-1,0 , 0,0,0, 0,0   ,-VEL, 0,0,0);
-		rob->addWaypoint(0 ,0 ,-1, 0,0,0, 0,+VEL,0   , 0,0,0);
+		switch (intOpts[iSimu]%10)
+		{
+			// horiz loop, no rotation
+			case 1: {
+				double VEL = 0.5;
+				rob->addWaypoint(0,0,0, 0,0,0, 0,0,0, 0,0,0);
+				rob->addWaypoint(1,0,0, 0,0,0, VEL,0,0, 0,0,0);
+				rob->addWaypoint(3,2,0, 0,0,0, 0,VEL,0, 0,0,0);
+				rob->addWaypoint(1,4,0, 0,0,0, -VEL,0,0, 0,0,0);
+				rob->addWaypoint(-1,4,0, 0,0,0, -VEL,0,0, 0,0,0);
+				rob->addWaypoint(-3,2,0, 0,0,0, 0,-VEL,0, 0,0,0);
+				rob->addWaypoint(-1,0,0, 0,0,0, VEL,0,0, 0,0,0);
+				rob->addWaypoint(0,0,0, 0,0,0, 0,0,0, 0,0,0);
+				break;
+			}
 		
-		rob->addWaypoint(0 ,+1,0 , 0,0,0, 0,0   ,+VEL, 0,0,0);
-		rob->addWaypoint(0 ,0 ,+1, 0,0,0, 0,-VEL,0   , 0,0,0);
-		rob->addWaypoint(0 ,-1,0 , 0,0,0, 0,0   ,-VEL, 0,0,0);
-		rob->addWaypoint(0 ,0 ,-1, 0,0,0, 0,+VEL,0   , 0,0,0);
+			// two coplanar circles
+			case 2: {
+				double VEL = 0.5;
+				rob->addWaypoint(0 ,+1,0 , 0,0,0, 0,0   ,+VEL, 0,0,0);
+				rob->addWaypoint(0 ,0 ,+1, 0,0,0, 0,-VEL,0   , 0,0,0);
+				rob->addWaypoint(0 ,-1,0 , 0,0,0, 0,0   ,-VEL, 0,0,0);
+				rob->addWaypoint(0 ,0 ,-1, 0,0,0, 0,+VEL,0   , 0,0,0);
+				
+				rob->addWaypoint(0 ,+1,0 , 0,0,0, 0,0   ,+VEL, 0,0,0);
+				rob->addWaypoint(0 ,0 ,+1, 0,0,0, 0,-VEL,0   , 0,0,0);
+				rob->addWaypoint(0 ,-1,0 , 0,0,0, 0,0   ,-VEL, 0,0,0);
+				rob->addWaypoint(0 ,0 ,-1, 0,0,0, 0,+VEL,0   , 0,0,0);
+				
+				rob->addWaypoint(0 ,+1,0 , 0,0,0, 0,0   ,+VEL, 0,0,0);
+				break;
+			}
 		
-		rob->addWaypoint(0 ,+1,0 , 0,0,0, 0,0   ,+VEL, 0,0,0);
-		
+			// two non-coplanar circles at constant velocity
+			case 3: {
+				double VEL = 0.5;
+				rob->addWaypoint(0   ,+1,0 , 0,0,0, 0,0   ,+VEL, 0,0,0);
+				rob->addWaypoint(0.25,0 ,+1, 0,0,0, VEL/4,-VEL,0   , 0,0,0);
+				rob->addWaypoint(0.5 ,-1,0 , 0,0,0, 0,0   ,-VEL, 0,0,0);
+				rob->addWaypoint(0.25,0 ,-1, 0,0,0, -VEL/4,+VEL,0   , 0,0,0);
+				
+				rob->addWaypoint(0    ,+1,0 , 0,0,0, 0,0   ,+VEL, 0,0,0);
+				rob->addWaypoint(-0.25,0 ,+1, 0,0,0, -VEL/4,-VEL,0   , 0,0,0);
+				rob->addWaypoint(-0.5 ,-1,0 , 0,0,0, 0,0   ,-VEL, 0,0,0);
+				rob->addWaypoint(-0.25,0 ,-1, 0,0,0, VEL/4,+VEL,0   , 0,0,0);
+				
+				rob->addWaypoint(0 ,+1,0 , 0,0,0, 0,0   ,+VEL, 0,0,0);
+				break;
+			}
+
+			// two non-coplanar circles with start and stop from/to null speed
+			case 4: {
+				double VEL = 0.5;
+				rob->addWaypoint(0   ,+1,0 , 0,0,0, 0,0   ,0, 0,0,0);
+				rob->addWaypoint(0   ,+1,0.1 , 0,0,0, 0,0   ,+VEL/2, 0,0,0);
+				rob->addWaypoint(0   ,+1,0.5 , 0,0,0, 0,0   ,+VEL/2, 0,0,0);
+				rob->addWaypoint(0.25,0 ,+1, 0,0,0, VEL/4,-VEL,0   , 0,0,0);
+				rob->addWaypoint(0.5 ,-1,0 , 0,0,0, 0,0   ,-VEL, 0,0,0);
+				rob->addWaypoint(0.25,0 ,-1, 0,0,0, -VEL/4,+VEL,0   , 0,0,0);
+				
+				rob->addWaypoint(0    ,+1,0 , 0,0,0, 0,0   ,+VEL, 0,0,0);
+				rob->addWaypoint(-0.25,0 ,+1, 0,0,0, -VEL/4,-VEL,0   , 0,0,0);
+				rob->addWaypoint(-0.5 ,-1,0 , 0,0,0, 0,0   ,-VEL, 0,0,0);
+				rob->addWaypoint(-0.25,0 ,-1, 0,0,0, VEL/4,+VEL,0   , 0,0,0);
+				
+				rob->addWaypoint(0 ,+1,-0.5 , 0,0,0, 0,0   ,+VEL/2, 0,0,0);
+				rob->addWaypoint(0 ,+1,-0.1 , 0,0,0, 0,0   ,+VEL/2, 0,0,0);
+				rob->addWaypoint(0 ,+1,0 , 0,0,0, 0,0   ,0, 0,0,0);
+				break;
+			}
+		}
+
 		simulator->addRobot(rob);
 		
 	}
@@ -436,12 +526,12 @@ void demo_slam01_main(world_ptr_t *world) {
 		senPtr11->setPose(0,0,0,-90,0,-90);
 	}
 	//senPtr11->pose.x(quaternion::originFrame());
-	senPtr11->params.setImgSize(IMG_WIDTH, IMG_HEIGHT);
+	senPtr11->params.setImgSize(img_width, img_height);
 	senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, CORRECTION_SIZE);
 	//JFR_DEBUG("Correction params: " << senPtr11->params.correction);
 	senPtr11->params.setMiscellaneous(PIX_NOISE, D_MIN);
 
-	if (intOpts[iSimu] == 1)
+	if (intOpts[iSimu] != 0)
 	{
 		jblas::vec6 pose;
 		subrange(pose, 0, 3) = subrange(senPtr11->pose.x(), 0, 3);
@@ -453,9 +543,9 @@ void demo_slam01_main(world_ptr_t *world) {
 	}
 	
 	// 3b. Create data manager.
-	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(IMG_WIDTH, IMG_HEIGHT, GRID_HCELLS, GRID_VCELLS, GRID_MARGIN, GRID_SEPAR));
+	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(img_width, img_height, GRID_HCELLS, GRID_VCELLS, GRID_MARGIN, GRID_SEPAR));
 	
-	if (intOpts[iSimu] == 1)
+	if (intOpts[iSimu] != 0)
 	{
 		boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, PATCH_DESC, PIX_NOISE, PIX_NOISE*PIX_NOISE_SIMUFACTOR));
 		boost::shared_ptr<simu::MatcherSimu<image::ConvexRoi> > matcher(new simu::MatcherSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, PATCH_SIZE, MAX_SEARCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE, PIX_NOISE*PIX_NOISE_SIMUFACTOR));
@@ -483,12 +573,12 @@ void demo_slam01_main(world_ptr_t *world) {
 		
 		#ifdef HAVE_VIAM
 		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, rawdata_mutex, 
-			CAMERA_DEVICE, cv::Size(IMG_WIDTH,IMG_HEIGHT), 0, 8, floatOpts[fFreq], intOpts[iTrigger], mode, strOpts[sDataPath]));
+			CAMERA_DEVICE, cv::Size(img_width,img_height), 0, 8, floatOpts[fFreq], intOpts[iTrigger], mode, strOpts[sDataPath]));
 		senPtr11->setHardwareSensor(hardSen11);
 		#else
 		if (intOpts[iReplay])
 		{
-			hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, rawdata_mutex, cv::Size(IMG_WIDTH,IMG_HEIGHT),strOpts[sDataPath]));
+			hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, rawdata_mutex, cv::Size(img_width,img_height),strOpts[sDataPath]));
 			senPtr11->setHardwareSensor(hardSen11);
 		}
 		#endif
@@ -939,7 +1029,7 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 		 * --dump=0/1  (needs --data-path)
 		 * --rand-seed=0/1/n, 0=generate new one, 1=in replay use the saved one, n=use seed n
 		 * --pause=0/n 0=don't, n=pause for frames>n (needs --replay 1)
-		 * --log=0/1 -> not implemented yet
+		 * --log=0/1 -> log result in text file
 		 * --verbose=0/1/2/3/4/5 -> Off/Trace/Warning/Debug/VerboseDebug/VeryVerboseDebug
 		 * --data-path=/mnt/ram/rtslam
 		 * #--slam-config=data/config1.xml -> not implemented yet

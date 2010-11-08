@@ -66,6 +66,7 @@ protected slots:
     void gamepads(quint8 count);
     void buttonState(ButtonNumber number, bool pressed);
     void axesValues(QListInt16 values);
+    void updateButtonFunction();
 
 };
 

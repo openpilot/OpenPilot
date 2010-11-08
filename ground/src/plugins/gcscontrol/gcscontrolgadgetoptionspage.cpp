@@ -51,6 +51,19 @@ GCSControlGadgetOptionsPage::~GCSControlGadgetOptionsPage()
 
 void GCSControlGadgetOptionsPage::buttonState(ButtonNumber number, bool pressed)
 {
+    if (options_page) {
+        QList<QCheckBox*> rbList;
+        rbList << options_page->buttonInput0 <<
+                  options_page->buttonInput1 << options_page->buttonInput2 <<
+                  options_page->buttonInput3 << options_page->buttonInput4 <<
+                  options_page->buttonInput5 << options_page->buttonInput6 <<
+                  options_page->buttonInput7;
+
+        if (number<8) // We only support 8 buttons
+        {
+            rbList.at(number)->setChecked(pressed);
+        }
+    }
 
 }
 
@@ -84,6 +97,7 @@ void GCSControlGadgetOptionsPage::axesValues(QListInt16 values)
 //creates options page widget (uses the UI file)
 QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
 {
+    int i;
     options_page = new Ui::GCSControlGadgetOptionsPage();
     QWidget *optionsPageWidget = new QWidget;
     options_page->setupUi(optionsPageWidget);
@@ -99,6 +113,63 @@ QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
         qb->addItems(chOptions);
     }
 
+    QList<QComboBox*> buttonList;
+    buttonList << options_page->button0 << options_page->button1 <<
+              options_page->button2 << options_page->button3 <<
+              options_page->button4 << options_page->button5 <<
+              options_page->button6 << options_page->button7;
+    QStringList buttonOptions;
+    buttonOptions << "None" << "Roll" << "Pitch" << "Yaw" << "Throttle" << "Armed" << "GCS Control";
+    foreach (QComboBox* qb, buttonList) {
+        qb->addItems(buttonOptions);
+    }
+    QList<QComboBox*> buttonActionList;
+    buttonActionList << options_page->buttonAction0 << options_page->buttonAction1 <<
+              options_page->buttonAction2 << options_page->buttonAction3 <<
+              options_page->buttonAction4 << options_page->buttonAction5 <<
+              options_page->buttonAction6 << options_page->buttonAction7;
+    QStringList buttonActionOptions;
+    buttonActionOptions << "None" << "Increase" << "Decrease" << "Toggle";
+    foreach (QComboBox* qb, buttonActionList) {
+        qb->addItems(buttonActionOptions);
+    }
+    QList<QDoubleSpinBox*> buttonValueList;
+    buttonValueList << options_page->buttonAmount0 << options_page->buttonAmount1 <<
+              options_page->buttonAmount2 << options_page->buttonAmount3 <<
+              options_page->buttonAmount4 << options_page->buttonAmount5 <<
+              options_page->buttonAmount6 << options_page->buttonAmount7;
+
+    for (i=0;i<8;i++)
+    {
+        if (buttonList.at(i)->currentText().compare("None")==0)
+        {
+            buttonActionList.at(i)->setVisible(0);
+            buttonValueList.at(i)->setVisible(0);
+        }
+        else if ((buttonList.at(i)->currentText().compare("Armed")==0)||
+                    (buttonList.at(i)->currentText().compare("GCS Control")==0))
+        {
+            buttonActionList.at(i)->setVisible(1);
+            buttonValueList.at(i)->setVisible(0);
+        }
+        else
+        {
+            buttonActionList.at(i)->setVisible(1);
+            if (buttonActionList.at(i)->currentText().compare("Toggle")==0)
+            {
+                buttonValueList.at(i)->setVisible(0);
+            }
+            else
+            {
+                buttonValueList.at(i)->setVisible(1);
+            }
+        }
+        connect(buttonList.at(i),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonFunction()));
+
+    }
+
+
+
     // Controls mode are from 1 to 4.
     if (m_config->getControlsMode()>0 && m_config->getControlsMode() < 5)
         options_page->controlsMode->setCurrentIndex(m_config->getControlsMode()-1);
@@ -112,6 +183,7 @@ QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
     }
 
     connect(sdlGamepad,SIGNAL(axesValues(QListInt16)),this,SLOT(axesValues(QListInt16)));
+    connect(sdlGamepad,SIGNAL(buttonState(ButtonNumber,bool)),this,SLOT(buttonState(ButtonNumber,bool)));
 
     return optionsPageWidget;
 }
@@ -156,4 +228,54 @@ void GCSControlGadgetOptionsPage::finish()
     disconnect(sdlGamepad,0,this,0);
     delete options_page;
     options_page = NULL;
+}
+
+
+void GCSControlGadgetOptionsPage::updateButtonFunction()
+{
+    int i;
+    QList<QComboBox*> buttonList;
+    buttonList << options_page->button0 << options_page->button1 <<
+              options_page->button2 << options_page->button3 <<
+              options_page->button4 << options_page->button5 <<
+              options_page->button6 << options_page->button7;
+    QList<QComboBox*> buttonActionList;
+    buttonActionList << options_page->buttonAction0 << options_page->buttonAction1 <<
+              options_page->buttonAction2 << options_page->buttonAction3 <<
+              options_page->buttonAction4 << options_page->buttonAction5 <<
+              options_page->buttonAction6 << options_page->buttonAction7;
+    QList<QDoubleSpinBox*> buttonValueList;
+    buttonValueList << options_page->buttonAmount0 << options_page->buttonAmount1 <<
+              options_page->buttonAmount2 << options_page->buttonAmount3 <<
+              options_page->buttonAmount4 << options_page->buttonAmount5 <<
+              options_page->buttonAmount6 << options_page->buttonAmount7;
+
+    for (i=0;i<8;i++)
+    {
+        if (buttonList.at(i)->currentText().compare("None")==0)
+        {
+            buttonActionList.at(i)->setVisible(0);
+            buttonValueList.at(i)->setVisible(0);
+        }
+        else if ((buttonList.at(i)->currentText().compare("Armed")==0)||
+                    (buttonList.at(i)->currentText().compare("GCS Control")==0))
+        {
+            buttonActionList.at(i)->setVisible(1);
+            buttonValueList.at(i)->setVisible(0);
+        }
+        else
+        {
+            buttonActionList.at(i)->setVisible(1);
+            if (buttonActionList.at(i)->currentText().compare("Toggle")==0)
+            {
+                buttonValueList.at(i)->setVisible(0);
+            }
+            else
+            {
+                buttonValueList.at(i)->setVisible(1);
+            }
+        }
+    }
+
+
 }

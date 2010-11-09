@@ -30,6 +30,7 @@
 
 #include <coreplugin/iuavgadget.h>
 #include <uavobjects/manualcontrolcommand.h>
+#include "gcscontrolgadgetconfiguration.h"
 #include "sdlgamepad/sdlgamepad.h"
 #include <QTime>
 #include "gcscontrolplugin.h"
@@ -67,6 +68,7 @@ private:
     int yawChannel;
     int throttleChannel;
     int controlsMode;
+    buttonSettingsStruct buttonSettings[8];
 
 signals:
     void sticksChangedRemotely(double leftX, double leftY, double rightX, double rightY);

@@ -69,6 +69,14 @@ void GCSControlGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 
     controlsMode = GCSControlConfig->getControlsMode();
 
+    int i;
+    for (i=0;i<8;i++)
+    {
+        buttonSettings[i].ActionID=GCSControlConfig->getbuttonSettings(i).ActionID;
+        buttonSettings[i].FunctionID=GCSControlConfig->getbuttonSettings(i).FunctionID;
+        buttonSettings[i].Amount=GCSControlConfig->getbuttonSettings(i).Amount;
+    }
+
 }
 
 ManualControlCommand* GCSControlGadget::getManualControlCommand() {
@@ -150,11 +158,24 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
         break;
     }
 
+    //check if buttons have control over this axis... if so don't update it
+    int buttonRollControl=0;
+    int buttonPitchControl=0;
+    int buttonYawControl=0;
+    int buttonThrottleControl=0;
+    for (int i=0;i<8;i++)
+    {
+        if ((buttonSettings[i].FunctionID==1)&&((buttonSettings[i].ActionID==1)||(buttonSettings[i].ActionID==2)))buttonRollControl=1;
+        if ((buttonSettings[i].FunctionID==2)&&((buttonSettings[i].ActionID==1)||(buttonSettings[i].ActionID==2)))buttonPitchControl=1;
+        if ((buttonSettings[i].FunctionID==3)&&((buttonSettings[i].ActionID==1)||(buttonSettings[i].ActionID==2)))buttonYawControl=1;
+        if ((buttonSettings[i].FunctionID==4)&&((buttonSettings[i].ActionID==1)||(buttonSettings[i].ActionID==2)))buttonThrottleControl=1;
+    }
+
     if((newThrottle != oldThrottle) || (newPitch != oldPitch) || (newYaw != oldYaw) || (newRoll != oldRoll)) {
-        obj->getField("Roll")->setDouble(newRoll);
-        obj->getField("Pitch")->setDouble(newPitch);
-        obj->getField("Yaw")->setDouble(newYaw);
-        obj->getField("Throttle")->setDouble(newThrottle);
+        if (buttonRollControl==0)obj->getField("Roll")->setDouble(newRoll);
+        if (buttonPitchControl==0)obj->getField("Pitch")->setDouble(newPitch);
+        if (buttonYawControl==0)obj->getField("Yaw")->setDouble(newYaw);
+        if (buttonThrottleControl==0)obj->getField("Throttle")->setDouble(newThrottle);
         obj->updated();
     }
 }
@@ -167,6 +188,80 @@ void GCSControlGadget::gamepads(quint8 count)
 
 void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
 {
+    int state;
+    if ((buttonSettings[number].ActionID>0)&&(buttonSettings[number].FunctionID>0)&&(pressed))
+    {//this button is configured
+        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+        UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+        UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(QString("ManualControlCommand")) );
+
+        switch (buttonSettings[number].FunctionID)
+        {
+        case 1://Roll
+            if (buttonSettings[number].ActionID==1)
+            {//increase
+                obj->getField("Roll")->setValue(obj->getField("Roll")->getValue().toDouble()+buttonSettings[number].Amount);
+            }
+            if (buttonSettings[number].ActionID==2)
+            {//decrease
+                obj->getField("Roll")->setValue(obj->getField("Roll")->getValue().toDouble()-buttonSettings[number].Amount);
+            }
+            break;
+        case 2://Pitch
+            if (buttonSettings[number].ActionID==1)
+            {//increase
+                obj->getField("Pitch")->setValue(obj->getField("Pitch")->getValue().toDouble()+buttonSettings[number].Amount);
+            }
+            if (buttonSettings[number].ActionID==2)
+            {//decrease
+                obj->getField("Pitch")->setValue(obj->getField("Pitch")->getValue().toDouble()-buttonSettings[number].Amount);
+            }
+            break;
+        case 3://Yaw
+            if (buttonSettings[number].ActionID==1)
+            {//increase
+                obj->getField("Yaw")->setValue(obj->getField("Yaw")->getValue().toDouble()+buttonSettings[number].Amount);
+            }
+            if (buttonSettings[number].ActionID==2)
+            {//decrease
+                obj->getField("Yaw")->setValue(obj->getField("Yaw")->getValue().toDouble()-buttonSettings[number].Amount);
+            }
+            break;
+        case 4://Throttle
+            if (buttonSettings[number].ActionID==1)
+            {//increase
+                obj->getField("Throttle")->setValue(obj->getField("Throttle")->getValue().toDouble()+buttonSettings[number].Amount);
+            }
+            if (buttonSettings[number].ActionID==2)
+            {//decrease
+                obj->getField("Throttle")->setValue(obj->getField("Throttle")->getValue().toDouble()-buttonSettings[number].Amount);
+            }
+            break;
+        case 5://Armed
+            if (buttonSettings[number].ActionID==3)
+            {//toggle
+                if(obj->getField("Armed")->getValue().toString().compare("True")==0)
+                {
+                    obj->getField("Armed")->setValue("False");
+                }
+                else
+                {
+                    obj->getField("Armed")->setValue("True");
+                }
+            }
+            break;
+        case 6://GCS Control
+            if (buttonSettings[number].ActionID==3)
+            {//toggle
+
+            }
+            break;
+        }
+        obj->updated();
+    }
+        //buttonSettings[number].ActionID NIDT
+        //buttonSettings[number].FunctionID -RPYTAC
+        //buttonSettings[number].Amount
 }
 
 void GCSControlGadget::axesValues(QListInt16 values)

@@ -30,7 +30,16 @@
 
 #include <coreplugin/iuavgadgetconfiguration.h>
 
+typedef struct{
+    int     ActionID;
+    int     FunctionID;
+    double  Amount;
+}buttonSettingsStruct;
+
+
 using namespace Core;
+
+
 
 class GCSControlGadgetConfiguration : public IUAVGadgetConfiguration
 {
@@ -43,7 +52,10 @@ class GCSControlGadgetConfiguration : public IUAVGadgetConfiguration
     int getControlsMode() { return controlsMode; }
     QList<int>  getChannelsMapping();
 
-
+    buttonSettingsStruct getbuttonSettings(int i){return buttonSettings[i];}
+    void setbuttonSettingsAction(int i, int ActionID ){buttonSettings[i].ActionID=ActionID;return;}
+    void setbuttonSettingsFunction(int i, int FunctionID ){buttonSettings[i].FunctionID=FunctionID;return;}
+    void setbuttonSettingsAmount(int i, double Amount ){buttonSettings[i].Amount=Amount;return;}
 
 
         void saveConfig(QSettings* settings) const;
@@ -56,6 +68,8 @@ class GCSControlGadgetConfiguration : public IUAVGadgetConfiguration
         int pitchChannel;
         int yawChannel;
         int throttleChannel;
+        buttonSettingsStruct buttonSettings[8];
+
 
 };
 

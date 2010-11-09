@@ -113,14 +113,15 @@ QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
         qb->addItems(chOptions);
     }
 
-    QList<QComboBox*> buttonList;
-    buttonList << options_page->button0 << options_page->button1 <<
-              options_page->button2 << options_page->button3 <<
-              options_page->button4 << options_page->button5 <<
-              options_page->button6 << options_page->button7;
+
+    QList<QComboBox*> buttonFunctionList;
+    buttonFunctionList << options_page->buttonFunction0 << options_page->buttonFunction1 <<
+              options_page->buttonFunction2 << options_page->buttonFunction3 <<
+              options_page->buttonFunction4 << options_page->buttonFunction5 <<
+              options_page->buttonFunction6 << options_page->buttonFunction7;
     QStringList buttonOptions;
-    buttonOptions << "None" << "Roll" << "Pitch" << "Yaw" << "Throttle" << "Armed" << "GCS Control";
-    foreach (QComboBox* qb, buttonList) {
+    buttonOptions <<"-" << "Roll" << "Pitch" << "Yaw" << "Throttle" << "Armed" << "GCS Control" ;
+    foreach (QComboBox* qb, buttonFunctionList) {
         qb->addItems(buttonOptions);
     }
     QList<QComboBox*> buttonActionList;
@@ -129,7 +130,7 @@ QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
               options_page->buttonAction4 << options_page->buttonAction5 <<
               options_page->buttonAction6 << options_page->buttonAction7;
     QStringList buttonActionOptions;
-    buttonActionOptions << "None" << "Increase" << "Decrease" << "Toggle";
+    buttonActionOptions << "Does nothing" << "Increases" << "Decreases" << "Toggles";
     foreach (QComboBox* qb, buttonActionList) {
         qb->addItems(buttonActionOptions);
     }
@@ -141,33 +142,14 @@ QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
 
     for (i=0;i<8;i++)
     {
-        if (buttonList.at(i)->currentText().compare("None")==0)
-        {
-            buttonActionList.at(i)->setVisible(0);
-            buttonValueList.at(i)->setVisible(0);
-        }
-        else if ((buttonList.at(i)->currentText().compare("Armed")==0)||
-                    (buttonList.at(i)->currentText().compare("GCS Control")==0))
-        {
-            buttonActionList.at(i)->setVisible(1);
-            buttonValueList.at(i)->setVisible(0);
-        }
-        else
-        {
-            buttonActionList.at(i)->setVisible(1);
-            if (buttonActionList.at(i)->currentText().compare("Toggle")==0)
-            {
-                buttonValueList.at(i)->setVisible(0);
-            }
-            else
-            {
-                buttonValueList.at(i)->setVisible(1);
-            }
-        }
-        connect(buttonList.at(i),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonFunction()));
+        buttonActionList.at(i)->setCurrentIndex(m_config->getbuttonSettings(i).ActionID);
+        buttonFunctionList.at(i)->setCurrentIndex(m_config->getbuttonSettings(i).FunctionID);
+        buttonValueList.at(i)->setValue(m_config->getbuttonSettings(i).Amount);
 
+        connect(buttonFunctionList.at(i),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonFunction()));
+        connect(buttonActionList.at(i),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonFunction()));
     }
-
+    updateButtonFunction();
 
 
     // Controls mode are from 1 to 4.
@@ -202,6 +184,23 @@ void GCSControlGadgetOptionsPage::apply()
              options_page->channel2 << options_page->channel3 <<
              options_page->channel4 << options_page->channel5 <<
              options_page->channel6 << options_page->channel7;
+   QList<QComboBox*> buttonFunctionList;
+   buttonFunctionList << options_page->buttonFunction0 << options_page->buttonFunction1 <<
+             options_page->buttonFunction2 << options_page->buttonFunction3 <<
+             options_page->buttonFunction4 << options_page->buttonFunction5 <<
+             options_page->buttonFunction6 << options_page->buttonFunction7;
+   QList<QComboBox*> buttonActionList;
+   buttonActionList << options_page->buttonAction0 << options_page->buttonAction1 <<
+             options_page->buttonAction2 << options_page->buttonAction3 <<
+             options_page->buttonAction4 << options_page->buttonAction5 <<
+             options_page->buttonAction6 << options_page->buttonAction7;
+   QList<QDoubleSpinBox*> buttonValueList;
+   buttonValueList << options_page->buttonAmount0 << options_page->buttonAmount1 <<
+             options_page->buttonAmount2 << options_page->buttonAmount3 <<
+             options_page->buttonAmount4 << options_page->buttonAmount5 <<
+             options_page->buttonAmount6 << options_page->buttonAmount7;
+
+
    int roll=-1 , pitch=-1, yaw=-1, throttle=-1;
    for (int i=0; i<chList.length(); i++) {
       switch (chList.at(i)->currentIndex()) {
@@ -221,6 +220,14 @@ void GCSControlGadgetOptionsPage::apply()
    }
    m_config->setRPYTchannels(roll,pitch,yaw,throttle);
 
+   int j;
+   for (j=0;j<8;j++)
+   {
+       m_config->setbuttonSettingsAction(j,buttonActionList.at(j)->currentIndex());
+       m_config->setbuttonSettingsFunction(j,buttonFunctionList.at(j)->currentIndex());
+       m_config->setbuttonSettingsAmount(j,buttonValueList.at(j)->value());
+   }
+
 }
 
 void GCSControlGadgetOptionsPage::finish()
@@ -234,11 +241,11 @@ void GCSControlGadgetOptionsPage::finish()
 void GCSControlGadgetOptionsPage::updateButtonFunction()
 {
     int i;
-    QList<QComboBox*> buttonList;
-    buttonList << options_page->button0 << options_page->button1 <<
-              options_page->button2 << options_page->button3 <<
-              options_page->button4 << options_page->button5 <<
-              options_page->button6 << options_page->button7;
+    QList<QComboBox*> buttonFunctionList;
+    buttonFunctionList << options_page->buttonFunction0 << options_page->buttonFunction1 <<
+              options_page->buttonFunction2 << options_page->buttonFunction3 <<
+              options_page->buttonFunction4 << options_page->buttonFunction5 <<
+              options_page->buttonFunction6 << options_page->buttonFunction7;
     QList<QComboBox*> buttonActionList;
     buttonActionList << options_page->buttonAction0 << options_page->buttonAction1 <<
               options_page->buttonAction2 << options_page->buttonAction3 <<
@@ -249,31 +256,32 @@ void GCSControlGadgetOptionsPage::updateButtonFunction()
               options_page->buttonAmount2 << options_page->buttonAmount3 <<
               options_page->buttonAmount4 << options_page->buttonAmount5 <<
               options_page->buttonAmount6 << options_page->buttonAmount7;
+    QList<QLabel*> buttonLabelList;
+    buttonLabelList << options_page->buttonLabel0 << options_page->buttonLabel1 <<
+              options_page->buttonLabel2 << options_page->buttonLabel3 <<
+              options_page->buttonLabel4 << options_page->buttonLabel5 <<
+              options_page->buttonLabel6 << options_page->buttonLabel7;
 
     for (i=0;i<8;i++)
     {
-        if (buttonList.at(i)->currentText().compare("None")==0)
+        if (buttonActionList.at(i)->currentText().compare("Does nothing")==0)
         {
-            buttonActionList.at(i)->setVisible(0);
+            buttonFunctionList.at(i)->setVisible(0);
+            buttonLabelList.at(i)->setVisible(0);
             buttonValueList.at(i)->setVisible(0);
         }
-        else if ((buttonList.at(i)->currentText().compare("Armed")==0)||
-                    (buttonList.at(i)->currentText().compare("GCS Control")==0))
+        else
+        if (buttonActionList.at(i)->currentText().compare("Toggles")==0)
         {
-            buttonActionList.at(i)->setVisible(1);
+            buttonFunctionList.at(i)->setVisible(1);
+            buttonLabelList.at(i)->setVisible(0);
             buttonValueList.at(i)->setVisible(0);
         }
         else
         {
-            buttonActionList.at(i)->setVisible(1);
-            if (buttonActionList.at(i)->currentText().compare("Toggle")==0)
-            {
-                buttonValueList.at(i)->setVisible(0);
-            }
-            else
-            {
-                buttonValueList.at(i)->setVisible(1);
-            }
+            buttonFunctionList.at(i)->setVisible(1);
+            buttonLabelList.at(i)->setVisible(1);
+            buttonValueList.at(i)->setVisible(1);
         }
     }
 

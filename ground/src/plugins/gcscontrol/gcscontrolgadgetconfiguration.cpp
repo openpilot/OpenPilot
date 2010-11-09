@@ -38,6 +38,13 @@ GCSControlGadgetConfiguration::GCSControlGadgetConfiguration(QString classId, QS
     yawChannel(-1),
     throttleChannel(-1)
 {
+    int i;
+    for (i=0;i<8;i++)
+    {
+        buttonSettings[i].ActionID=0;
+        buttonSettings[i].FunctionID=0;
+        buttonSettings[i].Amount=0;
+    }
     //if a saved configuration exists load it
     if(qSettings != 0) {
         controlsMode = qSettings->value("controlsMode").toInt();
@@ -45,6 +52,14 @@ GCSControlGadgetConfiguration::GCSControlGadgetConfiguration(QString classId, QS
         pitchChannel = qSettings->value("pitchChannel").toInt();
         yawChannel = qSettings->value("yawChannel").toInt();
         throttleChannel = qSettings->value("throttleChannel").toInt();
+
+        int i;
+        for (i=0;i<8;i++)
+        {
+            buttonSettings[i].ActionID = qSettings->value(QString().sprintf("button%dAction",i)).toInt();
+            buttonSettings[i].FunctionID = qSettings->value(QString().sprintf("button%dFunction",i)).toInt();
+            buttonSettings[i].Amount = qSettings->value(QString().sprintf("button%dAmount",i)).toDouble();
+        }
     }
 
 }
@@ -91,4 +106,13 @@ void GCSControlGadgetConfiguration::saveConfig(QSettings* settings) const {
     settings->setValue("pitchChannel", pitchChannel);
     settings->setValue("yawChannel", yawChannel);
     settings->setValue("throttleChannel", throttleChannel);
+
+    int i;
+    for (i=0;i<8;i++)
+    {
+        settings->setValue(QString().sprintf("button%dAction",i), buttonSettings[i].ActionID);
+        settings->setValue(QString().sprintf("button%dFunction",i), buttonSettings[i].FunctionID);
+        settings->setValue(QString().sprintf("button%dAmount",i), buttonSettings[i].Amount);
+    }
+
 }

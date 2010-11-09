@@ -184,13 +184,8 @@ all_ground: uavobjgenerator openpilotgcs
 .PHONY: gcs
 gcs: openpilotgcs
 
-# Note: openpilotgcs should depend on uavobjects directly since it uses
-#       the generated uavobject files.  This is commented out since the
-#       uavobjgenerator tool always regenerates its output files
-#       triggering unnecessary rebuilds of the elf file.
-
 .PHONY: openpilotgcs
-openpilotgcs:  #uavobjects
+openpilotgcs:  uavobjects
 	mkdir -p $(BUILD_DIR)/$@
 	( cd $(BUILD_DIR)/$@ ; \
 	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
@@ -222,12 +217,7 @@ all_flight: openpilot_elf ahrs_elf
 .PHONY: openpilot
 openpilot: openpilot_elf
 
-# Note: openpilot_* should depend on uavobjects directly since it uses
-#       the generated uavobject files.  This is commented out since the
-#       uavobjgenerator tool always regenerates its output files
-#       triggering unnecessary rebuilds of the elf file.
-
-openpilot_%: #uavobjects
+openpilot_%: uavobjects
 	mkdir -p $(BUILD_DIR)/openpilot
 	$(MAKE) OUTDIR="$(BUILD_DIR)/openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/OpenPilot $*
 
@@ -241,9 +231,7 @@ ahrs_%:
 .PHONY: sim_posix
 sim_posix: sim_posix_elf
 
-# Note: sim_* should depend on uavobjects directly - same reasons as above.
-
-sim_posix_%: #uavobjects
+sim_posix_%: uavobjects
 	mkdir -p $(BUILD_DIR)/simulation
 	$(MAKE) OUTDIR="$(BUILD_DIR)/simulation" -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.posix $*
 

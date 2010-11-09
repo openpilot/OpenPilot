@@ -160,36 +160,33 @@ bool UAVObjectGenerator::processAll()
                 return false;
             }
             // Write the flight code
-            // TODO: Only write file if modified
-            res = writeFile( flightCodePath.absolutePath() + "/" + namelc + ".c", flightCode );
+            res = writeFileIfDiffrent( flightCodePath.absolutePath() + "/" + namelc + ".c", flightCode );
             if (!res)
             {
                 sout << "Error: Could not write output files" << endl;
                 return false;
             }
-            res = writeFile( flightCodePath.absolutePath() + "/inc/" + namelc + ".h", flightInclude );
+            res = writeFileIfDiffrent( flightCodePath.absolutePath() + "/inc/" + namelc + ".h", flightInclude );
             if (!res)
             {
                 sout << "Error: Could not write output files" << endl;
                 return false;
             }
             // Write the GCS code
-            // TODO: Only write file if modified
-            res = writeFile( gcsCodePath.absolutePath() + "/" + namelc + ".cpp", gcsCode );
+            res = writeFileIfDiffrent( gcsCodePath.absolutePath() + "/" + namelc + ".cpp", gcsCode );
             if (!res)
             {
                 sout << "Error: Could not write output files" << endl;
                 return false;
             }
-            res = writeFile( gcsCodePath.absolutePath() + "/" + namelc + ".h", gcsInclude );
+            res = writeFileIfDiffrent( gcsCodePath.absolutePath() + "/" + namelc + ".h", gcsInclude );
             if (!res)
             {
                 sout << "Error: Could not write output files" << endl;
                 return false;
             }
             // Write the Python code
-            // TODO: Only write file if modified
-            res = writeFile( pythonCodePath.absolutePath() + "/" + namelc + ".py", pythonCode );
+            res = writeFileIfDiffrent( pythonCodePath.absolutePath() + "/" + namelc + ".py", pythonCode );
             if (!res)
             {
                 sout << "Error: Could not write output files" << endl;
@@ -208,7 +205,7 @@ bool UAVObjectGenerator::processAll()
     sout << "Updating object initialization files" << endl;
     flightInitTemplate.replace( QString("$(OBJINC)"), objInc);
     flightInitTemplate.replace( QString("$(OBJINIT)"), flightObjInit);
-    res = writeFile( flightCodePath.absolutePath() + "/" + objectsInitFilename + ".c",
+    res = writeFileIfDiffrent( flightCodePath.absolutePath() + "/" + objectsInitFilename + ".c",
                      flightInitTemplate );
     if (!res)
     {
@@ -219,7 +216,7 @@ bool UAVObjectGenerator::processAll()
     // Write the gcs object inialization files
     gcsInitTemplate.replace( QString("$(OBJINC)"), objInc);
     gcsInitTemplate.replace( QString("$(OBJINIT)"), gcsObjInit);
-    res = writeFile( gcsCodePath.absolutePath() + "/" + objectsInitFilename + ".cpp",
+    res = writeFileIfDiffrent( gcsCodePath.absolutePath() + "/" + objectsInitFilename + ".cpp",
                      gcsInitTemplate );
     if (!res)
     {
@@ -262,5 +259,15 @@ bool UAVObjectGenerator::writeFile(QString name, QString& str)
     fileStr << str;
     file.close();
     return true;
+}
+
+
+/**
+ * Write contents of string to file if the content changes
+ */
+bool UAVObjectGenerator::writeFileIfDiffrent(QString name, QString& str)
+{
+    if (readFile(name)==str) return true;
+    return writeFile(name,str);
 }
 

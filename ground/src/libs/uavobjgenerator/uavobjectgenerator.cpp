@@ -239,7 +239,12 @@ bool UAVObjectGenerator::processAll()
 QString UAVObjectGenerator::readFile(QString name)
 {
     QFile file(name);
-    if (!file.open(QFile::ReadOnly)) return QString();
+    if (!file.open(QFile::ReadOnly)) 
+    {
+        sout << "Warning: Could not open " << name << endl;
+        return QString();
+    }
+
     QTextStream fileStr(&file);
     QString str = fileStr.readAll();
     file.close();

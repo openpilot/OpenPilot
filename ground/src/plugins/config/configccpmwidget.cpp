@@ -171,6 +171,7 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_ccpm->ccpmType, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateType()));
     connect(m_ccpm->ccpmSingleServo, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateType()));
     connect(m_ccpm->CurveSettings, SIGNAL(cellChanged (int, int)), this, SLOT(UpdateCurveWidgets()));
+    connect(m_ccpm->TabObject, SIGNAL(currentChanged ( QWidget * )), this, SLOT(UpdateType()));
 
 
 
@@ -297,6 +298,11 @@ void ConfigccpmWidget::UpdateType()
         }
 
 
+        m_ccpm->ccpmAdvancedSettingsTable->resizeColumnsToContents();
+        for (int i=0;i<6;i++) {
+            m_ccpm->ccpmAdvancedSettingsTable->setColumnWidth(i,(m_ccpm->ccpmAdvancedSettingsTable->width()-
+                                                            m_ccpm->ccpmAdvancedSettingsTable->verticalHeader()->width())/6);
+        }
 
     //update UI
     ccpmSwashplateUpdate();
@@ -1132,5 +1138,26 @@ void ConfigccpmWidget::saveccpmUpdate()
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));
     Q_ASSERT(obj);
     updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+}
+
+void ConfigccpmWidget::resizeEvent(QResizeEvent* event)
+{
+    Q_UNUSED(event);
+    // Make the custom table columns autostretch:
+    m_ccpm->ccpmAdvancedSettingsTable->resizeColumnsToContents();
+    for (int i=0;i<6;i++) {
+        m_ccpm->ccpmAdvancedSettingsTable->setColumnWidth(i,(m_ccpm->ccpmAdvancedSettingsTable->width()-
+                                                        m_ccpm->ccpmAdvancedSettingsTable->verticalHeader()->width())/6);
+    }
+
+}
+void ConfigccpmWidget::showEvent(QShowEvent *event)
+{
+    Q_UNUSED(event)
+    m_ccpm->ccpmAdvancedSettingsTable->resizeColumnsToContents();
+    for (int i=0;i<6;i++) {
+        m_ccpm->ccpmAdvancedSettingsTable->setColumnWidth(i,(m_ccpm->ccpmAdvancedSettingsTable->width()-
+                                                        m_ccpm->ccpmAdvancedSettingsTable->verticalHeader()->width())/6);
+    }
 }
 

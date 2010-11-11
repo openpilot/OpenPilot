@@ -76,6 +76,9 @@ private:
         void requestccpmUpdate();
         void sendccpmUpdate();
         void saveccpmUpdate();
+protected:
+    void showEvent(QShowEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
 };
 

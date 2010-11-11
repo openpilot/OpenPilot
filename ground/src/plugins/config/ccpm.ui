@@ -75,7 +75,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="BasicTab">
         <attribute name="title">
@@ -95,7 +95,7 @@
              <item>
               <widget class="QGroupBox" name="SwashplateBox_2">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -213,7 +213,7 @@
              <item>
               <widget class="QGroupBox" name="SwashplateBox">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -504,7 +504,7 @@
              <item>
               <widget class="QGroupBox" name="SwashplateBox_3">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -1519,11 +1519,11 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_7">
              <item>
-              <layout class="QVBoxLayout" name="verticalLayout_11">
+              <layout class="QVBoxLayout" name="verticalLayout_11" stretch="3,1">
                <item>
                 <widget class="QTableWidget" name="CurveSettings">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                  <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -1531,7 +1531,7 @@
                  <property name="minimumSize">
                   <size>
                    <width>142</width>
-                   <height>173</height>
+                   <height>148</height>
                   </size>
                  </property>
                  <property name="maximumSize">
@@ -1552,7 +1552,7 @@
                   <enum>Qt::ScrollBarAsNeeded</enum>
                  </property>
                  <property name="autoScroll">
-                  <bool>false</bool>
+                  <bool>true</bool>
                  </property>
                  <property name="alternatingRowColors">
                   <bool>true</bool>
@@ -1813,12 +1813,12 @@
                 </widget>
                </item>
                <item>
-                <spacer name="verticalSpacer_5">
+                <spacer name="verticalSpacer_3">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
                  </property>
                  <property name="sizeType">
-                  <enum>QSizePolicy::Minimum</enum>
+                  <enum>QSizePolicy::Preferred</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
@@ -1838,14 +1838,26 @@
                   <widget class="QGroupBox" name="ThrottleCurveBox">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
+                     <horstretch>1</horstretch>
+                     <verstretch>1</verstretch>
                     </sizepolicy>
                    </property>
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
                      <height>0</height>
+                    </size>
+                   </property>
+                   <property name="sizeIncrement">
+                    <size>
+                     <width>10</width>
+                     <height>10</height>
+                    </size>
+                   </property>
+                   <property name="baseSize">
+                    <size>
+                     <width>100</width>
+                     <height>100</height>
                     </size>
                    </property>
                    <property name="layoutDirection">
@@ -1877,8 +1889,8 @@
                       </property>
                       <property name="minimumSize">
                        <size>
-                        <width>100</width>
-                        <height>100</height>
+                        <width>50</width>
+                        <height>50</height>
                        </size>
                       </property>
                       <property name="maximumSize">
@@ -1908,9 +1920,21 @@
                   <widget class="QGroupBox" name="PitchCurveBox">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
+                     <horstretch>1</horstretch>
+                     <verstretch>1</verstretch>
                     </sizepolicy>
+                   </property>
+                   <property name="sizeIncrement">
+                    <size>
+                     <width>10</width>
+                     <height>10</height>
+                    </size>
+                   </property>
+                   <property name="baseSize">
+                    <size>
+                     <width>100</width>
+                     <height>100</height>
+                    </size>
                    </property>
                    <property name="title">
                     <string>Pitch Curve</string>
@@ -1932,8 +1956,8 @@
                       </property>
                       <property name="minimumSize">
                        <size>
-                        <width>100</width>
-                        <height>100</height>
+                        <width>50</width>
+                        <height>50</height>
                        </size>
                       </property>
                       <property name="maximumSize">
@@ -1967,7 +1991,7 @@
                   <enum>Qt::Vertical</enum>
                  </property>
                  <property name="sizeType">
-                  <enum>QSizePolicy::Expanding</enum>
+                  <enum>QSizePolicy::Preferred</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
@@ -1996,15 +2020,21 @@
          <item>
           <widget class="QTableWidget" name="ccpmAdvancedSettingsTable">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>200</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
-             <width>525</width>
-             <height>210</height>
+             <width>1000</width>
+             <height>203</height>
             </size>
            </property>
            <property name="verticalScrollBarPolicy">
@@ -2014,7 +2044,7 @@
             <enum>Qt::ScrollBarAlwaysOff</enum>
            </property>
            <property name="autoScroll">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="alternatingRowColors">
             <bool>true</bool>
@@ -2396,7 +2426,7 @@
             <enum>Qt::Vertical</enum>
            </property>
            <property name="sizeType">
-            <enum>QSizePolicy::Preferred</enum>
+            <enum>QSizePolicy::MinimumExpanding</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>

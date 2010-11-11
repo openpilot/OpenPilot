@@ -56,7 +56,7 @@ static uint32_t CapCounterPrev[PIOS_PWM_NUM_INPUTS];
 //pwm
 
 //ppm
-static TIM_ICInitTypeDef TIM_ICInitStructure;
+//static TIM_ICInitTypeDef TIM_ICInitStructure;
 static uint8_t PulseIndex;
 static uint32_t PreviousValue;
 static uint32_t CurrentValue;
@@ -116,8 +116,8 @@ void PIOS_InputMode_Set(uint8_t Mode)
 		}
 		if(Mode<NELEMENTS(rcinputs))
 		{
-			rcinputs[Mode].init();
 			InputMode=Mode;
+			rcinputs[Mode].init();
 		}
 	}
 }
@@ -254,6 +254,51 @@ void PIOS_PPM_Init(void)
 void PIOS_PPM_DeInit(void)
 {
 	/* TODO! PIOS_PPM_DeInit*/
+	int32_t i;
+	for (i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
+		CaptureValue[i] = 0;
+	}
+
+	/* Supervisor Setup */
+#if (PIOS_PPM_SUPV_ENABLED)
+	/* Disable counter */
+	TIM_Cmd(PIOS_PPM_SUPV_TIMER, DISABLE);
+
+	/* Disable the CC2 Interrupt Request */
+	TIM_ITConfig(PIOS_PPM_SUPV_TIMER, TIM_IT_Update, DISABLE);
+
+	/* DeConfigure interrupts */
+	NVIC_InitTypeDef NVIC_InitStructure;
+	NVIC_InitStructure.NVIC_IRQChannel = PIOS_PPM_SUPV_IRQ_CHANNEL;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
+	NVIC_Init(&NVIC_InitStructure);
+#endif
+
+	/* Disable timers */
+	TIM_Cmd(PIOS_PPM_TIM, DISABLE);
+
+	/* Disable the Capture Compare Interrupt Request */
+	TIM_ITConfig(PIOS_PPM_TIM_PORT, PIOS_PPM_TIM_CCR, DISABLE);
+
+	/* Configure input pins */
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_InitStructure.GPIO_Pin = PIOS_PPM_GPIO_PIN;
+	GPIO_Init(PIOS_PPM_GPIO_PORT, &GPIO_InitStructure);
+
+
+	/* Disable timer interrupts */
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
+	NVIC_InitStructure.NVIC_IRQChannel = PIOS_PPM_TIM_IRQ;
+	NVIC_Init(&NVIC_InitStructure);
+
+	/* Setup RCC */
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, DISABLE);
 }
 
 /**
@@ -402,6 +447,50 @@ void PIOS_PWM_Init(void)
 void PIOS_PWM_DeInit(void)
 {
 	/* TODO! PIOS_PWM_DeInit*/
+	int32_t i;
+	for (i = 0; i < PIOS_PWM_NUM_INPUTS; i++) {
+		CaptureValue[i] = 0;
+	}
+
+	/* Supervisor Setup */
+#if (PIOS_PWM_SUPV_ENABLED)
+	/* Disable counter */
+	TIM_Cmd(PIOS_PWM_SUPV_TIMER, DISABLE);
+
+	/* Disable the CC2 Interrupt Request */
+	TIM_ITConfig(PIOS_PWM_SUPV_TIMER, TIM_IT_Update, DISABLE);
+
+	/* DeConfigure interrupts */
+	NVIC_InitTypeDef NVIC_InitStructure;
+	NVIC_InitStructure.NVIC_IRQChannel = PIOS_PWM_SUPV_IRQ_CHANNEL;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
+	NVIC_Init(&NVIC_InitStructure);
+#endif
+
+	/* Disable timers */
+	for (i = 0; i < PIOS_PWM_NUM_TIMS; i++) {
+		TIM_Cmd(PIOS_PWM_TIM[i], DISABLE);
+	}
+
+	/* Configure timer clocks */
+	for (i = 0; i < PIOS_PWM_NUM_INPUTS; i++) {
+		TIM_InternalClockConfig(PIOS_PWM_TIM_PORT[i]);
+		//TIM_TimeBaseInit(PIOS_PWM_TIM_PORT[i], &TIM_TimeBaseStructure);
+
+		/* Disable the Capture Compare Interrupt Request */
+		TIM_ITConfig(PIOS_PWM_TIM_PORT[i], PIOS_PWM_TIM_CCR[i], DISABLE);
+	}
+
+	/* Configure input pins */
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	for (i = 0; i < PIOS_PWM_NUM_INPUTS; i++) {
+		GPIO_InitStructure.GPIO_Pin = PIOS_PWM_GPIO_PIN[i];
+		GPIO_Init(PIOS_PWM_GPIO_PORT[i], &GPIO_InitStructure);
+	}
 }
 
 /**
@@ -554,12 +643,11 @@ void PIOS_SPEKTRUM_Init(void)
 	}
 
 	/* spektrum "watchdog" timer */
-	NVIC_InitTypeDef NVIC_InitStructure;
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
 	/* Enable timer clock */
 	PIOS_SPEKTRUM_SUPV_TIMER_RCC_FUNC;
 
 	/* Configure interrupts */
+	NVIC_InitTypeDef NVIC_InitStructure;
 	NVIC_InitStructure.NVIC_IRQChannel = PIOS_SPEKTRUM_SUPV_IRQ_CHANNEL;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
@@ -567,6 +655,7 @@ void PIOS_SPEKTRUM_Init(void)
 	NVIC_Init(&NVIC_InitStructure);
 
 	/* Time base configuration */
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
 	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
 	TIM_TimeBaseStructure.TIM_Period = ((1000000 / PIOS_SPEKTRUM_SUPV_HZ) - 1);
 	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;	/* For 1 uS accuracy */
@@ -590,6 +679,22 @@ void PIOS_SPEKTRUM_Init(void)
 void PIOS_SPEKTRUM_DeInit(void)
 {
 	/* TODO! PIOS_SPEKTRUM_DeInit*/
+
+	/* Supervisor Setup */
+	/* Disable counter */
+	TIM_Cmd(PIOS_SPEKTRUM_SUPV_TIMER, DISABLE);
+
+	/* Disable the CC2 Interrupt Request */
+	TIM_ITConfig(PIOS_SPEKTRUM_SUPV_TIMER, TIM_IT_Update, DISABLE);
+
+	/* DeConfigure interrupts */
+	NVIC_InitTypeDef NVIC_InitStructure;
+	NVIC_InitStructure.NVIC_IRQChannel = PIOS_SPEKTRUM_SUPV_IRQ_CHANNEL;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
+	NVIC_Init(&NVIC_InitStructure);
+
 }
 
 

@@ -38,6 +38,19 @@ from collections import namedtuple
 # This is a list of instances of the data fields contained in this object
 _fields = [ \
 	uavobject.UAVObjectField(
+		'GuidanceMode',
+		'b',
+		1,
+		[
+			'0',
+		],
+		{
+			'0' : 'DUAL_LOOP',
+			'1' : 'VELOCITY_CONTROL',
+			'2' : 'POSITION_PID',
+		}
+	),
+	uavobject.UAVObjectField(
 		'MaxGroundspeed',
 		'i',
 		1,
@@ -182,7 +195,7 @@ _fields = [ \
 
 class GuidanceSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 2428005802
+    OBJID        = 2071403670
     NAME         = "GuidanceSettings"
     METANAME     = "GuidanceSettingsMeta"
     ISSINGLEINST = 1

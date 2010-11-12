@@ -42,6 +42,13 @@ GuidanceSettings::GuidanceSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTI
 {
     // Create fields
     QList<UAVObjectField*> fields;
+    QStringList GuidanceModeElemNames;
+    GuidanceModeElemNames.append("0");
+    QStringList GuidanceModeEnumOptions;
+    GuidanceModeEnumOptions.append("DUAL_LOOP");
+    GuidanceModeEnumOptions.append("VELOCITY_CONTROL");
+    GuidanceModeEnumOptions.append("POSITION_PID");
+    fields.append( new UAVObjectField(QString("GuidanceMode"), QString(""), UAVObjectField::ENUM, GuidanceModeElemNames, GuidanceModeEnumOptions) );
     QStringList MaxGroundspeedElemNames;
     MaxGroundspeedElemNames.append("0");
     fields.append( new UAVObjectField(QString("MaxGroundspeed"), QString("cm/s"), UAVObjectField::INT32, MaxGroundspeedElemNames, QStringList()) );
@@ -117,6 +124,7 @@ UAVObject::Metadata GuidanceSettings::getDefaultMetadata()
  */
 void GuidanceSettings::setDefaultFieldValues()
 {
+    data.GuidanceMode = 0;
     data.MaxGroundspeed = 100;
     data.GroundVelocityP = 0.1;
     data.MaxVerticalSpeed = 100;

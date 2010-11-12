@@ -41,7 +41,7 @@
 #define GUIDANCESETTINGS_H
 
 // Object constants
-#define GUIDANCESETTINGS_OBJID 2428005802U
+#define GUIDANCESETTINGS_OBJID 2071403670U
 #define GUIDANCESETTINGS_NAME "GuidanceSettings"
 #define GUIDANCESETTINGS_METANAME "GuidanceSettingsMeta"
 #define GUIDANCESETTINGS_ISSINGLEINST 1
@@ -71,6 +71,7 @@
 
 // Object data
 typedef struct {
+    uint8_t GuidanceMode;
     int32_t MaxGroundspeed;
     float GroundVelocityP;
     int32_t MaxVerticalSpeed;
@@ -89,6 +90,9 @@ typedef struct {
 } __attribute__((packed)) GuidanceSettingsData;
 
 // Field information
+// Field GuidanceMode information
+/* Enumeration options for field GuidanceMode */
+typedef enum { GUIDANCESETTINGS_GUIDANCEMODE_DUAL_LOOP=0, GUIDANCESETTINGS_GUIDANCEMODE_VELOCITY_CONTROL=1, GUIDANCESETTINGS_GUIDANCEMODE_POSITION_PID=2 } GuidanceSettingsGuidanceModeOptions;
 // Field MaxGroundspeed information
 // Field GroundVelocityP information
 // Field MaxVerticalSpeed information

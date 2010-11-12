@@ -69,7 +69,9 @@ static void guidanceTask(void *parameters);
 static float bound(float val, float min, float max);
 
 static void updateVtolDesiredVelocity();
+static void manualSetDesiredVelocity();
 static void updateVtolDesiredAttitude();
+static void positionPIDcontrol();
 
 /**
  * Initialise the module, called on startup
@@ -107,13 +109,22 @@ static void guidanceTask(void *parameters)
 		ManualControlCommandGet(&manualControl);
 		SystemSettingsGet(&systemSettings);
 		GuidanceSettingsGet(&guidanceSettings);
-
+		
 		if ((manualControl.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO) &&
 		    ((systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL) ||
 		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADP) ||
-		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADX))){
-			updateVtolDesiredVelocity();
-			updateVtolDesiredAttitude();
+		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADX)))
+		{
+			if(guidanceSettings.GuidanceMode == GUIDANCESETTINGS_GUIDANCEMODE_POSITION_PID) {
+				positionPIDcontrol();
+			} else {
+				if(guidanceSettings.GuidanceMode == GUIDANCESETTINGS_GUIDANCEMODE_DUAL_LOOP) 
+					updateVtolDesiredVelocity();
+				else
+					manualSetDesiredVelocity();
+				
+				updateVtolDesiredAttitude();
+			}
 		} else {
 			// Be cleaner and get rid of global variables
 			northIntegral = 0;
@@ -178,9 +189,11 @@ static void updateVtolDesiredAttitude()
 	float northError;
 	float northDerivative;
 	float northCommand;
+	
 	float eastError;
 	float eastDerivative;
 	float eastCommand;
+
 	float downError;
 	float downDerivative;
 	
@@ -243,6 +256,98 @@ static void updateVtolDesiredAttitude()
 	attitudeDesired.Throttle = manualControl.Throttle;
 	
 	AttitudeDesiredSet(&attitudeDesired);
+}
+
+static void manualSetDesiredVelocity() 
+{
+	ManualControlCommandData cmd;
+	VelocityDesiredData velocityDesired;
+	
+	ManualControlCommandGet(&cmd);
+	VelocityDesiredGet(&velocityDesired);
+	
+	velocityDesired.North = -200 * cmd.Pitch;
+	velocityDesired.East = 200 * cmd.Roll;
+	velocityDesired.Down = 0;
+	
+	VelocityDesiredSet(&velocityDesired);	
+}
+
+/** 
+ * Control attitude with direct PID on position error
+ */
+static void positionPIDcontrol() 
+{
+	static portTickType lastSysTime;
+	portTickType thisSysTime = xTaskGetTickCount();;
+	float dT;
+	
+	AttitudeDesiredData attitudeDesired;
+	AttitudeActualData attitudeActual;
+	GuidanceSettingsData guidanceSettings;
+	StabilizationSettingsData stabSettings;
+	SystemSettingsData systemSettings;
+	PositionActualData positionActual;
+	PositionDesiredData positionDesired;
+	
+	float northError;
+	float northDerivative;
+	float northCommand;
+	
+	float eastError;
+	float eastDerivative;
+	float eastCommand;
+	
+	// Check how long since last update
+	if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
+		dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;		
+	lastSysTime = thisSysTime;
+	
+	SystemSettingsGet(&systemSettings);
+	GuidanceSettingsGet(&guidanceSettings);
+	
+	AttitudeDesiredGet(&attitudeDesired);
+	AttitudeActualGet(&attitudeActual);
+	StabilizationSettingsGet(&stabSettings);
+	PositionActualGet(&positionActual);
+	PositionDesiredGet(&positionDesired);
+	
+	attitudeDesired.Yaw = 0;	// try and face north
+	
+	// Yaw and pitch output from ground speed PID loop
+	northError = positionDesired.North - positionActual.North;
+	northDerivative = (northError - northErrorLast) / dT;
+	northIntegral =
+	bound(northIntegral + northError * dT, -guidanceSettings.MaxVelIntegral,
+	      guidanceSettings.MaxVelIntegral);
+	northErrorLast = northError;
+	northCommand =
+	northError * guidanceSettings.VelP + northDerivative * guidanceSettings.VelD + northIntegral * guidanceSettings.VelI;
+	
+	eastError = positionDesired.East - positionActual.East;
+	eastDerivative = (eastError - eastErrorLast) / dT;
+	eastIntegral = bound(eastIntegral + eastError * dT, 
+			     -guidanceSettings.MaxVelIntegral,
+			     guidanceSettings.MaxVelIntegral);
+	eastErrorLast = eastError;
+	eastCommand = eastError * guidanceSettings.VelP + eastDerivative * guidanceSettings.VelD + eastIntegral * guidanceSettings.VelI;
+	
+	// Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
+	// craft should move similarly for 5 deg roll versus 5 deg pitch
+	attitudeDesired.Pitch = bound(-northCommand * cosf(attitudeActual.Yaw * M_PI / 180) + 
+				      eastCommand * sinf(attitudeActual.Yaw * M_PI / 180),
+				      -stabSettings.PitchMax, stabSettings.PitchMax);
+	attitudeDesired.Roll = bound(-northCommand * sinf(attitudeActual.Yaw * M_PI / 180) + 
+				     eastCommand * cosf(attitudeActual.Yaw * M_PI / 180),
+				     -stabSettings.RollMax, stabSettings.RollMax);
+		
+	// For now override throttle with manual control.  Disable at your risk, quad goes to China.
+	ManualControlCommandData manualControl;
+	ManualControlCommandGet(&manualControl);
+	attitudeDesired.Throttle = manualControl.Throttle;
+	
+	AttitudeDesiredSet(&attitudeDesired);
+	
 }
 
 /**

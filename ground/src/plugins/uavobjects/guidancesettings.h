@@ -43,6 +43,7 @@ class UAVOBJECTS_EXPORT GuidanceSettings: public UAVDataObject
 public:
     // Field structure
     typedef struct {
+        quint8 GuidanceMode;
         qint32 MaxGroundspeed;
         float GroundVelocityP;
         qint32 MaxVerticalSpeed;
@@ -61,6 +62,9 @@ public:
     } __attribute__((packed)) DataFields;
 
     // Field information
+    // Field GuidanceMode information
+    /* Enumeration options for field GuidanceMode */
+    typedef enum { GUIDANCEMODE_DUAL_LOOP=0, GUIDANCEMODE_VELOCITY_CONTROL=1, GUIDANCEMODE_POSITION_PID=2 } GuidanceModeOptions;
     // Field MaxGroundspeed information
     // Field GroundVelocityP information
     // Field MaxVerticalSpeed information
@@ -78,7 +82,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 2428005802U;
+    static const quint32 OBJID = 2071403670U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

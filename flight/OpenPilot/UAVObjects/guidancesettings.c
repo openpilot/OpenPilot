@@ -80,6 +80,7 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	// Initialize object fields to their default values
 	UAVObjGetInstanceData(obj, instId, &data);
 	memset(&data, 0, sizeof(GuidanceSettingsData));
+	data.GuidanceMode = 0;
 	data.MaxGroundspeed = 100;
 	data.GroundVelocityP = 0.1;
 	data.MaxVerticalSpeed = 100;

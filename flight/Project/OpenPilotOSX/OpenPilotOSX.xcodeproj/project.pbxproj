@@ -38,6 +38,7 @@
 		65322D3012283CD60046CD7C /* NMEA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NMEA.h; sourceTree = "<group>"; };
 		65322D3B122841F60046CD7C /* gpstime.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gpstime.xml; sourceTree = "<group>"; };
 		65322D77122897210046CD7C /* MagOrAccelSensorCal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MagOrAccelSensorCal.c; path = ../../AHRS/MagOrAccelSensorCal.c; sourceTree = SOURCE_ROOT; };
+		65345C871288668B00A5E4E8 /* guidancesettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = guidancesettings.xml; sourceTree = "<group>"; };
 		654330231218E9780063F913 /* insgps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insgps.c; path = ../../AHRS/insgps.c; sourceTree = SOURCE_ROOT; };
 		6543304F121980300063F913 /* insgps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = insgps.h; sourceTree = "<group>"; };
 		6549E0D21279B3C800C5476F /* fifo_buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fifo_buffer.c; sourceTree = "<group>"; };
@@ -6797,6 +6798,7 @@
 				65B367F3121C2620003EAD18 /* gcstelemetrystats.xml */,
 				65209A1912208B0600453371 /* gpsposition.xml */,
 				65322D3B122841F60046CD7C /* gpstime.xml */,
+				65345C871288668B00A5E4E8 /* guidancesettings.xml */,
 				657CEEAD121DB6C8007A1FBE /* homelocation.xml */,
 				65B367F4121C2620003EAD18 /* manualcontrolcommand.xml */,
 				65B367F5121C2620003EAD18 /* manualcontrolsettings.xml */,

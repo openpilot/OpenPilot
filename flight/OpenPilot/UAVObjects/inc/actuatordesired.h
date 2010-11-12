@@ -41,7 +41,7 @@
 #define ACTUATORDESIRED_H
 
 // Object constants
-#define ACTUATORDESIRED_OBJID 2919796710U
+#define ACTUATORDESIRED_OBJID 3562104706U
 #define ACTUATORDESIRED_NAME "ActuatorDesired"
 #define ACTUATORDESIRED_METANAME "ActuatorDesiredMeta"
 #define ACTUATORDESIRED_ISSINGLEINST 1
@@ -76,6 +76,7 @@ typedef struct {
     float Yaw;
     float Throttle;
     float UpdateTime;
+    float NumLongUpdates;
 
 } __attribute__((packed)) ActuatorDesiredData;
 
@@ -85,6 +86,7 @@ typedef struct {
 // Field Yaw information
 // Field Throttle information
 // Field UpdateTime information
+// Field NumLongUpdates information
 
 
 // Generic interface functions

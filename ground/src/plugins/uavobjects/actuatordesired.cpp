@@ -57,6 +57,9 @@ ActuatorDesired::ActuatorDesired(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
     QStringList UpdateTimeElemNames;
     UpdateTimeElemNames.append("0");
     fields.append( new UAVObjectField(QString("UpdateTime"), QString("ms"), UAVObjectField::FLOAT32, UpdateTimeElemNames, QStringList()) );
+    QStringList NumLongUpdatesElemNames;
+    NumLongUpdatesElemNames.append("0");
+    fields.append( new UAVObjectField(QString("NumLongUpdates"), QString("ms"), UAVObjectField::FLOAT32, NumLongUpdatesElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

@@ -212,6 +212,8 @@ static void stabilizationTask(void* parameters)
 		if(shouldUpdate)
 		{
 			actuatorDesired.Throttle = attitudeDesired.Throttle;
+			if(dT > 15)
+				actuatorDesired.NumLongUpdates++;
 			ActuatorDesiredSet(&actuatorDesired);
 		}
 

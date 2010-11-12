@@ -87,12 +87,22 @@ _fields = [ \
 		{
 		}
 	),
+	uavobject.UAVObjectField(
+		'NumLongUpdates',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
 ]
 
 
 class ActuatorDesired(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 2919796710
+    OBJID        = 3562104706
     NAME         = "ActuatorDesired"
     METANAME     = "ActuatorDesiredMeta"
     ISSINGLEINST = 1

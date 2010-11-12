@@ -91,6 +91,7 @@ static float eastIntegral = 0;
 static float eastErrorLast = 0;
 static float downIntegral = 0;
 static float downErrorLast = 0;
+static uint8_t positionHoldLast = 0;
 
 /**
  * Module thread, should not return.
@@ -115,6 +116,18 @@ static void guidanceTask(void *parameters)
 		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADP) ||
 		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADX)))
 		{
+			if(positionHoldLast == 0) {
+				/* When enter position hold mode save current position */
+				PositionDesiredData positionDesired;
+				PositionActualData positionActual;
+				PositionDesiredGet(&positionDesired);
+				PositionActualGet(&positionActual);
+				positionDesired.North = positionActual.North;
+				positionDesired.East = positionActual.East;
+				PositionDesiredSet(&positionDesired);
+				positionHoldLast = 1;
+			}
+			
 			if(guidanceSettings.GuidanceMode == GUIDANCESETTINGS_GUIDANCEMODE_POSITION_PID) {
 				positionPIDcontrol();
 			} else {
@@ -133,6 +146,7 @@ static void guidanceTask(void *parameters)
 			eastErrorLast = 0;
 			downIntegral = 0;
 			downErrorLast = 0;
+			positionHoldLast = 0;
 		}			
 		vTaskDelayUntil(&lastSysTime, guidanceSettings.VelUpdatePeriod / portTICK_RATE_MS);
 	}

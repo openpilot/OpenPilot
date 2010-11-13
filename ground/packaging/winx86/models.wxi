@@ -2,7 +2,7 @@
 <Include>
 
   <Component Id="default_background.png" DiskId="1" Guid="5726DB43-3808-449D-A577-5723FE282C89">
-    <File Id="default_background.png" Name="default_background.png" Source="..\..\share\openpilotgcs\models\default_background.png" />
+    <File Id="default_background.png" Name="default_background.png" Source="..\..\share\openpilotgcs\models\backgrounds\default_background.png" />
   </Component>
   <Directory Id="helis" Name="helis">
     <Directory Id="t_rex" Name="t-rex">

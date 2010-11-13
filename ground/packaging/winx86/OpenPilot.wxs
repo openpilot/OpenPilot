@@ -146,7 +146,7 @@
             <ComponentRef Id="QtXml4.dll" />
             <ComponentRef Id="Qwt.dll" />
             <ComponentRef Id="QxtCore.dll" />
-            <ComponentRef Id="QYmodem.dll" />
+            <!--ComponentRef Id="QYmodem.dll" /-->
             <ComponentRef Id="SDL.dll" />
             <ComponentRef Id="sdlgamepad.dll" />
             <ComponentRef Id="Utils.dll" />

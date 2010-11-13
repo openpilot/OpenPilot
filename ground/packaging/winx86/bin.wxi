@@ -85,9 +85,9 @@
   <Component Id="QxtCore.dll" DiskId="1" Guid="7381C507-F59B-42AF-AA04-55ED1E0D3E18">
     <File Id="QxtCore.dll" Name="QxtCore.dll" Source="..\..\bin\QxtCore.dll" />
   </Component>
-  <Component Id="QYmodem.dll" DiskId="1" Guid="8ED965D6-C959-471C-BD5F-E09C93776D06">
+  <!--Component Id="QYmodem.dll" DiskId="1" Guid="8ED965D6-C959-471C-BD5F-E09C93776D06">
     <File Id="QYmodem.dll" Name="QYmodem.dll" Source="..\..\bin\QYmodem.dll" />
-  </Component>
+  </Component-->
   <Component Id="SDL.dll" DiskId="1" Guid="A3E4745A-114A-4C12-A466-0FC9E82B9800">
     <File Id="SDL.dll" Name="SDL.dll" Source="..\..\bin\SDL.dll" />
   </Component>

@@ -38,6 +38,12 @@ C: Dale Schintock
 D: October 2010
 V: http://www.youtube.com/watch?v=yk8ckeRMV8U
 
+M: First use of OpenPilot for filming homemade porn
+C: Edouard Lafargue
+D: Novemeber 2010
+V: XXX
+
+
 An incomplete list of some future Milestones is below:
 
 * First Helicopter flight with OpenPilot 

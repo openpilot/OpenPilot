@@ -53,6 +53,8 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, Internal:
     m_connectBtn(0),
     m_ioDev(NULL)
 {
+    Q_UNUSED(mainWindow);
+
     QVBoxLayout *top = new QVBoxLayout;
     top->setSpacing(0);
     top->setMargin(0);
@@ -121,6 +123,7 @@ void ConnectionManager::objectAdded(QObject *obj)
 
 void ConnectionManager::aboutToRemoveObject(QObject *obj)
 {
+    Q_UNUSED(obj);
 }
 
 /**
@@ -129,26 +132,22 @@ void ConnectionManager::aboutToRemoveObject(QObject *obj)
 */
 bool ConnectionManager::disconnectDevice()
 {
-
     // Check if we are currently connected or not
     if(!m_ioDev)
-    {
         return false; // We were not connected
-    }
-    else
-    {
-        //signal interested plugins that we are disconnecting the device
-        emit deviceDisconnected();
-        if(m_connectionDevice.connection)
-        {
-            m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
-            m_ioDev = NULL;
-            m_connectionDevice.connection = NULL;
-        }
 
-        m_connectBtn->setText("Connect");
-        m_availableDevList->setEnabled(true);
+    //signal interested plugins that we are disconnecting the device
+    emit deviceDisconnected();
+    if(m_connectionDevice.connection)
+    {
+        m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
+        m_ioDev = NULL;
+        m_connectionDevice.connection = NULL;
     }
+
+    m_connectBtn->setText("Connect");
+    m_availableDevList->setEnabled(true);
+    return true;
 }
 
 

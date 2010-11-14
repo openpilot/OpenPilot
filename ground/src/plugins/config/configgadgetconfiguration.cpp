@@ -29,6 +29,7 @@
 ConfigGadgetConfiguration::ConfigGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent)
 {
+    Q_UNUSED(qSettings);
 
 }
 
@@ -40,4 +41,5 @@ IUAVGadgetConfiguration *ConfigGadgetConfiguration::clone()
 
 void ConfigGadgetConfiguration::saveConfig(QSettings* settings) const {
 
+    Q_UNUSED(settings)
 }

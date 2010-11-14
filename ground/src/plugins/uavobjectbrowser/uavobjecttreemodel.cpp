@@ -312,6 +312,7 @@ QVariant UAVObjectTreeModel::data(const QModelIndex &index, int role) const
 
 bool UAVObjectTreeModel::setData(const QModelIndex &index, const QVariant & value, int role)
 {
+    Q_UNUSED(role)
     TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
     item->setData(value, index.column());
     return true;

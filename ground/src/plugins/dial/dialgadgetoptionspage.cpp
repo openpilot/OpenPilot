@@ -48,6 +48,7 @@ DialGadgetOptionsPage::DialGadgetOptionsPage(DialGadgetConfiguration *config, QO
 QWidget *DialGadgetOptionsPage::createPage(QWidget *parent)
 {
 
+    Q_UNUSED(parent);
     options_page = new Ui::DialGadgetOptionsPage();
     //main widget
     QWidget *optionsPageWidget = new QWidget;

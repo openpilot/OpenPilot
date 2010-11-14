@@ -37,6 +37,7 @@ QWidget *BrowserItemDelegate::createEditor(QWidget *parent,
                                            const QStyleOptionViewItem & option ,
                                            const QModelIndex & index ) const
 {
+    Q_UNUSED(option)
     FieldTreeItem *item = static_cast<FieldTreeItem*>(index.internalPointer());
     QWidget *editor = item->createEditor(parent);
     Q_ASSERT(editor);
@@ -68,5 +69,7 @@ void BrowserItemDelegate::updateEditorGeometry(QWidget *editor,
 
 QSize BrowserItemDelegate::sizeHint(const QStyleOptionViewItem & option, const QModelIndex &index) const
 {
+    Q_UNUSED(option);
+    Q_UNUSED(index);
     return QSpinBox().sizeHint();
 }

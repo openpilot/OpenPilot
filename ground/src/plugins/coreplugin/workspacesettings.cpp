@@ -155,6 +155,7 @@ void WorkspaceSettings::finish()
 
 void WorkspaceSettings::textEdited(QString name)
 {
+    Q_UNUSED(name);
     m_page->workspaceComboBox->setItemText(m_currentIndex, m_page->nameEdit->text());
 }
 

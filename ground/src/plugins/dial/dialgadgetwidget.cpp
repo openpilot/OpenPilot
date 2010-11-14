@@ -429,6 +429,7 @@ void DialGadgetWidget::paintEvent(QPaintEvent *event)
 // nature of SVG dials.
 void DialGadgetWidget::resizeEvent(QResizeEvent *event)
 {
+    Q_UNUSED(event);
     fitInView(m_background, Qt::KeepAspectRatio );
 }
 

@@ -159,5 +159,6 @@ void SystemHealthGadgetWidget::paintEvent(QPaintEvent *event)
 // nature of SVG dials.
 void SystemHealthGadgetWidget::resizeEvent(QResizeEvent *event)
 {
+    Q_UNUSED(event);
     fitInView(background, Qt::KeepAspectRatio );
 }

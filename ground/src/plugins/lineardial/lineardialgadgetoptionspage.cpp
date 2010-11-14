@@ -48,6 +48,7 @@ LineardialGadgetOptionsPage::LineardialGadgetOptionsPage(LineardialGadgetConfigu
 QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
 {
 
+    Q_UNUSED(parent);
     options_page = new Ui::LineardialGadgetOptionsPage();
     //main widget
     QWidget *optionsPageWidget = new QWidget;

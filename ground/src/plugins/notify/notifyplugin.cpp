@@ -378,6 +378,7 @@ void SoundNotifyPlugin::expireTimerHandler()
 
 void SoundNotifyPlugin::stateChanged(Phonon::State newstate, Phonon::State oldstate)
 {
+    Q_UNUSED(oldstate)
 	if((newstate  == Phonon::PausedState) ||
 	   (newstate  == Phonon::StoppedState))
 	{

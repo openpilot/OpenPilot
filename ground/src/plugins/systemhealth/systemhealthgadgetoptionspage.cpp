@@ -43,6 +43,7 @@ SystemHealthGadgetOptionsPage::SystemHealthGadgetOptionsPage(SystemHealthGadgetC
 QWidget *SystemHealthGadgetOptionsPage::createPage(QWidget *parent)
 {
 
+    Q_UNUSED(parent);
     options_page = new Ui::SystemHealthGadgetOptionsPage();
     //main widget
     QWidget *optionsPageWidget = new QWidget;

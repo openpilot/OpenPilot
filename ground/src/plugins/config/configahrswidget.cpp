@@ -280,8 +280,9 @@ void ConfigAHRSWidget::incrementProgress()
   */
 void ConfigAHRSWidget::calibPhase2()
 {
+
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
-    UAVObjectField *field = obj->getField(QString("measure_var"));
+//    UAVObjectField *field = obj->getField(QString("measure_var"));
 
     //  This is a bit weird, but it is because we are expecting an update from the
       // OP board with the correct calibration values, and those only arrive on the object update
@@ -326,7 +327,7 @@ void ConfigAHRSWidget::attitudeRawUpdated(UAVObject * obj)
     UAVObjectField *gyro_field = obj->getField(QString("gyros_filtered"));
     UAVObjectField *mag_field = obj->getField(QString("magnetometers"));
 
-    Q_ASSERT(gyro_field != 0 && accel_field != 0 & mag_field != 0);
+    Q_ASSERT(gyro_field != 0 && accel_field != 0 && mag_field != 0);
 
     // This is necessary to prevent a race condition on disconnect signal and another update
     if (collectingData == true) {

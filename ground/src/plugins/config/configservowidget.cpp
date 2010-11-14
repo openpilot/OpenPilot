@@ -939,8 +939,10 @@ void ConfigServoWidget::updateChannels(UAVObject* controlCommand)
 }
 
 
-void ConfigServoWidget::updateChannelSlider(QSlider* slider, QLabel* min, QLabel* max, QCheckBox* rev, int value) {
+void ConfigServoWidget::updateChannelSlider(QSlider* slider, QLabel* min, QLabel* max, QCheckBox* rev, int value)
+{
 
+    Q_UNUSED(rev);
     if (firstUpdate) {
         // Reset all the min/max values of the sliders since we are
         // starting the calibration.

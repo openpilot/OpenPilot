@@ -164,6 +164,8 @@ void UAVObjectBrowserWidget::updateObjectPersistance(ObjectPersistence::Operatio
 
 void UAVObjectBrowserWidget::currentChanged(const QModelIndex &current, const QModelIndex &previous)
 {
+    Q_UNUSED(previous);
+
     TreeItem *item = static_cast<TreeItem*>(current.internalPointer());
     bool enable = true;
     if (current == QModelIndex())

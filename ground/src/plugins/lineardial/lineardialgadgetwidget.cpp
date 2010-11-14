@@ -388,6 +388,7 @@ void LineardialGadgetWidget::paintEvent(QPaintEvent *event)
 // nature of SVG dials.
 void LineardialGadgetWidget::resizeEvent(QResizeEvent *event)
 {
+    Q_UNUSED(event);
     fitInView(background, Qt::KeepAspectRatio );
 }
 

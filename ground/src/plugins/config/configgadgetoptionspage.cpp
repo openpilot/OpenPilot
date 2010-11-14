@@ -31,11 +31,14 @@
 ConfigGadgetOptionsPage::ConfigGadgetOptionsPage(ConfigGadgetConfiguration *config, QObject *parent)
 {
 //todo:implement
+    Q_UNUSED(config);
+    Q_UNUSED(parent);
 }
 
 QWidget *ConfigGadgetOptionsPage::createPage(QWidget *parent)
 {
     //todo:implement
+    Q_UNUSED(parent);
     return new QWidget;
 }
 

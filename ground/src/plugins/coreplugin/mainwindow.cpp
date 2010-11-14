@@ -474,7 +474,6 @@ void MainWindow::registerDefaultActions()
 
     // Help menu separators
 
-
     // Return to editor shortcut: Note this requires Qt to fix up
     // handling of shortcut overrides in menus, item views, combos....
     m_focusToEditor = new QShortcut(this);
@@ -483,30 +482,39 @@ void MainWindow::registerDefaultActions()
     connect(m_focusToEditor, SIGNAL(activated()), this, SLOT(setFocusToEditor()));
 
     // New File Action
+
+    /*
     m_newAction = new QAction(QIcon(Constants::ICON_NEWFILE), tr("&New File or Project..."), this);
     cmd = am->registerAction(m_newAction, Constants::NEW, m_globalContext);
     cmd->setDefaultKeySequence(QKeySequence::New);
     mfile->addAction(cmd, Constants::G_FILE_NEW);
     connect(m_newAction, SIGNAL(triggered()), this, SLOT(newFile()));
+*/
 
     // Open Action
+/*
     m_openAction = new QAction(QIcon(Constants::ICON_OPENFILE), tr("&Open File or Project..."), this);
     cmd = am->registerAction(m_openAction, Constants::OPEN, m_globalContext);
     cmd->setDefaultKeySequence(QKeySequence::Open);
     mfile->addAction(cmd, Constants::G_FILE_OPEN);
     connect(m_openAction, SIGNAL(triggered()), this, SLOT(openFile()));
+*/
 
     // Open With Action
+/*
     m_openWithAction = new QAction(tr("&Open File With..."), this);
     cmd = am->registerAction(m_openWithAction, Constants::OPEN_WITH, m_globalContext);
     mfile->addAction(cmd, Constants::G_FILE_OPEN);
     connect(m_openWithAction, SIGNAL(triggered()), this, SLOT(openFileWith()));
+*/
 
-    // File->Recent Files Menu
+        // File->Recent Files Menu
+/*
     ActionContainer *ac = am->createMenu(Constants::M_FILE_RECENTFILES);
     mfile->addMenu(ac, Constants::G_FILE_OPEN);
     ac->menu()->setTitle(tr("Recent Files"));
-
+*/
+/*
     // Save Action
     QAction *tmpaction = new QAction(QIcon(Constants::ICON_SAVEFILE), tr("&Save"), this);
     cmd = am->registerAction(tmpaction, Constants::SAVE, m_globalContext);
@@ -524,6 +532,7 @@ void MainWindow::registerDefaultActions()
     cmd->setAttribute(Command::CA_UpdateText);
     cmd->setDefaultText(tr("Save &As..."));
     mfile->addAction(cmd, Constants::G_FILE_SAVE);
+    */
 
     // SaveAll Action
     m_saveAllAction = new QAction(tr("Save A&ll"), this);
@@ -542,7 +551,7 @@ void MainWindow::registerDefaultActions()
     connect(m_exitAction, SIGNAL(triggered()), this, SLOT(exit()));
 
     // Undo Action
-    tmpaction = new QAction(QIcon(Constants::ICON_UNDO), tr("&Undo"), this);
+    QAction *tmpaction = new QAction(QIcon(Constants::ICON_UNDO), tr("&Undo"), this);
     cmd = am->registerAction(tmpaction, Constants::UNDO, m_globalContext);
     cmd->setDefaultKeySequence(QKeySequence::Undo);
     cmd->setAttribute(Command::CA_UpdateText);
@@ -734,6 +743,7 @@ bool MainWindow::showOptionsDialog(const QString &category,
 void MainWindow::saveAll()
 {
     emit m_coreImpl->saveSettingsRequested();
+    saveSettings(); // OpenPilot-specific.
 }
 
 void MainWindow::exit()
@@ -1074,11 +1084,13 @@ void MainWindow::aboutToShowRecentFiles()
 {
     ActionContainer *aci =
         m_actionManager->actionContainer(Constants::M_FILE_RECENTFILES);
-    aci->menu()->clear();
+    if (aci) {
+        aci->menu()->clear();
 
-    bool hasRecentFiles = false;
+        bool hasRecentFiles = false;
 
-    aci->menu()->setEnabled(hasRecentFiles);
+        aci->menu()->setEnabled(hasRecentFiles);
+    }
 }
 
 void MainWindow::openRecentFile()

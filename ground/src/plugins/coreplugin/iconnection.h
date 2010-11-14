@@ -58,7 +58,7 @@ public:
     */
     virtual QIODevice *openDevice(const QString &deviceName) = 0;
 
-    virtual void closeDevice(const QString &deviceName) {};
+    virtual void closeDevice(const QString &deviceName) { Q_UNUSED(deviceName) };
 
     /**
     *   Connection type name "USB HID"

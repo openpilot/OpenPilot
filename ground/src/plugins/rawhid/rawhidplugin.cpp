@@ -130,6 +130,7 @@ QIODevice *RawHIDConnection::openDevice(const QString &deviceName)
 
 void RawHIDConnection::closeDevice(const QString &deviceName)
 {
+    Q_UNUSED(deviceName);
     //added by andrew...
     if (RawHidHandle){
         RawHidHandle->close();

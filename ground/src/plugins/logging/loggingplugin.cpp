@@ -139,7 +139,7 @@ bool LoggingPlugin::initialize(const QStringList& args, QString *errMsg)
 
     // Add Menu entry
     Core::ActionManager* am = Core::ICore::instance()->actionManager();
-    Core::ActionContainer* ac = am->actionContainer(Core::Constants::M_FILE);
+    Core::ActionContainer* ac = am->actionContainer(Core::Constants::M_TOOLS);
 
     // Command to start logging
     Core::Command* cmd = am->registerAction(new QAction(this),

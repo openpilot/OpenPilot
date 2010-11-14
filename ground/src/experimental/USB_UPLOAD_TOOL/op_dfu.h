@@ -115,6 +115,7 @@ public:
     void CopyWords(char * source, char* destination, int count);
    // QByteArray DownloadData(int devNumber,int numberOfPackets);
     OP_DFU(bool debug);
+    void sendReset(void);
     bool findDevices();
     QList<device> devices;
     int numberOfDevices;

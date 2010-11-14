@@ -13,11 +13,12 @@ CONFIG   += console
 CONFIG   -= app_bundle
 
 TEMPLATE = app
-
+DEFINES += RAWHID_LIBRARY
 SOURCES += main.cpp \
     op_dfu.cpp \
     delay.cpp
 HEADERS += ../../plugins/rawhid/pjrc_rawhid.h \
+ ../../plugins/rawhid/rawhid_global.h \
     op_dfu.h \
     delay.h
 

@@ -45,6 +45,11 @@ ImportExportGadgetWidget::ImportExportGadgetWidget(QWidget *parent) :
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     ui->setupUi(this);
+    ui->configFile->setExpectedKind(Utils::PathChooser::File);
+    ui->configFile->setPromptDialogFilter(tr("INI file (*.ini);; XML file (*.xml)"));
+    ui->configFile->setPromptDialogTitle(tr("Choose filename"));
+
+
 }
 
 ImportExportGadgetWidget::~ImportExportGadgetWidget()
@@ -68,12 +73,12 @@ void ImportExportGadgetWidget::loadConfiguration(const ImportExportGadgetConfigu
     if ( !config )
         return;
 
-    ui->configFile->setText(config->getIniFile());
+    ui->configFile->setPath(config->getIniFile());
 }
 
 void ImportExportGadgetWidget::on_exportButton_clicked()
 {
-    QString file = ui->configFile->text();
+    QString file = ui->configFile->path();
     qDebug() << "Export pressed! Write to file " << QFileInfo(file).absoluteFilePath();
 
     if ( QFileInfo(file).exists() ){
@@ -142,7 +147,7 @@ void ImportExportGadgetWidget::writeError(const QString& msg) const
 
 void ImportExportGadgetWidget::on_importButton_clicked()
 {
-    QString file = ui->configFile->text();
+    QString file = ui->configFile->path();
     qDebug() << "Import pressed! Read from file " << QFileInfo(file).absoluteFilePath();
     QMessageBox msgBox;
     if (! QFileInfo(file).isReadable()) {

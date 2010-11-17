@@ -25,7 +25,7 @@ OP_DFU::OP_DFU(bool _debug): debug(_debug)
     }
     if(debug)
         qDebug() << numDevices << " device(s) opened";
-    sendReset();
+    //sendReset();
 }
 void OP_DFU::sendReset(void)
 {

@@ -43,6 +43,7 @@
 #include <QLineEdit>
 #include <QThread>
 #include <QMessageBox>
+#include <QTimer>
 
 
 using namespace OP_DFU;
@@ -55,12 +56,14 @@ public:
     UploaderGadgetWidget(QWidget *parent = 0);
    ~UploaderGadgetWidget();
     typedef enum { IAP_STATE_READY, IAP_STATE_STEP_1, IAP_STATE_STEP_2, IAP_STEP_RESET, IAP_STATE_BOOTLOADER} IAPStep;
+    typedef enum { RESCUE_STEP0, RESCUE_STEP1, RESCUE_STEP2, RESCUE_STEP3, RESCUE_POWER1, RESCUE_POWER2, RESCUE_DETECT } RescueStep;
 
 
 private:
      Ui_UploaderWidget *m_config;
      DFUObject *dfu;
      IAPStep currentStep;
+     RescueStep rescueStep;
      bool resetOnly;
      void log(QString str);
      void clearLog();
@@ -73,6 +76,7 @@ private slots:
     void goToBootloader(UAVObject* = NULL, bool = false);
     void systemReset();
     void systemBoot();
+    void systemRescue();
 };
 
 #endif // UPLOADERGADGETWIDGET_H

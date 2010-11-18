@@ -13,16 +13,19 @@ DFUObject::DFUObject(bool _debug): debug(_debug)
     use_delay=true;
     int numDevices=0;
     int count=0;
-    while(numDevices==0)
+    while((numDevices==0) && count < 10)
     {
         if (debug)
             qDebug() << ".";
         delay::msleep(500);
         numDevices = hidHandle.open(1,0x20a0,0x4117,0,0); //0xff9c,0x0001);
+        count++;
+        /*
         if(++count==10)
         {
             count=0;
         }
+        */
     }
     if(debug)
         qDebug() << numDevices << " device(s) opened";
@@ -30,6 +33,7 @@ DFUObject::DFUObject(bool _debug): debug(_debug)
 
 DFUObject::~DFUObject()
 {
+    hidHandle.close(0);
 
 }
 

@@ -31,6 +31,7 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     m_config = new Ui_UploaderWidget();
     m_config->setupUi(this);
     currentStep = IAP_STATE_READY;
+    rescueStep = RESCUE_STEP0;
     resetOnly=false;
     dfu = NULL;
 
@@ -39,6 +40,7 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_config->haltButton, SIGNAL(clicked()), this, SLOT(goToBootloader()));
     connect(m_config->resetButton, SIGNAL(clicked()), this, SLOT(systemReset()));
     connect(m_config->bootButton, SIGNAL(clicked()), this, SLOT(systemBoot()));
+    connect(m_config->rescueButton, SIGNAL(clicked()), this, SLOT(systemRescue()));
 
 }
 
@@ -132,9 +134,9 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         dfu->findDevices();
         log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
         // Delete all previous tabs:
-        for (int i=0; i< m_config->systemElements->count(); i++) {
-             QWidget *qw = m_config->systemElements->widget(i);
-             m_config->systemElements->removeTab(i);
+        while (m_config->systemElements->count()) {
+             QWidget *qw = m_config->systemElements->widget(0);
+             m_config->systemElements->removeTab(0);
              delete qw;
         }
         for(int i=0;i<dfu->numberOfDevices;i++) {
@@ -207,6 +209,104 @@ void UploaderGadgetWidget::systemBoot()
     } else {
         log("Not in bootloader mode!");
     }
+}
+
+/**
+  Attempt a guided procedure to put both boards in BL mode when
+  the system is not bootable
+  */
+void UploaderGadgetWidget::systemRescue()
+{
+    switch (rescueStep) {
+    case RESCUE_STEP0: {
+        Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+        cm->disconnectDevice();
+
+        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+        // stop the polling thread: otherwise it will mess up DFU
+        RawHIDConnection *cnx =  pm->getObject<RawHIDConnection>();
+        cnx->suspendPolling();
+        // Delete all previous tabs:
+        while (m_config->systemElements->count()) {
+             QWidget *qw = m_config->systemElements->widget(0);
+             m_config->systemElements->removeTab(0);
+             delete qw;
+        }
+        if (dfu) {
+            delete dfu;
+            dfu = NULL;
+        }
+        clearLog();
+        log("**********************************************************");
+        log("** Follow those instructions to attempt a system rescue **");
+        log("**********************************************************");
+        log("You will be prompted to first connect USB, then system power");
+        log ("Connect USB in 3 seconds...");
+        rescueStep = RESCUE_STEP1;
+        QTimer::singleShot(1000, this, SLOT(systemRescue()));
+    }
+        break;
+    case RESCUE_STEP1:
+        rescueStep = RESCUE_STEP2;
+        log ("            ...2...");
+        QTimer::singleShot(1000, this, SLOT(systemRescue()));
+        break;
+    case RESCUE_STEP2:
+        rescueStep = RESCUE_STEP3;
+        log("            ...1...");
+        QTimer::singleShot(1000, this, SLOT(systemRescue()));
+        break;
+    case RESCUE_STEP3:
+        log("... NOW!\n***\n");
+        log("Connect Power in 1 second...");
+        rescueStep = RESCUE_POWER2;
+        QTimer::singleShot(1000, this, SLOT(systemRescue()));
+        break;
+    case RESCUE_POWER1:
+        rescueStep = RESCUE_POWER2;
+        log("            ...1...");
+        QTimer::singleShot(1000, this, SLOT(systemRescue()));
+        break;
+    case RESCUE_POWER2:
+        log("... NOW!\n***\nWaiting...");
+        rescueStep = RESCUE_DETECT;
+        QTimer::singleShot(3000, this, SLOT(systemRescue()));
+        break;
+    case RESCUE_DETECT:
+        rescueStep = RESCUE_STEP0;
+        log("Polling for devices...");
+        repaint();
+        if (!dfu)
+            dfu = new DFUObject(true);
+        if(!dfu->enterDFU(0))
+        {
+            log("Could not enter DFU mode.");
+            return;
+        }
+        if(!dfu->findDevices())
+        {
+            log("Could not detect devices.");
+            return;
+        }
+        log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
+        if (dfu->numberOfDevices > 5) {
+            log("Inconsistent number of devices, aborting!");
+            return;
+        }
+        for(int i=0;i<dfu->numberOfDevices;i++) {
+            deviceWidget* dw = new deviceWidget(this);
+            dw->setDeviceID(i);
+            dw->setDfu(dfu);
+            dw->populate();
+            m_config->systemElements->addTab(dw, QString("Device") + QString::number(i));
+        }
+        m_config->haltButton->setEnabled(false);
+        m_config->resetButton->setEnabled(false);
+        m_config->bootButton->setEnabled(true);
+        currentStep = IAP_STATE_BOOTLOADER; // So that we can boot from the GUI afterwards.
+
+    }
+
 
 }
 
@@ -216,6 +316,7 @@ void UploaderGadgetWidget::systemBoot()
 void UploaderGadgetWidget::log(QString str)
 {
    m_config->textBrowser->append(str);
+   m_config->textBrowser->repaint();
 
 }
 

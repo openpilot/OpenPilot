@@ -194,7 +194,8 @@ int32_t PIOS_PWM_Get(int8_t Channel)
 */
 void TIM3_IRQHandler(void)
 {
-	int32_t i;
+	/* Zero value always will be changed but this prevents compiler warning */
+	int32_t i = 0;
 
 	/* Do this as it's more efficient */
 	if (TIM_GetITStatus(PIOS_PWM_TIM_PORT[4], PIOS_PWM_TIM_CCR[4]) == SET) {
@@ -266,7 +267,8 @@ void TIM3_IRQHandler(void)
 */
 void TIM1_CC_IRQHandler(void)
 {
-	int32_t i;
+	/* Zero value always will be changed but this prevents compiler warning */
+	int32_t i = 0;
 
 	/* Do this as it's more efficient */
 	if (TIM_GetITStatus(PIOS_PWM_TIM_PORT[0], PIOS_PWM_TIM_CCR[0]) == SET) {

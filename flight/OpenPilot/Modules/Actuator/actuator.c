@@ -118,7 +118,7 @@ static void actuatorTask(void* parameters)
 	UAVObjEvent ev;
 	portTickType lastSysTime;
 	portTickType thisSysTime;
-	float dT;
+	float dT = 0.0f;
 	ActuatorCommandData command;
 	ActuatorSettingsData settings;
 

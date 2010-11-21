@@ -158,7 +158,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 	case EnterDFU:
 		if (((DeviceState == BLidle) && (Data0 < numberOfDevices))
 				|| (DeviceState == DFUidle)) {
-			if (Data0 > 0)
+			if (Data0 > 0)//PORQUE???
 				OPDfuIni(TRUE);
 			DeviceState = DFUidle;
 			currentProgrammingDestination = devicesTable[Data0].programmingType;

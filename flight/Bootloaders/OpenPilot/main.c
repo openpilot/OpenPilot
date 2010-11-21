@@ -38,10 +38,11 @@
 #include "stopwatch.h"
 #include "op_dfu.h"
 #include "usb_lib.h"
+#include "pios_iap.h"
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
 extern void FLASH_Download();
-#define BSL_HOLD_STATE       ((PIOS_USB_DETECT_GPIO_PORT->IDR & PIOS_USB_DETECT_GPIO_PIN) ? 0 : 1)
+#define BSL_HOLD_STATE ((PIOS_USB_DETECT_GPIO_PORT->IDR & PIOS_USB_DETECT_GPIO_PIN) ? 0 : 1)
 
 /* Private typedef -----------------------------------------------------------*/
 typedef void (*pFunction)(void);
@@ -59,6 +60,7 @@ uint32_t sweep_steps2 = 100; // * 5 mS -> 500 mS
 
 /* Extern variables ----------------------------------------------------------*/
 DFUStates DeviceState;
+DFUPort ProgPort;
 uint8_t JumpToApp = FALSE;
 uint8_t GO_dfu = FALSE;
 uint8_t USB_connected = FALSE;
@@ -81,13 +83,21 @@ int main() {
 	if (BSL_HOLD_STATE == 0)
 		USB_connected = TRUE;
 
+	PIOS_IAP_Init();
+	if (PIOS_IAP_CheckRequest() == TRUE) {
+		User_DFU_request = TRUE;
+		PIOS_IAP_ClearRequest();
+	}
 	GO_dfu = (USB_connected==TRUE) || (User_DFU_request==TRUE);
 	if (GO_dfu == TRUE) {
+		if(USB_connected)
+			ProgPort=Usb;
+		else
+			ProgPort=Serial;
 		PIOS_Board_Init();
 		PIOS_OPAHRS_Init();
 		DeviceState = BLidle;
 		STOPWATCH_Init(100);
-		USB_connected = TRUE;
 		PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 0);
 		//OPDfuIni(false);
 

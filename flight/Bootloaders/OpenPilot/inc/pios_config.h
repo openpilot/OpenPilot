@@ -36,27 +36,17 @@
 #define PIOS_INCLUDE_BL_HELPER
 #define USB_HID
 /* Enable/Disable PiOS Modules */
-//#define PIOS_INCLUDE_ADC
 #define PIOS_INCLUDE_DELAY
-//#define PIOS_INCLUDE_I2C
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
-//#define PIOS_INCLUDE_SPEKTRUM
-//#define PIOS_INCLUDE_PPM
-//#define PIOS_INCLUDE_PWM
-//#define PIOS_INCLUDE_SERVO
 #define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_SYS
 #define PIOS_INCLUDE_USART
 #define PIOS_INCLUDE_USB_HID
-//#define PIOS_INCLUDE_BMP085
 #define PIOS_INCLUDE_OPAHRS
 #define PIOS_INCLUDE_COM
-//#define PIOS_INCLUDE_SDCARD
-//#define PIOS_INCLUDE_SETTINGS
-//#define PIOS_INCLUDE_FREERTOS
 #define PIOS_INCLUDE_GPIO
-//#define PIOS_INCLUDE_EXTI
+#define PIOS_NO_GPS
 
 
 /* Defaults for Logging */
@@ -72,7 +62,6 @@
 /* Servos */
 #define SERVOS_POSITION_MIN		800
 #define SERVOS_POSITION_MAX		2200
-
 
 #endif /* PIOS_CONFIG_H */
 /**

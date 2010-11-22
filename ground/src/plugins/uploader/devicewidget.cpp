@@ -116,7 +116,18 @@ void deviceWidget::uploadFirmware()
         return;
     }
 
-    status("Starting firmware upload.");
+    status("Starting firmware upload");
+    // We don't know which device was used previously, so we
+    // are cautious and reenter DFU for this deviceID:
+    if(!m_dfu->enterDFU(deviceID))
+    {
+        status("Error:Could not enter DFU mode");
+        return;
+    }
+    OP_DFU::Status ret=m_dfu->StatusRequest();
+    qDebug() << m_dfu->StatusToString(ret);
+    m_dfu->AbortOperation(); // Necessary, otherwise I get random failures.
+
     connect(m_dfu, SIGNAL(progressUpdated(int)), this, SLOT(setProgress(int)));
     connect(m_dfu, SIGNAL(operationProgress(QString)), this, SLOT(status(QString)));
     connect(m_dfu, SIGNAL(uploadFinished(OP_DFU::Status)), this, SLOT(uploadFinished(OP_DFU::Status)));

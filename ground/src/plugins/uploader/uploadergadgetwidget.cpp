@@ -241,25 +241,39 @@ void UploaderGadgetWidget::systemRescue()
         log("** Follow those instructions to attempt a system rescue **");
         log("**********************************************************");
         log("You will be prompted to first connect USB, then system power");
-        log ("Connect USB in 3 seconds...");
+        log ("Connect USB in 2 seconds...");
         rescueStep = RESCUE_STEP1;
         QTimer::singleShot(1000, this, SLOT(systemRescue()));
     }
         break;
     case RESCUE_STEP1:
         rescueStep = RESCUE_STEP2;
-        log ("            ...2...");
+        log ("            ...1...");
         QTimer::singleShot(1000, this, SLOT(systemRescue()));
         break;
     case RESCUE_STEP2:
         rescueStep = RESCUE_STEP3;
-        log("            ...1...");
+        log("            ...Now!");
         QTimer::singleShot(1000, this, SLOT(systemRescue()));
         break;
     case RESCUE_STEP3:
-        log("... NOW!\n***\n");
-        log("Connect Power in 1 second...");
-        rescueStep = RESCUE_POWER2;
+        log("... Detecting Mainboard...");
+        repaint();
+        if (!dfu)
+            dfu = new DFUObject(true);
+        dfu->AbortOperation();
+        if(!dfu->enterDFU(0))
+        {
+            log("Could not enter DFU mode.");
+            return;
+        }
+        if(!dfu->findDevices())
+        {
+            log("Could not detect mainboard.");
+            return;
+        }
+        rescueStep = RESCUE_POWER1;
+        log("Connect Power in 2 second...");
         QTimer::singleShot(1000, this, SLOT(systemRescue()));
         break;
     case RESCUE_POWER1:
@@ -270,19 +284,12 @@ void UploaderGadgetWidget::systemRescue()
     case RESCUE_POWER2:
         log("... NOW!\n***\nWaiting...");
         rescueStep = RESCUE_DETECT;
-        QTimer::singleShot(3000, this, SLOT(systemRescue()));
+        QTimer::singleShot(4000, this, SLOT(systemRescue()));
         break;
     case RESCUE_DETECT:
         rescueStep = RESCUE_STEP0;
-        log("Polling for devices...");
+        log("Detecting AHRS...");
         repaint();
-        if (!dfu)
-            dfu = new DFUObject(true);
-        if(!dfu->enterDFU(0))
-        {
-            log("Could not enter DFU mode.");
-            return;
-        }
         if(!dfu->findDevices())
         {
             log("Could not detect devices.");
@@ -304,7 +311,6 @@ void UploaderGadgetWidget::systemRescue()
         m_config->resetButton->setEnabled(false);
         m_config->bootButton->setEnabled(true);
         currentStep = IAP_STATE_BOOTLOADER; // So that we can boot from the GUI afterwards.
-
     }
 
 

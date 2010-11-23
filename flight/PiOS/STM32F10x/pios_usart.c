@@ -202,7 +202,7 @@ int32_t PIOS_USART_RxBufferGet(uint8_t usart)
 		return -2;
 	}
 
-	if (!fifoBuf_getUsed(&usart_dev->rx)) {
+	if (fifoBuf_getUsed(&usart_dev->rx) == 0) {
 		/* Nothing new in the buffer */
 		return -1;
 	}
@@ -395,12 +395,11 @@ int32_t PIOS_USART_TxBufferPutMoreNonBlocking(uint8_t usart, const uint8_t * buf
 	/* Copy bytes to be transmitted into transmit buffer */
 	/* This operation should be atomic! */
 	PIOS_IRQ_Disable();
+	uint16_t used = fifoBuf_getUsed(&usart_dev->tx);
 	fifoBuf_putData(&usart_dev->tx,buffer,len);
-
-	if (fifoBuf_getUsed(&usart_dev->tx) == len) {
-		/* Buffer has just become non-empty, enable tx interrupt. */
+	
+	if(used == 0) /* enable sending when was empty */
 		USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, ENABLE);
-	}
 	PIOS_IRQ_Enable();
 
 	/* No error */

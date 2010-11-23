@@ -137,19 +137,30 @@ namespace mapcontrol
             }
         }
     }
+
+    /**
+      * Rotate the UAV Icon on the map, or rotate the map
+      * depending on the display mode
+      */
     void UAVItem::SetUAVHeading(const qreal &value)
     {
         if(mapfollowtype==UAVMapFollowType::CenterAndRotateMap)
         {
             mapwidget->SetRotate(-value);
         }
-        else
-            this->setRotation(value);
+        else {
+            if (this->rotation() != value)
+                this->setRotation(value);
+        }
     }
+
+
     int UAVItem::type()const
     {
         return Type;
     }
+
+
     void UAVItem::RefreshPos()
     {
         localposition=map->FromLatLngToLocal(coord);

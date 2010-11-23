@@ -276,8 +276,9 @@ namespace mapcontrol
      void OPMapWidget::SetRotate(qreal const& value)
      {
          map->mapRotate(value);
-         if(compass)
+         if(compass && (compass->rotation() != value)) {
              compass->setRotation(value);
+         }
      }
      void OPMapWidget::RipMap()
      {

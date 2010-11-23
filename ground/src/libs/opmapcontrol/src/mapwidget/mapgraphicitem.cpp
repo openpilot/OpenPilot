@@ -553,8 +553,10 @@ namespace mapcontrol
     }
     void MapGraphicItem::mapRotate(qreal angle)
     {
-        rotation=angle;
-        resize(scene()->sceneRect());
+        if (rotation != angle) {
+            rotation=angle;
+            resize(scene()->sceneRect());
+        }
     }
     QRectF MapGraphicItem::boundingBox(const QRectF &rect, const qreal &angle)
     {

@@ -34,6 +34,7 @@
 
 #include <pios.h>
 #include <pios_stm32.h>
+#include <fifo_buffer.h>
 
 struct pios_usart_cfg {
 	USART_TypeDef *regs;
@@ -44,17 +45,10 @@ struct pios_usart_cfg {
 	struct stm32_irq irq;
 };
 
-struct pios_usart_buffer {
-	uint8_t buf[PIOS_USART_RX_BUFFER_SIZE];
-	uint16_t head;
-	uint16_t tail;
-	uint16_t size;
-};
-
 struct pios_usart_dev {
 	const struct pios_usart_cfg *const cfg;
-	struct pios_usart_buffer rx;
-	struct pios_usart_buffer tx;
+	t_fifo_buffer rx;
+	t_fifo_buffer tx;
 };
 
 extern struct pios_usart_dev pios_usart_devs[];

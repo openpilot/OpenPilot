@@ -70,8 +70,8 @@ void PIOS_USART_Init(void)
 		PIOS_DEBUG_Assert(usart_dev);
 
 		/* Clear buffer counters */
-		usart_dev->rx.head = usart_dev->rx.tail = usart_dev->rx.size = 0;
-		usart_dev->tx.head = usart_dev->tx.tail = usart_dev->tx.size = 0;
+		fifoBuf_init(&usart_dev->rx);
+		fifoBuf_init(&usart_dev->tx);
 
 		/* Enable the USART Pins Software Remapping */
 		if (usart_dev->cfg->remap) {
@@ -157,7 +157,7 @@ int32_t PIOS_USART_RxBufferFree(uint8_t usart)
 		return -2;
 	}
 
-	return (sizeof(usart_dev->rx.buf) - usart_dev->rx.size);
+	return fifoBuf_getFree(&usart_dev->rx);
 }
 
 /**
@@ -179,7 +179,7 @@ int32_t PIOS_USART_RxBufferUsed(uint8_t usart)
 		return -2;
 	}
 
-	return (usart_dev->rx.size);
+	return fifoBuf_getUsed(&usart_dev->rx);
 }
 
 /**
@@ -202,18 +202,14 @@ int32_t PIOS_USART_RxBufferGet(uint8_t usart)
 		return -2;
 	}
 
-	if (!usart_dev->rx.size) {
+	if (!fifoBuf_getUsed(&usart_dev->rx)) {
 		/* Nothing new in the buffer */
 		return -1;
 	}
 
 	/* get byte - this operation should be atomic! */
 	PIOS_IRQ_Disable();
-	uint8_t b = usart_dev->rx.buf[usart_dev->rx.tail++];
-	if (usart_dev->rx.tail >= sizeof(usart_dev->rx.buf)) {
-		usart_dev->rx.tail = 0;
-	}
-	usart_dev->rx.size--;
+	uint8_t b = fifoBuf_getByte(&usart_dev->rx);
 	PIOS_IRQ_Enable();
 
 	/* Return received byte */
@@ -240,14 +236,14 @@ int32_t PIOS_USART_RxBufferPeek(uint8_t usart)
 		return -2;
 	}
 
-	if (!usart_dev->rx.size) {
+	if (!fifoBuf_getUsed(&usart_dev->rx)) {
 		/* Nothing new in the buffer */
 		return -1;
 	}
 
 	/* get byte - this operation should be atomic! */
 	PIOS_IRQ_Disable();
-	uint8_t b = usart_dev->rx.buf[usart_dev->rx.tail];
+	uint8_t b = fifoBuf_getBytePeek(&usart_dev->rx);
 	PIOS_IRQ_Enable();
 
 	/* Return received byte */
@@ -275,7 +271,7 @@ int32_t PIOS_USART_RxBufferPut(uint8_t usart, uint8_t b)
 		return -1;
 	}
 
-	if (usart_dev->rx.size >= sizeof(usart_dev->rx.buf)) {
+	if (fifoBuf_getFree(&usart_dev->rx) < 1) {
 		/* Buffer full (retry) */
 		return -2;
 	}
@@ -283,11 +279,7 @@ int32_t PIOS_USART_RxBufferPut(uint8_t usart, uint8_t b)
 	/* Copy received byte into receive buffer */
 	/* This operation should be atomic! */
 	PIOS_IRQ_Disable();
-	usart_dev->rx.buf[usart_dev->rx.head++] = b;
-	if (usart_dev->rx.head >= sizeof(usart_dev->rx.buf)) {
-		usart_dev->rx.head = 0;
-	}
-	usart_dev->rx.size++;
+	fifoBuf_putByte(&usart_dev->rx,b);
 	PIOS_IRQ_Enable();
 
 	/* No error */

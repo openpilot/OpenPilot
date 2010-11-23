@@ -12,12 +12,8 @@
 		65003B31121249CA00C183DD /* pios_wdg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_wdg.c; sourceTree = "<group>"; };
 		651913371256C5240039C0A3 /* ahrs_comm_objects.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_comm_objects.c; sourceTree = "<group>"; };
 		651913381256C5240039C0A3 /* ahrs_spi_comm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_spi_comm.c; sourceTree = "<group>"; };
-		651913391256C5240039C0A3 /* ahrs_spi_program_slave.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_spi_program_slave.c; sourceTree = "<group>"; };
 		6519133A1256C52B0039C0A3 /* ahrs_comm_objects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_comm_objects.h; sourceTree = "<group>"; };
 		6519133B1256C52B0039C0A3 /* ahrs_spi_comm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_comm.h; sourceTree = "<group>"; };
-		6519133C1256C52B0039C0A3 /* ahrs_spi_program_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program_master.h; sourceTree = "<group>"; };
-		6519133D1256C52B0039C0A3 /* ahrs_spi_program_slave.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program_slave.h; sourceTree = "<group>"; };
-		6519133E1256C52B0039C0A3 /* ahrs_spi_program.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program.h; sourceTree = "<group>"; };
 		651913571256D0030039C0A3 /* ahrssettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrssettings.h; sourceTree = "<group>"; };
 		651CF9E5120B5D8300EEFD70 /* pios_usb_hid_desc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_usb_hid_desc.c; sourceTree = "<group>"; };
 		651CF9E6120B5D8300EEFD70 /* pios_usb_hid_istr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_usb_hid_istr.c; sourceTree = "<group>"; };
@@ -2592,8 +2588,6 @@
 		65B7E6B4120DF1E2000C1123 /* pios_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_config.h; sourceTree = "<group>"; };
 		65B7E6B6120DF1E2000C1123 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../AHRS/Makefile; sourceTree = SOURCE_ROOT; };
 		65B7E6B7120DF1E2000C1123 /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_board.c; path = ../../AHRS/pios_board.c; sourceTree = SOURCE_ROOT; };
-		65C2595112249D9C0081B6ED /* buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = buffer.c; sourceTree = "<group>"; };
-		65C2595212249DA60081B6ED /* buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = buffer.h; sourceTree = "<group>"; };
 		65C259551224BFAF0081B6ED /* ahrscalibration.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrscalibration.c; sourceTree = "<group>"; };
 		65C259561224BFAF0081B6ED /* ahrssettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrssettings.c; sourceTree = "<group>"; };
 		65C259571224BFAF0081B6ED /* baroaltitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = baroaltitude.c; sourceTree = "<group>"; };
@@ -3009,8 +3003,6 @@
 				6549E0D21279B3C800C5476F /* fifo_buffer.c */,
 				651913371256C5240039C0A3 /* ahrs_comm_objects.c */,
 				651913381256C5240039C0A3 /* ahrs_spi_comm.c */,
-				651913391256C5240039C0A3 /* ahrs_spi_program_slave.c */,
-				65C2595112249D9C0081B6ED /* buffer.c */,
 				657CEEB7121DBC63007A1FBE /* CoordinateConversions.c */,
 				657CEEB8121DBC63007A1FBE /* inc */,
 				657CEEBB121DBC63007A1FBE /* WorldMagModel.c */,
@@ -3025,10 +3017,6 @@
 				6549E0D31279B3CF00C5476F /* fifo_buffer.h */,
 				6519133A1256C52B0039C0A3 /* ahrs_comm_objects.h */,
 				6519133B1256C52B0039C0A3 /* ahrs_spi_comm.h */,
-				6519133C1256C52B0039C0A3 /* ahrs_spi_program_master.h */,
-				6519133D1256C52B0039C0A3 /* ahrs_spi_program_slave.h */,
-				6519133E1256C52B0039C0A3 /* ahrs_spi_program.h */,
-				65C2595212249DA60081B6ED /* buffer.h */,
 				657CF024121F49CD007A1FBE /* WMMInternal.h */,
 				657CEEB9121DBC63007A1FBE /* CoordinateConversions.h */,
 				657CEEBA121DBC63007A1FBE /* WorldMagModel.h */,

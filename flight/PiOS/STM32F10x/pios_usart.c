@@ -305,7 +305,7 @@ int32_t PIOS_USART_TxBufferFree(uint8_t usart)
 		return 0;
 	}
 
-	return (sizeof(usart_dev->tx.buf) - usart_dev->tx.size);
+	return fifoBuf_getFree(&usart_dev->tx);
 }
 
 /**
@@ -327,7 +327,7 @@ int32_t PIOS_USART_TxBufferUsed(uint8_t usart)
 		return 0;
 	}
 
-	return (usart_dev->tx.size);
+	return fifoBuf_getUsed(&usart_dev->tx);
 }
 
 /**
@@ -350,18 +350,14 @@ int32_t PIOS_USART_TxBufferGet(uint8_t usart)
 		return -1;
 	}
 
-	if (!usart_dev->tx.size) {
+	if (fifoBuf_getUsed(&usart_dev->tx) == 0) {
 		/* Nothing new in the buffer */
 		return -2;
 	}
 
 	/* get byte - this operation should be atomic! */
 	PIOS_IRQ_Disable();
-	uint8_t b = usart_dev->tx.buf[usart_dev->tx.tail++];
-	if (usart_dev->tx.tail >= sizeof(usart_dev->tx.buf)) {
-		usart_dev->tx.tail = 0;
-	}
-	usart_dev->tx.size--;
+	uint8_t b = fifoBuf_getByte(&usart_dev->tx);
 	PIOS_IRQ_Enable();
 
 	/* Return received byte */
@@ -391,7 +387,7 @@ int32_t PIOS_USART_TxBufferPutMoreNonBlocking(uint8_t usart, const uint8_t * buf
 		return -1;
 	}
 
-	if (usart_dev->tx.size + len >= sizeof(usart_dev->tx.buf)) {
+	if (len >= fifoBuf_getFree(&usart_dev->tx)) {
 		/* Buffer cannot accept all requested bytes (retry) */
 		return -2;
 	}
@@ -399,21 +395,12 @@ int32_t PIOS_USART_TxBufferPutMoreNonBlocking(uint8_t usart, const uint8_t * buf
 	/* Copy bytes to be transmitted into transmit buffer */
 	/* This operation should be atomic! */
 	PIOS_IRQ_Disable();
+	fifoBuf_putData(&usart_dev->tx,buffer,len);
 
-	uint16_t i;
-	for (i = 0; i < len; ++i) {
-		usart_dev->tx.buf[usart_dev->tx.head++] = *buffer++;
-		if (usart_dev->tx.head >= sizeof(usart_dev->tx.buf)) {
-			usart_dev->tx.head = 0;
-		}
-
-		usart_dev->tx.size++;
-		if (usart_dev->tx.size == 1) {
-			/* Buffer has just become non-empty, enable tx interrupt. */
-			USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, ENABLE);
-		}
+	if (fifoBuf_getUsed(&usart_dev->tx) == len) {
+		/* Buffer has just become non-empty, enable tx interrupt. */
+		USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, ENABLE);
 	}
-
 	PIOS_IRQ_Enable();
 
 	/* No error */

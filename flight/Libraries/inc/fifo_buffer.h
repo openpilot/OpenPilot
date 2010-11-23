@@ -28,7 +28,7 @@
 
 #include "stm32f10x.h"
 
-#define FIFO_BUFFER_SIZE	512
+#define FIFO_BUFFER_SIZE	1024
 
 // *********************
 

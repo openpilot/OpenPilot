@@ -127,14 +127,16 @@ static void stabilizationTask(void* parameters)
 	lastSysTime = xTaskGetTickCount();
 	ZeroPids();
 	while(1) {
+
+		stabilization_updated = 1;
+		
 		// Wait until the ActuatorDesired object is updated, if a timeout then go to failsafe
 		if ( xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )
 		{
 			AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION,SYSTEMALARMS_ALARM_WARNING);
-		}
+			continue;
+		} 
 		
-		stabilization_updated = 1;
-
 		// Check how long since last update
 		thisSysTime = xTaskGetTickCount();
 		if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
@@ -222,9 +224,9 @@ static void stabilizationTask(void* parameters)
 		{
 			ZeroPids();
 		}
-
+		
 		// Clear alarms
-		AlarmsClear(SYSTEMALARMS_ALARM_STABILIZATION);
+		AlarmsClear(SYSTEMALARMS_ALARM_STABILIZATION);		
 	}
 }
 

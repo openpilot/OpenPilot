@@ -140,15 +140,15 @@ static void actuatorTask(void* parameters)
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1)
-	{
+	{		
+		actuator_updated = 1;
+
 		// Wait until the ActuatorDesired object is updated, if a timeout then go to failsafe
 		if ( xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )
 		{
 			setFailsafe();
 			continue;
 		}
-		
-		actuator_updated = 1;
 
 		// Check how long since last update
 		thisSysTime = xTaskGetTickCount();

@@ -208,9 +208,9 @@ int32_t PIOS_USART_RxBufferGet(uint8_t usart)
 	}
 
 	/* get byte - this operation should be atomic! */
-	PIOS_IRQ_Disable();
+	/* PIOS_IRQ_Disable(); -- not needed only one reader */
 	uint8_t b = fifoBuf_getByte(&usart_dev->rx);
-	PIOS_IRQ_Enable();
+	/* PIOS_IRQ_Enable(); */
 
 	/* Return received byte */
 	return b;
@@ -242,9 +242,9 @@ int32_t PIOS_USART_RxBufferPeek(uint8_t usart)
 	}
 
 	/* get byte - this operation should be atomic! */
-	PIOS_IRQ_Disable();
+	/* PIOS_IRQ_Disable(); -- not needed only one reader */
 	uint8_t b = fifoBuf_getBytePeek(&usart_dev->rx);
-	PIOS_IRQ_Enable();
+	/* PIOS_IRQ_Enable();                          */
 
 	/* Return received byte */
 	return b;
@@ -278,9 +278,9 @@ int32_t PIOS_USART_RxBufferPut(uint8_t usart, uint8_t b)
 
 	/* Copy received byte into receive buffer */
 	/* This operation should be atomic! */
-	PIOS_IRQ_Disable();
+	/* PIOS_IRQ_Disable(); -- not needed only one reader */
 	fifoBuf_putByte(&usart_dev->rx,b);
-	PIOS_IRQ_Enable();
+	/* PIOS_IRQ_Enable(); */
 
 	/* No error */
 	return 0;
@@ -356,9 +356,9 @@ int32_t PIOS_USART_TxBufferGet(uint8_t usart)
 	}
 
 	/* get byte - this operation should be atomic! */
-	PIOS_IRQ_Disable();
+	 PIOS_IRQ_Disable();
 	uint8_t b = fifoBuf_getByte(&usart_dev->tx);
-	PIOS_IRQ_Enable();
+	PIOS_IRQ_Enable(); 
 
 	/* Return received byte */
 	return b;
@@ -393,7 +393,8 @@ int32_t PIOS_USART_TxBufferPutMoreNonBlocking(uint8_t usart, const uint8_t * buf
 	}
 
 	/* Copy bytes to be transmitted into transmit buffer */
-	/* This operation should be atomic! */
+	/* This operation should be atomic!  Can't rely on   */
+	/* fifoBuf since two tasks write to the port         */
 	PIOS_IRQ_Disable();
 	uint16_t used = fifoBuf_getUsed(&usart_dev->tx);
 	fifoBuf_putData(&usart_dev->tx,buffer,len);

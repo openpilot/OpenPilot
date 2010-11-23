@@ -228,7 +228,13 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t * buff
 	if(!transfer_possible)
 		return -1;
 	
-	uint8_t previous_data = fifoBuf_getUsed(&tx_pios_fifo_buffer);
+	if(GetEPTxStatus(ENDP1) == EP_TX_NAK) {
+		/* This happens on windows when plugged in but GCS not connected */
+		/* in this case clear buffer and keep trying                     */
+		fifoBuf_clearData(&tx_pios_fifo_buffer);
+	}
+	
+	uint16_t previous_data = fifoBuf_getUsed(&tx_pios_fifo_buffer);
 
 	if (len > fifoBuf_getFree(&tx_pios_fifo_buffer))
 		return -2;	/* Cannot send all requested bytes */

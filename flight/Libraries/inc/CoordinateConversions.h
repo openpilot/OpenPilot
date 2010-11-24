@@ -53,4 +53,21 @@ void LLA2Base(double LLA[3], double BaseECEF[3], float Rne[3][3], float NED[3]);
 	// ****** Express ECEF in a local NED Base Frame ********
 void ECEF2Base(double ECEF[3], double BaseECEF[3], float Rne[3][3], float NED[3]);
 
+	// ****** convert Rotation Matrix to Quaternion ********
+	// ****** if R converts from e to b, q is rotation from e to b ****
+void R2Quaternion(float R[3][3], float q[4]);
+
+	// ****** Rotation Matrix from Two Vector Directions ********
+	// ****** given two vector directions (v1 and v2) known in two frames (b and e) find Rbe ***
+	// ****** solution is approximate if can't be exact ***
+uint8_t RotFrom2Vectors(const float v1b[3], const float v1e[3], const float v2b[3], const float v2e[3], float Rbe[3][3]);
+
+	// ****** Vector Cross Product ********
+void CrossProduct(const float v1[3], const float v2[3], float result[3]);
+
+	// ****** Vector Magnitude ********
+float VectorMagnitude(const float v[3]);
+
+
+
 #endif // COORDINATECONVERSIONS_H_

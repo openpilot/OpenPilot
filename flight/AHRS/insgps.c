@@ -104,6 +104,37 @@ void INSGPSInit()		//pretty much just a place holder for now
 	R[9] = .05;		// High freq altimeter noise variance (m^2)
 }
 
+void INSResetP(float PDiag[NUMX])
+{
+	uint8_t i,j;
+
+	// if PDiag[i] nonzero then clear row and column and set diagonal element
+	for (i=0;i<NUMX;i++){
+		if (PDiag != 0){
+			for (j=0;j<NUMX;j++)
+				P[i][j]=P[j][i]=0;
+			P[i][i]=PDiag[i];
+		}
+	}
+}
+
+void INSSetState(float pos[3], float vel[3], float q[4], float gyro_bias[3])
+{
+	X[0] = pos[0];
+	X[1] = pos[1];
+	X[2] = pos[2];
+	X[3] = vel[0];
+	X[4] = vel[1];
+	X[5] = vel[2];
+	X[6] = q[0];
+	X[7] = q[1];
+	X[8] = q[2];
+	X[9] = q[3];
+	X[10] = gyro_bias[0];
+	X[11] = gyro_bias[1];
+	X[12] = gyro_bias[2];
+}
+
 void INSPosVelReset(float pos[3], float vel[3]) 
 {
 	for (int i = 0; i < 6; i++) {

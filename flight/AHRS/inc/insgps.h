@@ -53,6 +53,8 @@ void INSGPSInit();
 void INSStatePrediction(float gyro_data[3], float accel_data[3], float dT);
 void INSCovariancePrediction(float dT);
 
+void INSResetP(float PDiag[13]);
+void INSSetState(float pos[3], float vel[3], float q[4], float gyro_bias[3]);
 void INSSetPosVelVar(float PosVar);
 void INSSetGyroBias(float gyro_bias[3]);
 void INSSetAccelVar(float accel_var[3]);

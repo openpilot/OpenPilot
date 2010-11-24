@@ -41,7 +41,7 @@
 
 #define MAX_OVERSAMPLING 50    /* cannot have more than 50 samples      */
 #define INSGPS_GPS_TIMEOUT 2   /* 2 seconds triggers reinit of position */
-#define INSGPS_GPS_MINSAT  7   /* 2 seconds triggers reinit of position */
+#define INSGPS_GPS_MINSAT  6   /* 2 seconds triggers reinit of position */
 #define INSGPS_GPS_MINPDOP 3.5 /* minimum PDOP for postition updates    */
 #define INSGPS_MAGLEN       1000
 #define INSGPS_MAGTOL      0.2 /* error in magnetic vector length to use  */
@@ -49,13 +49,13 @@
 // For debugging the raw sensors
 //#define DUMP_RAW
 //#define DUMP_FRIENDLY
-//#define DUMP_EKF
+#define DUMP_EKF
 
 #ifdef DUMP_EKF
 #define NUMX 13			// number of states, X is the state vector
 #define NUMW 9			// number of plant noise inputs, w is disturbance noise vector
 #define NUMV 10			// number of measurements, v is the measurement noise vector
-#define NUMU 6			// number of deterministic inputs, U is the input vector
+#define NUMU 7			// number of deterministic inputs, U is the input vector
 extern float F[NUMX][NUMX], G[NUMX][NUMW], H[NUMV][NUMX];	// linearized system matrices
 extern float P[NUMX][NUMX], X[NUMX];	// covariance matrix and state vector
 extern float Q[NUMW], R[NUMV];	// input noise and measurement noise variances
@@ -63,6 +63,7 @@ extern float K[NUMX][NUMV];	// feedback gain matrix
 #endif
 
 volatile int8_t ahrs_algorithm;
+volatile int8_t last_ahrs_algorithm;
 
 /**
  * @addtogroup AHRS_Structures Local Structres
@@ -170,6 +171,7 @@ void altitude_callback(AhrsObjHandle obj);
 void calibration_callback(AhrsObjHandle obj);
 void gps_callback(AhrsObjHandle obj);
 void settings_callback(AhrsObjHandle obj);
+void InitAlgorithm(void);
 
 volatile uint32_t last_counter_idle_start = 0;
 volatile uint32_t last_counter_idle_end = 0;
@@ -199,6 +201,7 @@ static uint8_t adc_oversampling = 20;
  */
 int main()
 {
+	uint8_t spike=0;
 	float gyro[3], accel[3];
 	float vel[3] = { 0, 0, 0 };
 	uint8_t gps_dirty = 1;
@@ -309,12 +312,17 @@ for all data to be up to date before doing anything*/
 
 	/******************* Main EKF loop ****************************/
 	while(1) {
+
+
 		AhrsPoll();
 		AhrsStatusData status;
 		AhrsStatusGet(&status);
 		status.CPULoad = ((float)running_counts /
 						  (float)(idle_counts + running_counts)) * 100;
-		status.IdleTimePerCyle = idle_counts / (timer_rate() / 10000);
+//		status.IdleTimePerCyle = idle_counts / (timer_rate() / 10000);
+// ***************************
+status.IdleTimePerCyle=spike;
+// ***************************
 		status.RunningTimePerCyle = running_counts / (timer_rate() / 10000);
 		status.DroppedUpdates = ekf_too_slow;
 		up_time = timer_count();
@@ -381,14 +389,34 @@ for all data to be up to date before doing anything*/
 		
 		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & mag_data.updated, 1);                                       // mag update (45)
 		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & mag_data.scaled.axis, 3*4);                                 // mag data (46:57)
-		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & gps_data, sizeof(gps_data));                                // gps data (58:82)
+
+		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & gps_data, sizeof(gps_data));                                // gps data (58:85)
 		
-		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & X, 4 * NUMX);                                               // X (83:134)
+		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & X, 4 * NUMX);                                               // X (86:137)
 		for(uint8_t i = 0; i < NUMX; i++) 
-			PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &(P[i][i]), 4);                                       // diag(P) (135:186)
+			PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &(P[i][i]), 4);                                           // diag(P) (138:189)
+
+		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & altitude_data.altitude, 4);                                 // BaroAlt (190:193)
 #endif  
 		
+
+//*****************************************
+//*****************************************
+//*****************************************
+//*****************************************
+
+		if (ahrs_algorithm != last_ahrs_algorithm)
+			InitAlgorithm();
+		last_ahrs_algorithm = ahrs_algorithm;
+
+//*****************************************
+//*****************************************
+//*****************************************
+//*****************************************
+
+
 		/******************** INS ALGORITHM **************************/
+
 		if (ahrs_algorithm != AHRSSETTINGS_ALGORITHM_SIMPLE) {
 
 			// format data for INS algo
@@ -428,21 +456,17 @@ for all data to be up to date before doing anything*/
 				vel[2] = 0;
 				
 				
-				INSSetPosVelVar(0.004);
+//				INSSetPosVelVar(0.004);
+				INSSetPosVelVar(0.04);
 				
 				if (mag_data.updated && !gps_dirty) {
 					//TOOD: add check for altitude updates
-					FullCorrection(mag_data.scaled.axis,
-						       gps_data.NED,
-						       vel,
-						       altitude_data.
-						       altitude);
+					//FullCorrection(mag_data.scaled.axis, gps_data.NED, vel, altitude_data.altitude);
+					GpsMagCorrection(mag_data.scaled.axis, gps_data.NED, vel);
 					mag_data.updated = 0;
 				} else if (!gps_dirty) {
-					GpsBaroCorrection(gps_data.NED,
-							  vel,
-							  altitude_data.
-							  altitude);
+					//GpsBaroCorrection(gps_data.NED, vel, altitude_data.altitude);
+					GpsBaroCorrection(gps_data.NED, vel, -gps_data.NED[2]);
 				} else { // GPS hasn't updated for a bit
 					INSPosVelReset(gps_data.NED,vel);					
 				}
@@ -452,8 +476,11 @@ for all data to be up to date before doing anything*/
 				   && mag_data.updated == 1) {
 				MagCorrection(mag_data.scaled.axis);	// only trust mags if outdoors
 				mag_data.updated = 0;
-			} else {
+			}
+			else if (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR){ //Do no update
+	 		} else {
 				// Indoors, update with zero position and velocity and high covariance
+spike++;
 				AHRSSettingsData settings;
 				AHRSSettingsGet(&settings);
 				INSSetPosVelVar(settings.IndoorVelocityVariance);
@@ -479,8 +506,7 @@ for all data to be up to date before doing anything*/
 					INSPosVelReset(vel,vel);					
 
 				if((mag_data.updated == 1) && (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
-					MagVelBaroCorrection(mag_data.scaled.axis,
-							     vel,altitude_data.altitude);  // only trust mags if outdoors
+					MagVelBaroCorrection(mag_data.scaled.axis,vel,altitude_data.altitude);  // only trust mags if outdoors
 					mag_data.updated = 0;
 				} else {
 					VelBaroCorrection(vel, altitude_data.altitude);
@@ -864,6 +890,18 @@ void gps_callback(AhrsObjHandle obj)
 	HomeLocationData home;
 	HomeLocationGet(&home);
 
+	// convert from cm back to meters
+	double LLA[3] = {(double) pos.Latitude / 1e7, (double) pos.Longitude / 1e7, (double) (pos.GeoidSeparation + pos.Altitude)};
+	// put in local NED frame
+	double ECEF[3] = {(double) (home.ECEF[0] / 100), (double) (home.ECEF[1] / 100), (double) (home.ECEF[2] / 100)};
+	LLA2Base(LLA, ECEF, (float (*)[3]) home.RNE, gps_data.NED);
+
+	gps_data.heading = pos.Heading;
+	gps_data.groundspeed = pos.Groundspeed;
+	gps_data.quality = 1;  /* currently unused */
+	gps_data.updated = true;
+
+	// if poor don't use this update
 	if((ahrs_algorithm != AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) ||
 	   (pos.Satellites < INSGPS_GPS_MINSAT) || 
 	   (pos.PDOP >= INSGPS_GPS_MINPDOP) || 
@@ -872,18 +910,8 @@ void gps_callback(AhrsObjHandle obj)
 	{
 		gps_data.quality = 0;
 		gps_data.updated = false;
-		return;
 	}
 
-	double LLA[3] = {(double) pos.Latitude / 1e7, (double) pos.Longitude / 1e7, (double) (pos.GeoidSeparation + pos.Altitude)};
-	// convert from cm back to meters
-	double ECEF[3] = {(double) (home.ECEF[0] / 100), (double) (home.ECEF[1] / 100), (double) (home.ECEF[2] / 100)};
-		LLA2Base(LLA, ECEF, (float (*)[3]) home.RNE, gps_data.NED);
-
-	gps_data.heading = pos.Heading;
-	gps_data.groundspeed = pos.Groundspeed;
-	gps_data.quality = 1;  /* currently unused */
-	gps_data.updated = true;	
 }
 
 void altitude_callback(AhrsObjHandle obj)
@@ -934,3 +962,45 @@ void homelocation_callback(AhrsObjHandle obj)
 /**
  * @}
  */
+
+void InitAlgorithm()
+{
+	float Rbe[3][3], q[4], accels[3], rpy[3], mag;
+	float ge[3]={0,0,-9.81}, zeros[3]={0,0,0}, Pdiag[13]={25,25,25,5,5,5,1e-5,1e-5,1e-5,1e-5,1e-5,1e-5,1e-5};
+	bool using_mags, using_gps;
+
+	HomeLocationData home;
+	HomeLocationGet(&home);
+
+	accels[0]=accel_data.filtered.x;
+	accels[1]=accel_data.filtered.y;
+	accels[2]=accel_data.filtered.z;
+
+	using_mags = (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) || (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR);
+    using_gps = (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR);
+
+	if (using_mags){
+		RotFrom2Vectors(accels, ge, mag_data.scaled.axis, home.Be, Rbe);
+		R2Quaternion(Rbe,q);
+		if (using_gps)
+			INSSetState(gps_data.NED, zeros, q, zeros);
+		else
+			INSSetState(zeros, zeros, q, zeros);
+	}
+	else{
+		// assume yaw = 0
+		mag = VectorMagnitude(accels);
+		rpy[1] = asinf(-accels[0]/mag);
+		rpy[0] = atan2(accels[1]/mag,accels[2]/mag);
+		rpy[2] = 0;
+		RPY2Quaternion(rpy,q);
+		if (using_gps)
+			INSSetState(gps_data.NED, zeros, q, zeros);
+		else
+			INSSetState(zeros, zeros, q, zeros);
+	}
+
+	INSResetP(Pdiag);
+
+    // TODO: include initial estimate of gyro bias?
+}

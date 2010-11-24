@@ -137,6 +137,8 @@ void Quaternion2RPY(float q[4], float rpy[3])
 	rpy[1] = RAD2DEG * asinf(-R13);	// pitch always between -pi/2 to pi/2
 	rpy[2] = RAD2DEG * atan2f(R12, R11);
 	rpy[0] = RAD2DEG * atan2f(R23, R33);
+
+	//TODO: consider the cases where |R13| ~= 1, |pitch| ~= pi/2
 }
 
 // ****** find quaternion from roll, pitch, yaw ********
@@ -215,3 +217,134 @@ void ECEF2Base(double ECEF[3], double BaseECEF[3], float Rne[3][3], float NED[3]
 	NED[1] = Rne[1][0] * diff[0] + Rne[1][1] * diff[1] + Rne[1][2] * diff[2];
 	NED[2] = Rne[2][0] * diff[0] + Rne[2][1] * diff[1] + Rne[2][2] * diff[2];
 }
+
+// ****** convert Rotation Matrix to Quaternion ********
+// ****** if R converts from e to b, q is rotation from e to b ****
+void R2Quaternion(float R[3][3], float q[4])
+{
+	float m[4], mag;
+	uint8_t index,i;
+
+	m[0] = 1 + R[0][0] + R[1][1] + R[2][2];
+	m[1] = 1 + R[0][0] - R[1][1] - R[2][2];
+	m[2] = 1 - R[0][0] + R[1][1] - R[2][2];
+	m[3] = 1 - R[0][0] - R[1][1] + R[2][2];
+
+	// find maximum divisor
+	index = 0;
+	mag = m[0];
+	for (i=1;i<4;i++){
+		if (m[i] > mag){
+			mag = m[i];
+			index = i;
+		}
+	}
+	mag = 2*sqrt(mag);
+
+	if (index == 0) {
+		q[0] = mag/4;
+		q[1] = (R[1][2]-R[2][1])/mag;
+		q[2] = (R[2][0]-R[0][2])/mag;
+		q[3] = (R[0][1]-R[1][0])/mag;
+	}
+	else if (index == 1) {
+		q[1] = mag/4;
+		q[0] = (R[1][2]-R[2][1])/mag;
+		q[2] = (R[0][1]+R[1][0])/mag;
+		q[3] = (R[0][2]+R[2][0])/mag;
+	}
+	else if (index == 2) {
+		q[2] = mag/4;
+		q[0] = (R[2][0]-R[0][2])/mag;
+		q[1] = (R[0][1]+R[1][0])/mag;
+		q[3] = (R[1][2]+R[2][1])/mag;
+	}
+	else {
+		q[3] = mag/4;
+		q[0] = (R[0][1]-R[1][0])/mag;
+		q[1] = (R[0][2]+R[2][0])/mag;
+		q[2] = (R[1][2]+R[2][1])/mag;
+	}
+
+	// q0 positive, i.e. angle between pi and -pi
+	if (q[0] < 0){
+		q[0] = -q[0];
+		q[1] = -q[1];
+		q[2] = -q[2];
+		q[3] = -q[3];
+	}
+}
+
+// ****** Rotation Matrix from Two Vector Directions ********
+// ****** given two vector directions (v1 and v2) known in two frames (b and e) find Rbe ***
+// ****** solution is approximate if can't be exact ***
+uint8_t RotFrom2Vectors(const float v1b[3], const float v1e[3], const float v2b[3], const float v2e[3], float Rbe[3][3])
+{
+	float Rib[3][3], Rie[3][3];
+	float mag;
+	uint8_t i,j,k;
+
+	// identity rotation in case of error
+	for (i=0;i<3;i++){
+		for (j=0;j<3;j++)
+			Rbe[i][j]=0;
+		Rbe[i][i]=1;
+	}
+
+	// The first rows of rot matrices chosen in direction of v1
+	mag = VectorMagnitude(v1b);
+	if (fabs(mag) < 1e-30)
+		return (-1);
+	for (i=0;i<3;i++)
+		Rib[0][i]=v1b[i]/mag;
+
+	mag = VectorMagnitude(v1e);
+	if (fabs(mag) < 1e-30)
+		return (-1);
+	for (i=0;i<3;i++)
+		Rie[0][i]=v1e[i]/mag;
+
+	// The second rows of rot matrices chosen in direction of v1xv2
+	CrossProduct(v1b,v2b,&Rib[1][0]);
+	mag = VectorMagnitude(&Rib[1][0]);
+	if (fabs(mag) < 1e-30)
+		return (-1);
+	for (i=0;i<3;i++)
+		Rib[1][i]=Rib[1][i]/mag;
+
+	CrossProduct(v1e,v2e,&Rie[1][0]);
+	mag = VectorMagnitude(&Rie[1][0]);
+	if (fabs(mag) < 1e-30)
+		return (-1);
+	for (i=0;i<3;i++)
+		Rie[1][i]=Rie[1][i]/mag;
+
+	// The third rows of rot matrices are XxY (Row1xRow2)
+	CrossProduct(&Rib[0][0],&Rib[1][0],&Rib[2][0]);
+	CrossProduct(&Rie[0][0],&Rie[1][0],&Rie[2][0]);
+
+	// Rbe = Rbi*Rie = Rib'*Rie
+	for (i=0;i<3;i++)
+		for(j=0;j<3;j++){
+			Rbe[i][j]=0;
+			for(k=0;k<3;k++)
+				Rbe[i][j] += Rib[k][i]*Rie[k][j];
+		}
+
+	return 1;
+}
+
+// ****** Vector Cross Product ********
+void CrossProduct(const float v1[3], const float v2[3], float result[3])
+{
+	result[0] = v1[1]*v2[2] - v2[1]*v1[2];
+	result[1] = v2[0]*v1[2] - v1[0]*v2[2];
+	result[2] = v1[0]*v2[1] - v2[0]*v1[1];
+}
+
+// ****** Vector Magnitude ********
+float VectorMagnitude(const float v[3])
+{
+	return(sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]));
+}
+

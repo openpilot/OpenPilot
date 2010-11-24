@@ -477,7 +477,7 @@ UNAME := $(shell uname)
 ifeq ($(UNAME), Darwin)
   OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.openpilot.osx.cfg -f ../Project/OpenOCD/stm32.cfg
 else
-  OOCD_CL+=-f ../Project/OpenOCD/floss-jtag-revb.cfg -f ../Project/OpenOCD/stm32.cfg
+  OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.openpilot.cfg -f ../Project/OpenOCD/stm32.cfg
 endif
 # initialize
 OOCD_CL+=-c init

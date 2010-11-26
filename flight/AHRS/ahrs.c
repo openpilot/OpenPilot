@@ -44,7 +44,7 @@
 #define INSGPS_GPS_MINSAT  6   /* 2 seconds triggers reinit of position */
 #define INSGPS_GPS_MINPDOP 3.5 /* minimum PDOP for postition updates    */
 #define INSGPS_MAGLEN       1000
-#define INSGPS_MAGTOL      0.2 /* error in magnetic vector length to use  */
+#define INSGPS_MAGTOL      0.5 /* error in magnetic vector length to use  */
 
 // For debugging the raw sensors
 //#define DUMP_RAW
@@ -668,8 +668,7 @@ void process_mag_data()
 	HomeLocationGet(&home);
 	if (PIOS_HMC5843_NewDataAvailable() && 
 	    (home.Set == HOMELOCATION_SET_TRUE) && 
-	    ((home.Be[0] != 0) || (home.Be[1] != 0) || (home.Be[2] != 0)) &&
-	    ((float) timer_count() / timer_rate() > 5)) {
+	    ((home.Be[0] != 0) || (home.Be[1] != 0) || (home.Be[2] != 0))) {
 		PIOS_HMC5843_ReadMag(mag_data.raw.axis);
 		// Swap the axis here to acount for orientation of mag chip (notice 0 and 1 swapped in raw)
 		mag_data.scaled.axis[0] = (mag_data.raw.axis[1] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];

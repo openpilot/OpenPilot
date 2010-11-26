@@ -667,7 +667,7 @@ void process_mag_data()
 	HomeLocationData home;
 	HomeLocationGet(&home);
 	if (PIOS_HMC5843_NewDataAvailable() && 
-	    (home.Set = HOMELOCATION_SET_TRUE) && 
+	    (home.Set == HOMELOCATION_SET_TRUE) && 
 	    ((home.Be[0] != 0) || (home.Be[1] != 0) || (home.Be[2] != 0)) &&
 	    ((float) timer_count() / timer_rate() > 5)) {
 		PIOS_HMC5843_ReadMag(mag_data.raw.axis);

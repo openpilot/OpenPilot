@@ -29,4 +29,87 @@
 /* PIOS Includes */
 #include <pios.h>
 
+struct mag_sensor {
+	uint8_t id[4];
+	uint8_t updated;
+	struct {
+		int16_t axis[3];
+	} raw;
+	struct {
+		float axis[3];
+	} scaled;
+	struct {
+		float bias[3];
+		float scale[3];
+		float variance[3];
+	} calibration;
+};
+
+//! Contains the data from the accelerometer
+struct accel_sensor {
+	struct {
+		uint16_t x;
+		uint16_t y;
+		uint16_t z;
+	} raw;
+	struct {
+		float x;
+		float y;
+		float z;
+	} filtered;
+	struct {
+		float bias[3];
+		float scale[3];
+		float variance[3];
+	} calibration;
+};
+
+//! Contains the data from the gyro
+struct gyro_sensor {
+	struct {
+		uint16_t x;
+		uint16_t y;
+		uint16_t z;
+	} raw;
+	struct {
+		float x;
+		float y;
+		float z;
+	} filtered;
+	struct {
+		float bias[3];
+		float scale[3];
+		float variance[3];
+	} calibration;
+	struct {
+		uint16_t xy;
+		uint16_t z;
+	} temp;
+};
+
+//! Conains the current estimate of the attitude
+struct attitude_solution {
+	struct {
+		float q1;
+		float q2;
+		float q3;
+		float q4;
+	} quaternion;
+};
+
+//! Contains data from the altitude sensor
+struct altitude_sensor {
+	float altitude;
+	bool updated;
+};
+
+//! Contains data from the GPS (via the SPI link)
+struct gps_sensor {
+	float NED[3];
+	float heading;
+	float groundspeed;
+	float quality;
+	bool updated;
+};
+
 #endif /* AHRS_H */

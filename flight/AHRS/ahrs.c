@@ -51,125 +51,20 @@
 //#define DUMP_FRIENDLY
 #define DUMP_EKF
 
-#ifdef DUMP_EKF
-#define NUMX 13			// number of states, X is the state vector
-#define NUMW 9			// number of plant noise inputs, w is disturbance noise vector
-#define NUMV 10			// number of measurements, v is the measurement noise vector
-#define NUMU 7			// number of deterministic inputs, U is the input vector
-extern float F[NUMX][NUMX], G[NUMX][NUMW], H[NUMV][NUMX];	// linearized system matrices
-extern float P[NUMX][NUMX], X[NUMX];	// covariance matrix and state vector
-extern float Q[NUMW], R[NUMV];	// input noise and measurement noise variances
-extern float K[NUMX][NUMV];	// feedback gain matrix
-#endif
-
 volatile int8_t ahrs_algorithm;
-volatile int8_t last_ahrs_algorithm;
-
-/**
- * @addtogroup AHRS_Structures Local Structres
- * @{
- */
-
-//! Contains the data from the mag sensor chip
-struct mag_sensor {
-	uint8_t id[4];
-	uint8_t updated;
-	struct {
-		int16_t axis[3];
-	} raw;
-	struct {
-		float axis[3];
-	} scaled;
-	struct {
-		float bias[3];
-		float scale[3];
-		float variance[3];
-	} calibration;
-} mag_data;
-
-//! Contains the data from the accelerometer
-struct accel_sensor {
-	struct {
-		uint16_t x;
-		uint16_t y;
-		uint16_t z;
-	} raw;
-	struct {
-		float x;
-		float y;
-		float z;
-	} filtered;
-	struct {
-		float bias[3];
-		float scale[3];
-		float variance[3];
-	} calibration;
-} accel_data;
-
-//! Contains the data from the gyro
-struct gyro_sensor {
-	struct {
-		uint16_t x;
-		uint16_t y;
-		uint16_t z;
-	} raw;
-	struct {
-		float x;
-		float y;
-		float z;
-	} filtered;
-	struct {
-		float bias[3];
-		float scale[3];
-		float variance[3];
-	} calibration;
-	struct {
-		uint16_t xy;
-		uint16_t z;
-	} temp;
-} gyro_data;
-
-//! Conains the current estimate of the attitude
-struct attitude_solution {
-	struct {
-		float q1;
-		float q2;
-		float q3;
-		float q4;
-	} quaternion;
-} attitude_data;
-
-//! Contains data from the altitude sensor
-struct altitude_sensor {
-	float altitude;
-	bool updated;
-} altitude_data;
-
-//! Contains data from the GPS (via the SPI link)
-struct gps_sensor {
-	float NED[3];
-	float heading;
-	float groundspeed;
-	float quality;
-	bool updated;
-} gps_data;
-
-/**
- * @}
- */
 
 /* INS functions */
 void ins_outdoor_update();
 void ins_indoor_update();
 void simple_update();
 
-/* Data accessors - prepare for */
-
-/* Function Prototypes */
+/* Data accessors */
 void downsample_data(void);
 void process_mag_data();
-void calibrate_sensors(void);
 void reset_values();
+void calibrate_sensors(void);
+
+/* Communication functions */
 void send_calibration(void);
 void send_attitude(void);
 void send_velocity(void);
@@ -179,13 +74,6 @@ void altitude_callback(AhrsObjHandle obj);
 void calibration_callback(AhrsObjHandle obj);
 void gps_callback(AhrsObjHandle obj);
 void settings_callback(AhrsObjHandle obj);
-void InitAlgorithm(void);
-
-volatile uint32_t last_counter_idle_start = 0;
-volatile uint32_t last_counter_idle_end = 0;
-volatile uint32_t idle_counts;
-volatile uint32_t running_counts;
-uint32_t counter_val;
 
 /**
  * @addtogroup AHRS_Global_Data AHRS Global Data
@@ -195,10 +83,26 @@ uint32_t counter_val;
 //! Filter coefficients used in decimation.  Limited order so filter can't run between samples
 int16_t fir_coeffs[MAX_OVERSAMPLING];
 
+//! Contains the data from the mag sensor chip
+struct mag_sensor mag_data;
+
+//! Contains the data from the accelerometer
+struct accel_sensor  accel_data;
+
+//! Contains the data from the gyro
+struct gyro_sensor gyro_data;
+
+//! Conains the current estimate of the attitude
+struct attitude_solution attitude_data;
+
+//! Contains data from the altitude sensor
+struct altitude_sensor altitude_data;
+
+//! Contains data from the GPS (via the SPI link)
+struct gps_sensor gps_data;
 
 //! The oversampling rate, ekf is 2k / this
 static uint8_t adc_oversampling = 20;
-
 
 /**
  * @}
@@ -438,6 +342,14 @@ void simple_update() {
  * @brief Output all the important inputs and states of the ekf through serial port 
  */
 #ifdef DUMP_EKF
+#define NUMX 13			// number of states, X is the state vector
+#define NUMW 9			// number of plant noise inputs, w is disturbance noise vector
+#define NUMV 10			// number of measurements, v is the measurement noise vector
+#define NUMU 7			// number of deterministic inputs, U is the input vector
+extern float F[NUMX][NUMX], G[NUMX][NUMW], H[NUMV][NUMX];	// linearized system matrices
+extern float P[NUMX][NUMX], X[NUMX];	// covariance matrix and state vector
+extern float Q[NUMW], R[NUMV];	// input noise and measurement noise variances
+extern float K[NUMX][NUMV];	// feedback gain matrix
 void print_ekf_binary() 
 {
 	uint8_t framing[16] = { 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
@@ -511,7 +423,12 @@ int main()
 	uint32_t up_time_real = 0;
 	uint32_t up_time = 0;
 	uint32_t last_up_time = 0;
-
+	static int8_t last_ahrs_algorithm;
+	uint32_t last_counter_idle_start = 0;
+	uint32_t last_counter_idle_end = 0;
+	uint32_t idle_counts = 0;
+	uint32_t running_counts = 0;
+	uint32_t counter_val = 0;
 	ahrs_algorithm = AHRSSETTINGS_ALGORITHM_SIMPLE;
 
 	/* Brings up System using CMSIS functions, enables the LEDs. */

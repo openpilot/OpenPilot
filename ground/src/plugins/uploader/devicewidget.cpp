@@ -108,7 +108,10 @@ void deviceWidget::uploadFirmware()
         return;
     }
 
-    bool verify = true;
+    bool verify = false;
+    if (m_dfu->devices[deviceID].Readable)
+        verify = true;
+
     QString filename = setOpenFileName();
 
     if (filename.isEmpty()) {

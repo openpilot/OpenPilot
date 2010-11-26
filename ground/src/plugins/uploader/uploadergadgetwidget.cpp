@@ -121,7 +121,8 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
 
         // Tell the mainboard to get into bootloader state:
         log("Going into Bootloader mode...");
-        dfu = new DFUObject(false);
+        if (!dfu)
+            dfu = new DFUObject(false);
         dfu->AbortOperation();
         if(!dfu->enterDFU(0))
         {
@@ -149,6 +150,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         m_config->haltButton->setEnabled(false);
         m_config->resetButton->setEnabled(false);
         m_config->bootButton->setEnabled(true);
+        m_config->rescueButton->setEnabled(false);
     }
         break;
     case IAP_STATE_BOOTLOADER:
@@ -189,13 +191,14 @@ void UploaderGadgetWidget::systemBoot()
         log("Booting system...");
         dfu->JumpToApp();
         currentStep = IAP_STATE_READY;
-        // stop the polling thread: otherwise it will mess up DFU
+        // Restart the polling thread
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
         RawHIDConnection *cnx =  pm->getObject<RawHIDConnection>();
         cnx->resumePolling();
         m_config->bootButton->setEnabled(false);
         m_config->haltButton->setEnabled(true);
         m_config->resetButton->setEnabled(true);
+        m_config->rescueButton->setEnabled(true);
         m_config->boardStatus->setText("Running");
         // Freeze the tabs, they are not useful anymore and their buttons
         // will cause segfaults or weird stuff if we use them.
@@ -205,6 +208,7 @@ void UploaderGadgetWidget::systemBoot()
         }
 
         delete dfu;
+        dfu = NULL;
 
     } else {
         log("Not in bootloader mode!");
@@ -217,14 +221,13 @@ void UploaderGadgetWidget::systemBoot()
   */
 void UploaderGadgetWidget::systemRescue()
 {
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    RawHIDConnection *cnx =  pm->getObject<RawHIDConnection>();
     switch (rescueStep) {
     case RESCUE_STEP0: {
         Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
         cm->disconnectDevice();
-
-        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
         // stop the polling thread: otherwise it will mess up DFU
-        RawHIDConnection *cnx =  pm->getObject<RawHIDConnection>();
         cnx->suspendPolling();
         // Delete all previous tabs:
         while (m_config->systemElements->count()) {
@@ -232,6 +235,8 @@ void UploaderGadgetWidget::systemRescue()
              m_config->systemElements->removeTab(0);
              delete qw;
         }
+        // Existing DFU objects will have a handle over USB and will
+        // disturb everything for the rescue process:
         if (dfu) {
             delete dfu;
             dfu = NULL;
@@ -259,17 +264,22 @@ void UploaderGadgetWidget::systemRescue()
     case RESCUE_STEP3:
         log("... Detecting Mainboard...");
         repaint();
-        if (!dfu)
-            dfu = new DFUObject(true);
+        dfu = new DFUObject(true);
         dfu->AbortOperation();
         if(!dfu->enterDFU(0))
         {
+            rescueStep = RESCUE_STEP0;
             log("Could not enter DFU mode.");
+            cnx->resumePolling();
             return;
         }
-        if(!dfu->findDevices())
+        if(!dfu->findDevices() || (dfu->numberOfDevices != 1))
         {
+            rescueStep = RESCUE_STEP0;
             log("Could not detect mainboard.");
+            delete dfu;
+            dfu = NULL;
+            cnx->resumePolling();
             return;
         }
         rescueStep = RESCUE_POWER1;
@@ -293,11 +303,17 @@ void UploaderGadgetWidget::systemRescue()
         if(!dfu->findDevices())
         {
             log("Could not detect devices.");
+            delete dfu;
+            dfu = NULL;
+            cnx->resumePolling();
             return;
         }
         log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
         if (dfu->numberOfDevices > 5) {
             log("Inconsistent number of devices, aborting!");
+            delete dfu;
+            dfu = NULL;
+            cnx->resumePolling();
             return;
         }
         for(int i=0;i<dfu->numberOfDevices;i++) {
@@ -310,10 +326,9 @@ void UploaderGadgetWidget::systemRescue()
         m_config->haltButton->setEnabled(false);
         m_config->resetButton->setEnabled(false);
         m_config->bootButton->setEnabled(true);
+        m_config->rescueButton->setEnabled(false);
         currentStep = IAP_STATE_BOOTLOADER; // So that we can boot from the GUI afterwards.
     }
-
-
 }
 
 /**

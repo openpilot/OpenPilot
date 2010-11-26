@@ -41,7 +41,7 @@
 #define AHRSCALIBRATION_H
 
 // Object constants
-#define AHRSCALIBRATION_OBJID 1408636690U
+#define AHRSCALIBRATION_OBJID 3761202980U
 #define AHRSCALIBRATION_NAME "AHRSCalibration"
 #define AHRSCALIBRATION_METANAME "AHRSCalibrationMeta"
 #define AHRSCALIBRATION_ISSINGLEINST 1
@@ -81,6 +81,8 @@ typedef struct {
     float mag_bias[3];
     float mag_scale[3];
     float mag_var[3];
+    float vel_var;
+    float pos_var;
 
 } __attribute__((packed)) AHRSCalibrationData;
 
@@ -133,6 +135,8 @@ typedef enum { AHRSCALIBRATION_MAG_SCALE_X=0, AHRSCALIBRATION_MAG_SCALE_Y=1, AHR
 typedef enum { AHRSCALIBRATION_MAG_VAR_X=0, AHRSCALIBRATION_MAG_VAR_Y=1, AHRSCALIBRATION_MAG_VAR_Z=2 } AHRSCalibrationmag_varElem;
 /* Number of elements for field mag_var */
 #define AHRSCALIBRATION_MAG_VAR_NUMELEM 3
+// Field vel_var information
+// Field pos_var information
 
 
 // Generic interface functions

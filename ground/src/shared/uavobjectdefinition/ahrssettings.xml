@@ -4,7 +4,6 @@
         <field name="Algorithm" units="" type="enum" elements="1" options="SIMPLE,INSGPS_INDOOR_NOMAG,INSGPS_INDOOR,INSGPS_OUTDOOR" defaultvalue="INSGPS_INDOOR_NOMAG"/>
         <field name="Downsampling" units="" type="uint8" elements="1" defaultvalue="20"/>
         <field name="UpdatePeriod" units="ms" type="uint8" elements="1" defaultvalue="1"/>
-        <field name="IndoorVelocityVariance" units="m^2" type="float" elements="1" defaultvalue="0.04"/>
         <field name="YawBias" units="" type="float" elements="1" defaultvalue="0"/>
         <field name="PitchBias" units="" type="float" elements="1" defaultvalue="0"/>
         <field name="RollBias" units="" type="float" elements="1" defaultvalue="0"/>	

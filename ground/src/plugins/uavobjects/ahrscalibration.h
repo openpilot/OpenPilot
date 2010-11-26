@@ -53,6 +53,8 @@ public:
         float mag_bias[3];
         float mag_scale[3];
         float mag_var[3];
+        float vel_var;
+        float pos_var;
 
     } __attribute__((packed)) DataFields;
 
@@ -105,10 +107,12 @@ public:
     typedef enum { MAG_VAR_X=0, MAG_VAR_Y=1, MAG_VAR_Z=2 } mag_varElem;
     /* Number of elements for field mag_var */
     static const quint32 MAG_VAR_NUMELEM = 3;
+    // Field vel_var information
+    // Field pos_var information
 
   
     // Constants
-    static const quint32 OBJID = 1408636690U;
+    static const quint32 OBJID = 3761202980U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

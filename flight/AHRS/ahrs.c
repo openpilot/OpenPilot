@@ -911,6 +911,9 @@ void calibration_callback(AhrsObjHandle obj)
 		calibrate_sensors();
 		send_calibration();
 	}
+	
+	INSSetPosVelVar(cal.pos_var, cal.vel_var);
+
 }
 
 void gps_callback(AhrsObjHandle obj)
@@ -973,10 +976,7 @@ void settings_callback(AhrsObjHandle obj)
 			fir_coeffs[i] = 1;
 		fir_coeffs[adc_oversampling] = adc_oversampling;
 		
-	}
-
-	INSSetPosVelVar(settings.IndoorVelocityVariance);
-	
+	}	
 }
 
 void homelocation_callback(AhrsObjHandle obj) 

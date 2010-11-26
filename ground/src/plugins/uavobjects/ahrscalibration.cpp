@@ -93,6 +93,12 @@ AHRSCalibration::AHRSCalibration(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
     mag_varElemNames.append("Y");
     mag_varElemNames.append("Z");
     fields.append( new UAVObjectField(QString("mag_var"), QString("mGau^s"), UAVObjectField::FLOAT32, mag_varElemNames, QStringList()) );
+    QStringList vel_varElemNames;
+    vel_varElemNames.append("0");
+    fields.append( new UAVObjectField(QString("vel_var"), QString("(m/s)^2"), UAVObjectField::FLOAT32, vel_varElemNames, QStringList()) );
+    QStringList pos_varElemNames;
+    pos_varElemNames.append("0");
+    fields.append( new UAVObjectField(QString("pos_var"), QString("m^2"), UAVObjectField::FLOAT32, pos_varElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -154,6 +160,8 @@ void AHRSCalibration::setDefaultFieldValues()
     data.mag_var[0] = 5e-05;
     data.mag_var[1] = 5e-05;
     data.mag_var[2] = 5e-05;
+    data.vel_var = 0.4;
+    data.pos_var = 0.4;
 
 }
 

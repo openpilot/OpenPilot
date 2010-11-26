@@ -72,16 +72,6 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'IndoorVelocityVariance',
-		'f',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
 		'YawBias',
 		'f',
 		1,
@@ -116,7 +106,7 @@ _fields = [ \
 
 class AHRSSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 3427867870
+    OBJID        = 1456050280
     NAME         = "AHRSSettings"
     METANAME     = "AHRSSettingsMeta"
     ISSINGLEINST = 1

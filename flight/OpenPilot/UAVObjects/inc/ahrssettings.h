@@ -41,7 +41,7 @@
 #define AHRSSETTINGS_H
 
 // Object constants
-#define AHRSSETTINGS_OBJID 3427867870U
+#define AHRSSETTINGS_OBJID 1456050280U
 #define AHRSSETTINGS_NAME "AHRSSettings"
 #define AHRSSETTINGS_METANAME "AHRSSettingsMeta"
 #define AHRSSETTINGS_ISSINGLEINST 1
@@ -74,7 +74,6 @@ typedef struct {
     uint8_t Algorithm;
     uint8_t Downsampling;
     uint8_t UpdatePeriod;
-    float IndoorVelocityVariance;
     float YawBias;
     float PitchBias;
     float RollBias;
@@ -87,7 +86,6 @@ typedef struct {
 typedef enum { AHRSSETTINGS_ALGORITHM_SIMPLE=0, AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR_NOMAG=1, AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR=2, AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR=3 } AHRSSettingsAlgorithmOptions;
 // Field Downsampling information
 // Field UpdatePeriod information
-// Field IndoorVelocityVariance information
 // Field YawBias information
 // Field PitchBias information
 // Field RollBias information

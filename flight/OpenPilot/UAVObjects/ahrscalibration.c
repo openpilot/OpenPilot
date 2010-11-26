@@ -108,6 +108,8 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	data.mag_var[0] = 5e-05;
 	data.mag_var[1] = 5e-05;
 	data.mag_var[2] = 5e-05;
+	data.vel_var = 0.4;
+	data.pos_var = 0.4;
 
 	UAVObjSetInstanceData(obj, instId, &data);
 

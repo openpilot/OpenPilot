@@ -27,3 +27,6 @@ OTHER_FILES += Uploader.pluginspec
 FORMS += \
     uploader.ui \
     devicewidget.ui
+
+RESOURCES += \
+    uploader.qrc

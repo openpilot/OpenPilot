@@ -32,6 +32,8 @@
 #include "op_dfu.h"
 #include <QWidget>
 #include <QFileDialog>
+#include <QtSvg/QGraphicsSvgItem>
+#include <QtSvg/QSvgRenderer>
 
 using namespace OP_DFU;
 
@@ -52,6 +54,7 @@ private:
     DFUObject *m_dfu;
     QByteArray downloadedFirmware;
     QString filename;
+    QGraphicsSvgItem *devicePic;
 
 signals:
 
@@ -63,6 +66,10 @@ public slots:
     void downloadFinished();
     void uploadFinished(OP_DFU::Status);
     void status(QString str);
+
+protected:
+    void showEvent(QShowEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
 };
 

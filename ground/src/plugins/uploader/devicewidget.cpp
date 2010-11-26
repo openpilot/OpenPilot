@@ -31,11 +31,34 @@ deviceWidget::deviceWidget(QWidget *parent) :
 {
     myDevice = new Ui_deviceWidget();
     myDevice->setupUi(this);
+    devicePic = NULL; // Initialize pointer to null
+
+    // Initialization of the Device icon display
+    myDevice->devicePicture->setScene(new QGraphicsScene(this));
 
     connect(myDevice->verifyButton, SIGNAL(clicked()), this, SLOT(verifyFirmware()));
     connect(myDevice->retrieveButton, SIGNAL(clicked()), this, SLOT(downloadFirmware()));
     connect(myDevice->updateButton, SIGNAL(clicked()), this, SLOT(uploadFirmware()));
 }
+
+
+void deviceWidget::showEvent(QShowEvent *event)
+{
+    Q_UNUSED(event)
+    // Thit fitInView method should only be called now, once the
+    // widget is shown, otherwise it cannot compute its values and
+    // the result is usually a ahrsbargraph that is way too small.
+    if (devicePic)
+       myDevice->devicePicture->fitInView(devicePic,Qt::KeepAspectRatio);
+}
+
+void deviceWidget::resizeEvent(QResizeEvent* event)
+{
+    Q_UNUSED(event);
+    if (devicePic)
+        myDevice->devicePicture->fitInView(devicePic, Qt::KeepAspectRatio);
+}
+
 
 void deviceWidget::setDeviceID(int devID){
     deviceID = devID;
@@ -53,6 +76,29 @@ void deviceWidget::populate()
 {
     int id = m_dfu->devices[deviceID].ID;
     myDevice->deviceID->setText(QString("Device ID: ") + QString::number(id));
+    // DeviceID tells us what sort of HW we have detected:
+    // display a nice icon:
+    myDevice->devicePicture->scene()->clear();
+    if (devicePic)
+        delete devicePic;
+    devicePic = new QGraphicsSvgItem();
+    devicePic->setSharedRenderer(new QSvgRenderer());
+
+    switch (id) {
+    case 1:
+        devicePic->renderer()->load(QString(":/uploader/images/deviceID-1.svg"));
+        break;
+    case 69:
+        devicePic->renderer()->load(QString(":/uploader/images/deviceID-69.svg"));
+        break;
+    default:
+        break;
+    }
+    devicePic->setElementId("device");
+    myDevice->devicePicture->scene()->addItem(devicePic);
+    myDevice->devicePicture->setSceneRect(devicePic->boundingRect());
+    myDevice->devicePicture->fitInView(devicePic,Qt::KeepAspectRatio);
+
     bool r = m_dfu->devices[deviceID].Readable;
     bool w = m_dfu->devices[deviceID].Writable;
     myDevice->deviceACL->setText(QString("Access: ") + QString(r ? "R" : "-") + QString(w ? "W" : "-"));
@@ -104,7 +150,7 @@ void deviceWidget::verifyFirmware()
 void deviceWidget::uploadFirmware()
 {
     if (!m_dfu->devices[deviceID].Writable) {
-        myDevice->statusLabel->setText(QString("Device not writable!"));
+        status("Device not writable!");
         return;
     }
 

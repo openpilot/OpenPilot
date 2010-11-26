@@ -139,25 +139,26 @@ void ins_outdoor_update()
 	INSCovariancePrediction(1 / (float)EKF_RATE);
 		
 	sensors = 0;
-	if (gps_data.updated) {
-		uint32_t this_gps_time = timer_count();
-		float gps_delay;
-		
+	
+	/* 
+	 * Detect if greater than certain time since last gps update and if so
+	 * reset EKF to that position since probably drifted too far for safe
+	 * update 
+	 */
+	uint32_t this_gps_time = timer_count();
+	float gps_delay;
+	
+	if (this_gps_time < last_gps_time)
+		gps_delay = ((0xFFFF - last_gps_time) - this_gps_time) / timer_rate();
+	else 
+		gps_delay = (this_gps_time - last_gps_time) / timer_rate();
+	last_gps_time = this_gps_time;
+	
+	if (gps_data.updated) {		
 		vel[0] = gps_data.groundspeed * cos(gps_data.heading * M_PI / 180);
 		vel[1] = gps_data.groundspeed * sin(gps_data.heading * M_PI / 180);
 		vel[2] = 0;
-		
-		/* 
-		 * Detect if greater than certain time since last gps update and if so
-		 * reset EKF to that position since probably drifted too far for safe
-		 * update 
-		 */
-		if (this_gps_time < last_gps_time)
-			gps_delay = ((0xFFFF - last_gps_time) - this_gps_time) / timer_rate();
-		else 
-			gps_delay = (this_gps_time - last_gps_time) / timer_rate();
-		last_gps_time = this_gps_time;
-		
+				
 		if(gps_delay > INSGPS_GPS_TIMEOUT)
 			INSPosVelReset(gps_data.NED,vel); // position stale, reset		
 		else  {
@@ -176,6 +177,11 @@ void ins_outdoor_update()
 			baro_offset = baro_offset * 0.99 + (gps_data.NED[2] + altitude_data.altitude) * 0.01;
 		}
 		gps_data.updated = false;
+	} else if (gps_delay > INSGPS_GPS_TIMEOUT) {
+		vel[0] = 0;
+		vel[1] = 0;
+		vel[2] = 0;
+		sensors |= VERT_SENSORS | HORIZ_SENSORS;
 	}
 	
 	if(mag_data.updated) {

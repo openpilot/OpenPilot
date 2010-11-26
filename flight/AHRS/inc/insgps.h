@@ -32,6 +32,8 @@
 #ifndef INSGPS_H_
 #define INSGPS_H_
 
+#include "stdint.h"
+
 /**
   * @addtogroup Constants
   * @{
@@ -52,6 +54,7 @@
 void INSGPSInit();
 void INSStatePrediction(float gyro_data[3], float accel_data[3], float dT);
 void INSCovariancePrediction(float dT);
+void INSCorrection(float mag_data[3], float Pos[3], float Vel[3], float BaroAlt, uint16_t SensorsUsed);
 
 void INSResetP(float PDiag[13]);
 void INSSetState(float pos[3], float vel[3], float q[4], float gyro_bias[3]);

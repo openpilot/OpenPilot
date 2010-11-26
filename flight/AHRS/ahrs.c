@@ -167,6 +167,7 @@ void simple_update();
 
 /* Function Prototypes */
 void downsample_data(void);
+void process_mag_data();
 void calibrate_sensors(void);
 void reset_values();
 void send_calibration(void);
@@ -204,14 +205,16 @@ static uint8_t adc_oversampling = 20;
  */
 
 /* INS functions */
+
 /**
  * @brief Update the EKF when in outdoor mode.  The primary difference is using the GPS values.
  */
 void ins_outdoor_update() 
 {
 	float gyro[3], accel[3], vel[3];
-	static uint8_t gps_dirty = 1;
 	static uint32_t last_gps_time = 0;
+	static float baro_offset = 0;
+	uint16_t sensors;
 		
 	// format data for INS algo
 	gyro[0] = gyro_data.filtered.x;
@@ -231,45 +234,61 @@ void ins_outdoor_update()
 	send_position();
 	INSCovariancePrediction(1 / (float)EKF_RATE);
 		
+	sensors = 0;
 	if (gps_data.updated) {
 		uint32_t this_gps_time = timer_count();
 		float gps_delay;
 		
-		// Detect if greater than certain time since last gps update and if so
-		// reset EKF to that position since probably drifted too far for safe
-		// update
+		vel[0] = gps_data.groundspeed * cos(gps_data.heading * M_PI / 180);
+		vel[1] = gps_data.groundspeed * sin(gps_data.heading * M_PI / 180);
+		vel[2] = 0;
+		
+		/* 
+		 * Detect if greater than certain time since last gps update and if so
+		 * reset EKF to that position since probably drifted too far for safe
+		 * update 
+		 */
 		if (this_gps_time < last_gps_time)
 			gps_delay = ((0xFFFF - last_gps_time) - this_gps_time) / timer_rate();
 		else 
 			gps_delay = (this_gps_time - last_gps_time) / timer_rate();
 		last_gps_time = this_gps_time;
 		
-		gps_dirty = gps_delay > INSGPS_GPS_TIMEOUT;
-		
-		// Compute velocity from Heading and groundspeed
-		vel[0] = gps_data.groundspeed * cos(gps_data.heading * M_PI / 180);
-		vel[1] = gps_data.groundspeed * sin(gps_data.heading * M_PI / 180);
-		vel[2] = 0;
-				
-		if (mag_data.updated && !gps_dirty) {
-			//TOOD: add check for altitude updates
-			//FullCorrection(mag_data.scaled.axis, gps_data.NED, vel, altitude_data.altitude);
-			GpsMagCorrection(mag_data.scaled.axis, gps_data.NED, vel);
-			mag_data.updated = 0;
-		} else if (!gps_dirty) {
-			//GpsBaroCorrection(gps_data.NED, vel, altitude_data.altitude);
-			GpsBaroCorrection(gps_data.NED, vel, -gps_data.NED[2]);
-		} else { // GPS hasn't updated for a bit
-			INSPosVelReset(gps_data.NED,vel);					
+		if(gps_delay > INSGPS_GPS_TIMEOUT)
+			INSPosVelReset(gps_data.NED,vel); // position stale, reset		
+		else  {
+			sensors |= HORIZ_SENSORS | POS_SENSORS;						
 		}
-		
+			
+		/* 
+		 * When using gps need to make sure that barometer is brought into NED frame   
+		 * we should try and see if the altitude from the home location is good enough 
+		 * to use for the offset but for now starting with this conservative filter    
+		 */
+		if(fabs(gps_data.NED[2] + altitude_data.altitude) > 10) {
+			baro_offset = gps_data.NED[2] + altitude_data.altitude;
+		} else {
+			/* IIR filter with 100 second or so tau to keep them crudely in the same frame */
+			baro_offset = baro_offset * 0.99 + (gps_data.NED[2] + altitude_data.altitude) * 0.01;
+		}
 		gps_data.updated = false;
-	} else if (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR
-		   && mag_data.updated == 1) {
-		MagCorrection(mag_data.scaled.axis);	// only trust mags if outdoors
-		mag_data.updated = 0;
 	}
 	
+	if(mag_data.updated) {
+		sensors |= MAG_SENSORS;
+		mag_data.updated = false;
+	}
+	
+	if(altitude_data.updated) {
+		sensors |= BARO_SENSOR;
+		altitude_data.updated = false;
+	}
+		
+	/* 
+	 * TODO: Need to add a general sanity check for all the inputs to make sure their kosher 
+	 * although probably should occur within INS itself 
+	 */
+	INSCorrection(mag_data.scaled.axis, gps_data.NED, vel, -altitude_data.altitude - baro_offset, sensors);	
 }
 
 /**
@@ -278,8 +297,8 @@ void ins_outdoor_update()
 void ins_indoor_update()
 {
 	float gyro[3], accel[3], vel[3];
-	static uint8_t indoor_dirty = 1;
 	static uint32_t last_indoor_time = 0;
+	uint16_t sensors = 0;
 
 	// format data for INS algo
 	gyro[0] = gyro_data.filtered.x;
@@ -299,7 +318,7 @@ void ins_indoor_update()
 	send_position();
 	INSCovariancePrediction(1 / (float)EKF_RATE);
 	
-	// Indoors, update with zero position and velocity and high covariance
+	/* Indoors, update with zero position and velocity and high covariance */
 	vel[0] = 0;
 	vel[1] = 0;
 	vel[2] = 0;
@@ -307,28 +326,86 @@ void ins_indoor_update()
 	uint32_t this_indoor_time = timer_count();
 	float indoor_delay;
 	
-	// Detect if greater than certain time since last gps update and if so
-	// reset EKF to that position since probably drifted too far for safe
-	// update
+	/*
+	 * Detect if greater than certain time since last gps update and if so
+	 * reset EKF to that position since probably drifted too far for safe
+	 * update
+	 */
 	if (this_indoor_time < last_indoor_time)
 		indoor_delay = ((0xFFFF - last_indoor_time) - this_indoor_time) / timer_rate();
 	else 
 		indoor_delay = (this_indoor_time - last_indoor_time) / timer_rate();
 	last_indoor_time = this_indoor_time;
+		
+	if(indoor_delay > INSGPS_GPS_TIMEOUT)
+		INSPosVelReset(vel,vel);
+	else 
+		sensors = HORIZ_SENSORS | VERT_SENSORS;
 	
-	indoor_dirty = indoor_delay > INSGPS_GPS_TIMEOUT;
-	
-	if(indoor_dirty)
-		INSPosVelReset(vel,vel);					
-	
-	if((mag_data.updated == 1) && (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
-		MagVelBaroCorrection(mag_data.scaled.axis,vel,altitude_data.altitude);  // only trust mags if outdoors
-		mag_data.updated = 0;
-	} else {
-		VelBaroCorrection(vel, altitude_data.altitude);
+	if(mag_data.updated) {
+		sensors |= MAG_SENSORS;
+		mag_data.updated = false;
 	}
+	
+	if(altitude_data.updated) {
+		sensors |= BARO_SENSOR;
+		altitude_data.updated = false;
+	}
+	
+	/* 
+	 * TODO: Need to add a general sanity check for all the inputs to make sure their kosher 
+	 * although probably should occur within INS itself 
+	 */
+	INSCorrection(mag_data.scaled.axis, gps_data.NED, vel, -altitude_data.altitude, sensors | HORIZ_SENSORS | VERT_SENSORS);	
 }
 
+/**
+ * @brief Initialize the EKF assuming stationary
+ */
+void ins_init_algorithm()
+{
+	float Rbe[3][3], q[4], accels[3], rpy[3], mag;
+	float ge[3]={0,0,-9.81}, zeros[3]={0,0,0}, Pdiag[13]={25,25,25,5,5,5,1e-5,1e-5,1e-5,1e-5,1e-5,1e-5,1e-5};
+	bool using_mags, using_gps;
+	
+	INSGPSInit();
+	
+	HomeLocationData home;
+	HomeLocationGet(&home);
+	
+	accels[0]=accel_data.filtered.x;
+	accels[1]=accel_data.filtered.y;
+	accels[2]=accel_data.filtered.z;
+	
+	using_mags = (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) || (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR);
+	using_mags &= (home.Be[0] != 0) || (home.Be[1] != 0) || (home.Be[2] != 0);  /* only use mags when valid home location */
+	using_gps = (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) && (gps_data.quality != 0);
+	
+	if (using_mags){
+		RotFrom2Vectors(accels, ge, mag_data.scaled.axis, home.Be, Rbe);
+		R2Quaternion(Rbe,q);
+		if (using_gps)
+			INSSetState(gps_data.NED, zeros, q, zeros);
+		else
+			INSSetState(zeros, zeros, q, zeros);
+	}
+	else{
+		// assume yaw = 0
+		mag = VectorMagnitude(accels);
+		rpy[1] = asinf(-accels[0]/mag);
+		rpy[0] = atan2(accels[1]/mag,accels[2]/mag);
+		rpy[2] = 0;
+		RPY2Quaternion(rpy,q);
+		if (using_gps)
+			INSSetState(gps_data.NED, zeros, q, zeros);
+		else
+			INSSetState(zeros, zeros, q, zeros);
+	}
+	
+	INSResetP(Pdiag);
+	
+	// TODO: include initial estimate of gyro bias?
+}
 
 /**
  * @brief Simple update using just mag and accel.  Yaw biased and big attitude changes.
@@ -358,6 +435,74 @@ void simple_update() {
 }
 
 /**
+ * @brief Output all the important inputs and states of the ekf through serial port 
+ */
+#ifdef DUMP_EKF
+void print_ekf_binary() 
+{
+	uint8_t framing[16] = { 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
+	// Dump raw buffer
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, &framing[0], 16);                                                         // framing header (1:16)
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & total_conversion_blocks, sizeof(total_conversion_blocks));  // dump block number (17:20)
+	
+	PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, (uint8_t *) & accel_data.filtered.x, 4*3);                     // accel data (21:32)
+	PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, (uint8_t *) & gyro_data.filtered.x, 4*3);                      // gyro data (33:44)
+	
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & mag_data.updated, 1);                                       // mag update (45)
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & mag_data.scaled.axis, 3*4);                                 // mag data (46:57)
+	
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & gps_data, sizeof(gps_data));                                // gps data (58:85)
+	
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & X, 4 * NUMX);                                               // X (86:137)
+	for(uint8_t i = 0; i < NUMX; i++) 
+		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &(P[i][i]), 4);                                           // diag(P) (138:189)
+	
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & altitude_data.altitude, 4);                                 // BaroAlt (190:193)	
+}
+#else
+void print_ekf_binary() {}
+#endif
+ 
+/**
+ * @brief Debugging function to output all the ADC samples 
+ */
+void print_ahrs_raw() 
+{
+	int result;
+	static int previous_conversion = 0;
+
+	uint8_t framing[16] =
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+		15 };
+	while (ahrs_state != AHRS_DATA_READY) ;
+	ahrs_state = AHRS_PROCESSING;
+	
+	if (total_conversion_blocks != previous_conversion + 1)
+		PIOS_LED_On(LED1);	// not keeping up
+	else
+		PIOS_LED_Off(LED1);
+	previous_conversion = total_conversion_blocks;
+	
+	downsample_data();
+	ahrs_state = AHRS_IDLE;;
+	
+	// Dump raw buffer
+	result = PIOS_COM_SendBuffer(PIOS_COM_AUX, &framing[0], 16);	// framing header
+	result += PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & total_conversion_blocks, sizeof(total_conversion_blocks));	// dump block number
+	result +=
+	PIOS_COM_SendBuffer(PIOS_COM_AUX,
+			    (uint8_t *) & valid_data_buffer[0],
+			    adc_oversampling *
+			    PIOS_ADC_NUM_PINS *
+			    sizeof(valid_data_buffer[0]));
+	if (result == 0)
+		PIOS_LED_Off(LED1);
+	else {
+		PIOS_LED_On(LED1);
+	}	
+}
+
+/**
  * @brief AHRS Main function
  */
 int main()
@@ -384,6 +529,7 @@ int main()
 	/* Setup the Accelerometer FS (Full-Scale) GPIO */
 	PIOS_GPIO_Enable(0);
 	SET_ACCEL_6G;
+	
 #if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
 	/* Magnetic sensor system */
 	PIOS_I2C_Init();
@@ -394,7 +540,6 @@ int main()
 #endif
 
 	reset_values();
-	INSGPSInit();
 
 	ahrs_state = AHRS_IDLE;
 	AhrsInitComms();
@@ -426,39 +571,9 @@ for all data to be up to date before doing anything*/
 	fir_coeffs[adc_oversampling] = adc_oversampling;
 
 #ifdef DUMP_RAW
-	int previous_conversion;
 	while (1) {
 		AhrsPoll();
-		int result;
-		uint8_t framing[16] =
-		    { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
-	  15 };
-		while (ahrs_state != AHRS_DATA_READY) ;
-		ahrs_state = AHRS_PROCESSING;
-
-		if (total_conversion_blocks != previous_conversion + 1)
-			PIOS_LED_On(LED1);	// not keeping up
-		else
-			PIOS_LED_Off(LED1);
-		previous_conversion = total_conversion_blocks;
-
-		downsample_data();
-		ahrs_state = AHRS_IDLE;;
-
-		// Dump raw buffer
-		result = PIOS_COM_SendBuffer(PIOS_COM_AUX, &framing[0], 16);	// framing header
-		result += PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & total_conversion_blocks, sizeof(total_conversion_blocks));	// dump block number
-		result +=
-		    PIOS_COM_SendBuffer(PIOS_COM_AUX,
-					(uint8_t *) & valid_data_buffer[0],
-					adc_oversampling *
-					ADC_CONTINUOUS_CHANNELS *
-					sizeof(valid_data_buffer[0]));
-		if (result == 0)
-			PIOS_LED_Off(LED1);
-		else {
-			PIOS_LED_On(LED1);
-		}
+		print_ahrs_raw();
 	}
 #endif
 
@@ -489,84 +604,29 @@ for all data to be up to date before doing anything*/
 		if ((total_conversion_blocks % 100) == 0)
 			PIOS_LED_Toggle(LED1);
 
-#if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
-		// Get magnetic readings
-		// For now don't use mags until the magnetic field is set AND until 5 seconds
-		// after initialization otherwise it seems to have problems
-		// TODO: Follow up this initialization issue
-		HomeLocationData home;
-		HomeLocationGet(&home);
-		if (PIOS_HMC5843_NewDataAvailable() && 
-		    (home.Set = HOMELOCATION_SET_TRUE) && 
-		    ((home.Be[0] != 0) || (home.Be[1] != 0) || (home.Be[2] != 0)) &&
-		    ((float) timer_count() / timer_rate() > 5)) {
-			PIOS_HMC5843_ReadMag(mag_data.raw.axis);
-			// Swap the axis here to acount for orientation of mag chip (notice 0 and 1 swapped in raw)
-			mag_data.scaled.axis[0] = (mag_data.raw.axis[1] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
-			mag_data.scaled.axis[1] = (mag_data.raw.axis[0] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
-			mag_data.scaled.axis[2] = (mag_data.raw.axis[2] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
-			
-			// Only use if magnetic length reasonable
-			float Blen = sqrt(pow(mag_data.scaled.axis[0],2) + pow(mag_data.scaled.axis[1],2) + pow(mag_data.scaled.axis[2],2));
-			if((Blen < INSGPS_MAGLEN * (1 + INSGPS_MAGTOL)) && (Blen > INSGPS_MAGLEN * (1 - INSGPS_MAGTOL)))
-				mag_data.updated = 1;
-		}
-
-#endif
 		// Delay for valid data
 
 		counter_val = timer_count();
 		running_counts = counter_val - last_counter_idle_end;
 		last_counter_idle_start = counter_val;
 
-		while (ahrs_state != AHRS_DATA_READY) ;
+		while (ahrs_state != AHRS_DATA_READY);
+		ahrs_state = AHRS_PROCESSING;
 
 		counter_val = timer_count();
 		idle_counts = counter_val - last_counter_idle_start;
 		last_counter_idle_end = counter_val;
 
-		ahrs_state = AHRS_PROCESSING;
-
 		downsample_data();
-
-#ifdef DUMP_EKF
-		uint8_t framing[16] = { 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
-		// Dump raw buffer
-		PIOS_COM_SendBuffer(PIOS_COM_AUX, &framing[0], 16);                                                         // framing header (1:16)
-		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & total_conversion_blocks, sizeof(total_conversion_blocks));  // dump block number (17:20)
+		process_mag_data();
 		
-		PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, (uint8_t *) & accel_data.filtered.x, 4*3);                     // accel data (21:32)
-		PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, (uint8_t *) & gyro_data.filtered.x, 4*3);                      // gyro data (33:44)
-		
-		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & mag_data.updated, 1);                                       // mag update (45)
-		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & mag_data.scaled.axis, 3*4);                                 // mag data (46:57)
+		print_ekf_binary();
 
-		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & gps_data, sizeof(gps_data));                                // gps data (58:85)
-		
-		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & X, 4 * NUMX);                                               // X (86:137)
-		for(uint8_t i = 0; i < NUMX; i++) 
-			PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &(P[i][i]), 4);                                           // diag(P) (138:189)
-
-		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & altitude_data.altitude, 4);                                 // BaroAlt (190:193)
-#endif  
-		
-
-//*****************************************
-//*****************************************
-//*****************************************
-//*****************************************
-
+		/* If algorithm changed reinit.  This could go in callback but wouldn't be synchronous */
 		if (ahrs_algorithm != last_ahrs_algorithm)
-			InitAlgorithm();
+			ins_init_algorithm();
 		last_ahrs_algorithm = ahrs_algorithm;
-
-//*****************************************
-//*****************************************
-//*****************************************
-//*****************************************
-
-
-		/******************** INS ALGORITHM **************************/
+		
 		switch(ahrs_algorithm) {
 			case AHRSSETTINGS_ALGORITHM_SIMPLE:
 				simple_update();
@@ -581,28 +641,6 @@ for all data to be up to date before doing anything*/
 		}
 		ahrs_state = AHRS_IDLE;
 
-#ifdef DUMP_FRIENDLY
-		PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_AUX, "b: %d\r\n",
-							total_conversion_blocks);
-		PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_AUX,"a: %d %d %d\r\n",
-							(int16_t) (accel_data.filtered.x * 1000),
-							(int16_t) (accel_data.filtered.y * 1000),
-							(int16_t) (accel_data.filtered.z * 1000));
-		PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_AUX, "g: %d %d %d\r\n",
-							(int16_t) (gyro_data.filtered.x * 1000),
-							(int16_t) (gyro_data.filtered.y * 1000),
-							(int16_t) (gyro_data.filtered.z * 1000));
-		PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_AUX,"m: %d %d %d\r\n",
-							mag_data.raw.axis[0],
-							mag_data.raw.axis[1],
-							mag_data.raw.axis[2]);
-		PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_AUX,
-							"q: %d %d %d %d\r\n",
-							(int16_t) (Nav.q[0] * 1000),
-							(int16_t) (Nav.q[1] * 1000),
-							(int16_t) (Nav.q[2] * 1000),
-							(int16_t) (Nav.q[3] * 1000));
-#endif
 	}
 
 	return 0;
@@ -692,6 +730,44 @@ void downsample_data()
 
 	AttitudeRawSet(&raw);
 }
+
+#if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
+/**
+ * @brief Get the mag data from the I2C sensor and load into structure
+ * @return none
+ * 
+ * This function also considers if the home location is set and has a valid
+ * magnetic field before updating the mag data to prevent data being used that
+ * cannot be interpreted.  In addition the mag data is not used for the first
+ * five seconds to allow the filter to start to converge 
+ */
+void process_mag_data() 
+{
+	// Get magnetic readings
+	// For now don't use mags until the magnetic field is set AND until 5 seconds
+	// after initialization otherwise it seems to have problems
+	// TODO: Follow up this initialization issue
+	HomeLocationData home;
+	HomeLocationGet(&home);
+	if (PIOS_HMC5843_NewDataAvailable() && 
+	    (home.Set = HOMELOCATION_SET_TRUE) && 
+	    ((home.Be[0] != 0) || (home.Be[1] != 0) || (home.Be[2] != 0)) &&
+	    ((float) timer_count() / timer_rate() > 5)) {
+		PIOS_HMC5843_ReadMag(mag_data.raw.axis);
+		// Swap the axis here to acount for orientation of mag chip (notice 0 and 1 swapped in raw)
+		mag_data.scaled.axis[0] = (mag_data.raw.axis[1] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
+		mag_data.scaled.axis[1] = (mag_data.raw.axis[0] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
+		mag_data.scaled.axis[2] = (mag_data.raw.axis[2] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
+		
+		// Only use if magnetic length reasonable
+		float Blen = sqrt(pow(mag_data.scaled.axis[0],2) + pow(mag_data.scaled.axis[1],2) + pow(mag_data.scaled.axis[2],2));
+		if((Blen < INSGPS_MAGLEN * (1 + INSGPS_MAGTOL)) && (Blen > INSGPS_MAGLEN * (1 - INSGPS_MAGTOL)))
+			mag_data.updated = 1;
+	}		
+}
+#else
+void process_mag_data() { }
+#endif
 
 /**
  * @brief Assumes board is not moving computes biases and variances of sensors
@@ -998,49 +1074,7 @@ void homelocation_callback(AhrsObjHandle obj)
 }
 
 
-
 /**
  * @}
  */
 
-void InitAlgorithm()
-{
-	float Rbe[3][3], q[4], accels[3], rpy[3], mag;
-	float ge[3]={0,0,-9.81}, zeros[3]={0,0,0}, Pdiag[13]={25,25,25,5,5,5,1e-5,1e-5,1e-5,1e-5,1e-5,1e-5,1e-5};
-	bool using_mags, using_gps;
-
-	HomeLocationData home;
-	HomeLocationGet(&home);
-
-	accels[0]=accel_data.filtered.x;
-	accels[1]=accel_data.filtered.y;
-	accels[2]=accel_data.filtered.z;
-
-	using_mags = (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) || (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR);
-    using_gps = (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR);
-
-	if (using_mags){
-		RotFrom2Vectors(accels, ge, mag_data.scaled.axis, home.Be, Rbe);
-		R2Quaternion(Rbe,q);
-		if (using_gps)
-			INSSetState(gps_data.NED, zeros, q, zeros);
-		else
-			INSSetState(zeros, zeros, q, zeros);
-	}
-	else{
-		// assume yaw = 0
-		mag = VectorMagnitude(accels);
-		rpy[1] = asinf(-accels[0]/mag);
-		rpy[0] = atan2(accels[1]/mag,accels[2]/mag);
-		rpy[2] = 0;
-		RPY2Quaternion(rpy,q);
-		if (using_gps)
-			INSSetState(gps_data.NED, zeros, q, zeros);
-		else
-			INSSetState(zeros, zeros, q, zeros);
-	}
-
-	INSResetP(Pdiag);
-
-    // TODO: include initial estimate of gyro bias?
-}

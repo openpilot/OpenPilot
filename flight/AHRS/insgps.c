@@ -46,8 +46,6 @@
 #endif
 
 // Private functions
-void INSCorrection(float mag_data[3], float Pos[3], float Vel[3],
-		   float BaroAlt, uint16_t SensorsUsed);
 void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
 			  float Q[NUMW], float dT, float P[NUMX][NUMX]);
 void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],

@@ -27,6 +27,7 @@
 
 #include "opmapgadgetwidget.h"
 #include "ui_opmap_widget.h"
+#include <utils/stylehelper.h>
 #include <QtGui/QApplication>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
@@ -64,6 +65,12 @@ const int uav_trail_time_list[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};              
 const int uav_trail_distance_list[] = {1, 2, 5, 10, 20, 50, 100, 200, 500};             // meters
 
 // *************************************************************************************
+
+
+// *************************************************************************************
+//  NOTE: go back to SVN REV 2137 and earlier to get back to experimental waypoint support.
+// *************************************************************************************
+
 
 // constructor
 OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
@@ -133,13 +140,10 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_map = new mapcontrol::OPMapWidget();	// create the map object
 
-    m_map->setFrameStyle(QFrame::NoFrame);							    // no border frame
-    m_map->setBackgroundBrush(Qt::black);							    // black background
+    m_map->setFrameStyle(QFrame::NoFrame);      // no border frame
+    m_map->setBackgroundBrush(QBrush(Utils::StyleHelper::baseColor())); // tile background
 
-    m_map->configuration->DragButton = Qt::LeftButton;		    // use the left mouse button for map dragging
-
-//  m_map->SetMinZoom(minimum_zoom);
-//  m_map->SetMaxZoom(maximum_zoom);				    // set the maximum zoom level
+    m_map->configuration->DragButton = Qt::LeftButton;  // use the left mouse button for map dragging
 
     m_widget->horizontalSliderZoom->setMinimum(m_map->MinZoom());			//
     m_widget->horizontalSliderZoom->setMaximum(m_map->MaxZoom() + max_digital_zoom);	//
@@ -200,6 +204,9 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // **************
     // set the user control options
 
+
+    // TODO: this switch does not make sense, does it??
+
     switch (m_map_mode)
     {
         case Normal_MapMode:
@@ -227,13 +234,14 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_widget->labelMousePos->setText("---");
     m_widget->labelMapZoom->setText("---");
 
-    m_widget->splitter->setCollapsible(1, false);
+
+    // Splitter is not used at the moment:
+    // m_widget->splitter->setCollapsible(1, false);
 
     // set the size of the collapsable widgets
-    QList<int> m_SizeList;
-//    m_SizeList << m_widget->splitter->sizes();
-    m_SizeList << 0 << 0 << 0;
-    m_widget->splitter->setSizes(m_SizeList);
+    //QList<int> m_SizeList;
+    //m_SizeList << 0 << 0 << 0;
+    //m_widget->splitter->setSizes(m_SizeList);
 
     m_widget->progressBarMap->setMaximum(1);
 
@@ -246,101 +254,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     #else
     #endif
 */
-    // **************
-    // add an auto-completer to the find-place line edit box
-/*
-    findPlaceWordList << "england" << "london" << "birmingham" << "shropshire";
-    QCompleter *findPlaceCompleter = new QCompleter(findPlaceWordList, this);
-    findPlaceCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    findPlaceCompleter->setCompletionMode(QCompleter::PopupCompletion);
-    findPlaceCompleter->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
-    m_widget->comboBoxFindPlace->setCompleter(findPlaceCompleter);
-*/
-    m_widget->comboBoxFindPlace->setAutoCompletion(true);
-
-    connect( m_widget->comboBoxFindPlace->lineEdit(), SIGNAL(returnPressed()), this, SLOT(comboBoxFindPlace_returnPressed()));
-
-    // **************
-    // init the waypoint tree (shown on the left on the map plugin GUI)
-
-    m_widget->treeViewWaypoints->setModel(&wayPoint_treeView_model);
-
-/*
-    // test
-//    wayPoint_treeView_model = new QStandardItemModel(5, 2);
-    for (int r = 0; r < 5; r++)
-    {
-	for (int c = 0; c < 2; c++)
-	{
-	    QStandardItem *item = new QStandardItem(QString("Row:%0, Column:%1").arg(r).arg(c));
-
-	    if (c == 0)
-    	    {
-		for (int i = 0; i < 3; i++)
-		{
-		    QStandardItem *child = new QStandardItem(QString("Item %0").arg(i));
-		    child->setEditable(false);
-		    item->appendRow(child);
-		}
-	    }
-
-	    wayPoint_treeView_model->setItem(r, c, item);
-	}
-    }
-    wayPoint_treeView_model->setHorizontalHeaderItem(0, new QStandardItem("Foo"));
-    wayPoint_treeView_model->setHorizontalHeaderItem(1, new QStandardItem("Bar-Baz"));
-
-//    m_widget->treeViewWaypoints->setModel(wayPoint_treeView_model);
-*/
-
-
-
-
-
-    // test only
-/*
-    // create a waypoint group
-    QStandardItem *item = new QStandardItem(tr("Camera shoot at the town hall"));
-    // add some waypoints
-    {
-	QStandardItem *child = new QStandardItem(QIcon(QString::fromUtf8(":/opmap/images/waypoint.png")), "North side window view");
-	child->setEditable(true);
-	item->appendRow(child);
-    }
-    {
-	QStandardItem *child = new QStandardItem(QIcon(QString::fromUtf8(":/opmap/images/waypoint.png")), "East side window view");
-	child->setEditable(true);
-	item->appendRow(child);
-    }
-    {
-	QStandardItem *child = new QStandardItem(QIcon(QString::fromUtf8(":/opmap/images/waypoint.png")), "South side window view");
-	child->setEditable(true);
-	item->appendRow(child);
-    }
-    {
-	QStandardItem *child = new QStandardItem(QIcon(QString::fromUtf8(":/opmap/images/waypoint.png")), "West side window view");
-	child->setEditable(true);
-	item->appendRow(child);
-    }
-    wayPoint_treeView_model.appendRow(item);
-*/
-    // create another waypoint group
-    QStandardItem *item = new QStandardItem(tr("Flight path 62"));
-    for (int i = 1; i < 8; i++)
-    {   // add some waypoints
-	QStandardItem *child = new QStandardItem(QIcon(QString::fromUtf8(":/opmap/images/waypoint.png")), QString("Waypoint %0").arg(i));
-	child->setEditable(true);
-	item->appendRow(child);
-    }
-    wayPoint_treeView_model.appendRow(item);
-
-
-
-
-
-
-
-
 
 
     // **************
@@ -393,9 +306,6 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 
 
     // this destructor doesn't appear to be called at shutdown???
-
-
-
 
 //    #if defined(Q_OS_MAC)
 //    #elif defined(Q_OS_WIN)
@@ -591,7 +501,9 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     switch (m_map_mode)
     {
-        case Normal_MapMode:    // only show the waypoint stuff if not in 'magic waypoint' mode
+        case Normal_MapMode:
+        // only show the waypoint stuff if not in 'magic waypoint' mode
+            /*
             menu.addSeparator()->setText(tr("Waypoints"));
 
             menu.addAction(wayPointEditorAct);
@@ -612,6 +524,7 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
             if (m_waypoint_list.count() > 0)
                 menu.addAction(clearWayPointsAct);	// we have waypoints
             m_waypoint_list_mutex.unlock();
+            */
 
             break;
 
@@ -670,6 +583,13 @@ void OPMapGadgetWidget::keyPressEvent(QKeyEvent* event)
 // *************************************************************************************
 // timer signals
 
+
+/**
+  Updates the UAV position on the map. It is called every 200ms
+  by a timer.
+
+  TODO: consider updating upon object update, not timer.
+  */
 void OPMapGadgetWidget::updatePosition()
 {
     if (!m_widget || !m_map)
@@ -681,10 +601,12 @@ void OPMapGadgetWidget::updatePosition()
     double longitude;
     double altitude;
 
-    if (!getUAV_LLA(latitude, longitude, altitude))                                 // get current UAV position
+    // get current UAV position
+    if (!getUAV_LLA(latitude, longitude, altitude))
         return;
 
-    float yaw = getUAV_Yaw();                                                       // get current UAV heading
+    // get current UAV heading
+    float yaw = getUAV_Yaw();
 
     internals::PointLatLng uav_pos = internals::PointLatLng(latitude, longitude);	// current UAV position
     float uav_heading_degrees = yaw;                                                // current UAV heading
@@ -700,10 +622,14 @@ void OPMapGadgetWidget::updatePosition()
             " " + QString::number(uav_ground_speed_meters_per_second, 'f', 1) + "m/s";
     m_widget->labelUAVPos->setText(str);
 
-    m_map->UAV->SetUAVPos(uav_pos, uav_altitude_meters);                            // set the maps UAV position
-    m_map->UAV->SetUAVHeading(uav_heading_degrees);                                 // set the maps UAV heading
+    m_map->UAV->SetUAVPos(uav_pos, uav_altitude_meters); // set the maps UAV position
+    m_map->UAV->SetUAVHeading(uav_heading_degrees);      // set the maps UAV heading
 }
 
+/**
+  Update plugin behaviour based on mouse position; Called every few ms by a
+  timer.
+ */
 void OPMapGadgetWidget::updateMousePos()
 {
     if (!m_widget || !m_map)
@@ -781,6 +707,10 @@ void OPMapGadgetWidget::updateMousePos()
 // *************************************************************************************
 // map signals
 
+
+/**
+  Update the Plugin UI to reflect a change in zoom level
+  */
 void OPMapGadgetWidget::zoomChanged(double zoomt, double zoom, double zoomd)
 {
     if (!m_widget || !m_map)
@@ -816,6 +746,9 @@ void OPMapGadgetWidget::OnCurrentPositionChanged(internals::PointLatLng point)
     m_widget->labelMapPos->setText(coord_str);
 }
 
+/**
+  Update the progress bar while there are still tiles to load
+  */
 void OPMapGadgetWidget::OnTilesStillToLoad(int number)
 {
     if (!m_widget || !m_map)
@@ -834,6 +767,9 @@ void OPMapGadgetWidget::OnTilesStillToLoad(int number)
 	prev_tile_number = number;
 }
 
+/**
+  Show the progress bar as soon as the map lib starts downloading
+  */
 void OPMapGadgetWidget::OnTileLoadStart()
 {
     if (!m_widget || !m_map)
@@ -841,6 +777,12 @@ void OPMapGadgetWidget::OnTileLoadStart()
 
     m_widget->progressBarMap->setVisible(true);
 }
+
+/**
+  Hide the progress bar once the map lib has finished downloading
+
+  TODO: somehow this gets called before tile load is actually complete?
+  */
 
 void OPMapGadgetWidget::OnTileLoadComplete()
 {
@@ -910,63 +852,23 @@ void OPMapGadgetWidget::WPValuesChanged(WayPointItem *waypoint)
 
 }
 
+/**
+  TODO: slot to do something upon Waypoint insertion
+  */
 void OPMapGadgetWidget::WPInserted(int const &number, WayPointItem *waypoint)
 {
     Q_UNUSED(number);
     Q_UNUSED(waypoint);
 }
 
+/**
+  TODO: slot to do something upon Waypoint deletion
+  */
 void OPMapGadgetWidget::WPDeleted(int const &number)
 {
     Q_UNUSED(number);
 }
 
-// *************************************************************************************
-// user control signals
-
-void OPMapGadgetWidget::comboBoxFindPlace_returnPressed()
-{
-    if (!m_widget || !m_map)
-        return;
-
-    QString place = m_widget->comboBoxFindPlace->currentText().simplified();
-    if (place.isNull() || place.isEmpty()) return;
-
-    if (!findPlaceWordList.contains(place, Qt::CaseInsensitive))
-    {
-	findPlaceWordList << place;	// add the new word into the history list
-/*
-	m_widget->comboBoxFindPlace->setCompleter(NULL);
-	delete findPlaceCompleter;
-	findPlaceCompleter = new QCompleter(findPlaceWordList, this);
-	findPlaceCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-	findPlaceCompleter->setCompletionMode(QCompleter::PopupCompletion);
-	findPlaceCompleter->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
-	m_widget->comboBoxFindPlace->setCompleter(findPlaceCompleter);
-*/
-/*
-	#if defined(Q_OS_MAC)
-	#elif defined(Q_OS_WIN)
-	    saveComboBoxLines(m_widget->comboBoxFindPlace, QCoreApplication::applicationDirPath() + "/opmap_find_place_history.txt");
-	#else
-	#endif
-*/
-    }
-
-    core::GeoCoderStatusCode::Types x = m_map->SetCurrentPositionByKeywords(place);
-    QString returned_text = mapcontrol::Helper::StrFromGeoCoderStatusCode(x);
-
-    QMessageBox::information(this, tr("OpenPilot GCS"), returned_text, QMessageBox::Ok);
-}
-
-void OPMapGadgetWidget::on_toolButtonFindPlace_clicked()
-{
-    if (!m_widget || !m_map)
-        return;
-
-    m_widget->comboBoxFindPlace->setFocus();
-    comboBoxFindPlace_returnPressed();
-}
 
 void OPMapGadgetWidget::on_toolButtonZoomP_clicked()
 {
@@ -1014,108 +916,6 @@ void OPMapGadgetWidget::on_horizontalSliderZoom_sliderMoved(int position)
     setZoom(position);
 }
 
-void OPMapGadgetWidget::on_toolButtonHome_clicked()
-{
-    if (!m_widget || !m_map)
-        return;
-
-//    QMutexLocker locker(&m_map_mutex);
-
-    // to do
-}
-
-
-void OPMapGadgetWidget::on_toolButtonPrevWaypoint_clicked()
-{
-    if (!m_widget || !m_map)
-        return;
-
-//    QMutexLocker locker(&m_map_mutex);
-
-    // to do
-}
-
-void OPMapGadgetWidget::on_toolButtonNextWaypoint_clicked()
-{
-    if (!m_widget || !m_map)
-        return;
-
-//    QMutexLocker locker(&m_map_mutex);
-
-    // to do
-}
-
-void OPMapGadgetWidget::on_toolButtonHoldPosition_clicked()
-{
-    if (!m_widget || !m_map)
-        return;
-
-//    QMutexLocker locker(&m_map_mutex);
-
-    // to do
-}
-
-void OPMapGadgetWidget::on_toolButtonGo_clicked()
-{
-    if (!m_widget || !m_map)
-        return;
-
-//    QMutexLocker locker(&m_map_mutex);
-
-    // to do
-}
-
-void OPMapGadgetWidget::on_toolButtonAddWaypoint_clicked()
-{
-    if (!m_widget || !m_map)
-        return;
-
-    if (m_map_mode != Normal_MapMode)
-        return;
-
-    QMutexLocker locker(&m_waypoint_list_mutex);
-
-	// create a waypoint at the center of the map
-    t_waypoint *wp = new t_waypoint;
-    wp->map_wp_item = NULL;
-    wp->coord = m_map->CurrentPosition();
-    wp->altitude = 0;
-    wp->description = "";
-    wp->locked = false;
-    wp->time_seconds = 0;
-    wp->hold_time_seconds = 0;
-    wp->map_wp_item = m_map->WPCreate(wp->coord, wp->altitude, wp->description);
-
-    wp->map_wp_item->setZValue(10 + wp->map_wp_item->Number());
-
-    wp->map_wp_item->setFlag(QGraphicsItem::ItemIsMovable, !wp->locked);
-
-    if (wp->map_wp_item)
-    {
-        if (!wp->locked)
-            wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker1.png"));
-        else
-            wp->map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker2.png"));
-        wp->map_wp_item->update();
-    }
-
-	// and remember it in our own local waypoint list
-    m_waypoint_list.append(wp);
-}
-
-void OPMapGadgetWidget::on_treeViewWaypoints_clicked(QModelIndex index)
-{
-    if (!m_widget || !m_map)
-        return;
-
-//    QMutexLocker locker(&m_map_mutex);
-
-    QStandardItem *item = wayPoint_treeView_model.itemFromIndex(index);
-    if (!item)
-        return;
-
-    // to do
-}
 
 void OPMapGadgetWidget::on_toolButtonNormalMapMode_clicked()
 {
@@ -1543,6 +1343,11 @@ void OPMapGadgetWidget::createActions()
     followUAVheadingAct->setChecked(false);
     connect(followUAVheadingAct, SIGNAL(toggled(bool)), this, SLOT(onFollowUAVheadingAct_toggled(bool)));
 
+    /*
+      TODO: Waypoint support is disabled for v1.0
+      */
+
+    /*
     wayPointEditorAct = new QAction(tr("&Waypoint editor"), this);
     wayPointEditorAct->setShortcut(tr("Ctrl+W"));
     wayPointEditorAct->setStatusTip(tr("Open the waypoint editor"));
@@ -1574,6 +1379,7 @@ void OPMapGadgetWidget::createActions()
     clearWayPointsAct->setShortcut(tr("Ctrl+C"));
     clearWayPointsAct->setStatusTip(tr("Clear waypoints"));
     connect(clearWayPointsAct, SIGNAL(triggered()), this, SLOT(onClearWayPointsAct_triggered()));
+    */
 
     homeMagicWaypointAct = new QAction(tr("Home magic waypoint"), this);
     homeMagicWaypointAct->setStatusTip(tr("Move the magic waypoint to the home position"));
@@ -1712,32 +1518,6 @@ void OPMapGadgetWidget::onCopyMouseLonToClipAct_triggered()
     clipboard->setText(QString::number(context_menu_lat_lon.Lng(), 'f', 7), QClipboard::Clipboard);
 }
 
-void OPMapGadgetWidget::onFindPlaceAct_triggered()
-{
-    if (!m_widget || !m_map)
-        return;
-
-    m_widget->comboBoxFindPlace->setFocus();	// move focus to the 'find place' text box
-
-/*
-    bool ok;
-    QString place = QInputDialog::getText(this, tr("OpenPilot GCS"), tr("Find place"), QLineEdit::Normal, QString::null, &ok);
-    place = place.simplified();
-    if (!ok || place.isNull() || place.isEmpty()) return;
-
-    if (!findPlaceWordList.contains(place, Qt::CaseInsensitive))
-    {
-	findPlaceWordList += place;	// add the new word into the history list
-    }
-
-    if (!m_map) return;
-
-    core::GeoCoderStatusCode::Types x = m_map->SetCurrentPositionByKeywords(place);
-    QString returned_text = mapcontrol::Helper::StrFromGeoCoderStatusCode(x);
-
-    QMessageBox::information(this, tr("OpenPilot GCS"), returned_text, QMessageBox::Ok);
-*/
-}
 
 void OPMapGadgetWidget::onShowCompassAct_toggled(bool show)
 {
@@ -1894,14 +1674,10 @@ void OPMapGadgetWidget::onUAVTrailDistanceActGroup_triggered(QAction *action)
     m_map->UAV->SetTrailDistance(trail_distance);
 }
 
-void OPMapGadgetWidget::onOpenWayPointEditorAct_triggered()
-{
-    if (!m_widget || !m_map)
-        return;
-
-    waypoint_editor_dialog.show();
-}
-
+/**
+  * TODO: unused for v1.0
+  **/
+/*
 void OPMapGadgetWidget::onAddWayPointAct_triggered()
 {
     if (!m_widget || !m_map)
@@ -1941,7 +1717,15 @@ void OPMapGadgetWidget::onAddWayPointAct_triggered()
 
     m_waypoint_list_mutex.unlock();
 }
+*/
 
+/**
+  * Called when the user asks to edit a waypoint from the map
+  *
+  * TODO: should open an interface to edit waypoint properties, or
+  *       propagate the signal to a specific WP plugin (tbd).
+  **/
+/*
 void OPMapGadgetWidget::onEditWayPointAct_triggered()
 {
     if (!m_widget || !m_map)
@@ -1953,11 +1737,16 @@ void OPMapGadgetWidget::onEditWayPointAct_triggered()
     if (!m_mouse_waypoint)
         return;
 
-    waypoint_edit_dialog.editWaypoint(m_mouse_waypoint);
+    //waypoint_edit_dialog.editWaypoint(m_mouse_waypoint);
 
     m_mouse_waypoint = NULL;
 }
+*/
 
+/**
+  * TODO: unused for v1.0
+  */
+/*
 void OPMapGadgetWidget::onLockWayPointAct_triggered()
 {
     if (!m_widget || !m_map || !m_mouse_waypoint)
@@ -1977,7 +1766,12 @@ void OPMapGadgetWidget::onLockWayPointAct_triggered()
 
     m_mouse_waypoint = NULL;
 }
+*/
 
+/**
+  * TODO: unused for v1.0
+  */
+/*
 void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
 {
     if (!m_widget || !m_map)
@@ -2011,26 +1805,31 @@ void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
 
         break;
     }
-/*
-    foreach (t_waypoint *wp, m_waypoint_list)
-    {
-        if (!wp) continue;
-        if (!wp->map_wp_item || wp->map_wp_item != m_mouse_waypoint) continue;
+//
+//    foreach (t_waypoint *wp, m_waypoint_list)
+//    {
+//        if (!wp) continue;
+//        if (!wp->map_wp_item || wp->map_wp_item != m_mouse_waypoint) continue;
+//
+//	    // delete the waypoint from the map
+//      m_map->WPDelete(wp->map_wp_item);
+//
+//	    // delete the waypoint from our local waypoint list
+//        m_waypoint_list.removeOne(wp);
+//
+//        delete wp;
+//
+//	    break;
+//	}
 
-	    // delete the waypoint from the map
-        m_map->WPDelete(wp->map_wp_item);
-
-	    // delete the waypoint from our local waypoint list
-        m_waypoint_list.removeOne(wp);
-
-        delete wp;
-
-	    break;
-	}
-*/
     m_mouse_waypoint = NULL;
 }
+*/
 
+/**
+  * TODO: No Waypoint support in v1.0
+  */
+/*
 void OPMapGadgetWidget::onClearWayPointsAct_triggered()
 {
     if (!m_widget || !m_map)
@@ -2054,6 +1853,7 @@ void OPMapGadgetWidget::onClearWayPointsAct_triggered()
 
     m_waypoint_list.clear();
 }
+*/
 
 void OPMapGadgetWidget::onHomeMagicWaypointAct_triggered()
 {
@@ -2084,9 +1884,9 @@ void OPMapGadgetWidget::onSafeAreaActGroup_triggered(QAction *action)
     keepMagicWaypointWithInSafeArea();
 }
 
-// *************************************************************************************
-// move the magic waypoint to the home position
-
+/**
+* move the magic waypoint to the home position
+**/
 void OPMapGadgetWidget::homeMagicWaypoint()
 {
     if (!m_widget || !m_map)

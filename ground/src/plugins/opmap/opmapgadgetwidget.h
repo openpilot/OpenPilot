@@ -44,8 +44,6 @@
 #include "opmap_overlay_widget.h"
 #include "opmap_zoom_slider_widget.h"
 #include "opmap_statusbar_widget.h"
-#include "opmap_waypointeditor_dialog.h"
-#include "opmap_edit_waypoint_dialog.h"
 
 #include "utils/coordinateconversions.h"
 
@@ -131,23 +129,23 @@ private slots:
     /**
     * @brief signals received from the various map plug-in widget user controls
     *
-    * @param
+    * Some are currently disabled for the v1.0 plugin version.
     */
-    void comboBoxFindPlace_returnPressed();
-    void on_toolButtonFindPlace_clicked();
+//    void comboBoxFindPlace_returnPressed();
+//    void on_toolButtonFindPlace_clicked();
     void on_toolButtonZoomM_clicked();
     void on_toolButtonZoomP_clicked();
     void on_toolButtonMapHome_clicked();
     void on_toolButtonMapUAV_clicked();
     void on_toolButtonMapUAVheading_clicked();
     void on_horizontalSliderZoom_sliderMoved(int position);
-    void on_toolButtonAddWaypoint_clicked();
-    void on_treeViewWaypoints_clicked(QModelIndex index);
+//    void on_toolButtonAddWaypoint_clicked();
+//    void on_treeViewWaypoints_clicked(QModelIndex index);
     void on_toolButtonHome_clicked();
-    void on_toolButtonNextWaypoint_clicked();
-    void on_toolButtonPrevWaypoint_clicked();
-    void on_toolButtonHoldPosition_clicked();
-    void on_toolButtonGo_clicked();
+//    void on_toolButtonNextWaypoint_clicked();
+//    void on_toolButtonPrevWaypoint_clicked();
+//    void on_toolButtonHoldPosition_clicked();
+//    void on_toolButtonGo_clicked();
     void on_toolButtonMagicWaypointMapMode_clicked();
     void on_toolButtonNormalMapMode_clicked();
     void on_toolButtonHomeWaypoint_clicked();
@@ -155,8 +153,6 @@ private slots:
 
     /**
     * @brief signals received from the map object
-    *
-    * @param
     */
     void zoomChanged(double zoomt,double zoom, double zoomd);
     void OnCurrentPositionChanged(internals::PointLatLng point);
@@ -167,6 +163,10 @@ private slots:
     void OnMapTypeChanged(MapType::Types type);
     void OnEmptyTileError(int zoom, core::Point pos);
     void OnTilesStillToLoad(int number);
+
+    /**
+      * Unused for now, hooks for future waypoint support
+      */
     void WPNumberChanged(int const& oldnumber,int const& newnumber, WayPointItem* waypoint);
     void WPValuesChanged(WayPointItem* waypoint);
     void WPInserted(int const& number, WayPointItem* waypoint);
@@ -174,8 +174,6 @@ private slots:
 
     /**
     * @brief mouse right click context menu signals
-    *
-    * @param
     */
     void onReloadAct_triggered();
     void onCopyMouseLatLonToClipAct_triggered();
@@ -193,12 +191,14 @@ private slots:
     void onGoUAVAct_triggered();
     void onFollowUAVpositionAct_toggled(bool checked);
     void onFollowUAVheadingAct_toggled(bool checked);
+/*
     void onOpenWayPointEditorAct_triggered();
     void onAddWayPointAct_triggered();
     void onEditWayPointAct_triggered();
     void onLockWayPointAct_triggered();
     void onDeleteWayPointAct_triggered();
     void onClearWayPointsAct_triggered();
+*/
     void onMapModeActGroup_triggered(QAction *action);
     void onZoomActGroup_triggered(QAction *action);
     void onHomeMagicWaypointAct_triggered();
@@ -236,9 +236,9 @@ private:
 
     mapcontrol::OPMapWidget *m_map;
 
-    opmap_waypointeditor_dialog waypoint_editor_dialog;
+    //opmap_waypointeditor_dialog waypoint_editor_dialog;
 
-    opmap_edit_waypoint_dialog waypoint_edit_dialog;
+    //opmap_edit_waypoint_dialog waypoint_edit_dialog;
 
     opmap_overlay_widget *m_overlay_widget;
 
@@ -276,12 +276,14 @@ private:
     QAction *goUAVAct;
     QAction *followUAVpositionAct;
     QAction *followUAVheadingAct;
+    /*
     QAction *wayPointEditorAct;
     QAction *addWayPointAct;
     QAction *editWayPointAct;
     QAction *lockWayPointAct;
     QAction *deleteWayPointAct;
     QAction *clearWayPointsAct;
+    */
     QAction *homeMagicWaypointAct;
 
     QAction *showSafeAreaAct;

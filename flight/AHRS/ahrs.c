@@ -245,8 +245,8 @@ void ins_indoor_update()
 		INSPosVelReset(vel,vel);
 	else 
 		sensors = HORIZ_SENSORS | VERT_SENSORS;
-	
-	if(mag_data.updated) {
+
+	if(mag_data.updated && (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
 		sensors |= MAG_SENSORS;
 		mag_data.updated = false;
 	}

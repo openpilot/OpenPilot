@@ -158,6 +158,13 @@ struct gps_sensor {
  * @}
  */
 
+/* INS functions */
+void ins_outdoor_update();
+void ins_indoor_update();
+void simple_update();
+
+/* Data accessors - prepare for */
+
 /* Function Prototypes */
 void downsample_data(void);
 void calibrate_sensors(void);
@@ -196,19 +203,166 @@ static uint8_t adc_oversampling = 20;
  * @}
  */
 
+/* INS functions */
+/**
+ * @brief Update the EKF when in outdoor mode.  The primary difference is using the GPS values.
+ */
+void ins_outdoor_update() 
+{
+	float gyro[3], accel[3], vel[3];
+	static uint8_t gps_dirty = 1;
+	static uint32_t last_gps_time = 0;
+		
+	// format data for INS algo
+	gyro[0] = gyro_data.filtered.x;
+	gyro[1] = gyro_data.filtered.y;
+	gyro[2] = gyro_data.filtered.z;
+	accel[0] = accel_data.filtered.x,
+	accel[1] = accel_data.filtered.y,
+	accel[2] = accel_data.filtered.z,
+		
+	INSStatePrediction(gyro, accel, 1 / (float)EKF_RATE);
+	attitude_data.quaternion.q1 = Nav.q[0];
+	attitude_data.quaternion.q2 = Nav.q[1];
+	attitude_data.quaternion.q3 = Nav.q[2];
+	attitude_data.quaternion.q4 = Nav.q[3];			
+	send_attitude();  // get message out quickly
+	send_velocity();
+	send_position();
+	INSCovariancePrediction(1 / (float)EKF_RATE);
+		
+	if (gps_data.updated) {
+		uint32_t this_gps_time = timer_count();
+		float gps_delay;
+		
+		// Detect if greater than certain time since last gps update and if so
+		// reset EKF to that position since probably drifted too far for safe
+		// update
+		if (this_gps_time < last_gps_time)
+			gps_delay = ((0xFFFF - last_gps_time) - this_gps_time) / timer_rate();
+		else 
+			gps_delay = (this_gps_time - last_gps_time) / timer_rate();
+		last_gps_time = this_gps_time;
+		
+		gps_dirty = gps_delay > INSGPS_GPS_TIMEOUT;
+		
+		// Compute velocity from Heading and groundspeed
+		vel[0] = gps_data.groundspeed * cos(gps_data.heading * M_PI / 180);
+		vel[1] = gps_data.groundspeed * sin(gps_data.heading * M_PI / 180);
+		vel[2] = 0;
+				
+		if (mag_data.updated && !gps_dirty) {
+			//TOOD: add check for altitude updates
+			//FullCorrection(mag_data.scaled.axis, gps_data.NED, vel, altitude_data.altitude);
+			GpsMagCorrection(mag_data.scaled.axis, gps_data.NED, vel);
+			mag_data.updated = 0;
+		} else if (!gps_dirty) {
+			//GpsBaroCorrection(gps_data.NED, vel, altitude_data.altitude);
+			GpsBaroCorrection(gps_data.NED, vel, -gps_data.NED[2]);
+		} else { // GPS hasn't updated for a bit
+			INSPosVelReset(gps_data.NED,vel);					
+		}
+		
+		gps_data.updated = false;
+	} else if (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR
+		   && mag_data.updated == 1) {
+		MagCorrection(mag_data.scaled.axis);	// only trust mags if outdoors
+		mag_data.updated = 0;
+	}
+	
+}
+
+/**
+ * @brief Update the EKF when in indoor mode
+ */
+void ins_indoor_update()
+{
+	float gyro[3], accel[3], vel[3];
+	static uint8_t indoor_dirty = 1;
+	static uint32_t last_indoor_time = 0;
+
+	// format data for INS algo
+	gyro[0] = gyro_data.filtered.x;
+	gyro[1] = gyro_data.filtered.y;
+	gyro[2] = gyro_data.filtered.z;
+	accel[0] = accel_data.filtered.x,
+	accel[1] = accel_data.filtered.y,
+	accel[2] = accel_data.filtered.z,
+	
+	INSStatePrediction(gyro, accel, 1 / (float)EKF_RATE);
+	attitude_data.quaternion.q1 = Nav.q[0];
+	attitude_data.quaternion.q2 = Nav.q[1];
+	attitude_data.quaternion.q3 = Nav.q[2];
+	attitude_data.quaternion.q4 = Nav.q[3];			
+	send_attitude();  // get message out quickly
+	send_velocity();
+	send_position();
+	INSCovariancePrediction(1 / (float)EKF_RATE);
+	
+	// Indoors, update with zero position and velocity and high covariance
+	vel[0] = 0;
+	vel[1] = 0;
+	vel[2] = 0;
+	
+	uint32_t this_indoor_time = timer_count();
+	float indoor_delay;
+	
+	// Detect if greater than certain time since last gps update and if so
+	// reset EKF to that position since probably drifted too far for safe
+	// update
+	if (this_indoor_time < last_indoor_time)
+		indoor_delay = ((0xFFFF - last_indoor_time) - this_indoor_time) / timer_rate();
+	else 
+		indoor_delay = (this_indoor_time - last_indoor_time) / timer_rate();
+	last_indoor_time = this_indoor_time;
+	
+	indoor_dirty = indoor_delay > INSGPS_GPS_TIMEOUT;
+	
+	if(indoor_dirty)
+		INSPosVelReset(vel,vel);					
+	
+	if((mag_data.updated == 1) && (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
+		MagVelBaroCorrection(mag_data.scaled.axis,vel,altitude_data.altitude);  // only trust mags if outdoors
+		mag_data.updated = 0;
+	} else {
+		VelBaroCorrection(vel, altitude_data.altitude);
+	}
+}
+
+
+/**
+ * @brief Simple update using just mag and accel.  Yaw biased and big attitude changes.
+ */
+void simple_update() {
+	float q[4];
+	float rpy[3];
+	/***************** SIMPLE ATTITUDE FROM NORTH AND ACCEL ************/
+	/* Very simple computation of the heading and attitude from accel. */
+	rpy[2] =
+	atan2((mag_data.raw.axis[0]),
+	      (-1 * mag_data.raw.axis[1])) * 180 /
+	M_PI;
+	rpy[1] =
+	atan2(accel_data.filtered.x,
+	      accel_data.filtered.z) * 180 / M_PI;
+	rpy[0] =
+	atan2(accel_data.filtered.y,
+	      accel_data.filtered.z) * 180 / M_PI;
+	
+	RPY2Quaternion(rpy, q);
+	attitude_data.quaternion.q1 = q[0];
+	attitude_data.quaternion.q2 = q[1];
+	attitude_data.quaternion.q3 = q[2];
+	attitude_data.quaternion.q4 = q[3];
+	send_attitude();	
+}
+
 /**
  * @brief AHRS Main function
  */
 int main()
 {
-	uint8_t spike=0;
-	float gyro[3], accel[3];
-	float vel[3] = { 0, 0, 0 };
-	uint8_t gps_dirty = 1;
-	uint8_t indoor_dirty = 1;
 	gps_data.quality = -1;
-	uint32_t last_gps_time = 0;
-	uint32_t last_indoor_time = 0;
 	uint32_t up_time_real = 0;
 	uint32_t up_time = 0;
 	uint32_t last_up_time = 0;
@@ -319,10 +473,7 @@ for all data to be up to date before doing anything*/
 		AhrsStatusGet(&status);
 		status.CPULoad = ((float)running_counts /
 						  (float)(idle_counts + running_counts)) * 100;
-//		status.IdleTimePerCyle = idle_counts / (timer_rate() / 10000);
-// ***************************
-status.IdleTimePerCyle=spike;
-// ***************************
+		status.IdleTimePerCyle = idle_counts / (timer_rate() / 10000);
 		status.RunningTimePerCyle = running_counts / (timer_rate() / 10000);
 		status.DroppedUpdates = ekf_too_slow;
 		up_time = timer_count();
@@ -416,132 +567,18 @@ status.IdleTimePerCyle=spike;
 
 
 		/******************** INS ALGORITHM **************************/
-
-		if (ahrs_algorithm != AHRSSETTINGS_ALGORITHM_SIMPLE) {
-
-			// format data for INS algo
-			gyro[0] = gyro_data.filtered.x;
-			gyro[1] = gyro_data.filtered.y;
-			gyro[2] = gyro_data.filtered.z;
-			accel[0] = accel_data.filtered.x,
-			accel[1] = accel_data.filtered.y,
-			accel[2] = accel_data.filtered.z,
-
-			INSStatePrediction(gyro, accel, 1 / (float)EKF_RATE);
-			send_attitude();  // get message out quickly
-			send_velocity();
-			send_position();
-			INSCovariancePrediction(1 / (float)EKF_RATE);
-
-			if (gps_data.updated && ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) {
-				uint32_t this_gps_time = timer_count();
-				float gps_delay;
-				
-				// Detect if greater than certain time since last gps update and if so
-				// reset EKF to that position since probably drifted too far for safe
-				// update
-				if (this_gps_time < last_gps_time)
-					gps_delay = ((0xFFFF - last_gps_time) - this_gps_time) / timer_rate();
-				else 
-					gps_delay = (this_gps_time - last_gps_time) / timer_rate();
-				last_gps_time = this_gps_time;
-				
-				gps_dirty = gps_delay > INSGPS_GPS_TIMEOUT;
-
-				// Compute velocity from Heading and groundspeed
-				vel[0] = gps_data.groundspeed *
-					cos(gps_data.heading * M_PI / 180);
-				vel[1] = gps_data.groundspeed *
-					sin(gps_data.heading * M_PI / 180);
-				vel[2] = 0;
-				
-				
-//				INSSetPosVelVar(0.004);
-				INSSetPosVelVar(0.04);
-				
-				if (mag_data.updated && !gps_dirty) {
-					//TOOD: add check for altitude updates
-					//FullCorrection(mag_data.scaled.axis, gps_data.NED, vel, altitude_data.altitude);
-					GpsMagCorrection(mag_data.scaled.axis, gps_data.NED, vel);
-					mag_data.updated = 0;
-				} else if (!gps_dirty) {
-					//GpsBaroCorrection(gps_data.NED, vel, altitude_data.altitude);
-					GpsBaroCorrection(gps_data.NED, vel, -gps_data.NED[2]);
-				} else { // GPS hasn't updated for a bit
-					INSPosVelReset(gps_data.NED,vel);					
-				}
-
-				gps_data.updated = false;
-			} else if (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR
-				   && mag_data.updated == 1) {
-				MagCorrection(mag_data.scaled.axis);	// only trust mags if outdoors
-				mag_data.updated = 0;
-			}
-			else if (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR){ //Do no update
-	 		} else {
-				// Indoors, update with zero position and velocity and high covariance
-spike++;
-				AHRSSettingsData settings;
-				AHRSSettingsGet(&settings);
-				INSSetPosVelVar(settings.IndoorVelocityVariance);
-				vel[0] = 0;
-				vel[1] = 0;
-				vel[2] = 0;
-				
-				uint32_t this_indoor_time = timer_count();
-				float indoor_delay;
-				
-				// Detect if greater than certain time since last gps update and if so
-				// reset EKF to that position since probably drifted too far for safe
-				// update
-				if (this_indoor_time < last_indoor_time)
-					indoor_delay = ((0xFFFF - last_indoor_time) - this_indoor_time) / timer_rate();
-				else 
-					indoor_delay = (this_indoor_time - last_indoor_time) / timer_rate();
-				last_indoor_time = this_indoor_time;
-				
-				indoor_dirty = indoor_delay > INSGPS_GPS_TIMEOUT;
-				
-				if(indoor_dirty)
-					INSPosVelReset(vel,vel);					
-
-				if((mag_data.updated == 1) && (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
-					MagVelBaroCorrection(mag_data.scaled.axis,vel,altitude_data.altitude);  // only trust mags if outdoors
-					mag_data.updated = 0;
-				} else {
-					VelBaroCorrection(vel, altitude_data.altitude);
-				}
-			}
-
-			attitude_data.quaternion.q1 = Nav.q[0];
-			attitude_data.quaternion.q2 = Nav.q[1];
-			attitude_data.quaternion.q3 = Nav.q[2];
-			attitude_data.quaternion.q4 = Nav.q[3];
-		} else if (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_SIMPLE) {
-			float q[4];
-			float rpy[3];
-	    /***************** SIMPLE ATTITUDE FROM NORTH AND ACCEL ************/
-			/* Very simple computation of the heading and attitude from accel. */
-			rpy[2] =
-			    atan2((mag_data.raw.axis[0]),
-				  (-1 * mag_data.raw.axis[1])) * 180 /
-			    M_PI;
-			rpy[1] =
-			    atan2(accel_data.filtered.x,
-				  accel_data.filtered.z) * 180 / M_PI;
-			rpy[0] =
-			    atan2(accel_data.filtered.y,
-				  accel_data.filtered.z) * 180 / M_PI;
-
-			RPY2Quaternion(rpy, q);
-			attitude_data.quaternion.q1 = q[0];
-			attitude_data.quaternion.q2 = q[1];
-			attitude_data.quaternion.q3 = q[2];
-			attitude_data.quaternion.q4 = q[3];
-			send_attitude();
-
+		switch(ahrs_algorithm) {
+			case AHRSSETTINGS_ALGORITHM_SIMPLE:
+				simple_update();
+				break;
+			case AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR:
+				ins_outdoor_update();
+				break;
+			case AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR:
+			case AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR_NOMAG:
+				ins_indoor_update();
+				break;
 		}
-
 		ahrs_state = AHRS_IDLE;
 
 #ifdef DUMP_FRIENDLY
@@ -944,6 +981,9 @@ void settings_callback(AhrsObjHandle obj)
 		fir_coeffs[adc_oversampling] = adc_oversampling;
 		
 	}
+
+	INSSetPosVelVar(settings.IndoorVelocityVariance);
+	
 }
 
 void homelocation_callback(AhrsObjHandle obj) 

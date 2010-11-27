@@ -141,7 +141,7 @@ private slots:
     void on_horizontalSliderZoom_sliderMoved(int position);
 //    void on_toolButtonAddWaypoint_clicked();
 //    void on_treeViewWaypoints_clicked(QModelIndex index);
-    void on_toolButtonHome_clicked();
+//    void on_toolButtonHome_clicked();
 //    void on_toolButtonNextWaypoint_clicked();
 //    void on_toolButtonPrevWaypoint_clicked();
 //    void on_toolButtonHoldPosition_clicked();
@@ -179,7 +179,7 @@ private slots:
     void onCopyMouseLatLonToClipAct_triggered();
     void onCopyMouseLatToClipAct_triggered();
     void onCopyMouseLonToClipAct_triggered();
-    void onFindPlaceAct_triggered();
+//    void onFindPlaceAct_triggered();
     void onShowCompassAct_toggled(bool show);
     void onShowUAVAct_toggled(bool show);
     void onShowHomeAct_toggled(bool show);

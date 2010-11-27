@@ -224,6 +224,7 @@ void deviceWidget::downloadFirmware()
 void deviceWidget::downloadFinished()
 {
     disconnect(m_dfu, SIGNAL(downloadFinished()), this, SLOT(downloadFinished()));
+    disconnect(m_dfu, SIGNAL(progressUpdated(int)), this, SLOT(setProgress(int)));
     status("Download successful");
     // Now save the result (use the utility function from OP_DFU)
     m_dfu->SaveByteArrayToFile(filename, downloadedFirmware);
@@ -236,6 +237,8 @@ void deviceWidget::downloadFinished()
 void deviceWidget::uploadFinished(OP_DFU::Status retstatus)
 {
     disconnect(m_dfu, SIGNAL(uploadFinished(OP_DFU::Status)), this, SLOT(uploadFinished(OP_DFU::Status)));
+    disconnect(m_dfu, SIGNAL(progressUpdated(int)), this, SLOT(setProgress(int)));
+    disconnect(m_dfu, SIGNAL(operationProgress(QString)), this, SLOT(status(QString)));
     if(retstatus != OP_DFU::Last_operation_Success) {
         status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data());
         return;
@@ -252,7 +255,6 @@ void deviceWidget::uploadFinished(OP_DFU::Status retstatus)
     status("Upload successful");
 
 }
-
 
 /**
   Slot to update the progress bar
@@ -274,7 +276,7 @@ QString deviceWidget::setOpenFileName()
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("Select firmware file"),
                                                     "",
-                                                    tr("All Files (*);;Firmware Files (*.bin)"),
+                                                    tr("Firmware Files (*.bin)"),
                                                     &selectedFilter,
                                                     options);
     return fileName;

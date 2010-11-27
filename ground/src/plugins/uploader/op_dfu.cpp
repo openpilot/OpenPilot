@@ -210,11 +210,11 @@ OP_DFU::Status DFUObject::UploadDescription(QString description)
     {
         return OP_DFU::abort;
     }
-    int ret=StatusRequest();
+    OP_DFU::Status ret = StatusRequest();
 
     if(debug)
-        qDebug()<<"Upload description Status="<<ret;
-    return (OP_DFU::Status)ret;
+        qDebug() << "Upload description Status=" << StatusToString(ret);
+    return ret;
 }
 
 
@@ -315,6 +315,7 @@ bool DFUObject::StartDownloadT(QByteArray *fw, qint32 const & numberOfBytes, Tra
     // Now get those packets:
     for(qint32 x=0;x<numberOfPackets;++x)
     {
+        int size;
         percentage=(float)(x+1)/numberOfPackets*100;
         if(laspercentage!=(int)percentage)
             printProgBar((int)percentage,"DOWNLOADING");
@@ -323,7 +324,6 @@ bool DFUObject::StartDownloadT(QByteArray *fw, qint32 const & numberOfBytes, Tra
         result = hidHandle.receive(0,buf,BUF_LEN,5000);
         if(debug)
             qDebug() << result << " bytes received"<<" Count="<<x<<"-"<<(int)buf[2]<<";"<<(int)buf[3]<<";"<<(int)buf[4]<<";"<<(int)buf[5]<<" Data="<<(int)buf[6]<<";"<<(int)buf[7]<<";"<<(int)buf[8]<<";"<<(int)buf[9];
-        int size;
         if(x==numberOfPackets-1)
             size=lastPacketCount*4;
         else
@@ -589,13 +589,13 @@ OP_DFU::Status DFUObject::UploadFirmwareT(const QString &sfile, const bool &veri
 
     if( !StartUpload(arr.length(), OP_DFU::FW, crc))
     {
+        ret = StatusRequest();
         if(debug)
         {
             qDebug() << "StartUpload failed";
-            OP_DFU::Status ret = StatusRequest();
             qDebug() << "StartUpload returned:" << StatusToString(ret);
         }
-        return OP_DFU::abort;
+        return ret;
     }
 
     emit operationProgress(QString("Erasing memory, please wait..."));
@@ -606,62 +606,50 @@ OP_DFU::Status DFUObject::UploadFirmwareT(const QString &sfile, const bool &veri
     // TODO: why is there a loop there? The "if" statement
     // will cause a break or return anyway!!
     for (int x = 0; x < 3; ++x) {
-        OP_DFU::Status ret = StatusRequest();
+        ret = StatusRequest();
         if (debug) qDebug() << "Erase returned: " << StatusToString(ret);
         if (ret == OP_DFU::uploading)
             break;
         else
-            return OP_DFU::abort;
+            return ret;
     }
 
     emit operationProgress(QString("Uploading firmware"));
     if( !UploadData(arr.length(),arr))
     {
+        ret = StatusRequest();
         if(debug)
         {
             qDebug()<<"Upload failed (upload data)";
-            OP_DFU::Status ret=StatusRequest();
-            qDebug()<<"StartUpload returned:"<<StatusToString(ret);
+            qDebug()<<"UploadData returned:"<<StatusToString(ret);
         }
-        return OP_DFU::abort;
+        return ret;
     }
     if(!EndOperation())
     {
+        ret = StatusRequest();
         if(debug)
         {
             qDebug()<<"Upload failed (end operation)";
-            OP_DFU::Status ret=StatusRequest();
-            qDebug()<<"StartUpload returned:"<<StatusToString(ret);
+            qDebug()<<"EndOperation returned:"<<StatusToString(ret);
         }
-        return OP_DFU::abort;
-    }
-    ret=StatusRequest();
-    if(ret==OP_DFU::Last_operation_Success)
-    {
-
-    }
-    else
-    {
         return ret;
     }
-    if(verify)
-    {
+    ret = StatusRequest();
+    if(ret != OP_DFU::Last_operation_Success)
+        return ret;
+
+    if(verify) {
         emit operationProgress(QString("Verifying firmware"));
         cout<<"Starting code verification\n";
         QByteArray arr2;
         StartDownloadT(&arr2, arr.length(),OP_DFU::FW);
-        if (arr == arr2 )
-            cout<<"Verify:PASSED\n";
-        else
-        {
+        if (arr != arr2 ) {
             cout<<"Verify:FAILED\n";
             return OP_DFU::abort;
         }
     }
-    else
-    {
-        return ret;
-    }
+
     if(debug)
         qDebug()<<"Status="<<ret;
     cout<<"Firmware Uploading succeeded\n";
@@ -793,6 +781,7 @@ void DFUObject::printProgBar( int const & percent,QString const& label){
         std::cout<< percent << "%     " << std::flush;
     }
 }
+
 quint32 DFUObject::CRC32WideFast(quint32 Crc, quint32 Size, quint32 *Buffer)
 {
     //Size = Size >> 2; // /4  Size passed in as a byte count, assumed to be a multiple of 4

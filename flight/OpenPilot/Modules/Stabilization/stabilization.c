@@ -199,6 +199,26 @@ static void stabilizationTask(void* parameters)
 					shouldUpdate = 1;
 					break;
 				}
+            case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE:
+                    //actuatorDesiredAxis[ct] = bound(manualAxis[ct]);
+                    //shouldUpdate = 1;
+                    switch (ct)
+                    {
+                    case ROLL:
+                            actuatorDesiredAxis[ct] = bound(attitudeDesiredAxis[ct]/settings.RollMax);
+                            shouldUpdate = 1;
+                    break;
+                    case PITCH:
+                            actuatorDesiredAxis[ct] = bound(attitudeDesiredAxis[ct]/settings.PitchMax);
+                            shouldUpdate = 1;
+                    break;
+                    case YAW:
+                            actuatorDesiredAxis[ct] = bound(attitudeDesiredAxis[ct]/180);
+                            shouldUpdate = 1;
+                    break;
+                    }
+                break;
+
 			}
 		}
 

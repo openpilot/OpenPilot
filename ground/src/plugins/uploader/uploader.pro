@@ -1,5 +1,6 @@
 TEMPLATE = lib
 TARGET = Uploader
+QT += svg
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(../../plugins/uavobjects/uavobjects.pri)

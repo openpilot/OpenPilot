@@ -296,6 +296,17 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_statusUpdateTimer->start();
 
     // **************
+    // Last, connect to the UAVObject updates we require to become a bit aware of
+    // our environment:
+
+    // Register for Home Location state changes
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
+    UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("HomeLocation")));
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this , SLOT(homePositionUpdated(UAVObject*)));
+
+
+
 
     m_map->setFocus();
 }
@@ -942,6 +953,20 @@ void OPMapGadgetWidget::on_toolButtonMoveToWP_clicked()
 // *************************************************************************************
 // public functions
 
+
+/** Updates the Home position icon whenever the HomePosition object
+  is updated
+  */
+void OPMapGadgetWidget::homePositionUpdated(UAVObject* hp)
+{
+    double lat = hp->getField("Latitude")->getDouble()*1e-7;
+    double lon = hp->getField("Longitude")->getDouble()*1e-7;
+    setHome(internals::PointLatLng(lat, lon));
+}
+
+/**
+  Sets the home position on the map widget
+  */
 void OPMapGadgetWidget::setHome(QPointF pos)
 {
     if (!m_widget || !m_map)
@@ -963,12 +988,13 @@ void OPMapGadgetWidget::setHome(QPointF pos)
     setHome(internals::PointLatLng(latitude, longitude));
 }
 
+/**
+  Sets the home position on the map widget
+  */
 void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon)
 {
     if (!m_widget || !m_map)
         return;
-
-    // *********
 
     if (pos_lat_lon.Lat() != pos_lat_lon.Lat() || pos_lat_lon.Lng() != pos_lat_lon.Lng())
         return;; // nan prevention
@@ -990,7 +1016,7 @@ void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon)
 
     // *********
 
-    #if defined(allow_manual_home_location_move)
+//    #if defined(allow_manual_home_location_move)
         home_position.coord = internals::PointLatLng(latitude, longitude);
 
         m_map->Home->SetCoord(home_position.coord);
@@ -998,9 +1024,13 @@ void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon)
 
         // move the magic waypoint to keep it within the safe area boundry
         keepMagicWaypointWithInSafeArea();
-    #endif
+//    #endif
 }
 
+
+/**
+  Centers the map over the home position
+  */
 void OPMapGadgetWidget::goHome()
 {
     if (!m_widget || !m_map)

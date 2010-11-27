@@ -111,6 +111,7 @@ public:
     void setMapMode(opMapModeType mode);
 
 public slots:
+    void homePositionUpdated(UAVObject*);
 
 protected:
     void resizeEvent(QResizeEvent *event);

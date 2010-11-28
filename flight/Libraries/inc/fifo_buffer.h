@@ -28,16 +28,14 @@
 
 #include "stm32f10x.h"
 
-#define FIFO_BUFFER_SIZE	1024
-
 // *********************
 
 typedef struct
 {
-	uint8_t buffer[FIFO_BUFFER_SIZE] __attribute__ ((aligned(4)));
-	volatile uint16_t rd;
-	volatile uint16_t wr;
-	uint16_t buf_size;
+    uint8_t *buf_ptr;
+    volatile uint16_t rd;
+    volatile uint16_t wr;
+    uint16_t buf_size;
 } t_fifo_buffer;
 
 // *********************
@@ -60,7 +58,7 @@ uint16_t fifoBuf_putByte(t_fifo_buffer *buf, const uint8_t b);
 
 uint16_t fifoBuf_putData(t_fifo_buffer *buf, const void *data, uint16_t len);
 
-void fifoBuf_init(t_fifo_buffer *buf);
+void fifoBuf_init(t_fifo_buffer *buf, const void *buffer, const uint16_t buffer_size);
 
 // *********************
 

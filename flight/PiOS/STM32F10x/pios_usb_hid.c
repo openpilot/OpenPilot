@@ -55,7 +55,10 @@ static uint8_t transfer_possible = 0;
 static uint8_t rx_packet_buffer[PIOS_USB_HID_DATA_LENGTH + 2] = { 0 };
 static uint8_t tx_packet_buffer[PIOS_USB_HID_DATA_LENGTH + 2] = { 0 };
 
+uint8_t rx_pios_fifo_buf[1024];
 t_fifo_buffer rx_pios_fifo_buffer;
+
+uint8_t tx_pios_fifo_buf[1024];
 t_fifo_buffer tx_pios_fifo_buffer;
 /**
  * Initialises USB COM layer
@@ -71,8 +74,8 @@ int32_t PIOS_USB_HID_Init(uint32_t mode)
 		return -1;
 	}
 
-	fifoBuf_init(&rx_pios_fifo_buffer);
-	fifoBuf_init(&tx_pios_fifo_buffer);
+	fifoBuf_init(&rx_pios_fifo_buffer, rx_pios_fifo_buf, sizeof(rx_pios_fifo_buf));
+	fifoBuf_init(&tx_pios_fifo_buffer, tx_pios_fifo_buf, sizeof(tx_pios_fifo_buf));
 
 	PIOS_USB_HID_Reenumerate();
 

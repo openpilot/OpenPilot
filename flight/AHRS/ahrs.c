@@ -43,7 +43,7 @@
 #define INSGPS_GPS_TIMEOUT 2   /* 2 seconds triggers reinit of position */
 #define INSGPS_GPS_MINSAT  6   /* 2 seconds triggers reinit of position */
 #define INSGPS_GPS_MINPDOP 3.5 /* minimum PDOP for postition updates    */
-#define INSGPS_MAGLEN       1000
+#define INSGPS_MAGLEN      1000
 #define INSGPS_MAGTOL      0.5 /* error in magnetic vector length to use  */
 
 // For debugging the raw sensors
@@ -104,6 +104,9 @@ struct gps_sensor gps_data;
 //! The oversampling rate, ekf is 2k / this
 static uint8_t adc_oversampling = 20;
 
+//! Offset correction of barometric alt, to match gps data
+static float baro_offset = 0;
+
 /**
  * @}
  */
@@ -117,7 +120,6 @@ void ins_outdoor_update()
 {
 	float gyro[3], accel[3], vel[3];
 	static uint32_t last_gps_time = 0;
-	static float baro_offset = 0;
 	uint16_t sensors;
 		
 	// format data for INS algo
@@ -174,7 +176,7 @@ void ins_outdoor_update()
 			baro_offset = gps_data.NED[2] + altitude_data.altitude;
 		} else {
 			/* IIR filter with 100 second or so tau to keep them crudely in the same frame */
-			baro_offset = baro_offset * 0.99 + (gps_data.NED[2] + altitude_data.altitude) * 0.01;
+			baro_offset = baro_offset * 0.999 + (gps_data.NED[2] + altitude_data.altitude) * 0.001;
 		}
 		gps_data.updated = false;
 	} else if (gps_delay > INSGPS_GPS_TIMEOUT) {
@@ -376,6 +378,7 @@ void print_ekf_binary()
 		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &(P[i][i]), 4);                                           // diag(P) (138:189)
 	
 	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & altitude_data.altitude, 4);                                 // BaroAlt (190:193)	
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & baro_offset, 4);                                            // baro_offset (194:198)
 }
 #else
 void print_ekf_binary() {}

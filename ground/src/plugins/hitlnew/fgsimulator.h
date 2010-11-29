@@ -52,6 +52,9 @@ private:
     static const float INHG2KPA;
     static const float FPS2CMPS;
 
+    int udpCounterGCSsend; //keeps track of udp packets sent to FG
+    int udpCounterFGrecv; //keeps track of udp packets received by FG
+
 	void processUpdate(const QByteArray& data);
 };
 

@@ -36,6 +36,7 @@
 #include "uavtalk/telemetrymanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/actuatordesired.h"
+#include "uavobjects/manualcontrolcommand.h"
 // #include "uavobjects/altitudeactual.h"
 #include "uavobjects/positionactual.h"
 #include "uavobjects/velocityactual.h"
@@ -96,9 +97,11 @@ typedef struct _CONNECTION
 	QString binPath;
 	QString dataPath;
 	QString hostAddress;
+        QString remoteHostAddress;
 	int outPort;
 	int inPort;
 	bool manual;
+        bool startSim;
 	QString latitude;
 	QString longitude;
 } SimulatorSettings;
@@ -159,6 +162,7 @@ protected:
 	QUdpSocket* outSocket;
 
 	ActuatorDesired* actDesired;
+        ManualControlCommand* manCtrlCommand;
         BaroAltitude* altActual;
 	AttitudeActual* attActual;
 	VelocityActual* velActual;

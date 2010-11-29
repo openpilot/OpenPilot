@@ -40,8 +40,8 @@ Simulator::Simulator(const SimulatorSettings& params) :
 	inSocket(NULL),
 	outSocket(NULL),
 	settings(params),
-	updatePeriod(50),
-	simTimeout(2000),
+        updatePeriod(50),
+        simTimeout(2000),
 	autopilotConnectionStatus(false),
 	simConnectionStatus(false),
 	txTimer(NULL),
@@ -50,7 +50,7 @@ Simulator::Simulator(const SimulatorSettings& params) :
 {
 	// move to thread
 	moveToThread(Core::ICore::instance()->threadManager()->getRealTimeThread());
-	connect(this, SIGNAL(myStart()), this, SLOT(onStart()),Qt::QueuedConnection);
+        connect(this, SIGNAL(myStart()), this, SLOT(onStart()),Qt::QueuedConnection);
 	emit myStart();
 }
 
@@ -116,6 +116,7 @@ void Simulator::onStart()
 	ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
 	UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
 	actDesired = ActuatorDesired::GetInstance(objManager);
+        manCtrlCommand = ManualControlCommand::GetInstance(objManager);
 	posHome = HomeLocation::GetInstance(objManager);
 	velActual = VelocityActual::GetInstance(objManager);
 	posActual = PositionActual::GetInstance(objManager);
@@ -140,19 +141,21 @@ void Simulator::onStart()
 	outSocket = new QUdpSocket();
 	setupUdpPorts(settings.hostAddress,settings.inPort,settings.outPort);
 
-	emit processOutput("\nHost: " + settings.hostAddress + "\n" + \
-					   "inputPort: " + QString::number(settings.inPort) + "\n" + \
-					   "outpurPort: " + QString::number(settings.outPort) + "\n");
+        emit processOutput("\nLocal interface: " + settings.hostAddress + "\n" + \
+                           "Remote interface: " + settings.remoteHostAddress + "\n" + \
+                           "inputPort: " + QString::number(settings.inPort) + "\n" + \
+                           "outputPort: " + QString::number(settings.outPort) + "\n");
 
-	qxtLog->info("\nHost: " + settings.hostAddress + "\n" + \
-					   "inputPort: " + QString::number(settings.inPort) + "\n" + \
-					   "outpurPort: " + QString::number(settings.outPort) + "\n");
+        qxtLog->info("\nLocal interface: " + settings.hostAddress + "\n" + \
+                     "Remote interface: " + settings.remoteHostAddress + "\n" + \
+                     "inputPort: " + QString::number(settings.inPort) + "\n" + \
+                     "outputPort: " + QString::number(settings.outPort) + "\n");
 
-//	if(!inSocket->waitForConnected(5000))
-//		processOutput(QString("Can't connect to %1 on %2 port!").arg(settings.hostAddress).arg(settings.inPort));
-	//outSocket->connectToHost(settings.hostAddress,settings.outPort); // FG
-	//if(!outSocket->waitForConnected(5000))
-	//	processOutput(QString("Can't connect to %1 on %2 port!").arg(settings.hostAddress).arg(settings.outPort));
+//        if(!inSocket->waitForConnected(5000))
+//                emit processOutput(QString("Can't connect to %1 on %2 port!").arg(settings.hostAddress).arg(settings.inPort));
+//        outSocket->connectToHost(settings.hostAddress,settings.outPort); // FG
+//        if(!outSocket->waitForConnected(5000))
+//                emit processOutput(QString("Can't connect to %1 on %2 port!").arg(settings.hostAddress).arg(settings.outPort));
 
 
 	connect(inSocket, SIGNAL(readyRead()), this, SLOT(receiveUpdate()),Qt::DirectConnection);
@@ -173,6 +176,7 @@ void Simulator::onStart()
 	time->start();
 	current.T=0;
 	current.i=0;
+
 }
 
 void Simulator::receiveUpdate()

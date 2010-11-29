@@ -35,6 +35,7 @@ HITLConfiguration::HITLConfiguration(QString classId, QSettings* qSettings, QObj
         settings.dataPath = "";
         settings.manual = false;
         settings.hostAddress = "127.0.0.1";
+        settings.remoteHostAddress = "127.0.0.1";
         settings.outPort = 0;
         settings.inPort = 0;
         settings.latitude = "";
@@ -47,6 +48,7 @@ HITLConfiguration::HITLConfiguration(QString classId, QSettings* qSettings, QObj
                 settings.dataPath = qSettings->value("dataPath").toString();
                 settings.manual = qSettings->value("manual").toBool();
                 settings.hostAddress = qSettings->value("hostAddress").toString();
+                settings.remoteHostAddress = qSettings->value("remoteHostAddress").toString();
                 settings.outPort = qSettings->value("outPort").toInt();
                 settings.inPort = qSettings->value("inPort").toInt();
                 settings.latitude = qSettings->value("latitude").toString();
@@ -72,6 +74,7 @@ void HITLConfiguration::saveConfig(QSettings* qSettings) const {
     qSettings->setValue("dataPath", settings.dataPath);
     qSettings->setValue("manual", settings.manual);
     qSettings->setValue("hostAddress", settings.hostAddress);
+    qSettings->setValue("remoteHostAddress", settings.remoteHostAddress);
     qSettings->setValue("outPort", settings.outPort);
     qSettings->setValue("inPort", settings.inPort);
     qSettings->setValue("latitude", settings.latitude);

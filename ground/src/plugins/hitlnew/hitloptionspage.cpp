@@ -77,8 +77,10 @@ QWidget *HITLOptionsPage::createPage(QWidget *parent)
 	m_optionsPage->executablePath->setPath(config->Settings().binPath);
 	m_optionsPage->dataPath->setPath(config->Settings().dataPath);
 	m_optionsPage->manualControl->setChecked(config->Settings().manual);
+        m_optionsPage->startSim->setChecked(config->Settings().startSim);
 
-	m_optionsPage->hostAddress->setText(config->Settings().hostAddress);
+        m_optionsPage->hostAddress->setText(config->Settings().hostAddress);
+        m_optionsPage->remoteHostAddress->setText(config->Settings().remoteHostAddress);
 	m_optionsPage->outputPort->setText(QString::number(config->Settings().outPort));
 	m_optionsPage->inputPort->setText(QString::number(config->Settings().inPort));
 	m_optionsPage->latitude->setText(config->Settings().latitude);
@@ -96,7 +98,9 @@ void HITLOptionsPage::apply()
 	settings.binPath = m_optionsPage->executablePath->path();
 	settings.dataPath = m_optionsPage->dataPath->path();
 	settings.manual = m_optionsPage->manualControl->isChecked();
+        settings.startSim = m_optionsPage->startSim->isChecked();
 	settings.hostAddress = m_optionsPage->hostAddress->text();
+        settings.remoteHostAddress = m_optionsPage->remoteHostAddress->text();
 
 	settings.inPort = m_optionsPage->inputPort->text().toInt();
 	settings.outPort = m_optionsPage->outputPort->text().toInt();

@@ -34,6 +34,13 @@
          <format>%f</format>
        </chunk>
 
+      <chunk>
+         <name>udpRecvByFGcount</name>
+         <node>/OP/udp-counter</node>
+         <type>int</type>
+         <format>%d</format>
+       </chunk>
+
    </input>
 
    <output>
@@ -208,6 +215,13 @@
          <type>float</type>
          <format>%f</format>
       </chunk>
+
+      <chunk>
+         <name>udpRecvByFGcount</name>
+         <node>/OP/udp-counter</node>
+         <type>int</type>
+         <format>%d</format>
+       </chunk>
 
    </output>
 

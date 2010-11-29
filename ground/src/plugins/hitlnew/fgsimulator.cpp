@@ -55,6 +55,8 @@ const float FGSimulator::FPS2CMPS = 30.48;
 FGSimulator::FGSimulator(const SimulatorSettings& params) :
 		Simulator(params)
 {
+    udpCounterFGrecv = 0;
+    udpCounterGCSsend = 0;
 }
 
 FGSimulator::~FGSimulator()
@@ -64,7 +66,10 @@ FGSimulator::~FGSimulator()
 
 void FGSimulator::setupUdpPorts(const QString& host, int inPort, int outPort)
 {
-	inSocket->bind(QHostAddress(host), inPort);
+    if(inSocket->bind(QHostAddress(host), inPort))
+        emit processOutput("Successfully bound to address " + host + " on port " + QString::number(inPort) + "\n");
+    else
+        emit processOutput("Cannot bind to address " + host + " on port " + QString::number(inPort) + "\n");
 }
 
 bool FGSimulator::setupProcess()
@@ -114,15 +119,28 @@ bool FGSimulator::setupProcess()
                      "--in-air " +
                      "--altitude=3000 " +
                      "--vc=100 " +
-                     "--generic=socket,out,50,localhost," + QString::number(settings.inPort) + ",udp,opfgprotocol");
+                     "--log-level=alert" +
+                     "--generic=socket,out,20," + settings.hostAddress + "," + QString::number(settings.inPort) + ",udp,opfgprotocol");
 	if(!settings.manual)
 	{
-            args.append(" --generic=socket,in,400,localhost," + QString::number(settings.outPort) + ",udp,opfgprotocol");
+            args.append(" --generic=socket,in,400," + settings.remoteHostAddress + "," + QString::number(settings.outPort) + ",udp,opfgprotocol");
 	}
 
-	// Start FlightGear
-	QString cmd("\"" + settings.binPath + "\" " + args + "\n");
-	simProcess->write(cmd.toAscii());
+        // Start FlightGear - only if checkbox is selected in HITL options page
+        if (settings.startSim)
+        {
+            QString cmd("\"" + settings.binPath + "\" " + args + "\n");
+            simProcess->write(cmd.toAscii());
+        }
+        else
+        {
+            emit processOutput("Start Flightgear from the command line with the following arguments: \n\n" + args + "\n\n" +
+                               "You can optionally run Flightgear from a networked computer.\n" +
+                               "Make sure the computer running Flightgear can can ping your local interface adapter. ie." + settings.hostAddress + "\n"
+                               "Remote computer must have the correct OpenPilot protocol installed.");
+        }
+
+        udpCounterGCSsend = 0;
 
 	return true;
 }
@@ -139,21 +157,78 @@ void FGSimulator::processReadyRead()
 
 void FGSimulator::transmitUpdate()
 {
-	// Read ActuatorDesired from autopilot
-	ActuatorDesired::DataFields actData = actDesired->getData();
-	float ailerons = actData.Roll;
-	float elevator = -actData.Pitch;
-	float rudder = actData.Yaw;
-	float throttle = actData.Throttle;
+    ActuatorDesired::DataFields actData;
+    ManualControlCommand::DataFields manCtrlData = manCtrlCommand->getData();
+
+    float ailerons = -1;
+    float elevator = -1;
+    float rudder = -1;
+    float throttle = -1;
+
+    if(manCtrlData.FlightMode == ManualControlCommand::FLIGHTMODE_MANUAL)
+    {
+        // Read joystick input
+        if(manCtrlData.Armed == ManualControlCommand::ARMED_TRUE)
+        {
+            ailerons = manCtrlData.Roll;
+            elevator = -manCtrlData.Pitch;
+            rudder = manCtrlData.Yaw;
+            throttle = manCtrlData.Throttle;
+        }
+    }
+    else
+    {
+         // Read ActuatorDesired from autopilot
+        actData = actDesired->getData();
+
+        ailerons = actData.Roll;
+        elevator = -actData.Pitch;
+        rudder = actData.Yaw;
+        throttle = actData.Throttle;
+    }
+
+    int allowableDifference = 10;
+
+    if(udpCounterFGrecv == udpCounterGCSsend)
+        udpCounterGCSsend = 0;
+    
+    if(udpCounterGCSsend < allowableDifference ) //FG udp queue is not delayed
+    {       
+        udpCounterGCSsend++;
+
 	// Send update to FlightGear
 	QString cmd;
-	cmd = QString("%1,%2,%3,%4\n")
-		  .arg(ailerons)
-		  .arg(elevator)
-		  .arg(rudder)
-		  .arg(throttle);
+        cmd = QString("%1,%2,%3,%4,%5\n")
+              .arg(ailerons) //ailerons
+              .arg(elevator) //elevator
+              .arg(rudder) //rudder
+              .arg(throttle) //throttle
+              .arg(udpCounterGCSsend); //UDP packet counter delay
+
 	QByteArray data = cmd.toAscii();
-	outSocket->writeDatagram(data, QHostAddress(settings.hostAddress), settings.outPort);
+
+        if(outSocket->writeDatagram(data, QHostAddress(settings.remoteHostAddress), settings.outPort) == -1)
+        {
+            emit processOutput("Error sending UDP packet to FG: " + outSocket->errorString() + "\n");
+        }
+    }
+    else
+    {
+        // don't send new packet. Flightgear cannot process UDP fast enough.
+        // V1.9.1 reads udp packets at set frequency and will get delayed if packets are sent too fast
+        // V2.0 does not currently work with --generic-protocol
+    }
+    
+    if(!settings.manual)
+    {
+        actData.Roll = ailerons;
+        actData.Pitch = elevator;
+        actData.Yaw = rudder;
+        actData.Throttle = throttle;
+        //actData.NumLongUpdates = (float)udpCounterFGrecv;
+        //actData.UpdateTime = (float)udpCounterGCSsend;
+        actDesired->setData(actData);
+    }
 }
 
 
@@ -211,6 +286,10 @@ void FGSimulator::processUpdate(const QByteArray& inp)
 	float velocityActualEast = fields[22].toFloat() * FPS2CMPS;	
 	// Get VelocityActual Down (cm/s)
 	float velocityActualNorth = fields[23].toFloat() * FPS2CMPS;
+
+        // Get UDP packets received by FG
+        int n = fields[24].toInt();
+        udpCounterFGrecv = n;
 
         //run once
         HomeLocation::DataFields homeData = posHome->getData();

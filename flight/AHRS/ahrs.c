@@ -170,7 +170,7 @@ void ins_outdoor_update()
 		 * we should try and see if the altitude from the home location is good enough 
 		 * to use for the offset but for now starting with this conservative filter    
 		 */
-		if(fabs(gps_data.NED[2] + altitude_data.altitude) > 10) {
+		if(fabs(gps_data.NED[2] + (altitude_data.altitude - baro_offset)) > 10) {
 			baro_offset = gps_data.NED[2] + altitude_data.altitude;
 		} else {
 			/* IIR filter with 100 second or so tau to keep them crudely in the same frame */
@@ -198,7 +198,7 @@ void ins_outdoor_update()
 	 * TODO: Need to add a general sanity check for all the inputs to make sure their kosher 
 	 * although probably should occur within INS itself 
 	 */
-	INSCorrection(mag_data.scaled.axis, gps_data.NED, vel, -altitude_data.altitude - baro_offset, sensors);	
+	INSCorrection(mag_data.scaled.axis, gps_data.NED, vel, altitude_data.altitude - baro_offset, sensors);	
 }
 
 /**
@@ -266,7 +266,7 @@ void ins_indoor_update()
 	 * TODO: Need to add a general sanity check for all the inputs to make sure their kosher 
 	 * although probably should occur within INS itself 
 	 */
-	INSCorrection(mag_data.scaled.axis, gps_data.NED, vel, -altitude_data.altitude, sensors | HORIZ_SENSORS | VERT_SENSORS);	
+	INSCorrection(mag_data.scaled.axis, gps_data.NED, vel, altitude_data.altitude, sensors | HORIZ_SENSORS | VERT_SENSORS);	
 }
 
 /**

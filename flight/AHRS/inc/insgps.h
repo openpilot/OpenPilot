@@ -79,6 +79,7 @@ struct NavStruct {
 	float Pos[3];		// Position in meters and relative to a local NED frame
 	float Vel[3];		// Velocity in meters and in NED
 	float q[4];		// unit quaternion rotation relative to NED
+	float gyro_bias[3];
 } Nav;
 
 /**

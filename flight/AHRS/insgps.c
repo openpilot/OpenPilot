@@ -92,7 +92,7 @@ void INSGPSInit()		//pretty much just a place holder for now
 
 	Q[0] = Q[1] = Q[2] = 50e-8;	// gyro noise variance (rad/s)^2
 	Q[3] = Q[4] = Q[5] = 0.01;	// accelerometer noise variance (m/s^2)^2
-	Q[6] = Q[7] = Q[8] = 2e-6;	// gyro bias random walk variance (rad/s^2)^2
+	Q[6] = Q[7] = Q[8] = 2e-14;	// gyro bias random walk variance (rad/s^2)^2
 
 	R[0] = R[1] = 0.004;	// High freq GPS horizontal position noise variance (m^2)
 	R[2] = 0.036;		// High freq GPS vertical position noise variance (m^2)
@@ -234,6 +234,9 @@ void INSStatePrediction(float gyro_data[3], float accel_data[3], float dT)
 	Nav.q[1] = X[7];
 	Nav.q[2] = X[8];
 	Nav.q[3] = X[9];
+	Nav.gyro_bias[0] = X[10];
+	Nav.gyro_bias[1] = X[11];
+	Nav.gyro_bias[2] = X[12];	
 }
 
 void INSCovariancePrediction(float dT)

@@ -151,6 +151,12 @@ plugin_gcscontrol.depends += plugin_uavobjects
 plugin_gcscontrol.depends += plugin_uavtalk
 SUBDIRS += plugin_gcscontrol
 
+# Antenna tracker
+#plugin_antennatrack.subdir = antennatrack
+#plugin_antennatrack.depends = plugin_coreplugin
+#plugin_antennatrack.depends = plugin_uavtalk
+#SUBDIRS += plugin_antennatrack
+
 # Empty UAVGadget - Default for new splits
 plugin_magicwaypoint.subdir = magicwaypoint
 plugin_magicwaypoint.depends = plugin_coreplugin

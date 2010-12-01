@@ -14,7 +14,7 @@
    height="258.02744"
    id="svg10068"
    version="1.1"
-   inkscape:version="0.47 r22583"
+   inkscape:version="0.48.0 r9654"
    sodipodi:docname="ahrs-calib.svg"
    inkscape:export-filename="H:\Documents\Hobbies\W433\My Gauges\vbat-001.png"
    inkscape:export-xdpi="103.61"
@@ -286,14 +286,14 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8"
+     inkscape:zoom="1.4"
      inkscape:cx="574.08216"
-     inkscape:cy="117.47189"
+     inkscape:cy="191.7576"
      inkscape:document-units="px"
      inkscape:current-layer="background"
      showgrid="false"
      inkscape:window-width="1366"
-     inkscape:window-height="693"
+     inkscape:window-height="691"
      inkscape:window-x="0"
      inkscape:window-y="24"
      inkscape:window-maximized="1"
@@ -474,16 +474,16 @@
            style="font-size:23.50640677999999895px;fill:#ffffff;fill-opacity:1">Gyro</tspan></text>
       <text
          xml:space="preserve"
-         style="font-size:47.01281356999999161px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
-         x="797.87463"
+         style="font-size:47.01281357px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
+         x="769.66687"
          y="-452.0961"
          id="text6763"
          transform="matrix(0,0.85083189,-1.1753203,0,0,0)"><tspan
            sodipodi:role="line"
            id="tspan6765"
-           x="797.87463"
+           x="769.66687"
            y="-452.0961"
-           style="font-size:23.50640677999999895px;fill:#ffffff;fill-opacity:1">Mag</tspan></text>
+           style="font-size:23.50640678px;fill:#ffffff;fill-opacity:1">Mag*1E-3</tspan></text>
     </g>
   </g>
   <g

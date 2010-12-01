@@ -659,12 +659,13 @@ void ConfigAHRSWidget::drawVariancesGraph()
     float gyro_z_var = -1/steps*(1+steps+log10(field->getValue(2).toFloat()));
     gyro_z->setTransform(QTransform::fromScale(1,gyro_z_var),false);
 
+    // Scale by 1e-3 because mag vars are much higher.
     field = obj->getField(QString("mag_var"));
-    float mag_x_var = -1/steps*(1+steps+log10(field->getValue(0).toFloat()));
+    float mag_x_var = -1/steps*(1+steps+log10(1e-3*field->getValue(0).toFloat()));
     mag_x->setTransform(QTransform::fromScale(1,mag_x_var),false);
-    float mag_y_var = -1/steps*(1+steps+log10(field->getValue(1).toFloat()));
+    float mag_y_var = -1/steps*(1+steps+log10(1e-3*field->getValue(1).toFloat()));
     mag_y->setTransform(QTransform::fromScale(1,mag_y_var),false);
-    float mag_z_var = -1/steps*(1+steps+log10(field->getValue(2).toFloat()));
+    float mag_z_var = -1/steps*(1+steps+log10(1e-3*field->getValue(2).toFloat()));
     mag_z->setTransform(QTransform::fromScale(1,mag_z_var),false);
 
 }

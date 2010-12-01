@@ -401,18 +401,17 @@ namespace jafar {
 
 					if (g_.storage() == LOCAL) {
 						if (g_.hasNullCov()) {
-							s << "\n .x : " << g_.x_ << "\n";
+							s << "\n  .x : " << g_.x_ << "\n";
 						}
 						else { // Null covariance
-							s << "\n .x : " << g_.x_ << "\n";
-							s << " .P : " << g_.P_;
+							s << "\n  .x : " << g_.x_ << "\n";
+							s << "  .P : " << g_.P_;
 						}
 					}
 					else { // REMOTE
-						s << "\n REM->[" << g_.x_.data().size() << "](...)\n";
-						s << " .ia: " << g_.ia_ << "\n";
-						s << " .x : " << g_.x_ << "\n";
-						s << " .P : " << g_.P_;
+						s << "  .ia: " << g_.ia_ << "\n";
+						s << "  .x : " << g_.x_ << "\n";
+						s << "  .P : " << g_.P_;
 					}
 					return s;
 				}

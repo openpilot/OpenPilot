@@ -606,6 +606,12 @@ void demo_slam01_main(world_ptr_t *world) {
 	{
 		viewerQt = PTR_CAST<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
 		viewerQt->bufferize(*world);
+		
+		// initializing stuff for controlling run/pause from viewer
+		boost::unique_lock<boost::mutex> runStatus_lock(viewerQt->runStatus.mutex);
+		viewerQt->runStatus.pause = intOpts[iPause];
+		viewerQt->runStatus.render_all = intOpts[iRenderAll];
+		runStatus_lock.unlock();
 	}
 	#endif
 	#ifdef HAVE_MODULE_GDHE
@@ -752,7 +758,18 @@ JFR_DEBUG("Robot state stdev after corrections " << sqrt(ublas::matrix_vector_ra
 			}
 // cout << "SLAM: processed a frame: t " << (*world)->t << " display_t " << (*world)->display_t << endl;
 
-			if (intOpts[iRenderAll])
+			bool renderAll;
+			#ifdef HAVE_MODULE_QDISPLAY
+			if (intOpts[iDispQt])
+			{
+				boost::unique_lock<boost::mutex> runStatus_lock(viewerQt->runStatus.mutex);
+				renderAll = viewerQt->runStatus.render_all;
+				runStatus_lock.unlock();
+			} else
+			#endif
+			renderAll = (intOpts[iRenderAll] != 0);
+
+			if (renderAll)
 			{
 				boost::unique_lock<boost::mutex> display_lock((*world)->display_mutex);
 				while(!(*world)->display_rendered && !(*world)->exit()) (*world)->display_condition.wait(display_lock);
@@ -809,12 +826,30 @@ JFR_DEBUG("Robot state stdev after corrections " << sqrt(ublas::matrix_vector_ra
 //		int t = (*world)->t;
 //		worldPtr->display_mutex.unlock();
 
-		bool doPause = (intOpts[iPause] != 0);
-		unsigned pose_start = intOpts[iPause];
-		if (pose_start == 1) pose_start = 0;
-		if (doPause && (*world)->t >= pose_start && had_data && !(*world)->exit())
+		bool doPause;
+		#ifdef HAVE_MODULE_QDISPLAY
+		if (intOpts[iDispQt])
+		{
+			boost::unique_lock<boost::mutex> runStatus_lock(viewerQt->runStatus.mutex);
+			doPause = viewerQt->runStatus.pause;
+			runStatus_lock.unlock();
+		} else
+		#endif
+		doPause = (intOpts[iPause] != 0);
+		if (doPause && had_data && !(*world)->exit())
 		{
 			(*world)->slam_blocked(true);
+			#ifdef HAVE_MODULE_QDISPLAY
+			if (intOpts[iDispQt])
+			{
+				boost::unique_lock<boost::mutex> runStatus_lock(viewerQt->runStatus.mutex);
+				do {
+					viewerQt->runStatus.condition.wait(runStatus_lock);
+				} while (viewerQt->runStatus.pause && !viewerQt->runStatus.next);
+				viewerQt->runStatus.next = 0;
+				runStatus_lock.unlock();
+			} else
+			#endif
 			getchar(); // wait for key in replay mode
 			(*world)->slam_blocked(false);
 		}

@@ -69,7 +69,6 @@ namespace jafar {
 			mat V_sg(3, 7);
 			mat V_lmk(3, 7);
 			mat23 EXP_v;
-
 			quaternion::eucToFrame(sg, lmk, v, V_sg, V_lmk);
 			dist(0) = norm_2(v)*jmath::sign(v(2));
 

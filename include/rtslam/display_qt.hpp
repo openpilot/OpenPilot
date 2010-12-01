@@ -40,6 +40,16 @@ class SensorQt;
 class LandmarkQt;
 class ObservationQt;
 
+struct RunStatus
+{
+	bool pause;
+	bool next;
+	bool render_all;
+	boost::condition_variable condition;
+	boost::mutex mutex;
+	RunStatus(): next(false) {}
+};
+
 
 #if DEFINE_USELESS_OBJECTS
 class ViewerQt: public Viewer<WorldQt,MapQt,RobotQt,SensorQt,LandmarkQt,ObservationQt,
@@ -55,6 +65,7 @@ class ViewerQt: public Viewer<WorldQt,MapQt,RobotQt,SensorQt,LandmarkQt,Observat
 		ViewerQt(int _fontSize = 8, double _ellipsesScale = 3.0, bool _dump = false, std::string _dump_pattern = "data/rendered2D_%02d-%06d.png"): 
 			fontSize(_fontSize), ellipsesScale(_ellipsesScale), doDump(_dump), dump_pattern(_dump_pattern) {}
 		void dump(std::string filepattern); // pattern with %d for sensor id
+		static RunStatus runStatus;
 };
 #else
 #error "does not work"
@@ -112,8 +123,10 @@ class RobotQt : public RobotDisplay
 /** **************************************************************************
 
 */
-class SensorQt : public SensorDisplay
+class SensorQt : public QObject, public SensorDisplay
 {
+	Q_OBJECT
+	private:
 		ViewerQt *viewerQt;
 	public:
 		// buffered data
@@ -137,6 +150,9 @@ class SensorQt : public SensorDisplay
 		void bufferize();
 		void render();
 		void dump(std::string filename);
+	public slots:
+		void onKeyPress(QKeyEvent *event);
+		void onMouseClick(QGraphicsSceneMouseEvent *mouseEvent, bool isClick);
 };
 
 #if DEFINE_USELESS_OBJECTS

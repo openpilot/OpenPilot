@@ -13,6 +13,8 @@ namespace jafar {
 namespace rtslam {
 namespace display {
 
+	RunStatus ViewerQt::runStatus;
+	
 	void ViewerQt::dump(std::string filepattern) // pattern with %d for sensor id
 	{
 		char filename[256];
@@ -90,6 +92,13 @@ namespace display {
 		if (view_private == NULL)
 		{
 			viewer_ = new qdisplay::Viewer();
+std::cout << "connecting slots" << std::endl;
+//connect(this, SIGNAL(onKeyPress(QKeyEvent*)), this, SLOT(test_slots(QKeyEvent*)));
+			if (!connect(viewer_, SIGNAL(onKeyPress(QKeyEvent*)), this, SLOT(onKeyPress(QKeyEvent*)), Qt::DirectConnection))
+				std::cout << "connect onKeyPress failed" << std::endl;
+			if (!connect(viewer_, SIGNAL(onMouseClick(QGraphicsSceneMouseEvent*, bool)), this, SLOT(onMouseClick(QGraphicsSceneMouseEvent*, bool)), Qt::DirectConnection))
+				std::cout << "connect onMouseClick failed" << std::endl;
+		
 			view_private = new qdisplay::ImageView();
 			viewer_->setImageView(view_private, 0, 0);
 			viewer_->resize(size.width+20,size.height+20);
@@ -359,6 +368,77 @@ namespace display {
 	}
 
 
+	void SensorQt::onKeyPress(QKeyEvent *event)
+	{
+		switch (event->key())
+		{
+			case Qt::Key_Space:
+			case Qt::Key_P: { // pause/run
+				boost::unique_lock<boost::mutex> runStatus_lock(viewerQt->runStatus.mutex);
+				viewerQt->runStatus.pause = !viewerQt->runStatus.pause;
+				runStatus_lock.unlock();
+				viewerQt->runStatus.condition.notify_all();
+				std::cout << "pause: " << (viewerQt->runStatus.pause ? "ON" : "OFF") << std::endl;
+				break;
+			}
+			case Qt::Key_Right:
+			case Qt::Key_Period:
+			case Qt::Key_N: { // next frame
+				boost::unique_lock<boost::mutex> runStatus_lock(viewerQt->runStatus.mutex);
+				viewerQt->runStatus.next = 1;
+				viewerQt->runStatus.pause = 1;
+				runStatus_lock.unlock();
+				viewerQt->runStatus.condition.notify_all();
+				break;
+			}
+			case Qt::Key_A:
+			case Qt::Key_R:
+			case Qt::Key_F: { // fast mode (don't render all)
+				boost::unique_lock<boost::mutex> runStatus_lock(viewerQt->runStatus.mutex);
+				viewerQt->runStatus.render_all = !viewerQt->runStatus.render_all;
+				runStatus_lock.unlock();
+				std::cout << "render-all: " << (viewerQt->runStatus.render_all ? "ON" : "OFF") << std::endl;
+				break;
+			}
+			case Qt::Key_Q: { // quit
+				QApplication::quit();
+				break;
+			}
+		}
+	}
+	
+	void SensorQt::onMouseClick(QGraphicsSceneMouseEvent *mouseEvent, bool isClick)
+	{
+		if (!isClick) return;
+		QGraphicsItem *clickedItem = viewer_->scene()->itemAt(mouseEvent->buttonDownScenePos(mouseEvent->button()));
+		ObservationAbstract *clickedObs = NULL;
+		
+		for(SensorAbstract::DataManagerList::iterator itDm = slamSen_->dataManagerList().begin();
+		    !clickedObs && itDm != slamSen_->dataManagerList().end(); ++itDm)
+		for(DataManagerAbstract::ObservationList::iterator itObs = (*itDm)->observationList().begin();
+		    !clickedObs && itObs != (*itDm)->observationList().end(); ++itObs)
+		{
+			ObservationQt *obs = PTR_CAST<ObservationQt*>((*itObs)->displayData[ViewerQt::id()]);
+			
+			for(ObservationQt::ItemList::iterator itItem = obs->items_.begin();
+			    !clickedObs && itItem != obs->items_.end(); ++itItem)
+				if ((*itItem)->hasItem(clickedItem)) clickedObs = itObs->get();
+		}
+		
+		if (clickedObs)
+		{
+			std::cout << "-----------------------------------------------" << std::endl;
+			std::cout << *clickedObs << std::endl;
+			std::cout << clickedObs->landmark() << std::endl;
+		}
+
+		
+	}
+
+
+
 }}}
+
+#include "display_qt.moc"
 
 #endif

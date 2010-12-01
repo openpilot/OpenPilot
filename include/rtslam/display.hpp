@@ -438,6 +438,7 @@ class ThreadSafeGarbageCollector
 			color_transparency,
 			color_yellow,
 			color_magenta,
+			color_darkred,
 			color_blue,
 			color_red,
 			color_cyan,
@@ -460,9 +461,9 @@ class ThreadSafeGarbageCollector
 					switch(lmk_phase)
 					{
 						case LandmarkDisplay::init: {
-							if (events.updated) return color_red;
-							if (events.matched) return color_magenta;
-							if (events.predicted) return color_magenta;
+							if (events.updated) return color_magenta;
+							if (events.matched) return color_darkred;
+							if (events.predicted) return color_darkred;
 							return color_yellow;
 						}
 						case LandmarkDisplay::converged: {
@@ -577,13 +578,16 @@ class ThreadSafeGarbageCollector
 			result.set(0,0,0);
 			switch (colorOrigin) {
 				case color_blue:
-					result.set(0,0,255);
+					result.set(0,0,224);
 					break;
 				case color_cyan:
 					result.set(0,255,255);
 					break;
 				case color_magenta:
-					result.set(255,0,255);
+					result.set(255,0,192);
+					break;
+				case color_darkred:
+					result.set(144,0,0);
 					break;
 				case color_red:
 					result.set(255,0,0);

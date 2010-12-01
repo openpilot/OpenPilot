@@ -3,7 +3,8 @@
 
 #include <QGraphicsView>
 #include <QStatusBar>
-
+#include <QGraphicsSceneMouseEvent>
+#include <QKeyEvent>
 #include <QMap>
 
 namespace jafar {
@@ -13,11 +14,16 @@ class ImageView;
 class Shape;
 class Line;
 class PolyLine;
+class Viewer;
 
 class MouseGraphicsScene: public QGraphicsScene
 {
+	private:
+		Viewer* viewer;
 	public:
+		MouseGraphicsScene(Viewer* viewer): viewer(viewer) {}
 		void mouseMoveEvent ( QGraphicsSceneMouseEvent * event );
+		void mouseReleaseEvent ( QGraphicsSceneMouseEvent * mouseEvent );
 };
 
 /**
@@ -109,17 +115,21 @@ class Viewer : public QGraphicsView {
      */
     void exportView( const std::string& fileName );
   public slots:
-    void exportView();
-	//void updateSceneRect();
+		void exportView();
+		//void updateSceneRect();
+	signals:
+		void onKeyPress(QKeyEvent *event);
+		void onMouseClick(QGraphicsSceneMouseEvent *mouseEvent, bool isClick);
   protected:
     virtual void contextMenuEvent ( QContextMenuEvent * event );
     virtual void keyPressEvent ( QKeyEvent * event );
     virtual void wheelEvent(QWheelEvent *event);
-	virtual void resizeEvent(QResizeEvent  * event);
+    virtual void resizeEvent(QResizeEvent  * event);
     virtual void mouseReleaseEvent ( QMouseEvent * event );
     virtual void mouseMoveEvent ( QMouseEvent * event );
   private:
     QGraphicsScene* m_scene;
+		friend class MouseGraphicsScene;
     QMap< int, QMap< int, ImageView* > > m_imageMosaic;
     int m_mosaicWidth, m_mosaicHeight;
 		int m_windowWidth, m_windowHeight;			// added
@@ -136,6 +146,7 @@ class Viewer : public QGraphicsView {
 	 */
 	void createCursor();
 
+	
 	/** Status bar to display information  statusBar->showMessage( QString) 
 	 *
 	 * @see setStatusMessage

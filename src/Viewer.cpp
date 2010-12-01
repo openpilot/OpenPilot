@@ -1,8 +1,6 @@
 #include "qdisplay/Viewer.hpp"
 
 #include <QGraphicsScene>
-#include <QGraphicsSceneMouseEvent>
-#include <QKeyEvent>
 #include <QSplitter>
 #include <QWheelEvent>
 #include <QSvgGenerator>
@@ -39,7 +37,7 @@ Viewer::Viewer(int mosaicWidth, int mosaicHeight, QGraphicsScene* scene ) : m_sc
 	
 	//--- Setting up the scene
 	if(not m_scene) {
-		m_scene = new MouseGraphicsScene();
+		m_scene = new MouseGraphicsScene(this);
 	}
 	m_scene->setBackgroundBrush( Qt::white );
 	setDragMode(QGraphicsView::ScrollHandDrag);
@@ -267,6 +265,15 @@ void Viewer::keyPressEvent ( QKeyEvent * event )
       scaleView(1 / 1.2);
       break;
   }
+  emit onKeyPress(event);
+}
+
+
+void MouseGraphicsScene::mouseReleaseEvent ( QGraphicsSceneMouseEvent * mouseEvent )
+{
+	QPointF dp = mouseEvent->buttonDownScreenPos(mouseEvent->button()) - mouseEvent->screenPos();
+	bool isClick = (std::abs(dp.x()) < 4) && (std::abs(dp.y()) < 4);
+	emit viewer->onMouseClick(mouseEvent, isClick);
 }
 
 void Viewer::wheelEvent(QWheelEvent *event)
@@ -497,6 +504,8 @@ void Viewer::setTitleWithMouseCoordinates(double x, double y)
 	oss << "(" << x << "  " << y << ")";
 	setWindowTitle(oss.str().c_str());
 }
+
+
 
 
 #include "Viewer.moc"

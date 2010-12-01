@@ -71,6 +71,15 @@ void Shape::setBoundingBox( double x, double y, double w, double h)
   m_boundingRect = QRectF( -w * 0.5, -h * 0.5, w, h );
   setPos(x,y);
 }
-  
+
+bool Shape::hasItem(QGraphicsItem *item) const
+{
+	if (item == this) return true;
+	QList<QGraphicsItem *> children = childItems();
+	for(QList<QGraphicsItem *>::iterator it = children.begin(); it != children.end(); ++it)
+		if (*it == item) return true;
+	return false;
+}
+
 }
 }

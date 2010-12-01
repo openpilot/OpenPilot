@@ -52,6 +52,7 @@ class Shape : public QGraphicsItemGroup {
     void setFontSize(int s) { m_fontSize = s; }
     void setFontColor( int r, int g, int b) { m_fontColor.setRgb(r,g,b); if (m_label) m_label->setDefaultTextColor( m_fontColor ); }
     void setBoundingBox( double x, double y, double w, double h);
+    bool hasItem(QGraphicsItem *item) const;
   private:
     ShapeType m_shapeType;
     QRectF m_boundingRect;

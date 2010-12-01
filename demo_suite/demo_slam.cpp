@@ -149,10 +149,10 @@ const unsigned N_FRAMES = 500000;
 const unsigned MAP_SIZE = 500;
 
 // constant velocity robot uncertainties and perturbations
-const double UNCERT_VLIN = .3; // m/s
-const double UNCERT_VANG = .3; // rad/s
-const double PERT_VLIN = 0.5; // m/s per sqrt(s)
-const double PERT_VANG = 0.5; // rad/s per sqrt(s)
+const double UNCERT_VLIN = .5; // m/s
+const double UNCERT_VANG = .5; // rad/s
+const double PERT_VLIN = 2.0; // m/s per sqrt(s)
+const double PERT_VANG = 2.0; // rad/s per sqrt(s)
 
 // inertial robot initial uncertainties and perturbations - in addition to constant velocity option UNCERT_VLIN.
 //if (intOpts[iRobot] == 1) // == robot inertial
@@ -179,6 +179,20 @@ const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 }
 const double DISTORTION[3] = { -0.23193,   0.11306, 0.0 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
 */
 
+// flea2 with original obj after 2010/11/24
+const unsigned IMG_WIDTH = 640;
+const unsigned IMG_HEIGHT = 480;
+const double INTRINSIC[4] = { 306.2969,   264.7741,   499.9177,   494.4829 };
+const double DISTORTION[3] = { -0.2293129, 0.08793152, -0.01349877 };
+
+
+// flea2 with Schneider lens
+/*const unsigned IMG_WIDTH = 640;
+const unsigned IMG_HEIGHT = 480;
+const double INTRINSIC[4] = { 3.043313e+02, 2.407406e+02, 6.714993e+02, 6.714853e+02};
+const double DISTORTION[3] = { -2.900038e-01, 2.388370e-01, -2.006549e-01 };
+*/
+
 // jmcodol's robot
 /*const unsigned IMG_WIDTH = 640;
 const unsigned IMG_HEIGHT = 480;
@@ -187,12 +201,12 @@ const double INTRINSIC[4] = { 327.53722,   222.40418,   533.18050,   531.56182 }
 const double DISTORTION[3] = { 0.0, 0.0};
 */
 
-// saragosse sequence
+/*// saragosse sequence
 const unsigned IMG_WIDTH = 512;
 const unsigned IMG_HEIGHT = 384;
 const double INTRINSIC[4] = { 281.647017175628, 198.770772126498,   534.760390823972,   535.280428739968 };
 const double DISTORTION[3] = { -0.27546592313146917, 0.12644899941674098, 0.036648747902512463 };
-
+*/
 
 //
 const unsigned CORRECTION_SIZE = 4;
@@ -213,10 +227,10 @@ const unsigned PATCH_DESC = 45;
 const unsigned PATCH_SIZE = 13; // in pixels
 const unsigned MAX_SEARCH_SIZE = 50000; // in number of pixels
 const unsigned KILL_SEARCH_SIZE = 100000; // in number of pixels
-const double MATCH_TH = 0.90;
+const double MATCH_TH = 0.95;
 const double MAHALANOBIS_TH = 3; // in n_sigmas
-const unsigned N_UPDATES_TOTAL = 25;
-const unsigned N_UPDATES_RANSAC = 20;
+const unsigned N_UPDATES_TOTAL = 20;
+const unsigned N_UPDATES_RANSAC = 15;
 const unsigned N_INIT = 10;
 const unsigned N_RECOMP_GAINS = 3;
 const double RANSAC_LOW_INNOV = 1.0; // in pixels
@@ -230,8 +244,8 @@ const double MIN_SCORE = 0.9;
 const double PARTIAL_POSITION = 0.25;
 
 // data manager: active search tesselation grid for new features detection
-const unsigned GRID_VCELLS = 4;
-const unsigned GRID_HCELLS = 4;
+const unsigned GRID_VCELLS = 3;
+const unsigned GRID_HCELLS = 3;
 const unsigned GRID_MARGIN = 11;
 const unsigned GRID_SEPAR = 20;
 

@@ -283,13 +283,18 @@ static void manualControlTask(void *parameters)
 			ManualControlCommandSet(&cmd);
 		}
 
-		if(cmd.Throttle < 0 && !lowThrottleDetected) {
+		if((cmd.Throttle < 0) && !lowThrottleDetected) {
 			lowThrottleDetected = 1;
 			lowThrottleStart = lastSysTime;
-		} else if (cmd.Throttle)  
+		} else if (cmd.Throttle >= 0)  
 			lowThrottleDetected = 0;
-		else if((cmd.Throttle < 0) && (timeDifferenceMs(lowThrottleStart, lastSysTime) > ARMED_TIMEOUT_MS)) 
+		else if((cmd.Throttle < 0) && (timeDifferenceMs(lowThrottleStart, lastSysTime) > ARMED_TIMEOUT_MS)) {
 			cmd.Armed = MANUALCONTROLCOMMAND_ARMED_FALSE;
+			ManualControlCommandSet(&cmd);
+		} 
+
+		
+		
 			
 		/* Look for arm or disarm signal */
 		if ((cmd.Throttle <= 0.05) && (cmd.Roll <= -0.95)) {
@@ -363,8 +368,8 @@ static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutr
 
 static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time) {
 	if(end_time > start_time) 
-		return (end_time - start_time) / portTICK_RATE_MS;
-	return ((((portTICK_RATE_MS) -1) - start_time) + end_time) / portTICK_RATE_MS;		
+		return (end_time - start_time) * portTICK_RATE_MS;
+	return ((((portTICK_RATE_MS) -1) - start_time) + end_time) * portTICK_RATE_MS;		
 }
 			   
 

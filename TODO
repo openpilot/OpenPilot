@@ -16,8 +16,7 @@ Features
 - inertial slam <- in progress
 
 - estimation hardware <- IN PROGRESS FOR MTI
-- make rtslam Loggable with DataLogger
-- set up simulation
+- set up inertial simulation
 - config files:
   * slam-config: description of robots, sensors, hardware, calib, with uncertainties and their simu-factor
   * env-config: a simulated environment with description of landmarks, robots and sensors trajectories
@@ -25,6 +24,9 @@ Features
   * [or] simu-lmk and simu-traj
   * display-config: colors...
 - when doing replay, allow to have a sequence without missing images and simulate "real-time" (ignoring image loading of course)
+- make maps really abstract, and all rtslam not depending specifically on EKF
+
+- [ok] make rtslam Loggable with DataLogger
 
 Organization
 ------------------------------------

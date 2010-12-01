@@ -29,7 +29,7 @@
   
   It is initially conceived for vision sensors (cameras), although this is not a constraint.
   
-  - In single-camera mode, it aims at achieveing a minimum of 30fps operation with 640x480 B+W images.
+  - In single-camera mode, it achieves 60fps operation with 640x480 B+W images (on a decent machine)
   - In multi-camera mode this target framerate is to be divided by the number of sensors.
   
   If you are a developer, jump to \ref secImplementation. Otherwise keep reading.
@@ -63,7 +63,7 @@
 	comprehensive units. 
 	An Observation exists every time there exist a sensor and a landmark, 
 	regardless of the sensor having actually observed the landmark or not.
-	An observation stores everything related with the bynome sensor-landmark.
+	An observation stores everything related with the pair sensor-landmark.
 	Its type is determined by both the sensor type and the landmark type. 
 	Therefore, its methods and data depend on both the type of sensor and the type of landmark,
 	and cannot be stored, owned or contained in any other place. 

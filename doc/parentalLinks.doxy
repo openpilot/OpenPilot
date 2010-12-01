@@ -15,7 +15,14 @@
 	The figure below illustrates the family-tree organization for the case of a map 
 	with 2 robots and 2 landmarks, one robot with one sensor and the other one with 2 sensors.
 	
-	\image html familyTree.png "The family tree hierarchical organization"
+	\image html familyTree.png "The simplified family tree hierarchical organization"
+
+	This is actually a simplified view of RTSLAM. In order to generically manage different types
+	of sensors and landmarks, some managers have been introduced:
+	- MapManager that manages the landmarks of some type in a map
+	- DataManager that manages a sensor and landmark type at the data processing level
+
+	\image html familyTree_full.png "The full family tree hierarchical organization"
 	
 	It is important to notice the following facts:
 	- An imaginary line going through the sensor and the observations separates the parts of the SLAM problem

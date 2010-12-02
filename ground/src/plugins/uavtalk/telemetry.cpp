@@ -30,6 +30,7 @@
 #include <QTime>
 #include <QtGlobal>
 #include <stdlib.h>
+#include <QDebug>
 
 /**
  * Constructor
@@ -211,13 +212,17 @@ void Telemetry::transactionCompleted(UAVObject* obj)
     // Check if there is a pending transaction and the objects match
     if ( transPending && transInfo.obj->getObjID() == obj->getObjID() )
     {
-        // Send signal
-        obj->emitTransactionCompleted(true);
+    //    qDebug() << QString("Telemetry: transaction completed for %1").arg(obj->getName());
         // Complete transaction
         transTimer->stop();
         transPending = false;
+        // Send signal
+        obj->emitTransactionCompleted(true);
         // Process new object updates from queue
         processObjectQueue();
+    } else
+    {
+  //      qDebug() << "Error: received a transaction completed when did not expect it.";
     }
 }
 
@@ -226,6 +231,7 @@ void Telemetry::transactionCompleted(UAVObject* obj)
  */
 void Telemetry::transactionTimeout()
 {
+//    qDebug() << "Telemetry: transaction timeout.";
     transTimer->stop();
     // Proceed only if there is a pending transaction
     if ( transPending )
@@ -239,11 +245,11 @@ void Telemetry::transactionTimeout()
         }
         else
         {
-            // Send signal
-            transInfo.obj->emitTransactionCompleted(false);
             // Terminate transaction
             utalk->cancelTransaction();
             transPending = false;
+            // Send signal
+            transInfo.obj->emitTransactionCompleted(false);
             // Process new object updates from queue
             processObjectQueue();
             ++txErrors;
@@ -258,6 +264,7 @@ void Telemetry::processObjectTransaction()
 {
     if (transPending)
     {
+    //    qDebug() << tr("Process Object transaction for %1").arg(transInfo.obj->getName());
         // Initiate transaction
         if (transInfo.objRequest)
         {
@@ -277,6 +284,9 @@ void Telemetry::processObjectTransaction()
             transTimer->stop();
             transPending = false;
         }
+    } else
+    {
+  //      qDebug() << "Error: inside of processObjectTransaction with no transPending";
     }
 }
 
@@ -286,6 +296,7 @@ void Telemetry::processObjectTransaction()
 void Telemetry::processObjectUpdates(UAVObject* obj, EventMask event, bool allInstances, bool priority)
 {
     // Push event into queue
+//    qDebug() << "Push event into queue for obj " << QString("%1 event %2").arg(obj->getName()).arg(event);
     ObjectQueueInfo objInfo;
     objInfo.obj = obj;
     objInfo.event = event;
@@ -319,7 +330,11 @@ void Telemetry::processObjectUpdates(UAVObject* obj, EventMask event, bool allIn
     // If there is no transaction in progress then process event
     if (!transPending)
     {
+    //    qDebug() << "No transaction pending, process object queue...";
         processObjectQueue();
+    } else
+    {
+   //     qDebug() << "Transaction pending, DO NOT process object queue...";
     }
 }
 
@@ -328,6 +343,8 @@ void Telemetry::processObjectUpdates(UAVObject* obj, EventMask event, bool allIn
  */
 void Telemetry::processObjectQueue()
 {
+  //  qDebug() << "Process object queue " << tr("- Depth (%1 %2)").arg(objQueue.length()).arg(objPriorityQueue.length());
+
     // Don nothing if a transaction is already in progress (should not happen)
     if (transPending)
     {
@@ -382,6 +399,9 @@ void Telemetry::processObjectQueue()
         // Start transaction
         transPending = true;
         processObjectTransaction();
+    } else
+    {
+//        qDebug() << QString("Process object queue: this is an unpack event for %1").arg(objInfo.obj->getName());
     }
 
     // If this is a metaobject then make necessary telemetry updates
@@ -390,6 +410,14 @@ void Telemetry::processObjectQueue()
     {
         updateObject( metaobj->getParentObject() );
     }
+
+    // The fact we received an unpacked event does not mean that
+    // we do not have additional objects still in the queue,
+    // so we have to reschedule queue processing to make sure they are not
+    // stuck:
+    if ( objInfo.event == EV_UNPACKED )
+        processObjectQueue();
+
 }
 
 /**

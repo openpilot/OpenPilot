@@ -159,6 +159,7 @@ namespace jafar {
 					r2i = r2i * r2; //                    r2i = r^(2*(i+1))
 					s += d(i) * r2i; //                   s = 1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + ...
 				}
+				if (s < 0.5) s = 1.0; // because the model is not valid too much out of the image, avoid to wrongly bring them back in the field of view
 				return s;
 			}
 
@@ -221,6 +222,7 @@ namespace jafar {
 						r2im1 = r2im1 * r2;
 					}
 
+					if (s < 0.5) s = 1.0; // because the model is not valid too much out of the image, avoid to wrongly bring them back in the field of view
 					ud = s * up; // finally ud = (1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + ...) * u;
 
 					R2_up(0) = 2 * up(0);

@@ -299,17 +299,16 @@ static void positionPIDcontrol()
 	AttitudeDesiredData attitudeDesired;
 	AttitudeActualData attitudeActual;
 	GuidanceSettingsData guidanceSettings;
+	VelocityActualData velocityActual;
 	StabilizationSettingsData stabSettings;
 	SystemSettingsData systemSettings;
 	PositionActualData positionActual;
 	PositionDesiredData positionDesired;
 	
 	float northError;
-	float northDerivative;
 	float northCommand;
 	
 	float eastError;
-	float eastDerivative;
 	float eastCommand;
 	
 	// Check how long since last update
@@ -325,26 +324,26 @@ static void positionPIDcontrol()
 	StabilizationSettingsGet(&stabSettings);
 	PositionActualGet(&positionActual);
 	PositionDesiredGet(&positionDesired);
+	VelocityActualGet(&velocityActual);
 	
 	attitudeDesired.Yaw = 0;	// try and face north
 	
 	// Yaw and pitch output from ground speed PID loop
 	northError = positionDesired.North - positionActual.North;
-	northDerivative = (northError - northErrorLast) / dT;
-	northIntegral =
-	bound(northIntegral + northError * dT, -guidanceSettings.MaxVelIntegral,
-	      guidanceSettings.MaxVelIntegral);
-	northErrorLast = northError;
-	northCommand =
-	northError * guidanceSettings.VelP + northDerivative * guidanceSettings.VelD + northIntegral * guidanceSettings.VelI;
+	northIntegral = bound(northIntegral + northError * dT, 
+			      -guidanceSettings.MaxVelIntegral,
+			      guidanceSettings.MaxVelIntegral);
+	northCommand = northError * guidanceSettings.VelP + 
+			northIntegral * guidanceSettings.VelI -
+			velocityActual.North * guidanceSettings.VelD;
 	
 	eastError = positionDesired.East - positionActual.East;
-	eastDerivative = (eastError - eastErrorLast) / dT;
 	eastIntegral = bound(eastIntegral + eastError * dT, 
 			     -guidanceSettings.MaxVelIntegral,
 			     guidanceSettings.MaxVelIntegral);
-	eastErrorLast = eastError;
-	eastCommand = eastError * guidanceSettings.VelP + eastDerivative * guidanceSettings.VelD + eastIntegral * guidanceSettings.VelI;
+	eastCommand = eastError * guidanceSettings.VelP + 
+			eastIntegral * guidanceSettings.VelI  - 
+			velocityActual.East * guidanceSettings.VelD;
 	
 	// Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
 	// craft should move similarly for 5 deg roll versus 5 deg pitch

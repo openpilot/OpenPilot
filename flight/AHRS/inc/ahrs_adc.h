@@ -37,17 +37,16 @@
 #include <pios.h>
 
 // Maximum of 50 oversampled points
-#define MAX_SAMPLES (8*50*2)
+#define MAX_OVERSAMPLING 50    /* cannot have more than 50 samples      */
+#define MAX_SAMPLES (PIOS_ADC_NUM_CHANNELS*MAX_OVERSAMPLING*2)
 
+typedef void (*ADCCallback) (float * data);
+
+// Public API:
 uint8_t AHRS_ADC_Config(int32_t adc_oversample);
 void AHRS_ADC_DMA_Handler(void);
-
-typedef enum { AHRS_IDLE, AHRS_DATA_READY, AHRS_PROCESSING } states;
-extern volatile states ahrs_state;
-extern volatile int16_t *valid_data_buffer;
-//! Counts how many times the EKF wasn't idle when DMA handler called
-extern volatile int32_t total_conversion_blocks;
-//! Total number of data blocks converted
-extern volatile int32_t ekf_too_slow;
+void AHRS_ADC_SetCallback(ADCCallback);
+void AHRS_ADC_SetFIRCoefficients(float * new_filter);
+float * AHRS_ADC_GetBuffer();
 
 #endif

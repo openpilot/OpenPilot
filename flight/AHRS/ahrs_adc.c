@@ -39,12 +39,18 @@ void DMA1_Channel1_IRQHandler()
 
 //! Where the raw data is stored
 volatile int16_t raw_data_buffer[MAX_SAMPLES];	// Double buffer that DMA just used
-//! Swapped by interrupt handler to achieve double buffering
-volatile int16_t *valid_data_buffer;
-volatile int32_t total_conversion_blocks;
-volatile int32_t ekf_too_slow;
-volatile uint8_t adc_oversample;
-volatile states ahrs_state;
+
+//! Various configuration settings
+struct {
+	volatile int16_t *valid_data_buffer;
+	volatile uint8_t adc_oversample;
+	int16_t fir_coeffs[MAX_OVERSAMPLING];
+} adc_config;
+
+//! Filter coefficients used in decimation.  Limited order so filter can't run between samples
+float downsampled_buffer[PIOS_ADC_NUM_PINS];
+
+static ADCCallback callback_function = (ADCCallback) NULL;
 
 /* Local Variables */
 static GPIO_TypeDef *ADC_GPIO_PORT[PIOS_ADC_NUM_PINS] = PIOS_ADC_PORTS;
@@ -69,6 +75,8 @@ uint8_t AHRS_ADC_Config(int32_t adc_oversample)
 
 	int32_t i;
 
+	adc_config.adc_oversample = adc_oversample;
+	
 	ADC_DeInit(ADC1);
 	ADC_DeInit(ADC2);
 
@@ -185,7 +193,64 @@ uint8_t AHRS_ADC_Config(int32_t adc_oversample)
 	/* Finally start initial conversion */
 	ADC_SoftwareStartConvCmd(ADC1, ENABLE);
 
+	/* Use simple averaging filter for now */
+	for (int i = 0; i < adc_oversample; i++)
+		adc_config.fir_coeffs[i] = 1;
+	adc_config.fir_coeffs[adc_oversample] = adc_oversample;
+	
 	return 1;
+}
+
+/**
+ * @brief Set a callback function that is executed whenever
+ * the ADC double buffer swaps 
+ */
+void AHRS_ADC_SetCallback(ADCCallback new_function) 
+{
+	callback_function = new_function;
+}
+
+/**
+ * @brief Return the address of the downsampled data buffer 
+ */
+float * AHRS_ADC_GetBuffer() 
+{
+	return downsampled_buffer;
+}
+
+/**
+ * @brief Set the fir coefficients.  Takes as many samples as the 
+ * current filter order plus one (normalization)
+ *
+ * @param new_filter Array of adc_oversampling floats plus one for the
+ * filter coefficients
+ */
+void AHRS_ADC_SetFIRCoefficients(float * new_filter)
+{
+	// Less than or equal to get normalization constant
+	for(int i = 0; i <= adc_config.adc_oversample; i++) 
+		adc_config.fir_coeffs[i] = new_filter[i];
+}
+
+/**
+ * @brief Downsample the data for each of the channels then call
+ * callback function if installed
+ */ 
+void AHRS_ADC_downsample_data()
+{
+	uint16_t chan;
+	uint16_t sample;
+	
+	for (chan = 0; chan < PIOS_ADC_NUM_CHANNELS; chan++) {
+		downsampled_buffer[chan] = 0;
+		for (sample = 0; sample < adc_config.adc_oversample; sample++) {
+			downsampled_buffer[chan] += adc_config.valid_data_buffer[chan + sample * PIOS_ADC_NUM_CHANNELS] * adc_config.fir_coeffs[sample];
+		}
+		downsampled_buffer[chan] /= (float) adc_config.fir_coeffs[adc_config.adc_oversample];
+	}
+	
+	if(callback_function != NULL)
+		callback_function(downsampled_buffer);
 }
 
 /**
@@ -199,32 +264,22 @@ uint8_t AHRS_ADC_Config(int32_t adc_oversample)
  */
 void AHRS_ADC_DMA_Handler(void)
 {
-	if (ahrs_state == AHRS_IDLE) {
-		// Ideally this would have a mutex, but I think we can avoid it (and don't have RTOS features)
-
-		if (DMA_GetFlagStatus(DMA1_IT_TC1)) {	// whole double buffer filled 
-			valid_data_buffer =
-			    &raw_data_buffer[1 * PIOS_ADC_NUM_CHANNELS *
-					     adc_oversample];
-			DMA_ClearFlag(DMA1_IT_TC1);
-		}
-		else if (DMA_GetFlagStatus(DMA1_IT_HT1)) {
-			valid_data_buffer =
-			    &raw_data_buffer[0 * PIOS_ADC_NUM_CHANNELS *
-					     adc_oversample];
-			DMA_ClearFlag(DMA1_IT_HT1);
-		}
-		else {
-			// This should not happen, probably due to transfer errors
-			DMA_ClearFlag(DMA1_FLAG_GL1);
-		}
-
-		ahrs_state = AHRS_DATA_READY;
-	} else {
-		// Track how many times an interrupt occurred before EKF finished processing
-		ekf_too_slow++;
-		DMA_ClearFlag(DMA1_IT_GL1);
+	if (DMA_GetFlagStatus(DMA1_IT_TC1)) {	// whole double buffer filled 
+		adc_config.valid_data_buffer =
+			&raw_data_buffer[1 * PIOS_ADC_NUM_CHANNELS *
+				 adc_config.adc_oversample];
+		DMA_ClearFlag(DMA1_IT_TC1);
+		AHRS_ADC_downsample_data();
 	}
-
-	total_conversion_blocks++;
+	else if (DMA_GetFlagStatus(DMA1_IT_HT1)) {
+		adc_config.valid_data_buffer = 
+			&raw_data_buffer[0 * PIOS_ADC_NUM_CHANNELS *
+				 adc_config.adc_oversample];
+		DMA_ClearFlag(DMA1_IT_HT1);
+		AHRS_ADC_downsample_data();
+	}
+	else {
+		// This should not happen, probably due to transfer errors
+		DMA_ClearFlag(DMA1_FLAG_GL1);
+	}
 }

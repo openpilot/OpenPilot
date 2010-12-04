@@ -222,7 +222,7 @@ TIM8  |           |           |           |
 /* With an ADCCLK = 14 MHz and a sampling time of 239.5 cycles: */
 /* Tconv = 239.5 + 12.5 = 252 cycles = 18�s */
 /* (1 / (ADCCLK / CYCLES)) = Sample Time (�S) */
-#define PIOS_ADC_IRQ_PRIO			PIOS_IRQ_PRIO_HIGH
+#define PIOS_ADC_IRQ_PRIO			PIOS_IRQ_PRIO_LOW
 
 // Currently analog acquistion hard coded at 480 Hz
 // PCKL2 = HCLK / 16

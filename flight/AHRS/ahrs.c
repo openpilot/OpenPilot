@@ -38,6 +38,8 @@
 #include "ahrs_spi_comm.h"
 #include "insgps.h"
 #include "CoordinateConversions.h"
+#include <stdbool.h>
+#include "fifo_buffer.h"
 
 #define INSGPS_GPS_TIMEOUT 2   /* 2 seconds triggers reinit of position */
 #define INSGPS_GPS_MINSAT  6   /* 2 seconds triggers reinit of position */
@@ -48,7 +50,7 @@
 // For debugging the raw sensors
 //#define DUMP_RAW
 //#define DUMP_FRIENDLY
-#define DUMP_EKF
+//#define DUMP_EKF
 
 volatile int8_t ahrs_algorithm;
 
@@ -59,6 +61,7 @@ void simple_update();
 
 /* Data accessors */
 void adc_callback(float *);
+bool get_accel_gyro_data();
 void process_mag_data();
 void reset_values();
 void calibrate_sensors(void);
@@ -99,15 +102,18 @@ struct altitude_sensor altitude_data;
 struct gps_sensor gps_data;
 
 //! The oversampling rate, ekf is 2k / this
-static uint8_t adc_oversampling = 30;
+static uint8_t adc_oversampling = 15;
 
 //! Offset correction of barometric alt, to match gps data
 static float baro_offset = 0;
 
 typedef enum { AHRS_IDLE, AHRS_DATA_READY, AHRS_PROCESSING } states;
-volatile states ahrs_state;
 volatile int32_t ekf_too_slow;
 volatile int32_t total_conversion_blocks;
+
+//! Buffer to allow ADC to run a bit faster than EKF
+uint8_t adc_fifo_buf[sizeof(float) * 6 * 4] __attribute__ ((aligned(4)));    // align to 32-bit to try and provide speed improvement
+t_fifo_buffer adc_fifo_buffer;
 
 
 /**
@@ -456,6 +462,9 @@ int main()
 	AHRS_ADC_Config(adc_oversampling);
 	AHRS_ADC_SetCallback(adc_callback);
 
+	/* ADC buffer */
+	fifoBuf_init(&adc_fifo_buffer, adc_fifo_buf, sizeof(adc_fifo_buf));
+
 	/* Setup the Accelerometer FS (Full-Scale) GPIO */
 	PIOS_GPIO_Enable(0);
 	SET_ACCEL_6G;
@@ -471,9 +480,7 @@ int main()
 	
 	reset_values();
 
-	ahrs_state = AHRS_IDLE;
 	AhrsInitComms();
-	ahrs_state = AHRS_IDLE;
 	while(!AhrsLinkReady()) {
 		AhrsPoll();
 	}
@@ -528,9 +535,9 @@ for all data to be up to date before doing anything*/
 		running_counts = counter_val - last_counter_idle_end;
 		last_counter_idle_start = counter_val;
 
-		while (ahrs_state != AHRS_DATA_READY);
-		ahrs_state = AHRS_PROCESSING;
-
+		// This function blocks till data avilable
+		get_accel_gyro_data();
+		
 		counter_val = timer_count();
 		idle_counts = counter_val - last_counter_idle_start;
 		last_counter_idle_end = counter_val;
@@ -556,11 +563,34 @@ for all data to be up to date before doing anything*/
 				ins_indoor_update();
 				break;
 		}
-		ahrs_state = AHRS_IDLE;
-
 	}
 
 	return 0;
+}
+
+/**
+ * @brief Get the accel and gyro data from whichever source when available
+ *
+ * This function will act as the HAL for the new INS sensors
+ */
+bool get_accel_gyro_data() 
+{
+	float accel[6];
+	float gyro[6];
+	while(fifoBuf_getUsed(&adc_fifo_buffer) < (sizeof(accel) + sizeof(gyro)));
+	
+	fifoBuf_getData(&adc_fifo_buffer, &accel[0], sizeof(float) * 3);
+	fifoBuf_getData(&adc_fifo_buffer, &gyro[0], sizeof(float) * 3);	
+	fifoBuf_getData(&adc_fifo_buffer, &accel[3], sizeof(float) * 3);
+	fifoBuf_getData(&adc_fifo_buffer, &gyro[3], sizeof(float) * 3);	
+	
+	accel_data.filtered.x = (accel[0] + accel[3]) / 2;
+	accel_data.filtered.y = (accel[1] + accel[4]) / 2;
+	accel_data.filtered.z = (accel[2] + accel[5]) / 2;
+	gyro_data.filtered.x = (gyro[0] + gyro[3]) / 2;
+	gyro_data.filtered.y = (gyro[1] + gyro[4]) / 2;
+	gyro_data.filtered.z = (gyro[2] + gyro[5]) / 2;
+	return true;
 }
 
 /**
@@ -577,16 +607,24 @@ for all data to be up to date before doing anything*/
  */
 void adc_callback(float * downsampled_data)
 {
+	float accel[3], gyro[3];
 	// Accel data is (y,x,z) in first third and fifth byte.  Convert to m/s
-	accel_data.filtered.y = (downsampled_data[0] * accel_data.calibration.scale[1]) + accel_data.calibration.bias[1];
-	accel_data.filtered.x = (downsampled_data[2] * accel_data.calibration.scale[0]) + accel_data.calibration.bias[0];
-	accel_data.filtered.z = (downsampled_data[4] * accel_data.calibration.scale[2]) + accel_data.calibration.bias[2];
+	accel[0] = (downsampled_data[2] * accel_data.calibration.scale[0]) + accel_data.calibration.bias[0];
+	accel[1] = (downsampled_data[0] * accel_data.calibration.scale[1]) + accel_data.calibration.bias[1];
+	accel[2] = (downsampled_data[4] * accel_data.calibration.scale[2]) + accel_data.calibration.bias[2];
 
 	// Gyro data is (x,y,z) in second, fifth and seventh byte.  Convert to rad/s
-	gyro_data.filtered.x = (downsampled_data[1] * gyro_data.calibration.scale[0]) + gyro_data.calibration.bias[0];
-	gyro_data.filtered.y = (downsampled_data[3] * gyro_data.calibration.scale[1]) + gyro_data.calibration.bias[1];
-	gyro_data.filtered.z = (downsampled_data[5] * gyro_data.calibration.scale[2]) + gyro_data.calibration.bias[2];
+	gyro[0] = (downsampled_data[1] * gyro_data.calibration.scale[0]) + gyro_data.calibration.bias[0];
+	gyro[1] = (downsampled_data[3] * gyro_data.calibration.scale[1]) + gyro_data.calibration.bias[1];
+	gyro[2] = (downsampled_data[5] * gyro_data.calibration.scale[2]) + gyro_data.calibration.bias[2];
 
+	if(fifoBuf_getFree(&adc_fifo_buffer) >= (sizeof(accel) + sizeof(gyro))) {
+		fifoBuf_putData(&adc_fifo_buffer, (uint8_t *) &accel[0], sizeof(accel));
+		fifoBuf_putData(&adc_fifo_buffer, (uint8_t *) &gyro[0], sizeof(gyro));
+	} else {
+		ekf_too_slow++;
+	}
+		
 	AttitudeRawData raw;
 
 	raw.accels[0] = downsampled_data[2];
@@ -598,13 +636,13 @@ void adc_callback(float * downsampled_data)
 	raw.gyrotemp[0] = downsampled_data[6];
 	raw.gyrotemp[1] = downsampled_data[7];
 
-	raw.gyros_filtered[0] = gyro_data.filtered.x * 180 / M_PI;
-	raw.gyros_filtered[1] = gyro_data.filtered.y * 180 / M_PI;
-	raw.gyros_filtered[2] = gyro_data.filtered.z * 180 / M_PI;
+	raw.gyros_filtered[0] = gyro[0] * 180 / M_PI;
+	raw.gyros_filtered[1] = gyro[1] * 180 / M_PI;
+	raw.gyros_filtered[2] = gyro[2] * 180 / M_PI;
 
-	raw.accels_filtered[0] = accel_data.filtered.x;
-	raw.accels_filtered[1] = accel_data.filtered.y;
-	raw.accels_filtered[2] = accel_data.filtered.z;
+	raw.accels_filtered[0] = accel[0];
+	raw.accels_filtered[1] = accel[1];
+	raw.accels_filtered[2] = accel[2];
 
 	raw.magnetometers[0] = mag_data.scaled.axis[0];
 	raw.magnetometers[1] = mag_data.scaled.axis[1];
@@ -622,14 +660,6 @@ void adc_callback(float * downsampled_data)
 	}
 
 	AttitudeRawSet(&raw);
-	
-	if (ahrs_state == AHRS_IDLE) {
-		ahrs_state = AHRS_DATA_READY;
-	} else {
-		// Track how many times an interrupt occurred before EKF finished processing
-		ekf_too_slow++;
-	}	
-	total_conversion_blocks++;		
 }
 
 #if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
@@ -691,8 +721,8 @@ void calibrate_sensors()
 
 
 	for (i = 0, j = 0; i < NBIAS; i++) {
-		while (ahrs_state != AHRS_DATA_READY) ;
-		ahrs_state = AHRS_PROCESSING;
+
+		get_accel_gyro_data();
 		
 		gyro_bias[0] += gyro_data.filtered.x / NBIAS;
 		gyro_bias[1] += gyro_data.filtered.y / NBIAS;
@@ -700,7 +730,6 @@ void calibrate_sensors()
 		accel_bias[0] += accel_data.filtered.x / NBIAS;
 		accel_bias[1] += accel_data.filtered.y / NBIAS;
 		accel_bias[2] += accel_data.filtered.z / NBIAS;
-		ahrs_state = AHRS_IDLE;
 
 #if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
 		if(PIOS_HMC5843_NewDataAvailable()) {
@@ -731,8 +760,7 @@ void calibrate_sensors()
 	accel_data.calibration.variance[2] = 0;
 
 	for (i = 0, j = 0; j < NVAR; j++) {
-		while (ahrs_state != AHRS_DATA_READY) ;
-		ahrs_state = AHRS_PROCESSING;
+		get_accel_gyro_data();
 
 		gyro_data.calibration.variance[0] += pow(gyro_data.filtered.x-gyro_bias[0],2) / NVAR;
 		gyro_data.calibration.variance[1] += pow(gyro_data.filtered.y-gyro_bias[1],2) / NVAR;
@@ -740,7 +768,7 @@ void calibrate_sensors()
 		accel_data.calibration.variance[0] += pow(accel_data.filtered.x-accel_bias[0],2) / NVAR;
 		accel_data.calibration.variance[1] += pow(accel_data.filtered.y-accel_bias[1],2) / NVAR;
 		accel_data.calibration.variance[2] += pow(accel_data.filtered.z-accel_bias[2],2) / NVAR;
-		ahrs_state = AHRS_IDLE;
+
 #if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
 		if(PIOS_HMC5843_NewDataAvailable()) {
 			j ++;

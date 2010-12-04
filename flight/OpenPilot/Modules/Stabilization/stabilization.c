@@ -92,8 +92,8 @@ int32_t StabilizationInitialize()
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
 	// Listen for updates.
-	AttitudeActualConnectQueue(queue);
-//	AttitudeRawConnectQueue(queue);
+//	AttitudeActualConnectQueue(queue);
+	AttitudeRawConnectQueue(queue);
 
 	StabilizationSettingsConnectCallback(SettingsUpdatedCb);
 	SettingsUpdatedCb(StabilizationSettingsHandle());

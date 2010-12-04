@@ -44,6 +44,7 @@
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/icore.h>
 #include <QKeySequence>
+#include "uavobjects/uavobjectmanager.h"
 #include <uavobjects/uavobjectmanager.h>
 
 /**
@@ -104,6 +105,17 @@ void LoggingThread::run()
         }
     }
 
+    GCSTelemetryStats* gcsStatsObj = GCSTelemetryStats::GetInstance(objManager);
+    GCSTelemetryStats::DataFields gcsStats = gcsStatsObj->getData();
+    if ( gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED )
+    {
+        qDebug() << "Logging: connected already, ask for all settings";
+        retrieveSettings();
+    } else {
+        qDebug() << "Logging: not connected, do no ask for settings";
+    }
+
+
     exec();
 }
 
@@ -118,6 +130,84 @@ void LoggingThread::stopLogging()
     qDebug() << "File closed";
     quit();
 }
+
+/**
+ * Initialize queue with settings objects to be retrieved.
+ */
+void LoggingThread::retrieveSettings()
+{
+    // Clear object queue
+    queue.clear();
+    // Get all objects, add metaobjects, settings and data objects with OnChange update mode to the queue
+    // Get UAVObjectManager instance
+    ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objMngr = pm->getObject<UAVObjectManager>();
+    QList< QList<UAVDataObject*> > objs = objMngr->getDataObjects();
+    for (int n = 0; n < objs.length(); ++n)
+    {
+        UAVDataObject* obj = objs[n][0];
+        if ( obj->isSettings() )
+                {
+                    queue.enqueue(obj);
+                }
+        }
+    // Start retrieving
+    qDebug() << tr("Logging: retrieve settings objects from the autopilot (%1 objects)")
+                  .arg( queue.length());
+    retrieveNextObject();
+}
+
+
+/**
+ * Retrieve the next object in the queue
+ */
+void LoggingThread::retrieveNextObject()
+{
+    // If queue is empty return
+    if ( queue.isEmpty() )
+    {
+        qDebug() << "Logging: Object retrieval completed";
+        return;
+    }
+    // Get next object from the queue
+    UAVObject* obj = queue.dequeue();
+    // Connect to object
+    connect(obj, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(transactionCompleted(UAVObject*,bool)));
+    // Request update
+    obj->requestUpdate();
+}
+
+/**
+ * Called by the retrieved object when a transaction is completed.
+ */
+void LoggingThread::transactionCompleted(UAVObject* obj, bool success)
+{
+    Q_UNUSED(success);
+    // Disconnect from sending object
+    obj->disconnect(this);
+    // Process next object if telemetry is still available
+    // Get stats objects
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    GCSTelemetryStats* gcsStatsObj = GCSTelemetryStats::GetInstance(objManager);
+    GCSTelemetryStats::DataFields gcsStats = gcsStatsObj->getData();
+    if ( gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED )
+    {
+        retrieveNextObject();
+    }
+    else
+    {
+        qDebug() << "Logging: Object retrieval has been cancelled";
+        queue.clear();
+    }
+}
+
+
+
+/****************************************************************
+    Logging plugin
+ ********************************/
+
 
 LoggingPlugin::LoggingPlugin() : state(IDLE)
 {
@@ -304,6 +394,9 @@ void LoggingPlugin::replayStopped()
 
     emit stateChanged("IDLE");
 }
+
+
+
 
 
 void LoggingPlugin::extensionsInitialized()

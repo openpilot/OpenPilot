@@ -29,10 +29,12 @@
 
 #include <extensionsystem/iplugin.h>
 #include <uavobjects/uavobjectmanager.h>
+#include "uavobjects/gcstelemetrystats.h"
 #include <uavtalk/uavtalk.h>
 #include <logfile.h>
 
 #include <QThread>
+#include <QQueue>
 #include <QReadWriteLock>
 
 class LoggingPlugin;
@@ -46,6 +48,7 @@ public:
 
 private slots:
     void objectUpdated(UAVObject * obj);
+    void transactionCompleted(UAVObject* obj, bool success);
 
 public slots:
     void stopLogging();
@@ -55,6 +58,13 @@ protected:
     QReadWriteLock lock;
     LogFile logFile;
     UAVTalk * uavTalk;
+
+private:
+    QQueue<UAVDataObject*> queue;
+
+    void retrieveSettings();
+    void retrieveNextObject();
+
 };
 
 class LoggingPlugin : public ExtensionSystem::IPlugin
@@ -96,6 +106,7 @@ private slots:
 
 private:
     LoggingGadgetFactory *mf;
+
 };
 #endif /* LoggingPLUGIN_H_ */
 /**

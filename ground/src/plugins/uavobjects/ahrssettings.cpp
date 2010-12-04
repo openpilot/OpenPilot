@@ -56,6 +56,12 @@ AHRSSettings::AHRSSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAM
     QStringList UpdatePeriodElemNames;
     UpdatePeriodElemNames.append("0");
     fields.append( new UAVObjectField(QString("UpdatePeriod"), QString("ms"), UAVObjectField::UINT8, UpdatePeriodElemNames, QStringList()) );
+    QStringList BiasCorrectedRawElemNames;
+    BiasCorrectedRawElemNames.append("0");
+    QStringList BiasCorrectedRawEnumOptions;
+    BiasCorrectedRawEnumOptions.append("TRUE");
+    BiasCorrectedRawEnumOptions.append("FALSE");
+    fields.append( new UAVObjectField(QString("BiasCorrectedRaw"), QString(""), UAVObjectField::ENUM, BiasCorrectedRawElemNames, BiasCorrectedRawEnumOptions) );
     QStringList YawBiasElemNames;
     YawBiasElemNames.append("0");
     fields.append( new UAVObjectField(QString("YawBias"), QString(""), UAVObjectField::FLOAT32, YawBiasElemNames, QStringList()) );
@@ -101,6 +107,7 @@ void AHRSSettings::setDefaultFieldValues()
     data.Algorithm = 1;
     data.Downsampling = 20;
     data.UpdatePeriod = 1;
+    data.BiasCorrectedRaw = 0;
     data.YawBias = 0;
     data.PitchBias = 0;
     data.RollBias = 0;

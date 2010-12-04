@@ -638,9 +638,9 @@ void downsample_data()
 	raw.gyrotemp[0] = valid_data_buffer[6];
 	raw.gyrotemp[1] = valid_data_buffer[7];
 
-	raw.gyros_filtered[0] = (gyro_data.filtered.x - Nav.gyro_bias[0]) * 180 / M_PI;
-	raw.gyros_filtered[1] = (gyro_data.filtered.y - Nav.gyro_bias[1]) * 180 / M_PI;
-	raw.gyros_filtered[2] = (gyro_data.filtered.z - Nav.gyro_bias[2]) * 180 / M_PI;
+	raw.gyros_filtered[0] = gyro_data.filtered.x * 180 / M_PI;
+	raw.gyros_filtered[1] = gyro_data.filtered.y * 180 / M_PI;
+	raw.gyros_filtered[2] = gyro_data.filtered.z * 180 / M_PI;
 
 	raw.accels[0] = valid_data_buffer[2];
 	raw.accels[1] = valid_data_buffer[0];
@@ -653,6 +653,17 @@ void downsample_data()
 	raw.magnetometers[0] = mag_data.scaled.axis[0];
 	raw.magnetometers[1] = mag_data.scaled.axis[1];
 	raw.magnetometers[2] = mag_data.scaled.axis[2];
+
+	AHRSSettingsData settings;
+	AHRSSettingsGet(&settings);
+	if(settings.BiasCorrectedRaw == AHRSSETTINGS_BIASCORRECTEDRAW_TRUE) {
+		raw.gyros_filtered[0] -= Nav.gyro_bias[0] * 180 / M_PI;
+		raw.gyros_filtered[1] -= Nav.gyro_bias[1] * 180 / M_PI;
+		raw.gyros_filtered[2] -= Nav.gyro_bias[2] * 180 / M_PI;
+		raw.accels_filtered[0] -= Nav.accel_bias[0];
+		raw.accels_filtered[1] -= Nav.accel_bias[1];
+		raw.accels_filtered[2] -= Nav.accel_bias[2];
+	}
 
 	AttitudeRawSet(&raw);
 }

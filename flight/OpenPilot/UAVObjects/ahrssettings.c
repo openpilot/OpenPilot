@@ -83,6 +83,7 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	data.Algorithm = 1;
 	data.Downsampling = 20;
 	data.UpdatePeriod = 1;
+	data.BiasCorrectedRaw = 0;
 	data.YawBias = 0;
 	data.PitchBias = 0;
 	data.RollBias = 0;

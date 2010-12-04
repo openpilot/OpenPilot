@@ -46,6 +46,7 @@ public:
         quint8 Algorithm;
         quint8 Downsampling;
         quint8 UpdatePeriod;
+        quint8 BiasCorrectedRaw;
         float YawBias;
         float PitchBias;
         float RollBias;
@@ -58,13 +59,16 @@ public:
     typedef enum { ALGORITHM_SIMPLE=0, ALGORITHM_INSGPS_INDOOR_NOMAG=1, ALGORITHM_INSGPS_INDOOR=2, ALGORITHM_INSGPS_OUTDOOR=3 } AlgorithmOptions;
     // Field Downsampling information
     // Field UpdatePeriod information
+    // Field BiasCorrectedRaw information
+    /* Enumeration options for field BiasCorrectedRaw */
+    typedef enum { BIASCORRECTEDRAW_TRUE=0, BIASCORRECTEDRAW_FALSE=1 } BiasCorrectedRawOptions;
     // Field YawBias information
     // Field PitchBias information
     // Field RollBias information
 
   
     // Constants
-    static const quint32 OBJID = 1456050280U;
+    static const quint32 OBJID = 3741078856U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

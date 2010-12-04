@@ -557,6 +557,12 @@ void ConfigAHRSWidget::computeScaleBias()
 
     obj->updated();
 
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
+    field = obj->getField(QString("BiasCorrectedRaw"));
+    field->setValue("TRUE");
+    obj->updated();
+
+
     position = -1; //set to run again
     m_ahrs->sixPointCalibInstructions->append("Computed accel and mag scale and bias...");
 
@@ -596,6 +602,12 @@ void ConfigAHRSWidget::sixPointCalibrationMode()
     field->setDouble(0,2);
 
     obj->updated();
+
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
+    field = obj->getField(QString("BiasCorrectedRaw"));
+    field->setValue("FALSE");
+    obj->updated();
+
 
     Thread::usleep(100000);
 

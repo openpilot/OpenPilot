@@ -102,7 +102,7 @@ struct altitude_sensor altitude_data;
 struct gps_sensor gps_data;
 
 //! The oversampling rate, ekf is 2k / this
-static uint8_t adc_oversampling = 20;
+static uint8_t adc_oversampling = 30;
 
 //! Offset correction of barometric alt, to match gps data
 static float baro_offset = 0;
@@ -166,11 +166,6 @@ void ins_outdoor_update()
 		else  {
 			sensors |= HORIZ_SENSORS | POS_SENSORS;						
 		}
-		
-		/* When doing outdoor update grab this variance */
-		AHRSCalibrationData cal;
-		AHRSCalibrationGet(&cal);
-		INSSetPosVelVar(cal.pos_var, cal.vel_var);		
 			
 		/* 
 		 * When using gps need to make sure that barometer is brought into NED frame   
@@ -257,12 +252,8 @@ void ins_indoor_update()
 	if(indoor_delay > INSGPS_GPS_TIMEOUT)
 		INSPosVelReset(vel,vel);
 	else 
-		sensors = HORIZ_SENSORS | VERT_SENSORS | POS_SENSORS;
-	
-	AHRSCalibrationData cal;
-	AHRSCalibrationGet(&cal);
-	INSSetPosVelVar(10, cal.vel_var);		
-	
+		sensors = HORIZ_SENSORS | VERT_SENSORS;
+
 	if(mag_data.updated && (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
 		sensors |= MAG_SENSORS;
 		mag_data.updated = false;
@@ -277,7 +268,7 @@ void ins_indoor_update()
 	 * TODO: Need to add a general sanity check for all the inputs to make sure their kosher 
 	 * although probably should occur within INS itself 
 	 */
-	INSCorrection(mag_data.scaled.axis, vel, vel, altitude_data.altitude, sensors | HORIZ_SENSORS | VERT_SENSORS);	
+	INSCorrection(mag_data.scaled.axis, gps_data.NED, vel, altitude_data.altitude, sensors | HORIZ_SENSORS | VERT_SENSORS);	
 }
 
 /**
@@ -286,7 +277,7 @@ void ins_indoor_update()
 void ins_init_algorithm()
 {
 	float Rbe[3][3], q[4], accels[3], rpy[3], mag;
-	float ge[3]={0,0,-9.81}, zeros[3]={0,0,0}, Pdiag[13]={25,25,25,5,5,5,1e-5,1e-5,1e-5,1e-5,1e-5,1e-5,1e-5};
+	float ge[3]={0,0,-9.81}, zeros[3]={0,0,0}, Pdiag[16]={25,25,25,5,5,5,1e-5,1e-5,1e-5,1e-5,1e-5,1e-5,1e-5,1e-4,1e-4,1e-4};
 	bool using_mags, using_gps;
 	
 	INSGPSInit();
@@ -306,9 +297,9 @@ void ins_init_algorithm()
 		RotFrom2Vectors(accels, ge, mag_data.scaled.axis, home.Be, Rbe);
 		R2Quaternion(Rbe,q);
 		if (using_gps)
-			INSSetState(gps_data.NED, zeros, q, zeros);
+			INSSetState(gps_data.NED, zeros, q, zeros, zeros);
 		else
-			INSSetState(zeros, zeros, q, zeros);
+			INSSetState(zeros, zeros, q, zeros, zeros);
 	}
 	else{
 		// assume yaw = 0
@@ -318,9 +309,9 @@ void ins_init_algorithm()
 		rpy[2] = 0;
 		RPY2Quaternion(rpy,q);
 		if (using_gps)
-			INSSetState(gps_data.NED, zeros, q, zeros);
+			INSSetState(gps_data.NED, zeros, q, zeros, zeros);
 		else
-			INSSetState(zeros, zeros, q, zeros);
+			INSSetState(zeros, zeros, q, zeros, zeros);
 	}
 	
 	INSResetP(Pdiag);
@@ -359,8 +350,8 @@ void simple_update() {
  * @brief Output all the important inputs and states of the ekf through serial port 
  */
 #ifdef DUMP_EKF
-#define NUMX 13			// number of states, X is the state vector
-#define NUMW 9			// number of plant noise inputs, w is disturbance noise vector
+#define NUMX 16			// number of states, X is the state vector
+#define NUMW 12			// number of plant noise inputs, w is disturbance noise vector
 #define NUMV 10			// number of measurements, v is the measurement noise vector
 #define NUMU 7			// number of deterministic inputs, U is the input vector
 extern float F[NUMX][NUMX], G[NUMX][NUMW], H[NUMV][NUMX];	// linearized system matrices
@@ -382,12 +373,12 @@ void print_ekf_binary()
 	
 	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & gps_data, sizeof(gps_data));                                // gps data (58:85)
 	
-	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & X, 4 * NUMX);                                               // X (86:137)
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & X, 4 * NUMX);                                               // X (86:149)
 	for(uint8_t i = 0; i < NUMX; i++) 
-		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &(P[i][i]), 4);                                           // diag(P) (138:189)
+		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &(P[i][i]), 4);                                           // diag(P) (150:213)
 	
-	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & altitude_data.altitude, 4);                                 // BaroAlt (190:193)	
-	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & baro_offset, 4);                                            // baro_offset (194:198)
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & altitude_data.altitude, 4);                                 // BaroAlt (214:217)
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & baro_offset, 4);                                            // baro_offset (218:221)
 }
 #else
 void print_ekf_binary() {}
@@ -903,7 +894,6 @@ void calibration_callback(AhrsObjHandle obj)
 {
 	AHRSCalibrationData cal;
 	AHRSCalibrationGet(&cal);
-	
 	if(cal.measure_var == AHRSCALIBRATION_MEASURE_VAR_SET){
 		for(int ct=0; ct<3; ct++)
 		{

@@ -166,6 +166,11 @@ void ins_outdoor_update()
 		else  {
 			sensors |= HORIZ_SENSORS | POS_SENSORS;						
 		}
+		
+		/* When doing outdoor update grab this variance */
+		AHRSCalibrationData cal;
+		AHRSCalibrationGet(&cal);
+		INSSetPosVelVar(cal.pos_var, cal.vel_var);		
 			
 		/* 
 		 * When using gps need to make sure that barometer is brought into NED frame   
@@ -252,8 +257,12 @@ void ins_indoor_update()
 	if(indoor_delay > INSGPS_GPS_TIMEOUT)
 		INSPosVelReset(vel,vel);
 	else 
-		sensors = HORIZ_SENSORS | VERT_SENSORS;
-
+		sensors = HORIZ_SENSORS | VERT_SENSORS | POS_SENSORS;
+	
+	AHRSCalibrationData cal;
+	AHRSCalibrationGet(&cal);
+	INSSetPosVelVar(10, cal.vel_var);		
+	
 	if(mag_data.updated && (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
 		sensors |= MAG_SENSORS;
 		mag_data.updated = false;
@@ -268,7 +277,7 @@ void ins_indoor_update()
 	 * TODO: Need to add a general sanity check for all the inputs to make sure their kosher 
 	 * although probably should occur within INS itself 
 	 */
-	INSCorrection(mag_data.scaled.axis, gps_data.NED, vel, altitude_data.altitude, sensors | HORIZ_SENSORS | VERT_SENSORS);	
+	INSCorrection(mag_data.scaled.axis, vel, vel, altitude_data.altitude, sensors | HORIZ_SENSORS | VERT_SENSORS);	
 }
 
 /**
@@ -894,6 +903,7 @@ void calibration_callback(AhrsObjHandle obj)
 {
 	AHRSCalibrationData cal;
 	AHRSCalibrationGet(&cal);
+	
 	if(cal.measure_var == AHRSCALIBRATION_MEASURE_VAR_SET){
 		for(int ct=0; ct<3; ct++)
 		{

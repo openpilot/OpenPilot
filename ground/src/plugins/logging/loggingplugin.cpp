@@ -126,6 +126,24 @@ void LoggingThread::run()
 void LoggingThread::stopLogging()
 {
     QWriteLocker locker(&lock);
+
+    // Disconnect all objects we registered with:
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+
+    QList< QList<UAVObject*> > list;
+    list = objManager->getObjects();
+    QList< QList<UAVObject*> >::const_iterator i;
+    QList<UAVObject*>::const_iterator j;
+
+    for (i = list.constBegin(); i != list.constEnd(); ++i)
+    {
+        for (j = (*i).constBegin(); j != (*i).constEnd(); ++j)
+        {
+            disconnect(*j, SIGNAL(objectUpdated(UAVObject*)), (LoggingThread*) this, SLOT(objectUpdated(UAVObject*)));
+        }
+    }
+
     logFile.close();
     qDebug() << "File closed";
     quit();
@@ -216,7 +234,8 @@ LoggingPlugin::LoggingPlugin() : state(IDLE)
 
 LoggingPlugin::~LoggingPlugin()
 {
-    // Do nothing
+    if (loggingThread)
+        delete loggingThread;
 }
 
 /**
@@ -226,6 +245,9 @@ bool LoggingPlugin::initialize(const QStringList& args, QString *errMsg)
 {
     Q_UNUSED(args);
     Q_UNUSED(errMsg);
+
+    loggingThread = NULL;
+
 
     // Add Menu entry
     Core::ActionManager* am = Core::ICore::instance()->actionManager();
@@ -314,6 +336,9 @@ void LoggingPlugin::toggleReplay()
 void LoggingPlugin::startLogging(QString file)
 {
     qDebug() << "Logging to " << file;
+    // We have to delete the previous logging thread if is was still there!
+    if (loggingThread)
+        delete loggingThread;
     loggingThread = new LoggingThread();
     if(loggingThread->openFile(file,this))
     {
@@ -359,6 +384,8 @@ void LoggingPlugin::startReplay(QString file)
 void LoggingPlugin::stopLogging()
 {
     emit stopLoggingSignal();
+    disconnect( this,SIGNAL(stopLoggingSignal()),0,0);
+
 }
 
 

@@ -19,6 +19,7 @@
         <field name="ChannelMax" units="us" type="int16" elements="8" defaultvalue="2000"/>
         <field name="ChannelNeutral" units="us" type="int16" elements="8" defaultvalue="1500"/>
         <field name="ChannelMin" units="us" type="int16" elements="8" defaultvalue="1000"/>
+        <field name="ArmedTimeout" units="ms" type="uint16" elements="1" defaultvalue="30000"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

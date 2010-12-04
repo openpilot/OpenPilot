@@ -41,7 +41,7 @@
 #define MANUALCONTROLSETTINGS_H
 
 // Object constants
-#define MANUALCONTROLSETTINGS_OBJID 3505967188U
+#define MANUALCONTROLSETTINGS_OBJID 157988682U
 #define MANUALCONTROLSETTINGS_NAME "ManualControlSettings"
 #define MANUALCONTROLSETTINGS_METANAME "ManualControlSettingsMeta"
 #define MANUALCONTROLSETTINGS_ISSINGLEINST 1
@@ -89,6 +89,7 @@ typedef struct {
     int16_t ChannelMax[8];
     int16_t ChannelNeutral[8];
     int16_t ChannelMin[8];
+    uint16_t ArmedTimeout;
 
 } __attribute__((packed)) ManualControlSettingsData;
 
@@ -159,6 +160,7 @@ typedef enum { MANUALCONTROLSETTINGS_POS3FLIGHTMODE_MANUAL=0, MANUALCONTROLSETTI
 // Field ChannelMin information
 /* Number of elements for field ChannelMin */
 #define MANUALCONTROLSETTINGS_CHANNELMIN_NUMELEM 8
+// Field ArmedTimeout information
 
 
 // Generic interface functions

@@ -125,6 +125,7 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	data.ChannelMin[5] = 1000;
 	data.ChannelMin[6] = 1000;
 	data.ChannelMin[7] = 1000;
+	data.ArmedTimeout = 30000;
 
 	UAVObjSetInstanceData(obj, instId, &data);
 

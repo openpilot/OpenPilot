@@ -61,6 +61,7 @@ public:
         qint16 ChannelMax[8];
         qint16 ChannelNeutral[8];
         qint16 ChannelMin[8];
+        quint16 ArmedTimeout;
 
     } __attribute__((packed)) DataFields;
 
@@ -131,10 +132,11 @@ public:
     // Field ChannelMin information
     /* Number of elements for field ChannelMin */
     static const quint32 CHANNELMIN_NUMELEM = 8;
+    // Field ArmedTimeout information
 
   
     // Constants
-    static const quint32 OBJID = 3505967188U;
+    static const quint32 OBJID = 157988682U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

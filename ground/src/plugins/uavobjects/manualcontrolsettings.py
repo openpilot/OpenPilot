@@ -337,12 +337,22 @@ _fields = [ \
 		{
 		}
 	),
+	uavobject.UAVObjectField(
+		'ArmedTimeout',
+		'H',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
 ]
 
 
 class ManualControlSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 3505967188
+    OBJID        = 157988682
     NAME         = "ManualControlSettings"
     METANAME     = "ManualControlSettingsMeta"
     ISSINGLEINST = 1

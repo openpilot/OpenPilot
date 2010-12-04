@@ -231,6 +231,9 @@ ManualControlSettings::ManualControlSettings(): UAVDataObject(OBJID, ISSINGLEINS
     ChannelMinElemNames.append("6");
     ChannelMinElemNames.append("7");
     fields.append( new UAVObjectField(QString("ChannelMin"), QString("us"), UAVObjectField::INT16, ChannelMinElemNames, QStringList()) );
+    QStringList ArmedTimeoutElemNames;
+    ArmedTimeoutElemNames.append("0");
+    fields.append( new UAVObjectField(QString("ArmedTimeout"), QString("ms"), UAVObjectField::UINT16, ArmedTimeoutElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -309,6 +312,7 @@ void ManualControlSettings::setDefaultFieldValues()
     data.ChannelMin[5] = 1000;
     data.ChannelMin[6] = 1000;
     data.ChannelMin[7] = 1000;
+    data.ArmedTimeout = 30000;
 
 }
 

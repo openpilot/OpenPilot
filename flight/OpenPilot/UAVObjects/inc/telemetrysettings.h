@@ -78,7 +78,15 @@ typedef struct {
 // Field information
 // Field Speed information
 /* Enumeration options for field Speed */
-typedef enum { TELEMETRYSETTINGS_SPEED_9600=0, TELEMETRYSETTINGS_SPEED_38400=1, TELEMETRYSETTINGS_SPEED_57600=2, TELEMETRYSETTINGS_SPEED_115200=3 } TelemetrySettingsSpeedOptions;
+typedef enum {
+    TELEMETRYSETTINGS_SPEED_2400 = 0,
+    TELEMETRYSETTINGS_SPEED_4800 = 1,
+    TELEMETRYSETTINGS_SPEED_9600 = 2,
+    TELEMETRYSETTINGS_SPEED_19200 = 3,
+    TELEMETRYSETTINGS_SPEED_38400 = 4,
+    TELEMETRYSETTINGS_SPEED_57600 = 5,
+    TELEMETRYSETTINGS_SPEED_115200 = 6
+} TelemetrySettingsSpeedOptions;
 
 
 // Generic interface functions

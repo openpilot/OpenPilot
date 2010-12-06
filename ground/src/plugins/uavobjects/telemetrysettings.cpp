@@ -45,7 +45,10 @@ TelemetrySettings::TelemetrySettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSET
     QStringList SpeedElemNames;
     SpeedElemNames.append("0");
     QStringList SpeedEnumOptions;
+    SpeedEnumOptions.append("2400");
+    SpeedEnumOptions.append("4800");
     SpeedEnumOptions.append("9600");
+    SpeedEnumOptions.append("19200");
     SpeedEnumOptions.append("38400");
     SpeedEnumOptions.append("57600");
     SpeedEnumOptions.append("115200");

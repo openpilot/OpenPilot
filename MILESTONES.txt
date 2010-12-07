@@ -17,6 +17,10 @@ C: Frederic Goddeeris
 D: August 2010
 V: http://vimeo.com/13659819
 
+M: First manual fixed wing flight
+C: James Cotton
+D: September 2010
+
 M: First stabilised fixed wing flight
 C: Edouard Lafargue 
 D: September 2010
@@ -43,6 +47,10 @@ C: Sami Korhonen (Sambas)
 D: November 2010
 V: http://www.youtube.com/watch?v=CIL29Yqt8Ck
 
+M: First -10 Deg C  flight
+C: Sami Korhonen (Sambas)
+D: November 2010
+
 
 
 An incomplete list of some future Milestones is below:
@@ -61,4 +69,5 @@ An incomplete list of some future Milestones is below:
 * First over 1km navigation flight
 * First over 5km navigation flight
 * First "Follow Me" navigation flight
+* First Channel Crossing with OpenPilot
 

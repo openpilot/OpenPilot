@@ -34,7 +34,7 @@ N: David "Buzz" Carlson
 E: chebuzz (plus) openpilot (at) gmail (dot) com
 D: 3D ModelView GCS Plugin, sponsor of HITL merge work and XPlane addition
 
-N: Corvus Corax
+N: Eric Price
 E: corvus (dot) corax (at) cybertrench (dot) com
 D: IL2 HITL GCS Plugin, Posix OpenPilot, Advanced stabilisation module
 
@@ -81,7 +81,7 @@ D: Embedded STM32 infrastructure
 N: Edouard Lafargue 
 E: edouard (at) lafargue (dot) name
 D: GCS Dial Plugins, GCS PFD Plugin, GCS GPS plugin, GCS Config plugin
-D: Artwork including display dials
+D: Artwork including standard display dials
 
 N: Matt Lipski
 E: mattlipski (plus) openpilot (at) gmail (dot) com
@@ -89,7 +89,7 @@ D: Deluxe Dials Set artwork, (Artificial Horizon, Compass, Turn Indicator)
 
 N: Les Newell
 E: les (dot) newell (at) fastmail (dot) co (dot) uk
-D: Advanced mixer matrix
+D: Advanced mixer matrix, SPI protocol based on UAVObjects
 
 N: Ken Northup
 E: helos360 (at) bellsouth (dot) net
@@ -97,12 +97,12 @@ D: 3D Modelling, Easystar adaption from FMS
 
 N: Guy McCaldin 
 E: guymcc (at) gmail (dot) com
-D: Artwork and design inc work on the Deluxe Dial Set
+D: Artwork and design including work on the Deluxe Dial Set
 
 N: Cathy Moss
 E: cmoss296 (at) blueyonder (dot) co (dot) uk
-D: Hardware design Lead: Gen 2 Mainboard, PipBee Pro, Current Sensor
-D: Lead dev PipBee Pro, creator OP Map Plugin
+D: Hardware design Lead: Gen 2 Mainboard, PipXtreme, Current Sensor
+D: Lead dev PipXtreme, creator OP Map Plugin
 
 N: Angus Peart
 E: gussy (at) openpilot (dot) org

@@ -287,7 +287,9 @@ static void manualControlTask(void *parameters)
 			lowThrottleStart = lastSysTime;
 		} else if (cmd.Throttle >= 0)  
 			lowThrottleDetected = 0;
-		else if((cmd.Throttle < 0) && (timeDifferenceMs(lowThrottleStart, lastSysTime) > settings.ArmedTimeout)) {
+		else if((cmd.Throttle < 0) && 
+			(timeDifferenceMs(lowThrottleStart, lastSysTime) > settings.ArmedTimeout) & 
+			(settings.ArmedTimeout != 0) ) {
 			cmd.Armed = MANUALCONTROLCOMMAND_ARMED_FALSE;
 			ManualControlCommandSet(&cmd);
 		} 

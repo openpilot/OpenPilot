@@ -1,7 +1,7 @@
 /**
 ******************************************************************************
 *
-* @file       uavitem.cpp
+* @file       gpsitem.cpp
 * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
 * @brief      A graphicsItem representing a UAV
 * @see        The GNU Public License (GPL) Version 3
@@ -25,10 +25,10 @@
 * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 #include "../internals/pureprojection.h"
-#include "uavitem.h"
+#include "gpsitem.h"
 namespace mapcontrol
 {
-    UAVItem::UAVItem(MapGraphicItem* map,OPMapWidget* parent):map(map),mapwidget(parent),showtrail(true),trailtime(5),traildistance(50),autosetreached(true)
+    GPSItem::GPSItem(MapGraphicItem* map,OPMapWidget* parent):map(map),mapwidget(parent),showtrail(true),trailtime(5),traildistance(50),autosetreached(true)
     ,autosetdistance(100)
     {
         pic.load(QString::fromUtf8(":/markers/images/mapquad.png"));
@@ -49,12 +49,12 @@ namespace mapcontrol
        // rect=QRectF(0,0,renderer.defaultSize().width()*0.05,renderer.defaultSize().height()*0.05);
 
     }
-    UAVItem::~UAVItem()
+    GPSItem::~GPSItem()
     {
         delete trail;
     }
 
-    void UAVItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+    void GPSItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
     {
         Q_UNUSED(option);
         Q_UNUSED(widget);
@@ -62,11 +62,11 @@ namespace mapcontrol
         painter->drawPixmap(-pic.width()/2,-pic.height()/2,pic);
        //   painter->drawRect(QRectF(-pic.width()/2,-pic.height()/2,pic.width()-1,pic.height()-1));
     }
-    QRectF UAVItem::boundingRect()const
+    QRectF GPSItem::boundingRect()const
     {
         return QRectF(-pic.width()/2,-pic.height()/2,pic.width(),pic.height());
     }
-    void UAVItem::SetUAVPos(const internals::PointLatLng &position, const int &altitude)
+    void GPSItem::SetUAVPos(const internals::PointLatLng &position, const int &altitude)
     {
         if(coord.IsEmpty())
             lastcoord=coord;
@@ -77,7 +77,7 @@ namespace mapcontrol
             {
                 if(timer.elapsed()>trailtime*1000)
                 {
-                    trail->addToGroup(new TrailItem(position,altitude,Qt::red,this));
+                    trail->addToGroup(new TrailItem(position,altitude,Qt::green,this));
                     timer.restart();
                 }
 
@@ -86,19 +86,19 @@ namespace mapcontrol
             {
                 if(qAbs(internals::PureProjection::DistanceBetweenLatLng(lastcoord,position)*1000)>traildistance)
                 {
-                    trail->addToGroup(new TrailItem(position,altitude,Qt::red,this));
+                    trail->addToGroup(new TrailItem(position,altitude,Qt::green,this));
                     lastcoord=position;
                 }
             }
             coord=position;
             this->altitude=altitude;
             RefreshPos();
-            if(mapfollowtype==UAVMapFollowType::CenterAndRotateMap||mapfollowtype==UAVMapFollowType::CenterMap)
+            /*if(mapfollowtype==UAVMapFollowType::CenterAndRotateMap||mapfollowtype==UAVMapFollowType::CenterMap)
             {
                 mapwidget->SetCurrentPosition(coord);
-            }
+            }*/
             this->update();
-            if(autosetreached)
+            /*if(autosetreached)
             {
                 foreach(QGraphicsItem* i,map->childItems())
                 {
@@ -134,7 +134,7 @@ namespace mapcontrol
                     }
                 }
 
-            }
+            }*/
         }
     }
 
@@ -142,7 +142,7 @@ namespace mapcontrol
       * Rotate the UAV Icon on the map, or rotate the map
       * depending on the display mode
       */
-    void UAVItem::SetUAVHeading(const qreal &value)
+    void GPSItem::SetUAVHeading(const qreal &value)
     {
         if(mapfollowtype==UAVMapFollowType::CenterAndRotateMap)
         {
@@ -155,13 +155,13 @@ namespace mapcontrol
     }
 
 
-    int UAVItem::type()const
+    int GPSItem::type()const
     {
         return Type;
     }
 
 
-    void UAVItem::RefreshPos()
+    void GPSItem::RefreshPos()
     {
         localposition=map->FromLatLngToLocal(coord);
         this->setPos(localposition.X(),localposition.Y());
@@ -174,23 +174,23 @@ namespace mapcontrol
         }
 
     }
-    void UAVItem::SetTrailType(const UAVTrailType::Types &value)
+    void GPSItem::SetTrailType(const UAVTrailType::Types &value)
     {
         trailtype=value;
         if(trailtype==UAVTrailType::ByTimeElapsed)
             timer.restart();
     }
-    void UAVItem::SetShowTrail(const bool &value)
+    void GPSItem::SetShowTrail(const bool &value)
     {
         showtrail=value;
         trail->setVisible(value);
     }
-    void UAVItem::DeleteTrail()const
+    void GPSItem::DeleteTrail()const
     {
         foreach(QGraphicsItem* i,trail->childItems())
             delete i;
     }
-    double UAVItem::Distance3D(const internals::PointLatLng &coord, const int &altitude)
+    double GPSItem::Distance3D(const internals::PointLatLng &coord, const int &altitude)
     {
        return sqrt(pow(internals::PureProjection::DistanceBetweenLatLng(this->coord,coord)*1000,2)+
        pow(this->altitude-altitude,2));

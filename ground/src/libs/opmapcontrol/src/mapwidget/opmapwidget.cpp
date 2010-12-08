@@ -33,7 +33,7 @@
 namespace mapcontrol
 {
 
-    OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config),UAV(0),Home(0),followmouse(true),compass(0),showuav(false),showhome(false)
+    OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config),UAV(0),GPS(0),Home(0),followmouse(true),compass(0),showuav(false),showhome(false)
     {
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         core=new internals::Core;
@@ -70,6 +70,20 @@ namespace mapcontrol
             {
                 delete UAV;
                 UAV=0;
+            }
+
+        }
+        if(value && GPS==0)
+        {
+            GPS=new GPSItem(map,this);
+            GPS->setParentItem(map);
+        }
+        else if(!value)
+        {
+            if(GPS!=0)
+            {
+                delete GPS;
+                GPS=0;
             }
 
         }

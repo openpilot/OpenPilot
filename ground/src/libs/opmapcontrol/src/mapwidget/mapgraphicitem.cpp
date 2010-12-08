@@ -25,6 +25,7 @@
 * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 #include "uavitem.h"
+#include "gpsitem.h"
 #include "homeitem.h"
 #include "mapgraphicitem.h"
 
@@ -87,7 +88,9 @@ namespace mapcontrol
             HomeItem* www=qgraphicsitem_cast<HomeItem*>(i);
             if(www)
                 www->RefreshPos();
-
+            GPSItem* wwww=qgraphicsitem_cast<GPSItem*>(i);
+            if(wwww)
+                wwww->RefreshPos();
         }
     }
     void MapGraphicItem::ChildPosRefresh()
@@ -103,6 +106,9 @@ namespace mapcontrol
             HomeItem* www=qgraphicsitem_cast<HomeItem*>(i);
             if(www)
                 www->RefreshPos();
+            GPSItem* wwww=qgraphicsitem_cast<GPSItem*>(i);
+            if(wwww)
+                wwww->RefreshPos();
         }
     }
     void MapGraphicItem::ConstructLastImage(int const& zoomdiff)

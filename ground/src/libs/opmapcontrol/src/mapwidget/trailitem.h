@@ -42,13 +42,14 @@ namespace mapcontrol
         Q_INTERFACES(QGraphicsItem)
     public:
                 enum { Type = UserType + 3 };
-        TrailItem(internals::PointLatLng const& coord,int const& altitude,QGraphicsItem* parent);
+        TrailItem(internals::PointLatLng const& coord,int const& altitude, QBrush color, QGraphicsItem* parent);
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                     QWidget *widget);
         QRectF boundingRect() const;
         int type() const;
         internals::PointLatLng coord;
     private:
+        QBrush m_brush;
 
 
     public slots:

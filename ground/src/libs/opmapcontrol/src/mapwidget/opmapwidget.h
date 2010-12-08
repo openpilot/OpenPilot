@@ -37,11 +37,13 @@
 #include "waypointitem.h"
 #include "QtSvg/QGraphicsSvgItem"
 #include "uavitem.h"
+#include "gpsitem.h"
 #include "homeitem.h"
 #include "mapripper.h"
 namespace mapcontrol
 {
     class UAVItem;
+    class GPSItem;
     class HomeItem;
     /**
     * @brief Collection of static functions to help dealing with various enums used
@@ -338,6 +340,7 @@ namespace mapcontrol
         void SetShowCompass(bool const& value);
 
         UAVItem* UAV;
+        GPSItem* GPS;
         HomeItem* Home;
         void SetShowUAV(bool const& value);
         bool ShowUAV()const{return showuav;}

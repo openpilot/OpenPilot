@@ -108,6 +108,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     // current position
     getUAV_LLA(latitude, longitude, altitude);
+    //getGPS_LLA(latitude, longitude, altitude);
 
     internals::PointLatLng pos_lat_lon = internals::PointLatLng(latitude, longitude);
 
@@ -166,6 +167,11 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_map->UAV->SetTrailType(UAVTrailType::ByTimeElapsed);
 //  m_map->UAV->SetTrailType(UAVTrailType::ByDistance);
 
+    m_map->GPS->SetTrailTime(uav_trail_time_list[0]);                           // seconds
+    m_map->GPS->SetTrailDistance(uav_trail_distance_list[1]);                   // meters
+
+    m_map->GPS->SetTrailType(UAVTrailType::ByTimeElapsed);
+//  m_map->GPS->SetTrailType(UAVTrailType::ByDistance);
     // **************
 
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -276,6 +282,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_map->SetCurrentPosition(home_position.coord);         // set the map position
     m_map->Home->SetCoord(home_position.coord);             // set the HOME position
     m_map->UAV->SetUAVPos(home_position.coord, 0.0);        // set the UAV position
+    m_map->GPS->SetUAVPos(home_position.coord, 0.0);        // set the UAV position
 
     // **************
     // create various context menu (mouse right click menu) actions
@@ -637,6 +644,15 @@ void OPMapGadgetWidget::updatePosition()
 
     m_map->UAV->SetUAVPos(uav_pos, uav_altitude_meters); // set the maps UAV position
     m_map->UAV->SetUAVHeading(uav_heading_degrees);      // set the maps UAV heading
+
+    if (!getGPS_LLA(latitude, longitude, altitude))
+        return;
+
+    uav_pos = internals::PointLatLng(latitude, longitude);	// current UAV position
+    m_map->GPS->SetUAVPos(uav_pos, uav_altitude_meters); // set the maps UAV position
+    m_map->GPS->SetUAVHeading(uav_heading_degrees);      // set the maps UAV heading
+
+
 }
 
 /**
@@ -1575,6 +1591,7 @@ void OPMapGadgetWidget::onShowUAVAct_toggled(bool show)
         return;
 
     m_map->UAV->setVisible(show);
+    m_map->GPS->setVisible(show);
 }
 
 void OPMapGadgetWidget::onMapModeActGroup_triggered(QAction *action)
@@ -1686,6 +1703,7 @@ void OPMapGadgetWidget::onClearUAVtrailAct_triggered()
         return;
 
     m_map->UAV->DeleteTrail();
+    m_map->GPS->DeleteTrail();
 }
 
 void OPMapGadgetWidget::onUAVTrailTimeActGroup_triggered(QAction *action)
@@ -2186,6 +2204,51 @@ bool OPMapGadgetWidget::getUAV_LLA(double &latitude, double &longitude, double &
 
     return true;
 }
+
+// *************************************************************************************
+
+bool OPMapGadgetWidget::getGPS_LLA(double &latitude, double &longitude, double &altitude)
+{
+    UAVObject *obj;
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    if (!pm) return false;
+    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+    if (!om) return false;
+
+    obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("GPSPosition")));
+    if (!obj) return false;
+    latitude = obj->getField(QString("Latitude"))->getDouble();
+    longitude = obj->getField(QString("Longitude"))->getDouble();
+    altitude = obj->getField(QString("Altitude"))->getDouble();
+
+    latitude *= 1E-7;
+    longitude *= 1E-7;
+
+    if (latitude != latitude) latitude = 0; // nan detection
+//    if (isNan(latitude)) latitude = 0; // nan detection
+    else
+//    if (!isFinite(latitude)) latitude = 0;
+//    else
+    if (latitude >  90) latitude =  90;
+    else
+    if (latitude < -90) latitude = -90;
+
+    if (longitude != longitude) longitude = 0; // nan detection
+    else
+//    if (longitude > std::numeric_limits<double>::max()) longitude = 0;  // +infinite
+//    else
+//    if (longitude < -std::numeric_limits<double>::max()) longitude = 0;  // -infinite
+//    else
+    if (longitude >  180) longitude =  180;
+    else
+    if (longitude < -180) longitude = -180;
+
+    if (altitude != altitude) altitude = 0; // nan detection
+
+    return true;
+}
+
 
 double OPMapGadgetWidget::getUAV_Yaw()
 {

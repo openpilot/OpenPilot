@@ -322,6 +322,7 @@ private:
     internals::PointLatLng destPoint(internals::PointLatLng source, double bear, double dist);
 
     bool getUAV_LLA(double &latitude, double &longitude, double &altitude);
+    bool getGPS_LLA(double &latitude, double &longitude, double &altitude);
     double getUAV_Yaw();
 
     void setMapFollowingMode();

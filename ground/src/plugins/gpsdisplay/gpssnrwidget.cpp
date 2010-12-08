@@ -21,6 +21,11 @@ GpsSnrWidget::GpsSnrWidget(QWidget *parent) :
         satTexts[i] = new QGraphicsSimpleTextItem("##",boxes[i]);
         satTexts[i]->setBrush(QColor("Black"));
         satTexts[i]->setFont(QFont("Courier"));
+
+        satSNRs[i] = new QGraphicsSimpleTextItem("##",boxes[i]);
+        satSNRs[i]->setBrush(QColor("Black"));
+        satSNRs[i]->setFont(QFont("Courier"));
+
     }
 
 }
@@ -108,6 +113,21 @@ void GpsSnrWidget::drawSat(int index) {
         matrix.scale(scale,scale);
         matrix.translate(-textRect.width()/2,-textRect.height());
         satTexts[index]->setTransform(matrix,false);
+
+        QString snrString = QString().number(snr);
+        if (snrString.length() ==1) { // Will probably never happen!
+            snrString = "0" + snrString;
+        }
+        satSNRs[index]->setText(snrString);
+        textRect = satSNRs[index]->boundingRect();
+
+        matrix.reset();
+        scale = 0.85 * (boxRect.width() / textRect.width());
+        matrix.translate( boxRect.width()/2,0);
+        matrix.scale(scale,scale);
+        matrix.translate(-textRect.width()/2,-textRect.height());
+        satSNRs[index]->setTransform(matrix,false);
+
     } else {
         boxes[index]->hide();
     }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>560</width>
-    <height>376</height>
+    <width>579</width>
+    <height>379</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -586,6 +586,11 @@
            <width>250</width>
            <height>95</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>Displays the SNR for each detected sat.
+Satellite number (PRN) is displayed inside the green bar.
+Sat SNR is displayed above (in dBHz)</string>
          </property>
          <property name="verticalScrollBarPolicy">
           <enum>Qt::ScrollBarAlwaysOff</enum>

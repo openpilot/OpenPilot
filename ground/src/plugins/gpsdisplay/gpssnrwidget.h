@@ -22,6 +22,7 @@ private:
     QGraphicsScene *scene;
     QGraphicsRectItem *boxes[MAX_SATTELITES];
     QGraphicsSimpleTextItem* satTexts[MAX_SATTELITES];
+    QGraphicsSimpleTextItem* satSNRs[MAX_SATTELITES];
 
     void drawSat(int index);
 

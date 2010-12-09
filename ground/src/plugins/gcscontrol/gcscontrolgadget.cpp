@@ -200,41 +200,41 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
         case 1://Roll
             if (buttonSettings[number].ActionID==1)
             {//increase
-                obj->getField("Roll")->setValue(obj->getField("Roll")->getValue().toDouble()+buttonSettings[number].Amount);
+                obj->getField("Roll")->setValue(bound(obj->getField("Roll")->getValue().toDouble()+buttonSettings[number].Amount));
             }
             if (buttonSettings[number].ActionID==2)
             {//decrease
-                obj->getField("Roll")->setValue(obj->getField("Roll")->getValue().toDouble()-buttonSettings[number].Amount);
+                obj->getField("Roll")->setValue(bound(obj->getField("Roll")->getValue().toDouble()-buttonSettings[number].Amount));
             }
             break;
         case 2://Pitch
             if (buttonSettings[number].ActionID==1)
             {//increase
-                obj->getField("Pitch")->setValue(obj->getField("Pitch")->getValue().toDouble()+buttonSettings[number].Amount);
+                obj->getField("Pitch")->setValue(bound(obj->getField("Pitch")->getValue().toDouble()+buttonSettings[number].Amount));
             }
             if (buttonSettings[number].ActionID==2)
             {//decrease
-                obj->getField("Pitch")->setValue(obj->getField("Pitch")->getValue().toDouble()-buttonSettings[number].Amount);
+                obj->getField("Pitch")->setValue(bound(obj->getField("Pitch")->getValue().toDouble()-buttonSettings[number].Amount));
             }
             break;
         case 3://Yaw
             if (buttonSettings[number].ActionID==1)
             {//increase
-                obj->getField("Yaw")->setValue(obj->getField("Yaw")->getValue().toDouble()+buttonSettings[number].Amount);
+                obj->getField("Yaw")->setValue(wrap(obj->getField("Yaw")->getValue().toDouble()+buttonSettings[number].Amount));
             }
             if (buttonSettings[number].ActionID==2)
             {//decrease
-                obj->getField("Yaw")->setValue(obj->getField("Yaw")->getValue().toDouble()-buttonSettings[number].Amount);
+                obj->getField("Yaw")->setValue(wrap(obj->getField("Yaw")->getValue().toDouble()-buttonSettings[number].Amount));
             }
             break;
         case 4://Throttle
             if (buttonSettings[number].ActionID==1)
             {//increase
-                obj->getField("Throttle")->setValue(obj->getField("Throttle")->getValue().toDouble()+buttonSettings[number].Amount);
+                obj->getField("Throttle")->setValue(bound(obj->getField("Throttle")->getValue().toDouble()+buttonSettings[number].Amount));
             }
             if (buttonSettings[number].ActionID==2)
             {//decrease
-                obj->getField("Throttle")->setValue(obj->getField("Throttle")->getValue().toDouble()-buttonSettings[number].Amount);
+                obj->getField("Throttle")->setValue(bound(obj->getField("Throttle")->getValue().toDouble()-buttonSettings[number].Amount));
             }
             break;
         case 5://Armed
@@ -300,4 +300,19 @@ void GCSControlGadget::axesValues(QListInt16 values)
             break;
         }
     }
+}
+
+
+double GCSControlGadget::bound(double input)
+{
+    if (input > 1.0)return 1.0;
+    if (input <-1.0)return -1.0;
+    return input;
+}
+
+double GCSControlGadget::wrap(double input)
+{
+    while (input > 1.0)input -= 2.0;
+    while (input <-1.0)input += 2.0;
+    return input;
 }

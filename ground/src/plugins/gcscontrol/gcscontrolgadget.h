@@ -69,6 +69,8 @@ private:
     int throttleChannel;
     int controlsMode;
     buttonSettingsStruct buttonSettings[8];
+    double bound(double input);
+    double wrap(double input);
 
 signals:
     void sticksChangedRemotely(double leftX, double leftY, double rightX, double rightY);

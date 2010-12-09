@@ -195,68 +195,63 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
         UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
         UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(QString("ManualControlCommand")) );
 
-        switch (buttonSettings[number].FunctionID)
+        switch (buttonSettings[number].ActionID)
         {
-        case 1://Roll
-            if (buttonSettings[number].ActionID==1)
-            {//increase
-                obj->getField("Roll")->setValue(bound(obj->getField("Roll")->getValue().toDouble()+buttonSettings[number].Amount));
-            }
-            if (buttonSettings[number].ActionID==2)
-            {//decrease
-                obj->getField("Roll")->setValue(bound(obj->getField("Roll")->getValue().toDouble()-buttonSettings[number].Amount));
-            }
-            break;
-        case 2://Pitch
-            if (buttonSettings[number].ActionID==1)
-            {//increase
-                obj->getField("Pitch")->setValue(bound(obj->getField("Pitch")->getValue().toDouble()+buttonSettings[number].Amount));
-            }
-            if (buttonSettings[number].ActionID==2)
-            {//decrease
-                obj->getField("Pitch")->setValue(bound(obj->getField("Pitch")->getValue().toDouble()-buttonSettings[number].Amount));
+        case 1://increase
+            switch (buttonSettings[number].FunctionID)
+            {
+            case 1://Roll
+                    obj->getField("Roll")->setValue(bound(obj->getField("Roll")->getValue().toDouble()+buttonSettings[number].Amount));
+                break;
+            case 2://Pitch
+                    obj->getField("Pitch")->setValue(bound(obj->getField("Pitch")->getValue().toDouble()+buttonSettings[number].Amount));
+                 break;
+            case 3://Yaw
+                    obj->getField("Yaw")->setValue(wrap(obj->getField("Yaw")->getValue().toDouble()+buttonSettings[number].Amount));
+                break;
+            case 4://Throttle
+                    obj->getField("Throttle")->setValue(bound(obj->getField("Throttle")->getValue().toDouble()+buttonSettings[number].Amount));
+                break;
             }
             break;
-        case 3://Yaw
-            if (buttonSettings[number].ActionID==1)
-            {//increase
-                obj->getField("Yaw")->setValue(wrap(obj->getField("Yaw")->getValue().toDouble()+buttonSettings[number].Amount));
-            }
-            if (buttonSettings[number].ActionID==2)
-            {//decrease
-                obj->getField("Yaw")->setValue(wrap(obj->getField("Yaw")->getValue().toDouble()-buttonSettings[number].Amount));
-            }
-            break;
-        case 4://Throttle
-            if (buttonSettings[number].ActionID==1)
-            {//increase
-                obj->getField("Throttle")->setValue(bound(obj->getField("Throttle")->getValue().toDouble()+buttonSettings[number].Amount));
-            }
-            if (buttonSettings[number].ActionID==2)
-            {//decrease
-                obj->getField("Throttle")->setValue(bound(obj->getField("Throttle")->getValue().toDouble()-buttonSettings[number].Amount));
+        case 2://decrease
+            switch (buttonSettings[number].FunctionID)
+            {
+            case 1://Roll
+                    obj->getField("Roll")->setValue(bound(obj->getField("Roll")->getValue().toDouble()-buttonSettings[number].Amount));
+                break;
+            case 2://Pitch
+                    obj->getField("Pitch")->setValue(bound(obj->getField("Pitch")->getValue().toDouble()-buttonSettings[number].Amount));
+                 break;
+            case 3://Yaw
+                    obj->getField("Yaw")->setValue(wrap(obj->getField("Yaw")->getValue().toDouble()-buttonSettings[number].Amount));
+                break;
+            case 4://Throttle
+                    obj->getField("Throttle")->setValue(bound(obj->getField("Throttle")->getValue().toDouble()-buttonSettings[number].Amount));
+                break;
             }
             break;
-        case 5://Armed
-            if (buttonSettings[number].ActionID==3)
-            {//toggle
-                if(obj->getField("Armed")->getValue().toString().compare("True")==0)
-                {
-                    obj->getField("Armed")->setValue("False");
-                }
-                else
-                {
-                    obj->getField("Armed")->setValue("True");
-                }
+        case 3://toggle
+            switch (buttonSettings[number].FunctionID)
+            {
+            case 1://Armed
+                    if(obj->getField("Armed")->getValue().toString().compare("True")==0)
+                    {
+                        obj->getField("Armed")->setValue("False");
+                    }
+                    else
+                    {
+                        obj->getField("Armed")->setValue("True");
+                    }
+                break;
+            case 2://GCS Control
+               break;
             }
-            break;
-        case 6://GCS Control
-            if (buttonSettings[number].ActionID==3)
-            {//toggle
 
-            }
             break;
         }
+
+
         obj->updated();
     }
         //buttonSettings[number].ActionID NIDT

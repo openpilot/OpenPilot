@@ -41,6 +41,8 @@ GCSControlGadgetOptionsPage::GCSControlGadgetOptionsPage(GCSControlGadgetConfigu
 
    sdlGamepad = dynamic_cast<GCSControlPlugin*>(parent)->sdlGamepad;
 
+
+
 }
 
 GCSControlGadgetOptionsPage::~GCSControlGadgetOptionsPage()
@@ -102,6 +104,8 @@ QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
     QWidget *optionsPageWidget = new QWidget;
     options_page->setupUi(optionsPageWidget);
 
+
+
     QList<QComboBox*> chList;
     chList << options_page->channel0 << options_page->channel1 <<
               options_page->channel2 << options_page->channel3 <<
@@ -147,9 +151,20 @@ QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
         buttonValueList.at(i)->setValue(m_config->getbuttonSettings(i).Amount);
 
         connect(buttonFunctionList.at(i),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonFunction()));
-        connect(buttonActionList.at(i),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonFunction()));
+        //connect(buttonActionList.at(i),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonActions[i]()));
+        updateButtonAction(i);
+        buttonFunctionList.at(i)->setCurrentIndex(m_config->getbuttonSettings(i).FunctionID);
     }
-    updateButtonFunction();
+    connect(buttonActionList.at(0),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonAction_0()));
+    connect(buttonActionList.at(1),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonAction_1()));
+    connect(buttonActionList.at(2),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonAction_2()));
+    connect(buttonActionList.at(3),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonAction_3()));
+    connect(buttonActionList.at(4),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonAction_4()));
+    connect(buttonActionList.at(5),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonAction_5()));
+    connect(buttonActionList.at(6),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonAction_6()));
+    connect(buttonActionList.at(7),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonAction_7()));
+
+    //updateButtonFunction();
 
 
     // Controls mode are from 1 to 4.
@@ -276,12 +291,76 @@ void GCSControlGadgetOptionsPage::updateButtonFunction()
             buttonFunctionList.at(i)->setVisible(1);
             buttonLabelList.at(i)->setVisible(0);
             buttonValueList.at(i)->setVisible(0);
-        }
+       }
         else
         {
             buttonFunctionList.at(i)->setVisible(1);
             buttonLabelList.at(i)->setVisible(1);
             buttonValueList.at(i)->setVisible(1);
+        }
+    }
+
+
+}
+
+void GCSControlGadgetOptionsPage::updateButtonAction(int controlID)
+{
+    int i;
+    QStringList buttonOptions;
+    QList<QComboBox*> buttonFunctionList;
+    buttonFunctionList << options_page->buttonFunction0 << options_page->buttonFunction1 <<
+              options_page->buttonFunction2 << options_page->buttonFunction3 <<
+              options_page->buttonFunction4 << options_page->buttonFunction5 <<
+              options_page->buttonFunction6 << options_page->buttonFunction7;
+    QList<QComboBox*> buttonActionList;
+    buttonActionList << options_page->buttonAction0 << options_page->buttonAction1 <<
+              options_page->buttonAction2 << options_page->buttonAction3 <<
+              options_page->buttonAction4 << options_page->buttonAction5 <<
+              options_page->buttonAction6 << options_page->buttonAction7;
+    QList<QDoubleSpinBox*> buttonValueList;
+    buttonValueList << options_page->buttonAmount0 << options_page->buttonAmount1 <<
+              options_page->buttonAmount2 << options_page->buttonAmount3 <<
+              options_page->buttonAmount4 << options_page->buttonAmount5 <<
+              options_page->buttonAmount6 << options_page->buttonAmount7;
+    QList<QLabel*> buttonLabelList;
+    buttonLabelList << options_page->buttonLabel0 << options_page->buttonLabel1 <<
+              options_page->buttonLabel2 << options_page->buttonLabel3 <<
+              options_page->buttonLabel4 << options_page->buttonLabel5 <<
+              options_page->buttonLabel6 << options_page->buttonLabel7;
+
+    //for (i=0;i<8;i++)
+    i=controlID;
+    {
+        if (buttonActionList.at(i)->currentText().compare("Does nothing")==0)
+        {
+            buttonFunctionList.at(i)->setVisible(0);
+            buttonLabelList.at(i)->setVisible(0);
+            buttonValueList.at(i)->setVisible(0);
+        }
+        else
+        if (buttonActionList.at(i)->currentText().compare("Toggles")==0)
+        {
+            disconnect(buttonFunctionList.at(i),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonFunction()));
+            buttonOptions <<"-" << "Armed" << "GCS Control" ;
+            buttonFunctionList.at(i)->clear();
+            buttonFunctionList.at(i)->insertItems(-1,buttonOptions);
+
+            buttonFunctionList.at(i)->setVisible(1);
+            buttonLabelList.at(i)->setVisible(0);
+            buttonValueList.at(i)->setVisible(0);
+            connect(buttonFunctionList.at(i),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonFunction()));
+        }
+        else
+        {
+            disconnect(buttonFunctionList.at(i),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonFunction()));
+            buttonOptions <<"-" << "Roll" << "Pitch" << "Yaw" << "Throttle" ;
+            buttonFunctionList.at(i)->clear();
+            buttonFunctionList.at(i)->addItems(buttonOptions);
+
+            buttonFunctionList.at(i)->setVisible(1);
+            buttonLabelList.at(i)->setVisible(1);
+            buttonValueList.at(i)->setVisible(1);
+            connect(buttonFunctionList.at(i),SIGNAL(currentIndexChanged(int)),this,SLOT(updateButtonFunction()));
         }
     }
 

@@ -67,7 +67,15 @@ protected slots:
     void buttonState(ButtonNumber number, bool pressed);
     void axesValues(QListInt16 values);
     void updateButtonFunction();
-
+    void updateButtonAction(int controlID);
+    void updateButtonAction_0(void){updateButtonAction(0);};
+    void updateButtonAction_1(void){updateButtonAction(1);};
+    void updateButtonAction_2(void){updateButtonAction(2);};
+    void updateButtonAction_3(void){updateButtonAction(3);};
+    void updateButtonAction_4(void){updateButtonAction(4);};
+    void updateButtonAction_5(void){updateButtonAction(5);};
+    void updateButtonAction_6(void){updateButtonAction(6);};
+    void updateButtonAction_7(void){updateButtonAction(7);};
 };
 
 #endif // GCSCONTROLGADGETOPTIONSPAGE_H

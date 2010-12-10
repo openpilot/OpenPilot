@@ -86,7 +86,7 @@ UAVObject::Metadata TelemetrySettings::getDefaultMetadata()
  */
 void TelemetrySettings::setDefaultFieldValues()
 {
-    data.Speed = 2;
+    data.Speed = 5;
 
 }
 

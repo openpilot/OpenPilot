@@ -1,5 +1,5 @@
 #include "port.h"
-#include "..\delay.h"
+#include "delay.h"
 port::port(PortSettings settings,QString name):mstatus(port::closed)
 {
     timer.start();

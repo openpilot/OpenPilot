@@ -2,7 +2,6 @@
 #include <cmath>
 #include <qwaitcondition.h>
 #include <QMutex>
-#include <conio.h>
 
 OP_DFU::OP_DFU(bool _debug,bool _use_serial,QString portname): debug(_debug),use_serial(_use_serial),mready(true)
 {
@@ -809,7 +808,7 @@ int OP_DFU::receiveData(void * data,int size)
         time.start();
         while(true)
         {
-            if(x=serialhandle->read_Packet(data+1)!=-1||time.elapsed()>10000)
+            if(x=serialhandle->read_Packet(((char *) data)+1)!=-1||time.elapsed()>10000)
             {
                 if(time.elapsed()>10000)
                     qDebug()<<"____timeout";

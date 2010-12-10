@@ -9,11 +9,11 @@
 #include <QList>
 #include <iostream>
 #include "delay.h"
-#include "../../../libs/qextserialport/src/qextserialport.h"
+#include "../../libs/qextserialport/src/qextserialport.h"
 #include <QTime>
-#include ".\SSP\qssp.h"
-#include ".\SSP\port.h"
-#include ".\SSP\qsspt.h"
+#include "SSP/qssp.h"
+#include "SSP/port.h"
+#include "SSP/qsspt.h"
 using namespace std;
 #define BUF_LEN 64
 

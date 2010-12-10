@@ -118,8 +118,8 @@ SRC += $(OPSYSTEM)/main.c
 SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(OPSYSTEM)/op_dfu.c
 SRC += $(OPSYSTEM)/stopwatch.c
-
-
+SRC += $(OPSYSTEM)/ssp_timer.c
+SRC += $(OPSYSTEM)/ssp.c
 
 
 ## PIOS Hardware (STM32F10x)
@@ -329,7 +329,7 @@ endif
 
 CFLAGS += -O$(OPT)
 ifeq ($(DEBUG),NO)
-CFLAGS += -fdata-sections -ffunction-sections
+CFLAGS += -ffunction-sections
 endif
 
 CFLAGS += -mcpu=$(MCU) -mthumb

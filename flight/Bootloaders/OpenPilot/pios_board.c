@@ -1,13 +1,11 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotSystem OpenPilot System
- * @{
- * @addtogroup OpenPilotCore OpenPilot Core
+ * @addtogroup OpenPilotBL OpenPilot BootLoader
  * @{
  *
  * @file       pios_board.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Defines board specific static initializers for hardware for the OpenPilot board.
+ * @brief      Defines board specific static initialisers for hardware for the OpenPilot board.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -64,7 +62,7 @@ void PIOS_Board_Init(void) {
 	PIOS_USB_HID_Init(0);
 #endif
 	//PIOS_I2C_Init();
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);//TODO Tirar
 }
 
 /* MicroSD Interface

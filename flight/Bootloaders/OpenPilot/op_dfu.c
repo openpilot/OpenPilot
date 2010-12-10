@@ -1,37 +1,41 @@
-/******************** (C) COPYRIGHT 2010 STMicroelectronics ********************
- * File Name          : usb_endp.c
- * Author             : MCD Application Team
- * Version            : V3.2.1
- * Date               : 07/05/2010
- * Description        : Endpoint routines
- ********************************************************************************
- * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
- * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE TIME.
- * AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY DIRECT,
- * INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM THE
- * CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING
- * INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
- *******************************************************************************/
+/**
+ ******************************************************************************
+ * @addtogroup OpenPilotBL OpenPilot BootLoader
+ * @brief These files contain the code to the OpenPilot MB Bootloader.
+ *
+ * @{
+ * @file       op_dfu.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      This file contains the DFU commands handling code
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 
 /* Includes ------------------------------------------------------------------*/
-//#include "platform_config.h"
 #include "pios.h"
-//#include "stm32f10x.h"
-//#include "usb_lib.h"
-//#include "usb_istr.h"
-//#include "stm32_eval.h"
-//#include "stm32f10x_flash.h"
-//#include "stm32f10x_crc.h"
-//#include "hw_config.h"
-//#include <string.h>
 #include "op_dfu.h"
 #include "pios_bl_helper.h"
 #include "pios_opahrs.h"
+#include "ssp.h"
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-
 //programmable devices
 Device devicesTable[10];
 uint8_t numberOfDevices = 0;
@@ -71,9 +75,11 @@ DFUTransfer downType = 0;
 /* Extern variables ----------------------------------------------------------*/
 extern DFUStates DeviceState;
 extern uint8_t JumpToApp;
+extern Port_t ssp_port;
+extern DFUPort ProgPort;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
-
+void sendData(uint8_t * buf,uint16_t size);
 uint32_t CalcFirmCRC(void);
 
 void DataDownload(DownloadAction action) {
@@ -125,14 +131,17 @@ void DataDownload(DownloadAction action) {
 			DeviceState = Last_operation_Success;
 			Aditionals = (uint32_t) Download;
 		}
-		PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, SendBuffer + 1, 63);//FIX+1
-		//PIOS SetEPTxValid(ENDP1);
+		sendData(SendBuffer+1,63);
 	}
 }
-
 void processComand(uint8_t *xReceive_Buffer) {
 
 	Command = xReceive_Buffer[COMMAND];
+#ifdef DEBUG_SSP
+	char str[63]={0};
+	sprintf(str,"Received COMMAND:%d|",Command);
+	PIOS_COM_SendString(PIOS_COM_TELEM_USB,str);
+#endif
 	EchoReqFlag = (Command >> 7);
 	EchoAnsFlag = (Command >> 6) & 0x01;
 	StartFlag = (Command >> 5) & 0x01;
@@ -352,8 +361,8 @@ void processComand(uint8_t *xReceive_Buffer) {
 			Buffer[12] = devicesTable[Data0 - 1].FW_Crc >> 8;
 			Buffer[13] = devicesTable[Data0 - 1].FW_Crc;
 		}
-		//PIOS USB_SIL_Write(EP1_IN, (uint8_t*) Buffer, 64);
-		PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, Buffer + 1, 63);//FIX+1
+		sendData(Buffer + 1, 63);
+		//PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, Buffer + 1, 63);//FIX+1
 		break;
 	case JumpFW:
 		if (numberOfDevices > 1) {
@@ -397,7 +406,14 @@ void processComand(uint8_t *xReceive_Buffer) {
 
 		break;
 	case Download_Req:
+#ifdef DEBUG_SSP
+			sprintf(str,"COMMAND:DOWNLOAD_REQ 1 Status=%d|",DeviceState);
+			PIOS_COM_SendString(PIOS_COM_TELEM_USB,str);
+#endif
 		if (DeviceState == DFUidle) {
+#ifdef DEBUG_SSP
+			PIOS_COM_SendString(PIOS_COM_TELEM_USB,"COMMAND:DOWNLOAD_REQ 1|");
+#endif
 			downType = Data0;
 			downPacketTotal = Count;
 			downSizeOfLastPacket = Data1;
@@ -434,9 +450,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 		Buffer[7] = 0;
 		Buffer[8] = 0;
 		Buffer[9] = 0;
-		PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, Buffer + 1, 63);//FIX+1
-		//PIOS USB_SIL_Write(EP1_IN, (uint8_t*) Buffer, 64);
-		//PIOS SetEPTxValid(ENDP1);
+		sendData(Buffer + 1, 63);
 		if (DeviceState == Last_operation_Success) {
 			DeviceState = DFUidle;
 		}
@@ -448,9 +462,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 	}
 	if (EchoReqFlag == 1) {
 		echoBuffer[1] = echoBuffer[1] | EchoAnsFlag;
-		PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, echoBuffer, 63);
-		//PIOS USB_SIL_Write(EP1_IN, (uint8_t*) echoBuffer, 64);
-		//PIOS SetEPTxValid(ENDP1);
+		sendData(echoBuffer + 1, 63);
 	}
 	return;
 }
@@ -504,8 +516,7 @@ void OPDfuIni(uint8_t discover) {
 					devicesTable[1] = dev;
 				}
 			}
-		}
-		else
+		} else
 			PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 0);
 	}
 	//TODO check other devices trough spi or whatever
@@ -558,4 +569,12 @@ uint32_t CalcFirmCRC() {
 		break;
 	}
 
+}
+void sendData(uint8_t * buf,uint16_t size)
+{
+if (ProgPort == Usb) {
+			PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, buf, size);//FIX+1
+		} else if (ProgPort == Serial) {
+			ssp_SendData(&ssp_port, buf, size);
+		}
 }

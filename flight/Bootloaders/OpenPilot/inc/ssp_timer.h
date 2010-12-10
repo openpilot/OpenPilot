@@ -3,9 +3,9 @@
  * @addtogroup OpenPilotBL OpenPilot BootLoader
  * @{
  *
- * @file       stopwatch.h
+ * @file       ssp_timer.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Timer functions for the LED PWM.
+ * @brief      Timer functions to be used with the SSP.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -25,8 +25,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef _STOPWATCH_H
-#define _STOPWATCH_H
+#ifndef _SSP_TIMER_H
+#define _SSP_TIMER_H
 
 /////////////////////////////////////////////////////////////////////////////
 // Global definitions
@@ -42,9 +42,9 @@
 // Prototypes
 /////////////////////////////////////////////////////////////////////////////
 
-extern s32 STOPWATCH_Init(u32 resolution);
-extern s32 STOPWATCH_Reset(void);
-extern u32 STOPWATCH_ValueGet(void);
+extern s32 SSP_TIMER_Init(u32 resolution);
+extern s32 SSP_TIMER_Reset(void);
+extern u32 SSP_TIMER_ValueGet(void);
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -52,4 +52,4 @@ extern u32 STOPWATCH_ValueGet(void);
 /////////////////////////////////////////////////////////////////////////////
 
 
-#endif /* _STOPWATCH_H */
+#endif /* _SSP_TIMER_H */

@@ -72,9 +72,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
-
+#include <pios.h>
 #include "ssp.h"
-
 /** PRIVATE DEFINITIONS **/
 #define SYNC                        225                     // Sync character used in Serial Protocol
 #define ESC                         224                     // ESC character used in Serial Protocol
@@ -230,6 +229,11 @@ int16_t ssp_SendProcess( Port_t *thisport )
 				value = SSP_TX_WAITING;
 			} else {
 				// Give up, # of trys has exceded the limit
+#ifdef DEBUG_SSP
+				char str[63]={0};
+				sprintf(str,"Send Timeout|");
+				PIOS_COM_SendString(PIOS_COM_TELEM_USB,str);
+#endif
 				value = SSP_TX_TIMEOUT;
 				CLEARBIT( thisport->flags, ACK_RECEIVED);
                 thisport->SendState = SSP_IDLE;
@@ -381,9 +385,19 @@ int16_t ssp_SendData( Port_t *thisport, const uint8_t *data, const uint16_t leng
         sf_MakePacket( thisport->txBuf, data, length, thisport->txSeqNo );
 		sf_SendPacket( thisport );				// punch out the packet to the serial port
         sf_SetSendTimeout( thisport );	// do the timeout values
+#ifdef DEBUG_SSP
+        char str[63]={0};
+        sprintf(str,"Sent DATA PACKET:%d|",thisport->txSeqNo);
+        PIOS_COM_SendString(PIOS_COM_TELEM_USB,str);
+#endif
     } else {
         // error we are already sending a packet. Need to wait for the current packet to be acked or timeout.
-        value = SSP_TX_BUSY;
+#ifdef DEBUG_SSP
+    	char str[63]={0};
+    	sprintf(str,"Error sending TX was busy|");
+    	PIOS_COM_SendString(PIOS_COM_TELEM_USB,str);
+#endif
+    	value = SSP_TX_BUSY;
     }
     return value;
 }
@@ -513,6 +527,11 @@ void sf_MakePacket( uint8_t *txBuf, const uint8_t * pdata, uint16_t length, uint
 
 static void sf_SendAckPacket( Port_t *thisport, uint8_t seqNumber)
 {
+#ifdef DEBUG_SSP
+	char str[63]={0};
+	sprintf(str,"Sent ACK PACKET:%d|",seqNumber);
+	PIOS_COM_SendString(PIOS_COM_TELEM_USB,str);
+#endif
     uint8_t    AckSeqNumber = SETBIT( seqNumber, ACK_BIT );
 
     // create the packet, note we pass AckSequenceNumber directly
@@ -778,12 +797,20 @@ static int16_t sf_ReceivePacket(Port_t *thisport)
 			//  It matches the last packet sent by us
 			SETBIT( thisport->txSeqNo, ACK_BIT );
 			thisport->SendState = SSP_ACKED;
+#ifdef DEBUG_SSP
+			char str[63]={0};
+			sprintf(str,"Received ACK:%d|",(thisport->txSeqNo & 0x7F));
+			PIOS_COM_SendString(PIOS_COM_TELEM_USB,str);
+#endif
 			value = FALSE;
 		}
         // else ignore the ACK packet
 	} else {
 		//  Received a 'data' packet, figure out what type of packet we received...
 		if( thisport->rxBuf[SEQNUM] == 0 ) {
+#ifdef DEBUG_SSP
+			PIOS_COM_SendString(PIOS_COM_TELEM_USB,"Received SYNC Request|");
+#endif
 			// Synchronize sequence number with host
 #ifdef ACTIVE_SYNCH
             thisport->sendSynch = TRUE;
@@ -800,6 +827,11 @@ static int16_t sf_ReceivePacket(Port_t *thisport)
 			thisport->rxSeqNo = thisport->rxBuf[SEQNUM];
 			// Let the application do something with the data/packet.
 			if( thisport->pfCallBack != NULL ) {
+#ifdef DEBUG_SSP
+				char str[63]={0};
+				sprintf(str,"Received DATA PACKET:%d [0]=%d %d %d|",thisport->rxSeqNo,(uint8_t)thisport->rxBuf[2],(uint8_t)thisport->rxBuf[3],(uint8_t)thisport->rxBuf[4]);
+				PIOS_COM_SendString(PIOS_COM_TELEM_USB,str);
+#endif
 				// skip the first two bytes (length and seq. no.) in the buffer.
 				thisport->pfCallBack( &(thisport->rxBuf[2]), thisport->rxBufLen);
 			}

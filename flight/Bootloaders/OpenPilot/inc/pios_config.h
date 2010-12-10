@@ -1,10 +1,7 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotSystem OpenPilot System
+ * @addtogroup OpenPilotBL OpenPilot BootLoader
  * @{
- * @addtogroup OpenPilotCore OpenPilot Core
- * @{
- *
  * @file       pios_config.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      PiOS configuration header. 
@@ -47,7 +44,7 @@
 #define PIOS_INCLUDE_COM
 #define PIOS_INCLUDE_GPIO
 #define PIOS_NO_GPS
-
+//#define DEBUG_SSP
 
 /* Defaults for Logging */
 #define LOG_FILENAME 			"PIOS.LOG"

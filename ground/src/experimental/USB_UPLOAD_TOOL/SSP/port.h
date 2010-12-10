@@ -9,7 +9,7 @@
 class port
 {
 public:
-
+    enum portstatus{open,closed,error};
     virtual int16_t pfSerialRead(void);			// function to read a character from the serial input stream
     virtual void pfSerialWrite( uint8_t );	// function to write a byte to be sent out the serial port
     virtual uint32_t pfGetTime(void);
@@ -38,7 +38,9 @@ public:
     uint32_t		TxError;
     uint16_t		flags;
     port(PortSettings settings,QString name);
+    portstatus status();
 private:
+    portstatus mstatus;
     QTime timer;
     QextSerialPort *sport;
 };

@@ -79,6 +79,7 @@ private:
     void     sf_MakePacket( uint8_t *buf, const uint8_t * pdata, uint16_t length, uint8_t seqNo );
     int16_t 	sf_ReceivePacket();
     uint16_t ssp_SendDataBlock(uint8_t *data, uint16_t length );
+    bool debug;
 public:
     /** PUBLIC FUNCTIONS **/
      virtual void pfCallBack( uint8_t *, uint16_t);	// call back function that is called when a full packet has been received
@@ -89,7 +90,7 @@ public:
     void        ssp_Init( const PortConfig_t* const info);
     int16_t		ssp_ReceiveByte( );
     uint16_t 	ssp_Synchronise(  );
-    qssp(port * info);
+    qssp(port * info,bool debug);
 };
 
 #endif // QSSP_H

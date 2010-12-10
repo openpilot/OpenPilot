@@ -15,39 +15,61 @@ int main(int argc, char *argv[])
 
     port * info;
     PortSettings settings;
-    settings.BaudRate=BAUD19200;
+    settings.BaudRate=BAUD57600;
     settings.DataBits=DATA_8;
     settings.FlowControl=FLOW_OFF;
     settings.Parity=PAR_NONE;
-    settings.StopBits=STOP_2;
-    settings.Timeout_Millisec=500;
+    settings.StopBits=STOP_1;
+    settings.Timeout_Millisec=5000;
 
-    info=new port(settings,"COM2");
+    info=new port(settings,"COM3");
     info->rxBuf 		= sspRxBuf;
     info->rxBufSize 	= MAX_PACKET_DATA_LEN;
     info->txBuf 		= sspTxBuf;
     info->txBufSize 	= 255;
     info->max_retry	= 3;
-    info->timeoutLen	= 100;
+    info->timeoutLen	= 5000;
     //qssp b(info);
     qsspt bb(info);
+    uint8_t buf[1000];
     QCoreApplication a(argc, argv);
-    QByteArray arr;
-    while(true)
+    while(!bb.ssp_Synchronise())
     {
+        qDebug()<<"trying sync";
+    }
+     bb.start();
+     qDebug()<<"sync complete";
+     buf[0]=0;
+     buf[1]=1;
+     buf[2]=2;
+     while(true)
+     {
+     if(bb.sendData(buf,63))
+         qDebug()<<"send OK";
+//     else
+//         qDebug()<<"send NOK";
+//     //bb.ssp_SendData(buf,63);
+ }
+     while(true)
+    {
+
+
+
         if(bb.packets_Available()>0)
         {
-            arr=bb.read_Packet();
-            qDebug()<<"receive="<<(int)arr[0]<<(int)arr[1]<<(int)arr[2];
-        }
 
-      //  b.ssp_ReceiveProcess();
-      //  b.ssp_SendProcess();
-//        if(b.isDataAvailable())
-//        {
-//            QByteArray bb=b.readData();
-//            qDebug()<<bb[0]<<bb[1]<<bb[2];
-//        }
+            bb.read_Packet(buf);
+            qDebug()<<"receive="<<(int)buf[0]<<(int)buf[1]<<(int)buf[2];
+            ++buf[0];
+            ++buf[1];
+            ++buf[2];
+            //bb.ssp_SendData(buf,63);
+            bb.sendData(buf,63);
+        }
+        //bb.ssp_ReceiveProcess();
+        //bb.ssp_SendProcess();
+
+
     }
     return a.exec();
 }

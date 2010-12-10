@@ -8,15 +8,26 @@
 
 int main(int argc, char *argv[])
 {
+    ///SSP/////////////////////////////////
+
+
+
+    /////////////////////////////////////////////
 //    OP_DFU dfu(false);
 //    dfu.test();
     QCoreApplication a(argc, argv);
+//    argc=4;
+//    argv[1]="-ls";
+//    argv[2]="-t";
+//    argv[3]="COM3";
     if(argc>1||!PRIVATE)
     {
+        bool use_serial=false;
         bool verify;
         bool debug=false;
         OP_DFU::Actions action;
         QString file;
+        QString serialport;
         QString description;
         int device=-1;
         QStringList args;
@@ -44,14 +55,17 @@ int main(int argc, char *argv[])
             cout<<"| -r                   : resets the device                               |\n";
             cout<<"| -j                   : exits bootloader and jumps to user FW           |\n";
             cout<<"| -debug               : prints debug information                        |\n";
+            cout<<"| -t <port>            : uses serial port*                               |\n";
             cout<<"|                                                                        |\n";
             cout<<"| examples:                                                              |\n";
             cout<<"|                                                                        |\n";
             cout<<"| program and verify device #0                                           |\n";
-            cout<<"| OPUploadTool -p c:/OpenPilot.bin -w \"Openpilot Firmware\" -v -d 0       |\n";
+            cout<<"| OPUploadTool -p c:/OpenPilot.bin -w \"Openpilot Firmware\" -v -d 0     |\n";
             cout<<"|                                                                        |\n";
             cout<<"| Perform a quick compare of FW in file with FW in device #1             |\n";
             cout<<"| OPUploadTool -ch c:/OpenPilot2.bin -d 2                                |\n";
+            cout<<"|                                                                        |\n";
+            cout<<"| *requires valid user space firmwares already running                   |\n";
             cout<<"|________________________________________________________________________|\n";
             return 0;
 
@@ -168,6 +182,14 @@ int main(int argc, char *argv[])
             cout<<"wrong parameters";
             return -1;
         }
+        if(args.contains(USE_SERIAL))
+        {
+            if(args.indexOf(USE_SERIAL)+1<args.length())
+            {
+                serialport=(args[args.indexOf(USE_SERIAL)+1]);
+                use_serial=true;
+            }
+        }
         if(debug)
         {
             qDebug()<<"Action="<<(int)action;
@@ -175,10 +197,16 @@ int main(int argc, char *argv[])
             qDebug()<<"Device="<<device;
             qDebug()<<"Action="<<action;
             qDebug()<<"Desctription"<<description;
+            qDebug()<<"Use Serial port"<<use_serial;
+            if(use_serial)
+                qDebug()<<"Port Name"<<serialport;
         }
 
         ///////////////////////////////////ACTIONS START///////////////////////////////////////////////////
-        OP_DFU dfu(debug);
+        OP_DFU dfu(debug,use_serial,serialport);
+        if(!dfu.ready())
+            return -1;
+
         dfu.AbortOperation();
         if(!dfu.enterDFU(0))
         {
@@ -294,12 +322,12 @@ int main(int argc, char *argv[])
 
         return 0;
     }
-    OP_DFU dfu(true);
-    //dfu.findDevices();
-    dfu.enterDFU(1);
-    dfu.UploadFirmware("c:/ahrs.bin",true,1);
-    // dfu.UploadDescription("josemanuel");
-    //  QString str=dfu.DownloadDescription(12);
+//    OP_DFU dfu(true);
+//    //dfu.findDevices();
+//    dfu.enterDFU(1);
+//    dfu.UploadFirmware("c:/ahrs.bin",true,1);
+//    // dfu.UploadDescription("josemanuel");
+//    //  QString str=dfu.DownloadDescription(12);
     // dfu.JumpToApp();
     // qDebug()<<"Description="<<str;
     return a.exec();

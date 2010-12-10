@@ -5,10 +5,15 @@
 #include <../../plugins/rawhid/pjrc_rawhid.h>
 #include <QDebug>
 #include <QFile>
- #include <QCryptographicHash>
+#include <QCryptographicHash>
 #include <QList>
 #include <iostream>
 #include "delay.h"
+#include "../../../libs/qextserialport/src/qextserialport.h"
+#include <QTime>
+#include ".\SSP\qssp.h"
+#include ".\SSP\port.h"
+#include ".\SSP\qsspt.h"
 using namespace std;
 #define BUF_LEN 64
 
@@ -25,6 +30,11 @@ using namespace std;
 #define LISTDEVICES         "-ls"   //done
 #define RESET               "-r"
 #define JUMP                "-j"
+#define USE_SERIAL          "-t"
+
+#define MAX_PACKET_DATA_LEN	255
+#define MAX_PACKET_BUF_SIZE	(1+1+MAX_PACKET_DATA_LEN+2)
+
 
 class OP_DFU
 {
@@ -73,32 +83,31 @@ public:
 
     enum Commands
     {
-        Reserved,
-        Req_Capabilities,
-        Rep_Capabilities,
-        EnterDFU,
-        JumpFW,
-        Reset,
-        Abort_Operation,
-        Upload,
-        Op_END,
-        Download_Req,
-        Download,
-        Status_Request,
-        Status_Rep,
+        Reserved,//0
+        Req_Capabilities,//1
+        Rep_Capabilities,//2
+        EnterDFU,//3
+        JumpFW,//4
+        Reset,//5
+        Abort_Operation,//6
+        Upload,//7
+        Op_END,//8
+        Download_Req,//9
+        Download,//10
+        Status_Request,//11
+        Status_Rep,//12
 
     };
     struct device
     {
-            int ID;
-            quint32 FW_CRC;
-            int BL_Version;
-            int SizeOfDesc;
-            quint32 SizeOfCode;
-            bool Readable;
-            bool Writable;
+        int ID;
+        quint32 FW_CRC;
+        int BL_Version;
+        int SizeOfDesc;
+        quint32 SizeOfCode;
+        bool Readable;
+        bool Writable;
     };
-
     void JumpToApp();
     void ResetDevice(void);
     bool enterDFU(int const &devNumber);
@@ -113,8 +122,8 @@ public:
     QByteArray StartDownload(qint32 const & numberOfBytes, TransferTypes const & type);
     bool SaveByteArrayToFile(QString const & file,QByteArray const &array);
     void CopyWords(char * source, char* destination, int count);
-   // QByteArray DownloadData(int devNumber,int numberOfPackets);
-    OP_DFU(bool debug);
+    // QByteArray DownloadData(int devNumber,int numberOfPackets);
+    OP_DFU(bool debug,bool use_serial,QString port);
     void sendReset(void);
     bool findDevices();
     QList<device> devices;
@@ -126,13 +135,22 @@ public:
     void test();
     int send_delay;
     bool use_delay;
+    bool ready(){return mready;}
     void AbortOperation(void);
 private:
+    bool mready;
     bool debug;
     int RWFlags;
-
+    bool use_serial;
+    qsspt * serialhandle;
+    int sendData(void*,int);
+    int receiveData(void * data,int size);
     pjrc_rawhid hidHandle;
     int setStartBit(int command){return command|0x20;}
+    uint8_t	sspTxBuf[MAX_PACKET_BUF_SIZE];
+    uint8_t	sspRxBuf[MAX_PACKET_BUF_SIZE];
+
+    port * info;
 };
 
 

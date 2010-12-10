@@ -2,41 +2,82 @@
 #include <cmath>
 #include <qwaitcondition.h>
 #include <QMutex>
+#include <conio.h>
 
-OP_DFU::OP_DFU(bool _debug): debug(_debug)
+OP_DFU::OP_DFU(bool _debug,bool _use_serial,QString portname): debug(_debug),use_serial(_use_serial),mready(true)
 {
-    send_delay=10;
-    use_delay=true;
-    int numDevices=0;
-    cout<<"Please connect device now\n";
-    int count=0;
-    while(numDevices==0)
+    if(use_serial)
     {
-        cout<<".";
-        delay::msleep(500);
-        numDevices = hidHandle.open(1,0x20a0,0x4117,0,0); //0xff9c,0x0001);
-        if(++count==10)
+        cout<<"Connect hw now and press any key";
+        //  getch();
+        // delay::msleep(2000);
+        PortSettings settings;
+        settings.BaudRate=BAUD57600;
+        settings.DataBits=DATA_8;
+        settings.FlowControl=FLOW_OFF;
+        settings.Parity=PAR_NONE;
+        settings.StopBits=STOP_1;
+        settings.Timeout_Millisec=1000;
+        info=new port(settings,portname);
+        info->rxBuf 		= sspRxBuf;
+        info->rxBufSize 	= MAX_PACKET_DATA_LEN;
+        info->txBuf 		= sspTxBuf;
+        info->txBufSize 	= MAX_PACKET_DATA_LEN;
+        info->max_retry	= 10;
+        info->timeoutLen	= 1000;
+        if(info->status()!=port::open)
         {
-            cout<<"\r";
-            cout<<"           ";
-            cout<<"\r";
-            count=0;
+            cout<<"Could not open serial port\n";
+            mready=false;
+            return;
         }
+        serialhandle=new qsspt(info,debug);
+
+        while(serialhandle->ssp_Synchronise()==false)
+        {
+             if (debug)
+                 qDebug()<<"SYNC failed, resending";
+        }
+        qDebug()<<"SYNC Succeded";
+        serialhandle->start();
+        // serialhandle->start();
     }
-    if(debug)
-        qDebug() << numDevices << " device(s) opened";
-    //sendReset();
+    else
+    {
+
+        send_delay=10;
+        use_delay=true;
+        int numDevices=0;
+        cout<<"Please connect device now\n";
+        int count=0;
+        while(numDevices==0)
+        {
+            cout<<".";
+            delay::msleep(500);
+            numDevices = hidHandle.open(1,0x20a0,0x4117,0,0); //0xff9c,0x0001);
+            if(++count==10)
+            {
+                cout<<"\r";
+                cout<<"           ";
+                cout<<"\r";
+                count=0;
+            }
+        }
+        if(debug)
+            qDebug() << numDevices << " device(s) opened";
+        //sendReset();
+    }
 }
 void OP_DFU::sendReset(void)
 {
     char b[64]={0x02,0x24,0x3C,0x20,0x17,0x00,0x30,0x76,0x1F,0x40,0x62,0x04,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x6C,0x40,0x2E,0x00,0x00,0x1C,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    hidHandle.send(0,b,64,1000);
+    sendData(b,64);
     delay::msleep(600);
     char bb[64]={0x02,0x24,0x3C,0x20,0x17,0x00,0x30,0x76,0x1F,0x40,0xB9,0x08,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x44,0xE8,0x30,0x00,0x00,0x13,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    hidHandle.send(0,bb,64,1000);
+    sendData(bb,64);
     delay::msleep(600);
     char bbb[64]={0x02,0x24,0x3C,0x20,0x17,0x00,0x30,0x76,0x1F,0x40,0x10,0x0D,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xF9,0x61,0x34,0x00,0x00,0x13,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-    hidHandle.send(0,bbb,64,1000);
+    sendData(bbb,64);
 }
 
 bool OP_DFU::SaveByteArrayToFile(QString const & sfile, const QByteArray &array)
@@ -68,7 +109,7 @@ bool OP_DFU::enterDFU(int const &devNumber)
     buf[8] = 1;//DFU Data2
     buf[9] = 1;//DFU Data3
 
-    int result = hidHandle.send(0,buf, BUF_LEN, 500);
+    int result = sendData(buf, BUF_LEN);
     if(result<1)
         return false;
     if(debug)
@@ -104,7 +145,8 @@ bool OP_DFU::StartUpload(qint32 const & numberOfBytes, TransferTypes const & typ
     buf[11] = crc;
     if(debug)
         qDebug()<<"Number of packets:"<<numberOfPackets<<" Size of last packet:"<<lastPacketCount;
-    int result = hidHandle.send(0,buf, BUF_LEN, 5000);
+    int result = sendData(buf, BUF_LEN);
+    delay::msleep(1000);
     if(debug)
         qDebug() << result << " bytes sent";
     if(result>0)
@@ -145,7 +187,7 @@ bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray  & data)
             packetsize=lastPacketCount;
         else
             packetsize=14;
-       // qDebug()<<packetcount;
+        // qDebug()<<packetcount;
         buf[2] = packetcount>>24;//DFU Count
         buf[3] = packetcount>>16;//DFU Count
         buf[4] = packetcount>>8;//DFU Count
@@ -164,8 +206,8 @@ bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray  & data)
         // qDebug()<<" Data0="<<(int)data[0]<<" Data0="<<(int)data[1]<<" Data0="<<(int)data[2]<<" Data0="<<(int)data[3]<<" buf6="<<(int)buf[6]<<" buf7="<<(int)buf[7]<<" buf8="<<(int)buf[8]<<" buf9="<<(int)buf[9];
         //delay::msleep(send_delay);
         if(int ret=StatusRequest()!=OP_DFU::uploading) return false;
-        int result = hidHandle.send(0,buf, BUF_LEN, 5000);
-     //   qDebug()<<"sent:"<<result;
+        int result = sendData(buf, BUF_LEN);
+        //   qDebug()<<"sent:"<<result;
         if(result<1)
         {
             return false;
@@ -180,7 +222,7 @@ bool OP_DFU::UploadData(qint32 const & numberOfBytes, QByteArray  & data)
 }
 OP_DFU::Status OP_DFU::UploadDescription(QString  & description)
 {
-     cout<<"Starting uploading description\n";
+    cout<<"Starting uploading description\n";
     if(description.length()%4!=0)
     {      
         int pad=description.length()/4;
@@ -229,8 +271,8 @@ void OP_DFU::test()
         ++buf[1];
         ++buf[2];
         ++buf[63];
-        hidHandle.send(0,buf,BUF_LEN,5000);
-        result = hidHandle.receive(0,buf,BUF_LEN,5000);
+        sendData(buf,BUF_LEN);
+        result = receiveData(buf,BUF_LEN);
 
         qDebug()<<"Result="<<result;
         qDebug()<<(int)buf[0]<<":"<<(int)buf[1]<<":"<<(int)buf[2]<<":"<<(int)buf[63];
@@ -263,7 +305,7 @@ QByteArray OP_DFU::StartDownload(qint32 const & numberOfBytes, TransferTypes con
     buf[8] = 1;//DFU Data2
     buf[9] = 1;//DFU Data3
 
-    int result = hidHandle.send(0,buf, BUF_LEN, 500);
+    int result = sendData(buf, BUF_LEN);
     if(debug)
         qDebug() << "StartDownload:"<<numberOfPackets<<"packets"<<" Last Packet Size="<<lastPacketCount<<" "<<result << " bytes sent";
     float percentage;
@@ -277,7 +319,7 @@ QByteArray OP_DFU::StartDownload(qint32 const & numberOfBytes, TransferTypes con
 
 
         //  qDebug()<<"Status="<<StatusToString(StatusRequest());
-        result = hidHandle.receive(0,buf,BUF_LEN,5000);
+        result = receiveData(buf,BUF_LEN);
         if(debug)
             qDebug() << result << " bytes received"<<" Count="<<x<<"-"<<(int)buf[2]<<";"<<(int)buf[3]<<";"<<(int)buf[4]<<";"<<(int)buf[5]<<" Data="<<(int)buf[6]<<";"<<(int)buf[7]<<";"<<(int)buf[8]<<";"<<(int)buf[9];
         int size;
@@ -304,7 +346,7 @@ void OP_DFU::ResetDevice(void)
     buf[7] = 0;
     buf[8] = 0;
     buf[9] = 0;
-    int result = hidHandle.send(0,buf, BUF_LEN, 500);
+    int result = sendData(buf, BUF_LEN);
 }
 void OP_DFU::AbortOperation(void)
 {
@@ -319,7 +361,7 @@ void OP_DFU::AbortOperation(void)
     buf[7] = 0;
     buf[8] = 0;
     buf[9] = 0;
-    int result = hidHandle.send(0,buf, BUF_LEN, 500);
+    int result = sendData(buf, BUF_LEN);
 }
 void OP_DFU::JumpToApp()
 {
@@ -335,7 +377,7 @@ void OP_DFU::JumpToApp()
     buf[8] = 0;
     buf[9] = 0;
 
-    int result = hidHandle.send(0,buf, BUF_LEN, 500);
+    int result = sendData(buf, BUF_LEN);
 }
 OP_DFU::Status OP_DFU::StatusRequest()
 {
@@ -351,10 +393,10 @@ OP_DFU::Status OP_DFU::StatusRequest()
     buf[8] = 0;
     buf[9] = 0;
 
-    int result = hidHandle.send(0,buf, BUF_LEN, 10000);
+    int result = sendData(buf, BUF_LEN);
     if(debug)
         qDebug() << result << " bytes sent";
-    result = hidHandle.receive(0,buf,BUF_LEN,10000);
+    result = receiveData(buf,BUF_LEN);
     if(debug)
         qDebug() << result << " bytes received";
     if(buf[1]==OP_DFU::Status_Rep)
@@ -380,12 +422,12 @@ bool OP_DFU::findDevices()
     buf[7] = 0;
     buf[8] = 0;
     buf[9] = 0;
-    int result = hidHandle.send(0,buf, BUF_LEN, 5000);
+    int result = sendData(buf, BUF_LEN);
     if(result<1)
     {
         return false;
     }
-    result = hidHandle.receive(0,buf,BUF_LEN,5000);
+    result = receiveData(buf,BUF_LEN);
     if(result<1)
     {
         return false;
@@ -413,8 +455,8 @@ bool OP_DFU::findDevices()
             buf[7] = 0;
             buf[8] = 0;
             buf[9] = 0;
-            int result = hidHandle.send(0,buf, BUF_LEN, 5000);
-            result = hidHandle.receive(0,buf,BUF_LEN,5000);
+            int result = sendData(buf, BUF_LEN);
+            result = receiveData(buf,BUF_LEN);
             devices[x].ID=buf[9];
             devices[x].BL_Version=buf[7];
             devices[x].SizeOfDesc=buf[8];
@@ -466,7 +508,7 @@ bool OP_DFU::EndOperation()
     buf[8] = 0;
     buf[9] = 0;
 
-    int result = hidHandle.send(0,buf, BUF_LEN, 5000);
+    int result = sendData(buf, BUF_LEN);
     // hidHandle.receive(0,buf,BUF_LEN,5000);
     if(debug)
         qDebug() << result << " bytes sent";
@@ -600,17 +642,17 @@ OP_DFU::Status OP_DFU::CompareFirmware(const QString &sfile, const CompareType &
     }
     if(type==OP_DFU::crccompare)
     {
-         quint32 crc=CRCFromQBArray(arr,devices[device].SizeOfCode);
-         if(crc==devices[device].FW_CRC)
-         {
-             cout<<"Compare Successfull CRC MATCH!\n";
-         }
-         else
-         {
-             cout<<"Compare failed CRC DONT MATCH!\n";
-         }
-         return StatusRequest();
-     }
+        quint32 crc=CRCFromQBArray(arr,devices[device].SizeOfCode);
+        if(crc==devices[device].FW_CRC)
+        {
+            cout<<"Compare Successfull CRC MATCH!\n";
+        }
+        else
+        {
+            cout<<"Compare failed CRC DONT MATCH!\n";
+        }
+        return StatusRequest();
+    }
     else
     {
         if(arr==StartDownload(arr.length(),OP_DFU::FW))
@@ -735,4 +777,44 @@ quint32 OP_DFU::CRCFromQBArray(QByteArray array, quint32 Size)
         t[x]=aux;
     }
     return CRC32WideFast(0xFFFFFFFF,Size/4,(quint32*)t);
+}
+int OP_DFU::sendData(void * data,int size)
+{
+    if(!use_serial)
+    {
+        return hidHandle.send(0,data, size, 5000);
+    }
+    else
+    {
+        if(serialhandle->sendData((uint8_t*)data+1,size-1))
+        {
+             if (debug)
+                qDebug()<<"packet sent"<<"data0"<<((uint8_t*)data+1)[0];
+            return size;
+        }
+        if(debug)
+            qDebug()<<"Serial send OVERRUN";
+    }
+}
+int OP_DFU::receiveData(void * data,int size)
+{
+    if(!use_serial)
+    {
+        return hidHandle.receive(0,data, size, 10000);
+    }
+    else
+    {
+        int x;
+        QTime time;
+        time.start();
+        while(true)
+        {
+            if(x=serialhandle->read_Packet(data+1)!=-1||time.elapsed()>10000)
+            {
+                if(time.elapsed()>10000)
+                    qDebug()<<"____timeout";
+                return x;
+            }
+        }
+    }
 }

@@ -249,7 +249,7 @@ static void updateVtolDesiredAttitude()
 	// Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
 	// craft should move similarly for 5 deg roll versus 5 deg pitch
 	attitudeDesired.Pitch = bound(-northCommand * cosf(attitudeActual.Yaw * M_PI / 180) + 
-				      eastCommand * sinf(attitudeActual.Yaw * M_PI / 180),
+				      -eastCommand * sinf(attitudeActual.Yaw * M_PI / 180),
 				      -stabSettings.PitchMax, stabSettings.PitchMax);
 	attitudeDesired.Roll = bound(-northCommand * sinf(attitudeActual.Yaw * M_PI / 180) + 
 				     eastCommand * cosf(attitudeActual.Yaw * M_PI / 180),

@@ -37,6 +37,7 @@ static PositionActualData PositionActual;
 static VelocityActualData VelocityActual;
 static HomeLocationData HomeLocation;
 static AHRSSettingsData AHRSSettings;
+static FirmwareIAPObjData FirmwareIAPObj;
 
 AhrsSharedObject objectHandles[MAX_AHRS_OBJECTS];
 
@@ -60,8 +61,9 @@ CREATEHANDLE(6, PositionActual);
 CREATEHANDLE(7, VelocityActual);
 CREATEHANDLE(8, HomeLocation);
 CREATEHANDLE(9, AHRSSettings);
+CREATEHANDLE(10, FirmwareIAPObj);
 
-#if 10 != MAX_AHRS_OBJECTS	//sanity check
+#if 11 != MAX_AHRS_OBJECTS	//sanity check
 #error We did not create the correct number of xxxHandle() functions
 #endif
 
@@ -101,6 +103,7 @@ void AhrsInitHandles(void)
 	ADDHANDLE(idx++, VelocityActual);
 	ADDHANDLE(idx++, HomeLocation);
 	ADDHANDLE(idx++, AHRSSettings);
+	ADDHANDLE(idx++, FirmwareIAPObj);
 	if (idx != MAX_AHRS_OBJECTS) {
 		PIOS_DEBUG_Assert(0);
 	}
@@ -113,7 +116,7 @@ void AhrsInitHandles(void)
 	GPSPositionConnectCallback(ObjectUpdatedCb);
 	HomeLocationConnectCallback(ObjectUpdatedCb);
 	AHRSCalibrationConnectCallback(ObjectUpdatedCb);
-
+	FirmwareIAPObjConnectCallback(ObjectUpdatedCb);
 #endif
 }
 

@@ -76,6 +76,7 @@ void altitude_callback(AhrsObjHandle obj);
 void calibration_callback(AhrsObjHandle obj);
 void gps_callback(AhrsObjHandle obj);
 void settings_callback(AhrsObjHandle obj);
+void firmwareiapobj_callback(AhrsObjHandle obj);
 
 /**
  * @addtogroup AHRS_Global_Data AHRS Global Data
@@ -492,6 +493,7 @@ for all data to be up to date before doing anything*/
 	BaroAltitudeConnectCallback(altitude_callback);
 	AHRSSettingsConnectCallback(settings_callback);
 	HomeLocationConnectCallback(homelocation_callback);
+	FirmwareIAPObjConnectCallback(firmwareiapobj_callback);
 
 	calibration_callback(AHRSCalibrationHandle()); //force an update
 
@@ -994,6 +996,15 @@ void homelocation_callback(AhrsObjHandle obj)
 	
 	INSSetMagNorth(Be);
 }
+
+void firmwareiapobj_callback(AhrsObjHandle obj) 
+{
+	FirmwareIAPObjData firmwareIAPObj;
+	FirmwareIAPObjGet(&firmwareIAPObj);	
+	
+	// float time = timer_counter() / timer_rate();
+}
+
 
 
 /**

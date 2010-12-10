@@ -37,6 +37,7 @@
 #include "homelocation.h"
 #include "ahrscalibration.h"
 #include "ahrssettings.h"
+#include "firmwareiapobj.h"
 
 /** union that will fit any UAVObject.
 */
@@ -52,11 +53,12 @@ typedef union {
 	VelocityActualData VelocityActual;
 	HomeLocationData HomeLocation;
 	AHRSSettingsData AHRSSettings;
+	FirmwareIAPObjData FirmwareIAPObj;
 } __attribute__ ((packed)) AhrsSharedData;
 
 /** The number of UAVObjects we will be dealing with.
 */
-#define MAX_AHRS_OBJECTS 10
+#define MAX_AHRS_OBJECTS 11
 
 /** Our own version of a UAVObject.
 */

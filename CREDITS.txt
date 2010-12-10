@@ -70,8 +70,12 @@ E: peter (at) pyne (dot) se
 D: GCS Core Developer
 D: Multiple GCS plugins, Gadget foundations, UAVObject viewer
 
+N: Joe Hlebasko
+E: joe (dot) hlebasko(plus) openpilot (at) gmail (dot) com
+D: Version 3 Main Board routing 
+
 N: Sami Korhonen
-E: samik.korhonen (plus) openpilot (at) gmail (dot) com
+E: samik (dot) korhonen (plus) openpilot (at) gmail (dot) com
 D: GPS Module, Spektrum RC Module 
 
 N: Thorsten Klose
@@ -138,6 +142,10 @@ E: stac (at) solidgoldbomb (dot) org
 D: Core Embedded Developer
 D: SPI protocol for AHRS, I2C rewrite and much core work  
 
+N: Troy Schultz
+E: troy (dot) schultz (at) rogers (dot) com
+D: INS design review and optimisation 
+
 N: Dr. Erhard Siegl
 E: Erhard (dot) Siegl (at) zogazoga (dot) at
 D: Configuration engine for the GCS
@@ -148,7 +156,7 @@ D: PPM inputs
 
 N: Rowan Taubitz
 E: rowan (at) zantek (dot) com (dot) au
-D: Hardware debugging and testing, creation of 2-layer Floss-JTAG Rev B.
+D: Hardware debugging and testing, creation of 2-layer Floss-JTAG Rev B
 D: Creation of Next-Gen FOSS-JTAG board
 
 N: Andrew Thoms

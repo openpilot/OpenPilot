@@ -60,6 +60,7 @@ An incomplete list of some future Milestones is below:
 * First successful position hold
 * First successful flight using the GCS only and no RC TX
 * First use of Magic Waypoint
+* First flip on a multirotor with OpenPilot
 * First Flybarless Helicopter flight with OpenPilot
 * First intentional Quad flip with OpenPilot
 * First flight with CopterControl

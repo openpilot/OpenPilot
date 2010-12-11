@@ -1,0 +1,18 @@
+<xml>
+    <object name="PipXtremeModemSettings" singleinstance="true" settings="true">
+        <description>Settings for the @ref PipXtremeModemSettings</description>
+        <field name="Frequency" units="Hz" type="uint32" elements="1" defaultvalue="433920000"/>
+        <field name="RFBandwidth" units="Hz" type="enum" elements="1" options="500,1000,2000,4000,8000,9600,16000,19200,24000,32000,64000,128000,192000" defaultvalue="128000"/>
+        <field name="MaxTxPower" units="dBm" type="enum" elements="1" options="1,2,5,8,11,14,17,20" defaultvalue="11"/>
+
+        <field name="AESEncryption" units="" type="enum" elements="1" options="False,True" defaultvalue="False"/>
+        <field name="AESEncryptionKey" units="" type="uint8" elements="16" defaultvalue="None"/>
+
+        <field name="PairedSerialNumberCRC" units="" type="uint32" elements="1" defaultvalue="0"/>
+
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="never" period="0"/>
+    </object>
+</xml>

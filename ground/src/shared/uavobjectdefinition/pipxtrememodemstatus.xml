@@ -1,0 +1,23 @@
+<xml>
+    <object name="PipXtremeModemStatus" singleinstance="true" settings="false">
+        <description>Status for the @ref PipXtremeModem</description>
+        <field name="SerialNumber" units="" type="uint8" elements="24" defaultvalue="None"/>
+        <field name="SerialNumberCRC" units="" type="uint32" elements="1" defaultvalue="None"/>
+
+        <field name="UpTime" units="ms" type="uint32" elements="1"/>
+
+        <field name="Frequency" units="Hz" type="uint32" elements="1"/>
+        <field name="RFBandwidth" units="Hz" type="uint32" elements="1"/>
+        <field name="TxPower" units="dBm" type="int8" elements="1"/>
+
+        <field name="State" units="" type="enum" elements="1" options="Disconnected,Connecting,Connected,NotReady"/>
+
+        <field name="TxDataRate" units="bytes/sec" type="uint32" elements="1"/>
+        <field name="RxDataRate" units="bytes/sec" type="uint32" elements="1"/>
+
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="2000"/>
+        <logging updatemode="never" period="0"/>
+    </object>
+</xml>

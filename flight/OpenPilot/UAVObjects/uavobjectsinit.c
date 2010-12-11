@@ -52,6 +52,8 @@
 #include "mixersettings.h"
 #include "mixerstatus.h"
 #include "objectpersistence.h"
+#include "pipxtrememodemsettings.h"
+#include "pipxtrememodemstatus.h"
 #include "positionactual.h"
 #include "positiondesired.h"
 #include "ratedesired.h"
@@ -94,6 +96,8 @@ void UAVObjectsInitializeAll()
     MixerSettingsInitialize();
     MixerStatusInitialize();
     ObjectPersistenceInitialize();
+    PipXtremeModemSettingsInitialize();
+    PipXtremeModemStatusInitialize();
     PositionActualInitialize();
     PositionDesiredInitialize();
     RateDesiredInitialize();

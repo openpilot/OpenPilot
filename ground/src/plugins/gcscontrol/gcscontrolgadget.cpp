@@ -75,6 +75,8 @@ void GCSControlGadget::loadConfiguration(IUAVGadgetConfiguration* config)
         buttonSettings[i].ActionID=GCSControlConfig->getbuttonSettings(i).ActionID;
         buttonSettings[i].FunctionID=GCSControlConfig->getbuttonSettings(i).FunctionID;
         buttonSettings[i].Amount=GCSControlConfig->getbuttonSettings(i).Amount;
+        buttonSettings[i].Amount=GCSControlConfig->getbuttonSettings(i).Amount;
+        channelReverse[i]=GCSControlConfig->getChannelsReverse().at(i);
     }
 
 }
@@ -251,7 +253,6 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
             break;
         }
 
-
         obj->updated();
     }
         //buttonSettings[number].ActionID NIDT
@@ -273,7 +274,14 @@ void GCSControlGadget::axesValues(QListInt16 values)
     double yValue = (yawChannel > -1) ? values[yawChannel] : 0;
     double tValue = (throttleChannel > -1) ? values[throttleChannel] : 0;
     double max = 32767;
-    if(joystickTime.elapsed() > JOYSTICK_UPDATE_RATE) {
+
+    if (rollChannel > -1) if(channelReverse[rollChannel]==true)rValue = -rValue;
+    if (pitchChannel > -1) if(channelReverse[pitchChannel]==true)pValue = -pValue;
+    if (yawChannel > -1) if(channelReverse[yawChannel]==true)yValue = -yValue;
+    if (throttleChannel > -1) if(channelReverse[throttleChannel]==true)tValue = -tValue;
+
+
+     if(joystickTime.elapsed() > JOYSTICK_UPDATE_RATE) {
         joystickTime.restart();
         // Remap RPYT to left X/Y and right X/Y depending on mode
         // Mode 1: LeftX = Yaw, LeftY = Pitch, RightX = Roll, RightY = Throttle

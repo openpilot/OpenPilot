@@ -71,6 +71,7 @@ private:
     buttonSettingsStruct buttonSettings[8];
     double bound(double input);
     double wrap(double input);
+    bool channelReverse[8];
 
 signals:
     void sticksChangedRemotely(double leftX, double leftY, double rightX, double rightY);

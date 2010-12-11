@@ -51,11 +51,13 @@ class GCSControlGadgetConfiguration : public IUAVGadgetConfiguration
     void setRPYTchannels(int roll, int pitch, int yaw, int throttle);
     int getControlsMode() { return controlsMode; }
     QList<int>  getChannelsMapping();
+    QList<bool>  getChannelsReverse();
 
     buttonSettingsStruct getbuttonSettings(int i){return buttonSettings[i];}
     void setbuttonSettingsAction(int i, int ActionID ){buttonSettings[i].ActionID=ActionID;return;}
     void setbuttonSettingsFunction(int i, int FunctionID ){buttonSettings[i].FunctionID=FunctionID;return;}
     void setbuttonSettingsAmount(int i, double Amount ){buttonSettings[i].Amount=Amount;return;}
+    void setChannelReverse(int i, bool Reverse ){channelReverse[i]=Reverse;return;}
 
 
         void saveConfig(QSettings* settings) const;
@@ -69,6 +71,7 @@ class GCSControlGadgetConfiguration : public IUAVGadgetConfiguration
         int yawChannel;
         int throttleChannel;
         buttonSettingsStruct buttonSettings[8];
+        bool channelReverse[8];
 
 
 };

@@ -32,6 +32,10 @@
 #include "gcscontrolplugin.h"
 #include "sdlgamepad/sdlgamepad.h"
 #include <QDebug>
+#include <QtGui/QCheckBox>
+#include <QtGui/QComboBox>
+#include <QtGui/QDoubleSpinBox>
+#include <QtGui/QLabel>
 
 namespace Core {
 class IUAVGadgetConfiguration;
@@ -60,6 +64,13 @@ private:
     Ui::GCSControlGadgetOptionsPage *options_page;
     GCSControlGadgetConfiguration *m_config;
     SDLGamepad *sdlGamepad;
+
+    QList<QComboBox*> chList;
+    QList<QCheckBox*> chRevList;
+    QList<QComboBox*> buttonFunctionList;
+    QList<QComboBox*> buttonActionList;
+    QList<QDoubleSpinBox*> buttonValueList;
+    QList<QLabel*> buttonLabelList;
 
 protected slots:
     // signals from joystick

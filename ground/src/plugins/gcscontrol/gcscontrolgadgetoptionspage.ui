@@ -99,6 +99,33 @@
           </item>
          </widget>
         </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Available controllers</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="AvailableControllerList">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
@@ -115,7 +142,7 @@
         </property>
         <widget class="QWidget" name="tabWidgetPage2">
          <attribute name="title">
-          <string>Joystick</string>
+          <string>Joystick Axes</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1">
           <property name="margin">
@@ -127,14 +154,14 @@
              <widget class="QComboBox" name="channel0"/>
             </item>
             <item row="2" column="2">
-             <widget class="QCheckBox" name="checkBox">
+             <widget class="QCheckBox" name="revCheckBox_1">
               <property name="text">
                <string>Rev</string>
               </property>
              </widget>
             </item>
             <item row="3" column="2">
-             <widget class="QCheckBox" name="checkBox_2">
+             <widget class="QCheckBox" name="revCheckBox_2">
               <property name="text">
                <string>Rev</string>
               </property>
@@ -218,42 +245,42 @@
              </widget>
             </item>
             <item row="4" column="2">
-             <widget class="QCheckBox" name="checkBox_3">
+             <widget class="QCheckBox" name="revCheckBox_3">
               <property name="text">
                <string>Rev</string>
               </property>
              </widget>
             </item>
             <item row="5" column="2">
-             <widget class="QCheckBox" name="checkBox_4">
+             <widget class="QCheckBox" name="revCheckBox_4">
               <property name="text">
                <string>Rev</string>
               </property>
              </widget>
             </item>
             <item row="6" column="2">
-             <widget class="QCheckBox" name="checkBox_5">
+             <widget class="QCheckBox" name="revCheckBox_5">
               <property name="text">
                <string>Rev</string>
               </property>
              </widget>
             </item>
             <item row="7" column="2">
-             <widget class="QCheckBox" name="checkBox_6">
+             <widget class="QCheckBox" name="revCheckBox_6">
               <property name="text">
                <string>Rev</string>
               </property>
              </widget>
             </item>
             <item row="8" column="2">
-             <widget class="QCheckBox" name="checkBox_7">
+             <widget class="QCheckBox" name="revCheckBox_7">
               <property name="text">
                <string>Rev</string>
               </property>
              </widget>
             </item>
             <item row="9" column="2">
-             <widget class="QCheckBox" name="checkBox_8">
+             <widget class="QCheckBox" name="revCheckBox_8">
               <property name="text">
                <string>Rev</string>
               </property>
@@ -270,39 +297,9 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tabWidgetPage3">
-         <attribute name="title">
-          <string>Audio</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_5">
-          <property name="margin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QLabel" name="telemetryLabel">
-            <property name="text">
-             <string>Audio: soundcard-based PPM decoding for trainer port. Not implemented yet.</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>276</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </widget>
         <widget class="QWidget" name="tab">
          <attribute name="title">
-          <string>Buttons</string>
+          <string>Joystick Buttons</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <property name="spacing">
@@ -976,6 +973,36 @@
              </widget>
             </item>
            </layout>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tabWidgetPage3">
+         <attribute name="title">
+          <string>Audio</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="telemetryLabel">
+            <property name="text">
+             <string>Audio: soundcard-based PPM decoding for trainer port. Not implemented yet.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>276</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </widget>

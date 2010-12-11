@@ -44,6 +44,7 @@ GCSControlGadgetConfiguration::GCSControlGadgetConfiguration(QString classId, QS
         buttonSettings[i].ActionID=0;
         buttonSettings[i].FunctionID=0;
         buttonSettings[i].Amount=0;
+        channelReverse[i] = 0;
     }
     //if a saved configuration exists load it
     if(qSettings != 0) {
@@ -59,6 +60,7 @@ GCSControlGadgetConfiguration::GCSControlGadgetConfiguration(QString classId, QS
             buttonSettings[i].ActionID = qSettings->value(QString().sprintf("button%dAction",i)).toInt();
             buttonSettings[i].FunctionID = qSettings->value(QString().sprintf("button%dFunction",i)).toInt();
             buttonSettings[i].Amount = qSettings->value(QString().sprintf("button%dAmount",i)).toDouble();
+            channelReverse[i] = qSettings->value(QString().sprintf("channel%dReverse",i)).toBool();
         }
     }
 
@@ -77,7 +79,14 @@ QList<int> GCSControlGadgetConfiguration::getChannelsMapping()
     ql << rollChannel << pitchChannel << yawChannel << throttleChannel;
     return ql;
 }
+QList<bool> GCSControlGadgetConfiguration::getChannelsReverse()
+{
+    QList<bool> ql;
+    int i;
+    for (i=0;i<8;i++)ql << channelReverse[i];
 
+    return ql;
+}
 
 /**
  * Clones a configuration.
@@ -92,6 +101,16 @@ IUAVGadgetConfiguration *GCSControlGadgetConfiguration::clone()
     m->pitchChannel = pitchChannel;
     m->yawChannel = yawChannel;
     m->throttleChannel = throttleChannel;
+
+    int i;
+    for (i=0;i<8;i++)
+    {
+        m->buttonSettings[i].ActionID = buttonSettings[i].ActionID;
+        m->buttonSettings[i].FunctionID = buttonSettings[i].FunctionID;
+        m->buttonSettings[i].Amount = buttonSettings[i].Amount;
+        m->channelReverse[i] = channelReverse[i];
+    }
+
 
     return m;
 }
@@ -113,6 +132,7 @@ void GCSControlGadgetConfiguration::saveConfig(QSettings* settings) const {
         settings->setValue(QString().sprintf("button%dAction",i), buttonSettings[i].ActionID);
         settings->setValue(QString().sprintf("button%dFunction",i), buttonSettings[i].FunctionID);
         settings->setValue(QString().sprintf("button%dAmount",i), buttonSettings[i].Amount);
+        settings->setValue(QString().sprintf("channel%dReverse",i), channelReverse[i]);
     }
 
 }

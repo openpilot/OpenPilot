@@ -86,6 +86,7 @@ void GCSControlGadgetOptionsPage::axesValues(QListInt16 values)
         int i=0;
         foreach (qint16 value, values) {
             if (i>7) break; // We only support 7 channels
+            if (chRevList.at(i)->isChecked()==1)value = 65535 - value;
              if (pbList.at(i)->minimum() > value)
                  pbList.at(i)->setMinimum(value);
              if (pbList.at(i)->maximum() < value)
@@ -106,7 +107,8 @@ QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
 
 
 
-    QList<QComboBox*> chList;
+    //QList<QComboBox*> chList;
+    chList.clear();
     chList << options_page->channel0 << options_page->channel1 <<
               options_page->channel2 << options_page->channel3 <<
               options_page->channel4 << options_page->channel5 <<
@@ -116,9 +118,15 @@ QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
     foreach (QComboBox* qb, chList) {
         qb->addItems(chOptions);
     }
+    //QList<QCheckBox*> chRevList;
+    chRevList.clear();
+    chRevList << options_page->revCheckBox_1 << options_page->revCheckBox_2 <<
+                 options_page->revCheckBox_3 << options_page->revCheckBox_4 <<
+                 options_page->revCheckBox_5 << options_page->revCheckBox_6 <<
+                 options_page->revCheckBox_7 << options_page->revCheckBox_8;
 
-
-    QList<QComboBox*> buttonFunctionList;
+    //QList<QComboBox*> buttonFunctionList;
+    buttonFunctionList.clear();
     buttonFunctionList << options_page->buttonFunction0 << options_page->buttonFunction1 <<
               options_page->buttonFunction2 << options_page->buttonFunction3 <<
               options_page->buttonFunction4 << options_page->buttonFunction5 <<
@@ -128,7 +136,8 @@ QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
     foreach (QComboBox* qb, buttonFunctionList) {
         qb->addItems(buttonOptions);
     }
-    QList<QComboBox*> buttonActionList;
+    //QList<QComboBox*> buttonActionList;
+    buttonActionList.clear();
     buttonActionList << options_page->buttonAction0 << options_page->buttonAction1 <<
               options_page->buttonAction2 << options_page->buttonAction3 <<
               options_page->buttonAction4 << options_page->buttonAction5 <<
@@ -138,11 +147,18 @@ QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
     foreach (QComboBox* qb, buttonActionList) {
         qb->addItems(buttonActionOptions);
     }
-    QList<QDoubleSpinBox*> buttonValueList;
+    //QList<QDoubleSpinBox*> buttonValueList;
+    buttonValueList.clear();
     buttonValueList << options_page->buttonAmount0 << options_page->buttonAmount1 <<
               options_page->buttonAmount2 << options_page->buttonAmount3 <<
               options_page->buttonAmount4 << options_page->buttonAmount5 <<
               options_page->buttonAmount6 << options_page->buttonAmount7;
+    //QList<QLabel*> buttonLabelList;
+    buttonLabelList.clear();
+    buttonLabelList << options_page->buttonLabel0 << options_page->buttonLabel1 <<
+              options_page->buttonLabel2 << options_page->buttonLabel3 <<
+              options_page->buttonLabel4 << options_page->buttonLabel5 <<
+              options_page->buttonLabel6 << options_page->buttonLabel7;
 
     for (i=0;i<8;i++)
     {
@@ -178,6 +194,11 @@ QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
         if (ql.at(i) > -1)
             chList.at(ql.at(i))->setCurrentIndex(i+1);
     }
+    QList<bool> qlChRev = m_config->getChannelsReverse();
+    for (i=0; i<8; i++)
+    {
+        chRevList.at(i)->setChecked(qlChRev.at(i));;
+    }
 
     connect(sdlGamepad,SIGNAL(axesValues(QListInt16)),this,SLOT(axesValues(QListInt16)));
     connect(sdlGamepad,SIGNAL(buttonState(ButtonNumber,bool)),this,SLOT(buttonState(ButtonNumber,bool)));
@@ -194,7 +215,7 @@ QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
 void GCSControlGadgetOptionsPage::apply()
 {
    m_config->setControlsMode(options_page->controlsMode->currentIndex()+1);
-   QList<QComboBox*> chList;
+   /*QList<QComboBox*> chList;
    chList << options_page->channel0 << options_page->channel1 <<
              options_page->channel2 << options_page->channel3 <<
              options_page->channel4 << options_page->channel5 <<
@@ -214,7 +235,7 @@ void GCSControlGadgetOptionsPage::apply()
              options_page->buttonAmount2 << options_page->buttonAmount3 <<
              options_page->buttonAmount4 << options_page->buttonAmount5 <<
              options_page->buttonAmount6 << options_page->buttonAmount7;
-
+*/
 
    int roll=-1 , pitch=-1, yaw=-1, throttle=-1;
    for (int i=0; i<chList.length(); i++) {
@@ -241,6 +262,7 @@ void GCSControlGadgetOptionsPage::apply()
        m_config->setbuttonSettingsAction(j,buttonActionList.at(j)->currentIndex());
        m_config->setbuttonSettingsFunction(j,buttonFunctionList.at(j)->currentIndex());
        m_config->setbuttonSettingsAmount(j,buttonValueList.at(j)->value());
+       m_config->setChannelReverse(j,chRevList.at(j)->isChecked());
    }
 
 }
@@ -256,7 +278,7 @@ void GCSControlGadgetOptionsPage::finish()
 void GCSControlGadgetOptionsPage::updateButtonFunction()
 {
     int i;
-    QList<QComboBox*> buttonFunctionList;
+    /*QList<QComboBox*> buttonFunctionList;
     buttonFunctionList << options_page->buttonFunction0 << options_page->buttonFunction1 <<
               options_page->buttonFunction2 << options_page->buttonFunction3 <<
               options_page->buttonFunction4 << options_page->buttonFunction5 <<
@@ -276,7 +298,7 @@ void GCSControlGadgetOptionsPage::updateButtonFunction()
               options_page->buttonLabel2 << options_page->buttonLabel3 <<
               options_page->buttonLabel4 << options_page->buttonLabel5 <<
               options_page->buttonLabel6 << options_page->buttonLabel7;
-
+*/
     for (i=0;i<8;i++)
     {
         if (buttonActionList.at(i)->currentText().compare("Does nothing")==0)
@@ -307,7 +329,7 @@ void GCSControlGadgetOptionsPage::updateButtonAction(int controlID)
 {
     int i;
     QStringList buttonOptions;
-    QList<QComboBox*> buttonFunctionList;
+    /*QList<QComboBox*> buttonFunctionList;
     buttonFunctionList << options_page->buttonFunction0 << options_page->buttonFunction1 <<
               options_page->buttonFunction2 << options_page->buttonFunction3 <<
               options_page->buttonFunction4 << options_page->buttonFunction5 <<
@@ -327,7 +349,7 @@ void GCSControlGadgetOptionsPage::updateButtonAction(int controlID)
               options_page->buttonLabel2 << options_page->buttonLabel3 <<
               options_page->buttonLabel4 << options_page->buttonLabel5 <<
               options_page->buttonLabel6 << options_page->buttonLabel7;
-
+*/
     //for (i=0;i<8;i++)
     i=controlID;
     {

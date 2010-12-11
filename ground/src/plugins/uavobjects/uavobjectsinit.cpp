@@ -54,6 +54,8 @@
 #include "mixersettings.h"
 #include "mixerstatus.h"
 #include "objectpersistence.h"
+#include "pipxtrememodemsettings.h"
+#include "pipxtrememodemstatus.h"
 #include "positionactual.h"
 #include "positiondesired.h"
 #include "ratedesired.h"
@@ -96,6 +98,8 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new MixerSettings() );
     objMngr->registerObject( new MixerStatus() );
     objMngr->registerObject( new ObjectPersistence() );
+    objMngr->registerObject( new PipXtremeModemSettings() );
+    objMngr->registerObject( new PipXtremeModemStatus() );
     objMngr->registerObject( new PositionActual() );
     objMngr->registerObject( new PositionDesired() );
     objMngr->registerObject( new RateDesired() );

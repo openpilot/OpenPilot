@@ -91,6 +91,9 @@ PipXtremeModemStatus::PipXtremeModemStatus(): UAVDataObject(OBJID, ISSINGLEINST,
     StateEnumOptions.append("Connected");
     StateEnumOptions.append("NotReady");
     fields.append( new UAVObjectField(QString("State"), QString(""), UAVObjectField::ENUM, StateElemNames, StateEnumOptions) );
+    QStringList TxRetryElemNames;
+    TxRetryElemNames.append("0");
+    fields.append( new UAVObjectField(QString("TxRetry"), QString(""), UAVObjectField::UINT16, TxRetryElemNames, QStringList()) );
     QStringList TxDataRateElemNames;
     TxDataRateElemNames.append("0");
     fields.append( new UAVObjectField(QString("TxDataRate"), QString("bytes/sec"), UAVObjectField::UINT32, TxDataRateElemNames, QStringList()) );
@@ -117,7 +120,7 @@ UAVObject::Metadata PipXtremeModemStatus::getDefaultMetadata()
     metadata.gcsTelemetryUpdatePeriod = 0;
     metadata.flightTelemetryAcked = 0;
     metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-    metadata.flightTelemetryUpdatePeriod = 2000;
+    metadata.flightTelemetryUpdatePeriod = 5000;
     metadata.loggingUpdateMode = UAVObject::UPDATEMODE_NEVER;
     metadata.loggingUpdatePeriod = 0;
     return metadata;

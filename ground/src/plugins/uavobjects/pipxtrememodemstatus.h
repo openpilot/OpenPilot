@@ -50,6 +50,7 @@ public:
         quint32 RFBandwidth;
         qint8 TxPower;
         quint8 State;
+        quint16 TxRetry;
         quint32 TxDataRate;
         quint32 RxDataRate;
 
@@ -67,12 +68,13 @@ public:
     // Field State information
     /* Enumeration options for field State */
     typedef enum { STATE_DISCONNECTED=0, STATE_CONNECTING=1, STATE_CONNECTED=2, STATE_NOTREADY=3 } StateOptions;
+    // Field TxRetry information
     // Field TxDataRate information
     // Field RxDataRate information
 
   
     // Constants
-    static const quint32 OBJID = 1854119896U;
+    static const quint32 OBJID = 2584820952U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

@@ -135,6 +135,16 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
+		'TxRetry',
+		'H',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
 		'TxDataRate',
 		'I',
 		1,
@@ -159,7 +169,7 @@ _fields = [ \
 
 class PipXtremeModemStatus(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 1854119896
+    OBJID        = 2584820952
     NAME         = "PipXtremeModemStatus"
     METANAME     = "PipXtremeModemStatusMeta"
     ISSINGLEINST = 1

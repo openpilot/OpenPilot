@@ -43,9 +43,12 @@ class UAVOBJECTS_EXPORT PipXtremeModemSettings: public UAVDataObject
 public:
     // Field structure
     typedef struct {
+        quint8 Frequency calibration;
+        quint32 Frequency min;
+        quint32 Frequency max;
         quint32 Frequency;
-        quint8 RFBandwidth;
-        quint8 MaxTxPower;
+        quint8 RF bandwidth;
+        quint8 Max Tx power;
         quint8 AESEncryption;
         quint8 AESEncryptionKey[16];
         quint32 PairedSerialNumberCRC;
@@ -53,13 +56,16 @@ public:
     } __attribute__((packed)) DataFields;
 
     // Field information
+    // Field Frequency calibration information
+    // Field Frequency min information
+    // Field Frequency max information
     // Field Frequency information
-    // Field RFBandwidth information
-    /* Enumeration options for field RFBandwidth */
-    typedef enum { RFBANDWIDTH_500=0, RFBANDWIDTH_1000=1, RFBANDWIDTH_2000=2, RFBANDWIDTH_4000=3, RFBANDWIDTH_8000=4, RFBANDWIDTH_9600=5, RFBANDWIDTH_16000=6, RFBANDWIDTH_19200=7, RFBANDWIDTH_24000=8, RFBANDWIDTH_32000=9, RFBANDWIDTH_64000=10, RFBANDWIDTH_128000=11, RFBANDWIDTH_192000=12 } RFBandwidthOptions;
-    // Field MaxTxPower information
-    /* Enumeration options for field MaxTxPower */
-    typedef enum { MAXTXPOWER_1=0, MAXTXPOWER_2=1, MAXTXPOWER_5=2, MAXTXPOWER_8=3, MAXTXPOWER_11=4, MAXTXPOWER_14=5, MAXTXPOWER_17=6, MAXTXPOWER_20=7 } MaxTxPowerOptions;
+    // Field RF bandwidth information
+    /* Enumeration options for field RF bandwidth */
+    typedef enum { RF BANDWIDTH_500=0, RF BANDWIDTH_1000=1, RF BANDWIDTH_2000=2, RF BANDWIDTH_4000=3, RF BANDWIDTH_8000=4, RF BANDWIDTH_9600=5, RF BANDWIDTH_16000=6, RF BANDWIDTH_19200=7, RF BANDWIDTH_24000=8, RF BANDWIDTH_32000=9, RF BANDWIDTH_64000=10, RF BANDWIDTH_128000=11, RF BANDWIDTH_192000=12 } RF bandwidthOptions;
+    // Field Max Tx power information
+    /* Enumeration options for field Max Tx power */
+    typedef enum { MAX TX POWER_1=0, MAX TX POWER_2=1, MAX TX POWER_5=2, MAX TX POWER_8=3, MAX TX POWER_11=4, MAX TX POWER_14=5, MAX TX POWER_17=6, MAX TX POWER_20=7 } Max Tx powerOptions;
     // Field AESEncryption information
     /* Enumeration options for field AESEncryption */
     typedef enum { AESENCRYPTION_FALSE=0, AESENCRYPTION_TRUE=1 } AESEncryptionOptions;
@@ -70,7 +76,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 1441129524U;
+    static const quint32 OBJID = 3841416984U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

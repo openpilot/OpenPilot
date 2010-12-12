@@ -173,6 +173,9 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
         if ((buttonSettings[i].FunctionID==4)&&((buttonSettings[i].ActionID==1)||(buttonSettings[i].ActionID==2)))buttonThrottleControl=1;
     }
 
+    //if we are not in local gcs control mode, ignore the joystick input
+    if (((GCSControlGadgetWidget *)m_widget)->getGCSControl()==false)return;
+
     if((newThrottle != oldThrottle) || (newPitch != oldPitch) || (newYaw != oldYaw) || (newRoll != oldRoll)) {
         if (buttonRollControl==0)obj->getField("Roll")->setDouble(newRoll);
         if (buttonPitchControl==0)obj->getField("Pitch")->setDouble(newPitch);
@@ -196,58 +199,68 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
         UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
         UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(QString("ManualControlCommand")) );
+        bool currentCGSControl = ((GCSControlGadgetWidget *)m_widget)->getGCSControl();
 
         switch (buttonSettings[number].ActionID)
         {
         case 1://increase
-            switch (buttonSettings[number].FunctionID)
+            if (currentCGSControl)
             {
-            case 1://Roll
-                    obj->getField("Roll")->setValue(bound(obj->getField("Roll")->getValue().toDouble()+buttonSettings[number].Amount));
-                break;
-            case 2://Pitch
-                    obj->getField("Pitch")->setValue(bound(obj->getField("Pitch")->getValue().toDouble()+buttonSettings[number].Amount));
-                 break;
-            case 3://Yaw
-                    obj->getField("Yaw")->setValue(wrap(obj->getField("Yaw")->getValue().toDouble()+buttonSettings[number].Amount));
-                break;
-            case 4://Throttle
-                    obj->getField("Throttle")->setValue(bound(obj->getField("Throttle")->getValue().toDouble()+buttonSettings[number].Amount));
-                break;
+                switch (buttonSettings[number].FunctionID)
+                {
+                case 1://Roll
+                        obj->getField("Roll")->setValue(bound(obj->getField("Roll")->getValue().toDouble()+buttonSettings[number].Amount));
+                    break;
+                case 2://Pitch
+                        obj->getField("Pitch")->setValue(bound(obj->getField("Pitch")->getValue().toDouble()+buttonSettings[number].Amount));
+                     break;
+                case 3://Yaw
+                        obj->getField("Yaw")->setValue(wrap(obj->getField("Yaw")->getValue().toDouble()+buttonSettings[number].Amount));
+                    break;
+                case 4://Throttle
+                        obj->getField("Throttle")->setValue(bound(obj->getField("Throttle")->getValue().toDouble()+buttonSettings[number].Amount));
+                    break;
+                }
             }
             break;
         case 2://decrease
-            switch (buttonSettings[number].FunctionID)
+            if (currentCGSControl)
             {
-            case 1://Roll
-                    obj->getField("Roll")->setValue(bound(obj->getField("Roll")->getValue().toDouble()-buttonSettings[number].Amount));
-                break;
-            case 2://Pitch
-                    obj->getField("Pitch")->setValue(bound(obj->getField("Pitch")->getValue().toDouble()-buttonSettings[number].Amount));
-                 break;
-            case 3://Yaw
-                    obj->getField("Yaw")->setValue(wrap(obj->getField("Yaw")->getValue().toDouble()-buttonSettings[number].Amount));
-                break;
-            case 4://Throttle
-                    obj->getField("Throttle")->setValue(bound(obj->getField("Throttle")->getValue().toDouble()-buttonSettings[number].Amount));
-                break;
+                switch (buttonSettings[number].FunctionID)
+                {
+                case 1://Roll
+                        obj->getField("Roll")->setValue(bound(obj->getField("Roll")->getValue().toDouble()-buttonSettings[number].Amount));
+                    break;
+                case 2://Pitch
+                        obj->getField("Pitch")->setValue(bound(obj->getField("Pitch")->getValue().toDouble()-buttonSettings[number].Amount));
+                     break;
+                case 3://Yaw
+                        obj->getField("Yaw")->setValue(wrap(obj->getField("Yaw")->getValue().toDouble()-buttonSettings[number].Amount));
+                    break;
+                case 4://Throttle
+                        obj->getField("Throttle")->setValue(bound(obj->getField("Throttle")->getValue().toDouble()-buttonSettings[number].Amount));
+                    break;
+                }
             }
             break;
         case 3://toggle
-            switch (buttonSettings[number].FunctionID)
-            {
-            case 1://Armed
-                    if(obj->getField("Armed")->getValue().toString().compare("True")==0)
+                switch (buttonSettings[number].FunctionID)
+                {
+                case 1://Armed
+                    if (currentCGSControl)
                     {
-                        obj->getField("Armed")->setValue("False");
-                    }
-                    else
-                    {
-                        obj->getField("Armed")->setValue("True");
+                        if(obj->getField("Armed")->getValue().toString().compare("True")==0)
+                        {
+                            obj->getField("Armed")->setValue("False");
+                        }
+                        else
+                        {
+                            obj->getField("Armed")->setValue("True");
+                        }
                     }
                 break;
             case 2://GCS Control
-                bool currentCGSControl = ((GCSControlGadgetWidget *)m_widget)->getGCSControl();
+                //Toggle the GCS Control checkbox, its built in signalling will handle the update to OP
                 ((GCSControlGadgetWidget *)m_widget)->setGCSControl(!currentCGSControl);
 
                break;

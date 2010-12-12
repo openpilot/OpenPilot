@@ -38,7 +38,7 @@ from collections import namedtuple
 # This is a list of instances of the data fields contained in this object
 _fields = [ \
 	uavobject.UAVObjectField(
-		'Frequency calibration',
+		'Frequency_Calibration',
 		'B',
 		1,
 		[
@@ -48,7 +48,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'Frequency min',
+		'Frequency_Min',
 		'I',
 		1,
 		[
@@ -58,7 +58,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'Frequency max',
+		'Frequency_Max',
 		'I',
 		1,
 		[
@@ -78,7 +78,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'RF bandwidth',
+		'RF_Bandwidth',
 		'b',
 		1,
 		[
@@ -101,7 +101,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'Max Tx power',
+		'Max_Tx_Power',
 		'b',
 		1,
 		[
@@ -119,7 +119,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'AESEncryption',
+		'AES_Encryption',
 		'b',
 		1,
 		[
@@ -131,7 +131,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'AESEncryptionKey',
+		'AES_EncryptionKey',
 		'B',
 		16,
 		[
@@ -156,7 +156,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'PairedSerialNumberCRC',
+		'Paired_Serial_Number_CRC',
 		'I',
 		1,
 		[
@@ -170,7 +170,7 @@ _fields = [ \
 
 class PipXtremeModemSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 3841416984
+    OBJID        = 2660664364
     NAME         = "PipXtremeModemSettings"
     METANAME     = "PipXtremeModemSettingsMeta"
     ISSINGLEINST = 1

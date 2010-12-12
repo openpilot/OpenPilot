@@ -43,38 +43,38 @@ class UAVOBJECTS_EXPORT PipXtremeModemStatus: public UAVDataObject
 public:
     // Field structure
     typedef struct {
-        quint8 SerialNumber[24];
-        quint32 SerialNumberCRC;
-        quint32 UpTime;
+        quint8 Serial_Number[24];
+        quint32 Serial_Number_CRC;
+        quint32 Up_Time;
         quint32 Frequency;
-        quint32 RFBandwidth;
-        qint8 TxPower;
+        quint32 RF_Bandwidth;
+        qint8 Tx_Power;
         quint8 State;
-        quint16 TxRetry;
-        quint32 TxDataRate;
-        quint32 RxDataRate;
+        quint16 Tx_Retry;
+        quint32 Tx_Data_Rate;
+        quint32 Rx_Data_Rate;
 
     } __attribute__((packed)) DataFields;
 
     // Field information
-    // Field SerialNumber information
-    /* Number of elements for field SerialNumber */
-    static const quint32 SERIALNUMBER_NUMELEM = 24;
-    // Field SerialNumberCRC information
-    // Field UpTime information
+    // Field Serial_Number information
+    /* Number of elements for field Serial_Number */
+    static const quint32 SERIAL_NUMBER_NUMELEM = 24;
+    // Field Serial_Number_CRC information
+    // Field Up_Time information
     // Field Frequency information
-    // Field RFBandwidth information
-    // Field TxPower information
+    // Field RF_Bandwidth information
+    // Field Tx_Power information
     // Field State information
     /* Enumeration options for field State */
     typedef enum { STATE_DISCONNECTED=0, STATE_CONNECTING=1, STATE_CONNECTED=2, STATE_NOTREADY=3 } StateOptions;
-    // Field TxRetry information
-    // Field TxDataRate information
-    // Field RxDataRate information
+    // Field Tx_Retry information
+    // Field Tx_Data_Rate information
+    // Field Rx_Data_Rate information
 
   
     // Constants
-    static const quint32 OBJID = 2584820952U;
+    static const quint32 OBJID = 3920019084U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

@@ -38,7 +38,7 @@ from collections import namedtuple
 # This is a list of instances of the data fields contained in this object
 _fields = [ \
 	uavobject.UAVObjectField(
-		'SerialNumber',
+		'Serial_Number',
 		'B',
 		24,
 		[
@@ -71,7 +71,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'SerialNumberCRC',
+		'Serial_Number_CRC',
 		'I',
 		1,
 		[
@@ -81,7 +81,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'UpTime',
+		'Up_Time',
 		'I',
 		1,
 		[
@@ -101,7 +101,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'RFBandwidth',
+		'RF_Bandwidth',
 		'I',
 		1,
 		[
@@ -111,7 +111,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'TxPower',
+		'Tx_Power',
 		'b',
 		1,
 		[
@@ -135,7 +135,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'TxRetry',
+		'Tx_Retry',
 		'H',
 		1,
 		[
@@ -145,7 +145,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'TxDataRate',
+		'Tx_Data_Rate',
 		'I',
 		1,
 		[
@@ -155,7 +155,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'RxDataRate',
+		'Rx_Data_Rate',
 		'I',
 		1,
 		[
@@ -169,7 +169,7 @@ _fields = [ \
 
 class PipXtremeModemStatus(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 2584820952
+    OBJID        = 3920019084
     NAME         = "PipXtremeModemStatus"
     METANAME     = "PipXtremeModemStatusMeta"
     ISSINGLEINST = 1

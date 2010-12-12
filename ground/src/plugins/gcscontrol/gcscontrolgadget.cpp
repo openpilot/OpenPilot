@@ -247,6 +247,9 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
                     }
                 break;
             case 2://GCS Control
+                bool currentCGSControl = ((GCSControlGadgetWidget *)m_widget)->getGCSControl();
+                ((GCSControlGadgetWidget *)m_widget)->setGCSControl(!currentCGSControl);
+
                break;
             }
 

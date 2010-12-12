@@ -40,6 +40,8 @@ class GCSControlGadgetWidget : public QLabel
 public:
     GCSControlGadgetWidget(QWidget *parent = 0);
     ~GCSControlGadgetWidget();
+    void setGCSControl(bool newState);
+    bool getGCSControl(void);
 
 signals:
     void sticksChanged(double leftX, double leftY, double rightX, double rightY);

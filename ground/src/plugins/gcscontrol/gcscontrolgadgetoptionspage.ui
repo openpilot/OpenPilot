@@ -122,8 +122,13 @@
         <item>
          <widget class="QComboBox" name="AvailableControllerList">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
+          <item>
+           <property name="text">
+            <string>Default</string>
+           </property>
+          </item>
          </widget>
         </item>
        </layout>

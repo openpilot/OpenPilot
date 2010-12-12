@@ -71,6 +71,11 @@ void GCSControlGadgetOptionsPage::buttonState(ButtonNumber number, bool pressed)
 
 void GCSControlGadgetOptionsPage::gamepads(quint8 count)
 {
+    /*options_page->AvailableControllerList->clear();
+    for (int i=0;i<count;i++)
+    {
+       options_page->AvailableControllerList->addItem(QString().sprintf("%d",i));//SDL_JoystickName(i));
+    }*/
 
 }
 
@@ -202,6 +207,7 @@ QWidget *GCSControlGadgetOptionsPage::createPage(QWidget *parent)
 
     connect(sdlGamepad,SIGNAL(axesValues(QListInt16)),this,SLOT(axesValues(QListInt16)));
     connect(sdlGamepad,SIGNAL(buttonState(ButtonNumber,bool)),this,SLOT(buttonState(ButtonNumber,bool)));
+    connect(sdlGamepad,SIGNAL(gamepads(quint8)),this,SLOT(gamepads(quint8)));
 
     return optionsPageWidget;
 }

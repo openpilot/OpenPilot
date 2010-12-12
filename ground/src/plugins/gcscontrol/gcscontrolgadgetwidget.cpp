@@ -157,7 +157,18 @@ void GCSControlGadgetWidget::selectFlightMode(int state)
     obj->updated();
 }
 
+void GCSControlGadgetWidget::setGCSControl(bool newState)
+{
+    m_gcscontrol->checkBoxGcsControl->setChecked(newState);
+};
+bool GCSControlGadgetWidget::getGCSControl(void)
+{
+    return m_gcscontrol->checkBoxGcsControl->isChecked();
+};
+
+
 /**
   * @}
   * @}
   */
+

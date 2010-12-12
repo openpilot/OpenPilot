@@ -41,7 +41,7 @@
 #define PIPXTREMEMODEMSTATUS_H
 
 // Object constants
-#define PIPXTREMEMODEMSTATUS_OBJID 1854119896U
+#define PIPXTREMEMODEMSTATUS_OBJID 2584820952U
 #define PIPXTREMEMODEMSTATUS_NAME "PipXtremeModemStatus"
 #define PIPXTREMEMODEMSTATUS_METANAME "PipXtremeModemStatusMeta"
 #define PIPXTREMEMODEMSTATUS_ISSINGLEINST 1
@@ -78,6 +78,7 @@ typedef struct {
     uint32_t RFBandwidth;
     int8_t TxPower;
     uint8_t State;
+    uint16_t TxRetry;
     uint32_t TxDataRate;
     uint32_t RxDataRate;
 
@@ -95,6 +96,7 @@ typedef struct {
 // Field State information
 /* Enumeration options for field State */
 typedef enum { PIPXTREMEMODEMSTATUS_STATE_DISCONNECTED=0, PIPXTREMEMODEMSTATUS_STATE_CONNECTING=1, PIPXTREMEMODEMSTATUS_STATE_CONNECTED=2, PIPXTREMEMODEMSTATUS_STATE_NOTREADY=3 } PipXtremeModemStatusStateOptions;
+// Field TxRetry information
 // Field TxDataRate information
 // Field RxDataRate information
 

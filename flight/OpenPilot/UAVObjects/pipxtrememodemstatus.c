@@ -113,7 +113,7 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	metadata.gcsAccess = ACCESS_READWRITE;
 	metadata.telemetryAcked = 0;
 	metadata.telemetryUpdateMode = UPDATEMODE_PERIODIC;
-	metadata.telemetryUpdatePeriod = 2000;
+	metadata.telemetryUpdatePeriod = 5000;
 	metadata.gcsTelemetryAcked = 0;
 	metadata.gcsTelemetryUpdateMode = UPDATEMODE_MANUAL;
 	metadata.gcsTelemetryUpdatePeriod = 0;

@@ -41,7 +41,7 @@
 #define PIPXTREMEMODEMSTATUS_H
 
 // Object constants
-#define PIPXTREMEMODEMSTATUS_OBJID 2584820952U
+#define PIPXTREMEMODEMSTATUS_OBJID 3920019084U
 #define PIPXTREMEMODEMSTATUS_NAME "PipXtremeModemStatus"
 #define PIPXTREMEMODEMSTATUS_METANAME "PipXtremeModemStatusMeta"
 #define PIPXTREMEMODEMSTATUS_ISSINGLEINST 1
@@ -71,34 +71,34 @@
 
 // Object data
 typedef struct {
-    uint8_t SerialNumber[24];
-    uint32_t SerialNumberCRC;
-    uint32_t UpTime;
+    uint8_t Serial_Number[24];
+    uint32_t Serial_Number_CRC;
+    uint32_t Up_Time;
     uint32_t Frequency;
-    uint32_t RFBandwidth;
-    int8_t TxPower;
+    uint32_t RF_Bandwidth;
+    int8_t Tx_Power;
     uint8_t State;
-    uint16_t TxRetry;
-    uint32_t TxDataRate;
-    uint32_t RxDataRate;
+    uint16_t Tx_Retry;
+    uint32_t Tx_Data_Rate;
+    uint32_t Rx_Data_Rate;
 
 } __attribute__((packed)) PipXtremeModemStatusData;
 
 // Field information
-// Field SerialNumber information
-/* Number of elements for field SerialNumber */
-#define PIPXTREMEMODEMSTATUS_SERIALNUMBER_NUMELEM 24
-// Field SerialNumberCRC information
-// Field UpTime information
+// Field Serial_Number information
+/* Number of elements for field Serial_Number */
+#define PIPXTREMEMODEMSTATUS_SERIAL_NUMBER_NUMELEM 24
+// Field Serial_Number_CRC information
+// Field Up_Time information
 // Field Frequency information
-// Field RFBandwidth information
-// Field TxPower information
+// Field RF_Bandwidth information
+// Field Tx_Power information
 // Field State information
 /* Enumeration options for field State */
 typedef enum { PIPXTREMEMODEMSTATUS_STATE_DISCONNECTED=0, PIPXTREMEMODEMSTATUS_STATE_CONNECTING=1, PIPXTREMEMODEMSTATUS_STATE_CONNECTED=2, PIPXTREMEMODEMSTATUS_STATE_NOTREADY=3 } PipXtremeModemStatusStateOptions;
-// Field TxRetry information
-// Field TxDataRate information
-// Field RxDataRate information
+// Field Tx_Retry information
+// Field Tx_Data_Rate information
+// Field Rx_Data_Rate information
 
 
 // Generic interface functions

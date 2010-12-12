@@ -41,7 +41,7 @@
 #define PIPXTREMEMODEMSETTINGS_H
 
 // Object constants
-#define PIPXTREMEMODEMSETTINGS_OBJID 3841416984U
+#define PIPXTREMEMODEMSETTINGS_OBJID 2660664364U
 #define PIPXTREMEMODEMSETTINGS_NAME "PipXtremeModemSettings"
 #define PIPXTREMEMODEMSETTINGS_METANAME "PipXtremeModemSettingsMeta"
 #define PIPXTREMEMODEMSETTINGS_ISSINGLEINST 1
@@ -71,36 +71,36 @@
 
 // Object data
 typedef struct {
-    uint8_t Frequency calibration;
-    uint32_t Frequency min;
-    uint32_t Frequency max;
+    uint8_t Frequency_Calibration;
+    uint32_t Frequency_Min;
+    uint32_t Frequency_Max;
     uint32_t Frequency;
-    uint8_t RF bandwidth;
-    uint8_t Max Tx power;
-    uint8_t AESEncryption;
-    uint8_t AESEncryptionKey[16];
-    uint32_t PairedSerialNumberCRC;
+    uint8_t RF_Bandwidth;
+    uint8_t Max_Tx_Power;
+    uint8_t AES_Encryption;
+    uint8_t AES_EncryptionKey[16];
+    uint32_t Paired_Serial_Number_CRC;
 
 } __attribute__((packed)) PipXtremeModemSettingsData;
 
 // Field information
-// Field Frequency calibration information
-// Field Frequency min information
-// Field Frequency max information
+// Field Frequency_Calibration information
+// Field Frequency_Min information
+// Field Frequency_Max information
 // Field Frequency information
-// Field RF bandwidth information
-/* Enumeration options for field RF bandwidth */
-typedef enum { PIPXTREMEMODEMSETTINGS_RF BANDWIDTH_500=0, PIPXTREMEMODEMSETTINGS_RF BANDWIDTH_1000=1, PIPXTREMEMODEMSETTINGS_RF BANDWIDTH_2000=2, PIPXTREMEMODEMSETTINGS_RF BANDWIDTH_4000=3, PIPXTREMEMODEMSETTINGS_RF BANDWIDTH_8000=4, PIPXTREMEMODEMSETTINGS_RF BANDWIDTH_9600=5, PIPXTREMEMODEMSETTINGS_RF BANDWIDTH_16000=6, PIPXTREMEMODEMSETTINGS_RF BANDWIDTH_19200=7, PIPXTREMEMODEMSETTINGS_RF BANDWIDTH_24000=8, PIPXTREMEMODEMSETTINGS_RF BANDWIDTH_32000=9, PIPXTREMEMODEMSETTINGS_RF BANDWIDTH_64000=10, PIPXTREMEMODEMSETTINGS_RF BANDWIDTH_128000=11, PIPXTREMEMODEMSETTINGS_RF BANDWIDTH_192000=12 } PipXtremeModemSettingsRF bandwidthOptions;
-// Field Max Tx power information
-/* Enumeration options for field Max Tx power */
-typedef enum { PIPXTREMEMODEMSETTINGS_MAX TX POWER_1=0, PIPXTREMEMODEMSETTINGS_MAX TX POWER_2=1, PIPXTREMEMODEMSETTINGS_MAX TX POWER_5=2, PIPXTREMEMODEMSETTINGS_MAX TX POWER_8=3, PIPXTREMEMODEMSETTINGS_MAX TX POWER_11=4, PIPXTREMEMODEMSETTINGS_MAX TX POWER_14=5, PIPXTREMEMODEMSETTINGS_MAX TX POWER_17=6, PIPXTREMEMODEMSETTINGS_MAX TX POWER_20=7 } PipXtremeModemSettingsMax Tx powerOptions;
-// Field AESEncryption information
-/* Enumeration options for field AESEncryption */
-typedef enum { PIPXTREMEMODEMSETTINGS_AESENCRYPTION_FALSE=0, PIPXTREMEMODEMSETTINGS_AESENCRYPTION_TRUE=1 } PipXtremeModemSettingsAESEncryptionOptions;
-// Field AESEncryptionKey information
-/* Number of elements for field AESEncryptionKey */
-#define PIPXTREMEMODEMSETTINGS_AESENCRYPTIONKEY_NUMELEM 16
-// Field PairedSerialNumberCRC information
+// Field RF_Bandwidth information
+/* Enumeration options for field RF_Bandwidth */
+typedef enum { PIPXTREMEMODEMSETTINGS_RF_BANDWIDTH_500=0, PIPXTREMEMODEMSETTINGS_RF_BANDWIDTH_1000=1, PIPXTREMEMODEMSETTINGS_RF_BANDWIDTH_2000=2, PIPXTREMEMODEMSETTINGS_RF_BANDWIDTH_4000=3, PIPXTREMEMODEMSETTINGS_RF_BANDWIDTH_8000=4, PIPXTREMEMODEMSETTINGS_RF_BANDWIDTH_9600=5, PIPXTREMEMODEMSETTINGS_RF_BANDWIDTH_16000=6, PIPXTREMEMODEMSETTINGS_RF_BANDWIDTH_19200=7, PIPXTREMEMODEMSETTINGS_RF_BANDWIDTH_24000=8, PIPXTREMEMODEMSETTINGS_RF_BANDWIDTH_32000=9, PIPXTREMEMODEMSETTINGS_RF_BANDWIDTH_64000=10, PIPXTREMEMODEMSETTINGS_RF_BANDWIDTH_128000=11, PIPXTREMEMODEMSETTINGS_RF_BANDWIDTH_192000=12 } PipXtremeModemSettingsRF_BandwidthOptions;
+// Field Max_Tx_Power information
+/* Enumeration options for field Max_Tx_Power */
+typedef enum { PIPXTREMEMODEMSETTINGS_MAX_TX_POWER_1=0, PIPXTREMEMODEMSETTINGS_MAX_TX_POWER_2=1, PIPXTREMEMODEMSETTINGS_MAX_TX_POWER_5=2, PIPXTREMEMODEMSETTINGS_MAX_TX_POWER_8=3, PIPXTREMEMODEMSETTINGS_MAX_TX_POWER_11=4, PIPXTREMEMODEMSETTINGS_MAX_TX_POWER_14=5, PIPXTREMEMODEMSETTINGS_MAX_TX_POWER_17=6, PIPXTREMEMODEMSETTINGS_MAX_TX_POWER_20=7 } PipXtremeModemSettingsMax_Tx_PowerOptions;
+// Field AES_Encryption information
+/* Enumeration options for field AES_Encryption */
+typedef enum { PIPXTREMEMODEMSETTINGS_AES_ENCRYPTION_FALSE=0, PIPXTREMEMODEMSETTINGS_AES_ENCRYPTION_TRUE=1 } PipXtremeModemSettingsAES_EncryptionOptions;
+// Field AES_EncryptionKey information
+/* Number of elements for field AES_EncryptionKey */
+#define PIPXTREMEMODEMSETTINGS_AES_ENCRYPTIONKEY_NUMELEM 16
+// Field Paired_Serial_Number_CRC information
 
 
 // Generic interface functions

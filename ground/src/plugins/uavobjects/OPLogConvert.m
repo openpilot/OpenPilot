@@ -245,8 +245,6 @@ function [] = OPLogConvert()
     MixerSettings(1).DecelTime = 0;
     MixerSettings(1).ThrottleCurve1 = zeros(1,5);
     MixerSettings(1).ThrottleCurve2 = zeros(1,5);
-    MixerSettings(1).Mixer0Type = 0;
-    MixerSettings(1).Mixer0Vector = zeros(1,5);
     MixerSettings(1).Mixer1Type = 0;
     MixerSettings(1).Mixer1Vector = zeros(1,5);
     MixerSettings(1).Mixer2Type = 0;
@@ -261,10 +259,11 @@ function [] = OPLogConvert()
     MixerSettings(1).Mixer6Vector = zeros(1,5);
     MixerSettings(1).Mixer7Type = 0;
     MixerSettings(1).Mixer7Vector = zeros(1,5);
+    MixerSettings(1).Mixer8Type = 0;
+    MixerSettings(1).Mixer8Vector = zeros(1,5);
 
     mixerstatusIdx = 1;
     MixerStatus.timestamp = 0;
-    MixerStatus(1).Mixer0 = 0;
     MixerStatus(1).Mixer1 = 0;
     MixerStatus(1).Mixer2 = 0;
     MixerStatus(1).Mixer3 = 0;
@@ -272,6 +271,7 @@ function [] = OPLogConvert()
     MixerStatus(1).Mixer5 = 0;
     MixerStatus(1).Mixer6 = 0;
     MixerStatus(1).Mixer7 = 0;
+    MixerStatus(1).Mixer8 = 0;
 
     objectpersistenceIdx = 1;
     ObjectPersistence.timestamp = 0;
@@ -465,10 +465,10 @@ function [] = OPLogConvert()
             case 157988682
                 ManualControlSettings(manualcontrolsettingsIdx) = ReadManualControlSettingsObject(fid, timestamp);
                 manualcontrolsettingsIdx = manualcontrolsettingsIdx + 1;
-            case 1945801048
+            case 1336817486
                 MixerSettings(mixersettingsIdx) = ReadMixerSettingsObject(fid, timestamp);
                 mixersettingsIdx = mixersettingsIdx + 1;
-            case 2468388390
+            case 4137893648
                 MixerStatus(mixerstatusIdx) = ReadMixerStatusObject(fid, timestamp);
                 mixerstatusIdx = mixerstatusIdx + 1;
             case 572614706
@@ -990,8 +990,6 @@ function [MixerSettings] = ReadMixerSettingsObject(fid, timestamp)
     MixerSettings.DecelTime = double(fread(fid, 1, 'float32'));
     MixerSettings.ThrottleCurve1 = double(fread(fid, 5, 'float32'));
     MixerSettings.ThrottleCurve2 = double(fread(fid, 5, 'float32'));
-    MixerSettings.Mixer0Type = double(fread(fid, 1, 'uint8'));
-    MixerSettings.Mixer0Vector = double(fread(fid, 5, 'int8'));
     MixerSettings.Mixer1Type = double(fread(fid, 1, 'uint8'));
     MixerSettings.Mixer1Vector = double(fread(fid, 5, 'int8'));
     MixerSettings.Mixer2Type = double(fread(fid, 1, 'uint8'));
@@ -1006,6 +1004,8 @@ function [MixerSettings] = ReadMixerSettingsObject(fid, timestamp)
     MixerSettings.Mixer6Vector = double(fread(fid, 5, 'int8'));
     MixerSettings.Mixer7Type = double(fread(fid, 1, 'uint8'));
     MixerSettings.Mixer7Vector = double(fread(fid, 5, 'int8'));
+    MixerSettings.Mixer8Type = double(fread(fid, 1, 'uint8'));
+    MixerSettings.Mixer8Vector = double(fread(fid, 5, 'int8'));
     % read CRC
     fread(fid, 1, 'uint8');
 end
@@ -1019,7 +1019,6 @@ function [MixerStatus] = ReadMixerStatusObject(fid, timestamp)
     end
 
     MixerStatus.timestamp = timestamp;
-    MixerStatus.Mixer0 = double(fread(fid, 1, 'float32'));
     MixerStatus.Mixer1 = double(fread(fid, 1, 'float32'));
     MixerStatus.Mixer2 = double(fread(fid, 1, 'float32'));
     MixerStatus.Mixer3 = double(fread(fid, 1, 'float32'));
@@ -1027,6 +1026,7 @@ function [MixerStatus] = ReadMixerStatusObject(fid, timestamp)
     MixerStatus.Mixer5 = double(fread(fid, 1, 'float32'));
     MixerStatus.Mixer6 = double(fread(fid, 1, 'float32'));
     MixerStatus.Mixer7 = double(fread(fid, 1, 'float32'));
+    MixerStatus.Mixer8 = double(fread(fid, 1, 'float32'));
     % read CRC
     fread(fid, 1, 'uint8');
 end

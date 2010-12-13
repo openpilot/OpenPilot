@@ -43,7 +43,6 @@ class UAVOBJECTS_EXPORT MixerStatus: public UAVDataObject
 public:
     // Field structure
     typedef struct {
-        float Mixer0;
         float Mixer1;
         float Mixer2;
         float Mixer3;
@@ -51,11 +50,11 @@ public:
         float Mixer5;
         float Mixer6;
         float Mixer7;
+        float Mixer8;
 
     } __attribute__((packed)) DataFields;
 
     // Field information
-    // Field Mixer0 information
     // Field Mixer1 information
     // Field Mixer2 information
     // Field Mixer3 information
@@ -63,10 +62,11 @@ public:
     // Field Mixer5 information
     // Field Mixer6 information
     // Field Mixer7 information
+    // Field Mixer8 information
 
   
     // Constants
-    static const quint32 OBJID = 2468388390U;
+    static const quint32 OBJID = 4137893648U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

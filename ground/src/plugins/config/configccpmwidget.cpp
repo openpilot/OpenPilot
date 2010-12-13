@@ -118,8 +118,8 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
 
     QStringList channels;
-    channels << "Channel0" << "Channel1" << "Channel2" <<
-            "Channel3" << "Channel4" << "Channel5" << "Channel6" << "Channel7" << "None" ;
+    channels << "Channel1" << "Channel2" <<
+            "Channel3" << "Channel4" << "Channel5" << "Channel6" << "Channel7" << "Channel8" << "None" ;
     m_ccpm->ccpmEngineChannel->addItems(channels);
     m_ccpm->ccpmEngineChannel->setCurrentIndex(8);
     m_ccpm->ccpmTailChannel->addItems(channels);
@@ -699,10 +699,10 @@ void ConfigccpmWidget::UpdateMixer()
         ThisEnable[4] = m_ccpm->ccpmServoYChannel->isEnabled();
         ThisEnable[5] = m_ccpm->ccpmServoZChannel->isEnabled();
 
-        ServoWText->setPlainText(QString("%1").arg( MixerChannelData[2] ));
-        ServoXText->setPlainText(QString("%1").arg( MixerChannelData[3] ));
-        ServoYText->setPlainText(QString("%1").arg( MixerChannelData[4] ));
-        ServoZText->setPlainText(QString("%1").arg( MixerChannelData[5] ));
+        ServoWText->setPlainText(QString("%1").arg( MixerChannelData[2]+1 ));
+        ServoXText->setPlainText(QString("%1").arg( MixerChannelData[3]+1 ));
+        ServoYText->setPlainText(QString("%1").arg( MixerChannelData[4]+1 ));
+        ServoZText->setPlainText(QString("%1").arg( MixerChannelData[5]+1 ));
 
 
         //go through the user data and update the mixer matrix
@@ -719,7 +719,7 @@ void ConfigccpmWidget::UpdateMixer()
             */
             if ((MixerChannelData[i]<8)&&((ThisEnable[i])||(i<2)))
             {
-                m_ccpm->ccpmAdvancedSettingsTable->item(i,0)->setText(QString("%1").arg( MixerChannelData[i] ));
+                m_ccpm->ccpmAdvancedSettingsTable->item(i,0)->setText(QString("%1").arg( MixerChannelData[i]+1 ));
                  //config the vector
                if (i==0)
                 {//motor-engine
@@ -759,7 +759,7 @@ void ConfigccpmWidget::UpdateMixer()
          for (i=0;i<6;i++)
          {
              Channel =m_ccpm->ccpmAdvancedSettingsTable->item(i,0)->text();
-             if (Channel == "-") Channel = QString("8");
+             if (Channel == "-") Channel = QString("9");
              MixerChannelData[i]= Channel.toInt();
          }
     }
@@ -797,7 +797,7 @@ void ConfigccpmWidget::requestccpmUpdate()
     //go through the user data and update the mixer matrix
     for (i=0;i<8;i++)
     {
-            field = obj->getField(tr( "Mixer%1Vector" ).arg(i));
+            field = obj->getField(tr( "Mixer%1Vector" ).arg(i+1));
             //config the vector
             for (j=0;j<5;j++)
             {
@@ -807,7 +807,7 @@ void ConfigccpmWidget::requestccpmUpdate()
     }
     for (i=0;i<8;i++)
     {
-            field = obj->getField(tr( "Mixer%1Type" ).arg(i));
+            field = obj->getField(tr( "Mixer%1Type" ).arg(i+1));
             MixerOutputType[i] = field->getValue().toString();
     }
 
@@ -1064,7 +1064,7 @@ void ConfigccpmWidget::sendccpmUpdate()
         //clear the output types
         for (i=0;i<8;i++)
         {
-            field = obj->getField(tr( "Mixer%1Type" ).arg( i ));
+            field = obj->getField(tr( "Mixer%1Type" ).arg( i+1 ));
             //clear the mixer type
             field->setValue("Disabled");
         }
@@ -1085,7 +1085,7 @@ void ConfigccpmWidget::sendccpmUpdate()
             if (MixerChannelData[i]<8)
             {
                 //select the correct mixer for this config element
-                field = obj->getField(tr( "Mixer%1Type" ).arg( MixerChannelData[i] ));
+                field = obj->getField(tr( "Mixer%1Type" ).arg( MixerChannelData[i]+1 ));
                 //set the mixer type
                 if (i==0)
                 {
@@ -1097,7 +1097,7 @@ void ConfigccpmWidget::sendccpmUpdate()
                 }
 
                 //select the correct mixer for this config element
-                field = obj->getField(tr( "Mixer%1Vector" ).arg( MixerChannelData[i] ));
+                field = obj->getField(tr( "Mixer%1Vector" ).arg( MixerChannelData[i]+1 ));
                 //config the vector
                 for (j=0;j<5;j++)
                 {

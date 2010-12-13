@@ -1228,10 +1228,10 @@
                     <number>0</number>
                    </property>
                    <property name="verticalScrollBarPolicy">
-                    <enum>Qt::ScrollBarAlwaysOn</enum>
+                    <enum>Qt::ScrollBarAlwaysOff</enum>
                    </property>
                    <property name="horizontalScrollBarPolicy">
-                    <enum>Qt::ScrollBarAlwaysOn</enum>
+                    <enum>Qt::ScrollBarAlwaysOff</enum>
                    </property>
                    <property name="backgroundBrush">
                     <brush brushstyle="SolidPattern">
@@ -1568,18 +1568,6 @@
                  </attribute>
                  <attribute name="verticalHeaderDefaultSectionSize">
                   <number>25</number>
-                 </attribute>
-                 <attribute name="verticalHeaderMinimumSectionSize">
-                  <number>25</number>
-                 </attribute>
-                 <attribute name="verticalHeaderDefaultSectionSize">
-                  <number>25</number>
-                 </attribute>
-                 <attribute name="horizontalHeaderStretchLastSection">
-                  <bool>true</bool>
-                 </attribute>
-                 <attribute name="horizontalHeaderCascadingSectionResizes">
-                  <bool>true</bool>
                  </attribute>
                  <attribute name="verticalHeaderMinimumSectionSize">
                   <number>25</number>
@@ -2063,12 +2051,6 @@
            </attribute>
            <attribute name="horizontalHeaderMinimumSectionSize">
             <number>20</number>
-           </attribute>
-           <attribute name="horizontalHeaderMinimumSectionSize">
-            <number>20</number>
-           </attribute>
-           <attribute name="horizontalHeaderDefaultSectionSize">
-            <number>75</number>
            </attribute>
            <row>
             <property name="text">

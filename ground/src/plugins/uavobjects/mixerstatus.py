@@ -38,16 +38,6 @@ from collections import namedtuple
 # This is a list of instances of the data fields contained in this object
 _fields = [ \
 	uavobject.UAVObjectField(
-		'Mixer0',
-		'f',
-		1,
-		[
-			'0',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
 		'Mixer1',
 		'f',
 		1,
@@ -117,12 +107,22 @@ _fields = [ \
 		{
 		}
 	),
+	uavobject.UAVObjectField(
+		'Mixer8',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
 ]
 
 
 class MixerStatus(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 2468388390
+    OBJID        = 4137893648
     NAME         = "MixerStatus"
     METANAME     = "MixerStatusMeta"
     ISSINGLEINST = 1

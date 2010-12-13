@@ -1125,7 +1125,7 @@ Neutral should be put at the bottom of the slider for the throttle.</string>
       </rect>
      </property>
      <property name="text">
-      <string>Channel 0</string>
+      <string>Channel 1</string>
      </property>
     </widget>
     <widget class="QLabel" name="actuator1Label">
@@ -1138,7 +1138,7 @@ Neutral should be put at the bottom of the slider for the throttle.</string>
       </rect>
      </property>
      <property name="text">
-      <string>Channel 1</string>
+      <string>Channel 2</string>
      </property>
     </widget>
     <widget class="QLabel" name="actuator2Label">
@@ -1151,7 +1151,7 @@ Neutral should be put at the bottom of the slider for the throttle.</string>
       </rect>
      </property>
      <property name="text">
-      <string>Channel 2</string>
+      <string>Channel 3</string>
      </property>
     </widget>
     <widget class="QLabel" name="actuator3Label">
@@ -1164,7 +1164,7 @@ Neutral should be put at the bottom of the slider for the throttle.</string>
       </rect>
      </property>
      <property name="text">
-      <string>Channel 3</string>
+      <string>Channel 4</string>
      </property>
     </widget>
     <widget class="QLabel" name="actuator4Label">
@@ -1177,7 +1177,7 @@ Neutral should be put at the bottom of the slider for the throttle.</string>
       </rect>
      </property>
      <property name="text">
-      <string>Channel 4</string>
+      <string>Channel 5</string>
      </property>
     </widget>
     <widget class="QLabel" name="actuator5Label">
@@ -1190,7 +1190,7 @@ Neutral should be put at the bottom of the slider for the throttle.</string>
       </rect>
      </property>
      <property name="text">
-      <string>Channel 5</string>
+      <string>Channel 6</string>
      </property>
     </widget>
     <widget class="QSlider" name="ch0OutSlider">
@@ -1325,7 +1325,7 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
      <property name="text">
-      <string>Channel 6</string>
+      <string>Channel 7</string>
      </property>
     </widget>
     <widget class="QLabel" name="actuator7Label">
@@ -1338,7 +1338,7 @@ p, li { white-space: pre-wrap; }
       </rect>
      </property>
      <property name="text">
-      <string>Channel 7</string>
+      <string>Channel 8</string>
      </property>
     </widget>
     <widget class="QComboBox" name="ch1Output">

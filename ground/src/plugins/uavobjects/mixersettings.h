@@ -49,8 +49,6 @@ public:
         float DecelTime;
         float ThrottleCurve1[5];
         float ThrottleCurve2[5];
-        quint8 Mixer0Type;
-        qint8 Mixer0Vector[5];
         quint8 Mixer1Type;
         qint8 Mixer1Vector[5];
         quint8 Mixer2Type;
@@ -65,6 +63,8 @@ public:
         qint8 Mixer6Vector[5];
         quint8 Mixer7Type;
         qint8 Mixer7Vector[5];
+        quint8 Mixer8Type;
+        qint8 Mixer8Vector[5];
 
     } __attribute__((packed)) DataFields;
 
@@ -83,14 +83,6 @@ public:
     typedef enum { THROTTLECURVE2_0=0, THROTTLECURVE2_25=1, THROTTLECURVE2_50=2, THROTTLECURVE2_75=3, THROTTLECURVE2_100=4 } ThrottleCurve2Elem;
     /* Number of elements for field ThrottleCurve2 */
     static const quint32 THROTTLECURVE2_NUMELEM = 5;
-    // Field Mixer0Type information
-    /* Enumeration options for field Mixer0Type */
-    typedef enum { MIXER0TYPE_DISABLED=0, MIXER0TYPE_MOTOR=1, MIXER0TYPE_SERVO=2 } Mixer0TypeOptions;
-    // Field Mixer0Vector information
-    /* Array element names for field Mixer0Vector */
-    typedef enum { MIXER0VECTOR_THROTTLECURVE1=0, MIXER0VECTOR_THROTTLECURVE2=1, MIXER0VECTOR_ROLL=2, MIXER0VECTOR_PITCH=3, MIXER0VECTOR_YAW=4 } Mixer0VectorElem;
-    /* Number of elements for field Mixer0Vector */
-    static const quint32 MIXER0VECTOR_NUMELEM = 5;
     // Field Mixer1Type information
     /* Enumeration options for field Mixer1Type */
     typedef enum { MIXER1TYPE_DISABLED=0, MIXER1TYPE_MOTOR=1, MIXER1TYPE_SERVO=2 } Mixer1TypeOptions;
@@ -147,10 +139,18 @@ public:
     typedef enum { MIXER7VECTOR_THROTTLECURVE1=0, MIXER7VECTOR_THROTTLECURVE2=1, MIXER7VECTOR_ROLL=2, MIXER7VECTOR_PITCH=3, MIXER7VECTOR_YAW=4 } Mixer7VectorElem;
     /* Number of elements for field Mixer7Vector */
     static const quint32 MIXER7VECTOR_NUMELEM = 5;
+    // Field Mixer8Type information
+    /* Enumeration options for field Mixer8Type */
+    typedef enum { MIXER8TYPE_DISABLED=0, MIXER8TYPE_MOTOR=1, MIXER8TYPE_SERVO=2 } Mixer8TypeOptions;
+    // Field Mixer8Vector information
+    /* Array element names for field Mixer8Vector */
+    typedef enum { MIXER8VECTOR_THROTTLECURVE1=0, MIXER8VECTOR_THROTTLECURVE2=1, MIXER8VECTOR_ROLL=2, MIXER8VECTOR_PITCH=3, MIXER8VECTOR_YAW=4 } Mixer8VectorElem;
+    /* Number of elements for field Mixer8Vector */
+    static const quint32 MIXER8VECTOR_NUMELEM = 5;
 
   
     // Constants
-    static const quint32 OBJID = 1945801048U;
+    static const quint32 OBJID = 1336817486U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;

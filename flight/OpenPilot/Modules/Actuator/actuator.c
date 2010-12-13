@@ -166,10 +166,10 @@ static void actuatorTask(void* parameters)
 		ActuatorSettingsGet(&settings);
 
 		int nMixers = 0;
-		Mixer_t * mixers = (Mixer_t *)&mixerSettings.Mixer0Type;
+		Mixer_t * mixers = (Mixer_t *)&mixerSettings.Mixer1Type;
 		for(int ct=0; ct < MAX_MIX_ACTUATORS; ct++)
 		{
-			if(mixers[ct].type != MIXERSETTINGS_MIXER0TYPE_DISABLED)
+			if(mixers[ct].type != MIXERSETTINGS_MIXER1TYPE_DISABLED)
 			{
 				nMixers ++;
 			}
@@ -189,12 +189,12 @@ static void actuatorTask(void* parameters)
 		float curve2 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve2);
 		for(int ct=0; ct < MAX_MIX_ACTUATORS; ct++)
 		{
-			if(mixers[ct].type != MIXERSETTINGS_MIXER0TYPE_DISABLED)
+			if(mixers[ct].type != MIXERSETTINGS_MIXER1TYPE_DISABLED)
 			{
 				status[ct] = ProcessMixer(ct, curve1, curve2, &mixerSettings, &desired, dT);
 
 				if(!armed &&
-				   mixers[ct].type == MIXERSETTINGS_MIXER0TYPE_MOTOR)
+				   mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR)
 				{
 					command.Channel[ct] = settings.ChannelMin[ct]; //force zero throttle
 					filterAccumulator[ct] = 0;
@@ -232,14 +232,14 @@ static void actuatorTask(void* parameters)
 float ProcessMixer(const int index, const float curve1, const float curve2,
 		   MixerSettingsData* mixerSettings, ActuatorDesiredData* desired, const float period)
 {
-	Mixer_t * mixers = (Mixer_t *)&mixerSettings->Mixer0Type; //pointer to array of mixers in UAVObjects
+	Mixer_t * mixers = (Mixer_t *)&mixerSettings->Mixer1Type; //pointer to array of mixers in UAVObjects
 	Mixer_t * mixer = &mixers[index];
-	float result = ((mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_THROTTLECURVE1] / 128.0f) * curve1) +
-	((mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_THROTTLECURVE2] / 128.0f) * curve2) +
-	((mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_ROLL] / 128.0f) * desired->Roll) +
-	((mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_PITCH] / 128.0f) * desired->Pitch) +
-	((mixer->matrix[MIXERSETTINGS_MIXER0VECTOR_YAW] / 128.0f) * desired->Yaw);
-	if(mixer->type == MIXERSETTINGS_MIXER0TYPE_MOTOR)
+	float result = ((mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_THROTTLECURVE1] / 128.0f) * curve1) +
+	((mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_THROTTLECURVE2] / 128.0f) * curve2) +
+	((mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_ROLL] / 128.0f) * desired->Roll) +
+	((mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_PITCH] / 128.0f) * desired->Pitch) +
+	((mixer->matrix[MIXERSETTINGS_MIXER1VECTOR_YAW] / 128.0f) * desired->Yaw);
+	if(mixer->type == MIXERSETTINGS_MIXER1TYPE_MOTOR)
 	{
 		if(result < 0) //idle throttle
 		{
@@ -364,12 +364,12 @@ static void setFailsafe()
 
 	MixerSettingsData mixerSettings;
 	MixerSettingsGet (&mixerSettings);
-	Mixer_t * mixers = (Mixer_t *)&mixerSettings.Mixer0Type; //pointer to array of mixers in UAVObjects
+	Mixer_t * mixers = (Mixer_t *)&mixerSettings.Mixer1Type; //pointer to array of mixers in UAVObjects
 
 	// Reset ActuatorCommand to safe values
 	for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n)
 	{
-		if(mixers[n].type == MIXERSETTINGS_MIXER0TYPE_MOTOR)
+		if(mixers[n].type == MIXERSETTINGS_MIXER1TYPE_MOTOR)
 		{
 			command.Channel[n] = settings.ChannelMin[n];
 		}

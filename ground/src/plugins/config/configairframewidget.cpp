@@ -92,10 +92,10 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     ffTuningInProgress = false;
     ffTuningPhase = false;
 
-    mixerTypes << "Mixer0Type" << "Mixer1Type" << "Mixer2Type" << "Mixer3Type"
-            << "Mixer4Type" << "Mixer5Type" << "Mixer6Type" << "Mixer7Type";
-    mixerVectors << "Mixer0Vector" << "Mixer1Vector" << "Mixer2Vector" << "Mixer3Vector"
-            << "Mixer4Vector" << "Mixer5Vector" << "Mixer6Vector" << "Mixer7Vector";
+    mixerTypes << "Mixer1Type" << "Mixer2Type" << "Mixer3Type"
+            << "Mixer4Type" << "Mixer5Type" << "Mixer6Type" << "Mixer7Type" << "Mixer8Type";
+    mixerVectors << "Mixer1Vector" << "Mixer2Vector" << "Mixer3Vector"
+            << "Mixer4Vector" << "Mixer5Vector" << "Mixer6Vector" << "Mixer7Vector" << "Mixer8Vector";
 
     QStringList airframeTypes;
     airframeTypes << "Fixed Wing" << "Multirotor" << "Helicopter" << "Custom";
@@ -114,8 +114,8 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
 
 
     QStringList channels;
-    channels << "None" << "Channel0" << "Channel1" << "Channel2" <<
-            "Channel3" << "Channel4" << "Channel5" << "Channel6" << "Channel7";
+    channels << "None" << "Channel1" << "Channel2" << "Channel3" <<
+            "Channel4" << "Channel5" << "Channel6" << "Channel7" << "Channel8";
     // Now load all the channel assignements for fixed wing
     m_aircraft->fwElevator1Channel->addItems(channels);
     m_aircraft->fwElevator2Channel->addItems(channels);
@@ -148,7 +148,7 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
 
     // Put combo boxes in line one of the custom mixer table:
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    UAVObjectField* field = obj->getField(QString("Mixer0Type"));
+    UAVObjectField* field = obj->getField(QString("Mixer1Type"));
     QStringList list = field->getOptions();
     for (int i=0;i<8;i++) {
         QComboBox* qb = new QComboBox(m_aircraft->customMixerTable);

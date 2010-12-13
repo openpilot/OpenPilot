@@ -7,8 +7,6 @@
         <field name="DecelTime" units="ms" type="float" elements="1" defaultvalue="0"/>
         <field name="ThrottleCurve1" units="percent" type="float" elements="5" elementnames="0,25,50,75,100" defaultvalue="0,0.25,0.5,0.75,1"/>
         <field name="ThrottleCurve2" units="percent" type="float" elements="5" elementnames="0,25,50,75,100" defaultvalue="0,0.25,0.5,0.75,1"/>
-        <field name="Mixer0Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo" defaultvalue="Disabled"/>
-        <field name="Mixer0Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
         <field name="Mixer1Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo" defaultvalue="Disabled"/>
         <field name="Mixer1Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
         <field name="Mixer2Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo" defaultvalue="Disabled"/>
@@ -23,6 +21,8 @@
         <field name="Mixer6Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
         <field name="Mixer7Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo" defaultvalue="Disabled"/>
         <field name="Mixer7Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
+        <field name="Mixer8Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo" defaultvalue="Disabled"/>
+        <field name="Mixer8Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

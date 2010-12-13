@@ -106,33 +106,6 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'Mixer0Type',
-		'b',
-		1,
-		[
-			'0',
-		],
-		{
-			'0' : 'Disabled',
-			'1' : 'Motor',
-			'2' : 'Servo',
-		}
-	),
-	uavobject.UAVObjectField(
-		'Mixer0Vector',
-		'b',
-		5,
-		[
-			'ThrottleCurve1',
-			'ThrottleCurve2',
-			'Roll',
-			'Pitch',
-			'Yaw',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
 		'Mixer1Type',
 		'b',
 		1,
@@ -321,12 +294,39 @@ _fields = [ \
 		{
 		}
 	),
+	uavobject.UAVObjectField(
+		'Mixer8Type',
+		'b',
+		1,
+		[
+			'0',
+		],
+		{
+			'0' : 'Disabled',
+			'1' : 'Motor',
+			'2' : 'Servo',
+		}
+	),
+	uavobject.UAVObjectField(
+		'Mixer8Vector',
+		'b',
+		5,
+		[
+			'ThrottleCurve1',
+			'ThrottleCurve2',
+			'Roll',
+			'Pitch',
+			'Yaw',
+		],
+		{
+		}
+	),
 ]
 
 
 class MixerSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 1945801048
+    OBJID        = 1336817486
     NAME         = "MixerSettings"
     METANAME     = "MixerSettingsMeta"
     ISSINGLEINST = 1

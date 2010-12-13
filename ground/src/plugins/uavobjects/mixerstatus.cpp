@@ -42,9 +42,6 @@ MixerStatus::MixerStatus(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
     QList<UAVObjectField*> fields;
-    QStringList Mixer0ElemNames;
-    Mixer0ElemNames.append("0");
-    fields.append( new UAVObjectField(QString("Mixer0"), QString(""), UAVObjectField::FLOAT32, Mixer0ElemNames, QStringList()) );
     QStringList Mixer1ElemNames;
     Mixer1ElemNames.append("0");
     fields.append( new UAVObjectField(QString("Mixer1"), QString(""), UAVObjectField::FLOAT32, Mixer1ElemNames, QStringList()) );
@@ -66,6 +63,9 @@ MixerStatus::MixerStatus(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     QStringList Mixer7ElemNames;
     Mixer7ElemNames.append("0");
     fields.append( new UAVObjectField(QString("Mixer7"), QString(""), UAVObjectField::FLOAT32, Mixer7ElemNames, QStringList()) );
+    QStringList Mixer8ElemNames;
+    Mixer8ElemNames.append("0");
+    fields.append( new UAVObjectField(QString("Mixer8"), QString(""), UAVObjectField::FLOAT32, Mixer8ElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

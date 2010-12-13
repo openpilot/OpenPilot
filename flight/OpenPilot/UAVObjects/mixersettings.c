@@ -94,12 +94,6 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	data.ThrottleCurve2[2] = 0.5;
 	data.ThrottleCurve2[3] = 0.75;
 	data.ThrottleCurve2[4] = 1;
-	data.Mixer0Type = 0;
-	data.Mixer0Vector[0] = 0;
-	data.Mixer0Vector[1] = 0;
-	data.Mixer0Vector[2] = 0;
-	data.Mixer0Vector[3] = 0;
-	data.Mixer0Vector[4] = 0;
 	data.Mixer1Type = 0;
 	data.Mixer1Vector[0] = 0;
 	data.Mixer1Vector[1] = 0;
@@ -142,6 +136,12 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	data.Mixer7Vector[2] = 0;
 	data.Mixer7Vector[3] = 0;
 	data.Mixer7Vector[4] = 0;
+	data.Mixer8Type = 0;
+	data.Mixer8Vector[0] = 0;
+	data.Mixer8Vector[1] = 0;
+	data.Mixer8Vector[2] = 0;
+	data.Mixer8Vector[3] = 0;
+	data.Mixer8Vector[4] = 0;
 
 	UAVObjSetInstanceData(obj, instId, &data);
 

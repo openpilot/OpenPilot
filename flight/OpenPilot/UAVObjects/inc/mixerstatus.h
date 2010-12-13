@@ -41,7 +41,7 @@
 #define MIXERSTATUS_H
 
 // Object constants
-#define MIXERSTATUS_OBJID 2468388390U
+#define MIXERSTATUS_OBJID 4137893648U
 #define MIXERSTATUS_NAME "MixerStatus"
 #define MIXERSTATUS_METANAME "MixerStatusMeta"
 #define MIXERSTATUS_ISSINGLEINST 1
@@ -71,7 +71,6 @@
 
 // Object data
 typedef struct {
-    float Mixer0;
     float Mixer1;
     float Mixer2;
     float Mixer3;
@@ -79,11 +78,11 @@ typedef struct {
     float Mixer5;
     float Mixer6;
     float Mixer7;
+    float Mixer8;
 
 } __attribute__((packed)) MixerStatusData;
 
 // Field information
-// Field Mixer0 information
 // Field Mixer1 information
 // Field Mixer2 information
 // Field Mixer3 information
@@ -91,6 +90,7 @@ typedef struct {
 // Field Mixer5 information
 // Field Mixer6 information
 // Field Mixer7 information
+// Field Mixer8 information
 
 
 // Generic interface functions

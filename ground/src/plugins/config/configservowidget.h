@@ -50,8 +50,8 @@ private:
         Ui_SettingsWidget *m_config;
         QList<QSlider> sliders;
         void updateChannelSlider(QSlider* slider, QLabel* min, QLabel* Max,  QCheckBox* rev, int value);
-        void assignChannel(UAVDataObject *obj, UAVObjectField *field, QString str);
-        void assignOutputChannel(UAVDataObject *obj, UAVObjectField *field, QString str);
+        void assignChannel(UAVDataObject *obj, QString str);
+        void assignOutputChannel(UAVDataObject *obj, QString str);
         int mccDataRate;
         UAVObject::Metadata accInitialData;
         QList<QSlider*> outSliders;

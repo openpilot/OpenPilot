@@ -42,6 +42,9 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     // First of all, put all the channel widgets into lists, so that we can
     // manipulate those:
+
+    // NOTE: for historical reasons, we have objects below called ch0 to ch7, but the
+    // convention for OP is Channel 1 to Channel 8.
     outLabels << m_config->ch0OutValue
             << m_config->ch1OutValue
             << m_config->ch2OutValue
@@ -163,7 +166,7 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
             m_config->ch1Output->addItem(field->getName());
             m_config->ch2Output->addItem(field->getName());
             m_config->ch3Output->addItem(field->getName());
-           m_config->ch4Output->addItem(field->getName());
+            m_config->ch4Output->addItem(field->getName());
             m_config->ch5Output->addItem(field->getName());
             m_config->ch6Output->addItem(field->getName());
             m_config->ch7Output->addItem(field->getName());
@@ -303,7 +306,7 @@ void ConfigServoWidget::requestRCOutputUpdate()
     QList<UAVObjectField*> fieldList = obj->getFields();
     foreach (UAVObjectField* field, fieldList) {
         if (field->getUnits().contains("channel")) {
-            assignOutputChannel(obj,field,field->getName());
+            assignOutputChannel(obj,field->getName());
         }
     }
 
@@ -590,7 +593,7 @@ void ConfigServoWidget::requestRCInputUpdate()
     QList<UAVObjectField*> fieldList = obj->getFields();
     foreach (UAVObjectField* field, fieldList) {
         if (field->getUnits().contains("channel")) {
-            assignChannel(obj, field, field->getName());
+            assignChannel(obj, field->getName());
         }
     }
 
@@ -765,9 +768,9 @@ void ConfigServoWidget::saveRCInputObject()
 /**
   * Set the dropdown option for a channel Input assignement
   */
-void ConfigServoWidget::assignChannel(UAVDataObject *obj, UAVObjectField *field, QString str)
+void ConfigServoWidget::assignChannel(UAVDataObject *obj, QString str)
 {
-    field = obj->getField(str);
+    UAVObjectField* field = obj->getField(str);
     QStringList options = field->getOptions();
     switch (options.indexOf(field->getValue().toString())) {
     case 0:
@@ -800,9 +803,9 @@ void ConfigServoWidget::assignChannel(UAVDataObject *obj, UAVObjectField *field,
 /**
   * Set the dropdown option for a channel output assignement
   */
-void ConfigServoWidget::assignOutputChannel(UAVDataObject *obj, UAVObjectField *field, QString str)
+void ConfigServoWidget::assignOutputChannel(UAVDataObject *obj, QString str)
 {
-    field = obj->getField(str);
+    UAVObjectField* field = obj->getField(str);
     QStringList options = field->getOptions();
     switch (options.indexOf(field->getValue().toString())) {
     case 0:

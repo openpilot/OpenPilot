@@ -68,20 +68,6 @@ MixerSettings::MixerSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, N
     ThrottleCurve2ElemNames.append("75");
     ThrottleCurve2ElemNames.append("100");
     fields.append( new UAVObjectField(QString("ThrottleCurve2"), QString("percent"), UAVObjectField::FLOAT32, ThrottleCurve2ElemNames, QStringList()) );
-    QStringList Mixer0TypeElemNames;
-    Mixer0TypeElemNames.append("0");
-    QStringList Mixer0TypeEnumOptions;
-    Mixer0TypeEnumOptions.append("Disabled");
-    Mixer0TypeEnumOptions.append("Motor");
-    Mixer0TypeEnumOptions.append("Servo");
-    fields.append( new UAVObjectField(QString("Mixer0Type"), QString(""), UAVObjectField::ENUM, Mixer0TypeElemNames, Mixer0TypeEnumOptions) );
-    QStringList Mixer0VectorElemNames;
-    Mixer0VectorElemNames.append("ThrottleCurve1");
-    Mixer0VectorElemNames.append("ThrottleCurve2");
-    Mixer0VectorElemNames.append("Roll");
-    Mixer0VectorElemNames.append("Pitch");
-    Mixer0VectorElemNames.append("Yaw");
-    fields.append( new UAVObjectField(QString("Mixer0Vector"), QString(""), UAVObjectField::INT8, Mixer0VectorElemNames, QStringList()) );
     QStringList Mixer1TypeElemNames;
     Mixer1TypeElemNames.append("0");
     QStringList Mixer1TypeEnumOptions;
@@ -180,6 +166,20 @@ MixerSettings::MixerSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, N
     Mixer7VectorElemNames.append("Pitch");
     Mixer7VectorElemNames.append("Yaw");
     fields.append( new UAVObjectField(QString("Mixer7Vector"), QString(""), UAVObjectField::INT8, Mixer7VectorElemNames, QStringList()) );
+    QStringList Mixer8TypeElemNames;
+    Mixer8TypeElemNames.append("0");
+    QStringList Mixer8TypeEnumOptions;
+    Mixer8TypeEnumOptions.append("Disabled");
+    Mixer8TypeEnumOptions.append("Motor");
+    Mixer8TypeEnumOptions.append("Servo");
+    fields.append( new UAVObjectField(QString("Mixer8Type"), QString(""), UAVObjectField::ENUM, Mixer8TypeElemNames, Mixer8TypeEnumOptions) );
+    QStringList Mixer8VectorElemNames;
+    Mixer8VectorElemNames.append("ThrottleCurve1");
+    Mixer8VectorElemNames.append("ThrottleCurve2");
+    Mixer8VectorElemNames.append("Roll");
+    Mixer8VectorElemNames.append("Pitch");
+    Mixer8VectorElemNames.append("Yaw");
+    fields.append( new UAVObjectField(QString("Mixer8Vector"), QString(""), UAVObjectField::INT8, Mixer8VectorElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -227,12 +227,6 @@ void MixerSettings::setDefaultFieldValues()
     data.ThrottleCurve2[2] = 0.5;
     data.ThrottleCurve2[3] = 0.75;
     data.ThrottleCurve2[4] = 1;
-    data.Mixer0Type = 0;
-    data.Mixer0Vector[0] = 0;
-    data.Mixer0Vector[1] = 0;
-    data.Mixer0Vector[2] = 0;
-    data.Mixer0Vector[3] = 0;
-    data.Mixer0Vector[4] = 0;
     data.Mixer1Type = 0;
     data.Mixer1Vector[0] = 0;
     data.Mixer1Vector[1] = 0;
@@ -275,6 +269,12 @@ void MixerSettings::setDefaultFieldValues()
     data.Mixer7Vector[2] = 0;
     data.Mixer7Vector[3] = 0;
     data.Mixer7Vector[4] = 0;
+    data.Mixer8Type = 0;
+    data.Mixer8Vector[0] = 0;
+    data.Mixer8Vector[1] = 0;
+    data.Mixer8Vector[2] = 0;
+    data.Mixer8Vector[3] = 0;
+    data.Mixer8Vector[4] = 0;
 
 }
 

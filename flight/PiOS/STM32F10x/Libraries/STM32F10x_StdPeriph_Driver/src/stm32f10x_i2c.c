@@ -187,7 +187,7 @@ void I2C_DeInit(I2C_TypeDef* I2Cx)
   *   contains the configuration information for the specified I2C peripheral.
   * @retval None
   */
-void I2C_Init(I2C_TypeDef* I2Cx, I2C_InitTypeDef* I2C_InitStruct)
+void I2C_Init(I2C_TypeDef* I2Cx, const I2C_InitTypeDef* I2C_InitStruct)
 {
   uint16_t tmpreg = 0, freqrange = 0;
   uint16_t result = 0x04;

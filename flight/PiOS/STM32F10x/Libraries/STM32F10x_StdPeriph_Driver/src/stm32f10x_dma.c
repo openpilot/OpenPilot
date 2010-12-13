@@ -198,7 +198,7 @@ void DMA_DeInit(DMA_Channel_TypeDef* DMAy_Channelx)
   *   contains the configuration information for the specified DMA Channel.
   * @retval None
   */
-void DMA_Init(DMA_Channel_TypeDef* DMAy_Channelx, DMA_InitTypeDef* DMA_InitStruct)
+void DMA_Init(DMA_Channel_TypeDef* DMAy_Channelx, const DMA_InitTypeDef* DMA_InitStruct)
 {
   uint32_t tmpreg = 0;
 

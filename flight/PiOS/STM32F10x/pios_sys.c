@@ -118,7 +118,7 @@ int32_t PIOS_SYS_Reset(void)
 
 	RCC_APB2PeriphResetCmd(0xffffffff, DISABLE);
 	RCC_APB1PeriphResetCmd(0xffffffff, DISABLE);
-	SCB->AIRCR = NVIC_AIRCR_VECTKEY | (1 << NVIC_VECTRESET);
+	SCB->AIRCR = SCB_AIRCR_VECTKEY | SCB_AIRCR_VECTRESET;
 
 	while (1) ;
 

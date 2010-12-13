@@ -48,6 +48,7 @@ UAVObjectGenerator::UAVObjectGenerator(QString& basepath, FILE* out) :
     flightCodePath = QDir( basepath + QString("flight/OpenPilot/UAVObjects"));
     gcsCodePath = QDir( basepath + QString("ground/src/plugins/uavobjects"));
     pythonTemplatePath = QDir( basepath + QString("ground/src/plugins/uavobjects"));
+    matlabTemplatePath = QDir( basepath + QString("ground/src/plugins/uavobjects"));
     // synthetic output files should go into the build directory once the various GUI build systems
     // learn how to find these output files in the build directory.
     //pythonCodePath = QDir( basepath + QString("build/uavobjects"));
@@ -55,6 +56,7 @@ UAVObjectGenerator::UAVObjectGenerator(QString& basepath, FILE* out) :
     objectTemplateFilename = QString("uavobjecttemplate");
     objectsInitTemplateFilename = QString("uavobjectsinittemplate");
     objectsInitFilename = QString("uavobjectsinit");
+    matlabOutFilename = QString("OPLogConvert");
     sout << "- OpenPilot UAVObject Generator -" << endl;
 }
 
@@ -71,6 +73,8 @@ bool UAVObjectGenerator::processAll()
     QString gcsIncludeTemplate = readFile( gcsCodePath.absoluteFilePath(objectTemplateFilename + ".h") );
     QString gcsInitTemplate = readFile( gcsCodePath.absoluteFilePath(objectsInitTemplateFilename + ".cpp") );
     QString pythonCodeTemplate = readFile( pythonTemplatePath.absoluteFilePath(objectTemplateFilename + ".py") );
+    QString matlabCodeTemplate = readFile( matlabTemplatePath.absoluteFilePath(objectTemplateFilename + ".m") );
+
     if ( flightCodeTemplate.isNull() || flightIncludeTemplate.isNull() ||
          gcsCodeTemplate.isNull() || gcsIncludeTemplate.isNull() ||
 	 pythonCodeTemplate.isNull() ||
@@ -111,6 +115,13 @@ bool UAVObjectGenerator::processAll()
     QString flightObjInit;
     QString gcsObjInit;
     QString pythonObjInit;
+
+
+    QString matlabAllocationCode;
+    QString matlabSwithCode;
+    QString matlabSaveObjectsCode;
+    QString matlabFunctionsCode;
+
     bool res;
     for (int parseridx = 0; parseridx < parsers.length(); ++ parseridx)
     {
@@ -159,6 +170,13 @@ bool UAVObjectGenerator::processAll()
                 sout << "Error: Improperly formatted Python object template file" << endl;
                 return false;
             }
+
+            // Generate the Matlab code            
+            res = parser->generateMatlabFile(objidx, matlabAllocationCode, matlabSwithCode, matlabSaveObjectsCode, matlabFunctionsCode);
+
+
+
+
             // Write the flight code
             res = writeFileIfDiffrent( flightCodePath.absolutePath() + "/" + namelc + ".c", flightCode );
             if (!res)
@@ -218,6 +236,18 @@ bool UAVObjectGenerator::processAll()
     gcsInitTemplate.replace( QString("$(OBJINIT)"), gcsObjInit);
     res = writeFileIfDiffrent( gcsCodePath.absolutePath() + "/" + objectsInitFilename + ".cpp",
                      gcsInitTemplate );
+    if (!res)
+    {
+        sout << "Error: Could not write output files" << endl;
+        return false;
+    }
+
+
+    matlabCodeTemplate.replace( QString("$(ALLOCATIONCODE)"), matlabAllocationCode);
+    matlabCodeTemplate.replace( QString("$(SWITCHCODE)"), matlabSwithCode);
+    matlabCodeTemplate.replace( QString("$(SAVEOBJECTSCODE)"), matlabSaveObjectsCode);
+    matlabCodeTemplate.replace( QString("$(FUNCTIONSCODE)"), matlabFunctionsCode);
+    res = writeFile( gcsCodePath.absolutePath() + "/" + matlabOutFilename + ".m", matlabCodeTemplate );
     if (!res)
     {
         sout << "Error: Could not write output files" << endl;

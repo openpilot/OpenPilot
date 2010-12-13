@@ -46,10 +46,12 @@ private:
     QDir flightCodePath;
     QDir gcsCodePath;
     QDir pythonTemplatePath;
+    QDir matlabTemplatePath;
     QDir pythonCodePath;
     QString objectTemplateFilename;
     QString objectsInitTemplateFilename;
     QString objectsInitFilename;
+    QString matlabOutFilename;
 
     QString readFile(QString name);
     bool writeFile(QString name, QString& str);

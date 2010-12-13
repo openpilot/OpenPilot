@@ -107,6 +107,9 @@ public:
                               QString& outInclude, QString& outCode);
     bool generatePythonObject(int objIndex, const QString& templateCode, QString& outCode);
 
+    bool generateMatlabFile(int objIndex, QString& matlabAllocationCode, QString& matlabSwithCode, QString& matlabSaveObjectsCode, QString& matlabFunctionsCode);
+
+
 private:
     QList<ObjectInfo*> objInfo;
     QString filename;
@@ -114,6 +117,7 @@ private:
     QStringList fieldTypeStrCPP;
     QStringList fieldTypeStrPython;
     QStringList fieldTypeStrCPPClass;
+    QStringList fieldTypeStrMatlab;
     QStringList fieldTypeStrXML;
     QStringList updateModeStr;
     QStringList updateModeStrXML;

@@ -13,8 +13,17 @@
 #include <QList>
 #include <iostream>
 #include "delay.h"
+#include <qextserialport/src/qextserialport.h>
+#include <QTime>
+#include "SSP/qssp.h"
+#include "SSP/port.h"
+#include "SSP/qsspt.h"
+
 using namespace std;
 #define BUF_LEN 64
+
+#define MAX_PACKET_DATA_LEN	255
+#define MAX_PACKET_BUF_SIZE	(1+1+MAX_PACKET_DATA_LEN+2)
 
 namespace OP_DFU {
 
@@ -63,19 +72,19 @@ namespace OP_DFU {
 
     enum Commands
     {
-        Reserved,
-        Req_Capabilities,
-        Rep_Capabilities,
-        EnterDFU,
-        JumpFW,
-        Reset,
-        Abort_Operation,
-        Upload,
-        Op_END,
-        Download_Req,
-        Download,
-        Status_Request,
-        Status_Rep,
+        Reserved,//0
+        Req_Capabilities,//1
+        Rep_Capabilities,//2
+        EnterDFU,//3
+        JumpFW,//4
+        Reset,//5
+        Abort_Operation,//6
+        Upload,//7
+        Op_END,//8
+        Download_Req,//9
+        Download,//10
+        Status_Request,//11
+        Status_Rep,//12
 
     };
     struct device
@@ -96,7 +105,9 @@ namespace OP_DFU {
 
         public:
 
-        DFUObject(bool debug);
+        //DFUObject(bool debug);
+        DFUObject(bool debug,bool use_serial,QString port);
+
         ~DFUObject();
 
         // Service commands:
@@ -146,9 +157,20 @@ namespace OP_DFU {
        void operationProgress(QString status);
 
     private:
+       // Generic variables:
         bool debug;
-
+        bool use_serial;
+        bool mready;
         int RWFlags;
+        qsspt * serialhandle;
+        int sendData(void*,int);
+        int receiveData(void * data,int size);
+        uint8_t	sspTxBuf[MAX_PACKET_BUF_SIZE];
+        uint8_t	sspRxBuf[MAX_PACKET_BUF_SIZE];
+        port * info;
+
+
+        // USB Bootloader:
         pjrc_rawhid hidHandle;
         int setStartBit(int command){ return command|0x20; }
         quint32 CRCFromQBArray(QByteArray array, quint32 Size);

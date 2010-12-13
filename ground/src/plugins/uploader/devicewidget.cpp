@@ -155,8 +155,10 @@ void deviceWidget::uploadFirmware()
     }
 
     bool verify = false;
+    /* TODO: does not work properly on current Bootloader!
     if (m_dfu->devices[deviceID].Readable)
         verify = true;
+     */
 
     QString filename = setOpenFileName();
 

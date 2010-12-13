@@ -33,6 +33,7 @@
 #include "devicewidget.h"
 #include "op_dfu.h"
 
+#include "uavtalk/telemetrymanager.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavobject.h"
@@ -58,6 +59,9 @@ public:
     typedef enum { IAP_STATE_READY, IAP_STATE_STEP_1, IAP_STATE_STEP_2, IAP_STEP_RESET, IAP_STATE_BOOTLOADER} IAPStep;
     typedef enum { RESCUE_STEP0, RESCUE_STEP1, RESCUE_STEP2, RESCUE_STEP3, RESCUE_POWER1, RESCUE_POWER2, RESCUE_DETECT } RescueStep;
 
+public slots:
+    void onAutopilotConnect();
+    void onAutopilotDisconnect();
 
 private:
      Ui_UploaderWidget *m_config;

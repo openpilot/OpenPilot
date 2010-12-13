@@ -18,9 +18,14 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="haltButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="toolTip">
         <string>Tells the mainboard to go down
-to bootloader mode.</string>
+to bootloader mode.
+(Only enabled if telemetry link is established, either
+through serial or USB)</string>
        </property>
        <property name="text">
         <string>Halt</string>
@@ -30,11 +35,12 @@ to bootloader mode.</string>
      <item>
       <widget class="QPushButton" name="bootButton">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="toolTip">
         <string>Boots the system.
-Only enabled if the system is halted.</string>
+Only useful if the system is halted
+(mainboard blue LED blinking slowly, orange LED off)</string>
        </property>
        <property name="text">
         <string>Boot</string>
@@ -43,8 +49,13 @@ Only enabled if the system is halted.</string>
      </item>
      <item>
       <widget class="QPushButton" name="resetButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="toolTip">
-        <string>Reset the system.</string>
+        <string>Reset the system.
+(Only enabled if telemetry link is established, either
+through serial or USB)</string>
        </property>
        <property name="text">
         <string>Reset</string>
@@ -74,6 +85,9 @@ recover a system which does not boot.</string>
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QComboBox" name="telemetryLink"/>
      </item>
      <item>
       <widget class="QLabel" name="boardStatus">

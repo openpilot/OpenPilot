@@ -35,7 +35,16 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     resetOnly=false;
     dfu = NULL;
 
-    //m_config->systemElements->addTab((QWidget*)new deviceWidget(),QString("Device"));
+    // Listen to autopilot connection events
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
+    connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
+    connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
+
+    // Also listen to disconnect actions from the user:
+    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    connect(cm, SIGNAL(deviceDisconnected()), this, SLOT(onAutopilotDisconnect()));
+
 
     connect(m_config->haltButton, SIGNAL(clicked()), this, SLOT(goToBootloader()));
     connect(m_config->resetButton, SIGNAL(clicked()), this, SLOT(systemReset()));
@@ -43,6 +52,23 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_config->rescueButton, SIGNAL(clicked()), this, SLOT(systemRescue()));
 
 }
+
+/**
+  Enables widget buttons if autopilot connected
+  */
+void UploaderGadgetWidget::onAutopilotConnect(){
+    m_config->haltButton->setEnabled(true);
+    m_config->resetButton->setEnabled(true);
+}
+
+/**
+  Enables widget buttons if autopilot connected
+  */
+void UploaderGadgetWidget::onAutopilotDisconnect(){
+    m_config->haltButton->setEnabled(false);
+    m_config->resetButton->setEnabled(false);
+}
+
 
 /**
   Tell the mainboard to go to bootloader:
@@ -122,7 +148,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         // Tell the mainboard to get into bootloader state:
         log("Going into Bootloader mode...");
         if (!dfu)
-            dfu = new DFUObject(false);
+            dfu = new DFUObject(false, false, QString());
         dfu->AbortOperation();
         if(!dfu->enterDFU(0))
         {
@@ -149,7 +175,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         }
         m_config->haltButton->setEnabled(false);
         m_config->resetButton->setEnabled(false);
-        m_config->bootButton->setEnabled(true);
+        //m_config->bootButton->setEnabled(true);
         m_config->rescueButton->setEnabled(false);
     }
         break;
@@ -181,7 +207,7 @@ void UploaderGadgetWidget::systemBoot()
     if (currentStep == IAP_STATE_BOOTLOADER) {
         clearLog();
         if (!dfu)
-            dfu = new DFUObject(true);
+            dfu = new DFUObject(true, false, QString());
         dfu->AbortOperation();
         if(!dfu->enterDFU(0))
         {
@@ -195,7 +221,7 @@ void UploaderGadgetWidget::systemBoot()
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
         RawHIDConnection *cnx =  pm->getObject<RawHIDConnection>();
         cnx->resumePolling();
-        m_config->bootButton->setEnabled(false);
+        // m_config->bootButton->setEnabled(false);
         m_config->haltButton->setEnabled(true);
         m_config->resetButton->setEnabled(true);
         m_config->rescueButton->setEnabled(true);
@@ -264,7 +290,7 @@ void UploaderGadgetWidget::systemRescue()
     case RESCUE_STEP3:
         log("... Detecting Mainboard...");
         repaint();
-        dfu = new DFUObject(true);
+        dfu = new DFUObject(true, false, QString());
         dfu->AbortOperation();
         if(!dfu->enterDFU(0))
         {
@@ -325,7 +351,7 @@ void UploaderGadgetWidget::systemRescue()
         }
         m_config->haltButton->setEnabled(false);
         m_config->resetButton->setEnabled(false);
-        m_config->bootButton->setEnabled(true);
+        //m_config->bootButton->setEnabled(true);
         m_config->rescueButton->setEnabled(false);
         currentStep = IAP_STATE_BOOTLOADER; // So that we can boot from the GUI afterwards.
     }

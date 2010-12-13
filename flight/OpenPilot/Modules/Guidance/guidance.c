@@ -279,9 +279,12 @@ static void manualSetDesiredVelocity()
 	
 	ManualControlCommandGet(&cmd);
 	VelocityDesiredGet(&velocityDesired);
+
+	GuidanceSettingsData guidanceSettings;
+	GuidanceSettingsGet(&guidanceSettings);
 	
-	velocityDesired.North = -200 * cmd.Pitch;
-	velocityDesired.East = 200 * cmd.Roll;
+	velocityDesired.North = -guidanceSettings.MaxGroundspeed * cmd.Pitch;
+	velocityDesired.East = guidanceSettings.MaxGroundspeed * cmd.Roll;
 	velocityDesired.Down = 0;
 	
 	VelocityDesiredSet(&velocityDesired);	

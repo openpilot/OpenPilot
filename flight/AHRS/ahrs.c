@@ -608,7 +608,10 @@ bool get_accel_gyro_data()
  * the fuselage, Y is along right the wing, and Z is down.
  */
 void adc_callback(float * downsampled_data)
-{
+{	
+	AHRSSettingsData settings;
+	AHRSSettingsGet(&settings);
+		
 	float accel[3], gyro[3];
 	// Accel data is (y,x,z) in first third and fifth byte.  Convert to m/s
 	accel[0] = (downsampled_data[2] * accel_data.calibration.scale[0]) + accel_data.calibration.bias[0];
@@ -620,6 +623,19 @@ void adc_callback(float * downsampled_data)
 	gyro[1] = (downsampled_data[3] * gyro_data.calibration.scale[1]) + gyro_data.calibration.bias[1];
 	gyro[2] = (downsampled_data[5] * gyro_data.calibration.scale[2]) + gyro_data.calibration.bias[2];
 
+#if 0
+	static float gravity_tracking[3] = {0,0,0};
+	const float tau = 0.9999;
+	gravity_tracking[0] = tau * gravity_tracking[0]  + (1-tau) * accel[0];
+	gravity_tracking[1] = tau * gravity_tracking[1] + (1-tau) * accel[1];
+	gravity_tracking[2] = tau * gravity_tracking[2] + (1-tau) * (accel[2] + 9.81);
+
+	if(settings.BiasCorrectedRaw == AHRSSETTINGS_BIASCORRECTEDRAW_TRUE) {
+		accel[0] -= gravity_tracking[0];
+		accel[1] -= gravity_tracking[1];
+		accel[2] -= gravity_tracking[2];
+	}
+#endif
 	if(fifoBuf_getFree(&adc_fifo_buffer) >= (sizeof(accel) + sizeof(gyro))) {
 		fifoBuf_putData(&adc_fifo_buffer, (uint8_t *) &accel[0], sizeof(accel));
 		fifoBuf_putData(&adc_fifo_buffer, (uint8_t *) &gyro[0], sizeof(gyro));
@@ -650,8 +666,6 @@ void adc_callback(float * downsampled_data)
 	raw.magnetometers[1] = mag_data.scaled.axis[1];
 	raw.magnetometers[2] = mag_data.scaled.axis[2];
 
-	AHRSSettingsData settings;
-	AHRSSettingsGet(&settings);
 	if(settings.BiasCorrectedRaw == AHRSSETTINGS_BIASCORRECTEDRAW_TRUE) {
 		raw.gyros_filtered[0] -= Nav.gyro_bias[0] * 180 / M_PI;
 		raw.gyros_filtered[1] -= Nav.gyro_bias[1] * 180 / M_PI;

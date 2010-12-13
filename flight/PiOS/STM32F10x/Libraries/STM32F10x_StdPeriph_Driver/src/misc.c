@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    misc.c
   * @author  MCD Application Team
-  * @version V3.1.2
-  * @date    09/28/2009
+  * @version V3.4.0
+  * @date    10/15/2010
   * @brief   This file provides all the miscellaneous firmware functions (add-on
   *          to CMSIS functions).
   ******************************************************************************
@@ -16,7 +16,7 @@
   * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
   * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
   *
-  * <h2><center>&copy; COPYRIGHT 2009 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT 2010 STMicroelectronics</center></h2>
   */ 
 
 /* Includes ------------------------------------------------------------------*/
@@ -108,7 +108,7 @@ void NVIC_PriorityGroupConfig(uint32_t NVIC_PriorityGroup)
   *   the configuration information for the specified NVIC peripheral.
   * @retval None
   */
-void NVIC_Init(const NVIC_InitTypeDef* NVIC_InitStruct)
+void NVIC_Init(NVIC_InitTypeDef* NVIC_InitStruct)
 {
   uint32_t tmppriority = 0x00, tmppre = 0x00, tmpsub = 0x0F;
   
@@ -220,4 +220,4 @@ void SysTick_CLKSourceConfig(uint32_t SysTick_CLKSource)
   * @}
   */
 
-/******************* (C) COPYRIGHT 2009 STMicroelectronics *****END OF FILE****/
+/******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

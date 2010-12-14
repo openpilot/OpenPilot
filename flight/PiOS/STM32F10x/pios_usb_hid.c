@@ -187,7 +187,8 @@ void sendChunk()
 {
 
 	uint32_t size = fifoBuf_getUsed(&tx_pios_fifo_buffer);
-	if (size > 0) {
+	if ((size > 0) && (GetEPTxStatus(ENDP1) != EP_TX_VALID)) {
+		
 		if (size > PIOS_USB_HID_DATA_LENGTH)
 			size = PIOS_USB_HID_DATA_LENGTH;
 #ifdef USB_HID
@@ -199,19 +200,13 @@ void sendChunk()
 		tx_packet_buffer[1] = size;	/* valid data length */
 
 #endif
-		/* Wait for any pending transmissions to complete */
-		while (GetEPTxStatus(ENDP1) == EP_TX_VALID) {
-#if defined(PIOS_INCLUDE_FREERTOS)
-			taskYIELD();
-#endif
-		}
 
 		UserToPMABufferCopy((uint8_t *) tx_packet_buffer, GetEPTxAddr(EP1_IN & 0x7F), size + 2);
 		SetEPTxCount((EP1_IN & 0x7F), PIOS_USB_HID_DATA_LENGTH + 2);
 
 		/* Send Buffer */
 		SetEPTxValid(ENDP1);
-	}
+	} 
 
 }
 
@@ -237,8 +232,6 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t * buff
 		fifoBuf_clearData(&tx_pios_fifo_buffer);
 	}
 	
-	uint16_t previous_data = fifoBuf_getUsed(&tx_pios_fifo_buffer);
-
 	if (len > fifoBuf_getFree(&tx_pios_fifo_buffer))
 		return -2;	/* Cannot send all requested bytes */
 
@@ -247,9 +240,7 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t * buff
 	/* case it only buffers half the bytes                          */
 	ret = fifoBuf_putData(&tx_pios_fifo_buffer, buffer, len);
 
-	/* If no previous data queued and not sending, then TX complete interrupt not likely so send manually */
-	if (previous_data == 0 && GetEPTxStatus(ENDP1) != EP_TX_VALID)
-		sendChunk();
+	sendChunk();
 
 	return 0;
 }

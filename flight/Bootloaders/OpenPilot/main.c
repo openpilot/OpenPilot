@@ -109,8 +109,7 @@ int main() {
 		USB_connected = TRUE;
 
 	PIOS_IAP_Init();
-	//if (PIOS_IAP_CheckRequest() == TRUE) {
-	{
+        if (PIOS_IAP_CheckRequest() == TRUE) {
 		User_DFU_request = TRUE;
 		PIOS_IAP_ClearRequest();
 

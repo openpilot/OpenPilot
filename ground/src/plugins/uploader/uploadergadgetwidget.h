@@ -32,6 +32,9 @@
 #include "delay.h"
 #include "devicewidget.h"
 #include "op_dfu.h"
+#include <qextserialport.h>
+#include <qextserialenumerator.h>
+
 
 #include "uavtalk/telemetrymanager.h"
 #include "extensionsystem/pluginmanager.h"
@@ -81,6 +84,8 @@ private slots:
     void systemReset();
     void systemBoot();
     void systemRescue();
+    void getSerialPorts();
+
 };
 
 #endif // UPLOADERGADGETWIDGET_H

@@ -87,7 +87,21 @@ recover a system which does not boot.</string>
       </spacer>
      </item>
      <item>
-      <widget class="QComboBox" name="telemetryLink"/>
+      <widget class="QComboBox" name="telemetryLink">
+       <property name="toolTip">
+        <string>When telemetry is not connected, select the communication method using this combo box.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="refreshPorts">
+       <property name="toolTip">
+        <string>Refresh the list of serial ports</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QLabel" name="boardStatus">

@@ -51,7 +51,44 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_config->bootButton, SIGNAL(clicked()), this, SLOT(systemBoot()));
     connect(m_config->rescueButton, SIGNAL(clicked()), this, SLOT(systemRescue()));
 
+    getSerialPorts();
+
+    QIcon rbi;
+    rbi.addFile(QString(":uploader/images/view-refresh.svg"));
+    m_config->refreshPorts->setIcon(rbi);
+
+    connect(m_config->refreshPorts, SIGNAL(clicked()), this, SLOT(getSerialPorts()));
+
 }
+
+
+bool sortPorts(const QextPortInfo &s1,const QextPortInfo &s2)
+{
+    return s1.portName<s2.portName;
+}
+
+/**
+  Gets the list of serial ports
+  */
+void UploaderGadgetWidget::getSerialPorts()
+{
+    QStringList list;
+    // Populate the telemetry combo box:
+    m_config->telemetryLink->clear();
+
+    list.append(QString("USB"));
+    QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
+
+    //sort the list by port number (nice idea from PT_Dreamer :))
+    qSort(ports.begin(), ports.end(),sortPorts);
+    foreach( QextPortInfo port, ports ) {
+       list.append(port.friendName);
+    }
+
+    m_config->telemetryLink->addItems(list);
+}
+
+
 
 /**
   Enables widget buttons if autopilot connected

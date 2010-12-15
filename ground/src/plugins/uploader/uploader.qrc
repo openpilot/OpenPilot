@@ -2,5 +2,6 @@
     <qresource prefix="/uploader">
         <file>images/deviceID-1.svg</file>
         <file>images/deviceID-69.svg</file>
+        <file>images/view-refresh.svg</file>
     </qresource>
 </RCC>

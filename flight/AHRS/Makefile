@@ -25,7 +25,7 @@
 
 # Set developer code and compile options
 # Set to YES for debugging
-DEBUG ?= NO
+DEBUG ?= YES
 USE_BOOTLOADER ?= NO
 
 # Set to YES when using Code Sourcery toolchain
@@ -121,6 +121,7 @@ SRC += $(PIOSSTM32F10X)/pios_exti.c
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_hmc5843.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
+SRC += $(PIOSCOMMON)/pios_iap.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c

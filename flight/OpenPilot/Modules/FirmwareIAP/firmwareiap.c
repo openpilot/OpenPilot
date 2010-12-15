@@ -66,9 +66,24 @@ static void FirmwareIAPCallback(UAVObjEvent* ev);
 
 static uint32_t	iap_calc_crc(void);
 
+static void read_description(uint8_t *);
+
 FirmwareIAPObjData 	data;
 
 static uint32_t	get_time(void);
+
+// Private constants
+#define STACK_SIZE configMINIMAL_STACK_SIZE
+#define TASK_PRIORITY (tskIDLE_PRIORITY+1)
+
+// Private types
+
+// Private variables
+static xTaskHandle taskHandle;
+
+// Private functions
+static void resetTask(void *parameters);
+
 /**
  * Initialise the module, called on startup.
  * \returns 0 on success or -1 if initialisation failed
@@ -85,11 +100,11 @@ static uint32_t	get_time(void);
 
 int32_t FirmwareIAPInitialize()
 {
-	data.Version[0] = version[0];
-	data.Version[1] = version[1];
-	data.Version[2] = version[2];
-	data.SVN = SVN;
-	data.crc = iap_calc_crc();
+	data.Target=FUNC_ID;
+	read_description(data.Description);
+	data.HWVersion=HW_VERSION;
+	data.ArmReset=0;
+	data.crc = 0;
 	FirmwareIAPObjSet( &data );
 	FirmwareIAPObjConnectCallback( &FirmwareIAPCallback );
 	return 0;
@@ -113,10 +128,21 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
     if ( ev->obj == FirmwareIAPObjHandle() )	{
 		// Get the input object data
 		FirmwareIAPObjGet(&data);
-        this_time = get_time();
+		this_time = get_time();
         delta = this_time - last_time;
         last_time = this_time;
-        
+        if((data.Target==FUNC_ID)&&(data.crc != iap_calc_crc()))
+        {
+        	read_description(data.Description);
+        	data.HWVersion=HW_VERSION;
+        	data.crc = iap_calc_crc();
+        	FirmwareIAPObjSet( &data );
+        }
+        if((data.ArmReset==1)&&(taskHandle==0))
+        {
+        	data.ArmReset=0;
+        	FirmwareIAPObjSet( &data );
+        }
         switch(iap_state) {
         case IAP_STATE_READY:
             if( data.Command == IAP_CMD_STEP_1 ) {
@@ -140,8 +166,7 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
                     // we've met the time requirements.
                 	PIOS_IAP_SetRequest1();
                 	PIOS_IAP_SetRequest2();
-                    // goodbye cruel world...
-                    PIOS_SYS_Reset();
+                	xTaskCreate(resetTask, (signed char *)"Reset", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
                 } else {
                     iap_state = IAP_STATE_READY;
                 }
@@ -200,4 +225,36 @@ static uint32_t iap_calc_crc(void)
 	CRC_CalcBlockCRC((uint32_t *) START_OF_USER_CODE, (SIZE_OF_CODE) >> 2);
 	return CRC_GetCRC();
 }
+static uint8_t *FLASH_If_Read(uint32_t SectorAddress)
+{
+	return (uint8_t *) (SectorAddress);
+}
+static void read_description(uint8_t * array)
+{
+	uint8_t x = 0;
+	for (uint32_t i = START_OF_USER_CODE + SIZE_OF_CODE; i < START_OF_USER_CODE + SIZE_OF_CODE + SIZE_OF_DESCRIPTION; ++i) {
+		array[x] = *FLASH_If_Read(i);
+		++x;
+	}
+}
 
+static void resetTask(void *parameters)
+{
+
+	portTickType lastSysTime;
+	uint8_t count=0;
+	// Main task loop
+	lastSysTime = xTaskGetTickCount();
+	while (1) {
+		data.Target=0xFF;
+		data.ArmReset=1;
+		data.crc=count;
+		FirmwareIAPObjSet(&data);
+		vTaskDelayUntil(&lastSysTime, 500 / portTICK_RATE_MS);
+		++count;
+		if(count>3)
+		{
+			PIOS_SYS_Reset();
+		}
+	}
+}

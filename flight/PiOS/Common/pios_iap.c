@@ -69,6 +69,7 @@ void PIOS_IAP_Init( void )
 
 	/* Clear Tamper pin Event(TE) pending flag */
 	BKP_ClearFlag();
+
 }
 
 /*!

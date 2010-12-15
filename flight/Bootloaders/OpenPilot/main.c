@@ -109,11 +109,27 @@ int main() {
 		USB_connected = TRUE;
 
 	PIOS_IAP_Init();
-        if (PIOS_IAP_CheckRequest() == TRUE) {
+
+	if (PIOS_IAP_CheckRequest() == TRUE) {
+		PIOS_Board_Init();
+		PIOS_DELAY_WaitmS(1000);
 		User_DFU_request = TRUE;
 		PIOS_IAP_ClearRequest();
-
 	}
+	/*
+	else
+	{
+		PIOS_Board_Init();
+		for(uint8_t x=0;x<10;++x)
+		{
+			PIOS_LED_Toggle(LED1);
+			PIOS_LED_Toggle(LED2);
+			PIOS_DELAY_WaitmS(1000);
+		}
+		PIOS_IAP_SetRequest1();
+		PIOS_IAP_SetRequest2();
+		PIOS_SYS_Reset();
+	}*/
 	GO_dfu = (USB_connected == TRUE) || (User_DFU_request == TRUE);
 
 	if (GO_dfu == TRUE) {

@@ -69,6 +69,7 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 // BOOTLOADER_SETTINGS
 //------------------------
 
+#define FUNC_ID				1
 #define HW_VERSION			01
 #define BOOTLOADER_VERSION	0
 #define MEM_SIZE			524288 //512K

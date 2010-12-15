@@ -76,7 +76,12 @@ void altitude_callback(AhrsObjHandle obj);
 void calibration_callback(AhrsObjHandle obj);
 void gps_callback(AhrsObjHandle obj);
 void settings_callback(AhrsObjHandle obj);
+
+/* Bootloader related functions and var*/
+static uint32_t	iap_calc_crc(void);
+static void read_description(uint8_t *);
 void firmwareiapobj_callback(AhrsObjHandle obj);
+volatile uint8_t reset_count=0;
 
 /**
  * @addtogroup AHRS_Global_Data AHRS Global Data
@@ -459,6 +464,8 @@ int main()
 	/* Communication system */
 	PIOS_COM_Init();
 
+	/* IAP System Setup */
+	PIOS_IAP_Init();
 	/* ADC system */
 	AHRS_ADC_Config(adc_oversampling);
 	AHRS_ADC_SetCallback(adc_callback);
@@ -1014,11 +1021,52 @@ void homelocation_callback(AhrsObjHandle obj)
 void firmwareiapobj_callback(AhrsObjHandle obj) 
 {
 	FirmwareIAPObjData firmwareIAPObj;
-	FirmwareIAPObjGet(&firmwareIAPObj);	
-	
-	// float time = timer_counter() / timer_rate();
+	FirmwareIAPObjGet(&firmwareIAPObj);
+	if(firmwareIAPObj.ArmReset==0)
+		reset_count=0;
+	if(firmwareIAPObj.ArmReset==1)
+	{
+
+		if((firmwareIAPObj.Target==FUNC_ID) || (firmwareIAPObj.Target==0xFF))
+		{
+
+			++reset_count;
+			if(reset_count>2)
+			{
+				PIOS_IAP_SetRequest1();
+				PIOS_IAP_SetRequest2();
+				PIOS_SYS_Reset();
+			}
+		}
+	}
+	else if(firmwareIAPObj.Target==FUNC_ID && firmwareIAPObj.crc!=iap_calc_crc())
+	{
+		read_description(firmwareIAPObj.Description);
+		firmwareIAPObj.crc=iap_calc_crc();
+		firmwareIAPObj.HWVersion=HW_VERSION;
+		FirmwareIAPObjSet(&firmwareIAPObj);
+	}
 }
 
+static uint32_t iap_calc_crc(void)
+{
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
+	CRC_ResetDR();
+	CRC_CalcBlockCRC((uint32_t *) START_OF_USER_CODE, (SIZE_OF_CODE) >> 2);
+	return CRC_GetCRC();
+}
+static uint8_t *FLASH_If_Read(uint32_t SectorAddress)
+{
+	return (uint8_t *) (SectorAddress);
+}
+static void read_description(uint8_t * array)
+{
+	uint8_t x = 0;
+	for (uint32_t i = START_OF_USER_CODE + SIZE_OF_CODE; i < START_OF_USER_CODE + SIZE_OF_CODE + SIZE_OF_DESCRIPTION; ++i) {
+		array[x] = *FLASH_If_Read(i);
+		++x;
+	}
+}
 
 
 /**

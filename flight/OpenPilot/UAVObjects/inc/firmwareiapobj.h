@@ -41,7 +41,7 @@
 #define FIRMWAREIAPOBJ_H
 
 // Object constants
-#define FIRMWAREIAPOBJ_OBJID 1075803696U
+#define FIRMWAREIAPOBJ_OBJID 879185696U
 #define FIRMWAREIAPOBJ_NAME "FirmwareIAPObj"
 #define FIRMWAREIAPOBJ_METANAME "FirmwareIAPObjMeta"
 #define FIRMWAREIAPOBJ_ISSINGLEINST 1
@@ -72,20 +72,22 @@
 // Object data
 typedef struct {
     uint16_t Command;
-    uint32_t Port;
-    uint8_t Version[3];
-    uint16_t SVN;
+    uint8_t Description[100];
+    uint8_t HWVersion;
+    uint8_t Target;
+    uint8_t ArmReset;
     uint32_t crc;
 
 } __attribute__((packed)) FirmwareIAPObjData;
 
 // Field information
 // Field Command information
-// Field Port information
-// Field Version information
-/* Number of elements for field Version */
-#define FIRMWAREIAPOBJ_VERSION_NUMELEM 3
-// Field SVN information
+// Field Description information
+/* Number of elements for field Description */
+#define FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM 100
+// Field HWVersion information
+// Field Target information
+// Field ArmReset information
 // Field crc information
 
 

@@ -123,7 +123,7 @@ public:
     bool SaveByteArrayToFile(QString const & file,QByteArray const &array);
     void CopyWords(char * source, char* destination, int count);
     // QByteArray DownloadData(int devNumber,int numberOfPackets);
-    OP_DFU(bool debug,bool use_serial,QString port);
+    OP_DFU(bool debug,bool use_serial,QString port,bool umodereset);
     void sendReset(void);
     bool findDevices();
     QList<device> devices;

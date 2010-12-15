@@ -64,6 +64,7 @@ TIM8  |           |           |           |
 //------------------------
 // BOOTLOADER_SETTINGS
 //------------------------
+#define FUNC_ID				2
 #define HW_VERSION			69
 #define BOOTLOADER_VERSION	0
 #define MEM_SIZE			0x20000 //128K

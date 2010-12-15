@@ -44,25 +44,27 @@ public:
     // Field structure
     typedef struct {
         quint16 Command;
-        quint32 Port;
-        quint8 Version[3];
-        quint16 SVN;
+        quint8 Description[100];
+        quint8 HWVersion;
+        quint8 Target;
+        quint8 ArmReset;
         quint32 crc;
 
     } __attribute__((packed)) DataFields;
 
     // Field information
     // Field Command information
-    // Field Port information
-    // Field Version information
-    /* Number of elements for field Version */
-    static const quint32 VERSION_NUMELEM = 3;
-    // Field SVN information
+    // Field Description information
+    /* Number of elements for field Description */
+    static const quint32 DESCRIPTION_NUMELEM = 100;
+    // Field HWVersion information
+    // Field Target information
+    // Field ArmReset information
     // Field crc information
 
   
     // Constants
-    static const quint32 OBJID = 1075803696U;
+    static const quint32 OBJID = 879185696U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

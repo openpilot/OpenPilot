@@ -108,6 +108,7 @@ SRC += $(PIOSSTM32F10X)/pios_spi.c
 SRC += $(PIOSCOMMON)/pios_opahrs_proto.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 SRC += $(PIOSCOMMON)/pios_bl_helper.c
+SRC += $(PIOSCOMMON)/pios_iap.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c

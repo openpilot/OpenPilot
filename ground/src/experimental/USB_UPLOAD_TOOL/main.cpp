@@ -13,8 +13,6 @@ int main(int argc, char *argv[])
 
 
     /////////////////////////////////////////////
-//    OP_DFU dfu(false);
-//    dfu.test();
     QCoreApplication a(argc, argv);
 //    argc=4;
 //    argv[1]="-ls";
@@ -25,6 +23,7 @@ int main(int argc, char *argv[])
         bool use_serial=false;
         bool verify;
         bool debug=false;
+        bool umodereset=false;
         OP_DFU::Actions action;
         QString file;
         QString serialport;
@@ -37,6 +36,8 @@ int main(int argc, char *argv[])
         }
         if(args.contains("-debug"))
             debug=true;
+        if(args.contains("-ur"))
+            umodereset=true;
         if(args.contains("-?")||(!PRIVATE && argc==1))
         {
             cout<<"_________________________________________________________________________\n";
@@ -55,12 +56,13 @@ int main(int argc, char *argv[])
             cout<<"| -r                   : resets the device                               |\n";
             cout<<"| -j                   : exits bootloader and jumps to user FW           |\n";
             cout<<"| -debug               : prints debug information                        |\n";
-            cout<<"| -t <port>            : uses serial port*                               |\n";
+            cout<<"| -t <port>            : uses serial port(requires:-ur)                  |\n";
+            cout<<"| -ur <port>           : user mode reset*                                |\n";
             cout<<"|                                                                        |\n";
             cout<<"| examples:                                                              |\n";
             cout<<"|                                                                        |\n";
             cout<<"| program and verify device #0                                           |\n";
-            cout<<"| OPUploadTool -p c:/OpenPilot.bin -w \"Openpilot Firmware\" -v -d 0     |\n";
+            cout<<"| OPUploadTool -p c:/OpenPilot.bin -w \"Openpilot Firmware\" -v -d 0       |\n";
             cout<<"|                                                                        |\n";
             cout<<"| Perform a quick compare of FW in file with FW in device #1             |\n";
             cout<<"| OPUploadTool -ch c:/OpenPilot2.bin -d 2                                |\n";
@@ -203,7 +205,7 @@ int main(int argc, char *argv[])
         }
 
         ///////////////////////////////////ACTIONS START///////////////////////////////////////////////////
-        OP_DFU dfu(debug,use_serial,serialport);
+        OP_DFU dfu(debug,use_serial,serialport,umodereset);
         if(!dfu.ready())
             return -1;
 

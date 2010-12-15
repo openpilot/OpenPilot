@@ -82,15 +82,22 @@ int main() {
 	//		PIOS_DELAY_WaitmS(1000);
 	//	}
 	//GO_dfu = TRUE;
-	GO_dfu = GO_dfu;// OR with app boot request
+	PIOS_IAP_Init();
+	GO_dfu = GO_dfu | PIOS_IAP_CheckRequest();// OR with app boot request
 	if (GO_dfu == FALSE) {
 		jump_to_app();
+	}
+	if(PIOS_IAP_CheckRequest())
+	{
+		PIOS_DELAY_WaitmS(1000);
+		PIOS_IAP_ClearRequest();
 	}
 	/* SPI link to master */
 	PIOS_SPI_Init();
 	lfsm_init();
 	boot_status = idle;
 	Fw_crc = crc_memory_calc();
+	PIOS_LED_On(LED1);
 	while (1) {
 		process_spi_request();
 	}

@@ -573,6 +573,7 @@ uint32_t CalcFirmCRC() {
 void sendData(uint8_t * buf,uint16_t size)
 {
 if (ProgPort == Usb) {
+
 			PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, buf, size);//FIX+1
 		} else if (ProgPort == Serial) {
 			ssp_SendData(&ssp_port, buf, size);

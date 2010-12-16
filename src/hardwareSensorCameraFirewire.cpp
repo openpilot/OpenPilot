@@ -122,7 +122,7 @@ namespace hardware {
 			case 1: { // YUV
 				switch (depth) {
 					case 6: hwformat = VIAM_HWFMT_YUV411; break;
-					case 8: hwformat = VIAM_HWFMT_YUV422; break;
+					case 8: hwformat = VIAM_HWFMT_YUV422_UYVY; break;
 					case 12: hwformat = VIAM_HWFMT_YUV444; break;
 					default: hwformat = VIAM_HWFMT_INVALID;
 				}

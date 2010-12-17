@@ -31,6 +31,8 @@
 #ifndef PIOS_I2C_H
 #define PIOS_I2C_H
 
+//#define PIOS_I2C_DIAGNOSTICS
+
 #include <stdbool.h>
 
 /* Global Types */
@@ -47,11 +49,25 @@ struct pios_i2c_txn {
 	uint8_t *buf;
 };
 
+#define I2C_LOG_DEPTH 5
+enum pios_i2c_error_type {
+	PIOS_I2C_ERROR_EVENT, 
+	PIOS_I2C_ERROR_FSM,
+	PIOS_I2C_ERROR_INTERRUPT
+};
+
+struct pios_i2c_fault_history {
+	enum pios_i2c_error_type type;
+	uint32_t event[I2C_LOG_DEPTH];
+	uint32_t state[I2C_LOG_DEPTH];
+};
+
 /* Public Functions */
 extern int32_t PIOS_I2C_Init(void);
 extern bool PIOS_I2C_Transfer(uint8_t i2c, const struct pios_i2c_txn txn_list[], uint32_t num_txns);
 extern void PIOS_I2C_EV_IRQ_Handler(uint8_t i2c);
 extern void PIOS_I2C_ER_IRQ_Handler(uint8_t i2c);
+extern void PIOS_I2C_GetDiagnoistics(struct pios_i2c_fault_history * data, uint16_t * error_counts);
 
 #endif /* PIOS_I2C_H */
 

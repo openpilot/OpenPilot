@@ -43,6 +43,7 @@
 #include "objectpersistence.h"
 #include "manualcontrolcommand.h"
 #include "systemstats.h"
+#include "i2cstats.h"
 
 
 // Private constants
@@ -69,6 +70,7 @@ static int32_t stackOverflow;
 // Private functions
 static void objectUpdatedCb(UAVObjEvent * ev);
 static void updateStats();
+static void updateI2Cstats();
 static void updateSystemAlarms();
 static void systemTask(void *parameters);
 
@@ -110,7 +112,8 @@ static void systemTask(void *parameters)
 
 		// Update the system alarms
 		updateSystemAlarms();
-
+		updateI2Cstats();
+		
 		// Flash the heartbeat LED
 		PIOS_LED_Toggle(LED1);
 
@@ -197,6 +200,25 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 			}
 		}
 	}
+}
+
+/**
+ * Called periodically to update the I2C statistics 
+ */
+static void updateI2Cstats() 
+{
+	I2CStatsData i2cStats;
+	I2CStatsGet(&i2cStats);
+	
+	struct pios_i2c_fault_history history;
+	PIOS_I2C_GetDiagnoistics(&history, &i2cStats.event_errors);
+	
+	for(uint8_t i = 0; (i < I2C_LOG_DEPTH) && (i < I2CSTATS_EVENT_LOG_NUMELEM); i++) {
+		i2cStats.event_log[i] = history.event[i];
+		i2cStats.state_log[i] = history.state[i];		
+	}
+	i2cStats.last_error_type = history.type;
+	I2CStatsSet(&i2cStats);
 }
 
 /**

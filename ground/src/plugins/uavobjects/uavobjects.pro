@@ -46,7 +46,8 @@ HEADERS += uavobjects_global.h \
     ratedesired.h \
     firmwareiapobj.h \
     pipxtrememodemsettings.h \
-    pipxtrememodemstatus.h
+    pipxtrememodemstatus.h \
+    i2cstats.h
 
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
@@ -90,5 +91,6 @@ SOURCES += uavobject.cpp \
     ratedesired.cpp \
     firmwareiapobj.cpp \
     pipxtrememodemsettings.cpp \
-    pipxtrememodemstatus.cpp
+    pipxtrememodemstatus.cpp \
+    i2cstats.cpp
 OTHER_FILES += UAVObjects.pluginspec

@@ -200,6 +200,15 @@ function [] = OPLogConvert()
     HomeLocation(1).RNE = zeros(1,9);
     HomeLocation(1).Be = zeros(1,3);
 
+    i2cstatsIdx = 1;
+    I2CStats.timestamp = 0;
+    I2CStats(1).event_errors = 0;
+    I2CStats(1).fsm_errors = 0;
+    I2CStats(1).irq_errors = 0;
+    I2CStats(1).last_error_type = 0;
+    I2CStats(1).event_log = zeros(1,5);
+    I2CStats(1).state_log = zeros(1,5);
+
     manualcontrolcommandIdx = 1;
     ManualControlCommand.timestamp = 0;
     ManualControlCommand(1).Connected = 0;
@@ -459,6 +468,9 @@ function [] = OPLogConvert()
             case 3590360786
                 HomeLocation(homelocationIdx) = ReadHomeLocationObject(fid, timestamp);
                 homelocationIdx = homelocationIdx + 1;
+            case 1063893720
+                I2CStats(i2cstatsIdx) = ReadI2CStatsObject(fid, timestamp);
+                i2cstatsIdx = i2cstatsIdx + 1;
             case 2841592332
                 ManualControlCommand(manualcontrolcommandIdx) = ReadManualControlCommandObject(fid, timestamp);
                 manualcontrolcommandIdx = manualcontrolcommandIdx + 1;
@@ -523,7 +535,7 @@ function [] = OPLogConvert()
     fclose(fid);
     
     matfile = strrep(logfile,'opl','mat');
-    save(matfile ,'ActuatorCommand','ActuatorDesired','ActuatorSettings','AHRSCalibration','AHRSSettings','AhrsStatus','AttitudeActual','AttitudeDesired','AttitudeRaw','BaroAltitude','FirmwareIAPObj','FlightBatteryState','FlightTelemetryStats','GCSTelemetryStats','GPSPosition','GPSSatellites','GPSTime','GuidanceSettings','HomeLocation','ManualControlCommand','ManualControlSettings','MixerSettings','MixerStatus','ObjectPersistence','PipXtremeModemSettings','PipXtremeModemStatus','PositionActual','PositionDesired','RateDesired','StabilizationSettings','SystemAlarms','SystemSettings','SystemStats','TelemetrySettings','VelocityActual','VelocityDesired');
+    save(matfile ,'ActuatorCommand','ActuatorDesired','ActuatorSettings','AHRSCalibration','AHRSSettings','AhrsStatus','AttitudeActual','AttitudeDesired','AttitudeRaw','BaroAltitude','FirmwareIAPObj','FlightBatteryState','FlightTelemetryStats','GCSTelemetryStats','GPSPosition','GPSSatellites','GPSTime','GuidanceSettings','HomeLocation','I2CStats','ManualControlCommand','ManualControlSettings','MixerSettings','MixerStatus','ObjectPersistence','PipXtremeModemSettings','PipXtremeModemStatus','PositionActual','PositionDesired','RateDesired','StabilizationSettings','SystemAlarms','SystemSettings','SystemStats','TelemetrySettings','VelocityActual','VelocityDesired');
     
 end
 
@@ -914,6 +926,25 @@ function [HomeLocation] = ReadHomeLocationObject(fid, timestamp)
     HomeLocation.ECEF = double(fread(fid, 3, 'int32'));
     HomeLocation.RNE = double(fread(fid, 9, 'float32'));
     HomeLocation.Be = double(fread(fid, 3, 'float32'));
+    % read CRC
+    fread(fid, 1, 'uint8');
+end
+
+function [I2CStats] = ReadI2CStatsObject(fid, timestamp)
+    if 1
+        headerSize = 8;
+    else
+        I2CStats.instanceID = fread(fid, 1, 'uint16');
+        headerSize = 10;
+    end
+
+    I2CStats.timestamp = timestamp;
+    I2CStats.event_errors = double(fread(fid, 1, 'uint16'));
+    I2CStats.fsm_errors = double(fread(fid, 1, 'uint16'));
+    I2CStats.irq_errors = double(fread(fid, 1, 'uint16'));
+    I2CStats.last_error_type = double(fread(fid, 1, 'uint8'));
+    I2CStats.event_log = double(fread(fid, 5, 'uint32'));
+    I2CStats.state_log = double(fread(fid, 5, 'uint32'));
     % read CRC
     fread(fid, 1, 'uint8');
 end

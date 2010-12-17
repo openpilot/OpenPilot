@@ -47,6 +47,7 @@
 #include "gpstime.h"
 #include "guidancesettings.h"
 #include "homelocation.h"
+#include "i2cstats.h"
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
 #include "mixersettings.h"
@@ -91,6 +92,7 @@ void UAVObjectsInitializeAll()
     GPSTimeInitialize();
     GuidanceSettingsInitialize();
     HomeLocationInitialize();
+    I2CStatsInitialize();
     ManualControlCommandInitialize();
     ManualControlSettingsInitialize();
     MixerSettingsInitialize();

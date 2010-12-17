@@ -35,6 +35,7 @@
 		65322D3B122841F60046CD7C /* gpstime.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gpstime.xml; sourceTree = "<group>"; };
 		65322D77122897210046CD7C /* MagOrAccelSensorCal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MagOrAccelSensorCal.c; path = ../../AHRS/MagOrAccelSensorCal.c; sourceTree = SOURCE_ROOT; };
 		65345C871288668B00A5E4E8 /* guidancesettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = guidancesettings.xml; sourceTree = "<group>"; };
+		65408AA812BB1648004DACC5 /* i2cstats.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = i2cstats.xml; sourceTree = "<group>"; };
 		654330231218E9780063F913 /* insgps.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insgps.c; path = ../../AHRS/insgps.c; sourceTree = SOURCE_ROOT; };
 		6543304F121980300063F913 /* insgps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = insgps.h; sourceTree = "<group>"; };
 		654612D812B5E9A900B719D0 /* pios_iap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_iap.c; sourceTree = "<group>"; };
@@ -6799,6 +6800,7 @@
 				65B367FC121C2620003EAD18 /* systemsettings.xml */,
 				65B367FD121C2620003EAD18 /* systemstats.xml */,
 				65B367FE121C2620003EAD18 /* telemetrysettings.xml */,
+				65408AA812BB1648004DACC5 /* i2cstats.xml */,
 			);
 			path = uavobjectdefinition;
 			sourceTree = "<group>";

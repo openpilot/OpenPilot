@@ -1,0 +1,15 @@
+<xml>
+    <object name="I2CStats" singleinstance="true" settings="false">
+        <description>Tracks statistics on the I2C bus.</description>
+        <field name="event_errors" units="" type="uint16" elements="1"/>
+        <field name="fsm_errors" units="" type="uint16" elements="1"/>
+        <field name="irq_errors" units="" type="uint16" elements="1"/>
+        <field name="last_error_type" units="" type="enum" elements="1" options="EVENT,FSM,INTERRUPT"/>
+        <field name="event_log" units="" type="uint32" elements="5"/>
+        <field name="state_log" units="" type="uint32" elements="5"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="10000"/>
+        <logging updatemode="periodic" period="30000"/>
+	</object>
+</xml>

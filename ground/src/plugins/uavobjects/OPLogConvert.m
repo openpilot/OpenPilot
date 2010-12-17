@@ -112,9 +112,10 @@ function [] = OPLogConvert()
     firmwareiapobjIdx = 1;
     FirmwareIAPObj.timestamp = 0;
     FirmwareIAPObj(1).Command = 0;
-    FirmwareIAPObj(1).Port = 0;
-    FirmwareIAPObj(1).Version = zeros(1,3);
-    FirmwareIAPObj(1).SVN = 0;
+    FirmwareIAPObj(1).Description = zeros(1,100);
+    FirmwareIAPObj(1).HWVersion = 0;
+    FirmwareIAPObj(1).Target = 0;
+    FirmwareIAPObj(1).ArmReset = 0;
     FirmwareIAPObj(1).crc = 0;
 
     flightbatterystateIdx = 1;
@@ -441,7 +442,7 @@ function [] = OPLogConvert()
             case 3980666102
                 BaroAltitude(baroaltitudeIdx) = ReadBaroAltitudeObject(fid, timestamp);
                 baroaltitudeIdx = baroaltitudeIdx + 1;
-            case 1075803696
+            case 879185696
                 FirmwareIAPObj(firmwareiapobjIdx) = ReadFirmwareIAPObjObject(fid, timestamp);
                 firmwareiapobjIdx = firmwareiapobjIdx + 1;
             case 144318184
@@ -759,9 +760,10 @@ function [FirmwareIAPObj] = ReadFirmwareIAPObjObject(fid, timestamp)
 
     FirmwareIAPObj.timestamp = timestamp;
     FirmwareIAPObj.Command = double(fread(fid, 1, 'uint16'));
-    FirmwareIAPObj.Port = double(fread(fid, 1, 'uint32'));
-    FirmwareIAPObj.Version = double(fread(fid, 3, 'uint8'));
-    FirmwareIAPObj.SVN = double(fread(fid, 1, 'uint16'));
+    FirmwareIAPObj.Description = double(fread(fid, 100, 'uint8'));
+    FirmwareIAPObj.HWVersion = double(fread(fid, 1, 'uint8'));
+    FirmwareIAPObj.Target = double(fread(fid, 1, 'uint8'));
+    FirmwareIAPObj.ArmReset = double(fread(fid, 1, 'uint8'));
     FirmwareIAPObj.crc = double(fread(fid, 1, 'uint32'));
     % read CRC
     fread(fid, 1, 'uint8');

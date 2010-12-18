@@ -81,7 +81,12 @@ public:
         setChanged(tmpValIndex != value);
         TreeItem::setData(value, column);
     }
-    QString enumOptions(int index) { return m_enumOptions.at(index); }
+    QString enumOptions(int index) {
+        if((index < 0) || (index >= m_enumOptions.length())) {
+            return QString("Invalid Value (") + QString().setNum(index) + QString(")");
+        }
+        return m_enumOptions.at(index);
+    }
     void apply() {
         int value = data(dataColumn).toInt();
         QStringList options = m_field->getOptions();

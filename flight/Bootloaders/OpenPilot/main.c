@@ -29,7 +29,6 @@
 #include <pios.h>
 #include "pios_opahrs.h"
 #include "stopwatch.h"
-#include "ssp_timer.h"
 #include "op_dfu.h"
 #include "usb_lib.h"
 #include "pios_iap.h"
@@ -61,7 +60,8 @@ uint8_t tempcount=0;
 
 /// SSP SECTION
 /// SSP TIME SOURCE
-uint32_t ssp_time;
+#define SSP_TIMER	TIM7
+uint32_t ssp_time=0;
 #define MAX_PACKET_DATA_LEN	255
 #define MAX_PACKET_BUF_SIZE	(1+1+MAX_PACKET_DATA_LEN+2)
 #define UART_BUFFER_SIZE 1024
@@ -98,7 +98,7 @@ uint32_t sspTimeSource();
 
 #define BLUE LED1
 #define RED	LED2
-
+#define LED_PWM_TIMER	TIM6
 int main() {
 	/* NOTE: Do NOT modify the following start-up sequence */
 	/* Any new initialization functions should be added in OpenPilotInit() */
@@ -116,20 +116,7 @@ int main() {
 		User_DFU_request = TRUE;
 		PIOS_IAP_ClearRequest();
 	}
-	/*
-	else
-	{
-		PIOS_Board_Init();
-		for(uint8_t x=0;x<10;++x)
-		{
-			PIOS_LED_Toggle(LED1);
-			PIOS_LED_Toggle(LED2);
-			PIOS_DELAY_WaitmS(1000);
-		}
-		PIOS_IAP_SetRequest1();
-		PIOS_IAP_SetRequest2();
-		PIOS_SYS_Reset();
-	}*/
+
 	GO_dfu = (USB_connected == TRUE) || (User_DFU_request == TRUE);
 
 	if (GO_dfu == TRUE) {
@@ -137,25 +124,24 @@ int main() {
 			ProgPort = Usb;
 		else
 			ProgPort = Serial;
-		//ProgPort = Serial;
 		PIOS_Board_Init();
 		PIOS_OPAHRS_Init();
 		if(User_DFU_request == TRUE)
 			DeviceState = DFUidle;
 		else
 			DeviceState = BLidle;
-		STOPWATCH_Init(100);
+		STOPWATCH_Init(100,LED_PWM_TIMER);
 		if (ProgPort == Serial) {
 			fifoBuf_init(&ssp_buffer,rx_buffer,UART_BUFFER_SIZE);
-			SSP_TIMER_Init(100);
-			SSP_TIMER_Reset();
+			STOPWATCH_Init(100,SSP_TIMER);//nao devia ser 1000?
+			STOPWATCH_Reset(SSP_TIMER);
 			ssp_Init(&ssp_port, &SSP_PortConfig);
 		}
 		PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 0);
 	} else
 		JumpToApp = TRUE;
 
-	STOPWATCH_Reset();
+	STOPWATCH_Reset(LED_PWM_TIMER);
 	while (TRUE) {
 		if (ProgPort == Serial) {
 			ssp_ReceiveProcess(&ssp_port);
@@ -204,7 +190,7 @@ int main() {
 		}
 
 		if (period1 != 0) {
-			if (LedPWM(period1, sweep_steps1, STOPWATCH_ValueGet()))
+			if (LedPWM(period1, sweep_steps1, STOPWATCH_ValueGet(LED_PWM_TIMER)))
 				PIOS_LED_On(BLUE);
 			else
 				PIOS_LED_Off(BLUE);
@@ -212,21 +198,20 @@ int main() {
 			PIOS_LED_On(BLUE);
 
 		if (period2 != 0) {
-			if (LedPWM(period2, sweep_steps2, STOPWATCH_ValueGet()))
+			if (LedPWM(period2, sweep_steps2, STOPWATCH_ValueGet(LED_PWM_TIMER)))
 				PIOS_LED_On(RED);
 			else
 				PIOS_LED_Off(RED);
 		} else
 			PIOS_LED_Off(RED);
 
-		if (STOPWATCH_ValueGet() > 100 * 50 * 100)
-			STOPWATCH_Reset();
-		if ((STOPWATCH_ValueGet() > 60000) && (DeviceState == BLidle))
+		if (STOPWATCH_ValueGet(LED_PWM_TIMER) > 100 * 50 * 100)
+			STOPWATCH_Reset(LED_PWM_TIMER);
+		if ((STOPWATCH_ValueGet(LED_PWM_TIMER) > 60000) && (DeviceState == BLidle))
 			JumpToApp = TRUE;
 
 		processRX();
 		DataDownload(start);
-		//DelayWithDown(10);//1000000);
 	}
 }
 
@@ -265,11 +250,9 @@ uint8_t processRX() {
 			for (int32_t x = 0; x < 63; ++x) {
 				mReceive_Buffer[x] = PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_USB);
 			}
-			//PIOS_IRQ_Enable();
 			processComand(mReceive_Buffer);
 		}
 	} else if (ProgPort == Serial) {
-
 
 		if (fifoBuf_getUsed(&ssp_buffer) >= 63) {
 			for (int32_t x = 0; x < 63; ++x) {
@@ -282,9 +265,9 @@ uint8_t processRX() {
 }
 
 uint32_t sspTimeSource() {
-	if (SSP_TIMER_ValueGet() > 5000) {
+	if (STOPWATCH_ValueGet(SSP_TIMER) > 5000) {
 		++ssp_time;
-		SSP_TIMER_Reset();
+		STOPWATCH_Reset(SSP_TIMER);
 	}
 	return ssp_time;
 }

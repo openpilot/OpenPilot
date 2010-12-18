@@ -118,7 +118,6 @@ SRC += $(OPSYSTEM)/main.c
 SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(OPSYSTEM)/op_dfu.c
 SRC += $(OPSYSTEM)/stopwatch.c
-SRC += $(OPSYSTEM)/ssp_timer.c
 SRC += $(OPSYSTEM)/ssp.c
 
 

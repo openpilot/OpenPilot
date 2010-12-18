@@ -205,6 +205,9 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 /**
  * Called periodically to update the I2C statistics 
  */
+#if defined(ARCH_POSIX) || defined(ARCH_WIN32)
+static void updateI2Cstats() {}
+#else
 static void updateI2Cstats() 
 {
 	I2CStatsData i2cStats;
@@ -220,6 +223,7 @@ static void updateI2Cstats()
 	i2cStats.last_error_type = history.type;
 	I2CStatsSet(&i2cStats);
 }
+#endif
 
 /**
  * Called periodically to update the system stats

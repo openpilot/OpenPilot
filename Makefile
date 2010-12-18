@@ -44,6 +44,9 @@ areyousureyoushouldberunningthis:
 	@echo "     sim_posix         - Build OpenPilot simulation firmware for"
 	@echo "                         a POSIX compatible system (Linux, Mac OS X, ...)"
 	@echo "     sim_posix_clean   - Delete all build output for the POSIX simulation"
+	@echo "     sim_win32         - Build OpenPilot simulation firmware for"
+	@echo "                         Windows using mingw and msys"
+	@echo "     sim_win32_clean   - Delete all build output for the win32 simulation"
 	@echo
 	@echo "   [GCS and UAVObjects]"
 	@echo "     gcs               - Build the Ground Control System application"
@@ -235,3 +238,9 @@ sim_posix_%: uavobjects
 	mkdir -p $(BUILD_DIR)/simulation
 	$(MAKE) OUTDIR="$(BUILD_DIR)/simulation" -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.posix $*
 
+.PHONY: sim_win32
+sim_win32: sim_win32_exe
+
+sim_win32_%: #uavobjects
+	mkdir -p $(BUILD_DIR)/simulation
+	$(MAKE) OUTDIR="$(BUILD_DIR)/simulation" -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.win32 $*

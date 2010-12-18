@@ -252,7 +252,7 @@ static DWORD WINAPI tick_generator(LPVOID lpParameter)
 		if(SignalObjectAndWait(hIsrMutex, hTickAck, 2000, FALSE) == WAIT_TIMEOUT)
 		{
 			printf("Tick generator: timed out at SignalObjectAndWait\n");
-			return 0;
+			exit(1);
 		}
 	}
 }
@@ -356,7 +356,7 @@ portBASE_TYPE xPortStartScheduler( void )
 		if(WaitForMultipleObjects(2, hObjList, TRUE, 2000) == WAIT_TIMEOUT)
 		{
 			printf("vPortStartScheduler: timed out at WaitForMultipleObjects\n");
-			return 0;
+			exit(1);
 		}
 
 		psSim=(SSIM_T *)*pxCurrentTCB;

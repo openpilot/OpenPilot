@@ -145,6 +145,7 @@ SRC += $(OPUAVOBJ)/manualcontrolsettings.c
 SRC += $(OPUAVOBJ)/attitudedesired.c
 SRC += $(OPUAVOBJ)/stabilizationsettings.c
 SRC += $(OPUAVOBJ)/ahrsstatus.c
+SRC += $(OPUAVOBJ)/i2cstats.c
 SRC += $(OPUAVOBJ)/baroaltitude.c
 SRC += $(OPUAVOBJ)/ahrscalibration.c
 SRC += $(OPUAVOBJ)/attitudeactual.c
@@ -160,6 +161,8 @@ SRC += $(OPUAVOBJ)/velocityactual.c
 SRC += $(OPUAVOBJ)/guidancesettings.c
 SRC += $(OPUAVOBJ)/firmwareiapobj.c
 SRC += $(OPUAVOBJ)/ratedesired.c
+SRC += $(OPUAVOBJ)/pipxtrememodemsettings.c
+SRC += $(OPUAVOBJ)/pipxtrememodemstatus.c
 endif
 
 ## PIOS Hardware (win32)

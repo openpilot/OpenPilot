@@ -25,7 +25,7 @@
 
 # Set developer code and compile options
 # Set to YES for debugging
-DEBUG ?= YES
+DEBUG ?= NO
 USE_BOOTLOADER ?= NO
 
 # Set to YES when using Code Sourcery toolchain

@@ -51,13 +51,15 @@ M: First -10 Deg C  flight
 C: Sami Korhonen (Sambas)
 D: November 2010
 
-
+M: First solid OpenPilot Position Hold
+C: Dale Schintock
+D: December 2010
+V: http://www.youtube.com/watch?v=BBCGVP0Vpgw
 
 An incomplete list of some future Milestones is below:
 
 * First Helicopter flight with OpenPilot 
 * First Octo flight with OpenPilot
-* First successful position hold
 * First successful flight using the GCS only and no RC TX
 * First use of Magic Waypoint
 * First flip on a multirotor with OpenPilot

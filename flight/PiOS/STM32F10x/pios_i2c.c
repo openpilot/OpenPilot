@@ -924,11 +924,6 @@ void PIOS_I2C_EV_IRQ_Handler(uint8_t i2c)
 	
 	event &= 0x000700FF;
 	
-	static uint32_t prev_event = 0;
-	if((event == prev_event) && (event == 0x70084))
-		return;
-	prev_event = event;
-
 	switch (event) { /* Mask out all the bits we don't care about */
 	case (I2C_EVENT_MASTER_MODE_SELECT | 0x40):
 		/* Unexplained event: EV5 + RxNE : Extraneous Rx.  Probably a late NACK from previous read. */
@@ -1049,12 +1044,14 @@ void PIOS_I2C_ER_IRQ_Handler(uint8_t i2c)
 	
 	if(I2C_GetFlagStatus(i2c_adapter->cfg->regs, I2C_FLAG_AF)) {
 		i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_NACK);
-	} else {	 	
+	} else {                
 		i2c_adapter_log_fault(PIOS_I2C_ERROR_INTERRUPT);
-			
+		
 		/* Fail hard on any errors for now */
 		i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_BUS_ERROR);
 	}
+	i2c_adapter_log_fault(PIOS_I2C_ERROR_INTERRUPT);
+	
 }
 
 /**

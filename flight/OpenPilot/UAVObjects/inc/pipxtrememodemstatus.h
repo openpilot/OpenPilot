@@ -41,7 +41,7 @@
 #define PIPXTREMEMODEMSTATUS_H
 
 // Object constants
-#define PIPXTREMEMODEMSTATUS_OBJID 3920019084U
+#define PIPXTREMEMODEMSTATUS_OBJID 539085060U
 #define PIPXTREMEMODEMSTATUS_NAME "PipXtremeModemStatus"
 #define PIPXTREMEMODEMSTATUS_METANAME "PipXtremeModemStatusMeta"
 #define PIPXTREMEMODEMSTATUS_ISSINGLEINST 1
@@ -71,8 +71,7 @@
 
 // Object data
 typedef struct {
-    uint8_t Serial_Number[24];
-    uint32_t Serial_Number_CRC;
+    uint32_t Serial_Number;
     uint32_t Up_Time;
     uint32_t Frequency;
     uint32_t RF_Bandwidth;
@@ -86,9 +85,6 @@ typedef struct {
 
 // Field information
 // Field Serial_Number information
-/* Number of elements for field Serial_Number */
-#define PIPXTREMEMODEMSTATUS_SERIAL_NUMBER_NUMELEM 24
-// Field Serial_Number_CRC information
 // Field Up_Time information
 // Field Frequency information
 // Field RF_Bandwidth information

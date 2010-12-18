@@ -44,33 +44,7 @@ PipXtremeModemStatus::PipXtremeModemStatus(): UAVDataObject(OBJID, ISSINGLEINST,
     QList<UAVObjectField*> fields;
     QStringList Serial_NumberElemNames;
     Serial_NumberElemNames.append("0");
-    Serial_NumberElemNames.append("1");
-    Serial_NumberElemNames.append("2");
-    Serial_NumberElemNames.append("3");
-    Serial_NumberElemNames.append("4");
-    Serial_NumberElemNames.append("5");
-    Serial_NumberElemNames.append("6");
-    Serial_NumberElemNames.append("7");
-    Serial_NumberElemNames.append("8");
-    Serial_NumberElemNames.append("9");
-    Serial_NumberElemNames.append("10");
-    Serial_NumberElemNames.append("11");
-    Serial_NumberElemNames.append("12");
-    Serial_NumberElemNames.append("13");
-    Serial_NumberElemNames.append("14");
-    Serial_NumberElemNames.append("15");
-    Serial_NumberElemNames.append("16");
-    Serial_NumberElemNames.append("17");
-    Serial_NumberElemNames.append("18");
-    Serial_NumberElemNames.append("19");
-    Serial_NumberElemNames.append("20");
-    Serial_NumberElemNames.append("21");
-    Serial_NumberElemNames.append("22");
-    Serial_NumberElemNames.append("23");
-    fields.append( new UAVObjectField(QString("Serial_Number"), QString(""), UAVObjectField::UINT8, Serial_NumberElemNames, QStringList()) );
-    QStringList Serial_Number_CRCElemNames;
-    Serial_Number_CRCElemNames.append("0");
-    fields.append( new UAVObjectField(QString("Serial_Number_CRC"), QString(""), UAVObjectField::UINT32, Serial_Number_CRCElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Serial_Number"), QString(""), UAVObjectField::UINT32, Serial_NumberElemNames, QStringList()) );
     QStringList Up_TimeElemNames;
     Up_TimeElemNames.append("0");
     fields.append( new UAVObjectField(QString("Up_Time"), QString("ms"), UAVObjectField::UINT32, Up_TimeElemNames, QStringList()) );
@@ -79,7 +53,7 @@ PipXtremeModemStatus::PipXtremeModemStatus(): UAVDataObject(OBJID, ISSINGLEINST,
     fields.append( new UAVObjectField(QString("Frequency"), QString("Hz"), UAVObjectField::UINT32, FrequencyElemNames, QStringList()) );
     QStringList RF_BandwidthElemNames;
     RF_BandwidthElemNames.append("0");
-    fields.append( new UAVObjectField(QString("RF_Bandwidth"), QString("Hz"), UAVObjectField::UINT32, RF_BandwidthElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("RF_Bandwidth"), QString("bits/sec"), UAVObjectField::UINT32, RF_BandwidthElemNames, QStringList()) );
     QStringList Tx_PowerElemNames;
     Tx_PowerElemNames.append("0");
     fields.append( new UAVObjectField(QString("Tx_Power"), QString("dBm"), UAVObjectField::INT8, Tx_PowerElemNames, QStringList()) );
@@ -96,10 +70,10 @@ PipXtremeModemStatus::PipXtremeModemStatus(): UAVDataObject(OBJID, ISSINGLEINST,
     fields.append( new UAVObjectField(QString("Tx_Retry"), QString(""), UAVObjectField::UINT16, Tx_RetryElemNames, QStringList()) );
     QStringList Tx_Data_RateElemNames;
     Tx_Data_RateElemNames.append("0");
-    fields.append( new UAVObjectField(QString("Tx_Data_Rate"), QString("bytes/sec"), UAVObjectField::UINT32, Tx_Data_RateElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Tx_Data_Rate"), QString("bits/sec"), UAVObjectField::UINT32, Tx_Data_RateElemNames, QStringList()) );
     QStringList Rx_Data_RateElemNames;
     Rx_Data_RateElemNames.append("0");
-    fields.append( new UAVObjectField(QString("Rx_Data_Rate"), QString("bytes/sec"), UAVObjectField::UINT32, Rx_Data_RateElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("Rx_Data_Rate"), QString("bits/sec"), UAVObjectField::UINT32, Rx_Data_RateElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -133,31 +107,7 @@ UAVObject::Metadata PipXtremeModemStatus::getDefaultMetadata()
  */
 void PipXtremeModemStatus::setDefaultFieldValues()
 {
-    data.Serial_Number[0] = 0;
-    data.Serial_Number[1] = 0;
-    data.Serial_Number[2] = 0;
-    data.Serial_Number[3] = 0;
-    data.Serial_Number[4] = 0;
-    data.Serial_Number[5] = 0;
-    data.Serial_Number[6] = 0;
-    data.Serial_Number[7] = 0;
-    data.Serial_Number[8] = 0;
-    data.Serial_Number[9] = 0;
-    data.Serial_Number[10] = 0;
-    data.Serial_Number[11] = 0;
-    data.Serial_Number[12] = 0;
-    data.Serial_Number[13] = 0;
-    data.Serial_Number[14] = 0;
-    data.Serial_Number[15] = 0;
-    data.Serial_Number[16] = 0;
-    data.Serial_Number[17] = 0;
-    data.Serial_Number[18] = 0;
-    data.Serial_Number[19] = 0;
-    data.Serial_Number[20] = 0;
-    data.Serial_Number[21] = 0;
-    data.Serial_Number[22] = 0;
-    data.Serial_Number[23] = 0;
-    data.Serial_Number_CRC = 0;
+    data.Serial_Number = 0;
 
 }
 

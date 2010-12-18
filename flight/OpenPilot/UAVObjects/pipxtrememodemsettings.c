@@ -80,11 +80,13 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	// Initialize object fields to their default values
 	UAVObjGetInstanceData(obj, instId, &data);
 	memset(&data, 0, sizeof(PipXtremeModemSettingsData));
+	data.Mode = 0;
+	data.Serial_Baudrate = 6;
 	data.Frequency_Calibration = 127;
 	data.Frequency_Min = 0;
 	data.Frequency_Max = 0;
 	data.Frequency = 0;
-	data.RF_Bandwidth = 11;
+	data.Max_RF_Bandwidth = 11;
 	data.Max_Tx_Power = 4;
 	data.AES_Encryption = 0;
 	data.AES_EncryptionKey[0] = 0;
@@ -103,7 +105,7 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	data.AES_EncryptionKey[13] = 0;
 	data.AES_EncryptionKey[14] = 0;
 	data.AES_EncryptionKey[15] = 0;
-	data.Paired_Serial_Number_CRC = 0;
+	data.Paired_Serial_Number = 0;
 
 	UAVObjSetInstanceData(obj, instId, &data);
 

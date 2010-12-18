@@ -42,6 +42,26 @@ PipXtremeModemSettings::PipXtremeModemSettings(): UAVDataObject(OBJID, ISSINGLEI
 {
     // Create fields
     QList<UAVObjectField*> fields;
+    QStringList ModeElemNames;
+    ModeElemNames.append("0");
+    QStringList ModeEnumOptions;
+    ModeEnumOptions.append("Normal");
+    ModeEnumOptions.append("Test_Carrier");
+    ModeEnumOptions.append("Test_Spectrum");
+    fields.append( new UAVObjectField(QString("Mode"), QString(""), UAVObjectField::ENUM, ModeElemNames, ModeEnumOptions) );
+    QStringList Serial_BaudrateElemNames;
+    Serial_BaudrateElemNames.append("0");
+    QStringList Serial_BaudrateEnumOptions;
+    Serial_BaudrateEnumOptions.append("1200");
+    Serial_BaudrateEnumOptions.append("2400");
+    Serial_BaudrateEnumOptions.append("4800");
+    Serial_BaudrateEnumOptions.append("9600");
+    Serial_BaudrateEnumOptions.append("19200");
+    Serial_BaudrateEnumOptions.append("38400");
+    Serial_BaudrateEnumOptions.append("57600");
+    Serial_BaudrateEnumOptions.append("115200");
+    Serial_BaudrateEnumOptions.append("230400");
+    fields.append( new UAVObjectField(QString("Serial_Baudrate"), QString("bits/sec"), UAVObjectField::ENUM, Serial_BaudrateElemNames, Serial_BaudrateEnumOptions) );
     QStringList Frequency_CalibrationElemNames;
     Frequency_CalibrationElemNames.append("0");
     fields.append( new UAVObjectField(QString("Frequency_Calibration"), QString(""), UAVObjectField::UINT8, Frequency_CalibrationElemNames, QStringList()) );
@@ -54,23 +74,23 @@ PipXtremeModemSettings::PipXtremeModemSettings(): UAVDataObject(OBJID, ISSINGLEI
     QStringList FrequencyElemNames;
     FrequencyElemNames.append("0");
     fields.append( new UAVObjectField(QString("Frequency"), QString("Hz"), UAVObjectField::UINT32, FrequencyElemNames, QStringList()) );
-    QStringList RF_BandwidthElemNames;
-    RF_BandwidthElemNames.append("0");
-    QStringList RF_BandwidthEnumOptions;
-    RF_BandwidthEnumOptions.append("500");
-    RF_BandwidthEnumOptions.append("1000");
-    RF_BandwidthEnumOptions.append("2000");
-    RF_BandwidthEnumOptions.append("4000");
-    RF_BandwidthEnumOptions.append("8000");
-    RF_BandwidthEnumOptions.append("9600");
-    RF_BandwidthEnumOptions.append("16000");
-    RF_BandwidthEnumOptions.append("19200");
-    RF_BandwidthEnumOptions.append("24000");
-    RF_BandwidthEnumOptions.append("32000");
-    RF_BandwidthEnumOptions.append("64000");
-    RF_BandwidthEnumOptions.append("128000");
-    RF_BandwidthEnumOptions.append("192000");
-    fields.append( new UAVObjectField(QString("RF_Bandwidth"), QString("Hz"), UAVObjectField::ENUM, RF_BandwidthElemNames, RF_BandwidthEnumOptions) );
+    QStringList Max_RF_BandwidthElemNames;
+    Max_RF_BandwidthElemNames.append("0");
+    QStringList Max_RF_BandwidthEnumOptions;
+    Max_RF_BandwidthEnumOptions.append("500");
+    Max_RF_BandwidthEnumOptions.append("1000");
+    Max_RF_BandwidthEnumOptions.append("2000");
+    Max_RF_BandwidthEnumOptions.append("4000");
+    Max_RF_BandwidthEnumOptions.append("8000");
+    Max_RF_BandwidthEnumOptions.append("9600");
+    Max_RF_BandwidthEnumOptions.append("16000");
+    Max_RF_BandwidthEnumOptions.append("19200");
+    Max_RF_BandwidthEnumOptions.append("24000");
+    Max_RF_BandwidthEnumOptions.append("32000");
+    Max_RF_BandwidthEnumOptions.append("64000");
+    Max_RF_BandwidthEnumOptions.append("128000");
+    Max_RF_BandwidthEnumOptions.append("192000");
+    fields.append( new UAVObjectField(QString("Max_RF_Bandwidth"), QString("bits/sec"), UAVObjectField::ENUM, Max_RF_BandwidthElemNames, Max_RF_BandwidthEnumOptions) );
     QStringList Max_Tx_PowerElemNames;
     Max_Tx_PowerElemNames.append("0");
     QStringList Max_Tx_PowerEnumOptions;
@@ -107,9 +127,9 @@ PipXtremeModemSettings::PipXtremeModemSettings(): UAVDataObject(OBJID, ISSINGLEI
     AES_EncryptionKeyElemNames.append("14");
     AES_EncryptionKeyElemNames.append("15");
     fields.append( new UAVObjectField(QString("AES_EncryptionKey"), QString(""), UAVObjectField::UINT8, AES_EncryptionKeyElemNames, QStringList()) );
-    QStringList Paired_Serial_Number_CRCElemNames;
-    Paired_Serial_Number_CRCElemNames.append("0");
-    fields.append( new UAVObjectField(QString("Paired_Serial_Number_CRC"), QString(""), UAVObjectField::UINT32, Paired_Serial_Number_CRCElemNames, QStringList()) );
+    QStringList Paired_Serial_NumberElemNames;
+    Paired_Serial_NumberElemNames.append("0");
+    fields.append( new UAVObjectField(QString("Paired_Serial_Number"), QString(""), UAVObjectField::UINT32, Paired_Serial_NumberElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -143,11 +163,13 @@ UAVObject::Metadata PipXtremeModemSettings::getDefaultMetadata()
  */
 void PipXtremeModemSettings::setDefaultFieldValues()
 {
+    data.Mode = 0;
+    data.Serial_Baudrate = 6;
     data.Frequency_Calibration = 127;
     data.Frequency_Min = 0;
     data.Frequency_Max = 0;
     data.Frequency = 0;
-    data.RF_Bandwidth = 11;
+    data.Max_RF_Bandwidth = 11;
     data.Max_Tx_Power = 4;
     data.AES_Encryption = 0;
     data.AES_EncryptionKey[0] = 0;
@@ -166,7 +188,7 @@ void PipXtremeModemSettings::setDefaultFieldValues()
     data.AES_EncryptionKey[13] = 0;
     data.AES_EncryptionKey[14] = 0;
     data.AES_EncryptionKey[15] = 0;
-    data.Paired_Serial_Number_CRC = 0;
+    data.Paired_Serial_Number = 0;
 
 }
 

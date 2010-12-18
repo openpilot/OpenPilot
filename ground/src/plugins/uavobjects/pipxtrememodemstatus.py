@@ -39,39 +39,6 @@ from collections import namedtuple
 _fields = [ \
 	uavobject.UAVObjectField(
 		'Serial_Number',
-		'B',
-		24,
-		[
-			'0',
-			'1',
-			'2',
-			'3',
-			'4',
-			'5',
-			'6',
-			'7',
-			'8',
-			'9',
-			'10',
-			'11',
-			'12',
-			'13',
-			'14',
-			'15',
-			'16',
-			'17',
-			'18',
-			'19',
-			'20',
-			'21',
-			'22',
-			'23',
-		],
-		{
-		}
-	),
-	uavobject.UAVObjectField(
-		'Serial_Number_CRC',
 		'I',
 		1,
 		[
@@ -169,7 +136,7 @@ _fields = [ \
 
 class PipXtremeModemStatus(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 3920019084
+    OBJID        = 539085060
     NAME         = "PipXtremeModemStatus"
     METANAME     = "PipXtremeModemStatusMeta"
     ISSINGLEINST = 1

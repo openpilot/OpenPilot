@@ -43,8 +43,7 @@ class UAVOBJECTS_EXPORT PipXtremeModemStatus: public UAVDataObject
 public:
     // Field structure
     typedef struct {
-        quint8 Serial_Number[24];
-        quint32 Serial_Number_CRC;
+        quint32 Serial_Number;
         quint32 Up_Time;
         quint32 Frequency;
         quint32 RF_Bandwidth;
@@ -58,9 +57,6 @@ public:
 
     // Field information
     // Field Serial_Number information
-    /* Number of elements for field Serial_Number */
-    static const quint32 SERIAL_NUMBER_NUMELEM = 24;
-    // Field Serial_Number_CRC information
     // Field Up_Time information
     // Field Frequency information
     // Field RF_Bandwidth information
@@ -74,7 +70,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 3920019084U;
+    static const quint32 OBJID = 539085060U;
     static const QString NAME;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 0;

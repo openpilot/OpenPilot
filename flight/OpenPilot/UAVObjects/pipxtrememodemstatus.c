@@ -80,31 +80,7 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	// Initialize object fields to their default values
 	UAVObjGetInstanceData(obj, instId, &data);
 	memset(&data, 0, sizeof(PipXtremeModemStatusData));
-	data.Serial_Number[0] = 0;
-	data.Serial_Number[1] = 0;
-	data.Serial_Number[2] = 0;
-	data.Serial_Number[3] = 0;
-	data.Serial_Number[4] = 0;
-	data.Serial_Number[5] = 0;
-	data.Serial_Number[6] = 0;
-	data.Serial_Number[7] = 0;
-	data.Serial_Number[8] = 0;
-	data.Serial_Number[9] = 0;
-	data.Serial_Number[10] = 0;
-	data.Serial_Number[11] = 0;
-	data.Serial_Number[12] = 0;
-	data.Serial_Number[13] = 0;
-	data.Serial_Number[14] = 0;
-	data.Serial_Number[15] = 0;
-	data.Serial_Number[16] = 0;
-	data.Serial_Number[17] = 0;
-	data.Serial_Number[18] = 0;
-	data.Serial_Number[19] = 0;
-	data.Serial_Number[20] = 0;
-	data.Serial_Number[21] = 0;
-	data.Serial_Number[22] = 0;
-	data.Serial_Number[23] = 0;
-	data.Serial_Number_CRC = 0;
+	data.Serial_Number = 0;
 
 	UAVObjSetInstanceData(obj, instId, &data);
 

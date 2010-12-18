@@ -789,13 +789,19 @@ void i2c_adapter_log_fault(enum pios_i2c_error_type type)
  * \param[out] counts three uint16 that receive the bad event, fsm, and error irq 
  * counts
  */
-void PIOS_I2C_GetDiagnoistics(struct pios_i2c_fault_history * data, uint16_t * counts) 
+void PIOS_I2C_GetDiagnostics(struct pios_i2c_fault_history * data, uint16_t * counts) 
 {
 #if defined(PIOS_I2C_DIAGNOSTICS)
 	memcpy(data, &i2c_adapter_fault_history, sizeof(i2c_adapter_fault_history));	
 	counts[0] = i2c_bad_event_counter;
 	counts[1] = i2c_fsm_fault_count;
 	counts[2] = i2c_error_interrupt_counter;
+#else
+	struct pios_i2c_fault_history i2c_adapter_fault_history;
+	i2c_adapter_fault_history.type = PIOS_I2C_ERROR_EVENT;
+
+	memcpy(data, &i2c_adapter_fault_history, sizeof(i2c_adapter_fault_history));	
+	counts[0] = counts[1] = counts[2] = 0;
 #endif
 }
 
@@ -841,7 +847,7 @@ int32_t PIOS_I2C_Init(void)
 		NVIC_Init(&(i2c_adapter->cfg->event.init));
 		NVIC_Init(&(i2c_adapter->cfg->error.init));
 	}
-
+	
 	/* No error */
 	return 0;
 }

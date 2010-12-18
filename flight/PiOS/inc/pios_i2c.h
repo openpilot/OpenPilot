@@ -31,7 +31,7 @@
 #ifndef PIOS_I2C_H
 #define PIOS_I2C_H
 
-//#define PIOS_I2C_DIAGNOSTICS
+#define PIOS_I2C_DIAGNOSTICS
 
 #include <stdbool.h>
 
@@ -67,7 +67,7 @@ extern int32_t PIOS_I2C_Init(void);
 extern bool PIOS_I2C_Transfer(uint8_t i2c, const struct pios_i2c_txn txn_list[], uint32_t num_txns);
 extern void PIOS_I2C_EV_IRQ_Handler(uint8_t i2c);
 extern void PIOS_I2C_ER_IRQ_Handler(uint8_t i2c);
-extern void PIOS_I2C_GetDiagnoistics(struct pios_i2c_fault_history * data, uint16_t * error_counts);
+extern void PIOS_I2C_GetDiagnostics(struct pios_i2c_fault_history * data, uint16_t * error_counts);
 
 #endif /* PIOS_I2C_H */
 

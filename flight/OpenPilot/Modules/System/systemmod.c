@@ -211,7 +211,7 @@ static void updateI2Cstats()
 	I2CStatsGet(&i2cStats);
 	
 	struct pios_i2c_fault_history history;
-	PIOS_I2C_GetDiagnoistics(&history, &i2cStats.event_errors);
+	PIOS_I2C_GetDiagnostics(&history, &i2cStats.event_errors);
 	
 	for(uint8_t i = 0; (i < I2C_LOG_DEPTH) && (i < I2CSTATS_EVENT_LOG_NUMELEM); i++) {
 		i2cStats.event_log[i] = history.event[i];

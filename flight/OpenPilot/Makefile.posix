@@ -130,6 +130,8 @@ ifndef TESTAPP
 SRC += $(OPUAVOBJ)/objectpersistence.c
 SRC += $(OPUAVOBJ)/positionactual.c
 SRC += $(OPUAVOBJ)/gpsposition.c
+SRC += $(OPUAVOBJ)/gpstime.c
+SRC += $(OPUAVOBJ)/gpssatellites.c
 SRC += $(OPUAVOBJ)/gcstelemetrystats.c
 SRC += $(OPUAVOBJ)/flighttelemetrystats.c
 SRC += $(OPUAVOBJ)/systemstats.c
@@ -144,15 +146,14 @@ SRC += $(OPUAVOBJ)/manualcontrolsettings.c
 SRC += $(OPUAVOBJ)/attitudedesired.c
 SRC += $(OPUAVOBJ)/stabilizationsettings.c
 SRC += $(OPUAVOBJ)/ahrsstatus.c
+SRC += $(OPUAVOBJ)/i2cstats.c
 SRC += $(OPUAVOBJ)/baroaltitude.c
+SRC += $(OPUAVOBJ)/ahrscalibration.c
 SRC += $(OPUAVOBJ)/attitudeactual.c
+SRC += $(OPUAVOBJ)/ahrssettings.c
 SRC += $(OPUAVOBJ)/flightbatterystate.c
 SRC += $(OPUAVOBJ)/attituderaw.c
 SRC += $(OPUAVOBJ)/homelocation.c
-SRC += $(OPUAVOBJ)/ahrscalibration.c
-SRC += $(OPUAVOBJ)/ahrssettings.c
-SRC += $(OPUAVOBJ)/gpstime.c
-SRC += $(OPUAVOBJ)/gpssatellites.c
 SRC += $(OPUAVOBJ)/mixersettings.c
 SRC += $(OPUAVOBJ)/mixerstatus.c
 SRC += $(OPUAVOBJ)/positiondesired.c
@@ -161,6 +162,8 @@ SRC += $(OPUAVOBJ)/velocityactual.c
 SRC += $(OPUAVOBJ)/guidancesettings.c
 SRC += $(OPUAVOBJ)/firmwareiapobj.c
 SRC += $(OPUAVOBJ)/ratedesired.c
+SRC += $(OPUAVOBJ)/pipxtrememodemsettings.c
+SRC += $(OPUAVOBJ)/pipxtrememodemstatus.c
 endif
 
 ## PIOS Hardware (posix)

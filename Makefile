@@ -7,12 +7,15 @@ DL_DIR=$(ROOT_DIR)/downloads
 # We almost need to consider autoconf/automake instead of this
 # I don't know if windows supports uname :-(
 QT_SPEC=win32-g++
+UAVOBJGENERATOR="$(BUILD_DIR)/uavobjgenerator/debug/uavobjgenerator.exe"
 UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
   QT_SPEC=linux-g++
+  UAVOBJGENERATOR="$(BUILD_DIR)/uavobjgenerator/uavobjgenerator"
 endif
 ifeq ($(UNAME), Darwin)
   QT_SPEC=macx-g++
+  UAVOBJGENERATOR="$(BUILD_DIR)/uavobjgenerator/uavobjgenerator"
 endif
 
 # Set up misc host tools
@@ -206,7 +209,7 @@ uavobjgenerator:
 .PHONY: uavobjects
 uavobjects: uavobjgenerator
 	mkdir -p $(BUILD_DIR)/$@
-	"$(BUILD_DIR)/uavobjgenerator/uavobjgenerator" "$(ROOT_DIR)/"
+	$(UAVOBJGENERATOR) "$(ROOT_DIR)/"
 
 ##############################
 #
@@ -241,6 +244,6 @@ sim_posix_%: uavobjects
 .PHONY: sim_win32
 sim_win32: sim_win32_exe
 
-sim_win32_%: #uavobjects
+sim_win32_%: uavobjects
 	mkdir -p $(BUILD_DIR)/simulation
 	$(MAKE) OUTDIR="$(BUILD_DIR)/simulation" -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.win32 $*

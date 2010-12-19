@@ -189,10 +189,12 @@ void FGSimulator::transmitUpdate()
 
     int allowableDifference = 10;
 
+    //qDebug() << "UDP sent:" << udpCounterGCSsend << " - UDP Received:" << udpCounterFGrecv;
+
     if(udpCounterFGrecv == udpCounterGCSsend)
         udpCounterGCSsend = 0;
     
-    if(udpCounterGCSsend < allowableDifference ) //FG udp queue is not delayed
+    if((udpCounterGCSsend < allowableDifference) || (udpCounterFGrecv==0) ) //FG udp queue is not delayed
     {       
         udpCounterGCSsend++;
 

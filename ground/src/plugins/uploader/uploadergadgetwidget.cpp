@@ -26,6 +26,8 @@
  */
 #include "uploadergadgetwidget.h"
 
+#define DFU_DEBUG true
+
 UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     m_config = new Ui_UploaderWidget();
@@ -89,6 +91,20 @@ void UploaderGadgetWidget::getSerialPorts()
 }
 
 
+QString UploaderGadgetWidget::getPortDevice(const QString &friendName)
+{
+    QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
+    foreach( QextPortInfo port, ports ) {
+           if(port.friendName == friendName)
+#ifdef Q_OS_WIN
+            return port.portName;
+#else
+            return port.physName;
+#endif
+        }
+    return "";
+}
+
 
 /**
   Enables widget buttons if autopilot connected
@@ -96,6 +112,9 @@ void UploaderGadgetWidget::getSerialPorts()
 void UploaderGadgetWidget::onAutopilotConnect(){
     m_config->haltButton->setEnabled(true);
     m_config->resetButton->setEnabled(true);
+    m_config->bootButton->setEnabled(false);
+    m_config->rescueButton->setEnabled(false);
+    m_config->telemetryLink->setEnabled(false);
 }
 
 /**
@@ -104,6 +123,9 @@ void UploaderGadgetWidget::onAutopilotConnect(){
 void UploaderGadgetWidget::onAutopilotDisconnect(){
     m_config->haltButton->setEnabled(false);
     m_config->resetButton->setEnabled(false);
+    m_config->bootButton->setEnabled(true);
+    m_config->rescueButton->setEnabled(true);
+    m_config->telemetryLink->setEnabled(true);
 }
 
 
@@ -161,16 +183,22 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
     case IAP_STEP_RESET:
     {
         currentStep = IAP_STATE_READY;
-        if (success) {
-            log("Oops, unexpected success step 3");
+        if (!success) {
+            log("Oops, failure step 3");
             log("Reset did NOT happen");
             disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
             break;
         }
         // The board is now reset: we have to disconnect telemetry
         Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+        QString dli = cm->getCurrentDevice().devName;
+        QString dlj = cm->getCurrentDevice().displayedName;
         cm->disconnectDevice();
         log("Board Reset");
+        if (dlj.startsWith("USB"))
+            m_config->telemetryLink->setCurrentIndex(m_config->telemetryLink->findText("USB"));
+        else
+            m_config->telemetryLink->setCurrentIndex(m_config->telemetryLink->findText(dli));
 
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
         disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
@@ -183,9 +211,16 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         cnx->suspendPolling();
 
         // Tell the mainboard to get into bootloader state:
-        log("Going into Bootloader mode...");
-        if (!dfu)
-            dfu = new DFUObject(false, false, QString());
+        log("Going into Bootloader mode, please wait 5 seconds...");
+        this->repaint();
+           delay::msleep(5000); // Required to let the board settle, otherwise we
+                                // get garbage on the USB HID pipe for the 1st request. Why ???
+        if (!dfu) {
+            if (dlj.startsWith("USB"))
+                dfu = new DFUObject(DFU_DEBUG, false, QString());
+            else
+                dfu = new DFUObject(DFU_DEBUG,true, getPortDevice(dli));
+        }
         dfu->AbortOperation();
         if(!dfu->enterDFU(0))
         {
@@ -210,9 +245,12 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             dw->populate();
             m_config->systemElements->addTab(dw, QString("Device") + QString::number(i));
         }
+        /*  (done already by autopilot disconnect signal)
         m_config->haltButton->setEnabled(false);
         m_config->resetButton->setEnabled(false);
-        //m_config->bootButton->setEnabled(true);
+        m_config->bootButton->setEnabled(true);
+        */
+        m_config->telemetryLink->setEnabled(false);
         m_config->rescueButton->setEnabled(false);
     }
         break;
@@ -241,41 +279,58 @@ void UploaderGadgetWidget::systemReset()
   */
 void UploaderGadgetWidget::systemBoot()
 {
-    if (currentStep == IAP_STATE_BOOTLOADER) {
-        clearLog();
-        if (!dfu)
-            dfu = new DFUObject(true, false, QString());
-        dfu->AbortOperation();
-        if(!dfu->enterDFU(0))
-        {
-            log("Could not enter DFU mode.");
-            return;
-        }
-        log("Booting system...");
-        dfu->JumpToApp();
-        currentStep = IAP_STATE_READY;
-        // Restart the polling thread
+    clearLog();
+    if (currentStep != IAP_STATE_BOOTLOADER) {
+        log("Did not go into bootloader from this interface");
+        log("I assume you know what you're doing...");
+        this->repaint();
+        // Stop the polling thread just in case (really necessary)
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
         RawHIDConnection *cnx =  pm->getObject<RawHIDConnection>();
-        cnx->resumePolling();
-        // m_config->bootButton->setEnabled(false);
-        m_config->haltButton->setEnabled(true);
-        m_config->resetButton->setEnabled(true);
-        m_config->rescueButton->setEnabled(true);
-        m_config->boardStatus->setText("Running");
+        cnx->suspendPolling();
+    }
+
+    QString devName = m_config->telemetryLink->currentText();
+
+    if (!dfu) {
+        if (devName == "USB")
+            dfu = new DFUObject(DFU_DEBUG, false, QString());
+        else
+            dfu = new DFUObject(DFU_DEBUG,true,getPortDevice(devName));
+    }
+    dfu->AbortOperation();
+    if(!dfu->enterDFU(0))
+    {
+        log("Could not enter DFU mode.");
+        delete dfu;
+        dfu = NULL;
+        return;
+    }
+    log("Booting system...");
+    dfu->JumpToApp();
+    // Restart the polling thread
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    RawHIDConnection *cnx =  pm->getObject<RawHIDConnection>();
+    cnx->resumePolling();
+    // m_config->bootButton->setEnabled(false);
+    //m_config->haltButton->setEnabled(true);
+    //m_config->resetButton->setEnabled(true);
+    m_config->rescueButton->setEnabled(true);
+    m_config->telemetryLink->setEnabled(true);
+    m_config->boardStatus->setText("Running");
+    if (currentStep == IAP_STATE_BOOTLOADER) {
         // Freeze the tabs, they are not useful anymore and their buttons
         // will cause segfaults or weird stuff if we use them.
         for (int i=0; i< m_config->systemElements->count(); i++) {
              deviceWidget *qw = (deviceWidget*)m_config->systemElements->widget(i);
              qw->freeze();
         }
-
-        delete dfu;
-        dfu = NULL;
-
-    } else {
-        log("Not in bootloader mode!");
     }
+    currentStep = IAP_STATE_READY;
+    log("You can now reconnect telemetry...");
+    delete dfu;
+    dfu = NULL;
+
 }
 
 /**
@@ -327,7 +382,7 @@ void UploaderGadgetWidget::systemRescue()
     case RESCUE_STEP3:
         log("... Detecting Mainboard...");
         repaint();
-        dfu = new DFUObject(true, false, QString());
+        dfu = new DFUObject(DFU_DEBUG, false, QString());
         dfu->AbortOperation();
         if(!dfu->enterDFU(0))
         {

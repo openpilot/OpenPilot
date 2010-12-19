@@ -40,7 +40,10 @@ through serial or USB)</string>
        <property name="toolTip">
         <string>Boots the system.
 Only useful if the system is halted
-(mainboard blue LED blinking slowly, orange LED off)</string>
+(mainboard blue LED blinking slowly, orange LED off)
+
+If telemetry is not running, select the link using the dropdown
+menu on the right.</string>
        </property>
        <property name="text">
         <string>Boot</string>
@@ -66,7 +69,9 @@ through serial or USB)</string>
       <widget class="QPushButton" name="rescueButton">
        <property name="toolTip">
         <string>Start a guided procedure to manually
-recover a system which does not boot.</string>
+recover a system which does not boot.
+
+Rescue is possible in USB mode only.</string>
        </property>
        <property name="text">
         <string>Rescue</string>
@@ -89,7 +94,12 @@ recover a system which does not boot.</string>
      <item>
       <widget class="QComboBox" name="telemetryLink">
        <property name="toolTip">
-        <string>When telemetry is not connected, select the communication method using this combo box.</string>
+        <string>When telemetry is not connected, select the communication
+method using this combo box.
+
+You can use this to force a communication channel when doing
+a &quot;Boot&quot; (button on the left). It is updated automatically when
+halting a running board.</string>
        </property>
       </widget>
      </item>
@@ -141,7 +151,7 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;To upgrade the firmware in your boards, proceed as follows:&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Connect telemetry in USB mode&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Connect telemetry&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Once telemetry is running, press &amp;quot;Halt&amp;quot; above&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- You will get a list of devices.&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- You can then upload/download to/from each board as you wish&lt;/p&gt;
@@ -161,7 +171,7 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Please connect your board through USB for firmware upload.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </widget>

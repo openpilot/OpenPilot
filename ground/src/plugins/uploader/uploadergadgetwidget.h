@@ -74,6 +74,7 @@ private:
      bool resetOnly;
      void log(QString str);
      void clearLog();
+     QString getPortDevice(const QString &friendName);
 
      QLineEdit* openFileNameLE;
 

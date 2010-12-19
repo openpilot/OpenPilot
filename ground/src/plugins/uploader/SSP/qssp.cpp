@@ -537,7 +537,7 @@ uint16_t   qssp::sf_CheckTimeout()
     }
     if(retval)
          if (debug)
-            qDebug()<<"timeout"<<current_time<<thisport->timeout;
+            qDebug()<<"timeout "<<current_time<<thisport->timeout;
     return retval;
 }
 

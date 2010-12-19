@@ -34,13 +34,11 @@ using namespace OP_DFU;
 
 DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname): debug(_debug),use_serial(_use_serial),mready(true)
 {
+    info = NULL;
 
     qRegisterMetaType<OP_DFU::Status>("Status");
     if(use_serial)
     {
-        // cout<<"Connect hw now and press any key";
-        //  getch();
-        // delay::msleep(2000);
         PortSettings settings;
         settings.BaudRate=BAUD57600;
         settings.DataBits=DATA_8;
@@ -57,20 +55,25 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname): debug(_debu
         info->timeoutLen	= 1000;
         if(info->status()!=port::open)
         {
-            cout<<"Could not open serial port\n";
-            mready=false;
+            cout << "Could not open serial port\n";
+            mready = false;
             return;
         }
-        serialhandle=new qsspt(info,debug);
+        serialhandle = new qsspt(info,debug);
 
-        while(serialhandle->ssp_Synchronise()==false)
+        int count = 0;
+        while((serialhandle->ssp_Synchronise()==false) && (count < 10))
         {
              if (debug)
                  qDebug()<<"SYNC failed, resending";
+             count++;
+        }
+        if (count == 10) {
+            mready = false;
+            return;
         }
         qDebug() << "SYNC Succeded";
         serialhandle->start();
-        // serialhandle->start();
     }
     else
     {
@@ -93,7 +96,12 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname): debug(_debu
 
 DFUObject::~DFUObject()
 {
-    hidHandle.close(0);
+    if (use_serial) {
+        if (mready)
+            delete serialhandle;
+    } else {
+        hidHandle.close(0);
+    }
 
 }
 

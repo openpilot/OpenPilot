@@ -68,7 +68,8 @@ public:
 
     void init();
 
-    QIODevice *getCurrentConnection();
+    QIODevice *getCurrentConnection(); // NOTE: this is never implemented ??
+    devListItem getCurrentDevice() { return m_connectionDevice;}
     bool disconnectDevice();
 
 protected:

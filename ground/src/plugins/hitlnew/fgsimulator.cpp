@@ -119,7 +119,7 @@ bool FGSimulator::setupProcess()
                      "--in-air " +
                      "--altitude=3000 " +
                      "--vc=100 " +
-                     "--log-level=alert" +
+                     "--log-level=alert " +
                      "--generic=socket,out,20," + settings.hostAddress + "," + QString::number(settings.inPort) + ",udp,opfgprotocol");
 	if(!settings.manual)
 	{

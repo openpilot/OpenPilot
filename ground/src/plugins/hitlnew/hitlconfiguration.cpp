@@ -34,6 +34,7 @@ HITLConfiguration::HITLConfiguration(QString classId, QSettings* qSettings, QObj
         settings.binPath = "";
         settings.dataPath = "";
         settings.manual = false;
+        settings.startSim = false;
         settings.hostAddress = "127.0.0.1";
         settings.remoteHostAddress = "127.0.0.1";
         settings.outPort = 0;
@@ -47,12 +48,13 @@ HITLConfiguration::HITLConfiguration(QString classId, QSettings* qSettings, QObj
                 settings.binPath = qSettings->value("binPath").toString();
                 settings.dataPath = qSettings->value("dataPath").toString();
                 settings.manual = qSettings->value("manual").toBool();
+                settings.startSim = qSettings->value("startSim").toBool();
                 settings.hostAddress = qSettings->value("hostAddress").toString();
                 settings.remoteHostAddress = qSettings->value("remoteHostAddress").toString();
                 settings.outPort = qSettings->value("outPort").toInt();
                 settings.inPort = qSettings->value("inPort").toInt();
                 settings.latitude = qSettings->value("latitude").toString();
-                settings.longitude = qSettings->value("longitude").toString();
+                settings.longitude = qSettings->value("longitude").toString();                
         }
 }
 
@@ -73,6 +75,7 @@ void HITLConfiguration::saveConfig(QSettings* qSettings) const {
     qSettings->setValue("binPath", settings.binPath);
     qSettings->setValue("dataPath", settings.dataPath);
     qSettings->setValue("manual", settings.manual);
+    qSettings->setValue("startSim", settings.startSim);
     qSettings->setValue("hostAddress", settings.hostAddress);
     qSettings->setValue("remoteHostAddress", settings.remoteHostAddress);
     qSettings->setValue("outPort", settings.outPort);

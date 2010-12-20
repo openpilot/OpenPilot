@@ -95,6 +95,11 @@ void JoystickControl::mouseMoveEvent(QMouseEvent *event)
 
     double Y = - (point.y() / sceneSize.height() - .5) * 2;
     double X = (point.x() / sceneSize.width() - .5) * 2;
+    if (Y<-1) Y = -1;
+    if (Y> 1) Y =  1;
+    if (X<-1) X = -1;
+    if (X> 1) X =  1;
+
     emit positionClicked(X, Y);
 }
 

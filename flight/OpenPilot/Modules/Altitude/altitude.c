@@ -69,10 +69,6 @@ int32_t AltitudeInitialize()
  */
 static void altitudeTask(void *parameters)
 {
-	// For power-up zero height pressure calibration
-	static float p0 = BMP085_P0 / 1000.0;
-	static uint32_t i = 15;
-
 	BaroAltitudeData data;
 	portTickType lastSysTime;
 
@@ -97,13 +93,8 @@ static void altitudeTask(void *parameters)
 		// Convert from Pa to kPa
 		data.Pressure = PIOS_BMP085_GetPressure() / 1000.0;
 
-		// Save zero height pressure as p0
-		if (i && (--i == 0)) {
-			p0 = data.Pressure;
-		}
-
 		// Compute the current altitude (all pressures in kPa)
-		data.Altitude = 44330.0 * (1.0 - powf((data.Pressure / p0), (1.0 / 5.255)));
+		data.Altitude = 44330.0 * (1.0 - powf((data.Pressure / (BMP085_P0 / 1000.0)), (1.0 / 5.255)));
 
 		// Update the AltitudeActual UAVObject
 		BaroAltitudeSet(&data);

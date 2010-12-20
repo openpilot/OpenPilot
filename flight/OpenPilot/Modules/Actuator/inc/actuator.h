@@ -32,6 +32,8 @@
 #ifndef ACTUATOR_H
 #define ACTUATOR_H
 
+#include <stdbool.h>
+
 int32_t ActuatorInitialize();
 
 #endif // ACTUATOR_H

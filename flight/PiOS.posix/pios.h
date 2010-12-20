@@ -58,6 +58,7 @@
 #include <pios_sdcard.h>
 #include <pios_udp.h>
 #include <pios_com.h>
+#include <pios_servo.h>
 
 #define NELEMENTS(x) (sizeof(x) / sizeof(*(x)))
 

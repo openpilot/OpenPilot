@@ -37,6 +37,8 @@
 #define PIOS_INCLUDE_FREERTOS
 #define PIOS_INCLUDE_COM
 #define PIOS_INCLUDE_UDP
+#define PIOS_INCLUDE_SERVO
+
 
 /* Defaults for Logging */
 #define LOG_FILENAME 			"PIOS.LOG"

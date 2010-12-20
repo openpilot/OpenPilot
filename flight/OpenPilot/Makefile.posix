@@ -53,8 +53,8 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Telemetry Stabilization Guidance ManualControl
-#MODULES =  Telemetry GPS ManualControl Actuator Altitude Attitude Stabilization
+MODULES =  Telemetry Actuator Stabilization Guidance ManualControl
+#MODULES =  Telemetry ManualControl Actuator Attitude Stabilization
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
 
@@ -173,6 +173,7 @@ SRC += $(PIOSPOSIX)/pios_delay.c
 SRC += $(PIOSPOSIX)/pios_sdcard.c
 SRC += $(PIOSPOSIX)/pios_udp.c
 SRC += $(PIOSPOSIX)/pios_com.c
+SRC += $(PIOSPOSIX)/pios_servo.c
 #
 ## RTOS
 SRC += $(RTOSSRCDIR)/list.c 

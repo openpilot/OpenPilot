@@ -57,7 +57,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Actuator Telemetry GPS ManualControl Altitude AHRSComms Stabilization Watchdog FirmwareIAP
+MODULES =  Actuator Telemetry GPS ManualControl Altitude AHRSComms Stabilization Guidance Watchdog FirmwareIAP
 
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial

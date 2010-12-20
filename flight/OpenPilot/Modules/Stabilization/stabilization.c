@@ -130,7 +130,7 @@ static void stabilizationTask(void* parameters)
 
 		stabilization_updated = 1;
 		
-		// Wait until the ActuatorDesired object is updated, if a timeout then go to failsafe
+		// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
 		if ( xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )
 		{
 			AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION,SYSTEMALARMS_ALARM_WARNING);

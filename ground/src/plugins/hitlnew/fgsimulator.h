@@ -51,6 +51,7 @@ private:
     static const float KT2MPS;
     static const float INHG2KPA;
     static const float FPS2CMPS;
+    static const float DEG2RAD;
 
     int udpCounterGCSsend; //keeps track of udp packets sent to FG
     int udpCounterFGrecv; //keeps track of udp packets received by FG

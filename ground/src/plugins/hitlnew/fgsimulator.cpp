@@ -38,6 +38,8 @@ const float FGSimulator::FT2M = 0.3048;
 const float FGSimulator::KT2MPS = 0.514444444;
 const float FGSimulator::INHG2KPA = 3.386;
 const float FGSimulator::FPS2CMPS = 30.48;
+const float FGSimulator::DEG2RAD = (M_PI/180.0);
+
 
 
 //FGSimulator::FGSimulator(QString hostAddr, int outPort, int inPort, bool manual, QString binPath, QString dataPath) :
@@ -171,7 +173,7 @@ void FGSimulator::transmitUpdate()
         if(manCtrlData.Armed == ManualControlCommand::ARMED_TRUE)
         {
             ailerons = manCtrlData.Roll;
-            elevator = -manCtrlData.Pitch;
+            elevator = manCtrlData.Pitch;
             rudder = manCtrlData.Yaw;
             throttle = manCtrlData.Throttle;
         }
@@ -182,7 +184,7 @@ void FGSimulator::transmitUpdate()
         actData = actDesired->getData();
 
         ailerons = actData.Roll;
-        elevator = -actData.Pitch;
+        elevator = actData.Pitch;
         rudder = actData.Yaw;
         throttle = actData.Throttle;
     }
@@ -236,34 +238,35 @@ void FGSimulator::transmitUpdate()
 
 void FGSimulator::processUpdate(const QByteArray& inp)
 {
+    //TODO: this does not use the FLIGHT_PARAM structure, it should!
         static char once=0;
 	// Split
 	QString data(inp);
 	QStringList fields = data.split(",");
 	// Get xRate (deg/s)
-//	float xRate = fields[0].toFloat() * 180.0/M_PI;
+//        float xRate = fields[0].toFloat() * 180.0/M_PI;
 	// Get yRate (deg/s)
-//	float yRate = fields[1].toFloat() * 180.0/M_PI;
+//        float yRate = fields[1].toFloat() * 180.0/M_PI;
 	// Get zRate (deg/s)
-//	float zRate = fields[2].toFloat() * 180.0/M_PI;
+//        float zRate = fields[2].toFloat() * 180.0/M_PI;
 	// Get xAccel (m/s^2)
-//	float xAccel = fields[3].toFloat() * FT2M;
+//        float xAccel = fields[3].toFloat() * FT2M;
 	// Get yAccel (m/s^2)
-//	float yAccel = fields[4].toFloat() * FT2M;
+//        float yAccel = fields[4].toFloat() * FT2M;
 	// Get xAccel (m/s^2)
-//	float zAccel = fields[5].toFloat() * FT2M;
+//        float zAccel = fields[5].toFloat() * FT2M;
 	// Get pitch (deg)
 	float pitch = fields[6].toFloat();
 	// Get pitchRate (deg/s)
-//	float pitchRate = fields[7].toFloat();
+        float pitchRate = fields[7].toFloat();
 	// Get roll (deg)
 	float roll = fields[8].toFloat();
 	// Get rollRate (deg/s)
-//	float rollRate = fields[9].toFloat();
+        float rollRate = fields[9].toFloat();
 	// Get yaw (deg)
 	float yaw = fields[10].toFloat();
 	// Get yawRate (deg/s)
-//	float yawRate = fields[11].toFloat();
+        float yawRate = fields[11].toFloat();
 	// Get latitude (deg)
 	float latitude = fields[12].toFloat();
 	// Get longitude (deg)
@@ -381,5 +384,18 @@ void FGSimulator::processUpdate(const QByteArray& inp)
         positionActualData.East = NED[1]*100; //Currently hardcoded as there is no way of setting up a reference point to calculate distance
         positionActualData.Down = NED[2]*100; //Multiply by 100 because positionActual expects input in Centimeters.
         posActual->setData(positionActualData);
+
+        // Update AttitudeRaw object (filtered gyros only for now)
+        AttitudeRaw::DataFields rawData;
+        memset(&rawData, 0, sizeof(AttitudeRaw::DataFields));
+        rawData = attRaw->getData();
+        rawData.gyros_filtered[0] = rollRate;
+        //rawData.gyros_filtered[1] = cos(DEG2RAD * roll) * pitchRate + sin(DEG2RAD * roll) * yawRate;
+        //rawData.gyros_filtered[2] = cos(DEG2RAD * roll) * yawRate - sin(DEG2RAD * roll) * pitchRate;
+        rawData.gyros_filtered[1] = -pitchRate;
+        rawData.gyros_filtered[2] = yawRate;
+        attRaw->setData(rawData);
+        attRaw->updated();
+
 }
 

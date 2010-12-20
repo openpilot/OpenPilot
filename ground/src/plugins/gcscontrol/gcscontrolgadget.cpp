@@ -96,19 +96,19 @@ void GCSControlGadget::manualControlCommandUpdated(UAVObject * obj) {
     switch (controlsMode) {
     case 1:
         // Mode 1: LeftX = Yaw, LeftY = Pitch, RightX = Roll, RightY = Throttle
-        emit sticksChangedRemotely(yaw,-pitch,roll,throttle);
+        emit sticksChangedRemotely(yaw,pitch,roll,throttle);
         break;
     case 2:
         // Mode 2: LeftX = Yaw, LeftY = Throttle, RightX = Roll, RightY = Pitch
-        emit sticksChangedRemotely(yaw,throttle,roll,-pitch);
+        emit sticksChangedRemotely(yaw,throttle,roll,pitch);
         break;
     case 3:
         // Mode 3: LeftX = Roll, LeftY = Pitch, RightX = Yaw, RightY = Throttle
-        emit sticksChangedRemotely(roll,-pitch,yaw,throttle);
+        emit sticksChangedRemotely(roll,pitch,yaw,throttle);
         break;
     case 4:
         // Mode 4: LeftX = Roll, LeftY = Throttle, RightX = Yaw, RightY = Pitch;
-        emit sticksChangedRemotely(roll,throttle,yaw,-pitch);
+        emit sticksChangedRemotely(roll,throttle,yaw,pitch);
         break;
     }
 }
@@ -133,28 +133,28 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
     case 1:
         // Mode 1: LeftX = Yaw, LeftY = Pitch, RightX = Roll, RightY = Throttle
         newRoll = rightX;
-        newPitch = -leftY;
+        newPitch = leftY;
         newYaw = leftX;
         newThrottle = rightY;
         break;
     case 2:
         // Mode 2: LeftX = Yaw, LeftY = Throttle, RightX = Roll, RightY = Pitch
         newRoll = rightX;
-        newPitch = -rightY;
+        newPitch = rightY;
         newYaw = leftX;
         newThrottle = leftY;
         break;
     case 3:
         // Mode 3: LeftX = Roll, LeftY = Pitch, RightX = Yaw, RightY = Throttle
         newRoll = leftX;
-        newPitch = -leftY;
+        newPitch = leftY;
         newYaw = rightX;
         newThrottle = rightY;
         break;
     case 4:
         // Mode 4: LeftX = Roll, LeftY = Throttle, RightX = Yaw, RightY = Pitch;
         newRoll = leftX;
-        newPitch = -rightY;
+        newPitch = rightY;
         newYaw = rightX;
         newThrottle = leftY;
         break;

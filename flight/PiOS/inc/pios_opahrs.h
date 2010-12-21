@@ -54,6 +54,7 @@ extern enum opahrs_result PIOS_OPAHRS_bl_resync(void);
 extern enum opahrs_result PIOS_OPAHRS_bl_GetMemMap(struct opahrs_msg_v0 *rsp);
 extern enum opahrs_result PIOS_OPAHRS_bl_reset(uint32_t delay);
 extern enum opahrs_result PIOS_OPAHRS_bl_boot(uint32_t delay);
+extern enum opahrs_result PIOS_OPAHRS_bl_FwDlData(struct opahrs_msg_v0 *req, struct opahrs_msg_v0 *rsp);
 /*
  * Protocol V1 messages used by application
  */

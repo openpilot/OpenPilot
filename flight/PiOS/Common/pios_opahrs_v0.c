@@ -230,6 +230,24 @@ enum opahrs_result PIOS_OPAHRS_bl_FwupData(struct opahrs_msg_v0 *req, struct opa
 	return opahrs_msg_v0_recv_rsp(OPAHRS_MSG_V0_RSP_FWUP_STATUS, rsp);
 }
 
+enum opahrs_result PIOS_OPAHRS_bl_FwDlData(struct opahrs_msg_v0 *req, struct opahrs_msg_v0 *rsp)
+{
+	if (!req || !rsp)
+		return OPAHRS_RESULT_FAILED;
+
+	/* Make up an attituderaw request */
+	opahrs_msg_v0_init_user_tx(req, OPAHRS_MSG_V0_REQ_FWDN_DATA);
+	enum opahrs_result rc;
+	/* Send the message until it is received */
+	rc = opahrs_msg_v0_send_req(req);
+	if (rc != OPAHRS_RESULT_OK) {
+		/* Failed to send the request, bail out */
+		return rc;
+	}
+
+	return opahrs_msg_v0_recv_rsp(OPAHRS_MSG_V0_RSP_FWDN_DATA, rsp);
+}
+
 enum opahrs_result PIOS_OPAHRS_bl_FwupVerify(struct opahrs_msg_v0 *rsp)
 {
 	if (!rsp)

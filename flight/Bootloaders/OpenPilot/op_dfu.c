@@ -66,7 +66,6 @@ uint8_t Data2;
 uint8_t Data3;
 uint8_t offset = 0;
 uint32_t aux;
-uint8_t spi_dev_desc[200] = { 0 };
 //Download vars
 uint32_t downSizeOfLastPacket = 0;
 uint32_t downPacketTotal = 0;
@@ -102,6 +101,11 @@ void DataDownload(DownloadAction action) {
 		for (uint8_t x = 0; x < packetSize; ++x) {
 			partoffset = (downPacketCurrent * 14 * 4) + (x * 4);
 			offset = baseOfAdressType(downType) + partoffset;
+			if(!flash_read(SendBuffer+(6+x*4),offset,currentProgrammingDestination))
+			{
+				DeviceState = Last_operation_failed;
+			}
+			/*
 			switch (currentProgrammingDestination) {
 			case Remote_flash_via_spi:
 				if (downType == Descript) {
@@ -122,7 +126,7 @@ void DataDownload(DownloadAction action) {
 				SendBuffer[9 + (x * 4)] = *FLASH_If_Read(offset + 3);
 				break;
 			}
-
+*/
 		}
 		//PIOS USB_SIL_Write(EP1_IN, (uint8_t*) SendBuffer, 64);
 		downPacketCurrent = downPacketCurrent + 1;
@@ -495,13 +499,8 @@ void OPDfuIni(uint8_t discover) {
 			if (PIOS_OPAHRS_bl_GetVersions(&rsp) == OPAHRS_RESULT_OK) {
 				dev.programmingType = Remote_flash_via_spi;
 				dev.BL_Version = rsp.payload.user.v.rsp.versions.bl_version;
-				dev.FW_Crc = rsp.payload.user.v.rsp.versions.fw_version;
+				dev.FW_Crc = rsp.payload.user.v.rsp.versions.fw_crc;
 				dev.devID = rsp.payload.user.v.rsp.versions.hw_version;
-				for (int x = 0; x < 200; ++x) {
-					spi_dev_desc[x]
-							= (uint8_t) rsp.payload.user.v.rsp.versions.description[x];
-
-				}
 				if (PIOS_OPAHRS_bl_GetMemMap(&rsp) == OPAHRS_RESULT_OK) {
 					dev.readWriteFlags
 							= rsp.payload.user.v.rsp.mem_map.rw_flags;
@@ -558,7 +557,7 @@ uint32_t CalcFirmCRC() {
 			PIOS_DELAY_WaitmS(1000);
 			PIOS_OPAHRS_bl_resync();
 			if (PIOS_OPAHRS_bl_GetVersions(&rsp) == OPAHRS_RESULT_OK) {
-				return rsp.payload.user.v.rsp.versions.fw_version;
+				return rsp.payload.user.v.rsp.versions.fw_crc;
 			}
 		}
 
@@ -574,8 +573,36 @@ void sendData(uint8_t * buf,uint16_t size)
 {
 if (ProgPort == Usb) {
 
-			PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, buf, size);//FIX+1
+			PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, buf, size);
+			if(DeviceState == downloading)
+				PIOS_DELAY_WaitmS(10);
+
 		} else if (ProgPort == Serial) {
 			ssp_SendData(&ssp_port, buf, size);
 		}
+}
+
+bool flash_read(uint8_t * buffer, uint32_t adr, DFUProgType type) {
+	struct opahrs_msg_v0 rsp;
+	struct opahrs_msg_v0 req;
+	switch (type) {
+	case Remote_flash_via_spi:
+		req.payload.user.v.req.fwdn_data.adress = adr;
+		if (PIOS_OPAHRS_bl_FwDlData(&req, &rsp) == OPAHRS_RESULT_OK) {
+			for (uint8_t x = 0; x < 4; ++x) {
+				buffer[x] = rsp.payload.user.v.rsp.fw_dn.data[x];
+			}
+			return TRUE;
+		}
+		return FALSE;
+		break;
+	case Self_flash:
+		for (uint8_t x = 0; x < 4; ++x) {
+			buffer[x] = *FLASH_If_Read(adr + x);
+		}
+		return TRUE;
+		break;
+	default:
+		return FALSE;
+	}
 }

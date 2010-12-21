@@ -161,9 +161,7 @@ void process_spi_request(void) {
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_VERSIONS);
 		user_tx_v0.payload.user.v.rsp.versions.bl_version = BOOTLOADER_VERSION;
 		user_tx_v0.payload.user.v.rsp.versions.hw_version = HW_VERSION;
-		user_tx_v0.payload.user.v.rsp.versions.fw_version = Fw_crc;
-		read_description(
-				(uint8_t *) &(user_tx_v0.payload.user.v.rsp.versions.description));
+		user_tx_v0.payload.user.v.rsp.versions.fw_crc = Fw_crc;
 		lfsm_user_set_tx_v0(&user_tx_v0);
 		break;
 	case OPAHRS_MSG_V0_REQ_MEM_MAP:
@@ -212,6 +210,15 @@ void process_spi_request(void) {
 		PIOS_LED_Off(LED1);
 		user_tx_v0.payload.user.v.rsp.fwup_status.status = boot_status;
 		lfsm_user_set_tx_v0(&user_tx_v0);
+		break;
+	case OPAHRS_MSG_V0_REQ_FWDN_DATA:
+			opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_FWDN_DATA);
+			uint32_t adr=user_rx_v0.payload.user.v.req.fwdn_data.adress;
+			for(uint8_t x=0;x<4;++x)
+			{
+				user_tx_v0.payload.user.v.rsp.fw_dn.data[x]=*FLASH_If_Read(adr+x);
+			}
+			lfsm_user_set_tx_v0(&user_tx_v0);
 		break;
 	case OPAHRS_MSG_V0_REQ_FWUP_START:
 		FLASH_Unlock();

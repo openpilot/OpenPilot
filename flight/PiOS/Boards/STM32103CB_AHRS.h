@@ -76,7 +76,7 @@ TIM8  |           |           |           |
 #elif STM32F10X_MD
 		#define HW_TYPE			1 //0=high_density 1=medium_density;
 #endif
-#define BOARD_READABLE	FALSE
+#define BOARD_READABLE	TRUE
 #define BOARD_WRITABLA	TRUE
 #define MAX_DEL_RETRYS	3
 

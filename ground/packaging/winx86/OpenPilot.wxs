@@ -134,6 +134,7 @@
             <ComponentRef Id="qmng4.dll" />
             <ComponentRef Id="qsvg4.dll" />
             <ComponentRef Id="qsvgicon4.dll" />
+            <ComponentRef Id="phonon_ds94.dll" />
             <ComponentRef Id="QtConcurrent.dll" />
             <ComponentRef Id="QtCore4.dll" />
             <ComponentRef Id="QtGui4.dll" />

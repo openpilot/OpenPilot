@@ -42,6 +42,9 @@ equals(copydata, 1) {
             # copy sql driver
             data_copy.commands += @$(CHK_DIR_EXISTS) $$targetPath(\"$$GCS_APP_PATH/sqldrivers\") $(MKDIR) $$targetPath(\"$$GCS_APP_PATH/sqldrivers\") $$addNewline()
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_PLUGINS]/sqldrivers/qsqlite4.dll\") $$targetPath(\"$$GCS_APP_PATH/sqldrivers/qsqlite4.dll\") $$addNewline()
+
+            # copy phonon_ds94
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_PLUGINS]/phonon_backend/phonon_ds94.dll\") $$targetPath(\"$$GCS_APP_PATH/phonon_ds94.dll\") $$addNewline()
         }
     }
 

@@ -29,11 +29,21 @@ namespace jafar {
 				DescriptorAbstract();
 				virtual ~DescriptorAbstract();
 
+				/**
+				 * Take an actual observation and use its appearance to improve the descriptor
+				 */
+				virtual void addObservation(const observation_ptr_t & obsPtr) = 0;
+				/**
+				 * Fills in the predicted appearance in an observation
+				 */
 				virtual bool predictAppearance(const observation_ptr_t & obsPtr) = 0;
-				/*{
-					cout << __FILE__ << ":" << __LINE__ << endl;
-					return false;}
-*/
+				/**
+				 * returns true if a valid prediction can be made with this descriptor for this observation
+				 * if it returns false, it doesn't mean that no prediction can be made, but that
+				 * we can't be sure it will be good
+				 */
+				virtual bool isPredictionValid(const observation_ptr_t & obsPtr) = 0;
+				
 				virtual std::string categoryName() {
 					return "DESCRIPTOR";
 				}

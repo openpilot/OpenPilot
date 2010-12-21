@@ -65,8 +65,11 @@ namespace rtslam {
 				measure.std(params.measStd);
 				measure.matchScore = matcher.match(targetAppSpec->patch, *(rawPtr->img),
 					roi, measure.x()(0), measure.x()(1));
-				rawPtr->img->robustCopy(appSpec->patch, (int)(measure.x()(0)-0.5)-appSpec->patch.width()/2,
-					(int)(measure.x()(1)-0.5)-appSpec->patch.height()/2, 0, 0, appSpec->patch.width(), appSpec->patch.height());
+				measure.x() += targetAppSpec->offset;
+				rawPtr->img->robustCopy(appSpec->patch, (int)(measure.x()(0))-appSpec->patch.width()/2,
+					(int)(measure.x()(1))-appSpec->patch.height()/2, 0, 0, appSpec->patch.width(), appSpec->patch.height());
+				appSpec->offset(0) = measure.x()(0) - ((int)(measure.x()(0)) + 0.5);
+				appSpec->offset(1) = measure.x()(1) - ((int)(measure.x()(1)) + 0.5);
 			}
 	};
 
@@ -77,6 +80,7 @@ namespace rtslam {
 	{
 		private:
 			QuickHarrisDetector detector;
+			boost::shared_ptr<DescriptorImagePointMultiViewFactory> descFactory;
 
 		public:
 			struct detector_params_t {
@@ -86,8 +90,9 @@ namespace rtslam {
 			} params;
 			
 		public:
-			ImagePointHarrisDetector(double convSize, double thres, double edge, int patchSize, double measStd):
-				detector(convSize, thres, edge)
+			ImagePointHarrisDetector(double convSize, double thres, double edge, int patchSize, double measStd,
+				boost::shared_ptr<DescriptorImagePointMultiViewFactory> const &descFactory):
+				detector(convSize, thres, edge), descFactory(descFactory)
 			{
 				params.patchSize = patchSize;
 				params.measStd = measStd;
@@ -109,9 +114,11 @@ namespace rtslam {
 					
 					int shift_x = (size.width-1)/2;
 					int shift_y = (size.height-1)/2;
-					int x_src = pix(0)-shift_x;
-					int y_src = pix(1)-shift_y;
+					int x_src = (int)pix(0)-shift_x;
+					int y_src = (int)pix(1)-shift_y;
 					rawData->img->copy(appPtr->patch, x_src, y_src, 0, 0, size.width, size.height);
+					appPtr->offset(0) = pix(0) - ((int)pix(0) + 0.5);
+					appPtr->offset(1) = pix(1) - ((int)pix(1) + 0.5);
 
 					return true;
 				} else return false;
@@ -125,10 +132,13 @@ namespace rtslam {
 				app_src->patch.copy(app_dst->patch, (app_src->patch.width()-app_dst->patch.width())/2,
 						(app_src->patch.height()-app_dst->patch.height())/2, 0, 0,
 						app_dst->patch.width(), app_dst->patch.height());
+				app_dst->offset = app_src->offset;
 
 				// create descriptor
 				vec7 globalSensorPose = obsPtr->sensorPtr()->globalPose();
-				desc_img_pnt_ptr_t descPtr(new DescriptorImagePoint(featPtr, globalSensorPose, obsPtr));
+				desc_img_pnt_mv_ptr_t descPtr(descFactory->createDescriptor());
+//				desc_img_pnt_fv_ptr_t descPtr(new DescriptorImagePointFirstView());
+				descPtr->addObservation(obsPtr);
 				obsPtr->landmarkPtr()->setDescriptor(descPtr);
 			}
 

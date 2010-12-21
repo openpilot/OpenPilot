@@ -157,7 +157,8 @@ namespace simu {
 				*app_dst = *app_src;
 				
 				// create descriptor
-				boost::shared_ptr<simu::DescriptorSimu> descPtr(new simu::DescriptorSimu(featPtr));
+				boost::shared_ptr<simu::DescriptorSimu> descPtr(new simu::DescriptorSimu());
+				descPtr->addObservation(obsPtr);
 				obsPtr->landmarkPtr()->setDescriptor(descPtr);
 			}
 

@@ -61,6 +61,7 @@ namespace jafar {
 		class SensorAbstract;
   	        class DataManagerAbstract;
 		class LandmarkAbstract;
+		class ObservationModelAbstract;
 		class ObservationAbstract;
 	  class MapManagerAbstract;
 		class RawAbstract;
@@ -77,6 +78,7 @@ namespace jafar {
 		typedef boost::shared_ptr<SensorAbstract>      										sensor_ptr_t;
 		typedef boost::shared_ptr<DataManagerAbstract>      							data_manager_ptr_t;
 		typedef boost::shared_ptr<LandmarkAbstract>    										landmark_ptr_t;
+		typedef boost::shared_ptr<ObservationModelAbstract> 							observation_model_ptr_t;
 		typedef boost::shared_ptr<ObservationAbstract> 										observation_ptr_t;
 		typedef boost::shared_ptr<MapManagerAbstract>    									map_manager_ptr_t;
 

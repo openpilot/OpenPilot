@@ -47,18 +47,21 @@ namespace simu {
 	class DescriptorSimu: public rtslam::DescriptorAbstract
 	{
 		private:
-			boost::shared_ptr<FeatureSimu> featPtr;
+			boost::shared_ptr<AppearanceSimu> appPtr;
 			
 		public:
-			DescriptorSimu(const boost::shared_ptr<FeatureSimu> & featPtr): featPtr(featPtr) {}
-			
+			void addObservation(const observation_ptr_t & obsPtr)
+			{
+				appPtr = SPTR_CAST<AppearanceSimu>(obsPtr->observedAppearance);
+			}
 			bool predictAppearance(const observation_ptr_t & obsPtr)
 			{
 				boost::shared_ptr<AppearanceSimu> app_dst = SPTR_CAST<AppearanceSimu>(obsPtr->predictedAppearance);
-				boost::shared_ptr<AppearanceSimu> app_src = SPTR_CAST<AppearanceSimu>(featPtr->appearancePtr);
+				boost::shared_ptr<AppearanceSimu> app_src = appPtr;
 				*app_dst = *app_src;
 				return true;
 			}
+			bool isPredictionValid(const observation_ptr_t & obsPtr) { return true; }
 	};
 	
 	

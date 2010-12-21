@@ -5,10 +5,12 @@ Bugs
 - trajectories are not repeatable and not always right
 - debug inertial... why sometimes uncertainty on quaternion grows significantly after move, and sometimes not (88,89,90) ?
 - do simulation with inertial
-- euclidean points are searched at another place with a long and thin ellipse through the whole image
+- do something when no display (blocked on while(!(*world)->display_rendered) (*world)->display_condition.wait(display_lock);)
 
 - in simulation without noise, with a slow start going forward, most of the time it works perfectly, but depending on the random seed sometimes it goes frankly on the side (left/right and/or top/down, up to 45 deg). It is the same with ransac iterative and with active search, but they can behave differently with the same random seed...
+
 - [ok] backproject-project is not identity !!! -> distortion correction was not precise enough
+- [ok] euclidean points are searched at another place with a long and thin ellipse through the whole image
 
 Features
 ------------------------------------
@@ -27,15 +29,19 @@ Features
 - when doing replay, allow to have a sequence without missing images and simulate "real-time" (ignoring image loading of course)
 - make maps really abstract, and all rtslam not depending specifically on EKF
 
+- allow to freeze landmarks, in order to use them for localization but stopping to estimate them, and try to densify the map, to have a better 3D mesh and ease passive map matching.
+- try to verify if the surface inside 3 points is a plane, and if not add points inside (or segments)
+
 - [ok] make rtslam Loggable with DataLogger
 
 Organization
 ------------------------------------
+- prepare for as-is distribution (doc + doc install + credits + license)
 - move QuickHarrisDetector to fdetect: attention to the prototype of detectIn() !!!
 - move ExtendedKalmanFilterIndirect to filter
 - move Gaussian to jmath
-- [ok] move dma branch to master
 - is it possible to set up subdirectories with jafar/cmake ?
+- [ok] move dma branch to master
 
 
 
@@ -58,12 +64,15 @@ Performance
 
 Precision
 ------------------------------------
+- to extract patch and match, compute an homography with the 4 corners, in order to take distortion a little bit into account
+- don't remove landmarks when they are not found because the point of view is too different
+- initialize new points if the existing points are not observed, especially if it is because the point of view is too different.
 - define and implement measure->P in matcher
 - extend to n-point ransac and reduce the lowInnov ?
 - if no feature is found, try with larger ellipse, because there is little chance you find them back later (except if this one image is bad), if you never find them back you'll be for sure inconsistent, and if you try later the ellipses will be greater and greater.
 - Finish implementing RobotCentric Kalman
 - To investigate : predict, compute jacobians, correct mean offline, recompute jacobians, correct online = better consistence but how much more computations ?
-- to extract patch and match, compute an homography with the 4 corners, in order to take distortion a little bit into account
+- harris: using square mask is suboptimal, but can we refine around the max with a gaussian mask in order to improve the precision of the corner ?
 
 - test predicted patch variance: if too low, discard exploration and declare not matched. Or rather test the variance of where you search, we can add an option minSigma to explorer that don't do correlation if sigma too low.
 - when a point is detected, do a matching with itself with interpolation to find subpixel position
@@ -74,6 +83,7 @@ Precision
 - [ok] limit n_updates of ransac, and ensure that some active search is done after ransac.
 - [ok] when all the ellipses are too large (because we lost a lot of frames), before deleting all of them try to match with subregions, and maybe limit ransac number of tries... and don't delete obs once they have been updated! it's too late!
 - [ok] there are still some 'display library' objects construction in display objects constructors, which are possibly time consuming, they should be moved in render with '== NULL' test. Maybe this is why quite often there is a gap in the few first frames.
+- [ok] port the multiview descriptor from the old slam in order to match landmarks in more different point of views
 
 
 Display

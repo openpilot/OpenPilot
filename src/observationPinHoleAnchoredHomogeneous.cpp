@@ -144,9 +144,6 @@ namespace jafar {
 		
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::predictAppearance_func() {
-			//desc_img_pnt_ptr_t descPtr = SPTR_CAST<DescriptorImagePoint>(landmarkPtr()->descriptorPtr);
-			//obs_ph_ahp_ptr_t _this = SPTR_CAST<ObservationPinHoleAnchoredHomogeneousPoint>(shared_from_this());
-			//descPtr->predictAppearance(_this);
 			observation_ptr_t _this = shared_from_this();
 			landmarkPtr()->descriptorPtr->predictAppearance(_this);
 		}

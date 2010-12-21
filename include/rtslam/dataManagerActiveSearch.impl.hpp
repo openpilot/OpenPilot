@@ -273,7 +273,7 @@ namespace jafar {
 						// 2d. Create lmk descriptor
 						vec7 globalSensorPose = sensorPtr()->globalPose();
 						desc_img_pnt_ptr_t
-						    descPtr(new DescriptorImagePoint(featPtr, globalSensorPose,
+						    descPtr(new DescriptorImagePointFirstView(featPtr, globalSensorPose,
 						                                     obsPtr));
 						obsPtr->landmarkPtr()->setDescriptor(descPtr);
 

@@ -31,6 +31,7 @@
 /* --- INCLUDE --------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
 
+#include "jmath/jblas.hpp"
 #include "image/Image.hpp"
 #include "rtslam/appearanceAbstract.hpp"
 #include "boost/shared_ptr.hpp"
@@ -52,9 +53,11 @@ namespace jafar {
 				image::Image patch;
 				unsigned int patchSum;
 				unsigned int patchSquareSum;
+				jblas::vec2 offset; ///< offset between the center of the patch and the real position of the feature
 			public:
-				AppearanceImagePoint(const image::Image& patch);
-				AppearanceImagePoint(int width, int height, int depth) : patch(width, height, depth, JfrImage_CS_GRAY) {
+				AppearanceImagePoint(const image::Image& patch, jblas::vec2 const &offset);
+				AppearanceImagePoint(int width, int height, int depth):
+					patch(width, height, depth, JfrImage_CS_GRAY) {
 //					cout << "Created patch with " << width << "x" << height << " pixels; depth: " << depth << "; color space: " << JfrImage_CS_GRAY << endl;
 				}
 				virtual ~AppearanceImagePoint();

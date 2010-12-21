@@ -12,7 +12,10 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-		AppearanceImagePoint::AppearanceImagePoint(const image::Image& patch) : patch(patch) {
+		AppearanceImagePoint::AppearanceImagePoint(const image::Image& patch, jblas::vec2 const &offset):
+			offset(offset)
+		{
+			patch.copyTo(this->patch);
 			computePatchIntegrals();
 		}
 
@@ -25,6 +28,7 @@ namespace jafar {
 			patch.copy(app->patch,0,0,0,0);
 			app->patchSum = patchSum;
 			app->patchSquareSum = patchSquareSum;
+			app->offset = offset;
 			return app;
 		}
 

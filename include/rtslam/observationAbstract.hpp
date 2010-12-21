@@ -236,8 +236,8 @@ namespace jafar {
 						bool predicted; ///<	Landmark is not new and has been predicted
 						bool visible; ///< 		Landmark is visible
 						bool predictedApp; ///< Appearance has been predicted for predicted pos
-						bool measured; ///< 	Feature is measured
-						bool matched; ///< 		Feature is matched
+						bool measured; ///< 	Feature is measured (we tried to match it)
+						bool matched; ///< 		Feature is successfully matched
 						bool updated; ///< 		Landmark is updated
 				} events;
 				
@@ -368,6 +368,11 @@ namespace jafar {
 						predictAppearance_func();
 						events.predictedApp = true;
 					}
+				}
+				
+				virtual void updateDescriptor()
+				{
+					landmarkPtr()->descriptorPtr->addObservation(this->shared_from_this());
 				}
 
 				virtual void predictAppearance_func() = 0;

@@ -221,13 +221,17 @@ const double REPARAM_TH = 0.1;
 const unsigned HARRIS_CONV_SIZE = 5;
 const double HARRIS_TH = 15.0;
 const double HARRIS_EDDGE = 2.0;
-const unsigned PATCH_DESC = 45;
+const unsigned PATCH_DESC = 30;
+
+const double DESC_SCALE_STEP = 2.0;
+const double DESC_ANGLE_STEP = jmath::degToRad(10.0);
+const DescriptorImagePointMultiView::PredictionType DESC_PREDICTION_TYPE = DescriptorImagePointMultiView::ptAffine;
 
 // data manager: zncc matcher and one-point-ransac
 const unsigned PATCH_SIZE = 13; // in pixels
 const unsigned MAX_SEARCH_SIZE = 50000; // in number of pixels
 const unsigned KILL_SEARCH_SIZE = 100000; // in number of pixels
-const double MATCH_TH = 0.95;
+const double MATCH_TH = 0.90;
 const double MAHALANOBIS_TH = 3; // in n_sigmas
 const unsigned N_UPDATES_TOTAL = 20;
 const unsigned N_UPDATES_RANSAC = 15;
@@ -248,6 +252,7 @@ const unsigned GRID_VCELLS = 3;
 const unsigned GRID_HCELLS = 3;
 const unsigned GRID_MARGIN = 11;
 const unsigned GRID_SEPAR = 20;
+
 
 ///##############################################
 
@@ -574,7 +579,8 @@ void demo_slam01_main(world_ptr_t *world) {
 		senPtr11->setHardwareSensor(hardSen11);
 	} else
 	{
-		boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE, PATCH_DESC, PIX_NOISE));
+		boost::shared_ptr<DescriptorImagePointMultiViewFactory> descFactory(new DescriptorImagePointMultiViewFactory(DESC_SCALE_STEP, DESC_ANGLE_STEP, DESC_PREDICTION_TYPE));
+		boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE, PATCH_DESC, PIX_NOISE, descFactory));
 	//	boost::shared_ptr<correl::Explorer<correl::Zncc> > znccMatcher(new correl::Explorer<correl::Zncc>());
 		boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(MIN_SCORE, PARTIAL_POSITION, PATCH_SIZE, MAX_SEARCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE));
 		

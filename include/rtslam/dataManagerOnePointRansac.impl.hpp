@@ -306,7 +306,7 @@ JFR_DEBUG_SEND(" " << obsPtr->id());
 			}
 JFR_DEBUG_END();
 
-			// update obs counters
+			// update obs counters and do some stuff
 			for(ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end();obsIter++)
 			{
 				observation_ptr_t obs = *obsIter;
@@ -314,6 +314,8 @@ JFR_DEBUG_END();
 				if (obs->events.measured) JFR_ASSERT(obs->events.visible && obs->events.predicted, "obs measured without previous steps");
 				if (obs->events.matched) JFR_ASSERT(obs->events.measured && obs->events.visible && obs->events.predicted, "obs matched without previous steps");
 				if (obs->events.updated) JFR_ASSERT(obs->events.matched && obs->events.measured && obs->events.visible && obs->events.predicted, "obs updated without previous steps");
+				
+				if (obs->events.updated) obs->updateDescriptor();
 				
 				if (obs->events.measured) obs->counters.nSearch++;
 				if (obs->events.matched) obs->counters.nMatch++;

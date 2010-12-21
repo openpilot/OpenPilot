@@ -356,7 +356,7 @@ void demo_slam01_main(world_ptr_t *world) {
 			case 1: {
 				// regular grid
 				const int npoints_ = 3*11*13; npoints = npoints_;
-				for(int i, z = -1; z <= 1; ++z) for(int y = -3; y <= 7; ++y) for(int x = -6; x <= 6; ++x, ++i)
+				for(int i = 0, z = -1; z <= 1; ++z) for(int y = -3; y <= 7; ++y) for(int x = -6; x <= 6; ++x, ++i)
 					{ points[i][0] = x*1.0; points[i][1] = y*1.0; points[i][2] = z*1.0; }
 				break;
 			}
@@ -648,7 +648,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	//worldPtr->display_mutex.unlock();
 
 jblas::vec robot_prediction;
-double average_robot_innovation;
+double average_robot_innovation = 0.;
 int n_innovation = 0;
 	
 	// ---------------------------------------------------------------------------
@@ -791,7 +791,7 @@ JFR_DEBUG("Robot state stdev after corrections " << sqrt(ublas::matrix_vector_ra
 			display_lock.unlock();
 		}
 */
-		int processed_t = (had_data ? (*world)->t : (*world)->t-1);
+		unsigned processed_t = (had_data ? (*world)->t : (*world)->t-1);
 		if ((*world)->display_t+1 < processed_t+1)
 		{
 //cout << "SLAM: checking if display has rendered" << endl;

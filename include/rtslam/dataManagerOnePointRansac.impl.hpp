@@ -30,7 +30,7 @@ namespace jafar {
 		{
 // JFR_DEBUG("\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
 			map_ptr_t mapPtr = sensorPtr()->robotPtr()->mapPtr();
-			int numObs = 0;
+			unsigned numObs = 0;
 			featMan->renew();
 
 			// Project and isolate visible observations
@@ -40,11 +40,11 @@ namespace jafar {
 // 	JFR_DEBUG_SEND(" " << (*it)->id());
 // JFR_DEBUG_END();
 
-			int n_tries = algorithmParams.n_tries;
+			unsigned n_tries = algorithmParams.n_tries;
 			if (obsVisibleList.size() < n_tries) n_tries = obsVisibleList.size();
 // JFR_DEBUG("will try Ransac " << n_tries << " times");
 
-			int current_try = 0;
+			unsigned current_try = 0;
 			if (n_tries >= 2)
 			while (current_try < n_tries)
 			{
@@ -183,7 +183,7 @@ JFR_DEBUG_END();
 			// FIXME don't search again landmarks that failed as base
 			
 JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("Updating with ActiveSearch:");
-			for (int i = 0; i < algorithmParams.n_recomp_gains; ++i)
+			for (unsigned i = 0; i < algorithmParams.n_recomp_gains; ++i)
 			{
 				// 4. for each obs in pending: retake algorithm from active search
 				
@@ -300,7 +300,7 @@ JFR_DEBUG_SEND(" " << obsPtr->id());
 
 				} // foreach observation
 // JFR_DEBUG("finished for this sensor !");
-				if (i != algorithmParams.n_recomp_gains-1 && obsListSorted.rbegin() != obsListSorted.rend())
+				if (i+1 != algorithmParams.n_recomp_gains && obsListSorted.rbegin() != obsListSorted.rend())
 					kernel::fastErase(activeSearchList, obsListSorted.rbegin()->second);
 				obsListSorted.clear(); // clear the list now or it will prevent the observation to be destroyed until next frame, and will still be displayed
 			}
@@ -405,7 +405,7 @@ JFR_DEBUG_END();
 		void DataManagerOnePointRansac<RawSpec,SensorSpec,FeatureSpec,RoiSpec,FeatureManagerSpec,DetectorSpec,MatcherSpec>::
 		detectNewObs(boost::shared_ptr<RawSpec> rawData)
 		{
-			for(int i = 0; i < algorithmParams.n_init; )
+			for(unsigned i = 0; i < algorithmParams.n_init; )
 			if (mapManagerPtr()->mapSpaceForInit()) {
 				//boost::shared_ptr<RawImage> rawDataSpec = SPTR_CAST<RawImage>(rawData);
 				RoiSpec roi;

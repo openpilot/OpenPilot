@@ -77,11 +77,11 @@ namespace jafar {
 
 			protected: // parameters
 				struct alg_params_t {
-						int n_updates_total;  ///< maximum number of updates
-						int n_updates_ransac; ///< maximum number of updates for ransac
-						int n_tries;   ///< number of RANSAC consensus tries
-						int n_init;    ///< number of feature initialization
-						int n_recomp_gains; ///< number of update after which infoGains are completely recomputed
+						unsigned n_updates_total;  ///< maximum number of updates
+						unsigned n_updates_ransac; ///< maximum number of updates for ransac
+						unsigned n_tries;   ///< number of RANSAC consensus tries
+						unsigned n_init;    ///< number of feature initialization
+						unsigned n_recomp_gains; ///< number of update after which infoGains are completely recomputed
 				} algorithmParams;
 
 			public: // getters ans setters

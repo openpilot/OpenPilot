@@ -256,6 +256,8 @@ void PFDGadgetWidget::updateAttitude(UAVObject *object1) {
         // to it. That way you always get the "shorter difference" to turn in."
         double fac = compassBandWidth/540;
         headingTarget = yawField->getDouble()*(-fac);
+        if (headingTarget != headingTarget)
+            headingTarget = headingValue; // NaN checking.
         if ((headingValue - headingTarget)/fac > 180) {
             headingTarget += 360*fac;
         } else if (((headingValue - headingTarget)/fac < -180)) {

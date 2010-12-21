@@ -248,9 +248,9 @@ bool DFUObject::UploadData(qint32 const & numberOfBytes, QByteArray  & data)
         //        }
         // qDebug()<<" Data0="<<(int)data[0]<<" Data0="<<(int)data[1]<<" Data0="<<(int)data[2]<<" Data0="<<(int)data[3]<<" buf6="<<(int)buf[6]<<" buf7="<<(int)buf[7]<<" buf8="<<(int)buf[8]<<" buf9="<<(int)buf[9];
         //delay::msleep(send_delay);
-        if(StatusRequest()!=OP_DFU::uploading) return false;
+
+        //if(StatusRequest()!=OP_DFU::uploading) return false;
         int result = sendData(buf, BUF_LEN);
-        //int result = hidHandle.send(0,buf, BUF_LEN, 5000);
      //   qDebug()<<"sent:"<<result;
         if(result<1)
         {

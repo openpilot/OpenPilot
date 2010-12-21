@@ -172,8 +172,9 @@ void FGSimulator::transmitUpdate()
         // Read joystick input
         if(manCtrlData.Armed == ManualControlCommand::ARMED_TRUE)
         {
+            // Note: Pitch sign is reversed in FG ?
             ailerons = manCtrlData.Roll;
-            elevator = manCtrlData.Pitch;
+            elevator = -manCtrlData.Pitch;
             rudder = manCtrlData.Yaw;
             throttle = manCtrlData.Throttle;
         }
@@ -184,7 +185,7 @@ void FGSimulator::transmitUpdate()
         actData = actDesired->getData();
 
         ailerons = actData.Roll;
-        elevator = actData.Pitch;
+        elevator = -actData.Pitch;
         rudder = actData.Yaw;
         throttle = actData.Throttle;
     }
@@ -226,7 +227,7 @@ void FGSimulator::transmitUpdate()
     if(!settings.manual)
     {
         actData.Roll = ailerons;
-        actData.Pitch = elevator;
+        actData.Pitch = -elevator;
         actData.Yaw = rudder;
         actData.Throttle = throttle;
         //actData.NumLongUpdates = (float)udpCounterFGrecv;
@@ -392,7 +393,7 @@ void FGSimulator::processUpdate(const QByteArray& inp)
         rawData.gyros_filtered[0] = rollRate;
         //rawData.gyros_filtered[1] = cos(DEG2RAD * roll) * pitchRate + sin(DEG2RAD * roll) * yawRate;
         //rawData.gyros_filtered[2] = cos(DEG2RAD * roll) * yawRate - sin(DEG2RAD * roll) * pitchRate;
-        rawData.gyros_filtered[1] = -pitchRate;
+        rawData.gyros_filtered[1] = pitchRate;
         rawData.gyros_filtered[2] = yawRate;
         attRaw->setData(rawData);
         attRaw->updated();

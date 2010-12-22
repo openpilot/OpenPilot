@@ -50,7 +50,8 @@ namespace jafar {
 				void initFromObs(const observation_ptr_t & obsPtr, int descSize);
 		};
 
-		std::ostream& operator <<(std::ostream & s, FeatureView const & desc);
+		std::ostream& operator <<(std::ostream & s, FeatureView const & fv);
+		image::oimstream& operator <<(image::oimstream & s, FeatureView const & fv);
 		
 		/**
 		 * This descriptor for image points only keeps the appearance of the feature
@@ -75,7 +76,7 @@ namespace jafar {
 				virtual bool isPredictionValid(const observation_ptr_t & obsPtr) { return true; }
 				
 				virtual void desc_text(std::ostream& os) const;
-
+				virtual void desc_image(image::oimstream& os) const;
 		};
 		
 		class DescriptorImagePointFirstViewFactory
@@ -126,7 +127,7 @@ namespace jafar {
 				virtual bool isPredictionValid(const observation_ptr_t & obsPtr);
 				
 				virtual void desc_text(std::ostream& os) const;
-				
+				virtual void desc_image(image::oimstream& os) const;
 			protected:
 				/**
 				 * return the closest view and if it is in the bounds or not

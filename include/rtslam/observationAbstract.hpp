@@ -142,6 +142,7 @@ namespace jafar {
 		    public ChildOf<DataManagerAbstract> {
 
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract const & obs);
+				friend image::oimstream& operator <<(image::oimstream & s, jafar::rtslam::ObservationAbstract const & obs);
 
 				// define the function linkToParentLandmark().
 				ENABLE_LINK_TO_PARENT(LandmarkAbstract,Landmark,ObservationAbstract)
@@ -388,6 +389,8 @@ namespace jafar {
 
 				virtual void transferInfoObs(observation_ptr_t & obs);
 
+				virtual void desc_image(image::oimstream& os) const {}
+				
 		};
 
 	}

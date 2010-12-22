@@ -7,6 +7,7 @@
 
 #ifdef HAVE_MODULE_QDISPLAY
 
+#include "qdisplay/imout.hpp"
 #include "rtslam/display_qt.hpp"
 
 namespace jafar {
@@ -428,8 +429,11 @@ std::cout << "connecting slots" << std::endl;
 		if (clickedObs)
 		{
 			std::cout << "----------------------------------------------- at frame " << framenumber << std::endl;
-			std::cout << *clickedObs << std::endl;
 			std::cout << clickedObs->landmark() << std::endl;
+			std::cout << *clickedObs << std::endl;
+			
+			qdisplay::imout << image::clear << clickedObs->landmark() << image::endl;
+			qdisplay::imout << image::vsep << *clickedObs << image::flush;
 		}
 
 		

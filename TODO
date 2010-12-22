@@ -100,3 +100,4 @@ Display
 - [ok] and transfer the bufferize step from the display thread to the slam thread, to get the higher priority, because it is not sure that the display thread inherit from the slam thread priority when the latter is waiting for the former.
 - [ok] Allow exhaustive rendering when offline, for videos
 - [ok] Catch keyboard and mouse events in the windows, in order to allow to play/pause/next, and to display infos about an obs and its lmk when it clicked on...
+- [ok] display visual information for observations and descriptors when clicking on it

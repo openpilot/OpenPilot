@@ -17,13 +17,19 @@ namespace jafar {
 		using namespace ublasExtra;
 		using namespace quaternion;
 
-		std::ostream& operator <<(std::ostream & s, FeatureView const & desc)
+		std::ostream& operator <<(std::ostream & s, FeatureView const & fv)
 		{
-			s << "  - by sensor " << desc.obsModelPtr->sensorPtr()->id() << " of " << 
-				desc.obsModelPtr->sensorPtr()->typeName() << " at " << desc.senPose;
+			s << "  - by sensor " << fv.obsModelPtr->sensorPtr()->id() << " of " << 
+				fv.obsModelPtr->sensorPtr()->typeName() << " at " << fv.senPose;
 			return s;
 		}
 
+		image::oimstream& operator <<(image::oimstream & s, FeatureView const & fv)
+		{
+			app_img_pnt_ptr_t app = SPTR_CAST<AppearanceImagePoint>(fv.appearancePtr);
+			s << app->patch;
+			return s;
+		}
 		
 		/***************************************************************************
 		 * FeatureView
@@ -99,6 +105,11 @@ app_dst->patch.save(buffer);
 			os << " of " << typeName() << "; " << view << std::endl;
 		}
 
+		void DescriptorImagePointFirstView::desc_image(image::oimstream& os) const
+		{
+			os << view << image::endl;
+		}
+		
 		/***************************************************************************
 		 * DescriptorImagePointMultiView
 		 **************************************************************************/
@@ -247,11 +258,26 @@ app_dst->patch.save(buffer);
 
 		void DescriptorImagePointMultiView::desc_text(std::ostream& os) const
 		{
-			os << " of " << typeName() << "; " << views.size() << " view(s):" << std::endl;
+			os << " of " << typeName() << "; " << views.size() << " view(s):";
 			for(FeatureViewList::const_iterator it = views.begin(); it != views.end(); ++it)
-				os << *it << std::endl;
+				os << std::endl << *it;
 		}
 
+		void DescriptorImagePointMultiView::desc_image(image::oimstream& os) const
+		{
+			int nviews = views.size();
+			if (nviews == 0) return;
+			int nvy = (int)(sqrt((double)nviews));
+			int nvx = nviews/nvy; if (nvx*nvy < nviews) nvx++;
+				
+			FeatureViewList::const_iterator it = views.begin();
+			for(int x = 0, y = 0; it != views.end(); ++it, ++x)
+			{
+				if (x >= nvx) { x = 0; ++y; os << image::endl; }
+				os << *it;
+			}
+			os << image::endl;
+		}
 
 	}
 }

@@ -62,7 +62,7 @@ namespace jafar {
 				size_t exp_size, prior_size;
 				void init_sizes() { exp_size = 2; prior_size = 1; }
 			public:
-				
+
 				ObservationModelPinHoleAnchoredHomogeneousPoint() { init_sizes(); }
 				ObservationModelPinHoleAnchoredHomogeneousPoint(const sensor_ptr_t & pinholePtr);
 			
@@ -144,6 +144,8 @@ namespace jafar {
 				}
 
 				virtual bool voteForReparametrizingLandmark();
+
+				virtual void desc_image(image::oimstream& os) const;
 
 			public:
 				double pixelNoise;

@@ -25,6 +25,10 @@ namespace jafar {
 			return s;
 		}
 
+		image::oimstream& operator <<(image::oimstream & s, DescriptorAbstract const & desc) {
+			desc.desc_image(s);
+			return s;
+		}
 
 	}
 }

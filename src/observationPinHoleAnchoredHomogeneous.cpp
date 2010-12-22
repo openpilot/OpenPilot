@@ -153,7 +153,20 @@ namespace jafar {
 			return (lmkAHP::linearityScore(sensorPtr()->globalPose(), landmarkPtr()->state.x(), landmarkPtr()->state.P()) < reparTh);
 		}
 
-
+		void ObservationPinHoleAnchoredHomogeneousPoint::desc_image(image::oimstream& os) const
+		{
+			if (events.predictedApp)
+			{
+				app_img_pnt_ptr_t predApp = SPTR_CAST<AppearanceImagePoint>(predictedAppearance);
+				os << predApp->patch << image::hsep;
+			}
+			
+			if (events.measured)
+			{
+				app_img_pnt_ptr_t obsApp = SPTR_CAST<AppearanceImagePoint>(observedAppearance);
+				os << obsApp->patch << image::endl;
+			}
+		}
 
 	}
 }

@@ -140,6 +140,8 @@ namespace jafar {
 					return false;
 				}
 
+				virtual void desc_image(image::oimstream& os) const;
+
 			public:
 				double pixelNoise;
 

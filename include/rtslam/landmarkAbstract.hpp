@@ -59,7 +59,8 @@ namespace jafar {
 		    LandmarkAbstract>, public ParentOf<ObservationAbstract> {
 
 				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::LandmarkAbstract const & obs);
-
+				friend image::oimstream& operator <<(image::oimstream & s, jafar::rtslam::LandmarkAbstract const & lmk);
+				
 				// define the function linkToParentMapManager().
 		       ENABLE_LINK_TO_PARENT(MapManagerAbstract,MapManager,LandmarkAbstract)
 				;

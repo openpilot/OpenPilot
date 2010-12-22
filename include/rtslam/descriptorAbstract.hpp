@@ -12,6 +12,7 @@
 #include <boost/smart_ptr.hpp>
 
 #include "jmath/jblas.hpp"
+#include "image/oimstream.hpp"
 
 #include "rtslam/rtSlam.hpp"
 //#include "rtslam/appearanceAbstract.hpp"
@@ -49,11 +50,13 @@ namespace jafar {
 				}
 
 				virtual void desc_text(std::ostream& os) const {}
+				virtual void desc_image(image::oimstream& os) const {}
 
 		};
 
 		
 		std::ostream& operator <<(std::ostream & s, DescriptorAbstract const & desc);
+		image::oimstream& operator <<(image::oimstream & s, DescriptorAbstract const & desc);
 		
 		
 	}

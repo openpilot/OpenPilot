@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <Product Id="C5857D7A-D0D7-4EF7-87CC-16E8CCA618CE" Name="OpenPilot GCS" Language="!(loc.LANG)" Version="0.0.0.1" Manufacturer="OpenPilot" UpgradeCode="C72FD8FA-A9FD-483C-890E-A2FDB6C8025F">
-        <Package Description="Test file in a Product" Comments="Simple test" InstallerVersion="200" Compressed="yes" Keywords="Installer OpenPilot" />
+        <Package Description="Test file in a Product" Languages="1033,1031,1028,1036,3082,1049" Comments="Simple test" InstallerVersion="200" Compressed="yes" Keywords="Installer OpenPilot"   />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramFilesFolder" Name="PFiles">
@@ -134,7 +134,6 @@
             <ComponentRef Id="qmng4.dll" />
             <ComponentRef Id="qsvg4.dll" />
             <ComponentRef Id="qsvgicon4.dll" />
-            <ComponentRef Id="phonon_ds94.dll" />
             <ComponentRef Id="QtConcurrent.dll" />
             <ComponentRef Id="QtCore4.dll" />
             <ComponentRef Id="QtGui4.dll" />

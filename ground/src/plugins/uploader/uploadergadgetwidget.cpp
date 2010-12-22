@@ -412,7 +412,7 @@ void UploaderGadgetWidget::systemRescue()
     case RESCUE_POWER2:
         log("... NOW!\n***\nWaiting...");
         rescueStep = RESCUE_DETECT;
-        QTimer::singleShot(4000, this, SLOT(systemRescue()));
+        QTimer::singleShot(5000, this, SLOT(systemRescue()));
         break;
     case RESCUE_DETECT:
         rescueStep = RESCUE_STEP0;

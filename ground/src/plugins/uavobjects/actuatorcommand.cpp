@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString ActuatorCommand::NAME = QString("ActuatorCommand");
+const QString ActuatorCommand::DESCRIPTION = QString("Contains the pulse duration sent to each of the channels.  Set by @ref ActuatorModule");
 
 /**
  * Constructor
@@ -57,6 +58,8 @@ ActuatorCommand::ActuatorCommand(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

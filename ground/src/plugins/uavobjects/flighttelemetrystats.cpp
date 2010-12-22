@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString FlightTelemetryStats::NAME = QString("FlightTelemetryStats");
+const QString FlightTelemetryStats::DESCRIPTION = QString("Maintains the telemetry statistics from the OpenPilot flight computer.");
 
 /**
  * Constructor
@@ -70,6 +71,8 @@ FlightTelemetryStats::FlightTelemetryStats(): UAVDataObject(OBJID, ISSINGLEINST,
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

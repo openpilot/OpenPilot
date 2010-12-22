@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString FirmwareIAPObj::NAME = QString("FirmwareIAPObj");
+const QString FirmwareIAPObj::DESCRIPTION = QString("Firmware IAP");
 
 /**
  * Constructor
@@ -164,6 +165,8 @@ FirmwareIAPObj::FirmwareIAPObj(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString MixerStatus::NAME = QString("MixerStatus");
+const QString MixerStatus::DESCRIPTION = QString("Status for the matrix mixer showing the output of each mixer after all scaling");
 
 /**
  * Constructor
@@ -71,6 +72,8 @@ MixerStatus::MixerStatus(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

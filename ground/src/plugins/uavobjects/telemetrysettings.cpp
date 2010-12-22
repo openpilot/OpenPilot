@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString TelemetrySettings::NAME = QString("TelemetrySettings");
+const QString TelemetrySettings::DESCRIPTION = QString("Select baud rate of telemetry.  Warning - this must match your modem.");
 
 /**
  * Constructor
@@ -58,6 +59,8 @@ TelemetrySettings::TelemetrySettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSET
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

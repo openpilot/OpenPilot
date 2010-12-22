@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString GCSTelemetryStats::NAME = QString("GCSTelemetryStats");
+const QString GCSTelemetryStats::DESCRIPTION = QString("The telemetry statistics from the ground computer");
 
 /**
  * Constructor
@@ -70,6 +71,8 @@ GCSTelemetryStats::GCSTelemetryStats(): UAVDataObject(OBJID, ISSINGLEINST, ISSET
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

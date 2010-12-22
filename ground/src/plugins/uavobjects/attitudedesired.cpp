@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString AttitudeDesired::NAME = QString("AttitudeDesired");
+const QString AttitudeDesired::DESCRIPTION = QString("The desired attitude that @ref StabilizationModule will try and achieve if FlightMode is Stabilized.  Comes from @ref ManaulControlModule.");
 
 /**
  * Constructor
@@ -59,6 +60,8 @@ AttitudeDesired::AttitudeDesired(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

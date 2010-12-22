@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString AttitudeActual::NAME = QString("AttitudeActual");
+const QString AttitudeActual::DESCRIPTION = QString("The updated Attitude estimation from @ref AHRSCommsModule.");
 
 /**
  * Constructor
@@ -68,6 +69,8 @@ AttitudeActual::AttitudeActual(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString SystemStats::NAME = QString("SystemStats");
+const QString SystemStats::DESCRIPTION = QString("CPU and memory usage from OpenPilot computer. ");
 
 /**
  * Constructor
@@ -56,6 +57,8 @@ SystemStats::SystemStats(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

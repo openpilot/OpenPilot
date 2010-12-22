@@ -52,6 +52,7 @@ $(DATAFIELDINFO)
     // Constants
     static const quint32 OBJID = $(OBJID)U;
     static const QString NAME;
+    static const QString DESCRIPTION;
     static const bool ISSINGLEINST = $(ISSINGLEINST);
     static const bool ISSETTINGS = $(ISSETTINGS);
     static const quint32 NUMBYTES = sizeof(DataFields);

@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString SystemAlarms::NAME = QString("SystemAlarms");
+const QString SystemAlarms::DESCRIPTION = QString("Alarms from OpenPilot to indicate failure conditions or warnings.  Set by various modules.");
 
 /**
  * Constructor
@@ -64,6 +65,8 @@ SystemAlarms::SystemAlarms(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAM
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

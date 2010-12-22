@@ -88,6 +88,7 @@ public:
     quint32 getInstID();
     bool isSingleInstance();
     QString getName();
+    QString getDescription();
     quint32 getNumBytes(); 
     qint32 pack(quint8* dataOut);
     qint32 unpack(const quint8* dataIn);
@@ -128,12 +129,14 @@ protected:
     quint32 instID;
     bool isSingleInst;
     QString name;
+    QString description;
     quint32 numBytes;
     QMutex* mutex;
     quint8* data;
     QList<UAVObjectField*> fields;
 
     void initializeFields(QList<UAVObjectField*>& fields, quint8* data, quint32 numBytes);
+    void setDescription(const QString& description);
 };
 
 #endif // UAVOBJECT_H

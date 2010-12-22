@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString PositionDesired::NAME = QString("PositionDesired");
+const QString PositionDesired::DESCRIPTION = QString("The position the craft is trying t achieve.  Can come from GCS or @ref PathPlanner ");
 
 /**
  * Constructor
@@ -56,6 +57,8 @@ PositionDesired::PositionDesired(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

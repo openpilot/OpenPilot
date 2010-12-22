@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString $(NAME)::NAME = QString("$(NAME)");
+const QString $(NAME)::DESCRIPTION = QString("$(DESCRIPTION)");
 
 /**
  * Constructor
@@ -47,6 +48,8 @@ $(FIELDSINIT)
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

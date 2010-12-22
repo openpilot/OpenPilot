@@ -117,6 +117,23 @@ QString UAVObject::getName()
 }
 
 /**
+ * Get the description of the object
+ */
+QString UAVObject::getDescription()
+{
+    return description;
+}
+
+/**
+ * Set the description of the object
+ */
+void UAVObject::setDescription(const QString& description)
+{
+    this->description = description;
+}
+
+
+/**
  * Get the total number of bytes of the object's data
  */
 quint32 UAVObject::getNumBytes()

@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString ActuatorDesired::NAME = QString("ActuatorDesired");
+const QString ActuatorDesired::DESCRIPTION = QString("Desired raw, pitch and yaw actuator settings.  Comes from either @ref StabilizationModule or @ref ManualControlModule depending on FlightMode.");
 
 /**
  * Constructor
@@ -65,6 +66,8 @@ ActuatorDesired::ActuatorDesired(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

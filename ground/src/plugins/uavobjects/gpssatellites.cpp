@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString GPSSatellites::NAME = QString("GPSSatellites");
+const QString GPSSatellites::DESCRIPTION = QString("Contains information about the GPS satellites in view from @ref GPSModule.");
 
 /**
  * Constructor
@@ -122,6 +123,8 @@ GPSSatellites::GPSSatellites(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, N
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

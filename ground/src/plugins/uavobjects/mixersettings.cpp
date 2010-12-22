@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString MixerSettings::NAME = QString("MixerSettings");
+const QString MixerSettings::DESCRIPTION = QString("Settings for the @ref ActuatorModule that controls the channel assignments for the mixer based on AircraftType");
 
 /**
  * Constructor
@@ -185,6 +186,8 @@ MixerSettings::MixerSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, N
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

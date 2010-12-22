@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString ManualControlSettings::NAME = QString("ManualControlSettings");
+const QString ManualControlSettings::DESCRIPTION = QString("Settings to indicate how to decode receiver input by @ref ManualControlModule.");
 
 /**
  * Constructor
@@ -239,6 +240,8 @@ ManualControlSettings::ManualControlSettings(): UAVDataObject(OBJID, ISSINGLEINS
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

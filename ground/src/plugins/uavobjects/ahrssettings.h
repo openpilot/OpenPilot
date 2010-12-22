@@ -70,6 +70,7 @@ public:
     // Constants
     static const quint32 OBJID = 3741078856U;
     static const QString NAME;
+    static const QString DESCRIPTION;
     static const bool ISSINGLEINST = 1;
     static const bool ISSETTINGS = 1;
     static const quint32 NUMBYTES = sizeof(DataFields);

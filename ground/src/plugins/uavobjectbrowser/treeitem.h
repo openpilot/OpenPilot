@@ -53,6 +53,12 @@ public:
     int childCount() const;
     int columnCount() const;
     QVariant data(int column = 1) const;
+    QString description() { return m_description; }
+    void setDescription(QString d) { // Split around 40 characters
+        int idx = d.indexOf(" ",40);
+        d.insert(idx,QString("<br>"));
+        m_description = d;
+    }
     // only column 1 (TreeItem::dataColumn) is changed with setData currently
     // other columns are initialized in constructor
     virtual void setData(QVariant value, int column = 1);
@@ -78,8 +84,9 @@ private slots:
 
 private:
     QList<TreeItem*> m_children;
-    // m_data contains: [0] property name, [1] value, and [2] unit
+    // m_data contains: [0] property name, [1] value, [2] unit
     QList<QVariant> m_data;
+    QString m_description;
     TreeItem *m_parent;
     bool m_highlight;
     bool m_changed;
@@ -120,7 +127,7 @@ public:
             TreeItem(data, parent), m_obj(0) { }
     ObjectTreeItem(const QVariant &data, TreeItem *parent = 0) :
             TreeItem(data, parent), m_obj(0) { }
-    void setObject(UAVObject *obj) { m_obj = obj; }
+    void setObject(UAVObject *obj) { m_obj = obj; setDescription(obj->getDescription()); }
     inline UAVObject *object() { return m_obj; }
 private:
     UAVObject *m_obj;

@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString HomeLocation::NAME = QString("HomeLocation");
+const QString HomeLocation::DESCRIPTION = QString("HomeLocation setting which contains the constants to tranlate from longitutde and latitude to NED reference frame.  Automatically set by @ref GPSModule after acquiring a 3D lock.  Used by @ref AHRSCommsModule.");
 
 /**
  * Constructor
@@ -83,6 +84,8 @@ HomeLocation::HomeLocation(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAM
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

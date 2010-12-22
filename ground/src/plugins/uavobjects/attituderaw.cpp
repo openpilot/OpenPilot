@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString AttitudeRaw::NAME = QString("AttitudeRaw");
+const QString AttitudeRaw::DESCRIPTION = QString("The raw attitude sensor data from @ref AHRSCommsModule.  Not always updated.");
 
 /**
  * Constructor
@@ -76,6 +77,8 @@ AttitudeRaw::AttitudeRaw(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

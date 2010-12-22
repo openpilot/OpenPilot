@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString StabilizationSettings::NAME = QString("StabilizationSettings");
+const QString StabilizationSettings::DESCRIPTION = QString("PID settings used by the Stabilization module to combine the @ref AttitudeActual and @ref AttitudeDesired to compute @ref ActuatorDesired");
 
 /**
  * Constructor
@@ -96,6 +97,8 @@ StabilizationSettings::StabilizationSettings(): UAVDataObject(OBJID, ISSINGLEINS
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

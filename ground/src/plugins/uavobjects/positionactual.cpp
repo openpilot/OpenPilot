@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString PositionActual::NAME = QString("PositionActual");
+const QString PositionActual::DESCRIPTION = QString("Contains the current position relative to @ref HomeLocation");
 
 /**
  * Constructor
@@ -56,6 +57,8 @@ PositionActual::PositionActual(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

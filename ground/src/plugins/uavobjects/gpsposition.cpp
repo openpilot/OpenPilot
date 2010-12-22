@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString GPSPosition::NAME = QString("GPSPosition");
+const QString GPSPosition::DESCRIPTION = QString("Future object for the raw GPS data from @ref GPSModule.  Only should be used by @ref AHRSCommsModule.");
 
 /**
  * Constructor
@@ -85,6 +86,8 @@ GPSPosition::GPSPosition(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString FlightBatteryState::NAME = QString("FlightBatteryState");
+const QString FlightBatteryState::DESCRIPTION = QString("Battery status information.  Not currently updated.");
 
 /**
  * Constructor
@@ -56,6 +57,8 @@ FlightBatteryState::FlightBatteryState(): UAVDataObject(OBJID, ISSINGLEINST, ISS
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

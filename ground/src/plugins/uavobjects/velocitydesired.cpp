@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString VelocityDesired::NAME = QString("VelocityDesired");
+const QString VelocityDesired::DESCRIPTION = QString("Used within @ref GuidanceModule to communicate between the task computing the desired velocity and the PID loop to achieve it (running at different rates).");
 
 /**
  * Constructor
@@ -56,6 +57,8 @@ VelocityDesired::VelocityDesired(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

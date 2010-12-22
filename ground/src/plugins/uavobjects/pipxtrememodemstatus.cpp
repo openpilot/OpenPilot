@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString PipXtremeModemStatus::NAME = QString("PipXtremeModemStatus");
+const QString PipXtremeModemStatus::DESCRIPTION = QString("Status for the @ref PipXtremeModem");
 
 /**
  * Constructor
@@ -79,6 +80,8 @@ PipXtremeModemStatus::PipXtremeModemStatus(): UAVDataObject(OBJID, ISSINGLEINST,
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

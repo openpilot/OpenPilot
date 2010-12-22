@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString VelocityActual::NAME = QString("VelocityActual");
+const QString VelocityActual::DESCRIPTION = QString("Updated by @ref AHRSCommsModule and used within @ref GuidanceModulefor velocity control");
 
 /**
  * Constructor
@@ -56,6 +57,8 @@ VelocityActual::VelocityActual(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

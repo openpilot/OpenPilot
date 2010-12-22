@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString GuidanceSettings::NAME = QString("GuidanceSettings");
+const QString GuidanceSettings::DESCRIPTION = QString("Settings for the @ref GuidanceModule");
 
 /**
  * Constructor
@@ -96,6 +97,8 @@ GuidanceSettings::GuidanceSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTI
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

@@ -292,20 +292,21 @@ function [] = OPLogConvert()
 
     pipxtrememodemsettingsIdx = 1;
     PipXtremeModemSettings.timestamp = 0;
+    PipXtremeModemSettings(1).Mode = 0;
+    PipXtremeModemSettings(1).Serial_Baudrate = 0;
     PipXtremeModemSettings(1).Frequency_Calibration = 0;
     PipXtremeModemSettings(1).Frequency_Min = 0;
     PipXtremeModemSettings(1).Frequency_Max = 0;
     PipXtremeModemSettings(1).Frequency = 0;
-    PipXtremeModemSettings(1).RF_Bandwidth = 0;
+    PipXtremeModemSettings(1).Max_RF_Bandwidth = 0;
     PipXtremeModemSettings(1).Max_Tx_Power = 0;
     PipXtremeModemSettings(1).AES_Encryption = 0;
     PipXtremeModemSettings(1).AES_EncryptionKey = zeros(1,16);
-    PipXtremeModemSettings(1).Paired_Serial_Number_CRC = 0;
+    PipXtremeModemSettings(1).Paired_Serial_Number = 0;
 
     pipxtrememodemstatusIdx = 1;
     PipXtremeModemStatus.timestamp = 0;
-    PipXtremeModemStatus(1).Serial_Number = zeros(1,24);
-    PipXtremeModemStatus(1).Serial_Number_CRC = 0;
+    PipXtremeModemStatus(1).Serial_Number = 0;
     PipXtremeModemStatus(1).Up_Time = 0;
     PipXtremeModemStatus(1).Frequency = 0;
     PipXtremeModemStatus(1).RF_Bandwidth = 0;
@@ -487,10 +488,10 @@ function [] = OPLogConvert()
             case 572614706
                 ObjectPersistence(objectpersistenceIdx) = ReadObjectPersistenceObject(fid, timestamp);
                 objectpersistenceIdx = objectpersistenceIdx + 1;
-            case 2660664364
+            case 3822692478
                 PipXtremeModemSettings(pipxtrememodemsettingsIdx) = ReadPipXtremeModemSettingsObject(fid, timestamp);
                 pipxtrememodemsettingsIdx = pipxtrememodemsettingsIdx + 1;
-            case 3920019084
+            case 539085060
                 PipXtremeModemStatus(pipxtrememodemstatusIdx) = ReadPipXtremeModemStatusObject(fid, timestamp);
                 pipxtrememodemstatusIdx = pipxtrememodemstatusIdx + 1;
             case 3765671478
@@ -1090,15 +1091,17 @@ function [PipXtremeModemSettings] = ReadPipXtremeModemSettingsObject(fid, timest
     end
 
     PipXtremeModemSettings.timestamp = timestamp;
+    PipXtremeModemSettings.Mode = double(fread(fid, 1, 'uint8'));
+    PipXtremeModemSettings.Serial_Baudrate = double(fread(fid, 1, 'uint8'));
     PipXtremeModemSettings.Frequency_Calibration = double(fread(fid, 1, 'uint8'));
     PipXtremeModemSettings.Frequency_Min = double(fread(fid, 1, 'uint32'));
     PipXtremeModemSettings.Frequency_Max = double(fread(fid, 1, 'uint32'));
     PipXtremeModemSettings.Frequency = double(fread(fid, 1, 'uint32'));
-    PipXtremeModemSettings.RF_Bandwidth = double(fread(fid, 1, 'uint8'));
+    PipXtremeModemSettings.Max_RF_Bandwidth = double(fread(fid, 1, 'uint8'));
     PipXtremeModemSettings.Max_Tx_Power = double(fread(fid, 1, 'uint8'));
     PipXtremeModemSettings.AES_Encryption = double(fread(fid, 1, 'uint8'));
     PipXtremeModemSettings.AES_EncryptionKey = double(fread(fid, 16, 'uint8'));
-    PipXtremeModemSettings.Paired_Serial_Number_CRC = double(fread(fid, 1, 'uint32'));
+    PipXtremeModemSettings.Paired_Serial_Number = double(fread(fid, 1, 'uint32'));
     % read CRC
     fread(fid, 1, 'uint8');
 end
@@ -1112,8 +1115,7 @@ function [PipXtremeModemStatus] = ReadPipXtremeModemStatusObject(fid, timestamp)
     end
 
     PipXtremeModemStatus.timestamp = timestamp;
-    PipXtremeModemStatus.Serial_Number = double(fread(fid, 24, 'uint8'));
-    PipXtremeModemStatus.Serial_Number_CRC = double(fread(fid, 1, 'uint32'));
+    PipXtremeModemStatus.Serial_Number = double(fread(fid, 1, 'uint32'));
     PipXtremeModemStatus.Up_Time = double(fread(fid, 1, 'uint32'));
     PipXtremeModemStatus.Frequency = double(fread(fid, 1, 'uint32'));
     PipXtremeModemStatus.RF_Bandwidth = double(fread(fid, 1, 'uint32'));

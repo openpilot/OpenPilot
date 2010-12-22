@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString AHRSSettings::NAME = QString("AHRSSettings");
+const QString AHRSSettings::DESCRIPTION = QString("Settings for the @ref AHRSCommsModule to control the algorithm and what is updated");
 
 /**
  * Constructor
@@ -76,6 +77,8 @@ AHRSSettings::AHRSSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAM
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

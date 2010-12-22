@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString RateDesired::NAME = QString("RateDesired");
+const QString RateDesired::DESCRIPTION = QString("Status for the matrix mixer showing the output of each mixer after all scaling");
 
 /**
  * Constructor
@@ -56,6 +57,8 @@ RateDesired::RateDesired(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString AHRSCalibration::NAME = QString("AHRSCalibration");
+const QString AHRSCalibration::DESCRIPTION = QString("Contains the calibration settings for the @ref AHRSCommsModule");
 
 /**
  * Constructor
@@ -104,6 +105,8 @@ AHRSCalibration::AHRSCalibration(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

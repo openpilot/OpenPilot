@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString ManualControlCommand::NAME = QString("ManualControlCommand");
+const QString ManualControlCommand::DESCRIPTION = QString("The output from the @ref ManualControlModule which descodes the receiver inputs.  Overriden by GCS for fly-by-wire control.");
 
 /**
  * Constructor
@@ -106,6 +107,8 @@ ManualControlCommand::ManualControlCommand(): UAVDataObject(OBJID, ISSINGLEINST,
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

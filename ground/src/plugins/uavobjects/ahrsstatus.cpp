@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString AhrsStatus::NAME = QString("AhrsStatus");
+const QString AhrsStatus::DESCRIPTION = QString("Status for the @ref AHRSCommsModule, including communication errors");
 
 /**
  * Constructor
@@ -99,6 +100,8 @@ AhrsStatus::AhrsStatus(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

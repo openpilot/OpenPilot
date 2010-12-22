@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString SystemSettings::NAME = QString("SystemSettings");
+const QString SystemSettings::DESCRIPTION = QString("Select airframe type.  Currently used by @ref ActuatorModule to choose mixing from @ref ActuatorDesired to @ref ActuatorCommand");
 
 /**
  * Constructor
@@ -67,6 +68,8 @@ SystemSettings::SystemSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS,
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

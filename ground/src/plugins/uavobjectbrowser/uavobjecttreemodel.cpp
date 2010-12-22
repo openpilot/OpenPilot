@@ -281,6 +281,11 @@ QVariant UAVObjectTreeModel::data(const QModelIndex &index, int role) const
 //    if (role == Qt::DecorationRole)
 //        return QIcon(":/core/images/openpilot_logo_128.png");
 
+    if (role == Qt::ToolTipRole) {
+        TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
+        return item->description();
+    }
+
     TreeItem *item = static_cast<TreeItem*>(index.internalPointer());
 
     if (index.column() == 0 && role == Qt::BackgroundRole) {

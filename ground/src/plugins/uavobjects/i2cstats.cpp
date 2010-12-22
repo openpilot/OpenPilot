@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString I2CStats::NAME = QString("I2CStats");
+const QString I2CStats::DESCRIPTION = QString("Tracks statistics on the I2C bus.");
 
 /**
  * Constructor
@@ -77,6 +78,8 @@ I2CStats::I2CStats(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

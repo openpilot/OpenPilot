@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString ObjectPersistence::NAME = QString("ObjectPersistence");
+const QString ObjectPersistence::DESCRIPTION = QString("Someone who knows please enter this");
 
 /**
  * Constructor
@@ -68,6 +69,8 @@ ObjectPersistence::ObjectPersistence(): UAVDataObject(OBJID, ISSINGLEINST, ISSET
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

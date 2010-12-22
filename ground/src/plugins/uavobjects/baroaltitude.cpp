@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString BaroAltitude::NAME = QString("BaroAltitude");
+const QString BaroAltitude::DESCRIPTION = QString("The raw data from the barometric sensor with pressure, temperature and altitude estimate.");
 
 /**
  * Constructor
@@ -56,6 +57,8 @@ BaroAltitude::BaroAltitude(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAM
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

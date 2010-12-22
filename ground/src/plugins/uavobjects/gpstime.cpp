@@ -34,6 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString GPSTime::NAME = QString("GPSTime");
+const QString GPSTime::DESCRIPTION = QString("Contains the GPS time from @ref GPSModule.  Required to compute the world magnetic model correctly when setting the home location.");
 
 /**
  * Constructor
@@ -65,6 +66,8 @@ GPSTime::GPSTime(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
     initializeFields(fields, (quint8*)&data, NUMBYTES);
     // Set the default field values
     setDefaultFieldValues();
+    // Set the object description
+    setDescription(DESCRIPTION);
 }
 
 /**

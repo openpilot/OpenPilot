@@ -629,6 +629,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	}
 	#endif
 
+	if (intOpts[iDispQt] || intOpts[iDispGdhe])
 	{
 		boost::unique_lock<boost::mutex> display_lock((*world)->display_mutex);
 		(*world)->display_rendered = false;
@@ -775,7 +776,7 @@ JFR_DEBUG("Robot state stdev after corrections " << sqrt(ublas::matrix_vector_ra
 			#endif
 			renderAll = (intOpts[iRenderAll] != 0);
 
-			if (renderAll)
+			if ((intOpts[iDispQt] || intOpts[iDispGdhe]) && renderAll)
 			{
 				boost::unique_lock<boost::mutex> display_lock((*world)->display_mutex);
 				while(!(*world)->display_rendered && !(*world)->exit()) (*world)->display_condition.wait(display_lock);

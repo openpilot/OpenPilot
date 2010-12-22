@@ -119,8 +119,8 @@ namespace jafar {
 
 			void setup(double reparTh, int killSizeTh, int killSearchTh, double killMatchTh, double killConsistencyTh, double dmin);
 
-				virtual std::string typeName() {
-					return "Obs. Pinhole Euclidean point";
+				virtual std::string typeName() const {
+					return "Pinhole-Euclidean-point";
 				}
 
 

@@ -81,7 +81,7 @@ namespace jafar {
 					return 0;
 				}
 
-				virtual std::string categoryName() {
+				virtual std::string categoryName() const {
 					return "MAP OBJECT";
 				}
 

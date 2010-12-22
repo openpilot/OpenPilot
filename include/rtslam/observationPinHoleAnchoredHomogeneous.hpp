@@ -124,8 +124,8 @@ namespace jafar {
 //					cout << "Deleted observation: " << id() << ": " << typeName() << endl;
 				}
 
-				virtual std::string typeName() {
-					return "Obs. Pinhole Anc. homog. point";
+				virtual std::string typeName() const {
+					return "Pinhole-Anch-homog-point";
 				}
 
 

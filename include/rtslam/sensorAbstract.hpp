@@ -183,7 +183,7 @@ namespace jafar {
 				 */
 				void globalPose(jblas::vec7 & senGlobalPose, jblas::mat & SG_rs);
 
-				virtual std::string categoryName() {
+				virtual std::string categoryName() const {
 					return "SENSOR";
 				}
 

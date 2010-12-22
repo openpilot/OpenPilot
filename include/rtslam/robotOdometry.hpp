@@ -68,7 +68,7 @@ namespace jafar {
 
 				~RobotOdometry(void) {
 				}
-				virtual std::string typeName() {
+				virtual std::string typeName() const {
 					return "Odometry";
 				}
 

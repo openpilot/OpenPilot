@@ -60,7 +60,7 @@ namespace jafar {
 				
 				virtual ~RawAbstract();
 
-				virtual std::string categoryName() {
+				virtual std::string categoryName() const {
 					return "RAW";
 				}
 

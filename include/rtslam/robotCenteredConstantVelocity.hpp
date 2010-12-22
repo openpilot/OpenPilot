@@ -51,7 +51,7 @@ namespace jafar {
 				~RobotCenteredConstantVelocity(void) {
 				}
 
-				virtual std::string typeName() {
+				virtual std::string typeName() const {
 					return "Centered-Constant-velocity";
 				}
 

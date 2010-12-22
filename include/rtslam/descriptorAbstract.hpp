@@ -44,7 +44,7 @@ namespace jafar {
 				 */
 				virtual bool isPredictionValid(const observation_ptr_t & obsPtr) = 0;
 				
-				virtual std::string categoryName() {
+				virtual std::string categoryName() const {
 					return "DESCRIPTOR";
 				}
 

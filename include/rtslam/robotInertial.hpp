@@ -71,7 +71,7 @@ namespace jafar {
 				~RobotInertial() {
 				}
 
-				virtual std::string typeName() {
+				virtual std::string typeName() const {
 					return "Inertial";
 				}
 

@@ -57,7 +57,7 @@ namespace jafar {
 
 				void setup(const size_t id, const string & name, const int _width, const int _height, const vec7 & pose, const vec7 & std, const jblas::vec2 & _s, const vec4 & k, const vec & d, const vec & c);
 
-				virtual std::string typeName() {
+				virtual std::string typeName() const {
 					return "Pin-hole-camera";
 				}
 

@@ -108,9 +108,9 @@ namespace jafar {
 			protected:
 				geometry_t geomType;
 			public:
-				std::string categoryName(){return "LANDMARK";}
-				geometry_t getGeomType(){return geomType;}
-				virtual std::string typeName() {return "Abstract";}
+				std::string categoryName() const {return "LANDMARK";}
+				geometry_t getGeomType() const {return geomType;}
+				virtual std::string typeName() const {return "Abstract";}
 
 				descriptor_ptr_t descriptorPtr; ///< Landmark descriptor
 

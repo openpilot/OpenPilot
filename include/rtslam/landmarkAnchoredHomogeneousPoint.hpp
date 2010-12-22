@@ -45,8 +45,8 @@ namespace jafar {
 //					cout << "Deleted landmark: " << id() << ": " << typeName() << endl;
 				}
 
-				virtual std::string typeName() {
-					return "Anchored homogeneous point";
+				virtual std::string typeName() const {
+					return "Anchored-homogeneous-point";
 				}
 
 

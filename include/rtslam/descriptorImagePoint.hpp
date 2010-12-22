@@ -65,10 +65,10 @@ namespace jafar {
 				DescriptorImagePointFirstView(int descSize);
 				virtual ~DescriptorImagePointFirstView();
 
-/*				virtual std::string typeName() {
-					return "Image point";
+				virtual std::string typeName() const {
+					return "Image-Point-First-View";
 				}
-*/
+
 				virtual void addObservation(const observation_ptr_t & obsPtr);
 				virtual bool predictAppearance(const observation_ptr_t & obsPtrNew);
 				virtual bool isPredictionValid(const observation_ptr_t & obsPtr) { return true; }
@@ -112,6 +112,10 @@ namespace jafar {
 			public:
 				DescriptorImagePointMultiView(int descSize, double scaleStep, double angleStep, PredictionType predictionType);
 				virtual ~DescriptorImagePointMultiView() {}
+				
+				virtual std::string typeName() const {
+					return "Image-Point-Multi-View";
+				}
 				
 				virtual void addObservation(const observation_ptr_t & obsPtr);
 				virtual bool predictAppearance(const observation_ptr_t & obsPtr);

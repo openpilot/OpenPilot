@@ -62,7 +62,7 @@ namespace jafar {
 				virtual ~FeatureAbstract() {
 				}
 
-				virtual std::string categoryName() {
+				virtual std::string categoryName() const {
 					return "FEATURE";
 				}
 

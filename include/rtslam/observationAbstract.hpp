@@ -249,8 +249,8 @@ namespace jafar {
 					id(landmarkPtr()->id());
 				}
 
-				virtual std::string typeName(){return "Observation Abstract";}
-				std::string categoryName() {
+				virtual std::string typeName() const {return "Abstract";}
+				std::string categoryName() const {
 					return "OBSERVATION";
 				}
 

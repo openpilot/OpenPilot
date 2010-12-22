@@ -52,8 +52,8 @@ namespace jafar {
 //					cout << "Deleted landmark: " << id() << ": " << typeName() << endl;
 				}
 
-				virtual std::string typeName() {
-					return "Euclidean point";
+				virtual std::string typeName() const {
+					return "Euclidean-point";
 				}
 
 

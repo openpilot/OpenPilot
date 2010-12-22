@@ -26,7 +26,7 @@ namespace jafar {
 		using namespace std;
 
 		// Serializer function very long: and defined at the end of file
-		// std::ostream& operator <<(std::ostream & s, jafar::rtslam::MapAbstract & map) {
+		// std::ostream& operator <<(std::ostream & s, jafar::rtslam::MapAbstract const & map) {
 
 		/**
 		 * Constructor
@@ -142,7 +142,7 @@ namespace jafar {
 		 *   - observations of landmark from each sensor
 		 */
 		std::ostream& operator <<(std::ostream & s,
-		    const jafar::rtslam::MapAbstract & map) {
+		    jafar::rtslam::MapAbstract const & map) {
 
 			s << "\n% ROBOTS AND SENSORS \n%=========================" << endl;
 			for (MapAbstract::RobotList::const_iterator robIter =

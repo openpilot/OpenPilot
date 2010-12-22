@@ -52,7 +52,7 @@ namespace jafar {
 				 * Operator << for class rawAbstract.
 				 * It shows some informations
 				 */
-				friend ostream& operator <<(ostream & s, jafar::rtslam::RawAbstract & rawA);
+				friend ostream& operator <<(ostream & s, jafar::rtslam::RawAbstract const & rawA);
 
 			public:
 

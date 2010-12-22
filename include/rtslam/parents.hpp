@@ -121,6 +121,14 @@ public:
 		}
 		return sptr;
 	}
+	const Parent_ptr parentPtr(void) const {
+		Parent_ptr sptr = parent_wptr.lock();
+		if (!sptr) {
+			std::cerr << __FILE__ << ":" << __LINE__ << " ChildOf::parentPtr threw weak" << std::endl;
+			throw "WEAK";
+		}
+		return sptr;
+	}
 	Parent& parent(void) {
 		Parent_ptr sptr = parent_wptr.lock();
 		if (!sptr) {
@@ -172,7 +180,10 @@ public:
  * fatherPtr() and father() respectively.
  */
 #define ENABLE_ACCESS_TO_FATHER(Parent)                       \
-		public: boost::shared_ptr<Parent> father##Ptr( void )               \
+		public: \
+  boost::shared_ptr<Parent> father##Ptr( void )               \
+  {  return ChildOf<Parent>::parentPtr(); }                   \
+  const boost::shared_ptr<Parent> father##Ptr( void ) const               \
   {  return ChildOf<Parent>::parentPtr(); }                   \
   Parent& father( void )                                      \
   {    return ChildOf<Parent>::parent();  }                   \
@@ -183,7 +194,10 @@ public:
  * explicit name, to handle the case of multiple parent.
  */
 #define ENABLE_ACCESS_TO_PARENT(Parent,accessName)            \
-		public: boost::shared_ptr<Parent> accessName##Ptr( void )           \
+		public: \
+  boost::shared_ptr<Parent> accessName##Ptr( void )           \
+  {  return ChildOf<Parent>::parentPtr(); }                   \
+  const boost::shared_ptr<Parent> accessName##Ptr( void ) const           \
   {  return ChildOf<Parent>::parentPtr(); }                   \
   Parent& accessName( void )                                  \
   {    return ChildOf<Parent>::parent();  }                   \

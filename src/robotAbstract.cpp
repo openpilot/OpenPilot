@@ -27,7 +27,7 @@ namespace jafar {
 		 * Operator << for class RobotAbstract.
 		 * It shows different information of the robot.
 		 */
-		ostream& operator <<(ostream & s, RobotAbstract & rob) {
+		ostream& operator <<(ostream & s, RobotAbstract const & rob) {
 			s << rob.categoryName() << " " << rob.id() << ": ";
 			if (rob.name().size() > 0) s << rob.name() << ", ";
 			s << "of type " << rob.typeName() << endl;

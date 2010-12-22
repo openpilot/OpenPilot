@@ -109,7 +109,7 @@ namespace jafar {
 		 */
 		class ActiveSearchGrid {
 
-				friend ostream& operator <<(ostream & s, ActiveSearchGrid & grid);
+				friend ostream& operator <<(ostream & s, ActiveSearchGrid const & grid);
 
 			private:
 				veci2 imgSize;

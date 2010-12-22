@@ -36,7 +36,7 @@ namespace jafar {
 		 */
 		class ObjectAbstract {
 
-				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObjectAbstract & obj);
+				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObjectAbstract const & obj);
 
 			public:
 				/**

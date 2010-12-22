@@ -32,7 +32,7 @@ namespace jafar {
 		 * Operator << for class ObservationAbstract.
 		 * It shows different information of the observation.
 		 */
-		std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract & obs) {
+		std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract const & obs) {
 			s << "OBSERVATION " << obs.id() << ": of " << obs.landmarkPtr()->typeName() << " from " << obs.sensorPtr()->typeName()
 			    << endl;
 			s << "Sensor: " << obs.sensorPtr()->id() << ", landmark: " << obs.landmarkPtr()->id() << endl;

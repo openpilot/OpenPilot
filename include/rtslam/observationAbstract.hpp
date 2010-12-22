@@ -141,7 +141,7 @@ namespace jafar {
 		    public boost::enable_shared_from_this<ObservationAbstract>,
 		    public ChildOf<DataManagerAbstract> {
 
-				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract & obs);
+				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract const & obs);
 
 				// define the function linkToParentLandmark().
 				ENABLE_LINK_TO_PARENT(LandmarkAbstract,Landmark,ObservationAbstract)
@@ -158,6 +158,7 @@ namespace jafar {
 
 				void linkToSensor( sensor_ptr_t ptr ) { model->linkToSensor(ptr); }
 				sensor_ptr_t sensorPtr( void ) { return model->sensorPtr(); }
+				const sensor_ptr_t sensorPtr( void ) const { return model->sensorPtr(); }
 				void linkToSensorSpecific( sensor_ptr_t ptr ) { model->linkToSensorSpecific(ptr); }
 
 			public:

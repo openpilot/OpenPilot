@@ -23,7 +23,7 @@ namespace jafar {
 		 * Operator << for class MapObject.
 		 * It shows different information of the object.
 		 */
-		ostream& operator <<(ostream & s, jafar::rtslam::MapObject & obj) {
+		ostream& operator <<(ostream & s, jafar::rtslam::MapObject const & obj) {
 			s << obj.categoryName() << " " << obj.id() << ": ";
 			if (obj.name().size() > 0)
 				s << obj.name() << ", ";

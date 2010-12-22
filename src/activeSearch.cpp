@@ -25,7 +25,7 @@ namespace jafar {
 		// ACTIVE SEARCH TESSELATION GRID
 		///////////////////////////////////////////
 
-		ostream& operator <<(ostream & s, ActiveSearchGrid & grid) {
+		ostream& operator <<(ostream & s, ActiveSearchGrid const & grid) {
 			s << "feature count: " << grid.projectionsCount;
 			return s;
 		}

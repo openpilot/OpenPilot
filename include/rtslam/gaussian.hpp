@@ -307,7 +307,7 @@ namespace jafar {
 
 
 				// Getters
-				inline bool                      hasNullCov()          { return hasNullCov_; }
+				inline bool                      hasNullCov() const    { return hasNullCov_; }
 				inline storage_t                 storage() const       { return storage_;    }
 				inline size_t                    size() const          { return size_;       }
 				inline jblas::ind_array        & ia()                  { return ia_;         }
@@ -397,7 +397,7 @@ namespace jafar {
 				 * For local storage, the mean and covariance data is shown.
 				 * For remote storage, the size of the remote Gaussian is also shown, and the indirect array too.
 				 */
-				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::Gaussian & g_) {
+				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::Gaussian const & g_) {
 
 					if (g_.storage() == LOCAL) {
 						if (g_.hasNullCov()) {

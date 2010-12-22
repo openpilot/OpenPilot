@@ -60,7 +60,7 @@ namespace jafar {
 		    public ParentOf<DataManagerAbstract> {
 
 				friend std::ostream& operator <<(std::ostream & s,
-				    jafar::rtslam::SensorAbstract & sen);
+				    jafar::rtslam::SensorAbstract const & sen);
 
 				// define the function linkToParentRobot().
 			ENABLE_LINK_TO_PARENT(RobotAbstract,Robot,SensorAbstract)

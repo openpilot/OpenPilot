@@ -99,6 +99,7 @@ private slots:
     void enableHomeLocSave(UAVObject *obj);
     void launchAHRSCalibration();
     void saveAHRSCalibration();
+    void launchAccelBiasCalibration();
     void calibPhase2();
     void incrementProgress();
     void ahrsSettingsRequest();
@@ -108,9 +109,11 @@ private slots:
     void computeScaleBias();
     void sixPointCalibrationMode();
     void attitudeRawUpdated(UAVObject * obj);
+    void accelBiasattitudeRawUpdated(UAVObject*);
+
 protected:
     void showEvent(QShowEvent *event);
-
+    void resizeEvent(QResizeEvent *event);
 
 };
 

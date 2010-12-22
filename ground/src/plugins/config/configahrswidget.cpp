@@ -203,6 +203,7 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     // Connect the signals
     connect(m_ahrs->ahrsCalibStart, SIGNAL(clicked()), this, SLOT(launchAHRSCalibration()));
+    connect(m_ahrs->accelBiasStart, SIGNAL(clicked()), this, SLOT(launchAccelBiasCalibration()));
     connect(m_ahrs->ahrsSettingsRequest, SIGNAL(clicked()), this, SLOT(ahrsSettingsRequest()));
     /*
     connect(m_ahrs->algorithm, SIGNAL(currentIndexChanged(int)), this, SLOT(ahrsSettingsSave()));
@@ -233,6 +234,106 @@ void ConfigAHRSWidget::showEvent(QShowEvent *event)
     m_ahrs->ahrsBargraph->fitInView(ahrsbargraph, Qt::KeepAspectRatio);
     m_ahrs->sixPointsHelp->fitInView(paperplane,Qt::KeepAspectRatio);
 }
+
+void ConfigAHRSWidget::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event)
+    m_ahrs->ahrsBargraph->fitInView(ahrsbargraph, Qt::KeepAspectRatio);
+    m_ahrs->sixPointsHelp->fitInView(paperplane,Qt::KeepAspectRatio);
+}
+
+/**
+  Starts an accelerometer bias calibration.
+  */
+void ConfigAHRSWidget::launchAccelBiasCalibration()
+{
+    m_ahrs->accelBiasStart->setEnabled(false);
+
+    // Setup the AHRS to give us the right data at the right rate:
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
+    UAVObjectField* field = obj->getField(QString("BiasCorrectedRaw"));
+    field->setValue("FALSE");
+    obj->updated();
+
+    accel_accum_x.clear();
+    accel_accum_y.clear();
+    accel_accum_z.clear();
+
+    UAVDataObject* ahrsCalib = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
+    ahrsCalib->getField("accel_bias")->setDouble(0,0);
+    ahrsCalib->getField("accel_bias")->setDouble(0,1);
+    ahrsCalib->getField("accel_bias")->setDouble(0,2);
+    ahrsCalib->updated();
+
+    /* Need to get as many AttitudeRaw updates as possible */
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
+    initialMdata = obj->getMetadata();
+    UAVObject::Metadata mdata = initialMdata;
+    mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+    mdata.flightTelemetryUpdatePeriod = 100;
+    obj->setMetadata(mdata);
+
+    // Now connect to the attituderaw updates, gather for 100 samples
+    collectingData = true;
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(accelBiasattitudeRawUpdated(UAVObject*)));
+
+}
+
+/**
+  Updates the accel bias raw values
+  */
+void ConfigAHRSWidget::accelBiasattitudeRawUpdated(UAVObject *obj)
+{
+    UAVObjectField *accel_field = obj->getField(QString("accels_filtered"));
+    Q_ASSERT(accel_field != 0);
+
+    // This is necessary to prevent a race condition on disconnect signal and another update
+    if (collectingData == true) {
+        accel_accum_x.append(accel_field->getValue(0).toDouble());
+        accel_accum_y.append(accel_field->getValue(1).toDouble());
+        accel_accum_z.append(accel_field->getValue(2).toDouble());
+    }
+
+    m_ahrs->accelBiasProgress->setValue(m_ahrs->accelBiasProgress->value()+1);
+
+    if(accel_accum_x.size() >= 100 && collectingData == true) {
+        collectingData = false;
+        disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(attitudeRawUpdated(UAVObject*)));
+        m_ahrs->accelBiasStart->setEnabled(true);
+
+        UAVDataObject* ahrsCalib = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
+        /*
+        double xScale = ahrsCalib->getField("accel_scale")->getDouble(0);
+        double yScale = ahrsCalib->getField("accel_scale")->getDouble(1);
+        double zScale = ahrsCalib->getField("accel_scale")->getDouble(2);
+        */
+
+        double xBias = - listMean(accel_accum_x);
+        double yBias = - listMean(accel_accum_y);
+        double zBias = -9.81 - listMean(accel_accum_z);
+
+        ahrsCalib->getField("accel_bias")->setDouble(xBias,0);
+        ahrsCalib->getField("accel_bias")->setDouble(yBias,1);
+        ahrsCalib->getField("accel_bias")->setDouble(zBias,2);
+
+        ahrsCalib->updated();
+
+        getObjectManager()->getObject(QString("AttitudeRaw"))->setMetadata(initialMdata);
+
+        UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
+        UAVObjectField* field = obj->getField(QString("BiasCorrectedRaw"));
+        field->setValue("TRUE");
+        obj->updated();
+
+        saveAHRSCalibration();
+
+    }
+
+}
+
+
+
 
 /**
   Launches the AHRS sensors calibration
@@ -702,6 +803,7 @@ void ConfigAHRSWidget::ahrsSettingsRequest()
 
     m_ahrs->ahrsCalibStart->setEnabled(true);
     m_ahrs->sixPointsStart->setEnabled(true);
+    m_ahrs->accelBiasStart->setEnabled(true);
     m_ahrs->calibInstructions->setText(QString("Press \"Start\" above to calibrate."));
 
 }

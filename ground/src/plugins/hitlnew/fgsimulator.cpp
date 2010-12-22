@@ -287,7 +287,7 @@ void FGSimulator::processUpdate(const QByteArray& inp)
 	// Get pressure (kpa)
 	float pressure = fields[20].toFloat() * INHG2KPA;
 	// Get VelocityActual Down (cm/s)
-        float velocityActualDown = fields[21].toFloat() * FPS2CMPS;
+        float velocityActualDown = - fields[21].toFloat() * FPS2CMPS;
 	// Get VelocityActual East (cm/s)
 	float velocityActualEast = fields[22].toFloat() * FPS2CMPS;	
 	// Get VelocityActual Down (cm/s)
@@ -396,7 +396,6 @@ void FGSimulator::processUpdate(const QByteArray& inp)
         rawData.gyros_filtered[1] = pitchRate;
         rawData.gyros_filtered[2] = yawRate;
         attRaw->setData(rawData);
-        attRaw->updated();
-
+        // attRaw->updated();
 }
 

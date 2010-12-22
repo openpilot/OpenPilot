@@ -1,6 +1,9 @@
 <xml>
     <object name="PipXtremeModemStatus" singleinstance="true" settings="false">
         <description>Status for the @ref PipXtremeModem</description>
+        <field name="Firmware_Version_Major" units="" type="uint8" elements="1" defaultvalue="0"/>
+        <field name="Firmware_Version_Minor" units="" type="uint8" elements="1" defaultvalue="0"/>
+        
         <field name="Serial_Number" units="" type="uint32" elements="1" defaultvalue="None"/>
 
         <field name="Up_Time" units="ms" type="uint32" elements="1"/>

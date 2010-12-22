@@ -88,6 +88,7 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	data.Frequency = 0;
 	data.Max_RF_Bandwidth = 11;
 	data.Max_Tx_Power = 4;
+	data.Tx_Data_Wait = 10;
 	data.AES_Encryption = 0;
 	data.AES_EncryptionKey[0] = 0;
 	data.AES_EncryptionKey[1] = 0;

@@ -38,6 +38,26 @@ from collections import namedtuple
 # This is a list of instances of the data fields contained in this object
 _fields = [ \
 	uavobject.UAVObjectField(
+		'Firmware_Version_Major',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'Firmware_Version_Minor',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
 		'Serial_Number',
 		'I',
 		1,
@@ -136,7 +156,7 @@ _fields = [ \
 
 class PipXtremeModemStatus(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 539085060
+    OBJID        = 2490854928
     NAME         = "PipXtremeModemStatus"
     METANAME     = "PipXtremeModemStatusMeta"
     ISSINGLEINST = 1

@@ -104,6 +104,9 @@ PipXtremeModemSettings::PipXtremeModemSettings(): UAVDataObject(OBJID, ISSINGLEI
     Max_Tx_PowerEnumOptions.append("17");
     Max_Tx_PowerEnumOptions.append("20");
     fields.append( new UAVObjectField(QString("Max_Tx_Power"), QString("dBm"), UAVObjectField::ENUM, Max_Tx_PowerElemNames, Max_Tx_PowerEnumOptions) );
+    QStringList Tx_Data_WaitElemNames;
+    Tx_Data_WaitElemNames.append("0");
+    fields.append( new UAVObjectField(QString("Tx_Data_Wait"), QString("ms"), UAVObjectField::UINT8, Tx_Data_WaitElemNames, QStringList()) );
     QStringList AES_EncryptionElemNames;
     AES_EncryptionElemNames.append("0");
     QStringList AES_EncryptionEnumOptions;
@@ -174,6 +177,7 @@ void PipXtremeModemSettings::setDefaultFieldValues()
     data.Frequency = 0;
     data.Max_RF_Bandwidth = 11;
     data.Max_Tx_Power = 4;
+    data.Tx_Data_Wait = 10;
     data.AES_Encryption = 0;
     data.AES_EncryptionKey[0] = 0;
     data.AES_EncryptionKey[1] = 0;

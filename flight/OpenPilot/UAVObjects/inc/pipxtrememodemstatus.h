@@ -41,7 +41,7 @@
 #define PIPXTREMEMODEMSTATUS_H
 
 // Object constants
-#define PIPXTREMEMODEMSTATUS_OBJID 539085060U
+#define PIPXTREMEMODEMSTATUS_OBJID 2490854928U
 #define PIPXTREMEMODEMSTATUS_NAME "PipXtremeModemStatus"
 #define PIPXTREMEMODEMSTATUS_METANAME "PipXtremeModemStatusMeta"
 #define PIPXTREMEMODEMSTATUS_ISSINGLEINST 1
@@ -71,6 +71,8 @@
 
 // Object data
 typedef struct {
+    uint8_t Firmware_Version_Major;
+    uint8_t Firmware_Version_Minor;
     uint32_t Serial_Number;
     uint32_t Up_Time;
     uint32_t Frequency;
@@ -84,6 +86,8 @@ typedef struct {
 } __attribute__((packed)) PipXtremeModemStatusData;
 
 // Field information
+// Field Firmware_Version_Major information
+// Field Firmware_Version_Minor information
 // Field Serial_Number information
 // Field Up_Time information
 // Field Frequency information

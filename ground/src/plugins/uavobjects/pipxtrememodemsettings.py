@@ -151,6 +151,16 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
+		'Tx_Data_Wait',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
 		'AES_Encryption',
 		'b',
 		1,
@@ -202,7 +212,7 @@ _fields = [ \
 
 class PipXtremeModemSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 3822692478
+    OBJID        = 444830632
     NAME         = "PipXtremeModemSettings"
     METANAME     = "PipXtremeModemSettingsMeta"
     ISSINGLEINST = 1

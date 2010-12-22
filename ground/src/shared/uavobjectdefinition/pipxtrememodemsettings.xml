@@ -16,6 +16,8 @@
         
         <field name="Max_Tx_Power" units="dBm" type="enum" elements="1" options="1,2,5,8,11,14,17,20" defaultvalue="11"/>
         
+        <field name="Tx_Data_Wait" units="ms" type="uint8" elements="1" defaultvalue="10"/>
+        
         <field name="AES_Encryption" units="" type="enum" elements="1" options="False,True" defaultvalue="False"/>
         <field name="AES_EncryptionKey" units="" type="uint8" elements="16" defaultvalue="None"/>
 

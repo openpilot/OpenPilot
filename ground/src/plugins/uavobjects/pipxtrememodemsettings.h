@@ -51,6 +51,7 @@ public:
         quint32 Frequency;
         quint8 Max_RF_Bandwidth;
         quint8 Max_Tx_Power;
+        quint8 Tx_Data_Wait;
         quint8 AES_Encryption;
         quint8 AES_EncryptionKey[16];
         quint32 Paired_Serial_Number;
@@ -74,6 +75,7 @@ public:
     // Field Max_Tx_Power information
     /* Enumeration options for field Max_Tx_Power */
     typedef enum { MAX_TX_POWER_1=0, MAX_TX_POWER_2=1, MAX_TX_POWER_5=2, MAX_TX_POWER_8=3, MAX_TX_POWER_11=4, MAX_TX_POWER_14=5, MAX_TX_POWER_17=6, MAX_TX_POWER_20=7 } Max_Tx_PowerOptions;
+    // Field Tx_Data_Wait information
     // Field AES_Encryption information
     /* Enumeration options for field AES_Encryption */
     typedef enum { AES_ENCRYPTION_FALSE=0, AES_ENCRYPTION_TRUE=1 } AES_EncryptionOptions;
@@ -84,7 +86,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 3822692478U;
+    static const quint32 OBJID = 444830632U;
     static const QString NAME;
     static const QString DESCRIPTION;
     static const bool ISSINGLEINST = 1;

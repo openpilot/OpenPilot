@@ -43,6 +43,8 @@ class UAVOBJECTS_EXPORT PipXtremeModemStatus: public UAVDataObject
 public:
     // Field structure
     typedef struct {
+        quint8 Firmware_Version_Major;
+        quint8 Firmware_Version_Minor;
         quint32 Serial_Number;
         quint32 Up_Time;
         quint32 Frequency;
@@ -56,6 +58,8 @@ public:
     } __attribute__((packed)) DataFields;
 
     // Field information
+    // Field Firmware_Version_Major information
+    // Field Firmware_Version_Minor information
     // Field Serial_Number information
     // Field Up_Time information
     // Field Frequency information
@@ -70,7 +74,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 539085060U;
+    static const quint32 OBJID = 2490854928U;
     static const QString NAME;
     static const QString DESCRIPTION;
     static const bool ISSINGLEINST = 1;

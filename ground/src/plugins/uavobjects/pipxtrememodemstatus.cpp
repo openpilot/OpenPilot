@@ -43,6 +43,12 @@ PipXtremeModemStatus::PipXtremeModemStatus(): UAVDataObject(OBJID, ISSINGLEINST,
 {
     // Create fields
     QList<UAVObjectField*> fields;
+    QStringList Firmware_Version_MajorElemNames;
+    Firmware_Version_MajorElemNames.append("0");
+    fields.append( new UAVObjectField(QString("Firmware_Version_Major"), QString(""), UAVObjectField::UINT8, Firmware_Version_MajorElemNames, QStringList()) );
+    QStringList Firmware_Version_MinorElemNames;
+    Firmware_Version_MinorElemNames.append("0");
+    fields.append( new UAVObjectField(QString("Firmware_Version_Minor"), QString(""), UAVObjectField::UINT8, Firmware_Version_MinorElemNames, QStringList()) );
     QStringList Serial_NumberElemNames;
     Serial_NumberElemNames.append("0");
     fields.append( new UAVObjectField(QString("Serial_Number"), QString(""), UAVObjectField::UINT32, Serial_NumberElemNames, QStringList()) );
@@ -110,6 +116,8 @@ UAVObject::Metadata PipXtremeModemStatus::getDefaultMetadata()
  */
 void PipXtremeModemStatus::setDefaultFieldValues()
 {
+    data.Firmware_Version_Major = 0;
+    data.Firmware_Version_Minor = 0;
     data.Serial_Number = 0;
 
 }

@@ -41,7 +41,7 @@
 #define PIPXTREMEMODEMSETTINGS_H
 
 // Object constants
-#define PIPXTREMEMODEMSETTINGS_OBJID 3822692478U
+#define PIPXTREMEMODEMSETTINGS_OBJID 444830632U
 #define PIPXTREMEMODEMSETTINGS_NAME "PipXtremeModemSettings"
 #define PIPXTREMEMODEMSETTINGS_METANAME "PipXtremeModemSettingsMeta"
 #define PIPXTREMEMODEMSETTINGS_ISSINGLEINST 1
@@ -79,6 +79,7 @@ typedef struct {
     uint32_t Frequency;
     uint8_t Max_RF_Bandwidth;
     uint8_t Max_Tx_Power;
+    uint8_t Tx_Data_Wait;
     uint8_t AES_Encryption;
     uint8_t AES_EncryptionKey[16];
     uint32_t Paired_Serial_Number;
@@ -102,6 +103,7 @@ typedef enum { PIPXTREMEMODEMSETTINGS_MAX_RF_BANDWIDTH_500=0, PIPXTREMEMODEMSETT
 // Field Max_Tx_Power information
 /* Enumeration options for field Max_Tx_Power */
 typedef enum { PIPXTREMEMODEMSETTINGS_MAX_TX_POWER_1=0, PIPXTREMEMODEMSETTINGS_MAX_TX_POWER_2=1, PIPXTREMEMODEMSETTINGS_MAX_TX_POWER_5=2, PIPXTREMEMODEMSETTINGS_MAX_TX_POWER_8=3, PIPXTREMEMODEMSETTINGS_MAX_TX_POWER_11=4, PIPXTREMEMODEMSETTINGS_MAX_TX_POWER_14=5, PIPXTREMEMODEMSETTINGS_MAX_TX_POWER_17=6, PIPXTREMEMODEMSETTINGS_MAX_TX_POWER_20=7 } PipXtremeModemSettingsMax_Tx_PowerOptions;
+// Field Tx_Data_Wait information
 // Field AES_Encryption information
 /* Enumeration options for field AES_Encryption */
 typedef enum { PIPXTREMEMODEMSETTINGS_AES_ENCRYPTION_FALSE=0, PIPXTREMEMODEMSETTINGS_AES_ENCRYPTION_TRUE=1 } PipXtremeModemSettingsAES_EncryptionOptions;

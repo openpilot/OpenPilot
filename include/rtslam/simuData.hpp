@@ -62,6 +62,7 @@ namespace simu {
 				return true;
 			}
 			bool isPredictionValid(const observation_ptr_t & obsPtr) { return true; }
+			std::ostream& print(std::ostream& os) const { os << appPtr->id; return os; }
 	};
 	
 	

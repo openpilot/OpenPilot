@@ -24,6 +24,14 @@ namespace jafar {
 
 		IdFactory LandmarkAbstract::landmarkIds = IdFactory();
 
+		std::ostream& operator <<(std::ostream & s, jafar::rtslam::LandmarkAbstract const & lmk) {
+			s << "LANDMARK " << lmk.id() << ": of " << lmk.typeName() << endl;
+			s << " .state:  " << lmk.state << endl;
+			DescriptorAbstract *desc = lmk.descriptorPtr.get();
+			s << " .descriptor:" << *desc << endl;
+			return s;
+		}
+		
 		/*
 		 * constructor.
 		 */

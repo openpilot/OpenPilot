@@ -17,6 +17,14 @@ namespace jafar {
 		using namespace ublasExtra;
 		using namespace quaternion;
 
+		std::ostream& operator <<(std::ostream & s, FeatureView const & desc)
+		{
+			s << "  - by sensor " << desc.obsModelPtr->sensorPtr()->id() << " of " << 
+				desc.obsModelPtr->sensorPtr()->typeName() << " at " << desc.senPose;
+			return s;
+		}
+
+		
 		/***************************************************************************
 		 * FeatureView
 		 **************************************************************************/
@@ -86,6 +94,10 @@ app_dst->patch.save(buffer);
 			return true;
 		}
 
+		void DescriptorImagePointFirstView::desc_text(std::ostream& os) const
+		{
+			os << " of " << typeName() << "; " << view << std::endl;
+		}
 
 		/***************************************************************************
 		 * DescriptorImagePointMultiView
@@ -233,6 +245,12 @@ app_dst->patch.save(buffer);
 			return (cosClosestAngle >= cosAngleStep);
 		}
 
+		void DescriptorImagePointMultiView::desc_text(std::ostream& os) const
+		{
+			os << " of " << typeName() << "; " << views.size() << " view(s):" << std::endl;
+			for(FeatureViewList::const_iterator it = views.begin(); it != views.end(); ++it)
+				os << *it << std::endl;
+		}
 
 
 	}

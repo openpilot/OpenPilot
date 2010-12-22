@@ -48,11 +48,15 @@ namespace jafar {
 					return "DESCRIPTOR";
 				}
 
+				virtual void desc_text(std::ostream& os) const {}
 
 		};
 
+		
+		std::ostream& operator <<(std::ostream & s, DescriptorAbstract const & desc);
+		
+		
 	}
-
 }
 
 #endif /* DESCRIPTORABSTRACT_H_ */

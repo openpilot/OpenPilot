@@ -50,6 +50,7 @@ namespace jafar {
 				void initFromObs(const observation_ptr_t & obsPtr, int descSize);
 		};
 
+		std::ostream& operator <<(std::ostream & s, FeatureView const & desc);
 		
 		/**
 		 * This descriptor for image points only keeps the appearance of the feature
@@ -72,6 +73,9 @@ namespace jafar {
 				virtual void addObservation(const observation_ptr_t & obsPtr);
 				virtual bool predictAppearance(const observation_ptr_t & obsPtrNew);
 				virtual bool isPredictionValid(const observation_ptr_t & obsPtr) { return true; }
+				
+				virtual void desc_text(std::ostream& os) const;
+
 		};
 		
 		class DescriptorImagePointFirstViewFactory
@@ -120,6 +124,8 @@ namespace jafar {
 				virtual void addObservation(const observation_ptr_t & obsPtr);
 				virtual bool predictAppearance(const observation_ptr_t & obsPtr);
 				virtual bool isPredictionValid(const observation_ptr_t & obsPtr);
+				
+				virtual void desc_text(std::ostream& os) const;
 				
 			protected:
 				/**

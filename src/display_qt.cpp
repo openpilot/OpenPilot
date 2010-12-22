@@ -427,7 +427,7 @@ std::cout << "connecting slots" << std::endl;
 		
 		if (clickedObs)
 		{
-			std::cout << "-----------------------------------------------" << std::endl;
+			std::cout << "----------------------------------------------- at frame " << framenumber << std::endl;
 			std::cout << *clickedObs << std::endl;
 			std::cout << clickedObs->landmark() << std::endl;
 		}

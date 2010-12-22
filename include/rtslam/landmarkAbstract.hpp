@@ -58,6 +58,7 @@ namespace jafar {
 		class LandmarkAbstract: public MapObject, public ChildOf<MapManagerAbstract> , public boost::enable_shared_from_this<
 		    LandmarkAbstract>, public ParentOf<ObservationAbstract> {
 
+				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::LandmarkAbstract const & obs);
 
 				// define the function linkToParentMapManager().
 		       ENABLE_LINK_TO_PARENT(MapManagerAbstract,MapManager,LandmarkAbstract)

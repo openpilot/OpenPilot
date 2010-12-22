@@ -33,7 +33,7 @@ namespace jafar {
 		 * It shows different information of the observation.
 		 */
 		std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract const & obs) {
-			s << "OBSERVATION " << obs.id() << ": of " << obs.landmarkPtr()->typeName() << " from " << obs.sensorPtr()->typeName()
+			s << "OBSERVATION " << obs.id() << ": of " << obs.typeName() << " from landmark " << obs.landmarkPtr()->typeName() << " and sensor " << obs.sensorPtr()->typeName()
 			    << endl;
 			s << "Sensor: " << obs.sensorPtr()->id() << ", landmark: " << obs.landmarkPtr()->id() << endl;
 			s << " .ia_rsl: " << obs.ia_rsl << endl;

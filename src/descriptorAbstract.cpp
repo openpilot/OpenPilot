@@ -20,6 +20,11 @@ namespace jafar {
 			// TODO Auto-generated destructor stub
 		}
 
-	}
+		std::ostream& operator <<(std::ostream & s, DescriptorAbstract const & desc) {
+			desc.desc_text(s);
+			return s;
+		}
 
+
+	}
 }

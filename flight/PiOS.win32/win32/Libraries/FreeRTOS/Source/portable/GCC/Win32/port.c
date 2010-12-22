@@ -36,6 +36,7 @@
 /* Scheduler includes. */
 #include "FreeRTOS.h"
 #include "task.h"
+#include <shlobj.h>
 
 extern DWORD * pxCurrentTCB;
 
@@ -43,6 +44,8 @@ extern DWORD * pxCurrentTCB;
 	Defines
 ******************************************************************************/
 #define NMI	(1<<CPU_INTR_SWI)
+#define MAX_KEY_LENGTH 255
+
 
 /*
  * Task control block.  A task control block (TCB) is allocated to each task,
@@ -90,6 +93,22 @@ typedef struct tskTaskControlBlock
 
 tskTCB *debug_task_handle;
 
+//MinGW doesn't include MMCSS ...
+//Bummer!
+
+typedef enum _AVRT_PRIORITY
+{
+	AVRT_PRIORITY_LOW = -1,
+	AVRT_PRIORITY_NORMAL,
+	AVRT_PRIORITY_HIGH,
+	AVRT_PRIORITY_CRITICAL
+} AVRT_PRIORITY, *PAVRT_PRIORITY;
+
+typedef HANDLE WINAPI (*set_mm_thread_characteristics)(char *TaskName, LPDWORD TaskIndex);
+typedef BOOL WINAPI (*set_mm_thread_priority)(HANDLE AvrtHandle, AVRT_PRIORITY priority);
+
+set_mm_thread_characteristics AvSetMmThreadCharacteristics;
+set_mm_thread_priority AvSetMmThreadPriority;
 
 /*
 	Win32 simulator doesn't really use a stack. Instead It just
@@ -108,7 +127,7 @@ typedef struct
 
 #define portNO_CRITICAL_NESTING 		( ( unsigned portLONG ) 0 )
 
-#define DEBUG_OUTPUT
+//#define DEBUG_OUTPUT
 //#define ERROR_OUTPUT
 
 #ifdef DEBUG_OUTPUT
@@ -154,6 +173,8 @@ typedef struct
 	#endif
 #endif
 
+typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
+
 /******************************************************************************
 	National prototypes
 ******************************************************************************/
@@ -174,6 +195,9 @@ static volatile portSTACK_TYPE dwEnabledIsr = NMI;	// mask of enabled ISRs (indi
 
 static HANDLE hTickAck;		// acknolwledge tick interrupt
 static HANDLE hTermAck;		// acknowledge termination
+
+BOOL bIsWow64;
+BOOL bUsingMMCSS;
 
 static enum
 {
@@ -221,6 +245,19 @@ static DWORD WINAPI tick_generator(LPVOID lpParameter)
 	HANDLE hObjList[2];
 	float before, after;
 
+	if(bUsingMMCSS)
+	{
+		DWORD taskIndex = 0;
+		HANDLE AvRtHandle = AvSetMmThreadCharacteristics(TEXT("FreeRTOS"), &taskIndex);
+		if(AvRtHandle == NULL)
+		{
+			printf("Error setting MMCSS on the tick generator.");
+			getchar();
+			exit(1);
+		}
+		AvSetMmThreadPriority(AvRtHandle, AVRT_PRIORITY_CRITICAL);
+	}
+
 	hTimer = CreateWaitableTimer(NULL, TRUE, NULL);
 	liDueTime.QuadPart = -(50000 - 10000*(int)msPerTick);	// 5ms -
 	//there is always another tick during WaitForMultipleObjects() while waiting
@@ -262,13 +299,283 @@ static DWORD WINAPI TaskSimThread( LPVOID lpParameter )
 	SSIM_T *psSim=(SSIM_T*)lpParameter;
 	ulCriticalNesting = psSim->ulCriticalNesting;
 
+	if(bUsingMMCSS)
+	{
+		DWORD taskIndex = 0;
+		HANDLE AvRtHandle = AvSetMmThreadCharacteristics("FreeRTOS", &taskIndex);
+		if(AvRtHandle == NULL)
+		{
+			printf("Error setting MMCSS on a task.");
+			getchar();
+			exit(1);
+		}
+	}
+
 	psSim->entry(psSim->pvParameters);
 
 	return 0;
 }
 
+void create_mmcss_registry_entry()
+{
+	HKEY hKey;
+	REGSAM flags = KEY_WRITE;
+	if(bIsWow64)
+		flags |= KEY_WOW64_64KEY;
+
+
+	if(RegCreateKeyEx(HKEY_LOCAL_MACHINE,
+			TEXT("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\FreeRTOS"),
+			0, NULL, 0, flags, NULL,
+			&hKey, NULL) != ERROR_SUCCESS)
+	{
+		printf("Internal error creating MMCSS registry key.");
+		getchar();
+		exit(1);
+	}
+
+	DWORD affinity = 0;
+	DWORD clock_rate = 10000;
+	DWORD gpu_priority = 8;
+	DWORD priority = 2;
+
+	TCHAR *background_only = TEXT("True");
+	TCHAR *scheduling_category = TEXT("High");
+	TCHAR *sfio_priority = TEXT("Normal");
+
+	RegSetValueEx(hKey, TEXT("Affinity"), 0, REG_DWORD,
+			(BYTE *) &affinity, sizeof(DWORD));
+	RegSetValueEx(hKey, TEXT("Clock Rate"), 0, REG_DWORD,
+			(BYTE *) &clock_rate, sizeof(DWORD));
+	RegSetValueEx(hKey, TEXT("GPU Priority"), 0, REG_DWORD,
+			(BYTE *) &gpu_priority, sizeof(DWORD));
+	RegSetValueEx(hKey, TEXT("Priority"), 0, REG_DWORD,
+			(BYTE *) &priority, sizeof(DWORD));
+
+	RegSetValueEx(hKey, TEXT("Background Only"), 0, REG_SZ,
+			(BYTE *) background_only,
+			(DWORD)(lstrlen(background_only)+1)*sizeof(TCHAR));
+	RegSetValueEx(hKey, TEXT("Scheduling Category"), 0, REG_SZ,
+			(BYTE *) scheduling_category,
+			(DWORD)(lstrlen(scheduling_category)+1)*sizeof(TCHAR));
+	RegSetValueEx(hKey, TEXT("SFIO Priority"), 0, REG_SZ,
+			(BYTE *) sfio_priority,
+			(DWORD)(lstrlen(sfio_priority)+1)*sizeof(TCHAR));
+
+	RegCloseKey(hKey);
+}
+
+
+//Boldly taken from MSDN
+BOOL IsUserAdmin(VOID)
+/*++
+Routine Description: This routine returns TRUE if the caller's
+process is a member of the Administrators local group. Caller is NOT
+expected to be impersonating anyone and is expected to be able to
+open its own process and process token.
+Arguments: None.
+Return Value:
+   TRUE - Caller has Administrators local group.
+   FALSE - Caller does not have Administrators local group. --
+*/
+{
+	BOOL b;
+	SID_IDENTIFIER_AUTHORITY NtAuthority = {SECURITY_NT_AUTHORITY};
+	PSID AdministratorsGroup;
+	b = AllocateAndInitializeSid(
+	    &NtAuthority,
+        2,
+        SECURITY_BUILTIN_DOMAIN_RID,
+        DOMAIN_ALIAS_RID_ADMINS,
+        0, 0, 0, 0, 0, 0,
+        &AdministratorsGroup);
+	if(b)
+	{
+		if (!CheckTokenMembership( NULL, AdministratorsGroup, &b))
+		{
+			b = FALSE;
+		}
+		FreeSid(AdministratorsGroup);
+	}
+
+	return b;
+}
+
+//Also boldly taken from MSDN
+void CheckIsWow64()
+{
+	LPFN_ISWOW64PROCESS fnIsWow64Process;
+
+	bIsWow64 = FALSE;
+
+    //IsWow64Process is not available on all supported versions of Windows.
+    //Use GetModuleHandle to get a handle to the DLL that contains the function
+    //and GetProcAddress to get a pointer to the function if available.
+
+    fnIsWow64Process = (LPFN_ISWOW64PROCESS) GetProcAddress(
+        GetModuleHandle(TEXT("kernel32")),"IsWow64Process");
+
+    if(NULL != fnIsWow64Process)
+    {
+        if (!fnIsWow64Process(GetCurrentProcess(),&bIsWow64))
+        {
+            printf("Error determining if FreeRTOS is running in WOW64 mode.");
+            getchar();
+            exit(1);
+        }
+    }
+}
+
+//Check whether we're an elevated process under UAC (only works with Vista and 7)
+BOOL is_elevated_process()
+{
+	HANDLE tokenHandle;
+	TOKEN_ELEVATION isElevated;
+	DWORD returnLength;
+
+	if(!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &tokenHandle))
+	{
+		printf("Error opening process token while verifying elevated rights.");
+		getchar();
+		exit(1);
+	}
+
+	if(!GetTokenInformation(tokenHandle,
+			TokenElevation,
+			(void *) &isElevated, sizeof(isElevated), &returnLength))
+	{
+		printf("Error getting token information while verifying elevated rights.");
+		CloseHandle(tokenHandle);
+		getchar();
+		exit(1);
+	}
+
+	CloseHandle(tokenHandle);
+
+	return (isElevated.TokenIsElevated != 0);
+}
+
+void check_mmcss_registry_entry()
+{
+	HKEY hKey;
+	DWORD numSubKeys;
+	TCHAR subKeyName[MAX_KEY_LENGTH];
+	DWORD subKeyNameSize;
+	BOOL exists = FALSE;
+	REGSAM flags = KEY_READ;
+	LONG enumError;
+	if(bIsWow64)
+		flags |= KEY_WOW64_64KEY;
+
+	//Check for the registry entry
+
+	if(RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+			TEXT("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks"),
+			0, flags,
+			&hKey) != ERROR_SUCCESS)
+	{
+		printf("Error opening MMCSS registry key.");
+		getchar();
+		exit(1);
+	}
+
+	//Enumerate through all subkeys
+	RegQueryInfoKey(hKey, NULL, NULL, NULL,
+			&numSubKeys, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	//printf("Num subkeys: %d\n", (int) numSubKeys);
+	for(DWORD i = 0; i < numSubKeys; i++)
+	{
+		subKeyNameSize = MAX_KEY_LENGTH;
+		if((enumError = RegEnumKeyEx(hKey, i, subKeyName, &subKeyNameSize,
+				NULL, NULL, NULL, NULL)) == ERROR_SUCCESS)
+		{
+			//printf("Subkey name: %s\n", subKeyName);
+			if(lstrcmp(subKeyName, TEXT("FreeRTOS")) == 0)
+			{
+				exists = TRUE;
+			}
+		}
+		else
+			printf("Error enumerating subkeys: %d\n", (int) enumError);
+	}
+
+	RegCloseKey(hKey);
+
+	if(exists)
+	{
+		return;
+	}
+
+	//it doesn't exist
+	//Create it
+
+	//Check for sufficient privileges
+	if(!is_elevated_process())
+	{
+		printf("Error: this program needs elevated privileges to run properly the first time only.\n");
+		printf("Please click 'run as administrator'.\n");
+		getchar();
+		exit(1);
+	}
+
+	create_mmcss_registry_entry();
+}
+
+void load_mmcss()
+{
+	HMODULE hAvrt = LoadLibrary(TEXT("Avrt.dll"));
+	if(hAvrt == NULL)
+	{
+		printf("Error: could not find avrt.dll.");
+		getchar();
+		exit(1);
+	}
+
+	AvSetMmThreadCharacteristics = (set_mm_thread_characteristics)
+			GetProcAddress(hAvrt, TEXT("AvSetMmThreadCharacteristicsA"));
+	AvSetMmThreadPriority = (set_mm_thread_priority)
+			GetProcAddress(hAvrt, TEXT("AvSetMmThreadPriority"));
+}
+
 static void create_system_objects(void)
 {
+	OSVERSIONINFO version;
+
+	version.dwOSVersionInfoSize = sizeof(version);
+	GetVersionEx(&version);
+
+	//For operating systems up to XP, increase the clock rate
+	//and increase the priority as much as possible
+	if(version.dwMajorVersion < 6)
+	{
+		if(IsUserAdmin())
+			SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
+		else
+			SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+
+		//Set timer
+
+		TIMECAPS tc;
+		timeGetDevCaps(&tc, sizeof(tc));
+		msPerTick = tc.wPeriodMin;
+		debug_printf("Ms per tick: %i\n", msPerTick);
+		if(msPerTick > 2)
+		{
+			printf("Warning: your system timer has a low resolution.\n");
+			printf("Either decrease the tick rate, or get a better PC!\n");
+		}
+		timeBeginPeriod(tc.wPeriodMin);
+		bUsingMMCSS = FALSE;
+	}
+	else
+	{
+		//From Vista onward, use MMCSS
+		CheckIsWow64();
+		check_mmcss_registry_entry();
+		load_mmcss();
+		bUsingMMCSS = TRUE;
+	}
+
 	DuplicateHandle(
 		GetCurrentProcess(),
 		GetCurrentThread(),
@@ -278,8 +585,20 @@ static void create_system_objects(void)
 		FALSE,
 		DUPLICATE_SAME_ACCESS);
 
-	SetThreadPriority(hIsrDispatcher, THREAD_PRIORITY_BELOW_NORMAL);
-	SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+	if(bUsingMMCSS)
+	{
+		DWORD taskIndex = 0;
+		HANDLE AvRtHandle = AvSetMmThreadCharacteristics("FreeRTOS", &taskIndex);
+		if(AvRtHandle == NULL)
+		{
+			printf("Error setting MMCSS on the scheduler.");
+			getchar();
+			exit(1);
+		}
+		AvSetMmThreadPriority(AvRtHandle, AVRT_PRIORITY_LOW);
+	}
+	else
+		SetThreadPriority(hIsrDispatcher, THREAD_PRIORITY_BELOW_NORMAL);
 
 	hIsrMutex = CreateMutex(NULL, FALSE, NULL);
 	hIsrInvoke = CreateEvent(NULL, FALSE, FALSE, NULL);
@@ -288,22 +607,12 @@ static void create_system_objects(void)
 
 	dwEnabledIsr |= (1<<CPU_INTR_TICK);
 
-	//Set timer
-
-	TIMECAPS tc;
-	timeGetDevCaps(&tc, sizeof(tc));
-	msPerTick = tc.wPeriodMin;
-	debug_printf("Ms per tick: %i\n", msPerTick);
-	if(msPerTick > 2)
-	{
-		printf("Warning: your system timer has a low resolution.\n");
-		printf("Either decrease the tick rate, or get a better PC!\n");
-	}
-	timeBeginPeriod(tc.wPeriodMin);
-
 #if configUSE_PREEMPTION != 0
-	SetThreadPriority(CreateThread(NULL, 0, tick_generator, NULL, 0, NULL),
-		THREAD_PRIORITY_ABOVE_NORMAL);
+	if(bUsingMMCSS)
+		CreateThread(NULL, 0, tick_generator, NULL, 0, NULL); //It uses MMCSS too
+	else
+		SetThreadPriority(CreateThread(NULL, 0, tick_generator, NULL, 0, NULL),
+				THREAD_PRIORITY_ABOVE_NORMAL);
 #endif
 }
 

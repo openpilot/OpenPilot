@@ -53,6 +53,8 @@
 #ifndef PORTMACRO_H
 #define PORTMACRO_H
 
+#define _WIN32_WINNT 0x600
+
 #include <windows.h>
 #include <tchar.h>
 #include <stdio.h>

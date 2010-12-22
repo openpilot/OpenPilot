@@ -51,13 +51,14 @@
 /* PIOS Board Specific Device Configuration */
 #include "pios_board_posix.h"
 
-/* PIOS Hardware Includes (posix) */
+/* PIOS Hardware Includes (win32) */
 #include <pios_sys.h>
 #include <pios_delay.h>
 #include <pios_led.h>
 #include <pios_sdcard.h>
 #include <pios_udp.h>
 #include <pios_com.h>
+#include <pios_servo.h>
 
 #define NELEMENTS(x) (sizeof(x) / sizeof(*(x)))
 

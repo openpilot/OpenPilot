@@ -1,16 +1,20 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_SERVO RC Servo Functions
+ * @{
  *
- * @file       posix.h  
- * @author     Corvus Corax Copyright (C) 2010.
- * @brief      Definitions to run PiOS on posix
- * @see        The GNU Public License (GPL) Version 2
+ * @file       pios_servo.h  
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      RC Servo functions header.
+ * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 
  * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 2 of the License, or 
+ * the Free Software Foundation; either version 3 of the License, or 
  * (at your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful, but 
@@ -23,15 +27,17 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_POSIX_H
-#define PIOS_POSIX_H
+#ifndef PIOS_SERVO_H
+#define PIOS_SERVO_H
 
-#include <stdint.h>
+/* Public Functions */
+extern void PIOS_Servo_Init(void);
+extern void PIOS_Servo_SetHz(uint16_t onetofour, uint16_t fivetoeight);
+extern void PIOS_Servo_Set(uint8_t Servo, uint16_t Position);
 
-#define FILEINFO FILE*
+#endif /* PIOS_SERVO_H */
 
-#define PIOS_SERVO_NUM_OUTPUTS 8
-#define PIOS_SERVO_NUM_TIMERS PIOS_SERVO_NUM_OUTPUTS
-
-#endif
-
+/**
+  * @}
+  * @}
+  */

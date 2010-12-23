@@ -67,7 +67,7 @@ namespace jafar {
 
 		void DescriptorImagePointFirstView::addObservation(const observation_ptr_t & obsPtr)
 		{
-			if (!view.appearancePtr)
+			if (obsPtr->events.updated && !view.appearancePtr)
 				view.initFromObs(obsPtr, descSize);
 		}
 
@@ -117,13 +117,22 @@ app_dst->patch.save(buffer);
 
 		DescriptorImagePointMultiView::DescriptorImagePointMultiView(int descSize, double scaleStep, double angleStep, PredictionType predictionType):
 			DescriptorAbstract(),
-			descSize(descSize), scaleStep(scaleStep), angleStep(angleStep), predictionType(predictionType), cosAngleStep(cos(angleStep))
+			lastObsFailed(false), descSize(descSize), scaleStep(scaleStep), angleStep(angleStep),
+			predictionType(predictionType), cosAngleStep(cos(angleStep))
 		{
 		}
 		
 		void DescriptorImagePointMultiView::addObservation(const observation_ptr_t & obsPtr)
 		{
-			lastValidView.initFromObs(obsPtr, descSize);
+			if (obsPtr->events.updated)
+			{
+				lastValidView.initFromObs(obsPtr, descSize);
+				lastObsFailed = false;
+			}
+			else if (obsPtr->events.predicted && obsPtr->events.measured && !obsPtr->events.matched)
+			{
+				lastObsFailed = true;
+			}
 		}
 		
 		bool DescriptorImagePointMultiView::predictAppearance(const observation_ptr_t & obsPtr)
@@ -243,7 +252,7 @@ app_dst->patch.save(buffer);
 				checkView(current_pov, current_pov_norm2, lmk, *it, cosClosestAngle, closestView);
 			
 			// if we can't have a good view, we add the last one and try with it
-			if ((!closestView || (cosClosestAngle < cosAngleStep)) && lastValidView.appearancePtr)
+			if ((!closestView || (cosClosestAngle < cosAngleStep && lastObsFailed)) && lastValidView.appearancePtr)
 			{
 				views.push_back(lastValidView);
 				checkView(current_pov, current_pov_norm2, lmk, views.back(), cosClosestAngle, closestView);

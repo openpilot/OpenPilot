@@ -107,6 +107,7 @@ namespace jafar {
 			protected:
 				FeatureViewList views; ///< the different views of the feature
 				FeatureView lastValidView; ///< the last valid view
+				bool lastObsFailed;
 			protected:
 				int descSize; ///< the size of the patches in the descriptor
 				double scaleStep; ///< the difference of scale that provokes storing of a new view, and the max difference of scale to use a view

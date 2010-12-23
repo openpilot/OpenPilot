@@ -315,7 +315,7 @@ JFR_DEBUG_END();
 				if (obs->events.matched) JFR_ASSERT(obs->events.measured && obs->events.visible && obs->events.predicted, "obs matched without previous steps");
 				if (obs->events.updated) JFR_ASSERT(obs->events.matched && obs->events.measured && obs->events.visible && obs->events.predicted, "obs updated without previous steps");
 				
-				if (obs->events.updated) obs->updateDescriptor();
+				obs->updateDescriptor();
 				
 				if (obs->events.measured) obs->counters.nSearch++;
 				if (obs->events.matched) obs->counters.nMatch++;
@@ -428,7 +428,7 @@ JFR_DEBUG_END();
 						obsPtr->events.predicted = false;
 						obsPtr->events.measured = true;
 						obsPtr->events.matched = false;
-						obsPtr->events.updated = false;
+						obsPtr->events.updated = true;
 						obsPtr->measurement = featPtr->measurement;
 
 						// 2c. compute and fill stochastic data for the landmark

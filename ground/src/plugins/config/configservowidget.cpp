@@ -912,7 +912,7 @@ void ConfigServoWidget::updateChannels(UAVObject* controlCommand)
     // Find the channel currently assigned to flightmode
     field = obj->getField("FlightMode");
     int chIndex = field->getOptions().indexOf(field->getValue().toString());
-    if ( chIndex < field->getOptions().length()) {
+    if ( chIndex < field->getOptions().length()-1) {
         float valueScaled;
         int chMin = inSliders.at(chIndex)->minimum();
         int chMax = inSliders.at(chIndex)->maximum();

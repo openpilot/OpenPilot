@@ -57,6 +57,10 @@ UAVObjectParser::UAVObjectParser()
                        QString("uint8") << QString("uint16") << QString("uint32") <<
                        QString("float") << QString("enum");
 
+    fieldTypeNumBytes << int(1) << int(2) << int(4) <<
+                        int(1) << int(2) << int(4) <<
+                        int(4) << int(1);
+
     updateModeStr << QString("UPDATEMODE_PERIODIC") << QString("UPDATEMODE_ONCHANGE") <<
                      QString("UPDATEMODE_MANUAL") << QString("UPDATEMODE_NEVER");
 
@@ -113,6 +117,27 @@ quint32 UAVObjectParser::getObjectID(int objIndex)
     else
     {
         return info->id;
+    }
+}
+
+/**
+ * Get the number of bytes in the data fields of this object
+ */
+int UAVObjectParser::getNumBytes(int objIndex)
+{
+    ObjectInfo* info = objInfo[objIndex];
+    if (info == NULL)
+    {
+        return 0;
+    }
+    else
+    {
+        int numBytes = 0;
+        for (int n = 0; n < info->fields.length(); ++n)
+        {
+            numBytes += info->fields[n]->numBytes * info->fields[n]->numElements;
+        }
+        return numBytes;
     }
 }
 
@@ -454,6 +479,7 @@ QString UAVObjectParser::processObjectFields(QDomNode& childNode, ObjectInfo* in
         if (index >= 0)
         {
             field->type = (FieldType)index;
+            field->numBytes = fieldTypeNumBytes[index];
         }
         else
         {

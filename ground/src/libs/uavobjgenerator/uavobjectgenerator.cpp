@@ -115,7 +115,7 @@ bool UAVObjectGenerator::processAll()
     QString flightObjInit;
     QString gcsObjInit;
     QString pythonObjInit;
-
+    int numBytesTotal = 0;
 
     QString matlabAllocationCode;
     QString matlabSwithCode;
@@ -130,7 +130,9 @@ bool UAVObjectGenerator::processAll()
         {
             QString name = parser->getObjectName(objidx);
             QString namelc = name.toLower();
-            sout << "Generating code for object: " << name << endl;
+            int numBytes = parser->getNumBytes(objidx);
+            numBytesTotal += numBytes;
+            sout << "Generating code for object: " << name << " (" << numBytes << " bytes)" << endl;
             // Check for object ID conflicts
             quint32 id = parser->getObjectID(objidx);
             if ( objIDList.contains(id) || id == 0 )
@@ -256,7 +258,7 @@ bool UAVObjectGenerator::processAll()
 
     // Done
     sout << "Done: processed " << xmlList.length() << " XML files and generated "
-            << objIDList.length() << " objects with no ID collisions." << endl;
+            << objIDList.length() << " objects with no ID collisions. Total size of the data fields is " << numBytesTotal << " bytes." << endl;
     return true;
 }
 

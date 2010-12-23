@@ -69,6 +69,7 @@ public:
         QString units;
         FieldType type;
         int numElements;
+        int numBytes;
         QStringList elementNames;
         QStringList options; // for enums only
         bool defaultElementNames;
@@ -101,6 +102,7 @@ public:
     QList<ObjectInfo*> getObjectInfo();
     QString getObjectName(int objIndex);
     quint32 getObjectID(int objIndex);
+    int getNumBytes(int objIndex);
     bool generateFlightObject(int objIndex, const QString& templateInclude, const QString& templateCode,
                                  QString& outInclude, QString& outCode);
     bool generateGCSObject(int objIndex, const QString& templateInclude, const QString& templateCode,
@@ -119,6 +121,7 @@ private:
     QStringList fieldTypeStrCPPClass;
     QStringList fieldTypeStrMatlab;
     QStringList fieldTypeStrXML;
+    QList<int> fieldTypeNumBytes;
     QStringList updateModeStr;
     QStringList updateModeStrXML;
     QStringList accessModeStr;

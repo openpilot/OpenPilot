@@ -67,10 +67,12 @@ namespace rtslam {
 				measure.std(params.measStd);
 				measure.matchScore = matcher.match(targetAppSpec->patch, *(rawPtr->img),
 					roi, measure.x()(0), measure.x()(1));
-				measure.x() += targetAppSpec->offset;
+				measure.x() += targetAppSpec->offset.x();
+				measure.P() += targetAppSpec->offset.P(); // no cross terms
 				rawPtr->img->extractPatch(appSpec->patch, (int)measure.x()(0), (int)measure.x()(1), appSpec->patch.width(), appSpec->patch.height());
-				appSpec->offset(0) = measure.x()(0) - ((int)(measure.x()(0)) + 0.5);
-				appSpec->offset(1) = measure.x()(1) - ((int)(measure.x()(1)) + 0.5);
+				appSpec->offset.x()(0) = measure.x()(0) - ((int)(measure.x()(0)) + 0.5);
+				appSpec->offset.x()(1) = measure.x()(1) - ((int)(measure.x()(1)) + 0.5);
+				appSpec->offset.P() = measure.P();
 			}
 	};
 
@@ -112,8 +114,9 @@ namespace rtslam {
 					vec pix = featPtr->measurement.x();
 					boost::shared_ptr<AppearanceImagePoint> appPtr = SPTR_CAST<AppearanceImagePoint>(featPtr->appearancePtr);
 					rawData->img->extractPatch(appPtr->patch, (int)pix(0), (int)pix(1), params.patchSize, params.patchSize);
-					appPtr->offset(0) = pix(0) - ((int)pix(0) + 0.5);
-					appPtr->offset(1) = pix(1) - ((int)pix(1) + 0.5);
+					appPtr->offset.x()(0) = pix(0) - ((int)pix(0) + 0.5);
+					appPtr->offset.x()(1) = pix(1) - ((int)pix(1) + 0.5);
+					appPtr->offset.P() = jblas::zero_mat(2); // by definition this is our landmark projection
 
 					return true;
 				} else return false;

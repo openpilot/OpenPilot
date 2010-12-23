@@ -19,9 +19,12 @@ namespace jafar {
 
 		std::ostream& operator <<(std::ostream & s, FeatureView const & fv)
 		{
+			app_img_pnt_ptr_t app = SPTR_CAST<AppearanceImagePoint>(fv.appearancePtr);
+			jblas::vec P(2); P(0) = sqrt(app->offset.P()(0,0)); P(1) = sqrt(app->offset.P()(1,1));
 			s << "  -" << (fv.used ? " [*] " : " ") << "at frame " << fv.frame << 
 				" by sensor " << fv.obsModelPtr->sensorPtr()->id() << " of " << 
-				fv.obsModelPtr->sensorPtr()->typeName() << " at " << fv.senPose;
+				fv.obsModelPtr->sensorPtr()->typeName() << " at " << fv.senPose <<
+				", with offset " << app->offset.x() << " +- " << P;
 			return s;
 		}
 
@@ -42,8 +45,8 @@ namespace jafar {
 			rawimage_ptr_t rawPtr = SPTR_CAST<RawImage>(obsPtr->sensorPtr()->rawPtr);
 			if (rawPtr->img->extractPatch(app->patch, (int)obsPtr->measurement.x()(0), (int)obsPtr->measurement.x()(1), descSize, descSize))
 			{
-				app->offset(0) = obsPtr->measurement.x()(0) - ((int)(obsPtr->measurement.x()(0)) + 0.5);
-				app->offset(1) = obsPtr->measurement.x()(1) - ((int)(obsPtr->measurement.x()(1)) + 0.5);
+				app_img_pnt_ptr_t obsApp = SPTR_CAST<AppearanceImagePoint>(obsPtr->observedAppearance);
+				app->offset = obsApp->offset;
 				appearancePtr = app;
 
 				senPose = obsPtr->sensorPtr()->globalPose();
@@ -90,8 +93,11 @@ namespace jafar {
 			
 			double alpha = zoom * cos(rotation);
 			double beta  = zoom * sin(rotation);
-			app_dst->offset(0) = alpha*app_src->offset(0) +  beta*app_src->offset(1);
-			app_dst->offset(1) = -beta*app_src->offset(0) + alpha*app_src->offset(1);
+			app_dst->offset.x()(0) = alpha*app_src->offset.x()(0) +  beta*app_src->offset.x()(1);
+			app_dst->offset.x()(1) = -beta*app_src->offset.x()(0) + alpha*app_src->offset.x()(1);
+			// this is an approximation for angle, but it's ok
+			app_dst->offset.P()(0,0) = alpha*app_src->offset.P()(0,0) +  beta*app_src->offset.P()(1,1);
+			app_dst->offset.P()(1,1) = -beta*app_src->offset.P()(0,0) + alpha*app_src->offset.P()(1,1);
 			
 /*char buffer[256];
 sprintf(buffer, "descriptor_patch_%03d.png", obsPtrNew->id());
@@ -156,8 +162,9 @@ app_dst->patch.save(buffer);
 					app_src->patch.robustCopy(app_dst->patch, 
 						(app_src->patch.width()-app_dst->patch.width())/2, (app_src->patch.height()-app_dst->patch.height())/2,
 						0, 0, app_dst->patch.width(), app_dst->patch.height());
-					app_dst->offset(0) = app_src->offset(0) + ((app_src->patch.width()-app_dst->patch.width())%2) * 0.5;
-					app_dst->offset(1) = app_src->offset(1) + ((app_src->patch.height()-app_dst->patch.height())%2) * 0.5;
+					app_dst->offset.x()(0) = app_src->offset.x()(0) + ((app_src->patch.width()-app_dst->patch.width())%2) * 0.5;
+					app_dst->offset.x()(1) = app_src->offset.x()(1) + ((app_src->patch.height()-app_dst->patch.height())%2) * 0.5;
+					app_dst->offset.P() = app_src->offset.P();
 				}
 				case ptAffine:
 				{
@@ -167,8 +174,11 @@ app_dst->patch.save(buffer);
 					
 					double alpha = zoom * cos(rotation);
 					double beta  = zoom * sin(rotation);
-					app_dst->offset(0) = alpha*app_src->offset(0) +  beta*app_src->offset(1);
-					app_dst->offset(1) = -beta*app_src->offset(0) + alpha*app_src->offset(1);
+					app_dst->offset.x()(0) = alpha*app_src->offset.x()(0) +  beta*app_src->offset.x()(1);
+					app_dst->offset.x()(1) = -beta*app_src->offset.x()(0) + alpha*app_src->offset.x()(1);
+					// this is an approximation for angle, but it's ok
+					app_dst->offset.P()(0,0) = alpha*app_src->offset.P()(0,0) +  beta*app_src->offset.P()(1,1);
+					app_dst->offset.P()(1,1) = -beta*app_src->offset.P()(0,0) + alpha*app_src->offset.P()(1,1);
 				}
 				case ptHomographic:
 				{

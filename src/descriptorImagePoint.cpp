@@ -9,6 +9,7 @@
 #include "jmath/angle.hpp"
 
 #include "rtslam/descriptorImagePoint.hpp"
+#include "rtslam/rawImage.hpp"
 #include "rtslam/quatTools.hpp"
 
 namespace jafar {
@@ -17,11 +18,33 @@ namespace jafar {
 		using namespace quaternion;
 
 		/***************************************************************************
+		 * FeatureView
+		 **************************************************************************/
+		
+		void FeatureView::initFromObs(const observation_ptr_t & obsPtr, int descSize)
+		{
+			app_img_pnt_ptr_t app(new AppearanceImagePoint(descSize, descSize, CV_8U));
+			rawimage_ptr_t rawPtr = SPTR_CAST<RawImage>(obsPtr->sensorPtr()->rawPtr);
+			if (rawPtr->img->extractPatch(app->patch, (int)obsPtr->measurement.x()(0), (int)obsPtr->measurement.x()(1), descSize, descSize))
+			{
+				app->offset(0) = obsPtr->measurement.x()(0) - ((int)(obsPtr->measurement.x()(0)) + 0.5);
+				app->offset(1) = obsPtr->measurement.x()(1) - ((int)(obsPtr->measurement.x()(1)) + 0.5);
+				appearancePtr = app;
+
+				senPose = obsPtr->sensorPtr()->globalPose();
+				obsModelPtr = obsPtr->model;
+				measurement = obsPtr->measurement.x();
+			}
+		}
+		
+		
+		/***************************************************************************
 		 * DescriptorImagePointFirstView
 		 **************************************************************************/
 
-		DescriptorImagePointFirstView::DescriptorImagePointFirstView():
-			DescriptorAbstract()
+		DescriptorImagePointFirstView::DescriptorImagePointFirstView(int descSize):
+			DescriptorAbstract(),
+			descSize(descSize)
 		{
 		}
 
@@ -31,13 +54,7 @@ namespace jafar {
 		void DescriptorImagePointFirstView::addObservation(const observation_ptr_t & obsPtr)
 		{
 			if (!view.appearancePtr)
-			{
-				app_img_pnt_ptr_t app = SPTR_CAST<AppearanceImagePoint>(obsPtr->observedAppearance);
-				view.senPose = obsPtr->sensorPtr()->globalPose();
-				view.appearancePtr.reset(new AppearanceImagePoint(app->patch, app->offset));
-				view.obsModelPtr = obsPtr->model;
-				view.measurement = obsPtr->measurement.x();
-			}
+				view.initFromObs(obsPtr, descSize);
 		}
 
 
@@ -75,19 +92,15 @@ app_dst->patch.save(buffer);
 		 **************************************************************************/
 
 
-		DescriptorImagePointMultiView::DescriptorImagePointMultiView(double scaleStep, double angleStep, PredictionType predictionType):
+		DescriptorImagePointMultiView::DescriptorImagePointMultiView(int descSize, double scaleStep, double angleStep, PredictionType predictionType):
 			DescriptorAbstract(),
-			scaleStep(scaleStep), angleStep(angleStep), predictionType(predictionType), cosAngleStep(cos(angleStep))
+			descSize(descSize), scaleStep(scaleStep), angleStep(angleStep), predictionType(predictionType), cosAngleStep(cos(angleStep))
 		{
 		}
 		
 		void DescriptorImagePointMultiView::addObservation(const observation_ptr_t & obsPtr)
 		{
-			app_img_pnt_ptr_t app = SPTR_CAST<AppearanceImagePoint>(obsPtr->observedAppearance);
-			lastValidView.senPose = obsPtr->sensorPtr()->globalPose();
-			lastValidView.appearancePtr.reset(new AppearanceImagePoint(app->patch, app->offset));
-			lastValidView.obsModelPtr = obsPtr->model;
-			lastValidView.measurement = obsPtr->measurement.x();
+			lastValidView.initFromObs(obsPtr, descSize);
 		}
 		
 		bool DescriptorImagePointMultiView::predictAppearance(const observation_ptr_t & obsPtr)
@@ -207,7 +220,7 @@ app_dst->patch.save(buffer);
 				checkView(current_pov, current_pov_norm2, lmk, *it, cosClosestAngle, closestView);
 			
 			// if we can't have a good view, we add the last one and try with it
-			if (!closestView || (cosClosestAngle < cosAngleStep))
+			if ((!closestView || (cosClosestAngle < cosAngleStep)) && lastValidView.appearancePtr)
 			{
 				views.push_back(lastValidView);
 				checkView(current_pov, current_pov_norm2, lmk, views.back(), cosClosestAngle, closestView);

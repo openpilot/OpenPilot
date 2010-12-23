@@ -43,6 +43,7 @@ namespace simu {
 			MatcherSimu(LandmarkAbstract::geometry_t type, size_t size, int patchSize, int maxSearchSize, double lowInnov, double threshold, double mahalanobisTh, double measStd, double simuMeasStd):
 				type(type), size(size), noise(NULL)
 			{
+				JFR_ASSERT(patchSize%2, "patchSize must be an odd number!");
 				params.patchSize = patchSize;
 				params.maxSearchSize = maxSearchSize;
 				params.lowInnov = lowInnov;
@@ -106,6 +107,7 @@ namespace simu {
 			DetectorSimu(LandmarkAbstract::geometry_t type, size_t size, int patchSize, double measStd, double simuMeasStd):
 				type(type), size(size), noise(NULL)
 			{
+				JFR_ASSERT(patchSize%2, "patchSize must be an odd number!");
 				params.patchSize = patchSize;
 				params.measStd = measStd;
 				params.measVar = measStd * measStd;

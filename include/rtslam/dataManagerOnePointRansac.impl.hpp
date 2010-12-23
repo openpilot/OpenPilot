@@ -438,6 +438,21 @@ JFR_DEBUG_END();
 						detector->fillDataObs(featPtr, obsPtr);
 
 						featMan->addObs(obsPtr->measurement.x());
+						
+//#ifndef JFR_NDEBUG
+#if 0
+						// check that point is correlated very close from the source (because of interpolation, and to check bugs)
+						obsPtr->project();
+						if (obsPtr->predictAppearance())
+						{
+							jblas::sym_mat P = jblas::identity_mat(obsPtr->expectation.size())*jmath::sqr(4.0);
+							RoiSpec roi(obsPtr->expectation.x(), P, 1.0);
+							obsPtr->searchSize = roi.count();
+							matcher->match(rawData, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
+							JFR_ASSERT(ublas::norm_2(obsPtr->measurement.x()-obsPtr->expectation.x()) <= 0.01);
+						}
+#endif
+						
 						++i;
 					} else // create&init
 					{

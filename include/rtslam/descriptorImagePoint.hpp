@@ -46,6 +46,8 @@ namespace jafar {
 					appearancePtr.reset();
 					obsModelPtr.reset();
 				}
+				
+				void initFromObs(const observation_ptr_t & obsPtr, int descSize);
 		};
 
 		
@@ -55,11 +57,12 @@ namespace jafar {
 		 * In addition it only uses scale and rotation for predicting appearance.
 		 */
 		class DescriptorImagePointFirstView: public jafar::rtslam::DescriptorAbstract {
-			public:
+			protected:
 				FeatureView view;
-
+			protected:
+				int descSize;
 			public:
-				DescriptorImagePointFirstView();
+				DescriptorImagePointFirstView(int descSize);
 				virtual ~DescriptorImagePointFirstView();
 
 /*				virtual std::string typeName() {
@@ -71,7 +74,17 @@ namespace jafar {
 				virtual bool isPredictionValid(const observation_ptr_t & obsPtr) { return true; }
 		};
 		
-		
+		class DescriptorImagePointFirstViewFactory
+		{
+			protected:
+				int descSize; ///< see DescriptorImagePointFirstView::descSize
+			public:
+				DescriptorImagePointFirstViewFactory(int descSize):
+					descSize(descSize) {}
+				DescriptorImagePointFirstView *createDescriptor() 
+					{ return new DescriptorImagePointFirstView(descSize); }
+		};
+				
 		
 		
 		
@@ -89,14 +102,15 @@ namespace jafar {
 			protected:
 				FeatureViewList views; ///< the different views of the feature
 				FeatureView lastValidView; ///< the last valid view
-		protected:
+			protected:
+				int descSize; ///< the size of the patches in the descriptor
 				double scaleStep; ///< the difference of scale that provokes storing of a new view, and the max difference of scale to use a view
 				double angleStep; ///< the difference of angle that provokes storing of a new view, in degrees
 				PredictionType predictionType;
 			private:
 				double cosAngleStep;
 			public:
-				DescriptorImagePointMultiView(double scaleStep, double angleStep, PredictionType predictionType);
+				DescriptorImagePointMultiView(int descSize, double scaleStep, double angleStep, PredictionType predictionType);
 				virtual ~DescriptorImagePointMultiView() {}
 				
 				virtual void addObservation(const observation_ptr_t & obsPtr);
@@ -114,14 +128,15 @@ namespace jafar {
 		class DescriptorImagePointMultiViewFactory
 		{
 			protected:
+				int descSize; ///< see DescriptorImagePointMultiView::descSize
 				double scaleStep; ///< see DescriptorImagePointMultiView::scaleStep
 				double angleStep; ///< see DescriptorImagePointMultiView::angleStep
 				DescriptorImagePointMultiView::PredictionType predictionType; ///< see DescriptorImagePointMultiView::predictionType
 			public:
-				DescriptorImagePointMultiViewFactory(double scaleStep, double angleStep, DescriptorImagePointMultiView::PredictionType predictionType):
-					scaleStep(scaleStep), angleStep(angleStep), predictionType(predictionType) {}
+				DescriptorImagePointMultiViewFactory(int descSize, double scaleStep, double angleStep, DescriptorImagePointMultiView::PredictionType predictionType):
+					descSize(descSize), scaleStep(scaleStep), angleStep(angleStep), predictionType(predictionType) {}
 				DescriptorImagePointMultiView *createDescriptor() 
-					{ return new DescriptorImagePointMultiView(scaleStep, angleStep, predictionType); }
+					{ return new DescriptorImagePointMultiView(descSize, scaleStep, angleStep, predictionType); }
 		};
 		
 	}

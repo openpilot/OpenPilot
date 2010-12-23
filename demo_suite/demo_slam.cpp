@@ -221,8 +221,8 @@ const double REPARAM_TH = 0.1;
 const unsigned HARRIS_CONV_SIZE = 5;
 const double HARRIS_TH = 15.0;
 const double HARRIS_EDDGE = 2.0;
-const unsigned PATCH_DESC = 30;
 
+const unsigned DESC_SIZE = 31;
 const double DESC_SCALE_STEP = 2.0;
 const double DESC_ANGLE_STEP = jmath::degToRad(10.0);
 const DescriptorImagePointMultiView::PredictionType DESC_PREDICTION_TYPE = DescriptorImagePointMultiView::ptAffine;
@@ -566,7 +566,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	
 	if (intOpts[iSimu] != 0)
 	{
-		boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, PATCH_DESC, PIX_NOISE, PIX_NOISE*PIX_NOISE_SIMUFACTOR));
+		boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, PATCH_SIZE, PIX_NOISE, PIX_NOISE*PIX_NOISE_SIMUFACTOR));
 		boost::shared_ptr<simu::MatcherSimu<image::ConvexRoi> > matcher(new simu::MatcherSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, PATCH_SIZE, MAX_SEARCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE, PIX_NOISE*PIX_NOISE_SIMUFACTOR));
 		
 		boost::shared_ptr<DataManager_ImagePoint_Ransac_Simu> dmPt11(new DataManager_ImagePoint_Ransac_Simu(detector, matcher, asGrid, N_UPDATES_TOTAL, N_UPDATES_RANSAC, RANSAC_NTRIES, N_INIT, N_RECOMP_GAINS));
@@ -579,9 +579,9 @@ void demo_slam01_main(world_ptr_t *world) {
 		senPtr11->setHardwareSensor(hardSen11);
 	} else
 	{
-		boost::shared_ptr<DescriptorImagePointMultiViewFactory> descFactory(new DescriptorImagePointMultiViewFactory(DESC_SCALE_STEP, DESC_ANGLE_STEP, DESC_PREDICTION_TYPE));
-		boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE, PATCH_DESC, PIX_NOISE, descFactory));
-	//	boost::shared_ptr<correl::Explorer<correl::Zncc> > znccMatcher(new correl::Explorer<correl::Zncc>());
+		//boost::shared_ptr<DescriptorImagePointFirstViewFactory> descFactory(new DescriptorImagePointFirstViewFactory(DESC_SIZE));
+		boost::shared_ptr<DescriptorImagePointMultiViewFactory> descFactory(new DescriptorImagePointMultiViewFactory(DESC_SIZE, DESC_SCALE_STEP, DESC_ANGLE_STEP, DESC_PREDICTION_TYPE));
+		boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE, PATCH_SIZE, PIX_NOISE, descFactory));
 		boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(MIN_SCORE, PARTIAL_POSITION, PATCH_SIZE, MAX_SEARCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE));
 		
 		boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, N_UPDATES_TOTAL, N_UPDATES_RANSAC, RANSAC_NTRIES, N_INIT, N_RECOMP_GAINS));

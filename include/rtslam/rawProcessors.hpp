@@ -48,6 +48,8 @@ namespace rtslam {
 			ImagePointZnccMatcher(double minScore, double partialPosition, int patchSize, int maxSearchSize, double lowInnov, double threshold, double mahalanobisTh, double measStd):
 				matcher(minScore, partialPosition)
 			{
+				JFR_ASSERT(patchSize%2, "patchSize must be an odd number!");
+				JFR_ASSERT(minScore>=0.0 && minScore<=1, "minScore must be between 0 and 1!");
 				params.patchSize = patchSize;
 				params.maxSearchSize = maxSearchSize;
 				params.lowInnov = lowInnov;
@@ -66,8 +68,7 @@ namespace rtslam {
 				measure.matchScore = matcher.match(targetAppSpec->patch, *(rawPtr->img),
 					roi, measure.x()(0), measure.x()(1));
 				measure.x() += targetAppSpec->offset;
-				rawPtr->img->robustCopy(appSpec->patch, (int)(measure.x()(0))-appSpec->patch.width()/2,
-					(int)(measure.x()(1))-appSpec->patch.height()/2, 0, 0, appSpec->patch.width(), appSpec->patch.height());
+				rawPtr->img->extractPatch(appSpec->patch, (int)measure.x()(0), (int)measure.x()(1), appSpec->patch.width(), appSpec->patch.height());
 				appSpec->offset(0) = measure.x()(0) - ((int)(measure.x()(0)) + 0.5);
 				appSpec->offset(1) = measure.x()(1) - ((int)(measure.x()(1)) + 0.5);
 			}
@@ -90,10 +91,12 @@ namespace rtslam {
 			} params;
 			
 		public:
-			ImagePointHarrisDetector(double convSize, double thres, double edge, int patchSize, double measStd,
+			ImagePointHarrisDetector(int convSize, double thres, double edge, int patchSize, double measStd,
 				boost::shared_ptr<DescriptorImagePointMultiViewFactory> const &descFactory):
 				detector(convSize, thres, edge), descFactory(descFactory)
 			{
+				JFR_ASSERT(convSize%2, "convSize must be an odd number!");
+				JFR_ASSERT(patchSize%2, "patchSize must be an odd number!");
 				params.patchSize = patchSize;
 				params.measStd = measStd;
 				params.measVar = measStd * measStd;
@@ -108,15 +111,7 @@ namespace rtslam {
 					// extract appearance
 					vec pix = featPtr->measurement.x();
 					boost::shared_ptr<AppearanceImagePoint> appPtr = SPTR_CAST<AppearanceImagePoint>(featPtr->appearancePtr);
-					//appPtr->patch.resize(params.patchSize, params.patchSize);
-					//cv::Size size = appPtr->patch.size();
-					cv::Size size(params.patchSize, params.patchSize);
-					
-					int shift_x = (size.width-1)/2;
-					int shift_y = (size.height-1)/2;
-					int x_src = (int)pix(0)-shift_x;
-					int y_src = (int)pix(1)-shift_y;
-					rawData->img->copy(appPtr->patch, x_src, y_src, 0, 0, size.width, size.height);
+					rawData->img->extractPatch(appPtr->patch, (int)pix(0), (int)pix(1), params.patchSize, params.patchSize);
 					appPtr->offset(0) = pix(0) - ((int)pix(0) + 0.5);
 					appPtr->offset(1) = pix(1) - ((int)pix(1) + 0.5);
 
@@ -129,15 +124,15 @@ namespace rtslam {
 				// extract observed appearance
 				app_img_pnt_ptr_t app_src = SPTR_CAST<AppearanceImagePoint>(featPtr->appearancePtr);
 				app_img_pnt_ptr_t app_dst = SPTR_CAST<AppearanceImagePoint>(obsPtr->observedAppearance);
-				app_src->patch.copy(app_dst->patch, (app_src->patch.width()-app_dst->patch.width())/2,
+				app_src->patch.copyTo(app_dst->patch);
+				/*app_src->patch.copy(app_dst->patch, (app_src->patch.width()-app_dst->patch.width())/2,
 						(app_src->patch.height()-app_dst->patch.height())/2, 0, 0,
-						app_dst->patch.width(), app_dst->patch.height());
+						app_dst->patch.width(), app_dst->patch.height());*/
 				app_dst->offset = app_src->offset;
 
 				// create descriptor
 				vec7 globalSensorPose = obsPtr->sensorPtr()->globalPose();
-				desc_img_pnt_mv_ptr_t descPtr(descFactory->createDescriptor());
-//				desc_img_pnt_fv_ptr_t descPtr(new DescriptorImagePointFirstView());
+				descriptor_ptr_t descPtr(descFactory->createDescriptor());
 				descPtr->addObservation(obsPtr);
 				obsPtr->landmarkPtr()->setDescriptor(descPtr);
 			}

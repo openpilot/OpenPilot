@@ -7,7 +7,7 @@
 #include "image/Image.hpp"
 
 namespace jafar {
-namespace qdisplay {
+namespace image {
 
 struct endl_ {};
 struct vsep_ {};
@@ -24,8 +24,6 @@ extern clear_ clear; ///< clear the display
 class oimstream
 {
 	protected:
-		qdisplay::Viewer *viewer;
-		qdisplay::ImageView *view;
 		image::Image image;
 		int width, height;
 		int cursorx, cursory;
@@ -34,9 +32,12 @@ class oimstream
 		void enlargeImage(int width_factor, int height_factor);
 		void makeRoomFor(int pwidth, int pheight);
 		void updateCursorsFor(int pwidth, int pheight);
+	protected:
+		virtual void flush_fun() = 0;
 	public:
-		oimstream(): viewer(NULL), view(NULL) {}
-		~oimstream() { delete viewer; delete view; }
+		oimstream() {}
+		virtual ~oimstream() {}
+		
 		friend oimstream& operator<<(oimstream& os, const image::Image &im);
 		friend oimstream& operator<<(oimstream& os, const endl_ &end);
 		friend oimstream& operator<<(oimstream& os, const vsep_ &end);
@@ -48,8 +49,42 @@ class oimstream
 		void setSeparatorColor();// TODO
 };
 
-extern oimstream imout; ///< equivalent to std::cout for images
+/*
+ * FIXME window is never displayed if there is no cv::waitKey after flush...
+ */
+class imout_t: public oimstream
+{
+	protected:
+		bool created;
+	protected:
+		virtual void flush_fun();
+	public:
+		imout_t(): created(false) {}
+		~imout_t() {}
+};
 
+extern imout_t imout; ///< equivalent to std::cout for images
+
+}}
+
+
+
+namespace jafar {
+namespace qdisplay {
+
+class imout_t: public image::oimstream
+{
+	protected:
+		qdisplay::Viewer *viewer;
+		qdisplay::ImageView *view;
+	protected:
+		virtual void flush_fun();
+	public:
+		imout_t(): viewer(NULL), view(NULL) {}
+		~imout_t() { delete viewer; delete view; }
+};
+
+extern imout_t imout; ///< equivalent to std::cout for images
 
 }}
 

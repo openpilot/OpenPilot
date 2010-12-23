@@ -14,22 +14,46 @@
 
 using namespace jafar;
 
-void display(void *) {
+void display_cv() {
+	image::Image img;
+	img.load(std::string("data/qt.png"), 0);
+	
+	image::imout << img << image::flush;
+	
+	cv::waitKey(2000);
+	
+	image::imout << image::clear;
+	image::imout << img << img << image::endl << img << image::endl << image::vsep;
+	image::imout << img << img << image::hsep << img << image::flush;
+	
+	cv::waitKey(2000);
+}
+
+void display_qt(void *) {
 	image::Image img;
 	img.load(std::string("data/qt.png"), 0);
 
-	qdisplay::imout << img << qdisplay::flush;
+	qdisplay::imout << img << image::flush;
 	
 	qdisplay::qtSleep(2000);
 	
-	qdisplay::imout << qdisplay::clear;
-	qdisplay::imout << img << img << qdisplay::endl << img << qdisplay::endl << qdisplay::vsep;
-	qdisplay::imout << img << img << qdisplay::hsep << img << qdisplay::flush;
+	qdisplay::imout << image::clear;
+	qdisplay::imout << img << img << image::endl << img << image::endl << image::vsep;
+	qdisplay::imout << img << img << image::hsep << img << image::flush;
 	
+	qdisplay::qtSleep(2000);
+	
+	display_cv();
 }
+
 
 int main()
 {
-	qdisplay::QtAppStart((qdisplay::FUNC)&display);
+	qdisplay::QtAppStart((qdisplay::FUNC)&display_qt);
+	
+	//sleep(4);
+	//display_cv();
+
+	
 }
 

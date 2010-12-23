@@ -1,16 +1,15 @@
 #include "qdisplay/imout.hpp"
 
-
+#include <highgui.h>
 
 namespace jafar {
-namespace qdisplay {
+namespace image {
 
 endl_ endl;
 vsep_ vsep;
 hsep_ hsep;
 flush_ flush;
 clear_ clear;
-oimstream imout;
 
 void oimstream::endl_fun()
 {
@@ -79,20 +78,7 @@ oimstream& operator<<(oimstream& os, const hsep_ &end)
 
 oimstream& operator<<(oimstream& os, const flush_ &end)
 {
-	if (!os.viewer)
-	{
-		os.viewer = new Viewer();
-		os.view = new ImageView();
-		os.viewer->setImageView(os.view, 0, 0);
-		os.viewer->resize(240, 320);
-		//viewer->scene()->setSceneRect(0,0,size.width,size.height);
-		os.viewer->setBackgroundColor(0,0,0);
-		os.viewer->setTitle("imout");
-	}
-	
-	os.image.setROI(0, 0, os.width, os.height);
-	os.view->setImage(os.image);
-	os.image.resetROI();
+	os.flush_fun();
 	return os;
 }
 
@@ -103,6 +89,47 @@ oimstream& operator<<(oimstream& os, const clear_ &end)
 	return os;
 }
 
+
+imout_t imout;
+
+void imout_t::flush_fun()
+{
+	if (!created)
+	{
+		cv::namedWindow("image::imout", 1);// CV_WINDOW_NORMAL/* | CV_WINDOW_FREERATIO*/);
+	}
+	
+	image.setROI(0, 0, width, height);
+	cv::imshow("image::imout", image);
+	image.resetROI();
+}
+
+
+}}
+
+
+namespace jafar {
+namespace qdisplay {
+
+void imout_t::flush_fun()
+{
+	if (!viewer)
+	{
+		viewer = new Viewer();
+		view = new ImageView();
+		viewer->setImageView(view, 0, 0);
+		viewer->resize(240, 320);
+		//viewer->scene()->setSceneRect(0,0,size.width,size.height);
+		viewer->setBackgroundColor(0,0,0);
+		viewer->setTitle("qdisplay::imout");
+	}
+	
+	image.setROI(0, 0, width, height);
+	view->setImage(image);
+	image.resetROI();
+}
+
+imout_t imout;
 
 }}
 

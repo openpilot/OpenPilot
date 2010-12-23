@@ -9,6 +9,7 @@
 
 #include "qdisplay/init.hpp"
 #include "qdisplay/imout.hpp"
+#include "image/imout.hpp"
 
 
 

@@ -40,6 +40,8 @@ namespace jafar {
 				appearance_ptr_t appearancePtr;
 				observation_model_ptr_t obsModelPtr;
 				jblas::vec measurement;
+				unsigned frame;
+				bool used;
 				
 				void clear()
 				{

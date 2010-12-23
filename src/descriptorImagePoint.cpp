@@ -19,7 +19,8 @@ namespace jafar {
 
 		std::ostream& operator <<(std::ostream & s, FeatureView const & fv)
 		{
-			s << "  - by sensor " << fv.obsModelPtr->sensorPtr()->id() << " of " << 
+			s << "  -" << (fv.used ? " [*] " : " ") << "at frame " << fv.frame << 
+				" by sensor " << fv.obsModelPtr->sensorPtr()->id() << " of " << 
 				fv.obsModelPtr->sensorPtr()->typeName() << " at " << fv.senPose;
 			return s;
 		}
@@ -48,6 +49,8 @@ namespace jafar {
 				senPose = obsPtr->sensorPtr()->globalPose();
 				obsModelPtr = obsPtr->model;
 				measurement = obsPtr->measurement.x();
+				frame = obsPtr->sensorPtr()->rawCounter;
+				used = false;
 			}
 		}
 		
@@ -228,6 +231,7 @@ app_dst->patch.save(buffer);
 			
 			if (dist_dist < scaleStep*scaleStep && cos_angle > cosClosestAngle)
 				{ closestView = &view; cosClosestAngle = cos_angle; }
+			view.used = false;
 		}
 
 		bool DescriptorImagePointMultiView::getClosestView(const observation_ptr_t & obsPtr, FeatureView* &closestView)
@@ -262,6 +266,7 @@ app_dst->patch.save(buffer);
 			
 			// return final result
 			if (cosClosestAngle < 0.1) closestView = NULL; // really not usable
+			if (closestView) closestView->used = true;
 			return (cosClosestAngle >= cosAngleStep);
 		}
 

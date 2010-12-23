@@ -26,7 +26,7 @@ void display_mono_unique(void*)
 {
 	TRACE; qdisplay::Viewer *viewer = new qdisplay::Viewer;
 	TRACE; image::Image img;
-	TRACE; img.load("demo_suite/qt.png");
+	TRACE; img.load("data/qt.png");
 	TRACE; qdisplay::ImageView *view = new qdisplay::ImageView(img);
 	TRACE; view->setImage(img);
 	TRACE; viewer->setImageView(view, 0, 0);
@@ -57,7 +57,7 @@ void display_mono_periodic(void*)
 	{
 		TRACE; qdisplay::Viewer *viewer = new qdisplay::Viewer;
 		TRACE; image::Image img;
-		TRACE; img.load("demo_suite/qt.png");
+		TRACE; img.load("data/qt.png");
 		TRACE; qdisplay::ImageView *view = new qdisplay::ImageView(img);
 		TRACE; view->setImage(img);
 		TRACE; viewer->setImageView(view, 0, 0);
@@ -107,7 +107,7 @@ void display_stereo_unique(Stereo_struct *sparam)
 			TRACE; sparam->s = new qdisplay::Shape(qdisplay::Shape::ShapeRectangle, 20*(1.5+cos(2*PI*sparam->t/15)), 20*(1.5+sin(2*PI*sparam->t/15)), 3, 3);
 			TRACE; qdisplay::Viewer *viewer = new qdisplay::Viewer;
 			TRACE; image::Image img;
-			TRACE; img.load("demo_suite/qt.png");
+			TRACE; img.load("data/qt.png");
 			TRACE; qdisplay::ImageView *view = new qdisplay::ImageView(img);
 			TRACE; view->setImage(img);
 			TRACE; viewer->setImageView(view, 0, 0);
@@ -140,7 +140,7 @@ void display_stereo_periodic(Stereo_struct *sparam)
 		TRACE; sparam->s = new qdisplay::Shape(qdisplay::Shape::ShapeRectangle, 20*(1.5+cos(2*PI*sparam->t/15)), 20*(1.5+sin(2*PI*sparam->t/15)), 3, 3);
 		TRACE; qdisplay::Viewer *viewer = new qdisplay::Viewer;
 		TRACE; image::Image img;
-		TRACE; img.load("demo_suite/qt.png");
+		TRACE; img.load("data/qt.png");
 		TRACE; qdisplay::ImageView *view = new qdisplay::ImageView(img);
 		TRACE; view->setImage(img);
 		TRACE; viewer->setImageView(view, 0, 0);

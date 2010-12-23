@@ -605,7 +605,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	}
 	
 	//--- force a first display with empty slam to ensure that all windows are loaded
-// cout << "SLAM: forcing first initialization display" << endl;
+// std::cout << "SLAM: forcing first initialization display" << std::endl;
 	#ifdef HAVE_MODULE_QDISPLAY
 	display::ViewerQt *viewerQt = NULL;
 	if (intOpts[iDispQt])
@@ -635,16 +635,16 @@ void demo_slam01_main(world_ptr_t *world) {
 		(*world)->display_rendered = false;
 		display_lock.unlock();
 		(*world)->display_condition.notify_all();
-// cout << "SLAM: now waiting for this display to finish" << endl;
+// std::cout << "SLAM: now waiting for this display to finish" << std::endl;
 		display_lock.lock();
 		while(!(*world)->display_rendered) (*world)->display_condition.wait(display_lock);
 		display_lock.unlock();
 	}
 
-// cout << "SLAM: starting slam" << endl;
+// std::cout << "SLAM: starting slam" << std::endl;
 
 	// Show empty map
-	cout << *mapPtr << endl;
+	std::cout << *mapPtr << std::endl;
 
 	//worldPtr->display_mutex.unlock();
 
@@ -684,16 +684,16 @@ int n_innovation = 0;
 			robIter != mapPtr->robotList().end(); ++robIter)
 		{
 			robot_ptr_t robPtr = *robIter;
-			// cout << "\n================================================== " << endl;
-			// cout << *robPtr << endl;
+			// std::cout << "\n================================================== " << std::endl;
+			// std::cout << *robPtr << std::endl;
 
 			// foreach sensor
 			for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin();
 				senIter != robPtr->sensorList().end(); ++senIter)
 			{
 				sensor_ptr_t senPtr = *senIter;
-				//					cout << "\n________________________________________________ " << endl;
-				//					cout << *senPtr << endl;
+				//					std::cout << "\n________________________________________________ " << std::endl;
+				//					std::cout << *senPtr << std::endl;
 
 				// get raw-data
 				int r = senPtr->acquireRaw();
@@ -711,11 +711,11 @@ int n_innovation = 0;
 					rawdata_lock.unlock();
 #endif
 				}
-// cout << "\n************************************************** " << endl;
+// cout << "\n************************************************** " << std::endl;
 JFR_DEBUG("                 FRAME : " << (*world)->t);
-//				cout << "Robot: " << *robPtr << endl;
-//				cout << "Pert: " << robPtr->perturbation.P() << "\nPert Jac: " << robPtr->XNEW_pert << "\nState pert: " << robPtr->Q << endl;
-//				cout << "Robot state: " << robPtr->state.x() << endl;
+//				std::cout << "Robot: " << *robPtr << std::endl;
+//				std::cout << "Pert: " << robPtr->perturbation.P() << "\nPert Jac: " << robPtr->XNEW_pert << "\nState pert: " << robPtr->Q << std::endl;
+//				std::cout << "Robot state: " << robPtr->state.x() << std::endl;
 
 				// move the filter time to the data raw.
 				robPtr->move(senPtr->getRaw()->timestamp);
@@ -747,14 +747,14 @@ JFR_DEBUG("Robot state stdev after corrections " << sqrt(ublas::matrix_vector_ra
 			if (robPtr1->dt_or_dx > max_dt) max_dt = robPtr1->dt_or_dx;
 
 			// Output info
-//						cout << endl;
-//						cout << "dt: " << (int) (1000 * robPtr1->dt_or_dx) << "ms (match "
+//						std::cout << std::endl;
+//						std::cout << "dt: " << (int) (1000 * robPtr1->dt_or_dx) << "ms (match "
 //						<< total_match_time/1000 << " ms, update " << total_update_time/1000 << "ms). Lmk: [";
-//						cout << mmPoint->landmarkList().size() << "] ";
+//						std::cout << mmPoint->landmarkList().size() << "] ";
 //						for (MapManagerAbstract::LandmarkList::iterator lmkIter =
 //								mmPoint->landmarkList().begin(); lmkIter
 //								!= mmPoint->landmarkList().end(); lmkIter++) {
-//							cout << (*lmkIter)->id() << " ";
+//							std::cout << (*lmkIter)->id() << " ";
 //						}
 
 			for (MapAbstract::MapManagerList::iterator mmIter = mapPtr->mapManagerList().begin(); 
@@ -763,7 +763,7 @@ JFR_DEBUG("Robot state stdev after corrections " << sqrt(ublas::matrix_vector_ra
 				map_manager_ptr_t mapMgr = *mmIter;
 				mapMgr->manage();
 			}
-// cout << "SLAM: processed a frame: t " << (*world)->t << " display_t " << (*world)->display_t << endl;
+// cout << "SLAM: processed a frame: t " << (*world)->t << " display_t " << (*world)->display_t << std::endl;
 
 			bool renderAll;
 			#ifdef HAVE_MODULE_QDISPLAY
@@ -795,11 +795,11 @@ JFR_DEBUG("Robot state stdev after corrections " << sqrt(ublas::matrix_vector_ra
 		unsigned processed_t = (had_data ? (*world)->t : (*world)->t-1);
 		if ((*world)->display_t+1 < processed_t+1)
 		{
-//cout << "SLAM: checking if display has rendered" << endl;
+//cout << "SLAM: checking if display has rendered" << std::endl;
 			boost::unique_lock<boost::mutex> display_lock((*world)->display_mutex);
 			if ((*world)->display_rendered)
 			{
-// cout << "SLAM: display has finished, let's bufferize this one" << endl;
+// cout << "SLAM: display has finished, let's bufferize this one" << std::endl;
 				#ifdef HAVE_MODULE_QDISPLAY
 				display::ViewerQt *viewerQt = NULL;
 				if (intOpts[iDispQt]) viewerQt = PTR_CAST<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
@@ -919,7 +919,7 @@ void demo_slam01_display(world_ptr_t *world) {
 		blocked_lock.unlock();
 		
 		// waiting that display is ready
-// cout << "DISPLAY: waiting for data" << endl;
+// std::cout << "DISPLAY: waiting for data" << std::endl;
 		boost::unique_lock<boost::mutex> display_lock((*world)->display_mutex);
 		if (intOpts[iDispQt] == 0)
 		{
@@ -940,7 +940,7 @@ void demo_slam01_display(world_ptr_t *world) {
 			#endif
 		}
 		display_lock.unlock();
-// cout << "DISPLAY: ok data here, let's start!" << endl;
+// std::cout << "DISPLAY: ok data here, let's start!" << std::endl;
 
 //		if ((*world)->t != prev_t)
 //		{
@@ -987,7 +987,7 @@ void demo_slam01_display(world_ptr_t *world) {
 //			(*world)->display_mutex.unlock();
 //			boost::this_thread::yield();
 //		}
-// cout << "DISPLAY: finished display, marking rendered" << endl;
+// std::cout << "DISPLAY: finished display, marking rendered" << std::endl;
 		display_lock.lock();
 		(*world)->display_rendered = true;
 		display_lock.unlock();

@@ -23,7 +23,6 @@
 
 namespace jafar {
 	namespace rtslam {
-		using namespace std;
 		using namespace jblas;
 		using namespace jmath::ublasExtra;
 

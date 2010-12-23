@@ -38,7 +38,6 @@
 
 namespace jafar {
 	namespace rtslam {
-		using namespace std;
 
 //		class RawImageSimu;
 //		typedef boost::shared_ptr<RawImageSimu> rawimagesimu_ptr_t2;

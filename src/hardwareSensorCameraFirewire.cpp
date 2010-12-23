@@ -215,7 +215,7 @@ namespace hardware {
 			{
 				std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << index();
 				bufferSpecPtr[buff_ready]->img->save(oss.str() + std::string(".pgm"));
-				fstream f; f.open((oss.str() + std::string(".time")).c_str(), ios_base::out); 
+				std::fstream f; f.open((oss.str() + std::string(".time")).c_str(), std::ios_base::out); 
 				f << std::setprecision(20) << bufferPtr[buff_ready]->timestamp << std::endl; f.close();
 			}
 			l.unlock();

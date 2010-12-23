@@ -40,7 +40,6 @@
 
 namespace jafar {
 	namespace rtslam {
-		using namespace std;
 
 		/** Base class for all landmark appearances defined in the module
 		 * rtslam.

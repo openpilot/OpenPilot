@@ -43,7 +43,6 @@
 
 namespace jafar {
 	namespace rtslam {
-		using namespace std;
 
 
 		// Forward declarations of children

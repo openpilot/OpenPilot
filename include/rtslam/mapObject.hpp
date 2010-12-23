@@ -20,7 +20,6 @@
 
 namespace jafar {
 	namespace rtslam {
-		using namespace std;
 
 
 		/**
@@ -30,7 +29,7 @@ namespace jafar {
 		 */
 		class MapObject: public ObjectAbstract {
 
-				friend ostream& operator <<(ostream & s, jafar::rtslam::MapObject const & obj);
+				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::MapObject const & obj);
 
 			public:
 				/**

@@ -26,7 +26,6 @@
 namespace jafar {
 	namespace rtslam {
 		using namespace jblas;
-		using namespace std;
 
 
 		/**
@@ -109,7 +108,7 @@ namespace jafar {
 		 */
 		class ActiveSearchGrid {
 
-				friend ostream& operator <<(ostream & s, ActiveSearchGrid const & grid);
+				friend std::ostream& operator <<(std::ostream & s, ActiveSearchGrid const & grid);
 
 			private:
 				veci2 imgSize;
@@ -220,7 +219,7 @@ namespace jafar {
 				 * \param senPtr pointer to the sensor under consideration.
 				 * \return a map of all observations that are visible from the sensor, ordered according to the information gain.
 				 */
-				map<double, observation_ptr_t> projectAll(const sensor_ptr_t & senPtr, size_t & numVis);
+				std::map<double, observation_ptr_t> projectAll(const sensor_ptr_t & senPtr, size_t & numVis);
 
 				/**
 				 * Predict observed appearance.

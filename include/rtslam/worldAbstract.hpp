@@ -28,7 +28,6 @@ namespace jafar {
 	 * \ingroup rtslam
 	 */
 	namespace rtslam {
-		using namespace std;
 
 		// some forward declarations.
 		class MapAbstract;

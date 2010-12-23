@@ -21,7 +21,6 @@
 
 namespace jafar {
 	namespace rtslam {
-		using namespace std;
 
 		class RobotInertial;
 		typedef boost::shared_ptr<RobotInertial> robinertial_ptr_t;

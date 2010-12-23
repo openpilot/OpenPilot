@@ -44,7 +44,6 @@
 
 namespace jafar {
 	namespace rtslam {
-		using namespace std;
 
 		class RawAbstract: public ObjectAbstract {
 
@@ -52,7 +51,7 @@ namespace jafar {
 				 * Operator << for class rawAbstract.
 				 * It shows some informations
 				 */
-				friend ostream& operator <<(ostream & s, jafar::rtslam::RawAbstract const & rawA);
+				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::RawAbstract const & rawA);
 
 			public:
 

@@ -18,7 +18,6 @@
 
 namespace jafar {
 	namespace rtslam {
-		using namespace std;
 		using namespace jafar::image;
 //		using namespace jafar::fdetect;
 

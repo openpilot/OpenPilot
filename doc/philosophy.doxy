@@ -1,0 +1,102 @@
+/** \page pagePhilosophy Philosophy of RTSLAM
+
+Subpages:
+ - \ref pageParentalLinks
+
+	In a typical SLAM problem, one or more robots navigate an environment, 
+	discovering and mapping landmarks on the way by means of their onboard sensors. 
+	There will usually be several robots of different kinds, 
+	carrying a different number of sensors of different kinds, which gather raw data and, 
+	by processing it, are capable of observing several landmarks of different kinds. 
+	All this variety of data is handled by the present Jafar \ref rtslam  in a way that is quite transparent. 
+	
+  
+  The module segments all data in 5 main classes: the map, robots, sensors, landmarks and observations. 
+  Here is an example of the structure.
+		
+	\image html slam.png "The main objects in rtslam"
+	
+	The hierarchical organization of all these objects is defined family-tree-like, as shown here: 
+	
+	\image html familyTree.png "The family tree hierarchical organization"
+	
+	The family-tree differs from a regular tree in that an object can have more than one parent 
+	(\e ie. a father and a mother). 
+		
+	See the \ref pageParentalLinks page for more information about the parental links.
+  
+	\b REMARK: The existence of the class Observation permits the correct segmentation of data and methods into
+	comprehensive units. 
+	An Observation exists every time there exist a sensor and a landmark, 
+	regardless of the sensor having actually observed the landmark or not.
+	An observation stores everything related with the pair sensor-landmark.
+	Its type is determined by both the sensor type and the landmark type. 
+	Therefore, its methods and data depend on both the type of sensor and the type of landmark,
+	and cannot be stored, owned or contained in any other place. 
+	An Observation has a full existence in its own right, as any other object in SLAM. 
+	- An actual, successful observation is merely a \e measurement. 
+	- A \e measurement is a member of Observation.
+	- Other members are the \e expectation and the \e innovation.
+	
+	Here is an example of the class Observation:
+	\code
+	class ObservationAbstract
+	{
+		public:
+			SensorAbstract   * sensor;                    // Pointer to mother sensor.
+			LandmarkAbstract * landmark;                  // Pointer to father landmark.
+			Expectation      expectation;                 // Expectation. This is a Gaussian.
+			Measurement      measurement;                 // Measurement. This is a Gaussian.
+			Innovation       innovation;                  // Innovation. This is a Gaussian.
+			struct           counters;                    // Event counters for map management.
+			struct           events;                      // Event flags for active-search flow control.
+			virtual bool     project() = 0;               // Project landmark into sensor.
+			virtual bool     isVisible() = 0;             // True if landmark is visible.
+			virtual bool     match();                     // Try to match and get measurement.
+			virtual bool     isIndividuallyConsistent();  // Consistency test.
+			virtual void     back_project() = 0;          // Back-project feature into landmark for initialization.
+	};
+	\endcode
+	
+  Here is an overview of how these objects are treated in this software.
+  
+  - \b Map: A playground base with robots and landmarks, and a stochastic map and filtering engine. 
+  	- It has children \b Robots  and \b Landmarks.
+  	- Its parent would be a higher structure managing multi-map setups. 
+  		This is not yet supported here, but an object \b MultiMap  could just do.
+  	- It knows how to keep all its children up to date in the stochastic map (EKF predictions and corrections).
+  - \b Robot: A frame carrying sensors.
+  	- It has children \b Sensors. 
+  	- It knows its parent \b Map.
+  	- It knows how to move. 
+  - \b Sensor:  A sensing device, with a pose specified in robot frame, and some intrinsic parameters. 
+  	- It has children \b Observations. 
+  	- It knows its parent \b Robot.
+  - \b Landmark:  A geometric entity in outer space, with some parameters in the stochastic map, 
+  	and some out of it. 
+  	- Its children are the \b Observations  that have potentially seen it.
+  	- It knows its parent \b Map. 
+  	- It knows how to transform itself to or from other frames. 
+  	- It knows how to reparametrize itself into another representation. 
+  - \b Observation:  All the information related to the fact that a landmark is observable from a sensor. 
+  	- This is the biggest class in the project.
+  	- It exists if the landmark is potentially observable by the sensor.  		
+  		An actual, successful observation is called a \e measurement.
+  	- It stores everything related to the bynome sensor-landmark, including expectations, 
+  	  measurements, innovations and all related Jacobians.
+  	- It does not have children.
+  	- It knows its parent \b Sensor (mother). 
+  	- It knows to which \b Landmark  it points to (father).
+  	- It knows how to detect new features and match them to landmarks.
+  	- It knows how to project existing landmarks.
+  	- It knows how to back-project features into new landmarks.
+
+  See the jafar::rtslam::MapAbstract class reference for a full dependence diagram. 
+  Observe that many bricks of data derive from a class jafar::rtslam::Gaussian (solid arrows;
+ 	the dashed arrows indicate ownship). This should not be surprising as we are dealing with EKF.
+	See the section \ref secGaussians below for further details.
+  
+  The classes specifying the structure and operation of these objects are defined as Abstract. 
+  They must be derived for each new instance that wants to be incorporated.
+
+*/

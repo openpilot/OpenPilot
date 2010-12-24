@@ -1,4 +1,4 @@
- /** \page pageQuaternion Quaternions in RTSLAM
+/** \page pageQuaternion Quaternions in RTSLAM
  
    
    We specify a quaternion with a unit, column 4-vector

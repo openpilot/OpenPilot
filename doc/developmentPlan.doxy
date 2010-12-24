@@ -1,0 +1,86 @@
+/** \page pageDevelopmentPlan Development plan of RTSLAM
+
+	\b NOTE: This section, as the work advances, should gradually move up to the previous section 
+	and become a stable documentation.
+  
+  \section secInitialDevelopment Initial development
+  
+  Initially, and to make it simple to develop, each abstract contains only one derived class, as follows:
+  
+  	- jafar::rtslam::MapAbstract
+  		- jafar::rtslam::MapEKF : classical local map with fixed origin (robot moves away from origin, 
+  		  all landmarks are referenced to the fixed origin).
+
+  	- jafar::rtslam::RobotAbstract
+  		- jafar::rtslam::RobotConstantVelocity : a 3D constant velocity model.
+  
+  	- jafar::rtslam::SensorAbstract
+  		- jafar::rtslam::SensorPinHole : A pin-hole perspective camera, with radial distorsion 
+  		  and correction models.
+  
+  	- jafar::rtslam::LandmarkAbstract
+  		- jafar::rtslam::LandmarkAnchoredHomogeneousPoint : Anchored homogeneous 3D points \b AHP (x_0,y_0,z_0,x,y,z,w).
+  
+  	- jafar::rtslam::ObservationAbstract : Please note that Observations depend always on 
+  	  two types of objects: sensor type and landmark type.
+  	  - jafar::rtslam::ObservationPinHolePoint : observe a point from a pin-hole sensor. 
+  	    Derive this class still once more to specify which kind of point.
+  			- jafar::rtslam::ObservationPinHoleAnchoredHomogeneousPoint : observe \b AHP from a pin-hole sensor.
+  
+	This sets the initially indispensable classes to start working with vision sensors 
+	and Anchored homogeneous point landmarks that allow undelayed initialization.
+
+	\section secNextDevelopment Next important developments
+	A second set of derivations should perform some additional and useful things such as a few new motion, sensor and landmark models. 
+	For the landmarks, we must start defining re-parametrization methods. 
+	We should also introduce the first of the straight line models.
+
+  	- jafar::rtslam::MapAbstract 
+  		- jafar::rtslam::MapEKFRobocentric : robocentric map where the origin is always brought to the robot pose. 
+  		This may require the extension of all robot classes with the appropriate re-frame functions.
+
+  	- jafar::rtslam::RobotAbstract
+  		- jafar::rtslam::RobotWith2DOdometry : a 3D odometry model with odometry inputs specified in the robot's local 2D plane.
+  		- jafar::rtslam::RobotInertial : a 3D motion model reading IMU measurements.
+  
+  	- jafar::rtslam::SensorAbstract
+  		- jafar::rtslam::SensorBarreto : A Barreto-modeled camera, preferably with distorsion and correction models.
+  
+  	- jafar::rtslam::LandmarkAbstract
+  		- jafar::rtslam::LandmarkEuclideanPoint : Euclidean 3D points \b EP, (x,y,z).
+  		- jafar::rtslam::landmarkAnchoredHomogeneousLine : 
+  			Anchored homogeneous 3D lines AHL3, (x_0,y_0,z_0,x_1,y_1,z_1,w_1,x_2,y_2,z_2,w_2).
+  
+  	- jafar::rtslam::ObservationAbstract : 
+  		Please note that Observations depend always on two types of objects: sensor type and landmark type.
+  	  - jafar::rtslam::ObservationPinHolePoint : observe a point from a pin-hole sensor. 
+  	    Derive this class still once more to specify which kind of point.
+	  		- jafar::rtslam::ObservationPinHoleEuclideanPoint : observe \b EP point from a pin-hole sensor.
+	  		- jafar::rtslam::ObservationBarretoAnchoredHomogeneousPoint : observe \b AHP point from a Barreto sensor.
+  			- jafar::rtslam::ObservationBarretoEuclideanPoint : observe \b EP point from a Barreto sensor.
+  	  - jafar::rtslam::ObservationPinHoleLine : observe a line from a pin-hole sensor. 
+  	    Derive this class still once more to specify which kind of line.
+	  		- jafar::rtslam::ObservationPinHoleAnchoredHomogeneousPointLine : observe \b AHL point from a pin-hole sensor.
+  
+  \section secFutureDevelopments Future developments
+	Further developments could consider building straight line landmark models. 
+	Non-anchored landmarks are to be tested with robocentric maps. 
+	The list below is not exhaustive, nor it tries to impose the order for future development.
+
+ 	- jafar::rtslam::LandmarkAbstract
+  		- jafar::rtslam::landmarkAnchoredModifiedPolarPoint : Anchored modified-polar 3D points AMPP3 (x_0,y_0,z_0,x,y,z,w). 
+  			This is the same as IDP landmarks.
+  		- jafar::rtslam::landmarkHomogeneousLine : Homogeneous 3D lines HL3 (x_1,y_1,z_1,w_1,x_2,y_2,z_2,w_2).
+  
+  	- jafar::rtslam::ObservationAbstract : Please note that Observations depend always on two types of objects: sensor type and landmark type.
+  	  - jafar::rtslam::ObservationPinHolePoint : observe a point from a pin-hole sensor. 
+  	    Derive this class still once more to specify which kind of point.
+	  		- jafar::rtslam::ObservationPinHoleHomogeneousLine : observe \b HL from a pin-hole sensor.
+	  		- jafar::rtslam::ObservationPinHoleAnchoredModifiedPolarPoint : observe \b AMPP from a pin-hole sensor.
+	  		- jafar::rtslam::ObservationBarretoAnchoredModifiedPolarPoint : observe \b AMPP from a Barreto sensor.
+  	  - jafar::rtslam::ObservationPinHoleLine : observe a line from a pin-hole sensor. 
+  	    Derive this class still once more to specify which kind of line.
+	  		- jafar::rtslam::ObservationBarretoAnchoredHomogeneousLine : observe \b AHL line from a Barreto sensor.
+	  		- jafar::rtslam::ObservationBarretoHomogeneousLine : observe \b HL from a Barreto sensor.
+
+*/

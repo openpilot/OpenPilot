@@ -15,10 +15,10 @@
 \section secContents Contents
 
  - \ref secPresentation
- - \ref secPhilosophy
- - \ref secImplementation
- - \ref secPlan
- - \ref secRtslamHistory, \ref secRtslamRequirements and \ref secRtslamInterface
+ - \ref secDevelopersGuide
+ - \ref secRtslamHistory
+ - \ref secRtslamRequirements
+ - \ref secRtslamInterface
  - \ref secReference
  
 \section secPresentation Presentation 
@@ -31,276 +31,26 @@
   - In single-camera mode, it achieves 60fps operation with 640x480 B+W images (on a decent machine)
   - In multi-camera mode this target framerate is to be divided by the number of sensors.
   
-  If you are a developer, jump to \ref secImplementation. Otherwise keep reading.
-  
 
-\section secPhilosophy Philosophy
+\section secDevelopersGuide  Developers guide
 
-	In a typical SLAM problem, one or more robots navigate an environment, 
-	discovering and mapping landmarks on the way by means of their onboard sensors. 
-	There will usually be several robots of different kinds, 
-	carrying a different number of sensors of different kinds, which gather raw data and, 
-	by processing it, are capable of observing several landmarks of different kinds. 
-	All this variety of data is handled by the present Jafar \ref rtslam  in a way that is quite transparent. 
-	
-  
-  The module segments all data in 5 main classes: the map, robots, sensors, landmarks and observations. 
-  Here is an example of the structure.
-		
-	\image html slam.png "The main objects in rtslam"
-	
-	The hierarchical organization of all these objects is defined family-tree-like, as shown here: 
-	
-	\image html familyTree.png "The family tree hierarchical organization"
-	
-	The family-tree differs from a regular tree in that an object can have more than one parent 
-	(\e ie. a father and a mother). 
-		
-	See the \ref pageLinks page for more information about the parental links.
-  
-	\b REMARK: The existence of the class Observation permits the correct segmentation of data and methods into
-	comprehensive units. 
-	An Observation exists every time there exist a sensor and a landmark, 
-	regardless of the sensor having actually observed the landmark or not.
-	An observation stores everything related with the pair sensor-landmark.
-	Its type is determined by both the sensor type and the landmark type. 
-	Therefore, its methods and data depend on both the type of sensor and the type of landmark,
-	and cannot be stored, owned or contained in any other place. 
-	An Observation has a full existence in its own right, as any other object in SLAM. 
-	- An actual, successful observation is merely a \e measurement. 
-	- A \e measurement is a member of Observation.
-	- Other members are the \e expectation and the \e innovation.
-	
-	Here is an example of the class Observation:
-	\code
-	class ObservationAbstract
-	{
-		public:
-			SensorAbstract   * sensor;                    // Pointer to mother sensor.
-			LandmarkAbstract * landmark;                  // Pointer to father landmark.
-			Expectation      expectation;                 // Expectation. This is a Gaussian.
-			Measurement      measurement;                 // Measurement. This is a Gaussian.
-			Innovation       innovation;                  // Innovation. This is a Gaussian.
-			struct           counters;                    // Event counters for map management.
-			struct           events;                      // Event flags for active-search flow control.
-			virtual bool     project() = 0;               // Project landmark into sensor.
-			virtual bool     isVisible() = 0;             // True if landmark is visible.
-			virtual bool     match();                     // Try to match and get measurement.
-			virtual bool     isIndividuallyConsistent();  // Consistency test.
-			virtual void     back_project() = 0;          // Back-project feature into landmark for initialization.
-	};
-	\endcode
-	
-  Here is an overview of how these objects are treated in this software.
-  
-  - \b Map: A playground base with robots and landmarks, and a stochastic map and filtering engine. 
-  	- It has children \b Robots  and \b Landmarks.
-  	- Its parent would be a higher structure managing multi-map setups. 
-  		This is not yet supported here, but an object \b MultiMap  could just do.
-  	- It knows how to keep all its children up to date in the stochastic map (EKF predictions and corrections).
-  - \b Robot: A frame carrying sensors.
-  	- It has children \b Sensors. 
-  	- It knows its parent \b Map.
-  	- It knows how to move. 
-  - \b Sensor:  A sensing device, with a pose specified in robot frame, and some intrinsic parameters. 
-  	- It has children \b Observations. 
-  	- It knows its parent \b Robot.
-  - \b Landmark:  A geometric entity in outer space, with some parameters in the stochastic map, 
-  	and some out of it. 
-  	- Its children are the \b Observations  that have potentially seen it.
-  	- It knows its parent \b Map. 
-  	- It knows how to transform itself to or from other frames. 
-  	- It knows how to reparametrize itself into another representation. 
-  - \b Observation:  All the information related to the fact that a landmark is observable from a sensor. 
-  	- This is the biggest class in the project.
-  	- It exists if the landmark is potentially observable by the sensor.  		
-  		An actual, successful observation is called a \e measurement.
-  	- It stores everything related to the bynome sensor-landmark, including expectations, 
-  	  measurements, innovations and all related Jacobians.
-  	- It does not have children.
-  	- It knows its parent \b Sensor (mother). 
-  	- It knows to which \b Landmark  it points to (father).
-  	- It knows how to detect new features and match them to landmarks.
-  	- It knows how to project existing landmarks.
-  	- It knows how to back-project features into new landmarks.
-
-  See the jafar::rtslam::MapAbstract class reference for a full dependence diagram. 
-  Observe that many bricks of data derive from a class jafar::rtslam::Gaussian (solid arrows;
- 	the dashed arrows indicate ownship). This should not be surprising as we are dealing with EKF.
-	See the section \ref secGaussians below for further details.
-  
-  The classes specifying the structure and operation of these objects are defined as Abstract. 
-  They must be derived for each new instance that wants to be incorporated.
-  
-  ## This is the end of the Philosophy section. Now, meditate.
-
-\section secImplementation Implementation
-
-	If you are not a new developer, jump to the \ref secPlan. If you are new you MUST keep reading here.
-
-	This software aims at being sufficiently general. 
-	However, some things are fixed in advance and should not be the subject of future modification.
-	Important details on these hard-coded decisions follow.
-	
-	\subsection secExternalLibraries External libraries
-	
-	We make use of Boost and OpenCV, which are warped into Jafar modules \ref jmath and \ref image.
-	
-	The graphics part is relegated to \ref qdisplay (2D) and \ref GDHE (3D). 
-	However, \ref rtslam creates libraries that are independent of the graphics output.
-	
-	\subsection secObjectCreation Objects creation policy
-	
-	We are currently discussing on the best way to implement run-time object creation,
-	either using factories or variants.
-	
-	\subsection secEkfSlam EKF-SLAM
-	
-	The stochastic map is a large Gaussian which is maintained by an EKF-SLAM. 
-	Variants could potentially include the UKF and/or the IEKF, 
-	but not the PF as we use Gaussians to represent probability densities.
-	
-	The system does not admit implementations based on non-linear optimization, 
-	such as key-frames SLAM or PTAM.
-	However, it is possible that some particular classes could be used as bricks for these alternative systems. 
-	This is to be evaluated in the future, and no efforts are made here to facilitate such a transition.
-	
-	\subsection secFunctions Functions with Jacobians
-	
-	Nearly all functions involved in EKF-SLAM are required to return Jacobian matrices. 
-	We systematicallly use a fixed terminology for naming Jacobian matrices, 
-	and the chain rule to create Jacobians of composed functions.
-	
-	See the \ref pageJacobians page for more information.
-	
-
-	\subsection secGaussians Gaussians
-	
-	We designed and built the jafar::rtslam::Gaussian class for storing Gaussian variables. 
-	This class is interesting because it admits both local and remote storage, 
-	and thus we can make it point to its own internal data or to data stored 
-	in the big Gaussian residing in the \b Map.
-	A nice feature of this class is that the indirect array of pointers to the Map is explicitly available.
-	This makes the manipulation of banded matrices and cross-variances easy, intuitive, light-weight, readable.
-	
-	\subsection secQuaternions Quaternions
-	
-	All orientation-related magnitudes are stored as quaternions. 
-	These are internally converted to rotation matrices when necessary.
-	Our quaternion is defined as a regular boost bounded_vector of dimension 4.
-	(More exactly, it is a typedef boost::numeric::ublas::bounded_vector<double,4> vec4.)
-	The real part comes first, then the three imaginary parts.
-	All the quaternion algebra is coded inside the module in the file quatTools.hpp.
-	
-	See the \ref pageQuaternion page and quatTools.hpp for more information about quaternions.
-	
-	## This is the end of the Implementation section.
-  
-\section secPlan  Development plan
-
-	\b NOTE: This section, as the work advances, should gradually move up to the previous section 
-	and become a stable documentation.
-  
-  \subsection secInitialDevelopment Initial development
-  
-  Initially, and to make it simple to develop, each abstract contains only one derived class, as follows:
-  
-  	- jafar::rtslam::MapAbstract
-  		- jafar::rtslam::MapEKF : classical local map with fixed origin (robot moves away from origin, 
-  		  all landmarks are referenced to the fixed origin).
-
-  	- jafar::rtslam::RobotAbstract
-  		- jafar::rtslam::RobotConstantVelocity : a 3D constant velocity model.
-  
-  	- jafar::rtslam::SensorAbstract
-  		- jafar::rtslam::SensorPinHole : A pin-hole perspective camera, with radial distorsion 
-  		  and correction models.
-  
-  	- jafar::rtslam::LandmarkAbstract
-  		- jafar::rtslam::LandmarkAnchoredHomogeneousPoint : Anchored homogeneous 3D points \b AHP (x_0,y_0,z_0,x,y,z,w).
-  
-  	- jafar::rtslam::ObservationAbstract : Please note that Observations depend always on 
-  	  two types of objects: sensor type and landmark type.
-  	  - jafar::rtslam::ObservationPinHolePoint : observe a point from a pin-hole sensor. 
-  	    Derive this class still once more to specify which kind of point.
-  			- jafar::rtslam::ObservationPinHoleAnchoredHomogeneousPoint : observe \b AHP from a pin-hole sensor.
-  
-	This sets the initially indispensable classes to start working with vision sensors 
-	and Anchored homogeneous point landmarks that allow undelayed initialization.
-
-	\subsection secNextDevelopment Next important developments
-	A second set of derivations should perform some additional and useful things such as a few new motion, sensor and landmark models. 
-	For the landmarks, we must start defining re-parametrization methods. 
-	We should also introduce the first of the straight line models.
-
-  	- jafar::rtslam::MapAbstract 
-  		- jafar::rtslam::MapEKFRobocentric : robocentric map where the origin is always brought to the robot pose. 
-  		This may require the extension of all robot classes with the appropriate re-frame functions.
-
-  	- jafar::rtslam::RobotAbstract
-  		- jafar::rtslam::RobotWith2DOdometry : a 3D odometry model with odometry inputs specified in the robot's local 2D plane.
-  		- jafar::rtslam::RobotInertial : a 3D motion model reading IMU measurements.
-  
-  	- jafar::rtslam::SensorAbstract
-  		- jafar::rtslam::SensorBarreto : A Barreto-modeled camera, preferably with distorsion and correction models.
-  
-  	- jafar::rtslam::LandmarkAbstract
-  		- jafar::rtslam::LandmarkEuclideanPoint : Euclidean 3D points \b EP, (x,y,z).
-  		- jafar::rtslam::landmarkAnchoredHomogeneousLine : 
-  			Anchored homogeneous 3D lines AHL3, (x_0,y_0,z_0,x_1,y_1,z_1,w_1,x_2,y_2,z_2,w_2).
-  
-  	- jafar::rtslam::ObservationAbstract : 
-  		Please note that Observations depend always on two types of objects: sensor type and landmark type.
-  	  - jafar::rtslam::ObservationPinHolePoint : observe a point from a pin-hole sensor. 
-  	    Derive this class still once more to specify which kind of point.
-	  		- jafar::rtslam::ObservationPinHoleEuclideanPoint : observe \b EP point from a pin-hole sensor.
-	  		- jafar::rtslam::ObservationBarretoAnchoredHomogeneousPoint : observe \b AHP point from a Barreto sensor.
-  			- jafar::rtslam::ObservationBarretoEuclideanPoint : observe \b EP point from a Barreto sensor.
-  	  - jafar::rtslam::ObservationPinHoleLine : observe a line from a pin-hole sensor. 
-  	    Derive this class still once more to specify which kind of line.
-	  		- jafar::rtslam::ObservationPinHoleAnchoredHomogeneousPointLine : observe \b AHL point from a pin-hole sensor.
-  
-  \subsection secFutureDevelopments Future developments
-	Further developments could consider building straight line landmark models. 
-	Non-anchored landmarks are to be tested with robocentric maps. 
-	The list below is not exhaustive, nor it tries to impose the order for future development.
-
- 	- jafar::rtslam::LandmarkAbstract
-  		- jafar::rtslam::landmarkAnchoredModifiedPolarPoint : Anchored modified-polar 3D points AMPP3 (x_0,y_0,z_0,x,y,z,w). 
-  			This is the same as IDP landmarks.
-  		- jafar::rtslam::landmarkHomogeneousLine : Homogeneous 3D lines HL3 (x_1,y_1,z_1,w_1,x_2,y_2,z_2,w_2).
-  
-  	- jafar::rtslam::ObservationAbstract : Please note that Observations depend always on two types of objects: sensor type and landmark type.
-  	  - jafar::rtslam::ObservationPinHolePoint : observe a point from a pin-hole sensor. 
-  	    Derive this class still once more to specify which kind of point.
-	  		- jafar::rtslam::ObservationPinHoleHomogeneousLine : observe \b HL from a pin-hole sensor.
-	  		- jafar::rtslam::ObservationPinHoleAnchoredModifiedPolarPoint : observe \b AMPP from a pin-hole sensor.
-	  		- jafar::rtslam::ObservationBarretoAnchoredModifiedPolarPoint : observe \b AMPP from a Barreto sensor.
-  	  - jafar::rtslam::ObservationPinHoleLine : observe a line from a pin-hole sensor. 
-  	    Derive this class still once more to specify which kind of line.
-	  		- jafar::rtslam::ObservationBarretoAnchoredHomogeneousLine : observe \b AHL line from a Barreto sensor.
-	  		- jafar::rtslam::ObservationBarretoHomogeneousLine : observe \b HL from a Barreto sensor.
-
-  
-  		
+ - \ref pagePhilosophy
+ - \ref pageImplementation
+ - \ref pageDevelopmentPlan
 
 \section secRtslamHistory  History
 
   - 0.1 (2010-01-29) - Initial version
 
 \section secRtslamRequirements Requirements
-	
-	NOTE: Please update this list as the work goes. 
-	Elements in parentheses are foreseen to be used but they are not at the time of writing this doc. 
-	You should therefore, either take people out of the parenthesis, or add new elements.
-	
-  Jafar modules: jmath, (filter, qdisplay)
+
+  Jafar modules: kernel image jmath correl (qdisplay gdhe)
   
-  Visualizers: (GDHE)
+  Libs: boost opencv (qt4 viam MTI)
 
-\section secRtslamInterface Tcl interface (generated by swig)
+\section secRtslamInterface Tcl and Ruby interface
 
-  The interface of the module is generated from the following files:
+  The interface of the module is generated by swig from the following files:
     - rtslam.i defines the wrapped classes and functions,
     - rtslamException.i defines the \c try { } \c catch block
 for this module.

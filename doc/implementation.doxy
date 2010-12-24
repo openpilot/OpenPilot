@@ -1,0 +1,65 @@
+/** \page pageImplementation Implementation of RTSLAM
+
+Subpages:
+ - \ref pageJacobians
+ - \ref pageQuaternion
+
+	If you are not a new developer, jump to the \ref secPlan. If you are new you MUST keep reading here.
+
+	This software aims at being sufficiently general. 
+	However, some things are fixed in advance and should not be the subject of future modification.
+	Important details on these hard-coded decisions follow.
+	
+	\section secExternalLibraries External libraries
+	
+	We make use of Boost and OpenCV, which are warped into Jafar modules \ref jmath and \ref image.
+	
+	The graphics part is relegated to \ref qdisplay (2D) and \ref GDHE (3D). 
+	However, \ref rtslam creates libraries that are independent of the graphics output.
+	
+	\section secObjectCreation Objects creation policy
+	
+	We are currently discussing on the best way to implement run-time object creation,
+	either using factories or variants.
+	
+	\section secEkfSlam EKF-SLAM
+	
+	The stochastic map is a large Gaussian which is maintained by an EKF-SLAM. 
+	Variants could potentially include the UKF and/or the IEKF, 
+	but not the PF as we use Gaussians to represent probability densities.
+	
+	The system does not admit implementations based on non-linear optimization, 
+	such as key-frames SLAM or PTAM.
+	However, it is possible that some particular classes could be used as bricks for these alternative systems. 
+	This is to be evaluated in the future, and no efforts are made here to facilitate such a transition.
+	
+	\section secFunctions Functions with Jacobians
+	
+	Nearly all functions involved in EKF-SLAM are required to return Jacobian matrices. 
+	We systematicallly use a fixed terminology for naming Jacobian matrices, 
+	and the chain rule to create Jacobians of composed functions.
+	
+	See the \ref pageJacobians page for more information.
+	
+
+	\section secGaussians Gaussians
+	
+	We designed and built the jafar::rtslam::Gaussian class for storing Gaussian variables. 
+	This class is interesting because it admits both local and remote storage, 
+	and thus we can make it point to its own internal data or to data stored 
+	in the big Gaussian residing in the \b Map.
+	A nice feature of this class is that the indirect array of pointers to the Map is explicitly available.
+	This makes the manipulation of banded matrices and cross-variances easy, intuitive, light-weight, readable.
+	
+	\section secQuaternions Quaternions
+	
+	All orientation-related magnitudes are stored as quaternions. 
+	These are internally converted to rotation matrices when necessary.
+	Our quaternion is defined as a regular boost bounded_vector of dimension 4.
+	(More exactly, it is a typedef boost::numeric::ublas::bounded_vector<double,4> vec4.)
+	The real part comes first, then the three imaginary parts.
+	All the quaternion algebra is coded inside the module in the file quatTools.hpp.
+	
+	See the \ref pageQuaternion page and quatTools.hpp for more information about quaternions.
+	
+*/

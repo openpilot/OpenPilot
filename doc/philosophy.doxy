@@ -24,7 +24,13 @@ Subpages:
 	(\e ie. a father and a mother). 
 		
 	See the \ref pageParentalLinks page for more information about the parental links.
-  
+	
+	The global organization of the main objects is represented in a UML-like way here:
+	
+	\image html organization-uml.png "The global organization of main objects"
+	
+	
+	
 	\b REMARK: The existence of the class Observation permits the correct segmentation of data and methods into
 	comprehensive units. 
 	An Observation exists every time there exist a sensor and a landmark, 

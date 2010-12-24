@@ -26,6 +26,7 @@ Features
   * [or] a file defines preset trajectories, and we make reference to them in env-config
   * [or] simu-lmk and simu-traj
   * display-config: colors...
+- reorganize and update the developer doc
 - when doing replay, allow to have a sequence without missing images and simulate "real-time" (ignoring image loading of course)
 - make maps really abstract, and all rtslam not depending specifically on EKF
 

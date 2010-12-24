@@ -376,6 +376,11 @@ namespace jafar {
 					landmarkPtr()->descriptorPtr->addObservation(this->shared_from_this());
 				}
 
+				virtual bool isDescriptorValid()
+				{
+					return landmarkPtr()->descriptorPtr->isPredictionValid(this->shared_from_this());
+				}
+
 				virtual void predictAppearance_func() = 0;
 
 				virtual double getMatchScore() = 0;

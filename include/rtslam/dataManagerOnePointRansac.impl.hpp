@@ -317,9 +317,12 @@ JFR_DEBUG_END();
 				
 				obs->updateDescriptor();
 				
-				if (obs->events.measured) obs->counters.nSearch++;
-				if (obs->events.matched) obs->counters.nMatch++;
-				if (obs->events.updated) obs->counters.nInlier++;
+				if (not (obs->events.measured && !obs->events.matched && !obs->isDescriptorValid()))
+				{
+					if (obs->events.measured) obs->counters.nSearch++;
+					if (obs->events.matched) obs->counters.nMatch++;
+					if (obs->events.updated) obs->counters.nInlier++;
+				}
 			}
 
 			// clear all sets to liberate shared pointers

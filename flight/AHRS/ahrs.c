@@ -365,16 +365,12 @@ void simple_update() {
  * @brief Output all the important inputs and states of the ekf through serial port 
  */
 #ifdef DUMP_EKF
-#define NUMX 16			// number of states, X is the state vector
-#define NUMW 12			// number of plant noise inputs, w is disturbance noise vector
-#define NUMV 10			// number of measurements, v is the measurement noise vector
-#define NUMU 7			// number of deterministic inputs, U is the input vector
-extern float F[NUMX][NUMX], G[NUMX][NUMW], H[NUMV][NUMX];	// linearized system matrices
-extern float P[NUMX][NUMX], X[NUMX];	// covariance matrix and state vector
-extern float Q[NUMW], R[NUMV];	// input noise and measurement noise variances
-extern float K[NUMX][NUMV];	// feedback gain matrix
+
+extern float **P, *X;	// covariance matrix and state vector
+
 void print_ekf_binary() 
 {
+	uint16_t states = ins_get_num_states();
 	uint8_t framing[16] = { 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
 	// Dump raw buffer
 	PIOS_COM_SendBuffer(PIOS_COM_AUX, &framing[0], 16);                                                         // framing header (1:16)
@@ -388,9 +384,9 @@ void print_ekf_binary()
 	
 	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & gps_data, sizeof(gps_data));                                // gps data (58:85)
 	
-	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & X, 4 * NUMX);                                               // X (86:149)
-	for(uint8_t i = 0; i < NUMX; i++) 
-		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &(P[i][i]), 4);                                           // diag(P) (150:213)
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & X, 4 * states);                                             // X (86:149)
+	for(uint8_t i = 0; i < states; i++) 
+		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &((*P)[i + i * states]), 4);                         // diag(P) (150:213)
 	
 	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & altitude_data.altitude, 4);                                 // BaroAlt (214:217)
 	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & baro_offset, 4);                                            // baro_offset (218:221)

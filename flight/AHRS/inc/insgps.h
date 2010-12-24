@@ -74,6 +74,8 @@ void GpsBaroCorrection(float Pos[3], float Vel[3], float BaroAlt);
 void GpsMagCorrection(float mag_data[3], float Pos[3], float Vel[2]);
 void VelBaroCorrection(float Vel[3], float BaroAlt);
 
+uint16_t ins_get_num_states();
+
 //  Nav structure containing current solution
 struct NavStruct {
 	float Pos[3];		// Position in meters and relative to a local NED frame

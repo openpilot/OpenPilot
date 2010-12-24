@@ -102,7 +102,7 @@ SRC += $(FLIGHTLIB)/ahrs_comm_objects.c
 SRC += $(BOOT)/ahrs_spi_program_slave.c
 SRC += $(BOOT)/ahrs_slave_test.c
 SRC += $(BOOT)/ahrs_spi_program.c
-SRC += insgps.c
+SRC += insgps13state.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 

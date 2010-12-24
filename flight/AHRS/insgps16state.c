@@ -68,6 +68,12 @@ float K[NUMX][NUMV];		// feedback gain matrix
 
 //  *************  Exposed Functions ****************
 //  *************************************************
+
+uint16_t ins_get_num_states() 
+{
+	return NUMX;
+}
+
 void INSGPSInit()		//pretty much just a place holder for now
 {
 	Be[0] = 1;
@@ -92,8 +98,8 @@ void INSGPSInit()		//pretty much just a place holder for now
 
 	Q[0] = Q[1] = Q[2] = 50e-8;	// gyro noise variance (rad/s)^2
 	Q[3] = Q[4] = Q[5] = 0.01;	// accelerometer noise variance (m/s^2)^2
-	Q[6] = Q[7] = Q[8] = 2e-14;	// gyro bias random walk variance (rad/s^2)^2
-	Q[9] = Q[10] = Q[11] = 2e-13;	// accel bias random walk variance (m/s^3)^2
+	Q[6] = Q[7] = Q[8] = 2e-9;	// gyro bias random walk variance (rad/s^2)^2
+	Q[9] = Q[10] = Q[11] = 2e-20;	// accel bias random walk variance (m/s^3)^2
 
 	R[0] = R[1] = 0.004;	// High freq GPS horizontal position noise variance (m^2)
 	R[2] = 0.036;		// High freq GPS vertical position noise variance (m^2)

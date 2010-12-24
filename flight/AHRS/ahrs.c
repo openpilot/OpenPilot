@@ -699,19 +699,21 @@ void process_mag_data()
 	// TODO: Follow up this initialization issue
 	HomeLocationData home;
 	HomeLocationGet(&home);
-	if (PIOS_HMC5843_NewDataAvailable() && 
-	    (home.Set == HOMELOCATION_SET_TRUE) && 
-	    ((home.Be[0] != 0) || (home.Be[1] != 0) || (home.Be[2] != 0))) {
+	if (PIOS_HMC5843_NewDataAvailable()) {
 		PIOS_HMC5843_ReadMag(mag_data.raw.axis);
+
 		// Swap the axis here to acount for orientation of mag chip (notice 0 and 1 swapped in raw)
 		mag_data.scaled.axis[0] = (mag_data.raw.axis[1] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
 		mag_data.scaled.axis[1] = (mag_data.raw.axis[0] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
 		mag_data.scaled.axis[2] = (mag_data.raw.axis[2] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
-		
+	
 		// Only use if magnetic length reasonable
 		float Blen = sqrt(pow(mag_data.scaled.axis[0],2) + pow(mag_data.scaled.axis[1],2) + pow(mag_data.scaled.axis[2],2));
-		if((Blen < INSGPS_MAGLEN * (1 + INSGPS_MAGTOL)) && (Blen > INSGPS_MAGLEN * (1 - INSGPS_MAGTOL)))
-			mag_data.updated = 1;
+
+		mag_data.updated =  (home.Set == HOMELOCATION_SET_TRUE) && 
+			((home.Be[0] != 0) || (home.Be[1] != 0) || (home.Be[2] != 0)) &&
+			((mag_data.raw.axis[0] != 0) || (mag_data.raw.axis[1] != 0) || (mag_data.raw.axis[2] != 0)) &&
+			((Blen < INSGPS_MAGLEN * (1 + INSGPS_MAGTOL)) && (Blen > INSGPS_MAGLEN * (1 - INSGPS_MAGTOL)));
 	}		
 }
 #else

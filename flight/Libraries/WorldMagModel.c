@@ -44,10 +44,10 @@
 #include "WorldMagModel.h"
 #include "WMMInternal.h"
 
-//#define ALLOC(x) pvPortMalloc(x)
-//#define FREE(x) pvPortFree(x)
-#define MALLOC(x) malloc(x)
-#define FREE(x) free(x)
+#define MALLOC(x) pvPortMalloc(x)
+#define FREE(x) vPortFree(x)
+//#define MALLOC(x) malloc(x)
+//#define FREE(x) free(x)
 
 // const should hopefully keep them in the flash region
 static const float CoeffFile[91][6] = { {0, 0, 0, 0, 0, 0},
@@ -184,16 +184,13 @@ int WMM_Initialize()
 }
 
 void WMM_GetMagVector(float Lat, float Lon, float AltEllipsoid, uint16_t Month, uint16_t Day, uint16_t Year, float B[3])
-{
-	char Error_Message[255];
-	
+{	
 	Ellip = (WMMtype_Ellipsoid *) MALLOC(sizeof(WMMtype_Ellipsoid));
 	MagneticModel = (WMMtype_MagneticModel *) MALLOC(sizeof(WMMtype_MagneticModel));
 	
 	WMMtype_CoordSpherical *CoordSpherical = (WMMtype_CoordSpherical *)
 	    MALLOC(sizeof(CoordSpherical));
 	WMMtype_CoordGeodetic *CoordGeodetic = (WMMtype_CoordGeodetic *) MALLOC(sizeof(CoordGeodetic));
-	WMMtype_Date *Date = (WMMtype_Date *) MALLOC(sizeof(WMMtype_Date));
 	WMMtype_GeoMagneticElements *GeoMagneticElements = (WMMtype_GeoMagneticElements *)
 	    MALLOC(sizeof(GeoMagneticElements));
 
@@ -204,10 +201,7 @@ void WMM_GetMagVector(float Lat, float Lon, float AltEllipsoid, uint16_t Month, 
 	CoordGeodetic->HeightAboveEllipsoid = AltEllipsoid;
 	WMM_GeodeticToSpherical(CoordGeodetic, CoordSpherical);	/*Convert from geodeitic to Spherical Equations: 17-18, WMM Technical report */
 
-	Date->Month = Month;
-	Date->Day = Day;
-	Date->Year = Year;
-	WMM_DateToYear(Date, Error_Message);
+	WMM_DateToYear(Month, Day, Year);
 	WMM_Geomag(CoordSpherical, CoordGeodetic, GeoMagneticElements);	/* Computes the geoMagnetic field elements and their time change */
 
 	B[0] = GeoMagneticElements->X;
@@ -218,7 +212,6 @@ void WMM_GetMagVector(float Lat, float Lon, float AltEllipsoid, uint16_t Month, 
 	FREE(MagneticModel);
 	FREE(CoordSpherical);
 	FREE(CoordGeodetic);
-	FREE(Date);
 	FREE(GeoMagneticElements);
 }
 
@@ -1008,7 +1001,7 @@ float WMM_get_secular_var_coeff_h(uint16_t index)
 	return CoeffFile[index][5];
 }
 
-uint16_t WMM_DateToYear(WMMtype_Date * CalendarDate, char *Error)
+uint16_t WMM_DateToYear(uint16_t month, uint16_t day, uint16_t year)
 // Converts a given calendar date into a decimal year
 {
 	uint16_t temp = 0;	// Total number of days
@@ -1016,26 +1009,24 @@ uint16_t WMM_DateToYear(WMMtype_Date * CalendarDate, char *Error)
 	uint16_t ExtraDay = 0;
 	uint16_t i;
 
-	if ((CalendarDate->Year % 4 == 0 && CalendarDate->Year % 100 != 0)
-	    || CalendarDate->Year % 400 == 0)
+	if ((year % 4 == 0 && year % 100 != 0)
+	    || year % 400 == 0)
 		ExtraDay = 1;
 	MonthDays[2] += ExtraDay;
 
 	/******************Validation********************************/
-	if (CalendarDate->Month <= 0 || CalendarDate->Month > 12) {
-		strcpy(Error, "\nError: The Month entered is invalid, valid months are '1 to 12'\n");
+	if (month <= 0 || month > 12) {
 		return 0;
 	}
-	if (CalendarDate->Day <= 0 || CalendarDate->Day > MonthDays[CalendarDate->Month]) {
-		// printf("\nThe number of days in month %d is %d\n", CalendarDate->Month, MonthDays[CalendarDate->Month]);
-		strcpy(Error, "\nError: The day entered is invalid\n");
+	if (day <= 0 || day > MonthDays[month]) {
 		return 0;
 	}
 	/****************Calculation of t***************************/
-	for (i = 1; i <= CalendarDate->Month; i++)
+	for (i = 1; i <= month; i++)
 		temp += MonthDays[i - 1];
-	temp += CalendarDate->Day;
-	decimal_date = CalendarDate->Year + (temp - 1) / (365.0 + ExtraDay);
+	temp += day;
+	
+	decimal_date = year + (temp - 1) / (365.0 + ExtraDay);
 
 	return 1;
 }				/*WMM_DateToYear */

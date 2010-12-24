@@ -44,6 +44,10 @@ private slots:
 	void transmitUpdate();
 
 private:
+        bool once;
+        float initX;
+        float initY;
+        float initZ;
 	enum XplaneOutputData
 	{
 		FramRate,
@@ -63,7 +67,7 @@ private:
 		Brakes,
 		AngularMoments,
 		AngularAccelerations,
-		AngularVelociies,
+                AngularVelocities,
 		PitchRollHeading,
 		AoA,
 		LatitudeLongitude,

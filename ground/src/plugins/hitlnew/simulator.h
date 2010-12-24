@@ -156,7 +156,13 @@ private slots:
 	virtual void processUpdate(const QByteArray& data) = 0;
 
 protected:
-	QProcess* simProcess;
+        static const float FT2M;
+        static const float KT2MPS;
+        static const float INHG2KPA;
+        static const float FPS2CMPS;
+        static const float DEG2RAD;
+
+        QProcess* simProcess;
 	QTime* time;
 	QUdpSocket* inSocket;//(new QUdpSocket());
 	QUdpSocket* outSocket;
@@ -179,6 +185,7 @@ protected:
 	QMutex lock;
 
 private:
+
 	int updatePeriod;
 	int simTimeout;
 	volatile bool autopilotConnectionStatus;

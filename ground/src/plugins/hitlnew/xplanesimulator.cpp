@@ -68,6 +68,7 @@ void TraceBuf(const char* buf,int len);
 XplaneSimulator::XplaneSimulator(const SimulatorSettings& params) :
 		Simulator(params)
 {
+    once = false;
 }
 
 
@@ -78,7 +79,9 @@ XplaneSimulator::~XplaneSimulator()
 void XplaneSimulator::setupUdpPorts(const QString& host, int inPort, int outPort)
 {
 	inSocket->bind(QHostAddress(host), inPort);
-	outSocket->bind(QHostAddress(host), outPort);
+        //outSocket->bind(QHostAddress(host), outPort);
+        once = false;
+
 }
 
 /**
@@ -92,33 +95,75 @@ void XplaneSimulator::transmitUpdate()
 	float elevator = actData.Pitch;
 	float rudder = actData.Yaw;
 	float throttle = actData.Throttle*2-1.0;
-	float tmp = -999;
-	quint32 none = *((quint32*)&tmp); // get float as 4 bytes
+        float none = -999;
+        //quint32 none = *((quint32*)&tmp); // get float as 4 bytes
 
-	quint32 code;
+        quint32 code;
 	QByteArray buf;
 	QDataStream stream(&buf,QIODevice::ReadWrite);
 
-// !!! LAN byte order - Big Endian
-//#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
-//	stream.setByteOrder(QDataStream::LittleEndian);
-//#endif
+        // !!! LAN byte order - Big Endian
+        #if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+            stream.setByteOrder(QDataStream::LittleEndian);
+        #endif
 
 	// 11th data settings (flight con: ail/elv/rud)
 	buf.clear();
-	code = 11;
-	quint8 header[] = "DATA";
-	stream << *((quint32*)header) << (quint8)0x30 << code << *((quint32*)&elevator) << *((quint32*)&ailerons) << *((quint32*)&rudder)
-			<< none << *((quint32*)&ailerons) << none << none  << none;
-	TraceBuf(buf.data(),41);
-	outSocket->write(buf);
+        code = 11;
+        //quint8 header[] = "DATA";
+        /*
+        stream << *((quint32*)header) <<
+                  (quint8)0x30 <<
+                  code <<
+                  *((quint32*)&elevator) <<
+                  *((quint32*)&ailerons) <<
+                  *((quint32*)&rudder)   <<
+                  none <<
+                  *((quint32*)&ailerons) <<
+                  none <<
+                  none  <<
+                  none;
+                  */
+        buf.append("DATA0");
+        buf.append(reinterpret_cast<const char*>(&code), sizeof(code));
+        buf.append(reinterpret_cast<const char*>(&elevator), sizeof(elevator));
+        buf.append(reinterpret_cast<const char*>(&ailerons), sizeof(ailerons));
+        buf.append(reinterpret_cast<const char*>(&rudder), sizeof(rudder));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+        buf.append(reinterpret_cast<const char*>(&rudder), sizeof(rudder));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+        TraceBuf(buf.data(),41);
+
+        if(outSocket->writeDatagram(buf, QHostAddress(settings.remoteHostAddress), settings.outPort) == -1)
+        {
+            emit processOutput("Error sending UDP packet to XPlane: " + outSocket->errorString() + "\n");
+        }
+        //outSocket->write(buf);
 
 	// 25th data settings (throttle command)
 	buf.clear();
 	code = 25;
-	stream << *((quint32*)header) << (quint8)0x30 << code << *((quint32*)&throttle) << none  << none
-			<< none  << none  << none << none  << none;
-	outSocket->write(buf);
+        //stream << *((quint32*)header) << (quint8)0x30 << code << *((quint32*)&throttle) << none  << none
+        //		<< none  << none  << none << none  << none;
+        buf.append("DATA0");
+        buf.append(reinterpret_cast<const char*>(&code), sizeof(code));
+        buf.append(reinterpret_cast<const char*>(&throttle), sizeof(throttle));
+        buf.append(reinterpret_cast<const char*>(&throttle), sizeof(throttle));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+        buf.append(reinterpret_cast<const char*>(&none), sizeof(none));
+
+        if(outSocket->writeDatagram(buf, QHostAddress(settings.remoteHostAddress), settings.outPort) == -1)
+        {
+            emit processOutput("Error sending UDP packet to XPlane: " + outSocket->errorString() + "\n");
+        }
+
+        //outSocket->write(buf);
 
 
 
@@ -147,7 +192,16 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
 	float roll = 0;
 	float heading = 0;
 	float pressure = 0;
-	float weather = 0;
+        float temperature = 0;
+        float velX = 0;
+        float velY = 0;
+        float velZ = 0;
+        float dstX = 0;
+        float dstY = 0;
+        float dstZ = 0;
+        float rollRate=0;
+        float pitchRate=0;
+        float yawRate=0;
 
 	QString str;
 	QByteArray& buf = const_cast<QByteArray&>(dataBuf);
@@ -170,12 +224,12 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
 			case XplaneSimulator::LatitudeLongitude:
 				latitude = *((float*)(buf.data()+4*1));
 				longitude = *((float*)(buf.data()+4*2));
-				altitude = *((float*)(buf.data()+4*3)) /* * 3.048 */;
+                                altitude = *((float*)(buf.data()+4*3))* FT2M;
 				break;
 
 			case XplaneSimulator::Speed:
-				airspeed = *((float*)(buf.data()+4*6));
-				speed = *((float*)(buf.data()+4*7));
+                                airspeed = *((float*)(buf.data()+4*7));
+                                speed = *((float*)(buf.data()+4*8));
 				break;
 
 			case XplaneSimulator::PitchRollHeading:
@@ -184,13 +238,31 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
 				heading = *((float*)(buf.data()+4*3));
 				break;
 
-			case XplaneSimulator::SystemPressures:
+                        /*
+                       case XplaneSimulator::SystemPressures:
 				pressure = *((float*)(buf.data()+4*1));
 				break;
+                                */
 
 			case XplaneSimulator::AtmosphereWeather:
-				weather = *((float*)(buf.data()+4*1));
+                                pressure = *((float*)(buf.data()+4*1)) * INHG2KPA;
+                                temperature = *((float*)(buf.data()+4*2));
 				break;
+
+                        case XplaneSimulator::LocVelDistTraveled:
+                            dstX = *((float*)(buf.data()+4*1));
+                            dstY = *((float*)(buf.data()+4*2));
+                            dstZ = *((float*)(buf.data()+4*3));
+                            velX = *((float*)(buf.data()+4*4));
+                            velY = *((float*)(buf.data()+4*5));
+                            velZ = *((float*)(buf.data()+4*6));
+                            break;
+
+                        case XplaneSimulator::AngularVelocities:
+                            pitchRate = *((float*)(buf.data()+4*1));
+                            rollRate = *((float*)(buf.data()+4*2));
+                            yawRate = *((float*)(buf.data()+4*3));
+                            break;
 
 			default:
 				break;
@@ -199,11 +271,50 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
 			buf.remove(0,36);
 		} while (channelCounter);
 
+
+                HomeLocation::DataFields homeData = posHome->getData();
+                if(!once)
+                {
+                    // Upon startup, we reset the HomeLocation object to
+                    // the plane's location:
+                    memset(&homeData, 0, sizeof(HomeLocation::DataFields));
+                    // Update homelocation
+                    homeData.Latitude = latitude * 1e7;
+                    homeData.Longitude = longitude * 1e7;
+                    homeData.Altitude = altitude;
+                    double LLA[3];
+                    LLA[0]=latitude;
+                    LLA[1]=longitude;
+                    LLA[2]=altitude;
+                    double ECEF[3];
+                    double RNE[9];
+                    Utils::CoordinateConversions().RneFromLLA(LLA,(double (*)[3])RNE);
+                    for (int t=0;t<9;t++) {
+                            homeData.RNE[t]=RNE[t];
+                    }
+                    Utils::CoordinateConversions().LLA2ECEF(LLA,ECEF);
+                    homeData.ECEF[0]=ECEF[0]*100;
+                    homeData.ECEF[1]=ECEF[1]*100;
+                    homeData.ECEF[2]=ECEF[2]*100;
+                    homeData.Be[0]=0;
+                    homeData.Be[1]=0;
+                    homeData.Be[2]=0;
+                    posHome->setData(homeData);
+                    posHome->updated();
+
+                    // Initialize the initial distance
+                    initX = dstX;
+                    initY = dstY;
+                    initZ = dstZ;
+                    once=1;
+                }
+
+
 		// Update AltitudeActual object
 		BaroAltitude::DataFields altActualData;
 		memset(&altActualData, 0, sizeof(BaroAltitude::DataFields));
 		altActualData.Altitude = altitude;
-		altActualData.Temperature = weather;
+                altActualData.Temperature = temperature;
 		altActualData.Pressure = pressure;
 		altActual->setData(altActualData);
 
@@ -212,7 +323,7 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
 		memset(&attActualData, 0, sizeof(AttitudeActual::DataFields));
 		attActualData.Roll = roll;   //roll;
 		attActualData.Pitch = pitch;  // pitch
-		//		attActualData.Yaw = yaw;
+                attActualData.Yaw = heading; // Yaw
 		//		attActualData.q1 = 0;
 		//		attActualData.q2 = 0;
 		//		attActualData.q3 = 0;
@@ -222,12 +333,43 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
 		// Update gps objects
                 GPSPosition::DataFields gpsData;
                 memset(&gpsData, 0, sizeof(GPSPosition::DataFields));
-		gpsData.Altitude = altitude;
-//		gpsData.Heading = pitch[2];
-//		gpsData.Groundspeed = speed[0];
-		gpsData.Latitude = latitude;
-		gpsData.Longitude = longitude;
+                gpsData.Altitude = altitude;
+                gpsData.Heading = heading;
+                gpsData.Groundspeed = speed;
+                gpsData.Latitude = latitude*1e7;
+                gpsData.Longitude = longitude*1e7;
+                gpsData.Satellites = 10;
+                gpsData.Status = GPSPosition::STATUS_FIX3D;
                 gpsPos->setData(gpsData);
+
+                // Update VelocityActual.{Nort,East,Down}
+                VelocityActual::DataFields velocityActualData;
+                memset(&velocityActualData, 0, sizeof(VelocityActual::DataFields));
+                velocityActualData.North = velX*100;
+                velocityActualData.East = velY*100;
+                velocityActualData.Down = velZ*100;
+                velActual->setData(velocityActualData);
+
+                // Update PositionActual.{Nort,East,Down}
+                PositionActual::DataFields positionActualData;
+                memset(&positionActualData, 0, sizeof(PositionActual::DataFields));
+                positionActualData.North = (dstX-initX)*100;
+                positionActualData.East = (dstY-initY)*100;
+                positionActualData.Down = (dstZ-initZ)*100;
+                posActual->setData(positionActualData);
+
+                // Update AttitudeRaw object (filtered gyros only for now)
+                AttitudeRaw::DataFields rawData;
+                memset(&rawData, 0, sizeof(AttitudeRaw::DataFields));
+                rawData = attRaw->getData();
+                rawData.gyros_filtered[0] = rollRate;
+                //rawData.gyros_filtered[1] = cos(DEG2RAD * roll) * pitchRate + sin(DEG2RAD * roll) * yawRate;
+                //rawData.gyros_filtered[2] = cos(DEG2RAD * roll) * yawRate - sin(DEG2RAD * roll) * pitchRate;
+                rawData.gyros_filtered[1] = pitchRate;
+                rawData.gyros_filtered[2] = yawRate;
+                attRaw->setData(rawData);
+
+
 	}
 	// issue manual update
 	//attActual->updated();

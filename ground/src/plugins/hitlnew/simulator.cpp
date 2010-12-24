@@ -34,6 +34,13 @@
 
 volatile bool Simulator::isStarted = false;
 
+const float Simulator::FT2M = 0.3048;
+const float Simulator::KT2MPS = 0.514444444;
+const float Simulator::INHG2KPA = 3.386;
+const float Simulator::FPS2CMPS = 30.48;
+const float Simulator::DEG2RAD = (M_PI/180.0);
+
+
 Simulator::Simulator(const SimulatorSettings& params) :
 	simProcess(NULL),
 	time(NULL),

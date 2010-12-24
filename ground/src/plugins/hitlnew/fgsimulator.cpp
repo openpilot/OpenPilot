@@ -34,11 +34,6 @@
 #define M_PI           3.14159265358979323846
 #endif
 
-const float FGSimulator::FT2M = 0.3048;
-const float FGSimulator::KT2MPS = 0.514444444;
-const float FGSimulator::INHG2KPA = 3.386;
-const float FGSimulator::FPS2CMPS = 30.48;
-const float FGSimulator::DEG2RAD = (M_PI/180.0);
 
 
 

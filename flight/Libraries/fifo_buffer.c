@@ -67,7 +67,7 @@ uint16_t fifoBuf_getFree(t_fifo_buffer *buf)
 
 void fifoBuf_clearData(t_fifo_buffer *buf)
 {       // remove all data from the buffer
-    buf->rd = buf->wr = 0;
+	buf->rd = buf->wr;
 }
 
 void fifoBuf_removeData(t_fifo_buffer *buf, uint16_t len)

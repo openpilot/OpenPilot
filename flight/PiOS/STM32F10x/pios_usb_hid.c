@@ -40,6 +40,10 @@
 
 #if defined(PIOS_INCLUDE_USB_HID)
 
+#if defined(PIOS_INCLUDE_FREERTOS)
+#define USE_FREERTOS
+#endif
+
 const struct pios_com_driver pios_usb_com_driver = {
 	.tx_nb = PIOS_USB_HID_TxBufferPutMoreNonBlocking,
 	.tx = PIOS_USB_HID_TxBufferPutMore,
@@ -60,6 +64,11 @@ t_fifo_buffer rx_pios_fifo_buffer;
 
 uint8_t tx_pios_fifo_buf[1024] __attribute__ ((aligned(4)));    // align to 32-bit to try and provide speed improvement
 t_fifo_buffer tx_pios_fifo_buffer;
+
+#if defined(USE_FREERTOS)
+xSemaphoreHandle pios_usb_tx_semaphore;
+#endif
+
 /**
  * Initialises USB COM layer
  * \param[in] mode currently only mode 0 supported
@@ -79,6 +88,11 @@ int32_t PIOS_USB_HID_Init(uint32_t mode)
 
 	PIOS_USB_HID_Reenumerate();
 
+	/* Create semaphore before enabling interrupts */
+#if defined(USE_FREERTOS)	
+	vSemaphoreCreateBinary(pios_usb_tx_semaphore);
+#endif
+	
 	/* Enable the USB Interrupts */
 	/* 2 bit for pre-emption priority, 2 bits for subpriority */
 	NVIC_InitTypeDef NVIC_InitStructure;
@@ -238,8 +252,17 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t * buff
 	/* don't check returned bytes because it should always succeed  */
 	/* after previous thread and no meaningful way to deal with the */
 	/* case it only buffers half the bytes                          */
+#if defined(USE_FREERTOS)
+	if(!xSemaphoreTake(pios_usb_tx_semaphore,10 / portTICK_RATE_MS))
+		return -3;
+#endif
+
 	ret = fifoBuf_putData(&tx_pios_fifo_buffer, buffer, len);
 
+#if defined(USE_FREERTOS)
+	xSemaphoreGive(pios_usb_tx_semaphore);
+#endif
+	
 	sendChunk();
 
 	return 0;

@@ -5,7 +5,7 @@
  *      Author: nmansard
  *      \ingroup rtslam
  */
-
+#if 0
 #include "rtslam/dataManagerActiveSearch.hpp"
 #include "rtslam/observationAbstract.hpp"
 #include "rtslam/rawImage.hpp"
@@ -296,3 +296,4 @@ namespace jafar {
   }  // namespace ::rtslam
 }; // namespace jafar::
 
+#endif

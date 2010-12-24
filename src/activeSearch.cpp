@@ -140,6 +140,7 @@ namespace jafar {
 			projectionsCount(cell(0), cell(1)) = -1;
 		}
 
+#if 0
 		////////////////////////////////////////////////////////
 		//    ACTIVE SEARCH ALGORITHMS
 		////////////////////////////////////////////////////////
@@ -174,6 +175,7 @@ namespace jafar {
 
 		void ActiveSearch::scanObs(const observation_ptr_t & obsPtr, const image::ConvexRoi & roi) {
 		}
+#endif
 
 	}
 }

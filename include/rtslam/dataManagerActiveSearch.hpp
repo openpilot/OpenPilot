@@ -5,10 +5,10 @@
  *      Author: nmansard
  *      \ingroup rtslam
  */
-
 #ifndef DATAMANAGERACTIVESEARCH_HPP_
 #define DATAMANAGERACTIVESEARCH_HPP_
 
+#if 0
 #include "rtslam/dataManagerAbstract.hpp"
 #include "rtslam/activeSearch.hpp"
 
@@ -104,4 +104,5 @@ namespace jafar {
 
 #include "rtslam/dataManagerActiveSearch.impl.hpp"
 
+#endif
 #endif /* DATAMANAGERACTIVESEARCH_HPP_ */

@@ -199,6 +199,7 @@ namespace jafar {
 
 		};
 
+#if 0
 		/**
 		 * Class for active search algorithms.
 		 * \ingroup rtslam
@@ -235,7 +236,7 @@ namespace jafar {
 				 */
 				void scanObs(const observation_ptr_t & obsPtr, const image::ConvexRoi & roi);
 		};
-
+#endif
 	}
 }
 

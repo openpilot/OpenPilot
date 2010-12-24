@@ -44,8 +44,108 @@
 #include "WorldMagModel.h"
 #include "WMMInternal.h"
 
+//#define ALLOC(x) pvPortMalloc(x)
+//#define FREE(x) pvPortFree(x)
+#define MALLOC(x) malloc(x)
+#define FREE(x) free(x)
+
+// const should hopefully keep them in the flash region
+static const float CoeffFile[91][6] = { {0, 0, 0, 0, 0, 0},
+	{1, 0, -29496.6, 0.0, 11.6, 0.0},
+	{1, 1, -1586.3, 4944.4, 16.5, -25.9},
+	{2, 0, -2396.6, 0.0, -12.1, 0.0},
+	{2, 1, 3026.1, -2707.7, -4.4, -22.5},
+	{2, 2, 1668.6, -576.1, 1.9, -11.8},
+	{3, 0, 1340.1, 0.0, 0.4, 0.0},
+	{3, 1, -2326.2, -160.2, -4.1, 7.3},
+	{3, 2, 1231.9, 251.9, -2.9, -3.9},
+	{3, 3, 634.0, -536.6, -7.7, -2.6},
+	{4, 0, 912.6, 0.0, -1.8, 0.0},
+	{4, 1, 808.9, 286.4, 2.3, 1.1},
+	{4, 2, 166.7, -211.2, -8.7, 2.7},
+	{4, 3, -357.1, 164.3, 4.6, 3.9},
+	{4, 4, 89.4, -309.1, -2.1, -0.8},
+	{5, 0, -230.9, 0.0, -1.0, 0.0},
+	{5, 1, 357.2, 44.6, 0.6, 0.4},
+	{5, 2, 200.3, 188.9, -1.8, 1.8},
+	{5, 3, -141.1, -118.2, -1.0, 1.2},
+	{5, 4, -163.0, 0.0, 0.9, 4.0},
+	{5, 5, -7.8, 100.9, 1.0, -0.6},
+	{6, 0, 72.8, 0.0, -0.2, 0.0},
+	{6, 1, 68.6, -20.8, -0.2, -0.2},
+	{6, 2, 76.0, 44.1, -0.1, -2.1},
+	{6, 3, -141.4, 61.5, 2.0, -0.4},
+	{6, 4, -22.8, -66.3, -1.7, -0.6},
+	{6, 5, 13.2, 3.1, -0.3, 0.5},
+	{6, 6, -77.9, 55.0, 1.7, 0.9},
+	{7, 0, 80.5, 0.0, 0.1, 0.0},
+	{7, 1, -75.1, -57.9, -0.1, 0.7},
+	{7, 2, -4.7, -21.1, -0.6, 0.3},
+	{7, 3, 45.3, 6.5, 1.3, -0.1},
+	{7, 4, 13.9, 24.9, 0.4, -0.1},
+	{7, 5, 10.4, 7.0, 0.3, -0.8},
+	{7, 6, 1.7, -27.7, -0.7, -0.3},
+	{7, 7, 4.9, -3.3, 0.6, 0.3},
+	{8, 0, 24.4, 0.0, -0.1, 0.0},
+	{8, 1, 8.1, 11.0, 0.1, -0.1},
+	{8, 2, -14.5, -20.0, -0.6, 0.2},
+	{8, 3, -5.6, 11.9, 0.2, 0.4},
+	{8, 4, -19.3, -17.4, -0.2, 0.4},
+	{8, 5, 11.5, 16.7, 0.3, 0.1},
+	{8, 6, 10.9, 7.0, 0.3, -0.1},
+	{8, 7, -14.1, -10.8, -0.6, 0.4},
+	{8, 8, -3.7, 1.7, 0.2, 0.3},
+	{9, 0, 5.4, 0.0, 0.0, 0.0},
+	{9, 1, 9.4, -20.5, -0.1, 0.0},
+	{9, 2, 3.4, 11.5, 0.0, -0.2},
+	{9, 3, -5.2, 12.8, 0.3, 0.0},
+	{9, 4, 3.1, -7.2, -0.4, -0.1},
+	{9, 5, -12.4, -7.4, -0.3, 0.1},
+	{9, 6, -0.7, 8.0, 0.1, 0.0},
+	{9, 7, 8.4, 2.1, -0.1, -0.2},
+	{9, 8, -8.5, -6.1, -0.4, 0.3},
+	{9, 9, -10.1, 7.0, -0.2, 0.2},
+	{10, 0, -2.0, 0.0, 0.0, 0.0},
+	{10, 1, -6.3, 2.8, 0.0, 0.1},
+	{10, 2, 0.9, -0.1, -0.1, -0.1},
+	{10, 3, -1.1, 4.7, 0.2, 0.0},
+	{10, 4, -0.2, 4.4, 0.0, -0.1},
+	{10, 5, 2.5, -7.2, -0.1, -0.1},
+	{10, 6, -0.3, -1.0, -0.2, 0.0},
+	{10, 7, 2.2, -3.9, 0.0, -0.1},
+	{10, 8, 3.1, -2.0, -0.1, -0.2},
+	{10, 9, -1.0, -2.0, -0.2, 0.0},
+	{10, 10, -2.8, -8.3, -0.2, -0.1},
+	{11, 0, 3.0, 0.0, 0.0, 0.0},
+	{11, 1, -1.5, 0.2, 0.0, 0.0},
+	{11, 2, -2.1, 1.7, 0.0, 0.1},
+	{11, 3, 1.7, -0.6, 0.1, 0.0},
+	{11, 4, -0.5, -1.8, 0.0, 0.1},
+	{11, 5, 0.5, 0.9, 0.0, 0.0},
+	{11, 6, -0.8, -0.4, 0.0, 0.1},
+	{11, 7, 0.4, -2.5, 0.0, 0.0},
+	{11, 8, 1.8, -1.3, 0.0, -0.1},
+	{11, 9, 0.1, -2.1, 0.0, -0.1},
+	{11, 10, 0.7, -1.9, -0.1, 0.0},
+	{11, 11, 3.8, -1.8, 0.0, -0.1},
+	{12, 0, -2.2, 0.0, 0.0, 0.0},
+	{12, 1, -0.2, -0.9, 0.0, 0.0},
+	{12, 2, 0.3, 0.3, 0.1, 0.0},
+	{12, 3, 1.0, 2.1, 0.1, 0.0},
+	{12, 4, -0.6, -2.5, -0.1, 0.0},
+	{12, 5, 0.9, 0.5, 0.0, 0.0},
+	{12, 6, -0.1, 0.6, 0.0, 0.1},
+	{12, 7, 0.5, 0.0, 0.0, 0.0},
+	{12, 8, -0.4, 0.1, 0.0, 0.0},
+	{12, 9, -0.4, 0.3, 0.0, 0.0},
+	{12, 10, 0.2, -0.9, 0.0, 0.0},
+	{12, 11, -0.8, -0.2, -0.1, 0.0},
+	{12, 12, 0.0, 0.9, 0.1, 0.0}
+};
+
 static WMMtype_Ellipsoid *Ellip;
 static WMMtype_MagneticModel *MagneticModel;
+static float decimal_date;
 
 /**************************************************************************************
 *   Example use - very simple - only two exposed functions
@@ -61,7 +161,8 @@ static WMMtype_MagneticModel *MagneticModel;
 int WMM_Initialize()
 //      Sets default values for WMM subroutines.
 //      UPDATES : Ellip and MagneticModel
-{
+{	
+	
 	// Sets WGS-84 parameters
 	Ellip->a = 6378.137;	// semi-major axis of the ellipsoid in km
 	Ellip->b = 6356.7523142;	// semi-minor axis of the ellipsoid in km
@@ -79,24 +180,22 @@ int WMM_Initialize()
 	MagneticModel->EditionDate = 5.7863328170559505e-307;
 	MagneticModel->epoch = 2010.0;
 	sprintf(MagneticModel->ModelName, "WMM-2010");
-	WMM_Set_Coeff_Array();
 	return 0;
 }
 
 void WMM_GetMagVector(float Lat, float Lon, float AltEllipsoid, uint16_t Month, uint16_t Day, uint16_t Year, float B[3])
 {
 	char Error_Message[255];
-
-	Ellip = (WMMtype_Ellipsoid *) pvPortMalloc(sizeof(WMMtype_Ellipsoid));
-	MagneticModel = (WMMtype_MagneticModel *)
-	    pvPortMalloc(sizeof(WMMtype_MagneticModel));
-
+	
+	Ellip = (WMMtype_Ellipsoid *) MALLOC(sizeof(WMMtype_Ellipsoid));
+	MagneticModel = (WMMtype_MagneticModel *) MALLOC(sizeof(WMMtype_MagneticModel));
+	
 	WMMtype_CoordSpherical *CoordSpherical = (WMMtype_CoordSpherical *)
-	    pvPortMalloc(sizeof(CoordSpherical));
-	WMMtype_CoordGeodetic *CoordGeodetic = (WMMtype_CoordGeodetic *) pvPortMalloc(sizeof(CoordGeodetic));
-	WMMtype_Date *Date = (WMMtype_Date *) pvPortMalloc(sizeof(WMMtype_Date));
+	    MALLOC(sizeof(CoordSpherical));
+	WMMtype_CoordGeodetic *CoordGeodetic = (WMMtype_CoordGeodetic *) MALLOC(sizeof(CoordGeodetic));
+	WMMtype_Date *Date = (WMMtype_Date *) MALLOC(sizeof(WMMtype_Date));
 	WMMtype_GeoMagneticElements *GeoMagneticElements = (WMMtype_GeoMagneticElements *)
-	    pvPortMalloc(sizeof(GeoMagneticElements));
+	    MALLOC(sizeof(GeoMagneticElements));
 
 	WMM_Initialize();
 
@@ -109,19 +208,18 @@ void WMM_GetMagVector(float Lat, float Lon, float AltEllipsoid, uint16_t Month, 
 	Date->Day = Day;
 	Date->Year = Year;
 	WMM_DateToYear(Date, Error_Message);
-	WMM_TimelyModifyMagneticModel(Date);
 	WMM_Geomag(CoordSpherical, CoordGeodetic, GeoMagneticElements);	/* Computes the geoMagnetic field elements and their time change */
 
 	B[0] = GeoMagneticElements->X;
 	B[1] = GeoMagneticElements->Y;
 	B[2] = GeoMagneticElements->Z;
 
-	vPortFree(Ellip);
-	vPortFree(MagneticModel);
-	vPortFree(CoordSpherical);
-	vPortFree(CoordGeodetic);
-	vPortFree(Date);
-	vPortFree(GeoMagneticElements);
+	FREE(Ellip);
+	FREE(MagneticModel);
+	FREE(CoordSpherical);
+	FREE(CoordGeodetic);
+	FREE(Date);
+	FREE(GeoMagneticElements);
 }
 
 uint16_t WMM_Geomag(WMMtype_CoordSpherical * CoordSpherical, WMMtype_CoordGeodetic * CoordGeodetic, WMMtype_GeoMagneticElements * GeoMagneticElements)
@@ -290,8 +388,8 @@ uint16_t WMM_Summation(WMMtype_LegendreFunction * LegendreFunction,
 /* Equation 12 in the WMM Technical report.  Derivative with respect to radius.*/
 			MagneticResults->Bz -=
 			    SphVariables->RelativeRadiusPower[n] *
-			    (MagneticModel->Main_Field_Coeff_G[index] *
-			     SphVariables->cos_mlambda[m] + MagneticModel->Main_Field_Coeff_H[index] * SphVariables->sin_mlambda[m])
+			    (WMM_get_main_field_coeff_g(index) *
+			     SphVariables->cos_mlambda[m] + WMM_get_main_field_coeff_h(index) * SphVariables->sin_mlambda[m])
 			    * (float)(n + 1) * LegendreFunction->Pcup[index];
 
 /*		  1 nMax  (n+2)    n     m            m           m
@@ -300,8 +398,8 @@ uint16_t WMM_Summation(WMMtype_LegendreFunction * LegendreFunction,
 /* Equation 11 in the WMM Technical report. Derivative with respect to longitude, divided by radius. */
 			MagneticResults->By +=
 			    SphVariables->RelativeRadiusPower[n] *
-			    (MagneticModel->Main_Field_Coeff_G[index] *
-			     SphVariables->sin_mlambda[m] - MagneticModel->Main_Field_Coeff_H[index] * SphVariables->cos_mlambda[m])
+			    (WMM_get_main_field_coeff_g(index) *
+			     SphVariables->sin_mlambda[m] - WMM_get_main_field_coeff_h(index) * SphVariables->cos_mlambda[m])
 			    * (float)(m) * LegendreFunction->Pcup[index];
 /*		   nMax  (n+2) n     m            m           m
 	Bx = - SUM (a/r)   SUM  [g cos(m p) + h sin(m p)] dP (sin(phi))
@@ -310,8 +408,8 @@ uint16_t WMM_Summation(WMMtype_LegendreFunction * LegendreFunction,
 
 			MagneticResults->Bx -=
 			    SphVariables->RelativeRadiusPower[n] *
-			    (MagneticModel->Main_Field_Coeff_G[index] *
-			     SphVariables->cos_mlambda[m] + MagneticModel->Main_Field_Coeff_H[index] * SphVariables->sin_mlambda[m])
+			    (WMM_get_main_field_coeff_g(index) *
+			     SphVariables->cos_mlambda[m] + WMM_get_main_field_coeff_h(index) * SphVariables->sin_mlambda[m])
 			    * LegendreFunction->dPcup[index];
 
 		}
@@ -363,8 +461,8 @@ uint16_t WMM_SecVarSummation(WMMtype_LegendreFunction * LegendreFunction,
 /*  Derivative with respect to radius.*/
 			MagneticResults->Bz -=
 			    SphVariables->RelativeRadiusPower[n] *
-			    (MagneticModel->Secular_Var_Coeff_G[index] *
-			     SphVariables->cos_mlambda[m] + MagneticModel->Secular_Var_Coeff_H[index] * SphVariables->sin_mlambda[m])
+			    (WMM_get_secular_var_coeff_g(index) *
+			     SphVariables->cos_mlambda[m] + WMM_get_secular_var_coeff_h(index) * SphVariables->sin_mlambda[m])
 			    * (float)(n + 1) * LegendreFunction->Pcup[index];
 
 /*		  1 nMax  (n+2)    n     m            m           m
@@ -373,8 +471,8 @@ uint16_t WMM_SecVarSummation(WMMtype_LegendreFunction * LegendreFunction,
 /* Derivative with respect to longitude, divided by radius. */
 			MagneticResults->By +=
 			    SphVariables->RelativeRadiusPower[n] *
-			    (MagneticModel->Secular_Var_Coeff_G[index] *
-			     SphVariables->sin_mlambda[m] - MagneticModel->Secular_Var_Coeff_H[index] * SphVariables->cos_mlambda[m])
+			    (WMM_get_secular_var_coeff_g(index) *
+			     SphVariables->sin_mlambda[m] - WMM_get_secular_var_coeff_h(index) * SphVariables->cos_mlambda[m])
 			    * (float)(m) * LegendreFunction->Pcup[index];
 /*		   nMax  (n+2) n     m            m           m
 	Bx = - SUM (a/r)   SUM  [g cos(m p) + h sin(m p)] dP (sin(phi))
@@ -383,8 +481,8 @@ uint16_t WMM_SecVarSummation(WMMtype_LegendreFunction * LegendreFunction,
 
 			MagneticResults->Bx -=
 			    SphVariables->RelativeRadiusPower[n] *
-			    (MagneticModel->Secular_Var_Coeff_G[index] *
-			     SphVariables->cos_mlambda[m] + MagneticModel->Secular_Var_Coeff_H[index] * SphVariables->sin_mlambda[m])
+			    (WMM_get_secular_var_coeff_g(index) *
+			     SphVariables->cos_mlambda[m] + WMM_get_secular_var_coeff_h(index) * SphVariables->sin_mlambda[m])
 			    * LegendreFunction->dPcup[index];
 		}
 	}
@@ -780,8 +878,8 @@ uint16_t WMM_SummationSpecial(WMMtype_SphericalHarmonicVariables *
 
 		MagneticResults->By +=
 		    SphVariables->RelativeRadiusPower[n] *
-		    (MagneticModel->Main_Field_Coeff_G[index] *
-		     SphVariables->sin_mlambda[1] - MagneticModel->Main_Field_Coeff_H[index] * SphVariables->cos_mlambda[1])
+		    (WMM_get_main_field_coeff_g(index) *
+		     SphVariables->sin_mlambda[1] - WMM_get_main_field_coeff_h(index) * SphVariables->cos_mlambda[1])
 		    * PcupS[n] * schmidtQuasiNorm3;
 	}
 
@@ -828,35 +926,87 @@ uint16_t WMM_SecVarSummationSpecial(WMMtype_SphericalHarmonicVariables *
 
 		MagneticResults->By +=
 		    SphVariables->RelativeRadiusPower[n] *
-		    (MagneticModel->Secular_Var_Coeff_G[index] *
-		     SphVariables->sin_mlambda[1] - MagneticModel->Secular_Var_Coeff_H[index] * SphVariables->cos_mlambda[1])
+		    (WMM_get_secular_var_coeff_g(index) *
+		     SphVariables->sin_mlambda[1] - WMM_get_secular_var_coeff_h(index) * SphVariables->cos_mlambda[1])
 		    * PcupS[n] * schmidtQuasiNorm3;
 	}
 
 	return TRUE;
 }				/*SecVarSummationSpecial */
 
-void WMM_TimelyModifyMagneticModel(WMMtype_Date * UserDate)
-// Time change the Model coefficients from the base year of the model using secular variation coefficients.
-//
-// Modified to work on the global data structure to reduce memory footprint
-{
-	uint16_t n, m, index, a, b;
+/**
+ * @brief Comput the MainFieldCoeffH accounting for the date
+ */
+float WMM_get_main_field_coeff_g(uint16_t index) 
+{	
+	if(index >= NUMTERMS)
+		return 0;
 
+	float coeff = CoeffFile[index][2];
+	uint16_t n, m, sum_index, a, b;
+	
 	a = MagneticModel->nMaxSecVar;
 	b = (a * (a + 1) / 2 + a);
 	for (n = 1; n <= MagneticModel->nMax; n++) {
 		for (m = 0; m <= n; m++) {
-			index = (n * (n + 1) / 2 + m);
-			if (index <= b) {
-				MagneticModel->Main_Field_Coeff_H[index] +=
-				    (UserDate->DecimalYear - MagneticModel->epoch) * MagneticModel->Secular_Var_Coeff_H[index];
-				MagneticModel->Main_Field_Coeff_G[index] +=
-				    (UserDate->DecimalYear - MagneticModel->epoch) * MagneticModel->Secular_Var_Coeff_G[index];
-			}
+			
+			sum_index = (n * (n + 1) / 2 + m);
+			
+			/* Hacky for now, will solve for which conditions need summing analytically */
+			if(sum_index != index)
+				continue;
+			
+			if (index <= b) 
+				coeff += (decimal_date - MagneticModel->epoch) * WMM_get_secular_var_coeff_g(sum_index);
+			
 		}
 	}
-}				/* WMM_TimelyModifyMagneticModel */
+	
+	return coeff;
+}
+
+float WMM_get_main_field_coeff_h(uint16_t index) 
+{	
+	if(index >= NUMTERMS)
+		return 0;
+	
+	float coeff = CoeffFile[index][3];
+	uint16_t n, m, sum_index, a, b;
+	
+	a = MagneticModel->nMaxSecVar;
+	b = (a * (a + 1) / 2 + a);
+	for (n = 1; n <= MagneticModel->nMax; n++) {
+		for (m = 0; m <= n; m++) {
+			
+			sum_index = (n * (n + 1) / 2 + m);
+			
+			/* Hacky for now, will solve for which conditions need summing analytically */
+			if(sum_index != index)
+				continue;
+			
+			if (index <= b) 
+				coeff += (decimal_date - MagneticModel->epoch) * WMM_get_secular_var_coeff_h(sum_index);
+		}
+	}
+	
+	return coeff;	
+}
+
+float WMM_get_secular_var_coeff_g(uint16_t index) 
+{		
+	if(index >= NUMTERMS)
+		return 0;
+	
+	return CoeffFile[index][4];
+}
+
+float WMM_get_secular_var_coeff_h(uint16_t index) 
+{		
+	if(index >= NUMTERMS)
+		return 0;
+	
+	return CoeffFile[index][5];
+}
 
 uint16_t WMM_DateToYear(WMMtype_Date * CalendarDate, char *Error)
 // Converts a given calendar date into a decimal year
@@ -885,7 +1035,7 @@ uint16_t WMM_DateToYear(WMMtype_Date * CalendarDate, char *Error)
 	for (i = 1; i <= CalendarDate->Month; i++)
 		temp += MonthDays[i - 1];
 	temp += CalendarDate->Day;
-	CalendarDate->DecimalYear = CalendarDate->Year + (temp - 1) / (365.0 + ExtraDay);
+	decimal_date = CalendarDate->Year + (temp - 1) / (365.0 + ExtraDay);
 
 	return 1;
 }				/*WMM_DateToYear */
@@ -917,108 +1067,3 @@ void WMM_GeodeticToSpherical(WMMtype_CoordGeodetic * CoordGeodetic, WMMtype_Coor
 
 }				// WMM_GeodeticToSpherical
 
-void WMM_Set_Coeff_Array()
-{
-	// const should hopefully keep them in the flash region
-	static const float CoeffFile[91][6] = { {0, 0, 0, 0, 0, 0},
-	{1, 0, -29496.6, 0.0, 11.6, 0.0},
-	{1, 1, -1586.3, 4944.4, 16.5, -25.9},
-	{2, 0, -2396.6, 0.0, -12.1, 0.0},
-	{2, 1, 3026.1, -2707.7, -4.4, -22.5},
-	{2, 2, 1668.6, -576.1, 1.9, -11.8},
-	{3, 0, 1340.1, 0.0, 0.4, 0.0},
-	{3, 1, -2326.2, -160.2, -4.1, 7.3},
-	{3, 2, 1231.9, 251.9, -2.9, -3.9},
-	{3, 3, 634.0, -536.6, -7.7, -2.6},
-	{4, 0, 912.6, 0.0, -1.8, 0.0},
-	{4, 1, 808.9, 286.4, 2.3, 1.1},
-	{4, 2, 166.7, -211.2, -8.7, 2.7},
-	{4, 3, -357.1, 164.3, 4.6, 3.9},
-	{4, 4, 89.4, -309.1, -2.1, -0.8},
-	{5, 0, -230.9, 0.0, -1.0, 0.0},
-	{5, 1, 357.2, 44.6, 0.6, 0.4},
-	{5, 2, 200.3, 188.9, -1.8, 1.8},
-	{5, 3, -141.1, -118.2, -1.0, 1.2},
-	{5, 4, -163.0, 0.0, 0.9, 4.0},
-	{5, 5, -7.8, 100.9, 1.0, -0.6},
-	{6, 0, 72.8, 0.0, -0.2, 0.0},
-	{6, 1, 68.6, -20.8, -0.2, -0.2},
-	{6, 2, 76.0, 44.1, -0.1, -2.1},
-	{6, 3, -141.4, 61.5, 2.0, -0.4},
-	{6, 4, -22.8, -66.3, -1.7, -0.6},
-	{6, 5, 13.2, 3.1, -0.3, 0.5},
-	{6, 6, -77.9, 55.0, 1.7, 0.9},
-	{7, 0, 80.5, 0.0, 0.1, 0.0},
-	{7, 1, -75.1, -57.9, -0.1, 0.7},
-	{7, 2, -4.7, -21.1, -0.6, 0.3},
-	{7, 3, 45.3, 6.5, 1.3, -0.1},
-	{7, 4, 13.9, 24.9, 0.4, -0.1},
-	{7, 5, 10.4, 7.0, 0.3, -0.8},
-	{7, 6, 1.7, -27.7, -0.7, -0.3},
-	{7, 7, 4.9, -3.3, 0.6, 0.3},
-	{8, 0, 24.4, 0.0, -0.1, 0.0},
-	{8, 1, 8.1, 11.0, 0.1, -0.1},
-	{8, 2, -14.5, -20.0, -0.6, 0.2},
-	{8, 3, -5.6, 11.9, 0.2, 0.4},
-	{8, 4, -19.3, -17.4, -0.2, 0.4},
-	{8, 5, 11.5, 16.7, 0.3, 0.1},
-	{8, 6, 10.9, 7.0, 0.3, -0.1},
-	{8, 7, -14.1, -10.8, -0.6, 0.4},
-	{8, 8, -3.7, 1.7, 0.2, 0.3},
-	{9, 0, 5.4, 0.0, 0.0, 0.0},
-	{9, 1, 9.4, -20.5, -0.1, 0.0},
-	{9, 2, 3.4, 11.5, 0.0, -0.2},
-	{9, 3, -5.2, 12.8, 0.3, 0.0},
-	{9, 4, 3.1, -7.2, -0.4, -0.1},
-	{9, 5, -12.4, -7.4, -0.3, 0.1},
-	{9, 6, -0.7, 8.0, 0.1, 0.0},
-	{9, 7, 8.4, 2.1, -0.1, -0.2},
-	{9, 8, -8.5, -6.1, -0.4, 0.3},
-	{9, 9, -10.1, 7.0, -0.2, 0.2},
-	{10, 0, -2.0, 0.0, 0.0, 0.0},
-	{10, 1, -6.3, 2.8, 0.0, 0.1},
-	{10, 2, 0.9, -0.1, -0.1, -0.1},
-	{10, 3, -1.1, 4.7, 0.2, 0.0},
-	{10, 4, -0.2, 4.4, 0.0, -0.1},
-	{10, 5, 2.5, -7.2, -0.1, -0.1},
-	{10, 6, -0.3, -1.0, -0.2, 0.0},
-	{10, 7, 2.2, -3.9, 0.0, -0.1},
-	{10, 8, 3.1, -2.0, -0.1, -0.2},
-	{10, 9, -1.0, -2.0, -0.2, 0.0},
-	{10, 10, -2.8, -8.3, -0.2, -0.1},
-	{11, 0, 3.0, 0.0, 0.0, 0.0},
-	{11, 1, -1.5, 0.2, 0.0, 0.0},
-	{11, 2, -2.1, 1.7, 0.0, 0.1},
-	{11, 3, 1.7, -0.6, 0.1, 0.0},
-	{11, 4, -0.5, -1.8, 0.0, 0.1},
-	{11, 5, 0.5, 0.9, 0.0, 0.0},
-	{11, 6, -0.8, -0.4, 0.0, 0.1},
-	{11, 7, 0.4, -2.5, 0.0, 0.0},
-	{11, 8, 1.8, -1.3, 0.0, -0.1},
-	{11, 9, 0.1, -2.1, 0.0, -0.1},
-	{11, 10, 0.7, -1.9, -0.1, 0.0},
-	{11, 11, 3.8, -1.8, 0.0, -0.1},
-	{12, 0, -2.2, 0.0, 0.0, 0.0},
-	{12, 1, -0.2, -0.9, 0.0, 0.0},
-	{12, 2, 0.3, 0.3, 0.1, 0.0},
-	{12, 3, 1.0, 2.1, 0.1, 0.0},
-	{12, 4, -0.6, -2.5, -0.1, 0.0},
-	{12, 5, 0.9, 0.5, 0.0, 0.0},
-	{12, 6, -0.1, 0.6, 0.0, 0.1},
-	{12, 7, 0.5, 0.0, 0.0, 0.0},
-	{12, 8, -0.4, 0.1, 0.0, 0.0},
-	{12, 9, -0.4, 0.3, 0.0, 0.0},
-	{12, 10, 0.2, -0.9, 0.0, 0.0},
-	{12, 11, -0.8, -0.2, -0.1, 0.0},
-	{12, 12, 0.0, 0.9, 0.1, 0.0}
-	};
-
-	// TODO: If this works here, delete first two columns to save space
-	for (uint16_t i = 0; i < NUMTERMS; i++) {
-		MagneticModel->Main_Field_Coeff_G[i] = CoeffFile[i][2];
-		MagneticModel->Main_Field_Coeff_H[i] = CoeffFile[i][3];
-		MagneticModel->Secular_Var_Coeff_G[i] = CoeffFile[i][4];
-		MagneticModel->Secular_Var_Coeff_H[i] = CoeffFile[i][5];
-	}
-
-}

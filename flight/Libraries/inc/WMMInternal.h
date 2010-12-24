@@ -43,10 +43,10 @@ typedef struct {
 	float EditionDate;
 	float epoch;		//Base time of Geomagnetic model epoch (yrs)
 	char ModelName[20];
-	float Main_Field_Coeff_G[NUMTERMS];	// C - Gauss coefficients of main geomagnetic model (nT)
-	float Main_Field_Coeff_H[NUMTERMS];	// C - Gauss coefficients of main geomagnetic model (nT)
-	float Secular_Var_Coeff_G[NUMTERMS];	// CD - Gauss coefficients of secular geomagnetic model (nT/yr)
-	float Secular_Var_Coeff_H[NUMTERMS];	// CD - Gauss coefficients of secular geomagnetic model (nT/yr)
+//	float Main_Field_Coeff_G[NUMTERMS];	// C - Gauss coefficients of main geomagnetic model (nT)
+//	float Main_Field_Coeff_H[NUMTERMS];	// C - Gauss coefficients of main geomagnetic model (nT)
+//	float Secular_Var_Coeff_G[NUMTERMS];	// CD - Gauss coefficients of secular geomagnetic model (nT/yr)
+//	float Secular_Var_Coeff_H[NUMTERMS];	// CD - Gauss coefficients of secular geomagnetic model (nT/yr)
 	uint16_t nMax;		// Maximum degree of spherical harmonic model
 	uint16_t nMaxSecVar;	// Maxumum degree of spherical harmonic secular model
 	uint16_t SecularVariationUsed;	// Whether or not the magnetic secular variation vector will be needed by program
@@ -121,7 +121,6 @@ typedef struct {
 void WMM_Set_Coeff_Array();
 void WMM_GeodeticToSpherical(WMMtype_CoordGeodetic * CoordGeodetic, WMMtype_CoordSpherical * CoordSpherical);
 uint16_t WMM_DateToYear(WMMtype_Date * CalendarDate, char *Error);
-void WMM_TimelyModifyMagneticModel(WMMtype_Date * UserDate);
 uint16_t WMM_Geomag(WMMtype_CoordSpherical * CoordSpherical,
 		    WMMtype_CoordGeodetic * CoordGeodetic, WMMtype_GeoMagneticElements * GeoMagneticElements);
 
@@ -155,5 +154,10 @@ uint16_t WMM_Summation(WMMtype_LegendreFunction * LegendreFunction,
 
 uint16_t WMM_SummationSpecial(WMMtype_SphericalHarmonicVariables *
 			      SphVariables, WMMtype_CoordSpherical * CoordSpherical, WMMtype_MagneticResults * MagneticResults);
+
+float WMM_get_main_field_coeff_g(uint16_t index);
+float WMM_get_main_field_coeff_h(uint16_t index);
+float WMM_get_secular_var_coeff_g(uint16_t index);
+float WMM_get_secular_var_coeff_h(uint16_t index);
 
 #endif /* WMMINTERNAL_H_ */

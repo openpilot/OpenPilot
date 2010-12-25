@@ -120,8 +120,9 @@ namespace jafar {
 				//Reparametrize old Landmarks into new ones
 				void reparametrize(const landmark_ptr_t & lmkDestPtr);
 				void reparametrize(int size, vec &xNew, sym_mat &pNew);
-				virtual vec reparametrize_func(const vec & lmk) = 0;
-				virtual void reparametrize_func(const vec & lmk, vec & lnew, mat & LNEW_lmk) = 0;
+				jblas::vec reparametrized() const { return reparametrize_func(state.x()); }
+				virtual vec reparametrize_func(const vec & lmk) const = 0;
+				virtual void reparametrize_func(const vec & lmk, vec & lnew, mat & LNEW_lmk) const = 0;
 
 				/**
 				 * Size of the landmark state

@@ -61,7 +61,7 @@ namespace jafar {
 
 				virtual size_t reparamSize() {return LandmarkAnchoredHomogeneousPoint::size();}
 
-				virtual vec reparametrize_func(const vec & lmk){
+				virtual vec reparametrize_func(const vec & lmk) const {
 					return lmkAHP::ahp2euc(lmk);
 				}
 
@@ -71,7 +71,7 @@ namespace jafar {
 				 * \param euc the returned Euclidean point.
 				 * \param EUC_ahp the Jacobian of the conversion.
 				 */
-				void reparametrize_func(const vec & ahp, vec & euc, mat & EUC_ahp) {
+				void reparametrize_func(const vec & ahp, vec & euc, mat & EUC_ahp) const {
 					lmkAHP::ahp2euc(ahp, euc, EUC_ahp);
 				}
 

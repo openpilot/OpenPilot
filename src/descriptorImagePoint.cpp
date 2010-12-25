@@ -82,8 +82,7 @@ namespace jafar {
 
 			double zoom, rotation;
 			landmark_ptr_t lmkPtr = obsPtrNew->landmarkPtr();
-			vec lmk = lmkPtr->state.x();
-			vec pnt = lmkPtr->reparametrize_func(lmk);
+			vec pnt = lmkPtr->reparametrized();
 			quaternion::getZoomRotation(view.senPose, obsPtrNew->sensorPtr()->globalPose(), pnt, zoom, rotation);
 			// normally we must cast to the derived type
 			app_img_pnt_ptr_t app_dst = SPTR_CAST<AppearanceImagePoint>(obsPtrNew->predictedAppearance);
@@ -150,7 +149,7 @@ app_dst->patch.save(buffer);
 			if (!getClosestView(obsPtr, view_src)) return false;
 
 			landmark_ptr_t lmkPtr = obsPtr->landmarkPtr();
-			jblas::vec lmk = lmkPtr->reparametrize_func(lmkPtr->state.x());
+			jblas::vec lmk = lmkPtr->reparametrized();
 			
 			app_img_pnt_ptr_t app_dst = SPTR_CAST<AppearanceImagePoint>(obsPtr->predictedAppearance);
 			app_img_pnt_ptr_t app_src = SPTR_CAST<AppearanceImagePoint>(view_src->appearancePtr);

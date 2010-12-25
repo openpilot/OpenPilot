@@ -36,6 +36,7 @@
 #include "rtslam/mapManager.hpp"
 #include "rtslam/mapObject.hpp"
 #include "rtslam/descriptorAbstract.hpp"
+#include "rtslam/visibilityMap.hpp"
 //#include "rtslam/observationAbstract.hpp"
 #include "rtslam/parents.hpp"
 
@@ -105,6 +106,7 @@ namespace jafar {
 						PNT_EUC, PNT_AH
 				};
 				type_enum type;
+				bool converged;
 
 			protected:
 				geometry_t geomType;
@@ -114,6 +116,7 @@ namespace jafar {
 				virtual std::string typeName() const {return "Abstract";}
 
 				descriptor_ptr_t descriptorPtr; ///< Landmark descriptor
+				VisibilityMap visibilityMap;
 
 				jblas::mat LNEW_lmk; ///<Jacobian comming from reparametrisation of old lmk wrt. new lmk
 

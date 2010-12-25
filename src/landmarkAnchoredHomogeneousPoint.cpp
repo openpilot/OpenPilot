@@ -24,12 +24,14 @@ namespace jafar {
 			LandmarkAbstract(mapPtr, 7) {
 			geomType = POINT,
 			type = PNT_AH;
+			converged = false;
 		}
 
 		LandmarkAnchoredHomogeneousPoint::LandmarkAnchoredHomogeneousPoint(const simulation_t dummy, const map_ptr_t & mapPtr) :
 			LandmarkAbstract(FOR_SIMULATION, mapPtr, 7) {
 			geomType = POINT,
 			type = PNT_AH;
+			converged = false;
 		}
 
 		bool LandmarkAnchoredHomogeneousPoint::needToDie(DecisionMethod dieMet){

@@ -36,7 +36,6 @@ namespace jafar {
 			s << "OBSERVATION " << obs.id() << ": of " << obs.typeName() << " from landmark " << obs.landmarkPtr()->typeName() << " and sensor " << obs.sensorPtr()->typeName()
 			    << endl;
 			s << "Sensor: " << obs.sensorPtr()->id() << ", landmark: " << obs.landmarkPtr()->id() << endl;
-			s << " .ia_rsl: " << obs.ia_rsl << endl;
 			s << " .expectation:  " << obs.expectation << endl;
 			s << " .measurement:  " << obs.measurement << endl;
 			s << " .innovation:   " << obs.innovation << endl;
@@ -48,6 +47,7 @@ namespace jafar {
 			s << " .cnt:| search: " << obs.counters.nSearch
 					<< " | match: " << obs.counters.nMatch
 					<< " | inlier: " << obs.counters.nInlier << " | ";
+			s << endl << " .visibility: " << obs.landmark().visibilityMap; // FIXME with different sensors
 			return s;
 		}
 		

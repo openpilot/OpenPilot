@@ -51,6 +51,7 @@ namespace jafar {
 		{
 			category = LANDMARK;
 			descriptorPtr = _prevLmk->descriptorPtr;
+			visibilityMap = _prevLmk->visibilityMap;
 		}
 
 		LandmarkAbstract::LandmarkAbstract(const simulation_t dummy, const map_ptr_t & _mapPtr, const size_t _size) :

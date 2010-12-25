@@ -134,9 +134,7 @@ namespace rtslam {
 				app_dst->offset = app_src->offset;
 
 				// create descriptor
-				vec7 globalSensorPose = obsPtr->sensorPtr()->globalPose();
 				descriptor_ptr_t descPtr(descFactory->createDescriptor());
-				descPtr->addObservation(obsPtr);
 				obsPtr->landmarkPtr()->setDescriptor(descPtr);
 			}
 

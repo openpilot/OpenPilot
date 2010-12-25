@@ -5,6 +5,7 @@ Bugs
 - trajectories are not repeatable and not always right
 - debug inertial... why sometimes uncertainty on quaternion grows significantly after move, and sometimes not (88,89,90) ?
 - do simulation with inertial
+- gdhe crashes when too many landmarks (probably), check if this is the number of objects or the size of a command or... and it make rtslam crashing with a sigpipe, check if we could avoid that!
 
 - in simulation without noise, with a slow start going forward, most of the time it works perfectly, but depending on the random seed sometimes it goes frankly on the side (left/right and/or top/down, up to 45 deg). It is the same with ransac iterative and with active search, but they can behave differently with the same random seed...
 
@@ -66,14 +67,16 @@ Performance
 Precision
 ------------------------------------
 - to extract patch and match, compute an homography with the 4 corners, in order to take distortion a little bit into account
-- don't remove landmarks when they are not found because the point of view is too different
-- initialize new points if the existing points are not observed, especially if it is because the point of view is too different.
 - define and implement measure->P in matcher
 - extend to n-point ransac and reduce the lowInnov ?
 - if no feature is found, try with larger ellipse, because there is little chance you find them back later (except if this one image is bad), if you never find them back you'll be for sure inconsistent, and if you try later the ellipses will be greater and greater.
 - Finish implementing RobotCentric Kalman
 - To investigate : predict, compute jacobians, correct mean offline, recompute jacobians, correct online = better consistence but how much more computations ?
 - harris: using square mask is suboptimal, but can we refine around the max with a gaussian mask in order to improve the precision of the corner ?
+- write different map managers :
+  - visual odometry (forget about landmarks shortly after they are lost or out of the frame)
+  - local map (try to keep the right amount of landmarks to allow close looping inside a map)
+  - reconstruction (like local map but try to have the most possible landmarks by stopping to update some of them, getting some of them out of the map, and trying to add more points for better coverage)
 
 - test predicted patch variance: if too low, discard exploration and declare not matched. Or rather test the variance of where you search, we can add an option minSigma to explorer that don't do correlation if sigma too low.
 - when a point is detected, do a matching with itself with interpolation to find subpixel position
@@ -85,6 +88,8 @@ Precision
 - [ok] when all the ellipses are too large (because we lost a lot of frames), before deleting all of them try to match with subregions, and maybe limit ransac number of tries... and don't delete obs once they have been updated! it's too late!
 - [ok] there are still some 'display library' objects construction in display objects constructors, which are possibly time consuming, they should be moved in render with '== NULL' test. Maybe this is why quite often there is a gap in the few first frames.
 - [ok] port the multiview descriptor from the old slam in order to match landmarks in more different point of views
+- [ok] don't remove landmarks when they are not found because the point of view is too different
+- [ok] initialize new points if the existing points are not observed, especially if it is because the point of view is too different.
 
 
 Display

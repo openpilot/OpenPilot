@@ -316,6 +316,7 @@ JFR_DEBUG_END();
 				if (obs->events.updated) JFR_ASSERT(obs->events.matched && obs->events.measured && obs->events.visible && obs->events.predicted, "obs updated without previous steps");
 				
 				obs->updateDescriptor();
+				obs->updateVisibilityMap();
 				
 				if (not (obs->events.measured && !obs->events.matched && !obs->isDescriptorValid()))
 				{
@@ -439,7 +440,9 @@ JFR_DEBUG_END();
 
 						// 2d. Create lmk descriptor
 						detector->fillDataObs(featPtr, obsPtr);
-
+						
+						obsPtr->updateDescriptor();
+						obsPtr->updateVisibilityMap();
 						featMan->addObs(obsPtr->measurement.x());
 						
 //#ifndef JFR_NDEBUG
@@ -491,13 +494,26 @@ JFR_DEBUG_END();
 				obsPtr->measurement.matchScore = 0;
 
 				obsPtr->project();
-				obsPtr->predictVisibility();
 				
-				if (obsPtr->isVisible())
+				if (obsPtr->predictVisibility())
 				{
-					obsPtr->events.visible = true;
-					featMan->addObs(obsPtr->expectation.x());
-					obsVisibleList.push_back(obsPtr);
+					double visibility, viscertainty;
+					obsPtr->landmark().visibilityMap.estimateVisibility(obsPtr, visibility, viscertainty);
+					bool add = false;
+					if (visibility > 0.75 && viscertainty > 0.75) add = true; else
+					if (!obsPtr->landmark().converged)
+						{ if (visibility < 0.25) visibility = 0.25; }
+					else
+						{ if (visibility < 0.1) visibility = 0.1; } // allow closing the loop! maybe look at neighbors
+					if (viscertainty < 0.25) visibility = 0.25;
+					if (rand()%1024 < visibility*1024) add = true;
+					
+					if (add)
+					{
+						featMan->addObs(obsPtr->expectation.x());
+						obsVisibleList.push_back(obsPtr);
+					} 
+					//else std::cout << __FILE__ << ":" << __LINE__ << " ignore lmk " << obsPtr->id() << std::endl;
 				} // visible obs
 			} // for each obs
 			remainingObsCount = obsVisibleList.size();

@@ -17,12 +17,14 @@ namespace jafar {
 			LandmarkAbstract(mapPtr, 3) {
 			geomType = POINT,
 			type = PNT_EUC;
+			converged = true;
 		}
 
 		LandmarkEuclideanPoint::LandmarkEuclideanPoint(const simulation_t dummy, const map_ptr_t & mapPtr) :
 			LandmarkAbstract(FOR_SIMULATION, mapPtr, 3) {
 			geomType = POINT,
 			type = PNT_EUC;
+			converged = true;
 		}
 
 		/**
@@ -32,6 +34,7 @@ namespace jafar {
 		        LandmarkAbstract(_mapPtr,prevlmk,size(),_icomp) {
 			geomType = POINT,
 			type = PNT_EUC;
+			converged = true;
 		}
 
 	} // namespace rtslam

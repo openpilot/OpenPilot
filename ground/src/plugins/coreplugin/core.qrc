@@ -50,5 +50,6 @@
         <file>images/optionsicon.png</file>
         <file>images/helpicon.png</file>
         <file>images/openpiloticon.png</file>
+        <file>OpenPilotGCS.ini</file>
     </qresource>
 </RCC>

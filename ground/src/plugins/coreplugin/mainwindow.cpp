@@ -269,11 +269,20 @@ void MainWindow::modeChanged(Core::IMode */*mode*/)
 void MainWindow::extensionsInitialized()
 {
 
+    QSettings* qs = m_settings;
+    QSettings defaultSettings(":/core/OpenPilotGCS.ini", QSettings::IniFormat);
+
+    if ( ! qs->allKeys().count() ){
+        qDebug() << "There is no config, load default config from resource /core/OpenPilotGCS.ini";
+        qs = &defaultSettings;
+    }
+    // qDebug() << "Number of keys in config: " << qs->allKeys().count();
+
     m_uavGadgetInstanceManager = new UAVGadgetInstanceManager(this);
-    m_uavGadgetInstanceManager->readConfigurations(m_settings);
+    m_uavGadgetInstanceManager->readConfigurations(qs);
 
     m_messageManager->init();
-    readSettings(m_settings);
+    readSettings(qs);
 
     updateContext();
 

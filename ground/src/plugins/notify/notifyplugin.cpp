@@ -38,17 +38,18 @@
 #include <iostream>
 #include "qxttimer.h"
 
-#define DEBUG_NOTIFIES
+//#define DEBUG_NOTIFIES
 
 SoundNotifyPlugin::SoundNotifyPlugin()
 {
 	phonon.mo = NULL;
-	phonon.ms = NULL;
    // Do nothing
 }
 
 SoundNotifyPlugin::~SoundNotifyPlugin()
 {
+    if (phonon.mo != NULL)
+        delete phonon.mo;
    // Do nothing
 }
 
@@ -135,6 +136,7 @@ void SoundNotifyPlugin::resetNotification(void)
 void SoundNotifyPlugin::updateNotificationList(QList<NotifyPluginConfiguration*> list)
 {
 	removedNotifies.clear();
+        resetNotification();
 	lstNotifications.clear();
 	lstNotifications=list;
 	connectNotifications();
@@ -148,8 +150,6 @@ void SoundNotifyPlugin::connectNotifications()
 	}
 	if(phonon.mo != NULL)
 		delete phonon.mo;
-	if(phonon.ms != NULL)
-		delete phonon.ms;
 
 	if(!enableSound) return;
 
@@ -193,10 +193,8 @@ void SoundNotifyPlugin::connectNotifications()
 
 	if(lstNotifications.isEmpty()) return;
 	// set notification message to current event
-        //phonon.mo = new Phonon::MediaObject;
         phonon.mo = Phonon::createPlayer(Phonon::NotificationCategory);
-        phonon.ms = new QList<Phonon::MediaSource>;
-        phonon.mo->clear();
+        phonon.mo->clearQueue();
         phonon.firstPlay = true;
 #ifdef DEBUG_NOTIFIES
         QList<Phonon::AudioOutputDevice> audioOutputDevices =
@@ -316,7 +314,7 @@ bool SoundNotifyPlugin::playNotification(NotifyPluginConfiguration* notification
 				int pos = rxlen.indexIn(notification->getRepeatFlag());
 				if (pos > -1) {
 					value = rxlen.cap(1); // "189"
-					timer_value = (value.toInt()+8)*1000; //ms*1000 + average duration of meassage
+                                        timer_value = (value.toInt()+8)*1000; //ms*1000 + average duration of meassage
 				}
 
 				if(!notification->timer)
@@ -332,15 +330,16 @@ bool SoundNotifyPlugin::playNotification(NotifyPluginConfiguration* notification
 			}
 		}
 		notification->firstStart=false;
-		phonon.mo->clear();
-		phonon.ms->clear();
+                phonon.mo->clear();
 		QString str = notification->parseNotifyMessage();
 #ifdef DEBUG_NOTIFIES
 		qDebug() << "play notification - " << str;
 #endif
-		foreach(QString item, notification->getNotifyMessageList())
-			phonon.ms->append(Phonon::MediaSource(item));
-		phonon.mo->setQueue(*phonon.ms);
+                foreach(QString item, notification->getNotifyMessageList()) {
+                    Phonon::MediaSource *ms = new Phonon::MediaSource(item);
+                    ms->setAutoDelete(true);
+                    phonon.mo->enqueue(*ms);
+                }
 		phonon.mo->play();
                 phonon.firstPlay = false; // On Linux, you sometimes have to nudge Phonon to play 1 time before
                                           // the state is not "Loading" anymore.
@@ -396,7 +395,14 @@ void SoundNotifyPlugin::stateChanged(Phonon::State newstate, Phonon::State oldst
 
 #ifdef DEBUG_NOTIFIES
     qDebug() << "File length (ms): " << phonon.mo->totalTime();
+    qDebug() << "New State: " << newstate;
 #endif
+
+    // This is a hack to force Linux to wait until the end of the
+    // wav file before moving to the next in the queue
+    if (phonon.mo->totalTime()>0)
+        phonon.mo->setTransitionTime(phonon.mo->totalTime());
+
 	if((newstate  == Phonon::PausedState) ||
 	   (newstate  == Phonon::StoppedState))
 	{
@@ -408,13 +414,12 @@ void SoundNotifyPlugin::stateChanged(Phonon::State newstate, Phonon::State oldst
 			qDebug() << "play audioFree - " << notification->parseNotifyMessage();
 #endif
 			playNotification(notification);
-		}
-	}
-	if(newstate  == Phonon::ErrorState)
+                }
+        } else if (newstate  == Phonon::ErrorState)
 	{
 		if(phonon.mo->errorType()==0) {
 			qDebug() << "Phonon::ErrorState: ErrorType = " << phonon.mo->errorType();
-			phonon.mo->clear();
+                        phonon.mo->clearQueue();
 		}
 	}
 //	if(newstate  == Phonon::BufferingState)

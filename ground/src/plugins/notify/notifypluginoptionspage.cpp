@@ -323,17 +323,16 @@ void  NotifyPluginOptionsPage::changeButtonText(Phonon::State newstate, Phonon::
 
 void NotifyPluginOptionsPage::on_buttonTestSoundNotification_clicked()
 {
-	QList <Phonon::MediaSource> messageNotify;
-	NotifyPluginConfiguration* notification = new NotifyPluginConfiguration;
+        // QList <Phonon::MediaSource> messageNotify;
+        NotifyPluginConfiguration *notification;
 
 	if(notifyRulesSelection->currentIndex().row()==-1) return;
 
+        notifySound->clearQueue();
 	notification = privListNotifications.at(notifyRulesSelection->currentIndex().row());
 	notification->parseNotifyMessage();
 	foreach(QString item, notification->getNotifyMessageList())
-		messageNotify.append(Phonon::MediaSource(item));
-	notifySound->clear();
-	notifySound->setQueue(messageNotify);
+                notifySound->enqueue(Phonon::MediaSource(item));
 	notifySound->play();
 }
 

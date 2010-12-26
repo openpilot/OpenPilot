@@ -40,7 +40,6 @@ class NotifyPluginConfiguration;
 
 typedef struct {
 	Phonon::MediaObject* mo;
-	QList<Phonon::MediaSource>* ms;
 	NotifyPluginConfiguration* notify;
         bool firstPlay;
 } PhononObject, *pPhononObject;

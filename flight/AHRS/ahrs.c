@@ -306,17 +306,35 @@ void ins_init_algorithm()
 	
 	using_mags = (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) || (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR);
 	using_mags &= (home.Be[0] != 0) || (home.Be[1] != 0) || (home.Be[2] != 0);  /* only use mags when valid home location */
-	using_gps = (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) && (gps_data.quality != 0);
 	
-	if (using_mags){
+	using_gps = (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) && (gps_data.quality != 0);
+
+	/* Block till a data update */
+	get_accel_gyro_data();
+
+	/* Ensure we get mag data in a timely manner */
+	uint16_t fail_count = 50; // 50 at 200 Hz is up to 0.25 sec
+	while(using_mags && !mag_data.updated & fail_count--) {
+		get_accel_gyro_data();
+		AhrsPoll();
+	}
+	using_mags &= mag_data.updated;		
+	
+	if (using_mags) {
+		/* Spin waiting for mag data */
+		while(!mag_data.updated) {
+			get_accel_gyro_data();
+			AhrsPoll();
+		}
+		mag_data.updated = false;
+
 		RotFrom2Vectors(accels, ge, mag_data.scaled.axis, home.Be, Rbe);
 		R2Quaternion(Rbe,q);
 		if (using_gps)
 			INSSetState(gps_data.NED, zeros, q, zeros, zeros);
 		else
 			INSSetState(zeros, zeros, q, zeros, zeros);
-	}
-	else{
+	} else {		
 		// assume yaw = 0
 		mag = VectorMagnitude(accels);
 		rpy[1] = asinf(-accels[0]/mag);

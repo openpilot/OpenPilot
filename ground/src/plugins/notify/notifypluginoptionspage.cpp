@@ -287,7 +287,8 @@ void NotifyPluginOptionsPage::on_soundLanguage_indexChanged(int index)
 {
 	options_page->SoundCollectionList->setCurrentIndex(index);
 
-	currentCollectionPath = options_page->SoundDirectoryPathChooser->path() +"\\"+options_page->SoundCollectionList->currentText();
+        currentCollectionPath = options_page->SoundDirectoryPathChooser->path() +
+                QDir::toNativeSeparators("/" + options_page->SoundCollectionList->currentText());
 
 	QDir dirPath(currentCollectionPath);
 	QStringList filters;

@@ -101,28 +101,28 @@ QString NotifyPluginConfiguration::parseNotifyMessage()
 	// generate queue of sound files to play
 	notifyMessageList.clear();
 
-	if(QFile::exists(getSoundCollectionPath()+"\\"+getCurrentLanguage()+"\\"+getSound1()+".wav"))
-		notifyMessageList.append(getSoundCollectionPath()+"\\"+getCurrentLanguage()+"\\"+getSound1()+".wav");
+        if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath()+ getCurrentLanguage()+"/"+getSound1()+".wav")))
+                notifyMessageList.append(QDir::toNativeSeparators(getSoundCollectionPath() + getCurrentLanguage()+"/"+getSound1()+".wav"));
 	else
-		if(QFile::exists(getSoundCollectionPath()+"\\default\\"+getSound2()+".wav"))
-			notifyMessageList.append(getSoundCollectionPath()+"\\default\\"+getSound1()+".wav");
+                if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath() + "default/"+getSound2()+".wav")))
+                        notifyMessageList.append(QDir::toNativeSeparators(getSoundCollectionPath() + "default/"+getSound1()+".wav"));
 
 	if(getSound2()!="")
 	{
-		if(QFile::exists(getSoundCollectionPath()+"\\"+getCurrentLanguage()+"\\"+getSound2()+".wav"))
-			notifyMessageList.append(getSoundCollectionPath()+"\\"+getCurrentLanguage()+"\\"+getSound2()+".wav");
+                if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath() + getCurrentLanguage()+"/"+getSound2()+".wav")))
+                        notifyMessageList.append(QDir::toNativeSeparators(getSoundCollectionPath() + getCurrentLanguage()+"/"+getSound2()+".wav"));
 		else
-			if(QFile::exists(getSoundCollectionPath()+"\\"+"\\default\\"+"\\"+getSound2()+".wav"))
-				notifyMessageList.append(getSoundCollectionPath()+"\\default\\"+getSound2()+".wav");
+                        if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath() + "default/"+getSound2()+".wav")))
+                                notifyMessageList.append(QDir::toNativeSeparators(getSoundCollectionPath() + "default/"+getSound2()+".wav"));
 	}
 
 	if(getSound3()!="")
 	{
-		if(QFile::exists(getSoundCollectionPath()+"\\"+getCurrentLanguage()+"\\"+getSound3()+".wav"))
-			notifyMessageList.append(getSoundCollectionPath()+"\\"+getCurrentLanguage()+"\\"+getSound3()+".wav");
+                if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath()+getCurrentLanguage()+"/"+getSound3()+".wav")))
+                        notifyMessageList.append(QDir::toNativeSeparators(getSoundCollectionPath()+getCurrentLanguage()+"/"+getSound3()+".wav"));
 		else
-			if(QFile::exists(getSoundCollectionPath()+"\\"+"\\default\\"+"\\"+getSound3()+".wav"))
-				notifyMessageList.append(getSoundCollectionPath()+"\\default\\"+getSound3()+".wav");
+                        if(QFile::exists(QDir::toNativeSeparators(getSoundCollectionPath()+"default/"+getSound3()+".wav")))
+                                notifyMessageList.append(QDir::toNativeSeparators(getSoundCollectionPath()+"default/"+getSound3()+".wav"));
 	}
 
 	switch(str1.at(0).toAscii())
@@ -204,12 +204,12 @@ QString NotifyPluginConfiguration::parseNotifyMessage()
 		}
 		foreach(QString fileName,numberFiles) {
 			fileName+=".wav";
-			QString filePath = getSoundCollectionPath()+"\\"+getCurrentLanguage()+"\\"+fileName;
+                        QString filePath = getSoundCollectionPath()+ QDir::toNativeSeparators(getCurrentLanguage()+"/"+fileName);
 			if(QFile::exists(filePath))
-				notifyMessageList.insert(position++,getSoundCollectionPath()+"\\"+getCurrentLanguage()+"\\"+fileName);
+                                notifyMessageList.insert(position++,getSoundCollectionPath()+ QDir::toNativeSeparators(getCurrentLanguage()+"/"+fileName));
 			else {
-				if(QFile::exists(getSoundCollectionPath()+"\\default\\"+fileName))
-					notifyMessageList.insert(position++,getSoundCollectionPath()+"\\default\\"+fileName);
+                                if(QFile::exists(getSoundCollectionPath()+QDir::toNativeSeparators("default/"+fileName)))
+                                        notifyMessageList.insert(position++,getSoundCollectionPath()+QDir::toNativeSeparators("default/"+fileName));
 				else {
 					notifyMessageList.clear();
 					break; // if no some of *.wav files, then don't play number!

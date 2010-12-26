@@ -38,7 +38,7 @@
 #include <iostream>
 #include "qxttimer.h"
 
-//#define DEBUG_NOTIFIES
+#define DEBUG_NOTIFIES
 
 SoundNotifyPlugin::SoundNotifyPlugin()
 {
@@ -193,10 +193,18 @@ void SoundNotifyPlugin::connectNotifications()
 
 	if(lstNotifications.isEmpty()) return;
 	// set notification message to current event
-	phonon.mo = new Phonon::MediaObject;
-	phonon.mo = Phonon::createPlayer(Phonon::NotificationCategory);
-	phonon.ms = new QList<Phonon::MediaSource>;
-	phonon.mo->clear();
+        //phonon.mo = new Phonon::MediaObject;
+        phonon.mo = Phonon::createPlayer(Phonon::NotificationCategory);
+        phonon.ms = new QList<Phonon::MediaSource>;
+        phonon.mo->clear();
+        phonon.firstPlay = true;
+#ifdef DEBUG_NOTIFIES
+        QList<Phonon::AudioOutputDevice> audioOutputDevices =
+                     Phonon::BackendCapabilities::availableAudioOutputDevices();
+        foreach(Phonon::AudioOutputDevice dev, audioOutputDevices) {
+            qDebug() << "Notify: Audio Output device: " << dev.name() << " - " << dev.description();
+        }
+#endif
 	connect(phonon.mo,SIGNAL(stateChanged(Phonon::State,Phonon::State)),
 			this,SLOT(stateChanged(Phonon::State,Phonon::State)));
 }
@@ -281,8 +289,12 @@ void SoundNotifyPlugin::checkNotificationRule(NotifyPluginConfiguration* notific
 
 bool SoundNotifyPlugin::playNotification(NotifyPluginConfiguration* notification)
 {
+#ifdef DEBUG_NOTIFIES
+    qDebug() << "Phonon State: " << phonon.mo->state();
+#endif
 	if((phonon.mo->state()==Phonon::PausedState) ||
-		(phonon.mo->state()==Phonon::StoppedState))
+                (phonon.mo->state()==Phonon::StoppedState) ||
+                phonon.firstPlay)
 	{
 		// don't fire expire timer
 		//notification->expire = false;
@@ -330,6 +342,8 @@ bool SoundNotifyPlugin::playNotification(NotifyPluginConfiguration* notification
 			phonon.ms->append(Phonon::MediaSource(item));
 		phonon.mo->setQueue(*phonon.ms);
 		phonon.mo->play();
+                phonon.firstPlay = false; // On Linux, you sometimes have to nudge Phonon to play 1 time before
+                                          // the state is not "Loading" anymore.
 	}
 	else
 		return false; // if audio is busy
@@ -379,6 +393,10 @@ void SoundNotifyPlugin::expireTimerHandler()
 void SoundNotifyPlugin::stateChanged(Phonon::State newstate, Phonon::State oldstate)
 {
     Q_UNUSED(oldstate)
+
+#ifdef DEBUG_NOTIFIES
+    qDebug() << "File length (ms): " << phonon.mo->totalTime();
+#endif
 	if((newstate  == Phonon::PausedState) ||
 	   (newstate  == Phonon::StoppedState))
 	{

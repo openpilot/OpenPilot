@@ -37,6 +37,7 @@ class XplaneSimulator: public Simulator
 public:
 	XplaneSimulator(const SimulatorSettings& params);
 	~XplaneSimulator();
+        bool setupProcess();
 
 	void setupUdpPorts(const QString& host, int inPort, int outPort);
 

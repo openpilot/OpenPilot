@@ -130,7 +130,7 @@ public:
 	static void setInstance(const QString& str) { Simulator::instances.append(str); }
 
 	virtual void stopProcess() {}
-	virtual void setupUdpPorts(const QString& host, int inPort, int outPort) {}
+        virtual void setupUdpPorts(const QString& host, int inPort, int outPort) { Q_UNUSED(host) Q_UNUSED(inPort) Q_UNUSED(outPort)}
 
 signals:
 	void autopilotConnected();

@@ -84,6 +84,14 @@ void XplaneSimulator::setupUdpPorts(const QString& host, int inPort, int outPort
 
 }
 
+bool XplaneSimulator::setupProcess()
+{
+    emit processOutput(QString("Please start X-Plane manually, and make sure it is setup to output its ") +
+                       "data to host " + settings.hostAddress + " UDP port " + QString::number(settings.inPort));
+    return true;
+
+}
+
 /**
  * update data in X-Plane simulator
  */

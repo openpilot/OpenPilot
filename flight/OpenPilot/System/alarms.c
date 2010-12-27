@@ -46,7 +46,8 @@ static int32_t hasSeverity(SystemAlarmsAlarmOptions severity);
 int32_t AlarmsInitialize(void)
 {
 	lock = xSemaphoreCreateRecursiveMutex();
-	AlarmsClearAll();
+	//AlarmsClearAll();
+	AlarmsDefaultAll();
 	return 0;
 }
 
@@ -102,6 +103,28 @@ SystemAlarmsAlarmOptions AlarmsGet(SystemAlarmsAlarmElem alarm)
     // Read alarm
     SystemAlarmsGet(&alarms);
     return alarms.Alarm[alarm];
+}
+
+/**
+ * Set an alarm to it's default value
+ * @param alarm The system alarm to be modified
+ * @return 0 if success, -1 if an error
+ */
+int32_t AlarmsDefault(SystemAlarmsAlarmElem alarm)
+{
+	return AlarmsSet(alarm, SYSTEMALARMS_ALARM_DEFAULT);
+}
+
+/**
+ * Default all alarms
+ */
+void AlarmsDefaultAll()
+{
+	uint32_t n;
+    for (n = 0; n < SYSTEMALARMS_ALARM_NUMELEM; ++n)
+    {
+    	AlarmsDefault(n);
+    }
 }
 
 /**

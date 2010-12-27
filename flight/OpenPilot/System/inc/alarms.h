@@ -29,10 +29,13 @@
 #define ALARMS_H
 
 #include "systemalarms.h"
+#define SYSTEMALARMS_ALARM_DEFAULT SYSTEMALARMS_ALARM_UNINITIALISED
 
 int32_t AlarmsInitialize(void);
 int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity);
 SystemAlarmsAlarmOptions AlarmsGet(SystemAlarmsAlarmElem alarm);
+int32_t AlarmsDefault(SystemAlarmsAlarmElem alarm);
+void AlarmsDefaultAll();
 int32_t AlarmsClear(SystemAlarmsAlarmElem alarm);
 void AlarmsClearAll();
 int32_t AlarmsHasWarnings();

@@ -314,7 +314,8 @@ void ins_init_algorithm()
 
 	/* Ensure we get mag data in a timely manner */
 	uint16_t fail_count = 50; // 50 at 200 Hz is up to 0.25 sec
-	while(using_mags && !mag_data.updated & fail_count--) {
+	while (using_mags && !mag_data.updated && fail_count--)
+	{
 		get_accel_gyro_data();
 		AhrsPoll();
 	}

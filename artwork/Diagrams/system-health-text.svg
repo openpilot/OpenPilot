@@ -476,6 +476,13 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3185"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
      inkscape:document-units="mm"
@@ -484,10 +491,10 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="4.9119409"
-     inkscape:cx="29.350749"
-     inkscape:cy="37.285377"
-     inkscape:current-layer="layer2"
+     inkscape:zoom="9.3551549"
+     inkscape:cx="30.361874"
+     inkscape:cy="38.611697"
+     inkscape:current-layer="svg3604"
      id="namedview3608"
      showgrid="false"
      inkscape:window-width="1680"
@@ -509,6 +516,10 @@
        orientation="0,1"
        position="-180.96091,-53.199384"
        id="guide3360" />
+    <sodipodi:guide
+       orientation="0,1"
+       position="34.202366,114.41506"
+       id="guide3168" />
   </sodipodi:namedview>
   <metadata
      id="metadata3610">
@@ -530,7 +541,7 @@
      style="display:inline">
     <rect
        style="fill:#453e3e;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.99921262;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect2816-7"
+       id="Background"
        width="93.746948"
        height="79.063599"
        x="497.92136"
@@ -541,7 +552,7 @@
        style="font-size:13.40719509px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
        x="523.5011"
        y="381.51367"
-       id="text3600-4"><tspan
+       id="MainBoard"><tspan
          sodipodi:role="line"
          id="tspan3602-8"
          x="523.5011"
@@ -584,32 +595,32 @@
        x="556.2887"
        height="20.208858"
        width="9.741457"
-       id="rect4000-7-6-7"
+       id="AHRS-SPI"
        style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
     <rect
        y="346.10165"
        x="569.6358"
        height="8.0567961"
        width="18.023544"
-       id="rect4000-7-6-5-9"
+       id="I2C"
        style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
     <rect
        y="355.2207"
        x="569.63025"
        height="8.0690594"
        width="18.036383"
-       id="rect4000-7-6-5-9-4"
+       id="Temp-Baro"
        style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.51991701;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
     <rect
        y="407.05673"
        x="552.6358"
        height="15.007023"
        width="5.311192"
-       id="rect4000-7-6-51-2-6"
+       id="USB"
        style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
     <rect
        style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect4000-7-6-51-2-0"
+       id="JTAG"
        width="5.311192"
        height="15.007023"
        x="560.98218"
@@ -619,21 +630,21 @@
        x="544.28949"
        height="15.007023"
        width="5.311192"
-       id="rect4000-7-6-51-2"
+       id="GPIO"
        style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
     <rect
        y="407.0524"
        x="514.80487"
        height="14.938984"
        width="9.9426785"
-       id="rect4000-7-6-51-2-4"
+       id="Pwr-Sense"
        style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53369814;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
     <rect
        y="406.95688"
        x="526.39636"
        height="15.034504"
        width="16.179909"
-       id="rect4000-7-8-9"
+       id="ADC"
        style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53585184;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
     <rect
        y="385.55762"
@@ -672,18 +683,17 @@
        x="25.010578"
        height="20.040594"
        width="30.08411"
-       id="rect4000-7-1"
+       id="USARTs"
        style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.55302167;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
        transform="translate(497.66563,344.28037)" />
     <rect
        inkscape:label="#rect4552-27"
-       y="3.1377156"
-       x="26.098318"
+       y="347.41809"
+       x="523.76398"
        height="5.6002355"
        width="23.347105"
        id="Telemetry"
-       style="fill:none;stroke:#ffffff;stroke-width:0.29055119;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
-       transform="translate(497.66563,344.28037)" />
+       style="fill:none;stroke:#ffffff;stroke-width:0.29055119;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
     <rect
        inkscape:label="#rect6258"
        y="395.55762"
@@ -708,6 +718,14 @@
        id="FlightTime"
        style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
        inkscape:label="#rect6260" />
+    <rect
+       y="353.41809"
+       x="523.76398"
+       height="5.6002355"
+       width="23.347105"
+       id="GPS"
+       style="fill:none;stroke:#ffffff;stroke-width:0.29055119;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       inkscape:label="#rect4120" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -741,10 +759,10 @@
      inkscape:groupmode="layer"
      id="layer47"
      inkscape:label="FlightTime-Error"
-     style="display:none">
+     style="display:inline">
     <g
        style="stroke:#cf0e0e;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
-       id="OutOfMemory-Error-4"
+       id="FlightTime-Error"
        transform="translate(20.488022,18.086644)"
        inkscape:label="#g4084">
       <path
@@ -754,7 +772,7 @@
       <path
          style="fill:none;stroke:#cf0e0e;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
          d="m 38.220502,41.354548 17.85063,-8.061574"
-         id="FlightTime-Error"
+         id="FlightTime-Error2"
          inkscape:label="#path4088-8" />
     </g>
   </g>
@@ -770,6 +788,132 @@
        height="8.1216154"
        x="58.539021"
        y="51.277248"
+       inkscape:label="#rect4080" />
+  </g>
+  <g
+     style="display:none"
+     inkscape:label="I2C-OK"
+     id="g3164"
+     inkscape:groupmode="layer">
+    <rect
+       inkscape:label="#rect8374"
+       y="1.8212841"
+       x="71.970177"
+       height="8.1216154"
+       width="18.153212"
+       id="I2C-OK"
+       style="fill:#04b629;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
+  </g>
+  <g
+     style="display:none"
+     inkscape:label="I2C-Warning"
+     id="g3160"
+     inkscape:groupmode="layer">
+    <rect
+       inkscape:label="#rect4073"
+       style="fill:#f1b907;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       id="I2C-Warning"
+       width="18.153212"
+       height="8.1216154"
+       x="71.970177"
+       y="1.8212841" />
+  </g>
+  <g
+     style="display:none"
+     inkscape:label="I2C-Error"
+     id="g3152"
+     inkscape:groupmode="layer">
+    <g
+       inkscape:label="#g4084"
+       transform="translate(33.813538,-31.144609)"
+       id="I2C-Error"
+       style="stroke:#cf0e0e;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline">
+      <path
+         id="path3156"
+         d="M 38.076545,33.292974 56.14311,41.28257"
+         style="fill:none;stroke:#cf0e0e;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         inkscape:label="#path4088-8"
+         id="path3158"
+         d="m 38.220502,41.354548 17.85063,-8.061574"
+         style="fill:none;stroke:#cf0e0e;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+  </g>
+  <g
+     style="display:none"
+     inkscape:label="I2C-Critical"
+     id="g3148"
+     inkscape:groupmode="layer">
+    <rect
+       inkscape:label="#rect4080"
+       y="1.8212841"
+       x="71.970177"
+       height="8.1216154"
+       width="18.153212"
+       id="I2C-Critical"
+       style="fill:#cf0e0e;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="g3184"
+     inkscape:label="GPS-OK"
+     style="display:none">
+    <rect
+       style="fill:#04b629;fill-opacity:1;stroke:#ffffff;stroke-width:0.30000001;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       id="GPS-OK"
+       width="23.347105"
+       height="5.6002355"
+       x="26.199663"
+       y="9.1076469"
+       inkscape:label="#rect8374" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="g3180"
+     inkscape:label="GPS-Warning"
+     style="display:none">
+    <rect
+       y="9.1076469"
+       x="26.199663"
+       height="5.6002355"
+       width="23.347105"
+       id="GPS-Warning"
+       style="fill:#f1b907;fill-opacity:1;stroke:#ffffff;stroke-width:0.30000001;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       inkscape:label="#rect4073" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="g3172"
+     inkscape:label="GPS-Error"
+     style="display:none">
+    <g
+       style="stroke:#cf0e0e;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       id="GPS-Error"
+       transform="matrix(1.2853162,0,0,0.64013573,-22.75,-11.845582)"
+       inkscape:label="#g4084">
+      <path
+         style="fill:none;stroke:#cf0e0e;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         d="M 38.076545,33.292974 56.14311,41.28257"
+         id="path3176" />
+      <path
+         style="fill:none;stroke:#cf0e0e;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         d="m 38.220502,41.354548 17.85063,-8.061574"
+         id="path3178"
+         inkscape:label="#path4088-8" />
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="g3168"
+     inkscape:label="GPS-Critical"
+     style="display:none">
+    <rect
+       style="fill:#cf0e0e;fill-opacity:1;stroke:#ffffff;stroke-width:0.30000001;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       id="GPS-Critical"
+       width="23.347105"
+       height="5.6002355"
+       x="26.199663"
+       y="9.1076469"
        inkscape:label="#rect4080" />
   </g>
   <g
@@ -1509,7 +1653,8 @@
        style="font-size:40px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
        x="77.634293"
        y="7.3057365"
-       id="text4647-0-2"><tspan
+       id="I2C-Text"
+       inkscape:label="#text4647-0-2"><tspan
          sodipodi:role="line"
          id="tspan4649-2-7"
          x="77.634293"
@@ -2104,8 +2249,9 @@
        x="497.92136"
        height="79.063599"
        width="93.746948"
-       id="rect3054"
-       style="fill:none;stroke:#000000;stroke-width:0.99921262;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
+       id="outline"
+       style="fill:none;stroke:#000000;stroke-width:0.99921262;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       inkscape:label="#rect3054" />
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
@@ -2161,13 +2307,6 @@
          x="27.843384"
          y="13.375334"
          style="font-size:4px;fill:#ffffff;fill-opacity:1">2:GPS</tspan></text>
-    <rect
-       y="9.1377163"
-       x="26.098318"
-       height="5.6002355"
-       width="23.347105"
-       id="rect4120"
-       style="fill:none;stroke:#ffffff;stroke-width:0.29055119;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
     <rect
        style="fill:none;stroke:#ffffff;stroke-width:0.29055119;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect4122"

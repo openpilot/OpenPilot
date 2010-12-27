@@ -188,6 +188,7 @@ static void gpsTask(void *parameters)
 			GPSPositionGet(&GpsData);
 			GpsData.Status = GPSPOSITION_STATUS_NOGPS;
 			GPSPositionSet(&GpsData);
+			AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_ERROR);
 		} else {
 			// Had an update
 			HomeLocationData home;
@@ -197,6 +198,12 @@ static void gpsTask(void *parameters)
 			if ((GpsData.Status == GPSPOSITION_STATUS_FIX3D) && (home.Set == HOMELOCATION_SET_FALSE)) {
 				setHomeLocation(&GpsData);
 			}
+
+			//criteria for GPS-OK taken from this post...
+			//http://forums.openpilot.org/topic/1523-professors-insgps-in-svn/page__view__findpost__p__5220
+			if ((GpsData.PDOP<3.5)&&(GpsData.Satellites>=7))AlarmsClear(SYSTEMALARMS_ALARM_GPS);
+			else if (GpsData.Status == GPSPOSITION_STATUS_FIX3D) AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_WARNING);
+			else AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_CRITICAL);
 		}
 		
 		// Block task until next update

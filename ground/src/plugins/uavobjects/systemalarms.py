@@ -40,7 +40,7 @@ _fields = [ \
 	uavobject.UAVObjectField(
 		'Alarm',
 		'b',
-		10,
+		14,
 		[
 			'OutOfMemory',
 			'StackOverflow',
@@ -52,12 +52,17 @@ _fields = [ \
 			'Actuator',
 			'Stabilization',
 			'AHRSComms',
+			'Battery',
+			'FlightTime',
+			'I2C',
+			'GPS',
 		],
 		{
 			'0' : 'OK',
 			'1' : 'Warning',
 			'2' : 'Error',
 			'3' : 'Critical',
+			'4' : 'Uninitialised',
 		}
 	),
 ]
@@ -65,7 +70,7 @@ _fields = [ \
 
 class SystemAlarms(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 2311311584
+    OBJID        = 2311314672
     NAME         = "SystemAlarms"
     METANAME     = "SystemAlarmsMeta"
     ISSINGLEINST = 1

@@ -80,6 +80,20 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	// Initialize object fields to their default values
 	UAVObjGetInstanceData(obj, instId, &data);
 	memset(&data, 0, sizeof(SystemAlarmsData));
+	data.Alarm[0] = 4;
+	data.Alarm[1] = 4;
+	data.Alarm[2] = 4;
+	data.Alarm[3] = 4;
+	data.Alarm[4] = 4;
+	data.Alarm[5] = 4;
+	data.Alarm[6] = 4;
+	data.Alarm[7] = 4;
+	data.Alarm[8] = 4;
+	data.Alarm[9] = 4;
+	data.Alarm[10] = 4;
+	data.Alarm[11] = 4;
+	data.Alarm[12] = 4;
+	data.Alarm[13] = 4;
 
 	UAVObjSetInstanceData(obj, instId, &data);
 

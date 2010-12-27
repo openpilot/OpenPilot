@@ -54,11 +54,16 @@ SystemAlarms::SystemAlarms(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAM
     AlarmElemNames.append("Actuator");
     AlarmElemNames.append("Stabilization");
     AlarmElemNames.append("AHRSComms");
+    AlarmElemNames.append("Battery");
+    AlarmElemNames.append("FlightTime");
+    AlarmElemNames.append("I2C");
+    AlarmElemNames.append("GPS");
     QStringList AlarmEnumOptions;
     AlarmEnumOptions.append("OK");
     AlarmEnumOptions.append("Warning");
     AlarmEnumOptions.append("Error");
     AlarmEnumOptions.append("Critical");
+    AlarmEnumOptions.append("Uninitialised");
     fields.append( new UAVObjectField(QString("Alarm"), QString(""), UAVObjectField::ENUM, AlarmElemNames, AlarmEnumOptions) );
 
     // Initialize object
@@ -95,6 +100,20 @@ UAVObject::Metadata SystemAlarms::getDefaultMetadata()
  */
 void SystemAlarms::setDefaultFieldValues()
 {
+    data.Alarm[0] = 4;
+    data.Alarm[1] = 4;
+    data.Alarm[2] = 4;
+    data.Alarm[3] = 4;
+    data.Alarm[4] = 4;
+    data.Alarm[5] = 4;
+    data.Alarm[6] = 4;
+    data.Alarm[7] = 4;
+    data.Alarm[8] = 4;
+    data.Alarm[9] = 4;
+    data.Alarm[10] = 4;
+    data.Alarm[11] = 4;
+    data.Alarm[12] = 4;
+    data.Alarm[13] = 4;
 
 }
 

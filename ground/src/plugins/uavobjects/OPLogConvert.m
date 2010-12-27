@@ -300,12 +300,15 @@ function [] = OPLogConvert()
     PipXtremeModemSettings(1).Frequency = 0;
     PipXtremeModemSettings(1).Max_RF_Bandwidth = 0;
     PipXtremeModemSettings(1).Max_Tx_Power = 0;
+    PipXtremeModemSettings(1).Tx_Data_Wait = 0;
     PipXtremeModemSettings(1).AES_Encryption = 0;
     PipXtremeModemSettings(1).AES_EncryptionKey = zeros(1,16);
     PipXtremeModemSettings(1).Paired_Serial_Number = 0;
 
     pipxtrememodemstatusIdx = 1;
     PipXtremeModemStatus.timestamp = 0;
+    PipXtremeModemStatus(1).Firmware_Version_Major = 0;
+    PipXtremeModemStatus(1).Firmware_Version_Minor = 0;
     PipXtremeModemStatus(1).Serial_Number = 0;
     PipXtremeModemStatus(1).Up_Time = 0;
     PipXtremeModemStatus(1).Frequency = 0;
@@ -350,7 +353,7 @@ function [] = OPLogConvert()
 
     systemalarmsIdx = 1;
     SystemAlarms.timestamp = 0;
-    SystemAlarms(1).Alarm = zeros(1,10);
+    SystemAlarms(1).Alarm = zeros(1,14);
 
     systemsettingsIdx = 1;
     SystemSettings.timestamp = 0;
@@ -488,10 +491,10 @@ function [] = OPLogConvert()
             case 572614706
                 ObjectPersistence(objectpersistenceIdx) = ReadObjectPersistenceObject(fid, timestamp);
                 objectpersistenceIdx = objectpersistenceIdx + 1;
-            case 3822692478
+            case 444830632
                 PipXtremeModemSettings(pipxtrememodemsettingsIdx) = ReadPipXtremeModemSettingsObject(fid, timestamp);
                 pipxtrememodemsettingsIdx = pipxtrememodemsettingsIdx + 1;
-            case 539085060
+            case 2490854928
                 PipXtremeModemStatus(pipxtrememodemstatusIdx) = ReadPipXtremeModemStatusObject(fid, timestamp);
                 pipxtrememodemstatusIdx = pipxtrememodemstatusIdx + 1;
             case 3765671478
@@ -506,7 +509,7 @@ function [] = OPLogConvert()
             case 3792991236
                 StabilizationSettings(stabilizationsettingsIdx) = ReadStabilizationSettingsObject(fid, timestamp);
                 stabilizationsettingsIdx = stabilizationsettingsIdx + 1;
-            case 2311311584
+            case 2311314672
                 SystemAlarms(systemalarmsIdx) = ReadSystemAlarmsObject(fid, timestamp);
                 systemalarmsIdx = systemalarmsIdx + 1;
             case 59202798
@@ -1099,6 +1102,7 @@ function [PipXtremeModemSettings] = ReadPipXtremeModemSettingsObject(fid, timest
     PipXtremeModemSettings.Frequency = double(fread(fid, 1, 'uint32'));
     PipXtremeModemSettings.Max_RF_Bandwidth = double(fread(fid, 1, 'uint8'));
     PipXtremeModemSettings.Max_Tx_Power = double(fread(fid, 1, 'uint8'));
+    PipXtremeModemSettings.Tx_Data_Wait = double(fread(fid, 1, 'uint8'));
     PipXtremeModemSettings.AES_Encryption = double(fread(fid, 1, 'uint8'));
     PipXtremeModemSettings.AES_EncryptionKey = double(fread(fid, 16, 'uint8'));
     PipXtremeModemSettings.Paired_Serial_Number = double(fread(fid, 1, 'uint32'));
@@ -1115,6 +1119,8 @@ function [PipXtremeModemStatus] = ReadPipXtremeModemStatusObject(fid, timestamp)
     end
 
     PipXtremeModemStatus.timestamp = timestamp;
+    PipXtremeModemStatus.Firmware_Version_Major = double(fread(fid, 1, 'uint8'));
+    PipXtremeModemStatus.Firmware_Version_Minor = double(fread(fid, 1, 'uint8'));
     PipXtremeModemStatus.Serial_Number = double(fread(fid, 1, 'uint32'));
     PipXtremeModemStatus.Up_Time = double(fread(fid, 1, 'uint32'));
     PipXtremeModemStatus.Frequency = double(fread(fid, 1, 'uint32'));
@@ -1209,7 +1215,7 @@ function [SystemAlarms] = ReadSystemAlarmsObject(fid, timestamp)
     end
 
     SystemAlarms.timestamp = timestamp;
-    SystemAlarms.Alarm = double(fread(fid, 10, 'uint8'));
+    SystemAlarms.Alarm = double(fread(fid, 14, 'uint8'));
     % read CRC
     fread(fid, 1, 'uint8');
 end

@@ -34,6 +34,7 @@
 #include "eventfilteringmainwindow.h"
 
 #include <QtCore/QMap>
+#include <QSettings>
 
 QT_BEGIN_NAMESPACE
 class QSettings;
@@ -106,7 +107,7 @@ public:
     Core::ModeManager *modeManager() const;
     Core::MimeDatabase *mimeDatabase() const;
 
-    inline QSettings *settings() const { return m_settings; }
+    QSettings *settings(QSettings::Scope scope) const;
     inline SettingsDatabase *settingsDatabase() const { return m_settingsDatabase; }
     IContext * currentContextObject() const;
     QStatusBar *statusBar() const;
@@ -170,6 +171,7 @@ private:
     QList<int> m_globalContext;
     QList<int> m_additionalContexts;
     QSettings *m_settings;
+    QSettings *m_globalSettings;
     SettingsDatabase *m_settingsDatabase;
     ActionManagerPrivate *m_actionManager;
     MessageManager *m_messageManager;

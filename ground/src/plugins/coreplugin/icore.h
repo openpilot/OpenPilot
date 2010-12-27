@@ -31,6 +31,7 @@
 
 #include "core_global.h"
 #include <QtCore/QObject>
+#include <QSettings>
 
 QT_BEGIN_NAMESPACE
 class QMainWindow;
@@ -84,7 +85,7 @@ public:
     virtual UAVGadgetInstanceManager *uavGadgetInstanceManager() const = 0;
     virtual MimeDatabase *mimeDatabase() const = 0;
 
-    virtual QSettings *settings() const = 0;
+    virtual QSettings *settings(QSettings::Scope scope = QSettings::UserScope) const = 0;
     virtual SettingsDatabase *settingsDatabase() const = 0;
     virtual void readMainSettings(QSettings* qs) = 0;
     virtual void saveMainSettings(QSettings* qs) = 0;

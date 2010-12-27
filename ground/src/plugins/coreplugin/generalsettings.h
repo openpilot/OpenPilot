@@ -57,6 +57,7 @@ public:
 
 private slots:
     void resetInterfaceColor();
+    void resetLanguage();
     void resetExternalEditor();
     void showHelpForExternalEditor();
 #ifdef Q_OS_UNIX
@@ -64,8 +65,13 @@ private slots:
 #endif
 
 private:
+    void fillLanguageBox() const;
+    QString language() const;
+    void setLanguage(const QString&);
     Ui::GeneralSettings *m_page;
     QPointer<QWidget> m_dialog;
+    QList<QTextCodec *> m_codecs;
+
 };
 
 } // namespace Internal

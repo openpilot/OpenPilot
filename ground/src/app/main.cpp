@@ -39,6 +39,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QLibraryInfo>
 #include <QtCore/QTranslator>
+#include <QtCore/QSettings>
 #include <QtCore/QVariant>
 
 #include <QtGui/QMessageBox>
@@ -212,6 +213,16 @@ int main(int argc, char **argv)
     QTranslator translator;
     QTranslator qtTranslator;
     QString locale = QLocale::system().name();
+
+    // Must be done before any QSettings class is created
+    QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope,
+            QCoreApplication::applicationDirPath()+QLatin1String(SHARE_PATH));
+    // keep this in sync with the MainWindow ctor in coreplugin/mainwindow.cpp
+    const QSettings settings(QSettings::IniFormat, QSettings::UserScope,
+                                 QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS"));
+    locale = settings.value("General/OverrideLanguage", locale).toString();
+
+
     const QString &creatorTrPath = QCoreApplication::applicationDirPath()
                         + QLatin1String(SHARE_PATH "/translations");
     if (translator.load(QLatin1String("openpilotgcs_") + locale, creatorTrPath)) {

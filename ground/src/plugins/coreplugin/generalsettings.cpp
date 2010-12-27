@@ -33,6 +33,10 @@
 #include <utils/consoleprocess.h>
 #include <coreplugin/icore.h>
 #include <QtGui/QMessageBox>
+#include <QtCore/QDir>
+
+#include <QtCore/QLibraryInfo>
+#include <QtCore/QSettings>
 
 #include "ui_generalsettings.h"
 
@@ -64,11 +68,51 @@ QString GeneralSettings::trCategory() const
     return tr("Environment");
 }
 
+static bool hasQmFilesForLocale(const QString &locale, const QString &creatorTrPath)
+{
+    static const QString qtTrPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
+
+    const QString trFile = QLatin1String("qt_") + locale + QLatin1String(".qm");
+    return QFile::exists(qtTrPath+'/'+trFile) || QFile::exists(creatorTrPath+'/'+trFile);
+}
+
+void GeneralSettings::fillLanguageBox() const
+{
+    const QString currentLocale = language();
+
+    m_page->languageBox->addItem(tr("<System Language>"), QString());
+    // need to add this explicitly, since there is no qm file for English
+    m_page->languageBox->addItem(QLatin1String("English"), QLatin1String("C"));
+    if (currentLocale == QLatin1String("C"))
+        m_page->languageBox->setCurrentIndex(m_page->languageBox->count() - 1);
+
+    const QString creatorTrPath =
+            Core::ICore::instance()->resourcePath() + QLatin1String("/translations");
+    const QStringList languageFiles = QDir(creatorTrPath).entryList(QStringList(QLatin1String("qtcreator*.qm")));
+
+    Q_FOREACH(const QString &languageFile, languageFiles)
+    {
+        int start = languageFile.indexOf(QLatin1Char('_'))+1;
+        int end = languageFile.lastIndexOf(QLatin1Char('.'));
+        const QString locale = languageFile.mid(start, end-start);
+        // no need to show a language that creator will not load anyway
+        if (hasQmFilesForLocale(locale, creatorTrPath)) {
+            m_page->languageBox->addItem(QLocale::languageToString(QLocale(locale).language()), locale);
+            if (locale == currentLocale)
+                m_page->languageBox->setCurrentIndex(m_page->languageBox->count() - 1);
+        }
+    }
+}
+
+
 QWidget *GeneralSettings::createPage(QWidget *parent)
 {
     m_page = new Ui::GeneralSettings();
     QWidget *w = new QWidget(parent);
     m_page->setupUi(w);
+
+    QSettings* settings = Core::ICore::instance()->settings();
+    fillLanguageBox();
 
     m_page->colorButton->setColor(StyleHelper::baseColor());
 #ifdef Q_OS_UNIX
@@ -95,12 +139,15 @@ QWidget *GeneralSettings::createPage(QWidget *parent)
 
 void GeneralSettings::apply()
 {
+    int currentIndex = m_page->languageBox->currentIndex();
+    setLanguage(m_page->languageBox->itemData(currentIndex, Qt::UserRole).toString());
     // Apply the new base color if accepted
     StyleHelper::setBaseColor(m_page->colorButton->color());
 #ifdef Q_OS_UNIX
 	ConsoleProcess::setTerminalEmulator(Core::ICore::instance()->settings(),
                                         m_page->terminalEdit->text());
 #endif
+
 }
 
 void GeneralSettings::finish()
@@ -142,4 +189,30 @@ void GeneralSettings::showHelpForExternalEditor()
     m_dialog = mb;
     mb->show();
 #endif
+}
+
+void GeneralSettings::resetLanguage()
+{
+    // system language is default
+    m_page->languageBox->setCurrentIndex(0);
+}
+
+QString GeneralSettings::language() const
+{
+    QSettings* settings = Core::ICore::instance()->settings();
+    return settings->value(QLatin1String("General/OverrideLanguage")).toString();
+}
+
+void GeneralSettings::setLanguage(const QString &locale)
+{
+    QSettings* settings = Core::ICore::instance()->settings();
+    if (settings->value(QLatin1String("General/OverrideLanguage")).toString() != locale)
+    {
+        QMessageBox::information((QWidget*)Core::ICore::instance()->mainWindow(), tr("Restart required"),
+                                 tr("The language change will take effect after a restart of the OpenPilot GCS."));
+    }
+    if (locale.isEmpty())
+        settings->remove(QLatin1String("General/OverrideLanguage"));
+    else
+        settings->setValue(QLatin1String("General/OverrideLanguage"), locale);
 }

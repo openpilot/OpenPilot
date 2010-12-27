@@ -62,7 +62,7 @@ public:
     ModeManager *modeManager() const;
     MimeDatabase *mimeDatabase() const;
 
-    QSettings *settings() const;
+    QSettings *settings(QSettings::Scope scope = QSettings::UserScope) const;
     SettingsDatabase *settingsDatabase() const;
     void readMainSettings(QSettings* qs);
     void saveMainSettings(QSettings* qs);

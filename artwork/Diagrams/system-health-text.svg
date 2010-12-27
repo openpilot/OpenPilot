@@ -420,6 +420,62 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3132"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3187"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3138"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3160"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3194"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3216"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3238"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3266"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
      inkscape:document-units="mm"
@@ -429,15 +485,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="4.9119409"
-     inkscape:cx="52.763083"
+     inkscape:cx="29.350749"
      inkscape:cy="37.285377"
-     inkscape:current-layer="layer43"
+     inkscape:current-layer="layer2"
      id="namedview3608"
      showgrid="false"
-     inkscape:window-width="1280"
-     inkscape:window-height="725"
-     inkscape:window-x="0"
-     inkscape:window-y="24"
+     inkscape:window-width="1680"
+     inkscape:window-height="994"
+     inkscape:window-x="-4"
+     inkscape:window-y="-4"
      inkscape:window-maximized="1"
      showguides="true"
      inkscape:guide-bbox="true">
@@ -520,8 +576,9 @@
        x="501.80048"
        height="8.2846708"
        width="18.023544"
-       id="rect4000-7-6-2-2"
-       style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+       id="Battery"
+       style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:label="#rect4000-7-6-2-2" />
     <rect
        y="345.96741"
        x="556.2887"
@@ -643,11 +700,83 @@
        x="557.29553"
        y="346.98621"
        inkscape:label="#rect4552-27" />
+    <rect
+       y="395.55762"
+       x="556.20465"
+       height="8.1216154"
+       width="18.153212"
+       id="FlightTime"
+       style="fill:#332d2d;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       inkscape:label="#rect6260" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer45"
+     inkscape:label="FlightTime-OK"
+     style="display:none">
+    <rect
+       style="fill:#04b629;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       id="FlightTime-OK"
+       width="18.153212"
+       height="8.1216154"
+       x="58.539021"
+       y="51.277248"
+       inkscape:label="#rect8374" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer46"
+     inkscape:label="FlightTime-Warning"
+     style="display:none">
+    <rect
+       y="51.277248"
+       x="58.539021"
+       height="8.1216154"
+       width="18.153212"
+       id="FlightTime-Warning"
+       style="fill:#f1b907;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       inkscape:label="#rect4073" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer47"
+     inkscape:label="FlightTime-Error"
+     style="display:none">
+    <g
+       style="stroke:#cf0e0e;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       id="OutOfMemory-Error-4"
+       transform="translate(20.488022,18.086644)"
+       inkscape:label="#g4084">
+      <path
+         style="fill:none;stroke:#cf0e0e;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         d="M 38.076545,33.292974 56.14311,41.28257"
+         id="path4086-8" />
+      <path
+         style="fill:none;stroke:#cf0e0e;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         d="m 38.220502,41.354548 17.85063,-8.061574"
+         id="FlightTime-Error"
+         inkscape:label="#path4088-8" />
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer48"
+     inkscape:label="FlightTime-Critical"
+     style="display:none">
+    <rect
+       style="fill:#cf0e0e;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       id="FlightTime-Critical"
+       width="18.153212"
+       height="8.1216154"
+       x="58.539021"
+       y="51.277248"
+       inkscape:label="#rect4080" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer41"
-     inkscape:label="AHRSComms-OK">
+     inkscape:label="AHRSComms-OK"
+     style="display:none">
     <rect
        transform="translate(-497.66563,-344.28037)"
        inkscape:label="#rect4552-27"
@@ -656,7 +785,7 @@
        height="13.085983"
        width="7.7278037"
        id="AHRSComms-OK"
-       style="display:inline;fill:#04b629;stroke:#ffffff;stroke-width:0.29055119000000001;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;fill-opacity:1" />
+       style="fill:#04b629;fill-opacity:1;stroke:#ffffff;stroke-width:0.29055119;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -677,7 +806,7 @@
      inkscape:groupmode="layer"
      id="layer43"
      inkscape:label="AHRSComms-Error"
-     style="display:inline">
+     style="display:none">
     <g
        style="stroke:#cf0e0e;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
        id="AHRSComms-Error"
@@ -779,7 +908,7 @@
      inkscape:groupmode="layer"
      id="layer29"
      inkscape:label="Actuator-OK"
-     style="display:inline">
+     style="display:none">
     <rect
        transform="translate(-497.66563,-344.28037)"
        inkscape:label="#rect4000-8-5"
@@ -1167,7 +1296,7 @@
      inkscape:groupmode="layer"
      id="layer7"
      inkscape:label="CPUOverload-OK"
-     style="display:inline">
+     style="display:none">
     <rect
        style="fill:#04b629;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
        id="CPUOverload-OK"
@@ -1232,11 +1361,12 @@
      style="display:none">
     <rect
        style="fill:#04b629;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect7370"
+       id="Battery-OK"
        width="18.023544"
        height="8.2846708"
        x="4.1348462"
-       y="1.8212841" />
+       y="1.8212841"
+       inkscape:label="#rect7370" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -1248,17 +1378,19 @@
        x="4.1348462"
        height="8.2846708"
        width="18.023544"
-       id="rect7397"
-       style="fill:#f1b907;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+       id="Battery-Warning"
+       style="fill:#f1b907;fill-opacity:1;stroke:#ffffff;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:label="#rect7397" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer4"
      inkscape:label="Power-Error"
-     style="display:inline">
+     style="display:none">
     <g
-       id="g4026"
-       style="stroke:#cf0e0e;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none">
+       id="Battery-Error"
+       style="stroke:#cf0e0e;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:label="#g4026">
       <path
          id="path4022"
          d="M 3.9588091,1.7664579 22.097352,10.043968"
@@ -1276,11 +1408,12 @@
      style="display:none">
     <rect
        style="fill:#cf0e0e;fill-opacity:1;stroke:#f9f9f9;stroke-width:0.53149605;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect7437"
+       id="Battery-Critical"
        width="18.023544"
        height="8.2846708"
        x="4.1348462"
-       y="1.8212841" />
+       y="1.8212841"
+       inkscape:label="#rect7437" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -1435,8 +1568,8 @@
        id="text4548-2-7-0"><tspan
          sodipodi:role="line"
          id="tspan4550-6-3-9"
-         x="-89.558723"
-         y="226.78656"
+         x="62.930996"
+         y="74.296837"
          style="font-size:4px;writing-mode:tb-rl;fill:#ffffff;fill-opacity:1">uSD</tspan></text>
     <rect
        transform="translate(-497.66563,-344.28037)"
@@ -1519,13 +1652,13 @@
          y="391.40311"
          style="font-size:4px;fill:#ffffff;fill-opacity:1">4</tspan></text>
     <rect
-       transform="translate(-497.66563,-344.28037)"
        style="fill:none;stroke:#ffffff;stroke-width:0.29055119;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
        id="rect4552-49-1-9"
        width="5.3263974"
        height="5.9022241"
        x="583.84381"
-       y="393.9584" />
+       y="393.9584"
+       transform="translate(-497.66563,-344.28037)" />
     <text
        transform="translate(-497.66563,-344.28037)"
        xml:space="preserve"
@@ -1618,8 +1751,8 @@
        id="text5124-0-6"><tspan
          sodipodi:role="line"
          id="tspan5126-0-0"
-         x="-87.574593"
-         y="210.30939"
+         x="65.096527"
+         y="57.638264"
          style="font-size:3px;writing-mode:tb-rl;fill:#ffffff;fill-opacity:1">USB</tspan></text>
     <text
        id="text5124-0-1"
@@ -1628,8 +1761,8 @@
        style="font-size:40px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
        xml:space="preserve"><tspan
          style="font-size:3px;writing-mode:tb-rl;fill:#ffffff;fill-opacity:1"
-         y="218.5744"
-         x="-89.271614"
+         y="65.973595"
+         x="63.329189"
          id="tspan5126-0-2"
          sodipodi:role="line">JTAG</tspan></text>
     <text
@@ -1681,8 +1814,8 @@
        id="text4842-6"><tspan
          sodipodi:role="line"
          id="tspan4844-13"
-         x="-128.34451"
-         y="161.79669"
+         x="23.024242"
+         y="10.427945"
          style="font-size:3.9241395px;writing-mode:tb-rl;fill:#ffffff;fill-opacity:1;stroke:none">Servo Output</tspan></text>
     <rect
        transform="translate(-497.66563,-344.28037)"
@@ -2056,12 +2189,12 @@
     <text
        id="text3100"
        y="56.338928"
-       x="38.884274"
+       x="39.741604"
        style="font-size:26.84721947px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
        xml:space="preserve"><tspan
          style="font-size:2.68472195px;fill:#ffffff;fill-opacity:1"
          y="56.338928"
-         x="38.884274"
+         x="39.741604"
          id="tspan3102"
          sodipodi:role="line">Stabilization</tspan></text>
     <text
@@ -2071,9 +2204,36 @@
        style="font-size:44.39514542px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
        xml:space="preserve"><tspan
          style="font-size:2.48068142px;writing-mode:tb-rl;fill:#ffffff;fill-opacity:1"
-         y="64.138992"
-         x="2.4633021"
+         y="63.426441"
+         x="3.1758516"
          id="tspan4919"
          sodipodi:role="line">AHRS</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
+       x="63.189972"
+       y="54.743988"
+       id="text3316-4"><tspan
+         sodipodi:role="line"
+         id="tspan3318-8"
+         x="63.189972"
+         y="54.743988"
+         style="font-size:3.5px;fill:#ffffff;fill-opacity:1">Flight</tspan><tspan
+         sodipodi:role="line"
+         x="63.189972"
+         y="59.118988"
+         style="font-size:3.5px;fill:#ffffff;fill-opacity:1"
+         id="tspan3204" /></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
+       x="63.482201"
+       y="58.05759"
+       id="text3316-4-1"><tspan
+         sodipodi:role="line"
+         x="63.482201"
+         y="58.05759"
+         style="font-size:3.5px;fill:#ffffff;fill-opacity:1"
+         id="tspan3204-4">Time</tspan></text>
   </g>
 </svg>

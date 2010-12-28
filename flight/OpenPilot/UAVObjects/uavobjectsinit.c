@@ -38,6 +38,7 @@
 #include "attitudedesired.h"
 #include "attituderaw.h"
 #include "baroaltitude.h"
+#include "batterysettings.h"
 #include "firmwareiapobj.h"
 #include "flightbatterystate.h"
 #include "flighttelemetrystats.h"
@@ -83,6 +84,7 @@ void UAVObjectsInitializeAll()
     AttitudeDesiredInitialize();
     AttitudeRawInitialize();
     BaroAltitudeInitialize();
+    BatterySettingsInitialize();
     FirmwareIAPObjInitialize();
     FlightBatteryStateInitialize();
     FlightTelemetryStatsInitialize();

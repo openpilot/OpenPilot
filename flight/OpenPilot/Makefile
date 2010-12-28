@@ -185,6 +185,7 @@ SRC += $(OPUAVOBJ)/firmwareiapobj.c
 SRC += $(OPUAVOBJ)/ratedesired.c
 SRC += $(OPUAVOBJ)/pipxtrememodemsettings.c
 SRC += $(OPUAVOBJ)/pipxtrememodemstatus.c
+SRC += $(OPUAVOBJ)/batterysettings.c
 endif
 
 ## PIOS Hardware (STM32F10x)

@@ -109,6 +109,13 @@ function [] = OPLogConvert()
     BaroAltitude(1).Temperature = 0;
     BaroAltitude(1).Pressure = 0;
 
+    batterysettingsIdx = 1;
+    BatterySettings.timestamp = 0;
+    BatterySettings(1).BatteryVoltage = 0;
+    BatterySettings(1).BatteryCapacity = 0;
+    BatterySettings(1).BatteryType = 0;
+    BatterySettings(1).Calibrations = zeros(1,2);
+
     firmwareiapobjIdx = 1;
     FirmwareIAPObj.timestamp = 0;
     FirmwareIAPObj(1).Command = 0;
@@ -449,6 +456,9 @@ function [] = OPLogConvert()
             case 3980666102
                 BaroAltitude(baroaltitudeIdx) = ReadBaroAltitudeObject(fid, timestamp);
                 baroaltitudeIdx = baroaltitudeIdx + 1;
+            case 2784959898
+                BatterySettings(batterysettingsIdx) = ReadBatterySettingsObject(fid, timestamp);
+                batterysettingsIdx = batterysettingsIdx + 1;
             case 879185696
                 FirmwareIAPObj(firmwareiapobjIdx) = ReadFirmwareIAPObjObject(fid, timestamp);
                 firmwareiapobjIdx = firmwareiapobjIdx + 1;
@@ -543,7 +553,7 @@ function [] = OPLogConvert()
     fclose(fid);
     
     matfile = strrep(logfile,'opl','mat');
-    save(matfile ,'ActuatorCommand','ActuatorDesired','ActuatorSettings','AHRSCalibration','AHRSSettings','AhrsStatus','AttitudeActual','AttitudeDesired','AttitudeRaw','BaroAltitude','FirmwareIAPObj','FlightBatteryState','FlightTelemetryStats','GCSTelemetryStats','GPSPosition','GPSSatellites','GPSTime','GuidanceSettings','HomeLocation','I2CStats','ManualControlCommand','ManualControlSettings','MixerSettings','MixerStatus','ObjectPersistence','PipXtremeModemSettings','PipXtremeModemStatus','PositionActual','PositionDesired','RateDesired','StabilizationSettings','SystemAlarms','SystemSettings','SystemStats','TelemetrySettings','VelocityActual','VelocityDesired');
+    save(matfile ,'ActuatorCommand','ActuatorDesired','ActuatorSettings','AHRSCalibration','AHRSSettings','AhrsStatus','AttitudeActual','AttitudeDesired','AttitudeRaw','BaroAltitude','BatterySettings','FirmwareIAPObj','FlightBatteryState','FlightTelemetryStats','GCSTelemetryStats','GPSPosition','GPSSatellites','GPSTime','GuidanceSettings','HomeLocation','I2CStats','ManualControlCommand','ManualControlSettings','MixerSettings','MixerStatus','ObjectPersistence','PipXtremeModemSettings','PipXtremeModemStatus','PositionActual','PositionDesired','RateDesired','StabilizationSettings','SystemAlarms','SystemSettings','SystemStats','TelemetrySettings','VelocityActual','VelocityDesired');
     
 end
 
@@ -753,6 +763,23 @@ function [BaroAltitude] = ReadBaroAltitudeObject(fid, timestamp)
     BaroAltitude.Altitude = double(fread(fid, 1, 'float32'));
     BaroAltitude.Temperature = double(fread(fid, 1, 'float32'));
     BaroAltitude.Pressure = double(fread(fid, 1, 'float32'));
+    % read CRC
+    fread(fid, 1, 'uint8');
+end
+
+function [BatterySettings] = ReadBatterySettingsObject(fid, timestamp)
+    if 1
+        headerSize = 8;
+    else
+        BatterySettings.instanceID = fread(fid, 1, 'uint16');
+        headerSize = 10;
+    end
+
+    BatterySettings.timestamp = timestamp;
+    BatterySettings.BatteryVoltage = double(fread(fid, 1, 'float32'));
+    BatterySettings.BatteryCapacity = double(fread(fid, 1, 'uint32'));
+    BatterySettings.BatteryType = double(fread(fid, 1, 'uint8'));
+    BatterySettings.Calibrations = double(fread(fid, 2, 'float32'));
     % read CRC
     fread(fid, 1, 'uint8');
 end

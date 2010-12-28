@@ -1,0 +1,13 @@
+<xml>
+    <object name="BatterySettings" singleinstance="true" settings="true">
+        <description>Battery configuration information.</description> 
+	<field name="BatteryVoltage" units="V"  type="float"  elements="1" defaultvalue="11.1"/>
+	<field name="BatteryCapacity" units="mAh"  type="uint32"  elements="1" defaultvalue="2200"/>
+        <field name="BatteryType" units="" type="enum" elements="1" options="LiPo,A123,LiCo,LiFeSO4,None" defaultvalue="LiPo"/>
+        <field name="Calibrations" units="" type="float" elementnames="Voltage,Current" defaultvalue="1.0"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="never" period="0"/>
+    </object>
+</xml>

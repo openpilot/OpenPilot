@@ -61,6 +61,7 @@ public:
    ~UploaderGadgetWidget();
     typedef enum { IAP_STATE_READY, IAP_STATE_STEP_1, IAP_STATE_STEP_2, IAP_STEP_RESET, IAP_STATE_BOOTLOADER} IAPStep;
     typedef enum { RESCUE_STEP0, RESCUE_STEP1, RESCUE_STEP2, RESCUE_STEP3, RESCUE_POWER1, RESCUE_POWER2, RESCUE_DETECT } RescueStep;
+    void log(QString str);
 
 public slots:
     void onAutopilotConnect();
@@ -72,7 +73,6 @@ private:
      IAPStep currentStep;
      RescueStep rescueStep;
      bool resetOnly;
-     void log(QString str);
      void clearLog();
      QString getPortDevice(const QString &friendName);
 

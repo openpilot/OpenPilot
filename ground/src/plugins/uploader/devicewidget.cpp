@@ -39,6 +39,9 @@ deviceWidget::deviceWidget(QWidget *parent) :
     connect(myDevice->verifyButton, SIGNAL(clicked()), this, SLOT(verifyFirmware()));
     connect(myDevice->retrieveButton, SIGNAL(clicked()), this, SLOT(downloadFirmware()));
     connect(myDevice->updateButton, SIGNAL(clicked()), this, SLOT(uploadFirmware()));
+
+    QPixmap pix = QPixmap(QString(":uploader/images/view-refresh.svg"));
+    myDevice->statusIcon->setPixmap(pix);
 }
 
 
@@ -112,7 +115,7 @@ void deviceWidget::populate()
     myDevice->description->setMaxLength(size);
     myDevice->description->setText(str.left(str.indexOf(QChar(255))));
 
-    myDevice->statusLabel->setText(QString("Ready..."));
+    status("Ready...", STATUSICON_INFO);
 
 }
 
@@ -129,11 +132,34 @@ void deviceWidget::freeze()
 }
 
 /**
+  Updates status message for messages coming from DFU
+  */
+void deviceWidget::dfuStatus(QString str)
+{
+    status(str, STATUSICON_RUNNING);
+}
+
+/**
   Updates status message
   */
-void deviceWidget::status(QString str)
+void deviceWidget::status(QString str, StatusIcon ic)
 {
+    QPixmap px;
     myDevice->statusLabel->setText(str);
+    switch (ic) {
+    case STATUSICON_RUNNING:
+        px.load(QString(":/uploader/images/system-run.svg"));
+        break;
+    case STATUSICON_OK:
+        px.load(QString(":/uploader/images/dialog-apply.svg"));
+        break;
+    case STATUSICON_FAIL:
+        px.load(QString(":/uploader/images/process-stop.svg"));
+        break;
+    default:
+        px.load(QString(":/uploader/images/gtk-info.svg"));
+    }
+    myDevice->statusIcon->setPixmap(px);
 }
 
 /**
@@ -150,7 +176,7 @@ void deviceWidget::verifyFirmware()
 void deviceWidget::uploadFirmware()
 {
     if (!m_dfu->devices[deviceID].Writable) {
-        status("Device not writable!");
+        status("Device not writable!", STATUSICON_FAIL);
         return;
     }
 
@@ -163,16 +189,16 @@ void deviceWidget::uploadFirmware()
     QString filename = setOpenFileName();
 
     if (filename.isEmpty()) {
-        status("Empty filename");
+        status("Empty filename", STATUSICON_FAIL);
         return;
     }
 
-    status("Starting firmware upload");
+    status("Starting firmware upload", STATUSICON_RUNNING);
     // We don't know which device was used previously, so we
     // are cautious and reenter DFU for this deviceID:
     if(!m_dfu->enterDFU(deviceID))
     {
-        status("Error:Could not enter DFU mode");
+        status("Error:Could not enter DFU mode", STATUSICON_FAIL);
         return;
     }
     OP_DFU::Status ret=m_dfu->StatusRequest();
@@ -180,14 +206,14 @@ void deviceWidget::uploadFirmware()
     m_dfu->AbortOperation(); // Necessary, otherwise I get random failures.
 
     connect(m_dfu, SIGNAL(progressUpdated(int)), this, SLOT(setProgress(int)));
-    connect(m_dfu, SIGNAL(operationProgress(QString)), this, SLOT(status(QString)));
+    connect(m_dfu, SIGNAL(operationProgress(QString)), this, SLOT(dfuStatus(QString)));
     connect(m_dfu, SIGNAL(uploadFinished(OP_DFU::Status)), this, SLOT(uploadFinished(OP_DFU::Status)));
     bool retstatus = m_dfu->UploadFirmware(filename.toAscii(),verify, deviceID);
     if(!retstatus ) {
-        status("Could not start upload");
+        status("Could not start upload", STATUSICON_FAIL);
         return;
     }
-    status("Uploading, please wait...");
+    status("Uploading, please wait...", STATUSICON_RUNNING);
 }
 
 /**
@@ -204,20 +230,20 @@ void deviceWidget::downloadFirmware()
     filename = setOpenFileName();
 
     if (filename.isEmpty()) {
-        status("Empty filename");
+        status("Empty filename", STATUSICON_FAIL);
         return;
     }
 
-    status("Downloading firmware from device");
+    status("Downloading firmware from device", STATUSICON_RUNNING);
     connect(m_dfu, SIGNAL(progressUpdated(int)), this, SLOT(setProgress(int)));
     connect(m_dfu, SIGNAL(downloadFinished()), this, SLOT(downloadFinished()));
     downloadedFirmware.clear(); // Empty the byte array
     bool ret = m_dfu->DownloadFirmware(&downloadedFirmware,deviceID);
     if(!ret) {
-        status(QString("Could not start download!"));
+        status("Could not start download!", STATUSICON_FAIL);
         return;
     }
-    status("Download started, please wait");
+    status("Download started, please wait", STATUSICON_RUNNING);
 }
 
 /**
@@ -227,7 +253,7 @@ void deviceWidget::downloadFinished()
 {
     disconnect(m_dfu, SIGNAL(downloadFinished()), this, SLOT(downloadFinished()));
     disconnect(m_dfu, SIGNAL(progressUpdated(int)), this, SLOT(setProgress(int)));
-    status("Download successful");
+    status("Download successful", STATUSICON_OK);
     // Now save the result (use the utility function from OP_DFU)
     m_dfu->SaveByteArrayToFile(filename, downloadedFirmware);
     myDevice->retrieveButton->setEnabled(true);
@@ -242,19 +268,19 @@ void deviceWidget::uploadFinished(OP_DFU::Status retstatus)
     disconnect(m_dfu, SIGNAL(progressUpdated(int)), this, SLOT(setProgress(int)));
     disconnect(m_dfu, SIGNAL(operationProgress(QString)), this, SLOT(status(QString)));
     if(retstatus != OP_DFU::Last_operation_Success) {
-        status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data());
+        status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
         return;
     } else
     if(!myDevice->description->text().isEmpty()) {
-        status(QString("Updating description"));
+        status(QString("Updating description"), STATUSICON_RUNNING);
         repaint(); // Make sure the text above shows right away
         retstatus = m_dfu->UploadDescription(myDevice->description->text());
         if( retstatus != OP_DFU::Last_operation_Success) {
-            status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data());
+            status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
             return;
         }
     }
-    status("Upload successful");
+    status("Upload successful", STATUSICON_OK);
 
 }
 

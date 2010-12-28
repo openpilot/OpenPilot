@@ -29,6 +29,7 @@
 #define DEVICEWIDGET_H
 
 #include "ui_devicewidget.h"
+#include "uploadergadgetwidget.h"
 #include "op_dfu.h"
 #include <QWidget>
 #include <QFileDialog>
@@ -41,11 +42,12 @@ class deviceWidget : public QWidget
 {
     Q_OBJECT
 public:
-    deviceWidget(QWidget *parent = 0);
+    deviceWidget( QWidget *parent = 0);
     void setDeviceID(int devID);
     void setDfu(DFUObject* dfu);
     void populate();
     void freeze();
+    typedef enum { STATUSICON_OK, STATUSICON_RUNNING, STATUSICON_FAIL, STATUSICON_INFO} StatusIcon;
     QString setOpenFileName();
 
 private:
@@ -55,6 +57,8 @@ private:
     QByteArray downloadedFirmware;
     QString filename;
     QGraphicsSvgItem *devicePic;
+    void status(QString str, StatusIcon ic);
+
 
 signals:
 
@@ -65,7 +69,7 @@ public slots:
     void setProgress(int);
     void downloadFinished();
     void uploadFinished(OP_DFU::Status);
-    void status(QString str);
+    void dfuStatus(QString);
 
 protected:
     void showEvent(QShowEvent *event);

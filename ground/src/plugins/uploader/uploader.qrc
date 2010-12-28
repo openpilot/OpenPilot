@@ -3,5 +3,9 @@
         <file>images/deviceID-1.svg</file>
         <file>images/deviceID-69.svg</file>
         <file>images/view-refresh.svg</file>
+        <file>images/system-run.svg</file>
+        <file>images/process-stop.svg</file>
+        <file>images/dialog-apply.svg</file>
+        <file>images/gtk-info.svg</file>
     </qresource>
 </RCC>

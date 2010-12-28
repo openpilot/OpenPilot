@@ -56,6 +56,9 @@
 #define STACK_SIZE			1024
 #define TASK_PRIORITY		(tskIDLE_PRIORITY + 3)
 #define SAMPLE_PERIOD_MS	500
+#define POWER_SENSOR_VERSION		1
+
+
 //#define ENABLE_DEBUG_MSG
 
 #ifdef ENABLE_DEBUG_MSG
@@ -100,6 +103,7 @@ static void task(void *parameters)
 
 	lastSysTime = xTaskGetTickCount();
 	while (1) {
+#if (POWER_SENSOR_VERSION == 1)
 		// TODO: Compare with floating point calculations
 
 		uint32_t mV, mA;
@@ -117,6 +121,10 @@ static void task(void *parameters)
 		FlightBatteryStateSet(&flightBatteryData);
 
 		vTaskDelayUntil(&lastSysTime, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
+#endif
+#if (POWER_SENSOR_VERSION == 2)
+
+#endif
 	}
 }
 

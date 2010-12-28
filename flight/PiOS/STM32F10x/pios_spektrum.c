@@ -43,8 +43,8 @@
 /* Global Variables */
 
 /* Local Variables, use pios_usart */
-static uint16_t CaptureValue[12];
-static uint8_t prev_byte = 0xFF, sync = 0, bytecount = 0, byte_array[20] = { 0 };
+static uint16_t CaptureValue[12],CaptureValueTemp[12];
+static uint8_t prev_byte = 0xFF, sync = 0, bytecount = 0, frame_error=0, byte_array[20] = { 0 };
 
 uint8_t sync_of = 0;
 
@@ -77,7 +77,7 @@ void PIOS_SPEKTRUM_Init(void)
 	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;	/* For 1 uS accuracy */
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_TimeBaseInit(PIOS_PPM_SUPV_TIMER, &TIM_TimeBaseStructure);
+	TIM_TimeBaseInit(PIOS_SPEKTRUM_SUPV_TIMER, &TIM_TimeBaseStructure);
 
 	/* Enable the Update Interrupt Request */
 	TIM_ITConfig(PIOS_SPEKTRUM_SUPV_TIMER, TIM_IT_Update, ENABLE);
@@ -188,8 +188,12 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 			frame = channel >> 15;
 			channeln = (channel >> 10) & 0x0F;
 			data = channel & 0x03FF;
-			if (channeln < 12)
-				CaptureValue[channeln] = data;
+			if(channeln==0 && data<10) // discard frame if throttle misbehaves
+			{
+				frame_error=1;
+			}
+			if (channeln < 12 && !frame_error)
+				CaptureValueTemp[channeln] = data;
 		}
 	}
 	if (bytecount == 16) {
@@ -197,6 +201,14 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 		bytecount = 0;
 		sync = 0;
 		sync_of = 0;
+		if (!frame_error)
+		{
+			for(int i=0;i<12;i++)
+			{
+				CaptureValue[i] = CaptureValueTemp[i];
+			}
+		}
+		frame_error=0;
 	}
 	prev_byte = b;
 	return 0;
@@ -232,13 +244,17 @@ PIOS_SPEKTRUM_SUPV_IRQ_FUNC {
 	sync = 0;
 	bytecount = 0;
 	prev_byte = 0xFF;
+	frame_error=0;
 	sync_of++;
 	/* watchdog activated */
-	if (sync_of > 1) {
+	if (sync_of > 3) {
 		/* signal lost */
 		sync_of = 0;
 		for (int i = 0; i < 12; i++)
+		{
 			CaptureValue[i] = 0;
+			CaptureValueTemp[i] = 0;
+		}
 	}
 }
 

@@ -48,5 +48,6 @@ void AHRS_ADC_DMA_Handler(void);
 void AHRS_ADC_SetCallback(ADCCallback);
 void AHRS_ADC_SetFIRCoefficients(float * new_filter);
 float * AHRS_ADC_GetBuffer();
+int16_t * AHRS_ADC_GetRawBuffer();
 
 #endif

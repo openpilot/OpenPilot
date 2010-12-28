@@ -49,7 +49,6 @@
 
 // For debugging the raw sensors
 //#define DUMP_RAW
-//#define DUMP_FRIENDLY
 //#define DUMP_EKF
 
 volatile int8_t ahrs_algorithm;
@@ -418,29 +417,30 @@ void print_ekf_binary() {}
  */
 void print_ahrs_raw() 
 {
-	/*int result;
+	int result;
 	static int previous_conversion = 0;
-
+	int16_t * valid_data_buffer;
+	
 	uint8_t framing[16] =
 	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
 		15 };
-	while (ahrs_state != AHRS_DATA_READY) ;
-	ahrs_state = AHRS_PROCESSING;
 	
+	get_accel_gyro_data();
+	
+	valid_data_buffer = AHRS_ADC_GetRawBuffer();
+
 	if (total_conversion_blocks != previous_conversion + 1)
 		PIOS_LED_On(LED1);	// not keeping up
 	else
 		PIOS_LED_Off(LED1);
 	previous_conversion = total_conversion_blocks;
 	
-	downsample_data();
-	ahrs_state = AHRS_IDLE;;
 	
 	// Dump raw buffer
-	result = PIOS_COM_SendBuffer(PIOS_COM_AUX, &framing[0], 16);	// framing header
-	result += PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & total_conversion_blocks, sizeof(total_conversion_blocks));	// dump block number
+	result = PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, &framing[0], 16);	// framing header
+	result += PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, (uint8_t *) & total_conversion_blocks, sizeof(total_conversion_blocks));	// dump block number
 	result +=
-	PIOS_COM_SendBuffer(PIOS_COM_AUX,
+	PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX,
 			    (uint8_t *) & valid_data_buffer[0],
 			    adc_oversampling *
 			    PIOS_ADC_NUM_PINS *
@@ -449,7 +449,7 @@ void print_ahrs_raw()
 		PIOS_LED_Off(LED1);
 	else {
 		PIOS_LED_On(LED1);
-	}	*/
+	}	
 }
 
 /**

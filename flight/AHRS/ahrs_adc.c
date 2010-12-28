@@ -219,6 +219,14 @@ float * AHRS_ADC_GetBuffer()
 }
 
 /**
+ * @brief Return the address of the raw data data buffer 
+ */
+int16_t * AHRS_ADC_GetRawBuffer() 
+{
+	return (int16_t *) adc_config.valid_data_buffer;
+}
+
+/**
  * @brief Set the fir coefficients.  Takes as many samples as the 
  * current filter order plus one (normalization)
  *

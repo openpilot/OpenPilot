@@ -58,8 +58,38 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
+		'PeakCurrent',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'AvgCurrent',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
 		'ConsumedEnergy',
-		'I',
+		'f',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'EstimatedFlightTime',
+		'f',
 		1,
 		[
 			'0',
@@ -72,7 +102,7 @@ _fields = [ \
 
 class FlightBatteryState(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 144318184
+    OBJID        = 126985486
     NAME         = "FlightBatteryState"
     METANAME     = "FlightBatteryStateMeta"
     ISSINGLEINST = 1

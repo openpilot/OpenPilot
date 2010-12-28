@@ -34,7 +34,7 @@
 #include "uavobjectfield.h"
 
 const QString FlightBatteryState::NAME = QString("FlightBatteryState");
-const QString FlightBatteryState::DESCRIPTION = QString("Battery status information.  Not currently updated.");
+const QString FlightBatteryState::DESCRIPTION = QString("Battery status information.");
 
 /**
  * Constructor
@@ -49,9 +49,18 @@ FlightBatteryState::FlightBatteryState(): UAVDataObject(OBJID, ISSINGLEINST, ISS
     QStringList CurrentElemNames;
     CurrentElemNames.append("0");
     fields.append( new UAVObjectField(QString("Current"), QString("A"), UAVObjectField::FLOAT32, CurrentElemNames, QStringList()) );
+    QStringList PeakCurrentElemNames;
+    PeakCurrentElemNames.append("0");
+    fields.append( new UAVObjectField(QString("PeakCurrent"), QString("A"), UAVObjectField::FLOAT32, PeakCurrentElemNames, QStringList()) );
+    QStringList AvgCurrentElemNames;
+    AvgCurrentElemNames.append("0");
+    fields.append( new UAVObjectField(QString("AvgCurrent"), QString("A"), UAVObjectField::FLOAT32, AvgCurrentElemNames, QStringList()) );
     QStringList ConsumedEnergyElemNames;
     ConsumedEnergyElemNames.append("0");
-    fields.append( new UAVObjectField(QString("ConsumedEnergy"), QString("mAh"), UAVObjectField::UINT32, ConsumedEnergyElemNames, QStringList()) );
+    fields.append( new UAVObjectField(QString("ConsumedEnergy"), QString("mAh"), UAVObjectField::FLOAT32, ConsumedEnergyElemNames, QStringList()) );
+    QStringList EstimatedFlightTimeElemNames;
+    EstimatedFlightTimeElemNames.append("0");
+    fields.append( new UAVObjectField(QString("EstimatedFlightTime"), QString("sec"), UAVObjectField::FLOAT32, EstimatedFlightTimeElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -87,6 +96,12 @@ UAVObject::Metadata FlightBatteryState::getDefaultMetadata()
  */
 void FlightBatteryState::setDefaultFieldValues()
 {
+    data.Voltage = 0;
+    data.Current = 0;
+    data.PeakCurrent = 0;
+    data.AvgCurrent = 0;
+    data.ConsumedEnergy = 0;
+    data.EstimatedFlightTime = 0;
 
 }
 

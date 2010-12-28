@@ -122,7 +122,10 @@ function [] = OPLogConvert()
     FlightBatteryState.timestamp = 0;
     FlightBatteryState(1).Voltage = 0;
     FlightBatteryState(1).Current = 0;
+    FlightBatteryState(1).PeakCurrent = 0;
+    FlightBatteryState(1).AvgCurrent = 0;
     FlightBatteryState(1).ConsumedEnergy = 0;
+    FlightBatteryState(1).EstimatedFlightTime = 0;
 
     flighttelemetrystatsIdx = 1;
     FlightTelemetryStats.timestamp = 0;
@@ -449,7 +452,7 @@ function [] = OPLogConvert()
             case 879185696
                 FirmwareIAPObj(firmwareiapobjIdx) = ReadFirmwareIAPObjObject(fid, timestamp);
                 firmwareiapobjIdx = firmwareiapobjIdx + 1;
-            case 144318184
+            case 126985486
                 FlightBatteryState(flightbatterystateIdx) = ReadFlightBatteryStateObject(fid, timestamp);
                 flightbatterystateIdx = flightbatterystateIdx + 1;
             case 1712072286
@@ -784,7 +787,10 @@ function [FlightBatteryState] = ReadFlightBatteryStateObject(fid, timestamp)
     FlightBatteryState.timestamp = timestamp;
     FlightBatteryState.Voltage = double(fread(fid, 1, 'float32'));
     FlightBatteryState.Current = double(fread(fid, 1, 'float32'));
-    FlightBatteryState.ConsumedEnergy = double(fread(fid, 1, 'uint32'));
+    FlightBatteryState.PeakCurrent = double(fread(fid, 1, 'float32'));
+    FlightBatteryState.AvgCurrent = double(fread(fid, 1, 'float32'));
+    FlightBatteryState.ConsumedEnergy = double(fread(fid, 1, 'float32'));
+    FlightBatteryState.EstimatedFlightTime = double(fread(fid, 1, 'float32'));
     % read CRC
     fread(fid, 1, 'uint8');
 end

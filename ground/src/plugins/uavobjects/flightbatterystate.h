@@ -45,18 +45,24 @@ public:
     typedef struct {
         float Voltage;
         float Current;
-        quint32 ConsumedEnergy;
+        float PeakCurrent;
+        float AvgCurrent;
+        float ConsumedEnergy;
+        float EstimatedFlightTime;
 
     } __attribute__((packed)) DataFields;
 
     // Field information
     // Field Voltage information
     // Field Current information
+    // Field PeakCurrent information
+    // Field AvgCurrent information
     // Field ConsumedEnergy information
+    // Field EstimatedFlightTime information
 
   
     // Constants
-    static const quint32 OBJID = 144318184U;
+    static const quint32 OBJID = 126985486U;
     static const QString NAME;
     static const QString DESCRIPTION;
     static const bool ISSINGLEINST = 1;

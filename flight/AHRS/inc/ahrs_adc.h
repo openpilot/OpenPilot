@@ -47,7 +47,8 @@ uint8_t AHRS_ADC_Config(int32_t adc_oversample);
 void AHRS_ADC_DMA_Handler(void);
 void AHRS_ADC_SetCallback(ADCCallback);
 void AHRS_ADC_SetFIRCoefficients(float * new_filter);
-float * AHRS_ADC_GetBuffer();
-int16_t * AHRS_ADC_GetRawBuffer();
+float * AHRS_ADC_GetBuffer(void);
+int16_t * AHRS_ADC_GetRawBuffer(void);
+uint8_t AHRS_ADC_GetOverSampling(void);
 
 #endif

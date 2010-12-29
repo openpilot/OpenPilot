@@ -213,7 +213,7 @@ void AHRS_ADC_SetCallback(ADCCallback new_function)
 /**
  * @brief Return the address of the downsampled data buffer 
  */
-float * AHRS_ADC_GetBuffer() 
+float * AHRS_ADC_GetBuffer(void)
 {
 	return downsampled_buffer;
 }
@@ -221,9 +221,17 @@ float * AHRS_ADC_GetBuffer()
 /**
  * @brief Return the address of the raw data data buffer 
  */
-int16_t * AHRS_ADC_GetRawBuffer() 
+int16_t * AHRS_ADC_GetRawBuffer(void)
 {
 	return (int16_t *) adc_config.valid_data_buffer;
+}
+
+/**
+ * @brief Return the amount of over sampling
+ */
+uint8_t AHRS_ADC_GetOverSampling(void)
+{
+    return adc_config.adc_oversample;
 }
 
 /**

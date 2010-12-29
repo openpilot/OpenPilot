@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Include>
+
+  <Directory Id="default_1" Name="default">
+    <Component Id="altimeter.svg" DiskId="1" Guid="B192AC40-0A24-4640-A892-09C34F104E28">
+      <File Id="altimeter.svg" Name="altimeter.svg" Source="..\..\..\share\openpilotgcs\dials\default\altimeter.svg" />
+    </Component>
+    <Component Id="arm_status.svg" DiskId="1" Guid="BD4799E3-E948-460A-8E33-D42241590C80">
+      <File Id="arm_status.svg" Name="arm-status.svg" Source="..\..\..\share\openpilotgcs\dials\default\arm-status.svg" />
+    </Component>
+    <Component Id="attitude.svg" DiskId="1" Guid="D8845B81-D918-47A7-9D76-D723DDA28DA9">
+      <File Id="attitude.svg" Name="attitude.svg" Source="..\..\..\share\openpilotgcs\dials\default\attitude.svg" />
+    </Component>
+    <Component Id="compass.svg" DiskId="1" Guid="961408C3-0941-4DB1-B9FC-E256BD0BF462">
+      <File Id="compass.svg" Name="compass.svg" Source="..\..\..\share\openpilotgcs\dials\default\compass.svg" />
+    </Component>
+    <Component Id="flightmode_status.svg" DiskId="1" Guid="33C8AA47-E1DE-445F-B24A-0ED150CEE396">
+      <File Id="flightmode_status.svg" Name="flightmode-status.svg" Source="..\..\..\share\openpilotgcs\dials\default\flightmode-status.svg" />
+    </Component>
+    <Component Id="gps_signal.svg" DiskId="1" Guid="4EE42023-B724-4251-9B0A-1D03454C75AB">
+      <File Id="gps_signal.svg" Name="gps-signal.svg" Source="..\..\..\share\openpilotgcs\dials\default\gps-signal.svg" />
+    </Component>
+    <Component Id="gps_status.svg" DiskId="1" Guid="EA0D1214-1064-4B8D-B348-758CD89FCB71">
+      <File Id="gps_status.svg" Name="gps-status.svg" Source="..\..\..\share\openpilotgcs\dials\default\gps-status.svg" />
+    </Component>
+    <Component Id="lineardial_horizontal.svg" DiskId="1" Guid="DE1D4B50-1C2F-47EA-AF70-81ECABC82533">
+      <File Id="lineardial_horizontal.svg" Name="lineardial-horizontal.svg" Source="..\..\..\share\openpilotgcs\dials\default\lineardial-horizontal.svg" />
+    </Component>
+    <Component Id="lineardial_vertical.svg" DiskId="1" Guid="A0264FD4-A16C-4F1A-87DA-7ADDA4E0317D">
+      <File Id="lineardial_vertical.svg" Name="lineardial-vertical.svg" Source="..\..\..\share\openpilotgcs\dials\default\lineardial-vertical.svg" />
+    </Component>
+    <Component Id="Readme.txt" DiskId="1" Guid="C3172322-0F08-4D6E-B194-D1651C597354">
+      <File Id="Readme.txt" Name="Readme.txt" Source="..\..\..\share\openpilotgcs\dials\default\Readme.txt" />
+    </Component>
+    <Component Id="speed.svg" DiskId="1" Guid="BCCBBA9A-D8D9-409D-8948-83C61C6E9232">
+      <File Id="speed.svg" Name="speed.svg" Source="..\..\..\share\openpilotgcs\dials\default\speed.svg" />
+    </Component>
+    <Component Id="textonly.svg" DiskId="1" Guid="DD164EB0-0EF0-4AB3-8BCF-93E34DB77D9D">
+      <File Id="textonly.svg" Name="textonly.svg" Source="..\..\..\share\openpilotgcs\dials\default\textonly.svg" />
+    </Component>
+    <Component Id="thermometer.svg" DiskId="1" Guid="AF9F8C7E-B96C-4695-BE5E-BB0A86B07292">
+      <File Id="thermometer.svg" Name="thermometer.svg" Source="..\..\..\share\openpilotgcs\dials\default\thermometer.svg" />
+    </Component>
+    <Component Id="vsi.svg" DiskId="1" Guid="2C798124-DB38-4134-97BF-C3EDD65502F3">
+      <File Id="vsi.svg" Name="vsi.svg" Source="..\..\..\share\openpilotgcs\dials\default\vsi.svg" />
+    </Component>
+  </Directory>
+  <Directory Id="deluxe" Name="deluxe">
+    <Component Id="altimeter.svg_1" DiskId="1" Guid="8C11CA4E-81D6-407E-B77F-5DFBA26F41EB">
+      <File Id="altimeter.svg_1" Name="altimeter.svg" Source="..\..\..\share\openpilotgcs\dials\deluxe\altimeter.svg" />
+    </Component>
+    <Component Id="compass.svg_1" DiskId="1" Guid="5F45F400-0324-4394-9F87-995F5E033A2C">
+      <File Id="compass.svg_1" Name="compass.svg" Source="..\..\..\share\openpilotgcs\dials\deluxe\compass.svg" />
+    </Component>
+    <Component Id="speed.svg_1" DiskId="1" Guid="F06C2BDD-ED07-421E-A813-FF3F772564D8">
+      <File Id="speed.svg_1" Name="speed.svg" Source="..\..\..\share\openpilotgcs\dials\deluxe\speed.svg" />
+    </Component>
+    <Component Id="vsi.svg_1" DiskId="1" Guid="3EB42492-18C2-42E4-A852-6B0FEED26668">
+      <File Id="vsi.svg_1" Name="vsi.svg" Source="..\..\..\share\openpilotgcs\dials\deluxe\vsi.svg" />
+    </Component>
+  </Directory>
+  <Directory Id="hi_contrast" Name="hi-contrast">
+    <Component Id="altimeter.svg_2" DiskId="1" Guid="F0BFA8D8-7043-48B6-96D5-4362CF3699E0">
+      <File Id="altimeter.svg_2" Name="altimeter.svg" Source="..\..\..\share\openpilotgcs\dials\hi-contrast\altimeter.svg" />
+    </Component>
+    <Component Id="attitude.svg_1" DiskId="1" Guid="A3A55234-CB0A-4C74-8F96-80B89B0DFED0">
+      <File Id="attitude.svg_1" Name="attitude.svg" Source="..\..\..\share\openpilotgcs\dials\hi-contrast\attitude.svg" />
+    </Component>
+    <Component Id="compass.svg_2" DiskId="1" Guid="93E816A6-6698-4F64-B78F-CE78C9B61EA1">
+      <File Id="compass.svg_2" Name="compass.svg" Source="..\..\..\share\openpilotgcs\dials\hi-contrast\compass.svg" />
+    </Component>
+    <Component Id="flightmode_status.svg_1" DiskId="1" Guid="3F0C48D6-92F4-4742-B78E-C007B4E9C6C8">
+      <File Id="flightmode_status.svg_1" Name="flightmode-status.svg" Source="..\..\..\share\openpilotgcs\dials\hi-contrast\flightmode-status.svg" />
+    </Component>
+    <Component Id="gps_signal.svg_1" DiskId="1" Guid="7C316F56-BE70-449D-B6CB-81CB33BBE110">
+      <File Id="gps_signal.svg_1" Name="gps-signal.svg" Source="..\..\..\share\openpilotgcs\dials\hi-contrast\gps-signal.svg" />
+    </Component>
+    <Component Id="gps_status.svg_1" DiskId="1" Guid="1F9BD6BC-FF23-494E-864A-1D8A43265C78">
+      <File Id="gps_status.svg_1" Name="gps-status.svg" Source="..\..\..\share\openpilotgcs\dials\hi-contrast\gps-status.svg" />
+    </Component>
+    <Component Id="lineardial_horizontal.svg_1" DiskId="1" Guid="FC5D74FD-C41A-495C-9229-BAF423E805C1">
+      <File Id="lineardial_horizontal.svg_1" Name="lineardial-horizontal.svg" Source="..\..\..\share\openpilotgcs\dials\hi-contrast\lineardial-horizontal.svg" />
+    </Component>
+    <Component Id="lineardial_vertical.svg_1" DiskId="1" Guid="BA7CED37-2ECF-4DDF-91CB-34A7F95A33E5">
+      <File Id="lineardial_vertical.svg_1" Name="lineardial-vertical.svg" Source="..\..\..\share\openpilotgcs\dials\hi-contrast\lineardial-vertical.svg" />
+    </Component>
+    <Component Id="speed.svg_2" DiskId="1" Guid="03D7BA6C-ECC2-4AC1-95E7-DA7EF0617D3C">
+      <File Id="speed.svg_2" Name="speed.svg" Source="..\..\..\share\openpilotgcs\dials\hi-contrast\speed.svg" />
+    </Component>
+    <Component Id="textonly.svg_1" DiskId="1" Guid="4B26F84D-C9D9-450D-B23A-83E8D7738E0C">
+      <File Id="textonly.svg_1" Name="textonly.svg" Source="..\..\..\share\openpilotgcs\dials\hi-contrast\textonly.svg" />
+    </Component>
+    <Component Id="thermometer.svg_1" DiskId="1" Guid="2827E721-C3B1-4544-A60B-8C17DF9663A7">
+      <File Id="thermometer.svg_1" Name="thermometer.svg" Source="..\..\..\share\openpilotgcs\dials\hi-contrast\thermometer.svg" />
+    </Component>
+    <Component Id="vsi.svg_2" DiskId="1" Guid="B5877E01-803C-48BA-82BA-E3B0C2D95AA8">
+      <File Id="vsi.svg_2" Name="vsi.svg" Source="..\..\..\share\openpilotgcs\dials\hi-contrast\vsi.svg" />
+    </Component>
+  </Directory>
+
+
+</Include>

@@ -21,7 +21,7 @@
                             <Directory Id="diagrams" Name="diagrams">
                                 <Directory Id="default" Name="default">
                                     <Component Id="system_health.svg" DiskId="1" Guid="AF4E2022-875C-4EAF-9C82-351E0917E0B7">
-                                        <File Id="system_health.svg" Name="system-health.svg" Source="..\..\share\openpilotgcs\diagrams\default\system-health.svg" />
+                                        <File Id="system_health.svg" Name="system-health.svg" Source="..\..\..\share\openpilotgcs\diagrams\default\system-health.svg" />
                                     </Component>
                                 </Directory>
                             </Directory>
@@ -30,10 +30,10 @@
                             </Directory>
                             <Directory Id="mapicons" Name="mapicons">
                                 <Component Id="easystar.png" DiskId="1" Guid="5990DBA8-9661-42E7-9EA0-EF5ED2BAFE1F">
-                                    <File Id="easystar.png" Name="easystar.png" Source="..\..\share\openpilotgcs\mapicons\easystar.png" />
+                                    <File Id="easystar.png" Name="easystar.png" Source="..\..\..\share\openpilotgcs\mapicons\easystar.png" />
                                 </Component>
                                 <Component Id="quad.png" DiskId="1" Guid="86580CD7-6553-4066-99A6-F3A9D44A8C9E">
-                                    <File Id="quad.png" Name="quad.png" Source="..\..\share\openpilotgcs\mapicons\quad.png" />
+                                    <File Id="quad.png" Name="quad.png" Source="..\..\..\share\openpilotgcs\mapicons\quad.png" />
                                 </Component>
                             </Directory>
                             <Directory Id="models" Name="models">
@@ -42,49 +42,49 @@
                             <Directory Id="pfd" Name="pfd">
                                 <Directory Id="default_2" Name="default">
                                     <Component Id="pfd.svg" DiskId="1" Guid="23CA1224-C973-4843-9473-7D6F84387EA5">
-                                        <File Id="pfd.svg" Name="pfd.svg" Source="..\..\share\openpilotgcs\pfd\default\pfd.svg" />
+                                        <File Id="pfd.svg" Name="pfd.svg" Source="..\..\..\share\openpilotgcs\pfd\default\pfd.svg" />
                                     </Component>
                                 </Directory>
                             </Directory>
                             <Directory Id="sounds" Name="sounds">
                                 <Component Id="Complete_sound_set.txt" DiskId="1" Guid="7F442112-B2AF-43BD-9CEA-A175630C3B82">
-                                    <File Id="Complete_sound_set.txt" Name="Complete sound set.txt" Source="..\..\share\openpilotgcs\sounds\Complete sound set.txt" />
+                                    <File Id="Complete_sound_set.txt" Name="Complete sound set.txt" Source="..\..\..\share\openpilotgcs\sounds\Complete sound set.txt" />
                                 </Component>
                                 <Component Id="License.txt" DiskId="1" Guid="9698EBB3-17D4-4F18-8B79-F09A48000A2D">
-                                    <File Id="License.txt" Name="License.txt" Source="..\..\share\openpilotgcs\sounds\License.txt" />
+                                    <File Id="License.txt" Name="License.txt" Source="..\..\..\share\openpilotgcs\sounds\License.txt" />
                                 </Component>
                                 <?include sounds.wxi ?>
                             </Directory>
                             <Directory Id="translations" Name="translations">
                                 <Component Id="openpilotgcs_de.qm" DiskId="1" Guid="CDD0D1D4-4750-4916-9E8C-3A68AD9C33EB">
-                                    <File Id="openpilotgcs_de.qm" Name="openpilotgcs_de.qm" Source="..\..\share\openpilotgcs\translations\openpilotgcs_de.qm" />
+                                    <File Id="openpilotgcs_de.qm" Name="openpilotgcs_de.qm" Source="..\..\..\share\openpilotgcs\translations\openpilotgcs_de.qm" />
                                 </Component>
                                 <Component Id="openpilotgcs_es.qm" DiskId="1" Guid="B67708FA-7F84-4711-976F-8C90CE18769C">
-                                    <File Id="openpilotgcs_es.qm" Name="openpilotgcs_es.qm" Source="..\..\share\openpilotgcs\translations\openpilotgcs_es.qm" />
+                                    <File Id="openpilotgcs_es.qm" Name="openpilotgcs_es.qm" Source="..\..\..\share\openpilotgcs\translations\openpilotgcs_es.qm" />
                                 </Component>
                                 <Component Id="openpilotgcs_fr.qm" DiskId="1" Guid="715F0768-8D9B-4919-8438-00F1689DFB3B">
-                                    <File Id="openpilotgcs_fr.qm" Name="openpilotgcs_fr.qm" Source="..\..\share\openpilotgcs\translations\openpilotgcs_fr.qm" />
+                                    <File Id="openpilotgcs_fr.qm" Name="openpilotgcs_fr.qm" Source="..\..\..\share\openpilotgcs\translations\openpilotgcs_fr.qm" />
                                 </Component>
                                 <Component Id="openpilotgcs_ru.qm" DiskId="1" Guid="D207314F-8A91-46EC-81B5-C3A61B60BF98">
-                                    <File Id="openpilotgcs_ru.qm" Name="openpilotgcs_ru.qm" Source="..\..\share\openpilotgcs\translations\openpilotgcs_ru.qm" />
+                                    <File Id="openpilotgcs_ru.qm" Name="openpilotgcs_ru.qm" Source="..\..\..\share\openpilotgcs\translations\openpilotgcs_ru.qm" />
                                 </Component>
                                 <Component Id="openpilotgcs_zh_CN.qm" DiskId="1" Guid="FA77BEF6-9F5B-49EE-B24F-7F15D51C82EC">
-                                    <File Id="openpilotgcs_zh_CN.qm" Name="openpilotgcs_zh_CN.qm" Source="..\..\share\openpilotgcs\translations\openpilotgcs_zh_CN.qm" />
+                                    <File Id="openpilotgcs_zh_CN.qm" Name="openpilotgcs_zh_CN.qm" Source="..\..\..\share\openpilotgcs\translations\openpilotgcs_zh_CN.qm" />
                                 </Component>
                                 <Component Id="qt_de.qm" DiskId="1" Guid="0DF8B05F-39CE-49E3-9978-924D3E8D2746">
-                                    <File Id="qt_de.qm" Name="qt_de.qm" Source="..\..\share\openpilotgcs\translations\qt_de.qm" />
+                                    <File Id="qt_de.qm" Name="qt_de.qm" Source="..\..\..\share\openpilotgcs\translations\qt_de.qm" />
                                 </Component>
                                 <Component Id="qt_es.qm" DiskId="1" Guid="2734BCFD-BD32-4D94-907F-588E4BBB94E6">
-                                    <File Id="qt_es.qm" Name="qt_es.qm" Source="..\..\share\openpilotgcs\translations\qt_es.qm" />
+                                    <File Id="qt_es.qm" Name="qt_es.qm" Source="..\..\..\share\openpilotgcs\translations\qt_es.qm" />
                                 </Component>
                                 <Component Id="qt_fr.qm" DiskId="1" Guid="A69BD98D-3A3F-42DD-A9E7-4738D0F85AB1">
-                                    <File Id="qt_fr.qm" Name="qt_fr.qm" Source="..\..\share\openpilotgcs\translations\qt_fr.qm" />
+                                    <File Id="qt_fr.qm" Name="qt_fr.qm" Source="..\..\..\share\openpilotgcs\translations\qt_fr.qm" />
                                 </Component>
                                 <Component Id="qt_ru.qm" DiskId="1" Guid="706B6F8C-2C50-4C7A-BFF7-1756D24F411D">
-                                    <File Id="qt_ru.qm" Name="qt_ru.qm" Source="..\..\share\openpilotgcs\translations\qt_ru.qm" />
+                                    <File Id="qt_ru.qm" Name="qt_ru.qm" Source="..\..\..\share\openpilotgcs\translations\qt_ru.qm" />
                                 </Component>
                                 <Component Id="qt_zh_CN.qm" DiskId="1" Guid="106A77BA-A063-4A43-8947-DD7C44A72452">
-                                    <File Id="qt_zh_CN.qm" Name="qt_zh_CN.qm" Source="..\..\share\openpilotgcs\translations\qt_zh_CN.qm" />
+                                    <File Id="qt_zh_CN.qm" Name="qt_zh_CN.qm" Source="..\..\..\share\openpilotgcs\translations\qt_zh_CN.qm" />
                                 </Component>
                             </Directory>
                         </Directory>
@@ -107,11 +107,11 @@
                     <Component Id="OpenPilotGCS.db" DiskId="1" Guid="8AEE7FF5-ABC0-4C0B-B17E-7E671B2A127E">
                         <RemoveFolder Id="DefaultSettings" On="uninstall" />
                         <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]\OpenPilotGCSdb" Type="string" Value="OpenPilotGCS.db" />
-                        <File Id="OpenPilotGCS.db" Name="OpenPilotGCS.db" Source="DefaultSettings\OpenPilotGCS.db" />
+                        <File Id="OpenPilotGCS.db" Name="OpenPilotGCS.db" Source="..\DefaultSettings\OpenPilotGCS.db" />
                     </Component>
                     <Component Id="OpenPilotGCS.ini" DiskId="1" Guid="EF02D380-C484-49ED-AE31-01410AB68ACA">
                         <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]\OpenPilotGCSini" Type="string" Value="OpenPilotGCS.ini" />
-                        <File Id="OpenPilotGCS.ini" Name="OpenPilotGCS.ini" Source="DefaultSettings\OpenPilotGCS.ini" />
+                        <File Id="OpenPilotGCS.ini" Name="OpenPilotGCS.ini" Source="..\DefaultSettings\OpenPilotGCS.ini" />
                     </Component>
                 </Directory>
             </Directory>
@@ -147,6 +147,7 @@
             <ComponentRef Id="Qwt.dll" />
             <ComponentRef Id="QxtCore.dll" />
             <!--ComponentRef Id="QYmodem.dll" /-->
+            <ComponentRef Id="phonon_ds94.dll" />
             <ComponentRef Id="SDL.dll" />
             <ComponentRef Id="sdlgamepad.dll" />
             <ComponentRef Id="Utils.dll" />
@@ -605,7 +606,7 @@
         <Property Id="WIXUI_INSTALLDIR" Value="INSTALLLOCATION">
         </Property>
         <UIRef Id="OpenPilotUI_InstallDir" />
-        <Icon Id="DesktopIcon.exe" SourceFile="..\..\bin\openpilotgcs.exe" />
-        <Icon Id="StartMenuIcon.exe" SourceFile="..\..\bin\openpilotgcs.exe" />
+        <Icon Id="DesktopIcon.exe" SourceFile="..\..\..\bin\openpilotgcs.exe" />
+        <Icon Id="StartMenuIcon.exe" SourceFile="..\..\..\bin\openpilotgcs.exe" />
     </Product>
 </Wix>

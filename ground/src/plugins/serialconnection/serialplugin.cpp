@@ -35,15 +35,60 @@
 
 #include <QDebug>
 
+
+
+SerialEnumerationThread::SerialEnumerationThread(SerialConnection *serial)
+    : m_serial(serial),
+    m_running(true)
+{
+}
+
+SerialEnumerationThread::~SerialEnumerationThread()
+{
+    m_running = false;
+    //wait for the thread to terminate
+    if(wait(1000) == false)
+        qDebug() << "Cannot terminate SerialEnumerationThread";
+}
+
+void SerialEnumerationThread::run()
+{
+    QStringList devices = m_serial->availableDevices();
+
+    while(m_running)
+    {
+        if(!m_serial->deviceOpened())
+        {
+            QStringList newDev = m_serial->availableDevices();
+            if(devices != newDev)
+            {
+                devices = newDev;
+                emit enumerationChanged();
+            }
+        }
+
+        msleep(2000); //update available devices every two seconds (doesn't need more)
+    }
+}
+
+
 SerialConnection::SerialConnection()
+    : m_enumerateThread(this)
 {
     serialHandle = NULL;
+#ifdef Q_OS_WIN
     //I'm cheating a little bit here:
     //Knowing if the device enumeration really changed is a bit complicated
     //so I just signal it whenever we have a device event...
     QMainWindow *mw = Core::ICore::instance()->mainWindow();
     QObject::connect(mw, SIGNAL(deviceChange()),
                      this, SLOT(onEnumerationChanged()));
+#else
+    // Other OSes do not send such signals:
+    QObject::connect(&m_enumerateThread, SIGNAL(enumerationChanged()),
+                     this, SLOT(onEnumerationChanged()));
+    m_enumerateThread.start();
+#endif
 }
 
 SerialConnection::~SerialConnection()
@@ -95,6 +140,7 @@ QIODevice *SerialConnection::openDevice(const QString &deviceName)
 #else
             serialHandle = new QextSerialPort(port.physName, set);
 #endif
+            m_deviceOpened = true;
             return serialHandle;
         }
     }
@@ -109,6 +155,7 @@ void SerialConnection::closeDevice(const QString &deviceName)
         serialHandle->close ();
         delete(serialHandle);
         serialHandle = NULL;
+        m_deviceOpened = false;
     }
 }
 

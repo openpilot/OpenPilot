@@ -33,9 +33,34 @@
 #include <qextserialenumerator.h>
 #include "coreplugin/iconnection.h"
 #include <extensionsystem/iplugin.h>
+#include <QThread>
 
 class IConnection;
 class QextSerialEnumerator;
+class SerialConnection;
+
+/**
+*   Helper thread to check on new serial port connection/disconnection
+*   Some operating systems do not send device insertion events so
+*   for those we have to poll
+*/
+class SERIAL_EXPORT SerialEnumerationThread : public QThread
+{
+    Q_OBJECT
+public:
+    SerialEnumerationThread(SerialConnection *serial);
+    virtual ~SerialEnumerationThread();
+
+    virtual void run();
+
+signals:
+    void enumerationChanged();
+
+protected:
+    SerialConnection *m_serial;
+    bool m_running;
+};
+
 
 /**
 *   Define a connection via the IConnection interface
@@ -56,12 +81,18 @@ public:
 
     virtual QString connectionName();
     virtual QString shortName();
+    bool deviceOpened() {return m_deviceOpened;}
+
 
 private:
     QextSerialPort*  serialHandle;
 
 protected slots:
     void onEnumerationChanged();
+
+protected:
+    SerialEnumerationThread m_enumerateThread;
+    bool m_deviceOpened;
 };
 
 

@@ -8,18 +8,20 @@ The fields are:
 Name (N)
 Email (E),
 Description of work (D) 
-
+Current maintainer function (M)
 
 ----------
 
 N: Connor Abbott
 E: connor (at) abbott (dot) cx
 D: Win32 OpenPilot port
+M: SITL Win32
 
 N: David Ankers
 E: david (at) openpilot (dot) org
 D: Co-founder, Project Coordination     
 D: Minor GCS infrastructure, updating the credit file 
+M: Admin
 
 N: Pedro Assuncao
 E: pedro (dot) agda (plus) openpilot (at) gmail (dot) com
@@ -29,20 +31,24 @@ N: Jose Barros
 E: josembarros (at) hotmail (dot) com
 D: Next-Gen OP Map Lib, Y-Modem Library, Uploader Plugin
 D: OP Bootloader, AHRS Bootloader, OPUploadTool
+M: Bootloader, OP MAP Lib 
  
 N: David "Buzz" Carlson 
 E: chebuzz (plus) openpilot (at) gmail (dot) com
 D: 3D ModelView GCS Plugin, sponsor of HITL merge work and XPlane addition
+M: 3D Modelview
 
 N: Eric Price
 E: corvus (dot) corax (at) cybertrench (dot) com
 D: IL2 HITL GCS Plugin, Posix OpenPilot, Advanced stabilisation module
+M: SITL Posix
 
 N: James Cotton
 E: peabody124 (plus) openpilot (at) gmail (dot) com
 D: Multiplatform HID implementation (firmware & GCS), GCS Joystick control 
 D: Posix OpenPilot work and Mac implementation 
 D: Firmware implementation of Professor Schinstock's INS/GPS
+M: Architecture co-lead
 
 N: Piotr Esden-Tempski
 E: esden (at) esden (dot) net
@@ -52,6 +58,7 @@ N: Frederic Goddeeris
 E: fredericgoddeeris (at) hotmail (dot) com
 D: I2C work and FreeRTOS work, MK integration
 D: EagleTree OSD implementation   
+M: OSD Module
 
 N: Daniel Godin
 E: dgodin (at) dnsct (dot) com
@@ -86,6 +93,7 @@ N: Edouard Lafargue
 E: edouard (at) lafargue (dot) name
 D: GCS Dial Plugins, GCS PFD Plugin, GCS GPS plugin, GCS Config plugin
 D: Artwork including standard display dials
+M: GCS Core
 
 N: Matt Lipski
 E: mattlipski (plus) openpilot (at) gmail (dot) com
@@ -168,6 +176,7 @@ N: Vassilis Varveropoulos
 E: vassilis (at) openpilot (dot) org
 D: Co-founder, Principal embedded software architect. 
 D: Module architecture and UAVTalk/UAVObjects implementation.
+M: Architecture co-lead
 
 N: Alex Vrubel
 E: alex.vrubel (plus) openpilot (at) gmail (dot) com

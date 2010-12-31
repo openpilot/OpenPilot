@@ -50,11 +50,18 @@ V: http://www.youtube.com/watch?v=CIL29Yqt8Ck
 M: First -10 Deg C  flight
 C: Sami Korhonen (Sambas)
 D: November 2010
+V: http://vimeo.com/17488702
 
 M: First solid OpenPilot Position Hold
 C: Dale Schintock
 D: December 2010
 V: http://www.youtube.com/watch?v=BBCGVP0Vpgw
+
+M: First intentional flip on a multirotor with OpenPilot
+C: Sami Korhonen (Sambas)
+D: December 2010
+V: http://vimeo.com/18318478
+
 
 An incomplete list of some future Milestones is below:
 
@@ -62,9 +69,7 @@ An incomplete list of some future Milestones is below:
 * First Octo flight with OpenPilot
 * First successful flight using the GCS only and no RC TX
 * First use of Magic Waypoint
-* First flip on a multirotor with OpenPilot
 * First Flybarless Helicopter flight with OpenPilot
-* First intentional Quad flip with OpenPilot
 * First flight with CopterControl
 * First fixed wing navigation flight
 * First Multirotor navigation flight

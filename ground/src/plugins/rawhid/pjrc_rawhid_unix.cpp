@@ -104,7 +104,7 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
             if (pid > 0 && dev->descriptor.idProduct != pid) continue;
             if (!dev->config) continue;
             if (dev->config->bNumInterfaces < 1) continue;
-            printf("device: vid=%04X, pic=%04X, with %d iface\n",
+            printf("device: vid=%04X, pic=%04X, with %d iface",
                    dev->descriptor.idVendor,
                    dev->descriptor.idProduct,
                    dev->config->bNumInterfaces);
@@ -114,7 +114,7 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
             for (i=0; i<dev->config->bNumInterfaces && iface; i++, iface++) {
                 desc = iface->altsetting;
                 if (!desc) continue;
-                printf("  type %d, %d, %d\n", desc->bInterfaceClass,
+                printf("  type %d, %d, %d", desc->bInterfaceClass,
                        desc->bInterfaceSubClass, desc->bInterfaceProtocol);
                 if (desc->bInterfaceClass != 3) continue;
                 if (desc->bInterfaceSubClass != 0) continue;
@@ -124,34 +124,34 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
                 for (n = 0; n < desc->bNumEndpoints; n++, ep++) {
                     if (ep->bEndpointAddress & 0x80) {
                         if (!ep_in) ep_in = ep->bEndpointAddress & 0x7F;
-                        printf("    IN endpoint %d\n", ep_in);
+                        qDebug() <<  "    IN endpoint " << ep_in;
                     } else {
                         if (!ep_out) ep_out = ep->bEndpointAddress;
-                        printf("    OUT endpoint %d\n", ep_out);
+                        qDebug() << "    OUT endpoint " <<  ep_out;
                     }
                 }
                 if (!ep_in) continue;
                 if (!u) {
                     u = usb_open(dev);
                     if (!u) {
-                        printf("  unable to open device\n");
+                        qDebug() << "  unable to open device";
                         break;
                     }
                 }
-                printf("  hid interface (generic)\n");
+                qDebug() << "  hid interface (generic)";
                 if (usb_get_driver_np(u, i, (char *)buf, sizeof(buf)) >= 0) {
-                    printf("  in use by driver \"%s\"\n", buf);
+                    printf("  in use by driver \"%s\"", buf);
                     if (usb_detach_kernel_driver_np(u, i) < 0) {
-                        printf("  unable to detach from kernel\n");
+                        printf("  unable to detach from kernel");
                         continue;
                     }
                 }
                 if (usb_claim_interface(u, i) < 0) {
-                    printf("  unable claim interface %d\n", i);
+                    printf("  unable claim interface %d", i);
                     continue;
                 }
                 len = usb_control_msg(u, 0x81, 6, 0x2200, i, (char *)buf, sizeof(buf), 250);
-                printf("  descriptor, len=%d\n", len);
+                printf("  descriptor, len=%d", len);
                 if (len < 2) {
                     usb_release_interface(u, i);
                     continue;
@@ -159,7 +159,7 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
                 p = buf;
                 parsed_usage_page = parsed_usage = 0;
                 while ((tag = hid_parse_item(&val, &p, buf + len)) >= 0) {
-                    printf("  tag: %X, val %X\n", tag, val);
+                    printf("  tag: %X, val %X", tag, val);
                     if (tag == 4) parsed_usage_page = val;
                     if (tag == 8) parsed_usage = val;
                     if (parsed_usage_page && parsed_usage) break;

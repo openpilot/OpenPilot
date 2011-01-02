@@ -8,13 +8,16 @@
 #include <cmath>
 #include "jmath/pca.hpp"
 #include "jmath/jmathException.hpp"
-#include "boost/numeric/bindings/lapack/syev.hpp"
-#include "boost/numeric/bindings/traits/ublas_matrix.hpp"
-#include "boost/numeric/bindings/traits/ublas_vector.hpp"
+#include <boost/numeric/bindings/lapack/driver/syev.hpp>
+#include <boost/numeric/bindings/ublas/matrix.hpp>
+#include <boost/numeric/bindings/ublas/vector.hpp>
+#include <boost/numeric/bindings/ublas/symmetric.hpp>
 
 namespace lapack = boost::numeric::bindings::lapack;
+namespace ublas = boost::numeric::ublas;
 using namespace std;
 using namespace jafar::jmath;
+typedef ublas::symmetric_adaptor< ublas::matrix<double, ublas::column_major>, ublas::upper > up_sym_adapt; 
 
 void PCA::batchPCA(const jblas::mat& X_, int dim_) {
   int m = X_.size1();
@@ -39,8 +42,9 @@ void PCA::batchPCA(const jblas::mat& X_, int dim_) {
   if (m <= n) {
     ublas::matrix<double,ublas::column_major> A = ublas::prod(centeredX,ublas::trans(centeredX));
     A /= n;
+		up_sym_adapt s_A(A);
     jblas::vec alpha(m);
-    int ierr = lapack::syev('V','U',A,alpha,lapack::optimal_workspace());	  
+    int ierr = lapack::syev('V',s_A,alpha);	  
     if (ierr!=0)
       JFR_RUN_TIME("PCA::batchPCA: error in lapack::syev() function, ierr=" << ierr);
     eigenvectors.resize(m,m);
@@ -52,8 +56,9 @@ void PCA::batchPCA(const jblas::mat& X_, int dim_) {
   } else {
     ublas::matrix<double,ublas::column_major> A = ublas::prod(ublas::trans(centeredX),centeredX);
     A /= n;
+		up_sym_adapt s_A(A);
     jblas::vec alpha(n);
-    int ierr = lapack::syev('V','U',A,alpha,lapack::optimal_workspace());
+    int ierr = lapack::syev('V',s_A,alpha);
     if (ierr!=0)
       JFR_RUN_TIME("PCA::batchPCA: error in lapack::syev() function, ierr=" << ierr);
     eigenvectors.resize(m,n);
@@ -107,8 +112,9 @@ void PCA::updatePCA(const jblas::vec& I_, UFlag f_, double thd_) {
     D(i,D.size2()-1) = static_cast<double>(n)/static_cast<double>((n+1)*(n+1))*gamma*a(i);
     D(D.size1()-1,D.size2()-1) = static_cast<double>(n)/static_cast<double>((n+1)*(n+1))*gamma*gamma;
   }
+	up_sym_adapt s_D(D);
   jblas::vec alphap(D.size1());
-  int ierr = lapack::syev('V','U',D,alphap,lapack::optimal_workspace());	  
+  int ierr = lapack::syev('U',s_D,alphap);	  
   if (ierr!=0)
     JFR_RUN_TIME("PCA::updatePCA: error in lapack::syev() function, ierr=" << ierr);
   jblas::mat R(D.size1(),D.size2());

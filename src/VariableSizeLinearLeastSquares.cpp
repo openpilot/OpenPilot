@@ -7,9 +7,9 @@
 #ifdef HAVE_BOOST_SANDBOX
 #ifdef HAVE_LAPACK
 
-#include "boost/numeric/bindings/lapack/gesv.hpp"
-#include "boost/numeric/bindings/traits/ublas_matrix.hpp"
-#include "boost/numeric/bindings/traits/ublas_vector.hpp"
+#include "boost/numeric/bindings/lapack/driver/gesv.hpp"
+#include "boost/numeric/bindings/ublas/matrix.hpp"
+#include "boost/numeric/bindings/ublas/vector.hpp"
 
 
 namespace lapack = boost::numeric::bindings::lapack;
@@ -26,7 +26,8 @@ void VariableSizeLinearLeastSquares::solve()
 {
   ublas::matrix<double, ublas::column_major> Abis(m_A);
   ublas::matrix<double, ublas::column_major> bbis(m_b);
-  lapack::gesv(Abis,bbis);
+	ublas::vector<int> ipiv(m_modelSize);
+  lapack::gesv(Abis,ipiv,bbis);
   m_x = column(bbis,0);
 }
 

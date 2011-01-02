@@ -22,9 +22,9 @@
 
 #ifdef HAVE_BOOST_SANDBOX
 #ifdef HAVE_LAPACK
-#include "boost/numeric/bindings/lapack/gesdd.hpp"
-#include "boost/numeric/bindings/traits/ublas_matrix.hpp"
-#include "boost/numeric/bindings/traits/ublas_vector.hpp"
+#include "boost/numeric/bindings/lapack/driver/gesdd.hpp"
+#include "boost/numeric/bindings/ublas/matrix.hpp"
+#include "boost/numeric/bindings/ublas/vector.hpp"
 #endif
 #endif
 
@@ -584,7 +584,7 @@ namespace jafar {
 				jblas::vec s(m.size2());
 				jblas::mat_column_major U(m.size1(), m.size2());
 				jblas::mat_column_major VT(m.size1(), m.size2());
-				int ierr = boost::numeric::bindings::lapack::gesdd(working_m, s, U, VT);
+				int ierr = boost::numeric::bindings::lapack::gesdd('A',working_m, s, U, VT);
 				if (ierr != 0) {
 					throw(jmath::LapackException(ierr, "LinearLeastSquares::solve: error in lapack::gesdd() routine", __FILE__,
 					    __LINE__));

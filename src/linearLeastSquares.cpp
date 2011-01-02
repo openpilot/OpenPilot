@@ -10,9 +10,9 @@
 #include <cmath>
 
 #include <iostream> // gesdd uses std::cerr but does not includes iostream
-#include "boost/numeric/bindings/lapack/gesdd.hpp"
-#include "boost/numeric/bindings/traits/ublas_matrix.hpp"
-#include "boost/numeric/bindings/traits/ublas_vector.hpp"
+#include "boost/numeric/bindings/lapack/driver/gesdd.hpp"
+#include "boost/numeric/bindings/ublas/matrix.hpp"
+#include "boost/numeric/bindings/ublas/vector.hpp"
 
 #include "kernel/jafarException.hpp"
 
@@ -69,7 +69,7 @@ void LinearLeastSquares::solve()
   mat_column_major U(sizeDataSet(), sizeModel());
   mat_column_major VT(sizeModel(), sizeModel());
 
-  int ierr = lapack::gesdd(m_A,s,U,VT);
+  int ierr = lapack::gesdd('A',m_A,s,U,VT);
   if (ierr!=0) {
     throw(jmath::LapackException(ierr, 
 				 "LinearLeastSquares::solve: error in lapack::gesdd() routine",

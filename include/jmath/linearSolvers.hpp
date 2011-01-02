@@ -33,7 +33,7 @@ namespace jafar {
        *
        * The function returns 0 in case of error, 1 if successfull
        */
-      int solve_QR(jblas::mat_column_major& A, const jblas::mat& B, jblas::mat& X);
+      int solve_QR(jblas::mat_column_major& A, const jblas::mat_column_major& B, jblas::mat_column_major& X);
 
       /**
        * This function returns the solution of Ax = b

@@ -8,9 +8,9 @@
 #include "assert.h"
 #include <cmath>
 #include <iostream> 
-#include "boost/numeric/bindings/lapack/gesdd.hpp"
-#include "boost/numeric/bindings/traits/ublas_matrix.hpp"
-#include "boost/numeric/bindings/traits/ublas_vector.hpp"
+#include "boost/numeric/bindings/lapack/driver/gesdd.hpp"
+#include "boost/numeric/bindings/ublas/matrix.hpp"
+#include "boost/numeric/bindings/ublas/vector.hpp"
 
 #include "kernel/jafarException.hpp"
 #include "jmath/jmathException.hpp"
@@ -67,7 +67,7 @@ void VariableSizeLinearLeastSquares2::solve()
   mat_column_major U(m_countValues, m_modelSize);
   mat_column_major VT(m_countValues, m_modelSize);
 
-  int ierr = lapack::gesdd(m_A,s,U,VT);
+  int ierr = lapack::gesdd('A', m_A,s,U,VT);
   if (ierr!=0) {
     throw(jmath::LapackException(ierr, 
 				 "LinearLeastSquares::solve: error in lapack::gesdd() routine",

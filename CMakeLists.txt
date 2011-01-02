@@ -2,7 +2,7 @@
 
 build_jafar_module(jmath
   VERSION 0
-  REVISION 1 
+  REVISION 2
   REQUIRED_MODULES kernel 
   #OPTIONAL_MODULES 
   REQUIRED_EXTLIBS lapack boost_sandbox

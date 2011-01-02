@@ -9,5 +9,5 @@ include(openpilotgcs.pri)
 TEMPLATE  = subdirs
 CONFIG   += ordered
 
-SUBDIRS = src share
+SUBDIRS = src share packaging
 unix:!macx:!isEmpty(copydata):SUBDIRS += bin

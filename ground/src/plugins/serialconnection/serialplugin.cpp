@@ -47,7 +47,7 @@ SerialEnumerationThread::~SerialEnumerationThread()
 {
     m_running = false;
     //wait for the thread to terminate
-    if(wait(1000) == false)
+    if(wait(2100) == false)
         qDebug() << "Cannot terminate SerialEnumerationThread";
 }
 

@@ -60,6 +60,13 @@ namespace rtslam {
 		JFR_ASSERT(phi_i >= 0 && phi_i < nang, "phi_i out of bounds " << phi_i << " | " << nang);
 		JFR_ASSERT(r_i >= 0 && r_i < ndist, "r_i out of bounds " << r_i << " | " << ndist);
 		
+		/*
+		 TODO to avoid repeated accesses to the map (log n), store the last used cell and coords,
+		 check that the coords are still the same, and reuse directly if so
+		 we could also if we are not close to the border of a cell infer quickly
+		 that the cell hasn't changed, avoiding computations of sqrt and atan2 and / and...
+		 eg by computing directly the cos or sin angle with dot or cross prod...
+		 */
 		if (create)
 			return &(map[Index(theta_i, phi_i, r_i)]);
 		else

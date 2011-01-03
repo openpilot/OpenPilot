@@ -136,7 +136,7 @@ namespace jafar {
 				/**
 				 * Predict appearance
 				 */
-				virtual void predictAppearance_func();
+				virtual bool predictAppearance_func();
 			
 
 				virtual double getMatchScore(){

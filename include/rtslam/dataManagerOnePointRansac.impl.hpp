@@ -88,24 +88,25 @@ namespace jafar {
 // JFR_DEBUG("was predicted at " << obsCurrentPtr->expectation.x() << ", now predicted at " << exp);
 
 					// FIXME rematch if isLowInnovationInlier is false
-					if(!obsCurrentPtr->events.matched){
-						// try to match with low innovation
-						obsCurrentPtr->predictAppearance();
-						jblas::sym_mat P = jblas::identity_mat(obsCurrentPtr->expectation.size())*jmath::sqr(matcher->params.lowInnov);
-						RoiSpec roi(exp, P, 1.0);
-						obsCurrentPtr->searchSize = roi.count();
-						
-						obsCurrentPtr->events.measured = true;
-						
-// JFR_DEBUG("not yet matched, trying with lowInnov in roi " << roi);
-						matcher->match(rawData, obsCurrentPtr->predictedAppearance, roi, obsCurrentPtr->measurement, obsCurrentPtr->observedAppearance);
-// JFR_DEBUG("obs " << obsCurrentPtr->id() << " expected at " << exp << " measured with innovation " << obsCurrentPtr->measurement.x()-exp);
-						if (obsCurrentPtr->getMatchScore() > matcher->params.threshold && 
-								isExpectedInnovationInlier(obsCurrentPtr, matcher->params.mahalanobisTh))
+					if(!obsCurrentPtr->events.matched)
+						if (obsCurrentPtr->predictAppearance())
 						{
-							obsCurrentPtr->events.matched = true;
+							// try to match with low innovation
+							jblas::sym_mat P = jblas::identity_mat(obsCurrentPtr->expectation.size())*jmath::sqr(matcher->params.lowInnov);
+							RoiSpec roi(exp, P, 1.0);
+							obsCurrentPtr->searchSize = roi.count();
+							
+							obsCurrentPtr->events.measured = true;
+							
+	// JFR_DEBUG("not yet matched, trying with lowInnov in roi " << roi);
+							matcher->match(rawData, obsCurrentPtr->predictedAppearance, roi, obsCurrentPtr->measurement, obsCurrentPtr->observedAppearance);
+	// JFR_DEBUG("obs " << obsCurrentPtr->id() << " expected at " << exp << " measured with innovation " << obsCurrentPtr->measurement.x()-exp);
+							if (obsCurrentPtr->getMatchScore() > matcher->params.threshold && 
+									isExpectedInnovationInlier(obsCurrentPtr, matcher->params.mahalanobisTh))
+							{
+								obsCurrentPtr->events.matched = true;
+							}
 						}
-					}
 					
 // JFR_DEBUG("matched: " << obsCurrentPtr->events.matched << " (measured " << obsCurrentPtr->events.measured << ") with score " << obsCurrentPtr->getMatchScore() << " at " << obsCurrentPtr->measurement.x());
 					
@@ -242,62 +243,62 @@ JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("Updating with ActiveSearch:");
 
 						obsPtr->events.visible = true;
 
-						if (numObs < algorithmParams.n_updates_total) {
+						if (numObs < algorithmParams.n_updates_total)
+							if (obsPtr->predictAppearance())
+							{
+								obsPtr->events.measured = true;
 
-							obsPtr->events.measured = true;
+								// 1c. predict search area and appearance
+								//cv::Rect roi = gauss2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.mahalanobisTh);
+								RoiSpec roi(obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);
+								obsPtr->searchSize = roi.count();
+								if (obsPtr->searchSize > matcher->params.maxSearchSize) roi.scale(sqrt(matcher->params.maxSearchSize/(double)obsPtr->searchSize));
+	// JFR_DEBUG("obs " << obsPtr->id() << " measured in " << roi);
 
-							// 1c. predict search area and appearance
-							//cv::Rect roi = gauss2rect(obsPtr->expectation.x(), obsPtr->expectation.P() + matcherParams_.measVar*identity_mat(2), matcherParams_.mahalanobisTh);
-							RoiSpec roi(obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);
-							obsPtr->searchSize = roi.count();
-							if (obsPtr->searchSize > matcher->params.maxSearchSize) roi.scale(sqrt(matcher->params.maxSearchSize/(double)obsPtr->searchSize));
-							obsPtr->predictAppearance();
-// JFR_DEBUG("obs " << obsPtr->id() << " measured in " << roi);
+								// 1d. match predicted feature in search area
+								//						kernel::Chrono match_chrono;
+								matcher->match(rawData, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
+	// JFR_DEBUG("obs " << obsPtr->id() << " expected at " << obsPtr->expectation.x() << " measured with innovation " << obsPtr->measurement.x()-obsPtr->expectation.x());
+								//						total_match_time += match_chrono.elapsedMicrosecond();
 
-							// 1d. match predicted feature in search area
-							//						kernel::Chrono match_chrono;
-							matcher->match(rawData, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
-// JFR_DEBUG("obs " << obsPtr->id() << " expected at " << obsPtr->expectation.x() << " measured with innovation " << obsPtr->measurement.x()-obsPtr->expectation.x());
-							//						total_match_time += match_chrono.elapsedMicrosecond();
+		/*
+									// DEBUG: save some appearances to file
+									((AppearanceImagePoint*)(((DescriptorImagePoint*)(obsPtr->landmark().descriptorPtr.get()))->featImgPntPtr->appearancePtr.get()))->patch.save("descriptor_app.png");
+									((AppearanceImagePoint*)(obsPtr->predictedAppearance.get()))->patch.save("predicted_app.png");
+									((AppearanceImagePoint*)(obsPtr->observedAppearance.get()))->patch.save("matched_app.png");
+		*/
+								// DEBUG: display predicted appearances on image, disable it when operating normally because can have side effects
+		/*
+								if (SHOW_PATCH) {
+									AppearanceImagePoint * appImgPtr =
+											PTR_CAST<AppearanceImagePoint*> (obsPtr->predictedAppearance.get());
+									jblas::veci shift(2);
+									shift(0) = (appImgPtr->patch.width() - 1) / 2;
+									shift(1) = (appImgPtr->patch.height() - 1) / 2;
+									appImgPtr->patch.robustCopy(*PTR_CAST<RawImage*> (senPtr->getRaw().get())->img, 0, 0,
+																							obsPtr->expectation.x(0) - shift(0), obsPtr->expectation.x(1) - shift(1));
+								}
+		*/
+	// JFR_DEBUG("obs " << obsPtr->id() << " got match score " << obsPtr->getMatchScore());
+								// 1e. if feature is found
+								if (obsPtr->getMatchScore() > matcher->params.threshold) {
+									obsPtr->events.matched = true;
+									obsPtr->computeInnovation();
 
-	/*
-								// DEBUG: save some appearances to file
-								((AppearanceImagePoint*)(((DescriptorImagePoint*)(obsPtr->landmark().descriptorPtr.get()))->featImgPntPtr->appearancePtr.get()))->patch.save("descriptor_app.png");
-								((AppearanceImagePoint*)(obsPtr->predictedAppearance.get()))->patch.save("predicted_app.png");
-								((AppearanceImagePoint*)(obsPtr->observedAppearance.get()))->patch.save("matched_app.png");
-	*/
-							// DEBUG: display predicted appearances on image, disable it when operating normally because can have side effects
-	/*
-							if (SHOW_PATCH) {
-								AppearanceImagePoint * appImgPtr =
-										PTR_CAST<AppearanceImagePoint*> (obsPtr->predictedAppearance.get());
-								jblas::veci shift(2);
-								shift(0) = (appImgPtr->patch.width() - 1) / 2;
-								shift(1) = (appImgPtr->patch.height() - 1) / 2;
-								appImgPtr->patch.robustCopy(*PTR_CAST<RawImage*> (senPtr->getRaw().get())->img, 0, 0,
-																						obsPtr->expectation.x(0) - shift(0), obsPtr->expectation.x(1) - shift(1));
-							}
-	*/
-// JFR_DEBUG("obs " << obsPtr->id() << " got match score " << obsPtr->getMatchScore());
-							// 1e. if feature is found
-							if (obsPtr->getMatchScore() > matcher->params.threshold) {
-								obsPtr->events.matched = true;
-								obsPtr->computeInnovation();
+									// 1f. if feature is inlier
+									if (obsPtr->compatibilityTest(matcher->params.mahalanobisTh)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
+										numObs++;
+										//								kernel::Chrono update_chrono;
+	JFR_DEBUG_SEND(" " << obsPtr->id());
+										obsPtr->update();
+										//								total_update_time += update_chrono.elapsedMicrosecond();
+										obsPtr->events.updated = true;
+	// JFR_DEBUG("corrected " << obsPtr->id());
+									} // obsPtr->compatibilityTest(M_TH)
+								} // obsPtr->getScoreMatchInPercent()>SC_TH
 
-								// 1f. if feature is inlier
-								if (obsPtr->compatibilityTest(matcher->params.mahalanobisTh)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
-									numObs++;
-									//								kernel::Chrono update_chrono;
-JFR_DEBUG_SEND(" " << obsPtr->id());
-									obsPtr->update();
-									//								total_update_time += update_chrono.elapsedMicrosecond();
-									obsPtr->events.updated = true;
-// JFR_DEBUG("corrected " << obsPtr->id());
-								} // obsPtr->compatibilityTest(M_TH)
-							} // obsPtr->getScoreMatchInPercent()>SC_TH
-
-	//						cout << *obsPtr << endl;
-						} // number of observations
+		//						cout << *obsPtr << endl;
+							} // number of observations
 					} // obsPtr->isVisible()
 
 					// cout << "\n-------------------------------------------------- " << endl;
@@ -639,14 +640,17 @@ JFR_DEBUG_END();
 		bool DataManagerOnePointRansac<RawSpec,SensorSpec,FeatureSpec,RoiSpec,FeatureManagerSpec,DetectorSpec,MatcherSpec>::
 		matchWithExpectedInnovation(boost::shared_ptr<RawSpec> rawData,  observation_ptr_t obsPtr)
 		{
-			obsPtr->predictAppearance();
-			RoiSpec roi(obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);
-			obsPtr->searchSize = roi.count();
-			if (obsPtr->searchSize > matcher->params.maxSearchSize) roi.scale(sqrt(matcher->params.maxSearchSize/(double)obsPtr->searchSize));
-			matcher->match(rawData, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
+			if (obsPtr->predictAppearance())
+			{
+				RoiSpec roi(obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);
+				obsPtr->searchSize = roi.count();
+				if (obsPtr->searchSize > matcher->params.maxSearchSize) roi.scale(sqrt(matcher->params.maxSearchSize/(double)obsPtr->searchSize));
+				matcher->match(rawData, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
 // JFR_DEBUG("obs " << obsPtr->id() << " expected at " << obsPtr->expectation.x() << " measured with innovation " << obsPtr->measurement.x()-obsPtr->expectation.x());
 
-			return (obsPtr->getMatchScore() > matcher->params.threshold && isExpectedInnovationInlier(obsPtr, matcher->params.mahalanobisTh));
+				return (obsPtr->getMatchScore() > matcher->params.threshold && isExpectedInnovationInlier(obsPtr, matcher->params.mahalanobisTh));
+			} else
+				return false;
 		}
 
 		#if 0

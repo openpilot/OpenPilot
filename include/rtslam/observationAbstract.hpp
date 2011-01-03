@@ -361,14 +361,19 @@ namespace jafar {
 				/**
 				 * Predict appearance
 				 */
-				virtual void predictAppearance(bool force = false)
+				virtual bool predictAppearance(bool force = false)
 				{
 					if (force || !events.predictedApp)
 					{
 //JFR_DEBUG("predictAppearance");
-						predictAppearance_func();
-						events.predictedApp = true;
+						if (predictAppearance_func())
+						{
+							events.predictedApp = true;
+							return true;
+						}
+						return false;
 					}
+					return true;
 				}
 				
 				virtual void updateDescriptor()
@@ -385,7 +390,7 @@ namespace jafar {
 					return landmarkPtr()->descriptorPtr->isPredictionValid(this->shared_from_this());
 				}
 
-				virtual void predictAppearance_func() = 0;
+				virtual bool predictAppearance_func() = 0;
 
 				virtual double getMatchScore() = 0;
 

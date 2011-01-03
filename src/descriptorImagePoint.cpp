@@ -146,7 +146,8 @@ app_dst->patch.save(buffer);
 		bool DescriptorImagePointMultiView::predictAppearance(const observation_ptr_t & obsPtr)
 		{
 			FeatureView* view_src;
-			if (!getClosestView(obsPtr, view_src)) return false;
+			getClosestView(obsPtr, view_src);
+			if (!view_src) return false;
 
 			landmark_ptr_t lmkPtr = obsPtr->landmarkPtr();
 			jblas::vec lmk = lmkPtr->reparametrized();
@@ -274,9 +275,9 @@ app_dst->patch.save(buffer);
 			}
 			
 			// return final result
-			if (cosClosestAngle < 0.1) closestView = NULL; // really not usable
+			if (cosClosestAngle < -0.5) closestView = NULL; // really not usable
 			if (closestView) closestView->used = true;
-			return (cosClosestAngle >= cosAngleStep);
+			return (closestView && cosClosestAngle >= cosAngleStep);
 		}
 
 		void DescriptorImagePointMultiView::desc_text(std::ostream& os) const

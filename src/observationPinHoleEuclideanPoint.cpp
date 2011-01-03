@@ -128,9 +128,9 @@ namespace jafar {
 		}
 		
 
-		void ObservationPinHoleEuclideanPoint::predictAppearance_func() {
+		bool ObservationPinHoleEuclideanPoint::predictAppearance_func() {
 			observation_ptr_t _this = shared_from_this();
-			landmarkPtr()->descriptorPtr->predictAppearance(_this);
+			return landmarkPtr()->descriptorPtr->predictAppearance(_this);
 		}
 
 		void ObservationPinHoleEuclideanPoint::desc_image(image::oimstream& os) const

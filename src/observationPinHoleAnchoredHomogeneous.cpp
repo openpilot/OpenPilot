@@ -143,9 +143,9 @@ namespace jafar {
 		}
 		
 
-		void ObservationPinHoleAnchoredHomogeneousPoint::predictAppearance_func() {
+		bool ObservationPinHoleAnchoredHomogeneousPoint::predictAppearance_func() {
 			observation_ptr_t _this = shared_from_this();
-			landmarkPtr()->descriptorPtr->predictAppearance(_this);
+			return landmarkPtr()->descriptorPtr->predictAppearance(_this);
 		}
 
 		bool ObservationPinHoleAnchoredHomogeneousPoint::voteForReparametrizingLandmark(){

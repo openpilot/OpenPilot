@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
+ * @{
  * @addtogroup BatteryModule Battery Module
  * @brief Measures battery voltage and current
  * Updates the FlightBatteryState object
- * @{ 
+ * @{
  *
  * @file       battery.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -48,6 +48,7 @@
 #include "openpilot.h"
 
 #include "flightbatterystate.h"
+#include "batterysettings.h"
 
 //
 // Configuration
@@ -92,8 +93,6 @@ int32_t BatteryInitialize(void)
  */
 static void task(void *parameters)
 {
-	uint cnt = 0;
-	uint32_t mAs = 0;
 	portTickType lastSysTime;
 	FlightBatteryStateData flightBatteryData;
 
@@ -101,11 +100,15 @@ static void task(void *parameters)
 
 	DEBUG_MSG("Battery Started\n");
 
+	AlarmsSet(SYSTEMALARMS_ALARM_BATTERY, SYSTEMALARMS_ALARM_ERROR);
+
 	lastSysTime = xTaskGetTickCount();
+
 	while (1) {
 #if (POWER_SENSOR_VERSION == 1)
 		// TODO: Compare with floating point calculations
-
+		uint cnt = 0;
+		uint32_t mAs = 0;
 		uint32_t mV, mA;
 
 		mV = PIOS_ADC_PinGet(2) * 1257 / 100;
@@ -120,11 +123,60 @@ static void task(void *parameters)
 		flightBatteryData.ConsumedEnergy = mAs / 3600;
 		FlightBatteryStateSet(&flightBatteryData);
 
-		vTaskDelayUntil(&lastSysTime, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
 #endif
 #if (POWER_SENSOR_VERSION == 2)
+		portTickType thisSysTime;
+		BatterySettingsData batterySettings;
+		float dT = SAMPLE_PERIOD_MS / 1000;
+		float Bob;
+		float energyRemaining;
 
+		// Check how long since last update
+		thisSysTime = xTaskGetTickCount();
+		if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
+			dT = (thisSysTime - lastSysTime) / (portTICK_RATE_MS / 1000.0f);
+		lastSysTime = thisSysTime;
+
+		BatterySettingsGet(&batterySettings);
+
+		//calculate the battery parameters
+		flightBatteryData.Voltage = ((float)PIOS_ADC_PinGet(2)) * 0.008065 * batterySettings.Calibrations[BATTERYSETTINGS_CALIBRATIONS_VOLTAGE]; //in Volts
+		flightBatteryData.Current = ((float)PIOS_ADC_PinGet(1)) * 0.016113 * batterySettings.Calibrations[BATTERYSETTINGS_CALIBRATIONS_CURRENT]; //in Amps
+	Bob =dT; // FIXME: something funky happens if I don't do this... Andrew
+		flightBatteryData.ConsumedEnergy += (flightBatteryData.Current * 1000.0 * dT / 3600.0) ;//in mAh
+
+		if (flightBatteryData.Current > flightBatteryData.PeakCurrent)flightBatteryData.PeakCurrent = flightBatteryData.Current; //in Amps
+		flightBatteryData.AvgCurrent=(flightBatteryData.AvgCurrent*0.8)+(flightBatteryData.Current*0.2); //in Amps
+
+		//sanity checks
+		if (flightBatteryData.AvgCurrent<0)flightBatteryData.AvgCurrent=0.0;
+		if (flightBatteryData.PeakCurrent<0)flightBatteryData.PeakCurrent=0.0;
+		if (flightBatteryData.ConsumedEnergy<0)flightBatteryData.ConsumedEnergy=0.0;
+
+		energyRemaining = batterySettings.BatteryCapacity - flightBatteryData.ConsumedEnergy; // in mAh
+		flightBatteryData.EstimatedFlightTime = ((energyRemaining / (flightBatteryData.AvgCurrent*1000.0))*3600.0);//in Sec
+
+		//generate alarms where needed...
+		if ((flightBatteryData.Voltage<=0)&&(flightBatteryData.Current<=0))
+		{
+			AlarmsSet(SYSTEMALARMS_ALARM_BATTERY, SYSTEMALARMS_ALARM_ERROR);
+			AlarmsSet(SYSTEMALARMS_ALARM_FLIGHTTIME, SYSTEMALARMS_ALARM_ERROR);
+		}
+		else
+		{
+			if (flightBatteryData.EstimatedFlightTime < 30) AlarmsSet(SYSTEMALARMS_ALARM_FLIGHTTIME, SYSTEMALARMS_ALARM_CRITICAL);
+			else if (flightBatteryData.EstimatedFlightTime < 60) AlarmsSet(SYSTEMALARMS_ALARM_FLIGHTTIME, SYSTEMALARMS_ALARM_WARNING);
+			else AlarmsClear(SYSTEMALARMS_ALARM_FLIGHTTIME);
+
+			// FIXME: should make the battery voltage detection dependent on battery type.
+			if ((flightBatteryData.Voltage < batterySettings.BatteryVoltage * 0.75)||(flightBatteryData.Current > batterySettings.BatteryCapacity * 0.85))AlarmsSet(SYSTEMALARMS_ALARM_BATTERY, SYSTEMALARMS_ALARM_CRITICAL);
+			else if ((flightBatteryData.Voltage < batterySettings.BatteryVoltage * 0.85)||(flightBatteryData.Current > batterySettings.BatteryCapacity * 0.95))AlarmsSet(SYSTEMALARMS_ALARM_BATTERY, SYSTEMALARMS_ALARM_WARNING);
+			else AlarmsClear(SYSTEMALARMS_ALARM_BATTERY);
+		}
+
+		FlightBatteryStateSet(&flightBatteryData);
 #endif
+		vTaskDelayUntil(&lastSysTime, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
 	}
 }
 

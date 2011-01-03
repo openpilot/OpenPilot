@@ -52,6 +52,11 @@ namespace jafar {
 				bool visible;
 				double infoGain;
 
+				friend std::ostream& operator <<(std::ostream & s, Expectation const & e_) {
+					s << (Gaussian&)e_ << std::endl;
+					s << "  .nonObs : " << e_.nonObs << " | .infoGain : " << e_.infoGain;
+					return s;
+				}
 		};
 
 	}

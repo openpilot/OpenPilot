@@ -151,7 +151,7 @@ namespace jafar {
 			expectation.x() = exp;
 			// P+ = F_x * P * F_x' + F_n * Q * F_n' :
 			expectation.P() = ublasExtra::prod_JPJt(ublas::project(landmarkPtr()->mapManagerPtr()->mapPtr()->filterPtr->P(), ia_rsl, ia_rsl), EXP_rsl);
-			// noon-observable
+			// non-observable
 			expectation.nonObs = nobs;
 
 			// Events

@@ -62,6 +62,7 @@ namespace jafar {
 			vec3 v;
 
 			lmkAHP::toBearingOnlyFrame(sg, lmk, v, dist(0));
+			dist(0) *= jmath::sign(v(2));
 			vec4 k = pinHolePtr()->params.intrinsic;
 			vec d = pinHolePtr()->params.distortion;
 			exp = pinhole::projectPoint(k, d, v);
@@ -88,6 +89,7 @@ namespace jafar {
 			//
 			// These functions below use the down-casted pointer because they need to know the particular object parameters and/or methods:
 			lmkAHP::toBearingOnlyFrame(sg, lmk, v, dist(0), V_sg, V_lmk);
+			dist(0) *= jmath::sign(v(2));
 			vec4 k = pinHolePtr()->params.intrinsic;
 			vec d = pinHolePtr()->params.distortion;
 			pinhole::projectPoint(k, d, v, exp, EXP_v);

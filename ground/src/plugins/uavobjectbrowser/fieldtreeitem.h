@@ -32,7 +32,7 @@
 #include <QtCore/QStringList>
 #include <QtGui/QWidget>
 #include <QtGui/QSpinBox>
-#include <QtGui/QDoubleSpinBox>
+#include <qscispinbox/QScienceSpinBox.h>
 #include <QtGui/QComboBox>
 #include <limits>
 
@@ -231,7 +231,7 @@ public:
         }
     }
     QWidget *createEditor(QWidget *parent) {
-        QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
+        QScienceSpinBox *editor = new QScienceSpinBox(parent);
         editor->setDecimals(6);
         editor->setMinimum(-std::numeric_limits<float>::max());
         editor->setMaximum(std::numeric_limits<float>::max());
@@ -239,13 +239,13 @@ public:
     }
 
     QVariant getEditorValue(QWidget *editor) {
-        QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
+        QScienceSpinBox *spinBox = static_cast<QScienceSpinBox*>(editor);
         spinBox->interpretText();
         return spinBox->value();
     }
 
     void setEditorValue(QWidget *editor, QVariant value) {
-        QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
+        QScienceSpinBox *spinBox = static_cast<QScienceSpinBox*>(editor);
         spinBox->setValue(value.toDouble());
     }
 private:

@@ -82,8 +82,42 @@ typedef DataManagerOnePointRansac<simu::RawSimu, SensorPinHole, simu::FeatureSim
 
 ///##############################################
 
+/*
+ * STATUS: working fine, use it
+ * Ransac ensures that we use correct observations for a few first updates,
+ * allowing bad observations to be more easily detected by gating
+ * You can disable it by setting N_UPDATES_RANSAC to 0
+ */
 #define RANSAC 1
+
+/*
+ * STATUS: working fine, use it
+ * This allows to have 0% cpu used for waiting/idle
+ */
 #define EVENT_BASED_RAW 1
+
+/*
+ * STATUS: in progress, do not use for now
+ * This allows to track landmarks longer by updating the reference patch when
+ * the landmark is not detected anymore and the point of view has changed
+ * significantly enough
+ * The problem is that the correlation is not robust enough in a matching
+ * (opposed to tracking) context, and it can provoke matching errors with a
+ * progressive appearance drift.
+ */
+#define MULTIVIEW_DESCRIPTOR 0
+
+/*
+ * STATUS: in progress, do not use for now
+ * This allows to ignore some landmarks when we have some experience telling
+ * us that we can't observe this landmarks from here (masking), in order to
+ * save some time, and to allow creation of other observations in the
+ * neighborhood to keep localizing with enough landmarks.
+ * The problem is that sometimes it creates too many landmarks in the same area
+ * (significantly slowing down slam), and sometimes doesn't create enough of
+ * them when it is necessary.
+ */
+#define VISIBILITY_MAP 0
 
 int mode = 0;
 time_t rseed;
@@ -223,15 +257,21 @@ const double HARRIS_TH = 15.0;
 const double HARRIS_EDDGE = 1.4;
 
 const unsigned DESC_SIZE = 31;
+#if MULTIVIEW_DESCRIPTOR
 const double DESC_SCALE_STEP = 2.0;
 const double DESC_ANGLE_STEP = jmath::degToRad(10.0);
 const DescriptorImagePointMultiView::PredictionType DESC_PREDICTION_TYPE = DescriptorImagePointMultiView::ptAffine;
+#endif
 
 // data manager: zncc matcher and one-point-ransac
 const unsigned PATCH_SIZE = 13; // in pixels
 const unsigned MAX_SEARCH_SIZE = 50000; // in number of pixels
 const unsigned KILL_SEARCH_SIZE = 100000; // in number of pixels
+#if MULTIVIEW_DESCRIPTOR
+const double MATCH_TH = 0.95;
+#else
 const double MATCH_TH = 0.90;
+#endif
 const double MAHALANOBIS_TH = 3; // in n_sigmas
 const unsigned N_UPDATES_TOTAL = 20;
 const unsigned N_UPDATES_RANSAC = 15;
@@ -579,8 +619,11 @@ void demo_slam01_main(world_ptr_t *world) {
 		senPtr11->setHardwareSensor(hardSen11);
 	} else
 	{
-		//boost::shared_ptr<DescriptorImagePointFirstViewFactory> descFactory(new DescriptorImagePointFirstViewFactory(DESC_SIZE));
+		#if MULTIVIEW_DESCRIPTOR
 		boost::shared_ptr<DescriptorImagePointMultiViewFactory> descFactory(new DescriptorImagePointMultiViewFactory(DESC_SIZE, DESC_SCALE_STEP, DESC_ANGLE_STEP, DESC_PREDICTION_TYPE));
+		#else
+		boost::shared_ptr<DescriptorImagePointFirstViewFactory> descFactory(new DescriptorImagePointFirstViewFactory(DESC_SIZE));
+		#endif
 		boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE, PATCH_SIZE, PIX_NOISE, descFactory));
 		boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(MIN_SCORE, PARTIAL_POSITION, PATCH_SIZE, MAX_SEARCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE));
 		

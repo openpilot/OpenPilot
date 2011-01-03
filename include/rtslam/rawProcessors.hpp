@@ -83,7 +83,7 @@ namespace rtslam {
 	{
 		private:
 			QuickHarrisDetector detector;
-			boost::shared_ptr<DescriptorImagePointMultiViewFactory> descFactory;
+			boost::shared_ptr<DescriptorFactoryAbstract> descFactory;
 
 		public:
 			struct detector_params_t {
@@ -94,7 +94,7 @@ namespace rtslam {
 			
 		public:
 			ImagePointHarrisDetector(int convSize, double thres, double edge, int patchSize, double measStd,
-				boost::shared_ptr<DescriptorImagePointMultiViewFactory> const &descFactory):
+				boost::shared_ptr<DescriptorFactoryAbstract> const &descFactory):
 				detector(convSize, thres, edge), descFactory(descFactory)
 			{
 				JFR_ASSERT(convSize%2, "convSize must be an odd number!");

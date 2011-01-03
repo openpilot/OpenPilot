@@ -72,7 +72,8 @@ Precision
 - if no feature is found, try with larger ellipse, because there is little chance you find them back later (except if this one image is bad), if you never find them back you'll be for sure inconsistent, and if you try later the ellipses will be greater and greater.
 - Finish implementing RobotCentric Kalman
 - To investigate : predict, compute jacobians, correct mean offline, recompute jacobians, correct online = better consistence but how much more computations ?
-- harris: using square mask is suboptimal, but can we refine around the max with a gaussian mask in order to improve the precision of the corner ?
+- harris: using square mask is suboptimal because it doesn't locate correctly the corner (adds a shift), but can we refine around the max with a gaussian mask in order to improve the precision of the corner ?
+- harris: making an interpolation in detection would also allow a better stability for changes of point of view, as only the real corner is invariant, a shift adds errors
 - write different map managers :
   - visual odometry (forget about landmarks shortly after they are lost or out of the frame)
   - local map (try to keep the right amount of landmarks to allow close looping inside a map)

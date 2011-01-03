@@ -81,14 +81,14 @@ namespace jafar {
 				virtual void desc_image(image::oimstream& os) const;
 		};
 		
-		class DescriptorImagePointFirstViewFactory
+		class DescriptorImagePointFirstViewFactory: public DescriptorFactoryAbstract
 		{
 			protected:
 				int descSize; ///< see DescriptorImagePointFirstView::descSize
 			public:
 				DescriptorImagePointFirstViewFactory(int descSize):
 					descSize(descSize) {}
-				DescriptorImagePointFirstView *createDescriptor() 
+				DescriptorAbstract *createDescriptor() 
 					{ return new DescriptorImagePointFirstView(descSize); }
 		};
 				
@@ -139,7 +139,7 @@ namespace jafar {
 				bool getClosestView(const observation_ptr_t & obsPtr, FeatureView* &closestView);
 		};
 		
-		class DescriptorImagePointMultiViewFactory
+		class DescriptorImagePointMultiViewFactory: public DescriptorFactoryAbstract
 		{
 			protected:
 				int descSize; ///< see DescriptorImagePointMultiView::descSize
@@ -149,7 +149,7 @@ namespace jafar {
 			public:
 				DescriptorImagePointMultiViewFactory(int descSize, double scaleStep, double angleStep, DescriptorImagePointMultiView::PredictionType predictionType):
 					descSize(descSize), scaleStep(scaleStep), angleStep(angleStep), predictionType(predictionType) {}
-				DescriptorImagePointMultiView *createDescriptor() 
+				DescriptorAbstract *createDescriptor() 
 					{ return new DescriptorImagePointMultiView(descSize, scaleStep, angleStep, predictionType); }
 		};
 		

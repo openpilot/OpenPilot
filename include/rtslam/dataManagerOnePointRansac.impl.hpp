@@ -19,6 +19,11 @@
 
 #include "rtslam/imageTools.hpp"
 
+/*
+ * STATUS: working fine, use it
+ * Buffered update is faster than iterative update, but it doesn't allow
+ * active search, so we use a mixed approach
+ */
 #define BUFFERED_UPDATE 1
 
 namespace jafar {
@@ -316,7 +321,9 @@ JFR_DEBUG_END();
 				if (obs->events.updated) JFR_ASSERT(obs->events.matched && obs->events.measured && obs->events.visible && obs->events.predicted, "obs updated without previous steps");
 				
 				obs->updateDescriptor();
+				#if VISIBILITY_MAP
 				obs->updateVisibilityMap();
+				#endif
 				
 				if (not (obs->events.measured && !obs->events.matched && !obs->isDescriptorValid()))
 				{
@@ -442,7 +449,9 @@ JFR_DEBUG_END();
 						detector->fillDataObs(featPtr, obsPtr);
 						
 						obsPtr->updateDescriptor();
+						#if VISIBILITY_MAP
 						obsPtr->updateVisibilityMap();
+						#endif
 						featMan->addObs(obsPtr->measurement.x());
 						
 //#ifndef JFR_NDEBUG
@@ -497,6 +506,7 @@ JFR_DEBUG_END();
 				
 				if (obsPtr->predictVisibility())
 				{
+					#if VISIBILITY_MAP
 					double visibility, viscertainty;
 					obsPtr->landmark().visibilityMap.estimateVisibility(obsPtr, visibility, viscertainty);
 					bool add = false;
@@ -507,6 +517,9 @@ JFR_DEBUG_END();
 						{ if (visibility < 0.1) visibility = 0.1; } // allow closing the loop! maybe look at neighbors
 					if (viscertainty < 0.25) visibility = 0.25;
 					if (rand()%1024 < visibility*1024) add = true;
+					#else
+					bool add = true;
+					#endif
 					
 					if (add)
 					{

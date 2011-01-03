@@ -59,6 +59,12 @@ namespace jafar {
 		image::oimstream& operator <<(image::oimstream & s, DescriptorAbstract const & desc);
 		
 		
+		class DescriptorFactoryAbstract
+		{
+			public:
+				virtual DescriptorAbstract *createDescriptor() = 0;
+		};
+		
 	}
 }
 

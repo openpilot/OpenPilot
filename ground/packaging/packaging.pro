@@ -1,7 +1,7 @@
 include(../openpilotgcs.pri)
 
 TEMPLATE = subdirs
-SUBDIRS =
+SUBDIRS = winx86
 
 # Copy Qt runtime libraries into the build directory (to run or package)
 equals(copydata, 1) {
@@ -58,7 +58,7 @@ equals(copydata, 1) {
 
         # copy SDL (if available) - Simple DirectMedia Layer (www.libsdl.org)
         SDL_DLL = SDL.dll
-        exists($$targetPath(\"$$[QT_INSTALL_BINS]/../../mingw/bin/$$SDL_DLL\")){
+        exists($$targetPath(\"$$[QT_INSTALL_BINS]/../../mingw/bin/$$SDL_DLL\")) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_BINS]/../../mingw/bin/$$SDL_DLL\") $$targetPath(\"$$GCS_APP_PATH/$$SDL_DLL\") $$addNewline()
         }
 

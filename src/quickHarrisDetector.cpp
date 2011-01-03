@@ -157,6 +157,7 @@ namespace jafar {
 			HQuickData* int_downRight;
 
 			float im_low_curv_max = 0; // maximum smallest eigenvalue
+			float im_high_curv_max;
 
 			int sm, df; // sum and difference
 			float sr, corner_ratio;
@@ -196,6 +197,7 @@ namespace jafar {
 					if (corner_ratio < m_edge) {
 						if (int_center->im_low_curv > im_low_curv_max) {
 							im_low_curv_max = int_center->im_low_curv;
+							im_high_curv_max = int_center->im_high_curv;
 							pixMax[0] = roi.x() + rj;
 							pixMax[1] = roi.y() + ri;
 						}
@@ -213,6 +215,8 @@ namespace jafar {
 			// normalized score: over the size of the derivative and convolution windows
 			scoreMax = sqrt(im_low_curv_max) / m_convolutionSize;
 
+			//std::cout << "high " << im_high_curv_max << " low " << im_low_curv_max << " ; ratio " << im_high_curv_max/im_low_curv_max << " score " << scoreMax << std::endl;
+			
 			return (scoreMax > m_threshold);
 
 		}

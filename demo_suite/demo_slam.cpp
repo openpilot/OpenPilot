@@ -220,7 +220,7 @@ const double REPARAM_TH = 0.1;
 // data manager: quick Harris detector
 const unsigned HARRIS_CONV_SIZE = 5;
 const double HARRIS_TH = 15.0;
-const double HARRIS_EDDGE = 2.0;
+const double HARRIS_EDDGE = 1.4;
 
 const unsigned DESC_SIZE = 31;
 const double DESC_SCALE_STEP = 2.0;

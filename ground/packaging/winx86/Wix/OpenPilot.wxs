@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <Product Id="C5857D7A-D0D7-4EF7-87CC-16E8CCA618CE" Name="OpenPilot GCS" Language="!(loc.LANG)" Version="0.0.0.1" Manufacturer="OpenPilot" UpgradeCode="C72FD8FA-A9FD-483C-890E-A2FDB6C8025F">
-        <Package Description="Test file in a Product" Languages="1033,1031,1028,1036,3082,1049" Comments="Simple test" InstallerVersion="200" Compressed="yes" Keywords="Installer OpenPilot"   />
+        <Package Description="Test file in a Product" Languages="1033,1031,1028,1036,3082,1049" Comments="Simple test" InstallerVersion="200" Compressed="yes" Keywords="Installer OpenPilot" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="ProgramFilesFolder" Name="PFiles">
@@ -102,23 +102,8 @@
                     </Component>
                 </Directory>
             </Directory>
-            <Directory Id="AppDataFolder">
-                <Directory Id="DefaultSettings" Name="OpenPilot">
-                    <Component Id="OpenPilotGCS.db" DiskId="1" Guid="8AEE7FF5-ABC0-4C0B-B17E-7E671B2A127E">
-                        <RemoveFolder Id="DefaultSettings" On="uninstall" />
-                        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]\OpenPilotGCSdb" Type="string" Value="OpenPilotGCS.db" />
-                        <File Id="OpenPilotGCS.db" Name="OpenPilotGCS.db" Source="..\DefaultSettings\OpenPilotGCS.db" />
-                    </Component>
-                    <Component Id="OpenPilotGCS.ini" DiskId="1" Guid="EF02D380-C484-49ED-AE31-01410AB68ACA">
-                        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]\OpenPilotGCSini" Type="string" Value="OpenPilotGCS.ini" />
-                        <File Id="OpenPilotGCS.ini" Name="OpenPilotGCS.ini" Source="..\DefaultSettings\OpenPilotGCS.ini" />
-                    </Component>
-                </Directory>
-            </Directory>
         </Directory>
         <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
-            <ComponentRef Id="OpenPilotGCS.db" />
-            <ComponentRef Id="OpenPilotGCS.ini" />
             <ComponentRef Id="Aggregation.dll" />
             <ComponentRef Id="ExtensionSystem.dll" />
             <ComponentRef Id="GLC_lib.dll" />

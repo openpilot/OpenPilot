@@ -189,12 +189,19 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
             break;
         }
+        // stop the polling thread: otherwise it will mess up DFU
+        // Do it now, because otherwise it will send bad stuff to
+        // the board before we have time to stop it.
+        RawHIDConnection *cnx =  pm->getObject<RawHIDConnection>();
+        cnx->suspendPolling();
+
         // The board is now reset: we have to disconnect telemetry
         Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
         QString dli = cm->getCurrentDevice().devName;
         QString dlj = cm->getCurrentDevice().displayedName;
         cm->disconnectDevice();
-        log("Board Reset");
+        log("Board Halt");
+        m_config->boardStatus->setText("Bootloader");
         if (dlj.startsWith("USB"))
             m_config->telemetryLink->setCurrentIndex(m_config->telemetryLink->findText("USB"));
         else
@@ -202,19 +209,20 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
 
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
         disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
+
         if (resetOnly) {
             resetOnly=false;
+            delay::msleep(3500);
+            systemBoot();
             break;
         }
-        // stop the polling thread: otherwise it will mess up DFU
-        RawHIDConnection *cnx =  pm->getObject<RawHIDConnection>();
-        cnx->suspendPolling();
+
+        currentStep = IAP_STATE_BOOTLOADER;
 
         // Tell the mainboard to get into bootloader state:
-        log("Going into Bootloader mode, please wait 5 seconds...");
+        log("Detecting devices, please wait 3 seconds...");
         this->repaint();
-           delay::msleep(5000); // Required to let the board settle, otherwise we
-                                // get garbage on the USB HID pipe for the 1st request. Why ???
+           delay::msleep(3100); // Required to let the board settle
         if (!dfu) {
             if (dlj.startsWith("USB"))
                 dfu = new DFUObject(DFU_DEBUG, false, QString());
@@ -227,8 +235,6 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             log("Could not enter DFU mode.");
             return;
         }
-        m_config->boardStatus->setText("Bootloader");
-        currentStep = IAP_STATE_BOOTLOADER;
         //dfu.StatusRequest();
         dfu->findDevices();
         log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
@@ -269,6 +275,10 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
 void UploaderGadgetWidget::systemReset()
 {
     resetOnly = true;
+    if (dfu) {
+        delete dfu;
+        dfu = NULL;
+    }
     m_config->textBrowser->clear();
     log("Board Reset initiated.");
     goToBootloader();
@@ -281,8 +291,6 @@ void UploaderGadgetWidget::systemBoot()
 {
     clearLog();
     if (currentStep != IAP_STATE_BOOTLOADER) {
-        log("Did not go into bootloader from this interface");
-        log("I assume you know what you're doing...");
         this->repaint();
         // Stop the polling thread just in case (really necessary)
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -318,7 +326,7 @@ void UploaderGadgetWidget::systemBoot()
     m_config->rescueButton->setEnabled(true);
     m_config->telemetryLink->setEnabled(true);
     m_config->boardStatus->setText("Running");
-    if (currentStep == IAP_STATE_BOOTLOADER) {
+    if (currentStep == IAP_STATE_BOOTLOADER ) {
         // Freeze the tabs, they are not useful anymore and their buttons
         // will cause segfaults or weird stuff if we use them.
         for (int i=0; i< m_config->systemElements->count(); i++) {

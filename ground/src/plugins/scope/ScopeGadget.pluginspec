@@ -2,7 +2,7 @@
     <vendor>The OpenPilot Project</vendor>
     <copyright>(C) 2010 OpenPilot Project</copyright>
     <license>The GNU Public License (GPL) Version 3</license>
-    <description>A scope gadget!</description>
+    <description>A scope gadget</description>
     <url>http://www.openpilot.org</url>
     <dependencyList>
         <dependency name="Core" version="1.0.0"/>

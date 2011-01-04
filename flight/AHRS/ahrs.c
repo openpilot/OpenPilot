@@ -640,9 +640,9 @@ void adc_callback(float * downsampled_data)
 	accel[2] = (downsampled_data[4] * accel_data.calibration.scale[2]) + accel_data.calibration.bias[2];
 
 	// Gyro data is (x,y,z) in second, fifth and seventh byte.  Convert to rad/s
-	gyro[0] = (downsampled_data[1] * gyro_data.calibration.scale[0]) + gyro_data.calibration.bias[0];
-	gyro[1] = (downsampled_data[3] * gyro_data.calibration.scale[1]) + gyro_data.calibration.bias[1];
-	gyro[2] = (downsampled_data[5] * gyro_data.calibration.scale[2]) + gyro_data.calibration.bias[2];
+	gyro[0] = ( ( downsampled_data[1] + gyro_data.calibration.tempcompfactor[0] * downsampled_data[6] ) * gyro_data.calibration.scale[0]) + gyro_data.calibration.bias[0];
+	gyro[1] = ( ( downsampled_data[3] + gyro_data.calibration.tempcompfactor[1] * downsampled_data[6] ) * gyro_data.calibration.scale[1]) + gyro_data.calibration.bias[1];
+	gyro[2] = ( ( downsampled_data[5] + gyro_data.calibration.tempcompfactor[2] * downsampled_data[7] ) * gyro_data.calibration.scale[2]) + gyro_data.calibration.bias[2];
 
 #if 0
 	static float gravity_tracking[3] = {0,0,0};
@@ -856,6 +856,9 @@ void reset_values() {
 	gyro_data.calibration.variance[0] = 1;
 	gyro_data.calibration.variance[1] = 1;
 	gyro_data.calibration.variance[2] = 1;
+	gyro_data.calibration.tempcompfactor[0] = 0;
+	gyro_data.calibration.tempcompfactor[1] = 0;
+	gyro_data.calibration.tempcompfactor[2] = 0;
 	mag_data.calibration.scale[0] = 1;
 	mag_data.calibration.scale[1] = 1;
 	mag_data.calibration.scale[2] = 1;
@@ -947,6 +950,7 @@ void calibration_callback(AhrsObjHandle obj)
 			gyro_data.calibration.scale[ct] = cal.gyro_scale[ct];
 			gyro_data.calibration.bias[ct] = cal.gyro_bias[ct];
 			gyro_data.calibration.variance[ct] = cal.gyro_var[ct];
+			gyro_data.calibration.tempcompfactor[ct] = cal.gyro_tempcompfactor[ct];
 			mag_data.calibration.bias[ct] = cal.mag_bias[ct];
 			mag_data.calibration.scale[ct] = cal.mag_scale[ct];
 			mag_data.calibration.variance[ct] = cal.mag_var[ct];

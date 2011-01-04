@@ -99,6 +99,9 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	data.gyro_var[0] = 0.0001;
 	data.gyro_var[1] = 0.0001;
 	data.gyro_var[2] = 0.0001;
+	data.gyro_tempcompfactor[0] = 0;
+	data.gyro_tempcompfactor[1] = 0;
+	data.gyro_tempcompfactor[2] = 0;
 	data.mag_bias[0] = 0;
 	data.mag_bias[1] = 0;
 	data.mag_bias[2] = 0;

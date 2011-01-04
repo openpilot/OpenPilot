@@ -80,6 +80,7 @@ struct gyro_sensor {
 		float bias[3];
 		float scale[3];
 		float variance[3];
+		float tempcompfactor[3];
 	} calibration;
 	struct {
 		uint16_t xy;

@@ -50,6 +50,7 @@ public:
         float gyro_bias[3];
         float gyro_scale[3];
         float gyro_var[3];
+        float gyro_tempcompfactor[3];
         float mag_bias[3];
         float mag_scale[3];
         float mag_var[3];
@@ -92,6 +93,11 @@ public:
     typedef enum { GYRO_VAR_X=0, GYRO_VAR_Y=1, GYRO_VAR_Z=2 } gyro_varElem;
     /* Number of elements for field gyro_var */
     static const quint32 GYRO_VAR_NUMELEM = 3;
+    // Field gyro_tempcompfactor information
+    /* Array element names for field gyro_tempcompfactor */
+    typedef enum { GYRO_TEMPCOMPFACTOR_X=0, GYRO_TEMPCOMPFACTOR_Y=1, GYRO_TEMPCOMPFACTOR_Z=2 } gyro_tempcompfactorElem;
+    /* Number of elements for field gyro_tempcompfactor */
+    static const quint32 GYRO_TEMPCOMPFACTOR_NUMELEM = 3;
     // Field mag_bias information
     /* Array element names for field mag_bias */
     typedef enum { MAG_BIAS_X=0, MAG_BIAS_Y=1, MAG_BIAS_Z=2 } mag_biasElem;
@@ -112,7 +118,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 3761202980U;
+    static const quint32 OBJID = 806362034U;
     static const QString NAME;
     static const QString DESCRIPTION;
     static const bool ISSINGLEINST = 1;

@@ -44,6 +44,7 @@ function [] = OPLogConvert()
     AHRSCalibration(1).gyro_bias = zeros(1,3);
     AHRSCalibration(1).gyro_scale = zeros(1,3);
     AHRSCalibration(1).gyro_var = zeros(1,3);
+    AHRSCalibration(1).gyro_tempcompfactor = zeros(1,3);
     AHRSCalibration(1).mag_bias = zeros(1,3);
     AHRSCalibration(1).mag_scale = zeros(1,3);
     AHRSCalibration(1).mag_var = zeros(1,3);
@@ -435,7 +436,7 @@ function [] = OPLogConvert()
             case 3054509114
                 ActuatorSettings(actuatorsettingsIdx) = ReadActuatorSettingsObject(fid, timestamp);
                 actuatorsettingsIdx = actuatorsettingsIdx + 1;
-            case 3761202980
+            case 806362034
                 AHRSCalibration(ahrscalibrationIdx) = ReadAHRSCalibrationObject(fid, timestamp);
                 ahrscalibrationIdx = ahrscalibrationIdx + 1;
             case 3741078856
@@ -639,6 +640,7 @@ function [AHRSCalibration] = ReadAHRSCalibrationObject(fid, timestamp)
     AHRSCalibration.gyro_bias = double(fread(fid, 3, 'float32'));
     AHRSCalibration.gyro_scale = double(fread(fid, 3, 'float32'));
     AHRSCalibration.gyro_var = double(fread(fid, 3, 'float32'));
+    AHRSCalibration.gyro_tempcompfactor = double(fread(fid, 3, 'float32'));
     AHRSCalibration.mag_bias = double(fread(fid, 3, 'float32'));
     AHRSCalibration.mag_scale = double(fread(fid, 3, 'float32'));
     AHRSCalibration.mag_var = double(fread(fid, 3, 'float32'));

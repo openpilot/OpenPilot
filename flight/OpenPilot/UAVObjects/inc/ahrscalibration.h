@@ -41,7 +41,7 @@
 #define AHRSCALIBRATION_H
 
 // Object constants
-#define AHRSCALIBRATION_OBJID 3761202980U
+#define AHRSCALIBRATION_OBJID 806362034U
 #define AHRSCALIBRATION_NAME "AHRSCalibration"
 #define AHRSCALIBRATION_METANAME "AHRSCalibrationMeta"
 #define AHRSCALIBRATION_ISSINGLEINST 1
@@ -78,6 +78,7 @@ typedef struct {
     float gyro_bias[3];
     float gyro_scale[3];
     float gyro_var[3];
+    float gyro_tempcompfactor[3];
     float mag_bias[3];
     float mag_scale[3];
     float mag_var[3];
@@ -120,6 +121,11 @@ typedef enum { AHRSCALIBRATION_GYRO_SCALE_X=0, AHRSCALIBRATION_GYRO_SCALE_Y=1, A
 typedef enum { AHRSCALIBRATION_GYRO_VAR_X=0, AHRSCALIBRATION_GYRO_VAR_Y=1, AHRSCALIBRATION_GYRO_VAR_Z=2 } AHRSCalibrationgyro_varElem;
 /* Number of elements for field gyro_var */
 #define AHRSCALIBRATION_GYRO_VAR_NUMELEM 3
+// Field gyro_tempcompfactor information
+/* Array element names for field gyro_tempcompfactor */
+typedef enum { AHRSCALIBRATION_GYRO_TEMPCOMPFACTOR_X=0, AHRSCALIBRATION_GYRO_TEMPCOMPFACTOR_Y=1, AHRSCALIBRATION_GYRO_TEMPCOMPFACTOR_Z=2 } AHRSCalibrationgyro_tempcompfactorElem;
+/* Number of elements for field gyro_tempcompfactor */
+#define AHRSCALIBRATION_GYRO_TEMPCOMPFACTOR_NUMELEM 3
 // Field mag_bias information
 /* Array element names for field mag_bias */
 typedef enum { AHRSCALIBRATION_MAG_BIAS_X=0, AHRSCALIBRATION_MAG_BIAS_Y=1, AHRSCALIBRATION_MAG_BIAS_Z=2 } AHRSCalibrationmag_biasElem;

@@ -22,8 +22,11 @@ namespace jafar {
        * Jmath.
        */
       enum ExceptionId {
-				LAPACK_ERROR, /**< Error reported by a lapack routine */
-				SYSTEM_FULL  /**< System is already full of data */
+				LAPACK_ERROR, /**< error reported by a lapack routine */
+				SYSTEM_FULL,  /**< system is already full of data */
+				WRONG_SIZE, /**< data size is not as required */
+				RESIZE_FAIL, /**< resizing data structure went worng */
+				WRONG_TYPE /**< this type is not handled in the switch statement */
       };
 
       /** Constructor. You should not use this constructor directly,

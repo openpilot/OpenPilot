@@ -39,6 +39,8 @@
 #include "openpilot.h"
 #include "baroaltitude.h"	// object that will be updated by the module
 
+#define ALT_PRES_MAF        // uncommment this to not use the pressure moving-average-filter
+
 // Private constants
 #define STACK_SIZE configMINIMAL_STACK_SIZE
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
@@ -48,6 +50,13 @@
 
 // Private variables
 static xTaskHandle taskHandle;
+
+// moving average filter variables
+#ifdef ALT_PRES_MAF
+    #define alt_maf_size    4
+    static int32_t alt_maf_buf[alt_maf_size];
+    static int32_t alt_maf_out = 0;
+#endif
 
 // Private functions
 static void altitudeTask(void *parameters);
@@ -60,6 +69,11 @@ int32_t AltitudeInitialize()
 {
 	// Start main task
 	xTaskCreate(altitudeTask, (signed char *)"Altitude", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+
+	// clear the moving average filter
+    for (int i = 0; i < alt_maf_size; i++)
+        alt_maf_buf[i] = 0;
+    alt_maf_out = 0;
 
 	return 0;
 }
@@ -89,9 +103,24 @@ static void altitudeTask(void *parameters)
 		PIOS_BMP085_StartADC(PressureConv);
 		xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
 
+		// read pressure
 		PIOS_BMP085_ReadADC();
-		// Convert from Pa to kPa
-		data.Pressure = PIOS_BMP085_GetPressure() / 1000.0;
+        int32_t pressure = PIOS_BMP085_GetPressure();
+
+        #ifdef ALT_PRES_MAF
+            // moving average filter the pressure
+            alt_maf_out -= alt_maf_buf[0];
+            for (int i = 0; i < alt_maf_size - 1; i++)
+                alt_maf_buf[i] = alt_maf_buf[i + 1];
+            alt_maf_buf[alt_maf_size - 1] = pressure;
+            alt_maf_out += pressure;
+
+            // Convert from Pa to kPa
+            data.Pressure = alt_maf_out / (1000.0f * alt_maf_size);
+        #else
+            // Convert from Pa to kPa
+            data.Pressure = pressure / 1000.0f;
+        #endif
 
 		// Compute the current altitude (all pressures in kPa)
 		data.Altitude = 44330.0 * (1.0 - powf((data.Pressure / (BMP085_P0 / 1000.0)), (1.0 / 5.255)));

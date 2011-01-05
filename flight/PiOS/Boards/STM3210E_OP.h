@@ -117,7 +117,8 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_BMP085_EOC_EXTI_LINE               EXTI_Line15
 #define PIOS_BMP085_EOC_IRQn                    EXTI15_10_IRQn
 #define PIOS_BMP085_EOC_PRIO                    PIOS_IRQ_PRIO_HIGH
-#define PIOS_BMP085_OVERSAMPLING                2
+//#define PIOS_BMP085_OVERSAMPLING                2
+#define PIOS_BMP085_OVERSAMPLING                3
 
 //-------------------------
 // USART

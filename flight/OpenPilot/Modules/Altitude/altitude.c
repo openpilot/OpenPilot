@@ -39,26 +39,24 @@
 #include "openpilot.h"
 #include "baroaltitude.h"	// object that will be updated by the module
 
-#define ALT_PRES_MAF        // uncommment this to not use the pressure moving-average-filter
-
 // Private constants
 #define STACK_SIZE configMINIMAL_STACK_SIZE
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
-#define UPDATE_PERIOD 100
+//#define UPDATE_PERIOD 100
+#define UPDATE_PERIOD 25
 
 // Private types
 
 // Private variables
 static xTaskHandle taskHandle;
 
-// moving average filter variables
-#ifdef ALT_PRES_MAF
-    #define alt_maf_size    4
-    static int32_t alt_maf_buf[alt_maf_size];
-    static int32_t alt_maf_out = 0;
-#endif
+// down sampling variables
+#define alt_ds_size    4
+static int32_t alt_ds_temp = 0;
+static int32_t alt_ds_pres = 0;
+static int alt_ds_count = 0;
 
-// Private functions
+        // Private functions
 static void altitudeTask(void *parameters);
 
 /**
@@ -70,12 +68,10 @@ int32_t AltitudeInitialize()
 	// Start main task
 	xTaskCreate(altitudeTask, (signed char *)"Altitude", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 
-    #ifdef ALT_PRES_MAF
-	    // clear the moving average filter
-	    for (int i = 0; i < alt_maf_size; i++)
-	        alt_maf_buf[i] = 0;
-	    alt_maf_out = 0;
-    #endif
+	// init down-sampling data
+    alt_ds_temp = 0;
+    alt_ds_pres = 0;
+    alt_ds_count = 0;
 
 	return 0;
 }
@@ -92,43 +88,38 @@ static void altitudeTask(void *parameters)
 
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
-	while (1) {
+	while (1)
+	{
 		// Update the temperature data
 		PIOS_BMP085_StartADC(TemperatureConv);
 		xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
-
 		PIOS_BMP085_ReadADC();
-		// Convert from 1/10ths of degC to degC
-		data.Temperature = PIOS_BMP085_GetTemperature() / 10.0;
+		alt_ds_temp += PIOS_BMP085_GetTemperature();
 
 		// Update the pressure data
 		PIOS_BMP085_StartADC(PressureConv);
 		xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
-
-		// read pressure
 		PIOS_BMP085_ReadADC();
-        int32_t pressure = PIOS_BMP085_GetPressure();
+		alt_ds_pres += PIOS_BMP085_GetPressure();
 
-        #ifdef ALT_PRES_MAF
-            // moving average filter the pressure
-            alt_maf_out -= alt_maf_buf[0];
-            for (int i = 0; i < alt_maf_size - 1; i++)
-                alt_maf_buf[i] = alt_maf_buf[i + 1];
-            alt_maf_buf[alt_maf_size - 1] = pressure;
-            alt_maf_out += pressure;
+		if (++alt_ds_count >= alt_ds_size)
+        {
+		    alt_ds_count = 0;
+
+		    // Convert from 1/10ths of degC to degC
+            data.Temperature = alt_ds_temp / (10.0 * alt_ds_size);
+            alt_ds_temp = 0;
 
             // Convert from Pa to kPa
-            data.Pressure = alt_maf_out / (1000.0f * alt_maf_size);
-        #else
-            // Convert from Pa to kPa
-            data.Pressure = pressure / 1000.0f;
-        #endif
+            data.Pressure = alt_ds_pres / (1000.0f * alt_ds_size);
+            alt_ds_pres = 0;
 
-		// Compute the current altitude (all pressures in kPa)
-		data.Altitude = 44330.0 * (1.0 - powf((data.Pressure / (BMP085_P0 / 1000.0)), (1.0 / 5.255)));
+            // Compute the current altitude (all pressures in kPa)
+            data.Altitude = 44330.0 * (1.0 - powf((data.Pressure / (BMP085_P0 / 1000.0)), (1.0 / 5.255)));
 
-		// Update the AltitudeActual UAVObject
-		BaroAltitudeSet(&data);
+            // Update the AltitudeActual UAVObject
+            BaroAltitudeSet(&data);
+        }
 
 		// Delay until it is time to read the next sample
 		vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD / portTICK_RATE_MS);

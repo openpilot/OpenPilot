@@ -101,7 +101,7 @@ const struct pios_spi_cfg pios_spi_sdcard_cfg = {
     .SPI_CRCPolynomial     = 7,
     .SPI_CPOL              = SPI_CPOL_High,
     .SPI_CPHA              = SPI_CPHA_2Edge,
-    .SPI_BaudRatePrescaler = 7 << 3, /* Maximum divider (ie. slowest clock rate) */
+    .SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256, /* Maximum divider (ie. slowest clock rate) */
   },
   .dma = {
     .ahb_clk  = RCC_AHBPeriph_DMA1,
@@ -199,7 +199,7 @@ const struct pios_spi_cfg pios_spi_ahrs_cfg = {
     .SPI_CRCPolynomial     = 7,
     .SPI_CPOL              = SPI_CPOL_High,
     .SPI_CPHA              = SPI_CPHA_2Edge,
-    .SPI_BaudRatePrescaler = 7 << 3, /* Maximum divider (ie. slowest clock rate) */
+    .SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16, 
   },
   .use_crc = TRUE,
   .dma = {

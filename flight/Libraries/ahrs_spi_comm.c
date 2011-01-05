@@ -53,7 +53,7 @@ typedef enum { COMMS_NULL, COMMS_OBJECT } COMMSCOMMAND;
 
 //The maximum number of objects that can be updated in one cycle.
 //Currently the link is capable of sending 3 packets per cycle but 2 is enough
-#define MAX_UPDATE_OBJECTS 2
+#define MAX_UPDATE_OBJECTS 1
 
 //Number of transmissions + 1 before we expect to see the data acknowledge
 //This is controlled by the SPI hardware.
@@ -144,7 +144,7 @@ void AhrsInitComms(void)
 #ifdef IN_AHRS
 	PIOS_SPI_Init();
 #else
-	PIOS_SPI_SetClockSpeed(PIOS_OPAHRS_SPI, PIOS_SPI_PRESCALER_8);	//36MHz/16 = 2.25MHz
+	/* Comms already init in OP code */
 	for (int ct = 0; ct < MAX_AHRS_OBJECTS; ct++) {
 		AhrsObjHandle hdl = AhrsFromIndex(ct);
 		if (hdl) {

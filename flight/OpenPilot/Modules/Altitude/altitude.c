@@ -70,10 +70,12 @@ int32_t AltitudeInitialize()
 	// Start main task
 	xTaskCreate(altitudeTask, (signed char *)"Altitude", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 
-	// clear the moving average filter
-    for (int i = 0; i < alt_maf_size; i++)
-        alt_maf_buf[i] = 0;
-    alt_maf_out = 0;
+    #ifdef ALT_PRES_MAF
+	    // clear the moving average filter
+	    for (int i = 0; i < alt_maf_size; i++)
+	        alt_maf_buf[i] = 0;
+	    alt_maf_out = 0;
+    #endif
 
 	return 0;
 }

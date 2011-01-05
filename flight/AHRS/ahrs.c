@@ -47,6 +47,9 @@
 #define INSGPS_MAGLEN      1000
 #define INSGPS_MAGTOL      0.5 /* error in magnetic vector length to use  */
 
+#define GYRO_OOB(x) ((x > (1000 / 180 * M_PI)) || (x < (-1000 / 180 * M_PI)))
+#define ACCEL_OOB(x) (((x > 12*9.81) || (x < -12*9.81)))
+
 // For debugging the raw sensors
 //#define DUMP_RAW
 //#define DUMP_EKF
@@ -551,7 +554,7 @@ for all data to be up to date before doing anything*/
 		AhrsStatusSet(&status);
 
 		// Alive signal
-		if ((total_conversion_blocks % 100) == 0)
+		if (((total_conversion_blocks % 100) & 0xFFFE) == 0)
 			PIOS_LED_Toggle(LED1);
 
 		// Delay for valid data
@@ -602,7 +605,8 @@ bool get_accel_gyro_data()
 {
 	float accel[6];
 	float gyro[6];
-	while(fifoBuf_getUsed(&adc_fifo_buffer) < (sizeof(accel) + sizeof(gyro)));
+	while(fifoBuf_getUsed(&adc_fifo_buffer) < (sizeof(accel) + sizeof(gyro)))
+		AhrsPoll();
 	
 	fifoBuf_getData(&adc_fifo_buffer, &accel[0], sizeof(float) * 3);
 	fifoBuf_getData(&adc_fifo_buffer, &gyro[0], sizeof(float) * 3);	
@@ -630,6 +634,7 @@ bool get_accel_gyro_data()
  * The accel_data values are converted into a coordinate system where X is forwards along
  * the fuselage, Y is along right the wing, and Z is down.
  */
+static uint16_t bad_values = 0;
 void adc_callback(float * downsampled_data)
 {	
 	AHRSSettingsData settings;
@@ -646,6 +651,15 @@ void adc_callback(float * downsampled_data)
 	gyro[1] = ( ( downsampled_data[3] + gyro_data.calibration.tempcompfactor[1] * downsampled_data[6] ) * gyro_data.calibration.scale[1]) + gyro_data.calibration.bias[1];
 	gyro[2] = ( ( downsampled_data[5] + gyro_data.calibration.tempcompfactor[2] * downsampled_data[7] ) * gyro_data.calibration.scale[2]) + gyro_data.calibration.bias[2];
 
+	if(isnan(accel[0] + accel[1] + accel[2]) ||
+	   isnan(gyro[0] + gyro[1] + gyro[2]) || 
+	   ACCEL_OOB(accel[0] + accel[1] + accel[2]) ||
+	   GYRO_OOB(gyro[0] + gyro[1] + gyro[2])) {
+		// If any values are NaN or inf don't push them
+		bad_values++;
+		return;
+	}
+	
 #if 0
 	static float gravity_tracking[3] = {0,0,0};
 	const float tau = 0.9999;

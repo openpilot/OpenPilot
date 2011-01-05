@@ -259,9 +259,7 @@ static DWORD WINAPI tick_generator(LPVOID lpParameter)
 	}
 
 	hTimer = CreateWaitableTimer(NULL, TRUE, NULL);
-	liDueTime.QuadPart = -(50000 - 10000*(int)msPerTick);	// 5ms -
-	//there is always another tick during WaitForMultipleObjects() while waiting
-	//for the mutex, so reduce the wait time by 1 tick
+	liDueTime.QuadPart = -100000;
 
 	hObjList[0] = hIsrMutex;
 	hObjList[1] = hTimer;

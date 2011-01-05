@@ -472,6 +472,8 @@ int main()
 	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
 
+	PIOS_LED_On(LED1);
+
 	/* Delay system */
 	PIOS_DELAY_Init();
 

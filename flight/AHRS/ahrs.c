@@ -605,8 +605,11 @@ bool get_accel_gyro_data()
 {
 	float accel[6];
 	float gyro[6];
-	while(fifoBuf_getUsed(&adc_fifo_buffer) < (sizeof(accel) + sizeof(gyro)))
-		AhrsPoll();
+	uint16_t spin_count = 1;
+	while(fifoBuf_getUsed(&adc_fifo_buffer) < (sizeof(accel) + sizeof(gyro))) {
+		if(spin_count++ == 0) 
+			AhrsPoll();
+	}
 	
 	fifoBuf_getData(&adc_fifo_buffer, &accel[0], sizeof(float) * 3);
 	fifoBuf_getData(&adc_fifo_buffer, &gyro[0], sizeof(float) * 3);	

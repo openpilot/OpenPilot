@@ -298,12 +298,12 @@ static void manualControlTask(void *parameters)
 		
 			
 		/* Look for arm or disarm signal */
-		if ((cmd.Throttle <= 0.05) && (cmd.Roll <= -0.95)) {
+		if ((cmd.Throttle <= 0) && (cmd.Roll <= -0.90)) {
 			if (armedDisarmStart == 0)	// store when started, deal with rollover
 				armedDisarmStart = lastSysTime;
 			else if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
 				cmd.Armed = MANUALCONTROLCOMMAND_ARMED_TRUE;
-		} else if ((cmd.Throttle <= 0.05) && (cmd.Roll >= 0.95)) {
+		} else if ((cmd.Throttle <= 0) && (cmd.Roll >= 0.90)) {
 			if (armedDisarmStart == 0)
 				armedDisarmStart = lastSysTime;
 			else if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)

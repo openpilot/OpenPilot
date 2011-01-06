@@ -29,7 +29,7 @@ namespace jafar {
       std::ostringstream os;
       os << a_ << std::endl;
       return os.str();
-    };
+    }
     template<class T>
     T add(const T& t1, const T& t2)
     {
@@ -123,7 +123,7 @@ namespace jafar {
       std::stringstream s;
       s << value;
       JFR_IO_STREAM(s >> t, "reading matrix or vector from string");
-    };
+    }
 
     /** Same as setSizeValue() for a vector except that size of \a vec
      * is used.
@@ -134,7 +134,7 @@ namespace jafar {
       std::stringstream s;
       s << "[" << vec.size() << "]" << value;
       JFR_IO_STREAM(s >> vec,"reading vector from string");
-    };
+    }
 
 
     /** Same as setSizeValue() for a matrix except that size of \a mat
@@ -146,7 +146,7 @@ namespace jafar {
       std::stringstream s;
       s << "[" << mat.size1() << "," << mat.size2() << "]" << value;
       JFR_IO_STREAM(s >> mat, "reading matrix from string");
-    };
+    }
    
     /** Dummy function that returns the ith element of a vec
      * 
@@ -154,11 +154,11 @@ namespace jafar {
 		template<class V>
 		double getElementAt(const V& v, const unsigned int& rank) {
 			if(rank < v.size()) return v(rank); else return 0.;
-		};
+		}
 		template<class V>
 		double setElementAt(V& v, const unsigned int& rank, double val) {
 			if(rank < v.size()) return v(rank) = val;
-		};
+		}
 		
 		/** Dummy function that returns the (i,j)th element of a mat
 		* 
@@ -166,11 +166,11 @@ namespace jafar {
 		template<class Mat>
 		double getMatElementAt(const Mat& m, const unsigned int& i, const unsigned int& j) {
 			if( (i < m.size1()) and (j < m.size2()) ) return m(i,j); else return 0.;
-		};
+		}
 		template<class Mat>
-		double setMatElementAt(Mat& m, const unsigned int& i, const unsigned int& j, double val) {
+		void setMatElementAt(Mat& m, const unsigned int& i, const unsigned int& j, double val) {
 			if( (i < m.size1()) and (j < m.size2()) ) m(i,j)= val;
-		};
+		}
  
   }
 }

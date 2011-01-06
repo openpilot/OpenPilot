@@ -653,15 +653,6 @@ void adc_callback(float * downsampled_data)
 	gyro[0] = ( ( downsampled_data[1] + gyro_data.calibration.tempcompfactor[0] * downsampled_data[6] ) * gyro_data.calibration.scale[0]) + gyro_data.calibration.bias[0];
 	gyro[1] = ( ( downsampled_data[3] + gyro_data.calibration.tempcompfactor[1] * downsampled_data[6] ) * gyro_data.calibration.scale[1]) + gyro_data.calibration.bias[1];
 	gyro[2] = ( ( downsampled_data[5] + gyro_data.calibration.tempcompfactor[2] * downsampled_data[7] ) * gyro_data.calibration.scale[2]) + gyro_data.calibration.bias[2];
-
-	if(isnan(accel[0] + accel[1] + accel[2]) ||
-	   isnan(gyro[0] + gyro[1] + gyro[2]) || 
-	   ACCEL_OOB(accel[0] + accel[1] + accel[2]) ||
-	   GYRO_OOB(gyro[0] + gyro[1] + gyro[2])) {
-		// If any values are NaN or inf don't push them
-		bad_values++;
-		return;
-	}
 	
 #if 0
 	static float gravity_tracking[3] = {0,0,0};
@@ -676,13 +667,21 @@ void adc_callback(float * downsampled_data)
 		accel[2] -= gravity_tracking[2];
 	}
 #endif
-	if(fifoBuf_getFree(&adc_fifo_buffer) >= (sizeof(accel) + sizeof(gyro))) {
-		fifoBuf_putData(&adc_fifo_buffer, (uint8_t *) &accel[0], sizeof(accel));
-		fifoBuf_putData(&adc_fifo_buffer, (uint8_t *) &gyro[0], sizeof(gyro));
+	if(!(isnan(accel[0] + accel[1] + accel[2]) ||
+	     isnan(gyro[0] + gyro[1] + gyro[2]) || 
+	     ACCEL_OOB(accel[0] + accel[1] + accel[2]) ||
+	     GYRO_OOB(gyro[0] + gyro[1] + gyro[2]))) {	
+		if(fifoBuf_getFree(&adc_fifo_buffer) >= (sizeof(accel) + sizeof(gyro))) {
+			fifoBuf_putData(&adc_fifo_buffer, (uint8_t *) &accel[0], sizeof(accel));
+			fifoBuf_putData(&adc_fifo_buffer, (uint8_t *) &gyro[0], sizeof(gyro));
+		} else {
+			ekf_too_slow++;
+		}
 	} else {
-		ekf_too_slow++;
+		// If any values are NaN or inf don't push them
+		bad_values++;
 	}
-		
+	
 	AttitudeRawData raw;
 
 	raw.accels[0] = downsampled_data[2];

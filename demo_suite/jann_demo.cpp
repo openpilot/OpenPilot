@@ -1,6 +1,9 @@
 ////////////////////////////////////////////////////////////////////
 // The car files are courtesy of Alex Segal found in gicp package //
 ////////////////////////////////////////////////////////////////////
+#include "jafarConfig.h"
+
+#ifdef HAVE_FLANN
 #include "jmath/jann.hpp"
 #include "jmath/mat_file.hpp"
 
@@ -23,3 +26,4 @@ int main(int argc, char** argv) {
 	tree.build();
 	tree.knn_search(scene.data, indices, dists, 10, search_params(32));
 }
+#endif /* HAVE_FLANN */

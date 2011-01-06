@@ -27,5 +27,12 @@ int main(int argc, char** argv) {
 	KD_tree_index< flann::L2<float> > tree(model.data);
 	tree.build();
 	tree.knn_search(scene.data, indices, dists, 10, search_params(32));
+
+#else /* HAVE_FLANN */
+
+	std::cout << "Please install the jann library to get this demo" << std::endl;
+
 #endif /* HAVE_FLANN */
+
+	return 0;
 }

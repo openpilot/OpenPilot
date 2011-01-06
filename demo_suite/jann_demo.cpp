@@ -3,14 +3,16 @@
 ////////////////////////////////////////////////////////////////////
 #include "jafarConfig.h"
 
-#ifdef HAVE_FLANN
 #include "jmath/jann.hpp"
 #include "jmath/mat_file.hpp"
 
-using namespace jafar;
-using namespace std;
-using namespace jann;
 int main(int argc, char** argv) {
+
+#ifdef HAVE_FLANN
+	using namespace jafar;
+	using namespace std;
+	using namespace jann;
+
 	jmath::matrix_file<float> model;
 	model.load("car0.ascii");
 	for (unsigned int r = 0; r < model.data.size1(); r++) {
@@ -25,5 +27,5 @@ int main(int argc, char** argv) {
 	KD_tree_index< flann::L2<float> > tree(model.data);
 	tree.build();
 	tree.knn_search(scene.data, indices, dists, 10, search_params(32));
-}
 #endif /* HAVE_FLANN */
+}

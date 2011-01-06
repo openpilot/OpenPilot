@@ -59,6 +59,8 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_ahrs = new Ui_AHRSWidget();
     m_ahrs->setupUi(this);
 
+    collectingData = false;
+
     // Initialization of the Paper plane widget
     m_ahrs->sixPointsHelp->setScene(new QGraphicsScene(this));
 
@@ -214,6 +216,7 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_ahrs->ahrsSettingsSaveSD, SIGNAL(clicked()), this, SLOT(ahrsSettingsSaveSD()));
     connect(m_ahrs->sixPointsStart, SIGNAL(clicked()), this, SLOT(sixPointCalibrationMode()));
     connect(m_ahrs->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
+    connect(m_ahrs->startDriftCalib, SIGNAL(clicked()),this, SLOT(launchGyroDriftCalibration()));
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(ahrsSettingsRequest()));
 
 
@@ -299,7 +302,7 @@ void ConfigAHRSWidget::accelBiasattitudeRawUpdated(UAVObject *obj)
 
     if(accel_accum_x.size() >= 100 && collectingData == true) {
         collectingData = false;
-        disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(attitudeRawUpdated(UAVObject*)));
+        disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(accelBiasattitudeRawUpdated(UAVObject*)));
         m_ahrs->accelBiasStart->setEnabled(true);
 
         UAVDataObject* ahrsCalib = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
@@ -330,6 +333,120 @@ void ConfigAHRSWidget::accelBiasattitudeRawUpdated(UAVObject *obj)
 
     }
 
+}
+
+
+/**
+  Starts an Gyro temperature drift calibration.
+  */
+void ConfigAHRSWidget::launchGyroDriftCalibration()
+{
+    if (!collectingData) {
+        // m_ahrs->startDriftCalib->setEnabled(false);
+        m_ahrs->startDriftCalib->setText("Stop");
+        m_ahrs->accelBiasStart->setEnabled(false);
+        m_ahrs->ahrsCalibStart->setEnabled(false);
+        m_ahrs->sixPointsStart->setEnabled(false);
+
+        // Setup the AHRS to give us the right data at the right rate:
+        UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
+        UAVObjectField* field = obj->getField(QString("BiasCorrectedRaw"));
+        field->setValue("FALSE");
+        obj->updated();
+
+        /* Need to get as many AttitudeRaw updates as possible */
+        obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
+        initialMdata = obj->getMetadata();
+        UAVObject::Metadata mdata = initialMdata;
+        mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+        mdata.flightTelemetryUpdatePeriod = 100;
+        obj->setMetadata(mdata);
+
+        // Now connect to the attituderaw updates until we stop
+        collectingData = true;
+        obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("BaroAltitude")));
+        field = obj->getField(QString("Temperature"));
+        double temp = field->getValue().toDouble();
+        m_ahrs->gyroTempSlider->setRange(temp*10,temp*10);
+        m_ahrs->gyroMaxTemp->setText(QString::number(temp,'g',3));
+        m_ahrs->gyroMinTemp->setText(QString::number(temp,'g',3));
+
+        connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(driftCalibrationAttitudeRawUpdated(UAVObject*)));
+    } else {
+        // Stop all the gathering:
+        collectingData = false;
+        m_ahrs->startDriftCalib->setText("Start");
+        m_ahrs->accelBiasStart->setEnabled(true);
+        m_ahrs->ahrsCalibStart->setEnabled(true);
+        m_ahrs->sixPointsStart->setEnabled(true);
+
+        UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
+        disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(driftCalibrationAttitudeRawUpdated(UAVObject*)));
+
+        getObjectManager()->getObject(QString("AttitudeRaw"))->setMetadata(initialMdata);
+
+        obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
+        UAVObjectField* field = obj->getField(QString("BiasCorrectedRaw"));
+        field->setValue("TRUE");
+        obj->updated();
+
+        // TODO: Now compute the drift here
+        computeGyroDrift();
+
+    }
+}
+
+/**
+  Updates the gyro drift calibration values in real time
+  */
+void ConfigAHRSWidget::driftCalibrationAttitudeRawUpdated(UAVObject* obj) {
+
+    // This is necessary to prevent a race condition on disconnect signal and another update
+    if (collectingData == true) {
+        /**
+          First of all, update the temperature user feedback
+          This is not what we will use for our calculations, but it it easier for the
+          user to have the real temperature rather than an obscure unit...
+          */
+        UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("BaroAltitude")));
+        UAVObjectField *tempField = obj->getField(QString("Temperature"));
+        Q_ASSERT(tempField != 0);
+        double mbTemp = tempField->getValue().toDouble();
+        if (mbTemp*10 < m_ahrs->gyroTempSlider->minimum()) {
+            m_ahrs->gyroTempSlider->setMinimum(mbTemp*10);
+            m_ahrs->gyroMinTemp->setText(QString::number(mbTemp,'g',3));
+        } else if (mbTemp*10 > m_ahrs->gyroTempSlider->maximum()) {
+             m_ahrs->gyroTempSlider->setMaximum(mbTemp*10);
+             m_ahrs->gyroMaxTemp->setText(QString::number(mbTemp,'g',3));
+        }
+        m_ahrs->gyroTempSlider->setValue(mbTemp*10);
+        // TODO:
+        // - Add an indicator to show that we have a significant
+        //   temperature difference in our gathered data (red/yellow/green)
+
+        /**
+          Now, append gyro values + gyro temp data into our buffers
+          */
+        // TODO:
+        // - choose a storage type for this data
+        // - Check it's not getting too big
+        // - do the actual appending
+        // - That's it, really...
+
+
+    }
+}
+
+/**
+  Computes gyro drift based on sampled data
+  */
+void ConfigAHRSWidget::computeGyroDrift() {
+    // TODO
+
+    // TODO: if this is not too computing-intensive, we could consider
+    // calling this with a timer when data sampling is enabled, to get
+    // a real-time view of the computed drift convergence and let the
+    // user stop sampling when it becomes stable enough...
 }
 
 
@@ -804,6 +921,8 @@ void ConfigAHRSWidget::ahrsSettingsRequest()
     m_ahrs->ahrsCalibStart->setEnabled(true);
     m_ahrs->sixPointsStart->setEnabled(true);
     m_ahrs->accelBiasStart->setEnabled(true);
+    m_ahrs->startDriftCalib->setEnabled(true);
+
     m_ahrs->calibInstructions->setText(QString("Press \"Start\" above to calibrate."));
 
 }

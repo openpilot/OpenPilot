@@ -91,9 +91,11 @@ private:
     double mag_data_z[6];
     int position;
 
+
     UAVObject::Metadata initialMdata;
 
     double listMean(QList<double> list);
+    void computeGyroDrift();
 
 private slots:
     void enableHomeLocSave(UAVObject *obj);
@@ -110,6 +112,8 @@ private slots:
     void sixPointCalibrationMode();
     void attitudeRawUpdated(UAVObject * obj);
     void accelBiasattitudeRawUpdated(UAVObject*);
+    void driftCalibrationAttitudeRawUpdated(UAVObject*);
+    void launchGyroDriftCalibration();
 
 protected:
     void showEvent(QShowEvent *event);

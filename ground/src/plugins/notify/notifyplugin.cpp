@@ -148,8 +148,10 @@ void SoundNotifyPlugin::connectNotifications()
 		if (obj != NULL)
 			disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(appendNotification(UAVObject*)));
 	}
-	if(phonon.mo != NULL)
-		delete phonon.mo;
+        if(phonon.mo != NULL) {
+            delete phonon.mo;
+            phonon.mo = NULL;
+        }
 
 	if(!enableSound) return;
 
@@ -287,6 +289,10 @@ void SoundNotifyPlugin::checkNotificationRule(NotifyPluginConfiguration* notific
 
 bool SoundNotifyPlugin::playNotification(NotifyPluginConfiguration* notification)
 {
+    // Check: race condition, if phonon.mo got deleted don't go further
+    if (phonon.mo == NULL)
+        return false;
+
 #ifdef DEBUG_NOTIFIES
     qDebug() << "Phonon State: " << phonon.mo->state();
 #endif

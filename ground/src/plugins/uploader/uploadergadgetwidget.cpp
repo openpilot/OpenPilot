@@ -210,13 +210,6 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
         disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
 
-        if (resetOnly) {
-            resetOnly=false;
-            delay::msleep(3500);
-            systemBoot();
-            break;
-        }
-
         currentStep = IAP_STATE_BOOTLOADER;
 
         // Tell the mainboard to get into bootloader state:
@@ -258,6 +251,13 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         */
         m_config->telemetryLink->setEnabled(false);
         m_config->rescueButton->setEnabled(false);
+        if (resetOnly) {
+            resetOnly=false;
+            delay::msleep(3500);
+            systemBoot();
+            break;
+        }
+
     }
         break;
     case IAP_STATE_BOOTLOADER:

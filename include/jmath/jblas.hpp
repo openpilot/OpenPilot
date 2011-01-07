@@ -18,15 +18,15 @@
 #include "jmath/serialize_symmetric.hpp"
 #include "jmath/serialize_banded.hpp"
 #else
-#include "boost/numeric/ublas/vector.hpp"
-#include "boost/numeric/ublas/matrix.hpp"
-#include "boost/numeric/ublas/symmetric.hpp"
-#include "boost/numeric/ublas/banded.hpp"
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/symmetric.hpp>
+#include <boost/numeric/ublas/banded.hpp>
 #endif
-#include "boost/numeric/ublas/io.hpp"
+#include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/triangular.hpp>
-#include "boost/numeric/ublas/matrix_proxy.hpp"
-#include "boost/numeric/ublas/vector_proxy.hpp"
+#include <boost/numeric/ublas/matrix_proxy.hpp>
+#include <boost/numeric/ublas/vector_proxy.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 
 #include "boost/math/quaternion.hpp"

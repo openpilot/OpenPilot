@@ -22,8 +22,8 @@ int main(int argc, char** argv) {
 	}
 	jmath::matrix_file<float> scene;
 	scene.load("car1.ascii");
-	ublas::matrix<float> dists(scene.data.size1(), scene.data.size2());
-	ublas::matrix<int> indices(scene.data.size1(), scene.data.size2());
+	ublas::matrix<float> dists(scene.data.size1(), 10);
+	ublas::matrix<int> indices(scene.data.size1(), 10);
 	KD_tree_index< flann::L2<float> > tree(model.data);
 	tree.build();
 	tree.knn_search(scene.data, indices, dists, 10, search_params(32));

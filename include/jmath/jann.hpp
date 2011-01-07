@@ -22,7 +22,7 @@
 /// shortcut for ublas namespace
 namespace ublas = boost::numeric::ublas;
 
-/// special nemespace to wrap flann library algorithms
+/// special nemespace to wrap flann library
 namespace jann {
 	/// algorithm to be used for research, use only if you want to create a new Index
 	enum algorithm {

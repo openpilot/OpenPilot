@@ -65,6 +65,7 @@
 #include "systemalarms.h"
 #include "systemsettings.h"
 #include "systemstats.h"
+#include "taskinfo.h"
 #include "telemetrysettings.h"
 #include "velocityactual.h"
 #include "velocitydesired.h"
@@ -111,6 +112,7 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new SystemAlarms() );
     objMngr->registerObject( new SystemSettings() );
     objMngr->registerObject( new SystemStats() );
+    objMngr->registerObject( new TaskInfo() );
     objMngr->registerObject( new TelemetrySettings() );
     objMngr->registerObject( new VelocityActual() );
     objMngr->registerObject( new VelocityDesired() );

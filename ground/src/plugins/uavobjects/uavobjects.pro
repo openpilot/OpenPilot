@@ -48,7 +48,8 @@ HEADERS += uavobjects_global.h \
     pipxtrememodemsettings.h \
     pipxtrememodemstatus.h \
     i2cstats.h \
-    batterysettings.h
+    batterysettings.h \
+    taskinfo.h
 
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
@@ -94,5 +95,6 @@ SOURCES += uavobject.cpp \
     pipxtrememodemsettings.cpp \
     pipxtrememodemstatus.cpp \
     i2cstats.cpp \
-    batterysettings.cpp
+    batterysettings.cpp \
+    taskinfo.cpp
 OTHER_FILES += UAVObjects.pluginspec

@@ -39,6 +39,7 @@ namespace OP_DFU {
         bytetobytecompare
     };
 
+    Q_ENUMS(Status)
     enum Status
     {
         DFUidle,//0
@@ -87,6 +88,7 @@ namespace OP_DFU {
         Status_Rep,//12
 
     };
+
     struct device
     {
             int ID;

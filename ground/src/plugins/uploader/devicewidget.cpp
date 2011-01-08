@@ -5,9 +5,9 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
- * @addtogroup YModemUploader YModem Serial Uploader Plugin
+ * @addtogroup Uploader Serial and USB Uploader Plugin
  * @{
- * @brief The YModem protocol serial uploader plugin
+ * @brief The USB and Serial protocol uploader plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -266,7 +266,7 @@ void deviceWidget::uploadFinished(OP_DFU::Status retstatus)
 {
     disconnect(m_dfu, SIGNAL(uploadFinished(OP_DFU::Status)), this, SLOT(uploadFinished(OP_DFU::Status)));
     disconnect(m_dfu, SIGNAL(progressUpdated(int)), this, SLOT(setProgress(int)));
-    disconnect(m_dfu, SIGNAL(operationProgress(QString)), this, SLOT(status(QString)));
+    disconnect(m_dfu, SIGNAL(operationProgress(QString)), this, SLOT(dfuStatus(QString)));
     if(retstatus != OP_DFU::Last_operation_Success) {
         status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
         return;

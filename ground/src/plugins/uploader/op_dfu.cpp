@@ -37,6 +37,7 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname): debug(_debu
     info = NULL;
 
     qRegisterMetaType<OP_DFU::Status>("Status");
+
     if(use_serial)
     {
         PortSettings settings;

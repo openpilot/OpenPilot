@@ -240,8 +240,10 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t * buff
 	if(!transfer_possible)
 		return -1;	
 	
-	if (len > fifoBuf_getFree(&tx_pios_fifo_buffer))
+	if (len > fifoBuf_getFree(&tx_pios_fifo_buffer)) {
+		sendChunk();    /* Try and send what's in the buffer though */
 		return -2;	/* Cannot send all requested bytes */
+	}
 
 	/* don't check returned bytes because it should always succeed  */
 	/* after previous thread and no meaningful way to deal with the */

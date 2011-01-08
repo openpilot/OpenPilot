@@ -320,9 +320,7 @@ static int32_t transmitData(uint8_t * data, int32_t length)
 		outputPort = telemetryPort;
 	}
 
-	// TODO: Update once the PIOS_COM is made blocking (it is implemented as a busy loop for now!)
-	//PIOS_LED_Toggle(LED2);
-	return PIOS_COM_SendBuffer(outputPort, data, length);
+	return PIOS_COM_SendBufferNonBlocking(outputPort, data, length);
 }
 
 /**

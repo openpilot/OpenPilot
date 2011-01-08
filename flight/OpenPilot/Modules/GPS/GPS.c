@@ -81,6 +81,7 @@ int32_t GPSInitialize(void)
 
 	// Start gps task
 	xReturn = xTaskCreate(gpsTask, (signed char *)"GPS", STACK_SIZE, NULL, TASK_PRIORITY, &gpsTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_GPS, gpsTaskHandle);
 
 	return 0;
 }

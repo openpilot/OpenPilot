@@ -95,6 +95,7 @@ int32_t ActuatorInitialize()
 
 	// Start main task
 	xTaskCreate(actuatorTask, (signed char*)"Actuator", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_ACTUATOR, taskHandle);
 
 	return 0;
 }

@@ -113,6 +113,9 @@ int32_t TelemetryInitialize(void)
 	xTaskCreate(telemetryTxTask, (signed char *)"TelTx", STACK_SIZE, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
 	xTaskCreate(telemetryTxPriTask, (signed char *)"TelPriTx", STACK_SIZE, NULL, TASK_PRIORITY_TXPRI, &telemetryTxPriTaskHandle);
 	xTaskCreate(telemetryRxTask, (signed char *)"TelRx", STACK_SIZE, NULL, TASK_PRIORITY_RX, &telemetryRxTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_TELEMETRYTX, telemetryTxTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_TELEMETRYTXPRI, telemetryTxPriTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_TELEMETRYRX, telemetryRxTaskHandle);
 
 	return 0;
 }

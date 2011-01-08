@@ -40,6 +40,7 @@
 #include "uavobjectmanager.h"
 #include "eventdispatcher.h"
 #include "alarms.h"
+#include "taskmonitor.h"
 #include "uavtalk.h"
 
 /* Global Functions */

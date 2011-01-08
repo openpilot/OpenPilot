@@ -63,6 +63,9 @@ void PIOS_Board_Init(void) {
 	/* Initialize the alarms library */
 	AlarmsInitialize();
 
+	/* Initialize the task monitor library */
+	TaskMonitorInitialize();
+
 	/* Initialize the PiOS library */
 	PIOS_COM_Init();
 	PIOS_Servo_Init();

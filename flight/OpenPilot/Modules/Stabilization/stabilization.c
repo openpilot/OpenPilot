@@ -99,6 +99,7 @@ int32_t StabilizationInitialize()
 	SettingsUpdatedCb(StabilizationSettingsHandle());
 	// Start main task
 	xTaskCreate(stabilizationTask, (signed char*)"Stabilization", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_STABILIZATION, taskHandle);
 
 	return 0;
 }

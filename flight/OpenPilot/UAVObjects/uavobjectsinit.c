@@ -63,6 +63,7 @@
 #include "systemalarms.h"
 #include "systemsettings.h"
 #include "systemstats.h"
+#include "taskinfo.h"
 #include "telemetrysettings.h"
 #include "velocityactual.h"
 #include "velocitydesired.h"
@@ -109,6 +110,7 @@ void UAVObjectsInitializeAll()
     SystemAlarmsInitialize();
     SystemSettingsInitialize();
     SystemStatsInitialize();
+    TaskInfoInitialize();
     TelemetrySettingsInitialize();
     VelocityActualInitialize();
     VelocityDesiredInitialize();

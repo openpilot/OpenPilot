@@ -78,6 +78,7 @@ int32_t AHRSCommsInitialize(void)
 
 	// Start main task
 	xTaskCreate(ahrscommsTask, (signed char *)"AHRSComms", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_AHRSCOMMS, taskHandle);
 
 	return 0;
 }

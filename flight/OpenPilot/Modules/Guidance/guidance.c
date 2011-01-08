@@ -81,6 +81,7 @@ int32_t GuidanceInitialize()
 {
 	// Start main task
 	xTaskCreate(guidanceTask, (signed char *)"Guidance", STACK_SIZE, NULL, TASK_PRIORITY, &guidanceTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_GUIDANCE, guidanceTaskHandle);
 
 	return 0;
 }

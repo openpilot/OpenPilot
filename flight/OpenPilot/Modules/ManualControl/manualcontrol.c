@@ -73,6 +73,7 @@ int32_t ManualControlInitialize()
 {
 	// Start main task
 	xTaskCreate(manualControlTask, (signed char *)"ManualControl", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_MANUALCONTROL, taskHandle);
 
 	return 0;
 }

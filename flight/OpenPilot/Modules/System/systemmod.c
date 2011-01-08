@@ -44,6 +44,7 @@
 #include "manualcontrolcommand.h"
 #include "systemstats.h"
 #include "i2cstats.h"
+#include "taskmonitor.h"
 
 
 // Private constants
@@ -97,6 +98,9 @@ static void systemTask(void *parameters)
 	// System initialization
 	OpenPilotInit();
 
+	// Register task
+	TaskMonitorAdd(TASKINFO_RUNNING_SYSTEM, systemTaskHandle);
+
 	// Initialize vars
 	idleCounter = 0;
 	idleCounterClear = 0;
@@ -114,6 +118,9 @@ static void systemTask(void *parameters)
 		updateSystemAlarms();
 		updateI2Cstats();
 		
+		// Update the task status object
+		TaskMonitorUpdateAll();
+
 		// Flash the heartbeat LED
 		PIOS_LED_Toggle(LED1);
 

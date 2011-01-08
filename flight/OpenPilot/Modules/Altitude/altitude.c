@@ -67,6 +67,7 @@ int32_t AltitudeInitialize()
 {
 	// Start main task
 	xTaskCreate(altitudeTask, (signed char *)"Altitude", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_ALTITUDE, taskHandle);
 
 	// init down-sampling data
     alt_ds_temp = 0;

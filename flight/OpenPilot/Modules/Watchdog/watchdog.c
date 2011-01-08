@@ -65,6 +65,7 @@ int32_t WatchdogInitialize()
 	
 	// Start main task
 	xTaskCreate(watchdogTask, (signed char *)"Watchdog", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_WATCHDOG, taskHandle);
 
 	return 0;
 }

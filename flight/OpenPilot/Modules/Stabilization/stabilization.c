@@ -45,7 +45,7 @@
 
 // Private constants
 #define MAX_QUEUE_SIZE 2
-#define STACK_SIZE configMINIMAL_STACK_SIZE
+#define STACK_SIZE_BYTES 724
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 #define FAILSAFE_TIMEOUT_MS 30
 
@@ -98,7 +98,7 @@ int32_t StabilizationInitialize()
 	StabilizationSettingsConnectCallback(SettingsUpdatedCb);
 	SettingsUpdatedCb(StabilizationSettingsHandle());
 	// Start main task
-	xTaskCreate(stabilizationTask, (signed char*)"Stabilization", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+	xTaskCreate(stabilizationTask, (signed char*)"Stabilization", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_STABILIZATION, taskHandle);
 
 	return 0;

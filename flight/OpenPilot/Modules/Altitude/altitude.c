@@ -40,7 +40,7 @@
 #include "baroaltitude.h"	// object that will be updated by the module
 
 // Private constants
-#define STACK_SIZE configMINIMAL_STACK_SIZE
+#define STACK_SIZE_BYTES 500
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 //#define UPDATE_PERIOD 100
 #define UPDATE_PERIOD 25
@@ -66,7 +66,7 @@ static void altitudeTask(void *parameters);
 int32_t AltitudeInitialize()
 {
 	// Start main task
-	xTaskCreate(altitudeTask, (signed char *)"Altitude", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+	xTaskCreate(altitudeTask, (signed char *)"Altitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_ALTITUDE, taskHandle);
 
 	// init down-sampling data

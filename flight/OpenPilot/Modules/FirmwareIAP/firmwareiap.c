@@ -73,7 +73,7 @@ FirmwareIAPObjData 	data;
 static uint32_t	get_time(void);
 
 // Private constants
-#define STACK_SIZE configMINIMAL_STACK_SIZE
+#define STACK_SIZE_BYTES 800
 #define TASK_PRIORITY (tskIDLE_PRIORITY+1)
 
 // Private types
@@ -166,7 +166,7 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
                     // we've met the time requirements.
                 	PIOS_IAP_SetRequest1();
                 	PIOS_IAP_SetRequest2();
-                	xTaskCreate(resetTask, (signed char *)"Reset", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+                	xTaskCreate(resetTask, (signed char *)"Reset", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
                 } else {
                     iap_state = IAP_STATE_READY;
                 }

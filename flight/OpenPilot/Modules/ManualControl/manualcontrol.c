@@ -44,7 +44,7 @@
 #include "flighttelemetrystats.h"
 
 // Private constants
-#define STACK_SIZE configMINIMAL_STACK_SIZE
+#define STACK_SIZE_BYTES 824
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 #define UPDATE_PERIOD_MS 20
 #define THROTTLE_FAILSAFE -0.1
@@ -72,7 +72,7 @@ volatile uint8_t manual_updated;
 int32_t ManualControlInitialize()
 {
 	// Start main task
-	xTaskCreate(manualControlTask, (signed char *)"ManualControl", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+	xTaskCreate(manualControlTask, (signed char *)"ManualControl", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_MANUALCONTROL, taskHandle);
 
 	return 0;

@@ -40,7 +40,7 @@
 // Private constants
 // TODO: Look up maximum task priority and set this to it.  Not trying to replicate CPU load.
 #define TASK_PRIORITY (tskIDLE_PRIORITY+5)
-#define STACK_SIZE configMINIMAL_STACK_SIZE
+#define STACK_SIZE_BYTES 324
 #define WATCHDOG_TIMEOUT 250
 
 // Private types
@@ -64,7 +64,7 @@ int32_t WatchdogInitialize()
 	manual_updated = 0;
 	
 	// Start main task
-	xTaskCreate(watchdogTask, (signed char *)"Watchdog", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+	xTaskCreate(watchdogTask, (signed char *)"Watchdog", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_WATCHDOG, taskHandle);
 
 	return 0;

@@ -57,7 +57,7 @@
 #include "velocityactual.h"
 
 // Private constants
-#define STACK_SIZE configMINIMAL_STACK_SIZE
+#define STACK_SIZE_BYTES 824
 #define TASK_PRIORITY (tskIDLE_PRIORITY+1)
 // Private types
 
@@ -80,7 +80,7 @@ static void positionPIDcontrol();
 int32_t GuidanceInitialize()
 {
 	// Start main task
-	xTaskCreate(guidanceTask, (signed char *)"Guidance", STACK_SIZE, NULL, TASK_PRIORITY, &guidanceTaskHandle);
+	xTaskCreate(guidanceTask, (signed char *)"Guidance", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &guidanceTaskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_GUIDANCE, guidanceTaskHandle);
 
 	return 0;

@@ -52,7 +52,7 @@ static void setHomeLocation(GPSPositionData * gpsData);
 
 // Private constants
 // Unfortunately need a good size stack for the WMM calculation
-#define STACK_SIZE configMINIMAL_STACK_SIZE + 1500
+#define STACK_SIZE_BYTES 1024
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 3)
 
 // Private types
@@ -80,7 +80,7 @@ int32_t GPSInitialize(void)
 	gpsPort = PIOS_COM_GPS;
 
 	// Start gps task
-	xReturn = xTaskCreate(gpsTask, (signed char *)"GPS", STACK_SIZE, NULL, TASK_PRIORITY, &gpsTaskHandle);
+	xReturn = xTaskCreate(gpsTask, (signed char *)"GPS", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &gpsTaskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_GPS, gpsTaskHandle);
 
 	return 0;

@@ -52,7 +52,7 @@
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998	// calibrated by running tests/test_cpuload.c
 											  // must be updated if the FreeRTOS or compiler
 											  // optimisation options are changed.
-#define STACK_SIZE configMINIMAL_STACK_SIZE
+#define STACK_SIZE_BYTES 924
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 
 #define HEAP_LIMIT_WARNING 4000
@@ -84,7 +84,7 @@ int32_t SystemModInitialize(void)
 	// Initialize vars
 	stackOverflow = 0;
 	// Create system task
-	xTaskCreate(systemTask, (signed char *)"System", STACK_SIZE, NULL, TASK_PRIORITY, &systemTaskHandle);
+	xTaskCreate(systemTask, (signed char *)"System", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &systemTaskHandle);
 	return 0;
 }
 

@@ -76,19 +76,24 @@ SerialConnection::SerialConnection()
     : m_enumerateThread(this)
 {
     serialHandle = NULL;
-#ifdef Q_OS_WIN
-    //I'm cheating a little bit here:
-    //Knowing if the device enumeration really changed is a bit complicated
-    //so I just signal it whenever we have a device event...
-    QMainWindow *mw = Core::ICore::instance()->mainWindow();
-    QObject::connect(mw, SIGNAL(deviceChange()),
-                     this, SLOT(onEnumerationChanged()));
-#else
+
+    // Experimental: enable polling on all OS'es since there
+    // were reports that autodetect does not work on XP amongst
+    // others.
+
+    //#ifdef Q_OS_WIN
+//    //I'm cheating a little bit here:
+//    //Knowing if the device enumeration really changed is a bit complicated
+//    //so I just signal it whenever we have a device event...
+//    QMainWindow *mw = Core::ICore::instance()->mainWindow();
+//    QObject::connect(mw, SIGNAL(deviceChange()),
+//                     this, SLOT(onEnumerationChanged()));
+//#else
     // Other OSes do not send such signals:
     QObject::connect(&m_enumerateThread, SIGNAL(enumerationChanged()),
                      this, SLOT(onEnumerationChanged()));
     m_enumerateThread.start();
-#endif
+//#endif
 }
 
 SerialConnection::~SerialConnection()

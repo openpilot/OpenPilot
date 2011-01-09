@@ -207,7 +207,6 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         else
             m_config->telemetryLink->setCurrentIndex(m_config->telemetryLink->findText(dli));
 
-        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
         disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
 
         currentStep = IAP_STATE_BOOTLOADER;
@@ -336,7 +335,7 @@ void UploaderGadgetWidget::systemBoot()
     }
     currentStep = IAP_STATE_READY;
     log("You can now reconnect telemetry...");
-    delete dfu;
+    delete dfu; // Frees up the USB/Serial port too
     dfu = NULL;
 
 }

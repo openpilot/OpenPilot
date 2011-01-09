@@ -38,6 +38,7 @@ public:
     uint32_t		TxError;
     uint16_t		flags;
     port(PortSettings settings,QString name);
+    ~port();
     portstatus status();
 private:
     portstatus mstatus;

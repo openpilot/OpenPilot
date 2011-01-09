@@ -12,6 +12,11 @@ port::port(PortSettings settings,QString name):mstatus(port::closed)
     else
         mstatus=port::error;
 }
+
+port::~port() {
+    sport->close();
+}
+
 port::portstatus port::status()
 {
     return mstatus;

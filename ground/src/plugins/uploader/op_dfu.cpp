@@ -98,8 +98,10 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname): debug(_debu
 DFUObject::~DFUObject()
 {
     if (use_serial) {
-        if (mready)
+        if (mready) {
             delete serialhandle;
+            delete info;
+        }
     } else {
         hidHandle.close(0);
     }

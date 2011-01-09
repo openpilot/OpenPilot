@@ -1,0 +1,10 @@
+<xml>
+    <object name="FlightPlanSettings" singleinstance="true" settings="true">
+        <description>Settings for the flight plan module, control the execution of the script</description>
+        <field name="Test" units="" type="float" elements="1" defaultvalue="0.0"/>
+		<access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="never" period="0"/>
+	</object>
+</xml>

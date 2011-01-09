@@ -49,7 +49,10 @@ HEADERS += uavobjects_global.h \
     pipxtrememodemstatus.h \
     i2cstats.h \
     batterysettings.h \
-    taskinfo.h
+    taskinfo.h \
+    flightplanstatus.h \
+    flightplansettings.h \
+    flightplancontrol.h
 
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
@@ -96,5 +99,8 @@ SOURCES += uavobject.cpp \
     pipxtrememodemstatus.cpp \
     i2cstats.cpp \
     batterysettings.cpp \
-    taskinfo.cpp
+    taskinfo.cpp \
+    flightplanstatus.cpp \
+    flightplansettings.cpp \
+    flightplancontrol.cpp
 OTHER_FILES += UAVObjects.pluginspec

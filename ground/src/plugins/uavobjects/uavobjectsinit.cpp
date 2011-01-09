@@ -43,6 +43,9 @@
 #include "batterysettings.h"
 #include "firmwareiapobj.h"
 #include "flightbatterystate.h"
+#include "flightplancontrol.h"
+#include "flightplansettings.h"
+#include "flightplanstatus.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "gpsposition.h"
@@ -90,6 +93,9 @@ void UAVObjectsInitialize(UAVObjectManager* objMngr)
     objMngr->registerObject( new BatterySettings() );
     objMngr->registerObject( new FirmwareIAPObj() );
     objMngr->registerObject( new FlightBatteryState() );
+    objMngr->registerObject( new FlightPlanControl() );
+    objMngr->registerObject( new FlightPlanSettings() );
+    objMngr->registerObject( new FlightPlanStatus() );
     objMngr->registerObject( new FlightTelemetryStats() );
     objMngr->registerObject( new GCSTelemetryStats() );
     objMngr->registerObject( new GPSPosition() );

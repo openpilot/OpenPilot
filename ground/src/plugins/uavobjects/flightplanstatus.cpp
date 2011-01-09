@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       taskinfo.cpp
+ * @file       flightplanstatus.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
  * @addtogroup GCSPlugins GCS Plugins
@@ -9,7 +9,7 @@
  * @addtogroup UAVObjectsPlugin UAVObjects Plugin
  * @{
  *   
- * @note       Object definition file: taskinfo.xml. 
+ * @note       Object definition file: flightplanstatus.xml. 
  *             This is an automatically generated file.
  *             DO NOT modify manually.
  *
@@ -30,52 +30,43 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "taskinfo.h"
+#include "flightplanstatus.h"
 #include "uavobjectfield.h"
 
-const QString TaskInfo::NAME = QString("TaskInfo");
-const QString TaskInfo::DESCRIPTION = QString("Task information");
+const QString FlightPlanStatus::NAME = QString("FlightPlanStatus");
+const QString FlightPlanStatus::DESCRIPTION = QString("Status of the flight plan script");
 
 /**
  * Constructor
  */
-TaskInfo::TaskInfo(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
+FlightPlanStatus::FlightPlanStatus(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 {
     // Create fields
     QList<UAVObjectField*> fields;
-    QStringList StackRemainingElemNames;
-    StackRemainingElemNames.append("System");
-    StackRemainingElemNames.append("Actuator");
-    StackRemainingElemNames.append("TelemetryTx");
-    StackRemainingElemNames.append("TelemetryTxPri");
-    StackRemainingElemNames.append("TelemetryRx");
-    StackRemainingElemNames.append("GPS");
-    StackRemainingElemNames.append("ManualControl");
-    StackRemainingElemNames.append("Altitude");
-    StackRemainingElemNames.append("AHRSComms");
-    StackRemainingElemNames.append("Stabilization");
-    StackRemainingElemNames.append("Guidance");
-    StackRemainingElemNames.append("Watchdog");
-    StackRemainingElemNames.append("FlightPlan");
-    fields.append( new UAVObjectField(QString("StackRemaining"), QString("bytes"), UAVObjectField::UINT16, StackRemainingElemNames, QStringList()) );
-    QStringList RunningElemNames;
-    RunningElemNames.append("System");
-    RunningElemNames.append("Actuator");
-    RunningElemNames.append("TelemetryTx");
-    RunningElemNames.append("TelemetryTxPri");
-    RunningElemNames.append("TelemetryRx");
-    RunningElemNames.append("GPS");
-    RunningElemNames.append("ManualControl");
-    RunningElemNames.append("Altitude");
-    RunningElemNames.append("AHRSComms");
-    RunningElemNames.append("Stabilization");
-    RunningElemNames.append("Guidance");
-    RunningElemNames.append("Watchdog");
-    RunningElemNames.append("FlightPlan");
-    QStringList RunningEnumOptions;
-    RunningEnumOptions.append("False");
-    RunningEnumOptions.append("True");
-    fields.append( new UAVObjectField(QString("Running"), QString("bool"), UAVObjectField::ENUM, RunningElemNames, RunningEnumOptions) );
+    QStringList StatusElemNames;
+    StatusElemNames.append("0");
+    QStringList StatusEnumOptions;
+    StatusEnumOptions.append("None");
+    StatusEnumOptions.append("Running");
+    StatusEnumOptions.append("Idle");
+    StatusEnumOptions.append("VMInitError");
+    StatusEnumOptions.append("ScriptStartError");
+    StatusEnumOptions.append("RunTimeError");
+    fields.append( new UAVObjectField(QString("Status"), QString(""), UAVObjectField::ENUM, StatusElemNames, StatusEnumOptions) );
+    QStringList ErrorTypeElemNames;
+    ErrorTypeElemNames.append("0");
+    QStringList ErrorTypeEnumOptions;
+    ErrorTypeEnumOptions.append("None");
+    fields.append( new UAVObjectField(QString("ErrorType"), QString(""), UAVObjectField::ENUM, ErrorTypeElemNames, ErrorTypeEnumOptions) );
+    QStringList ErrorFileIDElemNames;
+    ErrorFileIDElemNames.append("0");
+    fields.append( new UAVObjectField(QString("ErrorFileID"), QString(""), UAVObjectField::UINT32, ErrorFileIDElemNames, QStringList()) );
+    QStringList ErrorLineNumElemNames;
+    ErrorLineNumElemNames.append("0");
+    fields.append( new UAVObjectField(QString("ErrorLineNum"), QString(""), UAVObjectField::UINT32, ErrorLineNumElemNames, QStringList()) );
+    QStringList DebugElemNames;
+    DebugElemNames.append("0");
+    fields.append( new UAVObjectField(QString("Debug"), QString(""), UAVObjectField::FLOAT32, DebugElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -88,19 +79,19 @@ TaskInfo::TaskInfo(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTINGS, NAME)
 /**
  * Get the default metadata for this object
  */
-UAVObject::Metadata TaskInfo::getDefaultMetadata()
+UAVObject::Metadata FlightPlanStatus::getDefaultMetadata()
 {
     UAVObject::Metadata metadata;
     metadata.flightAccess = ACCESS_READWRITE;
     metadata.gcsAccess = ACCESS_READWRITE;
-    metadata.gcsTelemetryAcked = 1;
-    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+    metadata.gcsTelemetryAcked = 0;
+    metadata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_MANUAL;
     metadata.gcsTelemetryUpdatePeriod = 0;
-    metadata.flightTelemetryAcked = 1;
+    metadata.flightTelemetryAcked = 0;
     metadata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-    metadata.flightTelemetryUpdatePeriod = 10000;
-    metadata.loggingUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-    metadata.loggingUpdatePeriod = 1000;
+    metadata.flightTelemetryUpdatePeriod = 2000;
+    metadata.loggingUpdateMode = UAVObject::UPDATEMODE_NEVER;
+    metadata.loggingUpdatePeriod = 0;
     return metadata;
 }
 
@@ -109,15 +100,17 @@ UAVObject::Metadata TaskInfo::getDefaultMetadata()
  * If a default value is not specified the object fields
  * will be initialized to zero.
  */
-void TaskInfo::setDefaultFieldValues()
+void FlightPlanStatus::setDefaultFieldValues()
 {
+    data.Status = 0;
+    data.ErrorType = 0;
 
 }
 
 /**
  * Get the object data fields
  */
-TaskInfo::DataFields TaskInfo::getData()
+FlightPlanStatus::DataFields FlightPlanStatus::getData()
 {
     QMutexLocker locker(mutex);
     return data;
@@ -126,7 +119,7 @@ TaskInfo::DataFields TaskInfo::getData()
 /**
  * Set the object data fields
  */
-void TaskInfo::setData(const DataFields& data)
+void FlightPlanStatus::setData(const DataFields& data)
 {
     QMutexLocker locker(mutex);
     // Get metadata
@@ -145,9 +138,9 @@ void TaskInfo::setData(const DataFields& data)
  * Do not use this function directly to create new instances, the
  * UAVObjectManager should be used instead.
  */
-UAVDataObject* TaskInfo::clone(quint32 instID)
+UAVDataObject* FlightPlanStatus::clone(quint32 instID)
 {
-    TaskInfo* obj = new TaskInfo();
+    FlightPlanStatus* obj = new FlightPlanStatus();
     obj->initialize(instID, this->getMetaObject());
     return obj;
 }
@@ -155,7 +148,7 @@ UAVDataObject* TaskInfo::clone(quint32 instID)
 /**
  * Static function to retrieve an instance of the object.
  */
-TaskInfo* TaskInfo::GetInstance(UAVObjectManager* objMngr, quint32 instID)
+FlightPlanStatus* FlightPlanStatus::GetInstance(UAVObjectManager* objMngr, quint32 instID)
 {
-    return dynamic_cast<TaskInfo*>(objMngr->getObject(TaskInfo::OBJID, instID));
+    return dynamic_cast<FlightPlanStatus*>(objMngr->getObject(FlightPlanStatus::OBJID, instID));
 }

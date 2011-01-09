@@ -135,6 +135,22 @@ function [] = OPLogConvert()
     FlightBatteryState(1).ConsumedEnergy = 0;
     FlightBatteryState(1).EstimatedFlightTime = 0;
 
+    flightplancontrolIdx = 1;
+    FlightPlanControl.timestamp = 0;
+    FlightPlanControl(1).Test = 0;
+
+    flightplansettingsIdx = 1;
+    FlightPlanSettings.timestamp = 0;
+    FlightPlanSettings(1).Test = 0;
+
+    flightplanstatusIdx = 1;
+    FlightPlanStatus.timestamp = 0;
+    FlightPlanStatus(1).Status = 0;
+    FlightPlanStatus(1).ErrorType = 0;
+    FlightPlanStatus(1).ErrorFileID = 0;
+    FlightPlanStatus(1).ErrorLineNum = 0;
+    FlightPlanStatus(1).Debug = 0;
+
     flighttelemetrystatsIdx = 1;
     FlightTelemetryStats.timestamp = 0;
     FlightTelemetryStats(1).Status = 0;
@@ -376,6 +392,11 @@ function [] = OPLogConvert()
     SystemStats(1).HeapRemaining = 0;
     SystemStats(1).CPULoad = 0;
 
+    taskinfoIdx = 1;
+    TaskInfo.timestamp = 0;
+    TaskInfo(1).StackRemaining = zeros(1,13);
+    TaskInfo(1).Running = zeros(1,13);
+
     telemetrysettingsIdx = 1;
     TelemetrySettings.timestamp = 0;
     TelemetrySettings(1).Speed = 0;
@@ -466,6 +487,15 @@ function [] = OPLogConvert()
             case 126985486
                 FlightBatteryState(flightbatterystateIdx) = ReadFlightBatteryStateObject(fid, timestamp);
                 flightbatterystateIdx = flightbatterystateIdx + 1;
+            case 4125349796
+                FlightPlanControl(flightplancontrolIdx) = ReadFlightPlanControlObject(fid, timestamp);
+                flightplancontrolIdx = flightplancontrolIdx + 1;
+            case 2234942498
+                FlightPlanSettings(flightplansettingsIdx) = ReadFlightPlanSettingsObject(fid, timestamp);
+                flightplansettingsIdx = flightplansettingsIdx + 1;
+            case 2726772894
+                FlightPlanStatus(flightplanstatusIdx) = ReadFlightPlanStatusObject(fid, timestamp);
+                flightplanstatusIdx = flightplanstatusIdx + 1;
             case 1712072286
                 FlightTelemetryStats(flighttelemetrystatsIdx) = ReadFlightTelemetryStatsObject(fid, timestamp);
                 flighttelemetrystatsIdx = flighttelemetrystatsIdx + 1;
@@ -532,6 +562,9 @@ function [] = OPLogConvert()
             case 680908530
                 SystemStats(systemstatsIdx) = ReadSystemStatsObject(fid, timestamp);
                 systemstatsIdx = systemstatsIdx + 1;
+            case 1358273008
+                TaskInfo(taskinfoIdx) = ReadTaskInfoObject(fid, timestamp);
+                taskinfoIdx = taskinfoIdx + 1;
             case 2785592614
                 TelemetrySettings(telemetrysettingsIdx) = ReadTelemetrySettingsObject(fid, timestamp);
                 telemetrysettingsIdx = telemetrysettingsIdx + 1;
@@ -554,7 +587,7 @@ function [] = OPLogConvert()
     fclose(fid);
     
     matfile = strrep(logfile,'opl','mat');
-    save(matfile ,'ActuatorCommand','ActuatorDesired','ActuatorSettings','AHRSCalibration','AHRSSettings','AhrsStatus','AttitudeActual','AttitudeDesired','AttitudeRaw','BaroAltitude','BatterySettings','FirmwareIAPObj','FlightBatteryState','FlightTelemetryStats','GCSTelemetryStats','GPSPosition','GPSSatellites','GPSTime','GuidanceSettings','HomeLocation','I2CStats','ManualControlCommand','ManualControlSettings','MixerSettings','MixerStatus','ObjectPersistence','PipXtremeModemSettings','PipXtremeModemStatus','PositionActual','PositionDesired','RateDesired','StabilizationSettings','SystemAlarms','SystemSettings','SystemStats','TelemetrySettings','VelocityActual','VelocityDesired');
+    save(matfile ,'ActuatorCommand','ActuatorDesired','ActuatorSettings','AHRSCalibration','AHRSSettings','AhrsStatus','AttitudeActual','AttitudeDesired','AttitudeRaw','BaroAltitude','BatterySettings','FirmwareIAPObj','FlightBatteryState','FlightPlanControl','FlightPlanSettings','FlightPlanStatus','FlightTelemetryStats','GCSTelemetryStats','GPSPosition','GPSSatellites','GPSTime','GuidanceSettings','HomeLocation','I2CStats','ManualControlCommand','ManualControlSettings','MixerSettings','MixerStatus','ObjectPersistence','PipXtremeModemSettings','PipXtremeModemStatus','PositionActual','PositionDesired','RateDesired','StabilizationSettings','SystemAlarms','SystemSettings','SystemStats','TaskInfo','TelemetrySettings','VelocityActual','VelocityDesired');
     
 end
 
@@ -820,6 +853,52 @@ function [FlightBatteryState] = ReadFlightBatteryStateObject(fid, timestamp)
     FlightBatteryState.AvgCurrent = double(fread(fid, 1, 'float32'));
     FlightBatteryState.ConsumedEnergy = double(fread(fid, 1, 'float32'));
     FlightBatteryState.EstimatedFlightTime = double(fread(fid, 1, 'float32'));
+    % read CRC
+    fread(fid, 1, 'uint8');
+end
+
+function [FlightPlanControl] = ReadFlightPlanControlObject(fid, timestamp)
+    if 1
+        headerSize = 8;
+    else
+        FlightPlanControl.instanceID = fread(fid, 1, 'uint16');
+        headerSize = 10;
+    end
+
+    FlightPlanControl.timestamp = timestamp;
+    FlightPlanControl.Test = double(fread(fid, 1, 'float32'));
+    % read CRC
+    fread(fid, 1, 'uint8');
+end
+
+function [FlightPlanSettings] = ReadFlightPlanSettingsObject(fid, timestamp)
+    if 1
+        headerSize = 8;
+    else
+        FlightPlanSettings.instanceID = fread(fid, 1, 'uint16');
+        headerSize = 10;
+    end
+
+    FlightPlanSettings.timestamp = timestamp;
+    FlightPlanSettings.Test = double(fread(fid, 1, 'float32'));
+    % read CRC
+    fread(fid, 1, 'uint8');
+end
+
+function [FlightPlanStatus] = ReadFlightPlanStatusObject(fid, timestamp)
+    if 1
+        headerSize = 8;
+    else
+        FlightPlanStatus.instanceID = fread(fid, 1, 'uint16');
+        headerSize = 10;
+    end
+
+    FlightPlanStatus.timestamp = timestamp;
+    FlightPlanStatus.Status = double(fread(fid, 1, 'uint8'));
+    FlightPlanStatus.ErrorType = double(fread(fid, 1, 'uint8'));
+    FlightPlanStatus.ErrorFileID = double(fread(fid, 1, 'uint32'));
+    FlightPlanStatus.ErrorLineNum = double(fread(fid, 1, 'uint32'));
+    FlightPlanStatus.Debug = double(fread(fid, 1, 'float32'));
     % read CRC
     fread(fid, 1, 'uint8');
 end
@@ -1281,6 +1360,21 @@ function [SystemStats] = ReadSystemStatsObject(fid, timestamp)
     SystemStats.FlightTime = double(fread(fid, 1, 'uint32'));
     SystemStats.HeapRemaining = double(fread(fid, 1, 'uint16'));
     SystemStats.CPULoad = double(fread(fid, 1, 'uint8'));
+    % read CRC
+    fread(fid, 1, 'uint8');
+end
+
+function [TaskInfo] = ReadTaskInfoObject(fid, timestamp)
+    if 1
+        headerSize = 8;
+    else
+        TaskInfo.instanceID = fread(fid, 1, 'uint16');
+        headerSize = 10;
+    end
+
+    TaskInfo.timestamp = timestamp;
+    TaskInfo.StackRemaining = double(fread(fid, 13, 'uint16'));
+    TaskInfo.Running = double(fread(fid, 13, 'uint8'));
     % read CRC
     fread(fid, 1, 'uint8');
 end

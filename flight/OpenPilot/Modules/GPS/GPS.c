@@ -53,7 +53,7 @@ static void setHomeLocation(GPSPositionData * gpsData);
 // Private constants
 // Unfortunately need a good size stack for the WMM calculation
 #define STACK_SIZE_BYTES 1024
-#define TASK_PRIORITY (tskIDLE_PRIORITY + 3)
+#define TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 
 // Private types
 

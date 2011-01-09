@@ -53,7 +53,7 @@
 											  // must be updated if the FreeRTOS or compiler
 											  // optimisation options are changed.
 #define STACK_SIZE_BYTES 924
-#define TASK_PRIORITY (tskIDLE_PRIORITY+3)
+#define TASK_PRIORITY (tskIDLE_PRIORITY+2)
 
 #define HEAP_LIMIT_WARNING 4000
 #define HEAP_LIMIT_CRITICAL 1000

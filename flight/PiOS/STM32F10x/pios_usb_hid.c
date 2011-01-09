@@ -96,7 +96,6 @@ int32_t PIOS_USB_HID_Init(uint32_t mode)
 	/* Enable the USB Interrupts */
 	/* 2 bit for pre-emption priority, 2 bits for subpriority */
 	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	NVIC_InitStructure.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;

@@ -116,7 +116,7 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_BMP085_EOC_CLK                     RCC_APB2Periph_GPIOC
 #define PIOS_BMP085_EOC_EXTI_LINE               EXTI_Line15
 #define PIOS_BMP085_EOC_IRQn                    EXTI15_10_IRQn
-#define PIOS_BMP085_EOC_PRIO                    PIOS_IRQ_PRIO_HIGH
+#define PIOS_BMP085_EOC_PRIO                    PIOS_IRQ_PRIO_LOW
 //#define PIOS_BMP085_OVERSAMPLING                2
 #define PIOS_BMP085_OVERSAMPLING                3
 
@@ -353,7 +353,7 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
                                                 /* With an ADCCLK = 14 MHz and a sampling time of 293.5 cycles: */
                                                 /* Tconv = 239.5 + 12.5 = 252 cycles = 18?s */
                                                 /* (1 / (ADCCLK / CYCLES)) = Sample Time (?S) */
-#define PIOS_ADC_IRQ_PRIO                       PIOS_IRQ_PRIO_HIGH
+#define PIOS_ADC_IRQ_PRIO                       PIOS_IRQ_PRIO_MID
 
 //-------------------------
 // GPIO

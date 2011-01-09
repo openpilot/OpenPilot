@@ -66,8 +66,8 @@ void PIOS_SPEKTRUM_Init(void)
 
 	/* Configure interrupts */
 	NVIC_InitStructure.NVIC_IRQChannel = PIOS_SPEKTRUM_SUPV_IRQ_CHANNEL;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 

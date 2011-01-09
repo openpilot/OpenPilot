@@ -331,7 +331,7 @@ const struct pios_usart_cfg pios_usart_telem_cfg = {
     .handler = PIOS_USART_telem_irq_handler,
     .init    = {
       .NVIC_IRQChannel                   = USART2_IRQn,
-      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
       .NVIC_IRQChannelSubPriority        = 0,
       .NVIC_IRQChannelCmd                = ENABLE,
     },
@@ -378,7 +378,7 @@ const struct pios_usart_cfg pios_usart_gps_cfg = {
     .handler = PIOS_USART_gps_irq_handler,
     .init    = {
       .NVIC_IRQChannel                   = USART3_IRQn,
-      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
       .NVIC_IRQChannelSubPriority        = 0,
       .NVIC_IRQChannelCmd                = ENABLE,
     },
@@ -426,7 +426,7 @@ const struct pios_usart_cfg pios_usart_aux_cfg = {
     .handler = PIOS_USART_aux_irq_handler,
     .init    = {
       .NVIC_IRQChannel                   = USART1_IRQn,
-      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
       .NVIC_IRQChannelSubPriority        = 0,
       .NVIC_IRQChannelCmd                = ENABLE,
     },

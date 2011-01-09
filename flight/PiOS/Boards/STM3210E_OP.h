@@ -287,7 +287,7 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_SERVO_NUM_OUTPUTS                  8
 #define PIOS_SERVO_NUM_TIMERS                   PIOS_SERVO_NUM_OUTPUTS
 #define PIOS_SERVO_UPDATE_HZ                    50
-#define PIOS_SERVOS_INITIAL_POSITION            1500
+#define PIOS_SERVOS_INITIAL_POSITION            0 /* dont want to start motors, have no pulse till settings loaded */
 
 //-------------------------
 // ADC

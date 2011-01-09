@@ -3,9 +3,9 @@
 #
 
 ; Installer file name
-OutFile "OpenPilotGCS-XXXX-install.exe"
+!define OUT_FILE "OpenPilotGCS-XXXX-install.exe"
 
 ; Installer version info
-VIProductVersion "0.0.0.0"
-VIAddVersionKey "FileVersion" "0.0.0.0"
-VIAddVersionKey "Comments" "OpenPilot GCS Installer. Unknown product revision."
+!define PRODUCT_VERSION "0.0.0.0"
+!define FILE_VERSION "0.0.0.0"
+!define BUILD_DESCRIPTION "Unknown revision."

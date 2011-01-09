@@ -47,18 +47,26 @@
   ; Read automatically generated version info
   !include "OpenPilotGCS.nsh"
 
-; VIProductVersion "0.0.0.0"
-; VIAddVersionKey "FileVersion" "0.0.0.0"
-; VIAddVersionKey "Comments" "OpenPilot GCS Installer"
-  VIAddVersionKey "ProductName" "OpenPilot GCS Installer"
+; !define OUT_FILE "OpenPilotGCS-XXXX-install.exe"
+; !define PRODUCT_VERSION "0.0.0.0"
+; !define FILE_VERSION "0.0.0.0"
+; !define BUILD_DESCRIPTION "Unknown revision."
+
+  !define PRODUCT_NAME "OpenPilot GCS"
+  !define INSTALLER_NAME "OpenPilot GCS Installer"
+
+  VIProductVersion ${PRODUCT_VERSION}
+  VIAddVersionKey "ProductName" "${INSTALLER_NAME}"
+  VIAddVersionKey "FileVersion" ${FILE_VERSION}
+  VIAddVersionKey "Comments" "${INSTALLER_NAME}. ${BUILD_DESCRIPTION}"
   VIAddVersionKey "CompanyName" "The OpenPilot Team, http://www.openpilot.org"
-  VIAddVersionKey "LegalTrademarks" "OpenPilot GCS is a trademark of The OpenPilot Team"
+  VIAddVersionKey "LegalTrademarks" "${PRODUCT_NAME} is a trademark of The OpenPilot Team"
   VIAddVersionKey "LegalCopyright" "© 2010-2011 The OpenPilot Team"
-  VIAddVersionKey "FileDescription" "OpenPilot GCS Installer"
+  VIAddVersionKey "FileDescription" "${INSTALLER_NAME}"
 
   ; Program name and installer file
-  Name "OpenPilot GCS"
-; OutFile "OpenPilotGCS-1234-install.exe"
+  Name "${PRODUCT_NAME}"
+  OutFile "${OUT_FILE}"
 
 ;--------------------------------
 ; Misc options
@@ -181,10 +189,13 @@ SectionEnd
 
 Section "Shortcuts" InSecShortcuts
   ; Create desktop and start menu shortcuts
+  SetOutPath "$INSTDIR"
   CreateDirectory "$SMPROGRAMS\OpenPilot"
-  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot GCS.lnk" "$INSTDIR\bin\openpilotgcs.exe" "" "$INSTDIR\bin\openpilotgcs.exe" 0
+  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot GCS.lnk" "$INSTDIR\bin\openpilotgcs.exe" \
+	"" "$INSTDIR\bin\openpilotgcs.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
+  CreateShortCut "$DESKTOP\OpenPilot GCS.lnk" "$INSTDIR\bin\openpilotgcs.exe" \
+  	"" "$INSTDIR\bin\openpilotgcs.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
   CreateShortCut "$SMPROGRAMS\OpenPilot\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
-  CreateShortCut "$DESKTOP\OpenPilot GCS.lnk" "$INSTDIR\bin\openpilotgcs.exe" "" "$INSTDIR\bin\openpilotgcs.exe" 0
 SectionEnd
 
 Section ; create uninstall info

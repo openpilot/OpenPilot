@@ -161,8 +161,12 @@ void DialGadgetWidget::updateNeedle1(UAVObject *object1) {
         if(haveSubField1){
             int indexOfSubField = field->getElementNames().indexOf(QRegExp(subfield1, Qt::CaseSensitive, QRegExp::FixedString));
             value = field->getDouble(indexOfSubField);
-        }else
+        } else
             value = field->getDouble();
+        if (value != value) {
+            qDebug() << "Dial widget: encountered NaN !!";
+            return;
+        }
         setNeedle1(value);
     } else {
         qDebug() << "Wrong field, maybe an issue with object disconnection ?";
@@ -179,8 +183,12 @@ void DialGadgetWidget::updateNeedle2(UAVObject *object2) {
         if(haveSubField2){
             int indexOfSubField = field->getElementNames().indexOf(QRegExp(subfield2, Qt::CaseSensitive, QRegExp::FixedString));
             value = field->getDouble(indexOfSubField);
-        }else
+        } else
             value = field->getDouble();
+        if (value != value) {
+            qDebug() << "Dial widget: encountered NaN !!";
+            return;
+        }
         setNeedle2(value);
     } else {
         qDebug() << "Wrong field, maybe an issue with object disconnection ?";
@@ -197,8 +205,12 @@ void DialGadgetWidget::updateNeedle3(UAVObject *object3) {
         if(haveSubField3){
             int indexOfSubField = field->getElementNames().indexOf(QRegExp(subfield3, Qt::CaseSensitive, QRegExp::FixedString));
             value = field->getDouble(indexOfSubField);
-        }else
+        } else
             value = field->getDouble();
+        if (value != value) {
+            qDebug() << "Dial widget: encountered NaN !!";
+            return;
+        }
         setNeedle3(value);
     } else {
         qDebug() << "Wrong field, maybe an issue with object disconnection ?";

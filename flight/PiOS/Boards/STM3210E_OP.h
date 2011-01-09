@@ -353,7 +353,7 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
                                                 /* With an ADCCLK = 14 MHz and a sampling time of 293.5 cycles: */
                                                 /* Tconv = 239.5 + 12.5 = 252 cycles = 18?s */
                                                 /* (1 / (ADCCLK / CYCLES)) = Sample Time (?S) */
-#define PIOS_ADC_IRQ_PRIO                       PIOS_IRQ_PRIO_MID
+#define PIOS_ADC_IRQ_PRIO                       PIOS_IRQ_PRIO_LOW
 
 //-------------------------
 // GPIO

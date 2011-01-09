@@ -1,0 +1,120 @@
+==========================
+The Windows Sample Project
+==========================
+
+:Author:    Tyler Wilson, based on Desktop by Dean Hall
+:Id:        $Id: README 467 2010-03-26 16:18:49Z bjones460 $
+
+Purpose
+-------
+
+This is a sample project that demonstrates running interactive Python-on-a-chp on the
+Windows desktop. This differs from the POSIX version in platform 'desktop' (which is also
+used for cygwin builds).
+
+
+Building the Project
+--------------------
+
+The windows files are now checked directly into the Python-on-a-chip subversion trunk.
+
+ 
+
+Visual C++ 2008 or 2010 Express Edition
+---------------------------------------
+
+- I used a simple .bat file to generate the needed _img.c and _nat.c files. This is py2c.bat. Run this
+  before loading or building via the solution file.
+  
+  This is now included as a Pre-Build step in the VS solution files, so running the .bat file is not needed.
+ 
+ 
+- Start Visual C++ 2008 or 2010 Express Edition IDE. Open the src\platform\windows\pymiteVS2008.sln or src\platform\windows\pymiteVS2010.sln file.
+
+
+- Build. If successful, go to the next step. If not, send a message to the Python-on-a-chip Google
+  Groups mailing list.
+
+
+- In src\tools\ipm.py, change the PMVM_EXE line to this:
+ 
+  PMVM_EXE = "../platform/windows/main.exe"
+
+
+- Open a command prompt, cd to <python-on-a-chip>\src\tools, and perform the execute the following command:
+ 
+  python ipm.py --desktop
+
+
+- Go back to Visual Studio, and select Debug. This will attach to the main.exe that was executed in the
+  step above. You can set breakpoints, watch variables, etc..
+ 
+ 
+
+SCons
+-----
+
+- Open a regular command prop or "Visual Studio <version> Command Prompt". The VS Command Prompt
+  is located under the Tools section in the start menu. Recent versions (check which ones!) of 
+  scons should detect the proper PATH, INCLUDE and LIB values from the Registry.
+  
+
+- 'cd' to the root of the pymite directory.
+
+
+- Type 'scons PLATFORM=windows' at the prompt and press <Enter>. Everything should build, and a
+  main.exe created in the src\platform\windows directory
+  
+
+  Alternative, if you want to build directly from the platform/windows directory, you can use 'scons
+  PLATFORM=windows -u' to build. This will search up the directory tree for the 'master' SConstruct file.
+  
+
+- cd to the src/tools directory. In the ipm.py file, you will need to change the PMVM_EXE value to:
+
+  PMVM_EXE = "../platform/windows/main.exe"
+  
+
+- Now simply type 'python ipm.py -f ../platform/windows/pmfeatures.py --desktop' and <Enter> and you should be able to do all the standard
+  PyMite things.
+  
+  
+
+Make
+----
+
+- Note there is no make or nmake Makefile to build. You can use msbuild to build the Visual Studio
+  Project directly instead.
+  
+  
+  
+TODO
+----
+
+- Instead of the py2c.bat file, use a custom build step in the Visual Studio IDE. DONE
+ 
+ 
+- Get the VS Solution and SCons x64 builds working. That is, build native x64 versions of PyMite.
+ 
+ 
+- Add some simple Windows-specific extensions to test from within ipm.
+ 
+
+
+Version History
+---------------
+
+- Added a local windows stdint.h. This allows us to use the core vm source code
+  as-is for the Windows build. This could have issues if you try to build with MinGW
+  or other compiler set. Also, will likely break in VS2010, since they should be including
+  a stdint.h.
+  
+- I used the new pm_features.h to add the needed defines for snprintf. The __DEBUG__ to _DEBUG
+  should also be there too.
+
+- Found the magic TARGET_ARCH flag to scons that cleans up the windows SConscipt file quite a bit. This
+  fixes the issues I was having trying to build the x86 version on an x64 host, without having the x64
+  tools installed. (The scons folks marked this bug as-is [scons versions 2.0 and above fixed this I believe).
+  
+  
+.. :mode=rest:

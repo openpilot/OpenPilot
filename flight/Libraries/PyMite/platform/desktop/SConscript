@@ -1,0 +1,21 @@
+Import("vars")
+
+vars.Add("IPM", "Add the interactive library to the standard lib", True)
+
+CFLAGS = "-Os -Wall -gstabs -Wstrict-prototypes -Werror"
+if "DEBUG" in vars.args.keys():
+    CFLAGS = "-g -ggdb -D__DEBUG__=1 " + CFLAGS
+SOURCES = ["main.c", "plat.c"]
+PY_SOURCES = ["main.py"]
+PM_LIB_ROOT = ["pmvm_%s" % vars.args["PLATFORM"]]
+
+env = Environment(variables = vars,
+                  CPPPATH = ["#src/vm", "#src/platform/desktop"],
+                  CCFLAGS = CFLAGS)
+
+vmlib = SConscript(["../../vm/SConscript"], ["env", "vars"])
+img_sources = Command(["main_img.c", "main_nat.c"], [PY_SOURCES],
+    "src/tools/pmImgCreator.py -c -u -o src/platform/desktop/main_img.c" \
+    " --native-file=src/platform/desktop/main_nat.c $SOURCES")
+main = env.Program("main.out", SOURCES + img_sources,
+                   LIBS = PM_LIB_ROOT, LIBPATH = ["../../vm"])

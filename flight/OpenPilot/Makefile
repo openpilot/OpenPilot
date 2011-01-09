@@ -119,16 +119,16 @@ RTOSINCDIR = $(RTOSSRCDIR)/include
 DOXYGENDIR = ../Doc/Doxygen
 AHRSBOOTLOADER = ../Bootloaders/AHRS/
 AHRSBOOTLOADERINC = $(AHRSBOOTLOADER)/inc
-#PYMITE = $(FLIGHTLIB)/PyMite
-#PYMITELIB = $(PYMITE)/lib
-#PYMITEPLAT = $(PYMITE)/platform/openpilot
-#PYMITETOOLS = $(PYMITE)/tools
-#PYMITEVM = $(PYMITE)/vm
-#PYMITEINC = $(PYMITEVM)
-#PYMITEINC += $(PYMITEPLAT)
-#PYMITEINC += $(OUTDIR)
-#FLIGHTPLANLIB = $(OPMODULEDIR)/FlightPlan/lib
-#FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
+PYMITE = $(FLIGHTLIB)/PyMite
+PYMITELIB = $(PYMITE)/lib
+PYMITEPLAT = $(PYMITE)/platform/openpilot
+PYMITETOOLS = $(PYMITE)/tools
+PYMITEVM = $(PYMITE)/vm
+PYMITEINC = $(PYMITEVM)
+PYMITEINC += $(PYMITEPLAT)
+PYMITEINC += $(OUTDIR)
+FLIGHTPLANLIB = $(OPMODULEDIR)/FlightPlan/lib
+FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
@@ -197,6 +197,9 @@ SRC += $(OPUAVOBJ)/ratedesired.c
 SRC += $(OPUAVOBJ)/pipxtrememodemsettings.c
 SRC += $(OPUAVOBJ)/pipxtrememodemstatus.c
 SRC += $(OPUAVOBJ)/batterysettings.c
+SRC += $(OPUAVOBJ)/flightplancontrol.c
+SRC += $(OPUAVOBJ)/flightplanstatus.c
+SRC += $(OPUAVOBJ)/flightplansettings.c
 SRC += $(OPUAVOBJ)/taskinfo.c
 endif
 
@@ -294,7 +297,10 @@ SRC += $(AHRSBOOTLOADER)/ahrs_spi_program.c
 ## PyMite files
 #SRC += $(wildcard ${PYMITEVM}/*.c)
 #SRC += $(wildcard ${PYMITEPLAT}/*.c)
-#SRC += $(wildcard ${OUTDIR}/pmlib*.c)
+#SRC += $(OUTDIR)/pmlib_img.c
+#SRC += $(OUTDIR)/pmlib_nat.c
+#SRC += $(OUTDIR)/pmlibusr_img.c
+#SRC += $(OUTDIR)/pmlibusr_nat.c
 
 ## Mass Storage Device
 #SRC += $(MSDDIR)/msd.c
@@ -353,7 +359,7 @@ EXTRAINCDIRS  += $(RTOSINCDIR)
 EXTRAINCDIRS  += $(APPLIBDIR)
 EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/ARM_CM3
 EXTRAINCDIRS  += $(AHRSBOOTLOADERINC)
-#EXTRAINCDIRS  += $(PYMITEINC)
+EXTRAINCDIRS  += $(PYMITEINC)
 
 EXTRAINCDIRS += ${foreach MOD, ${MODULES}, Modules/${MOD}/inc} ${OPMODULEDIR}/System/inc
 
@@ -557,7 +563,7 @@ MSG_CLEANING = ${quote}Cleaning project:${quote}
 MSG_FORMATERROR = ${quote}Can not handle output-format${quote}
 MSG_ASMFROMC = ${quote}Creating asm-File from C-Source:${quote}
 MSG_ASMFROMC_ARM = ${quote}Creating asm-File from C-Source (ARM-only):${quote}
-#MSG_PYMITEINIT = ${quote}**** Generating PyMite intermediate code${quote}
+MSG_PYMITEINIT = ${quote}**** Generating PyMite intermediate code${quote}
 
 # List of all source files.
 ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)

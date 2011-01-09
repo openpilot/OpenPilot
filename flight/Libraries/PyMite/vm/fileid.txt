@@ -1,0 +1,36 @@
+===== =======================================
+ID    FILE
+===== =======================================
+0x01  codeobj.c
+0x02  dict.c
+0x03  frame.c
+0x04  func.c
+0x05  global.c
+0x06  heap.c
+0x07  img.c
+0x08  int.c
+0x09  interp.c
+0x0A  pmstdlib_nat.c
+0x0B  list.c
+0x0C  main.c
+0x0D  mem.c
+0x0E  module.c
+0x0F  obj.c
+0x10  seglist.c
+0x11  sli.c
+0x12  strobj.c
+0x13  tuple.c
+0x14  seq.c
+0x15  pm.c
+0x16  thread.c
+0x17  float.c
+0x18  class.c
+0x19  bytearray.c
+----- ---------------------------------------
+0x70  RESERVED FOR PLATFORM-SPECIFIC FILES
+0x7F
+----- ---------------------------------------
+0x90  utest.c
+0x92  ut_dict.c
+0x9B  ut_list.c
+===== =======================================

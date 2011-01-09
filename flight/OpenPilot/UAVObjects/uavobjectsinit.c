@@ -41,6 +41,9 @@
 #include "batterysettings.h"
 #include "firmwareiapobj.h"
 #include "flightbatterystate.h"
+#include "flightplancontrol.h"
+#include "flightplansettings.h"
+#include "flightplanstatus.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "gpsposition.h"
@@ -88,6 +91,9 @@ void UAVObjectsInitializeAll()
     BatterySettingsInitialize();
     FirmwareIAPObjInitialize();
     FlightBatteryStateInitialize();
+    FlightPlanControlInitialize();
+    FlightPlanSettingsInitialize();
+    FlightPlanStatusInitialize();
     FlightTelemetryStatsInitialize();
     GCSTelemetryStatsInitialize();
     GPSPositionInitialize();

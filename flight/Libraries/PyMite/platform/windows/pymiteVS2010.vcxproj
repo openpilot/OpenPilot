@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{95D2BB14-A2AD-4CB9-8AEF-EE5F5F9A3C60}</ProjectGuid>
+    <RootNamespace>pymite</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\vm;..\..\platform\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <OutputFile>main$(TargetExt)</OutputFile>
+    </Link>
+    <PreBuildEvent>
+      <Command>python ../../tools/pmGenPmFeatures.py pmfeatures.py &gt; pmfeatures.h
+python ../../tools/pmImgCreator.py -c -s -f pmfeatures.py -o ../../vm/pmstdlib_img.c --native-file=../../vm/pmstdlib_nat.c ../../lib/ipm.py ../../lib/list.py ../../lib/dict.py ../../lib/__bi.py ../../lib/sys.py ../../lib/string.py
+python ../../tools/pmImgCreator.py -c -u -f pmfeatures.py -o main_img.c --native-file=main_nat.c main.py</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\..\vm;..\..\platform\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <OutputFile>main$(TargetExt)</OutputFile>
+    </Link>
+    <PreBuildEvent>
+      <Command>python ../../tools/pmGenPmFeatures.py pmfeatures.py &gt; pmfeatures.h
+python ../../tools/pmImgCreator.py -c -s -f pmfeatures.py -o ../../vm/pmstdlib_img.c --native-file=../../vm/pmstdlib_nat.c ../../lib/ipm.py ../../lib/list.py ../../lib/dict.py ../../lib/__bi.py ../../lib/sys.py ../../lib/string.py
+python ../../tools/pmImgCreator.py -c -u -f pmfeatures.py -o main_img.c --native-file=main_nat.c main.py</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\vm\class.c" />
+    <ClCompile Include="..\..\vm\codeobj.c" />
+    <ClCompile Include="..\..\vm\dict.c" />
+    <ClCompile Include="..\..\vm\float.c" />
+    <ClCompile Include="..\..\vm\frame.c" />
+    <ClCompile Include="..\..\vm\func.c" />
+    <ClCompile Include="..\..\vm\global.c" />
+    <ClCompile Include="..\..\vm\heap.c" />
+    <ClCompile Include="..\..\vm\img.c" />
+    <ClCompile Include="..\..\vm\int.c" />
+    <ClCompile Include="..\..\vm\interp.c" />
+    <ClCompile Include="..\..\vm\list.c" />
+    <ClCompile Include="..\..\vm\mem.c" />
+    <ClCompile Include="..\..\vm\module.c" />
+    <ClCompile Include="..\..\vm\obj.c" />
+    <ClCompile Include="..\..\vm\pm.c" />
+    <ClCompile Include="..\..\vm\seglist.c" />
+    <ClCompile Include="..\..\vm\seq.c" />
+    <ClCompile Include="..\..\vm\sli.c" />
+    <ClCompile Include="..\..\vm\strobj.c" />
+    <ClCompile Include="..\..\vm\thread.c" />
+    <ClCompile Include="..\..\vm\tuple.c" />
+    <ClCompile Include="plat.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="main_img.c" />
+    <ClCompile Include="main_nat.c" />
+    <ClCompile Include="..\..\vm\pmstdlib_img.c" />
+    <ClCompile Include="..\..\vm\pmstdlib_nat.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\vm\pm.h" />
+    <ClInclude Include="pmfeatures.h" />
+    <ClInclude Include="stdint.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

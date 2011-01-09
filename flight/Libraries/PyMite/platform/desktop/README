@@ -1,0 +1,39 @@
+====================
+The Desktop Platform
+====================
+
+:Author:    Dean Hall
+:Id:        $Id: README 645 2010-10-18 12:27:57Z dwhall256 $
+
+Purpose
+-------
+
+This is a sample project that demonstrates running Python-on-a-Chip on the
+desktop.  Any POSIX-compliant OS should work (Mac OS X, Linux, Cygwin).
+
+
+Building the Project
+--------------------
+
+Start with a clean source tree.
+
+If you are running on a 64-bit processor, you will need to increase the
+heap size by editing ``src/platform/desktop/plat.h`` near line 18 to set
+``PM_HEAP_SIZE`` to a value ``0x4000`` or larger that is a multiple of four::
+
+    #define PM_HEAP_SIZE 0x4000
+
+The desktop is the default platform of the makefile build system,
+so typing ``make`` in the root directory will build for the desktop::
+
+    $ make
+
+The default application is to run the interactive prompt, ipm.  
+To run the host-side of ipm and launch the target-side type::
+
+    $ make ipm
+
+Read ``docs/src/InteractivePyMite.txt`` to learn how to run ipm.
+
+
+.. :mode=rest:

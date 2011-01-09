@@ -1,0 +1,41 @@
+# to get the Python executable path
+import sys
+
+# pulls in the variables set in the 'master' SConstruct file
+Import("vars")
+
+# these should match up with the source code
+vars.Add("HEAP_SIZE", "Size of the VM's heap.", 0x2000)
+vars.Add("IPM", "Add the interactive library to the standard lib", True)
+
+CFLAGS = "/DHEAP_SIZE=$HEAP_SIZE /D_CONSOLE"
+if "DEBUG" in vars.args.keys():
+    CFLAGS = "-D_DEBUG=1 " + CFLAGS
+SOURCES = ["main.c", "plat.c"]
+PY_SOURCES = ["main.py"]
+PM_LIB_ROOT = ["pmvm_%s" % vars.args["PLATFORM"], "user32"]	# should scons include the user32?
+
+
+env = Environment(variables = vars,
+	CPPPATH = ["#src/vm", "#src/platform/%s" % vars.args["PLATFORM"]],
+	TARGET_ARCH='x86') # this is the 'magic' that I have been looking for for a long time...
+
+# debug
+#print env.Dump()
+
+vmlib = SConscript(["../../vm/SConscript"], ["env", "vars"])
+
+pmfeatures = env.Command(["pmfeatures.h"], ["pmfeatures.py"], 
+    "%s src/tools/pmGenPmFeatures.py $SOURCE > $TARGET" % sys.executable)
+
+img_sources = env.Command(["main_img.c", "main_nat.c"], [PY_SOURCES],
+    "%s src/tools/pmImgCreator.py -f src/platform/windows/pmfeatures.py " \
+    "-c -u -o src/platform/%s/main_img.c " \
+    "--native-file=src/platform/%s/main_nat.c $SOURCES" %
+    	(sys.executable, vars.args["PLATFORM"], vars.args["PLATFORM"]))
+
+
+main = env.Program("main.exe",
+		SOURCES + img_sources,
+		LIBS = PM_LIB_ROOT,
+		LIBPATH = ["../../vm"])

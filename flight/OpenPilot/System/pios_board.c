@@ -252,7 +252,7 @@ const struct pios_spi_cfg pios_spi_ahrs_cfg = {
     .gpio = GPIOB,
     .init = {
       .GPIO_Pin   = GPIO_Pin_12,
-      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Speed = GPIO_Speed_10MHz,
       .GPIO_Mode  = GPIO_Mode_Out_PP,
     },
   },
@@ -260,7 +260,7 @@ const struct pios_spi_cfg pios_spi_ahrs_cfg = {
     .gpio = GPIOB,
     .init = {
       .GPIO_Pin   = GPIO_Pin_13,
-      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Speed = GPIO_Speed_10MHz,
       .GPIO_Mode  = GPIO_Mode_AF_PP,
     },
   },
@@ -268,7 +268,7 @@ const struct pios_spi_cfg pios_spi_ahrs_cfg = {
     .gpio = GPIOB,
     .init = {
       .GPIO_Pin   = GPIO_Pin_14,
-      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Speed = GPIO_Speed_10MHz,
       .GPIO_Mode  = GPIO_Mode_IN_FLOATING,
     },
   },
@@ -276,7 +276,7 @@ const struct pios_spi_cfg pios_spi_ahrs_cfg = {
     .gpio = GPIOB,
     .init = {
       .GPIO_Pin   = GPIO_Pin_15,
-      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Speed = GPIO_Speed_10MHz,
       .GPIO_Mode  = GPIO_Mode_AF_PP,
     },
   },

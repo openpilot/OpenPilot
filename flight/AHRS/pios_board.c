@@ -35,10 +35,8 @@
  * .rodata section (ie. Flash) rather than in the .bss section (RAM).
  */
 void PIOS_SPI_op_irq_handler(void);
-void DMA1_Channel5_IRQHandler()
-    __attribute__ ((alias("PIOS_SPI_op_irq_handler")));
-void DMA1_Channel4_IRQHandler()
-    __attribute__ ((alias("PIOS_SPI_op_irq_handler")));
+void DMA1_Channel5_IRQHandler() __attribute__ ((alias("PIOS_SPI_op_irq_handler")));
+void DMA1_Channel4_IRQHandler() __attribute__ ((alias("PIOS_SPI_op_irq_handler")));
 static const struct pios_spi_cfg pios_spi_op_cfg = {
 	.regs = SPI2,
 	.init = {
@@ -62,8 +60,7 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
 			 DMA1_FLAG_GL4),
 			.init = {
 				 .NVIC_IRQChannel = DMA1_Channel4_IRQn,
-				 .NVIC_IRQChannelPreemptionPriority =
-				 PIOS_IRQ_PRIO_HIGH,
+				 .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
 				 .NVIC_IRQChannelSubPriority = 0,
 				 .NVIC_IRQChannelCmd = ENABLE,
 				 },
@@ -110,7 +107,7 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
 		 .gpio = GPIOB,
 		 .init = {
 			  .GPIO_Pin = GPIO_Pin_12,
-			  .GPIO_Speed = GPIO_Speed_50MHz,
+			  .GPIO_Speed = GPIO_Speed_10MHz,
 			  .GPIO_Mode = GPIO_Mode_IN_FLOATING,
 			  },
 		 },
@@ -118,7 +115,7 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
 		 .gpio = GPIOB,
 		 .init = {
 			  .GPIO_Pin = GPIO_Pin_13,
-			  .GPIO_Speed = GPIO_Speed_50MHz,
+			  .GPIO_Speed = GPIO_Speed_10MHz,
 			  .GPIO_Mode = GPIO_Mode_IN_FLOATING,
 			  },
 		 },
@@ -126,7 +123,7 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
 		 .gpio = GPIOB,
 		 .init = {
 			  .GPIO_Pin = GPIO_Pin_14,
-			  .GPIO_Speed = GPIO_Speed_50MHz,
+			  .GPIO_Speed = GPIO_Speed_10MHz,
 			  .GPIO_Mode = GPIO_Mode_AF_PP,
 			  },
 		 },
@@ -134,7 +131,7 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
 		 .gpio = GPIOB,
 		 .init = {
 			  .GPIO_Pin = GPIO_Pin_15,
-			  .GPIO_Speed = GPIO_Speed_50MHz,
+			  .GPIO_Speed = GPIO_Speed_10MHz,
 			  .GPIO_Mode = GPIO_Mode_IN_FLOATING,
 			  },
 		 },
@@ -187,8 +184,7 @@ const struct pios_usart_cfg pios_usart_aux_cfg = {
 		.handler = PIOS_USART_aux_irq_handler,
 		.init = {
 			 .NVIC_IRQChannel = USART3_IRQn,
-			 .NVIC_IRQChannelPreemptionPriority =
-			 PIOS_IRQ_PRIO_HIGH,
+			 .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
 			 .NVIC_IRQChannelSubPriority = 0,
 			 .NVIC_IRQChannelCmd = ENABLE,
 			 },

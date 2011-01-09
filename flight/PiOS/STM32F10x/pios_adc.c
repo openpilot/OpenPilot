@@ -187,17 +187,21 @@ void DMA1_Channel1_IRQHandler(void)
 {
 	int32_t i;
 	uint16_t *src_ptr;
-
+	
+	bool bad_xfr = DMA_GetFlagStatus(DMA1_FLAG_TE1);
+	
 	/* Clear the pending flag(s) */
 	DMA_ClearFlag(DMA1_FLAG_TC1 | DMA1_FLAG_TE1 | DMA1_FLAG_HT1 | DMA1_FLAG_GL1);
 
 	src_ptr = (uint16_t *) adc_conversion_values;
 
-	/* Copy conversion values to adc_pin_values */
-	for (i = 0; i < PIOS_ADC_NUM_CHANNELS; ++i) {
-		/* Takeover new value */
-		adc_pin_values[i] = *src_ptr;
-		++src_ptr;
+	if(! bad_xfr ) {
+		/* Copy conversion values to adc_pin_values */
+		for (i = 0; i < PIOS_ADC_NUM_CHANNELS; ++i) {
+			/* Takeover new value */
+			adc_pin_values[i] = *src_ptr;
+			++src_ptr;
+		}
 	}
 
 	/* Request next conversion */

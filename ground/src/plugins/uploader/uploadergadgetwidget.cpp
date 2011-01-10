@@ -229,6 +229,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             log("Could not enter DFU mode.");
             delete dfu;
             dfu = NULL;
+            cnx->resumePolling();
             return;
         }
         dfu->AbortOperation();
@@ -237,6 +238,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             log("Could not enter DFU mode.");
             delete dfu;
             dfu = NULL;
+            cnx->resumePolling();
             return;
         }
         //dfu.StatusRequest();
@@ -244,6 +246,9 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
         if (dfu->numberOfDevices < 0 || dfu->numberOfDevices > 3) {
             log("Inconsistent number of devices! Aborting");
+            delete dfu;
+            dfu = NULL;
+            cnx->resumePolling();
             return;
         }
         // Delete all previous tabs:
@@ -259,11 +264,9 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             dw->populate();
             m_config->systemElements->addTab(dw, QString("Device") + QString::number(i));
         }
-        /*  (done already by autopilot disconnect signal)
         m_config->haltButton->setEnabled(false);
         m_config->resetButton->setEnabled(false);
         m_config->bootButton->setEnabled(true);
-        */
         m_config->telemetryLink->setEnabled(false);
         m_config->rescueButton->setEnabled(false);
         if (resetOnly) {

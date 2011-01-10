@@ -151,9 +151,9 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         fwIAP->getField("Command")->setValue("1122");
         connect(fwIAP,SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
         currentStep = IAP_STATE_STEP_1;
-        fwIAP->updated();
         clearLog();
         log(QString("IAP Step 1"));
+        fwIAP->updated();
         break;
     case IAP_STATE_STEP_1:
         if (!success)  {
@@ -166,8 +166,8 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         delay::msleep(600);
         fwIAP->getField("Command")->setValue("2233");
         currentStep = IAP_STATE_STEP_2;
-        fwIAP->updated();
         log(QString("IAP Step 2"));
+        fwIAP->updated();
         break;
     case IAP_STATE_STEP_2:
         if (!success) {
@@ -180,8 +180,8 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         delay::msleep(600);
         fwIAP->getField("Command")->setValue("3344");
         currentStep = IAP_STEP_RESET;
-        fwIAP->updated();
         log(QString("IAP Step 3"));
+        fwIAP->updated();
         break;
     case IAP_STEP_RESET:
     {
@@ -217,22 +217,35 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         // Tell the mainboard to get into bootloader state:
         log("Detecting devices, please wait 3 seconds...");
         this->repaint();
-           delay::msleep(3100); // Required to let the board settle
+        delay::msleep(3100); // Required to let the board settle
         if (!dfu) {
             if (dlj.startsWith("USB"))
                 dfu = new DFUObject(DFU_DEBUG, false, QString());
             else
                 dfu = new DFUObject(DFU_DEBUG,true, getPortDevice(dli));
         }
+        if (!dfu->ready())
+        {
+            log("Could not enter DFU mode.");
+            delete dfu;
+            dfu = NULL;
+            return;
+        }
         dfu->AbortOperation();
         if(!dfu->enterDFU(0))
         {
             log("Could not enter DFU mode.");
+            delete dfu;
+            dfu = NULL;
             return;
         }
         //dfu.StatusRequest();
         dfu->findDevices();
         log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
+        if (dfu->numberOfDevices < 0 || dfu->numberOfDevices > 3) {
+            log("Inconsistent number of devices! Aborting");
+            return;
+        }
         // Delete all previous tabs:
         while (m_config->systemElements->count()) {
              QWidget *qw = m_config->systemElements->widget(0);
@@ -340,7 +353,6 @@ void UploaderGadgetWidget::systemBoot()
     log("You can now reconnect telemetry...");
     delete dfu; // Frees up the USB/Serial port too
     dfu = NULL;
-
 }
 
 /**
@@ -369,6 +381,7 @@ void UploaderGadgetWidget::systemRescue()
             delete dfu;
             dfu = NULL;
         }
+        // Now we're good to go:
         clearLog();
         log("**********************************************************");
         log("** Follow those instructions to attempt a system rescue **");

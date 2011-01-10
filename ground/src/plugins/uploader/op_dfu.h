@@ -120,6 +120,7 @@ namespace OP_DFU {
         OP_DFU::Status StatusRequest();
         bool EndOperation();
         int AbortOperation(void);
+        bool ready() { return mready; }
 
         // Upload (send to device) commands
         OP_DFU::Status UploadDescription(QString description);

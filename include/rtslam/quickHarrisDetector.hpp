@@ -16,6 +16,15 @@
 
 #include "rtslam/featurePoint.hpp"
 
+
+/*
+ * STATUS: in progress, do not use for now
+ * Approximate a gaussian mask with integral images, in order to
+ * improve precision (getting points closer to the real corner).
+ * Disabled for now because it hasn't proved to be really more efficient.
+ */
+#define GAUSSIAN_MASK_APPROX 0
+
 namespace jafar{
 	namespace rtslam{
 
@@ -39,7 +48,12 @@ namespace jafar{
 		 */
 		class QuickHarrisDetector {
       public:
-        QuickHarrisDetector(int convolutionBoxSize = 5, float threshold = 15.0, float edge = 2.0);
+        QuickHarrisDetector(int convolutionBoxSize = 5, float threshold = 15.0, float edge = 2.0
+#if GAUSSIAN_MASK_APPROX
+          , int convolutionGaussianApproxCoeffsNumber = 3
+#endif
+          );
+        ~QuickHarrisDetector();
         virtual bool detectIn(image::Image const& image, feat_img_pnt_ptr_t featPtr, const image::ConvexRoi * roiPtr = 0 );
       private:
         void quickDerivatives(const image::Image & image, image::ConvexRoi & roi);
@@ -58,6 +72,19 @@ namespace jafar{
         };
         HQuickData* m_quickData; // integral image for quick detector.
 
+			private:
+				double normCoeff;
+				int m_nConvCoeffs;
+				int shift_conv;
+				int *shift_convs;
+				int *convCoeffs;
+				int nConvCoeffs;
+				bool nConvCoeffsCenter;
+
+				HQuickData** int_upLeft;
+				HQuickData** int_upRight;
+				HQuickData** int_downLeft;
+				HQuickData** int_downRight;
 		};
 	}
 }

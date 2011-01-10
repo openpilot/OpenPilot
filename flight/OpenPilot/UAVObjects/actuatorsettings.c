@@ -120,6 +120,22 @@ static void setDefaults(UAVObjHandle obj, uint16_t instId)
 	data.ChannelMin[5] = 1000;
 	data.ChannelMin[6] = 1000;
 	data.ChannelMin[7] = 1000;
+	data.ChannelType[0] = 0;
+	data.ChannelType[1] = 0;
+	data.ChannelType[2] = 0;
+	data.ChannelType[3] = 0;
+	data.ChannelType[4] = 0;
+	data.ChannelType[5] = 0;
+	data.ChannelType[6] = 0;
+	data.ChannelType[7] = 0;
+	data.ChannelAddr[0] = 0;
+	data.ChannelAddr[1] = 1;
+	data.ChannelAddr[2] = 2;
+	data.ChannelAddr[3] = 3;
+	data.ChannelAddr[4] = 4;
+	data.ChannelAddr[5] = 5;
+	data.ChannelAddr[6] = 6;
+	data.ChannelAddr[7] = 7;
 
 	UAVObjSetInstanceData(obj, instId, &data);
 

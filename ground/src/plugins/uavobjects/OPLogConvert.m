@@ -4,6 +4,9 @@ function [] = OPLogConvert()
     actuatorcommandIdx = 1;
     ActuatorCommand.timestamp = 0;
     ActuatorCommand(1).Channel = zeros(1,8);
+    ActuatorCommand(1).UpdateTime = 0;
+    ActuatorCommand(1).MaxUpdateTime = 0;
+    ActuatorCommand(1).NumFailedUpdates = 0;
 
     actuatordesiredIdx = 1;
     ActuatorDesired.timestamp = 0;
@@ -34,6 +37,8 @@ function [] = OPLogConvert()
     ActuatorSettings(1).ChannelMax = zeros(1,8);
     ActuatorSettings(1).ChannelNeutral = zeros(1,8);
     ActuatorSettings(1).ChannelMin = zeros(1,8);
+    ActuatorSettings(1).ChannelType = zeros(1,8);
+    ActuatorSettings(1).ChannelAddr = zeros(1,8);
 
     ahrscalibrationIdx = 1;
     AHRSCalibration.timestamp = 0;
@@ -453,13 +458,13 @@ function [] = OPLogConvert()
         
         %% Read object
         switch objID
-            case 3909877022
+            case 3907024856
                 ActuatorCommand(actuatorcommandIdx) = ReadActuatorCommandObject(fid, timestamp);
                 actuatorcommandIdx = actuatorcommandIdx + 1;
             case 3562104706
                 ActuatorDesired(actuatordesiredIdx) = ReadActuatorDesiredObject(fid, timestamp);
                 actuatordesiredIdx = actuatordesiredIdx + 1;
-            case 3054509114
+            case 844831578
                 ActuatorSettings(actuatorsettingsIdx) = ReadActuatorSettingsObject(fid, timestamp);
                 actuatorsettingsIdx = actuatorsettingsIdx + 1;
             case 806362034
@@ -611,6 +616,9 @@ function [ActuatorCommand] = ReadActuatorCommandObject(fid, timestamp)
 
     ActuatorCommand.timestamp = timestamp;
     ActuatorCommand.Channel = double(fread(fid, 8, 'int16'));
+    ActuatorCommand.UpdateTime = double(fread(fid, 1, 'uint8'));
+    ActuatorCommand.MaxUpdateTime = double(fread(fid, 1, 'uint8'));
+    ActuatorCommand.NumFailedUpdates = double(fread(fid, 1, 'uint8'));
     % read CRC
     fread(fid, 1, 'uint8');
 end
@@ -661,6 +669,8 @@ function [ActuatorSettings] = ReadActuatorSettingsObject(fid, timestamp)
     ActuatorSettings.ChannelMax = double(fread(fid, 8, 'int16'));
     ActuatorSettings.ChannelNeutral = double(fread(fid, 8, 'int16'));
     ActuatorSettings.ChannelMin = double(fread(fid, 8, 'int16'));
+    ActuatorSettings.ChannelType = double(fread(fid, 8, 'uint8'));
+    ActuatorSettings.ChannelAddr = double(fread(fid, 8, 'uint8'));
     % read CRC
     fread(fid, 1, 'uint8');
 end

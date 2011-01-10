@@ -92,6 +92,9 @@
 #if defined(PIOS_INCLUDE_HMC5843)
 #include <pios_hmc5843.h>
 #endif
+#if defined(PIOS_INCLUDE_I2C_ESC)
+#include <pios_i2c_esc.h>
+#endif
 #include <pios_iap.h>
 
 #if defined(PIOS_INCLUDE_BL_HELPER)

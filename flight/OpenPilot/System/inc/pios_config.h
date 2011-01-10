@@ -58,7 +58,7 @@
 #define PIOS_INCLUDE_GPIO
 #define PIOS_INCLUDE_EXTI
 #define PIOS_INCLUDE_WDG
-
+#define PIOS_INCLUDE_I2C_ESC
 
 /* Defaults for Logging */
 #define LOG_FILENAME 			"PIOS.LOG"

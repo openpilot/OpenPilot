@@ -365,12 +365,49 @@ _fields = [ \
 		{
 		}
 	),
+	uavobject.UAVObjectField(
+		'ChannelType',
+		'b',
+		8,
+		[
+			'0',
+			'1',
+			'2',
+			'3',
+			'4',
+			'5',
+			'6',
+			'7',
+		],
+		{
+			'0' : 'PWM',
+			'1' : 'MK',
+			'2' : 'ASTEC4',
+		}
+	),
+	uavobject.UAVObjectField(
+		'ChannelAddr',
+		'B',
+		8,
+		[
+			'0',
+			'1',
+			'2',
+			'3',
+			'4',
+			'5',
+			'6',
+			'7',
+		],
+		{
+		}
+	),
 ]
 
 
 class ActuatorSettings(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 3054509114
+    OBJID        = 844831578
     NAME         = "ActuatorSettings"
     METANAME     = "ActuatorSettingsMeta"
     ISSINGLEINST = 1

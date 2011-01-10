@@ -41,7 +41,7 @@
 #define ACTUATORCOMMAND_H
 
 // Object constants
-#define ACTUATORCOMMAND_OBJID 3909877022U
+#define ACTUATORCOMMAND_OBJID 3907024856U
 #define ACTUATORCOMMAND_NAME "ActuatorCommand"
 #define ACTUATORCOMMAND_METANAME "ActuatorCommandMeta"
 #define ACTUATORCOMMAND_ISSINGLEINST 1
@@ -72,6 +72,9 @@
 // Object data
 typedef struct {
     int16_t Channel[8];
+    uint8_t UpdateTime;
+    uint8_t MaxUpdateTime;
+    uint8_t NumFailedUpdates;
 
 } __attribute__((packed)) ActuatorCommandData;
 
@@ -79,6 +82,9 @@ typedef struct {
 // Field Channel information
 /* Number of elements for field Channel */
 #define ACTUATORCOMMAND_CHANNEL_NUMELEM 8
+// Field UpdateTime information
+// Field MaxUpdateTime information
+// Field NumFailedUpdates information
 
 
 // Generic interface functions

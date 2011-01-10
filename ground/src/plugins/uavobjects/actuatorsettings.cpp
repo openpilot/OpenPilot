@@ -259,6 +259,30 @@ ActuatorSettings::ActuatorSettings(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTI
     ChannelMinElemNames.append("6");
     ChannelMinElemNames.append("7");
     fields.append( new UAVObjectField(QString("ChannelMin"), QString("us"), UAVObjectField::INT16, ChannelMinElemNames, QStringList()) );
+    QStringList ChannelTypeElemNames;
+    ChannelTypeElemNames.append("0");
+    ChannelTypeElemNames.append("1");
+    ChannelTypeElemNames.append("2");
+    ChannelTypeElemNames.append("3");
+    ChannelTypeElemNames.append("4");
+    ChannelTypeElemNames.append("5");
+    ChannelTypeElemNames.append("6");
+    ChannelTypeElemNames.append("7");
+    QStringList ChannelTypeEnumOptions;
+    ChannelTypeEnumOptions.append("PWM");
+    ChannelTypeEnumOptions.append("MK");
+    ChannelTypeEnumOptions.append("ASTEC4");
+    fields.append( new UAVObjectField(QString("ChannelType"), QString(""), UAVObjectField::ENUM, ChannelTypeElemNames, ChannelTypeEnumOptions) );
+    QStringList ChannelAddrElemNames;
+    ChannelAddrElemNames.append("0");
+    ChannelAddrElemNames.append("1");
+    ChannelAddrElemNames.append("2");
+    ChannelAddrElemNames.append("3");
+    ChannelAddrElemNames.append("4");
+    ChannelAddrElemNames.append("5");
+    ChannelAddrElemNames.append("6");
+    ChannelAddrElemNames.append("7");
+    fields.append( new UAVObjectField(QString("ChannelAddr"), QString(""), UAVObjectField::UINT8, ChannelAddrElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);
@@ -334,6 +358,22 @@ void ActuatorSettings::setDefaultFieldValues()
     data.ChannelMin[5] = 1000;
     data.ChannelMin[6] = 1000;
     data.ChannelMin[7] = 1000;
+    data.ChannelType[0] = 0;
+    data.ChannelType[1] = 0;
+    data.ChannelType[2] = 0;
+    data.ChannelType[3] = 0;
+    data.ChannelType[4] = 0;
+    data.ChannelType[5] = 0;
+    data.ChannelType[6] = 0;
+    data.ChannelType[7] = 0;
+    data.ChannelAddr[0] = 0;
+    data.ChannelAddr[1] = 1;
+    data.ChannelAddr[2] = 2;
+    data.ChannelAddr[3] = 3;
+    data.ChannelAddr[4] = 4;
+    data.ChannelAddr[5] = 5;
+    data.ChannelAddr[6] = 6;
+    data.ChannelAddr[7] = 7;
 
 }
 

@@ -41,7 +41,7 @@
 #define ACTUATORSETTINGS_H
 
 // Object constants
-#define ACTUATORSETTINGS_OBJID 3054509114U
+#define ACTUATORSETTINGS_OBJID 844831578U
 #define ACTUATORSETTINGS_NAME "ActuatorSettings"
 #define ACTUATORSETTINGS_METANAME "ActuatorSettingsMeta"
 #define ACTUATORSETTINGS_ISSINGLEINST 1
@@ -89,6 +89,8 @@ typedef struct {
     int16_t ChannelMax[8];
     int16_t ChannelNeutral[8];
     int16_t ChannelMin[8];
+    uint8_t ChannelType[8];
+    uint8_t ChannelAddr[8];
 
 } __attribute__((packed)) ActuatorSettingsData;
 
@@ -147,6 +149,14 @@ typedef enum { ACTUATORSETTINGS_VTOLMOTORNW_CHANNEL1=0, ACTUATORSETTINGS_VTOLMOT
 // Field ChannelMin information
 /* Number of elements for field ChannelMin */
 #define ACTUATORSETTINGS_CHANNELMIN_NUMELEM 8
+// Field ChannelType information
+/* Enumeration options for field ChannelType */
+typedef enum { ACTUATORSETTINGS_CHANNELTYPE_PWM=0, ACTUATORSETTINGS_CHANNELTYPE_MK=1, ACTUATORSETTINGS_CHANNELTYPE_ASTEC4=2 } ActuatorSettingsChannelTypeOptions;
+/* Number of elements for field ChannelType */
+#define ACTUATORSETTINGS_CHANNELTYPE_NUMELEM 8
+// Field ChannelAddr information
+/* Number of elements for field ChannelAddr */
+#define ACTUATORSETTINGS_CHANNELADDR_NUMELEM 8
 
 
 // Generic interface functions

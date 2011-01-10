@@ -54,12 +54,42 @@ _fields = [ \
 		{
 		}
 	),
+	uavobject.UAVObjectField(
+		'UpdateTime',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'MaxUpdateTime',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
+	uavobject.UAVObjectField(
+		'NumFailedUpdates',
+		'B',
+		1,
+		[
+			'0',
+		],
+		{
+		}
+	),
 ]
 
 
 class ActuatorCommand(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 3909877022
+    OBJID        = 3907024856
     NAME         = "ActuatorCommand"
     METANAME     = "ActuatorCommandMeta"
     ISSINGLEINST = 1

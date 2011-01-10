@@ -61,6 +61,8 @@ public:
         qint16 ChannelMax[8];
         qint16 ChannelNeutral[8];
         qint16 ChannelMin[8];
+        quint8 ChannelType[8];
+        quint8 ChannelAddr[8];
 
     } __attribute__((packed)) DataFields;
 
@@ -119,10 +121,18 @@ public:
     // Field ChannelMin information
     /* Number of elements for field ChannelMin */
     static const quint32 CHANNELMIN_NUMELEM = 8;
+    // Field ChannelType information
+    /* Enumeration options for field ChannelType */
+    typedef enum { CHANNELTYPE_PWM=0, CHANNELTYPE_MK=1, CHANNELTYPE_ASTEC4=2 } ChannelTypeOptions;
+    /* Number of elements for field ChannelType */
+    static const quint32 CHANNELTYPE_NUMELEM = 8;
+    // Field ChannelAddr information
+    /* Number of elements for field ChannelAddr */
+    static const quint32 CHANNELADDR_NUMELEM = 8;
 
   
     // Constants
-    static const quint32 OBJID = 3054509114U;
+    static const quint32 OBJID = 844831578U;
     static const QString NAME;
     static const QString DESCRIPTION;
     static const bool ISSINGLEINST = 1;

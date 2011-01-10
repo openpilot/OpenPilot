@@ -353,7 +353,6 @@ static void go_fsm_fault(struct pios_i2c_adapter *i2c_adapter)
 #endif
 	/* Note that this transfer has hit a bus error */
 	i2c_adapter->bus_error = true;
-//	i2c_adapter->curr_state = I2C_STATE_STOPPED;
 
 	i2c_adapter_reset_bus(i2c_adapter);
 	
@@ -672,7 +671,7 @@ static void i2c_adapter_reset_bus(struct pios_i2c_adapter *i2c_adapter)
 	/* Check SDA line to determine if slave is asserting bus and clock out if so, this may  */
 	/* have to be repeated (due to futher bus errors) but better than clocking 0xFF into an */
 	/* ESC */
-	bool sda_hung = GPIO_ReadInputDataBit(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin) == Bit_RESET;
+	//bool sda_hung = GPIO_ReadInputDataBit(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin) == Bit_RESET;
 	while(GPIO_ReadInputDataBit(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin) == Bit_RESET) {
 		
 		/* Set clock high and wait for any clock stretching to finish. */
@@ -688,17 +687,14 @@ static void i2c_adapter_reset_bus(struct pios_i2c_adapter *i2c_adapter)
 		GPIO_SetBits(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin);
 		PIOS_DELAY_WaituS(2);
 	}
-	if(sda_hung) {
 		
-		/* Generate a start then stop condition */
-		GPIO_SetBits(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin);
-		PIOS_DELAY_WaituS(2);
-		GPIO_ResetBits(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin);
-		PIOS_DELAY_WaituS(2);
-		GPIO_ResetBits(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin);
-		PIOS_DELAY_WaituS(2);
-		
-	}
+	/* Generate a start then stop condition */
+	GPIO_SetBits(i2c_adapter->cfg->scl.gpio, i2c_adapter->cfg->scl.init.GPIO_Pin);
+	PIOS_DELAY_WaituS(2);
+	GPIO_ResetBits(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin);
+	PIOS_DELAY_WaituS(2);
+	GPIO_ResetBits(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin);
+	PIOS_DELAY_WaituS(2);
 
 	/* Set data and clock high and wait for any clock stretching to finish. */
 	GPIO_SetBits(i2c_adapter->cfg->sda.gpio, i2c_adapter->cfg->sda.init.GPIO_Pin);
@@ -914,6 +910,8 @@ void PIOS_I2C_EV_IRQ_Handler(uint8_t i2c)
 	i2c_adapter = find_i2c_adapter_by_id(i2c);
 	PIOS_DEBUG_Assert(i2c_adapter);
 	
+	PIOS_DELAY_WaituS(1);
+	
 	uint32_t event = I2C_GetLastEvent(i2c_adapter->cfg->regs);
 
 #if defined(PIOS_I2C_DIAGNOSTICS)	
@@ -983,7 +981,7 @@ void PIOS_I2C_EV_IRQ_Handler(uint8_t i2c)
 			while (halt) ;
 		}
 		break;
-	case 0:		/* Unexplained spurious event.  Not sure what to do here. */
+	case 0:                 /* This triggers an FSM fault sometimes, but not having it stops things working */
 	case 0x40:		/* RxNE only.  MSL + BUSY have already been cleared by HW. */
 	case 0x44:		/* RxNE + BTF.  MSL + BUSY have already been cleared by HW. */
 	case I2C_EVENT_MASTER_BYTE_RECEIVED:	/* EV7 */
@@ -1011,6 +1009,7 @@ void PIOS_I2C_EV_IRQ_Handler(uint8_t i2c)
 		break;
 	case 0x30084: /* Occurs between byte tranmistted and master mode selected */
 	case 0x30000: /* Need to throw away this spurious event */
+	//case 0x0: /* Not sure why zeros are occurring */
 		goto skip_event;
 		break; 
 	default:
@@ -1026,25 +1025,50 @@ skip_event:
 	;
 }
 
+uint32_t i2c_interrupt_history[5];
+uint8_t i2c_interrupt_history_pointer = 0;
+
 void PIOS_I2C_ER_IRQ_Handler(uint8_t i2c)
 {
 	struct pios_i2c_adapter *i2c_adapter;
 
 	i2c_adapter = find_i2c_adapter_by_id(i2c);
 	PIOS_DEBUG_Assert(i2c_adapter);
+	
+	PIOS_DELAY_WaituS(1);
 
 	
 #if defined(PIOS_I2C_DIAGNOSTICS)	
 	uint32_t event = I2C_GetLastEvent(i2c_adapter->cfg->regs);
 
-	/* Store event for diagnostics */
-	i2c_event_history[i2c_event_history_pointer] = event;
-	i2c_event_history_pointer = (i2c_event_history_pointer + 1) % I2C_LOG_DEPTH;
-#endif
+	i2c_interrupt_history[i2c_interrupt_history_pointer] = event;
+	i2c_interrupt_history_pointer = (i2c_interrupt_history_pointer + 1) % 5;
 	
-	if(I2C_GetFlagStatus(i2c_adapter->cfg->regs, I2C_FLAG_AF)) {
+#endif
+
+	switch(event) {
+		case 0x70184:	/* EV8_2, but system detects own stop byte as erroneous */
+			switch (i2c_adapter->last_byte - i2c_adapter->active_byte + 1) {
+				case 0:
+					i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_TRANSFER_DONE_LEN_EQ_0);
+					break;
+				case 1:
+					i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_TRANSFER_DONE_LEN_EQ_1);
+					break;
+				case 2:
+					i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_TRANSFER_DONE_LEN_EQ_2);
+					break;
+				default:
+					i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_TRANSFER_DONE_LEN_GT_2);
+					break;
+			}
+			return;
+			break;	
+	}
+	
+	if(event & I2C_FLAG_AF) {
 		i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_NACK);
-	} else {                
+	} else { /* Mostly bus errors here */              
 		i2c_adapter_log_fault(PIOS_I2C_ERROR_INTERRUPT);
 		
 		/* Fail hard on any errors for now */

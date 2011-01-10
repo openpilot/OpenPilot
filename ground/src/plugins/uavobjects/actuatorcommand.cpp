@@ -53,6 +53,15 @@ ActuatorCommand::ActuatorCommand(): UAVDataObject(OBJID, ISSINGLEINST, ISSETTING
     ChannelElemNames.append("6");
     ChannelElemNames.append("7");
     fields.append( new UAVObjectField(QString("Channel"), QString("us"), UAVObjectField::INT16, ChannelElemNames, QStringList()) );
+    QStringList UpdateTimeElemNames;
+    UpdateTimeElemNames.append("0");
+    fields.append( new UAVObjectField(QString("UpdateTime"), QString("ms x 10"), UAVObjectField::UINT8, UpdateTimeElemNames, QStringList()) );
+    QStringList MaxUpdateTimeElemNames;
+    MaxUpdateTimeElemNames.append("0");
+    fields.append( new UAVObjectField(QString("MaxUpdateTime"), QString("ms x 10"), UAVObjectField::UINT8, MaxUpdateTimeElemNames, QStringList()) );
+    QStringList NumFailedUpdatesElemNames;
+    NumFailedUpdatesElemNames.append("0");
+    fields.append( new UAVObjectField(QString("NumFailedUpdates"), QString(""), UAVObjectField::UINT8, NumFailedUpdatesElemNames, QStringList()) );
 
     // Initialize object
     initializeFields(fields, (quint8*)&data, NUMBYTES);

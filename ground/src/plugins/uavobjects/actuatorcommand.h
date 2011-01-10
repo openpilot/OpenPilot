@@ -44,6 +44,9 @@ public:
     // Field structure
     typedef struct {
         qint16 Channel[8];
+        quint8 UpdateTime;
+        quint8 MaxUpdateTime;
+        quint8 NumFailedUpdates;
 
     } __attribute__((packed)) DataFields;
 
@@ -51,10 +54,13 @@ public:
     // Field Channel information
     /* Number of elements for field Channel */
     static const quint32 CHANNEL_NUMELEM = 8;
+    // Field UpdateTime information
+    // Field MaxUpdateTime information
+    // Field NumFailedUpdates information
 
   
     // Constants
-    static const quint32 OBJID = 3909877022U;
+    static const quint32 OBJID = 3907024856U;
     static const QString NAME;
     static const QString DESCRIPTION;
     static const bool ISSINGLEINST = 1;

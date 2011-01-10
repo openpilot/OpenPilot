@@ -67,6 +67,8 @@ static void actuatorTask(void* parameters);
 static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutral);
 static void setFailsafe();
 static float MixerCurve(const float throttle, const float* curve);
+static bool set_channel(uint8_t mixer_channel, uint16_t value);
+
 float ProcessMixer(const int index, const float curve1, const float curve2,
 		   MixerSettingsData* mixerSettings, ActuatorDesiredData* desired,
 		   const float period);
@@ -97,7 +99,6 @@ int32_t ActuatorInitialize()
 	
 	return 0;
 }
-
 
 
 /**
@@ -201,25 +202,42 @@ static void actuatorTask(void* parameters)
 					lastResult[ct] = 0;
 				}else
 				{
+					// For motors when armed keep above neutral
+					if((mixer[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) && (status[ct] < 0)) 
+						status[ct] = 0;
+						
 					command.Channel[ct] = scaleChannel(status[ct],
 									   settings.ChannelMax[ct],
-									   settings.ChannelMin[ct],
+									   settings.ChannelNeutral[ct],
 									   settings.ChannelNeutral[ct]);
 				}
 			}
 		}
 		MixerStatusSet(&mixerStatus);
 
+		// Store update time
+		command.UpdateTime = 10000*dT;
+		if(command.UpdateTime > command.MaxUpdateTime)
+			command.MaxUpdateTime = command.UpdateTime;
+		
 		// Update output object
 		ActuatorCommandSet(&command);
 		// Update in case read only (eg. during servo configuration)
 		ActuatorCommandGet(&command);
 
 		// Update servo outputs
+		bool success = true;
 		for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n)
 		{
-			PIOS_Servo_Set( n, command.Channel[n] );
+			success &= set_channel(n, command.Channel[n]);
 		}
+
+		if(!success) {
+			command.NumFailedUpdates++;
+			ActuatorCommandSet(&command);
+			AlarmsSet(SYSTEMALARMS_ALARM_ACTUATOR, SYSTEMALARMS_ALARM_CRITICAL); 
+		}
+
 	}
 }
 
@@ -385,11 +403,45 @@ static void setFailsafe()
 	// Update servo outputs
 	for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n)
 	{
-		PIOS_Servo_Set( n, command.Channel[n] );
+		set_channel(n, command.Channel[n]);
 	}
 
 	// Update output object
 	ActuatorCommandSet(&command);
+}
+
+static bool set_channel(uint8_t mixer_channel, uint16_t value) {
+	
+	ActuatorSettingsData settings;
+	ActuatorSettingsGet(&settings);
+		
+	switch(settings.ChannelType[mixer_channel]) {
+		case ACTUATORSETTINGS_CHANNELTYPE_PWM:
+			PIOS_Servo_Set(settings.ChannelAddr[mixer_channel], value);
+			return true;
+		case ACTUATORSETTINGS_CHANNELTYPE_MK: 
+		{
+			ManualControlCommandData manual;
+			ManualControlCommandGet(&manual);
+			/* Unfortunately MK controller take forever to start so keep */
+			/* them spinning when armed */			 
+			if(manual.Armed)
+				value = (value < 0) ? 1 : value;
+			else 
+				value = 0;
+
+			return PIOS_SetMKSpeed(settings.ChannelAddr[mixer_channel],value);
+			break;
+		}
+		case ACTUATORSETTINGS_CHANNELTYPE_ASTEC4:
+			return PIOS_SetAstec4Speed(settings.ChannelAddr[mixer_channel],value);
+			break;
+		default:
+			return false;
+	}			
+	
+	return false;
+	
 }
 
 

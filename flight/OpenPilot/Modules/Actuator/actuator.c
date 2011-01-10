@@ -203,7 +203,7 @@ static void actuatorTask(void* parameters)
 				}else
 				{
 					// For motors when armed keep above neutral
-					if((mixer[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) && (status[ct] < 0)) 
+					if((mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) && (status[ct] < 0)) 
 						status[ct] = 0;
 						
 					command.Channel[ct] = scaleChannel(status[ct],

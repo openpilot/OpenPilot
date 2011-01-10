@@ -78,9 +78,6 @@ static float bound(float val);
 static void ZeroPids(void);
 static void SettingsUpdatedCb(UAVObjEvent * ev);
 
-// Global updated variable
-volatile uint8_t stabilization_updated;
-
 /**
  * Module initialization
  */
@@ -100,7 +97,8 @@ int32_t StabilizationInitialize()
 	// Start main task
 	xTaskCreate(stabilizationTask, (signed char*)"Stabilization", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_STABILIZATION, taskHandle);
-
+	PIOS_WDG_RegisterFlag(PIOS_WDG_STABILIZATION);
+	
 	return 0;
 }
 
@@ -128,9 +126,8 @@ static void stabilizationTask(void* parameters)
 	lastSysTime = xTaskGetTickCount();
 	ZeroPids();
 	while(1) {
+		PIOS_WDG_UpdateFlag(PIOS_WDG_STABILIZATION);
 
-		stabilization_updated = 1;
-		
 		// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
 		if ( xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )
 		{

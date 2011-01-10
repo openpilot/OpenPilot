@@ -36,6 +36,11 @@
 #include "stm32f10x_iwdg.h"
 #include "stm32f10x_dbgmcu.h"
 
+static struct wdg_configuration {
+	uint16_t used_flags;
+	uint16_t bootup_flags;
+} wdg_configuration;
+
 /** 
  * @brief Initialize the watchdog timer for a specified timeout
  *
@@ -53,9 +58,10 @@
  * @param[in] delayMs The delay period in ms
  * @returns Maximum recommended delay between updates
  */
-uint16_t PIOS_WDG_Init(uint16_t delayMs)
+void PIOS_WDG_Init()
 {
-	uint16_t delay = ((uint32_t) delayMs * 60) / 16;
+#if defined(PIOS_INCLUDE_WDG)
+	uint16_t delay = ((uint32_t) PIOS_WATCHDOG_TIMEOUT * 60) / 16;
 	if (delay > 0x0fff)
 		delay = 0x0fff;
 
@@ -66,7 +72,91 @@ uint16_t PIOS_WDG_Init(uint16_t delayMs)
 	IWDG_ReloadCounter();
 	IWDG_Enable();
 
-	return ((((uint32_t) delay * 16) / 60) * .75f);
+	// watchdog flags now stored in backup registers
+	PWR_BackupAccessCmd(ENABLE);
+	
+	wdg_configuration.bootup_flags = BKP_ReadBackupRegister(PIOS_WDG_REGISTER);
+#endif
+}
+
+/**
+ * @brief Register a module against the watchdog 
+ * 
+ * There are two ways to use PIOS WDG: this is for when
+ * multiple modules must be monitored.  In this case they 
+ * must first register against the watchdog system and 
+ * only when all of the modules have been updated with the
+ * watchdog be cleared.  Each module must have its own 
+ * bit in the 16 bit 
+ *
+ * @param[in] flag the bit this module wants to use
+ * @returns True if that bit is unregistered
+ */
+bool PIOS_WDG_RegisterFlag(uint16_t flag_requested) 
+{
+	
+	/* Fail if flag already registered */
+	if(wdg_configuration.used_flags & flag_requested)
+		return false;
+	
+	// FIXME: Protect with semaphore
+	wdg_configuration.used_flags |= flag_requested;
+	
+	return true;
+}
+
+/**
+ * @brief Function called by modules to indicate they are still running
+ *
+ * This function will set this flag in the active flags register (which is 
+ * a backup regsiter) and if all the registered flags are set will clear
+ * the watchdog and set only this flag in the backup register
+ *
+ * @param[in] flag the flag to set
+ * @return true if the watchdog cleared, false if flags are pending
+ */
+bool PIOS_WDG_UpdateFlag(uint16_t flag) 
+{	
+	// we can probably avoid using a semaphore here which will be good for
+	// efficiency and not blocking critical tasks.  race condition could 
+	// overwrite their flag update, but unlikely to block _all_ of them 
+	// for the timeout window
+	uint16_t cur_flags = BKP_ReadBackupRegister(PIOS_WDG_REGISTER);
+	
+	if((cur_flags | flag) == wdg_configuration.used_flags) {
+		PIOS_WDG_Clear();
+		BKP_WriteBackupRegister(PIOS_WDG_REGISTER, flag);		
+		return true;
+	} else {
+		BKP_WriteBackupRegister(PIOS_WDG_REGISTER, cur_flags | flag);		
+		return false;
+	}
+		
+}
+
+/** 
+ * @brief Returns the flags that were set at bootup
+ * 
+ * This is used for diagnostics, if only one flag not set this 
+ * was likely the module that wasn't running before reset
+ * 
+ * @return The active flags register from bootup
+ */
+uint16_t PIOS_WDG_GetBootupFlags()
+{
+	return wdg_configuration.bootup_flags;	
+}
+
+/** 
+ * @brief Returns the currently active flags
+ * 
+ * For external monitoring
+ * 
+ * @return The active flags register
+ */
+uint16_t PIOS_WDG_GetActiveFlags()
+{
+	return BKP_ReadBackupRegister(PIOS_WDG_REGISTER);
 }
 
 /**
@@ -76,5 +166,7 @@ uint16_t PIOS_WDG_Init(uint16_t delayMs)
  */
 void PIOS_WDG_Clear(void)
 {
+#if defined(PIOS_INCLUDE_WDG)
 	IWDG_ReloadCounter();
+#endif
 }

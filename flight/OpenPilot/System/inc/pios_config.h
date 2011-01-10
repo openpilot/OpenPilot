@@ -57,6 +57,7 @@
 #define PIOS_INCLUDE_FREERTOS
 #define PIOS_INCLUDE_GPIO
 #define PIOS_INCLUDE_EXTI
+#define PIOS_INCLUDE_WDG
 
 
 /* Defaults for Logging */

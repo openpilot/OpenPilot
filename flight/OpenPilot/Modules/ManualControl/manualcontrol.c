@@ -63,9 +63,6 @@ static void manualControlTask(void *parameters);
 static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutral);
 static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time);
 
-// Global updated variable
-volatile uint8_t manual_updated;
-
 /**
  * Module initialization
  */
@@ -74,7 +71,7 @@ int32_t ManualControlInitialize()
 	// Start main task
 	xTaskCreate(manualControlTask, (signed char *)"ManualControl", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_MANUALCONTROL, taskHandle);
-
+	PIOS_WDG_RegisterFlag(PIOS_WDG_MANUAL);
 	return 0;
 }
 
@@ -109,8 +106,7 @@ static void manualControlTask(void *parameters)
 	while (1) {
 		// Wait until next update
 		vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD_MS / portTICK_RATE_MS);
-
-		manual_updated = 1;
+		PIOS_WDG_UpdateFlag(PIOS_WDG_MANUAL);
 		
 		// Read settings
 		ManualControlSettingsGet(&settings);

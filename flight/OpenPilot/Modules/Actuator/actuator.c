@@ -71,9 +71,6 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
 		   MixerSettingsData* mixerSettings, ActuatorDesiredData* desired,
 		   const float period);
 
-// External watchdog update flag
-volatile uint8_t actuator_updated;
-
 //this structure is equivalent to the UAVObjects for one mixer.
 typedef struct {
 	uint8_t type;
@@ -96,7 +93,8 @@ int32_t ActuatorInitialize()
 	// Start main task
 	xTaskCreate(actuatorTask, (signed char*)"Actuator", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_ACTUATOR, taskHandle);
-
+	PIOS_WDG_RegisterFlag(PIOS_WDG_ACTUATOR);
+	
 	return 0;
 }
 
@@ -143,7 +141,7 @@ static void actuatorTask(void* parameters)
 	lastSysTime = xTaskGetTickCount();
 	while (1)
 	{		
-		actuator_updated = 1;
+		PIOS_WDG_UpdateFlag(PIOS_WDG_ACTUATOR);
 
 		// Wait until the ActuatorDesired object is updated, if a timeout then go to failsafe
 		if ( xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )

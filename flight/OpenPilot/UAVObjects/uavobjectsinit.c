@@ -70,6 +70,7 @@
 #include "telemetrysettings.h"
 #include "velocityactual.h"
 #include "velocitydesired.h"
+#include "watchdogstatus.h"
 
 
 /**
@@ -120,5 +121,6 @@ void UAVObjectsInitializeAll()
     TelemetrySettingsInitialize();
     VelocityActualInitialize();
     VelocityDesiredInitialize();
+    WatchdogStatusInitialize();
 
 }

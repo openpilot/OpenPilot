@@ -44,6 +44,7 @@
 #include "manualcontrolcommand.h"
 #include "systemstats.h"
 #include "i2cstats.h"
+#include "watchdogstatus.h"
 #include "taskmonitor.h"
 
 
@@ -72,6 +73,7 @@ static int32_t stackOverflow;
 static void objectUpdatedCb(UAVObjEvent * ev);
 static void updateStats();
 static void updateI2Cstats();
+static void updateWDGstats();
 static void updateSystemAlarms();
 static void systemTask(void *parameters);
 
@@ -117,6 +119,7 @@ static void systemTask(void *parameters)
 		// Update the system alarms
 		updateSystemAlarms();
 		updateI2Cstats();
+		updateWDGstats();
 		
 		// Update the task status object
 		TaskMonitorUpdateAll();
@@ -231,6 +234,14 @@ static void updateI2Cstats()
 	I2CStatsSet(&i2cStats);
 }
 #endif
+
+static void updateWDGstats() 
+{
+	WatchdogStatusData watchdogStatus;
+	watchdogStatus.BootupFlags = PIOS_WDG_GetBootupFlags();
+	watchdogStatus.ActiveFlags = PIOS_WDG_GetActiveFlags();
+	WatchdogStatusSet(&watchdogStatus);
+}
 
 /**
  * Called periodically to update the system stats

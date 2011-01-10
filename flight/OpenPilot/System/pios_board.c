@@ -83,6 +83,7 @@ void PIOS_Board_Init(void) {
 #endif
 	PIOS_I2C_Init();
 	PIOS_IAP_Init();
+	PIOS_WDG_Init();
 }
 
 /* MicroSD Interface

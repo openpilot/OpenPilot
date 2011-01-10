@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		65003B2D1212499100C183DD /* watchdog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = watchdog.h; sourceTree = "<group>"; };
-		65003B2E1212499100C183DD /* watchdog.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = watchdog.c; sourceTree = "<group>"; };
 		65003B31121249CA00C183DD /* pios_wdg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_wdg.c; sourceTree = "<group>"; };
 		6502584212CA4D2600583CDF /* insgps13state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insgps13state.c; path = ../../AHRS/insgps13state.c; sourceTree = SOURCE_ROOT; };
 		6509C7E912CA57DC002E5DC2 /* insgps16state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insgps16state.c; path = ../../AHRS/insgps16state.c; sourceTree = SOURCE_ROOT; };
@@ -43,6 +41,9 @@
 		6549E0D21279B3C800C5476F /* fifo_buffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fifo_buffer.c; sourceTree = "<group>"; };
 		6549E0D31279B3CF00C5476F /* fifo_buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fifo_buffer.h; sourceTree = "<group>"; };
 		655268BC121FBD2900410C6E /* ahrscalibration.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrscalibration.xml; sourceTree = "<group>"; };
+		655DBA5212DA5B6A00341B9A /* pios_iap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_iap.h; sourceTree = "<group>"; };
+		655DBA5312DA5E9900341B9A /* watchdogstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = watchdogstatus.xml; sourceTree = "<group>"; };
+		655DBA8A12DA644300341B9A /* taskmonitor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = taskmonitor.c; sourceTree = "<group>"; };
 		65632CBF124E09D900469B77 /* guidance.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = guidance.c; sourceTree = "<group>"; };
 		65632CC1124E09D900469B77 /* guidance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = guidance.h; sourceTree = "<group>"; };
 		65632DF51251650300469B77 /* pios_board.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_board.h; sourceTree = "<group>"; };
@@ -2901,23 +2902,6 @@
 			children = (
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		65003B2B1212499100C183DD /* Watchdog */ = {
-			isa = PBXGroup;
-			children = (
-				65003B2C1212499100C183DD /* inc */,
-				65003B2E1212499100C183DD /* watchdog.c */,
-			);
-			path = Watchdog;
-			sourceTree = "<group>";
-		};
-		65003B2C1212499100C183DD /* inc */ = {
-			isa = PBXGroup;
-			children = (
-				65003B2D1212499100C183DD /* watchdog.h */,
-			);
-			path = inc;
 			sourceTree = "<group>";
 		};
 		651F32EC1281DE7E00D065F8 /* FirmwareIAP */ = {
@@ -6802,6 +6786,7 @@
 				65B367FD121C2620003EAD18 /* systemstats.xml */,
 				65B367FE121C2620003EAD18 /* telemetrysettings.xml */,
 				65408AA812BB1648004DACC5 /* i2cstats.xml */,
+				655DBA5312DA5E9900341B9A /* watchdogstatus.xml */,
 			);
 			path = uavobjectdefinition;
 			sourceTree = "<group>";
@@ -6869,7 +6854,6 @@
 				65E8EF4F11EEA61E00BBF654 /* Stabilization */,
 				65E8EF5311EEA61E00BBF654 /* System */,
 				65E8EF5711EEA61E00BBF654 /* Telemetry */,
-				65003B2B1212499100C183DD /* Watchdog */,
 			);
 			name = Modules;
 			path = ../../OpenPilot/Modules;
@@ -7129,6 +7113,7 @@
 		65E8EF5B11EEA61E00BBF654 /* System */ = {
 			isa = PBXGroup;
 			children = (
+				655DBA8A12DA644300341B9A /* taskmonitor.c */,
 				65E8EF5C11EEA61E00BBF654 /* alarms.c */,
 				65E8EF5D11EEA61E00BBF654 /* inc */,
 				65E8EF6511EEA61E00BBF654 /* openpilot.c */,
@@ -7313,6 +7298,7 @@
 		65E8F03811EFF25C00BBF654 /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				655DBA5212DA5B6A00341B9A /* pios_iap.h */,
 				6526645A122DF972006F9A3C /* pios_i2c_priv.h */,
 				6526645B122DF972006F9A3C /* pios_wdg.h */,
 				651CF9EF120B700D00EEFD70 /* pios_usb_hid_desc.h */,

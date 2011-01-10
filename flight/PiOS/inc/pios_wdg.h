@@ -31,7 +31,11 @@
 #ifndef PIOS_WDG
 #define PIOS_WDG
 
-uint16_t PIOS_WDG_Init(uint16_t delayMs);
+void PIOS_WDG_Init();
+bool PIOS_WDG_RegisterFlag(uint16_t flag_requested);
+bool PIOS_WDG_UpdateFlag(uint16_t flag);
+uint16_t PIOS_WDG_GetBootupFlags();
+uint16_t PIOS_WDG_GetActiveFlags();
 void PIOS_WDG_Clear(void);
 
 #endif

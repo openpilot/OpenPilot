@@ -57,7 +57,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Actuator Telemetry GPS ManualControl Altitude AHRSComms Stabilization Guidance Watchdog FirmwareIAP
+MODULES =  Actuator Telemetry GPS ManualControl Altitude AHRSComms Stabilization Guidance FirmwareIAP
 
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
@@ -201,6 +201,7 @@ SRC += $(OPUAVOBJ)/flightplancontrol.c
 SRC += $(OPUAVOBJ)/flightplanstatus.c
 SRC += $(OPUAVOBJ)/flightplansettings.c
 SRC += $(OPUAVOBJ)/taskinfo.c
+SRC += $(OPUAVOBJ)/watchdogstatus.c
 endif
 
 ## PIOS Hardware (STM32F10x)

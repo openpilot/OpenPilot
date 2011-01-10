@@ -65,9 +65,6 @@ static xTaskHandle taskHandle;
 // Private functions
 static void ahrscommsTask(void *parameters);
 
-// Global update flag
-volatile uint8_t ahrs_updated;
-
 /**
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
@@ -79,6 +76,7 @@ int32_t AHRSCommsInitialize(void)
 	// Start main task
 	xTaskCreate(ahrscommsTask, (signed char *)"AHRSComms", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_AHRSCOMMS, taskHandle);
+	PIOS_WDG_RegisterFlag(PIOS_WDG_AHRS);
 
 	return 0;
 }
@@ -94,7 +92,7 @@ static void ahrscommsTask(void *parameters)
 
 	// Main task loop
 	while (1) {
-		ahrs_updated = 1;
+		PIOS_WDG_UpdateFlag(PIOS_WDG_AHRS);
 		
 		AHRSSettingsData settings;
 		AHRSSettingsGet(&settings);

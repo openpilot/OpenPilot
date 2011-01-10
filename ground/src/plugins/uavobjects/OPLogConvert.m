@@ -413,6 +413,11 @@ function [] = OPLogConvert()
     VelocityDesired(1).East = 0;
     VelocityDesired(1).Down = 0;
 
+    watchdogstatusIdx = 1;
+    WatchdogStatus.timestamp = 0;
+    WatchdogStatus(1).BootupFlags = 0;
+    WatchdogStatus(1).ActiveFlags = 0;
+
    
     %% Open file
     %fid = fopen('log.opl');
@@ -574,6 +579,9 @@ function [] = OPLogConvert()
             case 305094202
                 VelocityDesired(velocitydesiredIdx) = ReadVelocityDesiredObject(fid, timestamp);
                 velocitydesiredIdx = velocitydesiredIdx + 1;
+            case 3594971408
+                WatchdogStatus(watchdogstatusIdx) = ReadWatchdogStatusObject(fid, timestamp);
+                watchdogstatusIdx = watchdogstatusIdx + 1;
                 
             otherwise
                 disp('Unknown object ID');
@@ -587,7 +595,7 @@ function [] = OPLogConvert()
     fclose(fid);
     
     matfile = strrep(logfile,'opl','mat');
-    save(matfile ,'ActuatorCommand','ActuatorDesired','ActuatorSettings','AHRSCalibration','AHRSSettings','AhrsStatus','AttitudeActual','AttitudeDesired','AttitudeRaw','BaroAltitude','BatterySettings','FirmwareIAPObj','FlightBatteryState','FlightPlanControl','FlightPlanSettings','FlightPlanStatus','FlightTelemetryStats','GCSTelemetryStats','GPSPosition','GPSSatellites','GPSTime','GuidanceSettings','HomeLocation','I2CStats','ManualControlCommand','ManualControlSettings','MixerSettings','MixerStatus','ObjectPersistence','PipXtremeModemSettings','PipXtremeModemStatus','PositionActual','PositionDesired','RateDesired','StabilizationSettings','SystemAlarms','SystemSettings','SystemStats','TaskInfo','TelemetrySettings','VelocityActual','VelocityDesired');
+    save(matfile ,'ActuatorCommand','ActuatorDesired','ActuatorSettings','AHRSCalibration','AHRSSettings','AhrsStatus','AttitudeActual','AttitudeDesired','AttitudeRaw','BaroAltitude','BatterySettings','FirmwareIAPObj','FlightBatteryState','FlightPlanControl','FlightPlanSettings','FlightPlanStatus','FlightTelemetryStats','GCSTelemetryStats','GPSPosition','GPSSatellites','GPSTime','GuidanceSettings','HomeLocation','I2CStats','ManualControlCommand','ManualControlSettings','MixerSettings','MixerStatus','ObjectPersistence','PipXtremeModemSettings','PipXtremeModemStatus','PositionActual','PositionDesired','RateDesired','StabilizationSettings','SystemAlarms','SystemSettings','SystemStats','TaskInfo','TelemetrySettings','VelocityActual','VelocityDesired','WatchdogStatus');
     
 end
 
@@ -1421,6 +1429,21 @@ function [VelocityDesired] = ReadVelocityDesiredObject(fid, timestamp)
     VelocityDesired.North = double(fread(fid, 1, 'int32'));
     VelocityDesired.East = double(fread(fid, 1, 'int32'));
     VelocityDesired.Down = double(fread(fid, 1, 'int32'));
+    % read CRC
+    fread(fid, 1, 'uint8');
+end
+
+function [WatchdogStatus] = ReadWatchdogStatusObject(fid, timestamp)
+    if 1
+        headerSize = 8;
+    else
+        WatchdogStatus.instanceID = fread(fid, 1, 'uint16');
+        headerSize = 10;
+    end
+
+    WatchdogStatus.timestamp = timestamp;
+    WatchdogStatus.BootupFlags = double(fread(fid, 1, 'uint16'));
+    WatchdogStatus.ActiveFlags = double(fread(fid, 1, 'uint16'));
     % read CRC
     fread(fid, 1, 'uint8');
 end

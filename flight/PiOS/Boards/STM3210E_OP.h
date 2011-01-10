@@ -87,6 +87,16 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define MAX_DEL_RETRYS	3
 
 //------------------------
+// WATCHDOG_SETTINGS
+//------------------------
+#define PIOS_WATCHDOG_TIMEOUT 250
+#define PIOS_WDG_REGISTER BKP_DR4
+#define PIOS_WDG_ACTUATOR        0x0001
+#define PIOS_WDG_STABILIZATION   0x0002
+#define PIOS_WDG_AHRS            0x0004
+#define PIOS_WDG_MANUAL          0x0008
+
+//------------------------
 // PIOS_LED
 //------------------------
 #define PIOS_LED_LED1_GPIO_PORT                 GPIOC

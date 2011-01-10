@@ -43,9 +43,12 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
     connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
 
+    // Note: remove listening to the connection manager, it overlaps with
+    // listening to the telemetry manager, we should only listen to one, not both.
+
     // Also listen to disconnect actions from the user:
-    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-    connect(cm, SIGNAL(deviceDisconnected()), this, SLOT(onAutopilotDisconnect()));
+    // Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    // connect(cm, SIGNAL(deviceDisconnected()), this, SLOT(onAutopilotDisconnect()));
 
 
     connect(m_config->haltButton, SIGNAL(clicked()), this, SLOT(goToBootloader()));

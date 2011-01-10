@@ -25,6 +25,16 @@
  */
 #define GAUSSIAN_MASK_APPROX 0
 
+
+/*
+ * STATUS: in progress, do not use for now
+ * Try to detect virtual corners (created by a depth discontinuity).
+ * It does not eliminate them yet, we're just trying to find a good criteria,
+ * the current one tries to quickly count the gradient peaks around the point.
+ */
+#define FILTER_VIRTUAL_POINTS 0
+
+
 namespace jafar{
 	namespace rtslam{
 

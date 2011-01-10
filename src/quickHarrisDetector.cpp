@@ -341,6 +341,45 @@ namespace jafar {
 
 			//std::cout << "- at " << pixMax[0] << "," << pixMax[1] << " : high "  << im_high_curv_max << " low " << im_low_curv_max << " ; ratio " << im_high_curv_max/im_low_curv_max << " score " << scoreMax << std::endl;
 			
+#if FILTER_VIRTUAL_POINTS
+/*
+accept:
+_|_   (4)        |_      _/    _     (2)      _   _   _  (1 or 2)
+ |                              \             \   /
+reject:
+  |_     (3)    .  (0)
+  |
+*/
+			
+			int_center = m_quickData + ((pixMax[1]-roi.y()) * roi.w()) + (pixMax[0]-roi.x());
+			
+			int indexes[8][2] = {{-1,-1},{-1,0},{-1,1},{0,1},{1,1},{1,0},{1,-1},{0,-1}};
+			int radius = m_convolutionSize/2;
+			for(int i = 0; i < 8; ++i) for(int j = 0; j < 2; ++j) indexes[i][j] *= radius;
+			double thres = im_low_curv_max * 0.75;
+			
+			int npeaks = 0;
+			bool lastpeaked = false;
+			bool firstpeaked = false;
+			for(int i = 0; i < 8; ++i)
+			{
+				int_upLeft = int_center + indexes[i][1] * roi.w() + indexes[i][0];
+				
+				if (int_upLeft->im_high_curv > thres)
+				{
+					if (i == 0) firstpeaked = true; else
+					if (i == 7) lastpeaked = lastpeaked || firstpeaked;
+					
+					if (!lastpeaked) npeaks++; lastpeaked = true;
+					
+				} else
+					lastpeaked = false;
+std::cout << "  high " << int_upLeft->im_high_curv << " "  << " low " << int_upLeft->im_low_curv << std::endl;
+			}
+			bool ok = (npeaks == 1 || npeaks == 2 || npeaks == 4);
+			
+			std::cout << "  high " << int_center->im_high_curv << " low " << int_center->im_low_curv << " npeaks " << npeaks << " ok " << ok << std::endl;
+#endif
 			return (scoreMax > m_threshold);
 
 		}

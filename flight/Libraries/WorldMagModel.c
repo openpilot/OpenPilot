@@ -188,11 +188,9 @@ void WMM_GetMagVector(float Lat, float Lon, float AltEllipsoid, uint16_t Month, 
 	Ellip = (WMMtype_Ellipsoid *) MALLOC(sizeof(WMMtype_Ellipsoid));
 	MagneticModel = (WMMtype_MagneticModel *) MALLOC(sizeof(WMMtype_MagneticModel));
 	
-	WMMtype_CoordSpherical *CoordSpherical = (WMMtype_CoordSpherical *)
-	    MALLOC(sizeof(CoordSpherical));
-	WMMtype_CoordGeodetic *CoordGeodetic = (WMMtype_CoordGeodetic *) MALLOC(sizeof(CoordGeodetic));
-	WMMtype_GeoMagneticElements *GeoMagneticElements = (WMMtype_GeoMagneticElements *)
-	    MALLOC(sizeof(GeoMagneticElements));
+	WMMtype_CoordSpherical *CoordSpherical = (WMMtype_CoordSpherical *) MALLOC(sizeof(WMMtype_CoordSpherical));
+	WMMtype_CoordGeodetic *CoordGeodetic = (WMMtype_CoordGeodetic *) MALLOC(sizeof(WMMtype_CoordGeodetic));
+	WMMtype_GeoMagneticElements *GeoMagneticElements = (WMMtype_GeoMagneticElements *) MALLOC(sizeof(WMMtype_GeoMagneticElements));
 
 	WMM_Initialize();
 
@@ -240,23 +238,29 @@ uint16_t WMM_Geomag(WMMtype_CoordSpherical * CoordSpherical, WMMtype_CoordGeodet
 
     */
 {
-	WMMtype_LegendreFunction LegendreFunction;
-	WMMtype_SphericalHarmonicVariables SphVariables;
-	WMMtype_MagneticResults MagneticResultsSph, MagneticResultsGeo, MagneticResultsSphVar, MagneticResultsGeoVar;
+    WMMtype_LegendreFunction            *LegendreFunction = (WMMtype_LegendreFunction *) MALLOC(sizeof(WMMtype_LegendreFunction));
+    WMMtype_SphericalHarmonicVariables  *SphVariables = (WMMtype_SphericalHarmonicVariables *) MALLOC(sizeof(WMMtype_SphericalHarmonicVariables));
+    WMMtype_MagneticResults             MagneticResultsSph;
+    WMMtype_MagneticResults             MagneticResultsGeo;
+    WMMtype_MagneticResults             MagneticResultsSphVar;
+    WMMtype_MagneticResults             MagneticResultsGeoVar;
 
-	WMM_ComputeSphericalHarmonicVariables(CoordSpherical, MagneticModel->nMax, &SphVariables);	/* Compute Spherical Harmonic variables  */
-	WMM_AssociatedLegendreFunction(CoordSpherical, MagneticModel->nMax, &LegendreFunction);	/* Compute ALF  */
-	WMM_Summation(&LegendreFunction, &SphVariables, CoordSpherical, &MagneticResultsSph);	/* Accumulate the spherical harmonic coefficients */
-	WMM_SecVarSummation(&LegendreFunction, &SphVariables, CoordSpherical, &MagneticResultsSphVar);	/*Sum the Secular Variation Coefficients  */
-	WMM_RotateMagneticVector(CoordSpherical, CoordGeodetic, &MagneticResultsSph, &MagneticResultsGeo);	/* Map the computed Magnetic fields to Geodeitic coordinates  */
-	WMM_RotateMagneticVector(CoordSpherical, CoordGeodetic, &MagneticResultsSphVar, &MagneticResultsGeoVar);	/* Map the secular variation field components to Geodetic coordinates */
-	WMM_CalculateGeoMagneticElements(&MagneticResultsGeo, GeoMagneticElements);	/* Calculate the Geomagnetic elements, Equation 18 , WMM Technical report */
-	WMM_CalculateSecularVariation(&MagneticResultsGeoVar, GeoMagneticElements);	/*Calculate the secular variation of each of the Geomagnetic elements */
-	return TRUE;
+    WMM_ComputeSphericalHarmonicVariables(CoordSpherical, MagneticModel->nMax, SphVariables);	/* Compute Spherical Harmonic variables  */
+    WMM_AssociatedLegendreFunction(CoordSpherical, MagneticModel->nMax, LegendreFunction);	/* Compute ALF  */
+    WMM_Summation(LegendreFunction, SphVariables, CoordSpherical, &MagneticResultsSph);	/* Accumulate the spherical harmonic coefficients */
+    WMM_SecVarSummation(LegendreFunction, SphVariables, CoordSpherical, &MagneticResultsSphVar);	/*Sum the Secular Variation Coefficients  */
+    WMM_RotateMagneticVector(CoordSpherical, CoordGeodetic, &MagneticResultsSph, &MagneticResultsGeo);	/* Map the computed Magnetic fields to Geodeitic coordinates  */
+    WMM_RotateMagneticVector(CoordSpherical, CoordGeodetic, &MagneticResultsSphVar, &MagneticResultsGeoVar);	/* Map the secular variation field components to Geodetic coordinates */
+    WMM_CalculateGeoMagneticElements(&MagneticResultsGeo, GeoMagneticElements);	/* Calculate the Geomagnetic elements, Equation 18 , WMM Technical report */
+    WMM_CalculateSecularVariation(&MagneticResultsGeoVar, GeoMagneticElements);	/*Calculate the secular variation of each of the Geomagnetic elements */
+
+    FREE(SphVariables);
+    FREE(LegendreFunction);
+
+    return TRUE;
 }
 
-uint16_t WMM_ComputeSphericalHarmonicVariables(WMMtype_CoordSpherical *
-					       CoordSpherical, uint16_t nMax, WMMtype_SphericalHarmonicVariables * SphVariables)
+uint16_t WMM_ComputeSphericalHarmonicVariables(WMMtype_CoordSpherical *CoordSpherical, uint16_t nMax, WMMtype_SphericalHarmonicVariables *SphVariables)
 
    /* Computes Spherical variables
       Variables computed are (a/r)^(n+2), cos_m(lamda) and sin_m(lambda) for spherical harmonic
@@ -288,9 +292,8 @@ uint16_t WMM_ComputeSphericalHarmonicVariables(WMMtype_CoordSpherical *
 	/* for n = 0 ... model_order, compute (Radius of Earth / Spherica radius r)^(n+2)
 	   for n  1..nMax-1 (this is much faster than calling pow MAX_N+1 times).      */
 	SphVariables->RelativeRadiusPower[0] = (Ellip->re / CoordSpherical->r) * (Ellip->re / CoordSpherical->r);
-	for (n = 1; n <= nMax; n++) {
+	for (n = 1; n <= nMax; n++)
 		SphVariables->RelativeRadiusPower[n] = SphVariables->RelativeRadiusPower[n - 1] * (Ellip->re / CoordSpherical->r);
-	}
 
 	/*
 	   Compute cos(m*lambda), sin(m*lambda) for m = 0 ... nMax
@@ -302,7 +305,8 @@ uint16_t WMM_ComputeSphericalHarmonicVariables(WMMtype_CoordSpherical *
 
 	SphVariables->cos_mlambda[1] = cos_lambda;
 	SphVariables->sin_mlambda[1] = sin_lambda;
-	for (m = 2; m <= nMax; m++) {
+	for (m = 2; m <= nMax; m++)
+	{
 		SphVariables->cos_mlambda[m] = SphVariables->cos_mlambda[m - 1] * cos_lambda - SphVariables->sin_mlambda[m - 1] * sin_lambda;
 		SphVariables->sin_mlambda[m] = SphVariables->cos_mlambda[m - 1] * sin_lambda + SphVariables->sin_mlambda[m - 1] * cos_lambda;
 	}
@@ -444,8 +448,10 @@ uint16_t WMM_SecVarSummation(WMMtype_LegendreFunction * LegendreFunction,
 	MagneticResults->Bz = 0.0;
 	MagneticResults->By = 0.0;
 	MagneticResults->Bx = 0.0;
-	for (n = 1; n <= MagneticModel->nMaxSecVar; n++) {
-		for (m = 0; m <= n; m++) {
+	for (n = 1; n <= MagneticModel->nMaxSecVar; n++)
+	{
+		for (m = 0; m <= n; m++)
+		{
 			index = (n * (n + 1) / 2 + m);
 
 /*		    nMax  	(n+2) 	  n     m            m           m
@@ -480,9 +486,11 @@ uint16_t WMM_SecVarSummation(WMMtype_LegendreFunction * LegendreFunction,
 		}
 	}
 	cos_phi = cos(DEG2RAD(CoordSpherical->phig));
-	if (fabs(cos_phi) > 1.0e-10) {
+	if (fabs(cos_phi) > 1.0e-10)
+	{
 		MagneticResults->By = MagneticResults->By / cos_phi;
-	} else
+	}
+	else
 		/* Special calculation for component By at Geographic poles */
 	{
 		WMM_SecVarSummationSpecial(SphVariables, CoordSpherical, MagneticResults);
@@ -640,28 +648,32 @@ uint16_t WMM_PcupHigh(float *Pcup, float *dPcup, float x, uint16_t nMax)
   The derivates can't be computed for latitude = |90| degrees.
 	*/
 {
-	float pm2, pm1, pmm, plm, rescalem, z, scalef;
-	float f1[NUMPCUP], f2[NUMPCUP], PreSqr[NUMPCUP];
-	uint16_t k, kstart, m, n;
+    uint16_t    k, kstart, m, n;
+	float       pm2, pm1, pmm, plm, rescalem, z, scalef;
+	float       *f1 = (float *) MALLOC(sizeof(float) * NUMPCUP);
+	float       *f2 = (float *) MALLOC(sizeof(float) * NUMPCUP);
+	float       *PreSqr = (float *) MALLOC(sizeof(float) * NUMPCUP);
 
-	if (fabs(x) == 1.0) {
+	if (fabs(x) == 1.0)
+	{
 		// printf("Error in PcupHigh: derivative cannot be calculated at poles\n");
 		return FALSE;
 	}
 
 	scalef = 1.0e-280;
 
-	for (n = 0; n <= 2 * nMax + 1; ++n) {
+	for (n = 0; n <= 2 * nMax + 1; ++n)
 		PreSqr[n] = sqrt((float)(n));
-	}
 
 	k = 2;
 
-	for (n = 2; n <= nMax; n++) {
+	for (n = 2; n <= nMax; n++)
+	{
 		k = k + 1;
 		f1[k] = (float)(2 * n - 1) / (float)(n);
 		f2[k] = (float)(n - 1) / (float)(n);
-		for (m = 1; m <= n - 2; m++) {
+		for (m = 1; m <= n - 2; m++)
+		{
 			k = k + 1;
 			f1[k] = (float)(2 * n - 1) / PreSqr[n + m] / PreSqr[n - m];
 			f2[k] = PreSqr[n - m - 1] * PreSqr[n + m - 1] / PreSqr[n + m] / PreSqr[n - m];
@@ -681,7 +693,8 @@ uint16_t WMM_PcupHigh(float *Pcup, float *dPcup, float x, uint16_t nMax)
 	dPcup[1] = z;
 	k = 1;
 
-	for (n = 2; n <= nMax; n++) {
+	for (n = 2; n <= nMax; n++)
+	{
 		k = k + n;
 		plm = f1[k] * x * pm1 - f2[k] * pm2;
 		Pcup[k] = plm;
@@ -694,7 +707,8 @@ uint16_t WMM_PcupHigh(float *Pcup, float *dPcup, float x, uint16_t nMax)
 	rescalem = 1.0 / scalef;
 	kstart = 0;
 
-	for (m = 1; m <= nMax - 1; ++m) {
+	for (m = 1; m <= nMax - 1; ++m)
+	{
 		rescalem = rescalem * z;
 
 		/* Calculate Pcup(m,m) */
@@ -709,7 +723,8 @@ uint16_t WMM_PcupHigh(float *Pcup, float *dPcup, float x, uint16_t nMax)
 		Pcup[k] = pm1 * rescalem;
 		dPcup[k] = ((pm2 * rescalem) * PreSqr[2 * m + 1] - x * (float)(m + 1) * Pcup[k]) / z;
 		/* Calculate Pcup(n,m) */
-		for (n = m + 2; n <= nMax; ++n) {
+		for (n = m + 2; n <= nMax; ++n)
+		{
 			k = k + n;
 			plm = x * f1[k] * pm1 - f2[k] * pm2;
 			Pcup[k] = plm * rescalem;
@@ -725,6 +740,10 @@ uint16_t WMM_PcupHigh(float *Pcup, float *dPcup, float x, uint16_t nMax)
 	pmm = pmm / PreSqr[2 * nMax];
 	Pcup[kstart] = pmm * rescalem;
 	dPcup[kstart] = -(float)(nMax) * x * Pcup[kstart] / z;
+
+	FREE(PreSqr);
+    FREE(f2);
+	FREE(f1);
 
 	return TRUE;
 }				/* WMM_PcupHigh */
@@ -755,10 +774,13 @@ uint16_t WMM_PcupLow(float *Pcup, float *dPcup, float x, uint16_t nMax)
   the Associated Legendre Functions.
 */
 {
-	uint16_t n, m, index, index1, index2;
-	float k, z, schmidtQuasiNorm[NUMPCUP];
+    uint16_t    n, m, index, index1, index2;
+    float       k, z;
+    float       *schmidtQuasiNorm = (float *) MALLOC(sizeof(float) * NUMPCUP);
+
 	Pcup[0] = 1.0;
 	dPcup[0] = 0.0;
+
 	/*sin (geocentric latitude) - sin_phi */
 	z = sqrt((1.0 - x) * (1.0 + x));
 
@@ -822,6 +844,8 @@ uint16_t WMM_PcupLow(float *Pcup, float *dPcup, float x, uint16_t nMax)
 		}
 	}
 
+	FREE(schmidtQuasiNorm);
+
 	return TRUE;
 }				/*WMM_PcupLow */
 
@@ -838,8 +862,12 @@ uint16_t WMM_SummationSpecial(WMMtype_SphericalHarmonicVariables *
 
 	 */
 {
-	uint16_t n, index;
-	float k, sin_phi, PcupS[NUMPCUPS], schmidtQuasiNorm1, schmidtQuasiNorm2, schmidtQuasiNorm3;
+    uint16_t    n, index;
+    float       k, sin_phi;
+    float       schmidtQuasiNorm1;
+    float       schmidtQuasiNorm2;
+    float       schmidtQuasiNorm3;
+    float       *PcupS = (float *) MALLOC(sizeof(float) * NUMPCUPS);
 
 	PcupS[0] = 1;
 	schmidtQuasiNorm1 = 1.0;
@@ -876,6 +904,8 @@ uint16_t WMM_SummationSpecial(WMMtype_SphericalHarmonicVariables *
 		    * PcupS[n] * schmidtQuasiNorm3;
 	}
 
+	FREE(PcupS);
+
 	return TRUE;
 }				/*WMM_SummationSpecial */
 
@@ -891,8 +921,12 @@ uint16_t WMM_SecVarSummationSpecial(WMMtype_SphericalHarmonicVariables *
 	   CALLS : none
 
 	 */
-	uint16_t n, index;
-	float k, sin_phi, PcupS[NUMPCUPS], schmidtQuasiNorm1, schmidtQuasiNorm2, schmidtQuasiNorm3;
+    uint16_t    n, index;
+    float       k, sin_phi;
+    float       schmidtQuasiNorm1;
+    float       schmidtQuasiNorm2;
+    float       schmidtQuasiNorm3;
+    float       *PcupS = (float *) MALLOC(sizeof(float) * NUMPCUPS);
 
 	PcupS[0] = 1;
 	schmidtQuasiNorm1 = 1.0;
@@ -924,6 +958,8 @@ uint16_t WMM_SecVarSummationSpecial(WMMtype_SphericalHarmonicVariables *
 		    * PcupS[n] * schmidtQuasiNorm3;
 	}
 
+	FREE(PcupS);
+
 	return TRUE;
 }				/*SecVarSummationSpecial */
 
@@ -932,21 +968,24 @@ uint16_t WMM_SecVarSummationSpecial(WMMtype_SphericalHarmonicVariables *
  */
 float WMM_get_main_field_coeff_g(uint16_t index) 
 {	
-	if(index >= NUMTERMS)
+	if (index >= NUMTERMS)
 		return 0;
 
-	float coeff = CoeffFile[index][2];
-	uint16_t n, m, sum_index, a, b;
+    uint16_t n, m, sum_index, a, b;
+
+    float coeff = CoeffFile[index][2];
 	
 	a = MagneticModel->nMaxSecVar;
 	b = (a * (a + 1) / 2 + a);
-	for (n = 1; n <= MagneticModel->nMax; n++) {
-		for (m = 0; m <= n; m++) {
+	for (n = 1; n <= MagneticModel->nMax; n++)
+	{
+		for (m = 0; m <= n; m++)
+		{
 			
 			sum_index = (n * (n + 1) / 2 + m);
 			
 			/* Hacky for now, will solve for which conditions need summing analytically */
-			if(sum_index != index)
+			if (sum_index != index)
 				continue;
 			
 			if (index <= b) 
@@ -960,21 +999,23 @@ float WMM_get_main_field_coeff_g(uint16_t index)
 
 float WMM_get_main_field_coeff_h(uint16_t index) 
 {	
-	if(index >= NUMTERMS)
+	if (index >= NUMTERMS)
 		return 0;
 	
+    uint16_t n, m, sum_index, a, b;
 	float coeff = CoeffFile[index][3];
-	uint16_t n, m, sum_index, a, b;
 	
 	a = MagneticModel->nMaxSecVar;
 	b = (a * (a + 1) / 2 + a);
-	for (n = 1; n <= MagneticModel->nMax; n++) {
-		for (m = 0; m <= n; m++) {
+	for (n = 1; n <= MagneticModel->nMax; n++)
+	{
+		for (m = 0; m <= n; m++)
+		{
 			
 			sum_index = (n * (n + 1) / 2 + m);
 			
 			/* Hacky for now, will solve for which conditions need summing analytically */
-			if(sum_index != index)
+			if (sum_index != index)
 				continue;
 			
 			if (index <= b) 
@@ -987,7 +1028,7 @@ float WMM_get_main_field_coeff_h(uint16_t index)
 
 float WMM_get_secular_var_coeff_g(uint16_t index) 
 {		
-	if(index >= NUMTERMS)
+	if (index >= NUMTERMS)
 		return 0;
 	
 	return CoeffFile[index][4];
@@ -995,7 +1036,7 @@ float WMM_get_secular_var_coeff_g(uint16_t index)
 
 float WMM_get_secular_var_coeff_h(uint16_t index) 
 {		
-	if(index >= NUMTERMS)
+	if (index >= NUMTERMS)
 		return 0;
 	
 	return CoeffFile[index][5];
@@ -1009,18 +1050,16 @@ uint16_t WMM_DateToYear(uint16_t month, uint16_t day, uint16_t year)
 	uint16_t ExtraDay = 0;
 	uint16_t i;
 
-	if ((year % 4 == 0 && year % 100 != 0)
-	    || year % 400 == 0)
+	if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
 		ExtraDay = 1;
 	MonthDays[2] += ExtraDay;
 
 	/******************Validation********************************/
-	if (month <= 0 || month > 12) {
+	if (month <= 0 || month > 12)
 		return 0;
-	}
-	if (day <= 0 || day > MonthDays[month]) {
+	if (day <= 0 || day > MonthDays[month])
 		return 0;
-	}
+
 	/****************Calculation of t***************************/
 	for (i = 1; i <= month; i++)
 		temp += MonthDays[i - 1];
@@ -1057,4 +1096,3 @@ void WMM_GeodeticToSpherical(WMMtype_CoordGeodetic * CoordGeodetic, WMMtype_Coor
 	CoordSpherical->lambda = CoordGeodetic->lambda;	// longitude
 
 }				// WMM_GeodeticToSpherical
-

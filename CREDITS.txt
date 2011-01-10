@@ -77,6 +77,10 @@ E: peter (at) pyne (dot) se
 D: GCS Core Developer
 D: Multiple GCS plugins, Gadget foundations, UAVObject viewer
 
+N: Dean Hall
+E: dwhall256 (plus) openpilot (at) gmail (dot) com
+D: Creator of http://code.google.com/p/python-on-a-chip/
+
 N: Joe Hlebasko
 E: joe (dot) hlebasko(plus) openpilot (at) gmail (dot) com
 D: Version 3 Main Board routing 
@@ -115,6 +119,7 @@ N: Cathy Moss
 E: cmoss296 (at) blueyonder (dot) co (dot) uk
 D: Hardware design Lead: Gen 2 Mainboard, PipXtreme, Current Sensor
 D: Lead dev PipXtreme, creator OP Map Plugin
+M: PipX Modems
 
 N: Angus Peart
 E: gussy (at) openpilot (dot) org

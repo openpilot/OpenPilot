@@ -239,6 +239,8 @@ function [] = OPLogConvert()
     I2CStats(1).fsm_errors = 0;
     I2CStats(1).irq_errors = 0;
     I2CStats(1).last_error_type = 0;
+    I2CStats(1).evirq_log = zeros(1,5);
+    I2CStats(1).erirq_log = zeros(1,5);
     I2CStats(1).event_log = zeros(1,5);
     I2CStats(1).state_log = zeros(1,5);
 
@@ -527,7 +529,7 @@ function [] = OPLogConvert()
             case 3590360786
                 HomeLocation(homelocationIdx) = ReadHomeLocationObject(fid, timestamp);
                 homelocationIdx = homelocationIdx + 1;
-            case 1063893720
+            case 122889918
                 I2CStats(i2cstatsIdx) = ReadI2CStatsObject(fid, timestamp);
                 i2cstatsIdx = i2cstatsIdx + 1;
             case 2841592332
@@ -1081,8 +1083,10 @@ function [I2CStats] = ReadI2CStatsObject(fid, timestamp)
     I2CStats.fsm_errors = double(fread(fid, 1, 'uint16'));
     I2CStats.irq_errors = double(fread(fid, 1, 'uint16'));
     I2CStats.last_error_type = double(fread(fid, 1, 'uint8'));
-    I2CStats.event_log = double(fread(fid, 5, 'uint32'));
-    I2CStats.state_log = double(fread(fid, 5, 'uint32'));
+    I2CStats.evirq_log = double(fread(fid, 5, 'uint32'));
+    I2CStats.erirq_log = double(fread(fid, 5, 'uint32'));
+    I2CStats.event_log = double(fread(fid, 5, 'uint8'));
+    I2CStats.state_log = double(fread(fid, 5, 'uint8'));
     % read CRC
     fread(fid, 1, 'uint8');
 end

@@ -81,7 +81,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'event_log',
+		'evirq_log',
 		'I',
 		5,
 		[
@@ -95,7 +95,7 @@ _fields = [ \
 		}
 	),
 	uavobject.UAVObjectField(
-		'state_log',
+		'erirq_log',
 		'I',
 		5,
 		[
@@ -108,12 +108,81 @@ _fields = [ \
 		{
 		}
 	),
+	uavobject.UAVObjectField(
+		'event_log',
+		'b',
+		5,
+		[
+			'0',
+			'1',
+			'2',
+			'3',
+			'4',
+		],
+		{
+			'0' : 'I2C_EVENT_BUS_ERROR',
+			'1' : 'I2C_EVENT_START',
+			'2' : 'I2C_EVENT_STARTED_MORE_TXN_READ',
+			'3' : 'I2C_EVENT_STARTED_MORE_TXN_WRITE',
+			'4' : 'I2C_EVENT_STARTED_LAST_TXN_READ',
+			'5' : 'I2C_EVENT_STARTED_LAST_TXN_WRITE',
+			'6' : 'I2C_EVENT_ADDR_SENT_LEN_EQ_0',
+			'7' : 'I2C_EVENT_ADDR_SENT_LEN_EQ_1',
+			'8' : 'I2C_EVENT_ADDR_SENT_LEN_EQ_2',
+			'9' : 'I2C_EVENT_ADDR_SENT_LEN_GT_2',
+			'10' : 'I2C_EVENT_TRANSFER_DONE_LEN_EQ_0',
+			'11' : 'I2C_EVENT_TRANSFER_DONE_LEN_EQ_1',
+			'12' : 'I2C_EVENT_TRANSFER_DONE_LEN_EQ_2',
+			'13' : 'I2C_EVENT_TRANSFER_DONE_LEN_GT_2',
+			'14' : 'I2C_EVENT_NACK',
+			'15' : 'I2C_EVENT_STOPPED',
+			'16' : 'I2C_EVENT_AUTO',
+		}
+	),
+	uavobject.UAVObjectField(
+		'state_log',
+		'b',
+		5,
+		[
+			'0',
+			'1',
+			'2',
+			'3',
+			'4',
+		],
+		{
+			'0' : 'I2C_STATE_FSM_FAULT',
+			'1' : 'I2C_STATE_BUS_ERROR',
+			'2' : 'I2C_STATE_STOPPED',
+			'3' : 'I2C_STATE_STOPPING',
+			'4' : 'I2C_STATE_STARTING',
+			'5' : 'I2C_STATE_R_MORE_TXN_ADDR',
+			'6' : 'I2C_STATE_R_MORE_TXN_PRE_ONE',
+			'7' : 'I2C_STATE_R_MORE_TXN_PRE_FIRST',
+			'8' : 'I2C_STATE_R_MORE_TXN_PRE_MIDDLE',
+			'9' : 'I2C_STATE_R_MORE_TXN_LAST',
+			'10' : 'I2C_STATE_R_MORE_TXN_POST_LAST',
+			'11' : 'R_LAST_TXN_ADDR',
+			'12' : 'I2C_STATE_R_LAST_TXN_PRE_ONE',
+			'13' : 'I2C_STATE_R_LAST_TXN_PRE_FIRST',
+			'14' : 'I2C_STATE_R_LAST_TXN_PRE_MIDDLE',
+			'15' : 'I2C_STATE_R_LAST_TXN_PRE_LAST',
+			'16' : 'I2C_STATE_R_LAST_TXN_POST_LAST',
+			'17' : 'I2C_STATE_W_MORE_TXN_ADDR',
+			'18' : 'I2C_STATE_W_MORE_TXN_MIDDLE',
+			'19' : 'I2C_STATE_W_MORE_TXN_LAST',
+			'20' : 'I2C_STATE_W_LAST_TXN_ADDR',
+			'21' : 'I2C_STATE_W_LAST_TXN_MIDDLE',
+			'22' : 'I2C_STATE_W_LAST_TXN_LAST',
+			'23' : 'I2C_STATE_NACK',
+		}
+	),
 ]
 
 
 class I2CStats(uavobject.UAVObject):
     ## Object constants
-    OBJID        = 1063893720
+    OBJID        = 122889918
     NAME         = "I2CStats"
     METANAME     = "I2CStatsMeta"
     ISSINGLEINST = 1

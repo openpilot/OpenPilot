@@ -47,8 +47,10 @@ public:
         quint16 fsm_errors;
         quint16 irq_errors;
         quint8 last_error_type;
-        quint32 event_log[5];
-        quint32 state_log[5];
+        quint32 evirq_log[5];
+        quint32 erirq_log[5];
+        quint8 event_log[5];
+        quint8 state_log[5];
 
     } __attribute__((packed)) DataFields;
 
@@ -59,16 +61,26 @@ public:
     // Field last_error_type information
     /* Enumeration options for field last_error_type */
     typedef enum { LAST_ERROR_TYPE_EVENT=0, LAST_ERROR_TYPE_FSM=1, LAST_ERROR_TYPE_INTERRUPT=2 } last_error_typeOptions;
+    // Field evirq_log information
+    /* Number of elements for field evirq_log */
+    static const quint32 EVIRQ_LOG_NUMELEM = 5;
+    // Field erirq_log information
+    /* Number of elements for field erirq_log */
+    static const quint32 ERIRQ_LOG_NUMELEM = 5;
     // Field event_log information
+    /* Enumeration options for field event_log */
+    typedef enum { EVENT_LOG_I2C_EVENT_BUS_ERROR=0, EVENT_LOG_I2C_EVENT_START=1, EVENT_LOG_I2C_EVENT_STARTED_MORE_TXN_READ=2, EVENT_LOG_I2C_EVENT_STARTED_MORE_TXN_WRITE=3, EVENT_LOG_I2C_EVENT_STARTED_LAST_TXN_READ=4, EVENT_LOG_I2C_EVENT_STARTED_LAST_TXN_WRITE=5, EVENT_LOG_I2C_EVENT_ADDR_SENT_LEN_EQ_0=6, EVENT_LOG_I2C_EVENT_ADDR_SENT_LEN_EQ_1=7, EVENT_LOG_I2C_EVENT_ADDR_SENT_LEN_EQ_2=8, EVENT_LOG_I2C_EVENT_ADDR_SENT_LEN_GT_2=9, EVENT_LOG_I2C_EVENT_TRANSFER_DONE_LEN_EQ_0=10, EVENT_LOG_I2C_EVENT_TRANSFER_DONE_LEN_EQ_1=11, EVENT_LOG_I2C_EVENT_TRANSFER_DONE_LEN_EQ_2=12, EVENT_LOG_I2C_EVENT_TRANSFER_DONE_LEN_GT_2=13, EVENT_LOG_I2C_EVENT_NACK=14, EVENT_LOG_I2C_EVENT_STOPPED=15, EVENT_LOG_I2C_EVENT_AUTO=16 } event_logOptions;
     /* Number of elements for field event_log */
     static const quint32 EVENT_LOG_NUMELEM = 5;
     // Field state_log information
+    /* Enumeration options for field state_log */
+    typedef enum { STATE_LOG_I2C_STATE_FSM_FAULT=0, STATE_LOG_I2C_STATE_BUS_ERROR=1, STATE_LOG_I2C_STATE_STOPPED=2, STATE_LOG_I2C_STATE_STOPPING=3, STATE_LOG_I2C_STATE_STARTING=4, STATE_LOG_I2C_STATE_R_MORE_TXN_ADDR=5, STATE_LOG_I2C_STATE_R_MORE_TXN_PRE_ONE=6, STATE_LOG_I2C_STATE_R_MORE_TXN_PRE_FIRST=7, STATE_LOG_I2C_STATE_R_MORE_TXN_PRE_MIDDLE=8, STATE_LOG_I2C_STATE_R_MORE_TXN_LAST=9, STATE_LOG_I2C_STATE_R_MORE_TXN_POST_LAST=10, STATE_LOG_R_LAST_TXN_ADDR=11, STATE_LOG_I2C_STATE_R_LAST_TXN_PRE_ONE=12, STATE_LOG_I2C_STATE_R_LAST_TXN_PRE_FIRST=13, STATE_LOG_I2C_STATE_R_LAST_TXN_PRE_MIDDLE=14, STATE_LOG_I2C_STATE_R_LAST_TXN_PRE_LAST=15, STATE_LOG_I2C_STATE_R_LAST_TXN_POST_LAST=16, STATE_LOG_I2C_STATE_W_MORE_TXN_ADDR=17, STATE_LOG_I2C_STATE_W_MORE_TXN_MIDDLE=18, STATE_LOG_I2C_STATE_W_MORE_TXN_LAST=19, STATE_LOG_I2C_STATE_W_LAST_TXN_ADDR=20, STATE_LOG_I2C_STATE_W_LAST_TXN_MIDDLE=21, STATE_LOG_I2C_STATE_W_LAST_TXN_LAST=22, STATE_LOG_I2C_STATE_NACK=23 } state_logOptions;
     /* Number of elements for field state_log */
     static const quint32 STATE_LOG_NUMELEM = 5;
 
   
     // Constants
-    static const quint32 OBJID = 1063893720U;
+    static const quint32 OBJID = 122889918U;
     static const QString NAME;
     static const QString DESCRIPTION;
     static const bool ISSINGLEINST = 1;

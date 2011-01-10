@@ -227,6 +227,8 @@ static void updateI2Cstats()
 	PIOS_I2C_GetDiagnostics(&history, &i2cStats.event_errors);
 	
 	for(uint8_t i = 0; (i < I2C_LOG_DEPTH) && (i < I2CSTATS_EVENT_LOG_NUMELEM); i++) {
+		i2cStats.evirq_log[i] = history.evirq[i];
+		i2cStats.erirq_log[i] = history.erirq[i];
 		i2cStats.event_log[i] = history.event[i];
 		i2cStats.state_log[i] = history.state[i];		
 	}

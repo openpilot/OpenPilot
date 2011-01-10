@@ -34,7 +34,6 @@
 #include "openpilot.h"
 #include "actuator.h"
 #include "actuatorsettings.h"
-//#include "vtolsettings.h"
 #include "systemsettings.h"
 #include "actuatordesired.h"
 #include "actuatorcommand.h"
@@ -227,6 +226,7 @@ static void actuatorTask(void* parameters)
 
 		// Update servo outputs
 		bool success = true;
+		
 		for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n)
 		{
 			success &= set_channel(n, command.Channel[n]);

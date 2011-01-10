@@ -58,8 +58,10 @@ enum pios_i2c_error_type {
 
 struct pios_i2c_fault_history {
 	enum pios_i2c_error_type type;
-	uint32_t event[I2C_LOG_DEPTH];
-	uint32_t state[I2C_LOG_DEPTH];
+	uint32_t evirq[I2C_LOG_DEPTH];
+	uint32_t erirq[I2C_LOG_DEPTH];
+	uint8_t event[I2C_LOG_DEPTH];
+	uint8_t state[I2C_LOG_DEPTH];
 };
 
 /* Public Functions */

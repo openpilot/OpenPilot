@@ -227,15 +227,28 @@ JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("Updating with ActiveSearch:");
 						// Add to tesselation grid for active search
 						//featMan->addObs(obsPtr->expectation.x());
 						
-						// predict information gain
-						obsPtr->predictInfoGain();
+						/*
+						quicly check if expectation has some negative variance values,
+						to ignore the observation and prevent from crashing
+						(it means that the filter is corrupted and that we should stop
+						everything anyway)
+						*/
+						bool valid = true;
+						for (unsigned i = 0; i < obsPtr->expectation.P().size1(); ++i)
+							if (obsPtr->expectation.P()(i,i) < 0.0) { valid = false; break; }
+
+						if (valid)
+						{
+							// predict information gain
+							obsPtr->predictInfoGain();
 //TEST to change the update order:
 //obsPtr->expectation.infoGain = rand()/1000.;
 //obsPtr->expectation.infoGain = -obsPtr->expectation.infoGain;
 
-						// add to sorted list of observations
-						obsListSorted[obsPtr->expectation.infoGain] = obsIter;
+							// add to sorted list of observations
+							obsListSorted[obsPtr->expectation.infoGain] = obsIter;
 // JFR_DEBUG("obs " << obsPtr->id() << " info gain " << obsPtr->expectation.infoGain);
+						}
 					} // visible obs
 				} // for each obs
 

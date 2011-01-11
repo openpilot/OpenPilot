@@ -3,9 +3,11 @@
 #include <iostream>
 #include <unistd.h>
 
-#include <boost/numeric/bindings/traits/ublas_matrix.hpp>
-#include <boost/numeric/bindings/lapack/syev.hpp>
-#include <boost/numeric/bindings/lapack/gesdd.hpp>
+#include <boost/numeric/bindings/ublas/matrix.hpp>
+#include <boost/numeric/bindings/ublas/vector.hpp>
+#include <boost/numeric/bindings/ublas/symmetric.hpp>
+#include <boost/numeric/bindings/lapack/driver/syev.hpp>
+#include <boost/numeric/bindings/lapack/driver/gesdd.hpp>
 
 #include "gdhe/client.hpp"
 #include "jmath/angle.hpp"
@@ -138,13 +140,14 @@ namespace gdhe {
 	{
 		namespace lapack = boost::numeric::bindings::lapack;
 		jblas::vec lambda(3);
-//		ublas::matrix<double, ublas::column_major> A(ublas::project(_xCov, ublas::range(0,3), ublas::range(0,3))); 
-		ublas::matrix<double, ublas::column_major> A(_xCov); 
+//		jblas::mat_column_major A(ublas::project(_xCov, ublas::range(0,3), ublas::range(0,3))); 
+		jblas::mat_column_major A(_xCov); 
 		// SYEV is buggy to get 3d orientation... using generic GESDD instead to do svd decomposition, without using the fact that xCov is symmetric
-//		int ierr = lapack::syev( 'V', 'U', A, lambda, lapack::optimal_workspace() );
+//		up_sym_adapt s_A(A);
+//		int ierr = lapack::syev( 'V', s_A, lambda, lapack::optimal_workspace() );
 		jblas::mat_column_major U(3, 3);
 		jblas::mat_column_major VT(3, 3);
-		int ierr = lapack::gesdd(A,lambda,U,VT);
+		int ierr = lapack::gesdd('A',A,lambda,U,VT);
 		A = U;
 		
 		JFR_POSTCOND(ierr==0, "Ellipsoid:: error in lapack::syev() function, ierr=" << ierr);

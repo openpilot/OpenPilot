@@ -288,6 +288,7 @@ namespace correl {
 					image::ConvexRoi rroi2_in_im2(jmath::round((nbestx-nrect2_in_imB.x)/fw) + rect2_in_im2.x - refineDist,
 																				jmath::round((nbesty-nrect2_in_imB.y)/fh) + rect2_in_im2.y - refineDist,
 																				2*refineDist+1, 2*refineDist+1); // refine roi
+					rroi2_in_im2 *= result_in_im2;
 					rawExploreTranslationRobust(im1, im2, rroi2_in_im2, bestx, besty, best_score, result_in_im2, results);
 				}
 				

@@ -219,7 +219,8 @@ static void setHomeLocation(GPSPositionData * gpsData)
 	GPSTimeData gps;
 	GPSTimeGet(&gps);
 
-	if (gps.Year >= 2000) {
+	if (gps.Year >= 2000)
+	{
 		// Store LLA
 		home.Latitude = gpsData->Latitude;
 		home.Longitude = gpsData->Longitude;
@@ -237,10 +238,12 @@ static void setHomeLocation(GPSPositionData * gpsData)
 		home.ECEF[2] = (int32_t) (ECEF[2] * 100);
 
 		// Compute magnetic flux direction at home location
-		WMM_GetMagVector(LLA[0], LLA[1], LLA[2], gps.Month, gps.Day, gps.Year, &home.Be[0]);
+		if (WMM_GetMagVector(LLA[0], LLA[1], LLA[2], gps.Month, gps.Day, gps.Year, &home.Be[0]) >= 0)
+		{   // calculations appeared to go OK
 
-		home.Set = HOMELOCATION_SET_TRUE;
-		HomeLocationSet(&home);
+		    home.Set = HOMELOCATION_SET_TRUE;
+		    HomeLocationSet(&home);
+		}
 	}
 }
 

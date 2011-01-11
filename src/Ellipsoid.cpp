@@ -2,9 +2,11 @@
 
 #include "qdisplay/Ellipsoid.hpp"
 
-#include "boost/numeric/bindings/traits/ublas_matrix.hpp"
-#include <boost/numeric/bindings/lapack/syev.hpp>
 
+#include <boost/numeric/bindings/ublas/matrix.hpp>
+#include <boost/numeric/bindings/ublas/vector.hpp>
+#include <boost/numeric/bindings/lapack/driver/syev.hpp>
+#include <boost/numeric/bindings/ublas/symmetric.hpp>
 
 #include <kernel/jafarMacro.hpp>
 
@@ -26,12 +28,14 @@ Ellipsoid::Ellipsoid( const jblas::vec2& _x, const jblas::sym_mat22& _xCov, doub
 	set(_x, _xCov, _scale);
 }
 
+	
 void Ellipsoid::set( const jblas::vec2& _x, const jblas::sym_mat22& _xCov, double _scale )
 {
   namespace lapack = boost::numeric::bindings::lapack;
   jblas::vec2 lambda;
-  ublas::matrix<double, ublas::column_major> A(ublas::project(_xCov, ublas::range(0,2), ublas::range(0,2))); 
-  int ierr = lapack::syev( 'V', 'U', A, lambda, lapack::optimal_workspace() );
+  jblas::mat_column_major A(ublas::project(_xCov, ublas::range(0,2), ublas::range(0,2)));
+  jblas::up_sym_adapt_column_major s_A(A);
+  int ierr = lapack::syev('V', s_A, lambda, lapack::optimal_workspace() );
   JFR_POSTCOND(ierr==0,
       "Ellipsoid::Ellipsoid: error in lapack::syev() function, ierr=" << ierr);
   if (!ierr==0) {

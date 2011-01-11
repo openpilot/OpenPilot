@@ -268,10 +268,14 @@ app_dst->patch.save(buffer);
 			// if we can't have a good view, we add the last one and try with it
 			if ((!closestView || (cosClosestAngle < cosAngleStep && lastObsFailed)) && lastValidView.appearancePtr)
 			{
-				views.push_back(lastValidView);
-				checkView(current_pov, current_pov_norm2, lmk, views.back(), cosClosestAngle, closestView);
-				lastValidView.clear();
-				JFR_DEBUG("Descriptor of landmark " << obsPtr->id() << " stored a new view ; it has " << views.size() << " of them now");
+				checkView(current_pov, current_pov_norm2, lmk, lastValidView, cosClosestAngle, closestView);
+				if (closestView == &lastValidView)
+				{
+					views.push_back(lastValidView);
+					lastValidView.clear();
+					closestView = &(views.back());
+					JFR_DEBUG("Descriptor of landmark " << obsPtr->id() << " stored a new view ; it has " << views.size() << " of them now");
+				}
 			}
 			
 			// return final result

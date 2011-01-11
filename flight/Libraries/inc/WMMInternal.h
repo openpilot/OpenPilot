@@ -119,40 +119,40 @@ typedef struct {
 
 	// Internal Function Prototypes
 void WMM_Set_Coeff_Array();
-void WMM_GeodeticToSpherical(WMMtype_CoordGeodetic * CoordGeodetic, WMMtype_CoordSpherical * CoordSpherical);
-uint16_t WMM_DateToYear(uint16_t month, uint16_t day, uint16_t year);
-uint16_t WMM_Geomag(WMMtype_CoordSpherical * CoordSpherical,
+int WMM_GeodeticToSpherical(WMMtype_CoordGeodetic * CoordGeodetic, WMMtype_CoordSpherical * CoordSpherical);
+int WMM_DateToYear(uint16_t month, uint16_t day, uint16_t year);
+int WMM_Geomag(WMMtype_CoordSpherical * CoordSpherical,
 		    WMMtype_CoordGeodetic * CoordGeodetic, WMMtype_GeoMagneticElements * GeoMagneticElements);
 
-uint16_t WMM_AssociatedLegendreFunction(WMMtype_CoordSpherical * CoordSpherical, uint16_t nMax, WMMtype_LegendreFunction * LegendreFunction);
+int WMM_AssociatedLegendreFunction(WMMtype_CoordSpherical * CoordSpherical, uint16_t nMax, WMMtype_LegendreFunction * LegendreFunction);
 
-uint16_t WMM_CalculateGeoMagneticElements(WMMtype_MagneticResults * MagneticResultsGeo, WMMtype_GeoMagneticElements * GeoMagneticElements);
+int WMM_CalculateGeoMagneticElements(WMMtype_MagneticResults * MagneticResultsGeo, WMMtype_GeoMagneticElements * GeoMagneticElements);
 
-uint16_t WMM_CalculateSecularVariation(WMMtype_MagneticResults * MagneticVariation, WMMtype_GeoMagneticElements * MagneticElements);
+int WMM_CalculateSecularVariation(WMMtype_MagneticResults * MagneticVariation, WMMtype_GeoMagneticElements * MagneticElements);
 
-uint16_t WMM_ComputeSphericalHarmonicVariables(WMMtype_CoordSpherical *
+int WMM_ComputeSphericalHarmonicVariables(WMMtype_CoordSpherical *
 					       CoordSpherical, uint16_t nMax, WMMtype_SphericalHarmonicVariables * SphVariables);
 
-uint16_t WMM_PcupLow(float *Pcup, float *dPcup, float x, uint16_t nMax);
+int WMM_PcupLow(float *Pcup, float *dPcup, float x, uint16_t nMax);
 
-uint16_t WMM_PcupHigh(float *Pcup, float *dPcup, float x, uint16_t nMax);
+int WMM_PcupHigh(float *Pcup, float *dPcup, float x, uint16_t nMax);
 
-uint16_t WMM_RotateMagneticVector(WMMtype_CoordSpherical *,
+int WMM_RotateMagneticVector(WMMtype_CoordSpherical *,
 				  WMMtype_CoordGeodetic * CoordGeodetic,
 				  WMMtype_MagneticResults * MagneticResultsSph, WMMtype_MagneticResults * MagneticResultsGeo);
 
-uint16_t WMM_SecVarSummation(WMMtype_LegendreFunction * LegendreFunction,
+int WMM_SecVarSummation(WMMtype_LegendreFunction * LegendreFunction,
 			     WMMtype_SphericalHarmonicVariables *
 			     SphVariables, WMMtype_CoordSpherical * CoordSpherical, WMMtype_MagneticResults * MagneticResults);
 
-uint16_t WMM_SecVarSummationSpecial(WMMtype_SphericalHarmonicVariables *
+int WMM_SecVarSummationSpecial(WMMtype_SphericalHarmonicVariables *
 				    SphVariables, WMMtype_CoordSpherical * CoordSpherical, WMMtype_MagneticResults * MagneticResults);
 
-uint16_t WMM_Summation(WMMtype_LegendreFunction * LegendreFunction,
+int WMM_Summation(WMMtype_LegendreFunction * LegendreFunction,
 		       WMMtype_SphericalHarmonicVariables * SphVariables,
 		       WMMtype_CoordSpherical * CoordSpherical, WMMtype_MagneticResults * MagneticResults);
 
-uint16_t WMM_SummationSpecial(WMMtype_SphericalHarmonicVariables *
+int WMM_SummationSpecial(WMMtype_SphericalHarmonicVariables *
 			      SphVariables, WMMtype_CoordSpherical * CoordSpherical, WMMtype_MagneticResults * MagneticResults);
 
 float WMM_get_main_field_coeff_g(uint16_t index);

@@ -5,7 +5,15 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Source file for the World Magnetic Model
  *             This is a port of code available from the US NOAA.
+ *
  *             The hard coded coefficients should be valid until 2015.
+ *
+ *             Updated coeffs from ..
+ *             http://www.ngdc.noaa.gov/geomag/WMM/wmm_ddownload.shtml
+ *
+ *             NASA C source code ..
+ *             http://www.ngdc.noaa.gov/geomag/WMM/wmm_wdownload.shtml
+ *
  *             Major changes include:
  *                - No geoid model (altitude must be geodetic WGS-84)
  *                - Floating point calculation (not double precision)

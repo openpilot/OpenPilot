@@ -57,6 +57,7 @@ public:
     void setDescription(QString d) { // Split around 40 characters
         int idx = d.indexOf(" ",40);
         d.insert(idx,QString("<br>"));
+        d.remove("@Ref", Qt::CaseInsensitive);
         m_description = d;
     }
     // only column 1 (TreeItem::dataColumn) is changed with setData currently

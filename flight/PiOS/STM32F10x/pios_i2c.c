@@ -926,9 +926,7 @@ void PIOS_I2C_EV_IRQ_Handler(uint8_t i2c)
 	
 	i2c_adapter = find_i2c_adapter_by_id(i2c);
 	PIOS_DEBUG_Assert(i2c_adapter);
-	
-	PIOS_DELAY_WaituS(1);
-	
+		
 	uint32_t event = I2C_GetLastEvent(i2c_adapter->cfg->regs);
 
 #if defined(PIOS_I2C_DIAGNOSTICS)	
@@ -1049,10 +1047,7 @@ void PIOS_I2C_ER_IRQ_Handler(uint8_t i2c)
 
 	i2c_adapter = find_i2c_adapter_by_id(i2c);
 	PIOS_DEBUG_Assert(i2c_adapter);
-	
-	PIOS_DELAY_WaituS(1);
-
-	
+		
 #if defined(PIOS_I2C_DIAGNOSTICS)	
 	uint32_t event = I2C_GetLastEvent(i2c_adapter->cfg->regs);
 

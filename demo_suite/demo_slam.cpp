@@ -104,6 +104,8 @@ typedef DataManagerOnePointRansac<simu::RawSimu, SensorPinHole, simu::FeatureSim
  * The problem is that the correlation is not robust enough in a matching
  * (opposed to tracking) context, and it can provoke matching errors with a
  * progressive appearance drift.
+ * Also decreasing perfs by 10%, probably because we save a view at each obs,
+ * or maybe it just because of the different random process
  */
 #define MULTIVIEW_DESCRIPTOR 0
 

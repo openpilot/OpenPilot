@@ -26,6 +26,15 @@
  */
 #define BUFFERED_UPDATE 1
 
+/*
+ * STATUS: working fine, use it
+ * The goal is to improve performance by not computing jacobians
+ * and covariance matrix for observations that are not visible
+ * (but we compute twice the mean for those that are visible)
+ * It brings approx 2% speedup
+ */
+#define PROJECT_MEAN_VISIBILITY 1
+
 namespace jafar {
 	namespace rtslam {
 
@@ -101,10 +110,15 @@ namespace jafar {
 	// JFR_DEBUG("not yet matched, trying with lowInnov in roi " << roi);
 							matcher->match(rawData, obsCurrentPtr->predictedAppearance, roi, obsCurrentPtr->measurement, obsCurrentPtr->observedAppearance);
 	// JFR_DEBUG("obs " << obsCurrentPtr->id() << " expected at " << exp << " measured with innovation " << obsCurrentPtr->measurement.x()-exp);
-							if (obsCurrentPtr->getMatchScore() > matcher->params.threshold && 
-									isExpectedInnovationInlier(obsCurrentPtr, matcher->params.mahalanobisTh))
+							if (obsCurrentPtr->getMatchScore() > matcher->params.threshold)
 							{
-								obsCurrentPtr->events.matched = true;
+								#if PROJECT_MEAN_VISIBILITY
+								obsCurrentPtr->project();
+								#endif
+								if (isExpectedInnovationInlier(obsCurrentPtr, matcher->params.mahalanobisTh))
+								{
+									obsCurrentPtr->events.matched = true;
+								}
 							}
 						}
 					
@@ -212,7 +226,7 @@ JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("Updating with ActiveSearch:");
 
 						// Add to tesselation grid for active search
 						//featMan->addObs(obsPtr->expectation.x());
-
+						
 						// predict information gain
 						obsPtr->predictInfoGain();
 //TEST to change the update order:
@@ -503,7 +517,11 @@ JFR_DEBUG_END();
 				obsPtr->clearEvents();
 				obsPtr->measurement.matchScore = 0;
 
+				#if PROJECT_MEAN_VISIBILITY
+				obsPtr->projectMean();
+				#else
 				obsPtr->project();
+				#endif
 				
 				if (obsPtr->predictVisibility())
 				{
@@ -640,6 +658,10 @@ JFR_DEBUG_END();
 		bool DataManagerOnePointRansac<RawSpec,SensorSpec,FeatureSpec,RoiSpec,FeatureManagerSpec,DetectorSpec,MatcherSpec>::
 		matchWithExpectedInnovation(boost::shared_ptr<RawSpec> rawData,  observation_ptr_t obsPtr)
 		{
+			#if PROJECT_MEAN_VISIBILITY
+			obsPtr->project();
+			#endif
+			
 			if (obsPtr->predictAppearance())
 			{
 				RoiSpec roi(obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);

@@ -60,8 +60,8 @@ Performance
 	5. [ok] progressively enable optimizations when search area are larger
 	8. [ok] try to copy the search area in another image for a better use of cpu cache -> we already do it when doing half res search, that is when the search area is large enough, so it should be ok
 - [ok] check algorithm speed <- Good 60Hz. See issues with RT and OS -> reboot and stop the most possible programs and services
+- [ok] project only mean for visibility test, and compute jacobians and covariance only for visible obs
 - find a more clever way to manipulate the map used space: ia_indirectArray() is possibly an expensive way to go, or maybe use eigen2 instead of ublas...
-
 
 
 Precision

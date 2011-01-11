@@ -270,6 +270,11 @@ namespace jafar {
 				void project();
 
 				/**
+				 * Only project (without covariances)
+				 */
+				void projectMean();
+				
+				/**
 				 * Is visible
 				 * \return true if visible
 				 */

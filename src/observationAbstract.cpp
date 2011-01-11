@@ -158,6 +158,17 @@ namespace jafar {
 			events.predicted = true;
 // JFR_DEBUG("projected obs " << id() << ": expectation " << expectation.x() << " " << expectation.P());
 		}
+		
+		void ObservationAbstract::projectMean() {
+			vec7 sg = sensorPtr()->globalPose();
+
+			vec lmk = landmarkPtr()->state.x();
+			vec exp, nobs;
+			model->project_func(sg, lmk, exp, nobs);
+
+			expectation.x() = exp;
+			expectation.nonObs = nobs;
+		}
 
 		void ObservationAbstract::backProject(){
 			vec7 sg;

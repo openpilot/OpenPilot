@@ -2,6 +2,8 @@
 #define JMATH_MISC_HPP
 
 #include <cmath>
+#include <string>
+#include <sstream>
 
 namespace jafar {
 namespace jmath {

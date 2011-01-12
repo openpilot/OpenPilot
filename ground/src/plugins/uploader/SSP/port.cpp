@@ -25,7 +25,7 @@ int16_t port::pfSerialRead(void)
 {
 
     char c[1];
-    if(sport->bytesAvailable())
+    if( sport->bytesAvailable() )
     {
         sport->read(c,1);
     }

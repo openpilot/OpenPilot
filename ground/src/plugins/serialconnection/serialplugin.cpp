@@ -73,7 +73,7 @@ void SerialEnumerationThread::run()
 
 
 SerialConnection::SerialConnection()
-    : m_enumerateThread(this)
+    : enablePolling(true), m_enumerateThread(this)
 {
     serialHandle = NULL;
 
@@ -102,8 +102,10 @@ SerialConnection::~SerialConnection()
 
 void SerialConnection::onEnumerationChanged()
 {
-    emit availableDevChanged(this);
+    if (enablePolling)
+        emit availableDevChanged(this);
 }
+
 bool sortPorts(const QextPortInfo &s1,const QextPortInfo &s2)
 {
     return s1.portName<s2.portName;
@@ -112,12 +114,15 @@ bool sortPorts(const QextPortInfo &s1,const QextPortInfo &s2)
 QStringList SerialConnection::availableDevices()
 {
     QStringList list;
-    QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
 
-    //sort the list by port number (nice idea from PT_Dreamer :))
-    qSort(ports.begin(), ports.end(),sortPorts);
-    foreach( QextPortInfo port, ports ) {
-       list.append(port.friendName);
+    if (enablePolling) {
+        QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
+
+        //sort the list by port number (nice idea from PT_Dreamer :))
+        qSort(ports.begin(), ports.end(),sortPorts);
+        foreach( QextPortInfo port, ports ) {
+           list.append(port.friendName);
+        }
     }
 
     return list;
@@ -173,6 +178,22 @@ QString SerialConnection::connectionName()
 QString SerialConnection::shortName()
 {
     return QString("Serial");
+}
+
+/**
+ Tells the Serial plugin to stop polling for serial devices
+ */
+void SerialConnection::suspendPolling()
+{
+    enablePolling = false;
+}
+
+/**
+ Tells the Serial plugin to resume polling for serial devices
+ */
+void SerialConnection::resumePolling()
+{
+    enablePolling = true;
 }
 
 

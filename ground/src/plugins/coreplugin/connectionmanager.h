@@ -71,6 +71,8 @@ public:
     QIODevice *getCurrentConnection(); // NOTE: this is never implemented ??
     devListItem getCurrentDevice() { return m_connectionDevice;}
     bool disconnectDevice();
+    void suspendPolling();
+    void resumePolling();
 
 protected:
     void unregisterAll(IConnection *connection);

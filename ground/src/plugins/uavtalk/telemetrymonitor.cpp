@@ -54,6 +54,14 @@ TelemetryMonitor::TelemetryMonitor(UAVObjectManager* objMngr, Telemetry* tel)
     statsTimer->start(STATS_CONNECT_PERIOD_MS);
 }
 
+TelemetryMonitor::~TelemetryMonitor() {
+    // Before saying goodbye, set the GCS connection status to disconnected too:
+    GCSTelemetryStats::DataFields gcsStats = gcsStatsObj->getData();
+    gcsStats.Status = GCSTelemetryStats::STATUS_DISCONNECTED;
+    // Set data
+    gcsStatsObj->setData(gcsStats);
+}
+
 /**
  * Initiate object retrieval, initialize queue with objects to be retrieved.
  */

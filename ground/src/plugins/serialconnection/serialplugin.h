@@ -81,11 +81,16 @@ public:
 
     virtual QString connectionName();
     virtual QString shortName();
+    virtual void suspendPolling();
+    virtual void resumePolling();
+
     bool deviceOpened() {return m_deviceOpened;}
 
 
 private:
     QextSerialPort*  serialHandle;
+    bool enablePolling;
+
 
 protected slots:
     void onEnumerationChanged();

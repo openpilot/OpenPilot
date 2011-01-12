@@ -127,8 +127,13 @@ void UploaderGadgetWidget::onAutopilotDisconnect(){
     m_config->haltButton->setEnabled(false);
     m_config->resetButton->setEnabled(false);
     m_config->bootButton->setEnabled(true);
-    m_config->rescueButton->setEnabled(true);
-    m_config->telemetryLink->setEnabled(true);
+    if (currentStep == IAP_STATE_BOOTLOADER) {
+        m_config->rescueButton->setEnabled(false);
+        m_config->telemetryLink->setEnabled(false);
+    } else {
+        m_config->rescueButton->setEnabled(true);
+        m_config->telemetryLink->setEnabled(true);
+    }
 }
 
 
@@ -147,6 +152,8 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
 
     switch (currentStep) {
     case IAP_STATE_READY:
+        getSerialPorts(); // Useful in case a new serial port appeared since the initial list,
+                          // otherwise we won't find it when we stop the board.
         // The board is running, send the 1st IAP Reset order:
         fwIAP->getField("Command")->setValue("1122");
         connect(fwIAP,SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
@@ -192,17 +199,14 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
             break;
         }
-        // stop the polling thread: otherwise it will mess up DFU
-        // Do it now, because otherwise it will send bad stuff to
-        // the board before we have time to stop it.
-        RawHIDConnection *cnx =  pm->getObject<RawHIDConnection>();
-        cnx->suspendPolling();
 
         // The board is now reset: we have to disconnect telemetry
         Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
         QString dli = cm->getCurrentDevice().devName;
         QString dlj = cm->getCurrentDevice().displayedName;
         cm->disconnectDevice();
+        // Tell connections to stop their polling threads: otherwise it will mess up DFU
+        cm->suspendPolling();
         log("Board Halt");
         m_config->boardStatus->setText("Bootloader");
         if (dlj.startsWith("USB"))
@@ -229,7 +233,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             log("Could not enter DFU mode.");
             delete dfu;
             dfu = NULL;
-            cnx->resumePolling();
+            cm->resumePolling();
             return;
         }
         dfu->AbortOperation();
@@ -238,7 +242,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             log("Could not enter DFU mode.");
             delete dfu;
             dfu = NULL;
-            cnx->resumePolling();
+            cm->resumePolling();
             return;
         }
         //dfu.StatusRequest();
@@ -248,7 +252,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             log("Inconsistent number of devices! Aborting");
             delete dfu;
             dfu = NULL;
-            cnx->resumePolling();
+            cm->resumePolling();
             return;
         }
         // Delete all previous tabs:
@@ -264,11 +268,13 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             dw->populate();
             m_config->systemElements->addTab(dw, QString("Device") + QString::number(i));
         }
+        /*
         m_config->haltButton->setEnabled(false);
         m_config->resetButton->setEnabled(false);
         m_config->bootButton->setEnabled(true);
         m_config->telemetryLink->setEnabled(false);
         m_config->rescueButton->setEnabled(false);
+        */
         if (resetOnly) {
             resetOnly=false;
             delay::msleep(3500);
@@ -307,16 +313,18 @@ void UploaderGadgetWidget::systemReset()
   */
 void UploaderGadgetWidget::systemBoot()
 {
+
     clearLog();
+    m_config->bootButton->setEnabled(false);
     if (currentStep != IAP_STATE_BOOTLOADER) {
-        this->repaint();
-        // Stop the polling thread just in case (really necessary)
-        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-        RawHIDConnection *cnx =  pm->getObject<RawHIDConnection>();
-        cnx->suspendPolling();
+        // The board is now reset: we have to disconnect telemetry
+        Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+        cm->suspendPolling();
     }
 
     QString devName = m_config->telemetryLink->currentText();
+    log("Attempting to boot the system through " + devName + ".");
+    repaint();
 
     if (!dfu) {
         if (devName == "USB")
@@ -330,17 +338,16 @@ void UploaderGadgetWidget::systemBoot()
         log("Could not enter DFU mode.");
         delete dfu;
         dfu = NULL;
+        m_config->bootButton->setEnabled(true);
         return;
     }
     log("Booting system...");
     dfu->JumpToApp();
     // Restart the polling thread
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    RawHIDConnection *cnx =  pm->getObject<RawHIDConnection>();
-    cnx->resumePolling();
-    // m_config->bootButton->setEnabled(false);
-    //m_config->haltButton->setEnabled(true);
-    //m_config->resetButton->setEnabled(true);
+    // The board is now reset: we have to disconnect telemetry
+    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    cm->resumePolling();
+    m_config->bootButton->setEnabled(true);
     m_config->rescueButton->setEnabled(true);
     m_config->telemetryLink->setEnabled(true);
     m_config->boardStatus->setText("Running");
@@ -364,14 +371,12 @@ void UploaderGadgetWidget::systemBoot()
   */
 void UploaderGadgetWidget::systemRescue()
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    RawHIDConnection *cnx =  pm->getObject<RawHIDConnection>();
+    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
     switch (rescueStep) {
     case RESCUE_STEP0: {
-        Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
         cm->disconnectDevice();
         // stop the polling thread: otherwise it will mess up DFU
-        cnx->suspendPolling();
+        cm->suspendPolling();
         // Delete all previous tabs:
         while (m_config->systemElements->count()) {
              QWidget *qw = m_config->systemElements->widget(0);
@@ -414,7 +419,9 @@ void UploaderGadgetWidget::systemRescue()
         {
             rescueStep = RESCUE_STEP0;
             log("Could not enter DFU mode.");
-            cnx->resumePolling();
+            delete dfu;
+            dfu = NULL;
+            cm->resumePolling();
             return;
         }
         if(!dfu->findDevices() || (dfu->numberOfDevices != 1))
@@ -423,7 +430,7 @@ void UploaderGadgetWidget::systemRescue()
             log("Could not detect mainboard.");
             delete dfu;
             dfu = NULL;
-            cnx->resumePolling();
+            cm->resumePolling();
             return;
         }
         rescueStep = RESCUE_POWER1;
@@ -449,7 +456,7 @@ void UploaderGadgetWidget::systemRescue()
             log("Could not detect devices.");
             delete dfu;
             dfu = NULL;
-            cnx->resumePolling();
+            cm->resumePolling();
             return;
         }
         log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
@@ -457,7 +464,7 @@ void UploaderGadgetWidget::systemRescue()
             log("Inconsistent number of devices, aborting!");
             delete dfu;
             dfu = NULL;
-            cnx->resumePolling();
+            cm->resumePolling();
             return;
         }
         for(int i=0;i<dfu->numberOfDevices;i++) {

@@ -72,6 +72,7 @@ void TelemetryManager::onStop()
     delete telemetryMon;
     delete telemetry;
     delete utalk;
+    onDisconnect();
 }
 
 void TelemetryManager::onConnect()

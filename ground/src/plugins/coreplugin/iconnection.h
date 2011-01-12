@@ -70,6 +70,13 @@ public:
     */
     virtual QString shortName() {return connectionName();}
 
+    /**
+     * Manage whether the plugin is allowed to poll for devices
+     * or not
+     */
+    virtual void suspendPolling() {};
+    virtual void resumePolling() {};
+
 signals:
     /**
     *   Available devices list has changed, signal it to connection manager (and whoever wants to know)

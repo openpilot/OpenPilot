@@ -83,8 +83,8 @@ public:
 
     virtual QString connectionName();
     virtual QString shortName();
-    bool suspendPolling();
-    bool resumePolling();
+    virtual void suspendPolling();
+    virtual void resumePolling();
 
     bool deviceOpened() {return m_deviceOpened;}
 

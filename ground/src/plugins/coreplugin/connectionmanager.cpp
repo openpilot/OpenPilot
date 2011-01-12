@@ -248,6 +248,45 @@ void ConnectionManager::unregisterAll(IConnection *connection)
 }
 
 /**
+*   Tells every connection plugin to stop polling for devices if they
+*   are doing that.
+*/
+void ConnectionManager::suspendPolling()
+{
+    QList<IConnection*> connections;
+    connections.clear();
+
+    for(QLinkedList<devListItem>::iterator iter = m_devList.begin();
+    iter != m_devList.end(); iter++ ){
+        if (!connections.contains(iter->connection))
+            connections.append(iter->connection);
+    }
+    foreach (IConnection* cnx, connections) {
+        cnx->suspendPolling();
+    }
+}
+
+/**
+*   Tells every connection plugin to resume polling for devices if they
+*   are doing that.
+*/
+void ConnectionManager::resumePolling()
+{
+    QList<IConnection*> connections;
+    connections.clear();
+
+    for(QLinkedList<devListItem>::iterator iter = m_devList.begin();
+    iter != m_devList.end(); iter++ ){
+        if (!connections.contains(iter->connection))
+            connections.append(iter->connection);
+    }
+    foreach (IConnection* cnx, connections) {
+        cnx->resumePolling();
+    }
+}
+
+
+/**
 *   Register a device from a specific connection plugin
 */
 void ConnectionManager::registerDevice(IConnection *conn, const QString &devN, const QString &disp)
@@ -267,6 +306,7 @@ void ConnectionManager::registerDevice(IConnection *conn, const QString &devN, c
 */
 void ConnectionManager::devChanged(IConnection *connection)
 {
+
     //clear device list combobox
     m_availableDevList->clear();
 

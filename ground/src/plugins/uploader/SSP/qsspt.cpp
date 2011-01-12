@@ -32,7 +32,7 @@ bool qsspt::sendData(uint8_t * buf,uint16_t size)
     msize=size;
     sendbufmutex.unlock();
     msendwait.lock();
-    sendwait.wait(&msendwait,100000);
+    sendwait.wait(&msendwait,10000);
     msendwait.unlock();
     return true;
 }

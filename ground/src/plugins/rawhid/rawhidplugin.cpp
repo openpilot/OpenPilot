@@ -67,7 +67,7 @@ void RawHIDEnumerationThread::run()
             }
         }
 
-        msleep(500); //update available devices twice per second (doesn't need more)
+        msleep(1000); //update available devices every second (doesn't need more)
     }
 }
 
@@ -90,7 +90,8 @@ RawHIDConnection::~RawHIDConnection()
 
 void RawHIDConnection::onEnumerationChanged()
 {
-    emit availableDevChanged(this);
+    if (enablePolling)
+        emit availableDevChanged(this);
 }
 
 QStringList RawHIDConnection::availableDevices()
@@ -156,19 +157,17 @@ QString RawHIDConnection::shortName()
 /**
  Tells the Raw HID plugin to stop polling for USB devices
  */
-bool RawHIDConnection::suspendPolling()
+void RawHIDConnection::suspendPolling()
 {
     enablePolling = false;
-    return true;
 }
 
 /**
  Tells the Raw HID plugin to resume polling for USB devices
  */
-bool RawHIDConnection::resumePolling()
+void RawHIDConnection::resumePolling()
 {
     enablePolling = true;
-    return true;
 }
 
 

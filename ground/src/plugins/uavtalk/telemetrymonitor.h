@@ -46,6 +46,7 @@ class TelemetryMonitor : public QObject
 
 public:
     TelemetryMonitor(UAVObjectManager* objMngr, Telemetry* tel);
+    ~TelemetryMonitor();
 
 signals:
     void connected();

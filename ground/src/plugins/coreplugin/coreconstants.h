@@ -45,7 +45,7 @@ namespace Constants {
 
 const char * const GCS_VERSION_LONG      = GCS_VERSION;
 const char * const GCS_AUTHOR            = "OpenPilot Project";
-const char * const GCS_YEAR              = "2010";
+const char * const GCS_YEAR              = "2011";
 
 #ifdef GCS_REVISION
 const char * const GCS_REVISION_STR      = STRINGIFY(GCS_REVISION);
@@ -137,6 +137,7 @@ const char * const GOTONEXTGROUP         = "GCS.GotoNextTabGroup";
 const char * const WINDOWSLIST           = "GCS.WindowsList";
 const char * const ABOUT_OPENPILOTGCS    = "GCS.AboutOpenPilotGCS";
 const char * const ABOUT_PLUGINS         = "GCS.AboutPlugins";
+const char * const ABOUT_AUTHORS         = "GCS.AboutAuthors";
 const char * const ABOUT_QT              = "GCS.AboutQt";
 const char * const S_RETURNTOEDITOR      = "GCS.ReturnToEditor";
 const char * const OPEN_IN_EXTERNAL_EDITOR = "GCS.OpenInExternalEditor";

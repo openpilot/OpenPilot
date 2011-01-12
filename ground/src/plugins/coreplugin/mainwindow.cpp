@@ -53,6 +53,7 @@
 #include "variablemanager.h"
 #include "threadmanager.h"
 #include "versiondialog.h"
+#include "authorsdialog.h"
 #include "viewmanager.h"
 #include "uniqueidmanager.h"
 #include "manhattanstyle.h"
@@ -126,6 +127,7 @@ MainWindow::MainWindow() :
     m_mimeDatabase(new MimeDatabase),
 //    m_rightPaneWidget(0),
     m_versionDialog(0),
+    m_authorsDialog(0),
     m_activeContext(0),
     m_generalSettings(new GeneralSettings),
     m_shortcutSettings(new ShortcutSettings),
@@ -687,7 +689,17 @@ void MainWindow::registerDefaultActions()
 #ifdef Q_WS_MAC
     cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
 #endif
-    connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutOpenPilogGCS()));
+    connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutOpenPilotGCS()));
+
+    //Credits Action
+    tmpaction = new QAction(QIcon(Constants::ICON_PLUGIN), tr("About &Authors..."), this);
+    cmd = am->registerAction(tmpaction, Constants::ABOUT_AUTHORS, m_globalContext);
+    mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
+    tmpaction->setEnabled(true);
+#ifdef Q_WS_MAC
+    cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
+#endif
+    connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutOpenPilotAuthors()));
 
 
 }
@@ -1123,7 +1135,7 @@ void MainWindow::openRecentFile()
     }
 }
 
-void MainWindow::aboutOpenPilogGCS()
+void MainWindow::aboutOpenPilotGCS()
 {
     if (!m_versionDialog) {
         m_versionDialog = new VersionDialog(this);
@@ -1140,6 +1152,25 @@ void MainWindow::destroyVersionDialog()
         m_versionDialog = 0;
     }
 }
+
+void MainWindow::aboutOpenPilotAuthors()
+{
+    if (!m_authorsDialog) {
+        m_authorsDialog = new AuthorsDialog(this);
+        connect(m_authorsDialog, SIGNAL(finished(int)),
+                this, SLOT(destroyAuthorsDialog()));
+    }
+    m_authorsDialog->show();
+}
+
+void MainWindow::destroyAuthorsDialog()
+{
+    if (m_authorsDialog) {
+        m_authorsDialog->deleteLater();
+        m_authorsDialog = 0;
+    }
+}
+
 
 void MainWindow::aboutPlugins()
 {

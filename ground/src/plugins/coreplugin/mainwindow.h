@@ -74,6 +74,7 @@ class ShortcutSettings;
 class WorkspaceSettings;
 class ViewManager;
 class VersionDialog;
+class AuthorsDialog;
 class UAVGadgetMode;
 
 class CORE_EXPORT MainWindow : public EventFilteringMainWindow
@@ -150,10 +151,12 @@ private slots:
     void openRecentFile();
     void setFocusToEditor();
     void saveAll();
-    void aboutOpenPilogGCS();
+    void aboutOpenPilotGCS();
     void aboutPlugins();
+    void aboutOpenPilotAuthors();
     void updateFocusWidget(QWidget *old, QWidget *now);
     void destroyVersionDialog();
+    void destroyAuthorsDialog();
     void modeChanged(Core::IMode *mode);
 
 private:
@@ -188,6 +191,7 @@ private:
 //    RightPaneWidget *m_rightPaneWidget;
     Core::BaseView *m_outputView;
     VersionDialog *m_versionDialog;
+    AuthorsDialog *m_authorsDialog;
 
     IContext * m_activeContext;
 

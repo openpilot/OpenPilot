@@ -63,7 +63,8 @@ SOURCES += mainwindow.cpp \
     uavgadgetoptionspagedecorator.cpp \
     uavgadgetdecorator.cpp \
     workspacesettings.cpp \
-    uavconfiginfo.cpp
+    uavconfiginfo.cpp \
+    authorsdialog.cpp
 HEADERS += mainwindow.h \
     tabpositionindicator.h \
     fancyactionbar.h \
@@ -123,7 +124,8 @@ HEADERS += mainwindow.h \
     uavgadgetoptionspagedecorator.h \
     uavgadgetdecorator.h \
     workspacesettings.h \
-    uavconfiginfo.h
+    uavconfiginfo.h \
+    authorsdialog.h
 FORMS += dialogs/settingsdialog.ui \
     dialogs/shortcutsettings.ui \
     generalsettings.ui \

@@ -1,0 +1,77 @@
+/** \page pageSimulation Simulation environment
+
+RT-SLAM has a high level simulation environment. It allows to remove all the
+hardware sensor and raw data processing steps in order to control errors,
+noises, and ground truth. This is important for debugging and evaluation.
+
+This simulation environment is basic and simple, and is complementary to
+a real versatile simulator such as 
+\htmlonly <a href="http://morse.openrobots.org"><b>MORSE</b></a> \endhtmlonly.
+
+The simulation environment is composed of two parts:
+	- the simulator itself, that contains a description of the scenario and
+		the environment (robots, sensors, landmarks, robots trajectories).
+	- implementation of abstract classes for simulation : hardware classes 
+		that use the simulator to provide outputs, 
+		and high level simulated data and raw processors.
+		
+\section secSimulator The simulator
+
+The simulator part is composed of the adhoc simulator itself, that
+provides an interface from outside (in file \ref simulator.hpp):
+	- \link jafar::rtslam::simu::AdhocSimulator simu::AdhocSimulator \endlink
+	
+And some internal objects that are used for the simulation
+(in file \ref simulatorObjects.hpp):
+	- \link jafar::rtslam::simu::Robot simu::Robot \endlink
+	a simulated robot, which contains a description of its
+	trajectory during the experiment.
+	- \link jafar::rtslam::simu::Sensor simu::Sensor \endlink
+	a simulated sensor, which contains observation models for
+	the different types of landmarks it is supposed to observe.
+	- \link jafar::rtslam::simu::Landmark simu::Landmark \endlink
+	a simulated landmark
+
+
+\section secImplementations The implementations of abstract classes
+
+Because we simulate hardware, a simulation-targeted implementation of 
+all classes that are related with hardware must be provided:
+
+	- \link jafar::rtslam::simu::HardwareSensorAdhocSimulator 
+	simu::HardwareSensorAdhocSimulator \endlink
+	(in file \ref hardwareSensorAdhocSimulator.hpp)
+	- \link jafar::rtslam::simu::HardwareEstimatorInertialAdhocSimulator 
+	simu::HardwareEstimatorInertialAdhocSimulator \endlink
+	(in file \ref hardwareEstimatorInertialAdhocSimulator.hpp)
+	
+And because we also simulate high level features and are working with semantic
+sensors (ie that direcly provides observations of points, lines...), we need
+to provide simulation-targeted implementations of all data structures related
+to raw data (in file \ref simuData.hpp):
+
+	- \link jafar::rtslam::simu::RawSimu simu::RawSimu \endlink
+	- \link jafar::rtslam::simu::AppearanceSimu simu::AppearanceSimu \endlink
+	- \link jafar::rtslam::simu::FeatureSimu simu::FeatureSimu \endlink
+	- \link jafar::rtslam::simu::DescriptorSimu simu::DescriptorSimu \endlink
+
+As well as the raw processors that work with this new type of raw data
+(in file \ref simuRawProcessors.hpp):
+
+	- \link jafar::rtslam::simu::DetectorSimu simu::DetectorSimu \endlink
+	- \link jafar::rtslam::simu::MatcherSimu simu::MatcherSimu \endlink
+
+Fortunately as we are working with high level features, all of these classes
+are extremely simple.
+
+\section secErrors Management of errors and noises
+
+Errors and noises can be injected locally:
+	- raw data processing (detection and matching): set noise in rawProcessors
+	- extrinsic transformations: set a slightly different transformation when 
+	building simulation objects than initializing slam objects.
+	- hardware estimators: set noise, biases and gains in simulation hardware
+	simulators.
+
+*/
+

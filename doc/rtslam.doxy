@@ -6,21 +6,12 @@
 \version 0.1
 
 \authors
-  Joan Sola,         jsola@laas.fr     \n
+  Joan Solà,         jsola@laas.fr     \n
   Cyril Roussillon,  croussil@laas.fr  \n
-  Aurelien Gonzalez, agonzale@laas.fr  \n
+  Aurélien Gonzalez, agonzale@laas.fr  \n
   Nicolas Mansard,   nmansard@laas.fr  \n
   Jean-Marie Codol,  jmcodol@laas.fr   \n
   
-\section secContents Contents
-
- - \ref secPresentation
- - \ref secDevelopersGuide
- - \ref secRtslamHistory
- - \ref secRtslamRequirements
- - \ref secRtslamInterface
- - \ref secReference
- 
 \section secPresentation Presentation 
   This module implements real-time single-map EKF-SLAM based on an active-search architecture. 
   
@@ -36,6 +27,7 @@
 
  - \ref pagePhilosophy
  - \ref pageImplementation
+ - \ref pageSimulation
  - \ref pageDevelopmentPlan
 
 \section secRtslamHistory  History

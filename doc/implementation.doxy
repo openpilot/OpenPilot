@@ -1,10 +1,8 @@
-/** \page pageImplementation Implementation of RTSLAM
+/** \page pageImplementation Implementation choices
 
 Subpages:
  - \ref pageJacobians
  - \ref pageQuaternion
-
-	If you are not a new developer, jump to the \ref secPlan. If you are new you MUST keep reading here.
 
 	This software aims at being sufficiently general. 
 	However, some things are fixed in advance and should not be the subject of future modification.
@@ -12,15 +10,14 @@ Subpages:
 	
 	\section secExternalLibraries External libraries
 	
-	We make use of Boost and OpenCV, which are warped into Jafar modules \ref jmath and \ref image.
+	We make use of Boost and OpenCV, which are wrapped into Jafar \ref jmath and \ref image.
 	
-	The graphics part is relegated to \ref qdisplay (2D) and \ref GDHE (3D). 
+	The graphics part is relegated to \ref qdisplay (2D) and \ref gdhe (3D).
 	However, \ref rtslam creates libraries that are independent of the graphics output.
 	
 	\section secObjectCreation Objects creation policy
 	
-	We are currently discussing on the best way to implement run-time object creation,
-	either using factories or variants.
+	We use factories to implement run-time object creation.
 	
 	\section secEkfSlam EKF-SLAM
 	
@@ -28,10 +25,12 @@ Subpages:
 	Variants could potentially include the UKF and/or the IEKF, 
 	but not the PF as we use Gaussians to represent probability densities.
 	
-	The system does not admit implementations based on non-linear optimization, 
+	The system does not admit implementations based on non-linear optimization yet,
 	such as key-frames SLAM or PTAM.
-	However, it is possible that some particular classes could be used as bricks for these alternative systems. 
-	This is to be evaluated in the future, and no efforts are made here to facilitate such a transition.
+	However, it is possible that some particular classes could be used as bricks 
+	for these alternative systems,
+	and that one day we implement the possibility to use global optimization instead
+	of or complementarily to a filter.
 	
 	\section secFunctions Functions with Jacobians
 	
@@ -41,7 +40,6 @@ Subpages:
 	
 	See the \ref pageJacobians page for more information.
 	
-
 	\section secGaussians Gaussians
 	
 	We designed and built the jafar::rtslam::Gaussian class for storing Gaussian variables. 

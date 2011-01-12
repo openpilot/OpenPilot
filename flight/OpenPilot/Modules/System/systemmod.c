@@ -216,7 +216,7 @@ static void objectUpdatedCb(UAVObjEvent * ev)
  * Called periodically to update the I2C statistics 
  */
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
-static void updateI2Cstats() {}
+static void updateI2Cstats() {} //Posix and win32 don't have I2C
 #else
 static void updateI2Cstats() 
 {
@@ -237,6 +237,9 @@ static void updateI2Cstats()
 }
 #endif
 
+#if defined(ARCH_POSIX) || defined(ARCH_WIN32)
+static void updateWDGstats() {} //Posix and win32 don't have a watchdog
+#else
 static void updateWDGstats() 
 {
 	WatchdogStatusData watchdogStatus;
@@ -244,6 +247,7 @@ static void updateWDGstats()
 	watchdogStatus.ActiveFlags = PIOS_WDG_GetActiveFlags();
 	WatchdogStatusSet(&watchdogStatus);
 }
+#endif
 
 /**
  * Called periodically to update the system stats

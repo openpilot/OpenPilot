@@ -165,6 +165,11 @@ SRC += $(OPUAVOBJ)/ratedesired.c
 SRC += $(OPUAVOBJ)/pipxtrememodemsettings.c
 SRC += $(OPUAVOBJ)/pipxtrememodemstatus.c
 SRC += $(OPUAVOBJ)/batterysettings.c
+SRC += $(OPUAVOBJ)/flightplancontrol.c
+SRC += $(OPUAVOBJ)/flightplanstatus.c
+SRC += $(OPUAVOBJ)/flightplansettings.c
+SRC += $(OPUAVOBJ)/taskinfo.c
+SRC += $(OPUAVOBJ)/watchdogstatus.c
 endif
 
 ## PIOS Hardware (posix)

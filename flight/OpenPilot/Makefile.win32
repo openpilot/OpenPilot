@@ -113,6 +113,7 @@ SRC += ${OPMODULEDIR}/System/systemmod.c
 SRC += $(OPSYSTEM)/openpilot.c
 SRC += $(OPSYSTEM)/pios_board_posix.c
 SRC += $(OPSYSTEM)/alarms.c
+SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/uavobjectsinit.c
@@ -164,6 +165,11 @@ SRC += $(OPUAVOBJ)/ratedesired.c
 SRC += $(OPUAVOBJ)/pipxtrememodemsettings.c
 SRC += $(OPUAVOBJ)/pipxtrememodemstatus.c
 SRC += $(OPUAVOBJ)/batterysettings.c
+SRC += $(OPUAVOBJ)/flightplancontrol.c
+SRC += $(OPUAVOBJ)/flightplanstatus.c
+SRC += $(OPUAVOBJ)/flightplansettings.c
+SRC += $(OPUAVOBJ)/taskinfo.c
+SRC += $(OPUAVOBJ)/watchdogstatus.c
 endif
 
 ## PIOS Hardware (win32)
@@ -174,6 +180,7 @@ SRC += $(PIOSWIN32)/pios_sdcard.c
 SRC += $(PIOSWIN32)/pios_udp.c
 SRC += $(PIOSWIN32)/pios_com.c
 SRC += $(PIOSWIN32)/pios_servo.c
+SRC += $(PIOSWIN32)/pios_wdg.c
 #
 ## RTOS
 SRC += $(RTOSSRCDIR)/list.c 

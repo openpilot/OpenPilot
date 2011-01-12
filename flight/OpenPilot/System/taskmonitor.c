@@ -83,7 +83,11 @@ void TaskMonitorUpdateAll(void)
 		if (handles[n] != 0)
 		{
 			data.Running[n] = TASKINFO_RUNNING_TRUE;
+#if defined(ARCH_POSIX) || defined(ARCH_WIN32)
+			data.StackRemaining[n] = 10000;
+#else
 			data.StackRemaining[n] = uxTaskGetStackHighWaterMark(handles[n]) * 4;
+#endif
 		}
 		else
 		{

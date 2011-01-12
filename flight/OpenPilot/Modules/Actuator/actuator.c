@@ -410,6 +410,11 @@ static void setFailsafe()
 	ActuatorCommandSet(&command);
 }
 
+#if defined(ARCH_POSIX) || defined(ARCH_WIN32)
+static bool set_channel(uint8_t mixer_channel, uint16_t value) {
+	return true;
+}
+#else
 static bool set_channel(uint8_t mixer_channel, uint16_t value) {
 	
 	ActuatorSettingsData settings;
@@ -443,6 +448,7 @@ static bool set_channel(uint8_t mixer_channel, uint16_t value) {
 	return false;
 	
 }
+#endif
 
 
 /**

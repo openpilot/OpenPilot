@@ -251,6 +251,7 @@ void ConfigAHRSWidget::resizeEvent(QResizeEvent *event)
 void ConfigAHRSWidget::launchAccelBiasCalibration()
 {
     m_ahrs->accelBiasStart->setEnabled(false);
+    m_ahrs->accelBiasProgress->setValue(0);
 
     // Setup the AHRS to give us the right data at the right rate:
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
@@ -263,10 +264,10 @@ void ConfigAHRSWidget::launchAccelBiasCalibration()
     accel_accum_z.clear();
 
     UAVDataObject* ahrsCalib = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
-    ahrsCalib->getField("accel_bias")->setDouble(0,0);
-    ahrsCalib->getField("accel_bias")->setDouble(0,1);
-    ahrsCalib->getField("accel_bias")->setDouble(0,2);
-    ahrsCalib->updated();
+//    ahrsCalib->getField("accel_bias")->setDouble(0,0);
+//    ahrsCalib->getField("accel_bias")->setDouble(0,1);
+//    ahrsCalib->getField("accel_bias")->setDouble(0,2);
+//    ahrsCalib->updated();
 
     /* Need to get as many AttitudeRaw updates as possible */
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
@@ -306,26 +307,21 @@ void ConfigAHRSWidget::accelBiasattitudeRawUpdated(UAVObject *obj)
         m_ahrs->accelBiasStart->setEnabled(true);
 
         UAVDataObject* ahrsCalib = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
-        /*
-        double xScale = ahrsCalib->getField("accel_scale")->getDouble(0);
-        double yScale = ahrsCalib->getField("accel_scale")->getDouble(1);
-        double zScale = ahrsCalib->getField("accel_scale")->getDouble(2);
-        */
+        UAVObjectField* field = ahrsCalib->getField("accel_bias");
+        double xBias = field->getDouble(0)- listMean(accel_accum_x);
+        double yBias = field->getDouble(1) - listMean(accel_accum_y);
+        double zBias = -9.81 + field->getDouble(2) - listMean(accel_accum_z);
 
-        double xBias = - listMean(accel_accum_x);
-        double yBias = - listMean(accel_accum_y);
-        double zBias = -9.81 - listMean(accel_accum_z);
-
-        ahrsCalib->getField("accel_bias")->setDouble(xBias,0);
-        ahrsCalib->getField("accel_bias")->setDouble(yBias,1);
-        ahrsCalib->getField("accel_bias")->setDouble(zBias,2);
+        field->setDouble(xBias,0);
+        field->setDouble(yBias,1);
+        field->setDouble(zBias,2);
 
         ahrsCalib->updated();
 
         getObjectManager()->getObject(QString("AttitudeRaw"))->setMetadata(initialMdata);
 
         UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
-        UAVObjectField* field = obj->getField(QString("BiasCorrectedRaw"));
+        field = obj->getField(QString("BiasCorrectedRaw"));
         field->setValue("TRUE");
         obj->updated();
 
@@ -337,7 +333,7 @@ void ConfigAHRSWidget::accelBiasattitudeRawUpdated(UAVObject *obj)
 
 
 /**
-  Starts an Gyro temperature drift calibration.
+  Starts a Gyro temperature drift calibration.
   */
 void ConfigAHRSWidget::launchGyroDriftCalibration()
 {

@@ -94,6 +94,7 @@ protected:
     QComboBox *m_availableDevList;
     QPushButton *m_connectBtn;
     QLinkedList<devListItem> m_devList;
+    QList<IConnection*> m_connectionsList;
 
     //currently connected connection plugin
     devListItem m_connectionDevice;

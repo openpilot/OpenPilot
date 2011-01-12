@@ -117,13 +117,22 @@ void ConnectionManager::objectAdded(QObject *obj)
     //register devices and populate CB
     devChanged(connection);
 
+    // Keep track of the registration to be able to tell plugins
+    // to do things
+    m_connectionsList.append(connection);
+
     QObject::connect(connection, SIGNAL(availableDevChanged(IConnection *)),
                      this, SLOT(devChanged(IConnection*)));
 }
 
 void ConnectionManager::aboutToRemoveObject(QObject *obj)
 {
-    Q_UNUSED(obj);
+    //Check if a plugin added a connection object to the pool
+    IConnection *connection = Aggregation::query<IConnection>(obj);
+    if (!connection)
+        return;
+    if (m_connectionsList.contains(connection))
+            m_connectionsList.removeAt(m_connectionsList.indexOf(connection));
 }
 
 /**
@@ -250,18 +259,11 @@ void ConnectionManager::unregisterAll(IConnection *connection)
 /**
 *   Tells every connection plugin to stop polling for devices if they
 *   are doing that.
+*
 */
 void ConnectionManager::suspendPolling()
 {
-    QList<IConnection*> connections;
-    connections.clear();
-
-    for(QLinkedList<devListItem>::iterator iter = m_devList.begin();
-    iter != m_devList.end(); iter++ ){
-        if (!connections.contains(iter->connection))
-            connections.append(iter->connection);
-    }
-    foreach (IConnection* cnx, connections) {
+    foreach (IConnection* cnx, m_connectionsList) {
         cnx->suspendPolling();
     }
 }
@@ -272,15 +274,7 @@ void ConnectionManager::suspendPolling()
 */
 void ConnectionManager::resumePolling()
 {
-    QList<IConnection*> connections;
-    connections.clear();
-
-    for(QLinkedList<devListItem>::iterator iter = m_devList.begin();
-    iter != m_devList.end(); iter++ ){
-        if (!connections.contains(iter->connection))
-            connections.append(iter->connection);
-    }
-    foreach (IConnection* cnx, connections) {
+    foreach (IConnection* cnx, m_connectionsList) {
         cnx->resumePolling();
     }
 }

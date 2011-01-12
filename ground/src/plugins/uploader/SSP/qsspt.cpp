@@ -10,6 +10,7 @@ void qsspt::run()
     {
         receivestatus=this->ssp_ReceiveProcess();
         sendstatus=this->ssp_SendProcess();
+        msleep(1);
         sendbufmutex.lock();
         if(datapending && receivestatus==SSP_TX_IDLE)
         {

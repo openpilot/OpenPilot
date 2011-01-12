@@ -1,10 +1,8 @@
 /*
  * \file quickHarrisDetector.cpp
- *
- *  \date  Jun 4, 2010
- *  \author: jsola
- *
- *  \ingroup rtslam
+ * \date 04/06/2010
+ * \author jsola
+ * \ingroup rtslam
  */
 
 #include "jmath/misc.hpp"

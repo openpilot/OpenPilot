@@ -1,3 +1,9 @@
+/**
+ * \file visibilityMap.cpp
+ * \date 23/12/2010
+ * \author croussil
+ * \ingroup rtslam
+ */
 
 #include "jmath/angle.hpp"
 #include "rtslam/visibilityMap.hpp"

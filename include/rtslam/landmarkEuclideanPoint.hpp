@@ -1,9 +1,9 @@
-/*
+/**
  * \file landmarkEuclideanPoint.hpp
  *
- *  Created on: Apr 14, 2010
- *      Author: agonzale
- *      \ingroup rtslam
+ * \date 14/04/2010
+ * \author agonzale
+ * \ingroup rtslam
  */
 
 #ifndef LANDMARKEUCLIDEANPOINT_HPP_

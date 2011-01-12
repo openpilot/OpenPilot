@@ -5,8 +5,8 @@
  * They contain the true state.
  * This is part of the ad-hoc simulator.
  *
- * \author croussil@laas.fr
  * \date 24/07/2010
+ * \author croussil
  *
  * \ingroup rtslam
  */

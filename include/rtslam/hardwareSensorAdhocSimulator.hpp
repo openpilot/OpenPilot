@@ -3,8 +3,8 @@
  *
  * Interface between the slam and the ad-hoc simulator
  *
- * \author croussil@laas.fr
  * \date 24/07/2010
+ * \author croussil
  *
  * \ingroup rtslam
  */

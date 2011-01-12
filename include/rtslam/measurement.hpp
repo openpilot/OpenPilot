@@ -2,7 +2,7 @@
  * \file measurement.hpp
  *
  * \date 25/03/2010
- * \author jsola@laas.fr
+ * \author jsola
  *
  *
  *  ## Add a description here ##

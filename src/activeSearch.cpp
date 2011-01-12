@@ -1,12 +1,7 @@
 /**
  * \file activeSearch.cpp
- *
  * \date 10/04/2010
- * \author jsola@laas.fr
- *
- *
- *  ## Add a description here ##
- *
+ * \author jsola
  * \ingroup rtslam
  */
 

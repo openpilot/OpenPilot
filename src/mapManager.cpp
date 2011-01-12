@@ -1,13 +1,7 @@
 /**
- * mapManagerAbstract.cpp
- *
+ * \file mapManagerAbstract.cpp
  * \date 10/03/2010
- * \author nmansard@laas.fr
- *
- *  \file mapManagerAbstract.cpp
- *
- *  ## Add a description here ##
- *
+ * \author nmansard
  * \ingroup rtslam
  */
 

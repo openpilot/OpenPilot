@@ -1,8 +1,9 @@
-/*
- * parents.hpp
+/**
+ * \file parents.hpp
  *
- *  Created on: Apr 19, 2010
- *      Author: nmansard
+ * \date 19/04/2010
+ * \author nmansard
+ * \ingroup rtslam
  */
 
 #ifndef __rtslam_parents_H__

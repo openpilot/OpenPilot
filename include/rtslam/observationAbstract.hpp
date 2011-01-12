@@ -1,26 +1,7 @@
-/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- * Copyright RIA-LAAS/CNRS, 2010
- *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- *
- * File:      observationAbstract.h
- * Project:   RT-Slam
- * Author:    Joan Sola
- *
- * Version control
- * ===============
- *
- *  $Id$
- *
- * Description
- * ============
- *
- *
- * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-
 /**
  * \file observationAbstract.hpp
  * File defining the abstract observation class
- * \author jsola@laas.fr
+ * \author jsola
  * \ingroup rtslam
  */
 
@@ -122,7 +103,7 @@ namespace jafar {
 
 		/**
 		 * Base class for all observations defined in the module rtslam.
-		 * \author jsola@laas.fr
+		 * \author jsola
 		 *
 		 * In this class, the Jacobians are sparse. The states that contribute to the observation are available through an indirect array
 		 * - this->ia_rsl

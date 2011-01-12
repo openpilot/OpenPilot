@@ -3,8 +3,8 @@
  * 
  * ## Add brief description here ##
  *
- * \author jsola@laas.fr
  * \date 22/04/2010
+ * \author jsola
  *
  *  ## Add a description here ##
  *
@@ -27,7 +27,7 @@ namespace jafar {
 		using namespace jmath::ublasExtra;
 
 		/** Base class for all Gaussian perturbation vectors defined in the module rtslam.
-		 * \author jsola@laas.fr
+		 * \author jsola
 		 *
 		 * The Perturbation class is mainly a Gaussian. It represents discrete-time perturbation vectors.
 		 *

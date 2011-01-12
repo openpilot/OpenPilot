@@ -1,10 +1,10 @@
-/*
+/**
  * \file robotOdometry.hpp
  *
  * Header file for the robot with constant velocity motion model.
  *
- *  Created on: 14/02/2010
- *     \author: agonzale
+ * \date 14/02/2010
+ * \author agonzale
  *
  * \ingroup rtslam
  */
@@ -23,7 +23,7 @@ namespace jafar {
 		/**
 		 * Odometry motion model robot class.
 		 *
-		 * \author agonzale@laas.fr
+		 * \author agonzale
 		 *
 		 * This class implements a rigid frame in 3D moving with an odometry motion model.
 		 * This model performs one step on the pose F of a vehicle, given odometry increments U=[dx,dv] given by the robot frame.

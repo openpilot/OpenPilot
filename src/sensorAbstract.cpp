@@ -1,13 +1,7 @@
 /**
- * sensorAbstract.cpp
- *
+ * \file sensorAbstract.cpp
  * \date 10/03/2010
- * \author jsola@laas.fr
- *
- *  \file sensorAbstract.cpp
- *
- *  ## Add a description here ##
- *
+ * \author jsola
  * \ingroup rtslam
  */
 

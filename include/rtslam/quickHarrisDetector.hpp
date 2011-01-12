@@ -1,9 +1,8 @@
-/*
+/**
  * \file quickHarrisDetector.hpp
  *
- *     Project: jafar
- *  Created on: Jun 4, 2010
- *      \Author: jsola
+ * \date 04/06/2010
+ * \author jsola
  *
  *  \ingroup rtslam
  */
@@ -41,7 +40,7 @@ namespace jafar{
 		/**
 		 * Quick Harris detector class.
 		 * \ingroup rtslam
-		 * \author Joan Sola jsola@laas.fr
+		 * \author jsola
 		 *
 		 * This class detects the strongest Harris point inside a given region of interest.
 		 *

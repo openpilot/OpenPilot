@@ -1,10 +1,10 @@
-/*
- * \file robotCenteredConstantVelocity.hpp
+/**
+ * \file robotConstantVelocity.hpp
  *
  * Header file for the robot with constant velocity motion model.
  *
  * \date 14/02/2010
- * \author jsola@laas.fr
+ * \author jsola
  *
  * \ingroup rtslam
  */
@@ -24,7 +24,7 @@ namespace jafar {
 		/**
 		 * Constant velocity model robot class.
 		 *
-		 * \author jsola@laas.fr
+		 * \author jsola
 		 *
 		 * This class implements a rigid frame in 3D moving with a constant velocity motion model. This model is the following:\n
 		 * - p += v*dt <-- position\n

@@ -2,7 +2,7 @@
  * \file worldAbstract.hpp
  *
  * \date 2010/05/15
- *     \author croussil@laas.fr
+ * \author croussil
  *
  * Header file for abstract world
  *
@@ -36,7 +36,7 @@ namespace jafar {
 
 		/** Base class for all world types defined in the module rtslam.
 		 *
-		 * \author croussil@laas.fr
+		 * \author croussil
 		 * \ingroup rtslam
 		 */
 		class WorldAbstract: public ObjectAbstract, public ParentOf<MapAbstract> {

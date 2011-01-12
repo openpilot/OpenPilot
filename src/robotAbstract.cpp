@@ -1,13 +1,7 @@
 /**
- * robotAbstract.cpp
- *
+ * \file robotAbstract.cpp
  * \date 08/03/2010
- * \author jsola@laas.fr
- *
- *  \file robotAbstract.cpp
- *
- *  ## Add a description here ##
- *
+ * \author jsola
  * \ingroup rtslam
  */
 

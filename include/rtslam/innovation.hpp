@@ -2,7 +2,7 @@
  * \file innovation.hpp
  *
  * \date 25/03/2010
- * \author jsola@laas.fr
+ * \author jsola
  *
  *
  *  This file defines the class Innovation.
@@ -23,7 +23,7 @@ namespace jafar {
 
 
 		/** Base class for all Gaussian innovations defined in the module rtslam.
-		 * \author jsola@laas.fr
+		 * \author jsola
 		 *
 		 * It implements the trivial innovation model:
 		 * - inn = meas - exp.

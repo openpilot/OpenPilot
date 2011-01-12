@@ -1,9 +1,9 @@
-/*
- * dataManagerOnePointRansac.t.cpp
+/**
+ * \file dataManagerOnePointRansac.impl.hpp
  *
- *     Project: jafar
- *  Created on: Jun 30, 2010
- *      Author: jsola
+ * \date 30/06/2010
+ * \author jsola
+ * \ingroup rtslam
  */
 #include "kernel/misc.hpp"
 

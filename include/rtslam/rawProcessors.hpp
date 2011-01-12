@@ -4,7 +4,7 @@
  *  Some wrappers to raw processors to be used generically
  *
  * \date 20/07/2010
- * \author croussil@laas.fr
+ * \author croussil
  *
  * ## Add detailed description here ##
  *

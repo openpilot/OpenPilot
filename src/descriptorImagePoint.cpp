@@ -1,8 +1,8 @@
 /*
- * DesscriptorImagePoint.cpp
- *
- *  Created on: 20 avr. 2010
- *      Author: jmcodol@laas.fr
+ * \file descriptorImagePoint.cpp
+ * \date 20/04/2010
+ * \author jmcodol
+ * \ingroup rtslam
  */
 
 #include "jmath/ublasExtra.hpp"

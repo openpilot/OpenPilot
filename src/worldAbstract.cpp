@@ -1,13 +1,7 @@
 /**
- * worldAbstract.cpp
- *
+ * \file worldAbstract.cpp
  * \date 08/06/2010
- * \author croussil@laas.fr
- *
- *  \file worldAbstract.cpp
- *
- *  ## Add a description here ##
- *
+ * \author croussil
  * \ingroup rtslam
  */
 

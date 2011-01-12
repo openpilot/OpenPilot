@@ -1,12 +1,7 @@
 /**
  * \file quatTools.cpp
- *
  * \date 24/03/2010
- * \author jsola@laas.fr
- *
- *
- *  Definition of non-templatizable functions in namespace quatTools
- *
+ * \author jsola
  * \ingroup rtslam
  */
 

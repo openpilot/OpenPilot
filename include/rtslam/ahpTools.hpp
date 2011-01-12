@@ -2,7 +2,7 @@
  * \file ahpTools.hpp
  *
  * \date 13/04/2010
- * \author jsola@laas.fr
+ * \author jsola
  *
  *
  *  This file defines the namespace landmarkAHP in jafar::rtslam.

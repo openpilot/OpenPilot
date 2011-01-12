@@ -1,9 +1,9 @@
-/*
+/**
  * \file dataManagerActiveSearch.hpp
  *
- *  Created on: June 22, 2010
- *      Author: nmansard
- *      \ingroup rtslam
+ * \date 22/06/2010
+ * \author nmansard
+ * \ingroup rtslam
  */
 #ifndef DATAMANAGERACTIVESEARCH_HPP_
 #define DATAMANAGERACTIVESEARCH_HPP_

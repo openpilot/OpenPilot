@@ -4,7 +4,7 @@
  * Header file for abstract objects.
  *
  * \date 17/03/2010
- * \author jsola@laas.fr
+ * \author jsola
  *
  *
  * \ingroup rtslam

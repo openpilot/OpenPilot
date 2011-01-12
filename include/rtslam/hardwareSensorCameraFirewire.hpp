@@ -3,8 +3,8 @@
  *
  * Header file for getting data from a firewire camera
  *
- * \author croussil@laas.fr
  * \date 18/06/2010
+ * \author croussil
  *
  * \ingroup rtslam
  */

@@ -1,8 +1,7 @@
 /**
- *
  * \file rawImage.hpp
- * \author croussil@laas.fr
  * \date 19/05/2010
+ * \author croussil
  * File defining an image type
  * \ingroup rtslam
  */

@@ -1,8 +1,8 @@
 /*
- * DescriptorAbstract.cpp
- *
- *  Created on: 20 avr. 2010
- *      Author: jeanmarie
+ * \file descriptorAbstract.cpp
+ * \date 20/04/2010
+ * \author jmcodol
+ * \ingroup rtslam
  */
 
 #include "rtslam/descriptorAbstract.hpp"

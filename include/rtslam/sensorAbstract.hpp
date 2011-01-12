@@ -1,10 +1,10 @@
-/*
- * \file sensorAbstract.h
+/**
+ * \file sensorAbstract.hpp
  *
  * Header file for the abstract sensor.
  *
- * \date Jan 28, 2010
- * \author jsola@laas.fr
+ * \date 28/01/2010
+ * \author jsola
  *
  * \ingroup rtslam
  */

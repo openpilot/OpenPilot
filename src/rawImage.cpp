@@ -1,13 +1,7 @@
 /**
- * rawImageSimu.cpp
- *
- * \date 1/04/2010
+ * \file rawImageSimu.cpp
+ * \date 01/04/2010
  * \author jmcodol
- *
- *  \file rawImageSimu.cpp
- *
- *  ## Add a description here ##
- *
  * \ingroup rtslam
  */
 

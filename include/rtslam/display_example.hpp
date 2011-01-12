@@ -1,7 +1,7 @@
 /**
  * \file display_example.hpp
- * \author croussil@laas.fr
  * \date 25/03/2010
+ * \author croussil
  * Example of file defining an empty display architecture
  * Replace all "Ex" by the name of the rendering library it will use
  * \ingroup rtslam

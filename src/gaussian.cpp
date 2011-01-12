@@ -1,13 +1,7 @@
 /**
- * gaussian.cpp
- *
+ * \file gaussian.cpp
  * \date 14/03/2010
- * \author jsola@laas.fr
- *
- *  \file gaussian.cpp
- *
- *  ## Add a description here ##
- *
+ * \author jsola
  * \ingroup rtslam
  */
 

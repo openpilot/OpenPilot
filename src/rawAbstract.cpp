@@ -1,14 +1,7 @@
-
 /**
- * rawAbstract.cpp
- *
+ * \file rawAbstract.cpp
  * \date 30/03/2010
  * \author jmcodol
- *
- *  \file rawAbstract.cpp
- *
- *  ## Add a description here ##
- *
  * \ingroup rtslam
  */
 

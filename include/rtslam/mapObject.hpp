@@ -2,7 +2,7 @@
  *  \file mapObject.hpp
  *
  * \date 13/03/2010
- * \author jsola@laas.fr
+ * \author jsola
  *
  *  Header file for mappable objects
  *
@@ -24,7 +24,7 @@ namespace jafar {
 
 		/**
 		 * Class for generic mappable objects.
-		 * \author jsola@laas.fr
+		 * \author jsola
 		 * \ingroup rtslam
 		 */
 		class MapObject: public ObjectAbstract {

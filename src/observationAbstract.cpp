@@ -1,13 +1,7 @@
 /**
- * observationAbstract.cpp
- *
+ * \file observationAbstract.cpp
  * \date 10/03/2010
- * \author jsola@laas.fr
- *
- *  \file observationAbstract.cpp
- *
- *  ## Add a description here ##
- *
+ * \author jsola
  * \ingroup rtslam
  */
 

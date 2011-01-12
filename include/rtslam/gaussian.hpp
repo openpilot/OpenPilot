@@ -1,7 +1,7 @@
 
 /**
  * \file gaussian.hpp
- * \author jsola@laas.fr, croussil@laas.fr
+ * \author jsola, croussil
  * \date 13/02/2010
  * File defining the gaussian class.
  * \ingroup rtslam
@@ -23,7 +23,7 @@ namespace jafar {
 		/////////////////////////
 		/**
 		 * Class for Gaussians having LOCAL or REMOTE storage.
-		 * \author jsola@laas.fr & croussil@laas.fr
+		 * \author jsola & croussil
 		 *
 		 * This class defines a multi-dimensional Gaussian variable.
 		 * It allows mean and covariances data to be stored locally or remotelly,

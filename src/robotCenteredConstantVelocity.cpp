@@ -1,13 +1,7 @@
 /**
- * robotCenteredConstantVelocity.cpp
- *
- * \date 2/07/2010
- * \author jmcodol@laas.fr
- *
- *  \file robotConstantVelocity.cpp
- *
- *  ## Add a description here ##
- *
+ * \file robotCenteredConstantVelocity.cpp
+ * \date 02/07/2010
+ * \author jmcodol
  * \ingroup rtslam
  */
 

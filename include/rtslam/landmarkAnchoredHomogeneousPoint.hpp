@@ -1,6 +1,6 @@
 /**
  * \file landmarkAnchoredHomogeneousPoint.hpp
- * \author jsola@laas.fr
+ * \author jsola
  * \date 14/02/2010
  *
  * Header file for anchored homogeneous point

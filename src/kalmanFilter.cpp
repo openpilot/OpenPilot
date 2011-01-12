@@ -1,13 +1,7 @@
 /**
  * \file kalmanFilter.cpp
- *
- * Extended Kalman filter with sparse access governed by boost::indirect_array
- *
- *   \author: jsola@laas.fr
- *
  * \date 25/03/2010
- *
- *
+ * \author: jsola
  * \ingroup rtslam
  */
 

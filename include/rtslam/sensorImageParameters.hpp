@@ -1,9 +1,8 @@
-/*
- * sensorImageParameters.hpp
+/**
+ * \file sensorImageParameters.hpp
  *
- *     Project: jafar
- *  Created on: Jun 17, 2010
- *      Author: jsola
+ * \date 17/06/2010
+ * \author jsola
  * \ingroup rtslam
  */
 

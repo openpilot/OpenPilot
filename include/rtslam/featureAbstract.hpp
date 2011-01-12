@@ -1,26 +1,7 @@
-/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- * Copyright RIA-LAAS/CNRS, 2010
- *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- *
- * File:      featureAbstract.h
- * Project:   RT-Slam
- * Author:    Jean-Marie CODOL
- *
- * Version control
- * ===============
- *
- *  $Id$
- *
- * Description
- * ============
- *
- *
- * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-
 /**
  * \file featureAbstract.hpp
  * File defining the abstract feature.
- * \author jmcodol@laas.fr
+ * \author jmcodol
  * \ingroup rtslam
  */
 

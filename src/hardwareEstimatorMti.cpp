@@ -1,9 +1,7 @@
 /**
  * \file hardwareEstimatorMti.cpp
- *
- * \author croussil@laas.fr
  * \date 18/06/2010
- *
+ * \author croussil
  * \ingroup rtslam
  */
 

@@ -1,9 +1,9 @@
-/*
- * \file dataManagerActiveSearch.t.cpp
+/**
+ * \file dataManagerActiveSearch.impl.hpp
  *
- *  Created on: June 22, 2010
- *      Author: nmansard
- *      \ingroup rtslam
+ * \date 22/06/2010
+ * \author nmansard
+ * \ingroup rtslam
  */
 #if 0
 #include "rtslam/dataManagerActiveSearch.hpp"

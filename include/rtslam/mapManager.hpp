@@ -1,9 +1,9 @@
-/*
+/**
  * \file mapManager.hpp
  *
- *  Created on: Apr 22, 2010
- *      Author: nmansard
- *      \ingroup rtslam
+ * \date 22/04/2010
+ * \author nmansard
+ * \ingroup rtslam
  */
 
 #ifndef MAPMANAGER_HPP_

@@ -1,9 +1,9 @@
-/*
+/**
  * \file dataManagerOnePointRansac.hpp
  *
- *  \date: Jun 30, 2010
- *      \author: jsola
- *      \ingroup rtslam
+ * \date 30/06/2010
+ * \author jsola
+ * \ingroup rtslam
  */
 
 #ifndef DATAMANAGERONEPOINTRANSAC_HPP_

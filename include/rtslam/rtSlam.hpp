@@ -4,7 +4,7 @@
  *  This file defines general typedefs and material for the whole rtslam project.
  *
  * \date 21/03/2010
- * \author jsola@laas.fr
+ * \author jsola
  *
  *
  * \ingroup rtslam

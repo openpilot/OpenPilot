@@ -3,8 +3,8 @@
  *
  * Header file for pin-hole sensor.
  *
- * \author jsola@laas.fr
  * \date 14/02/2010
+ * \author jsola
  *
  * \ingroup rtslam
  */

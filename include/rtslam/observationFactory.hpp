@@ -3,8 +3,8 @@
  *
  * Header file for observation factories
  *
- * \author croussil@laas.fr
  * \date 16/06/2010
+ * \author croussil
  *
  * \ingroup rtslam
  */

@@ -1,12 +1,7 @@
 /**
  * \file robotInertial.cpp
- *
  * \date 26/03/2010
- * \author jsola@laas.fr
- *
- *
- *  ## Add a description here ##
- *
+ * \author jsola
  * \ingroup rtslam
  */
 

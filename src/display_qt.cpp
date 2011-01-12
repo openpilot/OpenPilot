@@ -1,7 +1,7 @@
 /**
- * \file display_qt.chpp
- * \author croussil@laas.fr
+ * \file display_qt.cpp
  * \date 25/03/2010
+ * \author croussil
  * \ingroup rtslam
  */
 

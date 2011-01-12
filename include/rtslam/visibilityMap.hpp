@@ -1,7 +1,8 @@
 /**
  * \file visibilityMap.hpp
- * \author croussil@laas.fr
  * \date 23/12/2010
+ * \author croussil
+ *
  * File defining the VisibilityMap, an object that keeps records
  * of places from where a landmark is or is not visible.
  * \ingroup rtslam

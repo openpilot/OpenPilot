@@ -4,7 +4,7 @@
  *  Active search detection and matching for points.
  *
  * \date 10/04/2010
- * \author jsola@laas.fr
+ * \author jsola
  *
  * ## Add detailed description here ##
  *
@@ -31,7 +31,7 @@ namespace jafar {
 		/**
 		 * Active search tesselation grid.
 		 *
-		 * \author jsola@laas.fr
+		 * \author jsola
 		 *
 		 * This class implements a tesselation grid for achieving active search
 		 * behavior in landmark initialization.

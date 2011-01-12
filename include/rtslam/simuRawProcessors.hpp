@@ -4,8 +4,8 @@
  * Raw processors for simulation.
  * This is NOT part of the ad-hoc simulator, but required for any estimator without realistic raw simulation.
  *
- * \author croussil@laas.fr
  * \date 24/07/2010
+ * \author croussil
  *
  * \ingroup rtslam
  */

@@ -2,7 +2,7 @@
  * \file robotInertial.hpp
  *
  * \date 26/03/2010
- * \author jsola@laas.fr
+ * \author jsola
  *
  *
  *  This file describes the class RobotInertial for a robot driven by inertial measurements.
@@ -28,7 +28,7 @@ namespace jafar {
 
 		/**
 		 * Inertial measurements unit - robot motion model.
-		 * \author jsola@laas.fr
+		 * \author jsola
 		 *
 		 * This motion model is driven by IMU measurements and random perturbations, and defined by:
 		 * - The state vector: position, velocity, orientation quaternion, accelerometer bias, gyrometer bias, gravity:

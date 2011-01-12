@@ -1,8 +1,8 @@
-/*
- * AppearanceAbstract.h
+/**
+ * \file appearanceAbstract.hpp
  *
- *  Created on: 14 avr. 2010
- *      Author: jeanmarie
+ * \date 14/04/2010
+ * \author jmcodol
  * \ingroup rtslam
  */
 

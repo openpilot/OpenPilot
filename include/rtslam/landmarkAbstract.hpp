@@ -1,25 +1,6 @@
-/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- * Copyright RIA-LAAS/CNRS, 2010
- *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- *
- * File:      landmarkAbstract.h
- * Project:   RT-Slam
- * Author:    Joan Sola
- *
- * Version control
- * ===============
- *
- *  $Id$
- *
- * Description
- * ============
- *
- *
- * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-
 /**
  * \file landmarkAbstract.hpp
- * \author jsola@laas.fr
+ * \author jsola
  * File defining the abstract landmark class
  * \ingroup rtslam
  */

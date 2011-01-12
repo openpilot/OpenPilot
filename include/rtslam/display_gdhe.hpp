@@ -1,7 +1,7 @@
 /**
  * \file display_gdhe.hpp
- * \author croussil@laas.fr
  * \date 25/03/2010
+ * \author croussil
  * File defining a display architecture for gdhe
  * \ingroup rtslam
  */

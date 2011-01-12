@@ -1,3 +1,7 @@
+/**
+ * \file rtSlam.cpp
+ * \ingroup rtslam
+ */
 
 #include "rtslam/rtSlam.hpp"
 

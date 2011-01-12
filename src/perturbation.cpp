@@ -1,10 +1,8 @@
 /*
- * perturbation.cpp
-
- *
- *     Project: jafar
- *  Created on: Jun 19, 2010
- *      Author: jsola
+ * \file perturbation.cpp
+ * \date 19/06/2010
+ * \author jsola
+ * \ingroup rtslam
  */
 
 #include "rtslam/perturbation.hpp"

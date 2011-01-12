@@ -1,8 +1,8 @@
 /*
- * landmarkEuclideanPoint.cpp
- *
- *  Created on: Apr 14, 2010
- *      Author: agonzale
+ * \file landmarkEuclideanPoint.cpp
+ * \date 14/04/2010
+ * \author agonzale
+ * \ingroup rtslam
  */
 
 #include "rtslam/landmarkEuclideanPoint.hpp"

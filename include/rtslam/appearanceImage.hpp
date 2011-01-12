@@ -1,26 +1,6 @@
-/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- * Copyright RIA-LAAS/CNRS, 2010
- *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- *
- * File:      AppreatenceImageSimu.h
- * Project:   RT-Slam
- * Author:    Jean-Marie CODOL
- *
- * Version control
- * ===============
- *
- *  $Id$
- *
- * Description
- * ============
- *
- *
- * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-
 /**
- * \file AppearanceImageSimu.hpp
- * File defining the simulated appearence.
- * \author jmcodol@laas.fr
+ * \file appearanceImage.hpp
+ * \author jmcodol
  * \ingroup rtslam
  */
 

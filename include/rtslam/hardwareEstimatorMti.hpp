@@ -3,8 +3,8 @@
  *
  * Header file for hardware robots
  *
- * \author croussil@laas.fr
  * \date 18/06/2010
+ * \author croussil
  *
  * \ingroup rtslam
  */

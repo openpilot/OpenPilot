@@ -1,8 +1,8 @@
 /*
- * observationPinHoleEuclideanPoint.cpp
- *
- *  Created on: Apr 15, 2010
- *      Author: agonzale
+ * \file observationPinHoleEuclideanPoint.cpp
+ * \date 15/04/2010
+ * \author agonzale
+ * \ingroup rtslam
  */
 
 #include "rtslam/observationPinHoleEuclideanPoint.hpp"

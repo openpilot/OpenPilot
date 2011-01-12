@@ -1,8 +1,8 @@
 /*
- * AppearanceAbstract.cpp
- *
- *  Created on: 14 avr. 2010
- *      Author: jeanmarie
+ * \file appearanceImage.cpp
+ * \date 14/04/2010
+ * \author jmcodol
+ * \ingroup rtslam
  */
 
 #include "rtslam/appearanceImage.hpp"

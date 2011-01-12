@@ -1,10 +1,10 @@
 /**
- *  \file kalmanFilter.hpp
+ * \file kalmanFilter.hpp
  *
- * Header file for the kalman filter
+ * Extended Kalman filter with sparse access governed by boost::indirect_array
  *
  * \date 04/03/2010
- *     \author jsola@laas.fr
+ * \author jsola
  *
  * \ingroup rtslam
  */

@@ -1,13 +1,7 @@
 /**
- * sensorPinHole.cpp
- *
+ * \file sensorPinHole.cpp
  * \date 10/03/2010
- * \author jsola@laas.fr
- *
- *  \file sensorPinHole.cpp
- *
- *  ## Add a description here ##
- *
+ * \author jsola
  * \ingroup rtslam
  */
 

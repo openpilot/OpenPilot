@@ -1,14 +1,7 @@
-
 /**
- * featureAbstract.cpp
- *
- * \date 1/04/2010
+ * \file featurePoint.cpp
+ * \date 01/04/2010
  * \author jmcodol
- *
- *  \file featureAbstract.cpp
- *
- *  ## Add a description here ##
- *
  * \ingroup rtslam
  */
 

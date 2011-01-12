@@ -1,13 +1,7 @@
 /**
- * landmarkAbstract.cpp
- *
+ * \file landmarkAbstract.cpp
  * \date 10/03/2010
- * \author jsola@laas.fr
- *
- *  \file landmarkAbstract.cpp
- *
- *  ## Add a description here ##
- *
+ * \author jsola
  * \ingroup rtslam
  */
 

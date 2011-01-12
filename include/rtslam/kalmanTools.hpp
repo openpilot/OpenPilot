@@ -1,9 +1,9 @@
-/*
- * kalmanTools.hpp
+/**
+ * \file kalmanTools.hpp
  *
- *     Project: jafar
- *  Created on: Jul 1, 2010
- *      Author: jsola
+ * \date 01/07/2010
+ * \author jsola
+ * \ingroup rtslam
  */
 
 #ifndef KALMANTOOLS_HPP_

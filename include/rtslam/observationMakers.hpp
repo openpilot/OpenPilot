@@ -3,8 +3,8 @@
  *
  * Header file for observation makers (atoms of the obs factory).
  *
- * \author nmansard@laas.fr from croussil@laas.fr
  * \date 16/06/2010
+ * \author nmansard from croussil
  *
  * \ingroup rtslam
  */

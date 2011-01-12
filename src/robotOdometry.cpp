@@ -1,13 +1,7 @@
 /**
- * robotOdometry.cpp
- *
- *  Created on: 07/03/2010
- *      Author: agonzale@laas.fr
- *
- *  \file robotOdometry.cpp
- *
- *  ## Add a description here ##
- *
+ * \file robotOdometry.cpp
+ * \date 07/03/2010
+ * \author agonzale
  * \ingroup rtslam
  */
 

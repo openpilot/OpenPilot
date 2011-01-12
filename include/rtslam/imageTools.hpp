@@ -1,10 +1,9 @@
-/*
+/**
  * \file imageTools.hpp
  *
- *     Project: jafar
- *  \date Jul 1, 2010
- *      \author jsola
- *      \ingroup rtslam
+ *  \date 01/07/2010
+ *  \author jsola
+ *  \ingroup rtslam
  */
 
 #ifndef IMAGETOOLS_HPP_

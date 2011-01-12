@@ -1,12 +1,7 @@
 /**
  * \file measurement.cpp
- *
  * \date 25/03/2010
- * \author jsola@laas.fr
- *
- *
- *  ## Add a description here ##
- *
+ * \author jsola
  * \ingroup rtslam
  */
 

@@ -1,13 +1,7 @@
 /**
- * mapObject.cpp
- *
+ * \file mapObject.cpp
  * \date 13/03/2010
- * \author jsola@laas.fr
- *
- *  \file mapObject.cpp
- *
- *  ## Add a description here ##
- *
+ * \author jsola
  * \ingroup rtslam
  */
 

@@ -1,26 +1,6 @@
-/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- * Copyright RIA-LAAS/CNRS, 2010
- *+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- *
- * File:      featureAbstract.h
- * Project:   RT-Slam
- * Author:    Jean-Marie CODOL
- *
- * Version control
- * ===============
- *
- *  $Id$
- *
- * Description
- * ============
- *
- *
- * ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-
 /**
- * \file featurePointSimu.hpp
- * File defining the simulated feature.
- * \author jmcodol@laas.fr
+ * \file featurePoint.hpp
+ * \author jmcodol
  * \ingroup rtslam
  */
 

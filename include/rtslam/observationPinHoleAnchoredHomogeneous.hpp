@@ -4,7 +4,7 @@
  * Header file for observations of Anchored Homogeneous Points (AHP) from pin-hole cameras.
  *
  * \date 14/02/2010
- *     \author jsola@laas.fr
+ * \author jsola
  *
  * \ingroup rtslam
  */
@@ -98,7 +98,7 @@ namespace jafar {
 
 		/**
 		 * Class for Pin-Hole observations of Anchored Homogeneous 3D points.
-		 * \author jsola@laas.fr
+		 * \author jsola
 		 * \ingroup rtslam
 		 */
 		class ObservationPinHoleAnchoredHomogeneousPoint: public ObservationAbstract,

@@ -1,8 +1,8 @@
-/*
+/**
  * \file mapAbstract.hpp
  *
- * \date Feb 9, 2010
- *     \author jsola@laas.fr
+ * \date 09/02/2010
+ * \author jsola
  *
  * Header file for abstract maps
  *
@@ -37,7 +37,7 @@ namespace jafar {
 
 		/** Base class for all map types defined in the module rtslam.
 		 *
-		 * \author jsola@laas.fr
+		 * \author jsola
 		 * \ingroup rtslam
 		 */
 		class MapAbstract: public ObjectAbstract, public ChildOf<WorldAbstract>, 

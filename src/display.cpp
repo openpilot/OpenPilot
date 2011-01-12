@@ -1,8 +1,7 @@
 /**
- * \file display.hpp
- * \author croussil@laas.fr
+ * \file display.cpp
  * \date 25/03/2010
- * File defining a generic display architecture
+ * \author croussil
  * \ingroup rtslam
  */
 

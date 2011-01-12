@@ -1,8 +1,9 @@
-/*
- * observationPinHoleEuclideanPoint.hpp
+/**
+ * \file observationPinHoleEuclideanPoint.hpp
  *
- *  Created on: Apr 15, 2010
- *      Author: agonzale
+ * \date 15/04/2010
+ * \author agonzale
+ * \ingroup rtslam
  */
 
 #ifndef OBSERVATIONPINHOLEEUCLIDEANPOINT_HPP_
@@ -92,7 +93,7 @@ namespace jafar {
 
 		/**
 		 * Class for Pin-Hole observations of Euclidean 3D points.
-		 * \author jsola@laas.fr
+		 * \author jsola
 		 * \ingroup rtslam
 		 */
 		class ObservationPinHoleEuclideanPoint: public ObservationAbstract,

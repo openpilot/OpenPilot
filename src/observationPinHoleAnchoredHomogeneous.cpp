@@ -1,13 +1,7 @@
 /**
- * observationPinHoleAnchoredHomogeneous.cpp
- *
+ * \file observationPinHoleAnchoredHomogeneous.cpp
  * \date 14/03/2010
- * \author jsola@laas.fr
- *
- *  \file observationPinHoleAnchoredHomogeneous.cpp
- *
- *  ## Add a description here ##
- *
+ * \author jsola
  * \ingroup rtslam
  */
 

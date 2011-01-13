@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       stopwatch.h
+ * @file       packet_handler.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Stop watch function
+ * @brief      Modem packet handling routines
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -23,17 +23,39 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __STOPWATCH_H__
-#define __STOPWATCH_H__
+#ifndef __PACKET_HANDLER_H__
+#define __PACKET_HANDLER_H__
 
-#include "stm32f10x.h"
+#include "stdint.h"
 
 // *****************************************************************************
 
-void STOPWATCH_init(uint32_t resolution);
-void STOPWATCH_reset(void);
-uint32_t STOPWATCH_get_count(void);
-uint32_t STOPWATCH_get_us(void);
+#define PH_MAX_CONNECTIONS      1	// maximum number of remote connections
+
+// *****************************************************************************
+
+void ph_1ms_tick(void);
+void ph_process(void);
+
+bool ph_connected(const int connection_index);
+
+uint16_t ph_putData_free(const int connection_index);
+uint16_t ph_putData(const int connection_index, const void *data, uint16_t len);
+
+uint16_t ph_getData_used(const int connection_index);
+uint16_t ph_getData(const int connection_index, void *data, uint16_t len);
+
+void ph_setDatarate(uint32_t datarate_bps);
+uint32_t ph_getDatarate(void);
+
+void ph_setTxPower(uint8_t tx_power);
+uint8_t ph_getTxPower(void);
+
+void ph_set_AES128_key(const void *key);
+
+int ph_set_remote_serial_number(int connection_index, uint32_t sn);
+
+void ph_init(uint32_t our_sn, uint32_t datarate_bps, uint8_t tx_power);
 
 // *****************************************************************************
 

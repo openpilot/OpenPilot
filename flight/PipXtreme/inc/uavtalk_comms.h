@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       crc.h
+ * @file       uavtalk_comms.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Serial communication port handling routines
+ * @brief      RF Module hardware layer
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -23,21 +23,18 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef _CRC_H_
-#define _CRC_H_
+#ifndef __UAVTALK_COMMS_H__
+#define __UAVTALK_COMMS_H__
 
-#include "stm32f10x.h"
+#include "stdint.h"
 
-// ********************************************************************
+// *****************************************************************************
 
-uint16_t UpdateCRC16(uint16_t crc, uint8_t b);
-uint16_t UpdateCRC16Data(uint16_t crc, void *data, uint32_t len);
+void uavtalk_1ms_tick(void);
+void uavtalk_process(void);
 
-uint32_t UpdateCRC32(uint32_t crc, uint8_t b);
-uint32_t UpdateCRC32Data(uint32_t crc, void *data, uint32_t len);
+void uavtalk_init(void);
 
-void CRC_init(void);
-
-// ********************************************************************
+// *****************************************************************************
 
 #endif

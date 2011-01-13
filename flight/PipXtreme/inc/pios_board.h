@@ -59,16 +59,36 @@ TIM8  |           |           |           |
 /* Channel 11 - 				*/
 /* Channel 12 - 				*/
 
+//------------------------
+// BOOTLOADER_SETTINGS
+//------------------------
+#define FUNC_ID				3
+#define HW_VERSION			21
+#define BOOTLOADER_VERSION	0
+#define MEM_SIZE			0x20000 //128K
+#define SIZE_OF_DESCRIPTION	100
+#define START_OF_USER_CODE	(uint32_t)0x08002000
+#define SIZE_OF_CODE		(uint32_t)(MEM_SIZE-(START_OF_USER_CODE-0x08000000)-SIZE_OF_DESCRIPTION)
+#ifdef STM32F10X_HD
+		#define HW_TYPE			0 //0=high_density 1=medium_density;
+#elif STM32F10X_MD
+		#define HW_TYPE			1 //0=high_density 1=medium_density;
+#endif
+#define BOARD_READABLE	TRUE
+#define BOARD_WRITABLA	TRUE
+#define MAX_DEL_RETRYS	3
+
+
 // *****************************************************************
 // System Settings
 
-#define PIOS_MASTER_CLOCK				72000000ul
-#define PIOS_PERIPHERAL_CLOCK			(PIOS_MASTER_CLOCK / 2)
+#define PIOS_MASTER_CLOCK                       72000000ul
+#define PIOS_PERIPHERAL_CLOCK                   (PIOS_MASTER_CLOCK / 2)
 
 #if defined(USE_BOOTLOADER)
-	#define PIOS_NVIC_VECTTAB_FLASH		((uint32_t)0x08006000)
+  #define PIOS_NVIC_VECTTAB_FLASH               (START_OF_USER_CODE)
 #else
-	#define PIOS_NVIC_VECTTAB_FLASH		((uint32_t)0x08000000)
+  #define PIOS_NVIC_VECTTAB_FLASH               ((uint32_t)0x08000000)
 #endif
 
 // *****************************************************************
@@ -130,7 +150,7 @@ TIM8  |           |           |           |
 
 #define TIMER_INT_TIMER					TIM3
 #define TIMER_INT_FUNC					TIM3_IRQHandler
-#define TIMER_INT_PRIORITY				0
+#define TIMER_INT_PRIORITY				2
 
 // *****************************************************************
 // Stop watch timer
@@ -142,23 +162,29 @@ TIM8  |           |           |           |
 //
 // See also pios_board.c
 
-#define PIOS_SPI_PORT				0
+#define PIOS_SPI_PORT                   0
 
 // *****************************************************************
 // PIOS_USART
 
-#define PIOS_USART_RX_BUFFER_SIZE	512
-#define PIOS_USART_TX_BUFFER_SIZE	256
+#define PIOS_USART_RX_BUFFER_SIZE       512
+#define PIOS_USART_TX_BUFFER_SIZE       512
 
-//#define PIOS_USART_BAUDRATE			57600
-#define PIOS_USART_BAUDRATE			115200
+#define PIOS_COM_SERIAL                 0
+//#define PIOS_COM_DEBUG                  PIOS_COM_SERIAL // comment this out if you don't want debug text sent out on the serial port
 
-#define PIOS_COM_SERIAL				0
-
-#define PIOS_COM_DEBUG				PIOS_COM_SERIAL	// comment this out if you don't want debug text sent out on the serial port
+#define PIOS_USART_BAUDRATE             57600
+//#define PIOS_USART_BAUDRATE           115200
 
 #if defined(PIOS_INCLUDE_USB_HID)
-	#define PIOS_COM_TELEM_USB      1
+  #define PIOS_COM_TELEM_USB            1
+#endif
+
+#if defined(PIOS_COM_DEBUG)
+  #define DEBUG_PRINTF(...) PIOS_COM_SendFormattedString(PIOS_COM_DEBUG, __VA_ARGS__)
+//      #define DEBUG_PRINTF(...) PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, __VA_ARGS__)
+#else
+  #define DEBUG_PRINTF(...)
 #endif
 
 // *****************************************************************
@@ -208,7 +234,7 @@ TIM8  |           |           |           |
 						/* With an ADCCLK = 14 MHz and a sampling time of 293.5 cycles: */
 						/* Tconv = 239.5 + 12.5 = 252 cycles = 18�s */
 						/* (1 / (ADCCLK / CYCLES)) = Sample Time (�S) */
-#define PIOS_ADC_IRQ_PRIO					PIOS_IRQ_PRIO_HIGH
+#define PIOS_ADC_IRQ_PRIO					3
 
 // *****************************************************************
 // GPIO output pins
@@ -291,12 +317,12 @@ TIM8  |           |           |           |
 #define GPIO_IN_2_PIN			GPIO_Pin_8
 #define GPIO_IN_2_MODE			GPIO_Mode_IN_FLOATING
 
-// 868MHz JP
+// 868MHz jumper option
 #define GPIO_IN_3_PORT			GPIOB
 #define GPIO_IN_3_PIN			GPIO_Pin_8
 #define GPIO_IN_3_MODE			GPIO_Mode_IPU
 
-// 915MHz JP
+// 915MHz jumper option
 #define GPIO_IN_4_PORT			GPIOB
 #define GPIO_IN_4_PIN			GPIO_Pin_9
 #define GPIO_IN_4_MODE			GPIO_Mode_IPU
@@ -332,7 +358,25 @@ TIM8  |           |           |           |
 	#define PIOS_USB_DETECT_GPIO_PORT		GPIO_IN_2_PORT
 	#define PIOS_USB_DETECT_GPIO_PIN		GPIO_IN_2_PIN
 	#define PIOS_USB_DETECT_EXTI_LINE		EXTI_Line4
-	#define PIOS_IRQ_USB_PRIORITY			PIOS_IRQ_PRIO_MID
+	#define PIOS_IRQ_USB_PRIORITY			8
+#endif
+
+// *****************************************************************
+// RFM22
+
+//#define RFM22_EXT_INT_USE
+
+#define RFM22_PIOS_SPI						PIOS_SPI_PORT	// SPIx
+
+#if defined(RFM22_EXT_INT_USE)
+	#define RFM22_EXT_INT_PORT_SOURCE		GPIO_PortSourceGPIOA
+	#define RFM22_EXT_INT_PIN_SOURCE		GPIO_PinSource2
+
+	#define RFM22_EXT_INT_LINE				EXTI_Line2
+	#define RFM22_EXT_INT_IRQn				EXTI2_IRQn
+	#define	RFM22_EXT_INT_FUNC				EXTI2_IRQHandler
+
+	#define RFM22_EXT_INT_PRIORITY			1
 #endif
 
 // *****************************************************************

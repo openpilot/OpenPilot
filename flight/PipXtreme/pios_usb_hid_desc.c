@@ -93,7 +93,7 @@ const uint8_t PIOS_HID_ConfigDescriptor[PIOS_HID_SIZ_CONFIG_DESC] =
     0x03,          // bmAttributes: Interrupt endpoint
     0x40,          // wMaxPacketSize: 2 Bytes max
     0x00,
-    1,          // bInterval: Polling Interval in ms
+    0x04,          // bInterval: Polling Interval in ms
     // 34
     	
     0x07,	// bLength: Endpoint Descriptor size
@@ -104,7 +104,7 @@ const uint8_t PIOS_HID_ConfigDescriptor[PIOS_HID_SIZ_CONFIG_DESC] =
     0x03,	// bmAttributes: Interrupt endpoint
     0x40,	// wMaxPacketSize: 2 Bytes max
     0x00,
-    1,	// bInterval: Polling Interval in ms
+    0x04,	// bInterval: Polling Interval in ms
     // 41
   };
 
@@ -175,15 +175,15 @@ const uint8_t PIOS_HID_StringProduct[PIOS_HID_SIZ_STRING_PRODUCT] =
   {
     PIOS_HID_SIZ_STRING_PRODUCT,       // bLength
     USB_STRING_DESCRIPTOR_TYPE,        // bDescriptorType
-    'O', 0,
-    'p', 0,
-    'e', 0,
-    'n', 0,
     'P', 0,
     'i', 0,
-    'l', 0,
-    'o', 0,
-    't', 0
+    'p', 0,
+    'X', 0,
+    't', 0,
+    'r', 0,
+    'e', 0,
+    'm', 0,
+    'e', 0
   };
 
 uint8_t PIOS_HID_StringSerial[PIOS_HID_SIZ_STRING_SERIAL] =

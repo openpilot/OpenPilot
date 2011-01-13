@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       crc.h
+ * @file       main.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Serial communication port handling routines
+ * @brief      Main modem header.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -23,21 +23,41 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef _CRC_H_
-#define _CRC_H_
 
-#include "stm32f10x.h"
+#ifndef __MAIN_H__
+#define __MAIN_H__
 
-// ********************************************************************
+#include <pios.h>
 
-uint16_t UpdateCRC16(uint16_t crc, uint8_t b);
-uint16_t UpdateCRC16Data(uint16_t crc, void *data, uint32_t len);
+// *****************************************************************************
 
-uint32_t UpdateCRC32(uint32_t crc, uint8_t b);
-uint32_t UpdateCRC32Data(uint32_t crc, void *data, uint32_t len);
+// firmware version
+#define version_major       0               // 0 to 255
+#define version_minor       1               // 0 to 255
 
-void CRC_init(void);
+// macro's for reading internal flash memory
+#define mem8(addr)          (*((volatile uint8_t  *)(addr)))
+#define mem16(addr)         (*((volatile uint16_t *)(addr)))
+#define mem32(addr)         (*((volatile uint32_t *)(addr)))
 
-// ********************************************************************
+enum {
+    freqBand_UNKNOWN = 0,
+    freqBand_434MHz,
+    freqBand_868MHz,
+    freqBand_915MHz
+};
+
+// *****************************************************************************
+
+extern volatile uint32_t    random32;
+
+extern bool                 booting;
+
+extern uint32_t             flash_size;
+
+extern char                 serial_number_str[25];
+extern uint32_t             serial_number_crc32;
+
+// *****************************************************************************
 
 #endif

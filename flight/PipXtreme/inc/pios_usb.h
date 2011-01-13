@@ -38,20 +38,13 @@
 #define PIOS_USB_VENDOR_ID		0x20A0
 #endif
 
-#ifndef PIOS_USB_VENDOR_STR
-#define PIOS_USB_VENDOR_STR		"openpilot.org"
-#endif
-
-#ifndef PIOS_USB_PRODUCT_STR
-#define PIOS_USB_PRODUCT_STR		"OpenPilot"
-#endif
 
 #ifndef PIOS_USB_PRODUCT_ID
 #define PIOS_USB_PRODUCT_ID		0x4117
 #endif
 
 #ifndef PIOS_USB_VERSION_ID
-#define PIOS_USB_VERSION_ID		0x0200        /* v2.00 */
+#define PIOS_USB_VERSION_ID		0x1201        /* v2.00 */
 #endif
 
 /* Internal defines which are used by PIOS USB HID (don't touch) */

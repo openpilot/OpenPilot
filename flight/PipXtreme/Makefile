@@ -1,8 +1,8 @@
  #####
- # Project: OpenPilot PipBee Modems
+ # Project: OpenPilot Pip Modems
  #    
  #  
- # Makefile for OpenPilot PipBee project
+ # Makefile for OpenPilot Pip Modem project
  #
  # The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
  #    
@@ -23,12 +23,13 @@
  #####
 
 
-# Set developer code and compile options
-# Set to YES for debugging
-DEBUG ?= YES
+# Debugging (YES/NO) ?
+DEBUG ?= NO
+
+# Is this code a bootloader (YES/NO) ?
 USE_BOOTLOADER ?= NO
 
-# Set to YES when using Code Sourcery toolchain
+# Use Code Sourcery toolchain (YES/NO) ?
 CODE_SOURCERY ?= YES
 
 # Toolchain prefix (i.e arm-elf- -> arm-elf-gcc.exe)
@@ -40,11 +41,19 @@ else
 REMOVE_CMD = rm
 endif
 
+
 FLASH_TOOL = OPENOCD
 
-# YES enables -mthumb option to flags for source-files listed 
-# in SRC and CPPSRC
+
+# YES enables -mthumb option to flags for source-files listed in SRC and CPPSRC
 USE_THUMB_MODE = YES
+
+
+
+# Include the USB files (YES/NO) ?
+USE_USB = YES
+
+
 
 # MCU name, submodel and board
 # - MCU used for compiler-option (-mcpu)
@@ -52,43 +61,68 @@ USE_THUMB_MODE = YES
 # - BOARD just passed as define (optional)
 MCU      = cortex-m3
 CHIP     = STM32F103CBT
-BOARD    = STM32103CB_PIPBEE
+BOARD    = STM32103CB_PIPXTREME
+#CHIP     = STM32F103C8T
+#BOARD    = STM32103C8_PIPXTREME
+MODEL    = MD
 ifeq ($(USE_BOOTLOADER), YES)
-MODEL    = MD
+BOOT_MODEL    = $(MODEL)_BL
 else
-MODEL    = MD
+BOOT_MODEL    = $(MODEL)_NB
 endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
 OUTDIR = Build
 
 # Target file name (without extension).
-TARGET = PipBee
+TARGET = PipXtreme
 
 # Paths
-PIPBEE = ./
-PIPBEEINC = $(PIPBEE)/inc
+HOME_DIR = ./
+HOME_DIR_INC = $(HOME_DIR)/inc
 PIOS = ../PiOS
 PIOSINC = $(PIOS)/inc
 FLIGHTLIB = ../Libraries
-FLIGHTLIBINC = ../Libraries/inc
+FLIGHTLIBINC = $(FLIGHTLIB)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
 PIOSCOMMON = $(PIOS)/Common
 APPLIBDIR = $(PIOSSTM32F10X)/Libraries
 STMLIBDIR = $(APPLIBDIR)
 STMSPDDIR = $(STMLIBDIR)/STM32F10x_StdPeriph_Driver
-STMUSBDIR = $(STMLIBDIR)/STM32_USB-FS-Device_Driver
+ifeq ($(USE_USB), YES)
+	STMUSBDIR = $(STMLIBDIR)/STM32_USB-FS-Device_Driver
+endif
 STMSPDSRCDIR = $(STMSPDDIR)/src
 STMSPDINCDIR = $(STMSPDDIR)/inc
+ifeq ($(USE_USB), YES)
+	STMUSBSRCDIR = $(STMUSBDIR)/src
+	STMUSBINCDIR = $(STMUSBDIR)/inc
+endif
 CMSISDIR  = $(STMLIBDIR)/CMSIS/Core/CM3
+BOOT = ../Bootloaders/AHRS
+BOOTINC = $(BOOT)/inc
 
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 
-## PipBee:
-SRC = pipbee.c
-SRC += pios_board.c
+## Core:
+SRC += $(HOME_DIR)/main.c
+SRC += $(HOME_DIR)/pios_board.c
+SRC += $(HOME_DIR)/crc.c
+SRC += $(HOME_DIR)/aes.c
+SRC += $(HOME_DIR)/rfm22b.c
+SRC += $(HOME_DIR)/packet_handler.c
+SRC += $(HOME_DIR)/transparent_comms.c
+SRC += $(HOME_DIR)/uavtalk_comms.c
+SRC += $(HOME_DIR)/saved_settings.c
+SRC += $(HOME_DIR)/gpio_in.c
+SRC += $(HOME_DIR)/stopwatch.c
+SRC += $(FLIGHTLIB)/fifo_buffer.c
+ifeq ($(USE_USB), YES)
+	SRC += $(HOME_DIR)/pios_usb_hid_desc.c
+endif
+
 
 ## PIOS Hardware (STM32F10x)
 SRC += $(PIOSSTM32F10X)/pios_sys.c
@@ -99,6 +133,17 @@ SRC += $(PIOSSTM32F10X)/pios_irq.c
 SRC += $(PIOSSTM32F10X)/pios_adc.c
 SRC += $(PIOSSTM32F10X)/pios_gpio.c
 SRC += $(PIOSSTM32F10X)/pios_spi.c
+SRC += $(PIOSSTM32F10X)/pios_wdg.c
+
+# PIOS USB related files (seperated to make code maintenance more easy)
+ifeq ($(USE_USB), YES)
+	SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
+	#SRC += $(PIOSSTM32F10X)/pios_usb_hid_desc.c
+	#SRC += $(PIOSSTM32F10X)/pios_usb_hid_endp.c
+	SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
+	SRC += $(PIOSSTM32F10X)/pios_usb_hid_prop.c
+	SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
+endif
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_com.c
@@ -110,20 +155,33 @@ SRC += $(CMSISDIR)/system_stm32f10x.c
 
 ## Used parts of the STM-Library
 SRC += $(STMSPDSRCDIR)/stm32f10x_adc.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_bkp.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_crc.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_dac.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_bkp.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_crc.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_dac.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_dbgmcu.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_dma.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_exti.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_flash.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_gpio.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_pwr.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_iwdg.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_i2c.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_pwr.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_rcc.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_rtc.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_rtc.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_spi.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_tim.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_usart.c
 SRC += $(STMSPDSRCDIR)/misc.c
+
+## STM32 USB Library
+ifeq ($(USE_USB), YES)
+	SRC += $(STMUSBSRCDIR)/usb_core.c
+	SRC += $(STMUSBSRCDIR)/usb_init.c
+	SRC += $(STMUSBSRCDIR)/usb_int.c
+	SRC += $(STMUSBSRCDIR)/usb_mem.c
+	SRC += $(STMUSBSRCDIR)/usb_regs.c
+	SRC += $(STMUSBSRCDIR)/usb_sil.c
+endif
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # use file-extension c for "c-only"-files
@@ -153,14 +211,19 @@ ASRCARM =
 
 # List any extra directories to look for include files here.
 #    Each directory must be seperated by a space.
+EXTRAINCDIRS  += $(HOME_DIR)
+EXTRAINCDIRS  += $(HOME_DIR_INC)
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)
 EXTRAINCDIRS  += $(PIOSSTM32F10X)
 EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
+ifeq ($(USE_USB), YES)
+	EXTRAINCDIRS  += $(STMUSBINCDIR)
+endif
 EXTRAINCDIRS  += $(CMSISDIR)
-EXTRAINCDIRS  += $(PIPBEEINC)
+EXTRAINCDIRS  += $(BOOTINC)
 
 # List any extra directories to look for library files here.
 # Also add directories where the linker should search for
@@ -187,6 +250,7 @@ ifeq ($(DEBUG),YES)
 OPT = 0
 else
 OPT = s
+#OPT = 2
 endif
 
 # Output format. (can be ihex or binary or both)
@@ -204,6 +268,9 @@ DEBUGF = dwarf-2
 CDEFS = -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
+ifeq ($(USE_BOOTLOADER), YES)
+CDEFS += -DUSE_BOOTLOADER
+endif
 
 # Place project-specific -D and/or -U options for 
 # Assembler with preprocessor here.
@@ -235,6 +302,9 @@ CFLAGS = -g$(DEBUGF)
 endif
 
 CFLAGS += -O$(OPT)
+ifeq ($(DEBUG),NO)
+CFLAGS += -fdata-sections -ffunction-sections
+endif
 CFLAGS += -mcpu=$(MCU) -mthumb
 CFLAGS += $(CDEFS)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
@@ -270,6 +340,9 @@ MATH_LIB = -lm
 #    -Map:      create map file
 #    --cref:    add cross reference to  map file
 LDFLAGS = -nostartfiles -Wl,-Map=$(OUTDIR)/$(TARGET).map,--cref,--gc-sections
+ifeq ($(DEBUG),NO)
+LDFLAGS += -Wl,-static -Wl,-s
+endif
 LDFLAGS += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
 LDFLAGS += -lc
 LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))
@@ -289,7 +362,12 @@ OOCD_EXE=openocd
 # debug level
 OOCD_CL=-d0
 # interface and board/target settings (using the OOCD target-library here)
-OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.ahrs.cfg -f ../Project/OpenOCD/stm32.cfg
+UNAME := $(shell uname)
+ifeq ($(UNAME), Darwin)
+  OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.pipxtreme.osx.cfg -f ../Project/OpenOCD/stm32.cfg
+else
+  OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.pipxtreme.cfg -f ../Project/OpenOCD/stm32.cfg
+endif
 # initialize
 OOCD_CL+=-c init
 # show the targets
@@ -411,11 +489,18 @@ gccversion :
 #	@echo $(ALLOBJ)
 
 # Program the device.
+ifeq ($(USE_BOOTLOADER), YES)
+# Program the device with OP Upload Tool".
+program: $(OUTDIR)/$(TARGET).bin
+	@echo ${quote}Programming with OP Upload Tool${quote}
+	../../ground/src/experimental/upload-build-desktop/debug/OPUploadTool -d 1 -p $(OUTDIR)/$(TARGET).bin
+else
 ifeq ($(FLASH_TOOL),OPENOCD)
 # Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
 program: $(OUTDIR)/$(TARGET).elf
-	@echo "Programming with OPENOCD"
+	@echo ${quote}Programming with OPENOCD${quote}
 	$(OOCD_EXE) $(OOCD_CL)
+endif
 endif
 
 # Create final output file (.hex) from ELF output file.

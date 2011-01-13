@@ -39,6 +39,6 @@
 #define PIOS_INCLUDE_COM
 #define PIOS_INCLUDE_GPIO
 #define PIOS_INCLUDE_EXTI
-//#define PIOS_INCLUDE_USB_HID
+#define PIOS_INCLUDE_USB_HID
 
 #endif /* PIOS_CONFIG_H */

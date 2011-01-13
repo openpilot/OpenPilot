@@ -569,7 +569,9 @@ bool DFUObject::findDevices()
             result = receiveData(buf,BUF_LEN);
             // int result = hidHandle.send(0,buf, BUF_LEN, 5000);
             // result = hidHandle.receive(0,buf,BUF_LEN,5000);
-            devices[x].ID=buf[9];
+            //devices[x].ID=buf[9];
+            devices[x].ID=buf[14];
+            devices[x].ID=devices[x].ID<<8 | (quint8)buf[15];
             devices[x].BL_Version=buf[7];
             devices[x].SizeOfDesc=buf[8];
 

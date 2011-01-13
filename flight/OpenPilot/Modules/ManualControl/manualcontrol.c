@@ -54,9 +54,18 @@
 #define CONNECTION_OFFSET 150
 
 // Private types
+typedef enum
+{
+	ARM_STATE_DISARMED,
+	ARM_STATE_ARMING_MANUAL,
+	ARM_STATE_ARMED,
+	ARM_STATE_DISARMING_MANUAL,
+	ARM_STATE_DISARMING_TIMEOUT
+} ArmState_t;
 
 // Private variables
 static xTaskHandle taskHandle;
+static ArmState_t armState;
 
 // Private functions
 static void manualControlTask(void *parameters);
@@ -86,10 +95,8 @@ static void manualControlTask(void *parameters)
 	ActuatorDesiredData actuator;
 	AttitudeDesiredData attitude;
 	portTickType lastSysTime;
-	portTickType armedDisarmStart = 0;
-	portTickType lowThrottleStart = 0;
-	uint8_t lowThrottleDetected = 0;
 	
+
 	float flightMode;
 
 	uint8_t disconnected_count = 0;
@@ -100,6 +107,7 @@ static void manualControlTask(void *parameters)
 	ManualControlCommandGet(&cmd);
 	cmd.Armed = MANUALCONTROLCOMMAND_ARMED_FALSE;
 	ManualControlCommandSet(&cmd);
+	armState = ARM_STATE_DISARMED;
 
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
@@ -277,37 +285,94 @@ static void manualControlTask(void *parameters)
 			cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_TRUE;
 			AlarmsClear(SYSTEMALARMS_ALARM_MANUALCONTROL);
 			ManualControlCommandSet(&cmd);
-		}
-
-		if((cmd.Throttle < 0) && !lowThrottleDetected) {
-			lowThrottleDetected = 1;
-			lowThrottleStart = lastSysTime;
-		} else if (cmd.Throttle >= 0)  
-			lowThrottleDetected = 0;
-		else if((cmd.Throttle < 0) && 
-			(timeDifferenceMs(lowThrottleStart, lastSysTime) > settings.ArmedTimeout) & 
-			(settings.ArmedTimeout != 0) ) {
-			cmd.Armed = MANUALCONTROLCOMMAND_ARMED_FALSE;
-			ManualControlCommandSet(&cmd);
 		} 
 
-		
-		
+		// Arming and Disarming mechanism
+		if (cmd.Throttle < 0) {
+			// Throttle is low, in this condition the arming state could change
+			float armStickLevel = cmd.Roll;
+			bool manualArm = false;
+			bool manualDisarm = false;
+			uint8_t newCmdArmed = cmd.Armed;
+			static portTickType armedDisarmStart;
+
+			if (armStickLevel <= -0.90)
+				manualArm = true;
+			else if (armStickLevel >= +0.90)
+				manualDisarm = true;
+
+
+			// Look for state changes and write in newArmState
+			switch(armState) {
+				case ARM_STATE_DISARMED:
+				    newCmdArmed = MANUALCONTROLCOMMAND_ARMED_FALSE;
+					if (manualArm) {
+						armedDisarmStart = lastSysTime;
+						armState = ARM_STATE_ARMING_MANUAL;
+					}
+					break;
+
+				case ARM_STATE_ARMING_MANUAL:
+					if (manualArm) {
+						if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
+						    armState = ARM_STATE_ARMED;
+					}
+					else
+					    armState = ARM_STATE_DISARMED;
+					break;
+
+				case ARM_STATE_ARMED:
+					// When we get here, the throttle is low,
+					// we go immediately to disarming due to timeout, also when the disarming mechanism is not enabled
+					armedDisarmStart = lastSysTime;
+					armState = ARM_STATE_DISARMING_TIMEOUT;
+					newCmdArmed = MANUALCONTROLCOMMAND_ARMED_TRUE;
+					break;
+
+				case ARM_STATE_DISARMING_TIMEOUT:
+					// We get here when armed while throttle low, even when the arming timeout is not enabled
+					if (settings.ArmedTimeout != 0)
+						if (timeDifferenceMs(armedDisarmStart, lastSysTime) > settings.ArmedTimeout)
+						    armState = ARM_STATE_DISARMED;
+					// Switch to disarming due to manual control when needed
+					if (manualDisarm) {
+						armedDisarmStart = lastSysTime;
+						armState = ARM_STATE_DISARMING_MANUAL;
+					}
+					break;
+
+				case ARM_STATE_DISARMING_MANUAL:
+					if (manualDisarm) {
+						if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
+						    armState = ARM_STATE_DISARMED;
+					}
+					else
+					    armState = ARM_STATE_ARMED;
+					break;
+			}
+			// Update cmd object when needed
+			if (newCmdArmed != cmd.Armed) {
+			    cmd.Armed = newCmdArmed;
+				ManualControlCommandSet(&cmd);
+			}
 			
-		/* Look for arm or disarm signal */
-		if ((cmd.Throttle <= 0) && (cmd.Roll <= -0.90)) {
-			if (armedDisarmStart == 0)	// store when started, deal with rollover
-				armedDisarmStart = lastSysTime;
-			else if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
-				cmd.Armed = MANUALCONTROLCOMMAND_ARMED_TRUE;
-		} else if ((cmd.Throttle <= 0) && (cmd.Roll >= 0.90)) {
-			if (armedDisarmStart == 0)
-				armedDisarmStart = lastSysTime;
-			else if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
-				cmd.Armed = MANUALCONTROLCOMMAND_ARMED_FALSE;
 		} else {
-			armedDisarmStart = 0;
+			// The throttle is not low, in case we where arming or disarming, abort
+			switch(armState) {
+				case ARM_STATE_DISARMING_MANUAL:
+				case ARM_STATE_DISARMING_TIMEOUT:
+					armState = ARM_STATE_ARMED;
+					break;
+				case ARM_STATE_ARMING_MANUAL:
+					armState = ARM_STATE_DISARMED;
+					break;
+				default:
+					// Nothing needs to be done in the other states
+					break;
+			}
 		}
+
+
 
 		// Depending on the mode update the Stabilization or Actuator objects
 		if (cmd.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL) {

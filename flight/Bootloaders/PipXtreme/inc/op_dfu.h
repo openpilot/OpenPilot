@@ -37,7 +37,7 @@ typedef struct
 	uint32_t 	sizeOfCode;
 	uint8_t 	sizeOfDescription;
 	uint8_t 	BL_Version;
-	uint8_t 	devID;
+	uint16_t 	devID;
 	DeviceType  devType;
 	uint32_t 	FW_Crc;
 }Device;

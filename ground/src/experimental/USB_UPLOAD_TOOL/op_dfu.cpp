@@ -501,7 +501,9 @@ bool OP_DFU::findDevices()
             buf[9] = 0;
             int result = sendData(buf, BUF_LEN);
             result = receiveData(buf,BUF_LEN);
-            devices[x].ID=buf[9];
+          //  devices[x].ID=buf[9];
+            devices[x].ID=buf[14];
+            devices[x].ID=devices[x].ID<<8 | (quint8)buf[15];
             devices[x].BL_Version=buf[7];
             devices[x].SizeOfDesc=buf[8];
 

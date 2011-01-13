@@ -122,7 +122,7 @@ struct opahrs_msg_v0_rsp_fwdn_data {
 } __attribute__ ((__packed__));
 
 struct opahrs_msg_v0_rsp_versions {
-	uint8_t hw_version;
+	uint16_t hw_version;
 	uint16_t bl_version;
 	uint32_t fw_crc;
 } __attribute__ ((__packed__));

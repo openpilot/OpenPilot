@@ -364,6 +364,8 @@ void processComand(uint8_t *xReceive_Buffer) {
 			Buffer[11] = devicesTable[Data0 - 1].FW_Crc >> 16;
 			Buffer[12] = devicesTable[Data0 - 1].FW_Crc >> 8;
 			Buffer[13] = devicesTable[Data0 - 1].FW_Crc;
+			Buffer[14] = devicesTable[Data0 - 1].devID>>8;
+			Buffer[15] = devicesTable[Data0 - 1].devID;
 		}
 		sendData(Buffer + 1, 63);
 		//PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, Buffer + 1, 63);//FIX+1

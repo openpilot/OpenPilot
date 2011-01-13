@@ -3,7 +3,7 @@
         <description>Firmware IAP</description> 
         <field name="Command" units="na" type="uint16" elements="1"/> 
         <field name="Description" units="na" type="uint8" elements="100"/> 
-        <field name="HWVersion" units="na" type="uint8" elements="1"/> 
+        <field name="HWVersion" units="na" type="uint16" elements="1"/> 
         <field name="Target" units="na" type="uint8" elements="1"/> 
         <field name="ArmReset" units="na" type="uint8" elements="1"/> 
         <field name="crc" units="na" type="uint32" elements="1"/> 

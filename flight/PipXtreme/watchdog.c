@@ -1,19 +1,10 @@
 /**
  ******************************************************************************
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @addtogroup   PIOS_WDG Watchdog Functions
- * @brief PIOS Comamnds to initialize and clear watchdog timer
- * @{
  *
- * @file       pios_spi.c
+ * @file       watchdog.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
- * @brief      Hardware Abstraction Layer for SPI ports of STM32
+ * @brief      Modem packet handling routines
  * @see        The GNU Public License (GPL) Version 3
- * @notes
- *
- * The PIOS Watchdog provides a HAL to initialize a watchdog 
  *
  *****************************************************************************/
 /*
@@ -55,7 +46,7 @@
  */
 uint16_t watchdog_Init(uint16_t delayMs)
 {
-	uint16_t delay = ((uint32_t) delayMs * 60) / 16;
+	uint16_t delay = ((uint32_t)delayMs * 60) / 16;
 	if (delay > 0x0fff)
 		delay = 0x0fff;
 
@@ -66,7 +57,7 @@ uint16_t watchdog_Init(uint16_t delayMs)
 	IWDG_ReloadCounter();
 	IWDG_Enable();
 
-	return ((((uint32_t) delay * 16) / 60) * .75f);
+	return ((((uint32_t)delay * 16) / 60) * .75f);
 }
 
 /**

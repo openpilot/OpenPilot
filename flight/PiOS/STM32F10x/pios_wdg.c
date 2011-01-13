@@ -55,16 +55,14 @@ static struct wdg_configuration {
  * set in the watchdog assumes the nominal clock rate, but the delay for FreeRTOS
  * to use is 75% of the minimal delay.
  *
- * @param[in] delayMs The delay period in ms
- * @returns Maximum recommended delay between updates
+ * @returns Maximum recommended delay between updates based on PIOS_WATCHDOG_TIMEOUT constant
  */
-void PIOS_WDG_Init()
+uint16_t PIOS_WDG_Init()
 {
-#if defined(PIOS_INCLUDE_WDG)
 	uint16_t delay = ((uint32_t) PIOS_WATCHDOG_TIMEOUT * 60) / 16;
 	if (delay > 0x0fff)
 		delay = 0x0fff;
-
+#if defined(PIOS_INCLUDE_WDG)
 	DBGMCU_Config(DBGMCU_IWDG_STOP, ENABLE);	// make the watchdog stop counting in debug mode
 	IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
 	IWDG_SetPrescaler(IWDG_Prescaler_16);
@@ -77,6 +75,7 @@ void PIOS_WDG_Init()
 	
 	wdg_configuration.bootup_flags = BKP_ReadBackupRegister(PIOS_WDG_REGISTER);
 #endif
+	return delay;
 }
 
 /**

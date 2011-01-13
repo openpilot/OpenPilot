@@ -119,6 +119,7 @@ SRC += $(HOME_DIR)/uavtalk_comms.c
 SRC += $(HOME_DIR)/saved_settings.c
 SRC += $(HOME_DIR)/gpio_in.c
 SRC += $(HOME_DIR)/stopwatch.c
+SRC += $(HOME_DIR)/watchdog.c
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 ifeq ($(USE_USB), YES)
 	SRC += $(HOME_DIR)/pios_usb_hid_desc.c
@@ -134,7 +135,6 @@ SRC += $(PIOSSTM32F10X)/pios_irq.c
 SRC += $(PIOSSTM32F10X)/pios_adc.c
 SRC += $(PIOSSTM32F10X)/pios_gpio.c
 SRC += $(PIOSSTM32F10X)/pios_spi.c
-SRC += $(PIOSSTM32F10X)/pios_wdg.c
 
 # PIOS USB related files (seperated to make code maintenance more easy)
 ifeq ($(USE_USB), YES)
@@ -156,19 +156,19 @@ SRC += $(CMSISDIR)/system_stm32f10x.c
 
 ## Used parts of the STM-Library
 SRC += $(STMSPDSRCDIR)/stm32f10x_adc.c
-#SRC += $(STMSPDSRCDIR)/stm32f10x_bkp.c
-#SRC += $(STMSPDSRCDIR)/stm32f10x_crc.c
-#SRC += $(STMSPDSRCDIR)/stm32f10x_dac.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_bkp.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_crc.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_dac.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_dbgmcu.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_dma.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_exti.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_flash.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_gpio.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_iwdg.c
-#SRC += $(STMSPDSRCDIR)/stm32f10x_i2c.c
-#SRC += $(STMSPDSRCDIR)/stm32f10x_pwr.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_i2c.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_pwr.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_rcc.c
-#SRC += $(STMSPDSRCDIR)/stm32f10x_rtc.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_rtc.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_spi.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_tim.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_usart.c

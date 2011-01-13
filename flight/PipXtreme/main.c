@@ -41,6 +41,7 @@
 #include "uavtalk_comms.h"
 #include "gpio_in.h"
 #include "stopwatch.h"
+#include "watchdog.h"
 #include "saved_settings.h"
 
 #include "main.h"
@@ -104,13 +105,13 @@ volatile int32_t        psu_adc;
 
       watchdog_timer = 0;
 
-      PIOS_WDG_Clear();
+      watchdog_Clear();
   }
 
   void enableWatchdog(void)
   {	// enable a watchdog
       watchdog_timer = 0;
-      watchdog_delay = PIOS_WDG_Init(1000);	// 1 second watchdog timeout
+      watchdog_delay = watchdog_Init(1000);	// 1 second watchdog timeout
   }
 
 #endif

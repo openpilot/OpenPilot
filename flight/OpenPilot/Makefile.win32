@@ -53,7 +53,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Telemetry Actuator Stabilization Guidance ManualControl
+MODULES =  Telemetry Actuator Stabilization Guidance ManualControl# FlightPlan
 #MODULES =  Telemetry GPS ManualControl Actuator Altitude Attitude Stabilization
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
@@ -90,6 +90,8 @@ OPUAVOBJ = ./UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
 OPTESTS  = ./Tests
 OPMODULEDIR = ./Modules
+FLIGHTLIB = ../Libraries
+FLIGHTLIBINC = ../Libraries/inc
 PIOS = ../PiOS.win32
 PIOSINC = $(PIOS)/inc
 PIOSWIN32 = $(PIOS)/win32
@@ -98,6 +100,16 @@ RTOSDIR = $(APPLIBDIR)/FreeRTOS
 RTOSSRCDIR = $(RTOSDIR)/Source
 RTOSINCDIR = $(RTOSSRCDIR)/include
 DOXYGENDIR = ../Doc/Doxygen
+PYMITE = $(FLIGHTLIB)/PyMite
+PYMITELIB = $(PYMITE)/lib
+PYMITEPLAT = $(PYMITE)/platform/openpilot
+PYMITETOOLS = $(PYMITE)/tools
+PYMITEVM = $(PYMITE)/vm
+PYMITEINC = $(PYMITEVM)
+PYMITEINC += $(PYMITEPLAT)
+PYMITEINC += $(OUTDIR)
+FLIGHTPLANLIB = $(OPMODULEDIR)/FlightPlan/lib
+FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
@@ -191,6 +203,14 @@ SRC += $(RTOSSRCDIR)/tasks.c
 SRC += $(RTOSSRCDIR)/portable/GCC/Win32/port.c
 SRC += $(RTOSSRCDIR)/portable/MemMang/heap_3.c
 
+## PyMite files
+#SRC += $(wildcard ${PYMITEVM}/*.c)
+#SRC += $(wildcard ${PYMITEPLAT}/*.c)
+#SRC += $(OUTDIR)/pmlib_img.c
+#SRC += $(OUTDIR)/pmlib_nat.c
+#SRC += $(OUTDIR)/pmlibusr_img.c
+#SRC += $(OUTDIR)/pmlibusr_nat.c
+
 
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
@@ -223,6 +243,7 @@ EXTRAINCDIRS  += $(MININIDIR)
 EXTRAINCDIRS  += $(RTOSINCDIR)
 EXTRAINCDIRS  += $(APPLIBDIR)
 EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/Win32
+EXTRAINCDIRS  += $(PYMITEINC)
 
 EXTRAINCDIRS += ${foreach MOD, ${MODULES}, Modules/${MOD}/inc} ${OPMODULEDIR}/System/inc
 
@@ -355,6 +376,7 @@ OBJDUMP = objdump
 SIZE    = size
 NM      = nm
 REMOVE  = $(REMOVE_CMD) -f
+PYTHON  = python
 ###SHELL   = sh
 ###COPY    = cp
 
@@ -382,6 +404,7 @@ MSG_CLEANING = ${quote}Cleaning project:${quote}
 MSG_FORMATERROR = ${quote}Can not handle output-format${quote}
 MSG_ASMFROMC = ${quote}Creating asm-File from C-Source:${quote}
 MSG_ASMFROMC_ARM = ${quote}Creating asm-File from C-Source (ARM-only):${quote}
+MSG_PYMITEINIT = ${quote}**** Generating PyMite intermediate code${quote}
 
 # List of all source files.
 ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
@@ -438,6 +461,13 @@ ${OUTDIR}/InitMods.c: Makefile.win32
 	@echo ${quote}void InitModules() {${quote} >> ${OUTDIR}/InitMods.c
 	@echo ${quote}${foreach MOD, ${MODNAMES}, ${MOD}Initialize();}${quote}  >> ${OUTDIR}/InitMods.c
 	@echo ${quote}}${quote} >> ${OUTDIR}/InitMods.c
+	
+# Generate code for PyMite
+#$(OUTDIR)/pmlib_img.c $(OUTDIR)/pmlib_nat.c $(OUTDIR)/pmlibusr_img.c $(OUTDIR)/pmlibusr_nat.c $(OUTDIR)/pmfeatures.h $(OPMODULEDIR)/FlightPlan/flightplan.c: $(wildcard $(PYMITELIB)/*.py) $(wildcard $(PYMITEPLAT)/*.py) $(wildcard $(FLIGHTPLANLIB)/*.py) $(wildcard $(FLIGHTPLANS)/*.py) 
+#	@echo ${MSG_PYMITEINIT}
+#	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -s --memspace=flash -o $(OUTDIR)/pmlib_img.c --native-file=$(OUTDIR)/pmlib_nat.c $(PYMITELIB)/list.py $(PYMITELIB)/dict.py $(PYMITELIB)/__bi.py $(PYMITELIB)/sys.py $(PYMITELIB)/string.py $(wildcard $(FLIGHTPLANLIB)/*.py)
+#	@$(PYTHON) $(PYMITETOOLS)/pmGenPmFeatures.py $(PYMITEPLAT)/pmfeatures.py > $(OUTDIR)/pmfeatures.h
+#	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -u -o $(OUTDIR)/pmlibusr_img.c --native-file=$(OUTDIR)/pmlibusr_nat.c $(FLIGHTPLANS)/test.py
 	
 # Eye candy.
 begin:

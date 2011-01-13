@@ -95,6 +95,11 @@ extern "C" {
 #define PM_GOTO_IF_ERROR(retval, target) if ((retval) != PM_RET_OK) \
                                             goto target
 
+//Dirty hack to resolve conflicts with winnt.h on Windows
+#if defined(C_ASSERT)
+#undef C_ASSERT
+#endif
+
 #if __DEBUG__
 /** If the boolean expression fails, return the ASSERT error code */
 #define C_ASSERT(boolexpr) \

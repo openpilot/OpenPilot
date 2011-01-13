@@ -1,4 +1,3 @@
-
 """__NATIVE__
 #include "openpilot.h"
 #include "flightplanstatus.h"

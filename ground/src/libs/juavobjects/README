@@ -1,0 +1,2 @@
+compile with ant
+depends on juavtalk and the generated java code from uavobjgenerator in the build dir

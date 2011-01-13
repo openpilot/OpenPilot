@@ -25,51 +25,25 @@
  */
 
 #include "uavobjectparser.h"
-#include <QByteArray>
-
 
 /**
  * Constructor
  */
 UAVObjectParser::UAVObjectParser()
 {
-    fieldTypeStrC << QString("int8_t") << QString("int16_t") << QString("int32_t") <<
-                     QString("uint8_t") << QString("uint16_t") << QString("uint32_t") <<
-                     QString("float") << QString("uint8_t");
+    fieldTypeStrXML << "int8" << "int16" << "int32" << "uint8"
+        << "uint16" << "uint32" <<"float" << "enum";
 
-    fieldTypeStrCPP << QString("qint8") << QString("qint16") << QString("qint32") <<
-                       QString( "quint8") << QString("quint16") << QString("quint32") <<
-                       QString("float") << QString("quint8");
+    updateModeStrXML << "periodic" << "onchange" << "manual" << "never";
 
-    fieldTypeStrPython << QString("b") << QString("h") << QString("i") <<
-                          QString( "B") << QString("H") << QString("I") <<
-                          QString("f") << QString("b");
-
-    fieldTypeStrCPPClass << QString("INT8") << QString("INT16") << QString("INT32") <<
-                            QString( "UINT8") << QString("UINT16") << QString("UINT32") <<
-                            QString("FLOAT32") << QString("ENUM");
-
-    fieldTypeStrMatlab << QString("int8") << QString("int16") << QString("int32") <<
-                       QString( "uint8") << QString("uint16") << QString("uint32") <<
-                       QString("float32") << QString("uint8");
-
-    fieldTypeStrXML << QString("int8") << QString("int16") << QString("int32") <<
-                       QString("uint8") << QString("uint16") << QString("uint32") <<
-                       QString("float") << QString("enum");
+    accessModeStr << "ACCESS_READWRITE" << "ACCESS_READONLY";
 
     fieldTypeNumBytes << int(1) << int(2) << int(4) <<
                         int(1) << int(2) << int(4) <<
                         int(4) << int(1);
 
-    updateModeStr << QString("UPDATEMODE_PERIODIC") << QString("UPDATEMODE_ONCHANGE") <<
-                     QString("UPDATEMODE_MANUAL") << QString("UPDATEMODE_NEVER");
+    accessModeStrXML << "readwrite" << "readonly";
 
-    updateModeStrXML << QString("periodic") << QString("onchange") <<
-                        QString("manual") << QString("never");
-
-    accessModeStr << QString("ACCESS_READWRITE") << QString("ACCESS_READONLY");
-
-    accessModeStrXML << QString("readwrite") << QString("readonly");
 }
 
 /**
@@ -83,9 +57,14 @@ int UAVObjectParser::getNumObjects()
 /**
  * Get the detailed object information
  */
-QList<UAVObjectParser::ObjectInfo*> UAVObjectParser::getObjectInfo()
+QList<ObjectInfo*> UAVObjectParser::getObjectInfo()
 {
     return objInfo;
+}
+
+ObjectInfo* UAVObjectParser::getObjectByIndex(int objIndex)
+{
+    return objInfo[objIndex];
 }
 
 /**
@@ -95,13 +74,9 @@ QString UAVObjectParser::getObjectName(int objIndex)
 {
     ObjectInfo* info = objInfo[objIndex];
     if (info == NULL)
-    {
         return QString();
-    }
-    else
-    {
-        return info->name;
-    }
+
+    return info->name;
 }
 
 /**
@@ -111,13 +86,8 @@ quint32 UAVObjectParser::getObjectID(int objIndex)
 {
     ObjectInfo* info = objInfo[objIndex];
     if (info == NULL)
-    {
         return 0;
-    }
-    else
-    {
-        return info->id;
-    }
+    return info->id;
 }
 
 /**
@@ -149,7 +119,6 @@ int UAVObjectParser::getNumBytes(int objIndex)
  */
 QString UAVObjectParser::parseXML(QString& xml, QString& filename)
 {
-    this->filename = filename;
     // Create DOM document and parse it
     QDomDocument doc("UAVObjects");
     bool parsed = doc.setContent(xml);
@@ -158,16 +127,15 @@ QString UAVObjectParser::parseXML(QString& xml, QString& filename)
     // Read all objects contained in the XML file, creating an new ObjectInfo for each
     QDomElement docElement = doc.documentElement();
     QDomNode node = docElement.firstChild();
-    while ( !node.isNull() )
-    {
+    while ( !node.isNull() ) {
         // Create new object entry
         ObjectInfo* info = new ObjectInfo;
+
+        info->filename=filename;
         // Process object attributes
         QString status = processObjectAttributes(node, info);
         if (!status.isNull())
-        {
             return status;
-        }
 
         // Process child elements (fields and metadata)
         QDomNode childNode = node.firstChild();
@@ -177,97 +145,78 @@ QString UAVObjectParser::parseXML(QString& xml, QString& filename)
         bool telFlightFound = false;
         bool logFound = false;
         bool descriptionFound = false;
-        while ( !childNode.isNull() )
-        {
+        while ( !childNode.isNull() ) {
             // Process element depending on its type
-            if ( childNode.nodeName().compare(QString("field")) == 0 )
-            {
+            if ( childNode.nodeName().compare(QString("field")) == 0 ) {
                 QString status = processObjectFields(childNode, info);
                 if (!status.isNull())
-                {
                     return status;
-                }
+
                 fieldFound = true;
             }
-            else if ( childNode.nodeName().compare(QString("access")) == 0 )
-            {
+            else if ( childNode.nodeName().compare(QString("access")) == 0 ) {
                 QString status = processObjectAccess(childNode, info);
                 if (!status.isNull())
-                {
                     return status;
-                }
+
                 accessFound = true;
             }
-            else if ( childNode.nodeName().compare(QString("telemetrygcs")) == 0 )
-            {
+            else if ( childNode.nodeName().compare(QString("telemetrygcs")) == 0 ) {
                 QString status = processObjectMetadata(childNode, &info->gcsTelemetryUpdateMode,
                                                        &info->gcsTelemetryUpdatePeriod, &info->gcsTelemetryAcked);
                 if (!status.isNull())
-                {
                     return status;
-                }
+
                 telGCSFound = true;
             }
-            else if ( childNode.nodeName().compare(QString("telemetryflight")) == 0 )
-            {
+            else if ( childNode.nodeName().compare(QString("telemetryflight")) == 0 ) {
                 QString status = processObjectMetadata(childNode, &info->flightTelemetryUpdateMode,
                                                        &info->flightTelemetryUpdatePeriod, &info->flightTelemetryAcked);
                 if (!status.isNull())
-                {
                     return status;
-                }
+
                 telFlightFound = true;
             }
-            else if ( childNode.nodeName().compare(QString("logging")) == 0 )
-            {
+            else if ( childNode.nodeName().compare(QString("logging")) == 0 ) {
                 QString status = processObjectMetadata(childNode, &info->loggingUpdateMode,
                                                        &info->loggingUpdatePeriod, NULL);
                 if (!status.isNull())
-                {
                     return status;
-                }
+
                 logFound = true;
             }
-            else if ( childNode.nodeName().compare(QString("description")) == 0 )
-            {
+            else if ( childNode.nodeName().compare(QString("description")) == 0 ) {
                 QString status = processObjectDescription(childNode, &info->description);
+
                 if (!status.isNull())
-                {
                     return status;
-                }
+
                 descriptionFound = true;
             }
-            else
-            {
+            else {
                 return QString("Unknown object element");
             }
+
             // Get next element
             childNode = childNode.nextSibling();
         }
 
         // Make sure that required elements were found
         if ( !accessFound )
-        {
             return QString("Object::access element is missing");
-        }
-        else if ( !telGCSFound )
-        {
+
+        if ( !telGCSFound )
             return QString("Object::telemetrygcs element is missing");
-        }
-        else if ( !telFlightFound )
-        {
+
+        if ( !telFlightFound )
             return QString("Object::telemetryflight element is missing");
-        }
-        else if ( !logFound )
-        {
+
+        if ( !logFound )
             return QString("Object::logging element is missing");
-        }
 
         // TODO: Make into error once all objects updated
         if ( !descriptionFound )
-        {
             return QString("Object::description element is missing");
-        }
 
         // Calculate ID
         calculateID(info);
@@ -296,8 +245,7 @@ void UAVObjectParser::calculateID(ObjectInfo* info)
     hash = updateHash(info->isSettings, hash);
     hash = updateHash(info->isSingleInst, hash);
     // Hash field information
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
+    for (int n = 0; n < info->fields.length(); ++n) {
         hash = updateHash(info->fields[n]->name, hash);
         hash = updateHash(info->fields[n]->numElements, hash);
         hash = updateHash(info->fields[n]->type, hash);
@@ -325,9 +273,8 @@ quint32 UAVObjectParser::updateHash(QString& value, quint32 hash)
     QByteArray bytes = value.toAscii();
     quint32 hashout = hash;
     for (int n = 0; n < bytes.length(); ++n)
-    {
         hashout = updateHash(bytes[n], hashout);
-    }
+
     return hashout;
 }
 
@@ -340,54 +287,35 @@ QString UAVObjectParser::processObjectMetadata(QDomNode& childNode, UpdateMode* 
     QDomNamedNodeMap elemAttributes = childNode.attributes();
     QDomNode elemAttr = elemAttributes.namedItem("updatemode");
     if ( elemAttr.isNull() )
-    {
         return QString("Object:telemetrygcs:updatemode attribute is missing");
-    }
-    else
-    {
-        int index = updateModeStrXML.indexOf( elemAttr.nodeValue() );
-        if (index >= 0)
-        {
-            *mode = (UpdateMode)index;
-        }
-        else
-        {
-            return QString("Object:telemetrygcs:updatemode attribute value is invalid");
-        }
-    }
+
+    int index = updateModeStrXML.indexOf( elemAttr.nodeValue() );
+
+    if (index<0)
+        return QString("Object:telemetrygcs:updatemode attribute value is invalid");
+
+    *mode = (UpdateMode)index;
+
     // Get period attribute
     elemAttr = elemAttributes.namedItem("period");
     if ( elemAttr.isNull() )
-    {
         return QString("Object:telemetrygcs:period attribute is missing");
-    }
-    else
-    {
-        *period = elemAttr.nodeValue().toInt();
-    }
+
+    *period = elemAttr.nodeValue().toInt();
+
+
     // Get acked attribute (only if acked parameter is not null, not applicable for logging metadata)
-    if ( acked != NULL)
-    {
+    if ( acked != NULL) {
         elemAttr = elemAttributes.namedItem("acked");
         if ( elemAttr.isNull())
-        {
             return QString("Object:telemetrygcs:acked attribute is missing");
-        }
+
+        if ( elemAttr.nodeValue().compare(QString("true")) == 0 )
+            *acked = true;
+        else if ( elemAttr.nodeValue().compare(QString("false")) == 0 )
+            *acked = false;
         else
-        {
-            if ( elemAttr.nodeValue().compare(QString("true")) == 0 )
-            {
-                *acked = true;
-            }
-            else if ( elemAttr.nodeValue().compare(QString("false")) == 0 )
-            {
-                *acked = false;
-            }
-            else
-            {
-                return QString("Object:telemetrygcs:acked attribute value is invalid");
-            }
-        }
+            return QString("Object:telemetrygcs:acked attribute value is invalid");
     }
     // Done
     return QString();
@@ -402,39 +330,25 @@ QString UAVObjectParser::processObjectAccess(QDomNode& childNode, ObjectInfo* in
     QDomNamedNodeMap elemAttributes = childNode.attributes();
     QDomNode elemAttr = elemAttributes.namedItem("gcs");
     if ( elemAttr.isNull() )
-    {
         return QString("Object:access:gcs attribute is missing");
-    }
+
+    int index = accessModeStrXML.indexOf( elemAttr.nodeValue() );
+    if (index >= 0)
+        info->gcsAccess = (AccessMode)index;
     else
-    {
-        int index = accessModeStrXML.indexOf( elemAttr.nodeValue() );
-        if (index >= 0)
-        {
-            info->gcsAccess = (AccessMode)index;
-        }
-        else
-        {
-            return QString("Object:access:gcs attribute value is invalid");
-        }
-    }
+        return QString("Object:access:gcs attribute value is invalid");
+
     // Get flight attribute
     elemAttr = elemAttributes.namedItem("flight");
     if ( elemAttr.isNull() )
-    {
         return QString("Object:access:flight attribute is missing");
-    }
+
+    index = accessModeStrXML.indexOf( elemAttr.nodeValue() );
+    if (index >= 0)
+        info->flightAccess = (AccessMode)index;
     else
-    {
-        int index = accessModeStrXML.indexOf( elemAttr.nodeValue() );
-        if (index >= 0)
-        {
-            info->flightAccess = (AccessMode)index;
-        }
-        else
-        {
-            return QString("Object:access:flight attribute value is invalid");
-        }
-    }
+        return QString("Object:access:flight attribute value is invalid");
+
     // Done
     return QString();
 }
@@ -450,123 +364,92 @@ QString UAVObjectParser::processObjectFields(QDomNode& childNode, ObjectInfo* in
     QDomNamedNodeMap elemAttributes = childNode.attributes();
     QDomNode elemAttr = elemAttributes.namedItem("name");
     if ( elemAttr.isNull() )
-    {
         return QString("Object:field:name attribute is missing");
-    }
-    else
-    {
-        field->name = elemAttr.nodeValue();
-    }
+
+    field->name = elemAttr.nodeValue();
+
+
     // Get units attribute
     elemAttr = elemAttributes.namedItem("units");
     if ( elemAttr.isNull() )
-    {
         return QString("Object:field:units attribute is missing");
-    }
-    else
-    {
-        field->units = elemAttr.nodeValue();
-    }
+
+    field->units = elemAttr.nodeValue();
+
     // Get type attribute
     elemAttr = elemAttributes.namedItem("type");
     if ( elemAttr.isNull() )
-    {
         return QString("Object:field:type attribute is missing");
+
+    int index = fieldTypeStrXML.indexOf(elemAttr.nodeValue());
+    if (index >= 0) {
+        field->type = (FieldType)index;
+        field->numBytes = fieldTypeNumBytes[index];
+    }  
+    else {
+        return QString("Object:field:type attribute value is invalid");
     }
-    else
-    {
-        int index = fieldTypeStrXML.indexOf(elemAttr.nodeValue());
-        if (index >= 0)
-        {
-            field->type = (FieldType)index;
-            field->numBytes = fieldTypeNumBytes[index];
-        }
-        else
-        {
-            return QString("Object:field:type attribute value is invalid");
-        }
-    }
+
     // Get numelements or elementnames attribute
     elemAttr = elemAttributes.namedItem("elementnames");
-    if ( !elemAttr.isNull() )
-    {
+    if ( !elemAttr.isNull() ) {
         // Get element names
         QStringList names = elemAttr.nodeValue().split(",", QString::SkipEmptyParts);
         for (int n = 0; n < names.length(); ++n)
-        {
             names[n] = names[n].trimmed();
-        }
+
         field->elementNames = names;
         field->numElements = names.length();
         field->defaultElementNames = false;
     }
-    else
-    {
+    else {
         elemAttr = elemAttributes.namedItem("elements");
-        if ( elemAttr.isNull() )
-        {
+        if ( elemAttr.isNull() ) {
             return QString("Object:field:elements and Object:field:elementnames attribute is missing");
         }
-        else
-        {
+        else {
             field->numElements = elemAttr.nodeValue().toInt();
             for (int n = 0; n < field->numElements; ++n)
-            {
                 field->elementNames.append(QString("%1").arg(n));
-            }
+
             field->defaultElementNames = true;
         }
     }
     // Get options attribute (only if an enum type)
-    if (field->type == FIELDTYPE_ENUM)
-    {
+    if (field->type == FIELDTYPE_ENUM) {
+
         // Get options attribute
         elemAttr = elemAttributes.namedItem("options");
         if ( elemAttr.isNull() )
-        {
             return QString("Object:field:options attribute is missing");
-        }
-        else
-        {
-            QStringList options = elemAttr.nodeValue().split(",", QString::SkipEmptyParts);
-            for (int n = 0; n < options.length(); ++n)
-            {
-                options[n] = options[n].trimmed();
-            }
-            field->options = options;
-        }
+
+        QStringList options = elemAttr.nodeValue().split(",", QString::SkipEmptyParts);
+        for (int n = 0; n < options.length(); ++n)
+            options[n] = options[n].trimmed();
+
+        field->options = options;
     }
+
     // Get the default value attribute (required for settings objects, optional for the rest)
     elemAttr = elemAttributes.namedItem("defaultvalue");
-    if ( elemAttr.isNull() )
-    {
+    if ( elemAttr.isNull() ) {
         if ( info->isSettings )
-        {
             return QString("Object:field:defaultvalue attribute is missing (required for settings objects)");
-        }else
-        {
-        	field->defaultValues = QStringList();
-        }
+        field->defaultValues = QStringList();
     }
-    else
-    {
+    else  {
 		QStringList defaults = elemAttr.nodeValue().split(",", QString::SkipEmptyParts);
 		for (int n = 0; n < defaults.length(); ++n)
-		{
 			defaults[n] = defaults[n].trimmed();
-		}
-		if(defaults.length() != field->numElements)
-		{
+
+		if(defaults.length() != field->numElements) {
 			if(defaults.length() != 1)
-			{
 				return QString("Object:field:incorrect number of default values");
-			}
+
 			/*support legacy single default for multiple elements
 			We sould really issue a warning*/
 			for(int ct=1; ct< field->numElements; ct++)
-			{
 				defaults.append(defaults[0]);
-			}
 		}
 		field->defaultValues = defaults;
     }
@@ -585,60 +468,40 @@ QString UAVObjectParser::processObjectAttributes(QDomNode& node, ObjectInfo* inf
     QDomNamedNodeMap attributes = node.attributes();
     QDomNode attr = attributes.namedItem("name");
     if ( attr.isNull() )
-    {
         return QString("Object:name attribute is missing");
-    }
-    else
-    {
-        info->name = attr.nodeValue();
-    }
+
+    info->name = attr.nodeValue();
+    info->namelc = attr.nodeValue().toLower();
+
     // Get singleinstance attribute
     attr = attributes.namedItem("singleinstance");
     if ( attr.isNull() )
-    {
         return QString("Object:singleinstance attribute is missing");
-    }
+
+    if ( attr.nodeValue().compare(QString("true")) == 0 )
+        info->isSingleInst = true;
+    else if ( attr.nodeValue().compare(QString("false")) == 0 )
+        info->isSingleInst = false;
     else
-    {
-        if ( attr.nodeValue().compare(QString("true")) == 0 )
-        {
-            info->isSingleInst = true;
-        }
-        else if ( attr.nodeValue().compare(QString("false")) == 0 )
-        {
-            info->isSingleInst = false;
-        }
-        else
-        {
-            return QString("Object:singleinstance attribute value is invalid");
-        }
-    }
+        return QString("Object:singleinstance attribute value is invalid");
+
     // Get settings attribute
     attr = attributes.namedItem("settings");
     if ( attr.isNull() )
-    {
         return QString("Object:settings attribute is missing");
-    }
-    else
-    {
-        if ( attr.nodeValue().compare(QString("true")) == 0 )
-        {
+
+    if ( attr.nodeValue().compare(QString("true")) == 0 )
             info->isSettings = true;
-        }
-        else if ( attr.nodeValue().compare(QString("false")) == 0 )
-        {
-            info->isSettings = false;
-        }
-        else
-        {
-            return QString("Object:settings attribute value is invalid");
-        }
-    }
+    else if ( attr.nodeValue().compare(QString("false")) == 0 )
+        info->isSettings = false;
+    else
+        return QString("Object:settings attribute value is invalid");
+
+
     // Settings objects can only have a single instance
     if ( info->isSettings && !info->isSingleInst )
-    {
         return QString("Object: Settings objects can not have multiple instances");
-    }
+
     // Done
     return QString();
 }
@@ -650,580 +513,4 @@ QString UAVObjectParser::processObjectDescription(QDomNode& childNode, QString *
 {
     description->append(childNode.firstChild().nodeValue());
     return QString();
-}
-
-
-/**
- * Replace all the common tags from the template file with actual object
- * information.
- */
-void UAVObjectParser::replaceCommonTags(QString& out, ObjectInfo* info)
-{
-    QString value;
-    // Replace $(XMLFILE) tag
-    out.replace(QString("$(XMLFILE)"), filename);
-    // Replace $(NAME) tag
-    out.replace(QString("$(NAME)"), info->name);
-    // Replace $(NAMELC) tag
-    out.replace(QString("$(NAMELC)"), info->name.toLower());
-    // Replace $(DESCRIPTION) tag
-    out.replace(QString("$(DESCRIPTION)"), info->description);
-    // Replace $(NAMEUC) tag
-    out.replace(QString("$(NAMEUC)"), info->name.toUpper());
-    // Replace $(OBJID) tag
-    out.replace(QString("$(OBJID)"), QString().setNum(info->id));
-    // Replace $(ISSINGLEINST) tag
-    value = boolToString( info->isSingleInst );
-    out.replace(QString("$(ISSINGLEINST)"), value);
-    // Replace $(ISSETTINGS) tag
-    value = boolToString( info->isSettings );
-    out.replace(QString("$(ISSETTINGS)"), value);
-    // Replace $(GCSACCESS) tag
-    value = accessModeStr[info->gcsAccess];
-    out.replace(QString("$(GCSACCESS)"), value);
-    // Replace $(FLIGHTACCESS) tag
-    value = accessModeStr[info->flightAccess];
-    out.replace(QString("$(FLIGHTACCESS)"), value);
-    // Replace $(FLIGHTTELEM_ACKED) tag
-    value = boolToString( info->flightTelemetryAcked );
-    out.replace(QString("$(FLIGHTTELEM_ACKED)"), value);
-    // Replace $(FLIGHTTELEM_UPDATEMODE) tag
-    value = updateModeStr[info->flightTelemetryUpdateMode];
-    out.replace(QString("$(FLIGHTTELEM_UPDATEMODE)"), value);
-    // Replace $(FLIGHTTELEM_UPDATEPERIOD) tag
-    out.replace(QString("$(FLIGHTTELEM_UPDATEPERIOD)"), QString().setNum(info->flightTelemetryUpdatePeriod));
-    // Replace $(GCSTELEM_ACKED) tag
-    value = boolToString( info->gcsTelemetryAcked );
-    out.replace(QString("$(GCSTELEM_ACKED)"), value);
-    // Replace $(GCSTELEM_UPDATEMODE) tag
-    value = updateModeStr[info->gcsTelemetryUpdateMode];
-    out.replace(QString("$(GCSTELEM_UPDATEMODE)"), value);
-    // Replace $(GCSTELEM_UPDATEPERIOD) tag
-    out.replace(QString("$(GCSTELEM_UPDATEPERIOD)"), QString().setNum(info->gcsTelemetryUpdatePeriod));
-    // Replace $(LOGGING_UPDATEMODE) tag
-    value = updateModeStr[info->loggingUpdateMode];
-    out.replace(QString("$(LOGGING_UPDATEMODE)"), value);
-    // Replace $(LOGGING_UPDATEPERIOD) tag
-    out.replace(QString("$(LOGGING_UPDATEPERIOD)"), QString().setNum(info->loggingUpdatePeriod));
-}
-
-/**
- * Convert a boolean to string
- */
-QString UAVObjectParser::boolToString(bool value)
-{
-    if ( value )
-    {
-        return QString("1");
-    }
-    else
-    {
-        return QString("0");
-    }
-}
-
-/**
- * Generate the flight object files
- */
-bool UAVObjectParser::generateFlightObject(int objIndex, const QString& templateInclude, const QString& templateCode,
-                                              QString& outInclude, QString& outCode)
-{
-    // Get object
-    ObjectInfo* info = objInfo[objIndex];
-    if (info == NULL) return false;
-
-    // Prepare output strings
-    outInclude = templateInclude;
-    outCode = templateCode;
-
-    // Replace common tags
-    replaceCommonTags(outInclude, info);
-    replaceCommonTags(outCode, info);
-
-    // Replace the $(DATAFIELDS) tag
-    QString type;
-    QString fields;
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
-        // Determine type
-        type = fieldTypeStrC[info->fields[n]->type];
-        // Append field
-        if ( info->fields[n]->numElements > 1 )
-        {
-            fields.append( QString("    %1 %2[%3];\n").arg(type)
-                           .arg(info->fields[n]->name).arg(info->fields[n]->numElements) );
-        }
-        else
-        {
-            fields.append( QString("    %1 %2;\n").arg(type).arg(info->fields[n]->name) );
-        }
-    }
-    outInclude.replace(QString("$(DATAFIELDS)"), fields);
-
-    // Replace the $(DATAFIELDINFO) tag
-    QString enums;
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
-        enums.append(QString("// Field %1 information\n").arg(info->fields[n]->name));
-        // Only for enum types
-        if (info->fields[n]->type == FIELDTYPE_ENUM)
-        {
-            enums.append(QString("/* Enumeration options for field %1 */\n").arg(info->fields[n]->name));
-            enums.append("typedef enum { ");
-            // Go through each option
-            QStringList options = info->fields[n]->options;
-            for (int m = 0; m < options.length(); ++m)
-            {
-                QString s = (m == (options.length()-1)) ? "%1_%2_%3=%4" : "%1_%2_%3=%4, ";
-                enums.append( s
-                                .arg( info->name.toUpper() )
-                                .arg( info->fields[n]->name.toUpper() )
-                                .arg( options[m].toUpper() )
-                                .arg(m) );
-
-            }
-            enums.append( QString(" } %1%2Options;\n")
-                          .arg( info->name )
-                          .arg( info->fields[n]->name ) );
-        }
-        // Generate element names (only if field has more than one element)
-        if (info->fields[n]->numElements > 1 && !info->fields[n]->defaultElementNames)
-        {
-            enums.append(QString("/* Array element names for field %1 */\n").arg(info->fields[n]->name));
-            enums.append("typedef enum { ");
-            // Go through the element names
-            QStringList elemNames = info->fields[n]->elementNames;
-            for (int m = 0; m < elemNames.length(); ++m)
-            {
-                QString s = (m != (elemNames.length()-1)) ? "%1_%2_%3=%4, " : "%1_%2_%3=%4";
-                enums.append( s
-                                .arg( info->name.toUpper() )
-                                .arg( info->fields[n]->name.toUpper() )
-                                .arg( elemNames[m].toUpper() )
-                                .arg(m) );
-
-            }
-            enums.append( QString(" } %1%2Elem;\n")
-                          .arg( info->name )
-                          .arg( info->fields[n]->name ) );
-        }
-        // Generate array information
-        if (info->fields[n]->numElements > 1)
-        {
-            enums.append(QString("/* Number of elements for field %1 */\n").arg(info->fields[n]->name));
-            enums.append( QString("#define %1_%2_NUMELEM %3\n")
-                          .arg( info->name.toUpper() )
-                          .arg( info->fields[n]->name.toUpper() )
-                          .arg( info->fields[n]->numElements ) );
-        }
-    }
-    outInclude.replace(QString("$(DATAFIELDINFO)"), enums);
-
-    // Replace the $(INITFIELDS) tag
-    QString initfields;
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
-        if (!info->fields[n]->defaultValues.isEmpty() )
-        {
-            // For non-array fields
-            if ( info->fields[n]->numElements == 1)
-            {
-                if ( info->fields[n]->type == FIELDTYPE_ENUM )
-                {
-                    initfields.append( QString("\tdata.%1 = %2;\n")
-                                .arg( info->fields[n]->name )
-                                .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValues[0] ) ) );
-                }
-                else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
-                {
-                    initfields.append( QString("\tdata.%1 = %2;\n")
-                                .arg( info->fields[n]->name )
-                                .arg( info->fields[n]->defaultValues[0].toFloat() ) );
-                }
-                else
-                {
-                    initfields.append( QString("\tdata.%1 = %2;\n")
-                                .arg( info->fields[n]->name )
-                                .arg( info->fields[n]->defaultValues[0].toInt() ) );
-                }
-            }
-            else
-            {
-                // Initialize all fields in the array
-                for (int idx = 0; idx < info->fields[n]->numElements; ++idx)
-                {
-                    if ( info->fields[n]->type == FIELDTYPE_ENUM )
-                    {
-                        initfields.append( QString("\tdata.%1[%2] = %3;\n")
-                                    .arg( info->fields[n]->name )
-                                    .arg( idx )
-                                    .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValues[idx] ) ) );
-                    }
-                    else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
-                    {
-                        initfields.append( QString("\tdata.%1[%2] = %3;\n")
-                                    .arg( info->fields[n]->name )
-                                    .arg( idx )
-                                    .arg( info->fields[n]->defaultValues[idx].toFloat() ) );
-                    }
-                    else
-                    {
-                        initfields.append( QString("\tdata.%1[%2] = %3;\n")
-                                    .arg( info->fields[n]->name )
-                                    .arg( idx )
-                                    .arg( info->fields[n]->defaultValues[idx].toInt() ) );
-                    }
-                }
-            }
-        }
-    }
-    outCode.replace(QString("$(INITFIELDS)"), initfields);
-
-    // Done
-    return true;
-}
-
-/**
- * Generate the GCS object files
- */
-bool UAVObjectParser::generateGCSObject(int objIndex, const QString& templateInclude, const QString& templateCode,
-                                           QString& outInclude, QString& outCode)
-{
-    // Get object
-    ObjectInfo* info = objInfo[objIndex];
-    if (info == NULL) return false;
-
-    // Prepare output strings
-    outInclude = templateInclude;
-    outCode = templateCode;
-
-    // Replace common tags
-    replaceCommonTags(outInclude, info);
-    replaceCommonTags(outCode, info);
-
-    // Replace the $(DATAFIELDS) tag
-    QString type;
-    QString fields;
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
-        // Determine type
-        type = fieldTypeStrCPP[info->fields[n]->type];
-        // Append field
-        if ( info->fields[n]->numElements > 1 )
-        {
-            fields.append( QString("        %1 %2[%3];\n").arg(type).arg(info->fields[n]->name)
-                           .arg(info->fields[n]->numElements) );
-        }
-        else
-        {
-            fields.append( QString("        %1 %2;\n").arg(type).arg(info->fields[n]->name) );
-        }
-    }
-    outInclude.replace(QString("$(DATAFIELDS)"), fields);
-
-    // Replace the $(FIELDSINIT) tag
-    QString finit;
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
-        // Setup element names
-        QString varElemName = info->fields[n]->name + "ElemNames";
-        finit.append( QString("    QStringList %1;\n").arg(varElemName) );
-        QStringList elemNames = info->fields[n]->elementNames;
-        for (int m = 0; m < elemNames.length(); ++m)
-        {
-            finit.append( QString("    %1.append(\"%2\");\n")
-                          .arg(varElemName)
-                          .arg(elemNames[m]) );
-        }
-        // Only for enum types
-        if (info->fields[n]->type == FIELDTYPE_ENUM)
-        {
-            QString varOptionName = info->fields[n]->name + "EnumOptions";
-            finit.append( QString("    QStringList %1;\n").arg(varOptionName) );
-            QStringList options = info->fields[n]->options;
-            for (int m = 0; m < options.length(); ++m)
-            {
-                finit.append( QString("    %1.append(\"%2\");\n")
-                              .arg(varOptionName)
-                              .arg(options[m]) );
-            }
-            finit.append( QString("    fields.append( new UAVObjectField(QString(\"%1\"), QString(\"%2\"), UAVObjectField::ENUM, %3, %4) );\n")
-                          .arg(info->fields[n]->name)
-                          .arg(info->fields[n]->units)
-                          .arg(varElemName)
-                          .arg(varOptionName) );
-        }
-        // For all other types
-        else
-        {
-            finit.append( QString("    fields.append( new UAVObjectField(QString(\"%1\"), QString(\"%2\"), UAVObjectField::%3, %4, QStringList()) );\n")
-                          .arg(info->fields[n]->name)
-                          .arg(info->fields[n]->units)
-                          .arg(fieldTypeStrCPPClass[info->fields[n]->type])
-                          .arg(varElemName) );
-        }
-    }
-    outCode.replace(QString("$(FIELDSINIT)"), finit);
-
-    // Replace the $(DATAFIELDINFO) tag
-    QString name;
-    QString enums;
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
-        enums.append(QString("    // Field %1 information\n").arg(info->fields[n]->name));
-        // Only for enum types
-        if (info->fields[n]->type == FIELDTYPE_ENUM)
-        {
-            enums.append(QString("    /* Enumeration options for field %1 */\n").arg(info->fields[n]->name));
-            enums.append("    typedef enum { ");
-            // Go through each option
-            QStringList options = info->fields[n]->options;
-            for (int m = 0; m < options.length(); ++m)
-            {
-                QString s = (m != (options.length()-1)) ? "%1_%2=%3, " : "%1_%2=%3";
-                enums.append( s
-                                .arg( info->fields[n]->name.toUpper() )
-                                .arg( options[m].toUpper() )
-                                .arg(m) );
-
-            }
-            enums.append( QString(" } %1Options;\n")
-                          .arg( info->fields[n]->name ) );
-        }
-        // Generate element names (only if field has more than one element)
-        if (info->fields[n]->numElements > 1 && !info->fields[n]->defaultElementNames)
-        {
-            enums.append(QString("    /* Array element names for field %1 */\n").arg(info->fields[n]->name));
-            enums.append("    typedef enum { ");
-            // Go through the element names
-            QStringList elemNames = info->fields[n]->elementNames;
-            for (int m = 0; m < elemNames.length(); ++m)
-            {
-                QString s = (m != (elemNames.length()-1)) ? "%1_%2=%3, " : "%1_%2=%3";
-                enums.append( s
-                                .arg( info->fields[n]->name.toUpper() )
-                                .arg( elemNames[m].toUpper() )
-                                .arg(m) );
-
-            }
-            enums.append( QString(" } %1Elem;\n")
-                          .arg( info->fields[n]->name ) );
-        }
-        // Generate array information
-        if (info->fields[n]->numElements > 1)
-        {
-            enums.append(QString("    /* Number of elements for field %1 */\n").arg(info->fields[n]->name));
-            enums.append( QString("    static const quint32 %1_NUMELEM = %2;\n")
-                          .arg( info->fields[n]->name.toUpper() )
-                          .arg( info->fields[n]->numElements ) );
-        }
-    }
-    outInclude.replace(QString("$(DATAFIELDINFO)"), enums);
-
-    // Replace the $(INITFIELDS) tag
-    QString initfields;
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
-        if (!info->fields[n]->defaultValues.isEmpty() )
-        {
-            // For non-array fields
-            if ( info->fields[n]->numElements == 1)
-            {
-                if ( info->fields[n]->type == FIELDTYPE_ENUM )
-                {
-                    initfields.append( QString("    data.%1 = %2;\n")
-                                .arg( info->fields[n]->name )
-                                .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValues[0] ) ) );
-                }
-                else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
-                {
-                    initfields.append( QString("    data.%1 = %2;\n")
-                                .arg( info->fields[n]->name )
-                                .arg( info->fields[n]->defaultValues[0].toFloat() ) );
-                }
-                else
-                {
-                    initfields.append( QString("    data.%1 = %2;\n")
-                                .arg( info->fields[n]->name )
-                                .arg( info->fields[n]->defaultValues[0].toInt() ) );
-                }
-            }
-            else
-            {
-                // Initialize all fields in the array
-                for (int idx = 0; idx < info->fields[n]->numElements; ++idx)
-                {
-                    if ( info->fields[n]->type == FIELDTYPE_ENUM )
-                    {
-                        initfields.append( QString("    data.%1[%2] = %3;\n")
-                                    .arg( info->fields[n]->name )
-                                    .arg( idx )
-                                    .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValues[idx] ) ) );
-                    }
-                    else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
-                    {
-                        initfields.append( QString("    data.%1[%2] = %3;\n")
-                                    .arg( info->fields[n]->name )
-                                    .arg( idx )
-                                    .arg( info->fields[n]->defaultValues[idx].toFloat() ) );
-                    }
-                    else
-                    {
-                        initfields.append( QString("    data.%1[%2] = %3;\n")
-                                    .arg( info->fields[n]->name )
-                                    .arg( idx )
-                                    .arg( info->fields[n]->defaultValues[idx].toInt() ) );
-                    }
-                }
-            }
-        }
-    }
-    outCode.replace(QString("$(INITFIELDS)"), initfields);
-
-    // Done
-    return true;
-}
-
-/**
- * Generate the Python object files
- */
-bool UAVObjectParser::generatePythonObject(int objIndex, const QString& templateCode, QString& outCode)
-{
-    // Get object
-    ObjectInfo* info = objInfo[objIndex];
-    if (info == NULL) return false;
-
-    // Prepare output strings
-    outCode = templateCode;
-
-    // Replace common tags
-    replaceCommonTags(outCode, info);
-
-    // Replace the $(DATAFIELDS) tag
-    QString fields;
-
-    fields.append(QString("[ \\\n"));
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
-      fields.append(QString("\tuavobject.UAVObjectField(\n"));
-      fields.append(QString("\t\t'%1',\n").arg(info->fields[n]->name));
-      fields.append(QString("\t\t'%1',\n").arg(fieldTypeStrPython[info->fields[n]->type]));
-      fields.append(QString("\t\t%1,\n").arg(info->fields[n]->numElements));
-
-      QStringList elemNames = info->fields[n]->elementNames;
-      fields.append(QString("\t\t[\n"));
-      for (int m = 0; m < elemNames.length(); ++m)
-      {
-	fields.append(QString("\t\t\t'%1',\n").arg(elemNames[m]));
-      }
-      fields.append(QString("\t\t],\n"));
-
-
-      fields.append(QString("\t\t{\n"));
-      if (info->fields[n]->type == FIELDTYPE_ENUM)
-      {
-	// Go through each option
-	QStringList options = info->fields[n]->options;
-	for (int m = 0; m < options.length(); ++m)
-        {
-	  fields.append( QString("\t\t\t'%1' : '%2',\n")
-			 .arg(m)
-			 .arg( options[m] ) );
-	}
-      }
-      fields.append(QString("\t\t}\n"));
-      fields.append(QString("\t),\n"));
-    }
-    fields.append(QString("]\n"));
-    outCode.replace(QString("$(DATAFIELDS)"), fields);
-
-    // Done
-    return true;
-}
-
-
-/**
- * Generate Matlab OPLogConvert.m file
- */
-bool  UAVObjectParser::generateMatlabFile(int objIndex, QString& matlabAllocationCode, QString& matlabSwithCode, QString& matlabSaveObjectsCode, QString& matlabFunctionsCode){
-    // Get object
-    ObjectInfo* info = objInfo[objIndex];
-    if (info == NULL) return false;
-
-
-    QString objectName(info->name);
-//    QString objectTableName(objectName + "Objects");
-    QString objectTableName(objectName);
-    QString tableIdxName(objectName.toLower() + "Idx");
-    QString functionName("Read" + info->name + "Object");
-    QString functionCall(functionName + "(fid, timestamp)");
-    QString objectID(QString().setNum(info->id));
-    QString isSingleInst = boolToString( info->isSingleInst );
-
-    // Generate allocation code (will replace the $(ALLOCATIONCODE) tag)
-    matlabAllocationCode.append("\n    " + tableIdxName + " = 1;\n");
-    matlabAllocationCode.append("    " + objectTableName + ".timestamp = 0;\n");
-    QString type;
-    QString allocfields;
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
-        // Determine type
-        type = fieldTypeStrMatlab[info->fields[n]->type];
-        // Append field
-        if ( info->fields[n]->numElements > 1 )
-        {
-            allocfields.append("    " + objectTableName + "(1)." + info->fields[n]->name + " = zeros(1," + QString::number(info->fields[n]->numElements, 10) + ");\n");
-        }
-        else
-        {
-            allocfields.append("    " + objectTableName + "(1)." + info->fields[n]->name + " = 0;\n");
-        }
-    }
-    matlabAllocationCode.append(allocfields);
-
-    // Generate 'swith:' code (will replace the $(SWITCHCODE) tag)
-    matlabSwithCode.append("            case " + objectID + "\n");
-    matlabSwithCode.append("                " + objectTableName + "(" + tableIdxName +") = " + functionCall + ";\n");
-    matlabSwithCode.append("                " + tableIdxName + " = " + tableIdxName +" + 1;\n");
-
-    // Generate objects saving code code (will replace the $(SAVEOBJECTSCODE) tag)
-    matlabSaveObjectsCode.append(",'"+objectTableName+"'");
-
-    // Generate functions code (will replace the $(FUNCTIONSCODE) tag)
-    matlabFunctionsCode.append("function [" + objectName + "] = " + functionCall + "\n");
-    matlabFunctionsCode.append("    if " + isSingleInst + "\n");
-    matlabFunctionsCode.append("        headerSize = 8;\n");
-    matlabFunctionsCode.append("    else\n");
-    matlabFunctionsCode.append("        " + objectName + ".instanceID = fread(fid, 1, 'uint16');\n");
-    matlabFunctionsCode.append("        headerSize = 10;\n");
-    matlabFunctionsCode.append("    end\n\n");
-    matlabFunctionsCode.append("    " + objectName + ".timestamp = timestamp;\n");
-
-    // Genrate functions code, actual fields of the object
-    QString funcfields;
-
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
-        // Determine type
-        type = fieldTypeStrMatlab[info->fields[n]->type];
-        // Append field
-        if ( info->fields[n]->numElements > 1 )
-        {
-            funcfields.append("    " + objectName + "." + info->fields[n]->name + " = double(fread(fid, " + QString::number(info->fields[n]->numElements, 10) + ", '" + type + "'));\n");
-        }
-        else
-        {
-            funcfields.append("    " + objectName + "." + info->fields[n]->name + " = double(fread(fid, 1, '" + type + "'));\n");
-        }
-    }    
-    matlabFunctionsCode.append(funcfields);
-
-    matlabFunctionsCode.append("    % read CRC\n");
-    matlabFunctionsCode.append("    fread(fid, 1, 'uint8');\n");
-
-    matlabFunctionsCode.append("end\n\n");
-
-
-    // Done
-    return true;
 }

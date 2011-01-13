@@ -1,0 +1,51 @@
+/**
+ ******************************************************************************
+ *
+ * @file       uavobjectgeneratorjava.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      produce java code for uavobjects
+ *
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
+#ifndef UAVOBJECTGENERATORJAVA_H
+#define UAVOBJECTGENERATORJAVA_H
+
+#define JAVA_TEMPLATE_DIR "ground/src/libs/juavobjects/templates/"
+#define JAVA_GENERATED_DIR "build/juavobjects/src/org/openpilot/uavtalk"
+
+#include "../generator_common.h"
+
+class UAVObjectGeneratorJava
+{
+public:
+    bool generate(UAVObjectParser* gen,QString basepath);
+
+private:
+    QString javaCodeTemplate;
+    QDir javaCodePath;
+    bool process_object(ObjectInfo* info);
+    QString formatJavaValue(FieldInfo* info,int idx);
+    QString QStringList2JavaArray(QStringList strl);
+    QString serializeJavaValue(int type,QString name);
+    QString deSerializeJavaValue(int type,QString name);
+    QString getFieldTypeStr(int type,bool as_obj);
+};
+
+#endif

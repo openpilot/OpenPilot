@@ -53,7 +53,9 @@ areyousureyoushouldberunningthis:
 	@echo
 	@echo "   [GCS and UAVObjects]"
 	@echo "     gcs               - Build the Ground Control System application"
-	@echo "     uavobjects        - Generate the gcs and openpilot source files from the UAVObject definition XML files"
+	@echo "     uavobjects        - Generate source files from the UAVObject definition XML files"
+	@echo "     uavobjects_gcs    - Generate groundstation source files from the UAVObject definition XML files"
+	@echo "     uavobjects_flight - Generate flight source files from the UAVObject definition XML files"
 	@echo
 	@echo "   Note: All tools will be installed into $(TOOLS_DIR)"
 	@echo "         All build output will be placed in $(BUILD_DIR)"
@@ -191,7 +193,7 @@ all_ground: uavobjgenerator openpilotgcs
 gcs: openpilotgcs
 
 .PHONY: openpilotgcs
-openpilotgcs:  uavobjects
+openpilotgcs:  uavobjects_gcs
 	mkdir -p $(BUILD_DIR)/$@
 	( cd $(BUILD_DIR)/$@ ; \
 	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
@@ -206,10 +208,19 @@ uavobjgenerator:
 	  $(MAKE) -w ; \
 	)
 
-.PHONY: uavobjects
-uavobjects: uavobjgenerator
+.PHONY: build_dir
+bzild_dir:
 	mkdir -p $(BUILD_DIR)/$@
+
+.PHONY:uavobjects
+uavobjects:  build_dir uavobjgenerator
 	$(UAVOBJGENERATOR) "$(ROOT_DIR)/"
+
+uavobjects_gcs: build_dir uavobjgenerator
+	$(UAVOBJGENERATOR) -gcs "$(ROOT_DIR)/"
+
+uavobjects_flight: build_dir uavobjgenerator
+	$(UAVOBJGENERATOR) -flight "$(ROOT_DIR)/"
 
 ##############################
 #
@@ -223,7 +234,7 @@ all_flight: openpilot_elf ahrs_elf
 .PHONY: openpilot
 openpilot: openpilot_elf
 
-openpilot_%: uavobjects
+openpilot_%: uavobjects_flight
 	mkdir -p $(BUILD_DIR)/openpilot
 	$(MAKE) OUTDIR="$(BUILD_DIR)/openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/OpenPilot $*
 
@@ -237,13 +248,13 @@ ahrs_%:
 .PHONY: sim_posix
 sim_posix: sim_posix_elf
 
-sim_posix_%: uavobjects
+sim_posix_%: uavobjects_flight
 	mkdir -p $(BUILD_DIR)/simulation
 	$(MAKE) OUTDIR="$(BUILD_DIR)/simulation" -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.posix $*
 
 .PHONY: sim_win32
 sim_win32: sim_win32_exe
 
-sim_win32_%: uavobjects
+sim_win32_%: uavobjects_flight
 	mkdir -p $(BUILD_DIR)/simulation
 	$(MAKE) OUTDIR="$(BUILD_DIR)/simulation" -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.win32 $*

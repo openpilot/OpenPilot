@@ -9,6 +9,17 @@ CONFIG -= app_bundle
 TEMPLATE = app
 SOURCES += main.cpp \
     uavobjectparser.cpp \
-    uavobjectgenerator.cpp
+    generators/generator_io.cpp \
+    generators/java/uavobjectgeneratorjava.cpp \
+    generators/flight/uavobjectgeneratorflight.cpp \
+    generators/gcs/uavobjectgeneratorgcs.cpp \
+    generators/matlab/uavobjectgeneratormatlab.cpp \
+    generators/python/uavobjectgeneratorpython.cpp \
+    generators/generator_common.cpp
 HEADERS += uavobjectparser.h \
-    uavobjectgenerator.h
+    generators/generator_io.h \
+    generators/java/uavobjectgeneratorjava.h \
+    generators/gcs/uavobjectgeneratorgcs.h \
+    generators/matlab/uavobjectgeneratormatlab.h \
+    generators/python/uavobjectgeneratorpython.h \
+    generators/generator_common.h

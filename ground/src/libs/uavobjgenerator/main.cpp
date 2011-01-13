@@ -26,32 +26,147 @@
 #include <QtCore/QCoreApplication>
 #include <QFile>
 #include <QString>
+#include <QStringList>
 #include <iostream>
-#include "uavobjectgenerator.h"
 
+#include "generators/java/uavobjectgeneratorjava.h"
+#include "generators/flight/uavobjectgeneratorflight.h"
+#include "generators/gcs/uavobjectgeneratorgcs.h"
+#include "generators/matlab/uavobjectgeneratormatlab.h"
+#include "generators/python/uavobjectgeneratorpython.h"
+
+#define ERR_USAGE 1
+#define ERR_XML 2
+
+using namespace std;
+
+/**
+ * print usage info
+ */
+void usage() {
+    cout << "Usage: uavobjectgenerator [-gcs] [-flight] [-java] [-python] [-mathlab] [base_path]" << endl;
+    cout << "       If no language is specified - all are build." << endl;
+    cout << "       base_path - base path to gcs and flight directories (as in svn)." << endl;
+}
+
+/**
+ * inform user of invalid usage
+ */
+int usage_err() {
+    cout << "Invalid usage!" << endl;
+    usage();
+    return ERR_USAGE;
+}
+
+/**
+ * entrance
+ */
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+
+    cout << "- OpenPilot UAVObject Generator -" << endl;
+
     QString basepath;
-    // Get arguments
-    if (argc == 1)
-    {
-        basepath = QString("../../../../../");
+    QStringList arguments_stringlist;
+
+    // process arguments
+    for (int argi=1;argi<argc;argi++)
+        arguments_stringlist << argv[argi];
+
+    bool do_gcs=(arguments_stringlist.removeAll("-gcs")>0);
+    bool do_flight=(arguments_stringlist.removeAll("-flight")>0);
+    bool do_java=(arguments_stringlist.removeAll("-java")>0);
+    bool do_python=(arguments_stringlist.removeAll("-python")>0);
+    bool do_matlab=(arguments_stringlist.removeAll("-mathlab")>0);
+
+    bool do_all=((do_gcs||do_flight||do_java||do_python||do_matlab)==false);
+
+    if (arguments_stringlist.length() == 0) // if we have no param left - make up a basepath
+        basepath =QString("../../../../../");
+    else if (arguments_stringlist.length() == 1) // if we have one param left it is the basepath
+        basepath = arguments_stringlist.at(0);
+    else // too many arguments
+        return usage_err();
+
+    if (!basepath.endsWith("/"))
+        basepath.append("/"); // append a slash if it is not there
+
+    QDir xmlPath = QDir( basepath + QString("ground/src/shared/uavobjectdefinition"));
+    UAVObjectParser* parser = new UAVObjectParser();
+
+    QStringList filters=QStringList("*.xml");
+
+    xmlPath.setNameFilters(filters);
+    QFileInfoList xmlList = xmlPath.entryInfoList();
+
+    // Read in each XML file and parse object(s) in them
+    for (int n = 0; n < xmlList.length(); ++n) {
+        QFileInfo fileinfo = xmlList[n];
+        std::cout << "Parsing XML file: " << fileinfo.fileName().toStdString() << std::endl;
+        QString filename = fileinfo.fileName();
+        QString xmlstr = readFile(fileinfo.absoluteFilePath());
+
+        QString res = parser->parseXML(xmlstr, filename);
+
+        if (!res.isNull()) {
+            std::cout << "Error parsing " << res.toStdString() << endl;
+            return ERR_XML;
+        }
     }
-    else if (argc == 2)
-    {
-        basepath = QString(argv[1]);
+
+    // check for duplicate object ID's
+    QList<quint32> objIDList;
+    for (int objidx = 0; objidx < parser->getNumObjects(); ++objidx) {
+        quint32 id = parser->getObjectID(objidx);
+
+        if ( objIDList.contains(id) || id == 0 ) {
+            cout << "Error: Object ID collision found in object " << parser->getObjectName(objidx).toStdString() << ", modify object name" << endl;
+            return ERR_XML;
+        }
+
+        objIDList.append(id);
     }
-    else
-    {
-        std::cout << "Invalid arguments: uavobjectgenerator [base path to gcs and flight directories (as in svn)]" << std::endl;
+
+    // done parsing and checking
+    cout << "Done: processed " << xmlList.length() << " XML files and generated "
+            << objIDList.length() << " objects with no ID collisions." << endl;
+
+    // generate flight code if wanted
+    if (do_flight|do_all) {
+        std::cout << "generating flight code" << endl ;
+        UAVObjectGeneratorFlight flightgen;
+        flightgen.generate(parser,basepath);
     }
-    // Start application
-    UAVObjectGenerator gen(basepath);
-    gen.processAll();
+
+    // generate gcs code if wanted
+    if (do_gcs|do_all) {
+        std::cout << "generating gcs code" << endl ;
+        UAVObjectGeneratorGCS gcsgen;
+        gcsgen.generate(parser,basepath);
+    }
+
+    // generate java code if wanted
+    if (do_java|do_all) {
+        std::cout << "generating java code" << endl ;
+        UAVObjectGeneratorJava javagen;
+        javagen.generate(parser,basepath);
+    }
+
+    // generate python code if wanted
+    if (do_python|do_all) {
+        std::cout << "generating python code" << endl ;
+        UAVObjectGeneratorPython pygen;
+        pygen.generate(parser,basepath);
+    }
+
+    // generate matlab code if wanted
+    if (do_matlab|do_all) {
+        std::cout << "generating matlab code" << endl ;
+        UAVObjectGeneratorMatlab matlabgen;
+        matlabgen.generate(parser,basepath);
+    }
+
     return 0;
 }
-
-
-
 

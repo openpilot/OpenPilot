@@ -91,8 +91,10 @@ namespace jafar {
 					// project
 					projectFromMean(exp, obsCurrentPtr, x_copy);
 
-					// FIXME rematch if isLowInnovationInlier is false
-					if(!obsCurrentPtr->events.matched)
+					bool inlier = obsCurrentPtr->events.matched && 
+					              isLowInnovationInlier(obsCurrentPtr, exp, matcher->params.lowInnov);
+					
+					if (!inlier)
 						if (obsCurrentPtr->predictAppearance())
 						{
 							// try to match with low innovation
@@ -113,9 +115,12 @@ namespace jafar {
 									obsCurrentPtr->events.matched = true;
 								}
 							}
+							
+							inlier = obsCurrentPtr->events.matched && 
+							         isLowInnovationInlier(obsCurrentPtr, exp, matcher->params.lowInnov);
 						}
 					
-					if(obsCurrentPtr->events.matched && isLowInnovationInlier(obsCurrentPtr, exp, matcher->params.lowInnov))
+					if (inlier)
 					{
 						// declare inlier
 						ransacSetPtr->inlierObs.push_back(obsCurrentPtr);
@@ -127,6 +132,8 @@ namespace jafar {
 				} // for each other obs
 			} // for i = 0:n_tries
 
+			// TODO we should also store the measurement when building the sets,
+			// and take the right one when using the best set
 
 			//###
 			//### Process the best Ransac set

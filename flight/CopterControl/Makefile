@@ -224,28 +224,20 @@ SRC += $(PIOSSTM32F10X)/pios_wdg.c
 
 
 # PIOS USB related files (seperated to make code maintenance more easy)
-SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
-SRC += $(PIOSSTM32F10X)/pios_usb_hid_desc.c
-#SRC += $(PIOSSTM32F10X)/pios_usb_hid_endp.c
-SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
-SRC += $(PIOSSTM32F10X)/pios_usb_hid_prop.c
-SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
+#SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
+#SRC += $(PIOSSTM32F10X)/pios_usb_hid_desc.c
+#SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
+#SRC += $(PIOSSTM32F10X)/pios_usb_hid_prop.c
+#SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_sdcard.c
 SRC += $(PIOSCOMMON)/pios_com.c
-SRC += $(PIOSCOMMON)/pios_bmp085.c
 SRC += $(PIOSCOMMON)/pios_i2c_esc.c
 SRC += $(PIOSCOMMON)/pios_iap.c
-#SRC += $(PIOSCOMMON)/pios_opahrs.c
-#SRC += $(PIOSCOMMON)/pios_opahrs_proto.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
-SRC += $(FLIGHTLIB)/ahrs_spi_comm.c
-SRC += $(FLIGHTLIB)/ahrs_comm_objects.c
 ## Libraries for flight calculations
 SRC += $(FLIGHTLIB)/fifo_buffer.c
-SRC += $(FLIGHTLIB)/WorldMagModel.c
-SRC += $(FLIGHTLIB)/CoordinateConversions.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c
@@ -272,12 +264,12 @@ SRC += $(STMSPDSRCDIR)/stm32f10x_dbgmcu.c
 SRC += $(STMSPDSRCDIR)/misc.c
 
 ## STM32 USB Library
-SRC += $(STMUSBSRCDIR)/usb_core.c
-SRC += $(STMUSBSRCDIR)/usb_init.c
-SRC += $(STMUSBSRCDIR)/usb_int.c
-SRC += $(STMUSBSRCDIR)/usb_mem.c
-SRC += $(STMUSBSRCDIR)/usb_regs.c
-SRC += $(STMUSBSRCDIR)/usb_sil.c
+#SRC += $(STMUSBSRCDIR)/usb_core.c
+#SRC += $(STMUSBSRCDIR)/usb_init.c
+#SRC += $(STMUSBSRCDIR)/usb_int.c
+#SRC += $(STMUSBSRCDIR)/usb_mem.c
+#SRC += $(STMUSBSRCDIR)/usb_regs.c
+#SRC += $(STMUSBSRCDIR)/usb_sil.c
 
 ## RTOS
 SRC += $(RTOSSRCDIR)/list.c

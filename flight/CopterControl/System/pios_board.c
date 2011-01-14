@@ -297,13 +297,13 @@ uint8_t pios_spi_num_devices = NELEMENTS(pios_spi_devs);
 void PIOS_SPI_sdcard_irq_handler(void)
 {
   /* Call into the generic code to handle the IRQ for this specific device */
-  PIOS_SPI_IRQ_Handler(PIOS_SDCARD_SPI);
+//  PIOS_SPI_IRQ_Handler(PIOS_SDCARD_SPI);
 }
 
 void PIOS_SPI_ahrs_irq_handler(void)
 {
   /* Call into the generic code to handle the IRQ for this specific device */
-  PIOS_SPI_IRQ_Handler(PIOS_OPAHRS_SPI);
+//  PIOS_SPI_IRQ_Handler(PIOS_OPAHRS_SPI);
 }
 
 /*

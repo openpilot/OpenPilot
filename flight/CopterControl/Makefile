@@ -57,7 +57,8 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Actuator Telemetry ManualControl Stabilization FirmwareIAP
+MODULES =  
+#Actuator Telemetry ManualControl Stabilization FirmwareIAP
 
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
@@ -71,8 +72,8 @@ MODULES =  Actuator Telemetry ManualControl Stabilization FirmwareIAP
 # - BOARD just passed as define (optional)
 MCU      = cortex-m3
 CHIP     = STM32F103RET
-BOARD    = STM3210E_CC_Rev1
-MODEL	 = HD
+BOARD    = STM32103CB_CC_Rev1
+MODEL	 = MD
 ifeq ($(USE_BOOTLOADER), YES)
 BOOT_MODEL    = $(MODEL)_BL
 
@@ -147,7 +148,7 @@ SRC += $(OPSYSTEM)/alarms.c
 SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
-SRC += $(OPUAVOBJ)/uavobjectsinit.c
+SRC += $(OPUAVOBJ)/uavobjectsinit_cc.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
 else
 ## TESTCODE
@@ -160,10 +161,6 @@ endif
 ## UAVOBJECTS
 ifndef TESTAPP
 SRC += $(OPUAVOBJ)/objectpersistence.c
-SRC += $(OPUAVOBJ)/positionactual.c
-SRC += $(OPUAVOBJ)/gpsposition.c
-SRC += $(OPUAVOBJ)/gpstime.c
-SRC += $(OPUAVOBJ)/gpssatellites.c
 SRC += $(OPUAVOBJ)/gcstelemetrystats.c
 SRC += $(OPUAVOBJ)/flighttelemetrystats.c
 SRC += $(OPUAVOBJ)/systemstats.c
@@ -171,35 +168,35 @@ SRC += $(OPUAVOBJ)/systemalarms.c
 SRC += $(OPUAVOBJ)/systemsettings.c
 SRC += $(OPUAVOBJ)/telemetrysettings.c
 SRC += $(OPUAVOBJ)/actuatorcommand.c
-SRC += $(OPUAVOBJ)/actuatordesired.c
-SRC += $(OPUAVOBJ)/actuatorsettings.c
+#SRC += $(OPUAVOBJ)/actuatordesired.c
+#SRC += $(OPUAVOBJ)/actuatorsettings.c
 SRC += $(OPUAVOBJ)/manualcontrolcommand.c
-SRC += $(OPUAVOBJ)/manualcontrolsettings.c
-SRC += $(OPUAVOBJ)/attitudedesired.c
-SRC += $(OPUAVOBJ)/stabilizationsettings.c
-SRC += $(OPUAVOBJ)/ahrsstatus.c
+#SRC += $(OPUAVOBJ)/manualcontrolsettings.c
+#SRC += $(OPUAVOBJ)/attitudedesired.c
+#SRC += $(OPUAVOBJ)/stabilizationsettings.c
+#SRC += $(OPUAVOBJ)/ahrsstatus.c
 SRC += $(OPUAVOBJ)/i2cstats.c
-SRC += $(OPUAVOBJ)/baroaltitude.c
-SRC += $(OPUAVOBJ)/ahrscalibration.c
-SRC += $(OPUAVOBJ)/attitudeactual.c
-SRC += $(OPUAVOBJ)/ahrssettings.c
-SRC += $(OPUAVOBJ)/flightbatterystate.c
-SRC += $(OPUAVOBJ)/attituderaw.c
-SRC += $(OPUAVOBJ)/homelocation.c
-SRC += $(OPUAVOBJ)/mixersettings.c
-SRC += $(OPUAVOBJ)/mixerstatus.c
-SRC += $(OPUAVOBJ)/positiondesired.c
-SRC += $(OPUAVOBJ)/velocitydesired.c
-SRC += $(OPUAVOBJ)/velocityactual.c
-SRC += $(OPUAVOBJ)/guidancesettings.c
-SRC += $(OPUAVOBJ)/firmwareiapobj.c
-SRC += $(OPUAVOBJ)/ratedesired.c
-SRC += $(OPUAVOBJ)/pipxtrememodemsettings.c
-SRC += $(OPUAVOBJ)/pipxtrememodemstatus.c
-SRC += $(OPUAVOBJ)/batterysettings.c
-SRC += $(OPUAVOBJ)/flightplancontrol.c
-SRC += $(OPUAVOBJ)/flightplanstatus.c
-SRC += $(OPUAVOBJ)/flightplansettings.c
+#SRC += $(OPUAVOBJ)/baroaltitude.c
+#SRC += $(OPUAVOBJ)/ahrscalibration.c
+#SRC += $(OPUAVOBJ)/attitudeactual.c
+#SRC += $(OPUAVOBJ)/ahrssettings.c
+#SRC += $(OPUAVOBJ)/flightbatterystate.c
+#SRC += $(OPUAVOBJ)/attituderaw.c
+#SRC += $(OPUAVOBJ)/homelocation.c
+#SRC += $(OPUAVOBJ)/mixersettings.c
+#SRC += $(OPUAVOBJ)/mixerstatus.c
+#SRC += $(OPUAVOBJ)/positiondesired.c
+#SRC += $(OPUAVOBJ)/velocitydesired.c
+#SRC += $(OPUAVOBJ)/velocityactual.c
+#SRC += $(OPUAVOBJ)/guidancesettings.c
+#SRC += $(OPUAVOBJ)/firmwareiapobj.c
+#SRC += $(OPUAVOBJ)/ratedesired.c
+#SRC += $(OPUAVOBJ)/pipxtrememodemsettings.c
+#SRC += $(OPUAVOBJ)/pipxtrememodemstatus.c
+#SRC += $(OPUAVOBJ)/batterysettings.c
+#SRC += $(OPUAVOBJ)/flightplancontrol.c
+#SRC += $(OPUAVOBJ)/flightplanstatus.c
+#SRC += $(OPUAVOBJ)/flightplansettings.c
 SRC += $(OPUAVOBJ)/taskinfo.c
 SRC += $(OPUAVOBJ)/watchdogstatus.c
 endif
@@ -284,10 +281,6 @@ SRC += $(RTOSSRCDIR)/portable/MemMang/heap_2.c
 #SRC += $(DOSFSDIR)/dosfs.c
 #SRC += $(DOSFSDIR)/dfs_sdcard.c
 
-## AHRS boot loader comms
-SRC += $(AHRSBOOTLOADER)/ahrs_spi_program_master.c
-SRC += $(AHRSBOOTLOADER)/ahrs_spi_program.c
-
 ## PyMite files
 #SRC += $(wildcard ${PYMITEVM}/*.c)
 #SRC += $(wildcard ${PYMITEPLAT}/*.c)
@@ -325,7 +318,7 @@ CPPSRCARM =
 # Even though the DOS/Win* filesystem matches both .s and .S the same,
 # it will preserve the spelling of the filenames, and gcc itself does
 # care about how the name is spelled on its command-line.
-ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL)_OP.S
+ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL).S
 
 # List Assembler source files here which must be assembled in ARM-Mode..
 ASRCARM =

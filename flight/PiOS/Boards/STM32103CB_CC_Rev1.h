@@ -81,10 +81,20 @@ TIM8  |           |           |           |
 #define MAX_DEL_RETRYS	3
 
 //------------------------
+// WATCHDOG_SETTINGS
+//------------------------
+#define PIOS_WATCHDOG_TIMEOUT 250
+#define PIOS_WDG_REGISTER BKP_DR4
+#define PIOS_WDG_ACTUATOR        0x0001
+#define PIOS_WDG_STABILIZATION   0x0002
+#define PIOS_WDG_AHRS            0x0004
+#define PIOS_WDG_MANUAL          0x0008
+
+//------------------------
 // PIOS_LED
 //------------------------
 #define PIOS_LED_LED1_GPIO_PORT			GPIOA
-#define PIOS_LED_LED1_GPIO_PIN			GPIO_Pin_3
+#define PIOS_LED_LED1_GPIO_PIN			GPIO_Pin_6
 #define PIOS_LED_LED1_GPIO_CLK			RCC_APB2Periph_GPIOA
 #define PIOS_LED_NUM				1
 #define PIOS_LED_PORTS				{ PIOS_LED_LED1_GPIO_PORT }
@@ -232,30 +242,110 @@ TIM8  |           |           |           |
 #define EKF_RATE		(PIOS_ADC_RATE / adc_oversampling / 2)
 
 //-------------------------
+// Receiver PWM inputs
+//-------------------------
+#define PIOS_PWM_CH1_GPIO_PORT                  GPIOA
+#define PIOS_PWM_CH1_PIN                        GPIO_Pin_9
+#define PIOS_PWM_CH1_TIM_PORT                   TIM1
+#define PIOS_PWM_CH1_CH                         TIM_Channel_2
+#define PIOS_PWM_CH1_CCR                        TIM_IT_CC2
+#define PIOS_PWM_CH2_GPIO_PORT                  GPIOA
+#define PIOS_PWM_CH2_PIN                        GPIO_Pin_10
+#define PIOS_PWM_CH2_TIM_PORT                   TIM1
+#define PIOS_PWM_CH2_CH                         TIM_Channel_3
+#define PIOS_PWM_CH2_CCR                        TIM_IT_CC3
+#define PIOS_PWM_CH3_GPIO_PORT                  GPIOA
+#define PIOS_PWM_CH3_PIN                        GPIO_Pin_0
+#define PIOS_PWM_CH3_TIM_PORT                   TIM5
+#define PIOS_PWM_CH3_CH                         TIM_Channel_1
+#define PIOS_PWM_CH3_CCR                        TIM_IT_CC1
+#define PIOS_PWM_CH4_GPIO_PORT                  GPIOA
+#define PIOS_PWM_CH4_PIN                        GPIO_Pin_8
+#define PIOS_PWM_CH4_TIM_PORT                   TIM1
+#define PIOS_PWM_CH4_CH                         TIM_Channel_1
+#define PIOS_PWM_CH4_CCR                        TIM_IT_CC1
+#define PIOS_PWM_CH5_GPIO_PORT                  GPIOB
+#define PIOS_PWM_CH5_PIN                        GPIO_Pin_1
+#define PIOS_PWM_CH5_TIM_PORT                   TIM3
+#define PIOS_PWM_CH5_CH                         TIM_Channel_4
+#define PIOS_PWM_CH5_CCR                        TIM_IT_CC4
+#define PIOS_PWM_CH6_GPIO_PORT                  GPIOB
+#define PIOS_PWM_CH6_PIN                        GPIO_Pin_0
+#define PIOS_PWM_CH6_TIM_PORT                   TIM3
+#define PIOS_PWM_CH6_CH                         TIM_Channel_3
+#define PIOS_PWM_CH6_CCR                        TIM_IT_CC3
+#define PIOS_PWM_CH7_GPIO_PORT                  GPIOB
+#define PIOS_PWM_CH7_PIN                        GPIO_Pin_4
+#define PIOS_PWM_CH7_TIM_PORT                   TIM3
+#define PIOS_PWM_CH7_CH                         TIM_Channel_1
+#define PIOS_PWM_CH7_CCR                        TIM_IT_CC1
+#define PIOS_PWM_CH8_GPIO_PORT                  GPIOB
+#define PIOS_PWM_CH8_PIN                        GPIO_Pin_5
+#define PIOS_PWM_CH8_TIM_PORT                   TIM3
+#define PIOS_PWM_CH8_CH                         TIM_Channel_2
+#define PIOS_PWM_CH8_CCR                        TIM_IT_CC2
+#define PIOS_PWM_GPIO_PORTS                     { PIOS_PWM_CH1_GPIO_PORT, PIOS_PWM_CH2_GPIO_PORT, PIOS_PWM_CH3_GPIO_PORT, PIOS_PWM_CH4_GPIO_PORT, PIOS_PWM_CH5_GPIO_PORT, PIOS_PWM_CH6_GPIO_PORT, PIOS_PWM_CH7_GPIO_PORT, PIOS_PWM_CH8_GPIO_PORT }
+#define PIOS_PWM_GPIO_PINS                      { PIOS_PWM_CH1_PIN, PIOS_PWM_CH2_PIN, PIOS_PWM_CH3_PIN, PIOS_PWM_CH4_PIN, PIOS_PWM_CH5_PIN, PIOS_PWM_CH6_PIN, PIOS_PWM_CH7_PIN, PIOS_PWM_CH8_PIN }
+#define PIOS_PWM_TIM_PORTS                      { PIOS_PWM_CH1_TIM_PORT, PIOS_PWM_CH2_TIM_PORT, PIOS_PWM_CH3_TIM_PORT, PIOS_PWM_CH4_TIM_PORT, PIOS_PWM_CH5_TIM_PORT, PIOS_PWM_CH6_TIM_PORT, PIOS_PWM_CH7_TIM_PORT, PIOS_PWM_CH8_TIM_PORT }
+#define PIOS_PWM_TIM_CHANNELS                   { PIOS_PWM_CH1_CH, PIOS_PWM_CH2_CH, PIOS_PWM_CH3_CH, PIOS_PWM_CH4_CH, PIOS_PWM_CH5_CH, PIOS_PWM_CH6_CH, PIOS_PWM_CH7_CH, PIOS_PWM_CH8_CH }
+#define PIOS_PWM_TIM_CCRS                       { PIOS_PWM_CH1_CCR, PIOS_PWM_CH2_CCR, PIOS_PWM_CH3_CCR, PIOS_PWM_CH4_CCR, PIOS_PWM_CH5_CCR, PIOS_PWM_CH6_CCR, PIOS_PWM_CH7_CCR, PIOS_PWM_CH8_CCR }
+#define PIOS_PWM_TIMS                           { TIM1, TIM3, TIM5 }
+#define PIOS_PWM_TIM_IRQS                       { TIM1_CC_IRQn, TIM3_IRQn, TIM5_IRQn }
+#define PIOS_PWM_NUM_INPUTS                     8
+#define PIOS_PWM_NUM_TIMS                       3
+#define PIOS_PWM_SUPV_ENABLED                   1
+#define PIOS_PWM_SUPV_TIMER                     TIM6
+#define PIOS_PWM_SUPV_TIMER_RCC_FUNC            RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE)
+#define PIOS_PWM_SUPV_HZ                        25
+#define PIOS_PWM_SUPV_IRQ_CHANNEL               TIM6_IRQn
+#define PIOS_PWM_SUPV_IRQ_FUNC                  void TIM6_IRQHandler(void)
+
+
+//-------------------------
+// Servo outputs
+//-------------------------
+#define PIOS_SERVO_GPIO_PORT_1TO4               GPIOB
+#define PIOS_SERVO_GPIO_PIN_1                   GPIO_Pin_6
+#define PIOS_SERVO_GPIO_PIN_2                   GPIO_Pin_7
+#define PIOS_SERVO_GPIO_PIN_3                   GPIO_Pin_8
+#define PIOS_SERVO_GPIO_PIN_4                   GPIO_Pin_9
+#define PIOS_SERVO_GPIO_PORT_5TO8               GPIOC
+#define PIOS_SERVO_GPIO_PIN_5                   GPIO_Pin_6
+#define PIOS_SERVO_GPIO_PIN_6                   GPIO_Pin_7
+#define PIOS_SERVO_GPIO_PIN_7                   GPIO_Pin_8
+#define PIOS_SERVO_GPIO_PIN_8                   GPIO_Pin_9
+#define PIOS_SERVO_NUM_OUTPUTS                  8
+#define PIOS_SERVO_NUM_TIMERS                   PIOS_SERVO_NUM_OUTPUTS
+#define PIOS_SERVO_UPDATE_HZ                    50
+#define PIOS_SERVOS_INITIAL_POSITION            0 /* dont want to start motors, have no pulse till settings loaded */
+
+//-------------------------
 // GPIO
 //-------------------------
-#define PIOS_GPIO_1_PORT			GPIOB
-#define PIOS_GPIO_1_PIN				GPIO_Pin_9
-#define PIOS_GPIO_1_GPIO_CLK			RCC_APB2Periph_GPIOB
-#define PIOS_GPIO_PORTS				{ PIOS_GPIO_1_PORT }
-#define PIOS_GPIO_PINS				{ PIOS_GPIO_1_PIN }
-#define PIOS_GPIO_CLKS				{ PIOS_GPIO_1_GPIO_CLK }
-#define PIOS_GPIO_NUM				1
-#define SET_ACCEL_2G PIOS_GPIO_On(0);
-#define SET_ACCEL_6G PIOS_GPIO_Off(0)
+#define PIOS_GPIO_1_PORT                        GPIOC
+#define PIOS_GPIO_1_PIN                         GPIO_Pin_0
+#define PIOS_GPIO_1_GPIO_CLK                    RCC_APB2Periph_GPIOC
+#define PIOS_GPIO_2_PORT                        GPIOC
+#define PIOS_GPIO_2_PIN                         GPIO_Pin_1
+#define PIOS_GPIO_2_GPIO_CLK                    RCC_APB2Periph_GPIOC
+#define PIOS_GPIO_3_PORT                        GPIOC
+#define PIOS_GPIO_3_PIN                         GPIO_Pin_2
+#define PIOS_GPIO_3_GPIO_CLK                    RCC_APB2Periph_GPIOC
+#define PIOS_GPIO_4_PORT                        GPIOD
+#define PIOS_GPIO_4_PIN                         GPIO_Pin_2
+#define PIOS_GPIO_4_GPIO_CLK                    RCC_APB2Periph_GPIOD
+#define PIOS_GPIO_PORTS                         { PIOS_GPIO_1_PORT, PIOS_GPIO_2_PORT, PIOS_GPIO_3_PORT, PIOS_GPIO_4_PORT }
+#define PIOS_GPIO_PINS                          { PIOS_GPIO_1_PIN, PIOS_GPIO_2_PIN, PIOS_GPIO_3_PIN, PIOS_GPIO_4_PIN }
+#define PIOS_GPIO_CLKS                          { PIOS_GPIO_1_GPIO_CLK, PIOS_GPIO_2_GPIO_CLK, PIOS_GPIO_3_GPIO_CLK, PIOS_GPIO_4_GPIO_CLK }
+#define PIOS_GPIO_NUM                           4
 
-//------------------------
-// PIOS_HMC5843
-//------------------------
-#define PIOS_HMC5843_DRDY_GPIO_PORT		GPIOB
-#define PIOS_HMC5843_DRDY_GPIO_PIN		GPIO_Pin_8
-#define PIOS_HMC5843_DRDY_PORT_SOURCE		GPIO_PortSourceGPIOB
-#define PIOS_HMC5843_DRDY_PIN_SOURCE		GPIO_PinSource8
-#define PIOS_HMC5843_DRDY_CLK			RCC_APB2Periph_GPIOB
-#define PIOS_HMC5843_DRDY_EXTI_LINE		EXTI_Line8
-#define PIOS_HMC5843_DRDY_IRQn			EXTI9_5_IRQn
-#define PIOS_HMC5843_DRDY_PRIO			PIOS_IRQ_PRIO_HIGH
-
-
+//-------------------------
+// USB
+//-------------------------
+#define PIOS_USB_ENABLED                        1
+#define PIOS_USB_DETECT_GPIO_PORT               GPIOC
+#define PIOS_USB_DETECT_GPIO_PIN                GPIO_Pin_4
+#define PIOS_USB_DETECT_EXTI_LINE               EXTI_Line4
+#define PIOS_IRQ_USB_PRIORITY                   PIOS_IRQ_PRIO_MID
 
 #endif /* STM32103CB_AHRS_H_ */

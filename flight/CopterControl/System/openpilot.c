@@ -84,6 +84,10 @@ int main()
 
 	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
+	for(;;) {
+		PIOS_LED_Toggle(LED1);
+		PIOS_DELAY_WaitmS(100);
+	}
 	
 	/* Initialize the system thread */
 	SystemModInitialize();

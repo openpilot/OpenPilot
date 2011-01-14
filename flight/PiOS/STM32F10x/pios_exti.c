@@ -41,7 +41,7 @@
 void EXTI15_10_IRQHandler(void)
 {
 #if defined(PIOS_INCLUDE_FREERTOS)
-	portBASE_TYPE xHigherPriorityTaskWoken;
+	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 #endif
 
 #if defined(PIOS_INCLUDE_BMP085)

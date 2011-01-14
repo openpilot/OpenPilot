@@ -57,7 +57,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  
+MODULES =  Telemetry ManualControl Stabilization
 #Actuator Telemetry ManualControl Stabilization FirmwareIAP
 
 #MODULES = Telemetry Example
@@ -177,6 +177,10 @@ SRC += $(OPUAVOBJ)/manualcontrolcommand.c
 SRC += $(OPUAVOBJ)/taskinfo.c
 SRC += $(OPUAVOBJ)/i2cstats.c
 SRC += $(OPUAVOBJ)/watchdogstatus.c
+SRC += $(OPUAVOBJ)/telemetrysettings.c
+SRC += $(OPUAVOBJ)/ratedesired.c
+SRC += $(OPUAVOBJ)/ahrssettings.c
+SRC += $(OPUAVOBJ)/manualcontrolsettings.c
 
 #${wildcard ${OBJ}/$(shell echo $(VAR) | tr A-Z a-z)/*.c}
 #SRC += ${foreach OBJ, ${UAVOBJECTS}, $(UAVOBJECTS)/$(OBJ).c}

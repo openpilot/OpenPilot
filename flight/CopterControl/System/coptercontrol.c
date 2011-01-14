@@ -109,13 +109,6 @@ void OpenPilotInit()
 	 * */
 	
 	PIOS_Board_Init();
-	PIOS_DELAY_Init();
-	PIOS_LED_Init();
-	
-	for(;;) {
-		PIOS_LED_Toggle(LED1);
-		PIOS_DELAY_WaitmS(1000);
-	}
 	
 	/* Initialize modules */
 	InitModules();

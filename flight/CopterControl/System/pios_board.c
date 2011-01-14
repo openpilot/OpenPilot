@@ -65,15 +65,15 @@ void PIOS_Board_Init(void) {
 
 	/* Initialize the PiOS library */
 	PIOS_COM_Init();
-	PIOS_Servo_Init();
-	PIOS_ADC_Init();
-	PIOS_GPIO_Init();
+	//PIOS_Servo_Init();
+	//PIOS_ADC_Init();
+	//PIOS_GPIO_Init();
 
 #if defined(PIOS_INCLUDE_PWM)
-	PIOS_PWM_Init();
+	//PIOS_PWM_Init();
 #endif
 #if defined(PIOS_INCLUDE_PPM)
-	PIOS_PPM_Init();
+	//PIOS_PPM_Init();
 #endif
 #if defined(PIOS_INCLUDE_USB_HID)
 	PIOS_USB_HID_Init(0);

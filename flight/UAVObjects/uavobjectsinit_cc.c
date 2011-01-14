@@ -96,4 +96,8 @@ void UAVObjectsInitializeAll()
 	TaskInfoInitialize();
 	I2CStatsInitialize();
 	WatchdogStatusInitialize();
+	TelemetrySettingsInitialize();
+	RateDesiredInitialize();
+	AHRSSettingsInitialize();
+	ManualControlSettingsInitialize();
 }

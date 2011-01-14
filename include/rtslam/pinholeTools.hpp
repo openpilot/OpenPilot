@@ -561,15 +561,13 @@ namespace jafar {
 					// jmath::LinearSolvers::solve_Cholesky(Rd, (rc - rd), c);
 
 					// therefore we solve manually the pseudo-inverse:
-					using namespace ublas;
-					using namespace jmath::ublasExtra;
-					mat RdtRd(size,size);
-					RdtRd = prod(trans(Rd), Rd);
-					mat iRdtRd(size, size);
-					inv(RdtRd, iRdtRd);
-					mat iRd = prod(iRdtRd, trans<mat>(Rd));
+					jblas::mat RdtRd(size,size);
+					RdtRd = ublas::prod(ublas::trans(Rd), Rd);
+					jblas::mat iRdtRd(size, size);
+					jmath::ublasExtra::inv(RdtRd, iRdtRd);
+					mat iRd = ublas::prod(iRdtRd, ublas::trans<jblas::mat>(Rd));
 
-					c = prod(iRd,(rc-rd));
+					c = ublas::prod(iRd,(rc-rd));
 				}
 			}
 

@@ -308,12 +308,14 @@ static void updateSystemAlarms()
 		AlarmsClear(SYSTEMALARMS_ALARM_STACKOVERFLOW);
 	}
 
+#if defined(PIOS_INCLUDE_SDCARD)
 	// Check for SD card
 	if (PIOS_SDCARD_IsMounted() == 0) {
 		AlarmsSet(SYSTEMALARMS_ALARM_SDCARD, SYSTEMALARMS_ALARM_WARNING);
 	} else {
 		AlarmsClear(SYSTEMALARMS_ALARM_SDCARD);
 	}
+#endif
 
 	// Check for event errors
 	UAVObjGetStats(&objStats);

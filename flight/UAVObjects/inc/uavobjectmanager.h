@@ -35,6 +35,13 @@
 #define UAVOBJ_ALL_INSTANCES 0xFFFF
 #define UAVOBJ_MAX_INSTANCES 1000
 
+
+// FIXME: All this typedef for SDCARD needs to be abstracted away
+#if !defined(PIOS_INCLUDE_SDCARD)
+typedef struct {} FILEINFO;
+#endif
+
+
 typedef void* UAVObjHandle;
 
 /**

@@ -324,19 +324,15 @@ extern const struct pios_com_driver pios_usart_com_driver;
 	extern const struct pios_com_driver pios_usb_com_driver;
 #endif
 
-struct pios_com_dev pios_com_devs[] =
-{
-	{
-		.id = PIOS_USART_SERIAL,
-		.driver = &pios_usart_com_driver,
-	},
+struct pios_com_dev pios_com_devs[] = { { .id = 0,
+		.driver = &pios_usb_com_driver, },
 #if defined(PIOS_INCLUDE_USB_HID)
-  {
-    .id     = 0,
-    .driver = &pios_usb_com_driver,
-  },
+		{
+			.id = 0,
+			.driver = &pios_usb_com_driver,
+		},
 #endif
-};
+		};
 
 const uint8_t pios_com_num_devices = NELEMENTS(pios_com_devs);
 

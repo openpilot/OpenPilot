@@ -41,14 +41,12 @@
 uint32_t STOPWATCH_Init(u32 resolution, TIM_TypeDef* TIM) {
 	uint32_t STOPWATCH_TIMER_RCC;
 	switch ((uint32_t)TIM) {
-	case (uint32_t)TIM6:
-		STOPWATCH_TIMER_RCC = RCC_APB1Periph_TIM6;
-		break;
-	case (uint32_t)TIM7:
-		STOPWATCH_TIMER_RCC = RCC_APB1Periph_TIM7;
-		break;
+	case (uint32_t)TIM1: STOPWATCH_TIMER_RCC = RCC_APB2Periph_TIM1;break;
+	case (uint32_t)TIM2: STOPWATCH_TIMER_RCC = RCC_APB1Periph_TIM2; break;
+	case (uint32_t)TIM3: STOPWATCH_TIMER_RCC = RCC_APB1Periph_TIM3; break;
+	case (uint32_t)TIM4: STOPWATCH_TIMER_RCC = RCC_APB1Periph_TIM4; break;
 	default:
-		STOPWATCH_TIMER_RCC = RCC_APB1Periph_TIM6;
+		STOPWATCH_TIMER_RCC = RCC_APB2Periph_TIM1;
 	}
 
 	// enable timer clock

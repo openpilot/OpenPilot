@@ -70,8 +70,8 @@ uint8_t processRX();
 void jump_to_app();
 
 #define BLUE LED1
-#define RED	LED2
-#define LED_PWM_TIMER	TIM6
+#define RED	LED4
+#define LED_PWM_TIMER	TIM3
 int main() {
 	/* NOTE: Do NOT modify the following start-up sequence */
 	/* Any new initialization functions should be added in OpenPilotInit() */
@@ -103,6 +103,7 @@ int main() {
 		JumpToApp = TRUE;
 
 	STOPWATCH_Reset(LED_PWM_TIMER);
+
 	while (TRUE) {
 		if (JumpToApp == TRUE)
 			jump_to_app();

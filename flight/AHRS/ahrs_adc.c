@@ -257,15 +257,15 @@ void AHRS_ADC_downsample_data()
 	uint16_t chan;
 	uint16_t sample;
 	
-	for (chan = 0; chan < PIOS_ADC_NUM_CHANNELS; chan++) {
-		downsampled_buffer[chan] = 0;
-		for (sample = 0; sample < adc_config.adc_oversample; sample++) {
-			downsampled_buffer[chan] += adc_config.valid_data_buffer[chan + sample * PIOS_ADC_NUM_CHANNELS] * adc_config.fir_coeffs[sample];
-		}
-		downsampled_buffer[chan] /= (float) adc_config.fir_coeffs[adc_config.adc_oversample];
+	for (chan = 0; chan < PIOS_ADC_NUM_CHANNELS; chan++)
+	{
+		register int32_t sum = 0;
+		for (sample = 0; sample < adc_config.adc_oversample; sample++)
+			sum += (int32_t)adc_config.valid_data_buffer[chan + sample * PIOS_ADC_NUM_CHANNELS] * adc_config.fir_coeffs[sample];
+		downsampled_buffer[chan] = (float)sum / adc_config.fir_coeffs[adc_config.adc_oversample];
 	}
 	
-	if(callback_function != NULL)
+	if (callback_function)
 		callback_function(downsampled_buffer);
 }
 

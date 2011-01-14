@@ -1,9 +1,12 @@
 /**
  ******************************************************************************
- *
- * @file       eventdispatcher.h
+ * @addtogroup OpenPilotSystem OpenPilot System
+ * @{
+ * @addtogroup OpenPilotLibraries OpenPilot System Libraries
+ * @{
+ * @file       taskmonitor.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Include files of the uavobjectlist library
+ * @brief      Include file of the task monitoring library
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -22,26 +25,18 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#ifndef TASKMONITOR_H
+#define TASKMONITOR_H
 
-#ifndef EVENTDISPATCHER_H
-#define EVENTDISPATCHER_H
+#include "taskinfo.h"
 
-// Public types
+int32_t TaskMonitorInitialize(void);
+int32_t TaskMonitorAdd(TaskInfoRunningElem task, xTaskHandle handle);
+void TaskMonitorUpdateAll(void);
+
+#endif // TASKMONITOR_H
+
 /**
- * Event dispatcher statistics
+ * @}
+ * @}
  */
-typedef struct {
-	uint32_t eventErrors;
-} EventStats;
-
-// Public functions
-int32_t EventDispatcherInitialize();
-void EventGetStats(EventStats* statsOut);
-void EventClearStats();
-int32_t EventCallbackDispatch(UAVObjEvent* ev, UAVObjEventCallback cb);
-int32_t EventPeriodicCallbackCreate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t periodMs);
-int32_t EventPeriodicCallbackUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, int32_t periodMs);
-int32_t EventPeriodicQueueCreate(UAVObjEvent* ev, xQueueHandle queue, int32_t periodMs);
-int32_t EventPeriodicQueueUpdate(UAVObjEvent* ev, xQueueHandle queue, int32_t periodMs);
-
-#endif // EVENTDISPATCHER_H

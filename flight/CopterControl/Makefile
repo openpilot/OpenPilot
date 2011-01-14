@@ -89,14 +89,14 @@ TARGET = OpenPilot
 # Paths
 OPSYSTEM = ./System
 OPSYSTEMINC = $(OPSYSTEM)/inc
-OPUAVTALK = ../UAVTalk
+OPUAVTALK = ./UAVTalk
 OPUAVTALKINC = $(OPUAVTALK)/inc
-OPUAVOBJ = ../UAVObjects
+OPUAVOBJ = ./UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
 OPTESTS  = ./Tests
-OPMODULEDIR = ../Modules
+OPMODULEDIR = ./Modules
 FLIGHTLIB = ../Libraries
-FLIGHTLIBINC = $(FLIGHTLIB)/inc
+FLIGHTLIBINC = ../Libraries/inc
 PIOS = ../PiOS
 PIOSINC = $(PIOS)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
@@ -202,7 +202,6 @@ SRC += $(OPUAVOBJ)/flightplanstatus.c
 SRC += $(OPUAVOBJ)/flightplansettings.c
 SRC += $(OPUAVOBJ)/taskinfo.c
 SRC += $(OPUAVOBJ)/watchdogstatus.c
-SRC += $(OPUAVOBJ)/nedaccel.c
 endif
 
 ## PIOS Hardware (STM32F10x)
@@ -364,7 +363,7 @@ EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/ARM_CM3
 EXTRAINCDIRS  += $(AHRSBOOTLOADERINC)
 EXTRAINCDIRS  += $(PYMITEINC)
 
-EXTRAINCDIRS += ${foreach MOD, ${MODULES}, $(OPMODULEDIR)/${MOD}/inc} ${OPMODULEDIR}/System/inc
+EXTRAINCDIRS += ${foreach MOD, ${MODULES}, Modules/${MOD}/inc} ${OPMODULEDIR}/System/inc
 
 
 # List any extra directories to look for library files here.
@@ -492,7 +491,7 @@ LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc
 
 # Set linker-script name depending on selected submodel name
-LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_$(BOARD)_$(BOOT_MODEL).ld
+LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_stm32f10x_$(BOOT_MODEL).ld
 
 # ---------------------------------------------------------------------------
 # Options for OpenOCD flash-programming

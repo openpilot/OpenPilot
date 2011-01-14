@@ -44,6 +44,7 @@ namespace hardware {
 	{
 		switch (hwfreq)
 		{
+			case VIAM_HWFPS_FREE: return 0.0;
 			case VIAM_HWFPS_1_875: return 1.875;
 			case VIAM_HWFPS_3_75: return 3.75;
 			case VIAM_HWFPS_7_5: return 7.5;
@@ -92,6 +93,7 @@ namespace hardware {
 	{
 		freq -= 0.1;
 		viam_hwfps_t hwfreq;
+		if (freq <= 0.0) hwfreq = VIAM_HWFPS_FREE; else
 		if (freq <= 1.875) hwfreq = VIAM_HWFPS_1_875; else
 		if (freq <= 3.75) hwfreq = VIAM_HWFPS_3_75; else
 		if (freq <= 7.5) hwfreq = VIAM_HWFPS_7_5; else

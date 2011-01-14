@@ -176,7 +176,6 @@ const int display_period = 100; // ms
 ///##############################################
 
 const std::string MTI_DEVICE = "/dev/ttyUSB0";
-const std::string CAMERA_DEVICE = "0x00b09d01006fb38f";
 
 // time
 const unsigned N_FRAMES = 500000;
@@ -214,29 +213,41 @@ const unsigned IMG_HEIGHT_SIMU = 480;
 const double INTRINSIC_SIMU[4] = { 320.0,   240.0,   500.0,   500.0 };
 const double DISTORTION_SIMU[3] = { -0.25,   0.10, 0.0 };
 
-// flea2 with original obj
+/*// flea2 with original obj
+const std::string CAMERA_DEVICE = "0x00b09d01006fb38f";
 const unsigned IMG_WIDTH = 640;
 const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 };
 const double DISTORTION[3] = { -0.23193,   0.11306, 0.0 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
-
+*/
 
 // flea2 with original obj after 2010/11/24
-//const unsigned IMG_WIDTH = 640;
-//const unsigned IMG_HEIGHT = 480;
-//const double INTRINSIC[4] = { 306.2969,   264.7741,   499.9177,   494.4829 };
-//const double DISTORTION[3] = { -0.2293129, 0.08793152, -0.01349877 };
+const std::string CAMERA_DEVICE = "0x00b09d01006fb38f";
+const unsigned IMG_WIDTH = 640;
+const unsigned IMG_HEIGHT = 480;
+const double INTRINSIC[4] = { 306.2969,   264.7741,   499.9177,   494.4829 };
+const double DISTORTION[3] = { -0.2293129, 0.08793152, -0.01349877 };
 
 
-// flea2 with Schneider lens
-/*const unsigned IMG_WIDTH = 640;
+/*// flea2 with original obj after 2010/11/24, 320x240
+const std::string CAMERA_DEVICE = "0x00b09d01006fb38f";
+const unsigned IMG_WIDTH = 320;
+const unsigned IMG_HEIGHT = 240;
+const double INTRINSIC[4] = { 153.148, 132.387, 249.959, 247.241 };
+const double DISTORTION[3] = { -0.2293129, 0.08793152, -0.01349877 };
+*/
+
+
+/*// flea2 with Schneider lens
+const std::string CAMERA_DEVICE = "0x00b09d01006fb38f";
+const unsigned IMG_WIDTH = 640;
 const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 3.043313e+02, 2.407406e+02, 6.714993e+02, 6.714853e+02};
 const double DISTORTION[3] = { -2.900038e-01, 2.388370e-01, -2.006549e-01 };
 */
 
-// flea2 left on Mana
-/*const unsigned IMG_WIDTH = 640;
+/*// flea2 left on Mana
+const unsigned IMG_WIDTH = 640;
 const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 3.220449e+02, 2.322685e+02, 6.723964e+02, 6.718552e+02};
 const double DISTORTION[3] = {-2.889972e-01, 2.511945e-01, -2.147339e-01 };
@@ -249,8 +260,9 @@ const double DISTORTION[3] = {-2.889972e-01, 2.511945e-01, -2.147339e-01 };
 //const double DISTORTION[3] = { -0.2927602, 0.250071, -0.2086941};
 
 
-// jmcodol's robot
-/*const unsigned IMG_WIDTH = 640;
+/*// jmcodol's robot
+const std::string CAMERA_DEVICE = "0x00b09d01006fb38f";
+const unsigned IMG_WIDTH = 640;
 const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 327.53722,   222.40418,   533.18050,   531.56182 };
 //const double DISTORTION[2] = { 0.08577,   -0.22006, 0.0 };
@@ -258,14 +270,16 @@ const double DISTORTION[3] = { 0.0, 0.0};
 */
 
 /*// saragosse sequence
+const std::string CAMERA_DEVICE = "0x00b09d01006fb38f";
 const unsigned IMG_WIDTH = 512;
 const unsigned IMG_HEIGHT = 384;
 const double INTRINSIC[4] = { 281.647017175628, 198.770772126498,   534.760390823972,   535.280428739968 };
 const double DISTORTION[3] = { -0.27546592313146917, 0.12644899941674098, 0.036648747902512463 };
 */
 
-/* Vitana IR Camera
-	const std::string CAMERA_DEVICE = "0x0001687300025581";
+/*// Vitana IR
+	//const std::string CAMERA_DEVICE = "0x0001687300025581";
+	const std::string CAMERA_DEVICE = "0x0001687300025853";
 	const unsigned IMG_WIDTH = 160;
 	const unsigned IMG_HEIGHT = 120;
 	const double INTRINSIC[4] = { 86.54042,   63.63390,  216.52344,   217.71205 };

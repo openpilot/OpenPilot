@@ -70,8 +70,8 @@ void PIOS_USART_Init(void)
 		PIOS_DEBUG_Assert(usart_dev);
 
 		/* Clear buffer counters */
-		fifoBuf_init(&usart_dev->rx, usart_dev->rx_buffer, UART_BUFFER_SIZE);
-		fifoBuf_init(&usart_dev->tx, usart_dev->tx_buffer, UART_BUFFER_SIZE);
+		fifoBuf_init(&usart_dev->rx, usart_dev->rx_buffer, sizeof(usart_dev->rx_buffer));
+		fifoBuf_init(&usart_dev->tx, usart_dev->tx_buffer, sizeof(usart_dev->tx_buffer));
 
 		/* Enable the USART Pins Software Remapping */
 		if (usart_dev->cfg->remap) {

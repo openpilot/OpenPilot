@@ -36,8 +36,6 @@
 #include <pios_stm32.h>
 #include <fifo_buffer.h>
 
-#define UART_BUFFER_SIZE        1024
-
 struct pios_usart_cfg {
 	USART_TypeDef *regs;
 	uint32_t remap;		/* GPIO_Remap_* */
@@ -50,10 +48,10 @@ struct pios_usart_cfg {
 struct pios_usart_dev {
 	const struct pios_usart_cfg *const cfg;
 
-	uint8_t rx_buffer[UART_BUFFER_SIZE] __attribute__ ((aligned(4)));    // align to 32-bit to try and provide speed improvement;
+	uint8_t rx_buffer[PIOS_USART_RX_BUFFER_SIZE] __attribute__ ((aligned(4)));    // align to 32-bit to try and provide speed improvement;
 	t_fifo_buffer rx;
 
-        uint8_t tx_buffer[UART_BUFFER_SIZE] __attribute__ ((aligned(4)));    // align to 32-bit to try and provide speed improvement;
+        uint8_t tx_buffer[PIOS_USART_TX_BUFFER_SIZE] __attribute__ ((aligned(4)));    // align to 32-bit to try and provide speed improvement;
 	t_fifo_buffer tx;
 };
 

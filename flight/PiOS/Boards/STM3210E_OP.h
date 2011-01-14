@@ -135,8 +135,8 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 //
 // See also pios_board.c
 //-------------------------
-#define PIOS_USART_RX_BUFFER_SIZE       1024
-#define PIOS_USART_TX_BUFFER_SIZE       256
+#define PIOS_USART_RX_BUFFER_SIZE       512
+#define PIOS_USART_TX_BUFFER_SIZE       512
 
 #define PIOS_COM_TELEM_BAUDRATE         57600
 #define PIOS_COM_GPS_BAUDRATE           57600

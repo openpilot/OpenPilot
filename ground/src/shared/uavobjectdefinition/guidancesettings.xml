@@ -1,7 +1,7 @@
 <xml>
     <object name="GuidanceSettings" singleinstance="true" settings="true">
         <description>Settings for the @ref GuidanceModule</description>
-        <field name="GuidanceMode" units="" type="enum" elements="1" options="DUAL_LOOP,VELOCITY_CONTROL,POSITION_PID" defaultvalue="DUAL_LOOP"/>
+        <field name="GuidanceMode" units="" type="enum" elements="1" options="DUAL_LOOP,VELOCITY_CONTROL" defaultvalue="DUAL_LOOP"/>
         <field name="MaxGroundspeed" units="cm/s" type="int32" elements="1" defaultvalue="100"/>
         <field name="GroundVelocityP" units="" type="float" elements="1" defaultvalue="0.1"/>
         <field name="MaxVerticalSpeed" units="cm/s" type="int32" elements="1" defaultvalue="100"/>

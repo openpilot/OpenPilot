@@ -59,10 +59,10 @@ static uint8_t transfer_possible = 0;
 static uint8_t rx_packet_buffer[PIOS_USB_HID_DATA_LENGTH + 2] = { 0 };
 static uint8_t tx_packet_buffer[PIOS_USB_HID_DATA_LENGTH + 2] = { 0 };
 
-uint8_t rx_pios_fifo_buf[1024] __attribute__ ((aligned(4)));    // align to 32-bit to try and provide speed improvement
+uint8_t rx_pios_fifo_buf[PIOS_USB_RX_BUFFER_SIZE] __attribute__ ((aligned(4)));    // align to 32-bit to try and provide speed improvement
 t_fifo_buffer rx_pios_fifo_buffer;
 
-uint8_t tx_pios_fifo_buf[1024] __attribute__ ((aligned(4)));    // align to 32-bit to try and provide speed improvement
+uint8_t tx_pios_fifo_buf[PIOS_USB_TX_BUFFER_SIZE] __attribute__ ((aligned(4)));    // align to 32-bit to try and provide speed improvement
 t_fifo_buffer tx_pios_fifo_buffer;
 
 #if defined(USE_FREERTOS)

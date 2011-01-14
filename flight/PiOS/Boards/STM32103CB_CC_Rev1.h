@@ -33,14 +33,10 @@
 /*
 Timer | Channel 1 | Channel 2 | Channel 3 | Channel 4
 ------+-----------+-----------+-----------+----------
-TIM1  |           |           |           |
-TIM2  | --------------- PIOS_DELAY -----------------
-TIM3  |           |           |           |
-TIM4  |           |           |           |
-TIM5  |           |           |           |
-TIM6  |           |           |           |
-TIM7  |           |           |           |
-TIM8  |           |           |           |
+TIM1  |  Servo 4  |           |           |
+TIM2  |  RC In 5  |  RC In 6  |  Servo 6  |  
+TIM3  |  Servo 5  |  RC In 2  |  RC In 3  |  RC In 4
+TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 ------+-----------+-----------+-----------+----------
 */
 
@@ -322,5 +318,6 @@ TIM8  |           |           |           |
 #define PIOS_USB_DETECT_GPIO_PIN                GPIO_Pin_15
 #define PIOS_USB_DETECT_EXTI_LINE               EXTI_Line15
 #define PIOS_IRQ_USB_PRIORITY                   PIOS_IRQ_PRIO_MID
-
+#define PIOS_USB_RX_BUFFER_SIZE                 256
+#define PIOS_USB_TX_BUFFER_SIZE                 256
 #endif /* STM32103CB_AHRS_H_ */

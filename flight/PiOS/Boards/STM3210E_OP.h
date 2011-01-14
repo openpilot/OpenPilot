@@ -393,6 +393,8 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_USB_DETECT_GPIO_PIN                GPIO_Pin_4
 #define PIOS_USB_DETECT_EXTI_LINE               EXTI_Line4
 #define PIOS_IRQ_USB_PRIORITY                   PIOS_IRQ_PRIO_MID
+#define PIOS_USB_RX_BUFFER_SIZE                 512
+#define PIOS_USB_TX_BUFFER_SIZE                 512
 
 /**
  * glue macros for file IO

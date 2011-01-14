@@ -31,8 +31,6 @@
 /* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_SERVO)
-
 /* Private Function Prototypes */
 
 /* Local Variables */
@@ -44,6 +42,7 @@ static volatile uint16_t ServoPosition[PIOS_SERVO_NUM_TIMERS];
 void PIOS_Servo_Init(void)
 {
 #ifndef PIOS_ENABLE_DEBUG_PINS
+#if defined(PIOS_INCLUDE_SERVO)
 	/* Initialise GPIOs as alternate function push/pull */
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
@@ -110,6 +109,7 @@ void PIOS_Servo_Init(void)
 	TIM_ARRPreloadConfig(TIM8, ENABLE);
 	TIM_CtrlPWMOutputs(TIM8, ENABLE);
 	TIM_Cmd(TIM8, ENABLE);
+#endif // PIOS_INCLUDE_SERVO
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
 
@@ -121,6 +121,7 @@ void PIOS_Servo_Init(void)
 void PIOS_Servo_SetHz(uint16_t onetofour, uint16_t fivetoeight)
 {
 #ifndef PIOS_ENABLE_DEBUG_PINS
+#if defined(PIOS_INCLUDE_SERVO)
 	/* (Re)-Initialise Timers TIM4 and TIM8 */
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
 	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
@@ -144,6 +145,7 @@ void PIOS_Servo_SetHz(uint16_t onetofour, uint16_t fivetoeight)
 	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
 	TIM_TimeBaseStructure.TIM_Period = ((1000000 / fivetoeight) - 1);
 	TIM_TimeBaseInit(TIM8, &TIM_TimeBaseStructure);
+#endif // PIOS_INCLUDE_SERVO
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
 
@@ -155,6 +157,7 @@ void PIOS_Servo_SetHz(uint16_t onetofour, uint16_t fivetoeight)
 void PIOS_Servo_Set(uint8_t Servo, uint16_t Position)
 {
 #ifndef PIOS_ENABLE_DEBUG_PINS
+#if defined(PIOS_INCLUDE_SERVO)
 	/* Make sure servo exists */
 	if (Servo < PIOS_SERVO_NUM_OUTPUTS && Servo >= 0) {
 		/* Update the position */
@@ -187,7 +190,6 @@ void PIOS_Servo_Set(uint8_t Servo, uint16_t Position)
 			break;
 		}
 	}
+#endif // PIOS_INCLUDE_SERVO
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
-
-#endif

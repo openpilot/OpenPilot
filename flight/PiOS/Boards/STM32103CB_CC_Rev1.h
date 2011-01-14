@@ -83,8 +83,8 @@ TIM8  |           |           |           |
 //------------------------
 // WATCHDOG_SETTINGS
 //------------------------
-#define PIOS_WATCHDOG_TIMEOUT 250
-#define PIOS_WDG_REGISTER BKP_DR4
+#define PIOS_WATCHDOG_TIMEOUT    250
+#define PIOS_WDG_REGISTER        BKP_DR4
 #define PIOS_WDG_ACTUATOR        0x0001
 #define PIOS_WDG_STABILIZATION   0x0002
 #define PIOS_WDG_AHRS            0x0004
@@ -293,7 +293,7 @@ TIM8  |           |           |           |
 #define PIOS_PWM_TIM_IRQS                       { TIM1_CC_IRQn, TIM3_IRQn, TIM5_IRQn }
 #define PIOS_PWM_NUM_INPUTS                     8
 #define PIOS_PWM_NUM_TIMS                       3
-#define PIOS_PWM_SUPV_ENABLED                   1
+#define PIOS_PWM_SUPV_ENABLED                   0
 #define PIOS_PWM_SUPV_TIMER                     TIM6
 #define PIOS_PWM_SUPV_TIMER_RCC_FUNC            RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE)
 #define PIOS_PWM_SUPV_HZ                        25

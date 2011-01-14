@@ -46,23 +46,28 @@
 #include "openpilot.h"
 #include "guidance.h"
 #include "guidancesettings.h"
+#include "attituderaw.h"
 #include "attitudeactual.h"
 #include "attitudedesired.h"
 #include "positiondesired.h"	// object that will be updated by the module
 #include "positionactual.h"
 #include "manualcontrolcommand.h"
+#include "nedaccel.h"
 #include "stabilizationsettings.h"
 #include "systemsettings.h"
 #include "velocitydesired.h"
 #include "velocityactual.h"
+#include "CoordinateConversions.h"
 
 // Private constants
+#define MAX_QUEUE_SIZE 1
 #define STACK_SIZE_BYTES 824
 #define TASK_PRIORITY (tskIDLE_PRIORITY+2)
 // Private types
 
 // Private variables
 static xTaskHandle guidanceTaskHandle;
+static xQueueHandle queue;
 
 // Private functions
 static void guidanceTask(void *parameters);
@@ -79,6 +84,12 @@ static void positionPIDcontrol();
  */
 int32_t GuidanceInitialize()
 {
+	// Create object queue
+	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+	
+	// Listen for updates.
+	AttitudeRawConnectQueue(queue);
+	
 	// Start main task
 	xTaskCreate(guidanceTask, (signed char *)"Guidance", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &guidanceTaskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_GUIDANCE, guidanceTaskHandle);
@@ -87,11 +98,8 @@ int32_t GuidanceInitialize()
 }
 
 static float northIntegral = 0;
-static float northErrorLast = 0;
 static float eastIntegral = 0;
-static float eastErrorLast = 0;
 static float downIntegral = 0;
-static float downErrorLast = 0;
 static uint8_t positionHoldLast = 0;
 
 /**
@@ -103,11 +111,70 @@ static void guidanceTask(void *parameters)
 	GuidanceSettingsData guidanceSettings;
 	ManualControlCommandData manualControl;
 
-	portTickType lastSysTime;
-
+	portTickType thisTime;
+	portTickType lastUpdateTime;
+	UAVObjEvent ev;
+	
+	float accel[3] = {0,0,0};
+	uint32_t accel_accum = 0;
+	
+	float q[4];
+	float Rbe[3][3];
+	float accel_ned[3];
+	
 	// Main task loop
-	lastSysTime = xTaskGetTickCount();
+	lastUpdateTime = xTaskGetTickCount();
 	while (1) {
+
+		// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
+		if ( xQueueReceive(queue, &ev, guidanceSettings.VelUpdatePeriod / portTICK_RATE_MS) != pdTRUE )
+		{
+			AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION,SYSTEMALARMS_ALARM_WARNING);
+			continue;
+		} 
+				
+		// Collect downsampled attitude data
+		AttitudeRawData attitudeRaw;
+		AttitudeRawGet(&attitudeRaw);		
+		accel[0] += attitudeRaw.gyros_filtered[0];
+		accel[1] += attitudeRaw.gyros_filtered[1];
+		accel[2] += attitudeRaw.gyros_filtered[2];
+		accel_accum++;
+		
+		// Continue collecting data if not enough time
+		thisTime = xTaskGetTickCount();
+		if( (thisTime - lastUpdateTime) < (guidanceSettings.VelUpdatePeriod / portTICK_RATE_MS) )
+			continue;
+		
+		lastUpdateTime = xTaskGetTickCount();
+		accel[0] /= accel_accum;
+		accel[1] /= accel_accum;
+		accel[2] /= accel_accum;
+		
+		//rotate avg accels into earth frame and store it
+		AttitudeActualData attitudeActual;
+		AttitudeActualGet(&attitudeActual);
+		q[0]=attitudeActual.q1;
+		q[1]=attitudeActual.q2;
+		q[2]=attitudeActual.q3;
+		q[3]=attitudeActual.q4;
+		Quaternion2R(q, Rbe);
+		for (uint8_t i=0; i<3; i++){
+			accel_ned[i]=0;
+			for (uint8_t j=0; j<3; j++)
+				accel_ned[i] += Rbe[j][i]*accel[j];
+		}
+		accel_ned[2] += 9.81;
+		
+		NedAccelData accelData;
+		NedAccelGet(&accelData);
+		// Convert from m/s to cm/s
+		accelData.North = accel[0] * 100;
+		accelData.East = accel[1] * 100;
+		accelData.North = accel[2] * 100;
+		NedAccelSet(&accelData);
+		
+		
 		ManualControlCommandGet(&manualControl);
 		SystemSettingsGet(&systemSettings);
 		GuidanceSettingsGet(&guidanceSettings);
@@ -143,14 +210,13 @@ static void guidanceTask(void *parameters)
 		} else {
 			// Be cleaner and get rid of global variables
 			northIntegral = 0;
-			northErrorLast = 0;
 			eastIntegral = 0;
-			eastErrorLast = 0;
 			downIntegral = 0;
-			downErrorLast = 0;
 			positionHoldLast = 0;
-		}			
-		vTaskDelayUntil(&lastSysTime, guidanceSettings.VelUpdatePeriod / portTICK_RATE_MS);
+		}
+		
+		accel[0] = accel[1] = accel[2] = 0;
+		accel_accum = 0;
 	}
 }
 
@@ -198,20 +264,19 @@ static void updateVtolDesiredAttitude()
 	VelocityActualData velocityActual;
 	AttitudeDesiredData attitudeDesired;
 	AttitudeActualData attitudeActual;
+	NedAccelData nedAccel;
 	GuidanceSettingsData guidanceSettings;
 	StabilizationSettingsData stabSettings;
 	SystemSettingsData systemSettings;
 
 	float northError;
-	float northDerivative;
 	float northCommand;
 	
 	float eastError;
-	float eastDerivative;
 	float eastCommand;
 
 	float downError;
-	float downDerivative;
+	float downCommand;
 	
 	// Check how long since last update
 	if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
@@ -227,26 +292,40 @@ static void updateVtolDesiredAttitude()
 	VelocityDesiredGet(&velocityDesired);
 	AttitudeActualGet(&attitudeActual);
 	StabilizationSettingsGet(&stabSettings);
+	NedAccelGet(&nedAccel);
 	
 	attitudeDesired.Yaw = 0;	// try and face north
 	
-	// Yaw and pitch output from ground speed PID loop
+	// Compute desired north command
 	northError = velocityDesired.North - velocityActual.North;
-	northDerivative = (northError - northErrorLast) / dT;
-	northIntegral =
-	bound(northIntegral + northError * dT, -guidanceSettings.MaxVelIntegral,
-	      guidanceSettings.MaxVelIntegral);
-	northErrorLast = northError;
-	northCommand =
-	northError * guidanceSettings.VelP + northDerivative * guidanceSettings.VelD + northIntegral * guidanceSettings.VelI;
+	northIntegral = bound(northIntegral + northError * dT, 
+			      -guidanceSettings.MaxVelIntegral,
+			      guidanceSettings.MaxVelIntegral);
+	northCommand = (northError * guidanceSettings.VelP +
+			northIntegral * guidanceSettings.VelI -
+			nedAccel.North * guidanceSettings.VelD);
 	
+	// Compute desired east command
 	eastError = velocityDesired.East - velocityActual.East;
-	eastDerivative = (eastError - eastErrorLast) / dT;
 	eastIntegral = bound(eastIntegral + eastError * dT, 
 			     -guidanceSettings.MaxVelIntegral,
 			     guidanceSettings.MaxVelIntegral);
-	eastErrorLast = eastError;
-	eastCommand = eastError * guidanceSettings.VelP + eastDerivative * guidanceSettings.VelD + eastIntegral * guidanceSettings.VelI;
+	eastCommand = (eastError * guidanceSettings.VelP + 
+		       eastIntegral * guidanceSettings.VelI - 
+		       nedAccel.East * guidanceSettings.VelD);
+	
+	// Compute desired down command
+	downError = velocityDesired.Down - velocityActual.Down;
+	downIntegral =	bound(downIntegral + downError * guidanceSettings.VelPIDUpdatePeriod, 
+			      -guidanceSettings.MaxThrottleIntegral,
+			      guidanceSettings.MaxThrottleIntegral);	
+	downCommand = (downError * guidanceSettings.DownP +
+		       downIntegral * guidanceSettings.DownI -
+		       nedAccel.Down * guidanceSettings.DownD);
+	
+	attitudeDesired.Throttle = bound(downError * guidanceSettings.DownP + 
+					 downIntegral * guidanceSettings.DownI -
+					 nedAccel.Down * guidanceSettings.DownD, 0, 1);
 	
 	// Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
 	// craft should move similarly for 5 deg roll versus 5 deg pitch
@@ -257,19 +336,12 @@ static void updateVtolDesiredAttitude()
 				     eastCommand * cosf(attitudeActual.Yaw * M_PI / 180),
 				     -stabSettings.RollMax, stabSettings.RollMax);
 	
-	downError = velocityDesired.Down - velocityActual.Down;
-	downDerivative = (downError - downErrorLast) / guidanceSettings.VelPIDUpdatePeriod;
-	downIntegral =	bound(downIntegral + downError * guidanceSettings.VelPIDUpdatePeriod, 
-			      -guidanceSettings.MaxThrottleIntegral,
-			      guidanceSettings.MaxThrottleIntegral);
-	downErrorLast = downError;
-	attitudeDesired.Throttle = bound(downError * guidanceSettings.DownP + downDerivative * guidanceSettings.DownD +
-					 downIntegral * guidanceSettings.DownI, 0, 1);
-	
-	// For now override throttle with manual control.  Disable at your risk, quad goes to China.
-	ManualControlCommandData manualControl;
-	ManualControlCommandGet(&manualControl);
-	attitudeDesired.Throttle = manualControl.Throttle;
+	if(guidanceSettings.ThrottleControl == GUIDANCESETTINGS_THROTTLECONTROL_FALSE) {
+		// For now override throttle with manual control.  Disable at your risk, quad goes to China.
+		ManualControlCommandData manualControl;
+		ManualControlCommandGet(&manualControl);
+		attitudeDesired.Throttle = manualControl.Throttle;
+	}
 	
 	AttitudeDesiredSet(&attitudeDesired);
 }

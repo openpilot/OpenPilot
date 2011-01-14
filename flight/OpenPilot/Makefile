@@ -202,6 +202,7 @@ SRC += $(OPUAVOBJ)/flightplanstatus.c
 SRC += $(OPUAVOBJ)/flightplansettings.c
 SRC += $(OPUAVOBJ)/taskinfo.c
 SRC += $(OPUAVOBJ)/watchdogstatus.c
+SRC += $(OPUAVOBJ)/nedaccel.c
 endif
 
 ## PIOS Hardware (STM32F10x)

@@ -53,7 +53,8 @@ HEADERS += uavobjects_global.h \
     flightplanstatus.h \
     flightplansettings.h \
     flightplancontrol.h \
-    watchdogstatus.h
+    watchdogstatus.h \
+    nedaccel.h
 
 SOURCES += uavobject.cpp \
     uavmetaobject.cpp \
@@ -104,6 +105,7 @@ SOURCES += uavobject.cpp \
     flightplanstatus.cpp \
     flightplansettings.cpp \
     flightplancontrol.cpp \
-    watchdogstatus.cpp
+    watchdogstatus.cpp \
+    nedaccel.cpp
 
 OTHER_FILES += UAVObjects.pluginspec

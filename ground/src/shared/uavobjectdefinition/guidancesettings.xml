@@ -14,6 +14,7 @@
         <field name="DownD" units="" type="float" elements="1" defaultvalue="0.0"/>
         <field name="MaxVelIntegral" units="deg" type="float" elements="1" defaultvalue="2"/>
         <field name="MaxThrottleIntegral" units="deg" type="float" elements="1" defaultvalue="1"/>
+        <field name="ThrottleControl" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
         <field name="VelUpdatePeriod" units="" type="int32" elements="1" defaultvalue="100"/>
         <field name="VelPIDUpdatePeriod" units="" type="int32" elements="1" defaultvalue="20"/>
         <access gcs="readwrite" flight="readwrite"/>

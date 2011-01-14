@@ -44,7 +44,7 @@
 #include "ahrssettings.h"
 
 // Private constants
-#define MAX_QUEUE_SIZE 2
+#define MAX_QUEUE_SIZE 1
 #define STACK_SIZE_BYTES 724
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 #define FAILSAFE_TIMEOUT_MS 30

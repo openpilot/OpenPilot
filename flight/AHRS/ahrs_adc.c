@@ -254,14 +254,15 @@ void AHRS_ADC_SetFIRCoefficients(float * new_filter)
  */ 
 void AHRS_ADC_downsample_data()
 {
-	uint16_t chan;
-	uint16_t sample;
-	
-	for (chan = 0; chan < PIOS_ADC_NUM_CHANNELS; chan++)
+	for (int chan = 0; chan < PIOS_ADC_NUM_CHANNELS; chan++)
 	{
 		register int32_t sum = 0;
-		for (sample = 0; sample < adc_config.adc_oversample; sample++)
-			sum += (int32_t)adc_config.valid_data_buffer[chan + sample * PIOS_ADC_NUM_CHANNELS] * adc_config.fir_coeffs[sample];
+		for (int sample = 0, k = chan; sample < adc_config.adc_oversample; sample++)
+		{
+//			sum += (int32_t)adc_config.valid_data_buffer[chan + sample * PIOS_ADC_NUM_CHANNELS] * adc_config.fir_coeffs[sample];
+            sum += (int32_t)adc_config.valid_data_buffer[k] * adc_config.fir_coeffs[sample];
+			k += PIOS_ADC_NUM_CHANNELS;
+		}
 		downsampled_buffer[chan] = (float)sum / adc_config.fir_coeffs[adc_config.adc_oversample];
 	}
 	

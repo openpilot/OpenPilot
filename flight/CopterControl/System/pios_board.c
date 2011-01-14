@@ -48,9 +48,6 @@ void PIOS_Board_Init(void) {
 	/* SPI Init */
 	PIOS_SPI_Init();
 
-	/* Enable and mount the SDCard */
-	PIOS_SDCARD_Init();
-	PIOS_SDCARD_MountFS(0);
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 	/* SPEKTRUM init must come before comms */
 	PIOS_SPEKTRUM_Init();

@@ -516,7 +516,7 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId, FILEINFO* file)
 	ObjectInstList* instEntry;
 
 	// Check for file system availability
-	if ( POIS_SDCARD_IsMounted() == 0 )
+	if ( PIOS_SDCARD_IsMounted() == 0 )
 	{
 		return -1;
 	}
@@ -574,7 +574,7 @@ int32_t UAVObjSave(UAVObjHandle obj, uint16_t instId)
 	uint8_t filename[14];
 
 	// Check for file system availability
-	if ( POIS_SDCARD_IsMounted() == 0 )
+	if ( PIOS_SDCARD_IsMounted() == 0 )
 	{
 		return -1;
 	}
@@ -624,7 +624,7 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO* file)
 	UAVObjHandle obj;
 
 	// Check for file system availability
-	if ( POIS_SDCARD_IsMounted() == 0 )
+	if ( PIOS_SDCARD_IsMounted() == 0 )
 	{
 		return NULL;
 	}
@@ -706,7 +706,7 @@ int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
 	uint8_t filename[14];
 
 	// Check for file system availability
-	if ( POIS_SDCARD_IsMounted() == 0 )
+	if ( PIOS_SDCARD_IsMounted() == 0 )
 	{
 		return -1;
 	}
@@ -763,7 +763,7 @@ int32_t UAVObjDelete(UAVObjHandle obj, uint16_t instId)
 	uint8_t filename[14];
 
 	// Check for file system availability
-	if ( POIS_SDCARD_IsMounted() == 0 )
+	if ( PIOS_SDCARD_IsMounted() == 0 )
 	{
 		return -1;
 	}

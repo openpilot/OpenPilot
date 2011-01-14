@@ -72,7 +72,7 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define FUNC_ID				1
 #define HW_VERSION			01
 #define BOOTLOADER_VERSION	0
-#define MEM_SIZE			524288 //512K
+#define MEM_SIZE			131072 //128K
 #define SIZE_OF_DESCRIPTION	(uint8_t) 100
 #define START_OF_USER_CODE	(uint32_t)0x08005000//REMEMBER SET ALSO IN link_stm32f10x_HD_BL.ld
 #define SIZE_OF_CODE		(uint32_t) (MEM_SIZE-(START_OF_USER_CODE-0x08000000)-SIZE_OF_DESCRIPTION)
@@ -89,7 +89,7 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 //------------------------
 // WATCHDOG_SETTINGS
 //------------------------
-#define PIOS_WATCHDOG_TIMEOUT 250
+#define PIOS_WATCHDOG_TIMEOUT    250
 #define PIOS_WDG_REGISTER BKP_DR4
 #define PIOS_WDG_ACTUATOR        0x0001
 #define PIOS_WDG_STABILIZATION   0x0002
@@ -99,16 +99,13 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 //------------------------
 // PIOS_LED
 //------------------------
-#define PIOS_LED_LED1_GPIO_PORT                 GPIOC
-#define PIOS_LED_LED1_GPIO_PIN                  GPIO_Pin_12
-#define PIOS_LED_LED1_GPIO_CLK                  RCC_APB2Periph_GPIOC
-#define PIOS_LED_LED2_GPIO_PORT                 GPIOC
-#define PIOS_LED_LED2_GPIO_PIN                  GPIO_Pin_13
-#define PIOS_LED_LED2_GPIO_CLK                  RCC_APB2Periph_GPIOC
-#define PIOS_LED_NUM                            2
-#define PIOS_LED_PORTS                          { PIOS_LED_LED1_GPIO_PORT, PIOS_LED_LED2_GPIO_PORT }
-#define PIOS_LED_PINS                           { PIOS_LED_LED1_GPIO_PIN, PIOS_LED_LED2_GPIO_PIN }
-#define PIOS_LED_CLKS                           { PIOS_LED_LED1_GPIO_CLK, PIOS_LED_LED2_GPIO_CLK }
+#define PIOS_LED_LED1_GPIO_PORT                 GPIOA
+#define PIOS_LED_LED1_GPIO_PIN                  GPIO_Pin_6
+#define PIOS_LED_LED1_GPIO_CLK                  RCC_APB2Periph_GPIOA
+#define PIOS_LED_NUM                            1
+#define PIOS_LED_PORTS                          { PIOS_LED_LED1_GPIO_PORT }
+#define PIOS_LED_PINS                           { PIOS_LED_LED1_GPIO_PIN }
+#define PIOS_LED_CLKS                           { PIOS_LED_LED1_GPIO_CLK }
 
 //------------------------
 // PIOS_I2C
@@ -398,17 +395,17 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
  * glue macros for file IO
  * STM32 uses DOSFS for file IO
  */
-#define PIOS_FOPEN_READ(filename,file)  DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *)filename, DFS_READ, PIOS_SDCARD_Sector, &file) != DFS_OK
+#define PIOS_FOPEN_READ(filename,file)  0 /* DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *)filename, DFS_READ, PIOS_SDCARD_Sector, &file) != DFS_OK */
 
-#define PIOS_FOPEN_WRITE(filename,file) DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *)filename, DFS_WRITE, PIOS_SDCARD_Sector, &file) != DFS_OK
+#define PIOS_FOPEN_WRITE(filename,file) 0 /* DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *)filename, DFS_WRITE, PIOS_SDCARD_Sector, &file) != DFS_OK */
 
-#define PIOS_FREAD(file,bufferadr,length,resultadr)     DFS_ReadFile(file, PIOS_SDCARD_Sector, (uint8_t*)bufferadr, resultadr, length) != DFS_OK
+#define PIOS_FREAD(file,bufferadr,length,resultadr)     0 /* DFS_ReadFile(file, PIOS_SDCARD_Sector, (uint8_t*)bufferadr, resultadr, length) != DFS_OK */
 
-#define PIOS_FWRITE(file,bufferadr,length,resultadr)    DFS_WriteFile(file, PIOS_SDCARD_Sector, (uint8_t*)bufferadr, resultadr, length)
+#define PIOS_FWRITE(file,bufferadr,length,resultadr)    0 /* DFS_WriteFile(file, PIOS_SDCARD_Sector, (uint8_t*)bufferadr, resultadr, length) */
 
-#define PIOS_FCLOSE(file)               DFS_Close(&file)
+#define PIOS_FCLOSE(file)               0 /* DFS_Close(&file) */
 
-#define PIOS_FUNLINK(filename)          DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t *)filename, PIOS_SDCARD_Sector)
+#define PIOS_FUNLINK(filename)          0 /* DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t *)filename, PIOS_SDCARD_Sector) */
 
 
 

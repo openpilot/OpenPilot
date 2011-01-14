@@ -57,7 +57,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Actuator Telemetry GPS ManualControl Altitude AHRSComms Stabilization Guidance FirmwareIAP
+MODULES =  Actuator Telemetry ManualControl Stabilization FirmwareIAP
 
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
@@ -71,7 +71,7 @@ MODULES =  Actuator Telemetry GPS ManualControl Altitude AHRSComms Stabilization
 # - BOARD just passed as define (optional)
 MCU      = cortex-m3
 CHIP     = STM32F103RET
-BOARD    = STM3210E_OP
+BOARD    = STM3210E_CC_Rev1
 MODEL	 = HD
 ifeq ($(USE_BOOTLOADER), YES)
 BOOT_MODEL    = $(MODEL)_BL
@@ -84,19 +84,19 @@ endif
 OUTDIR = Build
 
 # Target file name (without extension).
-TARGET = OpenPilot
+TARGET = CopterControl
 
 # Paths
 OPSYSTEM = ./System
 OPSYSTEMINC = $(OPSYSTEM)/inc
-OPUAVTALK = ./UAVTalk
+OPUAVTALK = ../UAVTalk
 OPUAVTALKINC = $(OPUAVTALK)/inc
-OPUAVOBJ = ./UAVObjects
+OPUAVOBJ = ../UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
 OPTESTS  = ./Tests
-OPMODULEDIR = ./Modules
+OPMODULEDIR = ../Modules
 FLIGHTLIB = ../Libraries
-FLIGHTLIBINC = ../Libraries/inc
+FLIGHTLIBINC = $(FLIGHTLIB)/inc
 PIOS = ../PiOS
 PIOSINC = $(PIOS)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
@@ -289,8 +289,8 @@ SRC += $(RTOSSRCDIR)/portable/GCC/ARM_CM3/port.c
 SRC += $(RTOSSRCDIR)/portable/MemMang/heap_2.c
 
 ## Dosfs file system
-SRC += $(DOSFSDIR)/dosfs.c
-SRC += $(DOSFSDIR)/dfs_sdcard.c
+#SRC += $(DOSFSDIR)/dosfs.c
+#SRC += $(DOSFSDIR)/dfs_sdcard.c
 
 ## AHRS boot loader comms
 SRC += $(AHRSBOOTLOADER)/ahrs_spi_program_master.c
@@ -363,7 +363,7 @@ EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/ARM_CM3
 EXTRAINCDIRS  += $(AHRSBOOTLOADERINC)
 EXTRAINCDIRS  += $(PYMITEINC)
 
-EXTRAINCDIRS += ${foreach MOD, ${MODULES}, Modules/${MOD}/inc} ${OPMODULEDIR}/System/inc
+EXTRAINCDIRS += ${foreach MOD, ${MODULES}, ${OPMODULEDIR}/${MOD}/inc} ${OPMODULEDIR}/System/inc
 
 
 # List any extra directories to look for library files here.

@@ -245,6 +245,13 @@ ahrs_%:
 	mkdir -p $(BUILD_DIR)/ahrs
 	$(MAKE) OUTDIR="$(BUILD_DIR)/ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/AHRS $*
 
+.PHONY: coptercontrol
+coptercontrol: coptercontrol_elf
+
+coptercontrol_%: uavobjects
+	mkdir -p $(BUILD_DIR)/coptercontrol
+	$(MAKE) OUTDIR="$(BUILD_DIR)/coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/CopterControl $*
+
 .PHONY: sim_posix
 sim_posix: sim_posix_elf
 

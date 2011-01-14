@@ -45,7 +45,7 @@ public:
     typedef struct {
         quint16 Command;
         quint8 Description[100];
-        quint8 HWVersion;
+        quint16 HWVersion;
         quint8 Target;
         quint8 ArmReset;
         quint32 crc;
@@ -64,7 +64,7 @@ public:
 
   
     // Constants
-    static const quint32 OBJID = 879185696U;
+    static const quint32 OBJID = 3083476468U;
     static const QString NAME;
     static const QString DESCRIPTION;
     static const bool ISSINGLEINST = 1;

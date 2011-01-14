@@ -128,11 +128,13 @@ static void systemTask(void *parameters)
 		PIOS_LED_Toggle(LED1);
 
 		// Turn on the error LED if an alarm is set
+#if (PIOS_LED_NUM > 1)
 		if (AlarmsHasWarnings()) {
 			PIOS_LED_On(LED2);
 		} else {
 			PIOS_LED_Off(LED2);
 		}
+#endif
 
 		ManualControlCommandData manualControlCommandData;
 		ManualControlCommandGet(&manualControlCommandData);
@@ -307,7 +309,7 @@ static void updateSystemAlarms()
 	}
 
 	// Check for SD card
-	if (POIS_SDCARD_IsMounted() == 0) {
+	if (PIOS_SDCARD_IsMounted() == 0) {
 		AlarmsSet(SYSTEMALARMS_ALARM_SDCARD, SYSTEMALARMS_ALARM_WARNING);
 	} else {
 		AlarmsClear(SYSTEMALARMS_ALARM_SDCARD);

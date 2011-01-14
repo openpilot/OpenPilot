@@ -94,10 +94,8 @@ int main()
 	/* If all is well we will never reach here as the scheduler will now be running. */
 	/* If we do get here, it will most likely be because we ran out of heap space. */
 	PIOS_LED_Off(LED1);
-	PIOS_LED_Off(LED2);
 	for(;;) {
 		PIOS_LED_Toggle(LED1);
-		PIOS_LED_Toggle(LED2);
 		PIOS_DELAY_WaitmS(100);
 	}
 

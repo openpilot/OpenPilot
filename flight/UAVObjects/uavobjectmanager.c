@@ -84,7 +84,7 @@ static ObjectInstList* getInstance(ObjectList* obj, uint16_t instId);
 static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb, int32_t eventMask);
 static int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb);
 
-#if defined(PIOS_USE_SDCARD)
+#if defined(PIOS_INCLUDE_SDCARD)
 static void objectFilename(ObjectList* obj, uint8_t* filename);
 static void customSPrintf(uint8_t* buffer, uint8_t* format, ...);
 #endif
@@ -514,7 +514,7 @@ int32_t UAVObjPack(UAVObjHandle obj, uint16_t instId, uint8_t* dataOut)
  */
 int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId, FILEINFO* file)
 {
-#if defined(PIOS_USE_SDCARD)
+#if defined(PIOS_INCLUDE_SDCARD)
 	uint32_t bytesWritten;
 	ObjectList* objEntry;
 	ObjectInstList* instEntry;
@@ -558,7 +558,7 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId, FILEINFO* file)
 
 	// Done
 	xSemaphoreGiveRecursive(mutex);
-#endif /* PIOS_USE_SDCARD */
+#endif /* PIOS_INCLUDE_SDCARD */
 	return 0;
 }
 
@@ -574,7 +574,7 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId, FILEINFO* file)
  */
 int32_t UAVObjSave(UAVObjHandle obj, uint16_t instId)
 {
-#if defined(PIOS_USE_SDCARD)
+#if defined(PIOS_INCLUDE_SDCARD)
 	FILEINFO file;
 	ObjectList* objEntry;
 	uint8_t filename[14];
@@ -612,7 +612,7 @@ int32_t UAVObjSave(UAVObjHandle obj, uint16_t instId)
 	// Done, close file and unlock
 	PIOS_FCLOSE(file);
 	xSemaphoreGiveRecursive(mutex);
-#endif /* PIOS_USD_SDCARD */
+#endif /* PIOS_INCLUDE_SDCARD */
 	return 0;
 }
 
@@ -695,7 +695,7 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO* file)
 	// Unlock
 	xSemaphoreGiveRecursive(mutex);
 	return obj;
-#else
+#else /* PIOS_INCLUDE_SDCARD */
 	return NULL;
 #endif
 }
@@ -760,7 +760,7 @@ int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
 	// Done, close file and unlock
 	PIOS_FCLOSE(file);
 	xSemaphoreGiveRecursive(mutex);
-#endif /* PIOS_USE_SDCARD */
+#endif /* PIOS_INCLUDE_SDCARD */
 	return 0;
 }
 
@@ -772,7 +772,7 @@ int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
  */
 int32_t UAVObjDelete(UAVObjHandle obj, uint16_t instId)
 {
-#if defined(PIOS_USE_SDCARD)
+#if defined(PIOS_INCLUDE_SDCARD)
 	ObjectList* objEntry;
 	uint8_t filename[14];
 
@@ -796,7 +796,7 @@ int32_t UAVObjDelete(UAVObjHandle obj, uint16_t instId)
 
 	// Done
 	xSemaphoreGiveRecursive(mutex);
-#endif /* PIOS_USD_SDCARD */
+#endif /* PIOS_INCLUDE_SDCARD */
 	return 0;
 }
 
@@ -1487,7 +1487,7 @@ static int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCa
 	return -1;
 }
 
-#if defined(PIOS_USE_SDCARD)
+#if defined(PIOS_INCLUDE_SDCARD)
 /**
  * Wrapper for the sprintf function
  */
@@ -1505,7 +1505,7 @@ static void objectFilename(ObjectList* obj, uint8_t* filename)
 {
 	customSPrintf(filename, (uint8_t*)"%X.obj", obj->id);
 }
-#endif /* PIOS_USD_SDCARD */
+#endif /* PIOS_INCLUDE_SDCARD */
 
 
 

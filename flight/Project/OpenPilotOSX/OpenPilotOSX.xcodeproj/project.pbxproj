@@ -10,11 +10,149 @@
 		65003B31121249CA00C183DD /* pios_wdg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_wdg.c; sourceTree = "<group>"; };
 		6502584212CA4D2600583CDF /* insgps13state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insgps13state.c; path = ../../AHRS/insgps13state.c; sourceTree = SOURCE_ROOT; };
 		6509C7E912CA57DC002E5DC2 /* insgps16state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insgps16state.c; path = ../../AHRS/insgps16state.c; sourceTree = SOURCE_ROOT; };
+		650D8E2112DFE16400D05CC9 /* actuator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actuator.c; sourceTree = "<group>"; };
+		650D8E2312DFE16400D05CC9 /* actuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = actuator.h; sourceTree = "<group>"; };
+		650D8E2512DFE16400D05CC9 /* ahrs_comms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_comms.c; sourceTree = "<group>"; };
+		650D8E2712DFE16400D05CC9 /* ahrs_comms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_comms.h; sourceTree = "<group>"; };
+		650D8E2912DFE16400D05CC9 /* altitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = altitude.c; sourceTree = "<group>"; };
+		650D8E2B12DFE16400D05CC9 /* altitude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = altitude.h; sourceTree = "<group>"; };
+		650D8E2F12DFE16400D05CC9 /* battery.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = battery.c; sourceTree = "<group>"; };
+		650D8E3112DFE16400D05CC9 /* battery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = battery.h; sourceTree = "<group>"; };
+		650D8E3312DFE16400D05CC9 /* example.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = example.c; sourceTree = "<group>"; };
+		650D8E3412DFE16400D05CC9 /* examplemodevent.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = examplemodevent.c; sourceTree = "<group>"; };
+		650D8E3512DFE16400D05CC9 /* examplemodperiodic.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = examplemodperiodic.c; sourceTree = "<group>"; };
+		650D8E3612DFE16400D05CC9 /* examplemodthread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = examplemodthread.c; sourceTree = "<group>"; };
+		650D8E3812DFE16400D05CC9 /* examplemodevent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = examplemodevent.h; sourceTree = "<group>"; };
+		650D8E3912DFE16400D05CC9 /* examplemodperiodic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = examplemodperiodic.h; sourceTree = "<group>"; };
+		650D8E3A12DFE16400D05CC9 /* examplemodthread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = examplemodthread.h; sourceTree = "<group>"; };
+		650D8E3C12DFE16400D05CC9 /* firmwareiap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = firmwareiap.c; sourceTree = "<group>"; };
+		650D8E3E12DFE16400D05CC9 /* firmwareiap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = firmwareiap.h; sourceTree = "<group>"; };
+		650D8E4012DFE16400D05CC9 /* flightplan.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flightplan.c; sourceTree = "<group>"; };
+		650D8E4212DFE16400D05CC9 /* test.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = test.py; sourceTree = "<group>"; };
+		650D8E4412DFE16400D05CC9 /* flightplan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flightplan.h; sourceTree = "<group>"; };
+		650D8E4612DFE16400D05CC9 /* uavobjects.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = uavobjects.py; sourceTree = "<group>"; };
+		650D8E4812DFE16400D05CC9 /* GPS.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GPS.c; sourceTree = "<group>"; };
+		650D8E4A12DFE16400D05CC9 /* GPS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPS.h; sourceTree = "<group>"; };
+		650D8E4B12DFE16400D05CC9 /* NMEA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NMEA.h; sourceTree = "<group>"; };
+		650D8E4C12DFE16400D05CC9 /* NMEA.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = NMEA.c; sourceTree = "<group>"; };
+		650D8E4E12DFE16400D05CC9 /* guidance.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = guidance.c; sourceTree = "<group>"; };
+		650D8E5012DFE16400D05CC9 /* guidance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = guidance.h; sourceTree = "<group>"; };
+		650D8E5312DFE16400D05CC9 /* manualcontrol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = manualcontrol.h; sourceTree = "<group>"; };
+		650D8E5412DFE16400D05CC9 /* manualcontrol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = manualcontrol.c; sourceTree = "<group>"; };
+		650D8E5812DFE16400D05CC9 /* MkSerial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MkSerial.h; sourceTree = "<group>"; };
+		650D8E5912DFE16400D05CC9 /* MKSerial.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = MKSerial.c; sourceTree = "<group>"; };
+		650D8E5C12DFE16400D05CC9 /* OsdEtStd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = OsdEtStd.c; sourceTree = "<group>"; };
+		650D8E5F12DFE16400D05CC9 /* stabilization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stabilization.h; sourceTree = "<group>"; };
+		650D8E6012DFE16400D05CC9 /* stabilization.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stabilization.c; sourceTree = "<group>"; };
+		650D8E6312DFE16400D05CC9 /* systemmod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systemmod.h; sourceTree = "<group>"; };
+		650D8E6412DFE16400D05CC9 /* systemmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = systemmod.c; sourceTree = "<group>"; };
+		650D8E6712DFE16400D05CC9 /* telemetry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = telemetry.h; sourceTree = "<group>"; };
+		650D8E6812DFE16400D05CC9 /* telemetry.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = telemetry.c; sourceTree = "<group>"; };
+		650D8E6B12DFE17500D05CC9 /* actuatorcommand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actuatorcommand.c; sourceTree = "<group>"; };
+		650D8E6C12DFE17500D05CC9 /* actuatordesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actuatordesired.c; sourceTree = "<group>"; };
+		650D8E6D12DFE17500D05CC9 /* actuatorsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actuatorsettings.c; sourceTree = "<group>"; };
+		650D8E6E12DFE17500D05CC9 /* ahrscalibration.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrscalibration.c; sourceTree = "<group>"; };
+		650D8E6F12DFE17500D05CC9 /* ahrssettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrssettings.c; sourceTree = "<group>"; };
+		650D8E7012DFE17500D05CC9 /* ahrsstatus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrsstatus.c; sourceTree = "<group>"; };
+		650D8E7112DFE17500D05CC9 /* attitudeactual.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = attitudeactual.c; sourceTree = "<group>"; };
+		650D8E7212DFE17500D05CC9 /* attitudedesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = attitudedesired.c; sourceTree = "<group>"; };
+		650D8E7312DFE17500D05CC9 /* attituderaw.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = attituderaw.c; sourceTree = "<group>"; };
+		650D8E7412DFE17500D05CC9 /* baroaltitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = baroaltitude.c; sourceTree = "<group>"; };
+		650D8E7512DFE17500D05CC9 /* batterysettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = batterysettings.c; sourceTree = "<group>"; };
+		650D8E7612DFE17500D05CC9 /* eventdispatcher.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = eventdispatcher.c; sourceTree = "<group>"; };
+		650D8E7712DFE17500D05CC9 /* firmwareiapobj.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = firmwareiapobj.c; sourceTree = "<group>"; };
+		650D8E7812DFE17500D05CC9 /* flightbatterystate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flightbatterystate.c; sourceTree = "<group>"; };
+		650D8E7912DFE17500D05CC9 /* flightplancontrol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flightplancontrol.c; sourceTree = "<group>"; };
+		650D8E7A12DFE17500D05CC9 /* flightplansettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flightplansettings.c; sourceTree = "<group>"; };
+		650D8E7B12DFE17500D05CC9 /* flightplanstatus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flightplanstatus.c; sourceTree = "<group>"; };
+		650D8E7C12DFE17500D05CC9 /* flighttelemetrystats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flighttelemetrystats.c; sourceTree = "<group>"; };
+		650D8E7D12DFE17500D05CC9 /* gcstelemetrystats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gcstelemetrystats.c; sourceTree = "<group>"; };
+		650D8E7E12DFE17500D05CC9 /* gpsposition.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gpsposition.c; sourceTree = "<group>"; };
+		650D8E7F12DFE17500D05CC9 /* gpssatellites.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gpssatellites.c; sourceTree = "<group>"; };
+		650D8E8012DFE17500D05CC9 /* gpstime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gpstime.c; sourceTree = "<group>"; };
+		650D8E8112DFE17500D05CC9 /* guidancesettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = guidancesettings.c; sourceTree = "<group>"; };
+		650D8E8212DFE17500D05CC9 /* homelocation.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = homelocation.c; sourceTree = "<group>"; };
+		650D8E8312DFE17500D05CC9 /* i2cstats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = i2cstats.c; sourceTree = "<group>"; };
+		650D8E8512DFE17500D05CC9 /* actuatorcommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = actuatorcommand.h; sourceTree = "<group>"; };
+		650D8E8612DFE17500D05CC9 /* actuatordesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = actuatordesired.h; sourceTree = "<group>"; };
+		650D8E8712DFE17500D05CC9 /* actuatorsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = actuatorsettings.h; sourceTree = "<group>"; };
+		650D8E8812DFE17500D05CC9 /* ahrscalibration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrscalibration.h; sourceTree = "<group>"; };
+		650D8E8912DFE17500D05CC9 /* ahrssettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrssettings.h; sourceTree = "<group>"; };
+		650D8E8A12DFE17500D05CC9 /* ahrsstatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrsstatus.h; sourceTree = "<group>"; };
+		650D8E8B12DFE17500D05CC9 /* attitudeactual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = attitudeactual.h; sourceTree = "<group>"; };
+		650D8E8C12DFE17500D05CC9 /* attitudedesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = attitudedesired.h; sourceTree = "<group>"; };
+		650D8E8D12DFE17500D05CC9 /* attituderaw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = attituderaw.h; sourceTree = "<group>"; };
+		650D8E8E12DFE17500D05CC9 /* baroaltitude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = baroaltitude.h; sourceTree = "<group>"; };
+		650D8E8F12DFE17500D05CC9 /* batterysettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = batterysettings.h; sourceTree = "<group>"; };
+		650D8E9012DFE17500D05CC9 /* eventdispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = eventdispatcher.h; sourceTree = "<group>"; };
+		650D8E9112DFE17500D05CC9 /* firmwareiapobj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = firmwareiapobj.h; sourceTree = "<group>"; };
+		650D8E9212DFE17500D05CC9 /* flightbatterystate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flightbatterystate.h; sourceTree = "<group>"; };
+		650D8E9312DFE17500D05CC9 /* flightplancontrol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flightplancontrol.h; sourceTree = "<group>"; };
+		650D8E9412DFE17500D05CC9 /* flightplansettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flightplansettings.h; sourceTree = "<group>"; };
+		650D8E9512DFE17500D05CC9 /* flightplanstatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flightplanstatus.h; sourceTree = "<group>"; };
+		650D8E9612DFE17500D05CC9 /* flighttelemetrystats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flighttelemetrystats.h; sourceTree = "<group>"; };
+		650D8E9712DFE17500D05CC9 /* gcstelemetrystats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gcstelemetrystats.h; sourceTree = "<group>"; };
+		650D8E9812DFE17500D05CC9 /* gpsposition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gpsposition.h; sourceTree = "<group>"; };
+		650D8E9912DFE17500D05CC9 /* gpssatellites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gpssatellites.h; sourceTree = "<group>"; };
+		650D8E9A12DFE17500D05CC9 /* gpstime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gpstime.h; sourceTree = "<group>"; };
+		650D8E9B12DFE17500D05CC9 /* guidancesettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = guidancesettings.h; sourceTree = "<group>"; };
+		650D8E9C12DFE17500D05CC9 /* homelocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = homelocation.h; sourceTree = "<group>"; };
+		650D8E9D12DFE17500D05CC9 /* i2cstats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = i2cstats.h; sourceTree = "<group>"; };
+		650D8E9E12DFE17500D05CC9 /* manualcontrolcommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = manualcontrolcommand.h; sourceTree = "<group>"; };
+		650D8E9F12DFE17500D05CC9 /* manualcontrolsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = manualcontrolsettings.h; sourceTree = "<group>"; };
+		650D8EA012DFE17500D05CC9 /* mixersettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mixersettings.h; sourceTree = "<group>"; };
+		650D8EA112DFE17500D05CC9 /* mixerstatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mixerstatus.h; sourceTree = "<group>"; };
+		650D8EA212DFE17500D05CC9 /* nedaccel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nedaccel.h; sourceTree = "<group>"; };
+		650D8EA312DFE17500D05CC9 /* objectpersistence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = objectpersistence.h; sourceTree = "<group>"; };
+		650D8EA412DFE17500D05CC9 /* pipxtrememodemsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pipxtrememodemsettings.h; sourceTree = "<group>"; };
+		650D8EA512DFE17500D05CC9 /* pipxtrememodemstatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pipxtrememodemstatus.h; sourceTree = "<group>"; };
+		650D8EA612DFE17500D05CC9 /* positionactual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = positionactual.h; sourceTree = "<group>"; };
+		650D8EA712DFE17500D05CC9 /* positiondesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = positiondesired.h; sourceTree = "<group>"; };
+		650D8EA812DFE17500D05CC9 /* ratedesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ratedesired.h; sourceTree = "<group>"; };
+		650D8EA912DFE17500D05CC9 /* stabilizationsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stabilizationsettings.h; sourceTree = "<group>"; };
+		650D8EAA12DFE17500D05CC9 /* systemalarms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systemalarms.h; sourceTree = "<group>"; };
+		650D8EAB12DFE17500D05CC9 /* systemsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systemsettings.h; sourceTree = "<group>"; };
+		650D8EAC12DFE17500D05CC9 /* systemstats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systemstats.h; sourceTree = "<group>"; };
+		650D8EAD12DFE17500D05CC9 /* taskinfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = taskinfo.h; sourceTree = "<group>"; };
+		650D8EAE12DFE17500D05CC9 /* telemetrysettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = telemetrysettings.h; sourceTree = "<group>"; };
+		650D8EAF12DFE17500D05CC9 /* uavobjectmanager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uavobjectmanager.h; sourceTree = "<group>"; };
+		650D8EB012DFE17500D05CC9 /* uavobjectsinit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uavobjectsinit.h; sourceTree = "<group>"; };
+		650D8EB112DFE17500D05CC9 /* uavobjecttemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uavobjecttemplate.h; sourceTree = "<group>"; };
+		650D8EB212DFE17500D05CC9 /* utlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utlist.h; sourceTree = "<group>"; };
+		650D8EB312DFE17500D05CC9 /* velocityactual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = velocityactual.h; sourceTree = "<group>"; };
+		650D8EB412DFE17500D05CC9 /* velocitydesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = velocitydesired.h; sourceTree = "<group>"; };
+		650D8EB512DFE17500D05CC9 /* watchdogstatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = watchdogstatus.h; sourceTree = "<group>"; };
+		650D8EB612DFE17500D05CC9 /* manualcontrolcommand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = manualcontrolcommand.c; sourceTree = "<group>"; };
+		650D8EB712DFE17500D05CC9 /* manualcontrolsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = manualcontrolsettings.c; sourceTree = "<group>"; };
+		650D8EB812DFE17500D05CC9 /* mixersettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mixersettings.c; sourceTree = "<group>"; };
+		650D8EB912DFE17500D05CC9 /* mixerstatus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mixerstatus.c; sourceTree = "<group>"; };
+		650D8EBA12DFE17500D05CC9 /* nedaccel.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = nedaccel.c; sourceTree = "<group>"; };
+		650D8EBB12DFE17500D05CC9 /* objectpersistence.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = objectpersistence.c; sourceTree = "<group>"; };
+		650D8EBC12DFE17500D05CC9 /* pipxtrememodemsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pipxtrememodemsettings.c; sourceTree = "<group>"; };
+		650D8EBD12DFE17500D05CC9 /* pipxtrememodemstatus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pipxtrememodemstatus.c; sourceTree = "<group>"; };
+		650D8EBE12DFE17500D05CC9 /* positionactual.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = positionactual.c; sourceTree = "<group>"; };
+		650D8EBF12DFE17500D05CC9 /* positiondesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = positiondesired.c; sourceTree = "<group>"; };
+		650D8EC012DFE17500D05CC9 /* ratedesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ratedesired.c; sourceTree = "<group>"; };
+		650D8EC112DFE17500D05CC9 /* stabilizationsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stabilizationsettings.c; sourceTree = "<group>"; };
+		650D8EC212DFE17500D05CC9 /* systemalarms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = systemalarms.c; sourceTree = "<group>"; };
+		650D8EC312DFE17500D05CC9 /* systemsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = systemsettings.c; sourceTree = "<group>"; };
+		650D8EC412DFE17500D05CC9 /* systemstats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = systemstats.c; sourceTree = "<group>"; };
+		650D8EC512DFE17500D05CC9 /* taskinfo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = taskinfo.c; sourceTree = "<group>"; };
+		650D8EC612DFE17500D05CC9 /* telemetrysettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = telemetrysettings.c; sourceTree = "<group>"; };
+		650D8EC712DFE17500D05CC9 /* uavobjectmanager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavobjectmanager.c; sourceTree = "<group>"; };
+		650D8EC812DFE17500D05CC9 /* uavobjectsinit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavobjectsinit.c; sourceTree = "<group>"; };
+		650D8EC912DFE17500D05CC9 /* uavobjectsinit_cc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavobjectsinit_cc.c; sourceTree = "<group>"; };
+		650D8ECA12DFE17500D05CC9 /* uavobjectsinittemplate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavobjectsinittemplate.c; sourceTree = "<group>"; };
+		650D8ECB12DFE17500D05CC9 /* uavobjecttemplate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavobjecttemplate.c; sourceTree = "<group>"; };
+		650D8ECC12DFE17500D05CC9 /* velocityactual.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = velocityactual.c; sourceTree = "<group>"; };
+		650D8ECD12DFE17500D05CC9 /* velocitydesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = velocitydesired.c; sourceTree = "<group>"; };
+		650D8ECE12DFE17500D05CC9 /* watchdogstatus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = watchdogstatus.c; sourceTree = "<group>"; };
+		650D8ED112DFE17500D05CC9 /* uavtalk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uavtalk.h; sourceTree = "<group>"; };
+		650D8ED212DFE17500D05CC9 /* uavtalk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavtalk.c; sourceTree = "<group>"; };
 		651913371256C5240039C0A3 /* ahrs_comm_objects.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_comm_objects.c; sourceTree = "<group>"; };
 		651913381256C5240039C0A3 /* ahrs_spi_comm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_spi_comm.c; sourceTree = "<group>"; };
 		6519133A1256C52B0039C0A3 /* ahrs_comm_objects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_comm_objects.h; sourceTree = "<group>"; };
 		6519133B1256C52B0039C0A3 /* ahrs_spi_comm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_comm.h; sourceTree = "<group>"; };
-		651913571256D0030039C0A3 /* ahrssettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrssettings.h; sourceTree = "<group>"; };
 		651CF9E5120B5D8300EEFD70 /* pios_usb_hid_desc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_usb_hid_desc.c; sourceTree = "<group>"; };
 		651CF9E6120B5D8300EEFD70 /* pios_usb_hid_istr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_usb_hid_istr.c; sourceTree = "<group>"; };
 		651CF9E7120B5D8300EEFD70 /* pios_usb_hid_prop.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_usb_hid_prop.c; sourceTree = "<group>"; };
@@ -52,8 +190,6 @@
 		657CEEB9121DBC63007A1FBE /* CoordinateConversions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoordinateConversions.h; sourceTree = "<group>"; };
 		657CEEBA121DBC63007A1FBE /* WorldMagModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldMagModel.h; sourceTree = "<group>"; };
 		657CEEBB121DBC63007A1FBE /* WorldMagModel.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = WorldMagModel.c; sourceTree = "<group>"; };
-		657CEEBF121DC054007A1FBE /* attituderaw.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = attituderaw.c; sourceTree = "<group>"; };
-		657CEEC1121DC054007A1FBE /* homelocation.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = homelocation.c; sourceTree = "<group>"; };
 		657CF024121F49CD007A1FBE /* WMMInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMMInternal.h; sourceTree = "<group>"; };
 		659ED317122226B60011010E /* ahrssettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrssettings.xml; sourceTree = "<group>"; };
 		65B35D7F121C261E003EAD18 /* bin.pro */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bin.pro; sourceTree = "<group>"; };
@@ -2590,34 +2726,9 @@
 		65B7E6B4120DF1E2000C1123 /* pios_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_config.h; sourceTree = "<group>"; };
 		65B7E6B6120DF1E2000C1123 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../AHRS/Makefile; sourceTree = SOURCE_ROOT; };
 		65B7E6B7120DF1E2000C1123 /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_board.c; path = ../../AHRS/pios_board.c; sourceTree = SOURCE_ROOT; };
-		65C259551224BFAF0081B6ED /* ahrscalibration.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrscalibration.c; sourceTree = "<group>"; };
-		65C259561224BFAF0081B6ED /* ahrssettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrssettings.c; sourceTree = "<group>"; };
-		65C259571224BFAF0081B6ED /* baroaltitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = baroaltitude.c; sourceTree = "<group>"; };
-		65C259581224BFAF0081B6ED /* gpsposition.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gpsposition.c; sourceTree = "<group>"; };
 		65C978E6125ED50400F2EDC8 /* stabilization.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stabilization.c; sourceTree = "<group>"; };
 		65D2CA841248F9A400B1E7D6 /* mixersettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixersettings.xml; sourceTree = "<group>"; };
 		65D2CA851248F9A400B1E7D6 /* mixerstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixerstatus.xml; sourceTree = "<group>"; };
-		65D38A9E125F6B6B00112AEB /* ahrscalibration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrscalibration.h; sourceTree = "<group>"; };
-		65D38A9F125F6B6B00112AEB /* attituderaw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = attituderaw.h; sourceTree = "<group>"; };
-		65D38AA0125F6B6B00112AEB /* baroaltitude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = baroaltitude.h; sourceTree = "<group>"; };
-		65D38AA1125F6B6B00112AEB /* firmwareiapobj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = firmwareiapobj.h; sourceTree = "<group>"; };
-		65D38AA2125F6B6B00112AEB /* gpsposition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gpsposition.h; sourceTree = "<group>"; };
-		65D38AA3125F6B6B00112AEB /* gpssatellites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gpssatellites.h; sourceTree = "<group>"; };
-		65D38AA4125F6B6B00112AEB /* gpstime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gpstime.h; sourceTree = "<group>"; };
-		65D38AA5125F6B6B00112AEB /* guidancesettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = guidancesettings.h; sourceTree = "<group>"; };
-		65D38AA6125F6B6B00112AEB /* homelocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = homelocation.h; sourceTree = "<group>"; };
-		65D38AA7125F6B6B00112AEB /* mixersettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mixersettings.h; sourceTree = "<group>"; };
-		65D38AA8125F6B6B00112AEB /* mixerstatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mixerstatus.h; sourceTree = "<group>"; };
-		65D38AA9125F6B6B00112AEB /* positiondesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = positiondesired.h; sourceTree = "<group>"; };
-		65D38AAA125F6B6B00112AEB /* velocityactual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = velocityactual.h; sourceTree = "<group>"; };
-		65D38AAB125F6B6B00112AEB /* velocitydesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = velocitydesired.h; sourceTree = "<group>"; };
-		65D38AAC125F6B8200112AEB /* firmwareiapobj.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = firmwareiapobj.c; sourceTree = "<group>"; };
-		65D38AAD125F6B8200112AEB /* guidancesettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = guidancesettings.c; sourceTree = "<group>"; };
-		65D38AAE125F6B8200112AEB /* mixersettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mixersettings.c; sourceTree = "<group>"; };
-		65D38AAF125F6B8200112AEB /* mixerstatus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mixerstatus.c; sourceTree = "<group>"; };
-		65D38AB0125F6B8200112AEB /* positiondesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = positiondesired.c; sourceTree = "<group>"; };
-		65D38AB1125F6B8200112AEB /* velocityactual.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = velocityactual.c; sourceTree = "<group>"; };
-		65D38AB2125F6B8200112AEB /* velocitydesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = velocitydesired.c; sourceTree = "<group>"; };
 		65E8EF1F11EEA61E00BBF654 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../OpenPilot/Makefile; sourceTree = SOURCE_ROOT; };
 		65E8EF2011EEA61E00BBF654 /* Makefile.posix */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.posix; path = ../../OpenPilot/Makefile.posix; sourceTree = SOURCE_ROOT; };
 		65E8EF2311EEA61E00BBF654 /* actuator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = actuator.c; path = ../../OpenPilot/Modules/Actuator/actuator.c; sourceTree = SOURCE_ROOT; };
@@ -2662,54 +2773,6 @@
 		65E8EF6B11EEA61E00BBF654 /* test_cpuload.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = test_cpuload.c; path = ../../OpenPilot/Tests/test_cpuload.c; sourceTree = SOURCE_ROOT; };
 		65E8EF6C11EEA61E00BBF654 /* test_i2c_PCF8570.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = test_i2c_PCF8570.c; path = ../../OpenPilot/Tests/test_i2c_PCF8570.c; sourceTree = SOURCE_ROOT; };
 		65E8EF6D11EEA61E00BBF654 /* test_uavobjects.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = test_uavobjects.c; path = ../../OpenPilot/Tests/test_uavobjects.c; sourceTree = SOURCE_ROOT; };
-		65E8EF6F11EEA61E00BBF654 /* actuatorcommand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = actuatorcommand.c; path = ../../OpenPilot/UAVObjects/actuatorcommand.c; sourceTree = SOURCE_ROOT; };
-		65E8EF7011EEA61E00BBF654 /* actuatordesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = actuatordesired.c; path = ../../OpenPilot/UAVObjects/actuatordesired.c; sourceTree = SOURCE_ROOT; };
-		65E8EF7111EEA61E00BBF654 /* actuatorsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = actuatorsettings.c; path = ../../OpenPilot/UAVObjects/actuatorsettings.c; sourceTree = SOURCE_ROOT; };
-		65E8EF7211EEA61E00BBF654 /* ahrsstatus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrsstatus.c; path = ../../OpenPilot/UAVObjects/ahrsstatus.c; sourceTree = SOURCE_ROOT; };
-		65E8EF7411EEA61E00BBF654 /* attitudeactual.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = attitudeactual.c; path = ../../OpenPilot/UAVObjects/attitudeactual.c; sourceTree = SOURCE_ROOT; };
-		65E8EF7511EEA61E00BBF654 /* attitudedesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = attitudedesired.c; path = ../../OpenPilot/UAVObjects/attitudedesired.c; sourceTree = SOURCE_ROOT; };
-		65E8EF7811EEA61E00BBF654 /* eventdispatcher.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = eventdispatcher.c; path = ../../OpenPilot/UAVObjects/eventdispatcher.c; sourceTree = SOURCE_ROOT; };
-		65E8EF7C11EEA61E00BBF654 /* flightbatterystate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = flightbatterystate.c; path = ../../OpenPilot/UAVObjects/flightbatterystate.c; sourceTree = SOURCE_ROOT; };
-		65E8EF7D11EEA61E00BBF654 /* flighttelemetrystats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = flighttelemetrystats.c; path = ../../OpenPilot/UAVObjects/flighttelemetrystats.c; sourceTree = SOURCE_ROOT; };
-		65E8EF7E11EEA61E00BBF654 /* gcstelemetrystats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gcstelemetrystats.c; path = ../../OpenPilot/UAVObjects/gcstelemetrystats.c; sourceTree = SOURCE_ROOT; };
-		65E8EF8111EEA61E00BBF654 /* actuatorcommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = actuatorcommand.h; path = ../../OpenPilot/UAVObjects/inc/actuatorcommand.h; sourceTree = SOURCE_ROOT; };
-		65E8EF8211EEA61E00BBF654 /* actuatordesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = actuatordesired.h; path = ../../OpenPilot/UAVObjects/inc/actuatordesired.h; sourceTree = SOURCE_ROOT; };
-		65E8EF8311EEA61E00BBF654 /* actuatorsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = actuatorsettings.h; path = ../../OpenPilot/UAVObjects/inc/actuatorsettings.h; sourceTree = SOURCE_ROOT; };
-		65E8EF8411EEA61E00BBF654 /* ahrsstatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ahrsstatus.h; path = ../../OpenPilot/UAVObjects/inc/ahrsstatus.h; sourceTree = SOURCE_ROOT; };
-		65E8EF8611EEA61E00BBF654 /* attitudeactual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attitudeactual.h; path = ../../OpenPilot/UAVObjects/inc/attitudeactual.h; sourceTree = SOURCE_ROOT; };
-		65E8EF8711EEA61E00BBF654 /* attitudedesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attitudedesired.h; path = ../../OpenPilot/UAVObjects/inc/attitudedesired.h; sourceTree = SOURCE_ROOT; };
-		65E8EF8911EEA61E00BBF654 /* eventdispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = eventdispatcher.h; path = ../../OpenPilot/UAVObjects/inc/eventdispatcher.h; sourceTree = SOURCE_ROOT; };
-		65E8EF8D11EEA61E00BBF654 /* flightbatterystate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = flightbatterystate.h; path = ../../OpenPilot/UAVObjects/inc/flightbatterystate.h; sourceTree = SOURCE_ROOT; };
-		65E8EF8E11EEA61E00BBF654 /* flighttelemetrystats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = flighttelemetrystats.h; path = ../../OpenPilot/UAVObjects/inc/flighttelemetrystats.h; sourceTree = SOURCE_ROOT; };
-		65E8EF8F11EEA61E00BBF654 /* gcstelemetrystats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gcstelemetrystats.h; path = ../../OpenPilot/UAVObjects/inc/gcstelemetrystats.h; sourceTree = SOURCE_ROOT; };
-		65E8EF9111EEA61E00BBF654 /* manualcontrolcommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = manualcontrolcommand.h; path = ../../OpenPilot/UAVObjects/inc/manualcontrolcommand.h; sourceTree = SOURCE_ROOT; };
-		65E8EF9211EEA61E00BBF654 /* manualcontrolsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = manualcontrolsettings.h; path = ../../OpenPilot/UAVObjects/inc/manualcontrolsettings.h; sourceTree = SOURCE_ROOT; };
-		65E8EF9311EEA61E00BBF654 /* objectpersistence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = objectpersistence.h; path = ../../OpenPilot/UAVObjects/inc/objectpersistence.h; sourceTree = SOURCE_ROOT; };
-		65E8EF9411EEA61E00BBF654 /* positionactual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = positionactual.h; path = ../../OpenPilot/UAVObjects/inc/positionactual.h; sourceTree = SOURCE_ROOT; };
-		65E8EF9511EEA61E00BBF654 /* stabilizationsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stabilizationsettings.h; path = ../../OpenPilot/UAVObjects/inc/stabilizationsettings.h; sourceTree = SOURCE_ROOT; };
-		65E8EF9611EEA61E00BBF654 /* systemalarms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = systemalarms.h; path = ../../OpenPilot/UAVObjects/inc/systemalarms.h; sourceTree = SOURCE_ROOT; };
-		65E8EF9711EEA61E00BBF654 /* systemsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = systemsettings.h; path = ../../OpenPilot/UAVObjects/inc/systemsettings.h; sourceTree = SOURCE_ROOT; };
-		65E8EF9811EEA61E00BBF654 /* systemstats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = systemstats.h; path = ../../OpenPilot/UAVObjects/inc/systemstats.h; sourceTree = SOURCE_ROOT; };
-		65E8EF9911EEA61E00BBF654 /* telemetrysettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = telemetrysettings.h; path = ../../OpenPilot/UAVObjects/inc/telemetrysettings.h; sourceTree = SOURCE_ROOT; };
-		65E8EF9A11EEA61E00BBF654 /* uavobjectmanager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uavobjectmanager.h; path = ../../OpenPilot/UAVObjects/inc/uavobjectmanager.h; sourceTree = SOURCE_ROOT; };
-		65E8EF9B11EEA61E00BBF654 /* uavobjectsinit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uavobjectsinit.h; path = ../../OpenPilot/UAVObjects/inc/uavobjectsinit.h; sourceTree = SOURCE_ROOT; };
-		65E8EF9C11EEA61E00BBF654 /* uavobjecttemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uavobjecttemplate.h; path = ../../OpenPilot/UAVObjects/inc/uavobjecttemplate.h; sourceTree = SOURCE_ROOT; };
-		65E8EF9D11EEA61E00BBF654 /* utlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utlist.h; path = ../../OpenPilot/UAVObjects/inc/utlist.h; sourceTree = SOURCE_ROOT; };
-		65E8EF9E11EEA61E00BBF654 /* manualcontrolcommand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = manualcontrolcommand.c; path = ../../OpenPilot/UAVObjects/manualcontrolcommand.c; sourceTree = SOURCE_ROOT; };
-		65E8EF9F11EEA61E00BBF654 /* manualcontrolsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = manualcontrolsettings.c; path = ../../OpenPilot/UAVObjects/manualcontrolsettings.c; sourceTree = SOURCE_ROOT; };
-		65E8EFA011EEA61E00BBF654 /* objectpersistence.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = objectpersistence.c; path = ../../OpenPilot/UAVObjects/objectpersistence.c; sourceTree = SOURCE_ROOT; };
-		65E8EFA111EEA61E00BBF654 /* positionactual.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = positionactual.c; path = ../../OpenPilot/UAVObjects/positionactual.c; sourceTree = SOURCE_ROOT; };
-		65E8EFA211EEA61E00BBF654 /* stabilizationsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stabilizationsettings.c; path = ../../OpenPilot/UAVObjects/stabilizationsettings.c; sourceTree = SOURCE_ROOT; };
-		65E8EFA311EEA61E00BBF654 /* systemalarms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = systemalarms.c; path = ../../OpenPilot/UAVObjects/systemalarms.c; sourceTree = SOURCE_ROOT; };
-		65E8EFA411EEA61E00BBF654 /* systemsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = systemsettings.c; path = ../../OpenPilot/UAVObjects/systemsettings.c; sourceTree = SOURCE_ROOT; };
-		65E8EFA511EEA61E00BBF654 /* systemstats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = systemstats.c; path = ../../OpenPilot/UAVObjects/systemstats.c; sourceTree = SOURCE_ROOT; };
-		65E8EFA611EEA61E00BBF654 /* telemetrysettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = telemetrysettings.c; path = ../../OpenPilot/UAVObjects/telemetrysettings.c; sourceTree = SOURCE_ROOT; };
-		65E8EFA711EEA61E00BBF654 /* uavobjectmanager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = uavobjectmanager.c; path = ../../OpenPilot/UAVObjects/uavobjectmanager.c; sourceTree = SOURCE_ROOT; };
-		65E8EFA811EEA61E00BBF654 /* uavobjectsinit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = uavobjectsinit.c; path = ../../OpenPilot/UAVObjects/uavobjectsinit.c; sourceTree = SOURCE_ROOT; };
-		65E8EFA911EEA61E00BBF654 /* uavobjectsinittemplate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = uavobjectsinittemplate.c; path = ../../OpenPilot/UAVObjects/uavobjectsinittemplate.c; sourceTree = SOURCE_ROOT; };
-		65E8EFAA11EEA61E00BBF654 /* uavobjecttemplate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = uavobjecttemplate.c; path = ../../OpenPilot/UAVObjects/uavobjecttemplate.c; sourceTree = SOURCE_ROOT; };
-		65E8EFAD11EEA61E00BBF654 /* uavtalk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = uavtalk.h; path = ../../OpenPilot/UAVTalk/inc/uavtalk.h; sourceTree = SOURCE_ROOT; };
-		65E8EFAE11EEA61E00BBF654 /* uavtalk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = uavtalk.c; path = ../../OpenPilot/UAVTalk/uavtalk.c; sourceTree = SOURCE_ROOT; };
 		65E8F03111EFF25C00BBF654 /* pios_bmp085.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_bmp085.c; path = ../../PiOS/Common/pios_bmp085.c; sourceTree = SOURCE_ROOT; };
 		65E8F03211EFF25C00BBF654 /* pios_com.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_com.c; path = ../../PiOS/Common/pios_com.c; sourceTree = SOURCE_ROOT; };
 		65E8F03311EFF25C00BBF654 /* pios_hmc5843.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_hmc5843.c; path = ../../PiOS/Common/pios_hmc5843.c; sourceTree = SOURCE_ROOT; };
@@ -2875,10 +2938,6 @@
 		65E8F0EE11EFF25C00BBF654 /* startup_stm32f10x_HD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_HD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_HD.S; sourceTree = SOURCE_ROOT; };
 		65E8F0F111EFF25C00BBF654 /* startup_stm32f10x_MD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_MD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_MD.S; sourceTree = SOURCE_ROOT; };
 		65EA2E171273C55200636061 /* ratedesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ratedesired.xml; sourceTree = "<group>"; };
-		65EA2E1D1273C6E900636061 /* ratedesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ratedesired.c; sourceTree = "<group>"; };
-		65EA2E1E1273C73000636061 /* ratedesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ratedesired.h; sourceTree = "<group>"; };
-		65EF3930123AF97D00D1B036 /* gpssatellites.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gpssatellites.c; sourceTree = "<group>"; };
-		65EF3931123AF97D00D1B036 /* gpstime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gpstime.c; sourceTree = "<group>"; };
 		65FC65BE123F209400B04F74 /* ahrs_adc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs_adc.c; path = ../../AHRS/ahrs_adc.c; sourceTree = SOURCE_ROOT; };
 		65FC65D5123F22AD00B04F74 /* ahrs_adc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_adc.h; sourceTree = "<group>"; };
 		65FC66AA123F30F100B04F74 /* ahrs_timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs_timer.c; path = ../../AHRS/ahrs_timer.c; sourceTree = SOURCE_ROOT; };
@@ -2900,6 +2959,465 @@
 			children = (
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		650D8E1F12DFE16400D05CC9 /* Modules */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E2012DFE16400D05CC9 /* Actuator */,
+				650D8E2412DFE16400D05CC9 /* AHRSComms */,
+				650D8E2812DFE16400D05CC9 /* Altitude */,
+				650D8E2C12DFE16400D05CC9 /* Attitude */,
+				650D8E2E12DFE16400D05CC9 /* Battery */,
+				650D8E3212DFE16400D05CC9 /* Example */,
+				650D8E3B12DFE16400D05CC9 /* FirmwareIAP */,
+				650D8E3F12DFE16400D05CC9 /* FlightPlan */,
+				650D8E4712DFE16400D05CC9 /* GPS */,
+				650D8E4D12DFE16400D05CC9 /* Guidance */,
+				650D8E5112DFE16400D05CC9 /* ManualControl */,
+				650D8E5512DFE16400D05CC9 /* MK */,
+				650D8E5A12DFE16400D05CC9 /* Osd */,
+				650D8E5D12DFE16400D05CC9 /* Stabilization */,
+				650D8E6112DFE16400D05CC9 /* System */,
+				650D8E6512DFE16400D05CC9 /* Telemetry */,
+			);
+			name = Modules;
+			path = ../../Modules;
+			sourceTree = SOURCE_ROOT;
+		};
+		650D8E2012DFE16400D05CC9 /* Actuator */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E2112DFE16400D05CC9 /* actuator.c */,
+				650D8E2212DFE16400D05CC9 /* inc */,
+			);
+			path = Actuator;
+			sourceTree = "<group>";
+		};
+		650D8E2212DFE16400D05CC9 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E2312DFE16400D05CC9 /* actuator.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		650D8E2412DFE16400D05CC9 /* AHRSComms */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E2512DFE16400D05CC9 /* ahrs_comms.c */,
+				650D8E2612DFE16400D05CC9 /* inc */,
+			);
+			path = AHRSComms;
+			sourceTree = "<group>";
+		};
+		650D8E2612DFE16400D05CC9 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E2712DFE16400D05CC9 /* ahrs_comms.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		650D8E2812DFE16400D05CC9 /* Altitude */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E2912DFE16400D05CC9 /* altitude.c */,
+				650D8E2A12DFE16400D05CC9 /* inc */,
+			);
+			path = Altitude;
+			sourceTree = "<group>";
+		};
+		650D8E2A12DFE16400D05CC9 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E2B12DFE16400D05CC9 /* altitude.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		650D8E2C12DFE16400D05CC9 /* Attitude */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E2D12DFE16400D05CC9 /* inc */,
+			);
+			path = Attitude;
+			sourceTree = "<group>";
+		};
+		650D8E2D12DFE16400D05CC9 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		650D8E2E12DFE16400D05CC9 /* Battery */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E2F12DFE16400D05CC9 /* battery.c */,
+				650D8E3012DFE16400D05CC9 /* inc */,
+			);
+			path = Battery;
+			sourceTree = "<group>";
+		};
+		650D8E3012DFE16400D05CC9 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E3112DFE16400D05CC9 /* battery.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		650D8E3212DFE16400D05CC9 /* Example */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E3312DFE16400D05CC9 /* example.c */,
+				650D8E3412DFE16400D05CC9 /* examplemodevent.c */,
+				650D8E3512DFE16400D05CC9 /* examplemodperiodic.c */,
+				650D8E3612DFE16400D05CC9 /* examplemodthread.c */,
+				650D8E3712DFE16400D05CC9 /* inc */,
+			);
+			path = Example;
+			sourceTree = "<group>";
+		};
+		650D8E3712DFE16400D05CC9 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E3812DFE16400D05CC9 /* examplemodevent.h */,
+				650D8E3912DFE16400D05CC9 /* examplemodperiodic.h */,
+				650D8E3A12DFE16400D05CC9 /* examplemodthread.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		650D8E3B12DFE16400D05CC9 /* FirmwareIAP */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E3C12DFE16400D05CC9 /* firmwareiap.c */,
+				650D8E3D12DFE16400D05CC9 /* inc */,
+			);
+			path = FirmwareIAP;
+			sourceTree = "<group>";
+		};
+		650D8E3D12DFE16400D05CC9 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E3E12DFE16400D05CC9 /* firmwareiap.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		650D8E3F12DFE16400D05CC9 /* FlightPlan */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E4012DFE16400D05CC9 /* flightplan.c */,
+				650D8E4112DFE16400D05CC9 /* flightplans */,
+				650D8E4312DFE16400D05CC9 /* inc */,
+				650D8E4512DFE16400D05CC9 /* lib */,
+			);
+			path = FlightPlan;
+			sourceTree = "<group>";
+		};
+		650D8E4112DFE16400D05CC9 /* flightplans */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E4212DFE16400D05CC9 /* test.py */,
+			);
+			path = flightplans;
+			sourceTree = "<group>";
+		};
+		650D8E4312DFE16400D05CC9 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E4412DFE16400D05CC9 /* flightplan.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		650D8E4512DFE16400D05CC9 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E4612DFE16400D05CC9 /* uavobjects.py */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		650D8E4712DFE16400D05CC9 /* GPS */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E4812DFE16400D05CC9 /* GPS.c */,
+				650D8E4912DFE16400D05CC9 /* inc */,
+				650D8E4C12DFE16400D05CC9 /* NMEA.c */,
+			);
+			path = GPS;
+			sourceTree = "<group>";
+		};
+		650D8E4912DFE16400D05CC9 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E4A12DFE16400D05CC9 /* GPS.h */,
+				650D8E4B12DFE16400D05CC9 /* NMEA.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		650D8E4D12DFE16400D05CC9 /* Guidance */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E4E12DFE16400D05CC9 /* guidance.c */,
+				650D8E4F12DFE16400D05CC9 /* inc */,
+			);
+			path = Guidance;
+			sourceTree = "<group>";
+		};
+		650D8E4F12DFE16400D05CC9 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E5012DFE16400D05CC9 /* guidance.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		650D8E5112DFE16400D05CC9 /* ManualControl */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E5212DFE16400D05CC9 /* inc */,
+				650D8E5412DFE16400D05CC9 /* manualcontrol.c */,
+			);
+			path = ManualControl;
+			sourceTree = "<group>";
+		};
+		650D8E5212DFE16400D05CC9 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E5312DFE16400D05CC9 /* manualcontrol.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		650D8E5512DFE16400D05CC9 /* MK */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E5612DFE16400D05CC9 /* MKSerial */,
+			);
+			path = MK;
+			sourceTree = "<group>";
+		};
+		650D8E5612DFE16400D05CC9 /* MKSerial */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E5712DFE16400D05CC9 /* inc */,
+				650D8E5912DFE16400D05CC9 /* MKSerial.c */,
+			);
+			path = MKSerial;
+			sourceTree = "<group>";
+		};
+		650D8E5712DFE16400D05CC9 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E5812DFE16400D05CC9 /* MkSerial.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		650D8E5A12DFE16400D05CC9 /* Osd */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E5B12DFE16400D05CC9 /* OsdEtStd */,
+			);
+			path = Osd;
+			sourceTree = "<group>";
+		};
+		650D8E5B12DFE16400D05CC9 /* OsdEtStd */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E5C12DFE16400D05CC9 /* OsdEtStd.c */,
+			);
+			path = OsdEtStd;
+			sourceTree = "<group>";
+		};
+		650D8E5D12DFE16400D05CC9 /* Stabilization */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E5E12DFE16400D05CC9 /* inc */,
+				650D8E6012DFE16400D05CC9 /* stabilization.c */,
+			);
+			path = Stabilization;
+			sourceTree = "<group>";
+		};
+		650D8E5E12DFE16400D05CC9 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E5F12DFE16400D05CC9 /* stabilization.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		650D8E6112DFE16400D05CC9 /* System */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E6212DFE16400D05CC9 /* inc */,
+				650D8E6412DFE16400D05CC9 /* systemmod.c */,
+			);
+			path = System;
+			sourceTree = "<group>";
+		};
+		650D8E6212DFE16400D05CC9 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E6312DFE16400D05CC9 /* systemmod.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		650D8E6512DFE16400D05CC9 /* Telemetry */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E6612DFE16400D05CC9 /* inc */,
+				650D8E6812DFE16400D05CC9 /* telemetry.c */,
+			);
+			path = Telemetry;
+			sourceTree = "<group>";
+		};
+		650D8E6612DFE16400D05CC9 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E6712DFE16400D05CC9 /* telemetry.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		650D8E6A12DFE17500D05CC9 /* UAVObjects */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E6B12DFE17500D05CC9 /* actuatorcommand.c */,
+				650D8E6C12DFE17500D05CC9 /* actuatordesired.c */,
+				650D8E6D12DFE17500D05CC9 /* actuatorsettings.c */,
+				650D8E6E12DFE17500D05CC9 /* ahrscalibration.c */,
+				650D8E6F12DFE17500D05CC9 /* ahrssettings.c */,
+				650D8E7012DFE17500D05CC9 /* ahrsstatus.c */,
+				650D8E7112DFE17500D05CC9 /* attitudeactual.c */,
+				650D8E7212DFE17500D05CC9 /* attitudedesired.c */,
+				650D8E7312DFE17500D05CC9 /* attituderaw.c */,
+				650D8E7412DFE17500D05CC9 /* baroaltitude.c */,
+				650D8E7512DFE17500D05CC9 /* batterysettings.c */,
+				650D8E7612DFE17500D05CC9 /* eventdispatcher.c */,
+				650D8E7712DFE17500D05CC9 /* firmwareiapobj.c */,
+				650D8E7812DFE17500D05CC9 /* flightbatterystate.c */,
+				650D8E7912DFE17500D05CC9 /* flightplancontrol.c */,
+				650D8E7A12DFE17500D05CC9 /* flightplansettings.c */,
+				650D8E7B12DFE17500D05CC9 /* flightplanstatus.c */,
+				650D8E7C12DFE17500D05CC9 /* flighttelemetrystats.c */,
+				650D8E7D12DFE17500D05CC9 /* gcstelemetrystats.c */,
+				650D8E7E12DFE17500D05CC9 /* gpsposition.c */,
+				650D8E7F12DFE17500D05CC9 /* gpssatellites.c */,
+				650D8E8012DFE17500D05CC9 /* gpstime.c */,
+				650D8E8112DFE17500D05CC9 /* guidancesettings.c */,
+				650D8E8212DFE17500D05CC9 /* homelocation.c */,
+				650D8E8312DFE17500D05CC9 /* i2cstats.c */,
+				650D8E8412DFE17500D05CC9 /* inc */,
+				650D8EB612DFE17500D05CC9 /* manualcontrolcommand.c */,
+				650D8EB712DFE17500D05CC9 /* manualcontrolsettings.c */,
+				650D8EB812DFE17500D05CC9 /* mixersettings.c */,
+				650D8EB912DFE17500D05CC9 /* mixerstatus.c */,
+				650D8EBA12DFE17500D05CC9 /* nedaccel.c */,
+				650D8EBB12DFE17500D05CC9 /* objectpersistence.c */,
+				650D8EBC12DFE17500D05CC9 /* pipxtrememodemsettings.c */,
+				650D8EBD12DFE17500D05CC9 /* pipxtrememodemstatus.c */,
+				650D8EBE12DFE17500D05CC9 /* positionactual.c */,
+				650D8EBF12DFE17500D05CC9 /* positiondesired.c */,
+				650D8EC012DFE17500D05CC9 /* ratedesired.c */,
+				650D8EC112DFE17500D05CC9 /* stabilizationsettings.c */,
+				650D8EC212DFE17500D05CC9 /* systemalarms.c */,
+				650D8EC312DFE17500D05CC9 /* systemsettings.c */,
+				650D8EC412DFE17500D05CC9 /* systemstats.c */,
+				650D8EC512DFE17500D05CC9 /* taskinfo.c */,
+				650D8EC612DFE17500D05CC9 /* telemetrysettings.c */,
+				650D8EC712DFE17500D05CC9 /* uavobjectmanager.c */,
+				650D8EC812DFE17500D05CC9 /* uavobjectsinit.c */,
+				650D8EC912DFE17500D05CC9 /* uavobjectsinit_cc.c */,
+				650D8ECA12DFE17500D05CC9 /* uavobjectsinittemplate.c */,
+				650D8ECB12DFE17500D05CC9 /* uavobjecttemplate.c */,
+				650D8ECC12DFE17500D05CC9 /* velocityactual.c */,
+				650D8ECD12DFE17500D05CC9 /* velocitydesired.c */,
+				650D8ECE12DFE17500D05CC9 /* watchdogstatus.c */,
+			);
+			name = UAVObjects;
+			path = ../../UAVObjects;
+			sourceTree = SOURCE_ROOT;
+		};
+		650D8E8412DFE17500D05CC9 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				650D8E8512DFE17500D05CC9 /* actuatorcommand.h */,
+				650D8E8612DFE17500D05CC9 /* actuatordesired.h */,
+				650D8E8712DFE17500D05CC9 /* actuatorsettings.h */,
+				650D8E8812DFE17500D05CC9 /* ahrscalibration.h */,
+				650D8E8912DFE17500D05CC9 /* ahrssettings.h */,
+				650D8E8A12DFE17500D05CC9 /* ahrsstatus.h */,
+				650D8E8B12DFE17500D05CC9 /* attitudeactual.h */,
+				650D8E8C12DFE17500D05CC9 /* attitudedesired.h */,
+				650D8E8D12DFE17500D05CC9 /* attituderaw.h */,
+				650D8E8E12DFE17500D05CC9 /* baroaltitude.h */,
+				650D8E8F12DFE17500D05CC9 /* batterysettings.h */,
+				650D8E9012DFE17500D05CC9 /* eventdispatcher.h */,
+				650D8E9112DFE17500D05CC9 /* firmwareiapobj.h */,
+				650D8E9212DFE17500D05CC9 /* flightbatterystate.h */,
+				650D8E9312DFE17500D05CC9 /* flightplancontrol.h */,
+				650D8E9412DFE17500D05CC9 /* flightplansettings.h */,
+				650D8E9512DFE17500D05CC9 /* flightplanstatus.h */,
+				650D8E9612DFE17500D05CC9 /* flighttelemetrystats.h */,
+				650D8E9712DFE17500D05CC9 /* gcstelemetrystats.h */,
+				650D8E9812DFE17500D05CC9 /* gpsposition.h */,
+				650D8E9912DFE17500D05CC9 /* gpssatellites.h */,
+				650D8E9A12DFE17500D05CC9 /* gpstime.h */,
+				650D8E9B12DFE17500D05CC9 /* guidancesettings.h */,
+				650D8E9C12DFE17500D05CC9 /* homelocation.h */,
+				650D8E9D12DFE17500D05CC9 /* i2cstats.h */,
+				650D8E9E12DFE17500D05CC9 /* manualcontrolcommand.h */,
+				650D8E9F12DFE17500D05CC9 /* manualcontrolsettings.h */,
+				650D8EA012DFE17500D05CC9 /* mixersettings.h */,
+				650D8EA112DFE17500D05CC9 /* mixerstatus.h */,
+				650D8EA212DFE17500D05CC9 /* nedaccel.h */,
+				650D8EA312DFE17500D05CC9 /* objectpersistence.h */,
+				650D8EA412DFE17500D05CC9 /* pipxtrememodemsettings.h */,
+				650D8EA512DFE17500D05CC9 /* pipxtrememodemstatus.h */,
+				650D8EA612DFE17500D05CC9 /* positionactual.h */,
+				650D8EA712DFE17500D05CC9 /* positiondesired.h */,
+				650D8EA812DFE17500D05CC9 /* ratedesired.h */,
+				650D8EA912DFE17500D05CC9 /* stabilizationsettings.h */,
+				650D8EAA12DFE17500D05CC9 /* systemalarms.h */,
+				650D8EAB12DFE17500D05CC9 /* systemsettings.h */,
+				650D8EAC12DFE17500D05CC9 /* systemstats.h */,
+				650D8EAD12DFE17500D05CC9 /* taskinfo.h */,
+				650D8EAE12DFE17500D05CC9 /* telemetrysettings.h */,
+				650D8EAF12DFE17500D05CC9 /* uavobjectmanager.h */,
+				650D8EB012DFE17500D05CC9 /* uavobjectsinit.h */,
+				650D8EB112DFE17500D05CC9 /* uavobjecttemplate.h */,
+				650D8EB212DFE17500D05CC9 /* utlist.h */,
+				650D8EB312DFE17500D05CC9 /* velocityactual.h */,
+				650D8EB412DFE17500D05CC9 /* velocitydesired.h */,
+				650D8EB512DFE17500D05CC9 /* watchdogstatus.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		650D8ECF12DFE17500D05CC9 /* UAVTalk */ = {
+			isa = PBXGroup;
+			children = (
+				650D8ED012DFE17500D05CC9 /* inc */,
+				650D8ED212DFE17500D05CC9 /* uavtalk.c */,
+			);
+			name = UAVTalk;
+			path = ../../UAVTalk;
+			sourceTree = SOURCE_ROOT;
+		};
+		650D8ED012DFE17500D05CC9 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				650D8ED112DFE17500D05CC9 /* uavtalk.h */,
+			);
+			path = inc;
 			sourceTree = "<group>";
 		};
 		651F32EC1281DE7E00D065F8 /* FirmwareIAP */ = {
@@ -2974,8 +3492,11 @@
 			children = (
 				65B7E6AC120DF1CD000C1123 /* AHRS */,
 				65E8EF1E11EEA61E00BBF654 /* OpenPilot */,
+				650D8E1F12DFE16400D05CC9 /* Modules */,
 				657CEEB6121DBC63007A1FBE /* Libraries */,
 				65E8F02F11EFF25C00BBF654 /* PiOS */,
+				650D8E6A12DFE17500D05CC9 /* UAVObjects */,
+				650D8ECF12DFE17500D05CC9 /* UAVTalk */,
 				C6A0FF2B0290797F04C91782 /* Documentation */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
 			);
@@ -6827,8 +7348,6 @@
 				65E8EF2111EEA61E00BBF654 /* Modules */,
 				65E8EF5B11EEA61E00BBF654 /* System */,
 				65E8EF6811EEA61E00BBF654 /* Tests */,
-				65E8EF6E11EEA61E00BBF654 /* UAVObjects */,
-				65E8EFAB11EEA61E00BBF654 /* UAVTalk */,
 			);
 			name = OpenPilot;
 			path = ../../OpenPilot;
@@ -7147,120 +7666,6 @@
 			);
 			name = Tests;
 			path = ../../OpenPilot/Tests;
-			sourceTree = SOURCE_ROOT;
-		};
-		65E8EF6E11EEA61E00BBF654 /* UAVObjects */ = {
-			isa = PBXGroup;
-			children = (
-				65EA2E1D1273C6E900636061 /* ratedesired.c */,
-				65D38AAC125F6B8200112AEB /* firmwareiapobj.c */,
-				65D38AAD125F6B8200112AEB /* guidancesettings.c */,
-				65D38AAE125F6B8200112AEB /* mixersettings.c */,
-				65D38AAF125F6B8200112AEB /* mixerstatus.c */,
-				65D38AB0125F6B8200112AEB /* positiondesired.c */,
-				65D38AB1125F6B8200112AEB /* velocityactual.c */,
-				65D38AB2125F6B8200112AEB /* velocitydesired.c */,
-				65C259551224BFAF0081B6ED /* ahrscalibration.c */,
-				65C259561224BFAF0081B6ED /* ahrssettings.c */,
-				65C259571224BFAF0081B6ED /* baroaltitude.c */,
-				657CEEBF121DC054007A1FBE /* attituderaw.c */,
-				657CEEC1121DC054007A1FBE /* homelocation.c */,
-				65E8EF6F11EEA61E00BBF654 /* actuatorcommand.c */,
-				65E8EF7011EEA61E00BBF654 /* actuatordesired.c */,
-				65E8EF7111EEA61E00BBF654 /* actuatorsettings.c */,
-				65E8EF7211EEA61E00BBF654 /* ahrsstatus.c */,
-				65E8EF7411EEA61E00BBF654 /* attitudeactual.c */,
-				65E8EF7511EEA61E00BBF654 /* attitudedesired.c */,
-				65E8EF7811EEA61E00BBF654 /* eventdispatcher.c */,
-				65E8EF7C11EEA61E00BBF654 /* flightbatterystate.c */,
-				65E8EF7D11EEA61E00BBF654 /* flighttelemetrystats.c */,
-				65E8EF7E11EEA61E00BBF654 /* gcstelemetrystats.c */,
-				65C259581224BFAF0081B6ED /* gpsposition.c */,
-				65EF3930123AF97D00D1B036 /* gpssatellites.c */,
-				65EF3931123AF97D00D1B036 /* gpstime.c */,
-				65E8EF8011EEA61E00BBF654 /* inc */,
-				65E8EF9E11EEA61E00BBF654 /* manualcontrolcommand.c */,
-				65E8EF9F11EEA61E00BBF654 /* manualcontrolsettings.c */,
-				65E8EFA011EEA61E00BBF654 /* objectpersistence.c */,
-				65E8EFA111EEA61E00BBF654 /* positionactual.c */,
-				65E8EFA211EEA61E00BBF654 /* stabilizationsettings.c */,
-				65E8EFA311EEA61E00BBF654 /* systemalarms.c */,
-				65E8EFA411EEA61E00BBF654 /* systemsettings.c */,
-				65E8EFA511EEA61E00BBF654 /* systemstats.c */,
-				65E8EFA611EEA61E00BBF654 /* telemetrysettings.c */,
-				65E8EFA711EEA61E00BBF654 /* uavobjectmanager.c */,
-				65E8EFA811EEA61E00BBF654 /* uavobjectsinit.c */,
-				65E8EFA911EEA61E00BBF654 /* uavobjectsinittemplate.c */,
-				65E8EFAA11EEA61E00BBF654 /* uavobjecttemplate.c */,
-			);
-			name = UAVObjects;
-			path = ../../OpenPilot/UAVObjects;
-			sourceTree = SOURCE_ROOT;
-		};
-		65E8EF8011EEA61E00BBF654 /* inc */ = {
-			isa = PBXGroup;
-			children = (
-				65EA2E1E1273C73000636061 /* ratedesired.h */,
-				65D38A9E125F6B6B00112AEB /* ahrscalibration.h */,
-				65D38A9F125F6B6B00112AEB /* attituderaw.h */,
-				65D38AA0125F6B6B00112AEB /* baroaltitude.h */,
-				65D38AA1125F6B6B00112AEB /* firmwareiapobj.h */,
-				65D38AA2125F6B6B00112AEB /* gpsposition.h */,
-				65D38AA3125F6B6B00112AEB /* gpssatellites.h */,
-				65D38AA4125F6B6B00112AEB /* gpstime.h */,
-				65D38AA5125F6B6B00112AEB /* guidancesettings.h */,
-				65D38AA6125F6B6B00112AEB /* homelocation.h */,
-				65D38AA7125F6B6B00112AEB /* mixersettings.h */,
-				65D38AA8125F6B6B00112AEB /* mixerstatus.h */,
-				65D38AA9125F6B6B00112AEB /* positiondesired.h */,
-				65D38AAA125F6B6B00112AEB /* velocityactual.h */,
-				65D38AAB125F6B6B00112AEB /* velocitydesired.h */,
-				651913571256D0030039C0A3 /* ahrssettings.h */,
-				65E8EF8111EEA61E00BBF654 /* actuatorcommand.h */,
-				65E8EF8211EEA61E00BBF654 /* actuatordesired.h */,
-				65E8EF8311EEA61E00BBF654 /* actuatorsettings.h */,
-				65E8EF8411EEA61E00BBF654 /* ahrsstatus.h */,
-				65E8EF8611EEA61E00BBF654 /* attitudeactual.h */,
-				65E8EF8711EEA61E00BBF654 /* attitudedesired.h */,
-				65E8EF8911EEA61E00BBF654 /* eventdispatcher.h */,
-				65E8EF8D11EEA61E00BBF654 /* flightbatterystate.h */,
-				65E8EF8E11EEA61E00BBF654 /* flighttelemetrystats.h */,
-				65E8EF8F11EEA61E00BBF654 /* gcstelemetrystats.h */,
-				65E8EF9111EEA61E00BBF654 /* manualcontrolcommand.h */,
-				65E8EF9211EEA61E00BBF654 /* manualcontrolsettings.h */,
-				65E8EF9311EEA61E00BBF654 /* objectpersistence.h */,
-				65E8EF9411EEA61E00BBF654 /* positionactual.h */,
-				65E8EF9511EEA61E00BBF654 /* stabilizationsettings.h */,
-				65E8EF9611EEA61E00BBF654 /* systemalarms.h */,
-				65E8EF9711EEA61E00BBF654 /* systemsettings.h */,
-				65E8EF9811EEA61E00BBF654 /* systemstats.h */,
-				65E8EF9911EEA61E00BBF654 /* telemetrysettings.h */,
-				65E8EF9A11EEA61E00BBF654 /* uavobjectmanager.h */,
-				65E8EF9B11EEA61E00BBF654 /* uavobjectsinit.h */,
-				65E8EF9C11EEA61E00BBF654 /* uavobjecttemplate.h */,
-				65E8EF9D11EEA61E00BBF654 /* utlist.h */,
-			);
-			name = inc;
-			path = ../../OpenPilot/UAVObjects/inc;
-			sourceTree = SOURCE_ROOT;
-		};
-		65E8EFAB11EEA61E00BBF654 /* UAVTalk */ = {
-			isa = PBXGroup;
-			children = (
-				65E8EFAC11EEA61E00BBF654 /* inc */,
-				65E8EFAE11EEA61E00BBF654 /* uavtalk.c */,
-			);
-			name = UAVTalk;
-			path = ../../OpenPilot/UAVTalk;
-			sourceTree = SOURCE_ROOT;
-		};
-		65E8EFAC11EEA61E00BBF654 /* inc */ = {
-			isa = PBXGroup;
-			children = (
-				65E8EFAD11EEA61E00BBF654 /* uavtalk.h */,
-			);
-			name = inc;
-			path = ../../OpenPilot/UAVTalk/inc;
 			sourceTree = SOURCE_ROOT;
 		};
 		65E8F02F11EFF25C00BBF654 /* PiOS */ = {

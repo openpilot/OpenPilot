@@ -252,6 +252,13 @@ coptercontrol_%: uavobjects
 	mkdir -p $(BUILD_DIR)/coptercontrol
 	$(MAKE) OUTDIR="$(BUILD_DIR)/coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/CopterControl $*
 
+.PHONY: pipxtreme
+pipxtreme: pipxtreme_elf
+
+pipxtreme_%: uavobjects_flight
+	mkdir -p $(BUILD_DIR)/pipxtreme
+	$(MAKE) OUTDIR="$(BUILD_DIR)/pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/PipXtreme $*
+
 .PHONY: sim_posix
 sim_posix: sim_posix_elf
 

@@ -316,11 +316,11 @@ void UploaderGadgetWidget::systemBoot()
 
     clearLog();
     m_config->bootButton->setEnabled(false);
-    if (currentStep != IAP_STATE_BOOTLOADER) {
-        // The board is now reset: we have to disconnect telemetry
-        Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-        cm->suspendPolling();
-    }
+
+    // Suspend telemety & polling in case it is not done yet
+    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    cm->disconnectDevice();
+    cm->suspendPolling();
 
     QString devName = m_config->telemetryLink->currentText();
     log("Attempting to boot the system through " + devName + ".");
@@ -344,8 +344,6 @@ void UploaderGadgetWidget::systemBoot()
     log("Booting system...");
     dfu->JumpToApp();
     // Restart the polling thread
-    // The board is now reset: we have to disconnect telemetry
-    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
     cm->resumePolling();
     m_config->bootButton->setEnabled(true);
     m_config->rescueButton->setEnabled(true);

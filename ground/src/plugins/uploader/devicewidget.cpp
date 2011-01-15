@@ -91,6 +91,12 @@ void deviceWidget::populate()
     case 1:
         devicePic->renderer()->load(QString(":/uploader/images/deviceID-1.svg"));
         break;
+    case 21:
+        devicePic->renderer()->load(QString(":/uploader/images/deviceID-21.svg"));
+        break;
+    case 42:
+        devicePic->renderer()->load(QString(":/uploader/images/deviceID-42.svg"));
+        break;
     case 69:
         devicePic->renderer()->load(QString(":/uploader/images/deviceID-69.svg"));
         break;

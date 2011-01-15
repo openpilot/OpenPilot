@@ -7,5 +7,7 @@
         <file>images/process-stop.svg</file>
         <file>images/dialog-apply.svg</file>
         <file>images/gtk-info.svg</file>
+        <file>images/deviceID-42.svg</file>
+        <file>images/deviceID-21.svg</file>
     </qresource>
 </RCC>

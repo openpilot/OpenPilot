@@ -409,7 +409,7 @@ void UploaderGadgetWidget::systemRescue()
         QTimer::singleShot(1000, this, SLOT(systemRescue()));
         break;
     case RESCUE_STEP3:
-        log("... Detecting Mainboard...");
+        log("... Detecting First Board...");
         repaint();
         dfu = new DFUObject(DFU_DEBUG, false, QString());
         dfu->AbortOperation();
@@ -425,7 +425,7 @@ void UploaderGadgetWidget::systemRescue()
         if(!dfu->findDevices() || (dfu->numberOfDevices != 1))
         {
             rescueStep = RESCUE_STEP0;
-            log("Could not detect mainboard.");
+            log("Could not detect a board, aborting!");
             delete dfu;
             dfu = NULL;
             cm->resumePolling();
@@ -447,11 +447,11 @@ void UploaderGadgetWidget::systemRescue()
         break;
     case RESCUE_DETECT:
         rescueStep = RESCUE_STEP0;
-        log("Detecting AHRS...");
+        log("Detecting second board...");
         repaint();
         if(!dfu->findDevices())
         {
-            log("Could not detect devices.");
+            log("Could not detect any board, aborting!");
             delete dfu;
             dfu = NULL;
             cm->resumePolling();

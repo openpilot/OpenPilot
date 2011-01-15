@@ -41,7 +41,7 @@
 #define $(NAMEUC)_H
 
 // Object constants
-#define $(NAMEUC)_OBJID $(OBJID)U
+#define $(NAMEUC)_OBJID $(OBJIDHEX)
 #define $(NAMEUC)_NAME "$(NAME)"
 #define $(NAMEUC)_METANAME "$(NAME)Meta"
 #define $(NAMEUC)_ISSINGLEINST $(ISSINGLEINST)

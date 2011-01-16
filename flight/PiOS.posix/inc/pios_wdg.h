@@ -38,4 +38,8 @@ uint16_t PIOS_WDG_GetBootupFlags();
 uint16_t PIOS_WDG_GetActiveFlags();
 void PIOS_WDG_Clear(void);
 
+#define PIOS_WDG_ACTUATOR        0x0001
+#define PIOS_WDG_STABILIZATION   0x0002
+#define PIOS_WDG_MANUAL          0x0008
+
 #endif

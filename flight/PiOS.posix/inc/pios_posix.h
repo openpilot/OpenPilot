@@ -28,6 +28,13 @@
 
 #include <stdint.h>
 
+typedef enum {FALSE = 0, TRUE = !FALSE} bool;
+
+#ifndef false
+	#define false FALSE
+	#define true TRUE
+#endif
+
 #define FILEINFO FILE*
 
 #define PIOS_SERVO_NUM_OUTPUTS 8

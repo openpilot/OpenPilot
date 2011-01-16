@@ -54,6 +54,7 @@ areyousureyoushouldberunningthis:
 	@echo "   [GCS and UAVObjects]"
 	@echo "     gcs               - Build the Ground Control System application"
 	@echo "     uavobjects        - Generate source files from the UAVObject definition XML files"
+	@echo "     uavobjects_test   - parse xml-files - check for valid, duplicate ObjId's, ... "
 	@echo "     uavobjects_gcs    - Generate groundstation source files from the UAVObject definition XML files"
 	@echo "     uavobjects_flight - Generate flight source files from the UAVObject definition XML files"
 	@echo
@@ -221,6 +222,9 @@ uavobjects_gcs: build_dir uavobjgenerator
 
 uavobjects_flight: build_dir uavobjgenerator
 	$(UAVOBJGENERATOR) -flight "$(ROOT_DIR)/"
+
+uavobjects_test: build_dir uavobjgenerator
+	$(UAVOBJGENERATOR) -v -none "$(ROOT_DIR)/"
 
 ##############################
 #

@@ -228,6 +228,7 @@ QString UAVObjectParser::parseXML(QString& xml, QString& filename)
         node = node.nextSibling();
     }
 
+    all_units.removeDuplicates();
     // Done, return null string
     return QString();
 }
@@ -375,6 +376,7 @@ QString UAVObjectParser::processObjectFields(QDomNode& childNode, ObjectInfo* in
         return QString("Object:field:units attribute is missing");
 
     field->units = elemAttr.nodeValue();
+    all_units << field->units;
 
     // Get type attribute
     elemAttr = elemAttributes.namedItem("type");

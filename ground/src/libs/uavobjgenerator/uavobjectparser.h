@@ -111,6 +111,7 @@ public:
 
     ObjectInfo* getObjectByIndex(int objIndex);
     int getNumBytes(int objIndex);
+    QStringList all_units;
 
 private:
     QList<ObjectInfo*> objInfo;

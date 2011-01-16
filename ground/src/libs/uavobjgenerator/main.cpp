@@ -35,8 +35,9 @@
 #include "generators/matlab/uavobjectgeneratormatlab.h"
 #include "generators/python/uavobjectgeneratorpython.h"
 
-#define ERR_USAGE 1
-#define ERR_XML 2
+#define RETURN_ERR_USAGE 1
+#define RETURN_ERR_XML 2
+#define RETURN_OK 0
 
 using namespace std;
 
@@ -44,9 +45,19 @@ using namespace std;
  * print usage info
  */
 void usage() {
-    cout << "Usage: uavobjectgenerator [-gcs] [-flight] [-java] [-python] [-mathlab] [base_path]" << endl;
-    cout << "       If no language is specified - all are build." << endl;
-    cout << "       base_path - base path to gcs and flight directories (as in svn)." << endl;
+    cout << "Usage: uavobjectgenerator [-gcs] [-flight] [-java] [-python] [-mathlab] [-none] [-v] [base_path]" << endl;
+    cout << "Languages: "<< endl;
+    cout << "\t-gcs           build grounstation code" << endl;
+    cout << "\t-flight        build flight code" << endl;
+    cout << "\t-java          build java code" << endl;
+    cout << "\t-python        build python code" << endl;
+    cout << "\t-matlab        build matlab code" << endl;
+    cout << "\tIf no language is specified ( and not -none ) -> all are build." << endl;
+    cout << "Misc: "<< endl;
+    cout << "\t-none          build no language - just parse xml's" << endl;
+    cout << "\t-h             this help" << endl;
+    cout << "\t-v             verbose" << endl;
+    cout << " \tbase_path     base path to gcs and flight directories (as in svn)." << endl;
 }
 
 /**
@@ -55,7 +66,7 @@ void usage() {
 int usage_err() {
     cout << "Invalid usage!" << endl;
     usage();
-    return ERR_USAGE;
+    return RETURN_ERR_USAGE;
 }
 
 /**
@@ -74,11 +85,18 @@ int main(int argc, char *argv[])
     for (int argi=1;argi<argc;argi++)
         arguments_stringlist << argv[argi];
 
+    if ((arguments_stringlist.removeAll("-h")>0)||(arguments_stringlist.removeAll("-h")>0)) {
+      usage();
+      return RETURN_OK; 
+    }
+
+    bool verbose=(arguments_stringlist.removeAll("-v")>0);
     bool do_gcs=(arguments_stringlist.removeAll("-gcs")>0);
     bool do_flight=(arguments_stringlist.removeAll("-flight")>0);
     bool do_java=(arguments_stringlist.removeAll("-java")>0);
     bool do_python=(arguments_stringlist.removeAll("-python")>0);
     bool do_matlab=(arguments_stringlist.removeAll("-mathlab")>0);
+    bool do_none=(arguments_stringlist.removeAll("-none")>0); //
 
     bool do_all=((do_gcs||do_flight||do_java||do_python||do_matlab)==false);
 
@@ -103,15 +121,15 @@ int main(int argc, char *argv[])
     // Read in each XML file and parse object(s) in them
     for (int n = 0; n < xmlList.length(); ++n) {
         QFileInfo fileinfo = xmlList[n];
-        std::cout << "Parsing XML file: " << fileinfo.fileName().toStdString() << std::endl;
+        cout << "Parsing XML file: " << fileinfo.fileName().toStdString() << endl;
         QString filename = fileinfo.fileName();
         QString xmlstr = readFile(fileinfo.absoluteFilePath());
 
         QString res = parser->parseXML(xmlstr, filename);
 
         if (!res.isNull()) {
-            std::cout << "Error parsing " << res.toStdString() << endl;
-            return ERR_XML;
+            cout << "Error parsing " << res.toStdString() << endl;
+            return RETURN_ERR_XML;
         }
     }
 
@@ -122,7 +140,7 @@ int main(int argc, char *argv[])
 
         if ( objIDList.contains(id) || id == 0 ) {
             cout << "Error: Object ID collision found in object " << parser->getObjectName(objidx).toStdString() << ", modify object name" << endl;
-            return ERR_XML;
+            return RETURN_ERR_XML;
         }
 
         objIDList.append(id);
@@ -132,41 +150,48 @@ int main(int argc, char *argv[])
     cout << "Done: processed " << xmlList.length() << " XML files and generated "
             << objIDList.length() << " objects with no ID collisions." << endl;
 
+
+    if (verbose) 
+        cout << "used units: " << parser->all_units.join(",").toStdString() << endl;
+
+    if (do_none)
+      return RETURN_OK;     
+
     // generate flight code if wanted
     if (do_flight|do_all) {
-        std::cout << "generating flight code" << endl ;
+        cout << "generating flight code" << endl ;
         UAVObjectGeneratorFlight flightgen;
         flightgen.generate(parser,basepath);
     }
 
     // generate gcs code if wanted
     if (do_gcs|do_all) {
-        std::cout << "generating gcs code" << endl ;
+        cout << "generating gcs code" << endl ;
         UAVObjectGeneratorGCS gcsgen;
         gcsgen.generate(parser,basepath);
     }
 
     // generate java code if wanted
     if (do_java|do_all) {
-        std::cout << "generating java code" << endl ;
+        cout << "generating java code" << endl ;
         UAVObjectGeneratorJava javagen;
         javagen.generate(parser,basepath);
     }
 
     // generate python code if wanted
     if (do_python|do_all) {
-        std::cout << "generating python code" << endl ;
+        cout << "generating python code" << endl ;
         UAVObjectGeneratorPython pygen;
         pygen.generate(parser,basepath);
     }
 
     // generate matlab code if wanted
     if (do_matlab|do_all) {
-        std::cout << "generating matlab code" << endl ;
+        cout << "generating matlab code" << endl ;
         UAVObjectGeneratorMatlab matlabgen;
         matlabgen.generate(parser,basepath);
     }
 
-    return 0;
+    return RETURN_OK;
 }
 

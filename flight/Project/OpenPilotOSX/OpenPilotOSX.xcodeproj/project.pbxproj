@@ -167,7 +167,6 @@
 		6526645A122DF972006F9A3C /* pios_i2c_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_i2c_priv.h; sourceTree = "<group>"; };
 		6526645B122DF972006F9A3C /* pios_wdg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_wdg.h; sourceTree = "<group>"; };
 		65322D3B122841F60046CD7C /* gpstime.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gpstime.xml; sourceTree = "<group>"; };
-		65322D77122897210046CD7C /* MagOrAccelSensorCal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MagOrAccelSensorCal.c; path = ../../AHRS/MagOrAccelSensorCal.c; sourceTree = SOURCE_ROOT; };
 		65345C871288668B00A5E4E8 /* guidancesettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = guidancesettings.xml; sourceTree = "<group>"; };
 		65408AA812BB1648004DACC5 /* i2cstats.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = i2cstats.xml; sourceTree = "<group>"; };
 		6543304F121980300063F913 /* insgps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = insgps.h; sourceTree = "<group>"; };
@@ -2970,7 +2969,6 @@
 		65E8F03511EFF25C00BBF654 /* pios_opahrs_proto.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_opahrs_proto.c; path = ../../PiOS/Common/pios_opahrs_proto.c; sourceTree = SOURCE_ROOT; };
 		65E8F03611EFF25C00BBF654 /* pios_sdcard.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_sdcard.c; path = ../../PiOS/Common/pios_sdcard.c; sourceTree = SOURCE_ROOT; };
 		65E8F03711EFF25C00BBF654 /* printf-stdarg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "printf-stdarg.c"; path = "../../PiOS/Common/printf-stdarg.c"; sourceTree = SOURCE_ROOT; };
-		65E8F03911EFF25C00BBF654 /* FreeRTOSConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FreeRTOSConfig.h; path = ../../PiOS/inc/FreeRTOSConfig.h; sourceTree = SOURCE_ROOT; };
 		65E8F03A11EFF25C00BBF654 /* pios_adc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_adc.h; path = ../../PiOS/inc/pios_adc.h; sourceTree = SOURCE_ROOT; };
 		65E8F03B11EFF25C00BBF654 /* pios_bmp085.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_bmp085.h; path = ../../PiOS/inc/pios_bmp085.h; sourceTree = SOURCE_ROOT; };
 		65E8F03C11EFF25C00BBF654 /* pios_com.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pios_com.h; path = ../../PiOS/inc/pios_com.h; sourceTree = SOURCE_ROOT; };
@@ -3106,8 +3104,6 @@
 		65E8F0D611EFF25C00BBF654 /* stm32f10x_usart.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stm32f10x_usart.c; path = ../../PiOS/STM32F10x/Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_usart.c; sourceTree = SOURCE_ROOT; };
 		65E8F0D711EFF25C00BBF654 /* stm32f10x_wwdg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stm32f10x_wwdg.c; path = ../../PiOS/STM32F10x/Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_wwdg.c; sourceTree = SOURCE_ROOT; };
 		65E8F0D811EFF25C00BBF654 /* link_stm32f10x_HD.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = link_stm32f10x_HD.ld; path = ../../PiOS/STM32F10x/link_stm32f10x_HD.ld; sourceTree = SOURCE_ROOT; };
-		65E8F0D911EFF25C00BBF654 /* link_stm32f10x_HD_BL.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = link_stm32f10x_HD_BL.ld; path = ../../PiOS/STM32F10x/link_stm32f10x_HD_BL.ld; sourceTree = SOURCE_ROOT; };
-		65E8F0DA11EFF25C00BBF654 /* link_stm32f10x_HD_NB.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = link_stm32f10x_HD_NB.ld; path = ../../PiOS/STM32F10x/link_stm32f10x_HD_NB.ld; sourceTree = SOURCE_ROOT; };
 		65E8F0DB11EFF25C00BBF654 /* link_stm32f10x_MD.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = link_stm32f10x_MD.ld; path = ../../PiOS/STM32F10x/link_stm32f10x_MD.ld; sourceTree = SOURCE_ROOT; };
 		65E8F0DC11EFF25C00BBF654 /* pios_adc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_adc.c; path = ../../PiOS/STM32F10x/pios_adc.c; sourceTree = SOURCE_ROOT; };
 		65E8F0DD11EFF25C00BBF654 /* pios_debug.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_debug.c; path = ../../PiOS/STM32F10x/pios_debug.c; sourceTree = SOURCE_ROOT; };
@@ -3128,8 +3124,6 @@
 		65E8F0EE11EFF25C00BBF654 /* startup_stm32f10x_HD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_HD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_HD.S; sourceTree = SOURCE_ROOT; };
 		65E8F0F111EFF25C00BBF654 /* startup_stm32f10x_MD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_MD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_MD.S; sourceTree = SOURCE_ROOT; };
 		65EA2E171273C55200636061 /* ratedesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ratedesired.xml; sourceTree = "<group>"; };
-		65FC65BE123F209400B04F74 /* ahrs_adc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs_adc.c; path = ../../AHRS/ahrs_adc.c; sourceTree = SOURCE_ROOT; };
-		65FC65D5123F22AD00B04F74 /* ahrs_adc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_adc.h; sourceTree = "<group>"; };
 		65FC66AA123F30F100B04F74 /* ahrs_timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs_timer.c; path = ../../AHRS/ahrs_timer.c; sourceTree = SOURCE_ROOT; };
 		65FC66AB123F312A00B04F74 /* ahrs_timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_timer.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -7453,8 +7447,6 @@
 			children = (
 				6509C7E912CA57DC002E5DC2 /* insgps16state.c */,
 				6502584212CA4D2600583CDF /* insgps13state.c */,
-				65322D77122897210046CD7C /* MagOrAccelSensorCal.c */,
-				65FC65BE123F209400B04F74 /* ahrs_adc.c */,
 				65FC66AA123F30F100B04F74 /* ahrs_timer.c */,
 				65B7E6AE120DF1E2000C1123 /* ahrs.c */,
 				65B7E6AF120DF1E2000C1123 /* inc */,
@@ -7468,7 +7460,6 @@
 			isa = PBXGroup;
 			children = (
 				65FC66AB123F312A00B04F74 /* ahrs_timer.h */,
-				65FC65D5123F22AD00B04F74 /* ahrs_adc.h */,
 				6543304F121980300063F913 /* insgps.h */,
 				65B7E6B0120DF1E2000C1123 /* ahrs.h */,
 				65B7E6B1120DF1E2000C1123 /* ahrs_fsm.h */,
@@ -7862,7 +7853,6 @@
 				651CF9F1120B700D00EEFD70 /* pios_usb_hid_prop.h */,
 				651CF9F2120B700D00EEFD70 /* pios_usb_hid_pwr.h */,
 				651CF9F3120B700D00EEFD70 /* usb_conf.h */,
-				65E8F03911EFF25C00BBF654 /* FreeRTOSConfig.h */,
 				65E8F03A11EFF25C00BBF654 /* pios_adc.h */,
 				65E8F03B11EFF25C00BBF654 /* pios_bmp085.h */,
 				65E8F03C11EFF25C00BBF654 /* pios_com.h */,
@@ -7901,8 +7891,6 @@
 			children = (
 				65E8F05911EFF25C00BBF654 /* Libraries */,
 				65E8F0D811EFF25C00BBF654 /* link_stm32f10x_HD.ld */,
-				65E8F0D911EFF25C00BBF654 /* link_stm32f10x_HD_BL.ld */,
-				65E8F0DA11EFF25C00BBF654 /* link_stm32f10x_HD_NB.ld */,
 				65E8F0DB11EFF25C00BBF654 /* link_stm32f10x_MD.ld */,
 				65E8F0DC11EFF25C00BBF654 /* pios_adc.c */,
 				65E8F0DD11EFF25C00BBF654 /* pios_debug.c */,

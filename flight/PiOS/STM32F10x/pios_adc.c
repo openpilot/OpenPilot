@@ -43,20 +43,11 @@ static ADC_TypeDef *ADC_MAPPING[PIOS_ADC_NUM_PINS] = PIOS_ADC_MAPPING;
 static const uint32_t ADC_CHANNEL_MAPPING[PIOS_ADC_NUM_PINS] = PIOS_ADC_CHANNEL_MAPPING;
 
 /**
- * @brief Initialise the ADC Peripheral
- * @param[in] adc_oversample
- * @return 
- *  @arg 1 for success
- *  @arg 0 for failure
- * Currently ignores rates and uses hardcoded values.  Need a little logic to
- * map from sampling rates and such to ADC constants.
+ * @brief Initialise the ADC Peripheral, configure to run at the max oversampling
  */
 void PIOS_ADC_Init()
 {	
 	pios_adc_devs[0].callback_function = NULL;
-	
-	ADC_DeInit(ADC1);
-	ADC_DeInit(ADC2);
 	
 	/* Setup analog pins */
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -69,7 +60,22 @@ void PIOS_ADC_Init()
 		GPIO_InitStructure.GPIO_Pin = ADC_GPIO_PIN[i];
 		GPIO_Init(ADC_GPIO_PORT[i], &GPIO_InitStructure);
 	}
-	
+
+	PIOS_ADC_Config(PIOS_ADC_MAX_OVERSAMPLING);	
+}
+
+/**
+ * @brief Configure the ADC to run at a fixed oversampling
+ * @param[in] oversampling the amount of oversampling to run at
+ */
+void PIOS_ADC_Config(uint32_t oversampling)
+{	
+	oversampling = (oversampling > PIOS_ADC_MAX_OVERSAMPLING) ? PIOS_ADC_MAX_OVERSAMPLING : oversampling;
+	pios_adc_devs[0].adc_oversample = oversampling;
+
+	ADC_DeInit(ADC1);
+	ADC_DeInit(ADC2);
+		
 	/* Enable ADC clocks */
 	PIOS_ADC_CLOCK_FUNCTION;
 	
@@ -87,7 +93,6 @@ void PIOS_ADC_Init()
 				 PIOS_ADC_SAMPLE_TIME);
 #endif
 	
-	// TODO: update ADC to continuous sampling, configure the sampling rate
 	/* Configure ADCs */
 	ADC_InitTypeDef ADC_InitStructure;
 	ADC_StructInit(&ADC_InitStructure);
@@ -108,7 +113,7 @@ void PIOS_ADC_Init()
 #endif
 	
 	RCC_ADCCLKConfig(PIOS_ADC_ADCCLK);
-	RCC_PCLK2Config(RCC_HCLK_Div16);
+	RCC_PCLK2Config(PIOS_ADC_PCLK2);
 	
 	/* Enable ADC1->DMA request */
 	ADC_DMACmd(ADC1, ENABLE);
@@ -129,17 +134,6 @@ void PIOS_ADC_Init()
 	while (ADC_GetCalibrationStatus(ADC2)) ;
 #endif
 	
-	PIOS_ADC_Config(1);
-
-	/* Enable DMA1 clock */
-	RCC_AHBPeriphClockCmd(pios_adc_devs[0].cfg->dma.ahb_clk, ENABLE);
-	
-}
-
-void PIOS_ADC_Config(uint32_t oversampling)
-{
-	pios_adc_devs[0].adc_oversample = oversampling;
-
 	/* Disable interrupts */
 	DMA_ITConfig(pios_adc_devs[0].cfg->dma.rx.channel, pios_adc_devs[0].cfg->dma.irq.flags, DISABLE);
 
@@ -165,6 +159,9 @@ void PIOS_ADC_Config(uint32_t oversampling)
 	for (int32_t i = 0; i < pios_adc_devs[0].adc_oversample; i++)
 		pios_adc_devs[0].fir_coeffs[i] = 1;
 	pios_adc_devs[0].fir_coeffs[pios_adc_devs[0].adc_oversample] = pios_adc_devs[0].adc_oversample;	
+	
+	/* Enable DMA1 clock */
+	RCC_AHBPeriphClockCmd(pios_adc_devs[0].cfg->dma.ahb_clk, ENABLE);
 }
 
 /**

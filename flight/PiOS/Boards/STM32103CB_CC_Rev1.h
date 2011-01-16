@@ -191,6 +191,7 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 #define PIOS_ADC_USE_ADC2			1
 #define PIOS_ADC_CLOCK_FUNCTION			RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 | RCC_APB2Periph_ADC2, ENABLE)
 #define PIOS_ADC_ADCCLK				RCC_PCLK2_Div2
+#define PIOS_ADC_PCLK2                          RCC_HCLK_Div16
 /* RCC_PCLK2_Div2: ADC clock = PCLK2/2 */
 /* RCC_PCLK2_Div4: ADC clock = PCLK2/4 */
 /* RCC_PCLK2_Div6: ADC clock = PCLK2/6 */

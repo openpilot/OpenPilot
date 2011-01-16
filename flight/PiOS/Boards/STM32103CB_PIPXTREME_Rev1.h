@@ -222,6 +222,7 @@ TIM8  |           |           |           |
 //#define PIOS_ADC_ADCCLK					RCC_PCLK2_Div4	// ADC clock = PCLK2/4
 //#define PIOS_ADC_ADCCLK					RCC_PCLK2_Div6	// ADC clock = PCLK2/6
 #define PIOS_ADC_ADCCLK						RCC_PCLK2_Div8	// ADC clock = PCLK2/8
+#define PIOS_ADC_PCLK2                          RCC_HCLK_Div16
 //#define PIOS_ADC_SAMPLE_TIME				ADC_SampleTime_1Cycles5
 //#define PIOS_ADC_SAMPLE_TIME				ADC_SampleTime_7Cycles5
 //#define PIOS_ADC_SAMPLE_TIME				ADC_SampleTime_13Cycles5

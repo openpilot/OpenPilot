@@ -152,7 +152,8 @@ void PIOS_ADC_Config(uint32_t oversampling)
 	DMA_Cmd(pios_adc_devs[0].cfg->dma.rx.channel, ENABLE);
 	
 	/* Trigger interrupt when for half conversions too to indicate double buffer */
-	DMA_ITConfig(pios_adc_devs[0].cfg->dma.rx.channel, pios_adc_devs[0].cfg->dma.irq.flags, ENABLE);
+	DMA_ITConfig(pios_adc_devs[0].cfg->dma.rx.channel, DMA_IT_TC, ENABLE);
+        DMA_ITConfig(pios_adc_devs[0].cfg->dma.rx.channel, DMA_IT_HT, ENABLE);
 	
 	/* Configure DMA interrupt */
 	NVIC_Init(&pios_adc_devs[0].cfg->dma.irq.init);

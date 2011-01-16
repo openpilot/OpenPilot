@@ -310,6 +310,7 @@ static int32_t processPeriodicUpdates()
 	PeriodicObjectList* objEntry;
 	int32_t timeNow;
     int32_t timeToNextUpdate;
+    int32_t offset;
 
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -327,7 +328,8 @@ static int32_t processPeriodicUpdates()
             if (objEntry->timeToNextUpdateMs <= timeNow)
             {
                 // Reset timer
-            	objEntry->timeToNextUpdateMs = timeNow + objEntry->updatePeriodMs;
+            	offset = ( timeNow - objEntry->timeToNextUpdateMs ) % objEntry->updatePeriodMs;
+            	objEntry->timeToNextUpdateMs = timeNow + objEntry->updatePeriodMs - offset;
     			// Invoke callback, if one
     			if ( objEntry->evInfo.cb != 0)
     			{

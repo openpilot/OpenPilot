@@ -437,6 +437,7 @@ void Telemetry::processPeriodicUpdates()
     ObjectTimeInfo objinfo;
     qint32 elapsedMs = 0;
     QTime time;
+    qint32 offset;
     for (int n = 0; n < objList.length(); ++n)
     {
         objinfo = objList[n];
@@ -448,7 +449,8 @@ void Telemetry::processPeriodicUpdates()
             if (objinfo.timeToNextUpdateMs <= 0)
             {
                 // Reset timer
-                objinfo.timeToNextUpdateMs = objinfo.updatePeriodMs;
+                offset = (-objinfo.timeToNextUpdateMs) % objinfo.updatePeriodMs;
+                objinfo.timeToNextUpdateMs = objinfo.updatePeriodMs - offset;
                 // Send object
                 time.start();
                 processObjectUpdates(objinfo.obj, EV_UPDATED_MANUAL, true, false);

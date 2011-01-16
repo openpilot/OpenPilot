@@ -55,8 +55,6 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
     //main layout
     options_page->setupUi(optionsPageWidget);
 
-    connect(options_page->minValue, SIGNAL(valueChanged(double)), this, SLOT(on_rangeMin_valueChanged(double)));
-    connect(options_page->maxValue, SIGNAL(valueChanged(double)), this, SLOT(on_rangeMax_valueChanged(double)));
 
     // Restore the contents from the settings:
     options_page->svgSourceFile->setExpectedKind(Utils::PathChooser::File);
@@ -65,6 +63,10 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
     options_page->svgSourceFile->setPath(m_config->getDialFile());
     options_page->minValue->setValue(m_config->getMin());
     options_page->maxValue->setValue(m_config->getMax());
+    // Do this by hand (in case value is zero, no signal would
+    // be sent!
+    on_rangeMin_valueChanged(m_config->getMin());
+    on_rangeMax_valueChanged(m_config->getMax());
     options_page->greenMin->setValue(m_config->getGreenMin());
     options_page->greenMax->setValue(m_config->getGreenMax());
     options_page->yellowMin->setValue(m_config->getYellowMin());
@@ -98,6 +100,8 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
 
     connect(options_page->objectName, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_objectName_currentIndexChanged(QString)));
     connect(options_page->fontPicker, SIGNAL(clicked()), this, SLOT(on_fontPicker_clicked()));
+    connect(options_page->minValue, SIGNAL(valueChanged(double)), this, SLOT(on_rangeMin_valueChanged(double)));
+    connect(options_page->maxValue, SIGNAL(valueChanged(double)), this, SLOT(on_rangeMax_valueChanged(double)));
 
     return optionsPageWidget;
 }
@@ -108,9 +112,16 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
  */
 void LineardialGadgetOptionsPage::on_rangeMin_valueChanged(double val)
 {
+    options_page->maxValue->setMinimum(val);
+
     options_page->greenMin->setMinimum(val);
     options_page->yellowMin->setMinimum(val);
     options_page->redMin->setMinimum(val);
+
+    options_page->greenMax->setMinimum(val);
+    options_page->yellowMax->setMinimum(val);
+    options_page->redMax->setMinimum(val);
+
 }
 
 /**
@@ -119,9 +130,16 @@ void LineardialGadgetOptionsPage::on_rangeMin_valueChanged(double val)
  */
 void LineardialGadgetOptionsPage::on_rangeMax_valueChanged(double val)
 {
+    options_page->minValue->setMaximum(val);
+
+
     options_page->greenMax->setMaximum(val);
     options_page->yellowMax->setMaximum(val);
     options_page->redMax->setMaximum(val);
+
+    options_page->greenMin->setMaximum(val);
+    options_page->yellowMin->setMaximum(val);
+    options_page->redMin->setMaximum(val);
 }
 
 

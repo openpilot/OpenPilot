@@ -1,11 +1,11 @@
 <xml>
 	<object name="StabilizationSettings" singleinstance="true" settings="true">
 		<description>PID settings used by the Stabilization module to combine the @ref AttitudeActual and @ref AttitudeDesired to compute @ref ActuatorDesired</description>
-		<field name="RollMax" units="Degrees" type="uint8" elements="1" defaultvalue="35"/>
-		<field name="PitchMax" units="Degrees" type="uint8" elements="1" defaultvalue="35"/>
-		<field name="YawMax" units="Degrees" type="uint8" elements="1" defaultvalue="35"/>
-		<field name="ManualRate" units="Degrees/sec" type="float" elements="3" elementnames="Roll,Pitch,Yaw" defaultvalue="150,150,150"/>
-		<field name="MaximumRate" units="Degrees/sec" type="float" elements="3" elementnames="Roll,Pitch,Yaw" defaultvalue="300,300,300"/>
+		<field name="RollMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>
+		<field name="PitchMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>
+		<field name="YawMax" units="degrees" type="uint8" elements="1" defaultvalue="35"/>
+		<field name="ManualRate" units="degrees/sec" type="float" elements="3" elementnames="Roll,Pitch,Yaw" defaultvalue="150,150,150"/>
+		<field name="MaximumRate" units="degrees/sec" type="float" elements="3" elementnames="Roll,Pitch,Yaw" defaultvalue="300,300,300"/>
 		
 		<field name="RollRatePI" units="" type="float" elements="2" elementnames="Kp,Ki,ILimit" defaultvalue="0.0015,0,0.5"/>
 		<field name="PitchRatePI" units="" type="float" elements="2" elementnames="Kp,Ki,ILimit" defaultvalue="0.0015,0,0.5"/>

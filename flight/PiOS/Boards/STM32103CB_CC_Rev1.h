@@ -134,7 +134,8 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //
 // See also pios_board.c
 //-------------------------
-#define PIOS_SPI_OP				0
+#define PIOS_SPI_FLASH				0
+#define PIOS_SPI_ACCEL				0
 
 //-------------------------
 // PIOS_USART
@@ -289,10 +290,18 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //-------------------------
 // GPIO
 //-------------------------
-#define PIOS_GPIO_PORTS                         {  }
-#define PIOS_GPIO_PINS                          {  }
-#define PIOS_GPIO_CLKS                          {  }
-#define PIOS_GPIO_NUM                           0
+#define PIOS_GPIO_1_PORT			GPIOA
+#define PIOS_GPIO_1_PIN				GPIO_Pin_7
+#define PIOS_GPIO_1_GPIO_CLK			RCC_APB2Periph_GPIOA
+
+#define PIOS_GPIO_PORTS				{ PIOS_GPIO_1_PORT }
+#define PIOS_GPIO_PINS				{ PIOS_GPIO_1_PIN }
+#define PIOS_GPIO_CLKS				{ PIOS_GPIO_1_GPIO_CLK }
+#define PIOS_GPIO_NUM				1
+
+#define PIOS_FLASH_ENABLE                       PIOS_GPIO_Off(0)
+#define PIOS_FLASH_DISABLE                      PIOS_GPIO_On(0)
+
 
 //-------------------------
 // USB

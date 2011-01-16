@@ -135,10 +135,10 @@ static void manualControlTask(void *parameters)
 		if (!ManualControlCommandReadOnly(&cmd)) {
 			// Check settings, if error raise alarm
 			if (settings.Roll >= MANUALCONTROLSETTINGS_ROLL_NONE ||
-			    settings.Pitch >= MANUALCONTROLSETTINGS_PITCH_NONE ||
-			    settings.Yaw >= MANUALCONTROLSETTINGS_YAW_NONE ||
-			    settings.Throttle >= MANUALCONTROLSETTINGS_THROTTLE_NONE ||
-			    settings.FlightMode >= MANUALCONTROLSETTINGS_FLIGHTMODE_NONE) {
+				settings.Pitch >= MANUALCONTROLSETTINGS_PITCH_NONE ||
+				settings.Yaw >= MANUALCONTROLSETTINGS_YAW_NONE ||
+				settings.Throttle >= MANUALCONTROLSETTINGS_THROTTLE_NONE ||
+				settings.FlightMode >= MANUALCONTROLSETTINGS_FLIGHTMODE_NONE) {
 				AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
 				cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;
 				cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
@@ -165,37 +165,37 @@ static void manualControlTask(void *parameters)
 
 			// Calculate pitch command in range +1 to -1
 			cmd.Pitch = scaleChannel(cmd.Channel[settings.Pitch], settings.ChannelMax[settings.Pitch],
-						 settings.ChannelMin[settings.Pitch], settings.ChannelNeutral[settings.Pitch]);
+						settings.ChannelMin[settings.Pitch], settings.ChannelNeutral[settings.Pitch]);
 
 			// Calculate yaw command in range +1 to -1
 			cmd.Yaw = scaleChannel(cmd.Channel[settings.Yaw], settings.ChannelMax[settings.Yaw],
-					       settings.ChannelMin[settings.Yaw], settings.ChannelNeutral[settings.Yaw]);
+						settings.ChannelMin[settings.Yaw], settings.ChannelNeutral[settings.Yaw]);
 
 			// Calculate throttle command in range +1 to -1
 			cmd.Throttle = scaleChannel(cmd.Channel[settings.Throttle], settings.ChannelMax[settings.Throttle],
-						    settings.ChannelMin[settings.Throttle], settings.ChannelNeutral[settings.Throttle]);
+						settings.ChannelMin[settings.Throttle], settings.ChannelNeutral[settings.Throttle]);
 
 			if (settings.Accessory1 != MANUALCONTROLSETTINGS_ACCESSORY1_NONE)
 				cmd.Accessory1 = scaleChannel(cmd.Channel[settings.Accessory1], settings.ChannelMax[settings.Accessory1],
-							      settings.ChannelMin[settings.Accessory1], settings.ChannelNeutral[settings.Accessory1]);
+						settings.ChannelMin[settings.Accessory1], settings.ChannelNeutral[settings.Accessory1]);
 			else
 				cmd.Accessory1 = 0;
 
 			if (settings.Accessory2 != MANUALCONTROLSETTINGS_ACCESSORY2_NONE)
 				cmd.Accessory2 = scaleChannel(cmd.Channel[settings.Accessory2], settings.ChannelMax[settings.Accessory2],
-							      settings.ChannelMin[settings.Accessory2], settings.ChannelNeutral[settings.Accessory2]);
+						settings.ChannelMin[settings.Accessory2], settings.ChannelNeutral[settings.Accessory2]);
 			else
 				cmd.Accessory2 = 0;
 
 			if (settings.Accessory3 != MANUALCONTROLSETTINGS_ACCESSORY3_NONE)
 				cmd.Accessory3 = scaleChannel(cmd.Channel[settings.Accessory3], settings.ChannelMax[settings.Accessory3],
-							      settings.ChannelMin[settings.Accessory3], settings.ChannelNeutral[settings.Accessory3]);
+						settings.ChannelMin[settings.Accessory3], settings.ChannelNeutral[settings.Accessory3]);
 			else
 				cmd.Accessory3 = 0;
 
 			// Update flight mode
 			flightMode = scaleChannel(cmd.Channel[settings.FlightMode], settings.ChannelMax[settings.FlightMode],
-						  settings.ChannelMin[settings.FlightMode], settings.ChannelNeutral[settings.FlightMode]);
+						settings.ChannelMin[settings.FlightMode], settings.ChannelNeutral[settings.FlightMode]);
 
 			if (flightMode < -FLIGHT_MODE_LIMIT) {       // Position 1
 				for(int i = 0; i < 3; i++) {
@@ -255,8 +255,8 @@ static void manualControlTask(void *parameters)
 		// Implement hysteresis loop on connection status
 		// Must check both Max and Min in case they reversed
 		if (!ManualControlCommandReadOnly(&cmd) &&
-		    cmd.Channel[settings.Throttle] < settings.ChannelMax[settings.Throttle] - CONNECTION_OFFSET &&
-		    cmd.Channel[settings.Throttle] < settings.ChannelMin[settings.Throttle] - CONNECTION_OFFSET) {
+			cmd.Channel[settings.Throttle] < settings.ChannelMax[settings.Throttle] - CONNECTION_OFFSET &&
+			cmd.Channel[settings.Throttle] < settings.ChannelMin[settings.Throttle] - CONNECTION_OFFSET) {
 			if (disconnected_count++ > 10) {
 				connection_state = DISCONNECTED;
 				connected_count = 0;
@@ -296,78 +296,78 @@ static void manualControlTask(void *parameters)
 
 			// Look for state changes and write in newArmState
 			if (settings.Arming == MANUALCONTROLSETTINGS_ARMING_NONE) {
-			    // No cahnnel assigned to arming -> arm imeediately when throttle is low
-			    newCmdArmed = MANUALCONTROLCOMMAND_ARMED_TRUE;
+				// No cahnnel assigned to arming -> arm imeediately when throttle is low
+				newCmdArmed = MANUALCONTROLCOMMAND_ARMED_TRUE;
 			} else {
-			    float armStickLevel;
-			    uint8_t channel = settings.Arming/2;    // 0=Channel1, 1=Channel1_Rev, 2=Channel2, ....
-			    bool reverse = (settings.Arming%2)==1;
-			    bool manualArm = false;
-			    bool manualDisarm = false;
+				float armStickLevel;
+				uint8_t channel = settings.Arming/2;    // 0=Channel1, 1=Channel1_Rev, 2=Channel2, ....
+				bool reverse = (settings.Arming%2)==1;
+				bool manualArm = false;
+				bool manualDisarm = false;
 
-			    armStickLevel = scaleChannel(cmd.Channel[channel], settings.ChannelMax[channel],
-                        settings.ChannelMin[channel], settings.ChannelNeutral[channel]);
-			    if (reverse)
-			        armStickLevel =-armStickLevel;
+				armStickLevel = scaleChannel(cmd.Channel[channel], settings.ChannelMax[channel],
+						settings.ChannelMin[channel], settings.ChannelNeutral[channel]);
+				if (reverse)
+					armStickLevel =-armStickLevel;
 
-			    if (armStickLevel <= -0.90)
-                    manualArm = true;
-                else if (armStickLevel >= +0.90)
-                    manualDisarm = true;
+				if (armStickLevel <= -0.90)
+					manualArm = true;
+				else if (armStickLevel >= +0.90)
+					manualDisarm = true;
 
 				switch(armState) {
-                    case ARM_STATE_DISARMED:
-                        newCmdArmed = MANUALCONTROLCOMMAND_ARMED_FALSE;
-                        if (manualArm) {
-                            armedDisarmStart = lastSysTime;
-                            armState = ARM_STATE_ARMING_MANUAL;
-                        }
-                        break;
+				case ARM_STATE_DISARMED:
+					newCmdArmed = MANUALCONTROLCOMMAND_ARMED_FALSE;
+					if (manualArm) {
+						armedDisarmStart = lastSysTime;
+						armState = ARM_STATE_ARMING_MANUAL;
+					}
+					break;
 
-                    case ARM_STATE_ARMING_MANUAL:
-                        if (manualArm) {
-                            if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
-                                armState = ARM_STATE_ARMED;
-                        }
-                        else
-                            armState = ARM_STATE_DISARMED;
-                        break;
+				case ARM_STATE_ARMING_MANUAL:
+					if (manualArm) {
+						if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
+							armState = ARM_STATE_ARMED;
+					}
+					else
+						armState = ARM_STATE_DISARMED;
+					break;
 
-                    case ARM_STATE_ARMED:
-                        // When we get here, the throttle is low,
-                        // we go immediately to disarming due to timeout, also when the disarming mechanism is not enabled
-                        armedDisarmStart = lastSysTime;
-                        armState = ARM_STATE_DISARMING_TIMEOUT;
-                        newCmdArmed = MANUALCONTROLCOMMAND_ARMED_TRUE;
-                        break;
+				case ARM_STATE_ARMED:
+					// When we get here, the throttle is low,
+					// we go immediately to disarming due to timeout, also when the disarming mechanism is not enabled
+					armedDisarmStart = lastSysTime;
+					armState = ARM_STATE_DISARMING_TIMEOUT;
+					newCmdArmed = MANUALCONTROLCOMMAND_ARMED_TRUE;
+					break;
 
-                    case ARM_STATE_DISARMING_TIMEOUT:
-                        // We get here when armed while throttle low, even when the arming timeout is not enabled
-                        if (settings.ArmedTimeout != 0)
-                            if (timeDifferenceMs(armedDisarmStart, lastSysTime) > settings.ArmedTimeout)
-                                armState = ARM_STATE_DISARMED;
-                        // Switch to disarming due to manual control when needed
-                        if (manualDisarm) {
-                            armedDisarmStart = lastSysTime;
-                            armState = ARM_STATE_DISARMING_MANUAL;
-                        }
-                        break;
+				case ARM_STATE_DISARMING_TIMEOUT:
+					// We get here when armed while throttle low, even when the arming timeout is not enabled
+					if (settings.ArmedTimeout != 0)
+						if (timeDifferenceMs(armedDisarmStart, lastSysTime) > settings.ArmedTimeout)
+							armState = ARM_STATE_DISARMED;
+					// Switch to disarming due to manual control when needed
+					if (manualDisarm) {
+						armedDisarmStart = lastSysTime;
+						armState = ARM_STATE_DISARMING_MANUAL;
+					}
+					break;
 
-                    case ARM_STATE_DISARMING_MANUAL:
-                        if (manualDisarm) {
-                            if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
-                                armState = ARM_STATE_DISARMED;
-                        }
-                        else
-                            armState = ARM_STATE_ARMED;
-                        break;
-                }
+				case ARM_STATE_DISARMING_MANUAL:
+					if (manualDisarm) {
+						if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
+							armState = ARM_STATE_DISARMED;
+					}
+					else
+						armState = ARM_STATE_ARMED;
+					break;
+				}
 			}
-            // Update cmd object when needed
-            if (newCmdArmed != cmd.Armed) {
-                cmd.Armed = newCmdArmed;
-                ManualControlCommandSet(&cmd);
-            }
+			// Update cmd object when needed
+			if (newCmdArmed != cmd.Armed) {
+				cmd.Armed = newCmdArmed;
+				ManualControlCommandSet(&cmd);
+			}
 		} else {
 			// The throttle is not low, in case we where arming or disarming, abort
 			switch(armState) {

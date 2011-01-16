@@ -422,7 +422,7 @@ void OPDfuIni(uint8_t discover) {
 	dev.sizeOfDescription = SIZE_OF_DESCRIPTION;
 	dev.BL_Version = BOOTLOADER_VERSION;
 	dev.FW_Crc = CalcFirmCRC();
-	dev.devID = HW_VERSION;
+	dev.devID = (BOARD_TYPE << 8) | BOARD_REVISION;
 	dev.devType = HW_TYPE;
 	numberOfDevices = 1;
 	devicesTable[0] = dev;

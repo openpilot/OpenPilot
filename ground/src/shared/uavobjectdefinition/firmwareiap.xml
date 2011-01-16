@@ -3,8 +3,8 @@
         <description>Firmware IAP</description> 
         <field name="Command" units="" type="uint16" elements="1"/> 
         <field name="Description" units="" type="uint8" elements="100"/> 
-        <field name="HWVersion" units="" type="uint16" elements="1"/> 
-        <field name="Target" units="" type="uint8" elements="1"/> 
+        <field name="BoardRevision" units="" type="uint16" elements="1"/> 
+        <field name="BoardType" units="" type="uint8" elements="1"/> 
         <field name="ArmReset" units="" type="uint8" elements="1"/> 
         <field name="crc" units="" type="uint32" elements="1"/> 
         <access gcs="readwrite" flight="readwrite"/> 

@@ -69,9 +69,14 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 // BOOTLOADER_SETTINGS
 //------------------------
 
-#define FUNC_ID				1
-#define HW_VERSION			01
+//#define FUNC_ID				1
+//#define HW_VERSION			01
+
 #define BOOTLOADER_VERSION	0
+#define BOARD_TYPE		0x01  // OpenPilot board
+#define BOARD_REVISION		0x01  // Beta version
+//#define HW_VERSION	(BOARD_TYPE << 8) | BOARD_REVISION
+
 #define MEM_SIZE			524288 //512K
 #define SIZE_OF_DESCRIPTION	(uint8_t) 100
 #define START_OF_USER_CODE	(uint32_t)0x08005000//REMEMBER SET ALSO IN link_stm32f10x_HD_BL.ld

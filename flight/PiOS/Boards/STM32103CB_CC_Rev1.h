@@ -60,9 +60,14 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //------------------------
 // BOOTLOADER_SETTINGS
 //------------------------
-#define FUNC_ID				2
-#define HW_VERSION			69
+//#define FUNC_ID				2
+//#define HW_VERSION			69
+
 #define BOOTLOADER_VERSION	0
+#define BOARD_TYPE		0x04
+#define BOARD_REVISION		0x01
+//#define HW_VERSION	(BOARD_TYPE << 8) | BOARD_REVISION
+
 #define MEM_SIZE			0x20000 //128K
 #define SIZE_OF_DESCRIPTION	100
 #define START_OF_USER_CODE	(uint32_t)0x08002000

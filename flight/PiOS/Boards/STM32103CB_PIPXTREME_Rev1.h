@@ -62,9 +62,9 @@ TIM8  |           |           |           |
 //------------------------
 // BOOTLOADER_SETTINGS
 //------------------------
-#define FUNC_ID				3
-#define HW_VERSION			21
 #define BOOTLOADER_VERSION	0
+#define BOARD_TYPE		0x03
+#define BOARD_REVISION		0x01
 #define MEM_SIZE			((uint32_t)(*((volatile uint16_t *)(0x1FFFF7E0))) * 1024 - 1024) //128K
 #define SIZE_OF_DESCRIPTION	100
 #define START_OF_USER_CODE	(uint32_t)0x08003000

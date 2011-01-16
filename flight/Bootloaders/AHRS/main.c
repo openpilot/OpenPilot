@@ -160,7 +160,7 @@ void process_spi_request(void) {
 		//PIOS_LED_On(LED1);
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_VERSIONS);
 		user_tx_v0.payload.user.v.rsp.versions.bl_version = BOOTLOADER_VERSION;
-		user_tx_v0.payload.user.v.rsp.versions.hw_version = HW_VERSION;
+		user_tx_v0.payload.user.v.rsp.versions.hw_version = (BOARD_TYPE << 8) | BOARD_REVISION;
 		user_tx_v0.payload.user.v.rsp.versions.fw_crc = Fw_crc;
 		lfsm_user_set_tx_v0(&user_tx_v0);
 		break;

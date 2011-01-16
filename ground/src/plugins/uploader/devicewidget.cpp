@@ -88,17 +88,17 @@ void deviceWidget::populate()
     devicePic->setSharedRenderer(new QSvgRenderer());
 
     switch (id) {
-    case 1:
-        devicePic->renderer()->load(QString(":/uploader/images/deviceID-1.svg"));
+    case 0x0101:
+        devicePic->renderer()->load(QString(":/uploader/images/deviceID-0101.svg"));
         break;
-    case 21:
-        devicePic->renderer()->load(QString(":/uploader/images/deviceID-21.svg"));
+    case 0x0301:
+        devicePic->renderer()->load(QString(":/uploader/images/deviceID-0301.svg"));
         break;
-    case 42:
-        devicePic->renderer()->load(QString(":/uploader/images/deviceID-42.svg"));
+    case 0x0401:
+        devicePic->renderer()->load(QString(":/uploader/images/deviceID-0401.svg"));
         break;
-    case 69:
-        devicePic->renderer()->load(QString(":/uploader/images/deviceID-69.svg"));
+    case 0x0201:
+        devicePic->renderer()->load(QString(":/uploader/images/deviceID-0201.svg"));
         break;
     default:
         break;

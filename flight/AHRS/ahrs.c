@@ -1063,7 +1063,7 @@ void firmwareiapobj_callback(AhrsObjHandle obj)
 	if(firmwareIAPObj.ArmReset==1)
 	{
 
-		if((firmwareIAPObj.Target==FUNC_ID) || (firmwareIAPObj.Target==0xFF))
+		if((firmwareIAPObj.BoardType==BOARD_TYPE) || (firmwareIAPObj.BoardType==0xFF))
 		{
 
 			++reset_count;
@@ -1075,11 +1075,11 @@ void firmwareiapobj_callback(AhrsObjHandle obj)
 			}
 		}
 	}
-	else if(firmwareIAPObj.Target==FUNC_ID && firmwareIAPObj.crc!=iap_calc_crc())
+	else if(firmwareIAPObj.BoardType==BOARD_TYPE && firmwareIAPObj.crc!=iap_calc_crc())
 	{
 		read_description(firmwareIAPObj.Description);
 		firmwareIAPObj.crc=iap_calc_crc();
-		firmwareIAPObj.HWVersion=HW_VERSION;
+		firmwareIAPObj.BoardRevision=BOARD_REVISION;
 		FirmwareIAPObjSet(&firmwareIAPObj);
 	}
 }

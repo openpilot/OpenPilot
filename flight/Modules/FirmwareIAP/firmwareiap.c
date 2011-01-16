@@ -100,9 +100,9 @@ static void resetTask(void *parameters);
 
 int32_t FirmwareIAPInitialize()
 {
-	data.Target=FUNC_ID;
+	data.BoardType= BOARD_TYPE;
 	read_description(data.Description);
-	data.HWVersion=HW_VERSION;
+	data.BoardRevision= BOARD_REVISION;
 	data.ArmReset=0;
 	data.crc = 0;
 	FirmwareIAPObjSet( &data );
@@ -131,10 +131,10 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
 		this_time = get_time();
         delta = this_time - last_time;
         last_time = this_time;
-        if((data.Target==FUNC_ID)&&(data.crc != iap_calc_crc()))
+        if((data.BoardType==BOARD_TYPE)&&(data.crc != iap_calc_crc()))
         {
         	read_description(data.Description);
-        	data.HWVersion=HW_VERSION;
+        	data.BoardRevision=BOARD_REVISION;
         	data.crc = iap_calc_crc();
         	FirmwareIAPObjSet( &data );
         }
@@ -246,7 +246,7 @@ static void resetTask(void *parameters)
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1) {
-		data.Target=0xFF;
+		data.BoardType=0xFF;
 		data.ArmReset=1;
 		data.crc=count;
 		FirmwareIAPObjSet(&data);

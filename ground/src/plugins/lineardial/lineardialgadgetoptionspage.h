@@ -64,6 +64,8 @@ private:
 private slots:
     void on_fontPicker_clicked();
     void on_objectName_currentIndexChanged(QString val);
+    void on_rangeMin_valueChanged(double val);
+    void on_rangeMax_valueChanged(double val);
 
 };
 

@@ -55,6 +55,9 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
     //main layout
     options_page->setupUi(optionsPageWidget);
 
+    connect(options_page->minValue, SIGNAL(valueChanged(double)), this, SLOT(on_rangeMin_valueChanged(double)));
+    connect(options_page->maxValue, SIGNAL(valueChanged(double)), this, SLOT(on_rangeMax_valueChanged(double)));
+
     // Restore the contents from the settings:
     options_page->svgSourceFile->setExpectedKind(Utils::PathChooser::File);
     options_page->svgSourceFile->setPromptDialogFilter(tr("SVG image (*.svg)"));
@@ -100,6 +103,29 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
 }
 
 /**
+ * Used to make sure the green/yellow/red ranges are consistent
+ * with the overall dial range
+ */
+void LineardialGadgetOptionsPage::on_rangeMin_valueChanged(double val)
+{
+    options_page->greenMin->setMinimum(val);
+    options_page->yellowMin->setMinimum(val);
+    options_page->redMin->setMinimum(val);
+}
+
+/**
+ * Used to make sure the green/yellow/red ranges are consistent
+ * with the overall dial range
+ */
+void LineardialGadgetOptionsPage::on_rangeMax_valueChanged(double val)
+{
+    options_page->greenMax->setMaximum(val);
+    options_page->yellowMax->setMaximum(val);
+    options_page->redMax->setMaximum(val);
+}
+
+
+/**
  * Called when the user presses apply or OK.
  *
  * Saves the current values
@@ -108,7 +134,9 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
 void LineardialGadgetOptionsPage::apply()
 {
     m_config->setDialFile(options_page->svgSourceFile->path());
-    m_config->setRange(options_page->minValue->value(),options_page->maxValue->value());
+    double rangeMin = options_page->minValue->value();
+    double rangeMax = options_page->maxValue->value();
+    m_config->setRange(rangeMin,rangeMax);
     m_config->setGreenRange(options_page->greenMin->value(),options_page->greenMax->value());
     m_config->setYellowRange(options_page->yellowMin->value(),options_page->yellowMax->value());
     m_config->setRedRange(options_page->redMin->value(),options_page->redMax->value());

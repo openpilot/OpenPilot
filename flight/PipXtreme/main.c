@@ -87,8 +87,8 @@ volatile uint32_t       uptime_ms;
 volatile uint16_t       second_tick_timer;
 volatile bool           second_tick;
 
-volatile int32_t        temp_adc;
-volatile int32_t        psu_adc;
+//volatile int32_t        temp_adc;
+//volatile int32_t        psu_adc;
 
 // *****************************************************************************
 
@@ -259,10 +259,10 @@ void TIMER_INT_FUNC(void)
 			// ***********
 
 			// read the chip temperature
-			temp_adc = PIOS_ADC_PinGet(0);
+//			temp_adc = PIOS_ADC_PinGet(0);
 
 			// read the psu voltage
-			psu_adc = PIOS_ADC_PinGet(1);
+//			psu_adc = PIOS_ADC_PinGet(1);
 
 			// ***********
 
@@ -560,8 +560,8 @@ int main()
 
     reset_addr = 0;
 
-    temp_adc = -1;
-    psu_adc = -1;
+//    temp_adc = -1;
+//    psu_adc = -1;
 
     API_Mode = FALSE;
 //      API_Mode = TRUE;			// TEST ONLY
@@ -594,7 +594,7 @@ int main()
     PIOS_COM_Init();
 
     // ADC system
-    PIOS_ADC_Init();
+//    PIOS_ADC_Init();
 
     // SPI link to master
     PIOS_SPI_Init();

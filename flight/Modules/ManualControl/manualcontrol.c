@@ -290,72 +290,84 @@ static void manualControlTask(void *parameters)
 		// Arming and Disarming mechanism
 		if (cmd.Throttle < 0) {
 			// Throttle is low, in this condition the arming state could change
-			float armStickLevel = cmd.Roll;
-			bool manualArm = false;
-			bool manualDisarm = false;
+
 			uint8_t newCmdArmed = cmd.Armed;
 			static portTickType armedDisarmStart;
 
-			if (armStickLevel <= -0.90)
-				manualArm = true;
-			else if (armStickLevel >= +0.90)
-				manualDisarm = true;
-
-
 			// Look for state changes and write in newArmState
-			switch(armState) {
-				case ARM_STATE_DISARMED:
-				    newCmdArmed = MANUALCONTROLCOMMAND_ARMED_FALSE;
-					if (manualArm) {
-						armedDisarmStart = lastSysTime;
-						armState = ARM_STATE_ARMING_MANUAL;
-					}
-					break;
+			if (settings.Arming == MANUALCONTROLSETTINGS_ARMING_NONE) {
+			    // No cahnnel assigned to arming -> arm imeediately when throttle is low
+			    newCmdArmed = MANUALCONTROLCOMMAND_ARMED_TRUE;
+			} else {
+			    float armStickLevel;
+			    uint8_t channel = settings.Arming/2;    // 0=Channel1, 1=Channel1_Rev, 2=Channel2, ....
+			    bool reverse = (settings.Arming%2)==1;
+			    bool manualArm = false;
+			    bool manualDisarm = false;
 
-				case ARM_STATE_ARMING_MANUAL:
-					if (manualArm) {
-						if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
-						    armState = ARM_STATE_ARMED;
-					}
-					else
-					    armState = ARM_STATE_DISARMED;
-					break;
+			    armStickLevel = scaleChannel(cmd.Channel[channel], settings.ChannelMax[channel],
+                        settings.ChannelMin[channel], settings.ChannelNeutral[channel]);
+			    if (reverse)
+			        armStickLevel =-armStickLevel;
 
-				case ARM_STATE_ARMED:
-					// When we get here, the throttle is low,
-					// we go immediately to disarming due to timeout, also when the disarming mechanism is not enabled
-					armedDisarmStart = lastSysTime;
-					armState = ARM_STATE_DISARMING_TIMEOUT;
-					newCmdArmed = MANUALCONTROLCOMMAND_ARMED_TRUE;
-					break;
+			    if (armStickLevel <= -0.90)
+                    manualArm = true;
+                else if (armStickLevel >= +0.90)
+                    manualDisarm = true;
 
-				case ARM_STATE_DISARMING_TIMEOUT:
-					// We get here when armed while throttle low, even when the arming timeout is not enabled
-					if (settings.ArmedTimeout != 0)
-						if (timeDifferenceMs(armedDisarmStart, lastSysTime) > settings.ArmedTimeout)
-						    armState = ARM_STATE_DISARMED;
-					// Switch to disarming due to manual control when needed
-					if (manualDisarm) {
-						armedDisarmStart = lastSysTime;
-						armState = ARM_STATE_DISARMING_MANUAL;
-					}
-					break;
+				switch(armState) {
+                    case ARM_STATE_DISARMED:
+                        newCmdArmed = MANUALCONTROLCOMMAND_ARMED_FALSE;
+                        if (manualArm) {
+                            armedDisarmStart = lastSysTime;
+                            armState = ARM_STATE_ARMING_MANUAL;
+                        }
+                        break;
 
-				case ARM_STATE_DISARMING_MANUAL:
-					if (manualDisarm) {
-						if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
-						    armState = ARM_STATE_DISARMED;
-					}
-					else
-					    armState = ARM_STATE_ARMED;
-					break;
+                    case ARM_STATE_ARMING_MANUAL:
+                        if (manualArm) {
+                            if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
+                                armState = ARM_STATE_ARMED;
+                        }
+                        else
+                            armState = ARM_STATE_DISARMED;
+                        break;
+
+                    case ARM_STATE_ARMED:
+                        // When we get here, the throttle is low,
+                        // we go immediately to disarming due to timeout, also when the disarming mechanism is not enabled
+                        armedDisarmStart = lastSysTime;
+                        armState = ARM_STATE_DISARMING_TIMEOUT;
+                        newCmdArmed = MANUALCONTROLCOMMAND_ARMED_TRUE;
+                        break;
+
+                    case ARM_STATE_DISARMING_TIMEOUT:
+                        // We get here when armed while throttle low, even when the arming timeout is not enabled
+                        if (settings.ArmedTimeout != 0)
+                            if (timeDifferenceMs(armedDisarmStart, lastSysTime) > settings.ArmedTimeout)
+                                armState = ARM_STATE_DISARMED;
+                        // Switch to disarming due to manual control when needed
+                        if (manualDisarm) {
+                            armedDisarmStart = lastSysTime;
+                            armState = ARM_STATE_DISARMING_MANUAL;
+                        }
+                        break;
+
+                    case ARM_STATE_DISARMING_MANUAL:
+                        if (manualDisarm) {
+                            if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
+                                armState = ARM_STATE_DISARMED;
+                        }
+                        else
+                            armState = ARM_STATE_ARMED;
+                        break;
+                }
 			}
-			// Update cmd object when needed
-			if (newCmdArmed != cmd.Armed) {
-			    cmd.Armed = newCmdArmed;
-				ManualControlCommandSet(&cmd);
-			}
-			
+            // Update cmd object when needed
+            if (newCmdArmed != cmd.Armed) {
+                cmd.Armed = newCmdArmed;
+                ManualControlCommandSet(&cmd);
+            }
 		} else {
 			// The throttle is not low, in case we where arming or disarming, abort
 			switch(armState) {
@@ -371,6 +383,7 @@ static void manualControlTask(void *parameters)
 					break;
 			}
 		}
+		// End of arming/disarming
 
 
 

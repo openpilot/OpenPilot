@@ -57,7 +57,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Telemetry ManualControl Stabilization
+MODULES =  Telemetry CCAttitude
 #Actuator Telemetry ManualControl Stabilization FirmwareIAP
 
 #MODULES = Telemetry Example

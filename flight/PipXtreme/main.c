@@ -686,13 +686,13 @@ int main()
     switch (saved_settings.frequency_band)
     {
         case freqBand_434MHz:
-            if (saved_settings.frequency_Hz == 0xffffffff)
+//            if (saved_settings.frequency_Hz == 0xffffffff)
             {
                 saved_settings.frequency_Hz = 434000000;
                 saved_settings.min_frequency_Hz = 434000000 - 2000000;
                 saved_settings.max_frequency_Hz = 434000000 + 2000000;
             }
-            if (saved_settings.max_rf_bandwidth == 0xffffffff)
+//            if (saved_settings.max_rf_bandwidth == 0xffffffff)
             {
     //          saved_settings.max_rf_bandwidth = 500;
     //          saved_settings.max_rf_bandwidth = 1000;
@@ -708,7 +708,7 @@ int main()
                 saved_settings.max_rf_bandwidth = 128000;
     //          saved_settings.max_rf_bandwidth = 192000;
             }
-            if (saved_settings.max_tx_power == 0xff)
+//            if (saved_settings.max_tx_power == 0xff)
             {
     //          saved_settings.max_tx_power = 0;        // +1dBm ... 1.25mW
     //          saved_settings.max_tx_power = 1;        // +2dBm ... 1.6mW
@@ -722,13 +722,13 @@ int main()
             break;
 
         case freqBand_868MHz:
-            if (saved_settings.frequency_Hz == 0xffffffff)
+//            if (saved_settings.frequency_Hz == 0xffffffff)
             {
                 saved_settings.frequency_Hz = 868000000;
                 saved_settings.min_frequency_Hz = 868000000 - 10000000;
                 saved_settings.max_frequency_Hz = 868000000 + 10000000;
             }
-            if (saved_settings.max_rf_bandwidth == 0xffffffff)
+//            if (saved_settings.max_rf_bandwidth == 0xffffffff)
             {
     //          saved_settings.max_rf_bandwidth = 500;
     //          saved_settings.max_rf_bandwidth = 1000;
@@ -744,7 +744,7 @@ int main()
                 saved_settings.max_rf_bandwidth = 128000;
     //          saved_settings.max_rf_bandwidth = 192000;
             }
-            if (saved_settings.max_tx_power == 0xff)
+//            if (saved_settings.max_tx_power == 0xff)
             {
     //          saved_settings.max_tx_power = 0;        // +1dBm ... 1.25mW
     //          saved_settings.max_tx_power = 1;        // +2dBm ... 1.6mW
@@ -758,13 +758,13 @@ int main()
             break;
 
         case freqBand_915MHz:
-            if (saved_settings.frequency_Hz == 0xffffffff)
+//            if (saved_settings.frequency_Hz == 0xffffffff)
             {
                 saved_settings.frequency_Hz = 915000000;
                 saved_settings.min_frequency_Hz = 915000000 - 13000000;
                 saved_settings.max_frequency_Hz = 915000000 + 13000000;
             }
-            if (saved_settings.max_rf_bandwidth == 0xffffffff)
+//            if (saved_settings.max_rf_bandwidth == 0xffffffff)
             {
     //          saved_settings.max_rf_bandwidth = 500;
     //          saved_settings.max_rf_bandwidth = 1000;
@@ -780,7 +780,7 @@ int main()
                 saved_settings.max_rf_bandwidth = 128000;
     //          saved_settings.max_rf_bandwidth = 192000;
             }
-            if (saved_settings.max_tx_power == 0xff)
+//            if (saved_settings.max_tx_power == 0xff)
             {
     //          saved_settings.max_tx_power = 0;        // +1dBm ... 1.25mW
     //          saved_settings.max_tx_power = 1;        // +2dBm ... 1.6mW

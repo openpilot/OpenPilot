@@ -222,7 +222,6 @@ TIM8  |           |           |           |
 //#define PIOS_ADC_ADCCLK					RCC_PCLK2_Div4	// ADC clock = PCLK2/4
 //#define PIOS_ADC_ADCCLK					RCC_PCLK2_Div6	// ADC clock = PCLK2/6
 #define PIOS_ADC_ADCCLK						RCC_PCLK2_Div8	// ADC clock = PCLK2/8
-#define PIOS_ADC_PCLK2                          RCC_HCLK_Div16
 //#define PIOS_ADC_SAMPLE_TIME				ADC_SampleTime_1Cycles5
 //#define PIOS_ADC_SAMPLE_TIME				ADC_SampleTime_7Cycles5
 //#define PIOS_ADC_SAMPLE_TIME				ADC_SampleTime_13Cycles5
@@ -235,8 +234,9 @@ TIM8  |           |           |           |
 						/* With an ADCCLK = 14 MHz and a sampling time of 293.5 cycles: */
 						/* Tconv = 239.5 + 12.5 = 252 cycles = 18�s */
 						/* (1 / (ADCCLK / CYCLES)) = Sample Time (�S) */
-#define PIOS_ADC_IRQ_PRIO					3
+#define PIOS_ADC_IRQ_PRIO                       3
 #define PIOS_ADC_MAX_OVERSAMPLING               1
+#define PIOS_ADC_RATE                           (72.0e6 / 1 / 8 / 252 / (PIOS_ADC_NUM_ADC_CHANNELS >> PIOS_ADC_USE_ADC2))
 
 // *****************************************************************
 // GPIO output pins

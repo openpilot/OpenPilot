@@ -324,7 +324,7 @@ const struct pios_adc_cfg pios_adc_cfg = {
 			.flags   = (DMA1_FLAG_TC1 | DMA1_FLAG_TE1 | DMA1_FLAG_HT1 | DMA1_FLAG_GL1),
 			.init    = {
 				.NVIC_IRQChannel                   = DMA1_Channel1_IRQn,
-				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
 				.NVIC_IRQChannelSubPriority        = 0,
 				.NVIC_IRQChannelCmd                = ENABLE,
 			},
@@ -339,7 +339,7 @@ const struct pios_adc_cfg pios_adc_cfg = {
 				.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word,
 				.DMA_MemoryDataSize     = DMA_MemoryDataSize_Word,
 				.DMA_Mode               = DMA_Mode_Circular,
-				.DMA_Priority           = DMA_Priority_High,
+				.DMA_Priority           = DMA_Priority_Low,
 				.DMA_M2M                = DMA_M2M_Disable,
 			},
 		}

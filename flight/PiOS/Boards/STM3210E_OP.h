@@ -359,7 +359,6 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_ADC_USE_ADC2                       1
 #define PIOS_ADC_CLOCK_FUNCTION                 RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1 | RCC_APB2Periph_ADC2, ENABLE)
 #define PIOS_ADC_ADCCLK                         RCC_PCLK2_Div8
-#define PIOS_ADC_PCLK2                          RCC_HCLK_Div16
                                                 /* RCC_PCLK2_Div2: ADC clock = PCLK2/2 */
                                                 /* RCC_PCLK2_Div4: ADC clock = PCLK2/4 */
                                                 /* RCC_PCLK2_Div6: ADC clock = PCLK2/6 */
@@ -370,7 +369,8 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
                                                 /* Tconv = 239.5 + 12.5 = 252 cycles = 18?s */
                                                 /* (1 / (ADCCLK / CYCLES)) = Sample Time (?S) */
 #define PIOS_ADC_IRQ_PRIO                       PIOS_IRQ_PRIO_LOW
-#define PIOS_ADC_MAX_OVERSAMPLING               1
+#define PIOS_ADC_MAX_OVERSAMPLING               10
+#define PIOS_ADC_RATE                           (72.0e6 / 1 / 8 / 252 / (PIOS_ADC_NUM_ADC_CHANNELS >> PIOS_ADC_USE_ADC2))
 
 //-------------------------
 // GPIO

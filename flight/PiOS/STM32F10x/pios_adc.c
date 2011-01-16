@@ -70,12 +70,14 @@ void PIOS_ADC_Init()
  */
 void PIOS_ADC_Config(uint32_t oversampling)
 {	
-	oversampling = (oversampling > PIOS_ADC_MAX_OVERSAMPLING) ? PIOS_ADC_MAX_OVERSAMPLING : oversampling;
-	pios_adc_devs[0].adc_oversample = oversampling;
+	pios_adc_devs[0].adc_oversample = (oversampling > PIOS_ADC_MAX_OVERSAMPLING) ? PIOS_ADC_MAX_OVERSAMPLING : oversampling;
 
 	ADC_DeInit(ADC1);
 	ADC_DeInit(ADC2);
-		
+	
+	/* Disable interrupts */
+	DMA_ITConfig(pios_adc_devs[0].cfg->dma.rx.channel, pios_adc_devs[0].cfg->dma.irq.flags, DISABLE);
+	
 	/* Enable ADC clocks */
 	PIOS_ADC_CLOCK_FUNCTION;
 	
@@ -92,7 +94,7 @@ void PIOS_ADC_Config(uint32_t oversampling)
 				 PIOS_ADC_TEMP_SENSOR_ADC_CHANNEL,
 				 PIOS_ADC_SAMPLE_TIME);
 #endif
-	
+	// return	
 	/* Configure ADCs */
 	ADC_InitTypeDef ADC_InitStructure;
 	ADC_StructInit(&ADC_InitStructure);
@@ -101,8 +103,7 @@ void PIOS_ADC_Config(uint32_t oversampling)
 	ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
 	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;
 	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
-	ADC_InitStructure.ADC_NbrOfChannel =
-	((PIOS_ADC_NUM_CHANNELS + 1) >> 1);
+	ADC_InitStructure.ADC_NbrOfChannel = ((PIOS_ADC_NUM_CHANNELS + 1) >> 1);
 	ADC_Init(ADC1, &ADC_InitStructure);
 	
 #if (PIOS_ADC_USE_ADC2)
@@ -113,8 +114,7 @@ void PIOS_ADC_Config(uint32_t oversampling)
 #endif
 	
 	RCC_ADCCLKConfig(PIOS_ADC_ADCCLK);
-	RCC_PCLK2Config(PIOS_ADC_PCLK2);
-	
+		
 	/* Enable ADC1->DMA request */
 	ADC_DMACmd(ADC1, ENABLE);
 	
@@ -133,10 +133,7 @@ void PIOS_ADC_Config(uint32_t oversampling)
 	ADC_StartCalibration(ADC2);
 	while (ADC_GetCalibrationStatus(ADC2)) ;
 #endif
-	
-	/* Disable interrupts */
-	DMA_ITConfig(pios_adc_devs[0].cfg->dma.rx.channel, pios_adc_devs[0].cfg->dma.irq.flags, DISABLE);
-
+		
 	/* Configure DMA channel */		
 	DMA_InitTypeDef dma_init = pios_adc_devs[0].cfg->dma.rx.init;	
 	dma_init.DMA_MemoryBaseAddr = (uint32_t) &pios_adc_devs[0].raw_data_buffer[0];

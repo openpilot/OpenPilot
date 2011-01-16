@@ -69,7 +69,7 @@ void PIOS_Board_Init(void) {
 	/* Initialize the PiOS library */
 	PIOS_COM_Init();
 	PIOS_Servo_Init();
-	PIOS_ADC_Init(1);
+	PIOS_ADC_Init();
 	PIOS_GPIO_Init();
 
 #if defined(PIOS_INCLUDE_PWM)
@@ -308,6 +308,59 @@ void PIOS_SPI_ahrs_irq_handler(void)
   /* Call into the generic code to handle the IRQ for this specific device */
   PIOS_SPI_IRQ_Handler(PIOS_OPAHRS_SPI);
 }
+
+/*
+ * ADC system
+ */
+#include "pios_adc_priv.h"
+extern void PIOS_ADC_handler(void);
+void DMA1_Channel1_IRQHandler() __attribute__ ((alias("PIOS_ADC_handler")));
+// Remap the ADC DMA handler to this one
+const struct pios_adc_cfg pios_adc_cfg = {
+	.dma = {
+		.ahb_clk  = RCC_AHBPeriph_DMA1,
+		.irq = {
+			.handler = PIOS_ADC_DMA_Handler,
+			.flags   = (DMA1_FLAG_TC1 | DMA1_FLAG_TE1 | DMA1_FLAG_HT1 | DMA1_FLAG_GL1),
+			.init    = {
+				.NVIC_IRQChannel                   = DMA1_Channel1_IRQn,
+				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+				.NVIC_IRQChannelSubPriority        = 0,
+				.NVIC_IRQChannelCmd                = ENABLE,
+			},
+		},
+		.rx = {
+			.channel = DMA1_Channel1,
+			.init    = {
+				.DMA_PeripheralBaseAddr = (uint32_t) & ADC1->DR,
+				.DMA_DIR                = DMA_DIR_PeripheralSRC,
+				.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
+				.DMA_MemoryInc          = DMA_MemoryInc_Enable,
+				.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word,
+				.DMA_MemoryDataSize     = DMA_MemoryDataSize_Word,
+				.DMA_Mode               = DMA_Mode_Circular,
+				.DMA_Priority           = DMA_Priority_High,
+				.DMA_M2M                = DMA_M2M_Disable,
+			},
+		}
+	}, 
+	.half_flag = DMA1_IT_HT1,
+	.full_flag = DMA1_IT_TC1,
+};
+
+struct pios_adc_dev pios_adc_devs[] = {
+	{
+		.cfg = &pios_adc_cfg,
+		.callback_function = NULL,
+	},
+};
+
+uint8_t pios_adc_num_devices = NELEMENTS(pios_adc_devs);
+
+void PIOS_ADC_handler() {
+	PIOS_ADC_DMA_Handler();
+}
+
 
 /*
  * Telemetry USART

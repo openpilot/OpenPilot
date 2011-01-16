@@ -594,7 +594,7 @@ int main()
     PIOS_COM_Init();
 
     // ADC system
-    PIOS_ADC_Init(1);
+    PIOS_ADC_Init();
 
     // SPI link to master
     PIOS_SPI_Init();

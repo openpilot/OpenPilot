@@ -486,7 +486,8 @@ int main()
 	/* IAP System Setup */
 	PIOS_IAP_Init();
 	/* ADC system */
-	PIOS_ADC_Init(adc_oversampling);
+	PIOS_ADC_Init();
+	PIOS_ADC_Config(adc_oversampling);
 	PIOS_ADC_SetCallback(adc_callback);
 
 	/* ADC buffer */
@@ -1038,7 +1039,7 @@ void settings_callback(AhrsObjHandle obj)
 	
 	if(settings.Downsampling != adc_oversampling) {
 		adc_oversampling = settings.Downsampling;
-		PIOS_ADC_Init(adc_oversampling);				
+		PIOS_ADC_Config(adc_oversampling);				
 	}	
 }
 

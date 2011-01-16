@@ -235,6 +235,7 @@ TIM8  |           |           |           |
 						/* Tconv = 239.5 + 12.5 = 252 cycles = 18�s */
 						/* (1 / (ADCCLK / CYCLES)) = Sample Time (�S) */
 #define PIOS_ADC_IRQ_PRIO					3
+#define PIOS_ADC_MAX_OVERSAMPLING               1
 
 // *****************************************************************
 // GPIO output pins

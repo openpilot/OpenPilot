@@ -28,10 +28,30 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_ADC)
+// Remap the ADC DMA handler to this one
+void PIOS_ADC_DMA_Handler();
+void DMA1_Channel1_IRQHandler() __attribute__ ((alias("PIOS_ADC_DMA_Handler")));
+
+
+// Private functions
+void PIOS_ADC_downsample_data();
+
+//! Where the raw data is stored
+volatile int16_t raw_data_buffer[PIOS_ADC_MAX_SAMPLES];	// Double buffer that DMA just used
+
+//! Various configuration settings
+struct {
+	volatile int16_t *valid_data_buffer;
+	volatile uint8_t adc_oversample;
+	int16_t fir_coeffs[PIOS_ADC_MAX_SAMPLES];
+} adc_config;
+
+//! Filter coefficients used in decimation.  Limited order so filter can't run between samples
+float downsampled_buffer[PIOS_ADC_NUM_PINS];
+
+static ADCCallback callback_function = (ADCCallback) NULL;
 
 /* Local Variables */
 static GPIO_TypeDef *ADC_GPIO_PORT[PIOS_ADC_NUM_PINS] = PIOS_ADC_PORTS;
@@ -41,82 +61,87 @@ static const uint32_t ADC_CHANNEL[PIOS_ADC_NUM_PINS] = PIOS_ADC_CHANNELS;
 static ADC_TypeDef *ADC_MAPPING[PIOS_ADC_NUM_PINS] = PIOS_ADC_MAPPING;
 static const uint32_t ADC_CHANNEL_MAPPING[PIOS_ADC_NUM_PINS] = PIOS_ADC_CHANNEL_MAPPING;
 
-/* The following two arrays are word aligned, so that DMA can transfer two hwords at once */
-static uint16_t adc_conversion_values[PIOS_ADC_NUM_CHANNELS] __attribute__ ((aligned(4)));
-//static uint16_t adc_conversion_values_sum[PIOS_ADC_NUM_CHANNELS]; __attribute__((aligned(4)));
-
-static uint16_t adc_pin_values[PIOS_ADC_NUM_CHANNELS];
-
 /**
-* Initialise the ADC Peripheral
-*/
-void PIOS_ADC_Init(void)
+ * @brief Initialise the ADC Peripheral
+ * @param[in] adc_oversample
+ * @return 
+ *  @arg 1 for success
+ *  @arg 0 for failure
+ * Currently ignores rates and uses hardcoded values.  Need a little logic to
+ * map from sampling rates and such to ADC constants.
+ */
+void PIOS_ADC_Init(uint8_t adc_oversample)
 {
+	
 	int32_t i;
-
-	/* Clear arrays and variables */
-	for (i = 0; i < PIOS_ADC_NUM_CHANNELS; ++i) {
-		adc_conversion_values[i] = 0;
-	}
-	for (i = 0; i < PIOS_ADC_NUM_CHANNELS; ++i) {
-		adc_pin_values[i] = 0;
-	}
-
+	
+	adc_config.adc_oversample = adc_oversample;
+	
+	ADC_DeInit(ADC1);
+	ADC_DeInit(ADC2);
+	
 	/* Setup analog pins */
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
-
+	
 	/* Enable each ADC pin in the array */
 	for (i = 0; i < PIOS_ADC_NUM_PINS; i++) {
 		GPIO_InitStructure.GPIO_Pin = ADC_GPIO_PIN[i];
 		GPIO_Init(ADC_GPIO_PORT[i], &GPIO_InitStructure);
 	}
-
+	
 	/* Enable ADC clocks */
 	PIOS_ADC_CLOCK_FUNCTION;
-
+	
 	/* Map channels to conversion slots depending on the channel selection mask */
 	for (i = 0; i < PIOS_ADC_NUM_PINS; i++) {
-		ADC_RegularChannelConfig(ADC_MAPPING[i], ADC_CHANNEL[i], ADC_CHANNEL_MAPPING[i], PIOS_ADC_SAMPLE_TIME);
+		ADC_RegularChannelConfig(ADC_MAPPING[i], ADC_CHANNEL[i],
+					 ADC_CHANNEL_MAPPING[i],
+					 PIOS_ADC_SAMPLE_TIME);
 	}
-
+	
 #if (PIOS_ADC_USE_TEMP_SENSOR)
 	ADC_TempSensorVrefintCmd(ENABLE);
-	ADC_RegularChannelConfig(PIOS_ADC_TEMP_SENSOR_ADC, ADC_Channel_14, PIOS_ADC_TEMP_SENSOR_ADC_CHANNEL, PIOS_ADC_SAMPLE_TIME);
+	ADC_RegularChannelConfig(PIOS_ADC_TEMP_SENSOR_ADC, ADC_Channel_16,
+				 PIOS_ADC_TEMP_SENSOR_ADC_CHANNEL,
+				 PIOS_ADC_SAMPLE_TIME);
 #endif
-
+	
+	// TODO: update ADC to continuous sampling, configure the sampling rate
 	/* Configure ADCs */
 	ADC_InitTypeDef ADC_InitStructure;
 	ADC_StructInit(&ADC_InitStructure);
 	ADC_InitStructure.ADC_Mode = ADC_Mode_RegSimult;
 	ADC_InitStructure.ADC_ScanConvMode = ENABLE;
-	ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;
+	ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
 	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;
 	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
-	ADC_InitStructure.ADC_NbrOfChannel = ((PIOS_ADC_NUM_CHANNELS + 1) >> 1);
+	ADC_InitStructure.ADC_NbrOfChannel =
+	((PIOS_ADC_NUM_CHANNELS + 1) >> 1);
 	ADC_Init(ADC1, &ADC_InitStructure);
-
+	
 #if (PIOS_ADC_USE_ADC2)
 	ADC_Init(ADC2, &ADC_InitStructure);
-
+	
 	/* Enable ADC2 external trigger conversion (to synch with ADC1) */
 	ADC_ExternalTrigConvCmd(ADC2, ENABLE);
 #endif
-
-	//RCC_ADCCLKConfig(PIOS_ADC_ADCCLK);
-
+	
+	RCC_ADCCLKConfig(PIOS_ADC_ADCCLK);
+	RCC_PCLK2Config(RCC_HCLK_Div16);
+	
 	/* Enable ADC1->DMA request */
 	ADC_DMACmd(ADC1, ENABLE);
-
+	
 	/* ADC1 calibration */
 	ADC_Cmd(ADC1, ENABLE);
 	ADC_ResetCalibration(ADC1);
 	while (ADC_GetResetCalibrationStatus(ADC1)) ;
 	ADC_StartCalibration(ADC1);
 	while (ADC_GetCalibrationStatus(ADC1)) ;
-
+	
 #if (PIOS_ADC_USE_ADC2)
 	/* ADC2 calibration */
 	ADC_Cmd(ADC2, ENABLE);
@@ -125,90 +150,170 @@ void PIOS_ADC_Init(void)
 	ADC_StartCalibration(ADC2);
 	while (ADC_GetCalibrationStatus(ADC2)) ;
 #endif
-
+	
 	/* Enable DMA1 clock */
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
-
+	
 	/* Configure DMA1 channel 1 to fetch data from ADC result register */
 	DMA_InitTypeDef DMA_InitStructure;
 	DMA_StructInit(&DMA_InitStructure);
 	DMA_DeInit(DMA1_Channel1);
 	DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t) & ADC1->DR;
-	DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t) & adc_conversion_values;
+	DMA_InitStructure.DMA_MemoryBaseAddr =
+	(uint32_t) & raw_data_buffer[0];
 	DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
-	DMA_InitStructure.DMA_BufferSize = ((PIOS_ADC_NUM_CHANNELS + 1) >> 1);	/* Number of conversions depends on number of used channels */
+	/* We are double buffering half words from the ADC.  Make buffer appropriately sized */
+	DMA_InitStructure.DMA_BufferSize =
+	(PIOS_ADC_NUM_CHANNELS * adc_oversample * 2) >> 1;
 	DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
 	DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
-	DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;
+	/* Note: We read ADC1 and ADC2 in parallel making a word read, also hence the half buffer size */
+	DMA_InitStructure.DMA_PeripheralDataSize =
+	DMA_PeripheralDataSize_Word;
 	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Word;
 	DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
-	DMA_InitStructure.DMA_Priority = DMA_Priority_Low;
+	DMA_InitStructure.DMA_Priority = DMA_Priority_High;
 	DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
 	DMA_Init(DMA1_Channel1, &DMA_InitStructure);
 	DMA_Cmd(DMA1_Channel1, ENABLE);
-
-	/* Trigger interrupt when all conversion values have been fetched */
+	
+	/* Trigger interrupt when for half conversions too to indicate double buffer */
 	DMA_ITConfig(DMA1_Channel1, DMA_IT_TC, ENABLE);
-
+	DMA_ITConfig(DMA1_Channel1, DMA_IT_HT, ENABLE);
+	
 	/* Configure and enable DMA interrupt */
 	NVIC_InitTypeDef NVIC_InitStructure;
 	NVIC_InitStructure.NVIC_IRQChannel = DMA1_Channel1_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_ADC_IRQ_PRIO;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority =
+	PIOS_ADC_IRQ_PRIO;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
-
+	
 	/* Finally start initial conversion */
 	ADC_SoftwareStartConvCmd(ADC1, ENABLE);
+	
+	/* Use simple averaging filter for now */
+	for (int i = 0; i < adc_oversample; i++)
+		adc_config.fir_coeffs[i] = 1;
+	adc_config.fir_coeffs[adc_oversample] = adc_oversample;
 }
 
 /**
-* Returns value of an ADC Pin
-* \param[in] pin number
-* \return ADC pin value - resolution depends on the selected oversampling rate
-* \return -1 if pin doesn't exist
-*/
+ * Returns value of an ADC Pin
+ * \param[in] pin number
+ * \return ADC pin value - resolution depends on the selected oversampling rate
+ * \return -1 if pin doesn't exist
+ */
 int32_t PIOS_ADC_PinGet(uint32_t pin)
 {
 	/* Check if pin exists */
 	if (pin >= PIOS_ADC_NUM_CHANNELS) {
 		return -1;
 	}
-
+	
 	/* Return last conversion result */
-	return adc_pin_values[pin];
+	return downsampled_buffer[pin];
 }
 
 /**
-* DMA channel interrupt is triggered when all ADC channels have been converted
-* \note shouldn't be called directly from application
-*/
-void DMA1_Channel1_IRQHandler(void)
+ * @brief Set a callback function that is executed whenever
+ * the ADC double buffer swaps 
+ */
+void PIOS_ADC_SetCallback(ADCCallback new_function) 
 {
-	int32_t i;
-	uint16_t *src_ptr;
-	
-	bool bad_xfr = DMA_GetFlagStatus(DMA1_FLAG_TE1);
-	
-	/* Clear the pending flag(s) */
-	DMA_ClearFlag(DMA1_FLAG_TC1 | DMA1_FLAG_TE1 | DMA1_FLAG_HT1 | DMA1_FLAG_GL1);
-
-	src_ptr = (uint16_t *) adc_conversion_values;
-
-	if(! bad_xfr ) {
-		/* Copy conversion values to adc_pin_values */
-		for (i = 0; i < PIOS_ADC_NUM_CHANNELS; ++i) {
-			/* Takeover new value */
-			adc_pin_values[i] = *src_ptr;
-			++src_ptr;
-		}
-	}
-
-	/* Request next conversion */
-	ADC_SoftwareStartConvCmd(ADC1, ENABLE);
+	callback_function = new_function;
 }
 
-#endif
+/**
+ * @brief Return the address of the downsampled data buffer 
+ */
+float * PIOS_ADC_GetBuffer(void)
+{
+	return downsampled_buffer;
+}
+
+/**
+ * @brief Return the address of the raw data data buffer 
+ */
+int16_t * PIOS_ADC_GetRawBuffer(void)
+{
+	return (int16_t *) adc_config.valid_data_buffer;
+}
+
+/**
+ * @brief Return the amount of over sampling
+ */
+uint8_t PIOS_ADC_GetOverSampling(void)
+{
+	return adc_config.adc_oversample;
+}
+
+/**
+ * @brief Set the fir coefficients.  Takes as many samples as the 
+ * current filter order plus one (normalization)
+ *
+ * @param new_filter Array of adc_oversampling floats plus one for the
+ * filter coefficients
+ */
+void PIOS_ADC_SetFIRCoefficients(float * new_filter)
+{
+	// Less than or equal to get normalization constant
+	for(int i = 0; i <= adc_config.adc_oversample; i++) 
+		adc_config.fir_coeffs[i] = new_filter[i];
+}
+
+/**
+ * @brief Downsample the data for each of the channels then call
+ * callback function if installed
+ */ 
+void PIOS_ADC_downsample_data()
+{
+	uint16_t chan;
+	uint16_t sample;
+	
+	for (chan = 0; chan < PIOS_ADC_NUM_CHANNELS; chan++) {
+		downsampled_buffer[chan] = 0;
+		for (sample = 0; sample < adc_config.adc_oversample; sample++) {
+			downsampled_buffer[chan] += adc_config.valid_data_buffer[chan + sample * PIOS_ADC_NUM_CHANNELS] * adc_config.fir_coeffs[sample];
+		}
+		downsampled_buffer[chan] /= (float) adc_config.fir_coeffs[adc_config.adc_oversample];
+	}
+	
+	if(callback_function != NULL)
+		callback_function(downsampled_buffer);
+}
+
+/**
+ * @brief Interrupt for half and full buffer transfer
+ * 
+ * This interrupt handler swaps between the two halfs of the double buffer to make
+ * sure the ahrs uses the most recent data.  Only swaps data when AHRS is idle, but
+ * really this is a pretense of a sanity check since the DMA engine is consantly 
+ * running in the background.  Keep an eye on the ekf_too_slow variable to make sure
+ * it's keeping up.
+ */
+void PIOS_ADC_DMA_Handler(void)
+{
+	if (DMA_GetFlagStatus(DMA1_IT_TC1)) {	// whole double buffer filled 
+		adc_config.valid_data_buffer =
+		&raw_data_buffer[1 * PIOS_ADC_NUM_CHANNELS *
+				 adc_config.adc_oversample];
+		DMA_ClearFlag(DMA1_IT_TC1);
+		PIOS_ADC_downsample_data();
+	}
+	else if (DMA_GetFlagStatus(DMA1_IT_HT1)) {
+		adc_config.valid_data_buffer = 
+		&raw_data_buffer[0 * PIOS_ADC_NUM_CHANNELS *
+				 adc_config.adc_oversample];
+		DMA_ClearFlag(DMA1_IT_HT1);
+		PIOS_ADC_downsample_data();
+	}
+	else {
+		// This should not happen, probably due to transfer errors
+		DMA_ClearFlag(DMA1_FLAG_GL1);
+	}
+}
 
 /** 
  * @}

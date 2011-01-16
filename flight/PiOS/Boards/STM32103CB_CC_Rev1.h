@@ -151,35 +151,30 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 
 //-------------------------
 // ADC
-// PIOS_ADC_PinGet(0) = Accel Z
-// PIOS_ADC_PinGet(2) = Accel Y
-// PIOS_ADC_PinGet(4) = Accel X
-// PIOS_ADC_PinGet(1) = Gyro X
-// PIOS_ADC_PinGet(3) = Gyro Y
-// PIOS_ADC_PinGet(5) = Gyro Z
-// PIOS_ADC_PinGet(6) = XY Temp
-// PIOS_ADC_PinGet(7) = Z Temp
+// PIOS_ADC_PinGet(0) = Gyro Z
+// PIOS_ADC_PinGet(1) = Gyro Y
+// PIOS_ADC_PinGet(2) = Gyro X
 //-------------------------
 //#define PIOS_ADC_OVERSAMPLING_RATE		1
 #define PIOS_ADC_USE_TEMP_SENSOR		1
-#define PIOS_ADC_TEMP_SENSOR_ADC		ADC1
-#define PIOS_ADC_TEMP_SENSOR_ADC_CHANNEL	1
+#define PIOS_ADC_TEMP_SENSOR_ADC		ADC2
+#define PIOS_ADC_TEMP_SENSOR_ADC_CHANNEL	2
 
 #define PIOS_ADC_PIN1_GPIO_PORT			GPIOA			// PA4 (Gyro X)
-#define PIOS_ADC_PIN1_GPIO_PIN			GPIO_Pin_4		// ADC12_IN2
-#define PIOS_ADC_PIN1_GPIO_CHANNEL		ADC_Channel_1
+#define PIOS_ADC_PIN1_GPIO_PIN			GPIO_Pin_4		// ADC12_IN4
+#define PIOS_ADC_PIN1_GPIO_CHANNEL		ADC_Channel_4
 #define PIOS_ADC_PIN1_ADC			ADC1
-#define PIOS_ADC_PIN1_ADC_NUMBER		2
+#define PIOS_ADC_PIN1_ADC_NUMBER		1
 
 #define PIOS_ADC_PIN2_GPIO_PORT			GPIOA			// PA5 (Gyro Y)
-#define PIOS_ADC_PIN2_GPIO_PIN			GPIO_Pin_5		// ADC123_IN1
-#define PIOS_ADC_PIN2_GPIO_CHANNEL		ADC_Channel_0
+#define PIOS_ADC_PIN2_GPIO_PIN			GPIO_Pin_5		// ADC123_IN5
+#define PIOS_ADC_PIN2_GPIO_CHANNEL		ADC_Channel_5
 #define PIOS_ADC_PIN2_ADC			ADC2
 #define PIOS_ADC_PIN2_ADC_NUMBER		1
 
 #define PIOS_ADC_PIN3_GPIO_PORT			GPIOA			// PA3 (Gyro Z)
-#define PIOS_ADC_PIN3_GPIO_PIN			GPIO_Pin_3		// ADC12_IN0
-#define PIOS_ADC_PIN3_GPIO_CHANNEL		ADC_Channel_1
+#define PIOS_ADC_PIN3_GPIO_PIN			GPIO_Pin_3		// ADC12_IN3
+#define PIOS_ADC_PIN3_GPIO_CHANNEL		ADC_Channel_3
 #define PIOS_ADC_PIN3_ADC			ADC1
 #define PIOS_ADC_PIN3_ADC_NUMBER		2
 
@@ -211,6 +206,7 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 // ADCCLK = PCLK2 / 2
 #define PIOS_ADC_RATE		(72.0e6 / 16 / 2 / 252 / (PIOS_ADC_NUM_PINS / 2))
 #define EKF_RATE		(PIOS_ADC_RATE / adc_oversampling / 2)
+#define PIOS_ADC_MAX_OVERSAMPLING               1
 
 //-------------------------
 // Receiver PWM inputs
@@ -293,22 +289,10 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //-------------------------
 // GPIO
 //-------------------------
-#define PIOS_GPIO_1_PORT                        GPIOC
-#define PIOS_GPIO_1_PIN                         GPIO_Pin_0
-#define PIOS_GPIO_1_GPIO_CLK                    RCC_APB2Periph_GPIOC
-#define PIOS_GPIO_2_PORT                        GPIOC
-#define PIOS_GPIO_2_PIN                         GPIO_Pin_1
-#define PIOS_GPIO_2_GPIO_CLK                    RCC_APB2Periph_GPIOC
-#define PIOS_GPIO_3_PORT                        GPIOC
-#define PIOS_GPIO_3_PIN                         GPIO_Pin_2
-#define PIOS_GPIO_3_GPIO_CLK                    RCC_APB2Periph_GPIOC
-#define PIOS_GPIO_4_PORT                        GPIOD
-#define PIOS_GPIO_4_PIN                         GPIO_Pin_2
-#define PIOS_GPIO_4_GPIO_CLK                    RCC_APB2Periph_GPIOD
-#define PIOS_GPIO_PORTS                         { PIOS_GPIO_1_PORT, PIOS_GPIO_2_PORT, PIOS_GPIO_3_PORT, PIOS_GPIO_4_PORT }
-#define PIOS_GPIO_PINS                          { PIOS_GPIO_1_PIN, PIOS_GPIO_2_PIN, PIOS_GPIO_3_PIN, PIOS_GPIO_4_PIN }
-#define PIOS_GPIO_CLKS                          { PIOS_GPIO_1_GPIO_CLK, PIOS_GPIO_2_GPIO_CLK, PIOS_GPIO_3_GPIO_CLK, PIOS_GPIO_4_GPIO_CLK }
-#define PIOS_GPIO_NUM                           4
+#define PIOS_GPIO_PORTS                         {  }
+#define PIOS_GPIO_PINS                          {  }
+#define PIOS_GPIO_CLKS                          {  }
+#define PIOS_GPIO_NUM                           0
 
 //-------------------------
 // USB

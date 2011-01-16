@@ -32,9 +32,16 @@
 #ifndef PIOS_ADC_H
 #define PIOS_ADC_H
 
+// Maximum of 50 oversampled points
+#define PIOS_ADC_MAX_SAMPLES (PIOS_ADC_NUM_CHANNELS * PIOS_ADC_MAX_OVERSAMPLING * 2)
+
+typedef void (*ADCCallback) (float * data);
+
 /* Public Functions */
-extern void PIOS_ADC_Init(void);
-extern int32_t PIOS_ADC_PinGet(uint32_t pin);
+void PIOS_ADC_Init(uint8_t adc_oversample);
+int32_t PIOS_ADC_PinGet(uint32_t pin);
+int16_t * PIOS_ADC_GetRawBuffer(void);
+void PIOS_ADC_SetCallback(ADCCallback new_function);
 
 #endif /* PIOS_ADC_H */
 

@@ -230,6 +230,7 @@ TIM8  |           |           |           |
 // ADCCLK = PCLK2 / 2
 #define PIOS_ADC_RATE		(72.0e6 / 16 / 2 / 252 / (PIOS_ADC_NUM_PINS / 2))
 #define EKF_RATE		(PIOS_ADC_RATE / adc_oversampling / 2)
+#define PIOS_ADC_MAX_OVERSAMPLING               50
 
 //-------------------------
 // GPIO

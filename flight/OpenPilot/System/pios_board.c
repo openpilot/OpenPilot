@@ -69,7 +69,7 @@ void PIOS_Board_Init(void) {
 	/* Initialize the PiOS library */
 	PIOS_COM_Init();
 	PIOS_Servo_Init();
-	PIOS_ADC_Init();
+	PIOS_ADC_Init(1);
 	PIOS_GPIO_Init();
 
 #if defined(PIOS_INCLUDE_PWM)

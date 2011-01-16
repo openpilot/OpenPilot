@@ -95,7 +95,6 @@ BOOTINC = $(BOOT)/inc
 ## AHRS:
 SRC = ahrs.c
 SRC += pios_board.c
-SRC += ahrs_adc.c
 SRC += ahrs_timer.c
 SRC += $(FLIGHTLIB)/ahrs_spi_comm.c
 SRC += $(FLIGHTLIB)/ahrs_comm_objects.c
@@ -107,6 +106,7 @@ SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 
 ## PIOS Hardware (STM32F10x)
+SRC += $(PIOSSTM32F10X)/pios_adc.c
 SRC += $(PIOSSTM32F10X)/pios_sys.c
 SRC += $(PIOSSTM32F10X)/pios_led.c
 SRC += $(PIOSSTM32F10X)/pios_delay.c

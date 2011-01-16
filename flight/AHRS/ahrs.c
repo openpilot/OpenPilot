@@ -33,7 +33,7 @@
 
 /* OpenPilot Includes */
 #include "ahrs.h"
-#include "ahrs_adc.h"
+#include "pios.h"
 #include "ahrs_timer.h"
 #include "ahrs_spi_comm.h"
 #include "insgps.h"
@@ -430,7 +430,7 @@ void print_ahrs_raw()
 	
 	get_accel_gyro_data();
 	
-	valid_data_buffer = AHRS_ADC_GetRawBuffer();
+	valid_data_buffer = PIOS_ADC_GetRawBuffer();
 
 	if (total_conversion_blocks != previous_conversion + 1)
 		PIOS_LED_On(LED1);	// not keeping up
@@ -486,8 +486,8 @@ int main()
 	/* IAP System Setup */
 	PIOS_IAP_Init();
 	/* ADC system */
-	AHRS_ADC_Config(adc_oversampling);
-	AHRS_ADC_SetCallback(adc_callback);
+	PIOS_ADC_Init(adc_oversampling);
+	PIOS_ADC_SetCallback(adc_callback);
 
 	/* ADC buffer */
 	fifoBuf_init(&adc_fifo_buffer, adc_fifo_buf, sizeof(adc_fifo_buf));
@@ -1038,12 +1038,7 @@ void settings_callback(AhrsObjHandle obj)
 	
 	if(settings.Downsampling != adc_oversampling) {
 		adc_oversampling = settings.Downsampling;
-		if(adc_oversampling > MAX_OVERSAMPLING) {
-			adc_oversampling = MAX_OVERSAMPLING;
-			settings.Downsampling = MAX_OVERSAMPLING;
-			AHRSSettingsSet(&settings);
-		}
-		AHRS_ADC_Config(adc_oversampling);				
+		PIOS_ADC_Init(adc_oversampling);				
 	}	
 }
 

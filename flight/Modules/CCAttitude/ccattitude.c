@@ -85,9 +85,44 @@ static void CCAttitudeTask(void *parameters)
 
 //	AlarmsClear(SYSTEMALARMS_ALARM_AHRSCOMMS, SYSTEMALARMS_ALARM_CRITICAL);
 
+	// Keep flash CS pin high while talking accel
+	PIOS_FLASH_DISABLE;
+	
+	uint8_t out_buf[16];
+	uint8_t in_buf[16];
+
+	out_buf[0] = 0x2C; // configure rate
+	out_buf[1] = 0x0C; // 200 Hz BW (400 Hz clock), not low power
+	
+	out_buf[2] = 0x2D; // select power control
+	out_buf[3] = 0x08; // active		
+	
+	out_buf[4] = 0x38; // configure FIFO
+	out_buf[5] = 0x90; // stream mode, watermark at 16 samples
+	
+	out_buf[6] = 0x31; // data format
+	out_buf[7] = 0x02; // 8 g range, 4-wire spi
+	
+	PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,0);
+	PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,out_buf,in_buf,8,NULL);
+	PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,1);
+
 	// Main task loop
 	while (1) {
 		//PIOS_WDG_UpdateFlag(PIOS_WDG_AHRS);
+		//int16_t accel_x,accel_y,accel_z;
+		
+		out_buf[0] = 0x32 | 0x80 | 0x40; // Multibyte read starting at X0
+		out_buf[1] = 0;
+		out_buf[2] = 0;
+		out_buf[3] = 0;
+		out_buf[4] = 0;
+		out_buf[5] = 0;
+		out_buf[6] = 0;
+		
+		PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,0);
+		PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,out_buf,in_buf,7,NULL);
+		PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,1);
 		
 		// TODO: register the adc callback, push the data onto a queue (safe for thread)
 		// with the queue ISR version
@@ -96,10 +131,16 @@ static void CCAttitudeTask(void *parameters)
 		attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] = PIOS_ADC_PinGet(0);
 		attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] = PIOS_ADC_PinGet(1);
 		attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] = PIOS_ADC_PinGet(2);
+		attitudeRaw.accels[ATTITUDERAW_ACCELS_X] = (in_buf[2] << 8) + in_buf[1];
+		attitudeRaw.accels[ATTITUDERAW_ACCELS_Y] = (in_buf[4] << 8) + in_buf[3];
+		attitudeRaw.accels[ATTITUDERAW_ACCELS_Z] = (in_buf[6] << 8) + in_buf[5];
+		attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_X] = (float) attitudeRaw.accels[ATTITUDERAW_ACCELS_X] / 256 * 9.81;
+		attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Y] = (float) attitudeRaw.accels[ATTITUDERAW_ACCELS_Y] / 256 * 9.81;
+		attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Z] = (float) attitudeRaw.accels[ATTITUDERAW_ACCELS_Z] / 256 * 9.81;
 		AttitudeRawSet(&attitudeRaw); 
-
+		
 		/* Wait for the next update interval */
-		vTaskDelayUntil(&lastSysTime, 100 / portTICK_RATE_MS);
+		vTaskDelayUntil(&lastSysTime, 10 / portTICK_RATE_MS);
 
 	}
 }

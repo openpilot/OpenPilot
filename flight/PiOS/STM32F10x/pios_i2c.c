@@ -1024,6 +1024,7 @@ void PIOS_I2C_EV_IRQ_Handler(uint8_t i2c)
 		break;
 	case 0x30084: /* Occurs between byte tranmistted and master mode selected */
 	case 0x30000: /* Need to throw away this spurious event */
+	case 0x30403: /* Detected this after got a NACK and then reprocessed by main handler */
 	//case 0x0: /* Not sure why zeros are occurring */
 		goto skip_event;
 		break; 

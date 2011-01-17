@@ -119,9 +119,11 @@ int main(int argc, char *argv[])
     QFileInfoList xmlList = xmlPath.entryInfoList();
 
     // Read in each XML file and parse object(s) in them
+    
     for (int n = 0; n < xmlList.length(); ++n) {
         QFileInfo fileinfo = xmlList[n];
-        cout << "Parsing XML file: " << fileinfo.fileName().toStdString() << endl;
+	if (verbose)
+	  cout << "Parsing XML file: " << fileinfo.fileName().toStdString() << endl;
         QString filename = fileinfo.fileName();
         QString xmlstr = readFile(fileinfo.absoluteFilePath());
 
@@ -135,10 +137,13 @@ int main(int argc, char *argv[])
 
     // check for duplicate object ID's
     QList<quint32> objIDList;
+    int numBytesTotal=0;
     for (int objidx = 0; objidx < parser->getNumObjects(); ++objidx) {
         quint32 id = parser->getObjectID(objidx);
-
-        if ( objIDList.contains(id) || id == 0 ) {
+        numBytesTotal+=parser->getNumBytes(objidx);
+        if (verbose)
+	  cout << "Checking object " << parser->getObjectName(objidx).toStdString() << " (" << parser->getNumBytes(objidx) << " bytes)" << endl;
+	if ( objIDList.contains(id) || id == 0 ) {
             cout << "Error: Object ID collision found in object " << parser->getObjectName(objidx).toStdString() << ", modify object name" << endl;
             return RETURN_ERR_XML;
         }
@@ -148,8 +153,8 @@ int main(int argc, char *argv[])
 
     // done parsing and checking
     cout << "Done: processed " << xmlList.length() << " XML files and generated "
-            << objIDList.length() << " objects with no ID collisions." << endl;
-
+	 << objIDList.length() << " objects with no ID collisions. Total size of the data fields is " << numBytesTotal << " bytes." << endl;
+    
 
     if (verbose) 
         cout << "used units: " << parser->all_units.join(",").toStdString() << endl;

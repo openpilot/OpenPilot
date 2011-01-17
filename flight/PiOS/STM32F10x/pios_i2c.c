@@ -1074,6 +1074,8 @@ void PIOS_I2C_ER_IRQ_Handler(uint8_t i2c)
 			}
 			return;
 			break;	
+		case 0:
+			return;
 	}
 	
 	if(event & I2C_FLAG_AF) {

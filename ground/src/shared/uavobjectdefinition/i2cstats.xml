@@ -1,9 +1,11 @@
 <xml>
     <object name="I2CStats" singleinstance="true" settings="false">
         <description>Tracks statistics on the I2C bus.</description>
-        <field name="event_errors" units="" type="uint16" elements="1"/>
-        <field name="fsm_errors" units="" type="uint16" elements="1"/>
-        <field name="irq_errors" units="" type="uint16" elements="1"/>
+        <field name="event_errors" units="" type="uint8" elements="1"/>
+        <field name="fsm_errors" units="" type="uint8" elements="1"/>
+        <field name="irq_errors" units="" type="uint8" elements="1"/>
+        <field name="nacks" units="" type="uint8" elements="1"/>
+        <field name="timeouts" units="" type="uint8" elements="1"/>
         <field name="last_error_type" units="" type="enum" elements="1" options="EVENT,FSM,INTERRUPT"/>
         <field name="evirq_log" units="" type="uint32" elements="5"/>
         <field name="erirq_log" units="" type="uint32" elements="5"/>

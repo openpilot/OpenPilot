@@ -79,9 +79,11 @@ volatile uint8_t i2c_state_history_pointer = 0;
 volatile enum i2c_adapter_event i2c_state_event_history[I2C_LOG_DEPTH];
 volatile uint8_t i2c_state_event_history_pointer;
 
-static uint16_t i2c_fsm_fault_count = 0;
-static uint16_t i2c_bad_event_counter = 0;
-static uint16_t i2c_error_interrupt_counter = 0;
+static uint8_t i2c_fsm_fault_count = 0;
+static uint8_t i2c_bad_event_counter = 0;
+static uint8_t i2c_error_interrupt_counter = 0;
+static uint8_t i2c_nack_counter = 0;
+static uint8_t i2c_timeout_counter = 0;
 #endif
 
 static void go_fsm_fault(struct pios_i2c_adapter *i2c_adapter);
@@ -802,13 +804,15 @@ void i2c_adapter_log_fault(enum pios_i2c_error_type type)
  * \param[out] counts three uint16 that receive the bad event, fsm, and error irq 
  * counts
  */
-void PIOS_I2C_GetDiagnostics(struct pios_i2c_fault_history * data, uint16_t * counts) 
+void PIOS_I2C_GetDiagnostics(struct pios_i2c_fault_history * data, uint8_t * counts) 
 {
 #if defined(PIOS_I2C_DIAGNOSTICS)
 	memcpy(data, &i2c_adapter_fault_history, sizeof(i2c_adapter_fault_history));	
 	counts[0] = i2c_bad_event_counter;
 	counts[1] = i2c_fsm_fault_count;
 	counts[2] = i2c_error_interrupt_counter;
+	counts[3] = i2c_nack_counter;
+	counts[4] = i2c_timeout_counter;
 #else
 	struct pios_i2c_fault_history i2c_adapter_fault_history;
 	i2c_adapter_fault_history.type = PIOS_I2C_ERROR_EVENT;
@@ -871,13 +875,16 @@ bool PIOS_I2C_Transfer(uint8_t i2c, const struct pios_i2c_txn txn_list[], uint32
 	PIOS_DEBUG_Assert(num_txns);
 
 	struct pios_i2c_adapter *i2c_adapter;
+	bool semaphore_success = true;
 
 	i2c_adapter = find_i2c_adapter_by_id(i2c);
 	PIOS_DEBUG_Assert(i2c_adapter);
 
 #ifdef USE_FREERTOS
 	/* Lock the bus */
-	xSemaphoreTake(i2c_adapter->sem_busy, portMAX_DELAY);
+	portTickType timeout;
+	timeout = i2c_adapter->cfg->transfer_timeout_ms / portTICK_RATE_MS;
+	semaphore_success &= (xSemaphoreTake(i2c_adapter->sem_busy, timeout) == pdTRUE);
 #endif /* USE_FREERTOS */
 
 	PIOS_DEBUG_Assert(i2c_adapter->curr_state == I2C_STATE_STOPPED);
@@ -888,7 +895,7 @@ bool PIOS_I2C_Transfer(uint8_t i2c, const struct pios_i2c_txn txn_list[], uint32
 
 #ifdef USE_FREERTOS
 	/* Make sure the done/ready semaphore is consumed before we start */
-	xSemaphoreTake(i2c_adapter->sem_ready, portMAX_DELAY);
+	semaphore_success &= (xSemaphoreTake(i2c_adapter->sem_ready, timeout) == pdTRUE);
 #endif
 
 	i2c_adapter->bus_error = false;
@@ -896,7 +903,7 @@ bool PIOS_I2C_Transfer(uint8_t i2c, const struct pios_i2c_txn txn_list[], uint32
 
 	/* Wait for the transfer to complete */
 #ifdef USE_FREERTOS
-	xSemaphoreTake(i2c_adapter->sem_ready, portMAX_DELAY);
+	semaphore_success &= (xSemaphoreTake(i2c_adapter->sem_ready, timeout) == pdTRUE);
 	xSemaphoreGive(i2c_adapter->sem_ready);
 #endif /* USE_FREERTOS */
 
@@ -912,9 +919,11 @@ bool PIOS_I2C_Transfer(uint8_t i2c, const struct pios_i2c_txn txn_list[], uint32
 #ifdef USE_FREERTOS
 	/* Unlock the bus */
 	xSemaphoreGive(i2c_adapter->sem_busy);
+	if(!semaphore_success)
+		i2c_timeout_counter++;
 #endif /* USE_FREERTOS */
 
-	return (!i2c_adapter->bus_error);
+	return (!i2c_adapter->bus_error) && semaphore_success;
 }
 
 #endif
@@ -1058,29 +1067,8 @@ void PIOS_I2C_ER_IRQ_Handler(uint8_t i2c)
 	
 #endif
 
-	switch(event) {
-		case 0x70184:	/* EV8_2, but system detects own stop byte as erroneous */
-			switch (i2c_adapter->last_byte - i2c_adapter->active_byte + 1) {
-				case 0:
-					i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_TRANSFER_DONE_LEN_EQ_0);
-					break;
-				case 1:
-					i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_TRANSFER_DONE_LEN_EQ_1);
-					break;
-				case 2:
-					i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_TRANSFER_DONE_LEN_EQ_2);
-					break;
-				default:
-					i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_TRANSFER_DONE_LEN_GT_2);
-					break;
-			}
-			return;
-			break;	
-		case 0:
-			return;
-	}
-	
 	if(event & I2C_FLAG_AF) {
+		i2c_nack_counter++;
 		i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_NACK);
 	} else { /* Mostly bus errors here */              
 		i2c_adapter_log_fault(PIOS_I2C_ERROR_INTERRUPT);

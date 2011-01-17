@@ -216,8 +216,8 @@ static void actuatorTask(void* parameters)
 
 		// Store update time
 		command.UpdateTime = 10000*dT;
-		if(command.UpdateTime > command.MaxUpdateTime)
-			command.MaxUpdateTime = command.UpdateTime;
+		if(1000*dT > command.MaxUpdateTime)
+			command.MaxUpdateTime = 1000*dT;
 		
 		// Update output object
 		ActuatorCommandSet(&command);

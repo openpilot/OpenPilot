@@ -935,7 +935,9 @@ void PIOS_I2C_EV_IRQ_Handler(uint8_t i2c)
 	i2c_evirq_history_pointer = (i2c_evirq_history_pointer + 1) % I2C_LOG_DEPTH;
 #endif
 	
-	event &= 0x000700FF;
+#define EVENT_MASK 0x000700FF
+	event &= EVENT_MASK;
+	
 	
 	switch (event) { /* Mask out all the bits we don't care about */
 	case (I2C_EVENT_MASTER_MODE_SELECT | 0x40):
@@ -1024,8 +1026,7 @@ void PIOS_I2C_EV_IRQ_Handler(uint8_t i2c)
 		break;
 	case 0x30084: /* Occurs between byte tranmistted and master mode selected */
 	case 0x30000: /* Need to throw away this spurious event */
-	case 0x30403: /* Detected this after got a NACK and then reprocessed by main handler */
-	//case 0x0: /* Not sure why zeros are occurring */
+	case 0x30403 & EVENT_MASK: /* Detected this after got a NACK, probably stop bit */			
 		goto skip_event;
 		break; 
 	default:
@@ -1086,9 +1087,7 @@ void PIOS_I2C_ER_IRQ_Handler(uint8_t i2c)
 		
 		/* Fail hard on any errors for now */
 		i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_BUS_ERROR);
-	}
-	i2c_adapter_log_fault(PIOS_I2C_ERROR_INTERRUPT);
-	
+	}	
 }
 
 /**

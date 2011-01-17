@@ -223,6 +223,7 @@ SRC += $(PIOSCOMMON)/pios_iap.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 ## Libraries for flight calculations
 SRC += $(FLIGHTLIB)/fifo_buffer.c
+SRC += $(FLIGHTLIB)/CoordinateConversions.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c

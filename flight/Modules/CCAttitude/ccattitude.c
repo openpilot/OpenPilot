@@ -51,14 +51,18 @@
 #include "pios.h"
 #include "ccattitude.h"
 #include "attituderaw.h"
+#include "attitudeactual.h"
+#include "CoordinateConversions.h"
 
 // Private constants
-#define STACK_SIZE_BYTES 340
+#define STACK_SIZE_BYTES 740
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 
 #define UPDATE_RATE  10 /* ms */
 #define GYRO_NEUTRAL 1665
-#define GYRO_SCALE   0.014f
+#define GYRO_SCALE   0.010f
+
+#define PI_MOD(x) (fmod(x + M_PI, M_PI * 2) - M_PI)
 // Private types
 
 // Private variables
@@ -66,6 +70,8 @@ static xTaskHandle taskHandle;
 
 // Private functions
 static void CCAttitudeTask(void *parameters);
+void updateSensors();
+void updateAttitude();
 
 /**
  * Initialise the module, called on startup
@@ -97,32 +103,11 @@ static void CCAttitudeTask(void *parameters)
 	while (1) {
 		//PIOS_WDG_UpdateFlag(PIOS_WDG_AHRS);
 		
-		struct pios_adxl345_data accel_data;
-		
 		// TODO: register the adc callback, push the data onto a queue (safe for thread)
 		// with the queue ISR version
-		AttitudeRawData attitudeRaw;
-		AttitudeRawGet(&attitudeRaw);		
-
-		attitudeRaw.gyros[ATTITUDERAW_GYROS_X] = PIOS_ADC_PinGet(0);
-		attitudeRaw.gyros[ATTITUDERAW_GYROS_Y] = PIOS_ADC_PinGet(1);
-		attitudeRaw.gyros[ATTITUDERAW_GYROS_Z] = PIOS_ADC_PinGet(2);
 		
-		attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] = (attitudeRaw.gyros[ATTITUDERAW_GYROS_X] - GYRO_NEUTRAL) * GYRO_SCALE;
-		attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] = (attitudeRaw.gyros[ATTITUDERAW_GYROS_Y] - GYRO_NEUTRAL) * GYRO_SCALE;
-		attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] = (attitudeRaw.gyros[ATTITUDERAW_GYROS_Z] - GYRO_NEUTRAL) * GYRO_SCALE;
-		
-		attitudeRaw.gyrotemp[0] = PIOS_ADXL345_Read(&accel_data);
-		attitudeRaw.gyrotemp[1] = PIOS_ADC_PinGet(3);
-
-		attitudeRaw.accels[ATTITUDERAW_ACCELS_X] = accel_data.x;
-		attitudeRaw.accels[ATTITUDERAW_ACCELS_Y] = accel_data.y;
-		attitudeRaw.accels[ATTITUDERAW_ACCELS_Z] = accel_data.z;
-		
-		attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_X] = (float) accel_data.x * 0.004f * 9.81;
-		attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Y] = (float) accel_data.y * 0.004f * 9.81;
-		attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Z] = (float) accel_data.z * 0.004f * 9.81;
-		AttitudeRawSet(&attitudeRaw); 
+		updateSensors();		
+		updateAttitude();
 		
 		/* Wait for the next update interval */
 		vTaskDelayUntil(&lastSysTime, UPDATE_RATE / portTICK_RATE_MS);
@@ -130,6 +115,80 @@ static void CCAttitudeTask(void *parameters)
 	}
 }
 
+void updateSensors() 
+{
+	AttitudeRawData attitudeRaw;
+	AttitudeRawGet(&attitudeRaw);		
+	struct pios_adxl345_data accel_data;
+	
+
+	attitudeRaw.gyros[ATTITUDERAW_GYROS_X] = PIOS_ADC_PinGet(0);
+	attitudeRaw.gyros[ATTITUDERAW_GYROS_Y] = PIOS_ADC_PinGet(1);
+	attitudeRaw.gyros[ATTITUDERAW_GYROS_Z] = PIOS_ADC_PinGet(2);
+	
+	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] = -(attitudeRaw.gyros[ATTITUDERAW_GYROS_X] - GYRO_NEUTRAL) * GYRO_SCALE;
+	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] = -(attitudeRaw.gyros[ATTITUDERAW_GYROS_Y] - GYRO_NEUTRAL) * GYRO_SCALE;
+	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] = (attitudeRaw.gyros[ATTITUDERAW_GYROS_Z] - GYRO_NEUTRAL) * GYRO_SCALE;
+	
+	attitudeRaw.gyrotemp[0] = PIOS_ADXL345_Read(&accel_data);
+	attitudeRaw.gyrotemp[1] = PIOS_ADC_PinGet(3);
+	
+	attitudeRaw.accels[ATTITUDERAW_ACCELS_X] = accel_data.x;
+	attitudeRaw.accels[ATTITUDERAW_ACCELS_Y] = accel_data.y;
+	attitudeRaw.accels[ATTITUDERAW_ACCELS_Z] = accel_data.z;
+	
+	attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_X] = (float) accel_data.x * 0.004f * 9.81;
+	attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Y] = (float) accel_data.y * 0.004f * 9.81;
+	attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Z] = (float) accel_data.z * 0.004f * 9.81;
+	AttitudeRawSet(&attitudeRaw); 	
+}
+
+#define UPDATE_FRAC 0.99f
+void updateAttitude()
+{
+	AttitudeActualData attitudeActual;
+	AttitudeActualGet(&attitudeActual);
+	
+	AttitudeRawData attitudeRaw;
+	AttitudeRawGet(&attitudeRaw);		
+
+	static portTickType lastSysTime = 0;
+	static portTickType thisSysTime;
+	
+	float accel_pitch, accel_roll;
+	float dT;
+	
+	thisSysTime = xTaskGetTickCount();
+	if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
+		dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
+	lastSysTime = thisSysTime;
+	
+	// Convert into radians
+	attitudeActual.Roll = attitudeActual.Roll * M_PI / 180;
+	attitudeActual.Pitch = attitudeActual.Pitch * M_PI / 180;
+	attitudeActual.Yaw = attitudeActual.Yaw * M_PI / 180;
+	
+	// Integrate gyros
+	attitudeActual.Roll  = PI_MOD(attitudeActual.Roll + attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] * dT);
+	attitudeActual.Pitch = PI_MOD(attitudeActual.Pitch + attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] * dT);
+	attitudeActual.Yaw += fmod(attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] * dT, 2 * M_PI);
+	       
+	// Compute gravity sense of ground
+	accel_roll = atan2(-attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Y],
+			   -attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Z]);
+	accel_pitch = atan2(attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_X],
+			    -attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Z]);
+	
+	// Compute quaternion
+	RPY2Quaternion(&attitudeActual.Roll, &attitudeActual.q1);
+	
+	// Weighted average and back into degrees
+	attitudeActual.Roll = (UPDATE_FRAC * attitudeActual.Roll + (1-UPDATE_FRAC) * accel_roll) * 180 / M_PI;
+	attitudeActual.Pitch = (UPDATE_FRAC * attitudeActual.Pitch + (1-UPDATE_FRAC) * accel_pitch) * 180 / M_PI;
+	attitudeActual.Yaw = attitudeActual.Yaw * 180 / M_PI;	
+	AttitudeActualSet(&attitudeActual);
+
+}
 /**
   * @}
   * @}

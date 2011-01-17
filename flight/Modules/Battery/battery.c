@@ -9,7 +9,7 @@
  *
  * @file       battery.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Module to read the battery sensor periodically
+ * @brief      Module to read the battery Voltage and Current periodically and set alarms appropriately.
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -53,16 +53,15 @@
 //
 // Configuration
 //
-#define DEBUG_PORT			PIOS_COM_TELEM_RF
 #define STACK_SIZE			1024
 #define TASK_PRIORITY		(tskIDLE_PRIORITY + 1)
 #define SAMPLE_PERIOD_MS	500
 #define POWER_SENSOR_VERSION		1
 
-
 //#define ENABLE_DEBUG_MSG
 
 #ifdef ENABLE_DEBUG_MSG
+#define DEBUG_PORT			PIOS_COM_TELEM_RF
 #define DEBUG_MSG(format, ...) PIOS_COM_SendFormattedString(DEBUG_PORT, format, ## __VA_ARGS__)
 #else
 #define DEBUG_MSG(format, ...)
@@ -96,9 +95,11 @@ static void task(void *parameters)
 	portTickType lastSysTime;
 	FlightBatteryStateData flightBatteryData;
 
+#ifdef ENABLE_DEBUG_MSG
 	PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
 
 	DEBUG_MSG("Battery Started\n");
+#endif
 
 	AlarmsSet(SYSTEMALARMS_ALARM_BATTERY, SYSTEMALARMS_ALARM_ERROR);
 
@@ -116,6 +117,7 @@ static void task(void *parameters)
 		mAs += mA * SAMPLE_PERIOD_MS / 1000;	// FIXME: Use real time between samples
 
 		DEBUG_MSG("%03d %06d => %06dmV   %06d => %06dmA  %06dmAh\n", cnt, PIOS_ADC_PinGet(2), mV, PIOS_ADC_PinGet(1), mA, mAs / 3600);
+
 		cnt++;
 
 		flightBatteryData.Voltage = (float)mV / 1000;

@@ -5,9 +5,9 @@
  * @addtogroup BatteryModule Battery Module
  * @{ 
  *
- * @file       attitude.h
+ * @file       battery.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Module to read the attitude solution from the AHRS on a periodic basis.
+ * @brief      Module to read the battery Voltage and Current periodically and set alarms appropriately.
  *
  * @see        The GNU Public License (GPL) Version 3
  *

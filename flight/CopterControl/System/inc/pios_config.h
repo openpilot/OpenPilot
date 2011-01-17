@@ -57,6 +57,8 @@
 //#define PIOS_INCLUDE_WDG
 #define PIOS_INCLUDE_I2C_ESC
 
+#define PIOS_INCLUDE_ADXL345
+
 /* Defaults for Logging */
 #define LOG_FILENAME 			"PIOS.LOG"
 #define STARTUP_LOG_ENABLED		1

@@ -166,6 +166,8 @@
 		65209A1912208B0600453371 /* gpsposition.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gpsposition.xml; sourceTree = "<group>"; };
 		6526645A122DF972006F9A3C /* pios_i2c_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_i2c_priv.h; sourceTree = "<group>"; };
 		6526645B122DF972006F9A3C /* pios_wdg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_wdg.h; sourceTree = "<group>"; };
+		6528CCB412E406B800CF5144 /* pios_adxl345.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_adxl345.c; sourceTree = "<group>"; };
+		6528CCE212E40F6700CF5144 /* pios_adxl345.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_adxl345.h; sourceTree = "<group>"; };
 		65322D3B122841F60046CD7C /* gpstime.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gpstime.xml; sourceTree = "<group>"; };
 		65345C871288668B00A5E4E8 /* guidancesettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = guidancesettings.xml; sourceTree = "<group>"; };
 		65408AA812BB1648004DACC5 /* i2cstats.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = i2cstats.xml; sourceTree = "<group>"; };
@@ -7471,6 +7473,7 @@
 				65E8F03511EFF25C00BBF654 /* pios_opahrs_proto.c */,
 				65E8F03611EFF25C00BBF654 /* pios_sdcard.c */,
 				65E8F03711EFF25C00BBF654 /* printf-stdarg.c */,
+				6528CCB412E406B800CF5144 /* pios_adxl345.c */,
 			);
 			name = Common;
 			path = ../../PiOS/Common;
@@ -7480,6 +7483,7 @@
 			isa = PBXGroup;
 			children = (
 				6526645A122DF972006F9A3C /* pios_i2c_priv.h */,
+				6528CCE212E40F6700CF5144 /* pios_adxl345.h */,
 				6526645B122DF972006F9A3C /* pios_wdg.h */,
 				651CF9EF120B700D00EEFD70 /* pios_usb_hid_desc.h */,
 				651CF9F0120B700D00EEFD70 /* pios_usb_hid_istr.h */,

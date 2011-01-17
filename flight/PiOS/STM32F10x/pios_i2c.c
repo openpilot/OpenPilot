@@ -163,7 +163,7 @@ const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM
 					       [I2C_EVENT_STARTED_MORE_TXN_WRITE] = I2C_STATE_W_MORE_TXN_ADDR,
 					       [I2C_EVENT_STARTED_LAST_TXN_READ] = I2C_STATE_R_LAST_TXN_ADDR,
 					       [I2C_EVENT_STARTED_LAST_TXN_WRITE] = I2C_STATE_W_LAST_TXN_ADDR,
-					       [I2C_EVENT_NACK] = I2C_STATE_STOPPING,
+					       [I2C_EVENT_NACK] = I2C_STATE_NACK,
 					       [I2C_EVENT_BUS_ERROR] = I2C_STATE_BUS_ERROR,
 					       },
 				},
@@ -572,11 +572,11 @@ static void go_w_last_txn_last(struct pios_i2c_adapter *i2c_adapter)
 	i2c_adapter->active_byte++;
 }
 
-static void go_nack(struct pios_i2c_adapter *i2c_adapter) {
-	I2C_ITConfig(i2c_adapter->cfg->regs, I2C_IT_BUF, DISABLE);
-	
-	// SHOULD MOVE THIS INTO A STOPPING STATE AND SET IT ONLY AFTER THE BYTE WAS SENT
-	I2C_GenerateSTOP(i2c_adapter->cfg->regs, ENABLE);	
+static void go_nack(struct pios_i2c_adapter *i2c_adapter) 
+{
+	I2C_ITConfig(i2c_adapter->cfg->regs, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
+	I2C_AcknowledgeConfig(i2c_adapter->cfg->regs, DISABLE);
+	I2C_GenerateSTOP(i2c_adapter->cfg->regs, ENABLE);
 }
 
 static void i2c_adapter_inject_event(struct pios_i2c_adapter *i2c_adapter, enum i2c_adapter_event event)

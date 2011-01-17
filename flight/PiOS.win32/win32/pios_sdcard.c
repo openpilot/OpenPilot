@@ -221,7 +221,7 @@ int32_t PIOS_SDCARD_StartupLog(void)
  * @return 0 if no
  * @return 1 if yes
  */
-int32_t POIS_SDCARD_IsMounted()
+int32_t PIOS_SDCARD_IsMounted()
 {
 	return 1;
 }

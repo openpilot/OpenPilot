@@ -84,12 +84,12 @@ TARGET = OpenPilot
 # Paths
 OPSYSTEM = ./System
 OPSYSTEMINC = $(OPSYSTEM)/inc
-OPUAVTALK = ./UAVTalk
+OPUAVTALK = ../UAVTalk
 OPUAVTALKINC = $(OPUAVTALK)/inc
-OPUAVOBJ = ./UAVObjects
+OPUAVOBJ = ../UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
 OPTESTS  = ./Tests
-OPMODULEDIR = ./Modules
+OPMODULEDIR = ../Modules
 FLIGHTLIB = ../Libraries
 FLIGHTLIBINC = ../Libraries/inc
 PIOS = ../PiOS.win32
@@ -130,6 +130,7 @@ SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/uavobjectsinit.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
+SRC += $(FLIGHTLIB)/CoordinateConversions.c
 else
 ## TESTCODE
 SRC += $(OPTESTS)/test_common.c
@@ -182,6 +183,7 @@ SRC += $(OPUAVOBJ)/flightplanstatus.c
 SRC += $(OPUAVOBJ)/flightplansettings.c
 SRC += $(OPUAVOBJ)/taskinfo.c
 SRC += $(OPUAVOBJ)/watchdogstatus.c
+SRC += $(OPUAVOBJ)/nedaccel.c
 endif
 
 ## PIOS Hardware (win32)
@@ -230,22 +232,24 @@ CPPSRCARM =
 
 # List any extra directories to look for include files here.
 #    Each directory must be seperated by a space.
-EXTRAINCDIRS  =  $(OPSYSTEM)
+EXTRAINCDIRS  = $(PIOSINC)
+EXTRAINCDIRS  +=  $(OPSYSTEM)
 EXTRAINCDIRS  += $(OPSYSTEMINC)
 EXTRAINCDIRS  += $(OPUAVTALK)
 EXTRAINCDIRS  += $(OPUAVTALKINC)
 EXTRAINCDIRS  += $(OPUAVOBJ)
 EXTRAINCDIRS  += $(OPUAVOBJINC)
 EXTRAINCDIRS  += $(PIOS)
-EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(PIOSWIN32)
 EXTRAINCDIRS  += $(MININIDIR)
 EXTRAINCDIRS  += $(RTOSINCDIR)
 EXTRAINCDIRS  += $(APPLIBDIR)
 EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/Win32
+EXTRAINCDIRS  += $(FLIGHTLIB)
+EXTRAINCDIRS  += $(FLIGHTLIBINC)
 EXTRAINCDIRS  += $(PYMITEINC)
 
-EXTRAINCDIRS += ${foreach MOD, ${MODULES}, Modules/${MOD}/inc} ${OPMODULEDIR}/System/inc
+EXTRAINCDIRS += ${foreach MOD, ${MODULES}, ${OPMODULEDIR}/${MOD}/inc} ${OPMODULEDIR}/System/inc
 
 
 # List any extra directories to look for library files here.

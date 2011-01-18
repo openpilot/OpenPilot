@@ -112,7 +112,7 @@ static bool readyObjects[MAX_AHRS_OBJECTS];
 */
 static AhrsEventCallback objCallbacks[MAX_AHRS_OBJECTS];
 
-/** Pending events.
+/** True for objects for which new data is received and callback needs to be called
 */
 static bool callbackPending[MAX_AHRS_OBJECTS];
 
@@ -190,7 +190,7 @@ void SetObjectDirty(const int idx)
 /** Work out what data needs to be sent.
 	If an object was not sent it will be retried 4 frames later
 */
-void FillObjectPacket()
+static void FillObjectPacket()
 {
 	txPacket.command = COMMS_OBJECT;
 	txPacket.magicNumber = TXMAGIC;
@@ -230,10 +230,11 @@ void FillObjectPacket()
 
 /** Process a received packet
 */
-void HandleRxPacket()
+static void HandleRxPacket()
 {
 	switch (rxPacket.command) {
 	case COMMS_NULL:
+	    // Empty packet, nothing to do
 		break;
 
 	case COMMS_OBJECT:
@@ -246,14 +247,15 @@ void HandleRxPacket()
 }
 
 /** Process a received UAVObject packet
-
 */
-void HandleObjectPacket()
+static void HandleObjectPacket()
 {
 	for (int ct = 0; ct < MAX_UPDATE_OBJECTS; ct++) {
+	    uint8_t idx;
 
-		//Flag objects that have been successfully received at the other end
-		uint8_t idx = rxPacket.objects[ct].done;
+		// Flag objects that have been successfully received at the other end
+		idx = rxPacket.objects[ct].done;
+        txPacket.objects[ct].done = AHRS_NO_OBJECT;
 		if (idx < MAX_AHRS_OBJECTS) {
 
 			if (dirtyObjects[idx] == 1) {	//this ack is the correct one for the last send
@@ -261,7 +263,7 @@ void HandleObjectPacket()
 			}
 		}
 
-		txPacket.objects[ct].done = AHRS_NO_OBJECT;
+		// Handle received object if there is one in this packet
 		idx = rxPacket.objects[ct].index;
 		if (idx == AHRS_NO_OBJECT) {
 			if (emptyCount > 0) {
@@ -273,7 +275,7 @@ void HandleObjectPacket()
 		if (obj) {
 			memcpy(obj->data, &rxPacket.objects[ct].object, obj->size);
 			txPacket.objects[ct].done = idx;
-			callbackPending[idx] = true;
+			callbackPending[idx] = true;    // New data available, call callback
 			readyObjects[idx] = true;
 		} else {
 			txPacket.status.invalidPacket++;
@@ -302,18 +304,24 @@ AhrsCommStatus AhrsGetStatus()
 	return (status);
 }
 
-void CommsCallback(uint8_t crc_ok, uint8_t crc_val)
+
+/** Function called after an SPI transfer
+ */
+static void CommsCallback(uint8_t crc_ok, uint8_t crc_val)
 {
 #ifndef IN_AHRS
 	PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 1);	//signal the end of the transfer
 #endif
 	txPacket.command = COMMS_NULL;	//we must send something so default to null
+
+	// While the crc is ok, there is a magic value in the received data for extra security
 	if (rxPacket.magicNumber != RXMAGIC) {
 		crc_ok = false;
 	}
 
 
 	if (crc_ok) {
+	    // The received data is OK, update link state and handle data
 		if (!linkOk && okCount > 0) {
 			okCount--;
 			if (okCount == 0) {
@@ -324,6 +332,7 @@ void CommsCallback(uint8_t crc_ok, uint8_t crc_val)
 		}
 		HandleRxPacket();
 	} else {
+	    // The received data is incorrect, update state
 #ifdef IN_AHRS			//AHRS - do we neeed to enter program mode?
 		if (memcmp(&rxPacket, SPI_PROGRAM_REQUEST, SPI_PROGRAM_REQUEST_LENGTH) == 0)
 		{
@@ -351,7 +360,9 @@ void CommsCallback(uint8_t crc_ok, uint8_t crc_val)
 #endif
 }
 
-void PollEvents(void)
+/** Call callbacks for object where new data is received
+ */
+static void PollEvents(void)
 {
 	for (int idx = 0; idx < MAX_AHRS_OBJECTS; idx++) {
 		if (objCallbacks[idx]) {
@@ -366,6 +377,7 @@ void PollEvents(void)
 		}
 	}
 }
+
 
 #ifdef IN_AHRS
 void AhrsPoll()

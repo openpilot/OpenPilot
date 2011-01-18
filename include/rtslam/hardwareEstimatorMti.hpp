@@ -66,6 +66,9 @@ namespace hardware {
 			~HardwareEstimatorMti();
 			void setSyncConfig(double timestamps_correction = 0.0/*, bool tightly_synchronized = false, double tight_offset*/);
 			
+			/**
+			 * @return data with 10 columns: time, accelero (3), gyro (3), magneto (3)
+			 */
 			jblas::mat_indirect acquireReadings(double t1, double t2);
 			void releaseReadings() { reading_pos = -1; }
 			jblas::ind_array instantValues() { return jmath::ublasExtra::ia_set(1,10); }

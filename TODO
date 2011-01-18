@@ -83,6 +83,8 @@ Precision
 - when a point is detected, do a matching with itself with interpolation to find subpixel position
 - when a point is matched, try to estimate if there is a possible ambiguity with another point in the ellipse 
 
+- inertial: ignore image if movement estimated by move() is too small ?
+
 - [ok] recompute all infoGains for a few first updates in active search
 - [ok] Finish implementing 1 point Ransac to avoid outliers
 - [ok] limit n_updates of ransac, and ensure that some active search is done after ransac.

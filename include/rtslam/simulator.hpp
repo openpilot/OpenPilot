@@ -105,6 +105,22 @@ class AdhocSimulator
 			if (it != robots.end()) return it->second->getPose(t); else return jblas::vec();
 		}
 		
+		/**
+		 * @return accelero (3), gyro (3)
+		 */
+		jblas::vec getRobotInertial(size_t id, double t) const
+		{
+			std::map<size_t,simu::Robot*>::const_iterator it = robots.find(id);
+			if (it != robots.end())
+			{
+				jblas::vec imu(6);
+				ublas::subrange(imu, 0, 3) = ublas::subrange(it->second->getAcc(t), 0, 3);
+				ublas::subrange(imu, 3, 6) = ublas::subrange(it->second->getSpeed(t), 3, 6);
+				return imu;
+			}
+			else return jblas::vec();
+		}
+		
 		jblas::vec getSensorPose(size_t robId, size_t senId, double t) const
 		{
 			std::map<size_t,simu::Robot*>::const_iterator itRob = robots.find(robId);

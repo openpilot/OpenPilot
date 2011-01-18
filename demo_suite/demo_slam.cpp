@@ -53,6 +53,7 @@
 
 #include "rtslam/simuRawProcessors.hpp"
 #include "rtslam/hardwareSensorAdhocSimulator.hpp"
+#include "rtslam/hardwareEstimatorInertialAdhocSimulator.hpp"
 
 using namespace jblas;
 using namespace jafar;
@@ -205,6 +206,21 @@ const double IMUPOSE[6] = {0, 0, 0, 90, 0, 90};// x,y,z,roll,pitch,yaw
 //IMU Pose on Mana
 //const double IMUPOSE[6] = {47, 15.3, 12.2, 0, 0, 0};// x,y,z,roll,pitch,yaw
 
+const double IMU_TIMESTAMP_CORRECTION = 0.0;
+const double SIMU_IMU_TIMESTAMP_CORRECTION = 0.000;
+const double SIMU_IMU_FREQ = 120.0;
+const double SIMU_IMU_GRAVITY = 9.81;
+const double SIMU_IMU_GYR_BIAS = 0.0;
+const double SIMU_IMU_GYR_BIAS_NOISESTD = 0.0;
+const double SIMU_IMU_GYR_GAIN = 0.0;
+const double SIMU_IMU_GYR_GAIN_NOISESTD = 0.0;
+const double SIMU_IMU_RANDWALKGYR_FACTOR = 0.0;
+const double SIMU_IMU_ACC_BIAS = 0.0;
+const double SIMU_IMU_ACC_BIAS_NOISESTD = 0.0;
+const double SIMU_IMU_ACC_GAIN = 0.0;
+const double SIMU_IMU_ACC_GAIN_NOISESTD = 0.0;
+const double SIMU_IMU_RANDWALKACC_FACTOR = 0.0;
+
 // pin-hole:
 
 // simu:
@@ -289,7 +305,7 @@ const double DISTORTION[3] = { -0.27546592313146917, 0.12644899941674098, 0.0366
 //
 const unsigned CORRECTION_SIZE = 4;
 const double PIX_NOISE = 1.0;
-const double PIX_NOISE_SIMUFACTOR = 1.0;
+const double PIX_NOISE_SIMUFACTOR = 0.5;
 
 // lmk management
 const double D_MIN = .5;
@@ -477,6 +493,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	{
 		robconstvel_ptr_t robPtr1_(new RobotConstantVelocity(mapPtr));
 		robPtr1_->setVelocityStd(UNCERT_VLIN, UNCERT_VANG);
+		robPtr1_->setId();
 
 		double _v[6] = {
 				PERT_VLIN, PERT_VLIN, PERT_VLIN,
@@ -500,6 +517,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	{
 		robinertial_ptr_t robPtr1_(new RobotInertial(mapPtr));
 		robPtr1_->setInitialStd(UNCERT_VLIN, UNCERT_ABIAS, UNCERT_WBIAS, UNCERT_GRAVITY);
+		robPtr1_->setId();
 
 		double _v[12] = {
 				PERT_AERR, PERT_AERR, PERT_AERR,
@@ -513,16 +531,25 @@ void demo_slam01_main(world_ptr_t *world) {
 		hardware::hardware_estimator_ptr_t hardEst1;
 		if (intOpts[iSimu] != 0)
 		{
-			// TODO
-			//boost::shared_ptr<hardware::HardwareEstimatorSimu> hardEst1_(new hardware::HardwareEstimatorSimu(
-			//	"/dev/ttyS0", floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath]));
-			//hardEst1 = hardEst1_;
+			boost::shared_ptr<hardware::HardwareEstimatorInertialAdhocSimulator> hardEst1_(
+				new hardware::HardwareEstimatorInertialAdhocSimulator(SIMU_IMU_FREQ, 50, simulator, robPtr1_->id()));
+			hardEst1_->setSyncConfig(SIMU_IMU_TIMESTAMP_CORRECTION);
+			
+			hardEst1_->setErrors(SIMU_IMU_GRAVITY, 
+				SIMU_IMU_GYR_BIAS, SIMU_IMU_GYR_BIAS_NOISESTD,
+				SIMU_IMU_GYR_GAIN, SIMU_IMU_GYR_GAIN_NOISESTD,
+				SIMU_IMU_RANDWALKGYR_FACTOR * PERT_RANWALKGYRO,
+				SIMU_IMU_ACC_BIAS, SIMU_IMU_ACC_BIAS_NOISESTD,
+				SIMU_IMU_ACC_GAIN, SIMU_IMU_ACC_GAIN_NOISESTD,
+				SIMU_IMU_RANDWALKACC_FACTOR * PERT_RANWALKACC);
+			
+			hardEst1 = hardEst1_;
 		} else
 		{
 			boost::shared_ptr<hardware::HardwareEstimatorMti> hardEst1_(new hardware::HardwareEstimatorMti(
 				MTI_DEVICE, floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath], true));
 			if (intOpts[iTrigger]) floatOpts[fFreq] = hardEst1_->getFreq();
-			hardEst1_->setSyncConfig(0.009);
+			hardEst1_->setSyncConfig(IMU_TIMESTAMP_CORRECTION);
 			hardEst1 = hardEst1_;
 		}
 		robPtr1_->setHardwareEstimator(hardEst1);
@@ -530,7 +557,6 @@ void demo_slam01_main(world_ptr_t *world) {
 		robPtr1 = robPtr1_;
 	}
 
-	robPtr1->setId();
 	robPtr1->linkToParentMap(mapPtr);
 	robPtr1->pose.x(quaternion::originFrame());
 	if (dataLogger) dataLogger->addLoggable(*robPtr1.get());

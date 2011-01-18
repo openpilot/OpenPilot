@@ -72,15 +72,62 @@ static void manualControlTask(void *parameters);
 static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutral);
 static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time);
 
+#define assumptions1 ( \
+		(MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE 		== MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE) 		&& \
+		(MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_RATE 		== MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE) 		&& \
+		(MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_ATTITUDE 	== MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE) 	   \
+		)
+
+#define assumptions2 ( \
+		(MANUALCONTROLSETTINGS_POS1FLIGHTMODE_MANUAL 			== MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL) 						&& \
+		(MANUALCONTROLSETTINGS_POS1FLIGHTMODE_STABILIZED		== MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED) 					&& \
+		(MANUALCONTROLSETTINGS_POS1FLIGHTMODE_AUTO 				== MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO) 						   \
+		)
+
+#define assumptions3 ( \
+		(MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_NONE 		== MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE) 		&& \
+		(MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_RATE 		== MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE) 		&& \
+		(MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_ATTITUDE 	== MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE) 	   \
+		)
+
+#define assumptions4 ( \
+		(MANUALCONTROLSETTINGS_POS2FLIGHTMODE_MANUAL 			== MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL) 						&& \
+		(MANUALCONTROLSETTINGS_POS2FLIGHTMODE_STABILIZED		== MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED) 					&& \
+		(MANUALCONTROLSETTINGS_POS2FLIGHTMODE_AUTO 				== MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO) 						   \
+		)
+
+#define assumptions5 ( \
+		(MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_NONE 		== MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE) 		&& \
+		(MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_RATE 		== MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE) 		&& \
+		(MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_ATTITUDE 	== MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE) 	   \
+		)
+
+#define assumptions6 ( \
+		(MANUALCONTROLSETTINGS_POS3FLIGHTMODE_MANUAL 			== MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL) 						&& \
+		(MANUALCONTROLSETTINGS_POS3FLIGHTMODE_STABILIZED		== MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED) 					&& \
+		(MANUALCONTROLSETTINGS_POS3FLIGHTMODE_AUTO 				== MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO) 						   \
+		)
+
+
+
+#define assumptions (assumptions1 && assumptions2 && assumptions3 && assumptions4 && assumptions5 && assumptions6)
+
 /**
  * Module initialization
  */
 int32_t ManualControlInitialize()
 {
+	// The following line compiles to nothing when the assumptions are correct
+	if (!assumptions)
+		return 1;
+	// In case the assumptions are incorrect, this module will not initialise and so will not function
+
 	// Start main task
 	xTaskCreate(manualControlTask, (signed char *)"ManualControl", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_MANUALCONTROL, taskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_MANUAL);
+
+
 	return 0;
 }
 
@@ -197,51 +244,24 @@ static void manualControlTask(void *parameters)
 			flightMode = scaleChannel(cmd.Channel[settings.FlightMode], settings.ChannelMax[settings.FlightMode],
 						settings.ChannelMin[settings.FlightMode], settings.ChannelNeutral[settings.FlightMode]);
 
-			if (flightMode < -FLIGHT_MODE_LIMIT) {       // Position 1
+			if (flightMode < -FLIGHT_MODE_LIMIT) {
+				// Position 1
 				for(int i = 0; i < 3; i++) {
-					if(settings.Pos1StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE)
-						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE;
-					else if(settings.Pos1StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_RATE)
-						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE;
-					else if(settings.Pos1StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_ATTITUDE)
-						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE;
+					cmd.StabilizationSettings[i] = settings.Pos1StabilizationSettings[i];	// See assumptions1
 				}
-				if(settings.Pos1FlightMode == MANUALCONTROLSETTINGS_POS1FLIGHTMODE_MANUAL)
-					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL;
-				else if(settings.Pos1FlightMode == MANUALCONTROLSETTINGS_POS1FLIGHTMODE_STABILIZED)
-					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED;
-				else if(settings.Pos1FlightMode == MANUALCONTROLSETTINGS_POS1FLIGHTMODE_AUTO)
-					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;
-			} else if (flightMode > FLIGHT_MODE_LIMIT) { // Position 3
+				cmd.FlightMode = settings.Pos1FlightMode;	// See assumptions2
+			} else if (flightMode > FLIGHT_MODE_LIMIT) {
+				// Position 3
 				for(int i = 0; i < 3; i++) {
-					if(settings.Pos3StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_NONE)
-						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE;
-					else if(settings.Pos3StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_RATE)
-						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE;
-					else if(settings.Pos3StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_ATTITUDE)
-						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE;
+					cmd.StabilizationSettings[i] = settings.Pos3StabilizationSettings[i];	// See assumptions5
 				}
-				if(settings.Pos3FlightMode == MANUALCONTROLSETTINGS_POS3FLIGHTMODE_MANUAL)
-					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL;
-				else if(settings.Pos3FlightMode == MANUALCONTROLSETTINGS_POS3FLIGHTMODE_STABILIZED)
-					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED;
-				else if(settings.Pos3FlightMode == MANUALCONTROLSETTINGS_POS3FLIGHTMODE_AUTO)
-					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;
-			} else {                                     // Position 2
+				cmd.FlightMode = settings.Pos3FlightMode;	// See assumptions6
+			} else {
+				// Position 2
 				for(int i = 0; i < 3; i++) {
-					if(settings.Pos2StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_NONE)
-						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE;
-					else if(settings.Pos2StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_RATE)
-						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE;
-					else if(settings.Pos2StabilizationSettings[i] == MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_ATTITUDE)
-						cmd.StabilizationSettings[i] = MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE;
+					cmd.StabilizationSettings[i] = settings.Pos2StabilizationSettings[i];	// See assumptions3
 				}
-				if(settings.Pos2FlightMode == MANUALCONTROLSETTINGS_POS2FLIGHTMODE_MANUAL)
-					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL;
-				else if(settings.Pos2FlightMode == MANUALCONTROLSETTINGS_POS2FLIGHTMODE_STABILIZED)
-					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED;
-				else if(settings.Pos2FlightMode == MANUALCONTROLSETTINGS_POS2FLIGHTMODE_AUTO)
-					cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;
+				cmd.FlightMode = settings.Pos2FlightMode;	// See assumptions4
 			}
 			// Update the ManualControlCommand object
 			ManualControlCommandSet(&cmd);

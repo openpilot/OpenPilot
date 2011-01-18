@@ -404,11 +404,14 @@ void SoundNotifyPlugin::stateChanged(Phonon::State newstate, Phonon::State oldst
     qDebug() << "New State: " << newstate;
 #endif
 
+#ifndef Q_OS_WIN
     // This is a hack to force Linux to wait until the end of the
-    // wav file before moving to the next in the queue
+    // wav file before moving to the next in the queue.
+    // I wish I did not have to go through a #define, but I did not
+    // manage to make this work on both platforms any other way!
     if (phonon.mo->totalTime()>0)
         phonon.mo->setTransitionTime(phonon.mo->totalTime());
-
+#endif
 	if((newstate  == Phonon::PausedState) ||
 	   (newstate  == Phonon::StoppedState))
 	{

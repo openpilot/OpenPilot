@@ -71,7 +71,7 @@ public:
 	QString getObjectField() const { return objectField; }
 	void setObjectField(QString text) { objectField = text; }
 
-	QString getSoundCollectionPath() const { return soundCollectionPath; }
+        QString getSoundCollectionPath() const { return soundCollectionPath; }
 	void setSoundCollectionPath(QString text) { soundCollectionPath = text; }
 
 	QString getCurrentLanguage() const { return currentLanguage; }

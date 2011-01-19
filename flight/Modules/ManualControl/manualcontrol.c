@@ -316,7 +316,7 @@ static void manualControlTask(void *parameters)
 
 			// Look for state changes and write in newArmState
 			if (settings.Arming == MANUALCONTROLSETTINGS_ARMING_NONE) {
-				// No cahnnel assigned to arming -> arm imeediately when throttle is low
+				// No channel assigned to arming -> arm immediately when throttle is low
 				newCmdArmed = MANUALCONTROLCOMMAND_ARMED_TRUE;
 			} else {
 				float armStickLevel;
@@ -325,15 +325,18 @@ static void manualControlTask(void *parameters)
 				bool manualArm = false;
 				bool manualDisarm = false;
 
-				armStickLevel = scaleChannel(cmd.Channel[channel], settings.ChannelMax[channel],
-						settings.ChannelMin[channel], settings.ChannelNeutral[channel]);
-				if (reverse)
-					armStickLevel =-armStickLevel;
+				if (connection_state == CONNECTED) {
+					// Should use RC input only if RX is connected
+					armStickLevel = scaleChannel(cmd.Channel[channel], settings.ChannelMax[channel],
+							settings.ChannelMin[channel], settings.ChannelNeutral[channel]);
+					if (reverse)
+						armStickLevel =-armStickLevel;
 
-				if (armStickLevel <= -0.90)
-					manualArm = true;
-				else if (armStickLevel >= +0.90)
-					manualDisarm = true;
+					if (armStickLevel <= -0.90)
+						manualArm = true;
+					else if (armStickLevel >= +0.90)
+						manualDisarm = true;
+				}
 
 				switch(armState) {
 				case ARM_STATE_DISARMED:

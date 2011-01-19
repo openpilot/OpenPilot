@@ -126,8 +126,7 @@ extern void vTaskSwitchContext( void );				\
 
 #define portOUTPUT_BYTE( a, b )
 
-extern void vPortForciblyEndThread( void *pxTaskToDelete );
-#define traceTASK_DELETE( pxTaskToDelete )		vPortForciblyEndThread( pxTaskToDelete )
+#define traceTASK_DELETE( pxTaskToDelete )		__delete_task( pxTaskToDelete )
 
 #define traceTASK_CREATE( pxNewTCB )
 
@@ -157,6 +156,9 @@ void __enable_interrupt(void);
 
 /* generate software interrupt - non - maskable */
 void __swi(void);
+
+/* generate an interrupt which causes the scheduler to delete the task */
+void __delete_task(void *tcb);
 
 /* To be used by interrupt generation threads. e.g. Create a thread that
 monitors console events and generate an interrupt whenever a key is pressed.

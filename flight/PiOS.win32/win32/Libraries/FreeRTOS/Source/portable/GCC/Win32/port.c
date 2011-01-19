@@ -196,13 +196,16 @@ static volatile portSTACK_TYPE dwEnabledIsr = NMI;	// mask of enabled ISRs (indi
 static HANDLE hTickAck;		// acknolwledge tick interrupt
 static HANDLE hTermAck;		// acknowledge termination
 
+volatile SSIM_T *taskToDelete;
+
 BOOL bIsWow64;
 BOOL bUsingMMCSS;
 
 static enum
 {
 	SWI_ID_YIELD,
-	SWI_ID_TERMINATE
+	SWI_ID_TERMINATE,
+	SWI_ID_ENDTASK
 }
 ESWI_ID;
 
@@ -638,7 +641,7 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 
 portBASE_TYPE xPortStartScheduler( void )
 {
-	BOOL bSwitch;
+	BOOL bSwitch, bTaskDelete;
 	SSIM_T *psSim;
 	DWORD dwIntr;
 	int i, iIsrCount;
@@ -675,6 +678,7 @@ portBASE_TYPE xPortStartScheduler( void )
 
 		bSwitch = (dwIntr != 0);	// switch only for a real interrupt
 		iIsrCount = 0;			// no suspensions after handling first int
+		bTaskDelete = FALSE;
 
 		for(i=0; dwIntr && i<CPU_INTR_COUNT; i++)
 		{
@@ -692,6 +696,11 @@ portBASE_TYPE xPortStartScheduler( void )
 						SetEvent(hTermAck);
 						ReleaseMutex(hIsrMutex);
 						return 0;
+					}
+					else if(ESWI_ID == SWI_ID_ENDTASK)
+					{
+						TerminateThread(taskToDelete->hThread, 0);
+						CloseHandle(taskToDelete->hSemaphore);
 					}
 
 					psSim->yielded = TRUE;
@@ -802,6 +811,23 @@ void __swi(void)
 		ESWI_ID = SWI_ID_YIELD;
 		SetEvent(hIsrInvoke);
 		SignalObjectAndWait(hIsrMutex, psSim->hSemaphore, INFINITE, FALSE);
+	}
+}
+
+void __delete_task(void *tcb)
+{
+	taskToDelete = *((SSIM_T **)tcb);
+
+	if(hIsrDispatcher)
+	{
+		WaitForSingleObject(hIsrMutex, INFINITE);
+		dwPendingIsr |= (1<<CPU_INTR_SWI);
+		ESWI_ID = SWI_ID_ENDTASK;
+		SetEvent(hIsrInvoke);
+		ReleaseMutex(hIsrMutex);
+
+		if(pxCurrentTCB == tcb)
+			Sleep(100000); //This task is suicidal, wait until it dies
 	}
 }
 

@@ -67,6 +67,24 @@ int32_t TaskMonitorAdd(TaskInfoRunningElem task, xTaskHandle handle)
 }
 
 /**
+ * Remove a task handle from the library
+ */
+int32_t TaskMonitorRemove(TaskInfoRunningElem task)
+{
+	if (task < TASKINFO_RUNNING_NUMELEM)
+	{
+	    xSemaphoreTakeRecursive(lock, portMAX_DELAY);
+		handles[task] = 0;
+		xSemaphoreGiveRecursive(lock);
+		return 0;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+/**
  * Update the status of all tasks
  */
 void TaskMonitorUpdateAll(void)

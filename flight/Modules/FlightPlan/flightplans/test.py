@@ -1,6 +1,9 @@
 import uavobjects
 import sys
 
-uavobjects.FlightPlanStatusUpdate(12) 
+n=0
+while n<200000:
+	uavobjects.FlightPlanStatusUpdate(n)
+	n=n+1 
 
 

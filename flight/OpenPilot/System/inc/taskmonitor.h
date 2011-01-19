@@ -32,6 +32,7 @@
 
 int32_t TaskMonitorInitialize(void);
 int32_t TaskMonitorAdd(TaskInfoRunningElem task, xTaskHandle handle);
+int32_t TaskMonitorRemove(TaskInfoRunningElem task);
 void TaskMonitorUpdateAll(void);
 
 #endif // TASKMONITOR_H

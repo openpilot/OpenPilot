@@ -57,7 +57,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Actuator Telemetry GPS ManualControl Altitude AHRSComms Stabilization Guidance FirmwareIAP
+MODULES =  Actuator Telemetry GPS ManualControl Altitude AHRSComms Stabilization Guidance FirmwareIAP FlightPlan
 
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
@@ -298,12 +298,12 @@ SRC += $(AHRSBOOTLOADER)/ahrs_spi_program_master.c
 SRC += $(AHRSBOOTLOADER)/ahrs_spi_program.c
 
 ## PyMite files
-#SRC += $(wildcard ${PYMITEVM}/*.c)
-#SRC += $(wildcard ${PYMITEPLAT}/*.c)
-#SRC += $(OUTDIR)/pmlib_img.c
-#SRC += $(OUTDIR)/pmlib_nat.c
-#SRC += $(OUTDIR)/pmlibusr_img.c
-#SRC += $(OUTDIR)/pmlibusr_nat.c
+SRC += $(OUTDIR)/pmlib_img.c
+SRC += $(OUTDIR)/pmlib_nat.c
+SRC += $(OUTDIR)/pmlibusr_img.c
+SRC += $(OUTDIR)/pmlibusr_nat.c
+SRC += $(wildcard ${PYMITEVM}/*.c)
+SRC += $(wildcard ${PYMITEPLAT}/*.c)
 
 ## Mass Storage Device
 #SRC += $(MSDDIR)/msd.c
@@ -614,7 +614,7 @@ else
 endif
 
 # Generate intermediate code
-gencode: ${OUTDIR}/InitMods.c #$(OUTDIR)/pmlib_img.c $(OUTDIR)/pmlib_nat.c $(OUTDIR)/pmlibusr_img.c $(OUTDIR)/pmlibusr_nat.c $(OUTDIR)/pmfeatures.h
+gencode: ${OUTDIR}/InitMods.c ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h 
 
 # Generate code for module initialization
 ${OUTDIR}/InitMods.c: Makefile
@@ -626,11 +626,11 @@ ${OUTDIR}/InitMods.c: Makefile
 	@echo ${quote}}${quote} >> ${OUTDIR}/InitMods.c
 
 # Generate code for PyMite
-#$(OUTDIR)/pmlib_img.c $(OUTDIR)/pmlib_nat.c $(OUTDIR)/pmlibusr_img.c $(OUTDIR)/pmlibusr_nat.c $(OUTDIR)/pmfeatures.h: $(wildcard $(PYMITELIB)/*.py) $(wildcard $(PYMITEPLAT)/*.py) $(wildcard $(FLIGHTPLANLIB)/*.py) $(wildcard $(FLIGHTPLANS)/*.py) 
-#	@echo ${MSG_PYMITEINIT}
-#	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -s --memspace=flash -o $(OUTDIR)/pmlib_img.c --native-file=$(OUTDIR)/pmlib_nat.c $(PYMITELIB)/list.py $(PYMITELIB)/dict.py $(PYMITELIB)/__bi.py $(PYMITELIB)/sys.py $(PYMITELIB)/string.py $(wildcard $(FLIGHTPLANLIB)/*.py)
-#	@$(PYTHON) $(PYMITETOOLS)/pmGenPmFeatures.py $(PYMITEPLAT)/pmfeatures.py > $(OUTDIR)/pmfeatures.h
-#	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -u -o $(OUTDIR)/pmlibusr_img.c --native-file=$(OUTDIR)/pmlibusr_nat.c $(FLIGHTPLANS)/test.py
+${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h: $(wildcard ${PYMITELIB}/*.py) $(wildcard ${PYMITEPLAT}/*.py) $(wildcard ${FLIGHTPLANLIB}/*.py) $(wildcard ${FLIGHTPLANS}/*.py) 
+	@echo ${MSG_PYMITEINIT}
+	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -s --memspace=flash -o $(OUTDIR)/pmlib_img.c --native-file=$(OUTDIR)/pmlib_nat.c $(PYMITELIB)/list.py $(PYMITELIB)/dict.py $(PYMITELIB)/__bi.py $(PYMITELIB)/sys.py $(PYMITELIB)/string.py $(wildcard $(FLIGHTPLANLIB)/*.py)
+	@$(PYTHON) $(PYMITETOOLS)/pmGenPmFeatures.py $(PYMITEPLAT)/pmfeatures.py > $(OUTDIR)/pmfeatures.h
+	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -u -o $(OUTDIR)/pmlibusr_img.c --native-file=$(OUTDIR)/pmlibusr_nat.c $(FLIGHTPLANS)/test.py
 
 # Eye candy.
 begin:

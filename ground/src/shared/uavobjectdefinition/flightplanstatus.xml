@@ -1,14 +1,15 @@
 <xml>
     <object name="FlightPlanStatus" singleinstance="true" settings="false">
-        <description>Status of the flight plan script</description>
-		<field name="Status" units="" type="enum" elements="1" options="None,Running,Idle,VMInitError,ScriptStartError,RunTimeError" defaultvalue="None"/>
-        <field name="ErrorType" units="" type="enum" elements="1" options="None" defaultvalue="None"/>
+		<description>Status of the flight plan script</description>
+		<field name="Status" units="" type="enum" elements="1" options="Stopped,Running,Finished,Error" defaultvalue="Stopped"/>
+    <field name="ErrorType" units="" type="enum" elements="1" options="None,VMInitError,Exception,Exit,IOError,DivByZero,AssertError,AttributeError,ImportError,IndexError,KeyError,MemoryError,NameError,SyntaxError,SystemError,TypeError,ValueError,StopIteration,Warning,UnknownError" defaultvalue="None"/>
 		<field name="ErrorFileID" units="" type="uint32" elements="1"/>
 		<field name="ErrorLineNum" units="" type="uint32" elements="1"/>
-		<field name="Debug" units="" type="float" elements="1"/>
-        <access gcs="readwrite" flight="readwrite"/>
-        <telemetrygcs acked="false" updatemode="manual" period="0"/>
-        <telemetryflight acked="false" updatemode="periodic" period="2000"/>
-        <logging updatemode="never" period="0"/>
+		<field name="Debug1" units="" type="float" elements="1" defaultvalue="0.0"/>
+		<field name="Debug2" units="" type="float" elements="1" defaultvalue="0.0"/>
+    <access gcs="readwrite" flight="readwrite"/>
+    <telemetrygcs acked="false" updatemode="manual" period="0"/>
+    <telemetryflight acked="false" updatemode="periodic" period="2000"/>
+    <logging updatemode="never" period="0"/>
     </object>
 </xml>

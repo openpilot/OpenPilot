@@ -28,7 +28,7 @@
 #ifndef SERIALPLUGIN_H
 #define SERIALPLUGIN_H
 
-#include "serial_global.h"
+//#include "serial_global.h"
 #include <qextserialport.h>
 #include <qextserialenumerator.h>
 #include "coreplugin/iconnection.h"
@@ -44,7 +44,8 @@ class SerialConnection;
 *   Some operating systems do not send device insertion events so
 *   for those we have to poll
 */
-class SERIAL_EXPORT SerialEnumerationThread : public QThread
+//class SERIAL_EXPORT SerialEnumerationThread : public QThread
+class SerialEnumerationThread : public QThread
 {
     Q_OBJECT
 public:
@@ -67,7 +68,8 @@ protected:
 *   Plugin will add a instance of this class to the pool,
 *   so the connection manager can use it.
 */
-class SERIAL_EXPORT SerialConnection
+//class SERIAL_EXPORT SerialConnection
+class SerialConnection
     : public Core::IConnection
 {
     Q_OBJECT
@@ -101,7 +103,9 @@ protected:
 };
 
 
-class SERIAL_EXPORT SerialPlugin
+
+//class SERIAL_EXPORT SerialPlugin
+class SerialPlugin
     : public ExtensionSystem::IPlugin
 {
     Q_OBJECT

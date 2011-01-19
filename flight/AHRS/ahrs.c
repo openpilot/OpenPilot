@@ -50,6 +50,10 @@
 #define GYRO_OOB(x) ((x > (1000 / 180 * M_PI)) || (x < (-1000 / 180 * M_PI)))
 #define ACCEL_OOB(x) (((x > 12*9.81) || (x < -12*9.81)))
 
+#define mag_raw_x_idx   1
+#define mag_raw_y_idx   0
+#define mag_raw_z_idx   2
+
 // For debugging the raw sensors
 //#define DUMP_RAW
 //#define DUMP_EKF
@@ -362,16 +366,9 @@ void simple_update() {
 	float rpy[3];
 	/***************** SIMPLE ATTITUDE FROM NORTH AND ACCEL ************/
 	/* Very simple computation of the heading and attitude from accel. */
-	rpy[2] =
-	atan2((mag_data.raw.axis[0]),
-	      (-1 * mag_data.raw.axis[1])) * 180 /
-	M_PI;
-	rpy[1] =
-	atan2(accel_data.filtered.x,
-	      accel_data.filtered.z) * 180 / M_PI;
-	rpy[0] =
-	atan2(accel_data.filtered.y,
-	      accel_data.filtered.z) * 180 / M_PI;
+	rpy[2] = atan2((mag_data.raw.axis[mag_raw_y_idx]), (-1 * mag_data.raw.axis[mag_raw_x_idx])) * 180 / M_PI;
+	rpy[1] = atan2(accel_data.filtered.x, accel_data.filtered.z) * 180 / M_PI;
+	rpy[0] = atan2(accel_data.filtered.y, accel_data.filtered.z) * 180 / M_PI;
 	
 	RPY2Quaternion(rpy, q);
 	attitude_data.quaternion.q1 = q[0];
@@ -742,16 +739,16 @@ void process_mag_data()
 		PIOS_HMC5843_ReadMag(mag_data.raw.axis);
 
 		// Swap the axis here to acount for orientation of mag chip (notice 0 and 1 swapped in raw)
-		mag_data.scaled.axis[0] = (mag_data.raw.axis[1] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
-		mag_data.scaled.axis[1] = (mag_data.raw.axis[0] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
-		mag_data.scaled.axis[2] = (mag_data.raw.axis[2] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
+		mag_data.scaled.axis[0] = (mag_data.raw.axis[mag_raw_x_idx] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
+		mag_data.scaled.axis[1] = (mag_data.raw.axis[mag_raw_y_idx] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
+		mag_data.scaled.axis[2] = (mag_data.raw.axis[mag_raw_z_idx] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
 	
 		// Only use if magnetic length reasonable
 		float Blen = sqrt(pow(mag_data.scaled.axis[0],2) + pow(mag_data.scaled.axis[1],2) + pow(mag_data.scaled.axis[2],2));
 
 		mag_data.updated =  (home.Set == HOMELOCATION_SET_TRUE) && 
 			((home.Be[0] != 0) || (home.Be[1] != 0) || (home.Be[2] != 0)) &&
-			((mag_data.raw.axis[0] != 0) || (mag_data.raw.axis[1] != 0) || (mag_data.raw.axis[2] != 0)) &&
+			((mag_data.raw.axis[mag_raw_x_idx] != 0) || (mag_data.raw.axis[mag_raw_y_idx] != 0) || (mag_data.raw.axis[mag_raw_z_idx] != 0)) &&
 			((Blen < INSGPS_MAGLEN * (1 + INSGPS_MAGTOL)) && (Blen > INSGPS_MAGLEN * (1 - INSGPS_MAGTOL)));
 	}		
 }
@@ -795,9 +792,9 @@ void calibrate_sensors()
 		if(PIOS_HMC5843_NewDataAvailable()) {
 			j ++;
 			PIOS_HMC5843_ReadMag(mag_data.raw.axis);
-			mag_data.scaled.axis[0] = (mag_data.raw.axis[0] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
-			mag_data.scaled.axis[1] = (mag_data.raw.axis[1] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
-			mag_data.scaled.axis[2] = (mag_data.raw.axis[2] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
+			mag_data.scaled.axis[0] = (mag_data.raw.axis[mag_raw_x_idx] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
+			mag_data.scaled.axis[1] = (mag_data.raw.axis[mag_raw_y_idx] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
+			mag_data.scaled.axis[2] = (mag_data.raw.axis[mag_raw_z_idx] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
 			mag_bias[0] += mag_data.scaled.axis[0];
 			mag_bias[1] += mag_data.scaled.axis[1];
 			mag_bias[2] += mag_data.scaled.axis[2];
@@ -833,9 +830,9 @@ void calibrate_sensors()
 		if(PIOS_HMC5843_NewDataAvailable()) {
 			j ++;
 			PIOS_HMC5843_ReadMag(mag_data.raw.axis);
-			mag_data.scaled.axis[0] = (mag_data.raw.axis[0] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
-			mag_data.scaled.axis[1] = (mag_data.raw.axis[1] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
-			mag_data.scaled.axis[2] = (mag_data.raw.axis[2] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
+			mag_data.scaled.axis[0] = (mag_data.raw.axis[mag_raw_x_idx] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
+			mag_data.scaled.axis[1] = (mag_data.raw.axis[mag_raw_y_idx] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
+			mag_data.scaled.axis[2] = (mag_data.raw.axis[mag_raw_z_idx] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
 			mag_data.calibration.variance[0] += pow(mag_data.scaled.axis[0]-mag_bias[0],2);
 			mag_data.calibration.variance[1] += pow(mag_data.scaled.axis[1]-mag_bias[1],2);
 			mag_data.calibration.variance[2] += pow(mag_data.scaled.axis[2]-mag_bias[2],2);

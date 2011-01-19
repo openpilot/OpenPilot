@@ -454,25 +454,32 @@ void ConfigServoWidget::saveRCOutputObject()
 void ConfigServoWidget::setChOutRange()
 {
     QSpinBox *spinbox = (QSpinBox*)QObject::sender();
+
     int index = outMin.indexOf(spinbox); // This is the channel number
     if (index < 0)
         index = outMax.indexOf(spinbox); // We can't know if the signal came from min or max
+
     QSlider *slider = outSliders[index];
+
     int oldMini = slider->minimum();
     int oldMaxi = slider->maximum();
-    if (outMin[index]->value()<outMax[index]->value()) {
-        slider->setRange(outMin[index]->value(),
-                         outMax[index]->value());
+
+    if (outMin[index]->value()<outMax[index]->value())
+    {
+        slider->setRange(outMin[index]->value(), outMax[index]->value());
         reversals[index]->setChecked(false);
-    } else {
-        slider->setRange(outMax[index]->value(),
-                         outMin[index]->value());
+    }
+    else
+    {
+        slider->setRange(outMax[index]->value(), outMin[index]->value());
         reversals[index]->setChecked(true);
     }
-    if (slider->value()==oldMini)
+
+    if (slider->value() == oldMini)
         slider->setValue(slider->minimum());
-    if (slider->value()==oldMaxi)
-        slider->setValue(slider->maximum());
+
+//    if (slider->value() == oldMaxi)
+//        slider->setValue(slider->maximum());  // this can be dangerous if it happens to be controlling a motor at the time!
 }
 
 /**

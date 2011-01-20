@@ -26,10 +26,15 @@
  */
 
 
-#include "uavobjects/uavobjectmanager.h"
-#include "extensionsystem/pluginmanager.h"
 #include "scopegadgetwidget.h"
 #include "utils/stylehelper.h"
+
+#include "uavtalk/telemetrymanager.h"
+#include "extensionsystem/pluginmanager.h"
+#include "uavobjects/uavobjectmanager.h"
+#include "uavobjects/uavobject.h"
+#include "coreplugin/icore.h"
+#include "coreplugin/connectionmanager.h"
 
 #include "qwt/src/qwt_plot_curve.h"
 #include "qwt/src/qwt_legend.h"
@@ -45,6 +50,7 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 
+using namespace Core;
 
 TestDataGen* ScopeGadgetWidget::testDataGen;
 
@@ -56,6 +62,28 @@ ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
     //Setup the timer that replots data
     replotTimer = new QTimer(this);
     connect(replotTimer, SIGNAL(timeout()), this, SLOT(replotNewData()));
+
+    // Listen to telemetry connection/disconnection events, no point
+    // running the scopes if we are not connected and not replaying logs
+    // Also listen to disconnect actions from the user
+    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    connect(cm, SIGNAL(deviceDisconnected()), this, SLOT(onTelemetryDisconnected()));
+    connect(cm, SIGNAL(deviceConnected(QIODevice*)), this, SLOT(onTelemetryConnected()));
+
+}
+
+/**
+ * Starts/stops telemetry
+ */
+void ScopeGadgetWidget::onTelemetryConnected()
+{
+    if(!replotTimer->isActive())
+        replotTimer->start(m_refreshInterval);
+}
+
+void ScopeGadgetWidget::onTelemetryDisconnected()
+{
+    replotTimer->stop();
 }
 
 void ScopeGadgetWidget::preparePlot(PlotType plotType)
@@ -87,11 +115,15 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
 
     connect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)),this, SLOT(showCurve(QwtPlotItem *, bool)));
 
-    if(!replotTimer->isActive())
-        replotTimer->start(m_refreshInterval);
-    else
-    {
-        replotTimer->setInterval(m_refreshInterval);
+    // Only start the timer if we are already connected
+    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    if (cm->getCurrentConnection()) {
+        if(!replotTimer->isActive())
+            replotTimer->start(m_refreshInterval);
+        else
+        {
+            replotTimer->setInterval(m_refreshInterval);
+        }
     }
 
 }

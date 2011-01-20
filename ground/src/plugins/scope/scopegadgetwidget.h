@@ -29,9 +29,6 @@
 #define SCOPEGADGETWIDGET_H_
 
 #include "plotdata.h"
-#include "uavobjects/uavobject.h"
-#include "uavobjects/baroaltitude.h"
-#include "uavobjects/positionactual.h"
 
 
 #include "qwt/src/qwt.h"
@@ -43,6 +40,7 @@
 #include <QTimer>
 #include <QTime>
 #include <QVector>
+
 
 /*!
   \brief This class is used to render the time values on the horizontal axis for the
@@ -122,6 +120,8 @@ private slots:
     void uavObjectReceived(UAVObject*);
     void replotNewData();
     void showCurve(QwtPlotItem *item, bool on);
+    void onTelemetryConnected();
+    void onTelemetryDisconnected();
 
 private:
 

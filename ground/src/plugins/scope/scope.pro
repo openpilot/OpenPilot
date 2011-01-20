@@ -3,6 +3,7 @@ TARGET = ScopeGadget
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(../../plugins/uavobjects/uavobjects.pri)
+include(../../plugins/uavtalk/uavtalk.pri)
 include(../../libs/qwt/qwt.pri)
 HEADERS += scopeplugin.h \
     plotdata.h

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <qextserialport.h>
 
 namespace Ui {
     class MainWindow;
@@ -17,6 +18,13 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    QextSerialPort *port;
+
+private slots:
+    void onDataAvailable();
+    void closePort();
+    void openPort();
 };
 
 #endif // MAINWINDOW_H

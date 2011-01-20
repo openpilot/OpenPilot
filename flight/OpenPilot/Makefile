@@ -136,6 +136,15 @@ FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
 MODNAMES = $(notdir ${MODULES})
 
 ifndef TESTAPP
+
+## PyMite files
+SRC += $(OUTDIR)/pmlib_img.c
+SRC += $(OUTDIR)/pmlib_nat.c
+SRC += $(OUTDIR)/pmlibusr_img.c
+SRC += $(OUTDIR)/pmlibusr_nat.c
+SRC += $(wildcard ${PYMITEVM}/*.c)
+SRC += $(wildcard ${PYMITEPLAT}/*.c)
+
 ## MODULES
 SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 SRC += ${OUTDIR}/InitMods.c
@@ -296,14 +305,6 @@ SRC += $(DOSFSDIR)/dfs_sdcard.c
 ## AHRS boot loader comms
 SRC += $(AHRSBOOTLOADER)/ahrs_spi_program_master.c
 SRC += $(AHRSBOOTLOADER)/ahrs_spi_program.c
-
-## PyMite files
-SRC += $(OUTDIR)/pmlib_img.c
-SRC += $(OUTDIR)/pmlib_nat.c
-SRC += $(OUTDIR)/pmlibusr_img.c
-SRC += $(OUTDIR)/pmlibusr_nat.c
-SRC += $(wildcard ${PYMITEVM}/*.c)
-SRC += $(wildcard ${PYMITEPLAT}/*.c)
 
 ## Mass Storage Device
 #SRC += $(MSDDIR)/msd.c

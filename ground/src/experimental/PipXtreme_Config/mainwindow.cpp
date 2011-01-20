@@ -1,3 +1,4 @@
+#include <QDebug>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -9,6 +10,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     port = NULL;
+
+    // ***************************
+
+    QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
+
+    foreach (QextPortInfo port, ports)
+    {
+        if (port.friendName == deviceName)
+        {
+        }
+    }
+
+    // ***************************
 
     port = new QextSerialPort(QextSerialPort::EventDriven);
     if (port)
@@ -26,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
         qDebug("isOpen : %d", port->isOpen());
     }
+
+    // ***************************
 }
 
 MainWindow::~MainWindow()

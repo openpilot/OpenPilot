@@ -2,7 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+
 #include <qextserialport.h>
+#include <qextserialenumerator.h>
+#include <QThread>
 
 namespace Ui {
     class MainWindow;

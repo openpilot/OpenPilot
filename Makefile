@@ -130,7 +130,7 @@ openocd_install: OPENOCD_URL  := http://sourceforge.net/projects/openocd/files/o
 openocd_install: OPENOCD_FILE := openocd-0.4.0.tar.bz2
 openocd_install: openocd_clean $(TOOLS_DIR)
 	# download the source only if it's newer than what we already have
-	wget -N -P "$(DL_DIR)" "$(OPENOCD_URL)"
+	wget -N -P "$(DL_DIR)" --trust-server-name "$(OPENOCD_URL)"
 
 	# extract the source
 	[ ! -d "$(DL_DIR)/openocd-build" ] || $(RM) -r "$(DL_DIR)/openocd-build"

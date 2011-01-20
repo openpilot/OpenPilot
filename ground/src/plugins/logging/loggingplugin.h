@@ -27,6 +27,7 @@
 #ifndef LOGGINGPLUGIN_H_
 #define LOGGINGPLUGIN_H_
 
+#include <coreplugin/iconnection.h>
 #include <extensionsystem/iplugin.h>
 #include <uavobjects/uavobjectmanager.h>
 #include "uavobjects/gcstelemetrystats.h"
@@ -39,6 +40,43 @@
 
 class LoggingPlugin;
 class LoggingGadgetFactory;
+
+/**
+*   Define a connection via the IConnection interface
+*   Plugin will add a instance of this class to the pool,
+*   so the connection manager can use it.
+*/
+class LoggingConnection
+    : public Core::IConnection
+{
+    Q_OBJECT
+public:
+    LoggingConnection();
+    virtual ~LoggingConnection();
+
+    virtual QStringList availableDevices();
+    virtual QIODevice *openDevice(const QString &deviceName);
+    virtual void closeDevice(const QString &deviceName);
+
+    virtual QString connectionName();
+    virtual QString shortName();
+
+    bool deviceOpened() {return m_deviceOpened;}
+
+
+private:
+    LogFile logFile;
+
+
+protected slots:
+    void onEnumerationChanged();
+    void startReplay(QString file);
+
+protected:
+    bool m_deviceOpened;
+};
+
+
 
 class LoggingThread : public QThread
 {
@@ -99,7 +137,6 @@ private slots:
     void toggleLogging();
     void toggleReplay();
     void startLogging(QString file);
-    void startReplay(QString file);
     void stopLogging();
     void loggingStopped();
     void replayStopped();

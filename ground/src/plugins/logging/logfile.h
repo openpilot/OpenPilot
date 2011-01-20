@@ -4,6 +4,7 @@
 #include <QIODevice>
 #include <QTime>
 #include <QTimer>
+#include <QMutexLocker>
 #include <QDebug>
 #include <QBuffer>
 #include <uavobjects/uavobjectmanager.h>
@@ -43,6 +44,8 @@ protected:
     QTime myTime;
     QFile file;
     qint32 lastTimeStamp;
+    QMutex mutex;
+
 
     int timeOffset;
     int pausedTime;

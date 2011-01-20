@@ -47,6 +47,78 @@
 #include "uavobjects/uavobjectmanager.h"
 #include <uavobjects/uavobjectmanager.h>
 
+
+LoggingConnection::LoggingConnection()
+{
+
+}
+
+LoggingConnection::~LoggingConnection()
+{
+}
+
+void LoggingConnection::onEnumerationChanged()
+{
+        emit availableDevChanged(this);
+}
+
+QStringList LoggingConnection::availableDevices()
+{
+    QStringList list;
+    list << "Logfile replay...";
+
+    return list;
+}
+
+QIODevice* LoggingConnection::openDevice(const QString &deviceName)
+{
+    if (logFile.isOpen()){
+        logFile.close();
+    }
+    QFileDialog * fd = new QFileDialog();
+    fd->setAcceptMode(QFileDialog::AcceptOpen);
+    fd->setNameFilter("OpenPilot Log (*.opl)");
+    connect(fd, SIGNAL(fileSelected(QString)), this, SLOT(startReplay(QString)));
+    fd->exec();
+    return &logFile;
+}
+
+void LoggingConnection::startReplay(QString file)
+{
+    logFile.setFileName(file);
+    if(logFile.open(QIODevice::ReadOnly)) {
+        qDebug() << "Replaying " << file;
+        // state = REPLAY;
+        logFile.startReplay();
+    }
+}
+
+void LoggingConnection::closeDevice(const QString &deviceName)
+{
+    Q_UNUSED(deviceName);
+    //we have to delete the serial connection we created
+    if (logFile.isOpen()){
+        logFile.close();
+        m_deviceOpened = false;
+    }
+}
+
+
+QString LoggingConnection::connectionName()
+{
+    return QString("Logfile replay");
+}
+
+QString LoggingConnection::shortName()
+{
+    return QString("Logfile");
+}
+
+
+
+
+
+
 /**
   * Sets the file to use for logging and takes the parent plugin
   * to connect to stop logging signal
@@ -259,7 +331,7 @@ bool LoggingPlugin::initialize(const QStringList& args, QString *errMsg)
                                             QList<int>() <<
                                             Core::Constants::C_GLOBAL_ID);
     cmd->setDefaultKeySequence(QKeySequence("Ctrl+L"));
-    cmd->action()->setText("Logging...");
+    cmd->action()->setText("Start logging...");
 
     ac->menu()->addSeparator();
     ac->appendGroup("Logging");
@@ -268,6 +340,7 @@ bool LoggingPlugin::initialize(const QStringList& args, QString *errMsg)
     connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(toggleLogging()));
 
     // Command to replay logging
+    /*
     Core::Command* cmd2 = am->registerAction(new QAction(this),
                                             "LoggingPlugin.Playback",
                                             QList<int>() <<
@@ -279,6 +352,7 @@ bool LoggingPlugin::initialize(const QStringList& args, QString *errMsg)
     ac->addAction(cmd2, "Replay");
 
     connect(cmd2->action(), SIGNAL(triggered(bool)), this, SLOT(toggleReplay()));
+    */
 
     mf = new LoggingGadgetFactory(this);
     addAutoReleasedObject(mf);
@@ -354,31 +428,6 @@ void LoggingPlugin::startLogging(QString file)
 }
 
 /**
-  * Starts the logging thread replaying a certain file
-  */
-void LoggingPlugin::startReplay(QString file)
-{
-
-    logFile.setFileName(file);
-    if(logFile.open(QIODevice::ReadOnly)) {
-        qDebug() << "Replaying " << file;
-        state = REPLAY;
-
-        ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-        UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-
-        uavTalk = new UAVTalk(&logFile, objManager);
-        logFile.startReplay();
-
-        emit stateChanged("REPLAY");
-    } else {
-        QErrorMessage err;
-        err.showMessage("Unable to open file for replay");
-        err.exec();
-    }
-}
-
-/**
   * Send the stop logging signal to the LoggingThread
   */
 void LoggingPlugin::stopLogging()
@@ -428,7 +477,7 @@ void LoggingPlugin::replayStopped()
 
 void LoggingPlugin::extensionsInitialized()
 {
-    // Do nothing
+    addAutoReleasedObject(new LoggingConnection);
 }
 
 void LoggingPlugin::shutdown()

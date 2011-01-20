@@ -8,10 +8,22 @@ LogFile::LogFile(QObject *parent) :
     connect(&timer, SIGNAL(timeout()), this, SLOT(timerFired()));
 }
 
+/**
+ * Opens the logfile QIODevice and the underlying logfile. In case
+ * we want to save the logfile, we open in WriteOnly. In case we
+ * want to read the logfile, we open in ReadOnly.
+ */
 bool LogFile::open(OpenMode mode) {
 
     // start a timer for playback
     myTime.restart();
+    if (file.isOpen()) {
+        // We end up here when doing a replay, because the connection
+        // manager will also try to open the QIODevice, even though we just
+        // opened it after selecting the file, which happens before the
+        // connection manager call...
+        return true;
+    }
 
     if(file.open(mode) == FALSE)
     {
@@ -23,18 +35,25 @@ bool LogFile::open(OpenMode mode) {
     // they can be read back if ID's change
 
     // Must call parent function for QIODevice to pass calls to writeData
-    QIODevice::open(mode);
+    // We always open ReadWrite, because otherwise we will get tons of warnings
+    // during a logfile replay. Read nature is checked upon write ops below.
+    QIODevice::open(QIODevice::ReadWrite);
 
     return true;
 }
 
 void LogFile::close()
 {
+    if (timer.isActive())
+        timer.stop();
     file.close();
     QIODevice::close();
 }
 
 qint64 LogFile::writeData(const char * data, qint64 dataSize) {
+    if (!file.isWritable())
+        return dataSize;
+
     quint32 timeStamp = myTime.elapsed();
 
     file.write((char *) &timeStamp,sizeof(timeStamp));
@@ -48,6 +67,7 @@ qint64 LogFile::writeData(const char * data, qint64 dataSize) {
 }
 
 qint64 LogFile::readData(char * data, qint64 maxSize) {
+    QMutexLocker locker(&mutex);
     qint64 toRead = qMin(maxSize,(qint64)dataBuffer.size());
     memcpy(data,dataBuffer.data(),toRead);
     dataBuffer.remove(0,toRead);
@@ -65,6 +85,7 @@ void LogFile::timerFired()
 
     if(file.bytesAvailable() > 4)
     {
+
         // TODO: going back in time will be a problem
         while ((myTime.elapsed() - timeOffset) * playbackSpeed > lastTimeStamp) {
 
@@ -80,7 +101,9 @@ void LogFile::timerFired()
                 return;
             }
 
+            mutex.lock();
             dataBuffer.append(file.read(dataSize));
+            mutex.unlock();
             emit readyRead();
 
             if(file.bytesAvailable() < 4) {

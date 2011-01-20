@@ -68,7 +68,7 @@ public:
 
     void init();
 
-    QIODevice *getCurrentConnection(); // NOTE: this is never implemented ??
+    QIODevice* getCurrentConnection() { return m_ioDev; }
     devListItem getCurrentDevice() { return m_connectionDevice;}
     bool disconnectDevice();
     void suspendPolling();

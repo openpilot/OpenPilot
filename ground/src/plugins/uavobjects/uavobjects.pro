@@ -45,7 +45,6 @@ HEADERS += uavobjects_global.h \
     positiondesired.h \
     ratedesired.h \
     firmwareiapobj.h \
-    pipxtrememodemsettings.h \
     i2cstats.h \
     batterysettings.h \
     taskinfo.h \
@@ -96,7 +95,6 @@ SOURCES += uavobject.cpp \
     positiondesired.cpp \
     ratedesired.cpp \
     firmwareiapobj.cpp \
-    pipxtrememodemsettings.cpp \
     i2cstats.cpp \
     batterysettings.cpp \
     taskinfo.cpp \

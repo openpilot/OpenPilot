@@ -30,6 +30,8 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) : QWidget(parent)
     m_config = new Ui_PipXtremeWidget();
     m_config->setupUi(this);
 
+    m_ioDev = NULL;
+
     currentStep = IAP_STATE_READY;
     rescueStep = RESCUE_STEP0;
     resetOnly = false;
@@ -71,8 +73,8 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) : QWidget(parent)
     // Listen to autopilot connection events
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
-    connect(telMngr, SIGNAL(connected()), this, SLOT(onModemConnect()));
-    connect(telMngr, SIGNAL(disconnected()), this, SLOT(onModemDisconnect()));
+    connect(telMngr, SIGNAL(connected()), this, SLOT(onTelemetryConnect()));
+    connect(telMngr, SIGNAL(disconnected()), this, SLOT(onTelemetryDisconnect()));
 
     // Note: remove listening to the connection manager, it overlaps with
     // listening to the telemetry manager, we should only listen to one, not both.
@@ -83,13 +85,13 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) : QWidget(parent)
 
     connect(m_config->connectButton, SIGNAL(clicked()), this, SLOT(goToAPIMode()));
 
-    getSerialPorts();
+    getPorts();
 
     QIcon rbi;
     rbi.addFile(QString(":pipxtreme/images/view-refresh.svg"));
     m_config->refreshPorts->setIcon(rbi);
 
-    connect(m_config->refreshPorts, SIGNAL(clicked()), this, SLOT(getSerialPorts()));
+    connect(m_config->refreshPorts, SIGNAL(clicked()), this, SLOT(getPorts()));
 
 //    delay::msleep(600);   // just for pips reference
 }
@@ -122,32 +124,31 @@ bool sortPorts(const QextPortInfo &s1,const QextPortInfo &s2)
     return (s1.portName < s2.portName);
 }
 
-// Gets the list of serial ports
-void PipXtremeGadgetWidget::getSerialPorts()
+void PipXtremeGadgetWidget::getPorts()
 {
     QStringList list;
 
-    m_config->refreshPorts->setEnabled(false);
-    m_config->telemetryLink->setEnabled(false);
+//    m_config->refreshPorts->setEnabled(false);
+//    m_config->telemetryLink->setEnabled(false);
 
-    // Populate the telemetry combo box:
-    m_config->telemetryLink->clear();
+    // ********************************
+    // Populate the telemetry combo box
 
-//    list.append(QString("USB"));
+    // get usb port list
 
+    // get serial port list
     QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
-
-    // sort the list by port number (nice idea from PT_Dreamer :))
-    qSort(ports.begin(), ports.end(),sortPorts);
+    qSort(ports.begin(), ports.end(), sortPorts);                   // sort the list by port number (nice idea from PT_Dreamer :))
     foreach (QextPortInfo port, ports)
-    {
        list.append(port.friendName);
-    }
 
+    m_config->telemetryLink->clear();
     m_config->telemetryLink->addItems(list);
 
-    m_config->refreshPorts->setEnabled(true);
-    m_config->telemetryLink->setEnabled(true);
+    // ********************************
+
+//    m_config->refreshPorts->setEnabled(true);
+//    m_config->telemetryLink->setEnabled(true);
 }
 
 QString PipXtremeGadgetWidget::getPortDevice(const QString &friendName)
@@ -166,6 +167,18 @@ QString PipXtremeGadgetWidget::getPortDevice(const QString &friendName)
     }
 
     return "";
+}
+
+void PipXtremeGadgetWidget::onTelemetryConnect()
+{
+    m_config->connectButton->setEnabled(false);
+    m_config->telemetryLink->setEnabled(false);
+}
+
+void PipXtremeGadgetWidget::onTelemetryDisconnect()
+{
+    m_config->connectButton->setEnabled(true);
+    m_config->telemetryLink->setEnabled(true);
 }
 
 void PipXtremeGadgetWidget::onModemConnect()
@@ -194,7 +207,7 @@ void PipXtremeGadgetWidget::goToAPIMode(UAVObject* callerObj, bool success)
     switch (currentStep)
     {
         case IAP_STATE_READY:
-            getSerialPorts(); // Useful in case a new serial port appeared since the initial list,
+            getPorts(); // Useful in case a new serial port appeared since the initial list,
                           // otherwise we won't find it when we stop the board.
 
             // The board is running, send the 1st IAP Reset order:

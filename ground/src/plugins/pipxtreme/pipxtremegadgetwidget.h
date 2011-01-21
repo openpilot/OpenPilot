@@ -28,7 +28,6 @@
 
 #include "ui_pipxtreme.h"
 #include "delay.h"
-//#include "op_dfu.h"
 
 #include <qextserialport.h>
 #include <qextserialenumerator.h>
@@ -45,9 +44,19 @@
 #include <QThread>
 #include <QMessageBox>
 #include <QTimer>
+#include <QtCore/QVector>
+#include <QtCore/QIODevice>
+#include <QtCore/QLinkedList>
+/*
+class IConnection;
 
-//using namespace OP_DFU;
-
+struct devListItem
+{
+    IConnection *connection;
+    QString devName;
+    QString displayedName;
+};
+*/
 class PipXtremeGadgetWidget : public QWidget
 {
     Q_OBJECT
@@ -60,6 +69,8 @@ public:
     typedef enum { RESCUE_STEP0, RESCUE_STEP1, RESCUE_STEP2, RESCUE_STEP3, RESCUE_POWER1, RESCUE_POWER2, RESCUE_DETECT } RescueStep;
 
 public slots:
+    void onTelemetryConnect();
+    void onTelemetryDisconnect();
     void onModemConnect();
     void onModemDisconnect();
 
@@ -67,20 +78,29 @@ protected:
     void resizeEvent(QResizeEvent *event);
 
 private:
-     Ui_PipXtremeWidget *m_config;
-//     DFUObject *dfu;
-     IAPStep currentStep;
-     RescueStep rescueStep;
-     bool resetOnly;
+    Ui_PipXtremeWidget *m_config;
 
-     QString getPortDevice(const QString &friendName);
+    IAPStep currentStep;
+    RescueStep rescueStep;
+    bool resetOnly;
+
+//    QLinkedList<devListItem> m_devList;
+//    QList<IConnection*> m_connectionsList;
+
+    // currently connected connection plugin
+//    devListItem m_connectionDevice;
+
+    // currently connected QIODevice
+    QIODevice *m_ioDev;
+
+    QString getPortDevice(const QString &friendName);
 
 private slots:
     void error(QString errorString,int errorNumber);
     void goToAPIMode(UAVObject* = NULL, bool = false);
     void systemReset();
     void systemBoot();
-    void getSerialPorts();
+    void getPorts();
 };
 
 #endif

@@ -133,12 +133,16 @@ void PIOS_ADC_Config(uint32_t oversampling)
 	ADC_StartCalibration(ADC2);
 	while (ADC_GetCalibrationStatus(ADC2)) ;
 #endif
-		
+	
+	/* This makes sure we have an even number of transfers if using ADC2 */
+	pios_adc_devs[0].dma_block_size = ((PIOS_ADC_NUM_CHANNELS + PIOS_ADC_USE_ADC2) >> PIOS_ADC_USE_ADC2) << PIOS_ADC_USE_ADC2;
+	pios_adc_devs[0].dma_half_buffer_size = pios_adc_devs[0].dma_block_size * pios_adc_devs[0].adc_oversample;
+
 	/* Configure DMA channel */		
 	DMA_InitTypeDef dma_init = pios_adc_devs[0].cfg->dma.rx.init;	
 	dma_init.DMA_MemoryBaseAddr = (uint32_t) &pios_adc_devs[0].raw_data_buffer[0];
 	dma_init.DMA_MemoryInc = DMA_MemoryInc_Enable;
-	dma_init.DMA_BufferSize = (PIOS_ADC_NUM_CHANNELS * pios_adc_devs[0].adc_oversample * 2) >> 1;
+	dma_init.DMA_BufferSize = pios_adc_devs[0].dma_half_buffer_size; /* x2 for double buffer /2 for 32-bit xfr */
 	DMA_Init(pios_adc_devs[0].cfg->dma.rx.channel, &dma_init);
 	DMA_Cmd(pios_adc_devs[0].cfg->dma.rx.channel, ENABLE);
 	
@@ -238,7 +242,7 @@ void PIOS_ADC_downsample_data()
 	for (chan = 0; chan < PIOS_ADC_NUM_CHANNELS; chan++) {
 		int32_t sum = 0;
 		for (sample = 0; sample < pios_adc_devs[0].adc_oversample; sample++) {
-			sum += pios_adc_devs[0].valid_data_buffer[chan + sample * PIOS_ADC_NUM_CHANNELS] * pios_adc_devs[0].fir_coeffs[sample];
+			sum += pios_adc_devs[0].valid_data_buffer[chan + sample * pios_adc_devs[0].dma_block_size] * pios_adc_devs[0].fir_coeffs[sample];
 		}
 		downsampled_buffer[chan] = (float) sum / pios_adc_devs[0].fir_coeffs[pios_adc_devs[0].adc_oversample];
 	}
@@ -259,12 +263,12 @@ void PIOS_ADC_downsample_data()
 void PIOS_ADC_DMA_Handler(void)
 {
 	if (DMA_GetFlagStatus(pios_adc_devs[0].cfg->full_flag /*DMA1_IT_TC1*/)) {	// whole double buffer filled 
-		pios_adc_devs[0].valid_data_buffer = &pios_adc_devs[0].raw_data_buffer[1 * PIOS_ADC_NUM_CHANNELS * pios_adc_devs[0].adc_oversample];
+		pios_adc_devs[0].valid_data_buffer = &pios_adc_devs[0].raw_data_buffer[pios_adc_devs[0].dma_half_buffer_size];
 		DMA_ClearFlag(pios_adc_devs[0].cfg->full_flag);
 		PIOS_ADC_downsample_data();
 	}
 	else if (DMA_GetFlagStatus(pios_adc_devs[0].cfg->half_flag /*DMA1_IT_HT1*/)) {
-		pios_adc_devs[0].valid_data_buffer = &pios_adc_devs[0].raw_data_buffer[0 * PIOS_ADC_NUM_CHANNELS * pios_adc_devs[0].adc_oversample];
+		pios_adc_devs[0].valid_data_buffer = &pios_adc_devs[0].raw_data_buffer[0];
 		DMA_ClearFlag(pios_adc_devs[0].cfg->half_flag);
 		PIOS_ADC_downsample_data();
 	}

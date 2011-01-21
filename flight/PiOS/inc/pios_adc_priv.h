@@ -47,6 +47,8 @@ struct pios_adc_dev {
 	ADCCallback callback_function;
 	volatile int16_t *valid_data_buffer;
 	volatile uint8_t adc_oversample;
+	uint8_t dma_block_size;
+	uint16_t dma_half_buffer_size;
 	int16_t fir_coeffs[PIOS_ADC_MAX_SAMPLES+1]  __attribute__ ((aligned(4)));
 	volatile int16_t raw_data_buffer[PIOS_ADC_MAX_SAMPLES]  __attribute__ ((aligned(4)));	// Double buffer that DMA just used
 	float downsampled_buffer[PIOS_ADC_NUM_CHANNELS]  __attribute__ ((aligned(4)));

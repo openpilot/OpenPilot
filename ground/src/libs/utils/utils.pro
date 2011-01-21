@@ -38,7 +38,8 @@ SOURCES += reloadpromptutils.cpp \
     detailsbutton.cpp \
     detailswidget.cpp \
     coordinateconversions.cpp \
-    pathutils.cpp
+    pathutils.cpp \
+    worldmagmodel.cpp
 win32 { 
     SOURCES += abstractprocess_win.cpp \
         consoleprocess_win.cpp \
@@ -84,7 +85,8 @@ HEADERS += utils_global.h \
     detailsbutton.h \
     detailswidget.h \
     coordinateconversions.h \
-    pathutils.h
+    pathutils.h \
+    worldmagmodel.h
 FORMS += filewizardpage.ui \
     projectintropage.ui \
     newclasswidget.ui \

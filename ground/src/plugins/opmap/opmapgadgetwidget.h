@@ -112,6 +112,8 @@ public:
 
 public slots:
     void homePositionUpdated(UAVObject*);
+    void onTelemetryConnect();
+    void onTelemetryDisconnect();
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -256,6 +258,8 @@ private:
     QMutex m_waypoint_list_mutex;
 
     QMutex m_map_mutex;
+
+    bool telemetry_connected;
 
     void createActions();
 

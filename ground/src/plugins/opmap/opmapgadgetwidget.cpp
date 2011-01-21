@@ -39,15 +39,14 @@
 
 #include <math.h>
 
+#include "uavtalk/telemetrymanager.h"
+#include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
+#include "uavobjects/uavobject.h"
 #include "uavobjects/positionactual.h"
 #include "uavobjects/homelocation.h"
-#include "extensionsystem/pluginmanager.h"
-
-
 
 //#define allow_manual_home_location_move
-
 
 // *************************************************************************************
 
@@ -95,9 +94,13 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_map_mode = Normal_MapMode;
 
+    telemetry_connected = false;
+
     context_menu_lat_lon = mouse_lat_lon = internals::PointLatLng(0, 0);
 
     setMouseTracking(true);
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 
     // **************
     // get current location
@@ -172,6 +175,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_map->GPS->SetTrailType(UAVTrailType::ByTimeElapsed);
 //  m_map->GPS->SetTrailType(UAVTrailType::ByDistance);
+
     // **************
 
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -290,6 +294,31 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     createActions();
 
     // **************
+    // connect to the UAVObject updates we require to become a bit aware of our environment:
+
+    if (pm)
+    {
+        // Register for Home Location state changes
+        UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
+        if (obm)
+        {
+            UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("HomeLocation")));
+            if (obj)
+            {
+                connect(obj, SIGNAL(objectUpdated(UAVObject*)), this , SLOT(homePositionUpdated(UAVObject*)));
+            }
+        }
+
+        // Listen to telemetry connection events
+        TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
+        if (telMngr)
+        {
+            connect(telMngr, SIGNAL(connected()), this, SLOT(onTelemetryConnect()));
+            connect(telMngr, SIGNAL(disconnected()), this, SLOT(onTelemetryDisconnect()));
+        }
+    }
+
+    // **************
     // create the desired timers
 
     m_updateTimer = new QTimer();
@@ -298,22 +327,11 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_updateTimer->start();
 
     m_statusUpdateTimer = new QTimer();
-    m_statusUpdateTimer->setInterval(50);
+    m_statusUpdateTimer->setInterval(100);
     connect(m_statusUpdateTimer, SIGNAL(timeout()), this, SLOT(updateMousePos()));
     m_statusUpdateTimer->start();
 
     // **************
-    // Last, connect to the UAVObject updates we require to become a bit aware of
-    // our environment:
-
-    // Register for Home Location state changes
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
-    UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("HomeLocation")));
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this , SLOT(homePositionUpdated(UAVObject*)));
-
-
-
 
     m_map->setFocus();
 }
@@ -617,6 +635,9 @@ void OPMapGadgetWidget::updatePosition()
 
     QMutexLocker locker(&m_map_mutex);
 
+    if (!telemetry_connected)
+        return;
+
     double latitude;
     double longitude;
     double altitude;
@@ -651,8 +672,6 @@ void OPMapGadgetWidget::updatePosition()
     uav_pos = internals::PointLatLng(latitude, longitude);	// current UAV position
     m_map->GPS->SetUAVPos(uav_pos, uav_altitude_meters); // set the maps UAV position
     m_map->GPS->SetUAVHeading(uav_heading_degrees);      // set the maps UAV heading
-
-
 }
 
 /**
@@ -967,18 +986,59 @@ void OPMapGadgetWidget::on_toolButtonMoveToWP_clicked()
 }
 
 // *************************************************************************************
-// public functions
+// public slots
 
-
-/** Updates the Home position icon whenever the HomePosition object
-  is updated
-  */
-void OPMapGadgetWidget::homePositionUpdated(UAVObject* hp)
+void OPMapGadgetWidget::onTelemetryConnect()
 {
-    double lat = hp->getField("Latitude")->getDouble()*1e-7;
-    double lon = hp->getField("Longitude")->getDouble()*1e-7;
+    telemetry_connected = true;
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    if (!pm) return;
+
+    UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
+    if (!obm) return;
+
+    UAVDataObject *obj;
+//    UAVObjectField *field;
+
+    // ***********************
+    // fetch the home location
+
+    obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("HomeLocation")));
+    if (!obj) return;
+
+    double lat = obj->getField("Latitude")->getDouble() * 1e-7;
+    double lon = obj->getField("Longitude")->getDouble() * 1e-7;
+//    double alt = obj->getField("Altitude")->getDouble();
+    setHome(internals::PointLatLng(lat, lon));
+
+    if (m_map)
+        m_map->SetCurrentPosition(home_position.coord);         // set the map position
+
+//    field = obj->getField(QString("Be"));
+//    if (!field) return;
+
+    // ***********************
+}
+
+void OPMapGadgetWidget::onTelemetryDisconnect()
+{
+    telemetry_connected = false;
+}
+
+// Updates the Home position icon whenever the HomePosition object is updated
+void OPMapGadgetWidget::homePositionUpdated(UAVObject *hp)
+{
+    if (!hp)
+        return;
+
+    double lat = hp->getField("Latitude")->getDouble() * 1e-7;
+    double lon = hp->getField("Longitude")->getDouble() * 1e-7;
     setHome(internals::PointLatLng(lat, lon));
 }
+
+// *************************************************************************************
+// public functions
 
 /**
   Sets the home position on the map widget

@@ -217,7 +217,7 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //-------------------------
 // Receiver PWM inputs
 //-------------------------
-#define PIOS_PWM_CH1_GPIO_PORT                  GPIOA
+/* #define PIOS_PWM_CH1_GPIO_PORT                  GPIOA
 #define PIOS_PWM_CH1_PIN                        GPIO_Pin_9
 #define PIOS_PWM_CH1_TIM_PORT                   TIM1
 #define PIOS_PWM_CH1_CH                         TIM_Channel_2
@@ -272,25 +272,13 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 #define PIOS_PWM_SUPV_HZ                        25
 #define PIOS_PWM_SUPV_IRQ_CHANNEL               TIM6_IRQn
 #define PIOS_PWM_SUPV_IRQ_FUNC                  void TIM6_IRQHandler(void)
-
+ */
 
 //-------------------------
 // Servo outputs
 //-------------------------
-#define PIOS_SERVO_GPIO_PORT_1TO4               GPIOB
-#define PIOS_SERVO_GPIO_PIN_1                   GPIO_Pin_6
-#define PIOS_SERVO_GPIO_PIN_2                   GPIO_Pin_7
-#define PIOS_SERVO_GPIO_PIN_3                   GPIO_Pin_8
-#define PIOS_SERVO_GPIO_PIN_4                   GPIO_Pin_9
-#define PIOS_SERVO_GPIO_PORT_5TO8               GPIOC
-#define PIOS_SERVO_GPIO_PIN_5                   GPIO_Pin_6
-#define PIOS_SERVO_GPIO_PIN_6                   GPIO_Pin_7
-#define PIOS_SERVO_GPIO_PIN_7                   GPIO_Pin_8
-#define PIOS_SERVO_GPIO_PIN_8                   GPIO_Pin_9
-#define PIOS_SERVO_NUM_OUTPUTS                  8
-#define PIOS_SERVO_NUM_TIMERS                   PIOS_SERVO_NUM_OUTPUTS
 #define PIOS_SERVO_UPDATE_HZ                    50
-#define PIOS_SERVOS_INITIAL_POSITION            0 /* dont want to start motors, have no pulse till settings loaded */
+#define PIOS_SERVOS_INITIAL_POSITION            2000 /* dont want to start motors, have no pulse till settings loaded */
 
 //-------------------------
 // GPIO

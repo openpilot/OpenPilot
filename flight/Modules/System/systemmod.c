@@ -112,7 +112,7 @@ static void systemTask(void *parameters)
 	ObjectPersistenceConnectCallback(&objectUpdatedCb);
 
 	// Main system loop
-	while (1) {
+	while (1) {		
 		// Update the system statistics
 		updateStats();
 

@@ -605,6 +605,88 @@ void PIOS_USART_spektrum_irq_handler(void)
 }
 #endif
 
+/**
+ * Pios servo configuration structures
+ */
+#include <pios_servo_priv.h>
+const struct pios_servo_channel pios_servo_channels[] = {
+	{
+		.timer = TIM4,
+		.port = GPIOB,
+		.channel = 1,
+		.pin = GPIO_Pin_6,
+	}, 
+	{
+		.timer = TIM4,
+		.port = GPIOB,
+		.channel = 2,
+		.pin = GPIO_Pin_7,
+	}, 
+	{
+		.timer = TIM4,
+		.port = GPIOB,
+		.channel = 3,
+		.pin = GPIO_Pin_8,
+	}, 
+	{
+		.timer = TIM4,
+		.port = GPIOB,
+		.channel = 4,
+		.pin = GPIO_Pin_9,
+	}, 
+	{
+		.timer = TIM8,
+		.port = GPIOC,
+		.channel = 1,
+		.pin = GPIO_Pin_6,
+	}, 
+	{
+		.timer = TIM8,
+		.port = GPIOC,
+		.channel = 2,
+		.pin = GPIO_Pin_7,
+	}, 
+	{
+		.timer = TIM8,
+		.port = GPIOC,
+		.channel = 3,
+		.pin = GPIO_Pin_8,
+	}, 
+	{
+		.timer = TIM8,
+		.port = GPIOC,
+		.channel = 4,
+		.pin = GPIO_Pin_9,
+	}, 	
+};
+
+const struct pios_servo_cfg pios_servo_cfg = {
+	.tim_base_init = {
+		.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,
+		.TIM_ClockDivision = TIM_CKD_DIV1,
+		.TIM_CounterMode = TIM_CounterMode_Up,
+		.TIM_Period = ((1000000 / PIOS_SERVO_UPDATE_HZ) - 1),
+		.TIM_RepetitionCounter = 0x0000,
+	},
+	.tim_oc_init = {
+		.TIM_OCMode = TIM_OCMode_PWM1,
+		.TIM_OutputState = TIM_OutputState_Enable,
+		.TIM_OutputNState = TIM_OutputNState_Disable,
+		.TIM_Pulse = PIOS_SERVOS_INITIAL_POSITION,		
+		.TIM_OCPolarity = TIM_OCPolarity_High,
+		.TIM_OCNPolarity = TIM_OCPolarity_High,
+		.TIM_OCIdleState = TIM_OCIdleState_Reset,
+		.TIM_OCNIdleState = TIM_OCNIdleState_Reset,
+	},
+	.gpio_init = {
+		.GPIO_Mode = GPIO_Mode_AF_PP,
+		.GPIO_Speed = GPIO_Speed_2MHz,
+	},
+	.channels = pios_servo_channels,
+	.num_channels = NELEMENTS(pios_servo_channels),
+};
+
+
 /*
  * COM devices
  */

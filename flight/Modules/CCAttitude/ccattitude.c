@@ -187,7 +187,32 @@ void updateAttitude()
 	attitudeActual.Pitch = (UPDATE_FRAC * attitudeActual.Pitch + (1-UPDATE_FRAC) * accel_pitch) * 180 / M_PI;
 	attitudeActual.Yaw = attitudeActual.Yaw * 180 / M_PI;	
 	AttitudeActualSet(&attitudeActual);
+}
 
+void updateStabilization()
+{
+	AttitudeActualData attitudeActual;
+	AttitudeActualGet(&attitudeActual);
+
+	AttitudeDesiredData attitudeDesired;
+	AttitudeDesiredGet(&attitudeDesired);
+
+	AttitudeRawData attitudeRaw;
+	AttitudeRawGet(&attitudeRaw);	
+	
+	ActuatorDesiredData actuatorDesired;
+	ActuatorDesiredGet(&actuatorDesired);
+}
+
+void updateActuator()
+{	
+	ActuatorDesiredData actuatorDesired;
+	ActuatorDesiredGet(&actuatorDesired);
+	
+	ActuatorCommandData actuatorCommand;
+	ActuatorCommandGet(&actuatorCommand);
+
+	ActuatorCommandSet(&actuatorCommand);
 }
 /**
   * @}

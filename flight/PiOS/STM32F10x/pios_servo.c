@@ -30,11 +30,9 @@
 
 /* Project Includes */
 #include "pios.h"
+#include "pios_servo_priv.h"
 
 /* Private Function Prototypes */
-
-/* Local Variables */
-static volatile uint16_t ServoPosition[PIOS_SERVO_NUM_TIMERS];
 
 /**
 * Initialise Servos
@@ -43,72 +41,82 @@ void PIOS_Servo_Init(void)
 {
 #ifndef PIOS_ENABLE_DEBUG_PINS
 #if defined(PIOS_INCLUDE_SERVO)
-	/* Initialise GPIOs as alternate function push/pull */
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_StructInit(&GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Pin = PIOS_SERVO_GPIO_PIN_3 | PIOS_SERVO_GPIO_PIN_4;
-#ifndef PIOS_COM_AUX
-	GPIO_InitStructure.GPIO_Pin |= PIOS_SERVO_GPIO_PIN_1 | PIOS_SERVO_GPIO_PIN_2;
-#endif
-	GPIO_Init(PIOS_SERVO_GPIO_PORT_1TO4, &GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Pin = PIOS_SERVO_GPIO_PIN_5 | PIOS_SERVO_GPIO_PIN_6 | PIOS_SERVO_GPIO_PIN_7 | PIOS_SERVO_GPIO_PIN_8;
-	GPIO_Init(PIOS_SERVO_GPIO_PORT_5TO8, &GPIO_InitStructure);
+	
+	
+	for (uint8_t i = 0; i < pios_servo_cfg.num_channels; i++) {
+		GPIO_InitTypeDef GPIO_InitStructure = pios_servo_cfg.gpio_init;
+		TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = pios_servo_cfg.tim_base_init;
+		TIM_OCInitTypeDef TIM_OCInitStructure = pios_servo_cfg.tim_oc_init;
 
-	/* Initialise RCC Clocks (TIM4 and TIM8) */
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
+		struct pios_servo_channel channel = pios_servo_cfg.channels[i];
+		
+		/* Enable appropriate clock to timer module */
+		switch((int32_t) channel.timer) {
+			case (int32_t)TIM1:
+				RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
+				break;
+			case (int32_t)TIM2:
+				RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+				break;
+			case (int32_t)TIM3:
+				RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+				break;
+			case (int32_t)TIM4:
+				RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+				break;
+			case (int32_t)TIM5:
+				RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
+				break;
+			case (int32_t)TIM6:
+				RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
+				break;
+			case (int32_t)TIM7:
+				RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
+				break;
+			case (int32_t)TIM8:
+				RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
+				break;
+		}
 
-	/* Initialise Timers TIM4 and TIM8 */
-	/* With a resolution of 1uS, period of 20mS (50Hz) */
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
-	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_TimeBaseStructure.TIM_Period = ((1000000 / PIOS_SERVO_UPDATE_HZ) - 1);
-	TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
-	TIM_TimeBaseInit(TIM8, &TIM_TimeBaseStructure);
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+		
+		/* Enable GPIO */
+		GPIO_InitStructure.GPIO_Pin = channel.pin;
+		GPIO_Init(channel.port, &GPIO_InitStructure);
+		
+		/* Enable time base */
+		TIM_TimeBaseInit(channel.timer,  &TIM_TimeBaseStructure);
+		
+		channel.timer->PSC = (PIOS_MASTER_CLOCK / 1000000) - 1;
+				
+		/* Set up for output compare function */
+		switch(channel.channel) {
+			case 1:
+				TIM_OC1Init(channel.timer, &TIM_OCInitStructure);
+				TIM_OC1PreloadConfig(channel.timer, TIM_OCPreload_Enable);
+				break;
+			case 2:
+				TIM_OC2Init(channel.timer, &TIM_OCInitStructure);
+				TIM_OC2PreloadConfig(channel.timer, TIM_OCPreload_Enable);
+				break;
+			case 3:
+				TIM_OC3Init(channel.timer, &TIM_OCInitStructure);
+				TIM_OC3PreloadConfig(channel.timer, TIM_OCPreload_Enable);
+				break;
+			case 4:
+				TIM_OC4Init(channel.timer, &TIM_OCInitStructure);
+				TIM_OC4PreloadConfig(channel.timer, TIM_OCPreload_Enable);
+				break;
+		}
+		
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+		TIM_ARRPreloadConfig(channel.timer, ENABLE);
+		TIM_CtrlPWMOutputs(channel.timer, ENABLE);
+		TIM_Cmd(channel.timer, ENABLE);		
+		
+	}	
 
-	/* Setup each timer separately */
-	TIM_OCInitTypeDef TIM_OCInitStructure;
-
-	/* TIM4 */
-	TIM_OCStructInit(&TIM_OCInitStructure);
-	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
-	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
-	TIM_OCInitStructure.TIM_Pulse = PIOS_SERVOS_INITIAL_POSITION;
-	TIM_OC1Init(TIM4, &TIM_OCInitStructure);
-	TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);
-	TIM_OC2Init(TIM4, &TIM_OCInitStructure);
-	TIM_OC2PreloadConfig(TIM4, TIM_OCPreload_Enable);
-	TIM_OC3Init(TIM4, &TIM_OCInitStructure);
-	TIM_OC3PreloadConfig(TIM4, TIM_OCPreload_Enable);
-	TIM_OC4Init(TIM4, &TIM_OCInitStructure);
-	TIM_OC4PreloadConfig(TIM4, TIM_OCPreload_Enable);
-	TIM_ARRPreloadConfig(TIM4, ENABLE);
-	TIM_CtrlPWMOutputs(TIM4, ENABLE);
-	TIM_Cmd(TIM4, ENABLE);
-
-	/* TIM8 */
-	TIM_OCStructInit(&TIM_OCInitStructure);
-	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
-	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
-	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
-	TIM_OCInitStructure.TIM_Pulse = PIOS_SERVOS_INITIAL_POSITION;
-	TIM_OC1Init(TIM8, &TIM_OCInitStructure);
-	TIM_OC1PreloadConfig(TIM8, TIM_OCPreload_Enable);
-	TIM_OC2Init(TIM8, &TIM_OCInitStructure);
-	TIM_OC2PreloadConfig(TIM8, TIM_OCPreload_Enable);
-	TIM_OC3Init(TIM8, &TIM_OCInitStructure);
-	TIM_OC3PreloadConfig(TIM8, TIM_OCPreload_Enable);
-	TIM_OC4Init(TIM8, &TIM_OCInitStructure);
-	TIM_OC4PreloadConfig(TIM8, TIM_OCPreload_Enable);
-	TIM_ARRPreloadConfig(TIM8, ENABLE);
-	TIM_CtrlPWMOutputs(TIM8, ENABLE);
-	TIM_Cmd(TIM8, ENABLE);
 #endif // PIOS_INCLUDE_SERVO
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
@@ -122,29 +130,31 @@ void PIOS_Servo_SetHz(uint16_t onetofour, uint16_t fivetoeight)
 {
 #ifndef PIOS_ENABLE_DEBUG_PINS
 #if defined(PIOS_INCLUDE_SERVO)
-	/* (Re)-Initialise Timers TIM4 and TIM8 */
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = pios_servo_cfg.tim_base_init;
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-
-#if 0
-	/* Clipping */
-	if (onetofour > 500) {
-		onetofour = 500;
-	}
-	if (fivetoeight > 500) {
-		fivetoeight = 500;
-	}
-#endif
-
 	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
-	TIM_TimeBaseStructure.TIM_Period = ((1000000 / onetofour) - 1);
-	TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
-
-	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
-	TIM_TimeBaseStructure.TIM_Period = ((1000000 / fivetoeight) - 1);
-	TIM_TimeBaseInit(TIM8, &TIM_TimeBaseStructure);
+	
+	for (uint8_t i = 0; i < pios_servo_cfg.num_channels; i++) {
+		struct pios_servo_channel channel = pios_servo_cfg.channels[i];
+		
+		/* Enable time base */
+		switch((int32_t)channel.timer) {
+			case (int32_t)TIM1:
+			case (int32_t)TIM2:
+			case (int32_t)TIM3:
+			case (int32_t)TIM4:
+				TIM_TimeBaseStructure.TIM_Period = ((1000000 / onetofour) - 1);
+				break;
+			case (int32_t)TIM5:
+			case (int32_t)TIM6:
+			case (int32_t)TIM7:
+			case (int32_t)TIM8:
+				TIM_TimeBaseStructure.TIM_Period = ((1000000 / fivetoeight) - 1);
+				break;								
+		}
+		TIM_TimeBaseInit(channel.timer,  &TIM_TimeBaseStructure);
+	} 
 #endif // PIOS_INCLUDE_SERVO
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
@@ -159,36 +169,23 @@ void PIOS_Servo_Set(uint8_t Servo, uint16_t Position)
 #ifndef PIOS_ENABLE_DEBUG_PINS
 #if defined(PIOS_INCLUDE_SERVO)
 	/* Make sure servo exists */
-	if (Servo < PIOS_SERVO_NUM_OUTPUTS && Servo >= 0) {
+	if (Servo < pios_servo_cfg.num_channels && Servo >= 0) {
 		/* Update the position */
-		ServoPosition[Servo] = Position;
 
-		switch (Servo) {
-		case 0:
-			TIM_SetCompare1(TIM4, Position);
-			break;
-		case 1:
-			TIM_SetCompare2(TIM4, Position);
-			break;
-		case 2:
-			TIM_SetCompare3(TIM4, Position);
-			break;
-		case 3:
-			TIM_SetCompare4(TIM4, Position);
-			break;
-		case 4:
-			TIM_SetCompare1(TIM8, Position);
-			break;
-		case 5:
-			TIM_SetCompare2(TIM8, Position);
-			break;
-		case 6:
-			TIM_SetCompare3(TIM8, Position);
-			break;
-		case 7:
-			TIM_SetCompare4(TIM8, Position);
-			break;
-		}
+		switch(pios_servo_cfg.channels[Servo].channel) {
+			case 1:
+				TIM_SetCompare1(pios_servo_cfg.channels[Servo].timer, Position);
+				break;
+			case 2:
+				TIM_SetCompare2(pios_servo_cfg.channels[Servo].timer, Position);
+				break;
+			case 3:
+				TIM_SetCompare3(pios_servo_cfg.channels[Servo].timer, Position);
+				break;
+			case 4:
+				TIM_SetCompare4(pios_servo_cfg.channels[Servo].timer, Position);
+				break;
+		}	 	
 	}
 #endif // PIOS_INCLUDE_SERVO
 #endif // PIOS_ENABLE_DEBUG_PINS

@@ -65,7 +65,13 @@ void PIOS_Board_Init(void) {
 
 	/* Initialize the PiOS library */
 	PIOS_COM_Init();
-	//PIOS_Servo_Init();
+
+	/* Remap AFIO pin */
+	GPIO_PinRemapConfig(GPIO_PartialRemap_TIM3, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+	PIOS_Servo_Init();
+	
 	PIOS_ADC_Init();
 	PIOS_GPIO_Init();
 
@@ -535,6 +541,76 @@ struct pios_com_dev pios_com_devs[] = {
 };
 
 const uint8_t pios_com_num_devices = NELEMENTS(pios_com_devs);
+
+
+/* 
+ * Servo outputs 
+ */
+#include <pios_servo_priv.h>
+const struct pios_servo_channel pios_servo_channels[] = {
+	{
+		.timer = TIM4,
+		.port = GPIOB,
+		.channel = 4,
+		.pin = GPIO_Pin_9,
+	}, 
+	{
+		.timer = TIM4,
+		.port = GPIOB,
+		.channel = 3,
+		.pin = GPIO_Pin_8,
+	}, 
+	{
+		.timer = TIM4,
+		.port = GPIOB,
+		.channel = 2,
+		.pin = GPIO_Pin_7,
+	}, 
+	{
+		.timer = TIM1,
+		.port = GPIOA,
+		.channel = 1,
+		.pin = GPIO_Pin_8,
+	}, 
+	{ /* needs to remap to alternative function */
+		.timer = TIM3,
+		.port = GPIOB,
+		.channel = 1,
+		.pin = GPIO_Pin_4,
+	},  	
+	{
+		.timer = TIM2,
+		.port = GPIOA,
+		.channel = 3,
+		.pin = GPIO_Pin_2,
+	}, 		
+};
+
+const struct pios_servo_cfg pios_servo_cfg = {
+	.tim_base_init = {
+		.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,
+		.TIM_ClockDivision = TIM_CKD_DIV1,
+		.TIM_CounterMode = TIM_CounterMode_Up,
+		.TIM_Period = ((1000000 / PIOS_SERVO_UPDATE_HZ) - 1),
+		.TIM_RepetitionCounter = 0x0000,
+	},
+	.tim_oc_init = {
+		.TIM_OCMode = TIM_OCMode_PWM1,
+		.TIM_OutputState = TIM_OutputState_Enable,
+		.TIM_OutputNState = TIM_OutputNState_Disable,
+		.TIM_Pulse = PIOS_SERVOS_INITIAL_POSITION,		
+		.TIM_OCPolarity = TIM_OCPolarity_High,
+		.TIM_OCNPolarity = TIM_OCPolarity_High,
+		.TIM_OCIdleState = TIM_OCIdleState_Reset,
+		.TIM_OCNIdleState = TIM_OCNIdleState_Reset,
+	},
+	.gpio_init = {
+		.GPIO_Mode = GPIO_Mode_AF_PP,
+		.GPIO_Speed = GPIO_Speed_2MHz,
+	},
+	.channels = pios_servo_channels,
+	.num_channels = NELEMENTS(pios_servo_channels),
+};
 
 /*
  * I2C Adapters

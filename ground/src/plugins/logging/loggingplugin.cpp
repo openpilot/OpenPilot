@@ -371,11 +371,18 @@ void LoggingPlugin::toggleLogging()
 {
     if(state == IDLE)
     {
-        QFileDialog * fd = new QFileDialog();
+        /*QFileDialog * fd = new QFileDialog();
         fd->setAcceptMode(QFileDialog::AcceptSave);
         fd->setNameFilter("OpenPilot Log (*.opl)");
         connect(fd, SIGNAL(fileSelected(QString)), this, SLOT(startLogging(QString)));
-        fd->exec();
+        fd->exec();*/
+
+        QString fileName = QFileDialog::getSaveFileName(NULL, tr("Start Log"),
+                                    tr("OP-%0.opl").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss")),
+                                    tr("OpenPilot Log (*.opl)"));
+        if(!fileName.isEmpty())
+            startLogging(fileName);
+
     }
     else if(state == LOGGING)
     {

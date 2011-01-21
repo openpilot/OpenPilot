@@ -266,6 +266,13 @@ static void updateStats()
 	stats.CPULoad =
 	    100 - (uint8_t) round(100.0 * ((float)idleCounter / (float)(SYSTEM_UPDATE_PERIOD_MS / 1000)) / (float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
 	idleCounterClear = 1;
+	
+#if defined(PIOS_INCLUDE_ADC) && defined(PIOS_ADC_USE_TEMP_SENSOR)
+	float temp_voltage = 3.3 * PIOS_ADC_PinGet(0) / ((1 << 12) - 1);
+	const float STM32_TEMP_V25 = 1.43; /* V */
+	const float STM32_TEMP_AVG_SLOPE = 4.3; /* mV/C */
+	stats.CPUTemp = (temp_voltage-STM32_TEMP_V25) * 1000 / STM32_TEMP_AVG_SLOPE + 25;
+#endif
 	SystemStatsSet(&stats);
 }
 

@@ -44,25 +44,42 @@
 ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+
     FancyTabWidget *ftw = new FancyTabWidget(this, true);
+
     ftw->setIconSize(64);
+
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(ftw);
     setLayout(layout);
-    QWidget *qwd = new ConfigServoWidget(this);
-    ftw->insertTab(0, qwd,QIcon(":/configgadget/images/Servo.png"),QString("RC Input/Output"));
+
+    // *********************
+
+    QWidget *qwd;
+
+    qwd = new ConfigServoWidget(this);
+    ftw->insertTab(0, qwd, QIcon(":/configgadget/images/Servo.png"), QString("RC Input/Output"));
+
     qwd = new ConfigAirframeWidget(this);
     ftw->insertTab(1, qwd, QIcon(":/configgadget/images/Airframe.png"), QString("Aircraft"));
-    qwd = new ConfigTelemetryWidget(this);
-    ftw->insertTab(2,qwd,QIcon(":/configgadget/images/XBee.svg"), QString("Telemetry"));
-    qwd = new ConfigAHRSWidget(this);
-    ftw->insertTab(3,qwd,QIcon(":/configgadget/images/AHRS-v1.3.png"),QString("AHRS"));
 
+    qwd = new ConfigTelemetryWidget(this);
+    ftw->insertTab(2, qwd, QIcon(":/configgadget/images/XBee.svg"), QString("Telemetry"));
+
+    qwd = new ConfigAHRSWidget(this);
+    ftw->insertTab(3, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("AHRS"));
+
+//    qwd = new ConfigPipXtremeWidget(this);
+//    ftw->insertTab(4, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));
+
+    // *********************
     // Listen to autopilot connection events
+
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
     connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
 
+    // *********************
 }
 
 ConfigGadgetWidget::~ConfigGadgetWidget()

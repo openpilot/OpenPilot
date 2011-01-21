@@ -157,6 +157,13 @@ SUBDIRS += plugin_gcscontrol
 #plugin_antennatrack.depends = plugin_uavtalk
 #SUBDIRS += plugin_antennatrack
 
+#PipXtreme Gadget
+#plugin_pipxtreme.subdir = pipxtreme
+#plugin_pipxtreme.depends = plugin_coreplugin
+#plugin_modelview.depends = plugin_uavobjects
+#plugin_modelview.depends = plugin_rawhid
+#SUBDIRS += plugin_pipxtreme
+
 # Empty UAVGadget - Default for new splits
 plugin_magicwaypoint.subdir = magicwaypoint
 plugin_magicwaypoint.depends = plugin_coreplugin

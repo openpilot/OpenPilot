@@ -41,8 +41,8 @@
 #include <stdbool.h>
 #include "fifo_buffer.h"
 
-#define deg_to_rad         (M_PI / 180.0)
-#define rad_to_deg         (180.0 / M_PI)
+#define DEG_TO_RAD         (M_PI / 180.0)
+#define RAD_TO_DEG         (180.0 / M_PI)
 
 #define INSGPS_GPS_TIMEOUT 2   /* 2 seconds triggers reinit of position */
 #define INSGPS_GPS_MINSAT  6   /* 2 seconds triggers reinit of position */
@@ -50,12 +50,12 @@
 #define INSGPS_MAGLEN      1000
 #define INSGPS_MAGTOL      0.5 /* error in magnetic vector length to use  */
 
-#define GYRO_OOB(x) ((x > (1000 * deg_to_rad)) || (x < (-1000 * deg_to_rad)))
+#define GYRO_OOB(x) ((x > (1000 * DEG_TO_RAD)) || (x < (-1000 * DEG_TO_RAD)))
 #define ACCEL_OOB(x) (((x > 12*9.81) || (x < -12*9.81)))
 
-#define mag_raw_x_idx   1
-#define mag_raw_y_idx   0
-#define mag_raw_z_idx   2
+#define MAG_RAW_X_IDX   1
+#define MAG_RAW_Y_IDX   0
+#define MAG_RAW_Z_IDX   2
 
 // For debugging the raw sensors
 //#define DUMP_RAW
@@ -182,8 +182,8 @@ void ins_outdoor_update()
 	
 	if (gps_data.updated)
 	{
-		vel[0] = gps_data.groundspeed * cos(gps_data.heading * deg_to_rad);
-		vel[1] = gps_data.groundspeed * sin(gps_data.heading * deg_to_rad);
+		vel[0] = gps_data.groundspeed * cos(gps_data.heading * DEG_TO_RAD);
+		vel[1] = gps_data.groundspeed * sin(gps_data.heading * DEG_TO_RAD);
 		vel[2] = 0;
 				
 		if(gps_delay > INSGPS_GPS_TIMEOUT)
@@ -370,9 +370,9 @@ void simple_update() {
 	float rpy[3];
 	/***************** SIMPLE ATTITUDE FROM NORTH AND ACCEL ************/
 	/* Very simple computation of the heading and attitude from accel. */
-	rpy[2] = atan2((mag_data.raw.axis[mag_raw_y_idx]), (-1 * mag_data.raw.axis[mag_raw_x_idx])) * rad_to_deg;
-	rpy[1] = atan2(accel_data.filtered.x, accel_data.filtered.z) * rad_to_deg;
-	rpy[0] = atan2(accel_data.filtered.y, accel_data.filtered.z) * rad_to_deg;
+	rpy[2] = atan2((mag_data.raw.axis[MAG_RAW_Y_IDX]), (-1 * mag_data.raw.axis[MAG_RAW_X_IDX])) * RAD_TO_DEG;
+	rpy[1] = atan2(accel_data.filtered.x, accel_data.filtered.z) * RAD_TO_DEG;
+	rpy[0] = atan2(accel_data.filtered.y, accel_data.filtered.z) * RAD_TO_DEG;
 	
 	RPY2Quaternion(rpy, q);
 	attitude_data.quaternion.q1 = q[0];
@@ -695,9 +695,9 @@ void adc_callback(float * downsampled_data)
 	raw.gyrotemp[0] = downsampled_data[6];
 	raw.gyrotemp[1] = downsampled_data[7];
 
-	raw.gyros_filtered[0] = gyro[0] * rad_to_deg;
-	raw.gyros_filtered[1] = gyro[1] * rad_to_deg;
-	raw.gyros_filtered[2] = gyro[2] * rad_to_deg;
+	raw.gyros_filtered[0] = gyro[0] * RAD_TO_DEG;
+	raw.gyros_filtered[1] = gyro[1] * RAD_TO_DEG;
+	raw.gyros_filtered[2] = gyro[2] * RAD_TO_DEG;
 
 	raw.accels_filtered[0] = accel[0];
 	raw.accels_filtered[1] = accel[1];
@@ -708,9 +708,9 @@ void adc_callback(float * downsampled_data)
 	raw.magnetometers[2] = mag_data.scaled.axis[2];
 
 	if(settings.BiasCorrectedRaw == AHRSSETTINGS_BIASCORRECTEDRAW_TRUE) {
-		raw.gyros_filtered[0] -= Nav.gyro_bias[0] * rad_to_deg;
-		raw.gyros_filtered[1] -= Nav.gyro_bias[1] * rad_to_deg;
-		raw.gyros_filtered[2] -= Nav.gyro_bias[2] * rad_to_deg;
+		raw.gyros_filtered[0] -= Nav.gyro_bias[0] * RAD_TO_DEG;
+		raw.gyros_filtered[1] -= Nav.gyro_bias[1] * RAD_TO_DEG;
+		raw.gyros_filtered[2] -= Nav.gyro_bias[2] * RAD_TO_DEG;
 		raw.accels_filtered[0] -= Nav.accel_bias[0];
 		raw.accels_filtered[1] -= Nav.accel_bias[1];
 		raw.accels_filtered[2] -= Nav.accel_bias[2];
@@ -743,16 +743,16 @@ void process_mag_data()
 		PIOS_HMC5843_ReadMag(mag_data.raw.axis);
 
 		// Swap the axis here to acount for orientation of mag chip (notice 0 and 1 swapped in raw)
-		mag_data.scaled.axis[0] = (mag_data.raw.axis[mag_raw_x_idx] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
-		mag_data.scaled.axis[1] = (mag_data.raw.axis[mag_raw_y_idx] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
-		mag_data.scaled.axis[2] = (mag_data.raw.axis[mag_raw_z_idx] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
+		mag_data.scaled.axis[0] = (mag_data.raw.axis[MAG_RAW_X_IDX] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
+		mag_data.scaled.axis[1] = (mag_data.raw.axis[MAG_RAW_Y_IDX] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
+		mag_data.scaled.axis[2] = (mag_data.raw.axis[MAG_RAW_Z_IDX] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
 	
 		// Only use if magnetic length reasonable
 		float Blen = sqrt(pow(mag_data.scaled.axis[0],2) + pow(mag_data.scaled.axis[1],2) + pow(mag_data.scaled.axis[2],2));
 
 		mag_data.updated =  (home.Set == HOMELOCATION_SET_TRUE) && 
 			((home.Be[0] != 0) || (home.Be[1] != 0) || (home.Be[2] != 0)) &&
-			((mag_data.raw.axis[mag_raw_x_idx] != 0) || (mag_data.raw.axis[mag_raw_y_idx] != 0) || (mag_data.raw.axis[mag_raw_z_idx] != 0)) &&
+			((mag_data.raw.axis[MAG_RAW_X_IDX] != 0) || (mag_data.raw.axis[MAG_RAW_Y_IDX] != 0) || (mag_data.raw.axis[MAG_RAW_Z_IDX] != 0)) &&
 			((Blen < INSGPS_MAGLEN * (1 + INSGPS_MAGTOL)) && (Blen > INSGPS_MAGLEN * (1 - INSGPS_MAGTOL)));
 	}		
 }
@@ -796,9 +796,9 @@ void calibrate_sensors()
 		if(PIOS_HMC5843_NewDataAvailable()) {
 			j ++;
 			PIOS_HMC5843_ReadMag(mag_data.raw.axis);
-			mag_data.scaled.axis[0] = (mag_data.raw.axis[mag_raw_x_idx] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
-			mag_data.scaled.axis[1] = (mag_data.raw.axis[mag_raw_y_idx] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
-			mag_data.scaled.axis[2] = (mag_data.raw.axis[mag_raw_z_idx] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
+			mag_data.scaled.axis[0] = (mag_data.raw.axis[MAG_RAW_X_IDX] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
+			mag_data.scaled.axis[1] = (mag_data.raw.axis[MAG_RAW_Y_IDX] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
+			mag_data.scaled.axis[2] = (mag_data.raw.axis[MAG_RAW_Z_IDX] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
 			mag_bias[0] += mag_data.scaled.axis[0];
 			mag_bias[1] += mag_data.scaled.axis[1];
 			mag_bias[2] += mag_data.scaled.axis[2];
@@ -834,9 +834,9 @@ void calibrate_sensors()
 		if(PIOS_HMC5843_NewDataAvailable()) {
 			j ++;
 			PIOS_HMC5843_ReadMag(mag_data.raw.axis);
-			mag_data.scaled.axis[0] = (mag_data.raw.axis[mag_raw_x_idx] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
-			mag_data.scaled.axis[1] = (mag_data.raw.axis[mag_raw_y_idx] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
-			mag_data.scaled.axis[2] = (mag_data.raw.axis[mag_raw_z_idx] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
+			mag_data.scaled.axis[0] = (mag_data.raw.axis[MAG_RAW_X_IDX] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
+			mag_data.scaled.axis[1] = (mag_data.raw.axis[MAG_RAW_Y_IDX] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
+			mag_data.scaled.axis[2] = (mag_data.raw.axis[MAG_RAW_Z_IDX] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
 			mag_data.calibration.variance[0] += pow(mag_data.scaled.axis[0]-mag_bias[0],2);
 			mag_data.calibration.variance[1] += pow(mag_data.scaled.axis[1]-mag_bias[1],2);
 			mag_data.calibration.variance[2] += pow(mag_data.scaled.axis[2]-mag_bias[2],2);

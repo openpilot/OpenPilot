@@ -41,13 +41,16 @@
 #include <stdbool.h>
 #include "fifo_buffer.h"
 
+#define deg_to_rad         (M_PI / 180.0)
+#define rad_to_deg         (180.0 / M_PI)
+
 #define INSGPS_GPS_TIMEOUT 2   /* 2 seconds triggers reinit of position */
 #define INSGPS_GPS_MINSAT  6   /* 2 seconds triggers reinit of position */
 #define INSGPS_GPS_MINPDOP 3.5 /* minimum PDOP for postition updates    */
 #define INSGPS_MAGLEN      1000
 #define INSGPS_MAGTOL      0.5 /* error in magnetic vector length to use  */
 
-#define GYRO_OOB(x) ((x > (1000 / 180 * M_PI)) || (x < (-1000 / 180 * M_PI)))
+#define GYRO_OOB(x) ((x > (1000 * deg_to_rad)) || (x < (-1000 * deg_to_rad)))
 #define ACCEL_OOB(x) (((x > 12*9.81) || (x < -12*9.81)))
 
 #define mag_raw_x_idx   1
@@ -177,9 +180,10 @@ void ins_outdoor_update()
 		gps_delay = (this_gps_time - last_gps_time) / timer_rate();
 	last_gps_time = this_gps_time;
 	
-	if (gps_data.updated) {		
-		vel[0] = gps_data.groundspeed * cos(gps_data.heading * M_PI / 180);
-		vel[1] = gps_data.groundspeed * sin(gps_data.heading * M_PI / 180);
+	if (gps_data.updated)
+	{
+		vel[0] = gps_data.groundspeed * cos(gps_data.heading * deg_to_rad);
+		vel[1] = gps_data.groundspeed * sin(gps_data.heading * deg_to_rad);
 		vel[2] = 0;
 				
 		if(gps_delay > INSGPS_GPS_TIMEOUT)
@@ -366,9 +370,9 @@ void simple_update() {
 	float rpy[3];
 	/***************** SIMPLE ATTITUDE FROM NORTH AND ACCEL ************/
 	/* Very simple computation of the heading and attitude from accel. */
-	rpy[2] = atan2((mag_data.raw.axis[mag_raw_y_idx]), (-1 * mag_data.raw.axis[mag_raw_x_idx])) * 180 / M_PI;
-	rpy[1] = atan2(accel_data.filtered.x, accel_data.filtered.z) * 180 / M_PI;
-	rpy[0] = atan2(accel_data.filtered.y, accel_data.filtered.z) * 180 / M_PI;
+	rpy[2] = atan2((mag_data.raw.axis[mag_raw_y_idx]), (-1 * mag_data.raw.axis[mag_raw_x_idx])) * rad_to_deg;
+	rpy[1] = atan2(accel_data.filtered.x, accel_data.filtered.z) * rad_to_deg;
+	rpy[0] = atan2(accel_data.filtered.y, accel_data.filtered.z) * rad_to_deg;
 	
 	RPY2Quaternion(rpy, q);
 	attitude_data.quaternion.q1 = q[0];
@@ -691,9 +695,9 @@ void adc_callback(float * downsampled_data)
 	raw.gyrotemp[0] = downsampled_data[6];
 	raw.gyrotemp[1] = downsampled_data[7];
 
-	raw.gyros_filtered[0] = gyro[0] * 180 / M_PI;
-	raw.gyros_filtered[1] = gyro[1] * 180 / M_PI;
-	raw.gyros_filtered[2] = gyro[2] * 180 / M_PI;
+	raw.gyros_filtered[0] = gyro[0] * rad_to_deg;
+	raw.gyros_filtered[1] = gyro[1] * rad_to_deg;
+	raw.gyros_filtered[2] = gyro[2] * rad_to_deg;
 
 	raw.accels_filtered[0] = accel[0];
 	raw.accels_filtered[1] = accel[1];
@@ -704,9 +708,9 @@ void adc_callback(float * downsampled_data)
 	raw.magnetometers[2] = mag_data.scaled.axis[2];
 
 	if(settings.BiasCorrectedRaw == AHRSSETTINGS_BIASCORRECTEDRAW_TRUE) {
-		raw.gyros_filtered[0] -= Nav.gyro_bias[0] * 180 / M_PI;
-		raw.gyros_filtered[1] -= Nav.gyro_bias[1] * 180 / M_PI;
-		raw.gyros_filtered[2] -= Nav.gyro_bias[2] * 180 / M_PI;
+		raw.gyros_filtered[0] -= Nav.gyro_bias[0] * rad_to_deg;
+		raw.gyros_filtered[1] -= Nav.gyro_bias[1] * rad_to_deg;
+		raw.gyros_filtered[2] -= Nav.gyro_bias[2] * rad_to_deg;
 		raw.accels_filtered[0] -= Nav.accel_bias[0];
 		raw.accels_filtered[1] -= Nav.accel_bias[1];
 		raw.accels_filtered[2] -= Nav.accel_bias[2];

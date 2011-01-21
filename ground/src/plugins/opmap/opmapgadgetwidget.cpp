@@ -36,8 +36,11 @@
 #include <QStringList>
 #include <QDir>
 #include <QFile>
+#include <QDateTime>
 
 #include <math.h>
+
+#include "utils/worldmagmodel.h"
 
 #include "uavtalk/telemetrymanager.h"
 #include "extensionsystem/pluginmanager.h"
@@ -46,7 +49,7 @@
 #include "uavobjects/positionactual.h"
 #include "uavobjects/homelocation.h"
 
-//#define allow_manual_home_location_move
+// #define allow_manual_home_location_move
 
 // *************************************************************************************
 
@@ -1092,15 +1095,13 @@ void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon)
 
     // *********
 
-//    #if defined(allow_manual_home_location_move)
-        home_position.coord = internals::PointLatLng(latitude, longitude);
+    home_position.coord = internals::PointLatLng(latitude, longitude);
 
-        m_map->Home->SetCoord(home_position.coord);
-        m_map->Home->RefreshPos();
+    m_map->Home->SetCoord(home_position.coord);
+    m_map->Home->RefreshPos();
 
-        // move the magic waypoint to keep it within the safe area boundry
-        keepMagicWaypointWithInSafeArea();
-//    #endif
+    // move the magic waypoint to keep it within the safe area boundry
+    keepMagicWaypointWithInSafeArea();
 }
 
 
@@ -1696,6 +1697,28 @@ void OPMapGadgetWidget::onSetHomeAct_triggered()
         return;
 
     setHome(context_menu_lat_lon);
+
+    // ***************
+    // calculate the magnetic model
+
+    double X, Y, Z;
+    QDateTime dt = QDateTime::currentDateTimeUtc();
+
+    Utils::WorldMagModel *wmm = new Utils::WorldMagModel();
+    if (wmm)
+    {
+        if (wmm->GetMagVector(home_position.coord.Lat(), home_position.coord.Lng(), home_position.altitude, dt.date().month(), dt.date().day(), dt.date().year(), &X, &Y, &Z) >= 0)
+        {
+            QString s = "lat:" + QString::number(home_position.coord.Lat(), 'f', 7) + " lon:" + QString::number(home_position.coord.Lng(), 'f', 7);
+            s += "   x:" + QString::number(X, 'f', 2) + " y:" + QString::number(Y, 'f', 2) + " z:" + QString::number(Z, 'f', 2);
+
+            qDebug() << "opmap HomePosition WMM .. " << s << endl;
+        }
+
+        delete wmm;
+    }
+
+    // ***************
 }
 
 void OPMapGadgetWidget::onGoHomeAct_triggered()

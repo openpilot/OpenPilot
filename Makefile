@@ -7,15 +7,15 @@ DL_DIR=$(ROOT_DIR)/downloads
 # We almost need to consider autoconf/automake instead of this
 # I don't know if windows supports uname :-(
 QT_SPEC=win32-g++
-UAVOBJGENERATOR="$(BUILD_DIR)/uavobjgenerator/debug/uavobjgenerator.exe"
+UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/debug/uavobjgenerator.exe"
 UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
   QT_SPEC=linux-g++
-  UAVOBJGENERATOR="$(BUILD_DIR)/uavobjgenerator/uavobjgenerator"
+  UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/uavobjgenerator"
 endif
 ifeq ($(UNAME), Darwin)
   QT_SPEC=macx-g++
-  UAVOBJGENERATOR="$(BUILD_DIR)/uavobjgenerator/uavobjgenerator"
+  UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/uavobjgenerator"
 endif
 
 
@@ -198,16 +198,16 @@ gcs: openpilotgcs
 
 .PHONY: openpilotgcs
 openpilotgcs:  uavobjects_gcs
-	mkdir -p $(BUILD_DIR)/$@
-	( cd $(BUILD_DIR)/$@ ; \
+	mkdir -p $(BUILD_DIR)/ground/$@
+	( cd $(BUILD_DIR)/ground/$@ ; \
 	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
 	  $(MAKE) -w ; \
 	)
 
 .PHONY: uavobjgenerator
 uavobjgenerator:
-	mkdir -p $(BUILD_DIR)/$@
-	( cd $(BUILD_DIR)/$@ ; \
+	mkdir -p $(BUILD_DIR)/ground/$@
+	( cd $(BUILD_DIR)/ground/$@ ; \
 	  $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
 	  $(MAKE) -w ; \
 	)

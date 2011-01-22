@@ -31,7 +31,7 @@ bool UAVObjectGeneratorPython::generate(UAVObjectParser* parser,QString template
 
     fieldTypeStrPython << "b" << "h" << "i" << "B" << "H" << "I" << "f" << "b";
 
-    pythonCodePath = QDir( templatepath + QString("ground/src/plugins/uavobjects"));
+    pythonCodePath = QDir( templatepath + QString("ground/openpilotgcs/src/plugins/uavobjects"));
     pythonOutputPath = QDir( outputpath + QString("python") );
     pythonOutputPath.mkpath(pythonOutputPath.absolutePath());
 

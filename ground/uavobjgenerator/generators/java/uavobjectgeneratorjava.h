@@ -27,7 +27,7 @@
 #ifndef UAVOBJECTGENERATORJAVA_H
 #define UAVOBJECTGENERATORJAVA_H
 
-#define JAVA_TEMPLATE_DIR "ground/src/libs/juavobjects/templates/"
+#define JAVA_TEMPLATE_DIR "ground/openpilotgcs/src/libs/juavobjects/templates/"
 #define JAVA_GENERATED_DIR "java/src/org/openpilot/uavtalk"
 
 #include "../generator_common.h"

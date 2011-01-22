@@ -33,8 +33,8 @@
 # /ground/share/openpilotgcs/sounds/default/
 /ground/share/openpilotgcs/sounds/default/normalize.exe
 
-# /ground/share/openpilotgcs/translations/
-/ground/share/openpilotgcs/translations/extract-mimetypes.xq
+# /ground/openpilotgcs/share/openpilotgcs/translations/
+/ground/openpilotgcs/share/openpilotgcs/translations/extract-mimetypes.xq
 
 # /ground/src/experimental/OPMapWidget/core/
 /ground/src/experimental/OPMapWidget/core/header.h
@@ -68,5 +68,5 @@
 openpilotgcs-build-desktop
 flight/Project/OpenPilotOSX/OpenPilotOSX.xcodeproj/*.mode1v3
 flight/Project/OpenPilotOSX/OpenPilotOSX.xcodeproj/*.pbxuser
-ground/openpilotgcs.pro.user
+ground/openpilotgcs/openpilotgcs.pro.user
 

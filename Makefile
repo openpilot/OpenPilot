@@ -200,7 +200,7 @@ gcs: openpilotgcs
 openpilotgcs:  uavobjects_gcs
 	mkdir -p $(BUILD_DIR)/$@
 	( cd $(BUILD_DIR)/$@ ; \
-	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
+	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
 	  $(MAKE) -w ; \
 	)
 

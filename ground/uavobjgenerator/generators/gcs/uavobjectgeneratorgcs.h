@@ -27,7 +27,7 @@
 #ifndef UAVOBJECTGENERATORGCS_H
 #define UAVOBJECTGENERATORGCS_H
 
-#define GCS_CODE_DIR "ground/src/plugins/uavobjects"
+#define GCS_CODE_DIR "ground/openpilotgcs/src/plugins/uavobjects"
 
 #include "../generator_common.h"
 

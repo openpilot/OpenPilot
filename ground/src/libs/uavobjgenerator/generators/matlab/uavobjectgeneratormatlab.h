@@ -32,7 +32,7 @@
 class UAVObjectGeneratorMatlab
 {
 public:
-    bool generate(UAVObjectParser* gen,QString basepath);
+    bool generate(UAVObjectParser* gen,QString basepath,QString outputpath);
 
 private:
     bool process_object(ObjectInfo* info);

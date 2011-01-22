@@ -28,12 +28,13 @@
 
 using namespace std;
 
-bool UAVObjectGeneratorMatlab::generate(UAVObjectParser* parser,QString basepath) {
+bool UAVObjectGeneratorMatlab::generate(UAVObjectParser* parser,QString basepath,QString outputpath) {
 
     fieldTypeStrMatlab << "int8" << "int16" << "int32"
         << "uint8" << "uint16" << "uint32" << "float32" << "uint8";
 
     QDir matlabTemplatePath = QDir( basepath + QString("ground/src/plugins/uavobjects"));
+    QDir matlabOutputPath = QDir( outputpath + QString("matlab"));
 
     QString matlabCodeTemplate = readFile( matlabTemplatePath.absoluteFilePath( "uavobjecttemplate.m") );
 
@@ -52,7 +53,7 @@ bool UAVObjectGeneratorMatlab::generate(UAVObjectParser* parser,QString basepath
     matlabCodeTemplate.replace( QString("$(SAVEOBJECTSCODE)"), matlabSaveObjectsCode);
     matlabCodeTemplate.replace( QString("$(FUNCTIONSCODE)"), matlabFunctionsCode);
 
-    bool res = writeFile( matlabTemplatePath.absolutePath() + "/OPLogConvert.m", matlabCodeTemplate );
+    bool res = writeFile( matlabOutputPath.absolutePath() + "/OPLogConvert.m", matlabCodeTemplate );
     if (!res) {
         cout << "Error: Could not write output files" << endl;
         return false;

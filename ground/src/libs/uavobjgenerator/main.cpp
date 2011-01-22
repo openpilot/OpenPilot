@@ -45,19 +45,19 @@ using namespace std;
  * print usage info
  */
 void usage() {
-    cout << "Usage: uavobjectgenerator [-gcs] [-flight] [-java] [-python] [-mathlab] [-none] [-v] [base_path]" << endl;
+    cout << "Usage: uavobjectgenerator [-gcs] [-flight] [-java] [-python] [-matlab] [-none] [-v] [base_path]" << endl;
     cout << "Languages: "<< endl;
-    cout << "\t-gcs           build grounstation code" << endl;
+    cout << "\t-gcs           build groundstation code" << endl;
     cout << "\t-flight        build flight code" << endl;
     cout << "\t-java          build java code" << endl;
     cout << "\t-python        build python code" << endl;
     cout << "\t-matlab        build matlab code" << endl;
-    cout << "\tIf no language is specified ( and not -none ) -> all are build." << endl;
+    cout << "\tIf no language is specified ( and not -none ) -> all are built." << endl;
     cout << "Misc: "<< endl;
     cout << "\t-none          build no language - just parse xml's" << endl;
     cout << "\t-h             this help" << endl;
     cout << "\t-v             verbose" << endl;
-    cout << " \tbase_path     base path to gcs and flight directories (as in svn)." << endl;
+    cout << "\tbase_path      base path to gcs and flight directories (as in svn)." << endl;
 }
 
 /**
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     bool do_flight=(arguments_stringlist.removeAll("-flight")>0);
     bool do_java=(arguments_stringlist.removeAll("-java")>0);
     bool do_python=(arguments_stringlist.removeAll("-python")>0);
-    bool do_matlab=(arguments_stringlist.removeAll("-mathlab")>0);
+    bool do_matlab=(arguments_stringlist.removeAll("-matlab")>0);
     bool do_none=(arguments_stringlist.removeAll("-none")>0); //
 
     bool do_all=((do_gcs||do_flight||do_java||do_python||do_matlab)==false);
@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
     if (do_matlab|do_all) {
         cout << "generating matlab code" << endl ;
         UAVObjectGeneratorMatlab matlabgen;
-        matlabgen.generate(parser,basepath);
+        matlabgen.generate(parser,basepath,outputpath);
     }
 
     return RETURN_OK;

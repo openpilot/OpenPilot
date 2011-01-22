@@ -28,14 +28,15 @@
 
 using namespace std;
 
-bool UAVObjectGeneratorFlight::generate(UAVObjectParser* parser,QString basepath,QString outputpath) {
+bool UAVObjectGeneratorFlight::generate(UAVObjectParser* parser,QString templatepath,QString outputpath) {
 
     fieldTypeStrC << "int8_t" << "int16_t" << "int32_t" <<"uint8_t"
             <<"uint16_t" << "uint32_t" << "float" << "uint8_t";
 
     QString flightObjInit,objInc;
-    flightCodePath = QDir( basepath + QString("flight/UAVObjects"));
-    flightOutputPath = QDir( outputpath + QString("flight"));
+    flightCodePath = QDir( templatepath + QString("flight/UAVObjects"));
+    flightOutputPath = QDir( outputpath + QString("flight") );
+    flightOutputPath.mkpath(flightOutputPath.absolutePath());
 
     flightCodeTemplate = readFile( flightCodePath.absoluteFilePath("uavobjecttemplate.c") );
     flightIncludeTemplate = readFile( flightCodePath.absoluteFilePath("inc/uavobjecttemplate.h") );

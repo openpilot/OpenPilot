@@ -28,13 +28,14 @@
 
 using namespace std;
 
-bool UAVObjectGeneratorMatlab::generate(UAVObjectParser* parser,QString basepath,QString outputpath) {
+bool UAVObjectGeneratorMatlab::generate(UAVObjectParser* parser,QString templatepath,QString outputpath) {
 
     fieldTypeStrMatlab << "int8" << "int16" << "int32"
         << "uint8" << "uint16" << "uint32" << "float32" << "uint8";
 
-    QDir matlabTemplatePath = QDir( basepath + QString("ground/src/plugins/uavobjects"));
-    QDir matlabOutputPath = QDir( outputpath + QString("matlab"));
+    QDir matlabTemplatePath = QDir( templatepath + QString("ground/src/plugins/uavobjects"));
+    QDir matlabOutputPath = QDir( outputpath + QString("matlab") );
+    matlabOutputPath.mkpath(matlabOutputPath.absolutePath());
 
     QString matlabCodeTemplate = readFile( matlabTemplatePath.absoluteFilePath( "uavobjecttemplate.m") );
 

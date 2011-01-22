@@ -45,7 +45,7 @@ using namespace std;
  * print usage info
  */
 void usage() {
-    cout << "Usage: uavobjectgenerator [-gcs] [-flight] [-java] [-python] [-matlab] [-none] [-v] [base_path]" << endl;
+    cout << "Usage: uavobjectgenerator [-gcs] [-flight] [-java] [-python] [-matlab] [-none] [-v] xml_path template_base" << endl;
     cout << "Languages: "<< endl;
     cout << "\t-gcs           build groundstation code" << endl;
     cout << "\t-flight        build flight code" << endl;
@@ -57,7 +57,8 @@ void usage() {
     cout << "\t-none          build no language - just parse xml's" << endl;
     cout << "\t-h             this help" << endl;
     cout << "\t-v             verbose" << endl;
-    cout << "\tbase_path      base path to gcs and flight directories (as in svn)." << endl;
+    cout << "\tinput_path     path to UAVObject definition (.xml) files." << endl;
+    cout << "\ttemplate_path  path to the root of the OpenPilot source tree." << endl;
 }
 
 /**
@@ -78,7 +79,8 @@ int main(int argc, char *argv[])
 
     cout << "- OpenPilot UAVObject Generator -" << endl;
 
-    QString basepath;
+    QString inputpath;
+    QString templatepath;
     QString outputpath;
     QStringList arguments_stringlist;
 
@@ -101,19 +103,24 @@ int main(int argc, char *argv[])
 
     bool do_all=((do_gcs||do_flight||do_java||do_python||do_matlab)==false);
 
-    if (arguments_stringlist.length() == 0) // if we have no param left - make up a basepath
-        basepath =QString("../../../../../");
-    else if (arguments_stringlist.length() == 1) // if we have one param left it is the basepath
-        basepath = arguments_stringlist.at(0);
-    else // too many arguments
+    if (arguments_stringlist.length() == 2) {
+        inputpath = arguments_stringlist.at(0);
+        templatepath = arguments_stringlist.at(1);
+    } else {
+        // wrong number of arguments
         return usage_err();
+    }
 
-    if (!basepath.endsWith("/"))
-        basepath.append("/"); // append a slash if it is not there
+    if (!inputpath.endsWith("/"))
+        inputpath.append("/"); // append a slash if it is not there
 
-    outputpath = basepath + QString("build/uavobject-synthetics/");
+    if (!templatepath.endsWith("/"))
+        templatepath.append("/"); // append a slash if it is not there
 
-    QDir xmlPath = QDir( basepath + QString("ground/src/shared/uavobjectdefinition"));
+    // put all output files in the current directory
+    outputpath = QString("./");
+
+    QDir xmlPath = QDir(inputpath);
     UAVObjectParser* parser = new UAVObjectParser();
 
     QStringList filters=QStringList("*.xml");
@@ -169,35 +176,35 @@ int main(int argc, char *argv[])
     if (do_flight|do_all) {
         cout << "generating flight code" << endl ;
         UAVObjectGeneratorFlight flightgen;
-        flightgen.generate(parser,basepath,outputpath);
+        flightgen.generate(parser,templatepath,outputpath);
     }
 
     // generate gcs code if wanted
     if (do_gcs|do_all) {
         cout << "generating gcs code" << endl ;
         UAVObjectGeneratorGCS gcsgen;
-        gcsgen.generate(parser,basepath,outputpath);
+        gcsgen.generate(parser,templatepath,outputpath);
     }
 
     // generate java code if wanted
     if (do_java|do_all) {
         cout << "generating java code" << endl ;
         UAVObjectGeneratorJava javagen;
-        javagen.generate(parser,basepath);
+        javagen.generate(parser,templatepath);
     }
 
     // generate python code if wanted
     if (do_python|do_all) {
         cout << "generating python code" << endl ;
         UAVObjectGeneratorPython pygen;
-        pygen.generate(parser,basepath,outputpath);
+        pygen.generate(parser,templatepath,outputpath);
     }
 
     // generate matlab code if wanted
     if (do_matlab|do_all) {
         cout << "generating matlab code" << endl ;
         UAVObjectGeneratorMatlab matlabgen;
-        matlabgen.generate(parser,basepath,outputpath);
+        matlabgen.generate(parser,templatepath,outputpath);
     }
 
     return RETURN_OK;

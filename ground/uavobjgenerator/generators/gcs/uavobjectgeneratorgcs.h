@@ -34,7 +34,7 @@
 class UAVObjectGeneratorGCS
 {
 public:
-    bool generate(UAVObjectParser* gen,QString basepath,QString outputpath);
+    bool generate(UAVObjectParser* gen,QString templatepath,QString outputpath);
 
 private:
     bool process_object(ObjectInfo* info);

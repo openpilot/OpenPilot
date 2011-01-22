@@ -27,7 +27,7 @@
 #include "uavobjectgeneratorgcs.h"
 using namespace std;
 
-bool UAVObjectGeneratorGCS::generate(UAVObjectParser* parser,QString basepath,QString outputpath) {
+bool UAVObjectGeneratorGCS::generate(UAVObjectParser* parser,QString templatepath,QString outputpath) {
 
     fieldTypeStrCPP << "qint8" << "qint16" << "qint32" <<
         "quint8" << "quint16" << "quint32" << "float" << "quint8";
@@ -35,8 +35,9 @@ bool UAVObjectGeneratorGCS::generate(UAVObjectParser* parser,QString basepath,QS
     fieldTypeStrCPPClass << "INT8" << "INT16" << "INT32"
         << "UINT8" << "UINT16" << "UINT32" << "FLOAT32" << "ENUM";
 
-    gcsCodePath = QDir( basepath + QString(GCS_CODE_DIR));
-    gcsOutputPath = QDir( outputpath + QString("gcs"));
+    gcsCodePath = QDir( templatepath + QString(GCS_CODE_DIR));
+    gcsOutputPath = QDir( outputpath + QString("gcs") );
+    gcsOutputPath.mkpath(gcsOutputPath.absolutePath());
 
     gcsCodeTemplate = readFile( gcsCodePath.absoluteFilePath("uavobjecttemplate.cpp") );
     gcsIncludeTemplate = readFile( gcsCodePath.absoluteFilePath("uavobjecttemplate.h") );

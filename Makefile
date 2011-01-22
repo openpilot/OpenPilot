@@ -18,6 +18,7 @@ ifeq ($(UNAME), Darwin)
   UAVOBJGENERATOR="$(BUILD_DIR)/uavobjgenerator/uavobjgenerator"
 endif
 
+
 # Set up misc host tools
 RM=rm
 
@@ -55,8 +56,10 @@ areyousureyoushouldberunningthis:
 	@echo "     gcs               - Build the Ground Control System application"
 	@echo "     uavobjects        - Generate source files from the UAVObject definition XML files"
 	@echo "     uavobjects_test   - parse xml-files - check for valid, duplicate ObjId's, ... "
-	@echo "     uavobjects_gcs    - Generate groundstation source files from the UAVObject definition XML files"
 	@echo "     uavobjects_flight - Generate flight source files from the UAVObject definition XML files"
+	@echo "     uavobjects_gcs    - Generate groundstation source files from the UAVObject definition XML files"
+	@echo "     uavobjects_python - Generate python source files from the UAVObject definition XML files"
+	@echo "     uavobjects_matlab - Generate matlab source files from the UAVObject definition XML files"
 	@echo
 	@echo "   Note: All tools will be installed into $(TOOLS_DIR)"
 	@echo "         All build output will be placed in $(BUILD_DIR)"
@@ -209,31 +212,22 @@ uavobjgenerator:
 	  $(MAKE) -w ; \
 	)
 
-.PHONY: uavobjects-synthetics
-uavobject-synthetics:
-	mkdir -p $(BUILD_DIR)/$@
-
 .PHONY:uavobjects
 uavobjects:  uavobjects_gcs uavobjects_flight uavobjects_python uavobjects_matlab
 
-uavobjects_gcs: uavobject-synthetics uavobjgenerator
-	mkdir -p $(BUILD_DIR)/uavobject-synthetics/gcs
-	$(UAVOBJGENERATOR) -gcs "$(ROOT_DIR)/"
+UAVOBJ_XML_DIR := $(ROOT_DIR)/shared/uavobjectdefinition
+UAVOBJ_OUT_DIR := $(BUILD_DIR)/uavobject-synthetics
 
-uavobjects_flight: uavobject-synthetics uavobjgenerator
-	mkdir -p $(BUILD_DIR)/uavobject-synthetics/flight
-	$(UAVOBJGENERATOR) -flight "$(ROOT_DIR)/"
+$(UAVOBJ_OUT_DIR):
+	mkdir -p $@
 
-uavobjects_python: uavobject-synthetics uavobjgenerator
-	mkdir -p $(BUILD_DIR)/uavobject-synthetics/python
-	$(UAVOBJGENERATOR) -python "$(ROOT_DIR)/"
+uavobjects_%: $(UAVOBJ_OUT_DIR) uavobjgenerator
+	( cd $(UAVOBJ_OUT_DIR) ; \
+	  $(UAVOBJGENERATOR) -$* $(UAVOBJ_XML_DIR) $(ROOT_DIR) ; \
+	)
 
-uavobjects_matlab: uavobject-synthetics uavobjgenerator
-	mkdir -p $(BUILD_DIR)/uavobject-synthetics/matlab
-	$(UAVOBJGENERATOR) -matlab "$(ROOT_DIR)/"
-
-uavobjects_test: uavobject-synthetics uavobjgenerator
-	$(UAVOBJGENERATOR) -v -none "$(ROOT_DIR)/"
+uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
+	$(UAVOBJGENERATOR) -v -none $(UAVOBJ_XML_DIR) $(ROOT_DIR)
 
 ##############################
 #

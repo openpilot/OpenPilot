@@ -130,6 +130,8 @@ PYMITEINC += $(OUTDIR)
 FLIGHTPLANLIB = $(OPMODULEDIR)/FlightPlan/lib
 FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
 
+OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
+
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 
@@ -156,7 +158,6 @@ SRC += $(OPSYSTEM)/alarms.c
 SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
-SRC += $(OPUAVOBJ)/uavobjectsinit.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
 else
 ## TESTCODE
@@ -168,48 +169,49 @@ endif
 
 ## UAVOBJECTS
 ifndef TESTAPP
-SRC += $(OPUAVOBJ)/objectpersistence.c
-SRC += $(OPUAVOBJ)/positionactual.c
-SRC += $(OPUAVOBJ)/gpsposition.c
-SRC += $(OPUAVOBJ)/gpstime.c
-SRC += $(OPUAVOBJ)/gpssatellites.c
-SRC += $(OPUAVOBJ)/gcstelemetrystats.c
-SRC += $(OPUAVOBJ)/flighttelemetrystats.c
-SRC += $(OPUAVOBJ)/systemstats.c
-SRC += $(OPUAVOBJ)/systemalarms.c
-SRC += $(OPUAVOBJ)/systemsettings.c
-SRC += $(OPUAVOBJ)/telemetrysettings.c
-SRC += $(OPUAVOBJ)/actuatorcommand.c
-SRC += $(OPUAVOBJ)/actuatordesired.c
-SRC += $(OPUAVOBJ)/actuatorsettings.c
-SRC += $(OPUAVOBJ)/manualcontrolcommand.c
-SRC += $(OPUAVOBJ)/manualcontrolsettings.c
-SRC += $(OPUAVOBJ)/attitudedesired.c
-SRC += $(OPUAVOBJ)/stabilizationsettings.c
-SRC += $(OPUAVOBJ)/ahrsstatus.c
-SRC += $(OPUAVOBJ)/i2cstats.c
-SRC += $(OPUAVOBJ)/baroaltitude.c
-SRC += $(OPUAVOBJ)/ahrscalibration.c
-SRC += $(OPUAVOBJ)/attitudeactual.c
-SRC += $(OPUAVOBJ)/ahrssettings.c
-SRC += $(OPUAVOBJ)/flightbatterystate.c
-SRC += $(OPUAVOBJ)/attituderaw.c
-SRC += $(OPUAVOBJ)/homelocation.c
-SRC += $(OPUAVOBJ)/mixersettings.c
-SRC += $(OPUAVOBJ)/mixerstatus.c
-SRC += $(OPUAVOBJ)/positiondesired.c
-SRC += $(OPUAVOBJ)/velocitydesired.c
-SRC += $(OPUAVOBJ)/velocityactual.c
-SRC += $(OPUAVOBJ)/guidancesettings.c
-SRC += $(OPUAVOBJ)/firmwareiapobj.c
-SRC += $(OPUAVOBJ)/ratedesired.c
-SRC += $(OPUAVOBJ)/batterysettings.c
-SRC += $(OPUAVOBJ)/flightplancontrol.c
-SRC += $(OPUAVOBJ)/flightplanstatus.c
-SRC += $(OPUAVOBJ)/flightplansettings.c
-SRC += $(OPUAVOBJ)/taskinfo.c
-SRC += $(OPUAVOBJ)/watchdogstatus.c
-SRC += $(OPUAVOBJ)/nedaccel.c
+SRC += $(OPUAVSYNTHDIR)/objectpersistence.c
+SRC += $(OPUAVSYNTHDIR)/positionactual.c
+SRC += $(OPUAVSYNTHDIR)/gpsposition.c
+SRC += $(OPUAVSYNTHDIR)/gpstime.c
+SRC += $(OPUAVSYNTHDIR)/gpssatellites.c
+SRC += $(OPUAVSYNTHDIR)/gcstelemetrystats.c
+SRC += $(OPUAVSYNTHDIR)/flighttelemetrystats.c
+SRC += $(OPUAVSYNTHDIR)/systemstats.c
+SRC += $(OPUAVSYNTHDIR)/systemalarms.c
+SRC += $(OPUAVSYNTHDIR)/systemsettings.c
+SRC += $(OPUAVSYNTHDIR)/telemetrysettings.c
+SRC += $(OPUAVSYNTHDIR)/actuatorcommand.c
+SRC += $(OPUAVSYNTHDIR)/actuatordesired.c
+SRC += $(OPUAVSYNTHDIR)/actuatorsettings.c
+SRC += $(OPUAVSYNTHDIR)/manualcontrolcommand.c
+SRC += $(OPUAVSYNTHDIR)/manualcontrolsettings.c
+SRC += $(OPUAVSYNTHDIR)/attitudedesired.c
+SRC += $(OPUAVSYNTHDIR)/stabilizationsettings.c
+SRC += $(OPUAVSYNTHDIR)/ahrsstatus.c
+SRC += $(OPUAVSYNTHDIR)/i2cstats.c
+SRC += $(OPUAVSYNTHDIR)/baroaltitude.c
+SRC += $(OPUAVSYNTHDIR)/ahrscalibration.c
+SRC += $(OPUAVSYNTHDIR)/attitudeactual.c
+SRC += $(OPUAVSYNTHDIR)/ahrssettings.c
+SRC += $(OPUAVSYNTHDIR)/flightbatterystate.c
+SRC += $(OPUAVSYNTHDIR)/attituderaw.c
+SRC += $(OPUAVSYNTHDIR)/homelocation.c
+SRC += $(OPUAVSYNTHDIR)/mixersettings.c
+SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
+SRC += $(OPUAVSYNTHDIR)/positiondesired.c
+SRC += $(OPUAVSYNTHDIR)/velocitydesired.c
+SRC += $(OPUAVSYNTHDIR)/velocityactual.c
+SRC += $(OPUAVSYNTHDIR)/guidancesettings.c
+SRC += $(OPUAVSYNTHDIR)/firmwareiapobj.c
+SRC += $(OPUAVSYNTHDIR)/ratedesired.c
+SRC += $(OPUAVSYNTHDIR)/batterysettings.c
+SRC += $(OPUAVSYNTHDIR)/flightplancontrol.c
+SRC += $(OPUAVSYNTHDIR)/flightplanstatus.c
+SRC += $(OPUAVSYNTHDIR)/flightplansettings.c
+SRC += $(OPUAVSYNTHDIR)/taskinfo.c
+SRC += $(OPUAVSYNTHDIR)/watchdogstatus.c
+SRC += $(OPUAVSYNTHDIR)/nedaccel.c
+SRC += $(OPUAVSYNTHDIR)/uavobjectsinit.c
 endif
 
 ## PIOS Hardware (STM32F10x)
@@ -346,6 +348,7 @@ EXTRAINCDIRS  += $(OPUAVTALK)
 EXTRAINCDIRS  += $(OPUAVTALKINC)
 EXTRAINCDIRS  += $(OPUAVOBJ)
 EXTRAINCDIRS  += $(OPUAVOBJINC)
+EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)

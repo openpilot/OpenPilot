@@ -209,21 +209,21 @@ uavobjgenerator:
 	  $(MAKE) -w ; \
 	)
 
-.PHONY: build_dir
-bzild_dir:
+.PHONY: uavobjects-synthetics
+uavobject-synthetics:
 	mkdir -p $(BUILD_DIR)/$@
 
 .PHONY:uavobjects
-uavobjects:  build_dir uavobjgenerator
-	$(UAVOBJGENERATOR) "$(ROOT_DIR)/"
+uavobjects:  uavobjects_gcs uavobjects_flight
 
-uavobjects_gcs: build_dir uavobjgenerator
+uavobjects_gcs: uavobject-synthetics uavobjgenerator
 	$(UAVOBJGENERATOR) -gcs "$(ROOT_DIR)/"
 
-uavobjects_flight: build_dir uavobjgenerator
+uavobjects_flight: uavobject-synthetics uavobjgenerator
+	mkdir -p $(BUILD_DIR)/uavobject-synthetics/flight
 	$(UAVOBJGENERATOR) -flight "$(ROOT_DIR)/"
 
-uavobjects_test: build_dir uavobjgenerator
+uavobjects_test: uavobject-synthetics uavobjgenerator
 	$(UAVOBJGENERATOR) -v -none "$(ROOT_DIR)/"
 
 ##############################

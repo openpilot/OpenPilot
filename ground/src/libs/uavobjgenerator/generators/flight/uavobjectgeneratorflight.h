@@ -32,10 +32,11 @@
 class UAVObjectGeneratorFlight
 {
 public:
-    bool generate(UAVObjectParser* gen,QString basepath);
+    bool generate(UAVObjectParser* gen,QString basepath,QString outputpath);
     QStringList fieldTypeStrC;
     QString flightCodeTemplate, flightIncludeTemplate, flightInitTemplate;
     QDir flightCodePath;
+    QDir flightOutputPath;
 
 private:
     bool process_object(ObjectInfo* info);

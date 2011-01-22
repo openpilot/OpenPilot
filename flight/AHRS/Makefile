@@ -89,6 +89,8 @@ OPSYSINC = $(OPDIR)/System/inc
 BOOT = ../Bootloaders/AHRS
 BOOTINC = $(BOOT)/inc
 
+OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
+
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 
@@ -182,7 +184,7 @@ EXTRAINCDIRS  += $(PIOSBOARDS)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
 EXTRAINCDIRS  += $(CMSISDIR)
 EXTRAINCDIRS  += $(AHRSINC)
-EXTRAINCDIRS  += $(OPUAVOBJINC)
+EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
 EXTRAINCDIRS  += $(BOOTINC)
 
 # List any extra directories to look for library files here.

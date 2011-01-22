@@ -79,6 +79,7 @@ int main(int argc, char *argv[])
     cout << "- OpenPilot UAVObject Generator -" << endl;
 
     QString basepath;
+    QString outputpath;
     QStringList arguments_stringlist;
 
     // process arguments
@@ -109,6 +110,8 @@ int main(int argc, char *argv[])
 
     if (!basepath.endsWith("/"))
         basepath.append("/"); // append a slash if it is not there
+
+    outputpath = basepath + QString("build/uavobject-synthetics/");
 
     QDir xmlPath = QDir( basepath + QString("ground/src/shared/uavobjectdefinition"));
     UAVObjectParser* parser = new UAVObjectParser();
@@ -166,7 +169,7 @@ int main(int argc, char *argv[])
     if (do_flight|do_all) {
         cout << "generating flight code" << endl ;
         UAVObjectGeneratorFlight flightgen;
-        flightgen.generate(parser,basepath);
+        flightgen.generate(parser,basepath,outputpath);
     }
 
     // generate gcs code if wanted

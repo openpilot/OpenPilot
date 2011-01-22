@@ -28,13 +28,14 @@
 
 using namespace std;
 
-bool UAVObjectGeneratorFlight::generate(UAVObjectParser* parser,QString basepath) {
+bool UAVObjectGeneratorFlight::generate(UAVObjectParser* parser,QString basepath,QString outputpath) {
 
     fieldTypeStrC << "int8_t" << "int16_t" << "int32_t" <<"uint8_t"
             <<"uint16_t" << "uint32_t" << "float" << "uint8_t";
 
     QString flightObjInit,objInc;
     flightCodePath = QDir( basepath + QString("flight/UAVObjects"));
+    flightOutputPath = QDir( outputpath + QString("flight"));
 
     flightCodeTemplate = readFile( flightCodePath.absoluteFilePath("uavobjecttemplate.c") );
     flightIncludeTemplate = readFile( flightCodePath.absoluteFilePath("inc/uavobjecttemplate.h") );
@@ -55,7 +56,7 @@ bool UAVObjectGeneratorFlight::generate(UAVObjectParser* parser,QString basepath
     // Write the flight object inialization files
     flightInitTemplate.replace( QString("$(OBJINC)"), objInc);
     flightInitTemplate.replace( QString("$(OBJINIT)"), flightObjInit);
-    bool res = writeFileIfDiffrent( flightCodePath.absolutePath() + "/uavobjectsinit.c",
+    bool res = writeFileIfDiffrent( flightOutputPath.absolutePath() + "/uavobjectsinit.c",
                      flightInitTemplate );
     if (!res) {
         cout << "Error: Could not write flight object init files" << endl;
@@ -221,13 +222,13 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
     outCode.replace(QString("$(INITFIELDS)"), initfields);
 
     // Write the flight code
-    bool res = writeFileIfDiffrent( flightCodePath.absolutePath() + "/" + info->namelc + ".c", outCode );
+    bool res = writeFileIfDiffrent( flightOutputPath.absolutePath() + "/" + info->namelc + ".c", outCode );
     if (!res) {
         cout << "Error: Could not write flight code files" << endl;
         return false;
     }
 
-    res = writeFileIfDiffrent( flightCodePath.absolutePath() + "/inc/" + info->namelc + ".h", outInclude );
+    res = writeFileIfDiffrent( flightOutputPath.absolutePath() + "/" + info->namelc + ".h", outInclude );
     if (!res) {
         cout << "Error: Could not write flight include files" << endl;
         return false;

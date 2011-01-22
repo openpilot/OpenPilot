@@ -25,6 +25,8 @@
 #include "pm.h"
 #include "openpilot.h"
 
+int pylinenum;
+
 PmReturn_t plat_init(void)
 {
     return PM_RET_OK;

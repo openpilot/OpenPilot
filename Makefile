@@ -205,7 +205,7 @@ openpilotgcs:  uavobjects_gcs
 uavobjgenerator:
 	mkdir -p $(BUILD_DIR)/$@
 	( cd $(BUILD_DIR)/$@ ; \
-	  $(QMAKE) $(ROOT_DIR)/ground/src/libs/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
+	  $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
 	  $(MAKE) -w ; \
 	)
 

@@ -214,7 +214,7 @@ uavobject-synthetics:
 	mkdir -p $(BUILD_DIR)/$@
 
 .PHONY:uavobjects
-uavobjects:  uavobjects_gcs uavobjects_flight
+uavobjects:  uavobjects_gcs uavobjects_flight uavobjects_python
 
 uavobjects_gcs: uavobject-synthetics uavobjgenerator
 	mkdir -p $(BUILD_DIR)/uavobject-synthetics/gcs
@@ -223,6 +223,10 @@ uavobjects_gcs: uavobject-synthetics uavobjgenerator
 uavobjects_flight: uavobject-synthetics uavobjgenerator
 	mkdir -p $(BUILD_DIR)/uavobject-synthetics/flight
 	$(UAVOBJGENERATOR) -flight "$(ROOT_DIR)/"
+
+uavobjects_python: uavobject-synthetics uavobjgenerator
+	mkdir -p $(BUILD_DIR)/uavobject-synthetics/python
+	$(UAVOBJGENERATOR) -python "$(ROOT_DIR)/"
 
 uavobjects_test: uavobject-synthetics uavobjgenerator
 	$(UAVOBJGENERATOR) -v -none "$(ROOT_DIR)/"

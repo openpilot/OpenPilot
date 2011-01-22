@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
     if (do_python|do_all) {
         cout << "generating python code" << endl ;
         UAVObjectGeneratorPython pygen;
-        pygen.generate(parser,basepath);
+        pygen.generate(parser,basepath,outputpath);
     }
 
     // generate matlab code if wanted

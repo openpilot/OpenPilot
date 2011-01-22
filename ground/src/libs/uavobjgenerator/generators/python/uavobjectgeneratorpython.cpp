@@ -27,11 +27,12 @@
 #include "uavobjectgeneratorpython.h"
 using namespace std;
 
-bool UAVObjectGeneratorPython::generate(UAVObjectParser* parser,QString basepath) {
+bool UAVObjectGeneratorPython::generate(UAVObjectParser* parser,QString basepath,QString outputpath) {
 
     fieldTypeStrPython << "b" << "h" << "i" << "B" << "H" << "I" << "f" << "b";
 
     pythonCodePath = QDir( basepath + QString("ground/src/plugins/uavobjects"));
+    pythonOutputPath = QDir( outputpath + QString("python"));
 
     pythonCodeTemplate = readFile( pythonCodePath.absoluteFilePath("uavobjecttemplate.py") );
 
@@ -106,7 +107,7 @@ bool UAVObjectGeneratorPython::process_object(ObjectInfo* info)
     outCode.replace(QString("$(DATAFIELDS)"), fields);
 
     // Write the Python code
-    bool res = writeFileIfDiffrent( pythonCodePath.absolutePath() + "/" + info->namelc + ".py", outCode );
+    bool res = writeFileIfDiffrent( pythonOutputPath.absolutePath() + "/" + info->namelc + ".py", outCode );
     if (!res) {
         cout << "Error: Could not write Python output files" << endl;
         return false;

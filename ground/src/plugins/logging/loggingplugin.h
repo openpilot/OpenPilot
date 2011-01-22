@@ -62,6 +62,7 @@ public:
     virtual QString shortName();
 
     bool deviceOpened() {return m_deviceOpened;}
+    LogFile* getLogfile() { return &logFile;}
 
 
 private:
@@ -117,7 +118,9 @@ public:
     bool initialize(const QStringList & arguments, QString * errorString);
     void shutdown();
 
-    LogFile * getLogfile() { return &logFile; };
+    LoggingConnection* getLogConnection() { return logConnection; };
+    LogFile* getLogfile() { return logConnection->getLogfile();}
+
 
 signals:
     void stopLoggingSignal(void);
@@ -131,11 +134,10 @@ protected:
 
     // These are used for replay, logging in its own thread
     UAVTalk * uavTalk;
-    LogFile logFile;
+    LoggingConnection* logConnection;
 
 private slots:
     void toggleLogging();
-    void toggleReplay();
     void startLogging(QString file);
     void stopLogging();
     void loggingStopped();

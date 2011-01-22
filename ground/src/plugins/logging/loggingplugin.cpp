@@ -302,12 +302,16 @@ void LoggingThread::transactionCompleted(UAVObject* obj, bool success)
 LoggingPlugin::LoggingPlugin() : state(IDLE)
 {
     // Do nothing
+    logConnection = new LoggingConnection();
 }
 
 LoggingPlugin::~LoggingPlugin()
 {
     if (loggingThread)
         delete loggingThread;
+
+    // Don't delete it, the plugin manager will do it:
+    //delete logConnection;
 }
 
 /**
@@ -339,26 +343,12 @@ bool LoggingPlugin::initialize(const QStringList& args, QString *errMsg)
 
     connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(toggleLogging()));
 
-    // Command to replay logging
-    /*
-    Core::Command* cmd2 = am->registerAction(new QAction(this),
-                                            "LoggingPlugin.Playback",
-                                            QList<int>() <<
-                                            Core::Constants::C_GLOBAL_ID);
-    cmd2->setDefaultKeySequence(QKeySequence("Ctrl+R"));
-    cmd2->action()->setText("Replay...");
-
-    ac->appendGroup("Replay");
-    ac->addAction(cmd2, "Replay");
-
-    connect(cmd2->action(), SIGNAL(triggered(bool)), this, SLOT(toggleReplay()));
-    */
 
     mf = new LoggingGadgetFactory(this);
     addAutoReleasedObject(mf);
 
     // Map signal from end of replay to replay stopped
-    connect(&logFile,SIGNAL(replayFinished()), this, SLOT(replayStopped()));
+    connect(getLogfile(),SIGNAL(replayFinished()), this, SLOT(replayStopped()));
 
     return true;
 }
@@ -387,26 +377,6 @@ void LoggingPlugin::toggleLogging()
     else if(state == LOGGING)
     {
         stopLogging();
-    }
-}
-
-/**
-  * The action that is triggered by the menu item which opens the
-  * file and begins replay if successful
-  */
-void LoggingPlugin::toggleReplay()
-{
-    if(state == IDLE)
-    {
-        QFileDialog * fd = new QFileDialog();
-        fd->setAcceptMode(QFileDialog::AcceptOpen);
-        fd->setNameFilter("OpenPilot Log (*.opl)");
-        connect(fd, SIGNAL(fileSelected(QString)), this, SLOT(startReplay(QString)));
-        fd->exec();
-    }
-    else if(state == REPLAY)
-    {
-        logFile.stopReplay();
     }
 }
 
@@ -470,7 +440,7 @@ void LoggingPlugin::replayStopped()
     if(uavTalk)
         delete(uavTalk);
 
-    logFile.close();
+    getLogfile()->close();
 
     uavTalk = 0;
     state = IDLE;
@@ -484,7 +454,7 @@ void LoggingPlugin::replayStopped()
 
 void LoggingPlugin::extensionsInitialized()
 {
-    addAutoReleasedObject(new LoggingConnection);
+    addAutoReleasedObject(logConnection);
 }
 
 void LoggingPlugin::shutdown()

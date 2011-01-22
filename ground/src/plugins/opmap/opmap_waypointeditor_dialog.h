@@ -37,8 +37,8 @@
 #include <QPixmap>
 #include <QUndoStack>
 
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/positionactual.h"
+#include "uavobjectmanager.h"
+#include "positionactual.h"
 
 namespace Ui {
     class opmap_waypointeditor_dialog;

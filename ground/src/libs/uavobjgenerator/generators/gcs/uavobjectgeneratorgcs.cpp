@@ -27,7 +27,7 @@
 #include "uavobjectgeneratorgcs.h"
 using namespace std;
 
-bool UAVObjectGeneratorGCS::generate(UAVObjectParser* parser,QString basepath) {
+bool UAVObjectGeneratorGCS::generate(UAVObjectParser* parser,QString basepath,QString outputpath) {
 
     fieldTypeStrCPP << "qint8" << "qint16" << "qint32" <<
         "quint8" << "quint16" << "quint32" << "float" << "quint8";
@@ -36,6 +36,7 @@ bool UAVObjectGeneratorGCS::generate(UAVObjectParser* parser,QString basepath) {
         << "UINT8" << "UINT16" << "UINT32" << "FLOAT32" << "ENUM";
 
     gcsCodePath = QDir( basepath + QString(GCS_CODE_DIR));
+    gcsOutputPath = QDir( outputpath + QString("gcs"));
 
     gcsCodeTemplate = readFile( gcsCodePath.absoluteFilePath("uavobjecttemplate.cpp") );
     gcsIncludeTemplate = readFile( gcsCodePath.absoluteFilePath("uavobjecttemplate.h") );
@@ -60,7 +61,7 @@ bool UAVObjectGeneratorGCS::generate(UAVObjectParser* parser,QString basepath) {
     // Write the gcs object inialization files
     gcsInitTemplate.replace( QString("$(OBJINC)"), objInc);
     gcsInitTemplate.replace( QString("$(OBJINIT)"), gcsObjInit);
-    bool res = writeFileIfDiffrent( gcsCodePath.absolutePath() + "/uavobjectsinit.cpp", gcsInitTemplate );
+    bool res = writeFileIfDiffrent( gcsOutputPath.absolutePath() + "/uavobjectsinit.cpp", gcsInitTemplate );
     if (!res) {
         cout << "Error: Could not write output files" << endl;
         return false;
@@ -254,12 +255,12 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo* info)
     outCode.replace(QString("$(INITFIELDS)"), initfields);
 
     // Write the GCS code
-    bool res = writeFileIfDiffrent( gcsCodePath.absolutePath() + "/" + info->namelc + ".cpp", outCode );
+    bool res = writeFileIfDiffrent( gcsOutputPath.absolutePath() + "/" + info->namelc + ".cpp", outCode );
     if (!res) {
         cout << "Error: Could not write gcs output files" << endl;
         return false;
     }
-    res = writeFileIfDiffrent( gcsCodePath.absolutePath() + "/" + info->namelc + ".h", outInclude );
+    res = writeFileIfDiffrent( gcsOutputPath.absolutePath() + "/" + info->namelc + ".h", outInclude );
     if (!res) {
         cout << "Error: Could not write gcs output files" << endl;
         return false;

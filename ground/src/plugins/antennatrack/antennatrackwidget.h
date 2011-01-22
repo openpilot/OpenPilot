@@ -30,7 +30,7 @@
 
 #include "ui_antennatrackwidget.h"
 #include "antennatrackgadgetconfiguration.h"
-#include "uavobjects/uavobject.h"
+#include "uavobject.h"
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>

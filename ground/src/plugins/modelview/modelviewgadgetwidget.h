@@ -38,8 +38,8 @@
 #include "sceneGraph/glc_world.h"
 #include "glc_exception.h"
 
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/attitudeactual.h"
+#include "uavobjectmanager.h"
+#include "attitudeactual.h"
 
 
 

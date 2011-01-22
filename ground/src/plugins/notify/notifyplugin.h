@@ -29,8 +29,8 @@
 
 #include <extensionsystem/iplugin.h> 
 #include "uavtalk/telemetrymanager.h"
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/uavobject.h"
+#include "uavobjectmanager.h"
+#include "uavobject.h"
 
 #include <QSettings>
 #include <phonon>

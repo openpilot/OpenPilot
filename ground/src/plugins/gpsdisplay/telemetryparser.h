@@ -31,8 +31,8 @@
 #include <QObject>
 #include <QtCore>
 #include "extensionsystem/pluginmanager.h"
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/uavobject.h"
+#include "uavobjectmanager.h"
+#include "uavobject.h"
 #include "gpsparser.h"
 
 

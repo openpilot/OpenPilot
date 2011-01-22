@@ -29,8 +29,8 @@
 #define MagicWaypointGADGETWIDGET_H_
 
 #include <QtGui/QLabel>
-#include "uavobjects/positiondesired.h"
-#include "uavobjects/positionactual.h"
+#include "positiondesired.h"
+#include "positionactual.h"
 
 class Ui_MagicWaypoint;
 

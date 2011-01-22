@@ -30,7 +30,7 @@
 
 #include <QtGui/QWidget>
 #include <QtGui/QTreeView>
-#include "uavobjects/objectpersistence.h"
+#include "objectpersistence.h"
 #include "uavobjecttreemodel.h"
 
 class QPushButton;

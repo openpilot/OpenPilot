@@ -30,8 +30,8 @@
 #include "ui_settingswidget.h"
 #include "configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/uavobject.h"
+#include "uavobjectmanager.h"
+#include "uavobject.h"
 #include <QtGui/QWidget>
 #include <QList>
 

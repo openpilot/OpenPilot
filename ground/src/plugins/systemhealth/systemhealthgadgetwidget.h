@@ -29,7 +29,7 @@
 #define SYSTEMHEALTHGADGETWIDGET_H_
 
 #include "systemhealthgadgetconfiguration.h"
-#include "uavobjects/uavobject.h"
+#include "uavobject.h"
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>

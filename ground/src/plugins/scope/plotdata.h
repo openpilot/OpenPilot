@@ -28,11 +28,11 @@
 #ifndef PLOTDATA_H
 #define PLOTDATA_H
 
-#include "uavobjects/uavobject.h"
-#include "uavobjects/baroaltitude.h"
-#include "uavobjects/positionactual.h"
-#include "uavobjects/attituderaw.h"
-#include "uavobjects/manualcontrolcommand.h"
+#include "uavobject.h"
+#include "baroaltitude.h"
+#include "positionactual.h"
+#include "attituderaw.h"
+#include "manualcontrolcommand.h"
 
 
 #include "qwt/src/qwt.h"

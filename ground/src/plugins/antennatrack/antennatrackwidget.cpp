@@ -27,7 +27,7 @@
 
 #include "antennatrackwidget.h"
 #include "extensionsystem/pluginmanager.h"
-#include "uavobjects/uavobjectmanager.h"
+#include "uavobjectmanager.h"
 
 
 #include <iostream>

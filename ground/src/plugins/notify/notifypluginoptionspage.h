@@ -30,8 +30,8 @@
 #define NOTIFYPLUGINOPTIONSPAGE_H
 
 #include "coreplugin/dialogs/ioptionspage.h"
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/uavobject.h"
+#include "uavobjectmanager.h"
+#include "uavobject.h"
 
 #include "QString"
 #include <QStringList>

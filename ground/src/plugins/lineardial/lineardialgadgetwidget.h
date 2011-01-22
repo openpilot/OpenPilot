@@ -30,8 +30,8 @@
 
 #include "lineardialgadgetconfiguration.h"
 #include "extensionsystem/pluginmanager.h"
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/uavobject.h"
+#include "uavobjectmanager.h"
+#include "uavobject.h"
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>

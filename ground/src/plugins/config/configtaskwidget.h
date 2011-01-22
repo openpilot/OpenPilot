@@ -29,9 +29,9 @@
 
 
 #include "extensionsystem/pluginmanager.h"
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/uavobject.h"
-#include "uavobjects/objectpersistence.h"
+#include "uavobjectmanager.h"
+#include "uavobject.h"
+#include "objectpersistence.h"
 #include <QQueue>
 #include <QtGui/QWidget>
 #include <QList>

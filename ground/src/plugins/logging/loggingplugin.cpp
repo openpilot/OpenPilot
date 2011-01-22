@@ -44,8 +44,7 @@
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/icore.h>
 #include <QKeySequence>
-#include "uavobjects/uavobjectmanager.h"
-#include <uavobjects/uavobjectmanager.h>
+#include "uavobjectmanager.h"
 
 
 LoggingConnection::LoggingConnection()

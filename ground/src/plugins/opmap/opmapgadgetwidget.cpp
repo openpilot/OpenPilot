@@ -44,10 +44,10 @@
 
 #include "uavtalk/telemetrymanager.h"
 #include "extensionsystem/pluginmanager.h"
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/uavobject.h"
-#include "uavobjects/positionactual.h"
-#include "uavobjects/homelocation.h"
+#include "uavobjectmanager.h"
+#include "uavobject.h"
+#include "positionactual.h"
+#include "homelocation.h"
 
 // #define allow_manual_home_location_move
 

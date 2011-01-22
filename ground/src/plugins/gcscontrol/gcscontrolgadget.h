@@ -29,7 +29,7 @@
 #define GCSControlGADGET_H_
 
 #include <coreplugin/iuavgadget.h>
-#include <uavobjects/manualcontrolcommand.h>
+#include "manualcontrolcommand.h"
 #include "gcscontrolgadgetconfiguration.h"
 #include "sdlgamepad/sdlgamepad.h"
 #include <QTime>

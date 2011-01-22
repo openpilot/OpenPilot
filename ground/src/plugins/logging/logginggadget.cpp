@@ -28,8 +28,8 @@
 #include "logginggadgetwidget.h"
 
 #include "extensionsystem/pluginmanager.h"
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/uavobject.h"
+#include "uavobjectmanager.h"
+#include "uavobject.h"
 
 LoggingGadget::LoggingGadget(QString classId, LoggingGadgetWidget *widget, QWidget *parent) :
         IUAVGadget(classId, parent),

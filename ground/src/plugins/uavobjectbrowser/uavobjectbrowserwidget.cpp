@@ -29,7 +29,7 @@
 #include "browseritemdelegate.h"
 #include "treeitem.h"
 #include "ui_uavobjectbrowser.h"
-#include "uavobjects/uavobjectmanager.h"
+#include "uavobjectmanager.h"
 #include <QStringList>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>

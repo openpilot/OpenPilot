@@ -35,9 +35,9 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 
-#include "uavobjects/uavobject.h"
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/manualcontrolcommand.h"
+#include "uavobject.h"
+#include "uavobjectmanager.h"
+#include "manualcontrolcommand.h"
 #include "extensionsystem/pluginmanager.h"
 #include "extensionsystem/pluginmanager.h"
 

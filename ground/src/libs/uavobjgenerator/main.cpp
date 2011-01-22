@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
     if (do_gcs|do_all) {
         cout << "generating gcs code" << endl ;
         UAVObjectGeneratorGCS gcsgen;
-        gcsgen.generate(parser,basepath);
+        gcsgen.generate(parser,basepath,outputpath);
     }
 
     // generate java code if wanted

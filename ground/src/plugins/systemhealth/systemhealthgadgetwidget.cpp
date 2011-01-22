@@ -28,8 +28,8 @@
 #include "systemhealthgadgetwidget.h"
 #include "utils/stylehelper.h"
 #include "extensionsystem/pluginmanager.h"
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/systemalarms.h"
+#include "uavobjectmanager.h"
+#include "systemalarms.h"
 
 #include <iostream>
 #include <QtGui/QFileDialog>

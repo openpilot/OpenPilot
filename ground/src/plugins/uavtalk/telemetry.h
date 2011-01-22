@@ -29,8 +29,8 @@
 #define TELEMETRY_H
 
 #include "uavtalk.h"
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/gcstelemetrystats.h"
+#include "uavobjectmanager.h"
+#include "gcstelemetrystats.h"
 #include <QMutex>
 #include <QMutexLocker>
 #include <QTimer>

@@ -29,7 +29,7 @@
 #define GCSControlGADGETWIDGET_H_
 
 #include <QtGui/QLabel>
-#include "uavobjects/manualcontrolcommand.h"
+#include "manualcontrolcommand.h"
 
 class Ui_GCSControl;
 

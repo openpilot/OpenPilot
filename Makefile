@@ -217,6 +217,7 @@ uavobject-synthetics:
 uavobjects:  uavobjects_gcs uavobjects_flight
 
 uavobjects_gcs: uavobject-synthetics uavobjgenerator
+	mkdir -p $(BUILD_DIR)/uavobject-synthetics/gcs
 	$(UAVOBJGENERATOR) -gcs "$(ROOT_DIR)/"
 
 uavobjects_flight: uavobject-synthetics uavobjgenerator

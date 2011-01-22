@@ -33,7 +33,7 @@
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
-#include "uavobjects/manualcontrolcommand.h"
+#include "manualcontrolcommand.h"
 
 namespace Ui {
     class JoystickControl;

@@ -31,7 +31,7 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QSemaphore>
-#include "uavobjects/uavobjectmanager.h"
+#include "uavobjectmanager.h"
 #include "uavtalk_global.h"
 
 class UAVTALK_EXPORT UAVTalk: public QObject

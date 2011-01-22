@@ -34,10 +34,10 @@
 #include <QTime>
 #include <QMutex>
 #include <QMutexLocker>
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/gcstelemetrystats.h"
-#include "uavobjects/flighttelemetrystats.h"
-#include "uavobjects/systemstats.h"
+#include "uavobjectmanager.h"
+#include "gcstelemetrystats.h"
+#include "flighttelemetrystats.h"
+#include "systemstats.h"
 #include "telemetry.h"
 
 class TelemetryMonitor : public QObject

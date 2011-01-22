@@ -30,8 +30,8 @@
 #include "ui_ccpm.h"
 #include "configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/uavobject.h"
+#include "uavobjectmanager.h"
+#include "uavobject.h"
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
 #include <QtGui/QWidget>

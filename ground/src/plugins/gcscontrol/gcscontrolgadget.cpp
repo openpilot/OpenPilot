@@ -28,8 +28,8 @@
 #include "gcscontrolgadgetwidget.h"
 #include "gcscontrolgadgetconfiguration.h"
 #include "extensionsystem/pluginmanager.h"
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/uavobject.h"
+#include "uavobjectmanager.h"
+#include "uavobject.h"
 #include <QDebug>
 
 #define JOYSTICK_UPDATE_RATE 50

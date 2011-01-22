@@ -35,7 +35,7 @@
 
 #include <hitlplugin.h>
 #include <simulator.h>
-#include "uavobjects/uavobjectmanager.h"
+#include "uavobjectmanager.h"
 #include "coreplugin/icore.h"
 #include "coreplugin/threadmanager.h"
 

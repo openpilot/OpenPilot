@@ -7,13 +7,13 @@
 #include <QTimer>
 #include <math.h>
 #include "uavtalk/telemetrymanager.h"
-#include "uavobjects/uavobjectmanager.h"
-#include "uavobjects/actuatordesired.h"
-#include "uavobjects/altitudeactual.h"
-#include "uavobjects/attitudeactual.h"
-#include "uavobjects/velocityactual.h"
-#include "uavobjects/positionactual.h"
-#include "uavobjects/gcstelemetrystats.h"
+#include "uavobjectmanager.h"
+#include "actuatordesired.h"
+#include "altitudeactual.h"
+#include "attitudeactual.h"
+#include "velocityactual.h"
+#include "positionactual.h"
+#include "gcstelemetrystats.h"
 
 class Simulator: public QObject
 {

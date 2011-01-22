@@ -49,6 +49,8 @@ equals(TEST, 1) {
     DEFINES += WITH_TESTS
 }
 
+win32:QMAKE_COPY_DIR = cp -r -f
+
 GCS_SOURCE_TREE = $$PWD
 isEmpty(GCS_BUILD_TREE) {
     sub_dir = $$_PRO_FILE_PWD_

@@ -1702,7 +1702,7 @@ void OPMapGadgetWidget::onSetHomeAct_triggered()
     // calculate the magnetic model
 
     double X, Y, Z;
-    QDateTime dt = QDateTime::currentDateTimeUtc();
+    QDateTime dt = QDateTime::currentDateTime().toUTC();
 
     Utils::WorldMagModel *wmm = new Utils::WorldMagModel();
     if (wmm)

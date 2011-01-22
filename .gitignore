@@ -24,43 +24,27 @@
 # /ground/
 /ground/Build
 
-# /ground/share/openpilotgcs/models/Easystar/
-/ground/share/openpilotgcs/models/Easystar/Thumbs.db
+/ground/openpilotgcs/share/openpilotgcs/models/Easystar/Thumbs.db
 
-# /ground/share/openpilotgcs/sounds/
-/ground/share/openpilotgcs/sounds/normalize.exe
+/ground/openpilotgcs/share/openpilotgcs/sounds/normalize.exe
 
-# /ground/share/openpilotgcs/sounds/default/
-/ground/share/openpilotgcs/sounds/default/normalize.exe
+/ground/openpilotgcs/share/openpilotgcs/sounds/default/normalize.exe
 
-# /ground/openpilotgcs/share/openpilotgcs/translations/
 /ground/openpilotgcs/share/openpilotgcs/translations/extract-mimetypes.xq
 
-# /ground/src/experimental/OPMapWidget/core/
-/ground/src/experimental/OPMapWidget/core/header.h
+/ground/openpilotgcs/src/experimental/OPMapWidget/core/header.h
 
-# /ground/src/experimental/tools/DocumentationHelper/
-/ground/src/experimental/tools/DocumentationHelper/ui_mainwindow.h
+/ground/openpilotgcs/src/experimental/tools/DocumentationHelper/ui_mainwindow.h
 
-# /ground/src/libs/qextserialport/
-/ground/src/libs/qextserialport/.hg
-/ground/src/libs/qextserialport/.hgtags
+/ground/openpilotgcs/src/libs/qextserialport/.hg
+/ground/openpilotgcs/src/libs/qextserialport/.hgtags
 
-# /ground/src/libs/qwt/
-/ground/src/libs/qwt/qwt.prf
-/ground/src/libs/qwt/designer
+/ground/openpilotgcs/src/libs/qwt/qwt.prf
+/ground/openpilotgcs/src/libs/qwt/designer
 
-# /ground/src/libs/uavobjgenerator/
-/ground/src/libs/uavobjgenerator/Makefile
-/ground/src/libs/uavobjgenerator/Makefile.Debug
-/ground/src/libs/uavobjgenerator/Makefile.Release
-/ground/src/libs/uavobjgenerator/debug
-/ground/src/libs/uavobjgenerator/release
+/ground/openpilotgcs/src/plugins/ipconnection/ui_ipconnectionoptionspage.h
 
-# /ground/src/plugins/ipconnection/
-/ground/src/plugins/ipconnection/ui_ipconnectionoptionspage.h
-
-# /
+# Ignore artifacts of top-level Makefile
 /downloads
 /tools
 /build
@@ -68,5 +52,10 @@
 openpilotgcs-build-desktop
 flight/Project/OpenPilotOSX/OpenPilotOSX.xcodeproj/*.mode1v3
 flight/Project/OpenPilotOSX/OpenPilotOSX.xcodeproj/*.pbxuser
+
+# Ignore some of the .pro.user files
 ground/openpilotgcs/openpilotgcs.pro.user
+ground/uavobjgenerator/uavobjgenerator.pro.user
+ground/uavobjects/uavobjects.pro.user
+ground/ground.pro.user
 

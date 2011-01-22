@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
     if (do_java|do_all) {
         cout << "generating java code" << endl ;
         UAVObjectGeneratorJava javagen;
-        javagen.generate(parser,templatepath);
+        javagen.generate(parser,templatepath,outputpath);
     }
 
     // generate python code if wanted

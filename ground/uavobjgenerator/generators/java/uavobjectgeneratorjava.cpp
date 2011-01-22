@@ -27,10 +27,10 @@
 #include "uavobjectgeneratorjava.h"
 using namespace std;
 
-bool UAVObjectGeneratorJava::generate(UAVObjectParser* parser,QString basepath) {
-    QDir javaTemplatePath = QDir( basepath + QString(JAVA_TEMPLATE_DIR));
+bool UAVObjectGeneratorJava::generate(UAVObjectParser* parser,QString templatepath,QString outputpath) {
+    QDir javaTemplatePath = QDir( templatepath + QString(JAVA_TEMPLATE_DIR));
 
-    javaCodePath = QDir ( basepath + QString(JAVA_GENERATED_DIR));
+    javaCodePath = QDir ( outputpath + QString(JAVA_GENERATED_DIR));
 
     javaCodeTemplate = readFile( javaTemplatePath.absoluteFilePath("uavobjecttemplate.java") );
     QString javaInitCodeTemplate = readFile( javaTemplatePath.absoluteFilePath("uavobjectsinittemplate.java") );

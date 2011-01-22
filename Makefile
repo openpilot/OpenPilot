@@ -213,7 +213,7 @@ uavobjgenerator:
 	)
 
 .PHONY:uavobjects
-uavobjects:  uavobjects_gcs uavobjects_flight uavobjects_python uavobjects_matlab
+uavobjects:  uavobjects_gcs uavobjects_flight uavobjects_python uavobjects_matlab uavobjects_java
 
 UAVOBJ_XML_DIR := $(ROOT_DIR)/shared/uavobjectdefinition
 UAVOBJ_OUT_DIR := $(BUILD_DIR)/uavobject-synthetics

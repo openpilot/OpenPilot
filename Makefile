@@ -254,7 +254,7 @@ openpilot_%: uavobjects_flight
 .PHONY: ahrs
 ahrs: ahrs_elf
 
-ahrs_%:
+ahrs_%: uavobjects_flight
 	mkdir -p $(BUILD_DIR)/ahrs
 	$(MAKE) OUTDIR="$(BUILD_DIR)/ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/AHRS $*
 

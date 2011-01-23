@@ -154,8 +154,12 @@ namespace Utils {
         Initialize();
     }
 
-    int WorldMagModel::GetMagVector(double Lat, double Lon, double AltEllipsoid, int Month, int Day, int Year, double *X, double *Y, double *Z)
+    int WorldMagModel::GetMagVector(double LLA[3], int Month, int Day, int Year, double Be[3])
     {
+        double Lat = LLA[0];
+        double Lon = LLA[1];
+        double AltEllipsoid = LLA[2];
+
         // ***********
         // range check supplied params
 
@@ -188,9 +192,9 @@ namespace Utils {
             return -6;  // error
 
         // set the returned values
-        *X = GeoMagneticElements.X;
-        *Y = GeoMagneticElements.Y;
-        *Z = GeoMagneticElements.Z;
+        Be[0] = GeoMagneticElements.X;
+        Be[1] = GeoMagneticElements.Y;
+        Be[2] = GeoMagneticElements.Z;
 
         // ***********
 

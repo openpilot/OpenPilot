@@ -134,7 +134,8 @@ namespace Utils {
     {
         public:
             WorldMagModel();
-            int GetMagVector(double Lat, double Lon, double AltEllipsoid, int Month, int Day, int Year, double *X, double *Y, double *Z);
+
+            int GetMagVector(double LLA[3], int Month, int Day, int Year, double Be[3]);
 
         private:
             WMMtype_Ellipsoid       Ellip;

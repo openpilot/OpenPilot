@@ -49,7 +49,8 @@ equals(TEST, 1) {
     DEFINES += WITH_TESTS
 }
 
-win32:QMAKE_COPY_DIR = cp -r -f
+#ideally, we would want a qmake.conf patch, but this does the trick...
+win32:!isEmpty(QMAKE_SH):QMAKE_COPY_DIR = cp -r -f
 
 GCS_SOURCE_TREE = $$PWD
 isEmpty(GCS_BUILD_TREE) {

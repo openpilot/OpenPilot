@@ -58,7 +58,7 @@ MODEL    = MD
 
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = Build
+OUTDIR = ..\..\..\build\flight\bootloaders\ahrs
 
 # Target file name (without extension).
 TARGET = AHRS_BL

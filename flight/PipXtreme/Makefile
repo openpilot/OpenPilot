@@ -72,7 +72,7 @@ BOOT_MODEL    = $(MODEL)_NB
 endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = Build
+OUTDIR = ..\..\build\flight\pipxtreme
 
 # Target file name (without extension).
 TARGET = PipXtreme

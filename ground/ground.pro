@@ -18,24 +18,17 @@
 # <top> = The full path to the base of your svn tree which should
 # contain "flight", "ground", etc.
 
-# There is a known problem with dependencies which should be fixed.
-# Until that the following workaround for qt-creator users exists:
-#
-# - run qmake in ground directory (generated GCS Makefiles lack some
-#   uavobject targets - it is known problem);
-# - build in uavobjgenerator;
-# - build in uavobjects;
-# - run qmake in ground again (IMPORTANT - now correct GCS Makefiles
-#   will be generated).
-#
-# Now you may build GCS using "Build project 'ground'" qt-creator
-# command. If some uavobjects were added/removed, you need to repeat
-# all steps after uavobjects.pro modification.
-#
-# Please note that this workaround (and meta-project at all) is only
-# for qt-creator users. Top level Makefile handles all dependencies
-# itself and don't use ground.pro.
+# There is a small problem with dependencies. qmake needs synthetic
+# files when it generates GCS Makefiles. But we do not have
+# uavobjgenerator at that time (on the 1st build). So we use the
+# following trick: at make stage in uavobjects we rerun qmake for
+# openpilotgcs.pro and regenerate GCS Makefiles using just built
+# synthetic files. It takes some extra time but solves the
+# dependency problem.
 
+# Please note that this meta-project intended only for qt-creator
+# users. Top level Makefile handles all dependencies itself and
+# doesn't use ground.pro.
 
 TEMPLATE  = subdirs
 

@@ -29,7 +29,9 @@ rem set PATH=D:\Work\OpenPilot\Apps\CodeSourcery\bin\;%PATH%
 set MAKE=cs-make
 
 rem Set some project path variables
-for /F %%D in ('cd') do set CURDIR=%%D
+rem for /F %%D in ('cd') do set CURDIR=%%D
+for %%D in (%0) do set CURDIR=%%~dD%%~pD
+
 set ROOT_DIR=%CURDIR%
 set BUILD_DIR=%ROOT_DIR%\build
 set UAVOBJ_XML_DIR=%ROOT_DIR%\shared\uavobjectdefinition

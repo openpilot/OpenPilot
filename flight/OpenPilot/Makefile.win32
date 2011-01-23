@@ -76,7 +76,7 @@ MODEL    = HD_NB
 endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = Build.win32
+OUTDIR = ../../build/flight/sitl_win32
 
 # Target file name (without extension).
 TARGET = OpenPilot
@@ -117,6 +117,15 @@ FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
 MODNAMES = $(notdir ${MODULES})   
 
 ifndef TESTAPP
+
+## PyMite files
+SRC += $(OUTDIR)/pmlib_img.c
+SRC += $(OUTDIR)/pmlib_nat.c
+SRC += $(OUTDIR)/pmlibusr_img.c
+SRC += $(OUTDIR)/pmlibusr_nat.c
+SRC += $(wildcard ${PYMITEVM}/*.c)
+SRC += $(wildcard ${PYMITEPLAT}/*.c)
+
 ## MODULES
 SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 SRC += ${OUTDIR}/InitMods.c
@@ -202,15 +211,6 @@ SRC += $(RTOSSRCDIR)/tasks.c
 ## RTOS Portable 
 SRC += $(RTOSSRCDIR)/portable/GCC/Win32/port.c
 SRC += $(RTOSSRCDIR)/portable/MemMang/heap_3.c
-
-## PyMite files
-SRC += $(wildcard ${PYMITEVM}/*.c)
-SRC += $(wildcard ${PYMITEPLAT}/*.c)
-SRC += $(OUTDIR)/pmlib_img.c
-SRC += $(OUTDIR)/pmlib_nat.c
-SRC += $(OUTDIR)/pmlibusr_img.c
-SRC += $(OUTDIR)/pmlibusr_nat.c
-
 
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).

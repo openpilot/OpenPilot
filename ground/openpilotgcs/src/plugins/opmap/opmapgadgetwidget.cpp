@@ -1703,58 +1703,7 @@ void OPMapGadgetWidget::onSetHomeAct_triggered()
 
     setHome(context_menu_lat_lon);
 
-    // ***************
-    // calculate the magnetic model and update the HomeLocation uavobject with lat, lon & correct 'Be' values
-
-    double X, Y, Z;
-    QDateTime dt = QDateTime::currentDateTime().toUTC();
-
-    Utils::WorldMagModel *wmm = new Utils::WorldMagModel();
-    if (wmm)
-    {
-        if (wmm->GetMagVector(home_position.coord.Lat(), home_position.coord.Lng(), home_position.altitude, dt.date().month(), dt.date().day(), dt.date().year(), &X, &Y, &Z) >= 0)
-        {
-            QString s = "lat:" + QString::number(home_position.coord.Lat(), 'f', 7) + " lon:" + QString::number(home_position.coord.Lng(), 'f', 7);
-            s += "   x:" + QString::number(X, 'f', 2) + " y:" + QString::number(Y, 'f', 2) + " z:" + QString::number(Z, 'f', 2);
-            qDebug() << "opmap HomePosition WMM .. " << s << endl;
-
-            // send the new position to the OP board
-            ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-            if (pm)
-            {
-                UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
-                if (obm)
-                {
-                    UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("HomeLocation")));
-                    UAVObjectField *Be_field = obj->getField(QString("Be"));
-
-                    if (obj && Be_field)
-                    {
-                        double current_altitude = obj->getField("Altitude")->getDouble();
-
-                        obj->getField("Set")->setValue("TRUE");
-                        obj->getField("Latitude")->setValue(home_position.coord.Lat() * 10e6);
-                        obj->getField("Longitude")->setValue(home_position.coord.Lng() * 10e6);
-                        obj->getField("Altitude")->setValue(current_altitude);
-                        Be_field->setDouble(X, 0);
-                        Be_field->setDouble(Y, 1);
-                        Be_field->setDouble(Z, 2);
-
-                        obj->updated();
-
-                        // save the new location to SD card .. don't use this yet
-//                        saveObjectToSD(obj);
-                    }
-                }
-            }
-
-
-        }
-
-        delete wmm;
-    }
-
-    // ***************
+    setHomeLocationObject();  // update the HomeLocation UAVObject
 }
 
 void OPMapGadgetWidget::onGoHomeAct_triggered()
@@ -2447,6 +2396,81 @@ void OPMapGadgetWidget::setMapFollowingMode()
         m_map->UAV->SetUAVHeading(0);                                   // reset the UAV heading to 0deg
         m_map->UAV->SetMapFollowType(UAVMapFollowType::CenterAndRotateMap);
     }
+}
+
+// *************************************************************************************
+// update the HomeLocation UAV Object
+
+void OPMapGadgetWidget::setHomeLocationObject()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    if (!pm) return;
+
+    UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
+    if (!obm) return;
+
+    UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("HomeLocation")));
+    if (!obj) return;
+
+    UAVObjectField *ECEF_field = obj->getField(QString("ECEF"));
+    if (!ECEF_field) return;
+
+    UAVObjectField *RNE_field = obj->getField(QString("RNE"));
+    if (!RNE_field) return;
+
+    UAVObjectField *Be_field = obj->getField(QString("Be"));
+    if (!Be_field) return;
+
+//    double current_altitude = obj->getField("Altitude")->getDouble();
+
+    double LLA[3];
+    double ECEF[3];
+    double RNE[9];
+    double Be[3];
+
+    QDateTime dt = QDateTime::currentDateTime().toUTC();
+
+    LLA[0] = home_position.coord.Lat();
+    LLA[1] = home_position.coord.Lng();
+    LLA[2] = home_position.altitude;
+
+    Utils::CoordinateConversions().LLA2ECEF(LLA, ECEF);
+    Utils::CoordinateConversions().RneFromLLA(LLA, (double (*)[3])RNE);
+    if (Utils::WorldMagModel().GetMagVector(LLA, dt.date().month(), dt.date().day(), dt.date().year(), Be) < 0)
+        return;
+
+    // debug
+    qDebug() << "opmap HomePosition WMM .. " << endl;
+    QString s = "lat:" + QString::number(LLA[0], 'f', 7) + " lon:" + QString::number(LLA[1], 'f', 7) + " alt:" + QString::number(LLA[2], 'f', 1);
+    qDebug() << "           " << s << endl;
+    s = "   ECEF[0]:" + QString::number(ECEF[0], 'f', 1) + " ECEF[1]:" + QString::number(ECEF[1], 'f', 1) + " ECEF[2]:" + QString::number(ECEF[2], 'f', 1);
+    qDebug() << "           " << s << endl;
+    s = "   BeX:" + QString::number(Be[0], 'f', 2) + " BeY:" + QString::number(Be[1], 'f', 2) + " BeZ:" + QString::number(Be[2], 'f', 2);
+    qDebug() << "           " << s << endl;
+
+    // send the new position to the OP board
+
+    obj->getField("Set")->setValue("TRUE");
+
+    obj->getField("Latitude")->setValue(LLA[0] * 10e6);
+    obj->getField("Longitude")->setValue(LLA[1] * 10e6);
+    obj->getField("Altitude")->setValue(LLA[2]);
+
+    for (int i = 0; i < 3; i++)
+        ECEF_field->setValue(ECEF[i] * 100, i);
+
+    for (int i = 0; i < 9; i++)
+        RNE_field->setDouble(RNE[i], i);
+
+    for (int i = 0; i < 3; i++)
+        Be_field->setDouble(Be[i], i);
+
+    obj->updated();
+
+    // save the new location to SD card .. don't use this yet
+//  saveObjectToSD(obj);
+
+    // ***************
 }
 
 // *************************************************************************************

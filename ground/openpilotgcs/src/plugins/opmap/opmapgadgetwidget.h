@@ -333,6 +333,8 @@ private:
     void saveObjectToSD(UAVObject *obj);
 
     void setMapFollowingMode();
+
+    void setHomeLocationObject();
 };
 
 #endif /* OPMAP_GADGETWIDGET_H_ */

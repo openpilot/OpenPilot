@@ -27,7 +27,7 @@
 
 #include "opmapgadgetwidget.h"
 #include "ui_opmap_widget.h"
-#include <utils/stylehelper.h>
+
 #include <QtGui/QApplication>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QVBoxLayout>
@@ -40,16 +40,21 @@
 
 #include <math.h>
 
+#include "utils/stylehelper.h"
+
 #include "utils/worldmagmodel.h"
 
 #include "uavtalk/telemetrymanager.h"
+
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
+#include "objectpersistence.h"
+
 #include "positionactual.h"
 #include "homelocation.h"
 
-// #define allow_manual_home_location_move
+#define allow_manual_home_location_move
 
 // *************************************************************************************
 
@@ -1699,7 +1704,7 @@ void OPMapGadgetWidget::onSetHomeAct_triggered()
     setHome(context_menu_lat_lon);
 
     // ***************
-    // calculate the magnetic model
+    // calculate the magnetic model and update the HomeLocation uavobject with lat, lon & correct 'Be' values
 
     double X, Y, Z;
     QDateTime dt = QDateTime::currentDateTime().toUTC();
@@ -1711,8 +1716,39 @@ void OPMapGadgetWidget::onSetHomeAct_triggered()
         {
             QString s = "lat:" + QString::number(home_position.coord.Lat(), 'f', 7) + " lon:" + QString::number(home_position.coord.Lng(), 'f', 7);
             s += "   x:" + QString::number(X, 'f', 2) + " y:" + QString::number(Y, 'f', 2) + " z:" + QString::number(Z, 'f', 2);
-
             qDebug() << "opmap HomePosition WMM .. " << s << endl;
+
+            // send the new position to the OP board
+            ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+            if (pm)
+            {
+                UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
+                if (obm)
+                {
+                    UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("HomeLocation")));
+                    UAVObjectField *Be_field = obj->getField(QString("Be"));
+
+                    if (obj && Be_field)
+                    {
+                        double current_altitude = obj->getField("Altitude")->getDouble();
+
+                        obj->getField("Set")->setValue("TRUE");
+                        obj->getField("Latitude")->setValue(home_position.coord.Lat() * 10e6);
+                        obj->getField("Longitude")->setValue(home_position.coord.Lng() * 10e6);
+                        obj->getField("Altitude")->setValue(current_altitude);
+                        Be_field->setDouble(X, 0);
+                        Be_field->setDouble(Y, 1);
+                        Be_field->setDouble(Z, 2);
+
+                        obj->updated();
+
+                        // save the new location to SD card .. don't use this yet
+//                        saveObjectToSD(obj);
+                    }
+                }
+            }
+
+
         }
 
         delete wmm;
@@ -2047,8 +2083,8 @@ void OPMapGadgetWidget::moveToMagicWaypointPosition()
     if (m_map_mode != MagicWaypoint_MapMode)
         return;
 
-    internals::PointLatLng coord = magic_waypoint.coord;
-    double altitude = magic_waypoint.altitude;
+//    internals::PointLatLng coord = magic_waypoint.coord;
+//    double altitude = magic_waypoint.altitude;
 
 
     // ToDo:
@@ -2332,7 +2368,6 @@ bool OPMapGadgetWidget::getGPS_LLA(double &latitude, double &longitude, double &
     return true;
 }
 
-
 double OPMapGadgetWidget::getUAV_Yaw()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -2349,6 +2384,42 @@ double OPMapGadgetWidget::getUAV_Yaw()
     while (yaw >= 360) yaw -= 360;
 
     return yaw;
+}
+
+// *************************************************************************************
+// save an object to SD card
+
+void OPMapGadgetWidget::saveObjectToSD(UAVObject *obj)
+{
+    if (!obj) return;
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    if (!pm) return;
+
+    UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
+    if (!obm) return;
+
+    ObjectPersistence *objper = dynamic_cast<ObjectPersistence *>( obm->getObject(ObjectPersistence::NAME) );
+    if (!objper) return;
+
+    connect(objper, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(uavObjectTransactionCompleted(UAVObject *, bool)));
+
+    ObjectPersistence::DataFields data;
+    data.Operation = ObjectPersistence::OPERATION_SAVE;
+    data.Selection = ObjectPersistence::SELECTION_SINGLEOBJECT;
+    data.ObjectID = obj->getObjID();
+    data.InstanceID = obj->getInstID();
+
+    objper->setData(data);
+    objper->updated();
+}
+
+void OPMapGadgetWidget::uavObjectTransactionCompleted(UAVObject *obj, bool success)
+{
+    Q_UNUSED(success);
+
+    // Disconnect from sending object
+    if (obj) obj->disconnect(this);
 }
 
 // *************************************************************************************

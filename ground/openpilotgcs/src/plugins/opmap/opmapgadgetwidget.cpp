@@ -2440,13 +2440,16 @@ void OPMapGadgetWidget::setHomeLocationObject()
         return;
 
     // debug
-    qDebug() << "opmap HomePosition WMM .. " << endl;
-    QString s = "lat:" + QString::number(LLA[0], 'f', 7) + " lon:" + QString::number(LLA[1], 'f', 7) + " alt:" + QString::number(LLA[2], 'f', 1);
-    qDebug() << "           " << s << endl;
-    s = "   ECEF[0]:" + QString::number(ECEF[0], 'f', 1) + " ECEF[1]:" + QString::number(ECEF[1], 'f', 1) + " ECEF[2]:" + QString::number(ECEF[2], 'f', 1);
-    qDebug() << "           " << s << endl;
-    s = "   BeX:" + QString::number(Be[0], 'f', 2) + " BeY:" + QString::number(Be[1], 'f', 2) + " BeZ:" + QString::number(Be[2], 'f', 2);
-    qDebug() << "           " << s << endl;
+    qDebug() << "opmap setting HomeLocation UAV Object .. " << endl;
+    QString s;
+    s = "        LAT:" + QString::number(LLA[0], 'f', 7) + " LON:" + QString::number(LLA[1], 'f', 7) + " ALT:" + QString::number(LLA[2], 'f', 1);
+    qDebug() << s << endl;
+    s = "        ECEF "; for (int i = 0; i < 3; i++) s += " " + QString::number((int)(ECEF[i] * 100));
+    qDebug() << s << endl;
+    s = "        RNE  ";  for (int i = 0; i < 9; i++) s += " " + QString::number(RNE[i], 'f', 7);
+    qDebug() << s << endl;
+    s = "        Be   ";  for (int i = 0; i < 3; i++) s += " " + QString::number(Be[i], 'f', 2);
+    qDebug() << s << endl;
 
     // send the new position to the OP board
 

@@ -159,6 +159,8 @@ static void manualControlTask(void *parameters)
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1) {
+		float scaledChannel[MANUALCONTROLCOMMAND_CHANNEL_NUMELEM];
+
 		// Wait until next update
 		vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD_MS / portTICK_RATE_MS);
 		PIOS_WDG_UpdateFlag(PIOS_WDG_MANUAL);
@@ -180,6 +182,7 @@ static void manualControlTask(void *parameters)
 		}
 			
 		if (!ManualControlCommandReadOnly(&cmd)) {
+
 			// Check settings, if error raise alarm
 			if (settings.Roll >= MANUALCONTROLSETTINGS_ROLL_NONE ||
 				settings.Pitch >= MANUALCONTROLSETTINGS_PITCH_NONE ||
@@ -204,45 +207,30 @@ static void manualControlTask(void *parameters)
 #elif defined(PIOS_INCLUDE_SPEKTRUM)
 				cmd.Channel[n] = PIOS_SPEKTRUM_Get(n);
 #endif
+				scaledChannel[n] = scaleChannel(cmd.Channel[n], settings.ChannelMax[n],	settings.ChannelMin[n], settings.ChannelNeutral[n]);
 			}
 
-			// Calculate roll command in range +1 to -1
-			cmd.Roll = scaleChannel(cmd.Channel[settings.Roll], settings.ChannelMax[settings.Roll],
-						settings.ChannelMin[settings.Roll], settings.ChannelNeutral[settings.Roll]);
-
-			// Calculate pitch command in range +1 to -1
-			cmd.Pitch = scaleChannel(cmd.Channel[settings.Pitch], settings.ChannelMax[settings.Pitch],
-						settings.ChannelMin[settings.Pitch], settings.ChannelNeutral[settings.Pitch]);
-
-			// Calculate yaw command in range +1 to -1
-			cmd.Yaw = scaleChannel(cmd.Channel[settings.Yaw], settings.ChannelMax[settings.Yaw],
-						settings.ChannelMin[settings.Yaw], settings.ChannelNeutral[settings.Yaw]);
-
-			// Calculate throttle command in range +1 to -1
-			cmd.Throttle = scaleChannel(cmd.Channel[settings.Throttle], settings.ChannelMax[settings.Throttle],
-						settings.ChannelMin[settings.Throttle], settings.ChannelNeutral[settings.Throttle]);
+			// Scale channels to -1 -> +1 range
+			cmd.Roll 		= scaledChannel[settings.Roll];
+			cmd.Pitch 		= scaledChannel[settings.Pitch];
+			cmd.Yaw 		= scaledChannel[settings.Yaw];
+			cmd.Throttle 	= scaledChannel[settings.Throttle];
+			flightMode 		= scaledChannel[settings.FlightMode];
 
 			if (settings.Accessory1 != MANUALCONTROLSETTINGS_ACCESSORY1_NONE)
-				cmd.Accessory1 = scaleChannel(cmd.Channel[settings.Accessory1], settings.ChannelMax[settings.Accessory1],
-						settings.ChannelMin[settings.Accessory1], settings.ChannelNeutral[settings.Accessory1]);
+				cmd.Accessory1 = scaledChannel[settings.Accessory1];
 			else
 				cmd.Accessory1 = 0;
 
 			if (settings.Accessory2 != MANUALCONTROLSETTINGS_ACCESSORY2_NONE)
-				cmd.Accessory2 = scaleChannel(cmd.Channel[settings.Accessory2], settings.ChannelMax[settings.Accessory2],
-						settings.ChannelMin[settings.Accessory2], settings.ChannelNeutral[settings.Accessory2]);
+				cmd.Accessory2 = scaledChannel[settings.Accessory2];
 			else
 				cmd.Accessory2 = 0;
 
 			if (settings.Accessory3 != MANUALCONTROLSETTINGS_ACCESSORY3_NONE)
-				cmd.Accessory3 = scaleChannel(cmd.Channel[settings.Accessory3], settings.ChannelMax[settings.Accessory3],
-						settings.ChannelMin[settings.Accessory3], settings.ChannelNeutral[settings.Accessory3]);
+				cmd.Accessory3 = scaledChannel[settings.Accessory3];
 			else
 				cmd.Accessory3 = 0;
-
-			// Update flight mode
-			flightMode = scaleChannel(cmd.Channel[settings.FlightMode], settings.ChannelMax[settings.FlightMode],
-						settings.ChannelMin[settings.FlightMode], settings.ChannelNeutral[settings.FlightMode]);
 
 			if (flightMode < -FLIGHT_MODE_LIMIT) {
 				// Position 1
@@ -327,8 +315,7 @@ static void manualControlTask(void *parameters)
 
 				if (connection_state == CONNECTED) {
 					// Should use RC input only if RX is connected
-					armStickLevel = scaleChannel(cmd.Channel[channel], settings.ChannelMax[channel],
-							settings.ChannelMin[channel], settings.ChannelNeutral[channel]);
+					armStickLevel = scaledChannel[channel];
 					if (reverse)
 						armStickLevel =-armStickLevel;
 

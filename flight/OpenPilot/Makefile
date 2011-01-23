@@ -81,7 +81,7 @@ BOOT_MODEL    = $(MODEL)_NB
 endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = Build
+OUTDIR = ..\..\build\flight\openpilot
 
 # Target file name (without extension).
 TARGET = OpenPilot
@@ -130,7 +130,7 @@ PYMITEINC += $(OUTDIR)
 FLIGHTPLANLIB = $(OPMODULEDIR)/FlightPlan/lib
 FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
 
-OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
+OPUAVSYNTHDIR = $(OUTDIR)/../../uavobject-synthetics/flight
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files

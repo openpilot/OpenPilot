@@ -34,6 +34,18 @@
 // Global variables
 const char *PIOS_DEBUG_AssertMsg = "ASSERT FAILED";
 
+#include <pios_servo_priv.h>
+extern const struct pios_servo_channel pios_servo_channels[];
+#define PIOS_SERVO_GPIO_PORT_1TO4 pios_servo_channels[0].port
+#define PIOS_SERVO_GPIO_PORT_5TO8 pios_servo_channels[4].port
+#define PIOS_SERVO_GPIO_PIN_1  pios_servo_channels[0].pin
+#define PIOS_SERVO_GPIO_PIN_2  pios_servo_channels[1].pin
+#define PIOS_SERVO_GPIO_PIN_3  pios_servo_channels[2].pin
+#define PIOS_SERVO_GPIO_PIN_4  pios_servo_channels[3].pin
+#define PIOS_SERVO_GPIO_PIN_5  pios_servo_channels[4].pin
+#define PIOS_SERVO_GPIO_PIN_6  pios_servo_channels[5].pin
+#define PIOS_SERVO_GPIO_PIN_7  pios_servo_channels[6].pin
+#define PIOS_SERVO_GPIO_PIN_8  pios_servo_channels[7].pin
 /* Private Function Prototypes */
 
 /**

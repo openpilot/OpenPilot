@@ -33,7 +33,7 @@ bool UAVObjectGeneratorMatlab::generate(UAVObjectParser* parser,QString template
     fieldTypeStrMatlab << "int8" << "int16" << "int32"
         << "uint8" << "uint16" << "uint32" << "float32" << "uint8";
 
-    QDir matlabTemplatePath = QDir( templatepath + QString("ground/openpilot/src/plugins/uavobjects"));
+    QDir matlabTemplatePath = QDir( templatepath + QString("ground/openpilotgcs/src/plugins/uavobjects"));
     QDir matlabOutputPath = QDir( outputpath + QString("matlab") );
     matlabOutputPath.mkpath(matlabOutputPath.absolutePath());
 

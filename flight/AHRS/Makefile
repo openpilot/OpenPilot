@@ -60,7 +60,7 @@ else
 BOOT_MODEL    = $(MODEL)_NB
 endif
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = ..\..\build\flight\ahrs
+OUTDIR = ..\..\build\ahrs
 
 # Target file name (without extension).
 TARGET = AHRS
@@ -89,7 +89,7 @@ OPSYSINC = $(OPDIR)/System/inc
 BOOT = ../Bootloaders/AHRS
 BOOTINC = $(BOOT)/inc
 
-OPUAVSYNTHDIR = $(OUTDIR)/../../uavobject-synthetics/flight
+OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files

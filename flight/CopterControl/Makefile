@@ -82,7 +82,7 @@ BOOT_MODEL    = $(MODEL)_NB
 endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = Build
+OUTDIR = ..\..\build\coptercontrol
 
 # Target file name (without extension).
 TARGET = CopterControl
@@ -131,6 +131,8 @@ PYMITEINC += $(OUTDIR)
 FLIGHTPLANLIB = $(OPMODULEDIR)/FlightPlan/lib
 FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
 
+OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
+
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 
@@ -160,29 +162,29 @@ endif
 
 ## UAVOBJECTS
 ifndef TESTAPP
-SRC += $(OPUAVOBJ)/objectpersistence.c
-SRC += $(OPUAVOBJ)/gcstelemetrystats.c
-SRC += $(OPUAVOBJ)/flighttelemetrystats.c
-SRC += $(OPUAVOBJ)/systemstats.c
-SRC += $(OPUAVOBJ)/systemalarms.c
-SRC += $(OPUAVOBJ)/systemsettings.c
-SRC += $(OPUAVOBJ)/stabilizationsettings.c
-SRC += $(OPUAVOBJ)/actuatorcommand.c
-SRC += $(OPUAVOBJ)/actuatordesired.c
-SRC += $(OPUAVOBJ)/actuatorsettings.c
-SRC += $(OPUAVOBJ)/attituderaw.c
-SRC += $(OPUAVOBJ)/attitudeactual.c
-SRC += $(OPUAVOBJ)/attitudedesired.c
-SRC += $(OPUAVOBJ)/manualcontrolcommand.c
-SRC += $(OPUAVOBJ)/taskinfo.c
-SRC += $(OPUAVOBJ)/i2cstats.c
-SRC += $(OPUAVOBJ)/watchdogstatus.c
-SRC += $(OPUAVOBJ)/telemetrysettings.c
-SRC += $(OPUAVOBJ)/ratedesired.c
-SRC += $(OPUAVOBJ)/manualcontrolsettings.c
-SRC += $(OPUAVOBJ)/mixersettings.c
-SRC += $(OPUAVOBJ)/mixerstatus.c
-SRC += $(OPUAVOBJ)/ahrssettings.c
+SRC += $(OPUAVSYNTHDIR)/objectpersistence.c
+SRC += $(OPUAVSYNTHDIR)/gcstelemetrystats.c
+SRC += $(OPUAVSYNTHDIR)/flighttelemetrystats.c
+SRC += $(OPUAVSYNTHDIR)/systemstats.c
+SRC += $(OPUAVSYNTHDIR)/systemalarms.c
+SRC += $(OPUAVSYNTHDIR)/systemsettings.c
+SRC += $(OPUAVSYNTHDIR)/stabilizationsettings.c
+SRC += $(OPUAVSYNTHDIR)/actuatorcommand.c
+SRC += $(OPUAVSYNTHDIR)/actuatordesired.c
+SRC += $(OPUAVSYNTHDIR)/actuatorsettings.c
+SRC += $(OPUAVSYNTHDIR)/attituderaw.c
+SRC += $(OPUAVSYNTHDIR)/attitudeactual.c
+SRC += $(OPUAVSYNTHDIR)/attitudedesired.c
+SRC += $(OPUAVSYNTHDIR)/manualcontrolcommand.c
+SRC += $(OPUAVSYNTHDIR)/taskinfo.c
+SRC += $(OPUAVSYNTHDIR)/i2cstats.c
+SRC += $(OPUAVSYNTHDIR)/watchdogstatus.c
+SRC += $(OPUAVSYNTHDIR)/telemetrysettings.c
+SRC += $(OPUAVSYNTHDIR)/ratedesired.c
+SRC += $(OPUAVSYNTHDIR)/manualcontrolsettings.c
+SRC += $(OPUAVSYNTHDIR)/mixersettings.c
+SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
+SRC += $(OPUAVSYNTHDIR)/ahrssettings.c
 #${wildcard ${OBJ}/$(shell echo $(VAR) | tr A-Z a-z)/*.c}
 #SRC += ${foreach OBJ, ${UAVOBJECTS}, $(UAVOBJECTS)/$(OBJ).c}
 # Cant use until i can automatically generate list of UAVObjects
@@ -321,6 +323,7 @@ EXTRAINCDIRS  += $(OPUAVTALK)
 EXTRAINCDIRS  += $(OPUAVTALKINC)
 EXTRAINCDIRS  += $(OPUAVOBJ)
 EXTRAINCDIRS  += $(OPUAVOBJINC)
+EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)

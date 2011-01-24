@@ -16,7 +16,7 @@ defineReplace(targetPath) {
 }
 
 defineReplace(addNewline) { 
-    return($$escape_expand(\n\t)) 
+    return($$escape_expand(\\n\\t))
 }
 
 # For use in custom compilers which just copy files

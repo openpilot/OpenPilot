@@ -11,15 +11,13 @@ rem Optional SVN utility to get currently used SVN revision is SubWCRev.exe,
 rem it installed by TortoiseSVN or available separately:
 rem http://sourceforge.net/projects/tortoisesvn/files/Tools/1.6.7/SubWCRev-1.6.7.18415.msi/download
 rem
-rem See OpenPilotGCS.nsi for more details.
-rem
 
 rem Set path to NSIS compiler
 set NSIS=%ProgramFiles%/NSIS/Unicode
 set NSISC=%NSIS%/makensis.exe
 
-rem Input script file
-set NSI=OpenPilotGCS.nsi
+rem Input script file (in the same directory as this batch file)
+for %%D in (%0) do set NSI=%%~dD%%~pD\openpilotgcs.nsi
 
 rem Build installer
 "%NSISC%" /V2 %NSI%

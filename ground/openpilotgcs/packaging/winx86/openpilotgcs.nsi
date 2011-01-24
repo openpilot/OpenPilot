@@ -37,23 +37,35 @@
 #  - remove only installed files, not a whole directory.
 
 ;--------------------------------
-; Include Modern UI
+; Paths
+  
+  ; Tree root locations (relative to this script location)
+  !define NSIS_DATA_TREE "."
+  !define GCS_BUILD_TREE "..\..\..\..\build\ground\openpilotgcs"
+  !define WINX86_PATH "packaging\winx86"
 
-  !include "MUI2.nsh"
+  ; Default installation folder
+  InstallDir "$LOCALAPPDATA\OpenPilot"
+  
+  ; Get installation folder from registry if available
+  InstallDirRegKey HKCU "Software\OpenPilot" "Install Location"
 
 ;--------------------------------
-; Version Information
+; Version information
+
+  ; Program name and installer file
+  !define PRODUCT_NAME "OpenPilot GCS"
+  !define INSTALLER_NAME "OpenPilot GCS Installer"
 
   ; Read automatically generated version info
-  !include "OpenPilotGCS.nsh"
-
 ; !define OUT_FILE "OpenPilotGCS-XXXX-install.exe"
 ; !define PRODUCT_VERSION "0.0.0.0"
 ; !define FILE_VERSION "0.0.0.0"
 ; !define BUILD_DESCRIPTION "Unknown revision."
+  !include "${GCS_BUILD_TREE}\${WINX86_PATH}\openpilotgcs.nsh"
 
-  !define PRODUCT_NAME "OpenPilot GCS"
-  !define INSTALLER_NAME "OpenPilot GCS Installer"
+  Name "${PRODUCT_NAME}"
+  OutFile "${GCS_BUILD_TREE}\${WINX86_PATH}\${OUT_FILE}"
 
   VIProductVersion ${PRODUCT_VERSION}
   VIAddVersionKey "ProductName" "${INSTALLER_NAME}"
@@ -64,21 +76,11 @@
   VIAddVersionKey "LegalCopyright" "© 2010-2011 The OpenPilot Team"
   VIAddVersionKey "FileDescription" "${INSTALLER_NAME}"
 
-  ; Program name and installer file
-  Name "${PRODUCT_NAME}"
-  OutFile "${OUT_FILE}"
-
 ;--------------------------------
-; Misc options
-  
-  ; Build tree root location
-  !define src "..\..\.."
+; Installer interface and base settings
 
-  ; Default installation folder
-  InstallDir "$LOCALAPPDATA\OpenPilot"
-  
-  ; Get installation folder from registry if available
-  InstallDirRegKey HKCU "Software\OpenPilot" "Install Location"
+  !include "MUI2.nsh"
+  !define MUI_ABORTWARNING
 
   ; Adds an XP manifest to the installer
   XPStyle on
@@ -94,22 +96,17 @@
 
   BrandingText "© 2010-2011 The OpenPilot Team, http://www.openpilot.org"
 
-  !define MUI_ICON "resources\openpilot.ico"
+  !define MUI_ICON "${NSIS_DATA_TREE}\resources\openpilot.ico"
   !define MUI_HEADERIMAGE
-  !define MUI_HEADERIMAGE_BITMAP "resources\header.bmp"
+  !define MUI_HEADERIMAGE_BITMAP "${NSIS_DATA_TREE}\resources\header.bmp"
   !define MUI_HEADERIMAGE_BITMAP_NOSTRETCH
-  !define MUI_WELCOMEFINISHPAGE_BITMAP "resources\welcome.bmp"
+  !define MUI_WELCOMEFINISHPAGE_BITMAP "${NSIS_DATA_TREE}\resources\welcome.bmp"
   !define MUI_WELCOMEFINISHPAGE_BITMAP_NOSTRETCH
-  !define MUI_UNWELCOMEFINISHPAGE_BITMAP "resources\welcome.bmp"
+  !define MUI_UNWELCOMEFINISHPAGE_BITMAP "${NSIS_DATA_TREE}\resources\welcome.bmp"
   !define MUI_UNWELCOMEFINISHPAGE_BITMAP_NOSTRETCH
 	
 ;--------------------------------
-; Interface Settings
-
-  !define MUI_ABORTWARNING
-
-;--------------------------------
-; Language Selection Dialog Settings
+; Language selection dialog settings
 
   ; Remember the installer language
   !define MUI_LANGDLL_REGISTRY_ROOT "HKCU" 
@@ -137,10 +134,10 @@
 ;--------------------------------
 ; Supported languages, license files and translations
 
-  !include "translations\languages.nsh"
+  !include "${NSIS_DATA_TREE}\translations\languages.nsh"
   
 ;--------------------------------
-; Reserve Files
+; Reserve files
   
   ; If you are using solid compression, files that are required before
   ; the actual installation should be stored first in the data block,
@@ -149,42 +146,42 @@
   !insertmacro MUI_RESERVEFILE_LANGDLL
 
 ;--------------------------------
-; Installer Sections
+; Installer sections
 
 Section "Core files" InSecCore
   SectionIn RO
   SetOutPath "$INSTDIR\bin"
-  File /r "${src}\bin\*"
+  File /r "${GCS_BUILD_TREE}\bin\*"
 SectionEnd
 
 Section "Plugins" InSecPlugins
   SectionIn RO
   SetOutPath "$INSTDIR\lib\openpilotgcs\plugins"
-  File /r "${src}\lib\openpilotgcs\plugins\*.dll"
-  File /r "${src}\lib\openpilotgcs\plugins\*.pluginspec"
+  File /r "${GCS_BUILD_TREE}\lib\openpilotgcs\plugins\*.dll"
+  File /r "${GCS_BUILD_TREE}\lib\openpilotgcs\plugins\*.pluginspec"
 SectionEnd
 
 Section "Resources" InSecResources
   SetOutPath "$INSTDIR\share\openpilotgcs\diagrams"
-  File /r "${src}\share\openpilotgcs\diagrams\*"
+  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\diagrams\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\dials"
-  File /r "${src}\share\openpilotgcs\dials\*"
+  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\dials\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\mapicons"
-  File /r "${src}\share\openpilotgcs\mapicons\*"
+  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\mapicons\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\models"
-  File /r "${src}\share\openpilotgcs\models\*"
+  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\models\*"
   SetOutPath "$INSTDIR\share\openpilotgcs\pfd"
-  File /r "${src}\share\openpilotgcs\pfd\*"
+  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\pfd\*"
 SectionEnd
 
 Section "Sound files" InSecSounds
   SetOutPath "$INSTDIR\share\openpilotgcs\sounds"
-  File /r "${src}\share\openpilotgcs\sounds\*"
+  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\sounds\*"
 SectionEnd
 
 Section "Localization" InSecLocalization
   SetOutPath "$INSTDIR\share\openpilotgcs\translations"
-  File /r "${src}\share\openpilotgcs\translations\*.qm"
+  File /r "${GCS_BUILD_TREE}\share\openpilotgcs\translations\*.qm"
 SectionEnd
 
 Section "Shortcuts" InSecShortcuts
@@ -225,7 +222,7 @@ SectionEnd
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
  
 ;--------------------------------
-; Installer Functions
+; Installer functions
 
 Function .onInit
 
@@ -234,7 +231,7 @@ Function .onInit
 FunctionEnd
 
 ;--------------------------------
-; Uninstaller Sections
+; Uninstaller sections
 
 Section "un.Program" UnSecProgram
   ; Remove installed files and/or directories
@@ -276,7 +273,7 @@ SectionEnd
   !insertmacro MUI_UNFUNCTION_DESCRIPTION_END
  
 ;--------------------------------
-; Uninstaller Functions
+; Uninstaller functions
 
 Function un.onInit
 

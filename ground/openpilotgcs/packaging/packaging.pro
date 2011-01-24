@@ -6,11 +6,8 @@ SUBDIRS = winx86
 # Copy Qt runtime libraries into the build directory (to run or package)
 equals(copydata, 1) {
 
-    # Windows only, debug target DLLs ending with 'd' are not copied
+    # Windows release only, no debug target DLLs ending with 'd'
     win32:CONFIG(release, debug|release) {
-
-        # copy packaging dir (with installer scripts which use relative paths)
-        data_copy.commands += $(COPY_DIR) $$targetPath(\"$$GCS_SOURCE_TREE/packaging/winx86\") $$targetPath(\"$$GCS_BUILD_TREE/packaging/winx86\") $$addNewline()
 
         # copy Qt DLLs and phonon4
         QT_DLLS = libgcc_s_dw2-1.dll \

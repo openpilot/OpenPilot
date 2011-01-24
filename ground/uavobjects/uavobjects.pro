@@ -59,7 +59,7 @@ win32 {
     uavobjects.commands += ../ground/uavobjgenerator/uavobjgenerator
     uavobjects.commands += -gcs -flight -python -matlab ../../shared/uavobjectdefinition ../.. &&
 
-    uavobjects.commands += cd ../ground/openpilotgcs) &&
+    uavobjects.commands += cd ../ground/openpilotgcs &&
     uavobjects.commands += $(QMAKE) ../../../ground/openpilotgcs/openpilotgcs.pro
     uavobjects.commands += -spec $$SPEC -r $$addNewline()
 }

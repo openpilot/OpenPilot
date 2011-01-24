@@ -113,6 +113,12 @@ void PIOS_Servo_Init(void)
 		TIM_Cmd(channel.timer, ENABLE);		
 		
 	}	
+	
+	if(pios_servo_cfg.remap) {
+		/* Warning, I don't think this will work for multiple remaps at once */
+		GPIO_PinRemapConfig(pios_servo_cfg.remap, ENABLE);
+	}
+	
 
 #endif // PIOS_INCLUDE_SERVO
 #endif // PIOS_ENABLE_DEBUG_PINS

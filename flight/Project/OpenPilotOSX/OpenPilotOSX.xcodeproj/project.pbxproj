@@ -149,6 +149,7 @@
 		650D8ECE12DFE17500D05CC9 /* watchdogstatus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = watchdogstatus.c; sourceTree = "<group>"; };
 		650D8ED112DFE17500D05CC9 /* uavtalk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uavtalk.h; sourceTree = "<group>"; };
 		650D8ED212DFE17500D05CC9 /* uavtalk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavtalk.c; sourceTree = "<group>"; };
+		65173C9F12EBFD1700D6A7CB /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../../Makefile; sourceTree = SOURCE_ROOT; };
 		651913371256C5240039C0A3 /* ahrs_comm_objects.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_comm_objects.c; sourceTree = "<group>"; };
 		651913381256C5240039C0A3 /* ahrs_spi_comm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_spi_comm.c; sourceTree = "<group>"; };
 		6519133A1256C52B0039C0A3 /* ahrs_comm_objects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_comm_objects.h; sourceTree = "<group>"; };
@@ -2961,6 +2962,7 @@
 		08FB7794FE84155DC02AAC07 /* OpenPilotOSX */ = {
 			isa = PBXGroup;
 			children = (
+				65173C9F12EBFD1700D6A7CB /* Makefile */,
 				657CEEB5121DBC49007A1FBE /* flight */,
 				65B35D7D121C261E003EAD18 /* ground */,
 			);

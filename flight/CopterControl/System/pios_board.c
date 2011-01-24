@@ -68,7 +68,6 @@ void PIOS_Board_Init(void) {
 
 	/* Remap AFIO pin */
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);
-	GPIO_PinRemapConfig( GPIO_PartialRemap_TIM3, ENABLE);
 	PIOS_Servo_Init();
 	
 	PIOS_ADC_Init();
@@ -78,14 +77,14 @@ void PIOS_Board_Init(void) {
 	PIOS_PWM_Init();
 #endif
 #if defined(PIOS_INCLUDE_PPM)
-	//PIOS_PPM_Init();
+	PIOS_PPM_Init();
 #endif
 #if defined(PIOS_INCLUDE_USB_HID)
-	PIOS_USB_HID_Init(0);
+	//PIOS_USB_HID_Init(0);
 #endif
-	PIOS_I2C_Init();
-	PIOS_IAP_Init();
-	PIOS_WDG_Init();
+	//PIOS_I2C_Init();
+	//PIOS_IAP_Init();
+	//PIOS_WDG_Init();
 }
 
 /* Flash/Accel Interface
@@ -543,6 +542,7 @@ const struct pios_servo_cfg pios_servo_cfg = {
 		.GPIO_Mode = GPIO_Mode_AF_PP,
 		.GPIO_Speed = GPIO_Speed_2MHz,
 	},
+	.remap = GPIO_PartialRemap_TIM3,
 	.channels = pios_servo_channels,
 	.num_channels = NELEMENTS(pios_servo_channels),
 };

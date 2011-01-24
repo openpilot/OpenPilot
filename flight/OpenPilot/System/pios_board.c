@@ -682,6 +682,7 @@ const struct pios_servo_cfg pios_servo_cfg = {
 		.GPIO_Mode = GPIO_Mode_AF_PP,
 		.GPIO_Speed = GPIO_Speed_2MHz,
 	},
+	.remap = 0,
 	.channels = pios_servo_channels,
 	.num_channels = NELEMENTS(pios_servo_channels),
 };

@@ -60,10 +60,9 @@
 
 // Private constants
 #define STACK_SIZE_BYTES 740
-#define STACK_SIZE_BYTES 540
-#define TASK_PRIORITY (tskIDLE_PRIORITY+4)
+#define TASK_PRIORITY (tskIDLE_PRIORITY+0)
 
-#define UPDATE_RATE  10 /* ms */
+#define UPDATE_RATE  100 /* ms */
 #define GYRO_NEUTRAL 1665
 #define GYRO_SCALE   0.010f
 
@@ -122,6 +121,7 @@ static void CCAttitudeTask(void *parameters)
 		
 		/* Wait for the next update interval */
 		vTaskDelayUntil(&lastSysTime, UPDATE_RATE / portTICK_RATE_MS);
+		//vTaskDelay(UPDATE_RATE / portTICK_RATE_MS);
 
 	}
 }
@@ -130,11 +130,11 @@ void updateInput()
 {
 	ManualControlCommandData manual;
 	ManualControlCommandGet(&manual);
-	manual.Throttle = (PIOS_PWM_Get(0) - 1100) / 900;
-	manual.Roll = (PIOS_PWM_Get(1) - 1500) / 500;
-	manual.Pitch = (PIOS_PWM_Get(2) - 1500) / 500;
-	manual.Yaw = (PIOS_PWM_Get(3) - 1500) / 500;
-	manual.FlightMode = (PIOS_PWM_Get(4) - 1500) / 500;
+	manual.Throttle = (float) (PIOS_PWM_Get(0) - 1100.0f) / 900.0f;
+	manual.Roll = (float) (PIOS_PWM_Get(1) - 1500.0f) / 500.0f;
+	manual.Pitch = (float) (PIOS_PWM_Get(2) - 1500.0f) / 500.0f;
+	manual.Yaw = (float) (PIOS_PWM_Get(3) - 1500.0f) / 500.0f;
+	manual.FlightMode = (float) (PIOS_PWM_Get(4) - 1500) / 500;
 	ManualControlCommandSet(&manual);
 }
 

@@ -45,6 +45,7 @@ struct pios_servo_cfg {
 	TIM_TimeBaseInitTypeDef tim_base_init;
 	TIM_OCInitTypeDef tim_oc_init;
 	GPIO_InitTypeDef gpio_init;
+	uint32_t remap;
 	const struct pios_servo_channel *const channels;
 	uint8_t num_channels;
 };

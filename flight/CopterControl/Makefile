@@ -57,7 +57,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Telemetry CCAttitude
+MODULES = Telemetry ManualControl Actuator CCAttitude #Stabilization
 #Actuator Telemetry ManualControl Stabilization FirmwareIAP
 
 #MODULES = Telemetry Example
@@ -362,7 +362,7 @@ LINKERSCRIPTPATH = $(PIOSSTM32F10X)
 # (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
 
 ifeq ($(DEBUG),YES)
-OPT = 0
+OPT = 1
 else
 OPT = s
 endif
@@ -427,11 +427,16 @@ CFLAGS += -mcpu=$(MCU) -mthumb
 CFLAGS += $(CDEFS)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 
+#CFLAGS += -fno-cprop-registers -fno-defer-pop -fno-guess-branch-probability -fno-section-anchors
+#CFLAGS += -fno-if-conversion -fno-if-conversion2 -fno-ipa-pure-const -fno-ipa-reference -fno-merge-constants
+#CFLAGS += -fno-split-wide-types -fno-tree-ccp -fno-tree-ch -fno-tree-copy-prop -fno-tree-copyrename 
+#CFLAGS += -fno-tree-dce -fno-tree-dominator-opts -fno-tree-dse -fno-tree-fre -fno-tree-sink -fno-tree-sra
+#CFLAGS += -fno-tree-ter
+#CFLAGS += -g$(DEBUGF) -DDEBUG
+
 CFLAGS += -mapcs-frame
 CFLAGS += -fomit-frame-pointer
-ifeq ($(CODE_SOURCERY), YES)
 CFLAGS += -fpromote-loop-indices
-endif
 
 CFLAGS += -Wall
 CFLAGS += -Werror

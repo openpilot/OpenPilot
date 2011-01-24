@@ -70,7 +70,6 @@
 #include "velocitydesired.h"
 #include "watchdogstatus.h"
 
-
 /**
  * Function used to initialize the first instance of each object.
  * This file is automatically updated by the UAVObjectGenerator.
@@ -93,11 +92,11 @@ void UAVObjectsInitializeAll()
 	I2CStatsInitialize();
 	WatchdogStatusInitialize();
 	TelemetrySettingsInitialize();
-	//StabilizationSettingsInitialize();
-	//ActuatorSettingsInitialize();
+	StabilizationSettingsInitialize();
+	ActuatorSettingsInitialize();
 	RateDesiredInitialize();
 	//AHRSSettingsInitialize();
-	//ManualControlSettingsInitialize();
-	//MixerSettingsInitialize();
-	//MixerStatusInitialize();
+	ManualControlSettingsInitialize();
+	MixerSettingsInitialize();
+	MixerStatusInitialize();
 }

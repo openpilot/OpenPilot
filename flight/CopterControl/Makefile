@@ -182,6 +182,7 @@ SRC += $(OPUAVOBJ)/ratedesired.c
 SRC += $(OPUAVOBJ)/manualcontrolsettings.c
 SRC += $(OPUAVOBJ)/mixersettings.c
 SRC += $(OPUAVOBJ)/mixerstatus.c
+SRC += $(OPUAVOBJ)/ahrssettings.c
 #${wildcard ${OBJ}/$(shell echo $(VAR) | tr A-Z a-z)/*.c}
 #SRC += ${foreach OBJ, ${UAVOBJECTS}, $(UAVOBJECTS)/$(OBJ).c}
 # Cant use until i can automatically generate list of UAVObjects

@@ -12,13 +12,13 @@
 
 void PIOS_FLASH_W25X_ClaimBus() 
 {
-	// TODO: Semaphore to lock bus
+	PIOS_SPI_ClaimBus(PIOS_SPI_FLASH);
 	PIOS_FLASH_ENABLE;
 }
 
 void PIOS_FLASH_W25X_ReleaseBus() 
 {
-	// TODO: Release semaphore
+	PIOS_SPI_ReleaseBus(PIOS_SPI_FLASH);
 	PIOS_FLASH_DISABLE;
 }
 

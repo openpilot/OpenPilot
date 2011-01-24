@@ -14,10 +14,8 @@
  */
 void PIOS_ADXL345_ClaimBus() 
 {
-	// TODO: Semaphore to lock bus
-	PIOS_ADXL_ENABLE;	
-	PIOS_DELAY_WaituS(1);
-	
+	PIOS_SPI_ClaimBus(PIOS_SPI_ACCEL);
+	PIOS_ADXL_ENABLE;		
 }
 
 /**
@@ -25,9 +23,8 @@ void PIOS_ADXL345_ClaimBus()
  */
 void PIOS_ADXL345_ReleaseBus() 
 {
-	// TODO: Release semaphore
+	PIOS_SPI_ReleaseBus(PIOS_SPI_ACCEL);
 	PIOS_ADXL_DISABLE;
-	PIOS_DELAY_WaituS(1);
 }
 
 /**

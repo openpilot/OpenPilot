@@ -51,6 +51,8 @@ extern int32_t PIOS_SPI_TransferByte(uint8_t spi, uint8_t b);
 extern int32_t PIOS_SPI_TransferBlock(uint8_t spi, const uint8_t * send_buffer, uint8_t * receive_buffer, uint16_t len, void *callback);
 extern int32_t PIOS_SPI_Busy(uint8_t spi);
 extern void PIOS_SPI_IRQ_Handler(uint8_t spi);
+extern int8_t PIOS_SPI_ClaimBus(uint8_t spi);
+extern int8_t PIOS_SPI_ReleaseBus(uint8_t spi);
 
 #endif /* PIOS_SPI_H */
 

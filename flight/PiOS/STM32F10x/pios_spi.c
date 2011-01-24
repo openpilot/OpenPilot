@@ -65,6 +65,11 @@ int32_t PIOS_SPI_Init(void)
 		/* Get a handle for the device configuration */
 		spi_dev = find_spi_dev_by_id(i);
 		PIOS_DEBUG_Assert(spi_dev);
+		
+#if defined(PIOS_INCLUDE_FREERTOS)
+		vSemaphoreCreateBinary(spi_dev->busy);
+		xSemaphoreGive(spi_dev->busy);
+#endif
 
 		/* Disable callback function */
 		spi_dev->callback = NULL;
@@ -197,6 +202,43 @@ int32_t PIOS_SPI_SetClockSpeed(uint8_t spi, SPIPrescalerTypeDef spi_prescaler)
 	SPI_Init(spi_dev->cfg->regs, &SPI_InitStructure);
 
 	PIOS_SPI_TransferByte(spi, 0xFF);
+	return 0;
+}
+
+/**
+ * Claim the SPI bus semaphore.  Calling the SPI functions does not require this
+ * \param[in] spi SPI number (0 or 1)
+ * \return 0 if no error
+ * \return -1 if timeout before claiming semaphore
+ */
+int8_t PIOS_SPI_ClaimBus(uint8_t spi)
+{
+#if defined(PIOS_INCLUDE_FREERTOS)
+	struct pios_spi_dev *spi_dev;
+	
+	/* Get a handle for the device configuration */
+	spi_dev = find_spi_dev_by_id(spi);
+	if (xSemaphoreTake(spi_dev->busy, 0xffff) != pdTRUE)
+		return -1;
+#endif
+	return 0;
+}
+
+/**
+ * Release the SPI bus semaphore.  Calling the SPI functions does not require this
+ * \param[in] spi SPI number (0 or 1)
+ * \return 0 if no error
+ */
+int8_t PIOS_SPI_ReleaseBus(uint8_t spi)
+{
+#if defined(PIOS_INCLUDE_FREERTOS)
+	struct pios_spi_dev *spi_dev;
+	
+	/* Get a handle for the device configuration */
+	spi_dev = find_spi_dev_by_id(spi);
+	
+	xSemaphoreGive(spi_dev->busy);
+#endif
 	return 0;
 }
 

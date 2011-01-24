@@ -51,6 +51,9 @@ struct pios_spi_dev {
 	void (*callback) (uint8_t, uint8_t);
 	uint8_t tx_dummy_byte;
 	uint8_t rx_dummy_byte;
+#if defined(PIOS_INCLUDE_FREERTOS)
+	xSemaphoreHandle busy;
+#endif
 };
 
 extern struct pios_spi_dev pios_spi_devs[];

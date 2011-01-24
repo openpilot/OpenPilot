@@ -140,16 +140,15 @@ void updateSensors()
 	struct pios_adxl345_data accel_data;
 	
 
-	attitudeRaw.gyros[ATTITUDERAW_GYROS_X] = PIOS_ADC_PinGet(0);
-	attitudeRaw.gyros[ATTITUDERAW_GYROS_Y] = PIOS_ADC_PinGet(1);
-	attitudeRaw.gyros[ATTITUDERAW_GYROS_Z] = PIOS_ADC_PinGet(2);
+	attitudeRaw.gyros[ATTITUDERAW_GYROS_X] = PIOS_ADC_PinGet(1);
+	attitudeRaw.gyros[ATTITUDERAW_GYROS_Y] = PIOS_ADC_PinGet(2);
+	attitudeRaw.gyros[ATTITUDERAW_GYROS_Z] = PIOS_ADC_PinGet(3);
 	
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] = -(attitudeRaw.gyros[ATTITUDERAW_GYROS_X] - GYRO_NEUTRAL) * GYRO_SCALE;
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] = (attitudeRaw.gyros[ATTITUDERAW_GYROS_Y] - GYRO_NEUTRAL) * GYRO_SCALE;
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] = (attitudeRaw.gyros[ATTITUDERAW_GYROS_Z] - GYRO_NEUTRAL) * GYRO_SCALE;
 	
 	attitudeRaw.gyrotemp[0] = PIOS_ADXL345_Read(&accel_data);
-	attitudeRaw.gyrotemp[1] = PIOS_ADC_PinGet(3);
 	
 	attitudeRaw.accels[ATTITUDERAW_ACCELS_X] = accel_data.x;
 	attitudeRaw.accels[ATTITUDERAW_ACCELS_Y] = accel_data.y;

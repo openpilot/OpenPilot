@@ -775,7 +775,7 @@ const struct pios_pwm_cfg pios_pwm_cfg = {
 	},
 	.remap = GPIO_PartialRemap_TIM3,
 	.irq = {
-		.handler = TIM2_IRQHandler,
+		.handler = TIM1_CC_IRQHandler,
 		.init    = {
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
 			.NVIC_IRQChannelSubPriority        = 0,
@@ -785,11 +785,11 @@ const struct pios_pwm_cfg pios_pwm_cfg = {
 	.channels = pios_pwm_channels,
 	.num_channels = NELEMENTS(pios_pwm_channels),
 };
-void TIM1_CC_IRQHandler()
+void PIOS_TIM1_CC_irq_handler()
 {
 	PIOS_PWM_irq_handler(TIM1);
 }
-void TIM3_IRQHandler()
+void PIOS_TIM3_irq_handler()
 {
 	PIOS_PWM_irq_handler(TIM3);
 }

@@ -53,8 +53,6 @@
 #include "attituderaw.h"
 #include "attitudeactual.h"
 #include "attitudedesired.h"
-#include "actuatordesired.h"
-#include "actuatorcommand.h"
 #include "manualcontrolcommand.h"
 #include "CoordinateConversions.h"
 
@@ -62,7 +60,7 @@
 #define STACK_SIZE_BYTES 740
 #define TASK_PRIORITY (tskIDLE_PRIORITY+0)
 
-#define UPDATE_RATE  100 /* ms */
+#define UPDATE_RATE  2 /* ms */
 #define GYRO_NEUTRAL 1665
 #define GYRO_SCALE   0.010f
 
@@ -75,11 +73,8 @@ static xTaskHandle taskHandle;
 // Private functions
 static void CCAttitudeTask(void *parameters);
 
-void updateInput();
 void updateSensors();
 void updateAttitude();
-void updateStabilization();
-void updateActuator();
 
 /**
  * Initialise the module, called on startup
@@ -113,11 +108,8 @@ static void CCAttitudeTask(void *parameters)
 		
 		// TODO: register the adc callback, push the data onto a queue (safe for thread)
 		// with the queue ISR version
-		updateInput();
 		updateSensors();		
 		updateAttitude();
-		updateStabilization();
-		updateActuator();
 		
 		/* Wait for the next update interval */
 		vTaskDelayUntil(&lastSysTime, UPDATE_RATE / portTICK_RATE_MS);
@@ -209,32 +201,6 @@ void updateAttitude()
 	attitudeActual.Pitch = (UPDATE_FRAC * attitudeActual.Pitch + (1-UPDATE_FRAC) * accel_pitch) * 180 / M_PI;
 	attitudeActual.Yaw = attitudeActual.Yaw * 180 / M_PI;	
 	AttitudeActualSet(&attitudeActual);
-}
-
-void updateStabilization()
-{
-	AttitudeActualData attitudeActual;
-	AttitudeActualGet(&attitudeActual);
-
-	AttitudeDesiredData attitudeDesired;
-	AttitudeDesiredGet(&attitudeDesired);
-
-	AttitudeRawData attitudeRaw;
-	AttitudeRawGet(&attitudeRaw);	
-	
-	ActuatorDesiredData actuatorDesired;
-	ActuatorDesiredGet(&actuatorDesired);
-}
-
-void updateActuator()
-{	
-	ActuatorDesiredData actuatorDesired;
-	ActuatorDesiredGet(&actuatorDesired);
-	
-	ActuatorCommandData actuatorCommand;
-	ActuatorCommandGet(&actuatorCommand);
-
-	ActuatorCommandSet(&actuatorCommand);
 }
 
 /**

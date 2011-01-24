@@ -78,9 +78,6 @@ void PIOS_Servo_Init(void)
 				break;
 		}
 
-		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-		
 		/* Enable GPIO */
 		GPIO_InitStructure.GPIO_Pin = channel.pin;
 		GPIO_Init(channel.port, &GPIO_InitStructure);

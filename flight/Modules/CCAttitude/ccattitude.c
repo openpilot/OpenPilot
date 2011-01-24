@@ -93,7 +93,6 @@ int32_t CCAttitudeInitialize(void)
  */
 static void CCAttitudeTask(void *parameters)
 {
-	portTickType lastSysTime;
 
 //	AlarmsClear(SYSTEMALARMS_ALARM_AHRSCOMMS, SYSTEMALARMS_ALARM_CRITICAL);
 
@@ -104,6 +103,7 @@ static void CCAttitudeTask(void *parameters)
 
 	// Main task loop
 	while (1) {
+		//portTickType lastSysTime;
 		//PIOS_WDG_UpdateFlag(PIOS_WDG_AHRS);
 		
 		// TODO: register the adc callback, push the data onto a queue (safe for thread)
@@ -112,8 +112,8 @@ static void CCAttitudeTask(void *parameters)
 		updateAttitude();
 		
 		/* Wait for the next update interval */
-		vTaskDelayUntil(&lastSysTime, UPDATE_RATE / portTICK_RATE_MS);
-		//vTaskDelay(UPDATE_RATE / portTICK_RATE_MS);
+		//vTaskDelayUntil(&lastSysTime, UPDATE_RATE / portTICK_RATE_MS);
+		vTaskDelay(UPDATE_RATE / portTICK_RATE_MS);
 
 	}
 }
@@ -125,7 +125,7 @@ void updateSensors()
 	struct pios_adxl345_data accel_data;
 	
 	static float gyro_bias[3] = {0,0,0};
-	static const float tau = 0.999f;
+	static const float tau = 0.9999f;
 
 	attitudeRaw.gyros[ATTITUDERAW_GYROS_X] = PIOS_ADC_PinGet(1);
 	attitudeRaw.gyros[ATTITUDERAW_GYROS_Y] = PIOS_ADC_PinGet(2);
@@ -143,15 +143,29 @@ void updateSensors()
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] -= gyro_bias[1];
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] -= gyro_bias[2];
 	
-	attitudeRaw.gyrotemp[0] = PIOS_ADXL345_Read(&accel_data);
+	// Get the accel data
+	uint8_t i = 0;
+	attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_X] = 0;
+	attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Y] = 0;
+	attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Z] = 0; 
+	
+	do {
+		i++;
+		attitudeRaw.gyrotemp[0] = PIOS_ADXL345_Read(&accel_data);
+		
+		attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_X] += (float) accel_data.x * 0.004f * 9.81;
+		attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Y] += -(float) accel_data.y * 0.004f * 9.81;
+		attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Z] += -(float) accel_data.z * 0.004f * 9.81;
+	} while ( (i < 32) && (attitudeRaw.gyrotemp[0] > 0) );
+	
+	attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_X] /= i;
+	attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Y] /= i;
+	attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Z] /= i; 
 	
 	attitudeRaw.accels[ATTITUDERAW_ACCELS_X] = accel_data.x;
 	attitudeRaw.accels[ATTITUDERAW_ACCELS_Y] = accel_data.y;
 	attitudeRaw.accels[ATTITUDERAW_ACCELS_Z] = accel_data.z;
 	
-	attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_X] = (float) accel_data.x * 0.004f * 9.81;
-	attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Y] = -(float) accel_data.y * 0.004f * 9.81;
-	attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Z] = -(float) accel_data.z * 0.004f * 9.81;
 	AttitudeRawSet(&attitudeRaw); 	
 }
 

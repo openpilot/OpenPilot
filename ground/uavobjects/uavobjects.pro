@@ -6,6 +6,7 @@
 
 TEMPLATE  = subdirs
 
+# Some handy defines
 defineReplace(targetPath) {
    return($$replace(1, /, $$QMAKE_DIR_SEP))
 }
@@ -14,19 +15,23 @@ defineReplace(addNewline) {
     return($$escape_expand(\\n\\t))
 }
 
-win32 {
-    CONFIG(release, debug|release) {
-        BUILD_SUBDIR = release/
-    } else {
-        BUILD_SUBDIR = debug/
-    }
+# QMAKESPEC should be defined by qmake but sometimes it is not
+isEmpty(QMAKESPEC) {
+    win32:SPEC = win32-g++
+    macx-g++:SPEC = macx-g++
+    linux-g++:SPEC = linux-g++
 } else {
-    BUILD_SUBDIR =
+    SPEC = $$QMAKESPEC
 }
 
-win32:SPEC = win32-g++
-macx-g++:SPEC = macx-g++
-linux-g++:SPEC = linux-g++
+# Some platform-dependent options
+win32 {
+    CONFIG(release, debug|release) {
+        BUILD_CONFIG = release
+    } else {
+        BUILD_CONFIG = debug
+    }
+}
 
 win32 {
     # Windows sometimes remembers working directory changed from Makefile, sometimes not.
@@ -35,21 +40,20 @@ win32 {
     uavobjects.commands += -$(MKDIR) $$targetPath(../../uavobject-synthetics) $$addNewline()
 
     uavobjects.commands += pushd $$targetPath(../../uavobject-synthetics) &&
-    uavobjects.commands += $$targetPath(../ground/uavobjgenerator/$${BUILD_SUBDIR}uavobjgenerator)
-    uavobjects.commands += -gcs -flight -python -matlab $$targetPath(../../shared/uavobjectdefinition)
-    uavobjects.commands += $$targetPath(../..) && popd $$addNewline()
+    uavobjects.commands += $$targetPath(../ground/uavobjgenerator/$${BUILD_CONFIG}/uavobjgenerator)
+    uavobjects.commands +=   -gcs -flight -python -matlab
+    uavobjects.commands +=   $$targetPath(../../shared/uavobjectdefinition)
+    uavobjects.commands +=   $$targetPath(../..) &&
+    uavobjects.commands += popd $$addNewline()
 
     uavobjects.commands += pushd $$targetPath(../../ground/openpilotgcs) &&
-    uavobjects.commands += $(QMAKE) $$targetPath(../../../ground/openpilotgcs/)openpilotgcs.pro
-    CONFIG(release, debug|release) {
-        uavobjects.commands += -spec $$SPEC -r CONFIG+=release && popd $$addNewline()
-    } else {
-        uavobjects.commands += -spec $$SPEC -r CONFIG+=debug && popd $$addNewline()
-    }
+    uavobjects.commands += $(QMAKE) -spec $$SPEC CONFIG+=$${BUILD_CONFIG} -r
+    uavobjects.commands +=   $$targetPath(../../../ground/openpilotgcs/)openpilotgcs.pro &&
+    uavobjects.commands += popd $$addNewline()
 }
 
 !win32 {
-    uavobjects.commands += -$(MKDIR) -p ../../uavobject-synthetics $$addNewline()
+    uavobjects.commands += $(MKDIR) -p ../../uavobject-synthetics $$addNewline()
 
     uavobjects.commands += cd ../../uavobject-synthetics &&
     uavobjects.commands += ../ground/uavobjgenerator/uavobjgenerator

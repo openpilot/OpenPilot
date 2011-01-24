@@ -67,9 +67,8 @@ void PIOS_Board_Init(void) {
 	PIOS_COM_Init();
 
 	/* Remap AFIO pin */
-	GPIO_PinRemapConfig(GPIO_PartialRemap_TIM3, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);
+	GPIO_PinRemapConfig( GPIO_PartialRemap_TIM3, ENABLE);
 	PIOS_Servo_Init();
 	
 	PIOS_ADC_Init();
@@ -262,9 +261,9 @@ void PIOS_ADC_handler() {
  * Telemetry USART
  */
 void PIOS_USART_telem_irq_handler(void);
-void USART2_IRQHandler() __attribute__ ((alias ("PIOS_USART_telem_irq_handler")));
+void USART1_IRQHandler() __attribute__ ((alias ("PIOS_USART_telem_irq_handler")));
 const struct pios_usart_cfg pios_usart_telem_cfg = {
-  .regs  = USART2,
+  .regs  = USART1,
   .init = {
     #if defined (PIOS_COM_TELEM_BAUDRATE)
         .USART_BaudRate        = PIOS_COM_TELEM_BAUDRATE,
@@ -280,7 +279,7 @@ const struct pios_usart_cfg pios_usart_telem_cfg = {
   .irq = {
     .handler = PIOS_USART_telem_irq_handler,
     .init    = {
-      .NVIC_IRQChannel                   = USART2_IRQn,
+      .NVIC_IRQChannel                   = USART1_IRQn,
       .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
       .NVIC_IRQChannelSubPriority        = 0,
       .NVIC_IRQChannelCmd                = ENABLE,
@@ -289,7 +288,7 @@ const struct pios_usart_cfg pios_usart_telem_cfg = {
   .rx   = {
     .gpio = GPIOA,
     .init = {
-      .GPIO_Pin   = GPIO_Pin_3,
+      .GPIO_Pin   = GPIO_Pin_10,
       .GPIO_Speed = GPIO_Speed_2MHz,
       .GPIO_Mode  = GPIO_Mode_IPU,
     },
@@ -297,7 +296,7 @@ const struct pios_usart_cfg pios_usart_telem_cfg = {
   .tx   = {
     .gpio = GPIOA,
     .init = {
-      .GPIO_Pin   = GPIO_Pin_2,
+      .GPIO_Pin   = GPIO_Pin_9,
       .GPIO_Speed = GPIO_Speed_2MHz,
       .GPIO_Mode  = GPIO_Mode_AF_PP,
     },
@@ -311,7 +310,6 @@ void PIOS_USART_gps_irq_handler(void);
 void USART3_IRQHandler() __attribute__ ((alias ("PIOS_USART_gps_irq_handler")));
 const struct pios_usart_cfg pios_usart_gps_cfg = {
   .regs = USART3,
-  .remap = GPIO_PartialRemap_USART3,
   .init = {
     #if defined (PIOS_COM_GPS_BAUDRATE)
         .USART_BaudRate        = PIOS_COM_GPS_BAUDRATE,
@@ -334,7 +332,7 @@ const struct pios_usart_cfg pios_usart_gps_cfg = {
     },
   },
   .rx   = {
-    .gpio = GPIOC,
+    .gpio = GPIOB,
     .init = {
       .GPIO_Pin   = GPIO_Pin_11,
       .GPIO_Speed = GPIO_Speed_2MHz,
@@ -342,7 +340,7 @@ const struct pios_usart_cfg pios_usart_gps_cfg = {
     },
   },
   .tx   = {
-    .gpio = GPIOC,
+    .gpio = GPIOB,
     .init = {
       .GPIO_Pin   = GPIO_Pin_10,
       .GPIO_Speed = GPIO_Speed_2MHz,
@@ -350,56 +348,6 @@ const struct pios_usart_cfg pios_usart_gps_cfg = {
     },
   },
 };
-
-#ifdef PIOS_COM_AUX
-/*
- * AUX USART
- */
-void PIOS_USART_aux_irq_handler(void);
-void USART1_IRQHandler() __attribute__ ((alias ("PIOS_USART_aux_irq_handler")));
-const struct pios_usart_cfg pios_usart_aux_cfg = {
-  .regs = USART1,
-  .init = {
-    #if defined (PIOS_COM_AUX_BAUDRATE)
-        .USART_BaudRate        = PIOS_COM_AUX_BAUDRATE,
-    #else
-        .USART_BaudRate        = 57600,
-    #endif
-    .USART_BaudRate            = 57600,
-    .USART_WordLength          = USART_WordLength_8b,
-    .USART_Parity              = USART_Parity_No,
-    .USART_StopBits            = USART_StopBits_1,
-    .USART_HardwareFlowControl = USART_HardwareFlowControl_None,
-    .USART_Mode                = USART_Mode_Rx | USART_Mode_Tx,
-  },
-  .irq = {
-    .handler = PIOS_USART_aux_irq_handler,
-    .init    = {
-      .NVIC_IRQChannel                   = USART1_IRQn,
-      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-      .NVIC_IRQChannelSubPriority        = 0,
-      .NVIC_IRQChannelCmd                = ENABLE,
-    },
-  },
-  .remap = GPIO_Remap_USART1,
-  .rx   = {
-    .gpio = GPIOB,
-    .init = {
-      .GPIO_Pin   = GPIO_Pin_7,
-      .GPIO_Speed = GPIO_Speed_2MHz,
-      .GPIO_Mode  = GPIO_Mode_IPU,
-    },
-  },
-  .tx   = {
-    .gpio = GPIOB,
-    .init = {
-      .GPIO_Pin   = GPIO_Pin_6,
-      .GPIO_Speed = GPIO_Speed_2MHz,
-      .GPIO_Mode  = GPIO_Mode_AF_PP,
-    },
-  },
-};
-#endif
 
 #ifdef PIOS_COM_SPEKTRUM
 /*
@@ -461,12 +409,6 @@ struct pios_usart_dev pios_usart_devs[] = {
   {
     .cfg = &pios_usart_gps_cfg,
   },
-#ifdef PIOS_COM_AUX
-#define PIOS_USART_AUX    2
-  {
-    .cfg = &pios_usart_aux_cfg,
-  },
-#endif
 #ifdef PIOS_COM_SPEKTRUM
 #define PIOS_USART_AUX    2
   {
@@ -486,13 +428,6 @@ void PIOS_USART_gps_irq_handler(void)
 {
   PIOS_USART_IRQ_Handler(PIOS_USART_GPS);
 }
-
-#ifdef PIOS_COM_AUX
-void PIOS_USART_aux_irq_handler(void)
-{
-  PIOS_USART_IRQ_Handler(PIOS_USART_AUX);
-}
-#endif
 
 #ifdef PIOS_COM_SPEKTRUM
 void PIOS_USART_spektrum_irq_handler(void)

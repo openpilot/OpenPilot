@@ -34,7 +34,6 @@
 #include <pios.h>
 #include <pios_stm32.h>
 
-//	GPIO_TypeDef *gpio;
 struct pios_servo_channel {
 	TIM_TypeDef * timer;
 	GPIO_TypeDef * port;

@@ -40,7 +40,6 @@
 #include "manualcontrolcommand.h"
 #include "actuatordesired.h"
 #include "attitudedesired.h"
-#include "ahrssettings.h"
 #include "flighttelemetrystats.h"
 
 // Private constants
@@ -410,15 +409,6 @@ static void manualControlTask(void *parameters)
 			attitude.Yaw = fmod(cmd.Yaw * 180.0, 360);
 			attitude.Throttle =  (cmd.Throttle < 0) ? -1 : cmd.Throttle;
 			AttitudeDesiredSet(&attitude);
-		}
-
-		if (cmd.Accessory3 < -.5) {	//TODO: Make what happens here depend on GCS
-			AHRSSettingsData attitudeSettings;
-			AHRSSettingsGet(&attitudeSettings);
-			// Hard coding a maximum bias of 15 for now... maybe mistake
-			attitudeSettings.PitchBias = cmd.Accessory1 * 15;
-			attitudeSettings.RollBias = cmd.Accessory2 * 15;
-			AHRSSettingsSet(&attitudeSettings);
 		}
 	}
 }

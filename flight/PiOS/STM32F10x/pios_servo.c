@@ -89,19 +89,19 @@ void PIOS_Servo_Init(void)
 				
 		/* Set up for output compare function */
 		switch(channel.channel) {
-			case 1:
+			case TIM_Channel_1:
 				TIM_OC1Init(channel.timer, &TIM_OCInitStructure);
 				TIM_OC1PreloadConfig(channel.timer, TIM_OCPreload_Enable);
 				break;
-			case 2:
+			case TIM_Channel_2:
 				TIM_OC2Init(channel.timer, &TIM_OCInitStructure);
 				TIM_OC2PreloadConfig(channel.timer, TIM_OCPreload_Enable);
 				break;
-			case 3:
+			case TIM_Channel_3:
 				TIM_OC3Init(channel.timer, &TIM_OCInitStructure);
 				TIM_OC3PreloadConfig(channel.timer, TIM_OCPreload_Enable);
 				break;
-			case 4:
+			case TIM_Channel_4:
 				TIM_OC4Init(channel.timer, &TIM_OCInitStructure);
 				TIM_OC4PreloadConfig(channel.timer, TIM_OCPreload_Enable);
 				break;

@@ -130,6 +130,11 @@ void updateInput()
 {
 	ManualControlCommandData manual;
 	ManualControlCommandGet(&manual);
+	manual.Throttle = (PIOS_PWM_Get(0) - 1100) / 900;
+	manual.Roll = (PIOS_PWM_Get(1) - 1500) / 500;
+	manual.Pitch = (PIOS_PWM_Get(2) - 1500) / 500;
+	manual.Yaw = (PIOS_PWM_Get(3) - 1500) / 500;
+	manual.FlightMode = (PIOS_PWM_Get(4) - 1500) / 500;
 	ManualControlCommandSet(&manual);
 }
 

@@ -202,61 +202,12 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 //-------------------------
 // Receiver PWM inputs
 //-------------------------
-#define PIOS_PWM_CH1_GPIO_PORT                  GPIOA
-#define PIOS_PWM_CH1_PIN                        GPIO_Pin_9
-#define PIOS_PWM_CH1_TIM_PORT                   TIM1
-#define PIOS_PWM_CH1_CH                         TIM_Channel_2
-#define PIOS_PWM_CH1_CCR                        TIM_IT_CC2
-#define PIOS_PWM_CH2_GPIO_PORT                  GPIOA
-#define PIOS_PWM_CH2_PIN                        GPIO_Pin_10
-#define PIOS_PWM_CH2_TIM_PORT                   TIM1
-#define PIOS_PWM_CH2_CH                         TIM_Channel_3
-#define PIOS_PWM_CH2_CCR                        TIM_IT_CC3
-#define PIOS_PWM_CH3_GPIO_PORT                  GPIOA
-#define PIOS_PWM_CH3_PIN                        GPIO_Pin_0
-#define PIOS_PWM_CH3_TIM_PORT                   TIM5
-#define PIOS_PWM_CH3_CH                         TIM_Channel_1
-#define PIOS_PWM_CH3_CCR                        TIM_IT_CC1
-#define PIOS_PWM_CH4_GPIO_PORT                  GPIOA
-#define PIOS_PWM_CH4_PIN                        GPIO_Pin_8
-#define PIOS_PWM_CH4_TIM_PORT                   TIM1
-#define PIOS_PWM_CH4_CH                         TIM_Channel_1
-#define PIOS_PWM_CH4_CCR                        TIM_IT_CC1
-#define PIOS_PWM_CH5_GPIO_PORT                  GPIOB
-#define PIOS_PWM_CH5_PIN                        GPIO_Pin_1
-#define PIOS_PWM_CH5_TIM_PORT                   TIM3
-#define PIOS_PWM_CH5_CH                         TIM_Channel_4
-#define PIOS_PWM_CH5_CCR                        TIM_IT_CC4
-#define PIOS_PWM_CH6_GPIO_PORT                  GPIOB
-#define PIOS_PWM_CH6_PIN                        GPIO_Pin_0
-#define PIOS_PWM_CH6_TIM_PORT                   TIM3
-#define PIOS_PWM_CH6_CH                         TIM_Channel_3
-#define PIOS_PWM_CH6_CCR                        TIM_IT_CC3
-#define PIOS_PWM_CH7_GPIO_PORT                  GPIOB
-#define PIOS_PWM_CH7_PIN                        GPIO_Pin_4
-#define PIOS_PWM_CH7_TIM_PORT                   TIM3
-#define PIOS_PWM_CH7_CH                         TIM_Channel_1
-#define PIOS_PWM_CH7_CCR                        TIM_IT_CC1
-#define PIOS_PWM_CH8_GPIO_PORT                  GPIOB
-#define PIOS_PWM_CH8_PIN                        GPIO_Pin_5
-#define PIOS_PWM_CH8_TIM_PORT                   TIM3
-#define PIOS_PWM_CH8_CH                         TIM_Channel_2
-#define PIOS_PWM_CH8_CCR                        TIM_IT_CC2
-#define PIOS_PWM_GPIO_PORTS                     { PIOS_PWM_CH1_GPIO_PORT, PIOS_PWM_CH2_GPIO_PORT, PIOS_PWM_CH3_GPIO_PORT, PIOS_PWM_CH4_GPIO_PORT, PIOS_PWM_CH5_GPIO_PORT, PIOS_PWM_CH6_GPIO_PORT, PIOS_PWM_CH7_GPIO_PORT, PIOS_PWM_CH8_GPIO_PORT }
-#define PIOS_PWM_GPIO_PINS                      { PIOS_PWM_CH1_PIN, PIOS_PWM_CH2_PIN, PIOS_PWM_CH3_PIN, PIOS_PWM_CH4_PIN, PIOS_PWM_CH5_PIN, PIOS_PWM_CH6_PIN, PIOS_PWM_CH7_PIN, PIOS_PWM_CH8_PIN }
-#define PIOS_PWM_TIM_PORTS                      { PIOS_PWM_CH1_TIM_PORT, PIOS_PWM_CH2_TIM_PORT, PIOS_PWM_CH3_TIM_PORT, PIOS_PWM_CH4_TIM_PORT, PIOS_PWM_CH5_TIM_PORT, PIOS_PWM_CH6_TIM_PORT, PIOS_PWM_CH7_TIM_PORT, PIOS_PWM_CH8_TIM_PORT }
-#define PIOS_PWM_TIM_CHANNELS                   { PIOS_PWM_CH1_CH, PIOS_PWM_CH2_CH, PIOS_PWM_CH3_CH, PIOS_PWM_CH4_CH, PIOS_PWM_CH5_CH, PIOS_PWM_CH6_CH, PIOS_PWM_CH7_CH, PIOS_PWM_CH8_CH }
-#define PIOS_PWM_TIM_CCRS                       { PIOS_PWM_CH1_CCR, PIOS_PWM_CH2_CCR, PIOS_PWM_CH3_CCR, PIOS_PWM_CH4_CCR, PIOS_PWM_CH5_CCR, PIOS_PWM_CH6_CCR, PIOS_PWM_CH7_CCR, PIOS_PWM_CH8_CCR }
-#define PIOS_PWM_TIMS                           { TIM1, TIM3, TIM5 }
-#define PIOS_PWM_TIM_IRQS                       { TIM1_CC_IRQn, TIM3_IRQn, TIM5_IRQn }
-#define PIOS_PWM_NUM_INPUTS                     8
-#define PIOS_PWM_NUM_TIMS                       3
-#define PIOS_PWM_SUPV_ENABLED                   1
+/*#define PIOS_PWM_SUPV_ENABLED                   1
 #define PIOS_PWM_SUPV_TIMER                     TIM6
 #define PIOS_PWM_SUPV_TIMER_RCC_FUNC            RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE)
 #define PIOS_PWM_SUPV_HZ                        25
 #define PIOS_PWM_SUPV_IRQ_CHANNEL               TIM6_IRQn
-#define PIOS_PWM_SUPV_IRQ_FUNC                  void TIM6_IRQHandler(void)
+#define PIOS_PWM_SUPV_IRQ_FUNC                  void TIM6_IRQHandler(void)*/
 
 //-------------------------
 // Receiver PPM input
@@ -291,6 +242,7 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 //-------------------------
 #define PIOS_SERVO_UPDATE_HZ                    50
 #define PIOS_SERVOS_INITIAL_POSITION            0 /* dont want to start motors, have no pulse till settings loaded */
+#define PIOS_PWM_MAX_INPUTS                     8
 
 //-------------------------
 // ADC

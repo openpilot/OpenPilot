@@ -2,12 +2,13 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS_PWM PWM Input Functions
+ * @addtogroup   PIOS_SERVO Servo Functions
+ * @brief PIOS interface to read and write from servo PWM ports
  * @{
  *
- * @file       pios_pwm.h
+ * @file       pios_servo_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      PWM Input functions header.
+ * @brief      Servo private structures.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -27,12 +28,38 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_PWM_H
-#define PIOS_PWM_H
+#ifndef PIOS_PWM_PRIV_H
+#define PIOS_PWM_PRIV_H
 
-/* Public Functions */
-extern void PIOS_PWM_Init(void);
-extern int32_t PIOS_PWM_Get(int8_t Channel);
-//extern void PIOS_PWM_irq_handler(TIM_TypeDef * timer);
+#include <pios.h>
+#include <pios_stm32.h>
 
-#endif /* PIOS_PWM_H */
+struct pios_pwm_channel {
+	TIM_TypeDef * timer;
+	GPIO_TypeDef * port;
+	uint16_t ccr;
+	uint8_t channel;
+	uint16_t pin;
+};
+
+struct pios_pwm_cfg {
+	TIM_TimeBaseInitTypeDef tim_base_init;
+	TIM_ICInitTypeDef tim_ic_init;
+	GPIO_InitTypeDef gpio_init;
+	uint32_t remap;		/* GPIO_Remap_* */
+	struct stm32_irq irq;
+	const struct pios_pwm_channel *const channels;
+	uint8_t num_channels;
+};
+
+extern void PIOS_PWM_irq_handler(TIM_TypeDef * timer);
+
+extern uint8_t pios_pwm_num_channels;
+extern const struct pios_pwm_cfg pios_pwm_cfg;
+
+#endif /* PIOS_PWM_PRIV_H */
+
+/**
+ * @}
+ * @}
+ */

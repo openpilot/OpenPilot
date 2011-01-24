@@ -613,49 +613,49 @@ const struct pios_servo_channel pios_servo_channels[] = {
 	{
 		.timer = TIM4,
 		.port = GPIOB,
-		.channel = 1,
+		.channel = TIM_Channel_1,
 		.pin = GPIO_Pin_6,
 	}, 
 	{
 		.timer = TIM4,
 		.port = GPIOB,
-		.channel = 2,
+		.channel = TIM_Channel_2,
 		.pin = GPIO_Pin_7,
 	}, 
 	{
 		.timer = TIM4,
 		.port = GPIOB,
-		.channel = 3,
+		.channel = TIM_Channel_3,
 		.pin = GPIO_Pin_8,
 	}, 
 	{
 		.timer = TIM4,
 		.port = GPIOB,
-		.channel = 4,
+		.channel = TIM_Channel_4,
 		.pin = GPIO_Pin_9,
 	}, 
 	{
 		.timer = TIM8,
 		.port = GPIOC,
-		.channel = 1,
+		.channel = TIM_Channel_1,
 		.pin = GPIO_Pin_6,
 	}, 
 	{
 		.timer = TIM8,
 		.port = GPIOC,
-		.channel = 2,
+		.channel = TIM_Channel_2,
 		.pin = GPIO_Pin_7,
 	}, 
 	{
 		.timer = TIM8,
 		.port = GPIOC,
-		.channel = 3,
+		.channel = TIM_Channel_3,
 		.pin = GPIO_Pin_8,
 	}, 
 	{
 		.timer = TIM8,
 		.port = GPIOC,
-		.channel = 4,
+		.channel = TIM_Channel_4,
 		.pin = GPIO_Pin_9,
 	}, 	
 };
@@ -686,6 +686,118 @@ const struct pios_servo_cfg pios_servo_cfg = {
 	.num_channels = NELEMENTS(pios_servo_channels),
 };
 
+
+/* 
+ * PWM Inputs 
+ */
+#include <pios_pwm_priv.h>
+const struct pios_pwm_channel pios_pwm_channels[] = {
+	{
+		.timer = TIM1,
+		.port = GPIOA,
+		.ccr = TIM_IT_CC2,
+		.channel = TIM_Channel_2,
+		.pin = GPIO_Pin_9,
+	}, 
+	{
+		.timer = TIM1,
+		.port = GPIOA,
+		.ccr = TIM_IT_CC3,
+		.channel = TIM_Channel_3,
+		.pin = GPIO_Pin_10,
+	}, 
+	{
+		.timer = TIM5,
+		.port = GPIOA,
+		.ccr = TIM_IT_CC1,
+		.channel = TIM_Channel_1,
+		.pin = GPIO_Pin_0
+	}, 
+	{
+		.timer = TIM1,
+		.port = GPIOA,
+		.ccr = TIM_IT_CC1,
+		.channel = TIM_Channel_1,
+		.pin = GPIO_Pin_8,
+	}, 
+	{ 
+		.timer = TIM3,
+		.port = GPIOB,
+		.ccr = TIM_IT_CC4,
+		.channel = TIM_Channel_4,
+		.pin = GPIO_Pin_1,
+	},  	
+	{
+		.timer = TIM3,
+		.port = GPIOB,
+		.ccr = TIM_IT_CC3,
+		.channel = TIM_Channel_3,
+		.pin = GPIO_Pin_0,
+	}, 		
+	{
+		.timer = TIM3,
+		.port = GPIOB,
+		.ccr = TIM_IT_CC1,
+		.channel = TIM_Channel_1,
+		.pin = GPIO_Pin_4,
+	}, 		
+	{
+		.timer = TIM3,
+		.port = GPIOB,
+		.ccr = TIM_IT_CC2,
+		.channel = TIM_Channel_2,
+		.pin = GPIO_Pin_5,
+	}, 		
+};
+
+void TIM2_IRQHandler();
+void TIM3_IRQHandler();
+void TIM4_IRQHandler();
+void TIM2_IRQHandler() __attribute__ ((alias ("PIOS_TIM2_irq_handler")));
+void TIM3_IRQHandler() __attribute__ ((alias ("PIOS_TIM3_irq_handler")));
+void TIM4_IRQHandler() __attribute__ ((alias ("PIOS_TIM4_irq_handler")));
+const struct pios_pwm_cfg pios_pwm_cfg = {
+	.tim_base_init = {
+		.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,
+		.TIM_ClockDivision = TIM_CKD_DIV1,
+		.TIM_CounterMode = TIM_CounterMode_Up,
+		.TIM_Period = 0xFFFF,
+		.TIM_RepetitionCounter = 0x0000,
+	},
+	.tim_ic_init = {
+		.TIM_ICPolarity = TIM_ICPolarity_Rising,
+		.TIM_ICSelection = TIM_ICSelection_DirectTI,
+		.TIM_ICPrescaler = TIM_ICPSC_DIV1,
+		.TIM_ICFilter = 0x0,		
+	},
+	.gpio_init = {
+		.GPIO_Mode = GPIO_Mode_IPD,
+		.GPIO_Speed = GPIO_Speed_2MHz,
+	},
+	.remap = GPIO_PartialRemap_TIM3,
+	.irq = {
+		.handler = TIM2_IRQHandler,
+		.init    = {
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+	.channels = pios_pwm_channels,
+	.num_channels = NELEMENTS(pios_pwm_channels),
+};
+void PIOS_TIM2_irq_handler()
+{
+	PIOS_PWM_irq_handler(TIM2);
+}
+void PIOS_TIM3_irq_handler()
+{
+	PIOS_PWM_irq_handler(TIM3);
+}
+void PIOS_TIM4_irq_handler()
+{
+	PIOS_PWM_irq_handler(TIM4);
+}
 
 /*
  * COM devices

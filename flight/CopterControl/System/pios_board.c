@@ -485,37 +485,37 @@ const struct pios_servo_channel pios_servo_channels[] = {
 	{
 		.timer = TIM4,
 		.port = GPIOB,
-		.channel = 4,
+		.channel = TIM_Channel_4,
 		.pin = GPIO_Pin_9,
 	}, 
 	{
 		.timer = TIM4,
 		.port = GPIOB,
-		.channel = 3,
+		.channel = TIM_Channel_3,
 		.pin = GPIO_Pin_8,
 	}, 
 	{
 		.timer = TIM4,
 		.port = GPIOB,
-		.channel = 2,
+		.channel = TIM_Channel_2,
 		.pin = GPIO_Pin_7,
 	}, 
 	{
 		.timer = TIM1,
 		.port = GPIOA,
-		.channel = 1,
+		.channel = TIM_Channel_1,
 		.pin = GPIO_Pin_8,
 	}, 
 	{ /* needs to remap to alternative function */
 		.timer = TIM3,
 		.port = GPIOB,
-		.channel = 1,
+		.channel = TIM_Channel_1,
 		.pin = GPIO_Pin_4,
 	},  	
 	{
 		.timer = TIM2,
 		.port = GPIOA,
-		.channel = 3,
+		.channel = TIM_Channel_3,
 		.pin = GPIO_Pin_2,
 	}, 		
 };

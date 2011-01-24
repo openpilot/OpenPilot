@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
+    FreeRTOS V6.1.1 - Copyright (C) 2011 Real Time Engineers Ltd.
 
     ***************************************************************************
     *                                                                         *
@@ -10,7 +10,7 @@
     *    + Looking for basic training,                                        *
     *    + Wanting to improve your FreeRTOS skills and productivity           *
     *                                                                         *
-    * then take a look at the FreeRTOS eBook                                  *
+    * then take a look at the FreeRTOS books - available as PDF or paperback  *
     *                                                                         *
     *        "Using the FreeRTOS Real Time Kernel - a Practical Guide"        *
     *                  http://www.FreeRTOS.org/Documentation                  *
@@ -59,7 +59,7 @@ only for ports that are using the MPU. */
 #ifdef portUSING_MPU_WRAPPERS
 
 	/* MPU_WRAPPERS_INCLUDED_FROM_API_FILE will be defined when this file is
-	included from queue.c or task.c to prevent it from having an effict within
+	included from queue.c or task.c to prevent it from having an effect within
 	those files. */
 	#ifndef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
 

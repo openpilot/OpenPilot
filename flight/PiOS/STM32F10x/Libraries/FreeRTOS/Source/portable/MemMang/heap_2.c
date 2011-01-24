@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
+    FreeRTOS V6.1.1 - Copyright (C) 2011 Real Time Engineers Ltd.
 
     ***************************************************************************
     *                                                                         *
@@ -10,7 +10,7 @@
     *    + Looking for basic training,                                        *
     *    + Wanting to improve your FreeRTOS skills and productivity           *
     *                                                                         *
-    * then take a look at the FreeRTOS eBook                                  *
+    * then take a look at the FreeRTOS books - available as PDF or paperback  *
     *                                                                         *
     *        "Using the FreeRTOS Real Time Kernel - a Practical Guide"        *
     *                  http://www.FreeRTOS.org/Documentation                  *
@@ -100,7 +100,7 @@ static xBlockLink xStart, xEnd;
 
 /* Keeps track of the number of free bytes remaining, but says nothing about
 fragmentation. */
-static size_t xFreeBytesRemaining;
+static size_t xFreeBytesRemaining = configTOTAL_HEAP_SIZE;
 
 /* STATIC FUNCTIONS ARE DEFINED AS MACROS TO MINIMIZE THE FUNCTION CALL DEPTH. */
 
@@ -148,8 +148,6 @@ xBlockLink *pxFirstFreeBlock;														\
 	pxFirstFreeBlock = ( void * ) xHeap.ucHeap;										\
 	pxFirstFreeBlock->xBlockSize = configTOTAL_HEAP_SIZE;							\
 	pxFirstFreeBlock->pxNextFreeBlock = &xEnd;										\
-																					\
-	xFreeBytesRemaining = configTOTAL_HEAP_SIZE;									\
 }
 /*-----------------------------------------------------------*/
 
@@ -223,7 +221,7 @@ void *pvReturn = NULL;
 					prvInsertBlockIntoFreeList( ( pxNewBlockLink ) );
 				}
 				
-				xFreeBytesRemaining -= xWantedSize;
+				xFreeBytesRemaining -= pxBlock->xBlockSize;
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
+    FreeRTOS V6.1.1 - Copyright (C) 2011 Real Time Engineers Ltd.
 
     ***************************************************************************
     *                                                                         *
@@ -10,7 +10,7 @@
     *    + Looking for basic training,                                        *
     *    + Wanting to improve your FreeRTOS skills and productivity           *
     *                                                                         *
-    * then take a look at the FreeRTOS eBook                                  *
+    * then take a look at the FreeRTOS books - available as PDF or paperback  *
     *                                                                         *
     *        "Using the FreeRTOS Real Time Kernel - a Practical Guide"        *
     *                  http://www.FreeRTOS.org/Documentation                  *
@@ -33,9 +33,9 @@
     FreeRTOS is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-    more details. You should have received a copy of the GNU General Public 
-    License and the FreeRTOS license exception along with FreeRTOS; if not it 
-    can be viewed here: http://www.freertos.org/a00114.html and also obtained 
+    more details. You should have received a copy of the GNU General Public
+    License and the FreeRTOS license exception along with FreeRTOS; if not it
+    can be viewed here: http://www.freertos.org/a00114.html and also obtained
     by writing to Richard Barry, contact details for whom are available on the
     FreeRTOS WEB site.
 
@@ -50,16 +50,6 @@
     http://www.OpenRTOS.com - Commercial support, development, porting,
     licensing and training services.
 */
-
-/**
- * @file tasks.c
- * @author FreeRTOS
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @addtogroup FreeRTOS FreeRTOS Operating system
- * @{
- */
-
 
 
 #include <stdio.h>
@@ -81,8 +71,6 @@ task.h is included from an application file. */
  * Macro to define the amount of stack available to the idle task.
  */
 #define tskIDLE_STACK_SIZE	configMINIMAL_STACK_SIZE
-
-#define tskIDLE_PRIORITY			( ( unsigned portBASE_TYPE ) 0 )
 
 /*
  * Task control block.  A task control block (TCB) is allocated to each task,
@@ -399,7 +387,6 @@ signed portBASE_TYPE xTaskGenericCreate( pdTASK_CODE pxTaskCode, const signed ch
 {
 signed portBASE_TYPE xReturn;
 tskTCB * pxNewTCB;
-portBASE_TYPE xRunPrivileged;
 
 	/* Allocate the memory required by the TCB and stack for the new task,
 	checking that the allocation was successful. */
@@ -409,16 +396,19 @@ portBASE_TYPE xRunPrivileged;
 	{
 		portSTACK_TYPE *pxTopOfStack;
 
-		/* Should the task be created in privileged mode? */
-		if( ( uxPriority & portPRIVILEGE_BIT ) != 0x00 )
-		{
-			xRunPrivileged = pdTRUE;
-		}
-		else
-		{
-			xRunPrivileged = pdFALSE;
-		}
-		uxPriority &= ~portPRIVILEGE_BIT;
+		#if( portUSING_MPU_WRAPPERS == 1 )
+			/* Should the task be created in privileged mode? */
+			portBASE_TYPE xRunPrivileged;
+			if( ( uxPriority & portPRIVILEGE_BIT ) != 0x00 )
+			{
+				xRunPrivileged = pdTRUE;
+			}
+			else
+			{
+				xRunPrivileged = pdFALSE;
+			}
+			uxPriority &= ~portPRIVILEGE_BIT;
+		#endif /* portUSING_MPU_WRAPPERS == 1 */
 
 		/* Calculate the top of stack address.  This depends on whether the
 		stack grows from high memory to low (as per the 80x86) or visa versa.
@@ -454,24 +444,35 @@ portBASE_TYPE xRunPrivileged;
 		#else
 		{
 			pxNewTCB->pxTopOfStack = pxPortInitialiseStack( pxTopOfStack, pxTaskCode, pvParameters );
-			( void ) xRunPrivileged;
 		}
 		#endif
 
+		if( ( void * ) pxCreatedTask != NULL )
+		{
+			/* Pass the TCB out - in an anonymous way.  The calling function/
+			task can use this as a handle to delete the task later if
+			required.*/
+			*pxCreatedTask = ( xTaskHandle ) pxNewTCB;
+		}
+		
 		/* We are going to manipulate the task queues to add this task to a
 		ready list, so must make sure no interrupts occur. */
 		portENTER_CRITICAL();
 		{
 			uxCurrentNumberOfTasks++;
-			if( uxCurrentNumberOfTasks == ( unsigned portBASE_TYPE ) 1 )
+			if( pxCurrentTCB == NULL )
 			{
-				/* As this is the first task it must also be the current task. */
+				/* There are no other tasks, or all the other tasks are in
+				the suspended state - make this the current task. */
 				pxCurrentTCB =  pxNewTCB;
 
-				/* This is the first task to be created so do the preliminary
-				initialisation required.  We will not recover if this call
-				fails, but we will report the failure. */
-				prvInitialiseTaskLists();
+				if( uxCurrentNumberOfTasks == ( unsigned portBASE_TYPE ) 1 )
+				{
+					/* This is the first task to be created so do the preliminary
+					initialisation required.  We will not recover if this call
+					fails, but we will report the failure. */
+					prvInitialiseTaskLists();
+				}
 			}
 			else
 			{
@@ -512,19 +513,11 @@ portBASE_TYPE xRunPrivileged;
 	else
 	{
 		xReturn = errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY;
-		traceTASK_CREATE_FAILED( pxNewTCB );
+		traceTASK_CREATE_FAILED();
 	}
 
 	if( xReturn == pdPASS )
 	{
-		if( ( void * ) pxCreatedTask != NULL )
-		{
-			/* Pass the TCB out - in an anonymous way.  The calling function/
-			task can use this as a handle to delete the task later if
-			required.*/
-			*pxCreatedTask = ( xTaskHandle ) pxNewTCB;
-		}
-
 		if( xSchedulerRunning != pdFALSE )
 		{
 			/* If the created task is of a higher priority than the current task
@@ -904,10 +897,31 @@ portBASE_TYPE xRunPrivileged;
 		}
 		portEXIT_CRITICAL();
 
-		/* We may have just suspended the current task. */
 		if( ( void * ) pxTaskToSuspend == NULL )
 		{
-			portYIELD_WITHIN_API();
+			if( xSchedulerRunning != pdFALSE )
+			{
+				/* We have just suspended the current task. */
+				portYIELD_WITHIN_API();
+			}
+			else
+			{
+				/* The scheduler is not running, but the task that was pointed
+				to by pxCurrentTCB has just been suspended and pxCurrentTCB
+				must be adjusted to point to a different task. */
+				if( uxCurrentNumberOfTasks == 1 )
+				{
+					/* No other tasks are defined, so set pxCurrentTCB back to
+					NULL so when the next task is created pxCurrentTCB will
+					be set to point to it no matter what its relative priority
+					is. */
+					pxCurrentTCB = NULL;
+				}
+				else
+				{
+					vTaskSwitchContext();
+				}
+			}
 		}
 	}
 
@@ -1054,7 +1068,7 @@ portBASE_TYPE xReturn;
 		macro must be defined to configure the timer/counter used to generate
 		the run time counter time base. */
 		portCONFIGURE_TIMER_FOR_RUN_TIME_STATS();
-
+		
 		/* Setting up the timer tick is hardware specific and thus in the
 		portable interface. */
 		if( xPortStartScheduler() )
@@ -1186,6 +1200,12 @@ portTickType xTicks;
 }
 /*-----------------------------------------------------------*/
 
+portTickType xTaskGetTickCountFromISR( void )
+{
+	return xTickCount;
+}
+/*-----------------------------------------------------------*/
+
 unsigned portBASE_TYPE uxTaskGetNumberOfTasks( void )
 {
 	/* A critical section is not required because the variables are of type
@@ -1262,13 +1282,23 @@ unsigned portBASE_TYPE uxTaskGetNumberOfTasks( void )
 	void vTaskGetRunTimeStats( signed char *pcWriteBuffer )
 	{
 	unsigned portBASE_TYPE uxQueue;
-	unsigned long ulTotalRunTime = portGET_RUN_TIME_COUNTER_VALUE();
+	unsigned long ulTotalRunTime;
 
 		/* This is a VERY costly function that should be used for debug only.
 		It leaves interrupts disabled for a LONG time. */
 
 		vTaskSuspendAll();
 		{
+			#ifdef portALT_GET_RUN_TIME_COUNTER_VALUE
+				portALT_GET_RUN_TIME_COUNTER_VALUE( ulTotalRunTime );
+			#else
+				ulTotalRunTime = portGET_RUN_TIME_COUNTER_VALUE();
+			#endif
+
+			/* Divide ulTotalRunTime by 100 to make the percentage caluclations
+			simpler in the prvGenerateRunTimeStatsForTasksInList() function. */
+			ulTotalRunTime /= 100UL;
+			
 			/* Run through all the lists that could potentially contain a TCB,
 			generating a table of run timer percentages in the provided
 			buffer. */
@@ -1574,7 +1604,13 @@ void vTaskSwitchContext( void )
 
 	#if ( configGENERATE_RUN_TIME_STATS == 1 )
 	{
-		unsigned long ulTempCounter = portGET_RUN_TIME_COUNTER_VALUE();
+		unsigned long ulTempCounter;
+		
+			#ifdef portALT_GET_RUN_TIME_COUNTER_VALUE
+				portALT_GET_RUN_TIME_COUNTER_VALUE( ulTempCounter );
+			#else
+				ulTempCounter = portGET_RUN_TIME_COUNTER_VALUE();
+			#endif
 
 			/* Add the amount of time the task has been running to the accumulated
 			time so far.  The time the task started running was stored in
@@ -1753,7 +1789,7 @@ portBASE_TYPE xReturn;
 			passed since vTaskSetTimeout() was called. */
 			xReturn = pdTRUE;
 		}
-		else if( ( ( portTickType ) xTickCount - ( portTickType ) pxTimeOut->xTimeOnEntering ) < ( portTickType ) *pxTicksToWait )
+		else if( ( ( portTickType ) ( ( portTickType ) xTickCount - ( portTickType ) pxTimeOut->xTimeOnEntering ) ) < ( portTickType ) *pxTicksToWait )
 		{
 			/* Not a genuine timeout. Adjust parameters for time remaining. */
 			*pxTicksToWait -= ( ( portTickType ) xTickCount - ( portTickType ) pxTimeOut->xTimeOnEntering );
@@ -2049,7 +2085,16 @@ tskTCB *pxNewTCB;
 		do
 		{
 			listGET_OWNER_OF_NEXT_ENTRY( pxNextTCB, pxList );
-			usStackRemaining = usTaskCheckFreeStackSpace( ( unsigned char * ) pxNextTCB->pxStack );
+			#if ( portSTACK_GROWTH > 0 )
+			{
+				usStackRemaining = usTaskCheckFreeStackSpace( ( unsigned char * ) pxNextTCB->pxEndOfStack );
+			}
+			#else
+			{
+				usStackRemaining = usTaskCheckFreeStackSpace( ( unsigned char * ) pxNextTCB->pxStack );
+			}
+			#endif			
+			
 			sprintf( pcStatusString, ( char * ) "%s\t\t%c\t%u\t%u\t%u\r\n", pxNextTCB->pcTaskName, cStatus, ( unsigned int ) pxNextTCB->uxPriority, usStackRemaining, ( unsigned int ) pxNextTCB->uxTCBNumber );
 			strcat( ( char * ) pcWriteBuffer, ( char * ) pcStatusString );
 
@@ -2084,19 +2129,40 @@ tskTCB *pxNewTCB;
 				}
 				else
 				{
-					/* What percentage of the total run time as the task used?
-					This will always be rounded down to the nearest integer. */
-					ulStatsAsPercentage = ( 100UL * pxNextTCB->ulRunTimeCounter ) / ulTotalRunTime;
+					/* What percentage of the total run time has the task used?
+					This will always be rounded down to the nearest integer. 
+					ulTotalRunTime has already been divided by 100. */
+					ulStatsAsPercentage = pxNextTCB->ulRunTimeCounter / ulTotalRunTime;
 
 					if( ulStatsAsPercentage > 0UL )
 					{
-						sprintf( pcStatsString, ( char * ) "%s\t\t%u\t\t%u%%\r\n", pxNextTCB->pcTaskName, ( unsigned int ) pxNextTCB->ulRunTimeCounter, ( unsigned int ) ulStatsAsPercentage );
+						#ifdef portLU_PRINTF_SPECIFIER_REQUIRED
+						{
+							sprintf( pcStatsString, ( char * ) "%s\t\t%lu\t\t%lu%%\r\n", pxNextTCB->pcTaskName, pxNextTCB->ulRunTimeCounter, ulStatsAsPercentage );							
+						}
+						#else
+						{
+							/* sizeof( int ) == sizeof( long ) so a smaller
+							printf() library can be used. */
+							sprintf( pcStatsString, ( char * ) "%s\t\t%u\t\t%u%%\r\n", pxNextTCB->pcTaskName, ( unsigned int ) pxNextTCB->ulRunTimeCounter, ( unsigned int ) ulStatsAsPercentage );
+						}
+						#endif
 					}
 					else
 					{
 						/* If the percentage is zero here then the task has
 						consumed less than 1% of the total run time. */
-						sprintf( pcStatsString, ( char * ) "%s\t\t%u\t\t<1%%\r\n", pxNextTCB->pcTaskName, ( unsigned int ) pxNextTCB->ulRunTimeCounter );
+						#ifdef portLU_PRINTF_SPECIFIER_REQUIRED
+						{
+							sprintf( pcStatsString, ( char * ) "%s\t\t%lu\t\t<1%%\r\n", pxNextTCB->pcTaskName, pxNextTCB->ulRunTimeCounter );							
+						}
+						#else
+						{
+							/* sizeof( int ) == sizeof( long ) so a smaller
+							printf() library can be used. */
+							sprintf( pcStatsString, ( char * ) "%s\t\t%u\t\t<1%%\r\n", pxNextTCB->pcTaskName, ( unsigned int ) pxNextTCB->ulRunTimeCounter );
+						}
+						#endif
 					}
 				}
 
@@ -2284,7 +2350,7 @@ tskTCB *pxNewTCB;
 
 		if( xSchedulerRunning != pdFALSE )
 		{
-			pxCurrentTCB->uxCriticalNesting++;
+			( pxCurrentTCB->uxCriticalNesting )++;
 		}
 	}
 
@@ -2299,7 +2365,7 @@ void vTaskExitCritical( void )
 	{
 		if( pxCurrentTCB->uxCriticalNesting > 0 )
 		{
-			pxCurrentTCB->uxCriticalNesting--;
+			( pxCurrentTCB->uxCriticalNesting )--;
 
 			if( pxCurrentTCB->uxCriticalNesting == 0 )
 			{

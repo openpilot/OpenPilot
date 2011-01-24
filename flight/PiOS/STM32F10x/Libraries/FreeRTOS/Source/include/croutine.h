@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
+    FreeRTOS V6.1.1 - Copyright (C) 2011 Real Time Engineers Ltd.
 
     ***************************************************************************
     *                                                                         *
@@ -10,7 +10,7 @@
     *    + Looking for basic training,                                        *
     *    + Wanting to improve your FreeRTOS skills and productivity           *
     *                                                                         *
-    * then take a look at the FreeRTOS eBook                                  *
+    * then take a look at the FreeRTOS books - available as PDF or paperback  *
     *                                                                         *
     *        "Using the FreeRTOS Real Time Kernel - a Practical Guide"        *
     *                  http://www.FreeRTOS.org/Documentation                  *
@@ -52,17 +52,10 @@
 */
 
 #ifndef INC_FREERTOS_H
-	#error "#include FreeRTOS.h" must appear in source files before "#include croutine.h"
+	#error "include FreeRTOS.h must appear in source files before include croutine.h"
 #endif
 
-/**
- * @file croutine.h
- * @author FreeRTOS
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @addtogroup FreeRTOS FreeRTOS Operating system
- * @{
- */
+
 
 
 #ifndef CO_ROUTINE_H
@@ -126,7 +119,7 @@ typedef struct corCoRoutineControlBlock
  // Variables in co-routines must be declared static if they must maintain value across a blocking call.
  // This may not be necessary for const variables.
  static const char cLedToFlash[ 2 ] = { 5, 6 };
- static const portTickType xTimeToDelay[ 2 ] = { 200, 400 };
+ static const portTickType uxFlashRates[ 2 ] = { 200, 400 };
 
      // Must start every co-routine with a call to crSTART();
      crSTART( xHandle );

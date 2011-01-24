@@ -1,15 +1,5 @@
-/**
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @addtogroup FreeRTOS FreeRTOS Operating system
- * @{
- *
- * @file port.c
- * @author FreeRTOS
- */
-
 /*
-    FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
+    FreeRTOS V6.1.1 - Copyright (C) 2011 Real Time Engineers Ltd.
 
     ***************************************************************************
     *                                                                         *
@@ -20,7 +10,7 @@
     *    + Looking for basic training,                                        *
     *    + Wanting to improve your FreeRTOS skills and productivity           *
     *                                                                         *
-    * then take a look at the FreeRTOS eBook                                  *
+    * then take a look at the FreeRTOS books - available as PDF or paperback  *
     *                                                                         *
     *        "Using the FreeRTOS Real Time Kernel - a Practical Guide"        *
     *                  http://www.FreeRTOS.org/Documentation                  *
@@ -125,6 +115,7 @@ portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack, pdTASK_CODE
 {
 	/* Simulate the stack frame as it would be created by a context switch
 	interrupt. */
+	pxTopOfStack--; /* Offset added to account for the way the MCU uses the stack on entry/exit of interrupts. */
 	*pxTopOfStack = portINITIAL_XPSR;	/* xPSR */
 	pxTopOfStack--;
 	*pxTopOfStack = ( portSTACK_TYPE ) pxCode;	/* PC */
@@ -164,7 +155,9 @@ void vPortStartFirstTask( void )
 					" ldr r0, [r0] 			\n"
 					" ldr r0, [r0] 			\n"
 					" msr msp, r0			\n" /* Set the msp back to the start of the stack. */
+					" cpsie i				\n" /* Globally enable interrupts. */
 					" svc 0					\n" /* System call to start first task. */
+					" nop					\n"
 				);
 }
 /*-----------------------------------------------------------*/

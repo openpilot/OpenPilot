@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V6.0.0 - Copyright (C) 2009 Real Time Engineers Ltd.
+    FreeRTOS V6.1.1 - Copyright (C) 2011 Real Time Engineers Ltd.
 
     ***************************************************************************
     *                                                                         *
@@ -10,7 +10,7 @@
     *    + Looking for basic training,                                        *
     *    + Wanting to improve your FreeRTOS skills and productivity           *
     *                                                                         *
-    * then take a look at the FreeRTOS eBook                                  *
+    * then take a look at the FreeRTOS books - available as PDF or paperback  *
     *                                                                         *
     *        "Using the FreeRTOS Real Time Kernel - a Practical Guide"        *
     *                  http://www.FreeRTOS.org/Documentation                  *
@@ -33,9 +33,9 @@
     FreeRTOS is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
     FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-    more details. You should have received a copy of the GNU General Public 
-    License and the FreeRTOS license exception along with FreeRTOS; if not it 
-    can be viewed here: http://www.freertos.org/a00114.html and also obtained 
+    more details. You should have received a copy of the GNU General Public
+    License and the FreeRTOS license exception along with FreeRTOS; if not it
+    can be viewed here: http://www.freertos.org/a00114.html and also obtained
     by writing to Richard Barry, contact details for whom are available on the
     FreeRTOS WEB site.
 
@@ -54,14 +54,6 @@
 #ifndef INC_FREERTOS_H
 #define INC_FREERTOS_H
 
-/**
- * @file FreeRTOS.h
- * @author FreeRTOS
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @addtogroup FreeRTOS FreeRTOS Operating system
- * @{
- */
 
 /*
  * Include the generic headers required for the FreeRTOS port being used.
@@ -247,17 +239,17 @@ typedef portBASE_TYPE (*pdTASK_HOOK_CODE)( void * );
 #endif
 
 #ifndef traceBLOCKING_ON_QUEUE_RECEIVE
-	/* Task is about to block because it cannot read from a 
+	/* Task is about to block because it cannot read from a
 	queue/mutex/semaphore.  pxQueue is a pointer to the queue/mutex/semaphore
-	upon which the read was attempted.  pxCurrentTCB points to the TCB of the 
+	upon which the read was attempted.  pxCurrentTCB points to the TCB of the
 	task that attempted the read. */
 	#define traceBLOCKING_ON_QUEUE_RECEIVE( pxQueue )
 #endif
 
 #ifndef traceBLOCKING_ON_QUEUE_SEND
-	/* Task is about to block because it cannot write to a 
+	/* Task is about to block because it cannot write to a
 	queue/mutex/semaphore.  pxQueue is a pointer to the queue/mutex/semaphore
-	upon which the write was attempted.  pxCurrentTCB points to the TCB of the 
+	upon which the write was attempted.  pxCurrentTCB points to the TCB of the
 	task that attempted the write. */
 	#define traceBLOCKING_ON_QUEUE_SEND( pxQueue )
 #endif
@@ -294,6 +286,10 @@ typedef portBASE_TYPE (*pdTASK_HOOK_CODE)( void * );
 
 #ifndef traceTAKE_MUTEX_RECURSIVE
 	#define traceTAKE_MUTEX_RECURSIVE( pxMutex )
+#endif
+
+#ifndef traceTAKE_MUTEX_RECURSIVE_FAILED
+	#define traceTAKE_MUTEX_RECURSIVE_FAILED( pxMutex )
 #endif
 
 #ifndef traceCREATE_COUNTING_SEMAPHORE
@@ -349,7 +345,7 @@ typedef portBASE_TYPE (*pdTASK_HOOK_CODE)( void * );
 #endif
 
 #ifndef traceTASK_CREATE_FAILED
-	#define traceTASK_CREATE_FAILED( pxNewTCB )
+	#define traceTASK_CREATE_FAILED()
 #endif
 
 #ifndef traceTASK_DELETE
@@ -395,7 +391,9 @@ typedef portBASE_TYPE (*pdTASK_HOOK_CODE)( void * );
 	#endif /* portCONFIGURE_TIMER_FOR_RUN_TIME_STATS */
 
 	#ifndef portGET_RUN_TIME_COUNTER_VALUE
-		#error If configGENERATE_RUN_TIME_STATS is defined then portGET_RUN_TIME_COUNTER_VALUE must also be defined.  portGET_RUN_TIME_COUNTER_VALUE should evaluate to the counter value of the timer/counter peripheral used as the run time counter time base.
+		#ifndef portALT_GET_RUN_TIME_COUNTER_VALUE
+			#error If configGENERATE_RUN_TIME_STATS is defined then either portGET_RUN_TIME_COUNTER_VALUE or portALT_GET_RUN_TIME_COUNTER_VALUE must also be defined.  See the examples provided and the FreeRTOS web site for more information.
+		#endif /* portALT_GET_RUN_TIME_COUNTER_VALUE */
 	#endif /* portGET_RUN_TIME_COUNTER_VALUE */
 
 #endif /* configGENERATE_RUN_TIME_STATS */
@@ -417,7 +415,7 @@ typedef portBASE_TYPE (*pdTASK_HOOK_CODE)( void * );
 #endif
 
 #ifndef pvPortMallocAligned
-	#define pvPortMallocAligned( xSize, pvBuffer ) pvPortMalloc( xSize ); ( void ) pvBuffer
+	#define pvPortMallocAligned( x, puxStackBuffer ) ( ( puxStackBuffer == NULL ) ? ( pvPortMalloc( x ) ) : ( puxStackBuffer ) )
 #endif
 
 #ifndef vPortFreeAligned

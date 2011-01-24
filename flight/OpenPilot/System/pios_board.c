@@ -691,6 +691,7 @@ const struct pios_servo_cfg pios_servo_cfg = {
 /* 
  * PWM Inputs 
  */
+#if defined(PIOS_INCLUDE_PWM)
 #include <pios_pwm_priv.h>
 const struct pios_pwm_channel pios_pwm_channels[] = {
 	{
@@ -793,6 +794,7 @@ void PIOS_TIM3_irq_handler()
 {
 	PIOS_PWM_irq_handler(TIM3);
 }
+#endif
 
 /*
  * COM devices

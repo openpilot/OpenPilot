@@ -25,7 +25,7 @@ isEmpty(QMAKESPEC) {
 }
 
 # Some platform-dependent options
-win32 {
+win32|unix {
     CONFIG(release, debug|release) {
         BUILD_CONFIG = release
     } else {
@@ -61,7 +61,7 @@ win32 {
 
     uavobjects.commands += cd ../ground/openpilotgcs &&
     uavobjects.commands += $(QMAKE) ../../../ground/openpilotgcs/openpilotgcs.pro
-    uavobjects.commands += -spec $$SPEC -r $$addNewline()
+    uavobjects.commands += -spec $$SPEC CONFIG+=$${BUILD_CONFIG} -r $$addNewline()
 }
 
 uavobjects.target = FORCE

@@ -60,7 +60,7 @@
 #define $(NAME)InstSet(instId, dataIn) UAVObjSetInstanceData($(NAME)Handle(), instId, dataIn)
 #define $(NAME)ConnectQueue(queue) UAVObjConnectQueue($(NAME)Handle(), queue, EV_MASK_ALL_UPDATES)
 #define $(NAME)ConnectCallback(cb) UAVObjConnectCallback($(NAME)Handle(), cb, EV_MASK_ALL_UPDATES)
-#define $(NAME)CreateInstance() UAVObjCreateInstance($(NAME)Handle())
+#define $(NAME)CreateInstance() UAVObjCreateInstance($(NAME)Handle(),&$(NAME)SetDefaults)
 #define $(NAME)RequestUpdate() UAVObjRequestUpdate($(NAME)Handle())
 #define $(NAME)RequestInstUpdate(instId) UAVObjRequestInstanceUpdate($(NAME)Handle(), instId)
 #define $(NAME)Updated() UAVObjUpdated($(NAME)Handle())
@@ -80,6 +80,7 @@ $(DATAFIELDINFO)
 // Generic interface functions
 int32_t $(NAME)Initialize();
 UAVObjHandle $(NAME)Handle();
+void $(NAME)SetDefaults(UAVObjHandle obj, uint16_t instId);
 
 #endif // $(NAMEUC)_H
 

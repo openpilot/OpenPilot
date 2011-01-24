@@ -135,7 +135,7 @@ const char* UAVObjGetName(UAVObjHandle obj);
 uint32_t UAVObjGetNumBytes(UAVObjHandle obj);
 uint16_t UAVObjGetNumInstances(UAVObjHandle obj);
 UAVObjHandle UAVObjGetLinkedObj(UAVObjHandle obj);
-uint16_t UAVObjCreateInstance(UAVObjHandle obj);
+uint16_t UAVObjCreateInstance(UAVObjHandle obj, UAVObjInitializeCallback initCb);
 int32_t UAVObjIsSingleInstance(UAVObjHandle obj);
 int32_t UAVObjIsMetaobject(UAVObjHandle obj);
 int32_t UAVObjIsSettings(UAVObjHandle obj);

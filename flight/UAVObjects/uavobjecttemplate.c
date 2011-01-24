@@ -42,9 +42,6 @@
 // Private variables
 static UAVObjHandle handle;
 
-// Private functions
-static void setDefaults(UAVObjHandle obj, uint16_t instId);
-
 /**
  * Initialize object.
  * \return 0 Success
@@ -54,7 +51,7 @@ int32_t $(NAME)Initialize()
 {
 	// Register object with the object manager
 	handle = UAVObjRegister($(NAMEUC)_OBJID, $(NAMEUC)_NAME, $(NAMEUC)_METANAME, 0,
-			$(NAMEUC)_ISSINGLEINST, $(NAMEUC)_ISSETTINGS, $(NAMEUC)_NUMBYTES, &setDefaults);
+			$(NAMEUC)_ISSINGLEINST, $(NAMEUC)_ISSETTINGS, $(NAMEUC)_NUMBYTES, &$(NAME)SetDefaults);
 
 	// Done
 	if (handle != 0)
@@ -72,7 +69,7 @@ int32_t $(NAME)Initialize()
  * If a default value is not specified the object fields
  * will be initialized to zero.
  */
-static void setDefaults(UAVObjHandle obj, uint16_t instId)
+void $(NAME)SetDefaults(UAVObjHandle obj, uint16_t instId)
 {
 	$(NAME)Data data;
 	UAVObjMetadata metadata;

@@ -69,7 +69,6 @@ struct ObjectListStruct {
 	int8_t isSettings; /** Set to 1 if this object is a settings object */
 	uint16_t numBytes; /** Number of data bytes contained in the object (for a single instance) */
 	uint16_t numInstances; /** Number of instances */
-	UAVObjInitializeCallback initCb; /** Object field and metadata initialization callback */
 	struct ObjectListStruct* linkedObj; /** Linked object, for regular objects this is the metaobject and for metaobjects it is the parent object */
 	ObjectInstList* instances; /** List of object instances, instance 0 always exists */
 	ObjectEventList* events; /** Event queues registered on the object */
@@ -197,7 +196,6 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char* name, const char* metaName,
 	objEntry->numBytes = numBytes;
 	objEntry->events = NULL;
 	objEntry->numInstances = 0;
-	objEntry->initCb = initCb;
 	objEntry->instances = NULL;
 	objEntry->linkedObj = NULL; // will be set later
 	LL_APPEND(objList, objEntry);
@@ -225,9 +223,9 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char* name, const char* metaName,
 	}
 
 	// Initialize object fields and metadata to default values
-	if ( objEntry->initCb != NULL )
+	if ( initCb != NULL )
 	{
-		objEntry->initCb((UAVObjHandle)objEntry, 0);
+		initCb((UAVObjHandle)objEntry, 0);
 	}
 
 	// Attempt to load object's metadata from the SD card (not done directly on the metaobject, but through the object)
@@ -366,7 +364,7 @@ uint16_t UAVObjGetNumInstances(UAVObjHandle obj)
  * \param[in] obj The object handle
  * \return The instance ID or 0 if an error
  */
-uint16_t UAVObjCreateInstance(UAVObjHandle obj)
+uint16_t UAVObjCreateInstance(UAVObjHandle obj, UAVObjInitializeCallback initCb)
 {
 	ObjectList* objEntry;
 	ObjectInstList* instEntry;
@@ -384,9 +382,9 @@ uint16_t UAVObjCreateInstance(UAVObjHandle obj)
 	}
 
 	// Initialize instance data
-	if ( objEntry->initCb != NULL )
+	if ( initCb != NULL )
 	{
-		objEntry->initCb(obj, instEntry->instId);
+		initCb(obj, instEntry->instId);
 	}
 
 	// Unlock

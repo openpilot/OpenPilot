@@ -41,7 +41,11 @@ win32 {
 
     uavobjects.commands += pushd $$targetPath(../../ground/openpilotgcs) &&
     uavobjects.commands += $(QMAKE) $$targetPath(../../../ground/openpilotgcs/)openpilotgcs.pro
-    uavobjects.commands += -spec $$SPEC -r && popd $$addNewline()
+    CONFIG(release, debug|release) {
+        uavobjects.commands += -spec $$SPEC -r CONFIG+=release && popd $$addNewline()
+    } else {
+        uavobjects.commands += -spec $$SPEC -r CONFIG+=debug && popd $$addNewline()
+    }
 }
 
 !win32 {

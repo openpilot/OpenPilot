@@ -20,9 +20,11 @@ rem -------------------------------------------------------------------
 rem Settings and definitions
 rem -------------------------------------------------------------------
 
-rem Set desired targets
-set TARGETS_FW=AHRS OpenPilot PipXtreme
-set TARGETS_BL=%TARGETS_FW%
+rem Set desired targets and paths
+set TARGETS_FW=ahrs openpilot pipxtreme coptercontrol
+set TARGETS_BL=ahrs openpilot pipxtreme
+set TARGET_FW_SUBDIR=.
+set TARGET_BL_SUBDIR=bootloaders
 
 rem Set toolset paths (if you don't have them added permanently)
 rem set PATH=D:\Work\OpenPilot\Apps\CodeSourcery\bin\;%PATH%
@@ -71,7 +73,7 @@ rem Bootloaders build
 rem -------------------------------------------------------------------
 
 for %%G in (%TARGETS_BL%) do (
-  %MAKE% CODE_SOURCERY=YES USE_BOOTLOADER=NO OUTDIR="%BUILD_DIR%\flight\Bootloaders\%%G" -C "%ROOT_DIR%\flight\Bootloaders\%%G" %TARGET%
+  %MAKE% CODE_SOURCERY=YES USE_BOOTLOADER=NO OUTDIR="%BUILD_DIR%\%TARGET_BL_SUBDIR%\%%G" -C "%ROOT_DIR%\flight\Bootloaders\%%G" %TARGET%
   if errorlevel 1 goto Abort1
 )
 
@@ -80,7 +82,7 @@ rem Firmware build
 rem -------------------------------------------------------------------
 
 for %%G in (%TARGETS_FW%) do (
-  %MAKE% CODE_SOURCERY=YES USE_BOOTLOADER=YES OUTDIR="%BUILD_DIR%\flight\%%G" -C "%ROOT_DIR%\flight\%%G" %TARGET%
+  %MAKE% CODE_SOURCERY=YES USE_BOOTLOADER=YES OUTDIR="%BUILD_DIR%\%TARGET_FW_SUBDIR%\%%G" -C "%ROOT_DIR%\flight\%%G" %TARGET%
   if errorlevel 1 goto Abort1
 )
 goto Done

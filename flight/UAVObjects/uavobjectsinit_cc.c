@@ -95,7 +95,7 @@ void UAVObjectsInitializeAll()
 	StabilizationSettingsInitialize();
 	ActuatorSettingsInitialize();
 	RateDesiredInitialize();
-	//AHRSSettingsInitialize();
+	AHRSSettingsInitialize();
 	ManualControlSettingsInitialize();
 	MixerSettingsInitialize();
 	MixerStatusInitialize();

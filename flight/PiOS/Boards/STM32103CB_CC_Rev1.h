@@ -221,7 +221,7 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //-------------------------
 // Servo outputs
 //-------------------------
-#define PIOS_SERVO_UPDATE_HZ                    50
+#define PIOS_SERVO_UPDATE_HZ                    250
 #define PIOS_SERVOS_INITIAL_POSITION            2000 /* dont want to start motors, have no pulse till settings loaded */
 
 //-------------------------
@@ -248,6 +248,6 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 #define PIOS_USB_DETECT_GPIO_PIN                GPIO_Pin_15
 #define PIOS_USB_DETECT_EXTI_LINE               EXTI_Line15
 #define PIOS_IRQ_USB_PRIORITY                   PIOS_IRQ_PRIO_MID
-#define PIOS_USB_RX_BUFFER_SIZE                 256
-#define PIOS_USB_TX_BUFFER_SIZE                 256
+#define PIOS_USB_RX_BUFFER_SIZE                 128
+#define PIOS_USB_TX_BUFFER_SIZE                 128
 #endif /* STM32103CB_AHRS_H_ */

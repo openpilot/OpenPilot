@@ -44,7 +44,7 @@ struct ObjectEventListStruct {
 	xQueueHandle queue;
 	UAVObjEventCallback cb;
 	int32_t eventMask;
-    struct ObjectEventListStruct* next;
+	struct ObjectEventListStruct* next;
 };
 typedef struct ObjectEventListStruct ObjectEventList;
 
@@ -54,7 +54,7 @@ typedef struct ObjectEventListStruct ObjectEventList;
 struct ObjectInstListStruct {
 	void* data;
 	uint16_t instId;
-    struct ObjectInstListStruct* next;
+	struct ObjectInstListStruct* next;
 };
 typedef struct ObjectInstListStruct ObjectInstList;
 
@@ -70,9 +70,9 @@ struct ObjectListStruct {
 	uint16_t numBytes; /** Number of data bytes contained in the object (for a single instance) */
 	uint16_t numInstances; /** Number of instances */
 	struct ObjectListStruct* linkedObj; /** Linked object, for regular objects this is the metaobject and for metaobjects it is the parent object */
-	ObjectInstList* instances; /** List of object instances, instance 0 always exists */
+	ObjectInstList instances; /** List of object instances, instance 0 always exists */
 	ObjectEventList* events; /** Event queues registered on the object */
-    struct ObjectListStruct* next; /** Needed by linked list library (utlist.h) */
+	struct ObjectListStruct* next; /** Needed by linked list library (utlist.h) */
 };
 typedef struct ObjectListStruct ObjectList;
 
@@ -196,7 +196,9 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char* name, const char* metaName,
 	objEntry->numBytes = numBytes;
 	objEntry->events = NULL;
 	objEntry->numInstances = 0;
-	objEntry->instances = NULL;
+	objEntry->instances.data = NULL;
+	objEntry->instances.instId = 0xFFFF;
+	objEntry->instances.next = NULL;	
 	objEntry->linkedObj = NULL; // will be set later
 	LL_APPEND(objList, objEntry);
 
@@ -1028,7 +1030,7 @@ int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint16_t instId, const void* dat
 	// Check access level
 	if ( !objEntry->isMetaobject )
 	{
-		mdata = (UAVObjMetadata*)(objEntry->linkedObj->instances->data);
+		mdata = (UAVObjMetadata*)(objEntry->linkedObj->instances.data);
 		if ( mdata->access == ACCESS_READONLY )
 		{
 			xSemaphoreGiveRecursive(mutex);
@@ -1168,7 +1170,7 @@ int8_t UAVObjReadOnly(UAVObjHandle obj)
     // Check access level
     if ( !objEntry->isMetaobject )
     {
-        mdata = (UAVObjMetadata*)(objEntry->linkedObj->instances->data);
+        mdata = (UAVObjMetadata*)(objEntry->linkedObj->instances.data);
         return mdata->access == ACCESS_READONLY;
     }
     return -1;
@@ -1319,7 +1321,7 @@ static int32_t sendEvent(ObjectList* obj, uint16_t instId, UAVObjEventType event
 	msg.instId = instId;
 
 	// Go through each object and push the event message in the queue (if event is activated for the queue)
-    LL_FOREACH(obj->events, eventEntry)
+	LL_FOREACH(obj->events, eventEntry)
 	{
     	if ( eventEntry->eventMask == 0 || (eventEntry->eventMask & event) != 0 )
     	{
@@ -1381,14 +1383,24 @@ static ObjectInstList* createInstance(ObjectList* obj, uint16_t instId)
 		}
 	}
 
-	// Create the actual instance
-	instEntry = (ObjectInstList*)pvPortMalloc(sizeof(ObjectInstList));
-	if (instEntry == NULL) return NULL;
-	instEntry->data = pvPortMalloc(obj->numBytes);
-	if (instEntry->data == NULL) return NULL;
-	memset(instEntry->data, 0, obj->numBytes);
-	instEntry->instId = instId;
-	LL_APPEND(obj->instances, instEntry);
+	if(instId == 0)  /* Instance 0 ObjectInstList allocated with ObjectList element */
+	{		
+		instEntry = &obj->instances;
+		instEntry->data = pvPortMalloc(obj->numBytes);
+		if (instEntry->data == NULL) return NULL;
+		memset(instEntry->data, 0, obj->numBytes);
+		instEntry->instId = instId;
+	} else 
+	{	
+		// Create the actual instance
+		instEntry = (ObjectInstList*)pvPortMalloc(sizeof(ObjectInstList));
+		if (instEntry == NULL) return NULL;
+		instEntry->data = pvPortMalloc(obj->numBytes);
+		if (instEntry->data == NULL) return NULL;
+		memset(instEntry->data, 0, obj->numBytes);
+		instEntry->instId = instId;
+		LL_APPEND(obj->instances.next, instEntry);
+	}
 	++obj->numInstances;
 
 	// Fire event
@@ -1406,7 +1418,7 @@ static ObjectInstList* getInstance(ObjectList* obj, uint16_t instId)
 	ObjectInstList* instEntry;
 
 	// Look for specified instance ID
-	LL_FOREACH(obj->instances, instEntry)
+	LL_FOREACH(&(obj->instances), instEntry)
 	{
 		if (instEntry->instId == instId)
 		{

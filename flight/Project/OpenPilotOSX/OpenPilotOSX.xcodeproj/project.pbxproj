@@ -149,6 +149,8 @@
 		650D8ECE12DFE17500D05CC9 /* watchdogstatus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = watchdogstatus.c; sourceTree = "<group>"; };
 		650D8ED112DFE17500D05CC9 /* uavtalk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uavtalk.h; sourceTree = "<group>"; };
 		650D8ED212DFE17500D05CC9 /* uavtalk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavtalk.c; sourceTree = "<group>"; };
+		6512D60512ED4CA2008175E5 /* pios_flash_w25x.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_flash_w25x.h; sourceTree = "<group>"; };
+		6512D60712ED4CB8008175E5 /* pios_flash_w25x.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_flash_w25x.c; sourceTree = "<group>"; };
 		65173C9F12EBFD1700D6A7CB /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../../Makefile; sourceTree = SOURCE_ROOT; };
 		651913371256C5240039C0A3 /* ahrs_comm_objects.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_comm_objects.c; sourceTree = "<group>"; };
 		651913381256C5240039C0A3 /* ahrs_spi_comm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_spi_comm.c; sourceTree = "<group>"; };
@@ -7478,6 +7480,7 @@
 				65E8F03611EFF25C00BBF654 /* pios_sdcard.c */,
 				65E8F03711EFF25C00BBF654 /* printf-stdarg.c */,
 				6528CCB412E406B800CF5144 /* pios_adxl345.c */,
+				6512D60712ED4CB8008175E5 /* pios_flash_w25x.c */,
 			);
 			name = Common;
 			path = ../../PiOS/Common;
@@ -7487,6 +7490,7 @@
 			isa = PBXGroup;
 			children = (
 				6528CCE212E40F6700CF5144 /* pios_adxl345.h */,
+				6512D60512ED4CA2008175E5 /* pios_flash_w25x.h */,
 				6526645B122DF972006F9A3C /* pios_wdg.h */,
 				651CF9EF120B700D00EEFD70 /* pios_usb_hid_desc.h */,
 				651CF9F0120B700D00EEFD70 /* pios_usb_hid_istr.h */,

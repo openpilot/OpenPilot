@@ -238,7 +238,8 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 
 #define PIOS_FLASH_ENABLE                       PIOS_GPIO_Off(0)
 #define PIOS_FLASH_DISABLE                      PIOS_GPIO_On(0)
-
+#define PIOS_ADXL_ENABLE                        PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,0)
+#define PIOS_ADXL_DISABLE                       PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,1)
 
 //-------------------------
 // USB

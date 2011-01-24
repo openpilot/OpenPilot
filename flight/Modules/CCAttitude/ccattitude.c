@@ -55,6 +55,7 @@
 #include "attitudedesired.h"
 #include "manualcontrolcommand.h"
 #include "CoordinateConversions.h"
+#include "pios_flash_w25x.h"
 
 // Private constants
 #define STACK_SIZE_BYTES 740

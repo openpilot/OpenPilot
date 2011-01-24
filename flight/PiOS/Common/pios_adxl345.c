@@ -15,7 +15,7 @@
 void PIOS_ADXL345_ClaimBus() 
 {
 	// TODO: Semaphore to lock bus
-	PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,0);	
+	PIOS_ADXL_ENABLE;	
 	PIOS_DELAY_WaituS(1);
 	
 }
@@ -26,7 +26,7 @@ void PIOS_ADXL345_ClaimBus()
 void PIOS_ADXL345_ReleaseBus() 
 {
 	// TODO: Release semaphore
-	PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,1);
+	PIOS_ADXL_DISABLE;
 	PIOS_DELAY_WaituS(1);
 }
 

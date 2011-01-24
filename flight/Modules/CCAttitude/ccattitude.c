@@ -52,10 +52,15 @@
 #include "ccattitude.h"
 #include "attituderaw.h"
 #include "attitudeactual.h"
+#include "attitudedesired.h"
+#include "actuatordesired.h"
+#include "actuatorcommand.h"
+#include "manualcontrolcommand.h"
 #include "CoordinateConversions.h"
 
 // Private constants
 #define STACK_SIZE_BYTES 740
+#define STACK_SIZE_BYTES 540
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 
 #define UPDATE_RATE  10 /* ms */
@@ -70,8 +75,12 @@ static xTaskHandle taskHandle;
 
 // Private functions
 static void CCAttitudeTask(void *parameters);
+
+void updateInput();
 void updateSensors();
 void updateAttitude();
+void updateStabilization();
+void updateActuator();
 
 /**
  * Initialise the module, called on startup
@@ -105,14 +114,23 @@ static void CCAttitudeTask(void *parameters)
 		
 		// TODO: register the adc callback, push the data onto a queue (safe for thread)
 		// with the queue ISR version
-		
+		updateInput();
 		updateSensors();		
 		updateAttitude();
+		updateStabilization();
+		updateActuator();
 		
 		/* Wait for the next update interval */
 		vTaskDelayUntil(&lastSysTime, UPDATE_RATE / portTICK_RATE_MS);
 
 	}
+}
+
+void updateInput()
+{
+	ManualControlCommandData manual;
+	ManualControlCommandGet(&manual);
+	ManualControlCommandSet(&manual);
 }
 
 void updateSensors() 
@@ -156,7 +174,7 @@ void updateAttitude()
 	static portTickType thisSysTime;
 	
 	float accel_pitch, accel_roll;
-	float dT;
+	static float dT = 0;
 	
 	thisSysTime = xTaskGetTickCount();
 	if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
@@ -205,7 +223,7 @@ void updateStabilization()
 }
 
 void updateActuator()
-{	
+{
 	ActuatorDesiredData actuatorDesired;
 	ActuatorDesiredGet(&actuatorDesired);
 	
@@ -214,6 +232,7 @@ void updateActuator()
 
 	ActuatorCommandSet(&actuatorCommand);
 }
+
 /**
   * @}
   * @}

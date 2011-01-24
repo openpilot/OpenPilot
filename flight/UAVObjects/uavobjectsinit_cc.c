@@ -83,10 +83,8 @@ void UAVObjectsInitializeAll()
 	SystemStatsInitialize();
 	SystemAlarmsInitialize();
 	SystemSettingsInitialize();
-	StabilizationSettingsInitialize();
 	ActuatorCommandInitialize();
 	ActuatorDesiredInitialize();
-	ActuatorSettingsInitialize();
 	AttitudeRawInitialize();
 	AttitudeActualInitialize();
 	AttitudeDesiredInitialize();
@@ -95,7 +93,11 @@ void UAVObjectsInitializeAll()
 	I2CStatsInitialize();
 	WatchdogStatusInitialize();
 	TelemetrySettingsInitialize();
+	//StabilizationSettingsInitialize();
+	//ActuatorSettingsInitialize();
 	RateDesiredInitialize();
-	AHRSSettingsInitialize();
-	ManualControlSettingsInitialize();
+	//AHRSSettingsInitialize();
+	//ManualControlSettingsInitialize();
+	//MixerSettingsInitialize();
+	//MixerStatusInitialize();
 }

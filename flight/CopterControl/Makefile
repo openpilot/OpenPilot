@@ -179,9 +179,9 @@ SRC += $(OPUAVOBJ)/i2cstats.c
 SRC += $(OPUAVOBJ)/watchdogstatus.c
 SRC += $(OPUAVOBJ)/telemetrysettings.c
 SRC += $(OPUAVOBJ)/ratedesired.c
-SRC += $(OPUAVOBJ)/ahrssettings.c
 SRC += $(OPUAVOBJ)/manualcontrolsettings.c
-
+SRC += $(OPUAVOBJ)/mixersettings.c
+SRC += $(OPUAVOBJ)/mixerstatus.c
 #${wildcard ${OBJ}/$(shell echo $(VAR) | tr A-Z a-z)/*.c}
 #SRC += ${foreach OBJ, ${UAVOBJECTS}, $(UAVOBJECTS)/$(OBJ).c}
 # Cant use until i can automatically generate list of UAVObjects
@@ -264,7 +264,7 @@ SRC += $(RTOSSRCDIR)/tasks.c
 
 ## RTOS Portable
 SRC += $(RTOSSRCDIR)/portable/GCC/ARM_CM3/port.c
-SRC += $(RTOSSRCDIR)/portable/MemMang/heap_2.c
+SRC += $(RTOSSRCDIR)/portable/MemMang/heap_1.c
 
 ## Dosfs file system
 #SRC += $(DOSFSDIR)/dosfs.c

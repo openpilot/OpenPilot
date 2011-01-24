@@ -62,7 +62,7 @@
 
 #define UPDATE_RATE  2 /* ms */
 #define GYRO_NEUTRAL 1665
-#define GYRO_SCALE   0.010f
+#define GYRO_SCALE   (0.010f * 180 / M_PI)
 
 #define PI_MOD(x) (fmod(x + M_PI, M_PI * 2) - M_PI)
 // Private types
@@ -118,24 +118,14 @@ static void CCAttitudeTask(void *parameters)
 	}
 }
 
-void updateInput()
-{
-	ManualControlCommandData manual;
-	ManualControlCommandGet(&manual);
-	manual.Throttle = (float) (PIOS_PWM_Get(0) - 1100.0f) / 900.0f;
-	manual.Roll = (float) (PIOS_PWM_Get(1) - 1500.0f) / 500.0f;
-	manual.Pitch = (float) (PIOS_PWM_Get(2) - 1500.0f) / 500.0f;
-	manual.Yaw = (float) (PIOS_PWM_Get(3) - 1500.0f) / 500.0f;
-	manual.FlightMode = (float) (PIOS_PWM_Get(4) - 1500) / 500;
-	ManualControlCommandSet(&manual);
-}
-
 void updateSensors() 
 {
 	AttitudeRawData attitudeRaw;
 	AttitudeRawGet(&attitudeRaw);		
 	struct pios_adxl345_data accel_data;
 	
+	static float gyro_bias[3] = {0,0,0};
+	static const float tau = 0.999f;
 
 	attitudeRaw.gyros[ATTITUDERAW_GYROS_X] = PIOS_ADC_PinGet(1);
 	attitudeRaw.gyros[ATTITUDERAW_GYROS_Y] = PIOS_ADC_PinGet(2);
@@ -144,6 +134,14 @@ void updateSensors()
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] = -(attitudeRaw.gyros[ATTITUDERAW_GYROS_X] - GYRO_NEUTRAL) * GYRO_SCALE;
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] = (attitudeRaw.gyros[ATTITUDERAW_GYROS_Y] - GYRO_NEUTRAL) * GYRO_SCALE;
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] = (attitudeRaw.gyros[ATTITUDERAW_GYROS_Z] - GYRO_NEUTRAL) * GYRO_SCALE;
+	
+	gyro_bias[0] = tau * gyro_bias[0] + (1-tau) * attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X];
+	gyro_bias[1] = tau * gyro_bias[1] + (1-tau) * attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y];
+	gyro_bias[2] = tau * gyro_bias[2] + (1-tau) * attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z];
+	
+	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] -= gyro_bias[0];
+	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] -= gyro_bias[1];
+	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] -= gyro_bias[2];
 	
 	attitudeRaw.gyrotemp[0] = PIOS_ADXL345_Read(&accel_data);
 	
@@ -183,9 +181,9 @@ void updateAttitude()
 	attitudeActual.Yaw = attitudeActual.Yaw * M_PI / 180;
 	
 	// Integrate gyros
-	attitudeActual.Roll  = PI_MOD(attitudeActual.Roll + attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] * dT);
-	attitudeActual.Pitch = PI_MOD(attitudeActual.Pitch + attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] * dT);
-	attitudeActual.Yaw += fmod(attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] * dT, 2 * M_PI);
+	attitudeActual.Roll  = PI_MOD(attitudeActual.Roll + attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] * dT * M_PI / 180);
+	attitudeActual.Pitch = PI_MOD(attitudeActual.Pitch + attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] * dT * M_PI / 180);
+	attitudeActual.Yaw += attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] * dT * M_PI / 180;
 	       
 	// Compute gravity sense of ground
 	accel_roll = atan2(-attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Y],
@@ -199,7 +197,7 @@ void updateAttitude()
 	// Weighted average and back into degrees
 	attitudeActual.Roll = (UPDATE_FRAC * attitudeActual.Roll + (1-UPDATE_FRAC) * accel_roll) * 180 / M_PI;
 	attitudeActual.Pitch = (UPDATE_FRAC * attitudeActual.Pitch + (1-UPDATE_FRAC) * accel_pitch) * 180 / M_PI;
-	attitudeActual.Yaw = attitudeActual.Yaw * 180 / M_PI;	
+	attitudeActual.Yaw = fmod(attitudeActual.Yaw * 180 / M_PI, 360);	
 	AttitudeActualSet(&attitudeActual);
 }
 

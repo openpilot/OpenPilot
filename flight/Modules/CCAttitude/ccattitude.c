@@ -223,7 +223,7 @@ void updateStabilization()
 }
 
 void updateActuator()
-{
+{	
 	ActuatorDesiredData actuatorDesired;
 	ActuatorDesiredGet(&actuatorDesired);
 	

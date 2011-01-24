@@ -60,7 +60,7 @@ else
 BOOT_MODEL    = $(MODEL)_NB
 endif
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = ..\..\build\ahrs
+OUTDIR = ../../build/ahrs
 
 # Target file name (without extension).
 TARGET = AHRS
@@ -590,18 +590,17 @@ clean_list :
 # Create output files directory
 # all known MS Windows OS define the ComSpec environment variable
 ifdef ComSpec
-$(shell md $(OUTDIR) 2>NUL)
+$(shell md $(subst /,\\,$(OUTDIR)) 2>NUL)
 else
-$(shell mkdir $(OUTDIR) 2>/dev/null)
+$(shell mkdir -p $(OUTDIR) 2>/dev/null)
 endif
 
 # Include the dependency files.
 ifdef ComSpec
--include $(shell md $(OUTDIR)\dep 2>NUL) $(wildcard $(OUTDIR)/dep/*)
+-include $(shell md $(subst /,\\,$(OUTDIR))\dep 2>NUL) $(wildcard $(OUTDIR)/dep/*)
 else
 -include $(shell mkdir $(OUTDIR) 2>/dev/null) $(shell mkdir $(OUTDIR)/dep 2>/dev/null) $(wildcard $(OUTDIR)/dep/*)
 endif
-
 
 
 # Listing of phony targets.

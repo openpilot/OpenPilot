@@ -23,8 +23,8 @@ void PIOS_ADXL345_ClaimBus()
  */
 void PIOS_ADXL345_ReleaseBus() 
 {
-	PIOS_SPI_ReleaseBus(PIOS_SPI_ACCEL);
 	PIOS_ADXL_DISABLE;
+	PIOS_SPI_ReleaseBus(PIOS_SPI_ACCEL);
 }
 
 /**

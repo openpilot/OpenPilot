@@ -12,6 +12,19 @@ for %%F in (%0) do echo SYNTAX: %%~nF%%~xF [build / clean / help]
 echo  - build: builds all flight targets including uavobjects, bootloaders and firmware
 echo  - clean: cleans all flight targets including bootloaders and firmware
 echo  - help:  this help
+echo:
+echo Environment variables:
+echo  - TARGETS_FW - list of target (default is all flight targets)
+echo  - TARGETS_BL - list of target (default is all flight bootloader targets)
+echo  - TARGET_FW_SUBDIR - subdirectory of build/ to build targets (default is .)
+echo  - TARGET_BL_SUBDIR - subdirectory of build/ to build bootloaders (default is bootloaders)
+echo:
+echo Example usage (from a batch file with .cmd extension):
+echo   set PATH=D:\Work\OpenPilot\Apps\CodeSourcery\bin\;%%PATH%%
+echo   set TARGETS_FW=ahrs openpilot
+echo   set TARGETS_BL=%%TARGETS_FW%%
+echo   call svn\trunk\Makefile.cmd build
+echo:
 goto Abort
 
 
@@ -21,10 +34,10 @@ rem Settings and definitions
 rem -------------------------------------------------------------------
 
 rem Set desired targets and paths
-set TARGETS_FW=ahrs openpilot pipxtreme coptercontrol
-set TARGETS_BL=ahrs openpilot pipxtreme
-set TARGET_FW_SUBDIR=.
-set TARGET_BL_SUBDIR=bootloaders
+if "%TARGETS_FW%" == "" set TARGETS_FW=ahrs openpilot pipxtreme coptercontrol
+if "%TARGETS_BL%" == "" set TARGETS_BL=ahrs openpilot pipxtreme
+if "%TARGET_FW_SUBDIR%" == "" set TARGET_FW_SUBDIR=.
+if "%TARGET_BL_SUBDIR%" == "" set TARGET_BL_SUBDIR=bootloaders
 
 rem Set toolset paths (if you don't have them added permanently)
 rem set PATH=D:\Work\OpenPilot\Apps\CodeSourcery\bin\;%PATH%

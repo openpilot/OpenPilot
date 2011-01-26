@@ -98,7 +98,7 @@ QString UAVObjectGeneratorJava::getFieldTypeStr(int type,bool as_obj) {
 QString UAVObjectGeneratorJava::formatJavaValue(FieldInfo* info,int idx) {
     switch(info->type) {
     case  FIELDTYPE_ENUM:
-      return (info->name.toUpper() + QString("_") + info->defaultValues[idx].toUpper());
+      return (info->name.toUpper() + QString("_") + info->defaultValues[idx].toUpper().replace(QRegExp(ENUM_SPECIAL_CHARS), ""));
     case FIELDTYPE_FLOAT32:
       return QString("%1f").arg( info->defaultValues[idx].toFloat() );
     default:
@@ -208,7 +208,7 @@ bool UAVObjectGeneratorJava::process_object(ObjectInfo* info)
         type = getFieldTypeStr(act_field_info->type,false); // Determine type
 
         for (int enum_n = 0; enum_n < act_field_info->options.length(); ++enum_n)
-            fieldsinit.append(QString("    public final static byte %1 = %2;\n").arg(act_field_info->name.toUpper() + QString("_") + act_field_info->options[enum_n].toUpper()).arg(enum_n) );
+            fieldsinit.append(QString("    public final static byte %1 = %2;\n").arg(act_field_info->name.toUpper() + QString("_") + act_field_info->options[enum_n].toUpper().replace(QRegExp(ENUM_SPECIAL_CHARS), "")).arg(enum_n) );
 
         fieldsinit.append(QString("    private ") + type);
 
@@ -233,7 +233,7 @@ bool UAVObjectGeneratorJava::process_object(ObjectInfo* info)
                 fieldsinit.append(QString("= new ") + type + QString("[%1]").arg(info->fields[n]->numElements));
         }
 
-        fieldsinit.append(QString(";"));
+        fieldsinit.append(QString(";\n"));
 
         if (n!=0)
             serialize_code_inner.append(QString(","));

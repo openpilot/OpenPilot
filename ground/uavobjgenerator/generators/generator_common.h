@@ -30,6 +30,9 @@
 #include "../uavobjectparser.h"
 #include "generator_io.h"
 
+// These special chars (regexp) will be removed from C/java identifiers
+#define ENUM_SPECIAL_CHARS "[\\.\\-\\s/]"
+
 void replaceCommonTags(QString& out, ObjectInfo* info);
 void replaceCommonTags(QString& out);
 QString boolTo01String(bool value);

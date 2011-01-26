@@ -121,7 +121,7 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
                 enums.append( s
                                 .arg( info->name.toUpper() )
                                 .arg( info->fields[n]->name.toUpper() )
-                                .arg( options[m].toUpper() )
+                                .arg( options[m].toUpper().replace(QRegExp(ENUM_SPECIAL_CHARS), "") )
                                 .arg(m) );
 
             }

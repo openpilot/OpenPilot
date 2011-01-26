@@ -221,8 +221,8 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //-------------------------
 // Servo outputs
 //-------------------------
-#define PIOS_SERVO_UPDATE_HZ                    250
-#define PIOS_SERVOS_INITIAL_POSITION            2000 /* dont want to start motors, have no pulse till settings loaded */
+#define PIOS_SERVO_UPDATE_HZ                    50
+#define PIOS_SERVOS_INITIAL_POSITION            0 /* dont want to start motors, have no pulse till settings loaded */
 
 //-------------------------
 // GPIO

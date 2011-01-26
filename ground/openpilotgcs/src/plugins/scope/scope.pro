@@ -1,12 +1,11 @@
 TEMPLATE = lib
 TARGET = ScopeGadget
+DEFINES += SCOPE_LIBRARY
 include(../../openpilotgcsplugin.pri)
-include(../../plugins/coreplugin/coreplugin.pri)
-include(../../plugins/uavobjects/uavobjects.pri)
-include(../../plugins/uavtalk/uavtalk.pri)
-include(../../libs/qwt/qwt.pri)
+include (scope_dependencies.pri)
 HEADERS += scopeplugin.h \
-    plotdata.h
+    plotdata.h \
+    scope_global.h
 HEADERS += scopegadgetoptionspage.h
 HEADERS += scopegadgetconfiguration.h
 HEADERS += scopegadget.h

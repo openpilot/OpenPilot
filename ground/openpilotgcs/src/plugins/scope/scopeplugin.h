@@ -27,6 +27,7 @@
 #ifndef SCOPEPLUGIN_H_
 #define SCOPEPLUGIN_H_
 
+#include "scope_global.h"
 #include <extensionsystem/iplugin.h>
 
 class ScopeGadgetFactory;
@@ -40,7 +41,10 @@ public:
     void extensionsInitialized();
     bool initialize(const QStringList & arguments, QString * errorString);
     void shutdown();
+
 private:
     ScopeGadgetFactory *mf;
+
+
 };
 #endif /* SCOPEPLUGIN_H_ */

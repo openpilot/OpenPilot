@@ -42,9 +42,22 @@ ScopeGadgetFactory::~ScopeGadgetFactory()
 {
 }
 
+void ScopeGadgetFactory::stopPlotting()
+{
+    emit onStopPlotting();
+}
+
+void ScopeGadgetFactory::startPlotting()
+{
+    emit onStartPlotting();
+}
+
+
 Core::IUAVGadget* ScopeGadgetFactory::createGadget(QWidget *parent)
 {
     ScopeGadgetWidget* gadgetWidget = new ScopeGadgetWidget(parent);
+    connect(this,SIGNAL(onStartPlotting()), gadgetWidget, SLOT(startPlotting()));
+    connect(this,SIGNAL(onStopPlotting()), gadgetWidget, SLOT(stopPlotting()));
     return new ScopeGadget(QString("ScopeGadget"), gadgetWidget, parent);
 }
 

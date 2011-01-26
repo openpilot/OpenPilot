@@ -120,8 +120,8 @@ private slots:
     void uavObjectReceived(UAVObject*);
     void replotNewData();
     void showCurve(QwtPlotItem *item, bool on);
-    void onTelemetryConnected();
-    void onTelemetryDisconnected();
+    void startPlotting();
+    void stopPlotting();
 
 private:
 

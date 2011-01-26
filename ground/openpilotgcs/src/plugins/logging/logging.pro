@@ -3,8 +3,6 @@ TARGET = LoggingGadget
 DEFINES += LOGGING_LIBRARY
 QT += svg
 include(../../openpilotgcsplugin.pri)
-include(../../plugins/uavobjects/uavobjects.pri)
-include(../../plugins/uavtalk/uavtalk.pri)
 include(logging_dependencies.pri)
 HEADERS += loggingplugin.h \
     logfile.h \

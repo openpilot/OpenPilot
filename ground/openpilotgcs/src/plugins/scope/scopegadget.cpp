@@ -25,6 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include "scopeplugin.h"
 #include "scopegadget.h"
 #include "scopegadgetconfiguration.h"
 #include "scopegadgetwidget.h"
@@ -36,6 +37,7 @@ ScopeGadget::ScopeGadget(QString classId, ScopeGadgetWidget *widget, QWidget *pa
         m_widget(widget),
         configLoaded(false)
 {
+
 }
 
 void ScopeGadget::loadConfiguration(IUAVGadgetConfiguration* config)

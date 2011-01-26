@@ -67,21 +67,21 @@ ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
     // running the scopes if we are not connected and not replaying logs
     // Also listen to disconnect actions from the user
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-    connect(cm, SIGNAL(deviceDisconnected()), this, SLOT(onTelemetryDisconnected()));
-    connect(cm, SIGNAL(deviceConnected(QIODevice*)), this, SLOT(onTelemetryConnected()));
+    connect(cm, SIGNAL(deviceDisconnected()), this, SLOT(stopPlotting()));
+    connect(cm, SIGNAL(deviceConnected(QIODevice*)), this, SLOT(startPlotting()));
 
 }
 
 /**
  * Starts/stops telemetry
  */
-void ScopeGadgetWidget::onTelemetryConnected()
+void ScopeGadgetWidget::startPlotting()
 {
     if(!replotTimer->isActive())
         replotTimer->start(m_refreshInterval);
 }
 
-void ScopeGadgetWidget::onTelemetryDisconnected()
+void ScopeGadgetWidget::stopPlotting()
 {
     replotTimer->stop();
 }

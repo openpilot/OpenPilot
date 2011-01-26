@@ -28,6 +28,7 @@
 #ifndef SCOPEGADGETFACTORY_H_
 #define SCOPEGADGETFACTORY_H_
 
+#include "scope_global.h"
 #include <coreplugin/iuavgadgetfactory.h>
 
 namespace Core
@@ -38,7 +39,7 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class ScopeGadgetFactory : public IUAVGadgetFactory
+class SCOPE_EXPORT ScopeGadgetFactory : public IUAVGadgetFactory
 {
     Q_OBJECT
 public:
@@ -48,6 +49,15 @@ public:
     Core::IUAVGadget *createGadget(QWidget *parent);
     IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
+
+public slots:
+    void stopPlotting();
+    void startPlotting();
+
+signals:
+    void onStopPlotting();
+    void onStartPlotting();
+
 };
 
 #endif // SCOPEGADGETFACTORY_H_

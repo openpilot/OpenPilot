@@ -38,11 +38,6 @@ E: chebuzz (plus) openpilot (at) gmail (dot) com
 D: 3D ModelView GCS Plugin, sponsor of HITL merge work and XPlane addition
 M: 3D Modelview
 
-N: Eric Price
-E: corvus (dot) corax (at) cybertrench (dot) com
-D: IL2 HITL GCS Plugin, Posix OpenPilot, Advanced stabilisation module
-M: SITL Posix
-
 N: James Cotton
 E: peabody124 (plus) openpilot (at) gmail (dot) com
 D: Multiplatform HID implementation (firmware & GCS), GCS Joystick control 
@@ -83,7 +78,8 @@ D: Creator of http://pythononachip.org
 
 N: Joe Hlebasko
 E: joe (dot) hlebasko(plus) openpilot (at) gmail (dot) com
-D: Version 3 Main Board routing 
+D: Production Main Board & Production OP GPS
+M: Hardware Architecture Team
 
 N: Sami Korhonen
 E: samik (dot) korhonen (plus) openpilot (at) gmail (dot) com
@@ -119,13 +115,18 @@ N: Cathy Moss
 E: cmoss296 (at) blueyonder (dot) co (dot) uk
 D: Hardware design Lead: Gen 2 Mainboard, PipXtreme, Current Sensor
 D: Lead dev PipXtreme, creator OP Map Plugin
-M: PipX Modems
+M: Hardware Architecture Team / PipX Modem 
 
 N: Angus Peart
 E: gussy (at) openpilot (dot) org
 D: Co-founder, Principal hardware architect.  
 D: Hardware design of OpenPilot, AHRS, GPS and other hardware
 D: Core developer embedded code
+
+N: Eric Price
+E: corvus (dot) corax (at) cybertrench (dot) com
+D: IL2 HITL GCS Plugin, Posix OpenPilot, Advanced stabilisation module
+M: SITL Posix
 
 N: Richard Querin
 E: rfquerin (plus) openpilot (at) gmail (dot) com
@@ -150,6 +151,11 @@ E: dales (at) ksu (dot) edu
 D: Lead AHRS Developer
 D: Creator of the OpenPilot INS / EKF
 
+N: Oleg Semyonov
+E: os-openpilot-org (at) os-propo (dot) info
+D: Core tester & Project organisation
+M: Russian Documentation Lead
+
 N: Stacey Sheldon
 E: stac (at) solidgoldbomb (dot) org
 D: Core Embedded Developer
@@ -158,6 +164,7 @@ D: SPI protocol for AHRS, I2C rewrite and much core work
 N: Troy Schultz
 E: troy (dot) schultz (at) rogers (dot) com
 D: INS design review and optimisation 
+M: Hardware Architecture Team
 
 N: Dr. Erhard Siegl
 E: Erhard (dot) Siegl (at) zogazoga (dot) at

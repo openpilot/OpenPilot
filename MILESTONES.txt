@@ -62,6 +62,31 @@ C: Sami Korhonen (Sambas)
 D: December 2010
 V: http://vimeo.com/18318478
 
+M: First CopterControl flight on a Quad
+C: ?
+D: January 2010
+V: 
+
+M: First CopterControl flight on a Tri
+C: ?
+D: January 2010
+V: 
+
+M: First CopterControl flight on a Hexa
+C: ?
+D: January 2010
+V: 
+
+M: First CopterControl flight on a Flybarless Heli
+C: ?
+D: January 2010
+V: 
+
+M: First CopterControl flight on a Fixed Wing
+C: ?
+D: January 2010
+V: 
+
 
 An incomplete list of some future Milestones is below:
 

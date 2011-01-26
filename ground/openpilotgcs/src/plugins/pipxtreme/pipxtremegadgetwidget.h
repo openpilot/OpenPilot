@@ -36,6 +36,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavobject.h"
+
 #include "rawhid/rawhidplugin.h"
 
 #include <QtGui/QWidget>
@@ -47,16 +48,65 @@
 #include <QtCore/QVector>
 #include <QtCore/QIODevice>
 #include <QtCore/QLinkedList>
-/*
-class IConnection;
 
-struct devListItem
+// *************************
+// pipx config comms packets
+
+#pragma pack(push, 1)
+
+typedef struct
 {
-    IConnection *connection;
-    QString devName;
-    QString displayedName;
-};
-*/
+    uint32_t    marker;
+    uint32_t    serial_number;
+    uint8_t     type;
+    uint8_t     spare;
+    uint16_t    data_size;
+    uint32_t    crc;
+    uint8_t     data[0];
+} t_pipx_header;
+
+typedef struct
+{
+    uint8_t     mode;
+    uint8_t     state;
+} t_pipx_data_mode_state;
+
+typedef struct
+{
+    uint32_t    serial_baudrate;    // serial uart baudrate
+
+    uint32_t    destination_id;
+
+    uint32_t    min_frequency_Hz;
+    uint32_t    max_frequency_Hz;
+    uint32_t    frequency_Hz;
+
+    uint32_t    max_rf_bandwidth;
+
+    uint8_t     max_tx_power;
+
+    uint8_t     frequency_band;
+
+    uint8_t     rf_xtal_cap;
+
+    bool        aes_enable;
+    uint8_t     aes_key[16];
+
+    uint16_t    frequency_step_size;
+} t_pipx_data_settings;
+
+typedef struct
+{
+    uint32_t    start_frequency;
+    uint16_t    frequency_step_size;
+    uint16_t    magnitudes;
+    int8_t      magnitude[0];
+} t_pipx_data_spectrum;
+
+#pragma pack(pop)
+
+// *************************
+
 class PipXtremeGadgetWidget : public QWidget
 {
     Q_OBJECT
@@ -69,8 +119,11 @@ public:
     typedef enum { RESCUE_STEP0, RESCUE_STEP1, RESCUE_STEP2, RESCUE_STEP3, RESCUE_POWER1, RESCUE_POWER2, RESCUE_DETECT } RescueStep;
 
 public slots:
+    void onTelemetryStart();
+    void onTelemetryStop();
     void onTelemetryConnect();
     void onTelemetryDisconnect();
+
     void onModemConnect();
     void onModemDisconnect();
 
@@ -84,21 +137,24 @@ private:
     RescueStep rescueStep;
     bool resetOnly;
 
-//    QLinkedList<devListItem> m_devList;
-//    QList<IConnection*> m_connectionsList;
-
-    // currently connected connection plugin
-//    devListItem m_connectionDevice;
+    pjrc_rawhid     rawHidHandle;
+//    RawHIDPlugin    *rawHidPlugin;
 
     // currently connected QIODevice
-    QIODevice *m_ioDev;
+    QIODevice *m_ioDevice;
+
 
     QString getPortDevice(const QString &friendName);
+
+    void suspendTelemetry();
+    void restartTelemetryPolling();
+
+    void processOutputStream();
+    void processInputStream();
 
 private slots:
     void error(QString errorString,int errorNumber);
     void goToAPIMode(UAVObject* = NULL, bool = false);
-    void systemReset();
     void systemBoot();
     void getPorts();
 };

@@ -22,7 +22,12 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
+#include <qDebug>
+
 #include "pipxtremegadgetwidget.h"
+
+//#include <aggregation/aggregate.h>
 
 // constructor
 PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) : QWidget(parent)
@@ -30,7 +35,7 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) : QWidget(parent)
     m_config = new Ui_PipXtremeWidget();
     m_config->setupUi(this);
 
-    m_ioDev = NULL;
+    m_ioDevice = NULL;
 
     currentStep = IAP_STATE_READY;
     rescueStep = RESCUE_STEP0;
@@ -73,6 +78,8 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) : QWidget(parent)
     // Listen to autopilot connection events
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
+    connect(telMngr, SIGNAL(myStart()), this, SLOT(onTelemetryStart()));
+    connect(telMngr, SIGNAL(myStop()), this, SLOT(onTelemetryStop()));
     connect(telMngr, SIGNAL(connected()), this, SLOT(onTelemetryConnect()));
     connect(telMngr, SIGNAL(disconnected()), this, SLOT(onTelemetryDisconnect()));
 
@@ -83,6 +90,9 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) : QWidget(parent)
     // Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
     // connect(cm, SIGNAL(deviceDisconnected()), this, SLOT(onModemDisconnect()));
 
+//    int opened = rawHidHandle.open(10, 0x20A0, 0x4117, 0xFF9C, 0x0001);
+//    rawHidPlugin = new RawHIDPlugin();
+
     connect(m_config->connectButton, SIGNAL(clicked()), this, SLOT(goToAPIMode()));
 
     getPorts();
@@ -92,6 +102,9 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) : QWidget(parent)
     m_config->refreshPorts->setIcon(rbi);
 
     connect(m_config->refreshPorts, SIGNAL(clicked()), this, SLOT(getPorts()));
+
+    if (m_ioDevice)
+        connect(m_ioDevice, SIGNAL(readyRead()), this, SLOT(processInputStream()));
 
 //    delay::msleep(600);   // just for pips reference
 }
@@ -119,36 +132,58 @@ void PipXtremeGadgetWidget::resizeEvent(QResizeEvent *event)
 //    PipXtremeGadgetWidget::resizeEvent(event);
 }
 
-bool sortPorts(const QextPortInfo &s1,const QextPortInfo &s2)
+bool sortSerialPorts(const QextPortInfo &s1, const QextPortInfo &s2)
 {
     return (s1.portName < s2.portName);
 }
+
+// ***************************************************************************************
 
 void PipXtremeGadgetWidget::getPorts()
 {
     QStringList list;
 
 //    m_config->refreshPorts->setEnabled(false);
-//    m_config->telemetryLink->setEnabled(false);
+//    m_config->comboBox_Ports->setEnabled(false);
+
+    m_config->comboBox_Ports->clear();
 
     // ********************************
-    // Populate the telemetry combo box
+    // Populate the telemetry combo box with serial ports
 
-    // get usb port list
-
-    // get serial port list
     QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
-    qSort(ports.begin(), ports.end(), sortPorts);                   // sort the list by port number (nice idea from PT_Dreamer :))
+
+    qSort(ports.begin(), ports.end(), sortSerialPorts);
+
     foreach (QextPortInfo port, ports)
        list.append(port.friendName);
 
-    m_config->telemetryLink->clear();
-    m_config->telemetryLink->addItems(list);
+    m_config->comboBox_Ports->addItems(list);
+
+    // ********************************
+    // Populate the telemetry combo box with usb ports
+
+    pjrc_rawhid *rawHidHandle = new pjrc_rawhid();
+    if (rawHidHandle)
+    {
+        int opened = rawHidHandle->open(10, 0x20A0, 0x4117, 0xFF9C, 0x0001);
+        if (opened > 0)
+        {
+            QList<QString> usb_ports;
+
+            for (int i = 0; i < opened; i++)
+                usb_ports.append(rawHidHandle->getserial(i));
+
+            m_config->comboBox_Ports->addItems(usb_ports);
+        }
+
+        delete rawHidHandle;
+    }
 
     // ********************************
 
 //    m_config->refreshPorts->setEnabled(true);
-//    m_config->telemetryLink->setEnabled(true);
+//    m_config->comboBox_Ports->setEnabled(true);
 }
 
 QString PipXtremeGadgetWidget::getPortDevice(const QString &friendName)
@@ -169,30 +204,79 @@ QString PipXtremeGadgetWidget::getPortDevice(const QString &friendName)
     return "";
 }
 
-void PipXtremeGadgetWidget::onTelemetryConnect()
+void PipXtremeGadgetWidget::onTelemetryStart()
 {
     m_config->connectButton->setEnabled(false);
-    m_config->telemetryLink->setEnabled(false);
+    m_config->comboBox_Ports->setEnabled(false);
+}
+
+void PipXtremeGadgetWidget::onTelemetryStop()
+{
+    m_config->connectButton->setEnabled(true);
+    m_config->comboBox_Ports->setEnabled(true);
+}
+
+void PipXtremeGadgetWidget::onTelemetryConnect()
+{
 }
 
 void PipXtremeGadgetWidget::onTelemetryDisconnect()
 {
-    m_config->connectButton->setEnabled(true);
-    m_config->telemetryLink->setEnabled(true);
 }
 
 void PipXtremeGadgetWidget::onModemConnect()
 {
     m_config->connectButton->setText(tr(" Disconnect "));
-    m_config->telemetryLink->setEnabled(false);
+    m_config->comboBox_Ports->setEnabled(false);
     m_config->pushButton_ScanSpectrum->setEnabled(true);
 }
 
 void PipXtremeGadgetWidget::onModemDisconnect()
 {
     m_config->connectButton->setText(tr(" Connect "));
-    m_config->telemetryLink->setEnabled(true);
+    m_config->comboBox_Ports->setEnabled(true);
     m_config->pushButton_ScanSpectrum->setEnabled(false);
+}
+
+void PipXtremeGadgetWidget::suspendTelemetry()
+{
+    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    if (!cm) return;
+
+    // Suspend telemety & polling
+    cm->disconnectDevice();
+    cm->suspendPolling();
+}
+
+void PipXtremeGadgetWidget::processOutputStream()
+{
+    if (!m_ioDevice)
+        return;
+
+//    if (m_ioDevice->bytesToWrite() < TX_BUFFER_SIZE )
+    {
+//        m_ioDevice->write((const char*)txBuffer, dataOffset+length+CHECKSUM_LENGTH);
+    }
+}
+
+void PipXtremeGadgetWidget::processInputStream()
+{
+    while (m_ioDevice && m_ioDevice->bytesAvailable() > 0)
+    {
+        quint8 tmp;
+        m_ioDevice->read((char*)&tmp, 1);
+
+//        processInputByte(tmp);
+    }
+}
+
+void PipXtremeGadgetWidget::restartTelemetryPolling()
+{
+    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    if (!cm) return;
+
+    // Restart the polling thread
+    cm->resumePolling();
 }
 
 // Ask the modem to go into API mode
@@ -237,20 +321,6 @@ void PipXtremeGadgetWidget::goToAPIMode(UAVObject* callerObj, bool success)
 */
 }
 
-// Tell the modem to reset
-void PipXtremeGadgetWidget::systemReset()
-{
-    resetOnly = true;
-/*
-    if (dfu)
-    {
-        delete dfu;
-        dfu = NULL;
-    }
-*/
-    goToAPIMode();
-}
-
 // Tells the system to boot (from Bootloader state)
 void PipXtremeGadgetWidget::systemBoot()
 {
@@ -260,7 +330,7 @@ void PipXtremeGadgetWidget::systemBoot()
     cm->disconnectDevice();
     cm->suspendPolling();
 
-    QString devName = m_config->telemetryLink->currentText();
+    QString devName = m_config->comboBox_Ports->currentText();
     repaint();
 
     if (!dfu)
@@ -282,7 +352,7 @@ void PipXtremeGadgetWidget::systemBoot()
     // Restart the polling thread
     cm->resumePolling();
 
-    m_config->telemetryLink->setEnabled(true);
+    m_config->comboBox_Ports->setEnabled(true);
     if (currentStep == IAP_STATE_BOOTLOADER )
     {
     }
@@ -291,6 +361,8 @@ void PipXtremeGadgetWidget::systemBoot()
     dfu = NULL;
 */
 }
+
+// ***************************************************************************************
 
 // Shows a message box with an error string.
 void PipXtremeGadgetWidget::error(QString errorString, int errorNumber)

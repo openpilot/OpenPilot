@@ -49,7 +49,7 @@ through serial or USB)</string>
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="telemetryLink">
+      <widget class="QComboBox" name="comboBox_Ports">
        <property name="minimumSize">
         <size>
          <width>200</width>

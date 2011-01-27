@@ -25,16 +25,16 @@
 ;--------------------------------
 ; Installer section descriptions
 
-  LangString DESC_InSecCore ${LANG_TRADCHINESE} "TRANSLATE THIS: Core GCS components (executable and libraries)."
-  LangString DESC_InSecPlugins ${LANG_TRADCHINESE} "TRANSLATE THIS: GCS plugins (provide most of GCS functionality)."
-  LangString DESC_InSecResources ${LANG_TRADCHINESE} "TRANSLATE THIS: GCS resources (diagrams, dials, mapicons, models, pfd, sounds)."
-  LangString DESC_InSecSounds ${LANG_TRADCHINESE} "TRANSLATE THIS: GCS sound files (used for audible event notifications)."
-  LangString DESC_InSecLocalization ${LANG_TRADCHINESE} "TRANSLATE THIS: GCS localization (for supported languages)."
-  LangString DESC_InSecShortcuts ${LANG_TRADCHINESE} "TRANSLATE THIS: Install application start menu shortcuts."
+  LangString DESC_InSecCore ${LANG_TRADCHINESE} "地面站核心组件 （可执行文件和库文件）."
+  LangString DESC_InSecPlugins ${LANG_TRADCHINESE} "地面站插件（提供地面站大部分功能）."
+  LangString DESC_InSecResources ${LANG_TRADCHINESE} "地面站资源库（图表，地图，模型，'pfd'（主要飞行数据图））."
+  LangString DESC_InSecSounds ${LANG_TRADCHINESE} "地面站音频文件（用于对于特定事件的提醒）."
+  LangString DESC_InSecLocalization ${LANG_TRADCHINESE} "地面站本土化（适用于它所支持的语言）."
+  LangString DESC_InSecShortcuts ${LANG_TRADCHINESE} "安装开始菜单的快捷方式."
 
 ;--------------------------------
 ; Uninstaller section descriptions
 
-  LangString DESC_UnSecProgram ${LANG_TRADCHINESE} "TRANSLATE THIS: OpenPilot GCS application and all components."
-  LangString DESC_UnSecCache ${LANG_TRADCHINESE} "TRANSLATE THIS: OpenPilot GCS cached maps data."
-  LangString DESC_UnSecConfig ${LANG_TRADCHINESE} "TRANSLATE THIS: OpenPilot GCS configuration files."
+  LangString DESC_UnSecProgram ${LANG_TRADCHINESE} "OpenPilot GCS（地面站）程序及其所有的文件."
+  LangString DESC_UnSecCache ${LANG_TRADCHINESE} "OpenPilot GCS（地面站）缓存的地图数据."
+  LangString DESC_UnSecConfig ${LANG_TRADCHINESE} "OpenPilot GCS（地面站）配置文件."

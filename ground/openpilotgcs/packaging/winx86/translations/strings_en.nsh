@@ -27,7 +27,7 @@
 
   LangString DESC_InSecCore ${LANG_ENGLISH} "Core GCS components (executable and libraries)."
   LangString DESC_InSecPlugins ${LANG_ENGLISH} "GCS plugins (provide most of GCS functionality)."
-  LangString DESC_InSecResources ${LANG_ENGLISH} "GCS resources (diagrams, dials, mapicons, models, pfd, sounds)."
+  LangString DESC_InSecResources ${LANG_ENGLISH} "GCS resources (diagrams, dials, mapicons, 3d-models, 'pfd')."
   LangString DESC_InSecSounds ${LANG_ENGLISH} "GCS sound files (used for audible event notifications)."
   LangString DESC_InSecLocalization ${LANG_ENGLISH} "GCS localization (for supported languages)."
   LangString DESC_InSecShortcuts ${LANG_ENGLISH} "Install application start menu shortcuts."

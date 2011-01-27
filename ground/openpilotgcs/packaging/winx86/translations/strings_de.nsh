@@ -25,16 +25,16 @@
 ;--------------------------------
 ; Installer section descriptions
 
-  LangString DESC_InSecCore ${LANG_GERMAN} "TRANSLATE THIS: Core GCS components (executable and libraries)."
-  LangString DESC_InSecPlugins ${LANG_GERMAN} "TRANSLATE THIS: GCS plugins (provide most of GCS functionality)."
-  LangString DESC_InSecResources ${LANG_GERMAN} "TRANSLATE THIS: GCS resources (diagrams, dials, mapicons, models, pfd, sounds)."
-  LangString DESC_InSecSounds ${LANG_GERMAN} "TRANSLATE THIS: GCS sound files (used for audible event notifications)."
-  LangString DESC_InSecLocalization ${LANG_GERMAN} "TRANSLATE THIS: GCS localization (for supported languages)."
-  LangString DESC_InSecShortcuts ${LANG_GERMAN} "TRANSLATE THIS: Install application start menu shortcuts."
+  LangString DESC_InSecCore ${LANG_GERMAN} "GCS Kernkomponenten (Programm und Bibliotheken)."
+  LangString DESC_InSecPlugins ${LANG_GERMAN} "GCS Plugins (Der Großteil der GCS Funktionalität)."
+  LangString DESC_InSecResources ${LANG_GERMAN} "GCS Resourcen (Diagramme, Zifferblätter, Kartenicons, 3d-Modelle, 'pfd')."
+  LangString DESC_InSecSounds ${LANG_GERMAN} "GCS Sounddateien (benötigt für akustische Ereignisbenachrichtigungen)."
+  LangString DESC_InSecLocalization ${LANG_GERMAN} "GCS Lokalisation (für unterstützte Sprachen)."
+  LangString DESC_InSecShortcuts ${LANG_GERMAN} "Installiere Verknüpfungen unter Startmenü->Anwendungen."
 
 ;--------------------------------
 ; Uninstaller section descriptions
 
-  LangString DESC_UnSecProgram ${LANG_GERMAN} "TRANSLATE THIS: OpenPilot GCS application and all components."
-  LangString DESC_UnSecCache ${LANG_GERMAN} "TRANSLATE THIS: OpenPilot GCS cached maps data."
-  LangString DESC_UnSecConfig ${LANG_GERMAN} "TRANSLATE THIS: OpenPilot GCS configuration files."
+  LangString DESC_UnSecProgram ${LANG_GERMAN} "OpenPilot GCS Programm inklusive aller Komponenten."
+  LangString DESC_UnSecCache ${LANG_GERMAN} "OpenPilot GCS zwischengespeichertes Kartenmaterial."
+  LangString DESC_UnSecConfig ${LANG_GERMAN} "OpenPilot GCS gespeicherte Konfigurationsdaten."

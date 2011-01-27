@@ -27,7 +27,7 @@
 
   LangString DESC_InSecCore ${LANG_FRENCH} "TRANSLATE THIS: Core GCS components (executable and libraries)."
   LangString DESC_InSecPlugins ${LANG_FRENCH} "TRANSLATE THIS: GCS plugins (provide most of GCS functionality)."
-  LangString DESC_InSecResources ${LANG_FRENCH} "TRANSLATE THIS: GCS resources (diagrams, dials, mapicons, models, pfd, sounds)."
+  LangString DESC_InSecResources ${LANG_FRENCH} "TRANSLATE THIS: GCS resources (diagrams, dials, mapicons, 3d-models, 'pfd')."
   LangString DESC_InSecSounds ${LANG_FRENCH} "TRANSLATE THIS: GCS sound files (used for audible event notifications)."
   LangString DESC_InSecLocalization ${LANG_FRENCH} "TRANSLATE THIS: GCS localization (for supported languages)."
   LangString DESC_InSecShortcuts ${LANG_FRENCH} "TRANSLATE THIS: Install application start menu shortcuts."

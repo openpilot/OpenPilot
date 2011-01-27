@@ -27,7 +27,7 @@
 
   LangString DESC_InSecCore ${LANG_RUSSIAN} "Основные компоненты GCS (исполняемый файл и библиотеки)."
   LangString DESC_InSecPlugins ${LANG_RUSSIAN} "Плагины GCS (обеспечивают большую часть функций GCS)."
-  LangString DESC_InSecResources ${LANG_RUSSIAN} "Ресурсы GCS (диаграммы, приборы, пиктограммы, модели, звуки)."
+  LangString DESC_InSecResources ${LANG_RUSSIAN} "Ресурсы GCS (диаграммы, приборы, пиктограммы, 3d-модели, 'pfd')."
   LangString DESC_InSecSounds ${LANG_RUSSIAN} "Звуковые файлы (используются для звуковых уведомлений о событиях)."
   LangString DESC_InSecLocalization ${LANG_RUSSIAN} "Файлы языковой поддержки (для поддерживаемых языков)."
   LangString DESC_InSecShortcuts ${LANG_RUSSIAN} "Установка ярлыков для приложения."

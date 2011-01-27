@@ -70,7 +70,7 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 
 #define MEM_SIZE			0x20000 //128K
 #define SIZE_OF_DESCRIPTION	100
-#define START_OF_USER_CODE	(uint32_t)0x08002000
+#define START_OF_USER_CODE	(uint32_t)0x08003000
 #define SIZE_OF_CODE		(uint32_t)(MEM_SIZE-(START_OF_USER_CODE-0x08000000)-SIZE_OF_DESCRIPTION)
 #ifdef STM32F10X_HD
 		#define HW_TYPE			0 //0=high_density 1=medium_density;

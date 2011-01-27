@@ -25,16 +25,16 @@
 ;--------------------------------
 ; Installer section descriptions
 
-  LangString DESC_InSecCore ${LANG_FRENCH} "TRANSLATE THIS: Core GCS components (executable and libraries)."
-  LangString DESC_InSecPlugins ${LANG_FRENCH} "TRANSLATE THIS: GCS plugins (provide most of GCS functionality)."
-  LangString DESC_InSecResources ${LANG_FRENCH} "TRANSLATE THIS: GCS resources (diagrams, dials, mapicons, 3d-models, 'pfd')."
-  LangString DESC_InSecSounds ${LANG_FRENCH} "TRANSLATE THIS: GCS sound files (used for audible event notifications)."
-  LangString DESC_InSecLocalization ${LANG_FRENCH} "TRANSLATE THIS: GCS localization (for supported languages)."
-  LangString DESC_InSecShortcuts ${LANG_FRENCH} "TRANSLATE THIS: Install application start menu shortcuts."
+  LangString DESC_InSecCore ${LANG_FRENCH} "Composants GCS principaux (executable et librairies)."
+  LangString DESC_InSecPlugins ${LANG_FRENCH} "Plugins GCS (fournissent la plupart des fonctions)."
+  LangString DESC_InSecResources ${LANG_FRENCH} "Ressources GCS (diagrammes, cadrans, modèles 3d, PFD)."
+  LangString DESC_InSecSounds ${LANG_FRENCH} "Fichiers son GCS (pour les notifications sonores)."
+  LangString DESC_InSecLocalization ${LANG_FRENCH} "Fichiers de localisation (langues supportées)."
+  LangString DESC_InSecShortcuts ${LANG_FRENCH} "Installer les raccourcis dans le menu démarrer."
 
 ;--------------------------------
 ; Uninstaller section descriptions
 
-  LangString DESC_UnSecProgram ${LANG_FRENCH} "TRANSLATE THIS: OpenPilot GCS application and all components."
-  LangString DESC_UnSecCache ${LANG_FRENCH} "TRANSLATE THIS: OpenPilot GCS cached maps data."
-  LangString DESC_UnSecConfig ${LANG_FRENCH} "TRANSLATE THIS: OpenPilot GCS configuration files."
+  LangString DESC_UnSecProgram ${LANG_FRENCH} "Application OpenPilot GCS et ses composants."
+  LangString DESC_UnSecCache ${LANG_FRENCH} "Données en cache OpenPilot GCS."
+  LangString DESC_UnSecConfig ${LANG_FRENCH} "Fichiers de configuration OpenPilot GCS."

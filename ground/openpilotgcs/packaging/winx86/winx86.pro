@@ -52,7 +52,8 @@ equals(copydata, 1):win32:CONFIG(release, debug|release) {
 
     # Create installer build target - this WILL NOT run during build, run it by hand
     message("Run \"make installer\" to build Windows installer (Unicode NSIS 2.46+ required)")
-    nsis.commands += @$$targetPath($$GCS_SOURCE_TREE/$$WINX86_PATH/Makefile.cmd)
     nsis.target = installer
+    nsis.depends = svninfo
+    nsis.commands += @$$targetPath($$GCS_SOURCE_TREE/$$WINX86_PATH/Makefile.cmd)
     QMAKE_EXTRA_TARGETS += nsis
 }

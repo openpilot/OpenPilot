@@ -791,8 +791,10 @@ const struct pios_pwm_channel pios_pwm_channels[] = {
 
 void TIM1_CC_IRQHandler();
 void TIM3_IRQHandler();
+void TIM5_IRQHandler();
 void TIM1_CC_IRQHandler() __attribute__ ((alias ("PIOS_TIM1_CC_irq_handler")));
 void TIM3_IRQHandler() __attribute__ ((alias ("PIOS_TIM3_irq_handler")));
+void TIM5_IRQHandler() __attribute__ ((alias ("PIOS_TIM5_irq_handler")));
 const struct pios_pwm_cfg pios_pwm_cfg = {
 	.tim_base_init = {
 		.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,
@@ -830,6 +832,10 @@ void PIOS_TIM1_CC_irq_handler()
 void PIOS_TIM3_irq_handler()
 {
 	PIOS_PWM_irq_handler(TIM3);
+}
+void PIOS_TIM5_irq_handler()
+{
+	PIOS_PWM_irq_handler(TIM5);
 }
 #endif
 

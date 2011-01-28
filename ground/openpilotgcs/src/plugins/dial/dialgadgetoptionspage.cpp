@@ -82,8 +82,6 @@ QWidget *DialGadgetOptionsPage::createPage(QWidget *parent)
 
     // Restore the contents from the settings:
 
-	options_page->useOpenGL->setChecked(m_config->useOpenGL());
-
     options_page->svgSourceFile->setExpectedKind(Utils::PathChooser::File);
     options_page->svgSourceFile->setPromptDialogFilter(tr("SVG image (*.svg)"));
     options_page->svgSourceFile->setPromptDialogTitle(tr("Choose SVG image"));
@@ -105,6 +103,10 @@ QWidget *DialGadgetOptionsPage::createPage(QWidget *parent)
     options_page->moveNeedle1->setCurrentIndex(options_page->moveNeedle1->findText(m_config->getN1Move()));
     options_page->moveNeedle2->setCurrentIndex(options_page->moveNeedle2->findText(m_config->getN2Move()));
     options_page->moveNeedle3->setCurrentIndex(options_page->moveNeedle3->findText(m_config->getN3Move()));
+
+	options_page->useOpenGL->setChecked(m_config->useOpenGL());
+	options_page->smoothUpdates->setChecked(m_config->getBeSmooth());
+
 
     //select saved UAV Object field values
     if(options_page->uavObject1->findText(m_config->getN1DataObject())!=-1){
@@ -155,7 +157,6 @@ QWidget *DialGadgetOptionsPage::createPage(QWidget *parent)
 void DialGadgetOptionsPage::apply()
 {
     m_config->setDialFile(options_page->svgSourceFile->path());
-	m_config->setUseOpenGL(options_page->useOpenGL->checkState());
 	m_config->setDialBackgroundID(options_page->backgroundID->text());
     m_config->setDialForegroundID(options_page->foregroundID->text());
     m_config->setDialNeedleID1(options_page->needle1ID->text());
@@ -180,7 +181,8 @@ void DialGadgetOptionsPage::apply()
     m_config->setN2Move(options_page->moveNeedle2->currentText());
     m_config->setN3Move(options_page->moveNeedle3->currentText());
     m_config->setFont(font.toString());
-
+	m_config->setUseOpenGL(options_page->useOpenGL->checkState());
+	m_config->setBeSmooth(options_page->smoothUpdates->checkState());
 }
 
 /**

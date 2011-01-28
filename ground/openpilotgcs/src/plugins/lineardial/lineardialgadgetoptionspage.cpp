@@ -75,8 +75,8 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
     options_page->redMax->setValue(m_config->getRedMax());
     options_page->factor->setValue(m_config->getFactor());
     options_page->decPlaces->setValue(m_config->getDecimalPlaces());
-	options_page->useOpenGL->setChecked(m_config->useOpenGL());
 	font.fromString(m_config->getFont());
+	options_page->useOpenGL->setChecked(m_config->useOpenGL());
 
     // Fills the combo boxes for the UAVObjects
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();

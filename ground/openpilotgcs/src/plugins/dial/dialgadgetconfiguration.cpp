@@ -36,7 +36,7 @@
 DialGadgetConfiguration::DialGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
     m_defaultDial("Unknown"),
-    dialBackgroundID("background"),
+	dialBackgroundID("background"),
     dialForegroundID("foreground"),
     dialNeedleID1("needle"),
     dialNeedleID2("needle2"),
@@ -52,13 +52,13 @@ DialGadgetConfiguration::DialGadgetConfiguration(QString classId, QSettings* qSe
     needle3Factor(1),
     needle1Move("Rotate"),
     needle2Move("Rotate"),
-    needle3Move("Rotate")
+	needle3Move("Rotate"),
+	useOpenGLFlag(false),
+	beSmooth(true)
 {
     //if a saved configuration exists load it
     if(qSettings != 0) {
         QString dialFile = qSettings->value("dialFile").toString();
-
-		useOpenGLFlag = qSettings->value("useOpenGLFlag").toBool();
 
 		m_defaultDial=Utils::PathUtils().InsertDataPath(dialFile);
 		dialBackgroundID = qSettings->value("dialBackgroundID").toString();
@@ -85,7 +85,9 @@ DialGadgetConfiguration::DialGadgetConfiguration(QString classId, QSettings* qSe
         needle2Move = qSettings->value("needle2Move").toString();
         needle3Move = qSettings->value("needle3Move").toString();
         font = qSettings->value("font").toString();
-    }
+		useOpenGLFlag = qSettings->value("useOpenGLFlag").toBool();
+		beSmooth = qSettings->value("beSmooth").toBool();
+	}
 }
 
 /**
@@ -95,7 +97,6 @@ DialGadgetConfiguration::DialGadgetConfiguration(QString classId, QSettings* qSe
 IUAVGadgetConfiguration *DialGadgetConfiguration::clone()
 {
     DialGadgetConfiguration *m = new DialGadgetConfiguration(this->classId());
-	m->useOpenGLFlag = useOpenGLFlag;
 	m->m_defaultDial=m_defaultDial;
     m->setDialBackgroundID(dialBackgroundID);
     m->setDialForegroundID(dialForegroundID);
@@ -121,6 +122,8 @@ IUAVGadgetConfiguration *DialGadgetConfiguration::clone()
     m->setN2Move(needle2Move);
     m->setN3Move(needle3Move);
     m->setFont(font);
+	m->useOpenGLFlag = useOpenGLFlag;
+	m->beSmooth = beSmooth;
 
     return m;
 }
@@ -132,8 +135,6 @@ IUAVGadgetConfiguration *DialGadgetConfiguration::clone()
 void DialGadgetConfiguration::saveConfig(QSettings* settings) const {
     QString dialFile = Utils::PathUtils().RemoveDataPath(m_defaultDial);
     settings->setValue("dialFile", dialFile);
-
-	settings->setValue("useOpenGLFlag", useOpenGLFlag);
 
 	settings->setValue("dialBackgroundID", dialBackgroundID);
     settings->setValue("dialForegroundID", dialForegroundID);
@@ -165,4 +166,7 @@ void DialGadgetConfiguration::saveConfig(QSettings* settings) const {
     settings->setValue("needle3Move", needle3Move);
 
     settings->setValue("font", font);
+
+	settings->setValue("useOpenGLFlag", useOpenGLFlag);
+	settings->setValue("beSmooth", beSmooth);
 }

@@ -54,6 +54,7 @@ void DialGadget::loadConfiguration(IUAVGadgetConfiguration* config)
                           m->getN3Move());
 
 	m_widget->enableOpenGL(m->useOpenGL());
+	m_widget->enableSmoothUpdates(m->getBeSmooth());
 
     m_widget->setN1Min(m->getN1Min());
     m_widget->setN1Max(m->getN1Max());

@@ -70,6 +70,7 @@ public:
     void setN3Move( QString move) { needle3Move = move; }
     void setFont(QString text) { font = text; }
 	void setUseOpenGL(bool flag) { useOpenGLFlag = flag; }
+	void setBeSmooth(bool flag) { beSmooth = flag;}
 
 
     //get dial configuration functions
@@ -99,6 +100,7 @@ public:
     QString getN3Move() { return needle3Move; }
     QString getFont() { return font;}
 	bool useOpenGL() { return useOpenGLFlag; }
+	bool getBeSmooth() { return beSmooth; }
 
     void saveConfig(QSettings* settings) const;
     IUAVGadgetConfiguration *clone();
@@ -138,6 +140,7 @@ private:
     QString needle3Move;
 
 	bool useOpenGLFlag;
+	bool beSmooth;
 };
 
 #endif // DIALGADGETCONFIGURATION_H

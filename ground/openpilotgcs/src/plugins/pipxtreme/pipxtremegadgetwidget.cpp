@@ -41,13 +41,13 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) : QWidget(parent)
     rescueStep = RESCUE_STEP0;
     resetOnly = false;
 
-    m_config->comboBox_Mode->clear();
-    m_config->comboBox_Mode->addItem("Normal", 0);
-    m_config->comboBox_Mode->addItem("Scan Spectrum", 1);
-    m_config->comboBox_Mode->addItem("Tx Carrier Calibrate", 2);
-    m_config->comboBox_Mode->addItem("Tx Spectrum Test", 3);
+	m_config->comboBox_Mode->clear();
+	m_config->comboBox_Mode->addItem("Normal", 0);
+	m_config->comboBox_Mode->addItem("Scan Spectrum", 1);
+	m_config->comboBox_Mode->addItem("Tx Carrier Calibrate", 2);
+	m_config->comboBox_Mode->addItem("Tx Spectrum Test", 3);
 
-    m_config->comboBox_SerialPortSpeed->clear();
+	m_config->comboBox_SerialPortSpeed->clear();
     m_config->comboBox_SerialPortSpeed->addItem("1200", 1200);
     m_config->comboBox_SerialPortSpeed->addItem("2400", 2400);
     m_config->comboBox_SerialPortSpeed->addItem("4800", 4800);

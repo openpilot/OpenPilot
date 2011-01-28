@@ -1,11 +1,13 @@
 TEMPLATE = lib
 TARGET = PipXtreme
 QT += svg
+
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(../../plugins/uavobjects/uavobjects.pri)
 include(../../plugins/uavtalk/uavtalk.pri)
 include(../../plugins/rawhid/rawhid.pri)
+
 INCLUDEPATH += ../../libs/qextserialport/src
 
 HEADERS += pipxtremegadget.h \
@@ -13,7 +15,7 @@ HEADERS += pipxtremegadget.h \
     pipxtremegadgetfactory.h \
     pipxtremegadgetoptionspage.h \
     pipxtremegadgetwidget.h \
-    plugin.h \
+    pipxtremeplugin.h \
     delay.h \
     devicewidget.h \
     SSP/port.h \
@@ -33,7 +35,6 @@ SOURCES += pipxtremegadget.cpp \
 OTHER_FILES += PipXtreme.pluginspec
 
 FORMS += \
-    pipxtreme.ui \
     pipxtreme.ui
 
 RESOURCES += \

@@ -42,6 +42,9 @@
  */
 void PIOS_Board_Init(void) {
 
+	/* Remap AFIO pin */
+	//GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);
+
 	/* Delay system */
 	PIOS_DELAY_Init();	
 	

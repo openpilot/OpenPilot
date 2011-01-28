@@ -45,7 +45,7 @@ using namespace std;
  * print usage info
  */
 void usage() {
-    cout << "Usage: uavobjectgenerator [-gcs] [-flight] [-java] [-python] [-matlab] [-none] [-v] xml_path template_base" << endl;
+    cout << "Usage: uavobjectgenerator [-gcs] [-flight] [-java] [-python] [-matlab] [-none] [-v] xml_path template_base [UAVObj1] ... [UAVObjN]" << endl;
     cout << "Languages: "<< endl;
     cout << "\t-gcs           build groundstation code" << endl;
     cout << "\t-flight        build flight code" << endl;
@@ -59,6 +59,9 @@ void usage() {
     cout << "\t-v             verbose" << endl;
     cout << "\tinput_path     path to UAVObject definition (.xml) files." << endl;
     cout << "\ttemplate_path  path to the root of the OpenPilot source tree." << endl;
+    cout << "\tUAVObjXY       name of a specific UAVObject to be built." << endl;
+    cout << "\tIf any specific UAVObjects are given only these will be built." << endl;
+    cout << "\tIf no UAVObject is specified -> all are built." << endl;
 }
 
 /**
@@ -83,6 +86,7 @@ int main(int argc, char *argv[])
     QString templatepath;
     QString outputpath;
     QStringList arguments_stringlist;
+    QStringList objects_stringlist;
 
     // process arguments
     for (int argi=1;argi<argc;argi++)
@@ -102,13 +106,20 @@ int main(int argc, char *argv[])
     bool do_none=(arguments_stringlist.removeAll("-none")>0); //
 
     bool do_all=((do_gcs||do_flight||do_java||do_python||do_matlab)==false);
+    bool do_allObjects=true;
 
-    if (arguments_stringlist.length() == 2) {
+    if (arguments_stringlist.length() >= 2) {
         inputpath = arguments_stringlist.at(0);
         templatepath = arguments_stringlist.at(1);
     } else {
         // wrong number of arguments
         return usage_err();
+    }
+    if (arguments_stringlist.length() >2) {
+        do_allObjects=false;
+        for (int argi=2;argi<arguments_stringlist.length();argi++) {
+            objects_stringlist << ( arguments_stringlist.at(argi).toLower() + ".xml" );
+        }
     }
 
     if (!inputpath.endsWith("/"))
@@ -132,8 +143,15 @@ int main(int argc, char *argv[])
     
     for (int n = 0; n < xmlList.length(); ++n) {
         QFileInfo fileinfo = xmlList[n];
-	if (verbose)
-	  cout << "Parsing XML file: " << fileinfo.fileName().toStdString() << endl;
+        if (!do_allObjects) {
+            if (!objects_stringlist.removeAll(fileinfo.fileName().toLower())) {
+                if (verbose)
+                  cout << "Skipping XML file: " << fileinfo.fileName().toStdString() << endl;
+               continue;
+            }
+        }
+        if (verbose)
+          cout << "Parsing XML file: " << fileinfo.fileName().toStdString() << endl;
         QString filename = fileinfo.fileName();
         QString xmlstr = readFile(fileinfo.absoluteFilePath());
 
@@ -145,6 +163,11 @@ int main(int argc, char *argv[])
         }
     }
 
+    if (objects_stringlist.length() > 0) {
+        cout << "required UAVObject definitions not found! " << objects_stringlist.join(",").toStdString() << endl;
+        return RETURN_ERR_XML;
+    }
+
     // check for duplicate object ID's
     QList<quint32> objIDList;
     int numBytesTotal=0;
@@ -152,8 +175,8 @@ int main(int argc, char *argv[])
         quint32 id = parser->getObjectID(objidx);
         numBytesTotal+=parser->getNumBytes(objidx);
         if (verbose)
-	  cout << "Checking object " << parser->getObjectName(objidx).toStdString() << " (" << parser->getNumBytes(objidx) << " bytes)" << endl;
-	if ( objIDList.contains(id) || id == 0 ) {
+          cout << "Checking object " << parser->getObjectName(objidx).toStdString() << " (" << parser->getNumBytes(objidx) << " bytes)" << endl;
+        if ( objIDList.contains(id) || id == 0 ) {
             cout << "Error: Object ID collision found in object " << parser->getObjectName(objidx).toStdString() << ", modify object name" << endl;
             return RETURN_ERR_XML;
         }
@@ -163,7 +186,7 @@ int main(int argc, char *argv[])
 
     // done parsing and checking
     cout << "Done: processed " << xmlList.length() << " XML files and generated "
-	 << objIDList.length() << " objects with no ID collisions. Total size of the data fields is " << numBytesTotal << " bytes." << endl;
+         << objIDList.length() << " objects with no ID collisions. Total size of the data fields is " << numBytesTotal << " bytes." << endl;
     
 
     if (verbose) 

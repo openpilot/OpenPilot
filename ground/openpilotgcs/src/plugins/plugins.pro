@@ -160,9 +160,15 @@ SUBDIRS += plugin_gcscontrol
 #PipXtreme Gadget
 #plugin_pipxtreme.subdir = pipxtreme
 #plugin_pipxtreme.depends = plugin_coreplugin
-#plugin_modelview.depends = plugin_uavobjects
-#plugin_modelview.depends = plugin_rawhid
+#plugin_pipxtreme.depends += plugin_uavobjects
+#plugin_pipxtreme.depends += plugin_rawhid
 #SUBDIRS += plugin_pipxtreme
+
+#Scope2 Gadget
+#plugin_scope2.subdir = scope2
+#plugin_scope2.depends = plugin_coreplugin
+#plugin_scope2.depends += plugin_uavobjects
+#SUBDIRS += plugin_scope2
 
 # Empty UAVGadget - Default for new splits
 plugin_magicwaypoint.subdir = magicwaypoint

@@ -9,4 +9,4 @@
 ; Installer version info  
 !define PRODUCT_VERSION "0.0.0.$WCREV$"  
 !define FILE_VERSION "0.0.0.$WCREV$"  
-!define BUILD_DESCRIPTION "Last committed revision $WCREV$ ($WCDATE$) using$WCMIXED? mixed:$ SVN revision range $WCRANGE$$WCMODS? (locally modified):$. Built from $WCURL$ on $WCNOW$." 
+!define BUILD_DESCRIPTION "Last committed revision $WCREV$ ($WCDATE$) using$WCMIXED? mixed:$ SVN revision range $WCRANGE$$WCMODS? (locally modified):$. Built from $WCURL$ ($WCNOW$)." 

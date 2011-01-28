@@ -417,8 +417,8 @@ unix {
 # Windows Install configuration
 win32 { 
     # Location of HEADERS and library
-    LIB_DIR = C:\GLC_lib\lib
-    INCLUDE_DIR = C:\GLC_lib\include
+    LIB_DIR = C:/GLC_lib/lib
+    INCLUDE_DIR = C:/GLC_lib/include
     include.path = $${INCLUDE_DIR}
     include_lib3ds.path = $${INCLUDE_DIR}/3rdparty/lib3ds
     include_glext.path = $${INCLUDE_DIR}/3rdparty/glext

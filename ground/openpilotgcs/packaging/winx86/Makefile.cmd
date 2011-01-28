@@ -8,7 +8,7 @@ rem This script requires Unicode NSIS 2.46 or higher:
 rem http://www.scratchpaper.com/
 rem
 rem Optional SVN utility to get currently used SVN revision is SubWCRev.exe,
-rem it installed by TortoiseSVN or available separately:
+rem it is a part of TortoiseSVN package or is available separately:
 rem http://sourceforge.net/projects/tortoisesvn/files/Tools/1.6.7/SubWCRev-1.6.7.18415.msi/download
 rem
 

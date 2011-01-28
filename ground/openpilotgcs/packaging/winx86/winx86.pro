@@ -19,15 +19,18 @@ equals(copydata, 1):win32:CONFIG(release, debug|release) {
     # http://sourceforge.net/projects/tortoisesvn/files/Tools/1.6.7/SubWCRev-1.6.7.18415.msi/download
 
     # Default location is TortoiseSVN bin folder.
+    # FIXME: it should try to find in the PATH first, and use hardcoded reference last
     SUBWCREV_EXE = $$targetPath(\"$$(ProgramFiles)/TortoiseSVN/bin/SubWCRev.exe\")
 
     exists($$SUBWCREV_EXE) {
         message("SubWCRev found: $${SUBWCREV_EXE}")
-        svninfo.commands += $$SUBWCREV_EXE $$targetPath($$GCS_SOURCE_TREE)
+        svninfo.commands += @echo Executing $${SUBWCREV_EXE} $$SVN_INFO_TEMPLATE $$SVN_INFO_MAKEFILE $$addNewline()
+        svninfo.commands += @$$SUBWCREV_EXE $$targetPath($$GCS_SOURCE_TREE)
         svninfo.commands +=   $$targetPath($$GCS_SOURCE_TREE/$$WINX86_PATH/$$SVN_INFO_TEMPLATE)
         svninfo.commands +=   $$targetPath($$GCS_BUILD_TREE/$$WINX86_PATH/$$SVN_INFO_MAKEFILE)
         svninfo.commands +=   $$addNewline()
-        svninfo.commands += $$SUBWCREV_EXE $$targetPath($$GCS_SOURCE_TREE)
+        svninfo.commands += @echo Executing $${SUBWCREV_EXE} $$NSIS_TEMPLATE $$NSIS_HEADER $$addNewline()
+        svninfo.commands += @$$SUBWCREV_EXE $$targetPath($$GCS_SOURCE_TREE)
         svninfo.commands +=   $$targetPath($$GCS_SOURCE_TREE/$$WINX86_PATH/$$NSIS_TEMPLATE)
         svninfo.commands +=   $$targetPath($$GCS_BUILD_TREE/$$WINX86_PATH/$$NSIS_HEADER)
         svninfo.commands +=   $$addNewline()
@@ -51,7 +54,7 @@ equals(copydata, 1):win32:CONFIG(release, debug|release) {
     QMAKE_EXTRA_TARGETS += force
 
     # Create installer build target - this WILL NOT run during build, run it by hand
-    message("Run \"make installer\" to build Windows installer (Unicode NSIS 2.46+ required)")
+    message("Run \"make installer\" in $$GCS_BUILD_TREE/$$WINX86_PATH to build Windows installer (Unicode NSIS 2.46+ required)")
     nsis.target = installer
     nsis.depends = svninfo
     nsis.commands += @$$targetPath($$GCS_SOURCE_TREE/$$WINX86_PATH/Makefile.cmd)

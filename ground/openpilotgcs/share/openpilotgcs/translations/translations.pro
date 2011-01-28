@@ -16,7 +16,7 @@ TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/openpilotgcs_,.ts)
 
 MIME_TR_H = $$PWD/mime_tr.h
 
-contains(QT_VERSION, ^4\.[0-5]\..*) {
+contains(QT_VERSION, ^4\\.[0-5]\\..*) {
     ts.commands = @echo This Qt version is too old for the ts target. Need Qt 4.6+.
 } else {
     for(dir, $$list($$files($$GCS_SOURCE_TREE/src/plugins/*))):MIMETYPES_FILES += $$files($$dir/*.mimetypes.xml)

@@ -14,10 +14,9 @@ echo  - clean: cleans all flight targets including bootloaders and firmware
 echo  - help:  this help
 echo:
 echo Environment variables:
-echo  - TARGETS_FW - list of target (default is all flight targets)
 echo  - TARGETS_BL - list of target (default is all flight bootloader targets)
-echo  - TARGET_FW_SUBDIR - subdirectory of build/ to build targets (default is .)
-echo  - TARGET_BL_SUBDIR - subdirectory of build/ to build bootloaders (default is bootloaders)
+echo  - TARGETS_FW - list of target (default is all flight targets)
+echo  - UAVOBJGENERATOR - path and filename override for UAVObjGenerator.exe
 echo:
 echo Example usage (from a batch file with .cmd extension):
 echo   set PATH=D:\Work\OpenPilot\Apps\CodeSourcery\bin\;%%PATH%%
@@ -34,53 +33,72 @@ rem Settings and definitions
 rem -------------------------------------------------------------------
 
 rem Set desired targets and paths
-if "%TARGETS_FW%" == "" set TARGETS_FW=ahrs openpilot pipxtreme coptercontrol
-if "%TARGETS_BL%" == "" set TARGETS_BL=ahrs openpilot pipxtreme
-if "%TARGET_FW_SUBDIR%" == "" set TARGET_FW_SUBDIR=.
+if "%TARGETS_BL%" == "" set TARGETS_BL=ahrs openpilot pipxtreme coptercontrol
+if "%TARGETS_FW%" == "" set TARGETS_FW=%TARGETS_BL%
 if "%TARGET_BL_SUBDIR%" == "" set TARGET_BL_SUBDIR=bootloaders
+if "%TARGET_FW_SUBDIR%" == "" set TARGET_FW_SUBDIR=.
 
 rem Set toolset paths (if you don't have them added permanently)
 rem set PATH=D:\Work\OpenPilot\Apps\CodeSourcery\bin\;%PATH%
+
 set MAKE=cs-make
 
 rem Set some project path variables
-rem for /F %%D in ('cd') do set CURDIR=%%D
-for %%D in (%0) do set CURDIR=%%~dD%%~pD
+for %%D in (%0) do set CURDIR=%%~dpD
 
 set ROOT_DIR=%CURDIR%
 set BUILD_DIR=%ROOT_DIR%\build
 set UAVOBJ_XML_DIR=%ROOT_DIR%\shared\uavobjectdefinition
 set UAVOBJ_OUT_DIR=%BUILD_DIR%\uavobject-synthetics
 
-rem Find the UAVObjGenerator
-for %%G in (debug release) do (
-  if exist %BUILD_DIR%\ground\uavobjgenerator\%%G\uavobjgenerator.exe (
-    set UAVOBJGENERATOR="%BUILD_DIR%\ground\uavobjgenerator\%%G\uavobjgenerator.exe"
-    goto UAVObjGeneratorFound
-  )
-)
-echo UAVObjGenerator was not found, please build it first
-goto Abort
-:UAVObjGeneratorFound
-
 rem -------------------------------------------------------------------
 rem Proceed with target
 rem -------------------------------------------------------------------
 
 set TARGET=%1
+if '%TARGET%' == 'clean' goto UAVObjectsDone
+
+rem -------------------------------------------------------------------
+rem Searching for UAVObjGenerator executable
+rem -------------------------------------------------------------------
+
+set UAVOBJGENERATOR_FILENAME=uavobjgenerator.exe
+
+rem If environment variable is set then expand it to full path and use
+for %%G in (%UAVOBJGENERATOR%) do set UAVOBJGENERATOR=%%~fG
+if exist "%UAVOBJGENERATOR%" goto UAVObjGeneratorFound
+
+rem Searching in builds
+for %%G in (debug release) do (
+  if exist %BUILD_DIR%\ground\uavobjgenerator\%%G\%UAVOBJGENERATOR_FILENAME% (
+    set UAVOBJGENERATOR="%BUILD_DIR%\ground\uavobjgenerator\%%G\%UAVOBJGENERATOR_FILENAME%"
+    goto UAVObjGeneratorFound
+  )
+)
+
+rem Searching in PATH
+for %%G in (%UAVOBJGENERATOR_FILENAME%) do set UAVOBJGENERATOR=%%~$PATH:G
+if exist %UAVOBJGENERATOR% goto UAVObjGeneratorFound
+
+rem Report error
+for %%G in (%ROOT_DIR%/ground/ground.pro) do set GROUND_PRO=%%~fG
+echo UAVObjGenerator was not found, please build it first using %GROUND_PRO%
+goto Abort
+
+:UAVObjGeneratorFound
+echo UAVObjGenerator found: %UAVOBJGENERATOR%
 
 rem -------------------------------------------------------------------
 rem UAVObjects for flight build
 rem -------------------------------------------------------------------
 
-if '%TARGET%' == 'clean' goto UAVObjectsDone
 mkdir %UAVOBJ_OUT_DIR% >NUL 2>&1
 pushd %UAVOBJ_OUT_DIR%
 %UAVOBJGENERATOR% -flight %UAVOBJ_XML_DIR% %ROOT_DIR%
 if errorlevel 1 goto Abort2
 popd
-:UAVObjectsDone
 
+:UAVObjectsDone
 rem -------------------------------------------------------------------
 rem Bootloaders build
 rem -------------------------------------------------------------------

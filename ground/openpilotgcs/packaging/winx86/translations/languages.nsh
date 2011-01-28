@@ -27,7 +27,7 @@
   !insertmacro MUI_LANGUAGE "French"
   !insertmacro MUI_LANGUAGE "German"
   !insertmacro MUI_LANGUAGE "Russian"
-  !insertmacro MUI_LANGUAGE "Spanish"
+; !insertmacro MUI_LANGUAGE "Spanish"
   !insertmacro MUI_LANGUAGE "TradChinese"
 
 ;--------------------------------
@@ -37,7 +37,7 @@
   LicenseLangString LicenseFile ${LANG_FRENCH} "licenses\GPLv3_fr.rtf"
   LicenseLangString LicenseFile ${LANG_GERMAN} "licenses\GPLv3_de.rtf"
   LicenseLangString LicenseFile ${LANG_RUSSIAN} "licenses\GPLv3_ru.rtf"
-  LicenseLangString LicenseFile ${LANG_SPANISH} "licenses\GPLv3_es.rtf"
+; LicenseLangString LicenseFile ${LANG_SPANISH} "licenses\GPLv3_es.rtf"
   LicenseLangString LicenseFile ${LANG_TRADCHINESE} "licenses\GPLv3_zh_CN.rtf"
 
 ;--------------------------------
@@ -47,5 +47,5 @@
   !include "translations\strings_fr.nsh"
   !include "translations\strings_de.nsh"
   !include "translations\strings_ru.nsh"
-  !include "translations\strings_es.nsh"
+; !include "translations\strings_es.nsh"
   !include "translations\strings_zh_CN.nsh"

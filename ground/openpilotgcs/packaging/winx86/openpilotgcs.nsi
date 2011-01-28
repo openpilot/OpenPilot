@@ -233,7 +233,7 @@ FunctionEnd
 ;--------------------------------
 ; Uninstaller sections
 
-Section "un.Program" UnSecProgram
+Section "un.OpenPilot GCS" UnSecProgram
   ; Remove installed files and/or directories
   RMDir /r /rebootok "$INSTDIR\bin"
   RMDir /r /rebootok "$INSTDIR\lib"
@@ -253,12 +253,12 @@ Section "un.Program" UnSecProgram
   RMDir /rebootok "$SMPROGRAMS\OpenPilot"
 SectionEnd
 
-Section "un.Cache" UnSecCache
+Section "un.Maps cache" UnSecCache
   ; Remove maps cache
   RMDir /r /rebootok "$PROFILE\OpenPilot"
 SectionEnd
 
-Section /o "un.Config" UnSecConfig
+Section /o "un.Configuration" UnSecConfig
   ; Remove configuration
   RMDir /r /rebootok "$APPDATA\OpenPilot"
 SectionEnd

@@ -27,7 +27,7 @@
 
   LangString DESC_InSecCore ${LANG_TRADCHINESE} "地面站核心组件 （可执行文件和库文件）."
   LangString DESC_InSecPlugins ${LANG_TRADCHINESE} "地面站插件（提供地面站大部分功能）."
-  LangString DESC_InSecResources ${LANG_TRADCHINESE} "地面站资源库（图表，地图，模型，'pfd'（主要飞行数据图））."
+  LangString DESC_InSecResources ${LANG_TRADCHINESE} "地面站资源库（图表，地图，模型，PFD（主要飞行数据图））."
   LangString DESC_InSecSounds ${LANG_TRADCHINESE} "地面站音频文件（用于对于特定事件的提醒）."
   LangString DESC_InSecLocalization ${LANG_TRADCHINESE} "地面站本土化（适用于它所支持的语言）."
   LangString DESC_InSecShortcuts ${LANG_TRADCHINESE} "安装开始菜单的快捷方式."

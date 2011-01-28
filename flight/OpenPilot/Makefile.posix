@@ -195,6 +195,7 @@ SRC += $(OPUAVSYNTHDIR)/flightplansettings.c
 SRC += $(OPUAVSYNTHDIR)/taskinfo.c
 SRC += $(OPUAVSYNTHDIR)/watchdogstatus.c
 SRC += $(OPUAVSYNTHDIR)/nedaccel.c
+SRC += $(OPUAVSYNTHDIR)/sonaraltitude.c
 SRC += $(OPUAVSYNTHDIR)/uavobjectsinit.c
 endif
 

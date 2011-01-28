@@ -509,48 +509,82 @@ const struct pios_usart_cfg pios_usart_aux_cfg = {
 /*
  * SPEKTRUM USART
  */
+#include <pios_spektrum_priv.h>
 void PIOS_USART_spektrum_irq_handler(void);
 void USART1_IRQHandler() __attribute__ ((alias ("PIOS_USART_spektrum_irq_handler")));
-const struct pios_usart_cfg pios_usart_spektrum_cfg = {
-  .regs = USART1,
-  .init = {
-    #if defined (PIOS_COM_SPEKTRUM_BAUDRATE)
-        .USART_BaudRate        = PIOS_COM_SPEKTRUM_BAUDRATE,
-    #else
-        .USART_BaudRate        = 115200,
-    #endif
-    .USART_WordLength          = USART_WordLength_8b,
-    .USART_Parity              = USART_Parity_No,
-    .USART_StopBits            = USART_StopBits_1,
-    .USART_HardwareFlowControl = USART_HardwareFlowControl_None,
-    .USART_Mode                = USART_Mode_Rx,
-  },
-  .irq = {
-    .handler = PIOS_USART_spektrum_irq_handler,
-    .init    = {
-      .NVIC_IRQChannel                   = USART1_IRQn,
-      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
-      .NVIC_IRQChannelSubPriority        = 0,
-      .NVIC_IRQChannelCmd                = ENABLE,
-    },
-  },
-  .rx   = {
-    .gpio = GPIOA,
-    .init = {
-      .GPIO_Pin   = GPIO_Pin_10,
-      .GPIO_Speed = GPIO_Speed_2MHz,
-      .GPIO_Mode  = GPIO_Mode_IPU,
-    },
-  },
-  .tx   = {
-    .gpio = GPIOA,
-    .init = {
-      .GPIO_Pin   = GPIO_Pin_9,
-      .GPIO_Speed = GPIO_Speed_2MHz,
-      .GPIO_Mode  = GPIO_Mode_IN_FLOATING,
-    },
-  },
+void TIM6_IRQHandler();
+void TIM6_IRQHandler() __attribute__ ((alias ("PIOS_TIM6_irq_handler")));
+const struct pios_spektrum_cfg pios_spektrum_cfg = {
+	.pios_usart_spektrum_cfg = {
+		  .regs = USART1,
+		  .init = {
+			#if defined (PIOS_COM_SPEKTRUM_BAUDRATE)
+				.USART_BaudRate        = PIOS_COM_SPEKTRUM_BAUDRATE,
+			#else
+				.USART_BaudRate        = 115200,
+			#endif
+			.USART_WordLength          = USART_WordLength_8b,
+			.USART_Parity              = USART_Parity_No,
+			.USART_StopBits            = USART_StopBits_1,
+			.USART_HardwareFlowControl = USART_HardwareFlowControl_None,
+			.USART_Mode                = USART_Mode_Rx,
+		  },
+		  .irq = {
+			.handler = PIOS_USART_spektrum_irq_handler,
+			.init    = {
+			  .NVIC_IRQChannel                   = USART1_IRQn,
+			  .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+			  .NVIC_IRQChannelSubPriority        = 0,
+			  .NVIC_IRQChannelCmd                = ENABLE,
+			},
+		  },
+		  .rx   = {
+			.gpio = GPIOA,
+			.init = {
+			  .GPIO_Pin   = GPIO_Pin_10,
+			  .GPIO_Speed = GPIO_Speed_2MHz,
+			  .GPIO_Mode  = GPIO_Mode_IPU,
+			},
+		  },
+		  .tx   = {
+			.gpio = GPIOA,
+			.init = {
+			  .GPIO_Pin   = GPIO_Pin_9,
+			  .GPIO_Speed = GPIO_Speed_2MHz,
+			  .GPIO_Mode  = GPIO_Mode_IN_FLOATING,
+			},
+		  },
+	},
+	.tim_base_init = {
+		.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,	/* For 1 uS accuracy */
+		.TIM_ClockDivision = TIM_CKD_DIV1,
+		.TIM_CounterMode = TIM_CounterMode_Up,
+		.TIM_Period = ((1000000 / 60) - 1), //60hz
+		.TIM_RepetitionCounter = 0x0000,
+	},
+	.gpio_init = { //used for bind feature
+		.GPIO_Mode = GPIO_Mode_Out_PP,
+		.GPIO_Speed = GPIO_Speed_2MHz,
+	},
+	.remap = 0,
+	.irq = {
+		.handler = TIM6_IRQHandler,
+		.init    = {
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+	.timer = TIM6,
+	.port = GPIOA,
+	.ccr = TIM_IT_Update,
+	.pin = GPIO_Pin_10,
 };
+
+void PIOS_TIM6_irq_handler()
+{
+	PIOS_SPEKTRUM_irq_handler();
+}
 #endif
 
 /*
@@ -574,7 +608,7 @@ struct pios_usart_dev pios_usart_devs[] = {
 #ifdef PIOS_COM_SPEKTRUM
 #define PIOS_USART_AUX    2
   {
-    .cfg = &pios_usart_spektrum_cfg,
+    .cfg = &pios_spektrum_cfg.pios_usart_spektrum_cfg,
   },
 #endif
 };

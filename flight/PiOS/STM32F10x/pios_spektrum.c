@@ -31,6 +31,7 @@
 
 /* Project Includes */
 #include "pios.h"
+#include "pios_spektrum_priv.h"
 
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 #if defined(PIOS_INCLUDE_PWM)
@@ -58,6 +59,68 @@ void PIOS_SPEKTRUM_Init(void)
 		PIOS_SPEKTRUM_Bind();
 	}
 
+///////////////////////
+
+	NVIC_InitTypeDef NVIC_InitStructure = pios_spektrum_cfg.irq.init;
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = pios_spektrum_cfg.tim_base_init;
+
+
+	/* Enable appropriate clock to timer module */
+	switch((int32_t) pios_spektrum_cfg.timer) {
+		case (int32_t)TIM1:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM1_CC_IRQn;
+			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
+			break;
+		case (int32_t)TIM2:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+			break;
+		case (int32_t)TIM3:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+			break;
+		case (int32_t)TIM4:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+			break;
+#ifdef STM32F10X_HD
+
+		case (int32_t)TIM5:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM5_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
+			break;
+		case (int32_t)TIM6:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM6_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
+			break;
+		case (int32_t)TIM7:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
+			break;
+		case (int32_t)TIM8:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM8_CC_IRQn;
+			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
+			break;
+#endif
+	}
+	NVIC_Init(&NVIC_InitStructure);
+
+	/* Configure timer clocks */
+	TIM_InternalClockConfig(pios_spektrum_cfg.timer);
+	TIM_TimeBaseInit(pios_spektrum_cfg.timer, &TIM_TimeBaseStructure);
+
+	/* Enable the Capture Compare Interrupt Request */
+	TIM_ITConfig(pios_spektrum_cfg.timer, pios_spektrum_cfg.ccr, ENABLE);
+
+	/* Clear update pending flag */
+	TIM_ClearFlag(pios_spektrum_cfg.timer, TIM_FLAG_Update);
+
+	/* Enable timers */
+	TIM_Cmd(pios_spektrum_cfg.timer, ENABLE);
+
+/////////////////////////////
+
+#if 0
 	/* spektrum "watchdog" timer */
 	NVIC_InitTypeDef NVIC_InitStructure;
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
@@ -83,10 +146,11 @@ void PIOS_SPEKTRUM_Init(void)
 	TIM_ITConfig(PIOS_SPEKTRUM_SUPV_TIMER, TIM_IT_Update, ENABLE);
 
 	/* Clear update pending flag */
-	TIM_ClearFlag(TIM6, TIM_FLAG_Update);
+	TIM_ClearFlag(PIOS_SPEKTRUM_SUPV_TIMER, TIM_FLAG_Update);
 
 	/* Enable counter */
 	TIM_Cmd(PIOS_SPEKTRUM_SUPV_TIMER, ENABLE);
+#endif
 }
 
 /**
@@ -112,6 +176,43 @@ int16_t PIOS_SPEKTRUM_Get(int8_t Channel)
 */
 uint8_t PIOS_SPEKTRUM_Bind(void)
 {
+	GPIO_InitTypeDef GPIO_InitStructure = pios_spektrum_cfg.gpio_init;
+	GPIO_InitStructure.GPIO_Pin = pios_spektrum_cfg.pin;
+	GPIO_Init(pios_spektrum_cfg.port, &GPIO_InitStructure);
+
+	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
+	//PIOS_DELAY_WaitmS(75);
+	/* RX line, drive high for 10us */
+	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
+	PIOS_DELAY_WaituS(10);
+	/* RX line, drive low for 120us */
+	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
+	PIOS_DELAY_WaituS(120);
+	/* RX line, drive high for 120us */
+	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
+	PIOS_DELAY_WaituS(120);
+	/* RX line, drive low for 120us */
+	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
+	PIOS_DELAY_WaituS(120);
+	/* RX line, drive high for 120us */
+	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
+	PIOS_DELAY_WaituS(120);
+	/* RX line, drive low for 120us */
+	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
+	PIOS_DELAY_WaituS(120);
+	/* RX line, drive high for 120us */
+	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
+	PIOS_DELAY_WaituS(120);
+	/* RX line, drive low for 120us */
+	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
+	PIOS_DELAY_WaituS(120);
+	/* RX line, drive high for 120us */
+	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
+	PIOS_DELAY_WaituS(120);
+	/* RX line, set input and wait for data, PIOS_SPEKTRUM_Init */
+
+#if 0
+
 #define PIOS_USART3_GPIO_PORT			GPIOA
 #define PIOS_USART3_RX_PIN			GPIO_Pin_10
 
@@ -155,6 +256,7 @@ uint8_t PIOS_SPEKTRUM_Bind(void)
 	PIOS_USART3_GPIO_PORT->BSRR = PIOS_USART3_RX_PIN;
 	PIOS_DELAY_WaituS(120);
 	/* RX line, set input and wait for data, PIOS_SPEKTRUM_Init */
+#endif
 	return 1;
 }
 
@@ -214,31 +316,32 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 	return 0;
 }
 
-/* Interrupt handler for USART3 */
+/* Interrupt handler for USART */
 void SPEKTRUM_IRQHandler(void)
 {
 	/* check if RXNE flag is set */
-	if (USART1->SR & (1 << 5)) {
-		uint8_t b = USART1->DR;
+	if (pios_spektrum_cfg.pios_usart_spektrum_cfg.regs->SR & (1 << 5)) {
+		uint8_t b = pios_spektrum_cfg.pios_usart_spektrum_cfg.regs->DR;
 		if (PIOS_SPEKTRUM_Decode(b) < 0) {
 			/* Here we could add some error handling */
 		}
 	}
 
-	if (USART1->SR & (1 << 7)) {	// check if TXE flag is set
+	if (pios_spektrum_cfg.pios_usart_spektrum_cfg.regs->SR & (1 << 7)) {	// check if TXE flag is set
 		/* Disable TXE interrupt (TXEIE=0) */
-		USART1->CR1 &= ~(1 << 7);
+		pios_spektrum_cfg.pios_usart_spektrum_cfg.regs->CR1 &= ~(1 << 7);
 	}
 	/* clear "watchdog" timer */
-	TIM_SetCounter(PIOS_SPEKTRUM_SUPV_TIMER, 0);
+	TIM_SetCounter(pios_spektrum_cfg.timer, 0);
 }
 
 /**
 * This function handles TIM6 global interrupt request.
 */
-PIOS_SPEKTRUM_SUPV_IRQ_FUNC {
+void PIOS_SPEKTRUM_irq_handler() {
+//PIOS_SPEKTRUM_SUPV_IRQ_FUNC {
 	/* Clear timer interrupt pending bit */
-	TIM_ClearITPendingBit(PIOS_SPEKTRUM_SUPV_TIMER, TIM_IT_Update);
+	TIM_ClearITPendingBit(pios_spektrum_cfg.timer, TIM_IT_Update);
 
 	/* sync between frames, TODO! DX7SE */
 	sync = 0;

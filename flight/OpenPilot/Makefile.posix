@@ -212,13 +212,17 @@ SRC += $(PIOSPOSIX)/pios_wdg.c
 #SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/WorldMagModel.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
-## RTOS
+## RTOS and RTOS Portable 
 SRC += $(RTOSSRCDIR)/list.c
 SRC += $(RTOSSRCDIR)/queue.c
-SRC += $(RTOSSRCDIR)/tasks.c
-#
-## RTOS Portable 
-SRC += $(RTOSSRCDIR)/portable/GCC/Posix/port.c
+UNAME := $(shell uname)
+ifeq ($(UNAME), Linux)
+  SRC += $(RTOSSRCDIR)/tasks_linux.c
+  SRC += $(RTOSSRCDIR)/portable/GCC/Posix/port_linux.c
+else
+  SRC += $(RTOSSRCDIR)/tasks_posix.c
+  SRC += $(RTOSSRCDIR)/portable/GCC/Posix/port_posix.c
+endif
 SRC += $(RTOSSRCDIR)/portable/MemMang/heap_3.c
 
 

@@ -89,6 +89,9 @@
 #if defined(PIOS_INCLUDE_BMP085)
 #include <pios_bmp085.h>
 #endif
+#if defined(PIOS_INCLUDE_HCSR04)
+#include <pios_hcsr04.h>
+#endif
 #if defined(PIOS_INCLUDE_HMC5843)
 #include <pios_hmc5843.h>
 #endif

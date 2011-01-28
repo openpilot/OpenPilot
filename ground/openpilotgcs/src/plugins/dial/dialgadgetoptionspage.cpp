@@ -82,6 +82,8 @@ QWidget *DialGadgetOptionsPage::createPage(QWidget *parent)
 
     // Restore the contents from the settings:
 
+	options_page->useOpenGL->setChecked(m_config->useOpenGL());
+
     options_page->svgSourceFile->setExpectedKind(Utils::PathChooser::File);
     options_page->svgSourceFile->setPromptDialogFilter(tr("SVG image (*.svg)"));
     options_page->svgSourceFile->setPromptDialogTitle(tr("Choose SVG image"));
@@ -153,7 +155,8 @@ QWidget *DialGadgetOptionsPage::createPage(QWidget *parent)
 void DialGadgetOptionsPage::apply()
 {
     m_config->setDialFile(options_page->svgSourceFile->path());
-    m_config->setDialBackgroundID(options_page->backgroundID->text());
+	m_config->setUseOpenGL(options_page->useOpenGL->checkState());
+	m_config->setDialBackgroundID(options_page->backgroundID->text());
     m_config->setDialForegroundID(options_page->foregroundID->text());
     m_config->setDialNeedleID1(options_page->needle1ID->text());
     m_config->setDialNeedleID2(options_page->needle2ID->text());

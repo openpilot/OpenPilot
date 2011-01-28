@@ -29,6 +29,7 @@
 #include "dialgadgetwidget.h"
 #include <utils/stylehelper.h>
 #include <iostream>
+#include <QtOpenGL/QGLWidget>
 #include <QDebug>
 
 DialGadgetWidget::DialGadgetWidget(QWidget *parent) : QGraphicsView(parent)
@@ -62,6 +63,17 @@ DialGadgetWidget::DialGadgetWidget(QWidget *parent) : QGraphicsView(parent)
 DialGadgetWidget::~DialGadgetWidget()
 {
    // Do nothing
+}
+
+/*!
+  \brief Enables/Disables OpenGL
+  */
+void DialGadgetWidget::enableOpenGL(bool flag)
+{
+	if (flag)
+		setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+	else
+		setViewport(new QWidget);
 }
 
 /*!

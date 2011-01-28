@@ -57,4 +57,5 @@ void LineardialGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     m_widget->setDialFile(m->getDialFile()); // Triggers widget repaint
     m_widget->setDialFont(m->getFont());
     m_widget->connectInput(m->getSourceDataObject(), m->getSourceObjectField());
+	m_widget->enableOpenGL(m->useOpenGL());
 }

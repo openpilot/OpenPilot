@@ -69,6 +69,7 @@ public:
     void setN2Move( QString move) { needle2Move = move; }
     void setN3Move( QString move) { needle3Move = move; }
     void setFont(QString text) { font = text; }
+	void setUseOpenGL(bool flag) { useOpenGLFlag = flag; }
 
 
     //get dial configuration functions
@@ -97,6 +98,7 @@ public:
     QString getN2Move() { return needle2Move; }
     QString getN3Move() { return needle3Move; }
     QString getFont() { return font;}
+	bool useOpenGL() { return useOpenGLFlag; }
 
     void saveConfig(QSettings* settings) const;
     IUAVGadgetConfiguration *clone();
@@ -134,6 +136,8 @@ private:
     QString needle1Move;
     QString needle2Move;
     QString needle3Move;
+
+	bool useOpenGLFlag;
 };
 
 #endif // DIALGADGETCONFIGURATION_H

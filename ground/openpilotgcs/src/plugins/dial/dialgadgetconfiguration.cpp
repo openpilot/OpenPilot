@@ -58,8 +58,10 @@ DialGadgetConfiguration::DialGadgetConfiguration(QString classId, QSettings* qSe
     if(qSettings != 0) {
         QString dialFile = qSettings->value("dialFile").toString();
 
-        m_defaultDial=Utils::PathUtils().InsertDataPath(dialFile);
-        dialBackgroundID = qSettings->value("dialBackgroundID").toString();
+		useOpenGLFlag = qSettings->value("useOpenGLFlag").toBool();
+
+		m_defaultDial=Utils::PathUtils().InsertDataPath(dialFile);
+		dialBackgroundID = qSettings->value("dialBackgroundID").toString();
         dialForegroundID = qSettings->value("dialForegroundID").toString();
         dialNeedleID1 = qSettings->value("dialNeedleID1").toString();
         dialNeedleID2 = qSettings->value("dialNeedleID2").toString();
@@ -93,7 +95,8 @@ DialGadgetConfiguration::DialGadgetConfiguration(QString classId, QSettings* qSe
 IUAVGadgetConfiguration *DialGadgetConfiguration::clone()
 {
     DialGadgetConfiguration *m = new DialGadgetConfiguration(this->classId());
-    m->m_defaultDial=m_defaultDial;
+	m->useOpenGLFlag = useOpenGLFlag;
+	m->m_defaultDial=m_defaultDial;
     m->setDialBackgroundID(dialBackgroundID);
     m->setDialForegroundID(dialForegroundID);
     m->setDialNeedleID1(dialNeedleID1);
@@ -130,7 +133,9 @@ void DialGadgetConfiguration::saveConfig(QSettings* settings) const {
     QString dialFile = Utils::PathUtils().RemoveDataPath(m_defaultDial);
     settings->setValue("dialFile", dialFile);
 
-    settings->setValue("dialBackgroundID", dialBackgroundID);
+	settings->setValue("useOpenGLFlag", useOpenGLFlag);
+
+	settings->setValue("dialBackgroundID", dialBackgroundID);
     settings->setValue("dialForegroundID", dialForegroundID);
 
     settings->setValue("dialNeedleID1", dialNeedleID1);

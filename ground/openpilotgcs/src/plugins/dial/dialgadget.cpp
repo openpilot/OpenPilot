@@ -53,6 +53,8 @@ void DialGadget::loadConfiguration(IUAVGadgetConfiguration* config)
                           m->dialNeedle2(),m->dialNeedle3(),m->getN1Move(), m->getN2Move(),
                           m->getN3Move());
 
+	m_widget->enableOpenGL(m->useOpenGL());
+
     m_widget->setN1Min(m->getN1Min());
     m_widget->setN1Max(m->getN1Max());
     m_widget->setN1Factor(m->getN1Factor());

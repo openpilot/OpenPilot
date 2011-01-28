@@ -71,6 +71,9 @@ GCSControlGadgetWidget::GCSControlGadgetWidget(QWidget *parent) : QLabel(parent)
     leftY = 0;
     rightX = 0;
     rightY = 0;
+
+	m_gcscontrol->widgetLeftStick->enableOpenGL(true);
+	m_gcscontrol->widgetRightStick->enableOpenGL(true);
 }
 
 GCSControlGadgetWidget::~GCSControlGadgetWidget()

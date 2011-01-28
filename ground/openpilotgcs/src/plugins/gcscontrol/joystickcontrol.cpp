@@ -35,6 +35,7 @@
 #include <QtGui/QPushButton>
 #include <QtGui/QMessageBox>
 #include <QMouseEvent>
+#include <QtOpenGL/QGLWidget>
 #include <QtGlobal>
 
 /**
@@ -71,6 +72,17 @@ JoystickControl::JoystickControl(QWidget *parent) :
 JoystickControl::~JoystickControl()
 {
 
+}
+
+/*!
+  \brief Enables/Disables OpenGL
+  */
+void JoystickControl::enableOpenGL(bool flag)
+{
+	if (flag)
+		setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+	else
+		setViewport(new QWidget);
 }
 
 /**

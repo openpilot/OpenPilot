@@ -48,74 +48,74 @@ plugin_uavtalk.depends += plugin_coreplugin
 # OPMap UAVGadget
 plugin_opmap.subdir = opmap
 plugin_opmap.depends = plugin_coreplugin
-plugin_opmap.depends = plugin_uavobjects
+plugin_opmap.depends += plugin_uavobjects
 SUBDIRS += plugin_opmap
 
 # Scope UAVGadget
 plugin_scope.subdir = scope
 plugin_scope.depends = plugin_coreplugin
-plugin_scope.depends = plugin_uavobjects
+plugin_scope.depends += plugin_uavobjects
 SUBDIRS += plugin_scope
 
 # UAVObject Browser Gadget
 plugin_uavobjectbrowser.subdir = uavobjectbrowser
 plugin_uavobjectbrowser.depends = plugin_coreplugin
-plugin_uavobjectbrowser.depends = plugin_uavobjects
+plugin_uavobjectbrowser.depends += plugin_uavobjects
 SUBDIRS += plugin_uavobjectbrowser
 
 # ModelView UAVGadget
 plugin_modelview.subdir = modelview
 plugin_modelview.depends = plugin_coreplugin
-plugin_modelview.depends = plugin_uavobjects
+plugin_modelview.depends += plugin_uavobjects
 SUBDIRS += plugin_modelview
 
 #Uploader Gadget
 plugin_uploader.subdir = uploader
 plugin_uploader.depends = plugin_coreplugin
-plugin_modelview.depends = plugin_uavobjects
-plugin_modelview.depends = plugin_rawhid
+plugin_uploader.depends += plugin_uavobjects
+plugin_uploader.depends += plugin_rawhid
 SUBDIRS += plugin_uploader
 
 #Dial Gadget
 plugin_dial.subdir = dial
 plugin_dial.depends = plugin_coreplugin
-plugin_dial.depends = plugin_uavobjects
+plugin_dial.depends += plugin_uavobjects
 SUBDIRS += plugin_dial
 
 #Linear Dial Gadget
 plugin_lineardial.subdir = lineardial
 plugin_lineardial.depends = plugin_coreplugin
-plugin_lineardial.depends = plugin_uavobjects
+plugin_lineardial.depends += plugin_uavobjects
 SUBDIRS += plugin_lineardial
 
 #System health Gadget
 plugin_systemhealth.subdir = systemhealth
 plugin_systemhealth.depends = plugin_coreplugin
-plugin_systemhealth.depends = plugin_uavobjects
+plugin_systemhealth.depends += plugin_uavobjects
 SUBDIRS += plugin_systemhealth
 
 #Notify Gadget
 plugin_notify.subdir = notify
 plugin_notify.depends = plugin_coreplugin
-plugin_notify.depends = plugin_uavobjects
+plugin_notify.depends += plugin_uavobjects
 SUBDIRS += plugin_notify
 
 #Config Gadget
 plugin_config.subdir = config
 plugin_config.depends = plugin_coreplugin
-plugin_config.depends = plugin_uavobjects
+plugin_config.depends += plugin_uavobjects
 SUBDIRS += plugin_config
 
 #GPS Display Gadget
 plugin_gpsdisplay.subdir = gpsdisplay
 plugin_gpsdisplay.depends = plugin_coreplugin
-plugin_gpsdisplay.depends = plugin_uavtalk
+plugin_gpsdisplay.depends += plugin_uavtalk
 SUBDIRS += plugin_gpsdisplay
 
 # Primary Flight Display (PFD) Gadget
 plugin_pfd.subdir = pfd
 plugin_pfd.depends = plugin_coreplugin
-plugin_pfd.depends = plugin_uavobjects
+plugin_pfd.depends += plugin_uavobjects
 SUBDIRS += plugin_pfd
 
 
@@ -154,7 +154,7 @@ SUBDIRS += plugin_gcscontrol
 # Antenna tracker
 #plugin_antennatrack.subdir = antennatrack
 #plugin_antennatrack.depends = plugin_coreplugin
-#plugin_antennatrack.depends = plugin_uavtalk
+#plugin_antennatrack.depends += plugin_uavtalk
 #SUBDIRS += plugin_antennatrack
 
 #PipXtreme Gadget

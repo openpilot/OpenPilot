@@ -255,8 +255,9 @@ ahrs_%: uavobjects_flight
 .PHONY: coptercontrol
 coptercontrol: coptercontrol_elf
 
-coptercontrol_%: uavobjects
+coptercontrol_%: uavobjgenerator
 	mkdir -p $(BUILD_DIR)/coptercontrol
+	$(MAKE) OUTDIR="$(BUILD_DIR)/coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/CopterControl uavobjects
 	$(MAKE) OUTDIR="$(BUILD_DIR)/coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/CopterControl $*
 
 .PHONY: pipxtreme

@@ -42,6 +42,7 @@ void PIOS_ADC_Init();
 void PIOS_ADC_Config(uint32_t oversampling);
 int32_t PIOS_ADC_PinGet(uint32_t pin);
 int16_t * PIOS_ADC_GetRawBuffer(void);
+uint8_t PIOS_ADC_GetOverSampling(void);
 void PIOS_ADC_SetCallback(ADCCallback new_function);
 extern void PIOS_ADC_DMA_Handler(void);
 

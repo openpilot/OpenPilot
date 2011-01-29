@@ -60,6 +60,7 @@
 // For debugging the raw sensors
 //#define DUMP_RAW
 //#define DUMP_EKF
+//#define PIP_DUMP_RAW
 
 volatile int8_t ahrs_algorithm;
 
@@ -419,6 +420,7 @@ void print_ekf_binary() {}
 /**
  * @brief Debugging function to output all the ADC samples 
  */
+#if defined(DUMP_RAW)
 void print_ahrs_raw() 
 {
 	int result;
@@ -455,6 +457,77 @@ void print_ahrs_raw()
 		PIOS_LED_On(LED1);
 	}	
 }
+#endif
+
+#if defined(PIP_DUMP_RAW)
+
+	#define MAX_OVERSAMPLING	PIOS_ADC_MAX_OVERSAMPLING
+
+	void print_ahrs_raw()
+	{
+		int16_t accel_x[MAX_OVERSAMPLING], accel_y[MAX_OVERSAMPLING], accel_z[MAX_OVERSAMPLING];
+		int16_t  gyro_x[MAX_OVERSAMPLING],  gyro_y[MAX_OVERSAMPLING],  gyro_z[MAX_OVERSAMPLING];
+		#if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
+			int16_t mag[3];
+			int16_t mag_x, mag_y, mag_z;
+		#endif
+
+		static int previous_conversion = 0;
+
+		uint8_t framing[3] = {0xD2, 0x73, 0x00};
+
+		// wait for new raw samples
+		while (previous_conversion == total_conversion_blocks);
+		if ((previous_conversion + 1) != total_conversion_blocks)
+			PIOS_LED_On(LED1);                              // we are not keeping up
+		previous_conversion = total_conversion_blocks;
+
+		// fetch the buffer address for the new samples
+		int16_t *valid_data_buffer = PIOS_ADC_GetRawBuffer();
+
+		// fetch number of raw samples in the buffer (per channel)
+		int over_sampling = PIOS_ADC_GetOverSampling();
+
+		framing[2] = over_sampling;
+
+		// copy the raw samples into their own buffers
+		for (uint16_t i = 0, j = 0; i < over_sampling; i++, j += PIOS_ADC_NUM_CHANNELS)
+		{
+			accel_x[i] = valid_data_buffer[j + 0];
+			accel_y[i] = valid_data_buffer[j + 2];
+			accel_z[i] = valid_data_buffer[j + 4];
+
+			gyro_x[i] = valid_data_buffer[j + 3];
+			gyro_y[i] = valid_data_buffer[j + 1];
+			gyro_z[i] = valid_data_buffer[j + 5];
+		}
+
+		#if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
+			if (PIOS_HMC5843_NewDataAvailable())
+			{
+				PIOS_HMC5843_ReadMag(mag);
+
+				mag_x = mag[MAG_RAW_X_IDX];
+				mag_y = mag[MAG_RAW_Y_IDX];
+				mag_z = mag[MAG_RAW_Z_IDX];
+			}
+		#endif
+
+		// send the raw samples
+		int result = PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, framing, sizeof(framing));
+		result += PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, (uint8_t *)accel_x, over_sampling * sizeof(accel_x[0]));
+		result += PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, (uint8_t *)accel_y, over_sampling * sizeof(accel_y[0]));
+		result += PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, (uint8_t *)accel_z, over_sampling * sizeof(accel_z[0]));
+		result += PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, (uint8_t *)gyro_x, over_sampling * sizeof(gyro_x[0]));
+		result += PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, (uint8_t *)gyro_y, over_sampling * sizeof(gyro_y[0]));
+		result += PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, (uint8_t *)gyro_z, over_sampling * sizeof(gyro_z[0]));
+
+		if (result != 0)
+			PIOS_LED_On(LED1);          // all data not sent
+		else
+			PIOS_LED_Off(LED1);
+	}
+#endif
 
 /**
  * @brief AHRS Main function
@@ -525,7 +598,7 @@ for all data to be up to date before doing anything*/
 
 	calibration_callback(AHRSCalibrationHandle()); //force an update
 
-#ifdef DUMP_RAW
+#if defined(DUMP_RAW) || defined(PIP_DUMP_RAW)
 	while (1) {
 		AhrsPoll();
 		print_ahrs_raw();

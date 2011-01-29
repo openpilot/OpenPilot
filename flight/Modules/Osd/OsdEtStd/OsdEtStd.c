@@ -250,12 +250,14 @@ static bool Write(uint32_t start, uint8_t length, const uint8_t * buffer)
 static uint32_t ReadSwVersion(void)
 {
 	uint8_t buf[4];
-	uint32_t version = 0;
+	uint32_t version;
 
 	if (Read(0, 4, buf)) {
 		version = (buf[0] - '0') * 100;
 		version += (buf[2] - '0') * 10;
 		version += (buf[3] - '0');
+	} else {
+		version = 0;
 	}
 
 	return version;
@@ -381,12 +383,19 @@ static void Task(void *parameters)
 	FlightBatteryStateConnectCallback(FlightBatteryStateUpdatedCb);
 
 	DEBUG_MSG("OSD ET Std\n");
-	version = ReadSwVersion();
-	DEBUG_MSG("SW: %d\n", version);
 
-	if (version != 115) {
-		DEBUG_MSG("INVALID SW VERSION\n");
-		return;
+	// Wait until OSD is detected
+	while(1) {
+		version = ReadSwVersion();
+		DEBUG_MSG("SW: %d ", version);
+
+		if (version == 115) {
+			DEBUG_MSG("OK\n");
+			break;
+		} else {
+			DEBUG_MSG("INVALID\n");
+			vTaskDelay(1000 / portTICK_RATE_MS);
+		}
 	}
 
 	UpdateConfig();

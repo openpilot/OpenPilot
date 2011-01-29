@@ -65,30 +65,6 @@ MODULES = Telemetry ManualControl Actuator CCAttitude #Stabilization
 #MODULES = Telemetry
 #MODULES += Osd/OsdEtStd
 
-# List of UAVObjects to include
-UAVOBJECTS = ObjectPersistence
-UAVOBJECTS += GCSTelemetryStats
-UAVOBJECTS += FlightTelemetryStats
-UAVOBJECTS += SystemStats
-UAVOBJECTS += SystemAlarms
-UAVOBJECTS += SystemSettings
-UAVOBJECTS += ActuatorCommand
-UAVOBJECTS += ActuatorDesired
-UAVOBJECTS += AttitudeRaw
-UAVOBJECTS += AttitudeActual
-UAVOBJECTS += AttitudeDesired
-UAVOBJECTS += ManualControlCommand
-UAVOBJECTS += TaskInfo
-UAVOBJECTS += I2CStats
-UAVOBJECTS += WatchdogStatus
-UAVOBJECTS += TelemetrySettings
-UAVOBJECTS += StabilizationSettings
-UAVOBJECTS += ActuatorSettings
-UAVOBJECTS += RateDesired
-UAVOBJECTS += AHRSSettings
-UAVOBJECTS += ManualControlSettings
-UAVOBJECTS += MixerSettings
-UAVOBJECTS += MixerStatus
 
 # MCU name, submodel and board
 # - MCU used for compiler-option (-mcpu)
@@ -106,20 +82,7 @@ BOOT_MODEL    = $(MODEL)_NB
 endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-ROOT_DIR = $(CURDIR)/../..
-BUILD_DIR = $(ROOT_DIR)/build
-OUTDIR = $(BUILD_DIR)/coptercontrol
-
-# We almost need to consider autoconf/automake instead of this
-# I don't know if windows supports uname :-(
-UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/debug/uavobjgenerator.exe"
-UNAME := $(shell uname)
-ifeq ($(UNAME), Linux)
-  UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/uavobjgenerator"
-endif
-ifeq ($(UNAME), Darwin)
-  UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/uavobjgenerator"
-endif
+OUTDIR = ../../build/coptercontrol
 
 # Target file name (without extension).
 TARGET = CopterControl
@@ -168,7 +131,7 @@ PYMITEINC += $(OUTDIR)
 FLIGHTPLANLIB = $(OPMODULEDIR)/FlightPlan/lib
 FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
 
-OPUAVSYNTHDIR = $(OUTDIR)/uavobject-synthetics/flight
+OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
@@ -187,8 +150,7 @@ SRC += $(OPSYSTEM)/alarms.c
 SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
-#SRC += $(OPUAVOBJ)/uavobjectsinit_cc.c
-#will use uavobjectsinit.c generated specially for CopterControl instead
+SRC += $(OPUAVOBJ)/uavobjectsinit_cc.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
 else
 ## TESTCODE
@@ -200,7 +162,33 @@ endif
 
 ## UAVOBJECTS
 ifndef TESTAPP
-SRC += $(wildcard $(OPUAVSYNTHDIR)/*.c)
+SRC += $(OPUAVSYNTHDIR)/objectpersistence.c
+SRC += $(OPUAVSYNTHDIR)/gcstelemetrystats.c
+SRC += $(OPUAVSYNTHDIR)/flighttelemetrystats.c
+SRC += $(OPUAVSYNTHDIR)/systemstats.c
+SRC += $(OPUAVSYNTHDIR)/systemalarms.c
+SRC += $(OPUAVSYNTHDIR)/systemsettings.c
+SRC += $(OPUAVSYNTHDIR)/stabilizationsettings.c
+SRC += $(OPUAVSYNTHDIR)/actuatorcommand.c
+SRC += $(OPUAVSYNTHDIR)/actuatordesired.c
+SRC += $(OPUAVSYNTHDIR)/actuatorsettings.c
+SRC += $(OPUAVSYNTHDIR)/attituderaw.c
+SRC += $(OPUAVSYNTHDIR)/attitudeactual.c
+SRC += $(OPUAVSYNTHDIR)/attitudedesired.c
+SRC += $(OPUAVSYNTHDIR)/manualcontrolcommand.c
+SRC += $(OPUAVSYNTHDIR)/taskinfo.c
+SRC += $(OPUAVSYNTHDIR)/i2cstats.c
+SRC += $(OPUAVSYNTHDIR)/watchdogstatus.c
+SRC += $(OPUAVSYNTHDIR)/telemetrysettings.c
+SRC += $(OPUAVSYNTHDIR)/ratedesired.c
+SRC += $(OPUAVSYNTHDIR)/manualcontrolsettings.c
+SRC += $(OPUAVSYNTHDIR)/mixersettings.c
+SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
+SRC += $(OPUAVSYNTHDIR)/ahrssettings.c
+#${wildcard ${OBJ}/$(shell echo $(VAR) | tr A-Z a-z)/*.c}
+#SRC += ${foreach OBJ, ${UAVOBJECTS}, $(UAVOBJECTS)/$(OBJ).c}
+# Cant use until i can automatically generate list of UAVObjects
+#SRC += ${OUTDIR}/InitObjects.c
 endif
 
 ## PIOS Hardware (STM32F10x)
@@ -610,7 +598,7 @@ endif
 
 
 # Generate intermediate code for objects
-gencode: ${OUTDIR}/InitMods.c
+gencode: ${OUTDIR}/InitObjects.c ${OUTDIR}/InitMods.c
 
 # Generate code for object initialization
 ${OUTDIR}/InitObjects.c: Makefile
@@ -825,23 +813,9 @@ else
 -include $(shell mkdir -p $(OUTDIR) 2>/dev/null) $(shell mkdir $(OUTDIR)/dep 2>/dev/null) $(wildcard $(OUTDIR)/dep/*)
 endif
 
-UAVOBJ_XML_DIR := $(ROOT_DIR)/shared/uavobjectdefinition
-UAVOBJ_OUT_DIR := $(OUTDIR)/uavobject-synthetics
 
-$(UAVOBJ_OUT_DIR):
-ifdef ComSpec
-	$(shell md $(subst /,\\,$@) 2>NUL)
-else
-	$(shell mkdir -p $@ 2>/dev/null)
-endif
-
-uavobjects: $(UAVOBJ_OUT_DIR)
-	( cd $(UAVOBJ_OUT_DIR) ; \
-	  $(REMOVE) $(wildcard $(OPUAVSYNTHDIR)/*.c) ; \
-	  $(UAVOBJGENERATOR) -flight $(UAVOBJ_XML_DIR) $(ROOT_DIR) $(UAVOBJECTS); \
-	)
 
 # Listing of phony targets.
 .PHONY : all begin finish end sizebefore sizeafter gccversion \
-build elf hex bin lss sym clean clean_list program gencode uavobjects
+build elf hex bin lss sym clean clean_list program gencode
 

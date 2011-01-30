@@ -266,6 +266,9 @@ void ConnectionManager::suspendPolling()
     foreach (IConnection* cnx, m_connectionsList) {
         cnx->suspendPolling();
     }
+
+	m_connectBtn->setEnabled(false);
+	m_availableDevList->setEnabled(false);
 }
 
 /**
@@ -277,6 +280,9 @@ void ConnectionManager::resumePolling()
     foreach (IConnection* cnx, m_connectionsList) {
         cnx->resumePolling();
     }
+
+	m_connectBtn->setEnabled(true);
+	m_availableDevList->setEnabled(true);
 }
 
 

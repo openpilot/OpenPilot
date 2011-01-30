@@ -46,6 +46,8 @@ public:
 	bool isNowPlaying; //
 	bool firstStart;
 
+	void copyTo(NotifyPluginConfiguration*) const;
+
 	QString getSound1() const { return sound1; }
 	void setSound1(QString text) {sound1 = text; }
 

@@ -66,6 +66,8 @@ public:
     SettingsDatabase *settingsDatabase() const;
     void readMainSettings(QSettings* qs);
     void saveMainSettings(QSettings* qs);
+    void readSettings(IConfigurablePlugin* plugin, QSettings* qs = 0 );
+    void saveSettings(IConfigurablePlugin* plugin, QSettings* qs = 0 );
 
     QString resourcePath() const;
 

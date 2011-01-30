@@ -32,6 +32,7 @@
 
 
 NotifyPluginConfiguration::NotifyPluginConfiguration(QObject *parent) :
+	QObject(parent),
 	isNowPlaying(0),
 	firstStart(1),
 	soundCollectionPath(""),
@@ -51,6 +52,27 @@ NotifyPluginConfiguration::NotifyPluginConfiguration(QObject *parent) :
 {
 	timer = NULL;
 	expireTimer = NULL;
+}
+
+void NotifyPluginConfiguration::copyTo(NotifyPluginConfiguration* that) const
+{
+
+	that->isNowPlaying = isNowPlaying;
+	that->firstStart = firstStart;
+	that->soundCollectionPath = soundCollectionPath;
+	that->currentLanguage = currentLanguage;
+	that->soundCollectionPath = soundCollectionPath;
+	that->dataObject = dataObject;
+	that->objectField = objectField;
+	that->value = value;
+	that->sound1 = sound1;
+	that->sound2 = sound2;
+	that->sound3 = sound3;
+	that->sayOrder = sayOrder;
+	that->spinBoxValue = spinBoxValue;
+	that->repeatString = repeatString;
+	that->repeatTimeout = repeatTimeout;
+	that->expireTimeout = expireTimeout;
 }
 
 

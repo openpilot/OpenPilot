@@ -28,15 +28,16 @@
 #define SOUNDNOTIFYPLUGIN_H
 
 #include <extensionsystem/iplugin.h> 
+#include <coreplugin/iconfigurableplugin.h>
 #include "uavtalk/telemetrymanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
+#include "notifypluginconfiguration.h"
 
 #include <QSettings>
 #include <phonon>
 
 class NotifyPluginOptionsPage;
-class NotifyPluginConfiguration;
 
 typedef struct {
 	Phonon::MediaObject* mo;
@@ -44,7 +45,7 @@ typedef struct {
         bool firstPlay;
 } PhononObject, *pPhononObject;
 
-class SoundNotifyPlugin : public ExtensionSystem::IPlugin
+class SoundNotifyPlugin : public Core::IConfigurablePlugin
 { 
 	Q_OBJECT
 public: 
@@ -53,11 +54,14 @@ public:
 
    void extensionsInitialized(); 
    bool initialize(const QStringList & arguments, QString * errorString); 
+   void readConfig( QSettings* qSettings, Core::UAVConfigInfo *configInfo);
+   void saveConfig( QSettings* qSettings, Core::UAVConfigInfo *configInfo);
    void shutdown();
 
 
    QList<NotifyPluginConfiguration*> getListNotifications() { return lstNotifications; }
    //void setListNotifications(QList<NotifyPluginConfiguration*>& list_notify) {  }
+   NotifyPluginConfiguration* getCurrentNotification(){ return &currentNotification;}
 
    bool getEnableSound() const { return enableSound; }
    void setEnableSound(bool value) {enableSound = value; }
@@ -65,6 +69,7 @@ public:
 
 
 private:
+   bool configured; // just for migration,delete later
    bool enableSound;
    QList< QList<Phonon::MediaSource>* > lstMediaSource;
    QStringList mediaSource;
@@ -79,6 +84,7 @@ private:
    QList<NotifyPluginConfiguration*> pendingNotifications;
    QList<NotifyPluginConfiguration*> removedNotifies;
 
+   NotifyPluginConfiguration currentNotification;
    NotifyPluginConfiguration* nowPlayingConfiguration;
 
    QString m_field;
@@ -88,6 +94,7 @@ private:
 
    bool playNotification(NotifyPluginConfiguration* notification);
    void checkNotificationRule(NotifyPluginConfiguration* notification, UAVObject* object);
+   void readConfig_0_0_0();
 
 private slots:
    void onTelemetryManagerAdded(QObject* obj);

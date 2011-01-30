@@ -62,6 +62,7 @@
 #include "baseview.h"
 #include "ioutputpane.h"
 #include "icorelistener.h"
+#include "iconfigurableplugin.h"
 
 #include <coreplugin/settingsdatabase.h>
 #include <utils/pathchooser.h>
@@ -998,13 +999,11 @@ static const char *colorKey = "Color";
 static const char *maxKey = "Maximized";
 static const char *fullScreenKey = "FullScreen";
 
-void MainWindow::readSettings()
-{
-    readSettings(m_settings);
-}
-
 void MainWindow::readSettings(QSettings* qs)
 {
+    if ( !qs ){
+        qs = m_settings;
+    }
 
     m_actionManager->readSettings(qs);
 
@@ -1036,13 +1035,13 @@ void MainWindow::readSettings(QSettings* qs)
 
 }
 
-void MainWindow::saveSettings()
-{
-    saveSettings(m_settings);
-}
 
 void MainWindow::saveSettings(QSettings* qs)
 {
+    if ( !qs ){
+        qs = m_settings;
+    }
+
     m_workspaceSettings->saveSettings(qs);
 
     qs->beginGroup(QLatin1String(settingsGroup));
@@ -1066,6 +1065,49 @@ void MainWindow::saveSettings(QSettings* qs)
 
     m_viewManager->saveSettings(qs);
     m_actionManager->saveSettings(qs);
+
+}
+
+void MainWindow::readSettings(IConfigurablePlugin* plugin, QSettings* qs)
+{
+    if ( !qs ){
+        qs = m_settings;
+    }
+
+    UAVConfigInfo configInfo;
+    QObject* qo = reinterpret_cast<QObject *>(plugin);
+    QString configName = qo->metaObject()->className();
+
+    qs->beginGroup("Plugins");
+    qs->beginGroup(configName);
+    configInfo.read(qs);
+    configInfo.setNameOfConfigurable("Plugin-"+configName);
+    qs->beginGroup("data");
+    plugin->readConfig(qs, &configInfo);
+
+    qs->endGroup();
+    qs->endGroup();
+    qs->endGroup();
+
+}
+
+void MainWindow::saveSettings(IConfigurablePlugin* plugin, QSettings* qs)
+{
+    if ( !qs ){
+        qs = m_settings;
+    }
+
+    UAVConfigInfo configInfo;
+    QString configName = plugin->metaObject()->className();
+
+    qs->beginGroup("Plugins");
+    qs->beginGroup(configName);
+    qs->beginGroup("data");
+    plugin->saveConfig(qs, &configInfo);
+    qs->endGroup();
+    configInfo.save(qs);
+    qs->endGroup();
+    qs->endGroup();
 
 }
 

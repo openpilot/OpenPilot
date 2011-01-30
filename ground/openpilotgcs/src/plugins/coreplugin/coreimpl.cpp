@@ -196,3 +196,12 @@ void CoreImpl::saveMainSettings(QSettings* qs)
     m_mainwindow->saveSettings(qs);
 }
 
+void CoreImpl::readSettings(IConfigurablePlugin* plugin, QSettings* qs)
+{
+    m_mainwindow->readSettings(plugin, qs);
+}
+void CoreImpl::saveSettings(IConfigurablePlugin* plugin, QSettings* qs)
+{
+    m_mainwindow->saveSettings(plugin, qs);
+}
+

@@ -125,7 +125,8 @@ HEADERS += mainwindow.h \
     uavgadgetdecorator.h \
     workspacesettings.h \
     uavconfiginfo.h \
-    authorsdialog.h
+    authorsdialog.h \
+    iconfigurableplugin.h
 FORMS += dialogs/settingsdialog.ui \
     dialogs/shortcutsettings.ui \
     generalsettings.ui \

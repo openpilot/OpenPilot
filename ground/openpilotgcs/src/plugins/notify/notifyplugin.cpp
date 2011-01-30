@@ -38,16 +38,20 @@
 #include <iostream>
 #include "qxttimer.h"
 
+static const QString VERSION = "1.0.0";
+
 //#define DEBUG_NOTIFIES
 
 SoundNotifyPlugin::SoundNotifyPlugin()
 {
 	phonon.mo = NULL;
+        configured = false;
    // Do nothing
 }
 
 SoundNotifyPlugin::~SoundNotifyPlugin()
 {
+    Core::ICore::instance()->saveSettings(this);
     if (phonon.mo != NULL)
         delete phonon.mo;
    // Do nothing
@@ -66,26 +70,96 @@ bool SoundNotifyPlugin::initialize(const QStringList& args, QString *errMsg)
 
 void SoundNotifyPlugin::extensionsInitialized()
 { 
-	settings = Core::ICore::instance()->settings();
-	settings->beginGroup(QLatin1String("NotifyPlugin"));
-
-	// read list of notifications from settings
-	int size = settings->beginReadArray("listNotifies");
-	for (int i = 0; i < size; ++i) {
-		 settings->setArrayIndex(i);
-		 NotifyPluginConfiguration* notification = new NotifyPluginConfiguration;
-		 notification->restoreState(settings);
-		 lstNotifications.append(notification);
-	}
-	settings->endArray();
-	setEnableSound(settings->value(QLatin1String("EnableSound"),0).toBool());
-	settings->endGroup();
+        Core::ICore::instance()->readSettings(this);
+        if ( !configured ){
+            readConfig_0_0_0();
+        }
 
 	ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
 	connect(pm, SIGNAL(objectAdded(QObject*)), this, SLOT(onTelemetryManagerAdded(QObject*)));
 	removedNotifies.clear();
 	connectNotifications();
 } 
+
+void SoundNotifyPlugin::saveConfig( QSettings* settings, UAVConfigInfo *configInfo){
+
+    configInfo->setVersion(VERSION);
+
+    settings->beginWriteArray("Current");
+    settings->setArrayIndex(0);
+    currentNotification.saveState(settings);
+    settings->endArray();
+
+    settings->beginGroup("listNotifies");
+    settings->remove("");
+    settings->endGroup();
+
+    settings->beginWriteArray("listNotifies");
+    for (int i = 0; i < lstNotifications.size(); i++) {
+            settings->setArrayIndex(i);
+            lstNotifications.at(i)->saveState(settings);
+    }
+    settings->endArray();
+    settings->setValue(QLatin1String("EnableSound"), enableSound);
+
+}
+
+void SoundNotifyPlugin::readConfig( QSettings* settings, UAVConfigInfo *configInfo){
+
+    if ( configInfo->version() == UAVConfigVersion() ){
+        // Just for migration to the new format.
+        configured = false;
+        return;
+    }
+
+    settings->beginReadArray("Current");
+    settings->setArrayIndex(0);
+    currentNotification.restoreState(settings);
+    settings->endArray();
+
+    // read list of notifications from settings
+    int size = settings->beginReadArray("listNotifies");
+    for (int i = 0; i < size; ++i) {
+             settings->setArrayIndex(i);
+             NotifyPluginConfiguration* notification = new NotifyPluginConfiguration;
+             notification->restoreState(settings);
+             lstNotifications.append(notification);
+    }
+    settings->endArray();
+    setEnableSound(settings->value(QLatin1String("EnableSound"),0).toBool());
+
+    configured = true;
+}
+
+void SoundNotifyPlugin::readConfig_0_0_0(){
+
+       settings = Core::ICore::instance()->settings();
+       settings->beginGroup(QLatin1String("NotifyPlugin"));
+
+       settings->beginReadArray("Current");
+       settings->setArrayIndex(0);
+       currentNotification.restoreState(settings);
+       settings->endArray();
+
+       // read list of notifications from settings
+       int size = settings->beginReadArray("listNotifies");
+       for (int i = 0; i < size; ++i) {
+                settings->setArrayIndex(i);
+                NotifyPluginConfiguration* notification = new NotifyPluginConfiguration;
+                notification->restoreState(settings);
+                lstNotifications.append(notification);
+       }
+       settings->endArray();
+       setEnableSound(settings->value(QLatin1String("EnableSound"),0).toBool());
+       settings->endGroup();
+	
+	ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
+	connect(pm, SIGNAL(objectAdded(QObject*)), this, SLOT(onTelemetryManagerAdded(QObject*)));
+	removedNotifies.clear();
+	connectNotifications();
+	
+	configured = true;
+     }
 
 void SoundNotifyPlugin::onTelemetryManagerAdded(QObject* obj)
 {
@@ -140,6 +214,8 @@ void SoundNotifyPlugin::updateNotificationList(QList<NotifyPluginConfiguration*>
 	lstNotifications.clear();
 	lstNotifications=list;
 	connectNotifications();
+
+        Core::ICore::instance()->saveSettings(this);
 }
 
 void SoundNotifyPlugin::connectNotifications()
@@ -405,12 +481,12 @@ void SoundNotifyPlugin::stateChanged(Phonon::State newstate, Phonon::State oldst
 #endif
 
 #ifndef Q_OS_WIN
-    // This is a hack to force Linux to wait until the end of the
-    // wav file before moving to the next in the queue.
-    // I wish I did not have to go through a #define, but I did not
-    // manage to make this work on both platforms any other way!
-    if (phonon.mo->totalTime()>0)
-        phonon.mo->setTransitionTime(phonon.mo->totalTime());
+	// This is a hack to force Linux to wait until the end of the
+	// wav file before moving to the next in the queue.
+	// I wish I did not have to go through a #define, but I did not
+	// manage to make this work on both platforms any other way!
+	if (phonon.mo->totalTime()>0)
+	    phonon.mo->setTransitionTime(phonon.mo->totalTime());
 #endif
 	if((newstate  == Phonon::PausedState) ||
 	   (newstate  == Phonon::StoppedState))

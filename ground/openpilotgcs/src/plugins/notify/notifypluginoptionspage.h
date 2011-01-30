@@ -76,7 +76,6 @@ public:
 private:
 	UAVObjectManager *objManager;
 	SoundNotifyPlugin* owner;
-	QSettings* settings;
 	QStringList listDirCollections;
 	QStringList listSoundFiles;
 	QString currentCollectionPath;

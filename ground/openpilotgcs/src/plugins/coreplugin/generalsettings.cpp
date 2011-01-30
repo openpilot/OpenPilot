@@ -111,6 +111,7 @@ QWidget *GeneralSettings::createPage(QWidget *parent)
     QWidget *w = new QWidget(parent);
     m_page->setupUi(w);
 
+    /* TODO: Clean this: settings not used, Core::ICore::instance()->settings() shouldn't be used, since not externally configurable */
     QSettings* settings = Core::ICore::instance()->settings();
     fillLanguageBox();
 

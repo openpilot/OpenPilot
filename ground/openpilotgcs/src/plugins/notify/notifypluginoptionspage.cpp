@@ -30,6 +30,7 @@
 #include "notifypluginconfiguration.h"
 #include "ui_notifypluginoptionspage.h"
 #include "extensionsystem/pluginmanager.h"
+#include "utils/pathutils.h"
 
 #include <QFileDialog>
 #include <QtAlgorithms>
@@ -64,7 +65,6 @@ QWidget *NotifyPluginOptionsPage::createPage(QWidget *parent)
 	options_page->setupUi(optionsPageWidget);
 
 	delegateItems.clear();
-	privListNotifications.clear();
 	listSoundFiles.clear();
 
 	delegateItems << "Repeat Once"
@@ -78,9 +78,6 @@ QWidget *NotifyPluginOptionsPage::createPage(QWidget *parent)
 	options_page->SoundDirectoryPathChooser->setPromptDialogTitle(tr("Choose sound collection directory"));
 
 
-
-	settings = Core::ICore::instance()->settings();
-	settings->beginGroup(QLatin1String("NotifyPlugin"));
 
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 	objManager = pm->getObject<UAVObjectManager>();
@@ -111,23 +108,18 @@ QWidget *NotifyPluginOptionsPage::createPage(QWidget *parent)
 
 	//emit resetNotification();
 
-	int size = settings->beginReadArray("listNotifies");
-	for (int i = 0; i < size; ++i) {
-		 settings->setArrayIndex(i);
-		 NotifyPluginConfiguration* notification = new NotifyPluginConfiguration;
-		 notification->restoreState(settings);
+
+        privListNotifications.clear();
+
+        for (int i = 0; i < owner->getListNotifications().size(); ++i) {
+                 NotifyPluginConfiguration* notification = new NotifyPluginConfiguration();
+                 owner->getListNotifications().at(i)->copyTo(notification);
 		 privListNotifications.append(notification);
 	}
-	settings->endArray();
 
-	settings->beginReadArray("Current");
-	settings->setArrayIndex(0);
-	NotifyPluginConfiguration notification;
-	notification.restoreState(settings);
-	updateConfigView(&notification);
-	settings->endArray();
-	options_page->chkEnableSound->setChecked(settings->value(QLatin1String("EnableSound"),0).toBool());
-	settings->endGroup();
+        updateConfigView(owner->getCurrentNotification());
+
+        options_page->chkEnableSound->setChecked(owner->getEnableSound());
 
 	QStringList headerStrings;
 	headerStrings << "Name" << "Repeats" << "Lifetime,sec";
@@ -214,29 +206,8 @@ void NotifyPluginOptionsPage::getOptionsPageValues(NotifyPluginConfiguration* no
 ////////////////////////////////////////////
 void NotifyPluginOptionsPage::apply()
 {
-	NotifyPluginConfiguration notification;
 
-	settings->beginGroup(QLatin1String("NotifyPlugin"));
-
-	getOptionsPageValues(&notification);
-
-	settings->beginWriteArray("Current");
-	settings->setArrayIndex(0);
-	notification.saveState(settings);
-	settings->endArray();
-
-	settings->beginGroup("listNotifies");
-	settings->remove("");
-	settings->endGroup();
-
-	settings->beginWriteArray("listNotifies");
-	for (int i = 0; i < privListNotifications.size(); i++) {
-		settings->setArrayIndex(i);
-		privListNotifications.at(i)->saveState(settings);
-	}
-	settings->endArray();
-	settings->setValue(QLatin1String("EnableSound"), options_page->chkEnableSound->isChecked());
-	settings->endGroup();
+        getOptionsPageValues(owner->getCurrentNotification());
 
 	owner->setEnableSound(options_page->chkEnableSound->isChecked());
 	//owner->setListNotifications(privListNotifications);
@@ -352,7 +323,7 @@ void NotifyPluginOptionsPage::updateConfigView(NotifyPluginConfiguration* notifi
 	{
 		//QDir dir = QDir::currentPath();
 		//path = QDir::currentPath().left(QDir::currentPath().indexOf("OpenPilot",0,Qt::CaseSensitive))+"../share/sounds";
-		path = "../share/sounds";
+            path = Utils::PathUtils().InsertDataPath("%%DATAPATH%%sounds");
 	}
 	options_page->SoundDirectoryPathChooser->setPath(path);
 

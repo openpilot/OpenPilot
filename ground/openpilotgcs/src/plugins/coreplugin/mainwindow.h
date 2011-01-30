@@ -47,6 +47,7 @@ namespace Core {
 class ActionManager;
 class BaseMode;
 class BaseView;
+class IConfigurablePlugin;
 class IContext;
 class IMode;
 class IWizard;
@@ -93,8 +94,10 @@ public:
     void addContextObject(IContext *contex);
     void removeContextObject(IContext *contex);
     void resetContext();
-    void readSettings(QSettings* qs);
-    void saveSettings(QSettings* qs);
+    void readSettings(QSettings* qs = 0);
+    void saveSettings(QSettings* qs = 0);
+    void readSettings(IConfigurablePlugin* plugin, QSettings* qs = 0);
+    void saveSettings(IConfigurablePlugin* plugin, QSettings* qs = 0);
     void openFiles(const QStringList &fileNames);
 
     Core::ActionManager *actionManager() const;
@@ -166,8 +169,6 @@ private:
     void registerDefaultActions();
 
     void createWorkspaces();
-    void readSettings();
-    void saveSettings();
 
     CoreImpl *m_coreImpl;
     UniqueIDManager *m_uniqueIDManager;

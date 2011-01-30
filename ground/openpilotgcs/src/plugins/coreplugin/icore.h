@@ -54,6 +54,7 @@ class VariableManager;
 class ThreadManager;
 class UAVGadgetManager;
 class UAVGadgetInstanceManager;
+class IConfigurablePlugin;
 
 class CORE_EXPORT ICore : public QObject
 {
@@ -89,6 +90,8 @@ public:
     virtual SettingsDatabase *settingsDatabase() const = 0;
     virtual void readMainSettings(QSettings* qs) = 0;
     virtual void saveMainSettings(QSettings* qs) = 0;
+    virtual void readSettings(IConfigurablePlugin* plugin, QSettings* qs = 0) = 0;
+    virtual void saveSettings(IConfigurablePlugin* plugin, QSettings* qs = 0) = 0;
 
     virtual QString resourcePath() const = 0;
 

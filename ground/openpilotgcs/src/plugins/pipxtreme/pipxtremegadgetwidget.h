@@ -143,7 +143,6 @@ private:
     // currently connected QIODevice
     QIODevice *m_ioDevice;
 
-
     QString getPortDevice(const QString &friendName);
 
     void suspendTelemetry();
@@ -152,8 +151,11 @@ private:
     void processOutputStream();
     void processInputStream();
 
+	void disconnect(bool resume_polling);
+
 private slots:
-    void error(QString errorString,int errorNumber);
+	void connectDisconnect();
+	void error(QString errorString,int errorNumber);
     void goToAPIMode(UAVObject* = NULL, bool = false);
     void systemBoot();
     void getPorts();

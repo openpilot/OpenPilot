@@ -17,7 +17,6 @@ HEADERS += pipxtremegadget.h \
     pipxtremegadgetwidget.h \
     pipxtremeplugin.h \
     delay.h \
-    devicewidget.h \
     SSP/port.h \
     SSP/qssp.h \
     SSP/qsspt.h \

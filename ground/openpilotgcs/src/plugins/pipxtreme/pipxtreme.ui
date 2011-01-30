@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>570</width>
-    <height>381</height>
+    <height>407</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,8 +15,67 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="2" column="1">
+      <widget class="QLabel" name="label_15">
+       <property name="text">
+        <string>Serial Baudrate</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QComboBox" name="comboBox_SerialBaudrate">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QComboBox" name="comboBox_Ports">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>Set the PC port the modem is connected too</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="connectButton">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="mouseTracking">
+        <bool>true</bool>
+       </property>
+       <property name="toolTip">
+        <string>Connect to the modem (when normal telemetry is not used)</string>
+       </property>
+       <property name="text">
+        <string> Connect </string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QToolButton" name="refreshPorts">
+       <property name="toolTip">
+        <string>Refresh the list of serial and USB ports available</string>
+       </property>
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -29,70 +88,27 @@
        </property>
       </spacer>
      </item>
-     <item>
-      <widget class="QPushButton" name="connectButton">
-       <property name="enabled">
-        <bool>true</bool>
+     <item row="2" column="0">
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
-       <property name="mouseTracking">
-        <bool>true</bool>
-       </property>
-       <property name="toolTip">
-        <string>Tells the mainboard to go down
-to bootloader mode.
-(Only enabled if telemetry link is established, either
-through serial or USB)</string>
-       </property>
-       <property name="text">
-        <string> Connect </string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="comboBox_Ports">
-       <property name="minimumSize">
+       <property name="sizeHint" stdset="0">
         <size>
-         <width>200</width>
-         <height>0</height>
+         <width>40</width>
+         <height>20</height>
         </size>
        </property>
-       <property name="toolTip">
-        <string>When telemetry is not connected, select the communication
-method using this combo box.
-
-You can use this to force a communication channel when doing
-a &quot;Boot&quot; (button on the left). It is updated automatically when
-halting a running board.</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="refreshPorts">
-       <property name="toolTip">
-        <string>Refresh the list of serial ports</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
+      </spacer>
      </item>
     </layout>
    </item>
    <item>
-    <spacer name="verticalSpacer_2">
+    <widget class="Line" name="line">
      <property name="orientation">
-      <enum>Qt::Vertical</enum>
+      <enum>Qt::Horizontal</enum>
      </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>8</height>
-      </size>
-     </property>
-    </spacer>
+    </widget>
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
@@ -174,6 +190,9 @@ halting a running board.</string>
          <width>16777215</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>Serial number of the remote modem you want to pair with</string>
        </property>
        <property name="styleSheet">
         <string notr="true"/>
@@ -431,6 +450,9 @@ halting a running board.</string>
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>Set the modems serial port speed</string>
+       </property>
       </widget>
      </item>
      <item row="5" column="3">
@@ -440,6 +462,9 @@ halting a running board.</string>
          <width>16777215</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>Set the maximum TX output power the modem will use</string>
        </property>
        <property name="layoutDirection">
         <enum>Qt::LeftToRight</enum>
@@ -457,6 +482,9 @@ halting a running board.</string>
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>Set the maximum RF datarate/channel bandwidth the modem will use</string>
+       </property>
       </widget>
      </item>
      <item row="3" column="3">
@@ -472,6 +500,9 @@ halting a running board.</string>
          <width>16777215</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>Set the modems RF carrier frequency</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -506,6 +537,9 @@ halting a running board.</string>
          <width>16777215</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="toolTip">
+        <string>Calibrate the modems RF carrier frequency</string>
        </property>
        <property name="accelerated">
         <bool>true</bool>
@@ -583,6 +617,9 @@ halting a running board.</string>
          <height>16777215</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>Set the modems operating mode</string>
+       </property>
       </widget>
      </item>
     </layout>
@@ -602,7 +639,7 @@ halting a running board.</string>
      <item>
       <widget class="QLineEdit" name="lineEdit_AESKey">
        <property name="toolTip">
-        <string>The AES encryption key</string>
+        <string>The AES encryption key - has to be the same key on the remote modem as well)</string>
        </property>
        <property name="styleSheet">
         <string notr="true"/>
@@ -633,6 +670,9 @@ halting a running board.</string>
      </item>
      <item>
       <widget class="QCheckBox" name="checkBox_AESEnable">
+       <property name="toolTip">
+        <string>Enable/Disable AES encryption</string>
+       </property>
        <property name="layoutDirection">
         <enum>Qt::RightToLeft</enum>
        </property>
@@ -644,27 +684,18 @@ halting a running board.</string>
     </layout>
    </item>
    <item>
-    <spacer name="verticalSpacer_3">
+    <widget class="Line" name="line_2">
      <property name="orientation">
-      <enum>Qt::Vertical</enum>
+      <enum>Qt::Horizontal</enum>
      </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>8</height>
-      </size>
-     </property>
-    </spacer>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_11">
      <item>
       <widget class="QPushButton" name="pushButton_ScanSpectrum">
        <property name="toolTip">
-        <string>Scan whole band</string>
+        <string>Scan whole band to see where their is interference and/or used channels</string>
        </property>
        <property name="text">
         <string>  Scan Spectrum  </string>

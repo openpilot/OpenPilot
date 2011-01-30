@@ -47,7 +47,7 @@ static UAVObjHandle handle;
  * \return 0 Success
  * \return -1 Failure
  */
-int32_t $(NAME)Initialize()
+int32_t $(NAME)Initialize(void)
 {
 	// Register object with the object manager
 	handle = UAVObjRegister($(NAMEUC)_OBJID, $(NAMEUC)_NAME, $(NAMEUC)_METANAME, 0,
@@ -63,6 +63,8 @@ int32_t $(NAME)Initialize()
 		return -1;
 	}
 }
+
+uavobj_initcall($(NAME)Initialize);
 
 /**
  * Initialize object fields and metadata with the default values.

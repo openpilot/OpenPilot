@@ -58,6 +58,9 @@
 #include <msd.h>
 #endif
 
+/* Generic initcall infrastructure */
+#include "pios_initcall.h"
+
 /* PIOS Board Specific Device Configuration */
 #include "pios_board.h"
 

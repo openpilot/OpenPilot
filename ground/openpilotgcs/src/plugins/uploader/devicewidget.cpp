@@ -78,7 +78,7 @@ void deviceWidget::setDfu(DFUObject *dfu)
 void deviceWidget::populate()
 {
     int id = m_dfu->devices[deviceID].ID;
-    myDevice->deviceID->setText(QString("Device ID: ") + QString::number(id));
+    myDevice->deviceID->setText(QString("Device ID: ") + QString::number(id, 16));
     // DeviceID tells us what sort of HW we have detected:
     // display a nice icon:
     myDevice->devicePicture->scene()->clear();

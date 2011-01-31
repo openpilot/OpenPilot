@@ -244,13 +244,6 @@ private:
 
     //opmap_edit_waypoint_dialog waypoint_edit_dialog;
 
-    opmap_overlay_widget *m_overlay_widget;
-
-    QGraphicsScene *m_map_graphics_scene;
-    QGraphicsProxyWidget *m_map_scene_proxy;
-    opmap_zoom_slider_widget *m_zoom_slider_widget;
-    opmap_statusbar_widget *m_statusbar_widget;
-
     QStandardItemModel wayPoint_treeView_model;
 
     mapcontrol::WayPointItem *m_mouse_waypoint;

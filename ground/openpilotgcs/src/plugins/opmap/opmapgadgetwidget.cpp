@@ -87,12 +87,6 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_widget = NULL;
     m_map = NULL;
     findPlaceCompleter = NULL;
-    m_overlay_widget = NULL;
-
-    m_map_graphics_scene = NULL;
-    m_map_scene_proxy = NULL;
-    m_zoom_slider_widget = NULL;
-    m_statusbar_widget = NULL;
 
     m_mouse_waypoint = NULL;
 
@@ -169,7 +163,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_map->SetShowHome(true);					    // display the HOME position on the map
     m_map->SetShowUAV(true);					    // display the UAV position on the map
 
-    m_map->Home->SetSafeArea(safe_area_radius_list[3]);                         // set radius (meters)
+	m_map->Home->SetSafeArea(safe_area_radius_list[0]);                         // set radius (meters)
     m_map->Home->SetShowSafeArea(true);                                         // show the safe area
 
     m_map->UAV->SetTrailTime(uav_trail_time_list[0]);                           // seconds
@@ -195,33 +189,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_widget->mapWidget->setLayout(layout);
 
     // **************
-    // create the user controls overlayed onto the map
-
-    // doing this makes the map VERY slow :(
-
-/*
-    m_zoom_slider_widget = new opmap_zoom_slider_widget();
-    m_statusbar_widget = new opmap_statusbar_widget();
-
-    m_map_graphics_scene = m_map->scene();
-
-    m_map_scene_proxy = m_map_graphics_scene->addWidget(m_zoom_slider_widget);
-    m_map_scene_proxy = m_map_graphics_scene->addWidget(m_statusbar_widget);
-
-    m_zoom_slider_widget->move(m_map->width() - 20 - m_zoom_slider_widget->width(), 20);
-    m_statusbar_widget->move(0, m_map->height() - m_statusbar_widget->height());
-*/
-/*
-    m_overlay_widget = new opmap_overlay_widget(m_map);
-    QVBoxLayout *layout2 = new QVBoxLayout;
-    layout2->setSpacing(0);
-    layout2->setContentsMargins(0, 0, 0, 0);
-    layout2->addWidget(m_overlay_widget);
-    m_map->setLayout(layout2);
-*/
-    // **************
     // set the user control options
-
 
     // TODO: this switch does not make sense, does it??
 
@@ -350,7 +318,6 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 	if (m_map)
 	{
 		disconnect(m_map, 0, 0, 0);
-
 		m_map->SetShowHome(false);
 		m_map->SetShowUAV(false);
 	}
@@ -378,8 +345,6 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
     m_waypoint_list_mutex.unlock();
     m_waypoint_list.clear();
 
-    if (m_zoom_slider_widget) delete m_zoom_slider_widget;
-    if (m_statusbar_widget) delete m_statusbar_widget;
 	if (m_map) delete m_map;
 }
 

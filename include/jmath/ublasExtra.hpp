@@ -627,9 +627,9 @@ namespace jafar {
 				size_t n_rows;
 				JFR_ASSERT(((n_rows = M.size1()) == M_v.size1()) && 
 									 ((n_cols = M.size2()) == M_v.size2()),
-									 "M and M_v must be same size")
+									 "M and M_v must be same size");
 				JFR_ASSERT(n_cols == v.size(),
-									 "vector size and matrix coulmns size must be equal")
+									 "vector size and matrix coulmns size must be equal");
 				for(unsigned int r = 0; r < n_rows; r++) 
 					for(unsigned int c = 0; c < n_cols; c++) 
 						M_v(r, c) = M(r,c) - v[c];

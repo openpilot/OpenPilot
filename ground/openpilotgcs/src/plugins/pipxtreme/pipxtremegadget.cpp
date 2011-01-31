@@ -34,12 +34,11 @@ PipXtremeGadget::PipXtremeGadget(QString classId,  PipXtremeGadgetWidget *widget
 
 PipXtremeGadget::~PipXtremeGadget()
 {
-
+   delete m_widget;
+   m_widget = NULL;
 }
-/**
- * Loads a configuration.
- *
- */
+
+// Loads a configuration.
 void PipXtremeGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
     Q_UNUSED(config);

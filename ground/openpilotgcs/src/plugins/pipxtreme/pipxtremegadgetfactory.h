@@ -28,6 +28,8 @@
 
 #include <coreplugin/iuavgadgetfactory.h>
 
+#include "pipxtremegadgetwidget.h"
+
 namespace Core {
 	class IUAVGadget;
 	class IUAVGadgetFactory;
@@ -45,6 +47,9 @@ public:
 	Core::IUAVGadget * createGadget(QWidget *parent);
 	IUAVGadgetConfiguration * createConfiguration(QSettings *qSettings);
 	IOptionsPage * createOptionsPage(IUAVGadgetConfiguration *config);
+
+protected:
+	PipXtremeGadgetWidget *gadgetWidget;
 
 };
 

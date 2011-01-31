@@ -37,6 +37,7 @@ SystemHealthGadget::SystemHealthGadget(QString classId, SystemHealthGadgetWidget
 
 SystemHealthGadget::~SystemHealthGadget()
 {
+    delete m_widget;
 }
 
 /*

@@ -37,6 +37,7 @@ PFDGadget::PFDGadget(QString classId, PFDGadgetWidget *widget, QWidget *parent) 
 
 PFDGadget::~PFDGadget()
 {
+    delete m_widget;
 }
 
 /*

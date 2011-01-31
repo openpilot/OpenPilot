@@ -37,6 +37,7 @@ LineardialGadget::LineardialGadget(QString classId, LineardialGadgetWidget *widg
 
 LineardialGadget::~LineardialGadget()
 {
+    delete m_widget;
 }
 
 /*

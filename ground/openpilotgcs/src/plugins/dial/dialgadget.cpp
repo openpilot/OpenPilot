@@ -38,6 +38,7 @@ DialGadget::DialGadget(QString classId, DialGadgetWidget *widget, QWidget *paren
 
 DialGadget::~DialGadget()
 {
+    delete m_widget;
 }
 
 /*

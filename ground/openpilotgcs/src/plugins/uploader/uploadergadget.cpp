@@ -36,7 +36,7 @@ UploaderGadget::UploaderGadget(QString classId,  UploaderGadgetWidget *widget, Q
 
 UploaderGadget::~UploaderGadget()
 {
-
+    delete m_widget;
 }
 /**
  * Loads a configuration.

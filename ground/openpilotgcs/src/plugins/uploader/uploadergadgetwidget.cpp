@@ -495,9 +495,16 @@ void UploaderGadgetWidget::clearLog()
     m_config->textBrowser->clear();
 }
 
+/**
+  * Remove all the device widgets...
+  */
 UploaderGadgetWidget::~UploaderGadgetWidget()
 {
-
+    while (m_config->systemElements->count()) {
+         QWidget *qw = m_config->systemElements->widget(0);
+         m_config->systemElements->removeTab(0);
+         delete qw;
+    }
 }
 
 

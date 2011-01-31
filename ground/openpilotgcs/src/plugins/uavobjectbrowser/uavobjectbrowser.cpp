@@ -36,7 +36,7 @@ UAVObjectBrowser::UAVObjectBrowser(QString classId, UAVObjectBrowserWidget *widg
 
 UAVObjectBrowser::~UAVObjectBrowser()
 {
-
+    delete m_widget;
 }
 
 void UAVObjectBrowser::loadConfiguration(IUAVGadgetConfiguration* config)

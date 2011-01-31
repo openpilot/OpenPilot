@@ -57,7 +57,7 @@ void TileCacheQueue::EnqueueCacheTask(CacheItemQueue *task)
 #ifdef DEBUG_TILECACHEQUEUE
             qDebug()<<"Wake Thread";
 #endif //DEBUG_TILECACHEQUEUE
-            this->start(QThread::NormalPriority);
+            //this->start(QThread::NormalPriority);
             //waitmutex.lock();
             waitc.wakeAll();
             //waitmutex.unlock();

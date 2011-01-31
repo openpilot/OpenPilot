@@ -31,12 +31,10 @@
 
 PipXtremePlugin::PipXtremePlugin()
 {
-   // Do nothing
 }
 
 PipXtremePlugin::~PipXtremePlugin()
 {
-   // Do nothing
 }
 
 bool PipXtremePlugin::initialize(const QStringList& args, QString *errMsg)

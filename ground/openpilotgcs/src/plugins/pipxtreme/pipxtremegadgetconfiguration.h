@@ -37,6 +37,7 @@ class PipXtremeGadgetConfiguration : public IUAVGadgetConfiguration
 Q_OBJECT
 public:
     explicit PipXtremeGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
+	~PipXtremeGadgetConfiguration();
 
     //set port configuration functions
     void setSpeed(BaudRateType speed) {m_defaultSpeed=speed;}

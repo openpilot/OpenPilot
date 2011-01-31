@@ -72,6 +72,10 @@ PipXtremeGadgetConfiguration::PipXtremeGadgetConfiguration(QString classId, QSet
     }
 }
 
+PipXtremeGadgetConfiguration::~PipXtremeGadgetConfiguration()
+{
+}
+
 /**
  * Clones a configuration.
  *

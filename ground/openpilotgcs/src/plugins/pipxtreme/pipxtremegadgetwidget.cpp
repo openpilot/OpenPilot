@@ -24,102 +24,97 @@
  */
 
 #include <QDebug>
+#include <QtOpenGL/QGLWidget>
 
 #include "pipxtremegadgetwidget.h"
 
 //#include <aggregation/aggregate.h>
 
+#define SERIAL_PORT	1
+#define USB_PORT	2
+
+// ***************************************************************************************
+
 // constructor
-PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) : QWidget(parent)
+PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
+	QWidget(parent),
+	m_widget(NULL),
+	m_ioDevice(NULL)
 {
-    m_config = new Ui_PipXtremeWidget();
-    m_config->setupUi(this);
+	m_widget = new Ui_PipXtremeWidget();
+	m_widget->setupUi(this);
 
-    m_ioDevice = NULL;
+	m_widget->comboBox_SerialBaudrate->clear();
+	m_widget->comboBox_SerialBaudrate->addItem("1200", 1200);
+	m_widget->comboBox_SerialBaudrate->addItem("2400", 2400);
+	m_widget->comboBox_SerialBaudrate->addItem("4800", 4800);
+	m_widget->comboBox_SerialBaudrate->addItem("9600", 9600);
+	m_widget->comboBox_SerialBaudrate->addItem("19200", 19200);
+	m_widget->comboBox_SerialBaudrate->addItem("38400", 38400);
+	m_widget->comboBox_SerialBaudrate->addItem("57600", 57600);
+	m_widget->comboBox_SerialBaudrate->addItem("115200", 115200);
+//	m_widget->comboBox_SerialBaudrate->addItem("230400", 230400);
+//	m_widget->comboBox_SerialBaudrate->addItem("460800", 460800);
+//	m_widget->comboBox_SerialBaudrate->addItem("921600", 921600);
+	m_widget->comboBox_SerialBaudrate->setCurrentIndex(m_widget->comboBox_SerialBaudrate->findText("57600"));
 
-    currentStep = IAP_STATE_READY;
-    rescueStep = RESCUE_STEP0;
-    resetOnly = false;
+	m_widget->comboBox_Mode->clear();
+	m_widget->comboBox_Mode->addItem("Normal", 0);
+	m_widget->comboBox_Mode->addItem("Scan Spectrum", 1);
+	m_widget->comboBox_Mode->addItem("Calibrate Tx Carrier Frequency", 2);
+	m_widget->comboBox_Mode->addItem("Test Tx Spectrum", 3);
 
-	m_config->comboBox_Mode->clear();
-	m_config->comboBox_Mode->addItem("Normal", 0);
-	m_config->comboBox_Mode->addItem("Scan Spectrum", 1);
-	m_config->comboBox_Mode->addItem("Tx Carrier Calibrate", 2);
-	m_config->comboBox_Mode->addItem("Tx Spectrum Test", 3);
+	m_widget->comboBox_SerialPortSpeed->clear();
+	for (int i = 0; i < m_widget->comboBox_SerialBaudrate->count(); i++)
+		m_widget->comboBox_SerialPortSpeed->addItem(m_widget->comboBox_SerialBaudrate->itemText(i), m_widget->comboBox_SerialBaudrate->itemData(i));
+	m_widget->comboBox_SerialPortSpeed->setCurrentIndex(m_widget->comboBox_SerialPortSpeed->findText("57600"));
 
-	m_config->comboBox_SerialBaudrate->clear();
-	m_config->comboBox_SerialBaudrate->addItem("1200", 1200);
-	m_config->comboBox_SerialBaudrate->addItem("2400", 2400);
-	m_config->comboBox_SerialBaudrate->addItem("4800", 4800);
-	m_config->comboBox_SerialBaudrate->addItem("9600", 9600);
-	m_config->comboBox_SerialBaudrate->addItem("19200", 19200);
-	m_config->comboBox_SerialBaudrate->addItem("38400", 38400);
-	m_config->comboBox_SerialBaudrate->addItem("57600", 57600);
-	m_config->comboBox_SerialBaudrate->addItem("115200", 115200);
-//	m_config->comboBox_SerialBaudrate->addItem("230400", 230400);
-//	m_config->comboBox_SerialBaudrate->addItem("460800", 460800);
-//	m_config->comboBox_SerialBaudrate->addItem("921600", 921600);
-	m_config->comboBox_SerialBaudrate->setCurrentIndex(m_config->comboBox_SerialBaudrate->findText("57600"));
+	m_widget->doubleSpinBox_Frequency->setSingleStep(0.00015625);
 
-	m_config->comboBox_SerialPortSpeed->clear();
-	m_config->comboBox_SerialPortSpeed->addItem("1200", 1200);
-	m_config->comboBox_SerialPortSpeed->addItem("2400", 2400);
-	m_config->comboBox_SerialPortSpeed->addItem("4800", 4800);
-	m_config->comboBox_SerialPortSpeed->addItem("9600", 9600);
-	m_config->comboBox_SerialPortSpeed->addItem("19200", 19200);
-	m_config->comboBox_SerialPortSpeed->addItem("38400", 38400);
-	m_config->comboBox_SerialPortSpeed->addItem("57600", 57600);
-	m_config->comboBox_SerialPortSpeed->addItem("115200", 115200);
-//	m_config->comboBox_SerialPortSpeed->addItem("230400", 230400);
-//	m_config->comboBox_SerialPortSpeed->addItem("460800", 460800);
-//	m_config->comboBox_SerialPortSpeed->addItem("921600", 921600);
-	m_config->comboBox_SerialPortSpeed->setCurrentIndex(m_config->comboBox_SerialPortSpeed->findText("57600"));
+	m_widget->progressBar_RSSI->setMinimum(-120);
+	m_widget->progressBar_RSSI->setMaximum(-20);
+	m_widget->progressBar_RSSI->setValue(-80);
 
-    m_config->doubleSpinBox_Frequency->setSingleStep(0.00015625);
-
-    m_config->graphicsView_Spectrum->setScene(new QGraphicsScene(this));
-    QGraphicsScene *spec_scene = m_config->graphicsView_Spectrum->scene();
+	m_widget->graphicsView_Spectrum->setScene(new QGraphicsScene(this));
+	m_widget->graphicsView_Spectrum->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+//	m_widget->graphicsView_Spectrum->setViewport(new QWidget);
+	m_widget->graphicsView_Spectrum->setCacheMode(QGraphicsView::CacheBackground);
+	m_widget->graphicsView_Spectrum->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
+	QGraphicsScene *spec_scene = m_widget->graphicsView_Spectrum->scene();
     if (spec_scene)
     {
-        spec_scene->setBackgroundBrush(Qt::black);
+		spec_scene->setBackgroundBrush(QColor(80, 80, 80));
         spec_scene->clear();
+
 //        spec_scene->addItem(m_background);
 //        spec_scene->addItem(m_joystickEnd);
 //        spec_scene->setSceneRect(m_background->boundingRect());
     }
 
-    m_config->pushButton_ScanSpectrum->setEnabled(false);
+	m_widget->pushButton_ScanSpectrum->setEnabled(false);
 
-    // Listen to autopilot connection events
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    TelemetryManager *telMngr = pm->getObject<TelemetryManager>();
-    connect(telMngr, SIGNAL(myStart()), this, SLOT(onTelemetryStart()));
-    connect(telMngr, SIGNAL(myStop()), this, SLOT(onTelemetryStop()));
-    connect(telMngr, SIGNAL(connected()), this, SLOT(onTelemetryConnect()));
-    connect(telMngr, SIGNAL(disconnected()), this, SLOT(onTelemetryDisconnect()));
+	QIcon rbi;
+	rbi.addFile(QString(":pipxtreme/images/view-refresh.svg"));
+	m_widget->refreshPorts->setIcon(rbi);
 
-    // Note: remove listening to the connection manager, it overlaps with
-    // listening to the telemetry manager, we should only listen to one, not both.
+	// Listen to telemetry connection events
+	ExtensionSystem::PluginManager *pluginManager = ExtensionSystem::PluginManager::instance();
+	if (pluginManager)
+	{
+		TelemetryManager *telemetryManager = pluginManager->getObject<TelemetryManager>();
+		if (telemetryManager)
+		{
+			connect(telemetryManager, SIGNAL(myStart()), this, SLOT(onTelemetryStart()));
+			connect(telemetryManager, SIGNAL(myStop()), this, SLOT(onTelemetryStop()));
+			connect(telemetryManager, SIGNAL(connected()), this, SLOT(onTelemetryConnect()));
+			connect(telemetryManager, SIGNAL(disconnected()), this, SLOT(onTelemetryDisconnect()));
+		}
+	}
 
-    // Also listen to disconnect actions from the user:
-    // Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-    // connect(cm, SIGNAL(deviceDisconnected()), this, SLOT(onModemDisconnect()));
+	getPorts();
 
-//    int opened = rawHidHandle.open(10, 0x20A0, 0x4117, 0xFF9C, 0x0001);
-//    rawHidPlugin = new RawHIDPlugin();
-
-	connect(m_config->connectButton, SIGNAL(clicked()), this, SLOT(connectDisconnect()));
-
-    getPorts();
-
-    QIcon rbi;
-    rbi.addFile(QString(":pipxtreme/images/view-refresh.svg"));
-    m_config->refreshPorts->setIcon(rbi);
-
-    connect(m_config->refreshPorts, SIGNAL(clicked()), this, SLOT(getPorts()));
-
-    if (m_ioDevice)
-        connect(m_ioDevice, SIGNAL(readyRead()), this, SLOT(processInputStream()));
+	connect(m_widget->connectButton, SIGNAL(clicked()), this, SLOT(connectDisconnect()));
+	connect(m_widget->refreshPorts, SIGNAL(clicked()), this, SLOT(getPorts()));
 
 //    delay::msleep(600);   // just for pips reference
 }
@@ -127,16 +122,18 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) : QWidget(parent)
 // destructor .. this never gets called :(
 PipXtremeGadgetWidget::~PipXtremeGadgetWidget()
 {
-	disconnect(false);
+	disconnectPort(false);
 }
+
+// ***************************************************************************************
 
 void PipXtremeGadgetWidget::resizeEvent(QResizeEvent *event)
 {
-    if (m_config)
+	if (m_widget)
     {
-        if (m_config->graphicsView_Spectrum)
+		if (m_widget->graphicsView_Spectrum)
         {
-            QGraphicsScene *spec_scene = m_config->graphicsView_Spectrum->scene();
+			QGraphicsScene *spec_scene = m_widget->graphicsView_Spectrum->scene();
             if (spec_scene)
             {
 //              spec_scene->setSceneRect(QRect(QPoint(0, 0), event->size()));
@@ -148,36 +145,66 @@ void PipXtremeGadgetWidget::resizeEvent(QResizeEvent *event)
 //    PipXtremeGadgetWidget::resizeEvent(event);
 }
 
+// ***************************************************************************************
+
+void PipXtremeGadgetWidget::onComboBoxPorts_currentIndexChanged(int index)
+{
+	if (index < 0)
+	{
+		m_widget->comboBox_SerialBaudrate->setEnabled(false);
+		return;
+	}
+
+	int type = m_widget->comboBox_Ports->itemData(index).toInt();
+
+	m_widget->comboBox_SerialBaudrate->setEnabled(type == SERIAL_PORT);
+}
+
+// ***************************************************************************************
+
+QString PipXtremeGadgetWidget::getSerialPortDevice(const QString &friendName)
+{
+	QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
+
+	foreach (QextPortInfo port, ports)
+	{
+		#ifdef Q_OS_WIN
+			if (port.friendName == friendName)
+				return port.portName;
+		#else
+			if (port.friendName == friendName)
+				return port.physName;
+		#endif
+	}
+
+	return "";
+}
+
 bool sortSerialPorts(const QextPortInfo &s1, const QextPortInfo &s2)
 {
     return (s1.portName < s2.portName);
 }
 
-// ***************************************************************************************
-
 void PipXtremeGadgetWidget::getPorts()
 {
     QStringList list;
 
-//    m_config->refreshPorts->setEnabled(false);
-//    m_config->comboBox_Ports->setEnabled(false);
+	disconnect(m_widget->comboBox_Ports, 0, 0, 0);
 
-    m_config->comboBox_Ports->clear();
+	m_widget->comboBox_Ports->clear();
 
     // ********************************
     // Populate the telemetry combo box with serial ports
 
-    QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
+	QList<QextPortInfo> serial_ports = QextSerialEnumerator::getPorts();
 
-    qSort(ports.begin(), ports.end(), sortSerialPorts);
+	qSort(serial_ports.begin(), serial_ports.end(), sortSerialPorts);
 
-    foreach (QextPortInfo port, ports)
+	foreach (QextPortInfo port, serial_ports)
        list.append(port.friendName);
 
 	for (int i = 0; i < list.count(); i++)
-		m_config->comboBox_Ports->addItem(list.at(i), 0);
-
-//    m_config->comboBox_Ports->addItems(list);
+		m_widget->comboBox_Ports->addItem(list.at(i), SERIAL_PORT);
 
     // ********************************
     // Populate the telemetry combo box with usb ports
@@ -193,10 +220,10 @@ void PipXtremeGadgetWidget::getPorts()
             for (int i = 0; i < opened; i++)
                 usb_ports.append(rawHidHandle->getserial(i));
 
-			for (int i = 0; i < usb_ports.count(); i++)
-				m_config->comboBox_Ports->addItem(usb_ports.at(i), 1);
+			qSort(usb_ports.begin(), usb_ports.end());
 
-//            m_config->comboBox_Ports->addItems(usb_ports);
+			for (int i = 0; i < usb_ports.count(); i++)
+				m_widget->comboBox_Ports->addItem(usb_ports.at(i), USB_PORT);
         }
 
         delete rawHidHandle;
@@ -204,43 +231,36 @@ void PipXtremeGadgetWidget::getPorts()
 
     // ********************************
 
-//    m_config->refreshPorts->setEnabled(true);
-//    m_config->comboBox_Ports->setEnabled(true);
+	connect(m_widget->comboBox_Ports, SIGNAL(currentIndexChanged(int)), this, SLOT(onComboBoxPorts_currentIndexChanged(int)));
+
+	onComboBoxPorts_currentIndexChanged(m_widget->comboBox_Ports->currentIndex());
+
+	// ********************************
 }
 
-QString PipXtremeGadgetWidget::getPortDevice(const QString &friendName)
-{
-    QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
-
-    foreach (QextPortInfo port, ports)
-    {
-        #ifdef Q_OS_WIN
-            if (port.friendName == friendName)
-                return port.portName;
-        #else
-            if (port.friendName == friendName)
-                return port.physName;
-        #endif
-    }
-
-    return "";
-}
-
-// *************************************************************************
+// ***************************************************************************************
 
 void PipXtremeGadgetWidget::onTelemetryStart()
 {
-    m_config->connectButton->setEnabled(false);
-    m_config->comboBox_Ports->setEnabled(false);
+	setEnabled(false);
+
+//	m_widget->connectButton->setEnabled(false);
+//	m_widget->comboBox_Ports->setEnabled(false);
+//	m_widget->refreshPorts->setEnabled(false);
+//	m_widget->comboBox_SerialBaudrate->setEnabled(false);
 }
 
 void PipXtremeGadgetWidget::onTelemetryStop()
 {
-    m_config->connectButton->setEnabled(true);
-    m_config->comboBox_Ports->setEnabled(true);
+	setEnabled(true);
+
+//	m_widget->connectButton->setEnabled(true);
+//	m_widget->comboBox_Ports->setEnabled(true);
+//	m_widget->refreshPorts->setEnabled(true);
+//	m_widget->comboBox_SerialBaudrate->setEnabled(true);
 }
 
-// *************************************************************************
+// ***************************************************************************************
 
 void PipXtremeGadgetWidget::onTelemetryConnect()
 {
@@ -250,44 +270,28 @@ void PipXtremeGadgetWidget::onTelemetryDisconnect()
 {
 }
 
-// *************************************************************************
+// ***************************************************************************************
 
-void PipXtremeGadgetWidget::onModemConnect()
-{
-    m_config->connectButton->setText(tr(" Disconnect "));
-    m_config->comboBox_Ports->setEnabled(false);
-    m_config->pushButton_ScanSpectrum->setEnabled(true);
-}
+void PipXtremeGadgetWidget::disableTelemetry()
+{	// Suspend telemetry & polling
 
-void PipXtremeGadgetWidget::onModemDisconnect()
-{
-    m_config->connectButton->setText(tr(" Connect "));
-    m_config->comboBox_Ports->setEnabled(true);
-    m_config->pushButton_ScanSpectrum->setEnabled(false);
-}
-
-// *************************************************************************
-
-void PipXtremeGadgetWidget::suspendTelemetry()
-{
 	Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
 	if (!cm) return;
 
-	// Suspend telemety & polling
 	cm->disconnectDevice();
 	cm->suspendPolling();
 }
 
-void PipXtremeGadgetWidget::restartTelemetryPolling()
-{
+void PipXtremeGadgetWidget::enableTelemetry()
+{	// Restart the polling thread
+
 	Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
 	if (!cm) return;
 
-	// Restart the polling thread
 	cm->resumePolling();
 }
 
-// *************************************************************************
+// ***************************************************************************************
 
 void PipXtremeGadgetWidget::processOutputStream()
 {
@@ -297,26 +301,45 @@ void PipXtremeGadgetWidget::processOutputStream()
 	if (!m_ioDevice->isOpen())
 		return;
 
-//    if (m_ioDevice->bytesToWrite() < TX_BUFFER_SIZE )
-    {
-//        m_ioDevice->write((const char*)txBuffer, dataOffset+length+CHECKSUM_LENGTH);
-    }
+//	if (m_ioDevice->bytesToWrite() < TX_BUFFER_SIZE )
+	{
+//		m_ioDevice->write((const char*)txBuffer, dataOffset+length+CHECKSUM_LENGTH);
+	}
 }
 
 void PipXtremeGadgetWidget::processInputStream()
 {
-    while (m_ioDevice && m_ioDevice->bytesAvailable() > 0)
+	while (m_ioDevice)
     {
-        quint8 tmp;
-        m_ioDevice->read((char*)&tmp, 1);
+		quint8 buf;
 
-//        processInputByte(tmp);
+		if (!m_ioDevice->isOpen())
+			break;
+
+		qint64 bytes_available = m_ioDevice->bytesAvailable();
+		if (bytes_available <= 0)
+			break;
+
+		qint64 bytes_read = m_ioDevice->read((char *)&buf, sizeof(buf));
+		if (bytes_read <= 0)
+			break;
+
+		processInputBytes(&buf, sizeof(buf));
     }
 }
 
-// *************************************************************************
+void PipXtremeGadgetWidget::processInputBytes(quint8 *buf, int count)
+{
+	if (!buf || count <= 0)
+		return;
 
-void PipXtremeGadgetWidget::disconnect(bool resume_polling)
+
+
+}
+
+// ***************************************************************************************
+
+void PipXtremeGadgetWidget::disconnectPort(bool enable_telemetry)
 {	// disconnect the comms port
 
 	if (!m_ioDevice)
@@ -324,56 +347,54 @@ void PipXtremeGadgetWidget::disconnect(bool resume_polling)
 
 	m_ioDevice->close();
 
+	disconnect(m_ioDevice, 0, 0, 0);
+
 	delete m_ioDevice;
 	m_ioDevice = NULL;
 
-	m_config->connectButton->setText("Connect");
-	m_config->comboBox_SerialBaudrate->setEnabled(true);
-	m_config->comboBox_Ports->setEnabled(true);
-	m_config->refreshPorts->setEnabled(true);
+	m_widget->connectButton->setText("Connect");
+	m_widget->comboBox_SerialBaudrate->setEnabled(true);
+	m_widget->comboBox_Ports->setEnabled(true);
+	m_widget->refreshPorts->setEnabled(true);
+	m_widget->pushButton_ScanSpectrum->setEnabled(false);
 
-	restartTelemetryPolling();
+	if (enable_telemetry)
+		enableTelemetry();
 }
 
-void PipXtremeGadgetWidget::connectDisconnect()
-{
-	if (m_ioDevice)
-	{	// disconnect
-		disconnect(true);
-		return;
-	}
+void PipXtremeGadgetWidget::connectPort()
+{	// connect the comms port
 
-	// ****************
-	// connect
+	disconnectPort(true);
 
-	int device_idx = m_config->comboBox_Ports->currentIndex();
+	int device_idx = m_widget->comboBox_Ports->currentIndex();
 	if (device_idx < 0)
 		return;
 
-	QString device_str = m_config->comboBox_Ports->currentText().trimmed();
+	QString device_str = m_widget->comboBox_Ports->currentText().trimmed();
 	if (device_str.isEmpty())
 		return;
 
-	int type = m_config->comboBox_Ports->itemData(device_idx).toInt();
+	int type = m_widget->comboBox_Ports->itemData(device_idx).toInt();
 
 //	qDebug() << QString::number(type) << ": " << device_str;
 
 	// Suspend telemety & polling in case it is not done yet
-	suspendTelemetry();
+	disableTelemetry();
 
 	switch (type)
 	{
-		case 0:		// serial port
+		case SERIAL_PORT:	// serial port
 			{
-				QString str = getPortDevice(device_str);
+				QString str = getSerialPortDevice(device_str);
 				if (str.isEmpty())
 					break;
 
-				int br_idx = m_config->comboBox_SerialBaudrate->currentIndex();
+				int br_idx = m_widget->comboBox_SerialBaudrate->currentIndex();
 				if (br_idx < 0)
 					break;
 
-				int baudrate = m_config->comboBox_SerialBaudrate->itemData(br_idx).toInt();
+				int baudrate = m_widget->comboBox_SerialBaudrate->itemData(br_idx).toInt();
 
 				BaudRateType bdt = BAUD57600;
 				switch (baudrate)
@@ -398,7 +419,8 @@ void PipXtremeGadgetWidget::connectDisconnect()
 				settings.FlowControl = FLOW_OFF;
 				settings.Timeout_Millisec = 500;
 
-				QextSerialPort *serial_dev = new QextSerialPort(str, settings, QextSerialPort::Polling);
+//				QextSerialPort *serial_dev = new QextSerialPort(str, settings, QextSerialPort::Polling);
+				QextSerialPort *serial_dev = new QextSerialPort(str, settings);
 				if (!serial_dev)
 					break;
 
@@ -409,15 +431,10 @@ void PipXtremeGadgetWidget::connectDisconnect()
 				}
 
 				m_ioDevice = serial_dev;
-
-				m_config->connectButton->setText("Disconnect");
-				m_config->comboBox_SerialBaudrate->setEnabled(false);
-				m_config->comboBox_Ports->setEnabled(false);
-				m_config->refreshPorts->setEnabled(false);
-				return;
+				break;
 			}
 
-		case 1:		// USB port
+		case USB_PORT:	// USB port
 			{
 				RawHID *usb_dev = new RawHID(device_str);
 				if (!usb_dev)
@@ -430,104 +447,37 @@ void PipXtremeGadgetWidget::connectDisconnect()
 				}
 
 				m_ioDevice = usb_dev;
-
-				m_config->connectButton->setText("Disconnect");
-				m_config->comboBox_SerialBaudrate->setEnabled(false);
-				m_config->comboBox_Ports->setEnabled(false);
-				m_config->refreshPorts->setEnabled(false);
-				return;
+				break;
 			}
 
-		default:	// unknown
+		default:	// unknown port type
 			break;
 	}
 
-	restartTelemetryPolling();
+	if (!m_ioDevice)
+	{	// failed to connect
+		enableTelemetry();
+	}
+	else
+	{	// connected OK
+		m_widget->connectButton->setText("Disconnect");
+		m_widget->comboBox_SerialBaudrate->setEnabled(false);
+		m_widget->comboBox_Ports->setEnabled(false);
+		m_widget->refreshPorts->setEnabled(false);
+		m_widget->pushButton_ScanSpectrum->setEnabled(true);
+
+		connect(m_ioDevice, SIGNAL(readyRead()), this, SLOT(processInputStream()));
+	}
 }
 
-// *************************************************************************
+// ***************************************************************************************
 
-// Ask the modem to go into API mode
-void PipXtremeGadgetWidget::goToAPIMode(UAVObject* callerObj, bool success)
+void PipXtremeGadgetWidget::connectDisconnect()
 {
-    Q_UNUSED(callerObj);
-/*
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVObject *fwIAP = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("FirmwareIAPObj")));
-
-    switch (currentStep)
-    {
-        case IAP_STATE_READY:
-            getPorts(); // Useful in case a new serial port appeared since the initial list,
-                          // otherwise we won't find it when we stop the board.
-
-            // The board is running, send the 1st IAP Reset order:
-            fwIAP->getField("Command")->setValue("1122");
-            connect(fwIAP,SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToAPIMode(UAVObject*, bool)));
-            currentStep = IAP_STATE_STEP_1;
-            fwIAP->updated();
-
-            break;
-
-        case IAP_STATE_STEP_1:
-            if (!success)
-            {
-                currentStep = IAP_STATE_READY;
-                disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToAPIMode(UAVObject*, bool)));
-                break;
-            }
-
-            delay::msleep(600);
-
-            fwIAP->getField("Command")->setValue("2233");
-            currentStep = IAP_STATE_READY;
-            fwIAP->updated();
-
-            break;
-    }
-*/
-}
-
-// Tells the system to boot (from Bootloader state)
-void PipXtremeGadgetWidget::systemBoot()
-{
-/*
-    // Suspend telemety & polling in case it is not done yet
-    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-    cm->disconnectDevice();
-    cm->suspendPolling();
-
-    QString devName = m_config->comboBox_Ports->currentText();
-    repaint();
-
-    if (!dfu)
-    {
-        if (devName == "USB")
-            dfu = new DFUObject(DFU_DEBUG, false, QString());
-        else
-            dfu = new DFUObject(DFU_DEBUG,true,getPortDevice(devName));
-    }
-    dfu->AbortOperation();
-    if (!dfu->enterDFU(0))
-    {
-        delete dfu;
-        dfu = NULL;
-
-        return;
-    }
-    dfu->JumpToApp();
-    // Restart the polling thread
-    cm->resumePolling();
-
-    m_config->comboBox_Ports->setEnabled(true);
-    if (currentStep == IAP_STATE_BOOTLOADER )
-    {
-    }
-    currentStep = IAP_STATE_READY;
-    delete dfu; // Frees up the USB/Serial port too
-    dfu = NULL;
-*/
+	if (m_ioDevice)
+		disconnectPort(true);	// disconnect
+	else
+		connectPort();			// connect
 }
 
 // ***************************************************************************************
@@ -535,9 +485,10 @@ void PipXtremeGadgetWidget::systemBoot()
 // Shows a message box with an error string.
 void PipXtremeGadgetWidget::error(QString errorString, int errorNumber)
 {
-    Q_UNUSED(errorNumber);
     QMessageBox msgBox;
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.setText(errorString + " [" + QString::number(errorNumber) + "]");
     msgBox.exec();
 }
+
+// ***************************************************************************************

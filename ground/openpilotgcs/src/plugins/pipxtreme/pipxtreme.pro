@@ -1,6 +1,8 @@
 TEMPLATE = lib
 TARGET = PipXtreme
+
 QT += svg
+QT += opengl
 
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)

@@ -29,8 +29,8 @@
 #include <coreplugin/iuavgadgetfactory.h>
 
 namespace Core {
-class IUAVGadget;
-class IUAVGadgetFactory;
+	class IUAVGadget;
+	class IUAVGadgetFactory;
 }
 
 using namespace Core;
@@ -42,9 +42,10 @@ public:
     PipXtremeGadgetFactory(QObject *parent = 0);
     ~PipXtremeGadgetFactory();
 
-    Core::IUAVGadget *createGadget(QWidget *parent);
-    IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
-    IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
+	Core::IUAVGadget * createGadget(QWidget *parent);
+	IUAVGadgetConfiguration * createConfiguration(QSettings *qSettings);
+	IOptionsPage * createOptionsPage(IUAVGadgetConfiguration *config);
+
 };
 
 #endif

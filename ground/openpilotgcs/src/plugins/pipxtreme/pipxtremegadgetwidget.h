@@ -116,49 +116,42 @@ public:
    ~PipXtremeGadgetWidget();
 
     typedef enum { IAP_STATE_READY, IAP_STATE_STEP_1} IAPStep;
-    typedef enum { RESCUE_STEP0, RESCUE_STEP1, RESCUE_STEP2, RESCUE_STEP3, RESCUE_POWER1, RESCUE_POWER2, RESCUE_DETECT } RescueStep;
 
 public slots:
     void onTelemetryStart();
     void onTelemetryStop();
+
     void onTelemetryConnect();
     void onTelemetryDisconnect();
 
-    void onModemConnect();
-    void onModemDisconnect();
+	void onComboBoxPorts_currentIndexChanged(int index);
 
 protected:
     void resizeEvent(QResizeEvent *event);
 
 private:
-    Ui_PipXtremeWidget *m_config;
+	Ui_PipXtremeWidget	*m_widget;
 
-    IAPStep currentStep;
-    RescueStep rescueStep;
-    bool resetOnly;
+	QIODevice			*m_ioDevice;
 
-    pjrc_rawhid     rawHidHandle;
-//    RawHIDPlugin    *rawHidPlugin;
+	QString getSerialPortDevice(const QString &friendName);
 
-    // currently connected QIODevice
-    QIODevice *m_ioDevice;
-
-    QString getPortDevice(const QString &friendName);
-
-    void suspendTelemetry();
-    void restartTelemetryPolling();
+	void disableTelemetry();
+	void enableTelemetry();
 
     void processOutputStream();
     void processInputStream();
 
-	void disconnect(bool resume_polling);
+	void disconnectPort(bool enable_telemetry);
+	void connectPort();
+
+	void processInputBytes(quint8 *buf, int count);
 
 private slots:
 	void connectDisconnect();
-	void error(QString errorString,int errorNumber);
-    void goToAPIMode(UAVObject* = NULL, bool = false);
-    void systemBoot();
+	void error(QString errorString, int errorNumber);
     void getPorts();
+
 };
 
 #endif

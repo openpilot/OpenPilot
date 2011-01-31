@@ -41,17 +41,17 @@ PipXtremeGadgetFactory::~PipXtremeGadgetFactory()
 
 Core::IUAVGadget* PipXtremeGadgetFactory::createGadget(QWidget *parent)
 {
-    PipXtremeGadgetWidget* gadgetWidget = new PipXtremeGadgetWidget(parent);
-    return new PipXtremeGadget(QString("PipXtreme"), gadgetWidget, parent);
+	PipXtremeGadgetWidget *gadgetWidget = new PipXtremeGadgetWidget(parent);
+	return new PipXtremeGadget(QString("PipXtreme"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *PipXtremeGadgetFactory::createConfiguration(QSettings* qSettings)
+IUAVGadgetConfiguration * PipXtremeGadgetFactory::createConfiguration(QSettings *qSettings)
 {
-    return new PipXtremeGadgetConfiguration(QString("PipXtreme"), qSettings);
+	return new PipXtremeGadgetConfiguration(QString("PipXtreme"), qSettings);
 }
 
-IOptionsPage *PipXtremeGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
+IOptionsPage * PipXtremeGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new PipXtremeGadgetOptionsPage(qobject_cast<PipXtremeGadgetConfiguration*>(config));
+	return new PipXtremeGadgetOptionsPage(qobject_cast<PipXtremeGadgetConfiguration *>(config));
 }
 

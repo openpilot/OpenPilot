@@ -34,6 +34,9 @@
          <height>0</height>
         </size>
        </property>
+       <property name="toolTip">
+        <string>The PC port serial baud rate</string>
+       </property>
       </widget>
      </item>
      <item row="1" column="2">
@@ -146,6 +149,9 @@
        <property name="acceptDrops">
         <bool>false</bool>
        </property>
+       <property name="toolTip">
+        <string>The modems serial number</string>
+       </property>
        <property name="styleSheet">
         <string notr="true">QLineEdit {
   border: none;
@@ -232,6 +238,9 @@
          <bold>true</bold>
         </font>
        </property>
+       <property name="toolTip">
+        <string>The modems frequency band</string>
+       </property>
        <property name="styleSheet">
         <string notr="true">QLineEdit {
   border: none;
@@ -279,6 +288,9 @@
          <weight>75</weight>
          <bold>true</bold>
         </font>
+       </property>
+       <property name="toolTip">
+        <string>The modems minimum allowed frequency</string>
        </property>
        <property name="styleSheet">
         <string notr="true">QLineEdit {
@@ -328,6 +340,9 @@
          <bold>true</bold>
         </font>
        </property>
+       <property name="toolTip">
+        <string>The modems maximum allowed frequency</string>
+       </property>
        <property name="styleSheet">
         <string notr="true">QLineEdit {
   border: none;
@@ -376,6 +391,9 @@
          <bold>true</bold>
         </font>
        </property>
+       <property name="toolTip">
+        <string>The modems minimum frequency step size</string>
+       </property>
        <property name="styleSheet">
         <string notr="true">QLineEdit {
   border: none;
@@ -423,6 +441,9 @@
          <weight>75</weight>
          <bold>true</bold>
         </font>
+       </property>
+       <property name="toolTip">
+        <string>The modems current state</string>
        </property>
        <property name="styleSheet">
         <string notr="true">QLineEdit {
@@ -619,6 +640,35 @@
        </property>
        <property name="toolTip">
         <string>Set the modems operating mode</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_16">
+       <property name="text">
+        <string>RSSI (dBm)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QProgressBar" name="progressBar_RSSI">
+       <property name="minimum">
+        <number>-120</number>
+       </property>
+       <property name="maximum">
+        <number>-20</number>
+       </property>
+       <property name="value">
+        <number>-60</number>
+       </property>
+       <property name="textVisible">
+        <bool>true</bool>
+       </property>
+       <property name="format">
+        <string>%v</string>
        </property>
       </widget>
      </item>

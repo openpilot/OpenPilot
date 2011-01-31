@@ -18,6 +18,10 @@ LIBS += -L../build \
     -lcore \
     -linternals \
     -lcore
+
+TARGETDEPS += ../build/libcore.a
+TARGETDEPS += ../build/libinternals.a
+
 HEADERS += mapgraphicitem.h \
     opmapwidget.h \
     configuration.h \

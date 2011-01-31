@@ -48,6 +48,8 @@
 #include <QtCore/QVector>
 #include <QtCore/QIODevice>
 #include <QtCore/QLinkedList>
+#include <QMutex>
+#include <QMutexLocker>
 
 // *************************
 // pipx config comms packets
@@ -56,54 +58,65 @@
 
 typedef struct
 {
-    uint32_t    marker;
-    uint32_t    serial_number;
-    uint8_t     type;
-    uint8_t     spare;
-    uint16_t    data_size;
-    uint32_t    crc;
-    uint8_t     data[0];
-} t_pipx_header;
+	uint32_t    marker;
+	uint32_t    serial_number;
+	uint8_t     type;
+	uint8_t     spare;
+	uint16_t    data_size;
+	uint32_t    header_crc;
+	uint32_t    data_crc;
+//	uint8_t     data[0];
+} t_pipx_config_header;
 
 typedef struct
 {
-    uint8_t     mode;
-    uint8_t     state;
-} t_pipx_data_mode_state;
+	uint8_t     mode;
+	uint8_t     state;
+} t_pipx_config_data_mode_state;
 
 typedef struct
 {
-    uint32_t    serial_baudrate;    // serial uart baudrate
+	uint32_t    serial_baudrate;    // serial uart baudrate
 
-    uint32_t    destination_id;
+	uint32_t    destination_id;
 
-    uint32_t    min_frequency_Hz;
-    uint32_t    max_frequency_Hz;
-    uint32_t    frequency_Hz;
+	uint32_t    min_frequency_Hz;
+	uint32_t    max_frequency_Hz;
+	uint32_t    frequency_Hz;
 
-    uint32_t    max_rf_bandwidth;
+	uint32_t    max_rf_bandwidth;
 
-    uint8_t     max_tx_power;
+	uint8_t     max_tx_power;
 
-    uint8_t     frequency_band;
+	uint8_t     frequency_band;
 
-    uint8_t     rf_xtal_cap;
+	uint8_t     rf_xtal_cap;
 
-    bool        aes_enable;
-    uint8_t     aes_key[16];
+	bool        aes_enable;
+	uint8_t     aes_key[16];
 
-    uint16_t    frequency_step_size;
-} t_pipx_data_settings;
+	uint16_t    frequency_step_size;
+} t_pipx_config_data_settings;
 
 typedef struct
 {
-    uint32_t    start_frequency;
-    uint16_t    frequency_step_size;
-    uint16_t    magnitudes;
-    int8_t      magnitude[0];
-} t_pipx_data_spectrum;
+	uint32_t    start_frequency;
+	uint16_t    frequency_step_size;
+	uint16_t    magnitudes;
+//	int8_t      magnitude[0];
+} t_pipx_config_data_spectrum;
 
 #pragma pack(pop)
+
+// *************************
+
+typedef struct
+{
+	quint8		*buffer;
+	int			size;
+	int			used;
+	QMutex		mutex;
+} t_buffer;
 
 // *************************
 
@@ -133,6 +146,14 @@ private:
 	Ui_PipXtremeWidget	*m_widget;
 
 	QIODevice			*m_ioDevice;
+	QMutex				device_mutex;
+
+	t_buffer			device_input_buffer;
+
+//	QVector<quint8>	buffer;
+
+	uint32_t updateCRC32Data(uint32_t crc, void *data, int len);
+	void makeCRC_Table32();
 
 	QString getSerialPortDevice(const QString &friendName);
 
@@ -140,12 +161,13 @@ private:
 	void enableTelemetry();
 
     void processOutputStream();
+
     void processInputStream();
+	void processInputBuffer();
+	void processInputPacket(quint8 *packet, int packet_size);
 
 	void disconnectPort(bool enable_telemetry);
 	void connectPort();
-
-	void processInputBytes(quint8 *buf, int count);
 
 private slots:
 	void connectDisconnect();

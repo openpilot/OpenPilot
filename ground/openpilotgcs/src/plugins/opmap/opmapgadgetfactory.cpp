@@ -25,25 +25,32 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "opmapgadgetfactory.h"
-#include "opmapgadgetwidget.h"
+//#include "opmapgadgetwidget.h"
 #include "opmapgadget.h"
 #include "opmapgadgetconfiguration.h"
 #include "opmapgadgetoptionspage.h"
 #include <coreplugin/iuavgadget.h>
 
 OPMapGadgetFactory::OPMapGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("OPMapGadget"), tr("OPMap Gadget"), parent)
+		IUAVGadgetFactory(QString("OPMapGadget"), tr("OPMap Gadget"), parent),
+		gadgetWidget(NULL)
 {
 }
 
 OPMapGadgetFactory::~OPMapGadgetFactory()
 {
+	if (gadgetWidget)
+	{
+		delete gadgetWidget;
+		gadgetWidget = NULL;
+	}
 }
 
 Core::IUAVGadget * OPMapGadgetFactory::createGadget(QWidget *parent)
 {
-    OPMapGadgetWidget *gadgetWidget = new OPMapGadgetWidget(parent);
-    return new OPMapGadget(QString("OPMapGadget"), gadgetWidget, parent);
+//    OPMapGadgetWidget *gadgetWidget = new OPMapGadgetWidget(parent);
+	gadgetWidget = new OPMapGadgetWidget(parent);
+	return new OPMapGadget(QString("OPMapGadget"), gadgetWidget, parent);
 }
 
 IUAVGadgetConfiguration *OPMapGadgetFactory::createConfiguration(QSettings* qSettings)

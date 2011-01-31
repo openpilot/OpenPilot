@@ -347,6 +347,13 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 // destructor
 OPMapGadgetWidget::~OPMapGadgetWidget()
 {
+	if (m_map)
+	{
+		disconnect(m_map, 0, 0, 0);
+
+		m_map->SetShowHome(false);
+		m_map->SetShowUAV(false);
+	}
 
 
     // this destructor doesn't appear to be called at shutdown???
@@ -373,8 +380,7 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 
     if (m_zoom_slider_widget) delete m_zoom_slider_widget;
     if (m_statusbar_widget) delete m_statusbar_widget;
-    if (m_map) delete m_map;
-    if (m_widget) delete m_widget;
+	if (m_map) delete m_map;
 }
 
 // *************************************************************************************

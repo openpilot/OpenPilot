@@ -70,6 +70,13 @@ public:
     void saveConfig(QSettings* settings) const;
     IUAVGadgetConfiguration *clone();
 
+    bool getLoggingEnabled(){return m_LoggingEnabled;};
+    bool getLoggingNewFileOnConnect(){return m_LoggingNewFileOnConnect;};
+    QString getLoggingPath(){return m_LoggingPath;};
+    void setLoggingEnabled(bool value){m_LoggingEnabled=value;};
+    void setLoggingNewFileOnConnect(bool value){m_LoggingNewFileOnConnect=value;};
+    void setLoggingPath(QString value){m_LoggingPath=value;};
+
 private:
 
     static const uint m_configurationStreamVersion = 1000;//Increment this if the stream format is not compatible with previous versions. This would cause existing configs to be discarded.
@@ -79,7 +86,9 @@ private:
     QList<PlotCurveConfiguration*> m_PlotCurveConfigs;
 
     void clearPlotData();
-
+    bool m_LoggingEnabled;
+    bool m_LoggingNewFileOnConnect;
+    QString m_LoggingPath;
 
 };
 

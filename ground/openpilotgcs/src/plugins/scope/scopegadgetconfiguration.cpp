@@ -72,6 +72,11 @@ ScopeGadgetConfiguration::ScopeGadgetConfiguration(QString classId, QSettings* q
 
             qSettings->endGroup();
         }
+
+        m_LoggingEnabled = qSettings->value("LoggingEnabled").toBool();
+        m_LoggingNewFileOnConnect = qSettings->value("LoggingNewFileOnConnect").toBool();
+        m_LoggingPath = qSettings->value("LoggingPath").toString();
+
     }
 }
 
@@ -119,6 +124,12 @@ IUAVGadgetConfiguration *ScopeGadgetConfiguration::clone()
         m->addPlotCurveConfig(newPlotCurveConf);
     }
 
+    m->setLoggingEnabled(m_LoggingEnabled);
+    m->setLoggingNewFileOnConnect(m_LoggingNewFileOnConnect);
+    m->setLoggingPath(m_LoggingPath);
+
+
+
     return m;
 }
 
@@ -151,6 +162,12 @@ void ScopeGadgetConfiguration::saveConfig(QSettings* qSettings) const {
 
         qSettings->endGroup();
     }
+
+    qSettings->setValue("LoggingEnabled",  m_LoggingEnabled);
+    qSettings->setValue("LoggingNewFileOnConnect",  m_LoggingNewFileOnConnect);
+    qSettings->setValue("LoggingPath",  m_LoggingPath);
+
+
 }
 
 void ScopeGadgetConfiguration::replacePlotCurveConfig(QList<PlotCurveConfiguration*> newPlotCurveConfigs)

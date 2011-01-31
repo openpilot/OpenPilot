@@ -26,6 +26,7 @@
  */
 
 
+#include <QDir>
 #include "scopegadgetwidget.h"
 #include "utils/stylehelper.h"
 
@@ -69,6 +70,21 @@ ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
     connect(cm, SIGNAL(deviceDisconnected()), this, SLOT(stopPlotting()));
     connect(cm, SIGNAL(deviceConnected(QIODevice*)), this, SLOT(startPlotting()));
+
+
+    m_csvLoggingStarted=0;
+    m_csvLoggingEnabled=0;
+    m_csvLoggingHeaderSaved=0;
+    m_csvLoggingDataSaved=0;
+    m_csvLoggingNameSet=0;
+    m_csvLoggingConnected=0;
+    m_csvLoggingNewFileOnConnect=0;
+    m_csvLoggingPath = QString("./csvlogging/");
+    m_csvLoggingStartTime = QDateTime::currentDateTime();
+
+    //Listen to autopilot connection events
+    connect(cm, SIGNAL(deviceDisconnected()), this, SLOT(csvLoggingDisconnect()));
+    connect(cm, SIGNAL(deviceConnected(QIODevice*)), this, SLOT(csvLoggingConnect()));
 
 }
 
@@ -267,7 +283,7 @@ void ScopeGadgetWidget::replotNewData()
         setAxisScale(QwtPlot::xBottom, toTime - m_xWindowSize, toTime);
     }
      //qDebug() << "replotNewData from " << NOW.addSecs(- m_xWindowSize) << " to " << NOW;
-
+    csvLoggingInsertData();
     replot();
 }
 
@@ -414,3 +430,151 @@ TestDataGen::~TestDataGen()
 
     delete timer;
 }
+
+/*
+int csvLoggingEnable;
+int csvLoggingHeaderSaved;
+int csvLoggingDataSaved;
+QString csvLoggingPath;
+QFile csvLoggingFile;
+*/
+int ScopeGadgetWidget::csvLoggingStart()
+{
+    if (!m_csvLoggingStarted)
+    if (m_csvLoggingEnabled)
+    if ((!m_csvLoggingNewFileOnConnect)||(m_csvLoggingNewFileOnConnect && m_csvLoggingConnected))
+    {
+        QDateTime NOW = QDateTime::currentDateTime();
+        m_csvLoggingStartTime = NOW;
+        m_csvLoggingHeaderSaved=0;
+        m_csvLoggingDataSaved=0;
+        QDir PathCheck(m_csvLoggingPath);
+        if (!PathCheck.exists())
+        {
+            PathCheck.mkpath("./");
+        }
+
+
+        if (m_csvLoggingNameSet)
+        {
+            m_csvLoggingFile.setFileName(QString("%1/%2_%3_%4.csv").arg(m_csvLoggingPath).arg(m_csvLoggingName).arg(NOW.toString("yyyy-MM-dd")).arg(NOW.toString("hh-mm-ss")));
+        }
+        else
+        {
+            m_csvLoggingFile.setFileName(QString("%1/Log_%2_%3.csv").arg(m_csvLoggingPath).arg(NOW.toString("yyyy-MM-dd")).arg(NOW.toString("hh-mm-ss")));
+        }
+        QDir FileCheck(m_csvLoggingFile.fileName());
+        if (FileCheck.exists())
+        {
+            m_csvLoggingFile.setFileName("");
+        }
+        else
+        {
+            m_csvLoggingStarted=1;
+            csvLoggingInsertHeader();
+        }
+
+    }
+
+    return 0;
+}
+
+int ScopeGadgetWidget::csvLoggingStop()
+{
+    m_csvLoggingStarted=0;
+
+    return 0;
+}
+
+int ScopeGadgetWidget::csvLoggingInsertHeader()
+{
+    if (!m_csvLoggingStarted) return -1;
+    if (m_csvLoggingHeaderSaved) return -2;
+    if (m_csvLoggingDataSaved) return -3;
+
+    m_csvLoggingHeaderSaved=1;
+    if(m_csvLoggingFile.open(QIODevice::WriteOnly | QIODevice::Append)== FALSE)
+    {
+        qDebug() << "Unable to open " << m_csvLoggingFile.fileName() << " for csv logging Header";
+    }
+    else
+    {
+        QTextStream ts( &m_csvLoggingFile );
+        ts << "date" << ", " << "Time"<< ", " << "Sec since start"<< ", " << "Connected";
+
+        foreach(PlotData* plotData2, m_curvesData.values())
+        {
+            ts  << ", ";
+            ts  << plotData2->uavObject;
+            ts  << "." << plotData2->uavField;
+            if (plotData2->haveSubField) ts  << "." << plotData2->uavSubField;
+        }
+        ts << endl;
+        m_csvLoggingFile.close();
+    }
+    return 0;
+}
+
+int ScopeGadgetWidget::csvLoggingInsertData()
+{
+    if (!m_csvLoggingStarted) return -1;
+    m_csvLoggingDataSaved=1;
+    m_csvLoggingDataValid=0;
+    QDateTime NOW = QDateTime::currentDateTime();
+    QString tempString;
+
+    if(m_csvLoggingFile.open(QIODevice::WriteOnly | QIODevice::Append)== FALSE)
+    {
+        qDebug() << "Unable to open " << m_csvLoggingFile.fileName() << " for csv logging Data";
+    }
+    else
+    {
+        QTextStream ss( &tempString );
+        ss << NOW.toString("yyyy-MM-dd") << ", " << NOW.toString("hh:mm:ss.z") << ", " << (NOW.toMSecsSinceEpoch() - m_csvLoggingStartTime.toMSecsSinceEpoch())/1000.00;
+        ss << ", " << m_csvLoggingConnected;
+        foreach(PlotData* plotData2, m_curvesData.values())
+        {
+            ss  << ", ";
+            if (plotData2->xData->isEmpty ())
+            {
+            }
+            else
+            {
+                ss  << QString().sprintf("%3.6g",plotData2->yData->last()/pow(10,plotData2->scalePower));
+                m_csvLoggingDataValid=1;
+            }
+        }
+        ss << endl;
+        if (m_csvLoggingDataValid)
+        {
+            QTextStream ts( &m_csvLoggingFile );
+            ts << tempString;
+        }
+        m_csvLoggingFile.close();
+    }
+
+
+    return 0;
+}
+void ScopeGadgetWidget::csvLoggingSetName(QString newName)
+{
+    m_csvLoggingName = newName;
+    m_csvLoggingNameSet=1;
+}
+
+
+
+void ScopeGadgetWidget::csvLoggingConnect()
+{
+    m_csvLoggingConnected=1;
+    if (m_csvLoggingNewFileOnConnect)csvLoggingStart();
+    return;
+}
+void ScopeGadgetWidget::csvLoggingDisconnect()
+{
+    m_csvLoggingHeaderSaved=0;
+    m_csvLoggingConnected=0;
+    if (m_csvLoggingNewFileOnConnect)csvLoggingStop();
+    return;
+}
+

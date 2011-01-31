@@ -116,6 +116,17 @@ QWidget* ScopeGadgetOptionsPage::createPage(QWidget *parent)
 
     setYAxisWidgetFromPlotCurve();
 
+    //logging path setup
+    options_page->LoggingPath->setExpectedKind(Utils::PathChooser::Directory);
+    options_page->LoggingPath->setPromptDialogTitle(tr("Choose Logging Directory"));
+    options_page->LoggingPath->setPath(m_config->getLoggingPath());
+    options_page->LoggingConnect->setChecked(m_config->getLoggingNewFileOnConnect());
+    options_page->LoggingEnable->setChecked(m_config->getLoggingEnabled());
+    connect(options_page->LoggingEnable, SIGNAL(clicked()), this, SLOT(on_loggingEnable_clicked()));
+    on_loggingEnable_clicked();
+
+
+
     return optionsPageWidget;
 }
 
@@ -226,6 +237,12 @@ void ScopeGadgetOptionsPage::apply()
     }
 
     m_config->replacePlotCurveConfig(plotCurveConfigs);
+
+    //save the logging config
+    m_config->setLoggingPath(options_page->LoggingPath->path());
+    m_config->setLoggingNewFileOnConnect(options_page->LoggingConnect->isChecked());
+    m_config->setLoggingEnabled(options_page->LoggingEnable->isChecked());
+
 }
 
 /*!
@@ -309,3 +326,12 @@ void ScopeGadgetOptionsPage::on_lstCurves_currentRowChanged(int currentRow)
     Q_UNUSED(currentRow);
     setYAxisWidgetFromPlotCurve();
 }
+
+void ScopeGadgetOptionsPage::on_loggingEnable_clicked()
+ {
+    bool en = options_page->LoggingEnable->isChecked();
+    options_page->LoggingPath->setEnabled(en);
+    options_page->LoggingConnect->setEnabled(en);
+    options_page->LoggingLabel->setEnabled(en);
+
+ }

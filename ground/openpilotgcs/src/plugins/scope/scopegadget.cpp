@@ -74,6 +74,15 @@ void ScopeGadget::loadConfiguration(IUAVGadgetConfiguration* config)
                        Qt::BevelJoin)
                 );
     }   
+
+    widget->setLoggingEnabled(sgConfig->getLoggingEnabled());
+    widget->setLoggingNewFileOnConnect(sgConfig->getLoggingNewFileOnConnect());
+    widget->setLoggingPath(sgConfig->getLoggingPath());
+
+    widget->csvLoggingStop();
+    widget->csvLoggingSetName(sgConfig->name());
+    widget->csvLoggingStart();
+
 }
 
 ScopeGadget::~ScopeGadget()

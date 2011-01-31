@@ -114,7 +114,12 @@ public:
     void addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor = 0, QPen pen = QPen(Qt::black));
     //void removeCurvePlot(QString uavObject, QString uavField);
     void clearCurvePlots();
-
+    int csvLoggingStart();
+    int csvLoggingStop();
+    void csvLoggingSetName(QString);
+    void setLoggingEnabled(bool value){m_csvLoggingEnabled=value;};
+    void setLoggingNewFileOnConnect(bool value){m_csvLoggingNewFileOnConnect=value;};
+    void setLoggingPath(QString value){m_csvLoggingPath=value;};
 
 private slots:
     void uavObjectReceived(UAVObject*);
@@ -122,6 +127,8 @@ private slots:
     void showCurve(QwtPlotItem *item, bool on);
     void startPlotting();
     void stopPlotting();
+    void csvLoggingConnect();
+    void csvLoggingDisconnect();
 
 private:
 
@@ -138,6 +145,25 @@ private:
     static TestDataGen* testDataGen;    
 
     QTimer *replotTimer;
+
+    bool m_csvLoggingStarted;
+    bool m_csvLoggingEnabled;
+    bool m_csvLoggingHeaderSaved;
+    bool m_csvLoggingDataSaved;
+    bool m_csvLoggingNameSet;
+    bool m_csvLoggingDataValid;
+    bool m_csvLoggingConnected;
+    bool m_csvLoggingNewFileOnConnect;
+
+    QDateTime m_csvLoggingStartTime;
+
+    QString m_csvLoggingName;
+    QString m_csvLoggingPath;
+    QFile m_csvLoggingFile;
+
+    int csvLoggingInsertHeader();
+    int csvLoggingInsertData();
+
 };
 
 

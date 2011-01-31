@@ -78,6 +78,8 @@ private slots:
     void on_btnAddCurve_clicked();
     void on_cmbUAVObjects_currentIndexChanged(QString val);    
     void on_btnColor_clicked();
+    void on_loggingEnable_clicked();
+
 };
 
 #endif // SCOPEGADGETOPTIONSPAGE_H

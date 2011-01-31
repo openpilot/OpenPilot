@@ -270,7 +270,7 @@ pipxtreme_%: uavobjects_flight
 sim_posix: sim_posix_elf
 
 sim_posix_%: uavobjects_flight
-	mkdir -p $(BUILD_DIR)/flight/sitl_posix
+	mkdir -p $(BUILD_DIR)/sitl_posix
 	$(MAKE) -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.posix $*
 
 .PHONY: sim_win32

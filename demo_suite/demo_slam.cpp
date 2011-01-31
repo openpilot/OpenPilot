@@ -244,6 +244,14 @@ const double INTRINSIC[4] = { 281.647017175628, 198.770772126498,   534.76039082
 const double DISTORTION[3] = { -0.27546592313146917, 0.12644899941674098, 0.036648747902512463 };
 */
 
+/* Vitana IR Camera
+	const std::string CAMERA_DEVICE = "0x0001687300025581";
+	const unsigned IMG_WIDTH = 160;
+	const unsigned IMG_HEIGHT = 120;
+	const double INTRINSIC[4] = { 86.54042,   63.63390,  216.52344,   217.71205 };
+	const double DISTORTION[3] = { -0.31580,   0.40753,   0.00000 };
+*/
+
 //
 const unsigned CORRECTION_SIZE = 4;
 const double PIX_NOISE = 1.0;

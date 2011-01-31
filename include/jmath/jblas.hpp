@@ -206,11 +206,17 @@ namespace jblas {
   typedef ublas::upper upper;
   typedef ublas::lower lower;
 	
-	typedef ublas::symmetric_adaptor<const jblas::mat> sym_adapt;
+	typedef ublas::symmetric_adaptor<const jblas::mat       > sym_adapt;
+	typedef ublas::symmetric_adaptor<const jblas::mat, upper> up_sym_adapt;
+	typedef ublas::symmetric_adaptor<const jblas::mat, lower> lo_sym_adapt;
+	typedef ublas::symmetric_adaptor<jblas::mat_column_major        > sym_adapt_column_major; 
+	typedef ublas::symmetric_adaptor<jblas::mat_column_major, upper > up_sym_adapt_column_major; 
+	typedef ublas::symmetric_adaptor<jblas::mat_column_major, lower > lo_sym_adapt_column_major; 
+	
 	/**
 	 * boost matrixes proxies
 	 */
-	typedef ublas::matrix_row< ublas::matrix<double, ublas::column_major> > mat_colum_major_row;
+	typedef ublas::matrix_row< jblas::mat_column_major > mat_colum_major_row;
 } // namespace jblas
 
 /*@}*/

@@ -2,6 +2,8 @@
 #define JMATH_MISC_HPP
 
 #include <cmath>
+#include <string>
+#include <sstream>
 
 namespace jafar {
 namespace jmath {
@@ -58,6 +60,25 @@ static inline std::string intToStr(int i) {
 	name << "" << i;
 	return name.str();
 }
+
+#define M_SQRTPI 1.7724538509055160
+
+inline double evalGaussian(double sigma, double x)
+{
+	return 1.0/(sigma*M_SQRT2*M_SQRTPI) * exp(-(x*x)/(2.0*sigma*sigma));
+}
+
+inline double evalGaussian(double sigma, double x, double y)
+{
+	double sigma22 = 2.0*sigma*sigma;
+	return 1.0/(M_PI*sigma22)*exp(-(x*x+y*y)/sigma22);
+}
+
+inline double evalGaussian(double sigmax, double sigmay, double x, double y)
+{
+	return 1.0/(2.0*M_PI*sigmax*sigmay)*exp(-(x*x)/(2.0*sigmax*sigmax) - (y*y)/(2.0*sigmay*sigmay));
+}
+
 
 }
 }

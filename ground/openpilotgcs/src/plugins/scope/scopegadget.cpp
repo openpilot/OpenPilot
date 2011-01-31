@@ -85,7 +85,11 @@ void ScopeGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 
 }
 
+/**
+  Scope gadget destructor: should delete the associated
+  scope gadget widget too!
+  */
 ScopeGadget::~ScopeGadget()
 {
-
+   delete m_widget;
 }

@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       uavtalk_comms.h
+ * @file       api_comms.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      RF Module hardware layer
  * @see        The GNU Public License (GPL) Version 3
@@ -23,17 +23,17 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __UAVTALK_COMMS_H__
-#define __UAVTALK_COMMS_H__
+#ifndef __API_COMMS_H__
+#define __API_COMMS_H__
 
 #include "stdint.h"
 
 // *****************************************************************************
 
-void uavtalk_1ms_tick(void);
-void uavtalk_process(void);
+void api_1ms_tick(void);
+void api_process(void);
 
-void uavtalk_init(void);
+void api_init(void);
 
 // *****************************************************************************
 

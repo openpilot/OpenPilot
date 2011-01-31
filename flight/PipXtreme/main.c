@@ -38,7 +38,7 @@
 #include "rfm22b.h"
 #include "packet_handler.h"
 #include "transparent_comms.h"
-#include "uavtalk_comms.h"
+#include "api_comms.h"
 #include "gpio_in.h"
 #include "stopwatch.h"
 #include "watchdog.h"
@@ -273,7 +273,7 @@ void TIMER_INT_FUNC(void)
 			if (!API_Mode)
 				trans_1ms_tick();		// transparent communications tick
 			else
-				uavtalk_1ms_tick();		// uavtalk communications tick
+				api_1ms_tick();			// api communications tick
 
 			// ***********
 		}
@@ -626,7 +626,7 @@ int main()
 
     trans_init();                                       // initialise the tranparent communications module
 
-    uavtalk_init();                                     // initialise the UAVTalk communications module
+    api_init();    		                                // initialise the API communications module
 
     setup_TimerInt(1000);                               // setup a 1kHz timer interrupt
 
@@ -915,7 +915,7 @@ int main()
         if (!API_Mode)
           trans_process();			// tranparent local communication processing (serial port and usb port)
         else
-          uavtalk_process();			// UAVTalk local communication processing (serial port and usb port)
+          api_process();			// API local communication processing (serial port and usb port)
 
 
 
@@ -937,7 +937,7 @@ int main()
 
 
         // ******************
-        // TEST ONLY ... get/put data over the radio link .. speed testing .. comment out trans_process() and uavtalk_process() if testing with this
+        // TEST ONLY ... get/put data over the radio link .. speed testing .. comment out trans_process() and api_process() if testing with this
 /*
 		int connection_index = 0;
 

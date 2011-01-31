@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       uavtalk_comms.h
+ * @file       api_comms.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      RF Module hardware layer
  * @see        The GNU Public License (GPL) Version 3
@@ -38,12 +38,12 @@
 
 #include "stm32f10x.h"
 #include "gpio_in.h"
-#include "uavtalk_comms.h"
+#include "api_comms.h"
 #include "packet_handler.h"
 #include "main.h"
 
 #if defined(PIOS_COM_DEBUG)
-	#define UAVTALK_DEBUG
+	#define API_DEBUG
 #endif
 
 // *****************************************************************************
@@ -104,26 +104,26 @@ static const uint8_t crc_table[256] = {
 // *****************************************************************************
 // local variables
 
-int8_t				uavtalk_previous_com_port = -1;
+int8_t				api_previous_com_port = -1;
 
-volatile uint16_t	uavtalk_rx_timer = 0;
-volatile uint16_t	uavtalk_tx_timer = 0;
+volatile uint16_t	api_rx_timer = 0;
+volatile uint16_t	api_tx_timer = 0;
 
-uint8_t				uavtalk_rx_buffer[MAX_PACKET_LENGTH] __attribute__ ((aligned(4)));
-uint16_t			uavtalk_rx_buffer_wr;
+uint8_t				api_rx_buffer[MAX_PACKET_LENGTH] __attribute__ ((aligned(4)));
+uint16_t			api_rx_buffer_wr;
 
-uint8_t				uavtalk_tx_buffer[MAX_PACKET_LENGTH] __attribute__ ((aligned(4)));
-uint16_t			uavtalk_tx_buffer_wr;
+uint8_t				api_tx_buffer[MAX_PACKET_LENGTH] __attribute__ ((aligned(4)));
+uint16_t			api_tx_buffer_wr;
 
 // *****************************************************************************
 // 8-bit CRC updating
 
-uint8_t uavtalk_updateCRC_byte(uint8_t crc, uint8_t b)
+uint8_t api_updateCRC_byte(uint8_t crc, uint8_t b)
 {
 	return crc_table[crc ^ b];
 }
 
-uint8_t uavtalk_updateCRC_buffer(uint8_t crc, const void *data, int32_t length)
+uint8_t api_updateCRC_buffer(uint8_t crc, const void *data, int32_t length)
 {
 	// use registers for speed
     register uint8_t crc8 = crc;
@@ -141,7 +141,7 @@ uint8_t uavtalk_updateCRC_buffer(uint8_t crc, const void *data, int32_t length)
 //
 // any corrupt/invalid UAVTalk packets/data are deleted from the buffer and we scan for the next valid packet.
 
-int16_t uavtalk_scanForPacket(void *buf, uint16_t *len)
+int16_t api_scanForUAVTalkPacket(void *buf, uint16_t *len)
 {
 	uint8_t *buffer = (uint8_t *)buf;
 
@@ -158,7 +158,7 @@ int16_t uavtalk_scanForPacket(void *buf, uint16_t *len)
 		// scan the buffer for the start of a UAVTalk packet
 		for (uint16_t i = 0; i < num_bytes; i++)
 		{
-			if (uavtalk_rx_buffer[i] != SYNC_VAL)
+			if (api_rx_buffer[i] != SYNC_VAL)
 				continue;	// not the start of a packet - move on to the next byte in the buffer
 
 			// possible start of packet found - we found a SYNC byte
@@ -197,7 +197,7 @@ int16_t uavtalk_scanForPacket(void *buf, uint16_t *len)
 		}
 
 		// check the packet CRC
-		uint8_t crc1 = uavtalk_updateCRC_buffer(0, buffer, header1->packet_size);
+		uint8_t crc1 = api_updateCRC_buffer(0, buffer, header1->packet_size);
 		uint8_t crc2 = buffer[header1->packet_size];
 		if (crc1 != crc2)
 		{	// faulty CRC
@@ -206,14 +206,14 @@ int16_t uavtalk_scanForPacket(void *buf, uint16_t *len)
 //			*len = num_bytes;
 			buffer[0] ^= 0xaa;	// corrupt the sync byte - we'll move the buffer bytes down further up in the code
 
-			#if defined(UAVTALK_DEBUG)
+			#if defined(API_DEBUG)
 				DEBUG_PRINTF("UAVTalk packet corrupt %d\r\n", header1->packet_size + 1);
 			#endif
 
 			continue;	// continue scanning for a valid packet in the buffer
 		}
 
-		#if defined(UAVTALK_DEBUG)
+		#if defined(API_DEBUG)
 			DEBUG_PRINTF("UAVTalk packet found %d\r\n", header1->packet_size + 1);
 		#endif
 
@@ -226,17 +226,17 @@ int16_t uavtalk_scanForPacket(void *buf, uint16_t *len)
 // *****************************************************************************
 // can be called from an interrupt if you wish
 
-void uavtalk_1ms_tick(void)
+void api_1ms_tick(void)
 {	// call this once every 1ms
 
-	if (uavtalk_rx_timer < 0xffff) uavtalk_rx_timer++;
-	if (uavtalk_tx_timer < 0xffff) uavtalk_tx_timer++;
+	if (api_rx_timer < 0xffff) api_rx_timer++;
+	if (api_tx_timer < 0xffff) api_tx_timer++;
 }
 
 // *****************************************************************************
 // call this as often as possible - not from an interrupt
 
-void uavtalk_process(void)
+void api_process(void)
 {	// copy data from comm-port RX buffer to RF packet handler TX buffer, and from RF packet handler RX buffer to comm-port TX buffer
 
 	// ********************
@@ -256,11 +256,11 @@ void uavtalk_process(void)
 	// ********************
 	// check to see if the local communication port has changed (usart/usb)
 
-	if (uavtalk_previous_com_port < 0 && uavtalk_previous_com_port != comm_port)
+	if (api_previous_com_port < 0 && api_previous_com_port != comm_port)
 	{	// the local communications port has changed .. remove any data in the buffers
-		uavtalk_rx_buffer_wr = 0;
+		api_rx_buffer_wr = 0;
 
-		uavtalk_tx_buffer_wr = 0;
+		api_tx_buffer_wr = 0;
 	}
 	else
 	if (usb_comms)
@@ -273,7 +273,7 @@ void uavtalk_process(void)
 		}
 	}
 
-	uavtalk_previous_com_port = comm_port;			// remember the current comm-port we are using
+	api_previous_com_port = comm_port;			// remember the current comm-port we are using
 
 	// ********************
 
@@ -302,31 +302,30 @@ void uavtalk_process(void)
 			SERIAL_RTS_SET;								// release the USART RTS line
 
 		// limit number of bytes we will get to how much space we have in our RX buffer
-		if (com_num > sizeof(uavtalk_rx_buffer) - uavtalk_rx_buffer_wr)
-			com_num = sizeof(uavtalk_rx_buffer) - uavtalk_rx_buffer_wr;
+		if (com_num > sizeof(api_rx_buffer) - api_rx_buffer_wr)
+			com_num = sizeof(api_rx_buffer) - api_rx_buffer_wr;
 
 		while (com_num > 0)
 		{	// fetch a byte from the comm-port RX buffer and save it into our RX buffer
-			uavtalk_rx_buffer[uavtalk_rx_buffer_wr++] = PIOS_COM_ReceiveBuffer(comm_port);
+			api_rx_buffer[api_rx_buffer_wr++] = PIOS_COM_ReceiveBuffer(comm_port);
 			com_num--;
 		}
 
-		int16_t packet_size = uavtalk_scanForPacket(uavtalk_rx_buffer, &uavtalk_rx_buffer_wr);
-
+		int16_t packet_size = api_scanForUAVTalkPacket(api_rx_buffer, &api_rx_buffer_wr);
 		if (packet_size < 0)
 			break;	// no UAVTalk packet in our RX buffer
 
-		uavtalk_rx_timer = 0;
+		api_rx_timer = 0;
 
 		if (!ph_connected(connection_index))
 		{	// we don't have a link to a remote modem .. remove the UAVTalk packet from our RX buffer
-			if (uavtalk_rx_buffer_wr > packet_size)
+			if (api_rx_buffer_wr > packet_size)
 			{
-				uavtalk_rx_buffer_wr -= packet_size;
-				memmove(uavtalk_rx_buffer, uavtalk_rx_buffer + packet_size, uavtalk_rx_buffer_wr);
+				api_rx_buffer_wr -= packet_size;
+				memmove(api_rx_buffer, api_rx_buffer + packet_size, api_rx_buffer_wr);
 			}
 			else
-				uavtalk_rx_buffer_wr = 0;
+				api_rx_buffer_wr = 0;
 			continue;
 		}
 
@@ -334,16 +333,16 @@ void uavtalk_process(void)
 			break;	// not enough room in the RF packet handler TX buffer for the UAVTalk packet
 
 		// copy the rx'ed UAVTalk packet into the RF packet handler TX buffer for sending over the RF link
-		ph_putData(connection_index, uavtalk_rx_buffer, packet_size);
+		ph_putData(connection_index, api_rx_buffer, packet_size);
 
 		// remove the UAVTalk packet from our RX buffer
-		if (uavtalk_rx_buffer_wr > packet_size)
+		if (api_rx_buffer_wr > packet_size)
 		{
-			uavtalk_rx_buffer_wr -= packet_size;
-			memmove(uavtalk_rx_buffer, uavtalk_rx_buffer + packet_size, uavtalk_rx_buffer_wr);
+			api_rx_buffer_wr -= packet_size;
+			memmove(api_rx_buffer, api_rx_buffer + packet_size, api_rx_buffer_wr);
 		}
 		else
-			uavtalk_rx_buffer_wr = 0;
+			api_rx_buffer_wr = 0;
 	}
 
 	// ********************
@@ -355,16 +354,16 @@ void uavtalk_process(void)
 		uint16_t ph_num = ph_getData_used(connection_index);
 
 		// limit to how much space we have in the temp TX buffer
-		if (ph_num > sizeof(uavtalk_tx_buffer) - uavtalk_tx_buffer_wr)
-			ph_num = sizeof(uavtalk_tx_buffer) - uavtalk_tx_buffer_wr;
+		if (ph_num > sizeof(api_tx_buffer) - api_tx_buffer_wr)
+			ph_num = sizeof(api_tx_buffer) - api_tx_buffer_wr;
 
 		if (ph_num > 0)
 		{	// fetch the data bytes received via the RF link and save into our temp buffer
-			ph_num = ph_getData(connection_index, uavtalk_tx_buffer + uavtalk_tx_buffer_wr, ph_num);
-			uavtalk_tx_buffer_wr += ph_num;
+			ph_num = ph_getData(connection_index, api_tx_buffer + api_tx_buffer_wr, ph_num);
+			api_tx_buffer_wr += ph_num;
 		}
 
-		int16_t packet_size = uavtalk_scanForPacket(uavtalk_tx_buffer, &uavtalk_tx_buffer_wr);
+		int16_t packet_size = api_scanForUAVTalkPacket(api_tx_buffer, &api_tx_buffer_wr);
 
 		if (packet_size <= 0)
 			break;	// no UAV Talk packet found
@@ -374,8 +373,8 @@ void uavtalk_process(void)
 		#if (defined(PIOS_COM_DEBUG) && (PIOS_COM_DEBUG == PIOS_COM_SERIAL))
 			if (!usb_comms)
 			{	// the serial-port is being used for debugging - don't send data down it
-				uavtalk_tx_buffer_wr = 0;
-				uavtalk_tx_timer = 0;
+				api_tx_buffer_wr = 0;
+				api_tx_timer = 0;
 				continue;
 			}
 		#endif
@@ -386,24 +385,24 @@ void uavtalk_process(void)
 		// send the data out the comm-port
 		int32_t res;
 //		if (usb_comms)
-//			res = PIOS_COM_SendBuffer(comm_port, uavtalk_tx_buffer, packet_size);
+//			res = PIOS_COM_SendBuffer(comm_port, api_tx_buffer, packet_size);
 //		else
-			res = PIOS_COM_SendBufferNonBlocking(comm_port, uavtalk_tx_buffer, packet_size);	// this one doesn't work properly with USB :(
+			res = PIOS_COM_SendBufferNonBlocking(comm_port, api_tx_buffer, packet_size);	// this one doesn't work properly with USB :(
 		if (res < 0)
 		{	// failed to send the data out the comm-port
-			#if defined(UAVTALK_DEBUG)
+			#if defined(API_DEBUG)
 				DEBUG_PRINTF("PIOS_COM_SendBuffer %d %d\r\n", packet_size, res);
 			#endif
 
-			if (uavtalk_tx_timer >= 5000)
+			if (api_tx_timer >= 5000)
 			{	// seems we can't send our data for at least the last 5 seconds - delete it
-				if (uavtalk_tx_buffer_wr > packet_size)
+				if (api_tx_buffer_wr > packet_size)
 				{
-					uavtalk_tx_buffer_wr -= packet_size;
-					memmove(uavtalk_tx_buffer, uavtalk_tx_buffer + packet_size, uavtalk_tx_buffer_wr);
+					api_tx_buffer_wr -= packet_size;
+					memmove(api_tx_buffer, api_tx_buffer + packet_size, api_tx_buffer_wr);
 				}
 				else
-					uavtalk_tx_buffer_wr = 0;
+					api_tx_buffer_wr = 0;
 			}
 
 			break;
@@ -411,15 +410,15 @@ void uavtalk_process(void)
 
 		// data was sent out the comm-port OK .. remove the sent data from our buffer
 
-		if (uavtalk_tx_buffer_wr > packet_size)
+		if (api_tx_buffer_wr > packet_size)
 		{
-			uavtalk_tx_buffer_wr -= packet_size;
-			memmove(uavtalk_tx_buffer, uavtalk_tx_buffer + packet_size, uavtalk_tx_buffer_wr);
+			api_tx_buffer_wr -= packet_size;
+			memmove(api_tx_buffer, api_tx_buffer + packet_size, api_tx_buffer_wr);
 		}
 		else
-			uavtalk_tx_buffer_wr = 0;
+			api_tx_buffer_wr = 0;
 
-		uavtalk_tx_timer = 0;
+		api_tx_timer = 0;
 	}
 
 	// ********************
@@ -427,16 +426,16 @@ void uavtalk_process(void)
 
 // *****************************************************************************
 
-void uavtalk_init(void)
+void api_init(void)
 {
-	uavtalk_previous_com_port = -1;
+	api_previous_com_port = -1;
 
-	uavtalk_rx_buffer_wr = 0;
+	api_rx_buffer_wr = 0;
 
-	uavtalk_tx_buffer_wr = 0;
+	api_tx_buffer_wr = 0;
 
-	uavtalk_rx_timer = 0;
-	uavtalk_tx_timer = 0;
+	api_rx_timer = 0;
+	api_tx_timer = 0;
 }
 
 // *****************************************************************************

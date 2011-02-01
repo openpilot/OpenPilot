@@ -70,7 +70,7 @@ ModelViewGadgetWidget::ModelViewGadgetWidget(QWidget *parent)
 
 ModelViewGadgetWidget::~ModelViewGadgetWidget()
 {
-    delete m_pFactory;
+    //delete m_pFactory;
 }
 
 //// Public funcitons ////

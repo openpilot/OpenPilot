@@ -86,8 +86,8 @@ GpsConstellationWidget::~GpsConstellationWidget()
     delete scene;
     scene = 0;
 
-    delete renderer;
-    renderer = 0;
+    //delete renderer;
+    //renderer = 0;
 }
 
 void GpsConstellationWidget::showEvent(QShowEvent *event)

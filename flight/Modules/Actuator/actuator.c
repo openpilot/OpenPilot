@@ -215,7 +215,7 @@ static void actuatorTask(void* parameters)
 						
 					command.Channel[ct] = scaleChannel(status[ct],
 									   settings.ChannelMax[ct],
-									   settings.ChannelNeutral[ct],
+									   settings.ChannelMin[ct],
 									   settings.ChannelNeutral[ct]);
 				}
 			}

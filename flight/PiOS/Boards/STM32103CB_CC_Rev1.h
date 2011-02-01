@@ -224,7 +224,7 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 // ADCCLK = PCLK2 / 2
 #define PIOS_ADC_RATE		(72.0e6 / 1 / 8 / 252 / (PIOS_ADC_NUM_ADC_CHANNELS >> PIOS_ADC_USE_ADC2))
 #define EKF_RATE		(PIOS_ADC_RATE / adc_oversampling / 2)
-#define PIOS_ADC_MAX_OVERSAMPLING               20
+#define PIOS_ADC_MAX_OVERSAMPLING               55
 
 //-------------------------
 // Receiver PWM inputs

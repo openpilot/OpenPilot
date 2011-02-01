@@ -102,6 +102,7 @@ static void AttitudeTask(void *parameters)
 
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 
+	PIOS_ADC_Config(PIOS_ADC_RATE / (1000 / UPDATE_RATE));
 	PIOS_ADC_SetCallback(adc_callback);
 
 	// Keep flash CS pin high while talking accel

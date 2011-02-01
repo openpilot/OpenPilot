@@ -25,19 +25,37 @@
 
 #include <QDebug>
 #include <QtOpenGL/QGLWidget>
+#include <stdlib.h>
 
 #include "pipxtremegadgetwidget.h"
 
 //#include <aggregation/aggregate.h>
 
+#define NO_PORT					0
 #define SERIAL_PORT				1
 #define USB_PORT				2
 
-#define pipx_header_marker		0x76b38a52
+// ***************************************************************************************
+// config packet details
+
+#define MAX_RETRIES					7
+#define RETRY_TIME					500		// ms
+
+#define pipx_header_marker			0x76b38a52
+
+#define pipx_packet_type_req_config	1
+#define pipx_packet_type_config		2
+
+enum {
+	freqBand_UNKNOWN = 0,
+	freqBand_434MHz,
+	freqBand_868MHz,
+	freqBand_915MHz
+};
 
 // ***************************************************************************************
 
-#define Poly32	0x04c11db7				// 32-bit polynomial .. this should produce the same as the STM32 hardware CRC
+#define Poly32	0x04c11db7		// 32-bit polynomial .. this should produce the same as the STM32 hardware CRC
 
 uint32_t CRC_Table32[] = {
 		0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9, 0x130476dc, 0x17c56b6b, 0x1a864db2, 0x1e475005,
@@ -80,7 +98,8 @@ uint32_t CRC_Table32[] = {
 PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 	QWidget(parent),
 	m_widget(NULL),
-	m_ioDevice(NULL)
+	m_ioDevice(NULL),
+	m_stage(PIPX_IDLE)
 {
 	m_widget = new Ui_PipXtremeWidget();
 	m_widget->setupUi(this);
@@ -114,6 +133,33 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 		m_widget->comboBox_SerialPortSpeed->addItem(m_widget->comboBox_SerialBaudrate->itemText(i), m_widget->comboBox_SerialBaudrate->itemData(i));
 	m_widget->comboBox_SerialPortSpeed->setCurrentIndex(m_widget->comboBox_SerialPortSpeed->findText("57600"));
 
+	m_widget->comboBox_MaxRFBandwidth->clear();
+	m_widget->comboBox_MaxRFBandwidth->addItem("500", 500);
+	m_widget->comboBox_MaxRFBandwidth->addItem("1000", 1000);
+	m_widget->comboBox_MaxRFBandwidth->addItem("2000", 2000);
+	m_widget->comboBox_MaxRFBandwidth->addItem("4000", 4000);
+	m_widget->comboBox_MaxRFBandwidth->addItem("8000", 8000);
+	m_widget->comboBox_MaxRFBandwidth->addItem("9600", 9600);
+	m_widget->comboBox_MaxRFBandwidth->addItem("16000", 16000);
+	m_widget->comboBox_MaxRFBandwidth->addItem("19200", 19200);
+	m_widget->comboBox_MaxRFBandwidth->addItem("24000", 24000);
+	m_widget->comboBox_MaxRFBandwidth->addItem("32000", 32000);
+	m_widget->comboBox_MaxRFBandwidth->addItem("64000", 64000);
+	m_widget->comboBox_MaxRFBandwidth->addItem("128000", 128000);
+	m_widget->comboBox_MaxRFBandwidth->addItem("192000", 192000);
+	m_widget->comboBox_MaxRFBandwidth->setCurrentIndex(m_widget->comboBox_MaxRFBandwidth->findText("128000"));
+
+	m_widget->comboBox_MaxRFTxPower->clear();
+	m_widget->comboBox_MaxRFTxPower->addItem("1.25mW", 0);
+	m_widget->comboBox_MaxRFTxPower->addItem("1.6mW", 1);
+	m_widget->comboBox_MaxRFTxPower->addItem("3.16mW", 2);
+	m_widget->comboBox_MaxRFTxPower->addItem("6.3mW", 3);
+	m_widget->comboBox_MaxRFTxPower->addItem("12.6mW", 4);
+	m_widget->comboBox_MaxRFTxPower->addItem("25mW", 5);
+	m_widget->comboBox_MaxRFTxPower->addItem("50mW", 6);
+	m_widget->comboBox_MaxRFTxPower->addItem("100mW", 7);
+	m_widget->comboBox_MaxRFTxPower->setCurrentIndex(m_widget->comboBox_MaxRFTxPower->findText("12.6mW"));
+
 	m_widget->doubleSpinBox_Frequency->setSingleStep(0.00015625);
 
 	m_widget->progressBar_RSSI->setMinimum(-120);
@@ -136,6 +182,7 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 //        spec_scene->setSceneRect(m_background->boundingRect());
     }
 
+	m_widget->pushButton_Save->setEnabled(false);
 	m_widget->pushButton_ScanSpectrum->setEnabled(false);
 
 	QIcon rbi;
@@ -160,6 +207,9 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 
 	connect(m_widget->connectButton, SIGNAL(clicked()), this, SLOT(connectDisconnect()));
 	connect(m_widget->refreshPorts, SIGNAL(clicked()), this, SLOT(getPorts()));
+	connect(m_widget->pushButton_AESKeyRandom, SIGNAL(clicked()), this, SLOT(randomiseAESKey()));
+	connect(m_widget->pushButton_ScanSpectrum, SIGNAL(clicked()), this, SLOT(scanSpectrum()));
+	connect(m_widget->pushButton_Save, SIGNAL(clicked()), this, SLOT(saveToFlash()));
 
 //    delay::msleep(600);   // just for pips reference
 }
@@ -217,10 +267,15 @@ void PipXtremeGadgetWidget::onComboBoxPorts_currentIndexChanged(int index)
 
 // ***************************************************************************************
 
+uint32_t PipXtremeGadgetWidget::updateCRC32(uint32_t crc, uint8_t b)
+{
+	return (crc << 8) ^ CRC_Table32[(crc >> 24) ^ b];
+}
+
 uint32_t PipXtremeGadgetWidget::updateCRC32Data(uint32_t crc, void *data, int len)
 {
-	uint8_t *p = (uint8_t *)data;
-	uint32_t _crc = crc;
+	register uint8_t *p = (uint8_t *)data;
+	register uint32_t _crc = crc;
 	for (int i = len; i > 0; i--)
 		_crc = (_crc << 8) ^ CRC_Table32[(_crc >> 24) ^ *p++];
 	return _crc;
@@ -282,7 +337,7 @@ void PipXtremeGadgetWidget::getPorts()
        list.append(port.friendName);
 
 	for (int i = 0; i < list.count(); i++)
-		m_widget->comboBox_Ports->addItem(list.at(i), SERIAL_PORT);
+		m_widget->comboBox_Ports->addItem("com: " + list.at(i), SERIAL_PORT);
 
     // ********************************
     // Populate the telemetry combo box with usb ports
@@ -301,7 +356,7 @@ void PipXtremeGadgetWidget::getPorts()
 			qSort(usb_ports.begin(), usb_ports.end());
 
 			for (int i = 0; i < usb_ports.count(); i++)
-				m_widget->comboBox_Ports->addItem(usb_ports.at(i), USB_PORT);
+				m_widget->comboBox_Ports->addItem("usb: " + usb_ports.at(i), USB_PORT);
         }
 
         delete rawHidHandle;
@@ -371,78 +426,254 @@ void PipXtremeGadgetWidget::enableTelemetry()
 
 // ***************************************************************************************
 
-void PipXtremeGadgetWidget::processOutputStream()
+void PipXtremeGadgetWidget::randomiseAESKey()
 {
-	QMutexLocker locker_dev(&device_mutex);
+	uint32_t crc = ((uint32_t)qrand() << 16) ^ qrand();
 
-	if (!m_ioDevice)
-        return;
-
-	if (!m_ioDevice->isOpen())
-		return;
-
-//	if (m_ioDevice->bytesToWrite() < TX_BUFFER_SIZE )
+	QString key = "";
+	for (int i = 0; i < 4; i++)
 	{
-//		m_ioDevice->write((const char*)txBuffer, dataOffset+length+CHECKSUM_LENGTH);
+		for (int i = 0; i < 27 + (qrand() & 0x7f); i++)
+			crc = updateCRC32(crc, qrand());
+
+		key += QString::number(crc, 16);
 	}
+
+	m_widget->lineEdit_AESKey->setText(key);
 }
 
-void PipXtremeGadgetWidget::processInputStream()
+void PipXtremeGadgetWidget::scanSpectrum()
+{
+}
+
+void PipXtremeGadgetWidget::saveToFlash()
 {
 	QMutexLocker locker_dev(&device_mutex);
 	QMutexLocker locker_inbuf(&device_input_buffer.mutex);
 
-	while (m_ioDevice)
-    {
-		if (!m_ioDevice->isOpen())
-			break;
+	if (!m_ioDevice) return;
+	if (!m_ioDevice->isOpen()) return;
 
-		qint64 bytes_available = m_ioDevice->bytesAvailable();
-		if (bytes_available <= 0)
-			break;
+	QString s;
+	uint32_t i;
+	bool ok;
 
-		if (!device_input_buffer.buffer)
-		{	// allocate a buffer for the data
-			device_input_buffer.size = bytes_available * 2;
-			device_input_buffer.used = 0;
-			device_input_buffer.buffer = new quint8 [device_input_buffer.size];
-			if (!device_input_buffer.buffer)
-				break;
-		}
-		else
+	t_pipx_config_data_settings settings;
+
+	s = m_widget->lineEdit_PairedSerialNumber->text().trimmed();
+	settings.destination_id = s.toUInt(&ok, 16);
+	if (s.isEmpty() || !ok)
+	{
+		error("Check your \"Paired Serial Number\" entry!", 0);
+		return;
+	}
+
+	settings.rf_xtal_cap = m_widget->spinBox_FrequencyCalibration->value();
+
+	s = m_widget->lineEdit_MinFrequency->text().trimmed();
+	settings.min_frequency_Hz = s.toUInt(&ok);
+	if (s.isEmpty() || !ok)
+	{
+		error("Check your \"Min Frequency\" entry!", 0);
+		return;
+	}
+
+	s = m_widget->lineEdit_MaxFrequency->text().trimmed();
+	settings.max_frequency_Hz = s.toUInt(&ok);
+	if (s.isEmpty() || !ok)
+	{
+		error("Check your \"Max Frequency\" entry!", 0);
+		return;
+	}
+
+	s = m_widget->doubleSpinBox_Frequency->text().trimmed();
+	settings.frequency_Hz = s.toFloat(&ok) * 1e6;
+	if (s.isEmpty() || !ok || settings.frequency_Hz < settings.min_frequency_Hz || settings.frequency_Hz > settings.max_frequency_Hz)
+	{
+		error("Check your \"Frequency\" entry!", 0);
+		return;
+	}
+
+	settings.max_rf_bandwidth = m_widget->comboBox_MaxRFBandwidth->itemData(m_widget->comboBox_MaxRFBandwidth->currentIndex()).toInt();
+
+	settings.max_tx_power = m_widget->comboBox_MaxRFTxPower->itemData(m_widget->comboBox_MaxRFTxPower->currentIndex()).toInt();
+
+	settings.serial_baudrate = m_widget->comboBox_SerialPortSpeed->itemData(m_widget->comboBox_SerialPortSpeed->currentIndex()).toInt();
+
+	settings.aes_enable = m_widget->checkBox_AESEnable->isChecked();
+
+	memset(settings.aes_key, 0, sizeof(settings.aes_key));
+	s = m_widget->lineEdit_AESKey->text().trimmed();
+	if (settings.aes_enable && s.length() != 32)
+	{
+		error("Check your \"AES Key\" entry! .. it must be 32 hex characters long", 0);
+		return;
+	}
+	for (int i = 0; i < sizeof(settings.aes_key); i++)
+	{
+		QString s2 = s.mid(0, 2);
+		s.remove(0, 2);
+		s = s.trimmed();
+		settings.aes_key[i] = s2.toInt(&ok, 16);
+		if (!ok)
 		{
-			if ((device_input_buffer.used + (bytes_available * 2)) > device_input_buffer.size)
-			{	// need to increase the size of the input buffer
-
-				// create a new larger buffer
-				int new_size = device_input_buffer.used + bytes_available * 2;
-				quint8 *new_buf = new quint8 [new_size];
-				if (!new_buf)
-					break;
-
-				// copy the data from the old buffer into the new buffer
-				memmove(new_buf, device_input_buffer.buffer, device_input_buffer.used);
-
-				// delete the old buffer
-				delete [] device_input_buffer.buffer;
-
-				// keep the new buffer
-				device_input_buffer.buffer = new_buf;
-				device_input_buffer.size = new_size;
-			}
+			error("Check your \"AES Key\" entry! .. it must contain only hex characters (0-9, a-f)", 0);
+			return;
 		}
+	}
 
-		// add the new data into the input buffer
-		qint64 bytes_read = m_ioDevice->read((char *)(device_input_buffer.buffer + device_input_buffer.used), bytes_available);
-		if (bytes_read <= 0)
-			break;
-		device_input_buffer.used += bytes_available;
+	s = m_widget->lineEdit_FrequencyBand->text().trimmed();
+	if (s == "434") settings.frequency_band = freqBand_434MHz;
+	else
+	if (s == "868") settings.frequency_band = freqBand_868MHz;
+	else
+	if (s == "915") settings.frequency_band = freqBand_915MHz;
+	else
+	{
+		error("Check your \"Frequency Band\" entry!", 0);
+		return;
+	}
 
-		processInputBuffer();
-    }
+	s = m_widget->lineEdit_FrequencyStepSize->text().trimmed();
+	settings.frequency_step_size = s.toFloat(&ok);
+	if (s.isEmpty() || !ok)
+	{
+		error("Check your \"Frequency Step Size\" entry!", 0);
+		return;
+	}
+
+	s = m_widget->lineEdit_SerialNumber->text().trimmed();
+	uint32_t serial_number = s.toUInt(&ok, 16);
+	if (s.isEmpty() || !ok || serial_number == 0)
+	{
+		error("Check your \"Serial Number\" entry!", 0);
+		return;
+	}
+
+	sendConfig(serial_number, &settings);
 }
 
-void PipXtremeGadgetWidget::processInputBuffer()
+// ***************************************************************************************
+// send various config packets
+
+void PipXtremeGadgetWidget::sendRequestConfig()
+{
+	// *****************
+	// create the packet
+
+	t_pipx_config_header header;
+	header.marker = pipx_header_marker;
+	header.serial_number = 0;
+	header.type = pipx_packet_type_req_config;
+	header.spare = 0;
+	header.data_size = 0;
+	header.data_crc = 0xffffffff;
+	header.header_crc = 0;
+	header.header_crc = updateCRC32Data(0xffffffff, &header, sizeof(t_pipx_config_header));
+
+	// *****************
+	// send the packet
+
+//	QMutexLocker locker_dev(&device_mutex);
+	if (!m_ioDevice) return;
+	if (!m_ioDevice->isOpen()) return;
+	qint64 bytes_written = m_ioDevice->write((const char*)&header, sizeof(t_pipx_config_header));
+
+//	error("Bytes written", bytes_written);	// TEST ONLY
+
+	// *****************
+}
+
+void PipXtremeGadgetWidget::sendConfig(uint32_t serial_number, t_pipx_config_data_settings *settings)
+{
+	if (!settings)
+		return;
+
+	uint8_t buffer[sizeof(t_pipx_config_header) + sizeof(t_pipx_config_data_settings)];
+
+	t_pipx_config_header *header = (t_pipx_config_header *)buffer;
+	uint8_t *data = (uint8_t *) header + sizeof(t_pipx_config_header);
+
+	// *****************
+	// create the packet
+
+	memcpy(data, settings, sizeof(t_pipx_config_data_settings));
+
+	header->marker = pipx_header_marker;
+	header->serial_number = serial_number;
+	header->type = pipx_packet_type_config;
+	header->spare = 0;
+	header->data_size = sizeof(t_pipx_config_data_settings);
+	header->data_crc = updateCRC32Data(0xffffffff, data, header->data_size);
+	header->header_crc = 0;
+	header->header_crc = updateCRC32Data(0xffffffff, header, sizeof(t_pipx_config_header));
+
+	// *****************
+	// send the packet
+
+//	QMutexLocker locker_dev(&device_mutex);
+	if (!m_ioDevice) return;
+	if (!m_ioDevice->isOpen()) return;
+	qint64 bytes_written = m_ioDevice->write((const char*)buffer, sizeof(t_pipx_config_header) + header->data_size);
+
+//	error("Bytes written", bytes_written);	// TEST ONLY
+
+	// *****************
+}
+
+// ***************************************************************************************
+// process rx stream data
+
+void PipXtremeGadgetWidget::processRxStream()
+{
+	QMutexLocker locker_dev(&device_mutex);
+	QMutexLocker locker_inbuf(&device_input_buffer.mutex);
+
+	if (!m_ioDevice) return;
+	if (!m_ioDevice->isOpen()) return;
+
+	qint64 bytes_available = m_ioDevice->bytesAvailable();
+	if (bytes_available <= 0) return;
+
+	// ensure we have buffer space for the new data
+	if (!device_input_buffer.buffer)
+	{	// allocate a buffer for the data
+		device_input_buffer.size = bytes_available * 2;
+		device_input_buffer.used = 0;
+		device_input_buffer.buffer = new quint8 [device_input_buffer.size];
+		if (!device_input_buffer.buffer) return;
+	}
+	else
+	{
+		if ((device_input_buffer.used + (bytes_available * 2)) > device_input_buffer.size)
+		{	// need to increase the buffer size
+
+			// create a new larger buffer
+			int new_size = device_input_buffer.used + bytes_available * 2;
+			quint8 *new_buf = new quint8 [new_size];
+			if (!new_buf) return;
+
+			// copy the data from the old buffer into the new buffer
+			memmove(new_buf, device_input_buffer.buffer, device_input_buffer.used);
+
+			// delete the old buffer
+			delete [] device_input_buffer.buffer;
+
+			// keep the new buffer
+			device_input_buffer.buffer = new_buf;
+			device_input_buffer.size = new_size;
+		}
+	}
+
+	// add the new data into the buffer
+	qint64 bytes_read = m_ioDevice->read((char *)(device_input_buffer.buffer + device_input_buffer.used), bytes_available);
+	if (bytes_read <= 0) return;
+	device_input_buffer.used += bytes_available;
+
+	processRxBuffer();
+}
+
+void PipXtremeGadgetWidget::processRxBuffer()
 {	// scan the buffer for a valid packet
 
 	if (!device_input_buffer.buffer || device_input_buffer.used < sizeof(t_pipx_config_header))
@@ -480,10 +711,14 @@ void PipXtremeGadgetWidget::processInputBuffer()
 			continue;
 		}
 
+		// valid error free header found!
+
 		int total_packet_size = sizeof(t_pipx_config_header) + header->data_size;
 
 		if (device_input_buffer.used < total_packet_size)
-			break;	// not yet got a full packet
+		{	// not yet got a full packet
+			break;
+		}
 
 		if (header->data_size > 0)
 		{
@@ -500,7 +735,7 @@ void PipXtremeGadgetWidget::processInputBuffer()
 			}
 		}
 
-		processInputPacket(device_input_buffer.buffer, total_packet_size);
+		processRxPacket(device_input_buffer.buffer, total_packet_size);
 
 		// remove the packet from the buffer
 		if (total_packet_size < device_input_buffer.used)
@@ -509,31 +744,128 @@ void PipXtremeGadgetWidget::processInputBuffer()
 	}
 }
 
-void PipXtremeGadgetWidget::processInputPacket(quint8 *packet, int packet_size)
+void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 {
 	if (!packet || packet_size <= 0)
 		return;
 
-//	t_pipx_config_header *header = (t_pipx_config_header *)packet;
-//	uint8_t *data = (uint8_t *)header + sizeof(t_pipx_config_header);
+	t_pipx_config_header *header = (t_pipx_config_header *)packet;
+	uint8_t *data = (uint8_t *)header + sizeof(t_pipx_config_header);
 
+	switch (header->type)
+	{
+		case pipx_packet_type_req_config:
+			break;
 
+		case pipx_packet_type_config:
+			if (m_stage == PIPX_REQ_CONFIG)
+			{
+				if (packet_size < sizeof(t_pipx_config_header) + sizeof(t_pipx_config_data_settings))
+					break;	// packet size is too small - error
 
+				m_stage = PIPX_IDLE;
+				m_stage_retries = 0;
 
+				t_pipx_config_data_settings *settings = (t_pipx_config_data_settings *)data;
 
+				m_widget->lineEdit_SerialNumber->setText(QString::number(header->serial_number, 16).toUpper());
+				if (settings->frequency_band == freqBand_434MHz)
+					m_widget->lineEdit_FrequencyBand->setText("434");
+				else
+				if (settings->frequency_band == freqBand_868MHz)
+					m_widget->lineEdit_FrequencyBand->setText("868");
+				else
+				if (settings->frequency_band == freqBand_915MHz)
+					m_widget->lineEdit_FrequencyBand->setText("915");
+				else
+					m_widget->lineEdit_FrequencyBand->setText("UNKNOWN [" + QString::number(settings->frequency_band) + "]");
+				m_widget->lineEdit_MinFrequency->setText(QString::number(settings->min_frequency_Hz));
+				m_widget->lineEdit_MaxFrequency->setText(QString::number(settings->max_frequency_Hz));
+				m_widget->lineEdit_FrequencyStepSize->setText(QString::number(settings->frequency_step_size, 'f', 2));
+				m_widget->lineEdit_State->setText("");
+				m_widget->progressBar_RSSI->setValue(-120);
+				m_widget->lineEdit_RxAFC->setText("");
 
+				m_widget->lineEdit_PairedSerialNumber->setText(QString::number(settings->destination_id, 16).toUpper());
+				m_widget->spinBox_FrequencyCalibration->setValue(settings->rf_xtal_cap);
 
+				m_widget->doubleSpinBox_Frequency->setMinimum((double)settings->min_frequency_Hz / 1e6);
+				m_widget->doubleSpinBox_Frequency->setMaximum((double)settings->max_frequency_Hz / 1e6);
+				m_widget->doubleSpinBox_Frequency->setValue((double)settings->frequency_Hz / 1e6);
 
+				m_widget->comboBox_MaxRFBandwidth->setCurrentIndex(m_widget->comboBox_MaxRFBandwidth->findData(settings->max_rf_bandwidth));
+
+				m_widget->comboBox_MaxRFTxPower->setCurrentIndex(m_widget->comboBox_MaxRFTxPower->findData(settings->max_tx_power));
+
+				m_widget->comboBox_SerialPortSpeed->setCurrentIndex(m_widget->comboBox_SerialPortSpeed->findData(settings->serial_baudrate));
+
+				QString key = "";
+				for (int i = 0; i < sizeof(settings->aes_key); i++)
+					key += QString::number(settings->aes_key[i], 16);
+				m_widget->lineEdit_AESKey->setText(key);
+				m_widget->checkBox_AESEnable->setChecked(settings->aes_enable);
+			}
+
+			break;
+	}
 }
 
 
 // ***************************************************************************************
 
-void PipXtremeGadgetWidget::disconnectPort(bool enable_telemetry)
-{	// disconnect the comms port
-
+void PipXtremeGadgetWidget::processStream()
+{
 	QMutexLocker locker_dev(&device_mutex);
 	QMutexLocker locker_inbuf(&device_input_buffer.mutex);
+
+	if (!m_ioDevice) return;
+	if (!m_ioDevice->isOpen()) return;
+
+	switch (m_stage)
+	{
+		case PIPX_IDLE:
+			break;
+
+		case PIPX_REQ_CONFIG:
+			if (++m_stage_retries > MAX_RETRIES)
+			{
+				disconnectPort(true, false);
+				break;
+			}
+			sendRequestConfig();
+			QTimer::singleShot(RETRY_TIME, this, SLOT(processStream()));
+			break;
+
+		case PIPX_REQ_RSSI:
+			if (++m_stage_retries > MAX_RETRIES)
+			{
+				disconnectPort(true, false);
+				break;
+			}
+
+			QTimer::singleShot(RETRY_TIME, this, SLOT(processStream()));
+			break;
+
+		default:
+			m_stage_retries = 0;
+			m_stage = PIPX_IDLE;
+			break;
+	}
+}
+
+// ***************************************************************************************
+
+void PipXtremeGadgetWidget::disconnectPort(bool enable_telemetry, bool lock_stuff)
+{	// disconnect the comms port
+
+	if (lock_stuff)
+	{
+		QMutexLocker locker_dev(&device_mutex);
+		QMutexLocker locker_inbuf(&device_input_buffer.mutex);
+	}
+
+	m_stage_retries = 0;
+	m_stage = PIPX_IDLE;
 
 	device_input_buffer.used = 0;
 
@@ -552,6 +884,21 @@ void PipXtremeGadgetWidget::disconnectPort(bool enable_telemetry)
 	m_widget->comboBox_Ports->setEnabled(true);
 	m_widget->refreshPorts->setEnabled(true);
 	m_widget->pushButton_ScanSpectrum->setEnabled(false);
+	m_widget->pushButton_Save->setEnabled(false);
+
+	m_widget->lineEdit_SerialNumber->setText("");
+	m_widget->lineEdit_FrequencyBand->setText("");
+	m_widget->lineEdit_MinFrequency->setText("");
+	m_widget->lineEdit_MaxFrequency->setText("");
+	m_widget->lineEdit_FrequencyStepSize->setText("");
+	m_widget->lineEdit_State->setText("");
+	m_widget->progressBar_RSSI->setValue(m_widget->progressBar_RSSI->minimum());
+	m_widget->lineEdit_RxAFC->setText("");
+	m_widget->lineEdit_PairedSerialNumber->setText("");
+	m_widget->spinBox_FrequencyCalibration->setValue(0);
+	m_widget->doubleSpinBox_Frequency->setValue(0);
+	m_widget->lineEdit_AESKey->setText("");
+	m_widget->checkBox_AESEnable->setChecked(false);
 
 	if (enable_telemetry)
 		enableTelemetry();
@@ -572,11 +919,26 @@ void PipXtremeGadgetWidget::connectPort()
 	if (device_str.isEmpty())
 		return;
 
-	int type = m_widget->comboBox_Ports->itemData(device_idx).toInt();
+	int type = NO_PORT;
+	if (device_str.toLower().startsWith("com: "))
+	{
+		type = SERIAL_PORT;
+		device_str.remove(0, 5);
+		device_str = device_str.trimmed();
+	}
+	else
+	if (device_str.toLower().startsWith("usb: "))
+	{
+		type = USB_PORT;
+		device_str.remove(0, 5);
+		device_str = device_str.trimmed();
+	}
+
+//	type = m_widget->comboBox_Ports->itemData(device_idx).toInt();
 
 //	qDebug() << QString::number(type) << ": " << device_str;
 
-	// Suspend telemety & polling in case it is not done yet
+	// Suspend GCS telemety & polling
 	disableTelemetry();
 
 	switch (type)
@@ -614,14 +976,15 @@ void PipXtremeGadgetWidget::connectPort()
 				settings.Parity = PAR_NONE;
 				settings.StopBits = STOP_1;
 				settings.FlowControl = FLOW_OFF;
-				settings.Timeout_Millisec = 500;
+				settings.Timeout_Millisec = 1000;
 
 //				QextSerialPort *serial_dev = new QextSerialPort(str, settings, QextSerialPort::Polling);
 				QextSerialPort *serial_dev = new QextSerialPort(str, settings);
 				if (!serial_dev)
 					break;
 
-				if (!serial_dev->open(QIODevice::ReadWrite | QIODevice::Unbuffered))
+//				if (!serial_dev->open(QIODevice::ReadWrite | QIODevice::Unbuffered))
+				if (!serial_dev->open(QIODevice::ReadWrite))
 				{
 					delete serial_dev;
 					break;
@@ -637,7 +1000,8 @@ void PipXtremeGadgetWidget::connectPort()
 				if (!usb_dev)
 					break;
 
-				if (!usb_dev->open(QIODevice::ReadWrite | QIODevice::Unbuffered))
+//				if (!usb_dev->open(QIODevice::ReadWrite | QIODevice::Unbuffered))
+				if (!usb_dev->open(QIODevice::ReadWrite))
 				{
 					delete usb_dev;
 					break;
@@ -652,7 +1016,7 @@ void PipXtremeGadgetWidget::connectPort()
 	}
 
 	if (!m_ioDevice)
-	{	// failed to connect
+	{	// failed to connect .. restore GCS telemetry and polling
 		enableTelemetry();
 	}
 	else
@@ -662,8 +1026,14 @@ void PipXtremeGadgetWidget::connectPort()
 		m_widget->comboBox_Ports->setEnabled(false);
 		m_widget->refreshPorts->setEnabled(false);
 		m_widget->pushButton_ScanSpectrum->setEnabled(true);
+		m_widget->pushButton_Save->setEnabled(true);
 
-		connect(m_ioDevice, SIGNAL(readyRead()), this, SLOT(processInputStream()));
+		connect(m_ioDevice, SIGNAL(readyRead()), this, SLOT(processRxStream()));
+
+		m_stage_retries = 0;
+		m_stage = PIPX_REQ_CONFIG;
+		locker_dev.unlock();
+		processStream();
 	}
 }
 
@@ -678,8 +1048,8 @@ void PipXtremeGadgetWidget::connectDisconnect()
 }
 
 // ***************************************************************************************
-
 // Shows a message box with an error string.
+
 void PipXtremeGadgetWidget::error(QString errorString, int errorNumber)
 {
     QMessageBox msgBox;

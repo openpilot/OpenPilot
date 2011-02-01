@@ -82,7 +82,7 @@ typedef struct
 
 	uint32_t    min_frequency_Hz;
 	uint32_t    max_frequency_Hz;
-	uint32_t    frequency_Hz;
+	float	    frequency_Hz;
 
 	uint32_t    max_rf_bandwidth;
 
@@ -95,13 +95,13 @@ typedef struct
 	bool        aes_enable;
 	uint8_t     aes_key[16];
 
-	uint16_t    frequency_step_size;
+	float	    frequency_step_size;
 } t_pipx_config_data_settings;
 
 typedef struct
 {
-	uint32_t    start_frequency;
-	uint16_t    frequency_step_size;
+	float	    start_frequency;
+	float	    frequency_step_size;
 	uint16_t    magnitudes;
 //	int8_t      magnitude[0];
 } t_pipx_config_data_spectrum;
@@ -128,8 +128,6 @@ public:
     PipXtremeGadgetWidget(QWidget *parent = 0);
    ~PipXtremeGadgetWidget();
 
-    typedef enum { IAP_STATE_READY, IAP_STATE_STEP_1} IAPStep;
-
 public slots:
     void onTelemetryStart();
     void onTelemetryStop();
@@ -143,6 +141,8 @@ protected:
     void resizeEvent(QResizeEvent *event);
 
 private:
+	typedef enum { PIPX_IDLE, PIPX_REQ_CONFIG, PIPX_REQ_RSSI} PipXStage;
+
 	Ui_PipXtremeWidget	*m_widget;
 
 	QIODevice			*m_ioDevice;
@@ -150,8 +150,12 @@ private:
 
 	t_buffer			device_input_buffer;
 
+	PipXStage			m_stage;
+	int					m_stage_retries;
+
 //	QVector<quint8>	buffer;
 
+	uint32_t updateCRC32(uint32_t crc, uint8_t b);
 	uint32_t updateCRC32Data(uint32_t crc, void *data, int len);
 	void makeCRC_Table32();
 
@@ -160,19 +164,24 @@ private:
 	void disableTelemetry();
 	void enableTelemetry();
 
-    void processOutputStream();
+	void sendRequestConfig();
+	void sendConfig(uint32_t serial_number, t_pipx_config_data_settings *settings);
 
-    void processInputStream();
-	void processInputBuffer();
-	void processInputPacket(quint8 *packet, int packet_size);
+	void processRxBuffer();
+	void processRxPacket(quint8 *packet, int packet_size);
 
-	void disconnectPort(bool enable_telemetry);
+	void disconnectPort(bool enable_telemetry, bool lock_stuff = true);
 	void connectPort();
 
 private slots:
 	void connectDisconnect();
 	void error(QString errorString, int errorNumber);
     void getPorts();
+	void randomiseAESKey();
+	void scanSpectrum();
+	void saveToFlash();
+	void processStream();
+	void processRxStream();
 
 };
 

@@ -50,7 +50,7 @@ void PIOS_Servo_Init(void)
 * \param[in] onetofour Rate for outputs 1 to 4 (Hz)
 * \param[in] fivetoeight Rate for outputs 5 to 8 (Hz)
 */
-void PIOS_Servo_SetHz(uint16_t onetofour, uint16_t fivetoeight)
+void PIOS_Servo_SetHz(uint16_t * banks, uint8_t num_banks)
 {
 }
 
@@ -63,7 +63,7 @@ void PIOS_Servo_Set(uint8_t Servo, uint16_t Position)
 {
 #ifndef PIOS_ENABLE_DEBUG_PINS
 	/* Make sure servo exists */
-	if (Servo < PIOS_SERVO_NUM_OUTPUTS && Servo >= 0) {
+	if (Servo < PIOS_SERVO_NUM_OUTPUTS) {
 		/* Update the position */
 		ServoPosition[Servo] = Position;
 

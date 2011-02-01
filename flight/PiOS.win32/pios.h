@@ -48,6 +48,9 @@
 #include <math.h>
 #include <unistd.h>
 
+/* Generic initcall infrastructure */
+#include "pios_initcall.h"
+
 /* PIOS Board Specific Device Configuration */
 #include "pios_board_posix.h"
 

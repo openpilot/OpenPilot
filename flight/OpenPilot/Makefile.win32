@@ -110,6 +110,7 @@ PYMITEINC += $(PYMITEPLAT)
 PYMITEINC += $(OUTDIR)
 FLIGHTPLANLIB = $(OPMODULEDIR)/FlightPlan/lib
 FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
+OPUAVSYNTHDIR = $(OUTDIR)/../../uavobject-synthetics/flight
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
@@ -137,9 +138,10 @@ SRC += $(OPSYSTEM)/alarms.c
 SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
-SRC += $(OPUAVOBJ)/uavobjectsinit.c
+SRC += $(OPUAVSYNTHDIR)/init/uavobjectsinit.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
+
 else
 ## TESTCODE
 SRC += $(OPTESTS)/test_common.c
@@ -149,48 +151,7 @@ endif
 
 ## UAVOBJECTS
 ifndef TESTAPP
-SRC += $(OPUAVOBJ)/objectpersistence.c
-SRC += $(OPUAVOBJ)/positionactual.c
-SRC += $(OPUAVOBJ)/gpsposition.c
-SRC += $(OPUAVOBJ)/gpstime.c
-SRC += $(OPUAVOBJ)/gpssatellites.c
-SRC += $(OPUAVOBJ)/gcstelemetrystats.c
-SRC += $(OPUAVOBJ)/flighttelemetrystats.c
-SRC += $(OPUAVOBJ)/systemstats.c
-SRC += $(OPUAVOBJ)/systemalarms.c
-SRC += $(OPUAVOBJ)/systemsettings.c
-SRC += $(OPUAVOBJ)/telemetrysettings.c
-SRC += $(OPUAVOBJ)/actuatorcommand.c
-SRC += $(OPUAVOBJ)/actuatordesired.c
-SRC += $(OPUAVOBJ)/actuatorsettings.c
-SRC += $(OPUAVOBJ)/manualcontrolcommand.c
-SRC += $(OPUAVOBJ)/manualcontrolsettings.c
-SRC += $(OPUAVOBJ)/attitudedesired.c
-SRC += $(OPUAVOBJ)/stabilizationsettings.c
-SRC += $(OPUAVOBJ)/ahrsstatus.c
-SRC += $(OPUAVOBJ)/i2cstats.c
-SRC += $(OPUAVOBJ)/baroaltitude.c
-SRC += $(OPUAVOBJ)/ahrscalibration.c
-SRC += $(OPUAVOBJ)/attitudeactual.c
-SRC += $(OPUAVOBJ)/ahrssettings.c
-SRC += $(OPUAVOBJ)/flightbatterystate.c
-SRC += $(OPUAVOBJ)/attituderaw.c
-SRC += $(OPUAVOBJ)/homelocation.c
-SRC += $(OPUAVOBJ)/mixersettings.c
-SRC += $(OPUAVOBJ)/mixerstatus.c
-SRC += $(OPUAVOBJ)/positiondesired.c
-SRC += $(OPUAVOBJ)/velocitydesired.c
-SRC += $(OPUAVOBJ)/velocityactual.c
-SRC += $(OPUAVOBJ)/guidancesettings.c
-SRC += $(OPUAVOBJ)/firmwareiapobj.c
-SRC += $(OPUAVOBJ)/ratedesired.c
-SRC += $(OPUAVOBJ)/batterysettings.c
-SRC += $(OPUAVOBJ)/flightplancontrol.c
-SRC += $(OPUAVOBJ)/flightplanstatus.c
-SRC += $(OPUAVOBJ)/flightplansettings.c
-SRC += $(OPUAVOBJ)/taskinfo.c
-SRC += $(OPUAVOBJ)/watchdogstatus.c
-SRC += $(OPUAVOBJ)/nedaccel.c
+SRC += $(wildcard $(OPUAVSYNTHDIR)/*.c)
 endif
 
 ## PIOS Hardware (win32)
@@ -246,6 +207,7 @@ EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/Win32
 EXTRAINCDIRS  += $(FLIGHTLIB)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)
 EXTRAINCDIRS  += $(PYMITEINC)
+EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
 
 EXTRAINCDIRS += ${foreach MOD, ${MODULES}, ${OPMODULEDIR}/${MOD}/inc} ${OPMODULEDIR}/System/inc
 

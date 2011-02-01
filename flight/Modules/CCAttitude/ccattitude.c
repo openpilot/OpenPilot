@@ -88,7 +88,7 @@ int32_t CCAttitudeInitialize(void)
 {
 	// Start main task
 	xTaskCreate(CCAttitudeTask, (signed char *)"CCAttitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_AHRSCOMMS, taskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_ATTITUDE, taskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
 	return 0;
 }
@@ -99,7 +99,7 @@ int32_t CCAttitudeInitialize(void)
 static void CCAttitudeTask(void *parameters)
 {
 
-//	AlarmsClear(SYSTEMALARMS_ALARM_AHRSCOMMS, SYSTEMALARMS_ALARM_CRITICAL);
+	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 
 	PIOS_ADC_SetCallback(adc_callback);
 

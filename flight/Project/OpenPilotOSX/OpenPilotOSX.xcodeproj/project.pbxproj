@@ -2725,6 +2725,48 @@
 		65B7E6B4120DF1E2000C1123 /* pios_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_config.h; sourceTree = "<group>"; };
 		65B7E6B6120DF1E2000C1123 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../AHRS/Makefile; sourceTree = SOURCE_ROOT; };
 		65B7E6B7120DF1E2000C1123 /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pios_board.c; path = ../../AHRS/pios_board.c; sourceTree = SOURCE_ROOT; };
+		65C35E5012EFB2F3004811C2 /* actuatorcommand.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = actuatorcommand.xml; sourceTree = "<group>"; };
+		65C35E5112EFB2F3004811C2 /* actuatordesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = actuatordesired.xml; sourceTree = "<group>"; };
+		65C35E5212EFB2F3004811C2 /* actuatorsettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = actuatorsettings.xml; sourceTree = "<group>"; };
+		65C35E5312EFB2F3004811C2 /* ahrscalibration.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrscalibration.xml; sourceTree = "<group>"; };
+		65C35E5412EFB2F3004811C2 /* ahrssettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrssettings.xml; sourceTree = "<group>"; };
+		65C35E5512EFB2F3004811C2 /* ahrsstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrsstatus.xml; sourceTree = "<group>"; };
+		65C35E5612EFB2F3004811C2 /* attitudeactual.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = attitudeactual.xml; sourceTree = "<group>"; };
+		65C35E5712EFB2F3004811C2 /* attitudedesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = attitudedesired.xml; sourceTree = "<group>"; };
+		65C35E5812EFB2F3004811C2 /* attituderaw.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = attituderaw.xml; sourceTree = "<group>"; };
+		65C35E5912EFB2F3004811C2 /* baroaltitude.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = baroaltitude.xml; sourceTree = "<group>"; };
+		65C35E5A12EFB2F3004811C2 /* batterysettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = batterysettings.xml; sourceTree = "<group>"; };
+		65C35E5B12EFB2F3004811C2 /* firmwareiap.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = firmwareiap.xml; sourceTree = "<group>"; };
+		65C35E5C12EFB2F3004811C2 /* flightbatterystate.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = flightbatterystate.xml; sourceTree = "<group>"; };
+		65C35E5D12EFB2F3004811C2 /* flightplancontrol.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = flightplancontrol.xml; sourceTree = "<group>"; };
+		65C35E5E12EFB2F3004811C2 /* flightplansettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = flightplansettings.xml; sourceTree = "<group>"; };
+		65C35E5F12EFB2F3004811C2 /* flightplanstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = flightplanstatus.xml; sourceTree = "<group>"; };
+		65C35E6012EFB2F3004811C2 /* flighttelemetrystats.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = flighttelemetrystats.xml; sourceTree = "<group>"; };
+		65C35E6112EFB2F3004811C2 /* gcstelemetrystats.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gcstelemetrystats.xml; sourceTree = "<group>"; };
+		65C35E6212EFB2F3004811C2 /* gpsposition.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gpsposition.xml; sourceTree = "<group>"; };
+		65C35E6312EFB2F3004811C2 /* gpssatellites.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gpssatellites.xml; sourceTree = "<group>"; };
+		65C35E6412EFB2F3004811C2 /* gpstime.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gpstime.xml; sourceTree = "<group>"; };
+		65C35E6512EFB2F3004811C2 /* guidancesettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = guidancesettings.xml; sourceTree = "<group>"; };
+		65C35E6612EFB2F3004811C2 /* homelocation.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = homelocation.xml; sourceTree = "<group>"; };
+		65C35E6712EFB2F3004811C2 /* i2cstats.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = i2cstats.xml; sourceTree = "<group>"; };
+		65C35E6812EFB2F3004811C2 /* manualcontrolcommand.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = manualcontrolcommand.xml; sourceTree = "<group>"; };
+		65C35E6912EFB2F3004811C2 /* manualcontrolsettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = manualcontrolsettings.xml; sourceTree = "<group>"; };
+		65C35E6A12EFB2F3004811C2 /* mixersettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixersettings.xml; sourceTree = "<group>"; };
+		65C35E6B12EFB2F3004811C2 /* mixerstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixerstatus.xml; sourceTree = "<group>"; };
+		65C35E6C12EFB2F3004811C2 /* nedaccel.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = nedaccel.xml; sourceTree = "<group>"; };
+		65C35E6D12EFB2F3004811C2 /* objectpersistence.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = objectpersistence.xml; sourceTree = "<group>"; };
+		65C35E6E12EFB2F3004811C2 /* positionactual.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = positionactual.xml; sourceTree = "<group>"; };
+		65C35E6F12EFB2F3004811C2 /* positiondesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = positiondesired.xml; sourceTree = "<group>"; };
+		65C35E7012EFB2F3004811C2 /* ratedesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ratedesired.xml; sourceTree = "<group>"; };
+		65C35E7112EFB2F3004811C2 /* stabilizationsettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = stabilizationsettings.xml; sourceTree = "<group>"; };
+		65C35E7212EFB2F3004811C2 /* systemalarms.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = systemalarms.xml; sourceTree = "<group>"; };
+		65C35E7312EFB2F3004811C2 /* systemsettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = systemsettings.xml; sourceTree = "<group>"; };
+		65C35E7412EFB2F3004811C2 /* systemstats.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = systemstats.xml; sourceTree = "<group>"; };
+		65C35E7512EFB2F3004811C2 /* taskinfo.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = taskinfo.xml; sourceTree = "<group>"; };
+		65C35E7612EFB2F3004811C2 /* telemetrysettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = telemetrysettings.xml; sourceTree = "<group>"; };
+		65C35E7712EFB2F3004811C2 /* velocityactual.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = velocityactual.xml; sourceTree = "<group>"; };
+		65C35E7812EFB2F3004811C2 /* velocitydesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = velocitydesired.xml; sourceTree = "<group>"; };
+		65C35E7912EFB2F3004811C2 /* watchdogstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = watchdogstatus.xml; sourceTree = "<group>"; };
 		65D2CA841248F9A400B1E7D6 /* mixersettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixersettings.xml; sourceTree = "<group>"; };
 		65D2CA851248F9A400B1E7D6 /* mixerstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixerstatus.xml; sourceTree = "<group>"; };
 		65E6DF6812E02BA300058553 /* ccattitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ccattitude.c; sourceTree = "<group>"; };
@@ -3335,6 +3377,7 @@
 		08FB7794FE84155DC02AAC07 /* OpenPilotOSX */ = {
 			isa = PBXGroup;
 			children = (
+				65C35E4E12EFB2F3004811C2 /* shared */,
 				65173C9F12EBFD1700D6A7CB /* Makefile */,
 				657CEEB5121DBC49007A1FBE /* flight */,
 				65B35D7D121C261E003EAD18 /* ground */,
@@ -7673,6 +7716,64 @@
 			name = inc;
 			path = ../../AHRS/inc;
 			sourceTree = SOURCE_ROOT;
+		};
+		65C35E4E12EFB2F3004811C2 /* shared */ = {
+			isa = PBXGroup;
+			children = (
+				65C35E4F12EFB2F3004811C2 /* uavobjectdefinition */,
+			);
+			name = shared;
+			path = ../../../shared;
+			sourceTree = SOURCE_ROOT;
+		};
+		65C35E4F12EFB2F3004811C2 /* uavobjectdefinition */ = {
+			isa = PBXGroup;
+			children = (
+				65C35E5012EFB2F3004811C2 /* actuatorcommand.xml */,
+				65C35E5112EFB2F3004811C2 /* actuatordesired.xml */,
+				65C35E5212EFB2F3004811C2 /* actuatorsettings.xml */,
+				65C35E5312EFB2F3004811C2 /* ahrscalibration.xml */,
+				65C35E5412EFB2F3004811C2 /* ahrssettings.xml */,
+				65C35E5512EFB2F3004811C2 /* ahrsstatus.xml */,
+				65C35E5612EFB2F3004811C2 /* attitudeactual.xml */,
+				65C35E5712EFB2F3004811C2 /* attitudedesired.xml */,
+				65C35E5812EFB2F3004811C2 /* attituderaw.xml */,
+				65C35E5912EFB2F3004811C2 /* baroaltitude.xml */,
+				65C35E5A12EFB2F3004811C2 /* batterysettings.xml */,
+				65C35E5B12EFB2F3004811C2 /* firmwareiap.xml */,
+				65C35E5C12EFB2F3004811C2 /* flightbatterystate.xml */,
+				65C35E5D12EFB2F3004811C2 /* flightplancontrol.xml */,
+				65C35E5E12EFB2F3004811C2 /* flightplansettings.xml */,
+				65C35E5F12EFB2F3004811C2 /* flightplanstatus.xml */,
+				65C35E6012EFB2F3004811C2 /* flighttelemetrystats.xml */,
+				65C35E6112EFB2F3004811C2 /* gcstelemetrystats.xml */,
+				65C35E6212EFB2F3004811C2 /* gpsposition.xml */,
+				65C35E6312EFB2F3004811C2 /* gpssatellites.xml */,
+				65C35E6412EFB2F3004811C2 /* gpstime.xml */,
+				65C35E6512EFB2F3004811C2 /* guidancesettings.xml */,
+				65C35E6612EFB2F3004811C2 /* homelocation.xml */,
+				65C35E6712EFB2F3004811C2 /* i2cstats.xml */,
+				65C35E6812EFB2F3004811C2 /* manualcontrolcommand.xml */,
+				65C35E6912EFB2F3004811C2 /* manualcontrolsettings.xml */,
+				65C35E6A12EFB2F3004811C2 /* mixersettings.xml */,
+				65C35E6B12EFB2F3004811C2 /* mixerstatus.xml */,
+				65C35E6C12EFB2F3004811C2 /* nedaccel.xml */,
+				65C35E6D12EFB2F3004811C2 /* objectpersistence.xml */,
+				65C35E6E12EFB2F3004811C2 /* positionactual.xml */,
+				65C35E6F12EFB2F3004811C2 /* positiondesired.xml */,
+				65C35E7012EFB2F3004811C2 /* ratedesired.xml */,
+				65C35E7112EFB2F3004811C2 /* stabilizationsettings.xml */,
+				65C35E7212EFB2F3004811C2 /* systemalarms.xml */,
+				65C35E7312EFB2F3004811C2 /* systemsettings.xml */,
+				65C35E7412EFB2F3004811C2 /* systemstats.xml */,
+				65C35E7512EFB2F3004811C2 /* taskinfo.xml */,
+				65C35E7612EFB2F3004811C2 /* telemetrysettings.xml */,
+				65C35E7712EFB2F3004811C2 /* velocityactual.xml */,
+				65C35E7812EFB2F3004811C2 /* velocitydesired.xml */,
+				65C35E7912EFB2F3004811C2 /* watchdogstatus.xml */,
+			);
+			path = uavobjectdefinition;
+			sourceTree = "<group>";
 		};
 		65E6DF6712E02BA300058553 /* CCAttitude */ = {
 			isa = PBXGroup;

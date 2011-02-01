@@ -57,14 +57,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES = Telemetry ManualControl Actuator Attitude Stabilization FirmwareIAP
-#Actuator Telemetry ManualControl Stabilization FirmwareIAP
-
-#MODULES = Telemetry Example
-#MODULES = Telemetry MK/MKSerial
-#MODULES = Telemetry
-#MODULES += Osd/OsdEtStd
-
+MODULES = Telemetry Attitude Stabilization Actuator ManualControl #FirmwareIAP
 
 # MCU name, submodel and board
 # - MCU used for compiler-option (-mcpu)

@@ -58,10 +58,10 @@
 #include "pios_flash_w25x.h"
 
 // Private constants
-#define STACK_SIZE_BYTES 740
-#define TASK_PRIORITY (tskIDLE_PRIORITY+0)
+#define STACK_SIZE_BYTES 440
+#define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 
-#define UPDATE_RATE  2 /* ms */
+#define UPDATE_RATE  3
 #define GYRO_NEUTRAL 1665
 #define GYRO_SCALE   (0.008f * 180 / M_PI)
 
@@ -92,7 +92,7 @@ int32_t AttitudeInitialize(void)
 	PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
 	return 0;
 }
-
+static portTickType lastSysTime;
 /**
  * Module thread, should not return.
  */
@@ -109,7 +109,7 @@ static void AttitudeTask(void *parameters)
 
 	// Main task loop
 	while (1) {
-		//portTickType lastSysTime;
+		//
 		PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
 		
 		// TODO: register the adc callback, push the data onto a queue (safe for thread)
@@ -118,8 +118,8 @@ static void AttitudeTask(void *parameters)
 		updateAttitude();
 		
 		/* Wait for the next update interval */
-		//vTaskDelayUntil(&lastSysTime, UPDATE_RATE / portTICK_RATE_MS);
-		vTaskDelay(UPDATE_RATE / portTICK_RATE_MS);
+		vTaskDelayUntil(&lastSysTime, UPDATE_RATE / portTICK_RATE_MS);
+		//vTaskDelay(UPDATE_RATE / portTICK_RATE_MS);
 
 	}
 }
@@ -172,7 +172,7 @@ void updateSensors()
 	AttitudeRawSet(&attitudeRaw); 	
 }
 
-#define UPDATE_FRAC 0.99f
+#define UPDATE_FRAC 0.999f
 void updateAttitude()
 {
 	AttitudeActualData attitudeActual;

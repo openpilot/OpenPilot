@@ -63,7 +63,7 @@
 
 #define UPDATE_RATE  2 /* ms */
 #define GYRO_NEUTRAL 1665
-#define GYRO_SCALE   (0.010f * 180 / M_PI)
+#define GYRO_SCALE   (0.008f * 180 / M_PI)
 
 #define PI_MOD(x) (fmod(x + M_PI, M_PI * 2) - M_PI)
 // Private types
@@ -73,6 +73,9 @@ static xTaskHandle taskHandle;
 
 // Private functions
 static void CCAttitudeTask(void *parameters);
+
+void adc_callback(float * data);
+float gyro[3] = {0, 0, 0};
 
 void updateSensors();
 void updateAttitude();
@@ -97,9 +100,10 @@ static void CCAttitudeTask(void *parameters)
 
 //	AlarmsClear(SYSTEMALARMS_ALARM_AHRSCOMMS, SYSTEMALARMS_ALARM_CRITICAL);
 
+	PIOS_ADC_SetCallback(adc_callback);
+
 	// Keep flash CS pin high while talking accel
-	PIOS_FLASH_DISABLE;
-	
+	PIOS_FLASH_DISABLE;		
 	PIOS_ADXL345_Init();
 
 	// Main task loop
@@ -128,13 +132,9 @@ void updateSensors()
 	static float gyro_bias[3] = {0,0,0};
 	static const float tau = 0.9999f;
 
-	attitudeRaw.gyros[ATTITUDERAW_GYROS_X] = PIOS_ADC_PinGet(1);
-	attitudeRaw.gyros[ATTITUDERAW_GYROS_Y] = PIOS_ADC_PinGet(2);
-	attitudeRaw.gyros[ATTITUDERAW_GYROS_Z] = PIOS_ADC_PinGet(3);
-	
-	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] = -(attitudeRaw.gyros[ATTITUDERAW_GYROS_X] - GYRO_NEUTRAL) * GYRO_SCALE;
-	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] = (attitudeRaw.gyros[ATTITUDERAW_GYROS_Y] - GYRO_NEUTRAL) * GYRO_SCALE;
-	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] = (attitudeRaw.gyros[ATTITUDERAW_GYROS_Z] - GYRO_NEUTRAL) * GYRO_SCALE;
+	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] = -(gyro[0] - GYRO_NEUTRAL) * GYRO_SCALE;
+	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] = (gyro[1] - GYRO_NEUTRAL) * GYRO_SCALE;
+	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] = -(gyro[2] - GYRO_NEUTRAL) * GYRO_SCALE;
 	
 	gyro_bias[0] = tau * gyro_bias[0] + (1-tau) * attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X];
 	gyro_bias[1] = tau * gyro_bias[1] + (1-tau) * attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y];
@@ -158,6 +158,7 @@ void updateSensors()
 		attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Y] += -(float) accel_data.y * 0.004f * 9.81;
 		attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Z] += -(float) accel_data.z * 0.004f * 9.81;
 	} while ( (i < 32) && (attitudeRaw.gyrotemp[0] > 0) );
+	attitudeRaw.gyrotemp[1] = i;
 	
 	attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_X] /= i;
 	attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Y] /= i;
@@ -214,6 +215,13 @@ void updateAttitude()
 	attitudeActual.Pitch = (UPDATE_FRAC * attitudeActual.Pitch + (1-UPDATE_FRAC) * accel_pitch) * 180 / M_PI;
 	attitudeActual.Yaw = fmod(attitudeActual.Yaw * 180 / M_PI, 360);	
 	AttitudeActualSet(&attitudeActual);
+}
+
+void adc_callback(float * data) 
+{
+	gyro[0] = data[1];
+	gyro[1] = data[2];
+	gyro[2] = data[3];
 }
 
 /**

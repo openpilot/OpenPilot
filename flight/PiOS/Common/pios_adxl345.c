@@ -80,7 +80,7 @@ void PIOS_ADXL345_SetMeasure(uint8_t enable)
 void PIOS_ADXL345_Init() 
 {
 	PIOS_ADXL345_ReleaseBus();
-	PIOS_ADXL345_SelectRate(ADXL_RATE_1600);
+	PIOS_ADXL345_SelectRate(ADXL_RATE_3200);
 	PIOS_ADXL345_SetRange(ADXL_RANGE_8G);
 	PIOS_ADXL345_FifoDepth(16);
 	PIOS_ADXL345_SetMeasure(1); 

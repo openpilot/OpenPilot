@@ -48,105 +48,6 @@
 		650D8E6412DFE16400D05CC9 /* systemmod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = systemmod.c; sourceTree = "<group>"; };
 		650D8E6712DFE16400D05CC9 /* telemetry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = telemetry.h; sourceTree = "<group>"; };
 		650D8E6812DFE16400D05CC9 /* telemetry.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = telemetry.c; sourceTree = "<group>"; };
-		650D8E6B12DFE17500D05CC9 /* actuatorcommand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actuatorcommand.c; sourceTree = "<group>"; };
-		650D8E6C12DFE17500D05CC9 /* actuatordesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actuatordesired.c; sourceTree = "<group>"; };
-		650D8E6D12DFE17500D05CC9 /* actuatorsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actuatorsettings.c; sourceTree = "<group>"; };
-		650D8E6E12DFE17500D05CC9 /* ahrscalibration.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrscalibration.c; sourceTree = "<group>"; };
-		650D8E6F12DFE17500D05CC9 /* ahrssettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrssettings.c; sourceTree = "<group>"; };
-		650D8E7012DFE17500D05CC9 /* ahrsstatus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrsstatus.c; sourceTree = "<group>"; };
-		650D8E7112DFE17500D05CC9 /* attitudeactual.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = attitudeactual.c; sourceTree = "<group>"; };
-		650D8E7212DFE17500D05CC9 /* attitudedesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = attitudedesired.c; sourceTree = "<group>"; };
-		650D8E7312DFE17500D05CC9 /* attituderaw.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = attituderaw.c; sourceTree = "<group>"; };
-		650D8E7412DFE17500D05CC9 /* baroaltitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = baroaltitude.c; sourceTree = "<group>"; };
-		650D8E7512DFE17500D05CC9 /* batterysettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = batterysettings.c; sourceTree = "<group>"; };
-		650D8E7612DFE17500D05CC9 /* eventdispatcher.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = eventdispatcher.c; sourceTree = "<group>"; };
-		650D8E7712DFE17500D05CC9 /* firmwareiapobj.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = firmwareiapobj.c; sourceTree = "<group>"; };
-		650D8E7812DFE17500D05CC9 /* flightbatterystate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flightbatterystate.c; sourceTree = "<group>"; };
-		650D8E7912DFE17500D05CC9 /* flightplancontrol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flightplancontrol.c; sourceTree = "<group>"; };
-		650D8E7A12DFE17500D05CC9 /* flightplansettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flightplansettings.c; sourceTree = "<group>"; };
-		650D8E7B12DFE17500D05CC9 /* flightplanstatus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flightplanstatus.c; sourceTree = "<group>"; };
-		650D8E7C12DFE17500D05CC9 /* flighttelemetrystats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = flighttelemetrystats.c; sourceTree = "<group>"; };
-		650D8E7D12DFE17500D05CC9 /* gcstelemetrystats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gcstelemetrystats.c; sourceTree = "<group>"; };
-		650D8E7E12DFE17500D05CC9 /* gpsposition.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gpsposition.c; sourceTree = "<group>"; };
-		650D8E7F12DFE17500D05CC9 /* gpssatellites.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gpssatellites.c; sourceTree = "<group>"; };
-		650D8E8012DFE17500D05CC9 /* gpstime.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gpstime.c; sourceTree = "<group>"; };
-		650D8E8112DFE17500D05CC9 /* guidancesettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = guidancesettings.c; sourceTree = "<group>"; };
-		650D8E8212DFE17500D05CC9 /* homelocation.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = homelocation.c; sourceTree = "<group>"; };
-		650D8E8312DFE17500D05CC9 /* i2cstats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = i2cstats.c; sourceTree = "<group>"; };
-		650D8E8512DFE17500D05CC9 /* actuatorcommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = actuatorcommand.h; sourceTree = "<group>"; };
-		650D8E8612DFE17500D05CC9 /* actuatordesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = actuatordesired.h; sourceTree = "<group>"; };
-		650D8E8712DFE17500D05CC9 /* actuatorsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = actuatorsettings.h; sourceTree = "<group>"; };
-		650D8E8812DFE17500D05CC9 /* ahrscalibration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrscalibration.h; sourceTree = "<group>"; };
-		650D8E8912DFE17500D05CC9 /* ahrssettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrssettings.h; sourceTree = "<group>"; };
-		650D8E8A12DFE17500D05CC9 /* ahrsstatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrsstatus.h; sourceTree = "<group>"; };
-		650D8E8B12DFE17500D05CC9 /* attitudeactual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = attitudeactual.h; sourceTree = "<group>"; };
-		650D8E8C12DFE17500D05CC9 /* attitudedesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = attitudedesired.h; sourceTree = "<group>"; };
-		650D8E8D12DFE17500D05CC9 /* attituderaw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = attituderaw.h; sourceTree = "<group>"; };
-		650D8E8E12DFE17500D05CC9 /* baroaltitude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = baroaltitude.h; sourceTree = "<group>"; };
-		650D8E8F12DFE17500D05CC9 /* batterysettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = batterysettings.h; sourceTree = "<group>"; };
-		650D8E9012DFE17500D05CC9 /* eventdispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = eventdispatcher.h; sourceTree = "<group>"; };
-		650D8E9112DFE17500D05CC9 /* firmwareiapobj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = firmwareiapobj.h; sourceTree = "<group>"; };
-		650D8E9212DFE17500D05CC9 /* flightbatterystate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flightbatterystate.h; sourceTree = "<group>"; };
-		650D8E9312DFE17500D05CC9 /* flightplancontrol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flightplancontrol.h; sourceTree = "<group>"; };
-		650D8E9412DFE17500D05CC9 /* flightplansettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flightplansettings.h; sourceTree = "<group>"; };
-		650D8E9512DFE17500D05CC9 /* flightplanstatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flightplanstatus.h; sourceTree = "<group>"; };
-		650D8E9612DFE17500D05CC9 /* flighttelemetrystats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flighttelemetrystats.h; sourceTree = "<group>"; };
-		650D8E9712DFE17500D05CC9 /* gcstelemetrystats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gcstelemetrystats.h; sourceTree = "<group>"; };
-		650D8E9812DFE17500D05CC9 /* gpsposition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gpsposition.h; sourceTree = "<group>"; };
-		650D8E9912DFE17500D05CC9 /* gpssatellites.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gpssatellites.h; sourceTree = "<group>"; };
-		650D8E9A12DFE17500D05CC9 /* gpstime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gpstime.h; sourceTree = "<group>"; };
-		650D8E9B12DFE17500D05CC9 /* guidancesettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = guidancesettings.h; sourceTree = "<group>"; };
-		650D8E9C12DFE17500D05CC9 /* homelocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = homelocation.h; sourceTree = "<group>"; };
-		650D8E9D12DFE17500D05CC9 /* i2cstats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = i2cstats.h; sourceTree = "<group>"; };
-		650D8E9E12DFE17500D05CC9 /* manualcontrolcommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = manualcontrolcommand.h; sourceTree = "<group>"; };
-		650D8E9F12DFE17500D05CC9 /* manualcontrolsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = manualcontrolsettings.h; sourceTree = "<group>"; };
-		650D8EA012DFE17500D05CC9 /* mixersettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mixersettings.h; sourceTree = "<group>"; };
-		650D8EA112DFE17500D05CC9 /* mixerstatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mixerstatus.h; sourceTree = "<group>"; };
-		650D8EA212DFE17500D05CC9 /* nedaccel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nedaccel.h; sourceTree = "<group>"; };
-		650D8EA312DFE17500D05CC9 /* objectpersistence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = objectpersistence.h; sourceTree = "<group>"; };
-		650D8EA412DFE17500D05CC9 /* pipxtrememodemsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pipxtrememodemsettings.h; sourceTree = "<group>"; };
-		650D8EA512DFE17500D05CC9 /* pipxtrememodemstatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pipxtrememodemstatus.h; sourceTree = "<group>"; };
-		650D8EA612DFE17500D05CC9 /* positionactual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = positionactual.h; sourceTree = "<group>"; };
-		650D8EA712DFE17500D05CC9 /* positiondesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = positiondesired.h; sourceTree = "<group>"; };
-		650D8EA812DFE17500D05CC9 /* ratedesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ratedesired.h; sourceTree = "<group>"; };
-		650D8EA912DFE17500D05CC9 /* stabilizationsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stabilizationsettings.h; sourceTree = "<group>"; };
-		650D8EAA12DFE17500D05CC9 /* systemalarms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systemalarms.h; sourceTree = "<group>"; };
-		650D8EAB12DFE17500D05CC9 /* systemsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systemsettings.h; sourceTree = "<group>"; };
-		650D8EAC12DFE17500D05CC9 /* systemstats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systemstats.h; sourceTree = "<group>"; };
-		650D8EAD12DFE17500D05CC9 /* taskinfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = taskinfo.h; sourceTree = "<group>"; };
-		650D8EAE12DFE17500D05CC9 /* telemetrysettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = telemetrysettings.h; sourceTree = "<group>"; };
-		650D8EAF12DFE17500D05CC9 /* uavobjectmanager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uavobjectmanager.h; sourceTree = "<group>"; };
-		650D8EB012DFE17500D05CC9 /* uavobjectsinit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uavobjectsinit.h; sourceTree = "<group>"; };
-		650D8EB112DFE17500D05CC9 /* uavobjecttemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uavobjecttemplate.h; sourceTree = "<group>"; };
-		650D8EB212DFE17500D05CC9 /* utlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utlist.h; sourceTree = "<group>"; };
-		650D8EB312DFE17500D05CC9 /* velocityactual.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = velocityactual.h; sourceTree = "<group>"; };
-		650D8EB412DFE17500D05CC9 /* velocitydesired.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = velocitydesired.h; sourceTree = "<group>"; };
-		650D8EB512DFE17500D05CC9 /* watchdogstatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = watchdogstatus.h; sourceTree = "<group>"; };
-		650D8EB612DFE17500D05CC9 /* manualcontrolcommand.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = manualcontrolcommand.c; sourceTree = "<group>"; };
-		650D8EB712DFE17500D05CC9 /* manualcontrolsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = manualcontrolsettings.c; sourceTree = "<group>"; };
-		650D8EB812DFE17500D05CC9 /* mixersettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mixersettings.c; sourceTree = "<group>"; };
-		650D8EB912DFE17500D05CC9 /* mixerstatus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mixerstatus.c; sourceTree = "<group>"; };
-		650D8EBA12DFE17500D05CC9 /* nedaccel.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = nedaccel.c; sourceTree = "<group>"; };
-		650D8EBB12DFE17500D05CC9 /* objectpersistence.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = objectpersistence.c; sourceTree = "<group>"; };
-		650D8EBC12DFE17500D05CC9 /* pipxtrememodemsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pipxtrememodemsettings.c; sourceTree = "<group>"; };
-		650D8EBD12DFE17500D05CC9 /* pipxtrememodemstatus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pipxtrememodemstatus.c; sourceTree = "<group>"; };
-		650D8EBE12DFE17500D05CC9 /* positionactual.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = positionactual.c; sourceTree = "<group>"; };
-		650D8EBF12DFE17500D05CC9 /* positiondesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = positiondesired.c; sourceTree = "<group>"; };
-		650D8EC012DFE17500D05CC9 /* ratedesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ratedesired.c; sourceTree = "<group>"; };
-		650D8EC112DFE17500D05CC9 /* stabilizationsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stabilizationsettings.c; sourceTree = "<group>"; };
-		650D8EC212DFE17500D05CC9 /* systemalarms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = systemalarms.c; sourceTree = "<group>"; };
-		650D8EC312DFE17500D05CC9 /* systemsettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = systemsettings.c; sourceTree = "<group>"; };
-		650D8EC412DFE17500D05CC9 /* systemstats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = systemstats.c; sourceTree = "<group>"; };
-		650D8EC512DFE17500D05CC9 /* taskinfo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = taskinfo.c; sourceTree = "<group>"; };
-		650D8EC612DFE17500D05CC9 /* telemetrysettings.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = telemetrysettings.c; sourceTree = "<group>"; };
-		650D8EC712DFE17500D05CC9 /* uavobjectmanager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavobjectmanager.c; sourceTree = "<group>"; };
-		650D8EC812DFE17500D05CC9 /* uavobjectsinit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavobjectsinit.c; sourceTree = "<group>"; };
-		650D8EC912DFE17500D05CC9 /* uavobjectsinit_cc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavobjectsinit_cc.c; sourceTree = "<group>"; };
-		650D8ECA12DFE17500D05CC9 /* uavobjectsinittemplate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavobjectsinittemplate.c; sourceTree = "<group>"; };
-		650D8ECB12DFE17500D05CC9 /* uavobjecttemplate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavobjecttemplate.c; sourceTree = "<group>"; };
-		650D8ECC12DFE17500D05CC9 /* velocityactual.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = velocityactual.c; sourceTree = "<group>"; };
-		650D8ECD12DFE17500D05CC9 /* velocitydesired.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = velocitydesired.c; sourceTree = "<group>"; };
-		650D8ECE12DFE17500D05CC9 /* watchdogstatus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = watchdogstatus.c; sourceTree = "<group>"; };
 		650D8ED112DFE17500D05CC9 /* uavtalk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uavtalk.h; sourceTree = "<group>"; };
 		650D8ED212DFE17500D05CC9 /* uavtalk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavtalk.c; sourceTree = "<group>"; };
 		6512D60512ED4CA2008175E5 /* pios_flash_w25x.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_flash_w25x.h; sourceTree = "<group>"; };
@@ -2767,6 +2668,16 @@
 		65C35E7712EFB2F3004811C2 /* velocityactual.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = velocityactual.xml; sourceTree = "<group>"; };
 		65C35E7812EFB2F3004811C2 /* velocitydesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = velocitydesired.xml; sourceTree = "<group>"; };
 		65C35E7912EFB2F3004811C2 /* watchdogstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = watchdogstatus.xml; sourceTree = "<group>"; };
+		65C35E9E12F0A834004811C2 /* uavobjecttemplate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavobjecttemplate.c; sourceTree = "<group>"; };
+		65C35E9F12F0A834004811C2 /* uavobjectsinittemplate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavobjectsinittemplate.c; sourceTree = "<group>"; };
+		65C35EA012F0A834004811C2 /* uavobjectsinit_cc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavobjectsinit_cc.c; sourceTree = "<group>"; };
+		65C35EA112F0A834004811C2 /* uavobjectmanager.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavobjectmanager.c; sourceTree = "<group>"; };
+		65C35EA312F0A834004811C2 /* eventdispatcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = eventdispatcher.h; sourceTree = "<group>"; };
+		65C35EA412F0A834004811C2 /* uavobjectmanager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uavobjectmanager.h; sourceTree = "<group>"; };
+		65C35EA512F0A834004811C2 /* uavobjectsinit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uavobjectsinit.h; sourceTree = "<group>"; };
+		65C35EA612F0A834004811C2 /* uavobjecttemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uavobjecttemplate.h; sourceTree = "<group>"; };
+		65C35EA712F0A834004811C2 /* utlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utlist.h; sourceTree = "<group>"; };
+		65C35EA812F0A834004811C2 /* eventdispatcher.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = eventdispatcher.c; sourceTree = "<group>"; };
 		65D2CA841248F9A400B1E7D6 /* mixersettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixersettings.xml; sourceTree = "<group>"; };
 		65D2CA851248F9A400B1E7D6 /* mixerstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixerstatus.xml; sourceTree = "<group>"; };
 		65E6DF6812E02BA300058553 /* ccattitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ccattitude.c; sourceTree = "<group>"; };
@@ -2997,172 +2908,6 @@
 		65E8F0EE11EFF25C00BBF654 /* startup_stm32f10x_HD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_HD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_HD.S; sourceTree = SOURCE_ROOT; };
 		65E8F0F111EFF25C00BBF654 /* startup_stm32f10x_MD.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = startup_stm32f10x_MD.S; path = ../../PiOS/STM32F10x/startup_stm32f10x_MD.S; sourceTree = SOURCE_ROOT; };
 		65EA2E171273C55200636061 /* ratedesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ratedesired.xml; sourceTree = "<group>"; };
-		65F93B9212EE09280047DB36 /* aes.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = aes.lst; sourceTree = "<group>"; };
-		65F93B9312EE09280047DB36 /* aes.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = aes.o; sourceTree = "<group>"; };
-		65F93B9412EE09280047DB36 /* core_cm3.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = core_cm3.lst; sourceTree = "<group>"; };
-		65F93B9512EE09280047DB36 /* core_cm3.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = core_cm3.o; sourceTree = "<group>"; };
-		65F93B9612EE09280047DB36 /* crc.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = crc.lst; sourceTree = "<group>"; };
-		65F93B9712EE09280047DB36 /* crc.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = crc.o; sourceTree = "<group>"; };
-		65F93B9912EE09280047DB36 /* aes.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = aes.o.d; sourceTree = "<group>"; };
-		65F93B9A12EE09280047DB36 /* core_cm3.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = core_cm3.o.d; sourceTree = "<group>"; };
-		65F93B9B12EE09280047DB36 /* crc.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = crc.o.d; sourceTree = "<group>"; };
-		65F93B9C12EE09280047DB36 /* fifo_buffer.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = fifo_buffer.o.d; sourceTree = "<group>"; };
-		65F93B9D12EE09280047DB36 /* gpio_in.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = gpio_in.o.d; sourceTree = "<group>"; };
-		65F93B9E12EE09280047DB36 /* main.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = main.o.d; sourceTree = "<group>"; };
-		65F93B9F12EE09280047DB36 /* misc.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = misc.o.d; sourceTree = "<group>"; };
-		65F93BA012EE09280047DB36 /* packet_handler.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = packet_handler.o.d; sourceTree = "<group>"; };
-		65F93BA112EE09280047DB36 /* pios_adc.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = pios_adc.o.d; sourceTree = "<group>"; };
-		65F93BA212EE09280047DB36 /* pios_board.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = pios_board.o.d; sourceTree = "<group>"; };
-		65F93BA312EE09280047DB36 /* pios_com.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = pios_com.o.d; sourceTree = "<group>"; };
-		65F93BA412EE09280047DB36 /* pios_delay.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = pios_delay.o.d; sourceTree = "<group>"; };
-		65F93BA512EE09280047DB36 /* pios_gpio.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = pios_gpio.o.d; sourceTree = "<group>"; };
-		65F93BA612EE09280047DB36 /* pios_irq.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = pios_irq.o.d; sourceTree = "<group>"; };
-		65F93BA712EE09280047DB36 /* pios_led.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = pios_led.o.d; sourceTree = "<group>"; };
-		65F93BA812EE09280047DB36 /* pios_spi.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = pios_spi.o.d; sourceTree = "<group>"; };
-		65F93BA912EE09280047DB36 /* pios_sys.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = pios_sys.o.d; sourceTree = "<group>"; };
-		65F93BAA12EE09280047DB36 /* pios_usart.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = pios_usart.o.d; sourceTree = "<group>"; };
-		65F93BAB12EE09280047DB36 /* pios_usb_hid.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = pios_usb_hid.o.d; sourceTree = "<group>"; };
-		65F93BAC12EE09280047DB36 /* pios_usb_hid_desc.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = pios_usb_hid_desc.o.d; sourceTree = "<group>"; };
-		65F93BAD12EE09280047DB36 /* pios_usb_hid_istr.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = pios_usb_hid_istr.o.d; sourceTree = "<group>"; };
-		65F93BAE12EE09280047DB36 /* pios_usb_hid_prop.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = pios_usb_hid_prop.o.d; sourceTree = "<group>"; };
-		65F93BAF12EE09280047DB36 /* pios_usb_hid_pwr.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = pios_usb_hid_pwr.o.d; sourceTree = "<group>"; };
-		65F93BB012EE09280047DB36 /* printf-stdarg.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = "printf-stdarg.o.d"; sourceTree = "<group>"; };
-		65F93BB112EE09280047DB36 /* rfm22b.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = rfm22b.o.d; sourceTree = "<group>"; };
-		65F93BB212EE09280047DB36 /* saved_settings.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = saved_settings.o.d; sourceTree = "<group>"; };
-		65F93BB312EE09280047DB36 /* stm32f10x_adc.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stm32f10x_adc.o.d; sourceTree = "<group>"; };
-		65F93BB412EE09280047DB36 /* stm32f10x_bkp.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stm32f10x_bkp.o.d; sourceTree = "<group>"; };
-		65F93BB512EE09280047DB36 /* stm32f10x_crc.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stm32f10x_crc.o.d; sourceTree = "<group>"; };
-		65F93BB612EE09280047DB36 /* stm32f10x_dac.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stm32f10x_dac.o.d; sourceTree = "<group>"; };
-		65F93BB712EE09280047DB36 /* stm32f10x_dbgmcu.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stm32f10x_dbgmcu.o.d; sourceTree = "<group>"; };
-		65F93BB812EE09280047DB36 /* stm32f10x_dma.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stm32f10x_dma.o.d; sourceTree = "<group>"; };
-		65F93BB912EE09280047DB36 /* stm32f10x_exti.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stm32f10x_exti.o.d; sourceTree = "<group>"; };
-		65F93BBA12EE09280047DB36 /* stm32f10x_flash.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stm32f10x_flash.o.d; sourceTree = "<group>"; };
-		65F93BBB12EE09280047DB36 /* stm32f10x_gpio.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stm32f10x_gpio.o.d; sourceTree = "<group>"; };
-		65F93BBC12EE09280047DB36 /* stm32f10x_i2c.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stm32f10x_i2c.o.d; sourceTree = "<group>"; };
-		65F93BBD12EE09280047DB36 /* stm32f10x_iwdg.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stm32f10x_iwdg.o.d; sourceTree = "<group>"; };
-		65F93BBE12EE09280047DB36 /* stm32f10x_pwr.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stm32f10x_pwr.o.d; sourceTree = "<group>"; };
-		65F93BBF12EE09280047DB36 /* stm32f10x_rcc.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stm32f10x_rcc.o.d; sourceTree = "<group>"; };
-		65F93BC012EE09280047DB36 /* stm32f10x_rtc.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stm32f10x_rtc.o.d; sourceTree = "<group>"; };
-		65F93BC112EE09280047DB36 /* stm32f10x_spi.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stm32f10x_spi.o.d; sourceTree = "<group>"; };
-		65F93BC212EE09280047DB36 /* stm32f10x_tim.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stm32f10x_tim.o.d; sourceTree = "<group>"; };
-		65F93BC312EE09280047DB36 /* stm32f10x_usart.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stm32f10x_usart.o.d; sourceTree = "<group>"; };
-		65F93BC412EE09280047DB36 /* stopwatch.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = stopwatch.o.d; sourceTree = "<group>"; };
-		65F93BC512EE09280047DB36 /* system_stm32f10x.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = system_stm32f10x.o.d; sourceTree = "<group>"; };
-		65F93BC612EE09280047DB36 /* transparent_comms.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = transparent_comms.o.d; sourceTree = "<group>"; };
-		65F93BC712EE09280047DB36 /* uavtalk_comms.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = uavtalk_comms.o.d; sourceTree = "<group>"; };
-		65F93BC812EE09280047DB36 /* usb_core.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = usb_core.o.d; sourceTree = "<group>"; };
-		65F93BC912EE09280047DB36 /* usb_init.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = usb_init.o.d; sourceTree = "<group>"; };
-		65F93BCA12EE09280047DB36 /* usb_int.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = usb_int.o.d; sourceTree = "<group>"; };
-		65F93BCB12EE09280047DB36 /* usb_mem.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = usb_mem.o.d; sourceTree = "<group>"; };
-		65F93BCC12EE09280047DB36 /* usb_regs.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = usb_regs.o.d; sourceTree = "<group>"; };
-		65F93BCD12EE09280047DB36 /* usb_sil.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = usb_sil.o.d; sourceTree = "<group>"; };
-		65F93BCE12EE09280047DB36 /* watchdog.o.d */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.dtrace; path = watchdog.o.d; sourceTree = "<group>"; };
-		65F93BCF12EE09280047DB36 /* fifo_buffer.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = fifo_buffer.lst; sourceTree = "<group>"; };
-		65F93BD012EE09280047DB36 /* fifo_buffer.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = fifo_buffer.o; sourceTree = "<group>"; };
-		65F93BD112EE09280047DB36 /* gpio_in.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = gpio_in.lst; sourceTree = "<group>"; };
-		65F93BD212EE09280047DB36 /* gpio_in.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = gpio_in.o; sourceTree = "<group>"; };
-		65F93BD312EE09280047DB36 /* main.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.lst; sourceTree = "<group>"; };
-		65F93BD412EE09280047DB36 /* main.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = main.o; sourceTree = "<group>"; };
-		65F93BD512EE09280047DB36 /* misc.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = misc.lst; sourceTree = "<group>"; };
-		65F93BD612EE09280047DB36 /* misc.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = misc.o; sourceTree = "<group>"; };
-		65F93BD712EE09280047DB36 /* packet_handler.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = packet_handler.lst; sourceTree = "<group>"; };
-		65F93BD812EE09280047DB36 /* packet_handler.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = packet_handler.o; sourceTree = "<group>"; };
-		65F93BD912EE09280047DB36 /* pios_adc.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pios_adc.lst; sourceTree = "<group>"; };
-		65F93BDA12EE09280047DB36 /* pios_adc.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = pios_adc.o; sourceTree = "<group>"; };
-		65F93BDB12EE09280047DB36 /* pios_board.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pios_board.lst; sourceTree = "<group>"; };
-		65F93BDC12EE09280047DB36 /* pios_board.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = pios_board.o; sourceTree = "<group>"; };
-		65F93BDD12EE09280047DB36 /* pios_com.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pios_com.lst; sourceTree = "<group>"; };
-		65F93BDE12EE09280047DB36 /* pios_com.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = pios_com.o; sourceTree = "<group>"; };
-		65F93BDF12EE09280047DB36 /* pios_delay.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pios_delay.lst; sourceTree = "<group>"; };
-		65F93BE012EE09280047DB36 /* pios_delay.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = pios_delay.o; sourceTree = "<group>"; };
-		65F93BE112EE09280047DB36 /* pios_gpio.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pios_gpio.lst; sourceTree = "<group>"; };
-		65F93BE212EE09280047DB36 /* pios_gpio.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = pios_gpio.o; sourceTree = "<group>"; };
-		65F93BE312EE09280047DB36 /* pios_irq.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pios_irq.lst; sourceTree = "<group>"; };
-		65F93BE412EE09280047DB36 /* pios_irq.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = pios_irq.o; sourceTree = "<group>"; };
-		65F93BE512EE09280047DB36 /* pios_led.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pios_led.lst; sourceTree = "<group>"; };
-		65F93BE612EE09280047DB36 /* pios_led.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = pios_led.o; sourceTree = "<group>"; };
-		65F93BE712EE09280047DB36 /* pios_spi.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pios_spi.lst; sourceTree = "<group>"; };
-		65F93BE812EE09280047DB36 /* pios_spi.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = pios_spi.o; sourceTree = "<group>"; };
-		65F93BE912EE09280047DB36 /* pios_sys.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pios_sys.lst; sourceTree = "<group>"; };
-		65F93BEA12EE09280047DB36 /* pios_sys.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = pios_sys.o; sourceTree = "<group>"; };
-		65F93BEB12EE09280047DB36 /* pios_usart.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pios_usart.lst; sourceTree = "<group>"; };
-		65F93BEC12EE09280047DB36 /* pios_usart.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = pios_usart.o; sourceTree = "<group>"; };
-		65F93BED12EE09280047DB36 /* pios_usb_hid.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pios_usb_hid.lst; sourceTree = "<group>"; };
-		65F93BEE12EE09280047DB36 /* pios_usb_hid.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = pios_usb_hid.o; sourceTree = "<group>"; };
-		65F93BEF12EE09280047DB36 /* pios_usb_hid_desc.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pios_usb_hid_desc.lst; sourceTree = "<group>"; };
-		65F93BF012EE09280047DB36 /* pios_usb_hid_desc.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = pios_usb_hid_desc.o; sourceTree = "<group>"; };
-		65F93BF112EE09280047DB36 /* pios_usb_hid_istr.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pios_usb_hid_istr.lst; sourceTree = "<group>"; };
-		65F93BF212EE09280047DB36 /* pios_usb_hid_istr.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = pios_usb_hid_istr.o; sourceTree = "<group>"; };
-		65F93BF312EE09280047DB36 /* pios_usb_hid_prop.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pios_usb_hid_prop.lst; sourceTree = "<group>"; };
-		65F93BF412EE09280047DB36 /* pios_usb_hid_prop.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = pios_usb_hid_prop.o; sourceTree = "<group>"; };
-		65F93BF512EE09280047DB36 /* pios_usb_hid_pwr.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pios_usb_hid_pwr.lst; sourceTree = "<group>"; };
-		65F93BF612EE09280047DB36 /* pios_usb_hid_pwr.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = pios_usb_hid_pwr.o; sourceTree = "<group>"; };
-		65F93BF712EE09280047DB36 /* PipXtreme.elf */ = {isa = PBXFileReference; lastKnownFileType = file; path = PipXtreme.elf; sourceTree = "<group>"; };
-		65F93BF812EE09280047DB36 /* PipXtreme.map */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PipXtreme.map; sourceTree = "<group>"; };
-		65F93BF912EE09280047DB36 /* printf-stdarg.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "printf-stdarg.lst"; sourceTree = "<group>"; };
-		65F93BFA12EE09280047DB36 /* printf-stdarg.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = "printf-stdarg.o"; sourceTree = "<group>"; };
-		65F93BFB12EE09280047DB36 /* rfm22b.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = rfm22b.lst; sourceTree = "<group>"; };
-		65F93BFC12EE09280047DB36 /* rfm22b.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = rfm22b.o; sourceTree = "<group>"; };
-		65F93BFD12EE09280047DB36 /* saved_settings.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = saved_settings.lst; sourceTree = "<group>"; };
-		65F93BFE12EE09280047DB36 /* saved_settings.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = saved_settings.o; sourceTree = "<group>"; };
-		65F93BFF12EE09280047DB36 /* startup_stm32f10x_MD.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = startup_stm32f10x_MD.lst; sourceTree = "<group>"; };
-		65F93C0012EE09280047DB36 /* startup_stm32f10x_MD.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = startup_stm32f10x_MD.o; sourceTree = "<group>"; };
-		65F93C0112EE09280047DB36 /* stm32f10x_adc.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32f10x_adc.lst; sourceTree = "<group>"; };
-		65F93C0212EE09280047DB36 /* stm32f10x_adc.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stm32f10x_adc.o; sourceTree = "<group>"; };
-		65F93C0312EE09280047DB36 /* stm32f10x_bkp.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32f10x_bkp.lst; sourceTree = "<group>"; };
-		65F93C0412EE09280047DB36 /* stm32f10x_bkp.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stm32f10x_bkp.o; sourceTree = "<group>"; };
-		65F93C0512EE09280047DB36 /* stm32f10x_crc.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32f10x_crc.lst; sourceTree = "<group>"; };
-		65F93C0612EE09280047DB36 /* stm32f10x_crc.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stm32f10x_crc.o; sourceTree = "<group>"; };
-		65F93C0712EE09280047DB36 /* stm32f10x_dac.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32f10x_dac.lst; sourceTree = "<group>"; };
-		65F93C0812EE09280047DB36 /* stm32f10x_dac.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stm32f10x_dac.o; sourceTree = "<group>"; };
-		65F93C0912EE09280047DB36 /* stm32f10x_dbgmcu.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32f10x_dbgmcu.lst; sourceTree = "<group>"; };
-		65F93C0A12EE09280047DB36 /* stm32f10x_dbgmcu.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stm32f10x_dbgmcu.o; sourceTree = "<group>"; };
-		65F93C0B12EE09280047DB36 /* stm32f10x_dma.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32f10x_dma.lst; sourceTree = "<group>"; };
-		65F93C0C12EE09280047DB36 /* stm32f10x_dma.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stm32f10x_dma.o; sourceTree = "<group>"; };
-		65F93C0D12EE09280047DB36 /* stm32f10x_exti.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32f10x_exti.lst; sourceTree = "<group>"; };
-		65F93C0E12EE09280047DB36 /* stm32f10x_exti.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stm32f10x_exti.o; sourceTree = "<group>"; };
-		65F93C0F12EE09280047DB36 /* stm32f10x_flash.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32f10x_flash.lst; sourceTree = "<group>"; };
-		65F93C1012EE09280047DB36 /* stm32f10x_flash.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stm32f10x_flash.o; sourceTree = "<group>"; };
-		65F93C1112EE09280047DB36 /* stm32f10x_gpio.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32f10x_gpio.lst; sourceTree = "<group>"; };
-		65F93C1212EE09280047DB36 /* stm32f10x_gpio.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stm32f10x_gpio.o; sourceTree = "<group>"; };
-		65F93C1312EE09280047DB36 /* stm32f10x_i2c.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32f10x_i2c.lst; sourceTree = "<group>"; };
-		65F93C1412EE09280047DB36 /* stm32f10x_i2c.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stm32f10x_i2c.o; sourceTree = "<group>"; };
-		65F93C1512EE09280047DB36 /* stm32f10x_iwdg.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32f10x_iwdg.lst; sourceTree = "<group>"; };
-		65F93C1612EE09280047DB36 /* stm32f10x_iwdg.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stm32f10x_iwdg.o; sourceTree = "<group>"; };
-		65F93C1712EE09280047DB36 /* stm32f10x_pwr.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32f10x_pwr.lst; sourceTree = "<group>"; };
-		65F93C1812EE09280047DB36 /* stm32f10x_pwr.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stm32f10x_pwr.o; sourceTree = "<group>"; };
-		65F93C1912EE09280047DB36 /* stm32f10x_rcc.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32f10x_rcc.lst; sourceTree = "<group>"; };
-		65F93C1A12EE09280047DB36 /* stm32f10x_rcc.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stm32f10x_rcc.o; sourceTree = "<group>"; };
-		65F93C1B12EE09280047DB36 /* stm32f10x_rtc.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32f10x_rtc.lst; sourceTree = "<group>"; };
-		65F93C1C12EE09280047DB36 /* stm32f10x_rtc.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stm32f10x_rtc.o; sourceTree = "<group>"; };
-		65F93C1D12EE09280047DB36 /* stm32f10x_spi.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32f10x_spi.lst; sourceTree = "<group>"; };
-		65F93C1E12EE09280047DB36 /* stm32f10x_spi.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stm32f10x_spi.o; sourceTree = "<group>"; };
-		65F93C1F12EE09280047DB36 /* stm32f10x_tim.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32f10x_tim.lst; sourceTree = "<group>"; };
-		65F93C2012EE09280047DB36 /* stm32f10x_tim.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stm32f10x_tim.o; sourceTree = "<group>"; };
-		65F93C2112EE09280047DB36 /* stm32f10x_usart.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stm32f10x_usart.lst; sourceTree = "<group>"; };
-		65F93C2212EE09280047DB36 /* stm32f10x_usart.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stm32f10x_usart.o; sourceTree = "<group>"; };
-		65F93C2312EE09280047DB36 /* stopwatch.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stopwatch.lst; sourceTree = "<group>"; };
-		65F93C2412EE09280047DB36 /* stopwatch.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = stopwatch.o; sourceTree = "<group>"; };
-		65F93C2512EE09280047DB36 /* system_stm32f10x.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = system_stm32f10x.lst; sourceTree = "<group>"; };
-		65F93C2612EE09280047DB36 /* system_stm32f10x.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = system_stm32f10x.o; sourceTree = "<group>"; };
-		65F93C2712EE09280047DB36 /* transparent_comms.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = transparent_comms.lst; sourceTree = "<group>"; };
-		65F93C2812EE09280047DB36 /* transparent_comms.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = transparent_comms.o; sourceTree = "<group>"; };
-		65F93C2912EE09280047DB36 /* uavtalk_comms.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = uavtalk_comms.lst; sourceTree = "<group>"; };
-		65F93C2A12EE09280047DB36 /* uavtalk_comms.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = uavtalk_comms.o; sourceTree = "<group>"; };
-		65F93C2B12EE09280047DB36 /* usb_core.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = usb_core.lst; sourceTree = "<group>"; };
-		65F93C2C12EE09280047DB36 /* usb_core.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = usb_core.o; sourceTree = "<group>"; };
-		65F93C2D12EE09280047DB36 /* usb_init.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = usb_init.lst; sourceTree = "<group>"; };
-		65F93C2E12EE09280047DB36 /* usb_init.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = usb_init.o; sourceTree = "<group>"; };
-		65F93C2F12EE09280047DB36 /* usb_int.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = usb_int.lst; sourceTree = "<group>"; };
-		65F93C3012EE09280047DB36 /* usb_int.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = usb_int.o; sourceTree = "<group>"; };
-		65F93C3112EE09280047DB36 /* usb_mem.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = usb_mem.lst; sourceTree = "<group>"; };
-		65F93C3212EE09280047DB36 /* usb_mem.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = usb_mem.o; sourceTree = "<group>"; };
-		65F93C3312EE09280047DB36 /* usb_regs.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = usb_regs.lst; sourceTree = "<group>"; };
-		65F93C3412EE09280047DB36 /* usb_regs.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = usb_regs.o; sourceTree = "<group>"; };
-		65F93C3512EE09280047DB36 /* usb_sil.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = usb_sil.lst; sourceTree = "<group>"; };
-		65F93C3612EE09280047DB36 /* usb_sil.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = usb_sil.o; sourceTree = "<group>"; };
-		65F93C3712EE09280047DB36 /* watchdog.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = watchdog.lst; sourceTree = "<group>"; };
-		65F93C3812EE09280047DB36 /* watchdog.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = watchdog.o; sourceTree = "<group>"; };
 		65F93C3912EE09280047DB36 /* aes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aes.c; sourceTree = "<group>"; };
 		65F93C3B12EE09280047DB36 /* aes.lst */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = aes.lst; sourceTree = "<group>"; };
 		65F93C3C12EE09280047DB36 /* aes.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = aes.o; sourceTree = "<group>"; };
@@ -3722,117 +3467,16 @@
 		650D8E6A12DFE17500D05CC9 /* UAVObjects */ = {
 			isa = PBXGroup;
 			children = (
-				650D8E6B12DFE17500D05CC9 /* actuatorcommand.c */,
-				650D8E6C12DFE17500D05CC9 /* actuatordesired.c */,
-				650D8E6D12DFE17500D05CC9 /* actuatorsettings.c */,
-				650D8E6E12DFE17500D05CC9 /* ahrscalibration.c */,
-				650D8E6F12DFE17500D05CC9 /* ahrssettings.c */,
-				650D8E7012DFE17500D05CC9 /* ahrsstatus.c */,
-				650D8E7112DFE17500D05CC9 /* attitudeactual.c */,
-				650D8E7212DFE17500D05CC9 /* attitudedesired.c */,
-				650D8E7312DFE17500D05CC9 /* attituderaw.c */,
-				650D8E7412DFE17500D05CC9 /* baroaltitude.c */,
-				650D8E7512DFE17500D05CC9 /* batterysettings.c */,
-				650D8E7612DFE17500D05CC9 /* eventdispatcher.c */,
-				650D8E7712DFE17500D05CC9 /* firmwareiapobj.c */,
-				650D8E7812DFE17500D05CC9 /* flightbatterystate.c */,
-				650D8E7912DFE17500D05CC9 /* flightplancontrol.c */,
-				650D8E7A12DFE17500D05CC9 /* flightplansettings.c */,
-				650D8E7B12DFE17500D05CC9 /* flightplanstatus.c */,
-				650D8E7C12DFE17500D05CC9 /* flighttelemetrystats.c */,
-				650D8E7D12DFE17500D05CC9 /* gcstelemetrystats.c */,
-				650D8E7E12DFE17500D05CC9 /* gpsposition.c */,
-				650D8E7F12DFE17500D05CC9 /* gpssatellites.c */,
-				650D8E8012DFE17500D05CC9 /* gpstime.c */,
-				650D8E8112DFE17500D05CC9 /* guidancesettings.c */,
-				650D8E8212DFE17500D05CC9 /* homelocation.c */,
-				650D8E8312DFE17500D05CC9 /* i2cstats.c */,
-				650D8E8412DFE17500D05CC9 /* inc */,
-				650D8EB612DFE17500D05CC9 /* manualcontrolcommand.c */,
-				650D8EB712DFE17500D05CC9 /* manualcontrolsettings.c */,
-				650D8EB812DFE17500D05CC9 /* mixersettings.c */,
-				650D8EB912DFE17500D05CC9 /* mixerstatus.c */,
-				650D8EBA12DFE17500D05CC9 /* nedaccel.c */,
-				650D8EBB12DFE17500D05CC9 /* objectpersistence.c */,
-				650D8EBC12DFE17500D05CC9 /* pipxtrememodemsettings.c */,
-				650D8EBD12DFE17500D05CC9 /* pipxtrememodemstatus.c */,
-				650D8EBE12DFE17500D05CC9 /* positionactual.c */,
-				650D8EBF12DFE17500D05CC9 /* positiondesired.c */,
-				650D8EC012DFE17500D05CC9 /* ratedesired.c */,
-				650D8EC112DFE17500D05CC9 /* stabilizationsettings.c */,
-				650D8EC212DFE17500D05CC9 /* systemalarms.c */,
-				650D8EC312DFE17500D05CC9 /* systemsettings.c */,
-				650D8EC412DFE17500D05CC9 /* systemstats.c */,
-				650D8EC512DFE17500D05CC9 /* taskinfo.c */,
-				650D8EC612DFE17500D05CC9 /* telemetrysettings.c */,
-				650D8EC712DFE17500D05CC9 /* uavobjectmanager.c */,
-				650D8EC812DFE17500D05CC9 /* uavobjectsinit.c */,
-				650D8EC912DFE17500D05CC9 /* uavobjectsinit_cc.c */,
-				650D8ECA12DFE17500D05CC9 /* uavobjectsinittemplate.c */,
-				650D8ECB12DFE17500D05CC9 /* uavobjecttemplate.c */,
-				650D8ECC12DFE17500D05CC9 /* velocityactual.c */,
-				650D8ECD12DFE17500D05CC9 /* velocitydesired.c */,
-				650D8ECE12DFE17500D05CC9 /* watchdogstatus.c */,
+				65C35E9E12F0A834004811C2 /* uavobjecttemplate.c */,
+				65C35E9F12F0A834004811C2 /* uavobjectsinittemplate.c */,
+				65C35EA012F0A834004811C2 /* uavobjectsinit_cc.c */,
+				65C35EA112F0A834004811C2 /* uavobjectmanager.c */,
+				65C35EA212F0A834004811C2 /* inc */,
+				65C35EA812F0A834004811C2 /* eventdispatcher.c */,
 			);
 			name = UAVObjects;
 			path = ../../UAVObjects;
 			sourceTree = SOURCE_ROOT;
-		};
-		650D8E8412DFE17500D05CC9 /* inc */ = {
-			isa = PBXGroup;
-			children = (
-				650D8E8512DFE17500D05CC9 /* actuatorcommand.h */,
-				650D8E8612DFE17500D05CC9 /* actuatordesired.h */,
-				650D8E8712DFE17500D05CC9 /* actuatorsettings.h */,
-				650D8E8812DFE17500D05CC9 /* ahrscalibration.h */,
-				650D8E8912DFE17500D05CC9 /* ahrssettings.h */,
-				650D8E8A12DFE17500D05CC9 /* ahrsstatus.h */,
-				650D8E8B12DFE17500D05CC9 /* attitudeactual.h */,
-				650D8E8C12DFE17500D05CC9 /* attitudedesired.h */,
-				650D8E8D12DFE17500D05CC9 /* attituderaw.h */,
-				650D8E8E12DFE17500D05CC9 /* baroaltitude.h */,
-				650D8E8F12DFE17500D05CC9 /* batterysettings.h */,
-				650D8E9012DFE17500D05CC9 /* eventdispatcher.h */,
-				650D8E9112DFE17500D05CC9 /* firmwareiapobj.h */,
-				650D8E9212DFE17500D05CC9 /* flightbatterystate.h */,
-				650D8E9312DFE17500D05CC9 /* flightplancontrol.h */,
-				650D8E9412DFE17500D05CC9 /* flightplansettings.h */,
-				650D8E9512DFE17500D05CC9 /* flightplanstatus.h */,
-				650D8E9612DFE17500D05CC9 /* flighttelemetrystats.h */,
-				650D8E9712DFE17500D05CC9 /* gcstelemetrystats.h */,
-				650D8E9812DFE17500D05CC9 /* gpsposition.h */,
-				650D8E9912DFE17500D05CC9 /* gpssatellites.h */,
-				650D8E9A12DFE17500D05CC9 /* gpstime.h */,
-				650D8E9B12DFE17500D05CC9 /* guidancesettings.h */,
-				650D8E9C12DFE17500D05CC9 /* homelocation.h */,
-				650D8E9D12DFE17500D05CC9 /* i2cstats.h */,
-				650D8E9E12DFE17500D05CC9 /* manualcontrolcommand.h */,
-				650D8E9F12DFE17500D05CC9 /* manualcontrolsettings.h */,
-				650D8EA012DFE17500D05CC9 /* mixersettings.h */,
-				650D8EA112DFE17500D05CC9 /* mixerstatus.h */,
-				650D8EA212DFE17500D05CC9 /* nedaccel.h */,
-				650D8EA312DFE17500D05CC9 /* objectpersistence.h */,
-				650D8EA412DFE17500D05CC9 /* pipxtrememodemsettings.h */,
-				650D8EA512DFE17500D05CC9 /* pipxtrememodemstatus.h */,
-				650D8EA612DFE17500D05CC9 /* positionactual.h */,
-				650D8EA712DFE17500D05CC9 /* positiondesired.h */,
-				650D8EA812DFE17500D05CC9 /* ratedesired.h */,
-				650D8EA912DFE17500D05CC9 /* stabilizationsettings.h */,
-				650D8EAA12DFE17500D05CC9 /* systemalarms.h */,
-				650D8EAB12DFE17500D05CC9 /* systemsettings.h */,
-				650D8EAC12DFE17500D05CC9 /* systemstats.h */,
-				650D8EAD12DFE17500D05CC9 /* taskinfo.h */,
-				650D8EAE12DFE17500D05CC9 /* telemetrysettings.h */,
-				650D8EAF12DFE17500D05CC9 /* uavobjectmanager.h */,
-				650D8EB012DFE17500D05CC9 /* uavobjectsinit.h */,
-				650D8EB112DFE17500D05CC9 /* uavobjecttemplate.h */,
-				650D8EB212DFE17500D05CC9 /* utlist.h */,
-				650D8EB312DFE17500D05CC9 /* velocityactual.h */,
-				650D8EB412DFE17500D05CC9 /* velocitydesired.h */,
-				650D8EB512DFE17500D05CC9 /* watchdogstatus.h */,
-			);
-			path = inc;
-			sourceTree = "<group>";
 		};
 		650D8ECF12DFE17500D05CC9 /* UAVTalk */ = {
 			isa = PBXGroup;
@@ -7775,6 +7419,18 @@
 			path = uavobjectdefinition;
 			sourceTree = "<group>";
 		};
+		65C35EA212F0A834004811C2 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65C35EA312F0A834004811C2 /* eventdispatcher.h */,
+				65C35EA412F0A834004811C2 /* uavobjectmanager.h */,
+				65C35EA512F0A834004811C2 /* uavobjectsinit.h */,
+				65C35EA612F0A834004811C2 /* uavobjecttemplate.h */,
+				65C35EA712F0A834004811C2 /* utlist.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
 		65E6DF6712E02BA300058553 /* CCAttitude */ = {
 			isa = PBXGroup;
 			children = (
@@ -8346,7 +8002,6 @@
 		65F93B9012EE09280047DB36 /* PipXtreme */ = {
 			isa = PBXGroup;
 			children = (
-				65F93B9112EE09280047DB36 /* ....buildflightpipxtreme */,
 				65F93C3912EE09280047DB36 /* aes.c */,
 				65F93C3A12EE09280047DB36 /* Build */,
 				65F93CEC12EE09290047DB36 /* crc.c */,
@@ -8367,187 +8022,6 @@
 			name = PipXtreme;
 			path = ../../PipXtreme;
 			sourceTree = SOURCE_ROOT;
-		};
-		65F93B9112EE09280047DB36 /* ....buildflightpipxtreme */ = {
-			isa = PBXGroup;
-			children = (
-				65F93B9212EE09280047DB36 /* aes.lst */,
-				65F93B9312EE09280047DB36 /* aes.o */,
-				65F93B9412EE09280047DB36 /* core_cm3.lst */,
-				65F93B9512EE09280047DB36 /* core_cm3.o */,
-				65F93B9612EE09280047DB36 /* crc.lst */,
-				65F93B9712EE09280047DB36 /* crc.o */,
-				65F93B9812EE09280047DB36 /* dep */,
-				65F93BCF12EE09280047DB36 /* fifo_buffer.lst */,
-				65F93BD012EE09280047DB36 /* fifo_buffer.o */,
-				65F93BD112EE09280047DB36 /* gpio_in.lst */,
-				65F93BD212EE09280047DB36 /* gpio_in.o */,
-				65F93BD312EE09280047DB36 /* main.lst */,
-				65F93BD412EE09280047DB36 /* main.o */,
-				65F93BD512EE09280047DB36 /* misc.lst */,
-				65F93BD612EE09280047DB36 /* misc.o */,
-				65F93BD712EE09280047DB36 /* packet_handler.lst */,
-				65F93BD812EE09280047DB36 /* packet_handler.o */,
-				65F93BD912EE09280047DB36 /* pios_adc.lst */,
-				65F93BDA12EE09280047DB36 /* pios_adc.o */,
-				65F93BDB12EE09280047DB36 /* pios_board.lst */,
-				65F93BDC12EE09280047DB36 /* pios_board.o */,
-				65F93BDD12EE09280047DB36 /* pios_com.lst */,
-				65F93BDE12EE09280047DB36 /* pios_com.o */,
-				65F93BDF12EE09280047DB36 /* pios_delay.lst */,
-				65F93BE012EE09280047DB36 /* pios_delay.o */,
-				65F93BE112EE09280047DB36 /* pios_gpio.lst */,
-				65F93BE212EE09280047DB36 /* pios_gpio.o */,
-				65F93BE312EE09280047DB36 /* pios_irq.lst */,
-				65F93BE412EE09280047DB36 /* pios_irq.o */,
-				65F93BE512EE09280047DB36 /* pios_led.lst */,
-				65F93BE612EE09280047DB36 /* pios_led.o */,
-				65F93BE712EE09280047DB36 /* pios_spi.lst */,
-				65F93BE812EE09280047DB36 /* pios_spi.o */,
-				65F93BE912EE09280047DB36 /* pios_sys.lst */,
-				65F93BEA12EE09280047DB36 /* pios_sys.o */,
-				65F93BEB12EE09280047DB36 /* pios_usart.lst */,
-				65F93BEC12EE09280047DB36 /* pios_usart.o */,
-				65F93BED12EE09280047DB36 /* pios_usb_hid.lst */,
-				65F93BEE12EE09280047DB36 /* pios_usb_hid.o */,
-				65F93BEF12EE09280047DB36 /* pios_usb_hid_desc.lst */,
-				65F93BF012EE09280047DB36 /* pios_usb_hid_desc.o */,
-				65F93BF112EE09280047DB36 /* pios_usb_hid_istr.lst */,
-				65F93BF212EE09280047DB36 /* pios_usb_hid_istr.o */,
-				65F93BF312EE09280047DB36 /* pios_usb_hid_prop.lst */,
-				65F93BF412EE09280047DB36 /* pios_usb_hid_prop.o */,
-				65F93BF512EE09280047DB36 /* pios_usb_hid_pwr.lst */,
-				65F93BF612EE09280047DB36 /* pios_usb_hid_pwr.o */,
-				65F93BF712EE09280047DB36 /* PipXtreme.elf */,
-				65F93BF812EE09280047DB36 /* PipXtreme.map */,
-				65F93BF912EE09280047DB36 /* printf-stdarg.lst */,
-				65F93BFA12EE09280047DB36 /* printf-stdarg.o */,
-				65F93BFB12EE09280047DB36 /* rfm22b.lst */,
-				65F93BFC12EE09280047DB36 /* rfm22b.o */,
-				65F93BFD12EE09280047DB36 /* saved_settings.lst */,
-				65F93BFE12EE09280047DB36 /* saved_settings.o */,
-				65F93BFF12EE09280047DB36 /* startup_stm32f10x_MD.lst */,
-				65F93C0012EE09280047DB36 /* startup_stm32f10x_MD.o */,
-				65F93C0112EE09280047DB36 /* stm32f10x_adc.lst */,
-				65F93C0212EE09280047DB36 /* stm32f10x_adc.o */,
-				65F93C0312EE09280047DB36 /* stm32f10x_bkp.lst */,
-				65F93C0412EE09280047DB36 /* stm32f10x_bkp.o */,
-				65F93C0512EE09280047DB36 /* stm32f10x_crc.lst */,
-				65F93C0612EE09280047DB36 /* stm32f10x_crc.o */,
-				65F93C0712EE09280047DB36 /* stm32f10x_dac.lst */,
-				65F93C0812EE09280047DB36 /* stm32f10x_dac.o */,
-				65F93C0912EE09280047DB36 /* stm32f10x_dbgmcu.lst */,
-				65F93C0A12EE09280047DB36 /* stm32f10x_dbgmcu.o */,
-				65F93C0B12EE09280047DB36 /* stm32f10x_dma.lst */,
-				65F93C0C12EE09280047DB36 /* stm32f10x_dma.o */,
-				65F93C0D12EE09280047DB36 /* stm32f10x_exti.lst */,
-				65F93C0E12EE09280047DB36 /* stm32f10x_exti.o */,
-				65F93C0F12EE09280047DB36 /* stm32f10x_flash.lst */,
-				65F93C1012EE09280047DB36 /* stm32f10x_flash.o */,
-				65F93C1112EE09280047DB36 /* stm32f10x_gpio.lst */,
-				65F93C1212EE09280047DB36 /* stm32f10x_gpio.o */,
-				65F93C1312EE09280047DB36 /* stm32f10x_i2c.lst */,
-				65F93C1412EE09280047DB36 /* stm32f10x_i2c.o */,
-				65F93C1512EE09280047DB36 /* stm32f10x_iwdg.lst */,
-				65F93C1612EE09280047DB36 /* stm32f10x_iwdg.o */,
-				65F93C1712EE09280047DB36 /* stm32f10x_pwr.lst */,
-				65F93C1812EE09280047DB36 /* stm32f10x_pwr.o */,
-				65F93C1912EE09280047DB36 /* stm32f10x_rcc.lst */,
-				65F93C1A12EE09280047DB36 /* stm32f10x_rcc.o */,
-				65F93C1B12EE09280047DB36 /* stm32f10x_rtc.lst */,
-				65F93C1C12EE09280047DB36 /* stm32f10x_rtc.o */,
-				65F93C1D12EE09280047DB36 /* stm32f10x_spi.lst */,
-				65F93C1E12EE09280047DB36 /* stm32f10x_spi.o */,
-				65F93C1F12EE09280047DB36 /* stm32f10x_tim.lst */,
-				65F93C2012EE09280047DB36 /* stm32f10x_tim.o */,
-				65F93C2112EE09280047DB36 /* stm32f10x_usart.lst */,
-				65F93C2212EE09280047DB36 /* stm32f10x_usart.o */,
-				65F93C2312EE09280047DB36 /* stopwatch.lst */,
-				65F93C2412EE09280047DB36 /* stopwatch.o */,
-				65F93C2512EE09280047DB36 /* system_stm32f10x.lst */,
-				65F93C2612EE09280047DB36 /* system_stm32f10x.o */,
-				65F93C2712EE09280047DB36 /* transparent_comms.lst */,
-				65F93C2812EE09280047DB36 /* transparent_comms.o */,
-				65F93C2912EE09280047DB36 /* uavtalk_comms.lst */,
-				65F93C2A12EE09280047DB36 /* uavtalk_comms.o */,
-				65F93C2B12EE09280047DB36 /* usb_core.lst */,
-				65F93C2C12EE09280047DB36 /* usb_core.o */,
-				65F93C2D12EE09280047DB36 /* usb_init.lst */,
-				65F93C2E12EE09280047DB36 /* usb_init.o */,
-				65F93C2F12EE09280047DB36 /* usb_int.lst */,
-				65F93C3012EE09280047DB36 /* usb_int.o */,
-				65F93C3112EE09280047DB36 /* usb_mem.lst */,
-				65F93C3212EE09280047DB36 /* usb_mem.o */,
-				65F93C3312EE09280047DB36 /* usb_regs.lst */,
-				65F93C3412EE09280047DB36 /* usb_regs.o */,
-				65F93C3512EE09280047DB36 /* usb_sil.lst */,
-				65F93C3612EE09280047DB36 /* usb_sil.o */,
-				65F93C3712EE09280047DB36 /* watchdog.lst */,
-				65F93C3812EE09280047DB36 /* watchdog.o */,
-			);
-			path = ....buildflightpipxtreme;
-			sourceTree = "<group>";
-		};
-		65F93B9812EE09280047DB36 /* dep */ = {
-			isa = PBXGroup;
-			children = (
-				65F93B9912EE09280047DB36 /* aes.o.d */,
-				65F93B9A12EE09280047DB36 /* core_cm3.o.d */,
-				65F93B9B12EE09280047DB36 /* crc.o.d */,
-				65F93B9C12EE09280047DB36 /* fifo_buffer.o.d */,
-				65F93B9D12EE09280047DB36 /* gpio_in.o.d */,
-				65F93B9E12EE09280047DB36 /* main.o.d */,
-				65F93B9F12EE09280047DB36 /* misc.o.d */,
-				65F93BA012EE09280047DB36 /* packet_handler.o.d */,
-				65F93BA112EE09280047DB36 /* pios_adc.o.d */,
-				65F93BA212EE09280047DB36 /* pios_board.o.d */,
-				65F93BA312EE09280047DB36 /* pios_com.o.d */,
-				65F93BA412EE09280047DB36 /* pios_delay.o.d */,
-				65F93BA512EE09280047DB36 /* pios_gpio.o.d */,
-				65F93BA612EE09280047DB36 /* pios_irq.o.d */,
-				65F93BA712EE09280047DB36 /* pios_led.o.d */,
-				65F93BA812EE09280047DB36 /* pios_spi.o.d */,
-				65F93BA912EE09280047DB36 /* pios_sys.o.d */,
-				65F93BAA12EE09280047DB36 /* pios_usart.o.d */,
-				65F93BAB12EE09280047DB36 /* pios_usb_hid.o.d */,
-				65F93BAC12EE09280047DB36 /* pios_usb_hid_desc.o.d */,
-				65F93BAD12EE09280047DB36 /* pios_usb_hid_istr.o.d */,
-				65F93BAE12EE09280047DB36 /* pios_usb_hid_prop.o.d */,
-				65F93BAF12EE09280047DB36 /* pios_usb_hid_pwr.o.d */,
-				65F93BB012EE09280047DB36 /* printf-stdarg.o.d */,
-				65F93BB112EE09280047DB36 /* rfm22b.o.d */,
-				65F93BB212EE09280047DB36 /* saved_settings.o.d */,
-				65F93BB312EE09280047DB36 /* stm32f10x_adc.o.d */,
-				65F93BB412EE09280047DB36 /* stm32f10x_bkp.o.d */,
-				65F93BB512EE09280047DB36 /* stm32f10x_crc.o.d */,
-				65F93BB612EE09280047DB36 /* stm32f10x_dac.o.d */,
-				65F93BB712EE09280047DB36 /* stm32f10x_dbgmcu.o.d */,
-				65F93BB812EE09280047DB36 /* stm32f10x_dma.o.d */,
-				65F93BB912EE09280047DB36 /* stm32f10x_exti.o.d */,
-				65F93BBA12EE09280047DB36 /* stm32f10x_flash.o.d */,
-				65F93BBB12EE09280047DB36 /* stm32f10x_gpio.o.d */,
-				65F93BBC12EE09280047DB36 /* stm32f10x_i2c.o.d */,
-				65F93BBD12EE09280047DB36 /* stm32f10x_iwdg.o.d */,
-				65F93BBE12EE09280047DB36 /* stm32f10x_pwr.o.d */,
-				65F93BBF12EE09280047DB36 /* stm32f10x_rcc.o.d */,
-				65F93BC012EE09280047DB36 /* stm32f10x_rtc.o.d */,
-				65F93BC112EE09280047DB36 /* stm32f10x_spi.o.d */,
-				65F93BC212EE09280047DB36 /* stm32f10x_tim.o.d */,
-				65F93BC312EE09280047DB36 /* stm32f10x_usart.o.d */,
-				65F93BC412EE09280047DB36 /* stopwatch.o.d */,
-				65F93BC512EE09280047DB36 /* system_stm32f10x.o.d */,
-				65F93BC612EE09280047DB36 /* transparent_comms.o.d */,
-				65F93BC712EE09280047DB36 /* uavtalk_comms.o.d */,
-				65F93BC812EE09280047DB36 /* usb_core.o.d */,
-				65F93BC912EE09280047DB36 /* usb_init.o.d */,
-				65F93BCA12EE09280047DB36 /* usb_int.o.d */,
-				65F93BCB12EE09280047DB36 /* usb_mem.o.d */,
-				65F93BCC12EE09280047DB36 /* usb_regs.o.d */,
-				65F93BCD12EE09280047DB36 /* usb_sil.o.d */,
-				65F93BCE12EE09280047DB36 /* watchdog.o.d */,
-			);
-			path = dep;
-			sourceTree = "<group>";
 		};
 		65F93C3A12EE09280047DB36 /* Build */ = {
 			isa = PBXGroup;

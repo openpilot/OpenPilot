@@ -31,8 +31,7 @@
 #include <coreplugin/iuavgadget.h>
 
 PipXtremeGadgetFactory::PipXtremeGadgetFactory(QObject *parent) :
-		IUAVGadgetFactory(QString("PipXtreme"), tr("PipXtreme Gadget"), parent),
-		gadgetWidget(NULL)
+		IUAVGadgetFactory(QString("PipXtreme"), tr("PipXtreme Gadget"), parent)
 {
 }
 

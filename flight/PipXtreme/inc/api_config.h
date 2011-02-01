@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       crc.h
+ * @file       api_config.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Serial communication port handling routines
+ * @brief      RF Module hardware layer
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -23,21 +23,18 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef _CRC_H_
-#define _CRC_H_
+#ifndef __API_CONFIG_H__
+#define __API_CONFIG_H__
 
-#include "stm32f10x.h"
+#include "stdint.h"
 
-// ********************************************************************
+// *****************************************************************************
 
-uint16_t updateCRC16(uint16_t crc, uint8_t b);
-uint16_t updateCRC16Data(uint16_t crc, void *data, uint32_t len);
+void apiconfig_1ms_tick(void);
+void apiconfig_process(void);
 
-uint32_t updateCRC32(uint32_t crc, uint8_t b);
-uint32_t updateCRC32Data(uint32_t crc, void *data, uint32_t len);
+void apiconfig_init(void);
 
-void CRC_init(void);
-
-// ********************************************************************
+// *****************************************************************************
 
 #endif

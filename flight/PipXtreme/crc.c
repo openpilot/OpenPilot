@@ -103,12 +103,12 @@ static const uint32_t CRC_Table32[]	= {
 // **************************************************************************
 // 16-bit CRC
 
-inline uint16_t UpdateCRC16(uint16_t crc, uint8_t b)
+inline uint16_t updateCRC16(uint16_t crc, uint8_t b)
 {	// update the crc - table method
 	return ((crc >> 8) ^ CRC_Table16[(crc & 0xff) ^ b]);
 }
 /*
-uint16_t UpdateCRC16(uint16_t crc, uint8_t b)
+uint16_t updateCRC16(uint16_t crc, uint8_t b)
 {	// update the fcs - bit band method
 	register uint8_t f = (uint8_t)(crc >> 8);
 	crc = (crc & 0x00ff) ^ b;
@@ -117,7 +117,7 @@ uint16_t UpdateCRC16(uint16_t crc, uint8_t b)
 	return (crc ^ f);
 }
 */
-uint16_t UpdateCRC16Data(uint16_t crc, void *data, uint32_t len)
+uint16_t updateCRC16Data(uint16_t crc, void *data, uint32_t len)
 {
 	register uint8_t *p = (uint8_t *)data;
 	register uint16_t _crc = crc;
@@ -128,7 +128,7 @@ uint16_t UpdateCRC16Data(uint16_t crc, void *data, uint32_t len)
 }
 /*
 // Generate the CRC table
-void MakeCRC_Table16(void)
+void makeCRC_Table16(void)
 {
 	for (uint16_t i = 0; i < 256; i++)
 	{
@@ -142,12 +142,12 @@ void MakeCRC_Table16(void)
 // **************************************************************************
 // 32-bit CRC
 
-inline uint32_t UpdateCRC32(uint32_t crc, uint8_t b)
+inline uint32_t updateCRC32(uint32_t crc, uint8_t b)
 {
 	return ((crc << 8) ^ CRC_Table32[(crc >> 24) ^ b]);
 }
 /*
-uint32_t UpdateCRC32(uint32_t crc, uint8_t b)
+uint32_t updateCRC32(uint32_t crc, uint8_t b)
 {	// update the crc - bit bang method
 	register uint32_t f = crc << 8;
 	crc = (crc >> 24) ^ b;
@@ -156,7 +156,7 @@ uint32_t UpdateCRC32(uint32_t crc, uint8_t b)
 	return (crc ^ f);
 }
 */
-uint32_t UpdateCRC32Data(uint32_t crc, void *data, uint32_t len)
+uint32_t updateCRC32Data(uint32_t crc, void *data, uint32_t len)
 {
 	register uint8_t *p = (uint8_t *)data;
 	register uint32_t _crc = crc;
@@ -167,7 +167,7 @@ uint32_t UpdateCRC32Data(uint32_t crc, void *data, uint32_t len)
 }
 /*
 // Generate the CRC table
-void MakeCRC_Table32(void)
+void makeCRC_Table32(void)
 {
 	for (uint32_t i = 0; i < 256; i++)
 	{

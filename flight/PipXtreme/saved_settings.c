@@ -109,7 +109,7 @@ int32_t saved_settings_read(void)
     // calculate and check the CRC
     uint32_t crc1 = tmp_settings.crc;
     tmp_settings.crc = 0;
-    uint32_t crc2 = UpdateCRC32Data(0xffffffff, (void *)&tmp_settings, sizeof(t_saved_settings));
+    uint32_t crc2 = updateCRC32Data(0xffffffff, (void *)&tmp_settings, sizeof(t_saved_settings));
     if (crc2 != crc1)
     {
         #if defined(SAVED_SETTINGS_DEBUG)
@@ -151,7 +151,7 @@ int32_t saved_settings_save(void)
     // calculate and add the CRC
 
     saved_settings.crc = 0;
-    saved_settings.crc = UpdateCRC32Data(0xffffffff, (void *)&saved_settings, sizeof(t_saved_settings));
+    saved_settings.crc = updateCRC32Data(0xffffffff, (void *)&saved_settings, sizeof(t_saved_settings));
 
     // *****************************************
     // first check to see if we need to save the settings
@@ -304,8 +304,10 @@ void saved_settings_init(void)
     saved_settings.aes_enable = FALSE;
     memmove((void *)&saved_settings.aes_key, saved_settings_default_aes_key, sizeof(saved_settings.aes_key));
 
+    saved_settings.serial_baudrate = 57600;
+
 //    saved_settings.crc = 0;
-//    saved_settings.crc = UpdateCRC32Data(0xffffffff, (void *)&saved_settings, sizeof(t_saved_settings));
+//    saved_settings.crc = updateCRC32Data(0xffffffff, (void *)&saved_settings, sizeof(t_saved_settings));
 
     // **********
 

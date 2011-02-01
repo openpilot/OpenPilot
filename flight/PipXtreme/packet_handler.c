@@ -273,7 +273,7 @@ uint16_t ph_getData(const int connection_index, void *data, uint16_t len)
 
 int ph_startConnect(int connection_index, uint32_t sn)
 {
-    random32 = UpdateCRC32(random32, 0xff);
+    random32 = updateCRC32(random32, 0xff);
 
     if (connection_index < 0 || connection_index >= PH_MAX_CONNECTIONS)
       return -1;
@@ -443,7 +443,7 @@ bool ph_sendPacket(int connection_index, bool encrypt, uint8_t packet_type, bool
       // ensure the 1st byte is not zero - to indicate this packet is encrypted
       while (enc_cbc[0] == 0)
       {
-          random32 = UpdateCRC32(random32, 0xff);
+          random32 = updateCRC32(random32, 0xff);
           enc_cbc[0] ^= random32;
       }
 
@@ -481,9 +481,9 @@ bool ph_sendPacket(int connection_index, bool encrypt, uint8_t packet_type, bool
   // complete the packet header by adding the CRC
 
   if (encrypt)
-    header->crc = UpdateCRC32Data(0xffffffff, header, packet_size - AES_BLOCK_SIZE);
+    header->crc = updateCRC32Data(0xffffffff, header, packet_size - AES_BLOCK_SIZE);
   else
-    header->crc = UpdateCRC32Data(0xffffffff, header, packet_size - 1);
+    header->crc = updateCRC32Data(0xffffffff, header, packet_size - 1);
 
   // ******************
   // encrypt the packet
@@ -600,7 +600,7 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
   uint16_t data_size = header->data_size;
 
   // update the ramdon number
-  random32 = UpdateCRC32(random32, 0xff);
+  random32 = updateCRC32(random32, 0xff);
 
   // *********************
   // debug stuff
@@ -1105,7 +1105,7 @@ void ph_processRxPacket(void)
       return;
   }
 
-  random32 = UpdateCRC32(random32 ^ header->crc, 0xff);	// help randomize the random number
+  random32 = updateCRC32(random32 ^ header->crc, 0xff);	// help randomize the random number
 
   // *********************
   // help to randomize the tx aes cbc bytes by using the received packet
@@ -1192,9 +1192,9 @@ void ph_processRxPacket(void)
   crc1 = header->crc;
   header->crc = 0;
   if (encrypted)
-    crc2 = UpdateCRC32Data(0xffffffff, header, packet_size - AES_BLOCK_SIZE);
+    crc2 = updateCRC32Data(0xffffffff, header, packet_size - AES_BLOCK_SIZE);
   else
-    crc2 = UpdateCRC32Data(0xffffffff, header, packet_size - 1);
+    crc2 = updateCRC32Data(0xffffffff, header, packet_size - 1);
   if (crc1 != crc2)
   {	// corrupt packet
       #if defined(PACKET_DEBUG)
@@ -1222,7 +1222,7 @@ void ph_processLinks(int connection_index)
   if (connection_index < 0 || connection_index >= PH_MAX_CONNECTIONS)
     return;
 
-  random32 = UpdateCRC32(random32, 0xff);
+  random32 = updateCRC32(random32, 0xff);
 
   t_connection *conn = &connection[connection_index];
 
@@ -1427,7 +1427,7 @@ void ph_set_AES128_key(const void *key)
 
 int ph_set_remote_serial_number(int connection_index, uint32_t sn)
 {
-  random32 = UpdateCRC32(random32, 0xff);
+  random32 = updateCRC32(random32, 0xff);
 
   if (ph_startConnect(connection_index, sn) >= 0)
   {
@@ -1453,7 +1453,7 @@ void ph_1ms_tick(void)
   register uint32_t *cbc = (uint32_t *)&enc_cbc;
   for (int i = 0; i < sizeof(enc_cbc) / 4; i++)
   {
-      random32 = UpdateCRC32(random32, 0xff);
+      random32 = updateCRC32(random32, 0xff);
       *cbc++ ^= random32;
   }
 
@@ -1516,7 +1516,7 @@ void ph_init(uint32_t our_sn, uint32_t datarate_bps, uint8_t tx_power)
 
   for (int i = 0; i < PH_MAX_CONNECTIONS; i++)
   {
-      random32 = UpdateCRC32(random32, 0xff);
+      random32 = updateCRC32(random32, 0xff);
 
       t_connection *conn = &connection[i];
 
@@ -1570,7 +1570,7 @@ void ph_init(uint32_t our_sn, uint32_t datarate_bps, uint8_t tx_power)
   // try too randomize the tx AES CBC bytes
   for (uint32_t j = 0, k = 0; j < 123 + (random32 & 1023); j++)
   {
-      random32 = UpdateCRC32(random32, 0xff);
+      random32 = updateCRC32(random32, 0xff);
       enc_cbc[k] ^= random32 >> 3;
       if (++k >= sizeof(enc_cbc)) k = 0;
   }

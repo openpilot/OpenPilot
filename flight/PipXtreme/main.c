@@ -38,7 +38,8 @@
 #include "rfm22b.h"
 #include "packet_handler.h"
 #include "transparent_comms.h"
-#include "api_comms.h"
+//#include "api_comms.h"
+#include "api_config.h"
 #include "gpio_in.h"
 #include "stopwatch.h"
 #include "watchdog.h"
@@ -273,7 +274,8 @@ void TIMER_INT_FUNC(void)
 			if (!API_Mode)
 				trans_1ms_tick();		// transparent communications tick
 			else
-				api_1ms_tick();			// api communications tick
+//				api_1ms_tick();			// api communications tick
+				apiconfig_1ms_tick();	// api communications tick
 
 			// ***********
 		}
@@ -362,8 +364,8 @@ void get_CPUDetails(void)
     }
 
     // create a 32-bit crc from the serial number hex string
-    serial_number_crc32 = UpdateCRC32Data(0xffffffff, serial_number_str, j);
-    serial_number_crc32 = UpdateCRC32(serial_number_crc32, j);
+    serial_number_crc32 = updateCRC32Data(0xffffffff, serial_number_str, j);
+    serial_number_crc32 = updateCRC32(serial_number_crc32, j);
 
 //  reset_addr = (uint32_t)&Reset_Handler;
 }
@@ -563,8 +565,8 @@ int main()
 //    temp_adc = -1;
 //    psu_adc = -1;
 
-    API_Mode = FALSE;
-//      API_Mode = TRUE;			// TEST ONLY
+//	API_Mode = FALSE;
+    API_Mode = TRUE;			// TEST ONLY
 
     second_tick_timer = 0;
     second_tick = FALSE;
@@ -626,7 +628,8 @@ int main()
 
     trans_init();                                       // initialise the tranparent communications module
 
-    api_init();    		                                // initialise the API communications module
+//	api_init();  	  	                                // initialise the API communications module
+    apiconfig_init();                                    // initialise the API communications module
 
     setup_TimerInt(1000);                               // setup a 1kHz timer interrupt
 
@@ -686,13 +689,13 @@ int main()
     switch (saved_settings.frequency_band)
     {
         case freqBand_434MHz:
-//            if (saved_settings.frequency_Hz == 0xffffffff)
+            if (saved_settings.min_frequency_Hz == 0xffffffff)
             {
                 saved_settings.frequency_Hz = 434000000;
-                saved_settings.min_frequency_Hz = 434000000 - 2000000;
-                saved_settings.max_frequency_Hz = 434000000 + 2000000;
+                saved_settings.min_frequency_Hz = saved_settings.frequency_Hz - 2000000;
+                saved_settings.max_frequency_Hz = saved_settings.frequency_Hz + 2000000;
             }
-//            if (saved_settings.max_rf_bandwidth == 0xffffffff)
+            if (saved_settings.max_rf_bandwidth == 0xffffffff)
             {
     //          saved_settings.max_rf_bandwidth = 500;
     //          saved_settings.max_rf_bandwidth = 1000;
@@ -708,7 +711,7 @@ int main()
                 saved_settings.max_rf_bandwidth = 128000;
     //          saved_settings.max_rf_bandwidth = 192000;
             }
-//            if (saved_settings.max_tx_power == 0xff)
+            if (saved_settings.max_tx_power == 0xff)
             {
     //          saved_settings.max_tx_power = 0;        // +1dBm ... 1.25mW
     //          saved_settings.max_tx_power = 1;        // +2dBm ... 1.6mW
@@ -722,13 +725,13 @@ int main()
             break;
 
         case freqBand_868MHz:
-//            if (saved_settings.frequency_Hz == 0xffffffff)
+            if (saved_settings.min_frequency_Hz == 0xffffffff)
             {
                 saved_settings.frequency_Hz = 868000000;
-                saved_settings.min_frequency_Hz = 868000000 - 10000000;
-                saved_settings.max_frequency_Hz = 868000000 + 10000000;
+                saved_settings.min_frequency_Hz = saved_settings.frequency_Hz - 10000000;
+                saved_settings.max_frequency_Hz = saved_settings.frequency_Hz + 10000000;
             }
-//            if (saved_settings.max_rf_bandwidth == 0xffffffff)
+            if (saved_settings.max_rf_bandwidth == 0xffffffff)
             {
     //          saved_settings.max_rf_bandwidth = 500;
     //          saved_settings.max_rf_bandwidth = 1000;
@@ -744,7 +747,7 @@ int main()
                 saved_settings.max_rf_bandwidth = 128000;
     //          saved_settings.max_rf_bandwidth = 192000;
             }
-//            if (saved_settings.max_tx_power == 0xff)
+            if (saved_settings.max_tx_power == 0xff)
             {
     //          saved_settings.max_tx_power = 0;        // +1dBm ... 1.25mW
     //          saved_settings.max_tx_power = 1;        // +2dBm ... 1.6mW
@@ -758,13 +761,13 @@ int main()
             break;
 
         case freqBand_915MHz:
-//            if (saved_settings.frequency_Hz == 0xffffffff)
+            if (saved_settings.min_frequency_Hz == 0xffffffff)
             {
                 saved_settings.frequency_Hz = 915000000;
-                saved_settings.min_frequency_Hz = 915000000 - 13000000;
-                saved_settings.max_frequency_Hz = 915000000 + 13000000;
+                saved_settings.min_frequency_Hz = saved_settings.frequency_Hz - 13000000;
+                saved_settings.max_frequency_Hz = saved_settings.frequency_Hz + 13000000;
             }
-//            if (saved_settings.max_rf_bandwidth == 0xffffffff)
+            if (saved_settings.max_rf_bandwidth == 0xffffffff)
             {
     //          saved_settings.max_rf_bandwidth = 500;
     //          saved_settings.max_rf_bandwidth = 1000;
@@ -780,7 +783,7 @@ int main()
                 saved_settings.max_rf_bandwidth = 128000;
     //          saved_settings.max_rf_bandwidth = 192000;
             }
-//            if (saved_settings.max_tx_power == 0xff)
+            if (saved_settings.max_tx_power == 0xff)
             {
     //          saved_settings.max_tx_power = 0;        // +1dBm ... 1.25mW
     //          saved_settings.max_tx_power = 1;        // +2dBm ... 1.6mW
@@ -862,8 +865,8 @@ int main()
 
     for (;;)
     {
-        random32 = UpdateCRC32(random32, PIOS_DELAY_TIMER->CNT >> 8);
-        random32 = UpdateCRC32(random32, PIOS_DELAY_TIMER->CNT);
+        random32 = updateCRC32(random32, PIOS_DELAY_TIMER->CNT >> 8);
+        random32 = updateCRC32(random32, PIOS_DELAY_TIMER->CNT);
 
         if (second_tick)
         {
@@ -913,9 +916,10 @@ int main()
         ph_process();					// packet handler processing
 
         if (!API_Mode)
-          trans_process();			// tranparent local communication processing (serial port and usb port)
+        	trans_process();			// tranparent local communication processing (serial port and usb port)
         else
-          api_process();			// API local communication processing (serial port and usb port)
+//        	api_process();				// API local communication processing (serial port and usb port)
+        	apiconfig_process();		// API local communication processing (serial port and usb port)
 
 
 

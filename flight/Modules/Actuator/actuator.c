@@ -217,7 +217,7 @@ static void actuatorTask(void* parameters)
 		MixerStatusSet(&mixerStatus);
 
 		// Store update time
-		command.UpdateTime = 10000*dT;
+		command.UpdateTime = 1000*dT;
 		if(1000*dT > command.MaxUpdateTime)
 			command.MaxUpdateTime = 1000*dT;
 		

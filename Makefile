@@ -229,6 +229,9 @@ uavobjects_%: $(UAVOBJ_OUT_DIR) uavobjgenerator
 uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
 	$(UAVOBJGENERATOR) -v -none $(UAVOBJ_XML_DIR) $(ROOT_DIR)
 
+uavobjects_clean:
+	[ ! -d "$(UAVOBJ_OUT_DIR)" ] || $(RM) -r "$(UAVOBJ_OUT_DIR)"
+
 ##############################
 #
 # Flight related components

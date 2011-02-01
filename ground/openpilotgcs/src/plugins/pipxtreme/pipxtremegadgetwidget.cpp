@@ -210,8 +210,6 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 	connect(m_widget->pushButton_AESKeyRandom, SIGNAL(clicked()), this, SLOT(randomiseAESKey()));
 	connect(m_widget->pushButton_ScanSpectrum, SIGNAL(clicked()), this, SLOT(scanSpectrum()));
 	connect(m_widget->pushButton_Save, SIGNAL(clicked()), this, SLOT(saveToFlash()));
-
-//    delay::msleep(600);   // just for pips reference
 }
 
 // destructor .. this never gets called :(

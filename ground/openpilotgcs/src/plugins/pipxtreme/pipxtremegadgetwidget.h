@@ -27,7 +27,6 @@
 #define PIPXTREMEGADGETWIDGET_H
 
 #include "ui_pipxtreme.h"
-#include "delay.h"
 
 #include <qextserialport.h>
 #include <qextserialenumerator.h>

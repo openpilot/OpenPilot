@@ -18,21 +18,14 @@ HEADERS += pipxtremegadget.h \
     pipxtremegadgetoptionspage.h \
     pipxtremegadgetwidget.h \
     pipxtremeplugin.h \
-    delay.h \
-    SSP/port.h \
-    SSP/qssp.h \
-    SSP/qsspt.h \
-    SSP/common.h
+
 SOURCES += pipxtremegadget.cpp \
     pipxtremegadgetconfiguration.cpp \
     pipxtremegadgetfactory.cpp \
     pipxtremegadgetoptionspage.cpp \
     pipxtremegadgetwidget.cpp \
     pipxtremeplugin.cpp \
-    delay.cpp \
-    SSP/port.cpp \
-    SSP/qssp.cpp \
-    SSP/qsspt.cpp
+
 OTHER_FILES += PipXtreme.pluginspec
 
 FORMS += \

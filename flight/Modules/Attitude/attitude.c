@@ -2,12 +2,12 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup CCAttitude Copter Control Attitude Estimation
- * @brief Handles communication with AHRS and updating position
+ * @addtogroup Attitude Copter Control Attitude Estimation
+ * @brief Acquires sensor data and computes attitude estimate 
  * Specifically updates the the @ref AttitudeActual "AttitudeActual" and @ref AttitudeRaw "AttitudeRaw" settings objects
  * @{
  *
- * @file       ccattitude.c
+ * @file       attitude.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Module to handle all comms to the AHRS on a periodic basis.
  *
@@ -49,7 +49,7 @@
  */
 
 #include "pios.h"
-#include "ccattitude.h"
+#include "attitude.h"
 #include "attituderaw.h"
 #include "attitudeactual.h"
 #include "attitudedesired.h"
@@ -72,7 +72,7 @@
 static xTaskHandle taskHandle;
 
 // Private functions
-static void CCAttitudeTask(void *parameters);
+static void AttitudeTask(void *parameters);
 
 void adc_callback(float * data);
 float gyro[3] = {0, 0, 0};
@@ -84,10 +84,10 @@ void updateAttitude();
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t CCAttitudeInitialize(void)
+int32_t AttitudeInitialize(void)
 {
 	// Start main task
-	xTaskCreate(CCAttitudeTask, (signed char *)"CCAttitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
+	xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_ATTITUDE, taskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
 	return 0;
@@ -96,7 +96,7 @@ int32_t CCAttitudeInitialize(void)
 /**
  * Module thread, should not return.
  */
-static void CCAttitudeTask(void *parameters)
+static void AttitudeTask(void *parameters)
 {
 
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);

@@ -2,12 +2,12 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{ 
- * @addtogroup AHRSCommsModule AHRSComms Module
+ * @addtogroup Attitude Attitude Module
  * @{ 
  *
- * @file       ahrs_comms.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Module to handle all comms to the AHRS on a periodic basis.
+ * @file       attitude.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
+ * @brief      Acquires sensor data and fuses it into attitude estimate for CC
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -27,11 +27,11 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef AHRS_COMMS_H
-#define AHRS_COMMS_H
+#ifndef ATTITUDE_H
+#define ATTITUDE_H
 
 #include "openpilot.h"
 
-int32_t AHRSCommsInitialize(void);
+int32_t AttitudeInitialize(void);
 
-#endif // AHRS_COMMS_H
+#endif // ATTITUDE_H

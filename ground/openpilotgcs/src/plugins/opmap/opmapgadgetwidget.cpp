@@ -318,8 +318,8 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 	if (m_map)
 	{
 		disconnect(m_map, 0, 0, 0);
-		m_map->SetShowHome(false);
-		m_map->SetShowUAV(false);
+		m_map->SetShowHome(false);	// doing this appears to stop the map lib crashing on exit
+		m_map->SetShowUAV(false);	//   "          "
 	}
 
 

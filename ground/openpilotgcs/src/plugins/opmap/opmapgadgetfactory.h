@@ -30,8 +30,6 @@
 
 #include <coreplugin/iuavgadgetfactory.h>
 
-#include "opmapgadgetwidget.h"
-
 namespace Core {
 	class IUAVGadget;
 	class IUAVGadgetFactory;
@@ -42,6 +40,7 @@ using namespace Core;
 class OPMapGadgetFactory : public Core::IUAVGadgetFactory
 {
     Q_OBJECT
+
 public:
     OPMapGadgetFactory(QObject *parent = 0);
     ~OPMapGadgetFactory();
@@ -49,7 +48,6 @@ public:
     Core::IUAVGadget *createGadget(QWidget *parent);
     IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
-
 };
 
-#endif // OPMAP_GADGETFACTORY_H_
+#endif

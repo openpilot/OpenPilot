@@ -25,7 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "opmapgadgetfactory.h"
-//#include "opmapgadgetwidget.h"
+#include "opmapgadgetwidget.h"
 #include "opmapgadget.h"
 #include "opmapgadgetconfiguration.h"
 #include "opmapgadgetoptionspage.h"

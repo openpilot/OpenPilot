@@ -24,14 +24,15 @@
  */
 
 #include "pipxtremegadgetfactory.h"
-//#include "pipxtremegadgetwidget.h"
+#include "pipxtremegadgetwidget.h"
 #include "pipxtremegadget.h"
 #include "pipxtremegadgetconfiguration.h"
 #include "pipxtremegadgetoptionspage.h"
 #include <coreplugin/iuavgadget.h>
 
 PipXtremeGadgetFactory::PipXtremeGadgetFactory(QObject *parent) :
-                IUAVGadgetFactory(QString("PipXtreme"), tr("PipXtreme Gadget"), parent)
+		IUAVGadgetFactory(QString("PipXtreme"), tr("PipXtreme Gadget"), parent),
+		gadgetWidget(NULL)
 {
 }
 
@@ -41,7 +42,7 @@ PipXtremeGadgetFactory::~PipXtremeGadgetFactory()
 
 Core::IUAVGadget* PipXtremeGadgetFactory::createGadget(QWidget *parent)
 {
-        PipXtremeGadgetWidget *gadgetWidget = new PipXtremeGadgetWidget(parent);
+	PipXtremeGadgetWidget *gadgetWidget = new PipXtremeGadgetWidget(parent);
 	return new PipXtremeGadget(QString("PipXtreme"), gadgetWidget, parent);
 }
 

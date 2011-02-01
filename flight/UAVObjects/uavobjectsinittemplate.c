@@ -28,13 +28,18 @@
  */
 
 #include "openpilot.h"
-$(OBJINC)
 
 /**
  * Function used to initialize the first instance of each object.
  * This file is automatically updated by the UAVObjectGenerator.
  */
+extern initcall_t __uavobj_initcall_start[], __uavobj_initcall_end[];
+
 void UAVObjectsInitializeAll()
 {
-$(OBJINIT)
+	initcall_t *fn;
+	int32_t ret;
+
+	for (fn = __uavobj_initcall_start; fn < __uavobj_initcall_end; fn++)
+		ret = (*fn)();
 }

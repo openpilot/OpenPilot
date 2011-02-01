@@ -31,14 +31,31 @@
 #ifndef PIOS_INITCALL_H
 #define PIOS_INITCALL_H
 
-/**
- * Just a stub define to make things compile.
- * Automatically link based initialization currently doesn't work
- * since posix really runs on a multitude of architectures
- * and we cannot define a linker script for each of them atm
+/* 
+ * This implementation is heavily based on the Linux Kernel initcall
+ * infrastructure:
+ *   http://lxr.linux.no/#linux/include/linux/init.h
+ *   http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=blob;f=include/linux/init.h
  */
 
-#define uavobj_initcall(fn)
+/*
+ * Used for initialization calls..
+ */
+typedef int32_t (*initcall_t)(void);
+
+/* initcalls are now grouped by functionality into separate 
+ * subsections. Ordering inside the subsections is determined
+ * by link order.
+ *
+ * The `id' arg to __define_initcall() is needed so that multiple initcalls
+ * can point at the same handler without causing duplicate-symbol build errors.
+ */
+
+#define __define_initcall(level,fn,id) \
+	static initcall_t __initcall_##fn##id __attribute__((__used__)) \
+	__attribute__((__section__(".initcall" level ".init"))) = fn
+
+#define uavobj_initcall(fn)		__define_initcall("uavobj",fn,1)
 
 #endif	/* PIOS_INITCALL_H */
 

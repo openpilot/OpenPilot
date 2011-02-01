@@ -37,7 +37,6 @@ public:
     QString flightCodeTemplate, flightIncludeTemplate, flightInitTemplate;
     QDir flightCodePath;
     QDir flightOutputPath;
-    QDir flightInitOutputPath;
 
 private:
     bool process_object(ObjectInfo* info);

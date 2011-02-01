@@ -89,6 +89,7 @@ int32_t CCAttitudeInitialize(void)
 	// Start main task
 	xTaskCreate(CCAttitudeTask, (signed char *)"CCAttitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_AHRSCOMMS, taskHandle);
+	PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
 	return 0;
 }
 
@@ -109,7 +110,7 @@ static void CCAttitudeTask(void *parameters)
 	// Main task loop
 	while (1) {
 		//portTickType lastSysTime;
-		//PIOS_WDG_UpdateFlag(PIOS_WDG_AHRS);
+		PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
 		
 		// TODO: register the adc callback, push the data onto a queue (safe for thread)
 		// with the queue ISR version

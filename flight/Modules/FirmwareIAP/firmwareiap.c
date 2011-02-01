@@ -26,10 +26,10 @@
  */
 #include <stdint.h>
 
+#include "pios.h"
 #include "openpilot.h"
 #include "firmwareiap.h"
 #include "firmwareiapobj.h"
-#include "pios_iap.h"
 
 #include "STM3210E_OP.h"
 
@@ -45,6 +45,8 @@
 #define IAP_STATE_READY     0
 #define IAP_STATE_STEP_1    1
 #define IAP_STATE_STEP_2    2
+
+#define RESET_DELAY         500 /* delay between sending reset ot INS */
 
 
 #define TICKS2MS(t)	((t)/portTICK_RATE_MS)
@@ -72,17 +74,13 @@ FirmwareIAPObjData 	data;
 
 static uint32_t	get_time(void);
 
-// Private constants
-#define STACK_SIZE_BYTES 800
-#define TASK_PRIORITY (tskIDLE_PRIORITY+1)
-
 // Private types
 
 // Private variables
 static xTaskHandle taskHandle;
 
 // Private functions
-static void resetTask(void *parameters);
+static void resetTask(UAVObjEvent *);
 
 /**
  * Initialise the module, called on startup.
@@ -166,8 +164,12 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
                     // we've met the time requirements.
                 	PIOS_IAP_SetRequest1();
                 	PIOS_IAP_SetRequest2();
-                	xTaskCreate(resetTask, (signed char *)"Reset", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-                } else {
+			
+			/* Note: Cant just wait timeout value, because first time is randomized */
+			UAVObjEvent * ev = pvPortMalloc(sizeof(UAVObjEvent));
+			memset(ev,0,sizeof(UAVObjEvent));
+			EventPeriodicCallbackCreate(ev, resetTask, 10);
+		} else {
                     iap_state = IAP_STATE_READY;
                 }
             } else {
@@ -238,19 +240,27 @@ static void read_description(uint8_t * array)
 	}
 }
 
-static void resetTask(void *parameters)
+/**
+ * Executed by event dispatcher callback to reset INS before resetting OP 
+ */
+static void resetTask(UAVObjEvent * ev)
 {
+	static portTickType lastSysTime;
+	static uint8_t count = 0;
+	static uint8_t first = 1;
+	
+	if(first == 1) { /* Initialize */
+		lastSysTime = xTaskGetTickCount();
+		first = 0;
+	}
 
-	portTickType lastSysTime;
-	uint8_t count=0;
-	// Main task loop
-	lastSysTime = xTaskGetTickCount();
-	while (1) {
+	
+	if((portTickType) (xTaskGetTickCount() - lastSysTime) > RESET_DELAY / portTICK_RATE_MS) {
+		lastSysTime = xTaskGetTickCount();
 		data.BoardType=0xFF;
 		data.ArmReset=1;
-		data.crc=count;
+		data.crc=count; /* Must change a value for this to get to INS */
 		FirmwareIAPObjSet(&data);
-		vTaskDelayUntil(&lastSysTime, 500 / portTICK_RATE_MS);
 		++count;
 		if(count>3)
 		{

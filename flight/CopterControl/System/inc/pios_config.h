@@ -78,6 +78,9 @@
 #define SERVOS_POSITION_MIN		800
 #define SERVOS_POSITION_MAX		2200
 
+#define PIOS_ACTUATOR_STACK_SIZE        992
+#define PIOS_MANUAL_STACK_SIZE          624
+#define PIOS_SYSTEM_STACK_SIZE          624
 
 #endif /* PIOS_CONFIG_H */
 /**

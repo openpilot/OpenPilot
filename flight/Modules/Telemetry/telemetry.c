@@ -36,8 +36,8 @@
 #include "telemetrysettings.h"
 
 // Private constants
-#define MAX_QUEUE_SIZE   TELEM_QUEUE_SIZE /*20*/
-#define STACK_SIZE_BYTES TELEM_STACK_SIZE /*624*/
+#define MAX_QUEUE_SIZE   TELEM_QUEUE_SIZE
+#define STACK_SIZE_BYTES TELEM_STACK_SIZE
 #define TASK_PRIORITY_RX (tskIDLE_PRIORITY + 2)
 #define TASK_PRIORITY_TX (tskIDLE_PRIORITY + 2)
 #define TASK_PRIORITY_TXPRI (tskIDLE_PRIORITY + 2)

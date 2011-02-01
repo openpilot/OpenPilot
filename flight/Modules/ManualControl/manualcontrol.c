@@ -43,7 +43,12 @@
 #include "flighttelemetrystats.h"
 
 // Private constants
+#if defined(PIOS_MANUAL_STACK_SIZE)
+#define STACK_SIZE_BYTES PIOS_MANUAL_STACK_SIZE
+#else
 #define STACK_SIZE_BYTES 824
+#endif
+
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 #define UPDATE_PERIOD_MS 20
 #define THROTTLE_FAILSAFE -0.1

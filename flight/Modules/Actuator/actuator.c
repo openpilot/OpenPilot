@@ -44,7 +44,13 @@
 
 // Private constants
 #define MAX_QUEUE_SIZE 2
-#define STACK_SIZE configMINIMAL_STACK_SIZE+200
+
+#if defined(PIOS_ACTUATOR_STACK_SIZE)
+#define STACK_SIZE_BYTES PIOS_ACTUATOR_STACK_SIZE
+#else
+#define STACK_SIZE_BYTES 1312
+#endif
+
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 #define FAILSAFE_TIMEOUT_MS 100
 #define MAX_MIX_ACTUATORS ACTUATORCOMMAND_CHANNEL_NUMELEM
@@ -96,7 +102,7 @@ int32_t ActuatorInitialize()
 	ActuatorSettingsConnectCallback(actuator_update_rate);
 	
 	// Start main task
-	xTaskCreate(actuatorTask, (signed char*)"Actuator", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+	xTaskCreate(actuatorTask, (signed char*)"Actuator", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_ACTUATOR, taskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_ACTUATOR);
 	

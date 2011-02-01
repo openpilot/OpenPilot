@@ -20,6 +20,7 @@
 #define W25X_DEVICE_ID              0x90
 #define W25X_SECTOR_ERASE           0x20
 #define W25X_PAGE_WRITE             0x02
+#define W25X_CHIP_ERASE             0x60
 
 #define W25X_STATUS_BUSY            0x01
 #define W25X_STATUS_WRITEPROTECT    0x02
@@ -37,6 +38,7 @@ static int8_t PIOS_Flash_W25X_ClaimBus();
 static void PIOS_Flash_W25X_ReleaseBus();
 static uint8_t PIOS_Flash_W25X_WriteEnable();
 static uint8_t PIOS_Flash_W25X_Busy() ;
+//static uint8_t PIOS_Flash_W25X_EraseChip();
 
 /** 
  * @brief Claim the SPI bus for flash use and assert CS pin
@@ -87,7 +89,6 @@ int8_t PIOS_Flash_W25X_Init()
 {
 	PIOS_GPIO_Enable(PIOS_FLASH_CS_PIN);
 	device_type = PIOS_Flash_W25X_ReadID();
-	PIOS_Flash_W25X_WriteEnable();	
 	return 0;
 }
 
@@ -148,6 +149,32 @@ int8_t PIOS_Flash_W25X_EraseSector(uint32_t addr)
 	return 0;
 }
 
+/**
+ * @brief Execute the whole chip
+ * @returns 0 if successful, -1 if unable to claim bus
+ */
+/*static uint8_t PIOS_Flash_W25X_EraseChip() 
+{
+	uint8_t ret;
+	uint8_t out[] = {W25X_CHIP_ERASE};
+	
+	if((ret = PIOS_Flash_W25X_WriteEnable()) != 0)
+		return ret;
+	
+	if(PIOS_Flash_W25X_ClaimBus() != 0)
+		return -1;
+	PIOS_SPI_TransferBlock(PIOS_SPI_FLASH,out,NULL,sizeof(out),NULL);	
+	PIOS_Flash_W25X_ReleaseBus();
+	while(PIOS_Flash_W25X_Busy()) {
+		//TODO: Fail on timeout
+#if defined(PIOS_INCLUDE_FREERTOS)
+		vTaskDelay(1);
+#endif
+	}
+	return 0;
+}*/
+
+
 /** 
  * @brief Write one page of data (up to 256 bytes) aligned to a page start
  * @param[in] addr Address in flash to write to
@@ -161,6 +188,7 @@ int8_t PIOS_Flash_W25X_EraseSector(uint32_t addr)
 int8_t PIOS_Flash_W25X_WriteData(uint32_t addr, uint8_t * data, uint16_t len)
 {
 	uint8_t ret;
+	uint8_t out[4] = {W25X_PAGE_WRITE, (addr >> 16) & 0xff, (addr >> 8) & 0xff , addr & 0xff};
 	
 	/* Can only write one page at a time */
 	if(len > 0x100) 
@@ -176,7 +204,6 @@ int8_t PIOS_Flash_W25X_WriteData(uint32_t addr, uint8_t * data, uint16_t len)
 	/* Execute write page command and clock in address.  Keep CS asserted */
 	if(PIOS_Flash_W25X_ClaimBus() != 0)
 		return -1;
-	uint8_t out[] = {W25X_PAGE_WRITE, (addr >> 16) && 0xff, (addr >> 8) && 0xff , addr && 0xff};
 	PIOS_SPI_TransferBlock(PIOS_SPI_FLASH,out,NULL,sizeof(out),NULL);
 	
 	/* Clock out data to flash */
@@ -189,7 +216,6 @@ int8_t PIOS_Flash_W25X_WriteData(uint32_t addr, uint8_t * data, uint16_t len)
 		vTaskDelay(1);
 #endif
 	}
-	
 	return 0;
 }
 
@@ -199,7 +225,7 @@ int8_t PIOS_Flash_W25X_ReadData(uint32_t addr, uint8_t * data, uint16_t len)
 		return -1;
 
 	/* Execute read command and clock in address.  Keep CS asserted */
-	uint8_t out[] = {W25X_READ_DATA, (addr >> 16) && 0xff, (addr >> 8) && 0xff , addr && 0xff};
+	uint8_t out[] = {W25X_READ_DATA, (addr >> 16) & 0xff, (addr >> 8) & 0xff , addr & 0xff};
 	PIOS_SPI_TransferBlock(PIOS_SPI_FLASH,out,NULL,sizeof(out),NULL);
 
 	/* Copy the transfer data to the buffer */

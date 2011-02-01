@@ -562,6 +562,14 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId, FILEINFO* file)
 	return 0;
 }
 
+struct fileHeader {
+	uint32_t id;
+	uint16_t instId;
+	uint16_t size;
+} __attribute__((packed));
+
+#define FLASH_MASK 0x001ff000  /* Select a sector */
+
 /**
  * Save the data of the specified object to the file system (SD card).
  * If the object contains multiple instances, all of them will be saved.
@@ -574,6 +582,32 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId, FILEINFO* file)
  */
 int32_t UAVObjSave(UAVObjHandle obj, uint16_t instId)
 {
+#if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
+	ObjectList* objEntry = (ObjectList*)obj;
+	
+	if(objEntry == NULL)
+		return -1;
+	
+	ObjectInstList* instEntry = getInstance(objEntry, instId);
+	
+	if(instEntry == NULL)
+		return -1;
+	
+	if(instEntry->data == NULL)
+		return -1;
+	
+
+	struct fileHeader header = {
+		.id = objEntry->id,
+		.instId = instId,
+		.size = objEntry->numBytes
+	};
+
+	uint32_t addr = (objEntry->id & FLASH_MASK);
+	PIOS_Flash_W25X_EraseSector(addr);
+	PIOS_Flash_W25X_WriteData(addr, (uint8_t *) &header, sizeof(header));
+	PIOS_Flash_W25X_WriteData(addr + sizeof(header), instEntry->data,objEntry->numBytes);
+#endif	
 #if defined(PIOS_INCLUDE_SDCARD)
 	FILEINFO file;
 	ObjectList* objEntry;
@@ -710,6 +744,36 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO* file)
  */
 int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
 {
+#if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
+	ObjectList* objEntry = (ObjectList*)obj;
+	
+	if(objEntry == NULL)
+		return -1;
+	
+	ObjectInstList* instEntry = getInstance(objEntry, instId);
+	
+	if(instEntry == NULL)
+		return -1;
+	
+	if(instEntry->data == NULL)
+		return -1;
+	
+	struct fileHeader header;
+	uint32_t addr = (objEntry->id & FLASH_MASK);
+
+	PIOS_Flash_W25X_ReadData(addr, (uint8_t *) &header, sizeof(header));
+	
+	if(header.id != objEntry->id)
+		return -1;
+	
+	// Read the instance data
+	if (PIOS_Flash_W25X_ReadData(addr + sizeof(header) ,instEntry->data, objEntry->numBytes) != 0)
+		return -1;
+		
+	// Fire event
+	sendEvent(objEntry, instId, EV_UNPACKED);		
+#endif
+	
 #if defined(PIOS_INCLUDE_SDCARD)
 	FILEINFO file;
 	ObjectList* objEntry;

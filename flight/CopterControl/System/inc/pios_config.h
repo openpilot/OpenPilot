@@ -55,11 +55,14 @@
 #define PIOS_INCLUDE_FREERTOS
 #define PIOS_INCLUDE_GPIO
 #define PIOS_INCLUDE_EXTI
-#define PIOS_INCLUDE_WDG
+//#define PIOS_INCLUDE_WDG
 #define PIOS_INCLUDE_I2C_ESC
 
 #define PIOS_INCLUDE_ADXL345
 #define PIOS_INCLUDE_FLASH
+
+/* A really shitty setting saving implementation */
+#define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
 
 /* Defaults for Logging */
 #define LOG_FILENAME 			"PIOS.LOG"

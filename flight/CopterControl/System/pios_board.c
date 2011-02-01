@@ -47,6 +47,7 @@ void PIOS_Board_Init(void) {
 	
 	/* SPI Init */
 	PIOS_SPI_Init();
+	PIOS_Flash_W25X_Init();
 
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 	/* SPEKTRUM init must come before comms */

@@ -127,10 +127,10 @@ void PIOS_Servo_Init(void)
 
 /**
 * Set the servo update rate (Max 500Hz)
-* \param[in] onetofour Rate for outputs 1 to 4 (Hz)
-* \param[in] fivetoeight Rate for outputs 5 to 8 (Hz)
+* \param[in] array of rates in Hz
+* \param[in] maximum number of banks
 */
-void PIOS_Servo_SetHz(uint16_t onetofour, uint16_t fivetoeight)
+void PIOS_Servo_SetHz(uint16_t * speeds, uint8_t banks)
 {
 #ifndef PIOS_ENABLE_DEBUG_PINS
 #if defined(PIOS_INCLUDE_SERVO)
@@ -139,26 +139,22 @@ void PIOS_Servo_SetHz(uint16_t onetofour, uint16_t fivetoeight)
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
 	
-	for (uint8_t i = 0; i < pios_servo_cfg.num_channels; i++) {
+	uint8_t set = 0;
+	
+	for(uint8_t i = 0; (i < pios_servo_cfg.num_channels) && (set < banks); i++) {		
+		bool new = true;
 		struct pios_servo_channel channel = pios_servo_cfg.channels[i];
 		
-		/* Enable time base */
-		switch((int32_t)channel.timer) {
-			case (int32_t)TIM1:
-			case (int32_t)TIM2:
-			case (int32_t)TIM3:
-			case (int32_t)TIM4:
-				TIM_TimeBaseStructure.TIM_Period = ((1000000 / onetofour) - 1);
-				break;
-			case (int32_t)TIM5:
-			case (int32_t)TIM6:
-			case (int32_t)TIM7:
-			case (int32_t)TIM8:
-				TIM_TimeBaseStructure.TIM_Period = ((1000000 / fivetoeight) - 1);
-				break;								
+		/* See if any previous channels use that same timer */
+		for(uint8_t j = 0; (j < i) && new; j++) 
+			new &= channel.timer != pios_servo_cfg.channels[j].timer;
+		
+		if(new) {
+			TIM_TimeBaseStructure.TIM_Period = ((1000000 / speeds[set]) - 1);		
+			TIM_TimeBaseInit(channel.timer,  &TIM_TimeBaseStructure);
+			set++;
 		}
-		TIM_TimeBaseInit(channel.timer,  &TIM_TimeBaseStructure);
-	} 
+	}
 #endif // PIOS_INCLUDE_SERVO
 #endif // PIOS_ENABLE_DEBUG_PINS
 }

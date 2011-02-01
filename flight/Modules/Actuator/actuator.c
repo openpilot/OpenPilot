@@ -63,6 +63,7 @@ static float filterAccumulator[MAX_MIX_ACTUATORS]={0,0,0,0,0,0,0,0};
 
 // Private functions
 static void actuatorTask(void* parameters);
+static void actuator_update_rate(UAVObjEvent *);
 static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutral);
 static void setFailsafe();
 static float MixerCurve(const float throttle, const float* curve);
@@ -90,7 +91,10 @@ int32_t ActuatorInitialize()
 
 	// Listen for ExampleObject1 updates
 	ActuatorDesiredConnectQueue(queue);
-
+	
+	// If settings change, update the output rate
+	ActuatorSettingsConnectCallback(actuator_update_rate);
+	
 	// Start main task
 	xTaskCreate(actuatorTask, (signed char*)"Actuator", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_ACTUATOR, taskHandle);
@@ -99,9 +103,8 @@ int32_t ActuatorInitialize()
 	return 0;
 }
 
-
 /**
- * @brieft Main Actuator module task
+ * @brief Main Actuator module task
  *
  * Universal matrix based mixer for VTOL, helis and fixed wing.
  * Converts desired roll,pitch,yaw and throttle to servo/ESC outputs.
@@ -129,8 +132,7 @@ static void actuatorTask(void* parameters)
 	ManualControlCommandData manualControl;
 	
 	ActuatorSettingsGet(&settings);
-	// Set servo update frequency (done only on start-up)
-	PIOS_Servo_SetHz(settings.ChannelUpdateFreq[0], settings.ChannelUpdateFreq[1]);
+	PIOS_Servo_SetHz(&settings.ChannelUpdateFreq[0], ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM);
 
 	float * status = (float *)&mixerStatus; //access status objects as an array of floats
 
@@ -408,6 +410,19 @@ static void setFailsafe()
 
 	// Update output object
 	ActuatorCommandSet(&command);
+}
+
+
+/**
+ * @brief Update the servo update rate
+ */
+static void actuator_update_rate(UAVObjEvent * ev)
+{
+	ActuatorSettingsData settings;
+	if ( ev->obj == ActuatorSettingsHandle() ) {
+		ActuatorSettingsGet(&settings);		
+		PIOS_Servo_SetHz(&settings.ChannelUpdateFreq[0], ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM);
+	}
 }
 
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)

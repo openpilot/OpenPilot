@@ -31,8 +31,6 @@
 #include "firmwareiap.h"
 #include "firmwareiapobj.h"
 
-#include "STM3210E_OP.h"
-
 // Private constants
 #define IAP_CMD_STEP_1      1122
 #define IAP_CMD_STEP_2      2233

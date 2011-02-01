@@ -57,7 +57,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES = Telemetry ManualControl Actuator CCAttitude #Stabilization
+MODULES = Telemetry ManualControl Actuator Attitude Stabilization FirmwareIAP
 #Actuator Telemetry ManualControl Stabilization FirmwareIAP
 
 #MODULES = Telemetry Example
@@ -185,6 +185,7 @@ SRC += $(OPUAVSYNTHDIR)/manualcontrolsettings.c
 SRC += $(OPUAVSYNTHDIR)/mixersettings.c
 SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
 SRC += $(OPUAVSYNTHDIR)/ahrssettings.c
+SRC += $(OPUAVSYNTHDIR)/firmwareiapobj.c
 #${wildcard ${OBJ}/$(shell echo $(VAR) | tr A-Z a-z)/*.c}
 #SRC += ${foreach OBJ, ${UAVOBJECTS}, $(UAVOBJECTS)/$(OBJ).c}
 # Cant use until i can automatically generate list of UAVObjects

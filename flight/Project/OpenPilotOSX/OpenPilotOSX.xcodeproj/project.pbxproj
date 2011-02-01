@@ -2678,10 +2678,10 @@
 		65C35EA612F0A834004811C2 /* uavobjecttemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uavobjecttemplate.h; sourceTree = "<group>"; };
 		65C35EA712F0A834004811C2 /* utlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utlist.h; sourceTree = "<group>"; };
 		65C35EA812F0A834004811C2 /* eventdispatcher.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = eventdispatcher.c; sourceTree = "<group>"; };
+		65C35F6612F0DC2D004811C2 /* attitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = attitude.c; sourceTree = "<group>"; };
+		65C35F6812F0DC2D004811C2 /* attitude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = attitude.h; sourceTree = "<group>"; };
 		65D2CA841248F9A400B1E7D6 /* mixersettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixersettings.xml; sourceTree = "<group>"; };
 		65D2CA851248F9A400B1E7D6 /* mixerstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixerstatus.xml; sourceTree = "<group>"; };
-		65E6DF6812E02BA300058553 /* ccattitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ccattitude.c; sourceTree = "<group>"; };
-		65E6DF6A12E02BA300058553 /* ccattitude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ccattitude.h; sourceTree = "<group>"; };
 		65E6DF7112E02E8E00058553 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		65E6DF7312E02E8E00058553 /* alarms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alarms.c; sourceTree = "<group>"; };
 		65E6DF7412E02E8E00058553 /* coptercontrol.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = coptercontrol.c; sourceTree = "<group>"; };
@@ -3143,9 +3143,8 @@
 				650D8E2012DFE16400D05CC9 /* Actuator */,
 				650D8E2412DFE16400D05CC9 /* AHRSComms */,
 				650D8E2812DFE16400D05CC9 /* Altitude */,
-				650D8E2C12DFE16400D05CC9 /* Attitude */,
+				65C35F6512F0DC2D004811C2 /* Attitude */,
 				650D8E2E12DFE16400D05CC9 /* Battery */,
-				65E6DF6712E02BA300058553 /* CCAttitude */,
 				650D8E3212DFE16400D05CC9 /* Example */,
 				650D8E3B12DFE16400D05CC9 /* FirmwareIAP */,
 				650D8E3F12DFE16400D05CC9 /* FlightPlan */,
@@ -3209,21 +3208,6 @@
 			isa = PBXGroup;
 			children = (
 				650D8E2B12DFE16400D05CC9 /* altitude.h */,
-			);
-			path = inc;
-			sourceTree = "<group>";
-		};
-		650D8E2C12DFE16400D05CC9 /* Attitude */ = {
-			isa = PBXGroup;
-			children = (
-				650D8E2D12DFE16400D05CC9 /* inc */,
-			);
-			path = Attitude;
-			sourceTree = "<group>";
-		};
-		650D8E2D12DFE16400D05CC9 /* inc */ = {
-			isa = PBXGroup;
-			children = (
 			);
 			path = inc;
 			sourceTree = "<group>";
@@ -7431,19 +7415,19 @@
 			path = inc;
 			sourceTree = "<group>";
 		};
-		65E6DF6712E02BA300058553 /* CCAttitude */ = {
+		65C35F6512F0DC2D004811C2 /* Attitude */ = {
 			isa = PBXGroup;
 			children = (
-				65E6DF6812E02BA300058553 /* ccattitude.c */,
-				65E6DF6912E02BA300058553 /* inc */,
+				65C35F6612F0DC2D004811C2 /* attitude.c */,
+				65C35F6712F0DC2D004811C2 /* inc */,
 			);
-			path = CCAttitude;
+			path = Attitude;
 			sourceTree = "<group>";
 		};
-		65E6DF6912E02BA300058553 /* inc */ = {
+		65C35F6712F0DC2D004811C2 /* inc */ = {
 			isa = PBXGroup;
 			children = (
-				65E6DF6A12E02BA300058553 /* ccattitude.h */,
+				65C35F6812F0DC2D004811C2 /* attitude.h */,
 			);
 			path = inc;
 			sourceTree = "<group>";

@@ -102,6 +102,12 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_WDG_MANUAL          0x0008
 
 //------------------------
+// TELEMETRY 
+//------------------------
+#define TELEM_QUEUE_SIZE         20
+#define TELEM_STACK_SIZE         624
+
+//------------------------
 // PIOS_LED
 //------------------------
 #define PIOS_LED_LED1_GPIO_PORT                 GPIOC

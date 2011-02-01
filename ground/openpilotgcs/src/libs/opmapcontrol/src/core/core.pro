@@ -15,7 +15,8 @@ SOURCES += opmaps.cpp \
     placemark.cpp \
     point.cpp \
     size.cpp \
-    kibertilecache.cpp
+    kibertilecache.cpp \
+    diagnostics.cpp
 HEADERS += opmaps.h \
     size.h \
     maptype.h \
@@ -35,4 +36,5 @@ HEADERS += opmaps.h \
     placemark.h \
     point.h \
     kibertilecache.h \
-    debugheader.h
+    debugheader.h \
+    diagnostics.h

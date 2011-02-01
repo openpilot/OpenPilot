@@ -39,6 +39,7 @@
 #include "pureimagecache.h"
 #include "alllayersoftype.h"
 #include "urlfactory.h"
+#include "diagnostics.h"
 
 //#include "point.h"
 
@@ -68,6 +69,8 @@ namespace core {
         AccessMode::Types GetAccessMode()const{return accessmode;}
         void setAccessMode(const AccessMode::Types& mode){accessmode=mode;}
         int RetryLoadTile;
+        diagnostics GetDiagnostics();
+
     private:
         bool useMemoryCache;
         LanguageType::Types Language;
@@ -75,12 +78,11 @@ namespace core {
         //  PureImageCache ImageCacheLocal;//TODO Criar acesso Get Set
         TileCacheQueue TileDBcacheQueue;
         OPMaps();
-
         OPMaps(OPMaps const&){}
         OPMaps& operator=(OPMaps const&){ return *this; }
         static OPMaps* m_pInstance;
-
-
+        diagnostics diag;
+        QMutex errorvars;
     protected:
         // MemoryCache TilesInMemory;
 

@@ -31,6 +31,7 @@
 #include "../core/geodecoderstatus.h"
 #include "../core/maptype.h"
 #include "../core/languagetype.h"
+#include "../core/diagnostics.h"
 #include "configuration.h"
 #include <QObject>
 #include <QtOpenGL/QGLWidget>
@@ -120,7 +121,7 @@ namespace mapcontrol
         */
         static QStringList AccessModeTypes(){return core::AccessMode::TypesList();}
 
-       /**
+        /**
         * @brief Converts from String to Type
         */
         static UAVMapFollowType::Types UAVMapFollowFromString(QString const& value){return UAVMapFollowType::TypeByStr(value);}
@@ -135,31 +136,31 @@ namespace mapcontrol
         /**
          * @brief Converts from String to Type
          */
-         static UAVTrailType::Types UAVTrailTypeFromString(QString const& value){return UAVTrailType::TypeByStr(value);}
-         /**
+        static UAVTrailType::Types UAVTrailTypeFromString(QString const& value){return UAVTrailType::TypeByStr(value);}
+        /**
          * @brief Converts from Type to String
          */
-         static QString StrFromUAVTrailType(UAVTrailType::Types const& value){return UAVTrailType::StrByType(value);}
-         /**
+        static QString StrFromUAVTrailType(UAVTrailType::Types const& value){return UAVTrailType::StrByType(value);}
+        /**
          * @brief Returns QStringList with string representing all the enum values
          */
-         static QStringList UAVTrailTypes(){return UAVTrailType::TypesList();}
+        static QStringList UAVTrailTypes(){return UAVTrailType::TypesList();}
     };
 
     class OPMapWidget:public QGraphicsView
     {
         Q_OBJECT
 
-       // Q_PROPERTY(int MaxZoom READ MaxZoom WRITE SetMaxZoom)
+        // Q_PROPERTY(int MaxZoom READ MaxZoom WRITE SetMaxZoom)
         Q_PROPERTY(int MinZoom READ MinZoom WRITE SetMinZoom)
-        Q_PROPERTY(bool ShowTileGridLines READ ShowTileGridLines WRITE SetShowTileGridLines)
-        Q_PROPERTY(double Zoom READ ZoomTotal WRITE SetZoom)
-        Q_PROPERTY(qreal Rotate READ Rotate WRITE SetRotate)
-        Q_ENUMS(internals::MouseWheelZoomType::Types)
-        Q_ENUMS(internals::GeoCoderStatusCode::Types)
+                Q_PROPERTY(bool ShowTileGridLines READ ShowTileGridLines WRITE SetShowTileGridLines)
+                Q_PROPERTY(double Zoom READ ZoomTotal WRITE SetZoom)
+                Q_PROPERTY(qreal Rotate READ Rotate WRITE SetRotate)
+                Q_ENUMS(internals::MouseWheelZoomType::Types)
+                Q_ENUMS(internals::GeoCoderStatusCode::Types)
 
     public:
-        QSize sizeHint() const;
+                QSize sizeHint() const;
         /**
         * @brief Constructor
         *
@@ -191,7 +192,7 @@ namespace mapcontrol
         */
         int MaxZoom()const{return map->MaxZoom();}
 
-      //  void SetMaxZoom(int const& value){map->maxZoom = value;}
+        //  void SetMaxZoom(int const& value){map->maxZoom = value;}
 
         /**
         * @brief
@@ -346,6 +347,7 @@ namespace mapcontrol
         bool ShowUAV()const{return showuav;}
         void SetShowHome(bool const& value);
         bool ShowHome()const{return showhome;}
+        void SetShowDiagnostics(bool const& value);
     private:
         internals::Core *core;
         MapGraphicItem *map;
@@ -360,7 +362,12 @@ namespace mapcontrol
         QGraphicsSvgItem *compass;
         bool showuav;
         bool showhome;
-     //   WayPointItem* item;//apagar
+        QTimer * diagTimer;
+        QGraphicsTextItem * diagGraphItem;
+        bool showDiag;
+    private slots:
+        void diagRefresh();
+        //   WayPointItem* item;//apagar
     protected:
         void resizeEvent(QResizeEvent *event);
         void showEvent ( QShowEvent * event );
@@ -383,14 +390,14 @@ namespace mapcontrol
         * @param waypoint a pointer to the WayPoint
         */
         void WPValuesChanged(WayPointItem* waypoint);
-         /**
+        /**
         * @brief Fires when a new WayPoint is inserted
         *
         * @param number new WayPoint number
         * @param waypoint WayPoint inserted
         */
         void WPReached(WayPointItem* waypoint);
-                /**
+        /**
                * @brief Fires when a new WayPoint is inserted
                *
                * @param number new WayPoint number

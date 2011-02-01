@@ -19,8 +19,8 @@ LIBS += -L../build \
     -linternals \
     -lcore
 
-TARGETDEPS += ../build/libcore.a
-TARGETDEPS += ../build/libinternals.a
+POST_TARGETDEPS  += ../build/libcore.a
+POST_TARGETDEPS  += ../build/libinternals.a
 
 HEADERS += mapgraphicitem.h \
     opmapwidget.h \

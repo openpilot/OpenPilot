@@ -30,7 +30,7 @@
 #include <QGraphicsItem>
 #include "../internals/core.h"
 //#include "../internals/point.h"
-
+#include "../core/diagnostics.h"
 #include "configuration.h"
 #include <QtGui>
 #include <QTransform>

@@ -34,7 +34,7 @@ using namespace projections;
 
 namespace internals {
     Core::Core():MouseWheelZooming(false),currentPosition(0,0),currentPositionPixel(0,0),LastLocationInBounds(-1,-1),sizeOfMapArea(0,0)
-            ,minOfTiles(0,0),maxOfTiles(0,0),zoom(0),isDragging(false),TooltipTextPadding(10,10),loaderLimit(5),maxzoom(21),started(false)
+            ,minOfTiles(0,0),maxOfTiles(0,0),zoom(0),isDragging(false),TooltipTextPadding(10,10),loaderLimit(5),maxzoom(21),started(false),runningThreads(0)
     {
         mousewheelzoomtype=MouseWheelZoomType::MousePositionAndCenter;
         SetProjection(new MercatorProjection());
@@ -53,6 +53,9 @@ namespace internals {
 
     void Core::run()
     {
+        MrunningThreads.lock();
+        ++runningThreads;
+        MrunningThreads.unlock();
 #ifdef DEBUG_CORE
         qlonglong debug;
         Mdebug.lock();
@@ -81,15 +84,15 @@ namespace internals {
         MtileLoadQueue.unlock();
 
         if(task.HasValue())
-        if(loaderLimit.tryAcquire(1,OPMaps::Instance()->Timeout))
-        {
+            if(loaderLimit.tryAcquire(1,OPMaps::Instance()->Timeout))
+            {
             MtileToload.lock();
             --tilesToload;
             MtileToload.unlock();
 #ifdef DEBUG_CORE
             qDebug()<<"loadLimit semaphore aquired "<<loaderLimit.available()<<" ID="<<debug<<" TASK="<<task.Pos.ToString()<<" "<<task.Zoom;
 #endif //DEBUG_CORE
-           
+
             {
 
 #ifdef DEBUG_CORE
@@ -172,7 +175,7 @@ namespace internals {
                         }
                         else
                         {
-                           // emit OnTilesStillToLoad(tilesToload);
+                            // emit OnTilesStillToLoad(tilesToload);
 
                             delete t;
                             t = 0;
@@ -216,7 +219,19 @@ namespace internals {
             emit OnTilesStillToLoad(tilesToload<0? 0:tilesToload);
             loaderLimit.release();
         }
+        MrunningThreads.lock();
+        --runningThreads;
+        MrunningThreads.unlock();
     }
+    diagnostics Core::GetDiagnostics()
+    {
+        MrunningThreads.lock();
+        diag=OPMaps::Instance()->GetDiagnostics();
+        diag.runningThreads=runningThreads;
+        MrunningThreads.unlock();
+        return diag;
+    }
+
     void Core::SetZoom(const int &value)
     {
         if (!isDragging)

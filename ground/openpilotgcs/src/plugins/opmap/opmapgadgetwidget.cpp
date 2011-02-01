@@ -463,6 +463,8 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     menu.addAction(showCompassAct);
 
+    menu.addAction(showDiagnostics);
+
     menu.addSeparator()->setText(tr("Zoom"));
 
     menu.addAction(zoomInAct);
@@ -1373,6 +1375,12 @@ void OPMapGadgetWidget::createActions()
     showCompassAct->setChecked(true);
     connect(showCompassAct, SIGNAL(toggled(bool)), this, SLOT(onShowCompassAct_toggled(bool)));
 
+    showDiagnostics = new QAction(tr("Show Diagnostics"), this);
+    showDiagnostics->setStatusTip(tr("Show/Hide the diagnostics"));
+    showDiagnostics->setCheckable(true);
+    showDiagnostics->setChecked(false);
+    connect(showDiagnostics, SIGNAL(toggled(bool)), this, SLOT(onShowDiagnostics_toggled(bool)));
+
     showHomeAct = new QAction(tr("Show Home"), this);
     showHomeAct->setStatusTip(tr("Show/Hide the Home location"));
     showHomeAct->setCheckable(true);
@@ -1612,6 +1620,14 @@ void OPMapGadgetWidget::onShowCompassAct_toggled(bool show)
         return;
 
     m_map->SetShowCompass(show);
+}
+
+void OPMapGadgetWidget::onShowDiagnostics_toggled(bool show)
+{
+    if (!m_widget || !m_map)
+        return;
+
+    m_map->SetShowDiagnostics(show);
 }
 
 void OPMapGadgetWidget::onShowHomeAct_toggled(bool show)

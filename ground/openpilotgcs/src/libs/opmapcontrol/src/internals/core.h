@@ -49,6 +49,8 @@
 #include "../internals/projections/platecarreeprojectionpergo.h"
 #include "../core/geodecoderstatus.h"
 #include "../core/opmaps.h"
+#include "../core/diagnostics.h"
+
 #include <QSemaphore>
 #include <QThread>
 #include <QDateTime>
@@ -63,216 +65,219 @@ namespace mapcontrol
 
 namespace internals {
 
-class Core:public QObject,public QRunnable
-{
-    Q_OBJECT
-
-    friend class mapcontrol::OPMapControl;
-    friend class mapcontrol::MapGraphicItem;
-public:
-    Core();
-    ~Core();
-    void run();
-    PointLatLng CurrentPosition()const{return currentPosition;}
-
-    void SetCurrentPosition(const PointLatLng &value);
-
-    core::Point GetcurrentPositionGPixel(){return currentPositionPixel;}
-    void SetcurrentPositionGPixel(const core::Point &value){currentPositionPixel=value;}
-
-    core::Point GetrenderOffset(){return renderOffset;}
-    void SetrenderOffset(const core::Point &value){renderOffset=value;}
-
-    core::Point GetcenterTileXYLocation(){return centerTileXYLocation;}
-    void SetcenterTileXYLocation(const core::Point &value){centerTileXYLocation=value;}
-
-    core::Point GetcenterTileXYLocationLast(){return centerTileXYLocationLast;}
-    void SetcenterTileXYLocationLast(const core::Point &value){centerTileXYLocationLast=value;}
-
-    core::Point GetdragPoint(){return dragPoint;}
-    void SetdragPoint(const core::Point &value){dragPoint=value;}
-
-    core::Point GetmouseDown(){return mouseDown;}
-    void SetmouseDown(const core::Point &value){mouseDown=value;}
-
-    core::Point GetmouseCurrent(){return mouseCurrent;}
-    void SetmouseCurrent(const core::Point &value){mouseCurrent=value;}
-
-    core::Point GetmouseLastZoom(){return mouseLastZoom;}
-    void SetmouseLastZoom(const core::Point &value){mouseLastZoom=value;}
-
-    MouseWheelZoomType::Types GetMouseWheelZoomType(){return mousewheelzoomtype;}
-    void SetMouseWheelZoomType(const MouseWheelZoomType::Types &value){mousewheelzoomtype=value;}
-
-    PointLatLng GetLastLocationInBounds(){return LastLocationInBounds;}
-    void SetLastLocationInBounds(const PointLatLng &value){LastLocationInBounds=value;}
-
-    Size GetsizeOfMapArea(){return sizeOfMapArea;}
-    void SetsizeOfMapArea(const Size &value){sizeOfMapArea=value;}
-
-    Size GetminOfTiles(){return minOfTiles;}
-    void SetminOfTiles(const Size &value){minOfTiles=value;}
-
-    Size GetmaxOfTiles(){return maxOfTiles;}
-    void SetmaxOfTiles(const Size &value){maxOfTiles=value;}
-
-    Rectangle GettileRect(){return tileRect;}
-    void SettileRect(const Rectangle &value){tileRect=value;}
-
-    core::Point GettilePoint(){return tilePoint;}
-    void SettilePoint(const core::Point &value){tilePoint=value;}
-
-    Rectangle GetCurrentRegion(){return CurrentRegion;}
-    void SetCurrentRegion(const Rectangle &value){CurrentRegion=value;}
-
-    QList<core::Point> tileDrawingList;
-
-    PureProjection* Projection()
+    class Core:public QObject,public QRunnable
     {
-        return projection;
-    }
-    void SetProjection(PureProjection* value)
-    {
-        projection=value;
-        tileRect=Rectangle(core::Point(0,0),value->TileSize());
-    }
-    bool IsDragging()const{return isDragging;}
+        Q_OBJECT
 
-    int Zoom()const{return zoom;}
-    void SetZoom(int const& value);
+        friend class mapcontrol::OPMapControl;
+        friend class mapcontrol::MapGraphicItem;
+    public:
+        Core();
+        ~Core();
+        void run();
+        PointLatLng CurrentPosition()const{return currentPosition;}
 
-    int MaxZoom()const{return maxzoom;}
+        void SetCurrentPosition(const PointLatLng &value);
 
-    void UpdateBounds();
+        core::Point GetcurrentPositionGPixel(){return currentPositionPixel;}
+        void SetcurrentPositionGPixel(const core::Point &value){currentPositionPixel=value;}
 
-    MapType::Types GetMapType(){return mapType;}
-    void SetMapType(MapType::Types const& value);
+        core::Point GetrenderOffset(){return renderOffset;}
+        void SetrenderOffset(const core::Point &value){renderOffset=value;}
 
-    void StartSystem();
+        core::Point GetcenterTileXYLocation(){return centerTileXYLocation;}
+        void SetcenterTileXYLocation(const core::Point &value){centerTileXYLocation=value;}
 
-    void UpdateCenterTileXYLocation();
+        core::Point GetcenterTileXYLocationLast(){return centerTileXYLocationLast;}
+        void SetcenterTileXYLocationLast(const core::Point &value){centerTileXYLocationLast=value;}
 
-    void OnMapSizeChanged(int const& width, int const& height);//TODO had as slot
+        core::Point GetdragPoint(){return dragPoint;}
+        void SetdragPoint(const core::Point &value){dragPoint=value;}
 
-    void OnMapClose();//TODO had as slot
+        core::Point GetmouseDown(){return mouseDown;}
+        void SetmouseDown(const core::Point &value){mouseDown=value;}
 
-    GeoCoderStatusCode::Types SetCurrentPositionByKeywords(QString const& keys);
+        core::Point GetmouseCurrent(){return mouseCurrent;}
+        void SetmouseCurrent(const core::Point &value){mouseCurrent=value;}
 
-    RectLatLng CurrentViewArea();
+        core::Point GetmouseLastZoom(){return mouseLastZoom;}
+        void SetmouseLastZoom(const core::Point &value){mouseLastZoom=value;}
 
-    PointLatLng FromLocalToLatLng(int const& x, int const& y);
+        MouseWheelZoomType::Types GetMouseWheelZoomType(){return mousewheelzoomtype;}
+        void SetMouseWheelZoomType(const MouseWheelZoomType::Types &value){mousewheelzoomtype=value;}
 
-    Point FromLatLngToLocal(PointLatLng const& latlng);
+        PointLatLng GetLastLocationInBounds(){return LastLocationInBounds;}
+        void SetLastLocationInBounds(const PointLatLng &value){LastLocationInBounds=value;}
 
-    int GetMaxZoomToFitRect(RectLatLng const& rect);
+        Size GetsizeOfMapArea(){return sizeOfMapArea;}
+        void SetsizeOfMapArea(const Size &value){sizeOfMapArea=value;}
 
-    void BeginDrag(core::Point const& pt);
+        Size GetminOfTiles(){return minOfTiles;}
+        void SetminOfTiles(const Size &value){minOfTiles=value;}
 
-    void EndDrag();
+        Size GetmaxOfTiles(){return maxOfTiles;}
+        void SetmaxOfTiles(const Size &value){maxOfTiles=value;}
 
-    void ReloadMap();
+        Rectangle GettileRect(){return tileRect;}
+        void SettileRect(const Rectangle &value){tileRect=value;}
 
-    void GoToCurrentPosition();
+        core::Point GettilePoint(){return tilePoint;}
+        void SettilePoint(const core::Point &value){tilePoint=value;}
 
-    bool MouseWheelZooming;
+        Rectangle GetCurrentRegion(){return CurrentRegion;}
+        void SetCurrentRegion(const Rectangle &value){CurrentRegion=value;}
 
-    void DragOffset(core::Point const& offset);
+        QList<core::Point> tileDrawingList;
 
-    void Drag(core::Point const& pt);
+        PureProjection* Projection()
+        {
+            return projection;
+        }
+        void SetProjection(PureProjection* value)
+        {
+            projection=value;
+            tileRect=Rectangle(core::Point(0,0),value->TileSize());
+        }
+        bool IsDragging()const{return isDragging;}
 
-    void CancelAsyncTasks();
+        int Zoom()const{return zoom;}
+        void SetZoom(int const& value);
 
-    void FindTilesAround(QList<core::Point> &list);
+        int MaxZoom()const{return maxzoom;}
 
-    void UpdateGroundResolution();
+        void UpdateBounds();
 
-    TileMatrix Matrix;
+        MapType::Types GetMapType(){return mapType;}
+        void SetMapType(MapType::Types const& value);
 
-    bool isStarted(){return started;}
+        void StartSystem();
+
+        void UpdateCenterTileXYLocation();
+
+        void OnMapSizeChanged(int const& width, int const& height);//TODO had as slot
+
+        void OnMapClose();//TODO had as slot
+
+        GeoCoderStatusCode::Types SetCurrentPositionByKeywords(QString const& keys);
+
+        RectLatLng CurrentViewArea();
+
+        PointLatLng FromLocalToLatLng(int const& x, int const& y);
+
+        Point FromLatLngToLocal(PointLatLng const& latlng);
+
+        int GetMaxZoomToFitRect(RectLatLng const& rect);
+
+        void BeginDrag(core::Point const& pt);
+
+        void EndDrag();
+
+        void ReloadMap();
+
+        void GoToCurrentPosition();
+
+        bool MouseWheelZooming;
+
+        void DragOffset(core::Point const& offset);
+
+        void Drag(core::Point const& pt);
+
+        void CancelAsyncTasks();
+
+        void FindTilesAround(QList<core::Point> &list);
+
+        void UpdateGroundResolution();
+
+        TileMatrix Matrix;
+
+        bool isStarted(){return started;}
+
+        diagnostics GetDiagnostics();
+    signals:
+        void OnCurrentPositionChanged(internals::PointLatLng point);
+        void OnTileLoadComplete();
+        void OnTilesStillToLoad(int number);
+        void OnTileLoadStart();
+        void OnMapDrag();
+        void OnMapZoomChanged();
+        void OnMapTypeChanged(MapType::Types type);
+        void OnEmptyTileError(int zoom, core::Point pos);
+        void OnNeedInvalidation();
+
+    private:
 
 
-signals:
-    void OnCurrentPositionChanged(internals::PointLatLng point);
-    void OnTileLoadComplete();
-    void OnTilesStillToLoad(int number);
-    void OnTileLoadStart();
-    void OnMapDrag();
-    void OnMapZoomChanged();
-    void OnMapTypeChanged(MapType::Types type);
-    void OnEmptyTileError(int zoom, core::Point pos);
-    void OnNeedInvalidation();
+        PointLatLng currentPosition;
+        core::Point currentPositionPixel;
+        core::Point renderOffset;
+        core::Point centerTileXYLocation;
+        core::Point centerTileXYLocationLast;
+        core::Point dragPoint;
+        Rectangle tileRect;
+        core::Point mouseDown;
+        bool CanDragMap;
+        core::Point mouseCurrent;
+        PointLatLng LastLocationInBounds;
+        core::Point mouseLastZoom;
 
-private:
-
-
-    PointLatLng currentPosition;
-    core::Point currentPositionPixel;
-    core::Point renderOffset;
-    core::Point centerTileXYLocation;
-    core::Point centerTileXYLocationLast;
-    core::Point dragPoint;
-    Rectangle tileRect;
-    core::Point mouseDown;
-    bool CanDragMap;
-    core::Point mouseCurrent;
-    PointLatLng LastLocationInBounds;
-    core::Point mouseLastZoom;
-
-    MouseWheelZoomType::Types mousewheelzoomtype;
+        MouseWheelZoomType::Types mousewheelzoomtype;
 
 
-    Size sizeOfMapArea;
-    Size minOfTiles;
-    Size maxOfTiles;
+        Size sizeOfMapArea;
+        Size minOfTiles;
+        Size maxOfTiles;
 
-    core::Point tilePoint;
+        core::Point tilePoint;
 
-    Rectangle CurrentRegion;
+        Rectangle CurrentRegion;
 
-    QQueue<LoadTask> tileLoadQueue;
+        QQueue<LoadTask> tileLoadQueue;
 
-    int zoom;
+        int zoom;
 
-    PureProjection* projection;
+        PureProjection* projection;
 
-    bool isDragging;
+        bool isDragging;
 
-    QMutex MtileLoadQueue;
+        QMutex MtileLoadQueue;
 
-    QMutex Moverlays;
+        QMutex Moverlays;
 
-    QMutex MtileDrawingList;
+        QMutex MtileDrawingList;
 #ifdef DEBUG_CORE
-    QMutex Mdebug;
-    static qlonglong debugcounter;
+        QMutex Mdebug;
+        static qlonglong debugcounter;
 #endif
-    Size TooltipTextPadding;
+        Size TooltipTextPadding;
 
-    MapType::Types mapType;
+        MapType::Types mapType;
 
-    QSemaphore loaderLimit;
+        QSemaphore loaderLimit;
 
-    QThreadPool ProcessLoadTaskCallback;
-    QMutex MtileToload;
-    int tilesToload;
+        QThreadPool ProcessLoadTaskCallback;
+        QMutex MtileToload;
+        int tilesToload;
 
-    int maxzoom;
+        int maxzoom;
+        QMutex MrunningThreads;
+        int runningThreads;
+        diagnostics diag;
 
-protected:
-    bool started;
+    protected:
+        bool started;
 
-    int Width;
-    int Height;
-    int pxRes100m;  // 100 meters
-    int pxRes1000m;  // 1km
-    int pxRes10km; // 10km
-    int pxRes100km; // 100km
-    int pxRes1000km; // 1000km
-    int pxRes5000km; // 5000km
-    void SetCurrentPositionGPixel(core::Point const& value){currentPositionPixel = value;}
-    void GoToCurrentPositionOnZoom();
+        int Width;
+        int Height;
+        int pxRes100m;  // 100 meters
+        int pxRes1000m;  // 1km
+        int pxRes10km; // 10km
+        int pxRes100km; // 100km
+        int pxRes1000km; // 1000km
+        int pxRes5000km; // 5000km
+        void SetCurrentPositionGPixel(core::Point const& value){currentPositionPixel = value;}
+        void GoToCurrentPositionOnZoom();
 
-};
+    };
 
 }
 #endif // CORE_H

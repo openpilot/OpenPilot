@@ -185,6 +185,7 @@ private slots:
     void onCopyMouseLonToClipAct_triggered();
 //    void onFindPlaceAct_triggered();
     void onShowCompassAct_toggled(bool show);
+    void onShowDiagnostics_toggled(bool show);
     void onShowUAVAct_toggled(bool show);
     void onShowHomeAct_toggled(bool show);
     void onGoZoomInAct_triggered();
@@ -265,6 +266,7 @@ private:
     QAction *copyMouseLonToClipAct;
     QAction *findPlaceAct;
     QAction *showCompassAct;
+    QAction *showDiagnostics;
     QAction *showHomeAct;
     QAction *showUAVAct;
     QAction *zoomInAct;

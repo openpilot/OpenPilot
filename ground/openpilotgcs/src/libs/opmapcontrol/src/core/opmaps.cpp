@@ -107,7 +107,7 @@ namespace core {
                 QTimer tT;
                 tT.setSingleShot(true);
                 connect(&network, SIGNAL(finished(QNetworkReply*)),
-                            &q, SLOT(quit()));
+                        &q, SLOT(quit()));
                 connect(&tT, SIGNAL(timeout()), &q, SLOT(quit()));
                 network.setProxy(Proxy);
 #ifdef DEBUG_GMAPS
@@ -120,7 +120,7 @@ namespace core {
 #ifdef DEBUG_TIMINGS
                 qDebug()<<"opmaps after make image url"<<time.elapsed();
 #endif		//url	"http://vec02.maps.yandex.ru/tiles?l=map&v=2.10.2&x=7&y=5&z=3"	string
-//"http://map3.pergo.com.tr/tile/02/000/000/007/000/000/002.png"
+                //"http://map3.pergo.com.tr/tile/02/000/000/007/000/000/002.png"
                 qheader.setUrl(QUrl(url));
                 qheader.setRawHeader("User-Agent",UserAgent);
                 qheader.setRawHeader("Accept","*/*");
@@ -199,9 +199,20 @@ namespace core {
                 q.exec();
 
                 if(!tT.isActive()){
+                    errorvars.lock();
+                    ++diag.timeouts;
+                    errorvars.unlock();
                     return ret;
-                        }
+                }
                 tT.stop();
+                if( (reply->error()!=QNetworkReply::NoError))
+                {
+                    errorvars.lock();
+                    ++diag.networkerrors;
+                    errorvars.unlock();
+                    reply->deleteLater();
+                    return ret;
+                }
                 ret=reply->readAll();
                 reply->deleteLater();//TODO can't this be global??
                 if(ret.isEmpty())
@@ -209,6 +220,9 @@ namespace core {
 #ifdef DEBUG_GMAPS
                     qDebug()<<"Invalid Tile";
 #endif //DEBUG_GMAPS
+                    errorvars.lock();
+                    ++diag.emptytiles;
+                    errorvars.unlock();
                     return ret;
                 }
 #ifdef DEBUG_GMAPS
@@ -247,4 +261,14 @@ namespace core {
     {
         return Cache::Instance()->ImageCache.ExportMapDataToDB(file,Cache::Instance()->ImageCache.GtileCache()+QDir::separator()+"Data.qmdb");
     }
+
+    diagnostics OPMaps::GetDiagnostics()
+    {
+        diagnostics i;
+        errorvars.lock();
+        i=diag;
+        errorvars.unlock();
+        return i;
+    }
 }
+

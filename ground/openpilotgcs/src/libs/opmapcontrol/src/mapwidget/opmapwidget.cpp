@@ -33,7 +33,7 @@
 namespace mapcontrol
 {
 
-    OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config),UAV(0),GPS(0),Home(0),followmouse(true),compass(0),showuav(false),showhome(false)
+    OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config),UAV(0),GPS(0),Home(0),followmouse(true),compass(0),showuav(false),showhome(false),showDiag(false),diagGraphItem(0),diagTimer(0)
     {
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         core=new internals::Core;
@@ -50,11 +50,35 @@ namespace mapcontrol
         connect(map->core,SIGNAL(OnTileLoadComplete()),this,SIGNAL(OnTileLoadComplete()));
         connect(map->core,SIGNAL(OnTileLoadStart()),this,SIGNAL(OnTileLoadStart()));
         connect(map->core,SIGNAL(OnTilesStillToLoad(int)),this,SIGNAL(OnTilesStillToLoad(int)));
+        SetShowDiagnostics(showDiag);
         this->setMouseTracking(followmouse);
         SetShowCompass(true);
 
     }
+    void OPMapWidget::SetShowDiagnostics(bool const& value)
+    {
+        showDiag=value;
+        if(!showDiag)
+        {
+            if(diagGraphItem!=0)
+            {
+                delete diagGraphItem;
+                diagGraphItem=0;
+            }
+            if(diagTimer!=0)
+            {
+                delete diagTimer;
+                diagTimer=0;
+            }
+        }
+        else
+        {
+            diagTimer=new QTimer();
+            connect(diagTimer,SIGNAL(timeout()),this,SLOT(diagRefresh()));
+            diagTimer->start(500);
+        }
 
+    }
     void OPMapWidget::SetShowUAV(const bool &value)
     {
         if(value && UAV==0)
@@ -118,7 +142,7 @@ namespace mapcontrol
     }
     QSize OPMapWidget::sizeHint() const
     {
-       return map->sizeHint();
+        return map->sizeHint();
     }
     void OPMapWidget::showEvent(QShowEvent *event)
     {
@@ -135,7 +159,7 @@ namespace mapcontrol
         delete configuration;
         foreach(QGraphicsItem* i,this->items())
         {
-           delete i;
+            delete i;
         }
     }
     void OPMapWidget::closeEvent(QCloseEvent *event)
@@ -264,6 +288,28 @@ namespace mapcontrol
         connect(this,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),item,SLOT(WPRenumbered(int,int,WayPointItem*)));
         connect(this,SIGNAL(WPDeleted(int)),item,SLOT(WPDeleted(int)));
     }
+    void OPMapWidget::diagRefresh()
+    {
+        if(showDiag)
+        {
+            if(diagGraphItem==0)
+            {
+                diagGraphItem=new QGraphicsTextItem();
+                mscene.addItem(diagGraphItem);
+                diagGraphItem->setPos(10,100);
+                diagGraphItem->setZValue(3);
+                diagGraphItem->setFlag(QGraphicsItem::ItemIsMovable,true);
+                diagGraphItem->setDefaultTextColor(Qt::yellow);
+            }
+            diagGraphItem->setPlainText(core->GetDiagnostics().toString());
+        }
+        else
+            if(diagGraphItem!=0)
+            {
+            delete diagGraphItem;
+            diagGraphItem=0;
+        }
+    }
 
     //////////////////////////////////////////////
     void OPMapWidget::SetShowCompass(const bool &value)
@@ -272,7 +318,7 @@ namespace mapcontrol
         {
             compass=new QGraphicsSvgItem(QString::fromUtf8(":/markers/images/compas.svg"));
             compass->setScale(0.1+0.05*(qreal)(this->size().width())/1000*(qreal)(this->size().height())/600);
-        //    compass->setTransformOriginPoint(compass->boundingRect().width(),compass->boundingRect().height());
+            //    compass->setTransformOriginPoint(compass->boundingRect().width(),compass->boundingRect().height());
             compass->setFlag(QGraphicsItem::ItemIsMovable,true);
             mscene.addItem(compass);
             compass->setTransformOriginPoint(compass->boundingRect().width()/2,compass->boundingRect().height()/2);            
@@ -287,15 +333,15 @@ namespace mapcontrol
             compass=0;
         }
     }
-     void OPMapWidget::SetRotate(qreal const& value)
-     {
-         map->mapRotate(value);
-         if(compass && (compass->rotation() != value)) {
-             compass->setRotation(value);
-         }
-     }
-     void OPMapWidget::RipMap()
-     {
-         new MapRipper(core,map->SelectedArea());
-     }
+    void OPMapWidget::SetRotate(qreal const& value)
+    {
+        map->mapRotate(value);
+        if(compass && (compass->rotation() != value)) {
+            compass->setRotation(value);
+        }
+    }
+    void OPMapWidget::RipMap()
+    {
+        new MapRipper(core,map->SelectedArea());
+    }
 }

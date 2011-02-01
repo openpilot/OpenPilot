@@ -194,6 +194,7 @@ namespace core {
         qlonglong id=++ConnCounter;
         Mcounter.unlock();
         {
+            Mcounter.lock();
             QSqlDatabase cn;
             cn = QSqlDatabase::addDatabase("QSQLITE",QString::number(id));
             QString db=gtilecache+"Data.qmdb";
@@ -219,30 +220,30 @@ namespace core {
                 }
                 cn.close();
             }
+            Mcounter.unlock();
         }
         QSqlDatabase::removeDatabase(QString::number(id));
         return true;
     }
     QByteArray PureImageCache::GetImageFromCache(MapType::Types type, Point pos, int zoom)
     {
-        bool ret=true;
         QByteArray ar;
         QString dir=gtilecache;
         Mcounter.lock();
         qlonglong id=++ConnCounter;
         Mcounter.unlock();
 #ifdef DEBUG_PUREIMAGECACHE
-        //  qDebug()<<"Cache dir="<<dir<<" Try to GET:"<<pos.X()+","+pos.Y();
+        qDebug()<<"Cache dir="<<dir<<" Try to GET:"<<pos.X()+","+pos.Y();
 #endif //DEBUG_PUREIMAGECACHE
 
         {
             QString db=dir+"Data.qmdb";
-            ret=QFileInfo(db).exists();
-            if(ret)
             {
+                Mcounter.lock();
                 QSqlDatabase cn;
 
                 cn = QSqlDatabase::addDatabase("QSQLITE",QString::number(id));
+
                 cn.setDatabaseName(db);
                 if(cn.open())
                 {
@@ -252,15 +253,12 @@ namespace core {
                         query.next();
                         if(query.isValid())
                         {
-
                             ar=query.value(0).toByteArray();
                         }
                     }
-
                     cn.close();
                 }
-
-
+                Mcounter.unlock();
             }
         }
         QSqlDatabase::removeDatabase(QString::number(id));

@@ -836,6 +836,15 @@ int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
  */
 int32_t UAVObjDelete(UAVObjHandle obj, uint16_t instId)
 {
+#if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
+	ObjectList* objEntry = (ObjectList*)obj;
+	
+	if(objEntry == NULL)
+		return -1;
+		
+	uint32_t addr = (objEntry->id & FLASH_MASK);
+	PIOS_Flash_W25X_EraseSector(addr);
+#endif	
 #if defined(PIOS_INCLUDE_SDCARD)
 	ObjectList* objEntry;
 	uint8_t filename[14];

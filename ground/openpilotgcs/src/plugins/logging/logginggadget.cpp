@@ -39,7 +39,7 @@ LoggingGadget::LoggingGadget(QString classId, LoggingGadgetWidget *widget, QWidg
 
 LoggingGadget::~LoggingGadget()
 {
-
+    delete m_widget;
 }
 
 void LoggingGadget::loadConfiguration(IUAVGadgetConfiguration* config)

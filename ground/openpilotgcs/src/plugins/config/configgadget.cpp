@@ -36,7 +36,7 @@ ConfigGadget::ConfigGadget(QString classId, ConfigGadgetWidget *widget, QWidget 
 
 ConfigGadget::~ConfigGadget()
 {
-
+    delete m_widget;
 }
 
 void ConfigGadget::loadConfiguration(IUAVGadgetConfiguration* config)

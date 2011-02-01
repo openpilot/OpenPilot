@@ -39,6 +39,7 @@ ImportExportGadget::ImportExportGadget(QString classId, ImportExportGadgetWidget
 
 ImportExportGadget::~ImportExportGadget()
 {
+    delete m_widget;
 }
 
 /*

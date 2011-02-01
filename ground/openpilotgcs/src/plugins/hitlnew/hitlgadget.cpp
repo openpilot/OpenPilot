@@ -38,7 +38,7 @@ HITLGadget::HITLGadget(QString classId, HITLWidget *widget, QWidget *parent) :
 
 HITLGadget::~HITLGadget()
 {
-
+    delete m_widget;
 }
 
 void HITLGadget::loadConfiguration(IUAVGadgetConfiguration* config)

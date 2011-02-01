@@ -36,6 +36,7 @@ OPMapGadget::OPMapGadget(QString classId, OPMapGadgetWidget *widget, QWidget *pa
 
 OPMapGadget::~OPMapGadget()
 {
+    delete m_widget;
 }
 
 void OPMapGadget::loadConfiguration(IUAVGadgetConfiguration *config)

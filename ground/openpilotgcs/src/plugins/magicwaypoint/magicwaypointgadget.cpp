@@ -40,6 +40,7 @@ MagicWaypointGadget::MagicWaypointGadget(QString classId, MagicWaypointGadgetWid
 
 MagicWaypointGadget::~MagicWaypointGadget()
 {
+    delete m_widget;
 }
 
 void MagicWaypointGadget::loadConfiguration(IUAVGadgetConfiguration* config)

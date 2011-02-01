@@ -50,9 +50,6 @@ public:
     IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 
-protected:
-	OPMapGadgetWidget *gadgetWidget;
-
 };
 
 #endif // OPMAP_GADGETFACTORY_H_

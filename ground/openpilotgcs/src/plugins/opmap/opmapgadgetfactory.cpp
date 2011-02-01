@@ -32,25 +32,18 @@
 #include <coreplugin/iuavgadget.h>
 
 OPMapGadgetFactory::OPMapGadgetFactory(QObject *parent) :
-		IUAVGadgetFactory(QString("OPMapGadget"), tr("OPMap Gadget"), parent),
-		gadgetWidget(NULL)
+                IUAVGadgetFactory(QString("OPMapGadget"), tr("OPMap Gadget"), parent)
 {
 }
 
 OPMapGadgetFactory::~OPMapGadgetFactory()
 {
-	if (gadgetWidget)
-	{
-		delete gadgetWidget;
-		gadgetWidget = NULL;
-	}
 }
 
 Core::IUAVGadget * OPMapGadgetFactory::createGadget(QWidget *parent)
 {
-//    OPMapGadgetWidget *gadgetWidget = new OPMapGadgetWidget(parent);
-	gadgetWidget = new OPMapGadgetWidget(parent);
-	return new OPMapGadget(QString("OPMapGadget"), gadgetWidget, parent);
+    OPMapGadgetWidget *gadgetWidget = new OPMapGadgetWidget(parent);
+    return new OPMapGadget(QString("OPMapGadget"), gadgetWidget, parent);
 }
 
 IUAVGadgetConfiguration *OPMapGadgetFactory::createConfiguration(QSettings* qSettings)

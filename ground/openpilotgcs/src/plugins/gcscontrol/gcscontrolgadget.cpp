@@ -54,7 +54,7 @@ GCSControlGadget::GCSControlGadget(QString classId, GCSControlGadgetWidget *widg
 
 GCSControlGadget::~GCSControlGadget()
 {
-
+    delete m_widget;
 }
 
 void GCSControlGadget::loadConfiguration(IUAVGadgetConfiguration* config)

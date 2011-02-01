@@ -35,5 +35,5 @@ EmptyGadget::EmptyGadget(QString classId, EmptyGadgetWidget *widget, QWidget *pa
 
 EmptyGadget::~EmptyGadget()
 {
-
+    delete m_widget;
 }

@@ -40,6 +40,7 @@ GpsDisplayGadget::GpsDisplayGadget(QString classId, GpsDisplayWidget *widget, QW
 
 GpsDisplayGadget::~GpsDisplayGadget()
 {
+    delete m_widget;
 }
 
 /*

@@ -48,9 +48,6 @@ public:
 	IUAVGadgetConfiguration * createConfiguration(QSettings *qSettings);
 	IOptionsPage * createOptionsPage(IUAVGadgetConfiguration *config);
 
-protected:
-	PipXtremeGadgetWidget *gadgetWidget;
-
 };
 
 #endif

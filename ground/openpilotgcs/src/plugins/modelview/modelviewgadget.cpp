@@ -36,7 +36,7 @@ ModelViewGadget::ModelViewGadget(QString classId, ModelViewGadgetWidget *widget,
 
 ModelViewGadget::~ModelViewGadget()
 {
-
+    delete m_widget;
 }
 
 void ModelViewGadget::loadConfiguration(IUAVGadgetConfiguration* config)

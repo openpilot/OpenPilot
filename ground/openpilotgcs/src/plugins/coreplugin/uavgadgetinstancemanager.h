@@ -62,6 +62,7 @@ public:
     void writeConfigurations(QSettings *qs);
     IUAVGadget *createGadget(QString classId, QWidget *parent);
     void removeGadget(IUAVGadget *gadget);
+    void removeAllGadgets();
     bool canDeleteConfiguration(IUAVGadgetConfiguration *config);
     void deleteConfiguration(IUAVGadgetConfiguration *config);
     void cloneConfiguration(IUAVGadgetConfiguration *config);

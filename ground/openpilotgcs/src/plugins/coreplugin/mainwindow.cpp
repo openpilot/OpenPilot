@@ -954,6 +954,10 @@ void MainWindow::shutdown()
     disconnect(QApplication::instance(), SIGNAL(focusChanged(QWidget*,QWidget*)),
                this, SLOT(updateFocusWidget(QWidget*,QWidget*)));
     m_activeContext = 0;
+
+    // We have to remove all the existing gagdets at his point, not
+    // later!
+    uavGadgetInstanceManager()->removeAllGadgets();
 }
 
 void MainWindow::createWorkspaces() {

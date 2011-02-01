@@ -67,6 +67,7 @@ UAVGadgetInstanceManager::~UAVGadgetInstanceManager()
         m_pm->removeObject(page);
         delete page;
     }
+
 }
 
 void UAVGadgetInstanceManager::readConfigurations(QSettings *qs)
@@ -274,6 +275,22 @@ void UAVGadgetInstanceManager::removeGadget(IUAVGadget *gadget)
         gadget = 0;
     }
 }
+
+/**
+  * Removes all the gadgets. This is called by the core plugin when
+  * shutting down: this ensures that all registered gadget factory destructors are
+  * indeed called when the GCS is shutting down. We can't destroy them at the end
+  * (coreplugin is deleted last), because the gadgets sometimes depend on other
+  * plugins, like uavobjects...
+  */
+void UAVGadgetInstanceManager::removeAllGadgets()
+{
+    foreach( IUAVGadget *gadget, m_gadgetInstances) {
+        m_gadgetInstances.removeOne(gadget);
+        delete gadget;
+    }
+}
+
 
 bool UAVGadgetInstanceManager::canDeleteConfiguration(IUAVGadgetConfiguration *config)
 {

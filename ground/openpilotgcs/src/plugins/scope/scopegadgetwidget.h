@@ -152,6 +152,7 @@ private:
     bool m_csvLoggingDataSaved;
     bool m_csvLoggingNameSet;
     bool m_csvLoggingDataValid;
+    bool m_csvLoggingDataUpdated;
     bool m_csvLoggingConnected;
     bool m_csvLoggingNewFileOnConnect;
 

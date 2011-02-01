@@ -76,6 +76,7 @@ ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
     m_csvLoggingEnabled=0;
     m_csvLoggingHeaderSaved=0;
     m_csvLoggingDataSaved=0;
+    m_csvLoggingDataUpdated=0;
     m_csvLoggingNameSet=0;
     m_csvLoggingConnected=0;
     m_csvLoggingNewFileOnConnect=0;
@@ -265,7 +266,7 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
 void ScopeGadgetWidget::uavObjectReceived(UAVObject* obj)
 {
     foreach(PlotData* plotData, m_curvesData.values()) {
-        plotData->append(obj);
+        if (plotData->append(obj)) m_csvLoggingDataUpdated=1;
     }
 }
 
@@ -500,7 +501,7 @@ int ScopeGadgetWidget::csvLoggingInsertHeader()
     else
     {
         QTextStream ts( &m_csvLoggingFile );
-        ts << "date" << ", " << "Time"<< ", " << "Sec since start"<< ", " << "Connected";
+        ts << "date" << ", " << "Time"<< ", " << "Sec since start"<< ", " << "Connected" << ", " << "Data changed";
 
         foreach(PlotData* plotData2, m_curvesData.values())
         {
@@ -530,12 +531,16 @@ int ScopeGadgetWidget::csvLoggingInsertData()
     else
     {
         QTextStream ss( &tempString );
+        ss << NOW.toString("yyyy-MM-dd") << ", " << NOW.toString("hh:mm:ss.z") << ", " ;
+
 #if QT_VERSION >= 0x040700
-        ss << NOW.toString("yyyy-MM-dd") << ", " << NOW.toString("hh:mm:ss.z") << ", " << (NOW.toMSecsSinceEpoch() - m_csvLoggingStartTime.toMSecsSinceEpoch())/1000.00;
+        ss <<(NOW.toMSecsSinceEpoch() - m_csvLoggingStartTime.toMSecsSinceEpoch())/1000.00;
 #else
-        ss << NOW.toString("yyyy-MM-dd") << ", " << NOW.toString("hh:mm:ss.z") << ", " << (NOW.toTime_t() - m_csvLoggingStartTime.toTime_t())/1000.00;
+        ss <<(NOW.toTime_t() - m_csvLoggingStartTime.toTime_t());
 #endif
-        ss << ", " << m_csvLoggingConnected;
+        ss << ", " << m_csvLoggingConnected << ", " << m_csvLoggingDataUpdated;
+        m_csvLoggingDataUpdated=0;
+
         foreach(PlotData* plotData2, m_curvesData.values())
         {
             ss  << ", ";

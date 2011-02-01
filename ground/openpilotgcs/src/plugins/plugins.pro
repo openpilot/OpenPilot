@@ -158,11 +158,11 @@ SUBDIRS += plugin_gcscontrol
 #SUBDIRS += plugin_antennatrack
 
 #PipXtreme Gadget
-#plugin_pipxtreme.subdir = pipxtreme
-#plugin_pipxtreme.depends = plugin_coreplugin
-#plugin_pipxtreme.depends += plugin_uavobjects
-#plugin_pipxtreme.depends += plugin_rawhid
-#SUBDIRS += plugin_pipxtreme
+plugin_pipxtreme.subdir = pipxtreme
+plugin_pipxtreme.depends = plugin_coreplugin
+plugin_pipxtreme.depends += plugin_uavobjects
+plugin_pipxtreme.depends += plugin_rawhid
+SUBDIRS += plugin_pipxtreme
 
 #Scope2 Gadget
 #plugin_scope2.subdir = scope2

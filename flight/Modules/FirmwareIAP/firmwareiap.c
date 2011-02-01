@@ -116,68 +116,68 @@ int32_t FirmwareIAPInitialize()
  */
 static void FirmwareIAPCallback(UAVObjEvent* ev)
 {
-    static uint32_t    	last_time = 0;
-    static uint16_t 	iap_state = IAP_STATE_READY;
-    uint32_t    		this_time;
-    uint32_t    		delta;
-
-    if ( ev->obj == FirmwareIAPObjHandle() )	{
+	static uint32_t    	last_time = 0;
+	static uint16_t 	iap_state = IAP_STATE_READY;
+	uint32_t    		this_time;
+	uint32_t    		delta;
+	
+	if ( ev->obj == FirmwareIAPObjHandle() )	{
 		// Get the input object data
 		FirmwareIAPObjGet(&data);
 		this_time = get_time();
-        delta = this_time - last_time;
-        last_time = this_time;
-        if((data.BoardType==BOARD_TYPE)&&(data.crc != iap_calc_crc()))
-        {
-        	read_description(data.Description);
-        	data.BoardRevision=BOARD_REVISION;
-        	data.crc = iap_calc_crc();
-        	FirmwareIAPObjSet( &data );
-        }
-        if((data.ArmReset==1)&&(taskHandle==0))
-        {
-        	data.ArmReset=0;
-        	FirmwareIAPObjSet( &data );
-        }
-        switch(iap_state) {
-        case IAP_STATE_READY:
-            if( data.Command == IAP_CMD_STEP_1 ) {
-                iap_state = IAP_STATE_STEP_1;
-            }            break;
-        case IAP_STATE_STEP_1:
-            if( data.Command == IAP_CMD_STEP_2 ) {
-                if( delta > iap_time_2_low_end && delta < iap_time_2_high_end ) {
-                    iap_state = IAP_STATE_STEP_2;
-                } else {
-                    iap_state = IAP_STATE_READY;
-                }
-            } else {
-                iap_state = IAP_STATE_READY;
-            }
-            break;
-        case IAP_STATE_STEP_2:
-            if( data.Command == IAP_CMD_STEP_3 ) {
-                if( delta > iap_time_3_low_end && delta < iap_time_3_high_end ) {
-                    // we've met the three sequence of command numbers
-                    // we've met the time requirements.
-                	PIOS_IAP_SetRequest1();
-                	PIOS_IAP_SetRequest2();
-			
-			/* Note: Cant just wait timeout value, because first time is randomized */
-			UAVObjEvent * ev = pvPortMalloc(sizeof(UAVObjEvent));
-			memset(ev,0,sizeof(UAVObjEvent));
-			EventPeriodicCallbackCreate(ev, resetTask, 10);
-		} else {
-                    iap_state = IAP_STATE_READY;
-                }
-            } else {
-                iap_state = IAP_STATE_READY;
-            }
-            break;
-        default:
-            iap_state = IAP_STATE_READY;
-            break;
-        }
+		delta = this_time - last_time;
+		last_time = this_time;
+		if((data.BoardType==BOARD_TYPE)&&(data.crc != iap_calc_crc()))
+		{
+			read_description(data.Description);
+			data.BoardRevision=BOARD_REVISION;
+			data.crc = iap_calc_crc();
+			FirmwareIAPObjSet( &data );
+		}
+		if((data.ArmReset==1)&&(taskHandle==0))
+		{
+			data.ArmReset=0;
+			FirmwareIAPObjSet( &data );
+		}
+		switch(iap_state) {
+			case IAP_STATE_READY:
+				if( data.Command == IAP_CMD_STEP_1 ) {
+					iap_state = IAP_STATE_STEP_1;
+				}            break;
+			case IAP_STATE_STEP_1:
+				if( data.Command == IAP_CMD_STEP_2 ) {
+					if( delta > iap_time_2_low_end && delta < iap_time_2_high_end ) {
+						iap_state = IAP_STATE_STEP_2;
+					} else {
+						iap_state = IAP_STATE_READY;
+					}
+				} else {
+					iap_state = IAP_STATE_READY;
+				}
+				break;
+			case IAP_STATE_STEP_2:
+				if( data.Command == IAP_CMD_STEP_3 ) {
+					if( delta > iap_time_3_low_end && delta < iap_time_3_high_end ) {
+						// we've met the three sequence of command numbers
+						// we've met the time requirements.
+						PIOS_IAP_SetRequest1();
+						PIOS_IAP_SetRequest2();
+						
+						/* Note: Cant just wait timeout value, because first time is randomized */
+						UAVObjEvent * ev = pvPortMalloc(sizeof(UAVObjEvent));
+						memset(ev,0,sizeof(UAVObjEvent));
+						EventPeriodicCallbackCreate(ev, resetTask, 10);
+					} else {
+						iap_state = IAP_STATE_READY;
+					}
+				} else {
+					iap_state = IAP_STATE_READY;
+				}
+				break;
+			default:
+				iap_state = IAP_STATE_READY;
+				break;
+		}
 	}
 }
 
@@ -197,9 +197,9 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
 static uint32_t get_time(void)
 {
 	portTickType	ticks;
-
+	
 	ticks = xTaskGetTickCount();
-
+	
 	return TICKS2MS(ticks);
 }
 
@@ -251,7 +251,7 @@ static void resetTask(UAVObjEvent * ev)
 		lastSysTime = xTaskGetTickCount();
 		first = 0;
 	}
-
+	
 	
 	if((portTickType) (xTaskGetTickCount() - lastSysTime) > RESET_DELAY / portTICK_RATE_MS) {
 		lastSysTime = xTaskGetTickCount();

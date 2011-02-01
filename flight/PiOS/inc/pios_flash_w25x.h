@@ -7,16 +7,9 @@
  *
  */
 
-#define W25X_WRITE_ENABLE           0x06
-#define W25X_WRITE_DISABLE          0x04
-#define W25X_READ_STATUS            0x05
-#define W25X_WRITE_STATUS           0x01
-#define W25X_READ_DATA              0x03
-#define W25X_FAST_READ              0x0b
-#define W25X_DEVICE_ID              0x90
-
-void PIOS_FLASH_W25X_Init();
-uint8_t PIOS_FLASH_ReadStatus();
-uint8_t PIOS_FLASH_ReadID();
-void PIOS_FLASH_W25X_WriteData(uint32_t addr, uint8_t * data, uint16_t len);
-void PIOS_FLASH_W25X_ReadData(uint32_t addr, uint8_t * data, uint16_t len);
+int8_t PIOS_Flash_W25X_Init();
+uint8_t PIOS_Flash_W25X_ReadStatus();
+uint8_t PIOS_Flash_W25X_ReadID();
+int8_t PIOS_Flash_W25X_EraseSector(uint32_t add);
+int8_t PIOS_Flash_W25X_WriteData(uint32_t addr, uint8_t * data, uint16_t len);
+int8_t PIOS_Flash_W25X_ReadData(uint32_t addr, uint8_t * data, uint16_t len);

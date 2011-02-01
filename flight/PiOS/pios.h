@@ -107,6 +107,10 @@
 #include <pios_adxl345.h>
 #endif
 
+#if defined(PIOS_INCLUDE_FLASH)
+#include <pios_flash_w25x.h>
+#endif
+
 #if defined(PIOS_INCLUDE_BL_HELPER)
 #include <pios_bl_helper.h>
 #endif

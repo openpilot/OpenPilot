@@ -45,6 +45,15 @@ MultiDimUniformDistribution::MultiDimUniformDistribution(std::size_t size_, unsi
   } 
 }
 
+MultiDimUniformDistribution::MultiDimUniformDistribution(std::size_t dim_, double min_, double max_, unsigned int seed_):
+	u(dim_),
+	uniformsVec(dim_)
+{
+	for (std::size_t i = 0; i < dim_; ++i) {
+		uniformsVec[i] = new UniformDistribution(min_, max_, seed_+i);
+	}
+}
+
 MultiDimUniformDistribution::MultiDimUniformDistribution(const vec& min_, const vec& max_, 
 							 unsigned int seed_) :
   u(min_.size()),
@@ -108,6 +117,15 @@ MultiDimNormalDistribution::MultiDimNormalDistribution(std::size_t size_, unsign
   for (std::size_t i=0 ; i <size_ ; i++) {
     normalsVec[i] = new  NormalDistribution(seed_+i);
   }
+}
+
+
+MultiDimNormalDistribution::MultiDimNormalDistribution(std::size_t dim_, double mean_, double cov_, unsigned int seed_):
+	normalsVec(dim_)
+{
+	for (std::size_t i = 0; i < dim_; ++i) {
+		normalsVec[i] = new  NormalDistribution(mean_, sqrt(cov_), seed_+i);
+	}
 }
 
 MultiDimNormalDistribution::MultiDimNormalDistribution(const vec& mean_, const vec& cov_, 

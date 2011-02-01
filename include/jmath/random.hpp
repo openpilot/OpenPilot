@@ -46,6 +46,7 @@ namespace jafar {
     public:
 
       MultiDimUniformDistribution(std::size_t dim_, unsigned int seed_ = 1);
+      MultiDimUniformDistribution(std::size_t dim_, double min_, double max_, unsigned int seed_ = 1);
       MultiDimUniformDistribution(const jblas::vec& min_, const jblas::vec& max_, unsigned int seed_ = 1);
       ~MultiDimUniformDistribution();
 
@@ -94,6 +95,7 @@ namespace jafar {
     public:
 
       MultiDimNormalDistribution(std::size_t dim_, unsigned int seed_ = 1);
+      MultiDimNormalDistribution(std::size_t dim_, double mean_, double cov_, unsigned int seed_ = 1);
       MultiDimNormalDistribution(const jblas::vec& mean_, const jblas::vec& cov_, unsigned int seed_ = 1);
       ~MultiDimNormalDistribution();
 

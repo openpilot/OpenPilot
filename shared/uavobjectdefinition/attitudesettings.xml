@@ -1,0 +1,11 @@
+<xml>
+    <object name="AttitudeSettings" singleinstance="true" settings="true">
+        <description>Settings for the @ref Attitude module used on CopterControl</description>
+        <field name="GyroBiasTau" units="channel" type="float" elements="1" defaultvalue="0.00001"/>
+        <field name="AccelTau" units="channel" type="float" elements="1" defaultvalue="0.00001"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="never" period="0"/>
+	</object>
+</xml>

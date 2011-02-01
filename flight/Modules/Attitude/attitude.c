@@ -53,6 +53,7 @@
 #include "attituderaw.h"
 #include "attitudeactual.h"
 #include "attitudedesired.h"
+#include "attitudesettings.h"
 #include "manualcontrolcommand.h"
 #include "CoordinateConversions.h"
 #include "pios_flash_w25x.h"
@@ -128,10 +129,14 @@ void updateSensors()
 {
 	AttitudeRawData attitudeRaw;
 	AttitudeRawGet(&attitudeRaw);		
+	
+	AttitudeSettingsData settings;
+	AttitudeSettingsGet(&settings);
+	
 	struct pios_adxl345_data accel_data;
 	
 	static float gyro_bias[3] = {0,0,0};
-	static const float tau = 0.9999f;
+	float tau = (1-settings.GyroBiasTau);
 
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] = -(gyro[0] - GYRO_NEUTRAL) * GYRO_SCALE;
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] = (gyro[1] - GYRO_NEUTRAL) * GYRO_SCALE;
@@ -172,9 +177,12 @@ void updateSensors()
 	AttitudeRawSet(&attitudeRaw); 	
 }
 
-#define UPDATE_FRAC 0.999f
+#define UPDATE_FRAC 0.99999f
 void updateAttitude()
 {
+	AttitudeSettingsData settings;
+	AttitudeSettingsGet(&settings);
+
 	AttitudeActualData attitudeActual;
 	AttitudeActualGet(&attitudeActual);
 	
@@ -186,6 +194,7 @@ void updateAttitude()
 	
 	float accel_pitch, accel_roll;
 	static float dT = 0;
+	float tau = 1-settings.AccelTau;
 	
 	thisSysTime = xTaskGetTickCount();
 	if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
@@ -212,8 +221,8 @@ void updateAttitude()
 	RPY2Quaternion(&attitudeActual.Roll, &attitudeActual.q1);
 	
 	// Weighted average and back into degrees
-	attitudeActual.Roll = (UPDATE_FRAC * attitudeActual.Roll + (1-UPDATE_FRAC) * accel_roll) * 180 / M_PI;
-	attitudeActual.Pitch = (UPDATE_FRAC * attitudeActual.Pitch + (1-UPDATE_FRAC) * accel_pitch) * 180 / M_PI;
+	attitudeActual.Roll = (tau * attitudeActual.Roll + (1-tau) * accel_roll) * 180 / M_PI;
+	attitudeActual.Pitch = (tau * attitudeActual.Pitch + (1-tau) * accel_pitch) * 180 / M_PI;
 	attitudeActual.Yaw = fmod(attitudeActual.Yaw * 180 / M_PI, 360);	
 	AttitudeActualSet(&attitudeActual);
 }

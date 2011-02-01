@@ -530,7 +530,11 @@ int ScopeGadgetWidget::csvLoggingInsertData()
     else
     {
         QTextStream ss( &tempString );
+#if QT_VERSION >= 0x040700
         ss << NOW.toString("yyyy-MM-dd") << ", " << NOW.toString("hh:mm:ss.z") << ", " << (NOW.toMSecsSinceEpoch() - m_csvLoggingStartTime.toMSecsSinceEpoch())/1000.00;
+#else
+        ss << NOW.toString("yyyy-MM-dd") << ", " << NOW.toString("hh:mm:ss.z") << ", " << (NOW.toTime_t() - m_csvLoggingStartTime.toTime_t())/1000.00;
+#endif
         ss << ", " << m_csvLoggingConnected;
         foreach(PlotData* plotData2, m_curvesData.values())
         {

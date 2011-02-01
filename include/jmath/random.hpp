@@ -22,7 +22,8 @@ namespace jafar {
     class UniformDistribution {
     public:
 
-      UniformDistribution(double min_=0.0, double max_=1.0, unsigned int seed_ = 1);
+      UniformDistribution(unsigned int seed_ = 1);
+      UniformDistribution(double min_, double max_, unsigned int seed_ = 1);
       ~UniformDistribution();
 
       double get();
@@ -67,7 +68,8 @@ namespace jafar {
     class NormalDistribution {
     public:
 
-      NormalDistribution(double mean_ = 0, double sigma_ = 1, unsigned int seed_ = 1);
+      NormalDistribution(unsigned int seed_ = 1);
+      NormalDistribution(double mean_, double sigma_, unsigned int seed_ = 1);
 
       ~NormalDistribution();
 

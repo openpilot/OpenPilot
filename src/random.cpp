@@ -15,6 +15,11 @@ using namespace jafar::jmath;
  * class UniformDistribution
  */
 
+UniformDistribution::UniformDistribution(unsigned int seed_) :
+  rng(seed_),
+  uniform(0.0, 1.0),
+  vg(rng, uniform) {}
+
 UniformDistribution::UniformDistribution(double min_, double max_,
                                          unsigned int seed_) :
   rng(seed_),
@@ -70,13 +75,21 @@ vec& MultiDimUniformDistribution::get() {
  * class NormalDistribution
  */
 
+NormalDistribution::NormalDistribution(unsigned int seed_) :
+  rng(seed_),
+  normal(0.0, 1.0),
+  vg(rng, normal) 
+{
+  get(); // why ?
+}
+
 NormalDistribution::NormalDistribution(double mean_, double sigma_, 
                                        unsigned int seed_) :
   rng(seed_),
   normal(mean_, sigma_),
   vg(rng, normal) 
 {
-  get();
+  get(); // why ?
 }
 
 NormalDistribution::~NormalDistribution() {}

@@ -144,6 +144,7 @@ SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
+SRC += $(OPUAVOBJ)/uavobjectsinit_linker.c
 else
 ## TESTCODE
 SRC += $(OPTESTS)/test_common.c
@@ -177,7 +178,6 @@ SRC += $(OPUAVSYNTHDIR)/manualcontrolsettings.c
 SRC += $(OPUAVSYNTHDIR)/mixersettings.c
 SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
 SRC += $(OPUAVSYNTHDIR)/firmwareiapobj.c
-SRC += $(OPUAVSYNTHDIR)/uavobjectsinit.c
 SRC += $(OPUAVSYNTHDIR)/attitudesettings.c
 #${wildcard ${OBJ}/$(shell echo $(VAR) | tr A-Z a-z)/*.c}
 #SRC += ${foreach OBJ, ${UAVOBJECTS}, $(UAVOBJECTS)/$(OBJ).c}

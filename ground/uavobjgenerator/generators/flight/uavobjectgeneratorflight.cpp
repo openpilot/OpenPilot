@@ -37,6 +37,8 @@ bool UAVObjectGeneratorFlight::generate(UAVObjectParser* parser,QString template
     flightCodePath = QDir( templatepath + QString("flight/UAVObjects"));
     flightOutputPath = QDir( outputpath + QString("flight") );
     flightOutputPath.mkpath(flightOutputPath.absolutePath());
+    flightInitOutputPath = QDir( outputpath + QString("flight/init") );
+    flightInitOutputPath.mkpath(flightInitOutputPath.absolutePath());
 
     flightCodeTemplate = readFile( flightCodePath.absoluteFilePath("uavobjecttemplate.c") );
     flightIncludeTemplate = readFile( flightCodePath.absoluteFilePath("inc/uavobjecttemplate.h") );
@@ -57,7 +59,7 @@ bool UAVObjectGeneratorFlight::generate(UAVObjectParser* parser,QString template
     // Write the flight object inialization files
     flightInitTemplate.replace( QString("$(OBJINC)"), objInc);
     flightInitTemplate.replace( QString("$(OBJINIT)"), flightObjInit);
-    bool res = writeFileIfDiffrent( flightOutputPath.absolutePath() + "/uavobjectsinit.c",
+    bool res = writeFileIfDiffrent( flightInitOutputPath.absolutePath() + "/uavobjectsinit.c",
                      flightInitTemplate );
     if (!res) {
         cout << "Error: Could not write flight object init files" << endl;

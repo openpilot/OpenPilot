@@ -54,5 +54,6 @@
 #define SERVOS_POSITION_MIN		800
 #define SERVOS_POSITION_MAX		2200
 
-
+#define TELEM_QUEUE_SIZE                20
+#define TELEM_STACK_SIZE                2048
 #endif /* PIOS_CONFIG_POSIX_H */

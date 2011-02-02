@@ -72,7 +72,7 @@ typedef struct
 
     uint32_t    min_frequency_Hz;
     uint32_t    max_frequency_Hz;
-    float	    frequency_Hz;
+    uint32_t    frequency_Hz;
 
     uint32_t    max_rf_bandwidth;
 
@@ -90,7 +90,7 @@ typedef struct
 
 typedef struct
 {
-    float	    start_frequency;
+	uint32_t	start_frequency;
     float	    frequency_step_size;
     uint16_t    magnitudes;
 //    int8_t      magnitude[0];
@@ -343,6 +343,7 @@ void apiconfig_process(void)
 	{	// the local communications port has changed .. remove any data in the buffers
 		apiconfig_rx_buffer_wr = 0;
 		apiconfig_tx_buffer_wr = 0;
+		apiconfig_tx_config_buffer_wr = 0;
 	}
 	else
 	if (usb_comms)
@@ -393,9 +394,10 @@ void apiconfig_process(void)
 			com_num--;
 		}
 
+		// scan for a configuration packet in the received data
 		uint16_t data_size = apiconfig_scanForConfigPacket(apiconfig_rx_buffer, &apiconfig_rx_buffer_wr, false);
 
-		if (data_size == 0 && apiconfig_rx_timer >= 10)
+		if (data_size == 0 && ((usb_comms && apiconfig_rx_timer >= 10) || ((!usb_comms && apiconfig_rx_timer >= 20))))
 		{	// no config packet found in the buffer within the timeout period, treat any data in the buffer as data to be sent over the air
 			data_size = apiconfig_rx_buffer_wr;
 		}
@@ -433,8 +435,8 @@ void apiconfig_process(void)
 		{
 			uint16_t data_size = apiconfig_tx_config_buffer_wr;
 
-			if (data_size > 32)
-				data_size = 32;
+//			if (data_size > 32)
+//				data_size = 32;
 
 			if (!usb_comms && !GPIO_IN(SERIAL_CTS_PIN))
 				break;	// we can't yet send data down the comm-port

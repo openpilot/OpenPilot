@@ -581,8 +581,8 @@ uint32_t rfm22_getDatarate(void);
 void rfm22_setTxPower(uint8_t tx_pwr);
 uint8_t rfm22_getTxPower(void);
 
-void rfm22_setNominalCarrierFrequency(float frequency_hz);
-float rfm22_getNominalCarrierFrequency(void);
+void rfm22_setNominalCarrierFrequency(uint32_t frequency_hz);
+uint32_t rfm22_getNominalCarrierFrequency(void);
 
 float rfm22_getFrequencyStepSize(void);
 

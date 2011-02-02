@@ -175,7 +175,7 @@ volatile uint8_t	rf_mode;							// holds our current RF mode
 
 uint32_t			lower_carrier_frequency_limit_Hz;	// the minimum RF frequency we can use
 uint32_t			upper_carrier_frequency_limit_Hz;	// the maximum RF frequency we can use
-float				carrier_frequency_hz;				// the current RF frequency we are on
+uint32_t			carrier_frequency_hz;				// the current RF frequency we are on
 
 uint32_t			carrier_datarate_bps;				// the RF data rate we are using
 
@@ -575,7 +575,7 @@ uint8_t rfm22_getTxPower(void)
 
 // ************************************
 
-void rfm22_setNominalCarrierFrequency(float frequency_hz)
+void rfm22_setNominalCarrierFrequency(uint32_t frequency_hz)
 {
 
 #if defined(RFM22_EXT_INT_USE)
@@ -629,7 +629,7 @@ void rfm22_setNominalCarrierFrequency(float frequency_hz)
 
 }
 
-float rfm22_getNominalCarrierFrequency(void)
+uint32_t rfm22_getNominalCarrierFrequency(void)
 {
     return carrier_frequency_hz;
 }
@@ -1574,7 +1574,7 @@ void rfm22_process(void)
 
 	if (power_on_reset)
 	{	// we need to re-initialize the RF module - it told us it's reset itself
-		float current_freq = carrier_frequency_hz;										// fetch current rf nominal frequency
+		uint32_t current_freq = carrier_frequency_hz;										// fetch current rf nominal frequency
 		uint32_t freq_hop_step_size = (uint32_t)frequency_hop_step_size_reg * 10000;	// fetch the frequency hoppping step size
 		rfm22_init(lower_carrier_frequency_limit_Hz, upper_carrier_frequency_limit_Hz, freq_hop_step_size);
 		rfm22_setNominalCarrierFrequency(current_freq);									// restore the nominal carrier frequency

@@ -45,8 +45,8 @@ uint16_t ph_putData(const int connection_index, const void *data, uint16_t len);
 uint16_t ph_getData_used(const int connection_index);
 uint16_t ph_getData(const int connection_index, void *data, uint16_t len);
 
-void ph_setNominalCarrierFrequency(float frequency_hz);
-float ph_getNominalCarrierFrequency(void);
+void ph_setNominalCarrierFrequency(uint32_t frequency_hz);
+uint32_t ph_getNominalCarrierFrequency(void);
 
 void ph_setDatarate(uint32_t datarate_bps);
 uint32_t ph_getDatarate(void);

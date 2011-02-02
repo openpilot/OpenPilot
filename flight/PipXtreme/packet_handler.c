@@ -1383,12 +1383,12 @@ void ph_processLinks(int connection_index)
 // *****************************************************************************
 // set/get the carrier frequency
 
-void ph_setNominalCarrierFrequency(float frequency_hz)
+void ph_setNominalCarrierFrequency(uint32_t frequency_hz)
 {
 	rfm22_setNominalCarrierFrequency(frequency_hz);
 }
 
-float ph_getNominalCarrierFrequency(void)
+uint32_t ph_getNominalCarrierFrequency(void)
 {
 	return rfm22_getNominalCarrierFrequency();
 }

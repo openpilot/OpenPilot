@@ -572,6 +572,9 @@ enum {	RX_WAIT_PREAMBLE_MODE = 0,
 
 // ************************************
 
+void rfm22_setFreqCalibration(uint8_t value);
+uint8_t rfm22_getFreqCalibration(void);
+
 void rfm22_setDatarate(uint32_t datarate_bps);
 uint32_t rfm22_getDatarate(void);
 

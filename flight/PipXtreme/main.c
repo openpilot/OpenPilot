@@ -453,11 +453,9 @@ void init_RF_module(void)
         while (1);
     }
 
-    // set carrier frequency
-    rfm22_setNominalCarrierFrequency(saved_settings.frequency_Hz);
-
+    rfm22_setFreqCalibration(saved_settings.rf_xtal_cap);
+    ph_setNominalCarrierFrequency(saved_settings.frequency_Hz);
     ph_setDatarate(saved_settings.max_rf_bandwidth);
-
     ph_setTxPower(saved_settings.max_tx_power);
 }
 
@@ -671,6 +669,11 @@ int main()
 
     saved_settings_init();
 
+	#if !defined(PIOS_COM_DEBUG)
+    	if (saved_settings.serial_baudrate != 0xffffffff)
+    		PIOS_COM_ChangeBaud(PIOS_COM_SERIAL, saved_settings.serial_baudrate);
+	#endif
+
     // *************
     // read the API mode pin
 
@@ -686,6 +689,7 @@ int main()
     else
     if ( GPIO_IN(_868MHz_PIN) && !GPIO_IN(_915MHz_PIN)) saved_settings.frequency_band = freqBand_915MHz;    // 915MHz band
 
+    // set some defaults if they are not set
     switch (saved_settings.frequency_band)
     {
         case freqBand_434MHz:
@@ -800,9 +804,9 @@ int main()
             break;
     }
 
-    if (serial_number_crc32 == 0x176C1EC6) saved_settings.destination_id = 0xA524A3B0;  // modem 1, open a connection to modem 2
-    else
-    if (serial_number_crc32 == 0xA524A3B0) saved_settings.destination_id = 0x176C1EC6;  // modem 2, open a connection to modem 1
+//    if (serial_number_crc32 == 0x176C1EC6) saved_settings.destination_id = 0xA524A3B0;  // modem 1, open a connection to modem 2
+//    else
+//    if (serial_number_crc32 == 0xA524A3B0) saved_settings.destination_id = 0x176C1EC6;  // modem 2, open a connection to modem 1
 
     // *************
 
@@ -837,21 +841,13 @@ int main()
     init_RF_module();
 
     // *************
-    // initialize the USB interface
-
-    #if defined(PIOS_INCLUDE_USB_HID)
-//        PIOS_USB_HID_Init(0); // this is not needed as it gets called by the com init routine .. thank you Ed!
-    #endif
-
-    // *************
 
     saved_settings_save();
 
     booting = FALSE;
 
     // *************
-
-    ph_set_remote_serial_number(0, saved_settings.destination_id);
+    // Main executive loop
 
     #if defined(PIOS_COM_DEBUG)
         DEBUG_PRINTF("\r\n");
@@ -860,8 +856,9 @@ int main()
         DEBUG_PRINTF("RF TX power: %d\r\n", ph_getTxPower());
     #endif
 
-    // *************
-    // Main executive loop
+    // start a remote connection going
+    ph_set_remote_encryption(0, saved_settings.aes_enable, (const void *)saved_settings.aes_key);
+    ph_set_remote_serial_number(0, saved_settings.destination_id);
 
     for (;;)
     {

@@ -207,6 +207,8 @@ volatile int16_t	temperature_reg;					// the temperature sensor reading
 	bool debug_outputted;
 #endif
 
+volatile uint8_t	osc_load_cap;						// xtal frequency calibration value
+
 volatile uint8_t	rssi;								// the current RSSI (register value)
 volatile int16_t	rssi_dBm;							// dBm value
 
@@ -386,6 +388,32 @@ uint8_t rfm22_read(uint8_t addr)
 	}
 
 #endif
+
+// ************************************
+// set/get the frequency calibration value
+
+void rfm22_setFreqCalibration(uint8_t value)
+{
+	osc_load_cap = value;
+
+	if (!initialized || power_on_reset)
+		return;				// we haven't yet been initialized
+
+	#if defined(RFM22_EXT_INT_USE)
+		exec_using_spi = TRUE;
+	#endif
+
+	rfm22_write(rfm22_xtal_osc_load_cap, osc_load_cap);
+
+	#if defined(RFM22_EXT_INT_USE)
+		exec_using_spi = FALSE;
+	#endif
+}
+
+uint8_t rfm22_getFreqCalibration(void)
+{
+	return osc_load_cap;
+}
 
 // ************************************
 // radio datarate about 19200 Baud
@@ -1796,15 +1824,15 @@ int rfm22_init(uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t fr
 	rfm22_write(rfm22_op_and_func_ctrl2, 0x00);
 
 	// calibrate our RF module to be exactly on frequency .. different for every module
-	if (serial_number_crc32 == 0x176C1EC6) rfm22_write(rfm22_xtal_osc_load_cap, OSC_LOAD_CAP_1);
+	osc_load_cap = OSC_LOAD_CAP;	// default
+/*	if (serial_number_crc32 == 0x176C1EC6) osc_load_cap = OSC_LOAD_CAP_1;
 	else
-	if (serial_number_crc32 == 0xA524A3B0) rfm22_write(rfm22_xtal_osc_load_cap, OSC_LOAD_CAP_2);
+	if (serial_number_crc32 == 0xA524A3B0) osc_load_cap = OSC_LOAD_CAP_2;
 	else
-	if (serial_number_crc32 == 0x9F6393C1) rfm22_write(rfm22_xtal_osc_load_cap, OSC_LOAD_CAP_3);
+	if (serial_number_crc32 == 0x9F6393C1) osc_load_cap = OSC_LOAD_CAP_3;
 	else
-	if (serial_number_crc32 == 0x994ECD31) rfm22_write(rfm22_xtal_osc_load_cap, OSC_LOAD_CAP_4);
-	else
-		rfm22_write(rfm22_xtal_osc_load_cap, OSC_LOAD_CAP);	// default
+	if (serial_number_crc32 == 0x994ECD31) osc_load_cap = OSC_LOAD_CAP_4;
+*/	rfm22_write(rfm22_xtal_osc_load_cap, osc_load_cap);
 
 	rfm22_write(rfm22_op_and_func_ctrl1, rfm22_opfc1_xton);					// READY mode
 //	rfm22_write(rfm22_op_and_func_ctrl1, rfm22_opfc1_pllon);				// TUNE mode

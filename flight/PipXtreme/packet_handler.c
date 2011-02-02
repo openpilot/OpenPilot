@@ -280,20 +280,11 @@ int ph_startConnect(int connection_index, uint32_t sn)
 
     t_connection *conn = &connection[connection_index];
 
-    if (sn != 0 && sn == our_serial_number)
-        return -2;							// same as our own
-
-    if (sn == BROADCAST_ADDR)
-    {
-
-        return -3;
-    }
+	conn->link_state = link_disconnected;
 
     LINK_LED_OFF;
 
-    conn->link_state = link_disconnected;
-
-    conn->serial_number = sn;
+	conn->serial_number = sn;
 
     conn->tx_sequence = 0;
     conn->tx_sequence_data_size = 0;
@@ -331,13 +322,23 @@ int ph_startConnect(int connection_index, uint32_t sn)
 
     conn->not_ready_timer = -1;
 
-//  conn->send_encrypted = true;
-    conn->send_encrypted = false;
+//	conn->send_encrypted = true;
+//	conn->send_encrypted = false;
 
     conn->rx_rssi_dBm = -200;
     conn->rx_afc_Hz = 0;
 
-    conn->link_state = link_connecting;
+    if (sn != 0 && sn == our_serial_number)
+        return -2;							// same as our own
+
+    if (sn == BROADCAST_ADDR)
+    {
+
+        return -3;
+    }
+
+    if (conn->serial_number != 0)
+    	conn->link_state = link_connecting;
 
     return connection_index;
 }
@@ -1380,6 +1381,19 @@ void ph_processLinks(int connection_index)
 }
 
 // *****************************************************************************
+// set/get the carrier frequency
+
+void ph_setNominalCarrierFrequency(float frequency_hz)
+{
+	rfm22_setNominalCarrierFrequency(frequency_hz);
+}
+
+float ph_getNominalCarrierFrequency(void)
+{
+	return rfm22_getNominalCarrierFrequency();
+}
+
+// *****************************************************************************
 // set/get the RF datarate
 
 void ph_setDatarate(uint32_t datarate_bps)
@@ -1417,10 +1431,13 @@ uint8_t ph_getTxPower(void)
 
 void ph_set_AES128_key(const void *key)
 {
-  memmove(aes_key, key, sizeof(aes_key));
+	if (!key)
+		return;
 
-  // create the AES decryption key
-  aes_decrypt_key_128_create(aes_key, (void *)&dec_aes_key);
+	memmove(aes_key, key, sizeof(aes_key));
+
+	// create the AES decryption key
+	aes_decrypt_key_128_create(aes_key, (void *)&dec_aes_key);
 }
 
 // *****************************************************************************
@@ -1441,6 +1458,17 @@ int ph_set_remote_serial_number(int connection_index, uint32_t sn)
   }
 
   return -4;
+}
+
+void ph_set_remote_encryption(int connection_index, bool enabled, const void *key)
+{
+    if (connection_index < 0 || connection_index >= PH_MAX_CONNECTIONS)
+        return;
+
+    t_connection *conn = &connection[connection_index];
+
+    ph_set_AES128_key(key);
+    conn->send_encrypted = enabled;
 }
 
 // *****************************************************************************
@@ -1554,7 +1582,7 @@ void ph_init(uint32_t our_sn, uint32_t datarate_bps, uint8_t tx_power)
 
       conn->not_ready_timer = -1;
 
-      conn->send_encrypted = true;
+      conn->send_encrypted = false;
 
       conn->rx_rssi_dBm = -200;
       conn->rx_afc_Hz = 0;

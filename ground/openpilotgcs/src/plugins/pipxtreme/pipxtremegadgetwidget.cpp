@@ -458,7 +458,13 @@ void PipXtremeGadgetWidget::saveToFlash()
 
 	t_pipx_config_data_settings settings;
 
-	s = m_widget->lineEdit_PairedSerialNumber->text().trimmed();
+	s = m_widget->lineEdit_PairedSerialNumber->text().trimmed().toLower();
+	s.replace(' ', "");	// remove all spaces
+	if (s.startsWith("0x"))
+	{
+		s.remove(0, 2);
+		s = s.trimmed();
+	}
 	settings.destination_id = s.toUInt(&ok, 16);
 	if (s.isEmpty() || !ok)
 	{
@@ -469,6 +475,7 @@ void PipXtremeGadgetWidget::saveToFlash()
 	settings.rf_xtal_cap = m_widget->spinBox_FrequencyCalibration->value();
 
 	s = m_widget->lineEdit_MinFrequency->text().trimmed();
+	s.replace(' ', "");	// remove all spaces
 	settings.min_frequency_Hz = s.toUInt(&ok);
 	if (s.isEmpty() || !ok)
 	{
@@ -477,6 +484,7 @@ void PipXtremeGadgetWidget::saveToFlash()
 	}
 
 	s = m_widget->lineEdit_MaxFrequency->text().trimmed();
+	s.replace(' ', "");	// remove all spaces
 	settings.max_frequency_Hz = s.toUInt(&ok);
 	if (s.isEmpty() || !ok)
 	{
@@ -485,6 +493,7 @@ void PipXtremeGadgetWidget::saveToFlash()
 	}
 
 	s = m_widget->doubleSpinBox_Frequency->text().trimmed();
+	s.replace(' ', "");	// remove all spaces
 	settings.frequency_Hz = s.toFloat(&ok) * 1e6;
 	if (s.isEmpty() || !ok || settings.frequency_Hz < settings.min_frequency_Hz || settings.frequency_Hz > settings.max_frequency_Hz)
 	{
@@ -502,6 +511,7 @@ void PipXtremeGadgetWidget::saveToFlash()
 
 	memset(settings.aes_key, 0, sizeof(settings.aes_key));
 	s = m_widget->lineEdit_AESKey->text().trimmed();
+	s.replace(' ', "");	// remove all spaces
 	if (settings.aes_enable && s.length() != 32)
 	{
 		error("Check your \"AES Key\" entry! .. it must be 32 hex characters long", 0);
@@ -521,6 +531,7 @@ void PipXtremeGadgetWidget::saveToFlash()
 	}
 
 	s = m_widget->lineEdit_FrequencyBand->text().trimmed();
+	s.replace(' ', "");	// remove all spaces
 	if (s == "434") settings.frequency_band = freqBand_434MHz;
 	else
 	if (s == "868") settings.frequency_band = freqBand_868MHz;
@@ -533,6 +544,7 @@ void PipXtremeGadgetWidget::saveToFlash()
 	}
 
 	s = m_widget->lineEdit_FrequencyStepSize->text().trimmed();
+	s.replace(' ', "");	// remove all spaces
 	settings.frequency_step_size = s.toFloat(&ok);
 	if (s.isEmpty() || !ok)
 	{
@@ -541,6 +553,7 @@ void PipXtremeGadgetWidget::saveToFlash()
 	}
 
 	s = m_widget->lineEdit_SerialNumber->text().trimmed();
+	s.replace(' ', "");	// remove all spaces
 	uint32_t serial_number = s.toUInt(&ok, 16);
 	if (s.isEmpty() || !ok || serial_number == 0)
 	{

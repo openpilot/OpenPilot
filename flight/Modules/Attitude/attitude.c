@@ -64,7 +64,6 @@
 
 #define UPDATE_RATE  3
 #define GYRO_NEUTRAL 1665
-#define GYRO_SCALE   (0.008f * 180 / M_PI)
 
 #define PI_MOD(x) (fmod(x + M_PI, M_PI * 2) - M_PI)
 // Private types
@@ -169,16 +168,17 @@ static void updateSensors()
 	
 	struct pios_adxl345_data accel_data;
 	
-	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] = -(gyro[0] - GYRO_NEUTRAL) * GYRO_SCALE;
-	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] = (gyro[1] - GYRO_NEUTRAL) * GYRO_SCALE;
-	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] = -(gyro[2] - GYRO_NEUTRAL) * GYRO_SCALE;
+	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] = -(gyro[0] - GYRO_NEUTRAL) * settings.GyroGain;
+	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] = (gyro[1] - GYRO_NEUTRAL) * settings.GyroGain;
+	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] = -(gyro[2] - GYRO_NEUTRAL) * settings.GyroGain;
 	
 	// Applying integral component here so it can be seen on the gyros and correct bias
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] += gyro_correct_int[0];
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] += gyro_correct_int[1];
 
 	// Because most crafts wont get enough information from gravity to zero yaw gyro
-	gyro_correct_int[2] = (1-settings.GyroBiasTau) * gyro_correct_int[2] - settings.GyroBiasTau * attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z];
+	gyro_correct_int[2] += - attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] * 
+				settings.AccelKI * UPDATE_RATE / 1000;
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] += gyro_correct_int[2];
 	
 	

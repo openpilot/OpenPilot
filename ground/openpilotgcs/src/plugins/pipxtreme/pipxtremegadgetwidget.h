@@ -81,7 +81,7 @@ typedef struct
 
 	uint32_t    min_frequency_Hz;
 	uint32_t    max_frequency_Hz;
-	float	    frequency_Hz;
+	uint32_t    frequency_Hz;
 
 	uint32_t    max_rf_bandwidth;
 
@@ -99,7 +99,7 @@ typedef struct
 
 typedef struct
 {
-	float	    start_frequency;
+	uint32_t	start_frequency;
 	float	    frequency_step_size;
 	uint16_t    magnitudes;
 //	int8_t      magnitude[0];

@@ -494,7 +494,7 @@ void PipXtremeGadgetWidget::saveToFlash()
 
 	s = m_widget->doubleSpinBox_Frequency->text().trimmed();
 	s.replace(' ', "");	// remove all spaces
-	settings.frequency_Hz = s.toFloat(&ok) * 1e6;
+	settings.frequency_Hz = (uint32_t)(s.toDouble(&ok) * 1e6);
 	if (s.isEmpty() || !ok || settings.frequency_Hz < settings.min_frequency_Hz || settings.frequency_Hz > settings.max_frequency_Hz)
 	{
 		error("Check your \"Frequency\" entry!", 0);

@@ -110,7 +110,7 @@ PYMITEINC += $(PYMITEPLAT)
 PYMITEINC += $(OUTDIR)
 FLIGHTPLANLIB = $(OPMODULEDIR)/FlightPlan/lib
 FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
-OPUAVSYNTHDIR = $(OUTDIR)/../../uavobject-synthetics/flight
+UAVOBJSYNTHDIR = $(OUTDIR)/../../uavobject-synthetics/flight
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
@@ -138,7 +138,7 @@ SRC += $(OPSYSTEM)/alarms.c
 SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
-SRC += $(OPUAVSYNTHDIR)/init/uavobjectsinit.c
+SRC += $(UAVOBJSYNTHDIR)/uavobjectsinit.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 
@@ -151,7 +151,8 @@ endif
 
 ## UAVOBJECTS
 ifndef TESTAPP
-SRC += $(wildcard $(OPUAVSYNTHDIR)/*.c)
+include $(UAVOBJSYNTHDIR)/Makefile.inc
+SRC += $(UAVOBJSRC)
 endif
 
 ## PIOS Hardware (win32)
@@ -207,7 +208,7 @@ EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/Win32
 EXTRAINCDIRS  += $(FLIGHTLIB)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)
 EXTRAINCDIRS  += $(PYMITEINC)
-EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
+EXTRAINCDIRS  += $(UAVOBJSYNTHDIR)
 
 EXTRAINCDIRS += ${foreach MOD, ${MODULES}, ${OPMODULEDIR}/${MOD}/inc} ${OPMODULEDIR}/System/inc
 

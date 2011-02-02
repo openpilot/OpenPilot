@@ -70,6 +70,12 @@ namespace core {
             qDebug()<<"Try Tile from memory:Size="<<TilesInMemory.MemoryCacheSize();
 #endif //DEBUG_GMAPS
             ret=GetTileFromMemoryCache(RawTile(type,pos,zoom));
+            if(!ret.isEmpty())
+            {
+                errorvars.lock();
+                ++diag.tilesFromMem;
+                errorvars.unlock();
+            }
 
         }
         if(ret.isEmpty())
@@ -85,6 +91,9 @@ namespace core {
                 ret=Cache::Instance()->ImageCache.GetImageFromCache(type,pos,zoom);
                 if(!ret.isEmpty())
                 {
+                    errorvars.lock();
+                    ++diag.tilesFromDB;
+                    errorvars.unlock();
 #ifdef DEBUG_GMAPS
                     qDebug()<<"Tile found in Database";
 #endif //DEBUG_GMAPS
@@ -228,6 +237,9 @@ namespace core {
 #ifdef DEBUG_GMAPS
                 qDebug()<<"Received Tile from the Internet";
 #endif //DEBUG_GMAPS
+                errorvars.lock();
+                ++diag.tilesFromNet;
+                errorvars.unlock();
                 if (useMemoryCache)
                 {
 #ifdef DEBUG_GMAPS

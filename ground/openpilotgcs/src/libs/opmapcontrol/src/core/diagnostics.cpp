@@ -26,6 +26,6 @@
 */
 #include "diagnostics.h"
 
-diagnostics::diagnostics():networkerrors(0),emptytiles(0),timeouts(0),runningThreads(0)
+diagnostics::diagnostics():networkerrors(0),emptytiles(0),timeouts(0),runningThreads(0),tilesFromMem(0),tilesFromNet(0),tilesFromDB(0)
 {
 }

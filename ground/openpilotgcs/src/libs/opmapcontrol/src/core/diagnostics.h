@@ -34,9 +34,13 @@ struct diagnostics
     int emptytiles;
     int timeouts;
     int runningThreads;
+    int tilesFromMem;
+    int tilesFromNet;
+    int tilesFromDB;
     QString toString()
     {
-        return QString("Network errors:%1\nEmpty Tiles:%2\nTimeOuts:%3\nRunningThreads:%4").arg(networkerrors).arg(emptytiles).arg(timeouts).arg(runningThreads);
+        return QString("Network errors:%1\nEmpty Tiles:%2\nTimeOuts:%3\nRunningThreads:%4\nTilesFromMem:%5\nTilesFromNet:%6\nTilesFromDB:%7").arg(networkerrors).arg(emptytiles).arg(timeouts).arg(runningThreads).arg(tilesFromMem).arg(tilesFromNet).arg(tilesFromDB);
+       ;
     }
 };
 

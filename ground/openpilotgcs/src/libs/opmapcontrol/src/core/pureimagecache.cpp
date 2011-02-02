@@ -194,11 +194,11 @@ namespace core {
         qlonglong id=++ConnCounter;
         Mcounter.unlock();
         {
-            Mcounter.lock();
             QSqlDatabase cn;
             cn = QSqlDatabase::addDatabase("QSQLITE",QString::number(id));
             QString db=gtilecache+"Data.qmdb";
             cn.setDatabaseName(db);
+            cn.setConnectOptions("QSQLITE_ENABLE_SHARED_CACHE");
             if(cn.open())
             {
                 {
@@ -220,7 +220,6 @@ namespace core {
                 }
                 cn.close();
             }
-            Mcounter.unlock();
         }
         QSqlDatabase::removeDatabase(QString::number(id));
         return true;
@@ -239,12 +238,12 @@ namespace core {
         {
             QString db=dir+"Data.qmdb";
             {
-                Mcounter.lock();
                 QSqlDatabase cn;
 
                 cn = QSqlDatabase::addDatabase("QSQLITE",QString::number(id));
 
                 cn.setDatabaseName(db);
+                cn.setConnectOptions("QSQLITE_ENABLE_SHARED_CACHE");
                 if(cn.open())
                 {
                     {
@@ -258,7 +257,6 @@ namespace core {
                     }
                     cn.close();
                 }
-                Mcounter.unlock();
             }
         }
         QSqlDatabase::removeDatabase(QString::number(id));
@@ -280,6 +278,7 @@ namespace core {
                 Mcounter.unlock();
                 cn = QSqlDatabase::addDatabase("QSQLITE",QString::number(id));
                 cn.setDatabaseName(db);
+                cn.setConnectOptions("QSQLITE_ENABLE_SHARED_CACHE");
                 if(cn.open())
                 {
                     {

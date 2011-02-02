@@ -59,7 +59,7 @@
 #include "pios_flash_w25x.h"
 
 // Private constants
-#define STACK_SIZE_BYTES 440
+#define STACK_SIZE_BYTES 540
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 
 #define UPDATE_RATE  3
@@ -78,8 +78,11 @@ static void AttitudeTask(void *parameters);
 void adc_callback(float * data);
 float gyro[3] = {0, 0, 0};
 
-void updateSensors();
-void updateAttitude();
+static float gyro_correct_int[3] = {0,0,0};
+
+static void initSensors();
+static void updateSensors();
+static void updateAttitude();
 
 /**
  * Initialise the module, called on startup
@@ -87,6 +90,17 @@ void updateAttitude();
  */
 int32_t AttitudeInitialize(void)
 {
+	// Initialize quaternion
+	AttitudeActualData attitude;
+	AttitudeActualGet(&attitude);
+	attitude.q1 = 1;
+	attitude.q2 = 0;
+	attitude.q3 = 0;
+	attitude.q4 = 0;
+	AttitudeActualSet(&attitude);
+	
+	
+		
 	// Start main task
 	xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_ATTITUDE, taskHandle);
@@ -108,7 +122,9 @@ static void AttitudeTask(void *parameters)
 	// Keep flash CS pin high while talking accel
 	PIOS_FLASH_DISABLE;		
 	PIOS_ADXL345_Init();
-
+		
+	initSensors();
+	
 	// Main task loop
 	while (1) {
 		//
@@ -126,7 +142,24 @@ static void AttitudeTask(void *parameters)
 	}
 }
 
-void updateSensors() 
+static void initSensors() 
+{
+	vTaskDelay(50);
+	updateSensors();
+	
+	AttitudeRawData attitudeRaw;
+	AttitudeRawGet(&attitudeRaw);	
+	
+	AttitudeSettingsData settings;
+	AttitudeSettingsGet(&settings);
+
+	// Zero initial bias
+	gyro_correct_int[0] = - attitudeRaw.gyros_filtered[0];
+	gyro_correct_int[1] = - attitudeRaw.gyros_filtered[1];
+	gyro_correct_int[2] = - attitudeRaw.gyros_filtered[2];
+}
+
+static void updateSensors() 
 {
 	AttitudeRawData attitudeRaw;
 	AttitudeRawGet(&attitudeRaw);		
@@ -136,20 +169,18 @@ void updateSensors()
 	
 	struct pios_adxl345_data accel_data;
 	
-	static float gyro_bias[3] = {0,0,0};
-	float tau = (1-settings.GyroBiasTau);
-
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] = -(gyro[0] - GYRO_NEUTRAL) * GYRO_SCALE;
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] = (gyro[1] - GYRO_NEUTRAL) * GYRO_SCALE;
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] = -(gyro[2] - GYRO_NEUTRAL) * GYRO_SCALE;
 	
-	gyro_bias[0] = tau * gyro_bias[0] + (1-tau) * attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X];
-	gyro_bias[1] = tau * gyro_bias[1] + (1-tau) * attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y];
-	gyro_bias[2] = tau * gyro_bias[2] + (1-tau) * attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z];
+	// Applying integral component here so it can be seen on the gyros and correct bias
+	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] += gyro_correct_int[0];
+	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] += gyro_correct_int[1];
+
+	// Because most crafts wont get enough information from gravity to zero yaw gyro
+	gyro_correct_int[2] = (1-settings.GyroBiasTau) * gyro_correct_int[2] - settings.GyroBiasTau * attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z];
+	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] += gyro_correct_int[2];
 	
-	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] -= gyro_bias[0];
-	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] -= gyro_bias[1];
-	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] -= gyro_bias[2];
 	
 	// Get the accel data
 	uint8_t i = 0;
@@ -178,53 +209,83 @@ void updateSensors()
 	AttitudeRawSet(&attitudeRaw); 	
 }
 
-#define UPDATE_FRAC 0.99999f
-void updateAttitude()
+static void updateAttitude()
 {
 	AttitudeSettingsData settings;
 	AttitudeSettingsGet(&settings);
-
+	
 	AttitudeActualData attitudeActual;
 	AttitudeActualGet(&attitudeActual);
 	
 	AttitudeRawData attitudeRaw;
 	AttitudeRawGet(&attitudeRaw);		
-
+	
 	static portTickType lastSysTime = 0;
 	static portTickType thisSysTime;
 	
-	float accel_pitch, accel_roll;
 	static float dT = 0;
-	float tau = 1-settings.AccelTau;
 	
 	thisSysTime = xTaskGetTickCount();
 	if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
 		dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
 	lastSysTime = thisSysTime;
 	
-	// Convert into radians
-	attitudeActual.Roll = attitudeActual.Roll * M_PI / 180;
-	attitudeActual.Pitch = attitudeActual.Pitch * M_PI / 180;
-	attitudeActual.Yaw = attitudeActual.Yaw * M_PI / 180;
+	// Bad practice to assume structure order, but saves memory
+	float * q = &attitudeActual.q1;
+	float gyro[3] = {attitudeRaw.gyros_filtered[0], attitudeRaw.gyros_filtered[1], attitudeRaw.gyros_filtered[2]};
+	{
+		float * accels = attitudeRaw.accels_filtered;
+		float grot[3];
+		float accel_err[3];
+		
+		// Rotate gravity to body frame and cross with accels
+		grot[0] = -9.81 * (2 * (q[1] * q[3] - q[0] * q[2]));
+		grot[1] = -9.81 * (2 * (q[2] * q[3] + q[0] * q[1]));
+		grot[2] = -9.81 * (q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]);
+		CrossProduct((const float *) accels, (const float *) grot, accel_err);
+		
+		// Accumulate integral of error.  Scale here so that units are rad/s
+		gyro_correct_int[0] += accel_err[0] * settings.AccelKI * dT;
+		gyro_correct_int[1] += accel_err[1] * settings.AccelKI * dT;
+		//gyro_correct_int[2] += accel_err[2] * settings.AccelKI * dT;
+		
+		// Correct rates based on error, integral component dealt with in updateSensors
+		gyro[0] += accel_err[0] * settings.AccelKp;
+		gyro[1] += accel_err[1] * settings.AccelKp;
+		gyro[2] += accel_err[2] * settings.AccelKp;
+	}
 	
-	// Integrate gyros
-	attitudeActual.Roll  = PI_MOD(attitudeActual.Roll + attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] * dT * M_PI / 180);
-	attitudeActual.Pitch = PI_MOD(attitudeActual.Pitch + attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] * dT * M_PI / 180);
-	attitudeActual.Yaw += attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] * dT * M_PI / 180;
-	       
-	// Compute gravity sense of ground
-	accel_roll = atan2(-attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Y],
-			   -attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Z]);
-	accel_pitch = atan2(attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_X],
-			    -attitudeRaw.accels_filtered[ATTITUDERAW_ACCELS_FILTERED_Z]);
+	{ // scoping variables to save memory
+		// Work out time derivative from INSAlgo writeup
+		// Also accounts for the fact that gyros are in deg/s
+		float qdot[4];
+		qdot[0] = (-q[1] * gyro[0] - q[2] * gyro[1] - q[3] * gyro[2]) * dT * M_PI / 180 / 2;
+		qdot[1] = (q[0] * gyro[0] - q[3] * gyro[1] + q[2] * gyro[2]) * dT * M_PI / 180 / 2;
+		qdot[2] = (q[3] * gyro[0] + q[0] * gyro[1] - q[1] * gyro[2]) * dT * M_PI / 180 / 2;
+		qdot[3] = (-q[2] * gyro[0] + q[1] * gyro[1] + q[0] * gyro[2]) * dT * M_PI / 180 / 2;
+		
+		// Take a time step
+		q[0] = q[0] + qdot[0];
+		q[1] = q[1] + qdot[1];
+		q[2] = q[2] + qdot[2];
+		q[3] = q[3] + qdot[3];
+	}
 	
-	// Compute quaternion
-	RPY2Quaternion(&attitudeActual.Roll, &attitudeActual.q1);
+	// Renomalize
+	float qmag = sqrt(q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3]);
+	q[0] = q[0] / qmag;
+	q[1] = q[1] / qmag;
+	q[2] = q[2] / qmag;
+	q[3] = q[3] / qmag;
 	
-	// Weighted average and back into degrees
-	attitudeActual.Roll = (tau * attitudeActual.Roll + (1-tau) * accel_roll) * 180 / M_PI;
-	attitudeActual.Pitch = (tau * attitudeActual.Pitch + (1-tau) * accel_pitch) * 180 / M_PI;
-	attitudeActual.Yaw = fmod(attitudeActual.Yaw * 180 / M_PI, 360);	
+	attitudeActual.q1 = q[0];
+	attitudeActual.q2 = q[1];
+	attitudeActual.q3 = q[2];
+	attitudeActual.q4 = q[3];
+	
+	// Convert into eueler degrees (makes assumptions about RPY order)
+	Quaternion2RPY(q,&attitudeActual.Roll);	
+
 	AttitudeActualSet(&attitudeActual);
 }
 

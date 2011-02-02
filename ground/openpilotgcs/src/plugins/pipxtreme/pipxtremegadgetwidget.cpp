@@ -427,18 +427,16 @@ void PipXtremeGadgetWidget::enableTelemetry()
 
 void PipXtremeGadgetWidget::randomiseAESKey()
 {
-	uint32_t crc = ((uint32_t)qrand() << 16) ^ qrand();
+	uint32_t crc = ((uint32_t)qrand() << 16) ^ qrand() ^ QDateTime::currentDateTime().toMSecsSinceEpoch();
 
 	QString key = "";
 	for (int i = 0; i < 4; i++)
 	{
-		for (int i = 0; i < (27 + (qrand() & 0x7f)) || !(crc >> 28); i++)
+		for (int i = 0; i < (27 + (qrand() & 0x7f)); i++)
 			crc = updateCRC32(crc, qrand());
 
-		key += QString::number(crc, 16);
+		key += QString::number(crc, 16).rightJustified(8, '0');
 	}
-
-	while (key.length() < 32) key = '0' + key;
 
 	m_widget->lineEdit_AESKey->setText(key);
 }
@@ -522,10 +520,10 @@ void PipXtremeGadgetWidget::saveToFlash()
 	}
 	for (int i = 0; i < (int)sizeof(settings.aes_key); i++)
 	{
-		QString s2 = s.mid(0, 2);
+		QString s2 = s.left(2);
 		s.remove(0, 2);
 		s = s.trimmed();
-		settings.aes_key[i] = s2.toInt(&ok, 16);
+		settings.aes_key[i] = s2.toUInt(&ok, 16);
 		if (!ok)
 		{
 			error("Check your \"AES Key\" entry! .. it must contain only hex characters (0-9, a-f)", 0);
@@ -600,6 +598,8 @@ void PipXtremeGadgetWidget::sendRequestConfig()
 	if (!m_ioDevice->isOpen()) return;
 	qint64 bytes_written = m_ioDevice->write((const char*)&header, sizeof(t_pipx_config_header));
 
+//	qDebug() << "PipX m_ioDevice->write: " << QString::number(bytes_written) << endl;
+
 	Q_UNUSED(bytes_written)
 
 //	error("Bytes written", bytes_written);	// TEST ONLY
@@ -641,6 +641,8 @@ void PipXtremeGadgetWidget::sendConfig(uint32_t serial_number, t_pipx_config_dat
 
 //	error("Bytes written", bytes_written);	// TEST ONLY
 
+	Q_UNUSED(bytes_written)
+
 	// *****************
 }
 
@@ -654,6 +656,8 @@ void PipXtremeGadgetWidget::processRxStream()
 
 	if (!m_ioDevice) return;
 	if (!m_ioDevice->isOpen()) return;
+
+	QTimer::singleShot(100, this, SLOT(processRxStream()));
 
 	qint64 bytes_available = m_ioDevice->bytesAvailable();
 	if (bytes_available <= 0) return;
@@ -824,8 +828,7 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 
 				QString key = "";
 				for (int i = 0; i < (int)sizeof(settings->aes_key); i++)
-					key += QString::number(settings->aes_key[i], 16);
-				while (key.length() < 32) key = '0' + key;
+					key += QString::number(settings->aes_key[i], 16).rightJustified(2, '0');
 				m_widget->lineEdit_AESKey->setText(key);
 				m_widget->checkBox_AESEnable->setChecked(settings->aes_enable);
 			}
@@ -1001,10 +1004,11 @@ void PipXtremeGadgetWidget::connectPort()
 				settings.StopBits = STOP_1;
 				settings.FlowControl = FLOW_OFF;
 				settings.Timeout_Millisec = 1000;
+//				settings.setQueryMode(QextSerialBase::EventDriven);
 
 //				QextSerialPort *serial_dev = new QextSerialPort(str, settings, QextSerialPort::Polling);
-				QextSerialPort *serial_dev = new QextSerialPort(str, settings, QextSerialPort::EventDriven);
-//				QextSerialPort *serial_dev = new QextSerialPort(str, settings);
+//				QextSerialPort *serial_dev = new QextSerialPort(str, settings, QextSerialPort::EventDriven);
+				QextSerialPort *serial_dev = new QextSerialPort(str, settings);
 				if (!serial_dev)
 					break;
 
@@ -1054,7 +1058,8 @@ void PipXtremeGadgetWidget::connectPort()
 		m_widget->pushButton_Save->setEnabled(true);
 
 		m_ioDevice->setTextModeEnabled(false);
-		connect(m_ioDevice, SIGNAL(readyRead()), this, SLOT(processRxStream()));
+		QTimer::singleShot(100, this, SLOT(processRxStream()));
+//		connect(m_ioDevice, SIGNAL(readyRead()), this, SLOT(processRxStream()));
 
 		m_stage_retries = 0;
 		m_stage = PIPX_REQ_CONFIG;

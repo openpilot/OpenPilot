@@ -37,6 +37,8 @@
 #include <QtGui/QWidget>
 #include <QList>
 
+#define CCPM_MAX_SWASH_SERVOS 4
+
 class Ui_Widget;
 
 class ConfigccpmWidget: public ConfigTaskWidget
@@ -51,16 +53,24 @@ private:
         Ui_ccpmWidget *m_ccpm;
         QGraphicsSvgItem *SwashplateImg;
         QGraphicsSvgItem *CurveImg;
-        QGraphicsSvgItem *ServoW;
-        QGraphicsSvgItem *ServoX;
-        QGraphicsSvgItem *ServoY;
-        QGraphicsSvgItem *ServoZ;
-        QGraphicsTextItem *ServoWText;
-        QGraphicsTextItem *ServoXText;
-        QGraphicsTextItem *ServoYText;
-        QGraphicsTextItem *ServoZText;
+        //QGraphicsSvgItem *ServoW;
+        //QGraphicsSvgItem *ServoX;
+        //QGraphicsSvgItem *ServoY;
+        //QGraphicsSvgItem *ServoZ;
+        //QGraphicsTextItem *ServoWText;
+        //QGraphicsTextItem *ServoXText;
+        //QGraphicsTextItem *ServoYText;
+        //QGraphicsTextItem *ServoZText;
+        QGraphicsSvgItem *Servos[CCPM_MAX_SWASH_SERVOS];
+        QGraphicsTextItem *ServosText[CCPM_MAX_SWASH_SERVOS];
+        QGraphicsLineItem *ServoLines[CCPM_MAX_SWASH_SERVOS];
+        QSpinBox *SwashLvlSpinBoxes[CCPM_MAX_SWASH_SERVOS];
+
+        bool userConfigurationInProgress;
+        int SwashLvlState;
 
         int MixerChannelData[6];
+        int ShowDisclaimer(int messageID);
 
     private slots:
         void ccpmSwashplateUpdate();
@@ -72,6 +82,14 @@ private:
         void UpdateCurveWidgets();
         void updatePitchCurveValue(QList<double>,double);
         void updateThrottleCurveValue(QList<double>,double);
+
+        void SwashLvlStartButtonPressed();
+        void SwashLvlNextButtonPressed();
+        void SwashLvlCancelButtonPressed();
+        void SwashLvlFinishButtonPressed();
+
+        //void runChannelTests(bool state);
+
     public slots:
         void requestccpmUpdate();
         void sendccpmUpdate();

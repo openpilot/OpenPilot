@@ -33,21 +33,34 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 #include <math.h>
+#include <QMessageBox>
 
 #define  Pi 3.14159265358979323846
 
 
 ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
+    int i;
     m_ccpm = new Ui_ccpmWidget();
     m_ccpm->setupUi(this);
-
+    userConfigurationInProgress=0;
+    SwashLvlState=0;
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
     //ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     //UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
     // Initialization of the swashplaye widget
     m_ccpm->SwashplateImage->setScene(new QGraphicsScene(this));
+
+    m_ccpm->SwashLvlSwashplateImage->setScene(m_ccpm->SwashplateImage->scene());
+    m_ccpm->SwashLvlSwashplateImage->setSceneRect(-50,-30,500,500);
+    m_ccpm->SwashLvlSwashplateImage->scale(.85,.85);
+
+    //m_ccpm->SwashplateImage->setSceneRect(SwashplateImg->boundingRect());
+    m_ccpm->SwashplateImage->setSceneRect(-50,-30,500,500);
+    m_ccpm->SwashplateImage->scale(.85,.85);
+
+
 
     QSvgRenderer *renderer = new QSvgRenderer();
     renderer->load(QString(":/configgadget/images/ccpm_setup.svg"));
@@ -58,56 +71,94 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     SwashplateImg->setElementId("Swashplate");
     SwashplateImg->setObjectName("Swashplate");
     m_ccpm->SwashplateImage->scene()->addItem(SwashplateImg);
-    m_ccpm->SwashplateImage->setSceneRect(SwashplateImg->boundingRect());
-
-    m_ccpm->SwashplateImage->scale(.75,.75);
-
-    ServoW = new QGraphicsSvgItem();
-    ServoW->setSharedRenderer(renderer);
-    ServoW->setElementId("ServoW");
-    m_ccpm->SwashplateImage->scene()->addItem(ServoW);
-
-    ServoX = new QGraphicsSvgItem();
-    ServoX->setSharedRenderer(renderer);
-    ServoX->setElementId("ServoX");
-    m_ccpm->SwashplateImage->scene()->addItem(ServoX);
-
-    ServoY = new QGraphicsSvgItem();
-    ServoY->setSharedRenderer(renderer);
-    ServoY->setElementId("ServoY");
-    m_ccpm->SwashplateImage->scene()->addItem(ServoY);
-
-    ServoZ = new QGraphicsSvgItem();
-    ServoZ->setSharedRenderer(renderer);
-    ServoZ->setElementId("ServoZ");
-    m_ccpm->SwashplateImage->scene()->addItem(ServoZ);
 
     QFont serifFont("Times", 16, QFont::Bold);
+    QPen pen;  // creates a default pen
 
-    ServoWText = new QGraphicsTextItem();
-    ServoWText->setDefaultTextColor(Qt::red);
-    ServoWText->setPlainText(QString("-"));
-    ServoWText->setFont(serifFont);
-    m_ccpm->SwashplateImage->scene()->addItem(ServoWText);
+    pen.setStyle(Qt::DotLine);
+    pen.setWidth(2);
+    pen.setBrush(Qt::gray);
+    pen.setCapStyle(Qt::RoundCap);
+    pen.setJoinStyle(Qt::RoundJoin);
 
-    ServoXText = new QGraphicsTextItem();
-    ServoXText->setDefaultTextColor(Qt::red);
-    ServoXText->setPlainText(QString("-"));
-    ServoXText->setFont(serifFont);
-    m_ccpm->SwashplateImage->scene()->addItem(ServoXText);
+    QList<QString> ServoNames;
+    ServoNames << "ServoW" << "ServoX" << "ServoY" << "ServoZ" ;
 
-    ServoYText = new QGraphicsTextItem();
-    ServoYText->setDefaultTextColor(Qt::red);
-    ServoYText->setPlainText(QString("-"));
-    ServoYText->setFont(serifFont);
-    m_ccpm->SwashplateImage->scene()->addItem(ServoYText);
+    for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++)
+    {
+        ServoLines[i] = m_ccpm->SwashLvlSwashplateImage->scene()->addLine(0,0,100*i,i*i*100,pen);
 
-    ServoZText = new QGraphicsTextItem();
-    ServoZText->setDefaultTextColor(Qt::red);
-    ServoZText->setPlainText(QString("-"));
-    ServoZText->setFont(serifFont);
-    m_ccpm->SwashplateImage->scene()->addItem(ServoZText);
+        Servos[i] = new QGraphicsSvgItem();
+        Servos[i]->setSharedRenderer(renderer);
+        Servos[i]->setElementId(ServoNames.at(i));
+        m_ccpm->SwashplateImage->scene()->addItem(Servos[i]);
 
+        ServosText[i] = new QGraphicsTextItem();
+        ServosText[i]->setDefaultTextColor(Qt::red);
+        ServosText[i]->setPlainText(QString("-"));
+        ServosText[i]->setFont(serifFont);
+        m_ccpm->SwashplateImage->scene()->addItem(ServosText[i]);
+
+
+        SwashLvlSpinBoxes[i] = new QSpinBox(m_ccpm->SwashLvlSwashplateImage);       // use QGraphicsView
+        m_ccpm->SwashLvlSwashplateImage->scene()->addWidget(SwashLvlSpinBoxes[i]);
+        //SwashLvlSpinBoxes[i]->move(i*50+50,20);
+        //SwashLvlSpinBoxes[i]->resize(40,20);
+        //SwashLvlSpinBoxes[i]->heightForWidth()
+        SwashLvlSpinBoxes[i]->setFixedSize(50,20);
+        SwashLvlSpinBoxes[i]->setMaximum(10000);
+        SwashLvlSpinBoxes[i]->setMinimum(0);
+        SwashLvlSpinBoxes[i]->setValue(0);
+
+    }
+
+
+/*
+    Servos[0] = new QGraphicsSvgItem();
+    Servos[0]->setSharedRenderer(renderer);
+    Servos[0]->setElementId("ServoW");
+    m_ccpm->SwashplateImage->scene()->addItem(Servos[0]);
+
+    Servos[1] = new QGraphicsSvgItem();
+    Servos[1]->setSharedRenderer(renderer);
+    Servos[1]->setElementId("ServoX");
+    m_ccpm->SwashplateImage->scene()->addItem(Servos[1]);
+
+    Servos[2] = new QGraphicsSvgItem();
+    Servos[2]->setSharedRenderer(renderer);
+    Servos[2]->setElementId("ServoY");
+    m_ccpm->SwashplateImage->scene()->addItem(Servos[2]);
+
+    Servos[3] = new QGraphicsSvgItem();
+    Servos[3]->setSharedRenderer(renderer);
+    Servos[3]->setElementId("ServoZ");
+    m_ccpm->SwashplateImage->scene()->addItem(Servos[3]);
+
+
+    ServosText[0] = new QGraphicsTextItem();
+    ServosText[0]->setDefaultTextColor(Qt::red);
+    ServosText[0]->setPlainText(QString("-"));
+    ServosText[0]->setFont(serifFont);
+    m_ccpm->SwashplateImage->scene()->addItem(ServosText[0]);
+
+    ServosText[1] = new QGraphicsTextItem();
+    ServosText[1]->setDefaultTextColor(Qt::red);
+    ServosText[1]->setPlainText(QString("-"));
+    ServosText[1]->setFont(serifFont);
+    m_ccpm->SwashplateImage->scene()->addItem(ServosText[1]);
+
+    ServosText[2] = new QGraphicsTextItem();
+    ServosText[2]->setDefaultTextColor(Qt::red);
+    ServosText[2]->setPlainText(QString("-"));
+    ServosText[2]->setFont(serifFont);
+    m_ccpm->SwashplateImage->scene()->addItem(ServosText[2]);
+
+    ServosText[3] = new QGraphicsTextItem();
+    ServosText[3]->setDefaultTextColor(Qt::red);
+    ServosText[3]->setPlainText(QString("-"));
+    ServosText[3]->setFont(serifFont);
+    m_ccpm->SwashplateImage->scene()->addItem(ServosText[3]);
+*/
     m_ccpm->PitchCurve->setMin(-1);
 
     resetMixer(m_ccpm->PitchCurve, 5);
@@ -177,6 +228,11 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     connect(m_ccpm->PitchCurve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updatePitchCurveValue(QList<double>,double)));
     connect(m_ccpm->ThrottleCurve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateThrottleCurveValue(QList<double>,double)));
+
+    connect(m_ccpm->SwashLvlStartButton, SIGNAL(clicked()), this, SLOT(SwashLvlStartButtonPressed()));
+    connect(m_ccpm->SwashLvlNextButton, SIGNAL(clicked()), this, SLOT(SwashLvlNextButtonPressed()));
+    connect(m_ccpm->SwashLvlCancelButton, SIGNAL(clicked()), this, SLOT(SwashLvlCancelButtonPressed()));
+    connect(m_ccpm->SwashLvlFinishButton, SIGNAL(clicked()), this, SLOT(SwashLvlFinishButtonPressed()));
 
 
 
@@ -601,8 +657,8 @@ void ConfigccpmWidget::GenerateCurve()
 
 void ConfigccpmWidget::ccpmSwashplateUpdate()
 {
-    double angle,CorrectionAngle,x,y,CenterX,CenterY;
-    int used;
+    double angle[CCPM_MAX_SWASH_SERVOS],CorrectionAngle,x,y,CenterX,CenterY;
+    int used[CCPM_MAX_SWASH_SERVOS],i;
 
     CorrectionAngle=m_ccpm->ccpmCorrectionAngle->value();
 
@@ -613,50 +669,109 @@ void ConfigccpmWidget::ccpmSwashplateUpdate()
 
     SwashplateImg->setPos(CenterX-200,CenterY-200);
 
+    used[0]=((m_ccpm->ccpmServoWChannel->currentIndex()<8)&&(m_ccpm->ccpmServoWChannel->isEnabled()));
+    used[1]=((m_ccpm->ccpmServoXChannel->currentIndex()<8)&&(m_ccpm->ccpmServoXChannel->isEnabled()));
+    used[2]=((m_ccpm->ccpmServoYChannel->currentIndex()<8)&&(m_ccpm->ccpmServoYChannel->isEnabled()));
+    used[3]=((m_ccpm->ccpmServoZChannel->currentIndex()<8)&&(m_ccpm->ccpmServoZChannel->isEnabled()));
+    angle[0]=(CorrectionAngle+180+m_ccpm->ccpmAngleW->value())*Pi/180.00;
+    angle[1]=(CorrectionAngle+180+m_ccpm->ccpmAngleX->value())*Pi/180.00;
+    angle[2]=(CorrectionAngle+180+m_ccpm->ccpmAngleY->value())*Pi/180.00;
+    angle[3]=(CorrectionAngle+180+m_ccpm->ccpmAngleZ->value())*Pi/180.00;
+
+
+    for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++)
+    {
+        x=CenterX-(200.00*sin(angle[i]))-10.00;
+        y=CenterY+(200.00*cos(angle[i]))-10.00;
+        Servos[i]->setPos(x, y);
+        Servos[i]->setVisible(used[i]!=0);
+
+        x=CenterX-(170.00*sin(angle[i]))-10.00;
+        y=CenterY+(170.00*cos(angle[i]))-10.00;
+        ServosText[i]->setPos(x, y);
+        ServosText[i]->setVisible(used[i]!=0);
+
+        x=CenterX-(205.00*sin(angle[i]))+25;
+        y=CenterY+(205.00*cos(angle[i]))+2;
+        SwashLvlSpinBoxes[i]->move(x,y);
+        SwashLvlSpinBoxes[i]->setVisible(used[i]!=0);
+
+
+        x=CenterX-(220.00*sin(angle[i]));
+        y=CenterY+(220.00*cos(angle[i]));
+        ServoLines[i]->setLine(CenterX,CenterY,x,y);
+        ServoLines[i]->setVisible(used[i]!=0);
+    }
+
+/*
     used=((m_ccpm->ccpmServoWChannel->currentIndex()<8)&&(m_ccpm->ccpmServoWChannel->isEnabled()));
-    ServoW->setVisible(used!=0);
-    ServoWText->setVisible(used!=0);
+    Servos[0]->setVisible(used!=0);
+    ServosText[0]->setVisible(used!=0);
     angle=(CorrectionAngle+180+m_ccpm->ccpmAngleW->value())*Pi/180.00;
     x=CenterX-(200.00*sin(angle))-10.00;
     y=CenterY+(200.00*cos(angle))-10.00;
-    ServoW->setPos(x, y);
+    Servos[0]->setPos(x, y);
     x=CenterX-(170.00*sin(angle))-10.00;
     y=CenterY+(170.00*cos(angle))-10.00;
-    ServoWText->setPos(x, y);
+    ServosText[0]->setPos(x, y);
+    x=CenterX-(220.00*sin(angle));
+    y=CenterY+(220.00*cos(angle));
+    SwashLvlSpinBoxes[0]->move(x,y);
+    SwashLvlSpinBoxes[0]->setVisible(used!=0);
+    ServoLines[0]->setLine(CenterX,CenterY,x,y);
+    ServoLines[0]->setVisible(used!=0);
 
     used=((m_ccpm->ccpmServoXChannel->currentIndex()<8)&&(m_ccpm->ccpmServoXChannel->isEnabled()));
-    ServoX->setVisible(used!=0);
-    ServoXText->setVisible(used!=0);
+    Servos[1]->setVisible(used!=0);
+    ServosText[1]->setVisible(used!=0);
     angle=(CorrectionAngle+180+m_ccpm->ccpmAngleX->value())*Pi/180.00;
     x=CenterX-(200.00*sin(angle))-10.00;
     y=CenterY+(200.00*cos(angle))-10.00;
-    ServoX->setPos(x, y);
+    Servos[1]->setPos(x, y);
     x=CenterX-(170.00*sin(angle))-10.00;
     y=CenterY+(170.00*cos(angle))-10.00;
-    ServoXText->setPos(x, y);
+    ServosText[1]->setPos(x, y);
+    x=CenterX-(220.00*sin(angle));
+    y=CenterY+(220.00*cos(angle));
+    SwashLvlSpinBoxes[1]->move(x,y);
+    SwashLvlSpinBoxes[1]->setVisible(used!=0);
+    ServoLines[1]->setLine(CenterX,CenterY,x,y);
+    ServoLines[1]->setVisible(used!=0);
 
     used=((m_ccpm->ccpmServoYChannel->currentIndex()<8)&&(m_ccpm->ccpmServoYChannel->isEnabled()));
-    ServoY->setVisible(used!=0);
-    ServoYText->setVisible(used!=0);
+    Servos[2]->setVisible(used!=0);
+    ServosText[2]->setVisible(used!=0);
     angle=(CorrectionAngle+180+m_ccpm->ccpmAngleY->value())*Pi/180.00;
     x=CenterX-(200.00*sin(angle))-10.00;
     y=CenterY+(200.00*cos(angle))-10.00;
-    ServoY->setPos(x, y);
+    Servos[2]->setPos(x, y);
     x=CenterX-(170.00*sin(angle))-10.00;
     y=CenterY+(170.00*cos(angle))-10.00;
-    ServoYText->setPos(x, y);
+    ServosText[2]->setPos(x, y);
+    x=CenterX-(220.00*sin(angle));
+    y=CenterY+(220.00*cos(angle));
+    SwashLvlSpinBoxes[2]->move(x,y);
+    SwashLvlSpinBoxes[2]->setVisible(used!=0);
+    ServoLines[2]->setLine(CenterX,CenterY,x,y);
+    ServoLines[2]->setVisible(used!=0);
 
     used=((m_ccpm->ccpmServoZChannel->currentIndex()<8)&&(m_ccpm->ccpmServoZChannel->isEnabled()));
-    ServoZ->setVisible(used!=0);
-    ServoZText->setVisible(used!=0);
+    Servos[3]->setVisible(used!=0);
+    ServosText[3]->setVisible(used!=0);
     angle=(CorrectionAngle+180+m_ccpm->ccpmAngleZ->value())*Pi/180.00;
     x=CenterX-(200.00*sin(angle))-10.00;
     y=CenterY+(200.00*cos(angle))-10.00;
-    ServoZ->setPos(x, y);
+    Servos[3]->setPos(x, y);
     x=CenterX-(170.00*sin(angle))-10.00;
     y=CenterY+(170.00*cos(angle))-10.00;
-    ServoZText->setPos(x, y);
-
+    ServosText[3]->setPos(x, y);
+    x=CenterX-(220.00*sin(angle));
+    y=CenterY+(220.00*cos(angle));
+    SwashLvlSpinBoxes[3]->move(x,y);
+    SwashLvlSpinBoxes[3]->setVisible(used!=0);
+    ServoLines[3]->setLine(CenterX,CenterY,x,y);
+    ServoLines[3]->setVisible(used!=0);
+*/
     //m_ccpm->SwashplateImage->centerOn (CenterX, CenterY);
 
     //m_ccpm->SwashplateImage->fitInView(SwashplateImg, Qt::KeepAspectRatio);
@@ -699,10 +814,10 @@ void ConfigccpmWidget::UpdateMixer()
         ThisEnable[4] = m_ccpm->ccpmServoYChannel->isEnabled();
         ThisEnable[5] = m_ccpm->ccpmServoZChannel->isEnabled();
 
-        ServoWText->setPlainText(QString("%1").arg( MixerChannelData[2]+1 ));
-        ServoXText->setPlainText(QString("%1").arg( MixerChannelData[3]+1 ));
-        ServoYText->setPlainText(QString("%1").arg( MixerChannelData[4]+1 ));
-        ServoZText->setPlainText(QString("%1").arg( MixerChannelData[5]+1 ));
+        ServosText[0]->setPlainText(QString("%1").arg( MixerChannelData[2]+1 ));
+        ServosText[1]->setPlainText(QString("%1").arg( MixerChannelData[3]+1 ));
+        ServosText[2]->setPlainText(QString("%1").arg( MixerChannelData[4]+1 ));
+        ServosText[3]->setPlainText(QString("%1").arg( MixerChannelData[5]+1 ));
 
 
         //go through the user data and update the mixer matrix
@@ -741,7 +856,7 @@ void ConfigccpmWidget::UpdateMixer()
                 {//Swashplate
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,1)->setText(QString("%1").arg(0));//ThrottleCurve1
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,2)->setText(QString("%1").arg((int)(127.0*CollectiveConstant)));//ThrottleCurve2
-                    m_ccpm->ccpmAdvancedSettingsTable->item(i,3)->setText(QString("%1").arg((int)(127.0*(1-CollectiveConstant)*sin((CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Roll
+                    m_ccpm->ccpmAdvancedSettingsTable->item(i,3)->setText(QString("%1").arg((int)(127.0*(1-CollectiveConstant)*sin((180+CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Roll
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,4)->setText(QString("%1").arg((int)(127.0*(1-CollectiveConstant)*cos((CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Pitch
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,5)->setText(QString("%1").arg(0));//Yaw
 
@@ -785,6 +900,8 @@ void ConfigccpmWidget::requestccpmUpdate()
     double a1,a2;
     int HeadRotation,temp;
     int isCCPM=0;
+
+    if (userConfigurationInProgress)return;
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -914,7 +1031,7 @@ void ConfigccpmWidget::requestccpmUpdate()
         //MixerDataFromHeli[i][3]=(127.0*(1-CollectiveConstant)*cos((CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Pitch
         a1=((double)MixerDataFromHeli[ServoChannels[j]][2]/(1.27*(100.0-Collective)));
         a2=((double)MixerDataFromHeli[ServoChannels[j]][3]/(1.27*(100.0-Collective)));
-        ServoAngles[j]=fmod(360.0+atan2(a1,a2)/(Pi/180.00),360.0);
+        ServoAngles[j]=fmod(360.0+atan2(-a1,a2)/(Pi/180.00),360.0);
         //check the angles for one being a multiple of 90deg
         if (fmod(ServoAngles[j],90)<MaxAngleError)
         {
@@ -1053,6 +1170,8 @@ void ConfigccpmWidget::sendccpmUpdate()
     UAVObjectField *field;
     UAVDataObject* obj;
 
+    if (userConfigurationInProgress)return;
+    ShowDisclaimer(1);
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
@@ -1131,6 +1250,8 @@ void ConfigccpmWidget::sendccpmUpdate()
   */
 void ConfigccpmWidget::saveccpmUpdate()
 {
+    if (userConfigurationInProgress)return;
+    ShowDisclaimer(0);
     // Send update so that the latest value is saved
     sendccpmUpdate();
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -1161,3 +1282,269 @@ void ConfigccpmWidget::showEvent(QShowEvent *event)
     }
 }
 
+
+void ConfigccpmWidget::SwashLvlStartButtonPressed()
+{
+    QMessageBox msgBox;
+    //int i;
+     msgBox.setText("Swashplate Leveling Routine");
+     msgBox.setInformativeText("You are about to start the Swashplate levelling routine. \nThis process will start by downloading the current configuration from the GCS to the OP hardware and will adjust your configuration at various stages.\nThe final state of your system should match the current configuration in the GCS config gadget.\nPlease ensure all ccpm settings in the GCS are correct before continuing.\nIf this process is interrupted, then the state of your OP board may not match the GCS configuration.\nAfter completing this process, please check all settings before attempting to fly.\n\nPlease disconnect your motor to ensure it will not spin up.\n\n\n Do you wish to proceed?");
+     msgBox.setStandardButtons(QMessageBox::Yes |  QMessageBox::Cancel);
+     msgBox.setDefaultButton(QMessageBox::Cancel);
+     msgBox.setIcon(QMessageBox::Information);
+     int ret = msgBox.exec();
+
+     switch (ret) {
+        case QMessageBox::Yes:
+            // Yes was clicked
+            SwashLvlState=0;
+            userConfigurationInProgress=1;
+
+            m_ccpm->SwashLvlStartButton->setEnabled(false);
+            m_ccpm->SwashLvlNextButton->setEnabled(true);
+            m_ccpm->SwashLvlCancelButton->setEnabled(true);
+            m_ccpm->SwashLvlFinishButton->setEnabled(false);
+            //clear status check boxes
+            m_ccpm->SwashLvlStepList->item(0)->setCheckState(Qt::Unchecked);
+            m_ccpm->SwashLvlStepList->item(1)->setCheckState(Qt::Unchecked);
+            m_ccpm->SwashLvlStepList->item(2)->setCheckState(Qt::Unchecked);
+            m_ccpm->SwashLvlStepList->item(3)->setCheckState(Qt::Unchecked);
+
+
+            //download the current settings to the OP hw
+            sendccpmUpdate();
+
+            //save off the old ActuatorSettings for the swashplate servos
+
+            //copy to new Actuator settings.
+
+            //store swashplate actuator numbers in array for levelling routine use...
+            //int ccpmServosChannel[CCPM_MAX_SWASH_SERVOS];
+            //ccpmServosChannel[0]=m_ccpm->ccpmServoWChannel->currentIndex();
+            //ccpmServosChannel[1]=m_ccpm->ccpmServoXChannel;
+            //ccpmServosChannel[2]=m_ccpm->ccpmServoYChannel;
+            //ccpmServosChannel[3]=m_ccpm->ccpmServoZChannel;
+
+            //int used[CCPM_MAX_SWASH_SERVOS];
+
+
+            //remove Flight control of ActuatorCommand
+            //runChannelTests(true);
+
+            //goto the first step
+            SwashLvlNextButtonPressed();
+        break;
+        case QMessageBox::Cancel:
+            // Cancel was clicked
+            SwashLvlState=0;
+            userConfigurationInProgress=0;
+
+            m_ccpm->SwashLvlStartButton->setEnabled(true);
+            m_ccpm->SwashLvlNextButton->setEnabled(false);
+            m_ccpm->SwashLvlCancelButton->setEnabled(false);
+            m_ccpm->SwashLvlFinishButton->setEnabled(false);
+            break;
+        default:
+            // should never be reached
+            break;
+      }
+
+
+}
+void ConfigccpmWidget::SwashLvlNextButtonPressed()
+{
+    ShowDisclaimer(2);
+    SwashLvlState++;
+    //int i;
+
+
+
+
+    switch (SwashLvlState)
+    {
+    case 0:
+        break;
+    case 1: //Neutral levelling
+        m_ccpm->SwashLvlStepList->setCurrentRow(0);
+        //set swashplate servos to Neutral values
+        //set spin boxes to neutral values
+        /*for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++)
+        {
+            used[i]=((ccpmServosChannel[i]->currentIndex()<8)&&(ccpmServosChannel[i]->isEnabled()));
+            if (used[i])SwashLvlSpinBoxes[ccpmServosChannel[i]->currentIndex()]->setValue(i);
+        }*/
+        //change control mode to gcs control / disarmed
+        //set throttle to 0
+        //disable position slider
+        m_ccpm->SwashLvlPositionSlider->setEnabled(false);
+        m_ccpm->SwashLvlPositionSpinBox->setEnabled(false);
+        //set position slider to 50%
+        m_ccpm->SwashLvlPositionSlider->setValue(50);
+        m_ccpm->SwashLvlPositionSpinBox->setValue(50);
+        //issue user instructions
+        m_ccpm->SwashLvlStepInstruction->setText("Neutral levelling");
+        break;
+    case 2: //Max levelling
+        //check Neutral status as complete
+        m_ccpm->SwashLvlStepList->item(0)->setCheckState(Qt::Checked);
+        m_ccpm->SwashLvlStepList->setCurrentRow(1);
+        //set swashplate servos to Max values
+        //set spin boxes to max values
+        //set position slider to 100%
+        m_ccpm->SwashLvlPositionSlider->setValue(100);
+        m_ccpm->SwashLvlPositionSpinBox->setValue(100);
+        //issue user instructions
+        m_ccpm->SwashLvlStepInstruction->setText("Max levelling");
+        break;
+    case 3: //Min levelling
+        //check Max status as complete
+        m_ccpm->SwashLvlStepList->item(1)->setCheckState(Qt::Checked);
+        m_ccpm->SwashLvlStepList->setCurrentRow(2);
+        //set swashplate servos to Min values
+        //set spin boxes to min values
+        //set position slider to 0%
+        m_ccpm->SwashLvlPositionSlider->setValue(0);
+        m_ccpm->SwashLvlPositionSpinBox->setValue(0);
+        //issue user instructions
+        m_ccpm->SwashLvlStepInstruction->setText("Min levelling");
+         break;
+    case 4: //levelling verification
+        //check Min status as complete
+        m_ccpm->SwashLvlStepList->item(2)->setCheckState(Qt::Checked);
+        m_ccpm->SwashLvlStepList->setCurrentRow(3);
+        //enable position slider
+        m_ccpm->SwashLvlPositionSlider->setEnabled(true);
+        m_ccpm->SwashLvlPositionSpinBox->setEnabled(true);
+        //issue user instructions
+        m_ccpm->SwashLvlStepInstruction->setText("levelling verification");
+         break;
+    case 5: //levelling complete
+        //check verify status as complete
+        m_ccpm->SwashLvlStepList->item(3)->setCheckState(Qt::Checked);
+        //issue user instructions
+        m_ccpm->SwashLvlStepInstruction->setText("levelling complete");
+        //disable position slider
+        m_ccpm->SwashLvlPositionSlider->setEnabled(false);
+        m_ccpm->SwashLvlPositionSpinBox->setEnabled(false);
+
+        m_ccpm->SwashLvlStartButton->setEnabled(false);
+        m_ccpm->SwashLvlNextButton->setEnabled(false);
+        m_ccpm->SwashLvlCancelButton->setEnabled(false);
+        m_ccpm->SwashLvlFinishButton->setEnabled(true);
+
+    default:
+        //restore collective/cyclic setting
+        //restore pitch curve
+        //clear spin boxes
+        //change control mode to gcs control (OFF) / disarmed
+        //issue user confirmation
+        break;
+    }
+}
+void ConfigccpmWidget::SwashLvlCancelButtonPressed()
+{
+    SwashLvlState=0;
+    m_ccpm->SwashLvlStartButton->setEnabled(true);
+    m_ccpm->SwashLvlNextButton->setEnabled(false);
+    m_ccpm->SwashLvlCancelButton->setEnabled(false);
+    m_ccpm->SwashLvlFinishButton->setEnabled(false);
+
+    //restore old Actuator Settings
+
+    //restore Flight control of ActuatorCommand
+    //runChannelTests(false);
+
+    userConfigurationInProgress=0;
+}
+
+
+void ConfigccpmWidget::SwashLvlFinishButtonPressed()
+{
+    ShowDisclaimer(0);
+    ShowDisclaimer(2);
+    m_ccpm->SwashLvlStartButton->setEnabled(true);
+    m_ccpm->SwashLvlNextButton->setEnabled(false);
+    m_ccpm->SwashLvlCancelButton->setEnabled(false);
+    m_ccpm->SwashLvlFinishButton->setEnabled(false);
+
+    //save new Actuator Settings
+
+    //restore Flight control of ActuatorCommand
+    //runChannelTests(false);
+
+    userConfigurationInProgress=0;
+}
+
+int ConfigccpmWidget::ShowDisclaimer(int messageID)
+{
+     QMessageBox msgBox;
+     msgBox.setText("Warning!!!");
+     int ret;
+     switch (messageID) {
+        case 0:
+            // Basic disclaimer
+             msgBox.setInformativeText("This code has many configurations.\n\nPlease double check all settings before attempting flight!");
+             msgBox.setStandardButtons(QMessageBox::Ok);
+             msgBox.setDefaultButton(QMessageBox::Ok);
+             msgBox.setIcon(QMessageBox::Information);
+             ret = msgBox.exec();
+             return 0;
+            break;
+        case 1:
+            // Not Tested disclaimer
+             msgBox.setInformativeText("The CCPM mixer code has not been used to fly a helicopter!\n\nUse it at your own risk!\n\nDo you wish to continue?");
+             msgBox.setStandardButtons(QMessageBox::Yes |  QMessageBox::Cancel);
+             msgBox.setDefaultButton(QMessageBox::Cancel);
+             msgBox.setIcon(QMessageBox::Warning);
+             ret = msgBox.exec();
+             switch (ret)
+             {
+             case QMessageBox::Cancel: return -1;
+             case QMessageBox::Yes: return 0;
+             }
+            break;
+        case 2:
+            // DO NOT use
+            msgBox.setInformativeText("The CCPM swashplate levelling code is NOT complete!\n\nDO NOT use it for flight!");
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.setDefaultButton(QMessageBox::Ok);
+            msgBox.setIcon(QMessageBox::Critical);
+            ret = msgBox.exec();
+            return 0;
+            break;
+       default:
+            // should never be reached
+            break;
+        }
+    return -1;
+}
+
+
+/**
+  Toggles the channel testing mode by making the GCS take over
+  the ActuatorCommand objects
+  */
+/*void ConfigccpmWidget::runChannelTests(bool state)
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorCommand")));
+    UAVObject::Metadata mdata = obj->getMetadata();
+    if (state)
+    {
+        accInitialData = mdata;
+        mdata.flightAccess = UAVObject::ACCESS_READONLY;
+        mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+        mdata.gcsTelemetryAcked = false;
+        mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
+        mdata.gcsTelemetryUpdatePeriod = 100;
+    }
+    else
+    {
+        mdata = accInitialData; // Restore metadata
+    }
+    obj->setMetadata(mdata);
+
+}
+*/

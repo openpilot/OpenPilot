@@ -179,6 +179,7 @@ private slots:
 	void randomiseAESKey();
 	void scanSpectrum();
 	void saveToFlash();
+	void textChangedAESKey(const QString &text);
 	void processStream();
 	void processRxStream();
 

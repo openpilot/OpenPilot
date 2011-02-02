@@ -210,6 +210,7 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 	connect(m_widget->pushButton_AESKeyRandom, SIGNAL(clicked()), this, SLOT(randomiseAESKey()));
 	connect(m_widget->pushButton_ScanSpectrum, SIGNAL(clicked()), this, SLOT(scanSpectrum()));
 	connect(m_widget->pushButton_Save, SIGNAL(clicked()), this, SLOT(saveToFlash()));
+	connect(m_widget->lineEdit_AESKey, SIGNAL(textChanged(const QString &)), this, SLOT(textChangedAESKey(const QString &)));
 }
 
 // destructor .. this never gets called :(
@@ -431,11 +432,13 @@ void PipXtremeGadgetWidget::randomiseAESKey()
 	QString key = "";
 	for (int i = 0; i < 4; i++)
 	{
-		for (int i = 0; i < 27 + (qrand() & 0x7f); i++)
+		for (int i = 0; i < (27 + (qrand() & 0x7f)) || !(crc >> 28); i++)
 			crc = updateCRC32(crc, qrand());
 
 		key += QString::number(crc, 16);
 	}
+
+	while (key.length() < 32) key = '0' + key;
 
 	m_widget->lineEdit_AESKey->setText(key);
 }
@@ -453,7 +456,6 @@ void PipXtremeGadgetWidget::saveToFlash()
 	if (!m_ioDevice->isOpen()) return;
 
 	QString s;
-	uint32_t i;
 	bool ok;
 
 	t_pipx_config_data_settings settings;
@@ -512,12 +514,13 @@ void PipXtremeGadgetWidget::saveToFlash()
 	memset(settings.aes_key, 0, sizeof(settings.aes_key));
 	s = m_widget->lineEdit_AESKey->text().trimmed();
 	s.replace(' ', "");	// remove all spaces
+	while (s.length() < 32) s = '0' + s;
 	if (settings.aes_enable && s.length() != 32)
 	{
 		error("Check your \"AES Key\" entry! .. it must be 32 hex characters long", 0);
 		return;
 	}
-	for (int i = 0; i < sizeof(settings.aes_key); i++)
+	for (int i = 0; i < (int)sizeof(settings.aes_key); i++)
 	{
 		QString s2 = s.mid(0, 2);
 		s.remove(0, 2);
@@ -564,6 +567,13 @@ void PipXtremeGadgetWidget::saveToFlash()
 	sendConfig(serial_number, &settings);
 }
 
+void PipXtremeGadgetWidget::textChangedAESKey(const QString &text)
+{
+	QString s = text;
+	s.replace(' ', "");
+	m_widget->label_AESkey->setText("AES Encryption Key (" + QString::number(s.length()) + ")");
+}
+
 // ***************************************************************************************
 // send various config packets
 
@@ -589,6 +599,8 @@ void PipXtremeGadgetWidget::sendRequestConfig()
 	if (!m_ioDevice) return;
 	if (!m_ioDevice->isOpen()) return;
 	qint64 bytes_written = m_ioDevice->write((const char*)&header, sizeof(t_pipx_config_header));
+
+	Q_UNUSED(bytes_written)
 
 //	error("Bytes written", bytes_written);	// TEST ONLY
 
@@ -677,9 +689,9 @@ void PipXtremeGadgetWidget::processRxStream()
 	}
 
 	// add the new data into the buffer
-	qint64 bytes_read = m_ioDevice->read((char *)(device_input_buffer.buffer + device_input_buffer.used), bytes_available);
+	qint64 bytes_read = m_ioDevice->read((char *)(device_input_buffer.buffer + device_input_buffer.used), device_input_buffer.size - device_input_buffer.used);
 	if (bytes_read <= 0) return;
-	device_input_buffer.used += bytes_available;
+	device_input_buffer.used += bytes_read;
 
 	processRxBuffer();
 }
@@ -687,10 +699,10 @@ void PipXtremeGadgetWidget::processRxStream()
 void PipXtremeGadgetWidget::processRxBuffer()
 {	// scan the buffer for a valid packet
 
-	if (!device_input_buffer.buffer || device_input_buffer.used < sizeof(t_pipx_config_header))
+	if (!device_input_buffer.buffer || device_input_buffer.used < (int)sizeof(t_pipx_config_header))
 		return;	// no data as yet or not yet enough data
 
-	while (device_input_buffer.used >= sizeof(t_pipx_config_header))
+	while (device_input_buffer.used >= (int)sizeof(t_pipx_config_header))
 	{
 		uint32_t crc1, crc2;
 
@@ -771,7 +783,7 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 		case pipx_packet_type_config:
 			if (m_stage == PIPX_REQ_CONFIG)
 			{
-				if (packet_size < sizeof(t_pipx_config_header) + sizeof(t_pipx_config_data_settings))
+				if (packet_size < (int)sizeof(t_pipx_config_header) + (int)sizeof(t_pipx_config_data_settings))
 					break;	// packet size is too small - error
 
 				m_stage = PIPX_IDLE;
@@ -811,8 +823,9 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 				m_widget->comboBox_SerialPortSpeed->setCurrentIndex(m_widget->comboBox_SerialPortSpeed->findData(settings->serial_baudrate));
 
 				QString key = "";
-				for (int i = 0; i < sizeof(settings->aes_key); i++)
+				for (int i = 0; i < (int)sizeof(settings->aes_key); i++)
 					key += QString::number(settings->aes_key[i], 16);
+				while (key.length() < 32) key = '0' + key;
 				m_widget->lineEdit_AESKey->setText(key);
 				m_widget->checkBox_AESEnable->setChecked(settings->aes_enable);
 			}
@@ -990,7 +1003,8 @@ void PipXtremeGadgetWidget::connectPort()
 				settings.Timeout_Millisec = 1000;
 
 //				QextSerialPort *serial_dev = new QextSerialPort(str, settings, QextSerialPort::Polling);
-				QextSerialPort *serial_dev = new QextSerialPort(str, settings);
+				QextSerialPort *serial_dev = new QextSerialPort(str, settings, QextSerialPort::EventDriven);
+//				QextSerialPort *serial_dev = new QextSerialPort(str, settings);
 				if (!serial_dev)
 					break;
 
@@ -1039,6 +1053,7 @@ void PipXtremeGadgetWidget::connectPort()
 		m_widget->pushButton_ScanSpectrum->setEnabled(true);
 		m_widget->pushButton_Save->setEnabled(true);
 
+		m_ioDevice->setTextModeEnabled(false);
 		connect(m_ioDevice, SIGNAL(readyRead()), this, SLOT(processRxStream()));
 
 		m_stage_retries = 0;

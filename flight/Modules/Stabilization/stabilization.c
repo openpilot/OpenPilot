@@ -45,7 +45,13 @@
 
 // Private constants
 #define MAX_QUEUE_SIZE 1
+
+#if defined(PIOS_STABILIZATION_STACK_SIZE)
+#define STACK_SIZE_BYTES PIOS_STABILIZATION_STACK_SIZE
+#else
 #define STACK_SIZE_BYTES 724
+#endif
+
 #define TASK_PRIORITY (tskIDLE_PRIORITY+4)
 #define FAILSAFE_TIMEOUT_MS 30
 

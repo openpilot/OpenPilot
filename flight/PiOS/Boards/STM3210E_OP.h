@@ -105,7 +105,7 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 // TELEMETRY 
 //------------------------
 #define TELEM_QUEUE_SIZE         20
-#define TELEM_STACK_SIZE         624
+#define PIOS_TELEM_STACK_SIZE    624
 
 //------------------------
 // PIOS_LED

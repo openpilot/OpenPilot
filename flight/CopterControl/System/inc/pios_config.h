@@ -77,6 +77,8 @@
 #define PIOS_ACTUATOR_STACK_SIZE        992
 #define PIOS_MANUAL_STACK_SIZE          624
 #define PIOS_SYSTEM_STACK_SIZE          624
+#define PIOS_STABILIZATION_STACK_SIZE   524
+#define PIOS_TELEM_STACK_SIZE           500
 
 #endif /* PIOS_CONFIG_H */
 /**

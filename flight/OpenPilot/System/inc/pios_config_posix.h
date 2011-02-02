@@ -51,5 +51,5 @@
 #define AUXUART_BAUDRATE		19200
 
 #define TELEM_QUEUE_SIZE                20
-#define TELEM_STACK_SIZE                2048
+#define PIOS_TELEM_STACK_SIZE           2048
 #endif /* PIOS_CONFIG_POSIX_H */

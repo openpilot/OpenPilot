@@ -177,9 +177,9 @@ static void updateSensors()
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] += gyro_correct_int[1];
 
 	// Because most crafts wont get enough information from gravity to zero yaw gyro
-	gyro_correct_int[2] += - attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] * 
-				settings.AccelKI * UPDATE_RATE / 1000;
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] += gyro_correct_int[2];
+	gyro_correct_int[2] += - attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Z] * 
+		settings.AccelKI * UPDATE_RATE / 1000;
 	
 	
 	// Get the accel data

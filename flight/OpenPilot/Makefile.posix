@@ -114,7 +114,7 @@ PYMITEINC += $(OUTDIR)
 FLIGHTPLANLIB = $(OPMODULEDIR)/FlightPlan/lib
 FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
 
-OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
+UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
@@ -143,7 +143,7 @@ SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
-SRC += $(OPUAVSYNTHDIR)/init/uavobjectsinit.c
+SRC += $(UAVOBJSYNTHDIR)/uavobjectsinit.c
 else
 ## TESTCODE
 SRC += $(OPTESTS)/test_common.c
@@ -154,7 +154,8 @@ endif
 
 ## UAVOBJECTS
 ifndef TESTAPP
-SRC += $(wildcard $(OPUAVSYNTHDIR)/*.c)
+include $(UAVOBJSYNTHDIR)/Makefile.inc
+SRC += $(UAVOBJSRC)
 endif
 
 ## PIOS Hardware (posix)
@@ -209,7 +210,7 @@ EXTRAINCDIRS  += $(OPUAVTALK)
 EXTRAINCDIRS  += $(OPUAVTALKINC)
 EXTRAINCDIRS  += $(OPUAVOBJ)
 EXTRAINCDIRS  += $(OPUAVOBJINC)
-EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
+EXTRAINCDIRS  += $(UAVOBJSYNTHDIR)
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)

@@ -130,7 +130,7 @@ PYMITEINC += $(OUTDIR)
 FLIGHTPLANLIB = $(OPMODULEDIR)/FlightPlan/lib
 FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
 
-OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
+UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
@@ -170,7 +170,8 @@ endif
 
 ## UAVOBJECTS
 ifndef TESTAPP
-SRC += $(wildcard $(OPUAVSYNTHDIR)/*.c )
+include $(UAVOBJSYNTHDIR)/Makefile.inc
+SRC += $(UAVOBJSRC)
 endif
 
 ## PIOS Hardware (STM32F10x)
@@ -308,7 +309,7 @@ EXTRAINCDIRS  += $(OPUAVTALK)
 EXTRAINCDIRS  += $(OPUAVTALKINC)
 EXTRAINCDIRS  += $(OPUAVOBJ)
 EXTRAINCDIRS  += $(OPUAVOBJINC)
-EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
+EXTRAINCDIRS  += $(UAVOBJSYNTHDIR)
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)

@@ -33,16 +33,15 @@ bool UAVObjectGeneratorFlight::generate(UAVObjectParser* parser,QString template
     fieldTypeStrC << "int8_t" << "int16_t" << "int32_t" <<"uint8_t"
             <<"uint16_t" << "uint32_t" << "float" << "uint8_t";
 
-    QString flightObjInit,objInc;
+    QString flightObjInit,objInc,objFileNames,objNames;
     flightCodePath = QDir( templatepath + QString("flight/UAVObjects"));
     flightOutputPath = QDir( outputpath + QString("flight") );
     flightOutputPath.mkpath(flightOutputPath.absolutePath());
-    flightInitOutputPath = QDir( outputpath + QString("flight/init") );
-    flightInitOutputPath.mkpath(flightInitOutputPath.absolutePath());
 
     flightCodeTemplate = readFile( flightCodePath.absoluteFilePath("uavobjecttemplate.c") );
     flightIncludeTemplate = readFile( flightCodePath.absoluteFilePath("inc/uavobjecttemplate.h") );
     flightInitTemplate = readFile( flightCodePath.absoluteFilePath("uavobjectsinittemplate.c") );
+    flightMakeTemplate = readFile( flightCodePath.absoluteFilePath("Makefiletemplate.inc") );
 
     if ( flightCodeTemplate.isNull() || flightIncludeTemplate.isNull() || flightInitTemplate.isNull()) {
             cerr << "Error: Could not open flight template files." << endl;
@@ -54,15 +53,27 @@ bool UAVObjectGeneratorFlight::generate(UAVObjectParser* parser,QString template
         process_object(info);
         flightObjInit.append("    " + info->name + "Initialize();\n");
         objInc.append("#include \"" + info->namelc + ".h\"\n");
+	objFileNames.append(" " + info->namelc);
+	objNames.append(" " + info->name);
     }
 
     // Write the flight object inialization files
     flightInitTemplate.replace( QString("$(OBJINC)"), objInc);
     flightInitTemplate.replace( QString("$(OBJINIT)"), flightObjInit);
-    bool res = writeFileIfDiffrent( flightInitOutputPath.absolutePath() + "/uavobjectsinit.c",
+    bool res = writeFileIfDiffrent( flightOutputPath.absolutePath() + "/uavobjectsinit.c",
                      flightInitTemplate );
     if (!res) {
         cout << "Error: Could not write flight object init files" << endl;
+        return false;
+    }
+
+    // Write the flight object Makefile
+    flightMakeTemplate.replace( QString("$(UAVOBJFILENAMES)"), objFileNames);
+    flightMakeTemplate.replace( QString("$(UAVOBJNAMES)"), objNames);
+    res = writeFileIfDiffrent( flightOutputPath.absolutePath() + "/Makefile.inc",
+                     flightMakeTemplate );
+    if (!res) {
+        cout << "Error: Could not write flight Makefile" << endl;
         return false;
     }
 

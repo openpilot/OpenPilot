@@ -106,6 +106,7 @@ typedef struct
 
 int8_t				apiconfig_previous_com_port = -1;
 
+volatile uint16_t	apiconfig_rx_config_timer = 0;
 volatile uint16_t	apiconfig_rx_timer = 0;
 volatile uint16_t	apiconfig_tx_timer = 0;
 
@@ -365,7 +366,10 @@ uint16_t apiconfig_scanForConfigPacket(void *buf, uint16_t *len, bool rf_packet)
 		#endif
 
 		if (!rf_packet)
+		{
+			apiconfig_rx_config_timer = 0;			// reset timer
 			apiconfig_rx_timer = 0;					// reset the timer
+		}
 
 		int total_packet_size = sizeof(t_pipx_config_header) + header->data_size;
 
@@ -409,6 +413,7 @@ uint16_t apiconfig_scanForConfigPacket(void *buf, uint16_t *len, bool rf_packet)
 void apiconfig_1ms_tick(void)
 {	// call this once every 1ms
 
+	if (apiconfig_rx_config_timer < 0xffff) apiconfig_rx_config_timer++;
 	if (apiconfig_rx_timer < 0xffff) apiconfig_rx_timer++;
 	if (apiconfig_tx_timer < 0xffff) apiconfig_tx_timer++;
 }
@@ -496,6 +501,8 @@ void apiconfig_process(void)
 
 		uint16_t time_out = 5;	// ms
 		if (!usb_comms) time_out = (15000 * sizeof(t_pipx_config_header)) / saved_settings.serial_baudrate;	// allow enough time to rx a config header
+		if (time_out < 5) time_out = 5;
+
 		if (data_size == 0 && apiconfig_rx_timer >= time_out)
 		{	// no config packet found in the buffer within the timeout period, treat any data in the buffer as data to be sent over the air
 			data_size = apiconfig_rx_buffer_wr;
@@ -648,6 +655,9 @@ void apiconfig_process(void)
 	}
 
 	// ********************
+
+	// speed the pinging speed up if the GCS is connected and monitoring the signal level etc
+	ph_setFastPing(apiconfig_rx_config_timer < 2000);
 }
 
 // *****************************************************************************
@@ -662,6 +672,7 @@ void apiconfig_init(void)
 
 	apiconfig_tx_config_buffer_wr = 0;
 
+	apiconfig_rx_config_timer = 0xffff;
 	apiconfig_rx_timer = 0;
 	apiconfig_tx_timer = 0;
 }

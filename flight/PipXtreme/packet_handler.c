@@ -184,6 +184,7 @@ typedef struct
     volatile uint32_t   rx_data_speed;                  // holds the number of data bits we have received each second
 
     uint16_t            ping_time;                      // ping timer
+    uint16_t            fast_ping_time;                 // ping timer
     bool                pinging;                        // TRUE if we are doing a ping test with the other modem - to check if it is still present
 
     bool                rx_not_ready_mode;              // TRUE if we have told the other modem we cannot receive data (due to buffer filling up).
@@ -216,6 +217,8 @@ uint8_t         ph_rx_buffer[256] __attribute__ ((aligned(4)));				// holds the 
 
 int16_t         rx_rssi_dBm;
 int32_t         rx_afc_Hz;
+
+bool			fast_ping;
 
 // *****************************************************************************
 // return TRUE if we are connected to the remote modem
@@ -313,7 +316,8 @@ int ph_startConnect(int connection_index, uint32_t sn)
     conn->rx_data_speed_count = 0;
     conn->rx_data_speed = 0;
 
-    conn->ping_time = 7000 + (random32 % 100) * 10;
+    conn->ping_time = 8000 + (random32 % 100) * 10;
+    conn->fast_ping_time = 600 + (random32 % 50) * 10;
     conn->pinging = false;
 
     conn->rx_not_ready_mode = false;
@@ -749,7 +753,8 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
       conn->rx_data_speed_count = 0;
       conn->rx_data_speed = 0;
 
-      conn->ping_time = 7000 + (random32 % 100) * 10;
+      conn->ping_time = 8000 + (random32 % 100) * 10;
+      conn->fast_ping_time = 600 + (random32 % 50) * 10;
       conn->pinging = false;
 
       conn->rx_not_ready_mode = false;
@@ -794,7 +799,8 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
       conn->rx_data_speed_count = 0;
       conn->rx_data_speed = 0;
 
-      conn->ping_time = 7000 + (random32 % 100) * 10;
+      conn->ping_time = 8000 + (random32 % 100) * 10;
+      conn->fast_ping_time = 600 + (random32 % 50) * 10;
       conn->pinging = false;
 
       conn->rx_not_ready_mode = false;
@@ -1233,6 +1239,9 @@ void ph_processLinks(int connection_index)
 
   bool tomanyRetries = (conn->tx_retry_counter >= RETRY_RECONNECT_COUNT);
 
+  if (conn->tx_retry_counter >= 3)
+	  conn->rx_rssi_dBm = -200;
+
   switch (conn->link_state)
   {
     case link_disconnected:
@@ -1298,11 +1307,14 @@ void ph_processLinks(int connection_index)
           break;
       }
 
-      if (conn->tx_packet_timer >= conn->ping_time)
+      uint16_t ping_time = conn->ping_time;
+      if (fast_ping) ping_time = conn->fast_ping_time;
+      if (conn->tx_packet_timer >= ping_time)
       {	// start pinging
           if (ph_sendPacket(connection_index, conn->send_encrypted, packet_type_ping, false))
           {
               conn->ping_time = 8000 + (random32 % 100) * 10;
+              conn->fast_ping_time = 600 + (random32 % 50) * 10;
               conn->tx_packet_timer = 0;
               conn->tx_retry_time = conn->tx_retry_time_slot_len * 4 + (random32 % conn->tx_retry_time_slots) * conn->tx_retry_time_slot_len * 4;
               conn->pinging = true;
@@ -1378,6 +1390,13 @@ void ph_processLinks(int connection_index)
 */
       break;
   }
+}
+
+// *****************************************************************************
+
+void ph_setFastPing(bool fast)
+{
+	fast_ping = fast;
 }
 
 // *****************************************************************************
@@ -1573,6 +1592,8 @@ void ph_init(uint32_t our_sn, uint32_t datarate_bps, uint8_t tx_power)
 {
   our_serial_number = our_sn;	// remember our own serial number
 
+  fast_ping = false;
+
   for (int i = 0; i < PH_MAX_CONNECTIONS; i++)
   {
       random32 = updateCRC32(random32, 0xff);
@@ -1605,6 +1626,7 @@ void ph_init(uint32_t our_sn, uint32_t datarate_bps, uint8_t tx_power)
       conn->rx_data_speed = 0;
 
       conn->ping_time = 8000 + (random32 % 100) * 10;
+      conn->fast_ping_time = 600 + (random32 % 50) * 10;
       conn->pinging = false;
 
       conn->rx_not_ready_mode = false;

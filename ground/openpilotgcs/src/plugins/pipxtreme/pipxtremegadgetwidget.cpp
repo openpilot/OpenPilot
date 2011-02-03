@@ -132,9 +132,11 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 	m_widget->comboBox_SerialBaudrate->addItem("38400", 38400);
 	m_widget->comboBox_SerialBaudrate->addItem("57600", 57600);
 	m_widget->comboBox_SerialBaudrate->addItem("115200", 115200);
-//	m_widget->comboBox_SerialBaudrate->addItem("230400", 230400);
-//	m_widget->comboBox_SerialBaudrate->addItem("460800", 460800);
-//	m_widget->comboBox_SerialBaudrate->addItem("921600", 921600);
+	#if (defined Q_OS_WIN)
+		m_widget->comboBox_SerialBaudrate->addItem("230400", 230400);
+		m_widget->comboBox_SerialBaudrate->addItem("460800", 460800);
+		m_widget->comboBox_SerialBaudrate->addItem("921600", 921600);
+	#endif
 	m_widget->comboBox_SerialBaudrate->setCurrentIndex(m_widget->comboBox_SerialBaudrate->findText("57600"));
 
 	m_widget->comboBox_Mode->clear();
@@ -930,8 +932,15 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 						m_widget->lineEdit_LinkState->setText("Unknown [" + QString::number(pipx_config_state.link_state) + "]");
 						break;
 				}
-				m_widget->progressBar_RSSI->setValue(pipx_config_state.rssi);
+				if (pipx_config_state.rssi < m_widget->progressBar_RSSI->minimum())
+					m_widget->progressBar_RSSI->setValue(m_widget->progressBar_RSSI->minimum());
+				else
+				if (pipx_config_state.rssi > m_widget->progressBar_RSSI->maximum())
+					m_widget->progressBar_RSSI->setValue(m_widget->progressBar_RSSI->maximum());
+				else
+					m_widget->progressBar_RSSI->setValue(pipx_config_state.rssi);
 				m_widget->lineEdit_RxAFC->setText(QString::number(pipx_config_state.afc) + "Hz");
+				m_widget->lineEdit_Retries->setText(QString::number(pipx_config_state.retries));
 			}
 
 			break;
@@ -1039,6 +1048,7 @@ void PipXtremeGadgetWidget::disconnectPort(bool enable_telemetry, bool lock_stuf
 	m_widget->lineEdit_LinkState->setText("");
 	m_widget->progressBar_RSSI->setValue(m_widget->progressBar_RSSI->minimum());
 	m_widget->lineEdit_RxAFC->setText("");
+	m_widget->lineEdit_Retries->setText("");
 	m_widget->lineEdit_PairedSerialNumber->setText("");
 	m_widget->spinBox_FrequencyCalibration->setValue(0);
 	m_widget->doubleSpinBox_Frequency->setValue(0);
@@ -1113,6 +1123,11 @@ void PipXtremeGadgetWidget::connectPort()
 					case 115200: bdt = BAUD115200; break;
 					case 128000: bdt = BAUD128000; break;
 					case 256000: bdt = BAUD256000; break;
+					#if (defined Q_OS_WIN)
+						case 230400: bdt = BAUD230400; break;
+						case 460800: bdt = BAUD460800; break;
+						case 921600: bdt = BAUD921600; break;
+					#endif
 				}
 
 				PortSettings settings;

@@ -84,6 +84,7 @@ typedef struct
 	uint8_t     link_state;
 	int16_t		rssi;
 	int32_t		afc;
+	uint16_t	retries;
 } t_pipx_config_state;
 
 typedef struct

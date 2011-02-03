@@ -1233,13 +1233,13 @@ void ph_processLinks(int connection_index)
 
   t_connection *conn = &connection[connection_index];
 
-  bool canTx = (!rfm22_transmitting() && rfm22_channelIsClear());// TRUE is we are can transmit
+  bool canTx = (!rfm22_transmitting() && rfm22_channelIsClear());// TRUE is we can transmit
 
   bool timeToRetry = (rfm22_txReady() && conn->tx_packet_timer >= conn->tx_retry_time);
 
   bool tomanyRetries = (conn->tx_retry_counter >= RETRY_RECONNECT_COUNT);
 
-  if (conn->tx_retry_counter >= 3)
+  if (conn->tx_retry_counter > 3)
 	  conn->rx_rssi_dBm = -200;
 
   switch (conn->link_state)
@@ -1406,8 +1406,17 @@ uint8_t ph_getCurrentLinkState(const int connection_index)
     if (connection_index < 0 || connection_index >= PH_MAX_CONNECTIONS)
         return 0;
 
-    t_connection *conn = &connection[connection_index];
-    return conn->link_state;
+    return connection[connection_index].link_state;
+}
+
+// *****************************************************************************
+
+uint16_t ph_getRetries(const int connection_index)
+{
+    if (connection_index < 0 || connection_index >= PH_MAX_CONNECTIONS)
+        return 0;
+
+    return connection[connection_index].tx_retry_counter;
 }
 
 // *****************************************************************************
@@ -1417,8 +1426,7 @@ int16_t ph_getLastRSSI(const int connection_index)
     if (connection_index < 0 || connection_index >= PH_MAX_CONNECTIONS)
         return 0;
 
-    t_connection *conn = &connection[connection_index];
-    return conn->rx_rssi_dBm;
+    return connection[connection_index].rx_rssi_dBm;
 }
 
 int32_t ph_getLastAFC(const int connection_index)
@@ -1426,8 +1434,7 @@ int32_t ph_getLastAFC(const int connection_index)
     if (connection_index < 0 || connection_index >= PH_MAX_CONNECTIONS)
         return 0;
 
-    t_connection *conn = &connection[connection_index];
-    return conn->rx_afc_Hz;
+    return connection[connection_index].rx_afc_Hz;
 }
 
 // *****************************************************************************
@@ -1515,10 +1522,9 @@ void ph_set_remote_encryption(int connection_index, bool enabled, const void *ke
     if (connection_index < 0 || connection_index >= PH_MAX_CONNECTIONS)
         return;
 
-    t_connection *conn = &connection[connection_index];
-
     ph_set_AES128_key(key);
-    conn->send_encrypted = enabled;
+
+    connection[connection_index].send_encrypted = enabled;
 }
 
 // *****************************************************************************

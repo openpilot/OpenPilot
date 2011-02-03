@@ -79,6 +79,7 @@ typedef struct
     uint8_t     link_state;
     int16_t		rssi;
     int32_t		afc;
+    uint16_t	retries;
 } __attribute__((__packed__)) t_pipx_config_state;
 
 typedef struct
@@ -176,6 +177,7 @@ int apiconfig_sendStatePacket(void)
 	state->link_state = ph_getCurrentLinkState(0);
 	state->rssi = ph_getLastRSSI(0);
 	state->afc = ph_getLastAFC(0);
+	state->retries = ph_getRetries(0);
 
 	header->data_crc = updateCRC32Data(0xffffffff, state, header->data_size);
 	header->header_crc = 0;

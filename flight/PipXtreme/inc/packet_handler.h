@@ -47,6 +47,8 @@ uint16_t ph_getData(const int connection_index, void *data, uint16_t len);
 
 void ph_setFastPing(bool fast);
 
+uint16_t ph_getRetries(const int connection_index);
+
 uint8_t ph_getCurrentLinkState(const int connection_index);
 
 int16_t ph_getLastRSSI(const int connection_index);

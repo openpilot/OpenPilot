@@ -74,11 +74,11 @@
 #define AUXUART_ENABLED			0
 #define AUXUART_BAUDRATE		19200
 
-#define PIOS_ACTUATOR_STACK_SIZE        992
+#define PIOS_ACTUATOR_STACK_SIZE        990
 #define PIOS_MANUAL_STACK_SIZE          624
 #define PIOS_SYSTEM_STACK_SIZE          624
 #define PIOS_STABILIZATION_STACK_SIZE   524
-#define PIOS_TELEM_STACK_SIZE           500
+#define PIOS_TELEM_STACK_SIZE           480
 
 #endif /* PIOS_CONFIG_H */
 /**

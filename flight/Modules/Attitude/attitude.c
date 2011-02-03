@@ -97,7 +97,7 @@ int32_t AttitudeInitialize(void)
 	AttitudeActualSet(&attitude);
 	
 	// Create queue for passing gyro data, allow 2 back samples in case
-	gyro_queue = xQueueCreate(2, sizeof(float) * 4);
+	gyro_queue = xQueueCreate(1, sizeof(float) * 4);
 	if(gyro_queue == NULL) 
 		return -1;
 	PIOS_ADC_SetQueue(gyro_queue);

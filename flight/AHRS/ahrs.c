@@ -759,34 +759,28 @@ void adc_callback(float * downsampled_data)
 	
 	AttitudeRawData raw;
 
-	raw.accels[0] = downsampled_data[2];
-	raw.accels[1] = downsampled_data[0];
-	raw.accels[2] = downsampled_data[4];
-	raw.gyros[0] = downsampled_data[1];
-	raw.gyros[1] = downsampled_data[3];
-	raw.gyros[2] = downsampled_data[5];
 	raw.gyrotemp[0] = downsampled_data[6];
 	raw.gyrotemp[1] = downsampled_data[7];
 
-	raw.gyros_filtered[0] = gyro[0] * RAD_TO_DEG;
-	raw.gyros_filtered[1] = gyro[1] * RAD_TO_DEG;
-	raw.gyros_filtered[2] = gyro[2] * RAD_TO_DEG;
+	raw.gyros[0] = gyro[0] * RAD_TO_DEG;
+	raw.gyros[1] = gyro[1] * RAD_TO_DEG;
+	raw.gyros[2] = gyro[2] * RAD_TO_DEG;
 
-	raw.accels_filtered[0] = accel[0];
-	raw.accels_filtered[1] = accel[1];
-	raw.accels_filtered[2] = accel[2];
+	raw.accels[0] = accel[0];
+	raw.accels[1] = accel[1];
+	raw.accels[2] = accel[2];
 
 	raw.magnetometers[0] = mag_data.scaled.axis[0];
 	raw.magnetometers[1] = mag_data.scaled.axis[1];
 	raw.magnetometers[2] = mag_data.scaled.axis[2];
 
 	if(settings.BiasCorrectedRaw == AHRSSETTINGS_BIASCORRECTEDRAW_TRUE) {
-		raw.gyros_filtered[0] -= Nav.gyro_bias[0] * RAD_TO_DEG;
-		raw.gyros_filtered[1] -= Nav.gyro_bias[1] * RAD_TO_DEG;
-		raw.gyros_filtered[2] -= Nav.gyro_bias[2] * RAD_TO_DEG;
-		raw.accels_filtered[0] -= Nav.accel_bias[0];
-		raw.accels_filtered[1] -= Nav.accel_bias[1];
-		raw.accels_filtered[2] -= Nav.accel_bias[2];
+		raw.gyros[0] -= Nav.gyro_bias[0] * RAD_TO_DEG;
+		raw.gyros[1] -= Nav.gyro_bias[1] * RAD_TO_DEG;
+		raw.gyros[2] -= Nav.gyro_bias[2] * RAD_TO_DEG;
+		raw.accels[0] -= Nav.accel_bias[0];
+		raw.accels[1] -= Nav.accel_bias[1];
+		raw.accels[2] -= Nav.accel_bias[2];
 	}
 
 	AttitudeRawSet(&raw);

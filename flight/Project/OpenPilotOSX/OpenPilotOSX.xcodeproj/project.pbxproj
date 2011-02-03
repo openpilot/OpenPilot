@@ -7367,6 +7367,7 @@
 				65C35E5612EFB2F3004811C2 /* attitudeactual.xml */,
 				65C35E5712EFB2F3004811C2 /* attitudedesired.xml */,
 				65C35E5812EFB2F3004811C2 /* attituderaw.xml */,
+				65E410AE12F65AEA00725888 /* attitudesettings.xml */,
 				65C35E5912EFB2F3004811C2 /* baroaltitude.xml */,
 				65C35E5A12EFB2F3004811C2 /* batterysettings.xml */,
 				65C35E5B12EFB2F3004811C2 /* firmwareiap.xml */,
@@ -7400,7 +7401,6 @@
 				65C35E7712EFB2F3004811C2 /* velocityactual.xml */,
 				65C35E7812EFB2F3004811C2 /* velocitydesired.xml */,
 				65C35E7912EFB2F3004811C2 /* watchdogstatus.xml */,
-				65E410AE12F65AEA00725888 /* attitudesettings.xml */,
 			);
 			path = uavobjectdefinition;
 			sourceTree = "<group>";

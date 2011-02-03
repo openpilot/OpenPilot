@@ -136,9 +136,9 @@ static void guidanceTask(void *parameters)
 		// Collect downsampled attitude data
 		AttitudeRawData attitudeRaw;
 		AttitudeRawGet(&attitudeRaw);		
-		accel[0] += attitudeRaw.gyros_filtered[0];
-		accel[1] += attitudeRaw.gyros_filtered[1];
-		accel[2] += attitudeRaw.gyros_filtered[2];
+		accel[0] += attitudeRaw.accels[0];
+		accel[1] += attitudeRaw.accels[1];
+		accel[2] += attitudeRaw.accels[2];
 		accel_accum++;
 		
 		// Continue collecting data if not enough time

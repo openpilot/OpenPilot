@@ -198,7 +198,7 @@ static void stabilizationTask(void* parameters)
 			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE:
 			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE:
 				{
-					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rateDesiredAxis[ct],  attitudeRaw.gyros_filtered[ct], 0);
+					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rateDesiredAxis[ct],  attitudeRaw.gyros[ct], 0);
 					actuatorDesiredAxis[ct] = bound(command);
 					shouldUpdate = 1;
 					break;

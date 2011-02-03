@@ -181,7 +181,7 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 
 	m_widget->progressBar_RSSI->setMinimum(-120);
 	m_widget->progressBar_RSSI->setMaximum(-20);
-	m_widget->progressBar_RSSI->setValue(-80);
+	m_widget->progressBar_RSSI->setValue(m_widget->progressBar_RSSI->minimum());
 
 	m_widget->graphicsView_Spectrum->setScene(new QGraphicsScene(this));
 	m_widget->graphicsView_Spectrum->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));

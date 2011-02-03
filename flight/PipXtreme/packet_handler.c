@@ -187,7 +187,7 @@ typedef struct
     bool                pinging;                        // TRUE if we are doing a ping test with the other modem - to check if it is still present
 
     bool                rx_not_ready_mode;              // TRUE if we have told the other modem we cannot receive data (due to buffer filling up).
-													// we set it back to FALSE when our received buffer starts to empty
+    													// we set it back to FALSE when our received buffer starts to empty
 
     volatile int16_t    ready_to_send_timer;            // ms .. used to hold off packet transmission to wait a bit for data to mount up for transmission (improves data thru-put speed)
 
@@ -215,7 +215,7 @@ uint8_t         ph_tx_buffer[256] __attribute__ ((aligned(4)));				// holds the 
 uint8_t         ph_rx_buffer[256] __attribute__ ((aligned(4)));				// holds the received packet
 
 int16_t         rx_rssi_dBm;
-int16_t         rx_afc_Hz;
+int32_t         rx_afc_Hz;
 
 // *****************************************************************************
 // return TRUE if we are connected to the remote modem
@@ -1378,6 +1378,37 @@ void ph_processLinks(int connection_index)
 */
       break;
   }
+}
+
+// *****************************************************************************
+
+uint8_t ph_getCurrentLinkState(const int connection_index)
+{
+    if (connection_index < 0 || connection_index >= PH_MAX_CONNECTIONS)
+        return 0;
+
+    t_connection *conn = &connection[connection_index];
+    return conn->link_state;
+}
+
+// *****************************************************************************
+
+int16_t ph_getLastRSSI(const int connection_index)
+{
+    if (connection_index < 0 || connection_index >= PH_MAX_CONNECTIONS)
+        return 0;
+
+    t_connection *conn = &connection[connection_index];
+    return conn->rx_rssi_dBm;
+}
+
+int32_t ph_getLastAFC(const int connection_index)
+{
+    if (connection_index < 0 || connection_index >= PH_MAX_CONNECTIONS)
+        return 0;
+
+    t_connection *conn = &connection[connection_index];
+    return conn->rx_afc_Hz;
 }
 
 // *****************************************************************************

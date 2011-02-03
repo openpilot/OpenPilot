@@ -221,7 +221,8 @@ volatile uint16_t	rx_buffer_wr;										// the receive buffer write index
 
 volatile uint8_t	rx_packet_buf[256] __attribute__ ((aligned(4)));	// the received packet
 volatile uint16_t	rx_packet_wr;										// the receive packet write index
-volatile int16_t	rx_packet_rssi_dBm;									// the receive packet signal strength
+volatile int16_t	rx_packet_start_rssi_dBm;							//
+volatile int16_t	rx_packet_rssi_dBm;									// the received packet signal strength
 volatile int32_t	rx_packet_afc_Hz;									// the receive packet frequency offset
 
 volatile uint8_t	*tx_data_addr;						// the address of the data we send in the transmitted packets
@@ -920,6 +921,9 @@ void rfm22_processRxInt(void)
 			rf_mode = RX_DATA_MODE;
 			RX_LED_ON;
 
+			// remember the rssi for this packet
+			rx_packet_start_rssi_dBm = rssi_dBm;
+
 			// read the 10-bit signed afc correction value
 			afc_correction = (uint16_t)rfm22_read(rfm22_afc_correction_read) << 8;		// bits 9 to 2
 			afc_correction |= (uint16_t)rfm22_read(rfm22_ook_counter_value1) & 0x00c0;	// bits 1 & 0
@@ -1077,7 +1081,7 @@ void rfm22_processRxInt(void)
 
 			if (rx_packet_wr == 0)
 			{	// save the received packet for further processing
-				rx_packet_rssi_dBm = rssi_dBm;							// remember the rssi for this packet
+				rx_packet_rssi_dBm = rx_packet_start_rssi_dBm;			// remember the rssi for this packet
 				rx_packet_afc_Hz = afc_correction_Hz;					// remember the afc offset for this packet
 				memmove((void *)rx_packet_buf, (void *)rx_buffer, wr);	// copy the packet data
 				rx_packet_wr = wr;										// save the length of the data

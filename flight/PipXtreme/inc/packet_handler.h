@@ -45,6 +45,11 @@ uint16_t ph_putData(const int connection_index, const void *data, uint16_t len);
 uint16_t ph_getData_used(const int connection_index);
 uint16_t ph_getData(const int connection_index, void *data, uint16_t len);
 
+uint8_t ph_getCurrentLinkState(const int connection_index);
+
+int16_t ph_getLastRSSI(const int connection_index);
+int32_t ph_getLastAFC(const int connection_index);
+
 void ph_setNominalCarrierFrequency(uint32_t frequency_hz);
 uint32_t ph_getNominalCarrierFrequency(void);
 

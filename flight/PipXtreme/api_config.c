@@ -41,10 +41,14 @@
 // *****************************************************************************
 // modem configuration packets
 
-#define pipx_header_marker			0x76b38a52
+#define PIPX_HEADER_MARKER					0x76b38a52
 
-#define pipx_packet_type_req_config	1
-#define pipx_packet_type_config		2
+#define PIPX_PACKET_TYPE_REQ_DETAILS		0
+#define PIPX_PACKET_TYPE_DETAILS			1
+#define PIPX_PACKET_TYPE_REQ_SETTINGS		2
+#define PIPX_PACKET_TYPE_SETTINGS			3
+#define PIPX_PACKET_TYPE_REQ_STATE			4
+#define PIPX_PACKET_TYPE_STATE				5
 
 typedef struct
 {
@@ -60,33 +64,34 @@ typedef struct
 
 typedef struct
 {
-    uint8_t     mode;
-    uint8_t     state;
-} __attribute__((__packed__)) t_pipx_config_data_mode_state;
+	uint8_t		major_version;
+	uint8_t		minor_version;
+	uint32_t	serial_number;
+	uint32_t    min_frequency_Hz;
+	uint32_t    max_frequency_Hz;
+	uint8_t     frequency_band;
+	float	    frequency_step_size;
+} __attribute__((__packed__)) t_pipx_config_details;
 
 typedef struct
 {
-    uint32_t    serial_baudrate;    // serial uart baudrate
+    uint8_t     mode;
+    uint8_t     link_state;
+    int16_t		rssi;
+    int32_t		afc;
+} __attribute__((__packed__)) t_pipx_config_state;
 
+typedef struct
+{
+    uint32_t    serial_baudrate;    // serial usart baudrate
     uint32_t    destination_id;
-
-    uint32_t    min_frequency_Hz;
-    uint32_t    max_frequency_Hz;
     uint32_t    frequency_Hz;
-
     uint32_t    max_rf_bandwidth;
-
     uint8_t     max_tx_power;
-
-    uint8_t     frequency_band;
-
     uint8_t     rf_xtal_cap;
-
     bool        aes_enable;
     uint8_t     aes_key[16];
-
-    float	    frequency_step_size;
-} __attribute__((__packed__)) t_pipx_config_data_settings;
+} __attribute__((__packed__)) t_pipx_config_settings;
 
 typedef struct
 {
@@ -115,32 +120,99 @@ uint16_t			apiconfig_tx_config_buffer_wr;
 
 // *****************************************************************************
 
-int apiconfig_sendConfigPacket()
+int apiconfig_sendDetailsPacket(void)
 {
-	if (sizeof(apiconfig_tx_config_buffer) - apiconfig_tx_config_buffer_wr < sizeof(t_pipx_config_header) + sizeof(t_pipx_config_data_settings))
+	if (sizeof(apiconfig_tx_config_buffer) - apiconfig_tx_config_buffer_wr < sizeof(t_pipx_config_header) + sizeof(t_pipx_config_details))
 		return -1;	// not enough room in the tx buffer for the packet we were going to send
 
 	t_pipx_config_header *header = (t_pipx_config_header *)(apiconfig_tx_config_buffer + apiconfig_tx_config_buffer_wr);
-	t_pipx_config_data_settings *settings = (t_pipx_config_data_settings *)((uint8_t *)header + sizeof(t_pipx_config_header));
+	t_pipx_config_details *details = (t_pipx_config_details *)((uint8_t *)header + sizeof(t_pipx_config_header));
 
-	header->marker = pipx_header_marker;
+	header->marker = PIPX_HEADER_MARKER;
 	header->serial_number = serial_number_crc32;
-	header->type = pipx_packet_type_config;
+	header->type = PIPX_PACKET_TYPE_DETAILS;
 	header->spare = 0;
-	header->data_size = sizeof(t_pipx_config_data_settings);
+	header->data_size = sizeof(t_pipx_config_details);
+
+	details->major_version = version_major;
+	details->minor_version = version_minor;
+	details->serial_number = serial_number_crc32;
+	details->min_frequency_Hz = saved_settings.min_frequency_Hz;
+	details->max_frequency_Hz = saved_settings.max_frequency_Hz;
+	details->frequency_band = saved_settings.frequency_band;
+	details->frequency_step_size = rfm22_getFrequencyStepSize();
+
+	header->data_crc = updateCRC32Data(0xffffffff, details, header->data_size);
+	header->header_crc = 0;
+	header->header_crc = updateCRC32Data(0xffffffff, header, sizeof(t_pipx_config_header));
+
+	int total_packet_size = sizeof(t_pipx_config_header) + header->data_size;
+
+	apiconfig_tx_config_buffer_wr += total_packet_size;
+
+	#if defined(APICONFIG_DEBUG)
+		DEBUG_PRINTF("TX api config: details\r\n");
+	#endif
+
+	return total_packet_size;
+}
+
+int apiconfig_sendStatePacket(void)
+{
+	if (sizeof(apiconfig_tx_config_buffer) - apiconfig_tx_config_buffer_wr < sizeof(t_pipx_config_header) + sizeof(t_pipx_config_state))
+		return -1;	// not enough room in the tx buffer for the packet we were going to send
+
+	t_pipx_config_header *header = (t_pipx_config_header *)(apiconfig_tx_config_buffer + apiconfig_tx_config_buffer_wr);
+	t_pipx_config_state *state = (t_pipx_config_state *)((uint8_t *)header + sizeof(t_pipx_config_header));
+
+	header->marker = PIPX_HEADER_MARKER;
+	header->serial_number = serial_number_crc32;
+	header->type = PIPX_PACKET_TYPE_STATE;
+	header->spare = 0;
+	header->data_size = sizeof(t_pipx_config_state);
+
+	state->mode = 0;
+	state->link_state = ph_getCurrentLinkState(0);
+	state->rssi = ph_getLastRSSI(0);
+	state->afc = ph_getLastAFC(0);
+
+	header->data_crc = updateCRC32Data(0xffffffff, state, header->data_size);
+	header->header_crc = 0;
+	header->header_crc = updateCRC32Data(0xffffffff, header, sizeof(t_pipx_config_header));
+
+	int total_packet_size = sizeof(t_pipx_config_header) + header->data_size;
+
+	apiconfig_tx_config_buffer_wr += total_packet_size;
+
+	#if defined(APICONFIG_DEBUG)
+		DEBUG_PRINTF("TX api config: state\r\n");
+	#endif
+
+	return total_packet_size;
+}
+
+int apiconfig_sendSettingsPacket(void)
+{
+	if (sizeof(apiconfig_tx_config_buffer) - apiconfig_tx_config_buffer_wr < sizeof(t_pipx_config_header) + sizeof(t_pipx_config_settings))
+		return -1;	// not enough room in the tx buffer for the packet we were going to send
+
+	t_pipx_config_header *header = (t_pipx_config_header *)(apiconfig_tx_config_buffer + apiconfig_tx_config_buffer_wr);
+	t_pipx_config_settings *settings = (t_pipx_config_settings *)((uint8_t *)header + sizeof(t_pipx_config_header));
+
+	header->marker = PIPX_HEADER_MARKER;
+	header->serial_number = serial_number_crc32;
+	header->type = PIPX_PACKET_TYPE_SETTINGS;
+	header->spare = 0;
+	header->data_size = sizeof(t_pipx_config_settings);
 
 	settings->serial_baudrate = saved_settings.serial_baudrate;
 	settings->destination_id = saved_settings.destination_id;
-	settings->min_frequency_Hz = saved_settings.min_frequency_Hz;
-	settings->max_frequency_Hz = saved_settings.max_frequency_Hz;
 	settings->frequency_Hz = saved_settings.frequency_Hz;
 	settings->max_rf_bandwidth = saved_settings.max_rf_bandwidth;
 	settings->max_tx_power = saved_settings.max_tx_power;
-	settings->frequency_band = saved_settings.frequency_band;
 	settings->rf_xtal_cap = saved_settings.rf_xtal_cap;
 	settings->aes_enable = saved_settings.aes_enable;
 	memcpy((char *)settings->aes_key, (char *)saved_settings.aes_key, sizeof(settings->aes_key));
-	settings->frequency_step_size = rfm22_getFrequencyStepSize();
 
 	header->data_crc = updateCRC32Data(0xffffffff, settings, header->data_size);
 	header->header_crc = 0;
@@ -151,7 +223,7 @@ int apiconfig_sendConfigPacket()
 	apiconfig_tx_config_buffer_wr += total_packet_size;
 
 	#if defined(APICONFIG_DEBUG)
-		DEBUG_PRINTF("TX api config: config\r\n");
+		DEBUG_PRINTF("TX api config: settings\r\n");
 	#endif
 
 	return total_packet_size;
@@ -167,25 +239,48 @@ void apiconfig_processInputPacket(void *buf, uint16_t len)
 
 	switch (header->type)
 	{
-		case pipx_packet_type_req_config:	// they are requesting our configuration
+		case PIPX_PACKET_TYPE_REQ_DETAILS:
 
 			#if defined(APICONFIG_DEBUG)
-				DEBUG_PRINTF("RX api config: req_config\r\n");
+				DEBUG_PRINTF("RX api config: req_details\r\n");
 			#endif
 
 			if (header->serial_number == 0 || header->serial_number == 0xffffffff || header->serial_number == serial_number_crc32)
-				apiconfig_sendConfigPacket();
+				apiconfig_sendDetailsPacket();
+
 			break;
 
-		case pipx_packet_type_config:	// they have sent us new configuration settings
+		case PIPX_PACKET_TYPE_REQ_STATE:
+
 			#if defined(APICONFIG_DEBUG)
-				DEBUG_PRINTF("RX api config: config\r\n");
+				DEBUG_PRINTF("RX api config: req_state\r\n");
+			#endif
+
+			if (header->serial_number == serial_number_crc32)
+				apiconfig_sendStatePacket();
+
+			break;
+
+		case PIPX_PACKET_TYPE_REQ_SETTINGS:	// they are requesting our configuration
+
+			#if defined(APICONFIG_DEBUG)
+				DEBUG_PRINTF("RX api config: req_settings\r\n");
+			#endif
+
+			if (header->serial_number == serial_number_crc32)
+				apiconfig_sendSettingsPacket();
+
+			break;
+
+		case PIPX_PACKET_TYPE_SETTINGS:		// they have sent us new configuration settings
+			#if defined(APICONFIG_DEBUG)
+				DEBUG_PRINTF("RX api config: settings\r\n");
 			#endif
 
 			if (header->serial_number == serial_number_crc32)
 			{	// the packet is meant for us
 
-				t_pipx_config_data_settings *settings = (t_pipx_config_data_settings *)data;
+				t_pipx_config_settings *settings = (t_pipx_config_settings *)data;
 
 				saved_settings.destination_id = settings->destination_id;
 
@@ -200,7 +295,8 @@ void apiconfig_processInputPacket(void *buf, uint16_t len)
 				saved_settings.serial_baudrate = settings->serial_baudrate;
 
 				saved_settings.aes_enable = settings->aes_enable;
-				memcpy((char *)saved_settings.aes_key, (char *)settings->aes_key, sizeof(saved_settings.aes_key));
+//				if (saved_settings.aes_enable)
+					memcpy((char *)saved_settings.aes_key, (char *)settings->aes_key, sizeof(saved_settings.aes_key));
 
 			    saved_settings_save();	// save the new settings
 
@@ -213,6 +309,7 @@ void apiconfig_processInputPacket(void *buf, uint16_t len)
 			    ph_set_remote_serial_number(0, saved_settings.destination_id);
 			    ph_set_remote_encryption(0, saved_settings.aes_enable, (const void *)saved_settings.aes_key);
 			}
+
 			break;
 
 		default:
@@ -244,7 +341,7 @@ uint16_t apiconfig_scanForConfigPacket(void *buf, uint16_t *len, bool rf_packet)
 			break;
 		}
 
-		if (header->marker != pipx_header_marker)
+		if (header->marker != PIPX_HEADER_MARKER)
 		{	// no packet marker found
 			i++;
 			continue;
@@ -397,7 +494,9 @@ void apiconfig_process(void)
 		// scan for a configuration packet in the received data
 		uint16_t data_size = apiconfig_scanForConfigPacket(apiconfig_rx_buffer, &apiconfig_rx_buffer_wr, false);
 
-		if (data_size == 0 && ((usb_comms && apiconfig_rx_timer >= 10) || ((!usb_comms && apiconfig_rx_timer >= 20))))
+		uint16_t time_out = 5;	// ms
+		if (!usb_comms) time_out = (15000 * sizeof(t_pipx_config_header)) / saved_settings.serial_baudrate;	// allow enough time to rx a config header
+		if (data_size == 0 && apiconfig_rx_timer >= time_out)
 		{	// no config packet found in the buffer within the timeout period, treat any data in the buffer as data to be sent over the air
 			data_size = apiconfig_rx_buffer_wr;
 		}

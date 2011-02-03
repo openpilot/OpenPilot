@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>571</width>
-    <height>460</height>
+    <height>486</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -115,7 +115,7 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
+     <item row="1" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
         <string>Serial Number (hex)</string>
@@ -125,7 +125,7 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
+     <item row="1" column="1">
       <widget class="QLineEdit" name="lineEdit_SerialNumber">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -173,55 +173,17 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="2">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Paired Serial Number (hex)</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="3">
-      <widget class="QLineEdit" name="lineEdit_PairedSerialNumber">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="toolTip">
-        <string>Serial number of the remote modem you want to pair with</string>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="maxLength">
-        <number>8</number>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
+     <item row="2" column="0">
       <widget class="QLabel" name="label_10">
        <property name="text">
-        <string>Frequency Band (MHz)</string>
+        <string>Frequency Band</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
+     <item row="2" column="1">
       <widget class="QLineEdit" name="lineEdit_FrequencyBand">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -262,17 +224,17 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item row="3" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Min Frequency (Hz)</string>
+        <string>Min Frequency</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
+     <item row="3" column="1">
       <widget class="QLineEdit" name="lineEdit_MinFrequency">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -313,17 +275,17 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
+     <item row="4" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>Max Frequency (Hz)</string>
+        <string>Max Frequency</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
+     <item row="4" column="1">
       <widget class="QLineEdit" name="lineEdit_MaxFrequency">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -364,17 +326,17 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
+     <item row="5" column="0">
       <widget class="QLabel" name="label_12">
        <property name="text">
-        <string>Frequency Step Size (Hz)</string>
+        <string>Frequency Step Size</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="5" column="1">
       <widget class="QLineEdit" name="lineEdit_FrequencyStepSize">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -415,18 +377,18 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
+     <item row="6" column="0">
       <widget class="QLabel" name="label_11">
        <property name="text">
-        <string>State</string>
+        <string>Link State</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
-      <widget class="QLineEdit" name="lineEdit_State">
+     <item row="6" column="1">
+      <widget class="QLineEdit" name="lineEdit_LinkState">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -466,40 +428,109 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="3">
-      <widget class="QComboBox" name="comboBox_SerialPortSpeed">
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>16777215</height>
-        </size>
+     <item row="7" column="0">
+      <widget class="QLabel" name="label_16">
+       <property name="text">
+        <string>RSSI (dBm)</string>
        </property>
-       <property name="toolTip">
-        <string>Set the modems serial port speed</string>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
-     <item row="5" column="3">
-      <widget class="QComboBox" name="comboBox_MaxRFTxPower">
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>16777215</height>
-        </size>
-       </property>
+     <item row="7" column="1">
+      <widget class="QProgressBar" name="progressBar_RSSI">
        <property name="toolTip">
-        <string>Set the maximum TX output power the modem will use</string>
+        <string>Received Signal Stremght Indicator</string>
        </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
+       <property name="minimum">
+        <number>-120</number>
        </property>
-       <property name="modelColumn">
-        <number>0</number>
+       <property name="maximum">
+        <number>-20</number>
+       </property>
+       <property name="value">
+        <number>-60</number>
+       </property>
+       <property name="textVisible">
+        <bool>true</bool>
+       </property>
+       <property name="format">
+        <string>%v</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="3">
-      <widget class="QComboBox" name="comboBox_MaxRFBandwidth">
+     <item row="8" column="0">
+      <widget class="QLabel" name="label_17">
+       <property name="text">
+        <string>Rx AFC</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QLineEdit" name="lineEdit_RxAFC">
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+  border: none;
+  border-radius: 1px;
+  padding: 0 8px;
+  background: rgba(0, 0, 0, 16);
+/*  background: transparent; */
+/*     selection-background-color: darkgray;*/
+}</string>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>Firmware Version</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="lineEdit_FirmwareVersion">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QLineEdit {
+  border: none;
+  border-radius: 1px;
+  padding: 0 8px;
+  background: rgba(0, 0, 0, 16);
+/*  background: transparent; */
+/*     selection-background-color: darkgray;*/
+}</string>
+       </property>
+       <property name="frame">
+        <bool>false</bool>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="QSpinBox" name="spinBox_FrequencyCalibration">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
@@ -507,7 +538,23 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>Set the maximum RF datarate/channel bandwidth the modem will use</string>
+        <string>Calibrate the modems RF carrier frequency</string>
+       </property>
+       <property name="accelerated">
+        <bool>true</bool>
+       </property>
+       <property name="maximum">
+        <number>255</number>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QLabel" name="label_13">
+       <property name="text">
+        <string>Frequency Calibration</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
@@ -548,14 +595,18 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="3">
-      <widget class="QSpinBox" name="spinBox_FrequencyCalibration">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+     <item row="3" column="2">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Frequency (MHz)</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="3">
+      <widget class="QComboBox" name="comboBox_MaxRFBandwidth">
        <property name="maximumSize">
         <size>
          <width>16777215</width>
@@ -563,33 +614,7 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>Calibrate the modems RF carrier frequency</string>
-       </property>
-       <property name="accelerated">
-        <bool>true</bool>
-       </property>
-       <property name="maximum">
-        <number>255</number>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="2">
-      <widget class="QLabel" name="label_8">
-       <property name="text">
-        <string>Serial Port Speed</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="2">
-      <widget class="QLabel" name="label_7">
-       <property name="text">
-        <string>Max RF Tx Power</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        <string>Set the maximum RF datarate/channel bandwidth the modem will use</string>
        </property>
       </widget>
      </item>
@@ -603,27 +628,59 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="2">
-      <widget class="QLabel" name="label_5">
+     <item row="5" column="3">
+      <widget class="QComboBox" name="comboBox_MaxRFTxPower">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>Set the maximum TX output power the modem will use</string>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="modelColumn">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="2">
+      <widget class="QLabel" name="label_7">
        <property name="text">
-        <string>Frequency (MHz)</string>
+        <string>Max RF Tx Power</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
-     <item row="2" column="2">
-      <widget class="QLabel" name="label_13">
+     <item row="6" column="3">
+      <widget class="QComboBox" name="comboBox_SerialPortSpeed">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>Set the modems serial port speed</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="2">
+      <widget class="QLabel" name="label_8">
        <property name="text">
-        <string>Frequency Calibration</string>
+        <string>Serial Port Speed</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
-     <item row="1" column="2">
+     <item row="0" column="2">
       <widget class="QLabel" name="label_14">
        <property name="text">
         <string>Mode</string>
@@ -633,7 +690,7 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="3">
+     <item row="0" column="3">
       <widget class="QComboBox" name="comboBox_Mode">
        <property name="enabled">
         <bool>false</bool>
@@ -649,59 +706,41 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="label_16">
-       <property name="text">
-        <string>RSSI (dBm)</string>
+     <item row="1" column="3">
+      <widget class="QLineEdit" name="lineEdit_PairedSerialNumber">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
        </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="QProgressBar" name="progressBar_RSSI">
-       <property name="minimum">
-        <number>-120</number>
+       <property name="toolTip">
+        <string>Serial number of the remote modem you want to pair with</string>
        </property>
-       <property name="maximum">
-        <number>-20</number>
-       </property>
-       <property name="value">
-        <number>-60</number>
-       </property>
-       <property name="textVisible">
-        <bool>true</bool>
-       </property>
-       <property name="format">
-        <string>%v</string>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="0">
-      <widget class="QLabel" name="label_17">
-       <property name="text">
-        <string>AFC (Hz)</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="1">
-      <widget class="QLineEdit" name="lineEdit_RxAFC">
        <property name="styleSheet">
-        <string notr="true">QLineEdit {
-  border: none;
-  border-radius: 1px;
-  padding: 0 8px;
-  background: rgba(0, 0, 0, 16);
-/*  background: transparent; */
-/*     selection-background-color: darkgray;*/
-}</string>
+        <string notr="true"/>
        </property>
-       <property name="readOnly">
-        <bool>true</bool>
+       <property name="maxLength">
+        <number>8</number>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Paired Serial Number (hex)</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
@@ -763,7 +802,7 @@
         <enum>Qt::RightToLeft</enum>
        </property>
        <property name="text">
-        <string>Enable</string>
+        <string>AES Enable</string>
        </property>
       </widget>
      </item>

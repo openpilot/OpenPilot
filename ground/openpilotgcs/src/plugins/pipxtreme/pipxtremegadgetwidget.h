@@ -69,33 +69,34 @@ typedef struct
 
 typedef struct
 {
+	uint8_t		major_version;
+	uint8_t		minor_version;
+	uint32_t	serial_number;
+	uint32_t    min_frequency_Hz;
+	uint32_t    max_frequency_Hz;
+	uint8_t     frequency_band;
+	float	    frequency_step_size;
+} t_pipx_config_details;
+
+typedef struct
+{
 	uint8_t     mode;
-	uint8_t     state;
-} t_pipx_config_data_mode_state;
+	uint8_t     link_state;
+	int16_t		rssi;
+	int32_t		afc;
+} t_pipx_config_state;
 
 typedef struct
 {
 	uint32_t    serial_baudrate;    // serial uart baudrate
-
 	uint32_t    destination_id;
-
-	uint32_t    min_frequency_Hz;
-	uint32_t    max_frequency_Hz;
 	uint32_t    frequency_Hz;
-
 	uint32_t    max_rf_bandwidth;
-
 	uint8_t     max_tx_power;
-
-	uint8_t     frequency_band;
-
 	uint8_t     rf_xtal_cap;
-
 	bool        aes_enable;
 	uint8_t     aes_key[16];
-
-	float	    frequency_step_size;
-} t_pipx_config_data_settings;
+} t_pipx_config_settings;
 
 typedef struct
 {
@@ -140,7 +141,7 @@ protected:
     void resizeEvent(QResizeEvent *event);
 
 private:
-	typedef enum { PIPX_IDLE, PIPX_REQ_CONFIG, PIPX_REQ_RSSI} PipXStage;
+	typedef enum { PIPX_IDLE, PIPX_REQ_DETAILS, PIPX_REQ_SETTINGS, PIPX_REQ_STATE} PipXStage;
 
 	Ui_PipXtremeWidget	*m_widget;
 
@@ -154,6 +155,10 @@ private:
 
 //	QVector<quint8>	buffer;
 
+	t_pipx_config_details	pipx_config_details;
+	t_pipx_config_settings	pipx_config_settings;
+	t_pipx_config_state		pipx_config_state;
+
 	uint32_t updateCRC32(uint32_t crc, uint8_t b);
 	uint32_t updateCRC32Data(uint32_t crc, void *data, int len);
 	void makeCRC_Table32();
@@ -163,8 +168,10 @@ private:
 	void disableTelemetry();
 	void enableTelemetry();
 
-	void sendRequestConfig();
-	void sendConfig(uint32_t serial_number, t_pipx_config_data_settings *settings);
+	void sendRequestDetails(uint32_t serial_number);
+	void sendRequestSettings(uint32_t serial_number);
+	void sendRequestState(uint32_t serial_number);
+	void sendSettings(uint32_t serial_number, t_pipx_config_settings *settings);
 
 	void processRxBuffer();
 	void processRxPacket(quint8 *packet, int packet_size);

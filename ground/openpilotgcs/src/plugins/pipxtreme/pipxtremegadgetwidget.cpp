@@ -41,16 +41,26 @@
 #define MAX_RETRIES					7
 #define RETRY_TIME					500		// ms
 
-#define pipx_header_marker			0x76b38a52
+#define PIPX_HEADER_MARKER					0x76b38a52
 
-#define pipx_packet_type_req_config	1
-#define pipx_packet_type_config		2
+#define PIPX_PACKET_TYPE_REQ_DETAILS		0
+#define PIPX_PACKET_TYPE_DETAILS			1
+#define PIPX_PACKET_TYPE_REQ_SETTINGS		2
+#define PIPX_PACKET_TYPE_SETTINGS			3
+#define PIPX_PACKET_TYPE_REQ_STATE			4
+#define PIPX_PACKET_TYPE_STATE				5
 
 enum {
 	freqBand_UNKNOWN = 0,
 	freqBand_434MHz,
 	freqBand_868MHz,
 	freqBand_915MHz
+};
+
+enum {
+	link_disconnected = 0,
+	link_connecting,
+	link_connected
 };
 
 // ***************************************************************************************
@@ -104,9 +114,14 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 	m_widget = new Ui_PipXtremeWidget();
 	m_widget->setupUi(this);
 
+	qsrand(QDateTime::currentDateTime().toMSecsSinceEpoch());
+
 	device_input_buffer.size = 8192;
 	device_input_buffer.used = 0;
 	device_input_buffer.buffer = new quint8 [device_input_buffer.size];
+
+	memset(&pipx_config_details, 0, sizeof(pipx_config_details));
+	memset(&pipx_config_settings, 0, sizeof(pipx_config_settings));
 
 	m_widget->comboBox_SerialBaudrate->clear();
 	m_widget->comboBox_SerialBaudrate->addItem("1200", 1200);
@@ -453,10 +468,12 @@ void PipXtremeGadgetWidget::saveToFlash()
 	if (!m_ioDevice) return;
 	if (!m_ioDevice->isOpen()) return;
 
+	if (pipx_config_details.serial_number == 0) return;	// we first need some details before sending new setings
+
 	QString s;
 	bool ok;
 
-	t_pipx_config_data_settings settings;
+	t_pipx_config_settings settings;
 
 	s = m_widget->lineEdit_PairedSerialNumber->text().trimmed().toLower();
 	s.replace(' ', "");	// remove all spaces
@@ -474,28 +491,12 @@ void PipXtremeGadgetWidget::saveToFlash()
 
 	settings.rf_xtal_cap = m_widget->spinBox_FrequencyCalibration->value();
 
-	s = m_widget->lineEdit_MinFrequency->text().trimmed();
-	s.replace(' ', "");	// remove all spaces
-	settings.min_frequency_Hz = s.toUInt(&ok);
-	if (s.isEmpty() || !ok)
-	{
-		error("Check your \"Min Frequency\" entry!", 0);
-		return;
-	}
-
-	s = m_widget->lineEdit_MaxFrequency->text().trimmed();
-	s.replace(' ', "");	// remove all spaces
-	settings.max_frequency_Hz = s.toUInt(&ok);
-	if (s.isEmpty() || !ok)
-	{
-		error("Check your \"Max Frequency\" entry!", 0);
-		return;
-	}
-
 	s = m_widget->doubleSpinBox_Frequency->text().trimmed();
 	s.replace(' ', "");	// remove all spaces
 	settings.frequency_Hz = (uint32_t)(s.toDouble(&ok) * 1e6);
-	if (s.isEmpty() || !ok || settings.frequency_Hz < settings.min_frequency_Hz || settings.frequency_Hz > settings.max_frequency_Hz)
+	if (ok)	// round it to the 'frequency step size'
+		settings.frequency_Hz = (uint32_t)(((double)settings.frequency_Hz + pipx_config_details.frequency_step_size / 2) / pipx_config_details.frequency_step_size) * pipx_config_details.frequency_step_size;
+	if (s.isEmpty() || !ok || settings.frequency_Hz < pipx_config_details.min_frequency_Hz || settings.frequency_Hz > pipx_config_details.max_frequency_Hz)
 	{
 		error("Check your \"Frequency\" entry!", 0);
 		return;
@@ -531,38 +532,12 @@ void PipXtremeGadgetWidget::saveToFlash()
 		}
 	}
 
-	s = m_widget->lineEdit_FrequencyBand->text().trimmed();
-	s.replace(' ', "");	// remove all spaces
-	if (s == "434") settings.frequency_band = freqBand_434MHz;
-	else
-	if (s == "868") settings.frequency_band = freqBand_868MHz;
-	else
-	if (s == "915") settings.frequency_band = freqBand_915MHz;
-	else
-	{
-		error("Check your \"Frequency Band\" entry!", 0);
-		return;
-	}
+	// send the new settings to the modem
+	sendSettings(pipx_config_details.serial_number, &settings);
 
-	s = m_widget->lineEdit_FrequencyStepSize->text().trimmed();
-	s.replace(' ', "");	// remove all spaces
-	settings.frequency_step_size = s.toFloat(&ok);
-	if (s.isEmpty() || !ok)
-	{
-		error("Check your \"Frequency Step Size\" entry!", 0);
-		return;
-	}
-
-	s = m_widget->lineEdit_SerialNumber->text().trimmed();
-	s.replace(' ', "");	// remove all spaces
-	uint32_t serial_number = s.toUInt(&ok, 16);
-	if (s.isEmpty() || !ok || serial_number == 0)
-	{
-		error("Check your \"Serial Number\" entry!", 0);
-		return;
-	}
-
-	sendConfig(serial_number, &settings);
+	// retrieve them back
+	m_stage_retries = 0;
+	m_stage = PIPX_REQ_SETTINGS;
 }
 
 void PipXtremeGadgetWidget::textChangedAESKey(const QString &text)
@@ -573,17 +548,48 @@ void PipXtremeGadgetWidget::textChangedAESKey(const QString &text)
 }
 
 // ***************************************************************************************
-// send various config packets
+// send various packets
 
-void PipXtremeGadgetWidget::sendRequestConfig()
+void PipXtremeGadgetWidget::sendRequestDetails(uint32_t serial_number)
 {
 	// *****************
 	// create the packet
 
 	t_pipx_config_header header;
-	header.marker = pipx_header_marker;
-	header.serial_number = 0;
-	header.type = pipx_packet_type_req_config;
+	header.marker = PIPX_HEADER_MARKER;
+	header.serial_number = serial_number;
+	header.type = PIPX_PACKET_TYPE_REQ_DETAILS;
+	header.spare = 0;
+	header.data_size = 0;
+	header.data_crc = 0xffffffff;
+	header.header_crc = 0;
+	header.header_crc = updateCRC32Data(0xffffffff, &header, sizeof(t_pipx_config_header));
+
+	// *****************
+	// send the packet
+
+//	QMutexLocker locker_dev(&device_mutex);
+	if (!m_ioDevice) return;
+	if (!m_ioDevice->isOpen()) return;
+	qint64 bytes_written = m_ioDevice->write((const char*)&header, sizeof(t_pipx_config_header));
+
+	Q_UNUSED(bytes_written)
+
+	// *****************
+}
+
+void PipXtremeGadgetWidget::sendRequestSettings(uint32_t serial_number)
+{
+	if (serial_number == 0)
+		return;
+
+	// *****************
+	// create the packet
+
+	t_pipx_config_header header;
+	header.marker = PIPX_HEADER_MARKER;
+	header.serial_number = serial_number;
+	header.type = PIPX_PACKET_TYPE_REQ_SETTINGS;
 	header.spare = 0;
 	header.data_size = 0;
 	header.data_crc = 0xffffffff;
@@ -607,12 +613,50 @@ void PipXtremeGadgetWidget::sendRequestConfig()
 	// *****************
 }
 
-void PipXtremeGadgetWidget::sendConfig(uint32_t serial_number, t_pipx_config_data_settings *settings)
+void PipXtremeGadgetWidget::sendRequestState(uint32_t serial_number)
 {
+	if (serial_number == 0)
+		return;
+
+	// *****************
+	// create the packet
+
+	t_pipx_config_header header;
+	header.marker = PIPX_HEADER_MARKER;
+	header.serial_number = serial_number;
+	header.type = PIPX_PACKET_TYPE_REQ_STATE;
+	header.spare = 0;
+	header.data_size = 0;
+	header.data_crc = 0xffffffff;
+	header.header_crc = 0;
+	header.header_crc = updateCRC32Data(0xffffffff, &header, sizeof(t_pipx_config_header));
+
+	// *****************
+	// send the packet
+
+//	QMutexLocker locker_dev(&device_mutex);
+	if (!m_ioDevice) return;
+	if (!m_ioDevice->isOpen()) return;
+	qint64 bytes_written = m_ioDevice->write((const char*)&header, sizeof(t_pipx_config_header));
+
+//	qDebug() << "PipX m_ioDevice->write: " << QString::number(bytes_written) << endl;
+
+	Q_UNUSED(bytes_written)
+
+//	error("Bytes written", bytes_written);	// TEST ONLY
+
+	// *****************
+}
+
+void PipXtremeGadgetWidget::sendSettings(uint32_t serial_number, t_pipx_config_settings *settings)
+{
+	if (serial_number == 0)
+		return;
+
 	if (!settings)
 		return;
 
-	uint8_t buffer[sizeof(t_pipx_config_header) + sizeof(t_pipx_config_data_settings)];
+	uint8_t buffer[sizeof(t_pipx_config_header) + sizeof(t_pipx_config_settings)];
 
 	t_pipx_config_header *header = (t_pipx_config_header *)buffer;
 	uint8_t *data = (uint8_t *) header + sizeof(t_pipx_config_header);
@@ -620,13 +664,13 @@ void PipXtremeGadgetWidget::sendConfig(uint32_t serial_number, t_pipx_config_dat
 	// *****************
 	// create the packet
 
-	memcpy(data, settings, sizeof(t_pipx_config_data_settings));
+	memcpy(data, settings, sizeof(t_pipx_config_settings));
 
-	header->marker = pipx_header_marker;
+	header->marker = PIPX_HEADER_MARKER;
 	header->serial_number = serial_number;
-	header->type = pipx_packet_type_config;
+	header->type = PIPX_PACKET_TYPE_SETTINGS;
 	header->spare = 0;
-	header->data_size = sizeof(t_pipx_config_data_settings);
+	header->data_size = sizeof(t_pipx_config_settings);
 	header->data_crc = updateCRC32Data(0xffffffff, data, header->data_size);
 	header->header_crc = 0;
 	header->header_crc = updateCRC32Data(0xffffffff, header, sizeof(t_pipx_config_header));
@@ -714,7 +758,7 @@ void PipXtremeGadgetWidget::processRxBuffer()
 		uint8_t *data = (uint8_t *)header + sizeof(t_pipx_config_header);
 
 		// check packet marker
-		if (header->marker != pipx_header_marker)
+		if (header->marker != PIPX_HEADER_MARKER)
 		{	// marker not yet found
 			// remove a byte
 			int i = 1;
@@ -781,58 +825,118 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 
 	switch (header->type)
 	{
-		case pipx_packet_type_req_config:
+		case PIPX_PACKET_TYPE_REQ_DETAILS:
 			break;
 
-		case pipx_packet_type_config:
-			if (m_stage == PIPX_REQ_CONFIG)
+		case PIPX_PACKET_TYPE_DETAILS:
+			if (m_stage == PIPX_REQ_DETAILS)
 			{
-				if (packet_size < (int)sizeof(t_pipx_config_header) + (int)sizeof(t_pipx_config_data_settings))
+				m_stage_retries = 0;
+				m_stage = PIPX_REQ_SETTINGS;
+
+				if (packet_size < (int)sizeof(t_pipx_config_header) + (int)sizeof(t_pipx_config_details))
 					break;	// packet size is too small - error
 
-				m_stage = PIPX_IDLE;
+				memcpy(&pipx_config_details, data, sizeof(t_pipx_config_details));
+
+				m_widget->lineEdit_FirmwareVersion->setText(QString::number(pipx_config_details.major_version) + "." + QString::number(pipx_config_details.minor_version));
+
+				m_widget->lineEdit_SerialNumber->setText(QString::number(pipx_config_details.serial_number, 16).toUpper());
+
+				if (pipx_config_details.frequency_band == freqBand_434MHz)
+					m_widget->lineEdit_FrequencyBand->setText("434MHz");
+				else
+				if (pipx_config_details.frequency_band == freqBand_868MHz)
+					m_widget->lineEdit_FrequencyBand->setText("868MHz");
+				else
+				if (pipx_config_details.frequency_band == freqBand_915MHz)
+					m_widget->lineEdit_FrequencyBand->setText("915MHz");
+				else
+					m_widget->lineEdit_FrequencyBand->setText("UNKNOWN [" + QString::number(pipx_config_details.frequency_band) + "]");
+
+				m_widget->lineEdit_MinFrequency->setText(QString::number((double)pipx_config_details.min_frequency_Hz / 1e6, 'f', 6) + "MHz");
+				m_widget->lineEdit_MaxFrequency->setText(QString::number((double)pipx_config_details.max_frequency_Hz / 1e6, 'f', 6) + "MHz");
+
+				m_widget->doubleSpinBox_Frequency->setMinimum((double)pipx_config_details.min_frequency_Hz / 1e6);
+				m_widget->doubleSpinBox_Frequency->setMaximum((double)pipx_config_details.max_frequency_Hz / 1e6);
+
+				m_widget->lineEdit_FrequencyStepSize->setText(QString::number(pipx_config_details.frequency_step_size, 'f', 2) + "Hz");
+
+				m_widget->pushButton_Save->setEnabled(true);
+				m_widget->pushButton_ScanSpectrum->setEnabled(true);
+			}
+			break;
+
+		case PIPX_PACKET_TYPE_REQ_SETTINGS:
+			break;
+
+		case PIPX_PACKET_TYPE_SETTINGS:
+			if (m_stage == PIPX_REQ_SETTINGS && pipx_config_details.serial_number != 0)
+			{
+				if (packet_size < (int)sizeof(t_pipx_config_header) + (int)sizeof(t_pipx_config_settings))
+					break;	// packet size is too small - error
+
 				m_stage_retries = 0;
+				m_stage = PIPX_REQ_STATE;
 
-				t_pipx_config_data_settings *settings = (t_pipx_config_data_settings *)data;
+				memcpy(&pipx_config_settings, data, sizeof(t_pipx_config_settings));
 
-				m_widget->lineEdit_SerialNumber->setText(QString::number(header->serial_number, 16).toUpper());
-				if (settings->frequency_band == freqBand_434MHz)
-					m_widget->lineEdit_FrequencyBand->setText("434");
-				else
-				if (settings->frequency_band == freqBand_868MHz)
-					m_widget->lineEdit_FrequencyBand->setText("868");
-				else
-				if (settings->frequency_band == freqBand_915MHz)
-					m_widget->lineEdit_FrequencyBand->setText("915");
-				else
-					m_widget->lineEdit_FrequencyBand->setText("UNKNOWN [" + QString::number(settings->frequency_band) + "]");
-				m_widget->lineEdit_MinFrequency->setText(QString::number(settings->min_frequency_Hz));
-				m_widget->lineEdit_MaxFrequency->setText(QString::number(settings->max_frequency_Hz));
-				m_widget->lineEdit_FrequencyStepSize->setText(QString::number(settings->frequency_step_size, 'f', 2));
-				m_widget->lineEdit_State->setText("");
-				m_widget->progressBar_RSSI->setValue(-120);
-				m_widget->lineEdit_RxAFC->setText("");
+				m_widget->lineEdit_PairedSerialNumber->setText(QString::number(pipx_config_settings.destination_id, 16).toUpper());
+				m_widget->spinBox_FrequencyCalibration->setValue(pipx_config_settings.rf_xtal_cap);
 
-				m_widget->lineEdit_PairedSerialNumber->setText(QString::number(settings->destination_id, 16).toUpper());
-				m_widget->spinBox_FrequencyCalibration->setValue(settings->rf_xtal_cap);
+				m_widget->doubleSpinBox_Frequency->setValue((double)pipx_config_settings.frequency_Hz / 1e6);
 
-				m_widget->doubleSpinBox_Frequency->setMinimum((double)settings->min_frequency_Hz / 1e6);
-				m_widget->doubleSpinBox_Frequency->setMaximum((double)settings->max_frequency_Hz / 1e6);
-				m_widget->doubleSpinBox_Frequency->setValue((double)settings->frequency_Hz / 1e6);
+				m_widget->comboBox_MaxRFBandwidth->setCurrentIndex(m_widget->comboBox_MaxRFBandwidth->findData(pipx_config_settings.max_rf_bandwidth));
 
-				m_widget->comboBox_MaxRFBandwidth->setCurrentIndex(m_widget->comboBox_MaxRFBandwidth->findData(settings->max_rf_bandwidth));
+				m_widget->comboBox_MaxRFTxPower->setCurrentIndex(m_widget->comboBox_MaxRFTxPower->findData(pipx_config_settings.max_tx_power));
 
-				m_widget->comboBox_MaxRFTxPower->setCurrentIndex(m_widget->comboBox_MaxRFTxPower->findData(settings->max_tx_power));
-
-				m_widget->comboBox_SerialPortSpeed->setCurrentIndex(m_widget->comboBox_SerialPortSpeed->findData(settings->serial_baudrate));
+				m_widget->comboBox_SerialPortSpeed->setCurrentIndex(m_widget->comboBox_SerialPortSpeed->findData(pipx_config_settings.serial_baudrate));
 
 				QString key = "";
-				for (int i = 0; i < (int)sizeof(settings->aes_key); i++)
-					key += QString::number(settings->aes_key[i], 16).rightJustified(2, '0');
+				for (int i = 0; i < (int)sizeof(pipx_config_settings.aes_key); i++)
+					key += QString::number(pipx_config_settings.aes_key[i], 16).rightJustified(2, '0');
 				m_widget->lineEdit_AESKey->setText(key);
-				m_widget->checkBox_AESEnable->setChecked(settings->aes_enable);
+				m_widget->checkBox_AESEnable->setChecked(pipx_config_settings.aes_enable);
 			}
 
+			break;
+
+		case PIPX_PACKET_TYPE_REQ_STATE:
+			break;
+
+		case PIPX_PACKET_TYPE_STATE:
+			if (m_stage == PIPX_REQ_STATE && pipx_config_details.serial_number != 0)
+			{
+				if (packet_size < (int)sizeof(t_pipx_config_header) + (int)sizeof(t_pipx_config_state))
+					break;	// packet size is too small - error
+
+				m_stage_retries = 0;
+//				m_stage = PIPX_REQ_STATE;
+
+				memcpy(&pipx_config_state, data, sizeof(t_pipx_config_state));
+
+				switch (pipx_config_state.link_state)
+				{
+					case link_disconnected:
+						m_widget->lineEdit_LinkState->setText("Disconnected");
+						break;
+					case link_connecting:
+						m_widget->lineEdit_LinkState->setText("Connecting");
+						break;
+					case link_connected:
+						m_widget->lineEdit_LinkState->setText("Connected");
+						break;
+					default:
+						m_widget->lineEdit_LinkState->setText("Unknown [" + QString::number(pipx_config_state.link_state) + "]");
+						break;
+				}
+				m_widget->progressBar_RSSI->setValue(pipx_config_state.rssi);
+				m_widget->lineEdit_RxAFC->setText(QString::number(pipx_config_state.afc) + "Hz");
+			}
+
+			break;
+
+		default:
 			break;
 	}
 }
@@ -851,31 +955,43 @@ void PipXtremeGadgetWidget::processStream()
 	switch (m_stage)
 	{
 		case PIPX_IDLE:
-			break;
-
-		case PIPX_REQ_CONFIG:
-			if (++m_stage_retries > MAX_RETRIES)
-			{
-				disconnectPort(true, false);
-				break;
-			}
-			sendRequestConfig();
 			QTimer::singleShot(RETRY_TIME, this, SLOT(processStream()));
 			break;
 
-		case PIPX_REQ_RSSI:
+		case PIPX_REQ_DETAILS:
 			if (++m_stage_retries > MAX_RETRIES)
 			{
 				disconnectPort(true, false);
 				break;
 			}
+			sendRequestDetails(0);
+			QTimer::singleShot(RETRY_TIME, this, SLOT(processStream()));
+			break;
 
+		case PIPX_REQ_SETTINGS:
+			if (++m_stage_retries > MAX_RETRIES)
+			{
+				disconnectPort(true, false);
+				break;
+			}
+			sendRequestSettings(pipx_config_details.serial_number);
+			QTimer::singleShot(RETRY_TIME, this, SLOT(processStream()));
+			break;
+
+		case PIPX_REQ_STATE:
+			if (++m_stage_retries > MAX_RETRIES)
+			{
+				disconnectPort(true, false);
+				break;
+			}
+			sendRequestState(pipx_config_details.serial_number);
 			QTimer::singleShot(RETRY_TIME, this, SLOT(processStream()));
 			break;
 
 		default:
 			m_stage_retries = 0;
 			m_stage = PIPX_IDLE;
+			QTimer::singleShot(RETRY_TIME, this, SLOT(processStream()));
 			break;
 	}
 }
@@ -896,15 +1012,16 @@ void PipXtremeGadgetWidget::disconnectPort(bool enable_telemetry, bool lock_stuf
 
 	device_input_buffer.used = 0;
 
-	if (!m_ioDevice)
-		return;
+	memset(&pipx_config_details, 0, sizeof(pipx_config_details));
+	memset(&pipx_config_settings, 0, sizeof(pipx_config_settings));
 
-	m_ioDevice->close();
-
-	disconnect(m_ioDevice, 0, 0, 0);
-
-	delete m_ioDevice;
-	m_ioDevice = NULL;
+	if (m_ioDevice)
+	{
+		m_ioDevice->close();
+		disconnect(m_ioDevice, 0, 0, 0);
+		delete m_ioDevice;
+		m_ioDevice = NULL;
+	}
 
 	m_widget->connectButton->setText("Connect");
 	m_widget->comboBox_SerialBaudrate->setEnabled(true);
@@ -913,12 +1030,13 @@ void PipXtremeGadgetWidget::disconnectPort(bool enable_telemetry, bool lock_stuf
 	m_widget->pushButton_ScanSpectrum->setEnabled(false);
 	m_widget->pushButton_Save->setEnabled(false);
 
+	m_widget->lineEdit_FirmwareVersion->setText("");
 	m_widget->lineEdit_SerialNumber->setText("");
 	m_widget->lineEdit_FrequencyBand->setText("");
 	m_widget->lineEdit_MinFrequency->setText("");
 	m_widget->lineEdit_MaxFrequency->setText("");
 	m_widget->lineEdit_FrequencyStepSize->setText("");
-	m_widget->lineEdit_State->setText("");
+	m_widget->lineEdit_LinkState->setText("");
 	m_widget->progressBar_RSSI->setValue(m_widget->progressBar_RSSI->minimum());
 	m_widget->lineEdit_RxAFC->setText("");
 	m_widget->lineEdit_PairedSerialNumber->setText("");
@@ -1050,21 +1168,21 @@ void PipXtremeGadgetWidget::connectPort()
 	}
 	else
 	{	// connected OK
+		memset(&pipx_config_details, 0, sizeof(pipx_config_details));
+		memset(&pipx_config_settings, 0, sizeof(pipx_config_settings));
+
 		m_widget->connectButton->setText("Disconnect");
 		m_widget->comboBox_SerialBaudrate->setEnabled(false);
 		m_widget->comboBox_Ports->setEnabled(false);
 		m_widget->refreshPorts->setEnabled(false);
-		m_widget->pushButton_ScanSpectrum->setEnabled(true);
-		m_widget->pushButton_Save->setEnabled(true);
 
 		m_ioDevice->setTextModeEnabled(false);
 		QTimer::singleShot(100, this, SLOT(processRxStream()));
 //		connect(m_ioDevice, SIGNAL(readyRead()), this, SLOT(processRxStream()));
 
 		m_stage_retries = 0;
-		m_stage = PIPX_REQ_CONFIG;
-		locker_dev.unlock();
-		processStream();
+		m_stage = PIPX_REQ_DETAILS;
+		QTimer::singleShot(100, this, SLOT(processStream()));
 	}
 }
 

@@ -49,6 +49,10 @@ void PIOS_ADC_Init()
 {	
 	pios_adc_devs[0].callback_function = NULL;
 	
+#if defined(PIOS_INCLUDE_FREERTOS)
+	pios_adc_devs[0].data_queue = NULL;
+#endif
+	
 	/* Setup analog pins */
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
@@ -191,6 +195,16 @@ void PIOS_ADC_SetCallback(ADCCallback new_function)
 	pios_adc_devs[0].callback_function = new_function;
 }
 
+#if defined(PIOS_INCLUDE_FREERTOS)
+/**
+ * @brief Register a queue to add data to when downsampled 
+ */
+void PIOS_ADC_SetQueue(xQueueHandle data_queue) 
+{
+	pios_adc_devs[0].data_queue = data_queue;
+}
+#endif
+
 /**
  * @brief Return the address of the downsampled data buffer 
  */
@@ -247,6 +261,13 @@ void PIOS_ADC_downsample_data()
 		downsampled_buffer[chan] = (float) sum / pios_adc_devs[0].fir_coeffs[pios_adc_devs[0].adc_oversample];
 	}
 	
+#if defined(PIOS_INCLUDE_FREERTOS)
+	if(pios_adc_devs[0].data_queue) {
+		static portBASE_TYPE xHigherPriorityTaskWoken;
+		xQueueSendFromISR(pios_adc_devs[0].data_queue, pios_adc_devs[0].downsampled_buffer, &xHigherPriorityTaskWoken);
+		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);		
+	}
+#endif
 	if(pios_adc_devs[0].callback_function)
 		pios_adc_devs[0].callback_function(pios_adc_devs[0].downsampled_buffer);
 }

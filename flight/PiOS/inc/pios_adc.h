@@ -44,6 +44,9 @@ int32_t PIOS_ADC_PinGet(uint32_t pin);
 int16_t * PIOS_ADC_GetRawBuffer(void);
 uint8_t PIOS_ADC_GetOverSampling(void);
 void PIOS_ADC_SetCallback(ADCCallback new_function);
+#if defined(PIOS_INCLUDE_FREERTOS)
+void PIOS_ADC_SetQueue(xQueueHandle data_queue);
+#endif
 extern void PIOS_ADC_DMA_Handler(void);
 
 #endif /* PIOS_ADC_H */

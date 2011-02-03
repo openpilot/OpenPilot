@@ -74,8 +74,6 @@ static xTaskHandle taskHandle;
 // Private functions
 static void AttitudeTask(void *parameters);
 
-void adc_callback(float * data);
-
 static float gyro_correct_int[3] = {0,0,0};
 static xQueueHandle gyro_queue;
 
@@ -99,10 +97,11 @@ int32_t AttitudeInitialize(void)
 	AttitudeActualSet(&attitude);
 	
 	// Create queue for passing gyro data, allow 2 back samples in case
-	gyro_queue = xQueueCreate(2, sizeof(float) * 3);
+	gyro_queue = xQueueCreate(2, sizeof(float) * 4);
 	if(gyro_queue == NULL) 
 		return -1;
-		
+	PIOS_ADC_SetQueue(gyro_queue);
+	
 	// Start main task
 	xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_ATTITUDE, taskHandle);
@@ -119,7 +118,6 @@ static void AttitudeTask(void *parameters)
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 
 	PIOS_ADC_Config(PIOS_ADC_RATE / (1000 / UPDATE_RATE));
-	PIOS_ADC_SetCallback(adc_callback);
 
 	// Keep flash CS pin high while talking accel
 	PIOS_FLASH_DISABLE;		
@@ -161,7 +159,7 @@ static void updateSensors()
 	AttitudeSettingsGet(&settings);
 	
 	struct pios_adxl345_data accel_data;
-	float gyro[3];
+	float gyro[4];
 	
 	// Only wait the time for two nominal updates before setting an alarm
 	if(xQueueReceive(gyro_queue, (void * const) gyro, UPDATE_RATE * 2) == errQUEUE_EMPTY) {
@@ -169,9 +167,11 @@ static void updateSensors()
 		return;
 	}
 	
-	attitudeRaw.gyros[ATTITUDERAW_GYROS_X] = -(gyro[0] - GYRO_NEUTRAL) * settings.GyroGain;
-	attitudeRaw.gyros[ATTITUDERAW_GYROS_Y] = (gyro[1] - GYRO_NEUTRAL) * settings.GyroGain;
-	attitudeRaw.gyros[ATTITUDERAW_GYROS_Z] = -(gyro[2] - GYRO_NEUTRAL) * settings.GyroGain;
+	
+	// First sample is temperature
+	attitudeRaw.gyros[ATTITUDERAW_GYROS_X] = -(gyro[1] - GYRO_NEUTRAL) * settings.GyroGain;
+	attitudeRaw.gyros[ATTITUDERAW_GYROS_Y] = (gyro[2] - GYRO_NEUTRAL) * settings.GyroGain;
+	attitudeRaw.gyros[ATTITUDERAW_GYROS_Z] = -(gyro[3] - GYRO_NEUTRAL) * settings.GyroGain;
 	
 	// Applying integral component here so it can be seen on the gyros and correct bias
 	attitudeRaw.gyros[ATTITUDERAW_GYROS_X] += gyro_correct_int[0];
@@ -285,14 +285,6 @@ static void updateAttitude()
 
 	AttitudeActualSet(&attitudeActual);
 }
-
-void adc_callback(float * data) 
-{
-	static portBASE_TYPE xHigherPriorityTaskWoken;
-	xQueueSendFromISR(gyro_queue, data, &xHigherPriorityTaskWoken);
-	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-}
-
 /**
   * @}
   * @}

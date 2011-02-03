@@ -45,6 +45,9 @@ struct pios_adc_cfg {
 struct pios_adc_dev {
 	const struct pios_adc_cfg *const cfg;	
 	ADCCallback callback_function;
+#if defined(PIOS_INCLUDE_FREERTOS)
+	xQueueHandle data_queue;
+#endif
 	volatile int16_t *valid_data_buffer;
 	volatile uint8_t adc_oversample;
 	uint8_t dma_block_size;

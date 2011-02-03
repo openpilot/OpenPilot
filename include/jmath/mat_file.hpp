@@ -20,10 +20,10 @@ namespace jafar {
 		public:
 			boost::numeric::ublas::matrix<T> data;
 			///default constructor
-      matrix_file() : jafar::kernel::CSVFileSaveLoad(), data(0,0) {};
+      matrix_file() : jafar::kernel::CSVFileSaveLoad(), data(0,0) {}
 			///constructor which initializes data content to @param _data
 			matrix_file(const boost::numeric::ublas::matrix<T> &_data) : 
-				jafar::kernel::CSVFileSaveLoad(), data(_data) {};
+				jafar::kernel::CSVFileSaveLoad(), data(_data) {}
 			protected:
 			void loadCSVFile(jafar::kernel::CSVFile& csvFile) {
 				data.resize(csvFile.nbOfLines(), csvFile.nbOfColumns());
@@ -60,10 +60,10 @@ namespace jafar {
 			storage storage_type;
 			///default constructor
       vector_file(storage type = VERTICAL) : 
-				jafar::kernel::CSVFileSaveLoad(), data(0), storage_type(type) {};
+				jafar::kernel::CSVFileSaveLoad(), data(0), storage_type(type) {}
 			///constructor which initializes data content to @param _data
 			vector_file(const boost::numeric::ublas::vector<T>& _data, storage type = VERTICAL) : 
-				jafar::kernel::CSVFileSaveLoad(), data(_data), storage_type(type) {};
+				jafar::kernel::CSVFileSaveLoad(), data(_data), storage_type(type) {}
 			protected:
 			void loadCSVFile(jafar::kernel::CSVFile& csvFile) {
 				JFR_PRED_ERROR((csvFile.nbOfLines() == 1) || (csvFile.nbOfColumns() == 1),

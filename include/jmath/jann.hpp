@@ -24,43 +24,43 @@ namespace ublas = boost::numeric::ublas;
 
 /// special nemespace to wrap flann library
 namespace jann {
-	/// algorithm to be used for research, use only if you want to create a new Index
-	enum algorithm {
-		LINEAR        = 0,
-		KDTREE        = 1,
-		KMEANS        = 2,
-		COMPOSITE     = 3,
-		KDTREE_SINGLE = 4,
-		SAVED         = 254,
-		AUTOTUNED     = 255
-	};
-	/// algorithm to initialize centers for the K Means algorithm
-	enum centers_init {
-		CENTERS_RANDOM   = 0,
-		CENTERS_GONZALES = 1,
-		CENTERS_KMEANSPP = 2
-	};
-	/// determine log level
-	enum log_level {
-		LOG_NONE  = 0,
-		LOG_FATAL = 1,
-		LOG_ERROR = 2,
-		LOG_WARN  = 3,
-		LOG_INFO  = 4
-	};
-	/// supported distances
-	enum distance {
-		EUCLIDEAN        = 1,
-		MANHATTAN        = 2,
-		MINKOWSKI        = 3,
-		MAX_DIST         = 4,
-		HIST_INTERSECT   = 5,
-		HELLINGER        = 6,
-		CS               = 7,
-		CHI_SQUARE       = 7,
-		KL               = 8,
-		KULLBACK_LEIBLER = 8
-	};
+	// /// algorithm to be used for research, use only if you want to create a new Index
+	// enum algorithm {
+	// 	LINEAR        = 0,
+	// 	KDTREE        = 1,
+	// 	KMEANS        = 2,
+	// 	COMPOSITE     = 3,
+	// 	KDTREE_SINGLE = 4,
+	// 	SAVED         = 254,
+	// 	AUTOTUNED     = 255
+	// };
+	// /// algorithm to initialize centers for the K Means algorithm
+	// enum centers_init {
+	// 	CENTERS_RANDOM   = 0,
+	// 	CENTERS_GONZALES = 1,
+	// 	CENTERS_KMEANSPP = 2
+	// };
+	// /// determine log level
+	// enum log_level {
+	// 	LOG_NONE  = 0,
+	// 	LOG_FATAL = 1,
+	// 	LOG_ERROR = 2,
+	// 	LOG_WARN  = 3,
+	// 	LOG_INFO  = 4
+	// };
+	// /// supported distances
+	// enum distance {
+	// 	EUCLIDEAN        = 1,
+	// 	MANHATTAN        = 2,
+	// 	MINKOWSKI        = 3,
+	// 	MAX_DIST         = 4,
+	// 	HIST_INTERSECT   = 5,
+	// 	HELLINGER        = 6,
+	// 	CS               = 7,
+	// 	CHI_SQUARE       = 7,
+	// 	KL               = 8,
+	// 	KULLBACK_LEIBLER = 8
+	// };
 
 	/** Class search_params holds the search parameters
 	 */
@@ -362,7 +362,7 @@ namespace jann {
 		 */	
 		K_means_index(const ublas::matrix<typename DISTANCE::ElementType>& dataset,
 									int branching = 32, int iterations = 11, 
-									centers_init init = CENTERS_RANDOM, 
+									flann_centers_init_t init = CENTERS_RANDOM, 
 									float cb_index = 0.2 ) :
 			index_factory<DISTANCE>(dataset, 
 															flann::KMeansIndexParams(branching, iterations, 
@@ -383,7 +383,7 @@ namespace jann {
 		 */
 		composite_index(const ublas::matrix<typename DISTANCE::ElementType>& dataset,
 										int trees = 4, int branching = 32, int iterations = 11,
-										centers_init init = CENTERS_RANDOM, float cb_index = 0.2 ) :
+										flann_centers_init_t init = CENTERS_RANDOM, float cb_index = 0.2 ) :
 			index_factory<DISTANCE>(dataset, 
 															flann::CompositeIndexParams(trees, branching,
 																													iterations, init,

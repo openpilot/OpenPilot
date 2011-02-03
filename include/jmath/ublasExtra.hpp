@@ -635,6 +635,61 @@ namespace jafar {
 						M_v(r, c) = M(r,c) - v[c];
 			}
 			
+			/** deletes a matrix M(nxm) row in a memory efficient way i.e. no extra memory
+			 *  is allocated.
+			 * @return M with size n-1xm.
+			 */
+			template<typename T>
+			void delete_row(ublas::matrix<T> &M, size_t index) 
+			{
+				JFR_ASSERT((index < M.size1() && (index>=0)),
+									 "index must be in [0.."<<M.size1()<<"[ range")
+				if (index == M.size1() -1)
+					M.resize(index, M.size2(), true);
+				else {
+					for(size_t row_counter = index+1; row_counter < M.size1();row_counter++)
+						row(M,row_counter-1) = row(M,row_counter);
+					M.resize(M.size1() - 1, M.size2(), true);
+				}
+			}
+
+			/** deletes a matrix M(nxm) column in a memory efficient way i.e. no extra memory
+			 *  is allocated.
+			 * @return M with size nxm-1.
+			 */
+			template<typename T>
+			void delete_column(ublas::matrix<T> &M, size_t index) 
+			{
+				JFR_ASSERT((index < M.size2() && (index>=0)),
+									 "index must be in [0.."<<M.size2()<<"[ range")
+				if (index == M.size2() - 1)
+					M.resize(M.size1(), index, true);
+				else {
+					for(size_t col_counter = index+1; col_counter < M.size1();col_counter++)
+						column(M,col_counter-1) = column(M,col_counter);
+					M.resize(M.size1() , M.size2() - 1, true);
+				}
+			}
+			/** deletes a list of column indices stored in @ref indices from @ref M
+			 * @param indices: vector of indices considered
+			 * @param is_sorted: are the indices sorted into an acending order?
+			 * @return M with size nxm-(indices.size()).
+			 */
+			template<typename T>
+			void delete_columns(ublas::matrix<T> &M, 
+													std::vector<size_t> indices, 
+													bool is_sorted = false) 
+			{
+				JFR_ASSERT((indices.size() < M.size2() && (indices.size()>0)),
+									 "indices size is "<<indices.size()<<
+									 " whereas M columns size is "<<M.size2())
+				if(!is_sorted)
+					std::sort(indices.begin(), indices.end());
+				for(std::vector<size_t>::reverse_iterator rit = indices.rbegin();
+						rit != indices.rend();
+						++rit)
+					delete_column(M, *rit);
+			}
 		} // namespace ublasExtra
 
 	/*\@}*/

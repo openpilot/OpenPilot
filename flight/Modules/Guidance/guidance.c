@@ -61,7 +61,7 @@
 
 // Private constants
 #define MAX_QUEUE_SIZE 1
-#define STACK_SIZE_BYTES 824
+#define STACK_SIZE_BYTES 1024
 #define TASK_PRIORITY (tskIDLE_PRIORITY+2)
 // Private types
 
@@ -124,6 +124,7 @@ static void guidanceTask(void *parameters)
 	// Main task loop
 	lastUpdateTime = xTaskGetTickCount();
 	while (1) {
+		GuidanceSettingsGet(&guidanceSettings);
 
 		// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
 		if ( xQueueReceive(queue, &ev, guidanceSettings.UpdatePeriod / portTICK_RATE_MS) != pdTRUE )
@@ -171,7 +172,7 @@ static void guidanceTask(void *parameters)
 		// Convert from m/s to cm/s
 		accelData.North = accel[0] * 100;
 		accelData.East = accel[1] * 100;
-		accelData.North = accel[2] * 100;
+		accelData.Down = accel[2] * 100;
 		NedAccelSet(&accelData);
 		
 		

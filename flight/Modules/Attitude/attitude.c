@@ -75,9 +75,9 @@ static xTaskHandle taskHandle;
 static void AttitudeTask(void *parameters);
 
 void adc_callback(float * data);
-float gyro[3] = {0, 0, 0};
 
 static float gyro_correct_int[3] = {0,0,0};
+static xQueueHandle gyro_queue;
 
 static void initSensors();
 static void updateSensors();
@@ -98,7 +98,10 @@ int32_t AttitudeInitialize(void)
 	attitude.q4 = 0;
 	AttitudeActualSet(&attitude);
 	
-	
+	// Create queue for passing gyro data, allow 2 back samples in case
+	gyro_queue = xQueueCreate(2, sizeof(float) * 3);
+	if(gyro_queue == NULL) 
+		return -1;
 		
 	// Start main task
 	xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
@@ -106,7 +109,7 @@ int32_t AttitudeInitialize(void)
 	PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
 	return 0;
 }
-static portTickType lastSysTime;
+
 /**
  * Module thread, should not return.
  */
@@ -126,18 +129,10 @@ static void AttitudeTask(void *parameters)
 	
 	// Main task loop
 	while (1) {
-		//
 		PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
 		
-		// TODO: register the adc callback, push the data onto a queue (safe for thread)
-		// with the queue ISR version
 		updateSensors();		
 		updateAttitude();
-		
-		/* Wait for the next update interval */
-		vTaskDelayUntil(&lastSysTime, UPDATE_RATE / portTICK_RATE_MS);
-		//vTaskDelay(UPDATE_RATE / portTICK_RATE_MS);
-
 	}
 }
 
@@ -167,6 +162,13 @@ static void updateSensors()
 	AttitudeSettingsGet(&settings);
 	
 	struct pios_adxl345_data accel_data;
+	float gyro[3];
+	
+	// Only wait the time for two nominal updates before setting an alarm
+	if(xQueueReceive(gyro_queue, (void * const) gyro, UPDATE_RATE * 2) == errQUEUE_EMPTY) {
+		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
+		return;
+	}
 	
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_X] = -(gyro[0] - GYRO_NEUTRAL) * settings.GyroGain;
 	attitudeRaw.gyros_filtered[ATTITUDERAW_GYROS_FILTERED_Y] = (gyro[1] - GYRO_NEUTRAL) * settings.GyroGain;
@@ -291,9 +293,9 @@ static void updateAttitude()
 
 void adc_callback(float * data) 
 {
-	gyro[0] = data[1];
-	gyro[1] = data[2];
-	gyro[2] = data[3];
+	static portBASE_TYPE xHigherPriorityTaskWoken;
+	xQueueSendFromISR(gyro_queue, data, &xHigherPriorityTaskWoken);
+	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 
 /**

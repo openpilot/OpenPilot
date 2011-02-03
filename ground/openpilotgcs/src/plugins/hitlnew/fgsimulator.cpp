@@ -385,11 +385,11 @@ void FGSimulator::processUpdate(const QByteArray& inp)
         AttitudeRaw::DataFields rawData;
         memset(&rawData, 0, sizeof(AttitudeRaw::DataFields));
         rawData = attRaw->getData();
-        rawData.gyros_filtered[0] = rollRate;
-        //rawData.gyros_filtered[1] = cos(DEG2RAD * roll) * pitchRate + sin(DEG2RAD * roll) * yawRate;
-        //rawData.gyros_filtered[2] = cos(DEG2RAD * roll) * yawRate - sin(DEG2RAD * roll) * pitchRate;
-        rawData.gyros_filtered[1] = pitchRate;
-        rawData.gyros_filtered[2] = yawRate;
+        rawData.gyros[0] = rollRate;
+        //rawData.gyros[1] = cos(DEG2RAD * roll) * pitchRate + sin(DEG2RAD * roll) * yawRate;
+        //rawData.gyros[2] = cos(DEG2RAD * roll) * yawRate - sin(DEG2RAD * roll) * pitchRate;
+        rawData.gyros[1] = pitchRate;
+        rawData.gyros[2] = yawRate;
         attRaw->setData(rawData);
         // attRaw->updated();
 }

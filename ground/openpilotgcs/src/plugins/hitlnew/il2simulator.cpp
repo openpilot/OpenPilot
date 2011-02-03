@@ -272,9 +272,9 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
         AttitudeRaw::DataFields rawData;
         memset(&rawData, 0, sizeof(AttitudeRaw::DataFields));
         rawData = attRaw->getData();
-        rawData.gyros_filtered[0] = current.dRoll;
-        rawData.gyros_filtered[1] = cos(DEG2RAD * current.roll) * current.dPitch + sin(DEG2RAD * current.roll) * current.dAzimuth;
-        rawData.gyros_filtered[2] = cos(DEG2RAD * current.roll) * current.dAzimuth - sin(DEG2RAD * current.roll) * current.dPitch;
+        rawData.gyros[0] = current.dRoll;
+        rawData.gyros[1] = cos(DEG2RAD * current.roll) * current.dPitch + sin(DEG2RAD * current.roll) * current.dAzimuth;
+        rawData.gyros[2] = cos(DEG2RAD * current.roll) * current.dAzimuth - sin(DEG2RAD * current.roll) * current.dPitch;
 
         // Update homelocation
         HomeLocation::DataFields homeData;

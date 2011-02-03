@@ -289,7 +289,7 @@ void ConfigAHRSWidget::launchAccelBiasCalibration()
   */
 void ConfigAHRSWidget::accelBiasattitudeRawUpdated(UAVObject *obj)
 {
-    UAVObjectField *accel_field = obj->getField(QString("accels_filtered"));
+    UAVObjectField *accel_field = obj->getField(QString("accels"));
     Q_ASSERT(accel_field != 0);
 
     // This is necessary to prevent a race condition on disconnect signal and another update
@@ -537,8 +537,8 @@ void ConfigAHRSWidget::saveAHRSCalibration()
 void ConfigAHRSWidget::attitudeRawUpdated(UAVObject * obj)
 {
     QMutexLocker lock(&attitudeRawUpdateLock);
-    UAVObjectField *accel_field = obj->getField(QString("accels_filtered"));
-    UAVObjectField *gyro_field = obj->getField(QString("gyros_filtered"));
+    UAVObjectField *accel_field = obj->getField(QString("accels"));
+    UAVObjectField *gyro_field = obj->getField(QString("gyros"));
     UAVObjectField *mag_field = obj->getField(QString("magnetometers"));
 
     Q_ASSERT(gyro_field != 0 && accel_field != 0 && mag_field != 0);

@@ -32,6 +32,7 @@
 #include <coreplugin/dialogs/ioptionspage.h>
 #include <QtCore/QPointer>
 #include <QtGui/QWidget>
+#include <QSettings>
 
 namespace Core {
 namespace Internal {
@@ -54,6 +55,8 @@ public:
     QWidget* createPage(QWidget *parent);
     void apply();
     void finish();
+    void readSettings(QSettings* qs);
+    void saveSettings(QSettings* qs);
 
 private slots:
     void resetInterfaceColor();
@@ -69,6 +72,7 @@ private:
     QString language() const;
     void setLanguage(const QString&);
     Ui::GeneralSettings *m_page;
+    QString m_language;
     QPointer<QWidget> m_dialog;
     QList<QTextCodec *> m_codecs;
 

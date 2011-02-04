@@ -55,7 +55,8 @@ static const char *fixedOptionsC =
 "Options:\n"
 "    -help               Display this help\n"
 "    -version            Display program version\n"
-"    -client             Attempt to connect to already running instance\n";
+"    -client             Attempt to connect to already running instance\n"
+"    -D key=value        Override preference e.g: -D General/OverrideLanguage=de\n";
 
 static const char *HELP_OPTION1 = "-h";
 static const char *HELP_OPTION2 = "-help";
@@ -63,6 +64,7 @@ static const char *HELP_OPTION3 = "/h";
 static const char *HELP_OPTION4 = "--help";
 static const char *VERSION_OPTION = "-version";
 static const char *CLIENT_OPTION = "-client";
+static const char *SETTING_OPTION = "-D";
 
 typedef QList<ExtensionSystem::PluginSpec *> PluginSpecSet;
 
@@ -198,6 +200,27 @@ static inline QStringList getPluginPaths()
 #  define SHARE_PATH "/../share/openpilotgcs"
 #endif
 
+static void overrideSettings(QSettings &settings, int argc, char **argv){
+
+    QMap<QString, QString> settingOptions;
+    // Options like -DMy/setting=test
+    QRegExp rx("([^=]+)=(.*)");
+
+    int i = 0;
+    while( i < argc ){
+        if ( QString("-D").compare(QString(argv[i++])) == 0 ){
+            if ( rx.indexIn(argv[i]) > -1 ){
+                settingOptions.insert(rx.cap(1), rx.cap(2));
+            }
+        }
+    }
+    QList<QString> keys = settingOptions.keys();
+    foreach ( QString key, keys ){
+        settings.setValue(key, settingOptions.value(key));
+    }
+    settings.sync();
+}
+
 int main(int argc, char **argv)
 {
 #ifdef Q_OS_MAC
@@ -210,33 +233,35 @@ int main(int argc, char **argv)
 
     SharedTools::QtSingleApplication app((QLatin1String(appNameC)), argc, argv);
 
-    QTranslator translator;
-    QTranslator qtTranslator;
     QString locale = QLocale::system().name();
 
     // Must be done before any QSettings class is created
     QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope,
             QCoreApplication::applicationDirPath()+QLatin1String(SHARE_PATH));
     // keep this in sync with the MainWindow ctor in coreplugin/mainwindow.cpp
-    const QSettings settings(QSettings::IniFormat, QSettings::UserScope,
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope,
                                  QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS"));
+
+    overrideSettings(settings, argc, argv);
     locale = settings.value("General/OverrideLanguage", locale).toString();
 
+    QTranslator translator;
+    QTranslator qtTranslator;
 
     const QString &creatorTrPath = QCoreApplication::applicationDirPath()
-                        + QLatin1String(SHARE_PATH "/translations");
+                                   + QLatin1String(SHARE_PATH "/translations");
     if (translator.load(QLatin1String("openpilotgcs_") + locale, creatorTrPath)) {
         const QString &qtTrPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
         const QString &qtTrFile = QLatin1String("qt_") + locale;
         // Binary installer puts Qt tr files into creatorTrPath
         if (qtTranslator.load(qtTrFile, qtTrPath) || qtTranslator.load(qtTrFile, creatorTrPath)) {
-            app.installTranslator(&translator);
-            app.installTranslator(&qtTranslator);
-            app.setProperty("qtc_locale", locale);
+            QCoreApplication::installTranslator(&translator);
+            QCoreApplication::installTranslator(&qtTranslator);
         } else {
             translator.load(QString()); // unload()
         }
     }
+    app.setProperty("qtc_locale", locale); // Do we need this?
 
     // Load
     ExtensionSystem::PluginManager pluginManager;
@@ -255,6 +280,7 @@ int main(int argc, char **argv)
         appOptions.insert(QLatin1String(HELP_OPTION4), false);
         appOptions.insert(QLatin1String(VERSION_OPTION), false);
         appOptions.insert(QLatin1String(CLIENT_OPTION), false);
+        appOptions.insert(QLatin1String(SETTING_OPTION), true);
         QString errorMessage;
         if (!pluginManager.parseOptions(arguments,
                                         appOptions,
@@ -329,4 +355,3 @@ int main(int argc, char **argv)
     QTimer::singleShot(100, &pluginManager, SLOT(startTests()));
     return app.exec();
 }
-

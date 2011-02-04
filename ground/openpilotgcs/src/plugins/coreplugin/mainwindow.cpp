@@ -1009,6 +1009,7 @@ void MainWindow::readSettings(QSettings* qs)
         qs = m_settings;
     }
 
+    m_generalSettings->readSettings(qs);
     m_actionManager->readSettings(qs);
 
     qs->beginGroup(QLatin1String(settingsGroup));
@@ -1069,6 +1070,7 @@ void MainWindow::saveSettings(QSettings* qs)
 
     m_viewManager->saveSettings(qs);
     m_actionManager->saveSettings(qs);
+    m_generalSettings->saveSettings(qs);
 
 }
 

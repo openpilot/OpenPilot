@@ -111,8 +111,6 @@ QWidget *GeneralSettings::createPage(QWidget *parent)
     QWidget *w = new QWidget(parent);
     m_page->setupUi(w);
 
-    /* TODO: Clean this: settings not used, Core::ICore::instance()->settings() shouldn't be used, since not externally configurable */
-    QSettings* settings = Core::ICore::instance()->settings();
     fillLanguageBox();
 
     m_page->colorButton->setColor(StyleHelper::baseColor());
@@ -154,6 +152,26 @@ void GeneralSettings::apply()
 void GeneralSettings::finish()
 {
     delete m_page;
+}
+
+void GeneralSettings::readSettings(QSettings* qs)
+{
+    qs->beginGroup(QLatin1String("General"));
+    m_language = qs->value(QLatin1String("OverrideLanguage"),QLocale::system().name()).toString();
+    qs->endGroup();
+
+}
+
+void GeneralSettings::saveSettings(QSettings* qs)
+{
+    qs->beginGroup(QLatin1String("General"));
+
+    if (m_language.isEmpty())
+        qs->remove(QLatin1String("OverrideLanguage"));
+    else
+        qs->setValue(QLatin1String("OverrideLanguage"), m_language);
+
+    qs->endGroup();
 }
 
 void GeneralSettings::resetInterfaceColor()
@@ -200,20 +218,15 @@ void GeneralSettings::resetLanguage()
 
 QString GeneralSettings::language() const
 {
-    QSettings* settings = Core::ICore::instance()->settings();
-    return settings->value(QLatin1String("General/OverrideLanguage")).toString();
+    return m_language;
 }
 
 void GeneralSettings::setLanguage(const QString &locale)
 {
-    QSettings* settings = Core::ICore::instance()->settings();
-    if (settings->value(QLatin1String("General/OverrideLanguage")).toString() != locale)
+    if (m_language != locale)
     {
         QMessageBox::information((QWidget*)Core::ICore::instance()->mainWindow(), tr("Restart required"),
                                  tr("The language change will take effect after a restart of the OpenPilot GCS."));
+        m_language = locale;
     }
-    if (locale.isEmpty())
-        settings->remove(QLatin1String("General/OverrideLanguage"));
-    else
-        settings->setValue(QLatin1String("General/OverrideLanguage"), locale);
 }

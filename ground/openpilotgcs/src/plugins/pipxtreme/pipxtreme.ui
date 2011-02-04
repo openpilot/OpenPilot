@@ -125,7 +125,7 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
+     <item row="1" column="1" colspan="2">
       <widget class="QLineEdit" name="lineEdit_SerialNumber">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -183,7 +183,7 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
+     <item row="2" column="1" colspan="2">
       <widget class="QLineEdit" name="lineEdit_FrequencyBand">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -234,7 +234,7 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
+     <item row="3" column="1" colspan="2">
       <widget class="QLineEdit" name="lineEdit_MinFrequency">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -285,7 +285,7 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="4" column="1" colspan="2">
       <widget class="QLineEdit" name="lineEdit_MaxFrequency">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -336,7 +336,7 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="5" column="1" colspan="2">
       <widget class="QLineEdit" name="lineEdit_FrequencyStepSize">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -387,7 +387,7 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="1">
+     <item row="6" column="1" colspan="2">
       <widget class="QLineEdit" name="lineEdit_LinkState">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -429,16 +429,16 @@
       </widget>
      </item>
      <item row="7" column="0">
-      <widget class="QLabel" name="label_16">
+      <widget class="QLabel" name="label_RSSI">
        <property name="text">
-        <string>RSSI (dBm)</string>
+        <string>RSSI</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>
-     <item row="7" column="1">
+     <item row="7" column="1" colspan="2">
       <widget class="QProgressBar" name="progressBar_RSSI">
        <property name="font">
         <font>
@@ -462,7 +462,7 @@
         <set>Qt::AlignCenter</set>
        </property>
        <property name="textVisible">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="textDirection">
         <enum>QProgressBar::TopToBottom</enum>
@@ -482,7 +482,7 @@
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
+     <item row="8" column="1" colspan="2">
       <widget class="QLineEdit" name="lineEdit_RxAFC">
        <property name="font">
         <font>
@@ -515,7 +515,7 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
+     <item row="0" column="1" colspan="2">
       <widget class="QLineEdit" name="lineEdit_FirmwareVersion">
        <property name="font">
         <font>
@@ -541,7 +541,7 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="3">
+     <item row="2" column="4">
       <widget class="QSpinBox" name="spinBox_FrequencyCalibration">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -566,7 +566,7 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="2">
+     <item row="2" column="3">
       <widget class="QLabel" name="label_13">
        <property name="text">
         <string>Frequency Calibration</string>
@@ -576,7 +576,7 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="3">
+     <item row="3" column="4">
       <widget class="QDoubleSpinBox" name="doubleSpinBox_Frequency">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -613,7 +613,7 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="2">
+     <item row="3" column="3">
       <widget class="QLabel" name="label_5">
        <property name="text">
         <string>Frequency (MHz)</string>
@@ -623,7 +623,7 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="3">
+     <item row="4" column="4">
       <widget class="QComboBox" name="comboBox_MaxRFBandwidth">
        <property name="maximumSize">
         <size>
@@ -636,7 +636,7 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="2">
+     <item row="4" column="3">
       <widget class="QLabel" name="label_6">
        <property name="text">
         <string>Max RF Datarate (bits/s)</string>
@@ -646,7 +646,7 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="3">
+     <item row="5" column="4">
       <widget class="QComboBox" name="comboBox_MaxRFTxPower">
        <property name="maximumSize">
         <size>
@@ -665,7 +665,7 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="2">
+     <item row="5" column="3">
       <widget class="QLabel" name="label_7">
        <property name="text">
         <string>Max RF Tx Power</string>
@@ -675,7 +675,7 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="3">
+     <item row="6" column="4">
       <widget class="QComboBox" name="comboBox_SerialPortSpeed">
        <property name="maximumSize">
         <size>
@@ -688,7 +688,7 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="2">
+     <item row="6" column="3">
       <widget class="QLabel" name="label_8">
        <property name="text">
         <string>Serial Port Speed</string>
@@ -698,7 +698,7 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="2">
+     <item row="0" column="3">
       <widget class="QLabel" name="label_14">
        <property name="text">
         <string>Mode</string>
@@ -708,7 +708,7 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="3">
+     <item row="0" column="4">
       <widget class="QComboBox" name="comboBox_Mode">
        <property name="enabled">
         <bool>false</bool>
@@ -724,7 +724,7 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="3">
+     <item row="1" column="4">
       <widget class="QLineEdit" name="lineEdit_PairedSerialNumber">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -752,7 +752,7 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="2">
+     <item row="1" column="3">
       <widget class="QLabel" name="label">
        <property name="text">
         <string>Paired Serial Number (hex)</string>
@@ -772,7 +772,7 @@
        </property>
       </widget>
      </item>
-     <item row="9" column="1">
+     <item row="9" column="1" colspan="2">
       <widget class="QLineEdit" name="lineEdit_Retries">
        <property name="font">
         <font>
@@ -880,7 +880,7 @@
      <item>
       <widget class="QPushButton" name="pushButton_Import">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="toolTip">
         <string>Restore the settings from a file</string>
@@ -893,7 +893,7 @@
      <item>
       <widget class="QPushButton" name="pushButton_Export">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="toolTip">
         <string>Save the settings into a file</string>

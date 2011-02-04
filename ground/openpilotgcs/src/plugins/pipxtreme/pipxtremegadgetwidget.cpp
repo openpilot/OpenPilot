@@ -25,11 +25,10 @@
 
 #include <QDebug>
 #include <QtOpenGL/QGLWidget>
+#include <QSettings>
 #include <stdlib.h>
 
 #include "pipxtremegadgetwidget.h"
-
-//#include <aggregation/aggregate.h>
 
 #define NO_PORT					0
 #define SERIAL_PORT				1
@@ -184,6 +183,8 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 	m_widget->progressBar_RSSI->setMaximum(-20);
 	m_widget->progressBar_RSSI->setValue(m_widget->progressBar_RSSI->minimum());
 
+	m_widget->label_RSSI->setText("RSSI");
+
 	m_widget->graphicsView_Spectrum->setScene(new QGraphicsScene(this));
 	m_widget->graphicsView_Spectrum->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 //	m_widget->graphicsView_Spectrum->setViewport(new QWidget);
@@ -202,6 +203,8 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 
 	m_widget->pushButton_Save->setEnabled(false);
 	m_widget->pushButton_ScanSpectrum->setEnabled(false);
+	m_widget->pushButton_Import->setEnabled(false);
+	m_widget->pushButton_Export->setEnabled(false);
 
 	QIcon rbi;
 	rbi.addFile(QString(":pipxtreme/images/view-refresh.svg"));
@@ -229,6 +232,8 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 	connect(m_widget->pushButton_ScanSpectrum, SIGNAL(clicked()), this, SLOT(scanSpectrum()));
 	connect(m_widget->pushButton_Save, SIGNAL(clicked()), this, SLOT(saveToFlash()));
 	connect(m_widget->lineEdit_AESKey, SIGNAL(textChanged(const QString &)), this, SLOT(textChangedAESKey(const QString &)));
+	connect(m_widget->pushButton_Import, SIGNAL(clicked()), this, SLOT(importSettings()));
+	connect(m_widget->pushButton_Export, SIGNAL(clicked()), this, SLOT(exportSettings()));
 }
 
 // destructor .. this never gets called :(
@@ -868,6 +873,8 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 
 				m_widget->pushButton_Save->setEnabled(true);
 				m_widget->pushButton_ScanSpectrum->setEnabled(true);
+				m_widget->pushButton_Import->setEnabled(true);
+				m_widget->pushButton_Export->setEnabled(true);
 			}
 			break;
 
@@ -941,6 +948,7 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 					m_widget->progressBar_RSSI->setValue(m_widget->progressBar_RSSI->maximum());
 				else
 					m_widget->progressBar_RSSI->setValue(pipx_config_state.rssi);
+				m_widget->label_RSSI->setText("RSSI " + QString::number(pipx_config_state.rssi) + "dBm");
 				m_widget->lineEdit_RxAFC->setText(QString::number(pipx_config_state.afc) + "Hz");
 				m_widget->lineEdit_Retries->setText(QString::number(pipx_config_state.retries));
 			}
@@ -1040,6 +1048,8 @@ void PipXtremeGadgetWidget::disconnectPort(bool enable_telemetry, bool lock_stuf
 	m_widget->refreshPorts->setEnabled(true);
 	m_widget->pushButton_ScanSpectrum->setEnabled(false);
 	m_widget->pushButton_Save->setEnabled(false);
+	m_widget->pushButton_Import->setEnabled(false);
+	m_widget->pushButton_Export->setEnabled(false);
 
 	m_widget->lineEdit_FirmwareVersion->setText("");
 	m_widget->lineEdit_SerialNumber->setText("");
@@ -1049,6 +1059,7 @@ void PipXtremeGadgetWidget::disconnectPort(bool enable_telemetry, bool lock_stuf
 	m_widget->lineEdit_FrequencyStepSize->setText("");
 	m_widget->lineEdit_LinkState->setText("");
 	m_widget->progressBar_RSSI->setValue(m_widget->progressBar_RSSI->minimum());
+	m_widget->label_RSSI->setText("RSSI");
 	m_widget->lineEdit_RxAFC->setText("");
 	m_widget->lineEdit_Retries->setText("");
 	m_widget->lineEdit_PairedSerialNumber->setText("");
@@ -1211,6 +1222,46 @@ void PipXtremeGadgetWidget::connectDisconnect()
 		disconnectPort(true);	// disconnect
 	else
 		connectPort();			// connect
+}
+
+// ***************************************************************************************
+
+void PipXtremeGadgetWidget::importSettings()
+{
+	QString ini_filename = "pipx_" + QString::number(pipx_config_details.serial_number, 16).rightJustified(8, '0') + ".ini";
+
+	QSettings settings(ini_filename, "OpenPilot");
+	settings.setDefaultFormat(QSettings::IniFormat);
+
+	pipx_config_settings.destination_id = settings.value("settings/paired_serial_number", 0).toUInt();
+	pipx_config_settings.rf_xtal_cap = settings.value("settings/frequency_calibration", 0x7f).toUInt();
+
+	m_widget->lineEdit_PairedSerialNumber->setText(QString::number(pipx_config_settings.destination_id, 16).toUpper());
+	m_widget->spinBox_FrequencyCalibration->setValue(pipx_config_settings.rf_xtal_cap);
+//	m_widget->doubleSpinBox_Frequency->setValue((double)pipx_config_settings.frequency_Hz / 1e6);
+//	m_widget->comboBox_MaxRFBandwidth->setCurrentIndex(m_widget->comboBox_MaxRFBandwidth->findData(pipx_config_settings.max_rf_bandwidth));
+//	m_widget->comboBox_MaxRFTxPower->setCurrentIndex(m_widget->comboBox_MaxRFTxPower->findData(pipx_config_settings.max_tx_power));
+//	m_widget->comboBox_SerialPortSpeed->setCurrentIndex(m_widget->comboBox_SerialPortSpeed->findData(pipx_config_settings.serial_baudrate));
+//
+//	QString key = "";
+//	for (int i = 0; i < (int)sizeof(pipx_config_settings.aes_key); i++)
+//		key += QString::number(pipx_config_settings.aes_key[i], 16).rightJustified(2, '0');
+//	m_widget->lineEdit_AESKey->setText(key);
+//	m_widget->checkBox_AESEnable->setChecked(pipx_config_settings.aes_enable);
+
+}
+
+void PipXtremeGadgetWidget::exportSettings()
+{
+
+	QString ini_filename = "pipx_" + QString::number(pipx_config_details.serial_number, 16).rightJustified(8, '0') + ".ini";
+
+	QSettings settings(ini_filename, "OpenPilot");
+	settings.setDefaultFormat(QSettings::IniFormat);
+
+	settings.setValue("settings/paired_serial_number", pipx_config_settings.destination_id);
+	settings.setValue("settings/frequency_calibration", pipx_config_settings.rf_xtal_cap);
+
 }
 
 // ***************************************************************************************

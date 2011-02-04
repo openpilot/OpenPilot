@@ -181,6 +181,8 @@ private:
 	void connectPort();
 
 private slots:
+	void importSettings();
+	void exportSettings();
 	void connectDisconnect();
 	void error(QString errorString, int errorNumber);
     void getPorts();

@@ -222,6 +222,7 @@ volatile uint16_t	rx_buffer_wr;										// the receive buffer write index
 volatile uint8_t	rx_packet_buf[256] __attribute__ ((aligned(4)));	// the received packet
 volatile uint16_t	rx_packet_wr;										// the receive packet write index
 volatile int16_t	rx_packet_start_rssi_dBm;							//
+volatile int32_t	rx_packet_start_afc_Hz;								//
 volatile int16_t	rx_packet_rssi_dBm;									// the received packet signal strength
 volatile int32_t	rx_packet_afc_Hz;									// the receive packet frequency offset
 
@@ -671,9 +672,6 @@ void rfm22_reenableRx(void)
 
 	rx_buffer_wr = 0;		// empty the rx buffer
 
-	afc_correction = 0;		// reset the afc correction reading
-	afc_correction_Hz = 0;	//   "               "
-
 	rfm22_int_timer = 0;	// reset the timer
 
 	STOPWATCH_reset();		// reset clear channel detect timer
@@ -715,9 +713,6 @@ void rfm22_setRxMode(void)
 	}
 
 	rx_buffer_wr = 0;		// empty the rx buffer
-
-	afc_correction = 0;		// reset the afc correction reading
-	afc_correction_Hz = 0;	//   "               "
 
 	rfm22_int_timer = 0;	// reset the timer
 
@@ -921,16 +916,14 @@ void rfm22_processRxInt(void)
 			rf_mode = RX_DATA_MODE;
 			RX_LED_ON;
 
-			// remember the rssi for this packet
-			rx_packet_start_rssi_dBm = rssi_dBm;
-
 			// read the 10-bit signed afc correction value
 			afc_correction = (uint16_t)rfm22_read(rfm22_afc_correction_read) << 8;		// bits 9 to 2
 			afc_correction |= (uint16_t)rfm22_read(rfm22_ook_counter_value1) & 0x00c0;	// bits 1 & 0
 			afc_correction >>= 6;
+			afc_correction_Hz = (int32_t)(frequency_step_size * afc_correction + 0.5f);	// convert the afc value to Hz
 
-			// convert the afc value to Hz
-			afc_correction_Hz = (int32_t)(frequency_step_size * afc_correction + 0.5f);
+			rx_packet_start_rssi_dBm = rssi_dBm;			// remember the rssi for this packet
+			rx_packet_start_afc_Hz = afc_correction_Hz;		// remember the afc value for this packet
 
 			#if defined(RFM22_DEBUG) && !defined(RFM22_EXT_INT_USE)
 				DEBUG_PRINTF(" sync_det");
@@ -1082,7 +1075,7 @@ void rfm22_processRxInt(void)
 			if (rx_packet_wr == 0)
 			{	// save the received packet for further processing
 				rx_packet_rssi_dBm = rx_packet_start_rssi_dBm;			// remember the rssi for this packet
-				rx_packet_afc_Hz = afc_correction_Hz;					// remember the afc offset for this packet
+				rx_packet_afc_Hz = rx_packet_start_afc_Hz;				// remember the afc offset for this packet
 				memmove((void *)rx_packet_buf, (void *)rx_buffer, wr);	// copy the packet data
 				rx_packet_wr = wr;										// save the length of the data
 			}
@@ -1749,6 +1742,8 @@ int rfm22_init(uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t fr
 	rx_buffer_current = 0;
 	rx_buffer_wr = 0;
 	rx_packet_wr = 0;
+	rx_packet_rssi_dBm = -200;
+	rx_packet_afc_Hz = 0;
 
 	tx_data_addr = NULL;
 	tx_data_rd = tx_data_wr = 0;
@@ -1765,6 +1760,7 @@ int rfm22_init(uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t fr
 	frequency_hop_channel = 0;
 
 	afc_correction = 0;
+	afc_correction_Hz = 0;
 
 	temperature_reg = 0;
 

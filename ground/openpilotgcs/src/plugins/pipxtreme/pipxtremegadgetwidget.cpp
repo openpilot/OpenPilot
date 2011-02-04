@@ -1243,9 +1243,7 @@ void PipXtremeGadgetWidget::importSettings()
 											options
 											).trimmed();
 	if (filename.isEmpty())
-	{
 		return;
-	}
 
 	if (!QFileInfo(filename).isReadable())
 	{
@@ -1256,6 +1254,12 @@ void PipXtremeGadgetWidget::importSettings()
 	}
 
 	QSettings settings(filename, QSettings::IniFormat);
+
+	uint32_t serial_number = settings.value("details/serial_number", 0).toUInt();
+	if (serial_number && serial_number != pipx_config_details.serial_number)
+	{
+//		return;
+	}
 
 	pipx_config_settings.destination_id = settings.value("settings/paired_serial_number", 0).toUInt();
 	pipx_config_settings.rf_xtal_cap = settings.value("settings/frequency_calibration", 0x7f).toUInt();
@@ -1291,10 +1295,8 @@ void PipXtremeGadgetWidget::exportSettings()
 											tr("PipX settings (*.ini)")
 											).trimmed();
 	if (filename.isEmpty())
-	{
 		return;
-	}
-
+/*
 	if (QFileInfo(filename).exists())
 	{
 		QMessageBox msgBox;
@@ -1307,16 +1309,20 @@ void PipXtremeGadgetWidget::exportSettings()
 		else
 			return;
 	}
-	QDir dir = QFileInfo(filename).absoluteDir();
+*/	QDir dir = QFileInfo(filename).absoluteDir();
 	if (!dir.exists())
 	{
 		QMessageBox msgBox;
-		msgBox.setText(tr("Can't write file ") + QFileInfo(filename).absoluteFilePath() + " since directory "+ dir.absolutePath() + " doesn't exist!");
+		msgBox.setText(tr("Can't write file ") + QFileInfo(filename).absoluteFilePath() + " since directory " + dir.absolutePath() + " doesn't exist!");
 		msgBox.exec();
 		return;
 	}
 
 	QSettings settings(filename, QSettings::IniFormat);
+	settings.setValue("details/serial_number", pipx_config_details.serial_number);
+	settings.setValue("details/min_frequency", pipx_config_details.min_frequency_Hz);
+	settings.setValue("details/max_frequency", pipx_config_details.max_frequency_Hz);
+	settings.setValue("details/frequency_band", pipx_config_details.frequency_band);
 	settings.setValue("settings/paired_serial_number", pipx_config_settings.destination_id);
 	settings.setValue("settings/frequency_calibration", pipx_config_settings.rf_xtal_cap);
 	settings.setValue("settings/frequency", pipx_config_settings.frequency_Hz);

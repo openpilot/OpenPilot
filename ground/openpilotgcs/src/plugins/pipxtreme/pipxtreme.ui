@@ -462,7 +462,7 @@
         <set>Qt::AlignCenter</set>
        </property>
        <property name="textVisible">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="textDirection">
         <enum>QProgressBar::TopToBottom</enum>

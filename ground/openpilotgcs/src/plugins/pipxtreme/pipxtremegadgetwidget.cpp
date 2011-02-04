@@ -114,7 +114,8 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 	m_widget = new Ui_PipXtremeWidget();
 	m_widget->setupUi(this);
 
-	qsrand(QDateTime::currentDateTime().toMSecsSinceEpoch());
+//	qsrand(QDateTime::currentDateTime().toMSecsSinceEpoch());	// only available with Qt 4.7.1 and later
+	qsrand(QDateTime::currentDateTime().toTime_t());
 
 	device_input_buffer.size = 8192;
 	device_input_buffer.used = 0;
@@ -444,7 +445,8 @@ void PipXtremeGadgetWidget::enableTelemetry()
 
 void PipXtremeGadgetWidget::randomiseAESKey()
 {
-	uint32_t crc = ((uint32_t)qrand() << 16) ^ qrand() ^ QDateTime::currentDateTime().toMSecsSinceEpoch();
+//	uint32_t crc = ((uint32_t)qrand() << 16) ^ qrand() ^ QDateTime::currentDateTime().toMSecsSinceEpoch();	// only available with Qt 4.7.1 and later
+	uint32_t crc = ((uint32_t)qrand() << 16) ^ qrand() ^ QDateTime::currentDateTime().toTime_t();
 
 	QString key = "";
 	for (int i = 0; i < 4; i++)

@@ -5,6 +5,12 @@
 #include <QRegExp>
 #include "qextserialport.h"
 
+#if (defined Q_OS_WIN)
+	#define CBR_230400	230400
+	#define CBR_460800	460800
+	#define CBR_921600	921600
+#endif
+
 void QextSerialPort::platformSpecificInit()
 {
     Win_Handle=INVALID_HANDLE_VALUE;

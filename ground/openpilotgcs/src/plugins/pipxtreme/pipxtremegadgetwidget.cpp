@@ -67,6 +67,19 @@ enum {
 
 // ***************************************************************************************
 
+enum {
+	modeNormal = 0,			// normal 2-way packet mode
+	modeStreamTx,			// 1-way continuous tx packet mode
+	modeStreamRx,			// 1-way continuous rx packet mode
+	modePPMTx,				// PPM tx mode
+	modePPMRx,				// PPM rx mode
+	modeScanSpectrum,		// scan the receiver over the whole band
+	modeTxBlankCarrierTest,	// blank carrier Tx mode (for calibrating the carrier frequency say)
+	modeTxSpectrumTest		// pseudo random Tx data mode (for checking the Tx carrier spectrum)
+};
+
+// ***************************************************************************************
+
 #define Poly32	0x04c11db7		// 32-bit polynomial .. this should produce the same as the STM32 hardware CRC
 
 uint32_t CRC_Table32[] = {
@@ -143,10 +156,14 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 	m_widget->comboBox_SerialBaudrate->setCurrentIndex(m_widget->comboBox_SerialBaudrate->findText("57600"));
 
 	m_widget->comboBox_Mode->clear();
-	m_widget->comboBox_Mode->addItem("Normal", 0);
-	m_widget->comboBox_Mode->addItem("Scan Spectrum", 1);
-	m_widget->comboBox_Mode->addItem("Calibrate Tx Carrier Frequency", 2);
-	m_widget->comboBox_Mode->addItem("Test Tx Spectrum", 3);
+	m_widget->comboBox_Mode->addItem("Normal", modeNormal);
+	m_widget->comboBox_Mode->addItem("Stream Tx", modeStreamTx);
+	m_widget->comboBox_Mode->addItem("Stream Rx", modeStreamRx);
+	m_widget->comboBox_Mode->addItem("PPM Tx", modePPMTx);
+	m_widget->comboBox_Mode->addItem("PPM Rx", modePPMRx);
+	m_widget->comboBox_Mode->addItem("Scan Spectrum", modeScanSpectrum);
+	m_widget->comboBox_Mode->addItem("Test Tx Blank Carrier Frequency", modeTxBlankCarrierTest);
+	m_widget->comboBox_Mode->addItem("Test Tx Spectrum", modeTxSpectrumTest);
 
 	m_widget->comboBox_SerialPortSpeed->clear();
 	for (int i = 0; i < m_widget->comboBox_SerialBaudrate->count(); i++)
@@ -486,6 +503,8 @@ void PipXtremeGadgetWidget::saveToFlash()
 	bool ok;
 
 	t_pipx_config_settings settings;
+
+	settings.mode = m_widget->comboBox_Mode->itemData(m_widget->comboBox_Mode->currentIndex()).toUInt();
 
 	s = m_widget->lineEdit_PairedSerialNumber->text().trimmed().toLower();
 	s.replace(' ', "");	// remove all spaces
@@ -851,6 +870,16 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 
 				memcpy(&pipx_config_details, data, sizeof(t_pipx_config_details));
 
+				if (pipx_config_details.major_version < 0 || (pipx_config_details.major_version == 0 && pipx_config_details.minor_version < 2))
+				{
+					QMessageBox msgBox;
+					msgBox.setIcon(QMessageBox::Critical);
+					msgBox.setText("You need to update your modem firmware to V0.2 or later");
+					msgBox.exec();
+					disconnectPort(true);
+					return;
+				}
+
 				m_widget->lineEdit_FirmwareVersion->setText(QString::number(pipx_config_details.major_version) + "." + QString::number(pipx_config_details.minor_version));
 
 				m_widget->lineEdit_SerialNumber->setText(QString::number(pipx_config_details.serial_number, 16).toUpper());
@@ -894,6 +923,8 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 				m_stage = PIPX_REQ_STATE;
 
 				memcpy(&pipx_config_settings, data, sizeof(t_pipx_config_settings));
+
+				m_widget->comboBox_Mode->setCurrentIndex(m_widget->comboBox_Mode->findData(pipx_config_settings.mode));
 
 				m_widget->lineEdit_PairedSerialNumber->setText(QString::number(pipx_config_settings.destination_id, 16).toUpper());
 				m_widget->spinBox_FrequencyCalibration->setValue(pipx_config_settings.rf_xtal_cap);
@@ -1261,6 +1292,7 @@ void PipXtremeGadgetWidget::importSettings()
 //		return;
 	}
 
+	pipx_config_settings.mode = settings.value("settings/mode", 0).toUInt();
 	pipx_config_settings.destination_id = settings.value("settings/paired_serial_number", 0).toUInt();
 	pipx_config_settings.rf_xtal_cap = settings.value("settings/frequency_calibration", 0x7f).toUInt();
 	pipx_config_settings.frequency_Hz = settings.value("settings/frequency", (pipx_config_details.min_frequency_Hz + pipx_config_details.max_frequency_Hz) / 2).toUInt();
@@ -1271,6 +1303,7 @@ void PipXtremeGadgetWidget::importSettings()
 	for (int i = 0; i < (int)sizeof(pipx_config_settings.aes_key); i++)
 		pipx_config_settings.aes_key[i] = settings.value("settings/aes_key_" + QString::number(i), 0).toUInt();
 
+	m_widget->comboBox_Mode->setCurrentIndex(m_widget->comboBox_Mode->findData(pipx_config_settings.mode));
 	m_widget->lineEdit_PairedSerialNumber->setText(QString::number(pipx_config_settings.destination_id, 16).toUpper());
 	m_widget->spinBox_FrequencyCalibration->setValue(pipx_config_settings.rf_xtal_cap);
 	m_widget->doubleSpinBox_Frequency->setValue((double)pipx_config_settings.frequency_Hz / 1e6);
@@ -1281,7 +1314,7 @@ void PipXtremeGadgetWidget::importSettings()
 	QString key = "";
 	for (int i = 0; i < (int)sizeof(pipx_config_settings.aes_key); i++)
 		key += QString::number(pipx_config_settings.aes_key[i], 16).rightJustified(2, '0');
-//	m_widget->lineEdit_AESKey->setText(key);
+	m_widget->lineEdit_AESKey->setText(key);
 	m_widget->checkBox_AESEnable->setChecked(pipx_config_settings.aes_enable);
 }
 
@@ -1323,6 +1356,7 @@ void PipXtremeGadgetWidget::exportSettings()
 	settings.setValue("details/min_frequency", pipx_config_details.min_frequency_Hz);
 	settings.setValue("details/max_frequency", pipx_config_details.max_frequency_Hz);
 	settings.setValue("details/frequency_band", pipx_config_details.frequency_band);
+	settings.setValue("settings/mode", pipx_config_settings.mode);
 	settings.setValue("settings/paired_serial_number", pipx_config_settings.destination_id);
 	settings.setValue("settings/frequency_calibration", pipx_config_settings.rf_xtal_cap);
 	settings.setValue("settings/frequency", pipx_config_settings.frequency_Hz);

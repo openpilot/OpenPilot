@@ -179,6 +179,8 @@ uint32_t			carrier_frequency_hz;				// the current RF frequency we are on
 
 uint32_t			carrier_datarate_bps;				// the RF data rate we are using
 
+uint32_t			rf_bandwidth_used;					// the RF bandwidth currently used
+
 uint8_t				hbsel;								// holds the hbsel (1 or 2)
 float				frequency_step_size;				//
 
@@ -443,6 +445,8 @@ void rfm22_setDatarate(uint32_t datarate_bps)
 		lookup_index++;
 
 	carrier_datarate_bps = datarate_bps = data_rate[lookup_index];
+
+	rf_bandwidth_used = rx_bandwidth[lookup_index];
 
 	// ********************************
 
@@ -1202,6 +1206,10 @@ void rfm22_processInt(void)
 	{
 		rssi = rfm22_read(rfm22_rssi);			// read rx signal strength .. 45 = -100dBm, 205 = -20dBm
 		rssi_dBm = ((int16_t)rssi / 2) - 122;	// convert to dBm
+
+		// calibrate the RSSI value (rf bandwidth appears to affect it)
+//		if (rf_bandwidth_used > 0)
+//			rssi_dBm -= 10000 / rf_bandwidth_used;
 	}
 	else
 	{
@@ -1749,6 +1757,8 @@ int rfm22_init(uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t fr
 	tx_data_rd = tx_data_wr = 0;
 
 	lookup_index = 0;
+
+	rf_bandwidth_used = 0;
 
 	rfm22_int_timer = 0;
 	rfm22_int_time_outs = 0;

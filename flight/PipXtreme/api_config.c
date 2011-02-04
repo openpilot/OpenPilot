@@ -84,6 +84,7 @@ typedef struct
 
 typedef struct
 {
+    uint8_t     mode;
     uint32_t    serial_baudrate;    // serial usart baudrate
     uint32_t    destination_id;
     uint32_t    frequency_Hz;
@@ -208,12 +209,13 @@ int apiconfig_sendSettingsPacket(void)
 	header->spare = 0;
 	header->data_size = sizeof(t_pipx_config_settings);
 
-	settings->serial_baudrate = saved_settings.serial_baudrate;
+	settings->mode = saved_settings.mode;
 	settings->destination_id = saved_settings.destination_id;
 	settings->frequency_Hz = saved_settings.frequency_Hz;
 	settings->max_rf_bandwidth = saved_settings.max_rf_bandwidth;
 	settings->max_tx_power = saved_settings.max_tx_power;
 	settings->rf_xtal_cap = saved_settings.rf_xtal_cap;
+	settings->serial_baudrate = saved_settings.serial_baudrate;
 	settings->aes_enable = saved_settings.aes_enable;
 	memcpy((char *)settings->aes_key, (char *)saved_settings.aes_key, sizeof(settings->aes_key));
 
@@ -285,16 +287,12 @@ void apiconfig_processInputPacket(void *buf, uint16_t len)
 
 				t_pipx_config_settings *settings = (t_pipx_config_settings *)data;
 
+				saved_settings.mode = settings->mode;
 				saved_settings.destination_id = settings->destination_id;
-
 				saved_settings.frequency_Hz = settings->frequency_Hz;
-
 				saved_settings.max_tx_power = settings->max_tx_power;
-
 				saved_settings.max_rf_bandwidth = settings->max_rf_bandwidth;
-
 				saved_settings.rf_xtal_cap = settings->rf_xtal_cap;
-
 				saved_settings.serial_baudrate = settings->serial_baudrate;
 
 				saved_settings.aes_enable = settings->aes_enable;
@@ -311,6 +309,28 @@ void apiconfig_processInputPacket(void *buf, uint16_t len)
 			    ph_setTxPower(saved_settings.max_tx_power);
 			    ph_set_remote_serial_number(0, saved_settings.destination_id);
 			    ph_set_remote_encryption(0, saved_settings.aes_enable, (const void *)saved_settings.aes_key);
+			    switch (saved_settings.mode)
+			    {
+			    	case modeNormal:				// normal 2-way packet mode
+			    		break;
+			    	case modeStreamTx:				// 1-way continuous tx packet mode
+		    			break;
+			    	case modeStreamRx:				// 1-way continuous rx packet mode
+		    			break;
+			    	case modePPMTx:					// PPM tx mode
+			    		break;
+			    	case modePPMRx:					// PPM rx mode
+		    			break;
+			    	case modeScanSpectrum:			// scan the receiver over the whole band
+			    		break;
+			    	case modeTxBlankCarrierTest:	// blank carrier Tx mode (for calibrating the carrier frequency say)
+			    		break;
+			    	case modeTxSpectrumTest:		// pseudo random Tx data mode (for checking the Tx carrier spectrum)
+			    		break;
+			    	default:						// unknown mode
+			    		saved_settings.mode = modeNormal;
+			    		break;
+			    }
 			}
 
 			break;

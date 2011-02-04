@@ -33,7 +33,7 @@
 
 // firmware version
 #define version_major       0               // 0 to 255
-#define version_minor       1               // 0 to 255
+#define version_minor       2               // 0 to 255
 
 // macro's for reading internal flash memory
 #define mem8(addr)          (*((volatile uint8_t  *)(addr)))
@@ -41,10 +41,21 @@
 #define mem32(addr)         (*((volatile uint32_t *)(addr)))
 
 enum {
-    freqBand_UNKNOWN = 0,
-    freqBand_434MHz,
-    freqBand_868MHz,
-    freqBand_915MHz
+	freqBand_UNKNOWN = 0,
+	freqBand_434MHz,
+	freqBand_868MHz,
+	freqBand_915MHz
+};
+
+enum {
+	modeNormal = 0,			// normal 2-way packet mode
+	modeStreamTx,			// 1-way continuous tx packet mode
+	modeStreamRx,			// 1-way continuous rx packet mode
+	modePPMTx,				// PPM tx mode
+	modePPMRx,				// PPM rx mode
+	modeScanSpectrum,		// scan the receiver over the whole band
+	modeTxBlankCarrierTest,	// blank carrier Tx mode (for calibrating the carrier frequency say)
+	modeTxSpectrumTest		// pseudo random Tx data mode (for checking the Tx carrier spectrum)
 };
 
 // *****************************************************************************

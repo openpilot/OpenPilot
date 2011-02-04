@@ -89,7 +89,8 @@ typedef struct
 
 typedef struct
 {
-	uint32_t    serial_baudrate;    // serial uart baudrate
+	uint8_t		mode;
+	uint32_t    serial_baudrate;
 	uint32_t    destination_id;
 	uint32_t    frequency_Hz;
 	uint32_t    max_rf_bandwidth;

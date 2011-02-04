@@ -689,10 +689,14 @@ int main()
     else
     if ( GPIO_IN(_868MHz_PIN) && !GPIO_IN(_915MHz_PIN)) saved_settings.frequency_band = freqBand_915MHz;    // 915MHz band
 
+    if (saved_settings.mode == 0xff)
+    	saved_settings.mode = modeNormal;
+
     // set some defaults if they are not set
     switch (saved_settings.frequency_band)
     {
         case freqBand_434MHz:
+
             if (saved_settings.min_frequency_Hz == 0xffffffff)
             {
                 saved_settings.frequency_Hz = 434000000;

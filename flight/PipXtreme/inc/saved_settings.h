@@ -54,7 +54,9 @@ typedef struct
     bool        aes_enable;
     uint8_t     aes_key[16];
 
-    uint8_t     spare[32];          // allow for future unknown settings
+    uint8_t     mode;
+
+    uint8_t     spare[31];          // allow for future unknown settings
 
     uint32_t    crc;
 } __attribute__((__packed__)) t_saved_settings;

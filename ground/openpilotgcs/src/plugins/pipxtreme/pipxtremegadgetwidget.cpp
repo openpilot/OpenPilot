@@ -26,6 +26,9 @@
 #include <QDebug>
 #include <QtOpenGL/QGLWidget>
 #include <QSettings>
+#include <QFileInfo>
+#include <QDir>
+#include <QFileDialog>
 #include <stdlib.h>
 
 #include "pipxtremegadgetwidget.h"
@@ -1228,40 +1231,101 @@ void PipXtremeGadgetWidget::connectDisconnect()
 
 void PipXtremeGadgetWidget::importSettings()
 {
-	QString ini_filename = "pipx_" + QString::number(pipx_config_details.serial_number, 16).rightJustified(8, '0') + ".ini";
+	QString filename = "pipx_" + QString::number(pipx_config_details.serial_number, 16).rightJustified(8, '0') + ".ini";
 
-	QSettings settings(ini_filename, "OpenPilot");
-	settings.setDefaultFormat(QSettings::IniFormat);
+	QFileDialog::Options options;
+	QString selectedFilter;
+	filename = QFileDialog::getOpenFileName(this,
+											tr("Load from PipX settings file"),
+											filename,
+											tr("PipX settings (*.ini)"),
+											&selectedFilter,
+											options
+											).trimmed();
+	if (filename.isEmpty())
+	{
+		return;
+	}
+
+	if (!QFileInfo(filename).isReadable())
+	{
+		QMessageBox msgBox;
+		msgBox.setText(tr("Can't read file ") + QFileInfo(filename).absoluteFilePath());
+		msgBox.exec();
+		return;
+	}
+
+	QSettings settings(filename, QSettings::IniFormat);
 
 	pipx_config_settings.destination_id = settings.value("settings/paired_serial_number", 0).toUInt();
 	pipx_config_settings.rf_xtal_cap = settings.value("settings/frequency_calibration", 0x7f).toUInt();
+	pipx_config_settings.frequency_Hz = settings.value("settings/frequency", (pipx_config_details.min_frequency_Hz + pipx_config_details.max_frequency_Hz) / 2).toUInt();
+	pipx_config_settings.max_rf_bandwidth = settings.value("settings/max_rf_bandwidth", 128000).toUInt();
+	pipx_config_settings.max_tx_power = settings.value("settings/max_tx_power", 4).toUInt();
+	pipx_config_settings.serial_baudrate = settings.value("settings/serial_baudrate", 57600).toUInt();
+	pipx_config_settings.aes_enable = settings.value("settings/aes_enable", false).toBool();
+	for (int i = 0; i < (int)sizeof(pipx_config_settings.aes_key); i++)
+		pipx_config_settings.aes_key[i] = settings.value("settings/aes_key_" + QString::number(i), 0).toUInt();
 
 	m_widget->lineEdit_PairedSerialNumber->setText(QString::number(pipx_config_settings.destination_id, 16).toUpper());
 	m_widget->spinBox_FrequencyCalibration->setValue(pipx_config_settings.rf_xtal_cap);
-//	m_widget->doubleSpinBox_Frequency->setValue((double)pipx_config_settings.frequency_Hz / 1e6);
-//	m_widget->comboBox_MaxRFBandwidth->setCurrentIndex(m_widget->comboBox_MaxRFBandwidth->findData(pipx_config_settings.max_rf_bandwidth));
-//	m_widget->comboBox_MaxRFTxPower->setCurrentIndex(m_widget->comboBox_MaxRFTxPower->findData(pipx_config_settings.max_tx_power));
-//	m_widget->comboBox_SerialPortSpeed->setCurrentIndex(m_widget->comboBox_SerialPortSpeed->findData(pipx_config_settings.serial_baudrate));
-//
-//	QString key = "";
-//	for (int i = 0; i < (int)sizeof(pipx_config_settings.aes_key); i++)
-//		key += QString::number(pipx_config_settings.aes_key[i], 16).rightJustified(2, '0');
-//	m_widget->lineEdit_AESKey->setText(key);
-//	m_widget->checkBox_AESEnable->setChecked(pipx_config_settings.aes_enable);
+	m_widget->doubleSpinBox_Frequency->setValue((double)pipx_config_settings.frequency_Hz / 1e6);
+	m_widget->comboBox_MaxRFBandwidth->setCurrentIndex(m_widget->comboBox_MaxRFBandwidth->findData(pipx_config_settings.max_rf_bandwidth));
+	m_widget->comboBox_MaxRFTxPower->setCurrentIndex(m_widget->comboBox_MaxRFTxPower->findData(pipx_config_settings.max_tx_power));
+	m_widget->comboBox_SerialPortSpeed->setCurrentIndex(m_widget->comboBox_SerialPortSpeed->findData(pipx_config_settings.serial_baudrate));
 
+	QString key = "";
+	for (int i = 0; i < (int)sizeof(pipx_config_settings.aes_key); i++)
+		key += QString::number(pipx_config_settings.aes_key[i], 16).rightJustified(2, '0');
+//	m_widget->lineEdit_AESKey->setText(key);
+	m_widget->checkBox_AESEnable->setChecked(pipx_config_settings.aes_enable);
 }
 
 void PipXtremeGadgetWidget::exportSettings()
 {
+	QString filename = "pipx_" + QString::number(pipx_config_details.serial_number, 16).rightJustified(8, '0') + ".ini";
 
-	QString ini_filename = "pipx_" + QString::number(pipx_config_details.serial_number, 16).rightJustified(8, '0') + ".ini";
+	filename = QFileDialog::getSaveFileName(this,
+											tr("Save to PipX settings file"),
+											filename,
+											tr("PipX settings (*.ini)")
+											).trimmed();
+	if (filename.isEmpty())
+	{
+		return;
+	}
 
-	QSettings settings(ini_filename, "OpenPilot");
-	settings.setDefaultFormat(QSettings::IniFormat);
+	if (QFileInfo(filename).exists())
+	{
+		QMessageBox msgBox;
+		msgBox.setText(tr("File already exists."));
+		msgBox.setInformativeText(tr("Do you want to overwrite the existing file?"));
+		msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+		msgBox.setDefaultButton(QMessageBox::Ok);
+		if (msgBox.exec() == QMessageBox::Ok)
+			QFileInfo(filename).absoluteDir().remove(QFileInfo(filename).fileName());
+		else
+			return;
+	}
+	QDir dir = QFileInfo(filename).absoluteDir();
+	if (!dir.exists())
+	{
+		QMessageBox msgBox;
+		msgBox.setText(tr("Can't write file ") + QFileInfo(filename).absoluteFilePath() + " since directory "+ dir.absolutePath() + " doesn't exist!");
+		msgBox.exec();
+		return;
+	}
 
+	QSettings settings(filename, QSettings::IniFormat);
 	settings.setValue("settings/paired_serial_number", pipx_config_settings.destination_id);
 	settings.setValue("settings/frequency_calibration", pipx_config_settings.rf_xtal_cap);
-
+	settings.setValue("settings/frequency", pipx_config_settings.frequency_Hz);
+	settings.setValue("settings/max_rf_bandwidth", pipx_config_settings.max_rf_bandwidth);
+	settings.setValue("settings/max_tx_power", pipx_config_settings.max_tx_power);
+	settings.setValue("settings/serial_baudrate", pipx_config_settings.serial_baudrate);
+	settings.setValue("settings/aes_enable", pipx_config_settings.aes_enable);
+	for (int i = 0; i < (int)sizeof(pipx_config_settings.aes_key); i++)
+		settings.setValue("settings/aes_key_" + QString::number(i), pipx_config_settings.aes_key[i]);
 }
 
 // ***************************************************************************************

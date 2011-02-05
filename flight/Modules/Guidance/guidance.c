@@ -170,9 +170,9 @@ static void guidanceTask(void *parameters)
 		NedAccelData accelData;
 		NedAccelGet(&accelData);
 		// Convert from m/s to cm/s
-		accelData.North = accel[0] * 100;
-		accelData.East = accel[1] * 100;
-		accelData.Down = accel[2] * 100;
+		accelData.North = accel_ned[0] * 100;
+		accelData.East = accel_ned[1] * 100;
+		accelData.Down = accel_ned[2] * 100;
 		NedAccelSet(&accelData);
 		
 		

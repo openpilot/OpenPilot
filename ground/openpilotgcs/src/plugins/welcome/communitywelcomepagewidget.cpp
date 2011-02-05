@@ -52,14 +52,14 @@ CommunityWelcomePageWidget::CommunityWelcomePageWidget(QWidget *parent) :
     connect(m_rssFetcher, SIGNAL(newsItemReady(QString, QString, QString)),
         ui->newsTreeWidget, SLOT(slotAddNewsItem(QString, QString, QString)));
     //: Add localized feed here only if one exists
-    m_rssFetcher->fetch(QUrl(tr("http://forums.openpilot.org/blog/rss/4-openpilot-development-blog")));
+    m_rssFetcher->fetch(QUrl(tr("http://newwww.openpilot.org/rss.xml")));
 
     QList<QPair<QString, QString> > sites;
     sites << qMakePair(tr("OpenPilot Home"), QString(QLatin1String("http://www.openpilot.org")));
     sites << qMakePair(tr("OpenPilot Wiki"), QString(QLatin1String("http://wiki.openpilot.org")));
     sites << qMakePair(tr("OpenPilot Store"), QString(QLatin1String("http://www.openpilot.org/store")));
     sites << qMakePair(tr("OpenPilot Forums"), QString(QLatin1String("http://forums.openpilot.org")));
-    sites << qMakePair(tr("OpenPilot Bug Tracker"), QString(QLatin1String("http://bugs.openpilot.org")));
+    sites << qMakePair(tr("OpenPilot Progress Tracker"), QString(QLatin1String("http://progress.openpilot.org")));
     
     QListIterator<QPair<QString, QString> > it(sites);
     while (it.hasNext()) {

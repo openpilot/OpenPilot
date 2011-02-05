@@ -55,6 +55,7 @@ public:
     QWidget* createPage(QWidget *parent);
     void apply();
     void finish();
+    bool saveSettingsOnExit() const;
     void readSettings(QSettings* qs);
     void saveSettings(QSettings* qs);
 
@@ -73,6 +74,7 @@ private:
     void setLanguage(const QString&);
     Ui::GeneralSettings *m_page;
     QString m_language;
+    bool m_saveSettingsOnExit;
     QPointer<QWidget> m_dialog;
     QList<QTextCodec *> m_codecs;
 

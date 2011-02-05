@@ -44,7 +44,8 @@ using namespace Utils;
 using namespace Core::Internal;
 
 GeneralSettings::GeneralSettings():
-    m_dialog(0)
+    m_dialog(0),
+    m_saveSettingsOnExit(true)
 {
 }
 
@@ -112,6 +113,7 @@ QWidget *GeneralSettings::createPage(QWidget *parent)
     m_page->setupUi(w);
 
     fillLanguageBox();
+    m_page->checkBoxSaveOnExit->setChecked(m_saveSettingsOnExit);
 
     m_page->colorButton->setColor(StyleHelper::baseColor());
 #ifdef Q_OS_UNIX
@@ -142,6 +144,8 @@ void GeneralSettings::apply()
     setLanguage(m_page->languageBox->itemData(currentIndex, Qt::UserRole).toString());
     // Apply the new base color if accepted
     StyleHelper::setBaseColor(m_page->colorButton->color());
+
+    m_saveSettingsOnExit = m_page->checkBoxSaveOnExit->isChecked();
 #ifdef Q_OS_UNIX
 	ConsoleProcess::setTerminalEmulator(Core::ICore::instance()->settings(),
                                         m_page->terminalEdit->text());
@@ -158,6 +162,7 @@ void GeneralSettings::readSettings(QSettings* qs)
 {
     qs->beginGroup(QLatin1String("General"));
     m_language = qs->value(QLatin1String("OverrideLanguage"),QLocale::system().name()).toString();
+    m_saveSettingsOnExit = qs->value(QLatin1String("SaveSettingsOnExit"),m_saveSettingsOnExit).toBool();
     qs->endGroup();
 
 }
@@ -171,6 +176,7 @@ void GeneralSettings::saveSettings(QSettings* qs)
     else
         qs->setValue(QLatin1String("OverrideLanguage"), m_language);
 
+    qs->setValue(QLatin1String("SaveSettingsOnExit"), m_saveSettingsOnExit);
     qs->endGroup();
 }
 
@@ -229,4 +235,9 @@ void GeneralSettings::setLanguage(const QString &locale)
                                  tr("The language change will take effect after a restart of the OpenPilot GCS."));
         m_language = locale;
     }
+}
+
+bool GeneralSettings::saveSettingsOnExit() const
+{
+    return m_saveSettingsOnExit;
 }

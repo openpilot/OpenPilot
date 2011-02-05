@@ -306,6 +306,9 @@ void MainWindow::extensionsInitialized()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    if ( !m_generalSettings->saveSettingsOnExit() ){
+        m_dontSaveSettings = true;
+    }
     if ( !m_dontSaveSettings ){
         emit m_coreImpl->saveSettingsRequested();
     }

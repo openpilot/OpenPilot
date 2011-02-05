@@ -170,7 +170,8 @@ endif
 
 ## UAVOBJECTS
 ifndef TESTAPP
-include $(UAVOBJSYNTHDIR)/Makefile.inc
+#include $(UAVOBJSYNTHDIR)/Makefile.inc
+include ./UAVObjects.inc
 SRC += $(UAVOBJSRC)
 endif
 

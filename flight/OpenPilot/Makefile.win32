@@ -151,8 +151,10 @@ endif
 
 ## UAVOBJECTS
 ifndef TESTAPP
-include $(UAVOBJSYNTHDIR)/Makefile.inc
+#include $(UAVOBJSYNTHDIR)/Makefile.inc
+include ./UAVObjects.inc
 SRC += $(UAVOBJSRC)
+CFLAGS_UAVOBJECTS = $(UAVOBJDEFINE)
 endif
 
 ## PIOS Hardware (win32)
@@ -288,6 +290,7 @@ ifeq ($(DEBUG),YES)
 CFLAGS = -g
 endif
 
+CFLAGS += $(CFLAGS_UAVOBJECTS)
 CFLAGS += -DARCH_WIN32
 CFLAGS += -O$(OPT)
 CFLAGS += -mtune=$(MCU)

@@ -56,7 +56,9 @@ static const char *fixedOptionsC =
 "    -help               Display this help\n"
 "    -version            Display program version\n"
 "    -client             Attempt to connect to already running instance\n"
-"    -D key=value        Override preference e.g: -D General/OverrideLanguage=de\n";
+"    -clean-config       Delete all existing configuration settings\n"
+"    -exit-after-config  Exit GCS after manipulating configuration settings\n"
+"    -D key=value        Override configuration settings e.g: -D General/OverrideLanguage=de\n";
 
 static const char *HELP_OPTION1 = "-h";
 static const char *HELP_OPTION2 = "-help";
@@ -64,7 +66,9 @@ static const char *HELP_OPTION3 = "/h";
 static const char *HELP_OPTION4 = "--help";
 static const char *VERSION_OPTION = "-version";
 static const char *CLIENT_OPTION = "-client";
-static const char *SETTING_OPTION = "-D";
+static const char *CONFIG_OPTION = "-D";
+static const char *CLEAN_CONFIG_OPTION = "-clean-config";
+static const char *EXIT_AFTER_CONFIG_OPTION = "-exit-after-config";
 
 typedef QList<ExtensionSystem::PluginSpec *> PluginSpecSet;
 
@@ -206,14 +210,17 @@ static void overrideSettings(QSettings &settings, int argc, char **argv){
     // Options like -DMy/setting=test
     QRegExp rx("([^=]+)=(.*)");
 
-    int i = 0;
-    while( i < argc ){
-        if ( QString("-D").compare(QString(argv[i++])) == 0 ){
-            if ( rx.indexIn(argv[i]) > -1 ){
+    for(int i = 0; i < argc; ++i ){
+        if ( QString(CONFIG_OPTION).compare(QString(argv[i])) == 0 ){
+            if ( rx.indexIn(argv[++i]) > -1 ){
                 settingOptions.insert(rx.cap(1), rx.cap(2));
             }
         }
+        if ( QString(CLEAN_CONFIG_OPTION).compare(QString(argv[i])) == 0 ){
+            settings.clear();
+        }
     }
+
     QList<QString> keys = settingOptions.keys();
     foreach ( QString key, keys ){
         settings.setValue(key, settingOptions.value(key));
@@ -280,7 +287,9 @@ int main(int argc, char **argv)
         appOptions.insert(QLatin1String(HELP_OPTION4), false);
         appOptions.insert(QLatin1String(VERSION_OPTION), false);
         appOptions.insert(QLatin1String(CLIENT_OPTION), false);
-        appOptions.insert(QLatin1String(SETTING_OPTION), true);
+        appOptions.insert(QLatin1String(CONFIG_OPTION), true);
+        appOptions.insert(QLatin1String(CLEAN_CONFIG_OPTION), false);
+        appOptions.insert(QLatin1String(EXIT_AFTER_CONFIG_OPTION), false);
         QString errorMessage;
         if (!pluginManager.parseOptions(arguments,
                                         appOptions,
@@ -312,6 +321,9 @@ int main(int argc, char **argv)
     }
     if (foundAppOptions.contains(QLatin1String(VERSION_OPTION))) {
         printVersion(coreplugin, pluginManager);
+        return 0;
+    }
+    if (foundAppOptions.contains(QLatin1String(EXIT_AFTER_CONFIG_OPTION))) {
         return 0;
     }
     if (foundAppOptions.contains(QLatin1String(HELP_OPTION1))

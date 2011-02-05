@@ -104,8 +104,8 @@ WelcomeMode::WelcomeMode() :
 
 WelcomeMode::~WelcomeMode()
 {
-    QSettings *settings = Core::ICore::instance()->settings();
-    settings->setValue("General/WelcomeTab", m_d->ui.stackedWidget->currentIndex());
+    // QSettings *settings = Core::ICore::instance()->settings();
+    // settings->setValue("General/WelcomeTab", m_d->ui.stackedWidget->currentIndex());
     delete m_d->m_widget;
     delete m_d;
 }
@@ -168,6 +168,7 @@ void WelcomeMode::initPlugins()
     }
     m_d->buttonLayout->addSpacing(5);
 
+    // TODO, This probably can beremoved. See OP-310
     QSettings *settings = Core::ICore::instance()->settings();
     int tabId = settings->value("General/WelcomeTab", 0).toInt();
 
@@ -181,6 +182,7 @@ void WelcomeMode::initPlugins()
                 break;
             }
     }
+    // TODO Delete until here
 
 }
 

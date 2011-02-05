@@ -95,7 +95,7 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //------------------------
 // TELEMETRY 
 //------------------------
-#define TELEM_QUEUE_SIZE         2
+#define TELEM_QUEUE_SIZE         20
 
 //------------------------
 // PIOS_LED

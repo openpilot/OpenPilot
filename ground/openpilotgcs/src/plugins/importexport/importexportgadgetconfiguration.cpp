@@ -47,8 +47,7 @@ ImportExportGadgetConfiguration::ImportExportGadgetConfiguration(QString classId
     if ( !configInfo->standardVersionHandlingOK(VERSION))
         return;
 
-    iniFile = qSettings->value("dialFile", "gcs.ini").toString(); // TODO Delete with next minor version.
-    iniFile = qSettings->value("iniFile", iniFile).toString();
+    iniFile = qSettings->value("iniFile", "gcs.xml").toString();
 }
 
 /**
@@ -68,7 +67,6 @@ IUAVGadgetConfiguration *ImportExportGadgetConfiguration::clone()
  */
 void ImportExportGadgetConfiguration::saveConfig(QSettings* qSettings, Core::UAVConfigInfo *configInfo) const {
     configInfo->setVersion(VERSION);
-    qSettings->setValue("dialFile", iniFile);
     qSettings->setValue("iniFile", iniFile);
 }
 

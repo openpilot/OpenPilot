@@ -31,6 +31,8 @@
 #include "xmlconfig.h"
 #include "coreplugin/uavgadgetinstancemanager.h"
 #include "coreplugin/icore.h"
+#include <extensionsystem/pluginmanager.h>
+#include <extensionsystem/pluginspec.h>
 #include <QtDebug>
 #include <QSettings>
 #include <QMessageBox>
@@ -47,7 +49,7 @@ ImportExportGadgetWidget::ImportExportGadgetWidget(QWidget *parent) :
     ui->setupUi(this);
     ui->configFile->setExpectedKind(Utils::PathChooser::File);
     ui->configFile->setPromptDialogFilter(tr("INI file (*.ini);; XML file (*.xml)"));
-    ui->configFile->setPromptDialogTitle(tr("Choose filename"));
+    ui->configFile->setPromptDialogTitle(tr("Choose configuration file"));
 
 
 }
@@ -111,11 +113,26 @@ void ImportExportGadgetWidget::on_exportButton_clicked()
 
 }
 
+QList<Core::IConfigurablePlugin*> ImportExportGadgetWidget::getConfigurables()
+{
+    QList<Core::IConfigurablePlugin*> configurables;
+
+    QList<ExtensionSystem::PluginSpec *> specs = ExtensionSystem::PluginManager::instance()->plugins();
+    foreach ( ExtensionSystem::PluginSpec* spec, specs ){
+        if ( Core::IConfigurablePlugin* plugin = dynamic_cast<Core::IConfigurablePlugin*>(spec->plugin()) ){
+            qDebug()<< "Configurable: " << plugin->metaObject()->className();
+            configurables.append(plugin);
+        }
+    }
+    return configurables;
+}
 
 void ImportExportGadgetWidget::exportConfiguration(const QString& fileName)
 {
-    bool general = ui->checkBoxGeneral->isChecked();
-    bool allGadgets = ui->checkBoxAllGadgets->isChecked();
+    bool doGeneral = ui->checkBoxGeneral->isChecked();
+    bool doAllGadgets = ui->checkBoxAllGadgets->isChecked();
+    bool doPlugins = ui->checkBoxPlugins->isChecked();
+
     QSettings::Format format;
     if ( ui->radioButtonIniFormat->isChecked() ){
         format = QSettings::IniFormat;
@@ -130,12 +147,18 @@ void ImportExportGadgetWidget::exportConfiguration(const QString& fileName)
 
     QSettings qs(fileName, format);
 
-    if (general) {
+    if (doGeneral) {
         Core::ICore::instance()->saveMainSettings(&qs);
     }
-    if (allGadgets) {
-        Core::ICore::instance()->uavGadgetInstanceManager()->writeConfigurations(&qs);
+    if (doAllGadgets) {
+        Core::ICore::instance()->uavGadgetInstanceManager()->saveSettings(&qs);
     }
+    if ( doPlugins ){
+        foreach ( Core::IConfigurablePlugin *plugin, getConfigurables()){
+            Core::ICore::instance()->saveSettings(plugin,&qs);
+        }
+    }
+
     qDebug() << "Export ended";
 }
 
@@ -166,8 +189,10 @@ void ImportExportGadgetWidget::on_importButton_clicked()
 
 void ImportExportGadgetWidget::importConfiguration(const QString& fileName)
 {
-    bool general = ui->checkBoxGeneral->isChecked();
-    bool allGadgets = ui->checkBoxAllGadgets->isChecked();
+    bool doGeneral = ui->checkBoxGeneral->isChecked();
+    bool doAllGadgets = ui->checkBoxAllGadgets->isChecked();
+    bool doPlugins = ui->checkBoxPlugins->isChecked();
+
     QSettings::Format format;
     if ( ui->radioButtonIniFormat->isChecked() ){
         format = QSettings::IniFormat;
@@ -182,11 +207,16 @@ void ImportExportGadgetWidget::importConfiguration(const QString& fileName)
 
     QSettings qs(fileName, format);
 
-    if (allGadgets) {
-        Core::ICore::instance()->uavGadgetInstanceManager()->readConfigurations(&qs);
+    if ( doAllGadgets ) {
+        Core::ICore::instance()->uavGadgetInstanceManager()->readSettings(&qs);
     }
-    if (general) {
+    if ( doGeneral ) {
         Core::ICore::instance()->readMainSettings(&qs);
+    }
+    if ( doPlugins ){
+        foreach ( Core::IConfigurablePlugin *plugin, getConfigurables()){
+            Core::ICore::instance()->readSettings(plugin,&qs);
+        }
     }
 
     qDebug() << "Import ended";

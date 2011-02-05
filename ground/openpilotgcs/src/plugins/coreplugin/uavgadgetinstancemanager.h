@@ -58,8 +58,8 @@ Q_OBJECT
 public:
     explicit UAVGadgetInstanceManager(QObject *parent = 0);
     ~UAVGadgetInstanceManager();
-    void readConfigurations(QSettings *qs);
-    void writeConfigurations(QSettings *qs);
+    void readSettings(QSettings *qs);
+    void saveSettings(QSettings *qs);
     IUAVGadget *createGadget(QString classId, QWidget *parent);
     void removeGadget(IUAVGadget *gadget);
     void removeAllGadgets();

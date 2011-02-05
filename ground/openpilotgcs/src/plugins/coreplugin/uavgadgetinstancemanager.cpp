@@ -70,7 +70,7 @@ UAVGadgetInstanceManager::~UAVGadgetInstanceManager()
 
 }
 
-void UAVGadgetInstanceManager::readConfigurations(QSettings *qs)
+void UAVGadgetInstanceManager::readSettings(QSettings *qs)
 {
     while ( !m_configurations.isEmpty() ){
        emit configurationToBeDeleted(m_configurations.takeLast());
@@ -204,7 +204,7 @@ void UAVGadgetInstanceManager::readConfigs_1_1_0(QSettings *qs)
     }
 }
 
-void UAVGadgetInstanceManager::writeConfigurations(QSettings *qs)
+void UAVGadgetInstanceManager::saveSettings(QSettings *qs)
 {
     UAVConfigInfo *configInfo;
     qs->beginGroup("UAVGadgetConfigurations");

@@ -285,7 +285,7 @@ void MainWindow::extensionsInitialized()
     // qDebug() << "Number of keys in config: " << qs->allKeys().count();
 
     m_uavGadgetInstanceManager = new UAVGadgetInstanceManager(this);
-    m_uavGadgetInstanceManager->readConfigurations(qs);
+    m_uavGadgetInstanceManager->readSettings(qs);
 
     m_messageManager->init();
     readSettings(qs);
@@ -313,7 +313,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     emit m_coreImpl->coreAboutToClose();
     saveSettings(m_settings);
 
-    m_uavGadgetInstanceManager->writeConfigurations(m_settings);
+    m_uavGadgetInstanceManager->saveSettings(m_settings);
 
     event->accept();
 }

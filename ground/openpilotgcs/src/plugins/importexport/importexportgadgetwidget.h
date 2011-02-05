@@ -13,6 +13,7 @@
 
 #include <QWidget>
 #include <QString>
+#include <coreplugin/iconfigurableplugin.h>
 #include "importexportgadgetconfiguration.h"
 
 namespace Ui
@@ -40,6 +41,7 @@ private:
     void writeError(const QString&) const;
     void exportConfiguration(const QString& fileName);
     void importConfiguration(const QString& fileName);
+    QList<Core::IConfigurablePlugin*> getConfigurables();
 
 private slots:
     void on_helpButton_clicked();

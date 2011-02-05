@@ -12,6 +12,7 @@ namespace Core {
 
 class CORE_EXPORT IConfigurablePlugin : public ExtensionSystem::IPlugin
 {
+    Q_OBJECT
 public:
     // IConfigurablePlugin(QObject *parent = 0){}
     virtual ~IConfigurablePlugin() {}

@@ -65,6 +65,9 @@
 #define LOG_FILENAME 			"PIOS.LOG"
 #define STARTUP_LOG_ENABLED		1
 
+/* Enable a priority queue in telemetry */
+#define PIOS_TELEM_PRIORITY_QUEUE
+
 /* COM Module */
 #define GPS_BAUDRATE			19200
 #define TELEM_BAUDRATE			19200

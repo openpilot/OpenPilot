@@ -51,9 +51,16 @@
 // Private variables
 static uint8_t telemetryPort;
 static xQueueHandle queue;
+
+#if defined(PIOS_TELEM_PRIORITY_QUEUE)
 static xQueueHandle priorityQueue;
-static xTaskHandle telemetryTxTaskHandle;
 static xTaskHandle telemetryTxPriTaskHandle;
+static void telemetryTxPriTask(void *parameters);
+#else
+#define priorityQueue queue
+#endif
+
+static xTaskHandle telemetryTxTaskHandle;
 static xTaskHandle telemetryRxTaskHandle;
 static uint32_t txErrors;
 static uint32_t txRetries;
@@ -62,7 +69,6 @@ static uint32_t timeOfLastObjectUpdate;
 
 // Private functions
 static void telemetryTxTask(void *parameters);
-static void telemetryTxPriTask(void *parameters);
 static void telemetryRxTask(void *parameters);
 static int32_t transmitData(uint8_t * data, int32_t length);
 static void registerObject(UAVObjHandle obj);
@@ -88,8 +94,10 @@ int32_t TelemetryInitialize(void)
 
 	// Create object queues
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+#if defined(PIOS_TELEM_PRIORITY_QUEUE)
 	priorityQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
-
+#endif
+	
 	// Get telemetry settings object
 	updateSettings();
 
@@ -111,12 +119,15 @@ int32_t TelemetryInitialize(void)
 
 	// Start telemetry tasks
 	xTaskCreate(telemetryTxTask, (signed char *)"TelTx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
-	xTaskCreate(telemetryTxPriTask, (signed char *)"TelPriTx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_TXPRI, &telemetryTxPriTaskHandle);
 	xTaskCreate(telemetryRxTask, (signed char *)"TelRx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_RX, &telemetryRxTaskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_TELEMETRYTX, telemetryTxTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_TELEMETRYTXPRI, telemetryTxPriTaskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_TELEMETRYRX, telemetryRxTaskHandle);
 
+#if defined(PIOS_TELEM_PRIORITY_QUEUE)
+	xTaskCreate(telemetryTxPriTask, (signed char *)"TelPriTx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_TXPRI, &telemetryTxPriTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_TELEMETRYTXPRI, telemetryTxPriTaskHandle);
+#endif
+	
 	return 0;
 }
 
@@ -258,6 +269,7 @@ static void telemetryTxTask(void *parameters)
 /**
  * Telemetry transmit task, high priority
  */
+#if defined(PIOS_TELEM_PRIORITY_QUEUE)
 static void telemetryTxPriTask(void *parameters)
 {
 	UAVObjEvent ev;
@@ -271,6 +283,7 @@ static void telemetryTxPriTask(void *parameters)
 		}
 	}
 }
+#endif
 
 /**
  * Telemetry transmit task. Processes queue events and periodic updates.

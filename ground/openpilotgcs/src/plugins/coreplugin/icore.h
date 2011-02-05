@@ -92,6 +92,7 @@ public:
     virtual void saveMainSettings(QSettings* qs) = 0;
     virtual void readSettings(IConfigurablePlugin* plugin, QSettings* qs = 0) = 0;
     virtual void saveSettings(IConfigurablePlugin* plugin, QSettings* qs = 0) = 0;
+    virtual void deleteSettings() = 0;
 
     virtual QString resourcePath() const = 0;
 

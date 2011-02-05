@@ -204,4 +204,8 @@ void CoreImpl::saveSettings(IConfigurablePlugin* plugin, QSettings* qs)
 {
     m_mainwindow->saveSettings(plugin, qs);
 }
+void CoreImpl::deleteSettings()
+{
+    m_mainwindow->deleteSettings();
+}
 

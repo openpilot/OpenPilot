@@ -97,6 +97,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="resetButton">
+       <property name="text">
+        <string>Reset Config</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="helpButton">
        <property name="text">
         <string>Help</string>

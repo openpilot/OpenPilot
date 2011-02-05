@@ -115,7 +115,7 @@ by your version of the plugin. You might want to upgrade the plugin.")
 
 #define TEXT_MISSING_CONFIGURATION  tr( \
 " Some configuration is missing in the imported config and will be replaced \
-by default settings. It's probably an old config.")
+by default settings.")
 
 #define TEXT_MAJOR_LOSS_OF_CONFIGURATION  tr( \
 " Major features can't be imported \

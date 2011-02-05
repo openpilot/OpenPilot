@@ -227,7 +227,28 @@ void ImportExportGadgetWidget::on_helpButton_clicked()
     qDebug() << "Show Help";
     QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/Import_Export_plugin"));
 }
+
+
+void ImportExportGadgetWidget::on_resetButton_clicked()
+{
+    QMessageBox msgBox;
+    msgBox.setText(tr("All your settings will be deleted!"));
+    msgBox.setInformativeText(tr("You must restart the GCS in order to activate the changes."));
+    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+    if ( msgBox.exec() == QMessageBox::Ok ){
+        qDebug() << "Reset requested!";
+        Core::ICore::instance()->deleteSettings();
+    }
+    else{
+        qDebug() << "Reset canceled!";
+        return;
+    }
+}
+
+
 /**
  * @}
  * @}
  */
+

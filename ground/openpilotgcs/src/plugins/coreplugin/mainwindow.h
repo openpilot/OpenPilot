@@ -98,6 +98,7 @@ public:
     void saveSettings(QSettings* qs = 0);
     void readSettings(IConfigurablePlugin* plugin, QSettings* qs = 0);
     void saveSettings(IConfigurablePlugin* plugin, QSettings* qs = 0);
+    void deleteSettings();
     void openFiles(const QStringList &fileNames);
 
     Core::ActionManager *actionManager() const;
@@ -176,6 +177,7 @@ private:
     QList<int> m_additionalContexts;
     QSettings *m_settings;
     QSettings *m_globalSettings;
+    bool m_dontSaveSettings; // In case of an Error or if we reset the settings, never save them.
     SettingsDatabase *m_settingsDatabase;
     ActionManagerPrivate *m_actionManager;
     MessageManager *m_messageManager;

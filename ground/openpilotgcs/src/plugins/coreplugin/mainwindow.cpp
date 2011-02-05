@@ -119,6 +119,7 @@ MainWindow::MainWindow() :
     m_settingsDatabase(new SettingsDatabase(QFileInfo(m_settings->fileName()).path(),
                                             QLatin1String("OpenPilotGCS"),
                                             this)),
+    m_dontSaveSettings(false),
     m_actionManager(new ActionManagerPrivate(this)),
     m_variableManager(new VariableManager(this)),
     m_threadManager(new ThreadManager(this)),
@@ -279,10 +280,16 @@ void MainWindow::extensionsInitialized()
     QSettings defaultSettings(":/core/OpenPilotGCS.ini", QSettings::IniFormat);
 
     if ( ! qs->allKeys().count() ){
-        qDebug() << "There is no config, load default config from resource /core/OpenPilotGCS.ini";
-        qs = &defaultSettings;
+        QMessageBox msgBox;
+        msgBox.setText(tr("No configuration file could be found."));
+        msgBox.setInformativeText(tr("Do you want to load an example configuration?"));
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgBox.setDefaultButton(QMessageBox::Yes);
+        if ( msgBox.exec() == QMessageBox::Yes ){
+            qDebug() << "Load default config from resource /core/OpenPilotGCS.ini";
+            qs = &defaultSettings;
+        }
     }
-    // qDebug() << "Number of keys in config: " << qs->allKeys().count();
 
     m_uavGadgetInstanceManager = new UAVGadgetInstanceManager(this);
     m_uavGadgetInstanceManager->readSettings(qs);
@@ -299,7 +306,9 @@ void MainWindow::extensionsInitialized()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    emit m_coreImpl->saveSettingsRequested();
+    if ( !m_dontSaveSettings ){
+        emit m_coreImpl->saveSettingsRequested();
+    }
 
     const QList<ICoreListener *> listeners =
         ExtensionSystem::PluginManager::instance()->getObjects<ICoreListener>();
@@ -311,10 +320,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 
     emit m_coreImpl->coreAboutToClose();
-    saveSettings(m_settings);
 
-    m_uavGadgetInstanceManager->saveSettings(m_settings);
-
+    if ( !m_dontSaveSettings ){
+        saveSettings(m_settings);
+        m_uavGadgetInstanceManager->saveSettings(m_settings);
+    }
     event->accept();
 }
 
@@ -767,6 +777,8 @@ bool MainWindow::showOptionsDialog(const QString &category,
 
 void MainWindow::saveAll()
 {
+    if ( m_dontSaveSettings) return;
+
     emit m_coreImpl->saveSettingsRequested();
     saveSettings(); // OpenPilot-specific.
 }
@@ -1043,6 +1055,8 @@ void MainWindow::readSettings(QSettings* qs)
 
 void MainWindow::saveSettings(QSettings* qs)
 {
+    if ( m_dontSaveSettings ) return;
+
     if ( !qs ){
         qs = m_settings;
     }
@@ -1099,6 +1113,7 @@ void MainWindow::readSettings(IConfigurablePlugin* plugin, QSettings* qs)
 
 void MainWindow::saveSettings(IConfigurablePlugin* plugin, QSettings* qs)
 {
+    if ( m_dontSaveSettings ) return;
     if ( !qs ){
         qs = m_settings;
     }
@@ -1115,6 +1130,13 @@ void MainWindow::saveSettings(IConfigurablePlugin* plugin, QSettings* qs)
     qs->endGroup();
     qs->endGroup();
 
+}
+
+void MainWindow::deleteSettings()
+{
+    m_settings->clear();
+    m_settings->sync();
+    m_dontSaveSettings = true;
 }
 
 void MainWindow::addAdditionalContext(int context)

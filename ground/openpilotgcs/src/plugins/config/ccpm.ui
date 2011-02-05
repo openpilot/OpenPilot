@@ -1275,6 +1275,570 @@
          </item>
         </layout>
        </widget>
+       <widget class="QWidget" name="SwashPlateLevel">
+        <attribute name="title">
+         <string>Swashplate Levelling</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_8">
+         <property name="margin">
+          <number>3</number>
+         </property>
+         <property name="spacing">
+          <number>3</number>
+         </property>
+         <item row="0" column="0">
+          <layout class="QVBoxLayout" name="verticalLayout_8">
+           <property name="leftMargin">
+            <number>3</number>
+           </property>
+           <item>
+            <widget class="QGroupBox" name="SwashLvlInstructionsBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>228</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="title">
+              <string>Commands</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <property name="margin">
+               <number>3</number>
+              </property>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_9">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QPushButton" name="SwashLvlStartButton">
+                  <property name="minimumSize">
+                   <size>
+                    <width>85</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>85</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Start</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="SwashLvlNextButton">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>85</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>85</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Next</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QTextEdit" name="SwashLvlStepInstruction">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>150</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>220</width>
+                  <height>450</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QGridLayout" name="gridLayout_3">
+                <item row="0" column="0">
+                 <widget class="QPushButton" name="SwashLvlCancelButton">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>170</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>170</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Cancel</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QPushButton" name="SwashLvlFinishButton">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>170</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>170</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Finish</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="SwashLvlStatusBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>200</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="title">
+              <string>Status</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_22">
+              <property name="horizontalSpacing">
+               <number>3</number>
+              </property>
+              <property name="verticalSpacing">
+               <number>2</number>
+              </property>
+              <property name="margin">
+               <number>3</number>
+              </property>
+              <item row="1" column="0">
+               <widget class="QListWidget" name="SwashLvlStepList">
+                <property name="minimumSize">
+                 <size>
+                  <width>220</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>190</width>
+                  <height>125</height>
+                 </size>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Neutral</string>
+                 </property>
+                 <property name="icon">
+                  <iconset>
+                   <normaloff>:/configgadget/images/none.png</normaloff>
+                   <normalon>:/configgadget/images/ok.png</normalon>:/configgadget/images/none.png</iconset>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Max</string>
+                 </property>
+                 <property name="icon">
+                  <iconset>
+                   <normaloff>:/configgadget/images/none.png</normaloff>
+                   <normalon>:/configgadget/images/ok.png</normalon>:/configgadget/images/none.png</iconset>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Min</string>
+                 </property>
+                 <property name="icon">
+                  <iconset>
+                   <normaloff>:/configgadget/images/none.png</normaloff>
+                   <normalon>:/configgadget/images/ok.png</normalon>:/configgadget/images/none.png</iconset>
+                 </property>
+                 <property name="flags">
+                  <set>ItemIsSelectable|ItemIsEnabled</set>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Verify</string>
+                 </property>
+                 <property name="icon">
+                  <iconset>
+                   <normaloff>:/configgadget/images/none.png</normaloff>
+                   <normalon>:/configgadget/images/ok.png</normalon>:/configgadget/images/none.png</iconset>
+                 </property>
+                 <property name="flags">
+                  <set>ItemIsEnabled</set>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::MinimumExpanding</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="0" column="1">
+          <widget class="QGroupBox" name="SwashLvlccpmSliderBox">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>50</width>
+             <height>100</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>600</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+           <property name="title">
+            <string>Position</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_5">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="margin">
+             <number>3</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_17">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>7</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Max</string>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <spacer name="horizontalSpacer_7">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>5</width>
+                  <height>25</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QSlider" name="SwashLvlPositionSlider">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>100</height>
+                 </size>
+                </property>
+                <property name="maximum">
+                 <number>100</number>
+                </property>
+                <property name="singleStep">
+                 <number>5</number>
+                </property>
+                <property name="value">
+                 <number>50</number>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_8">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>5</width>
+                  <height>25</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_18">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>7</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Min</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="SwashLvlPositionSpinBox">
+              <property name="maximum">
+               <number>100</number>
+              </property>
+              <property name="singleStep">
+               <number>5</number>
+              </property>
+              <property name="value">
+               <number>50</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QGroupBox" name="SwashLvlccpmSwashImageBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>1</horstretch>
+             <verstretch>1</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>200</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>600</width>
+             <height>600</height>
+            </size>
+           </property>
+           <property name="sizeIncrement">
+            <size>
+             <width>10</width>
+             <height>10</height>
+            </size>
+           </property>
+           <property name="baseSize">
+            <size>
+             <width>200</width>
+             <height>200</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>Swashplate Adjustment</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignHCenter|Qt::AlignTop</set>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+           <property name="checkable">
+            <bool>false</bool>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_11">
+            <property name="horizontalSpacing">
+             <number>3</number>
+            </property>
+            <property name="margin">
+             <number>3</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QSplitter" name="splitter_4">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <widget class="QGraphicsView" name="SwashLvlSwashplateImage">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>1</horstretch>
+                 <verstretch>1</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>200</width>
+                 <height>200</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>500</width>
+                 <height>500</height>
+                </size>
+               </property>
+               <property name="sizeIncrement">
+                <size>
+                 <width>10</width>
+                 <height>10</height>
+                </size>
+               </property>
+               <property name="baseSize">
+                <size>
+                 <width>200</width>
+                 <height>200</height>
+                </size>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::Box</enum>
+               </property>
+               <property name="frameShadow">
+                <enum>QFrame::Plain</enum>
+               </property>
+               <property name="lineWidth">
+                <number>1</number>
+               </property>
+               <property name="midLineWidth">
+                <number>0</number>
+               </property>
+               <property name="verticalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
+               </property>
+               <property name="horizontalScrollBarPolicy">
+                <enum>Qt::ScrollBarAlwaysOff</enum>
+               </property>
+               <property name="backgroundBrush">
+                <brush brushstyle="DiagCrossPattern">
+                 <color alpha="25">
+                  <red>126</red>
+                  <green>176</green>
+                  <blue>220</blue>
+                 </color>
+                </brush>
+               </property>
+               <property name="foregroundBrush">
+                <brush brushstyle="NoBrush">
+                 <color alpha="255">
+                  <red>0</red>
+                  <green>0</green>
+                  <blue>0</blue>
+                 </color>
+                </brush>
+               </property>
+               <property name="sceneRect">
+                <rectf>
+                 <x>0.000000000000000</x>
+                 <y>0.000000000000000</y>
+                 <width>400.000000000000000</width>
+                 <height>400.000000000000000</height>
+                </rectf>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+               <property name="resizeAnchor">
+                <enum>QGraphicsView::AnchorViewCenter</enum>
+               </property>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
        <widget class="QWidget" name="CurveTab">
         <attribute name="title">
          <string>Curve settings</string>
@@ -1977,570 +2541,6 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="SwashPlateLevel">
-        <attribute name="title">
-         <string>Swashplate Levelling</string>
-        </attribute>
-        <layout class="QGridLayout" name="gridLayout_8">
-         <property name="margin">
-          <number>3</number>
-         </property>
-         <property name="spacing">
-          <number>3</number>
-         </property>
-         <item row="0" column="0">
-          <layout class="QVBoxLayout" name="verticalLayout_8">
-           <property name="leftMargin">
-            <number>3</number>
-           </property>
-           <item>
-            <widget class="QGroupBox" name="SwashLvlInstructionsBox">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>228</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="title">
-              <string>Commands</string>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout">
-              <property name="margin">
-               <number>3</number>
-              </property>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_9">
-                <property name="spacing">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="QPushButton" name="SwashLvlStartButton">
-                  <property name="minimumSize">
-                   <size>
-                    <width>85</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>85</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Start</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="SwashLvlNextButton">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>85</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>85</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Next</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <widget class="QTextEdit" name="SwashLvlStepInstruction">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>150</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>220</width>
-                  <height>450</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <layout class="QGridLayout" name="gridLayout_3">
-                <item row="0" column="0">
-                 <widget class="QPushButton" name="SwashLvlCancelButton">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>170</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>170</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Cancel</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QPushButton" name="SwashLvlFinishButton">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>170</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>170</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Finish</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="SwashLvlStatusBox">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Maximum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>200</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="title">
-              <string>Status</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_22">
-              <property name="horizontalSpacing">
-               <number>3</number>
-              </property>
-              <property name="verticalSpacing">
-               <number>2</number>
-              </property>
-              <property name="margin">
-               <number>3</number>
-              </property>
-              <item row="1" column="0">
-               <widget class="QListWidget" name="SwashLvlStepList">
-                <property name="minimumSize">
-                 <size>
-                  <width>220</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>190</width>
-                  <height>125</height>
-                 </size>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>Neutral</string>
-                 </property>
-                 <property name="icon">
-                  <iconset>
-                   <normaloff>:/configgadget/images/none.png</normaloff>
-                   <normalon>:/configgadget/images/ok.png</normalon>:/configgadget/images/none.png</iconset>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Max</string>
-                 </property>
-                 <property name="icon">
-                  <iconset>
-                   <normaloff>:/configgadget/images/none.png</normaloff>
-                   <normalon>:/configgadget/images/ok.png</normalon>:/configgadget/images/none.png</iconset>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Min</string>
-                 </property>
-                 <property name="icon">
-                  <iconset>
-                   <normaloff>:/configgadget/images/none.png</normaloff>
-                   <normalon>:/configgadget/images/ok.png</normalon>:/configgadget/images/none.png</iconset>
-                 </property>
-                 <property name="flags">
-                  <set>ItemIsSelectable|ItemIsEnabled</set>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Verify</string>
-                 </property>
-                 <property name="icon">
-                  <iconset>
-                   <normaloff>:/configgadget/images/none.png</normaloff>
-                   <normalon>:/configgadget/images/ok.png</normalon>:/configgadget/images/none.png</iconset>
-                 </property>
-                 <property name="flags">
-                  <set>ItemIsEnabled</set>
-                 </property>
-                </item>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <spacer name="verticalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::MinimumExpanding</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>0</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item row="0" column="1">
-          <widget class="QGroupBox" name="SwashLvlccpmSliderBox">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>50</width>
-             <height>100</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>50</width>
-             <height>600</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-            </font>
-           </property>
-           <property name="title">
-            <string>Position</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
-            <property name="spacing">
-             <number>0</number>
-            </property>
-            <property name="margin">
-             <number>3</number>
-            </property>
-            <item>
-             <widget class="QLabel" name="label_17">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="font">
-               <font>
-                <pointsize>7</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Max</string>
-              </property>
-              <property name="scaledContents">
-               <bool>true</bool>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_4">
-              <item>
-               <spacer name="horizontalSpacer_7">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>5</width>
-                  <height>25</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QSlider" name="SwashLvlPositionSlider">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>100</height>
-                 </size>
-                </property>
-                <property name="maximum">
-                 <number>100</number>
-                </property>
-                <property name="singleStep">
-                 <number>5</number>
-                </property>
-                <property name="value">
-                 <number>50</number>
-                </property>
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_8">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>5</width>
-                  <height>25</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_18">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="font">
-               <font>
-                <pointsize>7</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Min</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="SwashLvlPositionSpinBox">
-              <property name="maximum">
-               <number>100</number>
-              </property>
-              <property name="singleStep">
-               <number>5</number>
-              </property>
-              <property name="value">
-               <number>50</number>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QGroupBox" name="SwashLvlccpmSwashImageBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>1</horstretch>
-             <verstretch>1</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>200</width>
-             <height>200</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>600</width>
-             <height>600</height>
-            </size>
-           </property>
-           <property name="sizeIncrement">
-            <size>
-             <width>10</width>
-             <height>10</height>
-            </size>
-           </property>
-           <property name="baseSize">
-            <size>
-             <width>200</width>
-             <height>200</height>
-            </size>
-           </property>
-           <property name="title">
-            <string>Swashplate Adjustment</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignHCenter|Qt::AlignTop</set>
-           </property>
-           <property name="flat">
-            <bool>false</bool>
-           </property>
-           <property name="checkable">
-            <bool>false</bool>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_11">
-            <property name="horizontalSpacing">
-             <number>3</number>
-            </property>
-            <property name="margin">
-             <number>3</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="QSplitter" name="splitter_4">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <widget class="QGraphicsView" name="SwashLvlSwashplateImage">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>1</horstretch>
-                 <verstretch>1</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>200</width>
-                 <height>200</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>500</width>
-                 <height>500</height>
-                </size>
-               </property>
-               <property name="sizeIncrement">
-                <size>
-                 <width>10</width>
-                 <height>10</height>
-                </size>
-               </property>
-               <property name="baseSize">
-                <size>
-                 <width>200</width>
-                 <height>200</height>
-                </size>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::Box</enum>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Plain</enum>
-               </property>
-               <property name="lineWidth">
-                <number>1</number>
-               </property>
-               <property name="midLineWidth">
-                <number>0</number>
-               </property>
-               <property name="verticalScrollBarPolicy">
-                <enum>Qt::ScrollBarAlwaysOff</enum>
-               </property>
-               <property name="horizontalScrollBarPolicy">
-                <enum>Qt::ScrollBarAlwaysOff</enum>
-               </property>
-               <property name="backgroundBrush">
-                <brush brushstyle="DiagCrossPattern">
-                 <color alpha="25">
-                  <red>126</red>
-                  <green>176</green>
-                  <blue>220</blue>
-                 </color>
-                </brush>
-               </property>
-               <property name="foregroundBrush">
-                <brush brushstyle="NoBrush">
-                 <color alpha="255">
-                  <red>0</red>
-                  <green>0</green>
-                  <blue>0</blue>
-                 </color>
-                </brush>
-               </property>
-               <property name="sceneRect">
-                <rectf>
-                 <x>0.000000000000000</x>
-                 <y>0.000000000000000</y>
-                 <width>400.000000000000000</width>
-                 <height>400.000000000000000</height>
-                </rectf>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-               <property name="resizeAnchor">
-                <enum>QGraphicsView::AnchorViewCenter</enum>
-               </property>
-              </widget>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
-       </widget>
        <widget class="QWidget" name="AdvancedTab">
         <attribute name="title">
          <string>Advanced settings</string>
@@ -2982,16 +2982,42 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>TabObject</tabstop>
   <tabstop>ccpmType</tabstop>
-  <tabstop>ccpmCollectivespinBox</tabstop>
+  <tabstop>TabObject</tabstop>
+  <tabstop>ccpmEngineChannel</tabstop>
+  <tabstop>ccpmTailChannel</tabstop>
+  <tabstop>ccpmServoWChannel</tabstop>
+  <tabstop>ccpmServoXChannel</tabstop>
+  <tabstop>ccpmServoYChannel</tabstop>
+  <tabstop>ccpmServoZChannel</tabstop>
+  <tabstop>ccpmSingleServo</tabstop>
+  <tabstop>ccpmAngleW</tabstop>
+  <tabstop>ccpmAngleX</tabstop>
+  <tabstop>ccpmAngleY</tabstop>
+  <tabstop>ccpmAngleZ</tabstop>
+  <tabstop>ccpmCorrectionAngle</tabstop>
   <tabstop>ccpmRevoSlider</tabstop>
   <tabstop>ccpmREVOspinBox</tabstop>
+  <tabstop>ccpmCollectiveSlider</tabstop>
+  <tabstop>ccpmCollectivespinBox</tabstop>
   <tabstop>SwashplateImage</tabstop>
+  <tabstop>SwashLvlStartButton</tabstop>
+  <tabstop>SwashLvlNextButton</tabstop>
+  <tabstop>SwashLvlStepInstruction</tabstop>
+  <tabstop>SwashLvlCancelButton</tabstop>
+  <tabstop>SwashLvlFinishButton</tabstop>
+  <tabstop>SwashLvlStepList</tabstop>
+  <tabstop>SwashLvlPositionSlider</tabstop>
+  <tabstop>SwashLvlPositionSpinBox</tabstop>
+  <tabstop>SwashLvlSwashplateImage</tabstop>
   <tabstop>CurveType</tabstop>
+  <tabstop>NumCurvePoints</tabstop>
   <tabstop>CurveValue1</tabstop>
   <tabstop>CurveValue2</tabstop>
   <tabstop>CurveValue3</tabstop>
+  <tabstop>CurveToGenerate</tabstop>
+  <tabstop>ccpmGenerateCurve</tabstop>
+  <tabstop>CurveSettings</tabstop>
   <tabstop>ccpmAdvancedSettingsTable</tabstop>
  </tabstops>
  <resources/>

@@ -43,7 +43,7 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     int i;
     m_ccpm = new Ui_ccpmWidget();
     m_ccpm->setupUi(this);
-    userConfigurationInProgress=0;
+    SwashLvlConfigurationInProgress=0;
     SwashLvlState=0;
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
     //ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -901,7 +901,7 @@ void ConfigccpmWidget::requestccpmUpdate()
     int HeadRotation,temp;
     int isCCPM=0;
 
-    if (userConfigurationInProgress)return;
+    if (SwashLvlConfigurationInProgress)return;
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -1170,7 +1170,7 @@ void ConfigccpmWidget::sendccpmUpdate()
     UAVObjectField *field;
     UAVDataObject* obj;
 
-    if (userConfigurationInProgress)return;
+    if (SwashLvlConfigurationInProgress)return;
     ShowDisclaimer(1);
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -1250,7 +1250,7 @@ void ConfigccpmWidget::sendccpmUpdate()
   */
 void ConfigccpmWidget::saveccpmUpdate()
 {
-    if (userConfigurationInProgress)return;
+    if (SwashLvlConfigurationInProgress)return;
     ShowDisclaimer(0);
     // Send update so that the latest value is saved
     sendccpmUpdate();
@@ -1286,7 +1286,7 @@ void ConfigccpmWidget::showEvent(QShowEvent *event)
 void ConfigccpmWidget::SwashLvlStartButtonPressed()
 {
     QMessageBox msgBox;
-    //int i;
+    int i;
      msgBox.setText("Swashplate Leveling Routine");
      msgBox.setInformativeText("You are about to start the Swashplate levelling routine. \nThis process will start by downloading the current configuration from the GCS to the OP hardware and will adjust your configuration at various stages.\nThe final state of your system should match the current configuration in the GCS config gadget.\nPlease ensure all ccpm settings in the GCS are correct before continuing.\nIf this process is interrupted, then the state of your OP board may not match the GCS configuration.\nAfter completing this process, please check all settings before attempting to fly.\n\nPlease disconnect your motor to ensure it will not spin up.\n\n\n Do you wish to proceed?");
      msgBox.setStandardButtons(QMessageBox::Yes |  QMessageBox::Cancel);
@@ -1294,11 +1294,19 @@ void ConfigccpmWidget::SwashLvlStartButtonPressed()
      msgBox.setIcon(QMessageBox::Information);
      int ret = msgBox.exec();
 
+     UAVObjectField* MinField;
+     UAVObjectField* NeutralField;
+     UAVObjectField* MaxField;
+     UAVDataObject* obj;
+     ExtensionSystem::PluginManager *pm;
+     UAVObjectManager *objManager;
+
      switch (ret) {
         case QMessageBox::Yes:
             // Yes was clicked
             SwashLvlState=0;
-            userConfigurationInProgress=1;
+            //remove Flight control of ActuatorCommand
+            enableSwashplateLevellingControl(true);
 
             m_ccpm->SwashLvlStartButton->setEnabled(false);
             m_ccpm->SwashLvlNextButton->setEnabled(true);
@@ -1314,22 +1322,43 @@ void ConfigccpmWidget::SwashLvlStartButtonPressed()
             //download the current settings to the OP hw
             sendccpmUpdate();
 
+            //change control mode to gcs control / disarmed
+            //set throttle to 0
+
+
             //save off the old ActuatorSettings for the swashplate servos
+            pm = ExtensionSystem::PluginManager::instance();
+            objManager = pm->getObject<UAVObjectManager>();
+
+
+            // Get the channel assignements:
+            obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
+            Q_ASSERT(obj);
+            obj->requestUpdate();
+            MinField = obj->getField(QString("ChannelMin"));
+            NeutralField = obj->getField(QString("ChannelNeutral"));
+            MaxField = obj->getField(QString("ChannelMax"));
+
+            //channel assignments
+            oldSwashLvlConfiguration.ServoChannels[0]=m_ccpm->ccpmServoWChannel->currentIndex();
+            oldSwashLvlConfiguration.ServoChannels[1]=m_ccpm->ccpmServoXChannel->currentIndex();
+            oldSwashLvlConfiguration.ServoChannels[2]=m_ccpm->ccpmServoYChannel->currentIndex();
+            oldSwashLvlConfiguration.ServoChannels[3]=m_ccpm->ccpmServoZChannel->currentIndex();
+            //if servos are used
+            oldSwashLvlConfiguration.Used[0]=((m_ccpm->ccpmServoWChannel->currentIndex()<8)&&(m_ccpm->ccpmServoWChannel->isEnabled()));
+            oldSwashLvlConfiguration.Used[1]=((m_ccpm->ccpmServoXChannel->currentIndex()<8)&&(m_ccpm->ccpmServoXChannel->isEnabled()));
+            oldSwashLvlConfiguration.Used[2]=((m_ccpm->ccpmServoYChannel->currentIndex()<8)&&(m_ccpm->ccpmServoYChannel->isEnabled()));
+            oldSwashLvlConfiguration.Used[3]=((m_ccpm->ccpmServoZChannel->currentIndex()<8)&&(m_ccpm->ccpmServoZChannel->isEnabled()));
+            //min,neutral,max values for the servos
+            for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++)
+            {
+                oldSwashLvlConfiguration.Min[i]=MinField->getValue(oldSwashLvlConfiguration.ServoChannels[i]).toInt();
+                oldSwashLvlConfiguration.Neutral[i]=NeutralField->getValue(oldSwashLvlConfiguration.ServoChannels[i]).toInt();
+                oldSwashLvlConfiguration.Max[i]=MaxField->getValue(oldSwashLvlConfiguration.ServoChannels[i]).toInt();
+            }
 
             //copy to new Actuator settings.
-
-            //store swashplate actuator numbers in array for levelling routine use...
-            //int ccpmServosChannel[CCPM_MAX_SWASH_SERVOS];
-            //ccpmServosChannel[0]=m_ccpm->ccpmServoWChannel->currentIndex();
-            //ccpmServosChannel[1]=m_ccpm->ccpmServoXChannel;
-            //ccpmServosChannel[2]=m_ccpm->ccpmServoYChannel;
-            //ccpmServosChannel[3]=m_ccpm->ccpmServoZChannel;
-
-            //int used[CCPM_MAX_SWASH_SERVOS];
-
-
-            //remove Flight control of ActuatorCommand
-            //runChannelTests(true);
+            memcpy((void*)&newSwashLvlConfiguration,(void*)&oldSwashLvlConfiguration,sizeof(SwashplateServoSettingsStruct));
 
             //goto the first step
             SwashLvlNextButtonPressed();
@@ -1337,7 +1366,8 @@ void ConfigccpmWidget::SwashLvlStartButtonPressed()
         case QMessageBox::Cancel:
             // Cancel was clicked
             SwashLvlState=0;
-            userConfigurationInProgress=0;
+            //restore Flight control of ActuatorCommand
+            enableSwashplateLevellingControl(false);
 
             m_ccpm->SwashLvlStartButton->setEnabled(true);
             m_ccpm->SwashLvlNextButton->setEnabled(false);
@@ -1366,15 +1396,8 @@ void ConfigccpmWidget::SwashLvlNextButtonPressed()
         break;
     case 1: //Neutral levelling
         m_ccpm->SwashLvlStepList->setCurrentRow(0);
-        //set swashplate servos to Neutral values
-        //set spin boxes to neutral values
-        /*for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++)
-        {
-            used[i]=((ccpmServosChannel[i]->currentIndex()<8)&&(ccpmServosChannel[i]->isEnabled()));
-            if (used[i])SwashLvlSpinBoxes[ccpmServosChannel[i]->currentIndex()]->setValue(i);
-        }*/
-        //change control mode to gcs control / disarmed
-        //set throttle to 0
+        //set spin boxes and swashplate servos to Neutral values
+        setSwashplateLevel(50);
         //disable position slider
         m_ccpm->SwashLvlPositionSlider->setEnabled(false);
         m_ccpm->SwashLvlPositionSpinBox->setEnabled(false);
@@ -1388,8 +1411,8 @@ void ConfigccpmWidget::SwashLvlNextButtonPressed()
         //check Neutral status as complete
         m_ccpm->SwashLvlStepList->item(0)->setCheckState(Qt::Checked);
         m_ccpm->SwashLvlStepList->setCurrentRow(1);
-        //set swashplate servos to Max values
-        //set spin boxes to max values
+        //set spin boxes and swashplate servos to Max values
+        setSwashplateLevel(100);
         //set position slider to 100%
         m_ccpm->SwashLvlPositionSlider->setValue(100);
         m_ccpm->SwashLvlPositionSpinBox->setValue(100);
@@ -1400,8 +1423,8 @@ void ConfigccpmWidget::SwashLvlNextButtonPressed()
         //check Max status as complete
         m_ccpm->SwashLvlStepList->item(1)->setCheckState(Qt::Checked);
         m_ccpm->SwashLvlStepList->setCurrentRow(2);
-        //set swashplate servos to Min values
-        //set spin boxes to min values
+        //set spin boxes and swashplate servos to Min values
+        setSwashplateLevel(0);
         //set position slider to 0%
         m_ccpm->SwashLvlPositionSlider->setValue(0);
         m_ccpm->SwashLvlPositionSpinBox->setValue(0);
@@ -1415,6 +1438,10 @@ void ConfigccpmWidget::SwashLvlNextButtonPressed()
         //enable position slider
         m_ccpm->SwashLvlPositionSlider->setEnabled(true);
         m_ccpm->SwashLvlPositionSpinBox->setEnabled(true);
+        //make heli respond to slider movement
+        connect(m_ccpm->SwashLvlPositionSlider, SIGNAL(valueChanged(int)), this, SLOT(setSwashplateLevel(int)));
+        //connect(m_ccpm->SwashLvlPositionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(setSwashplateLevel(int)));
+
         //issue user instructions
         m_ccpm->SwashLvlStepInstruction->setText("levelling verification");
          break;
@@ -1426,6 +1453,8 @@ void ConfigccpmWidget::SwashLvlNextButtonPressed()
         //disable position slider
         m_ccpm->SwashLvlPositionSlider->setEnabled(false);
         m_ccpm->SwashLvlPositionSpinBox->setEnabled(false);
+
+        disconnect(m_ccpm->SwashLvlPositionSlider, SIGNAL(valueChanged(int)), this, SLOT(setSwashplateLevel(int)));
 
         m_ccpm->SwashLvlStartButton->setEnabled(false);
         m_ccpm->SwashLvlNextButton->setEnabled(false);
@@ -1452,9 +1481,7 @@ void ConfigccpmWidget::SwashLvlCancelButtonPressed()
     //restore old Actuator Settings
 
     //restore Flight control of ActuatorCommand
-    //runChannelTests(false);
-
-    userConfigurationInProgress=0;
+    enableSwashplateLevellingControl(false);
 }
 
 
@@ -1470,9 +1497,7 @@ void ConfigccpmWidget::SwashLvlFinishButtonPressed()
     //save new Actuator Settings
 
     //restore Flight control of ActuatorCommand
-    //runChannelTests(false);
-
-    userConfigurationInProgress=0;
+    enableSwashplateLevellingControl(false);
 }
 
 int ConfigccpmWidget::ShowDisclaimer(int messageID)
@@ -1524,7 +1549,7 @@ int ConfigccpmWidget::ShowDisclaimer(int messageID)
   Toggles the channel testing mode by making the GCS take over
   the ActuatorCommand objects
   */
-/*void ConfigccpmWidget::runChannelTests(bool state)
+void ConfigccpmWidget::enableSwashplateLevellingControl(bool state)
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -1533,18 +1558,92 @@ int ConfigccpmWidget::ShowDisclaimer(int messageID)
     UAVObject::Metadata mdata = obj->getMetadata();
     if (state)
     {
-        accInitialData = mdata;
+        SwashLvlaccInitialData = mdata;
         mdata.flightAccess = UAVObject::ACCESS_READONLY;
         mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
         mdata.gcsTelemetryAcked = false;
         mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
         mdata.gcsTelemetryUpdatePeriod = 100;
+        SwashLvlConfigurationInProgress=1;
     }
     else
     {
-        mdata = accInitialData; // Restore metadata
+        mdata = SwashLvlaccInitialData; // Restore metadata
+        SwashLvlConfigurationInProgress=0;
     }
     obj->setMetadata(mdata);
 
 }
-*/
+
+/**
+  Sets the swashplate level to a given value based on current settings for Max, Neutral and Min values.
+  level ranges -1 to +1
+  */
+void ConfigccpmWidget::setSwashplateLevel(int percent)
+{
+    if (percent<0)return;// -1;
+    if (percent>100)return;// -1;
+    if (SwashLvlConfigurationInProgress!=1)return;// -1;
+    int i;
+    double value;
+    double level = ((double)percent /50.00) - 1.00;
+
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
+    UAVObjectField * channel = obj->getField("Channel");
+
+
+
+    if (level==0)
+    {
+        for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++)
+        {
+            channel->setValue(newSwashLvlConfiguration.Neutral[i],newSwashLvlConfiguration.ServoChannels[i]);
+            SwashLvlSpinBoxes[i]->setValue(newSwashLvlConfiguration.Neutral[i]);
+        }
+
+    }
+    else if (level>0)
+    {
+        for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++)
+        {
+            value = (newSwashLvlConfiguration.Max[i] - newSwashLvlConfiguration.Neutral[i])*level + newSwashLvlConfiguration.Neutral[i];
+            channel->setValue(value,newSwashLvlConfiguration.ServoChannels[i]);
+            SwashLvlSpinBoxes[i]->setValue(value);
+        }
+
+    }
+    else if (level<0)
+    {
+        for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++)
+        {
+            value = (newSwashLvlConfiguration.Neutral[i] - newSwashLvlConfiguration.Min[i])*level + newSwashLvlConfiguration.Neutral[i];
+            channel->setValue(value,newSwashLvlConfiguration.ServoChannels[i]);
+            SwashLvlSpinBoxes[i]->setValue(value);
+        }
+
+    }
+    obj->updated();
+return;
+}
+
+
+void ConfigccpmWidget::SwashLvlSpinBoxChanged(int value)
+{
+    switch (SwashLvlState)
+    {
+    case 0:
+        break;
+    case 1: //Neutral levelling
+        break;
+    case 2: //Max levelling
+        break;
+    case 3: //Min levelling
+        break;
+    case 4: //levelling verification
+        break;
+    case 5: //levelling complete
+        break;
+    default:
+        break;
+    }
+}

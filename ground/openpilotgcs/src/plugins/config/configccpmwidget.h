@@ -41,6 +41,14 @@
 
 class Ui_Widget;
 
+typedef struct {
+    int ServoChannels[CCPM_MAX_SWASH_SERVOS];
+    int Used[CCPM_MAX_SWASH_SERVOS];
+    int Max[CCPM_MAX_SWASH_SERVOS];
+    int Neutral[CCPM_MAX_SWASH_SERVOS];
+    int Min[CCPM_MAX_SWASH_SERVOS];
+} SwashplateServoSettingsStruct;
+
 class ConfigccpmWidget: public ConfigTaskWidget
 {
     Q_OBJECT
@@ -66,8 +74,13 @@ private:
         QGraphicsLineItem *ServoLines[CCPM_MAX_SWASH_SERVOS];
         QSpinBox *SwashLvlSpinBoxes[CCPM_MAX_SWASH_SERVOS];
 
-        bool userConfigurationInProgress;
+        bool SwashLvlConfigurationInProgress;
+        UAVObject::Metadata SwashLvlaccInitialData;
         int SwashLvlState;
+
+        SwashplateServoSettingsStruct oldSwashLvlConfiguration;
+        SwashplateServoSettingsStruct newSwashLvlConfiguration;
+
 
         int MixerChannelData[6];
         int ShowDisclaimer(int messageID);
@@ -88,7 +101,9 @@ private:
         void SwashLvlCancelButtonPressed();
         void SwashLvlFinishButtonPressed();
 
-        //void runChannelTests(bool state);
+        void enableSwashplateLevellingControl(bool state);
+        void setSwashplateLevel(int percent);
+        void SwashLvlSpinBoxChanged(int value);
 
     public slots:
         void requestccpmUpdate();

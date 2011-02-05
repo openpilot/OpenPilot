@@ -1533,7 +1533,7 @@ void ph_set_remote_encryption(int connection_index, bool enabled, const void *ke
 void ph_1ms_tick(void)
 {	// call this once every ms
 
-  // help randomize the encrypter cbc bytes
+  // help randomize the encryptor cbc bytes
   register uint32_t *cbc = (uint32_t *)&enc_cbc;
   for (int i = 0; i < sizeof(enc_cbc) / 4; i++)
   {

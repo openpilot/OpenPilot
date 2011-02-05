@@ -36,8 +36,8 @@
 
 // ************************************
 
-#define rfm22_min_carrier_frequency_Hz 		240000000ul
-#define rfm22_max_carrier_frequency_Hz 		930000000ul
+#define RFM22_MIN_CARRIER_FREQUENCY_HZ 		240000000ul
+#define RFM22_MAX_CARRIER_FREQUENCY_HZ 		930000000ul
 
 // ************************************
 
@@ -50,14 +50,14 @@ enum {	RX_WAIT_PREAMBLE_MODE = 0,
 
 // ************************************
 
-#define bit0									(1u << 0)
-#define bit1									(1u << 1)
-#define bit2									(1u << 2)
-#define bit3									(1u << 3)
-#define bit4									(1u << 4)
-#define bit5									(1u << 5)
-#define bit6									(1u << 6)
-#define bit7									(1u << 7)
+#define BIT0									(1u << 0)
+#define BIT1									(1u << 1)
+#define BIT2									(1u << 2)
+#define BIT3									(1u << 3)
+#define BIT4									(1u << 4)
+#define BIT5									(1u << 5)
+#define BIT6									(1u << 6)
+#define BIT7									(1u << 7)
 
 // ************************************
 
@@ -80,44 +80,44 @@ enum {	RX_WAIT_PREAMBLE_MODE = 0,
 #define rfm22_ds_ffovfl							0x80		// RX/TX FIFO Overflow Status
 
 #define rfm22_interrupt_status1						0x03	// R
-#define rfm22_is1_icrerror						bit0		// CRC Error. When set to 1 the cyclic redundancy check is failed.
-#define rfm22_is1_ipkvalid						bit1		// Valid Packet Received.When set to 1 a valid packet has been received.
-#define rfm22_is1_ipksent						bit2		// Packet Sent Interrupt. When set to1 a valid packet has been transmitted.
-#define rfm22_is1_iext							bit3		// External Interrupt. When set to 1 an interrupt occurred on one of the GPIO’s if it is programmed so. The status can be checked in register 0Eh. See GPIOx Configuration section for the details.
-#define rfm22_is1_irxffafull					bit4		// RX FIFO Almost Full.When set to 1 the RX FIFO has met its almost full threshold and needs to be read by the microcontroller.
-#define rfm22_is1_ixtffaem						bit5		// TX FIFO Almost Empty. When set to 1 the TX FIFO is almost empty and needs to be filled.
-#define rfm22_is1_itxffafull					bit6		// TX FIFO Almost Full. When set to 1 the TX FIFO has met its almost full threshold and needs to be transmitted.
-#define rfm22_is1_ifferr						bit7		// FIFO Underflow/Overflow Error. When set to 1 the TX or RX FIFO has overflowed or underflowed.
+#define rfm22_is1_icrerror						BIT0		// CRC Error. When set to 1 the cyclic redundancy check is failed.
+#define rfm22_is1_ipkvalid						BIT1		// Valid Packet Received.When set to 1 a valid packet has been received.
+#define rfm22_is1_ipksent						BIT2		// Packet Sent Interrupt. When set to1 a valid packet has been transmitted.
+#define rfm22_is1_iext							BIT3		// External Interrupt. When set to 1 an interrupt occurred on one of the GPIO’s if it is programmed so. The status can be checked in register 0Eh. See GPIOx Configuration section for the details.
+#define rfm22_is1_irxffafull					BIT4		// RX FIFO Almost Full.When set to 1 the RX FIFO has met its almost full threshold and needs to be read by the microcontroller.
+#define rfm22_is1_ixtffaem						BIT5		// TX FIFO Almost Empty. When set to 1 the TX FIFO is almost empty and needs to be filled.
+#define rfm22_is1_itxffafull					BIT6		// TX FIFO Almost Full. When set to 1 the TX FIFO has met its almost full threshold and needs to be transmitted.
+#define rfm22_is1_ifferr						BIT7		// FIFO Underflow/Overflow Error. When set to 1 the TX or RX FIFO has overflowed or underflowed.
 
 #define rfm22_interrupt_status2						0x04	// R
-#define rfm22_is2_ipor							bit0		// Power-on-Reset (POR). When the chip detects a Power on Reset above the desired setting this bit will be set to 1.
-#define rfm22_is2_ichiprdy						bit1		// Chip Ready (XTAL). When a chip ready event has been detected this bit will be set to 1.
-#define rfm22_is2_ilbd							bit2		// Low Battery Detect. When a low battery event is been detected this bit will be set to 1. This interrupt event is saved even if it is not enabled by the mask register bit and causes an interrupt after it is enabled.
-#define rfm22_is2_iwut							bit3		// Wake-Up-Timer. On the expiration of programmed wake-up timer this bit will be set to 1.
-#define rfm22_is2_irssi							bit4		// RSSI. When RSSI level exceeds the programmed threshold this bit will be set to 1.
-#define rfm22_is2_ipreainval					bit5		// Invalid Preamble Detected. When the preamble is not found within a period of time set by the invalid preamble detection threshold in Register 54h, this bit will be set to 1.
-#define rfm22_is2_ipreaval						bit6		// Valid Preamble Detected. When a preamble is detected this bit will be set to 1.
-#define rfm22_is2_iswdet						bit7		// Sync Word Detected. When a sync word is detected this bit will be set to 1.
+#define rfm22_is2_ipor							BIT0		// Power-on-Reset (POR). When the chip detects a Power on Reset above the desired setting this bit will be set to 1.
+#define rfm22_is2_ichiprdy						BIT1		// Chip Ready (XTAL). When a chip ready event has been detected this bit will be set to 1.
+#define rfm22_is2_ilbd							BIT2		// Low Battery Detect. When a low battery event is been detected this bit will be set to 1. This interrupt event is saved even if it is not enabled by the mask register bit and causes an interrupt after it is enabled.
+#define rfm22_is2_iwut							BIT3		// Wake-Up-Timer. On the expiration of programmed wake-up timer this bit will be set to 1.
+#define rfm22_is2_irssi							BIT4		// RSSI. When RSSI level exceeds the programmed threshold this bit will be set to 1.
+#define rfm22_is2_ipreainval					BIT5		// Invalid Preamble Detected. When the preamble is not found within a period of time set by the invalid preamble detection threshold in Register 54h, this bit will be set to 1.
+#define rfm22_is2_ipreaval						BIT6		// Valid Preamble Detected. When a preamble is detected this bit will be set to 1.
+#define rfm22_is2_iswdet						BIT7		// Sync Word Detected. When a sync word is detected this bit will be set to 1.
 
 #define rfm22_interrupt_enable1						0x05	// R/W
-#define rfm22_ie1_encrcerror					bit0		// Enable CRC Error. When set to 1 the CRC Error interrupt will be enabled.
-#define rfm22_ie1_enpkvalid						bit1		// Enable Valid Packet Received. When ipkvalid = 1 the Valid Packet Received Interrupt will be enabled.
-#define rfm22_ie1_enpksent						bit2		// Enable Packet Sent. When ipksent =1 the Packet Sense Interrupt will be enabled.
-#define rfm22_ie1_enext							bit3		// Enable External Interrupt. When set to 1 the External Interrupt will be enabled.
-#define rfm22_ie1_enrxffafull					bit4		// Enable RX FIFO Almost Full. When set to 1 the RX FIFO Almost Full interrupt will be enabled.
-#define rfm22_ie1_entxffaem						bit5		// Enable TX FIFO Almost Empty. When set to 1 the TX FIFO Almost Empty interrupt will be enabled.
-#define rfm22_ie1_entxffafull					bit6		// Enable TX FIFO Almost Full. When set to 1 the TX FIFO Almost Full interrupt will be enabled.
-#define rfm22_ie1_enfferr						bit7		// Enable FIFO Underflow/Overflow. When set to 1 the FIFO Underflow/Overflow interrupt will be enabled.
+#define rfm22_ie1_encrcerror					BIT0		// Enable CRC Error. When set to 1 the CRC Error interrupt will be enabled.
+#define rfm22_ie1_enpkvalid						BIT1		// Enable Valid Packet Received. When ipkvalid = 1 the Valid Packet Received Interrupt will be enabled.
+#define rfm22_ie1_enpksent						BIT2		// Enable Packet Sent. When ipksent =1 the Packet Sense Interrupt will be enabled.
+#define rfm22_ie1_enext							BIT3		// Enable External Interrupt. When set to 1 the External Interrupt will be enabled.
+#define rfm22_ie1_enrxffafull					BIT4		// Enable RX FIFO Almost Full. When set to 1 the RX FIFO Almost Full interrupt will be enabled.
+#define rfm22_ie1_entxffaem						BIT5		// Enable TX FIFO Almost Empty. When set to 1 the TX FIFO Almost Empty interrupt will be enabled.
+#define rfm22_ie1_entxffafull					BIT6		// Enable TX FIFO Almost Full. When set to 1 the TX FIFO Almost Full interrupt will be enabled.
+#define rfm22_ie1_enfferr						BIT7		// Enable FIFO Underflow/Overflow. When set to 1 the FIFO Underflow/Overflow interrupt will be enabled.
 
 #define rfm22_interrupt_enable2						0x06	// R/W
-#define rfm22_ie2_enpor							bit0		// Enable POR. When set to 1 the POR interrupt will be enabled.
-#define rfm22_ie2_enchiprdy						bit1		// Enable Chip Ready (XTAL). When set to 1 the Chip Ready interrupt will be enabled.
-#define rfm22_ie2_enlbd							bit2		// Enable Low Battery Detect. When set to 1 the Low Battery Detect interrupt will be enabled.
-#define rfm22_ie2_enwut							bit3		// Enable Wake-Up Timer. When set to 1 the Wake-Up Timer interrupt will be enabled.
-#define rfm22_ie2_enrssi						bit4		// Enable RSSI. When set to 1 the RSSI Interrupt will be enabled.
-#define rfm22_ie2_enpreainval					bit5		// Enable Invalid Preamble Detected. When mpreadet =1 the Invalid Preamble Detected Interrupt will be enabled.
-#define rfm22_ie2_enpreaval						bit6		// Enable Valid Preamble Detected. When mpreadet =1 the Valid Preamble Detected Interrupt will be enabled.
-#define rfm22_ie2_enswdet						bit7		// Enable Sync Word Detected. When mpreadet =1 the Preamble Detected Interrupt will be enabled.
+#define rfm22_ie2_enpor							BIT0		// Enable POR. When set to 1 the POR interrupt will be enabled.
+#define rfm22_ie2_enchiprdy						BIT1		// Enable Chip Ready (XTAL). When set to 1 the Chip Ready interrupt will be enabled.
+#define rfm22_ie2_enlbd							BIT2		// Enable Low Battery Detect. When set to 1 the Low Battery Detect interrupt will be enabled.
+#define rfm22_ie2_enwut							BIT3		// Enable Wake-Up Timer. When set to 1 the Wake-Up Timer interrupt will be enabled.
+#define rfm22_ie2_enrssi						BIT4		// Enable RSSI. When set to 1 the RSSI Interrupt will be enabled.
+#define rfm22_ie2_enpreainval					BIT5		// Enable Invalid Preamble Detected. When mpreadet =1 the Invalid Preamble Detected Interrupt will be enabled.
+#define rfm22_ie2_enpreaval						BIT6		// Enable Valid Preamble Detected. When mpreadet =1 the Valid Preamble Detected Interrupt will be enabled.
+#define rfm22_ie2_enswdet						BIT7		// Enable Sync Word Detected. When mpreadet =1 the Preamble Detected Interrupt will be enabled.
 
 #define rfm22_op_and_func_ctrl1						0x07	// R/W
 #define rfm22_opfc1_xton						0x01		// READY Mode (Xtal is ON).
@@ -572,15 +572,6 @@ enum {	RX_WAIT_PREAMBLE_MODE = 0,
 
 // ************************************
 
-void rfm22_setFreqCalibration(uint8_t value);
-uint8_t rfm22_getFreqCalibration(void);
-
-void rfm22_setDatarate(uint32_t datarate_bps);
-uint32_t rfm22_getDatarate(void);
-
-void rfm22_setTxPower(uint8_t tx_pwr);
-uint8_t rfm22_getTxPower(void);
-
 void rfm22_setNominalCarrierFrequency(uint32_t frequency_hz);
 uint32_t rfm22_getNominalCarrierFrequency(void);
 
@@ -589,6 +580,9 @@ float rfm22_getFrequencyStepSize(void);
 void rfm22_setFreqHopChannel(uint8_t channel);
 uint8_t rfm22_freqHopChannel(void);
 
+void rfm22_setDatarate(uint32_t datarate_bps);
+uint32_t rfm22_getDatarate(void);
+
 int16_t rfm22_receivedRSSI(void);
 int32_t rfm22_receivedAFCHz(void);
 uint16_t rfm22_receivedLength(void);
@@ -596,6 +590,12 @@ uint8_t * rfm22_receivedPointer(void);
 void rfm22_receivedDone(void);
 
 int32_t rfm22_sendData(void *data, uint16_t length, bool send_immediately);
+
+void rfm22_setFreqCalibration(uint8_t value);
+uint8_t rfm22_getFreqCalibration(void);
+
+void rfm22_setTxPower(uint8_t tx_pwr);
+uint8_t rfm22_getTxPower(void);
 
 void rfm22_setTxCarrierMode(void);
 void rfm22_setTxPNMode(void);

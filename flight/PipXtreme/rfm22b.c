@@ -182,7 +182,7 @@ uint32_t			carrier_datarate_bps;				// the RF data rate we are using
 uint32_t			rf_bandwidth_used;					// the RF bandwidth currently used
 
 uint8_t				hbsel;								// holds the hbsel (1 or 2)
-float				frequency_step_size;				//
+float				frequency_step_size;				// holds the minimum frequency step size
 
 uint8_t				frequency_hop_channel;				// current frequency hop channel
 
@@ -420,6 +420,107 @@ uint8_t rfm22_getFreqCalibration(void)
 }
 
 // ************************************
+// set/get the current tx power setting
+
+void rfm22_setTxPower(uint8_t tx_pwr)
+{
+    switch (tx_pwr)
+    {
+      case 0: tx_power = rfm22_tx_pwr_txpow_0; break;    // +1dBm ... 1.25mW
+      case 1: tx_power = rfm22_tx_pwr_txpow_1; break;    // +2dBm ... 1.6mW
+      case 2: tx_power = rfm22_tx_pwr_txpow_2; break;    // +5dBm ... 3.16mW
+      case 3: tx_power = rfm22_tx_pwr_txpow_3; break;    // +8dBm ... 6.3mW
+      case 4: tx_power = rfm22_tx_pwr_txpow_4; break;    // +11dBm .. 12.6mW
+      case 5: tx_power = rfm22_tx_pwr_txpow_5; break;    // +14dBm .. 25mW
+      case 6: tx_power = rfm22_tx_pwr_txpow_6; break;    // +17dBm .. 50mW
+      case 7: tx_power = rfm22_tx_pwr_txpow_7; break;    // +20dBm .. 100mW
+      default: break;
+    }
+}
+
+uint8_t rfm22_getTxPower(void)
+{
+    return tx_power;
+}
+
+// ************************************
+
+void rfm22_setNominalCarrierFrequency(uint32_t frequency_hz)
+{
+
+#if defined(RFM22_EXT_INT_USE)
+	exec_using_spi = TRUE;
+#endif
+
+	// *******
+
+	if (frequency_hz < lower_carrier_frequency_limit_Hz) frequency_hz = lower_carrier_frequency_limit_Hz;
+	else
+	if (frequency_hz > upper_carrier_frequency_limit_Hz) frequency_hz = upper_carrier_frequency_limit_Hz;
+
+	carrier_frequency_hz = frequency_hz;
+
+	if (frequency_hz < 480000000)
+		hbsel = 1;
+	else
+		hbsel = 2;
+	uint8_t fb = (uint8_t)(frequency_hz / (10000000 * hbsel));
+
+	uint32_t fc = (uint32_t)(frequency_hz - (10000000 * hbsel * fb));
+
+	fc = (fc * 64u) / (10000ul * hbsel);
+	fb -= 24;
+
+	if (hbsel > 1)
+		fb |= rfm22_fbs_hbsel;
+
+	fb |= rfm22_fbs_sbse;	// is this the RX LO polarity?
+
+	frequency_step_size = 156.25f * hbsel;
+
+	rfm22_write(rfm22_frequency_hopping_channel_select, frequency_hop_channel);	// frequency hoppping channel (0-255)
+
+	rfm22_write(rfm22_frequency_offset1, 0);						// no frequency offset
+	rfm22_write(rfm22_frequency_offset2, 0);						// no frequency offset
+
+	rfm22_write(rfm22_frequency_band_select, fb);					// set the carrier frequency
+	rfm22_write(rfm22_nominal_carrier_frequency1, fc >> 8);			//    "            "
+	rfm22_write(rfm22_nominal_carrier_frequency0, fc & 0xff);		//    "            "
+
+	// *******
+
+#if defined(RFM22_DEBUG)
+	DEBUG_PRINTF("rf setFreq: %0.2f\r\n", carrier_frequency_hz);
+#endif
+
+#if defined(RFM22_EXT_INT_USE)
+	exec_using_spi = FALSE;
+#endif
+
+}
+
+uint32_t rfm22_getNominalCarrierFrequency(void)
+{
+    return carrier_frequency_hz;
+}
+
+float rfm22_getFrequencyStepSize(void)
+{
+	return frequency_step_size;
+}
+
+void rfm22_setFreqHopChannel(uint8_t channel)
+{	// set the frequency hopping channel
+	frequency_hop_channel = channel;
+	rfm22_write(rfm22_frequency_hopping_channel_select, frequency_hop_channel);
+}
+
+uint8_t rfm22_freqHopChannel(void)
+{	// return the current frequency hopping channel
+	return frequency_hop_channel;
+}
+
+// ************************************
 // radio datarate about 19200 Baud
 // radio frequency deviation 45kHz
 // radio receiver bandwidth 67kHz.
@@ -553,107 +654,6 @@ void rfm22_setDatarate(uint32_t datarate_bps)
 uint32_t rfm22_getDatarate(void)
 {
     return carrier_datarate_bps;
-}
-
-// ************************************
-// set/get the current tx power setting
-
-void rfm22_setTxPower(uint8_t tx_pwr)
-{
-    switch (tx_pwr)
-    {
-      case 0: tx_power = rfm22_tx_pwr_txpow_0; break;    // +1dBm ... 1.25mW
-      case 1: tx_power = rfm22_tx_pwr_txpow_1; break;    // +2dBm ... 1.6mW
-      case 2: tx_power = rfm22_tx_pwr_txpow_2; break;    // +5dBm ... 3.16mW
-      case 3: tx_power = rfm22_tx_pwr_txpow_3; break;    // +8dBm ... 6.3mW
-      case 4: tx_power = rfm22_tx_pwr_txpow_4; break;    // +11dBm .. 12.6mW
-      case 5: tx_power = rfm22_tx_pwr_txpow_5; break;    // +14dBm .. 25mW
-      case 6: tx_power = rfm22_tx_pwr_txpow_6; break;    // +17dBm .. 50mW
-      case 7: tx_power = rfm22_tx_pwr_txpow_7; break;    // +20dBm .. 100mW
-      default: break;
-    }
-}
-
-uint8_t rfm22_getTxPower(void)
-{
-    return tx_power;
-}
-
-// ************************************
-
-void rfm22_setNominalCarrierFrequency(uint32_t frequency_hz)
-{
-
-#if defined(RFM22_EXT_INT_USE)
-	exec_using_spi = TRUE;
-#endif
-
-	// *******
-
-	if (frequency_hz < lower_carrier_frequency_limit_Hz) frequency_hz = lower_carrier_frequency_limit_Hz;
-	else
-	if (frequency_hz > upper_carrier_frequency_limit_Hz) frequency_hz = upper_carrier_frequency_limit_Hz;
-
-	carrier_frequency_hz = frequency_hz;
-
-	if (frequency_hz < 480000000)
-		hbsel = 1;
-	else
-		hbsel = 2;
-	uint8_t fb = (uint8_t)(frequency_hz / (10000000 * hbsel));
-
-	uint32_t fc = (uint32_t)(frequency_hz - (10000000 * hbsel * fb));
-
-	fc = (fc * 64u) / (10000ul * hbsel);
-	fb -= 24;
-
-	if (hbsel > 1)
-		fb |= rfm22_fbs_hbsel;
-
-	fb |= rfm22_fbs_sbse;	// is this the RX LO polarity?
-
-	frequency_step_size = 156.25f * hbsel;
-
-	rfm22_write(rfm22_frequency_hopping_channel_select, frequency_hop_channel);	// frequency hoppping channel (0-255)
-
-	rfm22_write(rfm22_frequency_offset1, 0);						// no frequency offset
-	rfm22_write(rfm22_frequency_offset2, 0);						// no frequency offset
-
-	rfm22_write(rfm22_frequency_band_select, fb);					// set the carrier frequency
-	rfm22_write(rfm22_nominal_carrier_frequency1, fc >> 8);			//    "            "
-	rfm22_write(rfm22_nominal_carrier_frequency0, fc & 0xff);		//    "            "
-
-	// *******
-
-#if defined(RFM22_DEBUG)
-	DEBUG_PRINTF("rf setFreq: %0.2f\r\n", carrier_frequency_hz);
-#endif
-
-#if defined(RFM22_EXT_INT_USE)
-	exec_using_spi = FALSE;
-#endif
-
-}
-
-uint32_t rfm22_getNominalCarrierFrequency(void)
-{
-    return carrier_frequency_hz;
-}
-
-float rfm22_getFrequencyStepSize(void)
-{
-	return frequency_step_size;
-}
-
-void rfm22_setFreqHopChannel(uint8_t channel)
-{	// set the frequency hopping channel
-	frequency_hop_channel = channel;
-	rfm22_write(rfm22_frequency_hopping_channel_select, frequency_hop_channel);
-}
-
-uint8_t rfm22_freqHopChannel(void)
-{	// return the current frequency hopping channel
-	return frequency_hop_channel;
 }
 
 // ************************************
@@ -1782,13 +1782,13 @@ int rfm22_init(uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t fr
 	// ****************
 	// set the minimum and maximum carrier frequency allowed
 
-	if (min_frequency_hz < rfm22_min_carrier_frequency_Hz) min_frequency_hz = rfm22_min_carrier_frequency_Hz;
+	if (min_frequency_hz < RFM22_MIN_CARRIER_FREQUENCY_HZ) min_frequency_hz = RFM22_MIN_CARRIER_FREQUENCY_HZ;
 	else
-	if (min_frequency_hz > rfm22_max_carrier_frequency_Hz) min_frequency_hz = rfm22_max_carrier_frequency_Hz;
+	if (min_frequency_hz > RFM22_MAX_CARRIER_FREQUENCY_HZ) min_frequency_hz = RFM22_MAX_CARRIER_FREQUENCY_HZ;
 
-	if (max_frequency_hz < rfm22_min_carrier_frequency_Hz) max_frequency_hz = rfm22_min_carrier_frequency_Hz;
+	if (max_frequency_hz < RFM22_MIN_CARRIER_FREQUENCY_HZ) max_frequency_hz = RFM22_MIN_CARRIER_FREQUENCY_HZ;
 	else
-	if (max_frequency_hz > rfm22_max_carrier_frequency_Hz) max_frequency_hz = rfm22_max_carrier_frequency_Hz;
+	if (max_frequency_hz > RFM22_MAX_CARRIER_FREQUENCY_HZ) max_frequency_hz = RFM22_MAX_CARRIER_FREQUENCY_HZ;
 
 	if (min_frequency_hz > max_frequency_hz)
 	{	// swap them over

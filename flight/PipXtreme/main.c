@@ -37,6 +37,9 @@
 #include "aes.h"
 #include "rfm22b.h"
 #include "packet_handler.h"
+#include "stream.h"
+#include "scan_spectrum.h"
+#include "ppm.h"
 #include "transparent_comms.h"
 //#include "api_comms.h"
 #include "api_config.h"
@@ -267,9 +270,23 @@ void TIMER_INT_FUNC(void)
 
 			// ***********
 
+			uint8_t mode = saved_settings.mode;
+//				modeTxBlankCarrierTest,	// blank carrier Tx mode (for calibrating the carrier frequency say)
+//				modeTxSpectrumTest		// pseudo random Tx data mode (for checking the Tx carrier spectrum)
+
 			rfm22_1ms_tick();			// rf module tick
 
-			ph_1ms_tick();				// packet handler tick
+			if (mode == modeNormal)
+				ph_1ms_tick();			// packet handler tick
+
+			if (mode == modeStreamTx || mode == modeStreamRx)
+				stream_1ms_tick();		// continuous data stream tick
+
+			if (mode == modeScanSpectrum)
+				ss_1ms_tick();			// spectrum scan tick
+
+			if (mode == modePPMTx || mode == modePPMRx)
+				ppm_1ms_tick();			// ppm tick
 
 			if (!API_Mode)
 				trans_1ms_tick();		// transparent communications tick
@@ -840,9 +857,14 @@ int main()
     #endif
 
     // *************
-    // initialize the RF module
 
-    init_RF_module();
+    init_RF_module();	// initialise the RF module
+
+    stream_init();		// initialise the continuous packet stream module
+
+    ppm_init();			// initialise the ppm module
+
+    ss_init();			// initialise the spectrum scanning module
 
     // *************
 
@@ -914,7 +936,21 @@ int main()
 
         rfm22_process();				// rf hardware layer processing
 
-        ph_process();					// packet handler processing
+		uint8_t mode = saved_settings.mode;
+//				modeTxBlankCarrierTest,	// blank carrier Tx mode (for calibrating the carrier frequency say)
+//				modeTxSpectrumTest		// pseudo random Tx data mode (for checking the Tx carrier spectrum)
+
+		if (mode == modeNormal)
+	        ph_process();				// packet handler processing
+
+		if (mode == modeStreamTx || mode == modeStreamRx)
+			stream_process();			// continuous data stream processing
+
+		if (mode == modeScanSpectrum)
+			ss_process();				// spectrum scan processing
+
+		if (mode == modePPMTx || mode == modePPMRx)
+			ppm_process();				// ppm processing
 
         if (!API_Mode)
         	trans_process();			// tranparent local communication processing (serial port and usb port)

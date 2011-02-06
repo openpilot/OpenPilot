@@ -25,7 +25,7 @@ RM=rm
 .PHONY: areyousureyoushouldberunningthis
 areyousureyoushouldberunningthis:
 	@echo
-	@echo "   This Makefile is somewhat experimental and will probably only work on Linux right now."
+	@echo "   This Makefile will probably only work on Linux and Mac right now."
 	@echo "   If you're sure you want to be using this, you may wish to try the following targets:"
 	@echo
 	@echo "   [Tool Installers]"
@@ -43,6 +43,12 @@ areyousureyoushouldberunningthis:
 	@echo "     openpilot_program - Program the firmware onto the OpenPilot board"
 	@echo "     ahrs              - Build firmware for the AHRS board"
 	@echo "     ahrs_clean        - Delete all build output for the AHRS firmware"
+	@echo "     ahrs_program      - Program the firmware onto the AHRS board"
+	@echo "     coptercontrol     - Build firmware for the CopterControl board"
+	@echo
+	@echo "       NOTE: To build firmware to be chain loaded from a bootloader, use"
+	@echo "                 make openpilot USE_BOOTLOADER=YES"
+	@echo "             Don't for get to do a clean between builds with/without bootloader"
 	@echo
 	@echo "   [Simulation]"
 	@echo "     sim_posix         - Build OpenPilot simulation firmware for"
@@ -52,8 +58,10 @@ areyousureyoushouldberunningthis:
 	@echo "                         Windows using mingw and msys"
 	@echo "     sim_win32_clean   - Delete all build output for the win32 simulation"
 	@echo
-	@echo "   [GCS and UAVObjects]"
+	@echo "   [GCS]"
 	@echo "     gcs               - Build the Ground Control System application"
+	@echo
+	@echo "   [UAVObjects]"
 	@echo "     uavobjects        - Generate source files from the UAVObject definition XML files"
 	@echo "     uavobjects_test   - parse xml-files - check for valid, duplicate ObjId's, ... "
 	@echo "     uavobjects_flight - Generate flight source files from the UAVObject definition XML files"
@@ -190,7 +198,7 @@ endif
 ##############################
 
 .PHONY: all_ground
-all_ground: uavobjgenerator openpilotgcs
+all_ground: openpilotgcs
 
 # Convenience target for the GCS
 .PHONY: gcs
@@ -239,7 +247,7 @@ uavobjects_clean:
 ##############################
 
 .PHONY: all_flight
-all_flight: openpilot_elf ahrs_elf
+all_flight: openpilot_elf ahrs_elf coptercontrol_elf pipxtreme_elf
 
 .PHONY: openpilot
 openpilot: openpilot_elf

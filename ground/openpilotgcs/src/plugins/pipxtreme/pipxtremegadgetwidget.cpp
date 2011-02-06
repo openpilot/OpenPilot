@@ -202,7 +202,7 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 	m_widget->doubleSpinBox_Frequency->setSingleStep(0.00015625);
 
 	m_widget->progressBar_RSSI->setMinimum(-120);
-	m_widget->progressBar_RSSI->setMaximum(-20);
+	m_widget->progressBar_RSSI->setMaximum(0);
 	m_widget->progressBar_RSSI->setValue(m_widget->progressBar_RSSI->minimum());
 
 	m_widget->label_RSSI->setText("RSSI");
@@ -902,6 +902,7 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 
 				m_widget->doubleSpinBox_Frequency->setMinimum((double)pipx_config_details.min_frequency_Hz / 1e6);
 				m_widget->doubleSpinBox_Frequency->setMaximum((double)pipx_config_details.max_frequency_Hz / 1e6);
+				m_widget->doubleSpinBox_Frequency->setSingleStep(((double)pipx_config_details.frequency_step_size * 4) / 1e6);
 
 				m_widget->lineEdit_FrequencyStepSize->setText(QString::number(pipx_config_details.frequency_step_size, 'f', 2) + "Hz");
 

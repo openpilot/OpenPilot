@@ -678,7 +678,7 @@ int main()
 
     #if defined(PIOS_COM_DEBUG)
         DEBUG_PRINTF("\r\n");
-        DEBUG_PRINTF("PipXtreme v%u.%u rebooted\r\n", version_major, version_minor);
+        DEBUG_PRINTF("PipXtreme v%u.%u rebooted\r\n", VERSION_MAJOR, VERSION_MINOR);
     #endif
 
     // *************
@@ -706,7 +706,10 @@ int main()
     else
     if ( GPIO_IN(_868MHz_PIN) && !GPIO_IN(_915MHz_PIN)) saved_settings.frequency_band = FREQBAND_915MHz;    // 915MHz band
 
-    if (saved_settings.mode == 0xff)
+    if (saved_settings.mode == 0xff  ||
+    	saved_settings.mode == MODE_TX_BLANK_CARRIER_TEST ||
+    	saved_settings.mode == MODE_TX_SPECTRUM_TEST ||
+    	saved_settings.mode == MODE_SCAN_SPECTRUM)
     	saved_settings.mode = MODE_NORMAL;
 
     // set some defaults if they are not set
@@ -738,14 +741,14 @@ int main()
             }
             if (saved_settings.max_tx_power == 0xff)
             {
-    //          saved_settings.max_tx_power = 0;        // +1dBm ... 1.25mW
-    //          saved_settings.max_tx_power = 1;        // +2dBm ... 1.6mW
-    //          saved_settings.max_tx_power = 2;        // +5dBm ... 3.16mW
-    //          saved_settings.max_tx_power = 3;        // +8dBm ... 6.3mW
-                saved_settings.max_tx_power = 4;        // +11dBm .. 12.6mW
-    //          saved_settings.max_tx_power = 5;        // +14dBm .. 25mW
-    //          saved_settings.max_tx_power = 6;        // +17dBm .. 50mW
-    //          saved_settings.max_tx_power = 7;        // +20dBm .. 100mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_0;        // +1dBm ... 1.25mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_1;        // +2dBm ... 1.6mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_2;        // +5dBm ... 3.16mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_3;        // +8dBm ... 6.3mW
+                saved_settings.max_tx_power = RFM22_tx_pwr_txpow_4;        // +11dBm .. 12.6mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_5;        // +14dBm .. 25mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_6;        // +17dBm .. 50mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_7;        // +20dBm .. 100mW
             }
             break;
 
@@ -774,14 +777,14 @@ int main()
             }
             if (saved_settings.max_tx_power == 0xff)
             {
-    //          saved_settings.max_tx_power = 0;        // +1dBm ... 1.25mW
-    //          saved_settings.max_tx_power = 1;        // +2dBm ... 1.6mW
-    //          saved_settings.max_tx_power = 2;        // +5dBm ... 3.16mW
-    //          saved_settings.max_tx_power = 3;        // +8dBm ... 6.3mW
-                saved_settings.max_tx_power = 4;        // +11dBm .. 12.6mW
-    //          saved_settings.max_tx_power = 5;        // +14dBm .. 25mW
-    //          saved_settings.max_tx_power = 6;        // +17dBm .. 50mW
-    //          saved_settings.max_tx_power = 7;        // +20dBm .. 100mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_0;        // +1dBm ... 1.25mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_1;        // +2dBm ... 1.6mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_2;        // +5dBm ... 3.16mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_3;        // +8dBm ... 6.3mW
+                saved_settings.max_tx_power = RFM22_tx_pwr_txpow_4;        // +11dBm .. 12.6mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_5;        // +14dBm .. 25mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_6;        // +17dBm .. 50mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_7;        // +20dBm .. 100mW
             }
             break;
 
@@ -810,14 +813,14 @@ int main()
             }
             if (saved_settings.max_tx_power == 0xff)
             {
-    //          saved_settings.max_tx_power = 0;        // +1dBm ... 1.25mW
-    //          saved_settings.max_tx_power = 1;        // +2dBm ... 1.6mW
-    //          saved_settings.max_tx_power = 2;        // +5dBm ... 3.16mW
-    //          saved_settings.max_tx_power = 3;        // +8dBm ... 6.3mW
-                saved_settings.max_tx_power = 4;        // +11dBm .. 12.6mW
-    //          saved_settings.max_tx_power = 5;        // +14dBm .. 25mW
-    //          saved_settings.max_tx_power = 6;        // +17dBm .. 50mW
-    //          saved_settings.max_tx_power = 7;        // +20dBm .. 100mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_0;        // +1dBm ... 1.25mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_1;        // +2dBm ... 1.6mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_2;        // +5dBm ... 3.16mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_3;        // +8dBm ... 6.3mW
+                saved_settings.max_tx_power = RFM22_tx_pwr_txpow_4;        // +11dBm .. 12.6mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_5;        // +14dBm .. 25mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_6;        // +17dBm .. 50mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_7;        // +20dBm .. 100mW
             }
             break;
 

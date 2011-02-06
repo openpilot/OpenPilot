@@ -48,7 +48,7 @@
 #include "rfm22b.h"
 
 #if defined(PIOS_COM_DEBUG)
-//      #define RFM22_DEBUG
+      #define RFM22_DEBUG
 //      #define RFM22_INT_TIMEOUT_DEBUG
 #endif
 
@@ -214,7 +214,7 @@ volatile uint8_t	osc_load_cap;						// xtal frequency calibration value
 volatile uint8_t	rssi;								// the current RSSI (register value)
 volatile int16_t	rssi_dBm;							// dBm value
 
-uint8_t			tx_power;							// the transmit power to use for data transmissions
+uint8_t				tx_power;							// the transmit power to use for data transmissions
 volatile uint8_t	tx_pwr;								// the tx power register read back
 
 volatile uint8_t	rx_buffer_current;									// the current receive buffer in use (double buffer)
@@ -394,32 +394,6 @@ uint8_t rfm22_read(uint8_t addr)
 #endif
 
 // ************************************
-// set/get the frequency calibration value
-
-void rfm22_setFreqCalibration(uint8_t value)
-{
-	osc_load_cap = value;
-
-	if (!initialized || power_on_reset)
-		return;				// we haven't yet been initialized
-
-	#if defined(RFM22_EXT_INT_USE)
-		exec_using_spi = TRUE;
-	#endif
-
-	rfm22_write(RFM22_xtal_osc_load_cap, osc_load_cap);
-
-	#if defined(RFM22_EXT_INT_USE)
-		exec_using_spi = FALSE;
-	#endif
-}
-
-uint8_t rfm22_getFreqCalibration(void)
-{
-	return osc_load_cap;
-}
-
-// ************************************
 // set/get the current tx power setting
 
 void rfm22_setTxPower(uint8_t tx_pwr)
@@ -458,8 +432,6 @@ void rfm22_setNominalCarrierFrequency(uint32_t frequency_hz)
 	else
 	if (frequency_hz > upper_carrier_frequency_limit_Hz) frequency_hz = upper_carrier_frequency_limit_Hz;
 
-	carrier_frequency_hz = frequency_hz;
-
 	if (frequency_hz < 480000000)
 		hbsel = 1;
 	else
@@ -470,6 +442,9 @@ void rfm22_setNominalCarrierFrequency(uint32_t frequency_hz)
 
 	fc = (fc * 64u) / (10000ul * hbsel);
 	fb -= 24;
+
+//	carrier_frequency_hz = frequency_hz;
+	carrier_frequency_hz = ((uint32_t)fb + 24 + ((float)fc / 64000)) * 10000000 * hbsel;
 
 	if (hbsel > 1)
 		fb |= RFM22_fbs_hbsel;
@@ -490,7 +465,8 @@ void rfm22_setNominalCarrierFrequency(uint32_t frequency_hz)
 	// *******
 
 #if defined(RFM22_DEBUG)
-	DEBUG_PRINTF("rf setFreq: %0.2f\r\n", carrier_frequency_hz);
+	DEBUG_PRINTF("rf setFreq: %u\r\n", carrier_frequency_hz);
+//	DEBUG_PRINTF("rf setFreq frequency_step_size: %0.2f\r\n", frequency_step_size);
 #endif
 
 #if defined(RFM22_EXT_INT_USE)
@@ -753,7 +729,7 @@ void rfm22_setRxMode(void)
 
 void rfm22_setTxMode(uint8_t mode)
 {
-	if (mode != TX_DATA_MODE && mode != TX_CARRIER_MODE && rf_mode != TX_PN_MODE)
+	if (mode != TX_DATA_MODE && mode != TX_CARRIER_MODE && mode != TX_PN_MODE)
 		return;		// invalid mode
 
 #if defined(RFM22_EXT_INT_USE)
@@ -771,22 +747,23 @@ void rfm22_setTxMode(uint8_t mode)
 
 	RX_LED_OFF;
 
+	// set the tx power
+//	rfm22_write(RFM22_tx_power, RFM22_tx_pwr_lna_sw | tx_power);
+//	rfm22_write(RFM22_tx_power, RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | tx_power);
+	rfm22_write(RFM22_tx_power, RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_1 | RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | tx_power);
+
 	uint8_t fd_bit = rfm22_read(RFM22_modulation_mode_control2) & RFM22_mmc2_fd;
 	if (mode == TX_CARRIER_MODE)
 	{	// blank carrier mode -  for testing
-		rfm22_write(RFM22_tx_power, RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | RFM22_tx_pwr_txpow_0);		// tx power +1dBm ... 1.25mW
 		rfm22_write(RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_pn9 | RFM22_mmc2_modtyp_none);	// FIFO mode, Blank carrier
 	}
 	else
 	if (mode == TX_PN_MODE)
 	{	// psuedo random data carrier mode - for testing
-		rfm22_write(RFM22_tx_power, RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | RFM22_tx_pwr_txpow_0);		// tx power +1dBm ... 1.25mW
 		rfm22_write(RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_pn9 | RFM22_mmc2_modtyp_gfsk);	// FIFO mode, PN9 carrier
 	}
 	else
 	{	// data transmission
-//		rfm22_write(RFM22_tx_power, RFM22_tx_pwr_lna_sw | tx_power);											// set the tx power
-		rfm22_write(RFM22_tx_power, RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | tx_power);					// set the tx power
 		rfm22_write(RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_fifo | RFM22_mmc2_modtyp_gfsk);	// FIFO mode, GFSK modulation
 	}
 
@@ -1375,12 +1352,12 @@ void rfm22_processInt(void)
 		case TX_CARRIER_MODE:
 		case TX_PN_MODE:
 
-			if (timer_ms >= TX_TEST_MODE_TIMELIMIT_MS)			// 'nn'ms limit
-			{
-				rfm22_setRxMode();								// back to rx mode
-				tx_data_rd = tx_data_wr = 0;					// wipe TX buffer
-				break;
-			}
+//			if (timer_ms >= TX_TEST_MODE_TIMELIMIT_MS)			// 'nn'ms limit
+//			{
+//				rfm22_setRxMode();								// back to rx mode
+//				tx_data_rd = tx_data_wr = 0;					// wipe TX buffer
+//				break;
+//			}
 
 			break;
 
@@ -1496,6 +1473,24 @@ int32_t rfm22_sendData(void *data, uint16_t length, bool send_immediately)
 
 // ************************************
 
+void rfm22_setTxNormal(void)
+{
+	if (!initialized)
+		return;
+
+//	if (rf_mode == TX_CARRIER_MODE || rf_mode == TX_PN_MODE)
+	{
+		rfm22_setRxMode();
+		tx_data_rd = tx_data_wr = 0;
+
+		rx_packet_wr = 0;
+		rx_packet_start_rssi_dBm = 0;
+		rx_packet_start_afc_Hz = 0;
+		rx_packet_rssi_dBm = 0;
+		rx_packet_afc_Hz = 0;
+	}
+}
+
 // enable a blank tx carrier (for frequency alignment)
 void rfm22_setTxCarrierMode(void)
 {
@@ -1550,6 +1545,43 @@ bool rfm22_txReady(void)
 		return FALSE;		// we haven't yet been initialized
 
 	return (tx_data_rd == 0 && tx_data_wr == 0 && rf_mode != TX_DATA_MODE && rf_mode != TX_CARRIER_MODE && rf_mode != TX_PN_MODE);
+}
+
+// ************************************
+// set/get the frequency calibration value
+
+void rfm22_setFreqCalibration(uint8_t value)
+{
+	osc_load_cap = value;
+
+	if (!initialized || power_on_reset)
+		return;				// we haven't yet been initialized
+
+	uint8_t prev_rf_mode = rf_mode;
+
+	if (rf_mode == TX_CARRIER_MODE || rf_mode == TX_PN_MODE)
+	{
+		rfm22_setRxMode();
+		tx_data_rd = tx_data_wr = 0;
+	}
+
+	#if defined(RFM22_EXT_INT_USE)
+		exec_using_spi = TRUE;
+	#endif
+
+	rfm22_write(RFM22_xtal_osc_load_cap, osc_load_cap);
+
+	#if defined(RFM22_EXT_INT_USE)
+		exec_using_spi = FALSE;
+	#endif
+
+	if (prev_rf_mode == TX_CARRIER_MODE || prev_rf_mode == TX_PN_MODE)
+		rfm22_setTxMode(prev_rf_mode);
+}
+
+uint8_t rfm22_getFreqCalibration(void)
+{
+	return osc_load_cap;
 }
 
 // ************************************
@@ -1642,12 +1674,12 @@ void rfm22_process(void)
 		case TX_CARRIER_MODE:
 		case TX_PN_MODE:
 
-			if (rfm22_int_timer >= TX_TEST_MODE_TIMELIMIT_MS)
-			{
-				rfm22_setRxMode();								// back to rx mode
-				tx_data_rd = tx_data_wr = 0;					// wipe TX buffer
-				break;
-			}
+//			if (rfm22_int_timer >= TX_TEST_MODE_TIMELIMIT_MS)
+//			{
+//				rfm22_setRxMode();								// back to rx mode
+//				tx_data_rd = tx_data_wr = 0;					// wipe TX buffer
+//				break;
+//			}
 
 			break;
 
@@ -1923,6 +1955,7 @@ int rfm22_init(uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t fr
 	rfm22_setNominalCarrierFrequency((min_frequency_hz + max_frequency_hz) / 2);	// set our nominal carrier frequency
 
 	rfm22_write(RFM22_tx_power, RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | tx_power);	// set the tx power
+//	rfm22_write(RFM22_tx_power, RFM22_tx_pwr_lna_sw | tx_power);	// set the tx power
 
 //	rfm22_write(RFM22_vco_current_trimming, 0x7f);
 //	rfm22_write(RFM22_vco_calibration_override, 0x40);

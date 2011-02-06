@@ -499,14 +499,14 @@ enum {	RX_WAIT_PREAMBLE_MODE = 0,
 //#define RFM22_gfsk_fir_coeff_value				0x6C	// R/W
 
 #define RFM22_tx_power								0x6D	// R/W
-#define RFM22_tx_pwr_txpow_0					0x00		// Lowest TX power
-#define RFM22_tx_pwr_txpow_1					0x01		//
-#define RFM22_tx_pwr_txpow_2					0x02		//
-#define RFM22_tx_pwr_txpow_3					0x03		//
-#define RFM22_tx_pwr_txpow_4					0x04		//
-#define RFM22_tx_pwr_txpow_5					0x05		//
-#define RFM22_tx_pwr_txpow_6					0x06		//
-#define RFM22_tx_pwr_txpow_7					0x07		// Highest TX power
+#define RFM22_tx_pwr_txpow_0					0x00		//  +1dBm .. 1.25mW
+#define RFM22_tx_pwr_txpow_1					0x01		//  +2dBm .. 1.6mW
+#define RFM22_tx_pwr_txpow_2					0x02		//  +5dBm .. 3.16mW
+#define RFM22_tx_pwr_txpow_3					0x03		//  +8dBm .. 6.3mW
+#define RFM22_tx_pwr_txpow_4					0x04		// +11dBm .. 12.6mW
+#define RFM22_tx_pwr_txpow_5					0x05		// +14dBm .. 25mW
+#define RFM22_tx_pwr_txpow_6					0x06		// +17dBm .. 50mW
+#define RFM22_tx_pwr_txpow_7					0x07		// +20dBm .. 100mW
 #define RFM22_tx_pwr_lna_sw						0x08		// LNA Switch Controller. If set, lna_sw control from the digital will go high during TX modes, and low during other times. If reset, the digital control signal is low at all times.
 #define RFM22_tx_pwr_papeaklvl_0				0x10		//      "                   "
 #define RFM22_tx_pwr_papeaklvl_1				0x20		// PA Peak Detect Level (direct from register). 00 = 6.5, 01 = 7, 10 = 7.5, 11 = 8, 00 = default
@@ -597,6 +597,7 @@ uint8_t rfm22_getFreqCalibration(void);
 void rfm22_setTxPower(uint8_t tx_pwr);
 uint8_t rfm22_getTxPower(void);
 
+void rfm22_setTxNormal(void);
 void rfm22_setTxCarrierMode(void);
 void rfm22_setTxPNMode(void);
 

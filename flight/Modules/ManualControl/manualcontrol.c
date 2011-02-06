@@ -83,8 +83,8 @@ static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time)
 		)
 
 #define assumptions2 ( \
-		((int)MANUALCONTROLSETTINGS_POS1FLIGHTMODE_MANUAL 			== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL) 						&& \
-		((int)MANUALCONTROLSETTINGS_POS1FLIGHTMODE_STABILIZED		== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED) 					&& \
+		((int)MANUALCONTROLSETTINGS_POS1FLIGHTMODE_MANUAL 				== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL) 						&& \
+		((int)MANUALCONTROLSETTINGS_POS1FLIGHTMODE_STABILIZED			== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED) 					&& \
 		((int)MANUALCONTROLSETTINGS_POS1FLIGHTMODE_AUTO 				== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO) 						   \
 		)
 
@@ -95,8 +95,8 @@ static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time)
 		)
 
 #define assumptions4 ( \
-		((int)MANUALCONTROLSETTINGS_POS2FLIGHTMODE_MANUAL 			== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL) 						&& \
-		((int)MANUALCONTROLSETTINGS_POS2FLIGHTMODE_STABILIZED		== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED) 					&& \
+		((int)MANUALCONTROLSETTINGS_POS2FLIGHTMODE_MANUAL 				== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL) 						&& \
+		((int)MANUALCONTROLSETTINGS_POS2FLIGHTMODE_STABILIZED			== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED) 					&& \
 		((int)MANUALCONTROLSETTINGS_POS2FLIGHTMODE_AUTO 				== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO) 						   \
 		)
 
@@ -107,14 +107,39 @@ static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time)
 		)
 
 #define assumptions6 ( \
-		((int)MANUALCONTROLSETTINGS_POS3FLIGHTMODE_MANUAL 			== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL) 						&& \
-		((int)MANUALCONTROLSETTINGS_POS3FLIGHTMODE_STABILIZED		== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED) 					&& \
+		((int)MANUALCONTROLSETTINGS_POS3FLIGHTMODE_MANUAL 				== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL) 						&& \
+		((int)MANUALCONTROLSETTINGS_POS3FLIGHTMODE_STABILIZED			== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED) 					&& \
 		((int)MANUALCONTROLSETTINGS_POS3FLIGHTMODE_AUTO 				== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO) 						   \
 		)
 
 
+#define ARMING_CHANNEL_ROLL		0
+#define ARMING_CHANNEL_PITCH	1
+#define ARMING_CHANNEL_YAW		2
 
-#define assumptions (assumptions1 && assumptions2 && assumptions3 && assumptions4 && assumptions5 && assumptions6)
+#define assumptions7 ( \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_ROLL) 	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_ROLLRIGHT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_ROLL) 	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_PITCHFORWARD		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_PITCH) 	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_PITCHAFT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_PITCH) 	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_YAWLEFT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_YAW) 		&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_YAWRIGHT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_YAW)		\
+		)
+
+#define assumptions8 ( \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	== 0) 	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_ROLLRIGHT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	!= 0) 	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_PITCHFORWARD	-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	== 0) 	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_PITCHAFT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	!= 0) 	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_YAWLEFT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	== 0)	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_YAWRIGHT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	!= 0)	\
+		)
+
+
+
+
+
+#define assumptions (assumptions1 && assumptions2 && assumptions3 && assumptions4 && assumptions5 && assumptions6 && assumptions7 && assumptions8)
 
 /**
  * Module initialization
@@ -299,105 +324,129 @@ static void manualControlTask(void *parameters)
 			ManualControlCommandSet(&cmd);
 		} 
 
+		//
 		// Arming and Disarming mechanism
-		if (cmd.Throttle < 0) {
-			// Throttle is low, in this condition the arming state could change
+		//
+		// Look for state changes and write in newArmState
+		uint8_t newCmdArmed = cmd.Armed;	// By default, keep the arming state the same
 
-			uint8_t newCmdArmed = cmd.Armed;
-			static portTickType armedDisarmStart;
-
-			// Look for state changes and write in newArmState
-			if (settings.Arming == MANUALCONTROLSETTINGS_ARMING_NONE) {
-				// No channel assigned to arming -> arm immediately when throttle is low
-				newCmdArmed = MANUALCONTROLCOMMAND_ARMED_TRUE;
-			} else {
-				float armStickLevel;
-				uint8_t channel = settings.Arming/2;    // 0=Channel1, 1=Channel1_Rev, 2=Channel2, ....
-				bool reverse = (settings.Arming%2)==1;
-				bool manualArm = false;
-				bool manualDisarm = false;
-
-				if (connection_state == CONNECTED) {
-					// Should use RC input only if RX is connected
-					armStickLevel = scaledChannel[channel];
-					if (reverse)
-						armStickLevel =-armStickLevel;
-
-					if (armStickLevel <= -0.90)
-						manualArm = true;
-					else if (armStickLevel >= +0.90)
-						manualDisarm = true;
-				}
-
-				switch(armState) {
-				case ARM_STATE_DISARMED:
-					newCmdArmed = MANUALCONTROLCOMMAND_ARMED_FALSE;
-					if (manualArm) {
-						armedDisarmStart = lastSysTime;
-						armState = ARM_STATE_ARMING_MANUAL;
-					}
-					break;
-
-				case ARM_STATE_ARMING_MANUAL:
-					if (manualArm) {
-						if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
-							armState = ARM_STATE_ARMED;
-					}
-					else
-						armState = ARM_STATE_DISARMED;
-					break;
-
-				case ARM_STATE_ARMED:
-					// When we get here, the throttle is low,
-					// we go immediately to disarming due to timeout, also when the disarming mechanism is not enabled
-					armedDisarmStart = lastSysTime;
-					armState = ARM_STATE_DISARMING_TIMEOUT;
-					newCmdArmed = MANUALCONTROLCOMMAND_ARMED_TRUE;
-					break;
-
-				case ARM_STATE_DISARMING_TIMEOUT:
-					// We get here when armed while throttle low, even when the arming timeout is not enabled
-					if (settings.ArmedTimeout != 0)
-						if (timeDifferenceMs(armedDisarmStart, lastSysTime) > settings.ArmedTimeout)
-							armState = ARM_STATE_DISARMED;
-					// Switch to disarming due to manual control when needed
-					if (manualDisarm) {
-						armedDisarmStart = lastSysTime;
-						armState = ARM_STATE_DISARMING_MANUAL;
-					}
-					break;
-
-				case ARM_STATE_DISARMING_MANUAL:
-					if (manualDisarm) {
-						if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
-							armState = ARM_STATE_DISARMED;
-					}
-					else
-						armState = ARM_STATE_ARMED;
-					break;
-				}
-			}
-			// Update cmd object when needed
-			if (newCmdArmed != cmd.Armed) {
-				cmd.Armed = newCmdArmed;
-				ManualControlCommandSet(&cmd);
-			}
+		if (settings.Arming == MANUALCONTROLSETTINGS_ARMING_ALWAYSDISARMED) {
+			// In this configuration we always disarm
+			newCmdArmed = MANUALCONTROLCOMMAND_ARMED_FALSE;
 		} else {
-			// The throttle is not low, in case we where arming or disarming, abort
-			switch(armState) {
-				case ARM_STATE_DISARMING_MANUAL:
-				case ARM_STATE_DISARMING_TIMEOUT:
-					armState = ARM_STATE_ARMED;
-					break;
-				case ARM_STATE_ARMING_MANUAL:
-					armState = ARM_STATE_DISARMED;
-					break;
-				default:
-					// Nothing needs to be done in the other states
-					break;
+			// In all other cases, we will not change the arm state when disconnected
+			if (connection_state == CONNECTED)
+			{
+				if (settings.Arming == MANUALCONTROLSETTINGS_ARMING_ALWAYSARMED) {
+					// In this configuration, we go into armed state as soon as the throttle is low, never disarm
+					if (cmd.Throttle < 0) {
+						newCmdArmed = MANUALCONTROLCOMMAND_ARMED_TRUE;
+					}
+				} else {
+					// When the configuration is not "Always armed" and no "Always disarmed",
+					// the state will not be changed when the throttle is not low
+					if (cmd.Throttle < 0) {
+						static portTickType armedDisarmStart;
+						float armingInputLevel = 0;
+
+						// Calc channel see assumptions7
+						switch ( (settings.Arming-MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 ) {
+						case ARMING_CHANNEL_ROLL: 	armingInputLevel = cmd.Roll; 	break;
+						case ARMING_CHANNEL_PITCH: 	armingInputLevel = cmd.Pitch; 	break;
+						case ARMING_CHANNEL_YAW: 	armingInputLevel = cmd.Yaw; 	break;
+						}
+
+						bool manualArm = false;
+						bool manualDisarm = false;
+
+						if (connection_state == CONNECTED) {
+							// Should use RC input only if RX is connected
+							if (armingInputLevel <= -0.90)
+								manualArm = true;
+							else if (armingInputLevel >= +0.90)
+								manualDisarm = true;
+						}
+
+						// Swap arm-disarming see assumptions8
+						if ((settings.Arming-MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2) {
+							bool temp = manualArm;
+							manualArm = manualDisarm;
+							manualDisarm = temp;
+						}
+
+						switch(armState) {
+						case ARM_STATE_DISARMED:
+							newCmdArmed = MANUALCONTROLCOMMAND_ARMED_FALSE;
+							if (manualArm) {
+								armedDisarmStart = lastSysTime;
+								armState = ARM_STATE_ARMING_MANUAL;
+							}
+							break;
+
+						case ARM_STATE_ARMING_MANUAL:
+							if (manualArm) {
+								if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
+									armState = ARM_STATE_ARMED;
+							}
+							else
+								armState = ARM_STATE_DISARMED;
+							break;
+
+						case ARM_STATE_ARMED:
+							// When we get here, the throttle is low,
+							// we go immediately to disarming due to timeout, also when the disarming mechanism is not enabled
+							armedDisarmStart = lastSysTime;
+							armState = ARM_STATE_DISARMING_TIMEOUT;
+							newCmdArmed = MANUALCONTROLCOMMAND_ARMED_TRUE;
+							break;
+
+						case ARM_STATE_DISARMING_TIMEOUT:
+							// We get here when armed while throttle low, even when the arming timeout is not enabled
+							if (settings.ArmedTimeout != 0)
+								if (timeDifferenceMs(armedDisarmStart, lastSysTime) > settings.ArmedTimeout)
+									armState = ARM_STATE_DISARMED;
+							// Switch to disarming due to manual control when needed
+							if (manualDisarm) {
+								armedDisarmStart = lastSysTime;
+								armState = ARM_STATE_DISARMING_MANUAL;
+							}
+							break;
+
+						case ARM_STATE_DISARMING_MANUAL:
+							if (manualDisarm) {
+								if (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)
+									armState = ARM_STATE_DISARMED;
+							}
+							else
+								armState = ARM_STATE_ARMED;
+							break;
+						}	// End Switch
+					} else {
+						// The throttle is not low, in case we where arming or disarming, abort
+						switch(armState) {
+							case ARM_STATE_DISARMING_MANUAL:
+							case ARM_STATE_DISARMING_TIMEOUT:
+								armState = ARM_STATE_ARMED;
+								break;
+							case ARM_STATE_ARMING_MANUAL:
+								armState = ARM_STATE_DISARMED;
+								break;
+							default:
+								// Nothing needs to be done in the other states
+								break;
+						}
+					}
+				}
 			}
 		}
+		// Update cmd object when needed
+		if (newCmdArmed != cmd.Armed) {
+			cmd.Armed = newCmdArmed;
+			ManualControlCommandSet(&cmd);
+		}
+		//
 		// End of arming/disarming
+		//
 
 
 
@@ -453,7 +502,16 @@ static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time)
 	return ((((portTICK_RATE_MS) -1) - start_time) + end_time) * portTICK_RATE_MS;		
 }
 			   
-
+//
+//static void armingMechanism(uint8_t* armingState, const ManualControlSettingsData* settings, const ManualControlCommandData* cmd)
+//{
+//	if (settings->Arming == MANUALCONTROLSETTINGS_ARMING_ALWAYSDISARMED) {
+//		*armingState = MANUALCONTROLCOMMAND_ARMED_FALSE;
+//		return;
+//	}
+//
+//
+//}
 /**
   * @}
   * @}

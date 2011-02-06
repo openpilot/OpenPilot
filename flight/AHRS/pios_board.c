@@ -391,3 +391,26 @@ void PIOS_I2C_main_adapter_er_irq_handler(void)
 }
 
 #endif /* PIOS_INCLUDE_I2C */
+
+#if defined(PIOS_ENABLE_DEBUG_PINS)
+
+static const struct stm32_gpio pios_debug_pins[] = {
+  {
+    .gpio = GPIOB,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_11,
+      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Mode  = GPIO_Mode_IN_FLOATING,
+    },
+  },
+  {
+    .gpio = GPIOB,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_10,
+      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Mode  = GPIO_Mode_Out_PP,
+    },
+  },
+};
+
+#endif /* PIOS_ENABLE_DEBUG_PINS */

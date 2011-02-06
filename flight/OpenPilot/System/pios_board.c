@@ -961,6 +961,85 @@ void PIOS_I2C_main_adapter_er_irq_handler(void)
   PIOS_I2C_ER_IRQ_Handler(PIOS_I2C_MAIN_ADAPTER);
 }
 
+#if defined(PIOS_ENABLE_DEBUG_PINS)
+
+static const struct stm32_gpio pios_debug_pins[] = {
+  #define PIOS_DEBUG_PIN_SERVO_1 0
+  {
+    .gpio = GPIOB,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_6,
+      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Mode  = GPIO_Mode_Out_PP;
+    },
+  },
+  #define PIOS_DEBUG_PIN_SERVO_2 1
+  {
+    .gpio = GPIOB,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_7,
+      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Mode  = GPIO_Mode_Out_PP;
+    },
+  },
+  #define PIOS_DEBUG_PIN_SERVO_3 2
+  {
+    .gpio = GPIOB,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_8,
+      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Mode  = GPIO_Mode_Out_PP;
+    },
+  },
+  #define PIOS_DEBUG_PIN_SERVO_4 3
+  {
+    .gpio = GPIOB,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_9,
+      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Mode  = GPIO_Mode_Out_PP;
+    },
+  },
+  #define PIOS_DEBUG_PIN_SERVO_5 4
+  {
+    .gpio = GPIOC,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_6,
+      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Mode  = GPIO_Mode_Out_PP;
+    },
+  },
+  #define PIOS_DEBUG_PIN_SERVO_6 5
+  {
+    .gpio = GPIOC,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_7,
+      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Mode  = GPIO_Mode_Out_PP;
+    },
+  },
+  #define PIOS_DEBUG_PIN_SERVO_7 6
+  {
+    .gpio = GPIOC,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_8,
+      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Mode  = GPIO_Mode_Out_PP;
+    },
+  },
+  #define PIOS_DEBUG_PIN_SERVO_8 7
+  {
+    .gpio = GPIOC,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_9,
+      .GPIO_Speed = GPIO_Speed_50MHz,
+      .GPIO_Mode  = GPIO_Mode_Out_PP;
+    },
+  },
+};
+
+#endif /* PIOS_ENABLE_DEBUG_PINS */
+
 /**
  * @}
  */

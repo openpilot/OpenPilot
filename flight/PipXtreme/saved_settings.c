@@ -295,11 +295,11 @@ void saved_settings_init(void)
 
     memset((void *)&saved_settings, 0xff, sizeof(t_saved_settings));
 
-   	saved_settings.mode = modeNormal;
+   	saved_settings.mode = MODE_NORMAL;
 
     saved_settings.destination_id = 0;
 
-    saved_settings.frequency_band = freqBand_UNKNOWN;
+    saved_settings.frequency_band = FREQBAND_UNKNOWN;
 
     saved_settings.rf_xtal_cap = 0x7f;
 

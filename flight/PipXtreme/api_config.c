@@ -43,12 +43,14 @@
 
 #define PIPX_HEADER_MARKER					0x76b38a52
 
-#define PIPX_PACKET_TYPE_REQ_DETAILS		0
-#define PIPX_PACKET_TYPE_DETAILS			1
-#define PIPX_PACKET_TYPE_REQ_SETTINGS		2
-#define PIPX_PACKET_TYPE_SETTINGS			3
-#define PIPX_PACKET_TYPE_REQ_STATE			4
-#define PIPX_PACKET_TYPE_STATE				5
+enum {
+	PIPX_PACKET_TYPE_REQ_DETAILS = 0,
+	PIPX_PACKET_TYPE_DETAILS,
+	PIPX_PACKET_TYPE_REQ_SETTINGS,
+	PIPX_PACKET_TYPE_SETTINGS,
+	PIPX_PACKET_TYPE_REQ_STATE,
+	PIPX_PACKET_TYPE_STATE
+};
 
 typedef struct
 {
@@ -137,8 +139,8 @@ int apiconfig_sendDetailsPacket(void)
 	header->spare = 0;
 	header->data_size = sizeof(t_pipx_config_details);
 
-	details->major_version = version_major;
-	details->minor_version = version_minor;
+	details->major_version = VERSION_MAJOR;
+	details->minor_version = VERSION_MINOR;
 	details->serial_number = serial_number_crc32;
 	details->min_frequency_Hz = saved_settings.min_frequency_Hz;
 	details->max_frequency_Hz = saved_settings.max_frequency_Hz;
@@ -311,24 +313,24 @@ void apiconfig_processInputPacket(void *buf, uint16_t len)
 			    ph_set_remote_encryption(0, saved_settings.aes_enable, (const void *)saved_settings.aes_key);
 			    switch (saved_settings.mode)
 			    {
-			    	case modeNormal:				// normal 2-way packet mode
+			    	case MODE_NORMAL:					// normal 2-way packet mode
 			    		break;
-			    	case modeStreamTx:				// 1-way continuous tx packet mode
+			    	case MODE_STREAM_TX:				// 1-way continuous tx packet mode
 		    			break;
-			    	case modeStreamRx:				// 1-way continuous rx packet mode
+			    	case MODE_STREAM_RX:				// 1-way continuous rx packet mode
 		    			break;
-			    	case modePPMTx:					// PPM tx mode
+			    	case MODE_PPM_TX:					// PPM tx mode
 			    		break;
-			    	case modePPMRx:					// PPM rx mode
+			    	case MODE_PPM_RX:					// PPM rx mode
 		    			break;
-			    	case modeScanSpectrum:			// scan the receiver over the whole band
+			    	case MODE_SCAN_SPECTRUM:			// scan the receiver over the whole band
 			    		break;
-			    	case modeTxBlankCarrierTest:	// blank carrier Tx mode (for calibrating the carrier frequency say)
+			    	case MODE_TX_BLANK_CARRIER_TEST:	// blank carrier Tx mode (for calibrating the carrier frequency say)
 			    		break;
-			    	case modeTxSpectrumTest:		// pseudo random Tx data mode (for checking the Tx carrier spectrum)
+			    	case MODE_TX_SPECTRUM_TEST:			// pseudo random Tx data mode (for checking the Tx carrier spectrum)
 			    		break;
-			    	default:						// unknown mode
-			    		saved_settings.mode = modeNormal;
+			    	default:							// unknown mode
+			    		saved_settings.mode = MODE_NORMAL;
 			    		break;
 			    }
 			}

@@ -276,16 +276,16 @@ void TIMER_INT_FUNC(void)
 
 			rfm22_1ms_tick();			// rf module tick
 
-			if (mode == modeNormal)
+			if (mode == MODE_NORMAL)
 				ph_1ms_tick();			// packet handler tick
 
-			if (mode == modeStreamTx || mode == modeStreamRx)
+			if (mode == MODE_STREAM_TX || mode == MODE_STREAM_RX)
 				stream_1ms_tick();		// continuous data stream tick
 
-			if (mode == modeScanSpectrum)
+			if (mode == MODE_SCAN_SPECTRUM)
 				ss_1ms_tick();			// spectrum scan tick
 
-			if (mode == modePPMTx || mode == modePPMRx)
+			if (mode == MODE_PPM_TX || mode == MODE_PPM_RX)
 				ppm_1ms_tick();			// ppm tick
 
 			if (!API_Mode)
@@ -395,9 +395,9 @@ void init_RF_module(void)
 
     switch (saved_settings.frequency_band)
     {
-        case freqBand_434MHz:
-        case freqBand_868MHz:
-        case freqBand_915MHz:
+        case FREQBAND_434MHz:
+        case FREQBAND_868MHz:
+        case FREQBAND_915MHz:
             i = rfm22_init(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz, 50000);
             break;
 
@@ -586,7 +586,7 @@ int main()
     second_tick_timer = 0;
     second_tick = FALSE;
 
-    saved_settings.frequency_band = freqBand_UNKNOWN;
+    saved_settings.frequency_band = FREQBAND_UNKNOWN;
 
     // *************
 
@@ -700,19 +700,19 @@ int main()
     // *************
     // read the 434/868/915 jumper options
 
-    if (!GPIO_IN(_868MHz_PIN) && !GPIO_IN(_915MHz_PIN)) saved_settings.frequency_band = freqBand_434MHz;    // 434MHz band
+    if (!GPIO_IN(_868MHz_PIN) && !GPIO_IN(_915MHz_PIN)) saved_settings.frequency_band = FREQBAND_434MHz;    // 434MHz band
     else
-    if (!GPIO_IN(_868MHz_PIN) &&  GPIO_IN(_915MHz_PIN)) saved_settings.frequency_band = freqBand_868MHz;    // 868MHz band
+    if (!GPIO_IN(_868MHz_PIN) &&  GPIO_IN(_915MHz_PIN)) saved_settings.frequency_band = FREQBAND_868MHz;    // 868MHz band
     else
-    if ( GPIO_IN(_868MHz_PIN) && !GPIO_IN(_915MHz_PIN)) saved_settings.frequency_band = freqBand_915MHz;    // 915MHz band
+    if ( GPIO_IN(_868MHz_PIN) && !GPIO_IN(_915MHz_PIN)) saved_settings.frequency_band = FREQBAND_915MHz;    // 915MHz band
 
     if (saved_settings.mode == 0xff)
-    	saved_settings.mode = modeNormal;
+    	saved_settings.mode = MODE_NORMAL;
 
     // set some defaults if they are not set
     switch (saved_settings.frequency_band)
     {
-        case freqBand_434MHz:
+        case FREQBAND_434MHz:
 
             if (saved_settings.min_frequency_Hz == 0xffffffff)
             {
@@ -749,7 +749,7 @@ int main()
             }
             break;
 
-        case freqBand_868MHz:
+        case FREQBAND_868MHz:
             if (saved_settings.min_frequency_Hz == 0xffffffff)
             {
                 saved_settings.frequency_Hz = 868000000;
@@ -785,7 +785,7 @@ int main()
             }
             break;
 
-        case freqBand_915MHz:
+        case FREQBAND_915MHz:
             if (saved_settings.min_frequency_Hz == 0xffffffff)
             {
                 saved_settings.frequency_Hz = 915000000;
@@ -849,10 +849,10 @@ int main()
 
         switch (saved_settings.frequency_band)
         {
-            case freqBand_UNKNOWN: DEBUG_PRINTF("UNKNOWN band\r\n"); break;
-            case freqBand_434MHz:  DEBUG_PRINTF("434MHz band\r\n"); break;
-            case freqBand_868MHz:  DEBUG_PRINTF("868MHz band\r\n"); break;
-            case freqBand_915MHz:  DEBUG_PRINTF("915MHz band\r\n"); break;
+            case FREQBAND_UNKNOWN: DEBUG_PRINTF("UNKNOWN band\r\n"); break;
+            case FREQBAND_434MHz:  DEBUG_PRINTF("434MHz band\r\n"); break;
+            case FREQBAND_868MHz:  DEBUG_PRINTF("868MHz band\r\n"); break;
+            case FREQBAND_915MHz:  DEBUG_PRINTF("915MHz band\r\n"); break;
         }
     #endif
 
@@ -940,16 +940,16 @@ int main()
 //				modeTxBlankCarrierTest,	// blank carrier Tx mode (for calibrating the carrier frequency say)
 //				modeTxSpectrumTest		// pseudo random Tx data mode (for checking the Tx carrier spectrum)
 
-		if (mode == modeNormal)
+		if (mode == MODE_NORMAL)
 	        ph_process();				// packet handler processing
 
-		if (mode == modeStreamTx || mode == modeStreamRx)
+		if (mode == MODE_STREAM_TX || mode == MODE_STREAM_RX)
 			stream_process();			// continuous data stream processing
 
-		if (mode == modeScanSpectrum)
+		if (mode == MODE_SCAN_SPECTRUM)
 			ss_process();				// spectrum scan processing
 
-		if (mode == modePPMTx || mode == modePPMRx)
+		if (mode == MODE_PPM_TX || mode == MODE_PPM_RX)
 			ppm_process();				// ppm processing
 
         if (!API_Mode)

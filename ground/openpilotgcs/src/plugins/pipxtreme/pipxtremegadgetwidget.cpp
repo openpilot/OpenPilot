@@ -45,37 +45,39 @@
 
 #define PIPX_HEADER_MARKER					0x76b38a52
 
-#define PIPX_PACKET_TYPE_REQ_DETAILS		0
-#define PIPX_PACKET_TYPE_DETAILS			1
-#define PIPX_PACKET_TYPE_REQ_SETTINGS		2
-#define PIPX_PACKET_TYPE_SETTINGS			3
-#define PIPX_PACKET_TYPE_REQ_STATE			4
-#define PIPX_PACKET_TYPE_STATE				5
-
 enum {
-	freqBand_UNKNOWN = 0,
-	freqBand_434MHz,
-	freqBand_868MHz,
-	freqBand_915MHz
+	PIPX_PACKET_TYPE_REQ_DETAILS = 0,
+	PIPX_PACKET_TYPE_DETAILS,
+	PIPX_PACKET_TYPE_REQ_SETTINGS,
+	PIPX_PACKET_TYPE_SETTINGS,
+	PIPX_PACKET_TYPE_REQ_STATE,
+	PIPX_PACKET_TYPE_STATE
 };
 
 enum {
-	link_disconnected = 0,
-	link_connecting,
-	link_connected
+	FREQBAND_UNKNOWN = 0,
+	FREQBAND_434MHz,
+	FREQBAND_868MHz,
+	FREQBAND_915MHz
+};
+
+enum {
+	LINK_DISCONNECTED = 0,
+	LINK_CONNECTING,
+	LINK_CONNECTED
 };
 
 // ***************************************************************************************
 
 enum {
-	modeNormal = 0,			// normal 2-way packet mode
-	modeStreamTx,			// 1-way continuous tx packet mode
-	modeStreamRx,			// 1-way continuous rx packet mode
-	modePPMTx,				// PPM tx mode
-	modePPMRx,				// PPM rx mode
-	modeScanSpectrum,		// scan the receiver over the whole band
-	modeTxBlankCarrierTest,	// blank carrier Tx mode (for calibrating the carrier frequency say)
-	modeTxSpectrumTest		// pseudo random Tx data mode (for checking the Tx carrier spectrum)
+	MODE_NORMAL = 0,			// normal 2-way packet mode
+	MODE_STREAM_TX,				// 1-way continuous tx packet mode
+	MODE_STREAM_RX,				// 1-way continuous rx packet mode
+	MODE_PPM_TX,				// PPM tx mode
+	MODE_PPM_RX,				// PPM rx mode
+	MODE_SCAN_SPECTRUM,			// scan the receiver over the whole band
+	MODE_TX_BLANK_CARRIER_TEST,	// blank carrier Tx mode (for calibrating the carrier frequency say)
+	MODE_TX_SPECTRUM_TEST		// pseudo random Tx data mode (for checking the Tx carrier spectrum)
 };
 
 // ***************************************************************************************
@@ -156,14 +158,14 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 	m_widget->comboBox_SerialBaudrate->setCurrentIndex(m_widget->comboBox_SerialBaudrate->findText("57600"));
 
 	m_widget->comboBox_Mode->clear();
-	m_widget->comboBox_Mode->addItem("Normal", modeNormal);
-	m_widget->comboBox_Mode->addItem("Stream Tx", modeStreamTx);
-	m_widget->comboBox_Mode->addItem("Stream Rx", modeStreamRx);
-	m_widget->comboBox_Mode->addItem("PPM Tx", modePPMTx);
-	m_widget->comboBox_Mode->addItem("PPM Rx", modePPMRx);
-	m_widget->comboBox_Mode->addItem("Scan Spectrum", modeScanSpectrum);
-	m_widget->comboBox_Mode->addItem("Test Tx Blank Carrier Frequency", modeTxBlankCarrierTest);
-	m_widget->comboBox_Mode->addItem("Test Tx Spectrum", modeTxSpectrumTest);
+	m_widget->comboBox_Mode->addItem("Normal", MODE_NORMAL);
+	m_widget->comboBox_Mode->addItem("Continuous Stream Tx", MODE_STREAM_TX);
+	m_widget->comboBox_Mode->addItem("Continuous Stream Rx", MODE_STREAM_RX);
+	m_widget->comboBox_Mode->addItem("PPM Tx", MODE_PPM_TX);
+	m_widget->comboBox_Mode->addItem("PPM Rx", MODE_PPM_RX);
+	m_widget->comboBox_Mode->addItem("Scan Spectrum", MODE_SCAN_SPECTRUM);
+	m_widget->comboBox_Mode->addItem("Test Tx Blank Carrier Frequency", MODE_TX_BLANK_CARRIER_TEST);
+	m_widget->comboBox_Mode->addItem("Test Tx Spectrum", MODE_TX_SPECTRUM_TEST);
 
 	m_widget->comboBox_SerialPortSpeed->clear();
 	for (int i = 0; i < m_widget->comboBox_SerialBaudrate->count(); i++)
@@ -870,11 +872,11 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 
 				memcpy(&pipx_config_details, data, sizeof(t_pipx_config_details));
 
-				if (pipx_config_details.major_version < 0 || (pipx_config_details.major_version == 0 && pipx_config_details.minor_version < 2))
+				if (pipx_config_details.major_version < 0 || (pipx_config_details.major_version <= 0 && pipx_config_details.minor_version < 3))
 				{
 					QMessageBox msgBox;
 					msgBox.setIcon(QMessageBox::Critical);
-					msgBox.setText("You need to update your modem firmware to V0.2 or later");
+					msgBox.setText("You need to update your modem firmware to V0.3 or later");
 					msgBox.exec();
 					disconnectPort(true);
 					return;
@@ -884,13 +886,13 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 
 				m_widget->lineEdit_SerialNumber->setText(QString::number(pipx_config_details.serial_number, 16).toUpper());
 
-				if (pipx_config_details.frequency_band == freqBand_434MHz)
+				if (pipx_config_details.frequency_band == FREQBAND_434MHz)
 					m_widget->lineEdit_FrequencyBand->setText("434MHz");
 				else
-				if (pipx_config_details.frequency_band == freqBand_868MHz)
+				if (pipx_config_details.frequency_band == FREQBAND_868MHz)
 					m_widget->lineEdit_FrequencyBand->setText("868MHz");
 				else
-				if (pipx_config_details.frequency_band == freqBand_915MHz)
+				if (pipx_config_details.frequency_band == FREQBAND_915MHz)
 					m_widget->lineEdit_FrequencyBand->setText("915MHz");
 				else
 					m_widget->lineEdit_FrequencyBand->setText("UNKNOWN [" + QString::number(pipx_config_details.frequency_band) + "]");
@@ -962,13 +964,13 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 
 				switch (pipx_config_state.link_state)
 				{
-					case link_disconnected:
+					case LINK_DISCONNECTED:
 						m_widget->lineEdit_LinkState->setText("Disconnected");
 						break;
-					case link_connecting:
+					case LINK_CONNECTING:
 						m_widget->lineEdit_LinkState->setText("Connecting");
 						break;
-					case link_connected:
+					case LINK_CONNECTED:
 						m_widget->lineEdit_LinkState->setText("Connected");
 						break;
 					default:

@@ -85,30 +85,30 @@ const uint8_t default_aes_key[AES_BLOCK_SIZE] = {0x65, 0x3b, 0x71, 0x89, 0x4a, 0
 #define PACKET_TYPE_MASK                0x7f    // packet type mask
 
 enum {
-    packet_type_none = 0,
+	PACKET_TYPE_NONE = 0,
 
-    packet_type_connect = 1,                    // for requesting a connection
-    packet_type_connect_ack = 2,                // ack
+	PACKET_TYPE_CONNECT,						// for requesting a connection
+	PACKET_TYPE_CONNECT_ACK,					// ack
 
-    packet_type_disconnect = 3,                 // to tell the other modem they cannot connect to us
+	PACKET_TYPE_DISCONNECT,						// to tell the other modem they cannot connect to us
 
-    packet_type_data = 4,                       // data packet (packet contains user data)
-    packet_type_data_ack = 5,                   // ack
+	PACKET_TYPE_DATA,							// data packet (packet contains user data)
+	PACKET_TYPE_DATA_ACK,						// ack
 
-    packet_type_ready = 6,                      // tells the other modem we are ready to accept more data
-    packet_type_ready_ack = 7,                  // ack
+	PACKET_TYPE_READY,							// tells the other modem we are ready to accept more data
+	PACKET_TYPE_READY_ACK,						// ack
 
-    packet_type_notready = 8,                   // tells the other modem we're not ready to accept more data - we can also send user data in this packet type
-    packet_type_notready_ack = 9,               // ack
+	PACKET_TYPE_NOTREADY,						// tells the other modem we're not ready to accept more data - we can also send user data in this packet type
+	PACKET_TYPE_NOTREADY_ACK,					// ack
 
-    packet_type_datarate = 10,                  // for changing the RF data rate
-    packet_type_datarate_ack = 11,              // ack
+	PACKET_TYPE_DATARATE,						// for changing the RF data rate
+	PACKET_TYPE_DATARATE_ACK,					// ack
 
-    packet_type_ping = 12,                      // used to check link is still up
-    packet_type_pong = 13,                      // ack
+	PACKET_TYPE_PING,							// used to check link is still up
+	PACKET_TYPE_PONG,							// ack
 
-    packet_type_adjust_tx_pwr = 14,             // used to ask the other modem to adjust it's tx power
-    packet_type_adjust_tx_pwr_ack = 15          // ack
+	PACKET_TYPE_ADJUST_TX_PWR,					// used to ask the other modem to adjust it's tx power
+	PACKET_TYPE_ADJUST_TX_PWR_ACK				// ack
 };
 
 #define BROADCAST_ADDR                          0xffffffff
@@ -148,9 +148,10 @@ typedef struct
 // *****************************************************************************
 // link state for each remote connection
 
-enum {  link_disconnected = 0,
-        link_connecting,
-        link_connected
+enum {
+	LINK_DISCONNECTED = 0,
+	LINK_CONNECTING,
+	LINK_CONNECTED
 };
 
 typedef struct
@@ -230,7 +231,7 @@ bool ph_connected(const int connection_index)
 
     t_connection *conn = &connection[connection_index];
 
-    return (conn->link_state == link_connected);
+    return (conn->link_state == LINK_CONNECTED);
 }
 
 // *****************************************************************************
@@ -283,7 +284,7 @@ int ph_startConnect(int connection_index, uint32_t sn)
 
     t_connection *conn = &connection[connection_index];
 
-	conn->link_state = link_disconnected;
+	conn->link_state = LINK_DISCONNECTED;
 
     LINK_LED_OFF;
 
@@ -342,7 +343,7 @@ int ph_startConnect(int connection_index, uint32_t sn)
     }
 
     if (conn->serial_number != 0)
-    	conn->link_state = link_connecting;
+    	conn->link_state = LINK_CONNECTING;
 
     return connection_index;
 }
@@ -383,7 +384,7 @@ bool ph_sendPacket(int connection_index, bool encrypt, uint8_t packet_type, bool
   if (!rfm22_txReady())
     return false;
 
-  if ((packet_type & PACKET_TYPE_MASK) == packet_type_none)
+  if ((packet_type & PACKET_TYPE_MASK) == PACKET_TYPE_NONE)
     return false;
 
   if (connection_index >= PH_MAX_CONNECTIONS)
@@ -399,7 +400,7 @@ bool ph_sendPacket(int connection_index, bool encrypt, uint8_t packet_type, bool
 
   uint8_t pack_type = packet_type & PACKET_TYPE_MASK;
 
-  bool data_packet = (pack_type == packet_type_data || pack_type == packet_type_notready);
+  bool data_packet = (pack_type == PACKET_TYPE_DATA || pack_type == PACKET_TYPE_NOTREADY);
 
   // ******************
   // calculate how many user data bytes we are going to add to the packet
@@ -529,22 +530,22 @@ bool ph_sendPacket(int connection_index, bool encrypt, uint8_t packet_type, bool
   DEBUG_PRINTF("T-PACK ");
   switch (pack_type)
   {
-    case packet_type_none:              DEBUG_PRINTF("none"); break;
-    case packet_type_connect:           DEBUG_PRINTF("connect"); break;
-    case packet_type_connect_ack:       DEBUG_PRINTF("connect_ack"); break;
-    case packet_type_disconnect:        DEBUG_PRINTF("disconnect"); break;
-    case packet_type_data:              DEBUG_PRINTF("data"); break;
-    case packet_type_data_ack:          DEBUG_PRINTF("data_ack"); break;
-    case packet_type_ready:             DEBUG_PRINTF("ready"); break;
-    case packet_type_ready_ack:         DEBUG_PRINTF("ready_ack"); break;
-    case packet_type_notready:          DEBUG_PRINTF("notready"); break;
-    case packet_type_notready_ack:      DEBUG_PRINTF("notready_ack"); break;
-    case packet_type_datarate:          DEBUG_PRINTF("datarate"); break;
-    case packet_type_datarate_ack:      DEBUG_PRINTF("datarate_ack"); break;
-    case packet_type_ping:              DEBUG_PRINTF("ping"); break;
-    case packet_type_pong:              DEBUG_PRINTF("pong"); break;
-    case packet_type_adjust_tx_pwr:     DEBUG_PRINTF("packet_type_adjust_tx_pwr"); break;
-    case packet_type_adjust_tx_pwr_ack: DEBUG_PRINTF("packet_type_adjust_tx_pwr_ack"); break;
+    case PACKET_TYPE_NONE:              DEBUG_PRINTF("none"); break;
+    case PACKET_TYPE_CONNECT:           DEBUG_PRINTF("connect"); break;
+    case PACKET_TYPE_CONNECT_ACK:       DEBUG_PRINTF("connect_ack"); break;
+    case PACKET_TYPE_DISCONNECT:        DEBUG_PRINTF("disconnect"); break;
+    case PACKET_TYPE_DATA:              DEBUG_PRINTF("data"); break;
+    case PACKET_TYPE_DATA_ACK:          DEBUG_PRINTF("data_ack"); break;
+    case PACKET_TYPE_READY:             DEBUG_PRINTF("ready"); break;
+    case PACKET_TYPE_READY_ACK:         DEBUG_PRINTF("ready_ack"); break;
+    case PACKET_TYPE_NOTREADY:          DEBUG_PRINTF("notready"); break;
+    case PACKET_TYPE_NOTREADY_ACK:      DEBUG_PRINTF("notready_ack"); break;
+    case PACKET_TYPE_DATARATE:          DEBUG_PRINTF("datarate"); break;
+    case PACKET_TYPE_DATARATE_ACK:      DEBUG_PRINTF("datarate_ack"); break;
+    case PACKET_TYPE_PING:              DEBUG_PRINTF("ping"); break;
+    case PACKET_TYPE_PONG:              DEBUG_PRINTF("pong"); break;
+    case PACKET_TYPE_ADJUST_TX_PWR:     DEBUG_PRINTF("PACKET_TYPE_ADJUST_TX_PWR"); break;
+    case PACKET_TYPE_ADJUST_TX_PWR_ACK: DEBUG_PRINTF("PACKET_TYPE_ADJUST_TX_PWR_ACK"); break;
     default:                            DEBUG_PRINTF("UNKNOWN [%d]", pack_type); break;
   }
   DEBUG_PRINTF(" tseq:%d rseq:%d", conn->tx_sequence, conn->rx_sequence);
@@ -558,28 +559,28 @@ bool ph_sendPacket(int connection_index, bool encrypt, uint8_t packet_type, bool
 
   switch (pack_type)
   {
-    case packet_type_connect:
-    case packet_type_disconnect:
-    case packet_type_data:
-    case packet_type_ready:
-    case packet_type_notready:
-    case packet_type_datarate:
-    case packet_type_ping:
-    case packet_type_adjust_tx_pwr:
+    case PACKET_TYPE_CONNECT:
+    case PACKET_TYPE_DISCONNECT:
+    case PACKET_TYPE_DATA:
+    case PACKET_TYPE_READY:
+    case PACKET_TYPE_NOTREADY:
+    case PACKET_TYPE_DATARATE:
+    case PACKET_TYPE_PING:
+    case PACKET_TYPE_ADJUST_TX_PWR:
       if (conn->tx_retry_counter < 0xffff)
         conn->tx_retry_counter++;
       break;
 
-    case packet_type_connect_ack:
-    case packet_type_data_ack:
-    case packet_type_ready_ack:
-    case packet_type_notready_ack:
-    case packet_type_datarate_ack:
-    case packet_type_pong:
-    case packet_type_adjust_tx_pwr_ack:
+    case PACKET_TYPE_CONNECT_ACK:
+    case PACKET_TYPE_DATA_ACK:
+    case PACKET_TYPE_READY_ACK:
+    case PACKET_TYPE_NOTREADY_ACK:
+    case PACKET_TYPE_DATARATE_ACK:
+    case PACKET_TYPE_PONG:
+    case PACKET_TYPE_ADJUST_TX_PWR_ACK:
       break;
 
-    case packet_type_none:
+    case PACKET_TYPE_NONE:
       break;
   }
 
@@ -627,22 +628,22 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
   DEBUG_PRINTF("R-PACK ");
   switch (packet_type)
   {
-    case packet_type_none:              DEBUG_PRINTF("none"); break;
-    case packet_type_connect:           DEBUG_PRINTF("connect"); break;
-    case packet_type_connect_ack:       DEBUG_PRINTF("connect_ack"); break;
-    case packet_type_disconnect:        DEBUG_PRINTF("disconnect"); break;
-    case packet_type_data:              DEBUG_PRINTF("data"); break;
-    case packet_type_data_ack:          DEBUG_PRINTF("data_ack"); break;
-    case packet_type_ready:             DEBUG_PRINTF("ready"); break;
-    case packet_type_ready_ack:         DEBUG_PRINTF("ready_ack"); break;
-    case packet_type_notready:          DEBUG_PRINTF("notready"); break;
-    case packet_type_notready_ack:      DEBUG_PRINTF("notready_ack"); break;
-    case packet_type_datarate:          DEBUG_PRINTF("datarate"); break;
-    case packet_type_datarate_ack:      DEBUG_PRINTF("datarate_ack"); break;
-    case packet_type_ping:              DEBUG_PRINTF("ping"); break;
-    case packet_type_pong:              DEBUG_PRINTF("pong"); break;
-    case packet_type_adjust_tx_pwr:     DEBUG_PRINTF("packet_type_adjust_tx_pwr"); break;
-    case packet_type_adjust_tx_pwr_ack: DEBUG_PRINTF("packet_type_adjust_tx_pwr_ack"); break;
+    case PACKET_TYPE_NONE:              DEBUG_PRINTF("none"); break;
+    case PACKET_TYPE_CONNECT:           DEBUG_PRINTF("connect"); break;
+    case PACKET_TYPE_CONNECT_ACK:       DEBUG_PRINTF("connect_ack"); break;
+    case PACKET_TYPE_DISCONNECT:        DEBUG_PRINTF("disconnect"); break;
+    case PACKET_TYPE_DATA:              DEBUG_PRINTF("data"); break;
+    case PACKET_TYPE_DATA_ACK:          DEBUG_PRINTF("data_ack"); break;
+    case PACKET_TYPE_READY:             DEBUG_PRINTF("ready"); break;
+    case PACKET_TYPE_READY_ACK:         DEBUG_PRINTF("ready_ack"); break;
+    case PACKET_TYPE_NOTREADY:          DEBUG_PRINTF("notready"); break;
+    case PACKET_TYPE_NOTREADY_ACK:      DEBUG_PRINTF("notready_ack"); break;
+    case PACKET_TYPE_DATARATE:          DEBUG_PRINTF("datarate"); break;
+    case PACKET_TYPE_DATARATE_ACK:      DEBUG_PRINTF("datarate_ack"); break;
+    case PACKET_TYPE_PING:              DEBUG_PRINTF("ping"); break;
+    case PACKET_TYPE_PONG:              DEBUG_PRINTF("pong"); break;
+    case PACKET_TYPE_ADJUST_TX_PWR:     DEBUG_PRINTF("PACKET_TYPE_ADJUST_TX_PWR"); break;
+    case PACKET_TYPE_ADJUST_TX_PWR_ACK: DEBUG_PRINTF("PACKET_TYPE_ADJUST_TX_PWR_ACK"); break;
     default:                            DEBUG_PRINTF("UNKNOWN [%d]", packet_type); break;
   }
   DEBUG_PRINTF(" tseq-%d rseq-%d", header->tx_seq, header->rx_seq);
@@ -692,9 +693,9 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
   if (connection_index >= PH_MAX_CONNECTIONS)
   {	// the packet is from an unknown source ID (unknown modem)
 
-      if (packet_type != packet_type_none)
+      if (packet_type != PACKET_TYPE_NONE)
       {	// send a disconnect packet back to them
-//              ph_sendPacket(-1, was_encrypted, packet_type_disconnect, true);
+//              ph_sendPacket(-1, was_encrypted, PACKET_TYPE_DISCONNECT, true);
       }
 
       return;
@@ -721,17 +722,17 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
 
   // ***********
 
-  if (packet_type == packet_type_none)
+  if (packet_type == PACKET_TYPE_NONE)
     return;
 
-  if (packet_type == packet_type_disconnect)
+  if (packet_type == PACKET_TYPE_DISCONNECT)
   {
-      conn->link_state = link_disconnected;
+      conn->link_state = LINK_DISCONNECTED;
       LINK_LED_OFF;
       return;
   }
 
-  if (packet_type == packet_type_connect)
+  if (packet_type == PACKET_TYPE_CONNECT)
   {
       LINK_LED_ON;
 
@@ -763,10 +764,10 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
 
       conn->not_ready_timer = -1;
 
-      conn->link_state = link_connected;
+      conn->link_state = LINK_CONNECTED;
 
       // send an ack back
-      if (ph_sendPacket(connection_index, conn->send_encrypted, packet_type_connect_ack, true))
+      if (ph_sendPacket(connection_index, conn->send_encrypted, PACKET_TYPE_CONNECT_ACK, true))
       {
           conn->tx_packet_timer = 0;
       }
@@ -774,11 +775,11 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
       return;
   }
 
-  if (packet_type == packet_type_connect_ack)
+  if (packet_type == PACKET_TYPE_CONNECT_ACK)
   {
       LINK_LED_ON;
 
-      if (conn->link_state != link_connecting)
+      if (conn->link_state != LINK_CONNECTING)
       {	// reset the link
           ph_set_remote_serial_number(connection_index, conn->serial_number);
           return;
@@ -809,7 +810,7 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
 
       conn->not_ready_timer = -1;
 
-      conn->link_state = link_connected;
+      conn->link_state = LINK_CONNECTED;
 
       return;
   }
@@ -817,9 +818,9 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
 
 
 
-  if (conn->link_state == link_connecting)
+  if (conn->link_state == LINK_CONNECTING)
   {	// we are trying to connect to them .. reply with a connect request packet
-      if (ph_sendPacket(connection_index, conn->send_encrypted, packet_type_connect, true))
+      if (ph_sendPacket(connection_index, conn->send_encrypted, PACKET_TYPE_CONNECT, true))
       {
           conn->tx_packet_timer = 0;
           conn->tx_retry_time = conn->tx_retry_time_slot_len * 4 + (random32 % conn->tx_retry_time_slots) * conn->tx_retry_time_slot_len * 4;
@@ -827,7 +828,7 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
       return;
   }
 
-  if (conn->link_state != link_connected)
+  if (conn->link_state != LINK_CONNECTED)
   {	// they have sent us a packet when we are not in a connected state - start a connection
       ph_startConnect(connection_index, conn->serial_number);
       return;
@@ -839,18 +840,18 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
   // check to make sure it's a wanted packet type
   switch (packet_type)
   {
-    case packet_type_data:
-    case packet_type_data_ack:
-    case packet_type_ready:
-    case packet_type_ready_ack:
-    case packet_type_notready:
-    case packet_type_notready_ack:
-    case packet_type_datarate:
-    case packet_type_datarate_ack:
-    case packet_type_ping:
-    case packet_type_pong:
-    case packet_type_adjust_tx_pwr:
-    case packet_type_adjust_tx_pwr_ack:
+    case PACKET_TYPE_DATA:
+    case PACKET_TYPE_DATA_ACK:
+    case PACKET_TYPE_READY:
+    case PACKET_TYPE_READY_ACK:
+    case PACKET_TYPE_NOTREADY:
+    case PACKET_TYPE_NOTREADY_ACK:
+    case PACKET_TYPE_DATARATE:
+    case PACKET_TYPE_DATARATE_ACK:
+    case PACKET_TYPE_PING:
+    case PACKET_TYPE_PONG:
+    case PACKET_TYPE_ADJUST_TX_PWR:
+    case PACKET_TYPE_ADJUST_TX_PWR_ACK:
       break;
     default:
       return;
@@ -877,9 +878,9 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
 
 
 
-  if (packet_type == packet_type_data || packet_type == packet_type_data_ack)
+  if (packet_type == PACKET_TYPE_DATA || packet_type == PACKET_TYPE_DATA_ACK)
   {
-      if (packet_type == packet_type_data && header->tx_seq == conn->rx_sequence)
+      if (packet_type == PACKET_TYPE_DATA && header->tx_seq == conn->rx_sequence)
       {	// the packet number is what we expected
 
           if (data_size > 0)
@@ -903,9 +904,9 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
 
       if (size >= 200 || (conn->ready_to_send_timer >= 10 && size > 0) || (conn->tx_sequence_data_size > 0 && size > 0))
       {	// send data
-          uint8_t pack_type = packet_type_data;
+          uint8_t pack_type = PACKET_TYPE_DATA;
           if (conn->rx_not_ready_mode)
-            pack_type = packet_type_notready;
+            pack_type = PACKET_TYPE_NOTREADY;
 
           if (ph_sendPacket(connection_index, conn->send_encrypted, pack_type, true))
           {
@@ -915,11 +916,11 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
           }
       }
 
-      if (packet_type == packet_type_data)
+      if (packet_type == PACKET_TYPE_DATA)
       {	// send an ack back
-          uint8_t pack_type = packet_type_data_ack;
+          uint8_t pack_type = PACKET_TYPE_DATA_ACK;
           if (conn->rx_not_ready_mode)
-            pack_type = packet_type_notready_ack;
+            pack_type = PACKET_TYPE_NOTREADY_ACK;
 
           if (ph_sendPacket(connection_index, conn->send_encrypted, pack_type, true))
           {
@@ -932,12 +933,12 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
       return;
   }
 
-  if (packet_type == packet_type_ready)
+  if (packet_type == PACKET_TYPE_READY)
   {
       conn->not_ready_timer = -1;	// stop timer
 
       // send an ack back
-      if (ph_sendPacket(connection_index, conn->send_encrypted, packet_type_ready_ack, true))
+      if (ph_sendPacket(connection_index, conn->send_encrypted, PACKET_TYPE_READY_ACK, true))
       {
           conn->tx_packet_timer = 0;
           conn->tx_retry_time = conn->tx_retry_time_slot_len * 4 + (random32 % conn->tx_retry_time_slots) * conn->tx_retry_time_slot_len * 4;
@@ -947,13 +948,13 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
       return;
   }
 
-  if (packet_type == packet_type_ready_ack)
+  if (packet_type == PACKET_TYPE_READY_ACK)
   {
       conn->rx_not_ready_mode = false;
       return;
   }
 
-  if (packet_type == packet_type_notready)
+  if (packet_type == PACKET_TYPE_NOTREADY)
   {
 //      conn->not_ready_timer = 0;	// start timer
 
@@ -980,7 +981,7 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
       }
 
       // send an ack back
-      if (ph_sendPacket(connection_index, conn->send_encrypted, packet_type_notready_ack, true))
+      if (ph_sendPacket(connection_index, conn->send_encrypted, PACKET_TYPE_NOTREADY_ACK, true))
       {
           conn->tx_packet_timer = 0;
           conn->tx_retry_time = conn->tx_retry_time_slot_len * 4 + (random32 % conn->tx_retry_time_slots) * conn->tx_retry_time_slot_len * 4;
@@ -990,14 +991,14 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
       return;
   }
 
-  if (packet_type == packet_type_notready_ack)
+  if (packet_type == PACKET_TYPE_NOTREADY_ACK)
   {
       return;
   }
 
-  if (packet_type == packet_type_ping)
+  if (packet_type == PACKET_TYPE_PING)
   {	// send a pong back
-      if (ph_sendPacket(connection_index, conn->send_encrypted, packet_type_pong, true))
+      if (ph_sendPacket(connection_index, conn->send_encrypted, PACKET_TYPE_PONG, true))
       {
           conn->tx_packet_timer = 0;
           conn->tx_retry_time = conn->tx_retry_time_slot_len + (random32 % conn->tx_retry_time_slots) * conn->tx_retry_time_slot_len;
@@ -1005,7 +1006,7 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
       return;
   }
 
-  if (packet_type == packet_type_pong)
+  if (packet_type == PACKET_TYPE_PONG)
   {
       if (conn->pinging)
       {
@@ -1015,10 +1016,10 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
       return;
   }
 
-  if (packet_type == packet_type_datarate)
+  if (packet_type == PACKET_TYPE_DATARATE)
   {
       // send an ack back
-      if (ph_sendPacket(connection_index, conn->send_encrypted, packet_type_datarate_ack, true))
+      if (ph_sendPacket(connection_index, conn->send_encrypted, PACKET_TYPE_DATARATE_ACK, true))
       {
           conn->tx_packet_timer = 0;
           conn->tx_retry_time = conn->tx_retry_time_slot_len + (random32 % conn->tx_retry_time_slots) * conn->tx_retry_time_slot_len;
@@ -1026,15 +1027,15 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
       return;
   }
 
-  if (packet_type == packet_type_datarate_ack)
+  if (packet_type == PACKET_TYPE_DATARATE_ACK)
   {
       return;
   }
 
-  if (packet_type == packet_type_adjust_tx_pwr)
+  if (packet_type == PACKET_TYPE_ADJUST_TX_PWR)
   {
       // send an ack back
-      if (ph_sendPacket(connection_index, conn->send_encrypted, packet_type_adjust_tx_pwr_ack, true))
+      if (ph_sendPacket(connection_index, conn->send_encrypted, PACKET_TYPE_ADJUST_TX_PWR_ACK, true))
       {
           conn->tx_packet_timer = 0;
           conn->tx_retry_time = conn->tx_retry_time_slot_len + (random32 % conn->tx_retry_time_slots) * conn->tx_retry_time_slot_len;
@@ -1042,7 +1043,7 @@ void ph_processPacket2(bool was_encrypted, t_packet_header *header, uint8_t *dat
       return;
   }
 
-  if (packet_type == packet_type_adjust_tx_pwr_ack)
+  if (packet_type == PACKET_TYPE_ADJUST_TX_PWR_ACK)
   {
       return;
   }
@@ -1244,7 +1245,7 @@ void ph_processLinks(int connection_index)
 
   switch (conn->link_state)
   {
-    case link_disconnected:
+    case LINK_DISCONNECTED:
       if (!canTx)
       {
           conn->tx_packet_timer = 0;
@@ -1262,7 +1263,7 @@ void ph_processLinks(int connection_index)
 
       break;
 
-    case link_connecting:
+    case LINK_CONNECTING:
       if (!canTx)
       {
           conn->tx_packet_timer = 0;
@@ -1272,7 +1273,7 @@ void ph_processLinks(int connection_index)
       if (!timeToRetry)
         break;
 
-      if (ph_sendPacket(connection_index, conn->send_encrypted, packet_type_connect, false))
+      if (ph_sendPacket(connection_index, conn->send_encrypted, PACKET_TYPE_CONNECT, false))
       {
           conn->tx_packet_timer = 0;
           conn->tx_retry_time = conn->tx_retry_time_slot_len * 4 + (random32 % conn->tx_retry_time_slots) * conn->tx_retry_time_slot_len * 4;
@@ -1281,7 +1282,7 @@ void ph_processLinks(int connection_index)
 
       break;
 
-    case link_connected:
+    case LINK_CONNECTED:
       if (!canTx)
       {
           conn->tx_packet_timer = 0;
@@ -1299,7 +1300,7 @@ void ph_processLinks(int connection_index)
 
       if (conn->pinging)
       {	// we are trying to ping them
-          if (ph_sendPacket(connection_index, conn->send_encrypted, packet_type_ping, false))
+          if (ph_sendPacket(connection_index, conn->send_encrypted, PACKET_TYPE_PING, false))
           {
               conn->tx_packet_timer = 0;
               conn->tx_retry_time = conn->tx_retry_time_slot_len * 4 + (random32 % conn->tx_retry_time_slots) * conn->tx_retry_time_slot_len * 4;
@@ -1311,7 +1312,7 @@ void ph_processLinks(int connection_index)
       if (fast_ping) ping_time = conn->fast_ping_time;
       if (conn->tx_packet_timer >= ping_time)
       {	// start pinging
-          if (ph_sendPacket(connection_index, conn->send_encrypted, packet_type_ping, false))
+          if (ph_sendPacket(connection_index, conn->send_encrypted, PACKET_TYPE_PING, false))
           {
               conn->ping_time = 8000 + (random32 % 100) * 10;
               conn->fast_ping_time = 600 + (random32 % 50) * 10;
@@ -1330,7 +1331,7 @@ void ph_processLinks(int connection_index)
 				uint16_t size = fifoBuf_getFree(&conn->rx_fifo_buffer);
 				if (size >= conn->rx_fifo_buffer.buf_size / 6)
 				{	// leave 'rx not ready' mode
-					if (ph_sendPacket(connection_index, conn->send_encrypted, packet_type_ready, false))
+					if (ph_sendPacket(connection_index, conn->send_encrypted, PACKET_TYPE_READY, false))
 					{
 						conn->tx_packet_timer = 0;
 						conn->tx_retry_time = conn->tx_retry_time_slot_len + (random32 % conn->tx_retry_time_slots) * conn->tx_retry_time_slot_len;
@@ -1355,9 +1356,9 @@ void ph_processLinks(int connection_index)
         if (size >= 200 || (conn->ready_to_send_timer >= 10 && size > 0) || (conn->tx_sequence_data_size > 0 && size > 0))
         {       // send data
 
-            uint8_t pack_type = packet_type_data;
+            uint8_t pack_type = PACKET_TYPE_DATA;
             if (conn->rx_not_ready_mode)
-              pack_type = packet_type_notready;
+              pack_type = PACKET_TYPE_NOTREADY;
 
             if (ph_sendPacket(connection_index, conn->send_encrypted, pack_type, false))
             {
@@ -1373,7 +1374,7 @@ void ph_processLinks(int connection_index)
       break;
 
     default:	// we should never end up here - maybe we should do a reboot?
-      conn->link_state = link_disconnected;
+      conn->link_state = LINK_DISCONNECTED;
 /*
 			// disable all interrupts
 			PIOS_IRQ_Disable();
@@ -1528,57 +1529,59 @@ void ph_set_remote_encryption(int connection_index, bool enabled, const void *ke
 }
 
 // *****************************************************************************
-// can be called from an interrupt if you wish
+// can be called from an interrupt if you wish.
+// call this once every ms
 
 void ph_1ms_tick(void)
-{	// call this once every ms
+{
+	if (saved_settings.mode == MODE_NORMAL)
+	{
+		// help randomize the encryptor cbc bytes
+		register uint32_t *cbc = (uint32_t *)&enc_cbc;
+		for (int i = 0; i < sizeof(enc_cbc) / 4; i++)
+		{
+			random32 = updateCRC32(random32, 0xff);
+			*cbc++ ^= random32;
+		}
 
-  // help randomize the encryptor cbc bytes
-  register uint32_t *cbc = (uint32_t *)&enc_cbc;
-  for (int i = 0; i < sizeof(enc_cbc) / 4; i++)
-  {
-      random32 = updateCRC32(random32, 0xff);
-      *cbc++ ^= random32;
-  }
+		for (int i = 0; i < PH_MAX_CONNECTIONS; i++)
+		{
+			t_connection *conn = &connection[i];
 
-  for (int i = 0; i < PH_MAX_CONNECTIONS; i++)
-  {
-      t_connection *conn = &connection[i];
+			if (conn->tx_packet_timer < 0xffff)
+				conn->tx_packet_timer++;
 
-      if (conn->tx_packet_timer < 0xffff)
-        conn->tx_packet_timer++;
+			if (conn->link_state == LINK_CONNECTED)
+			{	// we are connected
 
-      if (conn->link_state == link_connected)
-      {	// we are connected
+				if (conn->ready_to_send_timer >= 0 && conn->ready_to_send_timer < 0x7fff)
+					conn->ready_to_send_timer++;
 
-          if (conn->ready_to_send_timer >= 0 && conn->ready_to_send_timer < 0x7fff)
-            conn->ready_to_send_timer++;
+				if (conn->not_ready_timer >= 0 && conn->not_ready_timer < 0x7fffffff)
+					conn->not_ready_timer++;
 
-          if (conn->not_ready_timer >= 0 && conn->not_ready_timer < 0x7fffffff)
-            conn->not_ready_timer++;
-
-          if (conn->data_speed_timer < 0xffff)
-          {
-              if (++conn->data_speed_timer >= 1000)
-              {	// 1 second gone by
-                  conn->data_speed_timer = 0;
-                  conn->tx_data_speed = (conn->tx_data_speed + conn->tx_data_speed_count) >> 1;
-                  conn->tx_data_speed_count = 0;
-                  conn->rx_data_speed = (conn->rx_data_speed + conn->rx_data_speed_count) >> 1;
-                  conn->rx_data_speed_count = 0;
-              }
-          }
-
-      }
-      else
-      {	// we are not connected
-          if (conn->data_speed_timer) conn->data_speed_timer = 0;
-          if (conn->tx_data_speed_count) conn->tx_data_speed_count = 0;
-          if (conn->tx_data_speed) conn->tx_data_speed = 0;
-          if (conn->rx_data_speed_count) conn->rx_data_speed_count = 0;
-          if (conn->rx_data_speed) conn->rx_data_speed = 0;
-      }
-  }
+				if (conn->data_speed_timer < 0xffff)
+				{
+					if (++conn->data_speed_timer >= 1000)
+					{	// 1 second gone by
+						conn->data_speed_timer = 0;
+						conn->tx_data_speed = (conn->tx_data_speed + conn->tx_data_speed_count) >> 1;
+						conn->tx_data_speed_count = 0;
+						conn->rx_data_speed = (conn->rx_data_speed + conn->rx_data_speed_count) >> 1;
+						conn->rx_data_speed_count = 0;
+					}
+				}
+			}
+			else
+			{	// we are not connected
+				if (conn->data_speed_timer) conn->data_speed_timer = 0;
+				if (conn->tx_data_speed_count) conn->tx_data_speed_count = 0;
+				if (conn->tx_data_speed) conn->tx_data_speed = 0;
+				if (conn->rx_data_speed_count) conn->rx_data_speed_count = 0;
+				if (conn->rx_data_speed) conn->rx_data_speed = 0;
+			}
+		}
+	}
 }
 
 // *****************************************************************************
@@ -1586,10 +1589,17 @@ void ph_1ms_tick(void)
 
 void ph_process(void)
 {
-  ph_processRxPacket();
+	if (saved_settings.mode == MODE_NORMAL)
+	{
+		ph_processRxPacket();
 
-  for (int i = 0; i < PH_MAX_CONNECTIONS; i++)
-    ph_processLinks(i);
+		for (int i = 0; i < PH_MAX_CONNECTIONS; i++)
+			ph_processLinks(i);
+	}
+	else
+	{
+
+	}
 }
 
 // *****************************************************************************
@@ -1616,7 +1626,7 @@ void ph_init(uint32_t our_sn, uint32_t datarate_bps, uint8_t tx_power)
       fifoBuf_init(&conn->tx_fifo_buffer, conn->tx_buffer, PH_FIFO_BUFFER_SIZE);
       fifoBuf_init(&conn->rx_fifo_buffer, conn->rx_buffer, PH_FIFO_BUFFER_SIZE);
 
-      conn->link_state = link_disconnected;
+      conn->link_state = LINK_DISCONNECTED;
 
       conn->tx_packet_timer = 0;
 

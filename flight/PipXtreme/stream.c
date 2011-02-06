@@ -39,9 +39,17 @@
 
 // *************************************************************
 // can be called from an interrupt if you wish
+// call this once every ms
 
 void stream_1ms_tick(void)
-{	// call this once every ms
+{
+	if (saved_settings.mode == MODE_STREAM_TX)
+	{
+	}
+	else
+	if (saved_settings.mode == MODE_STREAM_RX)
+	{
+	}
 }
 
 // *************************************************************
@@ -49,6 +57,13 @@ void stream_1ms_tick(void)
 
 void stream_process(void)
 {
+	if (saved_settings.mode == MODE_STREAM_TX)
+	{
+	}
+	else
+	if (saved_settings.mode == MODE_STREAM_RX)
+	{
+	}
 }
 
 // *************************************************************

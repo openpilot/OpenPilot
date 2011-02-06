@@ -167,17 +167,18 @@ TIM8  |           |           |           |
 // *****************************************************************
 // PIOS_USART
 
-#define PIOS_USART_RX_BUFFER_SIZE       512
-#define PIOS_USART_TX_BUFFER_SIZE       512
+#define PIOS_USART_RX_BUFFER_SIZE		512
+#define PIOS_USART_TX_BUFFER_SIZE		512
 
-#define PIOS_COM_SERIAL                 0
-//#define PIOS_COM_DEBUG                  PIOS_COM_SERIAL // comment this out if you don't want debug text sent out on the serial port
+#define PIOS_COM_SERIAL					0
 
-#define PIOS_USART_BAUDRATE             57600
-//#define PIOS_USART_BAUDRATE           115200
+//#define PIOS_COM_DEBUG				PIOS_COM_SERIAL // comment this out if you don't want debug text sent out on the serial port
+
+#define PIOS_USART_BAUDRATE				57600
+//#define PIOS_USART_BAUDRATE			115200
 
 #if defined(PIOS_INCLUDE_USB_HID)
-  #define PIOS_COM_TELEM_USB            1
+  #define PIOS_COM_TELEM_USB			1
 #endif
 
 #if defined(PIOS_COM_DEBUG)

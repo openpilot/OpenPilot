@@ -35,10 +35,14 @@
 #endif
 
 // *************************************************************
-// can be called from an interrupt if you wish
+// can be called from an interrupt if you wish.
+// call this once every ms
 
 void ss_1ms_tick(void)
-{	// call this once every ms
+{
+	if (saved_settings.mode == MODE_SCAN_SPECTRUM)
+	{
+	}
 }
 
 // *************************************************************
@@ -46,6 +50,9 @@ void ss_1ms_tick(void)
 
 void ss_process(void)
 {
+	if (saved_settings.mode == MODE_SCAN_SPECTRUM)
+	{
+	}
 }
 
 // *************************************************************

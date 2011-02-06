@@ -36,9 +36,17 @@
 
 // *************************************************************
 // can be called from an interrupt if you wish
+// call this once every ms
 
 void ppm_1ms_tick(void)
-{	// call this once every ms
+{
+	if (saved_settings.mode == MODE_PPM_TX)
+	{
+	}
+	else
+	if (saved_settings.mode == MODE_PPM_RX)
+	{
+	}
 }
 
 // *************************************************************
@@ -46,6 +54,13 @@ void ppm_1ms_tick(void)
 
 void ppm_process(void)
 {
+	if (saved_settings.mode == MODE_PPM_TX)
+	{
+	}
+	else
+	if (saved_settings.mode == MODE_PPM_RX)
+	{
+	}
 }
 
 // *************************************************************

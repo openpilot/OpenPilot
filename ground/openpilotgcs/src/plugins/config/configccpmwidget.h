@@ -77,6 +77,7 @@ private:
         bool SwashLvlConfigurationInProgress;
         UAVObject::Metadata SwashLvlaccInitialData;
         int SwashLvlState;
+        int SwashLvlServoInterlock;
 
         SwashplateServoSettingsStruct oldSwashLvlConfiguration;
         SwashplateServoSettingsStruct newSwashLvlConfiguration;

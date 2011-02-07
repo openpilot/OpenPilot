@@ -61,11 +61,11 @@ enum {	RX_WAIT_PREAMBLE_MODE = 0,
 
 // ************************************
 
-#define RFM22_device_type							0x00	// R
-#define RFM22_dt_mask							0x1F
+#define RFM22_DEVICE_TYPE							0x00	// R
+#define RFM22_DT_MASK							0x1F
 
-#define RFM22_device_version						0x01	// R
-#define RFM22_dv_mask							0x1F
+#define RFM22_DEVICE_VERSION						0x01	// R
+#define RFM22_DV_MASK							0x1F
 
 #define RFM22_device_status							0x02	// R
 #define RFM22_ds_cps_mask						0x03		// Chip Power State mask

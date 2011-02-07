@@ -1842,14 +1842,14 @@ int rfm22_init(uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t fr
 	// ****************
 	// read the RF chip ID bytes
 
-	device_type = rfm22_read(RFM22_device_type) & RFM22_dt_mask;		// read the device type
+	device_type = rfm22_read(RFM22_DEVICE_TYPE) & RFM22_DT_MASK;		// read the device type
 	#if defined(RFM22_DEBUG)
 		DEBUG_PRINTF("rf device type: %d\r\n", device_type);
 	#endif
 	if (device_type != 0x08)
 		return -1;	// incorrect RF module type
 
-	device_version = rfm22_read(RFM22_device_version) & RFM22_dv_mask;	// read the device version
+	device_version = rfm22_read(RFM22_DEVICE_VERSION) & RFM22_DV_MASK;	// read the device version
 	#if defined(RFM22_DEBUG)
 		DEBUG_PRINTF("rf device version: %d\r\n", device_version);
 	#endif

@@ -29,7 +29,8 @@ SOURCES += pipxtremegadget.cpp \
 OTHER_FILES += PipXtreme.pluginspec
 
 FORMS += \
-    pipxtreme.ui
+    pipxtreme.ui \
+    pipxtremegadgetoptionspage.ui
 
 RESOURCES += \
     pipxtreme.qrc

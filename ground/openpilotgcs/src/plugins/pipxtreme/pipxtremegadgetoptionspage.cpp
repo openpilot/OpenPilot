@@ -25,30 +25,29 @@
 
 #include "pipxtremegadgetoptionspage.h"
 #include "pipxtremegadgetconfiguration.h"
-#include <QtGui/QLabel>
-#include <QtGui/QSpinBox>
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QTextEdit>
-#include <QtGui/QComboBox>
-#include <QtAlgorithms>
-#include <QStringList>
-
+#include "ui_pipxtremegadgetoptionspage.h"
 
 PipXtremeGadgetOptionsPage::PipXtremeGadgetOptionsPage(PipXtremeGadgetConfiguration *config, QObject *parent) :
         IOptionsPage(parent),
-        m_config(config)
+		options_page(NULL),
+		m_config(config)
 {
 }
 
 //creates options page widget
 QWidget *PipXtremeGadgetOptionsPage::createPage(QWidget *parent)
 {
-    //main widget
-    QWidget *widget = new QWidget;
+//    QWidget *widget = new QWidget;
+//    return widget;
 
-    return widget;
+	options_page = new Ui::PipXtremeGadgetOptionsPage();
+	QWidget *optionsPageWidget = new QWidget;
+	options_page->setupUi(optionsPageWidget);
+
+
+
+
+	return optionsPageWidget;
 }
 /**
  * Called when the user presses apply or OK.
@@ -63,7 +62,11 @@ void PipXtremeGadgetOptionsPage::apply()
 
 void PipXtremeGadgetOptionsPage::finish()
 {
-
+	if (options_page)
+	{
+		delete options_page;
+		options_page = NULL;
+	}
 }
 
 

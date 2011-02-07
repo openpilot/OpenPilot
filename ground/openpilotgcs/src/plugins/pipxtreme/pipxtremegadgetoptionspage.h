@@ -25,6 +25,7 @@
 
 #ifndef PIPXTREMEGADGETOPTIONSPAGE_H
 #define PIPXTREMEGADGETOPTIONSPAGE_H
+
 #include <qextserialport/src/qextserialenumerator.h>
 #include "coreplugin/dialogs/ioptionspage.h"
 #include "QString"
@@ -32,12 +33,14 @@
 #include <QDebug>
 
 namespace Core {
-class IUAVGadgetConfiguration;
+	class IUAVGadgetConfiguration;
 }
+
 class PipXtremeGadgetConfiguration;
-class QTextEdit;
-class QComboBox;
-class QSpinBox;
+
+namespace Ui {
+	class PipXtremeGadgetOptionsPage;
+}
 
 using namespace Core;
 
@@ -52,23 +55,8 @@ public:
     void finish();
 
 private:
-    PipXtremeGadgetConfiguration *m_config;
-    QComboBox *m_portCB;
-    QComboBox *m_speedCB;
-    QComboBox *m_databitsCB;
-    QComboBox *m_flowCB;
-    QComboBox *m_parityCB;
-    QComboBox *m_stopbitsCB;
-    QSpinBox *m_timeoutSpin;
-    QStringList BaudRateTypeString;
-    QStringList BaudRateTypeStringALL;
-    QStringList DataBitsTypeStringALL;
-    QStringList ParityTypeStringALL;
-    QStringList StopBitsTypeStringALL;
-    QStringList DataBitsTypeString;
-    QStringList ParityTypeString;
-    QStringList StopBitsTypeString;
-    QStringList FlowTypeString;
+	Ui::PipXtremeGadgetOptionsPage *options_page;
+	PipXtremeGadgetConfiguration *m_config;
 };
 
 #endif

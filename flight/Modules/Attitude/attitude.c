@@ -62,7 +62,7 @@
 #define STACK_SIZE_BYTES 540
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 
-#define UPDATE_RATE  3
+#define UPDATE_RATE  2.0f
 #define GYRO_NEUTRAL 1665
 
 #define PI_MOD(x) (fmod(x + M_PI, M_PI * 2) - M_PI)
@@ -78,8 +78,8 @@ static float gyro_correct_int[3] = {0,0,0};
 static xQueueHandle gyro_queue;
 
 static void initSensors();
-static void updateSensors();
-static void updateAttitude();
+static void updateSensors(AttitudeRawData *);
+static void updateAttitude(AttitudeRawData *);
 
 /**
  * Initialise the module, called on startup
@@ -117,7 +117,7 @@ static void AttitudeTask(void *parameters)
 
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 
-	PIOS_ADC_Config(PIOS_ADC_RATE / (1000 / UPDATE_RATE));
+	PIOS_ADC_Config((PIOS_ADC_RATE / 1000.0f) * UPDATE_RATE);
 
 	// Keep flash CS pin high while talking accel
 	PIOS_FLASH_DISABLE;		
@@ -129,17 +129,21 @@ static void AttitudeTask(void *parameters)
 	while (1) {
 		PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
 		
-		updateSensors();		
-		updateAttitude();
+		AttitudeRawData attitudeRaw;
+		AttitudeRawGet(&attitudeRaw);		
+		updateSensors(&attitudeRaw);		
+		updateAttitude(&attitudeRaw);
+		AttitudeRawSet(&attitudeRaw); 	
+
 	}
 }
 
 static void initSensors() 
 {
-	updateSensors();
 	
 	AttitudeRawData attitudeRaw;
 	AttitudeRawGet(&attitudeRaw);	
+	updateSensors(&attitudeRaw);
 	
 	AttitudeSettingsData settings;
 	AttitudeSettingsGet(&settings);
@@ -150,11 +154,8 @@ static void initSensors()
 	gyro_correct_int[2] = - attitudeRaw.gyros[2];
 }
 
-static void updateSensors() 
-{
-	AttitudeRawData attitudeRaw;
-	AttitudeRawGet(&attitudeRaw);		
-	
+static void updateSensors(AttitudeRawData * attitudeRaw) 
+{	
 	AttitudeSettingsData settings;
 	AttitudeSettingsGet(&settings);
 	
@@ -169,54 +170,50 @@ static void updateSensors()
 	
 	
 	// First sample is temperature
-	attitudeRaw.gyros[ATTITUDERAW_GYROS_X] = -(gyro[1] - GYRO_NEUTRAL) * settings.GyroGain;
-	attitudeRaw.gyros[ATTITUDERAW_GYROS_Y] = (gyro[2] - GYRO_NEUTRAL) * settings.GyroGain;
-	attitudeRaw.gyros[ATTITUDERAW_GYROS_Z] = -(gyro[3] - GYRO_NEUTRAL) * settings.GyroGain;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = -(gyro[1] - GYRO_NEUTRAL) * settings.GyroGain;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] = (gyro[2] - GYRO_NEUTRAL) * settings.GyroGain;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = -(gyro[3] - GYRO_NEUTRAL) * settings.GyroGain;
 	
 	// Applying integral component here so it can be seen on the gyros and correct bias
-	attitudeRaw.gyros[ATTITUDERAW_GYROS_X] += gyro_correct_int[0];
-	attitudeRaw.gyros[ATTITUDERAW_GYROS_Y] += gyro_correct_int[1];
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] += gyro_correct_int[0];
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] += gyro_correct_int[1];
 
 	// Because most crafts wont get enough information from gravity to zero yaw gyro
-	attitudeRaw.gyros[ATTITUDERAW_GYROS_Z] += gyro_correct_int[2];
-	gyro_correct_int[2] += - attitudeRaw.gyros[ATTITUDERAW_GYROS_Z] * 
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] += gyro_correct_int[2];
+	gyro_correct_int[2] += - attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] * 
 		settings.AccelKI * UPDATE_RATE / 1000;
 	
 	
 	// Get the accel data
 	uint8_t i = 0;
-	attitudeRaw.accels[ATTITUDERAW_ACCELS_X] = 0;
-	attitudeRaw.accels[ATTITUDERAW_ACCELS_Y] = 0;
-	attitudeRaw.accels[ATTITUDERAW_ACCELS_Z] = 0; 
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = 0;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = 0;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = 0; 
 	
 	do {
 		i++;
-		attitudeRaw.gyrotemp[0] = PIOS_ADXL345_Read(&accel_data);
+		attitudeRaw->gyrotemp[0] = PIOS_ADXL345_Read(&accel_data);
 		
-		attitudeRaw.accels[ATTITUDERAW_ACCELS_X] += (float) accel_data.x * 0.004f * 9.81;
-		attitudeRaw.accels[ATTITUDERAW_ACCELS_Y] += -(float) accel_data.y * 0.004f * 9.81;
-		attitudeRaw.accels[ATTITUDERAW_ACCELS_Z] += -(float) accel_data.z * 0.004f * 9.81;
-	} while ( (i < 32) && (attitudeRaw.gyrotemp[0] > 0) );
-	attitudeRaw.gyrotemp[1] = i;
+		attitudeRaw->accels[ATTITUDERAW_ACCELS_X] += (float) accel_data.x * 0.004f * 9.81;
+		attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] += -(float) accel_data.y * 0.004f * 9.81;
+		attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] += -(float) accel_data.z * 0.004f * 9.81;
+	} while ( (i < 32) && (attitudeRaw->gyrotemp[0] > 0) );
+	attitudeRaw->gyrotemp[1] = i;
 	
-	attitudeRaw.accels[ATTITUDERAW_ACCELS_X] /= i;
-	attitudeRaw.accels[ATTITUDERAW_ACCELS_Y] /= i;
-	attitudeRaw.accels[ATTITUDERAW_ACCELS_Z] /= i; 
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] /= i;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] /= i;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] /= i; 
 	
-	AttitudeRawSet(&attitudeRaw); 	
 }
 
-static void updateAttitude()
+static void updateAttitude(AttitudeRawData * attitudeRaw)
 {
 	AttitudeSettingsData settings;
 	AttitudeSettingsGet(&settings);
 	
 	AttitudeActualData attitudeActual;
 	AttitudeActualGet(&attitudeActual);
-	
-	AttitudeRawData attitudeRaw;
-	AttitudeRawGet(&attitudeRaw);		
-	
+		
 	static portTickType lastSysTime = 0;
 	static portTickType thisSysTime;
 	
@@ -229,9 +226,9 @@ static void updateAttitude()
 	
 	// Bad practice to assume structure order, but saves memory
 	float * q = &attitudeActual.q1;
-	float * gyro = attitudeRaw.gyros;
+	float * gyro = attitudeRaw->gyros;
 	{
-		float * accels = attitudeRaw.accels;
+		float * accels = attitudeRaw->accels;
 		float grot[3];
 		float accel_err[3];
 		

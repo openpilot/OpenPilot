@@ -319,17 +319,20 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 /* Interrupt handler for USART */
 void SPEKTRUM_IRQHandler(void)
 {
+	/* by always reading DR after SR make sure to clear any error interrupts */
+	volatile uint16_t sr = pios_spektrum_cfg.pios_usart_spektrum_cfg.regs->SR;
+	volatile uint8_t b = pios_spektrum_cfg.pios_usart_spektrum_cfg.regs->DR;
+	
 	/* check if RXNE flag is set */
-	if (pios_spektrum_cfg.pios_usart_spektrum_cfg.regs->SR & (1 << 5)) {
-		uint8_t b = pios_spektrum_cfg.pios_usart_spektrum_cfg.regs->DR;
+	if (sr & USART_SR_RXNE) {
 		if (PIOS_SPEKTRUM_Decode(b) < 0) {
 			/* Here we could add some error handling */
 		}
-	}
+	} 
 
-	if (pios_spektrum_cfg.pios_usart_spektrum_cfg.regs->SR & (1 << 7)) {	// check if TXE flag is set
+	if (sr & USART_SR_TXE) {	// check if TXE flag is set
 		/* Disable TXE interrupt (TXEIE=0) */
-		pios_spektrum_cfg.pios_usart_spektrum_cfg.regs->CR1 &= ~(1 << 7);
+		USART_ITConfig(pios_spektrum_cfg.pios_usart_spektrum_cfg.regs, USART_IT_TXE, DISABLE);
 	}
 	/* clear "watchdog" timer */
 	TIM_SetCounter(pios_spektrum_cfg.timer, 0);

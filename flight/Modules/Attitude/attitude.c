@@ -137,7 +137,7 @@ static void AttitudeTask(void *parameters)
 			// For first 5 seconds use accels to get gyro bias
 			accelKp = 1;
 			// Decrease the rate of gyro learning during init
-			accelKi = .1 / (xTaskGetTickCount() / 5000);
+			accelKi = .5 / (1 + xTaskGetTickCount() / 5000);
 		} else if (init == 0) {
 			settingsUpdatedCb(AttitudeSettingsHandle());
 			init = 1;

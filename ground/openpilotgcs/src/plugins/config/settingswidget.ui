@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -2410,8 +2410,17 @@ p, li { white-space: pre-wrap; }
 on your remote. Setup the flightmode channel on the RC Input tab
 if you have not done so already.</string>
        </property>
+       <property name="minimum">
+        <number>-100</number>
+       </property>
        <property name="maximum">
         <number>100</number>
+       </property>
+       <property name="pageStep">
+        <number>10</number>
+       </property>
+       <property name="sliderPosition">
+        <number>-100</number>
        </property>
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -2420,7 +2429,7 @@ if you have not done so already.</string>
         <enum>QSlider::TicksBelow</enum>
        </property>
        <property name="tickInterval">
-        <number>33</number>
+        <number>66</number>
        </property>
       </widget>
       <widget class="QLabel" name="label_7">

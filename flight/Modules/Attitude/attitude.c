@@ -77,9 +77,13 @@ static void AttitudeTask(void *parameters);
 static float gyro_correct_int[3] = {0,0,0};
 static xQueueHandle gyro_queue;
 
-static void initSensors();
 static void updateSensors(AttitudeRawData *);
 static void updateAttitude(AttitudeRawData *);
+static void settingsUpdatedCb(UAVObjEvent * objEv);
+
+static float accelKi = 0;
+static float accelKp = 0;
+static float gyroGain = 0.42;
 
 /**
  * Initialise the module, called on startup
@@ -102,6 +106,8 @@ int32_t AttitudeInitialize(void)
 		return -1;
 	PIOS_ADC_SetQueue(gyro_queue);
 	
+	AttitudeSettingsConnectCallback(&settingsUpdatedCb);
+	
 	// Start main task
 	xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_ATTITUDE, taskHandle);
@@ -115,6 +121,7 @@ int32_t AttitudeInitialize(void)
 static void AttitudeTask(void *parameters)
 {
 
+	uint8_t init = 0;
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 
 	PIOS_ADC_Config((PIOS_ADC_RATE / 1000.0f) * UPDATE_RATE);
@@ -122,11 +129,19 @@ static void AttitudeTask(void *parameters)
 	// Keep flash CS pin high while talking accel
 	PIOS_FLASH_DISABLE;		
 	PIOS_ADXL345_Init();
-		
-	initSensors();
-	
+			
 	// Main task loop
 	while (1) {
+		
+		if(xTaskGetTickCount() < 5000) {
+			// For first 5 seconds use accels to get gyro bias
+			accelKi = 10;
+			accelKp = 1;
+		} else if (init == 0) {
+			settingsUpdatedCb(AttitudeSettingsHandle());
+			init = 1;
+		}						
+			
 		PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
 		
 		AttitudeRawData attitudeRaw;
@@ -138,27 +153,8 @@ static void AttitudeTask(void *parameters)
 	}
 }
 
-static void initSensors() 
-{
-	
-	AttitudeRawData attitudeRaw;
-	AttitudeRawGet(&attitudeRaw);	
-	updateSensors(&attitudeRaw);
-	
-	AttitudeSettingsData settings;
-	AttitudeSettingsGet(&settings);
-
-	// Zero initial bias
-	gyro_correct_int[0] = - attitudeRaw.gyros[0];
-	gyro_correct_int[1] = - attitudeRaw.gyros[1];
-	gyro_correct_int[2] = - attitudeRaw.gyros[2];
-}
-
 static void updateSensors(AttitudeRawData * attitudeRaw) 
 {	
-	AttitudeSettingsData settings;
-	AttitudeSettingsGet(&settings);
-	
 	struct pios_adxl345_data accel_data;
 	float gyro[4];
 	
@@ -170,9 +166,9 @@ static void updateSensors(AttitudeRawData * attitudeRaw)
 	
 	
 	// First sample is temperature
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = -(gyro[1] - GYRO_NEUTRAL) * settings.GyroGain;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] = (gyro[2] - GYRO_NEUTRAL) * settings.GyroGain;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = -(gyro[3] - GYRO_NEUTRAL) * settings.GyroGain;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = -(gyro[1] - GYRO_NEUTRAL) * gyroGain;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] = (gyro[2] - GYRO_NEUTRAL) * gyroGain;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = -(gyro[3] - GYRO_NEUTRAL) * gyroGain;
 	
 	// Applying integral component here so it can be seen on the gyros and correct bias
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] += gyro_correct_int[0];
@@ -181,7 +177,7 @@ static void updateSensors(AttitudeRawData * attitudeRaw)
 	// Because most crafts wont get enough information from gravity to zero yaw gyro
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] += gyro_correct_int[2];
 	gyro_correct_int[2] += - attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] * 
-		settings.AccelKI * UPDATE_RATE / 1000;
+		accelKi * UPDATE_RATE / 1000;
 	
 	
 	// Get the accel data
@@ -208,9 +204,6 @@ static void updateSensors(AttitudeRawData * attitudeRaw)
 
 static void updateAttitude(AttitudeRawData * attitudeRaw)
 {
-	AttitudeSettingsData settings;
-	AttitudeSettingsGet(&settings);
-	
 	AttitudeActualData attitudeActual;
 	AttitudeActualGet(&attitudeActual);
 		
@@ -239,14 +232,14 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 		CrossProduct((const float *) accels, (const float *) grot, accel_err);
 		
 		// Accumulate integral of error.  Scale here so that units are rad/s
-		gyro_correct_int[0] += accel_err[0] * settings.AccelKI * dT;
-		gyro_correct_int[1] += accel_err[1] * settings.AccelKI * dT;
+		gyro_correct_int[0] += accel_err[0] * accelKi * dT;
+		gyro_correct_int[1] += accel_err[1] * accelKi * dT;
 		//gyro_correct_int[2] += accel_err[2] * settings.AccelKI * dT;
 		
 		// Correct rates based on error, integral component dealt with in updateSensors
-		gyro[0] += accel_err[0] * settings.AccelKp;
-		gyro[1] += accel_err[1] * settings.AccelKp;
-		gyro[2] += accel_err[2] * settings.AccelKp;
+		gyro[0] += accel_err[0] * accelKp;
+		gyro[1] += accel_err[1] * accelKp;
+		gyro[2] += accel_err[2] * accelKp;
 	}
 	
 	{ // scoping variables to save memory
@@ -281,6 +274,15 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 	Quaternion2RPY(q,&attitudeActual.Roll);	
 
 	AttitudeActualSet(&attitudeActual);
+}
+
+static void settingsUpdatedCb(UAVObjEvent * objEv) {
+	AttitudeSettingsData attitudeSettings;
+	AttitudeSettingsGet(&attitudeSettings);
+	
+	accelKp = attitudeSettings.AccelKp;
+	accelKi = attitudeSettings.AccelKI;		
+	gyroGain = attitudeSettings.GyroGain;
 }
 /**
   * @}

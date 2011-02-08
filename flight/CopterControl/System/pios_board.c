@@ -358,8 +358,8 @@ const struct pios_usart_cfg pios_usart_gps_cfg = {
 #include <pios_spektrum_priv.h>
 void PIOS_USART_spektrum_irq_handler(void);
 void USART3_IRQHandler() __attribute__ ((alias ("PIOS_USART_spektrum_irq_handler")));
-void TIM6_IRQHandler();
-void TIM6_IRQHandler() __attribute__ ((alias ("PIOS_TIM6_irq_handler")));
+void TIM2_IRQHandler();
+void TIM2_IRQHandler() __attribute__ ((alias ("PIOS_TIM2_irq_handler")));
 const struct pios_spektrum_cfg pios_spektrum_cfg = {
 	.pios_usart_spektrum_cfg = {
 		  .regs = USART3,
@@ -414,20 +414,20 @@ const struct pios_spektrum_cfg pios_spektrum_cfg = {
 	},
 	.remap = 0,
 	.irq = {
-		.handler = TIM6_IRQHandler,
+		.handler = TIM2_IRQHandler,
 		.init    = {
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
 			.NVIC_IRQChannelSubPriority        = 0,
 			.NVIC_IRQChannelCmd                = ENABLE,
 		},
 	},
-	.timer = TIM6,
+	.timer = TIM2,
 	.port = GPIOB,
 	.ccr = TIM_IT_Update,
 	.pin = GPIO_Pin_11,
 };
 
-void PIOS_TIM6_irq_handler()
+void PIOS_TIM2_irq_handler()
 {
 	PIOS_SPEKTRUM_irq_handler();
 }
@@ -491,23 +491,17 @@ struct pios_com_dev pios_com_devs[] = {
     .id     = PIOS_USART_TELEM,
     .driver = &pios_usart_com_driver,
   },
-#ifdef PIOS_COM_GPS
-  {
-    .id     = PIOS_USART_GPS,
-    .driver = &pios_usart_com_driver,
-  },
-#endif
 #if defined(PIOS_INCLUDE_USB_HID)
   {
     .id     = 0,
     .driver = &pios_usb_com_driver,
   },
 #endif
-#ifdef PIOS_COM_AUX
-  {
-    .id     = PIOS_USART_AUX,
-    .driver = &pios_usart_com_driver,
-  },
+#ifdef PIOS_COM_GPS
+	{
+		.id     = PIOS_USART_GPS,
+		.driver = &pios_usart_com_driver,
+	},
 #endif
 #ifdef PIOS_COM_SPEKTRUM
   {
@@ -555,12 +549,14 @@ const struct pios_servo_channel pios_servo_channels[] = {
 		.channel = TIM_Channel_1,
 		.pin = GPIO_Pin_4,
 	},  	
+#ifndef PIOS_INCLUDE_SPEKTRUM
 	{
 		.timer = TIM2,
 		.port = GPIOA,
 		.channel = TIM_Channel_3,
 		.pin = GPIO_Pin_2,
-	}, 		
+	},	
+#endif
 };
 
 const struct pios_servo_cfg pios_servo_cfg = {

@@ -111,8 +111,8 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //-------------------------
 // Delay Timer
 //-------------------------
-#define PIOS_DELAY_TIMER			TIM2
-#define PIOS_DELAY_TIMER_RCC_FUNC		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE)
+#define PIOS_DELAY_TIMER			TIM3
+#define PIOS_DELAY_TIMER_RCC_FUNC		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE)
 
 //-------------------------
 // System Settings
@@ -157,13 +157,13 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 
 #define PIOS_COM_TELEM_RF               0
 #ifdef PIOS_INCLUDE_GPS
-	#define PIOS_COM_GPS                1
+	#define PIOS_COM_GPS                2
 #endif
-#define PIOS_COM_TELEM_USB              2
+#define PIOS_COM_TELEM_USB              1
 
 #ifdef PIOS_INCLUDE_SPEKTRUM
     #define PIOS_COM_SPEKTRUM_BAUDRATE  115200
-    #define PIOS_COM_SPEKTRUM           1
+    #define PIOS_COM_SPEKTRUM           2
 #endif
 
 //-------------------------

@@ -464,18 +464,20 @@ void PIOS_USART_IRQ_Handler(uint8_t usart)
 	/* Get a handle for the device configuration */
 	usart_dev = find_usart_dev_by_id(usart);
 	PIOS_DEBUG_Assert(usart_dev);
+	
+	/* Force read of dr after sr to make sure to clear error flags */
+	volatile uint16_t sr = usart_dev->cfg->regs->SR;
+	volatile uint8_t dr = usart_dev->cfg->regs->DR;
 
 	/* Check if RXNE flag is set */
-	if (usart_dev->cfg->regs->SR & USART_SR_RXNE) {
-		uint8_t b = usart_dev->cfg->regs->DR;
-
-		if (PIOS_USART_RxBufferPut(usart, b) < 0) {
+	if (sr & USART_SR_RXNE) {
+		if (PIOS_USART_RxBufferPut(usart, dr) < 0) {
 			/* Here we could add some error handling */
 		}
 	}
 
 	/* Check if TXE flag is set */
-	if (usart_dev->cfg->regs->SR & USART_SR_TXE) {
+	if (sr & USART_SR_TXE) {
 		if (PIOS_USART_TxBufferUsed(usart) > 0) {
 			int32_t b = PIOS_USART_TxBufferGet(usart);
 

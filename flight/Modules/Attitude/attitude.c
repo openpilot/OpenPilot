@@ -135,9 +135,9 @@ static void AttitudeTask(void *parameters)
 		
 		if(xTaskGetTickCount() < 10000) {
 			// For first 5 seconds use accels to get gyro bias
-			accelKp = 1000;
+			accelKp = 1;
 			// Decrease the rate of gyro learning during init
-			accelKi = 100 / (xTaskGetTickCount() / 2000);
+			accelKi = .1 / (xTaskGetTickCount() / 5000);
 		} else if (init == 0) {
 			settingsUpdatedCb(AttitudeSettingsHandle());
 			init = 1;
@@ -178,7 +178,7 @@ static void updateSensors(AttitudeRawData * attitudeRaw)
 	// Because most crafts wont get enough information from gravity to zero yaw gyro
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] += gyro_correct_int[2];
 	gyro_correct_int[2] += - attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] * 
-		accelKi * UPDATE_RATE / 1000;
+		accelKi;
 	
 	
 	// Get the accel data
@@ -242,15 +242,15 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 		accel_err[1] /= accel_mag;
 		accel_err[2] /= accel_mag;
 		
-		// Accumulate integral of error.  Scale here so that units are rad/s
-		gyro_correct_int[0] += accel_err[0] * accelKi * dT;
-		gyro_correct_int[1] += accel_err[1] * accelKi * dT;
+		// Accumulate integral of error.  Scale here so that units are (rad/s) but Ki has units of s
+		gyro_correct_int[0] += accel_err[0] * accelKi;
+		gyro_correct_int[1] += accel_err[1] * accelKi;
 		//gyro_correct_int[2] += accel_err[2] * settings.AccelKI * dT;
 		
 		// Correct rates based on error, integral component dealt with in updateSensors
-		gyro[0] += accel_err[0] * accelKp;
-		gyro[1] += accel_err[1] * accelKp;
-		gyro[2] += accel_err[2] * accelKp;
+		gyro[0] += accel_err[0] * accelKp / dT;
+		gyro[1] += accel_err[1] * accelKp / dT;
+		gyro[2] += accel_err[2] * accelKp / dT;
 	}
 	
 	{ // scoping variables to save memory

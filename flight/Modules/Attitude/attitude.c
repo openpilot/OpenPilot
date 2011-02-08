@@ -133,10 +133,11 @@ static void AttitudeTask(void *parameters)
 	// Main task loop
 	while (1) {
 		
-		if(xTaskGetTickCount() < 5000) {
+		if(xTaskGetTickCount() < 10000) {
 			// For first 5 seconds use accels to get gyro bias
-			accelKi = 10;
-			accelKp = 1;
+			accelKp = 1000;
+			// Decrease the rate of gyro learning during init
+			accelKi = 100 / (xTaskGetTickCount() / 2000);
 		} else if (init == 0) {
 			settingsUpdatedCb(AttitudeSettingsHandle());
 			init = 1;
@@ -219,17 +220,27 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 	
 	// Bad practice to assume structure order, but saves memory
 	float * q = &attitudeActual.q1;
-	float * gyro = attitudeRaw->gyros;
+	float gyro[3];
+	gyro[0] = attitudeRaw->gyros[0];
+	gyro[1] = attitudeRaw->gyros[1];
+	gyro[2] = attitudeRaw->gyros[2];
+	
 	{
 		float * accels = attitudeRaw->accels;
 		float grot[3];
 		float accel_err[3];
 		
 		// Rotate gravity to body frame and cross with accels
-		grot[0] = -9.81 * (2 * (q[1] * q[3] - q[0] * q[2]));
-		grot[1] = -9.81 * (2 * (q[2] * q[3] + q[0] * q[1]));
-		grot[2] = -9.81 * (q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]);
+		grot[0] = -(2 * (q[1] * q[3] - q[0] * q[2]));
+		grot[1] = -(2 * (q[2] * q[3] + q[0] * q[1]));
+		grot[2] = -(q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]);
 		CrossProduct((const float *) accels, (const float *) grot, accel_err);
+		
+		// Account for accel magnitude 
+		float accel_mag = sqrt(accels[0]*accels[0] + accels[1]*accels[1] + accels[2]*accels[2]);
+		accel_err[0] /= accel_mag;
+		accel_err[1] /= accel_mag;
+		accel_err[2] /= accel_mag;
 		
 		// Accumulate integral of error.  Scale here so that units are rad/s
 		gyro_correct_int[0] += accel_err[0] * accelKi * dT;
@@ -281,7 +292,7 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	AttitudeSettingsGet(&attitudeSettings);
 	
 	accelKp = attitudeSettings.AccelKp;
-	accelKi = attitudeSettings.AccelKI;		
+	accelKi = attitudeSettings.AccelKi;		
 	gyroGain = attitudeSettings.GyroGain;
 }
 /**

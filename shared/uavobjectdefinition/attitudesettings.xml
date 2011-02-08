@@ -2,8 +2,8 @@
     <object name="AttitudeSettings" singleinstance="true" settings="true">
         <description>Settings for the @ref Attitude module used on CopterControl</description>
         <field name="GyroGain" units="(rad/s)/lsb" type="float" elements="1" defaultvalue="0.42"/>
-        <field name="AccelKp" units="channel" type="float" elements="1" defaultvalue="0.01"/>
-        <field name="AccelKI" units="channel" type="float" elements="1" defaultvalue="0.01"/>
+        <field name="AccelKp" units="channel" type="float" elements="1" defaultvalue="100"/>
+        <field name="AccelKi" units="channel" type="float" elements="1" defaultvalue="5"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

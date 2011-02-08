@@ -157,6 +157,10 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_config->fmsSsPos3Pitch->addItems(channelsList);
     m_config->fmsSsPos3Yaw->addItems(channelsList);
 
+    // And the Armin configurations:
+    field = obj->getField(QString("Arming"));
+    m_config->armControl->clear();
+    m_config->armControl->addItems(field->getOptions());
 
     obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
     fieldList = obj->getFields();
@@ -195,6 +199,11 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_config->saveFmsToSD, SIGNAL(clicked()), this, SLOT(saveRCInputObject()));
     connect(m_config->saveFmsToRAM, SIGNAL(clicked()), this, SLOT(sendRCInputUpdate()));
     connect(m_config->getFmsCurrent, SIGNAL(clicked()), this, SLOT(requestRCInputUpdate()));
+
+    connect(m_config->saveArmToSD, SIGNAL(clicked()), this, SLOT(saveRCInputObject()));
+    connect(m_config->saveArmToRAM, SIGNAL(clicked()), this, SLOT(sendRCInputUpdate()));
+    connect(m_config->getArmCurrent, SIGNAL(clicked()), this, SLOT(requestRCInputUpdate()));
+
 
     connect(m_config->saveRCOutputToSD, SIGNAL(clicked()), this, SLOT(saveRCOutputObject()));
     connect(m_config->saveRCOutputToRAM, SIGNAL(clicked()), this, SLOT(sendRCOutputUpdate()));
@@ -633,6 +642,12 @@ void ConfigServoWidget::requestRCInputUpdate()
     m_config->fmsSsPos3Yaw->setCurrentIndex(m_config->fmsSsPos3Yaw->findText(
             field->getValue(field->getElementNames().indexOf("Yaw")).toString()));
 
+    // Load the arming settings
+    field = obj->getField(QString("Arming"));
+    m_config->armControl->setCurrentIndex(m_config->armControl->findText(field->getValue().toString()));
+    field = obj->getField(QString("ArmedTimeout"));
+    m_config->armTimeout->setValue(field->getValue().toInt()/1000);
+
 }
 
 
@@ -750,6 +765,12 @@ void ConfigServoWidget::sendRCInputUpdate()
     field->setValue(m_config->fmsSsPos3Roll->currentText(), field->getElementNames().indexOf("Roll"));
     field->setValue(m_config->fmsSsPos3Pitch->currentText(), field->getElementNames().indexOf("Pitch"));
     field->setValue(m_config->fmsSsPos3Yaw->currentText(), field->getElementNames().indexOf("Yaw"));
+
+    // Save the arming settings
+    field = obj->getField(QString("Arming"));
+    field->setValue(m_config->armControl->currentText());
+    field = obj->getField(QString("ArmedTimeout"));
+    field->setValue(m_config->armTimeout->value()*1000);
 
     // ... and send to the OP Board
     obj->updated();

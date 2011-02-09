@@ -226,6 +226,7 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_ccpm->CurveSettings, SIGNAL(cellChanged (int, int)), this, SLOT(UpdateCurveWidgets()));
     connect(m_ccpm->TabObject, SIGNAL(currentChanged ( QWidget * )), this, SLOT(UpdateType()));
 
+//    connect(m_ccpm->SwashLvlSwashplateImage, SIGNAL(valueChanged(double)), this, SLOT(ccpmSwashplateRedraw()));
 
 
     connect(m_ccpm->PitchCurve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updatePitchCurveValue(QList<double>,double)));
@@ -235,7 +236,6 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_ccpm->SwashLvlNextButton, SIGNAL(clicked()), this, SLOT(SwashLvlNextButtonPressed()));
     connect(m_ccpm->SwashLvlCancelButton, SIGNAL(clicked()), this, SLOT(SwashLvlCancelButtonPressed()));
     connect(m_ccpm->SwashLvlFinishButton, SIGNAL(clicked()), this, SLOT(SwashLvlFinishButtonPressed()));
-
 
 
    // connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestccpmUpdate()));
@@ -657,9 +657,9 @@ void ConfigccpmWidget::GenerateCurve()
 
 }
 
-void ConfigccpmWidget::ccpmSwashplateUpdate()
+void ConfigccpmWidget::ccpmSwashplateRedraw()
 {
-    double angle[CCPM_MAX_SWASH_SERVOS],CorrectionAngle,x,y,CenterX,CenterY;
+    double angle[CCPM_MAX_SWASH_SERVOS],CorrectionAngle,x,y,w,h,radius,CenterX,CenterY;
     int used[CCPM_MAX_SWASH_SERVOS],i;
 
     CorrectionAngle=m_ccpm->ccpmCorrectionAngle->value();
@@ -683,103 +683,42 @@ void ConfigccpmWidget::ccpmSwashplateUpdate()
 
     for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++)
     {
-        x=CenterX-(200.00*sin(angle[i]))-10.00;
-        y=CenterY+(200.00*cos(angle[i]))-10.00;
+        radius=210;
+        x=CenterX-(radius*sin(angle[i]))-10.00;
+        y=CenterY+(radius*cos(angle[i]))-10.00;
         Servos[i]->setPos(x, y);
         Servos[i]->setVisible(used[i]!=0);
 
-        x=CenterX-(170.00*sin(angle[i]))-10.00;
-        y=CenterY+(170.00*cos(angle[i]))-10.00;
+        radius=170;
+        x=CenterX-(radius*sin(angle[i]))-10.00;
+        y=CenterY+(radius*cos(angle[i]))-10.00;
         ServosText[i]->setPos(x, y);
         ServosText[i]->setVisible(used[i]!=0);
 
-        x=CenterX-(205.00*sin(angle[i]))+25;
-        y=CenterY+(205.00*cos(angle[i]))+2;
-        SwashLvlSpinBoxes[i]->move(x,y);
+        w=SwashLvlSpinBoxes[i]->width()/2;
+        h=SwashLvlSpinBoxes[i]->height()/2;
+        radius = (215.00+w+h);
+        x=CenterX-(radius*sin(angle[i]))-w;
+        y=CenterY+(radius*cos(angle[i]))-h;
+        SwashLvlSpinBoxes[i]->move(m_ccpm->SwashLvlSwashplateImage->mapFromScene (x, y));
         SwashLvlSpinBoxes[i]->setVisible(used[i]!=0);
 
-
-        x=CenterX-(220.00*sin(angle[i]));
-        y=CenterY+(220.00*cos(angle[i]));
+        radius=220;
+        x=CenterX-(radius*sin(angle[i]));
+        y=CenterY+(radius*cos(angle[i]));
         ServoLines[i]->setLine(CenterX,CenterY,x,y);
         ServoLines[i]->setVisible(used[i]!=0);
     }
 
-/*
-    used=((m_ccpm->ccpmServoWChannel->currentIndex()<8)&&(m_ccpm->ccpmServoWChannel->isEnabled()));
-    Servos[0]->setVisible(used!=0);
-    ServosText[0]->setVisible(used!=0);
-    angle=(CorrectionAngle+180+m_ccpm->ccpmAngleW->value())*Pi/180.00;
-    x=CenterX-(200.00*sin(angle))-10.00;
-    y=CenterY+(200.00*cos(angle))-10.00;
-    Servos[0]->setPos(x, y);
-    x=CenterX-(170.00*sin(angle))-10.00;
-    y=CenterY+(170.00*cos(angle))-10.00;
-    ServosText[0]->setPos(x, y);
-    x=CenterX-(220.00*sin(angle));
-    y=CenterY+(220.00*cos(angle));
-    SwashLvlSpinBoxes[0]->move(x,y);
-    SwashLvlSpinBoxes[0]->setVisible(used!=0);
-    ServoLines[0]->setLine(CenterX,CenterY,x,y);
-    ServoLines[0]->setVisible(used!=0);
-
-    used=((m_ccpm->ccpmServoXChannel->currentIndex()<8)&&(m_ccpm->ccpmServoXChannel->isEnabled()));
-    Servos[1]->setVisible(used!=0);
-    ServosText[1]->setVisible(used!=0);
-    angle=(CorrectionAngle+180+m_ccpm->ccpmAngleX->value())*Pi/180.00;
-    x=CenterX-(200.00*sin(angle))-10.00;
-    y=CenterY+(200.00*cos(angle))-10.00;
-    Servos[1]->setPos(x, y);
-    x=CenterX-(170.00*sin(angle))-10.00;
-    y=CenterY+(170.00*cos(angle))-10.00;
-    ServosText[1]->setPos(x, y);
-    x=CenterX-(220.00*sin(angle));
-    y=CenterY+(220.00*cos(angle));
-    SwashLvlSpinBoxes[1]->move(x,y);
-    SwashLvlSpinBoxes[1]->setVisible(used!=0);
-    ServoLines[1]->setLine(CenterX,CenterY,x,y);
-    ServoLines[1]->setVisible(used!=0);
-
-    used=((m_ccpm->ccpmServoYChannel->currentIndex()<8)&&(m_ccpm->ccpmServoYChannel->isEnabled()));
-    Servos[2]->setVisible(used!=0);
-    ServosText[2]->setVisible(used!=0);
-    angle=(CorrectionAngle+180+m_ccpm->ccpmAngleY->value())*Pi/180.00;
-    x=CenterX-(200.00*sin(angle))-10.00;
-    y=CenterY+(200.00*cos(angle))-10.00;
-    Servos[2]->setPos(x, y);
-    x=CenterX-(170.00*sin(angle))-10.00;
-    y=CenterY+(170.00*cos(angle))-10.00;
-    ServosText[2]->setPos(x, y);
-    x=CenterX-(220.00*sin(angle));
-    y=CenterY+(220.00*cos(angle));
-    SwashLvlSpinBoxes[2]->move(x,y);
-    SwashLvlSpinBoxes[2]->setVisible(used!=0);
-    ServoLines[2]->setLine(CenterX,CenterY,x,y);
-    ServoLines[2]->setVisible(used!=0);
-
-    used=((m_ccpm->ccpmServoZChannel->currentIndex()<8)&&(m_ccpm->ccpmServoZChannel->isEnabled()));
-    Servos[3]->setVisible(used!=0);
-    ServosText[3]->setVisible(used!=0);
-    angle=(CorrectionAngle+180+m_ccpm->ccpmAngleZ->value())*Pi/180.00;
-    x=CenterX-(200.00*sin(angle))-10.00;
-    y=CenterY+(200.00*cos(angle))-10.00;
-    Servos[3]->setPos(x, y);
-    x=CenterX-(170.00*sin(angle))-10.00;
-    y=CenterY+(170.00*cos(angle))-10.00;
-    ServosText[3]->setPos(x, y);
-    x=CenterX-(220.00*sin(angle));
-    y=CenterY+(220.00*cos(angle));
-    SwashLvlSpinBoxes[3]->move(x,y);
-    SwashLvlSpinBoxes[3]->setVisible(used!=0);
-    ServoLines[3]->setLine(CenterX,CenterY,x,y);
-    ServoLines[3]->setVisible(used!=0);
-*/
     //m_ccpm->SwashplateImage->centerOn (CenterX, CenterY);
 
     //m_ccpm->SwashplateImage->fitInView(SwashplateImg, Qt::KeepAspectRatio);
+}
 
+void ConfigccpmWidget::ccpmSwashplateUpdate()
+{
+    ccpmSwashplateRedraw();
     UpdateMixer();
-
 }
 
 void ConfigccpmWidget::UpdateMixer()
@@ -1272,6 +1211,7 @@ void ConfigccpmWidget::resizeEvent(QResizeEvent* event)
         m_ccpm->ccpmAdvancedSettingsTable->setColumnWidth(i,(m_ccpm->ccpmAdvancedSettingsTable->width()-
                                                         m_ccpm->ccpmAdvancedSettingsTable->verticalHeader()->width())/6);
     }
+    ccpmSwashplateRedraw();
 
 }
 void ConfigccpmWidget::showEvent(QShowEvent *event)
@@ -1717,3 +1657,4 @@ void ConfigccpmWidget::SwashLvlSpinBoxChanged(int value)
     }
     return;
 }
+

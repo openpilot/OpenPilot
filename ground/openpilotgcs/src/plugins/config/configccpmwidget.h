@@ -88,6 +88,7 @@ private:
 
     private slots:
         void ccpmSwashplateUpdate();
+        void ccpmSwashplateRedraw();
         void UpdateCurveSettings();
         void GenerateCurve();
         void UpdateMixer();

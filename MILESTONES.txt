@@ -63,9 +63,9 @@ D: December 2010
 V: http://vimeo.com/18318478
 
 M: First CopterControl flight on a Quad
-C: ?
+C: Sami Korhonen (Sambas)
 D: January 2010
-V: 
+V: http://vimeo.com/19592820
 
 M: First CopterControl flight on a Tri
 C: ?

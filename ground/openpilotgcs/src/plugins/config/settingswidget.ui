@@ -2786,7 +2786,7 @@ Applies and Saves all settings to SD</string>
          <item>
           <widget class="QLabel" name="label_17">
            <property name="text">
-            <string>Arm airframe using:</string>
+            <string>Arm airframe using throttle off, plus:</string>
            </property>
           </widget>
          </item>

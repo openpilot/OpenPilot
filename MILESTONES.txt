@@ -64,8 +64,13 @@ V: http://vimeo.com/18318478
 
 M: First CopterControl flight on a Quad
 C: Sami Korhonen (Sambas)
-D: January 2010
+D: January 2011
 V: http://vimeo.com/19592820
+
+M: First UAVTalk connection across several continents - over the Internet
+C: Eric Price (CorvusCorax), James Cotton
+D: February 2011
+V: http://cybertrench.com/vixen/internet-telemetry_small.avi
 
 M: First CopterControl flight on a Tri
 C: ?

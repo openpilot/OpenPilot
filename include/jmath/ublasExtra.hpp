@@ -643,7 +643,7 @@ namespace jafar {
 			void delete_row(ublas::matrix<T> &M, size_t index) 
 			{
 				JFR_ASSERT((index < M.size1() && (index>=0)),
-									 "index must be in [0.."<<M.size1()<<"[ range")
+									 "index must be in [0.."<<M.size1()<<"[ range");
 				if (index == M.size1() -1)
 					M.resize(index, M.size2(), true);
 				else {
@@ -661,7 +661,7 @@ namespace jafar {
 			void delete_column(ublas::matrix<T> &M, size_t index) 
 			{
 				JFR_ASSERT((index < M.size2() && (index>=0)),
-									 "index must be in [0.."<<M.size2()<<"[ range")
+									 "index must be in [0.."<<M.size2()<<"[ range");
 				if (index == M.size2() - 1)
 					M.resize(M.size1(), index, true);
 				else {
@@ -682,7 +682,7 @@ namespace jafar {
 			{
 				JFR_ASSERT((indices.size() < M.size2() && (indices.size()>0)),
 									 "indices size is "<<indices.size()<<
-									 " whereas M columns size is "<<M.size2())
+									 " whereas M columns size is "<<M.size2());
 				if(!is_sorted)
 					std::sort(indices.begin(), indices.end());
 				for(std::vector<size_t>::reverse_iterator rit = indices.rbegin();

@@ -28,12 +28,10 @@
  */
 
 #include <pios.h>
-#include <pios_i2c_priv.h>
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 
 #if defined(PIOS_INCLUDE_SPI)
-
 
 #include <pios_spi_priv.h>
 
@@ -764,6 +762,10 @@ void PIOS_TIM5_irq_handler()
 }
 #endif
 
+#if defined(PIOS_INCLUDE_I2C)
+
+#include <pios_i2c_priv.h>
+
 /*
  * I2C Adapters
  */
@@ -822,28 +824,20 @@ const struct pios_i2c_adapter_cfg pios_i2c_main_adapter_cfg = {
   },
 };
 
-/*
- * Board specific number of devices.
- */
-struct pios_i2c_adapter pios_i2c_adapters[] = {
-  {
-    .cfg = &pios_i2c_main_adapter_cfg,
-  },
-};
-
-uint8_t pios_i2c_num_adapters = NELEMENTS(pios_i2c_adapters);
-
+uint32_t pios_i2c_main_adapter_id;
 void PIOS_I2C_main_adapter_ev_irq_handler(void)
 {
   /* Call into the generic code to handle the IRQ for this specific device */
-  PIOS_I2C_EV_IRQ_Handler(PIOS_I2C_MAIN_ADAPTER);
+  PIOS_I2C_EV_IRQ_Handler(pios_i2c_main_adapter_id);
 }
 
 void PIOS_I2C_main_adapter_er_irq_handler(void)
 {
   /* Call into the generic code to handle the IRQ for this specific device */
-  PIOS_I2C_ER_IRQ_Handler(PIOS_I2C_MAIN_ADAPTER);
+  PIOS_I2C_ER_IRQ_Handler(pios_i2c_main_adapter_id);
 }
+
+#endif /* PIOS_INCLUDE_I2C */
 
 #if defined(PIOS_ENABLE_DEBUG_PINS)
 
@@ -1019,7 +1013,12 @@ void PIOS_Board_Init(void) {
 	}
 #endif	/* PIOS_INCLUDE_COM */
 #endif  /* PIOS_INCLUDE_USB_HID */
-	PIOS_I2C_Init();
+
+#if defined(PIOS_INCLUDE_I2C)
+	if (PIOS_I2C_Init(&pios_i2c_main_adapter_id, &pios_i2c_main_adapter_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+#endif	/* PIOS_INCLUDE_I2C */
 	PIOS_IAP_Init();
 	PIOS_WDG_Init();
 }

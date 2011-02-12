@@ -265,6 +265,7 @@ void PIOS_USART_aux_irq_handler(void)
 #endif /* PIOS_INCLUDE_COM */
 
 #if defined(PIOS_INCLUDE_I2C)
+
 #include <pios_i2c_priv.h>
 
 /*
@@ -327,27 +328,17 @@ const struct pios_i2c_adapter_cfg pios_i2c_main_adapter_cfg = {
 		  },
 };
 
-/*
- * Board specific number of devices.
- */
-struct pios_i2c_adapter pios_i2c_adapters[] = {
-	{
-	 .cfg = &pios_i2c_main_adapter_cfg,
-	 },
-};
-
-uint8_t pios_i2c_num_adapters = NELEMENTS(pios_i2c_adapters);
-
+uint32_t pios_i2c_main_adapter_id;
 void PIOS_I2C_main_adapter_ev_irq_handler(void)
 {
 	/* Call into the generic code to handle the IRQ for this specific device */
-	PIOS_I2C_EV_IRQ_Handler(PIOS_I2C_MAIN_ADAPTER);
+	PIOS_I2C_EV_IRQ_Handler(pios_i2c_main_adapter_id);
 }
 
 void PIOS_I2C_main_adapter_er_irq_handler(void)
 {
 	/* Call into the generic code to handle the IRQ for this specific device */
-	PIOS_I2C_ER_IRQ_Handler(PIOS_I2C_MAIN_ADAPTER);
+	PIOS_I2C_ER_IRQ_Handler(pios_i2c_main_adapter_id);
 }
 
 #endif /* PIOS_INCLUDE_I2C */
@@ -426,7 +417,9 @@ void PIOS_Board_Init(void) {
 
 #if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
 	/* Magnetic sensor system */
-	PIOS_I2C_Init();
+	if (PIOS_I2C_Init(&pios_i2c_main_adapter_id, &pios_i2c_main_adapter_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
 	PIOS_HMC5843_Init();
 #endif
 

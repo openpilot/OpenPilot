@@ -137,7 +137,9 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 // PIOS_I2C
 // See also pios_board.c
 //------------------------
-#define PIOS_I2C_MAIN_ADAPTER                   0
+#define PIOS_I2C_MAX_DEVS			1
+extern uint32_t pios_i2c_main_adapter_id;
+#define PIOS_I2C_MAIN_ADAPTER			(pios_i2c_main_adapter_id)
 
 //-------------------------
 // SPI

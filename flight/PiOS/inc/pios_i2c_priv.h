@@ -78,8 +78,13 @@ enum i2c_adapter_state {
 	I2C_STATE_NUM_STATES	/* Must be last */
 };
 
+enum pios_i2c_adapter_magic {
+	PIOS_I2C_DEV_MAGIC = 0xa9a9b8b8,
+};
+
 struct pios_i2c_adapter {
-	const struct pios_i2c_adapter_cfg *const cfg;
+	enum pios_i2c_adapter_magic         magic;
+	const struct pios_i2c_adapter_cfg * cfg;
 	void (*callback) (uint8_t, uint8_t);
 #ifdef PIOS_INCLUDE_FREERTOS
 	xSemaphoreHandle sem_busy;
@@ -97,7 +102,6 @@ struct pios_i2c_adapter {
 	uint8_t *last_byte;
 };
 
-extern struct pios_i2c_adapter pios_i2c_adapters[];
-extern uint8_t pios_i2c_num_adapters;
+int32_t PIOS_I2C_Init(uint32_t * i2c_id, const struct pios_i2c_adapter_cfg * cfg);
 
 #endif /* PIOS_I2C_PRIV_H */

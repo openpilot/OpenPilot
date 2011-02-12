@@ -740,17 +740,6 @@ static void i2c_adapter_reset_bus(struct pios_i2c_adapter *i2c_adapter)
 
 #include <pios_i2c_priv.h>
 
-static struct pios_i2c_adapter *find_i2c_adapter_by_id(uint8_t adapter)
-{
-	if (adapter >= pios_i2c_num_adapters) {
-		/* Undefined I2C adapter for this board (see pios_board.c) */
-		return NULL;
-	}
-
-	/* Get a handle for the device configuration */
-	return &(pios_i2c_adapters[adapter]);
-}
-
 /* Return true if the FSM is in a terminal state */
 static bool i2c_adapter_fsm_terminated(struct pios_i2c_adapter *i2c_adapter)
 {
@@ -822,63 +811,107 @@ void PIOS_I2C_GetDiagnostics(struct pios_i2c_fault_history * data, uint8_t * cou
 #endif
 }
 
+static bool PIOS_I2C_validate(struct pios_i2c_adapter * i2c_adapter)
+{
+	return (i2c_adapter->magic == PIOS_I2C_DEV_MAGIC);
+}
+
+#if defined(PIOS_INCLUDE_FREERTOS) && 0
+static struct pios_i2c_dev * PIOS_I2C_alloc(void)
+{
+	struct pios_i2c_dev * i2c_adapter;
+
+	i2c_adapter = (struct pios_i2c_adapter *)malloc(sizeof(*i2c_adapter));
+	if (!i2c_adapter) return(NULL);
+
+	i2c_adapter->magic = PIOS_I2C_DEV_MAGIC;
+	return(i2c_adapter);
+}
+#else
+static struct pios_i2c_adapter pios_i2c_adapters[PIOS_I2C_MAX_DEVS];
+static uint8_t pios_i2c_num_adapters;
+static struct pios_i2c_adapter * PIOS_I2C_alloc(void)
+{
+	struct pios_i2c_adapter * i2c_adapter;
+
+	if (pios_i2c_num_adapters >= PIOS_I2C_MAX_DEVS) {
+		return (NULL);
+	}
+
+	i2c_adapter = &pios_i2c_adapters[pios_i2c_num_adapters++];
+	i2c_adapter->magic = PIOS_I2C_DEV_MAGIC;
+
+	return (i2c_adapter);
+}
+#endif
+
+
 /**
 * Initializes IIC driver
 * \param[in] mode currently only mode 0 supported
 * \return < 0 if initialisation failed
 */
-int32_t PIOS_I2C_Init(void)
+int32_t PIOS_I2C_Init(uint32_t * i2c_id, const struct pios_i2c_adapter_cfg * cfg)
 {
-	struct pios_i2c_adapter *i2c_adapter;
+	PIOS_DEBUG_Assert(i2c_id);
+	PIOS_DEBUG_Assert(cfg);
 
-	for (uint8_t i = 0; i < pios_i2c_num_adapters; i++) {
-		/* Get a handle for the device configuration */
-		i2c_adapter = find_i2c_adapter_by_id(i);
-		PIOS_DEBUG_Assert(i2c_adapter);
+	struct pios_i2c_adapter * i2c_adapter;
+
+	i2c_adapter = (struct pios_i2c_adapter *) PIOS_I2C_alloc();
+	if (!i2c_adapter) goto out_fail;
+
+	/* Bind the configuration to the device instance */
+	i2c_adapter->cfg = cfg;
 
 #ifdef USE_FREERTOS
-		/* 
-		 * Must be done prior to calling i2c_adapter_fsm_init()
-		 * since the sem_ready mutex is used in the initial state.
-		 */
-		vSemaphoreCreateBinary(i2c_adapter->sem_ready);
-		i2c_adapter->sem_busy = xSemaphoreCreateMutex();
+	/* 
+	 * Must be done prior to calling i2c_adapter_fsm_init()
+	 * since the sem_ready mutex is used in the initial state.
+	 */
+	vSemaphoreCreateBinary(i2c_adapter->sem_ready);
+	i2c_adapter->sem_busy = xSemaphoreCreateMutex();
 #endif // USE_FREERTOS
 
-		/* Enable the associated peripheral clock */
-		switch ((uint32_t) i2c_adapter->cfg->regs) {
-		case (uint32_t) I2C1:
-			/* Enable I2C peripheral clock (APB1 == slow speed) */
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1, ENABLE);
-			break;
-		case (uint32_t) I2C2:
-			/* Enable I2C peripheral clock (APB1 == slow speed) */
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
-			break;
-		}
-
-		/* Initialize the state machine */
-		i2c_adapter_fsm_init(i2c_adapter);
-
-		/* Configure and enable I2C interrupts */
-		NVIC_Init(&(i2c_adapter->cfg->event.init));
-		NVIC_Init(&(i2c_adapter->cfg->error.init));
+	/* Enable the associated peripheral clock */
+	switch ((uint32_t) i2c_adapter->cfg->regs) {
+	case (uint32_t) I2C1:
+		/* Enable I2C peripheral clock (APB1 == slow speed) */
+		RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1, ENABLE);
+		break;
+	case (uint32_t) I2C2:
+		/* Enable I2C peripheral clock (APB1 == slow speed) */
+		RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
+		break;
 	}
+
+	/* Initialize the state machine */
+	i2c_adapter_fsm_init(i2c_adapter);
+
+	*i2c_id = (uint32_t)i2c_adapter;
+
+	/* Configure and enable I2C interrupts */
+	NVIC_Init(&(i2c_adapter->cfg->event.init));
+	NVIC_Init(&(i2c_adapter->cfg->error.init));
 	
 	/* No error */
 	return 0;
+
+out_fail:
+	return(-1);
 }
 
-bool PIOS_I2C_Transfer(uint8_t i2c, const struct pios_i2c_txn txn_list[], uint32_t num_txns)
+bool PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], uint32_t num_txns)
 {
+	struct pios_i2c_adapter * i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
+
+	bool valid = PIOS_I2C_validate(i2c_adapter);
+	PIOS_Assert(valid)
+
 	PIOS_DEBUG_Assert(txn_list);
 	PIOS_DEBUG_Assert(num_txns);
 
-	struct pios_i2c_adapter *i2c_adapter;
 	bool semaphore_success = true;
-
-	i2c_adapter = find_i2c_adapter_by_id(i2c);
-	PIOS_DEBUG_Assert(i2c_adapter);
 
 #ifdef USE_FREERTOS
 	/* Lock the bus */
@@ -928,14 +961,13 @@ bool PIOS_I2C_Transfer(uint8_t i2c, const struct pios_i2c_txn txn_list[], uint32
 
 #endif
 
-void PIOS_I2C_EV_IRQ_Handler(uint8_t i2c)
+void PIOS_I2C_EV_IRQ_Handler(uint32_t i2c_id)
 {
-	struct pios_i2c_adapter *i2c_adapter;
-	
-	
-	i2c_adapter = find_i2c_adapter_by_id(i2c);
-	PIOS_DEBUG_Assert(i2c_adapter);
-		
+	struct pios_i2c_adapter * i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
+
+	bool valid = PIOS_I2C_validate(i2c_adapter);
+	PIOS_Assert(valid)
+
 	uint32_t event = I2C_GetLastEvent(i2c_adapter->cfg->regs);
 
 #if defined(PIOS_I2C_DIAGNOSTICS)	
@@ -1052,14 +1084,14 @@ skip_event:
 }
 
 
-void PIOS_I2C_ER_IRQ_Handler(uint8_t i2c)
+void PIOS_I2C_ER_IRQ_Handler(uint32_t i2c_id)
 {
-	struct pios_i2c_adapter *i2c_adapter;
+	struct pios_i2c_adapter * i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
 
-	i2c_adapter = find_i2c_adapter_by_id(i2c);
-	PIOS_DEBUG_Assert(i2c_adapter);
-		
-#if defined(PIOS_I2C_DIAGNOSTICS)	
+	bool valid = PIOS_I2C_validate(i2c_adapter);
+	PIOS_Assert(valid)
+
+#if defined(PIOS_I2C_DIAGNOSTICS)
 	uint32_t event = I2C_GetLastEvent(i2c_adapter->cfg->regs);
 
 	i2c_erirq_history[i2c_erirq_history_pointer] = event;

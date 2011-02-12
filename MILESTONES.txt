@@ -72,24 +72,25 @@ C: Eric Price (CorvusCorax), James Cotton
 D: February 2011
 V: http://cybertrench.com/vixen/internet-telemetry_small.avi
 
+M: First CopterControl flight on a Fixed Wing
+C: Oleg Semyonov (osnwt)
+D: February 2011
+V: http://www.youtube.com/watch?v=gt1ok7iSGDY
+
+
 M: First CopterControl flight on a Tri
 C: ?
-D: January 2010
+D: ?
 V: 
 
 M: First CopterControl flight on a Hexa
 C: ?
-D: January 2010
+D: ?
 V: 
 
 M: First CopterControl flight on a Flybarless Heli
 C: ?
-D: January 2010
-V: 
-
-M: First CopterControl flight on a Fixed Wing
-C: ?
-D: January 2010
+D: ?
 V: 
 
 

@@ -150,20 +150,36 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //-------------------------
 // PIOS_USART
 //-------------------------
+#define PIOS_USART_MAX_DEVS			2
+
 #define PIOS_USART_RX_BUFFER_SIZE               256
 #define PIOS_USART_TX_BUFFER_SIZE               256
-#define PIOS_USART_BAUDRATE                     57600
-#define PIOS_COM_DEBUG                          PIOS_COM_TELEM_RF
 
-#define PIOS_COM_TELEM_RF               0
-#ifdef PIOS_INCLUDE_GPS
-	#define PIOS_COM_GPS                2
-#endif
-#define PIOS_COM_TELEM_USB              1
+//-------------------------
+// PIOS_COM
+//
+// See also pios_board.c
+//-------------------------
+#define PIOS_COM_MAX_DEVS			4
+
+#define PIOS_COM_TELEM_BAUDRATE         57600
+extern uint32_t pios_com_telem_rf_id;
+#define PIOS_COM_TELEM_RF               (pios_com_telem_rf_id)
+#define PIOS_COM_DEBUG                  PIOS_COM_TELEM_RF
+
+#if defined(PIOS_INCLUDE_GPS)
+#define PIOS_COM_GPS_BAUDRATE           57600
+extern uint32_t pios_com_gps_id;
+#define PIOS_COM_GPS                    (pios_com_gps_id)
+#endif	/* PIOS_INCLUDE_GPS */
+
+extern uint32_t pios_com_telem_usb_id;
+#define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
 
 #ifdef PIOS_INCLUDE_SPEKTRUM
-    #define PIOS_COM_SPEKTRUM_BAUDRATE  115200
-    #define PIOS_COM_SPEKTRUM           2
+#define PIOS_COM_SPEKTRUM_BAUDRATE      115200
+extern uint32_t pios_com_spektrum_id;
+#define PIOS_COM_SPEKTRUM               (pios_com_spektrum_id)
 #endif
 
 //-------------------------

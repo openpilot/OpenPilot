@@ -50,6 +50,9 @@
 
 #include "main.h"
 
+/* Prototype of PIOS_Board_Init() function */
+extern void PIOS_Board_Init(void);
+
 // *****************************************************************************
 // ADC data
 
@@ -589,32 +592,12 @@ int main()
     saved_settings.frequency_band = FREQBAND_UNKNOWN;
 
     // *************
-
-    // Bring up System using CMSIS functions, enables the LEDs.
-    PIOS_SYS_Init();
-
-    // turn all the leds on
-    USB_LED_ON;
-    LINK_LED_ON;
-    RX_LED_ON;
-    TX_LED_ON;
+    PIOS_Board_Init();
 
     CRC_init();
 
     // read the CPU details
     get_CPUDetails();
-
-    // Delay system
-    PIOS_DELAY_Init();
-
-    // UART communication system
-    PIOS_COM_Init();
-
-    // ADC system
-//    PIOS_ADC_Init();
-
-    // SPI link to master
-    PIOS_SPI_Init();
 
     // setup the GPIO input pins
     GPIO_IN_Init();

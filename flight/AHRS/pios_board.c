@@ -260,47 +260,17 @@ const struct pios_usart_cfg pios_usart_aux_cfg = {
 	       },
 };
 
-/*
- * Board specific number of devices.
- */
-struct pios_usart_dev pios_usart_devs[] = {
-#define PIOS_USART_AUX    0
-	{
-	 .cfg = &pios_usart_aux_cfg,
-	 },
-};
-
-uint8_t pios_usart_num_devices = NELEMENTS(pios_usart_devs);
-
+static uint32_t pios_usart_aux_id;
 void PIOS_USART_aux_irq_handler(void)
 {
-	PIOS_USART_IRQ_Handler(PIOS_USART_AUX);
+	PIOS_USART_IRQ_Handler(pios_usart_aux_id);
 }
 
 #endif /* PIOS_INCLUDE_USART */
 
 #if defined(PIOS_INCLUDE_COM)
+
 #include <pios_com_priv.h>
-
-/*
- * COM devices
- */
-
-/*
- * Board specific number of devices.
- */
-extern const struct pios_com_driver pios_usart_com_driver;
-
-struct pios_com_dev pios_com_devs[] = {
-#if defined(PIOS_INCLUDE_USART)
-	{
-	 .id = PIOS_USART_AUX,
-	 .driver = &pios_usart_com_driver,
-	 },
-#endif
-};
-
-const uint8_t pios_com_num_devices = NELEMENTS(pios_com_devs);
 
 #endif /* PIOS_INCLUDE_COM */
 
@@ -414,3 +384,60 @@ static const struct stm32_gpio pios_debug_pins[] = {
 };
 
 #endif /* PIOS_ENABLE_DEBUG_PINS */
+
+extern const struct pios_com_driver pios_usart_com_driver;
+
+uint32_t pios_com_aux_id;
+uint8_t adc_fifo_buf[sizeof(float) * 6 * 4] __attribute__ ((aligned(4)));    // align to 32-bit to try and provide speed improvement
+
+/**
+ * PIOS_Board_Init()
+ * initializes all the core subsystems on this specific hardware
+ * called from System/openpilot.c
+ */
+void PIOS_Board_Init(void) {
+	/* Brings up System using CMSIS functions, enables the LEDs. */
+	PIOS_SYS_Init();
+
+	PIOS_LED_On(LED1);
+
+	/* Delay system */
+	PIOS_DELAY_Init();
+
+	/* Communication system */
+#if !defined(PIOS_ENABLE_DEBUG_PINS)
+#if defined(PIOS_INCLUDE_COM)
+	if (PIOS_USART_Init(&pios_usart_aux_id, &pios_usart_aux_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+	if (PIOS_COM_Init(&pios_com_aux_id, &pios_usart_com_driver, pios_usart_aux_id)) {
+		PIOS_DEBUG_Assert(0);
+	}
+#endif	/* PIOS_INCLUDE_COM */
+#endif
+
+	/* IAP System Setup */
+	PIOS_IAP_Init();
+
+	/* ADC system */
+	PIOS_ADC_Init();
+	extern uint8_t adc_oversampling;
+	PIOS_ADC_Config(adc_oversampling);
+	extern void adc_callback(float *);
+	PIOS_ADC_SetCallback(adc_callback);
+
+	/* ADC buffer */
+	extern t_fifo_buffer adc_fifo_buffer;
+	fifoBuf_init(&adc_fifo_buffer, adc_fifo_buf, sizeof(adc_fifo_buf));
+
+	/* Setup the Accelerometer FS (Full-Scale) GPIO */
+	PIOS_GPIO_Enable(0);
+	SET_ACCEL_6G;
+
+#if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
+	/* Magnetic sensor system */
+	PIOS_I2C_Init();
+	PIOS_HMC5843_Init();
+#endif
+
+}

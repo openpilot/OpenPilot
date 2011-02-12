@@ -32,30 +32,28 @@
 #ifndef PIOS_COM_H
 #define PIOS_COM_H
 
-/* Public Functions */
-extern int32_t PIOS_COM_Init(void);
-extern int32_t PIOS_COM_ChangeBaud(uint8_t port, uint32_t baud);
-extern int32_t PIOS_COM_SendCharNonBlocking(uint8_t port, char c);
-extern int32_t PIOS_COM_SendChar(uint8_t port, char c);
-extern int32_t PIOS_COM_SendBufferNonBlocking(uint8_t port, const uint8_t * buffer, uint16_t len);
-extern int32_t PIOS_COM_SendBuffer(uint8_t port, const uint8_t * buffer, uint16_t len);
-extern int32_t PIOS_COM_SendStringNonBlocking(uint8_t port, const char *str);
-extern int32_t PIOS_COM_SendString(uint8_t port, const char *str);
-extern int32_t PIOS_COM_SendFormattedStringNonBlocking(uint8_t port, const char *format, ...);
-extern int32_t PIOS_COM_SendFormattedString(uint8_t port, const char *format, ...);
-extern uint8_t PIOS_COM_ReceiveBuffer(uint8_t port);
-extern int32_t PIOS_COM_ReceiveBufferUsed(uint8_t port);
-
-extern int32_t PIOS_COM_ReceiveHandler(void);
-
 struct pios_com_driver {
-	void (*init) (uint8_t id);
-	void (*set_baud) (uint8_t id, uint32_t baud);
-	int32_t(*tx_nb) (uint8_t id, const uint8_t * buffer, uint16_t len);
-	int32_t(*tx) (uint8_t id, const uint8_t * buffer, uint16_t len);
-	int32_t(*rx) (uint8_t id);
-	int32_t(*rx_avail) (uint8_t id);
+	void    (*init)(uint32_t id);
+	void    (*set_baud)(uint32_t id, uint32_t baud);
+	int32_t (*tx_nb)(uint32_t id, const uint8_t *buffer, uint16_t len);
+	int32_t (*tx)(uint32_t id, const uint8_t *buffer, uint16_t len);
+	int32_t (*rx)(uint32_t id);
+	int32_t (*rx_avail)(uint32_t id);
 };
+
+/* Public Functions */
+extern int32_t PIOS_COM_Init(uint32_t * com_id, const struct pios_com_driver * driver, const uint32_t lower_id);
+extern int32_t PIOS_COM_ChangeBaud(uint32_t com_id, uint32_t baud);
+extern int32_t PIOS_COM_SendCharNonBlocking(uint32_t com_id, char c);
+extern int32_t PIOS_COM_SendChar(uint32_t com_id, char c);
+extern int32_t PIOS_COM_SendBufferNonBlocking(uint32_t com_id, const uint8_t *buffer, uint16_t len);
+extern int32_t PIOS_COM_SendBuffer(uint32_t com_id, const uint8_t *buffer, uint16_t len);
+extern int32_t PIOS_COM_SendStringNonBlocking(uint32_t com_id, const char *str);
+extern int32_t PIOS_COM_SendString(uint32_t com_id, const char *str);
+extern int32_t PIOS_COM_SendFormattedStringNonBlocking(uint32_t com_id, const char *format, ...);
+extern int32_t PIOS_COM_SendFormattedString(uint32_t com_id, const char *format, ...);
+extern uint8_t PIOS_COM_ReceiveBuffer(uint32_t com_id);
+extern int32_t PIOS_COM_ReceiveBufferUsed(uint32_t com_id);
 
 #endif /* PIOS_COM_H */
 

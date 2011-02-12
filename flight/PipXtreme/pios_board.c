@@ -250,6 +250,7 @@ void PIOS_ADC_handler() {
 // USART
 
 #if defined(PIOS_INCLUDE_USART)
+
 #include <pios_usart_priv.h>
 
 /*
@@ -263,11 +264,7 @@ const struct pios_usart_cfg pios_usart_serial_cfg =
 	.regs = USART1,
 	.init =
 	{
-		#if defined(PIOS_USART_BAUDRATE)
-			.USART_BaudRate = PIOS_USART_BAUDRATE,
-		#else
-			.USART_BaudRate = 57600,
-		#endif
+		.USART_BaudRate = 57600,
 		.USART_WordLength = USART_WordLength_8b,
 		.USART_Parity = USART_Parity_No,
 		.USART_StopBits = USART_StopBits_1,
@@ -307,22 +304,10 @@ const struct pios_usart_cfg pios_usart_serial_cfg =
 	},
 };
 
-/*
- * Board specific number of devices.
- */
-struct pios_usart_dev pios_usart_devs[] =
-{
-	#define PIOS_USART_SERIAL    0
-	{
-		.cfg = &pios_usart_serial_cfg,
-	},
-};
-
-uint8_t pios_usart_num_devices = NELEMENTS(pios_usart_devs);
-
+static uint32_t pios_usart_serial_id;
 void PIOS_USART_serial_irq_handler(void)
 {
-	PIOS_USART_IRQ_Handler(PIOS_USART_SERIAL);
+	PIOS_USART_IRQ_Handler(pios_usart_serial_id);
 }
 
 #endif /* PIOS_INCLUDE_USART */
@@ -330,36 +315,55 @@ void PIOS_USART_serial_irq_handler(void)
 // ***********************************************************************************
 
 #if defined(PIOS_INCLUDE_COM)
+
 #include <pios_com_priv.h>
-
-/*
- * COM devices
- */
-
-/*
- * Board specific number of devices.
- */
-extern const struct pios_com_driver pios_usart_com_driver;
-#if defined(PIOS_INCLUDE_USB_HID)
-	extern const struct pios_com_driver pios_usb_com_driver;
-#endif
-
-struct pios_com_dev pios_com_devs[] =
-{
-	{
-		.id = PIOS_USART_SERIAL,
-		.driver = &pios_usart_com_driver,
-	},
-#if defined(PIOS_INCLUDE_USB_HID)
-  {
-    .id     = 0,
-    .driver = &pios_usb_com_driver,
-  },
-#endif
-};
-
-const uint8_t pios_com_num_devices = NELEMENTS(pios_com_devs);
 
 #endif /* PIOS_INCLUDE_COM */
 
 // ***********************************************************************************
+
+extern const struct pios_com_driver pios_usb_com_driver;
+
+uint32_t pios_com_serial_id;
+uint32_t pios_com_telem_usb_id;
+
+/**
+ * PIOS_Board_Init()
+ * initializes all the core subsystems on this specific hardware
+ * called from System/openpilot.c
+ */
+void PIOS_Board_Init(void) {
+	// Bring up System using CMSIS functions, enables the LEDs.
+	PIOS_SYS_Init();
+
+	// turn all the leds on
+	USB_LED_ON;
+	LINK_LED_ON;
+	RX_LED_ON;
+	TX_LED_ON;
+
+	// Delay system
+	PIOS_DELAY_Init();
+
+	if (PIOS_USART_Init(&pios_usart_serial_id, &pios_usart_serial_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+	if (PIOS_COM_Init(&pios_com_serial_id, &pios_usart_com_driver, pios_usart_serial_id)) {
+		PIOS_DEBUG_Assert(0);
+	}
+
+#if defined(PIOS_INCLUDE_USB_HID)
+	PIOS_USB_HID_Init(0);
+#if defined(PIOS_INCLUDE_COM)
+	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, 0)) {
+		PIOS_DEBUG_Assert(0);
+	}
+#endif	/* PIOS_INCLUDE_COM */
+#endif  /* PIOS_INCLUDE_USB_HID */
+
+	// ADC system
+	// PIOS_ADC_Init();
+
+	// SPI link to master
+	PIOS_SPI_Init();
+}

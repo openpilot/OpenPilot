@@ -49,7 +49,7 @@
 // Private types
 
 // Private variables
-static uint8_t telemetryPort;
+static uint32_t telemetryPort;
 static xQueueHandle queue;
 
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
@@ -290,7 +290,7 @@ static void telemetryTxPriTask(void *parameters)
  */
 static void telemetryRxTask(void *parameters)
 {
-	uint8_t inputPort;
+	uint32_t inputPort;
 	int32_t len;
 
 	// Task loop
@@ -324,7 +324,7 @@ static void telemetryRxTask(void *parameters)
  */
 static int32_t transmitData(uint8_t * data, int32_t length)
 {
-	uint8_t outputPort;
+	uint32_t outputPort;
 
 	// Determine input port (USB takes priority over telemetry port)
 #if defined(PIOS_INCLUDE_USB_HID)

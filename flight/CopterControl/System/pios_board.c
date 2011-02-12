@@ -29,64 +29,9 @@
 
 #include <pios.h>
 #include <pios_spi_priv.h>
-#include <pios_usart_priv.h>
-#include <pios_com_priv.h>
 #include <pios_i2c_priv.h>
 #include <openpilot.h>
 #include <uavobjectsinit.h>
-
-/**
- * PIOS_Board_Init()
- * initializes all the core subsystems on this specific hardware
- * called from System/openpilot.c
- */
-void PIOS_Board_Init(void) {
-
-	/* Delay system */
-	PIOS_DELAY_Init();	
-	
-	/* SPI Init */
-	PIOS_SPI_Init();
-	PIOS_Flash_W25X_Init();
-
-#if defined(PIOS_INCLUDE_SPEKTRUM)
-	/* SPEKTRUM init must come before comms */
-	PIOS_SPEKTRUM_Init();
-#endif
-	/* Initialize UAVObject libraries */
-	EventDispatcherInitialize();
-	UAVObjInitialize();
-	UAVObjectsInitializeAll();
-
-	/* Initialize the alarms library */
-	AlarmsInitialize();
-
-	/* Initialize the task monitor library */
-	TaskMonitorInitialize();
-
-	/* Initialize the PiOS library */
-	PIOS_COM_Init();
-
-	/* Remap AFIO pin */
-	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);
-	PIOS_Servo_Init();
-	
-	PIOS_ADC_Init();
-	PIOS_GPIO_Init();
-
-#if defined(PIOS_INCLUDE_PWM)
-	PIOS_PWM_Init();
-#endif
-#if defined(PIOS_INCLUDE_PPM)
-	PIOS_PPM_Init();
-#endif
-#if defined(PIOS_INCLUDE_USB_HID)
-	PIOS_USB_HID_Init(0);
-#endif
-	PIOS_I2C_Init();
-	PIOS_IAP_Init();
-	PIOS_WDG_Init();
-}
 
 /* Flash/Accel Interface
  * 
@@ -256,6 +201,9 @@ void PIOS_ADC_handler() {
 	PIOS_ADC_DMA_Handler();
 }
 
+#if defined(PIOS_INCLUDE_USART)
+
+#include "pios_usart_priv.h"
 
 /*
  * Telemetry USART
@@ -303,7 +251,7 @@ const struct pios_usart_cfg pios_usart_telem_cfg = {
   },
 };
 
-#ifdef PIOS_COM_GPS
+#if defined(PIOS_INCLUDE_GPS)
 /*
  * GPS USART
  */
@@ -351,56 +299,64 @@ const struct pios_usart_cfg pios_usart_gps_cfg = {
 };
 #endif
 
-#ifdef PIOS_COM_SPEKTRUM
+#if defined(PIOS_INCLUDE_SPEKTRUM)
 /*
  * SPEKTRUM USART
  */
-#include <pios_spektrum_priv.h>
 void PIOS_USART_spektrum_irq_handler(void);
 void USART3_IRQHandler() __attribute__ ((alias ("PIOS_USART_spektrum_irq_handler")));
+const struct pios_usart_cfg pios_usart_spektrum_cfg = {
+	.regs = USART3,
+	.init = {
+	#if defined (PIOS_COM_SPEKTRUM_BAUDRATE)
+		.USART_BaudRate        = PIOS_COM_SPEKTRUM_BAUDRATE,
+	#else
+		.USART_BaudRate        = 115200,
+	#endif
+		.USART_WordLength          = USART_WordLength_8b,
+		.USART_Parity              = USART_Parity_No,
+		.USART_StopBits            = USART_StopBits_1,
+		.USART_HardwareFlowControl = USART_HardwareFlowControl_None,
+		.USART_Mode                = USART_Mode_Rx,
+	},
+	.irq = {
+		.handler = PIOS_USART_spektrum_irq_handler,
+		.init = {
+			.NVIC_IRQChannel                   = USART3_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		  },
+	},
+	.rx = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_11,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode  = GPIO_Mode_IPU,
+		},
+	},
+	.tx = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_10,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode  = GPIO_Mode_IN_FLOATING,
+		},
+	},
+};
+
+static uint32_t pios_usart_spektrum_id;
+void PIOS_USART_spektrum_irq_handler(void)
+{
+	SPEKTRUM_IRQHandler(pios_usart_spektrum_id);
+}
+
+#include <pios_spektrum_priv.h>
 void TIM2_IRQHandler();
 void TIM2_IRQHandler() __attribute__ ((alias ("PIOS_TIM2_irq_handler")));
 const struct pios_spektrum_cfg pios_spektrum_cfg = {
-	.pios_usart_spektrum_cfg = {
-		  .regs = USART3,
-		  .init = {
-			#if defined (PIOS_COM_SPEKTRUM_BAUDRATE)
-				.USART_BaudRate        = PIOS_COM_SPEKTRUM_BAUDRATE,
-			#else
-				.USART_BaudRate        = 115200,
-			#endif
-			.USART_WordLength          = USART_WordLength_8b,
-			.USART_Parity              = USART_Parity_No,
-			.USART_StopBits            = USART_StopBits_1,
-			.USART_HardwareFlowControl = USART_HardwareFlowControl_None,
-			.USART_Mode                = USART_Mode_Rx,
-		  },
-		  .irq = {
-			.handler = PIOS_USART_spektrum_irq_handler,
-			.init    = {
-			  .NVIC_IRQChannel                   = USART3_IRQn,
-			  .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
-			  .NVIC_IRQChannelSubPriority        = 0,
-			  .NVIC_IRQChannelCmd                = ENABLE,
-			},
-		  },
-		  .rx   = {
-			.gpio = GPIOB,
-			.init = {
-			  .GPIO_Pin   = GPIO_Pin_11,
-			  .GPIO_Speed = GPIO_Speed_2MHz,
-			  .GPIO_Mode  = GPIO_Mode_IPU,
-			},
-		  },
-		  .tx   = {
-			.gpio = GPIOB,
-			.init = {
-			  .GPIO_Pin   = GPIO_Pin_10,
-			  .GPIO_Speed = GPIO_Speed_2MHz,
-			  .GPIO_Mode  = GPIO_Mode_IN_FLOATING,
-			},
-		  },
-	},
+	.pios_usart_spektrum_cfg = pios_usart_spektrum_cfg;
 	.tim_base_init = {
 		.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,	/* For 1 uS accuracy */
 		.TIM_ClockDivision = TIM_CKD_DIV1,
@@ -431,88 +387,29 @@ void PIOS_TIM2_irq_handler()
 {
 	PIOS_SPEKTRUM_irq_handler();
 }
-#endif
+#endif	/* PIOS_INCLUDE_SPEKTRUM */
 
-/*
- * Board specific number of devices.
- */
-struct pios_usart_dev pios_usart_devs[] = {
-#define PIOS_USART_TELEM  0
-  {
-    .cfg = &pios_usart_telem_cfg,
-  },
-#ifdef PIOS_COM_GPS
-#define PIOS_USART_GPS    1
-  {
-    .cfg = &pios_usart_gps_cfg,
-  },
-#endif
-#ifdef PIOS_COM_SPEKTRUM
-#define PIOS_USART_AUX    2
-  {
-    .cfg = &pios_spektrum_cfg.pios_usart_spektrum_cfg,
-  },
-#endif
-};
-
-uint8_t pios_usart_num_devices = NELEMENTS(pios_usart_devs);
-
+static uint32_t pios_usart_telem_rf_id;
 void PIOS_USART_telem_irq_handler(void)
 {
-  PIOS_USART_IRQ_Handler(PIOS_USART_TELEM);
+	PIOS_USART_IRQ_Handler(pios_usart_telem_rf_id);
 }
 
-#ifdef PIOS_COM_GPS
+#if defined(PIOS_INCLUDE_GPS)
+static uint32_t pios_usart_gps_id;
 void PIOS_USART_gps_irq_handler(void)
 {
-  PIOS_USART_IRQ_Handler(PIOS_USART_GPS);
+	PIOS_USART_IRQ_Handler(pios_usart_gps_id);
 }
-#endif
+#endif	/* PIOS_INCLUDE_GPS */
 
-#ifdef PIOS_COM_SPEKTRUM
-void PIOS_USART_spektrum_irq_handler(void)
-{
-	SPEKTRUM_IRQHandler();
-}
-#endif
+#endif	/* PIOS_INCLUDE_USART */
 
-/*
- * COM devices
- */
+#if defined(PIOS_INCLUDE_COM)
 
-/*
- * Board specific number of devices.
- */
-extern const struct pios_com_driver pios_usart_com_driver;
-extern const struct pios_com_driver pios_usb_com_driver;
+#include "pios_com_priv.h"
 
-struct pios_com_dev pios_com_devs[] = {
-  {
-    .id     = PIOS_USART_TELEM,
-    .driver = &pios_usart_com_driver,
-  },
-#if defined(PIOS_INCLUDE_USB_HID)
-  {
-    .id     = 0,
-    .driver = &pios_usb_com_driver,
-  },
-#endif
-#ifdef PIOS_COM_GPS
-	{
-		.id     = PIOS_USART_GPS,
-		.driver = &pios_usart_com_driver,
-	},
-#endif
-#ifdef PIOS_COM_SPEKTRUM
-  {
-    .id     = PIOS_USART_AUX,
-    .driver = &pios_usart_com_driver,
-  },
-#endif
-};
-
-const uint8_t pios_com_num_devices = NELEMENTS(pios_com_devs);
-
+#endif	/* PIOS_INCLUDE_COM */
 
 /* 
  * Servo outputs 
@@ -766,6 +663,86 @@ void PIOS_I2C_main_adapter_er_irq_handler(void)
 {
   /* Call into the generic code to handle the IRQ for this specific device */
   PIOS_I2C_ER_IRQ_Handler(PIOS_I2C_MAIN_ADAPTER);
+}
+
+extern const struct pios_com_driver pios_usb_com_driver;
+
+uint32_t pios_com_telem_rf_id;
+uint32_t pios_com_telem_usb_id;
+uint32_t pios_com_gps_id;
+uint32_t pios_com_spektrum_id;
+
+/**
+ * PIOS_Board_Init()
+ * initializes all the core subsystems on this specific hardware
+ * called from System/openpilot.c
+ */
+void PIOS_Board_Init(void) {
+
+	/* Delay system */
+	PIOS_DELAY_Init();	
+	
+	/* SPI Init */
+	PIOS_SPI_Init();
+	PIOS_Flash_W25X_Init();
+
+#if defined(PIOS_INCLUDE_SPEKTRUM)
+	/* SPEKTRUM init must come before comms */
+	PIOS_SPEKTRUM_Init();
+#endif
+	/* Initialize UAVObject libraries */
+	EventDispatcherInitialize();
+	UAVObjInitialize();
+	UAVObjectsInitializeAll();
+
+	/* Initialize the alarms library */
+	AlarmsInitialize();
+
+	/* Initialize the task monitor library */
+	TaskMonitorInitialize();
+
+	/* Initialize the PiOS library */
+#if defined(PIOS_INCLUDE_COM)
+	if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+	if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id)) {
+		PIOS_DEBUG_Assert(0);
+	}
+#if defined(PIOS_INCLUDE_GPS)
+	if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+	if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id)) {
+		PIOS_DEBUG_Assert(0);
+	}
+#endif	/* PIOS_INCLUDE_GPS */
+#endif	/* PIOS_INCLUDE_COM */
+
+	/* Remap AFIO pin */
+	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);
+	PIOS_Servo_Init();
+	
+	PIOS_ADC_Init();
+	PIOS_GPIO_Init();
+
+#if defined(PIOS_INCLUDE_PWM)
+	PIOS_PWM_Init();
+#endif
+#if defined(PIOS_INCLUDE_PPM)
+	PIOS_PPM_Init();
+#endif
+#if defined(PIOS_INCLUDE_USB_HID)
+	PIOS_USB_HID_Init(0);
+#if defined(PIOS_INCLUDE_COM)
+	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, 0)) {
+		PIOS_DEBUG_Assert(0);
+	}
+#endif	/* PIOS_INCLUDE_COM */
+#endif
+	PIOS_I2C_Init();
+	PIOS_IAP_Init();
+	PIOS_WDG_Init();
 }
 
 /**

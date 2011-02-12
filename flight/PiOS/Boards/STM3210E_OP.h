@@ -142,34 +142,44 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_BMP085_OVERSAMPLING                3
 
 //-------------------------
-// USART
+// PIOS_USART
 //
 // See also pios_board.c
 //-------------------------
+#define PIOS_USART_MAX_DEVS             3
+
 #define PIOS_USART_RX_BUFFER_SIZE       512
 #define PIOS_USART_TX_BUFFER_SIZE       512
 
-#define PIOS_COM_TELEM_BAUDRATE         57600
-#define PIOS_COM_GPS_BAUDRATE           57600
+//-------------------------
+// PIOS_COM
+//
+// See also pios_board.c
+//-------------------------
+#define PIOS_COM_MAX_DEVS               4
 
-#ifdef PIOS_NO_GPS
-	#define PIOS_COM_TELEM_RF               0
-	#define PIOS_COM_TELEM_USB              1
-#else
-	#define PIOS_COM_TELEM_RF               0
-	#define PIOS_COM_GPS                    1
-	#define PIOS_COM_TELEM_USB              2
-#endif
+#define PIOS_COM_TELEM_BAUDRATE         57600
+extern uint32_t pios_com_telem_rf_id;
+#define PIOS_COM_TELEM_RF               (pios_com_telem_rf_id)
+
+#define PIOS_COM_GPS_BAUDRATE           57600
+extern uint32_t pios_com_gps_id;
+#define PIOS_COM_GPS                    (pios_com_gps_id)
+
+extern uint32_t pios_com_telem_usb_id;
+#define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
 
 #ifdef PIOS_ENABLE_AUX_UART
-    #define PIOS_COM_AUX_BAUDRATE       57600
-    #define PIOS_COM_AUX                3
-	#define PIOS_COM_DEBUG              PIOS_COM_AUX
+#define PIOS_COM_AUX_BAUDRATE           57600
+extern uint32_t pios_com_aux_id;
+#define PIOS_COM_AUX                    (pios_com_aux_id)
+#define PIOS_COM_DEBUG                  PIOS_COM_AUX
 #endif
 
 #ifdef PIOS_INCLUDE_SPEKTRUM
-    #define PIOS_COM_SPEKTRUM_BAUDRATE  115200
-    #define PIOS_COM_SPEKTRUM           3
+#define PIOS_COM_SPEKTRUM_BAUDRATE      115200
+extern uint32_t pios_com_spektrum_id;
+#define PIOS_COM_SPEKTRUM               (pios_com_spektrum_id)
 #endif
 
 //-------------------------

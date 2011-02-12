@@ -58,7 +58,7 @@ static void setHomeLocation(GPSPositionData * gpsData);
 // Private types
 
 // Private variables
-static uint8_t gpsPort;
+static uint32_t    gpsPort;
 static xTaskHandle gpsTaskHandle;
 static char gps_rx_buffer[NMEA_BUFFERSIZE];
 
@@ -182,7 +182,7 @@ static void gpsTask(void *parameters)
 				}
 			}
 		}
-		
+
 		// Check for GPS timeout
 		timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
 		if ((timeNowMs - timeOfLastUpdateMs) > GPS_TIMEOUT_MS) {
@@ -194,7 +194,7 @@ static void gpsTask(void *parameters)
 			// Had an update
 			HomeLocationData home;
 			HomeLocationGet(&home);
-			
+
 			GPSPositionGet(&GpsData);
 			if ((GpsData.Status == GPSPOSITION_STATUS_FIX3D) && (home.Set == HOMELOCATION_SET_FALSE)) {
 				setHomeLocation(&GpsData);
@@ -206,7 +206,7 @@ static void gpsTask(void *parameters)
 			else if (GpsData.Status == GPSPOSITION_STATUS_FIX3D) AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_WARNING);
 			else AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_CRITICAL);
 		}
-		
+
 		// Block task until next update
 		vTaskDelay(xDelay);
 	}
@@ -219,8 +219,7 @@ static void setHomeLocation(GPSPositionData * gpsData)
 	GPSTimeData gps;
 	GPSTimeGet(&gps);
 
-	if (gps.Year >= 2000)
-	{
+	if (gps.Year >= 2000) {
 		// Store LLA
 		home.Latitude = gpsData->Latitude;
 		home.Longitude = gpsData->Longitude;

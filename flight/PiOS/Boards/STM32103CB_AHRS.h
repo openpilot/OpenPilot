@@ -137,10 +137,19 @@ TIM8  |           |           |           |
 //-------------------------
 // PIOS_USART
 //-------------------------
+#define PIOS_USART_MAX_DEVS			2
 #define PIOS_USART_RX_BUFFER_SIZE		256
 #define PIOS_USART_TX_BUFFER_SIZE		256
-#define PIOS_USART_BAUDRATE				230400
-#define PIOS_COM_AUX				0
+#define PIOS_USART_BAUDRATE			230400
+
+//-------------------------
+// PIOS_COM
+//
+// See also pios_board.c
+//-------------------------
+#define PIOS_COM_MAX_DEVS			2
+extern uint32_t pios_com_aux_id;
+#define PIOS_COM_AUX				(pios_com_aux_id)
 #define PIOS_COM_DEBUG				PIOS_COM_AUX
 
 //-------------------------

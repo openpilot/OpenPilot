@@ -37,96 +37,129 @@
 #include <pios_usart_priv.h>
 
 /* Provide a COM driver */
+static void PIOS_USART_ChangeBaud(uint32_t usart_id, uint32_t baud);
+static int32_t PIOS_USART_TxBufferPutMoreNonBlocking(uint32_t usart_id, const uint8_t *buffer, uint16_t len);
+static int32_t PIOS_USART_TxBufferPutMore(uint32_t usart_id, const uint8_t *buffer, uint16_t len);
+static int32_t PIOS_USART_RxBufferGet(uint32_t usart_id);
+static int32_t PIOS_USART_RxBufferUsed(uint32_t usart_id);
+
 const struct pios_com_driver pios_usart_com_driver = {
 	.set_baud = PIOS_USART_ChangeBaud,
-	.tx_nb = PIOS_USART_TxBufferPutMoreNonBlocking,
-	.tx = PIOS_USART_TxBufferPutMore,
-	.rx = PIOS_USART_RxBufferGet,
+	.tx_nb    = PIOS_USART_TxBufferPutMoreNonBlocking,
+	.tx       = PIOS_USART_TxBufferPutMore,
+	.rx       = PIOS_USART_RxBufferGet,
 	.rx_avail = PIOS_USART_RxBufferUsed,
 };
 
-static struct pios_usart_dev *find_usart_dev_by_id(uint8_t usart)
+static bool PIOS_USART_validate(struct pios_usart_dev * usart_dev)
 {
-	if (usart >= pios_usart_num_devices) {
-		/* Undefined USART port for this board (see pios_board.c) */
-		return NULL;
-	}
-
-	/* Get a handle for the device configuration */
-	return &(pios_usart_devs[usart]);
+	return (usart_dev->magic == PIOS_USART_DEV_MAGIC);
 }
 
-/**
-* Initialise the onboard USARTs
-*/
-void PIOS_USART_Init(void)
+#if defined(PIOS_INCLUDE_FREERTOS) && 0
+static struct pios_usart_dev * PIOS_USART_alloc(void)
 {
-	struct pios_usart_dev *usart_dev;
-	uint8_t i;
+	struct pios_usart_dev * usart_dev;
 
-	for (i = 0; i < pios_usart_num_devices; i++) {
-		/* Get a handle for the device configuration */
-		usart_dev = find_usart_dev_by_id(i);
-		PIOS_DEBUG_Assert(usart_dev);
+	usart_dev = (struct pios_usart_dev *)malloc(sizeof(*usart_dev));
+	if (!usart_dev) return(NULL);
 
-		/* Clear buffer counters */
-		fifoBuf_init(&usart_dev->rx, usart_dev->rx_buffer, sizeof(usart_dev->rx_buffer));
-		fifoBuf_init(&usart_dev->tx, usart_dev->tx_buffer, sizeof(usart_dev->tx_buffer));
+	usart_dev->magic = PIOS_USART_DEV_MAGIC;
+	return(usart_dev);
+}
+#else
+static struct pios_usart_dev pios_usart_devs[PIOS_USART_MAX_DEVS];
+static uint8_t pios_usart_num_devs;
+static struct pios_usart_dev * PIOS_USART_alloc(void)
+{
+	struct pios_usart_dev * usart_dev;
 
-		/* Enable the USART Pins Software Remapping */
-		if (usart_dev->cfg->remap) {
-			GPIO_PinRemapConfig(usart_dev->cfg->remap, ENABLE);
-		}
-
-		/* Initialize the USART Rx and Tx pins */
-		GPIO_Init(usart_dev->cfg->rx.gpio, &usart_dev->cfg->rx.init);
-		GPIO_Init(usart_dev->cfg->tx.gpio, &usart_dev->cfg->tx.init);
-
-		/* Enable USART clock */
-		switch ((uint32_t) usart_dev->cfg->regs) {
-		case (uint32_t) USART1:
-			RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
-			break;
-		case (uint32_t) USART2:
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
-			break;
-		case (uint32_t) USART3:
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
-			break;
-		}
-
-		/* Enable USART */
-		USART_Init(usart_dev->cfg->regs, &usart_dev->cfg->init);
-
-		/* Configure USART Interrupts */
-		NVIC_Init(&usart_dev->cfg->irq.init);
-		USART_ITConfig(usart_dev->cfg->regs, USART_IT_RXNE, ENABLE);
-		USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, ENABLE);
-
-		/* Enable USART */
-		USART_Cmd(usart_dev->cfg->regs, ENABLE);
+	if (pios_usart_num_devs >= PIOS_USART_MAX_DEVS) {
+		return (NULL);
 	}
+
+	usart_dev = &pios_usart_devs[pios_usart_num_devs++];
+	usart_dev->magic = PIOS_USART_DEV_MAGIC;
+
+	return (usart_dev);
+}
+#endif
+
+
+/**
+* Initialise a single USART device
+*/
+int32_t PIOS_USART_Init(uint32_t * usart_id, const struct pios_usart_cfg * cfg)
+{
+	PIOS_DEBUG_Assert(usart_id);
+	PIOS_DEBUG_Assert(cfg);
+
+	struct pios_usart_dev * usart_dev;
+
+	usart_dev = (struct pios_usart_dev *) PIOS_USART_alloc();
+	if (!usart_dev) goto out_fail;
+
+	/* Bind the configuration to the device instance */
+	usart_dev->cfg = cfg;
+
+	/* Clear buffer counters */
+	fifoBuf_init(&usart_dev->rx, usart_dev->rx_buffer, sizeof(usart_dev->rx_buffer));
+	fifoBuf_init(&usart_dev->tx, usart_dev->tx_buffer, sizeof(usart_dev->tx_buffer));
+
+	/* Enable the USART Pins Software Remapping */
+	if (usart_dev->cfg->remap) {
+		GPIO_PinRemapConfig(usart_dev->cfg->remap, ENABLE);
+	}
+
+	/* Initialize the USART Rx and Tx pins */
+	GPIO_Init(usart_dev->cfg->rx.gpio, &usart_dev->cfg->rx.init);
+	GPIO_Init(usart_dev->cfg->tx.gpio, &usart_dev->cfg->tx.init);
+
+	/* Enable USART clock */
+	switch ((uint32_t)usart_dev->cfg->regs) {
+	case (uint32_t)USART1:
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+		break;
+	case (uint32_t)USART2:
+		RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+		break;
+	case (uint32_t)USART3:
+		RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
+		break;
+	}
+  
+	/* Configure the USART */
+	USART_Init(usart_dev->cfg->regs, &usart_dev->cfg->init);
+  
+	*usart_id = (uint32_t)usart_dev;
+
+	/* Configure USART Interrupts */
+	NVIC_Init(&usart_dev->cfg->irq.init);
+	USART_ITConfig(usart_dev->cfg->regs, USART_IT_RXNE, ENABLE);
+	USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE,  ENABLE);
+  
+	/* Enable USART */
+	USART_Cmd(usart_dev->cfg->regs, ENABLE);
+
+	return(0);
+
+out_fail:
+	return(-1);
 }
 
 /**
 * Changes the baud rate of the USART peripheral without re-initialising.
-* \param[in] usart USART name (GPS, TELEM, AUX)
+* \param[in] usart_id USART name (GPS, TELEM, AUX)
 * \param[in] baud Requested baud rate
 */
-void PIOS_USART_ChangeBaud(uint8_t usart, uint32_t baud)
+static void PIOS_USART_ChangeBaud(uint32_t usart_id, uint32_t baud)
 {
-	struct pios_usart_dev *usart_dev;
+	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
+
+	bool valid = PIOS_USART_validate(usart_dev);
+	PIOS_Assert(valid)
+
 	USART_InitTypeDef USART_InitStructure;
-
-	/* Get a handle for the device configuration */
-	usart_dev = find_usart_dev_by_id(usart);
-
-#if 0
-	if (!usart_dev) {
-		/* Undefined USART port for this board (see pios_board.c) */
-		return -2;
-	}
-#endif
 
 	/* Start with a copy of the default configuration for the peripheral */
 	USART_InitStructure = usart_dev->cfg->init;
@@ -139,68 +172,33 @@ void PIOS_USART_ChangeBaud(uint8_t usart, uint32_t baud)
 }
 
 /**
-* Returns number of free bytes in receive buffer
-* \param[in] USART USART name
-* \return USART number of free bytes
-* \return 1: USART available
-* \return 0: USART not available
-*/
-int32_t PIOS_USART_RxBufferFree(uint8_t usart)
-{
-	struct pios_usart_dev *usart_dev;
-
-	/* Get a handle for the device configuration */
-	usart_dev = find_usart_dev_by_id(usart);
-
-	if (!usart_dev) {
-		/* Undefined USART port for this board (see pios_board.c) */
-		return -2;
-	}
-
-	return fifoBuf_getFree(&usart_dev->rx);
-}
-
-/**
 * Returns number of used bytes in receive buffer
 * \param[in] USART USART name
 * \return > 0: number of used bytes
 * \return 0 if USART not available
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USART_RxBufferUsed(uint8_t usart)
+static int32_t PIOS_USART_RxBufferUsed(uint32_t usart_id)
 {
-	struct pios_usart_dev *usart_dev;
+	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
 
-	/* Get a handle for the device configuration */
-	usart_dev = find_usart_dev_by_id(usart);
+	bool valid = PIOS_USART_validate(usart_dev);
+	PIOS_Assert(valid)
 
-	if (!usart_dev) {
-		/* Undefined USART port for this board (see pios_board.c) */
-		return -2;
-	}
-
-	return fifoBuf_getUsed(&usart_dev->rx);
+	return (fifoBuf_getUsed(&usart_dev->rx));
 }
 
 /**
 * Gets a byte from the receive buffer
 * \param[in] USART USART name
-* \return -1 if USART not available
-* \return -2 if no new byte available
-* \return >= 0: number of received bytes
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
+* \return -1 if no new byte available
+* \return >= 0: actual byte received
 */
-int32_t PIOS_USART_RxBufferGet(uint8_t usart)
+static int32_t PIOS_USART_RxBufferGet(uint32_t usart_id)
 {
-	struct pios_usart_dev *usart_dev;
+	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
 
-	/* Get a handle for the device configuration */
-	usart_dev = find_usart_dev_by_id(usart);
-
-	if (!usart_dev) {
-		/* Undefined USART port for this board (see pios_board.c) */
-		return -2;
-	}
+	bool valid = PIOS_USART_validate(usart_dev);
+	PIOS_Assert(valid)
 
 	if (fifoBuf_getUsed(&usart_dev->rx) == 0) {
 		/* Nothing new in the buffer */
@@ -208,43 +206,7 @@ int32_t PIOS_USART_RxBufferGet(uint8_t usart)
 	}
 
 	/* get byte - this operation should be atomic! */
-	/* PIOS_IRQ_Disable(); -- not needed only one reader */
 	uint8_t b = fifoBuf_getByte(&usart_dev->rx);
-	/* PIOS_IRQ_Enable(); */
-
-	/* Return received byte */
-	return b;
-}
-
-/**
-* Returns the next byte of the receive buffer without taking it
-* \param[in] USART USART name
-* \return -1 if USART not available
-* \return -2 if no new byte available
-* \return >= 0: number of received bytes
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
-*/
-int32_t PIOS_USART_RxBufferPeek(uint8_t usart)
-{
-	struct pios_usart_dev *usart_dev;
-
-	/* Get a handle for the device configuration */
-	usart_dev = find_usart_dev_by_id(usart);
-
-	if (!usart_dev) {
-		/* Undefined USART port for this board (see pios_board.c) */
-		return -2;
-	}
-
-	if (!fifoBuf_getUsed(&usart_dev->rx)) {
-		/* Nothing new in the buffer */
-		return -1;
-	}
-
-	/* get byte - this operation should be atomic! */
-	/* PIOS_IRQ_Disable(); -- not needed only one reader */
-	uint8_t b = fifoBuf_getBytePeek(&usart_dev->rx);
-	/* PIOS_IRQ_Enable();                          */
 
 	/* Return received byte */
 	return b;
@@ -255,57 +217,26 @@ int32_t PIOS_USART_RxBufferPeek(uint8_t usart)
 * \param[in] USART USART name
 * \param[in] b byte which should be put into Rx buffer
 * \return 0 if no error
-* \return -1 if USART not available
-* \return -2 if buffer full (retry)
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
+* \return -1 if buffer full (retry)
 */
-int32_t PIOS_USART_RxBufferPut(uint8_t usart, uint8_t b)
+static int32_t PIOS_USART_RxBufferPut(uint32_t usart_id, uint8_t b)
 {
-	struct pios_usart_dev *usart_dev;
+	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
 
-	/* Get a handle for the device configuration */
-	usart_dev = find_usart_dev_by_id(usart);
-
-	if (!usart_dev) {
-		/* Undefined USART port for this board (see pios_board.c) */
-		return -1;
-	}
+	bool valid = PIOS_USART_validate(usart_dev);
+	PIOS_Assert(valid)
 
 	if (fifoBuf_getFree(&usart_dev->rx) < 1) {
 		/* Buffer full (retry) */
-		return -2;
+		return -1;
 	}
 
 	/* Copy received byte into receive buffer */
 	/* This operation should be atomic! */
-	/* PIOS_IRQ_Disable(); -- not needed only one reader */
-	fifoBuf_putByte(&usart_dev->rx,b);
-	/* PIOS_IRQ_Enable(); */
+	fifoBuf_putByte(&usart_dev->rx, b);
 
 	/* No error */
 	return 0;
-}
-
-/**
-* returns number of free bytes in transmit buffer
-* \param[in] USART USART name
-* \return number of free bytes
-* \return 0 if USART not available
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
-*/
-int32_t PIOS_USART_TxBufferFree(uint8_t usart)
-{
-	struct pios_usart_dev *usart_dev;
-
-	/* Get a handle for the device configuration */
-	usart_dev = find_usart_dev_by_id(usart);
-
-	if (!usart_dev) {
-		/* Undefined USART port for this board (see pios_board.c) */
-		return 0;
-	}
-
-	return fifoBuf_getFree(&usart_dev->tx);
 }
 
 /**
@@ -313,53 +244,40 @@ int32_t PIOS_USART_TxBufferFree(uint8_t usart)
 * \param[in] USART USART name
 * \return number of used bytes
 * \return 0 if USART not available
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USART_TxBufferUsed(uint8_t usart)
+static int32_t PIOS_USART_TxBufferUsed(uint32_t usart_id)
 {
-	struct pios_usart_dev *usart_dev;
+	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
 
-	/* Get a handle for the device configuration */
-	usart_dev = find_usart_dev_by_id(usart);
+	bool valid = PIOS_USART_validate(usart_dev);
+	PIOS_Assert(valid)
 
-	if (!usart_dev) {
-		/* Undefined USART port for this board (see pios_board.c) */
-		return 0;
-	}
-
-	return fifoBuf_getUsed(&usart_dev->tx);
+	return (fifoBuf_getUsed(&usart_dev->tx));
 }
 
 /**
 * gets a byte from the transmit buffer
 * \param[in] USART USART name
-* \return -1 if USART not available
-* \return -2 if no new byte available
+* \return -1 if no new byte available
 * \return >= 0: transmitted byte
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USART_TxBufferGet(uint8_t usart)
+static int32_t PIOS_USART_TxBufferGet(uint32_t usart_id)
 {
-	struct pios_usart_dev *usart_dev;
+	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
 
-	/* Get a handle for the device configuration */
-	usart_dev = find_usart_dev_by_id(usart);
-
-	if (!usart_dev) {
-		/* Undefined USART port for this board (see pios_board.c) */
-		return -1;
-	}
+	bool valid = PIOS_USART_validate(usart_dev);
+	PIOS_Assert(valid)
 
 	if (fifoBuf_getUsed(&usart_dev->tx) == 0) {
 		/* Nothing new in the buffer */
-		return -2;
+		return -1;
 	}
 
 	/* get byte - this operation should be atomic! */
-	 PIOS_IRQ_Disable();
+	PIOS_IRQ_Disable();
 	uint8_t b = fifoBuf_getByte(&usart_dev->tx);
-	PIOS_IRQ_Enable(); 
-
+	PIOS_IRQ_Enable();
+  
 	/* Return received byte */
 	return b;
 }
@@ -370,37 +288,32 @@ int32_t PIOS_USART_TxBufferGet(uint8_t usart)
 * \param[in] *buffer pointer to buffer to be sent
 * \param[in] len number of bytes to be sent
 * \return 0 if no error
-* \return -1 if USART not available
-* \return -2 if buffer full or cannot get all requested bytes (retry)
-* \return -3 if USART not supported by USARTTxBufferPut Routine
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
+* \return -1 if buffer full or cannot get all requested bytes (retry)
 */
-int32_t PIOS_USART_TxBufferPutMoreNonBlocking(uint8_t usart, const uint8_t * buffer, uint16_t len)
+static int32_t PIOS_USART_TxBufferPutMoreNonBlocking(uint32_t usart_id, const uint8_t *buffer, uint16_t len)
 {
-	struct pios_usart_dev *usart_dev;
+	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
 
-	/* Get a handle for the device configuration */
-	usart_dev = find_usart_dev_by_id(usart);
-
-	if (!usart_dev) {
-		/* Undefined USART port for this board (see pios_board.c) */
-		return -1;
-	}
+	bool valid = PIOS_USART_validate(usart_dev);
+	PIOS_Assert(valid)
 
 	if (len >= fifoBuf_getFree(&usart_dev->tx)) {
 		/* Buffer cannot accept all requested bytes (retry) */
-		return -2;
+		return -1;
 	}
 
 	/* Copy bytes to be transmitted into transmit buffer */
-	/* This operation should be atomic!  Can't rely on   */
-	/* fifoBuf since two tasks write to the port         */
+	/* This operation should be atomic! */
 	PIOS_IRQ_Disable();
+
 	uint16_t used = fifoBuf_getUsed(&usart_dev->tx);
 	fifoBuf_putData(&usart_dev->tx,buffer,len);
 	
-	if(used == 0) /* enable sending when was empty */
+	if (used == 0) {
+		/* enable sending when buffer was previously empty */
 		USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, ENABLE);
+	}
+
 	PIOS_IRQ_Enable();
 
 	/* No error */
@@ -414,72 +327,38 @@ int32_t PIOS_USART_TxBufferPutMoreNonBlocking(uint8_t usart, const uint8_t * buf
 * \param[in] *buffer pointer to buffer to be sent
 * \param[in] len number of bytes to be sent
 * \return 0 if no error
-* \return -1 if USART not available
-* \return -3 if USART not supported by USARTTxBufferPut Routine
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
 */
-int32_t PIOS_USART_TxBufferPutMore(uint8_t usart, const uint8_t * buffer, uint16_t len)
+static int32_t PIOS_USART_TxBufferPutMore(uint32_t usart_id, const uint8_t *buffer, uint16_t len)
 {
 	int32_t rc;
 
-	while ((rc = PIOS_USART_TxBufferPutMoreNonBlocking(usart, buffer, len)) == -2) ;
+	while ((rc = PIOS_USART_TxBufferPutMoreNonBlocking(usart_id, buffer, len)) == -1);
 
 	return rc;
 }
 
-/**
-* puts a byte onto the transmit buffer
-* \param[in] USART USART name
-* \param[in] b byte which should be put into Tx buffer
-* \return 0 if no error
-* \return -1 if USART not available
-* \return -2 if buffer full (retry)
-* \return -3 if USART not supported by USARTTxBufferPut Routine
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
-*/
-int32_t PIOS_USART_TxBufferPut_NonBlocking(uint8_t usart, uint8_t b)
+void PIOS_USART_IRQ_Handler(uint32_t usart_id)
 {
-	return PIOS_USART_TxBufferPutMoreNonBlocking(usart, &b, 1);
-}
+	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
 
-/**
-* puts a byte onto the transmit buffer<BR>
-* (blocking function)
-* \param[in] USART USART name
-* \param[in] b byte which should be put into Tx buffer
-* \return 0 if no error
-* \return -1 if USART not available
-* \return -3 if USART not supported by USARTTxBufferPut Routine
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
-*/
-int32_t PIOS_USART_TxBufferPut(uint8_t usart, uint8_t b)
-{
-	return PIOS_USART_TxBufferPutMore(usart, &b, 1);
-}
+	bool valid = PIOS_USART_validate(usart_dev);
+	PIOS_Assert(valid)
 
-void PIOS_USART_IRQ_Handler(uint8_t usart)
-{
-	struct pios_usart_dev *usart_dev;
-
-	/* Get a handle for the device configuration */
-	usart_dev = find_usart_dev_by_id(usart);
-	PIOS_DEBUG_Assert(usart_dev);
-	
 	/* Force read of dr after sr to make sure to clear error flags */
 	volatile uint16_t sr = usart_dev->cfg->regs->SR;
 	volatile uint8_t dr = usart_dev->cfg->regs->DR;
 
 	/* Check if RXNE flag is set */
 	if (sr & USART_SR_RXNE) {
-		if (PIOS_USART_RxBufferPut(usart, dr) < 0) {
+		if (PIOS_USART_RxBufferPut(usart_id, dr) < 0) {
 			/* Here we could add some error handling */
 		}
 	}
 
 	/* Check if TXE flag is set */
 	if (sr & USART_SR_TXE) {
-		if (PIOS_USART_TxBufferUsed(usart) > 0) {
-			int32_t b = PIOS_USART_TxBufferGet(usart);
+		if (PIOS_USART_TxBufferUsed(usart_id) > 0) {
+			int32_t b = PIOS_USART_TxBufferGet(usart_id);
 
 			if (b < 0) {
 				/* Here we could add some error handling */

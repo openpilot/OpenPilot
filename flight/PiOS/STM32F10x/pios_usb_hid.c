@@ -44,6 +44,11 @@
 #define USE_FREERTOS
 #endif
 
+static int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint32_t usbcom_id, const uint8_t *buffer, uint16_t len);
+static int32_t PIOS_USB_HID_TxBufferPutMore(uint32_t usbcom_id, const uint8_t *buffer, uint16_t len);
+static int32_t PIOS_USB_HID_RxBufferGet(uint32_t usbcom_id);
+static int32_t PIOS_USB_HID_RxBufferUsed(uint32_t usbcom_id);
+
 const struct pios_com_driver pios_usb_com_driver = {
 	.tx_nb = PIOS_USB_HID_TxBufferPutMoreNonBlocking,
 	.tx = PIOS_USB_HID_TxBufferPutMore,
@@ -201,7 +206,6 @@ void sendChunk()
 
 	uint32_t size = fifoBuf_getUsed(&tx_pios_fifo_buffer);
 	if ((size > 0) && (GetEPTxStatus(ENDP1) != EP_TX_VALID)) {
-		
 		if (size > PIOS_USB_HID_DATA_LENGTH)
 			size = PIOS_USB_HID_DATA_LENGTH;
 #ifdef USB_HID
@@ -219,7 +223,7 @@ void sendChunk()
 
 		/* Send Buffer */
 		SetEPTxValid(ENDP1);
-	} 
+	}
 
 }
 
@@ -232,13 +236,13 @@ void sendChunk()
  * \return -2 if too many bytes to be send
  * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
  */
-int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t * buffer, uint16_t len)
+static int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint32_t usbcom_id, const uint8_t * buffer, uint16_t len)
 {
 	uint16_t ret;
-	
+
 	if(!transfer_possible)
-		return -1;	
-	
+		return -1;
+
 	if (len > fifoBuf_getFree(&tx_pios_fifo_buffer)) {
 		sendChunk();    /* Try and send what's in the buffer though */
 		return -2;	/* Cannot send all requested bytes */
@@ -257,7 +261,7 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t * buff
 #if defined(USE_FREERTOS)
 	xSemaphoreGive(pios_usb_tx_semaphore);
 #endif
-	
+
 	sendChunk();
 
 	return 0;
@@ -272,13 +276,13 @@ int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint8_t id, const uint8_t * buff
  * \return -1 if too many bytes to be send
  * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
  */
-int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t id, const uint8_t * buffer, uint16_t len)
+static int32_t PIOS_USB_HID_TxBufferPutMore(uint32_t usbcom_id, const uint8_t *buffer, uint16_t len)
 {
 	if(len > (fifoBuf_getUsed(&tx_pios_fifo_buffer) + fifoBuf_getFree(&tx_pios_fifo_buffer)))
 		return -1;
-	
+
 	uint32_t error;
-	while ((error = PIOS_USB_HID_TxBufferPutMoreNonBlocking(id, buffer, len)) == -2) {
+	while ((error = PIOS_USB_HID_TxBufferPutMoreNonBlocking(usbcom_id, buffer, len)) == -2) {
 #if defined(PIOS_INCLUDE_FREERTOS)
 		taskYIELD();
 #endif
@@ -293,15 +297,15 @@ int32_t PIOS_USB_HID_TxBufferPutMore(uint8_t id, const uint8_t * buffer, uint16_
  * \return >= 0: received byte
  * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
  */
-int32_t PIOS_USB_HID_RxBufferGet(uint8_t id)
+static int32_t PIOS_USB_HID_RxBufferGet(uint32_t usbcom_id)
 {
 	uint8_t read;
-	
+
 	if(fifoBuf_getUsed(&rx_pios_fifo_buffer) == 0)
 		return -1;
-	
+
 	read = fifoBuf_getByte(&rx_pios_fifo_buffer);
-	
+
 	// If endpoint was stalled and there is now space make it valid
 	if ((GetEPRxStatus(ENDP1) != EP_RX_VALID) && (fifoBuf_getFree(&rx_pios_fifo_buffer) > 62)) {
 		SetEPRxStatus(ENDP1, EP_RX_VALID);
@@ -315,7 +319,7 @@ int32_t PIOS_USB_HID_RxBufferGet(uint8_t id)
  * \return 0 nothing available
  * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
  */
-int32_t PIOS_USB_HID_RxBufferUsed(uint8_t id)
+static int32_t PIOS_USB_HID_RxBufferUsed(uint32_t usbcom_id)
 {
 	return fifoBuf_getUsed(&rx_pios_fifo_buffer);
 }
@@ -342,14 +346,14 @@ void PIOS_USB_HID_EP1_OUT_Callback(void)
 
 	/* Use the memory interface function to write to the selected endpoint */
 	PMAToUserBufferCopy((uint8_t *) &rx_packet_buffer[0], GetEPRxAddr(ENDP1 & 0x7F), DataLength);
-	
+
 	/* The first byte is report ID (not checked), the second byte is the valid data length */
 #ifdef USB_HID
 	fifoBuf_putData(&rx_pios_fifo_buffer, &rx_packet_buffer[1], PIOS_USB_HID_DATA_LENGTH + 1);
 #else
 	fifoBuf_putData(&rx_pios_fifo_buffer, &rx_packet_buffer[2], rx_packet_buffer[1]);
 #endif
-	
+
 	// Only reactivate endpoint if available space in buffer
 	if (fifoBuf_getFree(&rx_pios_fifo_buffer) > 62) {
 		SetEPRxStatus(ENDP1, EP_RX_VALID);

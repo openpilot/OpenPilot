@@ -118,7 +118,7 @@ struct altitude_sensor altitude_data;
 struct gps_sensor gps_data;
 
 //! The oversampling rate, ekf is 2k / this
-static uint8_t adc_oversampling = 15;
+uint8_t adc_oversampling = 15;
 
 //! Offset correction of barometric alt, to match gps data
 static float baro_offset = 0;
@@ -128,7 +128,6 @@ volatile int32_t ekf_too_slow;
 volatile int32_t total_conversion_blocks;
 
 //! Buffer to allow ADC to run a bit faster than EKF
-uint8_t adc_fifo_buf[sizeof(float) * 6 * 4] __attribute__ ((aligned(4)));    // align to 32-bit to try and provide speed improvement
 t_fifo_buffer adc_fifo_buffer;
 
 
@@ -529,6 +528,8 @@ void print_ahrs_raw()
 	}
 #endif
 
+extern void PIOS_Board_Init(void);
+
 /**
  * @brief AHRS Main function
  */
@@ -546,35 +547,9 @@ int main()
 	uint32_t counter_val = 0;
 	ahrs_algorithm = AHRSSETTINGS_ALGORITHM_SIMPLE;
 
-	/* Brings up System using CMSIS functions, enables the LEDs. */
-	PIOS_SYS_Init();
+	PIOS_Board_Init();
 
-	PIOS_LED_On(LED1);
-
-	/* Delay system */
-	PIOS_DELAY_Init();
-
-	/* Communication system */
-	PIOS_COM_Init();
-
-	/* IAP System Setup */
-	PIOS_IAP_Init();
-	/* ADC system */
-	PIOS_ADC_Init();
-	PIOS_ADC_Config(adc_oversampling);
-	PIOS_ADC_SetCallback(adc_callback);
-
-	/* ADC buffer */
-	fifoBuf_init(&adc_fifo_buffer, adc_fifo_buf, sizeof(adc_fifo_buf));
-
-	/* Setup the Accelerometer FS (Full-Scale) GPIO */
-	PIOS_GPIO_Enable(0);
-	SET_ACCEL_6G;
-	
 #if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
-	/* Magnetic sensor system */
-	PIOS_I2C_Init();
-	PIOS_HMC5843_Init();
 	// Get 3 ID bytes
 	strcpy((char *)mag_data.id, "ZZZ");
 	PIOS_HMC5843_ReadID(mag_data.id);

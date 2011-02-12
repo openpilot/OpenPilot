@@ -34,13 +34,17 @@
 
 #include <pios.h>
 
-struct pios_com_dev {
-	uint8_t id;
-	const struct pios_com_driver *const driver;
+enum pios_com_dev_magic {
+  PIOS_COM_DEV_MAGIC = 0xaa55aa55,
 };
 
-extern struct pios_com_dev pios_com_devs[];
-extern const uint8_t pios_com_num_devices;
+struct pios_com_dev {
+	enum pios_com_dev_magic magic;
+	uint32_t id;
+	const struct pios_com_driver * driver;
+};
+
+extern int32_t PIOS_COM_ReceiveHandler(uint32_t com_id);
 
 #endif /* PIOS_COM_PRIV_H */
 

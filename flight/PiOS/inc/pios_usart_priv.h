@@ -34,7 +34,10 @@
 
 #include <pios.h>
 #include <pios_stm32.h>
-#include <fifo_buffer.h>
+#include "fifo_buffer.h"
+#include "pios_usart.h"
+
+extern const struct pios_com_driver pios_usart_com_driver;
 
 struct pios_usart_cfg {
 	USART_TypeDef *regs;
@@ -45,18 +48,26 @@ struct pios_usart_cfg {
 	struct stm32_irq irq;
 };
 
-struct pios_usart_dev {
-	const struct pios_usart_cfg *const cfg;
+enum pios_usart_dev_magic {
+	PIOS_USART_DEV_MAGIC = 0x11223344,
+};
 
-	uint8_t rx_buffer[PIOS_USART_RX_BUFFER_SIZE] __attribute__ ((aligned(4)));    // align to 32-bit to try and provide speed improvement;
+struct pios_usart_dev {
+	enum pios_usart_dev_magic     magic;
+	const struct pios_usart_cfg * cfg;
+
+	// align to 32-bit to try and provide speed improvement;
+	uint8_t rx_buffer[PIOS_USART_RX_BUFFER_SIZE] __attribute__ ((aligned(4)));
 	t_fifo_buffer rx;
 
-        uint8_t tx_buffer[PIOS_USART_TX_BUFFER_SIZE] __attribute__ ((aligned(4)));    // align to 32-bit to try and provide speed improvement;
+	// align to 32-bit to try and provide speed improvement;
+        uint8_t tx_buffer[PIOS_USART_TX_BUFFER_SIZE] __attribute__ ((aligned(4)));
 	t_fifo_buffer tx;
 };
 
-extern struct pios_usart_dev pios_usart_devs[];
-extern uint8_t pios_usart_num_devices;
+extern int32_t PIOS_USART_Init(uint32_t * usart_id, const struct pios_usart_cfg * cfg);
+
+extern void PIOS_USART_IRQ_Handler(uint32_t usart_id);
 
 #endif /* PIOS_USART_PRIV_H */
 

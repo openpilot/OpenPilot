@@ -122,6 +122,12 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 #define PIOS_LED_CLKS                           { PIOS_LED_LED1_GPIO_CLK, PIOS_LED_LED2_GPIO_CLK }
 
 //------------------------
+// PIOS_SPI
+// See also pios_board.c
+//------------------------
+#define PIOS_SPI_MAX_DEVS                       2
+
+//------------------------
 // PIOS_I2C
 // See also pios_board.c
 //------------------------
@@ -181,14 +187,6 @@ extern uint32_t pios_com_aux_id;
 extern uint32_t pios_com_spektrum_id;
 #define PIOS_COM_SPEKTRUM               (pios_com_spektrum_id)
 #endif
-
-//-------------------------
-// SPI
-//
-// See also pios_board.c
-//-------------------------
-#define PIOS_SDCARD_SPI                         0
-#define PIOS_OPAHRS_SPI                         1
 
 //-------------------------
 // Delay Timer

@@ -39,6 +39,8 @@ static void PIOS_Flash_W25X_ReleaseBus();
 static uint8_t PIOS_Flash_W25X_WriteEnable();
 static uint8_t PIOS_Flash_W25X_Busy() ;
 
+static uint32_t PIOS_SPI_FLASH;
+
 /** 
  * @brief Claim the SPI bus for flash use and assert CS pin
  * @return 0 for sucess, -1 for failure to get semaphore
@@ -84,8 +86,10 @@ static uint8_t PIOS_Flash_W25X_WriteEnable()
 /**
  * @brief Initialize the flash device and enable write access
  */
-int8_t PIOS_Flash_W25X_Init()
+int8_t PIOS_Flash_W25X_Init(uint32_t spi_id)
 {
+	PIOS_SPI_FLASH = spi_id;
+
 	PIOS_GPIO_Enable(PIOS_FLASH_CS_PIN);
 	device_type = PIOS_Flash_W25X_ReadID();
 	return 0;

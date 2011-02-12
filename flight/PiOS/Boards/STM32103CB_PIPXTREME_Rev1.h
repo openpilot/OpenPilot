@@ -157,12 +157,13 @@ TIM8  |           |           |           |
 
 #define STOPWATCH_TIMER					TIM4
 
-// *****************************************************************
-// SPI
-//
+//------------------------
+// PIOS_SPI
 // See also pios_board.c
-
-#define PIOS_SPI_PORT                   0
+//------------------------
+#define PIOS_SPI_MAX_DEVS               1
+extern uint32_t pios_spi_port_id;
+#define PIOS_SPI_PORT                   (pios_spi_port_id)
 
 //-------------------------
 // PIOS_USART

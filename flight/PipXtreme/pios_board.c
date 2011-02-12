@@ -173,22 +173,11 @@ static const struct pios_spi_cfg pios_spi_port_cfg =
 	},
 };
 
-/*
- * Board specific number of devices.
- */
-struct pios_spi_dev pios_spi_devs[] =
-{
-	{
-		.cfg = &pios_spi_port_cfg,
-	},
-};
-
-uint8_t pios_spi_num_devices = NELEMENTS(pios_spi_devs);
-
+uint32_t pios_spi_port_id;
 void PIOS_SPI_port_irq_handler(void)
 {
 	/* Call into the generic code to handle the IRQ for this specific device */
-	PIOS_SPI_IRQ_Handler(PIOS_SPI_PORT);
+	PIOS_SPI_IRQ_Handler(pios_spi_port_id);
 }
 
 #endif /* PIOS_INCLUDE_SPI */
@@ -365,5 +354,7 @@ void PIOS_Board_Init(void) {
 	// PIOS_ADC_Init();
 
 	// SPI link to master
-	PIOS_SPI_Init();
+	if (PIOS_SPI_Init(&pios_spi_port_id, &pios_spi_port_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
 }

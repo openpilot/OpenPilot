@@ -92,7 +92,7 @@ extern VOLINFO PIOS_SDCARD_VolInfo;
 extern uint8_t PIOS_SDCARD_Sector[SECTOR_SIZE];
 
 /* Prototypes */
-extern int32_t PIOS_SDCARD_Init(void);
+extern int32_t PIOS_SDCARD_Init(uint32_t spi_id);
 extern int32_t PIOS_SDCARD_PowerOn(void);
 extern int32_t PIOS_SDCARD_PowerOff(void);
 extern int32_t PIOS_SDCARD_CheckAvailable(uint8_t was_available);

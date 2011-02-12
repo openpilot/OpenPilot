@@ -47,7 +47,7 @@ static void ProcessPacket();
 //Number of crc failures to allow before giving up
 #define PROGRAM_PACKET_TRIES 4
 
-void AhrsProgramReceive(void)
+void AhrsProgramReceive(uint32_t spi_id)
 {
 	done = false;
 	memset(&txBuf,0,sizeof(AhrsProgramPacket));
@@ -55,9 +55,9 @@ void AhrsProgramReceive(void)
 	int count = PROGRAM_PACKET_TRIES;
 	while(1) {
 		WAIT_IF_RECEIVING();
-		while((PIOS_SPI_Busy(PIOS_SPI_OP) != 0)){};
+		while((PIOS_SPI_Busy(spi_id) != 0)){};
 		memset(&rxBuf,'a',sizeof(AhrsProgramPacket));
-		int32_t res = PIOS_SPI_TransferBlock(PIOS_SPI_OP, NULL, (uint8_t*) &rxBuf,
+		int32_t res = PIOS_SPI_TransferBlock(spi_id, NULL, (uint8_t*) &rxBuf,
 											 SPI_PROGRAM_REQUEST_LENGTH + 1, NULL);
 
 		if(res == 0 &&
@@ -77,14 +77,14 @@ void AhrsProgramReceive(void)
 	//send ack
 	memcpy(&txBuf,SPI_PROGRAM_ACK,SPI_PROGRAM_REQUEST_LENGTH);
 	WAIT_IF_RECEIVING();
-	while(0 != PIOS_SPI_TransferBlock(PIOS_SPI_OP,(uint8_t*) &txBuf, NULL,
+	while(0 != PIOS_SPI_TransferBlock(spi_id,(uint8_t*) &txBuf, NULL,
 									  SPI_PROGRAM_REQUEST_LENGTH + 1, NULL)) {};
 
 	txBuf.type = PROGRAM_NULL;
 
 	while(!done) {
 		WAIT_IF_RECEIVING();
-		if(0 == PIOS_SPI_TransferBlock(PIOS_SPI_OP,(uint8_t*) &txBuf,
+		if(0 == PIOS_SPI_TransferBlock(spi_id,(uint8_t*) &txBuf,
 									   (uint8_t*) &rxBuf, sizeof(AhrsProgramPacket), NULL)) {
 
 			uint32_t crc = GenerateCRC(&rxBuf);

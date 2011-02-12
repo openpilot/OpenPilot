@@ -40,32 +40,48 @@
 
 #include <pios_spi_priv.h>
 
-static struct pios_spi_dev *find_spi_dev_by_id(uint8_t spi)
+static bool PIOS_SPI_validate(struct pios_spi_dev * com_dev)
 {
-	if (spi >= pios_spi_num_devices) {
-		/* Undefined SPI port for this board (see pios_board.c) */
-		return NULL;
+	/* Should check device magic here */
+	return(true);
+}
+
+#if defined(PIOS_INCLUDE_FREERTOS) && 0
+static struct pios_spi_dev * PIOS_SPI_alloc(void)
+{
+	return (malloc(sizeof(struct pios_spi_dev)));
+}
+#else
+static struct pios_spi_dev pios_spi_devs[PIOS_SPI_MAX_DEVS];
+static uint8_t pios_spi_num_devs;
+static struct pios_spi_dev * PIOS_SPI_alloc(void)
+{
+	if (pios_spi_num_devs >= PIOS_SPI_MAX_DEVS) {
+		return (NULL);
 	}
 
-	/* Get a handle for the device configuration */
-	return &(pios_spi_devs[spi]);
+	return (&pios_spi_devs[pios_spi_num_devs++]);
 }
+#endif
 
 /**
 * Initialises SPI pins
 * \param[in] mode currently only mode 0 supported
 * \return < 0 if initialisation failed
 */
-int32_t PIOS_SPI_Init(void)
+int32_t PIOS_SPI_Init(uint32_t * spi_id, const struct pios_spi_cfg * cfg)
 {
-	struct pios_spi_dev *spi_dev;
-	uint8_t i;
+	PIOS_Assert(spi_id);
+	PIOS_Assert(cfg);
 
-	for (i = 0; i < pios_spi_num_devices; i++) {
-		/* Get a handle for the device configuration */
-		spi_dev = find_spi_dev_by_id(i);
-		PIOS_DEBUG_Assert(spi_dev);
+	struct pios_spi_dev * spi_dev;
 		
+	spi_dev = (struct pios_spi_dev *) PIOS_SPI_alloc();
+	if (!spi_dev) goto out_fail;
+
+	/* Bind the configuration to the device instance */
+	spi_dev->cfg = cfg;
+
 #if defined(PIOS_INCLUDE_FREERTOS)
 		vSemaphoreCreateBinary(spi_dev->busy);
 		xSemaphoreGive(spi_dev->busy);
@@ -96,7 +112,7 @@ int32_t PIOS_SPI_Init(void)
 			GPIO_Init(spi_dev->cfg->ssel.gpio, &(spi_dev->cfg->ssel.init));
 			break;
 		default:
-			PIOS_DEBUG_Assert(0);
+			PIOS_Assert(0);
 		}
 
 		/* Initialize the GPIO pins */
@@ -149,9 +165,12 @@ int32_t PIOS_SPI_Init(void)
 
 		/* Configure DMA interrupt */
 		NVIC_Init(&(spi_dev->cfg->dma.irq.init));
-	}
 
-	return 0;
+	*spi_id = (uint32_t)spi_dev;
+	return(0);
+
+out_fail:
+	return(-1);
 }
 
 /**
@@ -171,21 +190,16 @@ int32_t PIOS_SPI_Init(void)
 * </UL>
 * \return 0 if no error
 * \return -1 if disabled SPI port selected
-* \return -2 if unsupported SPI port selected
 * \return -3 if invalid spi_prescaler selected
 */
-int32_t PIOS_SPI_SetClockSpeed(uint8_t spi, SPIPrescalerTypeDef spi_prescaler)
+int32_t PIOS_SPI_SetClockSpeed(uint32_t spi_id, SPIPrescalerTypeDef spi_prescaler)
 {
-	struct pios_spi_dev *spi_dev;
-	SPI_InitTypeDef SPI_InitStructure;
+	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
 
-	/* Get a handle for the device configuration */
-	spi_dev = find_spi_dev_by_id(spi);
+	bool valid = PIOS_SPI_validate(spi_dev);
+	PIOS_Assert(valid)
 
-	if (!spi_dev) {
-		/* Undefined SPI port for this board (see pios_board.c) */
-		return -2;
-	}
+	SPI_InitTypeDef       SPI_InitStructure;
 
 	if (spi_prescaler >= 8) {
 		/* Invalid prescaler selected */
@@ -201,7 +215,7 @@ int32_t PIOS_SPI_SetClockSpeed(uint8_t spi, SPIPrescalerTypeDef spi_prescaler)
 	/* Write back the new configuration */
 	SPI_Init(spi_dev->cfg->regs, &SPI_InitStructure);
 
-	PIOS_SPI_TransferByte(spi, 0xFF);
+	PIOS_SPI_TransferByte(spi_id, 0xFF);
 	return 0;
 }
 
@@ -211,13 +225,14 @@ int32_t PIOS_SPI_SetClockSpeed(uint8_t spi, SPIPrescalerTypeDef spi_prescaler)
  * \return 0 if no error
  * \return -1 if timeout before claiming semaphore
  */
-int8_t PIOS_SPI_ClaimBus(uint8_t spi)
+int32_t PIOS_SPI_ClaimBus(uint32_t spi_id)
 {
 #if defined(PIOS_INCLUDE_FREERTOS)
-	struct pios_spi_dev *spi_dev;
-	
-	/* Get a handle for the device configuration */
-	spi_dev = find_spi_dev_by_id(spi);
+	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
+
+	bool valid = PIOS_SPI_validate(spi_dev);
+	PIOS_Assert(valid)
+
 	if (xSemaphoreTake(spi_dev->busy, 0xffff) != pdTRUE)
 		return -1;
 #endif
@@ -229,14 +244,14 @@ int8_t PIOS_SPI_ClaimBus(uint8_t spi)
  * \param[in] spi SPI number (0 or 1)
  * \return 0 if no error
  */
-int8_t PIOS_SPI_ReleaseBus(uint8_t spi)
+int32_t PIOS_SPI_ReleaseBus(uint32_t spi_id)
 {
 #if defined(PIOS_INCLUDE_FREERTOS)
-	struct pios_spi_dev *spi_dev;
-	
-	/* Get a handle for the device configuration */
-	spi_dev = find_spi_dev_by_id(spi);
-	
+	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
+
+	bool valid = PIOS_SPI_validate(spi_dev);
+	PIOS_Assert(valid)
+
 	xSemaphoreGive(spi_dev->busy);
 #endif
 	return 0;
@@ -247,20 +262,13 @@ int8_t PIOS_SPI_ReleaseBus(uint8_t spi)
 * \param[in] spi SPI number (0 or 1)
 * \param[in] pin_value 0 or 1
 * \return 0 if no error
-* \return -1 if disabled SPI port selected
-* \return -2 if unsupported SPI port selected
 */
-int32_t PIOS_SPI_RC_PinSet(uint8_t spi, uint8_t pin_value)
+int32_t PIOS_SPI_RC_PinSet(uint32_t spi_id, uint8_t pin_value)
 {
-	struct pios_spi_dev *spi_dev;
+	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
 
-	/* Get a handle for the device configuration */
-	spi_dev = find_spi_dev_by_id(spi);
-
-	if (!spi_dev) {
-		/* Undefined SPI port for this board (see pios_board.c) */
-		return -2;
-	}
+	bool valid = PIOS_SPI_validate(spi_dev);
+	PIOS_Assert(valid)
 
 	if (pin_value) {
 		GPIO_SetBits(spi_dev->cfg->ssel.gpio, spi_dev->cfg->ssel.init.GPIO_Pin);
@@ -276,17 +284,17 @@ int32_t PIOS_SPI_RC_PinSet(uint8_t spi, uint8_t pin_value)
 * \param[in] spi SPI number (0 or 1)
 * \param[in] b the byte which should be transfered
 */
-int32_t PIOS_SPI_TransferByte(uint8_t spi, uint8_t b)
+int32_t PIOS_SPI_TransferByte(uint32_t spi_id, uint8_t b)
 {
-	struct pios_spi_dev *spi_dev;
+	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
+
+	bool valid = PIOS_SPI_validate(spi_dev);
+	PIOS_Assert(valid)
+
 	uint8_t dummy;
 	uint8_t rx_byte;
 
-	/* Get a handle for the device configuration */
-	spi_dev = find_spi_dev_by_id(spi);
-	PIOS_DEBUG_Assert(spi_dev);
-
-	/*
+	/* 
 	 * Procedure taken from STM32F10xxx Reference Manual section 23.3.5
 	 */
 
@@ -326,21 +334,16 @@ int32_t PIOS_SPI_TransferByte(uint8_t spi, uint8_t b)
 * block until the transfer is finished.
 * \return >= 0 if no error during transfer
 * \return -1 if disabled SPI port selected
-* \return -2 if unsupported SPI port selected
 * \return -3 if function has been called during an ongoing DMA transfer
 */
-int32_t PIOS_SPI_TransferBlock(uint8_t spi, const uint8_t * send_buffer, uint8_t * receive_buffer, uint16_t len, void *callback)
+int32_t PIOS_SPI_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len, void *callback)
 {
-	struct pios_spi_dev *spi_dev;
-	DMA_InitTypeDef dma_init;
+	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
 
-	/* Get a handle for the device configuration */
-	spi_dev = find_spi_dev_by_id(spi);
+	bool valid = PIOS_SPI_validate(spi_dev);
+	PIOS_Assert(valid)
 
-	if (!spi_dev) {
-		/* Undefined SPI port for this board (see pios_board.c) */
-		return -2;
-	}
+	DMA_InitTypeDef       dma_init;
 
 	/* Exit if ongoing transfer */
 	if (DMA_GetCurrDataCounter(spi_dev->cfg->dma.rx.channel)) {
@@ -371,7 +374,7 @@ int32_t PIOS_SPI_TransferBlock(uint8_t spi, const uint8_t * send_buffer, uint8_t
 	} else {
 		/* Disable memory addr. increment - bytes written into dummy buffer */
 		spi_dev->rx_dummy_byte = 0xFF;
-		dma_init.DMA_MemoryBaseAddr = (uint32_t) & spi_dev->rx_dummy_byte;
+		dma_init.DMA_MemoryBaseAddr = (uint32_t) &spi_dev->rx_dummy_byte;
 		dma_init.DMA_MemoryInc = DMA_MemoryInc_Disable;
 	}
 	if (spi_dev->cfg->use_crc) {
@@ -396,7 +399,7 @@ int32_t PIOS_SPI_TransferBlock(uint8_t spi, const uint8_t * send_buffer, uint8_t
 	} else {
 		/* Disable memory addr. increment - bytes written into dummy buffer */
 		spi_dev->tx_dummy_byte = 0xFF;
-		dma_init.DMA_MemoryBaseAddr = (uint32_t) & spi_dev->tx_dummy_byte;
+		dma_init.DMA_MemoryBaseAddr = (uint32_t) &spi_dev->tx_dummy_byte;
 		dma_init.DMA_MemoryInc = DMA_MemoryInc_Disable;
 	}
 
@@ -438,13 +441,13 @@ int32_t PIOS_SPI_TransferBlock(uint8_t spi, const uint8_t * send_buffer, uint8_t
 	}
 
 	/* Wait until all bytes have been transmitted/received */
-	while (DMA_GetCurrDataCounter(spi_dev->cfg->dma.rx.channel)) ;
+	while (DMA_GetCurrDataCounter(spi_dev->cfg->dma.rx.channel));
 
 	/* Wait for the final bytes of the transfer to complete, including CRC byte(s). */
-	while (!(SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_TXE))) ;
+	while (!(SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_TXE)));
 
 	/* Wait for the final bytes of the transfer to complete, including CRC byte(s). */
-	while (SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_BSY)) ;
+	while (SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_BSY));
 
 	/* Check the CRC on the transfer if enabled. */
 	if (spi_dev->cfg->use_crc) {
@@ -466,17 +469,12 @@ int32_t PIOS_SPI_TransferBlock(uint8_t spi, const uint8_t * send_buffer, uint8_t
 * \return -2 if unsupported SPI port selected
 * \return -3 if function has been called during an ongoing DMA transfer
 */
-int32_t PIOS_SPI_Busy(uint8_t spi)
+int32_t PIOS_SPI_Busy(uint32_t spi_id)
 {
-	struct pios_spi_dev * spi_dev;
+	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
 
-	/* Get a handle for the device configuration */
-	spi_dev = find_spi_dev_by_id(spi);
-
-	if (!spi_dev) {
-		/* Undefined SPI port for this board (see pios_board.c) */
-		return -2;
-	}
+	bool valid = PIOS_SPI_validate(spi_dev);
+	PIOS_Assert(valid)
 
 	/* DMA buffer has data or SPI transmit register not empty or SPI is busy*/
 	if (DMA_GetCurrDataCounter(spi_dev->cfg->dma.rx.channel) ||
@@ -490,15 +488,12 @@ int32_t PIOS_SPI_Busy(uint8_t spi)
 }
 
 
-
-
-
-void PIOS_SPI_IRQ_Handler(uint8_t spi)
+void PIOS_SPI_IRQ_Handler(uint32_t spi_id)
 {
-	struct pios_spi_dev *spi_dev;
+	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
 
-	spi_dev = find_spi_dev_by_id(spi);
-	PIOS_DEBUG_Assert(spi_dev);
+	bool valid = PIOS_SPI_validate(spi_dev);
+	PIOS_Assert(valid)
 
 	DMA_ClearFlag(spi_dev->cfg->dma.irq.flags);
 

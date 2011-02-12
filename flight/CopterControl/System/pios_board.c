@@ -28,19 +28,23 @@
  */
 
 #include <pios.h>
-#include <pios_spi_priv.h>
 #include <pios_i2c_priv.h>
 #include <openpilot.h>
 #include <uavobjectsinit.h>
+
+#if defined(PIOS_INCLUDE_SPI)
+
+
+#include <pios_spi_priv.h>
 
 /* Flash/Accel Interface
  * 
  * NOTE: Leave this declared as const data so that it ends up in the 
  * .rodata section (ie. Flash) rather than in the .bss section (RAM).
  */
-void PIOS_SPI_ahrs_irq_handler(void);
-void DMA1_Channel4_IRQHandler() __attribute__ ((alias ("PIOS_SPI_ahrs_irq_handler")));
-void DMA1_Channel5_IRQHandler() __attribute__ ((alias ("PIOS_SPI_ahrs_irq_handler")));
+void PIOS_SPI_flash_accel_irq_handler(void);
+void DMA1_Channel4_IRQHandler() __attribute__ ((alias ("PIOS_SPI_flash_accel_irq_handler")));
+void DMA1_Channel5_IRQHandler() __attribute__ ((alias ("PIOS_SPI_flash_accel_irq_handler")));
 const struct pios_spi_cfg pios_spi_flash_accel_cfg = {
   .regs   = SPI2,
   .init   = {
@@ -59,7 +63,7 @@ const struct pios_spi_cfg pios_spi_flash_accel_cfg = {
     .ahb_clk  = RCC_AHBPeriph_DMA1,
     
     .irq = {
-      .handler = PIOS_SPI_ahrs_irq_handler,
+      .handler = PIOS_SPI_flash_accel_irq_handler,
       .flags   = (DMA1_FLAG_TC4 | DMA1_FLAG_TE4 | DMA1_FLAG_HT4 | DMA1_FLAG_GL4),
       .init    = {
 	.NVIC_IRQChannel                   = DMA1_Channel4_IRQn,
@@ -132,22 +136,14 @@ const struct pios_spi_cfg pios_spi_flash_accel_cfg = {
   },
 };
 
-/*
- * Board specific number of devices.
- */
-struct pios_spi_dev pios_spi_devs[] = {
-  {
-    .cfg = &pios_spi_flash_accel_cfg,
-  },
-};
-
-uint8_t pios_spi_num_devices = NELEMENTS(pios_spi_devs);
-
-void PIOS_SPI_ahrs_irq_handler(void)
+static uint32_t pios_spi_flash_accel_id;
+void PIOS_SPI_flash_accel_irq_handler(void)
 {
   /* Call into the generic code to handle the IRQ for this specific device */
-//  PIOS_SPI_IRQ_Handler(PIOS_OPAHRS_SPI);
+	PIOS_SPI_IRQ_Handler(pios_spi_flash_accel_id);
 }
+
+#endif	/* PIOS_INCLUDE_SPI */
 
 /*
  * ADC system
@@ -682,9 +678,13 @@ void PIOS_Board_Init(void) {
 	/* Delay system */
 	PIOS_DELAY_Init();	
 	
-	/* SPI Init */
-	PIOS_SPI_Init();
-	PIOS_Flash_W25X_Init();
+	/* Set up the SPI interface to the serial flash */
+	if (PIOS_SPI_Init(&pios_spi_flash_accel_id, &pios_spi_flash_accel_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+
+	PIOS_Flash_W25X_Init(pios_spi_flash_accel_id);
+	PIOS_ADXL345_Attach(pios_spi_flash_accel_id);
 
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 	/* SPEKTRUM init must come before comms */

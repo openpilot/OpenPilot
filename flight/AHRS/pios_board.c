@@ -137,21 +137,11 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
 		 },
 };
 
-/*
- * Board specific number of devices.
- */
-struct pios_spi_dev pios_spi_devs[] = {
-	{
-	 .cfg = &pios_spi_op_cfg,
-	 },
-};
-
-uint8_t pios_spi_num_devices = NELEMENTS(pios_spi_devs);
-
+uint32_t pios_spi_op_id;
 void PIOS_SPI_op_irq_handler(void)
 {
 	/* Call into the generic code to handle the IRQ for this specific device */
-	PIOS_SPI_IRQ_Handler(PIOS_SPI_OP);
+	PIOS_SPI_IRQ_Handler(pios_spi_op_id);
 }
 
 #endif /* PIOS_INCLUDE_SPI */
@@ -440,4 +430,16 @@ void PIOS_Board_Init(void) {
 	PIOS_HMC5843_Init();
 #endif
 
+#if defined(PIOS_INCLUDE_SPI)
+#include "ahrs_spi_comm.h"
+	AhrsInitComms();
+
+	/* Set up the SPI interface to the OP board */
+	if (PIOS_SPI_Init(&pios_spi_op_id, &pios_spi_op_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+
+	AhrsConnect(pios_spi_op_id);
+#endif
 }
+

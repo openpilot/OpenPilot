@@ -28,10 +28,14 @@
  */
 
 #include <pios.h>
-#include <pios_spi_priv.h>
 #include <pios_i2c_priv.h>
 #include <openpilot.h>
 #include <uavobjectsinit.h>
+
+#if defined(PIOS_INCLUDE_SPI)
+
+
+#include <pios_spi_priv.h>
 
 /* MicroSD Interface
  * 
@@ -230,31 +234,21 @@ const struct pios_spi_cfg pios_spi_ahrs_cfg = {
   },
 };
 
-/*
- * Board specific number of devices.
- */
-struct pios_spi_dev pios_spi_devs[] = {
-  {
-    .cfg = &pios_spi_sdcard_cfg,
-  },
-  {
-    .cfg = &pios_spi_ahrs_cfg,
-  },
-};
-
-uint8_t pios_spi_num_devices = NELEMENTS(pios_spi_devs);
-
+static uint32_t pios_spi_sdcard_id;
 void PIOS_SPI_sdcard_irq_handler(void)
 {
   /* Call into the generic code to handle the IRQ for this specific device */
-  PIOS_SPI_IRQ_Handler(PIOS_SDCARD_SPI);
+	PIOS_SPI_IRQ_Handler(pios_spi_sdcard_id);
 }
 
+uint32_t pios_spi_ahrs_id;
 void PIOS_SPI_ahrs_irq_handler(void)
 {
   /* Call into the generic code to handle the IRQ for this specific device */
-  PIOS_SPI_IRQ_Handler(PIOS_OPAHRS_SPI);
+	PIOS_SPI_IRQ_Handler(pios_spi_ahrs_id);
 }
+
+#endif /* PIOS_INCLUDE_SPI */
 
 /*
  * ADC system
@@ -938,6 +932,8 @@ uint32_t pios_com_gps_id;
 uint32_t pios_com_aux_id;
 uint32_t pios_com_spektrum_id;
 
+#include "ahrs_spi_comm.h"
+
 /**
  * PIOS_Board_Init()
  * initializes all the core subsystems on this specific hardware
@@ -951,12 +947,17 @@ void PIOS_Board_Init(void) {
 	/* Delay system */
 	PIOS_DELAY_Init();	
 	
-	/* SPI Init */
-	PIOS_SPI_Init();
+#if defined(PIOS_INCLUDE_SPI)	
+	/* Set up the SPI interface to the SD card */
+	if (PIOS_SPI_Init(&pios_spi_sdcard_id, &pios_spi_sdcard_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
 
 	/* Enable and mount the SDCard */
-	PIOS_SDCARD_Init();
+	PIOS_SDCARD_Init(pios_spi_sdcard_id);
 	PIOS_SDCARD_MountFS(0);
+#endif /* PIOS_INCLUDE_SPI */
+
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 	/* SPEKTRUM init must come before comms */
 	PIOS_SPEKTRUM_Init();
@@ -971,6 +972,17 @@ void PIOS_Board_Init(void) {
 
 	/* Initialize the task monitor library */
 	TaskMonitorInitialize();
+
+	/* Prepare the AHRS Comms upper layer protocol */
+	AhrsInitComms();
+
+	/* Set up the SPI interface to the AHRS */
+	if (PIOS_SPI_Init(&pios_spi_ahrs_id, &pios_spi_ahrs_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+
+	/* Bind the AHRS comms layer to the AHRS SPI link */
+	AhrsConnect(pios_spi_ahrs_id);
 
 	/* Initialize the PiOS library */
 #if defined(PIOS_INCLUDE_COM)

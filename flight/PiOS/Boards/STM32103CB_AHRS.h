@@ -132,7 +132,7 @@ TIM8  |           |           |           |
 //
 // See also pios_board.c
 //-------------------------
-#define PIOS_SPI_OP				0
+#define PIOS_SPI_MAX_DEVS			1
 
 //-------------------------
 // PIOS_USART

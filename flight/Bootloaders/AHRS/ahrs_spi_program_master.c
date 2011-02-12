@@ -29,21 +29,21 @@
 #include "ahrs_spi_program.h"
 #include "pios_spi.h"
 
-PROGERR TransferPacket(AhrsProgramPacket *txBuf, AhrsProgramPacket *rxBuf);
+PROGERR TransferPacket(uint32_t spi_id, AhrsProgramPacket *txBuf, AhrsProgramPacket *rxBuf);
 
 #define MAX_CONNECT_TRIES 500 //half a second
 
-bool AhrsProgramConnect(void)
+bool AhrsProgramConnect(uint32_t spi_id)
 {
 	AhrsProgramPacket rxBuf;
 	AhrsProgramPacket txBuf;
 	memset(&rxBuf, 0, sizeof(AhrsProgramPacket));
 	memcpy(&txBuf,SPI_PROGRAM_REQUEST,SPI_PROGRAM_REQUEST_LENGTH);
 	for(int ct = 0; ct < MAX_CONNECT_TRIES; ct++) {
-		PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 0);
-		uint32_t res = PIOS_SPI_TransferBlock(PIOS_OPAHRS_SPI, (uint8_t *) &txBuf,
+		PIOS_SPI_RC_PinSet(spi_id, 0);
+		uint32_t res = PIOS_SPI_TransferBlock(spi_id, (uint8_t *) &txBuf,
 											  (uint8_t *) & rxBuf, SPI_PROGRAM_REQUEST_LENGTH +1, NULL);
-		PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 1);
+		PIOS_SPI_RC_PinSet(spi_id, 1);
 		if(res == 0 && memcmp(&rxBuf, SPI_PROGRAM_ACK, SPI_PROGRAM_REQUEST_LENGTH) == 0) {
 			return (true);
 		}
@@ -54,7 +54,7 @@ bool AhrsProgramConnect(void)
 }
 
 
-PROGERR AhrsProgramWrite(uint32_t address, void * data, uint32_t size)
+PROGERR AhrsProgramWrite(uint32_t spi_id, uint32_t address, void * data, uint32_t size)
 {
 	AhrsProgramPacket rxBuf;
 	AhrsProgramPacket txBuf;
@@ -63,14 +63,14 @@ PROGERR AhrsProgramWrite(uint32_t address, void * data, uint32_t size)
 	txBuf.size = size;
 	txBuf.type = PROGRAM_WRITE;
 	txBuf.address = address;
-	PROGERR ret = TransferPacket(&txBuf, &rxBuf);
+	PROGERR ret = TransferPacket(spi_id, &txBuf, &rxBuf);
 	if(ret != PROGRAM_ERR_OK) {
 		return(ret);
 	}
 	return(PROGRAM_ERR_OK);
 }
 
-PROGERR AhrsProgramRead(uint32_t address, void * data, uint32_t size)
+PROGERR AhrsProgramRead(uint32_t spi_id, uint32_t address, void * data, uint32_t size)
 {
 	AhrsProgramPacket rxBuf;
 	AhrsProgramPacket txBuf;
@@ -78,7 +78,7 @@ PROGERR AhrsProgramRead(uint32_t address, void * data, uint32_t size)
 	txBuf.size = size;
 	txBuf.type = PROGRAM_READ;
 	txBuf.address = address;
-	PROGERR ret = TransferPacket(&txBuf, &rxBuf);
+	PROGERR ret = TransferPacket(spi_id, &txBuf, &rxBuf);
 	if(ret != PROGRAM_ERR_OK) {
 		return(ret);
 	}
@@ -86,14 +86,14 @@ PROGERR AhrsProgramRead(uint32_t address, void * data, uint32_t size)
 	return(PROGRAM_ERR_OK);
 }
 
-PROGERR AhrsProgramReboot(void)
+PROGERR AhrsProgramReboot(uint32_t spi_id)
 {
 	AhrsProgramPacket rxBuf;
 	AhrsProgramPacket txBuf;
 	memset(&rxBuf, 0, sizeof(AhrsProgramPacket));
 	txBuf.type = PROGRAM_REBOOT;
 	memcpy(txBuf.data,REBOOT_CONFIRMATION,REBOOT_CONFIRMATION_LENGTH);
-	PROGERR ret = TransferPacket(&txBuf, &rxBuf);
+	PROGERR ret = TransferPacket(spi_id, &txBuf, &rxBuf);
 	//If AHRS has rebooted we will get comms errors
 	if(ret == PROGRAM_ERR_LINK) {
 		return(PROGRAM_ERR_OK);
@@ -101,7 +101,7 @@ PROGERR AhrsProgramReboot(void)
 	return(PROGRAM_ERR_FUNCTION);
 }
 
-PROGERR TransferPacket(AhrsProgramPacket *txBuf, AhrsProgramPacket *rxBuf)
+PROGERR TransferPacket(uint32_t spi_id, AhrsProgramPacket *txBuf, AhrsProgramPacket *rxBuf)
 {
 	static uint32_t pktId = 0;
 	pktId++;
@@ -109,10 +109,10 @@ PROGERR TransferPacket(AhrsProgramPacket *txBuf, AhrsProgramPacket *rxBuf)
 	txBuf->crc = GenerateCRC(txBuf);
 	int ct = 0;
 	for(; ct < MAX_CONNECT_TRIES; ct++) {
-		PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 0);
-		uint32_t res = PIOS_SPI_TransferBlock(PIOS_OPAHRS_SPI, (uint8_t *) txBuf,
+		PIOS_SPI_RC_PinSet(spi_id, 0);
+		uint32_t res = PIOS_SPI_TransferBlock(spi_id, (uint8_t *) txBuf,
 											  (uint8_t *) rxBuf, sizeof(AhrsProgramPacket), NULL);
-		PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 1);
+		PIOS_SPI_RC_PinSet(spi_id, 1);
 		if(res == 0) {
 			if(rxBuf->type != PROGRAM_NULL &&
 					rxBuf->crc == GenerateCRC(rxBuf) &&

@@ -90,18 +90,20 @@ uint8_t PIOS_SDCARD_Sector[SECTOR_SIZE];
 static uint8_t CardType;
 static int32_t sdcard_mounted;
 
+static uint32_t PIOS_SDCARD_SPI;
+
 /**
 * Initialises SPI pins and peripheral to access MMC/SD Card
 * \param[in] mode currently only mode 0 supported
 * \return < 0 if initialisation failed
 */
-int32_t PIOS_SDCARD_Init(void)
+int32_t PIOS_SDCARD_Init(uint32_t spi_id)
 {
 	SDCARD_MUTEX_TAKE;
 
 	sdcard_mounted = 0;
 
-	//PIOS_SPI_Init(PIOS_SDCARD_SPI);
+	PIOS_SDCARD_SPI = spi_id;
 
 	/* Init SPI port for slow frequency access (ca. 0.3 MBit/s) */
 	PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_256);

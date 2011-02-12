@@ -31,5 +31,5 @@
 * If so, it will program the FLASH then return
 * If not it just returns.
 */
-void AhrsProgramReceive(void);
+void AhrsProgramReceive(uint32_t spi_id);
 #endif //AHRS_PROGRAM_SLAVE_H

@@ -547,6 +547,8 @@ int main()
 	uint32_t counter_val = 0;
 	ahrs_algorithm = AHRSSETTINGS_ALGORITHM_SIMPLE;
 
+	reset_values();
+
 	PIOS_Board_Init();
 
 #if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
@@ -555,9 +557,6 @@ int main()
 	PIOS_HMC5843_ReadID(mag_data.id);
 #endif
 	
-	reset_values();
-
-	AhrsInitComms();
 	while(!AhrsLinkReady()) {
 		AhrsPoll();
 	}

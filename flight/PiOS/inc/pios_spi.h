@@ -44,15 +44,14 @@ typedef enum {
 } SPIPrescalerTypeDef;
 
 /* Public Functions */
-extern int32_t PIOS_SPI_Init(void);
-extern int32_t PIOS_SPI_SetClockSpeed(uint8_t spi, SPIPrescalerTypeDef spi_prescaler);
-extern int32_t PIOS_SPI_RC_PinSet(uint8_t spi, uint8_t pin_value);
-extern int32_t PIOS_SPI_TransferByte(uint8_t spi, uint8_t b);
-extern int32_t PIOS_SPI_TransferBlock(uint8_t spi, const uint8_t * send_buffer, uint8_t * receive_buffer, uint16_t len, void *callback);
-extern int32_t PIOS_SPI_Busy(uint8_t spi);
-extern void PIOS_SPI_IRQ_Handler(uint8_t spi);
-extern int8_t PIOS_SPI_ClaimBus(uint8_t spi);
-extern int8_t PIOS_SPI_ReleaseBus(uint8_t spi);
+extern int32_t PIOS_SPI_SetClockSpeed(uint32_t spi_id, SPIPrescalerTypeDef spi_prescaler);
+extern int32_t PIOS_SPI_RC_PinSet(uint32_t spi_id, uint8_t pin_value);
+extern int32_t PIOS_SPI_TransferByte(uint32_t spi_id, uint8_t b);
+extern int32_t PIOS_SPI_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len, void *callback);
+extern int32_t PIOS_SPI_Busy(uint32_t spi_id);
+extern int32_t PIOS_SPI_ClaimBus(uint32_t spi_id);
+extern int32_t PIOS_SPI_ReleaseBus(uint32_t spi_id);
+extern void    PIOS_SPI_IRQ_Handler(uint32_t spi_id);
 
 #endif /* PIOS_SPI_H */
 

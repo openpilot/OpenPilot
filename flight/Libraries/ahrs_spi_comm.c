@@ -140,10 +140,14 @@ void AhrsInitComms(void)
 	memset(&readyObjects, 0, sizeof(bool) * MAX_AHRS_OBJECTS);
 	txPacket.command = COMMS_NULL;
 	rxPacket.command = COMMS_NULL;
+}
 
-#ifdef IN_AHRS
-	PIOS_SPI_Init();
-#else
+static uint32_t opahrs_spi_id;
+void AhrsConnect(uint32_t spi_id)
+{
+	/* Bind this comms layer to the appropriate SPI id */
+	opahrs_spi_id = spi_id;
+#ifndef IN_AHRS
 	/* Comms already init in OP code */
 	for (int ct = 0; ct < MAX_AHRS_OBJECTS; ct++) {
 		AhrsObjHandle hdl = AhrsFromIndex(ct);
@@ -152,7 +156,6 @@ void AhrsInitComms(void)
 		}
 	}
 #endif
-
 }
 
 int32_t AhrsSetData(AhrsObjHandle obj, const void *dataIn)
@@ -310,7 +313,7 @@ AhrsCommStatus AhrsGetStatus()
 static void CommsCallback(uint8_t crc_ok, uint8_t crc_val)
 {
 #ifndef IN_AHRS
-	PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 1);	//signal the end of the transfer
+	PIOS_SPI_RC_PinSet(opahrs_spi_id, 1);	//signal the end of the transfer
 #endif
 	txPacket.command = COMMS_NULL;	//we must send something so default to null
 
@@ -356,7 +359,7 @@ static void CommsCallback(uint8_t crc_ok, uint8_t crc_val)
 	   If PIOS_SPI_TransferBlock() fails for any reason, comms will stop working.
 	   In that case, AhrsPoll() should kick start things again.
 	 */
-	PIOS_SPI_TransferBlock(PIOS_SPI_OP, (uint8_t *) & txPacket, (uint8_t *) & rxPacket, sizeof(CommsDataPacket), &CommsCallback);
+	PIOS_SPI_TransferBlock(opahrs_spi_id, (uint8_t *) & txPacket, (uint8_t *) & rxPacket, sizeof(CommsDataPacket), &CommsCallback);
 #endif
 }
 
@@ -378,23 +381,22 @@ static void PollEvents(void)
 	}
 }
 
-
 #ifdef IN_AHRS
 void AhrsPoll()
 {
 	if(programReceive)
 	{
-		AhrsProgramReceive();
+		AhrsProgramReceive(opahrs_spi_id);
 		programReceive = false;
 	}
 	PollEvents();
-	if (PIOS_SPI_Busy(PIOS_SPI_OP) != 0) {	//Everything is working correctly
+	if (PIOS_SPI_Busy(opahrs_spi_id) != 0) {	//Everything is working correctly
 		return;
 	}
 	txPacket.status.kickStarts++;
 //comms have broken down - try kick starting it.
 	txPacket.command = COMMS_NULL;	//we must send something so default to null
-	PIOS_SPI_TransferBlock(PIOS_SPI_OP, (uint8_t *) & txPacket, (uint8_t *) & rxPacket, sizeof(CommsDataPacket), &CommsCallback);
+	PIOS_SPI_TransferBlock(opahrs_spi_id, (uint8_t *) & txPacket, (uint8_t *) & rxPacket, sizeof(CommsDataPacket), &CommsCallback);
 }
 
 bool AhrsLinkReady(void)
@@ -437,9 +439,9 @@ void AhrsSendObjects(void)
 
 void SendPacket(void)
 {
-	PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 0);
+	PIOS_SPI_RC_PinSet(opahrs_spi_id, 0);
 	//no point checking if this failed. There isn't much we could do about it if it did fail
-	PIOS_SPI_TransferBlock(PIOS_OPAHRS_SPI, (uint8_t *) & txPacket, (uint8_t *) & rxPacket, sizeof(CommsDataPacket), &CommsCallback);
+	PIOS_SPI_TransferBlock(opahrs_spi_id, (uint8_t *) & txPacket, (uint8_t *) & rxPacket, sizeof(CommsDataPacket), &CommsCallback);
 }
 
 static void AhrsUpdatedCb(AhrsObjHandle handle)

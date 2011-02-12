@@ -24,8 +24,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
- #ifndef AHRSCOMMS_H_INCLUDED
-#define AHRSCOMMS_H_INCLUDED
+#ifndef AHRS_SPI_COMM_H_INCLUDED
+#define AHRS_SPI_COMM_H_INCLUDED
 
 #ifdef IN_AHRS			//AHRS only
 #include <stdint.h>
@@ -87,6 +87,10 @@ AhrsSendObjects()
  */
 void AhrsInitComms(void);
 
+/** Connect Comms to a specific SPI interface instance.
+ */
+void AhrsConnect(uint32_t spi_id);
+
 /** AHRS version of UAVObject  xxxSetData.
 Returns: 0 if ok, -1 if an error
  */
@@ -129,4 +133,4 @@ void AhrsSendObjects(void);
 
 #endif
 
-#endif //#ifndef AHRSCOMMS_H_INCLUDED
+#endif //#ifndef AHRS_SPI_COMM_H_INCLUDED

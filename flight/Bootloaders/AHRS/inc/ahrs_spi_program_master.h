@@ -36,29 +36,27 @@ typedef enum {PROGRAM_ERR_OK, //OK
 /** Connect to AHRS and request programming mode
 * returns: false if failed.
 */
-bool AhrsProgramConnect(void);
+bool AhrsProgramConnect(uint32_t spi_id);
 
 /** Write data to AHRS
 * size must be between 1 and SPI_MAX_PROGRAM_DATA_SIZE
 * returns: error status
 */
 
-PROGERR AhrsProgramWrite(uint32_t address, void * data, uint32_t size);
+PROGERR AhrsProgramWrite(uint32_t spi_id, uint32_t address, void * data, uint32_t size);
 
 /** Read data from AHRS
 * size must be between 1 and SPI_MAX_PROGRAM_DATA_SIZE
 * returns: error status
 */
 
-PROGERR AhrsProgramRead(uint32_t address, void * data, uint32_t size);
-
+PROGERR AhrsProgramRead(uint32_t spi_id, uint32_t address, void * data, uint32_t size);
 
 /** reboot AHRS
 * returns: error status
 */
 
-PROGERR AhrsProgramReboot(void);
-
+PROGERR AhrsProgramReboot(uint32_t spi_id);
 
 //TODO: Implement programming protocol
 

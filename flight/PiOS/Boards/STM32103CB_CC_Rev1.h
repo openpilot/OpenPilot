@@ -144,8 +144,7 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //
 // See also pios_board.c
 //-------------------------
-#define PIOS_SPI_FLASH				0
-#define PIOS_SPI_ACCEL				0
+#define PIOS_SPI_MAX_DEVS			2
 
 //-------------------------
 // PIOS_USART

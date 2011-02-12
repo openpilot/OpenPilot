@@ -9,6 +9,8 @@
 
 #include "pios.h"
 
+static uint32_t PIOS_SPI_ACCEL;
+
 /**
  * @brief Claim the SPI bus for the accel communications and select this chip
  */
@@ -75,9 +77,17 @@ void PIOS_ADXL345_SetMeasure(uint8_t enable)
 }
 
 /**
+ * @brief Connect to the correct SPI bus
+ */
+void PIOS_ADXL345_Attach(uint32_t spi_id)
+{
+	PIOS_SPI_ACCEL = spi_id;
+}
+
+/**
  * @brief Initialize with good default settings
  */
-void PIOS_ADXL345_Init() 
+void PIOS_ADXL345_Init()
 {
 	PIOS_ADXL345_ReleaseBus();
 	PIOS_ADXL345_SelectRate(ADXL_RATE_3200);

@@ -47,7 +47,7 @@ struct pios_spi_cfg {
 };
 
 struct pios_spi_dev {
-	const struct pios_spi_cfg *const cfg;
+	const struct pios_spi_cfg * cfg;
 	void (*callback) (uint8_t, uint8_t);
 	uint8_t tx_dummy_byte;
 	uint8_t rx_dummy_byte;
@@ -56,9 +56,7 @@ struct pios_spi_dev {
 #endif
 };
 
-extern struct pios_spi_dev pios_spi_devs[];
-extern uint8_t pios_spi_num_devices;
-
+extern int32_t PIOS_SPI_Init(uint32_t * spi_id, const struct pios_spi_cfg * cfg);
 #endif /* PIOS_SPI_PRIV_H */
 
 /**

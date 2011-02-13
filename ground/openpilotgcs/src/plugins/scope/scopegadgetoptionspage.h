@@ -71,7 +71,6 @@ private:
     void setYAxisWidgetFromPlotCurve();
     void setButtonColor(const QColor &color);
 
-
 private slots:
     void on_lstCurves_currentRowChanged(int currentRow);
     void on_btnRemoveCurve_clicked();

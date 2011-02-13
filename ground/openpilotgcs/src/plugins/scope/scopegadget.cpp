@@ -68,7 +68,8 @@ void ScopeGadget::loadConfiguration(IUAVGadgetConfiguration* config)
                 uavField,
                 scale,
                 QPen(  QBrush(QColor(color),Qt::SolidPattern),
-                       (qreal)2,
+//					   (qreal)2,
+					   (qreal)1,
                        Qt::SolidLine,
                        Qt::SquareCap,
                        Qt::BevelJoin)

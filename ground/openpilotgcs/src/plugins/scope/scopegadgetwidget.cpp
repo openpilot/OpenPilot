@@ -114,13 +114,15 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
     // Show a title
     setTitle("Scope");    
 
-    setCanvasBackground(Utils::StyleHelper::baseColor());
+//    setCanvasBackground(Utils::StyleHelper::baseColor());
+	setCanvasBackground(QColor(48, 48, 48));
 
     //Add grid lines
     QwtPlotGrid *grid = new QwtPlotGrid;
-    grid->setMajPen(QPen(Qt::gray, 0, Qt::DashLine));
-    grid->setMinPen(QPen(Qt::lightGray, 0 , Qt::DotLine));
-    grid->attach(this);
+	grid->setMajPen(QPen(Qt::gray, 0, Qt::DashLine));
+	grid->setMinPen(QPen(Qt::lightGray, 0, Qt::DotLine));
+	grid->setPen(QPen(Qt::darkGray, 1, Qt::DotLine));
+	grid->attach(this);
 
     // Show a legend at the bottom
     if (legend() == 0) {

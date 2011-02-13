@@ -174,3 +174,8 @@ SUBDIRS += plugin_pipxtreme
 plugin_magicwaypoint.subdir = magicwaypoint
 plugin_magicwaypoint.depends = plugin_coreplugin
 SUBDIRS += plugin_magicwaypoint
+
+# UAVSettingsImportExport
+plugin_uavsettingsimportexport.subdir = uavsettingsimportexport
+plugin_uavsettingsimportexport.depends = plugin_coreplugin
+SUBDIRS += plugin_uavsettingsimportexport

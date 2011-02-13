@@ -888,6 +888,19 @@ void ConfigServoWidget::updateChannels(UAVObject* controlCommand)
             mccDataRate = mdata.flightTelemetryUpdatePeriod;
             mdata.flightTelemetryUpdatePeriod = 150;
             controlCommand->setMetadata(mdata);
+
+            // Also protect the user by setting all values to zero
+            // and making the ActuatorCommand object readonly
+            UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
+            mdata = obj->getMetadata();
+            mdata.flightAccess = UAVObject::ACCESS_READONLY;
+            obj->setMetadata(mdata);
+            UAVObjectField *field = obj->getField("Channel");
+            for (int i=0; i< field->getNumElements(); i++) {
+                field->setValue(0,i);
+            }
+            obj->updated();
+
         }
         fieldName = QString("Channel");
         field =  controlCommand->getField(fieldName);
@@ -932,6 +945,12 @@ void ConfigServoWidget::updateChannels(UAVObject* controlCommand)
             mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
             mdata.flightTelemetryUpdatePeriod = mccDataRate;
             controlCommand->setMetadata(mdata);
+
+            UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
+            mdata = obj->getMetadata();
+            mdata.flightAccess = UAVObject::ACCESS_READWRITE;
+            obj->setMetadata(mdata);
+
         }
         firstUpdate = true;
     }

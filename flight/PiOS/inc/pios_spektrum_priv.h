@@ -36,7 +36,7 @@
 #include <pios_usart_priv.h>
 
 struct pios_spektrum_cfg {
-	struct pios_usart_cfg pios_usart_spektrum_cfg;
+	const struct pios_usart_cfg * pios_usart_spektrum_cfg;
 	TIM_TimeBaseInitTypeDef tim_base_init;
 	GPIO_InitTypeDef gpio_init;
 	uint32_t remap;		/* GPIO_Remap_* */

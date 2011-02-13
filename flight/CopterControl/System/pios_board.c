@@ -351,7 +351,7 @@ void PIOS_USART_spektrum_irq_handler(void)
 void TIM2_IRQHandler();
 void TIM2_IRQHandler() __attribute__ ((alias ("PIOS_TIM2_irq_handler")));
 const struct pios_spektrum_cfg pios_spektrum_cfg = {
-	.pios_usart_spektrum_cfg = pios_usart_spektrum_cfg;
+	.pios_usart_spektrum_cfg = &pios_usart_spektrum_cfg,
 	.tim_base_init = {
 		.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,	/* For 1 uS accuracy */
 		.TIM_ClockDivision = TIM_CKD_DIV1,
@@ -380,7 +380,7 @@ const struct pios_spektrum_cfg pios_spektrum_cfg = {
 
 void PIOS_TIM2_irq_handler()
 {
-	PIOS_SPEKTRUM_irq_handler();
+	PIOS_SPEKTRUM_irq_handler(pios_usart_spektrum_id);
 }
 #endif	/* PIOS_INCLUDE_SPEKTRUM */
 
@@ -684,6 +684,13 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 	/* SPEKTRUM init must come before comms */
 	PIOS_SPEKTRUM_Init();
+
+	if (PIOS_USART_Init(&pios_usart_spektrum_id, &pios_usart_spektrum_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+	if (PIOS_COM_Init(&pios_com_spektrum_id, &pios_usart_com_driver, pios_usart_spektrum_id)) {
+		PIOS_DEBUG_Assert(0);
+	}
 #endif
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();

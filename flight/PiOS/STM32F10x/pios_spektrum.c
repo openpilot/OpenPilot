@@ -59,8 +59,6 @@ void PIOS_SPEKTRUM_Init(void)
 		PIOS_SPEKTRUM_Bind();
 	}
 
-///////////////////////
-
 	NVIC_InitTypeDef NVIC_InitStructure = pios_spektrum_cfg.irq.init;
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = pios_spektrum_cfg.tim_base_init;
 
@@ -117,40 +115,6 @@ void PIOS_SPEKTRUM_Init(void)
 
 	/* Enable timers */
 	TIM_Cmd(pios_spektrum_cfg.timer, ENABLE);
-
-/////////////////////////////
-
-#if 0
-	/* spektrum "watchdog" timer */
-	NVIC_InitTypeDef NVIC_InitStructure;
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-	/* Enable timer clock */
-	PIOS_SPEKTRUM_SUPV_TIMER_RCC_FUNC;
-
-	/* Configure interrupts */
-	NVIC_InitStructure.NVIC_IRQChannel = PIOS_SPEKTRUM_SUPV_IRQ_CHANNEL;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
-
-	/* Time base configuration */
-	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-	TIM_TimeBaseStructure.TIM_Period = ((1000000 / PIOS_SPEKTRUM_SUPV_HZ) - 1);
-	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;	/* For 1 uS accuracy */
-	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_TimeBaseInit(PIOS_SPEKTRUM_SUPV_TIMER, &TIM_TimeBaseStructure);
-
-	/* Enable the Update Interrupt Request */
-	TIM_ITConfig(PIOS_SPEKTRUM_SUPV_TIMER, TIM_IT_Update, ENABLE);
-
-	/* Clear update pending flag */
-	TIM_ClearFlag(PIOS_SPEKTRUM_SUPV_TIMER, TIM_FLAG_Update);
-
-	/* Enable counter */
-	TIM_Cmd(PIOS_SPEKTRUM_SUPV_TIMER, ENABLE);
-#endif
 }
 
 /**
@@ -211,52 +175,6 @@ uint8_t PIOS_SPEKTRUM_Bind(void)
 	PIOS_DELAY_WaituS(120);
 	/* RX line, set input and wait for data, PIOS_SPEKTRUM_Init */
 
-#if 0
-
-#define PIOS_USART3_GPIO_PORT			GPIOA
-#define PIOS_USART3_RX_PIN			GPIO_Pin_10
-
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_StructInit(&GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_InitStructure.GPIO_Pin = PIOS_USART3_RX_PIN;
-	GPIO_Init(PIOS_USART3_GPIO_PORT, &GPIO_InitStructure);
-	/* GPIO's Off */
-	/* TODO: powerup, RX line stay low for 75ms */
-	/* system init takes longer!!! */
-	/* I have no idea how long the powerup init window for satellite is but works with this */
-	PIOS_USART3_GPIO_PORT->BRR = PIOS_USART3_RX_PIN;
-	//PIOS_DELAY_WaitmS(75);
-	/* RX line, drive high for 10us */
-	PIOS_USART3_GPIO_PORT->BSRR = PIOS_USART3_RX_PIN;
-	PIOS_DELAY_WaituS(10);
-	/* RX line, drive low for 120us */
-	PIOS_USART3_GPIO_PORT->BRR = PIOS_USART3_RX_PIN;
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive high for 120us */
-	PIOS_USART3_GPIO_PORT->BSRR = PIOS_USART3_RX_PIN;
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive low for 120us */
-	PIOS_USART3_GPIO_PORT->BRR = PIOS_USART3_RX_PIN;
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive high for 120us */
-	PIOS_USART3_GPIO_PORT->BSRR = PIOS_USART3_RX_PIN;
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive low for 120us */
-	PIOS_USART3_GPIO_PORT->BRR = PIOS_USART3_RX_PIN;
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive high for 120us */
-	PIOS_USART3_GPIO_PORT->BSRR = PIOS_USART3_RX_PIN;
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive low for 120us */
-	PIOS_USART3_GPIO_PORT->BRR = PIOS_USART3_RX_PIN;
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive high for 120us */
-	PIOS_USART3_GPIO_PORT->BSRR = PIOS_USART3_RX_PIN;
-	PIOS_DELAY_WaituS(120);
-	/* RX line, set input and wait for data, PIOS_SPEKTRUM_Init */
-#endif
 	return 1;
 }
 
@@ -317,11 +235,11 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 }
 
 /* Interrupt handler for USART */
-void SPEKTRUM_IRQHandler(void)
+void SPEKTRUM_IRQHandler(uint32_t usart_id)
 {
 	/* by always reading DR after SR make sure to clear any error interrupts */
-	volatile uint16_t sr = pios_spektrum_cfg.pios_usart_spektrum_cfg.regs->SR;
-	volatile uint8_t b = pios_spektrum_cfg.pios_usart_spektrum_cfg.regs->DR;
+	volatile uint16_t sr = pios_spektrum_cfg.pios_usart_spektrum_cfg->regs->SR;
+	volatile uint8_t b = pios_spektrum_cfg.pios_usart_spektrum_cfg->regs->DR;
 	
 	/* check if RXNE flag is set */
 	if (sr & USART_SR_RXNE) {
@@ -332,7 +250,7 @@ void SPEKTRUM_IRQHandler(void)
 
 	if (sr & USART_SR_TXE) {	// check if TXE flag is set
 		/* Disable TXE interrupt (TXEIE=0) */
-		USART_ITConfig(pios_spektrum_cfg.pios_usart_spektrum_cfg.regs, USART_IT_TXE, DISABLE);
+		USART_ITConfig(pios_spektrum_cfg.pios_usart_spektrum_cfg->regs, USART_IT_TXE, DISABLE);
 	}
 	/* clear "watchdog" timer */
 	TIM_SetCounter(pios_spektrum_cfg.timer, 0);

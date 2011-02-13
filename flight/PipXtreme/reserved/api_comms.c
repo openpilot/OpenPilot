@@ -155,7 +155,7 @@ static const uint8_t crc_table[256] = {
 // *****************************************************************************
 // local variables
 
-int8_t				api_previous_com_port = -1;
+uint32_t			api_previous_com_port = 0;
 
 volatile uint16_t	api_rx_timer = 0;
 volatile uint16_t	api_tx_timer = 0;
@@ -299,7 +299,7 @@ void api_process(void)
 	// decide which comm-port we are using (usart or usb)
 
 	bool usb_comms = false;						// TRUE if we are using the usb port for comms.
-	uint8_t comm_port = PIOS_COM_SERIAL;		// default to using the usart comm-port
+	uint32_t comm_port = PIOS_COM_SERIAL;		// default to using the usart comm-port
 
 	#if defined(PIOS_INCLUDE_USB_HID)
 		if (PIOS_USB_HID_CheckAvailable(0))
@@ -312,7 +312,7 @@ void api_process(void)
 	// ********************
 	// check to see if the local communication port has changed (usart/usb)
 
-	if (api_previous_com_port < 0 && api_previous_com_port != comm_port)
+	if (api_previous_com_port == 0 && api_previous_com_port != comm_port)
 	{	// the local communications port has changed .. remove any data in the buffers
 		api_rx_buffer_wr = 0;
 		api_tx_buffer_wr = 0;
@@ -487,7 +487,7 @@ void api_process(void)
 
 void api_init(void)
 {
-	api_previous_com_port = -1;
+	api_previous_com_port = 0;
 
 	api_rx_buffer_wr = 0;
 

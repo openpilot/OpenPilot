@@ -38,7 +38,7 @@
 // *****************************************************************************
 // local variables
 
-int8_t                  trans_previous_com_port = -1;
+uint32_t                trans_previous_com_port = 0;
 
 volatile uint16_t       trans_rx_timer = 0;
 volatile uint16_t       trans_tx_timer = 0;
@@ -67,7 +67,7 @@ void trans_process(void)
     // decide which comm-port we are using (usart or usb)
 
     bool usb_comms = false;						// TRUE if we are using the usb port for comms.
-    uint8_t comm_port = PIOS_COM_SERIAL;		// default to using the usart comm-port
+    uint32_t comm_port = PIOS_COM_SERIAL;		// default to using the usart comm-port
 
     #if defined(PIOS_INCLUDE_USB_HID)
         if (PIOS_USB_HID_CheckAvailable(0))
@@ -80,7 +80,7 @@ void trans_process(void)
     // ********************
     // check to see if the local communication port has changed (usart/usb)
 
-    if (trans_previous_com_port < 0 && trans_previous_com_port != comm_port)
+    if (trans_previous_com_port == 0 && trans_previous_com_port != comm_port)
     {	// the local communications port has changed .. remove any data in the buffers
         trans_temp_buffer2_wr = 0;
     }
@@ -205,7 +205,7 @@ void trans_process(void)
 
 void trans_init(void)
 {
-	trans_previous_com_port = -1;
+	trans_previous_com_port = 0;
 
 	trans_temp_buffer2_wr = 0;
 

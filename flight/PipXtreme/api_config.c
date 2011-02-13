@@ -108,7 +108,7 @@ typedef struct
 // *****************************************************************************
 // local variables
 
-int8_t				apiconfig_previous_com_port = -1;
+uint32_t				apiconfig_previous_com_port = 0;
 
 volatile uint16_t	apiconfig_rx_config_timer = 0;
 volatile uint16_t	apiconfig_rx_timer = 0;
@@ -455,7 +455,7 @@ void apiconfig_process(void)
 	// decide which comm-port we are using (usart or usb)
 
 	bool usb_comms = false;						// TRUE if we are using the usb port for comms.
-	uint8_t comm_port = PIOS_COM_SERIAL;		// default to using the usart comm-port
+	uint32_t comm_port = PIOS_COM_SERIAL;		// default to using the usart comm-port
 
 	#if defined(PIOS_INCLUDE_USB_HID)
 		if (PIOS_USB_HID_CheckAvailable(0))
@@ -468,7 +468,7 @@ void apiconfig_process(void)
 	// ********************
 	// check to see if the local communication port has changed (usart/usb)
 
-	if (apiconfig_previous_com_port < 0 && apiconfig_previous_com_port != comm_port)
+	if (apiconfig_previous_com_port == 0 && apiconfig_previous_com_port != comm_port)
 	{	// the local communications port has changed .. remove any data in the buffers
 		apiconfig_rx_buffer_wr = 0;
 		apiconfig_tx_buffer_wr = 0;
@@ -691,7 +691,7 @@ void apiconfig_process(void)
 
 void apiconfig_init(void)
 {
-	apiconfig_previous_com_port = -1;
+	apiconfig_previous_com_port = 0;
 
 	apiconfig_rx_buffer_wr = 0;
 

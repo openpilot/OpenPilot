@@ -36,6 +36,8 @@ ENABLE_AUX_UART ?= NO
 #
 USE_BOOTLOADER ?= NO
 
+USE_SPEKTRUM ?= NO
+
 
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= YES
@@ -388,6 +390,10 @@ CDEFS += -DPIOS_ENABLE_AUX_UART
 endif
 ifeq ($(USE_BOOTLOADER), YES)
 CDEFS += -DUSE_BOOTLOADER
+endif
+
+ifeq ($(USE_SPEKTRUM), YES)
+CDEFS += -DUSE_SPEKTRUM
 endif
 
 

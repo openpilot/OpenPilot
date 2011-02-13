@@ -41,9 +41,14 @@
 #define PIOS_INCLUDE_I2C
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
-//#define PIOS_INCLUDE_SPEKTRUM
+
+#if defined(USE_SPEKTRUM)
+#define PIOS_INCLUDE_SPEKTRUM
+#else
 //#define PIOS_INCLUDE_PPM
 #define PIOS_INCLUDE_PWM
+#endif
+
 #define PIOS_INCLUDE_SERVO
 #define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_SYS

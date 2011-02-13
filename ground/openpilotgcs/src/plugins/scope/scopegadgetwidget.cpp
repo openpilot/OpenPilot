@@ -111,11 +111,20 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
 
     setMinimumSize(64, 64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+
     // Show a title
-    setTitle("Scope");    
+//	setTitle("Scope");
+
+	setMargin(1);
+
+//	QPalette pal = palette();
+//	QPalette::ColorRole cr = backgroundRole();
+//	pal.setColor(cr, QColor(128, 128, 128));				// background colour
+//	pal.setColor(QPalette::Text, QColor(255, 255, 255));	// text colour
+//	setPalette(pal);
 
 //    setCanvasBackground(Utils::StyleHelper::baseColor());
-	setCanvasBackground(QColor(48, 48, 48));
+	setCanvasBackground(QColor(64, 64, 64));
 
     //Add grid lines
     QwtPlotGrid *grid = new QwtPlotGrid;
@@ -124,13 +133,29 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
 	grid->setPen(QPen(Qt::darkGray, 1, Qt::DotLine));
 	grid->attach(this);
 
-    // Show a legend at the bottom
-    if (legend() == 0) {
-        QwtLegend *legend = new QwtLegend();
-        legend->setItemMode(QwtLegend::CheckableItem);
-        legend->setFrameStyle(QFrame::Box | QFrame::Sunken);
-        insertLegend(legend, QwtPlot::BottomLegend);
-    }
+	// Show a legend at the top
+	if (!legend())
+	{
+		QwtLegend *legend = new QwtLegend();
+		legend->setItemMode(QwtLegend::CheckableItem);
+		legend->setFrameStyle(QFrame::Box | QFrame::Sunken);
+
+		QPalette::ColorRole br = legend->backgroundRole();
+		QPalette pal = legend->palette();
+//		pal.setColor(QPalette::Window, QColor(64, 64, 64));		// background colour
+		pal.setColor(br, QColor(128, 128, 128));				// background colour
+		pal.setColor(QPalette::Text, QColor(255, 255, 255));	// text colour
+		legend->setPalette(pal);
+
+		insertLegend(legend, QwtPlot::TopLegend);
+	}
+	// Show a legend at the bottom
+//	if (legend() == 0) {
+//		QwtLegend *legend = new QwtLegend();
+//		legend->setItemMode(QwtLegend::CheckableItem);
+//		legend->setFrameStyle(QFrame::Box | QFrame::Sunken);
+//		insertLegend(legend, QwtPlot::BottomLegend);
+//	}
 
     connect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)),this, SLOT(showCurve(QwtPlotItem *, bool)));
 
@@ -161,7 +186,12 @@ void ScopeGadgetWidget::setupSequencialPlot()
 {
     preparePlot(SequencialPlot);
 
-    setAxisTitle(QwtPlot::xBottom, "Index");
+//	QwtText title("Index");
+////	title.setFont(QFont("Helvetica", 20));
+//	title.font().setPointSize(title.font().pointSize() / 2);
+//	setAxisTitle(QwtPlot::xBottom, title);
+////    setAxisTitle(QwtPlot::xBottom, "Index");
+
     setAxisScaleDraw(QwtPlot::xBottom, new QwtScaleDraw());
     setAxisScale(QwtPlot::xBottom, 0, m_xWindowSize);
     setAxisLabelRotation(QwtPlot::xBottom, 0.0);
@@ -172,12 +202,29 @@ void ScopeGadgetWidget::setupChronoPlot()
 {
     preparePlot(ChronoPlot);
 
-    setAxisTitle(QwtPlot::xBottom, "Time [h:m:s]");
+//	QwtText title("Time [h:m:s]");
+////	title.setFont(QFont("Helvetica", 20));
+//	title.font().setPointSize(title.font().pointSize() / 2);
+//	setAxisTitle(QwtPlot::xBottom, title);
+////	setAxisTitle(QwtPlot::xBottom, "Time [h:m:s]");
+
     setAxisScaleDraw(QwtPlot::xBottom, new TimeScaleDraw());
     uint NOW = QDateTime::currentDateTime().toTime_t();
     setAxisScale(QwtPlot::xBottom, NOW - m_xWindowSize / 1000, NOW);
     setAxisLabelRotation(QwtPlot::xBottom, -15.0);
     setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignLeft | Qt::AlignBottom);
+
+	QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
+//	QwtScaleDraw *scaleDraw = axisScaleDraw();
+
+	// set the axis colours .. can;t seem to change the background colour :(
+//	QPalette pal = scaleWidget->palette();
+//	QPalette::ColorRole cr = scaleWidget->backgroundRole();
+//	pal.setColor(cr, QColor(128, 128, 128));				// background colour
+//	cr = scaleWidget->foregroundRole();
+//	pal.setColor(cr, QColor(255, 255, 255));				// tick colour
+//	pal.setColor(QPalette::Text, QColor(255, 255, 255));	// text colour
+//	scaleWidget->setPalette(pal);
 
     /*
      In situations, when there is a label at the most right position of the
@@ -188,9 +235,8 @@ void ScopeGadgetWidget::setupChronoPlot()
      is enough space for the overlapping label below the left scale.
      */
 
-    QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
     const int fmh = QFontMetrics(scaleWidget->font()).height();
-    scaleWidget->setMinBorderDist(0, fmh / 2);
+	scaleWidget->setMinBorderDist(0, fmh / 2);
 }
 
 void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor, QPen pen)
@@ -209,7 +255,7 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
 
     //If the y-bounds are supplied, set them
     if (plotData->yMinimum != plotData->yMaximum)
-        setAxisScale(QwtPlot::yLeft, plotData->yMinimum, plotData->yMaximum);
+		setAxisScale(QwtPlot::yLeft, plotData->yMinimum, plotData->yMaximum);
 
     //Create the curve    
     QString curveName = (plotData->uavObject) + "." + (plotData->uavField);

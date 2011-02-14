@@ -112,9 +112,6 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
     setMinimumSize(64, 64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
-    // Show a title
-//	setTitle("Scope");
-
 	setMargin(1);
 
 //	QPalette pal = palette();
@@ -139,12 +136,12 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
 		QwtLegend *legend = new QwtLegend();
 		legend->setItemMode(QwtLegend::CheckableItem);
 		legend->setFrameStyle(QFrame::Box | QFrame::Sunken);
+		legend->setToolTip(tr("Click legend to show/hide scope trace"));
 
-		QPalette::ColorRole br = legend->backgroundRole();
 		QPalette pal = legend->palette();
-//		pal.setColor(QPalette::Window, QColor(64, 64, 64));		// background colour
-		pal.setColor(br, QColor(128, 128, 128));				// background colour
-		pal.setColor(QPalette::Text, QColor(255, 255, 255));	// text colour
+//		pal.setColor(QPalette::Window, QColor(64, 64, 64));				// background colour
+		pal.setColor(legend->backgroundRole(), QColor(100, 100, 100));	// background colour
+		pal.setColor(QPalette::Text, QColor(255, 255, 255));			// text colour
 		legend->setPalette(pal);
 
 		insertLegend(legend, QwtPlot::TopLegend);
@@ -196,6 +193,17 @@ void ScopeGadgetWidget::setupSequencialPlot()
     setAxisScale(QwtPlot::xBottom, 0, m_xWindowSize);
     setAxisLabelRotation(QwtPlot::xBottom, 0.0);
     setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignLeft | Qt::AlignBottom);
+
+	QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
+
+	// reduce the gap between the scope canvas and the axis scale
+	scaleWidget->setMargin(0);
+
+	// reduce the axis font size
+	QFont fnt(axisFont(QwtPlot::xBottom));
+	fnt.setPointSize(7);
+	setAxisFont(QwtPlot::xBottom, fnt);	// x-axis
+	setAxisFont(QwtPlot::yLeft, fnt);	// y-axis
 }
 
 void ScopeGadgetWidget::setupChronoPlot()
@@ -211,13 +219,24 @@ void ScopeGadgetWidget::setupChronoPlot()
     setAxisScaleDraw(QwtPlot::xBottom, new TimeScaleDraw());
     uint NOW = QDateTime::currentDateTime().toTime_t();
     setAxisScale(QwtPlot::xBottom, NOW - m_xWindowSize / 1000, NOW);
-    setAxisLabelRotation(QwtPlot::xBottom, -15.0);
-    setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignLeft | Qt::AlignBottom);
+//	setAxisLabelRotation(QwtPlot::xBottom, -15.0);
+	setAxisLabelRotation(QwtPlot::xBottom, 0.0);
+	setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignLeft | Qt::AlignBottom);
+//	setAxisLabelAlignment(QwtPlot::xBottom, Qt::AlignCenter | Qt::AlignBottom);
 
 	QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
 //	QwtScaleDraw *scaleDraw = axisScaleDraw();
 
-	// set the axis colours .. can;t seem to change the background colour :(
+	// reduce the gap between the scope canvas and the axis scale
+	scaleWidget->setMargin(0);
+
+	// reduce the axis font size
+	QFont fnt(axisFont(QwtPlot::xBottom));
+	fnt.setPointSize(7);
+	setAxisFont(QwtPlot::xBottom, fnt);	// x-axis
+	setAxisFont(QwtPlot::yLeft, fnt);	// y-axis
+
+	// set the axis colours .. can't seem to change the background colour :(
 //	QPalette pal = scaleWidget->palette();
 //	QPalette::ColorRole cr = scaleWidget->backgroundRole();
 //	pal.setColor(cr, QColor(128, 128, 128));				// background colour
@@ -235,8 +254,12 @@ void ScopeGadgetWidget::setupChronoPlot()
      is enough space for the overlapping label below the left scale.
      */
 
-    const int fmh = QFontMetrics(scaleWidget->font()).height();
-	scaleWidget->setMinBorderDist(0, fmh / 2);
+//	const int fmh = QFontMetrics(scaleWidget->font()).height();
+//	scaleWidget->setMinBorderDist(0, fmh / 2);
+
+//	const int fmw = QFontMetrics(scaleWidget->font()).width(" 00:00:00 ");
+//	const int fmw = QFontMetrics(scaleWidget->font()).width(" ");
+//	scaleWidget->setMinBorderDist(0, fmw);
 }
 
 void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor, QPen pen)
@@ -255,7 +278,9 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
 
     //If the y-bounds are supplied, set them
     if (plotData->yMinimum != plotData->yMaximum)
+	{
 		setAxisScale(QwtPlot::yLeft, plotData->yMinimum, plotData->yMaximum);
+	}
 
     //Create the curve    
     QString curveName = (plotData->uavObject) + "." + (plotData->uavField);

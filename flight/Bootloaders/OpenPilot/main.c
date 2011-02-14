@@ -125,7 +125,6 @@ int main() {
 		else
 			ProgPort = Serial;
 		PIOS_Board_Init();
-		PIOS_OPAHRS_Init();
 		if(User_DFU_request == TRUE)
 			DeviceState = DFUidle;
 		else
@@ -137,7 +136,7 @@ int main() {
 			STOPWATCH_Reset(SSP_TIMER);
 			ssp_Init(&ssp_port, &SSP_PortConfig);
 		}
-		PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 0);
+		PIOS_OPAHRS_ForceSlaveSelected(true);
 	} else
 		JumpToApp = TRUE;
 

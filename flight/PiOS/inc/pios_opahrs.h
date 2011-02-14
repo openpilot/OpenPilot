@@ -38,7 +38,8 @@ enum opahrs_result {
 	OPAHRS_RESULT_FAILED,
 };
 
-extern void PIOS_OPAHRS_Init(void);
+extern void PIOS_OPAHRS_Attach(uint32_t spi_id);
+extern void PIOS_OPAHRS_ForceSlaveSelected(bool selected);
 
 /*
  * Protocol V0 messages used to talk to bootloaders

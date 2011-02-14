@@ -36,9 +36,20 @@
 #include "pios_opahrs_proto.h"
 #include "pios_opahrs.h"
 
-void PIOS_OPAHRS_Init(void)
+static uint32_t PIOS_OPAHRS_SPI;
+
+void PIOS_OPAHRS_Attach(uint32_t spi_id)
 {
-	PIOS_SPI_SetClockSpeed(PIOS_OPAHRS_SPI, PIOS_SPI_PRESCALER_8);
+	PIOS_OPAHRS_SPI = spi_id;
+}
+
+void PIOS_OPAHRS_ForceSlaveSelected(bool selected)
+{
+	if (selected) {
+		PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 0);
+	} else {
+		PIOS_SPI_RC_PinSet(PIOS_OPAHRS_SPI, 1);
+	}
 }
 
 static int32_t opahrs_msg_txrx(const uint8_t * tx, uint8_t * rx, uint32_t len)

@@ -32,6 +32,12 @@ static struct lfsm_context context = { 0 };
 static void lfsm_update_link_tx (struct lfsm_context * context);
 static void lfsm_init_rx (struct lfsm_context * context);
 
+static uint32_t PIOS_SPI_OP;
+void lfsm_attach(uint32_t spi_id)
+{
+  PIOS_SPI_OP = spi_id;
+}
+
 /*
  *
  * Link Finite State Machine

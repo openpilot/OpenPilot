@@ -72,6 +72,7 @@ struct lfsm_link_stats {
   uint32_t rx_badver;
 };
 
+extern void lfsm_attach(uint32_t spi_id);
 extern void lfsm_init(void);
 extern void lfsm_inject_event(enum lfsm_event event);
 

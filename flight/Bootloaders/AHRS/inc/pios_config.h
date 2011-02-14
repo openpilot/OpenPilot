@@ -29,18 +29,12 @@
 #define PIOS_CONFIG_H
 
 /* Enable/Disable PiOS Modules */
-//#define PIOS_INCLUDE_ADC
 #define PIOS_INCLUDE_DELAY
-//#define PIOS_INCLUDE_I2C
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_SYS
 #define PIOS_INCLUDE_BL_HELPER
-//#define PIOS_INCLUDE_USART
-//#define PIOS_INCLUDE_COM
-//#define PIOS_INCLUDE_HMC5843
 #define PIOS_INCLUDE_GPIO
-
 
 #endif /* PIOS_CONFIG_H */

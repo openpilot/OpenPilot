@@ -37,6 +37,8 @@
 #include "bl_fsm.h"		/* lfsm_state */
 #include "stm32f10x_flash.h"
 
+extern void PIOS_Board_Init(void);
+
 #define NSS_HOLD_STATE       ((GPIOB->IDR & GPIO_Pin_12) ? 0 : 1)
 enum bootloader_status boot_status;
 /* Private typedef -----------------------------------------------------------*/
@@ -92,9 +94,7 @@ int main() {
 		PIOS_DELAY_WaitmS(1000);
 		PIOS_IAP_ClearRequest();
 	}
-	/* SPI link to master */
-	PIOS_SPI_Init();
-	lfsm_init();
+	PIOS_Board_Init();
 	boot_status = idle;
 	Fw_crc = crc_memory_calc();
 	PIOS_LED_On(LED1);

@@ -149,7 +149,7 @@ namespace jafar {
 				// to pending, they may be processed in active search if necessary
 				while (best_set->size() > algorithmParams.n_updates_ransac)
 				{
-					int n = (rand() % (best_set->size() - 1)) + 1; // keep the first one which is the base obs
+					int n = (rtslam::rand() % (best_set->size() - 1)) + 1; // keep the first one which is the base obs
 					best_set->pendingObs.push_back(best_set->inlierObs[n]);
 					kernel::fastErase(best_set->inlierObs, n);
 				}
@@ -431,7 +431,7 @@ namespace jafar {
 					else
 						{ if (visibility < 0.1) visibility = 0.1; } // allow closing the loop! maybe look at neighbors
 					if (viscertainty < 0.25) visibility = 0.25;
-					if (rand()%1024 < visibility*1024) add = true;
+					if (rtslam::rand()%1024 < visibility*1024) add = true;
 					#else
 					bool add = true;
 					#endif
@@ -457,7 +457,7 @@ namespace jafar {
 				// select one random obs
 //				obsBasePtr = selectOneRandomObs();
 				if (remainingObsCount <= 0) { obsBasePtr.reset(); return; }
-				int n = rand()%remainingObsCount;
+				int n = rtslam::rand()%remainingObsCount;
 				obsBasePtr = obsVisibleList[n];
 // JFR_DEBUG("getOneMatchedBaseObs: trying obs " << obsBasePtr->id() << " already matched " << obsBasePtr->events.matched);
 				// try to match (if not yet matched)

@@ -53,8 +53,8 @@ namespace jafar {
 			projectionsCount.clear();
 		}
 		void ActiveSearchGrid::renew() {
-			offset(0) = - (margin + rand() % (cellSize(0) - 2*margin)); // from -margin to -(cellSize(0)-margin)
-			offset(1) = - (margin + rand() % (cellSize(1) - 2*margin)); // from -margin to -(cellSize(0)-margin)
+			offset(0) = - (margin + rtslam::rand() % (cellSize(0) - 2*margin)); // from -margin to -(cellSize(0)-margin)
+			offset(1) = - (margin + rtslam::rand() % (cellSize(1) - 2*margin)); // from -margin to -(cellSize(0)-margin)
 			clear();
 		}
 
@@ -76,8 +76,8 @@ namespace jafar {
 				}
 			}
 			if (k > 0) { // number of empty inner cells
-				//				int idx = (double) rand() / RAND_MAX * k;
-				int idx = rand() % k; // between 0 and k-1
+				//				int idx = (double) rtslam::rand() / RAND_MAX * k;
+				int idx = rtslam::rand() % k; // between 0 and k-1
 				cell(0) = emptyCellsTile_tmp(idx, 0);
 				cell(1) = emptyCellsTile_tmp(idx, 1);
 				return true;

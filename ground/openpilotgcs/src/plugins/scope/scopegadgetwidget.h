@@ -30,7 +30,6 @@
 
 #include "plotdata.h"
 
-
 #include "qwt/src/qwt.h"
 #include "qwt/src/qwt_plot.h"
 #include "qwt/src/qwt_plot_curve.h"
@@ -40,7 +39,7 @@
 #include <QTimer>
 #include <QTime>
 #include <QVector>
-
+#include <QMutex>
 
 /*!
   \brief This class is used to render the time values on the horizontal axis for the
@@ -121,6 +120,13 @@ public:
     void setLoggingNewFileOnConnect(bool value){m_csvLoggingNewFileOnConnect=value;};
     void setLoggingPath(QString value){m_csvLoggingPath=value;};
 
+protected:
+	void mousePressEvent(QMouseEvent *e);
+	void mouseReleaseEvent(QMouseEvent *e);
+	void mouseDoubleClickEvent(QMouseEvent *e);
+	void mouseMoveEvent(QMouseEvent *e);
+	void wheelEvent(QWheelEvent *e);
+
 private slots:
     void uavObjectReceived(UAVObject*);
     void replotNewData();
@@ -162,9 +168,13 @@ private:
     QString m_csvLoggingPath;
     QFile m_csvLoggingFile;
 
+	QMutex mutex;
+
     int csvLoggingInsertHeader();
     int csvLoggingInsertData();
 
+	void deleteLegend();
+	void addLegend();
 };
 
 

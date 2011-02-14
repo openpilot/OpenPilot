@@ -50,15 +50,21 @@
 #include <QtGui/QWidget>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
+#include <QMutexLocker>
 
 using namespace Core;
 
 TestDataGen* ScopeGadgetWidget::testDataGen;
 
+// ******************************************************************
+
 ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
 {
     //if(testDataGen == 0)
     //    testDataGen = new TestDataGen();
+
+	setMouseTracking(true);
+//	canvas()->setMouseTracking(true);
 
     //Setup the timer that replots data
     replotTimer = new QTimer(this);
@@ -70,7 +76,6 @@ ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
     connect(cm, SIGNAL(deviceDisconnected()), this, SLOT(stopPlotting()));
     connect(cm, SIGNAL(deviceConnected(QIODevice*)), this, SLOT(startPlotting()));
-
 
     m_csvLoggingStarted=0;
     m_csvLoggingEnabled=0;
@@ -86,7 +91,63 @@ ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
     //Listen to autopilot connection events
     connect(cm, SIGNAL(deviceDisconnected()), this, SLOT(csvLoggingDisconnect()));
     connect(cm, SIGNAL(deviceConnected(QIODevice*)), this, SLOT(csvLoggingConnect()));
+}
 
+ScopeGadgetWidget::~ScopeGadgetWidget()
+{
+	if (replotTimer)
+	{
+		replotTimer->stop();
+
+		delete replotTimer;
+		replotTimer = NULL;
+	}
+
+	// Get the object to de-monitor
+	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+	UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+	foreach (QString uavObjName, m_connectedUAVObjects)
+	{
+		UAVDataObject *obj = dynamic_cast<UAVDataObject*>(objManager->getObject(uavObjName));
+		disconnect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(uavObjectReceived(UAVObject*)));
+	}
+
+	clearCurvePlots();
+}
+
+// ******************************************************************
+
+void ScopeGadgetWidget::mousePressEvent(QMouseEvent *e)
+{
+	QwtPlot::mousePressEvent(e);
+}
+
+void ScopeGadgetWidget::mouseReleaseEvent(QMouseEvent *e)
+{
+	QwtPlot::mouseReleaseEvent(e);
+}
+
+void ScopeGadgetWidget::mouseDoubleClickEvent(QMouseEvent *e)
+{
+	mutex.lock();
+		if (legend())
+			deleteLegend();
+		else
+			addLegend();
+	mutex.unlock();
+	update();
+
+	QwtPlot::mouseDoubleClickEvent(e);
+}
+
+void ScopeGadgetWidget::mouseMoveEvent(QMouseEvent *e)
+{
+	QwtPlot::mouseMoveEvent(e);
+}
+
+void ScopeGadgetWidget::wheelEvent(QWheelEvent *e)
+{
+	QwtPlot::wheelEvent(e);
 }
 
 /**
@@ -94,13 +155,51 @@ ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
  */
 void ScopeGadgetWidget::startPlotting()
 {
-    if(!replotTimer->isActive())
+	if (!replotTimer->isActive())
         replotTimer->start(m_refreshInterval);
 }
 
 void ScopeGadgetWidget::stopPlotting()
 {
     replotTimer->stop();
+}
+
+void ScopeGadgetWidget::deleteLegend()
+{
+	if (!legend())
+		return;
+
+	disconnect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)), this, 0);
+
+	insertLegend(NULL, QwtPlot::TopLegend);
+}
+
+void ScopeGadgetWidget::addLegend()
+{
+	if (legend())
+		return;
+
+	// Show a legend at the top
+	QwtLegend *legend = new QwtLegend();
+	legend->setItemMode(QwtLegend::CheckableItem);
+	legend->setFrameStyle(QFrame::Box | QFrame::Sunken);
+	legend->setToolTip(tr("Click legend to show/hide scope trace"));
+
+	QPalette pal = legend->palette();
+//	pal.setColor(QPalette::Window, QColor(64, 64, 64));				// background colour
+	pal.setColor(legend->backgroundRole(), QColor(100, 100, 100));	// background colour
+	pal.setColor(QPalette::Text, QColor(255, 255, 255));			// text colour
+	legend->setPalette(pal);
+
+	insertLegend(legend, QwtPlot::TopLegend);
+
+//	// Show a legend at the bottom
+//	QwtLegend *legend = new QwtLegend();
+//	legend->setItemMode(QwtLegend::CheckableItem);
+//	legend->setFrameStyle(QFrame::Box | QFrame::Sunken);
+//	insertLegend(legend, QwtPlot::BottomLegend);
+
+	connect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)), this, SLOT(showCurve(QwtPlotItem *, bool)));
 }
 
 void ScopeGadgetWidget::preparePlot(PlotType plotType)
@@ -130,31 +229,8 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
 	grid->setPen(QPen(Qt::darkGray, 1, Qt::DotLine));
 	grid->attach(this);
 
-	// Show a legend at the top
-	if (!legend())
-	{
-		QwtLegend *legend = new QwtLegend();
-		legend->setItemMode(QwtLegend::CheckableItem);
-		legend->setFrameStyle(QFrame::Box | QFrame::Sunken);
-		legend->setToolTip(tr("Click legend to show/hide scope trace"));
-
-		QPalette pal = legend->palette();
-//		pal.setColor(QPalette::Window, QColor(64, 64, 64));				// background colour
-		pal.setColor(legend->backgroundRole(), QColor(100, 100, 100));	// background colour
-		pal.setColor(QPalette::Text, QColor(255, 255, 255));			// text colour
-		legend->setPalette(pal);
-
-		insertLegend(legend, QwtPlot::TopLegend);
-	}
-	// Show a legend at the bottom
-//	if (legend() == 0) {
-//		QwtLegend *legend = new QwtLegend();
-//		legend->setItemMode(QwtLegend::CheckableItem);
-//		legend->setFrameStyle(QFrame::Box | QFrame::Sunken);
-//		insertLegend(legend, QwtPlot::BottomLegend);
-//	}
-
-    connect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)),this, SLOT(showCurve(QwtPlotItem *, bool)));
+	// Add the legend
+	addLegend();
 
     // Only start the timer if we are already connected
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
@@ -176,7 +252,9 @@ void ScopeGadgetWidget::showCurve(QwtPlotItem *item, bool on)
     if ( w && w->inherits("QwtLegendItem") )
         ((QwtLegendItem *)w)->setChecked(on);
 
-    replot();
+	mutex.lock();
+		replot();
+	mutex.unlock();
 }
 
 void ScopeGadgetWidget::setupSequencialPlot()
@@ -319,7 +397,9 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
         connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(uavObjectReceived(UAVObject*)));
     }
 
-    replot();
+	mutex.lock();
+		replot();
+	mutex.unlock();
 }
 
 //void ScopeGadgetWidget::removeCurvePlot(QString uavObject, QString uavField)
@@ -333,7 +413,9 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
 //    delete plotData->curve;
 //    delete plotData;
 //
-//    replot();
+//	mutex.lock();
+//	    replot();
+//	mutex.unlock();
 //}
 
 void ScopeGadgetWidget::uavObjectReceived(UAVObject* obj)
@@ -345,7 +427,10 @@ void ScopeGadgetWidget::uavObjectReceived(UAVObject* obj)
 
 void ScopeGadgetWidget::replotNewData()
 {
-    foreach(PlotData* plotData, m_curvesData.values()) {
+	QMutexLocker locker(&mutex);
+
+	foreach(PlotData* plotData, m_curvesData.values())
+	{
         plotData->removeStaleData();
         plotData->curve->setData(*plotData->xData, *plotData->yData);
     }
@@ -353,14 +438,15 @@ void ScopeGadgetWidget::replotNewData()
     QDateTime NOW = QDateTime::currentDateTime();
     double toTime = NOW.toTime_t();
     toTime += NOW.time().msec() / 1000.0;
-    if (m_plotType == ChronoPlot) {
+	if (m_plotType == ChronoPlot)
         setAxisScale(QwtPlot::xBottom, toTime - m_xWindowSize, toTime);
-    }
-     //qDebug() << "replotNewData from " << NOW.addSecs(- m_xWindowSize) << " to " << NOW;
-    csvLoggingInsertData();
-    replot();
-}
 
+//	qDebug() << "replotNewData from " << NOW.addSecs(- m_xWindowSize) << " to " << NOW;
+
+    csvLoggingInsertData();
+
+	replot();
+}
 
 void ScopeGadgetWidget::setupExamplePlot()
 {
@@ -398,36 +484,14 @@ void ScopeGadgetWidget::setupExamplePlot()
     curve2->setData(x, cs, points);
     curve3->setData(x, sg, points);
 
-
-
     curve1->attach(this);
     curve2->attach(this);
     curve3->attach(this);
 
-
-
     // finally, refresh the plot
-    replot();
-}
-
-
-ScopeGadgetWidget::~ScopeGadgetWidget()
-{
-    if (replotTimer)
-        replotTimer->stop();
-    delete replotTimer;
-    replotTimer = 0;
-
-    //Get the object to de-monitor
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-
-    foreach(QString uavObjName, m_connectedUAVObjects) {
-        UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(uavObjName));
-        disconnect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(uavObjectReceived(UAVObject*)));
-    }
-
-    clearCurvePlots();
+	mutex.lock();
+		replot();
+	mutex.unlock();
 }
 
 void ScopeGadgetWidget::clearCurvePlots()
@@ -638,13 +702,12 @@ int ScopeGadgetWidget::csvLoggingInsertData()
 
     return 0;
 }
+
 void ScopeGadgetWidget::csvLoggingSetName(QString newName)
 {
     m_csvLoggingName = newName;
     m_csvLoggingNameSet=1;
 }
-
-
 
 void ScopeGadgetWidget::csvLoggingConnect()
 {

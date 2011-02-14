@@ -102,9 +102,9 @@ namespace jafar {
 			// Split control and perturbation vectors into
 			// sensed acceleration and sensed angular rate
 			// and noises
-			vec3 am, wm, an, wn, ar, wr; // measurements and random walks
+			vec3 am, wm, vi, ti, abi, wbi; // measurements and random walks
 			splitControl(_u, am, wm);
-			splitPert(_n, an, wn, ar, wr);
+			splitPert(_n, vi, ti, abi, wbi);
 
 			// It is useful to start obtaining a nice rotation matrix and the product R*dt
 			Rold = q2R(q);
@@ -114,8 +114,8 @@ namespace jafar {
 			// a = R(q)(asens - ab) + g     true acceleration
 			// w = wsens - wb               true angular rate
 			vec3 atrue, wtrue;
-			atrue = prod(Rold, (am - ab + an)) + g; // could have done rotate(q, instead of prod(Rold, ; jac/q is Rold...
-			wtrue = wm - wb + wn;
+			atrue = prod(Rold, (am - ab)) + g; // could have done rotate(q, instead of prod(Rold, ; jac/q is Rold...
+			wtrue = wm - wb;
 
 			// Get new state vector
 			vec3 pnew, vnew, abnew, wbnew, gnew;
@@ -123,16 +123,16 @@ namespace jafar {
 
 			// qnew = q x q(w * dt)
 			// Keep qwt ( = q(w * dt)) for later use
-			vec4 qwdt = v2q(wtrue * _dt);
+			vec4 qwdt = v2q(wtrue * _dt + ti);
 			qnew = qProd(q, qwdt); //    orientation
-			vnew = v + atrue * _dt; //    velocity
+			vnew = v + atrue * _dt + vi; //    velocity
 			#ifdef AVGSPEED
 			pnew = p + (v+vnew)/2 * _dt; //     position
 			#else
 			pnew = p + v * _dt; //     position
 			#endif
-			abnew = ab + ar; //          acc bias
-			wbnew = wb + wr; //          gyro bias
+			abnew = ab + abi; //          acc bias
+			wbnew = wb + wbi; //          gyro bias
 			gnew = g; //                 gravity does not change
 			
 			// normalize quaternion

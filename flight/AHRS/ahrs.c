@@ -53,9 +53,18 @@
 #define GYRO_OOB(x) ((x > (1000 * DEG_TO_RAD)) || (x < (-1000 * DEG_TO_RAD)))
 #define ACCEL_OOB(x) (((x > 12*9.81) || (x < -12*9.81)))
 
-#define MAG_RAW_X_IDX   1
-#define MAG_RAW_Y_IDX   0
-#define MAG_RAW_Z_IDX   2
+// down-sampled data index
+#define ACCEL_RAW_X_IDX			2
+#define ACCEL_RAW_Y_IDX			0
+#define ACCEL_RAW_Z_IDX			4
+#define GYRO_RAW_X_IDX			1
+#define GYRO_RAW_Y_IDX			3
+#define GYRO_RAW_Z_IDX			5
+#define GYRO_TEMP_RAW_XY_IDX	6
+#define GYRO_TEMP_RAW_Z_IDX		7
+#define MAG_RAW_X_IDX			1
+#define MAG_RAW_Y_IDX			0
+#define MAG_RAW_Z_IDX			2
 
 // For debugging the raw sensors
 //#define DUMP_RAW
@@ -492,13 +501,13 @@ void print_ahrs_raw()
 		// copy the raw samples into their own buffers
 		for (uint16_t i = 0, j = 0; i < over_sampling; i++, j += PIOS_ADC_NUM_CHANNELS)
 		{
-			accel_x[i] = valid_data_buffer[j + 0];
-			accel_y[i] = valid_data_buffer[j + 2];
-			accel_z[i] = valid_data_buffer[j + 4];
+			accel_x[i] = valid_data_buffer[ACCEL_RAW_X_IDX + j];
+			accel_y[i] = valid_data_buffer[ACCEL_RAW_Y_IDX + j];
+			accel_z[i] = valid_data_buffer[ACCEL_RAW_Z_IDX + j];
 
-			gyro_x[i] = valid_data_buffer[j + 3];
-			gyro_y[i] = valid_data_buffer[j + 1];
-			gyro_z[i] = valid_data_buffer[j + 5];
+			gyro_x[i] = valid_data_buffer[GYRO_RAW_X_IDX + j];
+			gyro_y[i] = valid_data_buffer[GYRO_RAW_Y_IDX + j];
+			gyro_z[i] = valid_data_buffer[GYRO_RAW_Z_IDX + j];
 		}
 
 		#if defined(PIOS_INCLUDE_HMC5843) && defined(PIOS_INCLUDE_I2C)
@@ -691,31 +700,17 @@ void adc_callback(float * downsampled_data)
 	AHRSSettingsData settings;
 	AHRSSettingsGet(&settings);
 
-	bool gyro_calib =	// TRUE if we calibrating the gyro's (biases = 0 and scales = 1)
-		abs(gyro_data.calibration.bias[0]) < 0.0001f && abs(gyro_data.calibration.scale[0] - 1) < 0.0001f &&
-		abs(gyro_data.calibration.bias[1]) < 0.0001f && abs(gyro_data.calibration.scale[1] - 1) < 0.0001f &&
-		abs(gyro_data.calibration.bias[2]) < 0.0001f && abs(gyro_data.calibration.scale[2] - 1) < 0.0001f;
-
 	float accel[3], gyro[3];
 
 	// Accel data is (y,x,z) in first third and fifth byte.  Convert to m/s
-	accel[0] = (downsampled_data[2] * accel_data.calibration.scale[0]) + accel_data.calibration.bias[0];
-	accel[1] = (downsampled_data[0] * accel_data.calibration.scale[1]) + accel_data.calibration.bias[1];
-	accel[2] = (downsampled_data[4] * accel_data.calibration.scale[2]) + accel_data.calibration.bias[2];
+	accel[0] = (downsampled_data[ACCEL_RAW_X_IDX] * accel_data.calibration.scale[0]) + accel_data.calibration.bias[0];
+	accel[1] = (downsampled_data[ACCEL_RAW_Y_IDX] * accel_data.calibration.scale[1]) + accel_data.calibration.bias[1];
+	accel[2] = (downsampled_data[ACCEL_RAW_Z_IDX] * accel_data.calibration.scale[2]) + accel_data.calibration.bias[2];
 
 	// Gyro data is (x,y,z) in second, fifth and seventh byte.  Convert to rad/s
-	if (!gyro_calib)
-	{	// not calibrating gyro's
-		gyro[0] = ( ( downsampled_data[1] + gyro_data.calibration.tempcompfactor[0] * downsampled_data[6] ) * gyro_data.calibration.scale[0]) + gyro_data.calibration.bias[0];
-		gyro[1] = ( ( downsampled_data[3] + gyro_data.calibration.tempcompfactor[1] * downsampled_data[6] ) * gyro_data.calibration.scale[1]) + gyro_data.calibration.bias[1];
-		gyro[2] = ( ( downsampled_data[5] + gyro_data.calibration.tempcompfactor[2] * downsampled_data[7] ) * gyro_data.calibration.scale[2]) + gyro_data.calibration.bias[2];
-	}
-	else
-	{	// calibrating gyro's .. feed the raw values straight thru
-		gyro[0] = downsampled_data[1];
-		gyro[1] = downsampled_data[3];
-		gyro[2] = downsampled_data[5];
-	}
+	gyro[0] = ( ( downsampled_data[GYRO_RAW_X_IDX] + gyro_data.calibration.tempcompfactor[0] * downsampled_data[GYRO_TEMP_RAW_XY_IDX] ) * gyro_data.calibration.scale[0]) + gyro_data.calibration.bias[0];
+	gyro[1] = ( ( downsampled_data[GYRO_RAW_Y_IDX] + gyro_data.calibration.tempcompfactor[1] * downsampled_data[GYRO_TEMP_RAW_XY_IDX] ) * gyro_data.calibration.scale[1]) + gyro_data.calibration.bias[1];
+	gyro[2] = ( ( downsampled_data[GYRO_RAW_Z_IDX] + gyro_data.calibration.tempcompfactor[2] * downsampled_data[GYRO_TEMP_RAW_Z_IDX]  ) * gyro_data.calibration.scale[2]) + gyro_data.calibration.bias[2];
 	
 #if 0
 	static float gravity_tracking[3] = {0,0,0};
@@ -747,21 +742,12 @@ void adc_callback(float * downsampled_data)
 	
 	AttitudeRawData raw;
 
-	raw.gyrotemp[0] = downsampled_data[6];
-	raw.gyrotemp[1] = downsampled_data[7];
+	raw.gyrotemp[0] = downsampled_data[GYRO_TEMP_RAW_XY_IDX];
+	raw.gyrotemp[1] = downsampled_data[GYRO_TEMP_RAW_Z_IDX];
 
-	if (!gyro_calib)
-	{	// not calibrating gyro's
-		raw.gyros[0] = gyro[0] * RAD_TO_DEG;
-		raw.gyros[1] = gyro[1] * RAD_TO_DEG;
-		raw.gyros[2] = gyro[2] * RAD_TO_DEG;
-	}
-	else
-	{	// calibrating gyro's .. feed the raw values straight thru
-		raw.gyros[0] = gyro[0];
-		raw.gyros[1] = gyro[1];
-		raw.gyros[2] = gyro[2];
-	}
+	raw.gyros[0] = gyro[0] * RAD_TO_DEG;
+	raw.gyros[1] = gyro[1] * RAD_TO_DEG;
+	raw.gyros[2] = gyro[2] * RAD_TO_DEG;
 
 	raw.accels[0] = accel[0];
 	raw.accels[1] = accel[1];
@@ -773,12 +759,10 @@ void adc_callback(float * downsampled_data)
 
 	if (settings.BiasCorrectedRaw == AHRSSETTINGS_BIASCORRECTEDRAW_TRUE)
 	{
-		if (!gyro_calib)
-		{	// not calibrating gyro's
-			raw.gyros[0] -= Nav.gyro_bias[0] * RAD_TO_DEG;
-			raw.gyros[1] -= Nav.gyro_bias[1] * RAD_TO_DEG;
-			raw.gyros[2] -= Nav.gyro_bias[2] * RAD_TO_DEG;
-		}
+		raw.gyros[0] -= Nav.gyro_bias[0] * RAD_TO_DEG;
+		raw.gyros[1] -= Nav.gyro_bias[1] * RAD_TO_DEG;
+		raw.gyros[2] -= Nav.gyro_bias[2] * RAD_TO_DEG;
+
 		raw.accels[0] -= Nav.accel_bias[0];
 		raw.accels[1] -= Nav.accel_bias[1];
 		raw.accels[2] -= Nav.accel_bias[2];

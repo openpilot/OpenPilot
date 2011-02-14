@@ -247,7 +247,7 @@ uavobjects_clean:
 ##############################
 
 .PHONY: all_flight
-all_flight: openpilot_elf ahrs_elf coptercontrol_elf pipxtreme_elf
+all_flight: openpilot_elf bl_openpilot_elf ahrs_elf bl_ahrs_elf coptercontrol_elf bl_coptercontrol_elf pipxtreme_elf bl_pipxtreme_elf
 
 .PHONY: openpilot
 openpilot: openpilot_elf
@@ -256,12 +256,26 @@ openpilot_%: uavobjects_flight
 	mkdir -p $(BUILD_DIR)/openpilot
 	$(MAKE) OUTDIR="$(BUILD_DIR)/openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/OpenPilot $*
 
+.PHONY: bl_openpilot
+bl_openpilot: bl_openpilot_elf
+
+bl_openpilot_%:
+	mkdir -p $(BUILD_DIR)/bl_openpilot
+	$(MAKE) OUTDIR="$(BUILD_DIR)/bl_openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/OpenPilot $*
+
 .PHONY: ahrs
 ahrs: ahrs_elf
 
 ahrs_%: uavobjects_flight
 	mkdir -p $(BUILD_DIR)/ahrs
 	$(MAKE) OUTDIR="$(BUILD_DIR)/ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/AHRS $*
+
+.PHONY: bl_ahrs
+bl_ahrs: bl_ahrs_elf
+
+bl_ahrs_%:
+	mkdir -p $(BUILD_DIR)/bl_ahrs
+	$(MAKE) OUTDIR="$(BUILD_DIR)/bl_ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/AHRS $*
 
 .PHONY: coptercontrol
 coptercontrol: coptercontrol_elf
@@ -270,12 +284,26 @@ coptercontrol_%: uavobjects
 	mkdir -p $(BUILD_DIR)/coptercontrol
 	$(MAKE) OUTDIR="$(BUILD_DIR)/coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/CopterControl $*
 
+.PHONY: bl_coptercontrol
+bl_coptercontrol: bl_coptercontrol_elf
+
+bl_coptercontrol_%:
+	mkdir -p $(BUILD_DIR)/bl_coptercontrol
+	$(MAKE) OUTDIR="$(BUILD_DIR)/bl_coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/CopterControl $*
+
 .PHONY: pipxtreme
 pipxtreme: pipxtreme_elf
 
 pipxtreme_%: uavobjects_flight
 	mkdir -p $(BUILD_DIR)/pipxtreme
 	$(MAKE) OUTDIR="$(BUILD_DIR)/pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/PipXtreme $*
+
+.PHONY: bl_pipxtreme
+bl_pipxtreme: bl_pipxtreme_elf
+
+bl_pipxtreme_%:
+	mkdir -p $(BUILD_DIR)/bl_pipxtreme
+	$(MAKE) OUTDIR="$(BUILD_DIR)/bl_pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/PipXtreme $*
 
 .PHONY: sim_posix
 sim_posix: sim_posix_elf

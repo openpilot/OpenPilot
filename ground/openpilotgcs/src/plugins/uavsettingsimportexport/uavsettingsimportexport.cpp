@@ -79,8 +79,8 @@ bool UAVSettingsImportExportPlugin::initialize(const QStringList& args, QString 
                                            Core::Constants::C_GLOBAL_ID);
    cmd->setDefaultKeySequence(QKeySequence("Ctrl+E"));
 
-// cmd->action()->setText("UAVSettings Import/Export...");
-   cmd->action()->setText("UAVSettings Export...");
+// cmd->action()->setText(tr("UAV Settings Import/Export..."));
+   cmd->action()->setText(tr("UAV Settings Export..."));
 
 // ac->menu()->addSeparator();
 // ac->appendGroup("ImportExport");

@@ -67,7 +67,7 @@ bool ImportExportPlugin::initialize(const QStringList& args, QString *errMsg)
                                             QList<int>() <<
                                             Core::Constants::C_GLOBAL_ID);
     cmd->setDefaultKeySequence(QKeySequence("Ctrl+I"));
-    cmd->action()->setText("Import/Export...");
+    cmd->action()->setText(tr("GCS Settings Import/Export..."));
 
 //    ac->menu()->addSeparator();
 //    ac->appendGroup("ImportExport");

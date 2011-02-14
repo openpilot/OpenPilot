@@ -328,7 +328,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 		JumpToApp = 1;
 		break;
 	case Reset:
-		//PIOS Reset_Device();
+		PIOS_SYS_Reset();
 		break;
 	case Abort_Operation:
 		Next_Packet = 0;

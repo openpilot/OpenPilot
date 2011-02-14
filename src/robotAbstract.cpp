@@ -82,23 +82,25 @@ namespace jafar {
 			if (self_time < 0.) { firstmove = true; self_time = time; }
 			if (hardwareEstimatorPtr)
 			{
-				jblas::mat_indirect readings = hardwareEstimatorPtr->acquireReadings(self_time, time);
-// JFR_DEBUG("move from " << std::setprecision(19) << self_time << " to " << time << " with cur_time " << self_time << std::setprecision(6) << " using " << readings.size1() << " readings");
 //firstmove=false;
 				if (firstmove) // compute average past control and allow the robot to init its state with it
 				{
+					jblas::mat_indirect readings = hardwareEstimatorPtr->acquireReadings(0, time);
 					self_time = 0.;
 					dt_or_dx = 0.;
 					jblas::vec avg_u(readings.size2()-1); avg_u.clear();
-					
-					for(size_t i = 0; i < readings.size1(); i++)
+					unsigned nreadings = readings.size1();
+					if (readings(nreadings-1, 0) >= time) nreadings--; // because it could be available offline but not online
+					for(size_t i = 0; i < nreadings; i++)
 						avg_u += ublas::subrange(ublas::matrix_row<mat_indirect>(readings, i),1,readings.size2());
 					
-					if (readings.size1()) avg_u /= readings.size1();
+					if (readings.size1()) avg_u /= nreadings;
 					init(avg_u);
 				}
 				else // else just move with the available control
 				{
+					jblas::mat_indirect readings = hardwareEstimatorPtr->acquireReadings(self_time, time);
+// JFR_DEBUG("move from " << std::setprecision(19) << self_time << " to " << time << " with cur_time " << self_time << std::setprecision(6) << " using " << readings.size1() << " readings");
 					jblas::vec u(readings.size2()-1), prev_u(readings.size2()-1), next_u(readings.size2()-1);
 					
 					jblas::ind_array instantArray = hardwareEstimatorPtr->instantValues()-1;

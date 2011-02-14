@@ -193,15 +193,18 @@ const double PERT_VANG = 2.0; // rad/s per sqrt(s)
 // inertial robot initial uncertainties and perturbations - in addition to constant velocity option UNCERT_VLIN.
 //if (intOpts[iRobot] == 1) // == robot inertial
 const double UNCERT_GRAVITY = 1; // m/s^2
-const double UNCERT_ABIAS = 0.05*17.0; // 5% of full scale
-const double UNCERT_WBIAS = 0.05*jmath::degToRad(300.0); // 5% of full scale
-const double PERT_AERR = 0.001*sqrt(30.0/100.0); // m/s per sqrt(s), IMU acc error (MTI = 0.001*sqrt(40Hz/100Hz))
-const double PERT_WERR = jmath::degToRad(0.05)*sqrt(40.0/100.0); // rad per sqrt(s), IMU gyro error (MTI = 0.05*sqrt(30Hz/100Hz))
+const double UNCERT_ABIAS = 0.01*17.0; // 5% of full scale
+const double UNCERT_WBIAS = 0.01*jmath::degToRad(300.0); // 5% of full scale
+const double PERT_AERR = 1.4*0.02;//*sqrt(30.0/100.0); // m/s per sqrt(s), IMU acc error (MTI = 0.001*sqrt(40Hz/100Hz))
+const double PERT_WERR = jmath::degToRad(0.05)*sqrt(30.0); // rad per sqrt(s), IMU gyro error (MTI = 0.05*sqrt(30Hz/100Hz))
 const double PERT_RANWALKACC = 0; // m/s^2 per sqrt(s), IMU a_bias random walk
 const double PERT_RANWALKGYRO = 0; // rad/s^2 per sqrt(s), IMU w_bias random walk
 
 //IMU Pose
 const double IMUPOSE[6] = {0, 0, 0, 90, 0, 90};// x,y,z,roll,pitch,yaw
+
+//IMU Pose on Mana
+//const double IMUPOSE[6] = {47, 15.3, 12.2, 0, 0, 0};// x,y,z,roll,pitch,yaw
 
 // pin-hole:
 
@@ -730,7 +733,7 @@ int n_innovation = 0;
 	// loop all lmks
 	// create sen--lmk observation
 	// Temporal loop
-	if (dataLogger) dataLogger->log();
+	//if (dataLogger) dataLogger->log();
 	kernel::Chrono chrono;
 	double max_dt = 0;
 	for (; (*world)->t <= N_FRAMES;)

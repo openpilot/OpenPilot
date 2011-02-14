@@ -106,7 +106,7 @@ private:
         void enableSwashplateLevellingControl(bool state);
         void setSwashplateLevel(int percent);
         void SwashLvlSpinBoxChanged(int value);
-
+        void FocusChanged(QWidget *oldFocus, QWidget *newFocus);
     public slots:
         void requestccpmUpdate();
         void sendccpmUpdate();

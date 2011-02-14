@@ -1229,8 +1229,8 @@ void ConfigccpmWidget::SwashLvlStartButtonPressed()
 {
     QMessageBox msgBox;
     int i;
-     msgBox.setText("Swashplate Leveling Routine");
-     msgBox.setInformativeText("You are about to start the Swashplate levelling routine. \n\nThis process will start by downloading the current configuration from the GCS to the OP hardware and will adjust your configuration at various stages.\n\nThe final state of your system should match the current configuration in the GCS config gadget.\nPlease ensure all ccpm settings in the GCS are correct before continuing.\nIf this process is interrupted, then the state of your OP board may not match the GCS configuration.\nAfter completing this process, please check all settings before attempting to fly.\n\nPlease disconnect your motor to ensure it will not spin up.\n\n\n Do you wish to proceed?");
+     msgBox.setText("<h1>Swashplate Leveling Routine</h1>");
+     msgBox.setInformativeText("<b>You are about to start the Swashplate levelling routine.</b><p>This process will start by downloading the current configuration from the GCS to the OP hardware and will adjust your configuration at various stages.<p>The final state of your system should match the current configuration in the GCS config gadget.<p>Please ensure all ccpm settings in the GCS are correct before continuing.<p>If this process is interrupted, then the state of your OP board may not match the GCS configuration.<p><i>After completing this process, please check all settings before attempting to fly.</i><p><font color=red><b>Please disconnect your motor to ensure it will not spin up.</b></font><p><hr><i>Do you wish to proceed?</i>");
      msgBox.setStandardButtons(QMessageBox::Yes |  QMessageBox::Cancel);
      msgBox.setDefaultButton(QMessageBox::Cancel);
      msgBox.setIcon(QMessageBox::Information);
@@ -1302,7 +1302,7 @@ void ConfigccpmWidget::SwashLvlStartButtonPressed()
             //copy to new Actuator settings.
             memcpy((void*)&newSwashLvlConfiguration,(void*)&oldSwashLvlConfiguration,sizeof(SwashplateServoSettingsStruct));
 
-            //goto the first step
+             //goto the first step
             SwashLvlNextButtonPressed();
         break;
         case QMessageBox::Cancel:
@@ -1325,7 +1325,7 @@ void ConfigccpmWidget::SwashLvlStartButtonPressed()
 }
 void ConfigccpmWidget::SwashLvlNextButtonPressed()
 {
-    ShowDisclaimer(2);
+    //ShowDisclaimer(2);
     SwashLvlState++;
     int i;
 
@@ -1353,7 +1353,7 @@ void ConfigccpmWidget::SwashLvlNextButtonPressed()
             SwashLvlSpinBoxes[i]->setEnabled(true);
         }
         //issue user instructions
-        m_ccpm->SwashLvlStepInstruction->setText("Neutral levelling");
+        m_ccpm->SwashLvlStepInstruction->setHtml("<h2>Neutral levelling</h2><p>Using adjustment of:<ul><li>servo horns<li>link lengths and<li>Neutral timing spinboxes to the right</ul><br>ensure that the swashplate is in the center of desired travel range and is level.");
         break;
     case 2: //Max levelling
         //check Neutral status as complete
@@ -1365,7 +1365,7 @@ void ConfigccpmWidget::SwashLvlNextButtonPressed()
         m_ccpm->SwashLvlPositionSlider->setValue(100);
         m_ccpm->SwashLvlPositionSpinBox->setValue(100);
         //issue user instructions
-        m_ccpm->SwashLvlStepInstruction->setText("Max levelling");
+        m_ccpm->SwashLvlStepInstruction->setText("<h2>Max levelling</h2><p>Using adjustment of:<ul><li>Max timing spinboxes to the right ONLY</ul><br>ensure that the swashplate is at the top of desired travel range and is level.");
         break;
     case 3: //Min levelling
         //check Max status as complete
@@ -1377,7 +1377,7 @@ void ConfigccpmWidget::SwashLvlNextButtonPressed()
         m_ccpm->SwashLvlPositionSlider->setValue(0);
         m_ccpm->SwashLvlPositionSpinBox->setValue(0);
         //issue user instructions
-        m_ccpm->SwashLvlStepInstruction->setText("Min levelling");
+        m_ccpm->SwashLvlStepInstruction->setText("<h2>Min levelling</h2><p>Using adjustment of:<ul><li>Min timing spinboxes to the right ONLY</ul><br>ensure that the swashplate is at the bottom of desired travel range and is level.");
          break;
     case 4: //levelling verification
         //check Min status as complete
@@ -1395,13 +1395,13 @@ void ConfigccpmWidget::SwashLvlNextButtonPressed()
         }
 
         //issue user instructions
-        m_ccpm->SwashLvlStepInstruction->setText("levelling verification");
+        m_ccpm->SwashLvlStepInstruction->setText("<h2>levelling verification</h2><p>Adjust the slider to the right over it's full range and observe the swashplate motion. It should remain level over the entire range of travel.");
          break;
     case 5: //levelling complete
         //check verify status as complete
         m_ccpm->SwashLvlStepList->item(3)->setCheckState(Qt::Checked);
         //issue user instructions
-        m_ccpm->SwashLvlStepInstruction->setText("levelling complete");
+        m_ccpm->SwashLvlStepInstruction->setText("<h2>levelling complete</h2><p>Press the Finish button to save these settings to the SD card<p>Press the cancel button to return to the pre-levelling settings");
         //disable position slider
         m_ccpm->SwashLvlPositionSlider->setEnabled(false);
         m_ccpm->SwashLvlPositionSpinBox->setEnabled(false);
@@ -1414,7 +1414,7 @@ void ConfigccpmWidget::SwashLvlNextButtonPressed()
 
         m_ccpm->SwashLvlStartButton->setEnabled(false);
         m_ccpm->SwashLvlNextButton->setEnabled(false);
-        m_ccpm->SwashLvlCancelButton->setEnabled(false);
+        m_ccpm->SwashLvlCancelButton->setEnabled(true);
         m_ccpm->SwashLvlFinishButton->setEnabled(true);
 
     default:
@@ -1428,24 +1428,55 @@ void ConfigccpmWidget::SwashLvlNextButtonPressed()
 }
 void ConfigccpmWidget::SwashLvlCancelButtonPressed()
 {
+    int i;
     SwashLvlState=0;
+
+    UAVObjectField* MinField;
+    UAVObjectField* NeutralField;
+    UAVObjectField* MaxField;
+
     m_ccpm->SwashLvlStartButton->setEnabled(true);
     m_ccpm->SwashLvlNextButton->setEnabled(false);
     m_ccpm->SwashLvlCancelButton->setEnabled(false);
     m_ccpm->SwashLvlFinishButton->setEnabled(false);
 
+    m_ccpm->SwashLvlStepList->item(0)->setCheckState(Qt::Unchecked);
+    m_ccpm->SwashLvlStepList->item(1)->setCheckState(Qt::Unchecked);
+    m_ccpm->SwashLvlStepList->item(2)->setCheckState(Qt::Unchecked);
+    m_ccpm->SwashLvlStepList->item(3)->setCheckState(Qt::Unchecked);
+
     //restore old Actuator Settings
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
+    Q_ASSERT(obj);
+    //update settings to match our changes.
+    MinField = obj->getField(QString("ChannelMin"));
+    NeutralField = obj->getField(QString("ChannelNeutral"));
+    MaxField = obj->getField(QString("ChannelMax"));
+
+    //min,neutral,max values for the servos
+    for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++)
+    {
+        MinField->setValue(oldSwashLvlConfiguration.Min[i],oldSwashLvlConfiguration.ServoChannels[i]);
+        NeutralField->setValue(oldSwashLvlConfiguration.Neutral[i],oldSwashLvlConfiguration.ServoChannels[i]);
+        MaxField->setValue(oldSwashLvlConfiguration.Max[i],oldSwashLvlConfiguration.ServoChannels[i]);
+    }
+
+    obj->updated();
+
 
     //restore Flight control of ActuatorCommand
     enableSwashplateLevellingControl(false);
+
+    m_ccpm->SwashLvlStepInstruction->setText("<h2>Levelling Cancelled</h2><p>Previous settings have been restored.");
+
 }
 
 
 void ConfigccpmWidget::SwashLvlFinishButtonPressed()
 {
     int i;
-    ShowDisclaimer(0);
-    ShowDisclaimer(2);
 
     UAVObjectField* MinField;
     UAVObjectField* NeutralField;
@@ -1480,17 +1511,23 @@ void ConfigccpmWidget::SwashLvlFinishButtonPressed()
 
     //restore Flight control of ActuatorCommand
     enableSwashplateLevellingControl(false);
+
+    m_ccpm->SwashLvlStepInstruction->setText("<h2>Levelling Completed</h2><p>New settings have been saved to the SD card");
+
+    ShowDisclaimer(0);
+    //ShowDisclaimer(2);
+
 }
 
 int ConfigccpmWidget::ShowDisclaimer(int messageID)
 {
      QMessageBox msgBox;
-     msgBox.setText("Warning!!!");
+     msgBox.setText("<font color=red><h1>Warning!!!</h2></font>");
      int ret;
      switch (messageID) {
         case 0:
             // Basic disclaimer
-             msgBox.setInformativeText("This code has many configurations.\n\nPlease double check all settings before attempting flight!");
+             msgBox.setInformativeText("<h2>This code has many configurations.</h2><p>Please double check all settings before attempting flight!");
              msgBox.setStandardButtons(QMessageBox::Ok);
              msgBox.setDefaultButton(QMessageBox::Ok);
              msgBox.setIcon(QMessageBox::Information);
@@ -1499,7 +1536,7 @@ int ConfigccpmWidget::ShowDisclaimer(int messageID)
             break;
         case 1:
             // Not Tested disclaimer
-             msgBox.setInformativeText("The CCPM mixer code has not been used to fly a helicopter!\n\nUse it at your own risk!\n\nDo you wish to continue?");
+             msgBox.setInformativeText("<h2>The CCPM mixer code has not been used to fly a helicopter!</h2><p><font color=red>Use it at your own risk!</font><p>Do you wish to continue?");
              msgBox.setStandardButtons(QMessageBox::Yes |  QMessageBox::Cancel);
              msgBox.setDefaultButton(QMessageBox::Cancel);
              msgBox.setIcon(QMessageBox::Warning);
@@ -1512,7 +1549,7 @@ int ConfigccpmWidget::ShowDisclaimer(int messageID)
             break;
         case 2:
             // DO NOT use
-            msgBox.setInformativeText("The CCPM swashplate levelling code is NOT complete!\n\nDO NOT use it for flight!");
+            msgBox.setInformativeText("<h2>The CCPM swashplate levelling code is NOT complete!</h2><p><font color=red>DO NOT use it for flight!</font>");
             msgBox.setStandardButtons(QMessageBox::Ok);
             msgBox.setDefaultButton(QMessageBox::Ok);
             msgBox.setIcon(QMessageBox::Critical);
@@ -1547,11 +1584,23 @@ void ConfigccpmWidget::enableSwashplateLevellingControl(bool state)
         mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
         mdata.gcsTelemetryUpdatePeriod = 100;
         SwashLvlConfigurationInProgress=1;
+        connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)),this, SLOT(FocusChanged(QWidget*,QWidget*)));
+        m_ccpm->TabObject->setTabEnabled(0,0);
+        m_ccpm->TabObject->setTabEnabled(2,0);
+        m_ccpm->TabObject->setTabEnabled(3,0);
+        m_ccpm->ccpmType->setEnabled(0);
     }
     else
     {
         mdata = SwashLvlaccInitialData; // Restore metadata
         SwashLvlConfigurationInProgress=0;
+
+        disconnect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)),this, SLOT(FocusChanged(QWidget*,QWidget*)));
+        m_ccpm->TabObject->setTabEnabled(0,1);
+        m_ccpm->TabObject->setTabEnabled(2,1);
+        m_ccpm->TabObject->setTabEnabled(3,1);
+        m_ccpm->ccpmType->setEnabled(1);
+
     }
     obj->setMetadata(mdata);
 
@@ -1658,3 +1707,33 @@ void ConfigccpmWidget::SwashLvlSpinBoxChanged(int value)
     return;
 }
 
+
+void ConfigccpmWidget::FocusChanged(QWidget *oldFocus, QWidget *newFocus)
+{
+    if (SwashLvlConfigurationInProgress!=1) return;
+    QMessageBox msgBox;
+    int ret;
+    msgBox.setText("<h1>Warning!!!</h1>");
+
+    if ((this->isAncestorOf(oldFocus))&&(!this->isAncestorOf(newFocus)))
+    {
+        msgBox.setInformativeText("<b>You are in the middle of the levelling routine</b><br>Changing focus will cancel all levelling and return the OP hardware to the state it was in before levelling began.<p>Do you want to continue the levelling routine?");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgBox.setDefaultButton(QMessageBox::Yes);
+        msgBox.setIcon(QMessageBox::Information);
+        ret = msgBox.exec();
+
+        if (ret == QMessageBox::Yes)
+        {
+
+            //m_ccpm->TabObject->setCurrentIndex(1);
+            //m_ccpm->SwashPlateLevel->setFocus(Qt::MouseFocusReason);
+            //m_ccpm->SwashLvlInstructionsBox->setFocus(Qt::MouseFocusReason);
+            oldFocus->setFocus(Qt::MouseFocusReason);
+        }
+        if (ret == QMessageBox::No)
+        {
+            SwashLvlCancelButtonPressed();
+        }
+    }
+}

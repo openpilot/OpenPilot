@@ -38,10 +38,10 @@ namespace hardware {
 			if (mode == 2)
 			{
 				f >> row;
-//row(0) += 0*0.01; // TEST
 				boost::unique_lock<boost::mutex> l(mutex_data);
 				while(position == reading_pos || position == read_pos) cond_data.wait(l);
 				ublas::matrix_row<jblas::mat>(buffer, position) = row;
+				buffer(position,0) += timestamps_correction;
 				++position; if (position >= bufferSize) position = 0;
 			} else
 			{
@@ -50,7 +50,7 @@ namespace hardware {
 				boost::unique_lock<boost::mutex> l(mutex_data);
 				if (position == reading_pos) JFR_ERROR(RtslamException, RtslamException::BUFFER_OVERFLOW, "Data not released: Increase MTI buffer size !");
 				if (position == read_pos) JFR_ERROR(RtslamException, RtslamException::BUFFER_OVERFLOW, "Data not read: Increase MTI buffer size !");
-				buffer(position,0) = data.TIMESTAMP_FILTERED + timestamps_correction;
+				buffer(position,0) = data.TIMESTAMP_FILTERED;
 				buffer(position,1) = data.ACC[0];
 				buffer(position,2) = data.ACC[1];
 				buffer(position,3) = data.ACC[2];
@@ -61,6 +61,7 @@ namespace hardware {
 				buffer(position,8) = data.MAG[1];
 				buffer(position,9) = data.MAG[2];
 				row = ublas::matrix_row<jblas::mat>(buffer, position);
+				buffer(position,0) += timestamps_correction;
 				++position; if (position >= bufferSize) position = 0;
 #endif
 			}
@@ -98,10 +99,10 @@ namespace hardware {
 			config.syncOutSkipFactor = std::floor(1. / trigger_freq / period + 0.001) - 1; // mark all acquisitions
 			realFreq = 1. / (period * (config.syncOutSkipFactor + 1) );
 			std::cout << "MTI trigger set to freq " << realFreq << " Hz" << std::endl;
-			// number of clock ticks @ 33.9ns to offset pin action from sensor sampling
+			// number of ns to offset pin action from sensor sampling
 			config.syncOutOffset = 0; // no offset
-			// number of clock ticks @ 33.9ns to define pulse width
-			config.syncOutPulseWidth = trigger_shutter/33.9e-9;
+			// number of ns to define pulse width
+			config.syncOutPulseWidth = trigger_shutter/1e-9;
 
 			// Set SyncOut settings
 			if (!mti->set_syncOut(config.syncOutMode, config.syncOutPulsePolarity,
@@ -122,7 +123,7 @@ namespace hardware {
 			if (mode != 2)
 			{
 				std::cout << "Mti is initializating..." << std::flush;
-				sleep(5); // give some time to the time estimator to converge
+				sleep(3); // give some time to the time estimator to converge
 				std::cout << " done." << std::endl;
 			}
 		}

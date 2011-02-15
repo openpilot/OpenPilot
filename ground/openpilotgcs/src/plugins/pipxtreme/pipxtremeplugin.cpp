@@ -23,6 +23,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 #include "pipxtremeplugin.h"
 #include "pipxtremegadgetfactory.h"
 #include <QtPlugin>
@@ -31,29 +32,30 @@
 
 PipXtremePlugin::PipXtremePlugin()
 {
+	mf = NULL;
 }
 
 PipXtremePlugin::~PipXtremePlugin()
 {
 }
 
-bool PipXtremePlugin::initialize(const QStringList& args, QString *errMsg)
+bool PipXtremePlugin::initialize(const QStringList &args, QString *errMsg)
 {
    Q_UNUSED(args);
    Q_UNUSED(errMsg);
+
    mf = new PipXtremeGadgetFactory(this);
    addAutoReleasedObject(mf);
+
    return true;
 }
 
 void PipXtremePlugin::extensionsInitialized()
 {
-   // Do nothing
 }
 
 void PipXtremePlugin::shutdown()
 {
-   // Do nothing
 }
-Q_EXPORT_PLUGIN(PipXtremePlugin)
 
+Q_EXPORT_PLUGIN(PipXtremePlugin)

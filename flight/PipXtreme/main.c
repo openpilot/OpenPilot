@@ -669,6 +669,15 @@ int main()
 
     saved_settings_init();
 
+    if (saved_settings.mode == 0xff  ||
+    	saved_settings.mode == MODE_TX_BLANK_CARRIER_TEST ||
+    	saved_settings.mode == MODE_TX_SPECTRUM_TEST ||
+    	saved_settings.mode == MODE_SCAN_SPECTRUM)
+    	saved_settings.mode = MODE_NORMAL;
+
+    if (saved_settings.rts_time == 0xff || saved_settings.rts_time > 100)
+    	saved_settings.rts_time = 10;
+
 	#if !defined(PIOS_COM_DEBUG)
     	if (saved_settings.serial_baudrate != 0xffffffff)
     		PIOS_COM_ChangeBaud(PIOS_COM_SERIAL, saved_settings.serial_baudrate);
@@ -688,12 +697,6 @@ int main()
     if (!GPIO_IN(_868MHz_PIN) &&  GPIO_IN(_915MHz_PIN)) saved_settings.frequency_band = FREQBAND_868MHz;    // 868MHz band
     else
     if ( GPIO_IN(_868MHz_PIN) && !GPIO_IN(_915MHz_PIN)) saved_settings.frequency_band = FREQBAND_915MHz;    // 915MHz band
-
-    if (saved_settings.mode == 0xff  ||
-    	saved_settings.mode == MODE_TX_BLANK_CARRIER_TEST ||
-    	saved_settings.mode == MODE_TX_SPECTRUM_TEST ||
-    	saved_settings.mode == MODE_SCAN_SPECTRUM)
-    	saved_settings.mode = MODE_NORMAL;
 
     // set some defaults if they are not set
     switch (saved_settings.frequency_band)
@@ -811,10 +814,6 @@ int main()
             break;
     }
 
-//    if (serial_number_crc32 == 0x176C1EC6) saved_settings.destination_id = 0xA524A3B0;  // modem 1, open a connection to modem 2
-//    else
-//    if (serial_number_crc32 == 0xA524A3B0) saved_settings.destination_id = 0x176C1EC6;  // modem 2, open a connection to modem 1
-
     // *************
 
     processReset();           // Determine what caused the reset/reboot
@@ -866,6 +865,20 @@ int main()
         DEBUG_PRINTF("RF datarate: %dbps\r\n", ph_getDatarate());
         DEBUG_PRINTF("RF frequency: %dHz\r\n", rfm22_getNominalCarrierFrequency());
         DEBUG_PRINTF("RF TX power: %d\r\n", ph_getTxPower());
+
+        DEBUG_PRINTF("\r\nUnit mode: ");
+        switch (saved_settings.mode)
+        {
+        	case MODE_NORMAL:					DEBUG_PRINTF("NORMAL\r\n"); break;
+        	case MODE_STREAM_TX:				DEBUG_PRINTF("STREAM-TX\r\n"); break;
+        	case MODE_STREAM_RX:				DEBUG_PRINTF("STREAM-RX\r\n"); break;
+        	case MODE_PPM_TX:					DEBUG_PRINTF("PPM-TX\r\n"); break;
+        	case MODE_PPM_RX:					DEBUG_PRINTF("PPM-RX\r\n"); break;
+        	case MODE_SCAN_SPECTRUM:			DEBUG_PRINTF("SCAN-SPECTRUM\r\n"); break;
+        	case MODE_TX_BLANK_CARRIER_TEST:	DEBUG_PRINTF("TX-BLANK-CARRIER\r\n"); break;
+        	case MODE_TX_SPECTRUM_TEST:			DEBUG_PRINTF("TX_SPECTRUM\r\n"); break;
+        	default:							DEBUG_PRINTF("UNKNOWN [%u]\r\n", saved_settings.mode); break;
+        }
     #endif
 
     // start a remote connection going

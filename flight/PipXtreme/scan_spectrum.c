@@ -31,7 +31,7 @@
 #include "scan_spectrum.h"
 
 #if defined(PIOS_COM_DEBUG)
-//  #define SS_DEBUG
+	#define SS_DEBUG
 #endif
 
 // *************************************************************
@@ -59,6 +59,9 @@ void ss_process(void)
 
 void ss_init(void)
 {
+	#if defined(SS_DEBUG)
+		DEBUG_PRINTF("\r\nSS init\r\n");
+	#endif
 
 }
 

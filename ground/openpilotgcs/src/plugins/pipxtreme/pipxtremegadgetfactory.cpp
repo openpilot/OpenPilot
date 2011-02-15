@@ -54,4 +54,3 @@ IOptionsPage * PipXtremeGadgetFactory::createOptionsPage(IUAVGadgetConfiguration
 {
 	return new PipXtremeGadgetOptionsPage(qobject_cast<PipXtremeGadgetConfiguration *>(config));
 }
-

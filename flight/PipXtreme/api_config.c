@@ -95,6 +95,8 @@ typedef struct
     uint8_t     rf_xtal_cap;
     bool        aes_enable;
     uint8_t     aes_key[16];
+    uint8_t		rts_time;
+    uint8_t		spare[16];
 } __attribute__((__packed__)) t_pipx_config_settings;
 
 typedef struct
@@ -220,6 +222,8 @@ int apiconfig_sendSettingsPacket(void)
 	settings->serial_baudrate = saved_settings.serial_baudrate;
 	settings->aes_enable = saved_settings.aes_enable;
 	memcpy((char *)settings->aes_key, (char *)saved_settings.aes_key, sizeof(settings->aes_key));
+	settings->rts_time = saved_settings.rts_time;
+	memset(settings->spare, 0xff, sizeof(settings->spare));
 
 	header->data_crc = updateCRC32Data(0xffffffff, settings, header->data_size);
 	header->header_crc = 0;
@@ -296,10 +300,9 @@ void apiconfig_processInputPacket(void *buf, uint16_t len)
 				saved_settings.max_rf_bandwidth = settings->max_rf_bandwidth;
 				saved_settings.rf_xtal_cap = settings->rf_xtal_cap;
 				saved_settings.serial_baudrate = settings->serial_baudrate;
-
 				saved_settings.aes_enable = settings->aes_enable;
-//				if (saved_settings.aes_enable)
-					memcpy((char *)saved_settings.aes_key, (char *)settings->aes_key, sizeof(saved_settings.aes_key));
+				memcpy((char *)saved_settings.aes_key, (char *)settings->aes_key, sizeof(saved_settings.aes_key));
+				saved_settings.rts_time = settings->rts_time;
 
 			    saved_settings_save();	// save the new settings
 

@@ -26,7 +26,7 @@ SOURCES += pipxtremegadget.cpp \
     pipxtremegadgetwidget.cpp \
     pipxtremeplugin.cpp \
 
-OTHER_FILES += PipXtreme.pluginspec
+OTHER_FILES += pipxtreme.pluginspec
 
 FORMS += \
     pipxtreme.ui \

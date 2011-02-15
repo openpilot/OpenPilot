@@ -34,7 +34,7 @@
 #include "stream.h"
 
 #if defined(PIOS_COM_DEBUG)
-//  #define STREAM_DEBUG
+	#define STREAM_DEBUG
 #endif
 
 // *************************************************************
@@ -70,6 +70,9 @@ void stream_process(void)
 
 void stream_init(void)
 {
+	#if defined(STREAM_DEBUG)
+		DEBUG_PRINTF("\r\nSTREAM init\r\n");
+	#endif
 
 }
 

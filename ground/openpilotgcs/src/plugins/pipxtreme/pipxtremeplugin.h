@@ -33,13 +33,16 @@ class PipXtremeGadgetFactory;
 class PipXtremePlugin : public ExtensionSystem::IPlugin
 {
 public:
-        PipXtremePlugin();
-   ~PipXtremePlugin();
+	PipXtremePlugin();
+	~PipXtremePlugin();
 
-   void extensionsInitialized();
-   bool initialize(const QStringList & arguments, QString * errorString);
-   void shutdown();
+	void extensionsInitialized();
+	bool initialize(const QStringList & arguments, QString * errorString);
+	void shutdown();
+
 private:
-   PipXtremeGadgetFactory *mf;
+	PipXtremeGadgetFactory *mf;
+
 };
+
 #endif

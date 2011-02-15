@@ -31,7 +31,7 @@
 #include "ppm.h"
 
 #if defined(PIOS_COM_DEBUG)
-//  #define PPM_DEBUG
+	#define PPM_DEBUG
 #endif
 
 // *************************************************************
@@ -67,6 +67,9 @@ void ppm_process(void)
 
 void ppm_init(void)
 {
+	#if defined(PPM_DEBUG)
+		DEBUG_PRINTF("\r\nPPM init\r\n");
+	#endif
 
 }
 

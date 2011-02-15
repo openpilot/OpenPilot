@@ -56,7 +56,9 @@ typedef struct
 
     uint8_t     mode;
 
-    uint8_t     spare[31];          // allow for future unknown settings
+    uint8_t		rts_time;
+
+    uint8_t     spare[30];          // allow for future unknown settings
 
     uint32_t    crc;
 } __attribute__((__packed__)) t_saved_settings;

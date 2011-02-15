@@ -308,6 +308,8 @@ void saved_settings_init(void)
 
     saved_settings.serial_baudrate = 57600;
 
+    saved_settings.rts_time = 10;		// ms
+
 //    saved_settings.crc = 0;
 //    saved_settings.crc = updateCRC32Data(0xffffffff, (void *)&saved_settings, sizeof(t_saved_settings));
 

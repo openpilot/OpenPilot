@@ -98,6 +98,8 @@ typedef struct
 	uint8_t     rf_xtal_cap;
 	bool        aes_enable;
 	uint8_t     aes_key[16];
+	uint8_t		rts_time;
+	uint8_t		spare[16];
 } t_pipx_config_settings;
 
 typedef struct

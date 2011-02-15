@@ -536,12 +536,10 @@ void PipXtremeGadgetWidget::saveToFlash()
 	}
 
 	settings.max_rf_bandwidth = m_widget->comboBox_MaxRFBandwidth->itemData(m_widget->comboBox_MaxRFBandwidth->currentIndex()).toInt();
-
 	settings.max_tx_power = m_widget->comboBox_MaxRFTxPower->itemData(m_widget->comboBox_MaxRFTxPower->currentIndex()).toInt();
-
 	settings.serial_baudrate = m_widget->comboBox_SerialPortSpeed->itemData(m_widget->comboBox_SerialPortSpeed->currentIndex()).toInt();
-
 	settings.aes_enable = m_widget->checkBox_AESEnable->isChecked();
+	settings.rts_time = m_widget->spinBox_RTSTime->value();
 
 	memset(settings.aes_key, 0, sizeof(settings.aes_key));
 	s = m_widget->lineEdit_AESKey->text().trimmed();
@@ -872,11 +870,11 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 
 				memcpy(&pipx_config_details, data, sizeof(t_pipx_config_details));
 
-				if (pipx_config_details.major_version < 0 || (pipx_config_details.major_version <= 0 && pipx_config_details.minor_version < 3))
+				if (pipx_config_details.major_version < 0 || (pipx_config_details.major_version <= 0 && pipx_config_details.minor_version < 5))
 				{
 					QMessageBox msgBox;
 					msgBox.setIcon(QMessageBox::Critical);
-					msgBox.setText("You need to update your modem firmware to V0.3 or later");
+					msgBox.setText("You need to update your PipX modem firmware to V0.5 or later");
 					msgBox.exec();
 					disconnectPort(true);
 					return;
@@ -928,17 +926,13 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 				memcpy(&pipx_config_settings, data, sizeof(t_pipx_config_settings));
 
 				m_widget->comboBox_Mode->setCurrentIndex(m_widget->comboBox_Mode->findData(pipx_config_settings.mode));
-
 				m_widget->lineEdit_PairedSerialNumber->setText(QString::number(pipx_config_settings.destination_id, 16).toUpper());
 				m_widget->spinBox_FrequencyCalibration->setValue(pipx_config_settings.rf_xtal_cap);
-
 				m_widget->doubleSpinBox_Frequency->setValue((double)pipx_config_settings.frequency_Hz / 1e6);
-
 				m_widget->comboBox_MaxRFBandwidth->setCurrentIndex(m_widget->comboBox_MaxRFBandwidth->findData(pipx_config_settings.max_rf_bandwidth));
-
 				m_widget->comboBox_MaxRFTxPower->setCurrentIndex(m_widget->comboBox_MaxRFTxPower->findData(pipx_config_settings.max_tx_power));
-
 				m_widget->comboBox_SerialPortSpeed->setCurrentIndex(m_widget->comboBox_SerialPortSpeed->findData(pipx_config_settings.serial_baudrate));
+				m_widget->spinBox_RTSTime->setValue(pipx_config_settings.rts_time);
 
 				QString key = "";
 				for (int i = 0; i < (int)sizeof(pipx_config_settings.aes_key); i++)
@@ -1305,6 +1299,7 @@ void PipXtremeGadgetWidget::importSettings()
 	pipx_config_settings.aes_enable = settings.value("settings/aes_enable", false).toBool();
 	for (int i = 0; i < (int)sizeof(pipx_config_settings.aes_key); i++)
 		pipx_config_settings.aes_key[i] = settings.value("settings/aes_key_" + QString::number(i), 0).toUInt();
+	pipx_config_settings.rts_time = settings.value("settings/ready_to_send_time", 10).toUInt();
 
 	m_widget->comboBox_Mode->setCurrentIndex(m_widget->comboBox_Mode->findData(pipx_config_settings.mode));
 	m_widget->lineEdit_PairedSerialNumber->setText(QString::number(pipx_config_settings.destination_id, 16).toUpper());
@@ -1313,6 +1308,7 @@ void PipXtremeGadgetWidget::importSettings()
 	m_widget->comboBox_MaxRFBandwidth->setCurrentIndex(m_widget->comboBox_MaxRFBandwidth->findData(pipx_config_settings.max_rf_bandwidth));
 	m_widget->comboBox_MaxRFTxPower->setCurrentIndex(m_widget->comboBox_MaxRFTxPower->findData(pipx_config_settings.max_tx_power));
 	m_widget->comboBox_SerialPortSpeed->setCurrentIndex(m_widget->comboBox_SerialPortSpeed->findData(pipx_config_settings.serial_baudrate));
+	m_widget->spinBox_RTSTime->setValue(pipx_config_settings.rts_time);
 
 	QString key = "";
 	for (int i = 0; i < (int)sizeof(pipx_config_settings.aes_key); i++)
@@ -1367,6 +1363,7 @@ void PipXtremeGadgetWidget::exportSettings()
 	settings.setValue("settings/max_tx_power", pipx_config_settings.max_tx_power);
 	settings.setValue("settings/serial_baudrate", pipx_config_settings.serial_baudrate);
 	settings.setValue("settings/aes_enable", pipx_config_settings.aes_enable);
+	settings.setValue("settings/ready_to_send_time", pipx_config_settings.rts_time);
 	for (int i = 0; i < (int)sizeof(pipx_config_settings.aes_key); i++)
 		settings.setValue("settings/aes_key_" + QString::number(i), pipx_config_settings.aes_key[i]);
 }

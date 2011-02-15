@@ -1,5 +1,4 @@
-/**
- ******************************************************************************
+/******************************************************************************
  *
  * @file       packet_handler.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -1348,12 +1347,12 @@ void ph_processLinks(int connection_index)
         uint16_t size = fifoBuf_getUsed(&conn->tx_fifo_buffer);
 
         if (size == 0)
-          conn->ready_to_send_timer = -1;		// no data to send
+          conn->ready_to_send_timer = -1;	// no data to send
         else
         if (conn->ready_to_send_timer < 0)
           conn->ready_to_send_timer = 0;	// start timer
 
-        if (size >= 200 || (conn->ready_to_send_timer >= 10 && size > 0) || (conn->tx_sequence_data_size > 0 && size > 0))
+        if (size >= 200 || (conn->ready_to_send_timer >= saved_settings.rts_time && size > 0) || (conn->tx_sequence_data_size > 0 && size > 0))
         {       // send data
 
             uint8_t pack_type = PACKET_TYPE_DATA;

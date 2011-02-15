@@ -38,33 +38,63 @@ int main() {
 
 	PIOS_SYS_Init();
 	PIOS_Board_Init();
-	uint32_t base_adress;
-	base_adress=SCB->VTOR;
-	if(0x08000000+(sizeof(dataArray)*4)>base_adress)
-		error();
+	PIOS_LED_On(LED1);
+	PIOS_DELAY_WaitmS(5000);
+	PIOS_LED_Off(LED1);
 
-	for (int x=0;x<sizeof(dataArray);++x)
-	{
-		int result=0;
-		for (int retry = 0; retry < MAX_WRI_RETRYS; ++retry) {
-			if (result == 0) {
-				result = (FLASH_ProgramWord(0x08000000+(x*4), dataArray[x]) == FLASH_COMPLETE) ? 1
-						: 0;
+	/// Self overwrite check
+	uint32_t base_adress = SCB->VTOR;
+	if (0x08000000 + (sizeof(dataArray) * 4) > base_adress)
+		error();
+	///
+
+	/// Bootloader memory space erase
+	uint32_t pageAdress;
+	pageAdress = 0x08000000;
+	uint8_t fail = FALSE;
+	while ((pageAdress < base_adress) || (fail == TRUE)) {
+		for (int retry = 0; retry < MAX_DEL_RETRYS; ++retry) {
+			if (FLASH_ErasePage(pageAdress) == FLASH_COMPLETE) {
+				fail = FALSE;
+				break;
+			} else {
+				fail = TRUE;
 			}
 		}
-		if(result==0)
+#ifdef STM32F10X_HD
+		pageAdress += 2048;
+#elif defined (STM32F10X_MD)
+		pageAdress += 1024;
+#endif
+	}
+
+	if (fail == TRUE)
+		error();
+
+	///
+
+	/// Bootloader programing
+	for (int x = 0; x < sizeof(dataArray); ++x) {
+		int result = 0;
+		for (int retry = 0; retry < MAX_WRI_RETRYS; ++retry) {
+			if (result == 0) {
+				result = (FLASH_ProgramWord(0x08000000 + (x * 4), dataArray[x])
+						== FLASH_COMPLETE) ? 1 : 0;
+			}
+		}
+		if (result == 0)
 			error();
 	}
-	for(int x=0;x<3;++x)
-	{
-		PIOS_DELAY_WaitmS(2000);
-	}
-	PIOS_SYS_Reset();
-}
-void error()
-{
-	for(;;)
-	{
+	///
+	PIOS_LED_On(LED1);
+	for (;;) {}
 
+}
+void error() {
+	for (;;) {
+		PIOS_LED_On(LED1);
+		PIOS_DELAY_WaitmS(500);
+		PIOS_LED_Off(LED1);
+		PIOS_DELAY_WaitmS(500);
 	}
 }

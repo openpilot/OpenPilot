@@ -95,10 +95,11 @@ class BinToArray:
         fileOut.write("\n    };\n")
         fileIn.close()
         fileOut.close()
- 
+	
 if __name__ == "__main__":
     print(sys.argv[0])
     logging.basicConfig(level=logging.DEBUG)
     converter = BinToArray()
     converter.ConvertFileToArray(
         sys.argv[1], sys.argv[2], 4, 0, 'l')
+	

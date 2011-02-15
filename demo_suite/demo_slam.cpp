@@ -192,11 +192,16 @@ const double PERT_VANG = 2.0; // rad/s per sqrt(s)
 
 // inertial robot initial uncertainties and perturbations - in addition to constant velocity option UNCERT_VLIN.
 //if (intOpts[iRobot] == 1) // == robot inertial
-const double UNCERT_GRAVITY = 1; // m/s^2
-const double UNCERT_ABIAS = 0.01*17.0; // 5% of full scale
-const double UNCERT_WBIAS = 0.01*jmath::degToRad(300.0); // 5% of full scale
-const double PERT_AERR = 1.4*0.02;//*sqrt(30.0/100.0); // m/s per sqrt(s), IMU acc error (MTI = 0.001*sqrt(40Hz/100Hz))
-const double PERT_WERR = jmath::degToRad(0.05)*sqrt(30.0); // rad per sqrt(s), IMU gyro error (MTI = 0.05*sqrt(30Hz/100Hz))
+const double UNCERT_GRAVITY = 0.01 * 9.81; // 1% m/s^2
+const double UNCERT_ABIAS = 0.01*17.0; // 1% of full scale
+const double UNCERT_WBIAS = 0.01*jmath::degToRad(300.0); // 1% of full scale
+/*
+There is a 1.4 factor for gyros because the experimental noise (0.006)
+is slightly larger than computed noise (0.0055). For acceleros experimental
+noise (0.009) is compatible with computed noise (0.0011)
+ */
+const double PERT_AERR = 1.0 * 0.002*sqrt(30.0); // m/s2, IMU acc error (MTI = 0.002*sqrt(30Hz) m/s2)
+const double PERT_WERR = 1.4 * jmath::degToRad(0.05)*sqrt(40.0); // rad/s, IMU gyro error (MTI = 0.05*sqrt(40Hz) deg/s)
 const double PERT_RANWALKACC = 0; // m/s^2 per sqrt(s), IMU a_bias random walk
 const double PERT_RANWALKGYRO = 0; // rad/s^2 per sqrt(s), IMU w_bias random walk
 

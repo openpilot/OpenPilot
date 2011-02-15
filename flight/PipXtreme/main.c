@@ -94,8 +94,8 @@ volatile uint32_t       uptime_ms;
 volatile uint16_t       second_tick_timer;
 volatile bool           second_tick;
 
-//volatile int32_t        temp_adc;
-//volatile int32_t        psu_adc;
+//volatile int32_t      temp_adc;
+//volatile int32_t      psu_adc;
 
 // *****************************************************************************
 
@@ -124,40 +124,6 @@ volatile bool           second_tick;
 #endif
 
 // *****************************************************************************
-/*
-void WWDG_IRQHandler(void)
-{
-    // Update WWDG counter
-    WWDG_SetCounter(0x7F);
-
-    // Clear EWI flag
-    WWDG_ClearFlag();
-}
-
-void enableWatchdog(void)
-{
-	// Enable WWDG clock
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_WWDG, ENABLE);
-
-	// On Value line devices, WWDG clock counter = (PCLK1 (24MHz)/4096)/8 = 732 Hz (~1366 æs)
-	// On other devices, WWDG clock counter = (PCLK1(36MHz)/4096)/8 = 1099 Hz (~910 æs)
-	WWDG_SetPrescaler(WWDG_Prescaler_8);
-
-	// Set Window value to 65
-	WWDG_SetWindowValue(65);
-
-	// On Value line devices, Enable WWDG and set counter value to 127, WWDG timeout = ~1366 æs * 64 = 87.42 ms
-	// On other devices, Enable WWDG and set counter value to 127, WWDG timeout = ~910 æs * 64 = 58.25 ms
-	WWDG_Enable(127);
-
-	// Clear EWI flag
-	WWDG_ClearFlag();
-
-	// Enable EW interrupt
-	WWDG_EnableIT();
-}
-*/
-// *****************************************************************************
 
 void sequenceLEDs(void)
 {
@@ -185,51 +151,6 @@ void sequenceLEDs(void)
     }
 }
 
-// *****************************************************************************
-/*
-void setup_SPI(void)
-{
-    SPI_InitTypeDef SPI_InitStructure;
-
-	SPI_InitStructure.SPI_Mode = SPI_Mode_Master,
-//	SPI_InitStructure.SPI_Mode = SPI_Mode_Slave,
-
-	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex,
-//	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_RxOnly,
-//	SPI_InitStructure.SPI_Direction = SPI_Direction_1Line_Rx,
-//	SPI_InitStructure.SPI_Direction = SPI_Direction_1Line_Tx,
-
-//	SPI_InitStructure.SPI_DataSize = SPI_DataSize_16b,
-	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b,
-
-	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft,
-//	SPI_InitStructure.SPI_NSS = SPI_NSS_Hard,
-
-	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB,
-//	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_LSB,
-
-	SPI_InitStructure.SPI_CRCPolynomial = 7,
-
-//	SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low,
-	SPI_InitStructure.SPI_CPOL = SPI_CPOL_High,
-
-//	SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge,
-	SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge,
-
-//	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2,		// fastest SCLK
-//	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4,
-//	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8,
-//	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16,
-//	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_32,
-//	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64,
-//	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_128,
-	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256,	// slowest SCLK
-
-	SPI_Init(SPI1, &SPI_InitStructure);
-
-	SPI_Cmd(SPI1, ENABLE);
-}
-*/
 // *****************************************************************************
 // timer interrupt
 
@@ -592,6 +513,7 @@ int main()
     saved_settings.frequency_band = FREQBAND_UNKNOWN;
 
     // *************
+
     PIOS_Board_Init();
 
     CRC_init();
@@ -631,9 +553,9 @@ int main()
 
     setup_TimerInt(1000);                               // setup a 1kHz timer interrupt
 
-#if defined(USE_WATCHDOG)
-    enableWatchdog();                                   // enable the watchdog
-#endif
+	#if defined(USE_WATCHDOG)
+    	enableWatchdog();								// enable the watchdog
+	#endif
 
     // *************
     // do a simple LED flash test sequence so the user knows all the led's are working and that we have booted
@@ -657,15 +579,18 @@ int main()
     TX_LED_OFF;
 
     // *************
-    // debug stuff
 
     #if defined(PIOS_COM_DEBUG)
         DEBUG_PRINTF("\r\n");
         DEBUG_PRINTF("PipXtreme v%u.%u rebooted\r\n", VERSION_MAJOR, VERSION_MINOR);
+        DEBUG_PRINTF("\r\n");
+        DEBUG_PRINTF("CPU flash size: %u\r\n", flash_size);
+        DEBUG_PRINTF("CPU serial number: %s %08X\r\n", serial_number_str, serial_number_crc32);
+//      DEBUG_PRINTF("Reset address: %08X\r\n", reset_addr);
     #endif
 
     // *************
-    // initialize the saved settings module
+    // initialise the saved settings module
 
     saved_settings_init();
 
@@ -673,10 +598,10 @@ int main()
     	saved_settings.mode == MODE_TX_BLANK_CARRIER_TEST ||
     	saved_settings.mode == MODE_TX_SPECTRUM_TEST ||
     	saved_settings.mode == MODE_SCAN_SPECTRUM)
-    	saved_settings.mode = MODE_NORMAL;
+    	saved_settings.mode = MODE_NORMAL;	// go back to NORMAL mode
 
     if (saved_settings.rts_time == 0xff || saved_settings.rts_time > 100)
-    	saved_settings.rts_time = 10;
+    	saved_settings.rts_time = 10;	// default to 10ms
 
 	#if !defined(PIOS_COM_DEBUG)
     	if (saved_settings.serial_baudrate != 0xffffffff)
@@ -688,6 +613,13 @@ int main()
 
     if (!GPIO_IN(API_MODE_PIN))
         API_Mode = TRUE;
+
+	#if defined(PIOS_COM_DEBUG)
+    	if (!API_Mode)
+    		DEBUG_PRINTF("TRANSPARENT mode\r\n");
+    	else
+    		DEBUG_PRINTF("API mode\r\n");
+	#endif
 
     // *************
     // read the 434/868/915 jumper options
@@ -746,32 +678,9 @@ int main()
                 saved_settings.max_frequency_Hz = saved_settings.frequency_Hz + 10000000;
             }
             if (saved_settings.max_rf_bandwidth == 0xffffffff)
-            {
-    //          saved_settings.max_rf_bandwidth = 500;
-    //          saved_settings.max_rf_bandwidth = 1000;
-    //          saved_settings.max_rf_bandwidth = 2000;
-    //          saved_settings.max_rf_bandwidth = 4000;
-    //          saved_settings.max_rf_bandwidth = 8000;
-    //          saved_settings.max_rf_bandwidth = 9600;
-    //          saved_settings.max_rf_bandwidth = 16000;
-    //          saved_settings.max_rf_bandwidth = 19200;
-    //          saved_settings.max_rf_bandwidth = 24000;
-    //          saved_settings.max_rf_bandwidth = 32000;
-    //          saved_settings.max_rf_bandwidth = 64000;
                 saved_settings.max_rf_bandwidth = 128000;
-    //          saved_settings.max_rf_bandwidth = 192000;
-            }
             if (saved_settings.max_tx_power == 0xff)
-            {
-    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_0;        // +1dBm ... 1.25mW
-    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_1;        // +2dBm ... 1.6mW
-    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_2;        // +5dBm ... 3.16mW
-    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_3;        // +8dBm ... 6.3mW
                 saved_settings.max_tx_power = RFM22_tx_pwr_txpow_4;        // +11dBm .. 12.6mW
-    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_5;        // +14dBm .. 25mW
-    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_6;        // +17dBm .. 50mW
-    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_7;        // +20dBm .. 100mW
-            }
             break;
 
         case FREQBAND_915MHz:
@@ -782,66 +691,28 @@ int main()
                 saved_settings.max_frequency_Hz = saved_settings.frequency_Hz + 13000000;
             }
             if (saved_settings.max_rf_bandwidth == 0xffffffff)
-            {
-    //          saved_settings.max_rf_bandwidth = 500;
-    //          saved_settings.max_rf_bandwidth = 1000;
-    //          saved_settings.max_rf_bandwidth = 2000;
-    //          saved_settings.max_rf_bandwidth = 4000;
-    //          saved_settings.max_rf_bandwidth = 8000;
-    //          saved_settings.max_rf_bandwidth = 9600;
-    //          saved_settings.max_rf_bandwidth = 16000;
-    //          saved_settings.max_rf_bandwidth = 19200;
-    //          saved_settings.max_rf_bandwidth = 24000;
-    //          saved_settings.max_rf_bandwidth = 32000;
-    //          saved_settings.max_rf_bandwidth = 64000;
                 saved_settings.max_rf_bandwidth = 128000;
-    //          saved_settings.max_rf_bandwidth = 192000;
-            }
             if (saved_settings.max_tx_power == 0xff)
-            {
-    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_0;        // +1dBm ... 1.25mW
-    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_1;        // +2dBm ... 1.6mW
-    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_2;        // +5dBm ... 3.16mW
-    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_3;        // +8dBm ... 6.3mW
                 saved_settings.max_tx_power = RFM22_tx_pwr_txpow_4;        // +11dBm .. 12.6mW
-    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_5;        // +14dBm .. 25mW
-    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_6;        // +17dBm .. 50mW
-    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_7;        // +20dBm .. 100mW
-            }
             break;
 
         default:
             break;
     }
 
-    // *************
-
-    processReset();           // Determine what caused the reset/reboot
-
-    // *************
-    // debug stuff
-
-    #if defined(PIOS_COM_DEBUG)
-        DEBUG_PRINTF("\r\n");
-        DEBUG_PRINTF("CPU flash size: %u\r\n", flash_size);
-        DEBUG_PRINTF("CPU serial number: %s %08X\r\n", serial_number_str, serial_number_crc32);
-//      DEBUG_PRINTF("Reset address: %08X\r\n", reset_addr);
-
-        if (!API_Mode)
-            DEBUG_PRINTF("TRANSPARENT mode\r\n");
-        else
-            DEBUG_PRINTF("API mode\r\n");
-
-        switch (saved_settings.frequency_band)
-        {
-            case FREQBAND_UNKNOWN: DEBUG_PRINTF("UNKNOWN band\r\n"); break;
-            case FREQBAND_434MHz:  DEBUG_PRINTF("434MHz band\r\n"); break;
-            case FREQBAND_868MHz:  DEBUG_PRINTF("868MHz band\r\n"); break;
-            case FREQBAND_915MHz:  DEBUG_PRINTF("915MHz band\r\n"); break;
-        }
-    #endif
+	#if defined(PIOS_COM_DEBUG)
+    	switch (saved_settings.frequency_band)
+    	{
+    		case FREQBAND_UNKNOWN: DEBUG_PRINTF("UNKNOWN band\r\n"); break;
+    		case FREQBAND_434MHz:  DEBUG_PRINTF("434MHz band\r\n"); break;
+    		case FREQBAND_868MHz:  DEBUG_PRINTF("868MHz band\r\n"); break;
+    		case FREQBAND_915MHz:  DEBUG_PRINTF("915MHz band\r\n"); break;
+    	}
+	#endif
 
     // *************
+
+    processReset();		// Determine what caused the reset/reboot
 
     init_RF_module();	// initialise the RF module
 
@@ -850,8 +721,6 @@ int main()
     ppm_init();			// initialise the ppm module
 
     ss_init();			// initialise the spectrum scanning module
-
-    // *************
 
     saved_settings_save();
 
@@ -881,7 +750,7 @@ int main()
         }
     #endif
 
-    // start a remote connection going
+    // start a remote connection going to another modem
     ph_set_remote_encryption(0, saved_settings.aes_enable, (const void *)saved_settings.aes_key);
     ph_set_remote_serial_number(0, saved_settings.destination_id);
 
@@ -897,23 +766,23 @@ int main()
             // *************************
             // display the up-time .. HH:MM:SS
 
-//            #if defined(PIOS_COM_DEBUG)
-//		int32_t _uptime_ms = uptime_ms;
-//		uint32_t _uptime_sec = _uptime_ms / 1000;
-//		DEBUG_PRINTF("Uptime: %02d:%02d:%02d.%03d\r\n", _uptime_sec / 3600, (_uptime_sec / 60) % 60, _uptime_sec % 60, _uptime_ms % 1000);
-//	    #endif
+//          #if defined(PIOS_COM_DEBUG)
+//				uint32_t _uptime_ms = uptime_ms;
+//				uint32_t _uptime_sec = _uptime_ms / 1000;
+//				DEBUG_PRINTF("Uptime: %02d:%02d:%02d.%03d\r\n", _uptime_sec / 3600, (_uptime_sec / 60) % 60, _uptime_sec % 60, _uptime_ms % 1000);
+//	    	#endif
 
             // *************************
             // process the Temperature
 
-//	    if (temp_adc >= 0)
-//	    {
+//	    	if (temp_adc >= 0)
+//	    	{
 //				int32_t degress_C = temp_adc;
 //
 //				#if defined(PIOS_COM_DEBUG)
 //					DEBUG_PRINTF("TEMP: %d %d\r\n", temp_adc, degress_C);
 //				#endif
-//	    }
+//	    	}
 
             // *************************
             // process the PSU voltage level
@@ -928,9 +797,6 @@ int main()
 //            }
 
             // *************************
-
-
-//          rfm22_setTxCarrierMode();	// TEST ONLY
         }
 
         rfm22_process();				// rf hardware layer processing

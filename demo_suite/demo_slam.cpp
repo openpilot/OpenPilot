@@ -190,6 +190,18 @@ const double UNCERT_VANG = .5; // rad/s
 const double PERT_VLIN = 2.0; // m/s per sqrt(s)
 const double PERT_VANG = 2.0; // rad/s per sqrt(s)
 
+//-- Sensor Pose // x,y,z,roll,pitch,yaw
+// camera alone
+const double SENSOR_POSE_CONSTVEL[6] = {0, 0, 0, -90, 0, -90};
+// camera and IMU sticked together
+const double SENSOR_POSE_INERTIAL[6] = {0.04, 0.01, -0.035, 90, 0, 90};
+//const double SENSOR_POSE_INERTIAL[6] = {0.0, 0.0, 0.0, 90, 0, 90};
+// IMU on Mana on CPU, camera left
+//const double SENSOR_POSE_INERTIAL[6] = {47, 15.3, 12.2, -90, 0, -90};
+// IMU on Mana on platine, camera left
+//const double SENSOR_POSE_INERTIAL[6] = {0, 0, 0, -90, 0, -90};
+
+
 // inertial robot initial uncertainties and perturbations - in addition to constant velocity option UNCERT_VLIN.
 //if (intOpts[iRobot] == 1) // == robot inertial
 const double UNCERT_GRAVITY = 0.01 * 9.81; // 1% m/s^2
@@ -205,13 +217,7 @@ const double PERT_WERR = 1.4 * jmath::degToRad(0.05)*sqrt(40.0); // rad/s, IMU g
 const double PERT_RANWALKACC = 0; // m/s^2 per sqrt(s), IMU a_bias random walk
 const double PERT_RANWALKGYRO = 0; // rad/s^2 per sqrt(s), IMU w_bias random walk
 
-//IMU Pose
-const double IMUPOSE[6] = {0, 0, 0, 90, 0, 90};// x,y,z,roll,pitch,yaw
-
-//IMU Pose on Mana
-//const double IMUPOSE[6] = {47, 15.3, 12.2, 0, 0, 0};// x,y,z,roll,pitch,yaw
-
-const double IMU_TIMESTAMP_CORRECTION = 0.0;
+const double IMU_TIMESTAMP_CORRECTION = 0.010;//0.007;
 const double SIMU_IMU_TIMESTAMP_CORRECTION = 0.000;
 const double SIMU_IMU_FREQ = 120.0;
 const double SIMU_IMU_GRAVITY = 9.81;
@@ -242,13 +248,13 @@ const double INTRINSIC[4] = { 301.27013,   266.86136,   497.28243,   496.81116 }
 const double DISTORTION[3] = { -0.23193,   0.11306, 0.0 }; //{-0.27965, 0.20059, -0.14215}; //{-0.27572, 0.28827};
 */
 
-// flea2 with original obj after 2010/11/24
+/*// flea2 with original obj after 2010/11/24
 const std::string CAMERA_DEVICE = "0x00b09d01006fb38f";
 const unsigned IMG_WIDTH = 640;
 const unsigned IMG_HEIGHT = 480;
 const double INTRINSIC[4] = { 306.2969,   264.7741,   499.9177,   494.4829 };
 const double DISTORTION[3] = { -0.2293129, 0.08793152, -0.01349877 };
-
+*/
 
 /*// flea2 with original obj after 2010/11/24, 320x240
 const std::string CAMERA_DEVICE = "0x00b09d01006fb38f";
@@ -258,6 +264,21 @@ const double INTRINSIC[4] = { 153.148, 132.387, 249.959, 247.241 };
 const double DISTORTION[3] = { -0.2293129, 0.08793152, -0.01349877 };
 */
 
+
+/*// flea2 with 4.5 obj after 2011/02/14
+const std::string CAMERA_DEVICE = "0x00b09d010063565b";
+const unsigned IMG_WIDTH = 640;
+const unsigned IMG_HEIGHT = 480;
+const double INTRINSIC[4] = { 323.5790, 248.6014, 622.3523, 622.6011 };
+const double DISTORTION[3] = { -0.3335163, 0.2082654, -0.09450253 };
+*/
+
+// flea2 with 4.5 obj after 2011/02/16
+const std::string CAMERA_DEVICE = "0x00b09d010063565b";
+const unsigned IMG_WIDTH = 640;
+const unsigned IMG_HEIGHT = 480;
+const double INTRINSIC[4] = { 327.3508, 249.9982, 622.0489, 621.6159 };
+const double DISTORTION[3] = { -0.3270245, 0.1944629, -0.09558001 };
 
 /*// flea2 with Schneider lens
 const std::string CAMERA_DEVICE = "0x00b09d01006fb38f";
@@ -280,6 +301,15 @@ const double DISTORTION[3] = {-2.889972e-01, 2.511945e-01, -2.147339e-01 };
 //const double INTRINSIC[4] = { 268.44175,   197.6454,  535.7405, 535.0865 };
 //const double DISTORTION[3] = { -0.2927602, 0.250071, -0.2086941};
 
+
+/*// flea1 montoldre october 2010
+const std::string CAMERA_DEVICE = "";
+const unsigned IMG_WIDTH = 512;
+const unsigned IMG_HEIGHT = 384;
+const double INTRINSIC[4] = { 268.44175, 197.6454, 535.7405, 535.0865};
+//const double DISTORTION[3] = { -1.1710408, 4.0321136, -13.3564224 };
+const double DISTORTION[3] = { -2.927602e-01, 2.520071e-01, -2.086941e-01 };
+*/
 
 /*// jmcodol's robot
 const std::string CAMERA_DEVICE = "0x00b09d01006fb38f";
@@ -654,10 +684,12 @@ void demo_slam01_main(world_ptr_t *world) {
 	senPtr11->linkToParentRobot(robPtr1);
 	if (intOpts[iRobot] == 1)
 	{
-		senPtr11->setPose(IMUPOSE[0],IMUPOSE[1], IMUPOSE[2], IMUPOSE[3], IMUPOSE[4], IMUPOSE[5]); // x,y,z,roll,pitch,yaw
+		senPtr11->setPose(SENSOR_POSE_INERTIAL[0], SENSOR_POSE_INERTIAL[1], SENSOR_POSE_INERTIAL[2],
+											SENSOR_POSE_INERTIAL[3], SENSOR_POSE_INERTIAL[4], SENSOR_POSE_INERTIAL[5]); // x,y,z,roll,pitch,yaw
 	} else
 	{
-		senPtr11->setPose(0,0,0,-90,0,-90);
+		senPtr11->setPose(SENSOR_POSE_CONSTVEL[0], SENSOR_POSE_CONSTVEL[1], SENSOR_POSE_CONSTVEL[2],
+											SENSOR_POSE_CONSTVEL[3], SENSOR_POSE_CONSTVEL[4], SENSOR_POSE_CONSTVEL[5]); // x,y,z,roll,pitch,yaw
 	}
 	//senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(img_width, img_height);

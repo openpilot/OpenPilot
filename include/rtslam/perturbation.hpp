@@ -156,6 +156,7 @@ namespace jafar {
 				 * - The deterministic values integrate with time normally, linearly with dt:
 				 * 		- x = _x_ct * _dt
 				 * - The white, Gaussian random values integrate with the square root of dt. Their variance integrates linearly with dt:
+				 * 		- x = _x_ct * sqrt(_dt)
 				 *		- P = _P_ct * _dt
 				 *
 				 * This function takes mean and covariances from the internal variables of the class (which are often constant).

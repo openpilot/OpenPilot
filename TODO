@@ -67,7 +67,7 @@ Performance
 Precision
 ------------------------------------
 - to extract patch and match, compute an homography with the 4 corners, in order to take distortion a little bit into account
-- define and implement measure->P in matcher
+- define and implement measure->P in matcher, with the curvature, or at least delete points with one curvature too low
 - extend to n-point ransac and reduce the lowInnov ?
 - if no feature is found, try with larger ellipse, because there is little chance you find them back later (except if this one image is bad), if you never find them back you'll be for sure inconsistent, and if you try later the ellipses will be greater and greater.
 - Finish implementing RobotCentric Kalman
@@ -83,7 +83,8 @@ Precision
 - when a point is detected, do a matching with itself with interpolation to find subpixel position
 - when a point is matched, try to estimate if there is a possible ambiguity with another point in the ellipse 
 
-- inertial: ignore image if movement estimated by move() is too small ?
+- inertial: ignore image if movement estimated by move() is too small ? More generally and even without inertial, we can avoid updates with innovation too low wrt observation noise. Inconsistency comes from too large update, but also from too many updates even small, so there is a compromise to make.
+- inertial: estimate the time offset between the IMU and the camera timestamps, and take it into account to increase the incertainty when the dynamic is large
 
 - [ok] recompute all infoGains for a few first updates in active search
 - [ok] Finish implementing 1 point Ransac to avoid outliers

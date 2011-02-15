@@ -198,17 +198,26 @@ namespace jafar {
 			innovation.P() = measurement.P() + expectation.P();
 			INN_rsl = -EXP_rsl;
 		}
-
+		
 		void ObservationAbstract::computeInnovationMean(vec &inn, const vec &meas, const vec &exp) const
 		{
 			inn = meas - exp;
+		}
+
+		double ObservationAbstract::computeRelevance() {
+			// compute innovation score = squared mahalanobis distance of innovation.x wrt measurement.P
+			// but for faster result, and because measurement.P will probably always be diagonal, only use diagonal elements
+			innovation.relevance = 0.0;
+			for (size_t i = 0; i < measurement.size(); ++i)
+				innovation.relevance += jmath::sqr(innovation.x()(i))/measurement.P(i,i);
+			return innovation.relevance;
 		}
 
 		void ObservationAbstract::predictInfoGain() {
 			expectation.infoGain = ublasExtra::det(expectation.P());
 		}
 
-		bool ObservationAbstract::compatibilityTest(const double mahaDist){
+		bool ObservationAbstract::compatibilityTest(double mahaDist){
 //JFR_DEBUG("obs " << id() << " passing compatibilityTest with " << mahaDist);
 			return (innovation.mahalanobis() < mahaDist*mahaDist);
 		}

@@ -197,6 +197,7 @@ namespace jafar {
 			public:
 				void stackCorrection(Innovation & inn, const mat & INN_rsl, const ind_array & ia_rsl);
 				void correctAllStacked(const ind_array & iax);
+				void clearStack();
 
 		};
 

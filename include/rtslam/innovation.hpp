@@ -47,6 +47,7 @@ namespace jafar {
 
 				jblas::sym_mat iP_; ///<        The inverse of the innovation covariances matrix.
 				double mahalanobis_; ///<       The Mahalanobis distance from the measurement to the expectation.
+				double relevance; ///< The Mahalanobis distance of innovation.x wrt measurement.P
 
 				/**
 				 * Size construction.

@@ -120,8 +120,8 @@ namespace jafar {
 			}
 			
 			// 2 compute Kalman gain
-			ublasExtra::lu_inv(stackedInnovation_P, stackedInnovation_iP);
 // JFR_DEBUG("correctAllStacked: stackedInnovation_P " << stackedInnovation_P);
+			ublasExtra::lu_inv(stackedInnovation_P, stackedInnovation_iP);
 // JFR_DEBUG("correctAllStacked: stackedInnovation_iP " << stackedInnovation_iP);
 // JFR_DEBUG("correctAllStacked: PJt_tmp " << PJt_tmp);
 // JFR_DEBUG("stackedInnovation_x " << stackedInnovation_x);
@@ -132,6 +132,11 @@ namespace jafar {
 			ublas::project(x_, ia_x) += prod(K, stackedInnovation_x);
 			ublas::project(P_, ia_x, ia_x) += prod<sym_mat>(K, trans(PJt_tmp));
 			
+			corrStack.clear();
+		}
+		
+		void ExtendedKalmanFilterIndirect::clearStack()
+		{
 			corrStack.clear();
 		}
 

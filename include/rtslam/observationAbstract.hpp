@@ -277,6 +277,7 @@ namespace jafar {
 				 */
 				virtual void computeInnovation();
 				virtual void computeInnovationMean(vec &inn, const vec &meas, const vec &exp) const;
+				virtual double computeRelevance();
 
 				/**
 				 * Predict information gain.

@@ -11,6 +11,76 @@
  * \ingroup rtslam
  */
 
+
+
+/*
+ * STATUS: working fine, use it
+ * Ransac ensures that we use correct observations for a few first updates,
+ * allowing bad observations to be more easily detected by gating
+ * You can disable it by setting N_UPDATES_RANSAC to 0
+ */
+#define RANSAC_FIRST 1
+
+/*
+ * STATUS: working fine, use it
+ * This allows to have 0% cpu used for waiting/idle
+ */
+#define EVENT_BASED_RAW 1
+
+/*
+ * STATUS: in progress, do not use for now
+ * This allows to track landmarks longer by updating the reference patch when
+ * the landmark is not detected anymore and the point of view has changed
+ * significantly enough
+ * The problem is that the correlation is not robust enough in a matching
+ * (opposed to tracking) context, and it can provoke matching errors with a
+ * progressive appearance drift.
+ * Also decreasing perfs by 10%, probably because we save a view at each obs,
+ * or maybe it just because of the different random process
+ */
+#define MULTIVIEW_DESCRIPTOR 0
+
+/*
+ * STATUS: in progress, do not use for now
+ * This allows to ignore some landmarks when we have some experience telling
+ * us that we can't observe this landmarks from here (masking), in order to
+ * save some time, and to allow creation of other observations in the
+ * neighborhood to keep localizing with enough landmarks.
+ * The problem is that sometimes it creates too many landmarks in the same area
+ * (significantly slowing down slam), and sometimes doesn't create enough of
+ * them when it is necessary.
+ */
+#define VISIBILITY_MAP 0
+
+
+/*
+ * STATUS: in progress, do not use for now
+ * Only update if innovation is significant wrt measurement uncertainty.
+ * 
+ * Large updates are causing inconsistency because of linearization errors,
+ * but too numerous updates are also causing inconsistency, 
+ * so we should avoid to do not significant updates. 
+ * An update is not significant if there are large odds that it is 
+ * only measurement noise and that there is not much information.
+ * 
+ * When the camera is not moving at all, the landmarks are converging anyway
+ * quite fast because of this, at very unconsistent positions of course, 
+ * so that when the camera moves it cannot recover them.
+ * 
+ * Some work needs to be done yet to prevent search ellipses from growing
+ * too much and integrate it better with the whole management, but this was
+ * for first evaluation purpose.
+ * 
+ * Unfortunately it doesn't seem to improve much the situation, even if
+ * it is still working correctly with less computations.
+ * The feature is disabled for now.
+ */
+#define RELEVANCE_TEST 0
+
+
+///##############################################
+
+
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 //#include <boost/filesystem/operations.hpp>
@@ -55,6 +125,8 @@
 #include "rtslam/hardwareSensorAdhocSimulator.hpp"
 #include "rtslam/hardwareEstimatorInertialAdhocSimulator.hpp"
 
+///##############################################
+
 using namespace jblas;
 using namespace jafar;
 using namespace jafar::jmath;
@@ -82,45 +154,6 @@ typedef DataManagerOnePointRansac<RawImage, SensorPinHole, FeatureImagePoint, im
 typedef DataManagerOnePointRansac<simu::RawSimu, SensorPinHole, simu::FeatureSimu, image::ConvexRoi, ActiveSearchGrid, simu::DetectorSimu<image::ConvexRoi>, simu::MatcherSimu<image::ConvexRoi> > DataManager_ImagePoint_Ransac_Simu;
 
 ///##############################################
-
-/*
- * STATUS: working fine, use it
- * Ransac ensures that we use correct observations for a few first updates,
- * allowing bad observations to be more easily detected by gating
- * You can disable it by setting N_UPDATES_RANSAC to 0
- */
-#define RANSAC 1
-
-/*
- * STATUS: working fine, use it
- * This allows to have 0% cpu used for waiting/idle
- */
-#define EVENT_BASED_RAW 1
-
-/*
- * STATUS: in progress, do not use for now
- * This allows to track landmarks longer by updating the reference patch when
- * the landmark is not detected anymore and the point of view has changed
- * significantly enough
- * The problem is that the correlation is not robust enough in a matching
- * (opposed to tracking) context, and it can provoke matching errors with a
- * progressive appearance drift.
- * Also decreasing perfs by 10%, probably because we save a view at each obs,
- * or maybe it just because of the different random process
- */
-#define MULTIVIEW_DESCRIPTOR 0
-
-/*
- * STATUS: in progress, do not use for now
- * This allows to ignore some landmarks when we have some experience telling
- * us that we can't observe this landmarks from here (masking), in order to
- * save some time, and to allow creation of other observations in the
- * neighborhood to keep localizing with enough landmarks.
- * The problem is that sometimes it creates too many landmarks in the same area
- * (significantly slowing down slam), and sometimes doesn't create enough of
- * them when it is necessary.
- */
-#define VISIBILITY_MAP 0
 
 int mode = 0;
 time_t rseed;
@@ -367,14 +400,15 @@ const double MATCH_TH = 0.95;
 #else
 const double MATCH_TH = 0.90;
 #endif
-const double MAHALANOBIS_TH = 3; // in n_sigmas
+const double RELEVANCE_TH = 2.0; // in n_sigmas
+const double MAHALANOBIS_TH = 3.0; // in n_sigmas
 const unsigned N_UPDATES_TOTAL = 20;
 const unsigned N_UPDATES_RANSAC = 15;
 const unsigned N_INIT = 10;
 const unsigned N_RECOMP_GAINS = 3;
 const double RANSAC_LOW_INNOV = 1.0; // in pixels
 
-#if RANSAC
+#if RANSAC_FIRST
 const unsigned RANSAC_NTRIES = 6;
 #else
 const unsigned RANSAC_NTRIES = 0;
@@ -715,7 +749,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	if (intOpts[iSimu] != 0)
 	{
 		boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, PATCH_SIZE, PIX_NOISE, PIX_NOISE*PIX_NOISE_SIMUFACTOR));
-		boost::shared_ptr<simu::MatcherSimu<image::ConvexRoi> > matcher(new simu::MatcherSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, PATCH_SIZE, MAX_SEARCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE, PIX_NOISE*PIX_NOISE_SIMUFACTOR));
+		boost::shared_ptr<simu::MatcherSimu<image::ConvexRoi> > matcher(new simu::MatcherSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, PATCH_SIZE, MAX_SEARCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, RELEVANCE_TH, PIX_NOISE, PIX_NOISE*PIX_NOISE_SIMUFACTOR));
 		
 		boost::shared_ptr<DataManager_ImagePoint_Ransac_Simu> dmPt11(new DataManager_ImagePoint_Ransac_Simu(detector, matcher, asGrid, N_UPDATES_TOTAL, N_UPDATES_RANSAC, RANSAC_NTRIES, N_INIT, N_RECOMP_GAINS));
 
@@ -733,7 +767,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		boost::shared_ptr<DescriptorImagePointFirstViewFactory> descFactory(new DescriptorImagePointFirstViewFactory(DESC_SIZE));
 		#endif
 		boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE, PATCH_SIZE, PIX_NOISE, descFactory));
-		boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(MIN_SCORE, PARTIAL_POSITION, PATCH_SIZE, MAX_SEARCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, PIX_NOISE));
+		boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(MIN_SCORE, PARTIAL_POSITION, PATCH_SIZE, MAX_SEARCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, RELEVANCE_TH, PIX_NOISE));
 		
 		boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, N_UPDATES_TOTAL, N_UPDATES_RANSAC, RANSAC_NTRIES, N_INIT, N_RECOMP_GAINS));
 

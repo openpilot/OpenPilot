@@ -139,6 +139,7 @@ namespace jafar {
 			//### Process the best Ransac set
 			//### 
 			ransac_set_ptr_t best_set;
+			bool pending_buffered_update = false;
 			if (ransacSetList.size() != 0)
 			{
 				// 1. select ransacSet.inliers.size() max
@@ -146,7 +147,7 @@ namespace jafar {
 					if (!best_set || (*rsIter)->size() > best_set->size()) best_set = *rsIter;
 
 				// if there are too much updates to do bufferized, randomly move out some of them
-				// to pending, they may be processed in active search if necessary
+				// to pending, they may be processed in active search if really necessary
 				while (best_set->size() > algorithmParams.n_updates_ransac)
 				{
 					int n = (rtslam::rand() % (best_set->size() - 1)) + 1; // keep the first one which is the base obs
@@ -158,28 +159,61 @@ namespace jafar {
 				{
 					// 2. for each obs in inliers
 					JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("Updating with Ransac:");
+					#if RELEVANCE_TEST
+					double innovation_relevance = 0.0;
+					#endif
 					for(ObsList::iterator obsIter = best_set->inlierObs.begin(); obsIter != best_set->inlierObs.end(); ++obsIter)
 					{
 						observation_ptr_t obsPtr = *obsIter;
-						// Add to tesselation grid for active search
-						//featMan->addObs(obsPtr->expectation.x());
-						obsPtr->events.updated = true;
-						numObs++;
-						JFR_DEBUG_SEND(" " << obsPtr->id());
 						
 						// 2a. add obs to buffer for EKF update
 						#if BUFFERED_UPDATE
 						mapPtr->filterPtr->stackCorrection(obsPtr->innovation, obsPtr->INN_rsl, obsPtr->ia_rsl);
+						#if RELEVANCE_TEST
+						innovation_relevance += obsPtr->computeRelevance();
+						#endif
 						#else
 						obsPtr->project();
 						obsPtr->computeInnovation();
-						obsPtr->update();
+						#if RELEVANCE_TEST
+						if (obsPtr->computeRelevance() > jmath::sqr(matcher->params.relevanceTh))
+						#endif
+						{
+							obsPtr->update();
+							obsPtr->events.updated = true;
+						}
 						#endif
 					}
+					bool do_update = false;
 					#if BUFFERED_UPDATE
 					// 3. perform buffered update
-					mapPtr->filterPtr->correctAllStacked(mapPtr->ia_used_states());
+					#if RELEVANCE_TEST
+					if (innovation_relevance > jmath::sqr(matcher->params.relevanceTh))
 					#endif
+					{
+						mapPtr->filterPtr->correctAllStacked(mapPtr->ia_used_states());
+						do_update = true;
+					}
+					#if RELEVANCE_TEST
+					else pending_buffered_update = true;
+					#endif
+					
+					#endif
+					
+					for(ObsList::iterator obsIter = best_set->inlierObs.begin(); obsIter != best_set->inlierObs.end(); ++obsIter)
+						if (do_update || (*obsIter)->events.updated)
+						{
+							// Add to tesselation grid for active search
+							//featMan->addObs(obsPtr->expectation.x());
+							numObs++;
+							(*obsIter)->events.updated = true;
+							JFR_DEBUG_SEND(" " << (*obsIter)->id());
+						} else
+						{
+							// TODO do that better with an insignificant flag
+							(*obsIter)->events.measured = false;
+							(*obsIter)->events.matched = false;
+						}
 					JFR_DEBUG_END();
 				}
 			}
@@ -270,13 +304,23 @@ namespace jafar {
 									obsPtr->computeInnovation();
 
 									// 1f. if feature is inlier
-									if (obsPtr->compatibilityTest(matcher->params.mahalanobisTh)) { // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
+									if (obsPtr->compatibilityTest(matcher->params.mahalanobisTh) // use 3.0 for 3-sigma or the 5% proba from the chi-square tables.
+									#if RELEVANCE_TEST
+									    && obsPtr->computeRelevance() > jmath::sqr(matcher->params.relevanceTh)
+									#endif
+										 ) {
+										if (pending_buffered_update)
+										{
+											mapPtr->filterPtr->correctAllStacked(mapPtr->ia_used_states());
+											pending_buffered_update = false;
+											// TODO mark as updated
+										}
+										obsPtr->events.updated = true;
 										numObs++;
 										JFR_DEBUG_SEND(" " << obsPtr->id());
 										//								kernel::Chrono update_chrono;
 										obsPtr->update();
 										//								total_update_time += update_chrono.elapsedMicrosecond();
-										obsPtr->events.updated = true;
 									} // obsPtr->compatibilityTest(M_TH)
 								} // obsPtr->getScoreMatchInPercent()>SC_TH
 
@@ -290,6 +334,8 @@ namespace jafar {
 			}
 			JFR_DEBUG_END();
 
+			if (pending_buffered_update) mapPtr->filterPtr->clearStack();
+			
 			//###
 			//### Update obs counters and some other stuff
 			//### 

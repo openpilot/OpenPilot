@@ -31,6 +31,7 @@ namespace simu {
 				double lowInnov;      ///<     search region radius for first RANSAC consensus
 				double threshold;     ///<     matching threshold
 				double mahalanobisTh; ///< Mahalanobis distance for outlier rejection
+				double relevanceTh; ///< Mahalanobis distance for no information rejection
 				double measStd;       ///<       measurement noise std deviation
 				double measVar;       ///<       measurement noise variance
 				double simuMeasStd;
@@ -40,7 +41,7 @@ namespace simu {
 			MultiDimNormalDistribution *noise;
 
 		public:
-			MatcherSimu(LandmarkAbstract::geometry_t type, size_t size, int patchSize, int maxSearchSize, double lowInnov, double threshold, double mahalanobisTh, double measStd, double simuMeasStd):
+			MatcherSimu(LandmarkAbstract::geometry_t type, size_t size, int patchSize, int maxSearchSize, double lowInnov, double threshold, double mahalanobisTh, double relevanceTh, double measStd, double simuMeasStd):
 				type(type), size(size), noise(NULL)
 			{
 				JFR_ASSERT(patchSize%2, "patchSize must be an odd number!");
@@ -49,6 +50,7 @@ namespace simu {
 				params.lowInnov = lowInnov;
 				params.threshold = threshold;
 				params.mahalanobisTh = mahalanobisTh;
+				params.relevanceTh = relevanceTh;
 				params.measStd = measStd;
 				params.measVar = measStd * measStd;
 				params.simuMeasStd = simuMeasStd;

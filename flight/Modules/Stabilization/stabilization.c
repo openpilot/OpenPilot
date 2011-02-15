@@ -155,7 +155,6 @@ static void stabilizationTask(void* parameters)
 		SystemSettingsGet(&systemSettings);
 
 
-		float *manualAxis = &manualControl.Roll;
 		float *attitudeDesiredAxis = &attitudeDesired.Roll;
 		float *attitudeActualAxis = &attitudeActual.Roll;
 		float *actuatorDesiredAxis = &actuatorDesired.Roll;
@@ -164,19 +163,19 @@ static void stabilizationTask(void* parameters)
 		//Calculate desired rate
 		for(int8_t ct=0; ct< MAX_AXES; ct++)
 		{
-			switch(manualControl.StabilizationSettings[ct])
+			switch(attitudeDesired.StabilizationSettings[ct])
 			{
-			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE:
-				rateDesiredAxis[ct] = manualAxis[ct] * settings.ManualRate[ct];
+			case ATTITUDEDESIRED_STABILIZATIONSETTINGS_RATE:
+				rateDesiredAxis[ct] = attitudeDesiredAxis[ct];
 				break;
 
-			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE:
+			case ATTITUDEDESIRED_STABILIZATIONSETTINGS_ATTITUDE:
 				rateDesiredAxis[ct] = ApplyPid(&pids[PID_ROLL + ct],  attitudeDesiredAxis[ct],  attitudeActualAxis[ct], 1);
 				break;
 			}
 		}
 
-		uint8_t shouldUpdate = 0;
+		uint8_t shouldUpdate = 1;
 		RateDesiredSet(&rateDesired);
 		ActuatorDesiredGet(&actuatorDesired);
 		//Calculate desired command
@@ -193,36 +192,18 @@ static void stabilizationTask(void* parameters)
 				}
 
 			}
-			switch(manualControl.StabilizationSettings[ct])
+			switch(attitudeDesired.StabilizationSettings[ct])
 			{
-			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE:
-			case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE:
+			case ATTITUDEDESIRED_STABILIZATIONSETTINGS_RATE:
+			case ATTITUDEDESIRED_STABILIZATIONSETTINGS_ATTITUDE:
 				{
 					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rateDesiredAxis[ct],  attitudeRaw.gyros[ct], 0);
 					actuatorDesiredAxis[ct] = bound(command);
-					shouldUpdate = 1;
 					break;
 				}
-            case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE:
-                    //actuatorDesiredAxis[ct] = bound(manualAxis[ct]);
-                    //shouldUpdate = 1;
-                    switch (ct)
-                    {
-                    case ROLL:
-                            actuatorDesiredAxis[ct] = bound(attitudeDesiredAxis[ct]/settings.RollMax);
-                            shouldUpdate = 1;
-                    break;
-                    case PITCH:
-                            actuatorDesiredAxis[ct] = bound(attitudeDesiredAxis[ct]/settings.PitchMax);
-                            shouldUpdate = 1;
-                    break;
-                    case YAW:
-                            actuatorDesiredAxis[ct] = bound(attitudeDesiredAxis[ct]/180);
-                            shouldUpdate = 1;
-                    break;
-                    }
-                break;
-
+			case ATTITUDEDESIRED_STABILIZATIONSETTINGS_NONE:
+				actuatorDesiredAxis[ct] = bound(attitudeDesiredAxis[ct]);
+				break;
 			}
 		}
 

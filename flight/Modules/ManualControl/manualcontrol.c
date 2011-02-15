@@ -458,10 +458,43 @@ static void manualControlTask(void *parameters)
 			actuator.Throttle = cmd.Throttle;
 			ActuatorDesiredSet(&actuator);
 		} else if (cmd.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED) {
-			attitude.Roll = cmd.Roll * stabSettings.RollMax;
-			attitude.Pitch = cmd.Pitch * stabSettings.PitchMax;
-			attitude.Yaw = fmod(cmd.Yaw * 180.0, 360);
+			switch(cmd.StabilizationSettings[MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ROLL]) {
+				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE:
+					attitude.Roll = cmd.Roll * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_ROLL];
+					break;
+				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE:
+					attitude.Roll = cmd.Roll * stabSettings.RollMax;
+					break;
+				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE:
+					attitude.Roll = cmd.Roll;
+					break;
+			}
+			switch(cmd.StabilizationSettings[MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_PITCH]) {
+				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE:
+					attitude.Pitch = cmd.Pitch * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_PITCH];
+					break;
+				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE:
+					attitude.Pitch = cmd.Pitch * stabSettings.PitchMax;
+					break;
+				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE:
+					attitude.Pitch = cmd.Pitch;
+					break;
+			}
+			switch(cmd.StabilizationSettings[MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_YAW]) {
+				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE:
+					attitude.Yaw = cmd.Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW];
+					break;
+				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE:
+					attitude.Yaw = fmod(cmd.Yaw * 180.0, 360);
+					break;
+				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE:
+					attitude.Yaw = cmd.Yaw;
+					break;
+			}
 			attitude.Throttle =  (cmd.Throttle < 0) ? -1 : cmd.Throttle;
+			for(int i = 0; i < 3; i++) {
+				attitude.StabilizationSettings[i] = cmd.StabilizationSettings[i];
+			}
 			AttitudeDesiredSet(&attitude);
 		}
 	}

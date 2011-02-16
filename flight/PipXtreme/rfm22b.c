@@ -419,6 +419,15 @@ uint8_t rfm22_getTxPower(void)
 
 // ************************************
 
+uint32_t rfm22_minFrequency(void)
+{
+	return lower_carrier_frequency_limit_Hz;
+}
+uint32_t rfm22_maxFrequency(void)
+{
+	return upper_carrier_frequency_limit_Hz;
+}
+
 void rfm22_setNominalCarrierFrequency(uint32_t frequency_hz)
 {
 
@@ -494,6 +503,11 @@ void rfm22_setFreqHopChannel(uint8_t channel)
 uint8_t rfm22_freqHopChannel(void)
 {	// return the current frequency hopping channel
 	return frequency_hop_channel;
+}
+
+uint32_t rfm22_freqHopSize(void)
+{	// return the frequency hopping step size
+	return ((uint32_t)frequency_hop_step_size_reg * 10000);
 }
 
 // ************************************
@@ -1612,8 +1626,7 @@ void rfm22_process(void)
 	if (power_on_reset)
 	{	// we need to re-initialize the RF module - it told us it's reset itself
 		uint32_t current_freq = carrier_frequency_hz;										// fetch current rf nominal frequency
-		uint32_t freq_hop_step_size = (uint32_t)frequency_hop_step_size_reg * 10000;	// fetch the frequency hoppping step size
-		rfm22_init(lower_carrier_frequency_limit_Hz, upper_carrier_frequency_limit_Hz, freq_hop_step_size);
+		rfm22_init(lower_carrier_frequency_limit_Hz, upper_carrier_frequency_limit_Hz, rfm22_freqHopSize());
 		rfm22_setNominalCarrierFrequency(current_freq);									// restore the nominal carrier frequency
 		return;
 	}
@@ -1700,9 +1713,9 @@ void rfm22_process(void)
 }
 
 // ************************************
-// Initialize this hardware layer module and the rf module
+// reset the RF module
 
-int rfm22_init(uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t freq_hop_step_size)
+int rfm22_resetModule(void)
 {
 	initialized = false;
 
@@ -1711,10 +1724,6 @@ int rfm22_init(uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t fr
 #endif
 
 	power_on_reset = false;
-
-	#if defined(RFM22_DEBUG)
-		DEBUG_PRINTF("\r\nRF init\r\n");
-	#endif
 
 	// ****************
 
@@ -1812,6 +1821,59 @@ int rfm22_init(uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t fr
 	tx_pwr = 0;
 
 	// ****************
+	// read the RF chip ID bytes
+
+	device_type = rfm22_read(RFM22_DEVICE_TYPE) & RFM22_DT_MASK;		// read the device type
+	#if defined(RFM22_DEBUG)
+		DEBUG_PRINTF("rf device type: %d\r\n", device_type);
+	#endif
+	if (device_type != 0x08)
+		return -1;	// incorrect RF module type
+
+	device_version = rfm22_read(RFM22_DEVICE_VERSION) & RFM22_DV_MASK;	// read the device version
+	#if defined(RFM22_DEBUG)
+		DEBUG_PRINTF("rf device version: %d\r\n", device_version);
+	#endif
+//	if (device_version != RFM22_DEVICE_VERSION_V2)	// V2
+//		return -2;	// incorrect RF module version
+//	if (device_version != RFM22_DEVICE_VERSION_A0)	// A0
+//		return -2;	// incorrect RF module version
+	if (device_version != RFM22_DEVICE_VERSION_B1)	// B1
+		return -2;	// incorrect RF module version
+
+	// ****************
+
+	// disable Low Duty Cycle Mode
+	rfm22_write(RFM22_op_and_func_ctrl2, 0x00);
+
+	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_xton);					// READY mode
+//	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon);				// TUNE mode
+
+	// choose the 3 GPIO pin functions
+	rfm22_write(RFM22_io_port_config, RFM22_io_port_default);								// GPIO port use default value
+	rfm22_write(RFM22_gpio0_config, RFM22_gpio0_config_drv3 | RFM22_gpio0_config_txstate);	// GPIO0 = TX State (to control RF Switch)
+	rfm22_write(RFM22_gpio1_config, RFM22_gpio1_config_drv3 | RFM22_gpio1_config_rxstate);	// GPIO1 = RX State (to control RF Switch)
+	rfm22_write(RFM22_gpio2_config, RFM22_gpio2_config_drv3 | RFM22_gpio2_config_cca);		// GPIO2 = Clear Channel Assessment
+
+	// ****************
+
+	return 0;	// OK
+}
+
+// ************************************
+// Initialise this hardware layer module and the rf module
+
+int rfm22_init(uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t freq_hop_step_size)
+{
+	#if defined(RFM22_DEBUG)
+		DEBUG_PRINTF("\r\nRF init\r\n");
+	#endif
+
+	int res = rfm22_resetModule();
+	if (res < 0)
+		return res;
+
+	// ****************
 	// set the minimum and maximum carrier frequency allowed
 
 	if (min_frequency_hz < RFM22_MIN_CARRIER_FREQUENCY_HZ) min_frequency_hz = RFM22_MIN_CARRIER_FREQUENCY_HZ;
@@ -1840,32 +1902,8 @@ int rfm22_init(uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t fr
 	frequency_hop_step_size_reg = freq_hop_step_size;
 
 	// ****************
-	// read the RF chip ID bytes
-
-	device_type = rfm22_read(RFM22_DEVICE_TYPE) & RFM22_DT_MASK;		// read the device type
-	#if defined(RFM22_DEBUG)
-		DEBUG_PRINTF("rf device type: %d\r\n", device_type);
-	#endif
-	if (device_type != 0x08)
-		return -1;	// incorrect RF module type
-
-	device_version = rfm22_read(RFM22_DEVICE_VERSION) & RFM22_DV_MASK;	// read the device version
-	#if defined(RFM22_DEBUG)
-		DEBUG_PRINTF("rf device version: %d\r\n", device_version);
-	#endif
-//	if (device_version != RFM22_DEVICE_VERSION_V2)	// V2
-//		return -2;	// incorrect RF module version
-//	if (device_version != RFM22_DEVICE_VERSION_A0)	// A0
-//		return -2;	// incorrect RF module version
-	if (device_version != RFM22_DEVICE_VERSION_B1)	// B1
-		return -2;	// incorrect RF module version
-
-	// ****************
-
-	// disable Low Duty Cycle Mode
-	rfm22_write(RFM22_op_and_func_ctrl2, 0x00);
-
 	// calibrate our RF module to be exactly on frequency .. different for every module
+
 	osc_load_cap = OSC_LOAD_CAP;	// default
 /*	if (serial_number_crc32 == 0x176C1EC6) osc_load_cap = OSC_LOAD_CAP_1;
 	else
@@ -1876,16 +1914,8 @@ int rfm22_init(uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t fr
 	if (serial_number_crc32 == 0x994ECD31) osc_load_cap = OSC_LOAD_CAP_4;
 */	rfm22_write(RFM22_xtal_osc_load_cap, osc_load_cap);
 
-	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_xton);					// READY mode
-//	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon);				// TUNE mode
-
-	// choose the 3 GPIO pin functions
-	rfm22_write(RFM22_io_port_config, RFM22_io_port_default);								// GPIO port use default value
-	rfm22_write(RFM22_gpio0_config, RFM22_gpio0_config_drv3 | RFM22_gpio0_config_txstate);	// GPIO0 = TX State (to control RF Switch)
-	rfm22_write(RFM22_gpio1_config, RFM22_gpio1_config_drv3 | RFM22_gpio1_config_rxstate);	// GPIO1 = RX State (to control RF Switch)
-	rfm22_write(RFM22_gpio2_config, RFM22_gpio2_config_drv3 | RFM22_gpio2_config_cca);		// GPIO2 = Clear Channel Assessment
-
-        // set the RF datarate
+	// ****************
+	// set the RF datarate
 	rfm22_setDatarate(RFM22_DEFAULT_RF_DATARATE);
 
 	// Enable data whitening

@@ -572,6 +572,9 @@ enum {	RX_WAIT_PREAMBLE_MODE = 0,
 
 // ************************************
 
+uint32_t rfm22_minFrequency(void);
+uint32_t rfm22_maxFrequency(void);
+
 void rfm22_setNominalCarrierFrequency(uint32_t frequency_hz);
 uint32_t rfm22_getNominalCarrierFrequency(void);
 
@@ -579,6 +582,8 @@ float rfm22_getFrequencyStepSize(void);
 
 void rfm22_setFreqHopChannel(uint8_t channel);
 uint8_t rfm22_freqHopChannel(void);
+
+uint32_t rfm22_freqHopSize(void);
 
 void rfm22_setDatarate(uint32_t datarate_bps);
 uint32_t rfm22_getDatarate(void);

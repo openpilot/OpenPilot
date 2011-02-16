@@ -11,7 +11,7 @@ SUBDIRS   = plugin_coreplugin
 #plugin_donothing.depends = plugin_coreplugin
 
 
-# Core Plugin
+# Core plugin
 plugin_coreplugin.subdir = coreplugin
 
 # Empty UAVGadget - Default for new splits
@@ -19,7 +19,7 @@ plugin_emptygadget.subdir = emptygadget
 plugin_emptygadget.depends = plugin_coreplugin
 SUBDIRS += plugin_emptygadget
 
-# Welcome Plugin
+# Welcome plugin
 plugin_welcome.subdir = welcome
 plugin_welcome.depends = plugin_coreplugin
 SUBDIRS += plugin_welcome
@@ -34,12 +34,12 @@ SUBDIRS += plugin_serial
 plugin_serial.subdir = serialconnection
 plugin_serial.depends = plugin_coreplugin
 
-# UAVObjects plug-in
+# UAVObjects plugin
 SUBDIRS += plugin_uavobjects
 plugin_uavobjects.subdir = uavobjects
 plugin_uavobjects.depends = plugin_coreplugin
 
-# UAVTalk plug-in
+# UAVTalk plugin
 SUBDIRS += plugin_uavtalk
 plugin_uavtalk.subdir = uavtalk
 plugin_uavtalk.depends = plugin_uavobjects
@@ -57,7 +57,7 @@ plugin_scope.depends = plugin_coreplugin
 plugin_scope.depends += plugin_uavobjects
 SUBDIRS += plugin_scope
 
-# UAVObject Browser Gadget
+# UAVObject Browser gadget
 plugin_uavobjectbrowser.subdir = uavobjectbrowser
 plugin_uavobjectbrowser.depends = plugin_coreplugin
 plugin_uavobjectbrowser.depends += plugin_uavobjects
@@ -69,82 +69,80 @@ plugin_modelview.depends = plugin_coreplugin
 plugin_modelview.depends += plugin_uavobjects
 SUBDIRS += plugin_modelview
 
-#Uploader Gadget
+#Uploader gadget
 plugin_uploader.subdir = uploader
 plugin_uploader.depends = plugin_coreplugin
 plugin_uploader.depends += plugin_uavobjects
 plugin_uploader.depends += plugin_rawhid
 SUBDIRS += plugin_uploader
 
-#Dial Gadget
+#Dial gadget
 plugin_dial.subdir = dial
 plugin_dial.depends = plugin_coreplugin
 plugin_dial.depends += plugin_uavobjects
 SUBDIRS += plugin_dial
 
-#Linear Dial Gadget
+#Linear Dial gadget
 plugin_lineardial.subdir = lineardial
 plugin_lineardial.depends = plugin_coreplugin
 plugin_lineardial.depends += plugin_uavobjects
 SUBDIRS += plugin_lineardial
 
-#System health Gadget
+#System Health gadget
 plugin_systemhealth.subdir = systemhealth
 plugin_systemhealth.depends = plugin_coreplugin
 plugin_systemhealth.depends += plugin_uavobjects
 SUBDIRS += plugin_systemhealth
 
-#Notify Gadget
+#Notify gadget
 plugin_notify.subdir = notify
 plugin_notify.depends = plugin_coreplugin
 plugin_notify.depends += plugin_uavobjects
 SUBDIRS += plugin_notify
 
-#Config Gadget
+#Config gadget
 plugin_config.subdir = config
 plugin_config.depends = plugin_coreplugin
 plugin_config.depends += plugin_uavobjects
 SUBDIRS += plugin_config
 
-#GPS Display Gadget
+#GPS Display gadget
 plugin_gpsdisplay.subdir = gpsdisplay
 plugin_gpsdisplay.depends = plugin_coreplugin
 plugin_gpsdisplay.depends += plugin_uavtalk
 SUBDIRS += plugin_gpsdisplay
 
-# Primary Flight Display (PFD) Gadget
+# Primary Flight Display (PFD) gadget
 plugin_pfd.subdir = pfd
 plugin_pfd.depends = plugin_coreplugin
 plugin_pfd.depends += plugin_uavobjects
 SUBDIRS += plugin_pfd
-
 
 #IP connection plugin
 plugin_ipconnection.subdir = ipconnection
 plugin_ipconnection.depends = plugin_coreplugin
 SUBDIRS += plugin_ipconnection
 
-
-#HITLNEW Simulation Gadget
+#HITLNEW Simulation gadget
 plugin_hitlnew.subdir = hitlnew
 plugin_hitlnew.depends = plugin_coreplugin
 plugin_hitlnew.depends += plugin_uavobjects
 plugin_hitlnew.depends += plugin_uavtalk
 SUBDIRS += plugin_hitlnew
 
-# Export and Import GCS Configuration.
+# Export and Import GCS Configuration
 plugin_importexport.subdir = importexport
 plugin_importexport.depends = plugin_coreplugin
 SUBDIRS += plugin_importexport
 
-# Export and Import GCS Configuration.
+# Telemetry data logging plugin
 plugin_logging.subdir = logging
 plugin_logging.depends = plugin_coreplugin
 plugin_logging.depends += plugin_uavobjects
 plugin_logging.depends += plugin_uavtalk
 SUBDIRS += plugin_logging
 
-#GCS Control of UAV Gadget
+#GCS Control of UAV gadget
 plugin_gcscontrol.subdir = gcscontrol
 plugin_gcscontrol.depends = plugin_coreplugin
 plugin_gcscontrol.depends += plugin_uavobjects
@@ -157,25 +155,26 @@ SUBDIRS += plugin_gcscontrol
 #plugin_antennatrack.depends += plugin_uavtalk
 #SUBDIRS += plugin_antennatrack
 
-#PipXtreme Gadget
+#PipXtreme gadget
 plugin_pipxtreme.subdir = pipxtreme
 plugin_pipxtreme.depends = plugin_coreplugin
 plugin_pipxtreme.depends += plugin_uavobjects
 plugin_pipxtreme.depends += plugin_rawhid
 SUBDIRS += plugin_pipxtreme
 
-#Scope2 Gadget
+#Scope2 gadget
 #plugin_scope2.subdir = scope2
 #plugin_scope2.depends = plugin_coreplugin
 #plugin_scope2.depends += plugin_uavobjects
 #SUBDIRS += plugin_scope2
 
-# Empty UAVGadget - Default for new splits
+# Magic Waypoint gadget
 plugin_magicwaypoint.subdir = magicwaypoint
 plugin_magicwaypoint.depends = plugin_coreplugin
 SUBDIRS += plugin_magicwaypoint
 
-# UAVSettingsImportExport
+# UAV Settings Import/Export plugin
 plugin_uavsettingsimportexport.subdir = uavsettingsimportexport
 plugin_uavsettingsimportexport.depends = plugin_coreplugin
+plugin_uavsettingsimportexport.depends += plugin_uavobjects
 SUBDIRS += plugin_uavsettingsimportexport

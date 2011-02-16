@@ -341,6 +341,7 @@ OOCD_EXE=openocd
 OOCD_CL=-d0
 # interface and board/target settings (using the OOCD target-library here)
 UNAME := $(shell uname)
+
 ifeq ($(UNAME), Darwin)
   OOCD_CL+=-f ../../Project/OpenOCD/floss-jtag.openpilot.osx.cfg -f ../../Project/OpenOCD/stm32.cfg
 else
@@ -456,7 +457,9 @@ ifeq ($(MODEL), NULL)
 	@echo ${quote}Please specify the chip model with MODEL=MD/HD${quote}
 	@exit 2 
 endif
-	$(shell 'python file_to_array.py' $(SOURCE_BL) bl_array.h) 
+	python file_to_array.py $(SOURCE_BL) bl_array.h
+#UNAME := $(shell python file_to_array.py $(SOURCE_BL) bl_array.h)
+
 	
 ###########################################################################################################
 

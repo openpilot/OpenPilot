@@ -450,7 +450,7 @@ ifeq ($(SOURCE_BL), NULL)
 	@exit 2 
 endif
 ifeq ($(BOARD), NULL)
-	@echo ${quote}Please specify the board name with BOARD=board_name${quote}
+	@echo ${quote}Please specify the board name with BOARD=board_name (STM3210E_OP,STM32103CB_AHRS,STM32103CB_PIPXTREME,STM32103CB_CC_Rev1)${quote}
 	@exit 2 
 endif
 ifeq ($(MODEL), NULL)

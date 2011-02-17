@@ -253,7 +253,7 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
 	float quat[4];
 	rpy[0]=current.roll;
 	rpy[1]=current.pitch;
-	rpy[2]=current.yaw;
+	rpy[2]=current.azimuth;
         Utils::CoordinateConversions().RPY2Quaternion(rpy,quat);
         attActualData.q1 = quat[0];
         attActualData.q2 = quat[1];
@@ -281,9 +281,9 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
         rawData.gyros[0] = current.dRoll;
         rawData.gyros[1] = cos(DEG2RAD * current.roll) * current.dPitch + sin(DEG2RAD * current.roll) * current.dAzimuth;
         rawData.gyros[2] = cos(DEG2RAD * current.roll) * current.dAzimuth - sin(DEG2RAD * current.roll) * current.dPitch;
-	rawDara.accels[0] = current.ddX;
-	rawDara.accels[1] = current.ddY;
-	rawDara.accels[2] = current.ddZ;
+	rawData.accels[0] = current.ddX;
+	rawData.accels[1] = current.ddY;
+	rawData.accels[2] = current.ddZ;
 
         // Update homelocation
         HomeLocation::DataFields homeData;

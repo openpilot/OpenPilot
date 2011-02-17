@@ -443,6 +443,32 @@ void ConfigAHRSWidget::computeGyroDrift() {
     // calling this with a timer when data sampling is enabled, to get
     // a real-time view of the computed drift convergence and let the
     // user stop sampling when it becomes stable enough...
+    //
+    // Hint for whoever wants to implement that:
+    // The formula I use for computing the temperature compensation factor from
+    // two nicely filtered (downsampled) sample points is as follows:
+    //
+    // gyro_tempcompfactor == -(raw_gyro1 - raw_gyro2)/(gyro_temp1 - gyro_temp2)
+    //
+    // where raw_gyro1 and raw_gyro2 are gyroscope raw measurement values and
+    // gyro_temp1 and gyro_temp2 are the measurements from the gyroscope internal
+    // temperature sensors, each at two measure points T1 and T2
+    // note that the X and Y gyroscopes share one temperature sensor while
+    // Z has its own.
+    //
+    // the formula that calculates the AttitudeRav.gyros[X,Y,Z] values is
+    // currently as follows:
+    //
+    // gyro = 180/Pi * ( ( ( raw_gyro + raw_gyro * gyro_tempcompfactor ) * gyro_scale) + gyro_bias )
+    //
+    // so to get gyro_raw do the following:
+    // 1. set AHRSSettings.BiasCorrectedRaw to FALSE before measuring! (already done right now)
+    // 2. set AHRSCalibration.gyro_tempcompfactor to 0 before measuring!
+    // 3. gyro_raw = ( ( gyro * Pi / 180 ) - gyro_bias ) / gyro_scale
+    //
+    // a nice trick is to set gyro_bias to 0 and gyro_scale to (Pi / 180) in which case gyro = raw_gyro
+    // note that Pi/180 is very close to the "real" scale of the AHRS gyros anyway (though with switched signs)
+
 }
 
 

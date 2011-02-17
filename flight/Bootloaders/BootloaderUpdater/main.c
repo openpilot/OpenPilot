@@ -32,21 +32,22 @@
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
 extern void FLASH_Download();
-void error();
+void error(int);
 
 int main() {
 
 	PIOS_SYS_Init();
 	PIOS_Board_Init();
 	PIOS_LED_On(LED1);
-	PIOS_DELAY_WaitmS(5000);
+	PIOS_DELAY_WaitmS(3000);
 	PIOS_LED_Off(LED1);
 
 	/// Self overwrite check
 	uint32_t base_adress = SCB->VTOR;
-	if (0x08000000 + (sizeof(dataArray) * 4) > base_adress)
-		error();
+	if (0x08000000 + (sizeof(dataArray)) > base_adress)
+		error(LED1);
 	///
+	FLASH_Unlock();
 
 	/// Bootloader memory space erase
 	uint32_t pageAdress;
@@ -69,13 +70,15 @@ int main() {
 	}
 
 	if (fail == TRUE)
-		error();
+		error(LED1);
+
 
 	///
 
 	/// Bootloader programing
-	for (int x = 0; x < sizeof(dataArray); ++x) {
+	for (int x = 0; x < sizeof(dataArray)/sizeof(uint32_t); ++x) {
 		int result = 0;
+		PIOS_LED_Toggle(LED1);
 		for (int retry = 0; retry < MAX_WRI_RETRYS; ++retry) {
 			if (result == 0) {
 				result = (FLASH_ProgramWord(0x08000000 + (x * 4), dataArray[x])
@@ -83,18 +86,25 @@ int main() {
 			}
 		}
 		if (result == 0)
-			error();
+			error(LED1);
 	}
 	///
-	PIOS_LED_On(LED1);
-	for (;;) {}
+	for (int x=0;x<3;++x) {
+			PIOS_LED_On(led);
+			PIOS_DELAY_WaitmS(1000);
+			PIOS_LED_Off(led);
+			PIOS_DELAY_WaitmS(1000);
+		}
+	for (;;) {
+		PIOS_DELAY_WaitmS(1000);
+	}
 
 }
-void error() {
+void error(int led) {
 	for (;;) {
-		PIOS_LED_On(LED1);
+		PIOS_LED_On(led);
 		PIOS_DELAY_WaitmS(500);
-		PIOS_LED_Off(LED1);
+		PIOS_LED_Off(led);
 		PIOS_DELAY_WaitmS(500);
 	}
 }

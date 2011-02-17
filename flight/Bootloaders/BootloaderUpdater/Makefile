@@ -34,7 +34,7 @@ ENABLE_DEBUG_PINS ?= NO
 ENABLE_AUX_UART ?= NO
 
 #
-USE_BOOTLOADER ?= NO
+USE_BOOTLOADER ?= YES
 
 # Set to the source bootloader binary
 SOURCE_BL ?= NULL
@@ -67,9 +67,9 @@ MCU      = cortex-m3
 CHIP     = STM32F103CBT
 BOARD    ?= NULL
 MODEL	 ?= NULL
+
 ifeq ($(USE_BOOTLOADER), YES)
 BOOT_MODEL    = $(MODEL)_BL
-
 else
 BOOT_MODEL    = $(MODEL)_NB
 endif
@@ -320,7 +320,7 @@ LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc 
 
 # Set linker-script name depending on selected submodel name
-LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_stm32f10x_$(MODEL).ld
+LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_$(BOARD)_$(BOOT_MODEL).ld
 
 # Test if quotes are needed for the echo-command
 result = ${shell echo "test"}

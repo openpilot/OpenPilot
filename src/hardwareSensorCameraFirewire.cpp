@@ -184,10 +184,14 @@ namespace hardware {
 			{
 				index.wait(boost::lambda::_1 != last_processed_index);
 				//if (index != last_processed_index)
+				while (true)
 				{
 					// FIXME manage multisensors : put sensor id in filename
-					std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << index();
-					bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".pgm"));
+					std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << index()+first_index;
+					if (found_first != 2 && bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".pgm")) && found_first == 0) found_first = 1;
+					if (found_first != 1 && bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".png")) && found_first == 0) found_first = 2;
+					if (!found_first) { first_index++; continue; }
+					
 					if (bufferSpecPtr[buff_write]->img->data() == NULL)
 					{
 						boost::unique_lock<boost::mutex> l(mutex_data);
@@ -198,7 +202,9 @@ namespace hardware {
 					std::fstream f((oss.str() + std::string(".time")).c_str(), std::ios_base::in);
 					f >> bufferPtr[buff_write]->timestamp; f.close();
 					last_processed_index = index();
+					break;
 				} //else  { boost::this_thread::yield(); continue; }
+				if (no_more_data) break;
 			} else
 			{
 #ifdef HAVE_VIAM
@@ -243,6 +249,9 @@ namespace hardware {
 		buff_ready = 2;
 		image_count = 0;
 		//index = 0;
+		no_more_data = false;
+		found_first = 0;
+		first_index = 0;
 
 		// start acquire task
 		preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::preloadTask,this));
@@ -252,7 +261,6 @@ namespace hardware {
 		HardwareSensorAbstract(rawdata_condition, rawdata_mutex),index(0)
 	{
 		init(2, dump_path, imgSize);
-		no_more_data = false;
 	}
 	
 
@@ -284,7 +292,6 @@ namespace hardware {
 		realFreq = viamFreq_to_freq(hwmode.fps);
 		std::cout << "Camera set to freq " << realFreq << " Hz (external trigger " << trigger << ")" << std::endl;
 		init(camera_id, hwmode, mode, dump_path);
-		no_more_data = false;
 	}
 #endif
 

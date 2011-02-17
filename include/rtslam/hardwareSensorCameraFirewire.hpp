@@ -55,6 +55,8 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		rawimage_ptr_t bufferSpecPtr[3];
 		double realFreq;
 		bool no_more_data;
+		unsigned first_index;
+		int found_first; /// 0 = not found, 1 = found pgm, 2 = found png
 		
 		int mode;
 		kernel::VariableCondition<int> index;

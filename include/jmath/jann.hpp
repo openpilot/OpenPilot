@@ -90,8 +90,8 @@ namespace jann {
 			JFR_ASSERT(((flann_mat.rows == ublas_mat.size1()) && 
 									(flann_mat.cols == ublas_mat.size2())),
 								 "ublas matrix and flann matrix need to have the same sizes")
-			for(unsigned int r = 0; r < flann_mat.rows; r++)
-				for(unsigned int c = 0; c < flann_mat.cols; c++)
+			for(size_t r = 0; r < flann_mat.rows; r++)
+				for(size_t c = 0; c < flann_mat.cols; c++)
 					ublas_mat(r,c) = flann_mat[r][c];
 		}
 		///converts from ublas matrix to flann matrix
@@ -100,8 +100,8 @@ namespace jann {
 			JFR_ASSERT(((flann_mat.rows == ublas_mat.size1()) && 
 									(flann_mat.cols == ublas_mat.size2())),
 								 "ublas matrix and flann matrix need to have the same sizes")
-			for(unsigned int r = 0; r < flann_mat.rows; r++)
-				for(unsigned int c = 0; c < flann_mat.cols; c++)
+			for(size_t r = 0; r < flann_mat.rows; r++)
+				for(size_t c = 0; c < flann_mat.cols; c++)
 					flann_mat[r][c] = ublas_mat(r,c);
 		}
 		/**converts from single row flann matrix to ublas vector
@@ -113,7 +113,7 @@ namespace jann {
 								 "ublas vector and flann matrix rows need to have the same sizes")
 			if(flann_mat.cols > ublas_vec.size())
 				ublas_vec.resize(flann_mat.cols);
-			for(unsigned int counter = 0; counter < ublas_vec.size; counter++)
+			for(size_t counter = 0; counter < ublas_vec.size(); counter++)
 					ublas_vec[counter] = flann_mat[0][counter];
 		}
 		///converts from ublas vector to single row flann matrix 
@@ -121,7 +121,7 @@ namespace jann {
 		inline void convert(const ublas::vector<T>& ublas_vec, flann::Matrix<T>& flann_mat){
 			JFR_ASSERT(((flann_mat.rows == 1) && (flann_mat.cols >= ublas_vec.size())),
 								 "ublas vector and flann matrix rows need to have the same sizes")
-			for(unsigned int counter = 0; counter < ublas_vec.size; counter++)
+				for(size_t counter = 0; counter < ublas_vec.size(); counter++)
 					flann_mat[0][counter] = ublas_vec[counter];
 		}
 
@@ -165,8 +165,8 @@ namespace jann {
 										 jafar::jmath::JmathException,
 										 jafar::jmath::JmathException::WRONG_SIZE,
 										 "queries and dataset need to have same columns size")
-			JFR_PRED_ERROR(((indices.size2() >= (unsigned int)knn) && 
-											(dists.size2() >= (unsigned int)knn)),
+			JFR_PRED_ERROR(((indices.size2() >= (size_t)knn) && 
+											(dists.size2() >= (size_t)knn)),
 										 jafar::jmath::JmathException,
 										 jafar::jmath::JmathException::WRONG_SIZE,
 										 "indices and dists must have at least "<<knn<<" columns")
@@ -196,7 +196,7 @@ namespace jann {
 										 jafar::jmath::JmathException,
 										 jafar::jmath::JmathException::WRONG_SIZE,
 										 "query size must be of dataset columns size")
-			JFR_PRED_ERROR(((indices.size() >= knn) && (dists.size() >= knn)),
+				JFR_PRED_ERROR(((indices.size() >= size_t(knn)) && (dists.size() >= size_t(knn))),
 										 jafar::jmath::JmathException,
 										 jafar::jmath::JmathException::WRONG_SIZE,
 										 "indices and dists must be at least of size "<<knn)
@@ -251,7 +251,7 @@ namespace jann {
 										 jafar::jmath::JmathException,
 										 jafar::jmath::JmathException::WRONG_SIZE,
 										 "query size must be of dataset columns size")
-			JFR_PRED_ERROR((indices.size() == dists.size2()),
+				JFR_PRED_ERROR((indices.size() == dists.size()),
 										 jafar::jmath::JmathException,
 										 jafar::jmath::JmathException::WRONG_SIZE,
 										 "indices and dists must have same size")

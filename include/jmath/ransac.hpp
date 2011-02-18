@@ -1,6 +1,6 @@
 /**************************************************************************
  This file is kind of copy paste from the MRPT project http://www.mrpt.org.
- Form MRPT: the C++ port "is highly inspired on Peter Kovesi's MATLAB 
+ From MRPT: the C++ port "is highly inspired on Peter Kovesi's MATLAB 
  scripts (http://www.csse.uwa.edu.au/~pk)"
 ***************************************************************************/
 #ifndef  JMATH_RANSAC_HPP
@@ -37,7 +37,8 @@ namespace jafar {
 			 *  \param data A DxN matrix with all the observed data. D is the dimensionality of data points and N the number of points.
 			 *  \param
 			 *
-			 *  This implementation is highly inspired on Peter Kovesi's MATLAB scripts (http://www.csse.uwa.edu.au/~pk).
+			 *  This implementation is highly inspired on Peter Kovesi's MATLAB scripts 
+			 * (http://www.csse.uwa.edu.au/~pk).
 			 * \return false if no good solution can be found, true on success.
 			 */
 			static bool execute(const ublas::matrix<NUMTYPE>	  &data,
@@ -49,7 +50,7 @@ namespace jafar {
 													std::vector<size_t>			  &out_best_inliers,
 													ublas::matrix<NUMTYPE>    &out_best_model,
 													const NUMTYPE              prob_good_sample = 0.999,
-													const size_t				      max_iter = 2000) 
+													const size_t				      max_iter = 200000) 
 			{
 				JFR_ASSERT(min_size_samples_to_fit>=1, 
 									 "minimum size of samples to fit must be greater than 0")
@@ -100,31 +101,31 @@ namespace jafar {
 
             // Safeguard against being stuck in this loop forever
             if (++count > maxDataTrials) {
-							JFR_DEBUG("Unable to select a nondegenerate data set")
+							JFR_DEBUG("unable to select a nondegenerate data set")
             }
 					}
-
+					JFR_DEBUG("found a non degenerate data set")
 					// Once we are out here we should have some kind of model...
 					// Evaluate distances between points and model returning the indices
 					// of elements in x that are inliers.  Additionally, if M is a cell
 					// array of possible models 'distfn' will return the model that has
 					// the most inliers.  After this call M will be a non-cell objec
 					// representing only one model.
-					unsigned int bestModelIdx = 1000;
+					unsigned int best_model_index = -1;
 					std::vector<size_t>   inliers;
 					if (!degenerate) {
-						dist_func(data,MODELS, distance_threshold, bestModelIdx, inliers);
-						JFR_ASSERT( bestModelIdx<MODELS.size(), 
-												"while not degenerate index must be within MODELS.size()" );
+						dist_func(data,MODELS, distance_threshold, best_model_index, inliers);
+						// JFR_ASSERT(((best_model_index < MODELS.size()) && (best_model_index > -1)), 
+						// 						"best model index must be in [0.."<<MODELS.size()<<"[");
 					}
-					
+					JFR_DEBUG("best model index "<<best_model_index)
 					// Find the number of inliers to this model.
 					const size_t ninliers = inliers.size();
-
+					JFR_DEBUG("nb inliers "<<ninliers)
 					if (ninliers > bestscore ) {
 						bestscore = ninliers;  // Record data for this model
-					
-						out_best_model    = MODELS[bestModelIdx];
+						out_best_model.resize(MODELS[best_model_index].size1(), MODELS[best_model_index].size2());
+						out_best_model    = MODELS[best_model_index];
 						out_best_inliers  = inliers;
 
 						// Update estimate of N, the number of trials to ensure we pick,
@@ -136,16 +137,16 @@ namespace jafar {
 						pNoOutliers = std::min(1.0 - std::numeric_limits<NUMTYPE>::epsilon() , pNoOutliers); // Avoid division by 0.
 						// Number of
 						N = log(1-prob_good_sample)/log(pNoOutliers);
-						JFR_DEBUG("iter #"<<(unsigned)trialcount<<"Estimated number of iters: "<<(unsigned)N<<" pNoOutliers = "<<pNoOutliers<<" #inliers: "<<(unsigned)ninliers)
+						JFR_DEBUG("iter #"<<(unsigned)trialcount<<" Estimated number of iters: "<<(unsigned)N<<" pNoOutliers = "<<pNoOutliers<<" #inliers: "<<(unsigned)ninliers)
 					}
 
 					++trialcount;
 
-					JFR_DEBUG("trial "<<(unsigned int)trialcount<<"out of "<<(unsigned int)ceil(static_cast<NUMTYPE>(N)))
+					JFR_DEBUG("trial "<<(unsigned int)trialcount<<" out of "<<(unsigned int)ceil(static_cast<double>(N)))
 
 					// Safeguard against being stuck in this loop forever
 					if (trialcount > max_iter) {
-						JFR_DEBUG("Warning: maximum number of trials ("<<(unsigned)max_iter<<") reached")
+						JFR_DEBUG("Warning: maximum number of trials ("<<max_iter<<") reached")
 						break;
 					}
 				}

@@ -630,8 +630,8 @@ namespace jafar {
 									 "M and M_v must be same size");
 				JFR_ASSERT(n_cols == v.size(),
 									 "vector size and matrix coulmns size must be equal");
-				for(unsigned int r = 0; r < n_rows; r++) 
-					for(unsigned int c = 0; c < n_cols; c++) 
+				for(size_t r = 0; r < n_rows; r++) 
+					for(size_t c = 0; c < n_cols; c++) 
 						M_v(r, c) = M(r,c) - v[c];
 			}
 			
@@ -680,7 +680,7 @@ namespace jafar {
 													std::vector<size_t> indices, 
 													bool is_sorted = false) 
 			{
-				JFR_ASSERT((indices.size() < M.size2() && (indices.size()>0)),
+				JFR_ASSERT(((indices.size() <= M.size2()) && (indices.size() > 0)),
 									 "indices size is "<<indices.size()<<
 									 " whereas M columns size is "<<M.size2());
 				if(!is_sorted)

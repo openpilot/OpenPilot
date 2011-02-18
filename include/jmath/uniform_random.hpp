@@ -36,14 +36,14 @@ namespace jafar {
 
 		template<typename T>
 		class UNIFORM_GENERATOR {
+ 			T min;
+			T max;
+			uint32_t seed_value;
 			typedef boost::mt19937 generator_type;
 			typedef typename uniform_distribution<T>::type distribution_type;
 			distribution_type distribution;
 			generator_type rng;
 			boost::variate_generator<generator_type&, distribution_type> generator;
- 			T min;
-			T max;
-			uint32_t seed_value;
 
 		public:
 			/**
@@ -104,7 +104,7 @@ namespace jafar {
      */		
 		template<typename T>
 		static void uniform_fill(T min, T max, ublas::vector<T>& v) {
-			static jafar::jmath::UNIFORM_GENERATOR<T> gen(min, max, static_cast<unsigned int>(std::time(0)));
+			jafar::jmath::UNIFORM_GENERATOR<T> gen(min, max, static_cast<unsigned int>(std::time(0)));
 			gen.fill_vector(v);
 		}
 		/**  
@@ -114,7 +114,7 @@ namespace jafar {
      */		
 		template<typename T>
 		static void uniform_fill(T min, T max, std::vector<T>& v) {
-			static jafar::jmath::UNIFORM_GENERATOR<T> gen(min, max, static_cast<unsigned int>(std::time(0)));
+			jafar::jmath::UNIFORM_GENERATOR<T> gen(min, max, static_cast<unsigned int>(std::time(0)));
 			gen.fill_vector(v);
 		}
 
@@ -125,7 +125,7 @@ namespace jafar {
      */		
 		template<typename T>
 		static void uniform_fill(T min, T max, ublas::matrix<T>& m) {
-			static jafar::jmath::UNIFORM_GENERATOR<T> gen(min, max, static_cast<unsigned int>(std::time(0)));
+			jafar::jmath::UNIFORM_GENERATOR<T> gen(min, max, static_cast<unsigned int>(std::time(0)));
 			gen.fill_matrix(m);
 		}
 	}

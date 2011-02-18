@@ -47,7 +47,7 @@ namespace jafar {
 		 *  and n = [vi, ti, abi, wbi] the perturbation impulse.
 		 *
 		 * the transition equation f() is decomposed as:
-		 * #ifdef AVGSPEED
+		 * #if AVGSPEED
 		 * - p+  = p + (v + v+)/2*dt
 		 * #else
 		 * - p+  = p + v*dt
@@ -63,7 +63,7 @@ namespace jafar {
 		 *   var    |  p       q        v        ab       wb       g
 		 *      pos |  0       3        7        10       13       16
 		 *   -------+----------------------------------------------------
-		 * #ifdef AVGSPEED
+		 * #if AVGSPEED
 		 *   p   0  |  I  VNEW_q*dt/2  I*dt -R*dt*dt/2    0     I*dt*dt/2
 		 * #else
 		 *   p   0  |  I       0       I*dt      0        0        0
@@ -79,7 +79,7 @@ namespace jafar {
 		 *   var    |  vi    ti   abi  wbi
 		 *      pos |  0     3     6     9
 		 *   -------+----------------------
-		 * #ifdef AVGSPEED
+		 * #if AVGSPEED
 		 *   p   0  |I.dt/2  0     0     0
 		 * #else
 		 *   p   0  |  0     0     0     0
@@ -126,7 +126,7 @@ namespace jafar {
 			vec4 qwdt = v2q(wtrue * _dt + ti);
 			qnew = qProd(q, qwdt); //    orientation
 			vnew = v + atrue * _dt + vi; //    velocity
-			#ifdef AVGSPEED
+			#if AVGSPEED
 			pnew = p + (v+vnew)/2 * _dt; //     position
 			#else
 			pnew = p + v * _dt; //     position
@@ -148,7 +148,7 @@ namespace jafar {
 			// var    |  p       q        v        ab       wb       g
 			//    pos |  0       3        7        10       13       16
 			// -------+----------------------------------------------------
-			//#ifdef AVGSPEED
+			//#if AVGSPEED
 			// p   0  |  I  VNEW_q*dt/2  I*dt -R*dt*dt/2    0     I*dt*dt/2
 			//#else
 			// p   0  |  I       0       I*dt      0        0        0
@@ -165,7 +165,7 @@ namespace jafar {
 			identity_mat I(3);
 			Idt = I * _dt;
 			subrange(_XNEW_x, 0, 3, 7, 10) = Idt;
-			#ifdef AVGSPEED
+			#if AVGSPEED
 			subrange(_XNEW_x, 0, 3, 16, 19) = Idt*_dt/2;
 			#endif
 			subrange(_XNEW_x, 7, 10, 16, 19) = Idt;
@@ -190,13 +190,13 @@ namespace jafar {
 			// VNEW_q = d(R(q)*v) / dq
 			rotate_by_dq(q, v, VNEW_q);
 			subrange(_XNEW_x, 7, 10, 3, 7) = VNEW_q;
-			#ifdef AVGSPEED
+			#if AVGSPEED
 			subrange(_XNEW_x, 0, 3, 3, 7) = VNEW_q*_dt/2;
 			#endif
 
 			// Fill in VNEW_ab
 			subrange(_XNEW_x, 7, 10, 10, 13) = -Rdt;
-			#ifdef AVGSPEED
+			#if AVGSPEED
 			subrange(_XNEW_x, 0, 3, 10, 13) = -Rdt*_dt/2;
 			#endif
 
@@ -208,7 +208,7 @@ namespace jafar {
 			// var    |  vi    ti    abi    wbi
 			//    pos |  0     3     6     9
 			// -------+----------------------
-			//#ifdef AVGSPEED
+			//#if AVGSPEED
 			// p   0  |I.dt/2  0     0     0
 			//#else
 			// p   0  |  0     0     0     0
@@ -221,7 +221,7 @@ namespace jafar {
 
 			// Fill in the easy bits first
 			_XNEW_pert.clear();
-			#ifdef AVGSPEED
+			#if AVGSPEED
 			ublas::subrange(_XNEW_pert, 0, 3, 0, 3) = Idt/2;
 			#endif
 			ublas::subrange(_XNEW_pert, 7, 10, 0, 3) = I;
@@ -257,7 +257,34 @@ namespace jafar {
 			vec3 am, wm;
 			splitControl(_u, am, wm);
 			
+			#if INIT_Q_FROM_G
+			// init orientation from g
+			vec3 xr, yr, zr, xw, yw, zw; // robot and world frame axis
+			xw.clear(); xw(0)=1.; yw.clear(); yw(1)=1.; zw.clear(); zw(2)=1.;
+			zr = am/ublas::norm_2(am);
+			yr = ublasExtra::crossProd(zr,xw); if (yr(0) < 0.0) yr = -yr;
+			xr = -ublasExtra::crossProd(yw,zr); if (xr(0) < 0.0) xr = -xr;
+			if (ublas::norm_2(xr) > ublas::norm_2(yr)) // just in case one of them is too close to 0
+			{
+				xr = xr / ublas::norm_2(xr);
+				yr = ublasExtra::crossProd(zr,xr);
+			} else
+			{
+				yr = yr / ublas::norm_2(yr);
+				xr = ublasExtra::crossProd(yr,zr);
+			}
+			mat33 rot;
+			rot(0,0)=xr(0); rot(1,0)=xr(1), rot(2,0)=xr(2);
+			rot(0,1)=yr(0); rot(1,1)=yr(1), rot(2,1)=yr(2);
+			rot(0,2)=zr(0); rot(1,2)=zr(1), rot(2,2)=zr(2);
+			q = q2qc(R2q(rot));
+			
+			// init g from acceleration
+			//g = rotate(q, -am);
+			g(2) = -ublas::norm_2(am);
+			#else
 			g = -am;
+			#endif
 			
 			std::cout << "Initialize robot state with g = " << g << " and q = " << q << std::endl;
 			unsplitState(p, q, v, ab, wb, g, _xnew);

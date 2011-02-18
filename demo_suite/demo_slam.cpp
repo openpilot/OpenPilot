@@ -197,7 +197,7 @@ const double SENSOR_POSE_CONSTVEL[6] = {0, 0, 0, -90, 0, -90};
 const double SENSOR_POSE_INERTIAL[6] = {0.04, 0.01, -0.035, 90, 0, 90};
 //const double SENSOR_POSE_INERTIAL[6] = {0.0, 0.0, 0.0, 90, 0, 90};
 // IMU on Mana on CPU, camera left
-//const double SENSOR_POSE_INERTIAL[6] = {47, 15.3, 12.2, -90, 0, -90};
+//const double SENSOR_POSE_INERTIAL[6] = {0.47, 0.153, 0.122, -90, 0, -90};
 // IMU on Mana on platine, camera left
 //const double SENSOR_POSE_INERTIAL[6] = {0, 0, 0, -90, 0, -90};
 

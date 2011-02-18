@@ -17,7 +17,8 @@
 #include "boost/shared_ptr.hpp"
 #include "rtslam/robotAbstract.hpp"
 
-//#define AVGSPEED
+#define AVGSPEED 0
+#define INIT_Q_FROM_G 1
 
 namespace jafar {
 	namespace rtslam {
@@ -47,7 +48,7 @@ namespace jafar {
 		 * - \a wbi: the gyrometer bias random walk noise (impulse)
 		 *
 		 * The motion model equation x+ = f(x,u) is decomposed as:
-		 * #ifdef AVGSPEED
+		 * #if AVGSPEED
 		 * - p+  = p + (v + v+)/2*dt
 		 * #else
 		 * - p+  = p + v*dt
@@ -86,7 +87,7 @@ namespace jafar {
 				 * - The state vector, x = [p q v ab wb g] , of size 19.
 				 *
 				 * - The transition equation x+ = move(x,u), with u = [vi, ti, abi, wbi] the control impulse, is decomposed as:
-				 * #ifdef AVGSPEED
+				 * #if AVGSPEED
 				 * - p+  = p + (v + v+)/2*dt
 				 * #else
 				 * - p+  = p + v*dt

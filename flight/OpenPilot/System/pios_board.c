@@ -848,7 +848,7 @@ static const struct stm32_gpio pios_debug_pins[] = {
     .init = {
       .GPIO_Pin   = GPIO_Pin_6,
       .GPIO_Speed = GPIO_Speed_50MHz,
-      .GPIO_Mode  = GPIO_Mode_Out_PP;
+      .GPIO_Mode  = GPIO_Mode_Out_PP,
     },
   },
   #define PIOS_DEBUG_PIN_SERVO_2 1
@@ -857,7 +857,7 @@ static const struct stm32_gpio pios_debug_pins[] = {
     .init = {
       .GPIO_Pin   = GPIO_Pin_7,
       .GPIO_Speed = GPIO_Speed_50MHz,
-      .GPIO_Mode  = GPIO_Mode_Out_PP;
+      .GPIO_Mode  = GPIO_Mode_Out_PP,
     },
   },
   #define PIOS_DEBUG_PIN_SERVO_3 2
@@ -866,7 +866,7 @@ static const struct stm32_gpio pios_debug_pins[] = {
     .init = {
       .GPIO_Pin   = GPIO_Pin_8,
       .GPIO_Speed = GPIO_Speed_50MHz,
-      .GPIO_Mode  = GPIO_Mode_Out_PP;
+      .GPIO_Mode  = GPIO_Mode_Out_PP,
     },
   },
   #define PIOS_DEBUG_PIN_SERVO_4 3
@@ -875,7 +875,7 @@ static const struct stm32_gpio pios_debug_pins[] = {
     .init = {
       .GPIO_Pin   = GPIO_Pin_9,
       .GPIO_Speed = GPIO_Speed_50MHz,
-      .GPIO_Mode  = GPIO_Mode_Out_PP;
+      .GPIO_Mode  = GPIO_Mode_Out_PP,
     },
   },
   #define PIOS_DEBUG_PIN_SERVO_5 4
@@ -884,7 +884,7 @@ static const struct stm32_gpio pios_debug_pins[] = {
     .init = {
       .GPIO_Pin   = GPIO_Pin_6,
       .GPIO_Speed = GPIO_Speed_50MHz,
-      .GPIO_Mode  = GPIO_Mode_Out_PP;
+      .GPIO_Mode  = GPIO_Mode_Out_PP,
     },
   },
   #define PIOS_DEBUG_PIN_SERVO_6 5
@@ -893,7 +893,7 @@ static const struct stm32_gpio pios_debug_pins[] = {
     .init = {
       .GPIO_Pin   = GPIO_Pin_7,
       .GPIO_Speed = GPIO_Speed_50MHz,
-      .GPIO_Mode  = GPIO_Mode_Out_PP;
+      .GPIO_Mode  = GPIO_Mode_Out_PP,
     },
   },
   #define PIOS_DEBUG_PIN_SERVO_7 6
@@ -902,7 +902,7 @@ static const struct stm32_gpio pios_debug_pins[] = {
     .init = {
       .GPIO_Pin   = GPIO_Pin_8,
       .GPIO_Speed = GPIO_Speed_50MHz,
-      .GPIO_Mode  = GPIO_Mode_Out_PP;
+      .GPIO_Mode  = GPIO_Mode_Out_PP,
     },
   },
   #define PIOS_DEBUG_PIN_SERVO_8 7
@@ -911,7 +911,7 @@ static const struct stm32_gpio pios_debug_pins[] = {
     .init = {
       .GPIO_Pin   = GPIO_Pin_9,
       .GPIO_Speed = GPIO_Speed_50MHz,
-      .GPIO_Mode  = GPIO_Mode_Out_PP;
+      .GPIO_Mode  = GPIO_Mode_Out_PP,
     },
   },
 };

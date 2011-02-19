@@ -182,7 +182,7 @@ static void updateSensors(AttitudeRawData * attitudeRaw)
 	
 	
 	// Get the accel data
-	uint8_t i = 0;
+/*	uint8_t i = 0;
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = 0;
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = 0;
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = 0; 
@@ -200,7 +200,24 @@ static void updateSensors(AttitudeRawData * attitudeRaw)
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] /= i;
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] /= i;
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] /= i; 
-	
+*/
+	int32_t x = 0;
+	int32_t y = 0;
+	int32_t z = 0;
+	uint8_t i = 0;
+	uint8_t samples_remaining;
+	do {
+		i++;
+		samples_remaining = PIOS_ADXL345_Read(&accel_data);
+		x +=  accel_data.x;
+		y += -accel_data.y;
+		z += -accel_data.z;
+	} while ( (i < 32) && (samples_remaining > 0) );
+	attitudeRaw->gyrotemp[0] = samples_remaining;
+	attitudeRaw->gyrotemp[1] = i;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = ((float)x * 0.004f * 9.81f) / i;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = ((float)y * 0.004f * 9.81f) / i;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = ((float)z * 0.004f * 9.81f) / i;
 }
 
 static void updateAttitude(AttitudeRawData * attitudeRaw)

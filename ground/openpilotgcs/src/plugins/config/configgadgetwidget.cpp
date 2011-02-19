@@ -67,7 +67,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     ftw->insertTab(2, qwd, QIcon(":/configgadget/images/XBee.svg"), QString("Telemetry"));
 
     qwd = new ConfigAHRSWidget(this);
-    ftw->insertTab(3, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("AHRS"));
+    ftw->insertTab(3, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
 
 //    qwd = new ConfigPipXtremeWidget(this);
 //    ftw->insertTab(4, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));

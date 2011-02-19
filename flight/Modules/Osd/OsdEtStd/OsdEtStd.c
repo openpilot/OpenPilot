@@ -38,10 +38,8 @@
 // Configuration
 //
 #define DEBUG_PORT		PIOS_COM_GPS
-#define STACK_SIZE		1024
-#define TASK_PRIORITY	(tskIDLE_PRIORITY + 3)
 //#define ENABLE_DEBUG_MSG
-#define USE_DEBUG_PINS
+//#define USE_DEBUG_PINS
 //#define DUMP_CONFIG           // Enable this do read and dump the OSD config
 
 //
@@ -56,6 +54,9 @@
 
 #define CONFIG_LENGTH 6726
 #define MIN(a,b) ((a)<(b)?(a):(b))
+
+#define SUPPORTED_VERSION	115
+
 
 #define OSD_ADDRESS         0x30
 
@@ -105,6 +106,19 @@ uint8_t msg[63] =
 0x54, 0x54, 0x00, 0x00, 0x33, 0x28, 0x13, 0x00, 0x00, 0x08, 0x00, 0x00, 0x90, 0x0A };
 static volatile bool newPosData = FALSE;
 static volatile bool newBattData = FALSE;
+
+static enum
+{
+	STATE_DETECT,
+	STATE_UPDATE_CONF,
+	STATE_DUMP_CONF,
+	STTE_RUNNING
+
+} state;
+
+static UAVObjEvent ev;
+static uint32_t version = 0;
+
 
 //
 // Private functions
@@ -383,113 +397,109 @@ static void DumpConfig(void)
 #endif
 }
 
-static void Task(void *parameters)
+static void Run(void)
 {
-	uint32_t cnt = 0;
-	uint32_t version = 0;
+	static uint32_t cnt = 0;
 
-#ifdef ENABLE_DEBUG_MSG
-	PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
-#endif
+	if (newBattData) {
+		FlightBatteryStateData flightBatteryData;
 
-	GPSPositionConnectCallback(GPSPositionUpdatedCb);
-	FlightBatteryStateConnectCallback(FlightBatteryStateUpdatedCb);
+		FlightBatteryStateGet(&flightBatteryData);
 
-	DEBUG_MSG("OSD ET Std\n");
+		//DEBUG_MSG("%5d Batt: V=%dmV\n\r", cnt, (uint32_t)(flightBatteryData.Voltage*1000));
 
-	// Wait until OSD is detected
-	while(1) {
+		SetVoltage((uint32_t) (flightBatteryData.Voltage * 1000));
+		SetCurrent((uint32_t) (flightBatteryData.Current * 1000));
+		newBattData = FALSE;
+	}
+
+	if (newPosData) {
+		GPSPositionData positionData;
+
+		GPSPositionGet(&positionData);
+
+		//DEBUG_MSG("%5d Pos: #stat=%d #sats=%d alt=%d\n\r", cnt,
+		//              positionData.Status, positionData.Satellites, (uint32_t)positionData.Altitude);
+
+		// GPS Status
+		if (positionData.Status == GPSPOSITION_STATUS_FIX3D)
+			msg[OSDMSG_GPS_STAT] = OSDMSG_GPS_STAT_FIX;
+		else
+			msg[OSDMSG_GPS_STAT] = OSDMSG_GPS_STAT_NOFIX;
+		msg[OSDMSG_GPS_STAT] |= OSDMSG_GPS_STAT_HB_FLAG;
+
+		// GPS info
+		SetCoord(OSDMSG_LAT_IDX, positionData.Latitude);
+		SetCoord(OSDMSG_LON_IDX, positionData.Longitude);
+		SetAltitude(positionData.Altitude);
+		SetNbSats(positionData.Satellites);
+		SetCourse(positionData.Heading);
+
+		newPosData = FALSE;
+	} else {
+		msg[OSDMSG_GPS_STAT] &= ~OSDMSG_GPS_STAT_HB_FLAG;
+	}
+
+	DEBUG_MSG("SendMsg %d\n",cnt);
+	{
+		DebugPinHigh(DEBUG_PIN_I2C);
+		const struct pios_i2c_txn txn_list[] = {
+			{
+			 .addr = OSD_ADDRESS,
+			 .rw = PIOS_I2C_TXN_WRITE,
+			 .len = sizeof(msg),
+			 .buf = msg,
+			 }
+			,
+		};
+
+		PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+		DebugPinLow(DEBUG_PIN_I2C);
+	}
+
+	cnt++;
+
+}
+
+static void onTimer(UAVObjEvent * ev)
+{
+	DebugPinHigh(DEBUG_PIN_RUNNING);
+
+	#ifdef ENABLE_DEBUG_MSG
+		PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
+	#endif
+
+	if (state == STATE_DETECT) {
 		version = ReadSwVersion();
 		DEBUG_MSG("SW: %d ", version);
 
-		if (version == 115) {
+		if (version == SUPPORTED_VERSION) {
 			DEBUG_MSG("OK\n");
-			break;
+			state++;
 		} else {
 			DEBUG_MSG("INVALID\n");
-			vTaskDelay(1000 / portTICK_RATE_MS);
 		}
+	} else if (state == STATE_UPDATE_CONF) {
+		UpdateConfig();
+		state++;
+	} else if (state == STATE_DUMP_CONF) {
+		DumpConfig();
+		state++;
+	} else if (state == STTE_RUNNING) {
+		Run();
+	} else {
+		// should not happen..
+		state = STATE_DETECT;
 	}
 
-	UpdateConfig();
-	DumpConfig();
+	DebugPinLow(DEBUG_PIN_RUNNING);
 
-
-	while (1) {
-		//DEBUG_MSG("%d\n\r", cnt);
-
-		DebugPinHigh(DEBUG_PIN_RUNNING);
-#if 1
-		if (newBattData) {
-			FlightBatteryStateData flightBatteryData;
-
-			FlightBatteryStateGet(&flightBatteryData);
-
-			//DEBUG_MSG("%5d Batt: V=%dmV\n\r", cnt, (uint32_t)(flightBatteryData.Voltage*1000));
-
-			SetVoltage((uint32_t) (flightBatteryData.Voltage * 1000));
-			SetCurrent((uint32_t) (flightBatteryData.Current * 1000));
-			newBattData = FALSE;
-		}
-
-		if (newPosData) {
-			GPSPositionData positionData;
-
-			GPSPositionGet(&positionData);
-
-			//DEBUG_MSG("%5d Pos: #stat=%d #sats=%d alt=%d\n\r", cnt,
-			//              positionData.Status, positionData.Satellites, (uint32_t)positionData.Altitude);
-
-			// GPS Status
-			if (positionData.Status == GPSPOSITION_STATUS_FIX3D)
-				msg[OSDMSG_GPS_STAT] = OSDMSG_GPS_STAT_FIX;
-			else
-				msg[OSDMSG_GPS_STAT] = OSDMSG_GPS_STAT_NOFIX;
-			msg[OSDMSG_GPS_STAT] |= OSDMSG_GPS_STAT_HB_FLAG;
-
-			// GPS info
-			SetCoord(OSDMSG_LAT_IDX, positionData.Latitude);
-			SetCoord(OSDMSG_LON_IDX, positionData.Longitude);
-			SetAltitude(positionData.Altitude);
-			SetNbSats(positionData.Satellites);
-			SetCourse(positionData.Heading);
-
-			newPosData = FALSE;
-		} else {
-			msg[OSDMSG_GPS_STAT] &= ~OSDMSG_GPS_STAT_HB_FLAG;
-		}
-#endif
-
-		//DEBUG_MSG("SendMsg .");
-		{
-			DebugPinHigh(DEBUG_PIN_I2C);
-			const struct pios_i2c_txn txn_list[] = {
-				{
-				 .addr = OSD_ADDRESS,
-				 .rw = PIOS_I2C_TXN_WRITE,
-				 .len = sizeof(msg),
-				 .buf = msg,
-				 }
-				,
-			};
-
-			PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
-			DebugPinLow(DEBUG_PIN_I2C);
-		}
-
-		//DEBUG_MSG("\n\r");
-
-		cnt++;
-
-		DebugPinLow(DEBUG_PIN_RUNNING);
-
-		vTaskDelay(100 / portTICK_RATE_MS);
-	}
 }
 
 //
 // Public functions
 //
+
 
 /**
  * Initialise the module
@@ -498,8 +508,11 @@ static void Task(void *parameters)
  */
 int32_t OsdEtStdInitialize(void)
 {
-	// Start gps task
-	xTaskCreate(Task, (signed char *)"Osd", STACK_SIZE, NULL, TASK_PRIORITY, NULL);
+	GPSPositionConnectCallback(GPSPositionUpdatedCb);
+	FlightBatteryStateConnectCallback(FlightBatteryStateUpdatedCb);
+
+	memset(&ev,0,sizeof(UAVObjEvent));
+	EventPeriodicCallbackCreate(&ev, onTimer, 100 / portTICK_RATE_MS);
 
 	return 0;
 }

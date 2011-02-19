@@ -29,7 +29,7 @@ namespace jafar {
 					JFR_ASSERT(K.size2() == inn.size(), "sizes mismatch: K and inn");
 
 				inn.invertCov();
-				K = - prod(prod<mat>(project(P, ia_x, ia_x1), trans(INN_x1)), inn.iP_);
+				ublas::noalias(K) = - prod(prod<mat>(project(P, ia_x, ia_x1), trans(INN_x1)), inn.iP_);
 			}
 
 		}

@@ -28,6 +28,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
 #include "openpilot.h"
 
 #include "flightbatterystate.h"
@@ -39,7 +40,8 @@
 #define DEBUG_PORT		PIOS_COM_GPS
 #define STACK_SIZE		1024
 #define TASK_PRIORITY	(tskIDLE_PRIORITY + 3)
-#define ENABLE_DEBUG_MSG
+//#define ENABLE_DEBUG_MSG
+#define USE_DEBUG_PINS
 //#define DUMP_CONFIG           // Enable this do read and dump the OSD config
 
 //
@@ -70,6 +72,17 @@
 #define OSDMSG_GPS_STAT_NOFIX	0x03
 #define OSDMSG_GPS_STAT_FIX		0x2B
 #define OSDMSG_GPS_STAT_HB_FLAG	0x10
+
+#ifdef USE_DEBUG_PINS
+	#define	DEBUG_PIN_RUNNING	0
+	#define	DEBUG_PIN_I2C		1
+	#define DebugPinHigh(x) PIOS_DEBUG_PinHigh(x)
+	#define DebugPinLow(x)	PIOS_DEBUG_PinLow(x)
+#else
+	#define DebugPinHigh(x)
+	#define DebugPinLow(x)
+#endif
+
 
 static const char *UpdateConfFilePath = "/etosd/update.ocf";
 #ifdef DUMP_CONFIG
@@ -401,8 +414,11 @@ static void Task(void *parameters)
 	UpdateConfig();
 	DumpConfig();
 
+
 	while (1) {
 		//DEBUG_MSG("%d\n\r", cnt);
+
+		DebugPinHigh(DEBUG_PIN_RUNNING);
 #if 1
 		if (newBattData) {
 			FlightBatteryStateData flightBatteryData;
@@ -446,6 +462,7 @@ static void Task(void *parameters)
 
 		//DEBUG_MSG("SendMsg .");
 		{
+			DebugPinHigh(DEBUG_PIN_I2C);
 			const struct pios_i2c_txn txn_list[] = {
 				{
 				 .addr = OSD_ADDRESS,
@@ -457,11 +474,14 @@ static void Task(void *parameters)
 			};
 
 			PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+			DebugPinLow(DEBUG_PIN_I2C);
 		}
 
 		//DEBUG_MSG("\n\r");
 
 		cnt++;
+
+		DebugPinLow(DEBUG_PIN_RUNNING);
 
 		vTaskDelay(100 / portTICK_RATE_MS);
 	}

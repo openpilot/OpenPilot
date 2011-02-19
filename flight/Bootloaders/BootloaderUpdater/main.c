@@ -90,9 +90,9 @@ int main() {
 	}
 	///
 	for (int x=0;x<3;++x) {
-			PIOS_LED_On(led);
+			PIOS_LED_On(LED1);
 			PIOS_DELAY_WaitmS(1000);
-			PIOS_LED_Off(led);
+			PIOS_LED_Off(LED1);
 			PIOS_DELAY_WaitmS(1000);
 		}
 	for (;;) {

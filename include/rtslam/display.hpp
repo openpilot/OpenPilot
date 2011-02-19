@@ -461,15 +461,19 @@ class ThreadSafeGarbageCollector
 					switch(lmk_phase)
 					{
 						case LandmarkDisplay::init: {
+							if (!events.visible) return color_darkred;
 							if (events.updated) return color_magenta;
 							if (events.matched) return color_darkred;
-							if (events.predicted) return color_darkred;
+							if (events.measured) return color_darkred;
+							if (events.predicted) return color_magenta;
 							return color_yellow;
 						}
 						case LandmarkDisplay::converged: {
+							if (!events.visible) return color_blue;
 							if (events.updated) return color_cyan;
 							if (events.matched) return color_blue;
-							if (events.predicted) return color_blue;
+							if (events.measured) return color_blue;
+							if (events.predicted) return color_cyan;
 							return color_transparency;
 						}
 						default:

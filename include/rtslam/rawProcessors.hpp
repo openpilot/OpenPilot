@@ -66,7 +66,7 @@ namespace rtslam {
 				
 				measure.std(params.measStd);
 				measure.matchScore = matcher.match(targetAppSpec->patch, *(rawPtr->img),
-					roi, measure.x()(0), measure.x()(1));
+					roi, measure.x()(0), measure.x()(1), measure.std_est(0), measure.std_est(1));
 				measure.x() += targetAppSpec->offset.x();
 				measure.P() += targetAppSpec->offset.P(); // no cross terms
 				rawPtr->img->extractPatch(appSpec->patch, (int)measure.x()(0), (int)measure.x()(1), appSpec->patch.width(), appSpec->patch.height());

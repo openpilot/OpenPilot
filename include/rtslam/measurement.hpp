@@ -32,7 +32,12 @@ namespace jafar {
 				Measurement(size_t _size);
 
 				double matchScore; ///< matching quality score
-
+				jblas::vec2 std_est; ///< estimation of std dev based on correl max curv
+				
+				friend std::ostream& operator <<(std::ostream & s, Measurement const & m_) {
+					s << (rtslam::Gaussian&)(m_) << std::endl << "  .est std dev: " << m_.std_est;
+					return s;
+				}
 		};
 
 

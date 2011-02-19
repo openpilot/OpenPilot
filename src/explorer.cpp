@@ -121,10 +121,10 @@ namespace correl {
 		*/
 		void FastTranslationMatcherZncc::doCorrelationRobust(image::Image const& im1, image::Image& im2, int x, int y,
 			cv::Rect const &patch_in_im1, cv::Rect const &hpatch_in_im1, int& bestx, int& besty, double& best_score,
-			cv::Rect const &result_in_im2, cv::Mat *results)
+			cv::Rect const &result_in_im2, bool force, cv::Mat *results)
 		{
 			double &res = results->at<double>(y - result_in_im2.y, x - result_in_im2.x);
-			if (res > -3.5) { JFR_ASSERT(bestx >= 0 && besty >= 0 && best_score > -3.5, ""); return; } // already computed
+			if (res > (force?-1.5:-3.5)) { JFR_ASSERT(bestx >= 0 && besty >= 0 && best_score > -3.5, ""); return; } // already computed
 			cv::Rect patch_in_im2(x-hpatch_in_im1.width, y-hpatch_in_im1.height, patch_in_im1.width, patch_in_im1.height);
 			im2.setROI(patch_in_im2);
 			double score = Zncc::compute(im1, im2, NULL);
@@ -160,7 +160,7 @@ namespace correl {
 			{
 				int x1 = roi_in_im2.x(y), x2 = x1+roi_in_im2.w(y)-1;
 				for(int x = x1; x <= x2; ++x)
-					doCorrelationRobust(im1, im2, x, y, patch_in_im1, hpatch_in_im1, bestx, besty, best_score, result_in_im2, results);
+					doCorrelationRobust(im1, im2, x, y, patch_in_im1, hpatch_in_im1, bestx, besty, best_score, result_in_im2, false, results);
 			}
 		}
 
@@ -168,7 +168,7 @@ namespace correl {
 		FastTranslationMatcherZncc::match
 		*/
 		double FastTranslationMatcherZncc::match(image::Image const& im1, image::Image const& im2_, 
-			image::ConvexRoi const &roi_in_im2, double &xres, double &yres, cv::Mat **results_)
+			image::ConvexRoi const &roi_in_im2, double &xres, double &yres, double &xstd, double &ystd, cv::Mat **results_)
 		{
 			///-- init
 // JFR_DEBUG("### FastTranslationMatcherZncc::match im1 " << im1.getROI() << " im2 " << roi_in_im2);
@@ -189,6 +189,7 @@ namespace correl {
 			// global vars
 			image::Image im2(im2_);
 			int bestx = -1, besty = -1;
+			xstd = ystd = -0.125;
 			double best_score = -4.;
 			
 			///-- for dangerous areas, call the classical robust explorer and reduce the roi
@@ -323,13 +324,13 @@ namespace correl {
 			do {
 				bestx = nbestx, besty = nbesty;
 				if (bestx > result_in_im2.x                        && results->at<double>((besty  )-result_in_im2.y,(bestx-1)-result_in_im2.x) < -1.5)
-					doCorrelationRobust(im1, im2, bestx-1, besty  , patch_in_im1, hpatch_in_im1, nbestx, nbesty, best_score, result_in_im2, results);
+					doCorrelationRobust(im1, im2, bestx-1, besty  , patch_in_im1, hpatch_in_im1, nbestx, nbesty, best_score, result_in_im2, true, results);
 				if (bestx < result_in_im2.x+result_in_im2.width-1  && results->at<double>((besty  )-result_in_im2.y,(bestx+1)-result_in_im2.x) < -1.5)
-					doCorrelationRobust(im1, im2, bestx+1, besty  , patch_in_im1, hpatch_in_im1, nbestx, nbesty, best_score, result_in_im2, results);
+					doCorrelationRobust(im1, im2, bestx+1, besty  , patch_in_im1, hpatch_in_im1, nbestx, nbesty, best_score, result_in_im2, true, results);
 				if (besty > result_in_im2.y                        && results->at<double>((besty-1)-result_in_im2.y,(bestx  )-result_in_im2.x) < -1.5)
-					doCorrelationRobust(im1, im2, bestx  , besty-1, patch_in_im1, hpatch_in_im1, nbestx, nbesty, best_score, result_in_im2, results);
+					doCorrelationRobust(im1, im2, bestx  , besty-1, patch_in_im1, hpatch_in_im1, nbestx, nbesty, best_score, result_in_im2, true, results);
 				if (besty < result_in_im2.y+result_in_im2.height-1 && results->at<double>((besty+1)-result_in_im2.y,(bestx  )-result_in_im2.x) < -1.5)
-					doCorrelationRobust(im1, im2, bestx  , besty+1, patch_in_im1, hpatch_in_im1, nbestx, nbesty, best_score, result_in_im2, results);
+					doCorrelationRobust(im1, im2, bestx  , besty+1, patch_in_im1, hpatch_in_im1, nbestx, nbesty, best_score, result_in_im2, true, results);
 			} while (bestx != nbestx || besty != nbesty);
 			
 // JFR_DEBUG("### interpolate (" << bestx << "," << besty << "," << best_score << ")");
@@ -342,8 +343,9 @@ namespace correl {
 			a2 = results->at<double>((besty  )-result_in_im2.y,(bestx  )-result_in_im2.x);
 			if (bestx < result_in_im2.x+result_in_im2.width-1)
 				a3 = results->at<double>((besty  )-result_in_im2.y,(bestx+1)-result_in_im2.x);
-			if (a1 > -1.5 && a3 > -1.5) jmath::parabolicInterpolation(a1,a2,a3, xres, best_score_x);
+			if (a1 > -1.5 && a3 > -1.5) jmath::parabolicInterpolation(a1,a2,a3, xres, best_score_x, xstd);
 			xres += bestx+0.5;
+			xstd = -1.0/(2*xstd);
 			
 			// interpolate y
 			best_score_y = best_score; yres = 0; a1 = a2 = a3 = -2;
@@ -352,8 +354,9 @@ namespace correl {
 			a2 = results->at<double>((besty  )-result_in_im2.y,(bestx  )-result_in_im2.x);
 			if (besty < result_in_im2.y+result_in_im2.height-1)
 				a3 = results->at<double>((besty+1)-result_in_im2.y,(bestx  )-result_in_im2.x);
-			if (a1 > -1.5 && a3 > -1.5) jmath::parabolicInterpolation(a1,a2,a3, yres, best_score_y);
+			if (a1 > -1.5 && a3 > -1.5) jmath::parabolicInterpolation(a1,a2,a3, yres, best_score_y, ystd);
 			yres += besty+0.5;
+			ystd = -1.0/(2*ystd);
 			// merge score interpolations
 			// we could do better, with 3+3+2 interpolations, but it's too much work
 			//best_score = std::max(best_score_x, best_score_y); // approx 1, minoring

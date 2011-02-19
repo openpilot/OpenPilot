@@ -60,7 +60,7 @@ namespace jafar {
 					cv::Rect const &result_in_im2, cv::Mat *results);
 				inline void doCorrelationRobust(image::Image const& im1, image::Image& im2, int x, int y,
 					cv::Rect const &patch_in_im1, cv::Rect const &hpatch_in_im1, int& bestx, int& besty, double& best_score,
-					cv::Rect const &result_in_im2, cv::Mat *results);
+					cv::Rect const &result_in_im2, bool force, cv::Mat *results);
 				
 				inline void rawExploreTranslationFast(image::Image const& im1, image::Image& im2, 
 					image::ConvexRoi const &roi_in_im2, int &bestx, int &besty, double &best_score, 
@@ -93,7 +93,8 @@ namespace jafar {
 				-3 (no computation because too few pixels) and -2 (computation aborted because it wouldn't improve the best score)
 				@return score of best correlation
 				*/
-				double match(image::Image const& im1, image::Image const& im2_, image::ConvexRoi const &roi, double &xres, double &yres, cv::Mat **results_ = NULL);
+				double match(image::Image const& im1, image::Image const& im2_, image::ConvexRoi const &roi, double &xres, 
+				             double &xstd, double &ystd, double &yres, cv::Mat **results_ = NULL);
 		};
 
 		

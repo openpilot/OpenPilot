@@ -445,6 +445,7 @@ static bool set_channel(uint8_t mixer_channel, uint16_t value) {
 		case ACTUATORSETTINGS_CHANNELTYPE_PWM:
 			PIOS_Servo_Set(settings.ChannelAddr[mixer_channel], value);
 			return true;
+#if defined(PIOS_INCLUDE_I2C_ESC)
 		case ACTUATORSETTINGS_CHANNELTYPE_MK: 
 		{
 			ManualControlCommandData manual;
@@ -462,6 +463,7 @@ static bool set_channel(uint8_t mixer_channel, uint16_t value) {
 		case ACTUATORSETTINGS_CHANNELTYPE_ASTEC4:
 			return PIOS_SetAstec4Speed(settings.ChannelAddr[mixer_channel],value);
 			break;
+#endif
 		default:
 			return false;
 	}			

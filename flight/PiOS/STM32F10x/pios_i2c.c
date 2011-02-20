@@ -959,7 +959,6 @@ bool PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], ui
 	return (!i2c_adapter->bus_error) && semaphore_success;
 }
 
-#endif
 
 void PIOS_I2C_EV_IRQ_Handler(uint32_t i2c_id)
 {
@@ -1109,6 +1108,8 @@ void PIOS_I2C_ER_IRQ_Handler(uint32_t i2c_id)
 		i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_BUS_ERROR);
 	}	
 }
+
+#endif
 
 /**
   * @}

@@ -227,6 +227,7 @@ static void updateI2Cstats() {} //Posix and win32 don't have I2C
 #else
 static void updateI2Cstats() 
 {
+#if defined(PIOS_INCLUDE_I2C)
 	I2CStatsData i2cStats;
 	I2CStatsGet(&i2cStats);
 	
@@ -241,6 +242,7 @@ static void updateI2Cstats()
 	}
 	i2cStats.last_error_type = history.type;
 	I2CStatsSet(&i2cStats);
+#endif
 }
 #endif
 

@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
 	// 	std::cout << row(mat.data,i) << std::endl;
 	// }
 	mat.load("data.ascii");
-	jmath::mean_shift_clustering filter(2.0,0.1,0.1,100,mean_shift_clustering::NORMAL, 1.0);
+	jmath::mean_shift_clustering<double,3> filter(2.0,0.1,0.1,100,mean_shift_clustering<double,3>::NORMAL, 1.0);
 	size_t nb_clusters = filter.run(mat.data);
 	std::cout << "found " << nb_clusters << " clusters"<< std::endl;
 	// std::map<size_t, jmath::mean_shift_clustering::cluster> clusters = filter.found_clusters();

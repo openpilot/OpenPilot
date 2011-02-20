@@ -228,11 +228,11 @@ extern uint32_t pios_com_spektrum_id;
 //-------------------------
 // Receiver PPM input
 //-------------------------
-#define PIOS_PPM_GPIO_PORT                      PIOS_PWM_CH1_GPIO_PORT
-#define PIOS_PPM_GPIO_PIN                       PIOS_PWM_CH1_PIN
-#define PIOS_PPM_TIM_PORT                       PIOS_PWM_CH1_TIM_PORT
-#define PIOS_PPM_TIM_CHANNEL                    PIOS_PWM_CH1_CH
-#define PIOS_PPM_TIM_CCR                        PIOS_PWM_CH1_CCR
+#define PIOS_PPM_GPIO_PORT                      GPIOA
+#define PIOS_PPM_GPIO_PIN                       GPIO_Pin_9
+#define PIOS_PPM_TIM_PORT                       TIM1
+#define PIOS_PPM_TIM_CHANNEL                    TIM_Channel_2
+#define PIOS_PPM_TIM_CCR                        TIM_IT_CC2
 #define PIOS_PPM_TIM                            TIM1
 #define PIOS_PPM_TIM_IRQ                        TIM1_CC_IRQn
 #define PIOS_PPM_NUM_INPUTS                     8  //Could be more if needed

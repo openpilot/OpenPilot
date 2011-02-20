@@ -77,6 +77,10 @@ C: Oleg Semyonov (osnwt)
 D: February 2011
 V: http://www.youtube.com/watch?v=gt1ok7iSGDY
 
+M: First intentional flip on a multirotor with CopterControl
+C: Sami Korhonen (Sambas)
+D: February 2011
+V: http://vimeo.com/20159015
 
 M: First CopterControl flight on a Tri
 C: ?

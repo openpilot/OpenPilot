@@ -544,7 +544,7 @@ static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time)
 }
 			   
 static bool okToArm(void)
-{	// return TRUE if it's OK to arm
+{	// return TRUE if it's OK to arm, otherwise return FALSE
 
 	bool ok = true;
 
@@ -568,11 +568,11 @@ static bool okToArm(void)
 		    // Check each alarm
 			for (int i = 0; i < SYSTEMALARMS_ALARM_NUMELEM; i++)
 			{
-				if (alarms.Alarm[i] >= SYSTEMALARMS_ALARM_WARNING)
+				if (alarms.Alarm[i] >= SYSTEMALARMS_ALARM_ERROR)
 				{	// found an alarm thats set
 					if (i != SYSTEMALARMS_ALARM_GPS && i != SYSTEMALARMS_ALARM_TELEMETRY)
 					{	// it's not the gps or telemetry alarm
-						ok = false;
+						ok = false;	// prevent arming
 						break;
 					}
 				}
@@ -586,11 +586,11 @@ static bool okToArm(void)
 		    // Check each alarm
 			for (int i = 0; i < SYSTEMALARMS_ALARM_NUMELEM; i++)
 			{
-				if (alarms.Alarm[i] >= SYSTEMALARMS_ALARM_WARNING)
+				if (alarms.Alarm[i] >= SYSTEMALARMS_ALARM_ERROR)
 				{	// found an alarm thats set
 					if (i != SYSTEMALARMS_ALARM_TELEMETRY)
 					{	// it's not the telemetry alarm
-						ok = false;
+						ok = false;	// prevent arming
 						break;
 					}
 				}

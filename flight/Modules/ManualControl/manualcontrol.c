@@ -42,6 +42,8 @@
 #include "attitudedesired.h"
 #include "flighttelemetrystats.h"
 
+#include "ahrs_comm_objects.h"
+
 // Private constants
 #if defined(PIOS_MANUAL_STACK_SIZE)
 #define STACK_SIZE_BYTES PIOS_MANUAL_STACK_SIZE
@@ -75,6 +77,7 @@ static ArmState_t armState;
 static void manualControlTask(void *parameters);
 static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutral);
 static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time);
+static bool okToArm(void);
 
 #define assumptions1 ( \
 		((int)MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE 		== (int)MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE) 		&& \
@@ -377,9 +380,14 @@ static void manualControlTask(void *parameters)
 						switch(armState) {
 						case ARM_STATE_DISARMED:
 							newCmdArmed = MANUALCONTROLCOMMAND_ARMED_FALSE;
-							if (manualArm) {
-								armedDisarmStart = lastSysTime;
-								armState = ARM_STATE_ARMING_MANUAL;
+
+							if (manualArm)
+							{
+								if (okToArm())	// only allow arming if it's OK too
+								{
+									armedDisarmStart = lastSysTime;
+									armState = ARM_STATE_ARMING_MANUAL;
+								}
 							}
 							break;
 
@@ -535,6 +543,57 @@ static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time)
 	return ((((portTICK_RATE_MS) -1) - start_time) + end_time) * portTICK_RATE_MS;		
 }
 			   
+static bool okToArm(void)
+{	// return TRUE is it's OK to arm
+
+	bool ok = true;
+
+	// read AHRS settings
+	AHRSSettingsData AHRSSettings;
+	AHRSSettingsGet(&AHRSSettings);
+
+	// read alarms
+	SystemAlarmsData alarms;
+    SystemAlarmsGet(&alarms);
+
+//	// fetch the GPS alarm state
+//	SystemAlarmsAlarmOptions gps_alarm = AlarmsGet(SYSTEMALARMS_ALARM_GPS);
+
+	switch (AHRSSettings.Algorithm)
+	{
+		case AHRSSETTINGS_ALGORITHM_SIMPLE:
+		case AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR:
+		case AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR_NOMAG:
+
+		    // Go through alarms
+			for (int i = 0; i < SYSTEMALARMS_ALARM_NUMELEM; i++)
+			{
+				if (alarms.Alarm[i] >= SYSTEMALARMS_ALARM_WARNING)
+				{	// found an alarm thats set
+					if (i != SYSTEMALARMS_ALARM_GPS)
+					{	// it's not the gps alarm
+						ok = false;
+						break;
+					}
+				}
+			}
+
+			break;
+
+		case AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR:
+			if (AlarmsHasWarnings())
+				ok = false;
+			break;
+
+		default:	// unknown AHRS algorithum
+			if (AlarmsHasWarnings())
+				ok = false;
+			break;
+	}
+
+	return ok;
+}
+
 //
 //static void armingMechanism(uint8_t* armingState, const ManualControlSettingsData* settings, const ManualControlCommandData* cmd)
 //{

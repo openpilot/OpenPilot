@@ -124,7 +124,14 @@ namespace jann {
 				for(size_t counter = 0; counter < ublas_vec.size(); counter++)
 					flann_mat[0][counter] = ublas_vec[counter];
 		}
-
+		///converts from std vector to single row flann matrix 
+		template<typename T>
+		inline void convert(const std::vector<T>& std_vec, flann::Matrix<T>& flann_mat){
+			JFR_ASSERT(((flann_mat.rows == 1) && (flann_mat.cols >= std_vec.size())),
+								 "std vector and flann matrix rows need to have the same sizes")
+				for(size_t counter = 0; counter < std_vec.size(); counter++)
+					flann_mat[0][counter] = std_vec[counter];
+		}
 	public:
 		///element type of D
 		typedef typename D::ElementType element;
@@ -212,6 +219,35 @@ namespace jann {
 			_dists.free();
 			_indices.free();
 		}
+		///operates a k nearest neighbours search on a query
+		void knn_search(const std::vector<element>& query, 
+										std::vector<int>& indices, std::vector<result>& dists, 
+										int knn, const search_params& params) 
+		{
+			size_t length = query.size();
+			JFR_PRED_ERROR(length == dataset.cols,
+										 jafar::jmath::JmathException,
+										 jafar::jmath::JmathException::WRONG_SIZE,
+										 "query size must be of dataset columns size")
+				JFR_PRED_ERROR(((indices.size() >= size_t(knn)) && (dists.size() >= size_t(knn))),
+										 jafar::jmath::JmathException,
+										 jafar::jmath::JmathException::WRONG_SIZE,
+										 "indices and dists must be at least of size "<<knn)
+			flann::Matrix<element> _query(new element[length], 1, length);
+			convert(query,_query);
+			flann::Matrix<int> _indices(new int[indices.size()], 1, indices.size());
+			flann::Matrix<result> _dists(new result[dists.size()], 1, dists.size());
+			m_index->knnSearch(_query, _indices, _dists, knn, params);
+			convert(_indices, indices);
+			convert(_dists, dists);
+
+			_query.free();
+			_dists.free();
+			_indices.free();
+		}
+		/**operates a radius search on a query @return the number of neighbours 
+		 * within the search radius
+		 */
 		int radius_search(const ublas::vector<element>& query, 
 											ublas::matrix<int>& indices, 
 											ublas::matrix<result>& dists, float radius, 
@@ -238,12 +274,40 @@ namespace jann {
 			_dists.free();
 			_indices.free();
 		}
-
 		/**operates a radius search on a query @return the number of neighbours 
 		 * within the search radius
 		 */
 		int radius_search(const ublas::vector<element>& query,
 											ublas::vector<int>& indices, ublas::vector<result>& dists, 
+											float radius, const search_params& params) 
+		{
+			size_t length = query.size();
+			JFR_PRED_ERROR(length == dataset.cols,
+										 jafar::jmath::JmathException,
+										 jafar::jmath::JmathException::WRONG_SIZE,
+										 "query size must be of dataset columns size")
+				JFR_PRED_ERROR((indices.size() == dists.size()),
+										 jafar::jmath::JmathException,
+										 jafar::jmath::JmathException::WRONG_SIZE,
+										 "indices and dists must have same size")
+			flann::Matrix<element> _query(new element[length], 1, length);
+			convert(query,_query);
+			flann::Matrix<int> _indices(new int[indices.size()], 1, indices.size());
+			flann::Matrix<result> _dists(new result[dists.size()], 1, dists.size());
+			int result = m_index->radiusSearch(_query, _indices, _dists, radius, params);
+			convert(_indices, indices);
+			convert(_dists, dists);
+
+			_query.free();
+			_dists.free();
+			_indices.free();
+			return result;
+		}
+		/**operates a radius search on a query @return the number of neighbours 
+		 * within the search radius
+		 */
+		int radius_search(const std::vector<element>& query,
+											std::vector<int>& indices, std::vector<result>& dists, 
 											float radius, const search_params& params) 
 		{
 			size_t length = query.size();

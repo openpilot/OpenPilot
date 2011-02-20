@@ -544,7 +544,7 @@ static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time)
 }
 			   
 static bool okToArm(void)
-{	// return TRUE is it's OK to arm
+{	// return TRUE if it's OK to arm
 
 	bool ok = true;
 
@@ -556,8 +556,8 @@ static bool okToArm(void)
 	SystemAlarmsData alarms;
     SystemAlarmsGet(&alarms);
 
-//	// fetch the GPS alarm state
 //	SystemAlarmsAlarmOptions gps_alarm = AlarmsGet(SYSTEMALARMS_ALARM_GPS);
+//	SystemAlarmsAlarmOptions telemetry_alarm = AlarmsGet(SYSTEMALARMS_ALARM_TELEMETRY);
 
 	switch (AHRSSettings.Algorithm)
 	{
@@ -565,13 +565,13 @@ static bool okToArm(void)
 		case AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR:
 		case AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR_NOMAG:
 
-		    // Go through alarms
+		    // Check each alarm
 			for (int i = 0; i < SYSTEMALARMS_ALARM_NUMELEM; i++)
 			{
 				if (alarms.Alarm[i] >= SYSTEMALARMS_ALARM_WARNING)
 				{	// found an alarm thats set
-					if (i != SYSTEMALARMS_ALARM_GPS)
-					{	// it's not the gps alarm
+					if (i != SYSTEMALARMS_ALARM_GPS && i != SYSTEMALARMS_ALARM_TELEMETRY)
+					{	// it's not the gps or telemetry alarm
 						ok = false;
 						break;
 					}
@@ -581,13 +581,21 @@ static bool okToArm(void)
 			break;
 
 		case AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR:
-			if (AlarmsHasWarnings())
-				ok = false;
-			break;
-
 		default:	// unknown AHRS algorithum
-			if (AlarmsHasWarnings())
-				ok = false;
+
+		    // Check each alarm
+			for (int i = 0; i < SYSTEMALARMS_ALARM_NUMELEM; i++)
+			{
+				if (alarms.Alarm[i] >= SYSTEMALARMS_ALARM_WARNING)
+				{	// found an alarm thats set
+					if (i != SYSTEMALARMS_ALARM_TELEMETRY)
+					{	// it's not the telemetry alarm
+						ok = false;
+						break;
+					}
+				}
+			}
+
 			break;
 	}
 

@@ -47,6 +47,7 @@
 #include "uavtalk/telemetrymanager.h"
 
 #include "extensionsystem/pluginmanager.h"
+#include "uavobjectutilmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "objectpersistence.h"
@@ -973,31 +974,24 @@ void OPMapGadgetWidget::onTelemetryConnect()
 {
     telemetry_connected = true;
 
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm) return;
+	bool set;
+	double LLA[3];
 
-    UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
-    if (!obm) return;
+	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+	if (!pm) return;
+	UAVObjectUtilManager *obum = pm->getObject<UAVObjectUtilManager>();
+	if (!obum) return;
 
-    UAVDataObject *obj;
-//    UAVObjectField *field;
+	// ***********************
+	// fetch the home location
 
-    // ***********************
-    // fetch the home location
+	if (obum->getHomeLocation(set, LLA) < 0)
+		return;	// error
 
-    obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("HomeLocation")));
-    if (!obj) return;
-
-    double lat = obj->getField("Latitude")->getDouble() * 1e-7;
-    double lon = obj->getField("Longitude")->getDouble() * 1e-7;
-//    double alt = obj->getField("Altitude")->getDouble();
-    setHome(internals::PointLatLng(lat, lon));
+	setHome(internals::PointLatLng(LLA[0], LLA[1]));
 
     if (m_map)
         m_map->SetCurrentPosition(home_position.coord);         // set the map position
-
-//    field = obj->getField(QString("Be"));
-//    if (!field) return;
 
     // ***********************
 }
@@ -2264,42 +2258,19 @@ bool OPMapGadgetWidget::getUAV_LLA(double &latitude, double &longitude, double &
 
 bool OPMapGadgetWidget::getGPS_LLA(double &latitude, double &longitude, double &altitude)
 {
-    UAVObject *obj;
+	double LLA[3];
 
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm) return false;
-    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-    if (!om) return false;
+	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+	if (!pm) return false;
+	UAVObjectUtilManager *obum = pm->getObject<UAVObjectUtilManager>();
+	if (!obum) return false;
 
-    obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("GPSPosition")));
-    if (!obj) return false;
-    latitude = obj->getField(QString("Latitude"))->getDouble();
-    longitude = obj->getField(QString("Longitude"))->getDouble();
-    altitude = obj->getField(QString("Altitude"))->getDouble();
+	if (obum->getGPSPosition(LLA) < 0)
+		return false;	// error
 
-    latitude *= 1E-7;
-    longitude *= 1E-7;
-
-    if (latitude != latitude) latitude = 0; // nan detection
-//    if (isNan(latitude)) latitude = 0; // nan detection
-    else
-//    if (!isFinite(latitude)) latitude = 0;
-//    else
-    if (latitude >  90) latitude =  90;
-    else
-    if (latitude < -90) latitude = -90;
-
-    if (longitude != longitude) longitude = 0; // nan detection
-    else
-//    if (longitude > std::numeric_limits<double>::max()) longitude = 0;  // +infinite
-//    else
-//    if (longitude < -std::numeric_limits<double>::max()) longitude = 0;  // -infinite
-//    else
-    if (longitude >  180) longitude =  180;
-    else
-    if (longitude < -180) longitude = -180;
-
-    if (altitude != altitude) altitude = 0; // nan detection
+	latitude = LLA[0];
+	longitude = LLA[1];
+	altitude = LLA[2];
 
     return true;
 }
@@ -2320,42 +2291,6 @@ double OPMapGadgetWidget::getUAV_Yaw()
     while (yaw >= 360) yaw -= 360;
 
     return yaw;
-}
-
-// *************************************************************************************
-// save an object to SD card
-
-void OPMapGadgetWidget::saveObjectToSD(UAVObject *obj)
-{
-    if (!obj) return;
-
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm) return;
-
-    UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
-    if (!obm) return;
-
-    ObjectPersistence *objper = dynamic_cast<ObjectPersistence *>( obm->getObject(ObjectPersistence::NAME) );
-    if (!objper) return;
-
-    connect(objper, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(uavObjectTransactionCompleted(UAVObject *, bool)));
-
-    ObjectPersistence::DataFields data;
-    data.Operation = ObjectPersistence::OPERATION_SAVE;
-    data.Selection = ObjectPersistence::SELECTION_SINGLEOBJECT;
-    data.ObjectID = obj->getObjID();
-    data.InstanceID = obj->getInstID();
-
-    objper->setData(data);
-    objper->updated();
-}
-
-void OPMapGadgetWidget::uavObjectTransactionCompleted(UAVObject *obj, bool success)
-{
-    Q_UNUSED(success);
-
-    // Disconnect from sending object
-    if (obj) obj->disconnect(this);
 }
 
 // *************************************************************************************
@@ -2390,76 +2325,15 @@ void OPMapGadgetWidget::setMapFollowingMode()
 
 void OPMapGadgetWidget::setHomeLocationObject()
 {
-	double LLA[3];
-	double ECEF[3];
-	double RNE[9];
-	double Be[3];
-
-	LLA[0] = home_position.coord.Lat();
-	LLA[1] = home_position.coord.Lng();
-	LLA[2] = home_position.altitude;
-
-	if (Utils::HomeLocationUtil().getDetails(LLA, ECEF, RNE, Be) < 0)
-		return;	// error
-
-	// ******************
-	// save the new home location details
+	double LLA[3] = {home_position.coord.Lat(), home_position.coord.Lng(), home_position.altitude};
 
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 	if (!pm) return;
+	UAVObjectUtilManager *obum = pm->getObject<UAVObjectUtilManager>();
+	if (!obum) return;
 
-	UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
-	if (!obm) return;
-
-	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("HomeLocation")));
-	if (!obj) return;
-
-	UAVObjectField *ECEF_field = obj->getField(QString("ECEF"));
-	if (!ECEF_field) return;
-
-	UAVObjectField *RNE_field = obj->getField(QString("RNE"));
-	if (!RNE_field) return;
-
-	UAVObjectField *Be_field = obj->getField(QString("Be"));
-	if (!Be_field) return;
-
-	obj->getField("Set")->setValue("TRUE");
-
-	obj->getField("Latitude")->setValue(LLA[0] * 10e6);
-	obj->getField("Longitude")->setValue(LLA[1] * 10e6);
-	obj->getField("Altitude")->setValue(LLA[2]);
-
-	for (int i = 0; i < 3; i++)
-		ECEF_field->setValue(ECEF[i] * 100, i);
-
-	for (int i = 0; i < 9; i++)
-		RNE_field->setDouble(RNE[i], i);
-
-	for (int i = 0; i < 3; i++)
-		Be_field->setDouble(Be[i], i);
-
-	obj->updated();
-
-	// ******************
-	// save the new location to SD card
-
-//	saveObjectToSD(obj);
-
-	// ******************
-	// debug
-
-	qDebug() << "opmap setting HomeLocation UAV Object .. " << endl;
-	QString s;
-	s = "        LAT:" + QString::number(LLA[0], 'f', 7) + " LON:" + QString::number(LLA[1], 'f', 7) + " ALT:" + QString::number(LLA[2], 'f', 1);
-	qDebug() << s << endl;
-	s = "        ECEF "; for (int i = 0; i < 3; i++) s += " " + QString::number((int)(ECEF[i] * 100));
-	qDebug() << s << endl;
-	s = "        RNE  ";  for (int i = 0; i < 9; i++) s += " " + QString::number(RNE[i], 'f', 7);
-	qDebug() << s << endl;
-	s = "        Be   ";  for (int i = 0; i < 3; i++) s += " " + QString::number(Be[i], 'f', 2);
-	qDebug() << s << endl;
-
-	// ******************
+	if (obum->setHomeLocation(LLA, true) < 0)
+		return;	// error
 }
 
 // *************************************************************************************

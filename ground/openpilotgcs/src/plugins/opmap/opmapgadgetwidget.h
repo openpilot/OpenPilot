@@ -114,7 +114,6 @@ public slots:
     void homePositionUpdated(UAVObject *);
     void onTelemetryConnect();
     void onTelemetryDisconnect();
-    void uavObjectTransactionCompleted(UAVObject *obj, bool success);
 
 protected:
     void resizeEvent(QResizeEvent *event);
@@ -324,8 +323,6 @@ private:
     bool getUAV_LLA(double &latitude, double &longitude, double &altitude);
     bool getGPS_LLA(double &latitude, double &longitude, double &altitude);
     double getUAV_Yaw();
-
-    void saveObjectToSD(UAVObject *obj);
 
     void setMapFollowingMode();
 

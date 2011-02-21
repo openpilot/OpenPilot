@@ -145,8 +145,8 @@ int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3])
 
 	set = obj->getField("Set")->getValue().toBool();
 
-	LLA[0] = obj->getField("Latitude")->getDouble();
-	LLA[1] = obj->getField("Longitude")->getDouble();
+	LLA[0] = obj->getField("Latitude")->getDouble() * 1e-7;
+	LLA[1] = obj->getField("Longitude")->getDouble() * 1e-7;
 	LLA[2] = obj->getField("Altitude")->getDouble();
 
 	return 0;	// OK
@@ -176,8 +176,8 @@ int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3], double ECEF[
 
 	set = obj->getField("Set")->getValue().toBool();
 
-	LLA[0] = obj->getField("Latitude")->getDouble();
-	LLA[1] = obj->getField("Longitude")->getDouble();
+	LLA[0] = obj->getField("Latitude")->getDouble() * 1e-7;
+	LLA[1] = obj->getField("Longitude")->getDouble() * 1e-7;
 	LLA[2] = obj->getField("Altitude")->getDouble();
 
 	for (int i = 0; i < 3; i++)
@@ -208,8 +208,8 @@ int UAVObjectUtilManager::getGPSPosition(double LLA[3])
 	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("GPSPosition")));
 	if (!obj) return -3;
 
-	LLA[0] = obj->getField(QString("Latitude"))->getDouble() * 1E-7;
-	LLA[1] = obj->getField(QString("Longitude"))->getDouble() * 1E-7;
+	LLA[0] = obj->getField(QString("Latitude"))->getDouble() * 1e-7;
+	LLA[1] = obj->getField(QString("Longitude"))->getDouble() * 1e-7;
 	LLA[2] = obj->getField(QString("Altitude"))->getDouble();
 
 	if (LLA[0] != LLA[0]) LLA[0] = 0; // nan detection

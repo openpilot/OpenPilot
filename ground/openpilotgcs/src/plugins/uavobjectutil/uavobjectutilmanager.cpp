@@ -30,10 +30,6 @@
 
 #include "utils/homelocationutil.h"
 
-#include "extensionsystem/pluginmanager.h"
-#include "uavobjectmanager.h"
-#include "uavobject.h"
-
 #include <QMutexLocker>
 #include <QDebug>
 
@@ -49,6 +45,64 @@ UAVObjectUtilManager::~UAVObjectUtilManager()
 		delete mutex;
 		mutex = NULL;
 	}
+}
+
+// ******************************
+// SD card saving
+
+void UAVObjectUtilManager::saveObjectToSD(UAVObject *obj)
+{
+	QMutexLocker locker(mutex);
+
+	if (!obj) return;
+
+	// Add to queue
+	queue.enqueue(obj);
+
+	// If queue length is one, then start sending (call sendNextObject)
+	// Otherwise, do nothing, it's sending anyway
+	if (queue.length() <= 1)
+		saveNextObject();
+}
+
+void UAVObjectUtilManager::saveNextObject()
+{
+	if (queue.isEmpty()) return;
+
+	// Get next object from the queue
+	UAVObject *obj = queue.head();
+	if (!obj) return;
+
+	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+	if (!pm) return;
+
+	UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
+	if (!obm) return;
+
+	ObjectPersistence *objper = dynamic_cast<ObjectPersistence *>(obm->getObject(ObjectPersistence::NAME));
+	connect(objper, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(transactionCompleted(UAVObject *, bool)));
+
+	ObjectPersistence::DataFields data;
+	data.Operation = ObjectPersistence::OPERATION_SAVE;
+	data.Selection = ObjectPersistence::SELECTION_SINGLEOBJECT;
+	data.ObjectID = obj->getObjID();
+	data.InstanceID = obj->getInstID();
+	objper->setData(data);
+	objper->updated();
+}
+
+void UAVObjectUtilManager::transactionCompleted(UAVObject *obj, bool success)
+{
+	Q_UNUSED(success);
+
+	QMutexLocker locker(mutex);
+
+	if (!obj) return;
+
+	// Disconnect from sending object
+	obj->disconnect(this);
+	queue.dequeue();		// We can now remove the object, it's done.
+	saveNextObject();
 }
 
 // ******************************
@@ -107,13 +161,11 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 	// save the new location to SD card
 
 	if (save_to_sdcard)
-	{
-//		saveObjectToSD(obj);
-	}
+		saveObjectToSD(obj);
 
 	// ******************
 	// debug
-
+/*
 	qDebug() << "setting HomeLocation UAV Object .. " << endl;
 	QString s;
 	s = "        LAT:" + QString::number(LLA[0], 'f', 7) + " LON:" + QString::number(LLA[1], 'f', 7) + " ALT:" + QString::number(LLA[2], 'f', 1);
@@ -124,7 +176,7 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 	qDebug() << s << endl;
 	s = "        Be   ";  for (int i = 0; i < 3; i++) s += " " + QString::number(Be[i], 'f', 2);
 	qDebug() << s << endl;
-
+*/
 	// ******************
 
 	return 0;	// OK

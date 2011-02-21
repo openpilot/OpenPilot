@@ -31,9 +31,15 @@
 
 #include "uavobjectutil_global.h"
 
+#include "extensionsystem/pluginmanager.h"
+#include "uavobjectmanager.h"
+#include "uavobject.h"
+#include "objectpersistence.h"
+
 #include <QtGlobal>
 #include <QObject>
 #include <QMutex>
+#include <QQueue>
 
 class UAVOBJECTUTIL_EXPORT UAVObjectUtilManager: public QObject
 {
@@ -51,6 +57,14 @@ public:
 
 private:
 	QMutex *mutex;
+
+	QQueue<UAVObject *> queue;
+
+	void saveNextObject();
+	void saveObjectToSD(UAVObject *obj);
+
+private slots:
+	void transactionCompleted(UAVObject *obj, bool success);
 
 };
 

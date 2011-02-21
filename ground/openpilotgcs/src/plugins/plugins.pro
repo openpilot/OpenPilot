@@ -49,6 +49,7 @@ plugin_uavtalk.depends += plugin_coreplugin
 plugin_opmap.subdir = opmap
 plugin_opmap.depends = plugin_coreplugin
 plugin_opmap.depends += plugin_uavobjects
+plugin_opmap.depends += plugin_uavobjectutil
 SUBDIRS += plugin_opmap
 
 # Scope UAVGadget
@@ -162,11 +163,17 @@ plugin_pipxtreme.depends += plugin_uavobjects
 plugin_pipxtreme.depends += plugin_rawhid
 SUBDIRS += plugin_pipxtreme
 
-#Scope2 gadget
-#plugin_scope2.subdir = scope2
-#plugin_scope2.depends = plugin_coreplugin
-#plugin_scope2.depends += plugin_uavobjects
-#SUBDIRS += plugin_scope2
+#Scope OpenGL Gadget
+#plugin_scopeogl.subdir = scopeogl
+#plugin_scopeogl.depends = plugin_coreplugin
+#plugin_scopeogl.depends += plugin_uavobjects
+#SUBDIRS += plugin_scopeogl
+
+# UAV Object Utility plugin
+plugin_uavobjectutil.subdir = uavobjectutil
+plugin_uavobjectutil.depends = plugin_coreplugin
+plugin_uavobjectutil.depends += plugin_uavobjects
+SUBDIRS += plugin_uavobjectutil
 
 # Magic Waypoint gadget
 plugin_magicwaypoint.subdir = magicwaypoint

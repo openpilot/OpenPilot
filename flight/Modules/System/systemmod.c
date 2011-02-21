@@ -270,6 +270,11 @@ static void updateStats()
 #else
 	stats.HeapRemaining = xPortGetFreeHeapSize();
 #endif
+
+	// When idleCounterClear was not reset by the idle-task, it means the idle-task did not run
+	if (idleCounterClear) {
+		idleCounter = 0;
+	}
 	stats.CPULoad =
 	    100 - (uint8_t) round(100.0 * ((float)idleCounter / (float)(SYSTEM_UPDATE_PERIOD_MS / 1000)) / (float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
 	idleCounterClear = 1;

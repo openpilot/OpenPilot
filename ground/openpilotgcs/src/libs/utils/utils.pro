@@ -1,9 +1,13 @@
 TEMPLATE = lib
 TARGET = Utils
+
 QT += gui \
     network
+
 DEFINES += QTCREATOR_UTILS_LIB
+
 include(../../openpilotgcslibrary.pri)
+
 SOURCES += reloadpromptutils.cpp \
     settingsutils.cpp \
     filesearch.cpp \
@@ -39,14 +43,17 @@ SOURCES += reloadpromptutils.cpp \
     detailswidget.cpp \
     coordinateconversions.cpp \
     pathutils.cpp \
-    worldmagmodel.cpp
-win32 { 
+	worldmagmodel.cpp \
+	homelocationutil.cpp
+
+win32 {
     SOURCES += abstractprocess_win.cpp \
         consoleprocess_win.cpp \
         winutils.cpp
     HEADERS += winutils.h
 }
 else:SOURCES += consoleprocess_unix.cpp
+
 HEADERS += utils_global.h \
     reloadpromptutils.h \
     settingsutils.h \
@@ -86,10 +93,13 @@ HEADERS += utils_global.h \
     detailswidget.h \
     coordinateconversions.h \
     pathutils.h \
-    worldmagmodel.h
+	worldmagmodel.h \
+	homelocationutil.h
+
 FORMS += filewizardpage.ui \
     projectintropage.ui \
     newclasswidget.ui \
     submiteditorwidget.ui \
-    checkablemessagebox.ui
+	checkablemessagebox.ui
+
 RESOURCES += utils.qrc

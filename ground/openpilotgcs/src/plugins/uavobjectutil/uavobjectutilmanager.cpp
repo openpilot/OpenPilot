@@ -33,6 +33,9 @@
 #include <QMutexLocker>
 #include <QDebug>
 
+// ******************************
+// constructor/destructor
+
 UAVObjectUtilManager::UAVObjectUtilManager()
 {
     mutex = new QMutex(QMutex::Recursive);
@@ -82,10 +85,10 @@ void UAVObjectUtilManager::saveNextObject()
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 	if (!pm) return;
 
-	UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
-	if (!obm) return;
+	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+	if (!om) return;
 
-	ObjectPersistence *objper = dynamic_cast<ObjectPersistence *>(obm->getObject(ObjectPersistence::NAME));
+	ObjectPersistence *objper = dynamic_cast<ObjectPersistence *>(om->getObject(ObjectPersistence::NAME));
 	connect(objper, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(transactionCompleted(UAVObject *, bool)));
 
 	ObjectPersistence::DataFields data;
@@ -119,6 +122,7 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 	double ECEF[3];
 	double RNE[9];
 	double Be[3];
+	UAVObjectField *field;
 
 	QMutexLocker locker(mutex);
 
@@ -131,10 +135,10 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 	if (!pm) return -2;
 
-	UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
-	if (!obm) return -3;
+	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+	if (!om) return -3;
 
-	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("HomeLocation")));
+	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("HomeLocation")));
 	if (!obj) return -4;
 
 	UAVObjectField *ECEF_field = obj->getField(QString("ECEF"));
@@ -146,9 +150,17 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 	UAVObjectField *Be_field = obj->getField(QString("Be"));
 	if (!Be_field) return -7;
 
-	obj->getField("Latitude")->setDouble(LLA[0] * 10e6);
-	obj->getField("Longitude")->setDouble(LLA[1] * 10e6);
-	obj->getField("Altitude")->setDouble(LLA[2]);
+	field = obj->getField("Latitude");
+	if (!field) return -8;
+	field->setDouble(LLA[0] * 10e6);
+
+	field = obj->getField("Longitude");
+	if (!field) return -9;
+	field->setDouble(LLA[1] * 10e6);
+
+	field = obj->getField("Altitude");
+	if (!field) return -10;
+	field->setDouble(LLA[2]);
 
 	for (int i = 0; i < 3; i++)
 		ECEF_field->setDouble(ECEF[i] * 100, i);
@@ -159,7 +171,9 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 	for (int i = 0; i < 3; i++)
 		Be_field->setDouble(Be[i], i);
 
-	obj->getField("Set")->setValue("TRUE");
+	field = obj->getField("Set");
+	if (!field) return -11;
+	field->setValue("TRUE");
 
 	obj->updated();
 
@@ -190,24 +204,36 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 
 int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3])
 {
+	UAVObjectField *field;
+
 	QMutexLocker locker(mutex);
 
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 	if (!pm) return -1;
 
-	UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
-	if (!obm) return -2;
+	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+	if (!om) return -2;
 
-	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("HomeLocation")));
+	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("HomeLocation")));
 	if (!obj) return -3;
 
 //	obj->requestUpdate();
 
-	set = obj->getField("Set")->getValue().toBool();
+	field = obj->getField("Set");
+	if (!field) return -4;
+	set = field->getValue().toBool();
 
-	LLA[0] = obj->getField("Latitude")->getDouble() * 1e-7;
-	LLA[1] = obj->getField("Longitude")->getDouble() * 1e-7;
-	LLA[2] = obj->getField("Altitude")->getDouble();
+	field = obj->getField("Latitude");
+	if (!field) return -5;
+	LLA[0] = field->getDouble() * 1e-7;
+
+	field = obj->getField("Longitude");
+	if (!field) return -6;
+	LLA[1] = field->getDouble() * 1e-7;
+
+	field = obj->getField("Altitude");
+	if (!field) return -7;
+	LLA[2] = field->getDouble();
 
 	if (LLA[0] != LLA[0]) LLA[0] = 0; // nan detection
 	else
@@ -228,42 +254,51 @@ int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3])
 
 int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3], double ECEF[3], double RNE[9], double Be[3])
 {
+	UAVObjectField *field;
+
 	QMutexLocker locker(mutex);
 
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 	if (!pm) return -1;
 
-	UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
-	if (!obm) return -2;
+	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+	if (!om) return -2;
 
-	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("HomeLocation")));
+	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("HomeLocation")));
 	if (!obj) return -3;
 
 //	obj->requestUpdate();
 
-	UAVObjectField *ECEF_field = obj->getField(QString("ECEF"));
-	if (!ECEF_field) return -4;
+	field = obj->getField("Set");
+	if (!field) return -4;
+	set = field->getValue().toBool();
 
-	UAVObjectField *RNE_field = obj->getField(QString("RNE"));
-	if (!RNE_field) return -5;
+	field = obj->getField("Latitude");
+	if (!field) return -5;
+	LLA[0] = field->getDouble() * 1e-7;
 
-	UAVObjectField *Be_field = obj->getField(QString("Be"));
-	 if (!Be_field) return -6;
+	field = obj->getField("Longitude");
+	if (!field) return -6;
+	LLA[1] = field->getDouble() * 1e-7;
 
-	set = obj->getField("Set")->getValue().toBool();
+	field = obj->getField("Altitude");
+	if (!field) return -7;
+	LLA[2] = field->getDouble();
 
-	LLA[0] = obj->getField("Latitude")->getDouble() * 1e-7;
-	LLA[1] = obj->getField("Longitude")->getDouble() * 1e-7;
-	LLA[2] = obj->getField("Altitude")->getDouble();
-
+	field = obj->getField(QString("ECEF"));
+	if (!field) return -8;
 	for (int i = 0; i < 3; i++)
-		ECEF[i] = ECEF_field->getDouble(i);
+		ECEF[i] = field->getDouble(i);
 
+	field = obj->getField(QString("RNE"));
+	if (!field) return -9;
 	for (int i = 0; i < 9; i++)
-		RNE[i] = RNE_field->getDouble(i);
+		RNE[i] = field->getDouble(i);
 
+	field = obj->getField(QString("Be"));
+	if (!field) return -10;
 	for (int i = 0; i < 3; i++)
-		Be[i] = Be_field->getDouble(i);
+		Be[i] = field->getDouble(i);
 
 	return 0;	// OK
 }
@@ -273,22 +308,32 @@ int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3], double ECEF[
 
 int UAVObjectUtilManager::getGPSPosition(double LLA[3])
 {
+	UAVObjectField *field;
+
 	QMutexLocker locker(mutex);
 
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 	if (!pm) return -1;
 
-	UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
-	if (!obm) return -2;
+	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+	if (!om) return -2;
 
-	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("GPSPosition")));
+	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("GPSPosition")));
 	if (!obj) return -3;
 
 //	obj->requestUpdate();
 
-	LLA[0] = obj->getField(QString("Latitude"))->getDouble() * 1e-7;
-	LLA[1] = obj->getField(QString("Longitude"))->getDouble() * 1e-7;
-	LLA[2] = obj->getField(QString("Altitude"))->getDouble();
+	field = obj->getField(QString("Latitude"));
+	if (!field) return -4;
+	LLA[0] = field->getDouble() * 1e-7;
+
+	field = obj->getField(QString("Longitude"));
+	if (!field) return -5;
+	LLA[1] = field->getDouble() * 1e-7;
+
+	field = obj->getField(QString("Altitude"));
+	if (!field) return -6;
+	LLA[2] = field->getDouble();
 
 	if (LLA[0] != LLA[0]) LLA[0] = 0; // nan detection
 	else
@@ -312,6 +357,8 @@ int UAVObjectUtilManager::getGPSPosition(double LLA[3])
 
 int UAVObjectUtilManager::setTelemetrySerialPortSpeed(QString speed, bool save_to_sdcard)
 {
+	UAVObjectField *field;
+
 	QMutexLocker locker(mutex);
 
 	// ******************
@@ -320,15 +367,14 @@ int UAVObjectUtilManager::setTelemetrySerialPortSpeed(QString speed, bool save_t
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 	if (!pm) return -1;
 
-	UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
-	if (!obm) return -2;
+	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+	if (!om) return -2;
 
-	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("/*TelemetrySettings*/")));
+	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("/*TelemetrySettings*/")));
 	if (!obj) return -3;
 
-	UAVObjectField *field = obj->getField(QString("Speed"));
+	field = obj->getField(QString("Speed"));
 	if (!field) return -4;
-
 	field->setValue(speed);
 
 	obj->updated();
@@ -346,22 +392,23 @@ int UAVObjectUtilManager::setTelemetrySerialPortSpeed(QString speed, bool save_t
 
 int UAVObjectUtilManager::getTelemetrySerialPortSpeed(QString &speed)
 {
+	UAVObjectField *field;
+
 	QMutexLocker locker(mutex);
 
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 	if (!pm) return -1;
 
-	UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
-	if (!obm) return -2;
+	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+	if (!om) return -2;
 
-	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("TelemetrySettings")));
+	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("TelemetrySettings")));
 	if (!obj) return -3;
 
 //	obj->requestUpdate();
 
-	UAVObjectField *field = obj->getField(QString("Speed"));
+	field = obj->getField(QString("Speed"));
 	if (!field) return -4;
-
 	speed = field->getValue().toString();
 
 	return 0;	// OK
@@ -369,6 +416,8 @@ int UAVObjectUtilManager::getTelemetrySerialPortSpeed(QString &speed)
 
 int UAVObjectUtilManager::getTelemetrySerialPortSpeeds(QComboBox *comboBox)
 {
+	UAVObjectField *field;
+
 	QMutexLocker locker(mutex);
 
 	if (!comboBox) return -1;
@@ -376,17 +425,16 @@ int UAVObjectUtilManager::getTelemetrySerialPortSpeeds(QComboBox *comboBox)
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 	if (!pm) return -2;
 
-	UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
-	if (!obm) return -3;
+	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+	if (!om) return -3;
 
-	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("TelemetrySettings")));
+	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("TelemetrySettings")));
 	if (!obj) return -4;
 
 //	obj->requestUpdate();
 
-	UAVObjectField *field = obj->getField(QString("Speed"));
+	field = obj->getField(QString("Speed"));
 	if (!field) return -5;
-
 	comboBox->addItems(field->getOptions());
 
 	return 0;	// OK

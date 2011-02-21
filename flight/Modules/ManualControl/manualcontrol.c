@@ -42,8 +42,6 @@
 #include "attitudedesired.h"
 #include "flighttelemetrystats.h"
 
-#include "ahrs_comm_objects.h"
-
 // Private constants
 #if defined(PIOS_MANUAL_STACK_SIZE)
 #define STACK_SIZE_BYTES PIOS_MANUAL_STACK_SIZE
@@ -542,64 +540,31 @@ static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time)
 		return (end_time - start_time) * portTICK_RATE_MS;
 	return ((((portTICK_RATE_MS) -1) - start_time) + end_time) * portTICK_RATE_MS;		
 }
-			   
+			
+/**
+ * @brief Determine if the aircraft is safe to arm
+ * @returns True if safe to arm, false otherwise 
+ */
 static bool okToArm(void)
-{	// return TRUE if it's OK to arm, otherwise return FALSE
-
-	bool ok = true;
-
-	// read AHRS settings
-	AHRSSettingsData AHRSSettings;
-	AHRSSettingsGet(&AHRSSettings);
-
+{		
 	// read alarms
 	SystemAlarmsData alarms;
-    SystemAlarmsGet(&alarms);
-
-//	SystemAlarmsAlarmOptions gps_alarm = AlarmsGet(SYSTEMALARMS_ALARM_GPS);
-//	SystemAlarmsAlarmOptions telemetry_alarm = AlarmsGet(SYSTEMALARMS_ALARM_TELEMETRY);
-
-	switch (AHRSSettings.Algorithm)
+	SystemAlarmsGet(&alarms);
+	
+	
+	// Check each alarm
+	for (int i = 0; i < SYSTEMALARMS_ALARM_NUMELEM; i++)
 	{
-		case AHRSSETTINGS_ALGORITHM_SIMPLE:
-		case AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR:
-		case AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR_NOMAG:
-
-		    // Check each alarm
-			for (int i = 0; i < SYSTEMALARMS_ALARM_NUMELEM; i++)
-			{
-				if (alarms.Alarm[i] >= SYSTEMALARMS_ALARM_ERROR)
-				{	// found an alarm thats set
-					if (i != SYSTEMALARMS_ALARM_GPS && i != SYSTEMALARMS_ALARM_TELEMETRY)
-					{	// it's not the gps or telemetry alarm
-						ok = false;	// prevent arming
-						break;
-					}
-				}
-			}
-
-			break;
-
-		case AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR:
-		default:	// unknown AHRS algorithum
-
-		    // Check each alarm
-			for (int i = 0; i < SYSTEMALARMS_ALARM_NUMELEM; i++)
-			{
-				if (alarms.Alarm[i] >= SYSTEMALARMS_ALARM_ERROR)
-				{	// found an alarm thats set
-					if (i != SYSTEMALARMS_ALARM_TELEMETRY)
-					{	// it's not the telemetry alarm
-						ok = false;	// prevent arming
-						break;
-					}
-				}
-			}
-
-			break;
+		if (alarms.Alarm[i] >= SYSTEMALARMS_ALARM_ERROR)
+		{	// found an alarm thats set
+			if (i == SYSTEMALARMS_ALARM_GPS || i == SYSTEMALARMS_ALARM_TELEMETRY)
+				continue;
+			
+			return false;
+		}
 	}
-
-	return ok;
+	
+	return true;		
 }
 
 //

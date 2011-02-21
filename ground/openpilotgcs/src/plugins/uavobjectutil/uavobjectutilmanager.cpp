@@ -40,6 +40,12 @@ UAVObjectUtilManager::UAVObjectUtilManager()
 
 UAVObjectUtilManager::~UAVObjectUtilManager()
 {
+//	while (!queue.isEmpty())
+	{
+	}
+
+	disconnect();
+
 	if (mutex)
 	{
 		delete mutex;
@@ -120,7 +126,7 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 		return -1;	// error
 
 	// ******************
-	// save the new home location details
+	// save the new settings
 
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 	if (!pm) return -2;
@@ -158,7 +164,7 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 	obj->updated();
 
 	// ******************
-	// save the new location to SD card
+	// save the new setting to SD card
 
 	if (save_to_sdcard)
 		saveObjectToSD(obj);
@@ -195,11 +201,27 @@ int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3])
 	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("HomeLocation")));
 	if (!obj) return -3;
 
+//	obj->requestUpdate();
+
 	set = obj->getField("Set")->getValue().toBool();
 
 	LLA[0] = obj->getField("Latitude")->getDouble() * 1e-7;
 	LLA[1] = obj->getField("Longitude")->getDouble() * 1e-7;
 	LLA[2] = obj->getField("Altitude")->getDouble();
+
+	if (LLA[0] != LLA[0]) LLA[0] = 0; // nan detection
+	else
+	if (LLA[0] >  90) LLA[0] =  90;
+	else
+	if (LLA[0] < -90) LLA[0] = -90;
+
+	if (LLA[1] != LLA[1]) LLA[1] = 0; // nan detection
+	else
+	if (LLA[1] >  180) LLA[1] =  180;
+	else
+	if (LLA[1] < -180) LLA[1] = -180;
+
+	if (LLA[2] != LLA[2]) LLA[2] = 0; // nan detection
 
 	return 0;	// OK
 }
@@ -216,6 +238,8 @@ int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3], double ECEF[
 
 	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("HomeLocation")));
 	if (!obj) return -3;
+
+//	obj->requestUpdate();
 
 	UAVObjectField *ECEF_field = obj->getField(QString("ECEF"));
 	if (!ECEF_field) return -4;
@@ -260,6 +284,8 @@ int UAVObjectUtilManager::getGPSPosition(double LLA[3])
 	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("GPSPosition")));
 	if (!obj) return -3;
 
+//	obj->requestUpdate();
+
 	LLA[0] = obj->getField(QString("Latitude"))->getDouble() * 1e-7;
 	LLA[1] = obj->getField(QString("Longitude"))->getDouble() * 1e-7;
 	LLA[2] = obj->getField(QString("Altitude"))->getDouble();
@@ -277,6 +303,91 @@ int UAVObjectUtilManager::getGPSPosition(double LLA[3])
 	if (LLA[1] < -180) LLA[1] = -180;
 
 	if (LLA[2] != LLA[2]) LLA[2] = 0; // nan detection
+
+	return 0;	// OK
+}
+
+// ******************************
+// telemetry port
+
+int UAVObjectUtilManager::setTelemetrySerialPortSpeed(QString speed, bool save_to_sdcard)
+{
+	QMutexLocker locker(mutex);
+
+	// ******************
+	// save the new settings
+
+	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+	if (!pm) return -1;
+
+	UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
+	if (!obm) return -2;
+
+	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("/*TelemetrySettings*/")));
+	if (!obj) return -3;
+
+	UAVObjectField *field = obj->getField(QString("Speed"));
+	if (!field) return -4;
+
+	field->setValue(speed);
+
+	obj->updated();
+
+	// ******************
+	// save the new setting to SD card
+
+	if (save_to_sdcard)
+		saveObjectToSD(obj);
+
+	// ******************
+
+	return 0;	// OK
+}
+
+int UAVObjectUtilManager::getTelemetrySerialPortSpeed(QString &speed)
+{
+	QMutexLocker locker(mutex);
+
+	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+	if (!pm) return -1;
+
+	UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
+	if (!obm) return -2;
+
+	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("TelemetrySettings")));
+	if (!obj) return -3;
+
+//	obj->requestUpdate();
+
+	UAVObjectField *field = obj->getField(QString("Speed"));
+	if (!field) return -4;
+
+	speed = field->getValue().toString();
+
+	return 0;	// OK
+}
+
+int UAVObjectUtilManager::getTelemetrySerialPortSpeeds(QComboBox *comboBox)
+{
+	QMutexLocker locker(mutex);
+
+	if (!comboBox) return -1;
+
+	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+	if (!pm) return -2;
+
+	UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
+	if (!obm) return -3;
+
+	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("TelemetrySettings")));
+	if (!obj) return -4;
+
+//	obj->requestUpdate();
+
+	UAVObjectField *field = obj->getField(QString("Speed"));
+	if (!field) return -5;
+
+	comboBox->addItems(field->getOptions());
 
 	return 0;	// OK
 }

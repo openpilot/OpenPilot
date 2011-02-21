@@ -40,6 +40,7 @@
 #include <QObject>
 #include <QMutex>
 #include <QQueue>
+#include <QComboBox>
 
 class UAVOBJECTUTIL_EXPORT UAVObjectUtilManager: public QObject
 {
@@ -54,6 +55,10 @@ public:
 	int getHomeLocation(bool &set, double LLA[3], double ECEF[3], double RNE[9], double Be[3]);
 
 	int getGPSPosition(double LLA[3]);
+
+	int setTelemetrySerialPortSpeed(QString speed, bool save_to_sdcard);
+	int getTelemetrySerialPortSpeed(QString &speed);
+	int getTelemetrySerialPortSpeeds(QComboBox *comboBox);
 
 private:
 	QMutex *mutex;

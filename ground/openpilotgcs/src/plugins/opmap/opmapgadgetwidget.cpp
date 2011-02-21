@@ -2399,7 +2399,8 @@ void OPMapGadgetWidget::setHomeLocationObject()
 	LLA[1] = home_position.coord.Lng();
 	LLA[2] = home_position.altitude;
 
-	Utils::HomeLocationUtil().getDetails(LLA, ECEF, RNE, Be);
+	if (Utils::HomeLocationUtil().getDetails(LLA, ECEF, RNE, Be) < 0)
+		return;	// error
 
 	// ******************
 	// save the new home location details

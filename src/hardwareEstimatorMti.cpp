@@ -39,32 +39,29 @@ namespace hardware {
 			{
 				f >> row;
 				boost::unique_lock<boost::mutex> l(mutex_data);
-				while(position == reading_pos || position == read_pos) cond_data.wait(l);
-				ublas::matrix_row<jblas::mat>(buffer, position) = row;
-				buffer(position,0) += timestamps_correction;
-				++position; if (position >= bufferSize) position = 0;
+				while(write_position == read_position) cond_data.wait(l);
+// std::cout << "MTI preload: put at write_position " << write_position << " (read_position " << read_position << ") ts " << std::setprecision(16) << row(0) << std::endl;
 			} else
 			{
 #ifdef HAVE_MTI
 				if (!mti->read(&data)) continue;
 				boost::unique_lock<boost::mutex> l(mutex_data);
-				if (position == reading_pos) JFR_ERROR(RtslamException, RtslamException::BUFFER_OVERFLOW, "Data not released: Increase MTI buffer size !");
-				if (position == read_pos) JFR_ERROR(RtslamException, RtslamException::BUFFER_OVERFLOW, "Data not read: Increase MTI buffer size !");
-				buffer(position,0) = data.TIMESTAMP_FILTERED;
-				buffer(position,1) = data.ACC[0];
-				buffer(position,2) = data.ACC[1];
-				buffer(position,3) = data.ACC[2];
-				buffer(position,4) = data.GYR[0];
-				buffer(position,5) = data.GYR[1];
-				buffer(position,6) = data.GYR[2];
-				buffer(position,7) = data.MAG[0];
-				buffer(position,8) = data.MAG[1];
-				buffer(position,9) = data.MAG[2];
-				row = ublas::matrix_row<jblas::mat>(buffer, position);
-				buffer(position,0) += timestamps_correction;
-				++position; if (position >= bufferSize) position = 0;
+				if (write_position == read_position) JFR_ERROR(RtslamException, RtslamException::BUFFER_OVERFLOW, "Data not read: Increase MTI buffer size !");
+				row(0) = data.TIMESTAMP_FILTERED;
+				row(1) = data.ACC[0];
+				row(2) = data.ACC[1];
+				row(3) = data.ACC[2];
+				row(4) = data.GYR[0];
+				row(5) = data.GYR[1];
+				row(6) = data.GYR[2];
+				row(7) = data.MAG[0];
+				row(8) = data.MAG[1];
+				row(9) = data.MAG[2];
 #endif
 			}
+			ublas::matrix_row<jblas::mat>(buffer, write_position) = row;
+			buffer(write_position,0) += timestamps_correction;
+			++write_position; if (write_position >= bufferSize) write_position = 0;
 			
 			if (mode == 1)
 			{
@@ -77,11 +74,11 @@ namespace hardware {
 			f.close();
 	}
 
-	HardwareEstimatorMti::HardwareEstimatorMti(std::string device, double trigger_freq, double trigger_shutter, int bufferSize_, int mode, std::string dump_path, bool start_reading):
+	HardwareEstimatorMti::HardwareEstimatorMti(std::string device, double trigger_freq, double trigger_shutter, int bufferSize_, int mode, std::string dump_path):
 #ifdef HAVE_MTI
 		mti(NULL),
 #endif
-		buffer(bufferSize_, 10), bufferSize(bufferSize_), position(0), reading_pos(-1), read_pos(bufferSize_-1),
+		buffer(bufferSize_, 10), bufferSize(bufferSize_), write_position(0), read_position(bufferSize_-1),
 		timestamps_correction(0.0)/*, tightly_synchronized(false)*/, mode(mode), dump_path(dump_path)
 	{
 		if (mode != 2)
@@ -115,19 +112,8 @@ namespace hardware {
 #endif
 		}
 		
-		if (start_reading)
-		{
-			for(int i = 0; i < bufferSize; ++i) buffer(i,0) = -1.;
-			// start acquire task
-			preloadTask_thread = new boost::thread(boost::bind(&HardwareEstimatorMti::preloadTask,this));
-			if (mode != 2)
-			{
-				std::cout << "Mti is initializating..." << std::flush;
-				sleep(3); // give some time to the time estimator to converge
-				std::cout << " done." << std::endl;
-			}
-		}
 	}
+	
 	
 	HardwareEstimatorMti::~HardwareEstimatorMti()
 	{
@@ -136,6 +122,19 @@ namespace hardware {
 #endif
 	}
 
+	void HardwareEstimatorMti::start()
+	{
+		for(int i = 0; i < bufferSize; ++i) buffer(i,0) = -1.;
+		// start acquire task
+		preloadTask_thread = new boost::thread(boost::bind(&HardwareEstimatorMti::preloadTask,this));
+		std::cout << "Mti is initializating..." << std::flush;
+		if (mode == 2)
+			sleep(1); // give some time to read log until first frame
+		else
+			sleep(3); // give some time to the time estimator to converge
+		std::cout << " done." << std::endl;
+	}
+	
 	void HardwareEstimatorMti::setSyncConfig(double timestamps_correction/*, bool tightly_synchronized, double tight_offset*/)
 	{
 		this->timestamps_correction = timestamps_correction;
@@ -147,12 +146,12 @@ namespace hardware {
 	jblas::mat_indirect HardwareEstimatorMti::acquireReadings(double t1, double t2)
 	{
 		JFR_ASSERT(t1 <= t2, "");
-		// find indexes by dichotomy
 		boost::unique_lock<boost::mutex> l(mutex_data);
 		int i1, i2;
 		int i, j;
 
-		int i_left = position, i_right = position + bufferSize-1;
+		// find indexes by dichotomy
+		int i_left = write_position, i_right = write_position + bufferSize-1;
 		while(i_left != i_right)
 		{
 			j = (i_left+i_right)/2;
@@ -161,8 +160,9 @@ namespace hardware {
 		}
 		i = i_left % bufferSize;
 		i1 = (i-1 + bufferSize) % bufferSize;
+		if (t1 <= 1.0 && buffer(i1,0) < 0.0) i1 = i;
 		bool no_larger = (buffer(i,0) < t1);
-		bool no_smaller = (i == position);
+		bool no_smaller = (i == write_position);
 		if (no_larger && buffer(i1,0) < 0.0)  // no data at all
 			return ublas::project(buffer, jmath::ublasExtra::ia_set(ublas::range(0,0)), jmath::ublasExtra::ia_set(ublas::range(0, buffer.size2())));
 		if (no_smaller) JFR_ERROR(RtslamException, RtslamException::BUFFER_OVERFLOW, "Missing data: increase MTI buffer size !");
@@ -171,7 +171,7 @@ namespace hardware {
 			i2 = i1;
 		else
 		{
-			i_right = position + bufferSize-1;
+			i_right = write_position + bufferSize-1;
 			while(i_left != i_right)
 			{
 				j = (i_left+i_right)/2;
@@ -189,11 +189,11 @@ namespace hardware {
 		}*/
 		
 		// return mat_indirect
-		reading_pos = i1;
-		read_pos = i2;
+		read_position = i1;
+// std::cout << "MTI acquire: read_position " << read_position << " (write_position " << write_position << ")" << std::endl;
 		l.unlock();
 		cond_data.notify_all();
-// std::cout << "acquireReadings between " << std::setprecision(16) << t1 << " and " << t2 << ", ie indexes " << i1 << " and " << i2 << " with t(i1) " << buffer(i1, 0) << " and t(i2) " << buffer(i2, 0) << std::endl;
+// std::cout << "acquireReadings between " << std::setprecision(18) << t1 << " and " << t2 << ", ie indexes " << i1 << " and " << i2 << " with t(i1) " << buffer(i1, 0) << " and t(i2) " << buffer(i2, 0) << std::endl;
 
 		if (i1 < i2)
 		{
@@ -203,7 +203,7 @@ namespace hardware {
 		} else
 		{
 			return ublas::project(buffer, 
-				jmath::ublasExtra::ia_union(jmath::ublasExtra::ia_set(ublas::range(i1,buffer.size1())),
+				jmath::ublasExtra::ia_concat(jmath::ublasExtra::ia_set(ublas::range(i1,buffer.size1())),
 				                            jmath::ublasExtra::ia_set(ublas::range(0,i2+1))),
 				jmath::ublasExtra::ia_set(ublas::range(0,buffer.size2())));
 		}

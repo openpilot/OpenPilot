@@ -543,7 +543,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		{
 			// just to initialize the MTI as an external trigger controlling shutter time
 			hardware::HardwareEstimatorMti hardEst1(
-				MTI_DEVICE, floatOpts[fFreq], floatOpts[fShutter], 1, mode, strOpts[sDataPath], false);
+				MTI_DEVICE, floatOpts[fFreq], floatOpts[fShutter], 1, mode, strOpts[sDataPath]);
 			floatOpts[fFreq] = hardEst1.getFreq();
 		}
 	}
@@ -582,9 +582,10 @@ void demo_slam01_main(world_ptr_t *world) {
 		} else
 		{
 			boost::shared_ptr<hardware::HardwareEstimatorMti> hardEst1_(new hardware::HardwareEstimatorMti(
-				MTI_DEVICE, floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath], true));
+				MTI_DEVICE, floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath]));
 			if (intOpts[iTrigger]) floatOpts[fFreq] = hardEst1_->getFreq();
 			hardEst1_->setSyncConfig(IMU_TIMESTAMP_CORRECTION);
+			hardEst1_->start();
 			hardEst1 = hardEst1_;
 		}
 		robPtr1_->setHardwareEstimator(hardEst1);

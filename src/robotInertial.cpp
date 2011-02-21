@@ -259,6 +259,7 @@ namespace jafar {
 			
 			g = -am;
 			
+			std::cout << "Initialize robot state with g = " << g << " and q = " << q << std::endl;
 			unsplitState(p, q, v, ab, wb, g, _xnew);
 		}
 		

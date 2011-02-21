@@ -25,6 +25,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 #ifndef UAVOBJECTUTILMANAGER_H
 #define UAVOBJECTUTILMANAGER_H
 
@@ -45,6 +46,8 @@ public:
 	int setHomeLocation(double LLA[3], bool save_to_sdcard);
 	int getHomeLocation(bool &set, double LLA[3]);
 	int getHomeLocation(bool &set, double LLA[3], double ECEF[3], double RNE[9], double Be[3]);
+
+	int getGPSPosition(double LLA[3]);
 
 private:
 	QMutex *mutex;

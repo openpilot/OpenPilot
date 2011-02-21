@@ -193,3 +193,40 @@ int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3], double ECEF[
 }
 
 // ******************************
+// GPS
+
+int UAVObjectUtilManager::getGPSPosition(double LLA[3])
+{
+	QMutexLocker locker(mutex);
+
+	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+	if (!pm) return -1;
+
+	UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
+	if (!obm) return -2;
+
+	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("GPSPosition")));
+	if (!obj) return -3;
+
+	LLA[0] = obj->getField(QString("Latitude"))->getDouble() * 1E-7;
+	LLA[1] = obj->getField(QString("Longitude"))->getDouble() * 1E-7;
+	LLA[2] = obj->getField(QString("Altitude"))->getDouble();
+
+	if (LLA[0] != LLA[0]) LLA[0] = 0; // nan detection
+	else
+	if (LLA[0] >  90) LLA[0] =  90;
+	else
+	if (LLA[0] < -90) LLA[0] = -90;
+
+	if (LLA[1] != LLA[1]) LLA[1] = 0; // nan detection
+	else
+	if (LLA[1] >  180) LLA[1] =  180;
+	else
+	if (LLA[1] < -180) LLA[1] = -180;
+
+	if (LLA[2] != LLA[2]) LLA[2] = 0; // nan detection
+
+	return 0;	// OK
+}
+
+// ******************************

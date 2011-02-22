@@ -1,9 +1,41 @@
+/**
+ ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{
+ * @addtogroup GSPModule GPS Module
+ * @brief Process GPS information
+ * @{
+ *
+ * @file       NMEA.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      GPS module, handles GPS and NMEA stream
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
 #include "openpilot.h"
 #include "pios.h"
 #include "NMEA.h"
 #include "gpsposition.h"
 #include "gpstime.h"
 #include "gpssatellites.h"
+
+#if defined(ENABLE_GPS_NMEA) || defined(ENABLE_GPS_ONESENTENCE_GTOP)
 
 // Debugging
 //#define GPSDEBUG
@@ -18,10 +50,6 @@
 #define NMEA_DEBUG_PGTOP	///< define to enable debug of PGTOP messages
 #endif
 
-/* Utility functions */
-static float NMEA_real_to_float(char *nmea_real);
-static bool NMEA_latlon_to_fixed_point(int32_t * latlon, char *nmea_latlon);
-
 /* NMEA sentence parsers */
 
 struct nmea_parser {
@@ -29,39 +57,45 @@ struct nmea_parser {
 	 bool(*handler) (GPSPositionData * GpsData, char *sentence);
 };
 
-static bool nmeaProcessGPGGA(GPSPositionData * GpsData, char *sentence);
-static bool nmeaProcessGPRMC(GPSPositionData * GpsData, char *sentence);
-static bool nmeaProcessGPVTG(GPSPositionData * GpsData, char *sentence);
-static bool nmeaProcessGPGSA(GPSPositionData * GpsData, char *sentence);
-static bool nmeaProcessGPZDA(GPSPositionData * GpsData, char *sentence);
-static bool nmeaProcessGPGSV(GPSPositionData * GpsData, char *sentence);
-static bool nmeaProcessPGTOP(GPSPositionData * GpsData, char *sentence);
+	#ifdef ENABLE_GPS_NMEA
+		static bool nmeaProcessGPGGA(GPSPositionData * GpsData, char *sentence);
+		static bool nmeaProcessGPRMC(GPSPositionData * GpsData, char *sentence);
+		static bool nmeaProcessGPVTG(GPSPositionData * GpsData, char *sentence);
+		static bool nmeaProcessGPGSA(GPSPositionData * GpsData, char *sentence);
+		static bool nmeaProcessGPZDA(GPSPositionData * GpsData, char *sentence);
+		static bool nmeaProcessGPGSV(GPSPositionData * GpsData, char *sentence);
+	#endif
 
-static struct nmea_parser nmea_parsers[] = {
-	{
-	 .prefix = "GPGGA",
-	 .handler = nmeaProcessGPGGA,
-	 },
-	{
-	 .prefix = "GPVTG",
-	 .handler = nmeaProcessGPVTG,
-	 },
-	{
-	 .prefix = "GPGSA",
-	 .handler = nmeaProcessGPGSA,
-	 },
-	{
-	 .prefix = "GPRMC",
-	 .handler = nmeaProcessGPRMC,
-	 },
-	{
-	 .prefix = "GPZDA",
-	 .handler = nmeaProcessGPZDA,
-	 },
-	{
-	 .prefix = "GPGSV",
-	 .handler = nmeaProcessGPGSV,
-	 },
+	static bool nmeaProcessPGTOP(GPSPositionData * GpsData, char *sentence);
+
+	static struct nmea_parser nmea_parsers[] = {
+
+	#ifdef ENABLE_GPS_NMEA
+		{
+			.prefix = "GPGGA",
+			.handler = nmeaProcessGPGGA,
+		},
+		{
+			.prefix = "GPVTG",
+			.handler = nmeaProcessGPVTG,
+		},
+		{
+			.prefix = "GPGSA",
+			.handler = nmeaProcessGPGSA,
+		},
+		{
+			.prefix = "GPRMC",
+			.handler = nmeaProcessGPRMC,
+		},
+		{
+			.prefix = "GPZDA",
+			.handler = nmeaProcessGPZDA,
+		},
+		{
+			.prefix = "GPGSV",
+			.handler = nmeaProcessGPGSV,
+		},
+	#endif
         {
          .prefix = "PGTOP",
          .handler = nmeaProcessPGTOP,
@@ -118,6 +152,121 @@ bool NMEA_checksum(char *nmea_sentence)
 	return (checksum_computed == checksum_received);
 }
 
+/*
+ * This function only exists to deal with a linking
+ * failure in the stdlib function strtof().  This
+ * implementation does not rely on the _sbrk() syscall
+ * like strtof() does.
+ */
+
+/* Parse a number encoded in a string of the format:
+ *   [-]NN.nnnnn
+ * into a signed whole part and an unsigned fractional part.
+ * The fract_units field indicates the units of the fractional part as
+ *   1 whole = 10^fract_units fract
+ */
+static bool NMEA_parse_real(int32_t * whole, uint32_t * fract, uint8_t * fract_units, char *field)
+{
+	char *s = field;
+	char *field_w;
+	char *field_f;
+
+	PIOS_DEBUG_Assert(whole);
+	PIOS_DEBUG_Assert(fract);
+	PIOS_DEBUG_Assert(fract_units);
+
+	field_w = strsep(&s, ".");
+	field_f = s;
+
+	*whole = strtol(field_w, NULL, 10);
+
+	if (field_w) {
+		/* decimal was found so we may have a fractional part */
+		*fract = strtoul(field_f, NULL, 10);
+		*fract_units = strlen(field_f);
+	} else {
+		/* no decimal was found, fractional part is zero */
+		*fract = 0;
+		*fract_units = 0;
+	}
+
+	return true;
+}
+
+static float NMEA_real_to_float(char *nmea_real)
+{
+	int32_t whole;
+	uint32_t fract;
+	uint8_t fract_units;
+
+	/* Sanity checks */
+	PIOS_DEBUG_Assert(nmea_real);
+
+	if (!NMEA_parse_real(&whole, &fract, &fract_units, nmea_real)) {
+		return false;
+	}
+
+	/* Convert to float */
+	return (((float)whole) + fract * pow(10, -fract_units));
+}
+
+#ifdef ENABLE_GPS_NMEA
+/*
+ * Parse a field in the format:
+ *    DD[D]MM.mmmm[mm]
+ * into a fixed-point representation in units of (degrees * 1e-7)
+ */
+static bool NMEA_latlon_to_fixed_point(int32_t * latlon, char *nmea_latlon)
+{
+	int32_t num_DDDMM;
+	uint32_t num_m;
+	uint8_t units;
+
+	/* Sanity checks */
+	PIOS_DEBUG_Assert(nmea_latlon);
+	PIOS_DEBUG_Assert(latlon);
+
+	if (!NMEA_parse_real(&num_DDDMM, &num_m, &units, nmea_latlon)) {
+		return false;
+	}
+
+	/* scale up the mmmm[mm] field apropriately depending on # of digits */
+	switch (units) {
+	case 0:
+		/* no digits, value is zero so no scaling */
+		break;
+	case 1:		/* m       */
+		num_m *= 1e6;	/* m000000 */
+		break;
+	case 2:		/* mm      */
+		num_m *= 1e5;	/* mm00000 */
+		break;
+	case 3:		/* mmm     */
+		num_m *= 1e4;	/* mmm0000 */
+		break;
+	case 4:		/* mmmm    */
+		num_m *= 1e3;	/* mmmm000 */
+		break;
+	case 5:		/* mmmmm   */
+		num_m *= 1e2;	/* mmmmm00 */
+		break;
+	case 6:		/* mmmmmm  */
+		num_m *= 1e1;	/* mmmmmm0 */
+		break;
+	default:
+		/* unhandled format */
+		num_m = 0;
+		break;
+	}
+
+	*latlon = (num_DDDMM / 100) * 1e7;	/* scale the whole degrees */
+	*latlon += (num_DDDMM % 100) * 1e7 / 60;	/* add in the scaled decimal whole minutes */
+	*latlon += num_m / 60;	/* add in the scaled decimal fractional minutes */
+
+	return true;
+}
+#endif	// ENABLE_GPS_NMEA
+
 /**
  * Parses a complete NMEA sentence and updates the GPSPosition UAVObject
  * \param[in] An NMEA sentence with a valid checksum
@@ -162,6 +311,8 @@ bool NMEA_update_position(char *nmea_sentence)
 	/* Tell the caller what kind of packet we just parsed */
 	return true;
 }
+
+#ifdef ENABLE_GPS_NMEA
 
 /**
  * Parse an NMEA GPGGA sentence and update the given UAVObject
@@ -595,6 +746,8 @@ static bool nmeaProcessGPGSA(GPSPositionData * GpsData, char *sentence)
 	return true;
 }
 
+#endif	// ENABLE_GPS_NMEA
+
 /**
  * Parse an NMEA PGTOP sentence and update the given UAVObject
  * \param[in] A pointer to a GPSPosition UAVObject to be updated.
@@ -710,115 +863,4 @@ static bool nmeaProcessPGTOP(GPSPositionData * GpsData, char *sentence)
         return true;
 }
 
-/* Parse a number encoded in a string of the format:
- *   [-]NN.nnnnn
- * into a signed whole part and an unsigned fractional part.
- * The fract_units field indicates the units of the fractional part as
- *   1 whole = 10^fract_units fract
- */
-static bool NMEA_parse_real(int32_t * whole, uint32_t * fract, uint8_t * fract_units, char *field)
-{
-	char *s = field;
-	char *field_w;
-	char *field_f;
-
-	PIOS_DEBUG_Assert(whole);
-	PIOS_DEBUG_Assert(fract);
-	PIOS_DEBUG_Assert(fract_units);
-
-	field_w = strsep(&s, ".");
-	field_f = s;
-
-	*whole = strtol(field_w, NULL, 10);
-
-	if (field_w) {
-		/* decimal was found so we may have a fractional part */
-		*fract = strtoul(field_f, NULL, 10);
-		*fract_units = strlen(field_f);
-	} else {
-		/* no decimal was found, fractional part is zero */
-		*fract = 0;
-		*fract_units = 0;
-	}
-
-	return true;
-}
-
-/*
- * This function only exists to deal with a linking
- * failure in the stdlib function strtof().  This
- * implementation does not rely on the _sbrk() syscall
- * like strtof() does.
- */
-
-static float NMEA_real_to_float(char *nmea_real)
-{
-	int32_t whole;
-	uint32_t fract;
-	uint8_t fract_units;
-
-	/* Sanity checks */
-	PIOS_DEBUG_Assert(nmea_real);
-
-	if (!NMEA_parse_real(&whole, &fract, &fract_units, nmea_real)) {
-		return false;
-	}
-
-	/* Convert to float */
-	return (((float)whole) + fract * pow(10, -fract_units));
-}
-
-/*
- * Parse a field in the format:
- *    DD[D]MM.mmmm[mm]
- * into a fixed-point representation in units of (degrees * 1e-7)
- */
-static bool NMEA_latlon_to_fixed_point(int32_t * latlon, char *nmea_latlon)
-{
-	int32_t num_DDDMM;
-	uint32_t num_m;
-	uint8_t units;
-
-	/* Sanity checks */
-	PIOS_DEBUG_Assert(nmea_latlon);
-	PIOS_DEBUG_Assert(latlon);
-
-	if (!NMEA_parse_real(&num_DDDMM, &num_m, &units, nmea_latlon)) {
-		return false;
-	}
-
-	/* scale up the mmmm[mm] field apropriately depending on # of digits */
-	switch (units) {
-	case 0:
-		/* no digits, value is zero so no scaling */
-		break;
-	case 1:		/* m       */
-		num_m *= 1e6;	/* m000000 */
-		break;
-	case 2:		/* mm      */
-		num_m *= 1e5;	/* mm00000 */
-		break;
-	case 3:		/* mmm     */
-		num_m *= 1e4;	/* mmm0000 */
-		break;
-	case 4:		/* mmmm    */
-		num_m *= 1e3;	/* mmmm000 */
-		break;
-	case 5:		/* mmmmm   */
-		num_m *= 1e2;	/* mmmmm00 */
-		break;
-	case 6:		/* mmmmmm  */
-		num_m *= 1e1;	/* mmmmmm0 */
-		break;
-	default:
-		/* unhandled format */
-		num_m = 0;
-		break;
-	}
-
-	*latlon = (num_DDDMM / 100) * 1e7;	/* scale the whole degrees */
-	*latlon += (num_DDDMM % 100) * 1e7 / 60;	/* add in the scaled decimal whole minutes */
-	*latlon += num_m / 60;	/* add in the scaled decimal fractional minutes */
-
-	return true;
-}
+#endif	// #if defined(ENABLE_GPS_NMEA) || defined(ENABLE_GPS_ONESENTENCE_GTOP)

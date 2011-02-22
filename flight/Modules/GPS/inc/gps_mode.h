@@ -6,7 +6,7 @@
  * @brief Process GPS information
  * @{ 
  *
- * @file       GPS.h
+ * @file       gps_mode.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Include file of the GPS module.
  * 	       As with all modules only the initialize function is exposed all other
@@ -31,14 +31,28 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef GPS_H
-#define GPS_H
+#ifndef GPS_MODE_H
+#define GPS_MODE_H
 
-#include "gps_mode.h"
+// ****************
+// you MUST have one of these uncommented - and ONLY one
+//
+// note: the NMEA includes the one-sentance code as OP has the memory for it
 
-int32_t GPSInitialize(void);
+//#define ENABLE_GPS_BINARY_GTOP		// uncomment this if we are using GTOP BINARY mode
+//#define ENABLE_GPS_ONESENTENCE_GTOP	// uncomment this if we are using single sentance mode
+#define ENABLE_GPS_NMEA				// uncomment this if we are using NMEA mode
 
-#endif // GPS_H
+// ****************
+// make sure they have defined a protocol to use
+
+#if !defined(ENABLE_GPS_BINARY_GTOP) && !defined(ENABLE_GPS_ONESENTENCE_GTOP) && !defined(ENABLE_GPS_NMEA)
+	#error YOU MUST SELECT THE DESIRED GPS PROTOCOL IN gps_mode.h!
+#endif
+
+// ****************
+
+#endif
 
 /**
   * @}

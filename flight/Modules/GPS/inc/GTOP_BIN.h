@@ -1,17 +1,14 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
+ * @{
  * @addtogroup GSPModule GPS Module
  * @brief Process GPS information
- * @{ 
+ * @{
  *
- * @file       GPS.h
+ * @file       GTOP_BIN.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Include file of the GPS module.
- * 	       As with all modules only the initialize function is exposed all other
- * 	       interactions with the module take place through the event queue and
- *             objects.
+ * @brief      GPS module, handles GPS and NMEA stream
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -31,16 +28,15 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef GPS_H
-#define GPS_H
+#ifndef GTOP_BIN_H
+#define GTOP_BIN_H
 
+#include <stdint.h>
 #include "gps_mode.h"
 
-int32_t GPSInitialize(void);
+#ifdef ENABLE_GPS_BINARY_GTOP
+	extern int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volatile uint32_t *parsing_errors);
+	extern void GTOP_BIN_init(void);
+#endif
 
-#endif // GPS_H
-
-/**
-  * @}
-  * @}
-  */
+#endif

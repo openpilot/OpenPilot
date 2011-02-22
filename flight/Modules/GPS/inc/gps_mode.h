@@ -39,9 +39,9 @@
 //
 // note: the NMEA includes the one-sentance code as OP has the memory for it
 
-//#define ENABLE_GPS_BINARY_GTOP		// uncomment this if we are using GTOP BINARY mode
-//#define ENABLE_GPS_ONESENTENCE_GTOP	// uncomment this if we are using single sentance mode
-#define ENABLE_GPS_NMEA				// uncomment this if we are using NMEA mode
+//#define ENABLE_GPS_BINARY_GTOP      // uncomment this if we are using GTOP BINARY mode
+//#define ENABLE_GPS_ONESENTENCE_GTOP // uncomment this if we are using single sentance mode
+#define ENABLE_GPS_NMEA               // uncomment this if we are using NMEA mode
 
 // ****************
 // make sure they have defined a protocol to use

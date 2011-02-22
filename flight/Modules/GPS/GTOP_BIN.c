@@ -44,42 +44,42 @@
 
 typedef struct
 {
-	uint32_t	utc_time;
+	uint32_t  utc_time;
 
-	int32_t		latitude;
-	uint8_t		ns_indicator;
+	int32_t   latitude;
+	uint8_t   ns_indicator;
 
-	int32_t		longitude;
-	uint8_t		ew_indicator;
+	int32_t   longitude;
+	uint8_t   ew_indicator;
 
-	uint8_t		fix_quality;
+	uint8_t   fix_quality;
 
-	uint8_t		satellites_used;
+	uint8_t   satellites_used;
 
-	uint16_t	hdop;
+	uint16_t  hdop;
 
-	int32_t		msl_altitude;
+	int32_t   msl_altitude;
 
-	int32_t		geoidal_seperation;
+	int32_t   geoidal_seperation;
 
-	uint8_t		fix_type;
+	uint8_t   fix_type;
 
-	int32_t		course_over_ground;
+	int32_t   course_over_ground;
 
-	int32_t		speed_over_ground;
+	int32_t   speed_over_ground;
 
-	uint8_t		day;
-	uint8_t		month;
-	uint16_t	year;
+	uint8_t   day;
+	uint8_t   month;
+	uint16_t  year;
 }  __attribute__((__packed__)) t_gps_bin_packet_data;
 
 typedef struct
 {
-	uint16_t				header;
-	t_gps_bin_packet_data	data;
-	uint8_t					asterisk;
-	uint8_t					checksum;
-	uint16_t				end_word;
+	uint16_t              header;
+	t_gps_bin_packet_data data;
+	uint8_t               asterisk;
+	uint8_t               checksum;
+	uint16_t              end_word;
 }  __attribute__((__packed__)) t_gps_bin_packet;
 
 // ************

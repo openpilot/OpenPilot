@@ -81,7 +81,7 @@ static void setHomeLocation(GPSPositionData * gpsData);
 // ****************
 // Private variables
 
-static uint32_t    gpsPort;
+static uint32_t gpsPort;
 
 static xTaskHandle gpsTaskHandle;
 
@@ -123,17 +123,17 @@ int32_t GPSInitialize(void)
 
 static void gpsTask(void *parameters)
 {
-	portTickType	xDelay = 100 / portTICK_RATE_MS;
-	uint32_t		timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;;
-	GPSPositionData	GpsData;
+	portTickType xDelay = 100 / portTICK_RATE_MS;
+	uint32_t timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;;
+	GPSPositionData GpsData;
 	
 #ifdef ENABLE_GPS_BINARY_GTOP
 	GTOP_BIN_init();
 #else
-	uint8_t			rx_count = 0;
-	bool			start_flag = false;
-	bool			found_cr = false;
-	int32_t			gpsRxOverflow = 0;
+	uint8_t rx_count = 0;
+	bool start_flag = false;
+	bool found_cr = false;
+	int32_t gpsRxOverflow = 0;
 #endif
 	
 #ifdef FULL_COLD_RESTART

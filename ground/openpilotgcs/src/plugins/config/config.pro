@@ -21,7 +21,9 @@ HEADERS += configplugin.h \
     mixercurvewidget.h \
     mixercurvepoint.h \
     mixercurveline.h \
-    configccpmwidget.h
+    configccpmwidget.h \
+    configstabilizationwidget.h \
+    vernierwidget.h
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
     configgadgetwidget.cpp \
@@ -37,10 +39,14 @@ SOURCES += configplugin.cpp \
     mixercurvewidget.cpp \
     mixercurvepoint.cpp \
     mixercurveline.cpp \
-    configccpmwidget.cpp
+    configccpmwidget.cpp \
+    configstabilizationwidget.cpp \
+    vernierwidget.cpp
 FORMS += settingswidget.ui \
     airframe.ui \
     telemetry.ui \
     ahrs.ui \
-    ccpm.ui
+    ccpm.ui \
+    stabilization.ui \
+    vernier.ui
 RESOURCES += configgadget.qrc

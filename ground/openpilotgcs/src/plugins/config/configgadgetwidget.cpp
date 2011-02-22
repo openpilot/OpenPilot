@@ -31,6 +31,7 @@
 #include "configairframewidget.h"
 #include "configtelemetrywidget.h"
 #include "configahrswidget.h"
+#include "configstabilizationwidget.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -54,7 +55,6 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     setLayout(layout);
 
     // *********************
-
     QWidget *qwd;
 
     qwd = new ConfigServoWidget(this);
@@ -68,6 +68,9 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 
     qwd = new ConfigAHRSWidget(this);
     ftw->insertTab(3, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+
+    qwd = new ConfigStabilizationWidget(this);
+    ftw->insertTab(4, qwd, QIcon(), QString("Stabilization"));
 
 //    qwd = new ConfigPipXtremeWidget(this);
 //    ftw->insertTab(4, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));
@@ -85,6 +88,8 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 ConfigGadgetWidget::~ConfigGadgetWidget()
 {
    // Do nothing
+
+    // TODO: properly delete all the tabs in ftw before exiting
 }
 
 void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)

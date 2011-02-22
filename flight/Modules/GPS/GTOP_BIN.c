@@ -205,12 +205,12 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 		GPSTimeData GpsTime;
 		GPSTimeGet(&GpsTime);
 		uint32_t utc_time = rx_packet->data.utc_time / 1000;
-		GpsTime.Second = utc_time % 100;
-		GpsTime.Minute = (utc_time / 100) % 100;
-		GpsTime.Hour = utc_time / 10000;
-		GpsTime.Day = rx_packet->data.day;
-		GpsTime.Month = rx_packet->data.month;
-		GpsTime.Year = rx_packet->data.year;
+		GpsTime.Second = utc_time % 100;          //
+		GpsTime.Minute = (utc_time / 100) % 100;  //
+		GpsTime.Hour = utc_time / 10000;          //
+		GpsTime.Day = rx_packet->data.day;        //
+		GpsTime.Month = rx_packet->data.month;    //
+		GpsTime.Year = rx_packet->data.year;      //
 		GPSTimeSet(&GpsTime);
 
 		// set the gps position object
@@ -223,16 +223,16 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 			case 3: GpsData.Status = GPSPOSITION_STATUS_FIX3D; break;
 			default: GpsData.Status = GPSPOSITION_STATUS_NOGPS; break;
 		}
-		GpsData.Latitude        = rx_packet->data.latitude  * (rx_packet->data.ns_indicator == 1 ? +1 : -1);	// degrees * 1e6
-		GpsData.Longitude       = rx_packet->data.longitude * (rx_packet->data.ew_indicator == 1 ? +1 : -1);	// degrees * 1e6
-		GpsData.Altitude        = (float)rx_packet->data.msl_altitude / 1000;									// meters
-		GpsData.GeoidSeparation = (float)rx_packet->data.geoidal_seperation / 1000;								// meters
-		GpsData.Heading         = (float)rx_packet->data.course_over_ground / 1000;								// degrees
-		GpsData.Groundspeed     = (float)rx_packet->data.speed_over_ground / 3600;								// m/s
-		GpsData.Satellites      = rx_packet->data.satellites_used;												//
-//		GpsData.PDOP;																							//
-		GpsData.HDOP            = (float)rx_packet->data.hdop / 100;											//
-//		GpsData.VDOP;																							//
+		GpsData.Latitude        = rx_packet->data.latitude  * (rx_packet->data.ns_indicator == 1 ? +1 : -1);   // degrees * 1e6
+		GpsData.Longitude       = rx_packet->data.longitude * (rx_packet->data.ew_indicator == 1 ? +1 : -1);   // degrees * 1e6
+		GpsData.Altitude        = (float)rx_packet->data.msl_altitude / 1000;                                  // meters
+		GpsData.GeoidSeparation = (float)rx_packet->data.geoidal_seperation / 1000;                            // meters
+		GpsData.Heading         = (float)rx_packet->data.course_over_ground / 1000;                            // degrees
+		GpsData.Groundspeed     = (float)rx_packet->data.speed_over_ground / 3600;                             // m/s
+		GpsData.Satellites      = rx_packet->data.satellites_used;                                             //
+//		GpsData.PDOP;                                                                                          // not available in binary mode
+		GpsData.HDOP            = (float)rx_packet->data.hdop / 100;                                           //
+//		GpsData.VDOP;                                                                                          // not available in binary mode
 		GPSPositionSet(&GpsData);
 
 		// remove the spent packet from the buffer

@@ -108,10 +108,12 @@ static uint32_t swap4Bytes(uint32_t data)
 
 // ************
 /**
- * Parses a complete binary packet and updates the GPSPosition UAVObject
- * \param[in] A new byte from the GPS
- * \return true if we have found a valid binary packet
- * \return false if any errors were encountered with the packet
+ * Parses a complete binary packet and update the GPSPosition and GPSTime UAVObjects
+ *
+ * param[in] .. b = a new received byte from the GPS
+ *
+ * return '0' if we have found a valid binary packet
+ * return <0 if any errors were encountered with the packet or no packet found
  */
 
 int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volatile uint32_t *parsing_errors)
@@ -152,6 +154,7 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 			rx_packet->end_word != 0x0A0D ||
 			rx_packet->asterisk != 0x2A)
 		{	// no valid packet found - yet
+			if (parsing_errors) *parsing_errors++;
 			memmove(gps_rx_buffer, gps_rx_buffer + 1, gps_rx_buffer_wr - 1);
 			gps_rx_buffer_wr--;
 			continue;
@@ -185,7 +188,7 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 			continue;
 		}
 
-		// we now have all the GPS data in a valid packet, update the GpsData and GpsTime objects
+		// we now have a valid complete binary packet, update the GpsData and GpsTime objects
 
 		// correct the endian order of the parameters
 		rx_packet->data.utc_time = swap4Bytes(rx_packet->data.utc_time);

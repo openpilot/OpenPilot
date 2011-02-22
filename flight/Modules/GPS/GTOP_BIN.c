@@ -121,7 +121,7 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 	t_gps_bin_packet *rx_packet = (t_gps_bin_packet *)gps_rx_buffer;
 
 	if (gps_rx_buffer_wr >= sizeof(gps_rx_buffer))
-	{	// make room for the new byte
+	{   // make room for the new byte
 		memmove(gps_rx_buffer, gps_rx_buffer + 1, sizeof(gps_rx_buffer) - 1);
 		gps_rx_buffer_wr = sizeof(gps_rx_buffer) - 1;
 	}
@@ -129,13 +129,13 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 	// add the new byte into the buffer
 	gps_rx_buffer[gps_rx_buffer_wr++] = b;
 
-	while (gps_rx_buffer_wr >= sizeof(t_gps_bin_packet))
+	while (gps_rx_buffer_wr > 0)
 	{
 		// scan for the start of a binary packet (the header bytes)
 		while (gps_rx_buffer_wr >= sizeof(rx_packet->header))
 		{
 			if (rx_packet->header == 0x2404)
-				break;	// found a valid header marker
+				break;   // found a valid header marker
 
 			// shift all the bytes down one position
 			memmove(gps_rx_buffer, gps_rx_buffer + 1, gps_rx_buffer_wr - 1);
@@ -143,13 +143,11 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 		}
 
 		if (gps_rx_buffer_wr < sizeof(t_gps_bin_packet))
-		{	// not yet enough bytes for a complete binary packet
-			break;
-		}
+			break;   // not yet enough bytes for a complete binary packet
 
 		// we have enough bytes for a complete binary packet
 
-		// check to see if certain params are valid
+		// check to see if certain parameters in the binary packet are valid
 		if (rx_packet->header != 0x2404 ||
 			rx_packet->end_word != 0x0A0D ||
 			rx_packet->asterisk != 0x2A ||
@@ -157,7 +155,7 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 			(rx_packet->data.ew_indicator != 1 && rx_packet->data.ew_indicator != 2) ||
 			(rx_packet->data.fix_quality > 2) ||
 			(rx_packet->data.fix_type < 1 || rx_packet->data.fix_type > 3) )
-		{	// invalid packet
+		{   // invalid packet
 			if (parsing_errors) *parsing_errors++;
 			// shift all the bytes down one position
 			memmove(gps_rx_buffer, gps_rx_buffer + 1, gps_rx_buffer_wr - 1);
@@ -165,7 +163,7 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 			continue;
 		}
 
-		{	// check the checksum is valid
+		{   // check the checksum is valid
 			uint8_t *p = (uint8_t *)&rx_packet->data;
 			uint8_t checksum = 0;
 			for (int i = 0; i < sizeof(t_gps_bin_packet_data); i++)
@@ -197,38 +195,38 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 		// set the gps time object
 		GPSTimeData GpsTime;
 		GPSTimeGet(&GpsTime);
-		uint32_t utc_time = rx_packet->data.utc_time / 1000;
-		GpsTime.Second = utc_time % 100;          //
-		GpsTime.Minute = (utc_time / 100) % 100;  //
-		GpsTime.Hour = utc_time / 10000;          //
-		GpsTime.Day = rx_packet->data.day;        //
-		GpsTime.Month = rx_packet->data.month;    //
-		GpsTime.Year = rx_packet->data.year;      //
+			uint32_t utc_time = rx_packet->data.utc_time / 1000;
+			GpsTime.Second = utc_time % 100;          // seconds
+			GpsTime.Minute = (utc_time / 100) % 100;  // minutes
+			GpsTime.Hour = utc_time / 10000;          // hours
+			GpsTime.Day = rx_packet->data.day;        // day
+			GpsTime.Month = rx_packet->data.month;    // month
+			GpsTime.Year = rx_packet->data.year;      // year
 		GPSTimeSet(&GpsTime);
 
 		// set the gps position object
 		GPSPositionData	GpsData;
 		GPSPositionGet(&GpsData);
-		switch (rx_packet->data.fix_type)
-		{
-			case 1: GpsData.Status = GPSPOSITION_STATUS_NOFIX; break;
-			case 2: GpsData.Status = GPSPOSITION_STATUS_FIX2D; break;
-			case 3: GpsData.Status = GPSPOSITION_STATUS_FIX3D; break;
-			default: GpsData.Status = GPSPOSITION_STATUS_NOGPS; break;
-		}
-		GpsData.Latitude        = rx_packet->data.latitude  * (rx_packet->data.ns_indicator == 1 ? +1 : -1);   // degrees * 1e6
-		GpsData.Longitude       = rx_packet->data.longitude * (rx_packet->data.ew_indicator == 1 ? +1 : -1);   // degrees * 1e6
-		GpsData.Altitude        = (float)rx_packet->data.msl_altitude / 1000;                                  // meters
-		GpsData.GeoidSeparation = (float)rx_packet->data.geoidal_seperation / 1000;                            // meters
-		GpsData.Heading         = (float)rx_packet->data.course_over_ground / 1000;                            // degrees
-		GpsData.Groundspeed     = (float)rx_packet->data.speed_over_ground / 3600;                             // m/s
-		GpsData.Satellites      = rx_packet->data.satellites_used;                                             //
-//		GpsData.PDOP;                                                                                          // not available in binary mode
-		GpsData.HDOP            = (float)rx_packet->data.hdop / 100;                                           //
-//		GpsData.VDOP;                                                                                          // not available in binary mode
+			switch (rx_packet->data.fix_type)
+			{
+				case 1: GpsData.Status = GPSPOSITION_STATUS_NOFIX; break;
+				case 2: GpsData.Status = GPSPOSITION_STATUS_FIX2D; break;
+				case 3: GpsData.Status = GPSPOSITION_STATUS_FIX3D; break;
+				default: GpsData.Status = GPSPOSITION_STATUS_NOGPS; break;
+			}
+			GpsData.Latitude        = rx_packet->data.latitude  * (rx_packet->data.ns_indicator == 1 ? +1 : -1);   // degrees * 1e6
+			GpsData.Longitude       = rx_packet->data.longitude * (rx_packet->data.ew_indicator == 1 ? +1 : -1);   // degrees * 1e6
+			GpsData.Altitude        = (float)rx_packet->data.msl_altitude / 1000;                                  // meters
+			GpsData.GeoidSeparation = (float)rx_packet->data.geoidal_seperation / 1000;                            // meters
+			GpsData.Heading         = (float)rx_packet->data.course_over_ground / 1000;                            // degrees
+			GpsData.Groundspeed     = (float)rx_packet->data.speed_over_ground / 3600;                             // m/s
+			GpsData.Satellites      = rx_packet->data.satellites_used;                                             //
+//			GpsData.PDOP;                                                                                          // not available in binary mode
+			GpsData.HDOP            = (float)rx_packet->data.hdop / 100;                                           //
+//			GpsData.VDOP;                                                                                          // not available in binary mode
 		GPSPositionSet(&GpsData);
 
-		// remove the spent packet from the buffer
+		// remove the spent binary packet from the buffer
 		if (gps_rx_buffer_wr > sizeof(t_gps_bin_packet))
 		{
 			memmove(gps_rx_buffer, gps_rx_buffer + sizeof(t_gps_bin_packet), gps_rx_buffer_wr - sizeof(t_gps_bin_packet));

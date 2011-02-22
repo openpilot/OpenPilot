@@ -38,7 +38,7 @@
 // you MUST have one of these uncommented - and ONLY one
 
 //#define ENABLE_GPS_BINARY_GTOP      // uncomment this if we are using GTOP BINARY mode
-//#define ENABLE_GPS_ONESENTENCE_GTOP // uncomment this if we are using GTOP SINLGE SENTENCE mode
+//#define ENABLE_GPS_ONESENTENCE_GTOP // uncomment this if we are using GTOP SINGLE SENTENCE mode
 #define ENABLE_GPS_NMEA               // uncomment this if we are using NMEA mode
 
 // ****************

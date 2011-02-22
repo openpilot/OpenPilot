@@ -152,8 +152,12 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 
 		if (rx_packet->header != 0x2404 ||
 			rx_packet->end_word != 0x0A0D ||
-			rx_packet->asterisk != 0x2A)
-		{	// no valid packet found - yet
+			rx_packet->asterisk != 0x2A ||
+			(rx_packet->data.ns_indicator != 1 && rx_packet->data.ns_indicator != 2) ||
+			(rx_packet->data.ew_indicator != 1 && rx_packet->data.ew_indicator != 2) ||
+			(rx_packet->data.fix_quality > 2) ||
+			(rx_packet->data.fix_type < 1 || rx_packet->data.fix_type > 3) )
+		{	// invalid packet
 			if (parsing_errors) *parsing_errors++;
 			memmove(gps_rx_buffer, gps_rx_buffer + 1, gps_rx_buffer_wr - 1);
 			gps_rx_buffer_wr--;
@@ -176,18 +180,7 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 		}
 
 		// checksum appears correct
-
-		if (	(rx_packet->data.ns_indicator != 1 && rx_packet->data.ns_indicator != 2) ||
-				(rx_packet->data.ew_indicator != 1 && rx_packet->data.ew_indicator != 2) ||
-				(rx_packet->data.fix_quality > 2) ||
-				(rx_packet->data.fix_type < 1 || rx_packet->data.fix_type > 3) )
-		{	// found some invalid params - discard the packet
-			if (parsing_errors) *parsing_errors++;
-			memmove(gps_rx_buffer, gps_rx_buffer + 1, gps_rx_buffer_wr - 1);
-			gps_rx_buffer_wr--;
-			continue;
-		}
-
+		//
 		// we now have a valid complete binary packet, update the GpsData and GpsTime objects
 
 		// correct the endian order of the parameters

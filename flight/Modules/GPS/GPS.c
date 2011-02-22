@@ -139,6 +139,12 @@ static void gpsTask(void *parameters)
 #ifdef FULL_COLD_RESTART
 	// tell the GPS to do a FULL COLD restart
 	PIOS_COM_SendStringNonBlocking(gpsPort, "$PMTK104*37\r\n");
+	timeOfLastCommandMs = timeNowMs;
+	while (timeNowMs - timeOfLastCommandMs < 300)	// delay for 300ms to let the GPS sort itself out
+	{
+		vTaskDelay(xDelay);	// Block task until next update
+		timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;;
+	}
 #endif
 
 #ifdef DISABLE_GPS_TRESHOLD
@@ -151,7 +157,7 @@ static void gpsTask(void *parameters)
 #endif
 	
 #ifdef ENABLE_GPS_ONESENTENCE_GTOP
-	// switch to single sentance mode
+	// switch to single sentence mode
 	PIOS_COM_SendStringNonBlocking(gpsPort, "$PGCMD,21,2*6C\r\n");
 #endif
 
@@ -187,7 +193,7 @@ static void gpsTask(void *parameters)
 			}
 
 		#else
-			// NMEA or SINGLE-SENTANCE GPS mode
+			// NMEA or SINGLE-SENTENCE GPS mode
 
 			// This blocks the task until there is something on the buffer
 			while (PIOS_COM_ReceiveBufferUsed(gpsPort) > 0)
@@ -281,7 +287,7 @@ static void gpsTask(void *parameters)
 				#endif
 
 				#ifdef ENABLE_GPS_ONESENTENCE_GTOP
-					// switch to single sentance mode
+					// switch to single sentence mode
 					PIOS_COM_SendStringNonBlocking(gpsPort,"$PGCMD,21,2*6C\r\n");
 				#endif
 

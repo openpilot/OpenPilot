@@ -49,14 +49,6 @@
 #include "WorldMagModel.h"
 #include "CoordinateConversions.h"
 
-//#define FULL_COLD_RESTART				// uncomment this to tell the GPS to do a FULL COLD restart
-//#define DISABLE_GPS_TRESHOLD			//
-
-// ****************
-// constants/macros/typdefs
-
-#define GPS_TIMEOUT_MS 500
-
 // ****************
 // Private functions
 
@@ -66,17 +58,20 @@ static void setHomeLocation(GPSPositionData * gpsData);
 // ****************
 // Private constants
 
+//#define FULL_COLD_RESTART             // uncomment this to tell the GPS to do a FULL COLD restart
+//#define DISABLE_GPS_TRESHOLD          //
+
+#define GPS_TIMEOUT_MS                  500
+#define GPS_COMMAND_RESEND_TIMEOUT_MS   2000
+
 // Unfortunately need a good size stack for the WMM calculation
 #ifdef ENABLE_GPS_BINARY_GTOP
-	#define STACK_SIZE_BYTES 800
+	#define STACK_SIZE_BYTES            800
 #else
-	#define STACK_SIZE_BYTES 800
+	#define STACK_SIZE_BYTES            800
 #endif
 
-#define TASK_PRIORITY (tskIDLE_PRIORITY + 1)
-
-// ****************
-// Private types
+#define TASK_PRIORITY                   (tskIDLE_PRIORITY + 1)
 
 // ****************
 // Private variables
@@ -271,14 +266,17 @@ static void gpsTask(void *parameters)
 		// Check for GPS timeout
 		timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
 		if ((timeNowMs - timeOfLastUpdateMs) > GPS_TIMEOUT_MS)
-		{
+		{	// we have not received any valid GPS sentences for a while.
+			// either the GPS is not plugged in or a hardware problem or the GPS has locked up.
+
 			GPSPositionGet(&GpsData);
 			GpsData.Status = GPSPOSITION_STATUS_NOGPS;
 			GPSPositionSet(&GpsData);
 			AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_ERROR);
 
-			if ((timeNowMs - timeOfLastCommandMs) > 5000)	/// 5000ms
-			{	// resend the command .. just case the gps has only just been plugged in or the gps did not get our last command
+			if ((timeNowMs - timeOfLastCommandMs) >= GPS_COMMAND_RESEND_TIMEOUT_MS)
+			{	// resend the command .. just incase the gps has only just been plugged in or the gps did not get our last command
+				timeOfLastCommandMs = timeNowMs;
 
 				#ifdef ENABLE_GPS_BINARY_GTOP
 					GTOP_BIN_init();
@@ -299,13 +297,11 @@ static void gpsTask(void *parameters)
 				#ifdef DISABLE_GPS_TRESHOLD
 					PIOS_COM_SendStringNonBlocking(gpsPort,"$PMTK397,0*23\r\n");
 				#endif
-
-				timeOfLastCommandMs = timeNowMs;
 			}
 		}
 		else
-		{
-			// Had an update
+		{	// we appear to be receiving GPS sentences OK, we've had an update
+
 			HomeLocationData home;
 			HomeLocationGet(&home);
 

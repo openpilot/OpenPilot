@@ -34,7 +34,6 @@
 #include "gpsposition.h"
 #include "gpstime.h"
 
-//#include <stdbool.h>
 #include <string.h>	// memmove
 
 #ifdef ENABLE_GPS_BINARY_GTOP
@@ -84,9 +83,10 @@ typedef struct
 
 // ************
 
-// buffer that holds the binary packet
+// buffer that holds the incoming binary packet
 static uint8_t gps_rx_buffer[sizeof(t_gps_bin_packet)] __attribute__ ((aligned(4)));
 
+// number of bytes currently in the binary packet buffer
 static uint8_t gps_rx_buffer_wr = 0;
 
 // ************
@@ -137,9 +137,8 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 			if (rx_packet->header == 0x2404)
 				break;	// found a valid header marker
 
-			// remove oldest byte from buffer
-			if (gps_rx_buffer_wr > 1)
-				memmove(gps_rx_buffer, gps_rx_buffer + 1, gps_rx_buffer_wr - 1);
+			// shift all the bytes down one position
+			memmove(gps_rx_buffer, gps_rx_buffer + 1, gps_rx_buffer_wr - 1);
 			gps_rx_buffer_wr--;
 		}
 
@@ -150,6 +149,7 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 
 		// we have enough bytes for a complete binary packet
 
+		// check to see if certain params are valid
 		if (rx_packet->header != 0x2404 ||
 			rx_packet->end_word != 0x0A0D ||
 			rx_packet->asterisk != 0x2A ||
@@ -159,6 +159,7 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 			(rx_packet->data.fix_type < 1 || rx_packet->data.fix_type > 3) )
 		{	// invalid packet
 			if (parsing_errors) *parsing_errors++;
+			// shift all the bytes down one position
 			memmove(gps_rx_buffer, gps_rx_buffer + 1, gps_rx_buffer_wr - 1);
 			gps_rx_buffer_wr--;
 			continue;
@@ -173,14 +174,13 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 			if (checksum != rx_packet->checksum)
 			{	// checksum error
 				if (chksum_errors) *chksum_errors++;
+				// shift all the bytes down one position
 				memmove(gps_rx_buffer, gps_rx_buffer + 1, gps_rx_buffer_wr - 1);
 				gps_rx_buffer_wr--;
 				continue;
 			}
 		}
 
-		// checksum appears correct
-		//
 		// we now have a valid complete binary packet, update the GpsData and GpsTime objects
 
 		// correct the endian order of the parameters
@@ -237,10 +237,10 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 		else
 			gps_rx_buffer_wr = 0;
 
-		return 0;	// found a valid packet
+		return 0;  // found a valid packet
 	}
 
-	return -1;	// no valid packet found
+	return -1;     // no valid packet found
 }
 
 // ************

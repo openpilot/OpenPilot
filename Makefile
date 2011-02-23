@@ -280,12 +280,22 @@ openpilot_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/openpilot
 	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/OpenPilot $*
 
+.PHONY: openpilot_clean
+openpilot_clean:
+	$(V0) @echo " CLEAN     $@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/openpilot
+
 .PHONY: bl_openpilot
 bl_openpilot: bl_openpilot_elf
 
 bl_openpilot_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_openpilot
 	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/bl_openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/OpenPilot $*
+
+.PHONY: bl_openpilot_clean
+bl_openpilot_clean:
+	$(V0) @echo " CLEAN     $@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/bl_openpilot
 
 .PHONY: ahrs
 ahrs: ahrs_elf
@@ -294,12 +304,22 @@ ahrs_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/ahrs
 	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/AHRS $*
 
+.PHONY: ahrs_clean
+ahrs_clean:
+	$(V0) @echo " CLEAN     $@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/ahrs
+
 .PHONY: bl_ahrs
 bl_ahrs: bl_ahrs_elf
 
 bl_ahrs_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_ahrs
 	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/bl_ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/AHRS $*
+
+.PHONY: bl_ahrs_clean
+bl_ahrs_clean:
+	$(V0) @echo " CLEAN     $@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/bl_ahrs
 
 .PHONY: coptercontrol
 coptercontrol: coptercontrol_elf
@@ -308,12 +328,22 @@ coptercontrol_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/coptercontrol
 	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/CopterControl $*
 
+.PHONY: coptercontrol_clean
+coptercontrol_clean:
+	$(V0) @echo " CLEAN     $@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/coptercontrol
+
 .PHONY: bl_coptercontrol
 bl_coptercontrol: bl_coptercontrol_elf
 
 bl_coptercontrol_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_coptercontrol
 	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/bl_coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/CopterControl $*
+
+.PHONY: bl_coptercontrol_clean
+bl_coptercontrol_clean:
+	$(V0) @echo " CLEAN     $@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/bl_coptercontrol
 
 .PHONY: pipxtreme
 pipxtreme: pipxtreme_elf
@@ -322,12 +352,22 @@ pipxtreme_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/pipxtreme
 	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/PipXtreme $*
 
+.PHONY: pipxtreme_clean
+pipxtreme_clean:
+	$(V0) @echo " CLEAN     $@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/pipxtreme
+
 .PHONY: bl_pipxtreme
 bl_pipxtreme: bl_pipxtreme_elf
 
 bl_pipxtreme_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_pipxtreme
 	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/bl_pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/PipXtreme $*
+
+.PHONY: bl_pipxtreme_clean
+bl_pipxtreme_clean:
+	$(V0) @echo " CLEAN     $@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/bl_pipxtreme
 
 .PHONY: sim_posix
 sim_posix: sim_posix_elf

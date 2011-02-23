@@ -760,7 +760,7 @@ void demo_slam01_main(world_ptr_t *world) {
 // std::cout << "SLAM: starting slam" << std::endl;
 
 	// Show empty map
-	std::cout << *mapPtr << std::endl;
+//	std::cout << *mapPtr << std::endl;
 
 	//worldPtr->display_mutex.unlock();
 
@@ -1154,7 +1154,7 @@ void demo_slam01() {
 		f >> rseed;
 		f.close();
 	}
-	std::cout << __FILE__ << ":" << __LINE__ << " rseed " << rseed << std::endl;
+	std::cout << "Random seed " << rseed << std::endl;
 	rtslam::srand(rseed);
 
 	#ifdef HAVE_MODULE_QDISPLAY
@@ -1251,7 +1251,7 @@ int main(int argc, char* const* argv)
 	floatOpts[fFreq] = 60.0;
 	floatOpts[fShutter] = 2e-3;
 	strOpts[sDataPath] = ".";
-	strOpts[sConfigSetup] = "data/setup.cfg";
+	strOpts[sConfigSetup] = "#!@";
 	strOpts[sConfigEstimation] = "data/estimation.cfg";
 	
 	while (1)
@@ -1303,6 +1303,18 @@ int main(int argc, char* const* argv)
 	if (intOpts[iReplay]) mode = 2; else
 		if (intOpts[iDump]) mode = 1; else
 			mode = 0;
+	if (strOpts[sConfigSetup] == "#!@")
+	{
+		if (intOpts[iReplay])
+			strOpts[sConfigSetup] = strOpts[sDataPath] + "/setup.cfg";
+		else
+			strOpts[sConfigSetup] = "data/setup.cfg";
+	}
+	if (strOpts[sConfigSetup][0] == '@' && strOpts[sConfigSetup][1] == '/')
+		strOpts[sConfigSetup] = strOpts[sDataPath] + strOpts[sConfigSetup].substr(1);
+	if (strOpts[sConfigEstimation][0] == '@' && strOpts[sConfigEstimation][1] == '/')
+		strOpts[sConfigEstimation] = strOpts[sDataPath] + strOpts[sConfigEstimation].substr(1);
+	if (!intOpts[iReplay] && intOpts[iDump]) boost::filesystem::copy_file(strOpts[sConfigSetup], strOpts[sDataPath] + "/setup.cfg");
 	#ifndef HAVE_MODULE_QDISPLAY
 	intOpts[iDispQt] = 0;
 	#endif
@@ -1311,8 +1323,10 @@ int main(int argc, char* const* argv)
 	#endif
 
 	try {
+		std::cout << "Loading config files " << strOpts[sConfigSetup] << " and " << strOpts[sConfigEstimation] << std::endl;
 		configSetup.load(strOpts[sConfigSetup]);
 		configEstimation.load(strOpts[sConfigEstimation]);
+		
 		demo_slam01();
 	} catch (kernel::Exception &e) { std::cout << e.what(); return 1; }
 }

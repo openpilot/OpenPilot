@@ -631,37 +631,36 @@ endif
 # Create final output file (.hex) from ELF output file.
 %.hex: %.elf
 	@echo $(MSG_LOAD_FILE) $@
-	$(OBJCOPY) -O ihex $< $@
+	$(V1) $(OBJCOPY) -O ihex $< $@
 
 # Create final output file (.bin) from ELF output file.
 %.bin: %.elf
 	@echo $(MSG_LOAD_FILE) $@
-	$(OBJCOPY) -O binary $< $@
+	$(V1) $(OBJCOPY) -O binary $< $@
 
 # Create extended listing file/disassambly from ELF output file.
 # using objdump testing: option -C
 %.lss: %.elf
 	@echo $(MSG_EXTENDED_LISTING) $@
-	$(OBJDUMP) -h -S -C -r $< > $@
+	$(V1) $(OBJDUMP) -h -S -C -r $< > $@
 
 # Create a symbol table from ELF output file.
 %.sym: %.elf
 	@echo $(MSG_SYMBOL_TABLE) $@
-	$(NM) -n $< > $@
+	$(V1) $(NM) -n $< > $@
 
 # Link: create ELF output file from object files.
 .SECONDARY : $(TARGET).elf
 .PRECIOUS : $(ALLOBJ)
 %.elf:  $(ALLOBJ)
 	@echo $(MSG_LINKING) $(call toprel, $@)
-	$(CC) $(THUMB) $(CFLAGS) $(ALLOBJ) --output $@ $(LDFLAGS)
+	$(V1) $(CC) $(THUMB) $(CFLAGS) $(ALLOBJ) --output $@ $(LDFLAGS)
 
- 
 # Assemble: create object files from assembler source files.
 define ASSEMBLE_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 	@echo $(MSG_ASSEMBLING) $$(call toprel, $$<)
-	$(CC) -c $(THUMB) $$(ASFLAGS) $$< -o $$@
+	$(V1) $(CC) -c $(THUMB) $$(ASFLAGS) $$< -o $$@
 endef
 $(foreach src, $(ASRC), $(eval $(call ASSEMBLE_TEMPLATE, $(src))))
 
@@ -669,7 +668,7 @@ $(foreach src, $(ASRC), $(eval $(call ASSEMBLE_TEMPLATE, $(src))))
 define ASSEMBLE_ARM_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 	@echo $(MSG_ASSEMBLING_ARM) $$(call toprel, $$<)
-	$(CC) -c $$(ASFLAGS) $$< -o $$@
+	$(V1) $(CC) -c $$(ASFLAGS) $$< -o $$@
 endef
 $(foreach src, $(ASRCARM), $(eval $(call ASSEMBLE_ARM_TEMPLATE, $(src))))
 
@@ -678,7 +677,7 @@ $(foreach src, $(ASRCARM), $(eval $(call ASSEMBLE_ARM_TEMPLATE, $(src))))
 define COMPILE_C_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 	@echo $(MSG_COMPILING) $$(call toprel, $$<)
-	$(CC) -c $(THUMB) $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
+	$(V1) $(CC) -c $(THUMB) $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
 endef
 $(foreach src, $(SRC), $(eval $(call COMPILE_C_TEMPLATE, $(src))))
 
@@ -686,7 +685,7 @@ $(foreach src, $(SRC), $(eval $(call COMPILE_C_TEMPLATE, $(src))))
 define COMPILE_C_ARM_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 	@echo $(MSG_COMPILING_ARM) $$(call toprel, $$<)
-	$(CC) -c $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
+	$(V1) $(CC) -c $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
 endef
 $(foreach src, $(SRCARM), $(eval $(call COMPILE_C_ARM_TEMPLATE, $(src))))
 
@@ -695,7 +694,7 @@ $(foreach src, $(SRCARM), $(eval $(call COMPILE_C_ARM_TEMPLATE, $(src))))
 define COMPILE_CPP_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 	@echo $(MSG_COMPILINGCPP) $$(call toprel, $$<)
-	$(CC) -c $(THUMB) $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@
+	$(V1) $(CC) -c $(THUMB) $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@
 endef
 $(foreach src, $(CPPSRC), $(eval $(call COMPILE_CPP_TEMPLATE, $(src))))
 
@@ -703,7 +702,7 @@ $(foreach src, $(CPPSRC), $(eval $(call COMPILE_CPP_TEMPLATE, $(src))))
 define COMPILE_CPP_ARM_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 	@echo $(MSG_COMPILINGCPP_ARM) $$(call toprel, $$<)
-	$(CC) -c $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@
+	$(V1) $(CC) -c $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@
 endef
 $(foreach src, $(CPPSRCARM), $(eval $(call COMPILE_CPP_ARM_TEMPLATE, $(src))))
 
@@ -711,12 +710,12 @@ $(foreach src, $(CPPSRCARM), $(eval $(call COMPILE_CPP_ARM_TEMPLATE, $(src))))
 # Compile: create assembler files from C source files. ARM/Thumb
 $(SRC:.c=.s) : %.s : %.c
 	@echo $(MSG_ASMFROMC) ${quote}$(call toprel, $<)${quote}
-	$(CC) $(THUMB) -S $(CFLAGS) $(CONLYFLAGS) $< -o $@
+	$(V1) $(CC) $(THUMB) -S $(CFLAGS) $(CONLYFLAGS) $< -o $@
 
 # Compile: create assembler files from C source files. ARM only
 $(SRCARM:.c=.s) : %.s : %.c
 	@echo $(MSG_ASMFROMC_ARM) ${quote}$(call toprel, $<)${quote}
-	$(CC) -S $(CFLAGS) $(CONLYFLAGS) $< -o $@
+	$(V1) $(CC) -S $(CFLAGS) $(CONLYFLAGS) $< -o $@
 
 # Generate Doxygen documents
 docs:
@@ -727,21 +726,21 @@ clean: clean_list
 
 clean_list :
 	@echo $(MSG_CLEANING)
-	$(REMOVE) $(OUTDIR)/$(TARGET).map
-	$(REMOVE) $(OUTDIR)/$(TARGET).elf
-	$(REMOVE) $(OUTDIR)/$(TARGET).hex
-	$(REMOVE) $(OUTDIR)/$(TARGET).bin
-	$(REMOVE) $(OUTDIR)/$(TARGET).sym
-	$(REMOVE) $(OUTDIR)/$(TARGET).lss
-	$(REMOVE) $(wildcard $(OUTDIR)/*.c)
-	$(REMOVE) $(wildcard $(OUTDIR)/*.h)
-	$(REMOVE) $(ALLOBJ)
-	$(REMOVE) $(LSTFILES)
-	$(REMOVE) $(DEPFILES)
-	$(REMOVE) $(SRC:.c=.s)
-	$(REMOVE) $(SRCARM:.c=.s)
-	$(REMOVE) $(CPPSRC:.cpp=.s)
-	$(REMOVE) $(CPPSRCARM:.cpp=.s)
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).map
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).elf
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).hex
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).sym
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).lss
+	$(V1) $(REMOVE) $(wildcard $(OUTDIR)/*.c)
+	$(V1) $(REMOVE) $(wildcard $(OUTDIR)/*.h)
+	$(V1) $(REMOVE) $(ALLOBJ)
+	$(V1) $(REMOVE) $(LSTFILES)
+	$(V1) $(REMOVE) $(DEPFILES)
+	$(V1) $(REMOVE) $(SRC:.c=.s)
+	$(V1) $(REMOVE) $(SRCARM:.c=.s)
+	$(V1) $(REMOVE) $(CPPSRC:.cpp=.s)
+	$(V1) $(REMOVE) $(CPPSRCARM:.cpp=.s)
 
 
 # Create output files directory

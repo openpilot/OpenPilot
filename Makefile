@@ -22,6 +22,18 @@ endif
 # Set up misc host tools
 RM=rm
 
+# Decide on a verbosity level based on the V= parameter
+export AT := @
+
+ifndef V
+export V0    :=
+export V1    := $(AT)
+else ifeq ($(V), 0)
+export V0    := $(AT)
+export V1    := $(AT)
+else ifeq ($(V), 1)
+endif
+
 .PHONY: areyousureyoushouldberunningthis
 areyousureyoushouldberunningthis:
 	@echo
@@ -106,15 +118,15 @@ qt_sdk_install: QT_SDK_URL  := http://get.qt.nokia.com/qtsdk/qt-sdk-linux-x86-op
 qt_sdk_install: QT_SDK_FILE := $(notdir $(QT_SDK_URL))
 qt_sdk_install: qt_sdk_clean $(TOOLS_DIR)
 	# download the source only if it's newer than what we already have
-	wget -N -P "$(DL_DIR)" "$(QT_SDK_URL)"
+	$(V1) wget -N -P "$(DL_DIR)" "$(QT_SDK_URL)"
 
 	#installer is an executable, make it executable and run it
-	chmod u+x "$(DL_DIR)/$(QT_SDK_FILE)"
+	$(V1) chmod u+x "$(DL_DIR)/$(QT_SDK_FILE)"
 	"$(DL_DIR)/$(QT_SDK_FILE)" --installdir "$(QT_SDK_DIR)"
 
 .PHONY: qt_sdk_clean
 qt_sdk_clean:
-	[ ! -d "$(QT_SDK_DIR)" ] || $(RM) -rf $(QT_SDK_DIR)
+	$(V1) [ ! -d "$(QT_SDK_DIR)" ] || $(RM) -rf $(QT_SDK_DIR)
 
 # Set up ARM (STM32) SDK
 ARM_SDK_DIR := $(TOOLS_DIR)/arm-2009q3
@@ -124,14 +136,14 @@ arm_sdk_install: ARM_SDK_URL  := http://www.codesourcery.com/sgpp/lite/arm/porta
 arm_sdk_install: ARM_SDK_FILE := $(notdir $(ARM_SDK_URL))
 arm_sdk_install: arm_sdk_clean $(TOOLS_DIR)
 	# download the source only if it's newer than what we already have
-	wget -N -P "$(DL_DIR)" "$(ARM_SDK_URL)"
+	$(V1) wget -N -P "$(DL_DIR)" "$(ARM_SDK_URL)"
 
 	# binary only release so just extract it
-	tar -C $(TOOLS_DIR) -xjf "$(DL_DIR)/$(ARM_SDK_FILE)"
+	$(V1) tar -C $(TOOLS_DIR) -xjf "$(DL_DIR)/$(ARM_SDK_FILE)"
 
 .PHONY: arm_sdk_clean
 arm_sdk_clean:
-	[ ! -d "$(ARM_SDK_DIR)" ] || $(RM) -r $(ARM_SDK_DIR)
+	$(V1) [ ! -d "$(ARM_SDK_DIR)" ] || $(RM) -r $(ARM_SDK_DIR)
 
 # Set up openocd tools
 OPENOCD_DIR := $(TOOLS_DIR)/openocd
@@ -141,16 +153,16 @@ openocd_install: OPENOCD_URL  := http://sourceforge.net/projects/openocd/files/o
 openocd_install: OPENOCD_FILE := openocd-0.4.0.tar.bz2
 openocd_install: openocd_clean $(TOOLS_DIR)
 	# download the source only if it's newer than what we already have
-	wget -N -P "$(DL_DIR)" --trust-server-name "$(OPENOCD_URL)"
+	$(V1) wget -N -P "$(DL_DIR)" --trust-server-name "$(OPENOCD_URL)"
 
 	# extract the source
-	[ ! -d "$(DL_DIR)/openocd-build" ] || $(RM) -r "$(DL_DIR)/openocd-build"
-	mkdir -p "$(DL_DIR)/openocd-build"
-	tar -C $(DL_DIR)/openocd-build -xjf "$(DL_DIR)/$(OPENOCD_FILE)"
+	$(V1) [ ! -d "$(DL_DIR)/openocd-build" ] || $(RM) -r "$(DL_DIR)/openocd-build"
+	$(V1) mkdir -p "$(DL_DIR)/openocd-build"
+	$(V1) tar -C $(DL_DIR)/openocd-build -xjf "$(DL_DIR)/$(OPENOCD_FILE)"
 
 	# build and install
-	mkdir -p "$(OPENOCD_DIR)"
-	( \
+	$(V1) mkdir -p "$(OPENOCD_DIR)"
+	$(V1) ( \
 	  cd $(DL_DIR)/openocd-build/openocd-0.4.0 ; \
 	  ./configure --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi ; \
 	  $(MAKE) ; \
@@ -158,11 +170,11 @@ openocd_install: openocd_clean $(TOOLS_DIR)
 	)
 
 	# delete the extracted source when we're done
-	[ ! -d "$(DL_DIR)/openocd-build" ] || $(RM) -r "$(DL_DIR)/openocd-build"
+	$(V1) [ ! -d "$(DL_DIR)/openocd-build" ] || $(RM) -r "$(DL_DIR)/openocd-build"
 
 .PHONY: openocd_clean
 openocd_clean:
-	[ ! -d "$(OPENOCD_DIR)" ] || $(RM) -r "$(OPENOCD_DIR)"
+	$(V1) [ ! -d "$(OPENOCD_DIR)" ] || $(RM) -r "$(OPENOCD_DIR)"
 
 ##############################
 #
@@ -206,16 +218,16 @@ gcs: openpilotgcs
 
 .PHONY: openpilotgcs
 openpilotgcs:  uavobjects_gcs
-	mkdir -p $(BUILD_DIR)/ground/$@
-	( cd $(BUILD_DIR)/ground/$@ ; \
+	$(V1) mkdir -p $(BUILD_DIR)/ground/$@
+	$(V1) ( cd $(BUILD_DIR)/ground/$@ ; \
 	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
 	  $(MAKE) -w ; \
 	)
 
 .PHONY: uavobjgenerator
 uavobjgenerator:
-	mkdir -p $(BUILD_DIR)/ground/$@
-	( cd $(BUILD_DIR)/ground/$@ ; \
+	$(V1) mkdir -p $(BUILD_DIR)/ground/$@
+	$(V1) ( cd $(BUILD_DIR)/ground/$@ ; \
 	  $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
 	  $(MAKE) -w ; \
 	)
@@ -227,18 +239,18 @@ UAVOBJ_XML_DIR := $(ROOT_DIR)/shared/uavobjectdefinition
 UAVOBJ_OUT_DIR := $(BUILD_DIR)/uavobject-synthetics
 
 $(UAVOBJ_OUT_DIR):
-	mkdir -p $@
+	$(V1) mkdir -p $@
 
 uavobjects_%: $(UAVOBJ_OUT_DIR) uavobjgenerator
-	( cd $(UAVOBJ_OUT_DIR) ; \
+	$(V1) ( cd $(UAVOBJ_OUT_DIR) ; \
 	  $(UAVOBJGENERATOR) -$* $(UAVOBJ_XML_DIR) $(ROOT_DIR) ; \
 	)
 
 uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
-	$(UAVOBJGENERATOR) -v -none $(UAVOBJ_XML_DIR) $(ROOT_DIR)
+	$(V1) $(UAVOBJGENERATOR) -v -none $(UAVOBJ_XML_DIR) $(ROOT_DIR)
 
 uavobjects_clean:
-	[ ! -d "$(UAVOBJ_OUT_DIR)" ] || $(RM) -r "$(UAVOBJ_OUT_DIR)"
+	$(V1) [ ! -d "$(UAVOBJ_OUT_DIR)" ] || $(RM) -r "$(UAVOBJ_OUT_DIR)"
 
 ##############################
 #
@@ -265,68 +277,68 @@ all_flight_clean: all_fw_clean all_bl_clean
 openpilot: openpilot_elf
 
 openpilot_%: uavobjects_flight
-	mkdir -p $(BUILD_DIR)/openpilot
-	$(MAKE) OUTDIR="$(BUILD_DIR)/openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/OpenPilot $*
+	$(V1) mkdir -p $(BUILD_DIR)/openpilot
+	$(V1) $(MAKE) OUTDIR="$(BUILD_DIR)/openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/OpenPilot $*
 
 .PHONY: bl_openpilot
 bl_openpilot: bl_openpilot_elf
 
 bl_openpilot_%:
-	mkdir -p $(BUILD_DIR)/bl_openpilot
-	$(MAKE) OUTDIR="$(BUILD_DIR)/bl_openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/OpenPilot $*
+	$(V1) mkdir -p $(BUILD_DIR)/bl_openpilot
+	$(V1) $(MAKE) OUTDIR="$(BUILD_DIR)/bl_openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/OpenPilot $*
 
 .PHONY: ahrs
 ahrs: ahrs_elf
 
 ahrs_%: uavobjects_flight
-	mkdir -p $(BUILD_DIR)/ahrs
-	$(MAKE) OUTDIR="$(BUILD_DIR)/ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/AHRS $*
+	$(V1) mkdir -p $(BUILD_DIR)/ahrs
+	$(V1) $(MAKE) OUTDIR="$(BUILD_DIR)/ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/AHRS $*
 
 .PHONY: bl_ahrs
 bl_ahrs: bl_ahrs_elf
 
 bl_ahrs_%:
-	mkdir -p $(BUILD_DIR)/bl_ahrs
-	$(MAKE) OUTDIR="$(BUILD_DIR)/bl_ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/AHRS $*
+	$(V1) mkdir -p $(BUILD_DIR)/bl_ahrs
+	$(V1) $(MAKE) OUTDIR="$(BUILD_DIR)/bl_ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/AHRS $*
 
 .PHONY: coptercontrol
 coptercontrol: coptercontrol_elf
 
 coptercontrol_%: uavobjects
-	mkdir -p $(BUILD_DIR)/coptercontrol
-	$(MAKE) OUTDIR="$(BUILD_DIR)/coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/CopterControl $*
+	$(V1) mkdir -p $(BUILD_DIR)/coptercontrol
+	$(V1) $(MAKE) OUTDIR="$(BUILD_DIR)/coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/CopterControl $*
 
 .PHONY: bl_coptercontrol
 bl_coptercontrol: bl_coptercontrol_elf
 
 bl_coptercontrol_%:
-	mkdir -p $(BUILD_DIR)/bl_coptercontrol
-	$(MAKE) OUTDIR="$(BUILD_DIR)/bl_coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/CopterControl $*
+	$(V1) mkdir -p $(BUILD_DIR)/bl_coptercontrol
+	$(V1) $(MAKE) OUTDIR="$(BUILD_DIR)/bl_coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/CopterControl $*
 
 .PHONY: pipxtreme
 pipxtreme: pipxtreme_elf
 
 pipxtreme_%: uavobjects_flight
-	mkdir -p $(BUILD_DIR)/pipxtreme
-	$(MAKE) OUTDIR="$(BUILD_DIR)/pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/PipXtreme $*
+	$(V1) mkdir -p $(BUILD_DIR)/pipxtreme
+	$(V1) $(MAKE) OUTDIR="$(BUILD_DIR)/pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/PipXtreme $*
 
 .PHONY: bl_pipxtreme
 bl_pipxtreme: bl_pipxtreme_elf
 
 bl_pipxtreme_%:
-	mkdir -p $(BUILD_DIR)/bl_pipxtreme
-	$(MAKE) OUTDIR="$(BUILD_DIR)/bl_pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/PipXtreme $*
+	$(V1) mkdir -p $(BUILD_DIR)/bl_pipxtreme
+	$(V1) $(MAKE) OUTDIR="$(BUILD_DIR)/bl_pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/PipXtreme $*
 
 .PHONY: sim_posix
 sim_posix: sim_posix_elf
 
 sim_posix_%: uavobjects_flight
-	mkdir -p $(BUILD_DIR)/sitl_posix
-	$(MAKE) -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.posix $*
+	$(V1) mkdir -p $(BUILD_DIR)/sitl_posix
+	$(V1) $(MAKE) -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.posix $*
 
 .PHONY: sim_win32
 sim_win32: sim_win32_exe
 
 sim_win32_%: uavobjects_flight
-	mkdir -p $(BUILD_DIR)/flight/sitl_win32
-	$(MAKE) -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.win32 $*
+	$(V1) mkdir -p $(BUILD_DIR)/flight/sitl_win32
+	$(V1) $(MAKE) -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.win32 $*

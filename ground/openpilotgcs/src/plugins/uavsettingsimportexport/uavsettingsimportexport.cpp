@@ -43,17 +43,9 @@
 // for XML object
 #include <QDomDocument>
 
-// for file dialog
+// for file dialog and error messages
 #include <QFileDialog>
-
-// Define USE_QFILEDIALOG to use Qt native QFileDialog() call.
-// Sometimes it leaves a GUI artifact (text box with a file name) on Windows.
-// If this is not defined then getSaveFileName() will be used instead.
-// It calls system native dialog function which should be free of that.
-//#define USE_QFILEDIALOG
-
-// Define this to export only values w/o extra info
-//#define EXPORT_VALUES_ONLY
+#include <QMessageBox>
 
 UAVSettingsImportExportPlugin::UAVSettingsImportExportPlugin() 
 { 
@@ -101,7 +93,38 @@ void UAVSettingsImportExportPlugin::extensionsInitialized()
 // TODO: import function is not implemented yet
 void UAVSettingsImportExportPlugin::importExport()
 {
-    // generate XML to export
+    // available formats
+    enum { UNDEF, UAV, XML, INI } fileFormat = UNDEF;
+
+    // ask for file name and export format
+    QString fileName;
+    QString filters = tr("UAV Settings files (*.uav)")
+             + ";;" + tr("Simple XML files (*.xml)")
+             + ";;" + tr("INI files (*.ini)");
+
+    fileName = QFileDialog::getSaveFileName(0, tr("Save UAV Settings File As"), "", filters);
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    // check export file format
+    QFileInfo fileInfo(fileName);
+    QString fileType = fileInfo.suffix().toLower();
+
+    if (fileType == "uav") {
+        fileFormat = UAV;
+    } else if (fileType == "xml") {
+        fileFormat = XML;
+    } else {
+        QMessageBox mb(QMessageBox::Information,
+                        tr("UAV Settings Export"),
+                        tr("Unsupported export file format: '") + fileType + "'",
+                        QMessageBox::Ok);
+        mb.exec();
+        return;
+    }
+
+    // generate an XML first (used for all export formats as a formatted data source)
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
@@ -120,12 +143,13 @@ void UAVSettingsImportExportPlugin::importExport()
                 QDomElement o = doc.createElement("object");
                 o.setAttribute("name", obj->getName());
                 o.setAttribute("id", QString("0x")+ QString().setNum(obj->getObjID(),16).toUpper());
-#ifndef EXPORT_VALUES_ONLY
-                QDomElement d = doc.createElement("description");
-                QDomText t = doc.createTextNode(obj->getDescription().remove("@Ref ", Qt::CaseInsensitive));
-                d.appendChild(t);
-                o.appendChild(d);
-#endif
+                if (fileFormat == UAV) {
+                    QDomElement d = doc.createElement("description");
+                    QDomText t = doc.createTextNode(obj->getDescription().remove("@Ref ", Qt::CaseInsensitive));
+                    d.appendChild(t);
+                    o.appendChild(d);
+                }
+
                 // iterate over fields
                 QList<UAVObjectField*> fieldList = obj->getFields();
 
@@ -142,47 +166,29 @@ void UAVSettingsImportExportPlugin::importExport()
 
                     f.setAttribute("name", field->getName());
                     f.setAttribute("values", vals);
-#ifndef EXPORT_VALUES_ONLY
-                    f.setAttribute("type", field->getTypeAsString());
-                    f.setAttribute("units", field->getUnits());
-                    f.setAttribute("elements", nelem);
-#endif
+                    if (fileFormat == UAV) {
+                        f.setAttribute("type", field->getTypeAsString());
+                        f.setAttribute("units", field->getUnits());
+                        f.setAttribute("elements", nelem);
+                        if (field->getType() == UAVObjectField::ENUM) {
+                            f.setAttribute("options", field->getOptions().join(","));
+                        }
+                    }
                     o.appendChild(f);
                 }
                 root.appendChild(o);
             }
         }
     }
+
+    // save file
     QString xml = doc.toString(4);
 
-    // save XML to a file
-    QString filters = tr("UAVSettings files (*.uav);;XML files (*.xml);;All files (*)");
-
-#ifdef USE_QFILEDIALOG
-    QFileDialog *fd = new QFileDialog();
-    fd->setAcceptMode(QFileDialog::AcceptSave);
-    fd->setNameFilter(filters);
-    fd->setDefaultSuffix("uav");
-
-    fd->exec();
-    if ((fd->result() == QFileDialog::Accepted) && (fd->selectedFiles().size() == 1)) {
-        QFile file(fd->selectedFiles().first());
-        if (file.open(QIODevice::WriteOnly)) {
-            file.write(xml.toAscii());
-            file.close();
-        }
+    QFile file(fileName);
+    if (file.open(QIODevice::WriteOnly)) {
+        file.write(xml.toAscii());
+        file.close();
     }
-#else
-    QString fn = QFileDialog::getSaveFileName(0, tr("Save UAVSettings File As"), "", filters);
-    if (!fn.isEmpty()) {
-        QFile file(fn);
-        if (file.open(QIODevice::WriteOnly)) {
-            file.write(xml.toAscii());
-            file.close();
-        }
-    }
-#endif // USE_QFILEDIALOG
-
 }
 
 void UAVSettingsImportExportPlugin::shutdown() 

@@ -41,7 +41,8 @@
 
 // ************************************
 
-enum {	RX_WAIT_PREAMBLE_MODE = 0,
+enum {	RX_SCAN_SPECTRUM = 0,
+		RX_WAIT_PREAMBLE_MODE,
 		RX_WAIT_SYNC_MODE,
 		RX_DATA_MODE,
 		TX_DATA_MODE,
@@ -391,17 +392,18 @@ enum {	RX_WAIT_PREAMBLE_MODE = 0,
 #define RFM22_header_cntl1_hdch_01				0x03		// Received Header check for bytes 0 & 1.
 
 #define RFM22_header_control2						0x33	// R/W
+#define RFM22_header_cntl2_prealen				0x01		// MSB of Preamble Length. See register Preamble Length.
+#define RFM22_header_cntl2_synclen_3			0x00		// Synchronization Word 3
+#define RFM22_header_cntl2_synclen_32			0x02		// Synchronization Word 3 followed by 2
+#define RFM22_header_cntl2_synclen_321			0x04		// Synchronization Word 3 followed by 2 followed by 1
+#define RFM22_header_cntl2_synclen_3210			0x06		// Synchronization Word 3 followed by 2 followed by 1 followed by 0
+#define RFM22_header_cntl2_fixpklen				0x08		// Fix Packet Length. When fixpklen = 1 the packet length (pklen[7:0]) is not included in the header. When fixpklen = 0 the packet length is included in the header.
 #define RFM22_header_cntl2_hdlen_none			0x00		// no header
 #define RFM22_header_cntl2_hdlen_3				0x10		// header 3
 #define RFM22_header_cntl2_hdlen_32				0x20		// header 3 and 2
 #define RFM22_header_cntl2_hdlen_321			0x30		// header 3 and 2 and 1
 #define RFM22_header_cntl2_hdlen_3210			0x40		// header 3 and 2 and 1 and 0
-#define RFM22_header_cntl2_fixpklen				0x08		// Fix Packet Length. When fixpklen = 1 the packet length (pklen[7:0]) is not included in the header. When fixpklen = 0 the packet length is included in the header.
-#define RFM22_header_cntl2_synclen_3			0x00		// Synchronization Word 3
-#define RFM22_header_cntl2_synclen_32			0x02		// Synchronization Word 3 followed by 2
-#define RFM22_header_cntl2_synclen_321			0x04		// Synchronization Word 3 followed by 2 followed by 1
-#define RFM22_header_cntl2_synclen_3210			0x06		// Synchronization Word 3 followed by 2 followed by 1 followed by 0
-#define RFM22_header_cntl2_prealen				0x01		// MSB of Preamble Length. See register Preamble Length.
+#define RFM22_header_cntl2_skipsyn				0x80		// If high, the system will ignore the syncword search timeout reset. The chip will not return to searching for Preamble, but instead will remain searching for Sync word.
 
 #define RFM22_preamble_length						0x34	// R/W
 
@@ -588,6 +590,10 @@ uint32_t rfm22_freqHopSize(void);
 void rfm22_setDatarate(uint32_t datarate_bps);
 uint32_t rfm22_getDatarate(void);
 
+void rfm22_setRxMode(uint8_t mode, bool multi_packet_mode);
+
+int16_t rfm22_getRSSI(void);
+
 int16_t rfm22_receivedRSSI(void);
 int32_t rfm22_receivedAFCHz(void);
 uint16_t rfm22_receivedLength(void);
@@ -616,7 +622,8 @@ bool rfm22_txReady(void);
 void rfm22_1ms_tick(void);
 void rfm22_process(void);
 
-int rfm22_init(uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t freq_hop_step_size);
+int rfm22_init_scan_spectrum(uint32_t min_frequency_hz, uint32_t max_frequency_hz);
+int rfm22_init_normal(uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t freq_hop_step_size);
 
 // ************************************
 

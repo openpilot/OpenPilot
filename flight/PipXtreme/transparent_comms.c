@@ -29,6 +29,7 @@
 #include "gpio_in.h"
 #include "transparent_comms.h"
 #include "packet_handler.h"
+#include "saved_settings.h"
 #include "main.h"
 
 #if defined(PIOS_COM_DEBUG)
@@ -104,98 +105,111 @@ void trans_process(void)
 	// ********************
 	// send the data received down the comm-port to the RF packet handler TX buffer
 
-	// free space size in the RF packet handler tx buffer
-	uint16_t ph_num = ph_putData_free(connection_index);
-
-	// get the number of data bytes received down the comm-port
-	int32_t com_num = PIOS_COM_ReceiveBufferUsed(comm_port);
-
-	// set the USART RTS handshaking line
-	if (!usb_comms)
+	if (saved_settings.mode == MODE_NORMAL || saved_settings.mode == MODE_STREAM_TX)
 	{
-		if (ph_num < 32 || !ph_connected(connection_index))
-			SERIAL_RTS_CLEAR;						// lower the USART RTS line - we don't have space in the buffer for anymore bytes
+		// free space size in the RF packet handler tx buffer
+		uint16_t ph_num = ph_putData_free(connection_index);
+
+		// get the number of data bytes received down the comm-port
+		int32_t com_num = PIOS_COM_ReceiveBufferUsed(comm_port);
+
+		// set the USART RTS handshaking line
+		if (!usb_comms)
+		{
+			if (ph_num < 32 || !ph_connected(connection_index))
+				SERIAL_RTS_CLEAR;						// lower the USART RTS line - we don't have space in the buffer for anymore bytes
+			else
+				SERIAL_RTS_SET;							// release the USART RTS line - we have space in the buffer for now bytes
+		}
 		else
-			SERIAL_RTS_SET;							// release the USART RTS line - we have space in the buffer for now bytes
+			SERIAL_RTS_SET;								// release the USART RTS line
+
+		// limit number of bytes we will get to the size of the temp buffer
+		if (com_num > sizeof(trans_temp_buffer1))
+			com_num = sizeof(trans_temp_buffer1);
+
+		// limit number of bytes we will get to the size of the free space in the RF packet handler TX buffer
+		if (com_num > ph_num)
+			com_num = ph_num;
+
+		// copy data received down the comm-port into our temp buffer
+		register uint16_t bytes_saved = 0;
+		while (bytes_saved < com_num)
+			trans_temp_buffer1[bytes_saved++] = PIOS_COM_ReceiveBuffer(comm_port);
+
+		// put the received comm-port data bytes into the RF packet handler TX buffer
+		if (bytes_saved > 0)
+		{
+			trans_rx_timer = 0;
+			ph_putData(connection_index, trans_temp_buffer1, bytes_saved);
+		}
 	}
 	else
-		SERIAL_RTS_SET;								// release the USART RTS line
-
-	// limit number of bytes we will get to the size of the temp buffer
-	if (com_num > sizeof(trans_temp_buffer1))
-		com_num = sizeof(trans_temp_buffer1);
-
-	// limit number of bytes we will get to the size of the free space in the RF packet handler TX buffer
-	if (com_num > ph_num)
-		com_num = ph_num;
-
-	// copy data received down the comm-port into our temp buffer
-	register uint16_t bytes_saved = 0;
-	while (bytes_saved < com_num)
-		trans_temp_buffer1[bytes_saved++] = PIOS_COM_ReceiveBuffer(comm_port);
-
-	// put the received comm-port data bytes into the RF packet handler TX buffer
-	if (bytes_saved > 0)
-	{
-		trans_rx_timer = 0;
-		ph_putData(connection_index, trans_temp_buffer1, bytes_saved);
+	{	// empty the comm-ports rx buffer
+		int32_t com_num = PIOS_COM_ReceiveBufferUsed(comm_port);
+		while (com_num > 0)
+			PIOS_COM_ReceiveBuffer(comm_port);
 	}
 
 	// ********************
 	// send the data received via the RF link out the comm-port
 
-	if (trans_temp_buffer2_wr < sizeof(trans_temp_buffer2))
+	if (saved_settings.mode == MODE_NORMAL || saved_settings.mode == MODE_STREAM_RX)
 	{
-		// get number of data bytes received via the RF link
-		ph_num = ph_getData_used(connection_index);
+		if (trans_temp_buffer2_wr < sizeof(trans_temp_buffer2))
+		{
+			// get number of data bytes received via the RF link
+			uint16_t ph_num = ph_getData_used(connection_index);
 
-		// limit to how much space we have in the temp buffer
-		if (ph_num > sizeof(trans_temp_buffer2) - trans_temp_buffer2_wr)
-			ph_num = sizeof(trans_temp_buffer2) - trans_temp_buffer2_wr;
+			// limit to how much space we have in the temp buffer
+			if (ph_num > sizeof(trans_temp_buffer2) - trans_temp_buffer2_wr)
+				ph_num = sizeof(trans_temp_buffer2) - trans_temp_buffer2_wr;
 
-		if (ph_num > 0)
-		{	// fetch the data bytes received via the RF link and save into our temp buffer
-			ph_num = ph_getData(connection_index, trans_temp_buffer2 + trans_temp_buffer2_wr, ph_num);
-			trans_temp_buffer2_wr += ph_num;
+			if (ph_num > 0)
+			{	// fetch the data bytes received via the RF link and save into our temp buffer
+				ph_num = ph_getData(connection_index, trans_temp_buffer2 + trans_temp_buffer2_wr, ph_num);
+				trans_temp_buffer2_wr += ph_num;
+			}
 		}
-	}
 
-	#if (defined(PIOS_COM_DEBUG) && (PIOS_COM_DEBUG == PIOS_COM_SERIAL))
-		if (!usb_comms)
-		{	// the serial-port is being used for debugging - don't send data down it
-			trans_temp_buffer2_wr = 0;
-			trans_tx_timer = 0;
-			return;
-		}
-	#endif
-
-	if (trans_temp_buffer2_wr > 0)
-	{	// we have data in our temp buffer that needs sending out the comm-port
-
-		if (usb_comms || (!usb_comms && GPIO_IN(SERIAL_CTS_PIN)))
-		{	// we are OK to send the data out the comm-port
-
-			// send the data out the comm-port
-			int32_t res;
-//			if (usb_comms)
-//				res = PIOS_COM_SendBuffer(comm_port, trans_temp_buffer2, trans_temp_buffer2_wr);
-//			else
-				res = PIOS_COM_SendBufferNonBlocking(comm_port, trans_temp_buffer2, trans_temp_buffer2_wr);	// this one doesn't work properly with USB :(
-			if (res >= 0)
-			{	// data was sent out the comm-port OK .. remove the sent data from the temp buffer
+		#if (defined(PIOS_COM_DEBUG) && (PIOS_COM_DEBUG == PIOS_COM_SERIAL))
+			if (!usb_comms)
+			{	// the serial-port is being used for debugging - don't send data down it
 				trans_temp_buffer2_wr = 0;
 				trans_tx_timer = 0;
+				return;
 			}
-			else
-			{	// failed to send the data out the comm-port
-				#if defined(TRANS_DEBUG)
-					DEBUG_PRINTF("PIOS_COM_SendBuffer %d %d\r\n", trans_temp_buffer2_wr, res);
-				#endif
+		#endif
 
-				if (trans_tx_timer >= 5000)
-					trans_temp_buffer2_wr = 0;	// seems we can't send our data for at least the last 5 seconds - delete it
+		if (trans_temp_buffer2_wr > 0)
+		{	// we have data in our temp buffer that needs sending out the comm-port
+
+			if (usb_comms || (!usb_comms && GPIO_IN(SERIAL_CTS_PIN)))
+			{	// we are OK to send the data out the comm-port
+
+				// send the data out the comm-port
+				int32_t res = PIOS_COM_SendBufferNonBlocking(comm_port, trans_temp_buffer2, trans_temp_buffer2_wr);	// this one doesn't work properly with USB :(
+				if (res >= 0)
+				{	// data was sent out the comm-port OK .. remove the sent data from the temp buffer
+					trans_temp_buffer2_wr = 0;
+					trans_tx_timer = 0;
+				}
+				else
+				{	// failed to send the data out the comm-port
+					#if defined(TRANS_DEBUG)
+						DEBUG_PRINTF("PIOS_COM_SendBuffer %d %d\r\n", trans_temp_buffer2_wr, res);
+					#endif
+
+					if (trans_tx_timer >= 5000)
+						trans_temp_buffer2_wr = 0;	// seems we can't send our data for at least the last 5 seconds - delete it
+				}
 			}
 		}
+	}
+	else
+	{	// empty the buffer
+		trans_temp_buffer2_wr = 0;
+		trans_tx_timer = 0;
 	}
 
 	// ********************

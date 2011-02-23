@@ -38,7 +38,6 @@
 #include "rfm22b.h"
 #include "packet_handler.h"
 #include "stream.h"
-#include "scan_spectrum.h"
 #include "ppm.h"
 #include "transparent_comms.h"
 //#include "api_comms.h"
@@ -206,9 +205,6 @@ void TIMER_INT_FUNC(void)
 			if (mode == MODE_STREAM_TX || mode == MODE_STREAM_RX)
 				stream_1ms_tick();		// continuous data stream tick
 
-			if (mode == MODE_SCAN_SPECTRUM)
-				ss_1ms_tick();			// spectrum scan tick
-
 			if (mode == MODE_PPM_TX || mode == MODE_PPM_RX)
 				ppm_1ms_tick();			// ppm tick
 
@@ -322,7 +318,7 @@ void init_RF_module(void)
         case FREQBAND_434MHz:
         case FREQBAND_868MHz:
         case FREQBAND_915MHz:
-            i = rfm22_init(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz, 50000);
+            i = rfm22_init_normal(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz, 50000);
             break;
 
         default:
@@ -720,8 +716,6 @@ int main()
 
     ppm_init();			// initialise the ppm module
 
-    ss_init();			// initialise the spectrum scanning module
-
     saved_settings_save();
 
     booting = FALSE;
@@ -810,9 +804,6 @@ int main()
 
 		if (mode == MODE_STREAM_TX || mode == MODE_STREAM_RX)
 			stream_process();			// continuous data stream processing
-
-		if (mode == MODE_SCAN_SPECTRUM)
-			ss_process();				// spectrum scan processing
 
 		if (mode == MODE_PPM_TX || mode == MODE_PPM_RX)
 			ppm_process();				// ppm processing

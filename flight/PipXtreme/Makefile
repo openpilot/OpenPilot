@@ -106,7 +106,6 @@ SRC += $(HOME_DIR)/aes.c
 SRC += $(HOME_DIR)/rfm22b.c
 SRC += $(HOME_DIR)/packet_handler.c
 SRC += $(HOME_DIR)/stream.c
-SRC += $(HOME_DIR)/scan_spectrum.c
 SRC += $(HOME_DIR)/ppm.c
 SRC += $(HOME_DIR)/transparent_comms.c
 #SRC += $(HOME_DIR)/api_comms.c

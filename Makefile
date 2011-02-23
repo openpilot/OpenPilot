@@ -304,7 +304,7 @@ bl_ahrs_%:
 .PHONY: coptercontrol
 coptercontrol: coptercontrol_elf
 
-coptercontrol_%: uavobjects
+coptercontrol_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/coptercontrol
 	$(V1) $(MAKE) OUTDIR="$(BUILD_DIR)/coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/CopterControl $*
 

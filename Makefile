@@ -229,7 +229,7 @@ uavobjgenerator:
 	$(V1) mkdir -p $(BUILD_DIR)/ground/$@
 	$(V1) ( cd $(BUILD_DIR)/ground/$@ ; \
 	  $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
-	  $(MAKE) -w ; \
+	  $(MAKE) --no-print-directory -w ; \
 	)
 
 .PHONY:uavobjects
@@ -278,67 +278,67 @@ openpilot: openpilot_elf
 
 openpilot_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/openpilot
-	$(V1) $(MAKE) OUTDIR="$(BUILD_DIR)/openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/OpenPilot $*
+	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/OpenPilot $*
 
 .PHONY: bl_openpilot
 bl_openpilot: bl_openpilot_elf
 
 bl_openpilot_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_openpilot
-	$(V1) $(MAKE) OUTDIR="$(BUILD_DIR)/bl_openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/OpenPilot $*
+	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/bl_openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/OpenPilot $*
 
 .PHONY: ahrs
 ahrs: ahrs_elf
 
 ahrs_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/ahrs
-	$(V1) $(MAKE) OUTDIR="$(BUILD_DIR)/ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/AHRS $*
+	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/AHRS $*
 
 .PHONY: bl_ahrs
 bl_ahrs: bl_ahrs_elf
 
 bl_ahrs_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_ahrs
-	$(V1) $(MAKE) OUTDIR="$(BUILD_DIR)/bl_ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/AHRS $*
+	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/bl_ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/AHRS $*
 
 .PHONY: coptercontrol
 coptercontrol: coptercontrol_elf
 
 coptercontrol_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/coptercontrol
-	$(V1) $(MAKE) OUTDIR="$(BUILD_DIR)/coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/CopterControl $*
+	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/CopterControl $*
 
 .PHONY: bl_coptercontrol
 bl_coptercontrol: bl_coptercontrol_elf
 
 bl_coptercontrol_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_coptercontrol
-	$(V1) $(MAKE) OUTDIR="$(BUILD_DIR)/bl_coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/CopterControl $*
+	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/bl_coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/CopterControl $*
 
 .PHONY: pipxtreme
 pipxtreme: pipxtreme_elf
 
 pipxtreme_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/pipxtreme
-	$(V1) $(MAKE) OUTDIR="$(BUILD_DIR)/pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/PipXtreme $*
+	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/PipXtreme $*
 
 .PHONY: bl_pipxtreme
 bl_pipxtreme: bl_pipxtreme_elf
 
 bl_pipxtreme_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_pipxtreme
-	$(V1) $(MAKE) OUTDIR="$(BUILD_DIR)/bl_pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/PipXtreme $*
+	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/bl_pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/PipXtreme $*
 
 .PHONY: sim_posix
 sim_posix: sim_posix_elf
 
 sim_posix_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/sitl_posix
-	$(V1) $(MAKE) -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.posix $*
+	$(V1) $(MAKE) --no-print-directory -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.posix $*
 
 .PHONY: sim_win32
 sim_win32: sim_win32_exe
 
 sim_win32_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/flight/sitl_win32
-	$(V1) $(MAKE) -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.win32 $*
+	$(V1) $(MAKE) --no-print-directory -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.win32 $*

@@ -105,10 +105,10 @@ typedef struct
 typedef struct
 {
 	uint32_t	start_frequency;
-	float	    frequency_step_size;
+	uint16_t    frequency_step_size;
 	uint16_t    magnitudes;
 //	int8_t      magnitude[0];
-} t_pipx_config_data_spectrum;
+} t_pipx_config_spectrum;
 
 #pragma pack(pop)
 
@@ -162,6 +162,7 @@ private:
 	t_pipx_config_details	pipx_config_details;
 	t_pipx_config_settings	pipx_config_settings;
 	t_pipx_config_state		pipx_config_state;
+	t_pipx_config_spectrum	pipx_config_spectrum;
 
 	uint32_t updateCRC32(uint32_t crc, uint8_t b);
 	uint32_t updateCRC32Data(uint32_t crc, void *data, int len);

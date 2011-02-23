@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>571</width>
-    <height>508</height>
+    <height>527</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -810,6 +810,9 @@
      </item>
      <item row="7" column="4">
       <widget class="QSpinBox" name="spinBox_RTSTime">
+       <property name="toolTip">
+        <string>Ready-To-Send time is the maximum time the modem waits for more data before sending it. This is to try and make the RF link a little more efficient by creating larger packets.</string>
+       </property>
        <property name="maximum">
         <number>100</number>
        </property>
@@ -952,6 +955,13 @@
     <widget class="Line" name="line_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_19">
+     <property name="text">
+      <string>TextLabel</string>
      </property>
     </widget>
    </item>

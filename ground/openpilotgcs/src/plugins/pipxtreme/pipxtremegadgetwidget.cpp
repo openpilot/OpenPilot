@@ -51,7 +51,8 @@ enum {
 	PIPX_PACKET_TYPE_REQ_SETTINGS,
 	PIPX_PACKET_TYPE_SETTINGS,
 	PIPX_PACKET_TYPE_REQ_STATE,
-	PIPX_PACKET_TYPE_STATE
+	PIPX_PACKET_TYPE_STATE,
+	PIPX_PACKET_TYPE_SPECTRUM
 };
 
 enum {
@@ -870,7 +871,7 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 
 				memcpy(&pipx_config_details, data, sizeof(t_pipx_config_details));
 
-				if (pipx_config_details.major_version < 0 || (pipx_config_details.major_version <= 0 && pipx_config_details.minor_version < 5))
+				if (pipx_config_details.major_version < 0 || (pipx_config_details.major_version <= 0 && pipx_config_details.minor_version < 6))
 				{
 					QMessageBox msgBox;
 					msgBox.setIcon(QMessageBox::Critical);
@@ -982,6 +983,47 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 				m_widget->label_RSSI->setText("RSSI " + QString::number(pipx_config_state.rssi) + "dBm");
 				m_widget->lineEdit_RxAFC->setText(QString::number(pipx_config_state.afc) + "Hz");
 				m_widget->lineEdit_Retries->setText(QString::number(pipx_config_state.retries));
+			}
+
+			break;
+
+		case PIPX_PACKET_TYPE_SPECTRUM:	// a packet with scanned spectrum data
+			if (pipx_config_details.serial_number != 0)
+			{
+				if (packet_size < (int)sizeof(t_pipx_config_header) + (int)sizeof(t_pipx_config_spectrum))
+					break;	// packet size is too small - error
+
+				memcpy(&pipx_config_spectrum, data, sizeof(t_pipx_config_spectrum));
+				int8_t *spec_data = (int8_t *)(data + sizeof(t_pipx_config_spectrum));
+
+				if (pipx_config_spectrum.magnitudes > 0)
+				{
+					m_widget->label_19->setText(QString::number(pipx_config_spectrum.start_frequency) + " " + QString::number(pipx_config_spectrum.frequency_step_size) + " " + QString::number(pipx_config_spectrum.magnitudes));
+/*
+					QGraphicsScene *spec_scene = m_widget->graphicsView_Spectrum->scene();
+					if (spec_scene)
+					{
+						if (pipx_config_spectrum.start_frequency - pipx_config_details.min_frequency_Hz <= 0)
+							spec_scene->clear();
+
+						int w = 500;
+						int h = 500;
+
+						float xscale = (float)w / (pipx_config_details.max_frequency_Hz - pipx_config_details.min_frequency_Hz);
+						float yscale = h / 128.0f;
+
+						float xs = xscale * (pipx_config_spectrum.start_frequency - pipx_config_details.min_frequency_Hz);
+
+						for (int i = 0; i < pipx_config_spectrum.magnitudes; i++)
+						{
+							int x = -(w / 2) + xs + (xscale * i * pipx_config_spectrum.frequency_step_size);
+							int rssi = (int)spec_data[i] + 128;
+							int y = yscale * rssi;
+							spec_scene->addLine(x, -h / 2, x, (-h / 2) - y, QPen(Qt::green, 1, Qt::SolidLine, Qt::SquareCap));
+						}
+					}
+*/
+				}
 			}
 
 			break;

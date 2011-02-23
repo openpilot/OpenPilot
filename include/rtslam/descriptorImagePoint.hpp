@@ -104,7 +104,7 @@ namespace jafar {
 		{
 			public:
 				typedef std::vector<FeatureView> FeatureViewList; ///< a FeatureView list
-				enum PredictionType { ptNone, ptAffine, ptHomographic };
+				enum PredictionType { ptNone = 0, ptAffine, ptHomographic };
 				
 			protected:
 				FeatureViewList views; ///< the different views of the feature

@@ -272,12 +272,12 @@ void demo_slam01_main(world_ptr_t *world) {
 	boost::shared_ptr<ObservationFactory> obsFact(new ObservationFactory());
 	if (intOpts[iSimu] != 0)
 	{
-		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpSimuObservationMaker(REPARAM_TH, KILL_SEARCH_SIZE, 30, 0.5, 0.5, D_MIN, PATCH_SIZE)));
-		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpSimuObservationMaker(REPARAM_TH, KILL_SEARCH_SIZE, 30, 0.5, 0.5, D_MIN, PATCH_SIZE)));
+		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpSimuObservationMaker(configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5, configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
+		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpSimuObservationMaker(configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5, configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
 	} else
 	{
-		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpObservationMaker(REPARAM_TH, KILL_SEARCH_SIZE, 30, 0.5, 0.5, D_MIN, PATCH_SIZE)));
-		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpObservationMaker(REPARAM_TH, KILL_SEARCH_SIZE, 30, 0.5, 0.5, D_MIN, PATCH_SIZE)));
+		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpObservationMaker(configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5, configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
+		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpObservationMaker(configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5, configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
 	}
 
 
@@ -290,7 +290,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 
 	// 1. Create maps.
-	map_ptr_t mapPtr(new MapAbstract(MAP_SIZE));
+	map_ptr_t mapPtr(new MapAbstract(configEstimation.MAP_SIZE));
 	worldPtr->addMap(mapPtr);
 	// 1b. Create map manager.
 	boost::shared_ptr<MapManager<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> > mmPoint(new MapManager<
@@ -520,9 +520,9 @@ void demo_slam01_main(world_ptr_t *world) {
 	}
 	//senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(img_width, img_height);
-	senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, CORRECTION_SIZE);
+	senPtr11->params.setIntrinsicCalibration(intrinsic, distortion, configEstimation.CORRECTION_SIZE);
 	//JFR_DEBUG("Correction params: " << senPtr11->params.correction);
-	senPtr11->params.setMiscellaneous(PIX_NOISE, D_MIN);
+	senPtr11->params.setMiscellaneous(configEstimation.PIX_NOISE, configEstimation.D_MIN);
 
 	if (intOpts[iSimu] != 0)
 	{
@@ -536,14 +536,19 @@ void demo_slam01_main(world_ptr_t *world) {
 	}
 	
 	// 3b. Create data manager.
-	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(img_width, img_height, GRID_HCELLS, GRID_VCELLS, GRID_MARGIN, GRID_SEPAR));
+	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(img_width, img_height, configEstimation.GRID_HCELLS, configEstimation.GRID_VCELLS, configEstimation.GRID_MARGIN, configEstimation.GRID_SEPAR));
 	
+	#if RANSAC_FIRST
+	int ransac_ntries = configEstimation.RANSAC_NTRIES;
+	#else
+	int ransac_ntries = 0;
+	#endif
 	if (intOpts[iSimu] != 0)
 	{
-		boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, PATCH_SIZE, PIX_NOISE, PIX_NOISE*PIX_NOISE_SIMUFACTOR));
-		boost::shared_ptr<simu::MatcherSimu<image::ConvexRoi> > matcher(new simu::MatcherSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, PATCH_SIZE, MAX_SEARCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, RELEVANCE_TH, PIX_NOISE, PIX_NOISE*PIX_NOISE_SIMUFACTOR));
+		boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
+		boost::shared_ptr<simu::MatcherSimu<image::ConvexRoi> > matcher(new simu::MatcherSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, configEstimation.PATCH_SIZE, configEstimation.MAX_SEARCH_SIZE, configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
 		
-		boost::shared_ptr<DataManager_ImagePoint_Ransac_Simu> dmPt11(new DataManager_ImagePoint_Ransac_Simu(detector, matcher, asGrid, N_UPDATES_TOTAL, N_UPDATES_RANSAC, RANSAC_NTRIES, N_INIT, N_RECOMP_GAINS));
+		boost::shared_ptr<DataManager_ImagePoint_Ransac_Simu> dmPt11(new DataManager_ImagePoint_Ransac_Simu(detector, matcher, asGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
 
 		dmPt11->linkToParentSensorSpec(senPtr11);
 		dmPt11->linkToParentMapManager(mmPoint);
@@ -554,14 +559,14 @@ void demo_slam01_main(world_ptr_t *world) {
 	} else
 	{
 		#if MULTIVIEW_DESCRIPTOR
-		boost::shared_ptr<DescriptorImagePointMultiViewFactory> descFactory(new DescriptorImagePointMultiViewFactory(DESC_SIZE, DESC_SCALE_STEP, DESC_ANGLE_STEP, DESC_PREDICTION_TYPE));
+		boost::shared_ptr<DescriptorImagePointMultiViewFactory> descFactory(new DescriptorImagePointMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImagePointMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
 		#else
-		boost::shared_ptr<DescriptorImagePointFirstViewFactory> descFactory(new DescriptorImagePointFirstViewFactory(DESC_SIZE));
+		boost::shared_ptr<DescriptorImagePointFirstViewFactory> descFactory(new DescriptorImagePointFirstViewFactory(configEstimation.DESC_SIZE));
 		#endif
-		boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE, PATCH_SIZE, PIX_NOISE, descFactory));
-		boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(MIN_SCORE, PARTIAL_POSITION, PATCH_SIZE, MAX_SEARCH_SIZE, RANSAC_LOW_INNOV, MATCH_TH, MAHALANOBIS_TH, RELEVANCE_TH, PIX_NOISE));
+		boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(configEstimation.HARRIS_CONV_SIZE, configEstimation.HARRIS_TH, configEstimation.HARRIS_EDDGE, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, descFactory));
+		boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(configEstimation.MIN_SCORE, configEstimation.PARTIAL_POSITION, configEstimation.PATCH_SIZE, configEstimation.MAX_SEARCH_SIZE, configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE));
 		
-		boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, N_UPDATES_TOTAL, N_UPDATES_RANSAC, RANSAC_NTRIES, N_INIT, N_RECOMP_GAINS));
+		boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
 
 		dmPt11->linkToParentSensorSpec(senPtr11);
 		dmPt11->linkToParentMapManager(mmPoint);
@@ -1006,14 +1011,14 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 		#ifdef HAVE_MODULE_QDISPLAY
 		if (intOpts[iDispQt])
 		{
-			display::ViewerQt *viewerQt = new display::ViewerQt(8, MAHALANOBIS_TH, false, "data/rendered2D_%02d-%06d.png");
+			display::ViewerQt *viewerQt = new display::ViewerQt(8, configEstimation.MAHALANOBIS_TH, false, "data/rendered2D_%02d-%06d.png");
 			worldPtr->addDisplayViewer(viewerQt, display::ViewerQt::id());
 		}
 		#endif
 		#ifdef HAVE_MODULE_GDHE
 		if (intOpts[iDispGdhe])
 		{
-			display::ViewerGdhe *viewerGdhe = new display::ViewerGdhe("camera", MAHALANOBIS_TH, "localhost");
+			display::ViewerGdhe *viewerGdhe = new display::ViewerGdhe("camera", configEstimation.MAHALANOBIS_TH, "localhost");
 			boost::filesystem::path ram_path("/mnt/ram");
 			if (boost::filesystem::exists(ram_path) && boost::filesystem::is_directory(ram_path))
 				viewerGdhe->setConvertTempPath("/mnt/ram");
@@ -1154,6 +1159,7 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 
 			try {
 				configSetup.load(strOpts[sConfigSetup]);
+				configEstimation.load(strOpts[sConfigEstimation]);
 				demo_slam01();
 			} catch (kernel::Exception &e) { std::cout << e.what(); return 1; }
 		}

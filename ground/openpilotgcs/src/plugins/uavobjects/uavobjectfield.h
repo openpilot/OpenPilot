@@ -47,6 +47,7 @@ public:
     void initialize(quint8* data, quint32 dataOffset, UAVObject* obj);
     UAVObject* getObject();
     FieldType getType();
+    QString getTypeAsString();
     QString getName();
     QString getUnits();
     quint32 getNumElements();

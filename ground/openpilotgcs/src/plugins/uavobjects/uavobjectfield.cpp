@@ -107,6 +107,33 @@ UAVObjectField::FieldType UAVObjectField::getType()
     return type;
 }
 
+QString UAVObjectField::getTypeAsString()
+{
+    switch (type)
+    {
+        case UAVObjectField::INT8:
+            return "int8";
+        case UAVObjectField::INT16:
+            return "int16";
+        case UAVObjectField::INT32:
+            return "int32";
+        case UAVObjectField::UINT8:
+            return "uint8";
+        case UAVObjectField::UINT16:
+            return "uint16";
+        case UAVObjectField::UINT32:
+            return "uint32";
+        case UAVObjectField::FLOAT32:
+            return "float32";
+        case UAVObjectField::ENUM:
+            return "enum";
+        case UAVObjectField::STRING:
+            return "string";
+        default:
+            return "";
+    }
+}
+
 QStringList UAVObjectField::getElementNames()
 {
     return elementNames;

@@ -132,42 +132,6 @@ void UAVSettingsImportExportPlugin::importExport()
                 foreach (UAVObjectField* field, fieldList) {
                     QDomElement f = doc.createElement("field");
 
-#ifndef EXPORT_VALUES_ONLY
-                    QString type;
-                    switch (field->getType()) {
-                        // TODO: extend UAVObjectField class with getTypeString() member instead of this switch
-                        case UAVObjectField::INT8:
-                            type = "int8";
-                            break;
-                        case UAVObjectField::INT16:
-                            type = "int16";
-                            break;
-                        case UAVObjectField::INT32:
-                            type = "int32";
-                            break;
-                        case UAVObjectField::UINT8:
-                            type = "uint8";
-                            break;
-                        case UAVObjectField::UINT16:
-                            type = "uint16";
-                            break;
-                        case UAVObjectField::UINT32:
-                            type = "uint32";
-                            break;
-                        case UAVObjectField::FLOAT32:
-                            type = "float32";
-                            break;
-                        case UAVObjectField::ENUM:
-                            type = "enum";
-                            break;
-                        case UAVObjectField::STRING:
-                            type = "string";
-                            break;
-                        default:
-                            type = "";
-                            break;
-                    }
-#endif
                     // iterate over values
                     QString vals;
                     quint32 nelem = field->getNumElements();
@@ -179,7 +143,7 @@ void UAVSettingsImportExportPlugin::importExport()
                     f.setAttribute("name", field->getName());
                     f.setAttribute("values", vals);
 #ifndef EXPORT_VALUES_ONLY
-                    f.setAttribute("type", type);
+                    f.setAttribute("type", field->getTypeAsString());
                     f.setAttribute("units", field->getUnits());
                     f.setAttribute("elements", nelem);
 #endif

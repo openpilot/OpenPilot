@@ -64,21 +64,33 @@ static inline void parabolicInterpolation(double  x0, double  y0, double  x1, do
 
 /**
 	Compute the parabolic interpolation of an extremum from 3 points with constant x intervals, 
+	and return x an y extrema and the curvature coefficient a
+
+	For parameters see static inline void parabolicInterpolation(double  x0, double  y0, double  x1, double  y1, double  x2, double  y2, double & extremum_x, double & extremum_y, double  &a, double  &b, double  &c)
+*/
+static inline void parabolicInterpolation(double  y0, double  y1, double  y2, double & extremum_x, double & extremum_y, double & a)
+{
+	//double  x0 = -1, x1 = 0, x2 = 1;
+	//double  x01 = -1, x02 = -2, x12 = -1;
+	//double  t0 = y0/2, t1 = y1, t2 = y2/2;
+	a = (y0+y2)/2.0 - y1;
+	double  b = (y2-y0)/2.0;
+	double  c = y1;
+
+	extremum_x = -b/(a*2.0);
+	extremum_y = c-b*b/(a*4.0);
+}
+
+/**
+	Compute the parabolic interpolation of an extremum from 3 points with constant x intervals, 
 	and return x an y extrema.
 
 	For parameters see static inline void parabolicInterpolation(double  x0, double  y0, double  x1, double  y1, double  x2, double  y2, double & extremum_x, double & extremum_y, double  &a, double  &b, double  &c)
 */
 static inline void parabolicInterpolation(double  y0, double  y1, double  y2, double & extremum_x, double & extremum_y)
 {
-	//double  x0 = -1, x1 = 0, x2 = 1;
-	//double  x01 = -1, x02 = -2, x12 = -1;
-	//double  t0 = y0/2, t1 = y1, t2 = y2/2;
-	double  a = (y0+y2)/2.0 - y1;
-	double  b = (y2-y0)/2.0;
-	double  c = y1;
-
-	extremum_x = -b/(a*2.0);
-	extremum_y = c-b*b/(a*4.0);
+	double tempa;
+	parabolicInterpolation(y0, y1, y2, extremum_x, extremum_y, tempa);
 }
 
 /**

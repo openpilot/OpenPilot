@@ -24,6 +24,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
+/*
+ * TODO:
+ *  - write import functions
+ *  - split formats into different files/classes
+ *  - better error handling (not a lot of QMessageBoxes)
+ */
+
 #include "uavsettingsimportexport.h"
 
 #include <QtPlugin> 
@@ -115,12 +123,13 @@ void UAVSettingsImportExportPlugin::importExport()
         fileFormat = UAV;
     } else if (fileType == "xml") {
         fileFormat = XML;
+    } else if (fileType == "ini") {
+        fileFormat = INI;
     } else {
-        QMessageBox mb(QMessageBox::Information,
-                        tr("UAV Settings Export"),
-                        tr("Unsupported export file format: '") + fileType + "'",
-                        QMessageBox::Ok);
-        mb.exec();
+        QMessageBox::critical(0,
+                              tr("UAV Settings Export"),
+                              tr("Unsupported export file format: ") + fileType,
+                              QMessageBox::Ok);
         return;
     }
 
@@ -182,12 +191,45 @@ void UAVSettingsImportExportPlugin::importExport()
     }
 
     // save file
-    QString xml = doc.toString(4);
+    if ((fileFormat == UAV) || (fileFormat == XML)) {
+        QFile file(fileName);
+        if (file.open(QIODevice::WriteOnly) &&
+                (file.write(doc.toString(4).toAscii()) != -1)) {
+            file.close();
+        } else {
+            QMessageBox::critical(0,
+                                  tr("UAV Settings Export"),
+                                  tr("Unable to save settings: ") + fileName,
+                                  QMessageBox::Ok);
+            return;
+        }
+    } else if (fileFormat == INI) {
+        if (QFile::exists(fileName) && !QFile::remove(fileName)) {
+            QMessageBox::critical(0,
+                                  tr("UAV Settings Export"),
+                                  tr("Unable to remove existing file: ") + fileName,
+                                  QMessageBox::Ok);
+            return;
+        }
 
-    QFile file(fileName);
-    if (file.open(QIODevice::WriteOnly)) {
-        file.write(xml.toAscii());
-        file.close();
+        QSettings ini(fileName, QSettings::IniFormat);
+        QDomElement docElem = doc.documentElement();
+        QDomNodeList nodeList = docElem.elementsByTagName("object");
+        for (int i = 0; i < nodeList.count(); i++) {
+            QDomElement e = nodeList.at(i).toElement();
+            if (!e.isNull()) {
+                ini.beginGroup(e.attribute("name", "undefined"));
+                ini.setValue("id", e.attribute("id"));
+                QDomNodeList n = e.elementsByTagName("field");
+                for (int j = 0; j < n.count(); j++) {
+                    QDomElement f = n.at(j).toElement();
+                    if (!f.isNull()) {
+                        ini.setValue(f.attribute("name", "unknown"), f.attribute("values"));
+                    }
+                }
+                ini.endGroup();
+            }
+        }
     }
 }
 

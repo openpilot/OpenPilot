@@ -86,8 +86,8 @@ typedef struct
 // buffer that holds the incoming binary packet
 static uint8_t gps_rx_buffer[sizeof(t_gps_bin_packet)] __attribute__ ((aligned(4)));
 
-// number of bytes currently in the binary packet buffer
-static uint8_t gps_rx_buffer_wr = 0;
+// number of bytes currently in the rx buffer
+static int16_t gps_rx_buffer_wr = 0;
 
 // ************
 // endian swapping functions
@@ -118,8 +118,6 @@ static uint32_t swap4Bytes(uint32_t data)
 
 int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volatile uint32_t *parsing_errors)
 {
-	t_gps_bin_packet *rx_packet = (t_gps_bin_packet *)gps_rx_buffer;
-
 	if (gps_rx_buffer_wr >= sizeof(gps_rx_buffer))
 	{   // make room for the new byte
 		memmove(gps_rx_buffer, gps_rx_buffer + 1, sizeof(gps_rx_buffer) - 1);
@@ -129,17 +127,27 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 	// add the new byte into the buffer
 	gps_rx_buffer[gps_rx_buffer_wr++] = b;
 
+	int16_t i = 0;
+
 	while (gps_rx_buffer_wr > 0)
 	{
+		t_gps_bin_packet *rx_packet = (t_gps_bin_packet *)gps_rx_buffer;
+
 		// scan for the start of a binary packet (the header bytes)
-		while (gps_rx_buffer_wr >= sizeof(rx_packet->header))
+		while (gps_rx_buffer_wr - i >= sizeof(rx_packet->header))
 		{
 			if (rx_packet->header == 0x2404)
 				break;   // found a valid header marker
+			rx_packet = (t_gps_bin_packet *)(gps_rx_buffer + ++i);
+		}
 
-			// shift all the bytes down one position
-			memmove(gps_rx_buffer, gps_rx_buffer + 1, gps_rx_buffer_wr - 1);
-			gps_rx_buffer_wr--;
+		// remove unwanted bytes before the start of the packet header
+		if (i > 0)
+		{
+			gps_rx_buffer_wr -= i;
+			if (gps_rx_buffer_wr > 0)
+				memmove(gps_rx_buffer, gps_rx_buffer + i, gps_rx_buffer_wr);
+			i = 0;
 		}
 
 		if (gps_rx_buffer_wr < sizeof(t_gps_bin_packet))
@@ -157,9 +165,7 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 			(rx_packet->data.fix_type < 1 || rx_packet->data.fix_type > 3) )
 		{   // invalid packet
 			if (parsing_errors) *parsing_errors++;
-			// shift all the bytes down one position
-			memmove(gps_rx_buffer, gps_rx_buffer + 1, gps_rx_buffer_wr - 1);
-			gps_rx_buffer_wr--;
+			i++;
 			continue;
 		}
 
@@ -172,9 +178,7 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 			if (checksum != rx_packet->checksum)
 			{	// checksum error
 				if (chksum_errors) *chksum_errors++;
-				// shift all the bytes down one position
-				memmove(gps_rx_buffer, gps_rx_buffer + 1, gps_rx_buffer_wr - 1);
-				gps_rx_buffer_wr--;
+				i++;
 				continue;
 			}
 		}
@@ -227,13 +231,9 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 		GPSPositionSet(&GpsData);
 
 		// remove the spent binary packet from the buffer
-		if (gps_rx_buffer_wr > sizeof(t_gps_bin_packet))
-		{
-			memmove(gps_rx_buffer, gps_rx_buffer + sizeof(t_gps_bin_packet), gps_rx_buffer_wr - sizeof(t_gps_bin_packet));
-			gps_rx_buffer_wr -= sizeof(t_gps_bin_packet);
-		}
-		else
-			gps_rx_buffer_wr = 0;
+		gps_rx_buffer_wr -= sizeof(t_gps_bin_packet);
+		if (gps_rx_buffer_wr > 0)
+			memmove(gps_rx_buffer, gps_rx_buffer + sizeof(t_gps_bin_packet), gps_rx_buffer_wr);
 
 		return 0;  // found a valid packet
 	}

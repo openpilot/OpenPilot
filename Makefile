@@ -246,8 +246,20 @@ uavobjects_clean:
 #
 ##############################
 
-.PHONY: all_flight
-all_flight: openpilot_elf bl_openpilot_elf ahrs_elf bl_ahrs_elf coptercontrol_elf bl_coptercontrol_elf pipxtreme_elf bl_pipxtreme_elf
+FW_TARGETS := openpilot ahrs coptercontrol pipxtreme
+BL_TARGETS := $(addprefix bl_, $(FW_TARGETS))
+
+.PHONY: all_fw all_fw_clean
+all_fw:           $(addsuffix _elf,   $(FW_TARGETS))
+all_fw_clean:     $(addsuffix _clean, $(FW_TARGETS))
+
+.PHONY: all_bw all_bw_clean
+all_bl:           $(addsuffix _elf,   $(BL_TARGETS))
+all_bl_clean:     $(addsuffix _clean, $(BL_TARGETS))
+
+.PHONY: all_flight all_flight_clean
+all_flight:       all_fw all_bl
+all_flight_clean: all_fw_clean all_bl_clean
 
 .PHONY: openpilot
 openpilot: openpilot_elf

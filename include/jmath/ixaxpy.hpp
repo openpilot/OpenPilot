@@ -41,7 +41,7 @@ namespace jafar {
 			    const bubMatrixY Y)
 			{
 				matrix<double> JSii = prod(J, project(S, ia_in, ia_in));
-				project(S, ia_out, ia_out) = prod<sym_mat> (JSii, trans(J));
+				ublas::noalias(project(S, ia_out, ia_out)) = prod<sym_mat> (JSii, trans(J));
 				project(S, ia_out, ia_out) += Y;
 			}
 
@@ -49,7 +49,7 @@ namespace jafar {
 			void ixaxpy_diag_subprod(sym_mat & S, const bubMatrix & J, const ind_array & ia_in, const ind_array & ia_out)
 			{
 				matrix<double> JSii = prod(J, project(S, ia_in, ia_in));
-				project(S, ia_out, ia_out) = prod<sym_mat> (JSii, trans(J));
+				ublas::noalias(project(S, ia_out, ia_out)) = prod<sym_mat> (JSii, trans(J));
 			}
 
 

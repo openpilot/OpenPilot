@@ -168,7 +168,7 @@ enum { fFreq = 0, fShutter, nFloatOpts };
 double floatOpts[nFloatOpts] = {0.0};
 const int nFirstFloatOpt = nIntOpts, nLastFloatOpt = nIntOpts+nFloatOpts-1;
 
-enum { sSlamConfig = 0, sDataPath, nStrOpts };
+enum { sDataPath = 0, sConfigSetup, sConfigEstimation, nStrOpts };
 std::string strOpts[nStrOpts];
 const int nFirstStrOpt = nIntOpts+nFloatOpts, nLastStrOpt = nIntOpts+nFloatOpts+nStrOpts-1;
 
@@ -194,8 +194,9 @@ struct option long_options[] = {
 	{"freq", 2, 0, 0}, // should be in config file
 	{"shutter", 2, 0, 0}, // should be in config file
 	// string options
-	{"slam-config", 1, 0, 0},
 	{"data-path", 1, 0, 0},
+	{"config-setup", 1, 0, 0},
+	{"config-estimation", 1, 0, 0},
 	// breaking options
 	{"help",0,0,0},
 	{"usage",0,0,0},
@@ -221,17 +222,17 @@ void demo_slam01_main(world_ptr_t *world) {
 	int img_width, img_height;
 	if (intOpts[iSimu] != 0)
 	{
-		img_width = IMG_WIDTH_SIMU;
-		img_height = IMG_HEIGHT_SIMU;
-		intrinsic = createVector<4> (INTRINSIC_SIMU);
-		distortion = createVector<sizeof(DISTORTION_SIMU)/sizeof(double)> (DISTORTION);
+		img_width = configSetup.IMG_WIDTH_SIMU;
+		img_height = configSetup.IMG_HEIGHT_SIMU;
+		intrinsic = configSetup.INTRINSIC_SIMU;
+		distortion = configSetup.DISTORTION_SIMU;
 		
 	} else
 	{
-		img_width = IMG_WIDTH;
-		img_height = IMG_HEIGHT;
-		intrinsic = createVector<4> (INTRINSIC);
-		distortion = createVector<sizeof(DISTORTION)/sizeof(double)> (DISTORTION);
+		img_width = configSetup.IMG_WIDTH;
+		img_height = configSetup.IMG_HEIGHT;
+		intrinsic = configSetup.INTRINSIC;
+		distortion = configSetup.DISTORTION;
 	}
 	
 	
@@ -347,12 +348,12 @@ void demo_slam01_main(world_ptr_t *world) {
 	if (intOpts[iRobot] == 0) // constant velocity
 	{
 		robconstvel_ptr_t robPtr1_(new RobotConstantVelocity(mapPtr));
-		robPtr1_->setVelocityStd(UNCERT_VLIN, UNCERT_VANG);
+		robPtr1_->setVelocityStd(configSetup.UNCERT_VLIN, configSetup.UNCERT_VANG);
 		robPtr1_->setId();
 
 		double _v[6] = {
-				PERT_VLIN, PERT_VLIN, PERT_VLIN,
-				PERT_VANG, PERT_VANG, PERT_VANG };
+				configSetup.PERT_VLIN, configSetup.PERT_VLIN, configSetup.PERT_VLIN,
+				configSetup.PERT_VANG, configSetup.PERT_VANG, configSetup.PERT_VANG };
 		vec pertStd = createVector<6>(_v);
 		robPtr1_->perturbation.set_std_continuous(pertStd);
 		robPtr1_->constantPerturbation = false;
@@ -363,7 +364,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		{
 			// just to initialize the MTI as an external trigger controlling shutter time
 			hardware::HardwareEstimatorMti hardEst1(
-				MTI_DEVICE, floatOpts[fFreq], floatOpts[fShutter], 1, mode, strOpts[sDataPath]);
+				configSetup.MTI_DEVICE, floatOpts[fFreq], floatOpts[fShutter], 1, mode, strOpts[sDataPath]);
 			floatOpts[fFreq] = hardEst1.getFreq();
 		}
 	}
@@ -371,14 +372,19 @@ void demo_slam01_main(world_ptr_t *world) {
 	if (intOpts[iRobot] == 1) // inertial
 	{
 		robinertial_ptr_t robPtr1_(new RobotInertial(mapPtr));
-		robPtr1_->setInitialStd(UNCERT_VLIN, UNCERT_ABIAS, UNCERT_WBIAS, UNCERT_GRAVITY);
+		robPtr1_->setInitialStd(
+			configSetup.UNCERT_VLIN,
+			configSetup.UNCERT_ABIAS*configSetup.ACCELERO_FULLSCALE,
+			configSetup.UNCERT_WBIAS*configSetup.GYRO_FULLSCALE,
+			configSetup.UNCERT_GRAVITY*9.81);
 		robPtr1_->setId();
 
+		double aerr = configSetup.PERT_AERR * configSetup.ACCELERO_NOISE;
+		double werr = configSetup.PERT_WERR * configSetup.GYRO_NOISE;
 		double _v[12] = {
-				PERT_AERR, PERT_AERR, PERT_AERR,
-				PERT_WERR, PERT_WERR, PERT_WERR,
-				PERT_RANWALKACC, PERT_RANWALKACC, PERT_RANWALKACC,
-				PERT_RANWALKGYRO, PERT_RANWALKGYRO, PERT_RANWALKGYRO};
+				aerr, aerr, aerr, werr, werr, werr,
+				configSetup.PERT_RANWALKACC, configSetup.PERT_RANWALKACC, configSetup.PERT_RANWALKACC,
+				configSetup.PERT_RANWALKGYRO, configSetup.PERT_RANWALKGYRO, configSetup.PERT_RANWALKGYRO};
 		vec pertStd = createVector<12>(_v);
 		robPtr1_->perturbation.set_std_continuous(pertStd);
 		robPtr1_->constantPerturbation = false;
@@ -387,24 +393,24 @@ void demo_slam01_main(world_ptr_t *world) {
 		if (intOpts[iSimu] != 0)
 		{
 			boost::shared_ptr<hardware::HardwareEstimatorInertialAdhocSimulator> hardEst1_(
-				new hardware::HardwareEstimatorInertialAdhocSimulator(SIMU_IMU_FREQ, 50, simulator, robPtr1_->id()));
-			hardEst1_->setSyncConfig(SIMU_IMU_TIMESTAMP_CORRECTION);
+				new hardware::HardwareEstimatorInertialAdhocSimulator(configSetup.SIMU_IMU_FREQ, 50, simulator, robPtr1_->id()));
+			hardEst1_->setSyncConfig(configSetup.SIMU_IMU_TIMESTAMP_CORRECTION);
 			
-			hardEst1_->setErrors(SIMU_IMU_GRAVITY, 
-				SIMU_IMU_GYR_BIAS, SIMU_IMU_GYR_BIAS_NOISESTD,
-				SIMU_IMU_GYR_GAIN, SIMU_IMU_GYR_GAIN_NOISESTD,
-				SIMU_IMU_RANDWALKGYR_FACTOR * PERT_RANWALKGYRO,
-				SIMU_IMU_ACC_BIAS, SIMU_IMU_ACC_BIAS_NOISESTD,
-				SIMU_IMU_ACC_GAIN, SIMU_IMU_ACC_GAIN_NOISESTD,
-				SIMU_IMU_RANDWALKACC_FACTOR * PERT_RANWALKACC);
+			hardEst1_->setErrors(configSetup.SIMU_IMU_GRAVITY, 
+				configSetup.SIMU_IMU_GYR_BIAS, configSetup.SIMU_IMU_GYR_BIAS_NOISESTD,
+				configSetup.SIMU_IMU_GYR_GAIN, configSetup.SIMU_IMU_GYR_GAIN_NOISESTD,
+				configSetup.SIMU_IMU_RANDWALKGYR_FACTOR * configSetup.PERT_RANWALKGYRO,
+				configSetup.SIMU_IMU_ACC_BIAS, configSetup.SIMU_IMU_ACC_BIAS_NOISESTD,
+				configSetup.SIMU_IMU_ACC_GAIN, configSetup.SIMU_IMU_ACC_GAIN_NOISESTD,
+				configSetup.SIMU_IMU_RANDWALKACC_FACTOR * configSetup.PERT_RANWALKACC);
 			
 			hardEst1 = hardEst1_;
 		} else
 		{
 			boost::shared_ptr<hardware::HardwareEstimatorMti> hardEst1_(new hardware::HardwareEstimatorMti(
-				MTI_DEVICE, floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath]));
+				configSetup.MTI_DEVICE, floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath]));
 			if (intOpts[iTrigger]) floatOpts[fFreq] = hardEst1_->getFreq();
-			hardEst1_->setSyncConfig(IMU_TIMESTAMP_CORRECTION);
+			hardEst1_->setSyncConfig(configSetup.IMU_TIMESTAMP_CORRECTION);
 			hardEst1_->start();
 			hardEst1 = hardEst1_;
 		}
@@ -505,12 +511,12 @@ void demo_slam01_main(world_ptr_t *world) {
 	senPtr11->linkToParentRobot(robPtr1);
 	if (intOpts[iRobot] == 1)
 	{
-		senPtr11->setPose(SENSOR_POSE_INERTIAL[0], SENSOR_POSE_INERTIAL[1], SENSOR_POSE_INERTIAL[2],
-											SENSOR_POSE_INERTIAL[3], SENSOR_POSE_INERTIAL[4], SENSOR_POSE_INERTIAL[5]); // x,y,z,roll,pitch,yaw
+		senPtr11->setPose(configSetup.SENSOR_POSE_INERTIAL[0], configSetup.SENSOR_POSE_INERTIAL[1], configSetup.SENSOR_POSE_INERTIAL[2],
+											configSetup.SENSOR_POSE_INERTIAL[3], configSetup.SENSOR_POSE_INERTIAL[4], configSetup.SENSOR_POSE_INERTIAL[5]); // x,y,z,roll,pitch,yaw
 	} else
 	{
-		senPtr11->setPose(SENSOR_POSE_CONSTVEL[0], SENSOR_POSE_CONSTVEL[1], SENSOR_POSE_CONSTVEL[2],
-											SENSOR_POSE_CONSTVEL[3], SENSOR_POSE_CONSTVEL[4], SENSOR_POSE_CONSTVEL[5]); // x,y,z,roll,pitch,yaw
+		senPtr11->setPose(configSetup.SENSOR_POSE_CONSTVEL[0], configSetup.SENSOR_POSE_CONSTVEL[1], configSetup.SENSOR_POSE_CONSTVEL[2],
+											configSetup.SENSOR_POSE_CONSTVEL[3], configSetup.SENSOR_POSE_CONSTVEL[4], configSetup.SENSOR_POSE_CONSTVEL[5]); // x,y,z,roll,pitch,yaw
 	}
 	//senPtr11->pose.x(quaternion::originFrame());
 	senPtr11->params.setImgSize(img_width, img_height);
@@ -564,7 +570,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		
 		#ifdef HAVE_VIAM
 		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, rawdata_mutex, 
-			CAMERA_DEVICE, cv::Size(img_width,img_height), 0, 8, floatOpts[fFreq], intOpts[iTrigger], mode, strOpts[sDataPath]));
+			configSetup.CAMERA_DEVICE, cv::Size(img_width,img_height), 0, 8, floatOpts[fFreq], intOpts[iTrigger], mode, strOpts[sDataPath]));
 		senPtr11->setHardwareSensor(hardSen11);
 		#else
 		if (intOpts[iReplay])
@@ -1059,7 +1065,8 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 		 * --log=0/1 -> log result in text file
 		 * --verbose=0/1/2/3/4/5 -> Off/Trace/Warning/Debug/VerboseDebug/VeryVerboseDebug
 		 * --data-path=/mnt/ram/rtslam
-		 * #--slam-config=data/config1.xml -> not implemented yet
+		 * --config-setup=data/setup.cfg
+		 * --config-estimation=data/estimation.cfg
 		 * --help
 		 * --usage
 		 * --robot 0=constant vel, 1=inertial
@@ -1086,6 +1093,8 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 			floatOpts[fFreq] = 60.0;
 			floatOpts[fShutter] = 2e-3;
 			strOpts[sDataPath] = ".";
+			strOpts[sConfigSetup] = "data/setup.cfg";
+			strOpts[sConfigEstimation] = "data/estimation.cfg";
 			
 			while (1)
 			{
@@ -1143,5 +1152,8 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 			intOpts[iDispGdhe] = 0;
 			#endif
 
-			demo_slam01();
+			try {
+				configSetup.load(strOpts[sConfigSetup]);
+				demo_slam01();
+			} catch (kernel::Exception &e) { std::cout << e.what(); return 1; }
 		}

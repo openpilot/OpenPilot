@@ -1,5 +1,5 @@
 
-
+#if 0
 ///-----------------------------------------------------------------------------
 /// SENSOR
 ///-----------------------------------------------------------------------------
@@ -172,3 +172,180 @@ const double SIMU_IMU_ACC_BIAS_NOISESTD = 0.0;
 const double SIMU_IMU_ACC_GAIN = 0.0;
 const double SIMU_IMU_ACC_GAIN_NOISESTD = 0.0;
 const double SIMU_IMU_RANDWALKACC_FACTOR = 0.0;
+
+
+
+#endif
+
+
+#include "kernel/keyValueFile.hpp"
+
+#define KeyValueFile_getItem(k) keyValueFile.getItem(#k, k);
+#define KeyValueFile_setItem(k) keyValueFile.setItem(#k, k);
+
+
+
+class ConfigSetup: public kernel::KeyValueFileSaveLoad
+{
+ public:
+	/// SENSOR
+	jblas::vec6 SENSOR_POSE_CONSTVEL; /// sensor pose in constant velocity (x,y,z,roll,pitch,yaw) (deg)
+	jblas::vec6 SENSOR_POSE_INERTIAL; /// sensor pose in inertial (x,y,z,roll,pitch,yaw) (deg)
+
+	std::string CAMERA_DEVICE; /// camera device (firewire ID or device)
+	unsigned IMG_WIDTH;        /// image width
+	unsigned IMG_HEIGHT;       /// image height
+	jblas::vec4 INTRINSIC;     /// intrisic calibration parameters (u0,v0,alphaU,alphaV)
+	jblas::vec3 DISTORTION;    /// distortion calibration parameters
+
+	/// SIMU SENSOR
+	unsigned IMG_WIDTH_SIMU;
+	unsigned IMG_HEIGHT_SIMU;
+	jblas::vec4 INTRINSIC_SIMU;
+	jblas::vec3 DISTORTION_SIMU;
+
+	/// CONSTANT VELOCITY
+	double UNCERT_VLIN; /// initial uncertainty stdev on linear velocity (m/s)
+	double UNCERT_VANG; /// initial uncertainty stdev on angular velocity (rad/s)
+	double PERT_VLIN;   /// perturbation on linear velocity, ie non-constantness (m/s per sqrt(s))
+	double PERT_VANG;   /// perturbation on angular velocity, ie non-constantness (rad/s per sqrt(s))
+
+	/// INERTIAL (also using UNCERT_VLIN)
+	std::string MTI_DEVICE;    /// IMU device
+	double ACCELERO_FULLSCALE; /// full scale of accelerometers (m/s2)  (MTI: 17)
+	double ACCELERO_NOISE;     /// noise stdev of accelerometers (m/s2) (MTI: 0.002*sqrt(30) )
+	double GYRO_FULLSCALE;     /// full scale of gyrometers (rad/s)     (MTI: rad(300) )
+	double GYRO_NOISE;         /// noise stdev of gyrometers (rad/s)    (MTI: rad(0.05)*sqrt(40) )
+
+	double UNCERT_GRAVITY;   /// initial gravity uncertainty (% of 9.81)
+	double UNCERT_ABIAS;     /// initial accelerometer bias uncertainty (% of ACCELERO_FULLSCALE)
+	double UNCERT_WBIAS;     /// initial gyrometer bias uncertainty (% of GYRO_FULLSCALE)
+	double PERT_AERR;        /// noise stdev of accelerometers (% of ACCELERO_NOISE)
+	double PERT_WERR;        /// noise stdev of gyrometers (% of GYRO_NOISE)
+	double PERT_RANWALKACC;  /// IMU a_bias random walk (m/s2 per sqrt(s))
+	double PERT_RANWALKGYRO; /// IMU w_bias random walk (rad/s per sqrt(s))
+
+	double IMU_TIMESTAMP_CORRECTION; /// correction to add to the IMU timestamp for synchronization (s)
+
+	/// SIMU INERTIAL
+	double SIMU_IMU_TIMESTAMP_CORRECTION;
+	double SIMU_IMU_FREQ;
+	double SIMU_IMU_GRAVITY;
+	double SIMU_IMU_GYR_BIAS;
+	double SIMU_IMU_GYR_BIAS_NOISESTD;
+	double SIMU_IMU_GYR_GAIN;
+	double SIMU_IMU_GYR_GAIN_NOISESTD;
+	double SIMU_IMU_RANDWALKGYR_FACTOR;
+	double SIMU_IMU_ACC_BIAS;
+	double SIMU_IMU_ACC_BIAS_NOISESTD;
+	double SIMU_IMU_ACC_GAIN;
+	double SIMU_IMU_ACC_GAIN_NOISESTD;
+	double SIMU_IMU_RANDWALKACC_FACTOR;
+	
+ public:
+	virtual void loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFile)
+	{
+		KeyValueFile_getItem(SENSOR_POSE_CONSTVEL);
+		KeyValueFile_getItem(SENSOR_POSE_INERTIAL);
+		
+		KeyValueFile_getItem(CAMERA_DEVICE);
+		KeyValueFile_getItem(IMG_WIDTH);
+		KeyValueFile_getItem(IMG_HEIGHT);
+		KeyValueFile_getItem(INTRINSIC);
+		KeyValueFile_getItem(DISTORTION);
+		
+		KeyValueFile_getItem(IMG_WIDTH_SIMU);
+		KeyValueFile_getItem(IMG_HEIGHT_SIMU);
+		KeyValueFile_getItem(INTRINSIC_SIMU);
+		KeyValueFile_getItem(DISTORTION_SIMU);
+		
+		KeyValueFile_getItem(UNCERT_VLIN);
+		KeyValueFile_getItem(UNCERT_VANG);
+		KeyValueFile_getItem(PERT_VLIN);
+		KeyValueFile_getItem(PERT_VANG);
+		
+		KeyValueFile_getItem(MTI_DEVICE);
+		KeyValueFile_getItem(ACCELERO_FULLSCALE);
+		KeyValueFile_getItem(ACCELERO_NOISE);
+		KeyValueFile_getItem(GYRO_FULLSCALE);
+		KeyValueFile_getItem(GYRO_NOISE);
+		
+		KeyValueFile_getItem(UNCERT_GRAVITY);
+		KeyValueFile_getItem(UNCERT_ABIAS);
+		KeyValueFile_getItem(UNCERT_WBIAS);
+		KeyValueFile_getItem(PERT_AERR);
+		KeyValueFile_getItem(PERT_WERR);
+		KeyValueFile_getItem(PERT_RANWALKACC);
+		KeyValueFile_getItem(PERT_RANWALKGYRO);
+		
+		KeyValueFile_getItem(IMU_TIMESTAMP_CORRECTION);
+		
+		KeyValueFile_getItem(SIMU_IMU_TIMESTAMP_CORRECTION);
+		KeyValueFile_getItem(SIMU_IMU_FREQ);
+		KeyValueFile_getItem(SIMU_IMU_GRAVITY);
+		KeyValueFile_getItem(SIMU_IMU_GYR_BIAS);
+		KeyValueFile_getItem(SIMU_IMU_GYR_BIAS_NOISESTD);
+		KeyValueFile_getItem(SIMU_IMU_GYR_GAIN);
+		KeyValueFile_getItem(SIMU_IMU_GYR_GAIN_NOISESTD);
+		KeyValueFile_getItem(SIMU_IMU_RANDWALKGYR_FACTOR);
+		KeyValueFile_getItem(SIMU_IMU_ACC_BIAS);
+		KeyValueFile_getItem(SIMU_IMU_ACC_BIAS_NOISESTD);
+		KeyValueFile_getItem(SIMU_IMU_ACC_GAIN);
+		KeyValueFile_getItem(SIMU_IMU_ACC_GAIN_NOISESTD);
+		KeyValueFile_getItem(SIMU_IMU_RANDWALKACC_FACTOR);
+	}
+	
+	virtual void saveKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile)
+	{
+		KeyValueFile_setItem(SENSOR_POSE_CONSTVEL);
+		KeyValueFile_setItem(SENSOR_POSE_INERTIAL);
+		
+		KeyValueFile_setItem(CAMERA_DEVICE);
+		KeyValueFile_setItem(IMG_WIDTH);
+		KeyValueFile_setItem(IMG_HEIGHT);
+		KeyValueFile_setItem(INTRINSIC);
+		KeyValueFile_setItem(DISTORTION);
+		
+		KeyValueFile_setItem(IMG_WIDTH_SIMU);
+		KeyValueFile_setItem(IMG_HEIGHT_SIMU);
+		KeyValueFile_setItem(INTRINSIC_SIMU);
+		KeyValueFile_setItem(DISTORTION_SIMU);
+		
+		KeyValueFile_setItem(UNCERT_VLIN);
+		KeyValueFile_setItem(UNCERT_VANG);
+		KeyValueFile_setItem(PERT_VLIN);
+		KeyValueFile_setItem(PERT_VANG);
+		
+		KeyValueFile_setItem(MTI_DEVICE);
+		KeyValueFile_setItem(ACCELERO_FULLSCALE);
+		KeyValueFile_setItem(ACCELERO_NOISE);
+		KeyValueFile_setItem(GYRO_FULLSCALE);
+		KeyValueFile_setItem(GYRO_NOISE);
+		
+		KeyValueFile_setItem(UNCERT_GRAVITY);
+		KeyValueFile_setItem(UNCERT_ABIAS);
+		KeyValueFile_setItem(UNCERT_WBIAS);
+		KeyValueFile_setItem(PERT_AERR);
+		KeyValueFile_setItem(PERT_WERR);
+		KeyValueFile_setItem(PERT_RANWALKACC);
+		KeyValueFile_setItem(PERT_RANWALKGYRO);
+		
+		KeyValueFile_setItem(IMU_TIMESTAMP_CORRECTION);
+		
+		KeyValueFile_setItem(SIMU_IMU_TIMESTAMP_CORRECTION);
+		KeyValueFile_setItem(SIMU_IMU_FREQ);
+		KeyValueFile_setItem(SIMU_IMU_GRAVITY);
+		KeyValueFile_setItem(SIMU_IMU_GYR_BIAS);
+		KeyValueFile_setItem(SIMU_IMU_GYR_BIAS_NOISESTD);
+		KeyValueFile_setItem(SIMU_IMU_GYR_GAIN);
+		KeyValueFile_setItem(SIMU_IMU_GYR_GAIN_NOISESTD);
+		KeyValueFile_setItem(SIMU_IMU_RANDWALKGYR_FACTOR);
+		KeyValueFile_setItem(SIMU_IMU_ACC_BIAS);
+		KeyValueFile_setItem(SIMU_IMU_ACC_BIAS_NOISESTD);
+		KeyValueFile_setItem(SIMU_IMU_ACC_GAIN);
+		KeyValueFile_setItem(SIMU_IMU_ACC_GAIN_NOISESTD);
+		KeyValueFile_setItem(SIMU_IMU_RANDWALKACC_FACTOR);
+	}
+} configSetup;
+
+

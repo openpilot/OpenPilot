@@ -100,6 +100,14 @@ namespace jafar {
 			jblas::ind_array ia_union(const jblas::ind_array & ia1, const jblas::ind_array & ia2);
 
 			/**
+			 * Make the concatenation of two indirect arrays.
+			 * \param ia1 an indirect array
+			 * \param ia2 an indirect array
+			 * \return the simple concatenation of \a ia1 and \a ia2
+			 */
+			jblas::ind_array ia_concat(const jblas::ind_array & ia1, const jblas::ind_array & ia2);
+
+			/**
 			 * Return the N first indices of an indirect array.
 			 * \param ia the indirect array
 			 * \param N the number of indices to return

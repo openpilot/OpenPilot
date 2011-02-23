@@ -99,7 +99,17 @@ namespace jafar {
 				return icat;
 			}
 
-
+			/**
+			 * Concatenation of ind. arrays
+			 */
+			jblas::ind_array ia_concat(const jblas::ind_array & ia1, const jblas::ind_array & ia2) {
+				jblas::ind_array ia(ia1.size() + ia2.size());
+				for (size_t i = 0; i < ia1.size(); i++) ia(i) = ia1(i);
+				for (size_t i = 0; i < ia2.size(); i++) ia(i+ia1.size()) = ia2(i);
+				return ia;
+			}
+				
+				
 			/**
 			 * Return the N first indices of an indirect array
 			 */

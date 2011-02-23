@@ -7,638 +7,361 @@
     <x>0</x>
     <y>0</y>
     <width>639</width>
-    <height>407</height>
+    <height>465</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <widget class="QTabWidget" name="tabWidget">
+    <widget class="QTabWidget" name="piFactors">
      <property name="currentIndex">
       <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>P Factors</string>
+       <string>PI Factors</string>
       </attribute>
-      <widget class="QDial" name="dial">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>20</y>
-         <width>101</width>
-         <height>81</height>
-        </rect>
-       </property>
-       <property name="maximum">
-        <number>9999</number>
-       </property>
-       <property name="singleStep">
-        <number>10</number>
-       </property>
-       <property name="pageStep">
-        <number>100</number>
-       </property>
-       <property name="wrapping">
-        <bool>false</bool>
-       </property>
-       <property name="notchTarget">
-        <double>37.000000000000000</double>
-       </property>
-       <property name="notchesVisible">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QDial" name="dial_2">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>40</y>
-         <width>41</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="invertedAppearance">
-        <bool>false</bool>
-       </property>
-       <property name="invertedControls">
-        <bool>false</bool>
-       </property>
-       <property name="wrapping">
-        <bool>true</bool>
-       </property>
-       <property name="notchesVisible">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QDoubleSpinBox" name="doubleSpinBox">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>110</y>
-         <width>101</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <property name="decimals">
-        <number>6</number>
-       </property>
-       <property name="singleStep">
-        <double>0.000010000000000</double>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>10</y>
-         <width>67</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>RollRate</string>
-       </property>
-      </widget>
-      <widget class="QDial" name="dial_3">
-       <property name="geometry">
-        <rect>
-         <x>140</x>
-         <y>40</y>
-         <width>41</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="invertedAppearance">
-        <bool>false</bool>
-       </property>
-       <property name="invertedControls">
-        <bool>false</bool>
-       </property>
-       <property name="wrapping">
-        <bool>true</bool>
-       </property>
-       <property name="notchesVisible">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QDial" name="dial_4">
-       <property name="geometry">
-        <rect>
-         <x>110</x>
-         <y>20</y>
-         <width>101</width>
-         <height>81</height>
-        </rect>
-       </property>
-       <property name="maximum">
-        <number>9999</number>
-       </property>
-       <property name="singleStep">
-        <number>10</number>
-       </property>
-       <property name="pageStep">
-        <number>100</number>
-       </property>
-       <property name="wrapping">
-        <bool>false</bool>
-       </property>
-       <property name="notchTarget">
-        <double>37.000000000000000</double>
-       </property>
-       <property name="notchesVisible">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
-       <property name="geometry">
-        <rect>
-         <x>120</x>
-         <y>110</y>
-         <width>101</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <property name="decimals">
-        <number>6</number>
-       </property>
-       <property name="singleStep">
-        <double>0.000010000000000</double>
-       </property>
-      </widget>
-      <widget class="QDial" name="dial_5">
-       <property name="geometry">
-        <rect>
-         <x>250</x>
-         <y>40</y>
-         <width>41</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="invertedAppearance">
-        <bool>false</bool>
-       </property>
-       <property name="invertedControls">
-        <bool>false</bool>
-       </property>
-       <property name="wrapping">
-        <bool>true</bool>
-       </property>
-       <property name="notchesVisible">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QDial" name="dial_6">
-       <property name="geometry">
-        <rect>
-         <x>220</x>
-         <y>20</y>
-         <width>101</width>
-         <height>81</height>
-        </rect>
-       </property>
-       <property name="maximum">
-        <number>9999</number>
-       </property>
-       <property name="singleStep">
-        <number>10</number>
-       </property>
-       <property name="pageStep">
-        <number>100</number>
-       </property>
-       <property name="wrapping">
-        <bool>false</bool>
-       </property>
-       <property name="notchTarget">
-        <double>37.000000000000000</double>
-       </property>
-       <property name="notchesVisible">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
-       <property name="geometry">
-        <rect>
-         <x>230</x>
-         <y>110</y>
-         <width>101</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <property name="decimals">
-        <number>6</number>
-       </property>
-       <property name="singleStep">
-        <double>0.000010000000000</double>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_3">
-       <property name="geometry">
-        <rect>
-         <x>130</x>
-         <y>10</y>
-         <width>67</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>PitchRate</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_4">
-       <property name="geometry">
-        <rect>
-         <x>240</x>
-         <y>10</y>
-         <width>67</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>YawRate</string>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="checkBox">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>140</y>
-         <width>131</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Link Roll/Pitch</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_5">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>180</y>
-         <width>67</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Roll</string>
-       </property>
-      </widget>
-      <widget class="QDial" name="dial_7">
-       <property name="geometry">
-        <rect>
-         <x>110</x>
-         <y>190</y>
-         <width>101</width>
-         <height>81</height>
-        </rect>
-       </property>
-       <property name="maximum">
-        <number>9999</number>
-       </property>
-       <property name="singleStep">
-        <number>10</number>
-       </property>
-       <property name="pageStep">
-        <number>100</number>
-       </property>
-       <property name="wrapping">
-        <bool>false</bool>
-       </property>
-       <property name="notchTarget">
-        <double>37.000000000000000</double>
-       </property>
-       <property name="notchesVisible">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
-       <property name="geometry">
-        <rect>
-         <x>120</x>
-         <y>280</y>
-         <width>101</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <property name="decimals">
-        <number>6</number>
-       </property>
-       <property name="singleStep">
-        <double>0.000010000000000</double>
-       </property>
-      </widget>
-      <widget class="QDial" name="dial_8">
-       <property name="geometry">
-        <rect>
-         <x>220</x>
-         <y>190</y>
-         <width>101</width>
-         <height>81</height>
-        </rect>
-       </property>
-       <property name="maximum">
-        <number>9999</number>
-       </property>
-       <property name="singleStep">
-        <number>10</number>
-       </property>
-       <property name="pageStep">
-        <number>100</number>
-       </property>
-       <property name="wrapping">
-        <bool>false</bool>
-       </property>
-       <property name="notchTarget">
-        <double>37.000000000000000</double>
-       </property>
-       <property name="notchesVisible">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
-       <property name="geometry">
-        <rect>
-         <x>230</x>
-         <y>280</y>
-         <width>101</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <property name="decimals">
-        <number>6</number>
-       </property>
-       <property name="singleStep">
-        <double>0.000010000000000</double>
-       </property>
-      </widget>
-      <widget class="QDial" name="dial_9">
-       <property name="geometry">
-        <rect>
-         <x>140</x>
-         <y>210</y>
-         <width>41</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="invertedAppearance">
-        <bool>false</bool>
-       </property>
-       <property name="invertedControls">
-        <bool>false</bool>
-       </property>
-       <property name="wrapping">
-        <bool>true</bool>
-       </property>
-       <property name="notchesVisible">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QDial" name="dial_10">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>210</y>
-         <width>41</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="invertedAppearance">
-        <bool>false</bool>
-       </property>
-       <property name="invertedControls">
-        <bool>false</bool>
-       </property>
-       <property name="wrapping">
-        <bool>true</bool>
-       </property>
-       <property name="notchesVisible">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="checkBox_2">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>310</y>
-         <width>131</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Link Roll/Pitch</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_6">
-       <property name="geometry">
-        <rect>
-         <x>130</x>
-         <y>180</y>
-         <width>67</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Pitch</string>
-       </property>
-      </widget>
-      <widget class="QDial" name="dial_11">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>190</y>
-         <width>101</width>
-         <height>81</height>
-        </rect>
-       </property>
-       <property name="maximum">
-        <number>9999</number>
-       </property>
-       <property name="singleStep">
-        <number>10</number>
-       </property>
-       <property name="pageStep">
-        <number>100</number>
-       </property>
-       <property name="wrapping">
-        <bool>false</bool>
-       </property>
-       <property name="notchTarget">
-        <double>37.000000000000000</double>
-       </property>
-       <property name="notchesVisible">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_7">
-       <property name="geometry">
-        <rect>
-         <x>240</x>
-         <y>180</y>
-         <width>67</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Yaw</string>
-       </property>
-      </widget>
-      <widget class="QDial" name="dial_12">
-       <property name="geometry">
-        <rect>
-         <x>250</x>
-         <y>210</y>
-         <width>41</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="invertedAppearance">
-        <bool>false</bool>
-       </property>
-       <property name="invertedControls">
-        <bool>false</bool>
-       </property>
-       <property name="wrapping">
-        <bool>true</bool>
-       </property>
-       <property name="notchesVisible">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_6">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>280</y>
-         <width>101</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <property name="decimals">
-        <number>6</number>
-       </property>
-       <property name="singleStep">
-        <double>0.000010000000000</double>
-       </property>
-      </widget>
-      <widget class="QFrame" name="frame">
-       <property name="geometry">
-        <rect>
-         <x>350</x>
-         <y>10</y>
-         <width>251</width>
-         <height>131</height>
-        </rect>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <widget class="QLabel" name="label_2">
-        <property name="geometry">
-         <rect>
-          <x>30</x>
-          <y>30</y>
-          <width>161</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Advice on tuning here</string>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QCheckBox" name="checkBox_3">
-       <property name="geometry">
-        <rect>
-         <x>370</x>
-         <y>170</y>
-         <width>211</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Update values in real time</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton">
-       <property name="geometry">
-        <rect>
-         <x>440</x>
-         <y>250</y>
-         <width>98</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Save to RAM</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_2">
-       <property name="geometry">
-        <rect>
-         <x>440</x>
-         <y>300</y>
-         <width>98</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Save to SD</string>
-       </property>
-      </widget>
-      <zorder>dial_11</zorder>
-      <zorder>dial_7</zorder>
-      <zorder>dial_8</zorder>
-      <zorder>dial_6</zorder>
-      <zorder>dial_4</zorder>
-      <zorder>dial</zorder>
-      <zorder>dial_2</zorder>
-      <zorder>doubleSpinBox</zorder>
-      <zorder>label</zorder>
-      <zorder>doubleSpinBox_2</zorder>
-      <zorder>doubleSpinBox_3</zorder>
-      <zorder>label_3</zorder>
-      <zorder>label_4</zorder>
-      <zorder>checkBox</zorder>
-      <zorder>label_5</zorder>
-      <zorder>doubleSpinBox_4</zorder>
-      <zorder>doubleSpinBox_5</zorder>
-      <zorder>checkBox_2</zorder>
-      <zorder>label_6</zorder>
-      <zorder>label_7</zorder>
-      <zorder>doubleSpinBox_6</zorder>
-      <zorder>frame</zorder>
-      <zorder>checkBox_3</zorder>
-      <zorder>pushButton</zorder>
-      <zorder>pushButton_2</zorder>
-      <zorder>dial_3</zorder>
-      <zorder>dial_5</zorder>
-      <zorder>dial_10</zorder>
-      <zorder>dial_9</zorder>
-      <zorder>dial_12</zorder>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>Rate Stabilization (inner loop)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="frame_2">
+           <property name="toolTip">
+            <string>First, work on rate stabilization.</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QGridLayout" name="gridLayout" columnstretch="1,1,2,2,2">
+            <item row="1" column="1">
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>Roll</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="QDoubleSpinBox" name="rateRollKp">
+              <property name="toolTip">
+               <string>Slowly raise Kp until you start seeing clear oscillations when you fly.</string>
+              </property>
+              <property name="decimals">
+               <number>6</number>
+              </property>
+              <property name="singleStep">
+               <double>0.000100000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLabel" name="label_11">
+              <property name="text">
+               <string>Pitch</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QDoubleSpinBox" name="ratePitchKp">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+              <property name="singleStep">
+               <double>0.000100000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QLabel" name="label_12">
+              <property name="text">
+               <string>Kp</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3">
+             <widget class="QDoubleSpinBox" name="rateRollKi">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+              <property name="singleStep">
+               <double>0.000100000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="3">
+             <widget class="QDoubleSpinBox" name="ratePitchKi">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+              <property name="singleStep">
+               <double>0.000100000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QLabel" name="label_13">
+              <property name="text">
+               <string>Ki</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="4">
+             <widget class="QDoubleSpinBox" name="rateRollILimit">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+              <property name="singleStep">
+               <double>0.000100000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="4">
+             <widget class="QDoubleSpinBox" name="ratePitchILimit">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+              <property name="singleStep">
+               <double>0.000100000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4">
+             <widget class="QLabel" name="label_14">
+              <property name="text">
+               <string>ILimit</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" rowspan="2">
+             <widget class="QCheckBox" name="linkRateRP">
+              <property name="text">
+               <string>Link</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLabel" name="label_15">
+              <property name="text">
+               <string>Yaw</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2">
+             <widget class="QDoubleSpinBox" name="rateYawKp">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+              <property name="singleStep">
+               <double>0.000100000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="3">
+             <widget class="QDoubleSpinBox" name="rateYawKi">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+              <property name="singleStep">
+               <double>0.000100000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="4">
+             <widget class="QDoubleSpinBox" name="rateYawILimit">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+              <property name="singleStep">
+               <double>0.000100000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>Attitude Stabilization (outer loop)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QFrame" name="frame_3">
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,1,2,2,2">
+            <item row="1" column="0" rowspan="2">
+             <widget class="QCheckBox" name="linkAttitudeRP">
+              <property name="text">
+               <string>Link</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="label_16">
+              <property name="text">
+               <string>Roll</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLabel" name="label_17">
+              <property name="text">
+               <string>Pitch</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLabel" name="label_18">
+              <property name="text">
+               <string>Yaw</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="QDoubleSpinBox" name="rollKp">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="2">
+             <widget class="QDoubleSpinBox" name="pitchKp">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="2">
+             <widget class="QDoubleSpinBox" name="yawKp">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3">
+             <widget class="QDoubleSpinBox" name="rollKi">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="3">
+             <widget class="QDoubleSpinBox" name="pitchKi">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="3">
+             <widget class="QDoubleSpinBox" name="yawKi">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="4">
+             <widget class="QDoubleSpinBox" name="rollILimit">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="4">
+             <widget class="QDoubleSpinBox" name="pitchILimit">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="4">
+             <widget class="QDoubleSpinBox" name="yawILimit">
+              <property name="decimals">
+               <number>6</number>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QLabel" name="label_19">
+              <property name="text">
+               <string>Kp</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QLabel" name="label_20">
+              <property name="text">
+               <string>Ki</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4">
+             <widget class="QLabel" name="label_21">
+              <property name="text">
+               <string>ILimit</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="realTimeUpdates">
+           <property name="text">
+            <string>Update in real time</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -646,6 +369,51 @@
       </attribute>
      </widget>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="resetStabilizationToDefaults">
+       <property name="text">
+        <string>Reset to defaults</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="getStabilizationCurrent">
+       <property name="text">
+        <string>Get Current</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveStabilizationToRAM">
+       <property name="text">
+        <string>Save to RAM</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveStabilizationToSD">
+       <property name="text">
+        <string>Save to SD</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

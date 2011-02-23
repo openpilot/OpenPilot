@@ -32,6 +32,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
+#include "stabilizationsettings.h"
 #include <QtGui/QWidget>
 #include <QList>
 
@@ -46,11 +47,14 @@ public:
 
 private:
     Ui_StabilizationWidget *m_stabilization;
+    StabilizationSettings* stabSettings;
 
 private slots:
     void requestStabilizationUpdate();
-//    void sendTelemetryUpdate();
-//    void saveTelemetryUpdate();
+    void sendStabilizationUpdate();
+    void saveStabilizationUpdate();
+    void resetStabilizationToDefaults();
+    void parameterValueChanged(double value);
 
 };
 

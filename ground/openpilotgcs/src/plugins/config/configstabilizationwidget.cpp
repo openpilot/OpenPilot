@@ -37,6 +37,8 @@
 
 ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
+    stabSettings = StabilizationSettings::GetInstance(getObjectManager());
+
     m_stabilization = new Ui_StabilizationWidget();
     m_stabilization->setupUi(this);
 
@@ -44,11 +46,16 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("StabilizationSettings")));
 
     requestStabilizationUpdate();
-    //connect(m_telemetry->saveTelemetryToSD, SIGNAL(clicked()), this, SLOT(saveTelemetryUpdate()));
-    //connect(m_telemetry->saveTelemetryToRAM, SIGNAL(clicked()), this, SLOT(sendTelemetryUpdate()));
-    //connect(m_telemetry->getTelemetryCurrent, SIGNAL(clicked()), this, SLOT(requestTelemetryUpdate()));
+    connect(m_stabilization->saveStabilizationToSD, SIGNAL(clicked()), this, SLOT(saveStabilizationUpdate()));
+    connect(m_stabilization->saveStabilizationToRAM, SIGNAL(clicked()), this, SLOT(sendStabilizationUpdate()));
+    connect(m_stabilization->getStabilizationCurrent, SIGNAL(clicked()), this, SLOT(requestStabilizationUpdate()));
+    connect(m_stabilization->resetStabilizationToDefaults, SIGNAL(clicked()), this, SLOT(resetStabilizationToDefaults()));
 
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestStabilizationUpdate()));
+
+    // TODO: create a timer to regularly send the object update in case
+    // we want realtime updates.
+
 
 }
 
@@ -67,41 +74,88 @@ ConfigStabilizationWidget::~ConfigStabilizationWidget()
   */
 void ConfigStabilizationWidget::requestStabilizationUpdate()
 {
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("StabilizationSettings")));
-    Q_ASSERT(obj);
-    obj->requestUpdate();
+    stabSettings->requestUpdate();
+    StabilizationSettings::DataFields stabData = stabSettings->getData();
+    // Now fill in all the fields, this is fairly tedious:
+    m_stabilization->rateRollKp->setValue(stabData.RollRatePI[StabilizationSettings::ROLLRATEPI_KP]);
+    m_stabilization->rateRollKi->setValue(stabData.RollRatePI[StabilizationSettings::ROLLRATEPI_KI]);
+    m_stabilization->rateRollILimit->setValue(stabData.RollRatePI[StabilizationSettings::ROLLRATEPI_ILIMIT]);
+
+    m_stabilization->ratePitchKp->setValue(stabData.PitchRatePI[StabilizationSettings::PITCHRATEPI_KP]);
+    m_stabilization->ratePitchKi->setValue(stabData.PitchRatePI[StabilizationSettings::PITCHRATEPI_KI]);
+    m_stabilization->ratePitchILimit->setValue(stabData.PitchRatePI[StabilizationSettings::PITCHRATEPI_ILIMIT]);
+
+    m_stabilization->rateYawKp->setValue(stabData.YawRatePI[StabilizationSettings::YAWRATEPI_KP]);
+    m_stabilization->rateYawKi->setValue(stabData.YawRatePI[StabilizationSettings::YAWRATEPI_KI]);
+    m_stabilization->rateYawILimit->setValue(stabData.YawRatePI[StabilizationSettings::YAWRATEPI_ILIMIT]);
+
+    m_stabilization->rollKp->setValue(stabData.RollPI[StabilizationSettings::ROLLPI_KP]);
+    m_stabilization->rollKi->setValue(stabData.RollPI[StabilizationSettings::ROLLPI_KI]);
+    m_stabilization->rollILimit->setValue(stabData.RollPI[StabilizationSettings::ROLLPI_ILIMIT]);
+
+    m_stabilization->pitchKp->setValue(stabData.PitchPI[StabilizationSettings::PITCHPI_KP]);
+    m_stabilization->pitchKi->setValue(stabData.PitchPI[StabilizationSettings::PITCHPI_KI]);
+    m_stabilization->pitchILimit->setValue(stabData.PitchPI[StabilizationSettings::PITCHPI_ILIMIT]);
+
+    m_stabilization->yawKp->setValue(stabData.YawPI[StabilizationSettings::YAWPI_KP]);
+    m_stabilization->yawKi->setValue(stabData.YawPI[StabilizationSettings::YAWPI_KI]);
+    m_stabilization->yawILimit->setValue(stabData.YawPI[StabilizationSettings::YAWPI_ILIMIT]);
+
 }
+
 
 /**
   Send telemetry settings to the board
   */
-/*
-void ConfigStabilizationWidget::sendTelemetryUpdate()
+
+void ConfigStabilizationWidget::sendStabilizationUpdate()
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("TelemetrySettings")));
-    Q_ASSERT(obj);
-    UAVObjectField* field = obj->getField(QString("Speed"));
-    field->setValue(m_telemetry->telemetrySpeed->currentText());
-    obj->updated();
+    StabilizationSettings::DataFields stabData = stabSettings->getData();
+
+    stabData.RollRatePI[StabilizationSettings::ROLLRATEPI_KP] = m_stabilization->rateRollKp->value();
+    stabData.RollRatePI[StabilizationSettings::ROLLRATEPI_KI] = m_stabilization->rateRollKi->value();
+    stabData.RollRatePI[StabilizationSettings::ROLLRATEPI_ILIMIT] = m_stabilization->rateRollILimit->value();
+
+    stabData.PitchRatePI[StabilizationSettings::PITCHRATEPI_KP] = m_stabilization->ratePitchKp->value();
+    stabData.PitchRatePI[StabilizationSettings::PITCHRATEPI_KI] = m_stabilization->ratePitchKi->value();
+    stabData.PitchRatePI[StabilizationSettings::PITCHRATEPI_ILIMIT] = m_stabilization->ratePitchILimit->value();
+
+    stabData.YawRatePI[StabilizationSettings::YAWRATEPI_KP] = m_stabilization->rateYawKp->value();
+    stabData.YawRatePI[StabilizationSettings::YAWRATEPI_KI] = m_stabilization->rateYawKi->value();
+    stabData.YawRatePI[StabilizationSettings::YAWRATEPI_ILIMIT] = m_stabilization->rateYawILimit->value();
+
+    stabData.RollPI[StabilizationSettings::ROLLPI_KP] = m_stabilization->rollKp->value();
+    stabData.RollPI[StabilizationSettings::ROLLPI_KI] = m_stabilization->rollKi->value();
+    stabData.RollPI[StabilizationSettings::ROLLPI_ILIMIT] = m_stabilization->rollILimit->value();
+
+    stabData.PitchPI[StabilizationSettings::PITCHPI_KP] = m_stabilization->pitchKp->value();
+    stabData.PitchPI[StabilizationSettings::PITCHPI_KI] = m_stabilization->pitchKi->value();
+    stabData.PitchPI[StabilizationSettings::PITCHPI_ILIMIT] = m_stabilization->pitchILimit->value();
+
+    stabData.YawPI[StabilizationSettings::YAWPI_KP] = m_stabilization->yawKp->value();
+    stabData.YawPI[StabilizationSettings::YAWPI_KI] = m_stabilization->yawKi->value();
+    stabData.YawPI[StabilizationSettings::YAWPI_ILIMIT] = m_stabilization->yawILimit->value();
+
+    stabSettings->setData(stabData); // this is atomic
 }
-*/
+
 
 /**
   Send telemetry settings to the board and request saving to SD card
   */
-/*
-void ConfigStabilizationWidget::saveTelemetryUpdate()
+
+void ConfigStabilizationWidget::saveStabilizationUpdate()
 {
     // Send update so that the latest value is saved
-    sendTelemetryUpdate();
+    sendStabilizationUpdate();
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("TelemetrySettings")));
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("StabilizationSettings")));
     Q_ASSERT(obj);
     updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
 }
-*/
 
 
+void ConfigStabilizationWidget::resetStabilizationToDefaults()
+{
+}

@@ -131,7 +131,7 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 
 	while (gps_rx_buffer_wr > 0)
 	{
-		t_gps_bin_packet *rx_packet = (t_gps_bin_packet *)gps_rx_buffer;
+		t_gps_bin_packet *rx_packet = (t_gps_bin_packet *)(gps_rx_buffer + i);
 
 		// scan for the start of a binary packet (the header bytes)
 		while (gps_rx_buffer_wr - i >= sizeof(rx_packet->header))

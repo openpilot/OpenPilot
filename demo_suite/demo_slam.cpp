@@ -12,6 +12,10 @@
  */
 
 
+/** ############################################################################
+ * #############################################################################
+ * features enable/disable
+ * ###########################################################################*/
 
 /*
  * STATUS: working fine, use it
@@ -78,8 +82,10 @@
 #define RELEVANCE_TEST 0
 
 
-///##############################################
-
+/** ############################################################################
+ * #############################################################################
+ * Includes
+ * ###########################################################################*/
 
 #include <iostream>
 #include <boost/shared_ptr.hpp>
@@ -88,10 +94,10 @@
 #include <time.h>
 #include <map>
 #include <getopt.h>
+#include "kernel/keyValueFile.hpp"
 
 // jafar debug include
 #include "kernel/jafarDebug.hpp"
-#include "kernel/jafarTestMacro.hpp"
 #include "kernel/timingTools.hpp"
 #include "kernel/dataLog.hpp"
 #include "jmath/random.hpp"
@@ -125,7 +131,11 @@
 #include "rtslam/hardwareSensorAdhocSimulator.hpp"
 #include "rtslam/hardwareEstimatorInertialAdhocSimulator.hpp"
 
-///##############################################
+
+/** ############################################################################
+ * #############################################################################
+ * types variables functions
+ * ###########################################################################*/
 
 using namespace jblas;
 using namespace jafar;
@@ -153,12 +163,14 @@ typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, S
 typedef DataManagerOnePointRansac<RawImage, SensorPinHole, FeatureImagePoint, image::ConvexRoi, ActiveSearchGrid, ImagePointHarrisDetector, ImagePointZnccMatcher> DataManager_ImagePoint_Ransac;
 typedef DataManagerOnePointRansac<simu::RawSimu, SensorPinHole, simu::FeatureSimu, image::ConvexRoi, ActiveSearchGrid, simu::DetectorSimu<image::ConvexRoi>, simu::MatcherSimu<image::ConvexRoi> > DataManager_ImagePoint_Ransac_Simu;
 
-///##############################################
-
 int mode = 0;
 time_t rseed;
 
-///##############################################
+
+/** ############################################################################
+ * #############################################################################
+ * program parameters
+ * ###########################################################################*/
 
 enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose, iRobot, iTrigger, iSimu, nIntOpts };
 int intOpts[nIntOpts] = {0};
@@ -202,18 +214,140 @@ struct option long_options[] = {
 	{"usage",0,0,0},
 };
 
-///##############################################
+
+/** ############################################################################
+ * #############################################################################
+ * Config data
+ * ###########################################################################*/
 
 const int slam_priority = -20; // needs to be started as root to be < 0
 const int display_priority = 10;
 const int display_period = 100; // ms
 const unsigned N_FRAMES = 500000;
 
-#include "config_slam_setup.hpp"
-#include "config_slam_estimation.hpp"
 
-///##############################################
+class ConfigSetup: public kernel::KeyValueFileSaveLoad
+{
+ public:
+	/// SENSOR
+	jblas::vec6 SENSOR_POSE_CONSTVEL; /// sensor pose in constant velocity (x,y,z,roll,pitch,yaw) (deg)
+	jblas::vec6 SENSOR_POSE_INERTIAL; /// sensor pose in inertial (x,y,z,roll,pitch,yaw) (deg)
 
+	std::string CAMERA_DEVICE; /// camera device (firewire ID or device)
+	unsigned IMG_WIDTH;        /// image width
+	unsigned IMG_HEIGHT;       /// image height
+	jblas::vec4 INTRINSIC;     /// intrisic calibration parameters (u0,v0,alphaU,alphaV)
+	jblas::vec3 DISTORTION;    /// distortion calibration parameters
+
+	/// SIMU SENSOR
+	unsigned IMG_WIDTH_SIMU;
+	unsigned IMG_HEIGHT_SIMU;
+	jblas::vec4 INTRINSIC_SIMU;
+	jblas::vec3 DISTORTION_SIMU;
+
+	/// CONSTANT VELOCITY
+	double UNCERT_VLIN; /// initial uncertainty stdev on linear velocity (m/s)
+	double UNCERT_VANG; /// initial uncertainty stdev on angular velocity (rad/s)
+	double PERT_VLIN;   /// perturbation on linear velocity, ie non-constantness (m/s per sqrt(s))
+	double PERT_VANG;   /// perturbation on angular velocity, ie non-constantness (rad/s per sqrt(s))
+
+	/// INERTIAL (also using UNCERT_VLIN)
+	std::string MTI_DEVICE;    /// IMU device
+	double ACCELERO_FULLSCALE; /// full scale of accelerometers (m/s2)  (MTI: 17)
+	double ACCELERO_NOISE;     /// noise stdev of accelerometers (m/s2) (MTI: 0.002*sqrt(30) )
+	double GYRO_FULLSCALE;     /// full scale of gyrometers (rad/s)     (MTI: rad(300) )
+	double GYRO_NOISE;         /// noise stdev of gyrometers (rad/s)    (MTI: rad(0.05)*sqrt(40) )
+
+	double UNCERT_GRAVITY;   /// initial gravity uncertainty (% of 9.81)
+	double UNCERT_ABIAS;     /// initial accelerometer bias uncertainty (% of ACCELERO_FULLSCALE)
+	double UNCERT_WBIAS;     /// initial gyrometer bias uncertainty (% of GYRO_FULLSCALE)
+	double PERT_AERR;        /// noise stdev of accelerometers (% of ACCELERO_NOISE)
+	double PERT_WERR;        /// noise stdev of gyrometers (% of GYRO_NOISE)
+	double PERT_RANWALKACC;  /// IMU a_bias random walk (m/s2 per sqrt(s))
+	double PERT_RANWALKGYRO; /// IMU w_bias random walk (rad/s per sqrt(s))
+
+	double IMU_TIMESTAMP_CORRECTION; /// correction to add to the IMU timestamp for synchronization (s)
+
+	/// SIMU INERTIAL
+	double SIMU_IMU_TIMESTAMP_CORRECTION;
+	double SIMU_IMU_FREQ;
+	double SIMU_IMU_GRAVITY;
+	double SIMU_IMU_GYR_BIAS;
+	double SIMU_IMU_GYR_BIAS_NOISESTD;
+	double SIMU_IMU_GYR_GAIN;
+	double SIMU_IMU_GYR_GAIN_NOISESTD;
+	double SIMU_IMU_RANDWALKGYR_FACTOR;
+	double SIMU_IMU_ACC_BIAS;
+	double SIMU_IMU_ACC_BIAS_NOISESTD;
+	double SIMU_IMU_ACC_GAIN;
+	double SIMU_IMU_ACC_GAIN_NOISESTD;
+	double SIMU_IMU_RANDWALKACC_FACTOR;
+	
+ public:
+	virtual void loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFile);
+	virtual void saveKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile);
+} configSetup;
+
+
+
+class ConfigEstimation: public kernel::KeyValueFileSaveLoad
+{
+ public:
+	/// MISC
+	unsigned CORRECTION_SIZE; /// number of coefficients for the distortion correction polynomial
+
+	/// FILTER
+	unsigned MAP_SIZE; /// map size in # of states, robot + landmarks
+	double PIX_NOISE;  /// measurement noise of a point
+	double PIX_NOISE_SIMUFACTOR;
+
+	/// LANDMARKS
+	double D_MIN;      /// inverse depth mean initialization
+	double REPARAM_TH; /// reparametrization threshold
+
+	unsigned GRID_HCELLS;
+	unsigned GRID_VCELLS;
+	unsigned GRID_MARGIN;
+	unsigned GRID_SEPAR;
+
+	double RELEVANCE_TH;       /// (# of sigmas)
+	double MAHALANOBIS_TH;     /// (# of sigmas)
+	unsigned N_UPDATES_TOTAL;  /// max number of landmarks to update every frame
+	unsigned N_UPDATES_RANSAC; /// max number of landmarks to update with ransac every frame
+	unsigned N_INIT;           /// maximum number of landmarks to try to initialize every frame
+	unsigned N_RECOMP_GAINS;   /// how many times information gain is recomputed to resort observations in active search
+	double RANSAC_LOW_INNOV;   /// ransac low innovation threshold (pixels)
+
+	unsigned RANSAC_NTRIES;    /// number of base observation used to initialize a ransac set
+
+	/// RAW PROCESSING
+	unsigned HARRIS_CONV_SIZE;
+	double HARRIS_TH;
+	double HARRIS_EDDGE;
+
+	unsigned DESC_SIZE;     /// descriptor patch size (odd value)
+	double DESC_SCALE_STEP; /// MultiviewDescriptor: min change of scale (ratio)
+	double DESC_ANGLE_STEP; /// MultiviewDescriptor: min change of point of view (deg)
+	int DESC_PREDICTION_TYPE; /// type of prediction from descriptor (0 = none, 1 = affine, 2 = homographic)
+
+	unsigned PATCH_SIZE;       /// patch size used for matching
+	unsigned MAX_SEARCH_SIZE;  /// if the search area is larger than this # of pixels, we bound it
+	unsigned KILL_SEARCH_SIZE; /// if the search area is larger than this # of pixels, we vote for killing the landmark
+	double MATCH_TH;           /// ZNCC score threshold
+	double MIN_SCORE;          /// min ZNCC score under which we don't finish to compute the value of the score
+	double PARTIAL_POSITION;   /// position in the patch where we test if we finish the correlation computation
+	
+ public:
+	virtual void loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFile);
+	virtual void saveKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile);
+} configEstimation;
+
+
+
+/** ############################################################################
+ * #############################################################################
+ * Slam function
+ * ###########################################################################*/
 
 
 void demo_slam01_main(world_ptr_t *world) {
@@ -860,6 +994,11 @@ std::cout << "average_robot_innovation " << average_robot_innovation << std::end
 } // demo_slam01_main
 
 
+/** ############################################################################
+ * #############################################################################
+ * Display function
+ * ###########################################################################*/
+
 void demo_slam01_display(world_ptr_t *world) {
 //	static unsigned prev_t = 0;
 	kernel::Timer timer(display_period*1000);
@@ -979,6 +1118,12 @@ void demo_slam01_display(world_ptr_t *world) {
 	}
 }
 
+
+/** ############################################################################
+ * #############################################################################
+ * Exit function
+ * ###########################################################################*/
+
 void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 	(*world)->exit(true);
 	(*world)->display_condition.notify_all();
@@ -987,179 +1132,388 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
 	thread_main->timed_join(boost::posix_time::milliseconds(500));
 }
 
+/** ############################################################################
+ * #############################################################################
+ * Demo function
+ * ###########################################################################*/
 
-	void demo_slam01() {
-		world_ptr_t worldPtr(new WorldAbstract());
+void demo_slam01() {
+	world_ptr_t worldPtr(new WorldAbstract());
 
-		// deal with the random seed
-		rseed = time(NULL);
-		if (intOpts[iRandSeed] != 0 && intOpts[iRandSeed] != 1)
-			rseed = intOpts[iRandSeed];
-		if (!intOpts[iReplay] && intOpts[iDump]) {
-			std::fstream f((strOpts[sDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::out);
-			f << rseed << std::endl;
-			f.close();
-		}
-		else if (intOpts[iReplay] && intOpts[iRandSeed] == 1) {
-			std::fstream f((strOpts[sDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::in);
-			f >> rseed;
-			f.close();
-		}
-		std::cout << __FILE__ << ":" << __LINE__ << " rseed " << rseed << std::endl;
-		rtslam::srand(rseed);
+	// deal with the random seed
+	rseed = time(NULL);
+	if (intOpts[iRandSeed] != 0 && intOpts[iRandSeed] != 1)
+		rseed = intOpts[iRandSeed];
+	if (!intOpts[iReplay] && intOpts[iDump]) {
+		std::fstream f((strOpts[sDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::out);
+		f << rseed << std::endl;
+		f.close();
+	}
+	else if (intOpts[iReplay] && intOpts[iRandSeed] == 1) {
+		std::fstream f((strOpts[sDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::in);
+		f >> rseed;
+		f.close();
+	}
+	std::cout << __FILE__ << ":" << __LINE__ << " rseed " << rseed << std::endl;
+	rtslam::srand(rseed);
 
+	#ifdef HAVE_MODULE_QDISPLAY
+	if (intOpts[iDispQt])
+	{
+		display::ViewerQt *viewerQt = new display::ViewerQt(8, configEstimation.MAHALANOBIS_TH, false, "data/rendered2D_%02d-%06d.png");
+		worldPtr->addDisplayViewer(viewerQt, display::ViewerQt::id());
+	}
+	#endif
+	#ifdef HAVE_MODULE_GDHE
+	if (intOpts[iDispGdhe])
+	{
+		display::ViewerGdhe *viewerGdhe = new display::ViewerGdhe("camera", configEstimation.MAHALANOBIS_TH, "localhost");
+		boost::filesystem::path ram_path("/mnt/ram");
+		if (boost::filesystem::exists(ram_path) && boost::filesystem::is_directory(ram_path))
+			viewerGdhe->setConvertTempPath("/mnt/ram");
+		worldPtr->addDisplayViewer(viewerGdhe, display::ViewerGdhe::id());
+	}
+	#endif
+
+	// to start with qt display
+	if (intOpts[iDispQt]) // at least 2d
+	{
 		#ifdef HAVE_MODULE_QDISPLAY
-		if (intOpts[iDispQt])
-		{
-			display::ViewerQt *viewerQt = new display::ViewerQt(8, configEstimation.MAHALANOBIS_TH, false, "data/rendered2D_%02d-%06d.png");
-			worldPtr->addDisplayViewer(viewerQt, display::ViewerQt::id());
-		}
+		qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,display_priority,(qdisplay::FUNC)&demo_slam01_main,slam_priority,display_period,&worldPtr,(qdisplay::EXIT)&demo_slam01_exit);
+		#else
+		std::cout << "Please install qdisplay module if you want 2D display" << std::endl;
 		#endif
+	} else
+	if (intOpts[iDispGdhe]) // only 3d
+	{
 		#ifdef HAVE_MODULE_GDHE
-		if (intOpts[iDispGdhe])
-		{
-			display::ViewerGdhe *viewerGdhe = new display::ViewerGdhe("camera", configEstimation.MAHALANOBIS_TH, "localhost");
-			boost::filesystem::path ram_path("/mnt/ram");
-			if (boost::filesystem::exists(ram_path) && boost::filesystem::is_directory(ram_path))
-				viewerGdhe->setConvertTempPath("/mnt/ram");
-			worldPtr->addDisplayViewer(viewerGdhe, display::ViewerGdhe::id());
-		}
+		kernel::setCurrentThreadPriority(display_priority);
+		boost::thread *thread_disp = new boost::thread(boost::bind(demo_slam01_display,&worldPtr));
+		kernel::setCurrentThreadPriority(slam_priority);
+		demo_slam01_main(&worldPtr);
+		delete thread_disp;
+		#else
+		std::cout << "Please install gdhe module if you want 3D display" << std::endl;
 		#endif
-
-		// to start with qt display
-		if (intOpts[iDispQt]) // at least 2d
-		{
-			#ifdef HAVE_MODULE_QDISPLAY
-			qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,display_priority,(qdisplay::FUNC)&demo_slam01_main,slam_priority,display_period,&worldPtr,(qdisplay::EXIT)&demo_slam01_exit);
-			#else
-			std::cout << "Please install qdisplay module if you want 2D display" << std::endl;
-			#endif
-		} else
-		if (intOpts[iDispGdhe]) // only 3d
-		{
-			#ifdef HAVE_MODULE_GDHE
-			kernel::setCurrentThreadPriority(display_priority);
-			boost::thread *thread_disp = new boost::thread(boost::bind(demo_slam01_display,&worldPtr));
-			kernel::setCurrentThreadPriority(slam_priority);
-			demo_slam01_main(&worldPtr);
-			delete thread_disp;
-			#else
-			std::cout << "Please install gdhe module if you want 3D display" << std::endl;
-			#endif
-		} else // none
-		{
-			kernel::setCurrentThreadPriority(slam_priority);
-			demo_slam01_main(&worldPtr);
-		}
-
-		JFR_DEBUG("Terminated");
+	} else // none
+	{
+		kernel::setCurrentThreadPriority(slam_priority);
+		demo_slam01_main(&worldPtr);
 	}
 
+	JFR_DEBUG("Terminated");
+}
 
 
 
-		/**
-		 * Program options:
-		 * --disp-2d=0/1
-		 * --disp-3d=0/1
-		 * --render-all=0/1 (needs --replay 1)
-		 * --replay=0/1 (needs --data-path)
-		 * --dump=0/1  (needs --data-path)
-		 * --rand-seed=0/1/n, 0=generate new one, 1=in replay use the saved one, n=use seed n
-		 * --pause=0/n 0=don't, n=pause for frames>n (needs --replay 1)
-		 * --log=0/1 -> log result in text file
-		 * --verbose=0/1/2/3/4/5 -> Off/Trace/Warning/Debug/VerboseDebug/VeryVerboseDebug
-		 * --data-path=/mnt/ram/rtslam
-		 * --config-setup=data/setup.cfg
-		 * --config-estimation=data/estimation.cfg
-		 * --help
-		 * --usage
-		 * --robot 0=constant vel, 1=inertial
-		 * --trigger 0=internal, 1=external with MTI control, 2=external without control
-		 * --simu 0/1
-		 * --freq camera frequency in double Hz (with trigger==0/1)
-		 * --shutter shutter time in double seconds (with trigger==1)
-		 *
-		 * You can use the following examples and only change values:
-		 * online test (old mode=0):
-		 *   demo_slam --disp-2d=1 --disp-3d=1 --render-all=0 --replay=0 --dump=0 --rand-seed=0 --pause=0 --data-path=data/rtslam01
-		 *   demo_slam --disp-2d=1 --disp-3d=1
-		 * online with dump (old mode=1):
-		 *   demo_slam --disp-2d=1 --disp-3d=1 --render-all=0 --replay=0 --dump=1 --rand-seed=0 --pause=0 --data-path=data/rtslam01
-		 *   demo_slam --disp-2d=1 --disp-3d=1 --dump=1 --data-path=data/rtslam01
-		 * replay with pause  (old mode=2):
-		 *   demo_slam --disp-2d=1 --disp-3d=1 --render-all=1 --replay=1 --dump=0 --rand-seed=1 --pause=1 --data-path=data/rtslam01
-		 * replay with dump  (old mode=3):
-		 *   demo_slam --disp-2d=1 --disp-3d=1 --render-all=1 --replay=1 --dump=1 --rand-seed=1 --pause=0 --data-path=data/rtslam01
-		 */
-		int main(int argc, char* const* argv)
+/** ############################################################################
+ * #############################################################################
+ * main function
+ * ###########################################################################*/
+
+/**
+	* Program options:
+	* --disp-2d=0/1
+	* --disp-3d=0/1
+	* --render-all=0/1 (needs --replay 1)
+	* --replay=0/1 (needs --data-path)
+	* --dump=0/1  (needs --data-path)
+	* --rand-seed=0/1/n, 0=generate new one, 1=in replay use the saved one, n=use seed n
+	* --pause=0/n 0=don't, n=pause for frames>n (needs --replay 1)
+	* --log=0/1 -> log result in text file
+	* --verbose=0/1/2/3/4/5 -> Off/Trace/Warning/Debug/VerboseDebug/VeryVerboseDebug
+	* --data-path=/mnt/ram/rtslam
+	* --config-setup=data/setup.cfg
+	* --config-estimation=data/estimation.cfg
+	* --help
+	* --usage
+	* --robot 0=constant vel, 1=inertial
+	* --trigger 0=internal, 1=external with MTI control, 2=external without control
+	* --simu 0/1
+	* --freq camera frequency in double Hz (with trigger==0/1)
+	* --shutter shutter time in double seconds (with trigger==1)
+	*
+	* You can use the following examples and only change values:
+	* online test (old mode=0):
+	*   demo_slam --disp-2d=1 --disp-3d=1 --render-all=0 --replay=0 --dump=0 --rand-seed=0 --pause=0 --data-path=data/rtslam01
+	*   demo_slam --disp-2d=1 --disp-3d=1
+	* online with dump (old mode=1):
+	*   demo_slam --disp-2d=1 --disp-3d=1 --render-all=0 --replay=0 --dump=1 --rand-seed=0 --pause=0 --data-path=data/rtslam01
+	*   demo_slam --disp-2d=1 --disp-3d=1 --dump=1 --data-path=data/rtslam01
+	* replay with pause  (old mode=2):
+	*   demo_slam --disp-2d=1 --disp-3d=1 --render-all=1 --replay=1 --dump=0 --rand-seed=1 --pause=1 --data-path=data/rtslam01
+	* replay with dump  (old mode=3):
+	*   demo_slam --disp-2d=1 --disp-3d=1 --render-all=1 --replay=1 --dump=1 --rand-seed=1 --pause=0 --data-path=data/rtslam01
+	*/
+int main(int argc, char* const* argv)
+{
+	intOpts[iVerbose] = 5;
+	floatOpts[fFreq] = 60.0;
+	floatOpts[fShutter] = 2e-3;
+	strOpts[sDataPath] = ".";
+	strOpts[sConfigSetup] = "data/setup.cfg";
+	strOpts[sConfigEstimation] = "data/estimation.cfg";
+	
+	while (1)
+	{
+		int c, option_index = 0;
+		c = getopt_long_only(argc, argv, "", long_options, &option_index);
+		if (c == -1) break;
+		if (c == 0)
 		{
-			intOpts[iVerbose] = 5;
-			floatOpts[fFreq] = 60.0;
-			floatOpts[fShutter] = 2e-3;
-			strOpts[sDataPath] = ".";
-			strOpts[sConfigSetup] = "data/setup.cfg";
-			strOpts[sConfigEstimation] = "data/estimation.cfg";
-			
-			while (1)
+			if (option_index <= nLastIntOpt)
 			{
-				int c, option_index = 0;
-				c = getopt_long_only(argc, argv, "", long_options, &option_index);
-				if (c == -1) break;
-				if (c == 0)
-				{
-					if (option_index <= nLastIntOpt)
-					{
-						intOpts[option_index] = 1;
-						if (optarg) intOpts[option_index-nFirstIntOpt] = atoi(optarg);
-					} else
-					if (option_index <= nLastFloatOpt)
-					{
-						if (optarg) floatOpts[option_index-nFirstFloatOpt] = atof(optarg);
-					} else
-					if (option_index <= nLastStrOpt)
-					{
-						if (optarg) strOpts[option_index-nFirstStrOpt] = optarg;
-					} else
-					{
-						std::cout << "Integer options:" << std::endl;
-						for(int i = 0; i < nIntOpts; ++i)
-							std::cout << "\t--" << long_options[i+nFirstIntOpt].name << std::endl;
-						
-						std::cout << "Float options:" << std::endl;
-						for(int i = 0; i < nFloatOpts; ++i)
-							std::cout << "\t--" << long_options[i+nFirstFloatOpt].name << std::endl;
+				intOpts[option_index] = 1;
+				if (optarg) intOpts[option_index-nFirstIntOpt] = atoi(optarg);
+			} else
+			if (option_index <= nLastFloatOpt)
+			{
+				if (optarg) floatOpts[option_index-nFirstFloatOpt] = atof(optarg);
+			} else
+			if (option_index <= nLastStrOpt)
+			{
+				if (optarg) strOpts[option_index-nFirstStrOpt] = optarg;
+			} else
+			{
+				std::cout << "Integer options:" << std::endl;
+				for(int i = 0; i < nIntOpts; ++i)
+					std::cout << "\t--" << long_options[i+nFirstIntOpt].name << std::endl;
+				
+				std::cout << "Float options:" << std::endl;
+				for(int i = 0; i < nFloatOpts; ++i)
+					std::cout << "\t--" << long_options[i+nFirstFloatOpt].name << std::endl;
 
-						std::cout << "String options:" << std::endl;
-						for(int i = 0; i < nStrOpts; ++i)
-							std::cout << "\t--" << long_options[i+nFirstStrOpt].name << std::endl;
-						
-						std::cout << "Breaking options:" << std::endl;
-						for(int i = 0; i < 2; ++i)
-							std::cout << "\t--" << long_options[i+nFirstBreakingOpt].name << std::endl;
-						
-						return 0;
-					}
-				} else
-				{
-					std::cerr << "Unknown option " << c << std::endl;
-				}
+				std::cout << "String options:" << std::endl;
+				for(int i = 0; i < nStrOpts; ++i)
+					std::cout << "\t--" << long_options[i+nFirstStrOpt].name << std::endl;
+				
+				std::cout << "Breaking options:" << std::endl;
+				for(int i = 0; i < 2; ++i)
+					std::cout << "\t--" << long_options[i+nFirstBreakingOpt].name << std::endl;
+				
+				return 0;
 			}
-
-			// consistency
-			if (intOpts[iReplay]) mode = 2; else
-				if (intOpts[iDump]) mode = 1; else
-					mode = 0;
-			#ifndef HAVE_MODULE_QDISPLAY
-			intOpts[iDispQt] = 0;
-			#endif
-			#ifndef HAVE_MODULE_GDHE
-			intOpts[iDispGdhe] = 0;
-			#endif
-
-			try {
-				configSetup.load(strOpts[sConfigSetup]);
-				configEstimation.load(strOpts[sConfigEstimation]);
-				demo_slam01();
-			} catch (kernel::Exception &e) { std::cout << e.what(); return 1; }
+		} else
+		{
+			std::cerr << "Unknown option " << c << std::endl;
 		}
+	}
+
+	// consistency
+	if (intOpts[iReplay]) mode = 2; else
+		if (intOpts[iDump]) mode = 1; else
+			mode = 0;
+	#ifndef HAVE_MODULE_QDISPLAY
+	intOpts[iDispQt] = 0;
+	#endif
+	#ifndef HAVE_MODULE_GDHE
+	intOpts[iDispGdhe] = 0;
+	#endif
+
+	try {
+		configSetup.load(strOpts[sConfigSetup]);
+		configEstimation.load(strOpts[sConfigEstimation]);
+		demo_slam01();
+	} catch (kernel::Exception &e) { std::cout << e.what(); return 1; }
+}
+
+
+
+/** ############################################################################
+ * #############################################################################
+ * Config file loading
+ * ###########################################################################*/
+
+#define KeyValueFile_getItem(k) keyValueFile.getItem(#k, k);
+#define KeyValueFile_setItem(k) keyValueFile.setItem(#k, k);
+
+
+void ConfigSetup::loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFile)
+{
+	KeyValueFile_getItem(SENSOR_POSE_CONSTVEL);
+	KeyValueFile_getItem(SENSOR_POSE_INERTIAL);
+	
+	KeyValueFile_getItem(CAMERA_DEVICE);
+	KeyValueFile_getItem(IMG_WIDTH);
+	KeyValueFile_getItem(IMG_HEIGHT);
+	KeyValueFile_getItem(INTRINSIC);
+	KeyValueFile_getItem(DISTORTION);
+	
+	KeyValueFile_getItem(IMG_WIDTH_SIMU);
+	KeyValueFile_getItem(IMG_HEIGHT_SIMU);
+	KeyValueFile_getItem(INTRINSIC_SIMU);
+	KeyValueFile_getItem(DISTORTION_SIMU);
+	
+	KeyValueFile_getItem(UNCERT_VLIN);
+	KeyValueFile_getItem(UNCERT_VANG);
+	KeyValueFile_getItem(PERT_VLIN);
+	KeyValueFile_getItem(PERT_VANG);
+	
+	KeyValueFile_getItem(MTI_DEVICE);
+	KeyValueFile_getItem(ACCELERO_FULLSCALE);
+	KeyValueFile_getItem(ACCELERO_NOISE);
+	KeyValueFile_getItem(GYRO_FULLSCALE);
+	KeyValueFile_getItem(GYRO_NOISE);
+	
+	KeyValueFile_getItem(UNCERT_GRAVITY);
+	KeyValueFile_getItem(UNCERT_ABIAS);
+	KeyValueFile_getItem(UNCERT_WBIAS);
+	KeyValueFile_getItem(PERT_AERR);
+	KeyValueFile_getItem(PERT_WERR);
+	KeyValueFile_getItem(PERT_RANWALKACC);
+	KeyValueFile_getItem(PERT_RANWALKGYRO);
+	
+	KeyValueFile_getItem(IMU_TIMESTAMP_CORRECTION);
+	
+	KeyValueFile_getItem(SIMU_IMU_TIMESTAMP_CORRECTION);
+	KeyValueFile_getItem(SIMU_IMU_FREQ);
+	KeyValueFile_getItem(SIMU_IMU_GRAVITY);
+	KeyValueFile_getItem(SIMU_IMU_GYR_BIAS);
+	KeyValueFile_getItem(SIMU_IMU_GYR_BIAS_NOISESTD);
+	KeyValueFile_getItem(SIMU_IMU_GYR_GAIN);
+	KeyValueFile_getItem(SIMU_IMU_GYR_GAIN_NOISESTD);
+	KeyValueFile_getItem(SIMU_IMU_RANDWALKGYR_FACTOR);
+	KeyValueFile_getItem(SIMU_IMU_ACC_BIAS);
+	KeyValueFile_getItem(SIMU_IMU_ACC_BIAS_NOISESTD);
+	KeyValueFile_getItem(SIMU_IMU_ACC_GAIN);
+	KeyValueFile_getItem(SIMU_IMU_ACC_GAIN_NOISESTD);
+	KeyValueFile_getItem(SIMU_IMU_RANDWALKACC_FACTOR);
+}
+
+void ConfigSetup::saveKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile)
+{
+	KeyValueFile_setItem(SENSOR_POSE_CONSTVEL);
+	KeyValueFile_setItem(SENSOR_POSE_INERTIAL);
+	
+	KeyValueFile_setItem(CAMERA_DEVICE);
+	KeyValueFile_setItem(IMG_WIDTH);
+	KeyValueFile_setItem(IMG_HEIGHT);
+	KeyValueFile_setItem(INTRINSIC);
+	KeyValueFile_setItem(DISTORTION);
+	
+	KeyValueFile_setItem(IMG_WIDTH_SIMU);
+	KeyValueFile_setItem(IMG_HEIGHT_SIMU);
+	KeyValueFile_setItem(INTRINSIC_SIMU);
+	KeyValueFile_setItem(DISTORTION_SIMU);
+	
+	KeyValueFile_setItem(UNCERT_VLIN);
+	KeyValueFile_setItem(UNCERT_VANG);
+	KeyValueFile_setItem(PERT_VLIN);
+	KeyValueFile_setItem(PERT_VANG);
+	
+	KeyValueFile_setItem(MTI_DEVICE);
+	KeyValueFile_setItem(ACCELERO_FULLSCALE);
+	KeyValueFile_setItem(ACCELERO_NOISE);
+	KeyValueFile_setItem(GYRO_FULLSCALE);
+	KeyValueFile_setItem(GYRO_NOISE);
+	
+	KeyValueFile_setItem(UNCERT_GRAVITY);
+	KeyValueFile_setItem(UNCERT_ABIAS);
+	KeyValueFile_setItem(UNCERT_WBIAS);
+	KeyValueFile_setItem(PERT_AERR);
+	KeyValueFile_setItem(PERT_WERR);
+	KeyValueFile_setItem(PERT_RANWALKACC);
+	KeyValueFile_setItem(PERT_RANWALKGYRO);
+	
+	KeyValueFile_setItem(IMU_TIMESTAMP_CORRECTION);
+	
+	KeyValueFile_setItem(SIMU_IMU_TIMESTAMP_CORRECTION);
+	KeyValueFile_setItem(SIMU_IMU_FREQ);
+	KeyValueFile_setItem(SIMU_IMU_GRAVITY);
+	KeyValueFile_setItem(SIMU_IMU_GYR_BIAS);
+	KeyValueFile_setItem(SIMU_IMU_GYR_BIAS_NOISESTD);
+	KeyValueFile_setItem(SIMU_IMU_GYR_GAIN);
+	KeyValueFile_setItem(SIMU_IMU_GYR_GAIN_NOISESTD);
+	KeyValueFile_setItem(SIMU_IMU_RANDWALKGYR_FACTOR);
+	KeyValueFile_setItem(SIMU_IMU_ACC_BIAS);
+	KeyValueFile_setItem(SIMU_IMU_ACC_BIAS_NOISESTD);
+	KeyValueFile_setItem(SIMU_IMU_ACC_GAIN);
+	KeyValueFile_setItem(SIMU_IMU_ACC_GAIN_NOISESTD);
+	KeyValueFile_setItem(SIMU_IMU_RANDWALKACC_FACTOR);
+}
+
+void ConfigEstimation::loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFile)
+{
+	KeyValueFile_getItem(CORRECTION_SIZE);
+	
+	KeyValueFile_getItem(MAP_SIZE);
+	KeyValueFile_getItem(PIX_NOISE);
+	KeyValueFile_getItem(PIX_NOISE_SIMUFACTOR);
+	
+	KeyValueFile_getItem(D_MIN);
+	KeyValueFile_getItem(REPARAM_TH);
+	
+	KeyValueFile_getItem(GRID_HCELLS);
+	KeyValueFile_getItem(GRID_VCELLS);
+	KeyValueFile_getItem(GRID_MARGIN);
+	KeyValueFile_getItem(GRID_SEPAR);
+	
+	KeyValueFile_getItem(RELEVANCE_TH);
+	KeyValueFile_getItem(MAHALANOBIS_TH);
+	KeyValueFile_getItem(N_UPDATES_TOTAL);
+	KeyValueFile_getItem(N_UPDATES_RANSAC);
+	KeyValueFile_getItem(N_INIT);
+	KeyValueFile_getItem(N_RECOMP_GAINS);
+	KeyValueFile_getItem(RANSAC_LOW_INNOV);
+	
+	KeyValueFile_getItem(RANSAC_NTRIES);
+	
+	KeyValueFile_getItem(HARRIS_CONV_SIZE);
+	KeyValueFile_getItem(HARRIS_TH);
+	KeyValueFile_getItem(HARRIS_EDDGE);
+	
+	KeyValueFile_getItem(DESC_SIZE);
+	KeyValueFile_getItem(DESC_SCALE_STEP);
+	KeyValueFile_getItem(DESC_ANGLE_STEP);
+	KeyValueFile_getItem(DESC_PREDICTION_TYPE);
+	
+	KeyValueFile_getItem(PATCH_SIZE);
+	KeyValueFile_getItem(MAX_SEARCH_SIZE);
+	KeyValueFile_getItem(KILL_SEARCH_SIZE);
+	KeyValueFile_getItem(MATCH_TH);
+	KeyValueFile_getItem(MIN_SCORE);
+	KeyValueFile_getItem(PARTIAL_POSITION);
+}
+
+void ConfigEstimation::saveKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile)
+{
+	KeyValueFile_setItem(CORRECTION_SIZE);
+	
+	KeyValueFile_setItem(MAP_SIZE);
+	KeyValueFile_setItem(PIX_NOISE);
+	KeyValueFile_setItem(PIX_NOISE_SIMUFACTOR);
+	
+	KeyValueFile_setItem(D_MIN);
+	KeyValueFile_setItem(REPARAM_TH);
+	
+	KeyValueFile_setItem(GRID_HCELLS);
+	KeyValueFile_setItem(GRID_VCELLS);
+	KeyValueFile_setItem(GRID_MARGIN);
+	KeyValueFile_setItem(GRID_SEPAR);
+	
+	KeyValueFile_setItem(RELEVANCE_TH);
+	KeyValueFile_setItem(MAHALANOBIS_TH);
+	KeyValueFile_setItem(N_UPDATES_TOTAL);
+	KeyValueFile_setItem(N_UPDATES_RANSAC);
+	KeyValueFile_setItem(N_INIT);
+	KeyValueFile_setItem(N_RECOMP_GAINS);
+	KeyValueFile_setItem(RANSAC_LOW_INNOV);
+	
+	KeyValueFile_setItem(RANSAC_NTRIES);
+	
+	KeyValueFile_setItem(HARRIS_CONV_SIZE);
+	KeyValueFile_setItem(HARRIS_TH);
+	KeyValueFile_setItem(HARRIS_EDDGE);
+	
+	KeyValueFile_setItem(DESC_SIZE);
+	KeyValueFile_setItem(DESC_SCALE_STEP);
+	KeyValueFile_setItem(DESC_ANGLE_STEP);
+	KeyValueFile_setItem(DESC_PREDICTION_TYPE);
+	
+	KeyValueFile_setItem(PATCH_SIZE);
+	KeyValueFile_setItem(MAX_SEARCH_SIZE);
+	KeyValueFile_setItem(KILL_SEARCH_SIZE);
+	KeyValueFile_setItem(MATCH_TH);
+	KeyValueFile_setItem(MIN_SCORE);
+	KeyValueFile_setItem(PARTIAL_POSITION);
+}

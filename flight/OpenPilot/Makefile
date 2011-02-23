@@ -22,6 +22,9 @@
  # 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  #####
 
+WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
+TOP      := $(realpath $(WHEREAMI)/../../)
+include $(TOP)/make/firmware-defs.mk
 
 # Set developer code and compile options
 # Set to YES to compile for debugging
@@ -42,9 +45,6 @@ USE_SPEKTRUM ?= NO
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= YES
 
-# Toolchain prefix (i.e arm-elf- -> arm-elf-gcc.exe)
-TCHAIN_PREFIX ?= arm-none-eabi-
-
 # Remove command is different for Code Sourcery on Windows
 ifeq ($(CODE_SOURCERY), YES)
 REMOVE_CMD = cs-rm
@@ -53,10 +53,6 @@ REMOVE_CMD = rm
 endif
 
 FLASH_TOOL = OPENOCD
-
-# YES enables -mthumb option to flags for source-files listed
-# in SRC and CPPSRC
-USE_THUMB_MODE = YES
 
 # List of modules to include
 MODULES =  Actuator Telemetry GPS ManualControl Altitude AHRSComms Stabilization Guidance FirmwareIAP FlightPlan
@@ -83,13 +79,12 @@ BOOT_MODEL    = $(MODEL)_NB
 endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = ../../build/openpilot
+OUTDIR = $(TOP)/build/openpilot
 
 # Target file name (without extension).
 TARGET = OpenPilot
 
 # Paths
-TOP              := $(realpath $(PWD))/
 OPSYSTEM = ./System
 OPSYSTEMINC = $(OPSYSTEM)/inc
 OPUAVTALK = ../UAVTalk
@@ -419,7 +414,7 @@ CFLAGS = -g$(DEBUGF) -DDEBUG
 endif
 
 CFLAGS += -O$(OPT)
-CFLAGS += -mcpu=$(MCU) -mthumb
+CFLAGS += -mcpu=$(MCU)
 CFLAGS += $(CDEFS)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 
@@ -497,48 +492,11 @@ OOCD_CL+=-c "reset run"
 OOCD_CL+=-c shutdown
 # ---------------------------------------------------------------------------
 
-# Test if quotes are needed for the echo-command
-result = ${shell echo "test"}
-ifeq (${result}, test)
-	quote = '
-# This line is just to clear out the single quote above '
-else
-	quote =
-endif
-
 # Define programs and commands.
-CC      = $(TCHAIN_PREFIX)gcc
-CPP     = $(TCHAIN_PREFIX)g++
-AR      = $(TCHAIN_PREFIX)ar
-OBJCOPY = $(TCHAIN_PREFIX)objcopy
-OBJDUMP = $(TCHAIN_PREFIX)objdump
-SIZE    = $(TCHAIN_PREFIX)size
-NM      = $(TCHAIN_PREFIX)nm
 REMOVE  = $(REMOVE_CMD) -f
 PYTHON  = python
 ###SHELL   = sh
 ###COPY    = cp
-
-# Define Messages
-# English
-MSG_FORMATERROR      := ${quote} Can not handle output-format${quote}
-MSG_MODINIT          := ${quote} MODINIT   ${quote}
-MSG_SIZE_BEFORE      := ${quote} Size before:${quote}
-MSG_SIZE_AFTER       := ${quote} Size after build:${quote}
-MSG_LOAD_FILE        := ${quote} BIN/HEX   ${quote}
-MSG_EXTENDED_LISTING := ${quote} LIS       ${quote}
-MSG_SYMBOL_TABLE     := ${quote} NM        ${quote}
-MSG_LINKING          := ${quote} LD        ${quote}
-MSG_COMPILING        := ${quote} CC        ${quote}
-MSG_COMPILING_ARM    := ${quote} CC-ARM    ${quote}
-MSG_COMPILINGCPP     := ${quote} CXX       ${quote}
-MSG_COMPILINGCPP_ARM := ${quote} CXX-ARM   ${quote}
-MSG_ASSEMBLING       := ${quote} AS        ${quote}
-MSG_ASSEMBLING_ARM   := ${quote} AS-ARM    ${quote}
-MSG_CLEANING         := ${quote} CLEAN     ${quote}
-MSG_ASMFROMC         := ${quote} AS(C)     ${quote}
-MSG_ASMFROMC_ARM     := ${quote} AS(C)-ARM ${quote}
-MSG_PYMITEINIT       := ${quote} PY        ${quote}
 
 # List of all source files.
 ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
@@ -553,14 +511,8 @@ LSTFILES   = $(addprefix $(OUTDIR)/, $(addsuffix .lst, $(ALLSRCBASE)))
 # Define all depedency-files (used for make clean).
 DEPFILES   = $(addprefix $(OUTDIR)/dep/, $(addsuffix .o.d, $(ALLSRCBASE)))
 
-elf: $(OUTDIR)/$(TARGET).elf
-lss: $(OUTDIR)/$(TARGET).lss
-sym: $(OUTDIR)/$(TARGET).sym
-hex: $(OUTDIR)/$(TARGET).hex
-bin: $(OUTDIR)/$(TARGET).bin
-
 # Default target.
-all: gencode gccversion build sizeafter
+all: gencode gccversion build
 
 ifeq ($(LOADFORMAT),ihex)
 build: elf hex lss sym
@@ -575,8 +527,6 @@ $(error "$(MSG_FORMATERROR) $(FORMAT)")
 endif
 endif
 endif
-
-toprel = $(subst $(realpath $(TOP))/,,$(abspath $(1)))
 
 # Generate intermediate code
 gencode: ${OUTDIR}/InitMods.c ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h 
@@ -597,22 +547,6 @@ ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/p
 	@$(PYTHON) $(PYMITETOOLS)/pmGenPmFeatures.py $(PYMITEPLAT)/pmfeatures.py > $(OUTDIR)/pmfeatures.h
 	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -u -o $(OUTDIR)/pmlibusr_img.c --native-file=$(OUTDIR)/pmlibusr_nat.c $(FLIGHTPLANS)/test.py
 
-# Display sizes of sections.
-ELFSIZE = $(SIZE) -A  $(OUTDIR)/$(TARGET).elf
-##ELFSIZE = $(SIZE) --format=Berkeley --common $(OUTDIR)/$(TARGET).elf
-sizebefore:
-#	@if [ -f  $(OUTDIR)/$(TARGET).elf ]; then echo; echo $(MSG_SIZE_BEFORE); $(ELFSIZE); echo; fi
-
-sizeafter:
-#	@if [ -f  $(OUTDIR)/$(TARGET).elf ]; then echo; echo $(MSG_SIZE_AFTER); $(ELFSIZE); echo; fi
-	@echo $(MSG_SIZE_AFTER)
-	$(ELFSIZE)
-
-# Display compiler version information.
-gccversion :
-	@$(CC) --version
-#	@echo $(ALLOBJ)
-
 # Program the device.
 ifeq ($(USE_BOOTLOADER), YES)
 # Program the device with OP Upload Tool".
@@ -628,94 +562,44 @@ program: $(OUTDIR)/$(TARGET).elf
 endif
 endif
 
-# Create final output file (.hex) from ELF output file.
-%.hex: %.elf
-	@echo $(MSG_LOAD_FILE) $@
-	$(V1) $(OBJCOPY) -O ihex $< $@
-
-# Create final output file (.bin) from ELF output file.
-%.bin: %.elf
-	@echo $(MSG_LOAD_FILE) $@
-	$(V1) $(OBJCOPY) -O binary $< $@
-
-# Create extended listing file/disassambly from ELF output file.
-# using objdump testing: option -C
-%.lss: %.elf
-	@echo $(MSG_EXTENDED_LISTING) $@
-	$(V1) $(OBJDUMP) -h -S -C -r $< > $@
-
-# Create a symbol table from ELF output file.
-%.sym: %.elf
-	@echo $(MSG_SYMBOL_TABLE) $@
-	$(V1) $(NM) -n $< > $@
-
 # Link: create ELF output file from object files.
-.SECONDARY : $(TARGET).elf
-.PRECIOUS : $(ALLOBJ)
-%.elf:  $(ALLOBJ)
-	@echo $(MSG_LINKING) $(call toprel, $@)
-	$(V1) $(CC) $(THUMB) $(CFLAGS) $(ALLOBJ) --output $@ $(LDFLAGS)
+$(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ)))
 
 # Assemble: create object files from assembler source files.
-define ASSEMBLE_TEMPLATE
-$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
-	@echo $(MSG_ASSEMBLING) $$(call toprel, $$<)
-	$(V1) $(CC) -c $(THUMB) $$(ASFLAGS) $$< -o $$@
-endef
 $(foreach src, $(ASRC), $(eval $(call ASSEMBLE_TEMPLATE, $(src))))
 
 # Assemble: create object files from assembler source files. ARM-only
-define ASSEMBLE_ARM_TEMPLATE
-$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
-	@echo $(MSG_ASSEMBLING_ARM) $$(call toprel, $$<)
-	$(V1) $(CC) -c $$(ASFLAGS) $$< -o $$@
-endef
 $(foreach src, $(ASRCARM), $(eval $(call ASSEMBLE_ARM_TEMPLATE, $(src))))
 
-
 # Compile: create object files from C source files.
-define COMPILE_C_TEMPLATE
-$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
-	@echo $(MSG_COMPILING) $$(call toprel, $$<)
-	$(V1) $(CC) -c $(THUMB) $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
-endef
 $(foreach src, $(SRC), $(eval $(call COMPILE_C_TEMPLATE, $(src))))
 
 # Compile: create object files from C source files. ARM-only
-define COMPILE_C_ARM_TEMPLATE
-$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
-	@echo $(MSG_COMPILING_ARM) $$(call toprel, $$<)
-	$(V1) $(CC) -c $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
-endef
 $(foreach src, $(SRCARM), $(eval $(call COMPILE_C_ARM_TEMPLATE, $(src))))
 
-
 # Compile: create object files from C++ source files.
-define COMPILE_CPP_TEMPLATE
-$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
-	@echo $(MSG_COMPILINGCPP) $$(call toprel, $$<)
-	$(V1) $(CC) -c $(THUMB) $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@
-endef
 $(foreach src, $(CPPSRC), $(eval $(call COMPILE_CPP_TEMPLATE, $(src))))
 
 # Compile: create object files from C++ source files. ARM-only
-define COMPILE_CPP_ARM_TEMPLATE
-$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
-	@echo $(MSG_COMPILINGCPP_ARM) $$(call toprel, $$<)
-	$(V1) $(CC) -c $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@
-endef
 $(foreach src, $(CPPSRCARM), $(eval $(call COMPILE_CPP_ARM_TEMPLATE, $(src))))
 
-
 # Compile: create assembler files from C source files. ARM/Thumb
-$(SRC:.c=.s) : %.s : %.c
-	@echo $(MSG_ASMFROMC) ${quote}$(call toprel, $<)${quote}
-	$(V1) $(CC) $(THUMB) -S $(CFLAGS) $(CONLYFLAGS) $< -o $@
+$(eval $(call PARTIAL_COMPILE_TEMPLATE, SRC))
 
 # Compile: create assembler files from C source files. ARM only
-$(SRCARM:.c=.s) : %.s : %.c
-	@echo $(MSG_ASMFROMC_ARM) ${quote}$(call toprel, $<)${quote}
-	$(V1) $(CC) -S $(CFLAGS) $(CONLYFLAGS) $< -o $@
+$(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
+
+.PHONY: elf lss sym hex bin
+elf:  $(OUTDIR)/$(TARGET).elf
+lss:  $(OUTDIR)/$(TARGET).lss
+sym:  $(OUTDIR)/$(TARGET).sym
+hex:  $(OUTDIR)/$(TARGET).hex
+bin:  $(OUTDIR)/$(TARGET).bin
+
+# Display sizes of sections.
+$(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))
+.PHONY: size
+size: $(OUTDIR)/$(TARGET).elf_size
 
 # Generate Doxygen documents
 docs:
@@ -758,9 +642,6 @@ else
 -include $(shell mkdir -p $(OUTDIR) 2>/dev/null) $(shell mkdir $(OUTDIR)/dep 2>/dev/null) $(wildcard $(OUTDIR)/dep/*)
 endif
 
-
-
 # Listing of phony targets.
-.PHONY : all sizebefore sizeafter gccversion \
-build elf hex bin lss sym clean clean_list program gencode
+.PHONY : all build clean clean_list program gencode
 

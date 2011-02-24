@@ -17,7 +17,7 @@
 #include "boost/shared_ptr.hpp"
 #include "rtslam/robotAbstract.hpp"
 
-#define AVGSPEED 0
+#define AVGSPEED 1
 #define INIT_Q_FROM_G 1
 
 namespace jafar {

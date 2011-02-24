@@ -49,6 +49,7 @@ Organization
 
 Performance
 ------------------------------------
+- when the landmark was observed the previous frame, we can use a very fast matcher from t to t+1 to reduce uncertainty (eg SAD), before applying the robust matcher (eg ZNCC) in a 3x3 max window.
 - zncc optimizations :
 	6. start testing with a roi shrinked by 2, then the rest, it should speed up the process because in general the result is close to the center and thanks to 2.
 	7. to do in slam : if the search area is really to big, reduce n_sigmas to 2 or 1, if it is found it's nice, if it isn't it is not important
@@ -67,6 +68,8 @@ Performance
 Precision
 ------------------------------------
 - to extract patch and match, compute an homography with the 4 corners, in order to take distortion a little bit into account
+- correlation with interpolation is not the the most precise method, LK tracker should be more precise
+- if we are not sure that we are still tracking the same 3D landmark, it is better to create a new landmark, using the previous one to reasonably initialize it
 - define and implement measure->P in matcher, with the curvature, or at least delete points with one curvature too low
 - extend to n-point ransac and reduce the lowInnov ?
 - if no feature is found, try with larger ellipse, because there is little chance you find them back later (except if this one image is bad), if you never find them back you'll be for sure inconsistent, and if you try later the ellipses will be greater and greater.

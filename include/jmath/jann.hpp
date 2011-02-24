@@ -139,6 +139,21 @@ namespace jann {
 		typedef typename D::ResultType result;
 		///dataset stored as a flann::Matrix
 		flann::Matrix<element> dataset;
+		///empty constructor
+		index_factory() {}
+		/**  
+		 * @param _data: dataset in ublas::matrix format
+		 * @param params: index parameters as specified in flann manual
+		 * @param d: flann::distance structure
+		 */		
+		void operator()(const ublas::matrix<typename D::ElementType>& _data, 
+										const flann::IndexParams& params, D d = D() )
+		{
+			dataset = flann::Matrix<element>(new element[_data.size1()*_data.size2()], 
+																			 _data.size1(), _data.size2());
+			convert(_data, dataset);
+			m_index = new flann::Index<D>(dataset, params, d);
+		}
 		/**  
 		 * @param _data: dataset in ublas::matrix format
 		 * @param params: index parameters as specified in flann manual
@@ -410,6 +425,11 @@ namespace jann {
 		KD_tree_index(const ublas::matrix<typename DISTANCE::ElementType>& dataset, 
 									int nb_trees = 4) : 
 			index_factory<DISTANCE>(dataset, flann::KDTreeIndexParams(nb_trees)) {}
+		KD_tree_index() {}
+		void operator() (const ublas::matrix<typename DISTANCE::ElementType>& dataset, 
+										 int nb_trees = 4) {
+			index_factory<DISTANCE>::operator()(dataset, flann::KDTreeIndexParams(nb_trees));
+		}
 	};
 		
 	/** Class K_means_index

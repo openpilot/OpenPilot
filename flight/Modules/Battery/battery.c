@@ -54,7 +54,7 @@
 // Configuration
 //
 #define SAMPLE_PERIOD_MS		500
-#define POWER_SENSOR_VERSION	1
+#define POWER_SENSOR_VERSION	2
 
 //#define ENABLE_DEBUG_MSG
 
@@ -91,13 +91,15 @@ static void onTimer(UAVObjEvent* ev)
 	static portTickType lastSysTime;
 	static bool firstRun = true;
 
-	FlightBatteryStateData flightBatteryData;
+	static FlightBatteryStateData flightBatteryData;
 
 	if (firstRun) {
 		#ifdef ENABLE_DEBUG_MSG
 			PIOS_COM_ChangeBaud(DEBUG_PORT, 57600);
 		#endif
 		lastSysTime = xTaskGetTickCount();
+		//FlightBatteryStateGet(&flightBatteryData);
+
 		firstRun = false;
 	}
 
@@ -128,15 +130,15 @@ static void onTimer(UAVObjEvent* ev)
 #if (POWER_SENSOR_VERSION == 2)
 	portTickType thisSysTime;
 	BatterySettingsData batterySettings;
-	float dT = SAMPLE_PERIOD_MS / 1000;
+	static float dT = SAMPLE_PERIOD_MS / 1000;
 	float Bob;
 	float energyRemaining;
 
 	// Check how long since last update
 	thisSysTime = xTaskGetTickCount();
 	if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
-		dT = (thisSysTime - lastSysTime) / (portTICK_RATE_MS / 1000.0f);
-	lastSysTime = thisSysTime;
+		dT = (float)(thisSysTime - lastSysTime) / (float)(portTICK_RATE_MS * 1000.0f);
+	//lastSysTime = thisSysTime;
 
 	BatterySettingsGet(&batterySettings);
 
@@ -174,6 +176,7 @@ Bob =dT; // FIXME: something funky happens if I don't do this... Andrew
 		else if ((flightBatteryData.Voltage < batterySettings.BatteryVoltage * 0.85)||(flightBatteryData.Current > batterySettings.BatteryCapacity * 0.95))AlarmsSet(SYSTEMALARMS_ALARM_BATTERY, SYSTEMALARMS_ALARM_WARNING);
 		else AlarmsClear(SYSTEMALARMS_ALARM_BATTERY);
 	}
+	lastSysTime = thisSysTime;
 
 	FlightBatteryStateSet(&flightBatteryData);
 #endif

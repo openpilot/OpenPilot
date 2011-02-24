@@ -159,3 +159,7 @@ void ConfigStabilizationWidget::saveStabilizationUpdate()
 void ConfigStabilizationWidget::resetStabilizationToDefaults()
 {
 }
+
+void ConfigStabilizationWidget::parameterValueChanged(double value)
+{
+}

@@ -32,6 +32,7 @@
 #include <QtCore/QStringList>
 #include <QtGui/QWidget>
 #include <QtGui/QSpinBox>
+#include <QtGui/QDoubleSpinBox>
 #include <qscispinbox/QScienceSpinBox.h>
 #include <QtGui/QComboBox>
 #include <limits>
@@ -46,6 +47,8 @@
 #define QINT32MIN std::numeric_limits<qint32>::min()
 #define QINT32MAX std::numeric_limits<qint32>::max()
 #define QUINT32MAX std::numeric_limits<qint32>::max()
+
+#define USE_SCIENTIFIC_NOTATION
 
 class FieldTreeItem : public TreeItem
 {
@@ -231,22 +234,35 @@ public:
         }
     }
     QWidget *createEditor(QWidget *parent) {
-        QScienceSpinBox *editor = new QScienceSpinBox(parent);
-        editor->setDecimals(6);
+		#idef USE_SCIENTIFIC_NOTATION
+			QScienceSpinBox *editor = new QScienceSpinBox(parent);
+			editor->setDecimals(6);
+		#else
+			QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
+			editor->setDecimals(8);
+		#endif
         editor->setMinimum(-std::numeric_limits<float>::max());
         editor->setMaximum(std::numeric_limits<float>::max());
         return editor;
     }
 
     QVariant getEditorValue(QWidget *editor) {
-        QScienceSpinBox *spinBox = static_cast<QScienceSpinBox*>(editor);
-        spinBox->interpretText();
+		#idef USE_SCIENTIFIC_NOTATION
+			QScienceSpinBox *spinBox = static_cast<QScienceSpinBox*>(editor);
+		#else
+			QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
+		#endif
+		spinBox->interpretText();
         return spinBox->value();
     }
 
     void setEditorValue(QWidget *editor, QVariant value) {
-        QScienceSpinBox *spinBox = static_cast<QScienceSpinBox*>(editor);
-        spinBox->setValue(value.toDouble());
+		#idef USE_SCIENTIFIC_NOTATION
+			QScienceSpinBox *spinBox = static_cast<QScienceSpinBox*>(editor);
+		#else
+			QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
+		#endif
+		spinBox->setValue(value.toDouble());
     }
 private:
     UAVObjectField *m_field;

@@ -2,9 +2,9 @@
     <object name="AHRSCalibration" singleinstance="true" settings="true">
         <description>Contains the calibration settings for the @ref AHRSCommsModule</description>
         <field name="measure_var" units="" type="enum" elements="1" options="SET,MEASURE" defaultvalue="SET"/>
-        <field name="accel_bias" units="m/s^2" type="float" elementnames="X,Y,Z" defaultvalue="-72,-72,72"/>
-        <field name="accel_scale" units="m/s^2" type="float" elementnames="X,Y,Z" defaultvalue="0.003,0.003,-0.003"/>
-        <field name="accel_var" units="(m/s^2)^2" type="float" elementnames="X,Y,Z" defaultvalue="5e-5"/>
+        <field name="accel_bias" units="m/s^2" type="float" elementnames="X,Y,Z" defaultvalue="-73.5,-73.5,73.5"/>
+        <field name="accel_scale" units="m/s^2" type="float" elementnames="X,Y,Z" defaultvalue="0.0359,0.0359,-0.0359"/>
+        <field name="accel_var" units="(m/s^2)^2" type="float" elementnames="X,Y,Z" defaultvalue="5e-4"/>
         <field name="gyro_bias" units="rad/s" type="float" elementnames="X,Y,Z" defaultvalue="23,-23,23"/>
         <field name="gyro_scale" units="rad/s" type="float" elementnames="X,Y,Z" defaultvalue="-0.017,0.017,-0.017"/>
         <field name="gyro_var" units="(rad/s)^2" type="float" elementnames="X,Y,Z" defaultvalue="1e-4"/>

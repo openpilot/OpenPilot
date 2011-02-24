@@ -702,7 +702,7 @@ void adc_callback(float * downsampled_data)
 
 	float accel[3], gyro[3];
 
-	// Accel data is (y,x,z) in first third and fifth byte.  Convert to m/s
+	// Accel data is (y,x,z) in first third and fifth byte.  Convert to m/s^2
 	accel[0] = (downsampled_data[ACCEL_RAW_X_IDX] * accel_data.calibration.scale[0]) + accel_data.calibration.bias[0];
 	accel[1] = (downsampled_data[ACCEL_RAW_Y_IDX] * accel_data.calibration.scale[1]) + accel_data.calibration.bias[1];
 	accel[2] = (downsampled_data[ACCEL_RAW_Z_IDX] * accel_data.calibration.scale[2]) + accel_data.calibration.bias[2];
@@ -910,36 +910,36 @@ void calibrate_sensors()
  * @brief Populate fields with initial values
  */
 void reset_values() {
-	accel_data.calibration.scale[0] = 0.012;
-	accel_data.calibration.scale[1] = 0.012;
-	accel_data.calibration.scale[2] = -0.012;
-	accel_data.calibration.bias[0] = 24;
-	accel_data.calibration.bias[1] = 24;
-	accel_data.calibration.bias[2] = -24;
-	accel_data.calibration.variance[0] = 1e-4;
-	accel_data.calibration.variance[1] = 1e-4;
-	accel_data.calibration.variance[2] = 1e-4;
-	gyro_data.calibration.scale[0] = -0.014;
-	gyro_data.calibration.scale[1] = 0.014;
-	gyro_data.calibration.scale[2] = -0.014;
-	gyro_data.calibration.bias[0] = -24;
-	gyro_data.calibration.bias[1] = -24;
-	gyro_data.calibration.bias[2] = -24;
-	gyro_data.calibration.variance[0] = 1;
-	gyro_data.calibration.variance[1] = 1;
-	gyro_data.calibration.variance[2] = 1;
+	accel_data.calibration.scale[0] = 0.0359;
+	accel_data.calibration.scale[1] = 0.0359;
+	accel_data.calibration.scale[2] = -0.0359;
+	accel_data.calibration.bias[0] = -73.5;
+	accel_data.calibration.bias[1] = -73.5;
+	accel_data.calibration.bias[2] = 73.5;
+	accel_data.calibration.variance[0] = 5e-4;
+	accel_data.calibration.variance[1] = 5e-4;
+	accel_data.calibration.variance[2] = 5e-4;
+	gyro_data.calibration.scale[0] = -0.017;
+	gyro_data.calibration.scale[1] = 0.017;
+	gyro_data.calibration.scale[2] = -0.017;
+	gyro_data.calibration.bias[0] = 23;
+	gyro_data.calibration.bias[1] = -23;
+	gyro_data.calibration.bias[2] = 23;
+	gyro_data.calibration.variance[0] = 1e-4;
+	gyro_data.calibration.variance[1] = 1e-4;
+	gyro_data.calibration.variance[2] = 1e-4;
 	gyro_data.calibration.tempcompfactor[0] = 0;
 	gyro_data.calibration.tempcompfactor[1] = 0;
 	gyro_data.calibration.tempcompfactor[2] = 0;
-	mag_data.calibration.scale[0] = 1;
-	mag_data.calibration.scale[1] = 1;
-	mag_data.calibration.scale[2] = 1;
+	mag_data.calibration.scale[0] = -2;
+	mag_data.calibration.scale[1] = -2;
+	mag_data.calibration.scale[2] = -2;
 	mag_data.calibration.bias[0] = 0;
 	mag_data.calibration.bias[1] = 0;
 	mag_data.calibration.bias[2] = 0;
-	mag_data.calibration.variance[0] = 1;
-	mag_data.calibration.variance[1] = 1;
-	mag_data.calibration.variance[2] = 1;
+	mag_data.calibration.variance[0] = 50;
+	mag_data.calibration.variance[1] = 50;
+	mag_data.calibration.variance[2] = 50;
 }
 
 

@@ -48,7 +48,7 @@
 #define QINT32MAX std::numeric_limits<qint32>::max()
 #define QUINT32MAX std::numeric_limits<qint32>::max()
 
-#define USE_SCIENTIFIC_NOTATION
+//#define USE_SCIENTIFIC_NOTATION
 
 class FieldTreeItem : public TreeItem
 {
@@ -234,7 +234,7 @@ public:
         }
     }
     QWidget *createEditor(QWidget *parent) {
-		#idef USE_SCIENTIFIC_NOTATION
+		#ifdef USE_SCIENTIFIC_NOTATION
 			QScienceSpinBox *editor = new QScienceSpinBox(parent);
 			editor->setDecimals(6);
 		#else
@@ -247,7 +247,7 @@ public:
     }
 
     QVariant getEditorValue(QWidget *editor) {
-		#idef USE_SCIENTIFIC_NOTATION
+		#ifdef USE_SCIENTIFIC_NOTATION
 			QScienceSpinBox *spinBox = static_cast<QScienceSpinBox*>(editor);
 		#else
 			QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
@@ -257,7 +257,7 @@ public:
     }
 
     void setEditorValue(QWidget *editor, QVariant value) {
-		#idef USE_SCIENTIFIC_NOTATION
+		#ifdef USE_SCIENTIFIC_NOTATION
 			QScienceSpinBox *spinBox = static_cast<QScienceSpinBox*>(editor);
 		#else
 			QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);

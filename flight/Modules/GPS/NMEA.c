@@ -33,9 +33,7 @@
 #include "NMEA.h"
 #include "gpsposition.h"
 #include "gpstime.h"
-#ifdef ENABLE_GPS_NMEA
-	#include "gpssatellites.h"
-#endif
+#include "gpssatellites.h"
 
 #if defined(ENABLE_GPS_NMEA) || defined(ENABLE_GPS_ONESENTENCE_GTOP)
 

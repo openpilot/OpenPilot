@@ -265,7 +265,7 @@ static void gpsTask(void *parameters)
 
 		// Check for GPS timeout
 		timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
-		if ((timeNowMs - timeOfLastUpdateMs) > GPS_TIMEOUT_MS)
+		if ((timeNowMs - timeOfLastUpdateMs) >= GPS_TIMEOUT_MS)
 		{	// we have not received any valid GPS sentences for a while.
 			// either the GPS is not plugged in or a hardware problem or the GPS has locked up.
 

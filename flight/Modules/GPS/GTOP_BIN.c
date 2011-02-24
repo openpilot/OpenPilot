@@ -33,6 +33,7 @@
 #include "GTOP_BIN.h"
 #include "gpsposition.h"
 #include "gpstime.h"
+#include "gpssatellites.h"
 
 #include <string.h>	// memmove
 
@@ -119,7 +120,7 @@ static uint32_t swap4Bytes(uint32_t data)
 int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volatile uint32_t *parsing_errors)
 {
 	if (gps_rx_buffer_wr >= sizeof(gps_rx_buffer))
-	{   // make room for the new byte
+	{	// make room for the new byte .. this will actually never get executed, just here as a safe guard really
 		memmove(gps_rx_buffer, gps_rx_buffer + 1, sizeof(gps_rx_buffer) - 1);
 		gps_rx_buffer_wr = sizeof(gps_rx_buffer) - 1;
 	}
@@ -198,7 +199,7 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 
 		// set the gps time object
 		GPSTimeData GpsTime;
-		GPSTimeGet(&GpsTime);
+//		GPSTimeGet(&GpsTime);
 			uint32_t utc_time = rx_packet->data.utc_time / 1000;
 			GpsTime.Second = utc_time % 100;          // seconds
 			GpsTime.Minute = (utc_time / 100) % 100;  // minutes
@@ -210,7 +211,7 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 
 		// set the gps position object
 		GPSPositionData	GpsData;
-		GPSPositionGet(&GpsData);
+//		GPSPositionGet(&GpsData);
 			switch (rx_packet->data.fix_type)
 			{
 				case 1: GpsData.Status = GPSPOSITION_STATUS_NOFIX; break;
@@ -225,10 +226,17 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 			GpsData.Heading         = (float)rx_packet->data.course_over_ground / 1000;                                 // degrees
 			GpsData.Groundspeed     = (float)rx_packet->data.speed_over_ground / 3600;                                  // m/s
 			GpsData.Satellites      = rx_packet->data.satellites_used;                                                  //
-//			GpsData.PDOP;                                                                                               // not available in binary mode
+			GpsData.PDOP            = 99.99;                                                                            // not available in binary mode
 			GpsData.HDOP            = (float)rx_packet->data.hdop / 100;                                                //
-//			GpsData.VDOP;                                                                                               // not available in binary mode
+			GpsData.VDOP            = 99.99;                                                                            // not available in binary mode
 		GPSPositionSet(&GpsData);
+
+		// set the number of satellites
+//		GPSSatellitesData SattelliteData;
+////		GPSSatellitesGet(&SattelliteData);
+//			memset(&SattelliteData, 0, sizeof(SattelliteData));
+//			SattelliteData.SatsInView = rx_packet->data.satellites_used;                                                    //
+//		GPSSatellitesSet(&SattelliteData);
 
 		// remove the spent binary packet from the buffer
 		gps_rx_buffer_wr -= sizeof(t_gps_bin_packet);

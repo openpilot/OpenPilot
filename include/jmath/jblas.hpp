@@ -72,6 +72,12 @@ namespace jblas {
   typedef ublas::bounded_vector<double,7> vec7;
   /// 8 dimension vector
   typedef ublas::bounded_vector<double,8> vec8;
+  /// 9 dimension vector
+  typedef ublas::bounded_vector<double,9> vec9;
+  /// 10 dimension vector
+  typedef ublas::bounded_vector<double,10> vec10;
+  /// 11 dimension vector
+  typedef ublas::bounded_vector<double,11> vec11;
 
 
   /// standard matrix type

@@ -59,6 +59,16 @@ namespace jafar {
 		}
 
 		bool LandmarkAbstract::needToReparametrize(DecisionMethod repMet){
+			// first check if the landmark was observed this frame, always with the ANY policy
+			bool observed = false;
+			for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
+			{
+				observation_ptr_t obsPtr = *obsIter;
+				if (obsPtr->events.updated) { observed = true; break; }
+			}
+			if (!observed) return false;
+			
+			// now check according to the chosen policy that the linearity scores are ok
 			switch (repMet) {
 				case ANY : {
 					for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
@@ -92,8 +102,8 @@ namespace jafar {
 
 				}
 				default : {
-					cout << __FILE__ << ":" << __LINE__ << ": Bad evaluation method. Using ANY." << endl;
-					return needToReparametrize(ANY);
+					cout << __FILE__ << ":" << __LINE__ << ": Bad evaluation method. Using ALL." << endl;
+					return needToReparametrize(ALL);
 				}
 			}
 			return false;

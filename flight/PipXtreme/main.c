@@ -531,9 +531,25 @@ int main()
     RF_CS_ENABLE;
     RF_CS_HIGH;
 
-    // EEPROM chip-select line high
-    EE_CS_ENABLE;
-    EE_CS_HIGH;
+    // pin high
+    SPARE1_ENABLE;
+    SPARE1_HIGH;
+
+    // pin high
+    SPARE2_ENABLE;
+    SPARE2_HIGH;
+
+    // pin high
+    SPARE3_ENABLE;
+    SPARE3_HIGH;
+
+    // pin high
+    SPARE4_ENABLE;
+    SPARE4_HIGH;
+
+    // pin high
+    SPARE5_ENABLE;
+    SPARE5_HIGH;
 
     // *************
 

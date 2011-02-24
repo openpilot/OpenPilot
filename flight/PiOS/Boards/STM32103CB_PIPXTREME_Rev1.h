@@ -267,25 +267,35 @@ extern uint32_t pios_com_telem_usb_id;
 #define PIOS_GPIO_OUT_1_PIN			GPIO_Pin_4
 #define PIOS_GPIO_OUT_1_GPIO_CLK	RCC_APB2Periph_GPIOA
 
-// EEPROM chip-select line
+// spare pin
 #define PIOS_GPIO_OUT_2_PORT		GPIOA
-#define PIOS_GPIO_OUT_2_PIN			GPIO_Pin_1
+#define PIOS_GPIO_OUT_2_PIN			GPIO_Pin_0
 #define PIOS_GPIO_OUT_2_GPIO_CLK	RCC_APB2Periph_GPIOA
-/*
-// SPI-1 SCK line
+
+// spare pin
 #define PIOS_GPIO_OUT_3_PORT		GPIOA
-#define PIOS_GPIO_OUT_3_PIN			GPIO_Pin_5
+#define PIOS_GPIO_OUT_3_PIN			GPIO_Pin_1
 #define PIOS_GPIO_OUT_3_GPIO_CLK	RCC_APB2Periph_GPIOA
 
-// SPI-1 MOSI line
-#define PIOS_GPIO_OUT_4_PORT		GPIOA
-#define PIOS_GPIO_OUT_4_PIN			GPIO_Pin_7
-#define PIOS_GPIO_OUT_4_GPIO_CLK	RCC_APB2Periph_GPIOA
-*/
-#define PIOS_GPIO_NUM				3
-#define PIOS_GPIO_PORTS				{ PIOS_GPIO_OUT_0_PORT,      PIOS_GPIO_OUT_1_PORT,      PIOS_GPIO_OUT_2_PORT,    }
-#define PIOS_GPIO_PINS				{ PIOS_GPIO_OUT_0_PIN,       PIOS_GPIO_OUT_1_PIN,       PIOS_GPIO_OUT_2_PIN,     }
-#define PIOS_GPIO_CLKS				{ PIOS_GPIO_OUT_0_GPIO_CLK,  PIOS_GPIO_OUT_1_GPIO_CLK,  PIOS_GPIO_OUT_2_GPIO_CLK }
+// spare pin
+#define PIOS_GPIO_OUT_4_PORT		GPIOC
+#define PIOS_GPIO_OUT_4_PIN			GPIO_Pin_13
+#define PIOS_GPIO_OUT_4_GPIO_CLK	RCC_APB2Periph_GPIOC
+
+// spare pin
+#define PIOS_GPIO_OUT_5_PORT		GPIOC
+#define PIOS_GPIO_OUT_5_PIN			GPIO_Pin_14
+#define PIOS_GPIO_OUT_5_GPIO_CLK	RCC_APB2Periph_GPIOC
+
+// spare pin
+#define PIOS_GPIO_OUT_6_PORT		GPIOC
+#define PIOS_GPIO_OUT_6_PIN			GPIO_Pin_15
+#define PIOS_GPIO_OUT_6_GPIO_CLK	RCC_APB2Periph_GPIOC
+
+#define PIOS_GPIO_NUM				7
+#define PIOS_GPIO_PORTS				{ PIOS_GPIO_OUT_0_PORT,      PIOS_GPIO_OUT_1_PORT,      PIOS_GPIO_OUT_2_PORT,      PIOS_GPIO_OUT_3_PORT,      PIOS_GPIO_OUT_4_PORT,      PIOS_GPIO_OUT_5_PORT,      PIOS_GPIO_OUT_6_PORT}
+#define PIOS_GPIO_PINS				{ PIOS_GPIO_OUT_0_PIN,       PIOS_GPIO_OUT_1_PIN,       PIOS_GPIO_OUT_2_PIN,       PIOS_GPIO_OUT_3_PIN,       PIOS_GPIO_OUT_4_PIN,       PIOS_GPIO_OUT_5_PIN,       PIOS_GPIO_OUT_6_PIN}
+#define PIOS_GPIO_CLKS				{ PIOS_GPIO_OUT_0_GPIO_CLK,  PIOS_GPIO_OUT_1_GPIO_CLK,  PIOS_GPIO_OUT_2_GPIO_CLK,  PIOS_GPIO_OUT_3_GPIO_CLK,  PIOS_GPIO_OUT_4_GPIO_CLK,  PIOS_GPIO_OUT_5_GPIO_CLK,  PIOS_GPIO_OUT_6_GPIO_CLK}
 
 #define SERIAL_RTS_ENABLE			PIOS_GPIO_Enable(0)
 #define SERIAL_RTS_SET				PIOS_GPIO_Off(0)
@@ -295,18 +305,26 @@ extern uint32_t pios_com_telem_usb_id;
 #define RF_CS_HIGH					PIOS_GPIO_Off(1)
 #define RF_CS_LOW					PIOS_GPIO_On(1)
 
-#define EE_CS_ENABLE				PIOS_GPIO_Enable(2)
-#define EE_CS_HIGH					PIOS_GPIO_Off(2)
-#define EE_CS_LOW					PIOS_GPIO_On(2)
-/*
-#define SPI1_SCK_ENABLE				PIOS_GPIO_Enable(3)
-#define SPI1_SCK_HIGH				PIOS_GPIO_Off(3)
-#define SPI1_SCK_LOW				PIOS_GPIO_On(3)
+#define SPARE1_ENABLE				PIOS_GPIO_Enable(2)
+#define SPARE1_HIGH					PIOS_GPIO_Off(2)
+#define SPARE1_LOW					PIOS_GPIO_On(2)
 
-#define SPI1_MOSI_ENABLE			PIOS_GPIO_Enable(4)
-#define SPI1_MOSI_HIGH				PIOS_GPIO_Off(4)
-#define SPI1_MOSI_LOW				PIOS_GPIO_On(4)
-*/
+#define SPARE2_ENABLE				PIOS_GPIO_Enable(3)
+#define SPARE2_HIGH					PIOS_GPIO_Off(3)
+#define SPARE2_LOW					PIOS_GPIO_On(3)
+
+#define SPARE3_ENABLE				PIOS_GPIO_Enable(4)
+#define SPARE3_HIGH					PIOS_GPIO_Off(4)
+#define SPARE3_LOW					PIOS_GPIO_On(4)
+
+#define SPARE4_ENABLE				PIOS_GPIO_Enable(5)
+#define SPARE4_HIGH					PIOS_GPIO_Off(5)
+#define SPARE4_LOW					PIOS_GPIO_On(5)
+
+#define SPARE5_ENABLE				PIOS_GPIO_Enable(6)
+#define SPARE5_HIGH					PIOS_GPIO_Off(6)
+#define SPARE5_LOW					PIOS_GPIO_On(6)
+
 // *****************************************************************
 // GPIO input pins
 

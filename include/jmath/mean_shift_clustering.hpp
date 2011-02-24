@@ -114,9 +114,9 @@ namespace jafar {
 					unsigned int iter = 0;
 					vector_type this_difference;
 					do {
-						ublas::vector<int> this_indices(40);
-						ublas::vector<NUMTYPE> this_distances(40);
-						int nb_neighbours = points_tree.radius_search(current_center, this_indices, this_distances, window_radius, jann::search_params(128, 0, false));
+						ublas::vector<int> this_indices;
+						ublas::vector<NUMTYPE> this_distances;
+						int nb_neighbours = points_tree.radius_search(current_center, this_indices, this_distances, window_radius, jann::search_params(128, 0, true));
 						//found some neighbours
 						JFR_DEBUG("neighbours found: " << nb_neighbours)
 							if(nb_neighbours > 0) {
@@ -157,6 +157,7 @@ namespace jafar {
 						bool found = false;
 						typename std::map<size_t, cluster>::iterator cit;
 						for(cit = clusters.begin(); cit != clusters.end(); ++cit) {
+							//							JFR_DEBUG("dist_2 " << distance_2<NUMTYPE>(current_center, cit->second.center))
 							if(distance_2<NUMTYPE>(current_center, cit->second.center) < min_distance_between_clusters){
 								found = true;
 								break;
@@ -183,7 +184,7 @@ namespace jafar {
 					ublas::vector<NUMTYPE> dist; dist.resize(1);
 					clusters_tree.knn_search(row(data,i), index, dist, 1, jann::search_params(-1));
 					if(index[0] != -1) {
-						JFR_DEBUG("Assigned pt "<<i<<" to cluster "<<index[0])
+						//						JFR_DEBUG("Assigned pt "<<i<<" to cluster "<<index[0])
 							clusters[index[0]].add(i);
 					}
 				}

@@ -46,6 +46,33 @@ namespace jafar {
 			private:
 				void computePatchIntegrals();
 		};
+
+      class AppearanceImageSegment;
+      typedef boost::shared_ptr<AppearanceImageSegment> app_img_seg_ptr_t;
+
+      /** Appearence for matching
+       * rtslam.
+       *
+       * @ingroup rtslam
+       */
+      class AppearanceImageSegment: public AppearanceAbstract {
+         public:
+            image::Image patch;
+            unsigned int patchSum;
+            unsigned int patchSquareSum;
+            Gaussian offset; ///< offset between the center of the patch and the real position of the feature
+         public:
+            AppearanceImageSegment(const image::Image& patch, Gaussian const &offset);
+            AppearanceImageSegment(int width, int height, int depth):
+               patch(width, height, depth, JfrImage_CS_GRAY), offset(2) {
+//					cout << "Created patch with " << width << "x" << height << " pixels; depth: " << depth << "; color space: " << JfrImage_CS_GRAY << endl;
+            }
+            virtual ~AppearanceImageSegment();
+            virtual AppearanceAbstract* clone();
+
+         private:
+            void computePatchIntegrals();
+      };
 	}
 
 }

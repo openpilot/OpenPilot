@@ -36,13 +36,13 @@ CMAKE_COMMAND = /usr/bin/cmake
 RM = /usr/bin/cmake -E remove -f
 
 # The program to use to edit the cache.
-CMAKE_EDIT_COMMAND = /usr/bin/cmake-gui
+CMAKE_EDIT_COMMAND = /usr/bin/ccmake
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar
+CMAKE_SOURCE_DIR = /home/bhautboi/jafar
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar
+CMAKE_BINARY_DIR = /home/bhautboi/jafar
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -50,7 +50,7 @@ CMAKE_BINARY_DIR = /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/bin/cmake-gui -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -120,14 +120,14 @@ test/fast: test
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(CMAKE_COMMAND) -E cmake_progress_start /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar/CMakeFiles /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar/modules/rtslam/CMakeFiles/progress.marks
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f CMakeFiles/Makefile2 modules/rtslam/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar/CMakeFiles 0
+	cd /home/bhautboi/jafar && $(CMAKE_COMMAND) -E cmake_progress_start /home/bhautboi/jafar/CMakeFiles /home/bhautboi/jafar/modules/rtslam/CMakeFiles/progress.marks
+	cd /home/bhautboi/jafar && $(MAKE) -f CMakeFiles/Makefile2 modules/rtslam/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/bhautboi/jafar/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f CMakeFiles/Makefile2 modules/rtslam/clean
+	cd /home/bhautboi/jafar && $(MAKE) -f CMakeFiles/Makefile2 modules/rtslam/clean
 .PHONY : clean
 
 # The main clean target
@@ -136,22 +136,36 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f CMakeFiles/Makefile2 modules/rtslam/preinstall
+	cd /home/bhautboi/jafar && $(MAKE) -f CMakeFiles/Makefile2 modules/rtslam/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f CMakeFiles/Makefile2 modules/rtslam/preinstall
+	cd /home/bhautboi/jafar && $(MAKE) -f CMakeFiles/Makefile2 modules/rtslam/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/bhautboi/jafar && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
+modules/rtslam/CMakeFiles/package-rtslam.dir/rule:
+	cd /home/bhautboi/jafar && $(MAKE) -f CMakeFiles/Makefile2 modules/rtslam/CMakeFiles/package-rtslam.dir/rule
+.PHONY : modules/rtslam/CMakeFiles/package-rtslam.dir/rule
+
+# Convenience name for target.
+package-rtslam: modules/rtslam/CMakeFiles/package-rtslam.dir/rule
+.PHONY : package-rtslam
+
+# fast build rule for target.
+package-rtslam/fast:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/package-rtslam.dir/build.make modules/rtslam/CMakeFiles/package-rtslam.dir/build
+.PHONY : package-rtslam/fast
+
+# Convenience name for target.
 modules/rtslam/CMakeFiles/rtslam.dir/rule:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f CMakeFiles/Makefile2 modules/rtslam/CMakeFiles/rtslam.dir/rule
+	cd /home/bhautboi/jafar && $(MAKE) -f CMakeFiles/Makefile2 modules/rtslam/CMakeFiles/rtslam.dir/rule
 .PHONY : modules/rtslam/CMakeFiles/rtslam.dir/rule
 
 # Convenience name for target.
@@ -160,26 +174,12 @@ rtslam: modules/rtslam/CMakeFiles/rtslam.dir/rule
 
 # fast build rule for target.
 rtslam/fast:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/build
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/build
 .PHONY : rtslam/fast
 
 # Convenience name for target.
-modules/rtslam/CMakeFiles/rtslam_demo_jm_robotcentered.dir/rule:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f CMakeFiles/Makefile2 modules/rtslam/CMakeFiles/rtslam_demo_jm_robotcentered.dir/rule
-.PHONY : modules/rtslam/CMakeFiles/rtslam_demo_jm_robotcentered.dir/rule
-
-# Convenience name for target.
-rtslam_demo_jm_robotcentered: modules/rtslam/CMakeFiles/rtslam_demo_jm_robotcentered.dir/rule
-.PHONY : rtslam_demo_jm_robotcentered
-
-# fast build rule for target.
-rtslam_demo_jm_robotcentered/fast:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam_demo_jm_robotcentered.dir/build.make modules/rtslam/CMakeFiles/rtslam_demo_jm_robotcentered.dir/build
-.PHONY : rtslam_demo_jm_robotcentered/fast
-
-# Convenience name for target.
 modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/rule:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f CMakeFiles/Makefile2 modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/rule
+	cd /home/bhautboi/jafar && $(MAKE) -f CMakeFiles/Makefile2 modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/rule
 .PHONY : modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/rule
 
 # Convenience name for target.
@@ -188,12 +188,26 @@ rtslam_demo_slam: modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/rule
 
 # fast build rule for target.
 rtslam_demo_slam/fast:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/build.make modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/build
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/build.make modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/build
 .PHONY : rtslam_demo_slam/fast
 
 # Convenience name for target.
+modules/rtslam/CMakeFiles/rtslam_ruby_wrap.dir/rule:
+	cd /home/bhautboi/jafar && $(MAKE) -f CMakeFiles/Makefile2 modules/rtslam/CMakeFiles/rtslam_ruby_wrap.dir/rule
+.PHONY : modules/rtslam/CMakeFiles/rtslam_ruby_wrap.dir/rule
+
+# Convenience name for target.
+rtslam_ruby_wrap: modules/rtslam/CMakeFiles/rtslam_ruby_wrap.dir/rule
+.PHONY : rtslam_ruby_wrap
+
+# fast build rule for target.
+rtslam_ruby_wrap/fast:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam_ruby_wrap.dir/build.make modules/rtslam/CMakeFiles/rtslam_ruby_wrap.dir/build
+.PHONY : rtslam_ruby_wrap/fast
+
+# Convenience name for target.
 modules/rtslam/CMakeFiles/test_suite_rtslam.dir/rule:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f CMakeFiles/Makefile2 modules/rtslam/CMakeFiles/test_suite_rtslam.dir/rule
+	cd /home/bhautboi/jafar && $(MAKE) -f CMakeFiles/Makefile2 modules/rtslam/CMakeFiles/test_suite_rtslam.dir/rule
 .PHONY : modules/rtslam/CMakeFiles/test_suite_rtslam.dir/rule
 
 # Convenience name for target.
@@ -202,39 +216,15 @@ test_suite_rtslam: modules/rtslam/CMakeFiles/test_suite_rtslam.dir/rule
 
 # fast build rule for target.
 test_suite_rtslam/fast:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build
 .PHONY : test_suite_rtslam/fast
-
-demo_suite/demo_jm_robotcentered.o: demo_suite/demo_jm_robotcentered.cpp.o
-.PHONY : demo_suite/demo_jm_robotcentered.o
-
-# target to build an object file
-demo_suite/demo_jm_robotcentered.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam_demo_jm_robotcentered.dir/build.make modules/rtslam/CMakeFiles/rtslam_demo_jm_robotcentered.dir/demo_suite/demo_jm_robotcentered.cpp.o
-.PHONY : demo_suite/demo_jm_robotcentered.cpp.o
-
-demo_suite/demo_jm_robotcentered.i: demo_suite/demo_jm_robotcentered.cpp.i
-.PHONY : demo_suite/demo_jm_robotcentered.i
-
-# target to preprocess a source file
-demo_suite/demo_jm_robotcentered.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam_demo_jm_robotcentered.dir/build.make modules/rtslam/CMakeFiles/rtslam_demo_jm_robotcentered.dir/demo_suite/demo_jm_robotcentered.cpp.i
-.PHONY : demo_suite/demo_jm_robotcentered.cpp.i
-
-demo_suite/demo_jm_robotcentered.s: demo_suite/demo_jm_robotcentered.cpp.s
-.PHONY : demo_suite/demo_jm_robotcentered.s
-
-# target to generate assembly for a file
-demo_suite/demo_jm_robotcentered.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam_demo_jm_robotcentered.dir/build.make modules/rtslam/CMakeFiles/rtslam_demo_jm_robotcentered.dir/demo_suite/demo_jm_robotcentered.cpp.s
-.PHONY : demo_suite/demo_jm_robotcentered.cpp.s
 
 demo_suite/demo_slam.o: demo_suite/demo_slam.cpp.o
 .PHONY : demo_suite/demo_slam.o
 
 # target to build an object file
 demo_suite/demo_slam.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/build.make modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/demo_suite/demo_slam.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/build.make modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/demo_suite/demo_slam.cpp.o
 .PHONY : demo_suite/demo_slam.cpp.o
 
 demo_suite/demo_slam.i: demo_suite/demo_slam.cpp.i
@@ -242,7 +232,7 @@ demo_suite/demo_slam.i: demo_suite/demo_slam.cpp.i
 
 # target to preprocess a source file
 demo_suite/demo_slam.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/build.make modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/demo_suite/demo_slam.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/build.make modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/demo_suite/demo_slam.cpp.i
 .PHONY : demo_suite/demo_slam.cpp.i
 
 demo_suite/demo_slam.s: demo_suite/demo_slam.cpp.s
@@ -250,7 +240,7 @@ demo_suite/demo_slam.s: demo_suite/demo_slam.cpp.s
 
 # target to generate assembly for a file
 demo_suite/demo_slam.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/build.make modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/demo_suite/demo_slam.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/build.make modules/rtslam/CMakeFiles/rtslam_demo_slam.dir/demo_suite/demo_slam.cpp.s
 .PHONY : demo_suite/demo_slam.cpp.s
 
 src/activeSearch.o: src/activeSearch.cpp.o
@@ -258,7 +248,7 @@ src/activeSearch.o: src/activeSearch.cpp.o
 
 # target to build an object file
 src/activeSearch.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/activeSearch.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/activeSearch.cpp.o
 .PHONY : src/activeSearch.cpp.o
 
 src/activeSearch.i: src/activeSearch.cpp.i
@@ -266,7 +256,7 @@ src/activeSearch.i: src/activeSearch.cpp.i
 
 # target to preprocess a source file
 src/activeSearch.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/activeSearch.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/activeSearch.cpp.i
 .PHONY : src/activeSearch.cpp.i
 
 src/activeSearch.s: src/activeSearch.cpp.s
@@ -274,7 +264,7 @@ src/activeSearch.s: src/activeSearch.cpp.s
 
 # target to generate assembly for a file
 src/activeSearch.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/activeSearch.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/activeSearch.cpp.s
 .PHONY : src/activeSearch.cpp.s
 
 src/appearanceAbstract.o: src/appearanceAbstract.cpp.o
@@ -282,7 +272,7 @@ src/appearanceAbstract.o: src/appearanceAbstract.cpp.o
 
 # target to build an object file
 src/appearanceAbstract.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/appearanceAbstract.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/appearanceAbstract.cpp.o
 .PHONY : src/appearanceAbstract.cpp.o
 
 src/appearanceAbstract.i: src/appearanceAbstract.cpp.i
@@ -290,7 +280,7 @@ src/appearanceAbstract.i: src/appearanceAbstract.cpp.i
 
 # target to preprocess a source file
 src/appearanceAbstract.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/appearanceAbstract.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/appearanceAbstract.cpp.i
 .PHONY : src/appearanceAbstract.cpp.i
 
 src/appearanceAbstract.s: src/appearanceAbstract.cpp.s
@@ -298,7 +288,7 @@ src/appearanceAbstract.s: src/appearanceAbstract.cpp.s
 
 # target to generate assembly for a file
 src/appearanceAbstract.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/appearanceAbstract.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/appearanceAbstract.cpp.s
 .PHONY : src/appearanceAbstract.cpp.s
 
 src/appearanceImage.o: src/appearanceImage.cpp.o
@@ -306,7 +296,7 @@ src/appearanceImage.o: src/appearanceImage.cpp.o
 
 # target to build an object file
 src/appearanceImage.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/appearanceImage.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/appearanceImage.cpp.o
 .PHONY : src/appearanceImage.cpp.o
 
 src/appearanceImage.i: src/appearanceImage.cpp.i
@@ -314,7 +304,7 @@ src/appearanceImage.i: src/appearanceImage.cpp.i
 
 # target to preprocess a source file
 src/appearanceImage.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/appearanceImage.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/appearanceImage.cpp.i
 .PHONY : src/appearanceImage.cpp.i
 
 src/appearanceImage.s: src/appearanceImage.cpp.s
@@ -322,7 +312,7 @@ src/appearanceImage.s: src/appearanceImage.cpp.s
 
 # target to generate assembly for a file
 src/appearanceImage.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/appearanceImage.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/appearanceImage.cpp.s
 .PHONY : src/appearanceImage.cpp.s
 
 src/dataManagerAbstract.o: src/dataManagerAbstract.cpp.o
@@ -330,7 +320,7 @@ src/dataManagerAbstract.o: src/dataManagerAbstract.cpp.o
 
 # target to build an object file
 src/dataManagerAbstract.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerAbstract.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerAbstract.cpp.o
 .PHONY : src/dataManagerAbstract.cpp.o
 
 src/dataManagerAbstract.i: src/dataManagerAbstract.cpp.i
@@ -338,7 +328,7 @@ src/dataManagerAbstract.i: src/dataManagerAbstract.cpp.i
 
 # target to preprocess a source file
 src/dataManagerAbstract.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerAbstract.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerAbstract.cpp.i
 .PHONY : src/dataManagerAbstract.cpp.i
 
 src/dataManagerAbstract.s: src/dataManagerAbstract.cpp.s
@@ -346,7 +336,7 @@ src/dataManagerAbstract.s: src/dataManagerAbstract.cpp.s
 
 # target to generate assembly for a file
 src/dataManagerAbstract.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerAbstract.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerAbstract.cpp.s
 .PHONY : src/dataManagerAbstract.cpp.s
 
 src/dataManagerActiveSearch.o: src/dataManagerActiveSearch.cpp.o
@@ -354,7 +344,7 @@ src/dataManagerActiveSearch.o: src/dataManagerActiveSearch.cpp.o
 
 # target to build an object file
 src/dataManagerActiveSearch.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerActiveSearch.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerActiveSearch.cpp.o
 .PHONY : src/dataManagerActiveSearch.cpp.o
 
 src/dataManagerActiveSearch.i: src/dataManagerActiveSearch.cpp.i
@@ -362,7 +352,7 @@ src/dataManagerActiveSearch.i: src/dataManagerActiveSearch.cpp.i
 
 # target to preprocess a source file
 src/dataManagerActiveSearch.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerActiveSearch.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerActiveSearch.cpp.i
 .PHONY : src/dataManagerActiveSearch.cpp.i
 
 src/dataManagerActiveSearch.s: src/dataManagerActiveSearch.cpp.s
@@ -370,7 +360,7 @@ src/dataManagerActiveSearch.s: src/dataManagerActiveSearch.cpp.s
 
 # target to generate assembly for a file
 src/dataManagerActiveSearch.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerActiveSearch.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerActiveSearch.cpp.s
 .PHONY : src/dataManagerActiveSearch.cpp.s
 
 src/dataManagerOnePointRansac.o: src/dataManagerOnePointRansac.cpp.o
@@ -378,7 +368,7 @@ src/dataManagerOnePointRansac.o: src/dataManagerOnePointRansac.cpp.o
 
 # target to build an object file
 src/dataManagerOnePointRansac.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerOnePointRansac.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerOnePointRansac.cpp.o
 .PHONY : src/dataManagerOnePointRansac.cpp.o
 
 src/dataManagerOnePointRansac.i: src/dataManagerOnePointRansac.cpp.i
@@ -386,7 +376,7 @@ src/dataManagerOnePointRansac.i: src/dataManagerOnePointRansac.cpp.i
 
 # target to preprocess a source file
 src/dataManagerOnePointRansac.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerOnePointRansac.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerOnePointRansac.cpp.i
 .PHONY : src/dataManagerOnePointRansac.cpp.i
 
 src/dataManagerOnePointRansac.s: src/dataManagerOnePointRansac.cpp.s
@@ -394,7 +384,7 @@ src/dataManagerOnePointRansac.s: src/dataManagerOnePointRansac.cpp.s
 
 # target to generate assembly for a file
 src/dataManagerOnePointRansac.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerOnePointRansac.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerOnePointRansac.cpp.s
 .PHONY : src/dataManagerOnePointRansac.cpp.s
 
 src/descriptorAbstract.o: src/descriptorAbstract.cpp.o
@@ -402,7 +392,7 @@ src/descriptorAbstract.o: src/descriptorAbstract.cpp.o
 
 # target to build an object file
 src/descriptorAbstract.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorAbstract.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorAbstract.cpp.o
 .PHONY : src/descriptorAbstract.cpp.o
 
 src/descriptorAbstract.i: src/descriptorAbstract.cpp.i
@@ -410,7 +400,7 @@ src/descriptorAbstract.i: src/descriptorAbstract.cpp.i
 
 # target to preprocess a source file
 src/descriptorAbstract.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorAbstract.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorAbstract.cpp.i
 .PHONY : src/descriptorAbstract.cpp.i
 
 src/descriptorAbstract.s: src/descriptorAbstract.cpp.s
@@ -418,7 +408,7 @@ src/descriptorAbstract.s: src/descriptorAbstract.cpp.s
 
 # target to generate assembly for a file
 src/descriptorAbstract.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorAbstract.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorAbstract.cpp.s
 .PHONY : src/descriptorAbstract.cpp.s
 
 src/descriptorImagePoint.o: src/descriptorImagePoint.cpp.o
@@ -426,7 +416,7 @@ src/descriptorImagePoint.o: src/descriptorImagePoint.cpp.o
 
 # target to build an object file
 src/descriptorImagePoint.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorImagePoint.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorImagePoint.cpp.o
 .PHONY : src/descriptorImagePoint.cpp.o
 
 src/descriptorImagePoint.i: src/descriptorImagePoint.cpp.i
@@ -434,7 +424,7 @@ src/descriptorImagePoint.i: src/descriptorImagePoint.cpp.i
 
 # target to preprocess a source file
 src/descriptorImagePoint.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorImagePoint.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorImagePoint.cpp.i
 .PHONY : src/descriptorImagePoint.cpp.i
 
 src/descriptorImagePoint.s: src/descriptorImagePoint.cpp.s
@@ -442,15 +432,87 @@ src/descriptorImagePoint.s: src/descriptorImagePoint.cpp.s
 
 # target to generate assembly for a file
 src/descriptorImagePoint.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorImagePoint.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorImagePoint.cpp.s
 .PHONY : src/descriptorImagePoint.cpp.s
+
+src/display.o: src/display.cpp.o
+.PHONY : src/display.o
+
+# target to build an object file
+src/display.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/display.cpp.o
+.PHONY : src/display.cpp.o
+
+src/display.i: src/display.cpp.i
+.PHONY : src/display.i
+
+# target to preprocess a source file
+src/display.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/display.cpp.i
+.PHONY : src/display.cpp.i
+
+src/display.s: src/display.cpp.s
+.PHONY : src/display.s
+
+# target to generate assembly for a file
+src/display.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/display.cpp.s
+.PHONY : src/display.cpp.s
+
+src/display_gdhe.o: src/display_gdhe.cpp.o
+.PHONY : src/display_gdhe.o
+
+# target to build an object file
+src/display_gdhe.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/display_gdhe.cpp.o
+.PHONY : src/display_gdhe.cpp.o
+
+src/display_gdhe.i: src/display_gdhe.cpp.i
+.PHONY : src/display_gdhe.i
+
+# target to preprocess a source file
+src/display_gdhe.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/display_gdhe.cpp.i
+.PHONY : src/display_gdhe.cpp.i
+
+src/display_gdhe.s: src/display_gdhe.cpp.s
+.PHONY : src/display_gdhe.s
+
+# target to generate assembly for a file
+src/display_gdhe.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/display_gdhe.cpp.s
+.PHONY : src/display_gdhe.cpp.s
+
+src/display_qt.o: src/display_qt.cpp.o
+.PHONY : src/display_qt.o
+
+# target to build an object file
+src/display_qt.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/display_qt.cpp.o
+.PHONY : src/display_qt.cpp.o
+
+src/display_qt.i: src/display_qt.cpp.i
+.PHONY : src/display_qt.i
+
+# target to preprocess a source file
+src/display_qt.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/display_qt.cpp.i
+.PHONY : src/display_qt.cpp.i
+
+src/display_qt.s: src/display_qt.cpp.s
+.PHONY : src/display_qt.s
+
+# target to generate assembly for a file
+src/display_qt.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/display_qt.cpp.s
+.PHONY : src/display_qt.cpp.s
 
 src/expectation.o: src/expectation.cpp.o
 .PHONY : src/expectation.o
 
 # target to build an object file
 src/expectation.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/expectation.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/expectation.cpp.o
 .PHONY : src/expectation.cpp.o
 
 src/expectation.i: src/expectation.cpp.i
@@ -458,7 +520,7 @@ src/expectation.i: src/expectation.cpp.i
 
 # target to preprocess a source file
 src/expectation.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/expectation.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/expectation.cpp.i
 .PHONY : src/expectation.cpp.i
 
 src/expectation.s: src/expectation.cpp.s
@@ -466,7 +528,7 @@ src/expectation.s: src/expectation.cpp.s
 
 # target to generate assembly for a file
 src/expectation.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/expectation.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/expectation.cpp.s
 .PHONY : src/expectation.cpp.s
 
 src/featureAbstract.o: src/featureAbstract.cpp.o
@@ -474,7 +536,7 @@ src/featureAbstract.o: src/featureAbstract.cpp.o
 
 # target to build an object file
 src/featureAbstract.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/featureAbstract.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/featureAbstract.cpp.o
 .PHONY : src/featureAbstract.cpp.o
 
 src/featureAbstract.i: src/featureAbstract.cpp.i
@@ -482,7 +544,7 @@ src/featureAbstract.i: src/featureAbstract.cpp.i
 
 # target to preprocess a source file
 src/featureAbstract.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/featureAbstract.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/featureAbstract.cpp.i
 .PHONY : src/featureAbstract.cpp.i
 
 src/featureAbstract.s: src/featureAbstract.cpp.s
@@ -490,7 +552,7 @@ src/featureAbstract.s: src/featureAbstract.cpp.s
 
 # target to generate assembly for a file
 src/featureAbstract.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/featureAbstract.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/featureAbstract.cpp.s
 .PHONY : src/featureAbstract.cpp.s
 
 src/featurePoint.o: src/featurePoint.cpp.o
@@ -498,7 +560,7 @@ src/featurePoint.o: src/featurePoint.cpp.o
 
 # target to build an object file
 src/featurePoint.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/featurePoint.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/featurePoint.cpp.o
 .PHONY : src/featurePoint.cpp.o
 
 src/featurePoint.i: src/featurePoint.cpp.i
@@ -506,7 +568,7 @@ src/featurePoint.i: src/featurePoint.cpp.i
 
 # target to preprocess a source file
 src/featurePoint.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/featurePoint.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/featurePoint.cpp.i
 .PHONY : src/featurePoint.cpp.i
 
 src/featurePoint.s: src/featurePoint.cpp.s
@@ -514,7 +576,7 @@ src/featurePoint.s: src/featurePoint.cpp.s
 
 # target to generate assembly for a file
 src/featurePoint.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/featurePoint.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/featurePoint.cpp.s
 .PHONY : src/featurePoint.cpp.s
 
 src/gaussian.o: src/gaussian.cpp.o
@@ -522,7 +584,7 @@ src/gaussian.o: src/gaussian.cpp.o
 
 # target to build an object file
 src/gaussian.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/gaussian.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/gaussian.cpp.o
 .PHONY : src/gaussian.cpp.o
 
 src/gaussian.i: src/gaussian.cpp.i
@@ -530,7 +592,7 @@ src/gaussian.i: src/gaussian.cpp.i
 
 # target to preprocess a source file
 src/gaussian.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/gaussian.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/gaussian.cpp.i
 .PHONY : src/gaussian.cpp.i
 
 src/gaussian.s: src/gaussian.cpp.s
@@ -538,7 +600,7 @@ src/gaussian.s: src/gaussian.cpp.s
 
 # target to generate assembly for a file
 src/gaussian.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/gaussian.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/gaussian.cpp.s
 .PHONY : src/gaussian.cpp.s
 
 src/hardwareEstimatorMti.o: src/hardwareEstimatorMti.cpp.o
@@ -546,7 +608,7 @@ src/hardwareEstimatorMti.o: src/hardwareEstimatorMti.cpp.o
 
 # target to build an object file
 src/hardwareEstimatorMti.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareEstimatorMti.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareEstimatorMti.cpp.o
 .PHONY : src/hardwareEstimatorMti.cpp.o
 
 src/hardwareEstimatorMti.i: src/hardwareEstimatorMti.cpp.i
@@ -554,7 +616,7 @@ src/hardwareEstimatorMti.i: src/hardwareEstimatorMti.cpp.i
 
 # target to preprocess a source file
 src/hardwareEstimatorMti.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareEstimatorMti.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareEstimatorMti.cpp.i
 .PHONY : src/hardwareEstimatorMti.cpp.i
 
 src/hardwareEstimatorMti.s: src/hardwareEstimatorMti.cpp.s
@@ -562,7 +624,7 @@ src/hardwareEstimatorMti.s: src/hardwareEstimatorMti.cpp.s
 
 # target to generate assembly for a file
 src/hardwareEstimatorMti.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareEstimatorMti.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareEstimatorMti.cpp.s
 .PHONY : src/hardwareEstimatorMti.cpp.s
 
 src/hardwareSensorCameraFirewire.o: src/hardwareSensorCameraFirewire.cpp.o
@@ -570,7 +632,7 @@ src/hardwareSensorCameraFirewire.o: src/hardwareSensorCameraFirewire.cpp.o
 
 # target to build an object file
 src/hardwareSensorCameraFirewire.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareSensorCameraFirewire.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareSensorCameraFirewire.cpp.o
 .PHONY : src/hardwareSensorCameraFirewire.cpp.o
 
 src/hardwareSensorCameraFirewire.i: src/hardwareSensorCameraFirewire.cpp.i
@@ -578,7 +640,7 @@ src/hardwareSensorCameraFirewire.i: src/hardwareSensorCameraFirewire.cpp.i
 
 # target to preprocess a source file
 src/hardwareSensorCameraFirewire.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareSensorCameraFirewire.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareSensorCameraFirewire.cpp.i
 .PHONY : src/hardwareSensorCameraFirewire.cpp.i
 
 src/hardwareSensorCameraFirewire.s: src/hardwareSensorCameraFirewire.cpp.s
@@ -586,15 +648,39 @@ src/hardwareSensorCameraFirewire.s: src/hardwareSensorCameraFirewire.cpp.s
 
 # target to generate assembly for a file
 src/hardwareSensorCameraFirewire.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareSensorCameraFirewire.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareSensorCameraFirewire.cpp.s
 .PHONY : src/hardwareSensorCameraFirewire.cpp.s
+
+src/hierarchicalDirectSegmentDetector.o: src/hierarchicalDirectSegmentDetector.cpp.o
+.PHONY : src/hierarchicalDirectSegmentDetector.o
+
+# target to build an object file
+src/hierarchicalDirectSegmentDetector.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hierarchicalDirectSegmentDetector.cpp.o
+.PHONY : src/hierarchicalDirectSegmentDetector.cpp.o
+
+src/hierarchicalDirectSegmentDetector.i: src/hierarchicalDirectSegmentDetector.cpp.i
+.PHONY : src/hierarchicalDirectSegmentDetector.i
+
+# target to preprocess a source file
+src/hierarchicalDirectSegmentDetector.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hierarchicalDirectSegmentDetector.cpp.i
+.PHONY : src/hierarchicalDirectSegmentDetector.cpp.i
+
+src/hierarchicalDirectSegmentDetector.s: src/hierarchicalDirectSegmentDetector.cpp.s
+.PHONY : src/hierarchicalDirectSegmentDetector.s
+
+# target to generate assembly for a file
+src/hierarchicalDirectSegmentDetector.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hierarchicalDirectSegmentDetector.cpp.s
+.PHONY : src/hierarchicalDirectSegmentDetector.cpp.s
 
 src/innovation.o: src/innovation.cpp.o
 .PHONY : src/innovation.o
 
 # target to build an object file
 src/innovation.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/innovation.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/innovation.cpp.o
 .PHONY : src/innovation.cpp.o
 
 src/innovation.i: src/innovation.cpp.i
@@ -602,7 +688,7 @@ src/innovation.i: src/innovation.cpp.i
 
 # target to preprocess a source file
 src/innovation.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/innovation.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/innovation.cpp.i
 .PHONY : src/innovation.cpp.i
 
 src/innovation.s: src/innovation.cpp.s
@@ -610,7 +696,7 @@ src/innovation.s: src/innovation.cpp.s
 
 # target to generate assembly for a file
 src/innovation.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/innovation.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/innovation.cpp.s
 .PHONY : src/innovation.cpp.s
 
 src/kalmanFilter.o: src/kalmanFilter.cpp.o
@@ -618,7 +704,7 @@ src/kalmanFilter.o: src/kalmanFilter.cpp.o
 
 # target to build an object file
 src/kalmanFilter.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/kalmanFilter.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/kalmanFilter.cpp.o
 .PHONY : src/kalmanFilter.cpp.o
 
 src/kalmanFilter.i: src/kalmanFilter.cpp.i
@@ -626,7 +712,7 @@ src/kalmanFilter.i: src/kalmanFilter.cpp.i
 
 # target to preprocess a source file
 src/kalmanFilter.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/kalmanFilter.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/kalmanFilter.cpp.i
 .PHONY : src/kalmanFilter.cpp.i
 
 src/kalmanFilter.s: src/kalmanFilter.cpp.s
@@ -634,7 +720,7 @@ src/kalmanFilter.s: src/kalmanFilter.cpp.s
 
 # target to generate assembly for a file
 src/kalmanFilter.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/kalmanFilter.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/kalmanFilter.cpp.s
 .PHONY : src/kalmanFilter.cpp.s
 
 src/landmarkAbstract.o: src/landmarkAbstract.cpp.o
@@ -642,7 +728,7 @@ src/landmarkAbstract.o: src/landmarkAbstract.cpp.o
 
 # target to build an object file
 src/landmarkAbstract.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkAbstract.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkAbstract.cpp.o
 .PHONY : src/landmarkAbstract.cpp.o
 
 src/landmarkAbstract.i: src/landmarkAbstract.cpp.i
@@ -650,7 +736,7 @@ src/landmarkAbstract.i: src/landmarkAbstract.cpp.i
 
 # target to preprocess a source file
 src/landmarkAbstract.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkAbstract.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkAbstract.cpp.i
 .PHONY : src/landmarkAbstract.cpp.i
 
 src/landmarkAbstract.s: src/landmarkAbstract.cpp.s
@@ -658,7 +744,7 @@ src/landmarkAbstract.s: src/landmarkAbstract.cpp.s
 
 # target to generate assembly for a file
 src/landmarkAbstract.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkAbstract.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkAbstract.cpp.s
 .PHONY : src/landmarkAbstract.cpp.s
 
 src/landmarkAnchoredHomogeneousPoint.o: src/landmarkAnchoredHomogeneousPoint.cpp.o
@@ -666,7 +752,7 @@ src/landmarkAnchoredHomogeneousPoint.o: src/landmarkAnchoredHomogeneousPoint.cpp
 
 # target to build an object file
 src/landmarkAnchoredHomogeneousPoint.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkAnchoredHomogeneousPoint.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkAnchoredHomogeneousPoint.cpp.o
 .PHONY : src/landmarkAnchoredHomogeneousPoint.cpp.o
 
 src/landmarkAnchoredHomogeneousPoint.i: src/landmarkAnchoredHomogeneousPoint.cpp.i
@@ -674,7 +760,7 @@ src/landmarkAnchoredHomogeneousPoint.i: src/landmarkAnchoredHomogeneousPoint.cpp
 
 # target to preprocess a source file
 src/landmarkAnchoredHomogeneousPoint.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkAnchoredHomogeneousPoint.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkAnchoredHomogeneousPoint.cpp.i
 .PHONY : src/landmarkAnchoredHomogeneousPoint.cpp.i
 
 src/landmarkAnchoredHomogeneousPoint.s: src/landmarkAnchoredHomogeneousPoint.cpp.s
@@ -682,15 +768,39 @@ src/landmarkAnchoredHomogeneousPoint.s: src/landmarkAnchoredHomogeneousPoint.cpp
 
 # target to generate assembly for a file
 src/landmarkAnchoredHomogeneousPoint.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkAnchoredHomogeneousPoint.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkAnchoredHomogeneousPoint.cpp.s
 .PHONY : src/landmarkAnchoredHomogeneousPoint.cpp.s
+
+src/landmarkAnchoredHomogeneousPointsLine.o: src/landmarkAnchoredHomogeneousPointsLine.cpp.o
+.PHONY : src/landmarkAnchoredHomogeneousPointsLine.o
+
+# target to build an object file
+src/landmarkAnchoredHomogeneousPointsLine.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkAnchoredHomogeneousPointsLine.cpp.o
+.PHONY : src/landmarkAnchoredHomogeneousPointsLine.cpp.o
+
+src/landmarkAnchoredHomogeneousPointsLine.i: src/landmarkAnchoredHomogeneousPointsLine.cpp.i
+.PHONY : src/landmarkAnchoredHomogeneousPointsLine.i
+
+# target to preprocess a source file
+src/landmarkAnchoredHomogeneousPointsLine.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkAnchoredHomogeneousPointsLine.cpp.i
+.PHONY : src/landmarkAnchoredHomogeneousPointsLine.cpp.i
+
+src/landmarkAnchoredHomogeneousPointsLine.s: src/landmarkAnchoredHomogeneousPointsLine.cpp.s
+.PHONY : src/landmarkAnchoredHomogeneousPointsLine.s
+
+# target to generate assembly for a file
+src/landmarkAnchoredHomogeneousPointsLine.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkAnchoredHomogeneousPointsLine.cpp.s
+.PHONY : src/landmarkAnchoredHomogeneousPointsLine.cpp.s
 
 src/landmarkEuclideanPoint.o: src/landmarkEuclideanPoint.cpp.o
 .PHONY : src/landmarkEuclideanPoint.o
 
 # target to build an object file
 src/landmarkEuclideanPoint.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkEuclideanPoint.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkEuclideanPoint.cpp.o
 .PHONY : src/landmarkEuclideanPoint.cpp.o
 
 src/landmarkEuclideanPoint.i: src/landmarkEuclideanPoint.cpp.i
@@ -698,7 +808,7 @@ src/landmarkEuclideanPoint.i: src/landmarkEuclideanPoint.cpp.i
 
 # target to preprocess a source file
 src/landmarkEuclideanPoint.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkEuclideanPoint.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkEuclideanPoint.cpp.i
 .PHONY : src/landmarkEuclideanPoint.cpp.i
 
 src/landmarkEuclideanPoint.s: src/landmarkEuclideanPoint.cpp.s
@@ -706,7 +816,7 @@ src/landmarkEuclideanPoint.s: src/landmarkEuclideanPoint.cpp.s
 
 # target to generate assembly for a file
 src/landmarkEuclideanPoint.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkEuclideanPoint.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/landmarkEuclideanPoint.cpp.s
 .PHONY : src/landmarkEuclideanPoint.cpp.s
 
 src/mapAbstract.o: src/mapAbstract.cpp.o
@@ -714,7 +824,7 @@ src/mapAbstract.o: src/mapAbstract.cpp.o
 
 # target to build an object file
 src/mapAbstract.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapAbstract.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapAbstract.cpp.o
 .PHONY : src/mapAbstract.cpp.o
 
 src/mapAbstract.i: src/mapAbstract.cpp.i
@@ -722,7 +832,7 @@ src/mapAbstract.i: src/mapAbstract.cpp.i
 
 # target to preprocess a source file
 src/mapAbstract.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapAbstract.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapAbstract.cpp.i
 .PHONY : src/mapAbstract.cpp.i
 
 src/mapAbstract.s: src/mapAbstract.cpp.s
@@ -730,7 +840,7 @@ src/mapAbstract.s: src/mapAbstract.cpp.s
 
 # target to generate assembly for a file
 src/mapAbstract.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapAbstract.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapAbstract.cpp.s
 .PHONY : src/mapAbstract.cpp.s
 
 src/mapManager.o: src/mapManager.cpp.o
@@ -738,7 +848,7 @@ src/mapManager.o: src/mapManager.cpp.o
 
 # target to build an object file
 src/mapManager.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapManager.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapManager.cpp.o
 .PHONY : src/mapManager.cpp.o
 
 src/mapManager.i: src/mapManager.cpp.i
@@ -746,7 +856,7 @@ src/mapManager.i: src/mapManager.cpp.i
 
 # target to preprocess a source file
 src/mapManager.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapManager.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapManager.cpp.i
 .PHONY : src/mapManager.cpp.i
 
 src/mapManager.s: src/mapManager.cpp.s
@@ -754,7 +864,7 @@ src/mapManager.s: src/mapManager.cpp.s
 
 # target to generate assembly for a file
 src/mapManager.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapManager.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapManager.cpp.s
 .PHONY : src/mapManager.cpp.s
 
 src/mapObject.o: src/mapObject.cpp.o
@@ -762,7 +872,7 @@ src/mapObject.o: src/mapObject.cpp.o
 
 # target to build an object file
 src/mapObject.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapObject.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapObject.cpp.o
 .PHONY : src/mapObject.cpp.o
 
 src/mapObject.i: src/mapObject.cpp.i
@@ -770,7 +880,7 @@ src/mapObject.i: src/mapObject.cpp.i
 
 # target to preprocess a source file
 src/mapObject.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapObject.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapObject.cpp.i
 .PHONY : src/mapObject.cpp.i
 
 src/mapObject.s: src/mapObject.cpp.s
@@ -778,7 +888,7 @@ src/mapObject.s: src/mapObject.cpp.s
 
 # target to generate assembly for a file
 src/mapObject.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapObject.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/mapObject.cpp.s
 .PHONY : src/mapObject.cpp.s
 
 src/measurement.o: src/measurement.cpp.o
@@ -786,7 +896,7 @@ src/measurement.o: src/measurement.cpp.o
 
 # target to build an object file
 src/measurement.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/measurement.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/measurement.cpp.o
 .PHONY : src/measurement.cpp.o
 
 src/measurement.i: src/measurement.cpp.i
@@ -794,7 +904,7 @@ src/measurement.i: src/measurement.cpp.i
 
 # target to preprocess a source file
 src/measurement.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/measurement.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/measurement.cpp.i
 .PHONY : src/measurement.cpp.i
 
 src/measurement.s: src/measurement.cpp.s
@@ -802,7 +912,7 @@ src/measurement.s: src/measurement.cpp.s
 
 # target to generate assembly for a file
 src/measurement.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/measurement.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/measurement.cpp.s
 .PHONY : src/measurement.cpp.s
 
 src/objectAbstract.o: src/objectAbstract.cpp.o
@@ -810,7 +920,7 @@ src/objectAbstract.o: src/objectAbstract.cpp.o
 
 # target to build an object file
 src/objectAbstract.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/objectAbstract.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/objectAbstract.cpp.o
 .PHONY : src/objectAbstract.cpp.o
 
 src/objectAbstract.i: src/objectAbstract.cpp.i
@@ -818,7 +928,7 @@ src/objectAbstract.i: src/objectAbstract.cpp.i
 
 # target to preprocess a source file
 src/objectAbstract.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/objectAbstract.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/objectAbstract.cpp.i
 .PHONY : src/objectAbstract.cpp.i
 
 src/objectAbstract.s: src/objectAbstract.cpp.s
@@ -826,7 +936,7 @@ src/objectAbstract.s: src/objectAbstract.cpp.s
 
 # target to generate assembly for a file
 src/objectAbstract.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/objectAbstract.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/objectAbstract.cpp.s
 .PHONY : src/objectAbstract.cpp.s
 
 src/observationAbstract.o: src/observationAbstract.cpp.o
@@ -834,7 +944,7 @@ src/observationAbstract.o: src/observationAbstract.cpp.o
 
 # target to build an object file
 src/observationAbstract.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationAbstract.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationAbstract.cpp.o
 .PHONY : src/observationAbstract.cpp.o
 
 src/observationAbstract.i: src/observationAbstract.cpp.i
@@ -842,7 +952,7 @@ src/observationAbstract.i: src/observationAbstract.cpp.i
 
 # target to preprocess a source file
 src/observationAbstract.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationAbstract.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationAbstract.cpp.i
 .PHONY : src/observationAbstract.cpp.i
 
 src/observationAbstract.s: src/observationAbstract.cpp.s
@@ -850,7 +960,7 @@ src/observationAbstract.s: src/observationAbstract.cpp.s
 
 # target to generate assembly for a file
 src/observationAbstract.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationAbstract.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationAbstract.cpp.s
 .PHONY : src/observationAbstract.cpp.s
 
 src/observationPinHoleAnchoredHomogeneous.o: src/observationPinHoleAnchoredHomogeneous.cpp.o
@@ -858,7 +968,7 @@ src/observationPinHoleAnchoredHomogeneous.o: src/observationPinHoleAnchoredHomog
 
 # target to build an object file
 src/observationPinHoleAnchoredHomogeneous.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationPinHoleAnchoredHomogeneous.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationPinHoleAnchoredHomogeneous.cpp.o
 .PHONY : src/observationPinHoleAnchoredHomogeneous.cpp.o
 
 src/observationPinHoleAnchoredHomogeneous.i: src/observationPinHoleAnchoredHomogeneous.cpp.i
@@ -866,7 +976,7 @@ src/observationPinHoleAnchoredHomogeneous.i: src/observationPinHoleAnchoredHomog
 
 # target to preprocess a source file
 src/observationPinHoleAnchoredHomogeneous.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationPinHoleAnchoredHomogeneous.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationPinHoleAnchoredHomogeneous.cpp.i
 .PHONY : src/observationPinHoleAnchoredHomogeneous.cpp.i
 
 src/observationPinHoleAnchoredHomogeneous.s: src/observationPinHoleAnchoredHomogeneous.cpp.s
@@ -874,7 +984,7 @@ src/observationPinHoleAnchoredHomogeneous.s: src/observationPinHoleAnchoredHomog
 
 # target to generate assembly for a file
 src/observationPinHoleAnchoredHomogeneous.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationPinHoleAnchoredHomogeneous.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationPinHoleAnchoredHomogeneous.cpp.s
 .PHONY : src/observationPinHoleAnchoredHomogeneous.cpp.s
 
 src/observationPinHoleEuclideanPoint.o: src/observationPinHoleEuclideanPoint.cpp.o
@@ -882,7 +992,7 @@ src/observationPinHoleEuclideanPoint.o: src/observationPinHoleEuclideanPoint.cpp
 
 # target to build an object file
 src/observationPinHoleEuclideanPoint.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationPinHoleEuclideanPoint.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationPinHoleEuclideanPoint.cpp.o
 .PHONY : src/observationPinHoleEuclideanPoint.cpp.o
 
 src/observationPinHoleEuclideanPoint.i: src/observationPinHoleEuclideanPoint.cpp.i
@@ -890,7 +1000,7 @@ src/observationPinHoleEuclideanPoint.i: src/observationPinHoleEuclideanPoint.cpp
 
 # target to preprocess a source file
 src/observationPinHoleEuclideanPoint.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationPinHoleEuclideanPoint.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationPinHoleEuclideanPoint.cpp.i
 .PHONY : src/observationPinHoleEuclideanPoint.cpp.i
 
 src/observationPinHoleEuclideanPoint.s: src/observationPinHoleEuclideanPoint.cpp.s
@@ -898,7 +1008,7 @@ src/observationPinHoleEuclideanPoint.s: src/observationPinHoleEuclideanPoint.cpp
 
 # target to generate assembly for a file
 src/observationPinHoleEuclideanPoint.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationPinHoleEuclideanPoint.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationPinHoleEuclideanPoint.cpp.s
 .PHONY : src/observationPinHoleEuclideanPoint.cpp.s
 
 src/perturbation.o: src/perturbation.cpp.o
@@ -906,7 +1016,7 @@ src/perturbation.o: src/perturbation.cpp.o
 
 # target to build an object file
 src/perturbation.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/perturbation.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/perturbation.cpp.o
 .PHONY : src/perturbation.cpp.o
 
 src/perturbation.i: src/perturbation.cpp.i
@@ -914,7 +1024,7 @@ src/perturbation.i: src/perturbation.cpp.i
 
 # target to preprocess a source file
 src/perturbation.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/perturbation.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/perturbation.cpp.i
 .PHONY : src/perturbation.cpp.i
 
 src/perturbation.s: src/perturbation.cpp.s
@@ -922,7 +1032,7 @@ src/perturbation.s: src/perturbation.cpp.s
 
 # target to generate assembly for a file
 src/perturbation.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/perturbation.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/perturbation.cpp.s
 .PHONY : src/perturbation.cpp.s
 
 src/quatTools.o: src/quatTools.cpp.o
@@ -930,7 +1040,7 @@ src/quatTools.o: src/quatTools.cpp.o
 
 # target to build an object file
 src/quatTools.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/quatTools.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/quatTools.cpp.o
 .PHONY : src/quatTools.cpp.o
 
 src/quatTools.i: src/quatTools.cpp.i
@@ -938,7 +1048,7 @@ src/quatTools.i: src/quatTools.cpp.i
 
 # target to preprocess a source file
 src/quatTools.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/quatTools.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/quatTools.cpp.i
 .PHONY : src/quatTools.cpp.i
 
 src/quatTools.s: src/quatTools.cpp.s
@@ -946,7 +1056,7 @@ src/quatTools.s: src/quatTools.cpp.s
 
 # target to generate assembly for a file
 src/quatTools.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/quatTools.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/quatTools.cpp.s
 .PHONY : src/quatTools.cpp.s
 
 src/quickHarrisDetector.o: src/quickHarrisDetector.cpp.o
@@ -954,7 +1064,7 @@ src/quickHarrisDetector.o: src/quickHarrisDetector.cpp.o
 
 # target to build an object file
 src/quickHarrisDetector.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/quickHarrisDetector.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/quickHarrisDetector.cpp.o
 .PHONY : src/quickHarrisDetector.cpp.o
 
 src/quickHarrisDetector.i: src/quickHarrisDetector.cpp.i
@@ -962,7 +1072,7 @@ src/quickHarrisDetector.i: src/quickHarrisDetector.cpp.i
 
 # target to preprocess a source file
 src/quickHarrisDetector.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/quickHarrisDetector.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/quickHarrisDetector.cpp.i
 .PHONY : src/quickHarrisDetector.cpp.i
 
 src/quickHarrisDetector.s: src/quickHarrisDetector.cpp.s
@@ -970,7 +1080,7 @@ src/quickHarrisDetector.s: src/quickHarrisDetector.cpp.s
 
 # target to generate assembly for a file
 src/quickHarrisDetector.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/quickHarrisDetector.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/quickHarrisDetector.cpp.s
 .PHONY : src/quickHarrisDetector.cpp.s
 
 src/rawAbstract.o: src/rawAbstract.cpp.o
@@ -978,7 +1088,7 @@ src/rawAbstract.o: src/rawAbstract.cpp.o
 
 # target to build an object file
 src/rawAbstract.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rawAbstract.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rawAbstract.cpp.o
 .PHONY : src/rawAbstract.cpp.o
 
 src/rawAbstract.i: src/rawAbstract.cpp.i
@@ -986,7 +1096,7 @@ src/rawAbstract.i: src/rawAbstract.cpp.i
 
 # target to preprocess a source file
 src/rawAbstract.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rawAbstract.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rawAbstract.cpp.i
 .PHONY : src/rawAbstract.cpp.i
 
 src/rawAbstract.s: src/rawAbstract.cpp.s
@@ -994,7 +1104,7 @@ src/rawAbstract.s: src/rawAbstract.cpp.s
 
 # target to generate assembly for a file
 src/rawAbstract.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rawAbstract.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rawAbstract.cpp.s
 .PHONY : src/rawAbstract.cpp.s
 
 src/rawImage.o: src/rawImage.cpp.o
@@ -1002,7 +1112,7 @@ src/rawImage.o: src/rawImage.cpp.o
 
 # target to build an object file
 src/rawImage.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rawImage.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rawImage.cpp.o
 .PHONY : src/rawImage.cpp.o
 
 src/rawImage.i: src/rawImage.cpp.i
@@ -1010,7 +1120,7 @@ src/rawImage.i: src/rawImage.cpp.i
 
 # target to preprocess a source file
 src/rawImage.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rawImage.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rawImage.cpp.i
 .PHONY : src/rawImage.cpp.i
 
 src/rawImage.s: src/rawImage.cpp.s
@@ -1018,7 +1128,7 @@ src/rawImage.s: src/rawImage.cpp.s
 
 # target to generate assembly for a file
 src/rawImage.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rawImage.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rawImage.cpp.s
 .PHONY : src/rawImage.cpp.s
 
 src/robotAbstract.o: src/robotAbstract.cpp.o
@@ -1026,7 +1136,7 @@ src/robotAbstract.o: src/robotAbstract.cpp.o
 
 # target to build an object file
 src/robotAbstract.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotAbstract.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotAbstract.cpp.o
 .PHONY : src/robotAbstract.cpp.o
 
 src/robotAbstract.i: src/robotAbstract.cpp.i
@@ -1034,7 +1144,7 @@ src/robotAbstract.i: src/robotAbstract.cpp.i
 
 # target to preprocess a source file
 src/robotAbstract.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotAbstract.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotAbstract.cpp.i
 .PHONY : src/robotAbstract.cpp.i
 
 src/robotAbstract.s: src/robotAbstract.cpp.s
@@ -1042,7 +1152,7 @@ src/robotAbstract.s: src/robotAbstract.cpp.s
 
 # target to generate assembly for a file
 src/robotAbstract.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotAbstract.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotAbstract.cpp.s
 .PHONY : src/robotAbstract.cpp.s
 
 src/robotCenteredConstantVelocity.o: src/robotCenteredConstantVelocity.cpp.o
@@ -1050,7 +1160,7 @@ src/robotCenteredConstantVelocity.o: src/robotCenteredConstantVelocity.cpp.o
 
 # target to build an object file
 src/robotCenteredConstantVelocity.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotCenteredConstantVelocity.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotCenteredConstantVelocity.cpp.o
 .PHONY : src/robotCenteredConstantVelocity.cpp.o
 
 src/robotCenteredConstantVelocity.i: src/robotCenteredConstantVelocity.cpp.i
@@ -1058,7 +1168,7 @@ src/robotCenteredConstantVelocity.i: src/robotCenteredConstantVelocity.cpp.i
 
 # target to preprocess a source file
 src/robotCenteredConstantVelocity.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotCenteredConstantVelocity.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotCenteredConstantVelocity.cpp.i
 .PHONY : src/robotCenteredConstantVelocity.cpp.i
 
 src/robotCenteredConstantVelocity.s: src/robotCenteredConstantVelocity.cpp.s
@@ -1066,7 +1176,7 @@ src/robotCenteredConstantVelocity.s: src/robotCenteredConstantVelocity.cpp.s
 
 # target to generate assembly for a file
 src/robotCenteredConstantVelocity.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotCenteredConstantVelocity.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotCenteredConstantVelocity.cpp.s
 .PHONY : src/robotCenteredConstantVelocity.cpp.s
 
 src/robotConstantVelocity.o: src/robotConstantVelocity.cpp.o
@@ -1074,7 +1184,7 @@ src/robotConstantVelocity.o: src/robotConstantVelocity.cpp.o
 
 # target to build an object file
 src/robotConstantVelocity.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotConstantVelocity.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotConstantVelocity.cpp.o
 .PHONY : src/robotConstantVelocity.cpp.o
 
 src/robotConstantVelocity.i: src/robotConstantVelocity.cpp.i
@@ -1082,7 +1192,7 @@ src/robotConstantVelocity.i: src/robotConstantVelocity.cpp.i
 
 # target to preprocess a source file
 src/robotConstantVelocity.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotConstantVelocity.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotConstantVelocity.cpp.i
 .PHONY : src/robotConstantVelocity.cpp.i
 
 src/robotConstantVelocity.s: src/robotConstantVelocity.cpp.s
@@ -1090,7 +1200,7 @@ src/robotConstantVelocity.s: src/robotConstantVelocity.cpp.s
 
 # target to generate assembly for a file
 src/robotConstantVelocity.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotConstantVelocity.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotConstantVelocity.cpp.s
 .PHONY : src/robotConstantVelocity.cpp.s
 
 src/robotInertial.o: src/robotInertial.cpp.o
@@ -1098,7 +1208,7 @@ src/robotInertial.o: src/robotInertial.cpp.o
 
 # target to build an object file
 src/robotInertial.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotInertial.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotInertial.cpp.o
 .PHONY : src/robotInertial.cpp.o
 
 src/robotInertial.i: src/robotInertial.cpp.i
@@ -1106,7 +1216,7 @@ src/robotInertial.i: src/robotInertial.cpp.i
 
 # target to preprocess a source file
 src/robotInertial.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotInertial.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotInertial.cpp.i
 .PHONY : src/robotInertial.cpp.i
 
 src/robotInertial.s: src/robotInertial.cpp.s
@@ -1114,7 +1224,7 @@ src/robotInertial.s: src/robotInertial.cpp.s
 
 # target to generate assembly for a file
 src/robotInertial.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotInertial.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotInertial.cpp.s
 .PHONY : src/robotInertial.cpp.s
 
 src/robotOdometry.o: src/robotOdometry.cpp.o
@@ -1122,7 +1232,7 @@ src/robotOdometry.o: src/robotOdometry.cpp.o
 
 # target to build an object file
 src/robotOdometry.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotOdometry.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotOdometry.cpp.o
 .PHONY : src/robotOdometry.cpp.o
 
 src/robotOdometry.i: src/robotOdometry.cpp.i
@@ -1130,7 +1240,7 @@ src/robotOdometry.i: src/robotOdometry.cpp.i
 
 # target to preprocess a source file
 src/robotOdometry.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotOdometry.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotOdometry.cpp.i
 .PHONY : src/robotOdometry.cpp.i
 
 src/robotOdometry.s: src/robotOdometry.cpp.s
@@ -1138,15 +1248,39 @@ src/robotOdometry.s: src/robotOdometry.cpp.s
 
 # target to generate assembly for a file
 src/robotOdometry.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotOdometry.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/robotOdometry.cpp.s
 .PHONY : src/robotOdometry.cpp.s
+
+src/rtSlam.o: src/rtSlam.cpp.o
+.PHONY : src/rtSlam.o
+
+# target to build an object file
+src/rtSlam.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rtSlam.cpp.o
+.PHONY : src/rtSlam.cpp.o
+
+src/rtSlam.i: src/rtSlam.cpp.i
+.PHONY : src/rtSlam.i
+
+# target to preprocess a source file
+src/rtSlam.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rtSlam.cpp.i
+.PHONY : src/rtSlam.cpp.i
+
+src/rtSlam.s: src/rtSlam.cpp.s
+.PHONY : src/rtSlam.s
+
+# target to generate assembly for a file
+src/rtSlam.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rtSlam.cpp.s
+.PHONY : src/rtSlam.cpp.s
 
 src/rtslamException.o: src/rtslamException.cpp.o
 .PHONY : src/rtslamException.o
 
 # target to build an object file
 src/rtslamException.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rtslamException.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rtslamException.cpp.o
 .PHONY : src/rtslamException.cpp.o
 
 src/rtslamException.i: src/rtslamException.cpp.i
@@ -1154,7 +1288,7 @@ src/rtslamException.i: src/rtslamException.cpp.i
 
 # target to preprocess a source file
 src/rtslamException.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rtslamException.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rtslamException.cpp.i
 .PHONY : src/rtslamException.cpp.i
 
 src/rtslamException.s: src/rtslamException.cpp.s
@@ -1162,15 +1296,39 @@ src/rtslamException.s: src/rtslamException.cpp.s
 
 # target to generate assembly for a file
 src/rtslamException.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rtslamException.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/rtslamException.cpp.s
 .PHONY : src/rtslamException.cpp.s
+
+src/ruby/rtslam_wrap.o: src/ruby/rtslam_wrap.cpp.o
+.PHONY : src/ruby/rtslam_wrap.o
+
+# target to build an object file
+src/ruby/rtslam_wrap.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam_ruby_wrap.dir/build.make modules/rtslam/CMakeFiles/rtslam_ruby_wrap.dir/src/ruby/rtslam_wrap.cpp.o
+.PHONY : src/ruby/rtslam_wrap.cpp.o
+
+src/ruby/rtslam_wrap.i: src/ruby/rtslam_wrap.cpp.i
+.PHONY : src/ruby/rtslam_wrap.i
+
+# target to preprocess a source file
+src/ruby/rtslam_wrap.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam_ruby_wrap.dir/build.make modules/rtslam/CMakeFiles/rtslam_ruby_wrap.dir/src/ruby/rtslam_wrap.cpp.i
+.PHONY : src/ruby/rtslam_wrap.cpp.i
+
+src/ruby/rtslam_wrap.s: src/ruby/rtslam_wrap.cpp.s
+.PHONY : src/ruby/rtslam_wrap.s
+
+# target to generate assembly for a file
+src/ruby/rtslam_wrap.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam_ruby_wrap.dir/build.make modules/rtslam/CMakeFiles/rtslam_ruby_wrap.dir/src/ruby/rtslam_wrap.cpp.s
+.PHONY : src/ruby/rtslam_wrap.cpp.s
 
 src/sensorAbstract.o: src/sensorAbstract.cpp.o
 .PHONY : src/sensorAbstract.o
 
 # target to build an object file
 src/sensorAbstract.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorAbstract.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorAbstract.cpp.o
 .PHONY : src/sensorAbstract.cpp.o
 
 src/sensorAbstract.i: src/sensorAbstract.cpp.i
@@ -1178,7 +1336,7 @@ src/sensorAbstract.i: src/sensorAbstract.cpp.i
 
 # target to preprocess a source file
 src/sensorAbstract.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorAbstract.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorAbstract.cpp.i
 .PHONY : src/sensorAbstract.cpp.i
 
 src/sensorAbstract.s: src/sensorAbstract.cpp.s
@@ -1186,7 +1344,7 @@ src/sensorAbstract.s: src/sensorAbstract.cpp.s
 
 # target to generate assembly for a file
 src/sensorAbstract.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorAbstract.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorAbstract.cpp.s
 .PHONY : src/sensorAbstract.cpp.s
 
 src/sensorPinHole.o: src/sensorPinHole.cpp.o
@@ -1194,7 +1352,7 @@ src/sensorPinHole.o: src/sensorPinHole.cpp.o
 
 # target to build an object file
 src/sensorPinHole.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorPinHole.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorPinHole.cpp.o
 .PHONY : src/sensorPinHole.cpp.o
 
 src/sensorPinHole.i: src/sensorPinHole.cpp.i
@@ -1202,7 +1360,7 @@ src/sensorPinHole.i: src/sensorPinHole.cpp.i
 
 # target to preprocess a source file
 src/sensorPinHole.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorPinHole.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorPinHole.cpp.i
 .PHONY : src/sensorPinHole.cpp.i
 
 src/sensorPinHole.s: src/sensorPinHole.cpp.s
@@ -1210,15 +1368,39 @@ src/sensorPinHole.s: src/sensorPinHole.cpp.s
 
 # target to generate assembly for a file
 src/sensorPinHole.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorPinHole.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorPinHole.cpp.s
 .PHONY : src/sensorPinHole.cpp.s
+
+src/visibilityMap.o: src/visibilityMap.cpp.o
+.PHONY : src/visibilityMap.o
+
+# target to build an object file
+src/visibilityMap.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/visibilityMap.cpp.o
+.PHONY : src/visibilityMap.cpp.o
+
+src/visibilityMap.i: src/visibilityMap.cpp.i
+.PHONY : src/visibilityMap.i
+
+# target to preprocess a source file
+src/visibilityMap.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/visibilityMap.cpp.i
+.PHONY : src/visibilityMap.cpp.i
+
+src/visibilityMap.s: src/visibilityMap.cpp.s
+.PHONY : src/visibilityMap.s
+
+# target to generate assembly for a file
+src/visibilityMap.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/visibilityMap.cpp.s
+.PHONY : src/visibilityMap.cpp.s
 
 src/worldAbstract.o: src/worldAbstract.cpp.o
 .PHONY : src/worldAbstract.o
 
 # target to build an object file
 src/worldAbstract.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/worldAbstract.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/worldAbstract.cpp.o
 .PHONY : src/worldAbstract.cpp.o
 
 src/worldAbstract.i: src/worldAbstract.cpp.i
@@ -1226,7 +1408,7 @@ src/worldAbstract.i: src/worldAbstract.cpp.i
 
 # target to preprocess a source file
 src/worldAbstract.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/worldAbstract.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/worldAbstract.cpp.i
 .PHONY : src/worldAbstract.cpp.i
 
 src/worldAbstract.s: src/worldAbstract.cpp.s
@@ -1234,7 +1416,7 @@ src/worldAbstract.s: src/worldAbstract.cpp.s
 
 # target to generate assembly for a file
 src/worldAbstract.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/worldAbstract.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/worldAbstract.cpp.s
 .PHONY : src/worldAbstract.cpp.s
 
 test_suite/test_acsearch.o: test_suite/test_acsearch.cpp.o
@@ -1242,7 +1424,7 @@ test_suite/test_acsearch.o: test_suite/test_acsearch.cpp.o
 
 # target to build an object file
 test_suite/test_acsearch.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_acsearch.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_acsearch.cpp.o
 .PHONY : test_suite/test_acsearch.cpp.o
 
 test_suite/test_acsearch.i: test_suite/test_acsearch.cpp.i
@@ -1250,7 +1432,7 @@ test_suite/test_acsearch.i: test_suite/test_acsearch.cpp.i
 
 # target to preprocess a source file
 test_suite/test_acsearch.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_acsearch.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_acsearch.cpp.i
 .PHONY : test_suite/test_acsearch.cpp.i
 
 test_suite/test_acsearch.s: test_suite/test_acsearch.cpp.s
@@ -1258,7 +1440,7 @@ test_suite/test_acsearch.s: test_suite/test_acsearch.cpp.s
 
 # target to generate assembly for a file
 test_suite/test_acsearch.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_acsearch.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_acsearch.cpp.s
 .PHONY : test_suite/test_acsearch.cpp.s
 
 test_suite/test_ahp.o: test_suite/test_ahp.cpp.o
@@ -1266,7 +1448,7 @@ test_suite/test_ahp.o: test_suite/test_ahp.cpp.o
 
 # target to build an object file
 test_suite/test_ahp.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_ahp.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_ahp.cpp.o
 .PHONY : test_suite/test_ahp.cpp.o
 
 test_suite/test_ahp.i: test_suite/test_ahp.cpp.i
@@ -1274,7 +1456,7 @@ test_suite/test_ahp.i: test_suite/test_ahp.cpp.i
 
 # target to preprocess a source file
 test_suite/test_ahp.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_ahp.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_ahp.cpp.i
 .PHONY : test_suite/test_ahp.cpp.i
 
 test_suite/test_ahp.s: test_suite/test_ahp.cpp.s
@@ -1282,7 +1464,7 @@ test_suite/test_ahp.s: test_suite/test_ahp.cpp.s
 
 # target to generate assembly for a file
 test_suite/test_ahp.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_ahp.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_ahp.cpp.s
 .PHONY : test_suite/test_ahp.cpp.s
 
 test_suite/test_display.o: test_suite/test_display.cpp.o
@@ -1290,7 +1472,7 @@ test_suite/test_display.o: test_suite/test_display.cpp.o
 
 # target to build an object file
 test_suite/test_display.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_display.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_display.cpp.o
 .PHONY : test_suite/test_display.cpp.o
 
 test_suite/test_display.i: test_suite/test_display.cpp.i
@@ -1298,7 +1480,7 @@ test_suite/test_display.i: test_suite/test_display.cpp.i
 
 # target to preprocess a source file
 test_suite/test_display.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_display.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_display.cpp.i
 .PHONY : test_suite/test_display.cpp.i
 
 test_suite/test_display.s: test_suite/test_display.cpp.s
@@ -1306,7 +1488,7 @@ test_suite/test_display.s: test_suite/test_display.cpp.s
 
 # target to generate assembly for a file
 test_suite/test_display.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_display.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_display.cpp.s
 .PHONY : test_suite/test_display.cpp.s
 
 test_suite/test_euclidean.o: test_suite/test_euclidean.cpp.o
@@ -1314,7 +1496,7 @@ test_suite/test_euclidean.o: test_suite/test_euclidean.cpp.o
 
 # target to build an object file
 test_suite/test_euclidean.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_euclidean.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_euclidean.cpp.o
 .PHONY : test_suite/test_euclidean.cpp.o
 
 test_suite/test_euclidean.i: test_suite/test_euclidean.cpp.i
@@ -1322,7 +1504,7 @@ test_suite/test_euclidean.i: test_suite/test_euclidean.cpp.i
 
 # target to preprocess a source file
 test_suite/test_euclidean.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_euclidean.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_euclidean.cpp.i
 .PHONY : test_suite/test_euclidean.cpp.i
 
 test_suite/test_euclidean.s: test_suite/test_euclidean.cpp.s
@@ -1330,7 +1512,7 @@ test_suite/test_euclidean.s: test_suite/test_euclidean.cpp.s
 
 # target to generate assembly for a file
 test_suite/test_euclidean.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_euclidean.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_euclidean.cpp.s
 .PHONY : test_suite/test_euclidean.cpp.s
 
 test_suite/test_filter.o: test_suite/test_filter.cpp.o
@@ -1338,7 +1520,7 @@ test_suite/test_filter.o: test_suite/test_filter.cpp.o
 
 # target to build an object file
 test_suite/test_filter.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_filter.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_filter.cpp.o
 .PHONY : test_suite/test_filter.cpp.o
 
 test_suite/test_filter.i: test_suite/test_filter.cpp.i
@@ -1346,7 +1528,7 @@ test_suite/test_filter.i: test_suite/test_filter.cpp.i
 
 # target to preprocess a source file
 test_suite/test_filter.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_filter.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_filter.cpp.i
 .PHONY : test_suite/test_filter.cpp.i
 
 test_suite/test_filter.s: test_suite/test_filter.cpp.s
@@ -1354,7 +1536,7 @@ test_suite/test_filter.s: test_suite/test_filter.cpp.s
 
 # target to generate assembly for a file
 test_suite/test_filter.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_filter.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_filter.cpp.s
 .PHONY : test_suite/test_filter.cpp.s
 
 test_suite/test_gaussian.o: test_suite/test_gaussian.cpp.o
@@ -1362,7 +1544,7 @@ test_suite/test_gaussian.o: test_suite/test_gaussian.cpp.o
 
 # target to build an object file
 test_suite/test_gaussian.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_gaussian.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_gaussian.cpp.o
 .PHONY : test_suite/test_gaussian.cpp.o
 
 test_suite/test_gaussian.i: test_suite/test_gaussian.cpp.i
@@ -1370,7 +1552,7 @@ test_suite/test_gaussian.i: test_suite/test_gaussian.cpp.i
 
 # target to preprocess a source file
 test_suite/test_gaussian.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_gaussian.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_gaussian.cpp.i
 .PHONY : test_suite/test_gaussian.cpp.i
 
 test_suite/test_gaussian.s: test_suite/test_gaussian.cpp.s
@@ -1378,7 +1560,7 @@ test_suite/test_gaussian.s: test_suite/test_gaussian.cpp.s
 
 # target to generate assembly for a file
 test_suite/test_gaussian.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_gaussian.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_gaussian.cpp.s
 .PHONY : test_suite/test_gaussian.cpp.s
 
 test_suite/test_inertial.o: test_suite/test_inertial.cpp.o
@@ -1386,7 +1568,7 @@ test_suite/test_inertial.o: test_suite/test_inertial.cpp.o
 
 # target to build an object file
 test_suite/test_inertial.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_inertial.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_inertial.cpp.o
 .PHONY : test_suite/test_inertial.cpp.o
 
 test_suite/test_inertial.i: test_suite/test_inertial.cpp.i
@@ -1394,7 +1576,7 @@ test_suite/test_inertial.i: test_suite/test_inertial.cpp.i
 
 # target to preprocess a source file
 test_suite/test_inertial.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_inertial.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_inertial.cpp.i
 .PHONY : test_suite/test_inertial.cpp.i
 
 test_suite/test_inertial.s: test_suite/test_inertial.cpp.s
@@ -1402,7 +1584,7 @@ test_suite/test_inertial.s: test_suite/test_inertial.cpp.s
 
 # target to generate assembly for a file
 test_suite/test_inertial.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_inertial.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_inertial.cpp.s
 .PHONY : test_suite/test_inertial.cpp.s
 
 test_suite/test_landmark.o: test_suite/test_landmark.cpp.o
@@ -1410,7 +1592,7 @@ test_suite/test_landmark.o: test_suite/test_landmark.cpp.o
 
 # target to build an object file
 test_suite/test_landmark.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_landmark.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_landmark.cpp.o
 .PHONY : test_suite/test_landmark.cpp.o
 
 test_suite/test_landmark.i: test_suite/test_landmark.cpp.i
@@ -1418,7 +1600,7 @@ test_suite/test_landmark.i: test_suite/test_landmark.cpp.i
 
 # target to preprocess a source file
 test_suite/test_landmark.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_landmark.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_landmark.cpp.i
 .PHONY : test_suite/test_landmark.cpp.i
 
 test_suite/test_landmark.s: test_suite/test_landmark.cpp.s
@@ -1426,7 +1608,7 @@ test_suite/test_landmark.s: test_suite/test_landmark.cpp.s
 
 # target to generate assembly for a file
 test_suite/test_landmark.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_landmark.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_landmark.cpp.s
 .PHONY : test_suite/test_landmark.cpp.s
 
 test_suite/test_main.o: test_suite/test_main.cpp.o
@@ -1434,7 +1616,7 @@ test_suite/test_main.o: test_suite/test_main.cpp.o
 
 # target to build an object file
 test_suite/test_main.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_main.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_main.cpp.o
 .PHONY : test_suite/test_main.cpp.o
 
 test_suite/test_main.i: test_suite/test_main.cpp.i
@@ -1442,7 +1624,7 @@ test_suite/test_main.i: test_suite/test_main.cpp.i
 
 # target to preprocess a source file
 test_suite/test_main.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_main.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_main.cpp.i
 .PHONY : test_suite/test_main.cpp.i
 
 test_suite/test_main.s: test_suite/test_main.cpp.s
@@ -1450,7 +1632,7 @@ test_suite/test_main.s: test_suite/test_main.cpp.s
 
 # target to generate assembly for a file
 test_suite/test_main.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_main.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_main.cpp.s
 .PHONY : test_suite/test_main.cpp.s
 
 test_suite/test_obsPHEuc.o: test_suite/test_obsPHEuc.cpp.o
@@ -1458,7 +1640,7 @@ test_suite/test_obsPHEuc.o: test_suite/test_obsPHEuc.cpp.o
 
 # target to build an object file
 test_suite/test_obsPHEuc.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_obsPHEuc.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_obsPHEuc.cpp.o
 .PHONY : test_suite/test_obsPHEuc.cpp.o
 
 test_suite/test_obsPHEuc.i: test_suite/test_obsPHEuc.cpp.i
@@ -1466,7 +1648,7 @@ test_suite/test_obsPHEuc.i: test_suite/test_obsPHEuc.cpp.i
 
 # target to preprocess a source file
 test_suite/test_obsPHEuc.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_obsPHEuc.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_obsPHEuc.cpp.i
 .PHONY : test_suite/test_obsPHEuc.cpp.i
 
 test_suite/test_obsPHEuc.s: test_suite/test_obsPHEuc.cpp.s
@@ -1474,7 +1656,7 @@ test_suite/test_obsPHEuc.s: test_suite/test_obsPHEuc.cpp.s
 
 # target to generate assembly for a file
 test_suite/test_obsPHEuc.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_obsPHEuc.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_obsPHEuc.cpp.s
 .PHONY : test_suite/test_obsPHEuc.cpp.s
 
 test_suite/test_obspa.o: test_suite/test_obspa.cpp.o
@@ -1482,7 +1664,7 @@ test_suite/test_obspa.o: test_suite/test_obspa.cpp.o
 
 # target to build an object file
 test_suite/test_obspa.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_obspa.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_obspa.cpp.o
 .PHONY : test_suite/test_obspa.cpp.o
 
 test_suite/test_obspa.i: test_suite/test_obspa.cpp.i
@@ -1490,7 +1672,7 @@ test_suite/test_obspa.i: test_suite/test_obspa.cpp.i
 
 # target to preprocess a source file
 test_suite/test_obspa.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_obspa.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_obspa.cpp.i
 .PHONY : test_suite/test_obspa.cpp.i
 
 test_suite/test_obspa.s: test_suite/test_obspa.cpp.s
@@ -1498,15 +1680,39 @@ test_suite/test_obspa.s: test_suite/test_obspa.cpp.s
 
 # target to generate assembly for a file
 test_suite/test_obspa.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_obspa.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_obspa.cpp.s
 .PHONY : test_suite/test_obspa.cpp.s
+
+test_suite/test_pinhole.o: test_suite/test_pinhole.cpp.o
+.PHONY : test_suite/test_pinhole.o
+
+# target to build an object file
+test_suite/test_pinhole.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_pinhole.cpp.o
+.PHONY : test_suite/test_pinhole.cpp.o
+
+test_suite/test_pinhole.i: test_suite/test_pinhole.cpp.i
+.PHONY : test_suite/test_pinhole.i
+
+# target to preprocess a source file
+test_suite/test_pinhole.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_pinhole.cpp.i
+.PHONY : test_suite/test_pinhole.cpp.i
+
+test_suite/test_pinhole.s: test_suite/test_pinhole.cpp.s
+.PHONY : test_suite/test_pinhole.s
+
+# target to generate assembly for a file
+test_suite/test_pinhole.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_pinhole.cpp.s
+.PHONY : test_suite/test_pinhole.cpp.s
 
 test_suite/test_quaternion.o: test_suite/test_quaternion.cpp.o
 .PHONY : test_suite/test_quaternion.o
 
 # target to build an object file
 test_suite/test_quaternion.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_quaternion.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_quaternion.cpp.o
 .PHONY : test_suite/test_quaternion.cpp.o
 
 test_suite/test_quaternion.i: test_suite/test_quaternion.cpp.i
@@ -1514,7 +1720,7 @@ test_suite/test_quaternion.i: test_suite/test_quaternion.cpp.i
 
 # target to preprocess a source file
 test_suite/test_quaternion.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_quaternion.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_quaternion.cpp.i
 .PHONY : test_suite/test_quaternion.cpp.i
 
 test_suite/test_quaternion.s: test_suite/test_quaternion.cpp.s
@@ -1522,7 +1728,7 @@ test_suite/test_quaternion.s: test_suite/test_quaternion.cpp.s
 
 # target to generate assembly for a file
 test_suite/test_quaternion.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_quaternion.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_quaternion.cpp.s
 .PHONY : test_suite/test_quaternion.cpp.s
 
 test_suite/test_raw.o: test_suite/test_raw.cpp.o
@@ -1530,7 +1736,7 @@ test_suite/test_raw.o: test_suite/test_raw.cpp.o
 
 # target to build an object file
 test_suite/test_raw.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_raw.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_raw.cpp.o
 .PHONY : test_suite/test_raw.cpp.o
 
 test_suite/test_raw.i: test_suite/test_raw.cpp.i
@@ -1538,7 +1744,7 @@ test_suite/test_raw.i: test_suite/test_raw.cpp.i
 
 # target to preprocess a source file
 test_suite/test_raw.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_raw.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_raw.cpp.i
 .PHONY : test_suite/test_raw.cpp.i
 
 test_suite/test_raw.s: test_suite/test_raw.cpp.s
@@ -1546,7 +1752,7 @@ test_suite/test_raw.s: test_suite/test_raw.cpp.s
 
 # target to generate assembly for a file
 test_suite/test_raw.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_raw.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_raw.cpp.s
 .PHONY : test_suite/test_raw.cpp.s
 
 test_suite/test_robotOdo.o: test_suite/test_robotOdo.cpp.o
@@ -1554,7 +1760,7 @@ test_suite/test_robotOdo.o: test_suite/test_robotOdo.cpp.o
 
 # target to build an object file
 test_suite/test_robotOdo.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_robotOdo.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_robotOdo.cpp.o
 .PHONY : test_suite/test_robotOdo.cpp.o
 
 test_suite/test_robotOdo.i: test_suite/test_robotOdo.cpp.i
@@ -1562,7 +1768,7 @@ test_suite/test_robotOdo.i: test_suite/test_robotOdo.cpp.i
 
 # target to preprocess a source file
 test_suite/test_robotOdo.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_robotOdo.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_robotOdo.cpp.i
 .PHONY : test_suite/test_robotOdo.cpp.i
 
 test_suite/test_robotOdo.s: test_suite/test_robotOdo.cpp.s
@@ -1570,15 +1776,39 @@ test_suite/test_robotOdo.s: test_suite/test_robotOdo.cpp.s
 
 # target to generate assembly for a file
 test_suite/test_robotOdo.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_robotOdo.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_robotOdo.cpp.s
 .PHONY : test_suite/test_robotOdo.cpp.s
+
+test_suite/test_robotcentered.o: test_suite/test_robotcentered.cpp.o
+.PHONY : test_suite/test_robotcentered.o
+
+# target to build an object file
+test_suite/test_robotcentered.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_robotcentered.cpp.o
+.PHONY : test_suite/test_robotcentered.cpp.o
+
+test_suite/test_robotcentered.i: test_suite/test_robotcentered.cpp.i
+.PHONY : test_suite/test_robotcentered.i
+
+# target to preprocess a source file
+test_suite/test_robotcentered.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_robotcentered.cpp.i
+.PHONY : test_suite/test_robotcentered.cpp.i
+
+test_suite/test_robotcentered.s: test_suite/test_robotcentered.cpp.s
+.PHONY : test_suite/test_robotcentered.s
+
+# target to generate assembly for a file
+test_suite/test_robotcentered.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_robotcentered.cpp.s
+.PHONY : test_suite/test_robotcentered.cpp.s
 
 test_suite/test_senPH.o: test_suite/test_senPH.cpp.o
 .PHONY : test_suite/test_senPH.o
 
 # target to build an object file
 test_suite/test_senPH.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_senPH.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_senPH.cpp.o
 .PHONY : test_suite/test_senPH.cpp.o
 
 test_suite/test_senPH.i: test_suite/test_senPH.cpp.i
@@ -1586,7 +1816,7 @@ test_suite/test_senPH.i: test_suite/test_senPH.cpp.i
 
 # target to preprocess a source file
 test_suite/test_senPH.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_senPH.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_senPH.cpp.i
 .PHONY : test_suite/test_senPH.cpp.i
 
 test_suite/test_senPH.s: test_suite/test_senPH.cpp.s
@@ -1594,7 +1824,7 @@ test_suite/test_senPH.s: test_suite/test_senPH.cpp.s
 
 # target to generate assembly for a file
 test_suite/test_senPH.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_senPH.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_senPH.cpp.s
 .PHONY : test_suite/test_senPH.cpp.s
 
 test_suite/test_simu.o: test_suite/test_simu.cpp.o
@@ -1602,7 +1832,7 @@ test_suite/test_simu.o: test_suite/test_simu.cpp.o
 
 # target to build an object file
 test_suite/test_simu.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_simu.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_simu.cpp.o
 .PHONY : test_suite/test_simu.cpp.o
 
 test_suite/test_simu.i: test_suite/test_simu.cpp.i
@@ -1610,7 +1840,7 @@ test_suite/test_simu.i: test_suite/test_simu.cpp.i
 
 # target to preprocess a source file
 test_suite/test_simu.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_simu.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_simu.cpp.i
 .PHONY : test_suite/test_simu.cpp.i
 
 test_suite/test_simu.s: test_suite/test_simu.cpp.s
@@ -1618,7 +1848,7 @@ test_suite/test_simu.s: test_suite/test_simu.cpp.s
 
 # target to generate assembly for a file
 test_suite/test_simu.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_simu.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_simu.cpp.s
 .PHONY : test_suite/test_simu.cpp.s
 
 test_suite/test_suite_rtslam.o: test_suite/test_suite_rtslam.cpp.o
@@ -1626,7 +1856,7 @@ test_suite/test_suite_rtslam.o: test_suite/test_suite_rtslam.cpp.o
 
 # target to build an object file
 test_suite/test_suite_rtslam.cpp.o:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_suite_rtslam.cpp.o
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_suite_rtslam.cpp.o
 .PHONY : test_suite/test_suite_rtslam.cpp.o
 
 test_suite/test_suite_rtslam.i: test_suite/test_suite_rtslam.cpp.i
@@ -1634,7 +1864,7 @@ test_suite/test_suite_rtslam.i: test_suite/test_suite_rtslam.cpp.i
 
 # target to preprocess a source file
 test_suite/test_suite_rtslam.cpp.i:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_suite_rtslam.cpp.i
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_suite_rtslam.cpp.i
 .PHONY : test_suite/test_suite_rtslam.cpp.i
 
 test_suite/test_suite_rtslam.s: test_suite/test_suite_rtslam.cpp.s
@@ -1642,7 +1872,7 @@ test_suite/test_suite_rtslam.s: test_suite/test_suite_rtslam.cpp.s
 
 # target to generate assembly for a file
 test_suite/test_suite_rtslam.cpp.s:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_suite_rtslam.cpp.s
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_suite_rtslam.cpp.s
 .PHONY : test_suite/test_suite_rtslam.cpp.s
 
 # Help Target
@@ -1656,15 +1886,13 @@ help:
 	@echo "... install/local"
 	@echo "... install/strip"
 	@echo "... list_install_components"
+	@echo "... package-rtslam"
 	@echo "... rebuild_cache"
 	@echo "... rtslam"
-	@echo "... rtslam_demo_jm_robotcentered"
 	@echo "... rtslam_demo_slam"
+	@echo "... rtslam_ruby_wrap"
 	@echo "... test"
 	@echo "... test_suite_rtslam"
-	@echo "... demo_suite/demo_jm_robotcentered.o"
-	@echo "... demo_suite/demo_jm_robotcentered.i"
-	@echo "... demo_suite/demo_jm_robotcentered.s"
 	@echo "... demo_suite/demo_slam.o"
 	@echo "... demo_suite/demo_slam.i"
 	@echo "... demo_suite/demo_slam.s"
@@ -1692,6 +1920,15 @@ help:
 	@echo "... src/descriptorImagePoint.o"
 	@echo "... src/descriptorImagePoint.i"
 	@echo "... src/descriptorImagePoint.s"
+	@echo "... src/display.o"
+	@echo "... src/display.i"
+	@echo "... src/display.s"
+	@echo "... src/display_gdhe.o"
+	@echo "... src/display_gdhe.i"
+	@echo "... src/display_gdhe.s"
+	@echo "... src/display_qt.o"
+	@echo "... src/display_qt.i"
+	@echo "... src/display_qt.s"
 	@echo "... src/expectation.o"
 	@echo "... src/expectation.i"
 	@echo "... src/expectation.s"
@@ -1710,6 +1947,9 @@ help:
 	@echo "... src/hardwareSensorCameraFirewire.o"
 	@echo "... src/hardwareSensorCameraFirewire.i"
 	@echo "... src/hardwareSensorCameraFirewire.s"
+	@echo "... src/hierarchicalDirectSegmentDetector.o"
+	@echo "... src/hierarchicalDirectSegmentDetector.i"
+	@echo "... src/hierarchicalDirectSegmentDetector.s"
 	@echo "... src/innovation.o"
 	@echo "... src/innovation.i"
 	@echo "... src/innovation.s"
@@ -1722,6 +1962,9 @@ help:
 	@echo "... src/landmarkAnchoredHomogeneousPoint.o"
 	@echo "... src/landmarkAnchoredHomogeneousPoint.i"
 	@echo "... src/landmarkAnchoredHomogeneousPoint.s"
+	@echo "... src/landmarkAnchoredHomogeneousPointsLine.o"
+	@echo "... src/landmarkAnchoredHomogeneousPointsLine.i"
+	@echo "... src/landmarkAnchoredHomogeneousPointsLine.s"
 	@echo "... src/landmarkEuclideanPoint.o"
 	@echo "... src/landmarkEuclideanPoint.i"
 	@echo "... src/landmarkEuclideanPoint.s"
@@ -1779,15 +2022,24 @@ help:
 	@echo "... src/robotOdometry.o"
 	@echo "... src/robotOdometry.i"
 	@echo "... src/robotOdometry.s"
+	@echo "... src/rtSlam.o"
+	@echo "... src/rtSlam.i"
+	@echo "... src/rtSlam.s"
 	@echo "... src/rtslamException.o"
 	@echo "... src/rtslamException.i"
 	@echo "... src/rtslamException.s"
+	@echo "... src/ruby/rtslam_wrap.o"
+	@echo "... src/ruby/rtslam_wrap.i"
+	@echo "... src/ruby/rtslam_wrap.s"
 	@echo "... src/sensorAbstract.o"
 	@echo "... src/sensorAbstract.i"
 	@echo "... src/sensorAbstract.s"
 	@echo "... src/sensorPinHole.o"
 	@echo "... src/sensorPinHole.i"
 	@echo "... src/sensorPinHole.s"
+	@echo "... src/visibilityMap.o"
+	@echo "... src/visibilityMap.i"
+	@echo "... src/visibilityMap.s"
 	@echo "... src/worldAbstract.o"
 	@echo "... src/worldAbstract.i"
 	@echo "... src/worldAbstract.s"
@@ -1824,6 +2076,9 @@ help:
 	@echo "... test_suite/test_obspa.o"
 	@echo "... test_suite/test_obspa.i"
 	@echo "... test_suite/test_obspa.s"
+	@echo "... test_suite/test_pinhole.o"
+	@echo "... test_suite/test_pinhole.i"
+	@echo "... test_suite/test_pinhole.s"
 	@echo "... test_suite/test_quaternion.o"
 	@echo "... test_suite/test_quaternion.i"
 	@echo "... test_suite/test_quaternion.s"
@@ -1833,6 +2088,9 @@ help:
 	@echo "... test_suite/test_robotOdo.o"
 	@echo "... test_suite/test_robotOdo.i"
 	@echo "... test_suite/test_robotOdo.s"
+	@echo "... test_suite/test_robotcentered.o"
+	@echo "... test_suite/test_robotcentered.i"
+	@echo "... test_suite/test_robotcentered.s"
 	@echo "... test_suite/test_senPH.o"
 	@echo "... test_suite/test_senPH.i"
 	@echo "... test_suite/test_senPH.s"
@@ -1853,6 +2111,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/jeanmarie/NOT/eclipse/jafar/edt/jafar/jafar && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/bhautboi/jafar && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

@@ -85,7 +85,7 @@ namespace jafar {
 				} ;
 
 				enum type_enum{
-						PNT_EUC, PNT_AH
+                  PNT_EUC, PNT_AH, LINE_AHPL
 				};
 				type_enum type;
 				bool converged;

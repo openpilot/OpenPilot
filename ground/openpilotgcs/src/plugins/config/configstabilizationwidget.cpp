@@ -206,6 +206,10 @@ void ConfigStabilizationWidget::requestStabilizationUpdate()
     m_stabilization->yawKi->setValue(stabData.YawPI[StabilizationSettings::YAWPI_KI]);
     m_stabilization->yawILimit->setValue(stabData.YawPI[StabilizationSettings::YAWPI_ILIMIT]);
 
+    m_stabilization->rollMax->setValue(stabData.RollMax);
+    m_stabilization->pitchMax->setValue(stabData.PitchMax);
+    m_stabilization->yawMax->setValue(stabData.YawMax);
+
 }
 
 
@@ -240,6 +244,10 @@ void ConfigStabilizationWidget::sendStabilizationUpdate()
     stabData.YawPI[StabilizationSettings::YAWPI_KP] = m_stabilization->yawKp->value();
     stabData.YawPI[StabilizationSettings::YAWPI_KI] = m_stabilization->yawKi->value();
     stabData.YawPI[StabilizationSettings::YAWPI_ILIMIT] = m_stabilization->yawILimit->value();
+
+    stabData.RollMax = m_stabilization->rollMax->value();
+    stabData.PitchMax = m_stabilization->pitchMax->value();
+    stabData.YawMax = m_stabilization->yawMax->value();
 
     stabSettings->setData(stabData); // this is atomic
 }

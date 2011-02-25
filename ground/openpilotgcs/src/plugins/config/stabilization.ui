@@ -27,11 +27,35 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-          <widget class="QLabel" name="label_8">
-           <property name="text">
-            <string>Rate Stabilization (inner loop)</string>
-           </property>
-          </widget>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QLabel" name="label_8">
+             <property name="text">
+              <string>Rate Stabilization (inner loop)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>Hint: read the toolips!</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
           <widget class="QFrame" name="frame_2">
@@ -55,7 +79,8 @@
             <item row="1" column="2">
              <widget class="QDoubleSpinBox" name="rateRollKp">
               <property name="toolTip">
-               <string>Slowly raise Kp until you start seeing clear oscillations when you fly.</string>
+               <string>Slowly raise Kp until you start seeing clear oscillations when you fly.
+Then lower the value by 20% or so.</string>
               </property>
               <property name="decimals">
                <number>6</number>
@@ -245,6 +270,9 @@
             </item>
             <item row="1" column="2">
              <widget class="QDoubleSpinBox" name="rollKp">
+              <property name="toolTip">
+               <string>Once Rate stabilization is done, you should increase the Kp factor until the airframe oscillates again, and go back down 20%</string>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -394,6 +422,103 @@
       <attribute name="title">
        <string>Limits</string>
       </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Angle limits</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="QFrame" name="frame">
+            <property name="toolTip">
+             <string>In this area, you can setup the limits for roll, pitch and yaw in attitude mode, i.e. what max attitude the airframe will reach if the sticks are pushed to the max.</string>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QFormLayout" name="formLayout">
+             <property name="fieldGrowthPolicy">
+              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>RollMax</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="rollMax">
+               <property name="maximum">
+                <number>180</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>PitchMax</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="pitchMax">
+               <property name="maximum">
+                <number>180</number>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>YawMax</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QSpinBox" name="yawMax">
+               <property name="maximum">
+                <number>180</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
@@ -414,6 +539,12 @@
      </item>
      <item>
       <widget class="QPushButton" name="resetStabilizationToDefaults">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Not implemented yet.</string>
+       </property>
        <property name="text">
         <string>Reset to defaults</string>
        </property>

@@ -132,8 +132,11 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 	m_widget = new Ui_PipXtremeWidget();
 	m_widget->setupUi(this);
 
-//	qsrand(QDateTime::currentDateTime().toMSecsSinceEpoch());	// only available with Qt 4.7.1 and later
+#if QT_VERSION >= 0x040700
+	qsrand(QDateTime::currentDateTime().toMSecsSinceEpoch());
+#else
 	qsrand(QDateTime::currentDateTime().toTime_t());
+#endif
 
 	device_input_buffer.size = 8192;
 	device_input_buffer.used = 0;
@@ -187,6 +190,7 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 	m_widget->comboBox_MaxRFBandwidth->addItem("64000", 64000);
 	m_widget->comboBox_MaxRFBandwidth->addItem("128000", 128000);
 	m_widget->comboBox_MaxRFBandwidth->addItem("192000", 192000);
+	m_widget->comboBox_MaxRFBandwidth->addItem("256000", 256000);
 	m_widget->comboBox_MaxRFBandwidth->setCurrentIndex(m_widget->comboBox_MaxRFBandwidth->findText("128000"));
 
 	m_widget->comboBox_MaxRFTxPower->clear();

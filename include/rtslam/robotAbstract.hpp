@@ -1,6 +1,6 @@
 /**
  * \file robotAbstract.hpp
- * \author: jsola
+ * \author jsola
  *
  * File defining the abstract robot class
  *

@@ -34,7 +34,7 @@
 #include "uavobject.h"
 #include "stabilizationsettings.h"
 #include <QtGui/QWidget>
-#include <QList>
+#include <QTimer>
 
 
 class ConfigStabilizationWidget: public ConfigTaskWidget
@@ -48,13 +48,32 @@ public:
 private:
     Ui_StabilizationWidget *m_stabilization;
     StabilizationSettings* stabSettings;
+    QTimer updateTimer;
+
 
 private slots:
     void requestStabilizationUpdate();
     void sendStabilizationUpdate();
     void saveStabilizationUpdate();
     void resetStabilizationToDefaults();
-    void parameterValueChanged(double value);
+    void realtimeUpdateToggle(bool);
+
+    void updateRateRollKP(double);
+    void updateRateRollKI(double);
+    void updateRateRollILimit(double);
+
+    void updateRatePitchKP(double);
+    void updateRatePitchKI(double);
+    void updateRatePitchILimit(double);
+
+    void updateRollKP(double);
+    void updateRollKI(double);
+    void updateRollILimit(double);
+
+    void updatePitchKP(double);
+    void updatePitchKI(double);
+    void updatePitchILimit(double);
+
 
 };
 

@@ -53,15 +53,120 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
 
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestStabilizationUpdate()));
 
-    // TODO: create a timer to regularly send the object update in case
+    // Create a timer to regularly send the object update in case
     // we want realtime updates.
+    connect(&updateTimer, SIGNAL(timeout()), this, SLOT(sendStabilizationUpdate()));
+    connect(m_stabilization->realTimeUpdates, SIGNAL(toggled(bool)), this, SLOT(realtimeUpdateToggle(bool)));
 
+    // Connect the updates of the stab values
+    connect(m_stabilization->rateRollKp, SIGNAL(valueChanged(double)), this, SLOT(updateRateRollKP(double)));
+    connect(m_stabilization->rateRollKi, SIGNAL(valueChanged(double)), this, SLOT(updateRateRollKI(double)));
+    connect(m_stabilization->rateRollILimit, SIGNAL(valueChanged(double)), this, SLOT(updateRateRollILimit(double)));
+
+    connect(m_stabilization->ratePitchKp, SIGNAL(valueChanged(double)), this, SLOT(updateRatePitchKP(double)));
+    connect(m_stabilization->ratePitchKi, SIGNAL(valueChanged(double)), this, SLOT(updateRatePitchKI(double)));
+    connect(m_stabilization->ratePitchILimit, SIGNAL(valueChanged(double)), this, SLOT(updateRatePitchILimit(double)));
+
+    connect(m_stabilization->rollKp, SIGNAL(valueChanged(double)), this, SLOT(updateRollKP(double)));
+    connect(m_stabilization->rollKi, SIGNAL(valueChanged(double)), this, SLOT(updateRollKI(double)));
+    connect(m_stabilization->rollILimit, SIGNAL(valueChanged(double)), this, SLOT(updateRollILimit(double)));
+
+    connect(m_stabilization->pitchKp, SIGNAL(valueChanged(double)), this, SLOT(updatePitchKP(double)));
+    connect(m_stabilization->pitchKi, SIGNAL(valueChanged(double)), this, SLOT(updatePitchKI(double)));
+    connect(m_stabilization->pitchILimit, SIGNAL(valueChanged(double)), this, SLOT(updatePitchILimit(double)));
 
 }
 
 ConfigStabilizationWidget::~ConfigStabilizationWidget()
 {
    // Do nothing
+}
+
+
+void ConfigStabilizationWidget::updateRateRollKP(double val)
+{
+    if (m_stabilization->linkRateRP->isChecked()) {
+        m_stabilization->ratePitchKp->setValue(val);
+    }
+}
+
+void ConfigStabilizationWidget::updateRateRollKI(double val)
+{
+    if (m_stabilization->linkRateRP->isChecked()) {
+        m_stabilization->ratePitchKi->setValue(val);
+    }
+}
+
+void ConfigStabilizationWidget::updateRateRollILimit(double val)
+{
+    if (m_stabilization->linkRateRP->isChecked()) {
+        m_stabilization->ratePitchILimit->setValue(val);
+    }
+}
+
+void ConfigStabilizationWidget::updateRatePitchKP(double val)
+{
+    if (m_stabilization->linkRateRP->isChecked()) {
+        m_stabilization->rateRollKp->setValue(val);
+    }
+}
+
+void ConfigStabilizationWidget::updateRatePitchKI(double val)
+{
+    if (m_stabilization->linkRateRP->isChecked()) {
+        m_stabilization->rateRollKi->setValue(val);
+    }
+}
+
+void ConfigStabilizationWidget::updateRatePitchILimit(double val)
+{
+    if (m_stabilization->linkRateRP->isChecked()) {
+        m_stabilization->rateRollILimit->setValue(val);
+    }
+}
+
+void ConfigStabilizationWidget::updateRollKP(double val)
+{
+    if (m_stabilization->linkAttitudeRP->isChecked()) {
+        m_stabilization->pitchKp->setValue(val);
+    }
+}
+
+void ConfigStabilizationWidget::updateRollKI(double val)
+{
+    if (m_stabilization->linkAttitudeRP->isChecked()) {
+        m_stabilization->pitchKi->setValue(val);
+    }
+
+}
+
+void ConfigStabilizationWidget::updateRollILimit(double val)
+{
+    if (m_stabilization->linkAttitudeRP->isChecked()) {
+        m_stabilization->pitchILimit->setValue(val);
+    }
+}
+
+void ConfigStabilizationWidget::updatePitchKP(double val)
+{
+    if (m_stabilization->linkAttitudeRP->isChecked()) {
+        m_stabilization->rollKp->setValue(val);
+    }
+}
+
+void ConfigStabilizationWidget::updatePitchKI(double val)
+{
+    if (m_stabilization->linkAttitudeRP->isChecked()) {
+        m_stabilization->rollKi->setValue(val);
+    }
+
+}
+
+void ConfigStabilizationWidget::updatePitchILimit(double val)
+{
+    if (m_stabilization->linkAttitudeRP->isChecked()) {
+        m_stabilization->rollILimit->setValue(val);
+    }
 }
 
 
@@ -160,6 +265,10 @@ void ConfigStabilizationWidget::resetStabilizationToDefaults()
 {
 }
 
-void ConfigStabilizationWidget::parameterValueChanged(double value)
+void ConfigStabilizationWidget::realtimeUpdateToggle(bool state)
 {
+    if (state)
+        updateTimer.start(300);
+    else
+        updateTimer.stop();
 }

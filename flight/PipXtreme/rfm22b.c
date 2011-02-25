@@ -73,8 +73,10 @@
 
 #define TX_TEST_MODE_TIMELIMIT_MS		30000	// TX test modes time limit (in ms)
 
-#define TX_PREAMBLE_NIBBLES				8		// 7 to 511 (number of nibbles)
-#define RX_PREAMBLE_NIBBLES				5		// 5 to 31 (number of nibbles)
+//#define TX_PREAMBLE_NIBBLES				8		// 7 to 511 (number of nibbles)
+//#define RX_PREAMBLE_NIBBLES				5		// 5 to 31 (number of nibbles)
+#define TX_PREAMBLE_NIBBLES				12		// 7 to 511 (number of nibbles)
+#define RX_PREAMBLE_NIBBLES				6		// 5 to 31 (number of nibbles)
 
 #define FIFO_SIZE						64		// the size of the rf modules internal FIFO buffers
 
@@ -141,15 +143,18 @@ const uint32_t       freq_deviation[LOOKUP_SIZE] = {  4000,  4000,  4000,  4000,
 const uint32_t         rx_bandwidth[LOOKUP_SIZE] = { 17500, 17500, 17500, 17500, 17500, 19400, 32200, 38600, 51200,  64100, 137900, 269300, 420200, 518800};
 const int8_t        est_rx_sens_dBm[LOOKUP_SIZE] = {  -118,  -118,  -117,  -116,  -115,  -115,  -112,  -112,  -110,   -109,   -106,   -103,   -101,   -100}; // estimated receiver sensitivity for BER = 1E-3
 
-const uint8_t                reg_1C[LOOKUP_SIZE] = {  0x3A,  0x3A,  0x3A,  0x3A,  0x3A,  0x3B,  0x26,  0x2B,  0x2E,   0x16,   0x07,   0x83,   0x8A,   0x8C}; // rfm22_if_filter_bandwidth
-const uint8_t                reg_1D[LOOKUP_SIZE] = {  0x40,  0x40,  0x40,  0x40,  0x40,  0x40,  0x40,  0x40,  0x40,   0x40,   0x40,   0x40,   0x40,   0x40}; // rfm22_afc_loop_gearshift_override
+const uint8_t                reg_1C[LOOKUP_SIZE] = {  0x37,  0x37,  0x37,  0x37,  0x3A,  0x3B,  0x26,  0x28,  0x2E,   0x16,   0x07,   0x83,   0x8A,   0x8C}; // rfm22_if_filter_bandwidth
 
-const uint8_t                reg_20[LOOKUP_SIZE] = {  0xE8,  0xF4,  0xFA,  0x7D,  0x3F,  0x34,  0x3F,  0x34,  0x2A,   0x3F,   0x3F,   0x5E,   0x3F,   0x2F}; // rfm22_clk_recovery_oversampling_ratio
+const uint8_t                reg_1D[LOOKUP_SIZE] = {  0x44,  0x44,  0x44,  0x44,  0x44,  0x44,  0x44,  0x44,  0x44,   0x44,   0x44,   0x44,   0x44,   0x44}; // rfm22_afc_loop_gearshift_override
+const uint8_t                reg_1E[LOOKUP_SIZE] = {  0x0A,  0x0A,  0x0A,  0x0A,  0x0A,  0x0A,  0x0A,  0x0A,  0x0A,   0x0A,   0x0A,   0x0A,   0x0A,   0x02}; // rfm22_afc_timing_control
+
+const uint8_t                reg_1F[LOOKUP_SIZE] = {  0x03,  0x03,  0x03,  0x03,  0x03,  0x03,  0x03,  0x03,  0x03,   0x03,   0x03,   0x03,   0x03,   0x03}; // rfm22_clk_recovery_gearshift_override
+const uint8_t                reg_20[LOOKUP_SIZE] = {  0xE8,  0xF4,  0xFA,  0x70,  0x3F,  0x34,  0x3F,  0x34,  0x2A,   0x3F,   0x3F,   0x5E,   0x3F,   0x2F}; // rfm22_clk_recovery_oversampling_ratio
 const uint8_t                reg_21[LOOKUP_SIZE] = {  0x60,  0x20,  0x00,  0x01,  0x02,  0x02,  0x02,  0x02,  0x03,   0x02,   0x02,   0x01,   0x02,   0x02}; // rfm22_clk_recovery_offset2
 const uint8_t                reg_22[LOOKUP_SIZE] = {  0x20,  0x41,  0x83,  0x06,  0x0C,  0x75,  0x0C,  0x75,  0x12,   0x0C,   0x0C,   0x5D,   0x0C,   0xBB}; // rfm22_clk_recovery_offset1
 const uint8_t                reg_23[LOOKUP_SIZE] = {  0xC5,  0x89,  0x12,  0x25,  0x4A,  0x25,  0x4A,  0x25,  0x6F,   0x4A,   0x4A,   0x86,   0x4A,   0x0D}; // rfm22_clk_recovery_offset0
-const uint8_t                reg_24[LOOKUP_SIZE] = {  0x00,  0x00,  0x00,  0x02,  0x07,  0x07,  0x07,  0x07,  0x07,   0x07,   0x07,   0x02,   0x04,   0x05}; // rfm22_clk_recovery_timing_loop_gain1
-const uint8_t                reg_25[LOOKUP_SIZE] = {  0x0A,  0x23,  0x85,  0x0E,  0xFF,  0xFF,  0xFF,  0xFF,  0xFF,   0xFF,   0xFF,   0xBB,   0x12,   0x74}; // rfm22_clk_recovery_timing_loop_gain0
+const uint8_t                reg_24[LOOKUP_SIZE] = {  0x00,  0x00,  0x00,  0x02,  0x07,  0x07,  0x07,  0x07,  0x07,   0x07,   0x07,   0x05,   0x07,   0x07}; // rfm22_clk_recovery_timing_loop_gain1
+const uint8_t                reg_25[LOOKUP_SIZE] = {  0x0A,  0x23,  0x85,  0x0E,  0xFF,  0xFF,  0xFF,  0xFF,  0xFF,   0xFF,   0xFF,   0x74,   0xFF,   0xFF}; // rfm22_clk_recovery_timing_loop_gain0
 
 const uint8_t                reg_2A[LOOKUP_SIZE] = {  0x0E,  0x0E,  0x0E,  0x0E,  0x0E,  0x0D,  0x0D,  0x0E,  0x12,   0x17,   0x31,   0x50,   0x50,   0x50}; // rfm22_afc_limiter .. AFC_pull_in_range = ±AFCLimiter[7:0] x (hbsel+1) x 625 Hz
 
@@ -585,8 +590,11 @@ void rfm22_setDatarate(uint32_t datarate_bps)
 
 
 	rfm22_write(0x1C, reg_1C[lookup_index]);	// rfm22_if_filter_bandwidth
-	rfm22_write(0x1D, reg_1D[lookup_index]);	// rfm22_afc_loop_gearshift_override
 
+	rfm22_write(0x1D, reg_1D[lookup_index]);	// rfm22_afc_loop_gearshift_override
+	rfm22_write(0x1E, reg_1E[lookup_index]);	// RFM22_afc_timing_control
+
+	rfm22_write(0x1F, reg_1F[lookup_index]);	// RFM22_clk_recovery_gearshift_override
 	rfm22_write(0x20, reg_20[lookup_index]);	// rfm22_clk_recovery_oversampling_ratio
 	rfm22_write(0x21, reg_21[lookup_index]);	// rfm22_clk_recovery_offset2
 	rfm22_write(0x22, reg_22[lookup_index]);	// rfm22_clk_recovery_offset1

@@ -94,7 +94,7 @@ namespace jafar {
 					for(size_t i = 0; i < nreadings; i++)
 						avg_u += ublas::subrange(ublas::matrix_row<mat_indirect>(readings, i),1,readings.size2());
 					
-					if (readings.size1()) avg_u /= nreadings;
+					if (nreadings) avg_u /= nreadings;
 					init(avg_u);
 				}
 				else // else just move with the available control

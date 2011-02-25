@@ -45,6 +45,7 @@ namespace hardware {
 			
 			boost::mutex mutex_data;
 			boost::condition_variable cond_data;
+			boost::condition_variable cond_offline; // to be sure we don't need data before they are read
 			int write_position; // next position where to write, oldest available reading
 			int read_position; // oldest position not released (being read or not read at all)
 			

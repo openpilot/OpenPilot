@@ -18,28 +18,31 @@ namespace jafar {
 		class LandmarkAbstract;
 		class DataManagerAbstract;
 
-		class MapManagerAbstract: public ParentOf<LandmarkAbstract> ,
-		    public ParentOf<DataManagerAbstract> ,
-		    public ChildOf<MapAbstract> ,
-		    public boost::enable_shared_from_this<MapManagerAbstract> {
+		/**
+			This class is the abstract class for map managers, that manages
+			the life of landmarks at the map level (creation, 
+			reparametrization, deletion, etc).
+		*/
+		class MapManagerAbstract:
+					public ParentOf<LandmarkAbstract>,
+					public ParentOf<DataManagerAbstract>,
+					public ChildOf<MapAbstract>,
+					public boost::enable_shared_from_this<MapManagerAbstract>
+		{
 			public:
 				// define the function linkToParentMap().
-			ENABLE_LINK_TO_PARENT(MapAbstract,Map,MapManagerAbstract)
-				;
+				ENABLE_LINK_TO_PARENT(MapAbstract,Map,MapManagerAbstract);
 				// define the functions mapPtr() and map().
-			ENABLE_ACCESS_TO_PARENT(MapAbstract,map)
-				;
+				ENABLE_ACCESS_TO_PARENT(MapAbstract,map);
 				// define the type LandmarkList, and the function landmarkList().
-			ENABLE_ACCESS_TO_CHILDREN(LandmarkAbstract,Landmark,landmark)
-				;
+				ENABLE_ACCESS_TO_CHILDREN(LandmarkAbstract,Landmark,landmark);
 				// define the type DataManagerList, and the function dataManagerList().
-			ENABLE_ACCESS_TO_CHILDREN(DataManagerAbstract,DataManager,dataManager)
-				;
+				ENABLE_ACCESS_TO_CHILDREN(DataManagerAbstract,DataManager,dataManager);
 
 			protected:
 				virtual landmark_ptr_t createLandmarkInit(void) = 0;
 				virtual landmark_ptr_t createLandmarkConverged(landmark_ptr_t lmkinit,
-				    jblas::ind_array &_icomp) = 0;
+					jblas::ind_array &_icomp) = 0;
 				/* Compute the size of the complement between init and
 				 * converged lmk, ie the difference of the size of the states. */
 				virtual size_t sizeComplement(void) = 0;
@@ -58,22 +61,26 @@ namespace jafar {
 				void manageMap(void);
 		};
 
-		template<class LandmarkInit, class LandmarkAdvanced>
+		
+		/**
+			This class is a generic implementation of MapManagerAbstract, that
+			works with every type of landmark given they are provided as template
+			parameter.
+		*/
+		template<class LandmarkInit, class LandmarkConverged>
 		class MapManager: public MapManagerAbstract {
 			protected:
 				virtual landmark_ptr_t createLandmarkInit(void) {
 					return boost::shared_ptr<LandmarkInit>(new LandmarkInit(mapPtr()));
 				}
 				virtual landmark_ptr_t createLandmarkConverged(landmark_ptr_t lmkinit,
-				    jblas::ind_array &_icomp) {
-					return boost::shared_ptr<LandmarkAdvanced>(
-					                                           new LandmarkAdvanced(
-					                                                                mapPtr(),
-					                                                                lmkinit,
-					                                                                _icomp));
+					jblas::ind_array &_icomp)
+				{
+					return boost::shared_ptr<LandmarkConverged>(
+						new LandmarkConverged(mapPtr(), lmkinit, _icomp));
 				}
 				virtual size_t sizeComplement(void) {
-					return (LandmarkInit::size() - LandmarkAdvanced::size());
+					return (LandmarkInit::size() - LandmarkConverged::size());
 				}
 			public:
 				virtual ~MapManager(void) {

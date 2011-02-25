@@ -189,38 +189,38 @@ namespace jafar {
 				
 			public:
 				// Jacobians
-				mat SG_rs; ///<						Jacobian of global sensor pose wrt. robot and sensor mapped states
-				mat EXP_sg; ///<				 	Jacobian of expectation wrt. global sensor pose
-				mat EXP_l; ///< 					Jacobian of expectation wrt. landmark state
-				mat EXP_rsl; ///<        	Jacobian of the expectation wrt. the mapped states of robot, sensor and landmark.
-				mat INN_meas; ///<       	Jacobian of the innovation wrt. the measurement.
-				mat INN_exp; ///<        	Jacobian of the innovation wrt. the expectation.
-				mat INN_rsl; ///<        	Jacobian of the innovation wrt. the mapped states of robot, sensor and landmark.
-				mat LMK_sg; ///<					Jacobian of the landmark wrt. the global sensor pose.
-				mat LMK_meas; ///<       	Jacobian of the landmark wrt. the measurement.
-				mat LMK_prior; ///<      	Jacobian of the landmark wrt. the prior.
-				mat LMK_rs; ///<         	Jacobian of the landmark wrt. the robot and sensor mapped states.
+				mat SG_rs;     ///< Jacobian of global sensor pose wrt. robot and sensor mapped states
+				mat EXP_sg;    ///< Jacobian of expectation wrt. global sensor pose
+				mat EXP_l;     ///< Jacobian of expectation wrt. landmark state
+				mat EXP_rsl;   ///< Jacobian of the expectation wrt. the mapped states of robot, sensor and landmark.
+				mat INN_meas;  ///< Jacobian of the innovation wrt. the measurement.
+				mat INN_exp;   ///< Jacobian of the innovation wrt. the expectation.
+				mat INN_rsl;   ///< Jacobian of the innovation wrt. the mapped states of robot, sensor and landmark.
+				mat LMK_sg;    ///< Jacobian of the landmark wrt. the global sensor pose.
+				mat LMK_meas;  ///< Jacobian of the landmark wrt. the measurement.
+				mat LMK_prior; ///< Jacobian of the landmark wrt. the prior.
+				mat LMK_rs;    ///< Jacobian of the landmark wrt. the robot and sensor mapped states.
 
 			public:
 				/**
 				 * Counters
 				 */
 				struct Counters {
-						int nSearch; ///< 		Number of searches
-						int nMatch; ///< 			Number of matches
-						int nInlier; ///< 		Number of times declared inlier
+						int nSearch; ///< Number of searches
+						int nMatch;  ///< Number of matches
+						int nInlier; ///< Number of times declared inlier
 				} counters;
 
 				/**
 				 * Events
 				 */
 				struct Events {
-						bool predicted; ///<	Landmark is not new and has been predicted
-						bool visible; ///< 		Landmark is visible
+						bool predicted;    ///< Landmark is not new and has been predicted
+						bool visible;      ///< Landmark is visible
 						bool predictedApp; ///< Appearance has been predicted for predicted pos
-						bool measured; ///< 	Feature is measured (we tried to match it)
-						bool matched; ///< 		Feature is successfully matched
-						bool updated; ///< 		Landmark is updated
+						bool measured;     ///< Feature is measured (we tried to match it)
+						bool matched;      ///< Feature is successfully matched
+						bool updated;      ///< Landmark is updated
 				} events;
 				
 				int searchSize;

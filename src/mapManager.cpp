@@ -18,15 +18,17 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
-		observation_ptr_t MapManagerAbstract::createNewLandmark(
-		    data_manager_ptr_t dmaOrigin) {
+		observation_ptr_t MapManagerAbstract::createNewLandmark(data_manager_ptr_t dmaOrigin)
+		{
 			landmark_ptr_t newLmk = createLandmarkInit();
 			newLmk->setId();
 			newLmk->linkToParentMapManager(shared_from_this());
 			observation_ptr_t resObs;
 
-			for (MapManagerAbstract::DataManagerList::iterator iterDMA =
-			    dataManagerList().begin(); iterDMA != dataManagerList().end(); ++iterDMA) {
+			for (MapManagerAbstract::DataManagerList::iterator
+			     iterDMA = dataManagerList().begin();
+			     iterDMA != dataManagerList().end(); ++iterDMA)
+			{
 				data_manager_ptr_t dma = *iterDMA;
 				observation_ptr_t newObs =
 				    dma->observationFactory()->create(dma->sensorPtr(), newLmk);
@@ -41,13 +43,17 @@ namespace jafar {
 				/* Store for the return the obs corresponding to the dma origin. */
 				if (dma == dmaOrigin) resObs = newObs;
 			}
+			
 			return resObs;
 		}
 
-	  void MapManagerAbstract::unregisterLandmark(landmark_ptr_t lmkPtr,bool liberateFilter){
+	  void MapManagerAbstract::unregisterLandmark(landmark_ptr_t lmkPtr, bool liberateFilter)
+		{
 			// first unlink all observations
-			for (LandmarkAbstract::ObservationList::iterator obsIter =
-			    lmkPtr->observationList().begin(); obsIter != lmkPtr->observationList().end(); ++obsIter) {
+			for (LandmarkAbstract::ObservationList::iterator
+			     obsIter = lmkPtr->observationList().begin();
+			     obsIter != lmkPtr->observationList().end(); ++obsIter)
+			{
 				observation_ptr_t obsPtr = *obsIter;
 				obsPtr->dataManagerPtr()->unregisterChild(obsPtr);
 			}
@@ -59,10 +65,12 @@ namespace jafar {
 		}
 
 
-		void MapManagerAbstract::manage(void) {
+		void MapManagerAbstract::manage(void)
+		{
 			// foreach lmk
-			for (LandmarkList::iterator lmkIter = landmarkList().begin(); lmkIter
-			    != landmarkList().end(); ++lmkIter) {
+			for (LandmarkList::iterator lmkIter = landmarkList().begin();
+			     lmkIter != landmarkList().end(); ++lmkIter)
+			{
 				landmark_ptr_t lmkPtr = *lmkIter;
 				if (lmkPtr->needToDie() )
 				{
@@ -79,8 +87,8 @@ namespace jafar {
 		}
 
 
-
-    void MapManagerAbstract::reparametrizeLandmark(landmark_ptr_t lmkinit) {
+    void MapManagerAbstract::reparametrizeLandmark(landmark_ptr_t lmkinit)
+		{
 			//cout<<__PRETTY_FUNCTION__<<"(#"<<__LINE__<<"): " <<"" << endl;
 
 			// unregister lmk
@@ -108,25 +116,24 @@ namespace jafar {
 			// b. Call filter->reparametrize().
 			//cout << __PRETTY_FUNCTION__ << "about to call filter->reparametrize()" << endl;
 			lmkconv->state.x() = sconv;
-			mapPtr()->filterPtr->reparametrize(mapPtr()->ia_used_states(), CONV_init,
-			                                   lmkinit->state.ia(),
-			                                   lmkconv->state.ia());
+			mapPtr()->filterPtr->reparametrize(mapPtr()->ia_used_states(),
+				CONV_init, lmkinit->state.ia(), lmkconv->state.ia());
 
 			// Transfer info from the old lmk to the new one.
 			//cout << __PRETTY_FUNCTION__ << "about to transfer lmk info." << endl;
 			lmkconv->transferInfoLmk(lmkinit);
 
 			// Create the cv-lmk set of observations, one per sensor.
-			for (LandmarkAbstract::ObservationList::iterator obsIter =
-			    lmkinit->observationList().begin(); obsIter
-			    != lmkinit->observationList().end(); ++obsIter) {
+			for(LandmarkAbstract::ObservationList::iterator
+			    obsIter = lmkinit->observationList().begin();
+			    obsIter != lmkinit->observationList().end(); ++obsIter)
+			{
 				observation_ptr_t obsinit = *obsIter;
 				data_manager_ptr_t dma = obsinit->dataManagerPtr();
 				sensor_ptr_t sen = obsinit->sensorPtr();
 
 				//cout << __PRETTY_FUNCTION__ << "about to create new obs" << endl;
-				observation_ptr_t obsconv = dma->observationFactory()->create(sen,
-				                                                            lmkconv);
+				observation_ptr_t obsconv = dma->observationFactory()->create(sen, lmkconv);
 				obsconv->linkToParentDataManager(dma);
 				obsconv->linkToParentLandmark(lmkconv);
 				obsconv->linkToSensor(sen);
@@ -137,7 +144,6 @@ namespace jafar {
 
 			// liberate unused map space.
 			mapPtr()->liberateStates(idxComp);
-
 		}
 
 	}

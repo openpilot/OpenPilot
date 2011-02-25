@@ -1,11 +1,14 @@
 TEMPLATE = lib
 TARGET = Config
 QT += svg
+
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/uavtalk/uavtalk.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(../../plugins/uavobjects/uavobjects.pri)
+
 OTHER_FILES += Config.pluginspec
+
 HEADERS += configplugin.h \
     configgadgetconfiguration.h \
     configgadgetwidget.h \
@@ -22,7 +25,9 @@ HEADERS += configplugin.h \
     mixercurvepoint.h \
     mixercurveline.h \
     configccpmwidget.h \
-    configstabilizationwidget.h
+	configstabilizationwidget.h \
+	widgetbar.h
+
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
     configgadgetwidget.cpp \
@@ -39,11 +44,14 @@ SOURCES += configplugin.cpp \
     mixercurvepoint.cpp \
     mixercurveline.cpp \
     configccpmwidget.cpp \
-    configstabilizationwidget.cpp
+	configstabilizationwidget.cpp \
+	widgetbar.cpp
+
 FORMS += settingswidget.ui \
     airframe.ui \
     telemetry.ui \
     ahrs.ui \
     ccpm.ui \
     stabilization.ui
+
 RESOURCES += configgadget.qrc

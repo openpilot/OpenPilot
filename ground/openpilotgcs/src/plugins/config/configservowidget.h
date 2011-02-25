@@ -34,49 +34,56 @@
 #include "uavobject.h"
 #include <QtGui/QWidget>
 #include <QList>
+#include "widgetbar.h"
 
 class Ui_SettingsWidget;
 
 class ConfigServoWidget: public ConfigTaskWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    ConfigServoWidget(QWidget *parent = 0);
-    ~ConfigServoWidget();
-
+	ConfigServoWidget(QWidget *parent = 0);
+	~ConfigServoWidget();
 
 private:
-        Ui_SettingsWidget *m_config;
-        QList<QSlider> sliders;
-        void updateChannelSlider(QSlider* slider, QLabel* min, QLabel* Max,  QCheckBox* rev, int value);
-        void assignChannel(UAVDataObject *obj, QString str);
-        void assignOutputChannel(UAVDataObject *obj, QString str);
-        int mccDataRate;
-        UAVObject::Metadata accInitialData;
-        QList<QSlider*> outSliders;
-        QList<QSlider*> inSliders;
-        QList<QSpinBox*> outMin;
-        QList<QSpinBox*> outMax;
-        QList<QCheckBox*> reversals;
-        QList<QLabel*> outLabels;
+	Ui_SettingsWidget *m_config;
 
+	QList<QSlider> sliders;
 
-        bool firstUpdate;
+	void updateChannelWidgetBar(WidgetBar *widget_bar, QLabel *min, QLabel *max, QCheckBox *rev, int value);
 
-    private slots:
-        void updateChannels(UAVObject* obj);
-        void requestRCInputUpdate();
-        void sendRCInputUpdate();
-        void saveRCInputObject();
-        void requestRCOutputUpdate();
-        void sendRCOutputUpdate();
-        void saveRCOutputObject();
-        void runChannelTests(bool state);
-        void sendChannelTest(int value);
-        void setChOutRange();
-        void reverseChannel(bool state);
+	void assignChannel(UAVDataObject *obj, QString str);
+	void assignOutputChannel(UAVDataObject *obj, QString str);
 
+	int mccDataRate;
+
+	UAVObject::Metadata accInitialData;
+
+	QList<QSlider*> outSliders;
+	QList<QSpinBox*> outMin;
+	QList<QSpinBox*> outMax;
+	QList<QCheckBox*> reversals;
+	QList<QLabel*> outLabels;
+
+	QList<WidgetBar*> inWidgetBars;
+	QList<QLabel*> inMaxLabels;
+	QList<QLabel*> inMinLabels;
+
+	bool firstUpdate;
+
+private slots:
+	void updateChannels(UAVObject* obj);
+	void requestRCInputUpdate();
+	void sendRCInputUpdate();
+	void saveRCInputObject();
+	void requestRCOutputUpdate();
+	void sendRCOutputUpdate();
+	void saveRCOutputObject();
+	void runChannelTests(bool state);
+	void sendChannelTest(int value);
+	void setChOutRange();
+	void reverseChannel(bool state);
 };
 
-#endif // CONFIGSERVOWIDGET_H
+#endif

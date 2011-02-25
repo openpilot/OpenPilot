@@ -257,11 +257,19 @@ namespace jafar {
 			vec3 am, wm;
 			splitControl(_u, am, wm);
 			
-			#if INIT_Q_FROM_G
+			// init direction and uncertainty of g from acceleration
+			const double th_g = 9.81;
+			g = th_g*(-am)/ublas::norm_2(am);
+			double G = (ublas::norm_2(am) - th_g); G = 2*G*G;
+			for (size_t i = pose.size() + 9; i < pose.size() + 12; i++){
+				state.P(i,i) = std::max(state.P(i,i), G);
+			}
+			
 			// init orientation from g
+			#if INIT_Q_FROM_G
 			vec3 xr, yr, zr, xw, yw, zw; // robot and world frame axis
 			xw.clear(); xw(0)=1.; yw.clear(); yw(1)=1.; zw.clear(); zw(2)=1.;
-			zr = am/ublas::norm_2(am);
+			zr = -g/ublas::norm_2(g);
 			yr = ublasExtra::crossProd(zr,xw); if (yr(0) < 0.0) yr = -yr;
 			xr = -ublasExtra::crossProd(yw,zr); if (xr(0) < 0.0) xr = -xr;
 			if (ublas::norm_2(xr) > ublas::norm_2(yr)) // just in case one of them is too close to 0
@@ -279,14 +287,10 @@ namespace jafar {
 			rot(0,2)=zr(0); rot(1,2)=zr(1), rot(2,2)=zr(2);
 			q = q2qc(R2q(rot));
 			
-			// init g from acceleration
-			//g = rotate(q, -am);
-			g(2) = -ublas::norm_2(am);
-			#else
-			g = -am;
+			g(0)=0; g(1)=0; g(2) = -th_g; // update g
 			#endif
 			
-			std::cout << "Initialize robot state with g = " << g << " and q = " << q << std::endl;
+			std::cout << "Initialize robot state with g = " << g << " (std " << sqrt(state.P(pose.size()+9,pose.size()+9)) << ") and q = " << q << std::endl;
 			unsplitState(p, q, v, ab, wb, g, _xnew);
 		}
 		

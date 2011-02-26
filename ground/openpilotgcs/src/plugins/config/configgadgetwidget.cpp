@@ -70,7 +70,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     ftw->insertTab(3, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
 
     qwd = new ConfigStabilizationWidget(this);
-    ftw->insertTab(4, qwd, QIcon(), QString("Stabilization"));
+    ftw->insertTab(4, qwd, QIcon(":/configgadget/images/gyroscope.svg"), QString("Stabilization"));
 
 //    qwd = new ConfigPipXtremeWidget(this);
 //    ftw->insertTab(4, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>720</width>
-    <height>480</height>
+    <height>499</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,96 +17,8 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
-     <widget class="QWidget" name="tab">
-      <attribute name="title">
-       <string>Settings</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
-       <item>
-        <layout class="QHBoxLayout" name="ahrsSettingsLayout">
-         <item>
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>AHRS Algorithm:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="algorithm">
-           <property name="toolTip">
-            <string>Select the sensor integration algorithm here.
-&quot;Simple&quot; only uses accelerometer values
-&quot;INSGPS&quot; the full featured algorithm integrating all sensors</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Home Location:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QRadioButton" name="homeLocationSet">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="toolTip">
-            <string>Saves the Home Location. This is only enabled
-if the Home Location is set, i.e. if the GPS fix is
-successful.
-
-Disabled if there is no GPS fix.</string>
-           </property>
-           <property name="text">
-            <string>Set</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-           <attribute name="buttonGroup">
-            <string>buttonGroup</string>
-           </attribute>
-          </widget>
-         </item>
-         <item>
-          <widget class="QRadioButton" name="homeLocationClear">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="toolTip">
-            <string>Clears the HomeLocation: only makes sense if you save
-to SD. This will force the AHRS to use the next GPS fix as the
-new home location unless it is in indoor mode.</string>
-           </property>
-           <property name="text">
-            <string>Clear</string>
-           </property>
-           <attribute name="buttonGroup">
-            <string>buttonGroup</string>
-           </attribute>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
        <string>Calibration</string>
@@ -181,7 +93,6 @@ new home location unless it is in indoor mode.</string>
              </layout>
             </item>
            </layout>
-           <zorder></zorder>
            <zorder></zorder>
           </widget>
          </item>
@@ -508,6 +419,107 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Settings</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <layout class="QHBoxLayout" name="ahrsSettingsLayout">
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>INS Algorithm:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="algorithm">
+           <property name="toolTip">
+            <string>Select the sensor integration algorithm here.
+&quot;Simple&quot; only uses accelerometer values
+&quot;INSGPS&quot; the full featured algorithm integrating all sensors</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Home Location:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="homeLocationSet">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="toolTip">
+            <string>Saves the Home Location. This is only enabled
+if the Home Location is set, i.e. if the GPS fix is
+successful.
+
+Disabled if there is no GPS fix.</string>
+           </property>
+           <property name="text">
+            <string>Set</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string>buttonGroup</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="homeLocationClear">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="toolTip">
+            <string>Clears the HomeLocation: only makes sense if you save
+to SD. This will force the INS to use the next GPS fix as the
+new home location unless it is in indoor mode.</string>
+           </property>
+           <property name="text">
+            <string>Clear</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string>buttonGroup</string>
+           </attribute>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>

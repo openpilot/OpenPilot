@@ -224,7 +224,8 @@ You can usually go for higher values for Yaw factors.</string>
             <item row="3" column="3">
              <widget class="QDoubleSpinBox" name="rateYawKi">
               <property name="toolTip">
-               <string>I factor for rate stabilization is usually very low or even zero.</string>
+               <string>As a rule of thumb, you can set YawRate Ki at roughly the same
+value as YawRate Kp.</string>
               </property>
               <property name="decimals">
                <number>6</number>

@@ -1,3 +1,30 @@
+/**
+ ******************************************************************************
+ *
+ * @file       widgetbar.cpp
+ * @author     Cathy Moss Copyright (C) 2011.
+ *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2010.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup ConfigPlugin Configuration Plugin
+ * @{
+ * @brief A bar display widget
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 
  #include <QtGui>
 
@@ -9,6 +36,8 @@
 	m_maximum = 2000;
 	m_minimum = 1000;
 	m_value = 1500;
+
+	m_orientation = Qt::Vertical;
 
 	setBackgroundRole(QPalette::Base);
 	setAutoFillBackground(true);
@@ -46,8 +75,14 @@
 	update();
  }
 
- void WidgetBar::paintEvent(QPaintEvent * /* event */)
- {
+void WidgetBar::setOrientation(Qt::Orientation orientation)
+{
+	m_orientation = orientation;
+	update();
+}
+
+void WidgetBar::paintEvent(QPaintEvent * /* event */)
+{
 	QPainter painter(this);
 	painter.setRenderHint(QPainter::Antialiasing, false);
 
@@ -56,13 +91,30 @@
 
 	float level = (float)(m_value - m_minimum) / range;	// 0 to +1
 
-	int h = (int)((height() - 5) * level + 0.5f);
-
 	QRect rect;
-	rect.setLeft(2);
-	rect.setTop(height() - 3 - h);
-	rect.setWidth(width() - 5);
-	rect.setHeight(h);
+
+	switch (m_orientation)
+	{
+		case Qt::Horizontal:
+			{
+				int length = (int)((height() - 5) * level + 0.5f);
+				rect.setLeft(2);
+				rect.setTop(2);
+				rect.setWidth(length);
+				rect.setHeight(height() - 5);
+			}
+			break;
+
+		case Qt::Vertical:
+			{
+				int length = (int)((height() - 5) * level + 0.5f);
+				rect.setLeft(2);
+				rect.setTop(height() - 3 - length);
+				rect.setWidth(width() - 5);
+				rect.setHeight(length);
+			}
+			break;
+	}
 
 	// background
 	painter.setPen(QColor(160, 160, 160));

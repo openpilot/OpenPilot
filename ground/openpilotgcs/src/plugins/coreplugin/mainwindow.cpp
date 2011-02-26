@@ -206,8 +206,15 @@ MainWindow::MainWindow() :
 
 MainWindow::~MainWindow()
 {
-    hide();
-    qxtLog->removeAsMessageHandler();
+	if (m_connectionManager)	// Pip
+	{
+		m_connectionManager->disconnectDevice();
+		m_connectionManager->suspendPolling();
+	}
+
+	hide();
+
+	qxtLog->removeAsMessageHandler();
     foreach (QString engine, qxtLog->allLoggerEngines())
         qxtLog->removeLoggerEngine(engine);
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();

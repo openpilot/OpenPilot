@@ -48,8 +48,9 @@
 namespace Core {
 
 
-ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, Internal::FancyTabWidget *modeStack)
-    : m_availableDevList(0),
+ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, Internal::FancyTabWidget *modeStack) :
+	QWidget(mainWindow),	// Pip
+	m_availableDevList(0),
     m_connectBtn(0),
     m_ioDev(NULL)
 {
@@ -83,22 +84,21 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, Internal:
 
     modeStack->insertCornerWidget(modeStack->cornerWidgetCount()-1, this);
 
-    QObject::connect(m_connectBtn, SIGNAL(pressed()),
-                     this, SLOT(onConnectPressed()));
+	QObject::connect(m_connectBtn, SIGNAL(pressed()), this, SLOT(onConnectPressed()));
 }
 
 ConnectionManager::~ConnectionManager()
 {
+	disconnectDevice();	// Pip
+	suspendPolling();	// Pip
 }
 
 void ConnectionManager::init()
 {
     //register to the plugin manager so we can receive
     //new connection object from plugins
-    QObject::connect(ExtensionSystem::PluginManager::instance(), SIGNAL(objectAdded(QObject*)),
-                     this, SLOT(objectAdded(QObject*)));
-    QObject::connect(ExtensionSystem::PluginManager::instance(), SIGNAL(aboutToRemoveObject(QObject*)),
-                     this, SLOT(aboutToRemoveObject(QObject*)));
+	QObject::connect(ExtensionSystem::PluginManager::instance(), SIGNAL(objectAdded(QObject*)), this, SLOT(objectAdded(QObject*)));
+	QObject::connect(ExtensionSystem::PluginManager::instance(), SIGNAL(aboutToRemoveObject(QObject*)), this, SLOT(aboutToRemoveObject(QObject*)));
 }
 
 /**
@@ -108,8 +108,7 @@ void ConnectionManager::objectAdded(QObject *obj)
 {
     //Check if a plugin added a connection object to the pool
     IConnection *connection = Aggregation::query<IConnection>(obj);
-    if (!connection)
-        return;
+	if (!connection) return;
 
     //qDebug() << "Connection object registered:" << connection->connectionName();
     //qDebug() << connection->availableDevices();
@@ -121,16 +120,15 @@ void ConnectionManager::objectAdded(QObject *obj)
     // to do things
     m_connectionsList.append(connection);
 
-    QObject::connect(connection, SIGNAL(availableDevChanged(IConnection *)),
-                     this, SLOT(devChanged(IConnection*)));
+	QObject::connect(connection, SIGNAL(availableDevChanged(IConnection *)), this, SLOT(devChanged(IConnection *)));
 }
 
 void ConnectionManager::aboutToRemoveObject(QObject *obj)
 {
     //Check if a plugin added a connection object to the pool
     IConnection *connection = Aggregation::query<IConnection>(obj);
-    if (!connection)
-        return;
+	if (!connection) return;
+
     if (m_connectionsList.contains(connection))
             m_connectionsList.removeAt(m_connectionsList.indexOf(connection));
 }
@@ -142,36 +140,60 @@ void ConnectionManager::aboutToRemoveObject(QObject *obj)
 bool ConnectionManager::disconnectDevice()
 {
     // Check if we are currently connected or not
-    if(!m_ioDev)
+	if (!m_ioDev)
         return false; // We were not connected
 
-    //signal interested plugins that we are disconnecting the device
-    emit deviceDisconnected();
-    if(m_connectionDevice.connection)
+	//signal interested plugins that we are disconnecting the device
+	emit deviceDisconnected();
+
+	if (m_connectionDevice.connection)
     {
         m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
         m_ioDev = NULL;
         m_connectionDevice.connection = NULL;
     }
 
-    m_connectBtn->setText("Connect");
+	m_connectBtn->setText("Connect");
     m_availableDevList->setEnabled(true);
+
     return true;
 }
 
+void ConnectionManager::onConnectionClosed(QObject *obj)	// Pip
+{
+	if (!m_connectionDevice.connection || m_connectionDevice.connection != obj)
+		return;
+
+	m_connectionDevice.connection = NULL;
+	m_ioDev = NULL;
+
+	m_connectBtn->setText("Connect");
+	m_availableDevList->setEnabled(true);
+}
+
+void ConnectionManager::onConnectionDestroyed(QObject *obj)	// Pip
+{
+	if (!m_connectionDevice.connection || m_connectionDevice.connection != obj)
+		return;
+
+	m_connectionDevice.connection = NULL;
+	m_ioDev = NULL;
+
+	m_connectBtn->setText("Connect");
+	m_availableDevList->setEnabled(true);
+}
 
 /**
 *   Slot called when the user pressed the connect/disconnect button
 */
 void ConnectionManager::onConnectPressed()
 {
-    //check if we are trying to connect a new device
-    //or if we are disconnecting it
-    if(!m_ioDev)
-    {
+	if (!m_ioDev)
+	{	// connecting
+
         m_connectionDevice = findDevice(m_availableDevList->currentText());
 
-        if(m_connectionDevice.connection)
+		if (m_connectionDevice.connection)
         {
             m_ioDev = m_connectionDevice.connection->openDevice(m_connectionDevice.devName);
 
@@ -183,10 +205,16 @@ void ConnectionManager::onConnectPressed()
                 if (!m_ioDev->isOpen())
                 {
                     qDebug() << "could not connect to " << m_connectionDevice.devName;
+
                     // TODO: inform the user that something went wrong
-                    m_ioDev = NULL;
+
+					m_connectionDevice.connection = NULL;	// Pip
+					m_ioDev = NULL;
                     return;
                 }
+
+				connect(m_connectionDevice.connection, SIGNAL(deviceClosed(QObject *)), this, SLOT(onConnectionClosed(QObject *)));	// Pip
+				connect(m_connectionDevice.connection, SIGNAL(destroyed(QObject *)), this, SLOT(onConnectionDestroyed(QObject *)));	// Pip
 
                 //signal interested plugins that the user wants to connect to the device
                 emit deviceConnected(m_ioDev);
@@ -202,11 +230,12 @@ void ConnectionManager::onConnectPressed()
         }
     }
     else
-    {
-        //only do this if we are disconnecting
-        //signal interested plugins that user is disconnecting his device
-        emit deviceDisconnected();
-        if(m_connectionDevice.connection)
+	{	// disconnecting
+
+		//signal interested plugins that user is disconnecting his device
+		emit deviceDisconnected();
+
+		if (m_connectionDevice.connection)
         {
             m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
             m_ioDev = NULL;
@@ -223,14 +252,14 @@ void ConnectionManager::onConnectPressed()
 */
 devListItem ConnectionManager::findDevice(const QString &displayedName)
 {
-    foreach(devListItem d, m_devList)
+	foreach (devListItem d, m_devList)
     {
-        if(d.displayedName == displayedName)
-        {
+		if (d.displayedName == displayedName)
             return d;
-        }
     }
+
     qDebug() << "findDevice: cannot find " << displayedName << " in device list";
+
     devListItem d;
     d.connection = NULL;
     return d;
@@ -242,17 +271,12 @@ devListItem ConnectionManager::findDevice(const QString &displayedName)
 */
 void ConnectionManager::unregisterAll(IConnection *connection)
 {
-    for(QLinkedList<devListItem>::iterator iter = m_devList.begin();
-    iter != m_devList.end(); )
+	for (QLinkedList<devListItem>::iterator iter = m_devList.begin(); iter != m_devList.end(); )
     {
-        if(iter->connection == connection)
-        {
+		if (iter->connection == connection)
             iter = m_devList.erase(iter);
-        }
         else
-        {
             ++iter;
-        }
     }
 }
 
@@ -263,7 +287,8 @@ void ConnectionManager::unregisterAll(IConnection *connection)
 */
 void ConnectionManager::suspendPolling()
 {
-    foreach (IConnection* cnx, m_connectionsList) {
+	foreach (IConnection *cnx, m_connectionsList)
+	{
         cnx->suspendPolling();
     }
 
@@ -277,7 +302,8 @@ void ConnectionManager::suspendPolling()
 */
 void ConnectionManager::resumePolling()
 {
-    foreach (IConnection* cnx, m_connectionsList) {
+	foreach (IConnection *cnx, m_connectionsList)
+	{
         cnx->resumePolling();
     }
 
@@ -315,24 +341,23 @@ void ConnectionManager::devChanged(IConnection *connection)
 
     //and add them back in the list
     QStringList availableDev = connection->availableDevices();
-    foreach(QString dev, availableDev)
+	foreach (QString dev, availableDev)
     {
         QString cbName = connection->shortName() + ": " + dev;
         registerDevice(connection, dev, cbName);
     }
 
     //add all the list again to the combobox
-    foreach(devListItem d, m_devList)
+	foreach (devListItem d, m_devList)
     {
         m_availableDevList->addItem(d.displayedName);
     }
 
     //disable connection button if the list is empty
-    if(m_availableDevList->count() > 0)
+	if (m_availableDevList->count() > 0)
         m_connectBtn->setEnabled(true);
     else
         m_connectBtn->setEnabled(false);
 }
-
 
 } //namespace Core

@@ -37,8 +37,9 @@
 #include "rawhid_const.h"
 
 
-RawHIDEnumerationThread::RawHIDEnumerationThread(RawHIDConnection *rawhid)
-    : m_rawhid(rawhid),
+RawHIDEnumerationThread::RawHIDEnumerationThread(RawHIDConnection *rawhid) :
+	QThread(rawhid),	// Pip
+	m_rawhid(rawhid),
     m_running(true)
 {
 }
@@ -46,8 +47,9 @@ RawHIDEnumerationThread::RawHIDEnumerationThread(RawHIDConnection *rawhid)
 RawHIDEnumerationThread::~RawHIDEnumerationThread()
 {
     m_running = false;
-    //wait for the thread to terminate
-    if(wait(1000) == false)
+
+	// wait for the thread to terminate
+	if (!wait(100))
         qDebug() << "Cannot terminate RawHIDEnumerationThread";
 }
 
@@ -55,19 +57,24 @@ void RawHIDEnumerationThread::run()
 {
     QStringList devices = m_rawhid->availableDevices();
 
-    while(m_running)
+	int counter = 0;
+
+	while (m_running)
     {
-        if(!m_rawhid->deviceOpened())
+		// update available devices every second (doesn't need more)
+		if (++counter >= 100 && !m_rawhid->deviceOpened())
         {
+			counter = 0;
+
             QStringList newDev = m_rawhid->availableDevices();
-            if(devices != newDev)
+			if (devices != newDev)
             {
                 devices = newDev;
                 emit enumerationChanged();
             }
         }
 
-        msleep(1000); //update available devices every second (doesn't need more)
+		msleep(10);
     }
 }
 
@@ -79,14 +86,17 @@ RawHIDConnection::RawHIDConnection()
     RawHidHandle = NULL;
     enablePolling = true;
 
+	QObject::connect(&m_enumerateThread, SIGNAL(enumerationChanged()), this, SLOT(onEnumerationChanged()));
 
-    QObject::connect(&m_enumerateThread, SIGNAL(enumerationChanged()),
-                     this, SLOT(onEnumerationChanged()));
     m_enumerateThread.start();
 }
 
 RawHIDConnection::~RawHIDConnection()
-{}
+{
+	if (RawHidHandle)
+	{
+	}
+}
 
 void RawHIDConnection::onEnumerationChanged()
 {
@@ -116,16 +126,26 @@ QStringList RawHIDConnection::availableDevices()
     return devices;
 }
 
+void RawHIDConnection::onRawHidDestroyed(QObject *obj)	// Pip
+{
+	if (!RawHidHandle || RawHidHandle != obj)
+		return;
+
+	RawHidHandle = NULL;
+}
+
 QIODevice *RawHIDConnection::openDevice(const QString &deviceName)
 {
     //added by andrew
-    if (RawHidHandle){
+	if (RawHidHandle)
         closeDevice(deviceName);
-    }
     //end added by andrew
-    m_deviceOpened = true;
+
     //return new RawHID(deviceName);
     RawHidHandle = new RawHID(deviceName);
+
+	connect(RawHidHandle, SLOT(destroyed(QObject *)), this, SLOT(onRawHidDestroyed(QObject *)));	// Pip
+
     return RawHidHandle;
 }
 
@@ -133,16 +153,17 @@ void RawHIDConnection::closeDevice(const QString &deviceName)
 {
     Q_UNUSED(deviceName);
     //added by andrew...
-    if (RawHidHandle){
+	if (RawHidHandle)
+	{
         RawHidHandle->close();
-        delete(RawHidHandle);
-        RawHidHandle=NULL;
+
+		delete RawHidHandle;
+		RawHidHandle = NULL;
+
+		emit deviceClosed(this);	// Pip
     }
     //end added by andrew
-
-    m_deviceOpened = false;
 }
-
 
 QString RawHIDConnection::connectionName()
 {
@@ -212,6 +233,7 @@ void RawHIDTestThread::onBytesWritten(qint64 sz)
 
 RawHIDPlugin::RawHIDPlugin()
 {
+	hidConnection = NULL;	// Pip
 }
 
 RawHIDPlugin::~RawHIDPlugin()
@@ -221,8 +243,8 @@ RawHIDPlugin::~RawHIDPlugin()
 
 void RawHIDPlugin::extensionsInitialized()
 {
-    hidConnection = new RawHIDConnection();
-    addAutoReleasedObject(hidConnection);
+	hidConnection = new RawHIDConnection();
+	addAutoReleasedObject(hidConnection);
 
     //temp for test
     //addAutoReleasedObject(new RawHIDTestThread);

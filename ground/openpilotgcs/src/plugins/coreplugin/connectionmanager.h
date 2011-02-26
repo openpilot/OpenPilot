@@ -90,6 +90,9 @@ private slots:
     void onConnectPressed();
     void devChanged(IConnection *connection);
 
+	void onConnectionClosed(QObject *obj);
+	void onConnectionDestroyed(QObject *obj);
+
 protected:
     QComboBox *m_availableDevList;
     QPushButton *m_connectBtn;

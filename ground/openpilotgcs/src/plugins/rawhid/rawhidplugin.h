@@ -86,10 +86,17 @@ public:
     virtual void suspendPolling();
     virtual void resumePolling();
 
-    bool deviceOpened() {return m_deviceOpened;}
+	bool deviceOpened() { return (RawHidHandle != NULL); }	// Pip
+
+signals:
+	void availableDevChanged(QObject *obj);		// Pip
+	void deviceClosed(QObject *obj);			// Pip
 
 protected slots:
     void onEnumerationChanged();
+
+private slots:
+	void onRawHidDestroyed(QObject *obj);
 
 private:
     RawHID *RawHidHandle;

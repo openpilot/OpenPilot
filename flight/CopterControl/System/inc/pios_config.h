@@ -80,6 +80,13 @@
 #define AUXUART_ENABLED			0
 #define AUXUART_BAUDRATE		19200
 
+/* Alarm Thresholds */
+#define HEAP_LIMIT_WARNING		450
+#define HEAP_LIMIT_CRITICAL		350
+#define CPULOAD_LIMIT_WARNING		80
+#define CPULOAD_LIMIT_CRITICAL		95
+
+/* Task stack sizes */
 #define PIOS_ACTUATOR_STACK_SIZE       1020
 #define PIOS_MANUAL_STACK_SIZE          644
 #define PIOS_SYSTEM_STACK_SIZE          644

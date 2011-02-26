@@ -61,11 +61,6 @@
 
 #define TASK_PRIORITY (tskIDLE_PRIORITY+2)
 
-#define HEAP_LIMIT_WARNING 4000
-#define HEAP_LIMIT_CRITICAL 1000
-#define CPULOAD_LIMIT_WARNING 80
-#define CPULOAD_LIMIT_CRITICAL 95
-
 // Private types
 
 // Private variables

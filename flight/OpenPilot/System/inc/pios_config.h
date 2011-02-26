@@ -79,6 +79,12 @@
 #define AUXUART_ENABLED			0
 #define AUXUART_BAUDRATE		19200
 
+/* Alarm Thresholds */
+#define HEAP_LIMIT_WARNING		4000
+#define HEAP_LIMIT_CRITICAL		1000
+#define CPULOAD_LIMIT_WARNING		80
+#define CPULOAD_LIMIT_CRITICAL		95
+
 #endif /* PIOS_CONFIG_H */
 /**
  * @}

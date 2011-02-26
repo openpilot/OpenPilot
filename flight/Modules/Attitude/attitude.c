@@ -84,6 +84,7 @@ static void settingsUpdatedCb(UAVObjEvent * objEv);
 static float accelKi = 0;
 static float accelKp = 0;
 static float gyroGain = 0.42;
+static int16_t accelbias[3];
 
 /**
  * Initialise the module, called on startup
@@ -215,6 +216,9 @@ static void updateSensors(AttitudeRawData * attitudeRaw)
 	} while ( (i < 32) && (samples_remaining > 0) );
 	attitudeRaw->gyrotemp[0] = samples_remaining;
 	attitudeRaw->gyrotemp[1] = i;
+	x -= accelbias[0];
+	y -= accelbias[1];
+	z -= accelbias[2];
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = ((float)x * 0.004f * 9.81f) / i;
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = ((float)y * 0.004f * 9.81f) / i;
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = ((float)z * 0.004f * 9.81f) / i;
@@ -311,6 +315,11 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	accelKp = attitudeSettings.AccelKp;
 	accelKi = attitudeSettings.AccelKi;		
 	gyroGain = attitudeSettings.GyroGain;
+	
+	accelbias[0] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_X];
+	accelbias[1] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Y];
+	accelbias[2] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Z];
+	
 }
 /**
   * @}

@@ -58,9 +58,15 @@ public:
 signals:
     void enumerationChanged();
 
+protected slots:
+	void onRawHidConnectionDestroyed(QObject *obj);	// Pip
+
 protected:
     RawHIDConnection *m_rawhid;
     bool m_running;
+
+private:
+	QMutex	mutex;
 };
 
 

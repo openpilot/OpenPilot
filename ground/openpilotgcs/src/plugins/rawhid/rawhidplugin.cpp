@@ -36,12 +36,14 @@
 
 #include "rawhid_const.h"
 
+// ***************************************
 
 RawHIDEnumerationThread::RawHIDEnumerationThread(RawHIDConnection *rawhid) :
 	QThread(rawhid),	// Pip
 	m_rawhid(rawhid),
     m_running(true)
 {
+	connect(m_rawhid, SLOT(destroyed(QObject *)), this, SLOT(onRawHidConnectionDestroyed(QObject *)));	// Pip
 }
 
 RawHIDEnumerationThread::~RawHIDEnumerationThread()
@@ -53,6 +55,16 @@ RawHIDEnumerationThread::~RawHIDEnumerationThread()
         qDebug() << "Cannot terminate RawHIDEnumerationThread";
 }
 
+void RawHIDEnumerationThread::onRawHidConnectionDestroyed(QObject *obj)	// Pip
+{
+	QMutexLocker locker(&mutex);
+
+	if (!m_rawhid || m_rawhid != obj)
+		return;
+
+	m_rawhid = NULL;
+}
+
 void RawHIDEnumerationThread::run()
 {
     QStringList devices = m_rawhid->availableDevices();
@@ -61,8 +73,10 @@ void RawHIDEnumerationThread::run()
 
 	while (m_running)
     {
+		mutex.lock();	// Pip
+
 		// update available devices every second (doesn't need more)
-		if (++counter >= 100 && !m_rawhid->deviceOpened())
+		if (++counter >= 100 && m_rawhid && !m_rawhid->deviceOpened())
         {
 			counter = 0;
 
@@ -74,10 +88,13 @@ void RawHIDEnumerationThread::run()
             }
         }
 
+		mutex.unlock();	// Pip
+
 		msleep(10);
     }
 }
 
+// ***************************************
 
 RawHIDConnection::RawHIDConnection()
     : m_enumerateThread(this)

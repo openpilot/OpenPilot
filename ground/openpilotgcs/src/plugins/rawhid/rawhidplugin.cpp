@@ -83,7 +83,7 @@ void RawHIDEnumerationThread::run()
 		// update available devices every second (doesn't need more)
 		if (m_rawhid)
 		{
-//			if (!m_rawhid->deviceOpened())	// this was stopping us getting enumerations changes fed back
+                        if (!m_rawhid->deviceOpened())	// this was stopping us getting enumerations changes fed back
 			{
 				if (++counter >= 100)
 				{

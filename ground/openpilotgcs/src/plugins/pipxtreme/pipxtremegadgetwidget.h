@@ -36,6 +36,9 @@
 #include "uavobjects/uavobjectmanager.h"
 #include "uavobjects/uavobject.h"
 
+#include "coreplugin/icore.h"
+#include "coreplugin/connectionmanager.h"
+
 #include "rawhid/rawhidplugin.h"
 
 #include <QtGui/QWidget>

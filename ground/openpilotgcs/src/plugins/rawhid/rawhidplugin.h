@@ -89,7 +89,7 @@ public:
 	bool deviceOpened() { return (RawHidHandle != NULL); }	// Pip
 
 signals:
-	void availableDevChanged(QObject *obj);		// Pip
+//	void availableDevChanged(QObject *obj);		// Pip
 	void deviceClosed(QObject *obj);			// Pip
 
 protected slots:

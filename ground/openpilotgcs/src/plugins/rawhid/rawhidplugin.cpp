@@ -36,18 +36,23 @@
 
 #include "rawhid_const.h"
 
-// ***************************************
+// **********************************************************************
 
 RawHIDEnumerationThread::RawHIDEnumerationThread(RawHIDConnection *rawhid) :
 	QThread(rawhid),	// Pip
 	m_rawhid(rawhid),
     m_running(true)
 {
-	connect(m_rawhid, SLOT(destroyed(QObject *)), this, SLOT(onRawHidConnectionDestroyed(QObject *)));	// Pip
+	if (m_rawhid)
+		connect(m_rawhid, SLOT(destroyed(QObject *)), this, SLOT(onRawHidConnectionDestroyed(QObject *)));	// Pip
 }
 
 RawHIDEnumerationThread::~RawHIDEnumerationThread()
 {
+	mutex.lock();
+		m_rawhid = NULL;	// safe guard
+	mutex.unlock();
+
     m_running = false;
 
 	// wait for the thread to terminate
@@ -76,17 +81,27 @@ void RawHIDEnumerationThread::run()
 		mutex.lock();	// Pip
 
 		// update available devices every second (doesn't need more)
-		if (++counter >= 100 && m_rawhid && !m_rawhid->deviceOpened())
-        {
-			counter = 0;
+		if (m_rawhid)
+		{
+//			if (!m_rawhid->deviceOpened())	// this was stopping us getting enumerations changes fed back
+			{
+				if (++counter >= 100)
+				{
+					counter = 0;
 
-            QStringList newDev = m_rawhid->availableDevices();
-			if (devices != newDev)
-            {
-                devices = newDev;
-                emit enumerationChanged();
-            }
-        }
+					QStringList newDev = m_rawhid->availableDevices();
+					if (devices != newDev)
+					{
+						devices = newDev;
+						emit enumerationChanged();
+					}
+				}
+			}
+//			else
+//				counter = 0;
+		}
+		else
+			counter = 0;
 
 		mutex.unlock();	// Pip
 
@@ -94,7 +109,7 @@ void RawHIDEnumerationThread::run()
     }
 }
 
-// ***************************************
+// **********************************************************************
 
 RawHIDConnection::RawHIDConnection()
     : m_enumerateThread(this)
@@ -117,6 +132,17 @@ RawHIDConnection::~RawHIDConnection()
 
 void RawHIDConnection::onEnumerationChanged()
 {
+	if (RawHidHandle)	// Pip
+	{	// check to see if the connection has closed
+		if (!RawHidHandle->isOpen())
+		{	// connection has closed .. hmmmm, this connection is still showing as open after the USB device is unplugged from PC
+			delete RawHidHandle;
+			RawHidHandle = NULL;
+
+			emit deviceClosed(this);
+		}
+	}
+
     if (enablePolling)
         emit availableDevChanged(this);
 }
@@ -208,45 +234,7 @@ void RawHIDConnection::resumePolling()
     enablePolling = true;
 }
 
-
-
-//usb hid test thread
-//temporary...
-RawHIDTestThread::RawHIDTestThread()
-{
-    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-    QObject::connect(cm, SIGNAL(deviceConnected(QIODevice *)),
-                     this, SLOT(onDeviceConnect(QIODevice *)));
-    QObject::connect(cm, SIGNAL(deviceDisconnected()),
-                     this, SLOT(onDeviceDisconnect()));
-}
-
-void RawHIDTestThread::onDeviceConnect(QIODevice *dev)
-{
-    this->dev = dev;
-    dev->open(QIODevice::ReadWrite);
-    QObject::connect(dev, SIGNAL(readyRead()),
-                     this, SLOT(onReadyRead()));
-
-    QObject::connect(dev, SIGNAL(bytesWritten(qint64)),
-                     this, SLOT(onBytesWritten(qint64)));
-    dev->write("Hello raw hid device\n");
-}
-
-void RawHIDTestThread::onDeviceDisconnect()
-{
-    dev->close();
-}
-
-void RawHIDTestThread::onReadyRead()
-{
-    qDebug() << "Rx:" << dev->readLine(32);
-}
-
-void RawHIDTestThread::onBytesWritten(qint64 sz)
-{
-    qDebug() << "Sent " << sz << " bytes";
-}
+// **********************************************************************
 
 RawHIDPlugin::RawHIDPlugin()
 {
@@ -276,3 +264,5 @@ bool RawHIDPlugin::initialize(const QStringList & arguments, QString * errorStri
 }
 
 Q_EXPORT_PLUGIN(RawHIDPlugin)
+
+// **********************************************************************

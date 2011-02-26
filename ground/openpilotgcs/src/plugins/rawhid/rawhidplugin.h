@@ -129,22 +129,4 @@ private:
     RawHIDConnection *hidConnection;
 };
 
-
-//usb hid test thread
-#include "coreplugin/icore.h"
-#include "coreplugin/connectionmanager.h"
-class RawHIDTestThread: public QObject
-{
-    Q_OBJECT
-public:
-    RawHIDTestThread();
-protected slots:
-    void onDeviceConnect(QIODevice *);
-    void onDeviceDisconnect();
-    void onReadyRead();
-    void onBytesWritten(qint64 sz);
-protected:
-    QIODevice *dev;
-};
-
 #endif // RAWHIDPLUGIN_H

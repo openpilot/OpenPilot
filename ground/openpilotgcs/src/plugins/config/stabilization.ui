@@ -99,6 +99,10 @@ Then lower the value by 20% or so.</string>
             </item>
             <item row="2" column="2">
              <widget class="QDoubleSpinBox" name="ratePitchKp">
+              <property name="toolTip">
+               <string>Slowly raise Kp until you start seeing clear oscillations when you fly.
+Then lower the value by 20% or so.</string>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -119,6 +123,9 @@ Then lower the value by 20% or so.</string>
             </item>
             <item row="1" column="3">
              <widget class="QDoubleSpinBox" name="rateRollKi">
+              <property name="toolTip">
+               <string>I factor for rate stabilization is usually very low or even zero.</string>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -129,6 +136,9 @@ Then lower the value by 20% or so.</string>
             </item>
             <item row="2" column="3">
              <widget class="QDoubleSpinBox" name="ratePitchKi">
+              <property name="toolTip">
+               <string>I factor for rate stabilization is usually very low or even zero.</string>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -179,6 +189,10 @@ Then lower the value by 20% or so.</string>
             </item>
             <item row="1" column="0" rowspan="2">
              <widget class="QCheckBox" name="linkRateRP">
+              <property name="toolTip">
+               <string>If checked, the Roll and Pitch factors will be identical.
+When you change one, the other is updated.</string>
+              </property>
               <property name="text">
                <string>Link</string>
               </property>
@@ -193,6 +207,12 @@ Then lower the value by 20% or so.</string>
             </item>
             <item row="3" column="2">
              <widget class="QDoubleSpinBox" name="rateYawKp">
+              <property name="toolTip">
+               <string>Slowly raise Kp until you start seeing clear oscillations when you fly.
+Then lower the value by 20% or so.
+
+You can usually go for higher values for Yaw factors.</string>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -203,6 +223,9 @@ Then lower the value by 20% or so.</string>
             </item>
             <item row="3" column="3">
              <widget class="QDoubleSpinBox" name="rateYawKi">
+              <property name="toolTip">
+               <string>I factor for rate stabilization is usually very low or even zero.</string>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -242,6 +265,10 @@ Then lower the value by 20% or so.</string>
            <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,1,2,2,2">
             <item row="1" column="0" rowspan="2">
              <widget class="QCheckBox" name="linkAttitudeRP">
+              <property name="toolTip">
+               <string>If checked, the Roll and Pitch factors will be identical.
+When you change one, the other is updated.</string>
+              </property>
               <property name="text">
                <string>Link</string>
               </property>
@@ -271,7 +298,8 @@ Then lower the value by 20% or so.</string>
             <item row="1" column="2">
              <widget class="QDoubleSpinBox" name="rollKp">
               <property name="toolTip">
-               <string>Once Rate stabilization is done, you should increase the Kp factor until the airframe oscillates again, and go back down 20%</string>
+               <string>Once Rate stabilization is done, you should increase the Kp factor until the airframe oscillates again, and go back down 20% or so.
+</string>
               </property>
               <property name="decimals">
                <number>6</number>
@@ -283,6 +311,10 @@ Then lower the value by 20% or so.</string>
             </item>
             <item row="2" column="2">
              <widget class="QDoubleSpinBox" name="pitchKp">
+              <property name="toolTip">
+               <string>Once Rate stabilization is done, you should increase the Kp factor until the airframe oscillates again, and go back down 20% or so.
+</string>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -293,6 +325,10 @@ Then lower the value by 20% or so.</string>
             </item>
             <item row="3" column="2">
              <widget class="QDoubleSpinBox" name="yawKp">
+              <property name="toolTip">
+               <string>Once Rate stabilization is done, you should increase the Kp factor until the airframe oscillates again, and go back down 20% or so.
+</string>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -303,6 +339,9 @@ Then lower the value by 20% or so.</string>
             </item>
             <item row="1" column="3">
              <widget class="QDoubleSpinBox" name="rollKi">
+              <property name="toolTip">
+               <string>Ki can usually be almost identical to Kp.</string>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -313,6 +352,9 @@ Then lower the value by 20% or so.</string>
             </item>
             <item row="2" column="3">
              <widget class="QDoubleSpinBox" name="pitchKi">
+              <property name="toolTip">
+               <string>Ki can usually be almost identical to Kp.</string>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -323,6 +365,9 @@ Then lower the value by 20% or so.</string>
             </item>
             <item row="3" column="3">
              <widget class="QDoubleSpinBox" name="yawKi">
+              <property name="toolTip">
+               <string>Ki can usually be almost identical to Kp.</string>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -333,6 +378,11 @@ Then lower the value by 20% or so.</string>
             </item>
             <item row="1" column="4">
              <widget class="QDoubleSpinBox" name="rollILimit">
+              <property name="toolTip">
+               <string>ILimit can be equal to three to four times Ki, but you can adjust
+depending on whether your airframe is well balanced, and your
+flying style.</string>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -343,6 +393,11 @@ Then lower the value by 20% or so.</string>
             </item>
             <item row="2" column="4">
              <widget class="QDoubleSpinBox" name="pitchILimit">
+              <property name="toolTip">
+               <string>ILimit can be equal to three to four times Ki, but you can adjust
+depending on whether your airframe is well balanced, and your
+flying style.</string>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -353,6 +408,11 @@ Then lower the value by 20% or so.</string>
             </item>
             <item row="3" column="4">
              <widget class="QDoubleSpinBox" name="yawILimit">
+              <property name="toolTip">
+               <string>ILimit can be equal to three to four times Ki, but you can adjust
+depending on whether your airframe is well balanced, and your
+flying style.</string>
+              </property>
               <property name="decimals">
                <number>6</number>
               </property>
@@ -409,6 +469,10 @@ Then lower the value by 20% or so.</string>
          </item>
          <item>
           <widget class="QCheckBox" name="realTimeUpdates">
+           <property name="toolTip">
+            <string>If you check this, the GCS will udpate the stabilization factors
+automatically every 300ms, which will help for fast tuning.</string>
+           </property>
            <property name="text">
             <string>Update in real time</string>
            </property>

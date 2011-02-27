@@ -149,13 +149,16 @@ static void WriteToMsg32(uint8_t index, uint32_t value)
 	WriteToMsg16(index + 2, value / 10000);
 }
 
-static void SetCoord(uint8_t index, float coord)
+static void SetCoord(uint8_t index, uint32_t coord)
 {
-	uint32_t deg = (uint32_t) coord;
-	float sec = (coord - deg) * 60;
 
-	WriteToMsg24(index, sec * 10000);
+#define E7 10000000
+	uint8_t deg = coord / E7;
+	float sec = (float)(coord - deg*E7) / ((float)E7/(60.0*10000));
+
 	WriteToMsg8(index + 3, deg);
+	WriteToMsg24(index, sec);
+
 }
 
 static void SetCourse(uint16_t dir)

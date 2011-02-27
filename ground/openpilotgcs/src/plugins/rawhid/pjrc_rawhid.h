@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <QObject>
 #include <QDebug>
 #include <QString>
 #include "rawhid_global.h"
@@ -78,7 +79,6 @@
 	struct hid_struct
 	{
 		HANDLE handle;
-		int open;
 		struct hid_struct *prev;
 		struct hid_struct *next;
 	};
@@ -87,8 +87,9 @@
 
 // ************
 
-class RAWHID_EXPORT pjrc_rawhid
+class RAWHID_EXPORT pjrc_rawhid : public QObject
 {
+	Q_OBJECT
 
 public:
 	pjrc_rawhid();
@@ -100,6 +101,9 @@ public:
 	int send(int num, void *buf, int len, int timeout);
 	QString getserial(int num);
 	void mytest(int num);
+
+signals:
+	void deviceUnplugged(int num);
 
 private:
 	#if defined( Q_OS_MAC)
@@ -131,7 +135,7 @@ private:
 		hid_t * get_hid(int num);
 		void free_all_hid(void);
 		void hid_close(hid_t *hid);
-		void print_win32_err(void);
+		void print_win32_err(DWORD err);
 
 	#endif
 };

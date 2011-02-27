@@ -121,16 +121,18 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
 		h = CreateFile(details->DevicePath, GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
 		if (h == INVALID_HANDLE_VALUE)
 		{
+			DWORD err = GetLastError();
+
 			// I get ERROR_ACCESS_DENIED with most/all my input devices (mice/trackballs/tablet).
 			// Let's not log it :)
-			if (GetLastError() == ERROR_ACCESS_DENIED)
+			if (err == ERROR_ACCESS_DENIED)
 			{
 				free(details);
 				continue;
 			}
 
 			// qDebug wipes the GetLastError() it seems, so do that after print_win32_err().
-			print_win32_err();
+			print_win32_err(err);
 			qDebug() << "Problem opening handle, path: " << QString().fromWCharArray(details->DevicePath);
 
 			free(details);
@@ -168,10 +170,21 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
 			continue;
 		}
 
+//		COMMTIMEOUTS CommTimeouts;
+//		CommTimeouts.ReadIntervalTimeout = 100;			// 100ms
+//		CommTimeouts.ReadTotalTimeoutConstant = 5;		// ms
+//		CommTimeouts.ReadTotalTimeoutMultiplier = 1;	//
+//		CommTimeouts.WriteTotalTimeoutConstant = 5;		// ms
+//		CommTimeouts.WriteTotalTimeoutMultiplier = 1;	//
+//		if (!SetCommTimeouts(h, &CommTimeouts))
+//		{
+////			DWORD err = GetLastError();
+//
+//		}
+
 		qDebug("Open: Handle address: %li for num: %i", (long int) h, count);
 
 		hid->handle = h;
-		hid->open = 1;
 		add_hid(hid);
 
 		count++;
@@ -196,7 +209,10 @@ int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
 	DWORD n;
 
 	hid_t *hid = get_hid(num);
-	if (!hid || !hid->open) return -1;
+	if (!hid)
+		return -1;
+	if (!hid->handle)
+		return -1;
 
 	EnterCriticalSection(&rx_mutex);
 
@@ -207,9 +223,20 @@ int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
 
 	if (!ReadFile(hid->handle, buf, len, NULL, &ov))
 	{
-		if (GetLastError() != ERROR_IO_PENDING)
+		DWORD err = GetLastError();
+
+		if (err == ERROR_DEVICE_NOT_CONNECTED)
+		{	// the device has been unplugged
+			print_win32_err(err);
+			hid_close(hid);
+			LeaveCriticalSection(&rx_mutex);
+			emit deviceUnplugged(num);
+			return -1;
+		}
+
+		if (err != ERROR_IO_PENDING)
 		{
-			print_win32_err();
+			print_win32_err(err);
 			LeaveCriticalSection(&rx_mutex);
 			return -1;
 		}
@@ -223,7 +250,8 @@ int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
 		}
 		if (r != WAIT_OBJECT_0)
 		{
-			print_win32_err();
+			DWORD err = GetLastError();
+			print_win32_err(err);
 			LeaveCriticalSection(&rx_mutex);
 			return -1;
 		}
@@ -231,7 +259,17 @@ int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
 
 	if (!GetOverlappedResult(hid->handle, &ov, &n, FALSE))
 	{
-		print_win32_err();
+		DWORD err = GetLastError();
+		print_win32_err(err);
+
+		if (err == ERROR_DEVICE_NOT_CONNECTED)
+		{	// the device has been unplugged
+			hid_close(hid);
+			LeaveCriticalSection(&rx_mutex);
+			emit deviceUnplugged(num);
+			return -1;
+		}
+
 		LeaveCriticalSection(&rx_mutex);
 		return -1;
 	}
@@ -261,7 +299,10 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
 	DWORD n, r;
 
 	hid_t *hid = get_hid(num);
-	if (!hid || !hid->open) return -1;
+	if (!hid)
+		return -1;
+	if (!hid->handle)
+		return -1;
 
 //	qDebug("Send: Handle address: %li for num: %i", (long int) hid->handle, num);
 
@@ -277,7 +318,16 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
 	if (!WriteFile(hid->handle, buf, len, NULL, &ov))
 	{
 		DWORD err = GetLastError();
-		if ( err == ERROR_SUCCESS || err == ERROR_IO_PENDING )
+
+		if (err == ERROR_DEVICE_NOT_CONNECTED)
+		{	// the device has been unplugged
+			hid_close(hid);
+			LeaveCriticalSection(&tx_mutex);
+			emit deviceUnplugged(num);
+			return -1;
+		}
+
+		if (err == ERROR_SUCCESS || err == ERROR_IO_PENDING)
 		{
 //			qDebug("Waiting for write to finish");
 			r = WaitForSingleObject(tx_event, timeout);
@@ -289,7 +339,8 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
 			}
 			if (r != WAIT_OBJECT_0)
 			{
-				print_win32_err();
+				DWORD err = GetLastError();
+				print_win32_err(err);
 				LeaveCriticalSection(&tx_mutex);
 				return -1;
 			}
@@ -297,7 +348,7 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
 		else
 		{
 //			qDebug("Error writing to file");
-			print_win32_err();
+			print_win32_err(err);
 			LeaveCriticalSection(&tx_mutex);
 			return -1;
 		}
@@ -305,8 +356,18 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
 
 	if (!GetOverlappedResult(hid->handle, &ov, &n, FALSE))
 	{
+		DWORD err = GetLastError();
+
 		qDebug("Problem getting overlapped result");
-		print_win32_err();
+		print_win32_err(err);
+
+		if (err == ERROR_DEVICE_NOT_CONNECTED)
+		{	// the device has been unplugged
+			hid_close(hid);
+			LeaveCriticalSection(&tx_mutex);
+			emit deviceUnplugged(num);
+			return -1;
+		}
 	}
 
 	LeaveCriticalSection(&tx_mutex);
@@ -318,14 +379,25 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
 QString pjrc_rawhid::getserial(int num)
 {
 	hid_t *hid = get_hid(num);
-	if (!hid || !hid->open)
+	if (!hid)
+		return "";
+	if (!hid->handle)
 		return "";
 
 	// Should we do some "critical section" stuff here??
 	char temp[126];
 	if (!HidD_GetSerialNumberString(hid->handle, temp, sizeof(temp)))
 	{
-		print_win32_err();
+		DWORD err = GetLastError();
+		print_win32_err(err);
+
+		if (err == ERROR_DEVICE_NOT_CONNECTED)
+		{	// the device has been unplugged
+			hid_close(hid);
+			emit deviceUnplugged(num);
+			return "";
+		}
+
 		return QString("Error");
 	}
 
@@ -354,6 +426,7 @@ void pjrc_rawhid::add_hid(hid_t *h)
 		h->next = h->prev = NULL;
 		return;
 	}
+
 	last_hid->next = h;
 	h->prev = last_hid;
 	h->next = NULL;
@@ -386,19 +459,16 @@ void pjrc_rawhid::free_all_hid(void)
 void pjrc_rawhid::hid_close(hid_t *hid)
 {
 	if (!hid) return;
-	if (!hid->handle || !hid->open) return;
+	if (!hid->handle) return;
 
 	CloseHandle(hid->handle);
 	hid->handle = NULL;
 }
 
-void pjrc_rawhid::print_win32_err(void)
+void pjrc_rawhid::print_win32_err(DWORD err)
 {
 	char buf[256];
 	char temp[256];
-	DWORD err;
-
-	err = GetLastError();
 
 	//FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, (WCHAR*)buf, sizeof(buf), NULL);
 	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT), (WCHAR*)buf, sizeof(buf), NULL);

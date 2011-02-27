@@ -29,6 +29,7 @@ namespace jafar {
 
 		// Forward declarations of children
 		class ObservationAbstract;
+		class MapManagerAbstract;
 
 
 		/** Base class for all landmarks defined in the module
@@ -131,13 +132,10 @@ namespace jafar {
 				};
 
 				/**
-				 * Evaluate the landmark's need to die.
-				 *
-				 * This is a heuristic based on each observation statistics (the counters).
-				 * \param dieMet the method defining the heuristic: ANY, ALL or MAJORITY
+				 * Evaluate the landmark's special need to die.
 				 * \return \a true if the landmark should die.
 				 */
-				virtual bool needToDie(DecisionMethod dieMet = ANY);
+				virtual bool needToDie() { return false; }
 
 				/**
 				destroy the display data of itself and its children
@@ -149,12 +147,12 @@ namespace jafar {
 				 * We cut the linik to parent and the object naturally dies.
 				 */
 				void suicide();
-
+#if 0
 				/**
 				 * Evaluate the landmark's conditions for reparametrization
 				 */
 				virtual bool needToReparametrize(DecisionMethod repMethod = ALL);
-
+#endif
 				virtual void transferInfoLmk(landmark_ptr_t & lmkSourcePtr);
 
 		};

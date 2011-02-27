@@ -128,8 +128,7 @@ namespace jafar {
 					return "Pinhole-Anch-homog-point";
 				}
 
-
-				void setup(double reparTh, int killSizeTh, int killSearchTh, double killMatchTh, double killConsistencyTh, double dmin);
+				void setup(double dmin);
 
 //				void setup(double _pixNoise = 1.0);
 
@@ -143,8 +142,10 @@ namespace jafar {
 					return measurement.matchScore;
 				}
 
-				virtual bool voteForReparametrizingLandmark();
-
+				double computeLinearityScore(){
+					return lmkAHP::linearityScore(sensorPtr()->globalPose(), landmarkPtr()->state.x(), landmarkPtr()->state.P());
+				}
+				
 				virtual void desc_image(image::oimstream& os) const;
 
 			public:

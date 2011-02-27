@@ -181,12 +181,6 @@ namespace jafar {
 				// indirect arrays
 				ind_array ia_rsl; ///<    Ind. array of mapped indices of robot, sensor and landmark (ie, sensor might or might not be there).
 
-				double reparTh;
-				int killSizeTh;
-				int killSearchTh;
-				double killMatchTh;
-				double killConsistencyTh;
-				
 			public:
 				// Jacobians
 				mat SG_rs;     ///< Jacobian of global sensor pose wrt. robot and sensor mapped states
@@ -236,15 +230,6 @@ namespace jafar {
 					return "OBSERVATION";
 				}
 
-				void setup(double reparTh_, int killSizeTh_, int killSearchTh_, double killMatchTh_, double killConsistencyTh_)
-				{
-					reparTh = reparTh_;
-					killSizeTh = killSizeTh_;
-					killSearchTh = killSearchTh_;
-					killMatchTh = killMatchTh_;
-					killConsistencyTh = killConsistencyTh_;
-				}
-
 				/**
 				 * Project and get expectation covariances
 				 */
@@ -262,8 +247,7 @@ namespace jafar {
 				virtual bool isVisible() {
 					return events.visible;
 				}
-
-
+				
 				/**
 				 * Back-project
 				 */
@@ -382,10 +366,11 @@ namespace jafar {
 				virtual double getMatchScore() = 0;
 
 				void update() ;
-
+#if 0
 				virtual bool voteForKillingLandmark();
-
-				virtual bool voteForReparametrizingLandmark() = 0;
+#endif
+				/// return a linearity score for the associated converged type. 0 means fully linear. <0 means already converged.
+				virtual double computeLinearityScore() = 0; 
 
 				virtual void transferInfoObs(observation_ptr_t & obs);
 

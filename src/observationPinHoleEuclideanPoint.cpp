@@ -35,9 +35,9 @@ namespace jafar {
 			type = PNT_PH_EUC;
 		}
 
-		void ObservationPinHoleEuclideanPoint::setup(double reparTh, int killSizeTh, int killSearchTh, double killMatchTh, double killConsistencyTh, double dmin)
+		void ObservationPinHoleEuclideanPoint::setup(double dmin)
 		{
-			ObservationAbstract::setup(reparTh, killSizeTh, killSearchTh, killMatchTh, killConsistencyTh);
+			//ObservationAbstract::setup(reparTh, killSizeTh, killSearchTh, killMatchTh, killConsistencyTh);
 			//ObservationAbstract::setup(_noiseStd, getPrior());
 			Gaussian prior(1); // should never be used
 			setPrior(prior);

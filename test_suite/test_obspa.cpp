@@ -90,8 +90,8 @@ void test_obsap01(void) {
 	pinholePtr->params.setIntrinsicCalibration(k, d, d.size());
 	c = pinholePtr->params.correction;
 	
-	boost::shared_ptr<MapManager<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> > 
-		mmPoint(new MapManager<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint>());
+	landmark_factory_ptr_t lmkFactory(new LandmarkFactory<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint>());
+	map_manager_ptr_t mmPoint(new MapManager(lmkFactory));
 	mmPoint->linkToParentMap(mapPtr);
 	ahp_ptr_t ahpPtr(new LandmarkAnchoredHomogeneousPoint(mapPtr));
 	ahpPtr->linkToParentMapManager(mmPoint);

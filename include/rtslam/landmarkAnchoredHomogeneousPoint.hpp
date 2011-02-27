@@ -55,7 +55,7 @@ namespace jafar {
 				}
 
 
-				virtual bool needToDie(DecisionMethod dieMet = ANY);
+				virtual bool needToDie();
 
 				virtual size_t mySize() {return size();}
 

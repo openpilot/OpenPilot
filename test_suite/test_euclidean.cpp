@@ -37,8 +37,8 @@ void test_euc01(void) {
 	mat33 EUC_euc;
 
 	map_ptr_t mapPtr(new MapAbstract(100));
-	boost::shared_ptr<MapManager<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> > mmPoint(new MapManager<
-	    LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> ());
+	landmark_factory_ptr_t lmkFactory(new LandmarkFactory<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint>());
+	map_manager_ptr_t mmPoint(new MapManager(lmkFactory));
 	mmPoint->linkToParentMap(mapPtr);
 	eucp_ptr_t eucPtr(new LandmarkEuclideanPoint(mapPtr));
 	eucPtr->linkToParentMapManager(mmPoint);

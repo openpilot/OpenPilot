@@ -172,7 +172,7 @@ time_t rseed;
  * program parameters
  * ###########################################################################*/
 
-enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose, iRobot, iTrigger, iSimu, nIntOpts };
+enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose, iMap, iRobot, iTrigger, iSimu, nIntOpts };
 int intOpts[nIntOpts] = {0};
 const int nFirstIntOpt = 0, nLastIntOpt = nIntOpts-1;
 
@@ -199,6 +199,7 @@ struct option long_options[] = {
 	{"pause", 2, 0, 0},
 	{"log", 2, 0, 0},
 	{"verbose", 2, 0, 0},
+	{"map", 2, 0, 0},
 	{"robot", 2, 0, 0}, // should be in config file
 	{"trigger", 2, 0, 0}, // should be in config file
 	{"simu", 2, 0, 0},
@@ -406,12 +407,16 @@ void demo_slam01_main(world_ptr_t *world) {
 	boost::shared_ptr<ObservationFactory> obsFact(new ObservationFactory());
 	if (intOpts[iSimu] != 0)
 	{
-		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpSimuObservationMaker(configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5, configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
-		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpSimuObservationMaker(configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5, configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
+		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpSimuObservationMaker(
+		  configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
+		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpSimuObservationMaker(
+		  configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
 	} else
 	{
-		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpObservationMaker(configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5, configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
-		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpObservationMaker(configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5, configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
+		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpObservationMaker(
+		  configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
+		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpObservationMaker(
+		  configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
 	}
 
 
@@ -426,11 +431,31 @@ void demo_slam01_main(world_ptr_t *world) {
 	// 1. Create maps.
 	map_ptr_t mapPtr(new MapAbstract(configEstimation.MAP_SIZE));
 	worldPtr->addMap(mapPtr);
+	
 	// 1b. Create map manager.
-	boost::shared_ptr<MapManager<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> > mmPoint(new MapManager<
-	    LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint> ());
+	landmark_factory_ptr_t lmkFactory(new LandmarkFactory<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint>());
+	map_manager_ptr_t mmPoint;
+	switch(intOpts[iMap])
+	{
+		case 0: { // odometry
+			mmPoint.reset(new MapManagerOdometry(
+			  lmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE));
+			break;
+		}
+		case 1: { // global
+			mmPoint.reset(new MapManagerGlobal(
+			  lmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5));
+			break;
+		}
+		case 2: { // local/multimap
+			mmPoint.reset(new MapManagerLocal(
+			  lmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE));
+			break;	
+		}
+	}
 	mmPoint->linkToParentMap(mapPtr);
 
+	// simulation environment
 	boost::shared_ptr<simu::AdhocSimulator> simulator;
 	if (intOpts[iSimu] != 0)
 	{
@@ -1228,6 +1253,7 @@ void demo_slam01() {
 	* --help
 	* --usage
 	* --robot 0=constant vel, 1=inertial
+	* --map 0=odometry, 1=global, 2=local/multimap
 	* --trigger 0=internal, 1=external with MTI control, 2=external without control
 	* --simu 0/1
 	* --freq camera frequency in double Hz (with trigger==0/1)

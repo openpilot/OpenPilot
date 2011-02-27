@@ -58,7 +58,53 @@ namespace jafar {
 //			cout << "Deleted landmark: " << id() << ": " << typeName() << endl;
 		}
 
+#if 0
+		bool LandmarkAbstract::needToDie(DecisionMethod dieMet){
+			switch (dieMet) {
+				case ANY : {
+					// Drastic option: ANY vote for killing declares the need to die.
+					for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
+					{
+						observation_ptr_t obsPtr = *obsIter;
+						if (obsPtr->voteForKillingLandmark()) {
+							return true;
+						}
+					}
+					return false;
+				}
+				case ALL : {
+					// Magnanimous option: ALL votes for killing are necessary to declare the need to die.
+					for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
+					{
+						observation_ptr_t obsPtr = *obsIter;
+						if (!obsPtr->voteForKillingLandmark()) return false;
+					}
+					return true;
+				}
+				case MAJORITY : {
+					// Democratic option: MAJORITY of votes determines the need to die.
+					unsigned int nDie = 0, nSurvive = 0;
+					for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
+					{
+						observation_ptr_t obsPtr = *obsIter;
+						if (obsPtr->voteForKillingLandmark()) nDie++;
+						else nSurvive++;
+					}
+					if (nDie > nSurvive) return true;
+					return false;
+
+				}
+				default : {
+					cout << __FILE__ << ":" << __LINE__ << ": Bad evaluation method. Using ANY." << endl;
+					return needToDie(ANY);
+				}
+			}
+			return false;
+		}
+
+		
 		bool LandmarkAbstract::needToReparametrize(DecisionMethod repMet){
+			if (converged) return false;
 			// first check if the landmark was observed this frame, always with the ANY policy
 			bool observed = false;
 			for (ObservationList::iterator obsIter = observationList().begin(); obsIter != observationList().end(); obsIter++)
@@ -108,7 +154,7 @@ namespace jafar {
 			}
 			return false;
 		}
-
+#endif
 
 		void LandmarkAbstract::reparametrize(const landmark_ptr_t & lmkPtr) {
 //
@@ -179,7 +225,7 @@ namespace jafar {
 			this->geomType = lmkSourcePtr->getGeomType();
 
 		}
-
+#if 0
 		bool LandmarkAbstract::needToDie(DecisionMethod dieMet){
 			switch (dieMet) {
 				case ANY : {
@@ -222,7 +268,7 @@ namespace jafar {
 			}
 			return false;
 		}
-
+#endif
 		void LandmarkAbstract::destroyDisplay()
 		{
 			ObjectAbstract::destroyDisplay();

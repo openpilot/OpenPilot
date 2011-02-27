@@ -34,9 +34,9 @@ namespace jafar {
 			type = PNT_PH_AH;
 		}
 
-		void ObservationPinHoleAnchoredHomogeneousPoint::setup(double reparTh, int killSizeTh, int killSearchTh, double killMatchTh, double killConsistencyTh, double dmin)
+		void ObservationPinHoleAnchoredHomogeneousPoint::setup(double dmin)
 		{
-			ObservationAbstract::setup(reparTh, killSizeTh, killSearchTh, killMatchTh, killConsistencyTh);
+			//ObservationAbstract::setup(reparTh, killSizeTh, killSearchTh, killMatchTh, killConsistencyTh);
 			//ObservationAbstract::setup(_noiseStd, getPrior());
 			Gaussian prior(1);
 			prior.x(0) = 1/(3*dmin);
@@ -142,11 +142,6 @@ namespace jafar {
 		bool ObservationPinHoleAnchoredHomogeneousPoint::predictAppearance_func() {
 			observation_ptr_t _this = shared_from_this();
 			return landmarkPtr()->descriptorPtr->predictAppearance(_this);
-		}
-
-		bool ObservationPinHoleAnchoredHomogeneousPoint::voteForReparametrizingLandmark(){
-//			cout << "evaluating linearity for lmk: " << id() << endl;
-			return (lmkAHP::linearityScore(sensorPtr()->globalPose(), landmarkPtr()->state.x(), landmarkPtr()->state.P()) < reparTh);
 		}
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::desc_image(image::oimstream& os) const

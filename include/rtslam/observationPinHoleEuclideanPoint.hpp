@@ -112,22 +112,17 @@ namespace jafar {
 			void linkToSensorSpecific( sensor_ptr_t ptr ) { modelSpec->linkToSensorSpecific(ptr); }
 				
 			public:
-
-			ObservationPinHoleEuclideanPoint(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr);
-			~ObservationPinHoleEuclideanPoint(void){
+				ObservationPinHoleEuclideanPoint(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & eucPtr);
+				~ObservationPinHoleEuclideanPoint(void){
 //				cout << "Deleted observation: " << id() << ": " << typeName() << endl;
-					}
+				}
 
-			void setup(double reparTh, int killSizeTh, int killSearchTh, double killMatchTh, double killConsistencyTh, double dmin);
+				void setup(double dmin);
 
 				virtual std::string typeName() const {
 					return "Pinhole-Euclidean-point";
 				}
-
-
-//				void setup(double _pixNoise = 1.0);
-
-
+			
 				/**
 				 * Predict appearance
 				 */
@@ -137,8 +132,8 @@ namespace jafar {
 					return measurement.matchScore;
 				}
 
-				virtual bool voteForReparametrizingLandmark(){
-					return false;
+				virtual double computeLinearityScore(){
+					return 0.0;
 				}
 
 				virtual void desc_image(image::oimstream& os) const;

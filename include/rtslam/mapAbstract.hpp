@@ -33,7 +33,7 @@ namespace jafar {
 		class RobotAbstract;
 		class LandmarkAbstract;
 		class MapManagerAbstract;
-	  class ObservationFactory;
+		class ObservationFactory;
 
 		/** Base class for all map types defined in the module rtslam.
 		 *

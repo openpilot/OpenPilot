@@ -239,7 +239,7 @@ namespace jafar {
 			ind_array ia_x = mapPtr->ia_used_states();
 			mapPtr->filterPtr->correct(ia_x,innovation,INN_rsl,ia_rsl) ;
 		}
-
+#if 0
 		bool ObservationAbstract::voteForKillingLandmark(){
 			// kill big ellipses
 			// FIXME this is ok for 1 sensor, but not for more, because it won't work with policy ALL
@@ -267,7 +267,7 @@ namespace jafar {
 			}
 			return false;
 		}
-
+#endif
 		void ObservationAbstract::transferInfoObs(observation_ptr_t & obs){
 			this->id(obs->id());
 			this->name(obs->name());

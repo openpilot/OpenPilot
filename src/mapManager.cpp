@@ -18,9 +18,13 @@ namespace jafar {
 	namespace rtslam {
 		using namespace std;
 
+		/** ***************************************************************************************
+			MapManagerAbstract
+		******************************************************************************************/
+	
 		observation_ptr_t MapManagerAbstract::createNewLandmark(data_manager_ptr_t dmaOrigin)
 		{
-			landmark_ptr_t newLmk = createLandmarkInit();
+			landmark_ptr_t newLmk = lmkFactory->createInit(mapPtr());
 			newLmk->setId();
 			newLmk->linkToParentMapManager(shared_from_this());
 			observation_ptr_t resObs;
@@ -65,27 +69,6 @@ namespace jafar {
 		}
 
 
-		void MapManagerAbstract::manage(void)
-		{
-			// foreach lmk
-			for (LandmarkList::iterator lmkIter = landmarkList().begin();
-			     lmkIter != landmarkList().end(); ++lmkIter)
-			{
-				landmark_ptr_t lmkPtr = *lmkIter;
-				if (lmkPtr->needToDie() )
-				{
-					lmkIter++;
-					unregisterLandmark(lmkPtr);
-					lmkIter--;
-				} else if (lmkPtr->needToReparametrize() )
-				{
-					lmkIter++;
-					reparametrizeLandmark(lmkPtr);
-					lmkIter--;
-				}
-			}
-		}
-
 
     void MapManagerAbstract::reparametrizeLandmark(landmark_ptr_t lmkinit)
 		{
@@ -96,9 +79,9 @@ namespace jafar {
 			//lmkinit->destroyDisplay(); // cannot do that here, display is using it...
 
 			// Create a new landmark advanced instead of the previous init lmk.
-			jblas::ind_array idxComp(sizeComplement());
+			jblas::ind_array idxComp(lmkFactory->sizeComplement());
 			//cout << __PRETTY_FUNCTION__ << "about to create lmkcv." << endl;
-			landmark_ptr_t lmkconv = createLandmarkConverged(lmkinit, idxComp);
+			landmark_ptr_t lmkconv = lmkFactory->createConverged(mapPtr(), lmkinit, idxComp);
 
 			// link new landmark
 			lmkconv->linkToParentMapManager(shared_from_this());
@@ -145,7 +128,144 @@ namespace jafar {
 			// liberate unused map space.
 			mapPtr()->liberateStates(idxComp);
 		}
+		
+		
+		/** ***************************************************************************************
+			MapManager
+		******************************************************************************************/
+		
+		void MapManager::manageDefaultDeletion()
+		{
+			for(LandmarkList::iterator lmkIter = landmarkList().begin();
+					 lmkIter != landmarkList().end(); ++lmkIter)
+			{
+				landmark_ptr_t lmkPtr = *lmkIter;
+				bool needToDie = false;
+				for(LandmarkAbstract::ObservationList::iterator obsIter = lmkPtr->observationList().begin();
+						obsIter != lmkPtr->observationList().end(); ++obsIter)
+				{ // all observations (sensors) must agree to delete a landmark
+					observation_ptr_t obsPtr = *obsIter;
 
+					JFR_ASSERT(obsPtr->counters.nMatch <= obsPtr->counters.nSearch, "counters.nMatch " 
+										 << obsPtr->counters.nMatch << " > counters.nSearch " << obsPtr->counters.nSearch);
+					JFR_ASSERT(obsPtr->counters.nInlier <= obsPtr->counters.nMatch, "counters.nInlier " 
+										 << obsPtr->counters.nInlier << " > counters.nMatch " << obsPtr->counters.nMatch);
+
+					// kill if any sensor has search area too large
+					if (obsPtr->events.predicted && obsPtr->events.measured && !obsPtr->events.updated)
+					{
+						if (obsPtr->searchSize > killSizeTh) {
+							JFR_DEBUG( "Obs " << lmkPtr->id() << " Killed by size (size " << obsPtr->searchSize << ")" );
+							needToDie = true;
+							break;
+						}
+					}
+				}
+				if (needToDie)
+				{
+					lmkIter = unregisterLandmark(lmkIter);
+				}
+			}
+		}
+		
+		void MapManager::manageReparametrization()
+		{
+			for(LandmarkList::iterator lmkIter = landmarkList().begin();
+					 lmkIter != landmarkList().end(); ++lmkIter)
+			{
+				landmark_ptr_t lmkPtr = *lmkIter;
+				if (lmkPtr->converged) continue; // already reparametrized, we don't go back for now
+				bool needToReparametrize = true;
+				bool hasObserved = false;
+				for(LandmarkAbstract::ObservationList::iterator obsIter = lmkPtr->observationList().begin();
+						obsIter != lmkPtr->observationList().end(); ++obsIter)
+				{ // all observations (sensors) must agree to reparametrize a landmark, and at least one must have observed it
+					observation_ptr_t obsPtr = *obsIter;
+					if (obsPtr->events.updated) hasObserved = true;
+					if (obsPtr->computeLinearityScore() > reparTh)
+					{
+						needToReparametrize = false;
+						break;
+					}
+				}
+				if (hasObserved && needToReparametrize)
+					lmkIter = reparametrizeLandmark(lmkIter);
+			}
+		}
+
+		
+		/** ***************************************************************************************
+			MapManagerOdometry
+		******************************************************************************************/
+		
+		void MapManagerOdometry::manageDeletion()
+		{
+			for(MapManagerAbstract::LandmarkList::iterator lmkIter = this->landmarkList().begin();
+					 lmkIter != this->landmarkList().end(); ++lmkIter)
+			{
+				landmark_ptr_t lmkPtr = *lmkIter;
+				bool needToDie = true;
+				for(LandmarkAbstract::ObservationList::iterator obsIter = lmkPtr->observationList().begin();
+						obsIter != lmkPtr->observationList().end(); ++obsIter)
+				{ // all observations (sensors) must agree to delete a landmark
+					observation_ptr_t obsPtr = *obsIter;
+
+					// kill if all sensors have unstable and inconsistent observations
+					if (obsPtr->events.updated) needToDie = false;
+				}
+				if (needToDie)
+					lmkIter = unregisterLandmark(lmkIter);
+			}
+		}
+		
+		
+		/** ***************************************************************************************
+			MapManagerGlobal
+		******************************************************************************************/
+		
+		void MapManagerGlobal::manageDeletion()
+		{
+			for(MapManagerAbstract::LandmarkList::iterator lmkIter = this->landmarkList().begin();
+					 lmkIter != this->landmarkList().end(); ++lmkIter)
+			{
+				landmark_ptr_t lmkPtr = *lmkIter;
+				bool needToDie = false;
+				for(LandmarkAbstract::ObservationList::iterator obsIter = lmkPtr->observationList().begin();
+						obsIter != lmkPtr->observationList().end(); ++obsIter)
+				{ // all observations (sensors) must agree to delete a landmark
+					observation_ptr_t obsPtr = *obsIter;
+		
+					// kill if all sensors have unstable and inconsistent observations
+					if (obsPtr->counters.nSearch > killSearchTh) {
+						needToDie = true;
+						double matchRatio = obsPtr->counters.nMatch / (double)obsPtr->counters.nSearch;
+						double consistencyRatio = obsPtr->counters.nInlier / (double)obsPtr->counters.nMatch;
+		
+						if (matchRatio >= killMatchTh && consistencyRatio >= killConsistencyTh)
+						{
+							needToDie = false;
+							break;
+						}
+					}
+				}
+				if (needToDie)
+				{
+					JFR_DEBUG( "Obs " << lmkPtr->id() << " Killed by unstability");
+					lmkIter = unregisterLandmark(lmkIter);
+				}
+			}
+		}
+		
+		 bool MapManagerGlobal::mapSpaceForInit()
+		{
+			if (!MapManager::mapSpaceForInit())
+			{
+				// TODO delete some landmarks
+				return false;
+			}
+			return true;
+		}
+		
 	}
 }
 

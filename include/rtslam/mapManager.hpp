@@ -11,13 +11,14 @@
 
 #include "rtslam/parents.hpp"
 #include "rtslam/mapAbstract.hpp"
+#include "rtslam/landmarkFactory.hpp"
 
 namespace jafar {
 	namespace rtslam {
 
 		class LandmarkAbstract;
 		class DataManagerAbstract;
-
+		
 		/**
 			This class is the abstract class for map managers, that manages
 			the life of landmarks at the map level (creation, 
@@ -40,56 +41,119 @@ namespace jafar {
 				ENABLE_ACCESS_TO_CHILDREN(DataManagerAbstract,DataManager,dataManager);
 
 			protected:
-				virtual landmark_ptr_t createLandmarkInit(void) = 0;
-				virtual landmark_ptr_t createLandmarkConverged(landmark_ptr_t lmkinit,
-					jblas::ind_array &_icomp) = 0;
-				/* Compute the size of the complement between init and
-				 * converged lmk, ie the difference of the size of the states. */
-				virtual size_t sizeComplement(void) = 0;
-
+				landmark_factory_ptr_t lmkFactory;
 			public:
+				MapManagerAbstract(landmark_factory_ptr_t lmkFactory):
+					lmkFactory(lmkFactory) {}
 				virtual ~MapManagerAbstract(void) {
 				}
-
-				virtual bool mapSpaceForInit() = 0;
-				/* Return the pointer to the created observation that correspond to the
-				 * dmaOrigin. */
+				/**
+				 Does map has enough space to init a new landmark ?
+				*/
+				virtual bool mapSpaceForInit() {
+					return mapPtr()->unusedStates(lmkFactory->sizeInit());
+				}
+				/**
+				 Return the pointer to the created observation that correspond to the dmaOrigin.
+				*/
 				observation_ptr_t createNewLandmark(data_manager_ptr_t dmaOrigin);
-				void reparametrizeLandmark(landmark_ptr_t lmk);
-				void unregisterLandmark(landmark_ptr_t lmk, bool liberateFilter = true);
-				void manage(void);
-				void manageMap(void);
+				void reparametrizeLandmark(landmark_ptr_t lmkIter);
+				LandmarkList::iterator reparametrizeLandmark(LandmarkList::iterator lmkIter)
+				{ // FIXME do better than this! will crash if only one element.
+					landmark_ptr_t lmkPtr = *lmkIter;
+					lmkIter++;
+					reparametrizeLandmark(lmkPtr);
+					lmkIter--;
+					return lmkIter;
+				}
+				void unregisterLandmark(landmark_ptr_t lmkIter, bool liberateFilter = true);
+				LandmarkList::iterator unregisterLandmark(LandmarkList::iterator lmkIter, bool liberateFilter = true)
+				{ // FIXME do better than this! will crash if only one element.
+					landmark_ptr_t lmkPtr = *lmkIter;
+					lmkIter++;
+					unregisterLandmark(lmkPtr, liberateFilter);
+					lmkIter--;
+					return lmkIter;
+				}
+
+				virtual void manage(void) = 0;
 		};
 
 		
 		/**
-			This class is a generic implementation of MapManagerAbstract, that
-			works with every type of landmark given they are provided as template
-			parameter.
+			This class is a default implementation of MapManagerAbstract,
+			that only reparametrize and kill landmarks with a too large search area
 		*/
-		template<class LandmarkInit, class LandmarkConverged>
 		class MapManager: public MapManagerAbstract {
 			protected:
-				virtual landmark_ptr_t createLandmarkInit(void) {
-					return boost::shared_ptr<LandmarkInit>(new LandmarkInit(mapPtr()));
-				}
-				virtual landmark_ptr_t createLandmarkConverged(landmark_ptr_t lmkinit,
-					jblas::ind_array &_icomp)
-				{
-					return boost::shared_ptr<LandmarkConverged>(
-						new LandmarkConverged(mapPtr(), lmkinit, _icomp));
-				}
-				virtual size_t sizeComplement(void) {
-					return (LandmarkInit::size() - LandmarkConverged::size());
-				}
+				double reparTh;    ///< linearity threshold for reparametrization
+				double killSizeTh; ///< maximum search size, if bigger it will be deleted
+			protected:
+				virtual void manageReparametrization();
+				virtual void manageDefaultDeletion();
+				virtual void manageDeletion() {}; // to overload
 			public:
-				virtual ~MapManager(void) {
-				}
-				virtual bool mapSpaceForInit() {
-					return mapPtr()->unusedStates(LandmarkInit::size());
+				MapManager(landmark_factory_ptr_t lmkFactory, double reparTh = 0.1, double killSizeTh = 100000):
+					MapManagerAbstract(lmkFactory), reparTh(reparTh), killSizeTh(killSizeTh) {}
+				virtual ~MapManager(void) {}
+								
+				virtual void manage()
+				{
+					manageDefaultDeletion();
+					manageDeletion();
+					manageReparametrization();
 				}
 		};
 
+		
+		/**
+			Map manager with a very short memory policy. It deletes very quickly
+			lost landmarks, so that it won't be able to close much loops, but can
+			track more landmarks and be faster.
+		*/
+		class MapManagerOdometry: public MapManager {
+			public:
+				MapManagerOdometry(landmark_factory_ptr_t lmkFactory, double reparTh, double killSizeTh):
+					MapManager(lmkFactory, reparTh, killSizeTh) {}
+				virtual void manageDeletion();
+		};
+		
+		
+		/**
+			Map manager made for doing slam as long as possible while optimizing
+			the use of the map. When the map is full, lower quality and spatially
+			redundant landmarks are removed to make room for new landmarks.
+		*/
+		class MapManagerGlobal: public MapManager {
+			protected:
+				double killSearchTh;      ///< minimum number of times the landmark must have been searched to be deleted for match or consistency reasons
+				double killMatchTh;       ///< ratio match/search threshold
+				double killConsistencyTh; ///< ratio consistency/search threshold
+			public:
+				MapManagerGlobal(landmark_factory_ptr_t lmkFactory, double reparTh, double killSizeTh,
+				                double killSearchTh, double killMatchTh, double killConsistencyTh):
+				  MapManager(lmkFactory, reparTh, killSizeTh),
+				  killSearchTh(killSearchTh), killMatchTh(killMatchTh), killConsistencyTh(killConsistencyTh) {}
+				virtual void manageDeletion();
+				virtual bool mapSpaceForInit();
+		};
+		
+		
+		/**
+			Map manager made for managing a spatially local map in a hierarchical
+			multimap framework. When the map is full, it is supposed to be closed.
+		*/
+		class MapManagerLocal: public MapManager {
+			public:
+				MapManagerLocal(landmark_factory_ptr_t lmkFactory, double reparTh, double killSizeTh):
+					MapManager(lmkFactory, reparTh, killSizeTh) {}
+				virtual void manageDeletion()
+				{
+					// TODO
+				}
+		};
+		
+		
 	}
 }
 

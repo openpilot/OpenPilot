@@ -28,14 +28,14 @@ namespace jafar {
 			converged = false;
 		}
 
-		bool LandmarkAnchoredHomogeneousPoint::needToDie(DecisionMethod dieMet){
+		bool LandmarkAnchoredHomogeneousPoint::needToDie(){
 			double rho = state.x(6);
 			if (rho < 0)
 			{
 				JFR_DEBUG( "Lmk AHP " << id() << " Killed by negative depth (" << rho << ")" );
 				return true;
 			}
-			return LandmarkAbstract::needToDie(dieMet);
+			return LandmarkAbstract::needToDie();
 		}
 
 	} // namespace rtslam

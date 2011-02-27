@@ -64,9 +64,6 @@ protected slots:
 protected:
     RawHIDConnection *m_rawhid;
     bool m_running;
-
-private:
-	QMutex	mutex;
 };
 
 
@@ -95,7 +92,6 @@ public:
 	bool deviceOpened() { return (RawHidHandle != NULL); }	// Pip
 
 signals:
-//	void availableDevChanged(QObject *obj);		// Pip
 	void deviceClosed(QObject *obj);			// Pip
 
 protected slots:

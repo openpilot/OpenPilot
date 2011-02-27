@@ -49,9 +49,7 @@ RawHIDEnumerationThread::RawHIDEnumerationThread(RawHIDConnection *rawhid) :
 
 RawHIDEnumerationThread::~RawHIDEnumerationThread()
 {
-	mutex.lock();
-		m_rawhid = NULL;	// safe guard
-	mutex.unlock();
+	m_rawhid = NULL;	// safe guard
 
     m_running = false;
 
@@ -62,8 +60,6 @@ RawHIDEnumerationThread::~RawHIDEnumerationThread()
 
 void RawHIDEnumerationThread::onRawHidConnectionDestroyed(QObject *obj)	// Pip
 {
-	QMutexLocker locker(&mutex);
-
 	if (!m_rawhid || m_rawhid != obj)
 		return;
 
@@ -78,8 +74,6 @@ void RawHIDEnumerationThread::run()
 
 	while (m_running)
     {
-		mutex.lock();	// Pip
-
 		// update available devices every second (doesn't need more)
 		if (m_rawhid)
 		{
@@ -102,8 +96,6 @@ void RawHIDEnumerationThread::run()
 		}
 		else
 			counter = 0;
-
-		mutex.unlock();	// Pip
 
 		msleep(10);
     }
@@ -153,13 +145,15 @@ QStringList RawHIDConnection::availableDevices()
 
     QStringList devices;
 
-    if (enablePolling) {
+	if (enablePolling)
+	{
         pjrc_rawhid dev;
-        //open all device we can
+
+		// open all device we can
 		int opened = dev.open(USB_MAX_DEVICES, USB_VID, USB_PID, USB_USAGE_PAGE, USB_USAGE);
 
-        //for each devices found, get serial number and close it back
-        for(int i=0; i<opened; i++)
+		// for each devices found, get serial number and close it back
+		for (int i = 0; i < opened; i++)
         {
             devices.append(dev.getserial(i));
             dev.close(i);

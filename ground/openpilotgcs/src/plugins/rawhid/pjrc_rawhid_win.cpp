@@ -341,9 +341,7 @@ QString pjrc_rawhid::getserial(int num)
 //
 void pjrc_rawhid::close(int num)
 {
-	hid_t *hid = get_hid(num);
-	if (hid && hid->open)
-		hid_close(hid);
+	hid_close(get_hid(num));
 }
 
 void pjrc_rawhid::add_hid(hid_t *h)
@@ -388,12 +386,10 @@ void pjrc_rawhid::free_all_hid(void)
 void pjrc_rawhid::hid_close(hid_t *hid)
 {
 	if (!hid) return;
+	if (!hid->handle || !hid->open) return;
 
-	if (hid->handle)
-	{
-		CloseHandle(hid->handle);
-		hid->handle = NULL;
-	}
+	CloseHandle(hid->handle);
+	hid->handle = NULL;
 }
 
 void pjrc_rawhid::print_win32_err(void)

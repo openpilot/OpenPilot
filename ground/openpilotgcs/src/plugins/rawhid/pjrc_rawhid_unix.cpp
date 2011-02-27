@@ -275,9 +275,7 @@ QString pjrc_rawhid::getserial(int num) {
 //
 void pjrc_rawhid::close(int num)
 {
-	hid_t *hid = get_hid(num);
-	if (hid && !hid->open)
-		hid_close(hid);
+	hid_close(get_hid(num));
 }
 
 // Chuck Robey wrote a real HID report parser
@@ -358,6 +356,7 @@ void pjrc_rawhid::free_all_hid(void)
 void pjrc_rawhid::hid_close(hid_t *hid)
 {
 	if (!hid) return;
+	if (!hid->handle || !hid->open) return;
 
     usb_release_interface(hid->usb, hid->iface);
 

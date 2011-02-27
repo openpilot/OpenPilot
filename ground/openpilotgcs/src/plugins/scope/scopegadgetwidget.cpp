@@ -155,13 +155,19 @@ void ScopeGadgetWidget::wheelEvent(QWheelEvent *e)
  */
 void ScopeGadgetWidget::startPlotting()
 {
+	if (!replotTimer)
+		return;
+
 	if (!replotTimer->isActive())
         replotTimer->start(m_refreshInterval);
 }
 
 void ScopeGadgetWidget::stopPlotting()
 {
-    replotTimer->stop();
+	if (!replotTimer)
+		return;
+
+	replotTimer->stop();
 }
 
 void ScopeGadgetWidget::deleteLegend()
@@ -172,6 +178,7 @@ void ScopeGadgetWidget::deleteLegend()
 	disconnect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)), this, 0);
 
 	insertLegend(NULL, QwtPlot::TopLegend);
+//	insertLegend(NULL, QwtPlot::ExternalLegend);
 }
 
 void ScopeGadgetWidget::addLegend()
@@ -186,12 +193,13 @@ void ScopeGadgetWidget::addLegend()
 	legend->setToolTip(tr("Click legend to show/hide scope trace"));
 
 	QPalette pal = legend->palette();
-//	pal.setColor(QPalette::Window, QColor(64, 64, 64));				// background colour
 	pal.setColor(legend->backgroundRole(), QColor(100, 100, 100));	// background colour
+//	pal.setColor(legend->backgroundRole(), Qt::transparent);		// background colour
 	pal.setColor(QPalette::Text, QColor(255, 255, 255));			// text colour
 	legend->setPalette(pal);
 
 	insertLegend(legend, QwtPlot::TopLegend);
+//	insertLegend(legend, QwtPlot::ExternalLegend);
 
 //	// Show a legend at the bottom
 //	QwtLegend *legend = new QwtLegend();
@@ -234,15 +242,13 @@ void ScopeGadgetWidget::preparePlot(PlotType plotType)
 
     // Only start the timer if we are already connected
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-    if (cm->getCurrentConnection()) {
-        if(!replotTimer->isActive())
-            replotTimer->start(m_refreshInterval);
-        else
-        {
-            replotTimer->setInterval(m_refreshInterval);
-        }
-    }
-
+	if (cm->getCurrentConnection() && replotTimer)
+	{
+		if (!replotTimer->isActive())
+			replotTimer->start(m_refreshInterval);
+		else
+			replotTimer->setInterval(m_refreshInterval);
+	}
 }
 
 void ScopeGadgetWidget::showCurve(QwtPlotItem *item, bool on)

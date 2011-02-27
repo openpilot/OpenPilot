@@ -291,10 +291,10 @@ RawHID::RawHID(const QString &deviceName)
     m_writeThread(NULL)
 {
     //find the device the user want to open and close the other
-    int opened = dev.open(MAX_DEVICES, VID, PID, USAGE_PAGE, USAGE);
+	int opened = dev.open(USB_MAX_DEVICES, USB_VID, USB_PID, USB_USAGE_PAGE, USB_USAGE);
 
     //for each devices found, get serial number and close
-    for(int i=0; i<opened; i++)
+	for (int i=0; i<opened; i++)
     {
         if(deviceName == dev.getserial(i))
             m_deviceNo = i;
@@ -303,7 +303,7 @@ RawHID::RawHID(const QString &deviceName)
     }
 
     //didn't find the device we are trying to open (shouldnt happen)
-    if(m_deviceNo < 0)
+	if (m_deviceNo < 0)
     {
         qDebug() << "Error: cannot open device " << deviceName;
         return;

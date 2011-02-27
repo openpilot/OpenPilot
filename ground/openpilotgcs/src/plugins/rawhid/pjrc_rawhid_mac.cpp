@@ -85,6 +85,10 @@ pjrc_rawhid::pjrc_rawhid()
     last_hid = NULL;
 }
 
+pjrc_rawhid::~pjrc_rawhid()
+{
+}
+
 //  open - open 1 or more devices
 //
 //    Inputs:

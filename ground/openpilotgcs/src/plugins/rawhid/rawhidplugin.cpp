@@ -156,7 +156,7 @@ QStringList RawHIDConnection::availableDevices()
     if (enablePolling) {
         pjrc_rawhid dev;
         //open all device we can
-        int opened = dev.open(MAX_DEVICES, VID, PID, USAGE_PAGE, USAGE);
+		int opened = dev.open(USB_MAX_DEVICES, USB_VID, USB_PID, USB_USAGE_PAGE, USB_USAGE);
 
         //for each devices found, get serial number and close it back
         for(int i=0; i<opened; i++)

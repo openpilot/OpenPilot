@@ -8,5 +8,5 @@
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>
         <logging updatemode="periodic" period="1000"/>
-	</object>
+    </object>
 </xml>

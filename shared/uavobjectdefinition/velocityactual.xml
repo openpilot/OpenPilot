@@ -1,6 +1,6 @@
 <xml>
     <object name="VelocityActual" singleinstance="true" settings="false">
-        <description>Updated by @ref AHRSCommsModule and used within @ref GuidanceModulefor velocity control</description>
+        <description>Updated by @ref AHRSCommsModule and used within @ref GuidanceModule for velocity control</description>
         <field name="North" units="cm/s" type="int32" elements="1"/>
         <field name="East" units="cm/s" type="int32" elements="1"/>
         <field name="Down" units="cm/s" type="int32" elements="1"/>

@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -26,8 +26,8 @@
       <widget class="QLabel" name="ch0Max">
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>10</y>
+         <x>530</x>
+         <y>40</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -53,8 +53,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch0Cur">
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>160</y>
+         <x>160</x>
+         <y>40</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -79,8 +79,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch1Min">
        <property name="geometry">
         <rect>
-         <x>100</x>
-         <y>130</y>
+         <x>210</x>
+         <y>60</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -101,13 +101,16 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="text">
         <string>1000</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
       <widget class="QLabel" name="ch6Min">
        <property name="geometry">
         <rect>
-         <x>450</x>
-         <y>130</y>
+         <x>210</x>
+         <y>160</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -129,12 +132,15 @@ p, li { white-space: pre-wrap; }
        <property name="text">
         <string>1000</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
       </widget>
       <widget class="QLabel" name="ch7Cur">
        <property name="geometry">
         <rect>
-         <x>520</x>
-         <y>160</y>
+         <x>160</x>
+         <y>180</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -159,8 +165,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch4Max">
        <property name="geometry">
         <rect>
-         <x>310</x>
-         <y>10</y>
+         <x>530</x>
+         <y>120</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -186,8 +192,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch7Min">
        <property name="geometry">
         <rect>
-         <x>520</x>
-         <y>130</y>
+         <x>210</x>
+         <y>180</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -209,12 +215,15 @@ p, li { white-space: pre-wrap; }
        <property name="text">
         <string>1000</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
       </widget>
       <widget class="QPushButton" name="getRCInputCurrent">
        <property name="geometry">
         <rect>
          <x>250</x>
-         <y>240</y>
+         <y>210</y>
          <width>93</width>
          <height>27</height>
         </rect>
@@ -229,8 +238,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch2Min">
        <property name="geometry">
         <rect>
-         <x>170</x>
-         <y>130</y>
+         <x>210</x>
+         <y>80</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -252,12 +261,15 @@ p, li { white-space: pre-wrap; }
        <property name="text">
         <string>1000</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
       </widget>
       <widget class="QLabel" name="ch6Max">
        <property name="geometry">
         <rect>
-         <x>450</x>
-         <y>10</y>
+         <x>530</x>
+         <y>160</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -283,8 +295,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch5Max">
        <property name="geometry">
         <rect>
-         <x>380</x>
-         <y>10</y>
+         <x>530</x>
+         <y>140</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -310,8 +322,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch3Max">
        <property name="geometry">
         <rect>
-         <x>240</x>
-         <y>10</y>
+         <x>530</x>
+         <y>100</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -337,8 +349,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QPushButton" name="saveRCInputToSD">
        <property name="geometry">
         <rect>
-         <x>470</x>
-         <y>240</y>
+         <x>430</x>
+         <y>210</y>
          <width>93</width>
          <height>27</height>
         </rect>
@@ -354,8 +366,8 @@ Applies and Saves all settings to SD</string>
       <widget class="QLabel" name="ch4Cur">
        <property name="geometry">
         <rect>
-         <x>310</x>
-         <y>160</y>
+         <x>160</x>
+         <y>120</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -380,8 +392,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch4Min">
        <property name="geometry">
         <rect>
-         <x>310</x>
-         <y>130</y>
+         <x>210</x>
+         <y>120</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -403,12 +415,15 @@ p, li { white-space: pre-wrap; }
        <property name="text">
         <string>1000</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
       </widget>
       <widget class="QPushButton" name="saveRCInputToRAM">
        <property name="geometry">
         <rect>
-         <x>360</x>
-         <y>240</y>
+         <x>340</x>
+         <y>210</y>
          <width>93</width>
          <height>27</height>
         </rect>
@@ -424,9 +439,9 @@ Be sure to set the Neutral position on all sliders before sending!</string>
       <widget class="QComboBox" name="ch0Assign">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>180</y>
-         <width>68</width>
+         <x>20</x>
+         <y>40</y>
+         <width>131</width>
          <height>21</height>
         </rect>
        </property>
@@ -449,8 +464,8 @@ Be sure to set the Neutral position on all sliders before sending!</string>
       <widget class="QLabel" name="ch3Min">
        <property name="geometry">
         <rect>
-         <x>240</x>
-         <y>130</y>
+         <x>210</x>
+         <y>100</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -472,12 +487,15 @@ p, li { white-space: pre-wrap; }
        <property name="text">
         <string>1000</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
       </widget>
       <widget class="QLabel" name="ch7Max">
        <property name="geometry">
         <rect>
-         <x>520</x>
-         <y>10</y>
+         <x>530</x>
+         <y>180</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -503,8 +521,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch2Cur">
        <property name="geometry">
         <rect>
-         <x>170</x>
-         <y>160</y>
+         <x>160</x>
+         <y>80</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -529,8 +547,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch5Cur">
        <property name="geometry">
         <rect>
-         <x>380</x>
-         <y>160</y>
+         <x>160</x>
+         <y>140</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -555,8 +573,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch5Min">
        <property name="geometry">
         <rect>
-         <x>380</x>
-         <y>130</y>
+         <x>210</x>
+         <y>140</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -578,12 +596,15 @@ p, li { white-space: pre-wrap; }
        <property name="text">
         <string>1000</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
       </widget>
       <widget class="QLabel" name="ch1Cur">
        <property name="geometry">
         <rect>
-         <x>100</x>
-         <y>160</y>
+         <x>160</x>
+         <y>60</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -608,7 +629,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch6Cur">
        <property name="geometry">
         <rect>
-         <x>450</x>
+         <x>160</x>
          <y>160</y>
          <width>31</width>
          <height>17</height>
@@ -634,8 +655,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch3Cur">
        <property name="geometry">
         <rect>
-         <x>240</x>
-         <y>160</y>
+         <x>160</x>
+         <y>100</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -660,8 +681,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch2Max">
        <property name="geometry">
         <rect>
-         <x>170</x>
-         <y>10</y>
+         <x>530</x>
+         <y>80</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -687,8 +708,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch1Max">
        <property name="geometry">
         <rect>
-         <x>100</x>
-         <y>10</y>
+         <x>530</x>
+         <y>60</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -714,8 +735,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch0Min">
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>130</y>
+         <x>210</x>
+         <y>40</y>
          <width>31</width>
          <height>17</height>
         </rect>
@@ -737,13 +758,16 @@ p, li { white-space: pre-wrap; }
        <property name="text">
         <string>1000</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
       </widget>
       <widget class="QComboBox" name="ch1Assign">
        <property name="geometry">
         <rect>
-         <x>80</x>
-         <y>180</y>
-         <width>68</width>
+         <x>20</x>
+         <y>60</y>
+         <width>131</width>
          <height>21</height>
         </rect>
        </property>
@@ -757,9 +781,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QComboBox" name="ch2Assign">
        <property name="geometry">
         <rect>
-         <x>150</x>
-         <y>180</y>
-         <width>68</width>
+         <x>20</x>
+         <y>80</y>
+         <width>131</width>
          <height>21</height>
         </rect>
        </property>
@@ -773,9 +797,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QComboBox" name="ch3Assign">
        <property name="geometry">
         <rect>
-         <x>220</x>
-         <y>180</y>
-         <width>68</width>
+         <x>20</x>
+         <y>100</y>
+         <width>131</width>
          <height>21</height>
         </rect>
        </property>
@@ -789,9 +813,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QComboBox" name="ch4Assign">
        <property name="geometry">
         <rect>
-         <x>290</x>
-         <y>180</y>
-         <width>68</width>
+         <x>20</x>
+         <y>120</y>
+         <width>131</width>
          <height>21</height>
         </rect>
        </property>
@@ -805,9 +829,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QComboBox" name="ch5Assign">
        <property name="geometry">
         <rect>
-         <x>360</x>
-         <y>180</y>
-         <width>68</width>
+         <x>20</x>
+         <y>140</y>
+         <width>131</width>
          <height>21</height>
         </rect>
        </property>
@@ -821,9 +845,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QComboBox" name="ch6Assign">
        <property name="geometry">
         <rect>
-         <x>430</x>
-         <y>180</y>
-         <width>68</width>
+         <x>20</x>
+         <y>160</y>
+         <width>131</width>
          <height>21</height>
         </rect>
        </property>
@@ -837,9 +861,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QComboBox" name="ch7Assign">
        <property name="geometry">
         <rect>
-         <x>500</x>
+         <x>20</x>
          <y>180</y>
-         <width>68</width>
+         <width>131</width>
          <height>21</height>
         </rect>
        </property>
@@ -854,7 +878,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>240</y>
+         <y>210</y>
          <width>131</width>
          <height>22</height>
         </rect>
@@ -874,7 +898,7 @@ Neutral should be put at the bottom of the slider for the throttle.</string>
        <property name="geometry">
         <rect>
          <x>250</x>
-         <y>210</y>
+         <y>10</y>
          <width>311</width>
          <height>20</height>
         </rect>
@@ -896,9 +920,9 @@ Neutral should be put at the bottom of the slider for the throttle.</string>
       <widget class="QComboBox" name="receiverType">
        <property name="geometry">
         <rect>
-         <x>130</x>
-         <y>210</y>
-         <width>89</width>
+         <x>140</x>
+         <y>10</y>
+         <width>91</width>
          <height>21</height>
         </rect>
        </property>
@@ -912,8 +936,8 @@ Neutral should be put at the bottom of the slider for the throttle.</string>
       <widget class="QLabel" name="label_2">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>210</y>
+         <x>20</x>
+         <y>10</y>
          <width>111</width>
          <height>17</height>
         </rect>
@@ -929,7 +953,7 @@ Neutral should be put at the bottom of the slider for the throttle.</string>
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>270</y>
+         <y>240</y>
          <width>531</width>
          <height>41</height>
         </rect>
@@ -943,44 +967,13 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; color:#ff0000;&quot;&gt;when running calibration!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
-      <widget class="WidgetBar" name="widgetBarCH0" native="true">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>30</y>
-         <width>68</width>
-         <height>100</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>1</width>
-         <height>1</height>
-        </size>
-       </property>
-       <property name="mouseTracking">
-        <bool>false</bool>
-       </property>
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(165, 165, 165);</string>
-       </property>
-      </widget>
       <widget class="WidgetBar" name="widgetBarCH1" native="true">
        <property name="geometry">
         <rect>
-         <x>80</x>
-         <y>30</y>
-         <width>68</width>
-         <height>100</height>
+         <x>250</x>
+         <y>60</y>
+         <width>271</width>
+         <height>21</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -1008,10 +1001,10 @@ p, li { white-space: pre-wrap; }
       <widget class="WidgetBar" name="widgetBarCH2" native="true">
        <property name="geometry">
         <rect>
-         <x>150</x>
-         <y>30</y>
-         <width>68</width>
-         <height>100</height>
+         <x>250</x>
+         <y>80</y>
+         <width>271</width>
+         <height>21</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -1039,10 +1032,10 @@ p, li { white-space: pre-wrap; }
       <widget class="WidgetBar" name="widgetBarCH3" native="true">
        <property name="geometry">
         <rect>
-         <x>220</x>
-         <y>30</y>
-         <width>68</width>
-         <height>100</height>
+         <x>250</x>
+         <y>100</y>
+         <width>271</width>
+         <height>21</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -1070,10 +1063,10 @@ p, li { white-space: pre-wrap; }
       <widget class="WidgetBar" name="widgetBarCH4" native="true">
        <property name="geometry">
         <rect>
-         <x>290</x>
-         <y>30</y>
-         <width>68</width>
-         <height>100</height>
+         <x>250</x>
+         <y>120</y>
+         <width>271</width>
+         <height>21</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -1101,10 +1094,10 @@ p, li { white-space: pre-wrap; }
       <widget class="WidgetBar" name="widgetBarCH5" native="true">
        <property name="geometry">
         <rect>
-         <x>360</x>
-         <y>30</y>
-         <width>68</width>
-         <height>100</height>
+         <x>250</x>
+         <y>140</y>
+         <width>271</width>
+         <height>21</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -1132,10 +1125,10 @@ p, li { white-space: pre-wrap; }
       <widget class="WidgetBar" name="widgetBarCH6" native="true">
        <property name="geometry">
         <rect>
-         <x>430</x>
-         <y>30</y>
-         <width>68</width>
-         <height>100</height>
+         <x>250</x>
+         <y>160</y>
+         <width>271</width>
+         <height>21</height>
         </rect>
        </property>
        <property name="sizePolicy">
@@ -1163,10 +1156,41 @@ p, li { white-space: pre-wrap; }
       <widget class="WidgetBar" name="widgetBarCH7" native="true">
        <property name="geometry">
         <rect>
-         <x>500</x>
-         <y>30</y>
-         <width>68</width>
-         <height>100</height>
+         <x>250</x>
+         <y>180</y>
+         <width>271</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>1</width>
+         <height>1</height>
+        </size>
+       </property>
+       <property name="mouseTracking">
+        <bool>false</bool>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(165, 165, 165);</string>
+       </property>
+      </widget>
+      <widget class="WidgetBar" name="widgetBarCH0" native="true">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>40</y>
+         <width>271</width>
+         <height>21</height>
         </rect>
        </property>
        <property name="sizePolicy">

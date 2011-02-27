@@ -37,7 +37,8 @@
 	m_minimum = 1000;
 	m_value = 1500;
 
-	m_orientation = Qt::Vertical;
+//	m_orientation = Qt::Vertical;
+	m_orientation = Qt::Horizontal;
 
 	setBackgroundRole(QPalette::Base);
 	setAutoFillBackground(true);
@@ -120,7 +121,8 @@ void WidgetBar::paintEvent(QPaintEvent * /* event */)
 	// background
 //	painter.setPen(QColor(160, 160, 160));
 //	painter.setBrush(QColor(255, 255, 255));
-	painter.setPen(QColor(80, 80, 80));
+//	painter.setPen(QColor(80, 80, 80));
+	painter.setPen(QColor(160, 160, 160));
 	painter.setBrush(QColor(160, 160, 160));
 	painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
 
@@ -139,10 +141,11 @@ void WidgetBar::paintEvent(QPaintEvent * /* event */)
 			else
 //				painter.setPen(QColor(0, 255, 0));		// green
 				painter.setPen(QColor(128, 128, 255));	// blue
-			if (m_orientation == Qt::Vertical)
-				painter.drawLine(rect.left(), rect.bottom() + 1 - i, rect.right() + 1, rect.bottom() + 1 - i);	// vertical bar
+
+			if (m_orientation == Qt::Horizontal)
+				painter.drawLine(rect.left() + i, rect.top(), rect.left() + i, rect.bottom() + 1);				// horizontal bar
 			else
-				painter.drawLine(rect.top(), rect.left() + i, rect.bottom(), rect.left() + i);					// horizontal bar
+				painter.drawLine(rect.left(), rect.bottom() + 1 - i, rect.right() + 1, rect.bottom() + 1 - i);	// vertical bar
 		}
 	}
 }

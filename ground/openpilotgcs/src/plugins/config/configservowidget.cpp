@@ -275,6 +275,8 @@ void ConfigServoWidget::onTelemetryConnect()
 void ConfigServoWidget::onTelemetryDisconnect()
 {
 	enableControls(false);
+
+	m_config->doRCInputCalibration->setChecked(false);
 }
 
 // ************************************
@@ -296,6 +298,8 @@ void ConfigServoWidget::enableControls(bool enable)
 	m_config->saveRCOutputToSD->setEnabled(enable);
 	m_config->saveRCOutputToRAM->setEnabled(enable);
 	m_config->getRCOutputCurrent->setEnabled(enable);
+
+	m_config->doRCInputCalibration->setEnabled(enable);
 }
 
 /**

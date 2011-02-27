@@ -1,0 +1,42 @@
+
+The OpenPilot code is licensed under the GPLv3, there are a few minor exceptions to this so please see the headers of all source code for copyright and license information.
+
+The full text of the GPLv3 can be read here: http://www.gnu.org/licenses/gpl-3.0.txt
+
+Artwork is licensed under the Creative Commons BY-SA v3 license. 
+
+Documentation including translations is also licensed under the Creative Commons BY-SA v3 license.
+
+For details please see: http://creativecommons.org/licenses/by-sa/3.0/
+
+Licenses for the hardware files are included in the directories that contain the hardware, not all items are under the same license and you must check the files for each individual hardware design.   
+
+Please note that some of the hardware files are licensed under the Creative Commons BY-NC-SA v3 license, this is a Non-commercial license. OpenPilot is purely a non-profit hobby project with zero commercial intent, if you just want people to work for free or do your R&D for zero cost, please find a project that allows this as that not what OpenPilot is about.  
+We are hobbyists and we want to share our work with fellow hobbyists, additionally we need to ensure the future of the project and make sure it is sustainable.  
+
+If you wish to sell / distribute OpenPilot hardware or derivatives of OpenPilot hardware that are under a non-commercial license, please get in touch with one of the members of OpenPilot Foundation's administration committee. We can then negotiate a license waiver where a portion of the profits are donated to the OpenPilot Project to ensure its survival and future progression. Please note that this is in reference to PCB and Schematic designs, for people wishing to combine OpenPilot in to a Ready to Fly solution, this is perfectly fine as long as OpenPilot PCBs are bought from the OpenPilot project or one of the approved distributors.    
+
+For details the Non-Commercial license please see: http://creativecommons.org/licenses/by-nc-sa/3.0/
+
+A quick summary of what this license talk means, firstly using any work that is licensed under a form of the Creative Commons BY license, requires that credit is to be given. 
+
+The SA or Share Alike part of the license means that you must also use the same license in any work derived from the work under this license.  
+
+Hardware 
+The items under the non-commercial license means exactly that: they are for non-commercial use only and any derivatives that are made are also covered by the same non-commercial license. The hardware files under a non-commercial license are for  
+reference and for fellow hobbyists; they are not to be used to generate profit of any kind. Please note that even the OpenPilot project its self is a non-profit project. 
+
+For all items both non-commercial and items that allows commercial use, the OP logo must be placed on any work or derivative work and be clearly visible. If any web addresses are present on the hardware, these are also required to remain on any replications or any derivative work. 
+
+Documentation
+In documentation, authors names must be kept along with any logos. If documentation is for a physical product such as a schematic, the OpenPilot logo should be shown and any web addresses also displayed on the final physical hardware it was derived from.       
+
+Artwork
+If artwork is to be reused, the OpenPilot project should be credited. If for example this is a software application, credit should be given on the application splash screen or in a separate part of the application that is visible to users. For example the Help / About screen.  
+
+Contact Us
+If you are unsure, please contact one of the OpenPilot Foundation's administrators. Additionally, if you plan to use parts of the OpenPilot project in your own work, we would appreciate it if you get in touch with us anyway, it is possible we could combine efforts or have some work already in progress that might be helpful. This of course is our baby and we want to see what great things people do with it as well. 
+
+A final note, OpenPilot is a non-profit for fun project and we have only volunteers. A great deal of time, money and effort has been donated to this project; please respect the people that are part of it and their generosity. OpenPilot is funded entirely by the generous people who donate money and time to the community and help it grow. Giving full and proper credit is not only a legal requirement of the CC-BY-SA license, it is also the right thing to do. 
+
+Buying hardware from the OpenPilot project is very important to the survival and continuing progress of the project, a project like OpenPilot is extremely expensive to produce. 

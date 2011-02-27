@@ -40,7 +40,9 @@ TelemetryManager::TelemetryManager()
 
 	moveToThread(Core::ICore::instance()->threadManager()->getRealTimeThread());
 
-	QMutexLocker locker(&mutex);	// Pip
+	mutex = new QMutex(QMutex::Recursive);	// Pip
+
+	QMutexLocker locker(mutex);	// Pip
 
 	// Get UAVObjectManager instance
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -59,14 +61,14 @@ TelemetryManager::TelemetryManager()
 TelemetryManager::~TelemetryManager()
 {
 	// Pip
-	mutex.lock();
+	mutex->lock();
 //		deleteObjects();
-	mutex.unlock();
+	mutex->unlock();
 }
 
 void TelemetryManager::onObjectDestroyed(QObject *obj)		// Pip
 {
-	QMutexLocker locker(&mutex);
+	QMutexLocker locker(mutex);
 	deleteObjects();
 }
 
@@ -78,7 +80,7 @@ void TelemetryManager::start(QIODevice *dev)
 
 void TelemetryManager::onStart()
 {
-	QMutexLocker locker(&mutex);	// Pip
+	QMutexLocker locker(mutex);	// Pip
 
 	deleteObjects();	// Pip
 
@@ -115,10 +117,10 @@ void TelemetryManager::stop()
 
 void TelemetryManager::onStop()
 {
-	mutex.lock();			// Pip
+	mutex->lock();			// Pip
 		if (telemetryMon) telemetryMon->disconnect(this);
 		deleteObjects();
-	mutex.unlock();
+	mutex->unlock();
 
 	onDisconnect();
 }

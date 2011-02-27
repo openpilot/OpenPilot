@@ -69,7 +69,7 @@ private:
     Telemetry* telemetry;
     TelemetryMonitor* telemetryMon;
     QIODevice *device;
-	QMutex mutex;
+	QMutex *mutex;
 
 	void deleteObjects();	// Pip
 };

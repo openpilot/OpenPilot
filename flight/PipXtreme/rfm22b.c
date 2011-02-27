@@ -1854,6 +1854,11 @@ int rfm22_resetModule(uint8_t mode)
 
 		// set SPI port SCLK frequency .. 4.5MHz
 		PIOS_SPI_SetClockSpeed(RFM22_PIOS_SPI, PIOS_SPI_PRESCALER_16);
+		// set SPI port SCLK frequency .. 2.25MHz
+//		PIOS_SPI_SetClockSpeed(RFM22_PIOS_SPI, PIOS_SPI_PRESCALER_32);
+
+		// set SPI port SCLK frequency .. 285kHz .. purely for hardware fault finding
+//		PIOS_SPI_SetClockSpeed(RFM22_PIOS_SPI, PIOS_SPI_PRESCALER_256);
 
 		// ****************
 		// software reset the RF chip .. following procedure according to Si4x3x Errata (rev. B)
@@ -1941,22 +1946,32 @@ int rfm22_resetModule(uint8_t mode)
 	// read the RF chip ID bytes
 
 	device_type = rfm22_read(RFM22_DEVICE_TYPE) & RFM22_DT_MASK;		// read the device type
+	device_version = rfm22_read(RFM22_DEVICE_VERSION) & RFM22_DV_MASK;	// read the device version
+
 	#if defined(RFM22_DEBUG)
 		DEBUG_PRINTF("rf device type: %d\r\n", device_type);
-	#endif
-	if (device_type != 0x08)
-		return -1;	// incorrect RF module type
-
-	device_version = rfm22_read(RFM22_DEVICE_VERSION) & RFM22_DV_MASK;	// read the device version
-	#if defined(RFM22_DEBUG)
 		DEBUG_PRINTF("rf device version: %d\r\n", device_version);
 	#endif
+
+	if (device_type != 0x08)
+	{
+		#if defined(RFM22_DEBUG)
+			DEBUG_PRINTF("rf device type: INCORRECT - should be 0x08\r\n");
+		#endif
+		return -1;	// incorrect RF module type
+	}
+
 //	if (device_version != RFM22_DEVICE_VERSION_V2)	// V2
 //		return -2;	// incorrect RF module version
 //	if (device_version != RFM22_DEVICE_VERSION_A0)	// A0
 //		return -2;	// incorrect RF module version
 	if (device_version != RFM22_DEVICE_VERSION_B1)	// B1
+	{
+		#if defined(RFM22_DEBUG)
+			DEBUG_PRINTF("rf device version: INCORRECT\r\n");
+		#endif
 		return -2;	// incorrect RF module version
+	}
 
 	// ****************
 

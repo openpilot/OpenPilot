@@ -323,10 +323,10 @@ void init_RF_module(void)
 
         default:
             #if defined(PIOS_COM_DEBUG)
-                DEBUG_PRINTF("UNKNOWN BAND ERROR\r\n", i);
+                DEBUG_PRINTF("UNKNOWN BAND ERROR\r\n\r\n", i);
             #endif
 
-            for (int j = 0; j < 8; j++)
+            for (int j = 0; j < 16; j++)
             {
                 USB_LED_ON;
                 LINK_LED_OFF;
@@ -359,10 +359,10 @@ void init_RF_module(void)
     {	// RF module error .. flash the LED's
 
         #if defined(PIOS_COM_DEBUG)
-            DEBUG_PRINTF("RF ERROR res: %d\r\n", i);
+            DEBUG_PRINTF("RF ERROR res: %d\r\n\r\n", i);
         #endif
 
-        for (int j = 0; j < 6; j++)
+        for (int j = 0; j < 16; j++)
         {
             USB_LED_ON;
             LINK_LED_ON;

@@ -230,11 +230,14 @@ static void gpsTask(void *parameters)
 				else
 				if (found_cr && (c == '\n') )
 				{
+					// The NMEA functions require a zero-terminated string
+					// As we detected \r\n, the string as for sure 2 bytes long, we will also strip the \r\n
+					gps_rx_buffer[rx_count-2] = 0;
+
 					// prepare to parse next sentence
 					start_flag = false;
 					found_cr = false;
 					rx_count = 0;
-				
 					// Our rxBuffer must look like this now:
 					//   [0]           = '$'
 					//   ...           = zero or more bytes of sentence payload
@@ -246,12 +249,17 @@ static void gpsTask(void *parameters)
 					// Validate the checksum over the sentence
 					if (!NMEA_checksum(&gps_rx_buffer[1]))
 					{	// Invalid checksum.  May indicate dropped characters on Rx.
+						PIOS_DEBUG_PinHigh(2);
 						++numChecksumErrors;
+						PIOS_DEBUG_PinLow(2);
 					}
 					else
 					{	// Valid checksum, use this packet to update the GPS position
-						if (!NMEA_update_position(&gps_rx_buffer[1]))
+						if (!NMEA_update_position(&gps_rx_buffer[1])) {
+							PIOS_DEBUG_PinHigh(2);
 							++numParsingErrors;
+							PIOS_DEBUG_PinLow(2);
+						}
 						else
 							++numUpdates;
 

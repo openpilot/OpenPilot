@@ -46,12 +46,6 @@
 
 #include "uavtalk/telemetrymanager.h"
 
-#include "extensionsystem/pluginmanager.h"
-#include "uavobjectutilmanager.h"
-#include "uavobjectmanager.h"
-#include "uavobject.h"
-#include "objectpersistence.h"
-
 #include "positionactual.h"
 #include "homelocation.h"
 
@@ -91,6 +85,10 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_mouse_waypoint = NULL;
 
+	pm = NULL;
+	obm = NULL;
+	obum = NULL;
+
     prev_tile_number = 0;
 
     min_zoom = max_zoom = 0;
@@ -103,18 +101,22 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     setMouseTracking(true);
 
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+	pm = ExtensionSystem::PluginManager::instance();
+	if (pm)
+	{
+		obm = pm->getObject<UAVObjectManager>();
+		obum = pm->getObject<UAVObjectUtilManager>();
+	}
 
-    // **************
+	// **************
     // get current location
 
     double latitude = 0;
     double longitude = 0;
     double altitude = 0;
 
-    // current position
-    getUAV_LLA(latitude, longitude, altitude);
-    //getGPS_LLA(latitude, longitude, altitude);
+	// current position
+	getUAVPosition(latitude, longitude, altitude);
 
     internals::PointLatLng pos_lat_lon = internals::PointLatLng(latitude, longitude);
 
@@ -276,13 +278,12 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     if (pm)
     {
         // Register for Home Location state changes
-        UAVObjectManager *obm = pm->getObject<UAVObjectManager>();
         if (obm)
         {
-            UAVDataObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("HomeLocation")));
+			UAVDataObject *obj = dynamic_cast<UAVDataObject *>(obm->getObject(QString("HomeLocation")));
             if (obj)
             {
-                connect(obj, SIGNAL(objectUpdated(UAVObject*)), this , SLOT(homePositionUpdated(UAVObject*)));
+				connect(obj, SIGNAL(objectUpdated(UAVObject *)), this , SLOT(homePositionUpdated(UAVObject *)));
             }
         }
 
@@ -346,7 +347,11 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
     m_waypoint_list_mutex.unlock();
     m_waypoint_list.clear();
 
-	if (m_map) delete m_map;
+	if (m_map)
+	{
+		delete m_map;
+		m_map = NULL;
+	}
 }
 
 // *************************************************************************************
@@ -625,7 +630,7 @@ void OPMapGadgetWidget::updatePosition()
     double altitude;
 
     // get current UAV position
-    if (!getUAV_LLA(latitude, longitude, altitude))
+	if (!getUAVPosition(latitude, longitude, altitude))
         return;
 
     // get current UAV heading
@@ -648,7 +653,7 @@ void OPMapGadgetWidget::updatePosition()
     m_map->UAV->SetUAVPos(uav_pos, uav_altitude_meters); // set the maps UAV position
     m_map->UAV->SetUAVHeading(uav_heading_degrees);      // set the maps UAV heading
 
-    if (!getGPS_LLA(latitude, longitude, altitude))
+	if (!getGPSPosition(latitude, longitude, altitude))
         return;
 
     uav_pos = internals::PointLatLng(latitude, longitude);	// current UAV position
@@ -721,7 +726,7 @@ void OPMapGadgetWidget::updateMousePos()
         double latitude;
         double longitude;
         double altitude;
-        if (getUAV_LLA(latitude, longitude, altitude))  // get current UAV position
+		if (getUAVPosition(latitude, longitude, altitude))  // get current UAV position
         {
             internals::PointLatLng uav_pos = internals::PointLatLng(latitude, longitude);
 
@@ -974,13 +979,10 @@ void OPMapGadgetWidget::onTelemetryConnect()
 {
     telemetry_connected = true;
 
+	if (!obum) return;
+
 	bool set;
 	double LLA[3];
-
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-	if (!pm) return;
-	UAVObjectUtilManager *obum = pm->getObject<UAVObjectUtilManager>();
-	if (!obum) return;
 
 	// ***********************
 	// fetch the home location
@@ -1703,7 +1705,7 @@ void OPMapGadgetWidget::onGoUAVAct_triggered()
     double latitude;
     double longitude;
     double altitude;
-    if (getUAV_LLA(latitude, longitude, altitude))  // get current UAV position
+	if (getUAVPosition(latitude, longitude, altitude))  // get current UAV position
     {
         internals::PointLatLng uav_pos = internals::PointLatLng(latitude, longitude);	// current UAV position
         internals::PointLatLng map_pos = m_map->CurrentPosition();                      // current MAP position
@@ -2196,25 +2198,23 @@ internals::PointLatLng OPMapGadgetWidget::destPoint(internals::PointLatLng sourc
 
 // *************************************************************************************
 
-bool OPMapGadgetWidget::getUAV_LLA(double &latitude, double &longitude, double &altitude)
+bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, double &altitude)
 {
     double BaseECEF[3];
     double NED[3];
     double LLA[3];
     UAVObject *obj;
 
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm) return false;
-    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-    if (!om) return false;
+	if (!obm)
+		return false;
 
-    obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("HomeLocation")));
+	obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("HomeLocation")));
     if (!obj) return false;
     BaseECEF[0] = obj->getField(QString("ECEF"))->getDouble(0) / 100;
     BaseECEF[1] = obj->getField(QString("ECEF"))->getDouble(1) / 100;
     BaseECEF[2] = obj->getField(QString("ECEF"))->getDouble(2) / 100;
 
-    obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("PositionActual")));
+	obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("PositionActual")));
     if (!obj) return false;
     NED[0] = obj->getField(QString("North"))->getDouble() / 100;
     NED[1] = obj->getField(QString("East"))->getDouble() / 100;
@@ -2256,14 +2256,12 @@ bool OPMapGadgetWidget::getUAV_LLA(double &latitude, double &longitude, double &
 
 // *************************************************************************************
 
-bool OPMapGadgetWidget::getGPS_LLA(double &latitude, double &longitude, double &altitude)
+bool OPMapGadgetWidget::getGPSPosition(double &latitude, double &longitude, double &altitude)
 {
 	double LLA[3];
 
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-	if (!pm) return false;
-	UAVObjectUtilManager *obum = pm->getObject<UAVObjectUtilManager>();
-	if (!obum) return false;
+	if (!obum)
+		return false;
 
 	if (obum->getGPSPosition(LLA) < 0)
 		return false;	// error
@@ -2277,12 +2275,10 @@ bool OPMapGadgetWidget::getGPS_LLA(double &latitude, double &longitude, double &
 
 double OPMapGadgetWidget::getUAV_Yaw()
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (!pm) return 0.0;
-    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-    if (!om) return 0.0;
+	if (!obm)
+		return 0;
 
-    UAVObject *obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("AttitudeActual")));
+	UAVObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("AttitudeActual")));
     double yaw = obj->getField(QString("Yaw"))->getDouble();
 
     if (yaw != yaw) yaw = 0; // nan detection
@@ -2323,17 +2319,13 @@ void OPMapGadgetWidget::setMapFollowingMode()
 // *************************************************************************************
 // update the HomeLocation UAV Object
 
-void OPMapGadgetWidget::setHomeLocationObject()
+bool OPMapGadgetWidget::setHomeLocationObject()
 {
+	if (!obum)
+		return false;
+
 	double LLA[3] = {home_position.coord.Lat(), home_position.coord.Lng(), home_position.altitude};
-
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-	if (!pm) return;
-	UAVObjectUtilManager *obum = pm->getObject<UAVObjectUtilManager>();
-	if (!obum) return;
-
-	if (obum->setHomeLocation(LLA, true) < 0)
-		return;	// error
+	return (obum->setHomeLocation(LLA, true) >= 0);
 }
 
 // *************************************************************************************

@@ -47,6 +47,12 @@
 
 #include "utils/coordinateconversions.h"
 
+#include "extensionsystem/pluginmanager.h"
+#include "uavobjectutilmanager.h"
+#include "uavobjectmanager.h"
+#include "uavobject.h"
+#include "objectpersistence.h"
+
 // ******************************************************
 
 namespace Ui
@@ -240,7 +246,11 @@ private:
 
     mapcontrol::OPMapWidget *m_map;
 
-    //opmap_waypointeditor_dialog waypoint_editor_dialog;
+	ExtensionSystem::PluginManager *pm;
+	UAVObjectManager *obm;
+	UAVObjectUtilManager *obum;
+
+	//opmap_waypointeditor_dialog waypoint_editor_dialog;
 
     //opmap_edit_waypoint_dialog waypoint_edit_dialog;
 
@@ -320,13 +330,13 @@ private:
     double bearing(internals::PointLatLng from, internals::PointLatLng to);
     internals::PointLatLng destPoint(internals::PointLatLng source, double bear, double dist);
 
-    bool getUAV_LLA(double &latitude, double &longitude, double &altitude);
-    bool getGPS_LLA(double &latitude, double &longitude, double &altitude);
+	bool getUAVPosition(double &latitude, double &longitude, double &altitude);
+	bool getGPSPosition(double &latitude, double &longitude, double &altitude);
     double getUAV_Yaw();
 
     void setMapFollowingMode();
 
-    void setHomeLocationObject();
+	bool setHomeLocationObject();
 };
 
 #endif /* OPMAP_GADGETWIDGET_H_ */

@@ -138,7 +138,7 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
 	if (!om) return -3;
 
-	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("HomeLocation")));
+	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("HomeLocation")));
 	if (!obj) return -4;
 
 	UAVObjectField *ECEF_field = obj->getField(QString("ECEF"));
@@ -214,7 +214,7 @@ int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3])
 	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
 	if (!om) return -2;
 
-	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("HomeLocation")));
+	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("HomeLocation")));
 	if (!obj) return -3;
 
 //	obj->requestUpdate();
@@ -264,7 +264,7 @@ int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3], double ECEF[
 	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
 	if (!om) return -2;
 
-	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("HomeLocation")));
+	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("HomeLocation")));
 	if (!obj) return -3;
 
 //	obj->requestUpdate();
@@ -318,7 +318,7 @@ int UAVObjectUtilManager::getGPSPosition(double LLA[3])
 	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
 	if (!om) return -2;
 
-	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("GPSPosition")));
+	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("GPSPosition")));
 	if (!obj) return -3;
 
 //	obj->requestUpdate();
@@ -370,7 +370,7 @@ int UAVObjectUtilManager::setTelemetrySerialPortSpeed(QString speed, bool save_t
 	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
 	if (!om) return -2;
 
-	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("/*TelemetrySettings*/")));
+	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("/*TelemetrySettings*/")));
 	if (!obj) return -3;
 
 	field = obj->getField(QString("Speed"));
@@ -402,7 +402,7 @@ int UAVObjectUtilManager::getTelemetrySerialPortSpeed(QString &speed)
 	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
 	if (!om) return -2;
 
-	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("TelemetrySettings")));
+	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("TelemetrySettings")));
 	if (!obj) return -3;
 
 //	obj->requestUpdate();
@@ -428,7 +428,7 @@ int UAVObjectUtilManager::getTelemetrySerialPortSpeeds(QComboBox *comboBox)
 	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
 	if (!om) return -3;
 
-	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(om->getObject(QString("TelemetrySettings")));
+	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("TelemetrySettings")));
 	if (!obj) return -4;
 
 //	obj->requestUpdate();

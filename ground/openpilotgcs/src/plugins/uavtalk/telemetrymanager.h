@@ -35,6 +35,7 @@
 #include "uavobjectmanager.h"
 #include <QIODevice>
 #include <QObject>
+#include <QMutex>
 
 class UAVTALK_EXPORT TelemetryManager: public QObject
 {
@@ -46,6 +47,9 @@ public:
 
     void start(QIODevice *dev);
     void stop();
+
+public slots:
+	void onObjectDestroyed(QObject *obj);	// Pip
 
 signals:
     void connected();
@@ -65,6 +69,9 @@ private:
     Telemetry* telemetry;
     TelemetryMonitor* telemetryMon;
     QIODevice *device;
+	QMutex mutex;
+
+	void deleteObjects();	// Pip
 };
 
 #endif // TELEMETRYMANAGER_H

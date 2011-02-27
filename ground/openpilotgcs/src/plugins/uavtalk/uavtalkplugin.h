@@ -53,7 +53,6 @@ protected slots:
     void onDeviceDisconnect();
 
 private:
-    UAVObjectManager* objMngr;
     TelemetryManager* telMngr;
 };
 

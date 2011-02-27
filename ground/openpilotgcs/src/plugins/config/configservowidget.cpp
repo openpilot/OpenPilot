@@ -24,7 +24,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 #include "configservowidget.h"
+
+#include "uavtalk/telemetrymanager.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -33,14 +36,15 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 
-
-
 ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     m_config = new Ui_SettingsWidget();
     m_config->setupUi(this);
 
-    // First of all, put all the channel widgets into lists, so that we can
+	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+	UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+
+	// First of all, put all the channel widgets into lists, so that we can
     // manipulate those:
 
 	// NOTE: for historical reasons, we have objects below called ch0 to ch7, but the convention for OP is Channel 1 to Channel 8.
@@ -117,8 +121,6 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
 				   << m_config->widgetBarCH7;
 
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlCommand")));
     connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateChannels(UAVObject*)));
@@ -225,17 +227,29 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_config->saveArmToRAM, SIGNAL(clicked()), this, SLOT(sendRCInputUpdate()));
     connect(m_config->getArmCurrent, SIGNAL(clicked()), this, SLOT(requestRCInputUpdate()));
 
-
     connect(m_config->saveRCOutputToSD, SIGNAL(clicked()), this, SLOT(saveRCOutputObject()));
     connect(m_config->saveRCOutputToRAM, SIGNAL(clicked()), this, SLOT(sendRCOutputUpdate()));
     connect(m_config->getRCOutputCurrent, SIGNAL(clicked()), this, SLOT(requestRCOutputUpdate()));
-
 
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestRCInputUpdate()));
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestRCOutputUpdate()));
 
     firstUpdate = true;
 
+	enableControls(false);
+
+	// Listen to telemetry connection events
+	if (pm)
+	{
+		TelemetryManager *tm = pm->getObject<TelemetryManager>();
+		if (tm)
+		{
+			connect(tm, SIGNAL(myStart()), this, SLOT(onTelemetryStart()));
+			connect(tm, SIGNAL(myStop()), this, SLOT(onTelemetryStop()));
+			connect(tm, SIGNAL(connected()), this, SLOT(onTelemetryConnect()));
+			connect(tm, SIGNAL(disconnected()), this, SLOT(onTelemetryDisconnect()));
+		}
+	}
 }
 
 ConfigServoWidget::~ConfigServoWidget()
@@ -243,6 +257,46 @@ ConfigServoWidget::~ConfigServoWidget()
    // Do nothing
 }
 
+// ************************************
+
+void ConfigServoWidget::onTelemetryStart()
+{
+}
+
+void ConfigServoWidget::onTelemetryStop()
+{
+}
+
+void ConfigServoWidget::onTelemetryConnect()
+{
+	enableControls(true);
+}
+
+void ConfigServoWidget::onTelemetryDisconnect()
+{
+	enableControls(false);
+}
+
+// ************************************
+
+void ConfigServoWidget::enableControls(bool enable)
+{
+	m_config->getRCInputCurrent->setEnabled(enable);
+	m_config->saveRCInputToRAM->setEnabled(enable);
+	m_config->saveRCInputToSD->setEnabled(enable);
+
+	m_config->saveFmsToSD->setEnabled(enable);
+	m_config->saveFmsToRAM->setEnabled(enable);
+	m_config->getFmsCurrent->setEnabled(enable);
+
+	m_config->saveArmToSD->setEnabled(enable);
+	m_config->saveArmToRAM->setEnabled(enable);
+	m_config->getArmCurrent->setEnabled(enable);
+
+	m_config->saveRCOutputToSD->setEnabled(enable);
+	m_config->saveRCOutputToRAM->setEnabled(enable);
+	m_config->getRCOutputCurrent->setEnabled(enable);
+}
 
 /**
   Sends the channel value to the UAV to move the servo.

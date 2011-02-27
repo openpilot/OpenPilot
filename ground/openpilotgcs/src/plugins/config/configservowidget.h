@@ -46,6 +46,12 @@ public:
 	ConfigServoWidget(QWidget *parent = 0);
 	~ConfigServoWidget();
 
+public slots:
+	void onTelemetryStart();
+	void onTelemetryStop();
+	void onTelemetryConnect();
+	void onTelemetryDisconnect();
+
 private:
 	Ui_SettingsWidget *m_config;
 
@@ -71,6 +77,8 @@ private:
 	QList<QLabel*> inMinLabels;
 
 	bool firstUpdate;
+
+	void enableControls(bool enable);
 
 private slots:
 	void updateChannels(UAVObject* obj);

@@ -91,13 +91,14 @@ void WidgetBar::paintEvent(QPaintEvent * /* event */)
 
 	float level = (float)(m_value - m_minimum) / range;	// 0 to +1
 
+	int length = 0;
 	QRect rect;
 
 	switch (m_orientation)
 	{
 		case Qt::Horizontal:
 			{
-				int length = (int)((height() - 5) * level + 0.5f);
+				length = (int)((width() - 5) * level + 0.5f);
 				rect.setLeft(2);
 				rect.setTop(2);
 				rect.setWidth(length);
@@ -107,7 +108,7 @@ void WidgetBar::paintEvent(QPaintEvent * /* event */)
 
 		case Qt::Vertical:
 			{
-				int length = (int)((height() - 5) * level + 0.5f);
+				length = (int)((height() - 5) * level + 0.5f);
 				rect.setLeft(2);
 				rect.setTop(height() - 3 - length);
 				rect.setWidth(width() - 5);
@@ -117,14 +118,31 @@ void WidgetBar::paintEvent(QPaintEvent * /* event */)
 	}
 
 	// background
-	painter.setPen(QColor(160, 160, 160));
-	painter.setBrush(QColor(255, 255, 255));
+//	painter.setPen(QColor(160, 160, 160));
+//	painter.setBrush(QColor(255, 255, 255));
+	painter.setPen(QColor(80, 80, 80));
+	painter.setBrush(QColor(160, 160, 160));
 	painter.drawRect(QRect(0, 0, width() - 1, height() - 1));
 
 	if ((m_maximum - m_minimum) > 0)
 	{
-		painter.setPen(QColor(128, 128, 255));
-		painter.setBrush(QColor(128, 128, 255));
-		painter.drawRoundRect(rect, 3, 3);
+		// solid bar
+//		painter.setPen(QColor(128, 128, 255));
+//		painter.setBrush(QColor(128, 128, 255));
+//		painter.drawRoundRect(rect, 3, 3);
+
+		// colourful bar
+		for (int i = 0; i < length; i++)
+		{
+			if (!(i & 1))
+				painter.setPen(QColor(0, 0, 0));		// black
+			else
+//				painter.setPen(QColor(0, 255, 0));		// green
+				painter.setPen(QColor(128, 128, 255));	// blue
+			if (m_orientation == Qt::Vertical)
+				painter.drawLine(rect.left(), rect.bottom() + 1 - i, rect.right() + 1, rect.bottom() + 1 - i);	// vertical bar
+			else
+				painter.drawLine(rect.top(), rect.left() + i, rect.bottom(), rect.left() + i);					// horizontal bar
+		}
 	}
 }

@@ -195,6 +195,13 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 	bytecount++;
 	if (sync == 0) {
 		sync_word = (prev_byte << 8) + b;
+		if(bytecount==1)
+		{
+			/* record losscounter into channel8 */
+			CaptureValueTemp[7]=b;
+			/* instant write */
+			CaptureValue[7]=b;
+		}
 		if (((sync_word & 0x00FE) == 0) && (bytecount == 2)) {
 			/* sync low byte always 0x01, high byte seems to be random when switching TX on off on, loss counter??? */
 			if (sync_word & 0x01) {
@@ -271,7 +278,7 @@ void PIOS_SPEKTRUM_irq_handler() {
 	frame_error=0;
 	sync_of++;
 	/* watchdog activated */
-	if (sync_of > 3) {
+	if (sync_of > 6) {
 		/* signal lost */
 		sync_of = 0;
 		for (int i = 0; i < 12; i++)

@@ -96,7 +96,7 @@ namespace correl {
 			im2ptr += step2;
 		}
 		
-		if (useBornes) if (zncc_count / zncc_total < 0.5)
+		if (useBornes) if (zncc_count / zncc_total < 0.75)
 			{ /*std::cout << "zncc failed: " << zncc_count << "," << zncc_total << std::endl;*/ return -3; }
 		
 		// finish

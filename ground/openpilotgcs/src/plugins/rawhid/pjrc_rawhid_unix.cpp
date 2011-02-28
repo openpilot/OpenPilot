@@ -356,7 +356,7 @@ void pjrc_rawhid::free_all_hid(void)
 void pjrc_rawhid::hid_close(hid_t *hid)
 {
 	if (!hid) return;
-	if (!hid->handle || !hid->open) return;
+	if (!hid->open) return;
 
     usb_release_interface(hid->usb, hid->iface);
 

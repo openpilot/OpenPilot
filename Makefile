@@ -60,7 +60,7 @@ areyousureyoushouldberunningthis:
 	@echo
 	@echo "       NOTE: To build firmware to be chain loaded from a bootloader, use"
 	@echo "                 make openpilot USE_BOOTLOADER=YES"
-	@echo "             Don't for get to do a clean between builds with/without bootloader"
+	@echo "             Don't forget to do a clean between builds with/without bootloader"
 	@echo
 	@echo "   [Simulation]"
 	@echo "     sim_posix         - Build OpenPilot simulation firmware for"
@@ -90,7 +90,7 @@ all: uavobjects all_ground all_flight
 
 .PHONY: all_clean
 all_clean:
-	[ ! -d "$(BUILD_DIR)" ] || $(RM) -r "$(BUILD_DIR)"
+	[ ! -d "$(BUILD_DIR)" ] || $(RM) -rf "$(BUILD_DIR)"
 
 $(DL_DIR):
 	mkdir -p $@
@@ -277,7 +277,7 @@ all_flight_clean: all_fw_clean all_bl_clean
 openpilot: openpilot_elf
 
 openpilot_%: uavobjects_flight
-	$(V1) mkdir -p $(BUILD_DIR)/openpilot
+	$(V1) mkdir -p $(BUILD_DIR)/openpilot/dep
 	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/OpenPilot $*
 
 .PHONY: openpilot_clean
@@ -289,7 +289,7 @@ openpilot_clean:
 bl_openpilot: bl_openpilot_elf
 
 bl_openpilot_%:
-	$(V1) mkdir -p $(BUILD_DIR)/bl_openpilot
+	$(V1) mkdir -p $(BUILD_DIR)/bl_openpilot/dep
 	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/bl_openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/OpenPilot $*
 
 .PHONY: bl_openpilot_clean
@@ -301,7 +301,7 @@ bl_openpilot_clean:
 ahrs: ahrs_elf
 
 ahrs_%: uavobjects_flight
-	$(V1) mkdir -p $(BUILD_DIR)/ahrs
+	$(V1) mkdir -p $(BUILD_DIR)/ahrs/dep
 	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/AHRS $*
 
 .PHONY: ahrs_clean
@@ -313,7 +313,7 @@ ahrs_clean:
 bl_ahrs: bl_ahrs_elf
 
 bl_ahrs_%:
-	$(V1) mkdir -p $(BUILD_DIR)/bl_ahrs
+	$(V1) mkdir -p $(BUILD_DIR)/bl_ahrs/dep
 	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/bl_ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/AHRS $*
 
 .PHONY: bl_ahrs_clean
@@ -325,7 +325,7 @@ bl_ahrs_clean:
 coptercontrol: coptercontrol_elf
 
 coptercontrol_%: uavobjects_flight
-	$(V1) mkdir -p $(BUILD_DIR)/coptercontrol
+	$(V1) mkdir -p $(BUILD_DIR)/coptercontrol/dep
 	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/CopterControl $*
 
 .PHONY: coptercontrol_clean
@@ -337,7 +337,7 @@ coptercontrol_clean:
 bl_coptercontrol: bl_coptercontrol_elf
 
 bl_coptercontrol_%:
-	$(V1) mkdir -p $(BUILD_DIR)/bl_coptercontrol
+	$(V1) mkdir -p $(BUILD_DIR)/bl_coptercontrol/dep
 	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/bl_coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/CopterControl $*
 
 .PHONY: bl_coptercontrol_clean
@@ -349,7 +349,7 @@ bl_coptercontrol_clean:
 pipxtreme: pipxtreme_elf
 
 pipxtreme_%: uavobjects_flight
-	$(V1) mkdir -p $(BUILD_DIR)/pipxtreme
+	$(V1) mkdir -p $(BUILD_DIR)/pipxtreme/dep
 	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/PipXtreme $*
 
 .PHONY: pipxtreme_clean
@@ -361,7 +361,7 @@ pipxtreme_clean:
 bl_pipxtreme: bl_pipxtreme_elf
 
 bl_pipxtreme_%:
-	$(V1) mkdir -p $(BUILD_DIR)/bl_pipxtreme
+	$(V1) mkdir -p $(BUILD_DIR)/bl_pipxtreme/dep
 	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/bl_pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/PipXtreme $*
 
 .PHONY: bl_pipxtreme_clean

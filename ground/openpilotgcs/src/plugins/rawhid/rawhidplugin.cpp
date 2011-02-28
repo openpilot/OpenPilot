@@ -171,6 +171,17 @@ void RawHIDConnection::onRawHidDestroyed(QObject *obj)	// Pip
 	RawHidHandle = NULL;
 }
 
+void RawHIDConnection::onRawHidClosed()
+{
+	if (RawHidHandle)
+	{
+//		delete RawHidHandle;
+//		RawHidHandle = NULL;
+
+		emit deviceClosed(this);
+	}
+}
+
 QIODevice *RawHIDConnection::openDevice(const QString &deviceName)
 {
     //added by andrew
@@ -181,7 +192,11 @@ QIODevice *RawHIDConnection::openDevice(const QString &deviceName)
     //return new RawHID(deviceName);
     RawHidHandle = new RawHID(deviceName);
 
-	connect(RawHidHandle, SLOT(destroyed(QObject *)), this, SLOT(onRawHidDestroyed(QObject *)));	// Pip
+	if (RawHidHandle)
+	{
+		connect(RawHidHandle, SIGNAL(closed()), this, SLOT(onRawHidClosed()), Qt::QueuedConnection);
+		connect(RawHidHandle, SIGNAL(destroyed(QObject *)), this, SLOT(onRawHidDestroyed(QObject *)), Qt::QueuedConnection);
+	}
 
     return RawHidHandle;
 }
@@ -197,7 +212,7 @@ void RawHIDConnection::closeDevice(const QString &deviceName)
 		delete RawHidHandle;
 		RawHidHandle = NULL;
 
-		emit deviceClosed(this);	// Pip
+		emit deviceClosed(this);
     }
     //end added by andrew
 }

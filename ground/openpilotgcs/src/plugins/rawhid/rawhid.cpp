@@ -45,6 +45,7 @@ static const int WRITE_SIZE = 64;
 
 
 
+// *********************************************************************************
 
 /**
 *   Thread to desynchronize reading from the device
@@ -84,6 +85,8 @@ protected:
     bool m_running;
 };
 
+
+// *********************************************************************************
 
 /**
 *  This class is nearly the same than RawHIDReadThread but for writing
@@ -126,7 +129,7 @@ protected:
     bool m_running;
 };
 
-
+// *********************************************************************************
 
 RawHIDReadThread::RawHIDReadThread(RawHID *hid)
     : m_hid(hid),
@@ -206,6 +209,8 @@ RawHIDWriteThread::RawHIDWriteThread(RawHID *hid)
 {
 }
 
+// *********************************************************************************
+
 RawHIDWriteThread::~RawHIDWriteThread()
 {
     m_running = false;
@@ -283,20 +288,28 @@ qint64 RawHIDWriteThread::getBytesToWrite()
     return m_writeBuffer.size();
 }
 
+// *********************************************************************************
+
 RawHID::RawHID(const QString &deviceName)
     :QIODevice(),
     serialNumber(deviceName),
     m_deviceNo(-1),
     m_readThread(NULL),
-    m_writeThread(NULL)
+	m_writeThread(NULL),
+	m_mutex(NULL)
 {
-    //find the device the user want to open and close the other
+	m_mutex = new QMutex(QMutex::Recursive);
+
+	// detect if the USB device is unplugged
+	QObject::connect(&dev, SIGNAL(deviceUnplugged(int)), this, SLOT(onDeviceUnplugged(int)));
+
+	//find the device the user want to open and close the other
 	int opened = dev.open(USB_MAX_DEVICES, USB_VID, USB_PID, USB_USAGE_PAGE, USB_USAGE);
 
     //for each devices found, get serial number and close
-	for (int i=0; i<opened; i++)
+	for (int i = 0; i < opened; i++)
     {
-        if(deviceName == dev.getserial(i))
+		if (deviceName == dev.getserial(i))
             m_deviceNo = i;
         else
             dev.close(i);
@@ -318,46 +331,72 @@ RawHID::RawHID(const QString &deviceName)
 
 RawHID::~RawHID()
 {
-    if(m_readThread)
+	dev.close(m_deviceNo);
+
+	if (m_readThread)
         delete m_readThread;
 
-    if(m_writeThread)
+	if (m_writeThread)
         delete m_writeThread;
+}
+
+void RawHID::onDeviceUnplugged(int num)
+{
+	if (num != m_deviceNo)
+		return;
+
+	// the USB device has been unplugged
+
+	close();
 }
 
 bool RawHID::open(OpenMode mode)
 {
-    if(m_deviceNo < 0)
+	QMutexLocker locker(m_mutex);
+
+	if (m_deviceNo < 0)
         return false;
 
     QIODevice::open(mode);
 
-    if(!m_readThread)
-        m_readThread = new RawHIDReadThread(this);
+	if (!m_readThread)
+		m_readThread = new RawHIDReadThread(this);
 
-    if(!m_writeThread)
-        m_writeThread = new RawHIDWriteThread(this);
+	if (!m_writeThread)
+		m_writeThread = new RawHIDWriteThread(this);
+
+	if (m_readThread) m_readThread->start();	// Pip
+	if (m_writeThread) m_writeThread->start();	// Pip
 
     return true;
 }
 
-
 void RawHID::close()
 {
-    emit aboutToClose();
-    if(m_readThread) {
-        m_readThread->terminate();
-        delete m_readThread; // calls wait
-        m_readThread = NULL;
-    }
+	emit aboutToClose();
 
-    if(m_writeThread) {
-        m_writeThread->terminate();
-        delete m_writeThread;
-        m_writeThread = NULL;
-    }
+	m_mutex->lock();
 
-    dev.close(m_deviceNo);
+		if (m_readThread)
+		{
+			m_readThread->terminate();
+			delete m_readThread; // calls wait
+			m_readThread = NULL;
+		}
+
+		if (m_writeThread)
+		{
+			m_writeThread->terminate();
+			delete m_writeThread;
+			m_writeThread = NULL;
+		}
+
+		dev.close(m_deviceNo);
+
+	m_mutex->unlock();
+
+	emit closed();
+
     QIODevice::close();
 }
 
@@ -368,21 +407,42 @@ bool RawHID::isSequential() const
 
 qint64 RawHID::bytesAvailable() const
 {
-    return m_readThread->getBytesAvailable() + QIODevice::bytesAvailable();
+	QMutexLocker locker(m_mutex);
+
+	if (!m_readThread)
+		return -1;
+
+	return m_readThread->getBytesAvailable() + QIODevice::bytesAvailable();
 }
 
 qint64 RawHID::bytesToWrite() const
 {
+	QMutexLocker locker(m_mutex);
+
+	if (!m_writeThread)
+		return -1;
+
     return m_writeThread->getBytesToWrite() + QIODevice::bytesToWrite();
 }
 
 qint64 RawHID::readData(char *data, qint64 maxSize)
 {
-    return m_readThread->getReadData(data, maxSize);
+	QMutexLocker locker(m_mutex);
+
+	if (!m_readThread || !data)
+		return -1;
+
+	return m_readThread->getReadData(data, maxSize);
 }
 
 qint64 RawHID::writeData(const char *data, qint64 maxSize)
 {
-    return m_writeThread->pushDataToWrite(data, maxSize);
+	QMutexLocker locker(m_mutex);
+
+	if (!m_writeThread || !data)
+		return -1;
+
+	return m_writeThread->pushDataToWrite(data, maxSize);
 }
 
+// *********************************************************************************

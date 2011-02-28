@@ -47,6 +47,8 @@ class RawHIDWriteThread;
 */
 class RAWHID_EXPORT RawHID : public QIODevice
 {
+	Q_OBJECT
+
     friend class RawHIDReadThread;
     friend class RawHIDWriteThread;
 
@@ -58,6 +60,12 @@ public:
     virtual bool open(OpenMode mode);
     virtual void close();
     virtual bool isSequential() const;
+
+signals:
+	void closed();
+
+public slots:
+	void onDeviceUnplugged(int num);
 
 protected:
     virtual qint64 readData(char *data, qint64 maxSize);
@@ -72,6 +80,8 @@ protected:
 
     RawHIDReadThread *m_readThread;
     RawHIDWriteThread *m_writeThread;
+
+	QMutex *m_mutex;
 };
 
 #endif // RAWHID_H

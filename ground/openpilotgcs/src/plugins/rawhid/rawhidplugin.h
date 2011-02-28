@@ -94,6 +94,9 @@ public:
 signals:
 	void deviceClosed(QObject *obj);			// Pip
 
+public slots:
+	void onRawHidClosed();
+
 protected slots:
     void onEnumerationChanged();
 

@@ -28,7 +28,7 @@
         <rect>
          <x>530</x>
          <y>40</y>
-         <width>31</width>
+         <width>36</width>
          <height>17</height>
         </rect>
        </property>
@@ -81,9 +81,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch1Min">
        <property name="geometry">
         <rect>
-         <x>210</x>
+         <x>205</x>
          <y>60</y>
-         <width>31</width>
+         <width>36</width>
          <height>17</height>
         </rect>
        </property>
@@ -111,9 +111,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch6Min">
        <property name="geometry">
         <rect>
-         <x>210</x>
+         <x>205</x>
          <y>160</y>
-         <width>31</width>
+         <width>36</width>
          <height>17</height>
         </rect>
        </property>
@@ -171,7 +171,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>530</x>
          <y>120</y>
-         <width>31</width>
+         <width>36</width>
          <height>17</height>
         </rect>
        </property>
@@ -196,9 +196,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch7Min">
        <property name="geometry">
         <rect>
-         <x>210</x>
+         <x>205</x>
          <y>180</y>
-         <width>31</width>
+         <width>36</width>
          <height>17</height>
         </rect>
        </property>
@@ -242,9 +242,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch2Min">
        <property name="geometry">
         <rect>
-         <x>210</x>
+         <x>205</x>
          <y>80</y>
-         <width>31</width>
+         <width>36</width>
          <height>17</height>
         </rect>
        </property>
@@ -274,7 +274,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>530</x>
          <y>160</y>
-         <width>31</width>
+         <width>36</width>
          <height>17</height>
         </rect>
        </property>
@@ -301,7 +301,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>530</x>
          <y>140</y>
-         <width>31</width>
+         <width>36</width>
          <height>17</height>
         </rect>
        </property>
@@ -328,7 +328,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>530</x>
          <y>100</y>
-         <width>31</width>
+         <width>36</width>
          <height>17</height>
         </rect>
        </property>
@@ -398,9 +398,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch4Min">
        <property name="geometry">
         <rect>
-         <x>210</x>
+         <x>205</x>
          <y>120</y>
-         <width>31</width>
+         <width>36</width>
          <height>17</height>
         </rect>
        </property>
@@ -453,8 +453,8 @@ Be sure to set the Neutral position on all sliders before sending!</string>
        </property>
        <property name="font">
         <font>
-         <family>DejaVu Sans</family>
-         <pointsize>7</pointsize>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>8</pointsize>
         </font>
        </property>
        <property name="iconSize">
@@ -470,9 +470,9 @@ Be sure to set the Neutral position on all sliders before sending!</string>
       <widget class="QLabel" name="ch3Min">
        <property name="geometry">
         <rect>
-         <x>210</x>
+         <x>205</x>
          <y>100</y>
-         <width>31</width>
+         <width>36</width>
          <height>17</height>
         </rect>
        </property>
@@ -502,7 +502,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>530</x>
          <y>180</y>
-         <width>31</width>
+         <width>36</width>
          <height>17</height>
         </rect>
        </property>
@@ -583,9 +583,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch5Min">
        <property name="geometry">
         <rect>
-         <x>210</x>
+         <x>205</x>
          <y>140</y>
-         <width>31</width>
+         <width>36</width>
          <height>17</height>
         </rect>
        </property>
@@ -699,7 +699,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>530</x>
          <y>80</y>
-         <width>31</width>
+         <width>36</width>
          <height>17</height>
         </rect>
        </property>
@@ -726,7 +726,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>530</x>
          <y>60</y>
-         <width>31</width>
+         <width>36</width>
          <height>17</height>
         </rect>
        </property>
@@ -751,9 +751,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch0Min">
        <property name="geometry">
         <rect>
-         <x>210</x>
+         <x>205</x>
          <y>40</y>
-         <width>31</width>
+         <width>36</width>
          <height>17</height>
         </rect>
        </property>
@@ -789,8 +789,8 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="font">
         <font>
-         <family>DejaVu Sans</family>
-         <pointsize>7</pointsize>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>8</pointsize>
         </font>
        </property>
       </widget>
@@ -805,8 +805,8 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="font">
         <font>
-         <family>DejaVu Sans</family>
-         <pointsize>7</pointsize>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>8</pointsize>
         </font>
        </property>
       </widget>
@@ -821,8 +821,8 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="font">
         <font>
-         <family>DejaVu Sans</family>
-         <pointsize>7</pointsize>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>8</pointsize>
         </font>
        </property>
       </widget>
@@ -837,8 +837,8 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="font">
         <font>
-         <family>DejaVu Sans</family>
-         <pointsize>7</pointsize>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>8</pointsize>
         </font>
        </property>
       </widget>
@@ -853,8 +853,8 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="font">
         <font>
-         <family>DejaVu Sans</family>
-         <pointsize>7</pointsize>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>8</pointsize>
         </font>
        </property>
       </widget>
@@ -869,8 +869,8 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="font">
         <font>
-         <family>DejaVu Sans</family>
-         <pointsize>7</pointsize>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>8</pointsize>
         </font>
        </property>
       </widget>
@@ -885,8 +885,8 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="font">
         <font>
-         <family>DejaVu Sans</family>
-         <pointsize>7</pointsize>
+         <family>MS Shell Dlg 2</family>
+         <pointsize>8</pointsize>
         </font>
        </property>
       </widget>
@@ -894,10 +894,16 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>210</y>
-         <width>131</width>
+         <y>213</y>
+         <width>181</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
        </property>
        <property name="toolTip">
         <string>Start calibrating the RC Inputs.
@@ -921,7 +927,7 @@ Neutral should be put at the bottom of the slider for the throttle.</string>
        </property>
        <property name="font">
         <font>
-         <pointsize>10</pointsize>
+         <pointsize>11</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>

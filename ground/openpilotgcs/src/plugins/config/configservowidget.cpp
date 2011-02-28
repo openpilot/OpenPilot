@@ -111,6 +111,15 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
 			<< m_config->ch6Min
 			<< m_config->ch7Min;
 
+	inNeuLabels << m_config->ch0Cur
+			<< m_config->ch1Cur
+			<< m_config->ch2Cur
+			<< m_config->ch3Cur
+			<< m_config->ch4Cur
+			<< m_config->ch5Cur
+			<< m_config->ch6Cur
+			<< m_config->ch7Cur;
+
 	inSliders << m_config->inSlider0
 			  << m_config->inSlider1
 			  << m_config->inSlider2
@@ -209,7 +218,11 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
         }
     }
 
-    for (int i = 0; i < 8; i++) {
+	// set the RC input tneutral value textees
+	for (int i = 0; i < 8; i++)
+		inNeuLabels[i]->setText(QString::number(inSliders[i]->value()));
+
+	for (int i = 0; i < 8; i++) {
         connect(outMin[i], SIGNAL(editingFinished()), this, SLOT(setChOutRange()));
         connect(outMax[i], SIGNAL(editingFinished()), this, SLOT(setChOutRange()));
         connect(reversals[i], SIGNAL(toggled(bool)), this, SLOT(reverseChannel(bool)));
@@ -280,42 +293,42 @@ ConfigServoWidget::~ConfigServoWidget()
 
 void ConfigServoWidget::onInSliderValueChanged0(int value)
 {
-	m_config->ch0Cur->setText(QString::number(value));
+	inNeuLabels[0]->setText(QString::number(value));
 }
 
 void ConfigServoWidget::onInSliderValueChanged1(int value)
 {
-	m_config->ch1Cur->setText(QString::number(value));
+	inNeuLabels[1]->setText(QString::number(value));
 }
 
 void ConfigServoWidget::onInSliderValueChanged2(int value)
 {
-	m_config->ch2Cur->setText(QString::number(value));
+	inNeuLabels[2]->setText(QString::number(value));
 }
 
 void ConfigServoWidget::onInSliderValueChanged3(int value)
 {
-	m_config->ch3Cur->setText(QString::number(value));
+	inNeuLabels[3]->setText(QString::number(value));
 }
 
 void ConfigServoWidget::onInSliderValueChanged4(int value)
 {
-	m_config->ch4Cur->setText(QString::number(value));
+	inNeuLabels[4]->setText(QString::number(value));
 }
 
 void ConfigServoWidget::onInSliderValueChanged5(int value)
 {
-	m_config->ch5Cur->setText(QString::number(value));
+	inNeuLabels[5]->setText(QString::number(value));
 }
 
 void ConfigServoWidget::onInSliderValueChanged6(int value)
 {
-	m_config->ch6Cur->setText(QString::number(value));
+	inNeuLabels[6]->setText(QString::number(value));
 }
 
 void ConfigServoWidget::onInSliderValueChanged7(int value)
 {
-	m_config->ch7Cur->setText(QString::number(value));
+	inNeuLabels[7]->setText(QString::number(value));
 }
 
 // ************************************
@@ -361,7 +374,18 @@ void ConfigServoWidget::enableControls(bool enable)
 	m_config->getRCOutputCurrent->setEnabled(enable);
 
 	m_config->doRCInputCalibration->setEnabled(enable);
+
+	m_config->ch0Assign->setEnabled(enable);
+	m_config->ch1Assign->setEnabled(enable);
+	m_config->ch2Assign->setEnabled(enable);
+	m_config->ch3Assign->setEnabled(enable);
+	m_config->ch4Assign->setEnabled(enable);
+	m_config->ch5Assign->setEnabled(enable);
+	m_config->ch6Assign->setEnabled(enable);
+	m_config->ch7Assign->setEnabled(enable);
 }
+
+// ************************************
 
 /**
   Sends the channel value to the UAV to move the servo.

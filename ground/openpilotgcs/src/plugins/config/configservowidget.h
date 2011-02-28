@@ -86,6 +86,7 @@ private:
 	QList<WidgetBar*> inWidgetBars;
 	QList<QLabel*> inMaxLabels;
 	QList<QLabel*> inMinLabels;
+	QList<QLabel*> inNeuLabels;
 
 	bool firstUpdate;
 

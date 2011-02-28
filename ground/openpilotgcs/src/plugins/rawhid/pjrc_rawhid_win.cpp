@@ -38,13 +38,18 @@
 /* See: http://msdn.microsoft.com/en-us/library/ms794141.aspx */
 
 #include "pjrc_rawhid.h"
-
+#include <QMetaType>
 #include <QString>
-
+#include <initguid.h>
 #define printf qDebug
 
 pjrc_rawhid::pjrc_rawhid()
 {
+    if( !QMetaType::isRegistered( QMetaType::type("USVPortInfo") ) )
+        qRegisterMetaType<USBPortInfo>("USBPortInfo");
+#if (defined QT_GUI_LIB)
+    notificationWidget = 0;
+#endif // Q_OS_WIN
     first_hid = NULL;
     last_hid = NULL;
     rx_event = NULL;
@@ -53,6 +58,10 @@ pjrc_rawhid::pjrc_rawhid()
 
 pjrc_rawhid::~pjrc_rawhid()
 {
+#if (defined QT_GUI_LIB)
+    if( notificationWidget )
+        delete notificationWidget;
+#endif
 }
 
 //  open - open 1 or more devices
@@ -68,56 +77,68 @@ pjrc_rawhid::~pjrc_rawhid()
 //
 int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
 {
-	GUID guid;
-	HDEVINFO info;
-	DWORD index=0, reqd_size;
-	SP_DEVICE_INTERFACE_DATA iface;
-	SP_DEVICE_INTERFACE_DETAIL_DATA *details;
-	HIDD_ATTRIBUTES attrib;
-	PHIDP_PREPARSED_DATA hid_data;
-	HIDP_CAPS capabilities;
-	HANDLE h;
-	BOOL ret;
-	hid_t *hid;
+    GUID guid;
+    HDEVINFO info;
+    DWORD index=0, reqd_size;
+    SP_DEVICE_INTERFACE_DATA iface;
+    SP_DEVICE_INTERFACE_DETAIL_DATA *details;
+    HIDD_ATTRIBUTES attrib;
+    PHIDP_PREPARSED_DATA hid_data;
+    HIDP_CAPS capabilities;
+    HANDLE h;
+    BOOL ret;
+    hid_t *hid;
 
-	int count=0;
+    int count=0;
 
-	if (first_hid) free_all_hid();
+    if (first_hid) free_all_hid();
 
-	if (max < 1) return 0;
+    if (max < 1) return 0;
 
-	if (!rx_event)
-	{
-		rx_event = CreateEvent(NULL, TRUE, TRUE, NULL);
-		tx_event = CreateEvent(NULL, TRUE, TRUE, NULL);
-		InitializeCriticalSection(&rx_mutex);
-		InitializeCriticalSection(&tx_mutex);
+    if (!rx_event)
+    {
+        rx_event = CreateEvent(NULL, TRUE, TRUE, NULL);
+        tx_event = CreateEvent(NULL, TRUE, TRUE, NULL);
+        InitializeCriticalSection(&rx_mutex);
+        InitializeCriticalSection(&tx_mutex);
     }
 
-	HidD_GetHidGuid(&guid);
+    HidD_GetHidGuid(&guid);
 
-	info = SetupDiGetClassDevs(&guid, NULL, NULL, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
-	if (info == INVALID_HANDLE_VALUE) return 0;
+    info = SetupDiGetClassDevs(&guid, NULL, NULL, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
+    if (info == INVALID_HANDLE_VALUE) return 0;
 
-	for (index=0; 1 ;index++)
-	{
-		iface.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
-		ret = SetupDiEnumDeviceInterfaces(info, NULL, &guid, index, &iface);
-		if (!ret) return count;
+    for (index=0; 1 ;index++)
+    {
+        iface.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
+        ret = SetupDiEnumDeviceInterfaces(info, NULL, &guid, index, &iface);
+        if (!ret) return count;
 
-		SetupDiGetInterfaceDeviceDetail(info, &iface, NULL, 0, &reqd_size, NULL);
-		details = (SP_DEVICE_INTERFACE_DETAIL_DATA *)malloc(reqd_size);
-		if (details == NULL) continue;
+        SetupDiGetInterfaceDeviceDetail(info, &iface, NULL, 0, &reqd_size, NULL);
+        details = (SP_DEVICE_INTERFACE_DETAIL_DATA *)malloc(reqd_size);
+        if (details == NULL) continue;
 
-		memset(details, 0, reqd_size);
-		details->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
-		ret = SetupDiGetDeviceInterfaceDetail(info, &iface, details, reqd_size, NULL, NULL);
-		if (!ret)
-		{
-			free(details);
-			continue;
-		}
+        memset(details, 0, reqd_size);
+        details->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
+        ret = SetupDiGetDeviceInterfaceDetail(info, &iface, details, reqd_size, NULL, NULL);
+        if (!ret)
+        {
+            free(details);
+            continue;
+        }
 
+<<<<<<< .mine
+        h = CreateFile(details->DevicePath, GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+        if (h == INVALID_HANDLE_VALUE)
+        {
+            // I get ERROR_ACCESS_DENIED with most/all my input devices (mice/trackballs/tablet).
+            // Let's not log it :)
+            if (GetLastError() == ERROR_ACCESS_DENIED)
+            {
+                free(details);
+                continue;
+            }
+=======
 		h = CreateFile(details->DevicePath, GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
 		if (h == INVALID_HANDLE_VALUE)
 		{
@@ -130,46 +151,56 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
 				free(details);
 				continue;
 			}
+>>>>>>> .r2914
 
+<<<<<<< .mine
+            // qDebug wipes the GetLastError() it seems, so do that after print_win32_err().
+            print_win32_err();
+            qDebug() << "Problem opening handle, path: " << QString().fromWCharArray(details->DevicePath);
+=======
 			// qDebug wipes the GetLastError() it seems, so do that after print_win32_err().
 			print_win32_err(err);
 			qDebug() << "Problem opening handle, path: " << QString().fromWCharArray(details->DevicePath);
+>>>>>>> .r2914
 
-			free(details);
-			continue;
-		}
+            free(details);
+            continue;
+        }
 
-		free(details);
+        free(details);
 
-		attrib.Size = sizeof(HIDD_ATTRIBUTES);
-		ret = HidD_GetAttributes(h, &attrib);
-		//printf("vid: %4x\n", attrib.VendorID);
-		if (!ret || (vid > 0 && attrib.VendorID != vid) ||
-              (pid > 0 && attrib.ProductID != pid) ||
-			  !HidD_GetPreparsedData(h, &hid_data))
-		{
-			CloseHandle(h);
-			continue;
-		}
+        attrib.Size = sizeof(HIDD_ATTRIBUTES);
+        ret = HidD_GetAttributes(h, &attrib);
+        //printf("vid: %4x\n", attrib.VendorID);
+        if (!ret || (vid > 0 && attrib.VendorID != vid) ||
+            (pid > 0 && attrib.ProductID != pid) ||
+            !HidD_GetPreparsedData(h, &hid_data))
+        {
+            CloseHandle(h);
+            continue;
+        }
 
-		if (!HidP_GetCaps(hid_data, &capabilities) ||
-              (usage_page > 0 && capabilities.UsagePage != usage_page) ||
-			  (usage > 0 && capabilities.Usage != usage))
-		{
-			HidD_FreePreparsedData(hid_data);
-			CloseHandle(h);
-			continue;
-		}
+        if (!HidP_GetCaps(hid_data, &capabilities) ||
+            (usage_page > 0 && capabilities.UsagePage != usage_page) ||
+            (usage > 0 && capabilities.Usage != usage))
+        {
+            HidD_FreePreparsedData(hid_data);
+            CloseHandle(h);
+            continue;
+        }
 
-		HidD_FreePreparsedData(hid_data);
+        HidD_FreePreparsedData(hid_data);
 
-		hid = (struct hid_struct *)malloc(sizeof(struct hid_struct));
-		if (!hid)
-		{
-			CloseHandle(h);
-			continue;
-		}
+        hid = (struct hid_struct *)malloc(sizeof(struct hid_struct));
+        if (!hid)
+        {
+            CloseHandle(h);
+            continue;
+        }
 
+<<<<<<< .mine
+        qDebug("Open: Handle address: %li for num: %i", (long int) h, count);
+=======
 //		COMMTIMEOUTS CommTimeouts;
 //		CommTimeouts.ReadIntervalTimeout = 100;			// 100ms
 //		CommTimeouts.ReadTotalTimeoutConstant = 5;		// ms
@@ -183,15 +214,22 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
 //		}
 
 		qDebug("Open: Handle address: %li for num: %i", (long int) h, count);
+>>>>>>> .r2914
 
+<<<<<<< .mine
+        hid->handle = h;
+        hid->open = 1;
+        add_hid(hid);
+=======
 		hid->handle = h;
 		add_hid(hid);
+>>>>>>> .r2914
 
-		count++;
-		if (count >= max) return count;
-	}
+        count++;
+        if (count >= max) return count;
+    }
 
-	return count;
+    return count;
 }
 
 //  recveive - receive a packet
@@ -205,22 +243,37 @@ int pjrc_rawhid::open(int max, int vid, int pid, int usage_page, int usage)
 //
 int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
 {
-	OVERLAPPED ov;
-	DWORD n;
+    OVERLAPPED ov;
+    DWORD n;
 
+<<<<<<< .mine
+    hid_t *hid = get_hid(num);
+    if (!hid || !hid->open) return -1;
+=======
 	hid_t *hid = get_hid(num);
 	if (!hid)
 		return -1;
 	if (!hid->handle)
 		return -1;
+>>>>>>> .r2914
 
-	EnterCriticalSection(&rx_mutex);
+    EnterCriticalSection(&rx_mutex);
 
-	ResetEvent(&rx_event);
+    ResetEvent(&rx_event);
 
-	memset(&ov, 0, sizeof(ov));
-	ov.hEvent = rx_event;
+    memset(&ov, 0, sizeof(ov));
+    ov.hEvent = rx_event;
 
+<<<<<<< .mine
+    if (!ReadFile(hid->handle, buf, len, NULL, &ov))
+    {
+        if (GetLastError() != ERROR_IO_PENDING)
+        {
+            print_win32_err();
+            LeaveCriticalSection(&rx_mutex);
+            return -1;
+        }
+=======
 	if (!ReadFile(hid->handle, buf, len, NULL, &ov))
 	{
 		DWORD err = GetLastError();
@@ -240,7 +293,24 @@ int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
 			LeaveCriticalSection(&rx_mutex);
 			return -1;
 		}
+>>>>>>> .r2914
 
+<<<<<<< .mine
+        DWORD r = WaitForSingleObject(rx_event, timeout);
+        if (r == WAIT_TIMEOUT)
+        {
+            CancelIo(hid->handle);
+            LeaveCriticalSection(&rx_mutex);
+            return 0;
+        }
+        if (r != WAIT_OBJECT_0)
+        {
+            print_win32_err();
+            LeaveCriticalSection(&rx_mutex);
+            return -1;
+        }
+    }
+=======
 		DWORD r = WaitForSingleObject(rx_event, timeout);
 		if (r == WAIT_TIMEOUT)
 		{
@@ -256,7 +326,16 @@ int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
 			return -1;
 		}
 	}
+>>>>>>> .r2914
 
+<<<<<<< .mine
+    if (!GetOverlappedResult(hid->handle, &ov, &n, FALSE))
+    {
+        print_win32_err();
+        LeaveCriticalSection(&rx_mutex);
+        return -1;
+    }
+=======
 	if (!GetOverlappedResult(hid->handle, &ov, &n, FALSE))
 	{
 		DWORD err = GetLastError();
@@ -273,15 +352,16 @@ int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
 		LeaveCriticalSection(&rx_mutex);
 		return -1;
 	}
+>>>>>>> .r2914
 
-	LeaveCriticalSection(&rx_mutex);
+    LeaveCriticalSection(&rx_mutex);
 
-	if (n <= 0) return -1;
+    if (n <= 0) return -1;
 
-//	qDebug("Received %i bytes, first %x, second %x", len, *((char *) buf),*((char *)buf + 1));
+    //	qDebug("Received %i bytes, first %x, second %x", len, *((char *) buf),*((char *)buf + 1));
 
-	if ((int)n > len) n = len;
-	return n;
+    if ((int)n > len) n = len;
+    return n;
 }
 
 //  send - send a packet
@@ -295,26 +375,61 @@ int pjrc_rawhid::receive(int num, void *buf, int len, int timeout)
 //
 int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
 {
-	OVERLAPPED ov;
-	DWORD n, r;
+    OVERLAPPED ov;
+    DWORD n, r;
 
+<<<<<<< .mine
+    hid_t *hid = get_hid(num);
+    if (!hid || !hid->open) return -1;
+=======
 	hid_t *hid = get_hid(num);
 	if (!hid)
 		return -1;
 	if (!hid->handle)
 		return -1;
+>>>>>>> .r2914
 
-//	qDebug("Send: Handle address: %li for num: %i", (long int) hid->handle, num);
+    //	qDebug("Send: Handle address: %li for num: %i", (long int) hid->handle, num);
 
-	EnterCriticalSection(&tx_mutex);
+    EnterCriticalSection(&tx_mutex);
 
-	ResetEvent(&tx_event);
+    ResetEvent(&tx_event);
 
-	memset(&ov, 0, sizeof(ov));
-	ov.hEvent = tx_event;
+    memset(&ov, 0, sizeof(ov));
+    ov.hEvent = tx_event;
 
-//	qDebug("Trying to write %u bytes.  First %x second %x",len, *((char *) buf), *((char *)buf + 1));
+    //	qDebug("Trying to write %u bytes.  First %x second %x",len, *((char *) buf), *((char *)buf + 1));
 
+<<<<<<< .mine
+    if (!WriteFile(hid->handle, buf, len, NULL, &ov))
+    {
+        DWORD err = GetLastError();
+        if ( err == ERROR_SUCCESS || err == ERROR_IO_PENDING )
+        {
+            //			qDebug("Waiting for write to finish");
+            r = WaitForSingleObject(tx_event, timeout);
+            if (r == WAIT_TIMEOUT)
+            {
+                CancelIo(hid->handle);
+                LeaveCriticalSection(&tx_mutex);
+                return 0;
+            }
+            if (r != WAIT_OBJECT_0)
+            {
+                print_win32_err();
+                LeaveCriticalSection(&tx_mutex);
+                return -1;
+            }
+        }
+        else
+        {
+            //			qDebug("Error writing to file");
+            print_win32_err();
+            LeaveCriticalSection(&tx_mutex);
+            return -1;
+        }
+    }
+=======
 	if (!WriteFile(hid->handle, buf, len, NULL, &ov))
 	{
 		DWORD err = GetLastError();
@@ -353,7 +468,15 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
 			return -1;
 		}
 	}
+>>>>>>> .r2914
 
+<<<<<<< .mine
+    if (!GetOverlappedResult(hid->handle, &ov, &n, FALSE))
+    {
+        qDebug("Problem getting overlapped result");
+        print_win32_err();
+    }
+=======
 	if (!GetOverlappedResult(hid->handle, &ov, &n, FALSE))
 	{
 		DWORD err = GetLastError();
@@ -369,21 +492,37 @@ int pjrc_rawhid::send(int num, void *buf, int len, int timeout)
 			return -1;
 		}
 	}
+>>>>>>> .r2914
 
-	LeaveCriticalSection(&tx_mutex);
+    LeaveCriticalSection(&tx_mutex);
 
-	if (n <= 0) return -1;
-	return n;
+    if (n <= 0) return -1;
+    return n;
 }
 
 QString pjrc_rawhid::getserial(int num)
 {
+<<<<<<< .mine
+    hid_t *hid = get_hid(num);
+    if (!hid || !hid->open)
+        return "";
+=======
 	hid_t *hid = get_hid(num);
 	if (!hid)
 		return "";
+>>>>>>> .r2914
 	if (!hid->handle)
 		return "";
 
+<<<<<<< .mine
+    // Should we do some "critical section" stuff here??
+    char temp[126];
+    if (!HidD_GetSerialNumberString(hid->handle, temp, sizeof(temp)))
+    {
+        print_win32_err();
+        return QString("Error");
+    }
+=======
 	// Should we do some "critical section" stuff here??
 	char temp[126];
 	if (!HidD_GetSerialNumberString(hid->handle, temp, sizeof(temp)))
@@ -400,8 +539,9 @@ QString pjrc_rawhid::getserial(int num)
 
 		return QString("Error");
 	}
+>>>>>>> .r2914
 
-	return QString().fromUtf16((ushort*)temp,-1);
+    return QString().fromUtf16((ushort*)temp,-1);
 }
 
 //  close - close a device
@@ -413,13 +553,31 @@ QString pjrc_rawhid::getserial(int num)
 //
 void pjrc_rawhid::close(int num)
 {
+<<<<<<< .mine
+    hid_t *hid = get_hid(num);
+    if (hid && hid->open)
+        hid_close(hid);
+=======
 	hid_close(get_hid(num));
+>>>>>>> .r2914
 }
 
 void pjrc_rawhid::add_hid(hid_t *h)
 {
-	if (!h) return;
+    if (!h) return;
 
+<<<<<<< .mine
+    if (!first_hid || !last_hid)
+    {
+        first_hid = last_hid = h;
+        h->next = h->prev = NULL;
+        return;
+    }
+    last_hid->next = h;
+    h->prev = last_hid;
+    h->next = NULL;
+    last_hid = h;
+=======
 	if (!first_hid || !last_hid)
 	{
 		first_hid = last_hid = h;
@@ -431,47 +589,188 @@ void pjrc_rawhid::add_hid(hid_t *h)
 	h->prev = last_hid;
 	h->next = NULL;
 	last_hid = h;
+>>>>>>> .r2914
 }
 
 hid_t * pjrc_rawhid::get_hid(int num)
 {
-	hid_t *p;
-	for (p = first_hid; p && num > 0; p = p->next, num--) ;
-	return p;
+    hid_t *p;
+    for (p = first_hid; p && num > 0; p = p->next, num--) ;
+    return p;
 }
 
 void pjrc_rawhid::free_all_hid(void)
 {
-	for (hid_t *p = first_hid; p; p = p->next)
-		hid_close(p);
+    for (hid_t *p = first_hid; p; p = p->next)
+        hid_close(p);
 
-	hid_t *p = first_hid;
-	while (p)
-	{
-		hid_t *q = p;
-		p = p->next;
-		free(q);
-	}
+    hid_t *p = first_hid;
+    while (p)
+    {
+        hid_t *q = p;
+        p = p->next;
+        free(q);
+    }
 
-	first_hid = last_hid = NULL;
+    first_hid = last_hid = NULL;
 }
 
 void pjrc_rawhid::hid_close(hid_t *hid)
 {
-	if (!hid) return;
+    if (!hid) return;
 	if (!hid->handle) return;
 
+<<<<<<< .mine
+    if (hid->handle)
+    {
+        CloseHandle(hid->handle);
+        hid->handle = NULL;
+    }
+=======
 	CloseHandle(hid->handle);
 	hid->handle = NULL;
+>>>>>>> .r2914
 }
 
 void pjrc_rawhid::print_win32_err(DWORD err)
 {
+<<<<<<< .mine
+    char buf[256];
+    char temp[256];
+    DWORD err;
+=======
 	char buf[256];
 	char temp[256];
+>>>>>>> .r2914
 
-	//FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, (WCHAR*)buf, sizeof(buf), NULL);
-	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT), (WCHAR*)buf, sizeof(buf), NULL);
-	WideCharToMultiByte( CP_ACP, 0, (WCHAR*)buf, sizeof(buf), temp, sizeof(temp), NULL, NULL );
-	printf("err %ld: %s\n", err, temp);
+<<<<<<< .mine
+    err = GetLastError();
+
+=======
+>>>>>>> .r2914
+    //FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, 0, (WCHAR*)buf, sizeof(buf), NULL);
+    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err, MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT), (WCHAR*)buf, sizeof(buf), NULL);
+    WideCharToMultiByte( CP_ACP, 0, (WCHAR*)buf, sizeof(buf), temp, sizeof(temp), NULL, NULL );
+    printf("err %ld: %s\n", err, temp);
+}
+// see http://msdn.microsoft.com/en-us/library/ms791134.aspx for list of GUID classes
+#ifndef GUID_DEVCLASS_PORTS
+DEFINE_GUID(GUID_DEVCLASS_PORTS, 0x4d1e55b2, 0xf16f, 0x11cf, 0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30);
+#endif
+
+/* Gordon Schumacher's macros for TCHAR -> QString conversions and vice versa */
+#ifdef UNICODE
+#define QStringToTCHAR(x)     (wchar_t*) x.utf16()
+#define PQStringToTCHAR(x)    (wchar_t*) x->utf16()
+#define TCHARToQString(x)     QString::fromUtf16((ushort*)(x))
+#define TCHARToQStringN(x,y)  QString::fromUtf16((ushort*)(x),(y))
+#else
+#define QStringToTCHAR(x)     x.local8Bit().constData()
+#define PQStringToTCHAR(x)    x->local8Bit().constData()
+#define TCHARToQString(x)     QString::fromLocal8Bit((x))
+#define TCHARToQStringN(x,y)  QString::fromLocal8Bit((x),(y))
+#endif /*UNICODE*/
+
+void pjrc_rawhid::setUpNotifications( )
+{
+#ifdef QT_GUI_LIB
+    if(notificationWidget)
+        return;
+    notificationWidget = new USBRegistrationWidget(this);
+
+    DEV_BROADCAST_DEVICEINTERFACE dbh;
+    ZeroMemory(&dbh, sizeof(dbh));
+    dbh.dbcc_size = sizeof(dbh);
+    dbh.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
+    CopyMemory(&dbh.dbcc_classguid, &GUID_DEVCLASS_PORTS, sizeof(GUID));
+    if( RegisterDeviceNotification( notificationWidget->winId( ), &dbh, DEVICE_NOTIFY_WINDOW_HANDLE ) == NULL)
+        qWarning() << "RegisterDeviceNotification failed:" << GetLastError();
+    // setting up notifications doesn't tell us about devices already connected
+    // so get those manually
+#else
+    qWarning("GUI not enabled - can't register for device notifications.");
+#endif // QT_GUI_LIB
+}
+LRESULT pjrc_rawhid::onDeviceChangeWin( WPARAM wParam, LPARAM lParam )
+{
+    if ( DBT_DEVICEARRIVAL == wParam || DBT_DEVICEREMOVECOMPLETE == wParam )
+    {
+        PDEV_BROADCAST_HDR pHdr = (PDEV_BROADCAST_HDR)lParam;
+        if( pHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE )
+        {
+            PDEV_BROADCAST_DEVICEINTERFACE pDevInf = (PDEV_BROADCAST_DEVICEINTERFACE)pHdr;
+            // delimiters are different across APIs...change to backslash.  ugh.
+            QString deviceID = TCHARToQString(pDevInf->dbcc_name).toUpper().replace("#", "\\");
+            matchAndDispatchChangedDevice(deviceID, GUID_DEVCLASS_PORTS, wParam);
+        }
+    }
+    return 0;
+}
+#ifdef QT_GUI_LIB
+bool USBRegistrationWidget::winEvent( MSG* message, long* result )
+{
+    if ( message->message == WM_DEVICECHANGE ) {
+        qese->onDeviceChangeWin( message->wParam, message->lParam );
+        *result = 1;
+        return true;
+    }
+    return false;
+}
+#endif
+bool pjrc_rawhid::matchAndDispatchChangedDevice(const QString & deviceID, const GUID & guid, WPARAM wParam)
+{
+    bool rv = false;
+    DWORD dwFlag = (DBT_DEVICEARRIVAL == wParam) ? DIGCF_PRESENT : DIGCF_ALLCLASSES;
+    HDEVINFO devInfo;
+    if( (devInfo = SetupDiGetClassDevs(&guid,NULL,NULL,dwFlag)) != INVALID_HANDLE_VALUE )
+    {
+        SP_DEVINFO_DATA spDevInfoData;
+        spDevInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
+        for(int i=0; SetupDiEnumDeviceInfo(devInfo, i, &spDevInfoData); i++)
+        {
+            DWORD nSize=0 ;
+            TCHAR buf[MAX_PATH];
+            if ( SetupDiGetDeviceInstanceId(devInfo, &spDevInfoData, buf, MAX_PATH, &nSize) &&
+                 deviceID.contains(TCHARToQString(buf))) // we found a match
+            {
+                rv = true;
+                USBPortInfo info;
+                //info.productID = info.vendorID = 0;
+                getDeviceDetailsWin( &info, devInfo, &spDevInfoData, wParam );
+                if( wParam == DBT_DEVICEARRIVAL )
+                    emit deviceDiscovered(info);
+                else if( wParam == DBT_DEVICEREMOVECOMPLETE )
+                    emit deviceRemoved(info);
+                break;
+            }
+        }
+        SetupDiDestroyDeviceInfoList(devInfo);
+    }
+    return rv;
+}
+bool pjrc_rawhid::getDeviceDetailsWin( USBPortInfo* portInfo, HDEVINFO devInfo, PSP_DEVINFO_DATA devData, WPARAM wParam )
+{
+    portInfo->friendName = getDeviceProperty(devInfo, devData, SPDRP_FRIENDLYNAME);
+    if( wParam == DBT_DEVICEARRIVAL)
+        portInfo->physName = getDeviceProperty(devInfo, devData, SPDRP_PHYSICAL_DEVICE_OBJECT_NAME);
+    portInfo->enumName = getDeviceProperty(devInfo, devData, SPDRP_ENUMERATOR_NAME);
+    QString hardwareIDs = getDeviceProperty(devInfo, devData, SPDRP_HARDWAREID);
+    QRegExp idRx("VID_(\\w+)&PID_(\\w+)");
+    if( hardwareIDs.toUpper().contains(idRx) )
+    {
+        bool dummy;
+        portInfo->vendorID = idRx.cap(1).toInt(&dummy, 16);
+        portInfo->productID = idRx.cap(2).toInt(&dummy, 16);
+    }
+    return true;
+}
+QString pjrc_rawhid::getDeviceProperty(HDEVINFO devInfo, PSP_DEVINFO_DATA devData, DWORD property)
+{
+    DWORD buffSize = 0;
+    SetupDiGetDeviceRegistryProperty(devInfo, devData, property, NULL, NULL, 0, & buffSize);
+    BYTE* buff = new BYTE[buffSize];
+    SetupDiGetDeviceRegistryProperty(devInfo, devData, property, NULL, buff, buffSize, NULL);
+    QString result = TCHARToQString(buff);
+    delete [] buff;
+    return result;
 }

@@ -17,7 +17,7 @@ OTHER_FILES += RawHID.pluginspec
 # Platform Specific USB HID Stuff
 win32 { 
     SOURCES += pjrc_rawhid_win.cpp
-    LIBS += -lhid \
+LIBS += -lhid \
         -lsetupapi
 }
 macx { 

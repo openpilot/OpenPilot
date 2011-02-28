@@ -164,11 +164,15 @@ void ConnectionManager::onConnectionClosed(QObject *obj)	// Pip
 	if (!m_connectionDevice.connection || m_connectionDevice.connection != obj)
 		return;
 
+	m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
 	m_connectionDevice.connection = NULL;
 	m_ioDev = NULL;
 
 	m_connectBtn->setText("Connect");
 	m_availableDevList->setEnabled(true);
+
+	// signal interested plugins that user is disconnecting his device
+	emit deviceDisconnected();
 }
 
 void ConnectionManager::onConnectionDestroyed(QObject *obj)	// Pip
@@ -213,8 +217,8 @@ void ConnectionManager::onConnectPressed()
                     return;
                 }
 
-				connect(m_connectionDevice.connection, SIGNAL(deviceClosed(QObject *)), this, SLOT(onConnectionClosed(QObject *)));	// Pip
-				connect(m_connectionDevice.connection, SIGNAL(destroyed(QObject *)), this, SLOT(onConnectionDestroyed(QObject *)));	// Pip
+				connect(m_connectionDevice.connection, SIGNAL(deviceClosed(QObject *)), this, SLOT(onConnectionClosed(QObject *)), Qt::QueuedConnection);
+				connect(m_connectionDevice.connection, SIGNAL(destroyed(QObject *)), this, SLOT(onConnectionDestroyed(QObject *)), Qt::QueuedConnection);
 
                 //signal interested plugins that the user wants to connect to the device
                 emit deviceConnected(m_ioDev);

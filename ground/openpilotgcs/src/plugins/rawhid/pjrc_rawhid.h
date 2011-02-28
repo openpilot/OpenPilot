@@ -162,6 +162,7 @@ public:
     QString getserial(int num);
     void mytest(int num);
 signals:
+     void deviceUnplugged(int);//just to make pips changes compile
     /*!
       A new device has been connected to the system.
 
@@ -208,7 +209,7 @@ private:
     hid_t * get_hid(int num);
     void free_all_hid(void);
     void hid_close(hid_t *hid);
-    void print_win32_err(void);
+    void print_win32_err(DWORD err);
 
 #endif
 };

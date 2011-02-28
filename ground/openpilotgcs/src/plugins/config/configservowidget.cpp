@@ -111,14 +111,23 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
 			<< m_config->ch6Min
 			<< m_config->ch7Min;
 
-	inWidgetBars << m_config->widgetBarCH0
-				   << m_config->widgetBarCH1
-				   << m_config->widgetBarCH2
-				   << m_config->widgetBarCH3
-				   << m_config->widgetBarCH4
-				   << m_config->widgetBarCH5
-				   << m_config->widgetBarCH6
-				   << m_config->widgetBarCH7;
+	inSliders << m_config->inSlider0
+			  << m_config->inSlider1
+			  << m_config->inSlider2
+			  << m_config->inSlider3
+			  << m_config->inSlider4
+			  << m_config->inSlider5
+			  << m_config->inSlider6
+			  << m_config->inSlider7;
+
+//	inWidgetBars << m_config->widgetBarCH0
+//				   << m_config->widgetBarCH1
+//				   << m_config->widgetBarCH2
+//				   << m_config->widgetBarCH3
+//				   << m_config->widgetBarCH4
+//				   << m_config->widgetBarCH5
+//				   << m_config->widgetBarCH6
+//				   << m_config->widgetBarCH7;
 
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
 
@@ -234,6 +243,15 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestRCInputUpdate()));
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestRCOutputUpdate()));
 
+	connect(m_config->inSlider0, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged0(int)));
+	connect(m_config->inSlider1, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged1(int)));
+	connect(m_config->inSlider2, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged2(int)));
+	connect(m_config->inSlider3, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged3(int)));
+	connect(m_config->inSlider4, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged4(int)));
+	connect(m_config->inSlider5, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged5(int)));
+	connect(m_config->inSlider6, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged6(int)));
+	connect(m_config->inSlider7, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged7(int)));
+
     firstUpdate = true;
 
 	enableControls(false);
@@ -258,6 +276,50 @@ ConfigServoWidget::~ConfigServoWidget()
 }
 
 // ************************************
+// slider value changed signals
+
+void ConfigServoWidget::onInSliderValueChanged0(int value)
+{
+	m_config->ch0Cur->setText(QString::number(value));
+}
+
+void ConfigServoWidget::onInSliderValueChanged1(int value)
+{
+	m_config->ch1Cur->setText(QString::number(value));
+}
+
+void ConfigServoWidget::onInSliderValueChanged2(int value)
+{
+	m_config->ch2Cur->setText(QString::number(value));
+}
+
+void ConfigServoWidget::onInSliderValueChanged3(int value)
+{
+	m_config->ch3Cur->setText(QString::number(value));
+}
+
+void ConfigServoWidget::onInSliderValueChanged4(int value)
+{
+	m_config->ch4Cur->setText(QString::number(value));
+}
+
+void ConfigServoWidget::onInSliderValueChanged5(int value)
+{
+	m_config->ch5Cur->setText(QString::number(value));
+}
+
+void ConfigServoWidget::onInSliderValueChanged6(int value)
+{
+	m_config->ch6Cur->setText(QString::number(value));
+}
+
+void ConfigServoWidget::onInSliderValueChanged7(int value)
+{
+	m_config->ch7Cur->setText(QString::number(value));
+}
+
+// ************************************
+// telemetry start/stop connect/disconnect signals
 
 void ConfigServoWidget::onTelemetryStart()
 {
@@ -275,7 +337,6 @@ void ConfigServoWidget::onTelemetryConnect()
 void ConfigServoWidget::onTelemetryDisconnect()
 {
 	enableControls(false);
-
 	m_config->doRCInputCalibration->setChecked(false);
 }
 
@@ -636,9 +697,12 @@ void ConfigServoWidget::requestRCInputUpdate()
 		QVariant neutral = field_neu->getValue(i);
 		inMaxLabels[i]->setText(max.toString());
 		inMinLabels[i]->setText(min.toString());
-		inWidgetBars[i]->setMaximum(max.toInt());
-		inWidgetBars[i]->setMinimum(min.toInt());
-		inWidgetBars[i]->setValue(neutral.toInt());
+		inSliders[i]->setMaximum(max.toInt());
+		inSliders[i]->setMinimum(min.toInt());
+		inSliders[i]->setValue(neutral.toInt());
+//		inWidgetBars[i]->setMaximum(max.toInt());
+//		inWidgetBars[i]->setMinimum(min.toInt());
+//		inWidgetBars[i]->setValue(neutral.toInt());
 	}
 
     // Update receiver type
@@ -714,7 +778,8 @@ void ConfigServoWidget::sendRCInputUpdate()
     fieldName = QString("ChannelNeutral");
     field = obj->getField(fieldName);
 	for (int i = 0; i < 8; i++)
-		field->setValue(inWidgetBars[i]->value(), i);
+		field->setValue(inSliders[i]->value(), i);
+//		field->setValue(inWidgetBars[i]->value(), i);
 
     // Set RC Receiver type:
     fieldName = QString("InputMode");
@@ -929,7 +994,8 @@ void ConfigServoWidget::updateChannels(UAVObject* controlCommand)
 
 		field = controlCommand->getField(QString("Channel"));
 		for (int i = 0; i < 8; i++)
-			updateChannelWidgetBar(inWidgetBars[i], inMinLabels[i], inMaxLabels[i], reversals[i], field->getValue(i).toInt());
+			updateChannelInSlider(inSliders[i], inMinLabels[i], inMaxLabels[i], reversals[i], field->getValue(i).toInt());
+//			updateChannelWidgetBar(inWidgetBars[i], inMinLabels[i], inMaxLabels[i], reversals[i], field->getValue(i).toInt());
 
         firstUpdate = false;
 	}
@@ -959,9 +1025,13 @@ void ConfigServoWidget::updateChannels(UAVObject* controlCommand)
 	if (chIndex < field->getOptions().length() - 1)
 	{
 		float valueScaled;
-		int chMin = inWidgetBars[chIndex]->minimum();
-		int chMax = inWidgetBars[chIndex]->maximum();
-		int chNeutral = inWidgetBars[chIndex]->value();
+
+		int chMin = inSliders[chIndex]->minimum();
+		int chMax = inSliders[chIndex]->maximum();
+		int chNeutral = inSliders[chIndex]->value();
+//		int chMin = inWidgetBars[chIndex]->minimum();
+//		int chMax = inWidgetBars[chIndex]->maximum();
+//		int chNeutral = inWidgetBars[chIndex]->value();
 
 		int value = controlCommand->getField("Channel")->getValue(chIndex).toInt();
 		if ((chMax > chMin && value >= chNeutral) || (chMin > chMax && value <= chNeutral))
@@ -988,6 +1058,43 @@ void ConfigServoWidget::updateChannels(UAVObject* controlCommand)
 	}
 }
 
+void ConfigServoWidget::updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, QCheckBox *rev, int value)
+{
+	Q_UNUSED(rev);
+
+//	if (!slider || !min || !max || !rev)
+	if (!slider || !min || !max)
+		return;
+
+	if (firstUpdate)
+	{	// Reset all the min/max values of the progress bar since we are starting the calibration.
+
+		slider->setMaximum(value);
+		slider->setMinimum(value);
+		slider->setValue(value);
+
+		max->setText(QString::number(value));
+		min->setText(QString::number(value));
+
+		return;
+	}
+
+	if (value > 0)
+	{	// avoids glitches...
+		if (value > slider->maximum())
+		{
+			slider->setMaximum(value);
+			max->setText(QString::number(value));
+		}
+		if (value < slider->minimum())
+		{
+			slider->setMinimum(value);
+			min->setText(QString::number(value));
+		}
+		slider->setValue(value);
+	}
+}
+/*
 void ConfigServoWidget::updateChannelWidgetBar(WidgetBar *widget_bar, QLabel *min, QLabel *max, QCheckBox *rev, int value)
 {
 	Q_UNUSED(rev);
@@ -1024,3 +1131,4 @@ void ConfigServoWidget::updateChannelWidgetBar(WidgetBar *widget_bar, QLabel *mi
 		widget_bar->setValue(value);
 	}
 }
+*/

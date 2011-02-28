@@ -52,12 +52,22 @@ public slots:
 	void onTelemetryConnect();
 	void onTelemetryDisconnect();
 
+	void onInSliderValueChanged0(int value);
+	void onInSliderValueChanged1(int value);
+	void onInSliderValueChanged2(int value);
+	void onInSliderValueChanged3(int value);
+	void onInSliderValueChanged4(int value);
+	void onInSliderValueChanged5(int value);
+	void onInSliderValueChanged6(int value);
+	void onInSliderValueChanged7(int value);
+
 private:
 	Ui_SettingsWidget *m_config;
 
 	QList<QSlider> sliders;
 
-	void updateChannelWidgetBar(WidgetBar *widget_bar, QLabel *min, QLabel *max, QCheckBox *rev, int value);
+	void updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, QCheckBox *rev, int value);
+//	void updateChannelWidgetBar(WidgetBar *widget_bar, QLabel *min, QLabel *max, QCheckBox *rev, int value);
 
 	void assignChannel(UAVDataObject *obj, QString str);
 	void assignOutputChannel(UAVDataObject *obj, QString str);
@@ -72,6 +82,7 @@ private:
 	QList<QCheckBox*> reversals;
 	QList<QLabel*> outLabels;
 
+	QList<QSlider*> inSliders;
 	QList<WidgetBar*> inWidgetBars;
 	QList<QLabel*> inMaxLabels;
 	QList<QLabel*> inMinLabels;

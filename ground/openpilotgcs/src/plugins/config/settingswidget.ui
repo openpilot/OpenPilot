@@ -53,9 +53,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch0Cur">
        <property name="geometry">
         <rect>
-         <x>160</x>
+         <x>150</x>
          <y>40</y>
-         <width>31</width>
+         <width>51</width>
          <height>17</height>
         </rect>
        </property>
@@ -63,6 +63,8 @@ p, li { white-space: pre-wrap; }
         <font>
          <family>FreeSans</family>
          <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
         </font>
        </property>
        <property name="toolTip">
@@ -139,9 +141,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch7Cur">
        <property name="geometry">
         <rect>
-         <x>160</x>
+         <x>150</x>
          <y>180</y>
-         <width>31</width>
+         <width>51</width>
          <height>17</height>
         </rect>
        </property>
@@ -149,6 +151,8 @@ p, li { white-space: pre-wrap; }
         <font>
          <family>FreeSans</family>
          <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
         </font>
        </property>
        <property name="toolTip">
@@ -366,9 +370,9 @@ Applies and Saves all settings to SD</string>
       <widget class="QLabel" name="ch4Cur">
        <property name="geometry">
         <rect>
-         <x>160</x>
+         <x>150</x>
          <y>120</y>
-         <width>31</width>
+         <width>51</width>
          <height>17</height>
         </rect>
        </property>
@@ -376,6 +380,8 @@ Applies and Saves all settings to SD</string>
         <font>
          <family>FreeSans</family>
          <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
         </font>
        </property>
        <property name="toolTip">
@@ -441,7 +447,7 @@ Be sure to set the Neutral position on all sliders before sending!</string>
         <rect>
          <x>20</x>
          <y>40</y>
-         <width>131</width>
+         <width>121</width>
          <height>21</height>
         </rect>
        </property>
@@ -521,9 +527,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch2Cur">
        <property name="geometry">
         <rect>
-         <x>160</x>
+         <x>150</x>
          <y>80</y>
-         <width>31</width>
+         <width>51</width>
          <height>17</height>
         </rect>
        </property>
@@ -531,6 +537,8 @@ p, li { white-space: pre-wrap; }
         <font>
          <family>FreeSans</family>
          <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
         </font>
        </property>
        <property name="toolTip">
@@ -547,9 +555,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch5Cur">
        <property name="geometry">
         <rect>
-         <x>160</x>
+         <x>150</x>
          <y>140</y>
-         <width>31</width>
+         <width>51</width>
          <height>17</height>
         </rect>
        </property>
@@ -557,6 +565,8 @@ p, li { white-space: pre-wrap; }
         <font>
          <family>FreeSans</family>
          <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
         </font>
        </property>
        <property name="toolTip">
@@ -603,9 +613,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch1Cur">
        <property name="geometry">
         <rect>
-         <x>160</x>
+         <x>150</x>
          <y>60</y>
-         <width>31</width>
+         <width>51</width>
          <height>17</height>
         </rect>
        </property>
@@ -613,6 +623,8 @@ p, li { white-space: pre-wrap; }
         <font>
          <family>FreeSans</family>
          <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
         </font>
        </property>
        <property name="toolTip">
@@ -629,9 +641,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch6Cur">
        <property name="geometry">
         <rect>
-         <x>160</x>
+         <x>150</x>
          <y>160</y>
-         <width>31</width>
+         <width>51</width>
          <height>17</height>
         </rect>
        </property>
@@ -639,6 +651,8 @@ p, li { white-space: pre-wrap; }
         <font>
          <family>FreeSans</family>
          <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
         </font>
        </property>
        <property name="toolTip">
@@ -655,9 +669,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="ch3Cur">
        <property name="geometry">
         <rect>
-         <x>160</x>
+         <x>150</x>
          <y>100</y>
-         <width>31</width>
+         <width>51</width>
          <height>17</height>
         </rect>
        </property>
@@ -665,6 +679,8 @@ p, li { white-space: pre-wrap; }
         <font>
          <family>FreeSans</family>
          <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
         </font>
        </property>
        <property name="toolTip">
@@ -767,7 +783,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>20</x>
          <y>60</y>
-         <width>131</width>
+         <width>121</width>
          <height>21</height>
         </rect>
        </property>
@@ -783,7 +799,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>20</x>
          <y>80</y>
-         <width>131</width>
+         <width>121</width>
          <height>21</height>
         </rect>
        </property>
@@ -799,7 +815,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>20</x>
          <y>100</y>
-         <width>131</width>
+         <width>121</width>
          <height>21</height>
         </rect>
        </property>
@@ -815,7 +831,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>20</x>
          <y>120</y>
-         <width>131</width>
+         <width>121</width>
          <height>21</height>
         </rect>
        </property>
@@ -831,7 +847,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>20</x>
          <y>140</y>
-         <width>131</width>
+         <width>121</width>
          <height>21</height>
         </rect>
        </property>
@@ -847,7 +863,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>20</x>
          <y>160</y>
-         <width>131</width>
+         <width>121</width>
          <height>21</height>
         </rect>
        </property>
@@ -863,7 +879,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>20</x>
          <y>180</y>
-         <width>131</width>
+         <width>121</width>
          <height>21</height>
         </rect>
        </property>
@@ -967,224 +983,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600; color:#ff0000;&quot;&gt;when running calibration!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
-      <widget class="WidgetBar" name="widgetBarCH1" native="true">
-       <property name="geometry">
-        <rect>
-         <x>250</x>
-         <y>60</y>
-         <width>271</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>1</width>
-         <height>1</height>
-        </size>
-       </property>
-       <property name="mouseTracking">
-        <bool>false</bool>
-       </property>
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(165, 165, 165);</string>
-       </property>
-      </widget>
-      <widget class="WidgetBar" name="widgetBarCH2" native="true">
-       <property name="geometry">
-        <rect>
-         <x>250</x>
-         <y>80</y>
-         <width>271</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>1</width>
-         <height>1</height>
-        </size>
-       </property>
-       <property name="mouseTracking">
-        <bool>false</bool>
-       </property>
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(165, 165, 165);</string>
-       </property>
-      </widget>
-      <widget class="WidgetBar" name="widgetBarCH3" native="true">
-       <property name="geometry">
-        <rect>
-         <x>250</x>
-         <y>100</y>
-         <width>271</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>1</width>
-         <height>1</height>
-        </size>
-       </property>
-       <property name="mouseTracking">
-        <bool>false</bool>
-       </property>
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(165, 165, 165);</string>
-       </property>
-      </widget>
-      <widget class="WidgetBar" name="widgetBarCH4" native="true">
-       <property name="geometry">
-        <rect>
-         <x>250</x>
-         <y>120</y>
-         <width>271</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>1</width>
-         <height>1</height>
-        </size>
-       </property>
-       <property name="mouseTracking">
-        <bool>false</bool>
-       </property>
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(165, 165, 165);</string>
-       </property>
-      </widget>
-      <widget class="WidgetBar" name="widgetBarCH5" native="true">
-       <property name="geometry">
-        <rect>
-         <x>250</x>
-         <y>140</y>
-         <width>271</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>1</width>
-         <height>1</height>
-        </size>
-       </property>
-       <property name="mouseTracking">
-        <bool>false</bool>
-       </property>
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(165, 165, 165);</string>
-       </property>
-      </widget>
-      <widget class="WidgetBar" name="widgetBarCH6" native="true">
-       <property name="geometry">
-        <rect>
-         <x>250</x>
-         <y>160</y>
-         <width>271</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>1</width>
-         <height>1</height>
-        </size>
-       </property>
-       <property name="mouseTracking">
-        <bool>false</bool>
-       </property>
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(165, 165, 165);</string>
-       </property>
-      </widget>
-      <widget class="WidgetBar" name="widgetBarCH7" native="true">
-       <property name="geometry">
-        <rect>
-         <x>250</x>
-         <y>180</y>
-         <width>271</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>1</width>
-         <height>1</height>
-        </size>
-       </property>
-       <property name="mouseTracking">
-        <bool>false</bool>
-       </property>
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(165, 165, 165);</string>
-       </property>
-      </widget>
-      <widget class="WidgetBar" name="widgetBarCH0" native="true">
+      <widget class="QSlider" name="inSlider0">
        <property name="geometry">
         <rect>
          <x>250</x>
@@ -1193,26 +992,195 @@ p, li { white-space: pre-wrap; }
          <height>21</height>
         </rect>
        </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+       <property name="mouseTracking">
+        <bool>true</bool>
        </property>
-       <property name="minimumSize">
-        <size>
-         <width>1</width>
-         <height>1</height>
-        </size>
+       <property name="minimum">
+        <number>1000</number>
+       </property>
+       <property name="maximum">
+        <number>2000</number>
+       </property>
+       <property name="value">
+        <number>1500</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QSlider" name="inSlider1">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>60</y>
+         <width>271</width>
+         <height>21</height>
+        </rect>
        </property>
        <property name="mouseTracking">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
-       <property name="autoFillBackground">
-        <bool>false</bool>
+       <property name="minimum">
+        <number>1000</number>
        </property>
-       <property name="styleSheet">
-        <string notr="true">background-color: rgb(165, 165, 165);</string>
+       <property name="maximum">
+        <number>2000</number>
+       </property>
+       <property name="value">
+        <number>1500</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QSlider" name="inSlider2">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>80</y>
+         <width>271</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="mouseTracking">
+        <bool>true</bool>
+       </property>
+       <property name="minimum">
+        <number>1000</number>
+       </property>
+       <property name="maximum">
+        <number>2000</number>
+       </property>
+       <property name="value">
+        <number>1500</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QSlider" name="inSlider3">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>100</y>
+         <width>271</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="mouseTracking">
+        <bool>true</bool>
+       </property>
+       <property name="minimum">
+        <number>1000</number>
+       </property>
+       <property name="maximum">
+        <number>2000</number>
+       </property>
+       <property name="value">
+        <number>1500</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QSlider" name="inSlider4">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>120</y>
+         <width>271</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="mouseTracking">
+        <bool>true</bool>
+       </property>
+       <property name="minimum">
+        <number>1000</number>
+       </property>
+       <property name="maximum">
+        <number>2000</number>
+       </property>
+       <property name="value">
+        <number>1500</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QSlider" name="inSlider5">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>140</y>
+         <width>271</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="mouseTracking">
+        <bool>true</bool>
+       </property>
+       <property name="minimum">
+        <number>1000</number>
+       </property>
+       <property name="maximum">
+        <number>2000</number>
+       </property>
+       <property name="value">
+        <number>1500</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QSlider" name="inSlider6">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>160</y>
+         <width>271</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="mouseTracking">
+        <bool>true</bool>
+       </property>
+       <property name="minimum">
+        <number>1000</number>
+       </property>
+       <property name="maximum">
+        <number>2000</number>
+       </property>
+       <property name="value">
+        <number>1500</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QSlider" name="inSlider7">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>180</y>
+         <width>271</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="mouseTracking">
+        <bool>true</bool>
+       </property>
+       <property name="minimum">
+        <number>1000</number>
+       </property>
+       <property name="maximum">
+        <number>2000</number>
+       </property>
+       <property name="value">
+        <number>1500</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </widget>
@@ -3034,13 +3002,6 @@ Applies and Saves all settings to SD</string>
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>WidgetBar</class>
-   <extends>QWidget</extends>
-   <header location="global">widgetbar.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>ch0Assign</tabstop>
   <tabstop>ch1Assign</tabstop>

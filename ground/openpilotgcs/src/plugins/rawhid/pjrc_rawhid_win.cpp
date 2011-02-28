@@ -45,7 +45,7 @@
 
 pjrc_rawhid::pjrc_rawhid()
 {
-    if( !QMetaType::isRegistered( QMetaType::type("USVPortInfo") ) )
+    if( !QMetaType::isRegistered( QMetaType::type("USBPortInfo") ) )
         qRegisterMetaType<USBPortInfo>("USBPortInfo");
 #if (defined QT_GUI_LIB)
     notificationWidget = 0;
@@ -519,6 +519,8 @@ void pjrc_rawhid::setUpNotifications( )
         qWarning() << "RegisterDeviceNotification failed:" << GetLastError();
     // setting up notifications doesn't tell us about devices already connected
     // so get those manually
+    foreach( USBPortInfo port, getPorts() )
+      emit deviceDiscovered( port );
 #else
     qWarning("GUI not enabled - can't register for device notifications.");
 #endif // QT_GUI_LIB
@@ -567,7 +569,7 @@ bool pjrc_rawhid::matchAndDispatchChangedDevice(const QString & deviceID, const 
             {
                 rv = true;
                 USBPortInfo info;
-                //info.productID = info.vendorID = 0;
+                info.productID = info.vendorID = 0;
                 getDeviceDetailsWin( &info, devInfo, &spDevInfoData, wParam );
                 if( wParam == DBT_DEVICEARRIVAL )
                     emit deviceDiscovered(info);
@@ -594,6 +596,7 @@ bool pjrc_rawhid::getDeviceDetailsWin( USBPortInfo* portInfo, HDEVINFO devInfo, 
         portInfo->vendorID = idRx.cap(1).toInt(&dummy, 16);
         portInfo->productID = idRx.cap(2).toInt(&dummy, 16);
     }
+    qDebug()<<portInfo->productID;
     return true;
 }
 QString pjrc_rawhid::getDeviceProperty(HDEVINFO devInfo, PSP_DEVINFO_DATA devData, DWORD property)
@@ -605,4 +608,27 @@ QString pjrc_rawhid::getDeviceProperty(HDEVINFO devInfo, PSP_DEVINFO_DATA devDat
     QString result = TCHARToQString(buff);
     delete [] buff;
     return result;
+}
+QList<USBPortInfo> pjrc_rawhid::getPorts()
+{
+    QList<USBPortInfo> ports;
+    enumerateDevicesWin(GUID_DEVCLASS_PORTS, &ports);
+    return ports;
+}
+void pjrc_rawhid::enumerateDevicesWin( const GUID & guid, QList<USBPortInfo>* infoList )
+{
+    HDEVINFO devInfo;
+    if( (devInfo = SetupDiGetClassDevs(&guid, NULL, NULL, DIGCF_PRESENT)) != INVALID_HANDLE_VALUE)
+    {
+        SP_DEVINFO_DATA devInfoData;
+        devInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
+        for(int i = 0; SetupDiEnumDeviceInfo(devInfo, i, &devInfoData); i++)
+        {
+            USBPortInfo info;
+            info.productID = info.vendorID = 0;
+            getDeviceDetailsWin( &info, devInfo, &devInfoData );
+            infoList->append(info);
+        }
+        SetupDiDestroyDeviceInfoList(devInfo);
+    }
 }

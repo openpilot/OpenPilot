@@ -128,7 +128,7 @@ class RAWHID_EXPORT pjrc_rawhid: public QObject
 #ifdef Q_OS_WIN
 public:
     LRESULT onDeviceChangeWin( WPARAM wParam, LPARAM lParam );
-
+    static QList<USBPortInfo> getPorts();//should exhist for every plattform
 private:
     /*!
      * Get specific property from registry.
@@ -143,6 +143,7 @@ private:
 
     static bool getDeviceDetailsWin( USBPortInfo* portInfo, HDEVINFO devInfo,
                                      PSP_DEVINFO_DATA devData, WPARAM wParam = DBT_DEVICEARRIVAL );
+    static void enumerateDevicesWin( const GUID & guidDev, QList<USBPortInfo>* infoList );
     bool matchAndDispatchChangedDevice(const QString & deviceID, const GUID & guid, WPARAM wParam);
 #ifdef QT_GUI_LIB
     USBRegistrationWidget* notificationWidget;

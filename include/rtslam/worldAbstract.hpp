@@ -56,11 +56,6 @@ namespace jafar {
 				 */
 				virtual ~WorldAbstract() {
 				}
-
-				void addMap(map_ptr_t map)
-				{
-					mapList().push_back(map);
-				}
 				
 				//kernel::FifoMutex display_mutex;
 				unsigned t;

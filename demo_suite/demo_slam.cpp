@@ -430,7 +430,7 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	// 1. Create maps.
 	map_ptr_t mapPtr(new MapAbstract(configEstimation.MAP_SIZE));
-	worldPtr->addMap(mapPtr);
+	mapPtr->linkToParentWorld(worldPtr);
 	
 	// 1b. Create map manager.
 	landmark_factory_ptr_t lmkFactory(new LandmarkFactory<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint>());

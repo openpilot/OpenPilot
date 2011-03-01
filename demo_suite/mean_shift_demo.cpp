@@ -3,7 +3,7 @@
 #include "jmath/mean_shift_clustering.hpp"
 #include "jmath/jblas.hpp"
 #include "jmath/random.hpp"
-#include "jmath/mat_file.hpp"
+#include "jmath/ublas_data_file.hpp"
 
 using namespace jafar::jmath;
 using namespace jafar;

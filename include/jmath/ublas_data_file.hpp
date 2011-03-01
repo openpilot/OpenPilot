@@ -1,5 +1,5 @@
-#ifndef JMATH_MAT_FILE_HPP
-#define JMATH_MAT_FILE_HPP
+#ifndef JMATH_UBLAS_DATA_FILE_HPP
+#define JMATH_UBLAS_DATA_FILE_HPP
 
 #include "boost/numeric/ublas/vector.hpp"
 #include "boost/numeric/ublas/matrix.hpp"

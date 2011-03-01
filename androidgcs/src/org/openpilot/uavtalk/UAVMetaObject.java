@@ -2,13 +2,11 @@ package org.openpilot.uavtalk;
 
 public class UAVMetaObject extends UAVObject {
 
-	public UAVMetaObject(int objID, Boolean isSingleInst, String name) {
-		super(objID, isSingleInst, name);
-		// TODO Auto-generated constructor stub
-	}
-
-	public UAVMetaObject(int objID, String mname, UAVDataObject obj) {
-		// TODO Auto-generated constructor stub
+	private UAVDataObject parent;
+	
+	public UAVMetaObject(int objID, String mname, UAVDataObject parent) {
+		super(objID, true, mname);
+		this.parent = parent;
 	}
 
 	@Override

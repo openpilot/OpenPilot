@@ -25,8 +25,7 @@ HEADERS += configplugin.h \
     mixercurvepoint.h \
     mixercurveline.h \
     configccpmwidget.h \
-	configstabilizationwidget.h \
-	widgetbar.h
+	configstabilizationwidget.h
 
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
@@ -44,8 +43,7 @@ SOURCES += configplugin.cpp \
     mixercurvepoint.cpp \
     mixercurveline.cpp \
     configccpmwidget.cpp \
-	configstabilizationwidget.cpp \
-	widgetbar.cpp
+	configstabilizationwidget.cpp
 
 FORMS += settingswidget.ui \
     airframe.ui \

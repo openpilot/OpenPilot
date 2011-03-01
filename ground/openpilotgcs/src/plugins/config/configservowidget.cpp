@@ -129,15 +129,6 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
 			  << m_config->inSlider6
 			  << m_config->inSlider7;
 
-//	inWidgetBars << m_config->widgetBarCH0
-//				   << m_config->widgetBarCH1
-//				   << m_config->widgetBarCH2
-//				   << m_config->widgetBarCH3
-//				   << m_config->widgetBarCH4
-//				   << m_config->widgetBarCH5
-//				   << m_config->widgetBarCH6
-//				   << m_config->widgetBarCH7;
-
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
 
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlCommand")));
@@ -724,9 +715,6 @@ void ConfigServoWidget::requestRCInputUpdate()
 		inSliders[i]->setMaximum(max.toInt());
 		inSliders[i]->setMinimum(min.toInt());
 		inSliders[i]->setValue(neutral.toInt());
-//		inWidgetBars[i]->setMaximum(max.toInt());
-//		inWidgetBars[i]->setMinimum(min.toInt());
-//		inWidgetBars[i]->setValue(neutral.toInt());
 	}
 
     // Update receiver type
@@ -803,7 +791,6 @@ void ConfigServoWidget::sendRCInputUpdate()
     field = obj->getField(fieldName);
 	for (int i = 0; i < 8; i++)
 		field->setValue(inSliders[i]->value(), i);
-//		field->setValue(inWidgetBars[i]->value(), i);
 
     // Set RC Receiver type:
     fieldName = QString("InputMode");
@@ -1019,7 +1006,6 @@ void ConfigServoWidget::updateChannels(UAVObject* controlCommand)
 		field = controlCommand->getField(QString("Channel"));
 		for (int i = 0; i < 8; i++)
 			updateChannelInSlider(inSliders[i], inMinLabels[i], inMaxLabels[i], reversals[i], field->getValue(i).toInt());
-//			updateChannelWidgetBar(inWidgetBars[i], inMinLabels[i], inMaxLabels[i], reversals[i], field->getValue(i).toInt());
 
         firstUpdate = false;
 	}
@@ -1053,9 +1039,6 @@ void ConfigServoWidget::updateChannels(UAVObject* controlCommand)
 		int chMin = inSliders[chIndex]->minimum();
 		int chMax = inSliders[chIndex]->maximum();
 		int chNeutral = inSliders[chIndex]->value();
-//		int chMin = inWidgetBars[chIndex]->minimum();
-//		int chMax = inWidgetBars[chIndex]->maximum();
-//		int chNeutral = inWidgetBars[chIndex]->value();
 
 		int value = controlCommand->getField("Channel")->getValue(chIndex).toInt();
 		if ((chMax > chMin && value >= chNeutral) || (chMin > chMax && value <= chNeutral))
@@ -1118,41 +1101,3 @@ void ConfigServoWidget::updateChannelInSlider(QSlider *slider, QLabel *min, QLab
 		slider->setValue(value);
 	}
 }
-/*
-void ConfigServoWidget::updateChannelWidgetBar(WidgetBar *widget_bar, QLabel *min, QLabel *max, QCheckBox *rev, int value)
-{
-	Q_UNUSED(rev);
-
-//	if (!widget_bar || !min || !max || !rev)
-	if (!widget_bar || !min || !max)
-		return;
-
-	if (firstUpdate)
-	{	// Reset all the min/max values of the progress bar since we are starting the calibration.
-
-		widget_bar->setMaximum(value);
-		widget_bar->setMinimum(value);
-		widget_bar->setValue(value);
-
-		max->setText(QString::number(value));
-		min->setText(QString::number(value));
-
-		return;
-	}
-
-	if (value > 0)
-	{	// avoids glitches...
-		if (value > widget_bar->maximum())
-		{
-			widget_bar->setMaximum(value);
-			max->setText(QString::number(value));
-		}
-		if (value < widget_bar->minimum())
-		{
-			widget_bar->setMinimum(value);
-			min->setText(QString::number(value));
-		}
-		widget_bar->setValue(value);
-	}
-}
-*/

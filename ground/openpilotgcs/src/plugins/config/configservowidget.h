@@ -34,7 +34,6 @@
 #include "uavobject.h"
 #include <QtGui/QWidget>
 #include <QList>
-#include "widgetbar.h"
 
 class Ui_SettingsWidget;
 
@@ -67,7 +66,6 @@ private:
 	QList<QSlider> sliders;
 
 	void updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, QCheckBox *rev, int value);
-//	void updateChannelWidgetBar(WidgetBar *widget_bar, QLabel *min, QLabel *max, QCheckBox *rev, int value);
 
 	void assignChannel(UAVDataObject *obj, QString str);
 	void assignOutputChannel(UAVDataObject *obj, QString str);
@@ -83,7 +81,6 @@ private:
 	QList<QLabel*> outLabels;
 
 	QList<QSlider*> inSliders;
-	QList<WidgetBar*> inWidgetBars;
 	QList<QLabel*> inMaxLabels;
 	QList<QLabel*> inMinLabels;
 	QList<QLabel*> inNeuLabels;

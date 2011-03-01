@@ -439,36 +439,27 @@
       </widget>
      </item>
      <item row="7" column="1" colspan="2">
-      <widget class="QProgressBar" name="progressBar_RSSI">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
+      <widget class="WidgetBar" name="widgetRSSI" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <property name="toolTip">
-        <string>Received Signal Strength Indicator</string>
+       <property name="minimumSize">
+        <size>
+         <width>1</width>
+         <height>1</height>
+        </size>
        </property>
-       <property name="minimum">
-        <number>-120</number>
+       <property name="mouseTracking">
+        <bool>false</bool>
        </property>
-       <property name="maximum">
-        <number>0</number>
+       <property name="autoFillBackground">
+        <bool>false</bool>
        </property>
-       <property name="value">
-        <number>-60</number>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-       <property name="textVisible">
-        <bool>true</bool>
-       </property>
-       <property name="textDirection">
-        <enum>QProgressBar::TopToBottom</enum>
-       </property>
-       <property name="format">
-        <string>%v</string>
+       <property name="styleSheet">
+        <string notr="true">background-color: rgb(112, 112, 112);</string>
        </property>
       </widget>
      </item>
@@ -841,7 +832,7 @@
         </font>
        </property>
        <property name="toolTip">
-        <string>The AES encryption key - has to be the same key on the remote modem as well)</string>
+        <string>The AES encryption key - has to be the same key on the remote modem.</string>
        </property>
        <property name="styleSheet">
         <string notr="true"/>
@@ -1023,6 +1014,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WidgetBar</class>
+   <extends>QWidget</extends>
+   <header>widgetbar.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

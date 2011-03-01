@@ -18,6 +18,7 @@ HEADERS += pipxtremegadget.h \
     pipxtremegadgetoptionspage.h \
     pipxtremegadgetwidget.h \
     pipxtremeplugin.h \
+	widgetbar.h
 
 SOURCES += pipxtremegadget.cpp \
     pipxtremegadgetconfiguration.cpp \
@@ -25,6 +26,7 @@ SOURCES += pipxtremegadget.cpp \
     pipxtremegadgetoptionspage.cpp \
     pipxtremegadgetwidget.cpp \
     pipxtremeplugin.cpp \
+	widgetbar.cpp
 
 OTHER_FILES += pipxtreme.pluginspec
 

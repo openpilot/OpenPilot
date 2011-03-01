@@ -132,11 +132,11 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 	m_widget = new Ui_PipXtremeWidget();
 	m_widget->setupUi(this);
 
-#if QT_VERSION >= 0x040700
-	qsrand(QDateTime::currentDateTime().toMSecsSinceEpoch());
-#else
-	qsrand(QDateTime::currentDateTime().toTime_t());
-#endif
+	#if QT_VERSION >= 0x040700
+		qsrand(QDateTime::currentDateTime().toMSecsSinceEpoch());
+	#else
+		qsrand(QDateTime::currentDateTime().toTime_t());
+	#endif
 
 	device_input_buffer.size = 8192;
 	device_input_buffer.used = 0;
@@ -206,9 +206,9 @@ PipXtremeGadgetWidget::PipXtremeGadgetWidget(QWidget *parent) :
 
 	m_widget->doubleSpinBox_Frequency->setSingleStep(0.00015625);
 
-	m_widget->progressBar_RSSI->setMinimum(-120);
-	m_widget->progressBar_RSSI->setMaximum(0);
-	m_widget->progressBar_RSSI->setValue(m_widget->progressBar_RSSI->minimum());
+	m_widget->widgetRSSI->setMinimum(-120);
+	m_widget->widgetRSSI->setMaximum(0);
+	m_widget->widgetRSSI->setValue(m_widget->widgetRSSI->minimum());
 
 	m_widget->label_RSSI->setText("RSSI");
 
@@ -477,8 +477,11 @@ void PipXtremeGadgetWidget::enableTelemetry()
 
 void PipXtremeGadgetWidget::randomiseAESKey()
 {
-//	uint32_t crc = ((uint32_t)qrand() << 16) ^ qrand() ^ QDateTime::currentDateTime().toMSecsSinceEpoch();	// only available with Qt 4.7.1 and later
-	uint32_t crc = ((uint32_t)qrand() << 16) ^ qrand() ^ QDateTime::currentDateTime().toTime_t();
+	#if QT_VERSION >= 0x040700
+		uint32_t crc = ((uint32_t)qrand() << 16) ^ qrand() ^ QDateTime::currentDateTime().toMSecsSinceEpoch();	// only available with Qt 4.7.1 and later
+	#else
+		uint32_t crc = ((uint32_t)qrand() << 16) ^ qrand() ^ QDateTime::currentDateTime().toTime_t();
+	#endif
 
 	QString key = "";
 	for (int i = 0; i < 4; i++)
@@ -977,13 +980,13 @@ void PipXtremeGadgetWidget::processRxPacket(quint8 *packet, int packet_size)
 						m_widget->lineEdit_LinkState->setText("Unknown [" + QString::number(pipx_config_state.link_state) + "]");
 						break;
 				}
-				if (pipx_config_state.rssi < m_widget->progressBar_RSSI->minimum())
-					m_widget->progressBar_RSSI->setValue(m_widget->progressBar_RSSI->minimum());
+				if (pipx_config_state.rssi < m_widget->widgetRSSI->minimum())
+					m_widget->widgetRSSI->setValue(m_widget->widgetRSSI->minimum());
 				else
-				if (pipx_config_state.rssi > m_widget->progressBar_RSSI->maximum())
-					m_widget->progressBar_RSSI->setValue(m_widget->progressBar_RSSI->maximum());
+				if (pipx_config_state.rssi > m_widget->widgetRSSI->maximum())
+					m_widget->widgetRSSI->setValue(m_widget->widgetRSSI->maximum());
 				else
-					m_widget->progressBar_RSSI->setValue(pipx_config_state.rssi);
+					m_widget->widgetRSSI->setValue(pipx_config_state.rssi);
 				m_widget->label_RSSI->setText("RSSI " + QString::number(pipx_config_state.rssi) + "dBm");
 				m_widget->lineEdit_RxAFC->setText(QString::number(pipx_config_state.afc) + "Hz");
 				m_widget->lineEdit_Retries->setText(QString::number(pipx_config_state.retries));
@@ -1135,7 +1138,7 @@ void PipXtremeGadgetWidget::disconnectPort(bool enable_telemetry, bool lock_stuf
 	m_widget->lineEdit_MaxFrequency->setText("");
 	m_widget->lineEdit_FrequencyStepSize->setText("");
 	m_widget->lineEdit_LinkState->setText("");
-	m_widget->progressBar_RSSI->setValue(m_widget->progressBar_RSSI->minimum());
+	m_widget->widgetRSSI->setValue(m_widget->widgetRSSI->minimum());
 	m_widget->label_RSSI->setText("RSSI");
 	m_widget->lineEdit_RxAFC->setText("");
 	m_widget->lineEdit_Retries->setText("");

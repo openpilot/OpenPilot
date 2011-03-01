@@ -52,6 +52,7 @@
 #include <QtCore/QLinkedList>
 #include <QMutex>
 #include <QMutexLocker>
+#include "widgetbar.h"
 
 // *************************
 // pipx config comms packets
@@ -138,7 +139,6 @@ public:
 public slots:
     void onTelemetryStart();
     void onTelemetryStop();
-
     void onTelemetryConnect();
     void onTelemetryDisconnect();
 

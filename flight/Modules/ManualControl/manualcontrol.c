@@ -73,7 +73,7 @@ static ArmState_t armState;
 
 // Private functions
 static void manualControlTask(void *parameters);
-static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutral);
+static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutral, int16_t deadband_percent);
 static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time);
 static bool okToArm(void);
 
@@ -172,7 +172,7 @@ static void manualControlTask(void *parameters)
 	ActuatorDesiredData actuator;
 	AttitudeDesiredData attitude;
 	portTickType lastSysTime;
-	
+
 
 	float flightMode;
 
@@ -194,7 +194,7 @@ static void manualControlTask(void *parameters)
 		// Wait until next update
 		vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD_MS / portTICK_RATE_MS);
 		PIOS_WDG_UpdateFlag(PIOS_WDG_MANUAL);
-		
+
 		// Read settings
 		ManualControlSettingsGet(&settings);
 		StabilizationSettingsGet(&stabSettings);
@@ -202,15 +202,15 @@ static void manualControlTask(void *parameters)
 		if (ManualControlCommandReadOnly(&cmd)) {
 			FlightTelemetryStatsData flightTelemStats;
 			FlightTelemetryStatsGet(&flightTelemStats);
-			if(flightTelemStats.Status != FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) { 
+			if(flightTelemStats.Status != FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
 				/* trying to fly via GCS and lost connection.  fall back to transmitter */
 				UAVObjMetadata metadata;
 				UAVObjGetMetadata(&cmd, &metadata);
 				metadata.access = ACCESS_READWRITE;
-				UAVObjSetMetadata(&cmd, &metadata);				
+				UAVObjSetMetadata(&cmd, &metadata);
 			}
 		}
-			
+
 		if (!ManualControlCommandReadOnly(&cmd)) {
 
 			// Check settings, if error raise alarm
@@ -237,7 +237,7 @@ static void manualControlTask(void *parameters)
 #elif defined(PIOS_INCLUDE_SPEKTRUM)
 				cmd.Channel[n] = PIOS_SPEKTRUM_Get(n);
 #endif
-				scaledChannel[n] = scaleChannel(cmd.Channel[n], settings.ChannelMax[n],	settings.ChannelMin[n], settings.ChannelNeutral[n]);
+				scaledChannel[n] = scaleChannel(cmd.Channel[n], settings.ChannelMax[n],	settings.ChannelMin[n], settings.ChannelNeutral[n], 0);
 			}
 
 			// Scale channels to -1 -> +1 range
@@ -288,7 +288,7 @@ static void manualControlTask(void *parameters)
 			// setting and the get command will pull the right values from telemetry
 		} else
 			ManualControlCommandGet(&cmd);	/* Under GCS control */
-		
+
 
 		// Implement hysteresis loop on connection status
 		// Must check both Max and Min in case they reversed
@@ -323,7 +323,7 @@ static void manualControlTask(void *parameters)
 			cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_TRUE;
 			AlarmsClear(SYSTEMALARMS_ALARM_MANUALCONTROL);
 			ManualControlCommandSet(&cmd);
-		} 
+		}
 
 		//
 		// Arming and Disarming mechanism
@@ -509,49 +509,65 @@ static void manualControlTask(void *parameters)
 /**
  * Convert channel from servo pulse duration (microseconds) to scaled -1/+1 range.
  */
-static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutral)
+static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutral, int16_t deadband_percent)
 {
 	float valueScaled;
+
 	// Scale
-	if ((max > min && value >= neutral) || (min > max && value <= neutral)) {
-		if (max != neutral) {
+	if ((max > min && value >= neutral) || (min > max && value <= neutral))
+	{
+		if (max != neutral)
 			valueScaled = (float)(value - neutral) / (float)(max - neutral);
-		} else {
+		else
 			valueScaled = 0;
-		}
-	} else {
-		if (min != neutral) {
+	}
+	else
+	{
+		if (min != neutral)
 			valueScaled = (float)(value - neutral) / (float)(neutral - min);
-		} else {
+		else
 			valueScaled = 0;
-		}
 	}
+
+	// Neutral RC stick position dead band
+	if (deadband_percent > 0)
+	{
+		if (deadband_percent > 50) deadband_percent = 50;   // limit deadband to a maximum of 50%
+		float deadband = (float)deadband_percent / 100;
+		if (fabs(valueScaled) <= deadband)
+			valueScaled = 0;                                // deadband the value
+		else
+		if (valueScaled < 0)
+			valueScaled = (valueScaled + deadband) / (1.0 - deadband);	// value scales 0.0 to -1.0 after deadband
+		else
+			valueScaled = (valueScaled - deadband) / (1.0 - deadband);  // value scales 0.0 to +1.0 after deadband
+	}
+
 	// Bound
-	if (valueScaled > 1.0) {
-		valueScaled = 1.0;
-	} else if (valueScaled < -1.0) {
-		valueScaled = -1.0;
-	}
+	if (valueScaled >  1.0) valueScaled =  1.0;
+	else
+	if (valueScaled < -1.0) valueScaled = -1.0;
+
 	return valueScaled;
 }
 
 static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time) {
-	if(end_time > start_time) 
+	if(end_time > start_time)
 		return (end_time - start_time) * portTICK_RATE_MS;
-	return ((((portTICK_RATE_MS) -1) - start_time) + end_time) * portTICK_RATE_MS;		
+	return ((((portTICK_RATE_MS) -1) - start_time) + end_time) * portTICK_RATE_MS;
 }
-			
+
 /**
  * @brief Determine if the aircraft is safe to arm
- * @returns True if safe to arm, false otherwise 
+ * @returns True if safe to arm, false otherwise
  */
 static bool okToArm(void)
-{		
+{
 	// read alarms
 	SystemAlarmsData alarms;
 	SystemAlarmsGet(&alarms);
-	
-	
+
+
 	// Check each alarm
 	for (int i = 0; i < SYSTEMALARMS_ALARM_NUMELEM; i++)
 	{
@@ -559,12 +575,12 @@ static bool okToArm(void)
 		{	// found an alarm thats set
 			if (i == SYSTEMALARMS_ALARM_GPS || i == SYSTEMALARMS_ALARM_TELEMETRY)
 				continue;
-			
+
 			return false;
 		}
 	}
-	
-	return true;		
+
+	return true;
 }
 
 //

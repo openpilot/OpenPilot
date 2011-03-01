@@ -262,11 +262,11 @@ FW_TARGETS := openpilot ahrs coptercontrol pipxtreme
 BL_TARGETS := $(addprefix bl_, $(FW_TARGETS))
 
 .PHONY: all_fw all_fw_clean
-all_fw:           $(addsuffix _elf,   $(FW_TARGETS))
+all_fw:           $(addsuffix _bin,   $(FW_TARGETS))
 all_fw_clean:     $(addsuffix _clean, $(FW_TARGETS))
 
 .PHONY: all_bw all_bw_clean
-all_bl:           $(addsuffix _bin,   $(BL_TARGETS))
+all_bl:           $(addsuffix _elf,   $(BL_TARGETS))
 all_bl_clean:     $(addsuffix _clean, $(BL_TARGETS))
 
 .PHONY: all_flight all_flight_clean
@@ -274,7 +274,7 @@ all_flight:       all_fw all_bl
 all_flight_clean: all_fw_clean all_bl_clean
 
 .PHONY: openpilot
-openpilot: openpilot_elf
+openpilot: openpilot_bin
 
 openpilot_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/openpilot/dep
@@ -286,7 +286,7 @@ openpilot_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/openpilot
 
 .PHONY: bl_openpilot
-bl_openpilot: bl_openpilot_bin
+bl_openpilot: bl_openpilot_elf
 
 bl_openpilot_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_openpilot/dep
@@ -298,7 +298,7 @@ bl_openpilot_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/bl_openpilot
 
 .PHONY: ahrs
-ahrs: ahrs_elf
+ahrs: ahrs_bin
 
 ahrs_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/ahrs/dep
@@ -310,7 +310,7 @@ ahrs_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/ahrs
 
 .PHONY: bl_ahrs
-bl_ahrs: bl_ahrs_bin
+bl_ahrs: bl_ahrs_elf
 
 bl_ahrs_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_ahrs/dep
@@ -322,7 +322,7 @@ bl_ahrs_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/bl_ahrs
 
 .PHONY: coptercontrol
-coptercontrol: coptercontrol_elf
+coptercontrol: coptercontrol_bin
 
 coptercontrol_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/coptercontrol/dep
@@ -334,7 +334,7 @@ coptercontrol_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/coptercontrol
 
 .PHONY: bl_coptercontrol
-bl_coptercontrol: bl_coptercontrol_bin
+bl_coptercontrol: bl_coptercontrol_elf
 
 bl_coptercontrol_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_coptercontrol/dep
@@ -346,7 +346,7 @@ bl_coptercontrol_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/bl_coptercontrol
 
 .PHONY: pipxtreme
-pipxtreme: pipxtreme_elf
+pipxtreme: pipxtreme_bin
 
 pipxtreme_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/pipxtreme/dep
@@ -358,7 +358,7 @@ pipxtreme_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/pipxtreme
 
 .PHONY: bl_pipxtreme
-bl_pipxtreme: bl_pipxtreme_bin
+bl_pipxtreme: bl_pipxtreme_elf
 
 bl_pipxtreme_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_pipxtreme/dep

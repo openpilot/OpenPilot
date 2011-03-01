@@ -266,7 +266,7 @@ all_fw:           $(addsuffix _elf,   $(FW_TARGETS))
 all_fw_clean:     $(addsuffix _clean, $(FW_TARGETS))
 
 .PHONY: all_bw all_bw_clean
-all_bl:           $(addsuffix _elf,   $(BL_TARGETS))
+all_bl:           $(addsuffix _bin,   $(BL_TARGETS))
 all_bl_clean:     $(addsuffix _clean, $(BL_TARGETS))
 
 .PHONY: all_flight all_flight_clean
@@ -286,7 +286,7 @@ openpilot_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/openpilot
 
 .PHONY: bl_openpilot
-bl_openpilot: bl_openpilot_elf
+bl_openpilot: bl_openpilot_bin
 
 bl_openpilot_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_openpilot/dep
@@ -310,7 +310,7 @@ ahrs_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/ahrs
 
 .PHONY: bl_ahrs
-bl_ahrs: bl_ahrs_elf
+bl_ahrs: bl_ahrs_bin
 
 bl_ahrs_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_ahrs/dep
@@ -334,7 +334,7 @@ coptercontrol_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/coptercontrol
 
 .PHONY: bl_coptercontrol
-bl_coptercontrol: bl_coptercontrol_elf
+bl_coptercontrol: bl_coptercontrol_bin
 
 bl_coptercontrol_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_coptercontrol/dep
@@ -358,7 +358,7 @@ pipxtreme_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/pipxtreme
 
 .PHONY: bl_pipxtreme
-bl_pipxtreme: bl_pipxtreme_elf
+bl_pipxtreme: bl_pipxtreme_bin
 
 bl_pipxtreme_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_pipxtreme/dep

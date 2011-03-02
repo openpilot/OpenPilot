@@ -157,16 +157,30 @@ static void stabilizationTask(void* parameters)
 		
 #if defined(PIOS_QUATERNION_STABILIZATION)
 		// Quaternion calculation of error in each axis.  Uses more memory.
+		float rpy_desired[3];
 		float q_desired[4];
-		float q_curr[4];
 		float q_error[4];
 		float local_error[3];
 		
-		// Compute stabilization error as (q_desired' * q_current)', convert to RPY
-		RPY2Quaternion(&stabDesired.Roll, q_desired);
-		quat_copy(&attitudeActual.q1, q_curr);		
+		// Essentially zero errors for anything in rate or none
+		if(stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)
+			rpy_desired[0] = stabDesired.Roll;		
+		else 
+			rpy_desired[0] = attitudeActual.Roll;
+
+		if(stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)
+			rpy_desired[1] = stabDesired.Pitch;
+		else
+			rpy_desired[1] = attitudeActual.Pitch;
+
+		if(stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)
+			rpy_desired[2] = stabDesired.Yaw;
+		else
+			rpy_desired[2] = attitudeActual.Yaw;
+		
+		RPY2Quaternion(rpy_desired, q_desired);
 		quat_inverse(q_desired);
-		quat_mult(q_desired, q_curr, q_error);
+		quat_mult(q_desired, &attitudeActual.q1, q_error);
 		quat_inverse(q_error);
 		Quaternion2RPY(q_error, local_error);
 		
@@ -197,7 +211,7 @@ static void stabilizationTask(void* parameters)
 			}
 		}
 		
-		uint8_t shouldUpdate = 0;
+		uint8_t shouldUpdate = 1;
 		RateDesiredSet(&rateDesired);
 		ActuatorDesiredGet(&actuatorDesired);
 		//Calculate desired command
@@ -224,8 +238,6 @@ static void stabilizationTask(void* parameters)
 					break;
 				}
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_NONE:
-					//actuatorDesiredAxis[ct] = bound(manualAxis[ct]);
-					//shouldUpdate = 1;
 					switch (ct)
 				{
 					case ROLL:

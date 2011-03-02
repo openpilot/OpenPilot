@@ -29,30 +29,31 @@
 package org.openpilot.uavtalk.uavobjects;
 
 import  org.openpilot.uavtalk.UAVObject;
-import  org.openpilot.uavtalk.UAVObjectMetaData;
-import org.openpilot.uavtalk.UAVObjectFieldDescription;
+import  org.openpilot.uavtalk.UAVDataObject;
+import  org.openpilot.uavtalk.UAVMetaObject;
+
 /**
 $(DESCRIPTION)
 
 generated from $(XMLFILE)
 **/
-public class $(NAME) extends UAVObject{
+public class $(NAME) extends UAVDataObject{
 
 $(FIELDSINIT)
 
     public void setGeneratedMetaData() {
 
-	getMetaData().gcsAccess = UAVObjectMetaData.$(GCSACCESS);
-	getMetaData().gcsTelemetryAcked = UAVObjectMetaData.$(GCSTELEM_ACKEDTF);
-	getMetaData().gcsTelemetryUpdateMode = UAVObjectMetaData.$(GCSTELEM_UPDATEMODE);
+	getMetaData().gcsAccess = UAVMetaObject.$(GCSACCESS);
+	getMetaData().gcsTelemetryAcked = UAVMetaObject.$(GCSTELEM_ACKEDTF);
+	getMetaData().gcsTelemetryUpdateMode = UAVMetaObject.$(GCSTELEM_UPDATEMODE);
 	getMetaData().gcsTelemetryUpdatePeriod = $(GCSTELEM_UPDATEPERIOD);
 
-	getMetaData().flightAccess = UAVObjectMetaData.$(FLIGHTACCESS);
-	getMetaData().flightTelemetryAcked = UAVObjectMetaData.$(FLIGHTTELEM_ACKEDTF);
-	getMetaData().flightTelemetryUpdateMode = UAVObjectMetaData.$(FLIGHTTELEM_UPDATEMODE);
+	getMetaData().flightAccess = UAVMetaObject.$(FLIGHTACCESS);
+	getMetaData().flightTelemetryAcked = UAVMetaObject.$(FLIGHTTELEM_ACKEDTF);
+	getMetaData().flightTelemetryUpdateMode = UAVMetaObject.$(FLIGHTTELEM_UPDATEMODE);
 	getMetaData().flightTelemetryUpdatePeriod = $(FLIGHTTELEM_UPDATEPERIOD);
 
-	getMetaData().loggingUpdateMode = UAVObjectMetaData.$(LOGGING_UPDATEMODE);
+	getMetaData().loggingUpdateMode = UAVMetaObject.$(LOGGING_UPDATEMODE);
 	getMetaData().loggingUpdatePeriod = $(LOGGING_UPDATEPERIOD);
 
     }
@@ -65,7 +66,7 @@ $(FIELDSINIT)
 	return "$(NAME)";
     }
 
-    public String getObjDescription() {
+    public String getDescription() {
 	return "$(DESCRIPTION)";
     }
 

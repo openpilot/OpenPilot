@@ -50,6 +50,7 @@
 #include "attitudeactual.h"
 #include "positiondesired.h"	// object that will be updated by the module
 #include "positionactual.h"
+#include "manualcontrol.h"
 #include "manualcontrolcommand.h"
 #include "nedaccel.h"
 #include "stabilizationdesired.h"
@@ -180,7 +181,7 @@ static void guidanceTask(void *parameters)
 		SystemSettingsGet(&systemSettings);
 		GuidanceSettingsGet(&guidanceSettings);
 		
-		if ((manualControl.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO) &&
+		if ((PARSE_FLIGHT_MODE(manualControl.FlightMode) == FLIGHTMODE_GUIDANCE) &&
 		    ((systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_VTOL) ||
 		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADP) ||
 		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_QUADX) ||

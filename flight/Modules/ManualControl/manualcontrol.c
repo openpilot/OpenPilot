@@ -73,7 +73,7 @@ static ArmState_t armState;
 
 // Private functions
 static void updateActuatorDesired(ManualControlCommandData * cmd);
-static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualControlSettingsData * settings, float flightMode);
+static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualControlSettingsData * settings);
 
 static void manualControlTask(void *parameters);
 static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutral, int16_t deadband_percent);
@@ -81,40 +81,23 @@ static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time)
 static bool okToArm(void);
 
 #define assumptions1 ( \
-		((int)MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)       && \
-		((int)MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_RATE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)       && \
-		((int)MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_ATTITUDE 	== (int)STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)      \
-		)
-
-#define assumptions2 ( \
-		((int)MANUALCONTROLSETTINGS_POS1FLIGHTMODE_MANUAL               == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL)       && \
-		((int)MANUALCONTROLSETTINGS_POS1FLIGHTMODE_STABILIZED           == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED)   && \
-		((int)MANUALCONTROLSETTINGS_POS1FLIGHTMODE_AUTO                 == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO)            \
+		((int)MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NONE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)       && \
+		((int)MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_RATE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)       && \
+		((int)MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_ATTITUDE  == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)      \
 		)
 
 #define assumptions3 ( \
-		((int)MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_NONE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)      && \
-		((int)MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_RATE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)      && \
-		((int)MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_ATTITUDE 	== (int)STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)     \
-		)
-
-#define assumptions4 ( \
-		((int)MANUALCONTROLSETTINGS_POS2FLIGHTMODE_MANUAL               == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL)      && \
-		((int)MANUALCONTROLSETTINGS_POS2FLIGHTMODE_STABILIZED           == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED)  && \
-		((int)MANUALCONTROLSETTINGS_POS2FLIGHTMODE_AUTO                 == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO)           \
+		((int)MANUALCONTROLSETTINGS_STABILIZATION2SETTINGS_NONE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)      && \
+		((int)MANUALCONTROLSETTINGS_STABILIZATION2SETTINGS_RATE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)      && \
+		((int)MANUALCONTROLSETTINGS_STABILIZATION2SETTINGS_ATTITUDE  == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)     \
 		)
 
 #define assumptions5 ( \
-		((int)MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_NONE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)      && \
-		((int)MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_RATE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)      && \
-		((int)MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_ATTITUDE 	== (int)STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)     \
+		((int)MANUALCONTROLSETTINGS_STABILIZATION3SETTINGS_NONE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)      && \
+		((int)MANUALCONTROLSETTINGS_STABILIZATION3SETTINGS_RATE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)      && \
+		((int)MANUALCONTROLSETTINGS_STABILIZATION3SETTINGS_ATTITUDE  == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)     \
 		)
 
-#define assumptions6 ( \
-		((int)MANUALCONTROLSETTINGS_POS3FLIGHTMODE_MANUAL               == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL)      && \
-		((int)MANUALCONTROLSETTINGS_POS3FLIGHTMODE_STABILIZED           == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED)  && \
-		((int)MANUALCONTROLSETTINGS_POS3FLIGHTMODE_AUTO                 == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO)           \
-		)
 
 
 #define ARMING_CHANNEL_ROLL     0
@@ -140,21 +123,25 @@ static bool okToArm(void);
 		)
 
 
+#define assumptions_flightmode ( \
+		( (int)MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_MANUAL == (int) MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL) && \
+		( (int)MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED1 == (int) MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED1) && \
+		( (int)MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED2 == (int) MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED2) && \
+		( (int)MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED3 == (int) MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED3) && \
+		( (int)MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_VELOCITYCONTROL == (int) MANUALCONTROLCOMMAND_FLIGHTMODE_VELOCITYCONTROL) && \
+		( (int)MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD == (int) MANUALCONTROLCOMMAND_FLIGHTMODE_POSITIONHOLD) \
+		)
 
-
-
-#define assumptions (assumptions1 && assumptions2 && assumptions3 && assumptions4 && assumptions5 && assumptions6 && assumptions7 && assumptions8)
+#define assumptions (assumptions1 && assumptions3 && assumptions5 && assumptions7 && assumptions8 && assumptions_flightmode)
 
 /**
  * Module initialization
  */
 int32_t ManualControlInitialize()
 {
-	// The following line compiles to nothing when the assumptions are correct
-	if (!assumptions)
-		return 1;
-	// In case the assumptions are incorrect, this module will not initialise and so will not function
-
+	/* Check the assumptions about uavobject enum's are correct */
+	if(!assumptions) 
+		return -1;
 	// Start main task
 	xTaskCreate(manualControlTask, (signed char *)"ManualControl", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_MANUALCONTROL, taskHandle);
@@ -218,7 +205,6 @@ static void manualControlTask(void *parameters)
 				settings.Throttle >= MANUALCONTROLSETTINGS_THROTTLE_NONE ||
 				settings.FlightMode >= MANUALCONTROLSETTINGS_FLIGHTMODE_NONE) {
 				AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
-				cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO;
 				cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
 				ManualControlCommandSet(&cmd);
 				continue;
@@ -260,12 +246,13 @@ static void manualControlTask(void *parameters)
 			else
 				cmd.Accessory3 = 0;
 
+			// Note here the code is ass
 			if (flightMode < -FLIGHT_MODE_LIMIT) 
-				cmd.FlightMode = settings.Pos1FlightMode;
+				cmd.FlightMode = settings.FlightModePosition[0];
 			else if (flightMode > FLIGHT_MODE_LIMIT) 
-				cmd.FlightMode = settings.Pos3FlightMode;
+				cmd.FlightMode = settings.FlightModePosition[2];
 			else 
-				cmd.FlightMode = settings.Pos2FlightMode;
+				cmd.FlightMode = settings.FlightModePosition[1];
 			
 			// Update the ManualControlCommand object
 			ManualControlCommandSet(&cmd);
@@ -443,10 +430,21 @@ static void manualControlTask(void *parameters)
 
 
 		// Depending on the mode update the Stabilization or Actuator objects
-		if (cmd.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL)
-			updateActuatorDesired(&cmd);
-		else if (cmd.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED) 
-			updateStabilizationDesired(&cmd, &settings, flightMode);
+		switch(PARSE_FLIGHT_MODE(cmd.FlightMode)) {
+			case FLIGHTMODE_UNDEFINED:
+				// This reflects a bug in the code architecture!
+				AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
+				break;
+			case FLIGHTMODE_MANUAL:
+				updateActuatorDesired(&cmd);
+				break;
+			case FLIGHTMODE_STABILIZED:
+				updateStabilizationDesired(&cmd, &settings);
+				break;
+			case FLIGHTMODE_GUIDANCE:
+				// TODO: Implement
+				break;
+		}				
 	}
 }
 
@@ -461,7 +459,7 @@ static void updateActuatorDesired(ManualControlCommandData * cmd)
 	ActuatorDesiredSet(&actuator);	
 }
 
-static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualControlSettingsData * settings, float flightMode)
+static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualControlSettingsData * settings)
 {
 	StabilizationDesiredData stabilization;
 	StabilizationDesiredGet(&stabilization);
@@ -470,30 +468,40 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
 	StabilizationSettingsGet(&stabSettings);
 		
 	uint8_t * stab_settings;
-	if (flightMode < -FLIGHT_MODE_LIMIT) 
-		stab_settings = settings->Pos1StabilizationSettings;
-	else if (flightMode > FLIGHT_MODE_LIMIT) 
-		stab_settings = settings->Pos3StabilizationSettings;
-	else 
-		stab_settings = settings->Pos2StabilizationSettings;
+	switch(cmd->FlightMode) {
+		case MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED1:
+			stab_settings = settings->Stabilization1Settings;
+			break;
+		case MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED2:
+			stab_settings = settings->Stabilization2Settings;
+			break;
+		case MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED3:
+			stab_settings = settings->Stabilization3Settings;
+			break;
+		default:
+			// Major error, this should not occur because only enter this block when one of these is true
+			AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
+			break;	
+	}
 	
+	// TOOD: Add assumption about order of stabilization desired and manual control stabilization mode fields having same order
 	stabilization.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL]  = stab_settings[0];
 	stabilization.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = stab_settings[1];
 	stabilization.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW]   = stab_settings[2];
 	
-	stabilization.Roll = (stab_settings[0] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE) ? cmd->Roll :
-	     (stab_settings[0] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_RATE) ? cmd->Roll * stabSettings.MaximumRate[STABILIZATIONSETTINGS_MAXIMUMRATE_ROLL] :
-	     (stab_settings[0] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_ATTITUDE) ? cmd->Roll * stabSettings.RollMax :
+	stabilization.Roll = (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Roll :
+	     (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Roll * stabSettings.MaximumRate[STABILIZATIONSETTINGS_MAXIMUMRATE_ROLL] :
+	     (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Roll * stabSettings.RollMax :
 	     0; // this is an invalid mode
 					      ;
-	stabilization.Pitch = (stab_settings[1] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE) ? cmd->Pitch :
-	     (stab_settings[1] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_RATE) ? cmd->Pitch * stabSettings.MaximumRate[STABILIZATIONSETTINGS_MAXIMUMRATE_PITCH] :
-	     (stab_settings[1] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_ATTITUDE) ? cmd->Pitch * stabSettings.PitchMax :
+	stabilization.Pitch = (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Pitch :
+	     (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Pitch * stabSettings.MaximumRate[STABILIZATIONSETTINGS_MAXIMUMRATE_PITCH] :
+	     (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Pitch * stabSettings.PitchMax :
 	     0; // this is an invalid mode
 
-	stabilization.Yaw = (stab_settings[2] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE) ? cmd->Yaw :
-	     (stab_settings[2] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_RATE) ? cmd->Yaw * stabSettings.MaximumRate[STABILIZATIONSETTINGS_MAXIMUMRATE_YAW] :
-	     (stab_settings[2] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_ATTITUDE) ? fmod(cmd->Yaw * 180.0, 360) :
+	stabilization.Yaw = (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Yaw :
+	     (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Yaw * stabSettings.MaximumRate[STABILIZATIONSETTINGS_MAXIMUMRATE_YAW] :
+	     (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? fmod(cmd->Yaw * 180.0, 360) :
 	     0; // this is an invalid mode
 	
 	stabilization.Throttle = (cmd->Throttle < 0) ? -1 : cmd->Throttle; 

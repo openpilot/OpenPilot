@@ -69,7 +69,7 @@ namespace jafar {
 		    LMK_rs(_lmkPtr->state.size(),_senPtr->ia_globalPose.size())
 		{
 			clearCounters();
-			clearEvents();
+			clearFlags();
 			searchSize = 0;
 		}
 
@@ -96,7 +96,7 @@ namespace jafar {
 	    category = OBSERVATION;
 			id(_lmkPtr->id());
 			clearCounters();
-			clearEvents();
+			clearFlags();
 			searchSize = 0;
 		}
 
@@ -222,10 +222,13 @@ namespace jafar {
 			return (innovation.mahalanobis() < mahaDist*mahaDist);
 		}
 
-		void ObservationAbstract::clearEvents(){
+		void ObservationAbstract::clearFlags(){
 			int size = sizeof(Events)/sizeof(bool);
 			for (int i = 0; i < size; ++i)
 				((bool*)&events)[i] = false;
+			size = sizeof(Tasks)/sizeof(bool);
+			for (int i = 0; i < size; ++i)
+				((bool*)&tasks)[i] = false;
 		}
 
 		void ObservationAbstract::clearCounters(){

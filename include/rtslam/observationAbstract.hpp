@@ -211,12 +211,18 @@ namespace jafar {
 				struct Events {
 						bool predicted;    ///< Landmark is not new and has been predicted
 						bool visible;      ///< Landmark is visible
-						bool predictedApp; ///< Appearance has been predicted for predicted pos
 						bool measured;     ///< Feature is measured (we tried to match it)
 						bool matched;      ///< Feature is successfully matched
 						bool updated;      ///< Landmark is updated
 				} events;
 				
+				/**
+				 * Tasks
+				 */
+				struct Tasks {
+						bool predictedApp; ///< Appearance has been predicted for predicted pos
+				} tasks;
+
 				int searchSize;
 
 				type_enum type;
@@ -309,7 +315,7 @@ namespace jafar {
 				/**
 				 * Clear all event flags
 				 */
-				void clearEvents();
+				void clearFlags();
 				void clearCounters();
 
 
@@ -334,12 +340,12 @@ namespace jafar {
 				 */
 				virtual bool predictAppearance(bool force = false)
 				{
-					if (force || !events.predictedApp)
+					if (force || !tasks.predictedApp)
 					{
 //JFR_DEBUG("predictAppearance");
 						if (predictAppearance_func())
 						{
-							events.predictedApp = true;
+							tasks.predictedApp = true;
 							return true;
 						}
 						return false;

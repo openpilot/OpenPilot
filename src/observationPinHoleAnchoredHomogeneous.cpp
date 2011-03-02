@@ -146,7 +146,7 @@ namespace jafar {
 
 		void ObservationPinHoleAnchoredHomogeneousPoint::desc_image(image::oimstream& os) const
 		{
-			if (events.predictedApp)
+			if (tasks.predictedApp)
 			{
 				app_img_pnt_ptr_t predApp = SPTR_CAST<AppearanceImagePoint>(predictedAppearance);
 				os << predApp->patch << image::hsep;

@@ -232,7 +232,7 @@ namespace jafar {
 				{
 					observation_ptr_t obsPtr = *obsIter;
 					// FIXME maybe don't clear events and don't rematch if already did, especially if didn't reestimate
-					obsPtr->clearEvents();
+					obsPtr->clearFlags();
 					obsPtr->measurement.matchScore = 0;
 
 					// 1a. project
@@ -456,7 +456,7 @@ namespace jafar {
 			{
 				observation_ptr_t obsPtr = *obsIter;
 
-				obsPtr->clearEvents();
+				obsPtr->clearFlags();
 				obsPtr->measurement.matchScore = 0;
 
 				#if PROJECT_MEAN_VISIBILITY

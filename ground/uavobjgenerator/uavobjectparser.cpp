@@ -193,7 +193,7 @@ QString UAVObjectParser::parseXML(QString& xml, QString& filename)
 
                 descriptionFound = true;
             }
-            else {
+            else if (!childNode.isComment()) {
                 return QString("Unknown object element");
             }
 

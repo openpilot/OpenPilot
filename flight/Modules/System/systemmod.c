@@ -321,7 +321,7 @@ static void updateSystemAlarms()
 #if defined(PIOS_INCLUDE_SDCARD)
 	// Check for SD card
 	if (PIOS_SDCARD_IsMounted() == 0) {
-		AlarmsSet(SYSTEMALARMS_ALARM_SDCARD, SYSTEMALARMS_ALARM_WARNING);
+		AlarmsSet(SYSTEMALARMS_ALARM_SDCARD, SYSTEMALARMS_ALARM_ERROR);
 	} else {
 		AlarmsClear(SYSTEMALARMS_ALARM_SDCARD);
 	}

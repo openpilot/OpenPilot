@@ -48,11 +48,11 @@
 #include "guidancesettings.h"
 #include "attituderaw.h"
 #include "attitudeactual.h"
-#include "attitudedesired.h"
 #include "positiondesired.h"	// object that will be updated by the module
 #include "positionactual.h"
 #include "manualcontrolcommand.h"
 #include "nedaccel.h"
+#include "stabilizationdesired.h"
 #include "stabilizationsettings.h"
 #include "systemsettings.h"
 #include "velocitydesired.h"
@@ -269,7 +269,7 @@ static void updateVtolDesiredAttitude()
 
 	VelocityDesiredData velocityDesired;
 	VelocityActualData velocityActual;
-	AttitudeDesiredData attitudeDesired;
+	StabilizationDesiredData stabDesired;
 	AttitudeActualData attitudeActual;
 	NedAccelData nedAccel;
 	GuidanceSettingsData guidanceSettings;
@@ -295,13 +295,13 @@ static void updateVtolDesiredAttitude()
 	
 	VelocityActualGet(&velocityActual);
 	VelocityDesiredGet(&velocityDesired);
-	AttitudeDesiredGet(&attitudeDesired);
+	StabilizationDesiredGet(&stabDesired);
 	VelocityDesiredGet(&velocityDesired);
 	AttitudeActualGet(&attitudeActual);
 	StabilizationSettingsGet(&stabSettings);
 	NedAccelGet(&nedAccel);
 	
-	attitudeDesired.Yaw = 0;	// try and face north
+	stabDesired.Yaw = 0;	// try and face north
 	
 	// Compute desired north command
 	northError = velocityDesired.North - velocityActual.North;
@@ -330,14 +330,14 @@ static void updateVtolDesiredAttitude()
 		       downIntegral * guidanceSettings.VerticalVelPID[GUIDANCESETTINGS_VERTICALVELPID_KI] -
 		       nedAccel.Down * guidanceSettings.VerticalVelPID[GUIDANCESETTINGS_VERTICALVELPID_KD]);
 	
-	attitudeDesired.Throttle = bound(downCommand, 0, 1);
+	stabDesired.Throttle = bound(downCommand, 0, 1);
 	
 	// Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
 	// craft should move similarly for 5 deg roll versus 5 deg pitch
-	attitudeDesired.Pitch = bound(-northCommand * cosf(attitudeActual.Yaw * M_PI / 180) + 
+	stabDesired.Pitch = bound(-northCommand * cosf(attitudeActual.Yaw * M_PI / 180) + 
 				      -eastCommand * sinf(attitudeActual.Yaw * M_PI / 180),
 				      -guidanceSettings.MaxRollPitch, guidanceSettings.MaxRollPitch);
-	attitudeDesired.Roll = bound(-northCommand * sinf(attitudeActual.Yaw * M_PI / 180) + 
+	stabDesired.Roll = bound(-northCommand * sinf(attitudeActual.Yaw * M_PI / 180) + 
 				     eastCommand * cosf(attitudeActual.Yaw * M_PI / 180),
 				     -guidanceSettings.MaxRollPitch, guidanceSettings.MaxRollPitch);
 	
@@ -345,10 +345,14 @@ static void updateVtolDesiredAttitude()
 		// For now override throttle with manual control.  Disable at your risk, quad goes to China.
 		ManualControlCommandData manualControl;
 		ManualControlCommandGet(&manualControl);
-		attitudeDesired.Throttle = manualControl.Throttle;
+		stabDesired.Throttle = manualControl.Throttle;
 	}
 	
-	AttitudeDesiredSet(&attitudeDesired);
+	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+	
+	StabilizationDesiredSet(&stabDesired);
 }
 
 /**

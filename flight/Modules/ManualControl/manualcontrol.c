@@ -39,7 +39,7 @@
 #include "stabilizationsettings.h"
 #include "manualcontrolcommand.h"
 #include "actuatordesired.h"
-#include "attitudedesired.h"
+#include "stabilizationdesired.h"
 #include "flighttelemetrystats.h"
 
 // Private constants
@@ -72,68 +72,71 @@ static xTaskHandle taskHandle;
 static ArmState_t armState;
 
 // Private functions
+static void updateActuatorDesired(ManualControlCommandData * cmd);
+static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualControlSettingsData * settings, float flightMode);
+
 static void manualControlTask(void *parameters);
 static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutral, int16_t deadband_percent);
 static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time);
 static bool okToArm(void);
 
 #define assumptions1 ( \
-		((int)MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE 		== (int)MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE) 		&& \
-		((int)MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_RATE 		== (int)MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE) 		&& \
-		((int)MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_ATTITUDE 	== (int)MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE) 	   \
+		((int)MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)       && \
+		((int)MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_RATE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)       && \
+		((int)MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_ATTITUDE 	== (int)STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)      \
 		)
 
 #define assumptions2 ( \
-		((int)MANUALCONTROLSETTINGS_POS1FLIGHTMODE_MANUAL 				== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL) 						&& \
-		((int)MANUALCONTROLSETTINGS_POS1FLIGHTMODE_STABILIZED			== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED) 					&& \
-		((int)MANUALCONTROLSETTINGS_POS1FLIGHTMODE_AUTO 				== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO) 						   \
+		((int)MANUALCONTROLSETTINGS_POS1FLIGHTMODE_MANUAL               == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL)       && \
+		((int)MANUALCONTROLSETTINGS_POS1FLIGHTMODE_STABILIZED           == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED)   && \
+		((int)MANUALCONTROLSETTINGS_POS1FLIGHTMODE_AUTO                 == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO)            \
 		)
 
 #define assumptions3 ( \
-		((int)MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_NONE 		== (int)MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE) 		&& \
-		((int)MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_RATE 		== (int)MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE) 		&& \
-		((int)MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_ATTITUDE 	== (int)MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE) 	   \
+		((int)MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_NONE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)      && \
+		((int)MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_RATE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)      && \
+		((int)MANUALCONTROLSETTINGS_POS2STABILIZATIONSETTINGS_ATTITUDE 	== (int)STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)     \
 		)
 
 #define assumptions4 ( \
-		((int)MANUALCONTROLSETTINGS_POS2FLIGHTMODE_MANUAL 				== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL) 						&& \
-		((int)MANUALCONTROLSETTINGS_POS2FLIGHTMODE_STABILIZED			== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED) 					&& \
-		((int)MANUALCONTROLSETTINGS_POS2FLIGHTMODE_AUTO 				== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO) 						   \
+		((int)MANUALCONTROLSETTINGS_POS2FLIGHTMODE_MANUAL               == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL)      && \
+		((int)MANUALCONTROLSETTINGS_POS2FLIGHTMODE_STABILIZED           == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED)  && \
+		((int)MANUALCONTROLSETTINGS_POS2FLIGHTMODE_AUTO                 == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO)           \
 		)
 
 #define assumptions5 ( \
-		((int)MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_NONE 		== (int)MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE) 		&& \
-		((int)MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_RATE 		== (int)MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE) 		&& \
-		((int)MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_ATTITUDE 	== (int)MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE) 	   \
+		((int)MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_NONE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)      && \
+		((int)MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_RATE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)      && \
+		((int)MANUALCONTROLSETTINGS_POS3STABILIZATIONSETTINGS_ATTITUDE 	== (int)STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)     \
 		)
 
 #define assumptions6 ( \
-		((int)MANUALCONTROLSETTINGS_POS3FLIGHTMODE_MANUAL 				== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL) 						&& \
-		((int)MANUALCONTROLSETTINGS_POS3FLIGHTMODE_STABILIZED			== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED) 					&& \
-		((int)MANUALCONTROLSETTINGS_POS3FLIGHTMODE_AUTO 				== (int)MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO) 						   \
+		((int)MANUALCONTROLSETTINGS_POS3FLIGHTMODE_MANUAL               == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL)      && \
+		((int)MANUALCONTROLSETTINGS_POS3FLIGHTMODE_STABILIZED           == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED)  && \
+		((int)MANUALCONTROLSETTINGS_POS3FLIGHTMODE_AUTO                 == (int)MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO)           \
 		)
 
 
-#define ARMING_CHANNEL_ROLL		0
-#define ARMING_CHANNEL_PITCH	1
-#define ARMING_CHANNEL_YAW		2
+#define ARMING_CHANNEL_ROLL     0
+#define ARMING_CHANNEL_PITCH    1
+#define ARMING_CHANNEL_YAW      2
 
 #define assumptions7 ( \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_ROLL) 	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_ROLLRIGHT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_ROLL) 	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_PITCHFORWARD		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_PITCH) 	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_PITCHAFT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_PITCH) 	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_YAWLEFT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_YAW) 		&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_YAWRIGHT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_YAW)		\
+		( ((int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT           -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_ROLL) 	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_ROLLRIGHT          -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_ROLL) 	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_PITCHFORWARD       -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_PITCH) 	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_PITCHAFT           -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_PITCH) 	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_YAWLEFT            -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_YAW) 		&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_YAWRIGHT           -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_YAW)		\
 		)
 
 #define assumptions8 ( \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	== 0) 	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_ROLLRIGHT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	!= 0) 	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_PITCHFORWARD	-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	== 0) 	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_PITCHAFT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	!= 0) 	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_YAWLEFT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	== 0)	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_YAWRIGHT		-(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	!= 0)	\
+		( ((int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT           -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	== 0) 	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_ROLLRIGHT          -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	!= 0) 	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_PITCHFORWARD       -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	== 0) 	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_PITCHAFT           -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	!= 0) 	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_YAWLEFT            -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	== 0)	&& \
+		( ((int)MANUALCONTROLSETTINGS_ARMING_YAWRIGHT           -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	!= 0)	\
 		)
 
 
@@ -167,14 +170,10 @@ int32_t ManualControlInitialize()
 static void manualControlTask(void *parameters)
 {
 	ManualControlSettingsData settings;
-	StabilizationSettingsData stabSettings;
 	ManualControlCommandData cmd;
-	ActuatorDesiredData actuator;
-	AttitudeDesiredData attitude;
 	portTickType lastSysTime;
-
-
-	float flightMode;
+	
+	float flightMode = 0;
 
 	uint8_t disconnected_count = 0;
 	uint8_t connected_count = 0;
@@ -197,7 +196,6 @@ static void manualControlTask(void *parameters)
 
 		// Read settings
 		ManualControlSettingsGet(&settings);
-		StabilizationSettingsGet(&stabSettings);
 
 		if (ManualControlCommandReadOnly(&cmd)) {
 			FlightTelemetryStatsData flightTelemStats;
@@ -262,25 +260,13 @@ static void manualControlTask(void *parameters)
 			else
 				cmd.Accessory3 = 0;
 
-			if (flightMode < -FLIGHT_MODE_LIMIT) {
-				// Position 1
-				for(int i = 0; i < 3; i++) {
-					cmd.StabilizationSettings[i] = settings.Pos1StabilizationSettings[i];	// See assumptions1
-				}
-				cmd.FlightMode = settings.Pos1FlightMode;	// See assumptions2
-			} else if (flightMode > FLIGHT_MODE_LIMIT) {
-				// Position 3
-				for(int i = 0; i < 3; i++) {
-					cmd.StabilizationSettings[i] = settings.Pos3StabilizationSettings[i];	// See assumptions5
-				}
-				cmd.FlightMode = settings.Pos3FlightMode;	// See assumptions6
-			} else {
-				// Position 2
-				for(int i = 0; i < 3; i++) {
-					cmd.StabilizationSettings[i] = settings.Pos2StabilizationSettings[i];	// See assumptions3
-				}
-				cmd.FlightMode = settings.Pos2FlightMode;	// See assumptions4
-			}
+			if (flightMode < -FLIGHT_MODE_LIMIT) 
+				cmd.FlightMode = settings.Pos1FlightMode;
+			else if (flightMode > FLIGHT_MODE_LIMIT) 
+				cmd.FlightMode = settings.Pos3FlightMode;
+			else 
+				cmd.FlightMode = settings.Pos2FlightMode;
+			
 			// Update the ManualControlCommand object
 			ManualControlCommandSet(&cmd);
 			// This seems silly to set then get, but the reason is if the GCS is
@@ -457,53 +443,61 @@ static void manualControlTask(void *parameters)
 
 
 		// Depending on the mode update the Stabilization or Actuator objects
-		if (cmd.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL) {
-			actuator.Roll = cmd.Roll;
-			actuator.Pitch = cmd.Pitch;
-			actuator.Yaw = cmd.Yaw;
-			actuator.Throttle = cmd.Throttle;
-			ActuatorDesiredSet(&actuator);
-		} else if (cmd.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED) {
-			switch(cmd.StabilizationSettings[MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ROLL]) {
-				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE:
-					attitude.Roll = cmd.Roll * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_ROLL];
-					break;
-				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE:
-					attitude.Roll = cmd.Roll * stabSettings.RollMax;
-					break;
-				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE:
-					attitude.Roll = cmd.Roll;
-					break;
-			}
-			switch(cmd.StabilizationSettings[MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_PITCH]) {
-				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE:
-					attitude.Pitch = cmd.Pitch * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_PITCH];
-					break;
-				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE:
-					attitude.Pitch = cmd.Pitch * stabSettings.PitchMax;
-					break;
-				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE:
-					attitude.Pitch = cmd.Pitch;
-					break;
-			}
-			switch(cmd.StabilizationSettings[MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_YAW]) {
-				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_RATE:
-					attitude.Yaw = cmd.Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW];
-					break;
-				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_ATTITUDE:
-					attitude.Yaw = fmod(cmd.Yaw * 180.0, 360);
-					break;
-				case MANUALCONTROLCOMMAND_STABILIZATIONSETTINGS_NONE:
-					attitude.Yaw = cmd.Yaw;
-					break;
-			}
-			attitude.Throttle =  (cmd.Throttle < 0) ? -1 : cmd.Throttle;
-			for(int i = 0; i < 3; i++) {
-				attitude.StabilizationSettings[i] = cmd.StabilizationSettings[i];
-			}
-			AttitudeDesiredSet(&attitude);
-		}
+		if (cmd.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL)
+			updateActuatorDesired(&cmd);
+		else if (cmd.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_STABILIZED) 
+			updateStabilizationDesired(&cmd, &settings, flightMode);
 	}
+}
+
+static void updateActuatorDesired(ManualControlCommandData * cmd) 
+{
+	ActuatorDesiredData actuator;
+	ActuatorDesiredGet(&actuator);
+	actuator.Roll = cmd->Roll;
+	actuator.Pitch = cmd->Pitch;
+	actuator.Yaw = cmd->Yaw;
+	actuator.Throttle = (cmd->Throttle < 0) ? -1 : cmd->Throttle;
+	ActuatorDesiredSet(&actuator);	
+}
+
+static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualControlSettingsData * settings, float flightMode)
+{
+	StabilizationDesiredData stabilization;
+	StabilizationDesiredGet(&stabilization);
+	
+	StabilizationSettingsData stabSettings;
+	StabilizationSettingsGet(&stabSettings);
+		
+	uint8_t * stab_settings;
+	if (flightMode < -FLIGHT_MODE_LIMIT) 
+		stab_settings = settings->Pos1StabilizationSettings;
+	else if (flightMode > FLIGHT_MODE_LIMIT) 
+		stab_settings = settings->Pos3StabilizationSettings;
+	else 
+		stab_settings = settings->Pos2StabilizationSettings;
+	
+	stabilization.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL]  = stab_settings[0];
+	stabilization.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = stab_settings[1];
+	stabilization.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW]   = stab_settings[2];
+	
+	stabilization.Roll = (stab_settings[0] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE) ? cmd->Roll :
+	     (stab_settings[0] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_RATE) ? cmd->Roll * stabSettings.MaximumRate[STABILIZATIONSETTINGS_MAXIMUMRATE_ROLL] :
+	     (stab_settings[0] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_ATTITUDE) ? cmd->Roll * stabSettings.RollMax :
+	     0; // this is an invalid mode
+					      ;
+	stabilization.Roll = (stab_settings[1] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE) ? cmd->Pitch :
+	     (stab_settings[1] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_RATE) ? cmd->Pitch * stabSettings.MaximumRate[STABILIZATIONSETTINGS_MAXIMUMRATE_PITCH] :
+	     (stab_settings[1] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_ATTITUDE) ? cmd->Pitch * stabSettings.PitchMax :
+	     0; // this is an invalid mode
+
+	stabilization.Roll = (stab_settings[2] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE) ? cmd->Yaw :
+	     (stab_settings[2] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_RATE) ? cmd->Yaw * stabSettings.MaximumRate[STABILIZATIONSETTINGS_MAXIMUMRATE_YAW] :
+	     (stab_settings[2] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_ATTITUDE) ? fmod(cmd->Yaw * 180.0, 360) :
+	     0; // this is an invalid mode
+	
+	stabilization.Throttle = (cmd->Throttle < 0) ? -1 : cmd->Throttle; 
+	StabilizationDesiredSet(&stabilization);
 }
 
 /**

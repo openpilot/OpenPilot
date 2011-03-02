@@ -871,7 +871,9 @@ robot_prediction = robPtr->state.x();
 					dmaIter != senPtr->dataManagerList().end(); ++dmaIter)
 				{
 					data_manager_ptr_t dmaPtr = *dmaIter;
-					dmaPtr->process(senPtr->getRaw());
+					dmaPtr->processKnown(senPtr->getRaw());
+					dmaPtr->mapManagerPtr()->manage();
+					dmaPtr->detectNew(senPtr->getRaw());
 				} // foreach dataManager
 
 average_robot_innovation += ublas::norm_2(robPtr->state.x() - robot_prediction);
@@ -897,13 +899,14 @@ JFR_DEBUG("Robot state stdev after corrections " << sqrt(ublas::matrix_vector_ra
 //								!= mmPoint->landmarkList().end(); lmkIter++) {
 //							std::cout << (*lmkIter)->id() << " ";
 //						}
-
+#if 0
 			for (MapAbstract::MapManagerList::iterator mmIter = mapPtr->mapManagerList().begin(); 
 				mmIter != mapPtr->mapManagerList().end(); ++mmIter)
 			{
 				map_manager_ptr_t mapMgr = *mmIter;
 				mapMgr->manage();
 			}
+#endif
 // cout << "SLAM: processed a frame: t " << (*world)->t << " display_t " << (*world)->display_t << std::endl;
 
 			bool renderAll;

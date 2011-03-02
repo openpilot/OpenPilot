@@ -59,7 +59,9 @@ namespace jafar {
 				}
 				virtual ~DataManagerOnePointRansac() {
 				}
-				void process(boost::shared_ptr<RawAbstract> data);
+				void processKnown(raw_ptr_t data);
+				void detectNew(raw_ptr_t data);
+//				void process(boost::shared_ptr<RawAbstract> data);
 
 			protected: // main data members
 				boost::shared_ptr<DetectorSpec> detector;
@@ -96,12 +98,9 @@ namespace jafar {
 // 					return algorithmParams_;
 // 				}
 
-			protected: // particular processing
-				void processKnownObs(boost::shared_ptr<RawSpec> rawData);
-				void detectNewObs(boost::shared_ptr<RawSpec> rawData);
-
 			protected: // helper functions
 				void projectAndCollectVisibleObs();
+				void updateVisibleObs();
 				void getOneMatchedBaseObs(observation_ptr_t & obsBasePtr, boost::shared_ptr<RawSpec> rawData);
 				observation_ptr_t selectOneRandomObs();
 				vec updateMean(const observation_ptr_t & obsPtr);

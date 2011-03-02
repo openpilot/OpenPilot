@@ -40,15 +40,14 @@ namespace jafar {
 
 		template<class RawSpec,class SensorSpec, class FeatureSpec, class RoiSpec, class FeatureManagerSpec, class DetectorSpec, class MatcherSpec>
 		void DataManagerOnePointRansac<RawSpec,SensorSpec,FeatureSpec,RoiSpec,FeatureManagerSpec,DetectorSpec,MatcherSpec>::
-		processKnownObs(boost::shared_ptr<RawSpec> rawData)
+		processKnown(raw_ptr_t data)
 		{
-			
+			boost::shared_ptr<RawSpec> rawData = SPTR_CAST<RawSpec>(data);
 			//###
 			//### Init, collect visible observations
 			//### 
 			map_ptr_t mapPtr = sensorPtr()->robotPtr()->mapPtr();
 			unsigned numObs = 0;
-			featMan->renew();
 
 			projectAndCollectVisibleObs();
 
@@ -281,8 +280,6 @@ namespace jafar {
 					obsPtr->predictVisibility();
 					if (obsPtr->isVisible())
 					{
-						obsPtr->events.visible = true;
-
 						if (numObs < algorithmParams.n_updates_total)
 							if (obsPtr->predictAppearance())
 							{
@@ -309,12 +306,14 @@ namespace jafar {
 									    && obsPtr->computeRelevance() > jmath::sqr(matcher->params.relevanceTh)
 									#endif
 										 ) {
+										#if RELEVANCE_TEST
 										if (pending_buffered_update)
 										{
 											mapPtr->filterPtr->correctAllStacked(mapPtr->ia_used_states());
 											pending_buffered_update = false;
 											// TODO mark as updated
 										}
+										#endif
 										obsPtr->events.updated = true;
 										numObs++;
 										JFR_DEBUG_SEND(" " << obsPtr->id());
@@ -366,7 +365,6 @@ namespace jafar {
 
 			// clear all sets to liberate shared pointers
 			ransacSetList.clear();
-			obsVisibleList.clear();
 			obsBaseList.clear();
 			obsFailedList.clear();
 		}
@@ -374,8 +372,12 @@ namespace jafar {
 
 		template<class RawSpec,class SensorSpec, class FeatureSpec, class RoiSpec, class FeatureManagerSpec, class DetectorSpec, class MatcherSpec>
 		void DataManagerOnePointRansac<RawSpec,SensorSpec,FeatureSpec,RoiSpec,FeatureManagerSpec,DetectorSpec,MatcherSpec>::
-		detectNewObs(boost::shared_ptr<RawSpec> rawData)
+		detectNew(raw_ptr_t data)
 		{
+			boost::shared_ptr<RawSpec> rawData = SPTR_CAST<RawSpec>(data);			
+			updateVisibleObs();
+			obsVisibleList.clear();
+			
 			for(unsigned i = 0; i < algorithmParams.n_init; )
 			if (mapManagerPtr()->mapSpaceForInit()) {
 				//boost::shared_ptr<RawImage> rawDataSpec = SPTR_CAST<RawImage>(rawData);
@@ -437,7 +439,7 @@ namespace jafar {
 			} else break; // if space in map
 		} // detect()
 
-
+#if 0
 		template<class RawSpec,class SensorSpec, class FeatureSpec, class RoiSpec, class FeatureManagerSpec, class DetectorSpec, class MatcherSpec>
 		void DataManagerOnePointRansac<RawSpec,SensorSpec,FeatureSpec,RoiSpec,FeatureManagerSpec,DetectorSpec,MatcherSpec>::
 		process( boost::shared_ptr<RawAbstract> data )
@@ -448,7 +450,7 @@ namespace jafar {
 				// 2. Initialize new landmark.
 				detectNewObs(dataSpec);
 		}
-
+#endif
 
 		template<class RawSpec,class SensorSpec, class FeatureSpec, class RoiSpec, class FeatureManagerSpec, class DetectorSpec, class MatcherSpec>
 		void DataManagerOnePointRansac<RawSpec,SensorSpec,FeatureSpec,RoiSpec,FeatureManagerSpec,DetectorSpec,MatcherSpec>::
@@ -472,10 +474,11 @@ namespace jafar {
 				
 				if (obsPtr->predictVisibility())
 				{
+					bool add;
 					#if VISIBILITY_MAP
 					double visibility, viscertainty;
 					obsPtr->landmark().visibilityMap.estimateVisibility(obsPtr, visibility, viscertainty);
-					bool add = false;
+					add = false;
 					if (visibility > 0.75 && viscertainty > 0.75) add = true; else
 					if (!obsPtr->landmark().converged)
 						{ if (visibility < 0.25) visibility = 0.25; }
@@ -484,21 +487,35 @@ namespace jafar {
 					if (viscertainty < 0.25) visibility = 0.25;
 					if (rtslam::rand()%1024 < visibility*1024) add = true;
 					#else
-					bool add = true;
+					add = true;
 					#endif
 					
-					if (!mapManagerPtr()->isExclusive(obsPtr))
-						add = false;
-					
 					if (add)
-					{
-						featMan->addObs(obsPtr->expectation.x());
 						obsVisibleList.push_back(obsPtr);
-					} 
 					//else std::cout << __FILE__ << ":" << __LINE__ << " ignore lmk " << obsPtr->id() << std::endl;
 				} // visible obs
 			} // for each obs
 			remainingObsCount = obsVisibleList.size();
+		}
+
+		template<class RawSpec,class SensorSpec, class FeatureSpec, class RoiSpec, class FeatureManagerSpec, class DetectorSpec, class MatcherSpec>
+		void DataManagerOnePointRansac<RawSpec,SensorSpec,FeatureSpec,RoiSpec,FeatureManagerSpec,DetectorSpec,MatcherSpec>::
+		updateVisibleObs()
+		{
+			featMan->renew();
+
+			for(ObsList::iterator obsIter = obsVisibleList.begin(); obsIter != obsVisibleList.end();obsIter++)
+			{ // don't recompute visibility to save time
+				observation_ptr_t obsPtr = *obsIter;
+				bool add = false;
+				
+				if (obsPtr->events.updated) add = true; else
+				if (mapManagerPtr()->isExclusive(obsPtr)) add = true;
+				// TODO with visibility stuff
+				
+				if (add)
+					featMan->addObs(obsPtr->expectation.x()); // don't reproject to save time
+			} // for each visible obs
 		}
 
 

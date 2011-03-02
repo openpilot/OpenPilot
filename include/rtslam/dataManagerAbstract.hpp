@@ -48,7 +48,9 @@ namespace jafar {
     public:
       virtual ~DataManagerAbstract(void) {}
 
-      virtual void process( boost::shared_ptr<RawAbstract> data ) = 0;
+			virtual void processKnown(raw_ptr_t data) = 0;
+			virtual void detectNew(raw_ptr_t data) = 0;
+      //virtual void process( boost::shared_ptr<RawAbstract> data ) = 0;
 
     };
 

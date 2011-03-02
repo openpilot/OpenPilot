@@ -90,14 +90,14 @@ static void SettingsUpdatedCb(UAVObjEvent * ev);
 int32_t StabilizationInitialize()
 {
 	// Initialize variables
-
+	
 	// Create object queue
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
-
+	
 	// Listen for updates.
-//	AttitudeActualConnectQueue(queue);
+	//	AttitudeActualConnectQueue(queue);
 	AttitudeRawConnectQueue(queue);
-
+	
 	StabilizationSettingsConnectCallback(SettingsUpdatedCb);
 	SettingsUpdatedCb(StabilizationSettingsHandle());
 	// Start main task
@@ -116,8 +116,8 @@ static void stabilizationTask(void* parameters)
 	portTickType lastSysTime;
 	portTickType thisSysTime;
 	UAVObjEvent ev;
-
-
+	
+	
 	ActuatorDesiredData actuatorDesired;
 	StabilizationDesiredData stabDesired;
 	RateDesiredData rateDesired;
@@ -125,15 +125,15 @@ static void stabilizationTask(void* parameters)
 	AttitudeRawData attitudeRaw;
 	SystemSettingsData systemSettings;
 	ManualControlCommandData manualControl;
-
+	
 	SettingsUpdatedCb((UAVObjEvent *) NULL);
-
+	
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	ZeroPids();
 	while(1) {
 		PIOS_WDG_UpdateFlag(PIOS_WDG_STABILIZATION);
-
+		
 		// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
 		if ( xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )
 		{
@@ -146,36 +146,36 @@ static void stabilizationTask(void* parameters)
 		if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
 			dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
 		lastSysTime = thisSysTime;
-
+		
 		ManualControlCommandGet(&manualControl);
 		StabilizationDesiredGet(&stabDesired);
 		AttitudeActualGet(&attitudeActual);
 		AttitudeRawGet(&attitudeRaw);
 		RateDesiredGet(&rateDesired);
 		SystemSettingsGet(&systemSettings);
-
-
+		
+		
 		float *attitudeDesiredAxis = &stabDesired.Roll;
 		float *attitudeActualAxis = &attitudeActual.Roll;
 		float *actuatorDesiredAxis = &actuatorDesired.Roll;
 		float *rateDesiredAxis = &rateDesired.Roll;
-
+		
 		//Calculate desired rate
 		for(int8_t ct=0; ct< MAX_AXES; ct++)
 		{
 			switch(stabDesired.StabilizationMode[ct])
 			{
-			case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
-				rateDesiredAxis[ct] = attitudeDesiredAxis[ct];
-				break;
-
-			case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
-				rateDesiredAxis[ct] = ApplyPid(&pids[PID_ROLL + ct],  attitudeDesiredAxis[ct],  attitudeActualAxis[ct], 1);
-				break;
+				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
+					rateDesiredAxis[ct] = attitudeDesiredAxis[ct];
+					break;
+					
+				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
+					rateDesiredAxis[ct] = ApplyPid(&pids[PID_ROLL + ct],  attitudeDesiredAxis[ct],  attitudeActualAxis[ct], 1);
+					break;
 			}
 		}
-
-		uint8_t shouldUpdate = 1;
+		
+		uint8_t shouldUpdate = 0;
 		RateDesiredSet(&rateDesired);
 		ActuatorDesiredGet(&actuatorDesired);
 		//Calculate desired command
@@ -190,12 +190,12 @@ static void stabilizationTask(void* parameters)
 				{
 					rateDesiredAxis[ct] = -settings.MaximumRate[ct];
 				}
-
+				
 			}
 			switch(stabDesired.StabilizationMode[ct])
 			{
-			case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
-			case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
+				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
+				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
 				{
 					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rateDesiredAxis[ct],  attitudeRaw.gyros[ct], 0);
 					actuatorDesiredAxis[ct] = bound(command);
@@ -223,16 +223,16 @@ static void stabilizationTask(void* parameters)
 					
 			}
 		}
-
+		
 		// Save dT
 		actuatorDesired.UpdateTime = dT * 1000;
-
+		
 		if(manualControl.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL)
 		{
 			shouldUpdate = 0;
 		}
-
-
+		
+		
 		if(shouldUpdate)
 		{
 			actuatorDesired.Throttle = stabDesired.Throttle;
@@ -240,9 +240,9 @@ static void stabilizationTask(void* parameters)
 				actuatorDesired.NumLongUpdates++;
 			ActuatorDesiredSet(&actuatorDesired);
 		}
-
+		
 		if(manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_FALSE ||
-			!shouldUpdate || (stabDesired.Throttle < 0))
+		   !shouldUpdate || (stabDesired.Throttle < 0))
 		{
 			ZeroPids();
 		}
@@ -266,7 +266,7 @@ float ApplyPid(pid_type * pid, const float desired, const float actual, const ui
 			err += 360;
 		}
 	}
-
+	
 	float diff = (err - pid->lastErr);
 	pid->lastErr = err;
 	pid->iAccumulator += err * pid->i * dT;
@@ -308,7 +308,7 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 {
 	memset(pids,0,sizeof (pid_type) * PID_MAX);
 	StabilizationSettingsGet(&settings);
-
+	
 	float * data = settings.RollRatePI;
 	for(int8_t pid=0; pid < PID_MAX; pid++)
 	{
@@ -320,6 +320,6 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

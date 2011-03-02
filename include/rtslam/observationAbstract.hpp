@@ -203,6 +203,8 @@ namespace jafar {
 						int nSearch; ///< Number of searches
 						int nMatch;  ///< Number of matches
 						int nInlier; ///< Number of times declared inlier
+						int nSearchSinceLastInlier; ///< Number of frames the landmark was searched since last time it was inlier
+						int nFrameSinceLastVisible; ///< Number of frames since last time it was visible
 				} counters;
 
 				/**

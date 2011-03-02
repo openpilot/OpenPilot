@@ -211,7 +211,13 @@ namespace jafar {
 					observation_ptr_t obsPtr = *obsIter;
 
 					// kill if all sensors have unstable and inconsistent observations
-					if (obsPtr->events.updated) needToDie = false;
+					if (!(obsPtr->counters.nFrameSinceLastVisible > 0 ||
+//					    (obsPtr->counters.nInlier == 1 && !obsPtr->events.updated) ||
+					    obsPtr->counters.nSearchSinceLastInlier > 1))
+					{
+						needToDie = false;
+						break;
+					}
 				}
 				if (needToDie)
 					lmkIter = unregisterLandmark(lmkIter);

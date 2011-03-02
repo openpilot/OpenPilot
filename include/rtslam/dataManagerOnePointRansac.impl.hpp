@@ -358,6 +358,10 @@ namespace jafar {
 					if (obs->events.matched) obs->counters.nMatch++;
 					if (obs->events.updated) obs->counters.nInlier++;
 				}
+				
+				if (obs->events.measured) obs->counters.nSearchSinceLastInlier++;
+				if (obs->events.visible) obs->counters.nFrameSinceLastVisible = 0;
+				if (obs->events.updated) obs->counters.nSearchSinceLastInlier = 0;
 			}
 
 			// clear all sets to liberate shared pointers
@@ -457,6 +461,7 @@ namespace jafar {
 				observation_ptr_t obsPtr = *obsIter;
 
 				obsPtr->clearFlags();
+				obsPtr->counters.nFrameSinceLastVisible++;
 				obsPtr->measurement.matchScore = 0;
 
 				#if PROJECT_MEAN_VISIBILITY

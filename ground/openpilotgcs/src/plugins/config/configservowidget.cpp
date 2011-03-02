@@ -172,11 +172,11 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_config->ch7Output->addItem("None");
 
     // And the flight mode settings:
-    field = obj->getField(QString("Pos1FlightMode"));
+    field = obj->getField(QString("FlightModePosition"));
     m_config->fmsModePos1->addItems(field->getOptions());
     m_config->fmsModePos2->addItems(field->getOptions());
     m_config->fmsModePos3->addItems(field->getOptions());
-    field = obj->getField(QString("Pos1StabilizationSettings"));
+    field = obj->getField(QString("Stabilization1Settings"));
     channelsList.clear();
     channelsList.append(field->getOptions());
     m_config->fmsSsPos1Roll->addItems(channelsList);
@@ -740,21 +740,20 @@ void ConfigServoWidget::requestRCInputUpdate()
     }
 
     // Update all the flight mode settingsin the relevant tab
-    field = obj->getField(QString("Pos1FlightMode"));
-    m_config->fmsModePos1->setCurrentIndex((m_config->fmsModePos1->findText(field->getValue().toString())));
-    field = obj->getField(QString("Pos2FlightMode"));
-    m_config->fmsModePos2->setCurrentIndex((m_config->fmsModePos2->findText(field->getValue().toString())));
-    field = obj->getField(QString("Pos3FlightMode"));
-    m_config->fmsModePos3->setCurrentIndex((m_config->fmsModePos3->findText(field->getValue().toString())));
-    field = obj->getField(QString("Pos1StabilizationSettings"));
+    field = obj->getField(QString("FlightModePosition"));
+    m_config->fmsModePos1->setCurrentIndex((m_config->fmsModePos1->findText(field->getValue(0).toString())));
+    m_config->fmsModePos2->setCurrentIndex((m_config->fmsModePos2->findText(field->getValue(1).toString())));
+    m_config->fmsModePos3->setCurrentIndex((m_config->fmsModePos3->findText(field->getValue(2).toString())));
+
+    field = obj->getField(QString("Stabilization1Settings"));
 	m_config->fmsSsPos1Roll->setCurrentIndex(m_config->fmsSsPos1Roll->findText(field->getValue(field->getElementNames().indexOf("Roll")).toString()));
 	m_config->fmsSsPos1Pitch->setCurrentIndex(m_config->fmsSsPos1Pitch->findText(field->getValue(field->getElementNames().indexOf("Pitch")).toString()));
 	m_config->fmsSsPos1Yaw->setCurrentIndex(m_config->fmsSsPos1Yaw->findText(field->getValue(field->getElementNames().indexOf("Yaw")).toString()));
-    field = obj->getField(QString("Pos2StabilizationSettings"));
+    field = obj->getField(QString("Stabilization2Settings"));
 	m_config->fmsSsPos2Roll->setCurrentIndex(m_config->fmsSsPos2Roll->findText(field->getValue(field->getElementNames().indexOf("Roll")).toString()));
 	m_config->fmsSsPos2Pitch->setCurrentIndex(m_config->fmsSsPos2Pitch->findText(field->getValue(field->getElementNames().indexOf("Pitch")).toString()));
 	m_config->fmsSsPos2Yaw->setCurrentIndex(m_config->fmsSsPos2Yaw->findText(field->getValue(field->getElementNames().indexOf("Yaw")).toString()));
-    field = obj->getField(QString("Pos3StabilizationSettings"));
+    field = obj->getField(QString("Stabilization3Settings"));
 	m_config->fmsSsPos3Roll->setCurrentIndex(m_config->fmsSsPos3Roll->findText(field->getValue(field->getElementNames().indexOf("Roll")).toString()));
 	m_config->fmsSsPos3Pitch->setCurrentIndex(m_config->fmsSsPos3Pitch->findText(field->getValue(field->getElementNames().indexOf("Pitch")).toString()));
 	m_config->fmsSsPos3Yaw->setCurrentIndex(m_config->fmsSsPos3Yaw->findText(field->getValue(field->getElementNames().indexOf("Yaw")).toString()));
@@ -844,22 +843,20 @@ void ConfigServoWidget::sendRCInputUpdate()
     }
 
     // Send all the flight mode settings
-    field = obj->getField(QString("Pos1FlightMode"));
-    field->setValue(m_config->fmsModePos1->currentText());
-    field = obj->getField(QString("Pos2FlightMode"));
-    field->setValue(m_config->fmsModePos2->currentText());
-    field = obj->getField(QString("Pos3FlightMode"));
-    field->setValue(m_config->fmsModePos3->currentText());
+    field = obj->getField(QString("FlightModePosition"));
+    field->setValue(m_config->fmsModePos1->currentText(),0);
+    field->setValue(m_config->fmsModePos2->currentText(),1);
+    field->setValue(m_config->fmsModePos3->currentText(),2);
 
-    field = obj->getField(QString("Pos1StabilizationSettings"));
+    field = obj->getField(QString("Stabilization1Settings"));
     field->setValue(m_config->fmsSsPos1Roll->currentText(), field->getElementNames().indexOf("Roll"));
     field->setValue(m_config->fmsSsPos1Pitch->currentText(), field->getElementNames().indexOf("Pitch"));
     field->setValue(m_config->fmsSsPos1Yaw->currentText(), field->getElementNames().indexOf("Yaw"));
-    field = obj->getField(QString("Pos2StabilizationSettings"));
+    field = obj->getField(QString("Stabilization2Settings"));
     field->setValue(m_config->fmsSsPos2Roll->currentText(), field->getElementNames().indexOf("Roll"));
     field->setValue(m_config->fmsSsPos2Pitch->currentText(), field->getElementNames().indexOf("Pitch"));
     field->setValue(m_config->fmsSsPos2Yaw->currentText(), field->getElementNames().indexOf("Yaw"));
-    field = obj->getField(QString("Pos3StabilizationSettings"));
+    field = obj->getField(QString("Stabilization3Settings"));
     field->setValue(m_config->fmsSsPos3Roll->currentText(), field->getElementNames().indexOf("Roll"));
     field->setValue(m_config->fmsSsPos3Pitch->currentText(), field->getElementNames().indexOf("Pitch"));
     field->setValue(m_config->fmsSsPos3Yaw->currentText(), field->getElementNames().indexOf("Yaw"));

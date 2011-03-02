@@ -486,12 +486,12 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
 	     (stab_settings[0] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_ATTITUDE) ? cmd->Roll * stabSettings.RollMax :
 	     0; // this is an invalid mode
 					      ;
-	stabilization.Roll = (stab_settings[1] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE) ? cmd->Pitch :
+	stabilization.Pitch = (stab_settings[1] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE) ? cmd->Pitch :
 	     (stab_settings[1] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_RATE) ? cmd->Pitch * stabSettings.MaximumRate[STABILIZATIONSETTINGS_MAXIMUMRATE_PITCH] :
 	     (stab_settings[1] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_ATTITUDE) ? cmd->Pitch * stabSettings.PitchMax :
 	     0; // this is an invalid mode
 
-	stabilization.Roll = (stab_settings[2] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE) ? cmd->Yaw :
+	stabilization.Yaw = (stab_settings[2] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_NONE) ? cmd->Yaw :
 	     (stab_settings[2] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_RATE) ? cmd->Yaw * stabSettings.MaximumRate[STABILIZATIONSETTINGS_MAXIMUMRATE_YAW] :
 	     (stab_settings[2] == MANUALCONTROLSETTINGS_POS1STABILIZATIONSETTINGS_ATTITUDE) ? fmod(cmd->Yaw * 180.0, 360) :
 	     0; // this is an invalid mode

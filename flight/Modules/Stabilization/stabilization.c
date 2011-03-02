@@ -42,6 +42,7 @@
 #include "manualcontrolcommand.h"
 #include "systemsettings.h"
 #include "ahrssettings.h"
+#include "CoordinateConversions.h"
 
 // Private constants
 #define MAX_QUEUE_SIZE 1
@@ -79,7 +80,7 @@ pid_type pids[PID_MAX];
 
 // Private functions
 static void stabilizationTask(void* parameters);
-static float ApplyPid(pid_type * pid, const float desired, const float actual, const uint8_t angular);
+static float ApplyPid(pid_type * pid, const float err);
 static float bound(float val);
 static void ZeroPids(void);
 static void SettingsUpdatedCb(UAVObjEvent * ev);
@@ -154,9 +155,30 @@ static void stabilizationTask(void* parameters)
 		RateDesiredGet(&rateDesired);
 		SystemSettingsGet(&systemSettings);
 		
+#if defined(PIOS_QUATERNION_STABILIZATION)
+		// Quaternion calculation of error in each axis.  Uses more memory.
+		float q_desired[4];
+		float q_curr[4];
+		float q_error[4];
+		float local_error[3];
 		
+		// Compute stabilization error as (q_desired' * q_current)', convert to RPY
+		RPY2Quaternion(&stabDesired.Roll, q_desired);
+		quat_copy(&attitudeActual.q1, q_curr);		
+		quat_inverse(q_desired);
+		quat_mult(q_desired, q_curr, q_error);
+		quat_inverse(q_error);
+		Quaternion2RPY(q_error, local_error);
+		
+#else
+		// Simpler algorithm for CC, less memory
+		float local_error[3] = {stabDesired.Roll - attitudeActual.Roll,
+			stabDesired.Pitch - attitudeActual.Pitch,
+			stabDesired.Yaw - attitudeActual.Yaw};
+		local_error[2] = fmod(local_error[2] + 180, 360) - 180;
+#endif
+			
 		float *attitudeDesiredAxis = &stabDesired.Roll;
-		float *attitudeActualAxis = &attitudeActual.Roll;
 		float *actuatorDesiredAxis = &actuatorDesired.Roll;
 		float *rateDesiredAxis = &rateDesired.Roll;
 		
@@ -170,7 +192,7 @@ static void stabilizationTask(void* parameters)
 					break;
 					
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
-					rateDesiredAxis[ct] = ApplyPid(&pids[PID_ROLL + ct],  attitudeDesiredAxis[ct],  attitudeActualAxis[ct], 1);
+					rateDesiredAxis[ct] = ApplyPid(&pids[PID_ROLL + ct], local_error[ct]);
 					break;
 			}
 		}
@@ -197,7 +219,7 @@ static void stabilizationTask(void* parameters)
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
 				{
-					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rateDesiredAxis[ct],  attitudeRaw.gyros[ct], 0);
+					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rateDesiredAxis[ct]-attitudeRaw.gyros[ct]);
 					actuatorDesiredAxis[ct] = bound(command);
 					break;
 				}
@@ -252,21 +274,8 @@ static void stabilizationTask(void* parameters)
 	}
 }
 
-float ApplyPid(pid_type * pid, const float desired, const float actual, const uint8_t angular)
+float ApplyPid(pid_type * pid, const float err)
 {
-	float err = desired - actual;
-	if(angular) //take shortest route to desired position
-	{
-		if(err > 180)
-		{
-			err -= 360;
-		}
-		if(err < -180)
-		{
-			err += 360;
-		}
-	}
-	
 	float diff = (err - pid->lastErr);
 	pid->lastErr = err;
 	pid->iAccumulator += err * pid->i * dT;

@@ -85,6 +85,10 @@
 #define CPULOAD_LIMIT_WARNING		80
 #define CPULOAD_LIMIT_CRITICAL		95
 
+/* Stabilization options */
+#define PIOS_QUATERNION_STABILIZATION
+
+
 #endif /* PIOS_CONFIG_H */
 /**
  * @}

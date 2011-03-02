@@ -39,7 +39,7 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/ahrsstatus.h \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettings.h \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.h \
     $$UAVOBJECT_SYNTHETICS/manualcontrolcommand.h \
-    $$UAVOBJECT_SYNTHETICS/attitudedesired.h \
+    $$UAVOBJECT_SYNTHETICS/stabilizationdesired.h \
     $$UAVOBJECT_SYNTHETICS/actuatorsettings.h \
     $$UAVOBJECT_SYNTHETICS/actuatordesired.h \
     $$UAVOBJECT_SYNTHETICS/actuatorcommand.h \
@@ -84,7 +84,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/ahrsstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/manualcontrolcommand.cpp \
-    $$UAVOBJECT_SYNTHETICS/attitudedesired.cpp \
+    $$UAVOBJECT_SYNTHETICS/stabilizationdesired.cpp \
     $$UAVOBJECT_SYNTHETICS/actuatorsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/actuatordesired.cpp \
     $$UAVOBJECT_SYNTHETICS/actuatorcommand.cpp \

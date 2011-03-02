@@ -120,7 +120,7 @@ void RneFromLLA(double LLA[3], float Rne[3][3])
 }
 
 // ****** find roll, pitch, yaw from quaternion ********
-void Quaternion2RPY(float q[4], float rpy[3])
+void Quaternion2RPY(const float q[4], float rpy[3])
 {
 	float R13, R11, R12, R23, R33;
 	float q0s = q[0] * q[0];
@@ -142,7 +142,7 @@ void Quaternion2RPY(float q[4], float rpy[3])
 }
 
 // ****** find quaternion from roll, pitch, yaw ********
-void RPY2Quaternion(float rpy[3], float q[4])
+void RPY2Quaternion(const float rpy[3], float q[4])
 {
 	float phi, theta, psi;
 	float cphi, sphi, ctheta, stheta, cpsi, spsi;
@@ -348,3 +348,25 @@ float VectorMagnitude(const float v[3])
 	return(sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]));
 }
 
+void quat_inverse(float q[4]) 
+{
+	q[1] = -q[1];
+	q[2] = -q[2];
+	q[3] = -q[3];
+}
+
+void quat_copy(const float q[4], float qnew[4]) 
+{
+	qnew[0] = q[0];
+	qnew[1] = q[1];
+	qnew[2] = q[2];
+	qnew[3] = q[3];
+}
+
+void quat_mult(const float q1[4], const float q2[4], float qout[4]) 
+{
+	qout[0] = q1[0]*q2[0] - q1[1]*q2[1] - q1[2]*q2[2] - q1[3]*q2[3];
+	qout[1] = q1[0]*q2[1] + q1[1]*q2[0] + q1[2]*q2[3] - q1[3]*q2[2];
+	qout[2] = q1[0]*q2[2] - q1[1]*q2[3] + q1[2]*q2[0] + q1[3]*q2[1];
+	qout[3] = q1[0]*q2[3] + q1[1]*q2[2] - q1[2]*q2[1] + q1[3]*q2[0];
+}

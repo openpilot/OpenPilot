@@ -39,10 +39,10 @@ uint16_t ECEF2LLA(double ECEF[3], double LLA[3]);
 void RneFromLLA(double LLA[3], float Rne[3][3]);
 
 	// ****** find roll, pitch, yaw from quaternion ********
-void Quaternion2RPY(float q[4], float rpy[3]);
+void Quaternion2RPY(const float q[4], float rpy[3]);
 
 	// ****** find quaternion from roll, pitch, yaw ********
-void RPY2Quaternion(float rpy[3], float q[4]);
+void RPY2Quaternion(const float rpy[3], float q[4]);
 
 	//** Find Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
 void Quaternion2R(float q[4], float Rbe[3][3]);
@@ -68,6 +68,9 @@ void CrossProduct(const float v1[3], const float v2[3], float result[3]);
 	// ****** Vector Magnitude ********
 float VectorMagnitude(const float v[3]);
 
+void quat_inverse(float q[4]);
+void quat_copy(const float q[4], float qnew[4]);
+void quat_mult(const float q1[4], const float q2[4], float qout[4]);
 
 
 #endif // COORDINATECONVERSIONS_H_

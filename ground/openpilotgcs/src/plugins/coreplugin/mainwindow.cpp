@@ -570,7 +570,7 @@ void MainWindow::registerDefaultActions()
     */
 
     // SaveAll Action
-    m_saveAllAction = new QAction(tr("Save A&ll"), this);
+    m_saveAllAction = new QAction(tr("Save &GCS Default Settings"), this);
     cmd = am->registerAction(m_saveAllAction, Constants::SAVEALL, m_globalContext);
 #ifndef Q_WS_MAC
     cmd->setDefaultKeySequence(QKeySequence(tr("Ctrl+Shift+S")));

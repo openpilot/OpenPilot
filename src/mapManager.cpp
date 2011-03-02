@@ -224,6 +224,10 @@ namespace jafar {
 			}
 		}
 		
+		bool MapManagerOdometry::isExclusive(observation_ptr_t obsPtr)
+		{
+			return (!(obsPtr->counters.nSearchSinceLastInlier > 1));
+		}
 		
 		/** ***************************************************************************************
 			MapManagerGlobal

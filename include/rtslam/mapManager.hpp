@@ -76,7 +76,17 @@ namespace jafar {
 					return lmkIter;
 				}
 
+				/**
+					Manage when the landmarks are removed from the map or reparametrized
+				*/
 				virtual void manage(void) = 0;
+				/**
+					Returns if the given observation must be exclusive in the FeatureManager
+					(ie we believe there are good chances to find it again very soon),
+					or if new landmarks can be initialized ignoring this observation
+					(ie we believe there are few chances to find it again very soon)
+				*/
+				virtual bool isExclusive(observation_ptr_t obsPtr) = 0;
 		};
 
 		
@@ -103,6 +113,11 @@ namespace jafar {
 					manageDeletion();
 					manageReparametrization();
 				}
+				
+				virtual bool isExclusive(observation_ptr_t obsPtr)
+				{
+					return true;
+				}
 		};
 
 		
@@ -116,6 +131,7 @@ namespace jafar {
 				MapManagerOdometry(landmark_factory_ptr_t lmkFactory, double reparTh, double killSizeTh):
 					MapManager(lmkFactory, reparTh, killSizeTh) {}
 				virtual void manageDeletion();
+				virtual bool isExclusive(observation_ptr_t obsPtr);
 		};
 		
 		

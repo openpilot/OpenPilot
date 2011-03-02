@@ -487,6 +487,9 @@ namespace jafar {
 					bool add = true;
 					#endif
 					
+					if (!mapManagerPtr()->isExclusive(obsPtr))
+						add = false;
+					
 					if (add)
 					{
 						featMan->addObs(obsPtr->expectation.x());

@@ -91,8 +91,8 @@ static void flightPlanTask(void *parameters)
 	status.ErrorFileID = 0;
 	status.ErrorLineNum = 0;
 	status.ErrorType = FLIGHTPLANSTATUS_ERRORTYPE_NONE;
-	status.Debug1 = 0.0;
-	status.Debug2 = 0.0;
+	status.Debug[0] = 0.0;
+	status.Debug[1] = 0.0;
 	FlightPlanStatusSet(&status);
 
 	// Main thread loop
@@ -261,8 +261,8 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 				statusData.ErrorFileID = 0;
 				statusData.ErrorLineNum = 0;
 				statusData.ErrorType = FLIGHTPLANSTATUS_ERRORTYPE_NONE;
-				statusData.Debug1 = 0.0;
-				statusData.Debug2 = 0.0;
+				statusData.Debug[0] = 0.0;
+				statusData.Debug[1] = 0.0;
 				FlightPlanStatusSet(&statusData);
 			}
 		}

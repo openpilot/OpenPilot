@@ -59,6 +59,8 @@ void replaceCommonTags(QString& out, ObjectInfo* info)
     out.replace(QString("$(NAMEUC)"), info->name.toUpper());
     // Replace $(OBJID) tag
     out.replace(QString("$(OBJID)"), QString().setNum(info->id));
+    // Replace $(UOBJID) tag
+    out.replace(QString("$(UOBJID)"), QString().setNum((qint32)info->id));
     // Replace $(OBJIDHEX) tag
     out.replace(QString("$(OBJIDHEX)"),QString("0x")+ QString().setNum(info->id,16).toUpper());
     // Replace $(ISSINGLEINST) tag

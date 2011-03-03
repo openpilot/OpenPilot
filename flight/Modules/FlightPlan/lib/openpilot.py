@@ -31,13 +31,6 @@
 #include "flightplancontrol.h"
 """
 
-import sys
-
-
-# Get system time in ms
-def time():
-	return sys.time()
-
 # Delay (suspend VM thread) for timeToDelayMs ms
 def delay(timeToDelayMs):
 	"""__NATIVE__
@@ -135,8 +128,8 @@ def debug(val1, val2):
 	PmReturn_t retval;
 
 	// Check number of arguments
-  if (NATIVE_GET_NUM_ARGS() != 2)
-  {
+	if (NATIVE_GET_NUM_ARGS() != 2)
+ 	{
 		PM_RAISE(retval, PM_RET_EX_TYPE);
 		return retval;
  	}
@@ -147,9 +140,9 @@ def debug(val1, val2):
 	// Update debug1
 	pobj = NATIVE_GET_LOCAL(0);
 	if ( OBJ_GET_TYPE(pobj) == OBJ_TYPE_INT )
-		status.Debug1 = (float)(((pPmInt_t) pobj)->val);
+		status.Debug[0] = (float)(((pPmInt_t) pobj)->val);
 	else if ( OBJ_GET_TYPE(pobj) == OBJ_TYPE_FLT )
-		status.Debug1 = (float)(((pPmFloat_t) pobj)->val);
+		status.Debug[0] = (float)(((pPmFloat_t) pobj)->val);
 	else
 	{
 		PM_RAISE(retval, PM_RET_EX_TYPE);
@@ -159,9 +152,9 @@ def debug(val1, val2):
 	// Update debug2
 	pobj = NATIVE_GET_LOCAL(1);
 	if ( OBJ_GET_TYPE(pobj) == OBJ_TYPE_INT )
-		status.Debug2 = (float)(((pPmInt_t) pobj)->val);
+		status.Debug[1] = (float)(((pPmInt_t) pobj)->val);
 	else if ( OBJ_GET_TYPE(pobj) == OBJ_TYPE_FLT )
-		status.Debug2 = (float)(((pPmFloat_t) pobj)->val);
+		status.Debug[1] = (float)(((pPmFloat_t) pobj)->val);
 	else
 	{
 		PM_RAISE(retval, PM_RET_EX_TYPE);

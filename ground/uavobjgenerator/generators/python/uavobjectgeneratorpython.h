@@ -40,7 +40,6 @@ private:
     QString pythonCodeTemplate;
     QDir pythonCodePath;
     QDir pythonOutputPath;
-    QStringList fieldTypeStrPython;
 };
 
 #endif

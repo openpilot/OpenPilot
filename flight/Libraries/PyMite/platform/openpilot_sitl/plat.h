@@ -25,7 +25,7 @@
 #ifndef _PLAT_H_
 #define _PLAT_H_
 
-#define PM_HEAP_SIZE 0x2000
+#define PM_HEAP_SIZE 0x20000
 #define PM_FLOAT_LITTLE_ENDIAN
 
 #endif /* _PLAT_H_ */

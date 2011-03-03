@@ -45,9 +45,6 @@
 #include <QDebug>
 #include <QString>
 #elif defined(Q_OS_WIN32)
-#define _WIN32_WINNT 0x0500
-#define _WIN32_WINDOWS 0x0500
-#define WINVER 0x0500
 #include <windows.h>
 #include <setupapi.h>
 #include <ddk/hidsdi.h>

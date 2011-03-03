@@ -120,7 +120,8 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     m_aircraft->fwElevator1Channel->addItems(channels);
     m_aircraft->fwElevator2Channel->addItems(channels);
     m_aircraft->fwEngineChannel->addItems(channels);
-    m_aircraft->fwRudderChannel->addItems(channels);
+    m_aircraft->fwRudder1Channel->addItems(channels);
+    m_aircraft->fwRudder2Channel->addItems(channels);
     m_aircraft->fwAileron1Channel->addItems(channels);
     m_aircraft->fwAileron2Channel->addItems(channels);
     m_aircraft->multiMotor1->addItems(channels);
@@ -260,6 +261,17 @@ void ConfigAirframeWidget::toggleElevator2(int index)
     } else {
         m_aircraft->fwElevator2Channel->setEnabled(false);
         m_aircraft->fwElevator2Label->setEnabled(false);
+    }
+}
+
+void ConfigAirframeWidget::toggleRudder2(int index)
+{
+    if (index) {
+        m_aircraft->fwRudder2Channel->setEnabled(true);
+        m_aircraft->fwRudder2Label->setEnabled(true);
+    } else {
+        m_aircraft->fwRudder2Channel->setEnabled(false);
+        m_aircraft->fwRudder2Label->setEnabled(false);
     }
 }
 
@@ -477,9 +489,12 @@ void ConfigAirframeWidget::requestAircraftUpdate()
         field = obj->getField(QString("FixedWingPitch2"));
         Q_ASSERT(field);
         m_aircraft->fwElevator2Channel->setCurrentIndex(m_aircraft->fwElevator2Channel->findText(field->getValue().toString()));
-        field = obj->getField(QString("FixedWingYaw"));
+        field = obj->getField(QString("FixedWingYaw1"));
         Q_ASSERT(field);
-        m_aircraft->fwRudderChannel->setCurrentIndex(m_aircraft->fwRudderChannel->findText(field->getValue().toString()));
+        m_aircraft->fwRudder1Channel->setCurrentIndex(m_aircraft->fwRudder1Channel->findText(field->getValue().toString()));
+        field = obj->getField(QString("FixedWingYaw2"));
+        Q_ASSERT(field);
+        m_aircraft->fwRudder2Channel->setCurrentIndex(m_aircraft->fwRudder2Channel->findText(field->getValue().toString()));
 
         if (frameType == "FixedWingElevon") {
         // If the airframe is elevon, restore the slider setting
@@ -873,8 +888,10 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         // Setup the UI
         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Fixed Wing"));
         m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
-        m_aircraft->fwRudderChannel->setEnabled(true);
-        m_aircraft->fwRudderLabel->setEnabled(true);
+        m_aircraft->fwRudder1Channel->setEnabled(true);
+        m_aircraft->fwRudder1Label->setEnabled(true);
+        m_aircraft->fwRudder2Channel->setEnabled(true);
+        m_aircraft->fwRudder2Label->setEnabled(true);
         m_aircraft->fwElevator1Channel->setEnabled(true);
         m_aircraft->fwElevator1Label->setEnabled(true);
         m_aircraft->fwElevator2Channel->setEnabled(true);
@@ -899,8 +916,10 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->fwElevator1Label->setEnabled(false);
         m_aircraft->fwElevator2Channel->setEnabled(false);
         m_aircraft->fwElevator2Label->setEnabled(false);
-        m_aircraft->fwRudderChannel->setEnabled(true);
-        m_aircraft->fwRudderLabel->setEnabled(true);
+        m_aircraft->fwRudder1Channel->setEnabled(true);
+        m_aircraft->fwRudder1Label->setEnabled(true);
+        m_aircraft->fwRudder2Channel->setEnabled(true);
+        m_aircraft->fwRudder2Label->setEnabled(true);
         m_aircraft->fwElevator1Label->setText("Elevator 1");
         m_aircraft->fwElevator2Label->setText("Elevator 2");
         m_aircraft->elevonMixBox->setHidden(false);
@@ -910,8 +929,10 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
      } else if (frameType == "FixedWingVtail" || frameType == "Vtail") {
         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Fixed Wing"));
         m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Vtail"));
-        m_aircraft->fwRudderChannel->setEnabled(false);
-        m_aircraft->fwRudderLabel->setEnabled(false);
+        m_aircraft->fwRudder1Channel->setEnabled(false);
+        m_aircraft->fwRudder1Label->setEnabled(false);
+        m_aircraft->fwRudder2Channel->setEnabled(false);
+        m_aircraft->fwRudder2Label->setEnabled(false);
         m_aircraft->fwElevator1Channel->setEnabled(true);
         m_aircraft->fwElevator1Label->setEnabled(true);
         m_aircraft->fwElevator1Label->setText("Vtail 1");
@@ -923,6 +944,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
         m_aircraft->fwAileron2Label->setText("Aileron 2");
         m_aircraft->elevonLabel1->setText("Rudder");
         m_aircraft->elevonLabel2->setText("Pitch");
+
     } else if (frameType == "QuadX" || frameType == "Quad X") {
         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
         m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Quad X"));
@@ -1103,7 +1125,7 @@ bool ConfigAirframeWidget::setupFrameFixedWing()
     if (m_aircraft->fwEngineChannel->currentText() == "None" ||
         m_aircraft->fwElevator1Channel->currentText() == "None" ||
         ((m_aircraft->fwAileron1Channel->currentText() == "None") &&
-        (m_aircraft->fwRudderChannel->currentText() == "None"))) {
+        (m_aircraft->fwRudder1Channel->currentText() == "None"))) {
         // TODO: explain the problem in the UI
         m_aircraft->fwStatusLabel->setText("ERROR: check channel assignment");
         return false;
@@ -1129,9 +1151,9 @@ bool ConfigAirframeWidget::setupFrameFixedWing()
     Q_ASSERT(field);
     field->setValue(m_aircraft->fwAileron2Channel->currentText());
     // Rudder
-    field = obj->getField("FixedWingYaw");
+    field = obj->getField("FixedWingYaw1");
     Q_ASSERT(field);
-    field->setValue(m_aircraft->fwRudderChannel->currentText());
+    field->setValue(m_aircraft->fwRudder1Channel->currentText());
     // Throttle
     field = obj->getField("FixedWingThrottle");
     Q_ASSERT(field);
@@ -1164,7 +1186,7 @@ bool ConfigAirframeWidget::setupFrameFixedWing()
     field->setValue(127, ti);
 
     // Rudder
-    eng = m_aircraft->fwRudderChannel->currentIndex()-1;
+    eng = m_aircraft->fwRudder1Channel->currentIndex()-1;
     // eng will be -1 if rudder is set to "None"
     if (eng > -1) {
         field = obj->getField(mixerTypes.at(eng));
@@ -1249,10 +1271,14 @@ bool ConfigAirframeWidget::setupFrameElevon()
     field = obj->getField("FixedWingRoll2");
     Q_ASSERT(field);
     field->setValue(m_aircraft->fwAileron2Channel->currentText());
-    // Rudder (can be None)
-    field = obj->getField("FixedWingYaw");
+    // Rudder 1 (can be None)
+    field = obj->getField("FixedWingYaw1");
     Q_ASSERT(field);
-    field->setValue(m_aircraft->fwRudderChannel->currentText());
+    field->setValue(m_aircraft->fwRudder1Channel->currentText());
+    // Rudder 2 (can be None)
+    field = obj->getField("FixedWingYaw2");
+    Q_ASSERT(field);
+    field->setValue(m_aircraft->fwRudder2Channel->currentText());
     // Throttle
     field = obj->getField("FixedWingThrottle");
     Q_ASSERT(field);
@@ -1285,9 +1311,9 @@ bool ConfigAirframeWidget::setupFrameElevon()
     int ti = field->getElementNames().indexOf("ThrottleCurve1");
     field->setValue(127, ti);
 
-    // Rudder
-    eng = m_aircraft->fwRudderChannel->currentIndex()-1;
-    // eng will be -1 if rudder is set to "None"
+    // Rudder 1
+    eng = m_aircraft->fwRudder1Channel->currentIndex()-1;
+    // eng will be -1 if rudder 1 is set to "None"
     if (eng > -1) {
         field = obj->getField(mixerTypes.at(eng));
         field->setValue("Servo");
@@ -1295,6 +1321,18 @@ bool ConfigAirframeWidget::setupFrameElevon()
         resetField(field);
         ti = field->getElementNames().indexOf("Yaw");
         field->setValue(127, ti);
+    } // Else: we have no rudder, only elevons, we're fine with it.
+
+    // Rudder 2
+    eng = m_aircraft->fwRudder2Channel->currentIndex()-1;
+    // eng will be -1 if rudder 2 is set to "None"
+    if (eng > -1) {
+        field = obj->getField(mixerTypes.at(eng));
+        field->setValue("Servo");
+        field = obj->getField(mixerVectors.at(eng));
+        resetField(field);
+        ti = field->getElementNames().indexOf("Yaw");
+        field->setValue(-127, ti);
     } // Else: we have no rudder, only elevons, we're fine with it.
 
     eng = m_aircraft->fwAileron1Channel->currentIndex()-1;
@@ -1435,7 +1473,6 @@ bool ConfigAirframeWidget::setupFrameVtail()
     m_aircraft->fwStatusLabel->setText("Mixer generated");
     return true;
 }
-
 
 /**
   Set up a complete mixer, taking a table of factors. The factors
@@ -1775,7 +1812,7 @@ void ConfigAirframeWidget::sendAircraftUpdate()
         } else if (m_aircraft->fixedWingType->currentText() == "Elevon") {
             airframeType = "FixedWingElevon";
             setupFrameElevon();
-        } else { // Vtail
+        } else { // "Vtail"
             airframeType = "FixedWingVtail";
             setupFrameVtail();
         }
@@ -1984,7 +2021,7 @@ void ConfigAirframeWidget::sendAircraftUpdate()
             }
             obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
             Q_ASSERT(obj);
-            field = obj->getField("FixedWingYaw");
+            field = obj->getField("FixedWingYaw1");
             field->setValue(m_aircraft->triYawChannel->currentText());
             // No need to send a obj->updated() here because setupMotors
             // will do it.

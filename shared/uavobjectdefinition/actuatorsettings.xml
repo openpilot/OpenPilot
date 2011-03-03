@@ -5,7 +5,8 @@
         <field name="FixedWingRoll2" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
         <field name="FixedWingPitch1" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
         <field name="FixedWingPitch2" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
-        <field name="FixedWingYaw" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
+        <field name="FixedWingYaw1" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
+        <field name="FixedWingYaw2" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
         <field name="FixedWingThrottle" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
         <field name="VTOLMotorN" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
         <field name="VTOLMotorNE" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>

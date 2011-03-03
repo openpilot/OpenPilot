@@ -72,7 +72,7 @@
       <item>
        <widget class="QStackedWidget" name="airframesWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="fixedWing">
          <property name="enabled">
@@ -186,6 +186,13 @@
                   </property>
                  </widget>
                 </item>
+                <item row="2" column="1">
+                 <widget class="QComboBox" name="fwAileron2Channel">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
                 <item row="3" column="0">
                  <widget class="QLabel" name="fwElevator1Label">
                   <property name="minimumSize">
@@ -201,23 +208,6 @@
                 </item>
                 <item row="3" column="1">
                  <widget class="QComboBox" name="fwElevator1Channel"/>
-                </item>
-                <item row="5" column="0">
-                 <widget class="QLabel" name="fwRudderLabel">
-                  <property name="text">
-                   <string>Rudder</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="5" column="1">
-                 <widget class="QComboBox" name="fwRudderChannel"/>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QComboBox" name="fwAileron2Channel">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
                 </item>
                 <item row="4" column="0">
                  <widget class="QLabel" name="fwElevator2Label">
@@ -241,6 +231,26 @@
                    <bool>false</bool>
                   </property>
                  </widget>
+                </item>
+                <item row="5" column="0">
+                 <widget class="QLabel" name="fwRudder1Label">
+                  <property name="text">
+                   <string>Rudder 1</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="1">
+                 <widget class="QComboBox" name="fwRudder1Channel"/>
+                </item>
+                <item row="6" column="0">
+                 <widget class="QLabel" name="fwRudder2Label">
+                  <property name="text">
+                   <string>Rudder 2</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="6" column="1">
+                 <widget class="QComboBox" name="fwRudder2Channel"/>
                 </item>
                </layout>
               </item>
@@ -891,8 +901,11 @@ p, li { white-space: pre-wrap; }
                    <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Lucida Grande'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:10pt; font-weight:600;&quot;&gt;Beware&lt;/span&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:10pt;&quot;&gt;: Feed Forward Tuning will launch all engines around mid-throttle, you have been warned!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Beware&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;: Feed Forward Tuning will launch all engines around mid-throttle, you have been warned!&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                  </widget>
                 </item>

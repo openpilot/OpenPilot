@@ -137,10 +137,10 @@ extern void vPortYieldFromISR( void );
 
 extern void vPortEnterCritical( void );
 extern void vPortExitCritical( void );
-	
-extern void TaskTimerConfigure( void );
-extern uint32_t RTC_GetCounter( void );
 
+void PIOS_RTC_Start();
+uint32_t PIOS_RTC_Counter();
+	
 #define portDISABLE_INTERRUPTS()	portSET_INTERRUPT_MASK()
 #define portENABLE_INTERRUPTS()		portCLEAR_INTERRUPT_MASK()
 #define portENTER_CRITICAL()		vPortEnterCritical()

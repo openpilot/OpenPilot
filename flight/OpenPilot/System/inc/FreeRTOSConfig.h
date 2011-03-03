@@ -75,9 +75,9 @@ NVIC value of 255. */
 #if defined(DEBUG)
 #define configGENERATE_RUN_TIME_STATS 1
 #define INCLUDE_uxTaskGetRunTime 1
-#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() TaskTimerConfigure()
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() PIOS_RTC_Start()
 // Note: Using the tick count defeats the purpose here, need some timer on the scale of 10khz
-#define portGET_RUN_TIME_COUNTER_VALUE()  RTC_GetCounter()
+#define portGET_RUN_TIME_COUNTER_VALUE()  PIOS_RTC_Counter()
 #endif
 
 

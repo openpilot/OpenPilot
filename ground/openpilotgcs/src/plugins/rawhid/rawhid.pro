@@ -9,7 +9,8 @@ HEADERS += rawhid_global.h \
     rawhid_const.h \
     usbmonitor.h
 SOURCES += rawhidplugin.cpp \
-    rawhid.cpp
+    rawhid.cpp \
+    usbmonitor_win.cpp
 FORMS += 
 RESOURCES += 
 DEFINES += RAWHID_LIBRARY
@@ -17,8 +18,9 @@ OTHER_FILES += RawHID.pluginspec
 
 # Platform Specific USB HID Stuff
 win32 { 
-    SOURCES += pjrc_rawhid_win.cpp
-LIBS += -lhid \
+    SOURCES += pjrc_rawhid_win.cpp \
+        usbmonitor_win.cpp
+    LIBS += -lhid \
         -lsetupapi
 }
 macx { 
@@ -37,10 +39,12 @@ macx {
         CoreFoundation
 }
 linux-g++ {
-    SOURCES += pjrc_rawhid_unix.cpp
-    LIBS += -lusb
+    SOURCES += pjrc_rawhid_unix.cpp \
+            usbmonitor_linux.cpp
+    LIBS += -lusb -ludev
 }
 linux-g++-64 {
-    SOURCES += pjrc_rawhid_unix.cpp
-    LIBS += -lusb
+    SOURCES += pjrc_rawhid_unix.cpp \
+            usbmonitor_linux.cpp
+    LIBS += -lusb -ludev
 }

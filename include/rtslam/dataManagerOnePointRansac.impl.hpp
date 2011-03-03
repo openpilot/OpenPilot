@@ -147,7 +147,7 @@ namespace jafar {
 
 				// if there are too much updates to do bufferized, randomly move out some of them
 				// to pending, they may be processed in active search if really necessary
-				while (best_set->size() > algorithmParams.n_updates_ransac)
+				while (best_set->size() > 1 && best_set->size() > algorithmParams.n_updates_ransac)
 				{
 					int n = (rtslam::rand() % (best_set->size() - 1)) + 1; // keep the first one which is the base obs
 					best_set->pendingObs.push_back(best_set->inlierObs[n]);

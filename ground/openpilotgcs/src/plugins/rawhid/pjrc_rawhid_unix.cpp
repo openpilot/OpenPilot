@@ -358,7 +358,7 @@ void pjrc_rawhid::hid_close(hid_t *hid)
 	if (!hid) return;
 	if (!hid->open) return;
 
-    usb_release_interface(hid->usb, hid->iface);
+        usb_release_interface(hid->usb, hid->iface);
 
 	int others = 0;
 	for (hid_t *p = first_hid; p; p = p->next)
@@ -370,4 +370,5 @@ void pjrc_rawhid::hid_close(hid_t *hid)
 		usb_close(hid->usb);
 
     hid->usb = NULL;
+    hid->open = 0;
 }

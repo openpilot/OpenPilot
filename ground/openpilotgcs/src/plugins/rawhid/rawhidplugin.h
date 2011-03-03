@@ -30,6 +30,7 @@
 
 #include "rawhid_global.h"
 #include "rawhid.h"
+#include "usbmonitor.h"
 
 #include "coreplugin/iconnection.h"
 #include <extensionsystem/iplugin.h>
@@ -39,32 +40,6 @@
 
 class IConnection;
 class RawHIDConnection;
-
-
-/**
-*   Helper thread to check on device connection/disconnection
-*   Underlying HID library is not really easy to use,
-*   so we have to poll for device modification in a separate thread
-*/
-class RAWHID_EXPORT RawHIDEnumerationThread : public QThread
-{
-    Q_OBJECT
-public:
-    RawHIDEnumerationThread(RawHIDConnection *rawhid);
-    virtual ~RawHIDEnumerationThread();
-
-    virtual void run();
-
-signals:
-    void enumerationChanged();
-
-protected slots:
-	void onRawHidConnectionDestroyed(QObject *obj);	// Pip
-
-protected:
-    RawHIDConnection *m_rawhid;
-    bool m_running;
-};
 
 
 /**
@@ -89,7 +64,7 @@ public:
     virtual void suspendPolling();
     virtual void resumePolling();
 
-	bool deviceOpened() { return (RawHidHandle != NULL); }	// Pip
+    bool deviceOpened() { return (RawHidHandle != NULL); }	// Pip
 
 signals:
 	void deviceClosed(QObject *obj);			// Pip
@@ -98,10 +73,11 @@ public slots:
 	void onRawHidClosed();
 
 protected slots:
-    void onEnumerationChanged();
+    void onDeviceConnected();
+    void onDeviceDisconnected();
 
 private slots:
-	void onRawHidDestroyed(QObject *obj);
+    void onRawHidDestroyed(QObject *obj);
 
 private:
     RawHID *RawHidHandle;
@@ -109,7 +85,7 @@ private:
 
 protected:
     QMutex m_enumMutex;
-    RawHIDEnumerationThread m_enumerateThread;
+    USBMonitor m_usbMonitor;
     bool m_deviceOpened;
 };
 

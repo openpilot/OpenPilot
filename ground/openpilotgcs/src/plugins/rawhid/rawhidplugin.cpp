@@ -36,83 +36,19 @@
 
 #include "rawhid_const.h"
 
-// **********************************************************************
-
-RawHIDEnumerationThread::RawHIDEnumerationThread(RawHIDConnection *rawhid) :
-	QThread(rawhid),	// Pip
-	m_rawhid(rawhid),
-    m_running(true)
-{
-	if (m_rawhid)
-		connect(m_rawhid, SLOT(destroyed(QObject *)), this, SLOT(onRawHidConnectionDestroyed(QObject *)));	// Pip
-}
-
-RawHIDEnumerationThread::~RawHIDEnumerationThread()
-{
-	m_rawhid = NULL;	// safe guard
-
-    m_running = false;
-
-	// wait for the thread to terminate
-	if (!wait(100))
-        qDebug() << "Cannot terminate RawHIDEnumerationThread";
-}
-
-void RawHIDEnumerationThread::onRawHidConnectionDestroyed(QObject *obj)	// Pip
-{
-	if (!m_rawhid || m_rawhid != obj)
-		return;
-
-	m_rawhid = NULL;
-}
-
-void RawHIDEnumerationThread::run()
-{
-    QStringList devices = m_rawhid->availableDevices();
-
-	int counter = 0;
-
-	while (m_running)
-    {
-		// update available devices every second (doesn't need more)
-		if (m_rawhid)
-		{
-                        if (!m_rawhid->deviceOpened())	// this was stopping us getting enumerations changes fed back
-			{
-				if (++counter >= 100)
-				{
-					counter = 0;
-
-					QStringList newDev = m_rawhid->availableDevices();
-					if (devices != newDev)
-					{
-						devices = newDev;
-						emit enumerationChanged();
-					}
-				}
-			}
-//			else
-//				counter = 0;
-		}
-		else
-			counter = 0;
-
-		msleep(10);
-    }
-}
 
 // **********************************************************************
 
 RawHIDConnection::RawHIDConnection()
-    : m_enumerateThread(this)
+    : m_usbMonitor(this)
 {
     //added by andrew
     RawHidHandle = NULL;
     enablePolling = true;
 
-	QObject::connect(&m_enumerateThread, SIGNAL(enumerationChanged()), this, SLOT(onEnumerationChanged()));
+    connect(&m_usbMonitor, SIGNAL(deviceDiscovered(USBPortInfo)), this, SLOT(onDeviceConnected()));
+    connect(&m_usbMonitor, SIGNAL(deviceRemoved(USBPortInfo)), this, SLOT(onDeviceDisconnected()));
 
-    m_enumerateThread.start();
 }
 
 RawHIDConnection::~RawHIDConnection()
@@ -122,47 +58,42 @@ RawHIDConnection::~RawHIDConnection()
 	}
 }
 
-void RawHIDConnection::onEnumerationChanged()
+/**
+  The USB monitor tells us a new device appeared
+  */
+void RawHIDConnection::onDeviceConnected()
 {
-	if (RawHidHandle)	// Pip
-	{	// check to see if the connection has closed
-		if (!RawHidHandle->isOpen())
-		{	// connection has closed .. hmmmm, this connection is still showing as open after the USB device is unplugged from PC
-			delete RawHidHandle;
-			RawHidHandle = NULL;
+    emit availableDevChanged(this);
+}
 
-			emit deviceClosed(this);
-		}
-	}
-
+/**
+  The USB monitor tells us a device disappeard
+  */
+void RawHIDConnection::onDeviceDisconnected()
+{
+    emit deviceClosed(this);
     if (enablePolling)
         emit availableDevChanged(this);
 }
 
+/**
+  Returns the list of all currently available devices
+  */
 QStringList RawHIDConnection::availableDevices()
 {
-    QMutexLocker locker(&m_enumMutex);
-
     QStringList devices;
 
-	if (enablePolling)
-	{
-        pjrc_rawhid dev;
-
-		// open all device we can
-		int opened = dev.open(USB_MAX_DEVICES, USB_VID, USB_PID, USB_USAGE_PAGE, USB_USAGE);
-
-		// for each devices found, get serial number and close it back
-		for (int i = 0; i < opened; i++)
-        {
-            devices.append(dev.getserial(i));
-            dev.close(i);
-        }
+    QList<USBPortInfo> portsList = m_usbMonitor.availableDevices();
+    // We currently list devices by their serial number
+    foreach(USBPortInfo prt, portsList) {
+        devices.append(prt.serialNumber);
     }
 
     return devices;
 }
 
+
+/// TODO: still needed ???
 void RawHIDConnection::onRawHidDestroyed(QObject *obj)	// Pip
 {
 	if (!RawHidHandle || RawHidHandle != obj)
@@ -171,13 +102,11 @@ void RawHIDConnection::onRawHidDestroyed(QObject *obj)	// Pip
 	RawHidHandle = NULL;
 }
 
+/// TODO: still needed ???
 void RawHIDConnection::onRawHidClosed()
 {
 	if (RawHidHandle)
 	{
-//		delete RawHidHandle;
-//		RawHidHandle = NULL;
-
 		emit deviceClosed(this);
 	}
 }
@@ -200,6 +129,7 @@ QIODevice *RawHIDConnection::openDevice(const QString &deviceName)
 
     return RawHidHandle;
 }
+
 
 void RawHIDConnection::closeDevice(const QString &deviceName)
 {

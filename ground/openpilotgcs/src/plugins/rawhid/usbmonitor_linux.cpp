@@ -42,12 +42,12 @@ void USBMonitor::deviceEventReceived() {
 
     dev = udev_monitor_receive_device(this->monitor);
     if (dev) {
-        printf("Got Device");
+        printf("------- Got Device Event");
         QString action = QString(udev_device_get_action(dev));
-        if (action == "add") {
+        QString devtype = QString(udev_device_get_devtype(dev));
+        if (action == "add" && devtype == "usb_device") {
             emit deviceDiscovered(makePortInfo(dev));
-
-        } else if (action == "remove"){
+        } else if (action == "remove" && devtype == "usb_device"){
             emit deviceRemoved(makePortInfo(dev));
         }
 
@@ -67,8 +67,8 @@ USBMonitor::USBMonitor(QObject *parent): QThread(parent) {
     this->context = udev_new();
 
     this->monitor = udev_monitor_new_from_netlink(this->context, "udev");
-//    udev_monitor_filter_add_match_subsystem_devtype(
-//        this->monitor, "hidraw", NULL);
+    udev_monitor_filter_add_match_subsystem_devtype(
+        this->monitor, "usb", NULL);
     udev_monitor_enable_receiving(this->monitor);
     this->monitorNotifier = new QSocketNotifier(
         udev_monitor_get_fd(this->monitor), QSocketNotifier::Read, this);
@@ -95,7 +95,8 @@ QList<USBPortInfo> USBMonitor::availableDevices()
     struct udev_device *dev;
 
     enumerate = udev_enumerate_new(this->context);
-    udev_enumerate_add_match_subsystem(enumerate,"hidwraw");
+//    udev_enumerate_add_match_subsystem(enumerate,"usb");
+    udev_enumerate_add_match_sysattr(enumerate, "idVendor", "20a0");
     udev_enumerate_scan_devices(enumerate);
     devices = udev_enumerate_get_list_entry(enumerate);
     // Will use the 'native' udev functions to loop:
@@ -113,6 +114,7 @@ QList<USBPortInfo> USBMonitor::availableDevices()
         subsystem/devtype pair of "usb"/"usb_device". This will
         be several levels up the tree, but the function will find
         it.*/
+        /*
         dev = udev_device_get_parent_with_subsystem_devtype(
                     dev,
                     "usb",
@@ -121,24 +123,10 @@ QList<USBPortInfo> USBMonitor::availableDevices()
             printf("Unable to find parent usb device.");
             return  devicesList;
         }
+        */
 
-        /* From here, we can call get_sysattr_value() for each file
-        in the device's /sys entry. The strings passed into these
-        functions (idProduct, idVendor, serial, etc.) correspond
-        directly to the files in the directory which represents
-        the USB device. Note that USB strings are Unicode, UCS2
-        encoded, but the strings returned from
-        udev_device_get_sysattr_value() are UTF-8 encoded. */
-        printf("  VID/PID: %s %s\n",
-               udev_device_get_sysattr_value(dev,"idVendor"),
-                                udev_device_get_sysattr_value(dev, "idProduct"));
-        printf("  %s\n  %s\n",
-                                udev_device_get_sysattr_value(dev,"manufacturer"),
-                                udev_device_get_sysattr_value(dev,"product"));
-        printf("  serial: %s\n",
-                                 udev_device_get_sysattr_value(dev, "serial"));
         devicesList.append(makePortInfo(dev));
-        udev_device_unref(dev);
+            udev_device_unref(dev);
     }
     /* free the enumerator object */
     udev_enumerate_unref(enumerate);
@@ -171,6 +159,21 @@ USBPortInfo USBMonitor::makePortInfo(struct udev_device *dev)
     printf("   Subsystem: %s", udev_device_get_subsystem(dev));
     printf("   Devtype: %s", udev_device_get_devtype(dev));
     printf("   Action: %s", udev_device_get_action(dev));
+    /* From here, we can call get_sysattr_value() for each file
+    in the device's /sys entry. The strings passed into these
+    functions (idProduct, idVendor, serial, etc.) correspond
+    directly to the files in the directory which represents
+    the USB device. Note that USB strings are Unicode, UCS2
+    encoded, but the strings returned from
+    udev_device_get_sysattr_value() are UTF-8 encoded. */
+    printf("  VID/PID: %s %s",
+           udev_device_get_sysattr_value(dev,"idVendor"),
+            udev_device_get_sysattr_value(dev, "idProduct"));
+    printf("  %s   -  %s",
+            udev_device_get_sysattr_value(dev,"manufacturer"),
+            udev_device_get_sysattr_value(dev,"product"));
+    printf("  serial: %s",
+            udev_device_get_sysattr_value(dev, "serial"));
 
     prtInfo.vendorID = QString(udev_device_get_sysattr_value(dev, "idVendor")).toInt();
     prtInfo.productID = QString(udev_device_get_sysattr_value(dev, "idProduct")).toInt();

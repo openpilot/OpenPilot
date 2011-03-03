@@ -32,8 +32,14 @@
 
 #include <QThread>
 
-//TODO: temporary, will have to remove
-#include "pjrc_rawhid.h"
+struct USBPortInfo {
+    QString friendName; ///< Friendly name.
+    QString physName;
+    QString enumName;   ///< It seems its the only one with meaning
+    QString serialNumber; // As a string as it can be anything, really...
+    int vendorID;       ///< Vendor ID.
+    int productID;      ///< Product ID
+};
 
 // Depending on the OS, we'll need different things:
 #if defined( Q_OS_MAC)
@@ -46,27 +52,43 @@
 #include <QSocketNotifier>
 
 #elif defined (Q_OS_WIN32)
-//TODO
+
+#include <windows.h>
+#include <dbt.h>
+#include <setupapi.h>
+#include <ddk/hidsdi.h>
+#include <ddk/hidclass.h>
 #endif
 
-/*
-struct USBPortInfo {
-    QString friendName; ///< Friendly name.
-    QString physName;
-    QString enumName;   ///< It seems its the only one with meaning
-    int vendorID;       ///< Vendor ID.
-    int productID;      ///< Product ID
-};
-*/
 
+
+#ifdef Q_OS_WIN
+#ifdef QT_GUI_LIB
+#include <QWidget>
+class USBMonitor;
+
+class USBRegistrationWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    USBRegistrationWidget( USBMonitor* qese ) {
+        this->qese = qese;
+    }
+    ~USBRegistrationWidget( ) {}
+
+protected:
+    USBMonitor* qese;
+    bool winEvent( MSG* message, long* result );
+};
+#endif
+#endif
 
 /**
 *   A monitoring thread which will wait for device events.
 */
 class USBMonitor : public QThread
 {
-	Q_OBJECT
-
+        Q_OBJECT
 
 public:
     USBMonitor(QObject *parent = 0);
@@ -74,7 +96,9 @@ public:
     ~USBMonitor();
     QList<USBPortInfo> availableDevices();
     QList<USBPortInfo> availableDevices(int vid, int pid, int bcdDevice);
-
+    #if defined (Q_OS_WIN32)
+    LRESULT onDeviceChangeWin( WPARAM wParam, LPARAM lParam );
+    #endif
 signals:
     /*!
       A new device has been connected to the system.
@@ -113,7 +137,25 @@ private:
     QSocketNotifier *monitorNotifier;
     USBPortInfo makePortInfo(struct udev_device *dev);
 #elif defined (Q_OS_WIN32)
-    //TODO
+    void setUpNotifications();
+     /*!
+     * Get specific property from registry.
+     * \param devInfo pointer to the device information set that contains the interface
+     *    and its underlying device. Returned by SetupDiGetClassDevs() function.
+     * \param devData pointer to an SP_DEVINFO_DATA structure that defines the device instance.
+     *    this is returned by SetupDiGetDeviceInterfaceDetail() function.
+     * \param property registry property. One of defined SPDRP_* constants.
+     * \return property string.
+     */
+    static QString getDeviceProperty(HDEVINFO devInfo, PSP_DEVINFO_DATA devData, DWORD property);
+
+    static bool getDeviceDetailsWin( USBPortInfo* portInfo, HDEVINFO devInfo,
+                                     PSP_DEVINFO_DATA devData, WPARAM wParam = DBT_DEVICEARRIVAL );
+    static void enumerateDevicesWin( const GUID & guidDev, QList<USBPortInfo>* infoList );
+    bool matchAndDispatchChangedDevice(const QString & deviceID, const GUID & guid, WPARAM wParam);
+#ifdef QT_GUI_LIB
+    USBRegistrationWidget* notificationWidget;
+#endif
 #endif
 
 };

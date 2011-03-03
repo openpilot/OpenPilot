@@ -347,9 +347,9 @@ bool NMEA_update_position(char *nmea_sentence)
 	}
 
 	parser->cnt++;
-#ifdef DEBUG_MGSID_IN
-	DEBUG_MSG("%s %d\n", params[0], parser->cnt);
-#endif
+	#ifdef DEBUG_MGSID_IN
+		DEBUG_MSG("%s %d ", params[0], parser->cnt);
+	#endif
 	// Send the message to then parser and get it update the GpsData
 	GPSPositionData GpsData;
 	GPSPositionGet(&GpsData);
@@ -357,16 +357,22 @@ bool NMEA_update_position(char *nmea_sentence)
 
 	if (!parser->handler(&GpsData, &gpsDataUpdated, params, nbParams)) {
 		// Parse failed
-		DEBUG_MSG(" PARSE FAILED (\"%s\")\n", params[0]);
+		DEBUG_MSG("PARSE FAILED (\"%s\")", params[0]);
 		return false;
 	}
 
 
 	// All is fine :)  Update object if data has changed
 	if (gpsDataUpdated) {
+		#ifdef DEBUG_MGSID_IN
+			DEBUG_MSG("U");
+		#endif
 		GPSPositionSet(&GpsData);
 	}
 
+	#ifdef DEBUG_MGSID_IN
+		DEBUG_MSG("\n");
+	#endif
 	return true;
 }
 

@@ -46,6 +46,7 @@
 #include "i2cstats.h"
 #include "watchdogstatus.h"
 #include "taskmonitor.h"
+#include "pios_config.h"
 
 
 // Private constants

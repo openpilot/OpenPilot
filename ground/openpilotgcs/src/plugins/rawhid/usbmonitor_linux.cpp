@@ -43,10 +43,14 @@ void USBMonitor::deviceEventReceived() {
     dev = udev_monitor_receive_device(this->monitor);
     if (dev) {
         printf("Got Device");
-        printf("   Node: %s", udev_device_get_devnode(dev));
-        printf("   Subsystem: %s", udev_device_get_subsystem(dev));
-        printf("   Devtype: %s", udev_device_get_devtype(dev));
-        printf("   Action: %s", udev_device_get_action(dev));
+        QString action = QString(udev_device_get_action(dev));
+        if (action == "add") {
+            emit deviceDiscovered(makePortInfo(dev));
+
+        } else if (action == "remove"){
+            emit deviceRemoved(makePortInfo(dev));
+        }
+
         udev_device_unref(dev);
     }
     else {
@@ -55,7 +59,9 @@ void USBMonitor::deviceEventReceived() {
 
 }
 
-
+/**
+  Initialize the udev monitor here
+  */
 USBMonitor::USBMonitor(QObject *parent): QThread(parent) {
 
     this->context = udev_new();
@@ -76,4 +82,100 @@ USBMonitor::USBMonitor(QObject *parent): QThread(parent) {
 USBMonitor::~USBMonitor()
 {
     quit();
+}
+
+/**
+Returns a list of all currently available devices
+*/
+QList<USBPortInfo> USBMonitor::availableDevices()
+{
+    QList<USBPortInfo> devicesList;
+    struct udev_list_entry *devices, *dev_list_entry;
+    struct udev_enumerate *enumerate;
+    struct udev_device *dev;
+
+    enumerate = udev_enumerate_new(this->context);
+    udev_enumerate_add_match_subsystem(enumerate,"hidwraw");
+    udev_enumerate_scan_devices(enumerate);
+    devices = udev_enumerate_get_list_entry(enumerate);
+    // Will use the 'native' udev functions to loop:
+    udev_list_entry_foreach(dev_list_entry,devices) {
+        const char *path;
+
+        /* Get the filename of the /sys entry for the device
+        and create a udev_device object (dev) representing it */
+        path = udev_list_entry_get_name(dev_list_entry);
+        dev = udev_device_new_from_syspath(this->context, path);
+
+        /* The device pointed to by dev contains information about
+        the hidraw device. In order to get information about the
+        USB device, get the parent device with the
+        subsystem/devtype pair of "usb"/"usb_device". This will
+        be several levels up the tree, but the function will find
+        it.*/
+        dev = udev_device_get_parent_with_subsystem_devtype(
+                    dev,
+                    "usb",
+                    "usb_device");
+        if (!dev) {
+            printf("Unable to find parent usb device.");
+            return  devicesList;
+        }
+
+        /* From here, we can call get_sysattr_value() for each file
+        in the device's /sys entry. The strings passed into these
+        functions (idProduct, idVendor, serial, etc.) correspond
+        directly to the files in the directory which represents
+        the USB device. Note that USB strings are Unicode, UCS2
+        encoded, but the strings returned from
+        udev_device_get_sysattr_value() are UTF-8 encoded. */
+        printf("  VID/PID: %s %s\n",
+               udev_device_get_sysattr_value(dev,"idVendor"),
+                                udev_device_get_sysattr_value(dev, "idProduct"));
+        printf("  %s\n  %s\n",
+                                udev_device_get_sysattr_value(dev,"manufacturer"),
+                                udev_device_get_sysattr_value(dev,"product"));
+        printf("  serial: %s\n",
+                                 udev_device_get_sysattr_value(dev, "serial"));
+        devicesList.append(makePortInfo(dev));
+        udev_device_unref(dev);
+    }
+    /* free the enumerator object */
+    udev_enumerate_unref(enumerate);
+
+    return devicesList;
+
+}
+
+/**
+  Be a bit more picky and ask only for a specific type of device:
+  */
+QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDevice)
+{
+    QList<USBPortInfo> allPorts = availableDevices();
+    QList<USBPortInfo> thePortsWeWant;
+
+    foreach (USBPortInfo port, allPorts) {
+        thePortsWeWant.append(port);
+    }
+
+    return thePortsWeWant;
+}
+
+
+USBPortInfo USBMonitor::makePortInfo(struct udev_device *dev)
+{
+    USBPortInfo prtInfo;
+
+    printf("   Node: %s", udev_device_get_devnode(dev));
+    printf("   Subsystem: %s", udev_device_get_subsystem(dev));
+    printf("   Devtype: %s", udev_device_get_devtype(dev));
+    printf("   Action: %s", udev_device_get_action(dev));
+
+    prtInfo.vendorID = QString(udev_device_get_sysattr_value(dev, "idVendor")).toInt();
+    prtInfo.productID = QString(udev_device_get_sysattr_value(dev, "idProduct")).toInt();
+    prtInfo.serialNumber = QString(udev_device_get_sysattr_value(dev, "serial"));
+
+    return prtInfo;
+
 }

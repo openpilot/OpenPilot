@@ -72,6 +72,8 @@ public:
     USBMonitor(QObject *parent = 0);
 //    USBMonitor(int vid, int pid);
     ~USBMonitor();
+    QList<USBPortInfo> availableDevices();
+    QList<USBPortInfo> availableDevices(int vid, int pid, int bcdDevice);
 
 signals:
     /*!
@@ -109,6 +111,7 @@ private:
     struct udev *context;
     struct udev_monitor *monitor;
     QSocketNotifier *monitorNotifier;
+    USBPortInfo makePortInfo(struct udev_device *dev);
 #elif defined (Q_OS_WIN32)
     //TODO
 #endif

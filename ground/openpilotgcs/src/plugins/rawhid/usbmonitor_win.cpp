@@ -48,3 +48,26 @@ USBMonitor::~USBMonitor()
 {
     quit();
 }
+
+/**
+Returns a list of all currently available devices
+*/
+QList<USBPortInfo> USBMonitor::availableDevices()
+{
+
+}
+
+/**
+  Be a bit more picky and ask only for a specific type of device:
+  */
+QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDevice)
+{
+    QList<USBPortInfo> allPorts = availableDevices();
+    QList<USBPortInfo> thePortsWeWant;
+
+    foreach (USBPortInfo port, allPorts) {
+        thePortsWeWant.append(port);
+    }
+
+    return thePortsWeWant;
+}

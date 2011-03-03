@@ -98,6 +98,7 @@ struct USBPortInfo {
     QString friendName; ///< Friendly name.
     QString physName;
     QString enumName;   ///< It seems its the only one with meaning
+    QString serialNumber; // As a string as it can be anything, really...
     int vendorID;       ///< Vendor ID.
     int productID;      ///< Product ID
 };

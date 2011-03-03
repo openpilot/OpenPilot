@@ -3,6 +3,7 @@
         <description>Task information</description>
         <field name="StackRemaining" units="bytes" type="uint16" elementnames="System,Actuator,Attitude,TelemetryTx,TelemetryTxPri,TelemetryRx,GPS,ManualControl,Altitude,AHRSComms,Stabilization,Guidance,FlightPlan"/>
 	<field name="Running" units="bool" type="enum" options="False,True" elementnames="System,Actuator,Attitude,TelemetryTx,TelemetryTxPri,TelemetryRx,GPS,ManualControl,Altitude,AHRSComms,Stabilization,Guidance,FlightPlan"/>
+	<field name="RunningTime" units="µs" type="uint16" elementnames="System,Actuator,Attitude,TelemetryTx,TelemetryTxPri,TelemetryRx,GPS,ManualControl,Altitude,AHRSComms,Stabilization,Guidance,FlightPlan"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="periodic" period="10000"/>

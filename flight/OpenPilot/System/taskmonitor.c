@@ -105,7 +105,12 @@ void TaskMonitorUpdateAll(void)
 			data.StackRemaining[n] = 10000;
 #else
 			data.StackRemaining[n] = uxTaskGetStackHighWaterMark(handles[n]) * 4;
+#if ( configGENERATE_RUN_TIME_STATS == 1 )			
+			/* Generate run time stats */
+			data.RunningTime[n] = uxTaskGetRunTime(handles[n]);
 #endif
+#endif
+			
 		}
 		else
 		{

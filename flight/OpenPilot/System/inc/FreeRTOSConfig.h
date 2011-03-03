@@ -71,6 +71,16 @@ configKERNEL_INTERRUPT_PRIORITY setting.  Here 15 corresponds to the lowest
 NVIC value of 255. */
 #define configLIBRARY_KERNEL_INTERRUPT_PRIORITY	15
 
+/* Enable run time stats collection */
+#if defined(DEBUG)
+#define configGENERATE_RUN_TIME_STATS 1
+#define INCLUDE_uxTaskGetRunTime 1
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()  
+// Note: Using the tick count defeats the purpose here, need some timer on the scale of 10khz
+#define portGET_RUN_TIME_COUNTER_VALUE()  xTaskGetTickCount()
+#endif
+
+
 /**
   * @}
   */

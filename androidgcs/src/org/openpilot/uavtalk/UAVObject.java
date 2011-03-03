@@ -20,11 +20,27 @@ public abstract class UAVObject {
 	              ACCESS_READWRITE,
 	              ACCESS_READONLY
 	      } ;
-
-
-	      private Boolean isSingleInst;
-	      private int instID;
-	      private UAVMetaObject meta;
+	      
+	      /**
+	       * Access mode
+	       */
+	      public enum Acked{
+	              FALSE,
+	              TRUE
+	      } ;
+	      
+	      final class Metadata {
+	    	  public AccessMode flightAccess; /** Defines the access level for the local flight transactions (readonly and readwrite) */
+	    	  public AccessMode gcsAccess; /** Defines the access level for the local GCS transactions (readonly and readwrite) */
+	    	  public Acked flightTelemetryAcked; /** Defines if an ack is required for the transactions of this object (1:acked, 0:not acked) */
+	    	  public UpdateMode flightTelemetryUpdateMode; /** Update mode used by the autopilot (UpdateMode) */
+	    	  public int flightTelemetryUpdatePeriod; /** Update period used by the autopilot (only if telemetry mode is PERIODIC) */
+	    	  public Acked gcsTelemetryAcked; /** Defines if an ack is required for the transactions of this object (1:acked, 0:not acked) */
+	    	  public UpdateMode gcsTelemetryUpdateMode; /** Update mode used by the GCS (UpdateMode) */
+	    	  public int gcsTelemetryUpdatePeriod; /** Update period used by the GCS (only if telemetry mode is PERIODIC) */
+	    	  public UpdateMode loggingUpdateMode; /** Update mode used by the logging module (UpdateMode) */
+	    	  public int loggingUpdatePeriod; /** Update period used by the logging module (only if logging mode is PERIODIC) */
+	      } ;
 
 	      public UAVObject(int objID, Boolean isSingleInst, String name) {
 	    	  assert(objID == getObjID()); // ID is in implementation code, make sure it matches object
@@ -62,9 +78,13 @@ public abstract class UAVObject {
 			return true;  
 	      }
 	      
-	      public void setMetadata(UAVMetaObject obj) { meta = obj; }
-	      public UAVMetaObject getMetadata() { return meta; }
-	      public abstract UAVMetaObject getDefaultMetadata();
+	      public abstract void setMetadata(Metadata obj);
+	      public abstract Metadata getMetadata();
+	      public abstract Metadata getDefaultMetadata();
+
+	      private Boolean isSingleInst;
+	      private int instID;
+	      private UAVMetaObject meta;
 
 	      /*  
 	       // Unported code from QT	      

@@ -46,6 +46,7 @@ enum {	RX_SCAN_SPECTRUM = 0,
 		RX_WAIT_SYNC_MODE,
 		RX_DATA_MODE,
 		TX_DATA_MODE,
+		TX_STREAM_MODE,
 		TX_CARRIER_MODE,
 		TX_PN_MODE};
 
@@ -574,6 +575,10 @@ enum {	RX_SCAN_SPECTRUM = 0,
 
 // ************************************
 
+typedef void ( *t_rfm22_TxDataCallback ) (uint8_t *data, uint16_t len);
+
+// ************************************
+
 uint32_t rfm22_minFrequency(void);
 uint32_t rfm22_maxFrequency(void);
 
@@ -587,7 +592,7 @@ uint8_t rfm22_freqHopChannel(void);
 
 uint32_t rfm22_freqHopSize(void);
 
-void rfm22_setDatarate(uint32_t datarate_bps);
+void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening);
 uint32_t rfm22_getDatarate(void);
 
 void rfm22_setRxMode(uint8_t mode, bool multi_packet_mode);
@@ -608,6 +613,8 @@ uint8_t rfm22_getFreqCalibration(void);
 void rfm22_setTxPower(uint8_t tx_pwr);
 uint8_t rfm22_getTxPower(void);
 
+void rfm22_setTxStream(void);	// TEST ONLY
+
 void rfm22_setTxNormal(void);
 void rfm22_setTxCarrierMode(void);
 void rfm22_setTxPNMode(void);
@@ -622,7 +629,11 @@ bool rfm22_txReady(void);
 void rfm22_1ms_tick(void);
 void rfm22_process(void);
 
+void rfm22_TxData_SetCallback(t_rfm22_TxDataCallback new_function);
+
 int rfm22_init_scan_spectrum(uint32_t min_frequency_hz, uint32_t max_frequency_hz);
+int rfm22_init_tx_stream(uint32_t min_frequency_hz, uint32_t max_frequency_hz);
+int rfm22_init_rx_stream(uint32_t min_frequency_hz, uint32_t max_frequency_hz);
 int rfm22_init_normal(uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t freq_hop_step_size);
 
 // ************************************

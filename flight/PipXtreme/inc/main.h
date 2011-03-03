@@ -33,7 +33,7 @@
 
 // firmware version
 #define VERSION_MAJOR			0	// 0 to 255
-#define VERSION_MINOR			7	// 0 to 255
+#define VERSION_MINOR			8	// 0 to 255
 
 // macro's for reading internal flash memory
 #define mem8(addr)          (*((volatile uint8_t  *)(addr)))

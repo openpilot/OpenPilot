@@ -366,6 +366,8 @@ void apiconfig_processInputPacket(void *buf, uint16_t len)
 
 			    // ******
 
+			    PIOS_COM_ChangeBaud(PIOS_COM_SERIAL, saved_settings.serial_baudrate);
+
 			    switch (saved_settings.mode)
 			    {
 			    	case MODE_NORMAL:					// normal 2-way packet mode
@@ -382,15 +384,21 @@ void apiconfig_processInputPacket(void *buf, uint16_t len)
 			    		break;
 			    }
 
-			    PIOS_COM_ChangeBaud(PIOS_COM_SERIAL, saved_settings.serial_baudrate);
-
 			    if (saved_settings.mode != MODE_SCAN_SPECTRUM)
 			    {
-			    	rfm22_init_normal(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz, rfm22_freqHopSize());
+			    	if (saved_settings.mode == MODE_STREAM_TX || saved_settings.mode == MODE_PPM_TX)
+			    		rfm22_init_tx_stream(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz);
+			    	else
+			    	if (saved_settings.mode == MODE_STREAM_RX || saved_settings.mode == MODE_PPM_RX)
+			    		rfm22_init_rx_stream(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz);
+			    	else
+			    		rfm22_init_normal(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz, rfm22_freqHopSize());
+
 				    rfm22_setFreqCalibration(saved_settings.rf_xtal_cap);
 				    ph_setNominalCarrierFrequency(saved_settings.frequency_Hz);
 				    ph_setDatarate(saved_settings.max_rf_bandwidth);
 				    ph_setTxPower(saved_settings.max_tx_power);
+
 				    ph_set_remote_encryption(0, saved_settings.aes_enable, (const void *)saved_settings.aes_key);
 				    ph_set_remote_serial_number(0, saved_settings.destination_id);
 			    }
@@ -409,10 +417,12 @@ void apiconfig_processInputPacket(void *buf, uint16_t len)
 			    	case MODE_NORMAL:					// normal 2-way packet mode
 			    		break;
 			    	case MODE_STREAM_TX:				// 1-way continuous tx packet mode
+			    		rfm22_setTxStream();			// TEST ONLY
 		    			break;
 			    	case MODE_STREAM_RX:				// 1-way continuous rx packet mode
 		    			break;
 			    	case MODE_PPM_TX:					// PPM tx mode
+			    		rfm22_setTxStream();			// TEST ONLY
 			    		break;
 			    	case MODE_PPM_RX:					// PPM rx mode
 		    			break;

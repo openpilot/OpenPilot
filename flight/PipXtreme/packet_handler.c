@@ -348,6 +348,13 @@ int ph_startConnect(int connection_index, uint32_t sn)
 }
 
 // *****************************************************************************
+
+void rfm22_TxDataCallback(uint8_t *data, uint16_t len)
+{
+
+}
+
+// *****************************************************************************
 // transmit a packet
 
 bool ph_sendPacket(int connection_index, bool encrypt, uint8_t packet_type, bool send_immediately)
@@ -1455,7 +1462,7 @@ uint32_t ph_getNominalCarrierFrequency(void)
 
 void ph_setDatarate(uint32_t datarate_bps)
 {
-  rfm22_setDatarate(datarate_bps);
+  rfm22_setDatarate(datarate_bps, TRUE);
 
   uint32_t ms = 1280000ul / rfm22_getDatarate();
   if (ms < 10) ms = 10;
@@ -1510,6 +1517,8 @@ int ph_set_remote_serial_number(int connection_index, uint32_t sn)
       // wipe any user data present in the buffers
       fifoBuf_init(&conn->tx_fifo_buffer, conn->tx_buffer, PH_FIFO_BUFFER_SIZE);
       fifoBuf_init(&conn->rx_fifo_buffer, conn->rx_buffer, PH_FIFO_BUFFER_SIZE);
+
+      rfm22_TxData_SetCallback(rfm22_TxDataCallback);
 
       return connection_index;
   }

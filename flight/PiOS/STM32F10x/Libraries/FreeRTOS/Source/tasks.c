@@ -2175,6 +2175,18 @@ tskTCB *pxNewTCB;
 #endif
 /*-----------------------------------------------------------*/
 
+#if ( INCLUDE_uxTaskGetRunTime == 1 )
+unsigned portBASE_TYPE uxTaskGetRunTime( xTaskHandle xTask )
+{
+	tskTCB *pxTCB;
+	pxTCB = prvGetTCBFromHandle( xTask );
+	return pxTCB->ulRunTimeCounter;
+}
+
+#endif
+
+/*-----------------------------------------------------------*/
+
 #if ( ( configUSE_TRACE_FACILITY == 1 ) || ( INCLUDE_uxTaskGetStackHighWaterMark == 1 ) )
 
 	static unsigned short usTaskCheckFreeStackSpace( const unsigned char * pucStackByte )

@@ -6,7 +6,8 @@ HEADERS += rawhid_global.h \
     rawhidplugin.h \
     rawhid.h \
     pjrc_rawhid.h \
-    rawhid_const.h
+    rawhid_const.h \
+    usbmonitor.h
 SOURCES += rawhidplugin.cpp \
     rawhid.cpp
 FORMS += 

@@ -9,8 +9,7 @@ HEADERS += rawhid_global.h \
     rawhid_const.h \
     usbmonitor.h
 SOURCES += rawhidplugin.cpp \
-    rawhid.cpp \
-    usbmonitor_win.cpp
+    rawhid.cpp
 FORMS += 
 RESOURCES += 
 DEFINES += RAWHID_LIBRARY

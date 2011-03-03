@@ -129,8 +129,8 @@ void ConnectionManager::aboutToRemoveObject(QObject *obj)
     IConnection *connection = Aggregation::query<IConnection>(obj);
 	if (!connection) return;
 
-    if (m_connectionsList.contains(connection))
-            m_connectionsList.removeAt(m_connectionsList.indexOf(connection));
+	if (m_connectionsList.contains(connection))
+		m_connectionsList.removeAt(m_connectionsList.indexOf(connection));
 }
 
 /**
@@ -146,12 +146,20 @@ bool ConnectionManager::disconnectDevice()
 	//signal interested plugins that we are disconnecting the device
 	emit deviceDisconnected();
 
-	if (m_connectionDevice.connection)
-    {
-        m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
-        m_ioDev = NULL;
-        m_connectionDevice.connection = NULL;
-    }
+	try
+	{
+		if (m_connectionDevice.connection)
+		{
+			m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
+			m_connectionDevice.connection = NULL;
+			m_ioDev = NULL;
+		}
+	}
+	catch (...)
+	{	// handle exception
+		m_connectionDevice.connection = NULL;
+		m_ioDev = NULL;
+	}
 
 	m_connectBtn->setText("Connect");
     m_availableDevList->setEnabled(true);
@@ -164,9 +172,20 @@ void ConnectionManager::onConnectionClosed(QObject *obj)	// Pip
 	if (!m_connectionDevice.connection || m_connectionDevice.connection != obj)
 		return;
 
-	m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
-	m_connectionDevice.connection = NULL;
-	m_ioDev = NULL;
+	try
+	{
+		if (m_connectionDevice.connection)
+		{
+			m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
+			m_connectionDevice.connection = NULL;
+			m_ioDev = NULL;
+		}
+	}
+	catch (...)
+	{	// handle exception
+		m_connectionDevice.connection = NULL;
+		m_ioDev = NULL;
+	}
 
 	m_connectBtn->setText("Connect");
 	m_availableDevList->setEnabled(true);
@@ -200,8 +219,7 @@ void ConnectionManager::onConnectPressed()
 		if (m_connectionDevice.connection)
         {
             m_ioDev = m_connectionDevice.connection->openDevice(m_connectionDevice.devName);
-
-            if(m_ioDev)
+			if (m_ioDev)
             {
                 m_ioDev->open(QIODevice::ReadWrite);
 
@@ -212,7 +230,7 @@ void ConnectionManager::onConnectPressed()
 
                     // TODO: inform the user that something went wrong
 
-					m_connectionDevice.connection = NULL;	// Pip
+					m_connectionDevice.connection = NULL;
 					m_ioDev = NULL;
                     return;
                 }
@@ -239,12 +257,20 @@ void ConnectionManager::onConnectPressed()
 		//signal interested plugins that user is disconnecting his device
 		emit deviceDisconnected();
 
-		if (m_connectionDevice.connection)
-        {
-            m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
-            m_ioDev = NULL;
-            m_connectionDevice.connection = NULL;
-        }
+		try
+		{
+			if (m_connectionDevice.connection)
+			{
+				m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
+				m_connectionDevice.connection = NULL;
+				m_ioDev = NULL;
+			}
+		}
+		catch (...)
+		{	// handle exception
+			m_connectionDevice.connection = NULL;
+			m_ioDev = NULL;
+		}
 
         m_connectBtn->setText("Connect");
         m_availableDevList->setEnabled(true);

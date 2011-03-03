@@ -55,6 +55,8 @@
 #ifndef PORTMACRO_H
 #define PORTMACRO_H
 
+#include "stdint.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -135,6 +137,9 @@ extern void vPortYieldFromISR( void );
 
 extern void vPortEnterCritical( void );
 extern void vPortExitCritical( void );
+	
+extern void TaskTimerConfigure( void );
+extern uint32_t RTC_GetCounter( void );
 
 #define portDISABLE_INTERRUPTS()	portSET_INTERRUPT_MASK()
 #define portENABLE_INTERRUPTS()		portCLEAR_INTERRUPT_MASK()

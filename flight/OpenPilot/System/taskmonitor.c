@@ -84,6 +84,27 @@ int32_t TaskMonitorRemove(TaskInfoRunningElem task)
 	}
 }
 
+/** 
+ * Temporarily put function here for configuring RTC for task timing
+ * Only used in debug mode
+ */
+void TaskTimerConfigure( void ) 
+{
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_BKP | RCC_APB1Periph_PWR,
+			       ENABLE);
+	PWR_BackupAccessCmd(ENABLE);
+	
+	RCC_RTCCLKConfig(RCC_RTCCLKSource_HSE_Div128);
+	RCC_RTCCLKCmd(ENABLE);
+	RTC_WaitForLastTask();
+	RTC_WaitForSynchro();
+	RTC_WaitForLastTask();
+	RTC_SetPrescaler(0);	// counting at 8e6 / 128
+	RTC_WaitForLastTask();
+	RTC_SetCounter(0);
+	RTC_WaitForLastTask();	
+}
+
 /**
  * Update the status of all tasks
  */

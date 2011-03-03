@@ -38,18 +38,12 @@
 /* See: http://msdn.microsoft.com/en-us/library/ms794141.aspx */
 
 #include "pjrc_rawhid.h"
-#include <QMetaType>
 #include <QString>
-#include <initguid.h>
 #define printf qDebug
 
 pjrc_rawhid::pjrc_rawhid()
 {
-    if( !QMetaType::isRegistered( QMetaType::type("USBPortInfo") ) )
-        qRegisterMetaType<USBPortInfo>("USBPortInfo");
-#if (defined QT_GUI_LIB)
-    notificationWidget = 0;
-#endif // Q_OS_WIN
+
     first_hid = NULL;
     last_hid = NULL;
     rx_event = NULL;
@@ -58,10 +52,7 @@ pjrc_rawhid::pjrc_rawhid()
 
 pjrc_rawhid::~pjrc_rawhid()
 {
-#if (defined QT_GUI_LIB)
-    if( notificationWidget )
-        delete notificationWidget;
-#endif
+
 }
 
 //  open - open 1 or more devices
@@ -395,6 +386,8 @@ QString pjrc_rawhid::getserial(int num)
 
         // Should we do some "critical section" stuff here??
         char temp[126];
+        HidD_GetSerialNumberString(hid->handle, temp, sizeof(temp));
+        qDebug()<<"MANUF"<<QString().fromUtf16((ushort*)temp,-1);
         if (!HidD_GetSerialNumberString(hid->handle, temp, sizeof(temp)))
         {
                 DWORD err = GetLastError();
@@ -485,150 +478,3 @@ void pjrc_rawhid::print_win32_err(DWORD err)
         printf("err %ld: %s\n", err, temp);
 }
 
-// see http://msdn.microsoft.com/en-us/library/ms791134.aspx for list of GUID classes
-#ifndef GUID_DEVCLASS_PORTS
-DEFINE_GUID(GUID_DEVCLASS_PORTS, 0x4d1e55b2, 0xf16f, 0x11cf, 0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30);
-#endif
-
-/* Gordon Schumacher's macros for TCHAR -> QString conversions and vice versa */
-#ifdef UNICODE
-#define QStringToTCHAR(x)     (wchar_t*) x.utf16()
-#define PQStringToTCHAR(x)    (wchar_t*) x->utf16()
-#define TCHARToQString(x)     QString::fromUtf16((ushort*)(x))
-#define TCHARToQStringN(x,y)  QString::fromUtf16((ushort*)(x),(y))
-#else
-#define QStringToTCHAR(x)     x.local8Bit().constData()
-#define PQStringToTCHAR(x)    x->local8Bit().constData()
-#define TCHARToQString(x)     QString::fromLocal8Bit((x))
-#define TCHARToQStringN(x,y)  QString::fromLocal8Bit((x),(y))
-#endif /*UNICODE*/
-
-void pjrc_rawhid::setUpNotifications( )
-{
-#ifdef QT_GUI_LIB
-    if(notificationWidget)
-        return;
-    notificationWidget = new USBRegistrationWidget(this);
-
-    DEV_BROADCAST_DEVICEINTERFACE dbh;
-    ZeroMemory(&dbh, sizeof(dbh));
-    dbh.dbcc_size = sizeof(dbh);
-    dbh.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
-    CopyMemory(&dbh.dbcc_classguid, &GUID_DEVCLASS_PORTS, sizeof(GUID));
-    if( RegisterDeviceNotification( notificationWidget->winId( ), &dbh, DEVICE_NOTIFY_WINDOW_HANDLE ) == NULL)
-        qWarning() << "RegisterDeviceNotification failed:" << GetLastError();
-    // setting up notifications doesn't tell us about devices already connected
-    // so get those manually
-    foreach( USBPortInfo port, getPorts() )
-      emit deviceDiscovered( port );
-#else
-    qWarning("GUI not enabled - can't register for device notifications.");
-#endif // QT_GUI_LIB
-}
-LRESULT pjrc_rawhid::onDeviceChangeWin( WPARAM wParam, LPARAM lParam )
-{
-    if ( DBT_DEVICEARRIVAL == wParam || DBT_DEVICEREMOVECOMPLETE == wParam )
-    {
-        PDEV_BROADCAST_HDR pHdr = (PDEV_BROADCAST_HDR)lParam;
-        if( pHdr->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE )
-        {
-            PDEV_BROADCAST_DEVICEINTERFACE pDevInf = (PDEV_BROADCAST_DEVICEINTERFACE)pHdr;
-            // delimiters are different across APIs...change to backslash.  ugh.
-            QString deviceID = TCHARToQString(pDevInf->dbcc_name).toUpper().replace("#", "\\");
-            matchAndDispatchChangedDevice(deviceID, GUID_DEVCLASS_PORTS, wParam);
-        }
-    }
-    return 0;
-}
-#ifdef QT_GUI_LIB
-bool USBRegistrationWidget::winEvent( MSG* message, long* result )
-{
-    if ( message->message == WM_DEVICECHANGE ) {
-        qese->onDeviceChangeWin( message->wParam, message->lParam );
-        *result = 1;
-        return true;
-    }
-    return false;
-}
-#endif
-bool pjrc_rawhid::matchAndDispatchChangedDevice(const QString & deviceID, const GUID & guid, WPARAM wParam)
-{
-    bool rv = false;
-    DWORD dwFlag = (DBT_DEVICEARRIVAL == wParam) ? DIGCF_PRESENT : DIGCF_ALLCLASSES;
-    HDEVINFO devInfo;
-    if( (devInfo = SetupDiGetClassDevs(&guid,NULL,NULL,dwFlag)) != INVALID_HANDLE_VALUE )
-    {
-        SP_DEVINFO_DATA spDevInfoData;
-        spDevInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
-        for(int i=0; SetupDiEnumDeviceInfo(devInfo, i, &spDevInfoData); i++)
-        {
-            DWORD nSize=0 ;
-            TCHAR buf[MAX_PATH];
-            if ( SetupDiGetDeviceInstanceId(devInfo, &spDevInfoData, buf, MAX_PATH, &nSize) &&
-                 deviceID.contains(TCHARToQString(buf))) // we found a match
-            {
-                rv = true;
-                USBPortInfo info;
-                info.productID = info.vendorID = 0;
-                getDeviceDetailsWin( &info, devInfo, &spDevInfoData, wParam );
-                if( wParam == DBT_DEVICEARRIVAL )
-                    emit deviceDiscovered(info);
-                else if( wParam == DBT_DEVICEREMOVECOMPLETE )
-                    emit deviceRemoved(info);
-                break;
-            }
-        }
-        SetupDiDestroyDeviceInfoList(devInfo);
-    }
-    return rv;
-}
-bool pjrc_rawhid::getDeviceDetailsWin( USBPortInfo* portInfo, HDEVINFO devInfo, PSP_DEVINFO_DATA devData, WPARAM wParam )
-{
-    portInfo->friendName = getDeviceProperty(devInfo, devData, SPDRP_FRIENDLYNAME);
-    if( wParam == DBT_DEVICEARRIVAL)
-        portInfo->physName = getDeviceProperty(devInfo, devData, SPDRP_PHYSICAL_DEVICE_OBJECT_NAME);
-    portInfo->enumName = getDeviceProperty(devInfo, devData, SPDRP_ENUMERATOR_NAME);
-    QString hardwareIDs = getDeviceProperty(devInfo, devData, SPDRP_HARDWAREID);
-    QRegExp idRx("VID_(\\w+)&PID_(\\w+)");
-    if( hardwareIDs.toUpper().contains(idRx) )
-    {
-        bool dummy;
-        portInfo->vendorID = idRx.cap(1).toInt(&dummy, 16);
-        portInfo->productID = idRx.cap(2).toInt(&dummy, 16);
-    }
-    qDebug()<<portInfo->productID;
-    return true;
-}
-QString pjrc_rawhid::getDeviceProperty(HDEVINFO devInfo, PSP_DEVINFO_DATA devData, DWORD property)
-{
-    DWORD buffSize = 0;
-    SetupDiGetDeviceRegistryProperty(devInfo, devData, property, NULL, NULL, 0, & buffSize);
-    BYTE* buff = new BYTE[buffSize];
-    SetupDiGetDeviceRegistryProperty(devInfo, devData, property, NULL, buff, buffSize, NULL);
-    QString result = TCHARToQString(buff);
-    delete [] buff;
-    return result;
-}
-QList<USBPortInfo> pjrc_rawhid::getPorts()
-{
-    QList<USBPortInfo> ports;
-    enumerateDevicesWin(GUID_DEVCLASS_PORTS, &ports);
-    return ports;
-}
-void pjrc_rawhid::enumerateDevicesWin( const GUID & guid, QList<USBPortInfo>* infoList )
-{
-    HDEVINFO devInfo;
-    if( (devInfo = SetupDiGetClassDevs(&guid, NULL, NULL, DIGCF_PRESENT)) != INVALID_HANDLE_VALUE)
-    {
-        SP_DEVINFO_DATA devInfoData;
-        devInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
-        for(int i = 0; SetupDiEnumDeviceInfo(devInfo, i, &devInfoData); i++)
-        {
-            USBPortInfo info;
-            info.productID = info.vendorID = 0;
-            getDeviceDetailsWin( &info, devInfo, &devInfoData );
-            infoList->append(info);
-        }
-        SetupDiDestroyDeviceInfoList(devInfo);
-    }
-}

@@ -49,7 +49,6 @@
 #define _WIN32_WINDOWS 0x0500
 #define WINVER 0x0500
 #include <windows.h>
-#include <dbt.h>
 #include <setupapi.h>
 #include <ddk/hidsdi.h>
 #include <ddk/hidclass.h>
@@ -90,73 +89,16 @@ struct hid_struct
 
 #endif
 
-// ************
 
-//this all stuff was added by ME
 
-struct USBPortInfo {
-    QString friendName; ///< Friendly name.
-    QString physName;
-    QString enumName;   ///< It seems its the only one with meaning
-    QString serialNumber; // As a string as it can be anything, really...
-    int vendorID;       ///< Vendor ID.
-    int productID;      ///< Product ID
-};
-#ifdef Q_OS_WIN
-#ifdef QT_GUI_LIB
-#include <QWidget>
-class pjrc_rawhid;
-
-class USBRegistrationWidget : public QWidget
-{
-    Q_OBJECT
-public:
-    USBRegistrationWidget( pjrc_rawhid* qese ) {
-        this->qese = qese;
-    }
-    ~USBRegistrationWidget( ) { }
-
-protected:
-    pjrc_rawhid* qese;
-    bool winEvent( MSG* message, long* result );
-};
-#endif // QT_GUI_LIB
-#endif // Q_OS_WIN
 
 class RAWHID_EXPORT pjrc_rawhid: public QObject
 {
     Q_OBJECT
-#ifdef Q_OS_WIN
-public:
-    LRESULT onDeviceChangeWin( WPARAM wParam, LPARAM lParam );
-    static QList<USBPortInfo> getPorts();//should exhist for every plattform
-private:
-    /*!
-     * Get specific property from registry.
-     * \param devInfo pointer to the device information set that contains the interface
-     *    and its underlying device. Returned by SetupDiGetClassDevs() function.
-     * \param devData pointer to an SP_DEVINFO_DATA structure that defines the device instance.
-     *    this is returned by SetupDiGetDeviceInterfaceDetail() function.
-     * \param property registry property. One of defined SPDRP_* constants.
-     * \return property string.
-     */
-    static QString getDeviceProperty(HDEVINFO devInfo, PSP_DEVINFO_DATA devData, DWORD property);
 
-    static bool getDeviceDetailsWin( USBPortInfo* portInfo, HDEVINFO devInfo,
-                                     PSP_DEVINFO_DATA devData, WPARAM wParam = DBT_DEVICEARRIVAL );
-    static void enumerateDevicesWin( const GUID & guidDev, QList<USBPortInfo>* infoList );
-    bool matchAndDispatchChangedDevice(const QString & deviceID, const GUID & guid, WPARAM wParam);
-#ifdef QT_GUI_LIB
-    USBRegistrationWidget* notificationWidget;
-#endif
-#endif /*Q_OS_WIN*/
 public:
     pjrc_rawhid();
     ~pjrc_rawhid();
-    /*!
-      Enable event-driven notifications of board discovery/removal.
-    */
-    void setUpNotifications( );
     int open(int max, int vid, int pid, int usage_page, int usage);
     int receive(int num, void *buf, int len, int timeout);
     void close(int num);
@@ -165,22 +107,6 @@ public:
     void mytest(int num);
 signals:
      void deviceUnplugged(int);//just to make pips changes compile
-    /*!
-      A new device has been connected to the system.
-
-      setUpNotifications() must be called first to enable event-driven device notifications.
-      Currently only implemented on Windows and OS X.
-      \param info The device that has been discovered.
-    */
-    void deviceDiscovered( const USBPortInfo & info );
-    /*!
-      A device has been disconnected from the system.
-
-      setUpNotifications() must be called first to enable event-driven device notifications.
-      Currently only implemented on Windows and OS X.
-      \param info The device that was disconnected.
-    */
-    void deviceRemoved( const USBPortInfo & info );
 private:
 #if defined( Q_OS_MAC)
 

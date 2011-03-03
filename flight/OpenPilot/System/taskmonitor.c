@@ -84,27 +84,6 @@ int32_t TaskMonitorRemove(TaskInfoRunningElem task)
 	}
 }
 
-/** 
- * Temporarily put function here for configuring RTC for task timing
- * Only used in debug mode
- */
-void TaskTimerConfigure( void ) 
-{
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_BKP | RCC_APB1Periph_PWR,
-			       ENABLE);
-	PWR_BackupAccessCmd(ENABLE);
-	
-	RCC_RTCCLKConfig(RCC_RTCCLKSource_HSE_Div128);
-	RCC_RTCCLKCmd(ENABLE);
-	RTC_WaitForLastTask();
-	RTC_WaitForSynchro();
-	RTC_WaitForLastTask();
-	RTC_SetPrescaler(0);	// counting at 8e6 / 128
-	RTC_WaitForLastTask();
-	RTC_SetCounter(0);
-	RTC_WaitForLastTask();	
-}
-
 /**
  * Update the status of all tasks
  */
@@ -126,9 +105,9 @@ void TaskMonitorUpdateAll(void)
 			data.StackRemaining[n] = 10000;
 #else
 			data.StackRemaining[n] = uxTaskGetStackHighWaterMark(handles[n]) * 4;
-#if ( configGENERATE_RUN_TIME_STATS == 1 )			
+#if ( configGENERATE_RUN_TIME_STATS == 1 )
 			/* Generate run time stats */
-			data.RunningTime[n] = uxTaskGetRunTime(handles[n]);
+			data.RunningTime[n] = 100 * (float) uxTaskGetRunTime(handles[n]) / portGET_RUN_TIME_COUNTER_VALUE();
 #endif
 #endif
 			
@@ -137,6 +116,7 @@ void TaskMonitorUpdateAll(void)
 		{
 			data.Running[n] = TASKINFO_RUNNING_FALSE;
 			data.StackRemaining[n] = 0;
+			data.RunningTime[n] = 0;
 		}
 	}
 

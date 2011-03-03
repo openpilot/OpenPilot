@@ -28,10 +28,28 @@
 #ifndef USBMONITOR_H
 #define USBMONITOR_H
 
-#include "rawhid_global.h"
+//#include "rawhid_global.h"
 
 #include <QThread>
 
+//TODO: temporary, will have to remove
+#include "pjrc_rawhid.h"
+
+// Depending on the OS, we'll need different things:
+#if defined( Q_OS_MAC)
+
+// TODO
+
+#elif defined(Q_OS_UNIX)
+
+#include <libudev.h>
+#include <QSocketNotifier>
+
+#elif defined (Q_OS_WIN32)
+//TODO
+#endif
+
+/*
 struct USBPortInfo {
     QString friendName; ///< Friendly name.
     QString physName;
@@ -39,6 +57,7 @@ struct USBPortInfo {
     int vendorID;       ///< Vendor ID.
     int productID;      ///< Product ID
 };
+*/
 
 
 /**
@@ -50,8 +69,8 @@ class USBMonitor : public QThread
 
 
 public:
-    USBMonitor();
-    USBMonitor(int vid, int pid);
+    USBMonitor(QObject *parent = 0);
+//    USBMonitor(int vid, int pid);
     ~USBMonitor();
 
 signals:
@@ -72,9 +91,27 @@ signals:
     */
     void deviceRemoved( const USBPortInfo & info );
 
+private slots:
+    /**
+     Callback available for whenever the system that is put in place gets
+     an event
+     */
+    void deviceEventReceived();
+
 private:
 
-    QString serialNumber;
+    // Depending on the OS, we'll need different things:
+#if defined( Q_OS_MAC)
+
+// TODO
+
+#elif defined(Q_OS_UNIX)
+    struct udev *context;
+    struct udev_monitor *monitor;
+    QSocketNotifier *monitorNotifier;
+#elif defined (Q_OS_WIN32)
+    //TODO
+#endif
 
 };
 

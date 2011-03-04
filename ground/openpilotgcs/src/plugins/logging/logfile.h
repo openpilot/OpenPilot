@@ -27,7 +27,7 @@ public:
     bool stopReplay();
 
 public slots:
-    void setReplaySpeed(int val) { playbackSpeed = pow(10,((double) val)/100); qDebug() << playbackSpeed; };
+    void setReplaySpeed(double val) { playbackSpeed = pow(10,(val)/100); qDebug() << playbackSpeed; };
     void pauseReplay();
     void resumeReplay();
 

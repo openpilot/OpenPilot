@@ -154,7 +154,7 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
     {
         SP_DEVINFO_DATA spDevInfoData;
         spDevInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
-        for(int i=0; SetupDiEnumDeviceInfo(devInfo, i, &spDevInfoData); i++)
+        for(DWORD i=0; SetupDiEnumDeviceInfo(devInfo, i, &spDevInfoData); i++)
         {
             DWORD nSize=0 ;
             TCHAR buf[MAX_PATH];
@@ -162,17 +162,32 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
                  deviceID.contains(TCHARToQString(buf))) // we found a match
             {
                 USBPortInfo info;
-
-                /*rv = true;
-                USBPortInfo info;
-                info.productID = info.vendorID = 0;
-                getDeviceDetailsWin( &info, devInfo, &spDevInfoData, wParam );*/
-                infoFromHandle(guid,info,devInfo);
-
+                info.devicePath=deviceID;
                 if( wParam == DBT_DEVICEARRIVAL )
+                {
+                    if(infoFromHandle(guid,info,devInfo,i)==0)
+                        break;
+                    knowndevices.append(info);
                     emit deviceDiscovered(info);
+                    break;
+
+                }
                 else if( wParam == DBT_DEVICEREMOVECOMPLETE )
+                {
+                    for(int x=0;x<knowndevices.count();++x)
+                    {
+                        if(knowndevices[x].devicePath==deviceID)
+                        {
+                            emit deviceRemoved(knowndevices[x]);
+                            //qDebug()<<"REMOVED"<<knowndevices[x].product;
+                            knowndevices.removeAt(x);
+                            break;
+                        }
+                    }
                     emit deviceRemoved(info);
+
+
+                }
                 break;
 
             }
@@ -201,6 +216,7 @@ QList<USBPortInfo> USBMonitor::availableDevices()
     enumerateDevicesWin(guid_hid, &ports);
     return ports;
 }
+
 void USBMonitor::enumerateDevicesWin( const GUID & guid, QList<USBPortInfo>* infoList )
 {
     HDEVINFO devInfo;
@@ -211,41 +227,46 @@ void USBMonitor::enumerateDevicesWin( const GUID & guid, QList<USBPortInfo>* inf
 
         SP_DEVINFO_DATA devInfoData;
         devInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
-        for(int i = 0; SetupDiEnumDeviceInfo(devInfo, i, &devInfoData); i++)
+        for(DWORD i = 0; SetupDiEnumDeviceInfo(devInfo, i, &devInfoData); i++)
         {
-            if(infoFromHandle(guid,info,devInfo))
+            if(infoFromHandle(guid,info,devInfo,i)!=0)
                 infoList->append(info);
         }
+
         SetupDiDestroyDeviceInfoList(devInfo);
     }
 }
-bool USBMonitor::infoFromHandle(const GUID & guid,USBPortInfo & info,HDEVINFO & devInfo)
+
+int USBMonitor::infoFromHandle(const GUID & guid,USBPortInfo & info,HDEVINFO & devInfo,DWORD & index)
 {
+    //qDebug()<<"index0="<<index;
     bool ret;
     HANDLE h;
     SP_DEVICE_INTERFACE_DATA iface;
     SP_DEVICE_INTERFACE_DETAIL_DATA *details;
-    DWORD index=0, reqd_size;
+    DWORD reqd_size;
     HIDD_ATTRIBUTES attrib;
     PHIDP_PREPARSED_DATA hid_data;
     HIDP_CAPS capabilities;
 
     iface.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
+
     ret = SetupDiEnumDeviceInterfaces(devInfo, NULL, &guid, index, &iface);
-    if (!ret) return false;
+    if (!ret) return 0;
+    //qDebug()<<"index1="<<index;
     SetupDiGetInterfaceDeviceDetail(devInfo, &iface, NULL, 0, &reqd_size, NULL);
     details = (SP_DEVICE_INTERFACE_DETAIL_DATA *)malloc(reqd_size);
-    if (details == NULL) return false;
-
+    if (details == NULL) return 2;
+    //qDebug()<<"index2="<<index;
     memset(details, 0, reqd_size);
     details->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
     ret = SetupDiGetDeviceInterfaceDetail(devInfo, &iface, details, reqd_size, NULL, NULL);
     if (!ret)
     {
             free(details);
-            return false;
+            return 2;
     }
-
+    //qDebug()<<"index3="<<index;
     h = CreateFile(details->DevicePath, GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
 
     if (h == INVALID_HANDLE_VALUE)
@@ -257,17 +278,17 @@ bool USBMonitor::infoFromHandle(const GUID & guid,USBPortInfo & info,HDEVINFO & 
             if (err == ERROR_ACCESS_DENIED)
             {
                     free(details);
-                    return false;
+                    return 2;
             }
 
             qDebug() << "Problem opening handle, path: " << QString().fromWCharArray(details->DevicePath);
 
             free(details);
-            return false;
+            return 2;
     }
-
+    //qDebug()<<"index4="<<index;
     free(details);
-
+    //qDebug()<<"DETAILS???"<<QString().fromWCharArray(details->DevicePath).toUpper().replace("#", "\\");
     attrib.Size = sizeof(HIDD_ATTRIBUTES);
     ret = HidD_GetAttributes(h, &attrib);
     info.vendorID=attrib.VendorID;
@@ -278,15 +299,16 @@ bool USBMonitor::infoFromHandle(const GUID & guid,USBPortInfo & info,HDEVINFO & 
     if (!ret || !HidD_GetPreparsedData(h, &hid_data))
     {
             CloseHandle(h);
-            return false;
+            return 2;
     }
-
+    //qDebug()<<"index5="<<index;
     if (!HidP_GetCaps(hid_data, &capabilities))
     {
             HidD_FreePreparsedData(hid_data);
             CloseHandle(h);
-            return false;
+            return 2;
     }
+    //qDebug()<<"index6="<<index;
     info.UsagePage=capabilities.UsagePage;
     HidD_FreePreparsedData(hid_data);
     char temp[126];
@@ -296,7 +318,8 @@ bool USBMonitor::infoFromHandle(const GUID & guid,USBPortInfo & info,HDEVINFO & 
     info.manufacturer= QString().fromUtf16((ushort*)temp,-1);
     HidD_GetProductString(h, temp, sizeof(temp));
     info.product= QString().fromUtf16((ushort*)temp,-1);
+    //qDebug()<<"index="<<index<<"ProductID="<<info.product;
     CloseHandle(h);
     h = NULL;
-    return true;
+    return 1;
 }

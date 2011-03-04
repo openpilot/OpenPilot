@@ -4,7 +4,7 @@
 #include "jafarConfig.h"
 
 #include "jmath/jann.hpp"
-#include "jmath/mat_file.hpp"
+#include "jmath/ublas_data_file.hpp"
 
 int main(int argc, char** argv) {
 

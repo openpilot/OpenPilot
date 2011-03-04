@@ -25,10 +25,8 @@ public class UAVObjectField {
     	 constructorInitialize(name, units, type, elementNames, options);
     }
     
-    public void initialize(byte[] data, int dataOffset, UAVObject obj){
-        this.data = data;
-        this.offset = dataOffset;
-        this.obj = obj;
+    public void initialize(UAVObject obj){
+         this.obj = obj;
         clear();
     	
 	}
@@ -258,10 +256,13 @@ public class UAVObjectField {
     	if ( index >= numElements )
     		throw new Exception("Index out of bounds");
 
+    	System.out.println(data.toString());
+    	System.out.println(this.data.toString());
+    	
     	// Get metadata
-    	UAVObject.Metadata mdata = obj.getMetadata();
+    	//UAVObject.Metadata mdata = obj.getMetadata();
     	// Update value if the access mode permits
-    	if ( mdata.gcsAccess == UAVObject.AccessMode.ACCESS_READWRITE )
+    	if ( true ) //mdata.gcsAccess == UAVObject.AccessMode.ACCESS_READWRITE )
     	{
     		ByteBuffer bbuf = ByteBuffer.allocate(numBytesPerElement);
     		switch (type)
@@ -270,7 +271,7 @@ public class UAVObjectField {
     		case INT16:
     		case INT32:
     		{
-    			List<Integer> l = (List<Integer>) data;
+    			List<Integer> l = (List<Integer>) this.data;
     			l.set(index, (Integer) data);
     			break;
     		}
@@ -278,13 +279,13 @@ public class UAVObjectField {
     		case UINT16:
     		case UINT32:
     		{
-    			List<Integer> l = (List<Integer>) data;
+    			List<Integer> l = (List<Integer>) this.data;
     			l.set(index, (Integer) data);
     			break;
     		}
     		case FLOAT32:
     		{
-    			List<Float> l = (List<Float>) data;
+    			List<Float> l = (List<Float>) this.data;
     			l.set(index, (Float) data);
     			break;
     		}
@@ -292,7 +293,7 @@ public class UAVObjectField {
     		{
     			byte val = (byte) options.indexOf((String) data);
     			if(val < 0) throw new Exception("Enumerated value not found");    	            	
-    			List<Byte> l = (List<Byte>) data;
+    			List<Byte> l = (List<Byte>) this.data;
     			l.set(index, val);
     			break;
     		}
@@ -395,7 +396,37 @@ public class UAVObjectField {
     }
 
     public void clear() {
-    	// TODO: This accesses a shared array of the parent
+    	switch (type)
+        {
+            case INT8:
+            case INT16:
+            case INT32:
+            case UINT8:
+            case UINT16:
+            case UINT32:
+            	((ArrayList<Integer>) data).clear();
+            	for(int index = 0; index < numElements; ++index) {
+            		((ArrayList<Integer>) data).add(0);
+            	}
+                break;
+            case FLOAT32:
+            	((ArrayList<Float>) data).clear();
+            	for(int index = 0; index < numElements; ++index) {
+            		((ArrayList<Float>) data).add((float) 0);
+            	}
+                break;
+            case ENUM:
+            	((ArrayList<Byte>) data).clear();
+            	for(int index = 0; index < numElements; ++index) {
+            		((ArrayList<Byte>) data).add((byte)0);
+            	}
+                break;
+            case STRING:
+            	// TODO: Add string
+                break;
+            default:
+                numBytesPerElement = 0;
+        }
     }
     
     public void constructorInitialize(String name, String units, FieldType type, List<String> elementNames, List<String> options) {
@@ -410,47 +441,51 @@ public class UAVObjectField {
         this.obj = null;
         this.elementNames = elementNames;
         // Set field size
+        System.out.println("Initializing: type " + type + this.numElements);
+
         switch (type)
         {
             case INT8:
-            	data = (Object) new ArrayList<Integer>();
+            	data = (Object) new ArrayList<Integer>(this.numElements);
                 numBytesPerElement = 1;
                 break;
             case INT16:
-            	data = (Object) new ArrayList<Integer>();
+            	data = (Object) new ArrayList<Integer>(this.numElements);
                 numBytesPerElement = 2;
                 break;
             case INT32:
-            	data = (Object) new ArrayList<Integer>();
+            	data = (Object) new ArrayList<Integer>(this.numElements);
                 numBytesPerElement = 4;
                 break;
             case UINT8:
-            	data = (Object) new ArrayList<Integer>();
+            	data = (Object) new ArrayList<Integer>(this.numElements);
                 numBytesPerElement = 1;
                 break;
             case UINT16:
-            	data = (Object) new ArrayList<Integer>();
+            	data = (Object) new ArrayList<Integer>(this.numElements);
                 numBytesPerElement = 2;
                 break;
             case UINT32:
-            	data = (Object) new ArrayList<Integer>();
+            	data = (Object) new ArrayList<Integer>(this.numElements);
                 numBytesPerElement = 4;
                 break;
             case FLOAT32:
-            	data = (Object) new ArrayList<Double>();
+            	data = (Object) new ArrayList<Double>(this.numElements);
                 numBytesPerElement = 4;
                 break;
             case ENUM:
-            	data = (Object) new ArrayList<Byte>();
+            	data = (Object) new ArrayList<Byte>(this.numElements);
                 numBytesPerElement = 1;
                 break;
             case STRING:
-            	data = (Object) new ArrayList<String>();
+            	data = (Object) new ArrayList<String>(this.numElements);
                 numBytesPerElement = 1;
                 break;
             default:
                 numBytesPerElement = 0;
         }
+        clear();
+        System.out.println("Initialized: " + this.data.toString());
     }
     
 

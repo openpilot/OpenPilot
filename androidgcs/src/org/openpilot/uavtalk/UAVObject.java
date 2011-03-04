@@ -84,7 +84,7 @@ public abstract class UAVObject {
 
 	      private Boolean isSingleInst;
 	      private int instID;
-	      private UAVMetaObject meta;
+	      private Metadata meta;
 
 	      /*  
 	       // Unported code from QT	      

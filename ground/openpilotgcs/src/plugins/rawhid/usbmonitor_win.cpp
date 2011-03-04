@@ -43,6 +43,7 @@ void USBMonitor::deviceEventReceived() {
 
 
 USBMonitor::USBMonitor(QObject *parent): QThread(parent) {
+    HidD_GetHidGuid(&guid_hid);
     if( !QMetaType::isRegistered( QMetaType::type("USBPortInfo") ) )
         qRegisterMetaType<USBPortInfo>("USBPortInfo");
 #if (defined QT_GUI_LIB)
@@ -77,10 +78,12 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDevice)
 
 
 // see http://msdn.microsoft.com/en-us/library/ms791134.aspx for list of GUID classes
-#ifndef GUID_DEVCLASS_PORTS
-DEFINE_GUID(GUID_DEVCLASS_PORTS, 0x4d1e55b2, 0xf16f, 0x11cf, 0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30);
+/*#ifndef GUID_DEVCLASS_PORTS
+DEFINE_GUID(GUID_DEVCLASS_PORTS, //0x4d1e55b2, 0xf16f, 0x11cf, 0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30);
+                                 //0x745a17a0, 0x74d3, 0x11d0, 0xb6, 0xfe, 0x00, 0xa0, 0xc9, 0x0f, 0x57, 0xda);
+                                   0xA5DCBF10, 0x6530, 0x11D2, 0x90, 0x1F, 0x00, 0xC0, 0x4F, 0xB9, 0x51, 0xED);
 #endif
-
+*/
 /* Gordon Schumacher's macros for TCHAR -> QString conversions and vice versa */
 #ifdef UNICODE
 #define QStringToTCHAR(x)     (wchar_t*) x.utf16()
@@ -105,7 +108,7 @@ void USBMonitor::setUpNotifications( )
     ZeroMemory(&dbh, sizeof(dbh));
     dbh.dbcc_size = sizeof(dbh);
     dbh.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
-    CopyMemory(&dbh.dbcc_classguid, &GUID_DEVCLASS_PORTS, sizeof(GUID));
+    CopyMemory(&dbh.dbcc_classguid, &guid_hid, sizeof(GUID));
     if( RegisterDeviceNotification( notificationWidget->winId( ), &dbh, DEVICE_NOTIFY_WINDOW_HANDLE ) == NULL)
         qWarning() << "RegisterDeviceNotification failed:" << GetLastError();
     // setting up notifications doesn't tell us about devices already connected
@@ -126,7 +129,7 @@ LRESULT USBMonitor::onDeviceChangeWin( WPARAM wParam, LPARAM lParam )
             PDEV_BROADCAST_DEVICEINTERFACE pDevInf = (PDEV_BROADCAST_DEVICEINTERFACE)pHdr;
             // delimiters are different across APIs...change to backslash.  ugh.
             QString deviceID = TCHARToQString(pDevInf->dbcc_name).toUpper().replace("#", "\\");
-            matchAndDispatchChangedDevice(deviceID, GUID_DEVCLASS_PORTS, wParam);
+            matchAndDispatchChangedDevice(deviceID,guid_hid, wParam);
         }
     }
     return 0;
@@ -147,7 +150,7 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
     bool rv = false;
     DWORD dwFlag = (DBT_DEVICEARRIVAL == wParam) ? DIGCF_PRESENT : DIGCF_ALLCLASSES;
     HDEVINFO devInfo;
-    if( (devInfo = SetupDiGetClassDevs(&guid,NULL,NULL,dwFlag)) != INVALID_HANDLE_VALUE )
+    if( (devInfo = SetupDiGetClassDevs(&guid,NULL,NULL, dwFlag | DIGCF_DEVICEINTERFACE)) != INVALID_HANDLE_VALUE )
     {
         SP_DEVINFO_DATA spDevInfoData;
         spDevInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
@@ -158,38 +161,27 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
             if ( SetupDiGetDeviceInstanceId(devInfo, &spDevInfoData, buf, MAX_PATH, &nSize) &&
                  deviceID.contains(TCHARToQString(buf))) // we found a match
             {
-                rv = true;
+                USBPortInfo info;
+
+                /*rv = true;
                 USBPortInfo info;
                 info.productID = info.vendorID = 0;
-                getDeviceDetailsWin( &info, devInfo, &spDevInfoData, wParam );
+                getDeviceDetailsWin( &info, devInfo, &spDevInfoData, wParam );*/
+                infoFromHandle(guid,info,devInfo);
+
                 if( wParam == DBT_DEVICEARRIVAL )
                     emit deviceDiscovered(info);
                 else if( wParam == DBT_DEVICEREMOVECOMPLETE )
                     emit deviceRemoved(info);
                 break;
+
             }
         }
         SetupDiDestroyDeviceInfoList(devInfo);
     }
     return rv;
 }
-bool USBMonitor::getDeviceDetailsWin( USBPortInfo* portInfo, HDEVINFO devInfo, PSP_DEVINFO_DATA devData, WPARAM wParam )
-{
-    portInfo->friendName = getDeviceProperty(devInfo, devData, SPDRP_FRIENDLYNAME);
-    if( wParam == DBT_DEVICEARRIVAL)
-        portInfo->physName = getDeviceProperty(devInfo, devData, SPDRP_PHYSICAL_DEVICE_OBJECT_NAME);
-    portInfo->enumName = getDeviceProperty(devInfo, devData, SPDRP_ENUMERATOR_NAME);
-    QString hardwareIDs = getDeviceProperty(devInfo, devData, SPDRP_HARDWAREID);
-    QRegExp idRx("VID_(\\w+)&PID_(\\w+)");
-    if( hardwareIDs.toUpper().contains(idRx) )
-    {
-        bool dummy;
-        portInfo->vendorID = idRx.cap(1).toInt(&dummy, 16);
-        portInfo->productID = idRx.cap(2).toInt(&dummy, 16);
-    }
-    qDebug()<<portInfo->productID;
-    return true;
-}
+
 QString USBMonitor::getDeviceProperty(HDEVINFO devInfo, PSP_DEVINFO_DATA devData, DWORD property)
 {
     DWORD buffSize = 0;
@@ -206,23 +198,105 @@ Returns a list of all currently available devices
 QList<USBPortInfo> USBMonitor::availableDevices()
 {
     QList<USBPortInfo> ports;
-    enumerateDevicesWin(GUID_DEVCLASS_PORTS, &ports);
+    enumerateDevicesWin(guid_hid, &ports);
     return ports;
 }
 void USBMonitor::enumerateDevicesWin( const GUID & guid, QList<USBPortInfo>* infoList )
 {
     HDEVINFO devInfo;
-    if( (devInfo = SetupDiGetClassDevs(&guid, NULL, NULL, DIGCF_PRESENT)) != INVALID_HANDLE_VALUE)
+    USBPortInfo info;
+
+    if( (devInfo = SetupDiGetClassDevs(&guid, NULL, NULL, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE)) != INVALID_HANDLE_VALUE)
     {
+
         SP_DEVINFO_DATA devInfoData;
         devInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
         for(int i = 0; SetupDiEnumDeviceInfo(devInfo, i, &devInfoData); i++)
         {
-            USBPortInfo info;
-            info.productID = info.vendorID = 0;
-            getDeviceDetailsWin( &info, devInfo, &devInfoData );
-            infoList->append(info);
+            if(infoFromHandle(guid,info,devInfo))
+                infoList->append(info);
         }
         SetupDiDestroyDeviceInfoList(devInfo);
     }
+}
+bool USBMonitor::infoFromHandle(const GUID & guid,USBPortInfo & info,HDEVINFO & devInfo)
+{
+    bool ret;
+    HANDLE h;
+    SP_DEVICE_INTERFACE_DATA iface;
+    SP_DEVICE_INTERFACE_DETAIL_DATA *details;
+    DWORD index=0, reqd_size;
+    HIDD_ATTRIBUTES attrib;
+    PHIDP_PREPARSED_DATA hid_data;
+    HIDP_CAPS capabilities;
+
+    iface.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
+    ret = SetupDiEnumDeviceInterfaces(devInfo, NULL, &guid, index, &iface);
+    if (!ret) return false;
+    SetupDiGetInterfaceDeviceDetail(devInfo, &iface, NULL, 0, &reqd_size, NULL);
+    details = (SP_DEVICE_INTERFACE_DETAIL_DATA *)malloc(reqd_size);
+    if (details == NULL) return false;
+
+    memset(details, 0, reqd_size);
+    details->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
+    ret = SetupDiGetDeviceInterfaceDetail(devInfo, &iface, details, reqd_size, NULL, NULL);
+    if (!ret)
+    {
+            free(details);
+            return false;
+    }
+
+    h = CreateFile(details->DevicePath, GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ|FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+
+    if (h == INVALID_HANDLE_VALUE)
+    {
+            DWORD err = GetLastError();
+
+            // I get ERROR_ACCESS_DENIED with most/all my input devices (mice/trackballs/tablet).
+            // Let's not log it :)
+            if (err == ERROR_ACCESS_DENIED)
+            {
+                    free(details);
+                    return false;
+            }
+
+            qDebug() << "Problem opening handle, path: " << QString().fromWCharArray(details->DevicePath);
+
+            free(details);
+            return false;
+    }
+
+    free(details);
+
+    attrib.Size = sizeof(HIDD_ATTRIBUTES);
+    ret = HidD_GetAttributes(h, &attrib);
+    info.vendorID=attrib.VendorID;
+    info.productID=attrib.ProductID;
+    info.bcdDevice=attrib.VersionNumber;
+
+
+    if (!ret || !HidD_GetPreparsedData(h, &hid_data))
+    {
+            CloseHandle(h);
+            return false;
+    }
+
+    if (!HidP_GetCaps(hid_data, &capabilities))
+    {
+            HidD_FreePreparsedData(hid_data);
+            CloseHandle(h);
+            return false;
+    }
+    info.UsagePage=capabilities.UsagePage;
+    HidD_FreePreparsedData(hid_data);
+    char temp[126];
+    HidD_GetSerialNumberString(h, temp, sizeof(temp));
+    info.serialNumber= QString().fromUtf16((ushort*)temp,-1);
+    HidD_GetManufacturerString(h, temp, sizeof(temp));
+    info.manufacturer= QString().fromUtf16((ushort*)temp,-1);
+    HidD_GetProductString(h, temp, sizeof(temp));
+    info.product= QString().fromUtf16((ushort*)temp,-1);
+    CloseHandle(h);
+    h = NULL;
+    return true;
 }

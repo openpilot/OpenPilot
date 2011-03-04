@@ -37,8 +37,12 @@ struct USBPortInfo {
     QString physName;
     QString enumName;   ///< It seems its the only one with meaning
     QString serialNumber; // As a string as it can be anything, really...
+    QString manufacturer;
+    QString product;
+    int UsagePage;
     int vendorID;       ///< Vendor ID.
     int productID;      ///< Product ID
+    int bcdDevice;
 };
 
 // Depending on the OS, we'll need different things:
@@ -139,6 +143,7 @@ private:
     QSocketNotifier *monitorNotifier;
     USBPortInfo makePortInfo(struct udev_device *dev);
 #elif defined (Q_OS_WIN32)
+    GUID guid_hid;
     void setUpNotifications();
      /*!
      * Get specific property from registry.
@@ -150,9 +155,7 @@ private:
      * \return property string.
      */
     static QString getDeviceProperty(HDEVINFO devInfo, PSP_DEVINFO_DATA devData, DWORD property);
-
-    static bool getDeviceDetailsWin( USBPortInfo* portInfo, HDEVINFO devInfo,
-                                     PSP_DEVINFO_DATA devData, WPARAM wParam = DBT_DEVICEARRIVAL );
+    static bool infoFromHandle(const GUID & guid,USBPortInfo & info,HDEVINFO & devInfo);
     static void enumerateDevicesWin( const GUID & guidDev, QList<USBPortInfo>* infoList );
     bool matchAndDispatchChangedDevice(const QString & deviceID, const GUID & guid, WPARAM wParam);
 #ifdef QT_GUI_LIB

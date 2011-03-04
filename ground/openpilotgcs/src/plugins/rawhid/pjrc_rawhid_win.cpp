@@ -386,8 +386,6 @@ QString pjrc_rawhid::getserial(int num)
 
         // Should we do some "critical section" stuff here??
         char temp[126];
-        HidD_GetSerialNumberString(hid->handle, temp, sizeof(temp));
-        qDebug()<<"MANUF"<<QString().fromUtf16((ushort*)temp,-1);
         if (!HidD_GetSerialNumberString(hid->handle, temp, sizeof(temp)))
         {
                 DWORD err = GetLastError();

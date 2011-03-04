@@ -52,9 +52,7 @@
 #include "attitude.h"
 #include "attituderaw.h"
 #include "attitudeactual.h"
-#include "stabilizationdesired.h"
 #include "attitudesettings.h"
-#include "manualcontrolcommand.h"
 #include "CoordinateConversions.h"
 #include "pios_flash_w25x.h"
 

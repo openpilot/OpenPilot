@@ -54,8 +54,11 @@ RawHIDConnection::RawHIDConnection()
 RawHIDConnection::~RawHIDConnection()
 {
 	if (RawHidHandle)
-	{
-	}
+            if (RawHidHandle->isOpen())
+                RawHidHandle->close();
+
+        m_usbMonitor.quit();
+        m_usbMonitor.wait(500);
 }
 
 /**

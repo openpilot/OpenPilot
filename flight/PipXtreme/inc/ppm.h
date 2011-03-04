@@ -32,7 +32,7 @@
 
 void ppm_1ms_tick(void);
 void ppm_process(void);
-void ppm_init(void);
+void ppm_init(uint32_t our_sn);
 
 // *************************************************************
 

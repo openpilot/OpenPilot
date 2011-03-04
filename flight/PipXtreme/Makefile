@@ -129,6 +129,7 @@ SRC += $(PIOSSTM32F10X)/pios_irq.c
 SRC += $(PIOSSTM32F10X)/pios_adc.c
 SRC += $(PIOSSTM32F10X)/pios_gpio.c
 SRC += $(PIOSSTM32F10X)/pios_spi.c
+SRC += $(PIOSSTM32F10X)/pios_ppm.c
 
 # PIOS USB related files (seperated to make code maintenance more easy)
 ifeq ($(USE_USB), YES)

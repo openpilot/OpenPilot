@@ -287,7 +287,8 @@ uint16_t			timeout_ms = 20000;					//
 uint16_t			timeout_sync_ms = 3;				//
 uint16_t			timeout_data_ms = 20;				//
 
-t_rfm22_TxDataCallback		tx_data_callback_function;
+t_rfm22_TxDataByteCallback		tx_data_byte_callback_function;
+t_rfm22_RxDataByteCallback		rx_data_byte_callback_function;
 
 // ************************************
 // SPI read/write
@@ -922,6 +923,10 @@ void rfm22_setTxMode(uint8_t mode)
 			// add some data
 			for (uint16_t j = wr - rd; j > 0; j--)
 			{
+//				int16_t b = -1;
+//				if (tx_data_byte_callback_function)
+//					b = tx_data_byte_callback_function();
+
 				rfm22_burstWrite(tx_data_addr[rd++]);
 				if (++i >= max_bytes) break;
 			}
@@ -1082,6 +1087,12 @@ void rfm22_processRxInt(void)
 			for (register uint16_t i = RX_FIFO_HI_WATERMARK; i > 0; i--)
 			{
 				register uint8_t b = rfm22_burstRead();	// read a byte from the rf modules RX FIFO buffer
+
+				if (rx_data_byte_callback_function)
+				{
+					rx_data_byte_callback_function(b);
+				}
+
 				if (wr < sizeof(rx_buffer))
 					rx_buffer[wr++] = b;				// save the byte into our rx buffer
 			}
@@ -1151,11 +1162,18 @@ void rfm22_processRxInt(void)
 			{	// their must still be data in the RX FIFO we need to get
 
 				rfm22_startBurstRead(RFM22_fifo_access);
-				while (wr < len)
-				{
-					if (wr >= sizeof(rx_buffer)) break;
-					rx_buffer[wr++] = rfm22_burstRead();
-				}
+					while (wr < len)
+					{
+						register uint8_t b = rfm22_burstRead();
+
+						if (rx_data_byte_callback_function)
+						{
+							rx_data_byte_callback_function(b);
+						}
+
+						if (wr >= sizeof(rx_buffer)) break;
+						rx_buffer[wr++] = b;
+					}
 				rfm22_endBurstRead();
 
 				rx_buffer_wr = wr;
@@ -1220,6 +1238,10 @@ uint8_t rfm22_topUpRFTxFIFO(void)
 		// add some data
 		for (uint16_t j = wr - rd; j > 0; j--)
 		{
+//			int16_t b = -1;
+//			if (tx_data_byte_callback_function)
+//				b = tx_data_byte_callback_function();
+
 			rfm22_burstWrite(tx_data_addr[rd++]);
 			if (++i >= max_bytes) break;
 		}
@@ -1794,9 +1816,8 @@ uint8_t rfm22_getFreqCalibration(void)
 
 void rfm22_1ms_tick(void)
 {	// call this once every ms
-
-	if (!initialized)
-		return;				// we haven't yet been initialized
+	if (booting) return;
+	if (!initialized) return;		// we haven't yet been initialized
 
 	if (rf_mode != RX_SCAN_SPECTRUM)
 	{
@@ -1809,8 +1830,8 @@ void rfm22_1ms_tick(void)
 
 void rfm22_process(void)
 {
-	if (!initialized)
-		return;				// we haven't yet been initialized
+	if (booting) return;
+	if (!initialized) return;	// we haven't yet been initialized
 
 	#if !defined(RFM22_EXT_INT_USE)
 		if (rf_mode != RX_SCAN_SPECTRUM)
@@ -1942,9 +1963,14 @@ void rfm22_process(void)
 
 // ************************************
 
-void rfm22_TxData_SetCallback(t_rfm22_TxDataCallback new_function)
+void rfm22_TxDataByte_SetCallback(t_rfm22_TxDataByteCallback new_function)
 {
-	tx_data_callback_function = new_function;
+	tx_data_byte_callback_function = new_function;
+}
+
+void rfm22_RxDataByte_SetCallback(t_rfm22_RxDataByteCallback new_function)
+{
+	rx_data_byte_callback_function = new_function;
 }
 
 // ************************************
@@ -2028,7 +2054,8 @@ int rfm22_resetModule(uint8_t mode, uint32_t min_frequency_hz, uint32_t max_freq
 	rssi = 0;
 	rssi_dBm = -200;
 
-	tx_data_callback_function = NULL;
+	tx_data_byte_callback_function = NULL;
+	rx_data_byte_callback_function = NULL;
 
 	rx_buffer_current = 0;
 	rx_buffer_wr = 0;

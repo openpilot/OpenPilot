@@ -32,7 +32,7 @@
 
 void stream_1ms_tick(void);
 void stream_process(void);
-void stream_init(void);
+void stream_init(uint32_t our_sn);
 
 // *************************************************************
 

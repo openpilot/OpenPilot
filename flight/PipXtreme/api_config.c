@@ -30,6 +30,8 @@
 #include "api_config.h"
 #include "rfm22b.h"
 #include "packet_handler.h"
+#include "stream.h"
+#include "ppm.h"
 #include "saved_settings.h"
 #include "crc.h"
 #include "main.h"
@@ -344,6 +346,8 @@ void apiconfig_processInputPacket(void *buf, uint16_t len)
 			if (header->serial_number == serial_number_crc32)
 			{	// the packet is meant for us
 
+				booting = true;
+
 			    ph_set_remote_serial_number(0, 0);	// stop the packet handler trying to communicate
 
 			    // ******
@@ -384,59 +388,53 @@ void apiconfig_processInputPacket(void *buf, uint16_t len)
 			    		break;
 			    }
 
-			    if (saved_settings.mode != MODE_SCAN_SPECTRUM)
-			    {
-			    	if (saved_settings.mode == MODE_STREAM_TX || saved_settings.mode == MODE_PPM_TX)
-			    		rfm22_init_tx_stream(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz);
-			    	else
-			    	if (saved_settings.mode == MODE_STREAM_RX || saved_settings.mode == MODE_PPM_RX)
-			    		rfm22_init_rx_stream(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz);
-			    	else
-			    		rfm22_init_normal(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz, rfm22_freqHopSize());
-
-				    rfm22_setFreqCalibration(saved_settings.rf_xtal_cap);
-				    ph_setNominalCarrierFrequency(saved_settings.frequency_Hz);
-				    ph_setDatarate(saved_settings.max_rf_bandwidth);
-				    ph_setTxPower(saved_settings.max_tx_power);
-
-				    ph_set_remote_encryption(0, saved_settings.aes_enable, (const void *)saved_settings.aes_key);
-				    ph_set_remote_serial_number(0, saved_settings.destination_id);
-			    }
-			    else
-			    {
-					rfm22_init_scan_spectrum(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz);
-				    rfm22_setFreqCalibration(saved_settings.rf_xtal_cap);
-			    	apiconfig_spec_start_freq = saved_settings.min_frequency_Hz;
-			    	apiconfig_spec_freq = apiconfig_spec_start_freq;
-			    	apiconfig_spec_buffer_wr = 0;
-			    	apiconfig_ss_timer = 0;
-			    }
-
 			    switch (saved_settings.mode)
 			    {
-			    	case MODE_NORMAL:					// normal 2-way packet mode
+			    	case MODE_NORMAL:						// normal 2-way packet mode
+			   			ph_init(serial_number_crc32);		// initialise the packet handler
 			    		break;
-			    	case MODE_STREAM_TX:				// 1-way continuous tx packet mode
-			    		rfm22_setTxStream();			// TEST ONLY
+
+			    	case MODE_STREAM_TX:					// 1-way continuous tx packet mode
+			    	case MODE_STREAM_RX:					// 1-way continuous rx packet mode
+			   			stream_init(serial_number_crc32);	// initialise the continuous packet stream module
 		    			break;
-			    	case MODE_STREAM_RX:				// 1-way continuous rx packet mode
+
+			    	case MODE_PPM_TX:						// PPM tx mode
+			    	case MODE_PPM_RX:						// PPM rx mode
+			   			ppm_init(serial_number_crc32);		// initialise the PPM module
 		    			break;
-			    	case MODE_PPM_TX:					// PPM tx mode
-			    		rfm22_setTxStream();			// TEST ONLY
-			    		break;
-			    	case MODE_PPM_RX:					// PPM rx mode
-		    			break;
+
 			    	case MODE_SCAN_SPECTRUM:			// scan the receiver over the whole band
+						rfm22_init_scan_spectrum(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz);
+					    rfm22_setFreqCalibration(saved_settings.rf_xtal_cap);
+				    	apiconfig_spec_start_freq = saved_settings.min_frequency_Hz;
+				    	apiconfig_spec_freq = apiconfig_spec_start_freq;
+				    	apiconfig_spec_buffer_wr = 0;
+				    	apiconfig_ss_timer = 0;
 			    		break;
+
 			    	case MODE_TX_BLANK_CARRIER_TEST:	// blank carrier Tx mode (for calibrating the carrier frequency say)
+			    		rfm22_init_normal(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz, rfm22_freqHopSize());
+			    	    rfm22_setFreqCalibration(saved_settings.rf_xtal_cap);
+			    	    rfm22_setNominalCarrierFrequency(saved_settings.frequency_Hz);
+			    	    rfm22_setDatarate(saved_settings.max_rf_bandwidth, TRUE);
+			    	    rfm22_setTxPower(saved_settings.max_tx_power);
 			    		rfm22_setTxCarrierMode();
 			    		break;
+
 			    	case MODE_TX_SPECTRUM_TEST:			// pseudo random Tx data mode (for checking the Tx carrier spectrum)
+			    		rfm22_init_normal(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz, rfm22_freqHopSize());
+			    	    rfm22_setFreqCalibration(saved_settings.rf_xtal_cap);
+			    	    rfm22_setNominalCarrierFrequency(saved_settings.frequency_Hz);
+			    	    rfm22_setDatarate(saved_settings.max_rf_bandwidth, TRUE);
+			    	    rfm22_setTxPower(saved_settings.max_tx_power);
 			    		rfm22_setTxPNMode();
 			    		break;
 			    }
 
 			    // ******
+
+			    booting = false;
 			}
 
 			break;

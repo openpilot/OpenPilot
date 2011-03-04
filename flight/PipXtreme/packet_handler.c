@@ -348,10 +348,23 @@ int ph_startConnect(int connection_index, uint32_t sn)
 }
 
 // *****************************************************************************
+// return a byte for the tx packet transmission.
+//
+// return value < 0 if no more bytes available, otherwise return byte to be sent
 
-void rfm22_TxDataCallback(uint8_t *data, uint16_t len)
+int16_t ph_TxDataByteCallback(void)
 {
+	return -1;
+}
 
+// *************************************************************
+// we are being given a received byte
+//
+// return TRUE to continue current packet receive, otherwise return FALSe to halt current packet reception
+
+bool ph_RxDataByteCallback(uint8_t b)
+{
+	return true;
 }
 
 // *****************************************************************************
@@ -1518,8 +1531,6 @@ int ph_set_remote_serial_number(int connection_index, uint32_t sn)
       fifoBuf_init(&conn->tx_fifo_buffer, conn->tx_buffer, PH_FIFO_BUFFER_SIZE);
       fifoBuf_init(&conn->rx_fifo_buffer, conn->rx_buffer, PH_FIFO_BUFFER_SIZE);
 
-      rfm22_TxData_SetCallback(rfm22_TxDataCallback);
-
       return connection_index;
   }
 
@@ -1542,6 +1553,8 @@ void ph_set_remote_encryption(int connection_index, bool enabled, const void *ke
 
 void ph_1ms_tick(void)
 {
+	if (booting) return;
+
 	if (saved_settings.mode == MODE_NORMAL)
 	{
 		// help randomize the encryptor cbc bytes
@@ -1597,6 +1610,8 @@ void ph_1ms_tick(void)
 
 void ph_process(void)
 {
+	if (booting) return;
+
 	if (saved_settings.mode == MODE_NORMAL)
 	{
 		ph_processRxPacket();
@@ -1612,7 +1627,7 @@ void ph_process(void)
 
 // *****************************************************************************
 
-void ph_init(uint32_t our_sn, uint32_t datarate_bps, uint8_t tx_power)
+void ph_init(uint32_t our_sn)
 {
   our_serial_number = our_sn;	// remember our own serial number
 
@@ -1665,20 +1680,33 @@ void ph_init(uint32_t our_sn, uint32_t datarate_bps, uint8_t tx_power)
       conn->rx_afc_Hz = 0;
   }
 
-  ph_setDatarate(datarate_bps);
-
-  ph_setTxPower(tx_power);
-
   // set the AES encryption key using the default AES key
   ph_set_AES128_key(default_aes_key);
 
-  // try too randomize the tx AES CBC bytes
+  // try too randomise the tx AES CBC bytes
   for (uint32_t j = 0, k = 0; j < 123 + (random32 & 1023); j++)
   {
       random32 = updateCRC32(random32, 0xff);
       enc_cbc[k] ^= random32 >> 3;
       if (++k >= sizeof(enc_cbc)) k = 0;
   }
+
+  // ******
+
+  rfm22_init_normal(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz, rfm22_freqHopSize());
+
+  rfm22_TxDataByte_SetCallback(ph_TxDataByteCallback);
+  rfm22_RxDataByte_SetCallback(ph_RxDataByteCallback);
+
+  rfm22_setFreqCalibration(saved_settings.rf_xtal_cap);
+  ph_setNominalCarrierFrequency(saved_settings.frequency_Hz);
+  ph_setDatarate(saved_settings.max_rf_bandwidth);
+  ph_setTxPower(saved_settings.max_tx_power);
+
+  ph_set_remote_encryption(0, saved_settings.aes_enable, (const void *)saved_settings.aes_key);
+  ph_set_remote_serial_number(0, saved_settings.destination_id);
+
+  // ******
 }
 
 // *****************************************************************************

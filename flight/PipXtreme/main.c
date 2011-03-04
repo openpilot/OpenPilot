@@ -1,3 +1,4 @@
+
 /**
  ******************************************************************************
  *
@@ -391,9 +392,9 @@ void init_RF_module(void)
     }
 
     rfm22_setFreqCalibration(saved_settings.rf_xtal_cap);
-    ph_setNominalCarrierFrequency(saved_settings.frequency_Hz);
-    ph_setDatarate(saved_settings.max_rf_bandwidth);
-    ph_setTxPower(saved_settings.max_tx_power);
+    rfm22_setNominalCarrierFrequency(saved_settings.frequency_Hz);
+    rfm22_setDatarate(saved_settings.max_rf_bandwidth, TRUE);
+    rfm22_setTxPower(saved_settings.max_tx_power);
 }
 
 // *****************************************************************************
@@ -553,12 +554,10 @@ int main()
 
     // *************
 
-    random32 ^= serial_number_crc32;                    // try to randomize the random number
-//      random32 ^= serial_number_crc32 ^ CRC_IDR;      // try to randomize the random number
+    random32 ^= serial_number_crc32;                    // try to randomise the random number
+//      random32 ^= serial_number_crc32 ^ CRC_IDR;      // try to randomise the random number
 
-    ph_init(serial_number_crc32, 128000, 0);            // initialise the packet handler
-
-    trans_init();                                       // initialise the tranparent communications module
+    trans_init();                                       // initialise the transparent communications module
 
 //	api_init();  	  	                                // initialise the API communications module
     apiconfig_init();                                    // initialise the API communications module
@@ -728,41 +727,57 @@ int main()
 
     init_RF_module();	// initialise the RF module
 
-    stream_init();		// initialise the continuous packet stream module
+    // *************
 
-    ppm_init();			// initialise the ppm module
+	#if defined(PIOS_COM_DEBUG)
+    	DEBUG_PRINTF("\r\n");
+    	DEBUG_PRINTF("RF datarate: %dbps\r\n", ph_getDatarate());
+    	DEBUG_PRINTF("RF frequency: %dHz\r\n", rfm22_getNominalCarrierFrequency());
+    	DEBUG_PRINTF("RF TX power: %d\r\n", ph_getTxPower());
 
-    saved_settings_save();
+    	DEBUG_PRINTF("\r\nUnit mode: ");
+    	switch (saved_settings.mode)
+    	{
+    		case MODE_NORMAL:					DEBUG_PRINTF("NORMAL\r\n"); break;
+    		case MODE_STREAM_TX:				DEBUG_PRINTF("STREAM-TX\r\n"); break;
+    		case MODE_STREAM_RX:				DEBUG_PRINTF("STREAM-RX\r\n"); break;
+    		case MODE_PPM_TX:					DEBUG_PRINTF("PPM-TX\r\n"); break;
+    		case MODE_PPM_RX:					DEBUG_PRINTF("PPM-RX\r\n"); break;
+    		case MODE_SCAN_SPECTRUM:			DEBUG_PRINTF("SCAN-SPECTRUM\r\n"); break;
+    		case MODE_TX_BLANK_CARRIER_TEST:	DEBUG_PRINTF("TX-BLANK-CARRIER\r\n"); break;
+    		case MODE_TX_SPECTRUM_TEST:			DEBUG_PRINTF("TX_SPECTRUM\r\n"); break;
+    		default:							DEBUG_PRINTF("UNKNOWN [%u]\r\n", saved_settings.mode); break;
+    	}
+	#endif
 
-    booting = FALSE;
+   	switch (saved_settings.mode)
+   	{
+   		case MODE_NORMAL:
+   			ph_init(serial_number_crc32);            // initialise the packet handler
+   			break;
+
+   		case MODE_STREAM_TX:
+   		case MODE_STREAM_RX:
+   			stream_init(serial_number_crc32);		// initialise the continuous packet stream module
+   			break;
+
+   		case MODE_PPM_TX:
+   		case MODE_PPM_RX:
+   			ppm_init(serial_number_crc32);			// initialise the ppm module
+   			break;
+
+   		case MODE_SCAN_SPECTRUM:
+   		case MODE_TX_BLANK_CARRIER_TEST:
+   		case MODE_TX_SPECTRUM_TEST:
+   			break;
+   	}
 
     // *************
     // Main executive loop
 
-    #if defined(PIOS_COM_DEBUG)
-        DEBUG_PRINTF("\r\n");
-        DEBUG_PRINTF("RF datarate: %dbps\r\n", ph_getDatarate());
-        DEBUG_PRINTF("RF frequency: %dHz\r\n", rfm22_getNominalCarrierFrequency());
-        DEBUG_PRINTF("RF TX power: %d\r\n", ph_getTxPower());
+    saved_settings_save();
 
-        DEBUG_PRINTF("\r\nUnit mode: ");
-        switch (saved_settings.mode)
-        {
-        	case MODE_NORMAL:					DEBUG_PRINTF("NORMAL\r\n"); break;
-        	case MODE_STREAM_TX:				DEBUG_PRINTF("STREAM-TX\r\n"); break;
-        	case MODE_STREAM_RX:				DEBUG_PRINTF("STREAM-RX\r\n"); break;
-        	case MODE_PPM_TX:					DEBUG_PRINTF("PPM-TX\r\n"); break;
-        	case MODE_PPM_RX:					DEBUG_PRINTF("PPM-RX\r\n"); break;
-        	case MODE_SCAN_SPECTRUM:			DEBUG_PRINTF("SCAN-SPECTRUM\r\n"); break;
-        	case MODE_TX_BLANK_CARRIER_TEST:	DEBUG_PRINTF("TX-BLANK-CARRIER\r\n"); break;
-        	case MODE_TX_SPECTRUM_TEST:			DEBUG_PRINTF("TX_SPECTRUM\r\n"); break;
-        	default:							DEBUG_PRINTF("UNKNOWN [%u]\r\n", saved_settings.mode); break;
-        }
-    #endif
-
-    // start a remote connection going to another modem
-    ph_set_remote_encryption(0, saved_settings.aes_enable, (const void *)saved_settings.aes_key);
-    ph_set_remote_serial_number(0, saved_settings.destination_id);
+    booting = FALSE;
 
     for (;;)
     {

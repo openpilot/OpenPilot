@@ -40,6 +40,8 @@
 
 void ppm_1ms_tick(void)
 {
+	if (booting) return;
+
 	if (saved_settings.mode == MODE_PPM_TX)
 	{
 	}
@@ -47,6 +49,26 @@ void ppm_1ms_tick(void)
 	if (saved_settings.mode == MODE_PPM_RX)
 	{
 	}
+}
+
+// *************************************************************
+// return a byte for the tx packet transmission.
+//
+// return value < 0 if no more bytes available, otherwise return byte to be sent
+
+int16_t ppm_TxDataByteCallback(void)
+{
+	return -1;
+}
+
+// *************************************************************
+// we are being given a received byte
+//
+// return TRUE to continue current packet receive, otherwise return FALSe to halt current packet reception
+
+bool ppm_RxDataByteCallback(uint8_t b)
+{
+	return true;
 }
 
 // *************************************************************
@@ -54,6 +76,8 @@ void ppm_1ms_tick(void)
 
 void ppm_process(void)
 {
+	if (booting) return;
+
 	if (saved_settings.mode == MODE_PPM_TX)
 	{
 	}
@@ -65,12 +89,27 @@ void ppm_process(void)
 
 // *************************************************************
 
-void ppm_init(void)
+void ppm_init(uint32_t our_sn)
 {
 	#if defined(PPM_DEBUG)
 		DEBUG_PRINTF("\r\nPPM init\r\n");
 	#endif
 
+	if (saved_settings.mode == MODE_PPM_TX)
+		rfm22_init_tx_stream(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz);
+	else
+	if (saved_settings.mode == MODE_PPM_RX)
+		rfm22_init_rx_stream(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz);
+
+	rfm22_TxDataByte_SetCallback(ppm_TxDataByteCallback);
+	rfm22_RxDataByte_SetCallback(ppm_RxDataByteCallback);
+
+    rfm22_setFreqCalibration(saved_settings.rf_xtal_cap);
+	rfm22_setNominalCarrierFrequency(saved_settings.frequency_Hz);
+	rfm22_setDatarate(saved_settings.max_rf_bandwidth, FALSE);
+	rfm22_setTxPower(saved_settings.max_tx_power);
+
+	rfm22_setTxStream();			// TEST ONLY
 }
 
 // *************************************************************

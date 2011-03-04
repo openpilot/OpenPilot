@@ -70,9 +70,9 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDevice)
     QList<USBPortInfo> thePortsWeWant;
 
     foreach (USBPortInfo port, allPorts) {
-        thePortsWeWant.append(port);
+        if((port.vendorID==vid || vid==-1) && (port.productID==pid || vid==-1) && (port.bcdDevice==bcdDevice || bcdDevice==-1))
+            thePortsWeWant.append(port);
     }
-
     return thePortsWeWant;
 }
 
@@ -229,8 +229,11 @@ void USBMonitor::enumerateDevicesWin( const GUID & guid, QList<USBPortInfo>* inf
         devInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
         for(DWORD i = 0; SetupDiEnumDeviceInfo(devInfo, i, &devInfoData); i++)
         {
-            if(infoFromHandle(guid,info,devInfo,i)!=0)
+            int r=infoFromHandle(guid,info,devInfo,i);
+            if(r==1)
                 infoList->append(info);
+            else if (r==0)
+                break;
         }
 
         SetupDiDestroyDeviceInfoList(devInfo);

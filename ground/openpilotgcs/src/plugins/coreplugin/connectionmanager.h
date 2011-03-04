@@ -104,6 +104,10 @@ protected:
 
     //currently connected QIODevice
     QIODevice *m_ioDev;
+
+private:
+	bool connectDevice();
+
 };
 
 } //namespace Core

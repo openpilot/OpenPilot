@@ -102,6 +102,76 @@ void ConnectionManager::init()
 }
 
 /**
+*   Method called when the user clicks the "Connect" button
+*/
+bool ConnectionManager::connectDevice()
+{
+	devListItem connection_device = findDevice(m_availableDevList->currentText());
+	if (!connection_device.connection)
+		return false;
+
+	QIODevice *io_dev = connection_device.connection->openDevice(connection_device.devName);
+	if (!io_dev)
+		return false;
+
+	io_dev->open(QIODevice::ReadWrite);
+
+	// check if opening the device worked
+	if (!io_dev->isOpen())
+	{
+		qDebug() << "Error: could not connect to " << connection_device.devName;
+		return false;
+	}
+
+	// we appear to have connected to the device OK
+
+	// remember the connection/device details
+	m_connectionDevice = connection_device;
+	m_ioDev = io_dev;
+
+	connect(m_connectionDevice.connection, SIGNAL(deviceClosed(QObject *)), this, SLOT(onConnectionClosed(QObject *)), Qt::QueuedConnection);
+	connect(m_connectionDevice.connection, SIGNAL(destroyed(QObject *)), this, SLOT(onConnectionDestroyed(QObject *)), Qt::QueuedConnection);
+
+	m_connectBtn->setText("Disconnect");
+	m_availableDevList->setEnabled(false);
+
+	// signal interested plugins that we connected to the device
+	emit deviceConnected(m_ioDev);
+
+	return true;
+}
+
+/**
+*   Method called by plugins who want to force a disconnection.
+*   Used by Uploader gadget for instance.
+*/
+bool ConnectionManager::disconnectDevice()
+{
+	if (!m_ioDev)
+	{   // apparently we are already disconnected
+
+		m_connectionDevice.connection = NULL;
+		m_ioDev = NULL;
+
+		return false;
+	}
+
+	// we appear to be connected - disconnect from the device
+
+	try
+	{
+		if (m_connectionDevice.connection)
+			m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
+	}
+	catch (...)
+	{	// handle exception
+		qDebug() << "Exception: m_connectionDevice.connection->closeDevice(" << m_connectionDevice.devName << ")";
+	}
+
+	onConnectionClosed(m_connectionDevice.connection);
+}
+
+/**
 *   Slot called when a plugin added an object to the core pool
 */
 void ConnectionManager::objectAdded(QObject *obj)
@@ -129,42 +199,14 @@ void ConnectionManager::aboutToRemoveObject(QObject *obj)
     IConnection *connection = Aggregation::query<IConnection>(obj);
 	if (!connection) return;
 
-	if (m_connectionsList.contains(connection))
-		m_connectionsList.removeAt(m_connectionsList.indexOf(connection));
-}
-
-/**
-*   Method called by plugins who want to force a disconnection. Used
-*   by Uploader gadget for instance.
-*/
-bool ConnectionManager::disconnectDevice()
-{
-    // Check if we are currently connected or not
-	if (!m_ioDev)
-        return false; // We were not connected
-
-	//signal interested plugins that we are disconnecting the device
-	emit deviceDisconnected();
-
-	try
-	{
-		if (m_connectionDevice.connection)
-		{
-			m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
-			m_connectionDevice.connection = NULL;
-			m_ioDev = NULL;
-		}
-	}
-	catch (...)
-	{	// handle exception
+	if (m_connectionDevice.connection && m_connectionDevice.connection == connection)	// Pip
+	{	// we are currently using the one that is about to be removed
 		m_connectionDevice.connection = NULL;
 		m_ioDev = NULL;
 	}
 
-	m_connectBtn->setText("Connect");
-    m_availableDevList->setEnabled(true);
-
-    return true;
+	if (m_connectionsList.contains(connection))
+		m_connectionsList.removeAt(m_connectionsList.indexOf(connection));
 }
 
 void ConnectionManager::onConnectionClosed(QObject *obj)	// Pip
@@ -172,20 +214,8 @@ void ConnectionManager::onConnectionClosed(QObject *obj)	// Pip
 	if (!m_connectionDevice.connection || m_connectionDevice.connection != obj)
 		return;
 
-	try
-	{
-		if (m_connectionDevice.connection)
-		{
-			m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
-			m_connectionDevice.connection = NULL;
-			m_ioDev = NULL;
-		}
-	}
-	catch (...)
-	{	// handle exception
-		m_connectionDevice.connection = NULL;
-		m_ioDev = NULL;
-	}
+	m_connectionDevice.connection = NULL;
+	m_ioDev = NULL;
 
 	m_connectBtn->setText("Connect");
 	m_availableDevList->setEnabled(true);
@@ -196,14 +226,7 @@ void ConnectionManager::onConnectionClosed(QObject *obj)	// Pip
 
 void ConnectionManager::onConnectionDestroyed(QObject *obj)	// Pip
 {
-	if (!m_connectionDevice.connection || m_connectionDevice.connection != obj)
-		return;
-
-	m_connectionDevice.connection = NULL;
-	m_ioDev = NULL;
-
-	m_connectBtn->setText("Connect");
-	m_availableDevList->setEnabled(true);
+	onConnectionClosed(obj);
 }
 
 /**
@@ -211,69 +234,13 @@ void ConnectionManager::onConnectionDestroyed(QObject *obj)	// Pip
 */
 void ConnectionManager::onConnectPressed()
 {
-	if (!m_ioDev)
+	if (!m_ioDev || !m_connectionDevice.connection)
 	{	// connecting
-
-        m_connectionDevice = findDevice(m_availableDevList->currentText());
-
-		if (m_connectionDevice.connection)
-        {
-            m_ioDev = m_connectionDevice.connection->openDevice(m_connectionDevice.devName);
-			if (m_ioDev)
-            {
-                m_ioDev->open(QIODevice::ReadWrite);
-
-                // check if opening the device worked
-                if (!m_ioDev->isOpen())
-                {
-                    qDebug() << "could not connect to " << m_connectionDevice.devName;
-
-                    // TODO: inform the user that something went wrong
-
-					m_connectionDevice.connection = NULL;
-					m_ioDev = NULL;
-                    return;
-                }
-
-				connect(m_connectionDevice.connection, SIGNAL(deviceClosed(QObject *)), this, SLOT(onConnectionClosed(QObject *)), Qt::QueuedConnection);
-				connect(m_connectionDevice.connection, SIGNAL(destroyed(QObject *)), this, SLOT(onConnectionDestroyed(QObject *)), Qt::QueuedConnection);
-
-                //signal interested plugins that the user wants to connect to the device
-                emit deviceConnected(m_ioDev);
-                m_connectBtn->setText("Disconnect");
-                m_availableDevList->setEnabled(false);
-                return;
-            }
-            else
-            {
-                m_connectionDevice.connection = NULL;
-                m_ioDev = NULL;
-            }
-        }
+		connectDevice();
     }
     else
 	{	// disconnecting
-
-		//signal interested plugins that user is disconnecting his device
-		emit deviceDisconnected();
-
-		try
-		{
-			if (m_connectionDevice.connection)
-			{
-				m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
-				m_connectionDevice.connection = NULL;
-				m_ioDev = NULL;
-			}
-		}
-		catch (...)
-		{	// handle exception
-			m_connectionDevice.connection = NULL;
-			m_ioDev = NULL;
-		}
-
-        m_connectBtn->setText("Connect");
-        m_availableDevList->setEnabled(true);
+		disconnectDevice();
     }
 }
 
@@ -293,21 +260,6 @@ devListItem ConnectionManager::findDevice(const QString &displayedName)
     devListItem d;
     d.connection = NULL;
     return d;
-}
-
-/**
-*   Unregister all devices from one connection plugin
-*   \param[in] connection Connection type that you want to forget about :)
-*/
-void ConnectionManager::unregisterAll(IConnection *connection)
-{
-	for (QLinkedList<devListItem>::iterator iter = m_devList.begin(); iter != m_devList.end(); )
-    {
-		if (iter->connection == connection)
-            iter = m_devList.erase(iter);
-        else
-            ++iter;
-    }
 }
 
 /**
@@ -341,6 +293,27 @@ void ConnectionManager::resumePolling()
 	m_availableDevList->setEnabled(true);
 }
 
+/**
+*   Unregister all devices from one connection plugin
+*   \param[in] connection Connection type that you want to forget about :)
+*/
+void ConnectionManager::unregisterAll(IConnection *connection)
+{
+	for (QLinkedList<devListItem>::iterator iter = m_devList.begin(); iter != m_devList.end(); )
+	{
+		if (iter->connection == connection)
+		{
+			if (m_connectionDevice.connection && m_connectionDevice.connection == connection)
+			{	// we are currently using the one we are about to erase
+				onConnectionClosed(m_connectionDevice.connection);
+			}
+
+			iter = m_devList.erase(iter);
+		}
+		else
+			++iter;
+	}
+}
 
 /**
 *   Register a device from a specific connection plugin
@@ -362,7 +335,6 @@ void ConnectionManager::registerDevice(IConnection *conn, const QString &devN, c
 */
 void ConnectionManager::devChanged(IConnection *connection)
 {
-
     //clear device list combobox
     m_availableDevList->clear();
 

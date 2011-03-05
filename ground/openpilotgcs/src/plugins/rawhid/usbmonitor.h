@@ -57,9 +57,15 @@ struct USBPortInfo {
 #include <QSocketNotifier>
 
 #elif defined (Q_OS_WIN32)
-#define _WIN32_WINNT 0x0500
-#define _WIN32_WINDOWS 0x0500
-#define WINVER 0x0500
+#ifndef _WIN32_WINNT
+    #define _WIN32_WINNT 0x0500
+#endif
+#ifndef _WIN32_WINDOWS
+    #define _WIN32_WINDOWS 0x0500
+#endif
+#ifndef WINVER
+    #define WINVER 0x0500
+#endif
 #include <windows.h>
 #include <dbt.h>
 #include <setupapi.h>

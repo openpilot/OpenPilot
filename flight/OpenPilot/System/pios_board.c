@@ -31,6 +31,9 @@
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 
+//#define I2C_DEBUG_PIN			0
+//#define USART_GPS_DEBUG_PIN		1
+
 #if defined(PIOS_INCLUDE_SPI)
 
 #include <pios_spi_priv.h>
@@ -546,7 +549,14 @@ void PIOS_USART_telem_irq_handler(void)
 static uint32_t pios_usart_gps_id;
 void PIOS_USART_gps_irq_handler(void)
 {
+#ifdef USART_GPS_DEBUG_PIN
+	PIOS_DEBUG_PinHigh(USART_GPS_DEBUG_PIN);
+#endif
 	PIOS_USART_IRQ_Handler(pios_usart_gps_id);
+#ifdef USART_GPS_DEBUG_PIN
+	PIOS_DEBUG_PinLow(USART_GPS_DEBUG_PIN);
+#endif
+
 }
 
 #ifdef PIOS_COM_AUX
@@ -827,8 +837,14 @@ const struct pios_i2c_adapter_cfg pios_i2c_main_adapter_cfg = {
 uint32_t pios_i2c_main_adapter_id;
 void PIOS_I2C_main_adapter_ev_irq_handler(void)
 {
-  /* Call into the generic code to handle the IRQ for this specific device */
-  PIOS_I2C_EV_IRQ_Handler(pios_i2c_main_adapter_id);
+#ifdef I2C_DEBUG_PIN
+	PIOS_DEBUG_PinHigh(I2C_DEBUG_PIN);
+#endif
+	/* Call into the generic code to handle the IRQ for this specific device */
+	PIOS_I2C_EV_IRQ_Handler(pios_i2c_main_adapter_id);
+#ifdef I2C_DEBUG_PIN
+	PIOS_DEBUG_PinLow(I2C_DEBUG_PIN);
+#endif
 }
 
 void PIOS_I2C_main_adapter_er_irq_handler(void)
@@ -937,6 +953,9 @@ void PIOS_Board_Init(void) {
 
 	/* Remap AFIO pin */
 	//GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);
+
+	/* Debug services */
+	PIOS_DEBUG_Init();
 
 	/* Delay system */
 	PIOS_DELAY_Init();	

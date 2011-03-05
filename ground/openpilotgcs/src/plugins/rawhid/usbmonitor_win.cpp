@@ -313,6 +313,7 @@ int USBMonitor::infoFromHandle(const GUID & guid,USBPortInfo & info,HDEVINFO & d
     }
     //qDebug()<<"index6="<<index;
     info.UsagePage=capabilities.UsagePage;
+    info.Usage=capabilities.Usage;
     HidD_FreePreparsedData(hid_data);
     char temp[126];
     HidD_GetSerialNumberString(h, temp, sizeof(temp));

@@ -41,6 +41,7 @@ struct USBPortInfo {
     QString product;
     QString devicePath; //only has meaning on windows
     int UsagePage;
+    int Usage;
     int vendorID;       ///< Vendor ID.
     int productID;      ///< Product ID
     int bcdDevice;

@@ -119,16 +119,16 @@ bool ConnectionManager::connectDevice()
 	// check if opening the device worked
 	if (!io_dev->isOpen())
 	{
-		qDebug() << "Error: could not connect to " << connection_device.devName;
+		qDebug() << "Error: io_dev->isOpen() returned FALSE .. could not open connection too " << connection_device.devName;
 
 		// close the device
 		try
 		{
-			connection_device->closeDevice(connection_device.devName);
+			connection_device.connection->closeDevice(connection_device.devName);
 		}
 		catch (...)
 		{	// handle exception
-			qDebug() << "Exception: connection_device->closeDevice(" << connection_device.devName << ")";
+			qDebug() << "Exception: connection_device.connection->closeDevice(" << connection_device.devName << ")";
 		}
 
 		return false;
@@ -180,6 +180,8 @@ bool ConnectionManager::disconnectDevice()
 	}
 
 	onConnectionClosed(m_connectionDevice.connection);
+
+	return true;
 }
 
 /**

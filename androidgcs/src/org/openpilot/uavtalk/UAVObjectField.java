@@ -90,8 +90,7 @@ public class UAVObjectField {
      * to a new ByteBuffer for UAVTalk.  It also converts from the java standard (big endian)
      * to the arm/uavtalk standard (little endian)
      * @param dataOut
-     * @return
-]     
+     * @return the number of bytes added
      * @throws Exception */
     public int pack(ByteBuffer dataOut) throws Exception {
         //QMutexLocker locker(obj->getMutex());

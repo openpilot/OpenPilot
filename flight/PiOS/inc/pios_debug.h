@@ -36,6 +36,8 @@ extern const char *PIOS_DEBUG_AssertMsg;
 void PIOS_DEBUG_Init(void);
 void PIOS_DEBUG_PinHigh(uint8_t pin);
 void PIOS_DEBUG_PinLow(uint8_t pin);
+void PIOS_DEBUG_PinValue8Bit(uint8_t value);
+void PIOS_DEBUG_PinValue4BitL(uint8_t value);
 void PIOS_DEBUG_Panic(const char *msg);
 
 #ifdef DEBUG

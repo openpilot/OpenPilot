@@ -100,6 +100,28 @@ void PIOS_DEBUG_PinLow(uint8_t Pin)
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
 
+
+void PIOS_DEBUG_PinValue8Bit(uint8_t value)
+{
+#ifdef PIOS_ENABLE_DEBUG_PINS
+	uint32_t bsrr_l = ((~(value & 0x0F)<<(16+6))) | ((value & 0x0F)<<6);
+	uint32_t bsrr_h = ((~(value & 0xF0)<<(16+6-4))) | ((value & 0xF0)<<(6-4));
+	PIOS_IRQ_Disable();
+	PIOS_SERVO_GPIO_PORT_1TO4->BSRR = bsrr_l;
+	PIOS_SERVO_GPIO_PORT_5TO8->BSRR = bsrr_h;
+	PIOS_IRQ_Enable();
+#endif // PIOS_ENABLE_DEBUG_PINS
+}
+
+void PIOS_DEBUG_PinValue4BitL(uint8_t value)
+{
+#ifdef PIOS_ENABLE_DEBUG_PINS
+	uint32_t bsrr_l = ((~(value & 0x0F)<<(16+6))) | ((value & 0x0F)<<6);
+	PIOS_SERVO_GPIO_PORT_1TO4->BSRR = bsrr_l;
+#endif // PIOS_ENABLE_DEBUG_PINS
+}
+
+
 /**
  * Report a serious error and halt
  */

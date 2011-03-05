@@ -124,11 +124,11 @@ bool ConnectionManager::connectDevice()
 		// close the device
 		try
 		{
-			m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
+			connection_device->closeDevice(connection_device.devName);
 		}
 		catch (...)
 		{	// handle exception
-			qDebug() << "Exception: m_connectionDevice.connection->closeDevice(" << m_connectionDevice.devName << ")";
+			qDebug() << "Exception: connection_device->closeDevice(" << connection_device.devName << ")";
 		}
 
 		return false;

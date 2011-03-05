@@ -120,6 +120,17 @@ bool ConnectionManager::connectDevice()
 	if (!io_dev->isOpen())
 	{
 		qDebug() << "Error: could not connect to " << connection_device.devName;
+
+		// close the device
+		try
+		{
+			m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
+		}
+		catch (...)
+		{	// handle exception
+			qDebug() << "Exception: m_connectionDevice.connection->closeDevice(" << m_connectionDevice.devName << ")";
+		}
+
 		return false;
 	}
 

@@ -49,7 +49,8 @@
 //#define PIOS_USB_PRODUCT_ID		0x415C        // PipXtreme PID
 
 #ifndef PIOS_USB_VERSION_ID
-#define PIOS_USB_VERSION_ID		0x1201        /* v2.00 */
+//#define PIOS_USB_VERSION_ID		0x1201        /* v2.00 */
+#define PIOS_USB_VERSION_ID		0x0301            // PipXtreme, board revision 1
 #endif
 
 /* Internal defines which are used by PIOS USB HID (don't touch) */

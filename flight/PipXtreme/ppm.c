@@ -263,6 +263,20 @@ void ppm_In_Supervisor(void)
 	}
 }
 
+uint32_t ppm_In_NewFrame(void)
+{
+	if (booting || ppm_initialising)
+		return 0;
+
+	if (ppm_In_Frames >= 4 && ppm_In_Frames != ppm_In_PrevFrames)
+	{	// we have a new PPM frame
+		ppm_In_PrevFrames = ppm_In_Frames;
+		return ppm_In_PrevFrames;
+	}
+
+	return 0;
+}
+
 int32_t ppm_In_GetChannelPulseWidth(uint8_t channel)
 {
 	if (booting || ppm_initialising)
@@ -329,10 +343,8 @@ void ppm_process(void)
 
 	if (saved_settings.mode == MODE_PPM_TX)
 	{
-		if (ppm_In_Frames > 0 && ppm_In_Frames != ppm_In_PrevFrames)
-		{	// we have a new PPM frame
-
-			ppm_In_PrevFrames = ppm_In_Frames;
+		if (ppm_In_NewFrame() > 0)
+		{	// we have a new PPM frame to send
 
 			#ifdef PPM_DEBUG
 				DEBUG_PRINTF("\r\n");
@@ -344,7 +356,7 @@ void ppm_process(void)
 //				int32_t pwm = ppm_In_GetChannelPulseWidth(i);
 
 				#ifdef PPM_DEBUG
-					DEBUG_PRINTF("ppm_in: %u %u %4u\r\n", ppm_In_PrevFrames, i, ppm_In_GetChannelPulseWidth(i));
+					DEBUG_PRINTF("ppm_in: %u %u %4u\r\n", ppm_In_Frames, i, ppm_In_GetChannelPulseWidth(i));
 				#endif
 			}
 		}
@@ -364,6 +376,10 @@ void ppm_deinit(void)
 	// disable the PPM timer
 	TIM_Cmd(PIOS_PPM_IN_TIM, DISABLE);
 
+	// un-remap the PPM IN pin
+//	GPIO_PinRemapConfig(GPIO_PartialRemap1_TIM2, DISABLE);
+	GPIO_PinRemapConfig(GPIO_PartialRemap2_TIM2, DISABLE);
+//	GPIO_PinRemapConfig(GPIO_FullRemap_TIM2, DISABLE);
 }
 
 void ppm_init(uint32_t our_sn)

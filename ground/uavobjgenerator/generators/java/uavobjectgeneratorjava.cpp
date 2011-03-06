@@ -54,14 +54,14 @@ bool UAVObjectGeneratorJava::generate(UAVObjectParser* parser,QString templatepa
         ObjectInfo* info=parser->getObjectByIndex(objidx);
         process_object(info);
 
-        javaObjInit.append("    objMngr->registerObject( new " + info->name + "() );\n");
+        javaObjInit.append("\t\t\tobjMngr.registerObject( new " + info->name + "() );\n");
         objInc.append("#include \"" + info->namelc + ".h\"\n");
     }
 
     // Write the gcs object inialization files
     javaInitTemplate.replace( QString("$(OBJINC)"), objInc);
     javaInitTemplate.replace( QString("$(OBJINIT)"), javaObjInit);
-    bool res = writeFileIfDiffrent( javaOutputPath.absolutePath() + "/uavobjectsinit.java", javaInitTemplate );
+    bool res = writeFileIfDiffrent( javaOutputPath.absolutePath() + "/UAVObjectsInitialize.java", javaInitTemplate );
     if (!res) {
         cout << "Error: Could not write output files" << endl;
         return false;

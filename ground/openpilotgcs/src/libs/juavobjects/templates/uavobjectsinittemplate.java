@@ -26,50 +26,18 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package org.openpilot.uavtalk;
+package org.openpilot.uavtalk.uavobjects;
 
 import org.openpilot.uavtalk.uavobjects.*;
-import org.openpilot.uavtalk.UAVObject;
-import java.util.HashMap;
+import org.openpilot.uavtalk.UAVObjectManager;
 
-public class UAVObjects {
-
-    private static UAVObject[] uavobjects=null;
-    private static HashMap id2obj;
-
-    public static void init() {
-	if (uavobjects==null) {
-	    uavobjects=new UAVObject[] {
-$(OBJINIT)
-	    };
-	    id2obj=new HashMap();
-	    for (int i=0;i< uavobjects.length;i++)
-		id2obj.put(uavobjects[i].getObjID(),i);
+public class UAVObjectsInitialize {
+	
+	public static void register(UAVObjectManager objMngr) {
+		try {
+$(OBJINIT)	
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-    }
-
-    public static UAVObject[] getUAVObjectArray() {
-	return uavobjects;
-    }
-
-    public static boolean hasObjectWithID(int id) {
-	return id2obj.containsKey(id);
-    }
-
-    public static UAVObject getObjectByID(int id) {
-	if (!hasObjectWithID(id))
-	    return null;
-	return uavobjects[(Integer)id2obj.get(id)];
-    }
-
-    public static UAVObject getObjectByName(String name) {
-	return uavobjects[0];
-    }
-
-    public static void printAll() {
-	for (UAVObject obj : uavobjects)
-	    System.out.println(obj.getObjName());
-    }
-
-$(OBJGETTER)
 }

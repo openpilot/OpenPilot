@@ -36,7 +36,6 @@ import java.util.ListIterator;
 import org.openpilot.uavtalk.UAVObjectManager;
 import org.openpilot.uavtalk.UAVObject;
 import org.openpilot.uavtalk.UAVDataObject;
-import org.openpilot.uavtalk.UAVMetaObject;
 import org.openpilot.uavtalk.UAVObjectField;
 
 /**
@@ -46,7 +45,7 @@ generated from $(XMLFILE)
  **/
 public class $(NAME) extends UAVDataObject {
 
-	public $(NAME)() throws Exception {
+	public $(NAME)() {
 		super(OBJID, ISSINGLEINST, ISSETTINGS, NAME);
 		
 		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
@@ -57,10 +56,9 @@ $(FIELDSINIT)
 		int numBytes = 0;
 		ListIterator<UAVObjectField> li = fields.listIterator();
 		while(li.hasNext()) {
-			numBytes += li.next().getNumBytesElement();
+			numBytes += li.next().getNumBytes();
 		}
 		NUMBYTES = numBytes;
-		
 
 		// Initialize object
 		initializeFields(fields, ByteBuffer.allocate(NUMBYTES), NUMBYTES);

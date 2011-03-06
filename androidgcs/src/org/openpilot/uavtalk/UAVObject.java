@@ -105,10 +105,9 @@ public abstract class UAVObject {
 	 *             When unable to unpack a field
 	 */
 	public void initializeFields(List<UAVObjectField> fields, ByteBuffer data,
-			int numBytes) throws Exception {
+			int numBytes) {
 		// TODO: QMutexLocker locker(mutex);
 		this.numBytes = numBytes;
-//	this.data = data;
 		this.fields = fields;
 		// Initialize fields
 		for (int n = 0; n < fields.size(); ++n) {
@@ -288,7 +287,7 @@ public abstract class UAVObject {
 	 * @throws Exception
 	 * @returns The number of bytes copied
 	 */
-	public int unpack(ByteBuffer dataIn) throws Exception {
+	public int unpack(ByteBuffer dataIn) {
 		if( dataIn == null )
 			return 0;
 

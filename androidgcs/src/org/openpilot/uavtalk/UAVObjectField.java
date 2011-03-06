@@ -440,11 +440,7 @@ public class UAVObjectField {
     
     public String toString() {
         String sout = new String();
-        sout += name + ": [ ";
-        for (int n = 0; n < numElements; ++n)
-        	sout += String.valueOf(n) + "(" + getValue(n) + ") ";
-        
-        sout += "] " + units + "\n";
+        sout += name + ": " + ((List) data).toString() + " (" + units + ")\n";
         return sout;    	
     }
 

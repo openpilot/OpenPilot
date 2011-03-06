@@ -18,6 +18,8 @@ ifeq ($(UNAME), Darwin)
   UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/uavobjgenerator"
 endif
 
+# OpenPilot GCS build configuration (debug | release)
+GCS_BUILD_CONF ?= debug
 
 # Set up misc host tools
 RM=rm
@@ -220,7 +222,7 @@ gcs: openpilotgcs
 openpilotgcs:  uavobjects_gcs
 	$(V1) mkdir -p $(BUILD_DIR)/ground/$@
 	$(V1) ( cd $(BUILD_DIR)/ground/$@ ; \
-	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
+	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) ; \
 	  $(MAKE) -w ; \
 	)
 

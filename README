@@ -39,4 +39,14 @@ git svn dcommit
 
    which will also automatically push them to the origin git repository.
 
+IMPORTANT:
 
+Your local commit will have a different SHA id than the commit pushed to origin
+by the auto-synchronization, however the changes will still be identical.
+Therefore (assuming you just git svn dcommitted to master) you can fix those
+ids with
+
+git fetch --all
+git rebase origin/master
+
+Since git rebase will recognize the commits as the same.

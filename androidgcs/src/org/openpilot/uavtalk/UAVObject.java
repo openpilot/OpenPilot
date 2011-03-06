@@ -114,7 +114,7 @@ public abstract class UAVObject {
 		for (int n = 0; n < fields.size(); ++n) {
 			fields.get(n).initialize(this);
 		}
-//		unpack(data);
+		unpack(data);
 	}
 
 	/**
@@ -291,13 +291,12 @@ public abstract class UAVObject {
 	public int unpack(ByteBuffer dataIn) throws Exception {
 		if( dataIn == null )
 			return 0;
-		System.out.println( dataIn.toString() );
+
 		// QMutexLocker locker(mutex);
 		int numBytes = 0;
 		ListIterator<UAVObjectField> li = fields.listIterator();
 		while (li.hasNext()) {
 			UAVObjectField field = li.next();
-			System.out.println(field.toString());
 			numBytes += field.unpack(dataIn);
 		}
 		return numBytes;

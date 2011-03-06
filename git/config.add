@@ -1,0 +1,5 @@
+[svn-remote "svn"]
+        url = svn://svn.openpilot.org/OpenPilot
+        fetch = trunk:refs/remotes/trunk
+        branches = branches/*:refs/remotes/*
+        tags = tags/*:refs/remotes/tags/*

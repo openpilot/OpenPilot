@@ -1,0 +1,42 @@
+While OpenPilot master source is still in subversion, you cannot "git push" any
+changes to the master branch or any other branches tracked by subversion.
+Instead these changes need to be committed to SVN via "git svn dcommit".
+
+For that to work you need two things:
+
+1. Your git repository needs to have a git-svn link. You can create that
+   manually by adding the following lines into your .git/config file:
+
+[svn-remote "svn"]
+        url = svn://svn.openpilot.org/OpenPilot
+        fetch = trunk:refs/remotes/trunk
+        branches = branches/*:refs/remotes/*
+        tags = tags/*:refs/remotes/tags/*
+
+2. Your git repository needs to know the corresponding svn revisions for all
+   refs. For that you would execute
+
+git svn fetch --all --use-log-author --add-author-from
+
+   However this takes very long when done the first time. You can speed this up
+   by copying the "git/svn" and "git/refs" subfolders into your .git directory,
+   which will give you recent subversion references.
+
+   If you have a bash interpreter, executing
+
+./link_to_subversion.sh
+
+   will do this automatically.
+
+   If 'git svn' complains about inconsistencies when trying to dcommit it
+   usually helps to do a
+
+git svn rebase
+
+   in your working branch. You can then commit your changes with
+
+git svn dcommit
+
+   which will also automatically push them to the origin git repository.
+
+

@@ -21,8 +21,9 @@ public class UAVObjectManager {
 	 * A new instance can be created directly by instantiating a new object or by calling clone() of
 	 * an existing object. The object will be registered and will be properly initialized so that it can accept
 	 * updates.
+	 * @throws Exception 
 	 */
-	Boolean registerObject(UAVDataObject obj)
+	public boolean registerObject(UAVDataObject obj) throws Exception
 	{
 		//  QMutexLocker locker(mutex);
 
@@ -126,7 +127,7 @@ public class UAVObjectManager {
 		return true;
 	}
 
-	void addObject(UAVObject obj)
+	public void addObject(UAVObject obj)
 	{
 		// Add to list
 		List<UAVObject> ls = new ArrayList<UAVObject>();
@@ -139,7 +140,7 @@ public class UAVObjectManager {
 	 * Get all objects. A two dimentional QList is returned. Objects are grouped by
 	 * instances of the same object type.
 	 */
-	List<List<UAVObject>> getObjects()
+	public List<List<UAVObject>> getObjects()
 	{
 		//QMutexLocker locker(mutex);
 		return objects;
@@ -148,7 +149,7 @@ public class UAVObjectManager {
 	/**
 	 * Same as getObjects() but will only return DataObjects.
 	 */
-	List< List<UAVDataObject> > getDataObjects()
+	public List< List<UAVDataObject> > getDataObjects()
 	{
 		return new ArrayList<List<UAVDataObject>>();
 
@@ -186,7 +187,7 @@ public class UAVObjectManager {
 	/**
 	 * Same as getObjects() but will only return MetaObjects.
 	 */
-	List <List<UAVMetaObject> > getMetaObjects()
+	public List <List<UAVMetaObject> > getMetaObjects()
 	{
 		return new ArrayList< List<UAVMetaObject> >();
 		/*
@@ -227,7 +228,7 @@ public class UAVObjectManager {
 	 * Get a specific object given its name and instance ID
 	 * @returns The object is found or NULL if not
 	 */
-	UAVObject getObject(String name, int instId)
+	public UAVObject getObject(String name, int instId)
 	{
 		return getObject(name, 0, instId);
 	}
@@ -236,7 +237,7 @@ public class UAVObjectManager {
 	 * Get a specific object given its object and instance ID
 	 * @returns The object is found or NULL if not
 	 */
-	UAVObject getObject(int objId, int instId)
+	public UAVObject getObject(int objId, int instId)
 	{
 		return getObject(null, objId, instId);
 	}
@@ -244,7 +245,7 @@ public class UAVObjectManager {
 	/**
 	 * Helper function for the public getObject() functions.
 	 */
-	UAVObject getObject(String name, int objId, int instId)
+	public UAVObject getObject(String name, int objId, int instId)
 	{
 		//QMutexLocker locker(mutex);
 		// Check if this object type is already in the list
@@ -271,7 +272,7 @@ public class UAVObjectManager {
 	/**
 	 * Get all the instances of the object specified by name
 	 */
-	List<UAVObject> getObjectInstances(String name)
+	public List<UAVObject> getObjectInstances(String name)
 	{
 		return getObjectInstances(name, 0);
 	}
@@ -279,7 +280,7 @@ public class UAVObjectManager {
 	/**
 	 * Get all the instances of the object specified by its ID
 	 */
-	List<UAVObject> getObjectInstances(int objId)
+	public List<UAVObject> getObjectInstances(int objId)
 	{
 		return getObjectInstances(null, objId);
 	}
@@ -287,7 +288,7 @@ public class UAVObjectManager {
 	/**
 	 * Helper function for the public getObjectInstances()
 	 */
-	List<UAVObject> getObjectInstances(String name, int objId)
+	public List<UAVObject> getObjectInstances(String name, int objId)
 	{
 		//QMutexLocker locker(mutex);
 		// Check if this object type is already in the list
@@ -307,7 +308,7 @@ public class UAVObjectManager {
 	/**
 	 * Get the number of instances for an object given its name
 	 */
-	int getNumInstances(String name)
+	public int getNumInstances(String name)
 	{
 		return getNumInstances(name, 0);
 	}
@@ -315,7 +316,7 @@ public class UAVObjectManager {
 	/**
 	 * Get the number of instances for an object given its ID
 	 */
-	int getNumInstances(int objId)
+	public int getNumInstances(int objId)
 	{
 		return getNumInstances(null, objId);
 	}
@@ -323,10 +324,9 @@ public class UAVObjectManager {
 	/**
 	 * Helper function for public getNumInstances
 	 */
-	int getNumInstances(String name, int objId)
+	public int getNumInstances(String name, int objId)
 	{
 		return getObjectInstances(name,objId).size();
 	}
-
 
 }

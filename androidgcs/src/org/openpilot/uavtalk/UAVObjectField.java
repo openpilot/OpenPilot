@@ -248,34 +248,37 @@ public class UAVObjectField {
         return null;    
     }
     
-    public void setValue(Object data) throws Exception { setValue(data,0); }    
-    public void setValue(Object data, int index) throws Exception {
+    public void setValue(Object data) { setValue(data,0); }    
+    public void setValue(Object data, int index) {
     	//    	   QMutexLocker locker(obj->getMutex());
     	// Check that index is not out of bounds
     	if ( index >= numElements )
-    		throw new Exception("Index out of bounds");
+    		//throw new Exception("Index out of bounds");
 
     	System.out.println(data.toString());
     	System.out.println(this.data.toString());
     	
     	// Get metadata
-    	//UAVObject.Metadata mdata = obj.getMetadata();
+    	UAVObject.Metadata mdata = obj.getMetadata();
     	// Update value if the access mode permits
-    	if ( true ) //mdata.gcsAccess == UAVObject.AccessMode.ACCESS_READWRITE )
+    	if ( mdata.gcsAccess == UAVObject.AccessMode.ACCESS_READWRITE )
     	{
-    		ByteBuffer bbuf = ByteBuffer.allocate(numBytesPerElement);
     		switch (type)
     		{
     		case INT8:
+    			data = new Integer((Byte) data);
     		case INT16:
+    			data = new Integer((Short) data);
     		case INT32:
     		{
     			List<Integer> l = (List<Integer>) this.data;
-    			l.set(index, (Integer) data);
+    			l.set(index,(Integer) data);
     			break;
     		}
     		case UINT8:
+    			data = new Integer((Byte) data);
     		case UINT16:
+    			data = new Integer((Short) data);
     		case UINT32:
     		{
     			List<Integer> l = (List<Integer>) this.data;
@@ -291,14 +294,14 @@ public class UAVObjectField {
     		case ENUM:
     		{
     			byte val = (byte) options.indexOf((String) data);
-    			if(val < 0) throw new Exception("Enumerated value not found");    	            	
+    			//if(val < 0) throw new Exception("Enumerated value not found");    	            	
     			List<Byte> l = (List<Byte>) this.data;
     			l.set(index, val);
     			break;
     		}
     		case STRING: 
     		{
-    			throw new Exception("Sorry I haven't implemented strings yet");
+    			//throw new Exception("Sorry I haven't implemented strings yet");
     		}
     		}
     	}
@@ -309,24 +312,24 @@ public class UAVObjectField {
     	return Double.valueOf((Double) getValue(index));
     }
     
-    void setDouble(double value) throws Exception { setDouble(value, 0); };
-    void setDouble(double value, int index) throws Exception {
+    public void setDouble(double value) throws Exception { setDouble(value, 0); };
+    public void setDouble(double value, int index) throws Exception {
     	setValue(value, index);
     }
     
-    int getDataOffset() {
+    public int getDataOffset() {
     	return offset; 
     }
     
-    int getNumBytes() {
+    public int getNumBytes() {
         return numBytesPerElement * numElements;
     }
     
-    int getNumBytesElement() {
+    public int getNumBytesElement() {
     	return numBytesPerElement;
     }
     
-    boolean isNumeric() {
+    public boolean isNumeric() {
         switch (type)
         {
             case INT8:
@@ -352,7 +355,7 @@ public class UAVObjectField {
         }    	
     }
     
-    boolean isText() {
+    public boolean isText() {
         switch (type)
         {
             case INT8:

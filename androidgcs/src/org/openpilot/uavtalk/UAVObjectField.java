@@ -90,8 +90,8 @@ public class UAVObjectField {
      * to the arm/uavtalk standard (little endian)
      * @param dataOut
      * @return the number of bytes added
-     * @throws Exception */
-    public int pack(ByteBuffer dataOut) throws Exception {
+     **/
+    public int pack(ByteBuffer dataOut) {
         //QMutexLocker locker(obj->getMutex());
         // Pack each element in output buffer
     	dataOut.order(ByteOrder.LITTLE_ENDIAN);
@@ -147,7 +147,7 @@ public class UAVObjectField {
                 break;
             case STRING:
             	// TODO: Implement strings
-            	throw new Exception("Strings not yet implemented");
+            	throw new Error("Strings not yet implemented");
         }
         // Done
         return getNumBytes();    	
@@ -358,13 +358,13 @@ public class UAVObjectField {
     	}
     }
     
-    public double getDouble() throws Exception { return getDouble(0); };
-    public double getDouble(int index) throws Exception {
+    public double getDouble() { return getDouble(0); };
+    public double getDouble(int index) {
     	return Double.valueOf((Double) getValue(index));
     }
     
-    public void setDouble(double value) throws Exception { setDouble(value, 0); };
-    public void setDouble(double value, int index) throws Exception {
+    public void setDouble(double value) { setDouble(value, 0); };
+    public void setDouble(double value, int index) {
     	setValue(value, index);
     }
     
@@ -436,9 +436,7 @@ public class UAVObjectField {
         String sout = new String();
         sout += name + ": [ ";
         for (int n = 0; n < numElements; ++n)
-        {
         	sout += String.valueOf(n) + "(" + getValue(n) + ") ";
-        }
         
         sout += "] " + units + "\n";
         return sout;    	
@@ -486,6 +484,18 @@ public class UAVObjectField {
             	((ArrayList<Long>) data).clear();
             	for(int index = 0; index < numElements; ++index) {
             		((ArrayList<Long>) data).add((long) 0);
+            	}
+                break;
+            case FLOAT32:
+            	((ArrayList<Float>) data).clear();
+            	for(int index = 0; index < numElements; ++index) {
+            		((ArrayList<Float>) data).add((float) 0);
+            	}
+                break;
+            case ENUM:
+            	((ArrayList<Byte>) data).clear();
+            	for(int index = 0; index < numElements; ++index) {
+            		((ArrayList<Byte>) data).add((byte) 0);
             	}
                 break;
         }
@@ -546,8 +556,6 @@ public class UAVObjectField {
                 numBytesPerElement = 0;
         }
         clear();
-        
-        System.out.println(this);
     }
     
     /**

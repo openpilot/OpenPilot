@@ -9,7 +9,7 @@ public abstract class UAVDataObject extends UAVObject {
 	 * @param isSet
 	 * @param name
 	 */
-	public UAVDataObject(int objID, Boolean isSingleInst, Boolean isSet, String name) throws Exception {
+	public UAVDataObject(int objID, Boolean isSingleInst, Boolean isSet, String name) {
 		super(objID, isSingleInst, name);
 		mobj = null;
 		this.isSet = isSet;

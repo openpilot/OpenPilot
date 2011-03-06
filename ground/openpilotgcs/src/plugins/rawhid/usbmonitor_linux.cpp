@@ -144,9 +144,9 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDevice)
     QList<USBPortInfo> thePortsWeWant;
 
     foreach (USBPortInfo port, allPorts) {
-        thePortsWeWant.append(port);
+        if((port.vendorID==vid || vid==-1) && (port.productID==pid || vid==-1) && (port.bcdDevice==bcdDevice || bcdDevice==-1))
+            thePortsWeWant.append(port);
     }
-
     return thePortsWeWant;
 }
 
@@ -155,6 +155,9 @@ USBPortInfo USBMonitor::makePortInfo(struct udev_device *dev)
 {
     USBPortInfo prtInfo;
 
+    //////////
+    //  Debug info
+    //////////
     printf("   Node: %s", udev_device_get_devnode(dev));
     printf("   Subsystem: %s", udev_device_get_subsystem(dev));
     printf("   Devtype: %s", udev_device_get_devtype(dev));
@@ -166,18 +169,32 @@ USBPortInfo USBMonitor::makePortInfo(struct udev_device *dev)
     the USB device. Note that USB strings are Unicode, UCS2
     encoded, but the strings returned from
     udev_device_get_sysattr_value() are UTF-8 encoded. */
-    printf("  VID/PID: %s %s",
+    printf("  VID/PID/bcdDevice : %s %s %s",
            udev_device_get_sysattr_value(dev,"idVendor"),
-            udev_device_get_sysattr_value(dev, "idProduct"));
+           udev_device_get_sysattr_value(dev, "idProduct"),
+           udev_device_get_sysattr_value(dev,"bcdDevice"));
     printf("  %s   -  %s",
             udev_device_get_sysattr_value(dev,"manufacturer"),
             udev_device_get_sysattr_value(dev,"product"));
     printf("  serial: %s",
             udev_device_get_sysattr_value(dev, "serial"));
+    //////////
+    //  Debug info end
+    //////////
+
 
     prtInfo.vendorID = QString(udev_device_get_sysattr_value(dev, "idVendor")).toInt();
     prtInfo.productID = QString(udev_device_get_sysattr_value(dev, "idProduct")).toInt();
     prtInfo.serialNumber = QString(udev_device_get_sysattr_value(dev, "serial"));
+    prtInfo.manufacturer = QString(udev_device_get_sysattr_value(dev,"manufacturer"));
+    prtInfo.product = QString(udev_device_get_sysattr_value(dev,"product"));
+//    prtInfo.UsagePage = QString(udev_device_get_sysattr_value(dev,""));
+//    prtInfo.Usage = QString(udev_device_get_sysattr_value(dev,""));
+    prtInfo.bcdDevice = QString(udev_device_get_sysattr_value(dev,"bcdDevice")).toInt();
+
+
+
+
 
     return prtInfo;
 

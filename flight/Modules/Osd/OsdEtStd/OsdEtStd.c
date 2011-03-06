@@ -267,12 +267,16 @@ static bool Write(uint32_t start, uint8_t length, const uint8_t * buffer)
 
 	ack[0] = 0;
 
-	if (PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list1, NELEMENTS(txn_list1))) {
+	//
+	// FIXME: See OP-305, the driver seems to return FALSE while all is OK
+	//
+	PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list1, NELEMENTS(txn_list1));
+//	if (PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list1, NELEMENTS(txn_list1))) {
 		//DEBUG_MSG("ACK=%d ", ack[0]);
 		if (ack[0] == 49) {
 			return TRUE;
 		}
-	}
+//	}
 
 	return FALSE;
 }
@@ -320,6 +324,8 @@ static void UpdateConfig(void)
 					DEBUG_MSG(".");
 					addr += n;
 				}
+			} else {
+				DEBUG_MSG(" FILEREAD FAILED ");
 			}
 		}
 

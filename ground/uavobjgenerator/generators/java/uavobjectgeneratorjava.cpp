@@ -210,9 +210,9 @@ bool UAVObjectGeneratorJava::process_object(ObjectInfo* info)
             {
                 if ( info->fields[n]->type == FIELDTYPE_ENUM )
                 {
-                    initfields.append( QString("\t\tgetField(\"%1\").setValue(%2);\n")
+                    initfields.append( QString("\t\tgetField(\"%1\").setValue(\"%2\");\n")
                                 .arg( info->fields[n]->name )
-                                .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValues[0] ) ) );
+                                .arg( info->fields[n]->defaultValues[0] ) );
                 }
                 else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
                 {
@@ -233,10 +233,10 @@ bool UAVObjectGeneratorJava::process_object(ObjectInfo* info)
                 for (int idx = 0; idx < info->fields[n]->numElements; ++idx)
                 {
                     if ( info->fields[n]->type == FIELDTYPE_ENUM ) {
-                        initfields.append( QString("\t\tgetField(\"%1\").setValue(%3,%2);\n")
+                        initfields.append( QString("\t\tgetField(\"%1\").setValue(\"%3\",%2);\n")
                                     .arg( info->fields[n]->name )
                                     .arg( idx )
-                                    .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValues[idx] ) ) );
+                                    .arg( info->fields[n]->defaultValues[idx] ) );
                     }
                     else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 ) {
                         initfields.append( QString("\t\tgetField(\"%1\").setValue(%3,%2);\n")

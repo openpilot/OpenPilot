@@ -1,0 +1,7 @@
+; This file is used internally by git-svn
+; You should not have to edit it
+[svn-remote "svn"]
+	reposRoot = svn://svn.openpilot.org/OpenPilot
+	uuid = ebee16cc-31ac-478f-84a7-5cbb03baadba
+	branches-maxRev = 2982
+	tags-maxRev = 2982

@@ -1,0 +1,5 @@
+r1299
+  +empty_dir: branches/patrick/ST_AHRS/Build/dep
+  +dir_prop: branches/patrick/EKF%20Development svn:ignore *.wmv%0A
+  +file_prop: branches/patrick/EKF%20Development/FlightGear/Flight%20IMU%20Simulation%20Samples.7z svn:mime-type application/octet-stream
+  +file_prop: branches/patrick/EKF%20Development/IMU%20Sensor%20Samples.7z svn:mime-type application/octet-stream

@@ -1,0 +1,63 @@
+r1736
+r1745
+  +empty_dir: branches/Experimental/Les/OpenPilot/Modules/Attitude/inc
+  +dir_prop: branches/Experimental/Les svn:ignore *.pnproj%0A*.pnps%0A.cproject%0A.metadata%0A.project%0A.settings%0ABuild%0A
+  +dir_prop: branches/Experimental/Les/AHRS svn:ignore Build%0A
+  +dir_prop: branches/Experimental/Les/OpenPilot svn:ignore Build%0ABuild.win32%0A
+  +dir_prop: branches/Experimental/Les/OpenPilot/Modules svn:ignore ActuatorLes%0A
+  +dir_prop: branches/Experimental/Les/OpenPilot/Modules/Actuator svn:ignore matrix%0Amatrixmixer%0A
+  +dir_prop: branches/Experimental/Les/PipBee svn:ignore Build%0A
+  +file_prop: branches/Experimental/Les/Doc/Architecture/HiTLArchitecture.dia svn:mime-type application/octet-stream
+  +file_prop: branches/Experimental/Les/Doc/Architecture/OPModuleArchitecture.dia svn:mime-type application/octet-stream
+  +file_prop: branches/Experimental/Les/OpenPilot/Modules/Telemetry/inc/telemetry.h svn:mime-type text/plain
+  +file_prop: branches/Experimental/Les/OpenPilot/Modules/Telemetry/telemetry.c svn:mime-type text/plain
+  +file_prop: branches/Experimental/Les/OpenPilot/UAVObjects/eventdispatcher.c svn:mime-type text/plain
+  +file_prop: branches/Experimental/Les/OpenPilot/UAVObjects/inc/eventdispatcher.h svn:mime-type text/plain
+  +file_prop: branches/Experimental/Les/OpenPilot/UAVObjects/inc/uavobjectmanager.h svn:mime-type text/plain
+  +file_prop: branches/Experimental/Les/OpenPilot/UAVObjects/inc/uavobjectsinit.h svn:mime-type text/plain
+  +file_prop: branches/Experimental/Les/OpenPilot/UAVObjects/inc/uavobjecttemplate.h svn:mime-type text/plain
+  +file_prop: branches/Experimental/Les/OpenPilot/UAVObjects/inc/utlist.h svn:mime-type text/plain
+  +file_prop: branches/Experimental/Les/OpenPilot/UAVObjects/uavobjectmanager.c svn:mime-type text/plain
+  +file_prop: branches/Experimental/Les/OpenPilot/UAVObjects/uavobjectsinit.c svn:mime-type text/plain
+  +file_prop: branches/Experimental/Les/OpenPilot/UAVObjects/uavobjecttemplate.c svn:mime-type text/plain
+  +file_prop: branches/Experimental/Les/OpenPilot/UAVTalk/inc/uavtalk.h svn:mime-type text/plain
+  +file_prop: branches/Experimental/Les/OpenPilot/UAVTalk/uavtalk.c svn:mime-type text/plain
+  +file_prop: branches/Experimental/Les/PiOS/Common/pios_opahrs_v0.c svn:eol-style native
+  +file_prop: branches/Experimental/Les/PiOS/STM32F10x/Libraries/CMSIS/License.doc svn:mime-type application/octet-stream
+r1746
+r1789
+r1790
+  -empty_dir: branches/Experimental/Les/PiOS/Common/ahrs_comms_defines.c
+  -empty_dir: branches/Experimental/Les/PiOS/Common/pios_ahrs_comms.c
+  -empty_dir: branches/Experimental/Les/PiOS/inc/ahrs_comms_defines.h
+  -empty_dir: branches/Experimental/Les/PiOS/inc/pios_ahrs_comms.h
+r1808
+r1993
+  +empty_dir: branches/Experimental/Stabilization/les/Stabilization/inc
+  +empty_dir: branches/Experimental/Stabilization/simple/Stabilization/inc
+r2038
+  +empty_dir: branches/Experimental/AHRS-tests-Corvus/ahrs
+r2087
+r2088
+r2089
+r2092
+r2101
+r2102
+r2103
+  -empty_dir: branches/Experimental/Stabilization/les%2Bcorvus/ManualControl
+r2105
+r2108
+r2584
+  +file_prop: branches/Experimental/obsolete/Wix/Bitmaps/New.ico svn:mime-type application/octet-stream
+  +file_prop: branches/Experimental/obsolete/Wix/Bitmaps/Up.ico svn:mime-type application/octet-stream
+  +file_prop: branches/Experimental/obsolete/Wix/Bitmaps/bannrbmp.bmp svn:mime-type application/octet-stream
+  +file_prop: branches/Experimental/obsolete/Wix/Bitmaps/dlgbmp.bmp svn:mime-type application/octet-stream
+  +file_prop: branches/Experimental/obsolete/Wix/Bitmaps/exclamic.ico svn:mime-type application/octet-stream
+  +file_prop: branches/Experimental/obsolete/Wix/Bitmaps/info.ico svn:mime-type application/octet-stream
+  +file_prop: branches/Experimental/obsolete/Wix/MsiTools/MsiTran.Exe svn:mime-type application/octet-stream
+r2713
+r2717
+r2978
+r2979
+r2980
+r2981

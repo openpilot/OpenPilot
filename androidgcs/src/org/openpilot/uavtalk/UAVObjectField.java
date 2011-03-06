@@ -343,8 +343,14 @@ public class UAVObjectField {
     			break;
     		}
     		case ENUM:
-    		{
-    			byte val = (byte) options.indexOf((String) data);
+    		{    			
+    			byte val;
+    			try {
+    				// Test if numeric constant passed in
+    				val = ((Number) data).byteValue();
+    			} catch (Exception e) {
+    				val = (byte) options.indexOf((String) data);
+    			}
     			//if(val < 0) throw new Exception("Enumerated value not found");    	            	
     			List<Byte> l = (List<Byte>) this.data;
     			l.set(index, val);

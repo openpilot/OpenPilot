@@ -3,12 +3,15 @@ package org.openpilot.uavtalk;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 public class UAVMetaObject extends UAVObject {
 
 	public UAVMetaObject(int objID, String name, UAVDataObject parent) throws Exception {
 		super(objID, true, name);
 		this.parent = parent;
+		
+		ownMetadata = new Metadata();
 
 		ownMetadata.flightAccess = UAVObject.AccessMode.ACCESS_READWRITE;
 		ownMetadata.gcsAccess = UAVObject.AccessMode.ACCESS_READWRITE;
@@ -48,9 +51,17 @@ public class UAVMetaObject extends UAVObject {
 		fields.add( new UAVObjectField("Logging Update Mode", "", UAVObjectField.FieldType.ENUM, 1, updateModeEnum) );
 		fields.add( new UAVObjectField("Logging Update Period", "", UAVObjectField.FieldType.UINT32, 1, null ) );
 
+		int numBytes = 0;
+		ListIterator<UAVObjectField> li = fields.listIterator();
+		while(li.hasNext()) {
+			numBytes += li.next().getNumBytes();
+		}
+
+		// Initialize object
+
 		// Initialize parent
 		super.initialize(0);
-		super.initializeFields(fields, ByteBuffer.allocate(10), 10);
+		initializeFields(fields, ByteBuffer.allocate(numBytes), numBytes);
 
 		// Setup metadata of parent
 		parentMetadata = parent.getDefaultMetadata();	

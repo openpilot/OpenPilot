@@ -9,39 +9,78 @@ public abstract class UAVDataObject extends UAVObject {
 	 * @param isSet
 	 * @param name
 	 */
-	public UAVDataObject(int objID, Boolean isSingleInst, Boolean isSet, String name) {
+	public UAVDataObject(int objID, Boolean isSingleInst, Boolean isSet, String name) throws Exception {
 		super(objID, isSingleInst, name);
+		mobj = null;
+		this.isSet = isSet;
 	}
-	
-	public abstract void initialize(int instID, UAVMetaObject mobj);
-	
-	public abstract void initialize(UAVMetaObject mobj);
-	
-	Boolean isSettings() {
-		return null;
+	/**
+	 * Initialize instance ID and assign a metaobject
+	 */
+	public void initialize(int instID, UAVMetaObject mobj)
+	{
+	    //QMutexLocker locker(mutex);
+	    this.mobj = mobj;
+	    super.initialize(instID);
 	}
-	
-    UAVMetaObject getMetaObject() {
-		return null;	
-    }
+
+	/**
+	 * Assign a metaobject
+	 */
+	public void initialize(UAVMetaObject mobj)
+	{
+	    //QMutexLocker locker(mutex);
+	    this.mobj = mobj;
+	}
+
+	/**
+	 * Returns true if this is a data object holding module settings
+	 */
+	public boolean isSettings()
+	{
+	    return isSet;
+	}
+
+	/**
+	 * Set the object's metadata
+	 */
+	public void setMetadata(Metadata mdata)
+	{
+	    if ( mobj != null )
+	    {
+	        mobj.setData(mdata);
+	    }
+	}
+
+	/**
+	 * Get the object's metadata
+	 */
+	public Metadata getMetadata()
+	{
+	    if ( mobj != null)
+	    {
+	        return mobj.getData();
+	    }
+	    else
+	    {
+	        return getDefaultMetadata();
+	    }
+	}
+
+	/**
+	 * Get the metaobject
+	 */
+	public UAVMetaObject getMetaObject()
+	{
+	    return mobj;
+	}
 	    
+    // TODO: Make abstract
     public UAVDataObject clone(int instID) {
-    	try {
-			return (UAVDataObject) super.clone();
-		} catch (CloneNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+		return (UAVDataObject) super.clone();
     }
     
-public:
-	static int OBJID = $(OBJIDHEX);
-    static String NAME;
-    static String DESCRIPTION;
-    static boolean ISSINGLEINST = $(ISSINGLEINST);
-    static boolean ISSETTINGS = $(ISSETTINGS);
-    static int NUMBYTES = sizeof(DataFields);
-
+    private UAVMetaObject mobj;
+    private boolean isSet;
 
 }

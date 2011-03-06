@@ -255,6 +255,7 @@ static void updateWDGstats()
  */
 static void updateStats()
 {
+	static portTickType lastTickCount = 0;
 	SystemStatsData stats;
 
 	// Get stats and update
@@ -271,8 +272,14 @@ static void updateStats()
 	if (idleCounterClear) {
 		idleCounter = 0;
 	}
-	stats.CPULoad =
-	    100 - (uint8_t) round(100.0 * ((float)idleCounter / (float)(SYSTEM_UPDATE_PERIOD_MS / 1000)) / (float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
+
+	portTickType now = xTaskGetTickCount();
+	if (now > lastTickCount) {
+		uint32_t dT = (xTaskGetTickCount() - lastTickCount) * portTICK_RATE_MS;	// in ms
+		stats.CPULoad =
+			100 - (uint8_t) round(100.0 * ((float)idleCounter / ((float)dT / 1000.0)) / (float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
+	} //else: TickCount has wrapped, do not calc now
+	lastTickCount = now;
 	idleCounterClear = 1;
 	
 #if defined(PIOS_INCLUDE_ADC) && defined(PIOS_ADC_USE_TEMP_SENSOR)

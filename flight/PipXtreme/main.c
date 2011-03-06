@@ -532,6 +532,10 @@ int main()
     RF_CS_ENABLE;
     RF_CS_HIGH;
 
+    // PPM OUT low
+    PPM_OUT_ENABLE;
+    PPM_OUT_LOW;
+
     // pin high
     SPARE1_ENABLE;
     SPARE1_HIGH;

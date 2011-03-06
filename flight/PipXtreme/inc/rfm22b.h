@@ -576,7 +576,7 @@ enum {	RX_SCAN_SPECTRUM = 0,
 // ************************************
 
 typedef int16_t ( *t_rfm22_TxDataByteCallback ) (void);
-typedef bool ( *t_rfm22_RxDataByteCallback ) (uint8_t b);
+typedef bool ( *t_rfm22_RxDataCallback ) (void *data, uint8_t len);
 
 // ************************************
 
@@ -631,7 +631,7 @@ void rfm22_1ms_tick(void);
 void rfm22_process(void);
 
 void rfm22_TxDataByte_SetCallback(t_rfm22_TxDataByteCallback new_function);
-void rfm22_RxDataByte_SetCallback(t_rfm22_RxDataByteCallback new_function);
+void rfm22_RxData_SetCallback(t_rfm22_RxDataCallback new_function);
 
 int rfm22_init_scan_spectrum(uint32_t min_frequency_hz, uint32_t max_frequency_hz);
 int rfm22_init_tx_stream(uint32_t min_frequency_hz, uint32_t max_frequency_hz);

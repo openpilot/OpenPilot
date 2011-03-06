@@ -358,11 +358,11 @@ int16_t ph_TxDataByteCallback(void)
 }
 
 // *************************************************************
-// we are being given a received byte
+// we are being given a block of received bytes
 //
-// return TRUE to continue current packet receive, otherwise return FALSe to halt current packet reception
+// return TRUE to continue current packet receive, otherwise return FALSE to halt current packet reception
 
-bool ph_RxDataByteCallback(uint8_t b)
+bool ph_RxDataCallback(void *data, uint8_t len)
 {
 	return true;
 }
@@ -1627,86 +1627,98 @@ void ph_process(void)
 
 // *****************************************************************************
 
+void ph_disconnectAll(void)
+{
+	for (int i = 0; i < PH_MAX_CONNECTIONS; i++)
+	{
+		random32 = updateCRC32(random32, 0xff);
+
+		t_connection *conn = &connection[i];
+
+		conn->serial_number = 0;
+
+		conn->tx_sequence = 0;
+		conn->tx_sequence_data_size = 0;
+
+		conn->rx_sequence = 0;
+
+		fifoBuf_init(&conn->tx_fifo_buffer, conn->tx_buffer, PH_FIFO_BUFFER_SIZE);
+		fifoBuf_init(&conn->rx_fifo_buffer, conn->rx_buffer, PH_FIFO_BUFFER_SIZE);
+
+		conn->link_state = LINK_DISCONNECTED;
+
+		conn->tx_packet_timer = 0;
+
+		conn->tx_retry_time_slots = 5;
+		conn->tx_retry_time_slot_len = 40;
+		conn->tx_retry_time = conn->tx_retry_time_slot_len * 4 + (random32 % conn->tx_retry_time_slots) * conn->tx_retry_time_slot_len * 4;
+		conn->tx_retry_counter = 0;
+
+		conn->data_speed_timer = 0;
+		conn->tx_data_speed_count = 0;
+		conn->tx_data_speed = 0;
+		conn->rx_data_speed_count = 0;
+		conn->rx_data_speed = 0;
+
+		conn->ping_time = 8000 + (random32 % 100) * 10;
+		conn->fast_ping_time = 600 + (random32 % 50) * 10;
+		conn->pinging = false;
+
+		conn->rx_not_ready_mode = false;
+
+		conn->ready_to_send_timer = -1;
+
+		conn->not_ready_timer = -1;
+
+		conn->send_encrypted = false;
+
+		conn->rx_rssi_dBm = -200;
+		conn->rx_afc_Hz = 0;
+	}
+}
+
+// *****************************************************************************
+
+void ph_deinit(void)
+{
+	ph_disconnectAll();
+}
+
 void ph_init(uint32_t our_sn)
 {
-  our_serial_number = our_sn;	// remember our own serial number
+	our_serial_number = our_sn;	// remember our own serial number
 
-  fast_ping = false;
+	fast_ping = false;
 
-  for (int i = 0; i < PH_MAX_CONNECTIONS; i++)
-  {
-      random32 = updateCRC32(random32, 0xff);
+	ph_disconnectAll();
 
-      t_connection *conn = &connection[i];
+	// set the AES encryption key using the default AES key
+	ph_set_AES128_key(default_aes_key);
 
-      conn->serial_number = 0;
+	// try too randomise the tx AES CBC bytes
+	for (uint32_t j = 0, k = 0; j < 123 + (random32 & 1023); j++)
+	{
+		random32 = updateCRC32(random32, 0xff);
+		enc_cbc[k] ^= random32 >> 3;
+		if (++k >= sizeof(enc_cbc)) k = 0;
+	}
 
-      conn->tx_sequence = 0;
-      conn->tx_sequence_data_size = 0;
+	// ******
 
-      conn->rx_sequence = 0;
+	rfm22_init_normal(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz, rfm22_freqHopSize());
 
-      fifoBuf_init(&conn->tx_fifo_buffer, conn->tx_buffer, PH_FIFO_BUFFER_SIZE);
-      fifoBuf_init(&conn->rx_fifo_buffer, conn->rx_buffer, PH_FIFO_BUFFER_SIZE);
+	rfm22_TxDataByte_SetCallback(ph_TxDataByteCallback);
+	rfm22_RxData_SetCallback(ph_RxDataCallback);
 
-      conn->link_state = LINK_DISCONNECTED;
+	rfm22_setFreqCalibration(saved_settings.rf_xtal_cap);
+	ph_setNominalCarrierFrequency(saved_settings.frequency_Hz);
+	ph_setDatarate(saved_settings.max_rf_bandwidth);
+	ph_setTxPower(saved_settings.max_tx_power);
 
-      conn->tx_packet_timer = 0;
+	ph_set_remote_encryption(0, saved_settings.aes_enable, (const void *)saved_settings.aes_key);
+	ph_set_remote_serial_number(0, saved_settings.destination_id);
 
-      conn->tx_retry_time_slots = 5;
-      conn->tx_retry_time_slot_len = 40;
-      conn->tx_retry_time = conn->tx_retry_time_slot_len * 4 + (random32 % conn->tx_retry_time_slots) * conn->tx_retry_time_slot_len * 4;
-      conn->tx_retry_counter = 0;
-
-      conn->data_speed_timer = 0;
-      conn->tx_data_speed_count = 0;
-      conn->tx_data_speed = 0;
-      conn->rx_data_speed_count = 0;
-      conn->rx_data_speed = 0;
-
-      conn->ping_time = 8000 + (random32 % 100) * 10;
-      conn->fast_ping_time = 600 + (random32 % 50) * 10;
-      conn->pinging = false;
-
-      conn->rx_not_ready_mode = false;
-
-      conn->ready_to_send_timer = -1;
-
-      conn->not_ready_timer = -1;
-
-      conn->send_encrypted = false;
-
-      conn->rx_rssi_dBm = -200;
-      conn->rx_afc_Hz = 0;
-  }
-
-  // set the AES encryption key using the default AES key
-  ph_set_AES128_key(default_aes_key);
-
-  // try too randomise the tx AES CBC bytes
-  for (uint32_t j = 0, k = 0; j < 123 + (random32 & 1023); j++)
-  {
-      random32 = updateCRC32(random32, 0xff);
-      enc_cbc[k] ^= random32 >> 3;
-      if (++k >= sizeof(enc_cbc)) k = 0;
-  }
-
-  // ******
-
-  rfm22_init_normal(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz, rfm22_freqHopSize());
-
-  rfm22_TxDataByte_SetCallback(ph_TxDataByteCallback);
-  rfm22_RxDataByte_SetCallback(ph_RxDataByteCallback);
-
-  rfm22_setFreqCalibration(saved_settings.rf_xtal_cap);
-  ph_setNominalCarrierFrequency(saved_settings.frequency_Hz);
-  ph_setDatarate(saved_settings.max_rf_bandwidth);
-  ph_setTxPower(saved_settings.max_tx_power);
-
-  ph_set_remote_encryption(0, saved_settings.aes_enable, (const void *)saved_settings.aes_key);
-  ph_set_remote_serial_number(0, saved_settings.destination_id);
-
-  // ******
+	// ******
 }
 
 // *****************************************************************************

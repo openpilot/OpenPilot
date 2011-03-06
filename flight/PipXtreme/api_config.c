@@ -370,6 +370,10 @@ void apiconfig_processInputPacket(void *buf, uint16_t len)
 
 			    // ******
 
+			    ph_deinit();
+			    stream_deinit();
+			    ppm_deinit();
+
 			    PIOS_COM_ChangeBaud(PIOS_COM_SERIAL, saved_settings.serial_baudrate);
 
 			    switch (saved_settings.mode)

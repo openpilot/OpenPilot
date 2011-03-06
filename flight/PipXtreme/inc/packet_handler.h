@@ -68,6 +68,7 @@ void ph_set_AES128_key(const void *key);
 int ph_set_remote_serial_number(int connection_index, uint32_t sn);
 void ph_set_remote_encryption(int connection_index, bool enabled, const void *key);
 
+void ph_deinit(void);
 void ph_init(uint32_t our_sn);
 
 // *****************************************************************************

@@ -65,11 +65,11 @@ int16_t stream_TxDataByteCallback(void)
 }
 
 // *************************************************************
-// we are being given a received byte
+// we are being given a block of received bytes
 //
-// return TRUE to continue current packet receive, otherwise return FALSe to halt current packet reception
+// return TRUE to continue current packet receive, otherwise return FALSE to halt current packet reception
 
-bool stream_RxDataByteCallback(uint8_t b)
+bool stream_RxDataCallback(void *data, uint8_t len)
 {
 	return true;
 }
@@ -92,6 +92,10 @@ void stream_process(void)
 
 // *************************************************************
 
+void stream_deinit(void)
+{
+}
+
 void stream_init(uint32_t our_sn)
 {
 	#if defined(STREAM_DEBUG)
@@ -105,7 +109,7 @@ void stream_init(uint32_t our_sn)
 		rfm22_init_rx_stream(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz);
 
 	rfm22_TxDataByte_SetCallback(stream_TxDataByteCallback);
-	rfm22_RxDataByte_SetCallback(stream_RxDataByteCallback);
+	rfm22_RxData_SetCallback(stream_RxDataCallback);
 
     rfm22_setFreqCalibration(saved_settings.rf_xtal_cap);
 	rfm22_setNominalCarrierFrequency(saved_settings.frequency_Hz);

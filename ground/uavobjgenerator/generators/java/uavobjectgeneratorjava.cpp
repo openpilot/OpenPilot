@@ -29,8 +29,8 @@
 using namespace std;
 
 bool UAVObjectGeneratorJava::generate(UAVObjectParser* parser,QString templatepath,QString outputpath) {
-    fieldTypeStrCPP << "qint8" << "qint16" << "qint32" <<
-        "quint8" << "quint16" << "quint32" << "float" << "quint8";
+    fieldTypeStrCPP << "Byte" << "Short" << "Int" <<
+        "Short" << "Int" << "Long" << "Float" << "Byte";
 
     fieldTypeStrCPPClass << "INT8" << "INT16" << "INT32"
         << "UINT8" << "UINT16" << "UINT32" << "FLOAT32" << "ENUM";

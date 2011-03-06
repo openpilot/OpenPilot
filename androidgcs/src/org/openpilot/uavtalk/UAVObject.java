@@ -462,9 +462,7 @@ public abstract class UAVObject {
 	 * Return a string with the object information (only the header)
 	 */
 	public String toStringBrief() {
-		return getName() + " ( " + getObjID() + " " + getInstID() + " " + getNumBytes() + ")\n";
-		//		getName(), getObjID(), getInstID(), getNumBytes(),
-			//	isSingleInstance());
+		return getName() + " ( " + Integer.toHexString(getObjID()) + " " + Integer.toHexString(getInstID()) + " " + getNumBytes() + ")\n";
 	}
 
 	/**

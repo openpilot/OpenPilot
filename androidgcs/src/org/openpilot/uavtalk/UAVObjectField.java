@@ -27,8 +27,7 @@ public class UAVObjectField {
     
     public void initialize(UAVObject obj){
          this.obj = obj;
-        clear();
-    	
+        //clear();    	
 	}
     
     public UAVObject getObject() {
@@ -161,19 +160,19 @@ public class UAVObjectField {
         {
             case INT8:
             {
-            	List<Integer> l = (List<Integer>) this.data;
+            	List<Byte> l = (List<Byte>) this.data;
             	for (int index = 0 ; index < numElements; ++index) {
-            		Byte val = dataIn.get();
-            		l.set(index, val.intValue());
+            		Long val = bound(dataIn.get());
+            		l.set(index, val.byteValue());
             	}
                 break;
             }
             case INT16:
             {
-            	List<Integer> l = (List<Integer>) this.data;
+            	List<Short> l = (List<Short>) this.data;
             	for (int index = 0 ; index < numElements; ++index) {
-            		Short val = dataIn.getShort();
-            		l.set(index, val.intValue());
+            		Long val = bound(dataIn.getShort());
+            		l.set(index, val.shortValue());
             	}
                 break;
             }
@@ -181,18 +180,18 @@ public class UAVObjectField {
             {
             	List<Integer> l = (List<Integer>) this.data;
             	for (int index = 0 ; index < numElements; ++index) {
-            		Integer val = dataIn.getInt();
+            		Long val = bound(dataIn.getInt());
             		l.set(index, val.intValue());
             	}
                 break;
             }
             case UINT8:
-            	// TOOD: Deal with unsigned
             {
-            	List<Integer> l = (List<Integer>) this.data;
+            	List<Short> l = (List<Short>) this.data;
             	for (int index = 0 ; index < numElements; ++index) {
-            		Byte val = dataIn.get();
-            		l.set(index, val.intValue());
+            		int signedval = (int) dataIn.get();  // this sign extends it
+            		int unsignedval = signedval & 0xff;    // drop sign extension
+            		l.set(index, (short) unsignedval);
             	}
                 break;
             }
@@ -200,17 +199,19 @@ public class UAVObjectField {
             {
             	List<Integer> l = (List<Integer>) this.data;
             	for (int index = 0 ; index < numElements; ++index) {
-            		Short val = dataIn.getShort();
-            		l.set(index, val.intValue());
+            		int signedval = (int) dataIn.getShort();  // this sign extends it
+            		int unsignedval = signedval & 0xffff;    // drop sign extension
+            		l.set(index, unsignedval);
             	}
                 break;
             }
             case UINT32:
             {
-            	List<Integer> l = (List<Integer>) this.data;
+            	List<Long> l = (List<Long>) this.data;
             	for (int index = 0 ; index < numElements; ++index) {
-            		Integer val = dataIn.getInt();
-            		l.set(index, val.intValue());
+            		long signedval = (long) dataIn.getInt();  // this sign extends it
+            		long unsignedval = signedval & 0xffffffffL;    // drop sign extension
+            		l.set(index, unsignedval);
             	}
                 break;
             }
@@ -240,36 +241,31 @@ public class UAVObjectField {
     }
     
     Object getValue()  { return getValue(0); };
-    Object getValue(int index)  {
+    @SuppressWarnings("unchecked")
+	Object getValue(int index)  {
 //        QMutexLocker locker(obj->getMutex());
         // Check that index is not out of bounds
         if ( index >= numElements )
         {
             return null;
         }
-
+        
         switch (type)
         {
             case INT8:
+            	return ((List<Byte>) data).get(index).intValue();
             case INT16:
+            	return ((List<Short>) data).get(index).intValue();
             case INT32:
-            {
-            	List<Integer> l = (List<Integer>) data;
-            	return l.get(index);
-            }
+            	return ((List<Integer>) data).get(index).intValue();
             case UINT8:
+            	return ((List<Short>) data).get(index).intValue();
             case UINT16:
+            	return ((List<Integer>) data).get(index).intValue();
             case UINT32:
-            {
-            	// TODO: Correctly deal with unsigned values
-            	List<Integer> l = (List<Integer>) data;
-            	return l.get(index);
-            }
+            	return ((List<Long>) data).get(index);
             case FLOAT32:
-            {
-            	List<Float> l = (List<Float>) data;
-            	return l.get(index);
-            }
+            	return ((List<Float>) data).get(index);
             case ENUM:
             {
             	List<Byte> l = (List<Byte>) data;
@@ -290,10 +286,11 @@ public class UAVObjectField {
     }
     
     public void setValue(Object data) { setValue(data,0); }    
-    public void setValue(Object data, int index) {
+    @SuppressWarnings("unchecked")
+	public void setValue(Object data, int index) {
     	//    	   QMutexLocker locker(obj->getMutex());
     	// Check that index is not out of bounds
-    	if ( index >= numElements );
+    	//if ( index >= numElements );
     		//throw new Exception("Index out of bounds");
 
     	// Get metadata
@@ -304,25 +301,45 @@ public class UAVObjectField {
     		switch (type)
     		{
     		case INT8:
+    		{
+    			List<Byte> l = (List<Byte>) this.data;
+    			l.set(index, bound(data).byteValue());
+    			break;
+    		}
     		case INT16:
+    		{
+    			List<Short> l = (List<Short>) this.data;
+    			l.set(index, bound(data).shortValue());
+    			break;
+    		}
     		case INT32:
     		{
     			List<Integer> l = (List<Integer>) this.data;
-    			l.set(index,((Number) data).intValue());
+    			l.set(index, bound(data).intValue());
     			break;
     		}
     		case UINT8:
+    		{
+    			List<Short> l = (List<Short>) this.data;
+    			l.set(index, bound(data).shortValue());
+    			break;
+    		}
     		case UINT16:
-    		case UINT32:
     		{
     			List<Integer> l = (List<Integer>) this.data;
-    			l.set(index,((Number) data).intValue());
+    			l.set(index, bound(data).intValue());
+    			break;
+    		}
+    		case UINT32:
+    		{
+    			List<Long> l = (List<Long>) this.data;
+    			l.set(index, bound(data));
     			break;
     		}
     		case FLOAT32:
     		{
     			List<Float> l = (List<Float>) this.data;
-    			l.set(index, (Float) data);
+    			l.set(index, ((Number) data).floatValue());
     			break;
     		}
     		case ENUM:
@@ -431,37 +448,46 @@ public class UAVObjectField {
     	
     }
 
-    public void clear() {
+    @SuppressWarnings("unchecked")
+	public void clear() {
     	switch (type)
         {
             case INT8:
+            	((ArrayList<Byte>) data).clear();
+            	for(int index = 0; index < numElements; ++index) {
+            		((ArrayList<Byte>) data).add((byte) 0);
+            	}
+                break;
             case INT16:
+            	((ArrayList<Short>) data).clear();
+            	for(int index = 0; index < numElements; ++index) {
+            		((ArrayList<Short>) data).add((short) 0);
+            	}
+                break;
             case INT32:
-            case UINT8:
-            case UINT16:
-            case UINT32:
             	((ArrayList<Integer>) data).clear();
             	for(int index = 0; index < numElements; ++index) {
             		((ArrayList<Integer>) data).add(0);
             	}
                 break;
-            case FLOAT32:
-            	((ArrayList<Float>) data).clear();
+            case UINT8:
+            	((ArrayList<Short>) data).clear();
             	for(int index = 0; index < numElements; ++index) {
-            		((ArrayList<Float>) data).add((float) 0);
+            		((ArrayList<Short>) data).add((short) 0);
             	}
                 break;
-            case ENUM:
-            	((ArrayList<Byte>) data).clear();
+            case UINT16:
+            	((ArrayList<Integer>) data).clear();
             	for(int index = 0; index < numElements; ++index) {
-            		((ArrayList<Byte>) data).add((byte)0);
+            		((ArrayList<Integer>) data).add(0);
             	}
                 break;
-            case STRING:
-            	// TODO: Add string
+            case UINT32:
+            	((ArrayList<Long>) data).clear();
+            	for(int index = 0; index < numElements; ++index) {
+            		((ArrayList<Long>) data).add((long) 0);
+            	}
                 break;
-            default:
-                numBytesPerElement = 0;
         }
     }
     
@@ -481,11 +507,11 @@ public class UAVObjectField {
         switch (type)
         {
             case INT8:
-            	data = (Object) new ArrayList<Integer>(this.numElements);
+            	data = (Object) new ArrayList<Byte>(this.numElements);
                 numBytesPerElement = 1;
                 break;
             case INT16:
-            	data = (Object) new ArrayList<Integer>(this.numElements);
+            	data = (Object) new ArrayList<Short>(this.numElements);
                 numBytesPerElement = 2;
                 break;
             case INT32:
@@ -493,7 +519,7 @@ public class UAVObjectField {
                 numBytesPerElement = 4;
                 break;
             case UINT8:
-            	data = (Object) new ArrayList<Integer>(this.numElements);
+            	data = (Object) new ArrayList<Short>(this.numElements);
                 numBytesPerElement = 1;
                 break;
             case UINT16:
@@ -501,11 +527,11 @@ public class UAVObjectField {
                 numBytesPerElement = 2;
                 break;
             case UINT32:
-            	data = (Object) new ArrayList<Integer>(this.numElements);
+            	data = (Object) new ArrayList<Long>(this.numElements);
                 numBytesPerElement = 4;
                 break;
             case FLOAT32:
-            	data = (Object) new ArrayList<Double>(this.numElements);
+            	data = (Object) new ArrayList<Float>(this.numElements);
                 numBytesPerElement = 4;
                 break;
             case ENUM:
@@ -520,8 +546,69 @@ public class UAVObjectField {
                 numBytesPerElement = 0;
         }
         clear();
+        
+        System.out.println(this);
     }
     
+    /**
+     * For numerical types bounds the data appropriately
+     * @param val Can be any object, for numerical tries to cast to Number
+     * @return long value with the right range (for float rounds)
+     * @note This is mostly needed because java has no unsigned integer
+     */
+    protected Long bound (Object val) {
+    	
+    	switch(type) {
+    	case ENUM:
+    	case STRING:
+    		return 0L;
+    	case FLOAT32:
+    		return ((Number) val).longValue();
+    	}
+
+    	long num = ((Number) val).longValue();
+
+    	switch(type) {
+    	case INT8:
+    		if(num < Byte.MIN_VALUE)
+    			return (long) Byte.MAX_VALUE;
+    		if(num > Byte.MAX_VALUE)
+    			return (long) Byte.MAX_VALUE;
+    		return num;
+    	case INT16:
+    		if(num < Short.MIN_VALUE)
+    			return (long) Short.MIN_VALUE;
+    		if(num > Short.MAX_VALUE)
+    			return (long) Short.MAX_VALUE;
+    		return num;
+    	case INT32:
+    		if(num < Integer.MIN_VALUE)
+    			return (long) Integer.MIN_VALUE;
+    		if(num > Integer.MAX_VALUE)
+    			return (long) Integer.MAX_VALUE;
+    		return num;
+    	case UINT8:
+    		if(num < 0)
+    			return (long) 0;
+    		if(num > 255)
+    			return (long) 255;
+    		return num;
+    	case UINT16:
+    		if(num < 0)
+    			return (long) 0;
+    		if(num > 65535)
+    			return (long) 65535;
+    		return num;
+    	case UINT32:
+    		if(num < 0)
+    			return (long) 0;
+    		if(num > 4294967295L)
+    			return 4294967295L;
+    		return num;
+    	}
+    	
+    	return num;
+    }
 
 	private String name;
 	private String units;

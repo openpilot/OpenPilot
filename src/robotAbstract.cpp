@@ -144,6 +144,12 @@ namespace jafar {
 			self_time = time;
 		}
 
+		void RobotAbstract::move_fake(double time){
+			if (self_time < 0.) self_time = 0.;
+			if (hardwareEstimatorPtr) hardwareEstimatorPtr->acquireReadings(self_time, time);
+			self_time = time;
+		}
+
 
 		void RobotAbstract::writeLogHeader(kernel::DataLogger& log) const
 		{

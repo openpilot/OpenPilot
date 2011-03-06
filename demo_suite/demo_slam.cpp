@@ -737,7 +737,7 @@ void demo_slam01_main(world_ptr_t *world) {
 			configSetup.CAMERA_DEVICE, cv::Size(img_width,img_height), 0, 8, floatOpts[fFreq], intOpts[iTrigger], mode, strOpts[sDataPath]));
 		senPtr11->setHardwareSensor(hardSen11);
 		#else
-		if (intOpts[iReplay])
+		if (intOpts[iReplay] & 1)
 		{
 			hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, rawdata_mutex, cv::Size(img_width,img_height),strOpts[sDataPath]));
 			senPtr11->setHardwareSensor(hardSen11);
@@ -858,26 +858,33 @@ JFR_DEBUG("                 FRAME : " << (*world)->t);
 //				std::cout << "Pert: " << robPtr->perturbation.P() << "\nPert Jac: " << robPtr->XNEW_pert << "\nState pert: " << robPtr->Q << std::endl;
 //				std::cout << "Robot state: " << robPtr->state.x() << std::endl;
 
-				// move the filter time to the data raw.
-				robPtr->move(senPtr->getRaw()->timestamp);
+				if (intOpts[iReplay] != 2)
+				{
+					// move the filter time to the data raw.
+					robPtr->move(senPtr->getRaw()->timestamp);
 JFR_DEBUG("Robot state after move " << robPtr1->state.x());
 JFR_DEBUG("Robot state stdev after move " << sqrt(ublas::matrix_vector_range<jblas::sym_mat_indirect>(robPtr1->state.P(), ublas::range(0, robPtr1->state.P().size1()), ublas::range (0, robPtr1->state.P().size2()))));
 
 
 robot_prediction = robPtr->state.x();
 
-				// foreach dataManager
-				for (SensorAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin();
-					dmaIter != senPtr->dataManagerList().end(); ++dmaIter)
-				{
-					data_manager_ptr_t dmaPtr = *dmaIter;
-					dmaPtr->processKnown(senPtr->getRaw());
-					dmaPtr->mapManagerPtr()->manage();
-					dmaPtr->detectNew(senPtr->getRaw());
-				} // foreach dataManager
+					// foreach dataManager
+					for (SensorAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin();
+						dmaIter != senPtr->dataManagerList().end(); ++dmaIter)
+					{
+						data_manager_ptr_t dmaPtr = *dmaIter;
+						dmaPtr->processKnown(senPtr->getRaw());
+						dmaPtr->mapManagerPtr()->manage();
+						dmaPtr->detectNew(senPtr->getRaw());
+					} // foreach dataManager
 
 average_robot_innovation += ublas::norm_2(robPtr->state.x() - robot_prediction);
 n_innovation++;
+
+				} else
+				{
+					robPtr->move_fake(senPtr->getRaw()->timestamp);
+				}
 
 			} // for each sensor
 		} // for each robot
@@ -1112,7 +1119,7 @@ void demo_slam01_display(world_ptr_t *world) {
 			if (intOpts[iDispGdhe]) viewerGdhe->render();
 			#endif
 			
-			if ((intOpts[iReplay] || intOpts[iSimu]) && intOpts[iDump] && (*world)->display_t+1 != 0)
+			if (((intOpts[iReplay] & 1) || intOpts[iSimu]) && intOpts[iDump] && (*world)->display_t+1 != 0)
 			{
 				#ifdef HAVE_MODULE_QDISPLAY
 				if (intOpts[iDispQt])
@@ -1172,12 +1179,12 @@ void demo_slam01() {
 	rseed = time(NULL);
 	if (intOpts[iRandSeed] != 0 && intOpts[iRandSeed] != 1)
 		rseed = intOpts[iRandSeed];
-	if (!intOpts[iReplay] && intOpts[iDump]) {
+	if (!(intOpts[iReplay] & 1) && intOpts[iDump]) {
 		std::fstream f((strOpts[sDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::out);
 		f << rseed << std::endl;
 		f.close();
 	}
-	else if (intOpts[iReplay] && intOpts[iRandSeed] == 1) {
+	else if ((intOpts[iReplay] & 1) && intOpts[iRandSeed] == 1) {
 		std::fstream f((strOpts[sDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::in);
 		f >> rseed;
 		f.close();
@@ -1244,7 +1251,7 @@ void demo_slam01() {
 	* --disp-2d=0/1
 	* --disp-3d=0/1
 	* --render-all=0/1 (needs --replay 1)
-	* --replay=0/1 (needs --data-path)
+	* --replay=0/1/2/3 (off/on/off no slam/on true time) (needs --data-path)
 	* --dump=0/1  (needs --data-path)
 	* --rand-seed=0/1/n, 0=generate new one, 1=in replay use the saved one, n=use seed n
 	* --pause=0/n 0=don't, n=pause for frames>n (needs --replay 1)
@@ -1329,12 +1336,12 @@ int main(int argc, char* const* argv)
 	}
 
 	// consistency
-	if (intOpts[iReplay]) mode = 2; else
+	if (intOpts[iReplay] & 1) mode = 2; else
 		if (intOpts[iDump]) mode = 1; else
 			mode = 0;
 	if (strOpts[sConfigSetup] == "#!@")
 	{
-		if (intOpts[iReplay])
+		if (intOpts[iReplay] & 1)
 			strOpts[sConfigSetup] = strOpts[sDataPath] + "/setup.cfg";
 		else
 			strOpts[sConfigSetup] = "data/setup.cfg";
@@ -1343,7 +1350,7 @@ int main(int argc, char* const* argv)
 		strOpts[sConfigSetup] = strOpts[sDataPath] + strOpts[sConfigSetup].substr(1);
 	if (strOpts[sConfigEstimation][0] == '@' && strOpts[sConfigEstimation][1] == '/')
 		strOpts[sConfigEstimation] = strOpts[sDataPath] + strOpts[sConfigEstimation].substr(1);
-	if (!intOpts[iReplay] && intOpts[iDump]) boost::filesystem::copy_file(strOpts[sConfigSetup], strOpts[sDataPath] + "/setup.cfg");
+	if (!(intOpts[iReplay] & 1) && intOpts[iDump]) boost::filesystem::copy_file(strOpts[sConfigSetup], strOpts[sDataPath] + "/setup.cfg");
 	#ifndef HAVE_MODULE_QDISPLAY
 	intOpts[iDispQt] = 0;
 	#endif

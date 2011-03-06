@@ -201,6 +201,7 @@ namespace jafar {
 				}
 				
 				void move(double time);
+				void move_fake(double time);
 
 				void move(const vec & u, double time){
 					bool firstmove = false;

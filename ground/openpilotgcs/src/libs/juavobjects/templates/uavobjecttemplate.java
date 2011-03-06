@@ -28,61 +28,110 @@
 
 package org.openpilot.uavtalk.uavobjects;
 
-import  org.openpilot.uavtalk.UAVObject;
-import  org.openpilot.uavtalk.UAVDataObject;
-import  org.openpilot.uavtalk.UAVMetaObject;
-import  org.openpilot.uavtalk.UAVObjectField;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
+import org.openpilot.uavtalk.UAVObjectManager;
+import org.openpilot.uavtalk.UAVObject;
+import org.openpilot.uavtalk.UAVDataObject;
+import org.openpilot.uavtalk.UAVMetaObject;
+import org.openpilot.uavtalk.UAVObjectField;
 
 /**
 $(DESCRIPTION)
 
 generated from $(XMLFILE)
-**/
+ **/
 public class $(NAME) extends UAVDataObject {
 
+	public $(NAME)() throws Exception {
+		super(OBJID, ISSINGLEINST, ISSETTINGS, NAME);
+		
+		List<UAVObjectField> fields = new ArrayList<UAVObjectField>();
+		
 $(FIELDSINIT)
 
-    public $(NAME) (int objID, Boolean isSingleInst, Boolean isSet, String name) {
-        super(OBJID, ISSINGLEINST, ISSETTINGS, NAME);
-    }
+		// Compute the number of bytes for this object
+		int numBytes = 0;
+		ListIterator<UAVObjectField> li = fields.listIterator();
+		while(li.hasNext()) {
+			numBytes += li.next().getNumBytesElement();
+		}
+		NUMBYTES = numBytes;
+		
 
-    public void setGeneratedMetaData() {
+		// Initialize object
+		initializeFields(fields, ByteBuffer.allocate(NUMBYTES), NUMBYTES);
+		// Set the default field values
+		setDefaultFieldValues();
+		// Set the object description
+		setDescription(DESCRIPTION);
+	}
 
-	getMetaData().gcsAccess = UAVObject.AccessMode.$(GCSACCESS);
-	getMetaData().gcsTelemetryAcked = UAVObject.Acked.$(GCSTELEM_ACKEDTF);
-	getMetaData().gcsTelemetryUpdateMode = UAVObject.UpdateMode.$(GCSTELEM_UPDATEMODE);
-	getMetaData().gcsTelemetryUpdatePeriod = $(GCSTELEM_UPDATEPERIOD);
+	/**
+	 * Create a Metadata object filled with default values for this object
+	 * @return Metadata object with default values
+	 */
+	public Metadata getDefaultMetadata() {
+		UAVObject.Metadata metadata = new UAVObject.Metadata();
+		metadata.gcsAccess = UAVObject.AccessMode.$(GCSACCESS);
+		metadata.gcsTelemetryAcked = UAVObject.Acked.$(GCSTELEM_ACKEDTF);
+		metadata.gcsTelemetryUpdateMode = UAVObject.UpdateMode.$(GCSTELEM_UPDATEMODE);
+		metadata.gcsTelemetryUpdatePeriod = $(GCSTELEM_UPDATEPERIOD);
 
-	getMetaData().flightAccess = UAVObject.AccessMode.$(FLIGHTACCESS);
-	getMetaData().flightTelemetryAcked = UAVObject.Acked.$(FLIGHTTELEM_ACKEDTF);
-	getMetaData().flightTelemetryUpdateMode = UAVObject.UpdateMode.$(FLIGHTTELEM_UPDATEMODE);
-	getMetaData().flightTelemetryUpdatePeriod = $(FLIGHTTELEM_UPDATEPERIOD);
+		metadata.flightAccess = UAVObject.AccessMode.$(FLIGHTACCESS);
+		metadata.flightTelemetryAcked = UAVObject.Acked.$(FLIGHTTELEM_ACKEDTF);
+		metadata.flightTelemetryUpdateMode = UAVObject.UpdateMode.$(FLIGHTTELEM_UPDATEMODE);
+		metadata.flightTelemetryUpdatePeriod = $(FLIGHTTELEM_UPDATEPERIOD);
 
-	getMetaData().loggingUpdateMode = UAVObject.UpdateMode.$(LOGGING_UPDATEMODE);
-	getMetaData().loggingUpdatePeriod = $(LOGGING_UPDATEPERIOD);
+		metadata.loggingUpdateMode = UAVObject.UpdateMode.$(LOGGING_UPDATEMODE);
+		metadata.loggingUpdatePeriod = $(LOGGING_UPDATEPERIOD);
+		return metadata;
+	}
 
-    }
-    
-    public int getObjID() {
-	return $(OBJIDHEX);
-    }
-    
-    public String getObjName() {
-	return "$(NAME)";
-    }
+	/**
+	 * Initialize object fields with the default values.
+	 * If a default value is not specified the object fields
+	 * will be initialized to zero.
+	 */
+	public void setDefaultFieldValues()
+	{
+$(INITFIELDS)
+	}
 
-    public String getDescription() {
-	return "$(DESCRIPTION)";
-    }
-protected:
+	/**
+	 * Create a clone of this object, a new instance ID must be specified.
+	 * Do not use this function directly to create new instances, the
+	 * UAVObjectManager should be used instead.
+	 */
+	public UAVDataObject clone(int instID) {
+		// TODO: Need to get specific instance to clone
+		try {
+			$(NAME) obj = new $(NAME)();
+			obj.initialize(instID, this.getMetaObject());
+			return obj;
+		} catch  (Exception e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Static function to retrieve an instance of the object.
+	 */
+	public $(NAME) GetInstance(UAVObjectManager objMngr, int instID)
+	{
+	    return ($(NAME))(objMngr.getObject($(NAME).OBJID, instID));
+	}
+
 	// Constants
-	static final int OBJID = $(OBJIDHEX);
-	static final String NAME;
-	static final String DESCRIPTION;
-	static final boolean ISSINGLEINST = $(ISSINGLEINST);
-	static final boolean ISSETTINGS = $(ISSETTINGS);
-	static final int NUMBYTES = sizeof(DataFields);
+	protected static final int OBJID = $(OBJIDHEX);
+	protected static final String NAME = "$(NAME)";
+	protected static String DESCRIPTION = "$(DESCRIPTION)";
+	protected static final boolean ISSINGLEINST = $(ISSINGLEINST) == 1;
+	protected static final boolean ISSETTINGS = $(ISSETTINGS) == 1;
+	protected static int NUMBYTES = 0;
 
 
-$(GETTERSETTER)
 }

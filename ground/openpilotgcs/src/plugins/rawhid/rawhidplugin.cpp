@@ -74,7 +74,6 @@ void RawHIDConnection::onDeviceConnected()
   */
 void RawHIDConnection::onDeviceDisconnected()
 {
-    emit deviceClosed(this);
     if (enablePolling)
         emit availableDevChanged(this);
 }
@@ -86,32 +85,13 @@ QStringList RawHIDConnection::availableDevices()
 {
     QStringList devices;
 
-    QList<USBPortInfo> portsList = m_usbMonitor.availableDevices(0x20a0, -1, -1);
+	QList<USBPortInfo> portsList = m_usbMonitor.availableDevices(USB_VID, -1, -1);
     // We currently list devices by their serial number
     foreach(USBPortInfo prt, portsList) {
         devices.append(prt.serialNumber);
     }
 
     return devices;
-}
-
-
-/// TODO: still needed ???
-void RawHIDConnection::onRawHidDestroyed(QObject *obj)	// Pip
-{
-	if (!RawHidHandle || RawHidHandle != obj)
-		return;
-
-	RawHidHandle = NULL;
-}
-
-/// TODO: still needed ???
-void RawHIDConnection::onRawHidClosed()
-{
-	if (RawHidHandle)
-	{
-		emit deviceClosed(this);
-	}
 }
 
 QIODevice *RawHIDConnection::openDevice(const QString &deviceName)
@@ -123,13 +103,6 @@ QIODevice *RawHIDConnection::openDevice(const QString &deviceName)
 
     //return new RawHID(deviceName);
     RawHidHandle = new RawHID(deviceName);
-
-	if (RawHidHandle)
-	{
-		connect(RawHidHandle, SIGNAL(closed()), this, SLOT(onRawHidClosed()), Qt::QueuedConnection);
-		connect(RawHidHandle, SIGNAL(destroyed(QObject *)), this, SLOT(onRawHidDestroyed(QObject *)), Qt::QueuedConnection);
-	}
-
     return RawHidHandle;
 }
 
@@ -144,8 +117,6 @@ void RawHIDConnection::closeDevice(const QString &deviceName)
 
 		delete RawHidHandle;
 		RawHidHandle = NULL;
-
-		emit deviceClosed(this);
     }
     //end added by andrew
 }

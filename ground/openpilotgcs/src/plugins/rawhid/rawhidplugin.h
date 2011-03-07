@@ -66,18 +66,9 @@ public:
 
     bool deviceOpened() { return (RawHidHandle != NULL); }	// Pip
 
-signals:
-	void deviceClosed(QObject *obj);			// Pip
-
-public slots:
-	void onRawHidClosed();
-
 protected slots:
     void onDeviceConnected();
     void onDeviceDisconnected();
-
-private slots:
-    void onRawHidDestroyed(QObject *obj);
 
 private:
     RawHID *RawHidHandle;

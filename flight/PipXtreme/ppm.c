@@ -49,6 +49,8 @@
 
 // *************************************************************
 
+uint8_t ppm_mode;
+
 volatile bool ppm_initialising = true;
 
 volatile uint32_t ppm_In_PrevFrames = 0;
@@ -141,6 +143,9 @@ void ppm_In_Init(void)
 
 	// Enable the Capture Compare Interrupt Request
 	TIM_ITConfig(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR, ENABLE);
+
+	// Clear TIMER Capture compare interrupt pending bit
+	TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR);
 
 	// Enable timer
 	TIM_Cmd(PIOS_PPM_TIM, ENABLE);
@@ -375,6 +380,9 @@ void ppm_Out_Init(void)
 	// TIM IT enable
 	TIM_ITConfig(PIOS_PPM_TIM, PIOS_PPM_OUT_TIM_CCR, ENABLE);
 
+	// Clear TIMER Capture compare interrupt pending bit
+	TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR);
+
 	// Enable clock to timer module
 	TIM_Cmd(PIOS_PPM_TIM, ENABLE);
 
@@ -446,9 +454,9 @@ void ppm_Out_Supervisor(void)
 
 void PIOS_PPM_CC_IRQ_FUNC(void)
 {
-	if (saved_settings.mode == MODE_PPM_TX) PIOS_PPM_IN_CC_IRQ();
+	if (ppm_mode == MODE_PPM_TX) PIOS_PPM_IN_CC_IRQ();
 	else
-	if (saved_settings.mode == MODE_PPM_RX) PIOS_PPM_OUT_CC_IRQ();
+	if (ppm_mode == MODE_PPM_RX) PIOS_PPM_OUT_CC_IRQ();
 }
 
 // *************************************************************
@@ -460,17 +468,9 @@ void ppm_1ms_tick(void)
 	if (booting || ppm_initialising)
 		return;
 
-	if (saved_settings.mode == MODE_PPM_TX)
-	{
-		ppm_In_Supervisor();
-		return;
-	}
-
-	if (saved_settings.mode == MODE_PPM_RX)
-	{
-		ppm_Out_Supervisor();
-		return;
-	}
+	if (ppm_mode == MODE_PPM_TX) ppm_In_Supervisor();
+	else
+	if (ppm_mode == MODE_PPM_RX) ppm_Out_Supervisor();
 }
 
 // *************************************************************
@@ -501,7 +501,7 @@ void ppm_process(void)
 	if (booting || ppm_initialising)
 		return;
 
-	if (saved_settings.mode == MODE_PPM_TX)
+	if (ppm_mode == MODE_PPM_TX)
 	{
 		if (ppm_In_NewFrame() > 0)
 		{	// we have a new PPM frame to send
@@ -518,14 +518,15 @@ void ppm_process(void)
 				#ifdef PPM_DEBUG
 					DEBUG_PRINTF("ppm_in: %u %u %4u\r\n", ppm_In_Frames, i, ppm_In_GetChannelPulseWidth(i));
 				#endif
+
+				// TODO:
 			}
 		}
-		return;
 	}
-
+	else
 	if (saved_settings.mode == MODE_PPM_RX)
 	{
-		return;
+		// TODO:
 	}
 }
 
@@ -568,13 +569,15 @@ void ppm_init(uint32_t our_sn)
 		DEBUG_PRINTF("\r\nPPM init\r\n");
 	#endif
 
-	if (saved_settings.mode == MODE_PPM_TX)
+	ppm_mode = saved_settings.mode;
+
+	if (ppm_mode == MODE_PPM_TX)
 	{
 		ppm_In_Init();
 		rfm22_init_tx_stream(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz);
 	}
 	else
-	if (saved_settings.mode == MODE_PPM_RX)
+	if (ppm_mode == MODE_PPM_RX)
 	{
 		ppm_Out_Init();
 		rfm22_init_rx_stream(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz);
@@ -588,7 +591,7 @@ void ppm_init(uint32_t our_sn)
 	rfm22_setDatarate(saved_settings.max_rf_bandwidth, FALSE);
 	rfm22_setTxPower(saved_settings.max_tx_power);
 
-	if (saved_settings.mode == MODE_PPM_TX)
+	if (ppm_mode == MODE_PPM_TX)
 		rfm22_setTxStream();
 
 	ppm_initialising = false;

@@ -46,6 +46,7 @@ public abstract class UAVObject {
 		}
 	}
 
+	public abstract boolean isMetadata();
 	
 	/**
 	 * Object update mode

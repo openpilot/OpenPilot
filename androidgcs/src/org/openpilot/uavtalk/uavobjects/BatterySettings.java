@@ -121,7 +121,7 @@ public class BatterySettings extends UAVDataObject {
 	{
 		getField("BatteryVoltage").setValue(11.1);
 		getField("BatteryCapacity").setValue(2200);
-		getField("BatteryType").setValue(0);
+		getField("BatteryType").setValue("LiPo");
 		getField("Calibrations").setValue(1,0);
 		getField("Calibrations").setValue(1,1);
 

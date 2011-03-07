@@ -144,8 +144,8 @@ public class FlightPlanStatus extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
-		getField("Status").setValue(0);
-		getField("ErrorType").setValue(0);
+		getField("Status").setValue("Stopped");
+		getField("ErrorType").setValue("None");
 		getField("Debug1").setValue(0);
 		getField("Debug2").setValue(0);
 

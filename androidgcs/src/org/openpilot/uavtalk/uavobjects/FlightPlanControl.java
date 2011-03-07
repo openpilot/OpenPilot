@@ -104,7 +104,7 @@ public class FlightPlanControl extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
-		getField("Command").setValue(0);
+		getField("Command").setValue("Start");
 
 	}
 

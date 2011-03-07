@@ -171,7 +171,7 @@ public class AHRSCalibration extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
-		getField("measure_var").setValue(0);
+		getField("measure_var").setValue("SET");
 		getField("accel_bias").setValue(-73.5,0);
 		getField("accel_bias").setValue(-73.5,1);
 		getField("accel_bias").setValue(73.5,2);

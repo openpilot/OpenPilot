@@ -139,7 +139,7 @@ public class HomeLocation extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
-		getField("Set").setValue(0);
+		getField("Set").setValue("FALSE");
 		getField("Latitude").setValue(0);
 		getField("Longitude").setValue(0);
 		getField("Altitude").setValue(0);

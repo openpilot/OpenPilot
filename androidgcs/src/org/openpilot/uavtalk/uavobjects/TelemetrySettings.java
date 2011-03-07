@@ -108,7 +108,7 @@ public class TelemetrySettings extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
-		getField("Speed").setValue(5);
+		getField("Speed").setValue("57600");
 
 	}
 

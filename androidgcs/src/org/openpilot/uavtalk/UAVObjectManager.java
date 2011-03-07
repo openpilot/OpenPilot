@@ -118,6 +118,7 @@ public class UAVObjectManager {
 		// Create metaobject
 		String mname = obj.getName();
 		mname += "Meta";
+
 		UAVMetaObject mobj = new UAVMetaObject(obj.getObjID()+1, mname, obj);
 		// Initialize object
 		obj.initialize(0, mobj);
@@ -224,6 +225,17 @@ public class UAVObjectManager {
 		 */
 	}
 
+	
+	/**
+	 * Returns a specific object by name only, returns instance ID zero
+	 * @param name The object name
+	 * @return The object or null if not found
+	 */
+	public UAVObject getObject(String name) 
+	{
+		return getObject(name, 0, 0);
+	}
+	
 	/**
 	 * Get a specific object given its name and instance ID
 	 * @returns The object is found or NULL if not
@@ -233,6 +245,16 @@ public class UAVObjectManager {
 		return getObject(name, 0, instId);
 	}
 
+	/**
+	 * Get a specific object with given object ID and instance ID zero
+	 * @param objId the object id
+	 * @returns The object is found or NULL if not
+	 */
+	public UAVObject getObject(int objId) 
+	{
+		return getObject(null, objId, 0);
+	}
+	
 	/**
 	 * Get a specific object given its object and instance ID
 	 * @returns The object is found or NULL if not

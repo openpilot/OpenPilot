@@ -91,8 +91,7 @@ public class UAVObjectField {
      * @param dataOut
      * @return the number of bytes added
      **/
-    public int pack(ByteBuffer dataOut) {
-        //QMutexLocker locker(obj->getMutex());
+    public synchronized int pack(ByteBuffer dataOut) {
         // Pack each element in output buffer
     	dataOut.order(ByteOrder.LITTLE_ENDIAN);
         switch (type)
@@ -153,7 +152,7 @@ public class UAVObjectField {
         return getNumBytes();    	
     }
     
-    public int unpack(ByteBuffer dataIn) {
+    public synchronized int unpack(ByteBuffer dataIn) {
         // Unpack each element from input buffer
     	dataIn.order(ByteOrder.LITTLE_ENDIAN);
         switch (type)
@@ -240,10 +239,9 @@ public class UAVObjectField {
         return getNumBytes();    	
     }
     
-    Object getValue()  { return getValue(0); };
+    public Object getValue()  { return getValue(0); };
     @SuppressWarnings("unchecked")
-	Object getValue(int index)  {
-//        QMutexLocker locker(obj->getMutex());
+	public synchronized Object getValue(int index)  {
         // Check that index is not out of bounds
         if ( index >= numElements )
         {
@@ -287,8 +285,7 @@ public class UAVObjectField {
     
     public void setValue(Object data) { setValue(data,0); }    
     @SuppressWarnings("unchecked")
-	public void setValue(Object data, int index) {
-    	//    	   QMutexLocker locker(obj->getMutex());
+	public synchronized void setValue(Object data, int index) {
     	// Check that index is not out of bounds
     	//if ( index >= numElements );
     		//throw new Exception("Index out of bounds");
@@ -361,6 +358,7 @@ public class UAVObjectField {
     			//throw new Exception("Sorry I haven't implemented strings yet");
     		}
     		}
+    		obj.updated();
     	}
     }
     
@@ -449,7 +447,7 @@ public class UAVObjectField {
     }
 
     @SuppressWarnings("unchecked")
-	public void clear() {
+	public synchronized void clear() {
     	switch (type)
         {
             case INT8:
@@ -503,7 +501,7 @@ public class UAVObjectField {
         }
     }
     
-    public void constructorInitialize(String name, String units, FieldType type, List<String> elementNames, List<String> options) {
+    public synchronized void constructorInitialize(String name, String units, FieldType type, List<String> elementNames, List<String> options) {
         // Copy params
         this.name = name;
         this.units = units;

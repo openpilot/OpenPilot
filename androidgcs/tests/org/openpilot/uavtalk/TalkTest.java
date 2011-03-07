@@ -9,6 +9,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.Observable;
+import java.util.Observer;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,8 +22,9 @@ public class TalkTest {
 
 	static UAVObjectManager objMngr;
 	static final String IP_ADDRDESS = new String("127.0.0.1");
-	static final int PORT_NUM = 8000;
-	
+	static final int PORT_NUM = 7777;
+	boolean succeed = false;
+
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		objMngr = new UAVObjectManager();
@@ -29,7 +32,7 @@ public class TalkTest {
 	}
 
 	@Test
-	public void testProcessInputStream() {
+	public void testGetFlightStatus() {
 		Socket connection = null;
 		UAVTalk talk = null;
 		try{
@@ -48,7 +51,29 @@ public class TalkTest {
 			fail("Couldn't construct UAVTalk object");
 		}
 		
-		talk.processInputStream();
+		Thread inputStream = talk.getInputProcessThread();
+		inputStream.start();
+
+		succeed = false;
+		
+		UAVObject obj = objMngr.getObject("FlightTelemetryStats");
+
+		obj.addUpdatedObserver( new Observer() {
+			public void update(Observable observable, Object data) {
+				// TODO Auto-generated method stub
+				System.out.println("Updated: " + data.toString());
+				succeed = true;
+			}
+		});
+		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+		}
+		
+		if(!succeed)
+			fail("Never received a FlightTelemetryStats update");
+
 	}
 
 	@Test

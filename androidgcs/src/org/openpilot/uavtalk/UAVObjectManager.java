@@ -23,7 +23,7 @@ public class UAVObjectManager {
 	 * updates.
 	 * @throws Exception 
 	 */
-	public boolean registerObject(UAVDataObject obj) throws Exception
+	public synchronized boolean registerObject(UAVDataObject obj) throws Exception
 	{
 		//  QMutexLocker locker(mutex);
 
@@ -128,7 +128,7 @@ public class UAVObjectManager {
 		return true;
 	}
 
-	public void addObject(UAVObject obj)
+	public synchronized void addObject(UAVObject obj)
 	{
 		// Add to list
 		List<UAVObject> ls = new ArrayList<UAVObject>();
@@ -143,15 +143,15 @@ public class UAVObjectManager {
 	 */
 	public List<List<UAVObject>> getObjects()
 	{
-		//QMutexLocker locker(mutex);
 		return objects;
 	}
 
 	/**
 	 * Same as getObjects() but will only return DataObjects.
 	 */
-	public List< List<UAVDataObject> > getDataObjects()
+	public  List< List<UAVDataObject> > getDataObjects()
 	{
+		assert(false); // TOOD This
 		return new ArrayList<List<UAVDataObject>>();
 
 		/*		QMutexLocker locker(mutex);
@@ -190,6 +190,7 @@ public class UAVObjectManager {
 	 */
 	public List <List<UAVMetaObject> > getMetaObjects()
 	{
+		assert(false); // TODO		
 		return new ArrayList< List<UAVMetaObject> >();
 		/*
 		QMutexLocker locker(mutex);
@@ -267,7 +268,7 @@ public class UAVObjectManager {
 	/**
 	 * Helper function for the public getObject() functions.
 	 */
-	public UAVObject getObject(String name, int objId, int instId)
+	public synchronized UAVObject getObject(String name, int objId, int instId)
 	{
 		//QMutexLocker locker(mutex);
 		// Check if this object type is already in the list
@@ -310,9 +311,8 @@ public class UAVObjectManager {
 	/**
 	 * Helper function for the public getObjectInstances()
 	 */
-	public List<UAVObject> getObjectInstances(String name, int objId)
+	public synchronized List<UAVObject> getObjectInstances(String name, int objId)
 	{
-		//QMutexLocker locker(mutex);
 		// Check if this object type is already in the list
 		ListIterator<List<UAVObject>> objIter = objects.listIterator();
 		while(objIter.hasNext()) {

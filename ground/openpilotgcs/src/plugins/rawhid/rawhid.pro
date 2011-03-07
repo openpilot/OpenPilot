@@ -23,7 +23,8 @@ win32 {
         -lsetupapi
 }
 macx { 
-    SOURCES += pjrc_rawhid_mac.cpp
+    SOURCES += pjrc_rawhid_mac.cpp \
+            usbmonitor_mac.cpp
     SDK = /Developer/SDKs/MacOSX10.5.sdk
     ARCH = -mmacosx-version-min=10.5 \
         -arch \

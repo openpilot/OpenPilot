@@ -41,12 +41,25 @@
 #error "AUX com cannot be used with SPEKTRUM"
 #endif
 
+/**
+ * @Note Framesyncing:
+ * The code resets the watchdog timer whenever a single byte is received, so what watchdog code
+ * is never called if regularly getting bytes
+ 
+/**
+ * Constants
+ */
+
 /* Global Variables */
 
 /* Local Variables, use pios_usart */
 static uint16_t CaptureValue[12],CaptureValueTemp[12];
 static uint8_t prev_byte = 0xFF, sync = 0, bytecount = 0, datalength=0, frame_error=0, byte_array[20] = { 0 };
 
+
+#define MAX_UPDATE_DELAY_MS 100
+static uint32_t last_updated_time = 0;
+static uint32_t max_update_period = 0;
 uint8_t sync_of = 0;
 
 /**
@@ -59,62 +72,8 @@ void PIOS_SPEKTRUM_Init(void)
 		PIOS_SPEKTRUM_Bind();
 	}
 
-	NVIC_InitTypeDef NVIC_InitStructure = pios_spektrum_cfg.irq.init;
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = pios_spektrum_cfg.tim_base_init;
-
-
-	/* Enable appropriate clock to timer module */
-	switch((int32_t) pios_spektrum_cfg.timer) {
-		case (int32_t)TIM1:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM1_CC_IRQn;
-			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
-			break;
-		case (int32_t)TIM2:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
-			break;
-		case (int32_t)TIM3:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
-			break;
-		case (int32_t)TIM4:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
-			break;
-#ifdef STM32F10X_HD
-
-		case (int32_t)TIM5:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM5_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
-			break;
-		case (int32_t)TIM6:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM6_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
-			break;
-		case (int32_t)TIM7:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
-			break;
-		case (int32_t)TIM8:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM8_CC_IRQn;
-			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
-			break;
-#endif
-	}
-	NVIC_Init(&NVIC_InitStructure);
-
-	/* Configure timer clocks */
-	TIM_InternalClockConfig(pios_spektrum_cfg.timer);
-	TIM_TimeBaseInit(pios_spektrum_cfg.timer, &TIM_TimeBaseStructure);
-
-	/* Enable the Capture Compare Interrupt Request */
-	TIM_ITConfig(pios_spektrum_cfg.timer, pios_spektrum_cfg.ccr, ENABLE);
-
-	/* Clear update pending flag */
-	TIM_ClearFlag(pios_spektrum_cfg.timer, TIM_FLAG_Update);
-
-	/* Enable timers */
-	TIM_Cmd(pios_spektrum_cfg.timer, ENABLE);
+	last_updated_time = 0;
+	max_update_period = MAX_UPDATE_DELAY_MS * 1000 * PIOS_RTC_Rate();
 }
 
 /**
@@ -125,6 +84,7 @@ void PIOS_SPEKTRUM_Init(void)
 */
 int16_t PIOS_SPEKTRUM_Get(int8_t Channel)
 {
+	if(PIOS_RTC_Counter() - last_updated_time
 	/* Return error if channel not available */
 	if (Channel >= 12) {
 		return -1;
@@ -285,10 +245,15 @@ void SPEKTRUM_IRQHandler(uint32_t usart_id)
 }
 
 /**
-* This function handles TIM6 global interrupt request.
-*/
-void PIOS_SPEKTRUM_irq_handler() {
-//PIOS_SPEKTRUM_SUPV_IRQ_FUNC {
+ *@brief This function is called when a spektrum word hasnt been decoded for too long
+ */
+void PIOS_SPEKTRUM_timeout() {
+	for (int i = 0; i < 12; i++)
+	{
+		CaptureValue[i] = 0;
+		CaptureValueTemp[i] = 0;
+	}
+}	
 	/* Clear timer interrupt pending bit */
 	TIM_ClearITPendingBit(pios_spektrum_cfg.timer, TIM_IT_Update);
 

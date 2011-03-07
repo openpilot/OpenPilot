@@ -156,8 +156,10 @@ extern void vPortAddTaskHandle( void *pxTaskHandle );
 
 /* Make use of times(man 2) to gather run-time statistics on the tasks. */
 extern void vPortFindTicksPerSecond( void );
+#undef portCONFIGURE_TIMER_FOR_RUN_TIME_STATS
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()	vPortFindTicksPerSecond()		/* Nothing to do because the timer is already present. */
 extern unsigned long ulPortGetTimerValue( void );
+#undef portGET_RUN_TIME_COUNTER_VALUE
 #define portGET_RUN_TIME_COUNTER_VALUE()			ulPortGetTimerValue()			/* Query the System time stats for this process. */
 
 #ifdef __cplusplus

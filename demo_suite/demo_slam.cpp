@@ -1351,7 +1351,11 @@ int main(int argc, char* const* argv)
 		strOpts[sConfigSetup] = strOpts[sDataPath] + strOpts[sConfigSetup].substr(1);
 	if (strOpts[sConfigEstimation][0] == '@' && strOpts[sConfigEstimation][1] == '/')
 		strOpts[sConfigEstimation] = strOpts[sDataPath] + strOpts[sConfigEstimation].substr(1);
-	if (!(intOpts[iReplay] & 1) && intOpts[iDump]) boost::filesystem::copy_file(strOpts[sConfigSetup], strOpts[sDataPath] + "/setup.cfg");
+	if (!(intOpts[iReplay] & 1) && intOpts[iDump])
+	{
+		boost::filesystem::remove(strOpts[sDataPath] + "/setup.cfg");
+		boost::filesystem::copy_file(strOpts[sConfigSetup], strOpts[sDataPath] + "/setup.cfg"/*, boost::filesystem::copy_option::overwrite_if_exists*/);
+	}
 	#ifndef HAVE_MODULE_QDISPLAY
 	intOpts[iDispQt] = 0;
 	#endif

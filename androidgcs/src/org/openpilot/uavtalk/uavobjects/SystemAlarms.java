@@ -121,22 +121,22 @@ public class SystemAlarms extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
-		getField("Alarm").setValue(0,0);
-		getField("Alarm").setValue(0,1);
-		getField("Alarm").setValue(0,2);
-		getField("Alarm").setValue(0,3);
-		getField("Alarm").setValue(0,4);
-		getField("Alarm").setValue(0,5);
-		getField("Alarm").setValue(0,6);
-		getField("Alarm").setValue(0,7);
-		getField("Alarm").setValue(0,8);
-		getField("Alarm").setValue(0,9);
-		getField("Alarm").setValue(0,10);
-		getField("Alarm").setValue(0,11);
-		getField("Alarm").setValue(0,12);
-		getField("Alarm").setValue(0,13);
-		getField("Alarm").setValue(0,14);
-		getField("Alarm").setValue(0,15);
+		getField("Alarm").setValue("Uninitialised",0);
+		getField("Alarm").setValue("Uninitialised",1);
+		getField("Alarm").setValue("Uninitialised",2);
+		getField("Alarm").setValue("Uninitialised",3);
+		getField("Alarm").setValue("Uninitialised",4);
+		getField("Alarm").setValue("Uninitialised",5);
+		getField("Alarm").setValue("Uninitialised",6);
+		getField("Alarm").setValue("Uninitialised",7);
+		getField("Alarm").setValue("Uninitialised",8);
+		getField("Alarm").setValue("Uninitialised",9);
+		getField("Alarm").setValue("Uninitialised",10);
+		getField("Alarm").setValue("Uninitialised",11);
+		getField("Alarm").setValue("Uninitialised",12);
+		getField("Alarm").setValue("Uninitialised",13);
+		getField("Alarm").setValue("Uninitialised",14);
+		getField("Alarm").setValue("Uninitialised",15);
 
 	}
 

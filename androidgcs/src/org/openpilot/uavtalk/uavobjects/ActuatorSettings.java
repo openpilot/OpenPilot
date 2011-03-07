@@ -358,20 +358,20 @@ public class ActuatorSettings extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
-		getField("FixedWingRoll1").setValue(8);
-		getField("FixedWingRoll2").setValue(8);
-		getField("FixedWingPitch1").setValue(8);
-		getField("FixedWingPitch2").setValue(8);
-		getField("FixedWingYaw").setValue(8);
-		getField("FixedWingThrottle").setValue(8);
-		getField("VTOLMotorN").setValue(8);
-		getField("VTOLMotorNE").setValue(8);
-		getField("VTOLMotorE").setValue(8);
-		getField("VTOLMotorSE").setValue(8);
-		getField("VTOLMotorS").setValue(8);
-		getField("VTOLMotorSW").setValue(8);
-		getField("VTOLMotorW").setValue(8);
-		getField("VTOLMotorNW").setValue(8);
+		getField("FixedWingRoll1").setValue("None");
+		getField("FixedWingRoll2").setValue("None");
+		getField("FixedWingPitch1").setValue("None");
+		getField("FixedWingPitch2").setValue("None");
+		getField("FixedWingYaw").setValue("None");
+		getField("FixedWingThrottle").setValue("None");
+		getField("VTOLMotorN").setValue("None");
+		getField("VTOLMotorNE").setValue("None");
+		getField("VTOLMotorE").setValue("None");
+		getField("VTOLMotorSE").setValue("None");
+		getField("VTOLMotorS").setValue("None");
+		getField("VTOLMotorSW").setValue("None");
+		getField("VTOLMotorW").setValue("None");
+		getField("VTOLMotorNW").setValue("None");
 		getField("ChannelUpdateFreq").setValue(50,0);
 		getField("ChannelUpdateFreq").setValue(50,1);
 		getField("ChannelUpdateFreq").setValue(50,2);
@@ -400,14 +400,14 @@ public class ActuatorSettings extends UAVDataObject {
 		getField("ChannelMin").setValue(1000,5);
 		getField("ChannelMin").setValue(1000,6);
 		getField("ChannelMin").setValue(1000,7);
-		getField("ChannelType").setValue(0,0);
-		getField("ChannelType").setValue(0,1);
-		getField("ChannelType").setValue(0,2);
-		getField("ChannelType").setValue(0,3);
-		getField("ChannelType").setValue(0,4);
-		getField("ChannelType").setValue(0,5);
-		getField("ChannelType").setValue(0,6);
-		getField("ChannelType").setValue(0,7);
+		getField("ChannelType").setValue("PWM",0);
+		getField("ChannelType").setValue("PWM",1);
+		getField("ChannelType").setValue("PWM",2);
+		getField("ChannelType").setValue("PWM",3);
+		getField("ChannelType").setValue("PWM",4);
+		getField("ChannelType").setValue("PWM",5);
+		getField("ChannelType").setValue("PWM",6);
+		getField("ChannelType").setValue("PWM",7);
 		getField("ChannelAddr").setValue(0,0);
 		getField("ChannelAddr").setValue(1,1);
 		getField("ChannelAddr").setValue(2,2);

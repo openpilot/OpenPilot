@@ -142,7 +142,7 @@ public class GuidanceSettings extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
-		getField("GuidanceMode").setValue(0);
+		getField("GuidanceMode").setValue("DUAL_LOOP");
 		getField("HorizontalP").setValue(0.2,0);
 		getField("HorizontalP").setValue(150,1);
 		getField("HorizontalVelPID").setValue(0.1,0);
@@ -155,7 +155,7 @@ public class GuidanceSettings extends UAVDataObject {
 		getField("VerticalVelPID").setValue(0,1);
 		getField("VerticalVelPID").setValue(0,2);
 		getField("VerticalVelPID").setValue(0,3);
-		getField("ThrottleControl").setValue(0);
+		getField("ThrottleControl").setValue("FALSE");
 		getField("MaxRollPitch").setValue(10);
 		getField("UpdatePeriod").setValue(100);
 

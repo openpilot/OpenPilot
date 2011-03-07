@@ -132,10 +132,10 @@ public class AHRSSettings extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
-		getField("Algorithm").setValue(1);
+		getField("Algorithm").setValue("INSGPS_INDOOR_NOMAG");
 		getField("Downsampling").setValue(20);
 		getField("UpdatePeriod").setValue(1);
-		getField("BiasCorrectedRaw").setValue(0);
+		getField("BiasCorrectedRaw").setValue("TRUE");
 		getField("YawBias").setValue(0);
 		getField("PitchBias").setValue(0);
 		getField("RollBias").setValue(0);

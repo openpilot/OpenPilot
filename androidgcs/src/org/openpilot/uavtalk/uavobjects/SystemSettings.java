@@ -117,7 +117,7 @@ public class SystemSettings extends UAVDataObject {
 	 */
 	public void setDefaultFieldValues()
 	{
-		getField("AirframeType").setValue(0);
+		getField("AirframeType").setValue("FixedWing");
 
 	}
 

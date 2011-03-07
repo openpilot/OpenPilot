@@ -36,7 +36,10 @@
 
 // *************************************************************
 
-#define PPM_OUT_SYNC_PULSE_US            12000                      // microseconds
+#define PPM_OUT_FRAME_PERIOD_US          20000                      // microseconds
+#define PPM_OUT_HIGH_PULSE_US            480                        // microseconds
+#define PPM_OUT_MIN_CHANNEL_PULSE_US     850                        // microseconds
+#define PPM_OUT_MAX_CHANNEL_PULSE_US     2200                       // microseconds
 
 #define PPM_IN_MIN_SYNC_PULSE_US         7000                       // microseconds .. Pip's 6-chan TX goes down to 8.8ms
 #define PPM_IN_MAX_SYNC_PULSE_US         16000                      // microseconds .. Pip's 6-chan TX goes up to 14.4ms
@@ -59,18 +62,23 @@ volatile int8_t ppm_In_ChannelsDetected = 0;
 volatile int8_t ppm_In_ChannelPulseIndex = -1;
 volatile uint32_t ppm_In_PreviousValue = 0;
 volatile uint32_t ppm_In_CurrentValue = 0;
-volatile uint32_t ppm_In_ChannelPulseWidthNew[PIOS_PPM_IN_MAX_INPUTS];
-volatile uint32_t ppm_In_ChannelPulseWidth[PIOS_PPM_IN_MAX_INPUTS];
+volatile uint32_t ppm_In_ChannelPulseWidthNew[PIOS_PPM_MAX_CHANNELS];
+volatile uint32_t ppm_In_ChannelPulseWidth[PIOS_PPM_MAX_CHANNELS];
+
+volatile uint16_t ppm_Out_ChannelPulseWidth[PIOS_PPM_MAX_CHANNELS];
+volatile uint16_t ppm_Out_SyncPulseWidth = PPM_OUT_FRAME_PERIOD_US;
+volatile int8_t ppm_Out_ChannelPulseIndex = -1;
+volatile uint8_t ppm_Out_ChannelsUsed = 0;
 
 // *************************************************************
 
-// Initialise the ppm
+// Initialise the PPM INPUT
 void ppm_In_Init(void)
 {
 	TIM_ICInitTypeDef TIM_ICInitStructure;
 
 	// disable the timer
-	TIM_Cmd(PIOS_PPM_IN_TIM, DISABLE);
+	TIM_Cmd(PIOS_PPM_TIM, DISABLE);
 
 	ppm_In_PrevFrames = 0;
 	ppm_In_NoisyChannelCounter = 0;
@@ -83,29 +91,29 @@ void ppm_In_Init(void)
 	ppm_In_PreviousValue = 0;
 	ppm_In_CurrentValue = 0;
 
-	for (int i = 0; i < PIOS_PPM_IN_MAX_INPUTS; i++)
+	for (int i = 0; i < PIOS_PPM_MAX_CHANNELS; i++)
 	{
 		ppm_In_ChannelPulseWidthNew[i] = 0;
 		ppm_In_ChannelPulseWidth[i] = 0;
 	}
 
 	// Setup RCC
-	PIOS_PPM_IN_TIMER_RCC_FUNC;
+	PIOS_PPM_TIMER_EN_RCC_FUNC;
 
 	// Enable timer interrupts
 	NVIC_InitTypeDef NVIC_InitStructure;
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_InitStructure.NVIC_IRQChannel = PIOS_PPM_IN_TIM_IRQ;
+	NVIC_InitStructure.NVIC_IRQChannel = PIOS_PPM_TIM_IRQ;
 	NVIC_Init(&NVIC_InitStructure);
 
 	// Init PPM IN pin
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = PPM_IN_PIN;
 	GPIO_InitStructure.GPIO_Mode = PPM_IN_MODE;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Pin = PPM_IN_PIN;
 	GPIO_Init(PPM_IN_PORT, &GPIO_InitStructure);
 
 	// remap the pin to switch it to timer mode
@@ -119,7 +127,7 @@ void ppm_In_Init(void)
 	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
 	TIM_ICInitStructure.TIM_ICFilter = 0x0;
 	TIM_ICInitStructure.TIM_Channel = PIOS_PPM_IN_TIM_CHANNEL;
-	TIM_ICInit(PIOS_PPM_IN_TIM_PORT, &TIM_ICInitStructure);
+	TIM_ICInit(PIOS_PPM_TIM_PORT, &TIM_ICInitStructure);
 
 	// Configure timer clocks
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
@@ -128,47 +136,51 @@ void ppm_In_Init(void)
 	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_InternalClockConfig(PIOS_PPM_IN_TIM_PORT);
-	TIM_TimeBaseInit(PIOS_PPM_IN_TIM_PORT, &TIM_TimeBaseStructure);
+	TIM_InternalClockConfig(PIOS_PPM_TIM_PORT);
+	TIM_TimeBaseInit(PIOS_PPM_TIM_PORT, &TIM_TimeBaseStructure);
 
 	// Enable the Capture Compare Interrupt Request
-	TIM_ITConfig(PIOS_PPM_IN_TIM_PORT, PIOS_PPM_IN_TIM_CCR, ENABLE);
+	TIM_ITConfig(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR, ENABLE);
 
 	// Enable timer
-	TIM_Cmd(PIOS_PPM_IN_TIM, ENABLE);
+	TIM_Cmd(PIOS_PPM_TIM, ENABLE);
 
 	// Setup local variable which stays in this scope
 	// Doing this here and using a local variable saves doing it in the ISR
 	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
 	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
 	TIM_ICInitStructure.TIM_ICFilter = 0x0;
+
+#ifdef PPM_DEBUG
+	DEBUG_PRINTF("ppm_in: initialised\r\n");
+#endif
 }
 
 // TIMER capture/compare interrupt
-void PIOS_PPM_IN_CC_IRQ_FUNC(void)
+void PIOS_PPM_IN_CC_IRQ(void)
 {
 	uint32_t pulse_width_us;    // new pulse width in microseconds
 
 	if (booting || ppm_initialising)
 	{	// just clear the interrupt
-		if (TIM_GetITStatus(PIOS_PPM_IN_TIM_PORT, PIOS_PPM_IN_TIM_CCR) == SET)
+		if (TIM_GetITStatus(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR) == SET)
 		{
-			TIM_ClearITPendingBit(PIOS_PPM_IN_TIM_PORT, PIOS_PPM_IN_TIM_CCR);
-			PIOS_PPM_IN_TIM_GETCAP_FUNC(PIOS_PPM_IN_TIM_PORT);
+			TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR);
+			PIOS_PPM_IN_TIM_GETCAP_FUNC(PIOS_PPM_TIM_PORT);
 		}
-		TIM_ClearITPendingBit(PIOS_PPM_IN_TIM_PORT, PIOS_PPM_IN_TIM_CCR);
+		TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR);
 		return;
 	}
 
 	// Do this as it's more efficient
-	if (TIM_GetITStatus(PIOS_PPM_IN_TIM_PORT, PIOS_PPM_IN_TIM_CCR) == SET)
+	if (TIM_GetITStatus(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR) == SET)
 	{
 		ppm_In_PreviousValue = ppm_In_CurrentValue;
-		ppm_In_CurrentValue = PIOS_PPM_IN_TIM_GETCAP_FUNC(PIOS_PPM_IN_TIM_PORT);
+		ppm_In_CurrentValue = PIOS_PPM_IN_TIM_GETCAP_FUNC(PIOS_PPM_TIM_PORT);
 	}
 
 	// Clear TIMER Capture compare interrupt pending bit
-	TIM_ClearITPendingBit(PIOS_PPM_IN_TIM_PORT, PIOS_PPM_IN_TIM_CCR);
+	TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR);
 
 	// Capture computation
 	if (ppm_In_CurrentValue > ppm_In_PreviousValue)
@@ -194,7 +206,7 @@ void PIOS_PPM_IN_CC_IRQ_FUNC(void)
 				if (ppm_In_ChannelsDetected > 0 && ppm_In_ChannelPulseIndex == ppm_In_ChannelsDetected)
 				{	// detected same number of channels as in previous PPM frame .. save the new channel PWM values
 //					if (ppm_In_NoisyChannelCounter <= 2)	// only update channels if the channels are fairly noise free
-						for (int i = 0; i < PIOS_PPM_IN_MAX_INPUTS; i++)
+						for (int i = 0; i < PIOS_PPM_MAX_CHANNELS; i++)
 							ppm_In_ChannelPulseWidth[i] = ppm_In_ChannelPulseWidthNew[i];
 				}
 				ppm_In_ChannelsDetected = ppm_In_ChannelPulseIndex;     // the number of channels we found in this frame
@@ -217,7 +229,7 @@ void PIOS_PPM_IN_CC_IRQ_FUNC(void)
 
 		if (pulse_width_us >= PPM_IN_MIN_CHANNEL_PULSE_US && pulse_width_us <= PPM_IN_MAX_CHANNEL_PULSE_US)
 		{	// this new channel pulse is within the accepted tolerance range
-			if (ppm_In_ChannelPulseIndex < PIOS_PPM_IN_MAX_INPUTS)
+			if (ppm_In_ChannelPulseIndex < PIOS_PPM_MAX_CHANNELS)
 			{
 				int32_t difference = (int32_t)pulse_width_us - ppm_In_ChannelPulseWidthNew[ppm_In_ChannelPulseIndex];
 				if (abs(difference) >= 300)
@@ -283,13 +295,160 @@ int32_t ppm_In_GetChannelPulseWidth(uint8_t channel)
 		return -1;
 
 	// Return error if channel not available
-	if (channel >= PIOS_PPM_IN_MAX_INPUTS || channel >= ppm_In_ChannelsDetected)
+	if (channel >= PIOS_PPM_MAX_CHANNELS || channel >= ppm_In_ChannelsDetected)
 		return -2;
 
 	if (ppm_In_LastValidFrameTimer > (PPM_IN_MAX_SYNC_PULSE_US * 4) / 1000)
 		return 0;	// to long since last valid PPM frame
 
 	return ppm_In_ChannelPulseWidth[channel];    // return channel pulse width
+}
+
+// *************************************************************
+
+// Initialise the PPM INPUT
+void ppm_Out_Init(void)
+{
+	// disable the timer
+	TIM_Cmd(PIOS_PPM_TIM, DISABLE);
+
+	ppm_Out_SyncPulseWidth = PPM_OUT_FRAME_PERIOD_US;
+	ppm_Out_ChannelPulseIndex = -1;
+	ppm_Out_ChannelsUsed = 0;
+	for (int i = 0; i < PIOS_PPM_MAX_CHANNELS; i++)
+		ppm_Out_ChannelPulseWidth[i] = 1000;
+//		ppm_Out_ChannelPulseWidth[i] = 1000 + i * 100;	// TEST ONLY
+
+//	ppm_Out_ChannelsUsed = 5;	// TEST ONLY
+
+	PIOS_PPM_TIMER_EN_RCC_FUNC;
+
+	// Init PPM OUT pin
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_StructInit(&GPIO_InitStructure);
+	GPIO_InitStructure.GPIO_Pin = PPM_OUT_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
+	GPIO_Init(PPM_OUT_PORT, &GPIO_InitStructure);
+
+	// remap the pin to switch it to timer mode
+//	GPIO_PinRemapConfig(GPIO_PartialRemap1_TIM2, ENABLE);
+//	GPIO_PinRemapConfig(GPIO_PartialRemap2_TIM2, ENABLE);
+	GPIO_PinRemapConfig(GPIO_FullRemap_TIM2, ENABLE);
+
+	// Enable timer interrupt
+	NVIC_InitTypeDef NVIC_InitStructure;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_InitStructure.NVIC_IRQChannel = PIOS_PPM_TIM_IRQ;
+	NVIC_Init(&NVIC_InitStructure);
+
+	// Time base configuration
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
+	TIM_TimeBaseStructure.TIM_Period = ppm_Out_SyncPulseWidth - 1;
+	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
+	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+	TIM_InternalClockConfig(PIOS_PPM_TIM_PORT);
+	TIM_TimeBaseInit(PIOS_PPM_TIM_PORT, &TIM_TimeBaseStructure);
+
+	// Set up for output compare function
+	TIM_OCInitTypeDef TIM_OCInitStructure;
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
+	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Disable;
+	TIM_OCInitStructure.TIM_Pulse = PPM_OUT_HIGH_PULSE_US;
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
+	TIM_OCInitStructure.TIM_OCNPolarity = TIM_OCPolarity_High;
+	TIM_OCInitStructure.TIM_OCIdleState = TIM_OCIdleState_Reset;
+	TIM_OCInitStructure.TIM_OCNIdleState = TIM_OCNIdleState_Reset;
+	TIM_OC3Init(PIOS_PPM_TIM, &TIM_OCInitStructure);
+	TIM_OC3PreloadConfig(PIOS_PPM_TIM, TIM_OCPreload_Enable);
+
+	TIM_ARRPreloadConfig(PIOS_PPM_TIM, ENABLE);
+
+	// TIMER Main Output Enable
+	TIM_CtrlPWMOutputs(PIOS_PPM_TIM, ENABLE);
+
+	// TIM IT enable
+	TIM_ITConfig(PIOS_PPM_TIM, PIOS_PPM_OUT_TIM_CCR, ENABLE);
+
+	// Enable clock to timer module
+	TIM_Cmd(PIOS_PPM_TIM, ENABLE);
+
+#ifdef PPM_DEBUG
+	DEBUG_PRINTF("ppm_out: initialised\r\n");
+#endif
+}
+
+// TIMER capture/compare interrupt
+void PIOS_PPM_OUT_CC_IRQ(void)
+{
+	// clear the interrupt
+	if (TIM_GetITStatus(PIOS_PPM_TIM_PORT, PIOS_PPM_OUT_TIM_CCR) == SET)
+	{
+		TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_OUT_TIM_CCR);
+		PIOS_PPM_IN_TIM_GETCAP_FUNC(PIOS_PPM_TIM_PORT);
+	}
+	TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_OUT_TIM_CCR);
+
+	if (booting || ppm_initialising)
+		return;
+
+	// *************************
+	// update the TIMER period (channel pulse width)
+
+	if (ppm_Out_ChannelPulseIndex < 0)
+	{	// SYNC PULSE
+		TIM_SetAutoreload(PIOS_PPM_TIM, ppm_Out_SyncPulseWidth - 1);    // sync pulse length
+		ppm_Out_SyncPulseWidth = PPM_OUT_FRAME_PERIOD_US;               // reset sync period
+
+		if (ppm_Out_ChannelsUsed > 0)
+			ppm_Out_ChannelPulseIndex = 0;                              // onto channel-1
+	}
+	else
+	{	// CHANNEL PULSE
+		uint16_t pulse_width = ppm_Out_ChannelPulseWidth[ppm_Out_ChannelPulseIndex];
+		if (pulse_width < PPM_OUT_MIN_CHANNEL_PULSE_US) pulse_width = PPM_OUT_MIN_CHANNEL_PULSE_US;
+		else
+		if (pulse_width > PPM_OUT_MAX_CHANNEL_PULSE_US) pulse_width = PPM_OUT_MAX_CHANNEL_PULSE_US;
+
+		TIM_SetAutoreload(PIOS_PPM_TIM, pulse_width - 1);              // channel pulse width
+		ppm_Out_SyncPulseWidth -= pulse_width;                         // maintain constant PPM frame period
+
+		// TEST ONLY
+//		pulse_width += 4;
+//		if (pulse_width > 2000) pulse_width = 1000;
+//		ppm_Out_ChannelPulseWidth[ppm_Out_ChannelPulseIndex] = pulse_width;
+
+		ppm_Out_ChannelPulseIndex++;
+		if (ppm_Out_ChannelPulseIndex >= ppm_Out_ChannelsUsed || ppm_Out_ChannelPulseIndex >= PIOS_PPM_MAX_CHANNELS)
+			ppm_Out_ChannelPulseIndex = -1;                            // back to SYNC pulse
+	}
+
+	// *************************
+}
+
+void ppm_Out_Supervisor(void)
+{	// this gets called once every millisecond by an interrupt
+
+	if (booting || ppm_initialising)
+		return;
+
+
+
+}
+
+// *************************************************************
+// TIMER capture/compare interrupt
+
+void PIOS_PPM_CC_IRQ_FUNC(void)
+{
+	if (saved_settings.mode == MODE_PPM_TX) PIOS_PPM_IN_CC_IRQ();
+	else
+	if (saved_settings.mode == MODE_PPM_RX) PIOS_PPM_OUT_CC_IRQ();
 }
 
 // *************************************************************
@@ -309,6 +468,7 @@ void ppm_1ms_tick(void)
 
 	if (saved_settings.mode == MODE_PPM_RX)
 	{
+		ppm_Out_Supervisor();
 		return;
 	}
 }
@@ -351,7 +511,7 @@ void ppm_process(void)
 				DEBUG_PRINTF("ppm_in: sync %u\r\n", ppm_In_SyncPulseWidth);
 			#endif
 
-			for (int i = 0; i <	PIOS_PPM_IN_MAX_INPUTS && i < ppm_In_ChannelsDetected; i++)
+			for (int i = 0; i <	PIOS_PPM_MAX_CHANNELS && i < ppm_In_ChannelsDetected; i++)
 			{
 //				int32_t pwm = ppm_In_GetChannelPulseWidth(i);
 
@@ -373,13 +533,31 @@ void ppm_process(void)
 
 void ppm_deinit(void)
 {
-	// disable the PPM timer
-	TIM_Cmd(PIOS_PPM_IN_TIM, DISABLE);
+	ppm_initialising = true;
 
-	// un-remap the PPM IN pin
-//	GPIO_PinRemapConfig(GPIO_PartialRemap1_TIM2, DISABLE);
-	GPIO_PinRemapConfig(GPIO_PartialRemap2_TIM2, DISABLE);
-//	GPIO_PinRemapConfig(GPIO_FullRemap_TIM2, DISABLE);
+	// disable the PPM timer
+	TIM_Cmd(PIOS_PPM_TIM, DISABLE);
+
+	PIOS_PPM_TIMER_DIS_RCC_FUNC;
+
+	// TIM IT disable
+	TIM_ITConfig(PIOS_PPM_TIM, PIOS_PPM_IN_TIM_CCR | PIOS_PPM_OUT_TIM_CCR, DISABLE);
+
+	// TIMER Main Output Disable
+	TIM_CtrlPWMOutputs(PIOS_PPM_TIM, DISABLE);
+
+	// un-remap the PPM pins
+	GPIO_PinRemapConfig(GPIO_FullRemap_TIM2, DISABLE);
+
+	// Disable timer interrupt
+	NVIC_InitTypeDef NVIC_InitStructure;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
+	NVIC_InitStructure.NVIC_IRQChannel = PIOS_PPM_TIM_IRQ;
+	NVIC_Init(&NVIC_InitStructure);
+
+	ppm_initialising = false;
 }
 
 void ppm_init(uint32_t our_sn)
@@ -398,6 +576,7 @@ void ppm_init(uint32_t our_sn)
 	else
 	if (saved_settings.mode == MODE_PPM_RX)
 	{
+		ppm_Out_Init();
 		rfm22_init_rx_stream(saved_settings.min_frequency_Hz, saved_settings.max_frequency_Hz);
 	}
 
@@ -409,7 +588,8 @@ void ppm_init(uint32_t our_sn)
 	rfm22_setDatarate(saved_settings.max_rf_bandwidth, FALSE);
 	rfm22_setTxPower(saved_settings.max_tx_power);
 
-	rfm22_setTxStream();			// TEST ONLY
+	if (saved_settings.mode == MODE_PPM_TX)
+		rfm22_setTxStream();
 
 	ppm_initialising = false;
 }

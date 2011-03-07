@@ -140,7 +140,6 @@ bool ConnectionManager::connectDevice()
 	m_connectionDevice = connection_device;
 	m_ioDev = io_dev;
 
-//	connect(m_connectionDevice.connection, SIGNAL(deviceClosed(QObject *)), this, SLOT(onConnectionClosed(QObject *)));
 	connect(m_connectionDevice.connection, SIGNAL(destroyed(QObject *)), this, SLOT(onConnectionDestroyed(QObject *)), Qt::QueuedConnection);
 
 	m_connectBtn->setText("Disconnect");

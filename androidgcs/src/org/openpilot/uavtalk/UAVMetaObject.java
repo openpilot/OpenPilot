@@ -66,6 +66,11 @@ public class UAVMetaObject extends UAVObject {
 		// Setup metadata of parent
 		parentMetadata = parent.getDefaultMetadata();	
 	}
+	
+	@Override
+	public boolean isMetadata() { 
+		return true; 
+	};
 
 	/**
 	 * Get the parent object

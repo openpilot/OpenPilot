@@ -76,7 +76,7 @@ namespace hardware {
 			f.close();
 	}
 
-	HardwareEstimatorMti::HardwareEstimatorMti(std::string device, double trigger_freq, double trigger_shutter, int bufferSize_, int mode, std::string dump_path):
+	HardwareEstimatorMti::HardwareEstimatorMti(std::string device, double trigger_mode, double trigger_freq, double trigger_shutter, int bufferSize_, int mode, std::string dump_path):
 #ifdef HAVE_MTI
 		mti(NULL),
 #endif
@@ -94,21 +94,24 @@ namespace hardware {
 			config.syncOutPulsePolarity = MTI_SYNCOUTPULSE_POS;
 			// number of acquisitions to skip before syncOut pin actuates
 			
-			const double period = 10e-3; // 10ms = 100Hz
-			config.syncOutSkipFactor = std::floor(1. / trigger_freq / period + 0.001) - 1; // mark all acquisitions
-			realFreq = 1. / (period * (config.syncOutSkipFactor + 1) );
-			std::cout << "MTI trigger set to freq " << realFreq << " Hz" << std::endl;
-			// number of ns to offset pin action from sensor sampling
-			config.syncOutOffset = 0; // no offset
-			// number of ns to define pulse width
-			config.syncOutPulseWidth = trigger_shutter/1e-9;
-
-			// Set SyncOut settings
-			if (!mti->set_syncOut(config.syncOutMode, config.syncOutPulsePolarity,
-				config.syncOutSkipFactor, config.syncOutOffset,
-				config.syncOutPulseWidth))
-				std::cout << "mti.set_syncOut failed" << std::endl;
-
+			if (trigger_mode != 0)
+			{
+				const double period = 10e-3; // 10ms = 100Hz
+				config.syncOutSkipFactor = std::floor(1. / trigger_freq / period + 0.001) - 1; // mark all acquisitions
+				realFreq = 1. / (period * (config.syncOutSkipFactor + 1) );
+				std::cout << "MTI trigger set to freq " << realFreq << " Hz" << std::endl;
+				// number of ns to offset pin action from sensor sampling
+				config.syncOutOffset = 0; // no offset
+				// number of ns to define pulse width
+				if (trigger_shutter < 1e-6 || trigger_mode != 1) trigger_shutter = 0.5e-3;
+				config.syncOutPulseWidth = trigger_shutter/1e-9;
+	
+				// Set SyncOut settings
+				if (!mti->set_syncOut(config.syncOutMode, config.syncOutPulsePolarity,
+					config.syncOutSkipFactor, config.syncOutOffset,
+					config.syncOutPulseWidth))
+					std::cout << "mti.set_syncOut failed" << std::endl;
+			}
 //if (!mti.set_outputSkipFactor(49))
 //std::cout << "mti.set_outputFactor failed" << std::endl;
 #endif

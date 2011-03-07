@@ -72,12 +72,12 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		viam_hwsize_t size_to_viamSize(cv::Size size);
 		viam_hwfps_t freq_to_viamFreq(double freq);
 		viam_hwformat_t format_to_viamFormat(int format, int depth);
-		viam_hwtrigger_t trigger_to_viamTrigger(bool trigger);
+		viam_hwtrigger_t trigger_to_viamTrigger(int trigger);
 #endif
 	
 		void init(int mode, std::string dump_path, cv::Size imgSize);
 #ifdef HAVE_VIAM
-		void init(const std::string &camera_id, viam_hwmode_t &hwmode, int mode, std::string dump_path);
+		void init(const std::string &camera_id, viam_hwmode_t &hwmode, double shutter, int mode, std::string dump_path);
 #endif
 	public:
 		
@@ -88,7 +88,7 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		@param mode 0 = normal, 1 = dump used images, 2 = from dumped images
 		@param dump_path the path where the images are saved/read... Use a ram disk !!!
 		*/
-		HardwareSensorCameraFirewire(boost::condition_variable &rawdata_condition, boost::mutex &rawdata_mutex, const std::string &camera_id, cv::Size size, int format, int depth, double freq, bool trigger, int mode = 0, std::string dump_path = ".");
+		HardwareSensorCameraFirewire(boost::condition_variable &rawdata_condition, boost::mutex &rawdata_mutex, const std::string &camera_id, cv::Size size, int format, int depth, double freq, int trigger, double shutter, int mode = 0, std::string dump_path = ".");
 #endif
 		/**
 		Same as before but assumes that mode=2, and doesn't need a camera

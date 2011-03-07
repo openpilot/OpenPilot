@@ -519,11 +519,11 @@ void demo_slam01_main(world_ptr_t *world) {
 
 		robPtr1 = robPtr1_;
 		
-		if (intOpts[iTrigger] == 1)
+		if (intOpts[iTrigger] != 0)
 		{
 			// just to initialize the MTI as an external trigger controlling shutter time
 			hardware::HardwareEstimatorMti hardEst1(
-				configSetup.MTI_DEVICE, floatOpts[fFreq], floatOpts[fShutter], 1, mode, strOpts[sDataPath]);
+				configSetup.MTI_DEVICE, intOpts[iTrigger], floatOpts[fFreq], floatOpts[fShutter], 1, mode, strOpts[sDataPath]);
 			floatOpts[fFreq] = hardEst1.getFreq();
 		}
 	}
@@ -567,8 +567,8 @@ void demo_slam01_main(world_ptr_t *world) {
 		} else
 		{
 			boost::shared_ptr<hardware::HardwareEstimatorMti> hardEst1_(new hardware::HardwareEstimatorMti(
-				configSetup.MTI_DEVICE, floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath]));
-			if (intOpts[iTrigger]) floatOpts[fFreq] = hardEst1_->getFreq();
+				configSetup.MTI_DEVICE, intOpts[iTrigger], floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath]));
+			if (intOpts[iTrigger] != 0) floatOpts[fFreq] = hardEst1_->getFreq();
 			hardEst1_->setSyncConfig(configSetup.IMU_TIMESTAMP_CORRECTION);
 			hardEst1_->start();
 			hardEst1 = hardEst1_;
@@ -734,7 +734,8 @@ void demo_slam01_main(world_ptr_t *world) {
 		
 		#ifdef HAVE_VIAM
 		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, rawdata_mutex, 
-			configSetup.CAMERA_DEVICE, cv::Size(img_width,img_height), 0, 8, floatOpts[fFreq], intOpts[iTrigger], mode, strOpts[sDataPath]));
+			configSetup.CAMERA_DEVICE, cv::Size(img_width,img_height), 0, 8, floatOpts[fFreq], intOpts[iTrigger], 
+			floatOpts[fShutter], mode, strOpts[sDataPath]));
 		senPtr11->setHardwareSensor(hardSen11);
 		#else
 		if (intOpts[iReplay] & 1)
@@ -1264,10 +1265,10 @@ void demo_slam01() {
 	* --usage
 	* --robot 0=constant vel, 1=inertial
 	* --map 0=odometry, 1=global, 2=local/multimap
-	* --trigger 0=internal, 1=external with MTI control, 2=external without control
+	* --trigger 0=internal, 1=external mode 1, 2=external mode 0, 3=external mode 14 (PointGrey (Flea) only)
 	* --simu 0/1
 	* --freq camera frequency in double Hz (with trigger==0/1)
-	* --shutter shutter time in double seconds (with trigger==1)
+	* --shutter shutter time in double seconds (0=auto); for trigger modes 0,2,3 the value is relative between 0 and 1
 	*
 	* You can use the following examples and only change values:
 	* online test (old mode=0):
@@ -1285,7 +1286,7 @@ int main(int argc, char* const* argv)
 {
 	intOpts[iVerbose] = 5;
 	floatOpts[fFreq] = 60.0;
-	floatOpts[fShutter] = 2e-3;
+	floatOpts[fShutter] = 0.0;
 	strOpts[sDataPath] = ".";
 	strOpts[sConfigSetup] = "#!@";
 	strOpts[sConfigEstimation] = "data/estimation.cfg";

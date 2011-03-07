@@ -138,11 +138,18 @@ namespace hardware {
 		return hwformat;
 	}
 
-	viam_hwtrigger_t HardwareSensorCameraFirewire::trigger_to_viamTrigger(bool trigger)
+	viam_hwtrigger_t HardwareSensorCameraFirewire::trigger_to_viamTrigger(int trigger)
 	{
 		viam_hwtrigger_t hwtrigger;
-		if (trigger) hwtrigger = VIAM_HWTRIGGER_MODE1_HIGH;
-		else hwtrigger = VIAM_HWTRIGGER_INTERNAL;
+		switch (trigger)
+		{
+			case 1: hwtrigger = VIAM_HWTRIGGER_MODE1_HIGH; break;
+			case 2: hwtrigger = VIAM_HWTRIGGER_MODE0_HIGH; break;
+			case 3: std::cout << "error: trigger mode 14 not implemented in viam, switch to mode 0" << std::endl;
+			        hwtrigger = VIAM_HWTRIGGER_MODE0_HIGH; break;
+			default:
+			case 0: hwtrigger = VIAM_HWTRIGGER_INTERNAL;
+		}
 		return hwtrigger;
 	}
 
@@ -265,7 +272,7 @@ namespace hardware {
 	
 
 #ifdef HAVE_VIAM
-	void HardwareSensorCameraFirewire::init(const std::string &camera_id, viam_hwmode_t &hwmode, int mode, std::string dump_path)
+	void HardwareSensorCameraFirewire::init(const std::string &camera_id, viam_hwmode_t &hwmode, double shutter, int mode, std::string dump_path)
 	{
 		// configure camera
 		if (mode == 0 || mode == 1)
@@ -278,6 +285,18 @@ namespace hardware {
 			r = viam_camera_sethwmode(handle, camera, &hwmode);
 			r = viam_hardware_load(handle,"dc1394");
 			r = viam_hardware_attach(handle);
+			
+			if (hwmode.trigger != VIAM_HWTRIGGER_MODE1_HIGH)
+			{ 
+				viam_filter_t shutter_filter = NULL;
+				viam_image_ref image = viam_image_getbyname(handle, "image1");
+				shutter_filter = viam_filter_luminance_create(handle, "shutter", VIAM_FILTER_SHUTTER, shutter);
+				if (shutter >= 1e-6)
+					viam_filter_push(handle, image, shutter_filter, VIAM_FILTER_HARDWARE, VIAM_FILTER_MANUAL);
+				else
+					viam_filter_push(handle, image, shutter_filter, VIAM_FILTER_HARDWARE, VIAM_FILTER_HARDWARE_AUTO);
+			}
+			
 			r = viam_bank_configure(handle, bank);
 			r = viam_datatransmit(handle, bank, VIAM_ON);
 		}
@@ -285,13 +304,13 @@ namespace hardware {
 		init(mode, dump_path, viamSize_to_size(hwmode.size));
 	}
 
-	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(boost::condition_variable &rawdata_condition, boost::mutex &rawdata_mutex, const std::string &camera_id, cv::Size size, int format, int depth, double freq, bool trigger, int mode, std::string dump_path):
+	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(boost::condition_variable &rawdata_condition, boost::mutex &rawdata_mutex, const std::string &camera_id, cv::Size size, int format, int depth, double freq, int trigger, double shutter, int mode, std::string dump_path):
 		HardwareSensorAbstract(rawdata_condition, rawdata_mutex), index(0)
 	{
 		viam_hwmode_t hwmode = { size_to_viamSize(size), format_to_viamFormat(format, depth), VIAM_HW_FIXED, freq_to_viamFreq(freq), trigger_to_viamTrigger(trigger) };
 		realFreq = viamFreq_to_freq(hwmode.fps);
 		std::cout << "Camera set to freq " << realFreq << " Hz (external trigger " << trigger << ")" << std::endl;
-		init(camera_id, hwmode, mode, dump_path);
+		init(camera_id, hwmode, shutter, mode, dump_path);
 	}
 #endif
 

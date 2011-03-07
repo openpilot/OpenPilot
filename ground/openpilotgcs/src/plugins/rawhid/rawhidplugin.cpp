@@ -86,7 +86,7 @@ QStringList RawHIDConnection::availableDevices()
 {
     QStringList devices;
 
-    QList<USBPortInfo> portsList = m_usbMonitor.availableDevices();
+    QList<USBPortInfo> portsList = m_usbMonitor.availableDevices(0x20a0, -1, -1);
     // We currently list devices by their serial number
     foreach(USBPortInfo prt, portsList) {
         devices.append(prt.serialNumber);

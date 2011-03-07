@@ -71,7 +71,7 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDevice)
     QList<USBPortInfo> thePortsWeWant;
 
     foreach (USBPortInfo port, allPorts) {
-        if((port.vendorID==vid || vid==-1) && (port.productID==pid || vid==-1) && (port.bcdDevice==bcdDevice || bcdDevice==-1))
+        if((port.vendorID==vid || vid==-1) && (port.productID==pid || pid==-1) && (port.bcdDevice==bcdDevice || bcdDevice==-1))
             thePortsWeWant.append(port);
     }
     return thePortsWeWant;

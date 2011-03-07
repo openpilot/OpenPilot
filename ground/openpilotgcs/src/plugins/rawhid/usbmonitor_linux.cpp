@@ -95,8 +95,8 @@ QList<USBPortInfo> USBMonitor::availableDevices()
     struct udev_device *dev;
 
     enumerate = udev_enumerate_new(this->context);
-//    udev_enumerate_add_match_subsystem(enumerate,"usb");
-    udev_enumerate_add_match_sysattr(enumerate, "idVendor", "20a0");
+    udev_enumerate_add_match_subsystem(enumerate,"usb");
+//    udev_enumerate_add_match_sysattr(enumerate, "idVendor", "20a0");
     udev_enumerate_scan_devices(enumerate);
     devices = udev_enumerate_get_list_entry(enumerate);
     // Will use the 'native' udev functions to loop:
@@ -107,26 +107,9 @@ QList<USBPortInfo> USBMonitor::availableDevices()
         and create a udev_device object (dev) representing it */
         path = udev_list_entry_get_name(dev_list_entry);
         dev = udev_device_new_from_syspath(this->context, path);
-
-        /* The device pointed to by dev contains information about
-        the hidraw device. In order to get information about the
-        USB device, get the parent device with the
-        subsystem/devtype pair of "usb"/"usb_device". This will
-        be several levels up the tree, but the function will find
-        it.*/
-        /*
-        dev = udev_device_get_parent_with_subsystem_devtype(
-                    dev,
-                    "usb",
-                    "usb_device");
-        if (!dev) {
-            printf("Unable to find parent usb device.");
-            return  devicesList;
-        }
-        */
-
-        devicesList.append(makePortInfo(dev));
-            udev_device_unref(dev);
+        if (QString(udev_device_get_devtype(dev)) == "usb_device")
+            devicesList.append(makePortInfo(dev));
+        udev_device_unref(dev);
     }
     /* free the enumerator object */
     udev_enumerate_unref(enumerate);
@@ -144,7 +127,7 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDevice)
     QList<USBPortInfo> thePortsWeWant;
 
     foreach (USBPortInfo port, allPorts) {
-        if((port.vendorID==vid || vid==-1) && (port.productID==pid || vid==-1) && (port.bcdDevice==bcdDevice || bcdDevice==-1))
+        if((port.vendorID==vid || vid==-1) && (port.productID==pid || pid==-1) && (port.bcdDevice==bcdDevice || bcdDevice==-1))
             thePortsWeWant.append(port);
     }
     return thePortsWeWant;
@@ -183,14 +166,15 @@ USBPortInfo USBMonitor::makePortInfo(struct udev_device *dev)
     //////////
 
 
-    prtInfo.vendorID = QString(udev_device_get_sysattr_value(dev, "idVendor")).toInt();
-    prtInfo.productID = QString(udev_device_get_sysattr_value(dev, "idProduct")).toInt();
+    bool ok;
+    prtInfo.vendorID = QString(udev_device_get_sysattr_value(dev, "idVendor")).toInt(&ok, 16);
+    prtInfo.productID = QString(udev_device_get_sysattr_value(dev, "idProduct")).toInt(&ok, 16);
     prtInfo.serialNumber = QString(udev_device_get_sysattr_value(dev, "serial"));
     prtInfo.manufacturer = QString(udev_device_get_sysattr_value(dev,"manufacturer"));
     prtInfo.product = QString(udev_device_get_sysattr_value(dev,"product"));
 //    prtInfo.UsagePage = QString(udev_device_get_sysattr_value(dev,""));
 //    prtInfo.Usage = QString(udev_device_get_sysattr_value(dev,""));
-    prtInfo.bcdDevice = QString(udev_device_get_sysattr_value(dev,"bcdDevice")).toInt();
+    prtInfo.bcdDevice = QString(udev_device_get_sysattr_value(dev,"bcdDevice")).toInt(&ok, 16);
 
 
 

@@ -52,7 +52,7 @@
 
 #define GYRO_OOB(x) ((x > (1000 * DEG_TO_RAD)) || (x < (-1000 * DEG_TO_RAD)))
 #define ACCEL_OOB(x) (((x > 12*9.81) || (x < -12*9.81)))
-
+#define ISNAN(x) (x != x)
 // down-sampled data index
 #define ACCEL_RAW_X_IDX			2
 #define ACCEL_RAW_Y_IDX			0
@@ -623,10 +623,20 @@ for all data to be up to date before doing anything*/
 
 		// This function blocks till data avilable
 		get_accel_gyro_data();
-		
+			
 		counter_val = timer_count();
 		idle_counts = counter_val - last_counter_idle_start;
 		last_counter_idle_end = counter_val;
+		
+		
+		if(ISNAN(accel_data.filtered.x + accel_data.filtered.y + accel_data.filtered.z) ||
+		   ISNAN(gyro_data.filtered.x + gyro_data.filtered.y + gyro_data.filtered.z) ||
+		   ACCEL_OOB(accel_data.filtered.x + accel_data.filtered.y + accel_data.filtered.z) ||
+		   GYRO_OOB(gyro_data.filtered.x + gyro_data.filtered.y + gyro_data.filtered.z)) {	
+			// If any values are NaN or huge don't update
+//TODO: add field to ahrs status to track number of these events
+			continue;
+		}
 		
 		print_ekf_binary();
 
@@ -694,7 +704,6 @@ bool get_accel_gyro_data()
  * The accel_data values are converted into a coordinate system where X is forwards along
  * the fuselage, Y is along right the wing, and Z is down.
  */
-static uint16_t bad_values = 0;
 void adc_callback(float * downsampled_data)
 {	
 	AHRSSettingsData settings;
@@ -725,19 +734,11 @@ void adc_callback(float * downsampled_data)
 		accel[2] -= gravity_tracking[2];
 	}
 #endif
-	if(!(isnan(accel[0] + accel[1] + accel[2]) ||
-	     isnan(gyro[0] + gyro[1] + gyro[2]) || 
-	     ACCEL_OOB(accel[0] + accel[1] + accel[2]) ||
-	     GYRO_OOB(gyro[0] + gyro[1] + gyro[2]))) {	
-		if(fifoBuf_getFree(&adc_fifo_buffer) >= (sizeof(accel) + sizeof(gyro))) {
-			fifoBuf_putData(&adc_fifo_buffer, (uint8_t *) &accel[0], sizeof(accel));
-			fifoBuf_putData(&adc_fifo_buffer, (uint8_t *) &gyro[0], sizeof(gyro));
-		} else {
-			ekf_too_slow++;
-		}
+	if(fifoBuf_getFree(&adc_fifo_buffer) >= (sizeof(accel) + sizeof(gyro))) {
+		fifoBuf_putData(&adc_fifo_buffer, (uint8_t *) &accel[0], sizeof(accel));
+		fifoBuf_putData(&adc_fifo_buffer, (uint8_t *) &gyro[0], sizeof(gyro));
 	} else {
-		// If any values are NaN or inf don't push them
-		bad_values++;
+		ekf_too_slow++;
 	}
 	
 	AttitudeRawData raw;

@@ -623,7 +623,10 @@ for all data to be up to date before doing anything*/
 
 		// This function blocks till data avilable
 		get_accel_gyro_data();
-			
+
+		// Get any mag data available
+		process_mag_data();
+
 		counter_val = timer_count();
 		idle_counts = counter_val - last_counter_idle_start;
 		last_counter_idle_end = counter_val;
@@ -675,7 +678,6 @@ bool get_accel_gyro_data()
 	while(fifoBuf_getUsed(&adc_fifo_buffer) < (sizeof(accel) + sizeof(gyro))) {
 		if(spin_count++ == 0) 
 			AhrsPoll();
-		process_mag_data();
 	}
 	
 	fifoBuf_getData(&adc_fifo_buffer, &accel[0], sizeof(float) * 3);

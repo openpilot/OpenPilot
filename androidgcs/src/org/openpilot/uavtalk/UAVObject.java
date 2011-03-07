@@ -3,9 +3,50 @@ package org.openpilot.uavtalk;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Observer;
+import java.util.Observable;
 
 public abstract class UAVObject {
 
+	public class CallbackListener extends Observable {		
+		private UAVObject parent;
+		
+		public CallbackListener(UAVObject parent) {
+			this.parent = parent;
+		}
+
+		public void event () {
+			setChanged();
+			notifyObservers(parent);
+		}
+	}
+	
+	private CallbackListener updatedListeners = new CallbackListener(this);
+	public void addUpdatedObserver(Observer o) {
+		synchronized(updatedListeners) {
+			updatedListeners.addObserver(o);
+		}
+	}
+	void updated() {
+		synchronized(updatedListeners) {
+			updatedListeners.event();
+		}
+	}
+	
+	private CallbackListener unpackedListeners = new CallbackListener(this);
+	public void addUnpackedObserver(Observer o) {
+		synchronized(unpackedListeners) {
+			unpackedListeners.addObserver(o);
+		}
+	}
+	void unpacked() {
+		synchronized(unpackedListeners) {
+			System.out.println("Unpacked!: " + unpackedListeners.countObservers() + " " + getName());
+			unpackedListeners.event();
+		}
+	}
+
+	
 	/**
 	 * Object update mode
 	 */
@@ -298,10 +339,12 @@ public abstract class UAVObject {
 			UAVObjectField field = li.next();
 			numBytes += field.unpack(dataIn);
 		}
+		
+		// Trigger all the listeners for the unpack event
+		unpacked();
+		updated();
+		
 		return numBytes;
-		// TODO: Callbacks
-		// emit objectUnpacked(this); // trigger object updated event
-		// emit objectUpdated(this);
 	}
 
 	// /**

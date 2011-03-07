@@ -10,6 +10,22 @@ import java.nio.ByteOrder;
 
 public class UAVTalk {
 
+	private Thread inputProcessingThread = null;
+	/**
+	 * A reference to the thread for processing the incoming stream
+	 * @return
+	 */
+	public Thread getInputProcessThread() {
+		if(inputProcessingThread == null)
+
+			inputProcessingThread = new Thread() {
+			public void run() {
+				processInputStream();
+			}
+		};
+		return inputProcessingThread;
+	}
+	
 	/**
 	 * Constants
 	 */
@@ -684,7 +700,7 @@ public class UAVTalk {
 	 * \param[in] type Transaction type
 	 * \return Success (true), Failure (false)
 	 */
-	public boolean transmitSingleObject(UAVObject obj, int type, boolean allInstances)
+	public synchronized boolean transmitSingleObject(UAVObject obj, int type, boolean allInstances)
 	{
 		int length;
 		int dataOffset;

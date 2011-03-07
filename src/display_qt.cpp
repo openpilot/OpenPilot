@@ -228,7 +228,10 @@ std::cout << "connecting slots" << std::endl;
 				delete predictedApp_;
 				predictedApp_ = slamObs_->predictedAppearance->clone();
 #endif
-				break;
+            break;
+         case LandmarkDisplay::ltSeg:
+            // TODO : Implement
+            break;
 			default:
 				JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkGeomType_);
 				break;
@@ -361,8 +364,10 @@ std::cout << "connecting slots" << std::endl;
 
 				}
 				break;
-			}
-
+         }
+         case LandmarkDisplay::ltSeg:
+            // TODO : implement
+            break;
 			default:
 				JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkGeomType_);
 		}

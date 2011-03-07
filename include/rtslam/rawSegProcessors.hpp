@@ -34,6 +34,15 @@ namespace rtslam {
 
       public:
          struct matcher_params_t {
+            // RANSAC
+            int maxSearchSize;
+            double lowInnov;      ///<     search region radius for first RANSAC consensus
+            double threshold;     ///<     matching threshold
+            double mahalanobisTh; ///< Mahalanobis distance for outlier rejection
+            double relevanceTh; ///< Mahalanobis distance for no information rejection
+            double measStd;       ///<       measurement noise std deviation
+            double measVar;       ///<       measurement noise variance
+            // DSEG
             double translationError;
             double rotationError;
          } params;
@@ -48,8 +57,8 @@ namespace rtslam {
 
          void match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, const image::ConvexRoi & roi, Measurement & measure, appearance_ptr_t & app)
          {
-            app_img_seg_ptr_t targetAppSpec = SPTR_CAST<AppearanceImageSegment>(targetApp);
-            app_img_seg_ptr_t appSpec = SPTR_CAST<AppearanceImageSegment>(app);
+            app_seg_ptr_t targetAppSpec = SPTR_CAST<AppearanceSegment>(targetApp);
+            app_seg_ptr_t appSpec = SPTR_CAST<AppearanceSegment>(app);
 /*
             measure.std(params.measStd);
             measure.matchScore = matcher.match(targetAppSpec->patch, *(rawPtr->img),
@@ -72,6 +81,10 @@ namespace rtslam {
 
       public:
          struct detector_params_t {
+            // RANSAC
+            double measStd;       ///<       measurement noise std deviation
+            double measVar;       ///<       measurement noise variance
+            // HDSEG
             int hierarchyLevel;
          } params;
 
@@ -83,14 +96,18 @@ namespace rtslam {
             params.hierarchyLevel = hierarchyLevel;
          }
 
-         bool detect(const boost::shared_ptr<RawImage> & rawData, const image::ConvexRoi &roi, boost::shared_ptr<FeatureImagePoint> & featPtr)
+         bool detect(const boost::shared_ptr<RawImage> & rawData, const image::ConvexRoi &roi, boost::shared_ptr<FeatureSegment> & featPtr)
          {
-/*
-            featPtr.reset(new FeatureImagePoint(params.patchSize, params.patchSize, CV_8U));
+            bool ret = false;
+            featPtr.reset(new FeatureSegment());
             featPtr->measurement.std(params.measStd);
-*/
-            if (detector.detectIn(*(rawData->img.get()), featPtr, &roi))
+
+            ret = detector.detectIn(*(rawData->img.get()), featPtr, &roi);
+
+            if(ret)
             {
+               // Don't extract yet
+
                /*
                // extract appearance
                vec pix = featPtr->measurement.x();
@@ -100,20 +117,22 @@ namespace rtslam {
                appPtr->offset.x()(1) = pix(1) - ((int)pix(1) + 0.5);
                appPtr->offset.P() = jblas::zero_mat(2); // by definition this is our landmark projection
                */
-               return true;
-            } else return false;
+            }
+
+            JFR_DEBUG("returning " << (ret ? "true" : "false"));
+            return ret;
          }
 
-         void fillDataObs(const boost::shared_ptr<FeatureImageSegment> & featPtr, boost::shared_ptr<ObservationAbstract> & obsPtr)
+         void fillDataObs(const boost::shared_ptr<FeatureSegment> & featPtr, boost::shared_ptr<ObservationAbstract> & obsPtr)
          {
             // extract observed appearance
-            app_img_pnt_ptr_t app_src = SPTR_CAST<AppearanceImagePoint>(featPtr->appearancePtr);
-            app_img_pnt_ptr_t app_dst = SPTR_CAST<AppearanceImagePoint>(obsPtr->observedAppearance);
-            app_src->patch.copyTo(app_dst->patch);
+            app_seg_ptr_t app_src = SPTR_CAST<AppearanceSegment>(featPtr->appearancePtr);
+            app_seg_ptr_t app_dst = SPTR_CAST<AppearanceSegment>(obsPtr->observedAppearance);
+//            app_src->patch.copyTo(app_dst->patch);
             /*app_src->patch.copy(app_dst->patch, (app_src->patch.width()-app_dst->patch.width())/2,
                   (app_src->patch.height()-app_dst->patch.height())/2, 0, 0,
                   app_dst->patch.width(), app_dst->patch.height());*/
-            app_dst->offset = app_src->offset;
+            //app_dst->offset = app_src->offset;
 
             // create descriptor
             descriptor_ptr_t descPtr(descFactory->createDescriptor());

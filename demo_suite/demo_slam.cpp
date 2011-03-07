@@ -82,6 +82,13 @@
 #define RELEVANCE_TEST 0
 
 
+/*
+ * STATUS: in progress, do not use for now
+ * This uses HDseg powered Segment based slam instead of the usual point based slam.
+ */
+#define SEGMENT_BASED 1
+
+
 /** ############################################################################
  * #############################################################################
  * Includes
@@ -117,6 +124,7 @@
 #include "rtslam/observationFactory.hpp"
 #include "rtslam/observationMakers.hpp"
 #include "rtslam/activeSearch.hpp"
+#include "rtslam/activeSegmentSearch.hpp"
 #include "rtslam/featureAbstract.hpp"
 #include "rtslam/rawImage.hpp"
 #include "rtslam/descriptorImagePoint.hpp"
@@ -160,9 +168,12 @@ typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, S
 	AppearanceImagePoint, SensorAbstract::PINHOLE, LandmarkAbstract::PNT_AH> PinholeAhpObservationMaker;
 typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, SensorPinHole, LandmarkAnchoredHomogeneousPoint,
 	simu::AppearanceSimu, SensorAbstract::PINHOLE, LandmarkAbstract::PNT_AH> PinholeAhpSimuObservationMaker;
+typedef ImageSegmentObservationMaker<ObservationPinHoleAnchoredHomogeneousPointsLine, SensorPinHole, LandmarkAnchoredHomogeneousPointsLine,
+   AppearanceImageSegment, SensorAbstract::PINHOLE, LandmarkAbstract::LINE_AHPL> PinholeAhplObservationMaker;
 
 typedef DataManagerOnePointRansac<RawImage, SensorPinHole, FeatureImagePoint, image::ConvexRoi, ActiveSearchGrid, ImagePointHarrisDetector, ImagePointZnccMatcher> DataManager_ImagePoint_Ransac;
 typedef DataManagerOnePointRansac<simu::RawSimu, SensorPinHole, simu::FeatureSimu, image::ConvexRoi, ActiveSearchGrid, simu::DetectorSimu<image::ConvexRoi>, simu::MatcherSimu<image::ConvexRoi> > DataManager_ImagePoint_Ransac_Simu;
+typedef DataManagerOnePointRansac<RawImage, SensorPinHole, FeatureSegment, image::ConvexRoi, ActiveSegmentSearchGrid, HDsegDetector, DsegMatcher> DataManager_ImageSeg_Test;
 
 int mode = 0;
 time_t rseed;
@@ -408,6 +419,9 @@ void demo_slam01_main(world_ptr_t *world) {
 	
 	// pin-hole parameters in BOOST format
 	boost::shared_ptr<ObservationFactory> obsFact(new ObservationFactory());
+#ifdef SEGMENT_BASED
+   obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhplObservationMaker(configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5, configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
+#else
 	if (intOpts[iSimu] != 0)
 	{
 		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpSimuObservationMaker(
@@ -421,7 +435,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhpObservationMaker(
 		  configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
 	}
-
+#endif
 
 	// ---------------------------------------------------------------------------
 	// --- INIT ------------------------------------------------------------------
@@ -433,10 +447,16 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	// 1. Create maps.
 	map_ptr_t mapPtr(new MapAbstract(configEstimation.MAP_SIZE));
+<<<<<<< HEAD
 	mapPtr->linkToParentWorld(worldPtr);
 	
-	// 1b. Create map manager.
-	landmark_factory_ptr_t lmkFactory(new LandmarkFactory<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint>());
+   // 1b. Create map manager.
+
+#ifdef SEGMENT_BASED
+   landmark_factory_ptr_t lmkFactory(new LandmarkFactory<LandmarkAnchoredHomogeneousPointsLine, LandmarkAnchoredHomogeneousPointsLine>());
+#else
+   landmark_factory_ptr_t lmkFactory(new LandmarkFactory<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint>());
+#endif
 	map_manager_ptr_t mmPoint;
 	switch(intOpts[iMap])
 	{
@@ -699,12 +719,15 @@ void demo_slam01_main(world_ptr_t *world) {
 	
 	// 3b. Create data manager.
 	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(img_width, img_height, configEstimation.GRID_HCELLS, configEstimation.GRID_VCELLS, configEstimation.GRID_MARGIN, configEstimation.GRID_SEPAR));
-	
+   boost::shared_ptr<ActiveSegmentSearchGrid> assGrid(new ActiveSegmentSearchGrid(img_width, img_height, configEstimation.GRID_HCELLS, configEstimation.GRID_VCELLS, configEstimation.GRID_MARGIN, configEstimation.GRID_SEPAR));
+
 	#if RANSAC_FIRST
-	int ransac_ntries = configEstimation.RANSAC_NTRIES;
+   int ransac_ntries = configEstimation.RANSAC_NTRIES;
 	#else
 	int ransac_ntries = 0;
-	#endif
+   #endif
+
+   #ifndef SEGMENT_BASED
 	if (intOpts[iSimu] != 0)
 	{
 		boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
@@ -719,22 +742,37 @@ void demo_slam01_main(world_ptr_t *world) {
 		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator(rawdata_condition, rawdata_mutex, floatOpts[fFreq], simulator, senPtr11->id(), robPtr1->id()));
 		senPtr11->setHardwareSensor(hardSen11);
 	} else
-	{
-		boost::shared_ptr<DescriptorFactoryAbstract> descFactory;
-		if (configEstimation.MULTIVIEW_DESCRIPTOR)
-			descFactory.reset(new DescriptorImagePointMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImagePointMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
-		else
-			descFactory.reset(new DescriptorImagePointFirstViewFactory(configEstimation.DESC_SIZE));
+   #endif
+   {
+      #ifdef SEGMENT_BASED
+         if (configEstimation.MULTIVIEW_DESCRIPTOR)
+            descFactory.reset(new DescriptorImageSegMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImagePointMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
+         else
+            descFactory.reset(new DescriptorImageSegFirstViewFactory(configEstimation.DESC_SIZE));
 
-		boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(configEstimation.HARRIS_CONV_SIZE, configEstimation.HARRIS_TH, configEstimation.HARRIS_EDDGE, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, descFactory));
-		boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(configEstimation.MIN_SCORE, configEstimation.PARTIAL_POSITION, configEstimation.PATCH_SIZE, configEstimation.MAX_SEARCH_SIZE, configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE));
-		
-		boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
+         boost::shared_ptr<HDsegDetector> hdsegDetector(new HDsegDetector(3,descFactory));
+         boost::shared_ptr<DsegMatcher> dsegMatcher(new DsegMatcher(0.1,0.1));
+         boost::shared_ptr<DataManager_ImageSeg_Test> dmSeg(new DataManager_ImageSeg_Test(hdsegDetector, dsegMatcher, assGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
 
-		dmPt11->linkToParentSensorSpec(senPtr11);
-		dmPt11->linkToParentMapManager(mmPoint);
-		dmPt11->setObservationFactory(obsFact);
+         dmSeg->linkToParentSensorSpec(senPtr11);
+         dmSeg->linkToParentMapManager(mmSeg);
+         dmSeg->setObservationFactory(obsFact);
+      #else
+         boost::shared_ptr<DescriptorFactoryAbstract> descFactory;
+         if (configEstimation.MULTIVIEW_DESCRIPTOR)
+            descFactory.reset(new DescriptorImagePointMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImagePointMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
+         else
+            descFactory.reset(new DescriptorImagePointFirstViewFactory(configEstimation.DESC_SIZE));
 
+         boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(configEstimation.HARRIS_CONV_SIZE, configEstimation.HARRIS_TH, configEstimation.HARRIS_EDDGE, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, descFactory));
+         boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(configEstimation.MIN_SCORE, configEstimation.PARTIAL_POSITION, configEstimation.PATCH_SIZE, configEstimation.MAX_SEARCH_SIZE, configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE));
+
+         boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
+
+         dmPt11->linkToParentSensorSpec(senPtr11);
+         dmPt11->linkToParentMapManager(mmPoint);
+         dmPt11->setObservationFactory(obsFact);
+      #endif
 		
 		#ifdef HAVE_VIAM
 		viam_hwcrop_t crop;

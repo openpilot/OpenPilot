@@ -21,11 +21,19 @@ namespace jafar {
          converged = false;
       }
 
+      LandmarkAnchoredHomogeneousPointsLine::LandmarkAnchoredHomogeneousPointsLine(const map_ptr_t & _mapPtr, const landmark_ptr_t _prevLmk,jblas::ind_array & _icomp) :
+         LandmarkAbstract(_mapPtr, 11) {
+          // Do nothing this constructor is not supposed to be called
+          // Nothing reparametrizes to AHPL (yet)
+          assert(false);
+      }
+
       bool LandmarkAnchoredHomogeneousPointsLine::needToDie(DecisionMethod dieMet){
-         double rho = state.x(6);
-         if (rho < 0)
+         double rho1 = state.x(6);
+         double rho2 = state.x(10);
+         if (rho1 < 0 || rho2 < 0)
          {
-            JFR_DEBUG( "Lmk AHP " << id() << " Killed by negative depth (" << rho << ")" );
+            JFR_DEBUG( "Lmk AHP " << id() << " Killed by negative depth (" << rho1 << " " << rho2 << ")" );
             return true;
          }
          return LandmarkAbstract::needToDie(dieMet);

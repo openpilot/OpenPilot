@@ -12,6 +12,7 @@
 #include "rtslam/observationFactory.hpp"
 #include "rtslam/featurePoint.hpp"
 #include "rtslam/descriptorImagePoint.hpp"
+#include "rtslam/descriptorImageSeg.hpp"
 #include "rtslam/simuData.hpp"
 
 namespace jafar {
@@ -61,5 +62,43 @@ class ImagePointObservationMaker
 		}
 		*/
 };
+
+template<class ObsType, class SenType, class LmkType, class AppType,
+    SensorAbstract::type_enum SenTypeId, LandmarkAbstract::type_enum LmkTypeId>
+class ImageSegmentObservationMaker
+  : public ObservationMakerAbstract
+{
+   private:
+      double reparTh;
+      int killSizeTh;
+      int killSearchTh;
+      double killMatchTh;
+      double killConsistencyTh;
+      double dmin;
+      int patchSize;
+   public:
+
+      ImageSegmentObservationMaker(double _reparTh, int _killSizeTh, int _killSearchTh, double _killMatchTh, double _killConsistencyTh, double _dmin, int _patchSize):
+         ObservationMakerAbstract(SenTypeId, LmkTypeId), reparTh(_reparTh), killSizeTh(_killSizeTh), killSearchTh(_killSearchTh),
+         killMatchTh(_killMatchTh), killConsistencyTh(_killConsistencyTh), dmin(_dmin), patchSize(_patchSize) {}
+
+      observation_ptr_t create(const sensor_ptr_t &senPtr, const landmark_ptr_t &lmkPtr)
+      {
+         boost::shared_ptr<ObsType> res(new ObsType(senPtr, lmkPtr));
+         if (boost::is_same<AppType,AppearanceImageSegment>::value)
+         {
+            res->predictedAppearance.reset(new AppearanceImageSegment(patchSize, patchSize, CV_8U));
+            res->observedAppearance.reset(new AppearanceImageSegment(patchSize, patchSize, CV_8U));
+         } else
+         if (boost::is_same<AppType,simu::AppearanceSimu>::value)
+         {
+            res->predictedAppearance.reset(new simu::AppearanceSimu());
+            res->observedAppearance.reset(new simu::AppearanceSimu());
+         }
+         res->setup(reparTh, killSizeTh, killSearchTh, killMatchTh, killConsistencyTh, dmin);
+         return res;
+      }
+};
+
 
 }} // namespace jafar::rtslam

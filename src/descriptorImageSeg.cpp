@@ -79,10 +79,14 @@ namespace jafar {
 
 
       bool DescriptorImageSegFirstView::predictAppearance(const observation_ptr_t & obsPtrNew) {
-
+/*
          double zoom, rotation;
          landmark_ptr_t lmkPtr = obsPtrNew->landmarkPtr();
-         vec seg = lmkPtr->reparametrized();
+         //vec seg = lmkPtr->reparametrized(); // Dummy, we reparametrize the first point of the segment for the zoomRotation
+         vec3 seg;
+         seg[0] = 0;
+         seg[1] = 0;
+         seg[2] = 0;
          quaternion::getZoomRotation(view.senPose, obsPtrNew->sensorPtr()->globalPose(), seg, zoom, rotation);
          // normally we must cast to the derived type
          app_img_seg_ptr_t app_dst = SPTR_CAST<AppearanceImageSegment>(obsPtrNew->predictedAppearance);
@@ -97,7 +101,7 @@ namespace jafar {
          // this is an approximation for angle, but it's ok
          app_dst->offset.P()(0,0) = alpha*app_src->offset.P()(0,0) +  beta*app_src->offset.P()(1,1);
          app_dst->offset.P()(1,1) = -beta*app_src->offset.P()(0,0) + alpha*app_src->offset.P()(1,1);
-
+*/
 /*char buffer[256];
 sprintf(buffer, "descriptor_patch_%03d.png", obsPtrNew->id());
 app_src->patch.save(buffer);
@@ -105,7 +109,8 @@ JFR_DEBUG("predict with desc " << this << " and view " << &view << " and app " <
 sprintf(buffer, "predicted_patch_%03d.png", obsPtrNew->id());
 app_dst->patch.save(buffer);
 */
-         return true;
+//         return true;
+            return false;
       }
 
       void DescriptorImageSegFirstView::desc_text(std::ostream& os) const

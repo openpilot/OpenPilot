@@ -29,6 +29,7 @@
 
 #include "rtslam/featureAbstract.hpp"
 #include "rtslam/appearanceImage.hpp"
+#include "rtslam/appearanceSegment.hpp"
 #include "boost/shared_ptr.hpp"
 
 /* --------------------------------------------------------------------- */
@@ -42,15 +43,22 @@ namespace jafar {
 //		class RawImageSimu;
 //		typedef boost::shared_ptr<RawImageSimu> rawimagesimu_ptr_t2;
 
+      class FeatureSegment;
+      typedef boost::shared_ptr<FeatureSegment> feat_seg_ptr_t;
+
+      class FeatureSegment: public FeatureAbstract {
+         public:
+            FeatureSegment() : FeatureAbstract(4, appearance_ptr_t()) {
+            }
+            virtual ~FeatureSegment() {
+            }
+            void setup(double u1, double v1, double u2, double v2, double quality);
+      };
+
 
       class FeatureImageSegment;
       typedef boost::shared_ptr<FeatureImageSegment> feat_img_seg_ptr_t;
 
-      /** Base class for all landmark appearances defined in the module
-       * rtslam.
-       *
-       * @ingroup rtslam
-       */
       class FeatureImageSegment: public FeatureAbstract {
          public:
             FeatureImageSegment() : FeatureAbstract(4, appearance_ptr_t()) {

@@ -21,7 +21,7 @@ namespace jafar {
 	namespace rtslam {
 
 		class AppearanceImagePoint;
-		typedef boost::shared_ptr<AppearanceImagePoint> app_img_pnt_ptr_t;
+      typedef boost::shared_ptr<AppearanceImagePoint> app_img_pnt_ptr_t;
 
 		/** Appearence for matching
 		 * rtslam.

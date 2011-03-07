@@ -103,7 +103,7 @@ namespace display {
 		public:
 			rtslam::LandmarkAbstract *slamLmk_;
 			MapDisplay *dispMap_;
-			enum Type { ltPoint };
+         enum Type { ltPoint, ltSeg };
 			enum Phase { init, converged };
 			Type  type_;
 			Phase phase_;
@@ -112,7 +112,9 @@ namespace display {
 				switch (_slamLmk->getGeomType())
 				{
 					case rtslam::LandmarkAbstract::POINT:
-						return ltPoint;
+                  return ltPoint;
+               case rtslam::LandmarkAbstract::LINE:
+                  return ltSeg;
 					default:
 						JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark" << _slamLmk->getGeomType());
 				}

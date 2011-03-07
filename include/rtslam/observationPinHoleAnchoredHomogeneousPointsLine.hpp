@@ -58,7 +58,7 @@ namespace jafar {
             }
          protected:
             size_t exp_size, prior_size;
-            void init_sizes() { exp_size = 2; prior_size = 1; }
+            void init_sizes() { exp_size = 4; prior_size = 2; }
          public:
 
             ObservationModelPinHoleAnchoredHomogeneousPointsLine() { init_sizes(); }
@@ -67,19 +67,19 @@ namespace jafar {
             /**
              * Projection function, with Jacobians and non-observable part.
              */
-            virtual void project_func(const vec11 & sg, const vec & lmk, vec & meas, vec & nobs);
+            virtual void project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs);
             /**
              * Projection function, with Jacobians and non-observable part.
              */
-            virtual void project_func(const vec11 & sg, const vec & lmk, vec & meas, vec & nobs, mat & EXP_sg, mat & EXP_lmk);
+            virtual void project_func(const vec7 & sg, const vec & lmk, vec & meas, vec & nobs, mat & EXP_sg, mat & EXP_lmk);
             /**
              * Retro-projection function, with Jacobians
              */
-            virtual void backProject_func(const vec11 & sg, const vec & meas, const vec & nobs, vec & lmk);
+            virtual void backProject_func(const vec7 & sg, const vec & meas, const vec & nobs, vec & lmk);
             /**
              * Retro-projection function, with Jacobians
              */
-            virtual void backProject_func(const vec11 & sg, const vec & meas, const vec & nobs, vec & lmk, mat & LMK_sg,
+            virtual void backProject_func(const vec7 & sg, const vec & meas, const vec & nobs, vec & lmk, mat & LMK_sg,
                                   mat & LMK_meas, mat & LMK_nobs);
 
             /**
@@ -95,8 +95,8 @@ namespace jafar {
 
 
       /**
-       * Class for Pin-Hole observations of Anchored Homogeneous 3D points.
-       * \author jsola@laas.fr
+       * Class for Pin-Hole observations of Lines based on Anchored Homogeneous 3D points.
+       * \author bhautboi@laas.fr
        * \ingroup rtslam
        */
       class ObservationPinHoleAnchoredHomogeneousPointsLine: public ObservationAbstract,
@@ -117,13 +117,13 @@ namespace jafar {
 
       public:
 
-            ObservationPinHoleAnchoredHomogeneousPointsLine(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahpPtr);
+            ObservationPinHoleAnchoredHomogeneousPointsLine(const sensor_ptr_t & pinholePtr, const landmark_ptr_t & ahplPtr);
             ~ObservationPinHoleAnchoredHomogeneousPointsLine(void) {
 //					cout << "Deleted observation: " << id() << ": " << typeName() << endl;
             }
 
             virtual std::string typeName() const {
-               return "Pinhole-Anch-homog-point";
+               return "Pinhole-Anch-homog-points-line";
             }
 
 

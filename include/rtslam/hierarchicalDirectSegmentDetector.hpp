@@ -14,7 +14,9 @@
 #include "image/Image.hpp"
 #include "image/roi.hpp"
 
-#include "rtslam/featurePoint.hpp"
+#include "rtslam/featureSegment.hpp"
+
+#include "dseg/HierarchicalDirectSegmentsDetector.hpp"
 
 namespace jafar{
 	namespace rtslam{
@@ -30,8 +32,10 @@ namespace jafar{
       public:
         HierarchicalDirectSegmentDetector();
         ~HierarchicalDirectSegmentDetector();
-        virtual bool detectIn(image::Image const& image, feat_img_pnt_ptr_t featPtr, const image::ConvexRoi * roiPtr = 0 );
-		};
+        virtual bool detectIn(image::Image const& image, feat_seg_ptr_t featPtr, const image::ConvexRoi * roiPtr = 0 );
+      private:
+         dseg::HierarchicalDirectSegmentsDetector detector;
+      };
 	}
 }
 

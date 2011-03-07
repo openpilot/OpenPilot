@@ -74,8 +74,8 @@ namespace jafar {
 
         virtual bool needToDie(DecisionMethod dieMet = ANY);
 
-        virtual bool needToReparametrize(){
-          return true; // TODO why ?
+        virtual bool needToReparametrize(DecisionMethod met = ALL){
+          return false; // TODO real reparametrization
         }
     }; // class LandmarkAnchoredHomogeneousPointsLine
   } // namespace rtslam

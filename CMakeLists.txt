@@ -10,7 +10,7 @@ build_jafar_module(rtslam
   REVISION 1 
 
   REQUIRED_MODULES kernel image jmath correl
-  OPTIONAL_MODULES qdisplay gdhe
+  OPTIONAL_MODULES qdisplay gdhe dseg
 
   REQUIRED_EXTLIBS boost_thread boost_system boost_filesystem boost_regex
   OPTIONAL_EXTLIBS qt4 viam MTI

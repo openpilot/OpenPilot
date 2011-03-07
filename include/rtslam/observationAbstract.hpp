@@ -148,7 +148,8 @@ namespace jafar {
 				
 				enum type_enum {
 					PNT_PH_EUC, ///< Pin hole Euclidean point
-					PNT_PH_AH ///< Pin hole Anchored homogeneous point
+               PNT_PH_AH, ///< Pin hole Anchored homogeneous point
+               PNT_PH_AHPL ///< Pin hole Anchored homogeneous points line
 				};
 
 

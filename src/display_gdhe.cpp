@@ -295,8 +295,9 @@ JFR_DEBUG("robot EULER: " << uncertEuler);*/
 					(*it)->refresh();
 				}
 				break;
-			}
-			
+         }
+         case LandmarkAbstract::LINE_AHPL: // DO SOMETHING
+            break;
 			default:
 				JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << type_);
 		}

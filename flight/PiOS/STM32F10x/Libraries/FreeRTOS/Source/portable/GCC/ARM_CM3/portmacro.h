@@ -138,7 +138,7 @@ extern void vPortYieldFromISR( void );
 extern void vPortEnterCritical( void );
 extern void vPortExitCritical( void );
 
-void PIOS_RTC_Start();
+void PIOS_RTC_Init();
 uint32_t PIOS_RTC_Counter();
 	
 #define portDISABLE_INTERRUPTS()	portSET_INTERRUPT_MASK()

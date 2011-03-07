@@ -31,8 +31,10 @@
 #define PIOS_SERVO_H
 
 /* Public Functions */
-extern void PIOS_RTC_Start();
+extern void PIOS_RTC_Init();
 extern uint32_t PIOS_RTC_Counter();
+extern float PIOS_RTC_Rate();
+extern float PIOS_RTC_MsPerTick();
 
 #endif /* PIOS_SERVO_H */
 

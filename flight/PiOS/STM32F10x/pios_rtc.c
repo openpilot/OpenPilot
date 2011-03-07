@@ -33,7 +33,11 @@
 
 #if defined(PIOS_INCLUDE_RTC)
 
-void PIOS_RTC_Start()
+#ifndef PIOS_RTC_PRESCALAR
+#define PIOS_RTC_PRESCALAR 0
+#endif
+
+void PIOS_RTC_Init()
 {
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_BKP | RCC_APB1Periph_PWR,
 			       ENABLE);
@@ -44,7 +48,7 @@ void PIOS_RTC_Start()
 	RTC_WaitForLastTask();
 	RTC_WaitForSynchro();
 	RTC_WaitForLastTask();
-	RTC_SetPrescaler(0);	// counting at 8e6 / 128
+	RTC_SetPrescaler(PIOS_RTC_PRESCALAR);	// counting at 8e6 / 128
 	RTC_WaitForLastTask();
 	RTC_SetCounter(0);
 	RTC_WaitForLastTask();
@@ -55,6 +59,15 @@ uint32_t PIOS_RTC_Counter()
 	return RTC_GetCounter();
 }
 
+float PIOS_RTC_Rate()
+{
+	return (float) (8e6 / 128) / (1 + PIOS_RTC_PRESCALAR);
+}
+
+float PIOS_RTC_MsPerTick() 
+{
+	return 1000.0f / PIOS_RTC_Rate();
+}
 
 #endif
 

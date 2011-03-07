@@ -1049,6 +1049,7 @@ void PIOS_Board_Init(void) {
 
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 	/* SPEKTRUM init must come before comms */
+	PIOS_RTC_Init();  // Spektrum uses RTC to check for frame failures
 	PIOS_SPEKTRUM_Init();
 
 	if (PIOS_USART_Init(&pios_usart_spektrum_id, &pios_usart_spektrum_cfg)) {

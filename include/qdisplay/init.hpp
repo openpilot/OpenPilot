@@ -51,7 +51,9 @@ class QtAppStart: public QObject
 		@param prioMain the priority of the main thread (see prioDisplay)
 		@param display_interval the interval in ms at which the display function is called. 0 means only once.
 		@param _sharedDataStructure the data structure that is passed to _main and _display functions
-		@param _onExit the optional function that is executed just before the application terminates because all windows are closed
+		@param _onExit the optional function that is executed just before the application terminates because all windows are closed.
+		Must return void and accept two parameters, a void pointer and a pointer to the main thread, to have the possibility to join
+		it. The function must be cast to qdisplay::EXIT_FUNC
 		*/
 		QtAppStart(void (*_display)(SharedDataStructure*), int prioDisplay = 0,
 			void (*_main)(SharedDataStructure*) = NULL, int prioMain = 0,
@@ -68,7 +70,7 @@ class QtAppStart: public QObject
 The function pointer type you must cast to the functions you give as a parameter to QtAppStart
 */
 typedef void(*FUNC)(void*);
-typedef void(*EXIT)(void*,boost::thread*);
+typedef void(*EXIT_FUNC)(void*,boost::thread*);
 
 /**
 Special sleep function that processes qt events to refresh display

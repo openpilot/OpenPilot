@@ -366,8 +366,181 @@ std::cout << "connecting slots" << std::endl;
 				break;
          }
          case LandmarkDisplay::ltSeg:
-            // TODO : implement
+         {
+            bool dispPred2 = events_.visible && events_.predicted;
+            bool dispMeas2 = events_.visible && (events_.measured || events_.matched || !events_.predicted);
+            bool dispInit2 = events_.visible && !events_.predicted;
+
+            // Build display objects if it is the first time they are displayed
+            if (items_.size() != 4)
+            {
+               // clear
+               items_.clear();
+               lines_.clear();
+               if (!dispPred2)
+               {
+                  predObs_.clear();
+                  predObsCov_ = identity_mat(4);
+               }
+               if (!dispMeas2)
+               {
+                  measObs_.clear();
+               }
+
+               qdisplay::Shape *s;
+               qdisplay::Line *l;
+
+               // prediction point1
+               s = new qdisplay::Shape(qdisplay::Shape::ShapeCross, predObs_(0), predObs_(1), 3, 3);
+               s->setFontSize(viewerQt->fontSize);
+               s->setVisible(false);
+               items_.push_back(s);
+               dispSen_->view()->addShape(s);
+               // prediction point2
+               s = new qdisplay::Shape(qdisplay::Shape::ShapeCross, predObs_(2), predObs_(3), 3, 3);
+               s->setFontSize(viewerQt->fontSize);
+               s->setVisible(false);
+               items_.push_back(s);
+               dispSen_->view()->addShape(s);
+               // prediction line
+               l = new qdisplay::Line(predObs_(0), predObs_(1), predObs_(2), predObs_(3));
+               l->setVisible(false);
+               lines_.push_back(l);
+               dispSen_->view()->addLine(l);
+
+               // prediction ellipse
+/*
+               s = new qdisplay::Ellipsoid(predObs_, predObsCov_, viewerQt->ellipsesScale);
+               s->setVisible(false);
+               items_.push_back(s);
+               dispSen_->view()->addShape(s);
+*/
+               // measure point1
+               s = new qdisplay::Shape(qdisplay::Shape::ShapeCrossX, measObs_(0), measObs_(1), 3, 3);
+               s->setFontSize(viewerQt->fontSize);
+               s->setVisible(false);
+               items_.push_back(s);
+               dispSen_->view()->addShape(s);
+               // measure point2
+               s = new qdisplay::Shape(qdisplay::Shape::ShapeCrossX, measObs_(2), measObs_(3), 3, 3);
+               s->setFontSize(viewerQt->fontSize);
+               s->setVisible(false);
+               items_.push_back(s);
+               dispSen_->view()->addShape(s);
+               // prediction line
+               l = new qdisplay::Line(measObs_(0), measObs_(1), measObs_(2), measObs_(3));
+               l->setVisible(false);
+               lines_.push_back(l);
+               dispSen_->view()->addLine(l);
+            }
+            // Refresh the display objects every time
+            {
+               colorRGB c; c.set(255,255,255);
+
+/*
+               lmk_state lmkstate = lmk_state_init;
+               if (landmarkPhase_==LandmarkDisplay::init)      lmkstate = lmk_state_init ;
+               if (landmarkPhase_==LandmarkDisplay::converged) lmkstate = lmk_state_converged ;
+               lmk_events lmkstateadvanced = lmk_events_not_predicted ;
+               if (events_.predicted) lmkstateadvanced = lmk_events_predicted ;
+               if (events_.matched)   lmkstateadvanced = lmk_events_matched ;
+               if (updated_)   lmkstateadvanced = lmk_events_updated ;
+*/
+
+               // prediction points
+               ItemList::iterator it = items_.begin();
+               LineList::iterator lit = lines_.begin();
+               // prediction line
+               (*lit)->setVisible(dispPred2);
+               if (dispPred2)
+               {
+                  c = getColorRGB(ColorManager::getColorObject_prediction(landmarkPhase_,events_)) ;
+                  std::ostringstream oss; oss << id_; if (dispMeas2) oss << " - " << int(match_score*100);
+                  (*lit)->setColor(c.R,c.G,c.B);
+
+                  (*it)->setColor(c.R,c.G,c.B); //
+                  (*it)->setFontColor(c.R,c.G,c.B); //
+                  (*it)->setLabel(oss.str().c_str());
+                  (*it)->setPos(predObs_(0), predObs_(1));
+                  (*it)->setVisible(true);
+                  ++it;
+                  (*it)->setColor(c.R,c.G,c.B); //
+                  (*it)->setFontColor(c.R,c.G,c.B); //
+                  (*it)->setLabel(oss.str().c_str());
+                  (*it)->setPos(predObs_(2), predObs_(3));
+                  (*it)->setVisible(true);
+               }
+
+               // prediction ellipse
+/*
+               ++it;
+               if (dispPred2)
+               {
+                  (*it)->setColor(c.R,c.G,c.B); // yellow
+                  qdisplay::Ellipsoid *ell = PTR_CAST<qdisplay::Ellipsoid*>(*it);
+                  ell->set(predObs_, predObsCov_, viewerQt->ellipsesScale);
+               }
+               (*it)->setVisible(dispPred2);
+*/
+//JFR_DEBUG("drawn ellipse for obs " << id_ << " at " << predObs_ << " with size " << predObsCov_ << ", scale " << viewerQt->ellipsesScale << " and visibility " << dispPred);
+
+               // Measure line
+               ++lit;
+               (*lit)->setVisible(dispMeas2);
+               // measure points
+               ++it;
+//std::cout << "display obs " << id_ << " with flags visible " << events_.visible << " matched " << events_.matched
+//		<< " predicted " << events_.predicted << " position " << measObs_ << std::endl;
+               if (dispMeas2)
+               {
+                  c = getColorRGB(ColorManager::getColorObject_measure(landmarkPhase_,events_)) ;
+                  (*lit)->setColor(c.R,c.G,c.B); //
+                  if (dispInit2)
+                  {
+                     (*it)->setFontColor(c.R,c.G,c.B); //
+                     (*it)->setLabel(jmath::toStr(id_).c_str());
+                  } else
+                  {
+                     (*it)->setLabel("");
+                  }
+                  (*it)->setColor(c.R,c.G,c.B); // red
+                  (*it)->setPos(measObs_(0), measObs_(1));
+                  (*it)->setVisible(true);
+                  ++it;
+                  if (dispInit2)
+                  {
+                     (*it)->setFontColor(c.R,c.G,c.B); //
+                     (*it)->setLabel(jmath::toStr(id_).c_str());
+                  } else
+                  {
+                     (*it)->setLabel("");
+                  }
+                  (*it)->setColor(c.R,c.G,c.B); // red
+                  (*it)->setPos(measObs_(2), measObs_(3));
+                  (*it)->setVisible(true);
+               }
+
+#if EMBED_PREDICTED_APP
+               // display predicted appearance
+               switch (slamObs_->sensorPtr()->type)
+               {
+                  case SensorAbstract::PINHOLE: case SensorAbstract::BARRETO:
+                  {
+                     AppearanceImagePoint* appImgPtr = PTR_CAST<AppearanceImagePoint*>(slamObs_->predictedAppearance.get());
+                     jblas::veci shift(2); shift(0) = (appImgPtr->patch.width()-1)/2; shift(1) = (appImgPtr->patch.height()-1)/2;
+                     appImgPtr->patch.robustCopy(PTR_CAST<SensorQt*>(dispSen_)->image, 0, 0, predObs_(0)-shift(0), predObs_(1)-shift(1));
+                  }
+                  default:
+                  {
+
+                  }
+
+               }
+#endif
+
+            }
             break;
+         }
 			default:
 				JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkGeomType_);
 		}

@@ -27,7 +27,7 @@ namespace jafar{
                if(set.segmentAt(i)->l)
             }
 */
-            featPtr.reset(new FeatureSegment());
+           // featPtr.reset(new FeatureSegment());
             featPtr->measurement.x(0) = set.segmentAt(0)->x1();
             featPtr->measurement.x(1) = set.segmentAt(0)->y1();
             featPtr->measurement.x(2) = set.segmentAt(0)->x2();

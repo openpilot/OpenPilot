@@ -14,6 +14,7 @@
 #include "qdisplay/Viewer.hpp"
 #include "qdisplay/Shape.hpp"
 #include "qdisplay/Ellipsoid.hpp"
+#include "qdisplay/Line.hpp"
 #include "qdisplay/init.hpp"
 
 #include "rtslam/display.hpp"
@@ -199,8 +200,10 @@ class ObservationQt : public ObservationDisplay
 		// graphical objects
 		SensorQt *dispSen_; // not owner
 		typedef std::list<qdisplay::Shape*> ItemList;
-		ItemList items_;
-	public:
+      typedef std::list<qdisplay::Line*>  LineList;
+      ItemList items_;
+      LineList lines_;
+   public:
 		ObservationQt(ViewerAbstract *_viewer, rtslam::ObservationAbstract *_slamObs, SensorQt *_dispSen);
 		~ObservationQt();
 		void bufferize();

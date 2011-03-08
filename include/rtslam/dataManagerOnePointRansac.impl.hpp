@@ -402,7 +402,7 @@ namespace jafar {
 						obsPtr->events.measured = true;
 						obsPtr->events.matched = false;
 						obsPtr->events.updated = true;
-						obsPtr->measurement = featPtr->measurement;
+                  obsPtr->measurement = featPtr->measurement;
 
 						// 2c. compute and fill stochastic data for the landmark
 						obsPtr->backProject();

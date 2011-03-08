@@ -419,7 +419,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	
 	// pin-hole parameters in BOOST format
 	boost::shared_ptr<ObservationFactory> obsFact(new ObservationFactory());
-#ifdef SEGMENT_BASED
+#if SEGMENT_BASED
    obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhplObservationMaker(configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5, configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
 #else
 	if (intOpts[iSimu] != 0)
@@ -447,12 +447,10 @@ void demo_slam01_main(world_ptr_t *world) {
 
 	// 1. Create maps.
 	map_ptr_t mapPtr(new MapAbstract(configEstimation.MAP_SIZE));
-<<<<<<< HEAD
 	mapPtr->linkToParentWorld(worldPtr);
 	
    // 1b. Create map manager.
-
-#ifdef SEGMENT_BASED
+#if SEGMENT_BASED
    landmark_factory_ptr_t lmkFactory(new LandmarkFactory<LandmarkAnchoredHomogeneousPointsLine, LandmarkAnchoredHomogeneousPointsLine>());
 #else
    landmark_factory_ptr_t lmkFactory(new LandmarkFactory<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint>());
@@ -727,7 +725,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	int ransac_ntries = 0;
    #endif
 
-   #ifndef SEGMENT_BASED
+   #if !SEGMENT_BASED
 	if (intOpts[iSimu] != 0)
 	{
 		boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
@@ -744,7 +742,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	} else
    #endif
    {
-      #ifdef SEGMENT_BASED
+      #if SEGMENT_BASED
          if (configEstimation.MULTIVIEW_DESCRIPTOR)
             descFactory.reset(new DescriptorImageSegMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImagePointMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
          else

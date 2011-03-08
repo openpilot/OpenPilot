@@ -30,6 +30,7 @@
 
 /* Project Includes */
 #include "pios.h"
+#include "pios_ppm_priv.h"
 
 #if defined(PIOS_INCLUDE_PPM)
 
@@ -62,6 +63,68 @@ void PIOS_PPM_Init(void)
 	for (i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
 		CaptureValue[i] = 0;
 	}
+	////////////////////////////////
+
+	NVIC_InitTypeDef NVIC_InitStructure = pios_ppm_cfg.irq.init;
+
+	/* Enable appropriate clock to timer module */
+	switch((int32_t) pios_ppm_cfg.timer) {
+		case (int32_t)TIM1:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM1_CC_IRQn;
+			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
+			break;
+		case (int32_t)TIM2:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+			break;
+		case (int32_t)TIM3:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+			break;
+		case (int32_t)TIM4:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+			break;
+#ifdef STM32F10X_HD
+
+		case (int32_t)TIM5:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM5_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
+			break;
+		case (int32_t)TIM6:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM6_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
+			break;
+		case (int32_t)TIM7:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
+			break;
+		case (int32_t)TIM8:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM8_CC_IRQn;
+			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
+			break;
+#endif
+	}
+	NVIC_Init(&NVIC_InitStructure);
+
+	GPIO_InitTypeDef GPIO_InitStructure = pios_ppm_cfg.gpio_init;
+	GPIO_Init(pios_ppm_cfg.port, &GPIO_InitStructure);
+
+	TIM_ICInitStructure = pios_ppm_cfg.tim_ic_init;
+	TIM_ICInit(pios_ppm_cfg.timer, &TIM_ICInitStructure);
+
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = pios_ppm_cfg.tim_base_init;
+	TIM_InternalClockConfig(pios_ppm_cfg.timer);
+	TIM_TimeBaseInit(pios_ppm_cfg.timer, &TIM_TimeBaseStructure);
+
+	/* Enable the Capture Compare Interrupt Request */
+	TIM_ITConfig(pios_ppm_cfg.timer, pios_ppm_cfg.ccr, ENABLE);
+
+	/* Enable timers */
+	TIM_Cmd(pios_ppm_cfg.timer, ENABLE);
+
+	/////////////////////////////////
+#if 0
 
 	/* Setup RCC */
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
@@ -104,6 +167,7 @@ void PIOS_PPM_Init(void)
 
 	/* Enable timers */
 	TIM_Cmd(PIOS_PPM_TIM, ENABLE);
+#endif
 
 	/* Supervisor Setup */
 #if (PIOS_PPM_SUPV_ENABLED)
@@ -114,7 +178,67 @@ void PIOS_PPM_Init(void)
 	for (i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
 		CapCounterPrev[i] = 0;
 	}
+///////////////
 
+	NVIC_InitStructure = pios_ppmsv_cfg.irq.init;
+
+	/* Enable appropriate clock to timer module */
+	switch((int32_t) pios_ppmsv_cfg.timer) {
+		case (int32_t)TIM1:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM1_CC_IRQn;
+			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
+			break;
+		case (int32_t)TIM2:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+			break;
+		case (int32_t)TIM3:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+			break;
+		case (int32_t)TIM4:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+			break;
+#ifdef STM32F10X_HD
+
+		case (int32_t)TIM5:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM5_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
+			break;
+		case (int32_t)TIM6:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM6_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
+			break;
+		case (int32_t)TIM7:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
+			break;
+		case (int32_t)TIM8:
+			NVIC_InitStructure.NVIC_IRQChannel = TIM8_CC_IRQn;
+			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
+			break;
+#endif
+	}
+
+	/* Configure interrupts */
+	NVIC_Init(&NVIC_InitStructure);
+	/* Time base configuration */
+	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
+	TIM_TimeBaseStructure = pios_ppmsv_cfg.tim_base_init;
+	TIM_TimeBaseInit(pios_ppmsv_cfg.timer, &TIM_TimeBaseStructure);
+
+	/* Enable the CC2 Interrupt Request */
+	TIM_ITConfig(pios_ppmsv_cfg.timer, pios_ppmsv_cfg.ccr, ENABLE);
+
+	/* Clear update pending flag */
+	TIM_ClearFlag(pios_ppmsv_cfg.timer, TIM_FLAG_Update);
+
+	/* Enable counter */
+	TIM_Cmd(pios_ppmsv_cfg.timer, ENABLE);
+
+//////////////////
+#if 0
 	/* Enable timer clock */
 	PIOS_PPM_SUPV_TIMER_RCC_FUNC;
 
@@ -141,6 +265,7 @@ void PIOS_PPM_Init(void)
 
 	/* Enable counter */
 	TIM_Cmd(PIOS_PPM_SUPV_TIMER, ENABLE);
+#endif
 #endif
 
 	/* Setup local variable which stays in this scope */
@@ -170,16 +295,30 @@ int32_t PIOS_PPM_Get(int8_t Channel)
 * Some work and testing still needed, need to detect start of frame and decode pulses
 *
 */
-void TIM1_CC_IRQHandler(void)
+void PIOS_PPM_irq_handler(void)
+//void TIM1_CC_IRQHandler(void)
 {
 	/* Do this as it's more efficient */
-	if (TIM_GetITStatus(PIOS_PPM_TIM_PORT, PIOS_PPM_TIM_CCR) == SET) {
+	if (TIM_GetITStatus(pios_ppm_cfg.timer, pios_ppm_cfg.ccr) == SET) {
 		PreviousValue = CurrentValue;
-		CurrentValue = TIM_GetCapture2(PIOS_PPM_TIM_PORT);
+		switch((int32_t) pios_ppm_cfg.ccr) {
+			case (int32_t)TIM_IT_CC1:
+				CurrentValue = TIM_GetCapture1(pios_ppm_cfg.timer);
+				break;
+			case (int32_t)TIM_IT_CC2:
+				CurrentValue = TIM_GetCapture2(pios_ppm_cfg.timer);
+				break;
+			case (int32_t)TIM_IT_CC3:
+				CurrentValue = TIM_GetCapture3(pios_ppm_cfg.timer);
+				break;
+			case (int32_t)TIM_IT_CC4:
+				CurrentValue = TIM_GetCapture4(pios_ppm_cfg.timer);
+				break;
+		}
 	}
 
 	/* Clear TIM3 Capture compare interrupt pending bit */
-	TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_TIM_CCR);
+	TIM_ClearITPendingBit(pios_ppm_cfg.timer, pios_ppm_cfg.ccr);
 
 	/* Capture computation */
 	if (CurrentValue > PreviousValue) {
@@ -204,9 +343,10 @@ void TIM1_CC_IRQHandler(void)
 /**
 * This function handles TIM3 global interrupt request.
 */
-PIOS_PPM_SUPV_IRQ_FUNC {
+void PIOS_PPMSV_irq_handler(void){
+//PIOS_PPM_SUPV_IRQ_FUNC {
 	/* Clear timer interrupt pending bit */
-	TIM_ClearITPendingBit(PIOS_PPM_SUPV_TIMER, TIM_IT_Update);
+	TIM_ClearITPendingBit(pios_ppmsv_cfg.timer, pios_ppmsv_cfg.ccr);
 
 	/* Simple state machine */
 	if (SupervisorState == 0) {

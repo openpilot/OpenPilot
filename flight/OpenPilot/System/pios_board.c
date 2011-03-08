@@ -772,6 +772,82 @@ void PIOS_TIM5_irq_handler()
 }
 #endif
 
+/*
+ * PPM Input
+ */
+#if defined(PIOS_INCLUDE_PPM)
+#include <pios_ppm_priv.h>
+void TIM6_IRQHandler();
+void TIM6_IRQHandler() __attribute__ ((alias ("PIOS_TIM6_irq_handler")));
+const struct pios_ppmsv_cfg pios_ppmsv_cfg = {
+	.tim_base_init = {
+		.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,	/* For 1 uS accuracy */
+		.TIM_ClockDivision = TIM_CKD_DIV1,
+		.TIM_CounterMode = TIM_CounterMode_Up,
+		.TIM_Period = ((1000000 / 25) - 1), /* 25 Hz */
+		.TIM_RepetitionCounter = 0x0000,
+	},
+	.irq = {
+		.handler = TIM6_IRQHandler,
+		.init    = {
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+	.timer = TIM6,
+	.ccr = TIM_IT_Update,
+};
+
+void PIOS_TIM6_irq_handler()
+{
+	PIOS_PPMSV_irq_handler();
+}
+
+void TIM1_CC_IRQHandler();
+void TIM1_CC_IRQHandler() __attribute__ ((alias ("PIOS_TIM1_CC_irq_handler")));
+const struct pios_ppm_cfg pios_ppm_cfg = {
+	.tim_base_init = {
+		.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,	/* For 1 uS accuracy */
+		.TIM_ClockDivision = TIM_CKD_DIV1,
+		.TIM_CounterMode = TIM_CounterMode_Up,
+		.TIM_Period = 0xFFFF,
+		.TIM_RepetitionCounter = 0x0000,
+	},
+	.tim_ic_init = {
+			.TIM_ICPolarity = TIM_ICPolarity_Rising,
+			.TIM_ICSelection = TIM_ICSelection_DirectTI,
+			.TIM_ICPrescaler = TIM_ICPSC_DIV1,
+			.TIM_ICFilter = 0x0,
+			.TIM_Channel = TIM_Channel_2,
+	},
+	.gpio_init = {
+			.GPIO_Mode = GPIO_Mode_IPD,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Pin = GPIO_Pin_9,
+	},
+	.remap = 0,
+	.irq = {
+		.handler = TIM1_CC_IRQHandler,
+		.init    = {
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+			.NVIC_IRQChannel = TIM1_CC_IRQn,
+		},
+	},
+	.timer = TIM1,
+	.port = GPIOA,
+	.ccr = TIM_IT_CC2,
+};
+
+void PIOS_TIM1_CC_irq_handler()
+{
+	PIOS_PPM_irq_handler();
+}
+
+#endif //PPM
+
 #if defined(PIOS_INCLUDE_I2C)
 
 #include <pios_i2c_priv.h>

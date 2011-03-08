@@ -181,9 +181,10 @@ namespace correl {
 			m[3] = -m[1];
 			m[4] = m[0];
 			m[5] = h * 0.5f;
-			CvMat M = cvMat( 2, 3, CV_32F, m );
-			cvFillImage(&(*im2bis), 0);
-			cvGetQuadrangleSubPix( &(*im2), &(*im2bis), &M);
+			CvMat M1 = cvMat( 2, 3, CV_32F, m );
+			cv::Mat M(&M1);
+			im2bis->setTo(0);
+			image::getQuadrangleSubPix( *im2, *im2bis, M);
 			double zncc = compute(*im1,*im2bis);
 			if(zncc > bestZncc) { bestZncc = zncc; /*tempBestAngle = radangle;*/}
 		}

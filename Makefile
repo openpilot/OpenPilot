@@ -382,5 +382,5 @@ sim_posix_%: uavobjects_flight
 sim_win32: sim_win32_exe
 
 sim_win32_%: uavobjects_flight
-	$(V1) mkdir -p $(BUILD_DIR)/flight/sitl_win32
+	$(V1) mkdir -p $(BUILD_DIR)/sitl_win32
 	$(V1) $(MAKE) --no-print-directory -C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.win32 $*

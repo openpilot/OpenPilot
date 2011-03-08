@@ -76,7 +76,7 @@ MODEL    = HD_NB
 endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = ../../build/flight/sitl_win32
+OUTDIR = ../../build/sitl_win32
 
 # Target file name (without extension).
 TARGET = OpenPilot
@@ -110,7 +110,7 @@ PYMITEINC += $(PYMITEPLAT)
 PYMITEINC += $(OUTDIR)
 FLIGHTPLANLIB = $(OPMODULEDIR)/FlightPlan/lib
 FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
-UAVOBJSYNTHDIR = $(OUTDIR)/../../uavobject-synthetics/flight
+UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files

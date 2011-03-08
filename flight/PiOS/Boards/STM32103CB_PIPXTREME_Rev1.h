@@ -30,17 +30,13 @@
 // Timers and Channels Used
 
 /*
-Timer | Channel 1 | Channel 2 | Channel 3 | Channel 4
-------+-----------+-----------+-----------+----------
-TIM1  |           |           |           |
-TIM2  | --------------- DELAY ----------------------
-TIM3  | --------------- Timer Interrupt ------------
-TIM4  | --------------- STOPWATCH ------------------
-TIM5  |           |           |           |
-TIM6  |           |           |           |
-TIM7  |           |           |           |
-TIM8  |           |           |           |
-------+-----------+-----------+-----------+----------
+Timer | Channel 1  | Channel 2  | Channel 3  | Channel 4
+------+------------+------------+------------+------------
+TIM1  |                       DELAY                      |
+TIM2  |                         | PPM Output | PPM Input |
+TIM3  |                  TIMER INTERRUPT                 |
+TIM4  |                     STOPWATCH                    |
+------+------------+------------+------------+------------
 */
 
 //------------------------
@@ -142,8 +138,10 @@ TIM8  |           |           |           |
 // *****************************************************************
 // Delay Timer
 
-#define PIOS_DELAY_TIMER				TIM2
-#define PIOS_DELAY_TIMER_RCC_FUNC		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE)
+//#define PIOS_DELAY_TIMER				TIM2
+//#define PIOS_DELAY_TIMER_RCC_FUNC		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE)
+#define PIOS_DELAY_TIMER				TIM1
+#define PIOS_DELAY_TIMER_RCC_FUNC		RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE)
 
 // *****************************************************************
 // Timer interrupt
@@ -184,7 +182,7 @@ extern uint32_t pios_spi_port_id;
 
 extern uint32_t pios_com_serial_id;
 #define PIOS_COM_SERIAL                 (pios_com_serial_id)
-//#define PIOS_COM_DEBUG                  PIOS_COM_SERIAL
+#define PIOS_COM_DEBUG                  PIOS_COM_SERIAL           // uncomment this to send debug info out the serial port
 
 #if defined(PIOS_INCLUDE_USB_HID)
 extern uint32_t pios_com_telem_usb_id;
@@ -192,11 +190,33 @@ extern uint32_t pios_com_telem_usb_id;
 #endif
 
 #if defined(PIOS_COM_DEBUG)
-  #define DEBUG_PRINTF(...) PIOS_COM_SendFormattedString(PIOS_COM_DEBUG, __VA_ARGS__)
-//      #define DEBUG_PRINTF(...) PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, __VA_ARGS__)
+//  #define DEBUG_PRINTF(...) PIOS_COM_SendFormattedString(PIOS_COM_DEBUG, __VA_ARGS__)
+  #define DEBUG_PRINTF(...) PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, __VA_ARGS__)
 #else
   #define DEBUG_PRINTF(...)
 #endif
+
+//-------------------------
+// PPM input/output
+//-------------------------
+#define PIOS_PPM_IN_GPIO_PORT               GPIOB
+#define PIOS_PPM_IN_GPIO_PIN                GPIO_Pin_11
+#define PIOS_PPM_IN_TIM_CHANNEL             TIM_Channel_4
+#define PIOS_PPM_IN_TIM_CCR                 TIM_IT_CC4
+#define PIOS_PPM_IN_TIM_GETCAP_FUNC         TIM_GetCapture4
+
+#define PIOS_PPM_OUT_GPIO_PORT              GPIOB
+#define PIOS_PPM_OUT_GPIO_PIN               GPIO_Pin_10
+#define PIOS_PPM_OUT_TIM_CHANNEL            TIM_Channel_3
+#define PIOS_PPM_OUT_TIM_CCR                TIM_IT_CC3
+
+#define PIOS_PPM_MAX_CHANNELS               7
+#define PIOS_PPM_TIM_PORT                   TIM2
+#define PIOS_PPM_TIM                        TIM2
+#define PIOS_PPM_TIM_IRQ                    TIM2_IRQn
+#define PIOS_PPM_CC_IRQ_FUNC                TIM2_IRQHandler
+#define PIOS_PPM_TIMER_EN_RCC_FUNC	        RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE)
+#define PIOS_PPM_TIMER_DIS_RCC_FUNC	        RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, DISABLE)
 
 // *****************************************************************
 // ADC
@@ -267,35 +287,40 @@ extern uint32_t pios_com_telem_usb_id;
 #define PIOS_GPIO_OUT_1_PIN			GPIO_Pin_4
 #define PIOS_GPIO_OUT_1_GPIO_CLK	RCC_APB2Periph_GPIOA
 
-// spare pin
-#define PIOS_GPIO_OUT_2_PORT		GPIOA
-#define PIOS_GPIO_OUT_2_PIN			GPIO_Pin_0
-#define PIOS_GPIO_OUT_2_GPIO_CLK	RCC_APB2Periph_GPIOA
+// PPM OUT line
+#define PIOS_GPIO_OUT_2_PORT		GPIOB
+#define PIOS_GPIO_OUT_2_PIN			GPIO_Pin_10
+#define PIOS_GPIO_OUT_2_GPIO_CLK	RCC_APB2Periph_GPIOB
 
 // spare pin
 #define PIOS_GPIO_OUT_3_PORT		GPIOA
-#define PIOS_GPIO_OUT_3_PIN			GPIO_Pin_1
+#define PIOS_GPIO_OUT_3_PIN			GPIO_Pin_0
 #define PIOS_GPIO_OUT_3_GPIO_CLK	RCC_APB2Periph_GPIOA
 
 // spare pin
-#define PIOS_GPIO_OUT_4_PORT		GPIOC
-#define PIOS_GPIO_OUT_4_PIN			GPIO_Pin_13
-#define PIOS_GPIO_OUT_4_GPIO_CLK	RCC_APB2Periph_GPIOC
+#define PIOS_GPIO_OUT_4_PORT		GPIOA
+#define PIOS_GPIO_OUT_4_PIN			GPIO_Pin_1
+#define PIOS_GPIO_OUT_4_GPIO_CLK	RCC_APB2Periph_GPIOA
 
 // spare pin
 #define PIOS_GPIO_OUT_5_PORT		GPIOC
-#define PIOS_GPIO_OUT_5_PIN			GPIO_Pin_14
+#define PIOS_GPIO_OUT_5_PIN			GPIO_Pin_13
 #define PIOS_GPIO_OUT_5_GPIO_CLK	RCC_APB2Periph_GPIOC
 
 // spare pin
 #define PIOS_GPIO_OUT_6_PORT		GPIOC
-#define PIOS_GPIO_OUT_6_PIN			GPIO_Pin_15
+#define PIOS_GPIO_OUT_6_PIN			GPIO_Pin_14
 #define PIOS_GPIO_OUT_6_GPIO_CLK	RCC_APB2Periph_GPIOC
 
-#define PIOS_GPIO_NUM				7
-#define PIOS_GPIO_PORTS				{ PIOS_GPIO_OUT_0_PORT,      PIOS_GPIO_OUT_1_PORT,      PIOS_GPIO_OUT_2_PORT,      PIOS_GPIO_OUT_3_PORT,      PIOS_GPIO_OUT_4_PORT,      PIOS_GPIO_OUT_5_PORT,      PIOS_GPIO_OUT_6_PORT}
-#define PIOS_GPIO_PINS				{ PIOS_GPIO_OUT_0_PIN,       PIOS_GPIO_OUT_1_PIN,       PIOS_GPIO_OUT_2_PIN,       PIOS_GPIO_OUT_3_PIN,       PIOS_GPIO_OUT_4_PIN,       PIOS_GPIO_OUT_5_PIN,       PIOS_GPIO_OUT_6_PIN}
-#define PIOS_GPIO_CLKS				{ PIOS_GPIO_OUT_0_GPIO_CLK,  PIOS_GPIO_OUT_1_GPIO_CLK,  PIOS_GPIO_OUT_2_GPIO_CLK,  PIOS_GPIO_OUT_3_GPIO_CLK,  PIOS_GPIO_OUT_4_GPIO_CLK,  PIOS_GPIO_OUT_5_GPIO_CLK,  PIOS_GPIO_OUT_6_GPIO_CLK}
+// spare pin
+#define PIOS_GPIO_OUT_7_PORT		GPIOC
+#define PIOS_GPIO_OUT_7_PIN			GPIO_Pin_15
+#define PIOS_GPIO_OUT_7_GPIO_CLK	RCC_APB2Periph_GPIOC
+
+#define PIOS_GPIO_NUM				8
+#define PIOS_GPIO_PORTS				{PIOS_GPIO_OUT_0_PORT,     PIOS_GPIO_OUT_1_PORT,     PIOS_GPIO_OUT_2_PORT,     PIOS_GPIO_OUT_3_PORT,     PIOS_GPIO_OUT_4_PORT,     PIOS_GPIO_OUT_5_PORT,     PIOS_GPIO_OUT_6_PORT,     PIOS_GPIO_OUT_7_PORT}
+#define PIOS_GPIO_PINS				{PIOS_GPIO_OUT_0_PIN,      PIOS_GPIO_OUT_1_PIN,      PIOS_GPIO_OUT_2_PIN,      PIOS_GPIO_OUT_3_PIN,      PIOS_GPIO_OUT_4_PIN,      PIOS_GPIO_OUT_5_PIN,      PIOS_GPIO_OUT_6_PIN,      PIOS_GPIO_OUT_7_PIN}
+#define PIOS_GPIO_CLKS				{PIOS_GPIO_OUT_0_GPIO_CLK, PIOS_GPIO_OUT_1_GPIO_CLK, PIOS_GPIO_OUT_2_GPIO_CLK, PIOS_GPIO_OUT_3_GPIO_CLK, PIOS_GPIO_OUT_4_GPIO_CLK, PIOS_GPIO_OUT_5_GPIO_CLK, PIOS_GPIO_OUT_6_GPIO_CLK, PIOS_GPIO_OUT_7_GPIO_CLK}
 
 #define SERIAL_RTS_ENABLE			PIOS_GPIO_Enable(0)
 #define SERIAL_RTS_SET				PIOS_GPIO_Off(0)
@@ -305,25 +330,31 @@ extern uint32_t pios_com_telem_usb_id;
 #define RF_CS_HIGH					PIOS_GPIO_Off(1)
 #define RF_CS_LOW					PIOS_GPIO_On(1)
 
-#define SPARE1_ENABLE				PIOS_GPIO_Enable(2)
-#define SPARE1_HIGH					PIOS_GPIO_Off(2)
-#define SPARE1_LOW					PIOS_GPIO_On(2)
+#define PPM_OUT_PIN                 PIOS_GPIO_OUT_2_PIN
+#define PPM_OUT_PORT                PIOS_GPIO_OUT_2_PORT
+#define PPM_OUT_ENABLE				PIOS_GPIO_Enable(2)
+#define PPM_OUT_HIGH				PIOS_GPIO_Off(2)
+#define PPM_OUT_LOW					PIOS_GPIO_On(2)
 
-#define SPARE2_ENABLE				PIOS_GPIO_Enable(3)
-#define SPARE2_HIGH					PIOS_GPIO_Off(3)
-#define SPARE2_LOW					PIOS_GPIO_On(3)
+#define SPARE1_ENABLE				PIOS_GPIO_Enable(3)
+#define SPARE1_HIGH					PIOS_GPIO_Off(3)
+#define SPARE1_LOW					PIOS_GPIO_On(3)
 
-#define SPARE3_ENABLE				PIOS_GPIO_Enable(4)
-#define SPARE3_HIGH					PIOS_GPIO_Off(4)
-#define SPARE3_LOW					PIOS_GPIO_On(4)
+#define SPARE2_ENABLE				PIOS_GPIO_Enable(4)
+#define SPARE2_HIGH					PIOS_GPIO_Off(4)
+#define SPARE2_LOW					PIOS_GPIO_On(4)
 
-#define SPARE4_ENABLE				PIOS_GPIO_Enable(5)
-#define SPARE4_HIGH					PIOS_GPIO_Off(5)
-#define SPARE4_LOW					PIOS_GPIO_On(5)
+#define SPARE3_ENABLE				PIOS_GPIO_Enable(5)
+#define SPARE3_HIGH					PIOS_GPIO_Off(5)
+#define SPARE3_LOW					PIOS_GPIO_On(5)
 
-#define SPARE5_ENABLE				PIOS_GPIO_Enable(6)
-#define SPARE5_HIGH					PIOS_GPIO_Off(6)
-#define SPARE5_LOW					PIOS_GPIO_On(6)
+#define SPARE4_ENABLE				PIOS_GPIO_Enable(6)
+#define SPARE4_HIGH					PIOS_GPIO_Off(6)
+#define SPARE4_LOW					PIOS_GPIO_On(6)
+
+#define SPARE5_ENABLE				PIOS_GPIO_Enable(7)
+#define SPARE5_HIGH					PIOS_GPIO_Off(7)
+#define SPARE5_LOW					PIOS_GPIO_On(7)
 
 // *****************************************************************
 // GPIO input pins
@@ -368,10 +399,15 @@ extern uint32_t pios_com_telem_usb_id;
 #define GPIO_IN_6_PIN			GPIO_Pin_0
 #define GPIO_IN_6_MODE			GPIO_Mode_IN_FLOATING
 
-#define GPIO_IN_NUM				7
-#define GPIO_IN_PORTS			{ GPIO_IN_0_PORT, GPIO_IN_1_PORT, GPIO_IN_2_PORT, GPIO_IN_3_PORT, GPIO_IN_4_PORT, GPIO_IN_5_PORT, GPIO_IN_6_PORT }
-#define GPIO_IN_PINS			{ GPIO_IN_0_PIN,  GPIO_IN_1_PIN,  GPIO_IN_2_PIN,  GPIO_IN_3_PIN,  GPIO_IN_4_PIN,  GPIO_IN_5_PIN,  GPIO_IN_6_PIN  }
-#define GPIO_IN_MODES			{ GPIO_IN_0_MODE, GPIO_IN_1_MODE, GPIO_IN_2_MODE, GPIO_IN_3_MODE, GPIO_IN_4_MODE, GPIO_IN_5_MODE, GPIO_IN_6_MODE }
+// PPM IN line
+#define PPM_IN_PORT			    GPIOB
+#define PPM_IN_PIN			    GPIO_Pin_11
+#define PPM_IN_MODE	      		GPIO_Mode_IPD
+
+#define GPIO_IN_NUM				8
+#define GPIO_IN_PORTS			{ GPIO_IN_0_PORT, GPIO_IN_1_PORT, GPIO_IN_2_PORT, GPIO_IN_3_PORT, GPIO_IN_4_PORT, GPIO_IN_5_PORT, GPIO_IN_6_PORT, PPM_IN_PORT }
+#define GPIO_IN_PINS			{ GPIO_IN_0_PIN,  GPIO_IN_1_PIN,  GPIO_IN_2_PIN,  GPIO_IN_3_PIN,  GPIO_IN_4_PIN,  GPIO_IN_5_PIN,  GPIO_IN_6_PIN,  PPM_IN_PIN  }
+#define GPIO_IN_MODES			{ GPIO_IN_0_MODE, GPIO_IN_1_MODE, GPIO_IN_2_MODE, GPIO_IN_3_MODE, GPIO_IN_4_MODE, GPIO_IN_5_MODE, GPIO_IN_6_MODE, PPM_IN_MODE }
 
 #define API_MODE_PIN			0
 #define SERIAL_CTS_PIN			1

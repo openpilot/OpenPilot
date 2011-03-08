@@ -28,7 +28,7 @@
 #ifndef USBMONITOR_H
 #define USBMONITOR_H
 
-//#include "rawhid_global.h"
+#include "rawhid_global.h"
 
 #include <QThread>
 
@@ -100,16 +100,23 @@ protected:
 /**
 *   A monitoring thread which will wait for device events.
 */
-class USBMonitor : public QThread
+
+class RAWHID_EXPORT USBMonitor : public QThread
 {
-        Q_OBJECT
+    Q_OBJECT
 
 public:
+    enum RunState {
+        Bootloader = 0x01,
+        Running = 0x02
+    };
+
+    static USBMonitor *instance();
+
     USBMonitor(QObject *parent = 0);
-//    USBMonitor(int vid, int pid);
     ~USBMonitor();
     QList<USBPortInfo> availableDevices();
-    QList<USBPortInfo> availableDevices(int vid, int pid, int bcdDevice);
+    QList<USBPortInfo> availableDevices(int vid, int pid, int boardModel, int runState);
     #if defined (Q_OS_WIN32)
     LRESULT onDeviceChangeWin( WPARAM wParam, LPARAM lParam );
     #endif
@@ -139,6 +146,9 @@ private slots:
     void deviceEventReceived();
 
 private:
+
+    Q_DISABLE_COPY(USBMonitor)
+    static USBMonitor *m_instance;
 
     // Depending on the OS, we'll need different things:
 #if defined( Q_OS_MAC)

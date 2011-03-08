@@ -59,10 +59,20 @@ void USBMonitor::deviceEventReceived() {
 
 }
 
+
+USBMonitor* USBMonitor::instance()
+{
+    return m_instance;
+}
+
+USBMonitor* USBMonitor::m_instance = 0;
+
 /**
   Initialize the udev monitor here
   */
 USBMonitor::USBMonitor(QObject *parent): QThread(parent) {
+
+    m_instance = this;
 
     this->context = udev_new();
 
@@ -120,14 +130,17 @@ QList<USBPortInfo> USBMonitor::availableDevices()
 
 /**
   Be a bit more picky and ask only for a specific type of device:
+     On OpenPilot, the bcdDeviceLSB indicates the run state: bootloader or running.
+     bcdDeviceMSB indicates the board model.
   */
-QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDevice)
+QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceMSB, int bcdDeviceLSB)
 {
     QList<USBPortInfo> allPorts = availableDevices();
     QList<USBPortInfo> thePortsWeWant;
 
     foreach (USBPortInfo port, allPorts) {
-        if((port.vendorID==vid || vid==-1) && (port.productID==pid || pid==-1) && (port.bcdDevice==bcdDevice || bcdDevice==-1))
+        if((port.vendorID==vid || vid==-1) && (port.productID==pid || pid==-1) && ((port.bcdDevice>>8)==bcdDeviceMSB || bcdDeviceMSB==-1) &&
+                ( (port.bcdDevice&0x00ff) ==bcdDeviceLSB || bcdDeviceLSB==-1))
             thePortsWeWant.append(port);
     }
     return thePortsWeWant;

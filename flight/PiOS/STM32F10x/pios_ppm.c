@@ -63,7 +63,6 @@ void PIOS_PPM_Init(void)
 	for (i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
 		CaptureValue[i] = 0;
 	}
-	////////////////////////////////
 
 	NVIC_InitTypeDef NVIC_InitStructure = pios_ppm_cfg.irq.init;
 
@@ -105,14 +104,18 @@ void PIOS_PPM_Init(void)
 			break;
 #endif
 	}
+	/* Enable timer interrupts */
 	NVIC_Init(&NVIC_InitStructure);
 
+	/* Configure input pins */
 	GPIO_InitTypeDef GPIO_InitStructure = pios_ppm_cfg.gpio_init;
 	GPIO_Init(pios_ppm_cfg.port, &GPIO_InitStructure);
 
+	/* Configure timer for input capture */
 	TIM_ICInitStructure = pios_ppm_cfg.tim_ic_init;
 	TIM_ICInit(pios_ppm_cfg.timer, &TIM_ICInitStructure);
 
+	/* Configure timer clocks */
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = pios_ppm_cfg.tim_base_init;
 	TIM_InternalClockConfig(pios_ppm_cfg.timer);
 	TIM_TimeBaseInit(pios_ppm_cfg.timer, &TIM_TimeBaseStructure);
@@ -123,52 +126,6 @@ void PIOS_PPM_Init(void)
 	/* Enable timers */
 	TIM_Cmd(pios_ppm_cfg.timer, ENABLE);
 
-	/////////////////////////////////
-#if 0
-
-	/* Setup RCC */
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
-
-	/* Enable timer interrupts */
-	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_InitStructure.NVIC_IRQChannel = PIOS_PPM_TIM_IRQ;
-	NVIC_Init(&NVIC_InitStructure);
-
-	/* Configure input pins */
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Pin = PIOS_PPM_GPIO_PIN;
-	GPIO_Init(PIOS_PPM_GPIO_PORT, &GPIO_InitStructure);
-
-	/* Configure timer for input capture */
-	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
-	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
-	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
-	TIM_ICInitStructure.TIM_ICFilter = 0x0;
-	TIM_ICInitStructure.TIM_Channel = PIOS_PPM_TIM_CHANNEL;
-	TIM_ICInit(PIOS_PPM_TIM_PORT, &TIM_ICInitStructure);
-
-	/* Configure timer clocks */
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-	TIM_TimeBaseStructure.TIM_Period = 0xFFFF;
-	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
-	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_InternalClockConfig(PIOS_PPM_TIM_PORT);
-	TIM_TimeBaseInit(PIOS_PPM_TIM_PORT, &TIM_TimeBaseStructure);
-
-	/* Enable the Capture Compare Interrupt Request */
-	TIM_ITConfig(PIOS_PPM_TIM_PORT, PIOS_PPM_TIM_CCR, ENABLE);
-
-	/* Enable timers */
-	TIM_Cmd(PIOS_PPM_TIM, ENABLE);
-#endif
-
 	/* Supervisor Setup */
 #if (PIOS_PPM_SUPV_ENABLED)
 	/* Flush counter variables */
@@ -178,7 +135,6 @@ void PIOS_PPM_Init(void)
 	for (i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
 		CapCounterPrev[i] = 0;
 	}
-///////////////
 
 	NVIC_InitStructure = pios_ppmsv_cfg.irq.init;
 
@@ -223,12 +179,13 @@ void PIOS_PPM_Init(void)
 
 	/* Configure interrupts */
 	NVIC_Init(&NVIC_InitStructure);
+
 	/* Time base configuration */
 	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
 	TIM_TimeBaseStructure = pios_ppmsv_cfg.tim_base_init;
 	TIM_TimeBaseInit(pios_ppmsv_cfg.timer, &TIM_TimeBaseStructure);
 
-	/* Enable the CC2 Interrupt Request */
+	/* Enable the CCx Interrupt Request */
 	TIM_ITConfig(pios_ppmsv_cfg.timer, pios_ppmsv_cfg.ccr, ENABLE);
 
 	/* Clear update pending flag */
@@ -236,36 +193,6 @@ void PIOS_PPM_Init(void)
 
 	/* Enable counter */
 	TIM_Cmd(pios_ppmsv_cfg.timer, ENABLE);
-
-//////////////////
-#if 0
-	/* Enable timer clock */
-	PIOS_PPM_SUPV_TIMER_RCC_FUNC;
-
-	/* Configure interrupts */
-	NVIC_InitStructure.NVIC_IRQChannel = PIOS_PPM_SUPV_IRQ_CHANNEL;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
-
-	/* Time base configuration */
-	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-	TIM_TimeBaseStructure.TIM_Period = ((1000000 / PIOS_PPM_SUPV_HZ) - 1);
-	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;	/* For 1 uS accuracy */
-	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_TimeBaseInit(PIOS_PPM_SUPV_TIMER, &TIM_TimeBaseStructure);
-
-	/* Enable the CC2 Interrupt Request */
-	TIM_ITConfig(PIOS_PPM_SUPV_TIMER, TIM_IT_Update, ENABLE);
-
-	/* Clear update pending flag */
-	TIM_ClearFlag(TIM2, TIM_FLAG_Update);
-
-	/* Enable counter */
-	TIM_Cmd(PIOS_PPM_SUPV_TIMER, ENABLE);
-#endif
 #endif
 
 	/* Setup local variable which stays in this scope */
@@ -291,12 +218,11 @@ int32_t PIOS_PPM_Get(int8_t Channel)
 }
 
 /**
-* Handle TIM1 global interrupt request
+* Handle TIMx global interrupt request
 * Some work and testing still needed, need to detect start of frame and decode pulses
 *
 */
 void PIOS_PPM_irq_handler(void)
-//void TIM1_CC_IRQHandler(void)
 {
 	/* Do this as it's more efficient */
 	if (TIM_GetITStatus(pios_ppm_cfg.timer, pios_ppm_cfg.ccr) == SET) {
@@ -317,7 +243,7 @@ void PIOS_PPM_irq_handler(void)
 		}
 	}
 
-	/* Clear TIM3 Capture compare interrupt pending bit */
+	/* Clear TIMx Capture compare interrupt pending bit */
 	TIM_ClearITPendingBit(pios_ppm_cfg.timer, pios_ppm_cfg.ccr);
 
 	/* Capture computation */
@@ -343,8 +269,7 @@ void PIOS_PPM_irq_handler(void)
 /**
 * This function handles TIM3 global interrupt request.
 */
-void PIOS_PPMSV_irq_handler(void){
-//PIOS_PPM_SUPV_IRQ_FUNC {
+void PIOS_PPMSV_irq_handler(void) {
 	/* Clear timer interrupt pending bit */
 	TIM_ClearITPendingBit(pios_ppmsv_cfg.timer, pios_ppmsv_cfg.ccr);
 

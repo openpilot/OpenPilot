@@ -228,21 +228,8 @@ extern uint32_t pios_com_spektrum_id;
 //-------------------------
 // Receiver PPM input
 //-------------------------
-/*#define PIOS_PPM_GPIO_PORT                      GPIOA
-#define PIOS_PPM_GPIO_PIN                       GPIO_Pin_9
-#define PIOS_PPM_TIM_PORT                       TIM1
-#define PIOS_PPM_TIM_CHANNEL                    TIM_Channel_2
-#define PIOS_PPM_TIM_CCR                        TIM_IT_CC2
-#define PIOS_PPM_TIM                            TIM1
-#define PIOS_PPM_TIM_IRQ                        TIM1_CC_IRQn*/
 #define PIOS_PPM_NUM_INPUTS                     8  //Could be more if needed
-/*#define PIOS_PPM_SUPV_ENABLED                   1
-#define PIOS_PPM_SUPV_TIMER                     TIM6
-#define PIOS_PPM_SUPV_TIMER_RCC_FUNC            RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE)
-#define PIOS_PPM_SUPV_HZ                        25
-#define PIOS_PPM_SUPV_IRQ_CHANNEL               TIM6_IRQn
-#define PIOS_PPM_SUPV_IRQ_FUNC                  void TIM6_IRQHandler(void)
-*/
+#define PIOS_PPM_SUPV_ENABLED                   1
 //-------------------------
 // SPEKTRUM input
 //-------------------------

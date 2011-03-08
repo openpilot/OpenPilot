@@ -1215,7 +1215,7 @@ void demo_slam01() {
 	if (intOpts[iDispQt]) // at least 2d
 	{
 		#ifdef HAVE_MODULE_QDISPLAY
-		qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,display_priority,(qdisplay::FUNC)&demo_slam01_main,slam_priority,display_period,&worldPtr,(qdisplay::EXIT)&demo_slam01_exit);
+		qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,display_priority,(qdisplay::FUNC)&demo_slam01_main,slam_priority,display_period,&worldPtr,(qdisplay::EXIT_FUNC)&demo_slam01_exit);
 		#else
 		std::cout << "Please install qdisplay module if you want 2D display" << std::endl;
 		#endif

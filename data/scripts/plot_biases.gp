@@ -45,16 +45,16 @@ deltat(t)=((t0<=1)?(t0=t,0):(t-t0))
 
 # now plot:
 plot \
-	file using (deltat(\$1)):15 with points pt 1 lt rgb "red"       title "Bias AX", \
+	file using (deltat(\$1)):15 with points pt 1 lt rgb "red"       title "Bias AX with 3 sigma limits", \
 	file using (deltat(\$1)):(\$15-3*\$37) with points pt 0 lt rgb "red"       title "", \
 	file using (deltat(\$1)):(\$15+3*\$37) with points pt 0 lt rgb "red"       title "", \
-	file using (deltat(\$1)):16 with points pt 1 lt rgb "dark-red"  title "Bias AY", \
+	file using (deltat(\$1)):16 with points pt 1 lt rgb "dark-red"  title "Bias AY with 3 sigma limits", \
 	file using (deltat(\$1)):(\$16-3*\$38) with points pt 0 lt rgb "dark-red"       title "", \
 	file using (deltat(\$1)):(\$16+3*\$38) with points pt 0 lt rgb "dark-red"       title "", \
-	file using (deltat(\$1)):17 with points pt 1 lt rgb "orange"    title "Bias AZ", \
+	file using (deltat(\$1)):17 with points pt 1 lt rgb "orange"    title "Bias AZ with 3 sigma limits", \
 	file using (deltat(\$1)):(\$17-3*\$39) with points pt 0 lt rgb "orange"       title "", \
 	file using (deltat(\$1)):(\$17+3*\$39) with points pt 0 lt rgb "orange"       title "", \
-	file using (deltat(\$1)):(norm3(\$21,\$22,\$23)-9.805) with points pt 1 lt rgb "blue"          title "Norm g - 9.805", \
+	file using (deltat(\$1)):(norm3(\$21,\$22,\$23)-9.805) with points pt 1 lt rgb "blue"          title "Norm g - 9.805 with 3 sigma limits", \
 	file using (deltat(\$1)):(norm3(\$21,\$22,\$23)-9.805-3*norm3(\$43,\$44,\$45)) with points pt 0 lt rgb "blue"          title "", \
 	file using (deltat(\$1)):(norm3(\$21,\$22,\$23)-9.805+3*norm3(\$43,\$44,\$45)) with points pt 0 lt rgb "blue"          title "", \
 	file using (deltat(\$1)):(pitch(\$21,\$22,\$23)) axes x1y2 with points pt 1 lt rgb "green"     title "Pitch g", \

@@ -42,7 +42,7 @@ set zlabel "z (m)"
 
 # now plot:
 splot \
-	file using 2:3:4 with lines lt rgb "blue" notitle
+	file using 13:14:15 with lines lt rgb "blue" notitle
 
 # prevent window from closing at the end
 #pause -1

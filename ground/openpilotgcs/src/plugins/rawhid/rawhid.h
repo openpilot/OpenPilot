@@ -36,6 +36,7 @@
 #include <QByteArray>
 
 #include "pjrc_rawhid.h"
+#include "usbmonitor.h"
 
 //helper classes
 class RawHIDReadThread;

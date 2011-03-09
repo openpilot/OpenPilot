@@ -411,7 +411,14 @@ static void go_starting(struct pios_i2c_adapter *i2c_adapter)
 	i2c_adapter->last_byte = &(i2c_adapter->active_txn->buf[i2c_adapter->active_txn->len - 1]);
 
 	I2C_GenerateSTART(i2c_adapter->cfg->regs, ENABLE);
-	I2C_ITConfig(i2c_adapter->cfg->regs, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, ENABLE);
+	if (i2c_adapter->active_txn->rw == PIOS_I2C_TXN_READ) {
+		I2C_ITConfig(i2c_adapter->cfg->regs, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, ENABLE);
+	} else {
+		// For write operations, do not enable the IT_BUF events.
+		// The current driver does not act when the TX data register is not full, only when the complete byte is sent.
+		// With the IT_BUF enabled, we constantly get IRQs, See OP-326
+		I2C_ITConfig(i2c_adapter->cfg->regs, I2C_IT_EVT | I2C_IT_ERR, ENABLE);
+	}
 }
 
 /* Common to 'more' and 'last' transaction */
@@ -1100,7 +1107,9 @@ void PIOS_I2C_ER_IRQ_Handler(uint32_t i2c_id)
 
 	if(event & I2C_FLAG_AF) {
 		i2c_nack_counter++;
+
 		I2C_ClearFlag(i2c_adapter->cfg->regs, I2C_FLAG_AF);
+
 		i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_NACK);
 	} else { /* Mostly bus errors here */              
 		i2c_adapter_log_fault(PIOS_I2C_ERROR_INTERRUPT);

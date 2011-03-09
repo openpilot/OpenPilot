@@ -80,18 +80,23 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname): debug(_debu
     {
         send_delay=10;
         use_delay=true;
-        int numDevices=0;
+//        int numDevices=0;
+        QList<USBPortInfo> devices;
         int count=0;
-        while((numDevices==0) && count < 10)
+        while((devices.length()==0) && count < 10)
         {
             if (debug)
                 qDebug() << ".";
             delay::msleep(500);
-            numDevices = hidHandle.open(1,0x20a0,0x4117,0,0); //0xff9c,0x0001);
+            devices = USBMonitor::instance()->availableDevices(0x20a0,-1,-1,USBMonitor::Bootloader);
             count++;
         }
-        if(debug)
-            qDebug() << numDevices << " device(s) opened";
+       if (devices.length()==1) {
+           hidHandle.open(1,devices.first().vendorID,devices.first().productID,0,0);
+        } else {
+           qDebug() << "More than one device, don't know what to do!";
+       }
+
     }
 }
 

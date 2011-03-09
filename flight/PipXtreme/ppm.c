@@ -42,8 +42,6 @@
 #define PPM_OUT_MAX_CHANNEL_PULSE_US     2200                       // microseconds
 
 #define PPM_IN_MIN_SYNC_PULSE_US         7000                       // microseconds .. Pip's 6-chan TX goes down to 8.8ms
-#define PPM_IN_MAX_SYNC_PULSE_US         16000                      // microseconds .. Pip's 6-chan TX goes up to 14.4ms
-
 #define PPM_IN_MIN_CHANNEL_PULSE_US      750                        // microseconds
 #define PPM_IN_MAX_CHANNEL_PULSE_US      2400                       // microseconds
 
@@ -54,21 +52,19 @@ uint8_t ppm_mode;
 volatile bool ppm_initialising = true;
 
 volatile uint32_t ppm_In_PrevFrames = 0;
-
 volatile uint32_t ppm_In_LastValidFrameTimer = 0;
 volatile uint32_t ppm_In_Frames = 0;
-volatile uint32_t ppm_In_SyncPulseWidth = 0;
-volatile uint32_t ppm_In_LastFrameTime = 0;
+volatile uint32_t ppm_In_ErrorFrames = 0;
 volatile uint8_t ppm_In_NoisyChannelCounter = 0;
 volatile int8_t ppm_In_ChannelsDetected = 0;
 volatile int8_t ppm_In_ChannelPulseIndex = -1;
-volatile uint32_t ppm_In_PreviousValue = 0;
-volatile uint32_t ppm_In_CurrentValue = 0;
+volatile int32_t ppm_In_PreviousValue = -1;
+volatile uint32_t ppm_In_PulseWidth = 0;
 volatile uint32_t ppm_In_ChannelPulseWidthNew[PIOS_PPM_MAX_CHANNELS];
 volatile uint32_t ppm_In_ChannelPulseWidth[PIOS_PPM_MAX_CHANNELS];
 
 volatile uint16_t ppm_Out_ChannelPulseWidth[PIOS_PPM_MAX_CHANNELS];
-volatile uint16_t ppm_Out_SyncPulseWidth = PPM_OUT_FRAME_PERIOD_US;
+volatile uint32_t ppm_Out_SyncPulseWidth = PPM_OUT_FRAME_PERIOD_US;
 volatile int8_t ppm_Out_ChannelPulseIndex = -1;
 volatile uint8_t ppm_Out_ChannelsUsed = 0;
 
@@ -86,12 +82,11 @@ void ppm_In_Init(void)
 	ppm_In_NoisyChannelCounter = 0;
 	ppm_In_LastValidFrameTimer = 0;
 	ppm_In_Frames = 0;
-	ppm_In_SyncPulseWidth = 0;
-	ppm_In_LastFrameTime = 0;
+	ppm_In_ErrorFrames = 0;
 	ppm_In_ChannelsDetected = 0;
 	ppm_In_ChannelPulseIndex = -1;
-	ppm_In_PreviousValue = 0;
-	ppm_In_CurrentValue = 0;
+	ppm_In_PreviousValue = -1;
+	ppm_In_PulseWidth = 0;
 
 	for (int i = 0; i < PIOS_PPM_MAX_CHANNELS; i++)
 	{
@@ -99,7 +94,7 @@ void ppm_In_Init(void)
 		ppm_In_ChannelPulseWidth[i] = 0;
 	}
 
-	// Setup RCC
+	// Enable timer clock
 	PIOS_PPM_TIMER_EN_RCC_FUNC;
 
 	// Enable timer interrupts
@@ -119,33 +114,36 @@ void ppm_In_Init(void)
 	GPIO_Init(PPM_IN_PORT, &GPIO_InitStructure);
 
 	// remap the pin to switch it to timer mode
-//	GPIO_PinRemapConfig(GPIO_PartialRemap1_TIM2, ENABLE);
-	GPIO_PinRemapConfig(GPIO_PartialRemap2_TIM2, ENABLE);
-//	GPIO_PinRemapConfig(GPIO_FullRemap_TIM2, ENABLE);
+	if (PIOS_PPM_TIM == TIM2)
+	{
+//		GPIO_PinRemapConfig(GPIO_PartialRemap1_TIM2, ENABLE);
+		GPIO_PinRemapConfig(GPIO_PartialRemap2_TIM2, ENABLE);
+//		GPIO_PinRemapConfig(GPIO_FullRemap_TIM2, ENABLE);
+	}
 
 	// Configure timer for input capture
 	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
 	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
 	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
-	TIM_ICInitStructure.TIM_ICFilter = 0x0;
+	TIM_ICInitStructure.TIM_ICFilter = 15;     // 0 to 15
 	TIM_ICInitStructure.TIM_Channel = PIOS_PPM_IN_TIM_CHANNEL;
 	TIM_ICInit(PIOS_PPM_TIM_PORT, &TIM_ICInitStructure);
 
 	// Configure timer clocks
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
 	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-	TIM_TimeBaseStructure.TIM_Period = 0xFFFF;
+	TIM_TimeBaseStructure.TIM_Period = 25000 - 1;   // 25ms - can be anything you like now really - up to 65536us
 	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 	TIM_InternalClockConfig(PIOS_PPM_TIM_PORT);
 	TIM_TimeBaseInit(PIOS_PPM_TIM_PORT, &TIM_TimeBaseStructure);
 
-	// Enable the Capture Compare Interrupt Request
-	TIM_ITConfig(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR, ENABLE);
+	// Enable the Capture Compare and Update Interrupts
+	TIM_ITConfig(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR | TIM_IT_Update, ENABLE);
 
-	// Clear TIMER Capture compare interrupt pending bit
-	TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR);
+	// Clear TIMER Capture compare and update interrupt pending bits
+	TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR | TIM_IT_Update);
 
 	// Enable timer
 	TIM_Cmd(PIOS_PPM_TIM, ENABLE);
@@ -161,123 +159,163 @@ void ppm_In_Init(void)
 #endif
 }
 
-// TIMER capture/compare interrupt
+// TIMER capture/compare/update interrupt
 void PIOS_PPM_IN_CC_IRQ(void)
 {
-	uint32_t pulse_width_us;    // new pulse width in microseconds
+	uint16_t new_value = 0;
+	uint32_t period = (uint32_t)PIOS_PPM_TIM->ARR + 1;
 
 	if (booting || ppm_initialising)
-	{	// just clear the interrupt
-		if (TIM_GetITStatus(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR) == SET)
-		{
-			TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR);
-			PIOS_PPM_IN_TIM_GETCAP_FUNC(PIOS_PPM_TIM_PORT);
-		}
-		TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR);
+	{   // clear the interrupts
+		TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR | TIM_IT_Update);
 		return;
 	}
 
-	// Do this as it's more efficient
-	if (TIM_GetITStatus(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR) == SET)
-	{
-		ppm_In_PreviousValue = ppm_In_CurrentValue;
-		ppm_In_CurrentValue = PIOS_PPM_IN_TIM_GETCAP_FUNC(PIOS_PPM_TIM_PORT);
-	}
+	// determine the interrupt source(s)
+	bool update_int = TIM_GetITStatus(PIOS_PPM_TIM_PORT, TIM_IT_Update) == SET;          // timer/counter overflow occured
+	bool capture_int = TIM_GetITStatus(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR) == SET;   // PPM input capture
 
-	// Clear TIMER Capture compare interrupt pending bit
-	TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR);
+	if (capture_int)
+		new_value = PIOS_PPM_IN_TIM_GETCAP_FUNC(PIOS_PPM_TIM_PORT);
 
-	// Capture computation
-	if (ppm_In_CurrentValue > ppm_In_PreviousValue)
-		pulse_width_us = (ppm_In_CurrentValue - ppm_In_PreviousValue);
-	else
-		pulse_width_us = ((0xFFFF - ppm_In_PreviousValue) + ppm_In_CurrentValue);
+	// clear the interrupts
+	TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR | TIM_IT_Update);
 
 	// ********
 
-	#ifdef PPM_DEBUG
-//		DEBUG_PRINTF("ppm_in: %uus\r\n", pulse_width_us);
-	#endif
+	uint32_t ticks = 0;
+	if (update_int)
+	{   // timer/counter overflowed
 
-	if (pulse_width_us >= PPM_IN_MIN_SYNC_PULSE_US)
-	{	// SYNC pulse
-
-		if (pulse_width_us <= PPM_IN_MAX_SYNC_PULSE_US)
-		{	// SYNC pulse width is within accepted tolerance
-
-			if (ppm_In_ChannelPulseIndex > 0)
-			{	// we found some channel PWM's in the PPM stream
-
-				if (ppm_In_ChannelsDetected > 0 && ppm_In_ChannelPulseIndex == ppm_In_ChannelsDetected)
-				{	// detected same number of channels as in previous PPM frame .. save the new channel PWM values
-//					if (ppm_In_NoisyChannelCounter <= 2)	// only update channels if the channels are fairly noise free
-						for (int i = 0; i < PIOS_PPM_MAX_CHANNELS; i++)
-							ppm_In_ChannelPulseWidth[i] = ppm_In_ChannelPulseWidthNew[i];
-				}
-				ppm_In_ChannelsDetected = ppm_In_ChannelPulseIndex;     // the number of channels we found in this frame
-
-				ppm_In_LastValidFrameTimer = 0;                         // reset timer
-
-				ppm_In_Frames++;                                        // update frame counter
-			}
-
-			ppm_In_NoisyChannelCounter = 0;                             // reset noisy channel detector
-			ppm_In_ChannelPulseIndex = 0;                               // start of PPM frame
-			ppm_In_LastFrameTime = 0;                                   // reset timer
+		if (ppm_In_PreviousValue >= 0)
+			ticks = (period - ppm_In_PreviousValue) + new_value;
+		else
+		{
+			ticks = period;
+			if (capture_int) ticks += new_value;
 		}
-
-		ppm_In_SyncPulseWidth = pulse_width_us;                         // remember the length of this SYNC pulse
+		ppm_In_PreviousValue = -1;
 	}
 	else
-	if (ppm_In_SyncPulseWidth > 0 && ppm_In_ChannelPulseIndex >= 0)
+	if (capture_int)
+	{
+		if (ppm_In_PreviousValue >= 0)
+			ticks = new_value - ppm_In_PreviousValue;
+		else
+			ticks += new_value;
+	}
+
+	ppm_In_PulseWidth += ticks;
+	if (ppm_In_PulseWidth > 0x7fffffff)
+		ppm_In_PulseWidth = 0x7fffffff;                    // prevent overflows
+
+	ppm_In_LastValidFrameTimer += ticks;
+	if (ppm_In_LastValidFrameTimer > 0x7fffffff)
+		ppm_In_LastValidFrameTimer = 0x7fffffff;           // prevent overflows
+
+	if (capture_int)
+		ppm_In_PreviousValue = new_value;
+
+	// ********
+
+#ifdef PPM_DEBUG
+//	DEBUG_PRINTF("ppm_in:");
+//	if (update_int) DEBUG_PRINTF(" update");
+//	if (capture_int) DEBUG_PRINTF(" capture");
+//	DEBUG_PRINTF(" %u %u\r\n", ppm_In_LastValidFrameTimer, ppm_In_PulseWidth);
+#endif
+
+	if (ppm_In_LastValidFrameTimer >= 200000 && ppm_In_Frames > 0)
+	{	// we haven't seen a valid PPM frame for at least 200ms
+		for (int i = 0; i < PIOS_PPM_MAX_CHANNELS; i++)
+			ppm_In_ChannelPulseWidth[i] = 0;
+		ppm_In_Frames = 0;
+		ppm_In_ErrorFrames = 0;
+	}
+
+	if (ppm_In_ChannelPulseIndex < 0 || ppm_In_PulseWidth > PPM_IN_MAX_CHANNEL_PULSE_US)
+	{	// we are looking for a SYNC pulse, or we are receiving one
+
+			if (ppm_In_ChannelPulseIndex >= 0)
+			{	// it's either the start of a sync pulse or a noisy channel .. assume it's the end of a PPM frame
+
+				if (ppm_In_ChannelPulseIndex > 0)
+				{
+					if (ppm_In_Frames < 0xffffffff)
+						ppm_In_Frames++;                            // update frame counter
+
+					#ifdef PPM_DEBUG
+//						DEBUG_PRINTF("ppm_in: %u %u\r\n", ppm_In_ChannelsDetected, ppm_In_ChannelPulseIndex);
+					#endif
+
+					if (ppm_In_ChannelsDetected > 0 &&
+							ppm_In_ChannelsDetected == ppm_In_ChannelPulseIndex &&
+							ppm_In_NoisyChannelCounter <= 2)
+					{	// detected same number of channels as in previous PPM frame .. save the new channel PWM values
+						#ifdef PPM_DEBUG
+//							DEBUG_PRINTF("ppm_in: %u channels detected\r\n", ppm_In_ChannelPulseIndex);
+						#endif
+
+						for (int i = 0; i < PIOS_PPM_MAX_CHANNELS; i++)
+							ppm_In_ChannelPulseWidth[i] = ppm_In_ChannelPulseWidthNew[i];
+
+						ppm_In_LastValidFrameTimer = 0;                 // reset timer
+					}
+					else
+					{
+						if ((ppm_In_ChannelsDetected > 0 && ppm_In_ChannelsDetected != ppm_In_ChannelPulseIndex) ||
+								ppm_In_NoisyChannelCounter >= 2)
+						{
+							if (ppm_In_ErrorFrames < 0xffffffff)
+								ppm_In_ErrorFrames++;
+						}
+					}
+					ppm_In_ChannelsDetected = ppm_In_ChannelPulseIndex;     // the number of channels we found in this frame
+				}
+
+				ppm_In_ChannelPulseIndex = -1;                              // back to looking for a SYNC pulse
+			}
+
+		if (ppm_In_PulseWidth >= PPM_IN_MIN_SYNC_PULSE_US)
+		{	// SYNC pulse found
+			ppm_In_NoisyChannelCounter = 0;                             // reset noisy channel detector
+			ppm_In_ChannelPulseIndex = 0;                               // start of PPM frame
+		}
+	}
+	else
+	if (capture_int)
 	{	// CHANNEL pulse
 
-		if (pulse_width_us >= PPM_IN_MIN_CHANNEL_PULSE_US && pulse_width_us <= PPM_IN_MAX_CHANNEL_PULSE_US)
-		{	// this new channel pulse is within the accepted tolerance range
+		if (ppm_In_PulseWidth < PPM_IN_MIN_CHANNEL_PULSE_US)
+		{	// bad/noisy channel pulse .. reset state to wait for next SYNC pulse
+			ppm_In_ChannelPulseIndex = -1;
+
+			if (ppm_In_ErrorFrames < 0xffffffff)
+				ppm_In_ErrorFrames++;
+		}
+		else
+		{	// pulse width is within the accepted tolerance range for a channel
 			if (ppm_In_ChannelPulseIndex < PIOS_PPM_MAX_CHANNELS)
 			{
-				int32_t difference = (int32_t)pulse_width_us - ppm_In_ChannelPulseWidthNew[ppm_In_ChannelPulseIndex];
-				if (abs(difference) >= 300)
-					ppm_In_NoisyChannelCounter++;                       // possibly a noisy channel - or an RC switch was moved
+				if (ppm_In_ChannelPulseWidthNew[ppm_In_ChannelPulseIndex] > 0)
+				{
+					int32_t difference = (int32_t)ppm_In_PulseWidth - ppm_In_ChannelPulseWidthNew[ppm_In_ChannelPulseIndex];
+					if (abs(difference) >= 600)
+						ppm_In_NoisyChannelCounter++;                       // possibly a noisy channel - or an RC switch was moved
+				}
 
-				ppm_In_ChannelPulseWidthNew[ppm_In_ChannelPulseIndex] = pulse_width_us;    // save it
+				ppm_In_ChannelPulseWidthNew[ppm_In_ChannelPulseIndex] = ppm_In_PulseWidth;    // save it
 			}
 
 			if (ppm_In_ChannelPulseIndex < 127)
 				ppm_In_ChannelPulseIndex++;                             // next channel
-
-			ppm_In_LastFrameTime = 0;                                   // reset timer
-		}
-		else
-		{	// bad/noisy channel pulse .. reset state to wait for next SYNC pulse
-			ppm_In_Frames = 0;
-			ppm_In_ChannelPulseIndex = -1;
 		}
 	}
+
+	if (capture_int)
+		ppm_In_PulseWidth = 0;
 
 	// ********
-}
-
-void ppm_In_Supervisor(void)
-{	// this gets called once every millisecond by an interrupt
-
-	if (booting || ppm_initialising)
-		return;
-
-	if (ppm_In_LastValidFrameTimer < 0xffffffff)
-		ppm_In_LastValidFrameTimer++;
-
-	if (ppm_In_LastFrameTime < 0xffffffff)
-		ppm_In_LastFrameTime++;
-
-	if (ppm_In_LastFrameTime > ((PPM_IN_MAX_SYNC_PULSE_US * 2) / 1000) && ppm_In_SyncPulseWidth > 0)
-	{	// no PPM frames detected for a while .. reset PPM state
-		ppm_In_SyncPulseWidth = 0;
-		ppm_In_ChannelsDetected = 0;
-		ppm_In_ChannelPulseIndex = -1;
-		ppm_In_NoisyChannelCounter = 0;
-		ppm_In_Frames = 0;
-	}
 }
 
 uint32_t ppm_In_NewFrame(void)
@@ -285,7 +323,7 @@ uint32_t ppm_In_NewFrame(void)
 	if (booting || ppm_initialising)
 		return 0;
 
-	if (ppm_In_Frames >= 4 && ppm_In_Frames != ppm_In_PrevFrames)
+	if (ppm_In_Frames >= 2 && ppm_In_Frames != ppm_In_PrevFrames)
 	{	// we have a new PPM frame
 		ppm_In_PrevFrames = ppm_In_Frames;
 		return ppm_In_PrevFrames;
@@ -302,9 +340,6 @@ int32_t ppm_In_GetChannelPulseWidth(uint8_t channel)
 	// Return error if channel not available
 	if (channel >= PIOS_PPM_MAX_CHANNELS || channel >= ppm_In_ChannelsDetected)
 		return -2;
-
-	if (ppm_In_LastValidFrameTimer > (PPM_IN_MAX_SYNC_PULSE_US * 4) / 1000)
-		return 0;	// to long since last valid PPM frame
 
 	return ppm_In_ChannelPulseWidth[channel];    // return channel pulse width
 }
@@ -326,6 +361,7 @@ void ppm_Out_Init(void)
 
 //	ppm_Out_ChannelsUsed = 5;	// TEST ONLY
 
+	// Enable timer clock
 	PIOS_PPM_TIMER_EN_RCC_FUNC;
 
 	// Init PPM OUT pin
@@ -383,7 +419,7 @@ void ppm_Out_Init(void)
 	// Clear TIMER Capture compare interrupt pending bit
 	TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR);
 
-	// Enable clock to timer module
+	// Enable timer
 	TIM_Cmd(PIOS_PPM_TIM, ENABLE);
 
 #ifdef PPM_DEBUG
@@ -395,11 +431,6 @@ void ppm_Out_Init(void)
 void PIOS_PPM_OUT_CC_IRQ(void)
 {
 	// clear the interrupt
-	if (TIM_GetITStatus(PIOS_PPM_TIM_PORT, PIOS_PPM_OUT_TIM_CCR) == SET)
-	{
-		TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_OUT_TIM_CCR);
-		PIOS_PPM_IN_TIM_GETCAP_FUNC(PIOS_PPM_TIM_PORT);
-	}
 	TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_OUT_TIM_CCR);
 
 	if (booting || ppm_initialising)
@@ -439,24 +470,18 @@ void PIOS_PPM_OUT_CC_IRQ(void)
 	// *************************
 }
 
-void ppm_Out_Supervisor(void)
-{	// this gets called once every millisecond by an interrupt
-
-	if (booting || ppm_initialising)
-		return;
-
-
-
-}
-
 // *************************************************************
 // TIMER capture/compare interrupt
 
 void PIOS_PPM_CC_IRQ_FUNC(void)
 {
-	if (ppm_mode == MODE_PPM_TX) PIOS_PPM_IN_CC_IRQ();
+	if (ppm_mode == MODE_PPM_TX)
+		PIOS_PPM_IN_CC_IRQ();
 	else
-	if (ppm_mode == MODE_PPM_RX) PIOS_PPM_OUT_CC_IRQ();
+	if (ppm_mode == MODE_PPM_RX)
+		PIOS_PPM_OUT_CC_IRQ();
+	else
+		TIM_ClearITPendingBit(PIOS_PPM_TIM_PORT, PIOS_PPM_IN_TIM_CCR | TIM_IT_Update); // clear the interrupts
 }
 
 // *************************************************************
@@ -468,9 +493,7 @@ void ppm_1ms_tick(void)
 	if (booting || ppm_initialising)
 		return;
 
-	if (ppm_mode == MODE_PPM_TX) ppm_In_Supervisor();
-	else
-	if (ppm_mode == MODE_PPM_RX) ppm_Out_Supervisor();
+
 }
 
 // *************************************************************
@@ -507,8 +530,7 @@ void ppm_process(void)
 		{	// we have a new PPM frame to send
 
 			#ifdef PPM_DEBUG
-				DEBUG_PRINTF("\r\n");
-				DEBUG_PRINTF("ppm_in: sync %u\r\n", ppm_In_SyncPulseWidth);
+				DEBUG_PRINTF("ppm_in: %5u %5u ..", ppm_In_Frames, ppm_In_ErrorFrames);
 			#endif
 
 			for (int i = 0; i <	PIOS_PPM_MAX_CHANNELS && i < ppm_In_ChannelsDetected; i++)
@@ -516,15 +538,19 @@ void ppm_process(void)
 //				int32_t pwm = ppm_In_GetChannelPulseWidth(i);
 
 				#ifdef PPM_DEBUG
-					DEBUG_PRINTF("ppm_in: %u %u %4u\r\n", ppm_In_Frames, i, ppm_In_GetChannelPulseWidth(i));
+					DEBUG_PRINTF(" %4u", ppm_In_GetChannelPulseWidth(i));
 				#endif
 
 				// TODO:
 			}
+
+			#ifdef PPM_DEBUG
+				DEBUG_PRINTF("\r\n");
+			#endif
 		}
 	}
 	else
-	if (saved_settings.mode == MODE_PPM_RX)
+	if (ppm_mode == MODE_PPM_RX)
 	{
 		// TODO:
 	}
@@ -536,9 +562,12 @@ void ppm_deinit(void)
 {
 	ppm_initialising = true;
 
-	// disable the PPM timer
+	ppm_mode = 0;
+
+	// disable timer
 	TIM_Cmd(PIOS_PPM_TIM, DISABLE);
 
+	// Disable timer clock
 	PIOS_PPM_TIMER_DIS_RCC_FUNC;
 
 	// TIM IT disable
@@ -563,13 +592,15 @@ void ppm_deinit(void)
 
 void ppm_init(uint32_t our_sn)
 {
+	ppm_deinit();
+
 	ppm_initialising = true;
+
+	ppm_mode = saved_settings.mode;
 
 	#if defined(PPM_DEBUG)
 		DEBUG_PRINTF("\r\nPPM init\r\n");
 	#endif
-
-	ppm_mode = saved_settings.mode;
 
 	if (ppm_mode == MODE_PPM_TX)
 	{

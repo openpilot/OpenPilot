@@ -263,7 +263,7 @@ void setup_TimerInt(uint16_t Hz)
     // Time base configuration
     TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
     TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-    TIM_TimeBaseStructure.TIM_Period = ((1000000 / Hz) - 1);
+    TIM_TimeBaseStructure.TIM_Period = (1000000 / Hz) - 1;
     TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;	// For 1 uS accuracy
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
@@ -674,11 +674,11 @@ int main()
             }
             if (saved_settings.max_tx_power == 0xff)
             {
-    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_0;        // +1dBm ... 1.25mW
+                saved_settings.max_tx_power = RFM22_tx_pwr_txpow_0;        // +1dBm ... 1.25mW
     //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_1;        // +2dBm ... 1.6mW
     //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_2;        // +5dBm ... 3.16mW
     //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_3;        // +8dBm ... 6.3mW
-                saved_settings.max_tx_power = RFM22_tx_pwr_txpow_4;        // +11dBm .. 12.6mW
+    //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_4;        // +11dBm .. 12.6mW
     //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_5;        // +14dBm .. 25mW
     //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_6;        // +17dBm .. 50mW
     //          saved_settings.max_tx_power = RFM22_tx_pwr_txpow_7;        // +20dBm .. 100mW
@@ -695,7 +695,7 @@ int main()
             if (saved_settings.max_rf_bandwidth == 0xffffffff)
                 saved_settings.max_rf_bandwidth = 128000;
             if (saved_settings.max_tx_power == 0xff)
-                saved_settings.max_tx_power = RFM22_tx_pwr_txpow_4;        // +11dBm .. 12.6mW
+                saved_settings.max_tx_power = RFM22_tx_pwr_txpow_0;    // +1dBm ... 1.25mW
             break;
 
         case FREQBAND_915MHz:
@@ -708,7 +708,7 @@ int main()
             if (saved_settings.max_rf_bandwidth == 0xffffffff)
                 saved_settings.max_rf_bandwidth = 128000;
             if (saved_settings.max_tx_power == 0xff)
-                saved_settings.max_tx_power = RFM22_tx_pwr_txpow_4;        // +11dBm .. 12.6mW
+                saved_settings.max_tx_power = RFM22_tx_pwr_txpow_0;    // +1dBm ... 1.25mW
             break;
 
         default:

@@ -40,7 +40,8 @@
 
 
 #ifndef PIOS_USB_PRODUCT_ID
-#define PIOS_USB_PRODUCT_ID		0x415C         // PipXtreme PID
+#define PIOS_USB_PRODUCT_ID		0x4117
+//#define PIOS_USB_PRODUCT_ID		0x415C         // PipXtreme PID
 #endif
 
 #ifndef PIOS_USB_VERSION_ID

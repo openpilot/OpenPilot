@@ -617,6 +617,17 @@ public class UAVObjectField {
     	
     	return num;
     }
+    
+    @Override
+    public UAVObjectField clone()
+    {
+    	UAVObjectField newField = new UAVObjectField(new String(name), new String(units), type, 
+    			new ArrayList<String>(elementNames), 
+    			new ArrayList<String>(options));
+    	newField.initialize(obj);
+    	newField.data = data;
+		return newField;
+    }
 
 	private String name;
 	private String units;
@@ -626,7 +637,7 @@ public class UAVObjectField {
     private int numElements;
     private int numBytesPerElement;
     private int offset;
-    private Object data;
     private UAVObject obj;
+    protected Object data;
 
 }

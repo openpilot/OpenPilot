@@ -3,9 +3,29 @@ package org.openpilot.uavtalk;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Observable;
+import java.util.Observer;
 
 public class UAVObjectManager {
 
+	public class CallbackListener extends Observable {		
+		public void event (UAVObject obj) {
+			setChanged();
+			notifyObservers(obj);
+		}
+	}
+	private CallbackListener newInstance = new CallbackListener();
+	public void addNewInstanceObserver(Observer o) {
+		synchronized(newInstance) {
+			newInstance.addObserver(o);
+		}
+	}
+	private CallbackListener newObject = new CallbackListener();
+	public void addNewObjectObserver(Observer o) {
+		synchronized(newObject) {
+			newObject.addObserver(o);
+		}
+	}
 	private final int MAX_INSTANCES = 10;
 
 	// Use array list to store objects since rarely added or deleted
@@ -79,11 +99,12 @@ public class UAVObjectManager {
 					UAVDataObject newObj = obj.clone(instID);
 					newObj.initialize(mobj);
 					instList.add(newObj);
-					// emit new instance signal
+					newInstance.event(newObj);
 				}
 				obj.initialize(mobj);
 				//emit new instance signal
 				instList.add(obj);
+				newInstance.event(obj);
 
 				instIter = instList.listIterator();
 				while(instIter.hasNext()) {
@@ -101,13 +122,13 @@ public class UAVObjectManager {
 					UAVDataObject cobj = obj.clone(instId);
 					cobj.initialize(mobj);
 					instList.add(cobj);
-					// emit newInstance(cobj);
+					newInstance.event(cobj);
 				}
 				// Finally, initialize the actual object instance
 				obj.initialize(mobj);
 				// Add the actual object instance in the list
 				instList.add(obj);
-				//emit newInstance(obj);
+				newInstance.event(obj);
 				return true;
 			}
 
@@ -149,81 +170,67 @@ public class UAVObjectManager {
 	/**
 	 * Same as getObjects() but will only return DataObjects.
 	 */
-	public  List< List<UAVDataObject> > getDataObjects()
+	public synchronized List< List<UAVDataObject> > getDataObjects()
 	{
-		assert(false); // TOOD This
-		return new ArrayList<List<UAVDataObject>>();
-
-		/*		QMutexLocker locker(mutex);
-		QList< QList<UAVDataObject*> > dObjects;
+		List< List<UAVDataObject> > dObjects = new ArrayList< List<UAVDataObject> > ();
 
 		// Go through objects and copy to new list when types match
-		for (int objidx = 0; objidx < objects.length(); ++objidx)
-		{
-			if (objects[objidx].length() > 0)
-			{
-				// Check type
-				UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objects[objidx][0]);
-				if (obj != NULL)
-				{
-					// Create instance list
-					QList<UAVDataObject*> list;
-					// Go through instances and cast them to UAVDataObject, then add to list
-					for (int instidx = 0; instidx < objects[objidx].length(); ++instidx)
-					{
-						obj = dynamic_cast<UAVDataObject*>(objects[objidx][instidx]);
-						if (obj != NULL)
-						{
-							list.append(obj);
-						}
-					}
-					// Append to object list
-					dObjects.append(list);
-				}
+		ListIterator<List<UAVObject>> objIt = objects.listIterator(0);
+
+		// Check if this object type is already in the list
+		while(objIt.hasNext()) {
+			List<UAVObject> instList = objIt.next();
+
+			// If no instances skip
+			if(instList.size() == 0)
+				continue;
+			
+			// If meta data skip
+			if(instList.get(0).isMetadata())
+				continue;
+			
+			List<UAVDataObject> newInstList = new ArrayList<UAVDataObject>();			
+			ListIterator<UAVObject> instIt = instList.listIterator();			
+			while(instIt.hasNext()) {
+				newInstList.add((UAVDataObject) instIt.next());
 			}
-		}*/
+			dObjects.add(newInstList);
+		}
 		// Done
+		return dObjects;
 	}
 
 	/**
 	 * Same as getObjects() but will only return MetaObjects.
 	 */
-	public List <List<UAVMetaObject> > getMetaObjects()
+	public synchronized List <List<UAVMetaObject> > getMetaObjects()
 	{
-		assert(false); // TODO		
-		return new ArrayList< List<UAVMetaObject> >();
-		/*
-		QMutexLocker locker(mutex);
-		QList< QList<UAVMetaObject*> > mObjects;
+		List< List<UAVMetaObject> > mObjects = new ArrayList< List<UAVMetaObject> > ();
 
 		// Go through objects and copy to new list when types match
-		for (int objidx = 0; objidx < objects.length(); ++objidx)
-		{
-			if (objects[objidx].length() > 0)
-			{
-				// Check type
-				UAVMetaObject* obj = dynamic_cast<UAVMetaObject*>(objects[objidx][0]);
-				if (obj != NULL)
-				{
-					// Create instance list
-					QList<UAVMetaObject*> list;
-					// Go through instances and cast them to UAVMetaObject, then add to list
-					for (int instidx = 0; instidx < objects[objidx].length(); ++instidx)
-					{
-						obj = dynamic_cast<UAVMetaObject*>(objects[objidx][instidx]);
-						if (obj != NULL)
-						{
-							list.append(obj);
-						}
-					}
-					// Append to object list
-					mObjects.append(list);
-				}
+		ListIterator<List<UAVObject>> objIt = objects.listIterator(0);
+
+		// Check if this object type is already in the list
+		while(objIt.hasNext()) {
+			List<UAVObject> instList = objIt.next();
+
+			// If no instances skip
+			if(instList.size() == 0)
+				continue;
+			
+			// If meta data skip
+			if(!instList.get(0).isMetadata())
+				continue;
+			
+			List<UAVMetaObject> newInstList = new ArrayList<UAVMetaObject>();			
+			ListIterator<UAVObject> instIt = instList.listIterator();			
+			while(instIt.hasNext()) {
+				newInstList.add((UAVMetaObject) instIt.next());
 			}
+			mObjects.add(newInstList);
 		}
 		// Done
 		return mObjects;
-		 */
 	}
 
 	
@@ -270,7 +277,6 @@ public class UAVObjectManager {
 	 */
 	public synchronized UAVObject getObject(String name, int objId, int instId)
 	{
-		//QMutexLocker locker(mutex);
 		// Check if this object type is already in the list
 		ListIterator<List<UAVObject>> objIter = objects.listIterator();
 		while(objIter.hasNext()) {

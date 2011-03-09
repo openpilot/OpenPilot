@@ -1,6 +1,7 @@
 package org.openpilot.uavtalk;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Observer;
@@ -128,8 +129,7 @@ public abstract class UAVObject {
 		// this.mutex = new QMutex(QMutex::Recursive);
 	};
 
-	public void initialize(int instID) {
-		// QMutexLocker locker(mutex);
+	public synchronized void initialize(int instID) {
 		this.instID = instID;
 	}
 
@@ -146,9 +146,8 @@ public abstract class UAVObject {
 	 * @throws Exception
 	 *             When unable to unpack a field
 	 */
-	public void initializeFields(List<UAVObjectField> fields, ByteBuffer data,
+	public synchronized void initializeFields(List<UAVObjectField> fields, ByteBuffer data,
 			int numBytes) {
-		// TODO: QMutexLocker locker(mutex);
 		this.numBytes = numBytes;
 		this.fields = fields;
 		// Initialize fields
@@ -267,15 +266,13 @@ public abstract class UAVObject {
 	 * Get the number of fields held by this object
 	 */
 	public int getNumFields() {
-		// QMutexLocker locker(mutex);
 		return fields.size();
 	}
 
 	/**
 	 * Get the object's fields
 	 */
-	public List<UAVObjectField> getFields() {
-		// QMutexLocker locker(mutex);
+	public synchronized List<UAVObjectField> getFields() {
 		return fields;
 	}
 
@@ -286,7 +283,6 @@ public abstract class UAVObject {
 	 * @returns The field or NULL if not found
 	 */
 	public UAVObjectField getField(String name) {
-		// QMutexLocker locker(mutex);
 		// Look for field
 		ListIterator<UAVObjectField> li = fields.listIterator();
 		while (li.hasNext()) {
@@ -307,8 +303,7 @@ public abstract class UAVObject {
 	 * @returns The number of bytes copied
 	 * @note The array must already have enough space allocated for the object
 	 */
-	public int pack(ByteBuffer dataOut) throws Exception {
-		// QMutexLocker locker(mutex);
+	public synchronized int pack(ByteBuffer dataOut) throws Exception {
 		if (dataOut.remaining() < getNumBytes())
 			throw new Exception("Not enough bytes in ByteBuffer to pack object");
 		int numBytes = 0;
@@ -329,7 +324,7 @@ public abstract class UAVObject {
 	 * @throws Exception
 	 * @returns The number of bytes copied
 	 */
-	public int unpack(ByteBuffer dataIn) {
+	public synchronized int unpack(ByteBuffer dataIn) {
 		if( dataIn == null )
 			return 0;
 
@@ -532,8 +527,17 @@ public abstract class UAVObject {
 	/**
 	 * Java specific functions
 	 */
-	public UAVObject clone() {
-		return (UAVObject) clone();
+	public synchronized UAVObject clone() {
+		UAVObject newObj = clone();
+		List<UAVObjectField> newFields = new ArrayList<UAVObjectField>();
+		ListIterator<UAVObjectField> li = fields.listIterator();
+		while(li.hasNext()) {
+			UAVObjectField nf = li.next().clone();
+			nf.initialize(newObj);
+			newFields.add(nf);
+		}
+		newObj.initializeFields(newFields, ByteBuffer.allocate(numBytes), numBytes);
+		return newObj;
 	}
 
 	/**

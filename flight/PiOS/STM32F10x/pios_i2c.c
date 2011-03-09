@@ -1100,6 +1100,7 @@ void PIOS_I2C_ER_IRQ_Handler(uint32_t i2c_id)
 
 	if(event & I2C_FLAG_AF) {
 		i2c_nack_counter++;
+		I2C_ClearFlag(i2c_adapter->cfg->regs, I2C_FLAG_AF);
 		i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_NACK);
 	} else { /* Mostly bus errors here */              
 		i2c_adapter_log_fault(PIOS_I2C_ERROR_INTERRUPT);

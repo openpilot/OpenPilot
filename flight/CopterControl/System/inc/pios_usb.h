@@ -43,15 +43,15 @@
 #endif
 
 #ifndef PIOS_USB_PRODUCT_STR
-#define PIOS_USB_PRODUCT_STR		"OpenPilot"
+#define PIOS_USB_PRODUCT_STR		"CopterControl"
 #endif
 
 #ifndef PIOS_USB_PRODUCT_ID
-#define PIOS_USB_PRODUCT_ID		0x415A
+#define PIOS_USB_PRODUCT_ID		0x415B
 #endif
 
 #ifndef PIOS_USB_VERSION_ID
-#define PIOS_USB_VERSION_ID		0x0102	/* OpenPilot board (01), Running state (02) */
+#define PIOS_USB_VERSION_ID		0x0402	/* CopterControl board (04), Running state (02) */
 #endif
 
 /* Internal defines which are used by PIOS USB HID (don't touch) */

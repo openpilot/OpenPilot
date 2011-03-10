@@ -24,7 +24,7 @@ public abstract class UAVDataObject extends UAVObject {
 	    super.initialize(instID);
 	}
 
-	public boolean isMetadata() { return true; };
+	public boolean isMetadata() { return false; };
 	/**
 	 * Assign a metaobject
 	 */

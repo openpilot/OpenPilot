@@ -92,7 +92,7 @@ public class TelemetryMonitor {
 	        }
 	    }
 	    // Start retrieving
-	    Log.d(TAG,"Starting to retrieve meta and settings objects from the autopilot (%1 objects)" + queue.size()) ;
+	    System.out.println(TAG + "Starting to retrieve meta and settings objects from the autopilot (" + queue.size() + " objects)");
 	    retrieveNextObject();
 	}
 
@@ -120,7 +120,7 @@ public class TelemetryMonitor {
 	    // Get next object from the queue
 	    UAVObject obj = queue.remove(0);
 	    
-	    Log.d(TAG, "Retrieving object: " + obj.getName()) ;
+//	    Log.d(TAG, "Retrieving object: " + obj.getName()) ;
 	    // Connect to object
 	    obj.addTransactionCompleted(new Observer() {
 			public void update(Observable observable, Object data) {
@@ -161,6 +161,10 @@ public class TelemetryMonitor {
 	public synchronized void flightStatsUpdated(UAVObject obj)
 	{
 	    // Force update if not yet connected
+	    gcsStatsObj = objMngr.getObject("GCSTelemetryStats");
+	    flightStatsObj = objMngr.getObject("FlightTelemetryStats");
+	    
+	    System.out.println(flightStatsObj.toString());
 	    if ( ((String) gcsStatsObj.getField("Status").getValue()).compareTo("Connected") != 0 ||
 	    		((String) flightStatsObj.getField("Status").getValue()).compareTo("Connected") == 0 )
 	    {
@@ -204,8 +208,17 @@ public class TelemetryMonitor {
 	    }
 
 	    // Update connection state
-	    UAVObjectField statusField = gcsStatsObj.getField("Connection");
+	    gcsStatsObj = objMngr.getObject("GCSTelemetryStats");
+	    flightStatsObj = objMngr.getObject("FlightTelemetryStats");
+	    if(gcsStatsObj == null) {
+	    	System.out.println("No GCS stats yet");
+	    	return;
+	    }
+	    UAVObjectField statusField = gcsStatsObj.getField("Status");
 	    String oldStatus = (String) statusField.getValue();
+	    
+	    System.out.println("GCS: " + statusField.getValue() + " Flight: " + flightStatsObj.getField("Status").getValue());
+
 	    if ( oldStatus.compareTo("Disconnected") == 0 )
 	    {
 	        // Request connection
@@ -217,6 +230,7 @@ public class TelemetryMonitor {
 	        if ( ((String) flightStatsObj.getField("Status").getValue()).compareTo("HandshakeAck") == 0 )
 	        {
 	        	statusField.setValue("Connected");
+	        	System.out.println("Connected" + statusField.toString());
 	        }
 	    }
 	    else if ( oldStatus.compareTo("Connected") == 0 )
@@ -230,11 +244,18 @@ public class TelemetryMonitor {
 
 	    // Force telemetry update if not yet connected
 	    boolean gcsStatusChanged = !oldStatus.equals(statusField.getValue());
+	    
+	    if(gcsStatusChanged)
+	    	System.out.println("GCS Status changed");
 	    boolean gcsConnected = ((String) statusField.getValue()).compareTo("Connected") == 0;
 	    boolean gcsDisconnected = ((String) statusField.getValue()).compareTo("Disconnected") == 0;
+	    
+	    if(gcsConnected) 
+	    	System.out.println("Detected here");
 	    if (  gcsStatusChanged ||
 	    		((String) flightStatsObj.getField("Status").getValue()).compareTo("Disconnected") != 0 )
 	    {
+	    	System.out.println("Sending gcs status\n\n\n");
 	        gcsStatsObj.updated();
 	    }
 
@@ -242,14 +263,15 @@ public class TelemetryMonitor {
 	    if (gcsConnected && gcsStatusChanged)
 	    {
 	    	setPeriod(STATS_UPDATE_PERIOD_MS);
-	        Log.d(TAG,"Connection with the autopilot established");
+	    	System.out.println(TAG + " Connection with the autopilot established");
+	        //Log.d(TAG,"Connection with the autopilot established");
 	        startRetrievingObjects();
 	    }
 	    if (gcsDisconnected && gcsStatusChanged)
 	    {
 	    	setPeriod(STATS_CONNECT_PERIOD_MS);
-	        Log.d(TAG,"Connection with the autopilot lost");
-	        Log.d(TAG,"Trying to connect to the autopilot");
+	        System.out.println(TAG + " Connection with the autopilot lost");
+	        //Log.d(TAG,"Trying to connect to the autopilot");
 	        //emit disconnected();
 	    }
 	}
@@ -260,6 +282,7 @@ public class TelemetryMonitor {
 
 		periodicTask.cancel();
 		currentPeriod = ms;
+		periodicTask = new Timer();
 	    periodicTask.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {

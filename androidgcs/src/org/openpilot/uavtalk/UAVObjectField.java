@@ -131,7 +131,7 @@ public class UAVObjectField {
             case UINT32:
             	// TODO: Deal properly with unsigned
                 for (int index = 0; index < numElements; ++index) {
-                	Integer val = (Integer) getValue(index);
+                	Integer val = (int) ( ((Long) getValue(index)).longValue() & 0xffffffffL);
                 	dataOut.putInt(val);
                 }
                 break;
@@ -364,7 +364,7 @@ public class UAVObjectField {
     
     public double getDouble() { return getDouble(0); };
     public double getDouble(int index) {
-    	return Double.valueOf((Double) getValue(index));
+    	return ((Number) getValue(index)).doubleValue();
     }
     
     public void setDouble(double value) { setDouble(value, 0); };

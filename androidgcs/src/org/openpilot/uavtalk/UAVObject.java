@@ -53,11 +53,14 @@ public abstract class UAVObject {
 			updatedListeners.addObserver(o);
 		}
 	}
-	void updated() {
+	void updated(boolean manually) {
 		synchronized(updatedListeners) {
 			updatedListeners.event();
 		}
+		if(manually)
+			updatedManual();
 	}
+	void updated() { updated(true); };
 	
 	private CallbackListener unpackedListeners = new CallbackListener(this);
 	public void addUnpackedObserver(Observer o) {
@@ -67,7 +70,6 @@ public abstract class UAVObject {
 	}
 	void unpacked() {
 		synchronized(unpackedListeners) {
-			System.out.println("Unpacked!: " + unpackedListeners.countObservers() + " " + getName());
 			unpackedListeners.event();
 		}
 	}
@@ -387,7 +389,7 @@ public abstract class UAVObject {
 		
 		// Trigger all the listeners for the unpack event
 		unpacked();
-		updated();
+		updated(false);
 		
 		return numBytes;
 	}

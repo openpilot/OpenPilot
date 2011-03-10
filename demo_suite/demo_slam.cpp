@@ -748,7 +748,7 @@ void demo_slam01_main(world_ptr_t *world) {
          else
             descFactory.reset(new DescriptorImageSegFirstViewFactory(configEstimation.DESC_SIZE));
 
-         boost::shared_ptr<HDsegDetector> hdsegDetector(new HDsegDetector(3,descFactory));
+         boost::shared_ptr<HDsegDetector> hdsegDetector(new HDsegDetector(3,configEstimation.PIX_NOISE,descFactory));
          boost::shared_ptr<DsegMatcher> dsegMatcher(new DsegMatcher(0.1,0.1));
          boost::shared_ptr<DataManager_ImageSeg_Test> dmSeg(new DataManager_ImageSeg_Test(hdsegDetector, dsegMatcher, assGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
 

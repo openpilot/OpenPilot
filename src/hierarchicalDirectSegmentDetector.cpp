@@ -21,17 +21,27 @@ namespace jafar{
 
          if(set.count() > 0)
          {
-/*				Take the best (someday)
+            int bestId = 0;
+            double bestSqrLength = 0;
             for(int i=0 ; i<set.count() ; i++)
             {
-               if(set.segmentAt(i)->l)
+               const dseg::SegmentHypothesis* seg = set.segmentAt(i);
+
+               double dx = seg->x1() - seg->x2();
+               double dy = seg->y1() - seg->y2();
+               double sqrLength = dx*dx + dy*dy;
+               if(sqrLength > bestSqrLength)
+               {
+                  bestId = i;
+                  bestSqrLength = sqrLength;
+               }
             }
-*/
-           // featPtr.reset(new FeatureSegment());
-            featPtr->measurement.x(0) = set.segmentAt(0)->x1();
-            featPtr->measurement.x(1) = set.segmentAt(0)->y1();
-            featPtr->measurement.x(2) = set.segmentAt(0)->x2();
-            featPtr->measurement.x(3) = set.segmentAt(0)->y2();
+
+            featPtr->measurement.x(0) = set.segmentAt(bestId)->x1();
+            featPtr->measurement.x(1) = set.segmentAt(bestId)->y1();
+            featPtr->measurement.x(2) = set.segmentAt(bestId)->x2();
+            featPtr->measurement.x(3) = set.segmentAt(bestId)->y2();
+            featPtr->measurement.matchScore = 1; // No idea of what this thingy does, 1 sounds fine
 
             featPtr->appearancePtr.reset(new AppearanceSegment());
 

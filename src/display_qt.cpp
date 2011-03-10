@@ -372,7 +372,7 @@ std::cout << "connecting slots" << std::endl;
             bool dispInit2 = events_.visible && !events_.predicted;
 
             // Build display objects if it is the first time they are displayed
-            if (items_.size() != 4)
+            if (items_.size() != 6)
             {
                // clear
                items_.clear();
@@ -407,14 +407,20 @@ std::cout << "connecting slots" << std::endl;
                l->setVisible(false);
                lines_.push_back(l);
                dispSen_->view()->addLine(l);
-
-               // prediction ellipse
-/*
-               s = new qdisplay::Ellipsoid(predObs_, predObsCov_, viewerQt->ellipsesScale);
+               // prediction ellipse1
+               vec pred = subrange(predObs_,0,2);
+               mat predCov = subrange(predObsCov_,0,2,0,2);
+               s = new qdisplay::Ellipsoid(pred, predCov, viewerQt->ellipsesScale);
                s->setVisible(false);
                items_.push_back(s);
                dispSen_->view()->addShape(s);
-*/
+               // prediction ellipse2
+               pred = subrange(predObs_,2,4);
+               predCov = subrange(predObsCov_,2,4,2,4);
+               s = new qdisplay::Ellipsoid(pred, predCov, viewerQt->ellipsesScale);
+               s->setVisible(false);
+               items_.push_back(s);
+               dispSen_->view()->addShape(s);
                // measure point1
                s = new qdisplay::Shape(qdisplay::Shape::ShapeCrossX, measObs_(0), measObs_(1), 3, 3);
                s->setFontSize(viewerQt->fontSize);
@@ -450,13 +456,10 @@ std::cout << "connecting slots" << std::endl;
                // prediction points
                ItemList::iterator it = items_.begin();
                LineList::iterator lit = lines_.begin();
-               // prediction line
-               (*lit)->setVisible(dispPred2);
                if (dispPred2)
                {
                   c = getColorRGB(ColorManager::getColorObject_prediction(landmarkPhase_,events_)) ;
                   std::ostringstream oss; oss << id_; if (dispMeas2) oss << " - " << int(match_score*100);
-                  (*lit)->setColor(c.R,c.G,c.B);
 
                   (*it)->setColor(c.R,c.G,c.B); //
                   (*it)->setFontColor(c.R,c.G,c.B); //
@@ -470,23 +473,42 @@ std::cout << "connecting slots" << std::endl;
                   (*it)->setPos(predObs_(2), predObs_(3));
                   (*it)->setVisible(true);
                }
+               else
+               {
+                  (*it)->setVisible(false);
+                  ++it;
+                  (*it)->setVisible(false);
+               }
+               // prediction line
+               (*lit)->setColor(c.R,c.G,c.B); // Line color
+               (*lit)->setVisible(dispPred2);
 
-               // prediction ellipse
-/*
+               // prediction ellipses
                ++it;
                if (dispPred2)
                {
                   (*it)->setColor(c.R,c.G,c.B); // yellow
                   qdisplay::Ellipsoid *ell = PTR_CAST<qdisplay::Ellipsoid*>(*it);
-                  ell->set(predObs_, predObsCov_, viewerQt->ellipsesScale);
+                  vec pred = subrange(predObs_,0,2);
+                  mat predCov = subrange(predObsCov_,0,2,0,2);
+                  ell->set(pred, predCov, viewerQt->ellipsesScale);
+                  (*it)->setVisible(true);
+                  ++it;
+                  (*it)->setColor(c.R,c.G,c.B); // yellow
+                  ell = PTR_CAST<qdisplay::Ellipsoid*>(*it);
+                  pred = subrange(predObs_,2,4);
+                  predCov = subrange(predObsCov_,2,4,2,4);
+                  ell->set(pred, predCov, viewerQt->ellipsesScale);
+                  (*it)->setVisible(true);
                }
-               (*it)->setVisible(dispPred2);
-*/
+               else
+               {
+                  (*it)->setVisible(false);
+                  ++it;
+                  (*it)->setVisible(false);
+               }
 //JFR_DEBUG("drawn ellipse for obs " << id_ << " at " << predObs_ << " with size " << predObsCov_ << ", scale " << viewerQt->ellipsesScale << " and visibility " << dispPred);
 
-               // Measure line
-               ++lit;
-               (*lit)->setVisible(dispMeas2);
                // measure points
                ++it;
 //std::cout << "display obs " << id_ << " with flags visible " << events_.visible << " matched " << events_.matched
@@ -494,7 +516,6 @@ std::cout << "connecting slots" << std::endl;
                if (dispMeas2)
                {
                   c = getColorRGB(ColorManager::getColorObject_measure(landmarkPhase_,events_)) ;
-                  (*lit)->setColor(c.R,c.G,c.B); //
                   if (dispInit2)
                   {
                      (*it)->setFontColor(c.R,c.G,c.B); //
@@ -519,6 +540,16 @@ std::cout << "connecting slots" << std::endl;
                   (*it)->setPos(measObs_(2), measObs_(3));
                   (*it)->setVisible(true);
                }
+               else
+               {
+                  (*it)->setVisible(false);
+                  ++it;
+                  (*it)->setVisible(false);
+               }
+               // Measure line
+               ++lit;
+               (*lit)->setVisible(dispMeas2);
+               (*lit)->setColor(c.R,c.G,c.B);
 
 #if EMBED_PREDICTED_APP
                // display predicted appearance

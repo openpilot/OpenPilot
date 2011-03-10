@@ -267,6 +267,54 @@ src/activeSearch.cpp.s:
 	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/activeSearch.cpp.s
 .PHONY : src/activeSearch.cpp.s
 
+src/activeSegmentSearch.o: src/activeSegmentSearch.cpp.o
+.PHONY : src/activeSegmentSearch.o
+
+# target to build an object file
+src/activeSegmentSearch.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/activeSegmentSearch.cpp.o
+.PHONY : src/activeSegmentSearch.cpp.o
+
+src/activeSegmentSearch.i: src/activeSegmentSearch.cpp.i
+.PHONY : src/activeSegmentSearch.i
+
+# target to preprocess a source file
+src/activeSegmentSearch.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/activeSegmentSearch.cpp.i
+.PHONY : src/activeSegmentSearch.cpp.i
+
+src/activeSegmentSearch.s: src/activeSegmentSearch.cpp.s
+.PHONY : src/activeSegmentSearch.s
+
+# target to generate assembly for a file
+src/activeSegmentSearch.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/activeSegmentSearch.cpp.s
+.PHONY : src/activeSegmentSearch.cpp.s
+
+src/ahplTools.o: src/ahplTools.cpp.o
+.PHONY : src/ahplTools.o
+
+# target to build an object file
+src/ahplTools.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/ahplTools.cpp.o
+.PHONY : src/ahplTools.cpp.o
+
+src/ahplTools.i: src/ahplTools.cpp.i
+.PHONY : src/ahplTools.i
+
+# target to preprocess a source file
+src/ahplTools.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/ahplTools.cpp.i
+.PHONY : src/ahplTools.cpp.i
+
+src/ahplTools.s: src/ahplTools.cpp.s
+.PHONY : src/ahplTools.s
+
+# target to generate assembly for a file
+src/ahplTools.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/ahplTools.cpp.s
+.PHONY : src/ahplTools.cpp.s
+
 src/appearanceAbstract.o: src/appearanceAbstract.cpp.o
 .PHONY : src/appearanceAbstract.o
 
@@ -315,78 +363,6 @@ src/appearanceImage.cpp.s:
 	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/appearanceImage.cpp.s
 .PHONY : src/appearanceImage.cpp.s
 
-src/dataManagerAbstract.o: src/dataManagerAbstract.cpp.o
-.PHONY : src/dataManagerAbstract.o
-
-# target to build an object file
-src/dataManagerAbstract.cpp.o:
-	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerAbstract.cpp.o
-.PHONY : src/dataManagerAbstract.cpp.o
-
-src/dataManagerAbstract.i: src/dataManagerAbstract.cpp.i
-.PHONY : src/dataManagerAbstract.i
-
-# target to preprocess a source file
-src/dataManagerAbstract.cpp.i:
-	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerAbstract.cpp.i
-.PHONY : src/dataManagerAbstract.cpp.i
-
-src/dataManagerAbstract.s: src/dataManagerAbstract.cpp.s
-.PHONY : src/dataManagerAbstract.s
-
-# target to generate assembly for a file
-src/dataManagerAbstract.cpp.s:
-	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerAbstract.cpp.s
-.PHONY : src/dataManagerAbstract.cpp.s
-
-src/dataManagerActiveSearch.o: src/dataManagerActiveSearch.cpp.o
-.PHONY : src/dataManagerActiveSearch.o
-
-# target to build an object file
-src/dataManagerActiveSearch.cpp.o:
-	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerActiveSearch.cpp.o
-.PHONY : src/dataManagerActiveSearch.cpp.o
-
-src/dataManagerActiveSearch.i: src/dataManagerActiveSearch.cpp.i
-.PHONY : src/dataManagerActiveSearch.i
-
-# target to preprocess a source file
-src/dataManagerActiveSearch.cpp.i:
-	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerActiveSearch.cpp.i
-.PHONY : src/dataManagerActiveSearch.cpp.i
-
-src/dataManagerActiveSearch.s: src/dataManagerActiveSearch.cpp.s
-.PHONY : src/dataManagerActiveSearch.s
-
-# target to generate assembly for a file
-src/dataManagerActiveSearch.cpp.s:
-	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerActiveSearch.cpp.s
-.PHONY : src/dataManagerActiveSearch.cpp.s
-
-src/dataManagerOnePointRansac.o: src/dataManagerOnePointRansac.cpp.o
-.PHONY : src/dataManagerOnePointRansac.o
-
-# target to build an object file
-src/dataManagerOnePointRansac.cpp.o:
-	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerOnePointRansac.cpp.o
-.PHONY : src/dataManagerOnePointRansac.cpp.o
-
-src/dataManagerOnePointRansac.i: src/dataManagerOnePointRansac.cpp.i
-.PHONY : src/dataManagerOnePointRansac.i
-
-# target to preprocess a source file
-src/dataManagerOnePointRansac.cpp.i:
-	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerOnePointRansac.cpp.i
-.PHONY : src/dataManagerOnePointRansac.cpp.i
-
-src/dataManagerOnePointRansac.s: src/dataManagerOnePointRansac.cpp.s
-.PHONY : src/dataManagerOnePointRansac.s
-
-# target to generate assembly for a file
-src/dataManagerOnePointRansac.cpp.s:
-	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/dataManagerOnePointRansac.cpp.s
-.PHONY : src/dataManagerOnePointRansac.cpp.s
-
 src/descriptorAbstract.o: src/descriptorAbstract.cpp.o
 .PHONY : src/descriptorAbstract.o
 
@@ -434,6 +410,30 @@ src/descriptorImagePoint.s: src/descriptorImagePoint.cpp.s
 src/descriptorImagePoint.cpp.s:
 	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorImagePoint.cpp.s
 .PHONY : src/descriptorImagePoint.cpp.s
+
+src/descriptorImageSeg.o: src/descriptorImageSeg.cpp.o
+.PHONY : src/descriptorImageSeg.o
+
+# target to build an object file
+src/descriptorImageSeg.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorImageSeg.cpp.o
+.PHONY : src/descriptorImageSeg.cpp.o
+
+src/descriptorImageSeg.i: src/descriptorImageSeg.cpp.i
+.PHONY : src/descriptorImageSeg.i
+
+# target to preprocess a source file
+src/descriptorImageSeg.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorImageSeg.cpp.i
+.PHONY : src/descriptorImageSeg.cpp.i
+
+src/descriptorImageSeg.s: src/descriptorImageSeg.cpp.s
+.PHONY : src/descriptorImageSeg.s
+
+# target to generate assembly for a file
+src/descriptorImageSeg.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorImageSeg.cpp.s
+.PHONY : src/descriptorImageSeg.cpp.s
 
 src/display.o: src/display.cpp.o
 .PHONY : src/display.o
@@ -578,6 +578,30 @@ src/featurePoint.s: src/featurePoint.cpp.s
 src/featurePoint.cpp.s:
 	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/featurePoint.cpp.s
 .PHONY : src/featurePoint.cpp.s
+
+src/featureSegment.o: src/featureSegment.cpp.o
+.PHONY : src/featureSegment.o
+
+# target to build an object file
+src/featureSegment.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/featureSegment.cpp.o
+.PHONY : src/featureSegment.cpp.o
+
+src/featureSegment.i: src/featureSegment.cpp.i
+.PHONY : src/featureSegment.i
+
+# target to preprocess a source file
+src/featureSegment.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/featureSegment.cpp.i
+.PHONY : src/featureSegment.cpp.i
+
+src/featureSegment.s: src/featureSegment.cpp.s
+.PHONY : src/featureSegment.s
+
+# target to generate assembly for a file
+src/featureSegment.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/featureSegment.cpp.s
+.PHONY : src/featureSegment.cpp.s
 
 src/gaussian.o: src/gaussian.cpp.o
 .PHONY : src/gaussian.o
@@ -986,6 +1010,30 @@ src/observationPinHoleAnchoredHomogeneous.s: src/observationPinHoleAnchoredHomog
 src/observationPinHoleAnchoredHomogeneous.cpp.s:
 	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationPinHoleAnchoredHomogeneous.cpp.s
 .PHONY : src/observationPinHoleAnchoredHomogeneous.cpp.s
+
+src/observationPinHoleAnchoredHomogeneousPointsLine.o: src/observationPinHoleAnchoredHomogeneousPointsLine.cpp.o
+.PHONY : src/observationPinHoleAnchoredHomogeneousPointsLine.o
+
+# target to build an object file
+src/observationPinHoleAnchoredHomogeneousPointsLine.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationPinHoleAnchoredHomogeneousPointsLine.cpp.o
+.PHONY : src/observationPinHoleAnchoredHomogeneousPointsLine.cpp.o
+
+src/observationPinHoleAnchoredHomogeneousPointsLine.i: src/observationPinHoleAnchoredHomogeneousPointsLine.cpp.i
+.PHONY : src/observationPinHoleAnchoredHomogeneousPointsLine.i
+
+# target to preprocess a source file
+src/observationPinHoleAnchoredHomogeneousPointsLine.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationPinHoleAnchoredHomogeneousPointsLine.cpp.i
+.PHONY : src/observationPinHoleAnchoredHomogeneousPointsLine.cpp.i
+
+src/observationPinHoleAnchoredHomogeneousPointsLine.s: src/observationPinHoleAnchoredHomogeneousPointsLine.cpp.s
+.PHONY : src/observationPinHoleAnchoredHomogeneousPointsLine.s
+
+# target to generate assembly for a file
+src/observationPinHoleAnchoredHomogeneousPointsLine.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/observationPinHoleAnchoredHomogeneousPointsLine.cpp.s
+.PHONY : src/observationPinHoleAnchoredHomogeneousPointsLine.cpp.s
 
 src/observationPinHoleEuclideanPoint.o: src/observationPinHoleEuclideanPoint.cpp.o
 .PHONY : src/observationPinHoleEuclideanPoint.o
@@ -1899,27 +1947,27 @@ help:
 	@echo "... src/activeSearch.o"
 	@echo "... src/activeSearch.i"
 	@echo "... src/activeSearch.s"
+	@echo "... src/activeSegmentSearch.o"
+	@echo "... src/activeSegmentSearch.i"
+	@echo "... src/activeSegmentSearch.s"
+	@echo "... src/ahplTools.o"
+	@echo "... src/ahplTools.i"
+	@echo "... src/ahplTools.s"
 	@echo "... src/appearanceAbstract.o"
 	@echo "... src/appearanceAbstract.i"
 	@echo "... src/appearanceAbstract.s"
 	@echo "... src/appearanceImage.o"
 	@echo "... src/appearanceImage.i"
 	@echo "... src/appearanceImage.s"
-	@echo "... src/dataManagerAbstract.o"
-	@echo "... src/dataManagerAbstract.i"
-	@echo "... src/dataManagerAbstract.s"
-	@echo "... src/dataManagerActiveSearch.o"
-	@echo "... src/dataManagerActiveSearch.i"
-	@echo "... src/dataManagerActiveSearch.s"
-	@echo "... src/dataManagerOnePointRansac.o"
-	@echo "... src/dataManagerOnePointRansac.i"
-	@echo "... src/dataManagerOnePointRansac.s"
 	@echo "... src/descriptorAbstract.o"
 	@echo "... src/descriptorAbstract.i"
 	@echo "... src/descriptorAbstract.s"
 	@echo "... src/descriptorImagePoint.o"
 	@echo "... src/descriptorImagePoint.i"
 	@echo "... src/descriptorImagePoint.s"
+	@echo "... src/descriptorImageSeg.o"
+	@echo "... src/descriptorImageSeg.i"
+	@echo "... src/descriptorImageSeg.s"
 	@echo "... src/display.o"
 	@echo "... src/display.i"
 	@echo "... src/display.s"
@@ -1938,6 +1986,9 @@ help:
 	@echo "... src/featurePoint.o"
 	@echo "... src/featurePoint.i"
 	@echo "... src/featurePoint.s"
+	@echo "... src/featureSegment.o"
+	@echo "... src/featureSegment.i"
+	@echo "... src/featureSegment.s"
 	@echo "... src/gaussian.o"
 	@echo "... src/gaussian.i"
 	@echo "... src/gaussian.s"
@@ -1989,6 +2040,9 @@ help:
 	@echo "... src/observationPinHoleAnchoredHomogeneous.o"
 	@echo "... src/observationPinHoleAnchoredHomogeneous.i"
 	@echo "... src/observationPinHoleAnchoredHomogeneous.s"
+	@echo "... src/observationPinHoleAnchoredHomogeneousPointsLine.o"
+	@echo "... src/observationPinHoleAnchoredHomogeneousPointsLine.i"
+	@echo "... src/observationPinHoleAnchoredHomogeneousPointsLine.s"
 	@echo "... src/observationPinHoleEuclideanPoint.o"
 	@echo "... src/observationPinHoleEuclideanPoint.i"
 	@echo "... src/observationPinHoleEuclideanPoint.s"

@@ -81,6 +81,10 @@ namespace jafar {
          mat V_lmk(6, 11);
          mat EXP_v(4, 6);
 
+         V_sg.clear();
+         V_lmk.clear();
+         EXP_v.clear();
+
          // We make the projection.
          // This is decomposed in two steps:
          // - Transform lmk to sensor pose, ready for Bearing-only projection.
@@ -136,13 +140,23 @@ namespace jafar {
          mat V_1(6, 1);
          mat VN_v(6,6), VN_pix(6,4);
 
+         V_pix.clear();
+         V_1.clear();
+
+         vec2 pix1, pix2;
          mat V1_pix1(3,2), V2_pix2(3,2);
          mat V1_1(3,1), V2_1(3,1);
          vec3 v1,v2;
+
+         pix1 = subrange(pix, 0, 2);
+         pix2 = subrange(pix, 2, 4);
+
          pinhole::backProjectPoint(pinHolePtr()->params.intrinsic, pinHolePtr()->params.correction,
-                                   pix, 1.0, v1, V1_pix1, V1_1);
+                                   pix1, 1.0, v1, V1_pix1, V1_1);
+
          pinhole::backProjectPoint(pinHolePtr()->params.intrinsic, pinHolePtr()->params.correction,
-                                   pix, 1.0, v2, V2_pix2, V2_1);
+                                   pix2, 1.0, v2, V2_pix2, V2_1);
+
          subrange(v,0,3) = v1;
          subrange(v,3,6) = v2;
          subrange(V_1,0,3,0,1) = V1_1;
@@ -177,7 +191,6 @@ namespace jafar {
       {
          bool inimg = pinhole::isInImage(x, pinHolePtr()->params.width, pinHolePtr()->params.height);
          bool infront = (nobs(0) > 0.0);
-// JFR_DEBUG("ObservationModelPHAHP::predictVisibility_func x " << x << " nobs " << nobs << " inimg/infront " << inimg << "/" << infront);
          return inimg && infront;
       }
 

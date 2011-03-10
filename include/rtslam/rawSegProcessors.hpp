@@ -89,11 +89,13 @@ namespace rtslam {
          } params;
 
       public:
-         HDsegDetector(int hierarchyLevel,
+         HDsegDetector(int hierarchyLevel, double measStd,
             boost::shared_ptr<DescriptorFactoryAbstract> const &descFactory):
             detector(), descFactory(descFactory)
          {
             params.hierarchyLevel = hierarchyLevel;
+            params.measStd = measStd;
+            params.measVar = measStd * measStd;
          }
 
          bool detect(const boost::shared_ptr<RawImage> & rawData, const image::ConvexRoi &roi, boost::shared_ptr<FeatureSegment> & featPtr)

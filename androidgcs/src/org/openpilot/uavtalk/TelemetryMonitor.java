@@ -28,6 +28,7 @@ public class TelemetryMonitor {
 	private UAVObject flightStatsObj;
 	private Timer periodicTask;
 	private int currentPeriod;
+	private long lastUpdateTime;
 	private List<UAVObject> queue;
 	
 	public TelemetryMonitor(UAVObjectManager objMngr, Telemetry tel)
@@ -121,9 +122,15 @@ public class TelemetryMonitor {
 	    
 	    Log.d(TAG, "Retrieving object: " + obj.getName()) ;
 	    // Connect to object
-	    //connect(obj, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(transactionCompleted(UAVObject*,bool)));
+	    obj.addTransactionCompleted(new Observer() {
+			public void update(Observable observable, Object data) {
+				UAVObject.TransactionResult result = (UAVObject.TransactionResult) data;
+				transactionCompleted(result.obj, result.success);
+			}	    	
+	    });
+
 	    // Request update
-	    tel.requestUpdate(obj);
+	    tel.updateRequested(obj);
 	    objPending = obj;
 	}
 
@@ -184,9 +191,10 @@ public class TelemetryMonitor {
 	    boolean connectionTimeout;
 	    if ( telStats.rxObjects > 0 )
 	    {
-	        //connectionTimer.start();
+	    	lastUpdateTime = System.currentTimeMillis();
+
 	    }
-	    if ( connectionTimer.elapsed() > CONNECTION_TIMEOUT_MS  )
+	    if ( (System.currentTimeMillis() - lastUpdateTime) > CONNECTION_TIMEOUT_MS  )
 	    {
 	        connectionTimeout = true;
 	    }
@@ -196,53 +204,53 @@ public class TelemetryMonitor {
 	    }
 
 	    // Update connection state
-	    int oldStatus = gcsStats.Status;
-	    if ( gcsStats.Status == GCSTelemetryStats::STATUS_DISCONNECTED )
+	    UAVObjectField statusField = gcsStatsObj.getField("Connection");
+	    String oldStatus = (String) statusField.getValue();
+	    if ( oldStatus.compareTo("Disconnected") == 0 )
 	    {
 	        // Request connection
-	        gcsStats.Status = GCSTelemetryStats::STATUS_HANDSHAKEREQ;
+	    	statusField.setValue("HandshakeReq");
 	    }
-	    else if ( gcsStats.Status == GCSTelemetryStats::STATUS_HANDSHAKEREQ )
+	    else if ( oldStatus.compareTo("HandshakeReq") == 0 )
 	    {
 	        // Check for connection acknowledge
-	        if ( flightStats.Status == FlightTelemetryStats::STATUS_HANDSHAKEACK )
+	        if ( ((String) flightStatsObj.getField("Status").getValue()).compareTo("HandshakeAck") == 0 )
 	        {
-	            gcsStats.Status = GCSTelemetryStats::STATUS_CONNECTED;
+	        	statusField.setValue("Connected");
 	        }
 	    }
-	    else if ( gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED )
+	    else if ( oldStatus.compareTo("Connected") == 0 )
 	    {
 	        // Check if the connection is still active and the the autopilot is still connected
-	        if (flightStats.Status == FlightTelemetryStats::STATUS_DISCONNECTED || connectionTimeout)
+	        if ( ((String) flightStatsObj.getField("Status").getValue()).compareTo("Disconnected") == 0 || connectionTimeout)
 	        {
-	            gcsStats.Status = GCSTelemetryStats::STATUS_DISCONNECTED;
+	        	statusField.setValue("Disconnected");
 	        }
 	    }
 
-	    // Set data
-	    gcsStatsObj->setData(gcsStats);
-
 	    // Force telemetry update if not yet connected
-	    if ( gcsStats.Status != GCSTelemetryStats::STATUS_CONNECTED ||
-	         flightStats.Status != FlightTelemetryStats::STATUS_CONNECTED )
+	    boolean gcsStatusChanged = !oldStatus.equals(statusField.getValue());
+	    boolean gcsConnected = ((String) statusField.getValue()).compareTo("Connected") == 0;
+	    boolean gcsDisconnected = ((String) statusField.getValue()).compareTo("Disconnected") == 0;
+	    if (  gcsStatusChanged ||
+	    		((String) flightStatsObj.getField("Status").getValue()).compareTo("Disconnected") != 0 )
 	    {
-	        gcsStatsObj->updated();
+	        gcsStatsObj.updated();
 	    }
 
 	    // Act on new connections or disconnections
-	    if (gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED && gcsStats.Status != oldStatus)
+	    if (gcsConnected && gcsStatusChanged)
 	    {
 	    	setPeriod(STATS_UPDATE_PERIOD_MS);
-	        statsTimer->setInterval(STATS_UPDATE_PERIOD_MS);
 	        Log.d(TAG,"Connection with the autopilot established");
 	        startRetrievingObjects();
 	    }
-	    if (gcsStats.Status == GCSTelemetryStats::STATUS_DISCONNECTED && gcsStats.Status != oldStatus)
+	    if (gcsDisconnected && gcsStatusChanged)
 	    {
 	    	setPeriod(STATS_CONNECT_PERIOD_MS);
 	        Log.d(TAG,"Connection with the autopilot lost");
 	        Log.d(TAG,"Trying to connect to the autopilot");
-	        emit disconnected();
+	        //emit disconnected();
 	    }
 	}
 

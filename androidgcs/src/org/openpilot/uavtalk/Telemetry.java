@@ -585,7 +585,7 @@ public class Telemetry {
         processObjectUpdates(obj, EV_UNPACKED, false, true);
     }
 
-    private synchronized void updateRequested(UAVObject obj)
+    public synchronized void updateRequested(UAVObject obj)
     {
         processObjectUpdates(obj, EV_UPDATE_REQ, false, true);
     }

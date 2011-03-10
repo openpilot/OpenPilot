@@ -102,7 +102,6 @@ public class UAVObjectManager {
 					newInstance.event(newObj);
 				}
 				obj.initialize(mobj);
-				//emit new instance signal
 				instList.add(obj);
 				newInstance.event(obj);
 
@@ -155,7 +154,7 @@ public class UAVObjectManager {
 		List<UAVObject> ls = new ArrayList<UAVObject>();
 		ls.add(obj);
 		objects.add(ls);
-		//emit newObject(obj);
+		newObject.event(obj);
 	}
 
 	/**

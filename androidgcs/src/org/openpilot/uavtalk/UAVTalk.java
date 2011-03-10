@@ -7,8 +7,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Observable;
 
-public class UAVTalk {
+public class UAVTalk extends Observable{
 
 	private Thread inputProcessingThread = null;
 	/**
@@ -632,8 +633,8 @@ public class UAVTalk {
 		if (respObj != null && respObj.getObjID() == obj.getObjID() && (respObj.getInstID() == obj.getInstID() || respAllInstances))
 		{
 			respObj = null;
-			// TODO: Signals
-//			emit transactionCompleted(obj);
+			setChanged();
+			notifyObservers(obj);
 		}
 	}
 

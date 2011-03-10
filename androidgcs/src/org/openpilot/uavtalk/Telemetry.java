@@ -1,5 +1,6 @@
 package org.openpilot.uavtalk;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -91,6 +92,15 @@ public class Telemetry {
 
         // Setup transaction timer
         transPending = false;
+        // Setup and start the periodic timer
+        timeToNextUpdateMs = 0;
+        updateTimerSetPeriod(1000);
+        // Setup and start the stats timer
+        txErrors = 0;
+        txRetries = 0;
+    }
+    
+    synchronized void transTimerSetPeriod(int periodMs) {
         transTimer = new Timer();
         transTimerTask = new TimerTask() {
 			@Override
@@ -98,9 +108,10 @@ public class Telemetry {
 				transactionTimeout();
 			}        	
         };
-        // Setup and start the periodic timer
-        timeToNextUpdateMs = 0;
-        
+        transTimer.schedule(transTimerTask, periodMs, periodMs);
+    }
+    
+    synchronized void updateTimerSetPeriod(int periodMs) {
         updateTimer = new Timer();
         updateTimerTask = new TimerTask() {
 			@Override
@@ -108,10 +119,8 @@ public class Telemetry {
 				processPeriodicUpdates();
 			}        	
         };
-        updateTimer.scheduleAtFixedRate(updateTimerTask, 1000, 1000);
-        // Setup and start the stats timer
-        txErrors = 0;
-        txRetries = 0;
+        updateTimer.schedule(updateTimerTask, periodMs, periodMs);
+
     }
 
     /**
@@ -341,7 +350,7 @@ public class Telemetry {
             // Start timer if a response is expected
             if ( transInfo.objRequest || transInfo.acked == Acked.TRUE )
             {
-            	transTimer.scheduleAtFixedRate(transTimerTask, REQ_TIMEOUT_MS, REQ_TIMEOUT_MS);
+            	transTimerSetPeriod(REQ_TIMEOUT_MS);
             }
             else
             {
@@ -433,6 +442,7 @@ public class Telemetry {
 
         // Check if a connection has been established, only process GCSTelemetryStats updates
         // (used to establish the connection)
+        gcsStatsObj = objMngr.getObject("GCSTelemetryStats");
         if ( ((String) gcsStatsObj.getField("Status").getValue()).compareTo("Connected") != 0 )
         {
             objQueue.clear();
@@ -538,8 +548,7 @@ public class Telemetry {
         timeToNextUpdateMs = minDelay;
 
         // Restart timer
-        //updateTimer->start(timeToNextUpdateMs);
-        updateTimer.scheduleAtFixedRate(updateTimerTask, timeToNextUpdateMs, timeToNextUpdateMs);
+        updateTimerSetPeriod(timeToNextUpdateMs);
     }
 
     public TelemetryStats getStats()
@@ -607,10 +616,10 @@ public class Telemetry {
     private UAVObjectManager objMngr;
     private UAVTalk utalk;
     private UAVObject gcsStatsObj;
-    private List<ObjectTimeInfo> objList;
+    private List<ObjectTimeInfo> objList = new ArrayList<ObjectTimeInfo>();
     private Queue<ObjectQueueInfo> objQueue = new LinkedList<ObjectQueueInfo>();
     private Queue<ObjectQueueInfo> objPriorityQueue = new LinkedList<ObjectQueueInfo>();
-    private ObjectTransactionInfo transInfo;
+    private ObjectTransactionInfo transInfo = new ObjectTransactionInfo();
     private boolean transPending;
     
     private Timer updateTimer;

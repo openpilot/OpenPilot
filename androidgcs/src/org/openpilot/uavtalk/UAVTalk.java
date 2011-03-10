@@ -200,9 +200,9 @@ public class UAVTalk extends Observable{
 	 * \param[in] allInstances If set true then all instances will be updated
 	 * \return Success (true), Failure (false)
 	 */
-	public boolean sendObject(UAVObject obj, boolean acked, boolean allInstances)
+	public synchronized boolean sendObject(UAVObject obj, boolean acked, boolean allInstances)
 	{
-		//QMutexLocker locker(mutex);
+		System.out.println("Sending obj: " + obj.toString());
 		if (acked)
 		{
 			return objectTransaction(obj, TYPE_OBJ_ACK, allInstances);
@@ -216,9 +216,8 @@ public class UAVTalk extends Observable{
 	/**
 	 * Cancel a pending transaction
 	 */
-	public void cancelTransaction()
+	public synchronized void cancelTransaction()
 	{
-		//QMutexLocker locker(mutex);
 		respObj = null;
 	}
 
@@ -250,6 +249,7 @@ public class UAVTalk extends Observable{
 		}
 		else if (type == TYPE_OBJ)
 		{
+			System.out.println("Transmitting object: " + obj.toString());
 			return transmitObject(obj, TYPE_OBJ, allInstances);
 		}
 		else
@@ -763,7 +763,12 @@ public class UAVTalk extends Observable{
 		bbuf.put((byte) (updateCRC(0, bbuf.array()) & 0xff));
 
 		try {
-			outStream.write(bbuf.array());
+			int packlen = bbuf.position();
+			bbuf.position(0);
+			byte [] dst = new byte[packlen];
+			bbuf.get(dst,0,packlen);
+			System.out.println("Outputting: " + dst.length);
+			outStream.write(dst);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

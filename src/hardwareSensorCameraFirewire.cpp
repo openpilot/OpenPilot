@@ -284,20 +284,21 @@ namespace hardware {
 			r = viam_bank_cameraadd(handle,bank,camera,"image1");
 			r = viam_camera_sethwmode(handle, camera, &hwmode);
 			r = viam_hardware_load(handle,"dc1394");
+			
 			r = viam_hardware_attach(handle);
+			r = viam_bank_configure(handle, bank);
 			
 			if (hwmode.trigger != VIAM_HWTRIGGER_MODE1_HIGH)
 			{ 
 				viam_filter_t shutter_filter = NULL;
 				viam_image_ref image = viam_image_getbyname(handle, "image1");
-				shutter_filter = viam_filter_luminance_create(handle, "shutter", VIAM_FILTER_SHUTTER, shutter);
+				shutter_filter = viam_filter_luminance_create(handle, "shutter", VIAM_FILTER_SHUTTER, VIAM_VALUE_ABSOLUTE, shutter);
 				if (shutter >= 1e-6)
 					viam_filter_push(handle, image, shutter_filter, VIAM_FILTER_HARDWARE, VIAM_FILTER_MANUAL);
 				else
 					viam_filter_push(handle, image, shutter_filter, VIAM_FILTER_HARDWARE, VIAM_FILTER_HARDWARE_AUTO);
 			}
 			
-			r = viam_bank_configure(handle, bank);
 			r = viam_datatransmit(handle, bank, VIAM_ON);
 		}
 

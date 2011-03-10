@@ -28,6 +28,16 @@ public class TalkTest {
 	static final int PORT_NUM = 7777;
 	boolean succeed = false;
 
+	byte[] flightStatsConnected = 
+		{0x3c,0x20,0x1d,0x00,
+			(byte) 0x5e,(byte) 0x26,(byte) 0x0c,(byte) 0x66,
+			0x03,0x00,0x00,0x00,
+			0x00,0x00,0x00,0x00,
+			0x00,0x00,0x00,0x00,
+			0x00,0x00,0x00,0x00,
+			0x00,0x00,0x00,0x00,
+			0x00,(byte) 0xAE};
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		objMngr = new UAVObjectManager();
@@ -89,40 +99,40 @@ public class TalkTest {
 		obj.getField("Status").setValue("Connected");
 		
 		talk.sendObject(obj, false, false);
-		
+				
 		System.out.println("Size: " + os.size());
 		byte [] array = os.toByteArray();
 		for(int i = 0; i < array.length; i++) {
 			System.out.print("0x" + Integer.toHexString((int) array[i] & 0xff));
+			System.out.print("/0x" + Integer.toHexString((int) flightStatsConnected[i] & 0xff));
 			if(i != array.length-1)
-				System.out.print(", ");
+				System.out.print("\n");
 		}
 		System.out.print("\n");
+		for(int i = 0; i < array.length; i++)
+			assertEquals(os.toByteArray()[i], flightStatsConnected[i]);
 	}
 	
 	@Test
-	public void testReceiveObject() {
-		ByteArrayInputStream is = new ByteArrayInputStream(new byte[0], 0, 0);
+	public void testReceiveObject() throws InterruptedException {
+		ByteArrayInputStream is = new ByteArrayInputStream(flightStatsConnected, 0, flightStatsConnected.length);
 		ByteArrayOutputStream os = new ByteArrayOutputStream(100);
 		
-		// Send object to create the test packet (should hard code in test string)
-		UAVTalk talk = new UAVTalk(is,os,objMngr);
+		// Make the Status wrong initially
 		UAVObject obj = objMngr.getObject("FlightTelemetryStats");
-		obj.getField("Status").setValue("Connected");
-		talk.sendObject(obj, false, false);
-		
 		obj.getField("Status").setValue("Disconnected");
 		
 		// Test receiving from that stream
-		is = new ByteArrayInputStream(os.toByteArray(), 0, os.size());
-		talk = new UAVTalk(is,os,objMngr);
+		UAVTalk talk = new UAVTalk(is,os,objMngr);
 		Thread inputStream = talk.getInputProcessThread();
 		inputStream.start();
+		
+		Thread.sleep(1000);
 		
 		System.out.println("Should be FlightTelemetry Stats:");
 		System.out.println(objMngr.getObject("FlightTelemetryStats").toString());
 
-		fail("Not working yet");
+		assertEquals(obj.getField("Status").getValue(), new String("Connected"));
 	}
 
 

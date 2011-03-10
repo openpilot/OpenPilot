@@ -202,7 +202,6 @@ public class UAVTalk extends Observable{
 	 */
 	public synchronized boolean sendObject(UAVObject obj, boolean acked, boolean allInstances)
 	{
-		System.out.println("Sending obj: " + obj.toString());
 		if (acked)
 		{
 			return objectTransaction(obj, TYPE_OBJ_ACK, allInstances);
@@ -249,7 +248,6 @@ public class UAVTalk extends Observable{
 		}
 		else if (type == TYPE_OBJ)
 		{
-			System.out.println("Transmitting object: " + obj.toString());
 			return transmitObject(obj, TYPE_OBJ, allInstances);
 		}
 		else
@@ -263,7 +261,7 @@ public class UAVTalk extends Observable{
 	 * \param[in] rxbyte Received byte
 	 * \return Success (true), Failure (false)
 	 */
-	public boolean processInputByte(int rxbyte)
+	public synchronized boolean processInputByte(int rxbyte)
 	{
 		assert(objMngr != null);
 
@@ -448,12 +446,10 @@ public class UAVTalk extends Observable{
 				break;
 			}
 
-			//mutex->lock();
 			rxBuffer.position(0);
 			receiveObject(rxType, rxObjId, rxInstId, rxBuffer);
 			stats.rxObjectBytes += rxLength;
 			stats.rxObjects++;
-			//mutex->unlock();
 
 			rxState = RxStateType.STATE_SYNC;
 			break;
@@ -484,13 +480,13 @@ public class UAVTalk extends Observable{
 		boolean error = false;
 		boolean allInstances = (instId == ALL_INSTANCES? true : false);
 
-		System.out.println("Received object: " + objId + " " + objMngr.getObject(objId).getName());
 		// Process message type
 		switch (type) {
 		case TYPE_OBJ:
 			// All instances, not allowed for OBJ messages
 			if (!allInstances)
 			{
+				System.out.println("Received object: " + objId + " " + objMngr.getObject(objId).getName());
 				// Get object and update its data
 				obj = updateObject(objId, instId, data);
 				// Check if an ack is pending
@@ -512,6 +508,7 @@ public class UAVTalk extends Observable{
 			// All instances, not allowed for OBJ_ACK messages
 			if (!allInstances)
 			{
+				System.out.println("Received object ack: " + objId + " " + objMngr.getObject(objId).getName());
 				// Get object and update its data
 				obj = updateObject(objId, instId, data);
 				// Transmit ACK
@@ -531,6 +528,7 @@ public class UAVTalk extends Observable{
 			break;
 		case TYPE_OBJ_REQ:
 			// Get object, if all instances are requested get instance 0 of the object
+			System.out.println("Received object request: " + objId + " " + objMngr.getObject(objId).getName());
 			if (allInstances)
 			{
 				obj = objMngr.getObject(objId);
@@ -553,6 +551,7 @@ public class UAVTalk extends Observable{
 			// All instances, not allowed for ACK messages
 			if (!allInstances)
 			{
+				System.out.println("Received ack: " + objId + " " + objMngr.getObject(objId).getName());
 				// Get object
 				obj = objMngr.getObject(objId, instId);
 				// Check if an ack is pending
@@ -578,7 +577,7 @@ public class UAVTalk extends Observable{
 	 * If the object instance could not be found in the list, then a
 	 * new one is created.
 	 */
-	public UAVObject updateObject(int objId, int instId, ByteBuffer data)
+	public synchronized UAVObject updateObject(int objId, int instId, ByteBuffer data)
 	{
 		assert(objMngr != null);
 
@@ -613,13 +612,14 @@ public class UAVTalk extends Observable{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			System.out.println("Unpacking new object");
 			instobj.unpack(data);
 			return instobj;
 		}
 		else
 		{
 			// Unpack data into object instance
-			// System.out.println("Unpacking: " + data.position() + " / " + data.capacity() );
+			System.out.println("Unpacking existing object: " + data.position() + " / " + data.capacity() );
 			obj.unpack(data);
 			return obj;
 		}

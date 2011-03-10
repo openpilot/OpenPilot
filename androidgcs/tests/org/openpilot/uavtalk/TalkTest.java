@@ -1,10 +1,13 @@
 package org.openpilot.uavtalk;
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -31,7 +34,7 @@ public class TalkTest {
 		UAVObjectsInitialize.register(objMngr);
 	}
 
-	@Test
+	//@Test
 	public void testGetFlightStatus() {
 		Socket connection = null;
 		UAVTalk talk = null;
@@ -78,22 +81,49 @@ public class TalkTest {
 
 	@Test
 	public void testSendObjectRequest() {
-		fail("Not yet implemented");
+		ByteArrayInputStream is = new ByteArrayInputStream(new byte[0], 0, 0);
+		ByteArrayOutputStream os = new ByteArrayOutputStream(100);
+		
+		UAVTalk talk = new UAVTalk(is,os,objMngr);
+		UAVObject obj = objMngr.getObject("FlightTelemetryStats");
+		obj.getField("Status").setValue("Connected");
+		
+		talk.sendObject(obj, false, false);
+		
+		System.out.println("Size: " + os.size());
+		byte [] array = os.toByteArray();
+		for(int i = 0; i < array.length; i++) {
+			System.out.print("0x" + Integer.toHexString((int) array[i] & 0xff));
+			if(i != array.length-1)
+				System.out.print(", ");
+		}
+		System.out.print("\n");
 	}
-
-	@Test
-	public void testSendObject() {
-		fail("Not yet implemented");
-	}
-
+	
 	@Test
 	public void testReceiveObject() {
-		fail("Not yet implemented");
+		ByteArrayInputStream is = new ByteArrayInputStream(new byte[0], 0, 0);
+		ByteArrayOutputStream os = new ByteArrayOutputStream(100);
+		
+		// Send object to create the test packet (should hard code in test string)
+		UAVTalk talk = new UAVTalk(is,os,objMngr);
+		UAVObject obj = objMngr.getObject("FlightTelemetryStats");
+		obj.getField("Status").setValue("Connected");
+		talk.sendObject(obj, false, false);
+		
+		obj.getField("Status").setValue("Disconnected");
+		
+		// Test receiving from that stream
+		is = new ByteArrayInputStream(os.toByteArray(), 0, os.size());
+		talk = new UAVTalk(is,os,objMngr);
+		Thread inputStream = talk.getInputProcessThread();
+		inputStream.start();
+		
+		System.out.println("Should be FlightTelemetry Stats:");
+		System.out.println(objMngr.getObject("FlightTelemetryStats").toString());
+
+		fail("Not working yet");
 	}
 
-	@Test
-	public void testUpdateObject() {
-		fail("Not yet implemented");
-	}
 
 }

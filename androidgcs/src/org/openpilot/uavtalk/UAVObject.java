@@ -8,7 +8,7 @@ import java.util.Observer;
 import java.util.Observable;
 
 public abstract class UAVObject {
-
+	
 	public class CallbackListener extends Observable {		
 		private UAVObject parent;
 		
@@ -19,6 +19,31 @@ public abstract class UAVObject {
 		public void event () {
 			setChanged();
 			notifyObservers(parent);
+		}
+		public void event (Object data) {
+			setChanged();
+			notifyObservers(data);
+		}
+	}
+	
+	public class TransactionResult {
+		public UAVObject obj;
+		public boolean success;
+		public TransactionResult(UAVObject obj, boolean success) {
+			this.obj = obj;
+			this.success = success;
+		}
+	}
+	
+	private CallbackListener transactionCompletedListeners = new CallbackListener(this);
+	public void addTransactionCompleted(Observer o) {
+		synchronized(transactionCompletedListeners) {
+			transactionCompletedListeners.addObserver(o);
+		}
+	}
+	void transactionCompleted(boolean status) {
+		synchronized(transactionCompletedListeners) {
+			transactionCompletedListeners.event(new TransactionResult(this,status));
 		}
 	}
 	
@@ -44,6 +69,30 @@ public abstract class UAVObject {
 		synchronized(unpackedListeners) {
 			System.out.println("Unpacked!: " + unpackedListeners.countObservers() + " " + getName());
 			unpackedListeners.event();
+		}
+	}
+
+	private CallbackListener updatedAutoListeners = new CallbackListener(this);
+	public void addUpdatedAutoObserver(Observer o) {
+		synchronized(updatedAutoListeners) {
+			updatedAutoListeners.addObserver(o);
+		}
+	}
+	void updatedAuto() {
+		synchronized(updatedAutoListeners) {
+			updatedAutoListeners.event();
+		}
+	}
+
+	private CallbackListener updatedManualListeners = new CallbackListener(this);
+	public void addUpdatedManualObserver(Observer o) {
+		synchronized(updatedManualListeners) {
+			updatedManualListeners.addObserver(o);
+		}
+	}
+	void updatedManual() {
+		synchronized(updatedManualListeners) {
+			updatedManualListeners.event();
 		}
 	}
 

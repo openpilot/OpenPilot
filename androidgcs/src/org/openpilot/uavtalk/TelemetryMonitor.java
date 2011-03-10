@@ -123,7 +123,7 @@ public class TelemetryMonitor {
 	    // Connect to object
 	    //connect(obj, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(transactionCompleted(UAVObject*,bool)));
 	    // Request update
-	    obj.requestUpdate();
+	    tel.requestUpdate(obj);
 	    objPending = obj;
 	}
 

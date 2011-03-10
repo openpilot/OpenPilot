@@ -175,7 +175,12 @@ public class UAVTalk extends Observable{
 				e.printStackTrace();
 				break;
 			}
-			//System.out.println("Received byte " + val + " in state + " + rxState);
+			if(val == -1) {
+				System.out.println("End of stream, terminating processInputStream thread");
+				break;
+			}
+			
+			System.out.println("Received byte " + val + " in state + " + rxState);
 			processInputByte(val);
 		}
 	}
@@ -760,7 +765,7 @@ public class UAVTalk extends Observable{
 			}
 
 		// Calculate checksum
-		bbuf.put((byte) (updateCRC(0, bbuf.array()) & 0xff));
+		bbuf.put((byte) (updateCRC(0, bbuf.array(), bbuf.position()) & 0xff));
 
 		try {
 			int packlen = bbuf.position();
@@ -818,9 +823,9 @@ public class UAVTalk extends Observable{
 	{
 		return crc_table[crc ^ (data & 0xff)];
 	}
-	int updateCRC(int crc, byte [] data)
+	int updateCRC(int crc, byte [] data, int length)
 	{
-		for (int i = 0; i < data.length; i++)
+		for (int i = 0; i < length; i++)
 			crc = updateCRC(crc, (int) data[i]);
 		return crc;		
 	}

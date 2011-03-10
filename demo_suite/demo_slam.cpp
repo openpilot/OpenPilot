@@ -42,7 +42,7 @@
  * Also decreasing perfs by 10%, probably because we save a view at each obs,
  * or maybe it just because of the different random process
  */
-#define MULTIVIEW_DESCRIPTOR 0
+//#define MULTIVIEW_DESCRIPTOR 1 // moved in config file
 
 /*
  * STATUS: in progress, do not use for now
@@ -327,6 +327,7 @@ class ConfigEstimation: public kernel::KeyValueFileSaveLoad
 	double HARRIS_EDDGE;
 
 	unsigned DESC_SIZE;     /// descriptor patch size (odd value)
+	bool MULTIVIEW_DESCRIPTOR; /// whether use or not the multiview descriptor
 	double DESC_SCALE_STEP; /// MultiviewDescriptor: min change of scale (ratio)
 	double DESC_ANGLE_STEP; /// MultiviewDescriptor: min change of point of view (deg)
 	int DESC_PREDICTION_TYPE; /// type of prediction from descriptor (0 = none, 1 = affine, 2 = homographic)
@@ -717,11 +718,12 @@ void demo_slam01_main(world_ptr_t *world) {
 		senPtr11->setHardwareSensor(hardSen11);
 	} else
 	{
-		#if MULTIVIEW_DESCRIPTOR
-		boost::shared_ptr<DescriptorImagePointMultiViewFactory> descFactory(new DescriptorImagePointMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImagePointMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
-		#else
-		boost::shared_ptr<DescriptorImagePointFirstViewFactory> descFactory(new DescriptorImagePointFirstViewFactory(configEstimation.DESC_SIZE));
-		#endif
+		boost::shared_ptr<DescriptorFactoryAbstract> descFactory;
+		if (configEstimation.MULTIVIEW_DESCRIPTOR)
+			descFactory.reset(new DescriptorImagePointMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImagePointMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
+		else
+			descFactory.reset(new DescriptorImagePointFirstViewFactory(configEstimation.DESC_SIZE));
+
 		boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(configEstimation.HARRIS_CONV_SIZE, configEstimation.HARRIS_TH, configEstimation.HARRIS_EDDGE, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, descFactory));
 		boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(configEstimation.MIN_SCORE, configEstimation.PARTIAL_POSITION, configEstimation.PATCH_SIZE, configEstimation.MAX_SEARCH_SIZE, configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE));
 		
@@ -1518,6 +1520,7 @@ void ConfigEstimation::loadKeyValueFile(jafar::kernel::KeyValueFile const& keyVa
 	KeyValueFile_getItem(HARRIS_EDDGE);
 	
 	KeyValueFile_getItem(DESC_SIZE);
+	KeyValueFile_getItem(MULTIVIEW_DESCRIPTOR);
 	KeyValueFile_getItem(DESC_SCALE_STEP);
 	KeyValueFile_getItem(DESC_ANGLE_STEP);
 	KeyValueFile_getItem(DESC_PREDICTION_TYPE);
@@ -1561,6 +1564,7 @@ void ConfigEstimation::saveKeyValueFile(jafar::kernel::KeyValueFile& keyValueFil
 	KeyValueFile_setItem(HARRIS_EDDGE);
 	
 	KeyValueFile_setItem(DESC_SIZE);
+	KeyValueFile_setItem(MULTIVIEW_DESCRIPTOR);
 	KeyValueFile_setItem(DESC_SCALE_STEP);
 	KeyValueFile_setItem(DESC_ANGLE_STEP);
 	KeyValueFile_setItem(DESC_PREDICTION_TYPE);

@@ -180,7 +180,7 @@ public class UAVTalk extends Observable{
 				break;
 			}
 			
-			System.out.println("Received byte " + val + " in state + " + rxState);
+			//System.out.println("Received byte " + val + " in state + " + rxState);
 			processInputByte(val);
 		}
 	}
@@ -423,7 +423,6 @@ public class UAVTalk extends Observable{
 			// Update CRC
 			rxCS = updateCRC(rxCS, rxbyte);
 
-			//System.out.println(rxCount + "/" + rxLength);
 			rxBuffer.put(rxCount++, (byte) (rxbyte & 0xff));
 			if (rxCount < rxLength)
 				break;
@@ -491,7 +490,7 @@ public class UAVTalk extends Observable{
 			// All instances, not allowed for OBJ messages
 			if (!allInstances)
 			{
-				System.out.println("Received object: " + objId + " " + objMngr.getObject(objId).getName());
+				System.out.println("Received object: " + objMngr.getObject(objId).getName());
 				// Get object and update its data
 				obj = updateObject(objId, instId, data);
 				// Check if an ack is pending
@@ -513,7 +512,7 @@ public class UAVTalk extends Observable{
 			// All instances, not allowed for OBJ_ACK messages
 			if (!allInstances)
 			{
-				System.out.println("Received object ack: " + objId + " " + objMngr.getObject(objId).getName());
+//				System.out.println("Received object ack: " + objId + " " + objMngr.getObject(objId).getName());
 				// Get object and update its data
 				obj = updateObject(objId, instId, data);
 				// Transmit ACK
@@ -533,7 +532,7 @@ public class UAVTalk extends Observable{
 			break;
 		case TYPE_OBJ_REQ:
 			// Get object, if all instances are requested get instance 0 of the object
-			System.out.println("Received object request: " + objId + " " + objMngr.getObject(objId).getName());
+//			System.out.println("Received object request: " + objId + " " + objMngr.getObject(objId).getName());
 			if (allInstances)
 			{
 				obj = objMngr.getObject(objId);
@@ -556,7 +555,7 @@ public class UAVTalk extends Observable{
 			// All instances, not allowed for ACK messages
 			if (!allInstances)
 			{
-				System.out.println("Received ack: " + objId + " " + objMngr.getObject(objId).getName());
+//				System.out.println("Received ack: " + objId + " " + objMngr.getObject(objId).getName());
 				// Get object
 				obj = objMngr.getObject(objId, instId);
 				// Check if an ack is pending
@@ -617,14 +616,14 @@ public class UAVTalk extends Observable{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			System.out.println("Unpacking new object");
+//			System.out.println("Unpacking new object");
 			instobj.unpack(data);
 			return instobj;
 		}
 		else
 		{
 			// Unpack data into object instance
-			System.out.println("Unpacking existing object: " + data.position() + " / " + data.capacity() );
+//			System.out.println("Unpacking existing object: " + data.position() + " / " + data.capacity() );
 			obj.unpack(data);
 			return obj;
 		}
@@ -772,7 +771,6 @@ public class UAVTalk extends Observable{
 			bbuf.position(0);
 			byte [] dst = new byte[packlen];
 			bbuf.get(dst,0,packlen);
-			System.out.println("Outputting: " + dst.length);
 			outStream.write(dst);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

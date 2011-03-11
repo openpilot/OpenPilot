@@ -164,7 +164,6 @@ public class TelemetryMonitor {
 	    gcsStatsObj = objMngr.getObject("GCSTelemetryStats");
 	    flightStatsObj = objMngr.getObject("FlightTelemetryStats");
 	    
-	    System.out.println(flightStatsObj.toString());
 	    if ( ((String) gcsStatsObj.getField("Status").getValue()).compareTo("Connected") != 0 ||
 	    		((String) flightStatsObj.getField("Status").getValue()).compareTo("Connected") == 0 )
 	    {
@@ -250,8 +249,6 @@ public class TelemetryMonitor {
 	    boolean gcsConnected = ((String) statusField.getValue()).compareTo("Connected") == 0;
 	    boolean gcsDisconnected = ((String) statusField.getValue()).compareTo("Disconnected") == 0;
 	    
-	    if(gcsConnected) 
-	    	System.out.println("Detected here");
 	    if (  gcsStatusChanged ||
 	    		((String) flightStatsObj.getField("Status").getValue()).compareTo("Disconnected") != 0 )
 	    {

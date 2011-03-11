@@ -101,7 +101,14 @@ public class Telemetry {
     }
     
     synchronized void transTimerSetPeriod(int periodMs) {
-        transTimer = new Timer();
+    	if(transTimerTask != null)
+    		transTimerTask.cancel();
+    	
+    	if(transTimer != null) 
+    		transTimer.purge();
+
+   		transTimer = new Timer();
+    	
         transTimerTask = new TimerTask() {
 			@Override
 			public void run() {

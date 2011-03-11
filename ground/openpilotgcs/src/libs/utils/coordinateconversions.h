@@ -48,6 +48,7 @@ public:
     void LLA2Base(double LLA[3], double BaseECEF[3], float Rne[3][3], float NED[3]);
     void Quaternion2RPY(const float q[4], float rpy[3]);
     void RPY2Quaternion(const float rpy[3], float q[4]);
+    void Quaternion2R(const float q[4], float Rbe[3][3]);
 };
 
 }

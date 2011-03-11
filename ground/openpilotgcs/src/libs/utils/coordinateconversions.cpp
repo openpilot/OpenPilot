@@ -218,4 +218,22 @@ void CoordinateConversions::RPY2Quaternion(const float rpy[3], float q[4])
 	}
 }
 
+//** Find Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
+void CoordinateConversions::Quaternion2R(const float q[4], float Rbe[3][3])
+{
+
+	float q0s = q[0] * q[0], q1s = q[1] * q[1], q2s = q[2] * q[2], q3s = q[3] * q[3];
+
+	Rbe[0][0] = q0s + q1s - q2s - q3s;
+	Rbe[0][1] = 2 * (q[1] * q[2] + q[0] * q[3]);
+	Rbe[0][2] = 2 * (q[1] * q[3] - q[0] * q[2]);
+	Rbe[1][0] = 2 * (q[1] * q[2] - q[0] * q[3]);
+	Rbe[1][1] = q0s - q1s + q2s - q3s;
+	Rbe[1][2] = 2 * (q[2] * q[3] + q[0] * q[1]);
+	Rbe[2][0] = 2 * (q[1] * q[3] + q[0] * q[2]);
+	Rbe[2][1] = 2 * (q[2] * q[3] - q[0] * q[1]);
+	Rbe[2][2] = q0s - q1s - q2s + q3s;
+}
+
+
 }

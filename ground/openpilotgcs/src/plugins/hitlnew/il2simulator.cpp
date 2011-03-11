@@ -272,18 +272,26 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
         memset(&velData, 0, sizeof(VelocityActual::DataFields));
         velData.North = current.dY*100;
         velData.East = current.dX*100;
-        velData.Down = current.dZ*100;
+        velData.Down = current.dZ*-100;
 
-        // Update AttitudeRaw object (filtered gyros only for now)
+        // Update AttitudeRaw object (filtered gyros and accels only for now)
         AttitudeRaw::DataFields rawData;
         memset(&rawData, 0, sizeof(AttitudeRaw::DataFields));
         rawData = attRaw->getData();
-        rawData.gyros[0] = current.dRoll;
-        rawData.gyros[1] = cos(DEG2RAD * current.roll) * current.dPitch + sin(DEG2RAD * current.roll) * current.dAzimuth;
-        rawData.gyros[2] = cos(DEG2RAD * current.roll) * current.dAzimuth - sin(DEG2RAD * current.roll) * current.dPitch;
-	rawData.accels[0] = current.ddX;
-	rawData.accels[1] = current.ddY;
-	rawData.accels[2] = current.ddZ;
+	// rotate turn rates and accelerations into body frame
+	// (note: rotation deltas are NOT in NED frame but in RPY - manual conversion!)
+	rawData.gyros[0] = current.dRoll;
+	rawData.gyros[1] = cos(DEG2RAD * current.roll) * current.dPitch + sin(DEG2RAD * current.roll) * current.dAzimuth;
+	rawData.gyros[2] = cos(DEG2RAD * current.roll) * current.dAzimuth - sin(DEG2RAD * current.roll) * current.dPitch;
+	// accels are in NED and can be converted using standard ned->local rotation matrix
+	float Rbe[3][3];
+	Utils::CoordinateConversions().Quaternion2R(quat,Rbe);
+	for (int t=0;t<3;t++) {
+		rawData.accels[t]=current.ddX*Rbe[t][0]
+				+current.ddY*Rbe[t][1]
+				+(current.ddZ+9.81)*Rbe[t][2];
+	}
+	rawData.accels[2]=-rawData.accels[2];
 
         // Update homelocation
         HomeLocation::DataFields homeData;

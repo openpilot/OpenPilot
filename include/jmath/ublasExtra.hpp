@@ -617,7 +617,7 @@ namespace jafar {
 
 			/** computes per row M minus v and store it in M_v
 			 * @return M_v
-			 * @TODO: move it into a matrix vector operator like ublas::prod
+			 * @TODO: move it into a matrix vector expression like ublas::prod
 			 */
 			template<typename T>
 			void minus_vector(const ublas::matrix<T> &M, const ublas::vector<T> &v, 
@@ -635,6 +635,34 @@ namespace jafar {
 						M_v(r, c) = M(r,c) - v[c];
 			}
 			
+			/** computes per row M minus v and store it in M
+			 * @TODO: move it into a matrix vector expression like ublas::prod
+			 */
+			template<typename T>
+			void minus_vector(ublas::matrix<T> &M, const ublas::vector<T> &v)
+			{
+				size_t n_cols;
+				JFR_ASSERT((n_cols = M.size2()) == v.size(),
+									 "vector size and matrix coulmns size must be equal");
+				size_t n_rows = M.size1();
+				for(size_t r = 0; r < n_rows; r++) 
+					for(size_t c = 0; c < n_cols; c++) 
+						M(r, c)-= v[c];
+			}
+
+			/** computes per row M plus v and store it in M
+			 * @TODO: move it into a matrix vector expression like ublas::prod
+			 */
+			template<typename T>
+			void plus_vector(ublas::matrix<T> &M, const ublas::vector<T> &v)
+			{
+				JFR_ASSERT(M.size2() == v.size(),
+									 "vector size and matrix coulmns size must be equal");
+				for(size_t r = 0; r < M.size1(); r++) 
+					for(size_t c = 0; c < M.size2(); c++) 
+						M(r, c)+= v[c];
+			}
+
 			/** deletes a matrix M(nxm) row in a memory efficient way i.e. no extra memory
 			 *  is allocated.
 			 * @return M with size n-1xm.
@@ -690,8 +718,27 @@ namespace jafar {
 						++rit)
 					delete_column(M, *rit);
 			}
+			/** deletes a list of row indices stored in @ref indices from @ref M
+			 * @param indices: vector of indices considered
+			 * @param is_sorted: are the indices sorted into an acending order?
+			 * @return M with size nxm-(indices.size()).
+			 */
+			template<typename T>
+			void delete_rows(ublas::matrix<T> &M, 
+											 std::vector<size_t> indices, 
+											 bool is_sorted = false) 
+			{
+				JFR_ASSERT(((indices.size() <= M.size2()) && (indices.size() > 0)),
+									 "indices size is "<<indices.size()<<
+									 " whereas M rows size is "<<M.size2());
+				if(!is_sorted)
+					std::sort(indices.begin(), indices.end());
+				for(std::vector<size_t>::reverse_iterator rit = indices.rbegin();
+						rit != indices.rend();
+						++rit)
+					delete_row(M, *rit);
+			}
 		} // namespace ublasExtra
-
 	/*\@}*/
 
 	} // namespace jmath

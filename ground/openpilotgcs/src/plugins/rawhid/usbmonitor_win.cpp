@@ -57,6 +57,7 @@ USBMonitor::USBMonitor(QObject *parent): QThread(parent) {
     notificationWidget = 0;
 #endif // Q_OS_WIN
     setUpNotifications();
+    m_instance=this;
 }
 
 USBMonitor::~USBMonitor()
@@ -223,10 +224,8 @@ Returns a list of all currently available devices
 */
 QList<USBPortInfo> USBMonitor::availableDevices()
 {
-    GUID guid_hidd;
-    HidD_GetHidGuid(&guid_hidd);
     QList<USBPortInfo> ports;
-    enumerateDevicesWin(guid_hidd, &ports);
+    enumerateDevicesWin(guid_hid, &ports);
     //qDebug()<<"USBMonitorWin availabledevices="<<ports.count();
     return ports;
 }

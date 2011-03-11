@@ -394,7 +394,7 @@ void PipXtremeGadgetWidget::getPorts()
     pjrc_rawhid *rawHidHandle = new pjrc_rawhid();
     if (rawHidHandle)
     {
-        int opened = rawHidHandle->open(10, 0x20A0, 0x4117, 0xFF9C, 0x0001);
+        int opened = rawHidHandle->open(10, 0x20A0, 0x415C, 0xFF9C, 0x0001);
         if (opened > 0)
         {
             QList<QString> usb_ports;

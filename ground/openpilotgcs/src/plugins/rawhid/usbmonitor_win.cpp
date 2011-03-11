@@ -31,7 +31,6 @@
 
 #include "usbmonitor.h"
 #include <QDebug>
-
 #define printf qDebug
 
 void USBMonitor::deviceEventReceived() {
@@ -80,6 +79,7 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceM
     QList<USBPortInfo> thePortsWeWant;
 
     foreach (USBPortInfo port, allPorts) {
+        //qDebug()<<"USBMonitorWin:Port VID="<<port.vendorID<<"PID="<<port.productID<<"bcddevice="<<port.bcdDevice;
         if((port.vendorID==vid || vid==-1) && (port.productID==pid || pid==-1) && ((port.bcdDevice>>8)==bcdDeviceMSB || bcdDeviceMSB==-1) &&
                 ( (port.bcdDevice&0x00ff) ==bcdDeviceLSB || bcdDeviceLSB==-1))
             thePortsWeWant.append(port);
@@ -223,8 +223,11 @@ Returns a list of all currently available devices
 */
 QList<USBPortInfo> USBMonitor::availableDevices()
 {
+    GUID guid_hidd;
+    HidD_GetHidGuid(&guid_hidd);
     QList<USBPortInfo> ports;
-    enumerateDevicesWin(guid_hid, &ports);
+    enumerateDevicesWin(guid_hidd, &ports);
+    //qDebug()<<"USBMonitorWin availabledevices="<<ports.count();
     return ports;
 }
 
@@ -232,10 +235,10 @@ void USBMonitor::enumerateDevicesWin( const GUID & guid, QList<USBPortInfo>* inf
 {
     HDEVINFO devInfo;
     USBPortInfo info;
-
+    //qDebug()<<"enumerateDevicesWin1";
     if( (devInfo = SetupDiGetClassDevs(&guid, NULL, NULL, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE)) != INVALID_HANDLE_VALUE)
     {
-
+        //qDebug()<<"enumerateDevicesWin2";
         SP_DEVINFO_DATA devInfoData;
         devInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
         for(DWORD i = 0; SetupDiEnumDeviceInfo(devInfo, i, &devInfoData); i++)

@@ -249,16 +249,16 @@ static void gpsTask(void *parameters)
 					// Validate the checksum over the sentence
 					if (!NMEA_checksum(&gps_rx_buffer[1]))
 					{	// Invalid checksum.  May indicate dropped characters on Rx.
-						PIOS_DEBUG_PinHigh(2);
+						//PIOS_DEBUG_PinHigh(2);
 						++numChecksumErrors;
-						PIOS_DEBUG_PinLow(2);
+						//PIOS_DEBUG_PinLow(2);
 					}
 					else
 					{	// Valid checksum, use this packet to update the GPS position
 						if (!NMEA_update_position(&gps_rx_buffer[1])) {
-							PIOS_DEBUG_PinHigh(2);
+							//PIOS_DEBUG_PinHigh(2);
 							++numParsingErrors;
-							PIOS_DEBUG_PinLow(2);
+							//PIOS_DEBUG_PinLow(2);
 						}
 						else
 							++numUpdates;

@@ -72,6 +72,8 @@
 		6526645B122DF972006F9A3C /* pios_wdg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_wdg.h; sourceTree = "<group>"; };
 		6528CCB412E406B800CF5144 /* pios_adxl345.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_adxl345.c; sourceTree = "<group>"; };
 		6528CCE212E40F6700CF5144 /* pios_adxl345.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_adxl345.h; sourceTree = "<group>"; };
+		652C8568132B632A00BFCC70 /* firmwareiapobj.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = firmwareiapobj.xml; sourceTree = "<group>"; };
+		652C856A132B6EA600BFCC70 /* sonaraltitude.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = sonaraltitude.xml; sourceTree = "<group>"; };
 		65322D3B122841F60046CD7C /* gpstime.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = gpstime.xml; sourceTree = "<group>"; };
 		65345C871288668B00A5E4E8 /* guidancesettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = guidancesettings.xml; sourceTree = "<group>"; };
 		6536D47B1307962C0042A298 /* stabilizationdesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = stabilizationdesired.xml; sourceTree = "<group>"; };
@@ -2642,7 +2644,6 @@
 		65C35E5812EFB2F3004811C2 /* attituderaw.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = attituderaw.xml; sourceTree = "<group>"; };
 		65C35E5912EFB2F3004811C2 /* baroaltitude.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = baroaltitude.xml; sourceTree = "<group>"; };
 		65C35E5A12EFB2F3004811C2 /* batterysettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = batterysettings.xml; sourceTree = "<group>"; };
-		65C35E5B12EFB2F3004811C2 /* firmwareiap.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = firmwareiap.xml; sourceTree = "<group>"; };
 		65C35E5C12EFB2F3004811C2 /* flightbatterystate.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = flightbatterystate.xml; sourceTree = "<group>"; };
 		65C35E5D12EFB2F3004811C2 /* flightplancontrol.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = flightplancontrol.xml; sourceTree = "<group>"; };
 		65C35E5E12EFB2F3004811C2 /* flightplansettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = flightplansettings.xml; sourceTree = "<group>"; };
@@ -7374,7 +7375,7 @@
 				65E410AE12F65AEA00725888 /* attitudesettings.xml */,
 				65C35E5912EFB2F3004811C2 /* baroaltitude.xml */,
 				65C35E5A12EFB2F3004811C2 /* batterysettings.xml */,
-				65C35E5B12EFB2F3004811C2 /* firmwareiap.xml */,
+				652C8568132B632A00BFCC70 /* firmwareiapobj.xml */,
 				65C35E5C12EFB2F3004811C2 /* flightbatterystate.xml */,
 				65C35E5D12EFB2F3004811C2 /* flightplancontrol.xml */,
 				65C35E5E12EFB2F3004811C2 /* flightplansettings.xml */,
@@ -7396,6 +7397,7 @@
 				65C35E6E12EFB2F3004811C2 /* positionactual.xml */,
 				65C35E6F12EFB2F3004811C2 /* positiondesired.xml */,
 				65C35E7012EFB2F3004811C2 /* ratedesired.xml */,
+				652C856A132B6EA600BFCC70 /* sonaraltitude.xml */,
 				6536D47B1307962C0042A298 /* stabilizationdesired.xml */,
 				65C35E7112EFB2F3004811C2 /* stabilizationsettings.xml */,
 				65C35E7212EFB2F3004811C2 /* systemalarms.xml */,

@@ -185,6 +185,7 @@ static void actuatorTask(void* parameters)
 		if(nMixers < 2) //Nothing can fly with less than two mixers.
 		{
 			AlarmsSet(SYSTEMALARMS_ALARM_ACTUATOR, SYSTEMALARMS_ALARM_WARNING);
+			setFailsafe(); // So that channels like PWM buzzer keep working
 			continue;
 		}
 
@@ -431,6 +432,9 @@ static void actuator_update_rate(UAVObjEvent * ev)
 	}
 }
 
+#define ALARM_SEQ 0b11110110110000	// pause, short, short, short, long
+
+
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
 static bool set_channel(uint8_t mixer_channel, uint16_t value) {
 	return true;
@@ -442,6 +446,31 @@ static bool set_channel(uint8_t mixer_channel, uint16_t value) {
 	ActuatorSettingsGet(&settings);
 		
 	switch(settings.ChannelType[mixer_channel]) {
+		case ACTUATORSETTINGS_CHANNELTYPE_PWMALARMBUZZER: {
+			// This is for buzzers that take a PWM input
+			bool buzz = false;
+			static portTickType lastSysTime = 0;
+			static uint32_t alarm_seq_state = 0;
+			portTickType thisSysTime = xTaskGetTickCount();
+			portTickType dT = 0;
+
+			// For now, only look at the battery alarm, because functions like AlarmsHasCritical() can block for some time; to be discussed
+			if (AlarmsGet(SYSTEMALARMS_ALARM_BATTERY) > SYSTEMALARMS_ALARM_WARNING) {
+				if(thisSysTime > lastSysTime)
+					dT = thisSysTime - lastSysTime;
+				buzz = (alarm_seq_state&1);	// Buzz when the LS bit is 1
+				if (dT > 80) {
+					// Go to next bit in alarm_seq_state
+					alarm_seq_state >>= 1;
+					if (alarm_seq_state == 0)
+						alarm_seq_state = ALARM_SEQ;	// All done, re-init alarm_seq_state
+					lastSysTime = thisSysTime;
+				}
+			}
+			PIOS_Servo_Set(	settings.ChannelAddr[mixer_channel],
+							buzz?settings.ChannelMax[mixer_channel]:settings.ChannelMin[mixer_channel]);
+			return true;
+		}
 		case ACTUATORSETTINGS_CHANNELTYPE_PWM:
 			PIOS_Servo_Set(settings.ChannelAddr[mixer_channel], value);
 			return true;

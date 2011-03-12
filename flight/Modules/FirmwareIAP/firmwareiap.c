@@ -38,11 +38,12 @@
 
 #define IAP_CMD_CRC         100
 #define IAP_CMD_VERIFY      101
-#define IAP_CMD_VERSION		102
+#define IAP_CMD_VERSION	    102
 
 #define IAP_STATE_READY     0
 #define IAP_STATE_STEP_1    1
 #define IAP_STATE_STEP_2    2
+#define IAP_STATE_RESETTING 3
 
 #define RESET_DELAY         500 /* delay between sending reset ot INS */
 
@@ -60,6 +61,8 @@ const uint32_t    iap_time_3_high_end = 5000;
 // Private variables
 const static uint8_t 	version[] = { 0, 0, 1 };
 const static uint16_t	SVN = 12345;
+static uint8_t reset_count = 0;
+static portTickType lastResetSysTime;
 
 // Private functions
 static void FirmwareIAPCallback(UAVObjEvent* ev);
@@ -73,9 +76,6 @@ FirmwareIAPObjData 	data;
 static uint32_t	get_time(void);
 
 // Private types
-
-// Private variables
-static xTaskHandle taskHandle;
 
 // Private functions
 static void resetTask(UAVObjEvent *);
@@ -114,12 +114,15 @@ int32_t FirmwareIAPInitialize()
  * \note
  *
  */
+static uint8_t    iap_state = IAP_STATE_READY;
 static void FirmwareIAPCallback(UAVObjEvent* ev)
 {
-	static uint32_t    	last_time = 0;
-	static uint16_t 	iap_state = IAP_STATE_READY;
-	uint32_t    		this_time;
-	uint32_t    		delta;
+	static uint32_t   last_time = 0;
+	uint32_t          this_time;
+	uint32_t          delta;
+	
+	if(iap_state == IAP_STATE_RESETTING)
+		return;
 	
 	if ( ev->obj == FirmwareIAPObjHandle() )	{
 		// Get the input object data
@@ -134,7 +137,7 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
 			data.crc = iap_calc_crc();
 			FirmwareIAPObjSet( &data );
 		}
-		if((data.ArmReset==1)&&(taskHandle==0))
+		if((data.ArmReset==1)&&(iap_state!=IAP_STATE_RESETTING))
 		{
 			data.ArmReset=0;
 			FirmwareIAPObjSet( &data );
@@ -164,15 +167,21 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
 						PIOS_IAP_SetRequest2();
 						
 						/* Note: Cant just wait timeout value, because first time is randomized */
+						reset_count = 0;
+						lastResetSysTime = xTaskGetTickCount();
 						UAVObjEvent * ev = pvPortMalloc(sizeof(UAVObjEvent));
 						memset(ev,0,sizeof(UAVObjEvent));
-						EventPeriodicCallbackCreate(ev, resetTask, 10);
+						EventPeriodicCallbackCreate(ev, resetTask, 100);
+						iap_state = IAP_STATE_RESETTING;
 					} else {
 						iap_state = IAP_STATE_READY;
 					}
 				} else {
 					iap_state = IAP_STATE_READY;
 				}
+				break;
+			case IAP_STATE_RESETTING:
+				// stay here permanentally, should reboot
 				break;
 			default:
 				iap_state = IAP_STATE_READY;
@@ -242,25 +251,18 @@ static void read_description(uint8_t * array)
  * Executed by event dispatcher callback to reset INS before resetting OP 
  */
 static void resetTask(UAVObjEvent * ev)
-{
-	static portTickType lastSysTime;
-	static uint8_t count = 0;
-	static uint8_t first = 1;
+{		
+	PIOS_LED_Toggle(LED1);
+	PIOS_LED_Toggle(LED2);
 	
-	if(first == 1) { /* Initialize */
-		lastSysTime = xTaskGetTickCount();
-		first = 0;
-	}
-	
-	
-	if((portTickType) (xTaskGetTickCount() - lastSysTime) > RESET_DELAY / portTICK_RATE_MS) {
-		lastSysTime = xTaskGetTickCount();
+	if((portTickType) (xTaskGetTickCount() - lastResetSysTime) > RESET_DELAY / portTICK_RATE_MS) {
+		lastResetSysTime = xTaskGetTickCount();
 		data.BoardType=0xFF;
 		data.ArmReset=1;
-		data.crc=count; /* Must change a value for this to get to INS */
+		data.crc=reset_count; /* Must change a value for this to get to INS */
 		FirmwareIAPObjSet(&data);
-		++count;
-		if(count>3)
+		++reset_count;
+		if(reset_count>3)
 		{
 			PIOS_SYS_Reset();
 		}

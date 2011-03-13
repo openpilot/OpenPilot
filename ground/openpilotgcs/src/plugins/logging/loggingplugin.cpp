@@ -299,7 +299,6 @@ void LoggingThread::transactionCompleted(UAVObject* obj, bool success)
 
 LoggingPlugin::LoggingPlugin() : state(IDLE)
 {
-    // Do nothing
     logConnection = new LoggingConnection();
 }
 
@@ -347,6 +346,7 @@ bool LoggingPlugin::initialize(const QStringList& args, QString *errMsg)
 
     // Map signal from end of replay to replay stopped
     connect(getLogfile(),SIGNAL(replayFinished()), this, SLOT(replayStopped()));
+    connect(getLogfile(),SIGNAL(replayStarted()), this, SLOT(replayStarted()));
 
     return true;
 }
@@ -428,23 +428,22 @@ void LoggingPlugin::loggingStopped()
 }
 
 /**
-  * Received the replay stoppedsignal from the LogFile
+  * Received the replay stopped signal from the LogFile
   */
 void LoggingPlugin::replayStopped()
 {
-    Q_ASSERT(state == REPLAY);
-
-    if(uavTalk)
-        delete(uavTalk);
-
-    getLogfile()->close();
-
-    uavTalk = 0;
     state = IDLE;
-
     emit stateChanged("IDLE");
 }
 
+/**
+  * Received the replay started signal from the LogFile
+  */
+void LoggingPlugin::replayStarted()
+{
+    state = REPLAY;
+    emit stateChanged("REPLAY");
+}
 
 
 

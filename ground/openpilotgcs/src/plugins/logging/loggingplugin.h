@@ -137,14 +137,14 @@ protected:
     LoggingThread * loggingThread;
 
     // These are used for replay, logging in its own thread
-    UAVTalk * uavTalk;
-    LoggingConnection* logConnection;    
+    LoggingConnection* logConnection;
 
 private slots:
     void toggleLogging();
     void startLogging(QString file);
     void stopLogging();
     void loggingStopped();
+    void replayStarted();
     void replayStopped();
 
 private:

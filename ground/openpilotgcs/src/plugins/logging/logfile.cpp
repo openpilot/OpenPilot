@@ -44,6 +44,8 @@ bool LogFile::open(OpenMode mode) {
 
 void LogFile::close()
 {
+    emit aboutToClose();
+
     if (timer.isActive())
         timer.stop();
     file.close();
@@ -127,11 +129,12 @@ bool LogFile::startReplay() {
     file.read((char *) &lastTimeStamp,sizeof(lastTimeStamp));
     timer.setInterval(10);
     timer.start();
+    emit replayStarted();
     return true;
 }
 
 bool LogFile::stopReplay() {
-    timer.stop();
+    close();
     emit replayFinished();
     return true;
 }

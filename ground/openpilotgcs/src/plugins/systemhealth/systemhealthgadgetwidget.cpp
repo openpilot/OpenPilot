@@ -31,8 +31,6 @@
 #include "uavobjectmanager.h"
 #include "systemalarms.h"
 
-#include <iostream>
-#include <QtGui/QFileDialog>
 #include <QDebug>
 
 /*
@@ -48,6 +46,7 @@ SystemHealthGadgetWidget::SystemHealthGadgetWidget(QWidget *parent) : QGraphicsV
     m_renderer = new QSvgRenderer();
     background = new QGraphicsSvgItem();
     foreground = new QGraphicsSvgItem();
+    nolink = new QGraphicsSvgItem();
 
     paint();
 
@@ -58,12 +57,33 @@ SystemHealthGadgetWidget::SystemHealthGadgetWidget(QWidget *parent) : QGraphicsV
     SystemAlarms* obj = dynamic_cast<SystemAlarms*>(objManager->getObject(QString("SystemAlarms")));
     connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateAlarms(UAVObject*)));
 
+    // Listen to autopilot connection events
+    TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
+    connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
+    connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
+
+}
+
+/**
+  * Hide the "No Link" overlay
+  */
+void SystemHealthGadgetWidget::onAutopilotConnect()
+{
+    nolink->setVisible(false);
+}
+
+/**
+  * Show the "No Link" overlay
+  */
+void SystemHealthGadgetWidget::onAutopilotDisconnect()
+{
+    nolink->setVisible(true);
 }
 
 void SystemHealthGadgetWidget::updateAlarms(UAVObject* systemAlarm)
 {
     // This code does not know anything about alarms beforehand, and
-    // I found to efficient way to locate items inside the scene by
+    // I found no efficient way to locate items inside the scene by
     // name, so it's just as simple to reset the scene:
     // And add the one with the right name.
     QGraphicsScene *m_scene = scene();
@@ -109,27 +129,29 @@ SystemHealthGadgetWidget::~SystemHealthGadgetWidget()
 void SystemHealthGadgetWidget::setSystemFile(QString dfn)
 {
     setBackgroundBrush(QBrush(Utils::StyleHelper::baseColor()));
-   if (QFile::exists(dfn))
-   {
-      m_renderer->load(dfn);
-      if(m_renderer->isValid())
-      {
-         fgenabled = false;
+   if (QFile::exists(dfn)) {
+       m_renderer->load(dfn);
+       if(m_renderer->isValid()) {
+           fgenabled = false;
+           background->setSharedRenderer(m_renderer);
+           background->setElementId("background");
 
-         background->setSharedRenderer(m_renderer);
-         background->setElementId("background");
+           if (m_renderer->elementExists("foreground")) {
+               foreground->setSharedRenderer(m_renderer);
+               foreground->setElementId("foreground");
+               foreground->setZValue(99);
+               fgenabled = true;
+           }
+           if (m_renderer->elementExists("nolink")) {
+               nolink->setSharedRenderer(m_renderer);
+               nolink->setElementId("nolink");
+               nolink->setZValue(100);
+           }
 
-         if (m_renderer->elementExists("foreground")) {
-            foreground->setSharedRenderer(m_renderer);
-            foreground->setElementId("foreground");
-            foreground->setZValue(99);
-            fgenabled = true;
-        }
-         std::cout<<"Dial file loaded"<<std::endl;
          QGraphicsScene *l_scene = scene();
          l_scene->setSceneRect(background->boundingRect());
          fitInView(background, Qt::KeepAspectRatio );
-     }
+       }
    }
    else
    { qDebug() <<"SystemHealthGadget: no file"; }
@@ -141,6 +163,7 @@ void SystemHealthGadgetWidget::paint()
     l_scene->clear();
     l_scene->addItem(background);
     l_scene->addItem(foreground);
+    l_scene->addItem(nolink);
     update();
 }
 

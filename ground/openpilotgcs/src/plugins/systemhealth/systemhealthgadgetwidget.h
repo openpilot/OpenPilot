@@ -30,6 +30,7 @@
 
 #include "systemhealthgadgetconfiguration.h"
 #include "uavobject.h"
+#include "uavtalk/telemetrymanager.h"
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
@@ -54,11 +55,14 @@ protected:
 
 private slots:
    void updateAlarms(UAVObject *systemAlarm); // Called by the systemalarms UAVObject
+   void onAutopilotConnect();
+   void onAutopilotDisconnect();
 
 private:
    QSvgRenderer *m_renderer;
    QGraphicsSvgItem *background;
    QGraphicsSvgItem *foreground;
+   QGraphicsSvgItem *nolink;
 
                    // Simple flag to skip rendering if the
    bool fgenabled; // layer does not exist.

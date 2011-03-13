@@ -4,7 +4,6 @@ QT += svg
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(systemhealth_dependencies.pri)
-include(../../libs/qwt/qwt.pri)
 HEADERS += systemhealthplugin.h
 HEADERS += systemhealthgadget.h
 HEADERS += systemhealthgadgetwidget.h

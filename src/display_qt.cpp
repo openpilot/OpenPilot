@@ -41,7 +41,7 @@ namespace display {
 	/** **************************************************************************
 	
 	*/
-	SensorQt::SensorQt(ViewerAbstract *_viewer, rtslam::SensorAbstract *_slamSen, RobotQt *_dispRob): 
+	SensorQt::SensorQt(ViewerAbstract *_viewer, rtslam::SensorExteroAbstract *_slamSen, RobotQt *_dispRob): 
 		SensorDisplay(_viewer, _slamSen, _dispRob), viewerQt(PTR_CAST<ViewerQt*>(_viewer)), 
 		viewer_(NULL), view_private(NULL), framenumber_label(NULL), sensorpose_label(NULL)
 	{
@@ -644,7 +644,7 @@ std::cout << "connecting slots" << std::endl;
 		QGraphicsItem *clickedItem = viewer_->scene()->itemAt(mouseEvent->buttonDownScenePos(mouseEvent->button()));
 		ObservationAbstract *clickedObs = NULL;
 		
-		for(SensorAbstract::DataManagerList::iterator itDm = slamSen_->dataManagerList().begin();
+		for(SensorExteroAbstract::DataManagerList::iterator itDm = slamSen_->dataManagerList().begin();
 		    !clickedObs && itDm != slamSen_->dataManagerList().end(); ++itDm)
 		for(DataManagerAbstract::ObservationList::iterator itObs = (*itDm)->observationList().begin();
 		    !clickedObs && itObs != (*itDm)->observationList().end(); ++itObs)

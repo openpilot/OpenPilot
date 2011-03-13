@@ -32,7 +32,7 @@ namespace jafar {
 		 * This model accepts radial distortion model
 		 * \ingroup rtslam
 		 */
-		class SensorPinHole: public SensorAbstract {
+		class SensorPinHole: public SensorExteroAbstract {
 
 			public:
 

@@ -70,7 +70,7 @@ namespace display {
 	{
 			ViewerEx *viewerEx;
 		public:
-			SensorEx(ViewerAbstract *_viewer, rtslam::SensorAbstract *_slamSen, RobotEx *_dispRob): 
+			SensorEx(ViewerAbstract *_viewer, rtslam::SensorExteroAbstract *_slamSen, RobotEx *_dispRob): 
 				SensorDisplay(_viewer, _slamSen, _dispRob), viewerEx(PTR_CAST<ViewerEx*>(_viewer)) {}
 			void bufferize() {}
 			void render() {}

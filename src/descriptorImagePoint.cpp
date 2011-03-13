@@ -42,17 +42,18 @@ namespace jafar {
 		void FeatureView::initFromObs(const observation_ptr_t & obsPtr, int descSize)
 		{
 			app_img_pnt_ptr_t app(new AppearanceImagePoint(descSize, descSize, CV_8U));
-			rawimage_ptr_t rawPtr = SPTR_CAST<RawImage>(obsPtr->sensorPtr()->rawPtr);
+			sensorext_ptr_t senPtr = SPTR_CAST<SensorExteroAbstract>(obsPtr->sensorPtr());
+			rawimage_ptr_t rawPtr = SPTR_CAST<RawImage>(senPtr->rawPtr);
 			if (rawPtr->img->extractPatch(app->patch, (int)obsPtr->measurement.x()(0), (int)obsPtr->measurement.x()(1), descSize, descSize))
 			{
 				app_img_pnt_ptr_t obsApp = SPTR_CAST<AppearanceImagePoint>(obsPtr->observedAppearance);
 				app->offset = obsApp->offset;
 				appearancePtr = app;
 
-				senPose = obsPtr->sensorPtr()->globalPose();
+				senPose = senPtr->globalPose();
 				obsModelPtr = obsPtr->model;
 				measurement = obsPtr->measurement.x();
-				frame = obsPtr->sensorPtr()->rawCounter;
+				frame = senPtr->rawCounter;
 				used = false;
 			}
 		}

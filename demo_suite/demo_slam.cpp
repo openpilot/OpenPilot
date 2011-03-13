@@ -878,7 +878,8 @@ int n_innovation = 0;
 			for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin();
 				senIter != robPtr->sensorList().end(); ++senIter)
 			{
-				sensor_ptr_t senPtr = *senIter;
+				if ((*senIter)->kind == SensorAbstract::PROPRIOCEPTIVE) continue; // FIXME temporary
+				sensorext_ptr_t senPtr = SPTR_CAST<SensorExteroAbstract>(*senIter);
 				//					std::cout << "\n________________________________________________ " << std::endl;
 				//					std::cout << *senPtr << std::endl;
 
@@ -915,7 +916,7 @@ JFR_DEBUG("Robot state stdev after move " << sqrt(ublas::matrix_vector_range<jbl
 robot_prediction = robPtr->state.x();
 
 					// foreach dataManager
-					for (SensorAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin();
+					for (SensorExteroAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin();
 						dmaIter != senPtr->dataManagerList().end(); ++dmaIter)
 					{
 						data_manager_ptr_t dmaPtr = *dmaIter;

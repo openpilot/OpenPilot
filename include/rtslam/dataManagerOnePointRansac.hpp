@@ -43,7 +43,7 @@ namespace jafar {
 
 			public:
 				// Define the function linkToParentSensorSpec.
-				ENABLE_LINK_TO_SPECIFIC_PARENT(SensorAbstract, SensorSpec, SensorSpec, DataManagerAbstract);
+				ENABLE_LINK_TO_SPECIFIC_PARENT(SensorExteroAbstract, SensorSpec, SensorSpec, DataManagerAbstract);
 				// Define the functions sensorSpec() and sensorSpecPtr().
 				ENABLE_ACCESS_TO_SPECIFIC_PARENT(SensorSpec, sensorSpec);
 

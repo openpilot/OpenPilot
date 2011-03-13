@@ -114,7 +114,7 @@ namespace display {
 	{
 			ViewerGdhe *viewerGdhe;
 		public:
-			SensorGdhe(ViewerAbstract *viewer_, rtslam::SensorAbstract *_slamSen, RobotGdhe *_dispRob);
+			SensorGdhe(ViewerAbstract *viewer_, rtslam::SensorExteroAbstract *_slamSen, RobotGdhe *_dispRob);
 			void bufferize() {}
 			void render() {}
 	};

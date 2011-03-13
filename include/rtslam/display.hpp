@@ -86,10 +86,10 @@ namespace display {
 	class SensorDisplay : public DisplayDataAbstract
 	{
 		public:
-			rtslam::SensorAbstract *slamSen_;
+			rtslam::SensorExteroAbstract *slamSen_;
 			RobotDisplay *dispRobot_;
 			SensorAbstract::type_enum type_;
-			SensorDisplay(ViewerAbstract *viewer_, rtslam::SensorAbstract *_slamSen, RobotDisplay *_dispRobot): 
+			SensorDisplay(ViewerAbstract *viewer_, rtslam::SensorExteroAbstract *_slamSen, RobotDisplay *_dispRobot): 
 				DisplayDataAbstract(viewer_), slamSen_(_slamSen), dispRobot_(_dispRobot), type_(_slamSen->type) {}
 	};
 
@@ -166,7 +166,7 @@ namespace display {
 	{
 		protected:
 			typedef boost::variant<rtslam::world_ptr_t, rtslam::map_ptr_t, rtslam::robot_ptr_t, 
-				rtslam::sensor_ptr_t, rtslam::landmark_ptr_t, rtslam::observation_ptr_t> SlamObjectPtr;
+				rtslam::sensorext_ptr_t, rtslam::landmark_ptr_t, rtslam::observation_ptr_t> SlamObjectPtr;
 			typedef std::vector<SlamObjectPtr> SlamObjectsList;
 			SlamObjectsList slamObjects_; ///< all the slam objects at the time of bufferization (that must be displayed)
 
@@ -294,7 +294,7 @@ class ThreadSafeGarbageCollector
 							robDisp.render();
 						}
 					}
-					void operator()(rtslam::sensor_ptr_t const &sen) const {
+					void operator()(rtslam::sensorext_ptr_t const &sen) const {
 						if (!boost::is_same<SensorDisplayType,SensorDisplay>::value) {
 							SensorDisplayType &senDisp = *PTR_CAST<SensorDisplayType*>(sen->displayData[MyViewer::id()]);
 							senDisp.render();
@@ -363,27 +363,31 @@ class ThreadSafeGarbageCollector
 				// bufferize robot
 				if (!boost::is_same<RobotDisplayType,RobotDisplay>::value)
 					bufferizeObject<RobotDisplayType, MapDisplayType, robot_ptr_t, map_ptr_t>(rob, map, id());
-				// bufferize sensors
+				// bufferize exteroceptive sensors
 				for(RobotAbstract::SensorList::iterator sen = rob->sensorList().begin(); sen != rob->sensorList().end(); ++sen)
-					bufferize(*sen,rob);
+					if ((*sen)->kind == SensorAbstract::EXTEROCEPTIVE) 
+					{
+						sensorext_ptr_t senPtr = SPTR_CAST<SensorExteroAbstract>(*sen);
+						bufferize(senPtr,rob);
+					}
 			}
 
-			inline void bufferize(rtslam::sensor_ptr_t sen, rtslam::robot_ptr_t rob)
+			inline void bufferize(rtslam::sensorext_ptr_t sen, rtslam::robot_ptr_t rob)
 			{
 				// bufferize sensor
 				if (!boost::is_same<SensorDisplayType,SensorDisplay>::value)
-					bufferizeObject<SensorDisplayType, RobotDisplayType, sensor_ptr_t, robot_ptr_t>(sen, rob, id());
+					bufferizeObject<SensorDisplayType, RobotDisplayType, sensorext_ptr_t, robot_ptr_t>(sen, rob, id());
 				// bufferize observations
-				for(SensorAbstract::DataManagerList::iterator dma = sen->dataManagerList().begin(); dma!=sen->dataManagerList().end();++dma)
+				for(SensorExteroAbstract::DataManagerList::iterator dma = sen->dataManagerList().begin(); dma!=sen->dataManagerList().end();++dma)
 				  for(LandmarkAbstract::ObservationList::iterator obs = (*dma)->observationList().begin(); obs != (*dma)->observationList().end(); ++obs)
 				    bufferize(*obs,sen);
 			}
 
-			inline void bufferize(rtslam::observation_ptr_t obs, rtslam::sensor_ptr_t sen)
+			inline void bufferize(rtslam::observation_ptr_t obs, rtslam::sensorext_ptr_t sen)
 			{
 				// bufferize observationbufferizeObject
 				if (!boost::is_same<ObservationDisplayType,ObservationDisplay>::value) // bufferize observation
-					bufferizeObject<ObservationDisplayType, SensorDisplayType, observation_ptr_t, sensor_ptr_t>(obs, sen, id());
+					bufferizeObject<ObservationDisplayType, SensorDisplayType, observation_ptr_t, sensorext_ptr_t>(obs, sen, id());
 			}
 
 			inline void bufferize(rtslam::landmark_ptr_t lmk, rtslam::map_ptr_t map)

@@ -88,7 +88,7 @@ namespace rtslam {
 		if (obsPtr->events.measured)
 		{
 			Cell &cell = *(getCell(obsPtr, true));
-			cell.lastTryFrame = obsPtr->sensorPtr()->rawCounter;
+			cell.lastTryFrame = SPTR_CAST<SensorExteroAbstract>(obsPtr->sensorPtr())->rawCounter;
 			cell.lastResult = obsPtr->events.updated;
 			if (cell.lastResult) cell.nSuccess++; else cell.nFailure++;
 			lastCell = &cell;

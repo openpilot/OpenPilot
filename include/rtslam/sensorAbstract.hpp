@@ -34,75 +34,54 @@ namespace jafar {
 		class ObservationAbstract;
 		class DataManagerAbstract;
 
-		//		/**
-		//		 * Base class for all parameter sets in module rtslam.
-		//		 * \ingroup rtslam
-		//		 */
-		//		class ParametersAbstract {
-		//			public:
-		//				/**
-		//				 * Mandatory virtual destructor.
-		//				 */
-		//				inline virtual ~ParametersAbstract(void) {
-		//				}
-		//
-		//		};
-
-
-		/**
-		 * Base class for all sensors defined in the module rtslam.
-		 * \ingroup rtslam
-		 */
+		typedef struct { unsigned id; double timestamp; double arrival; } RawInfo;
+		typedef struct { std::vector<RawInfo> available; RawInfo next; double process_time; } RawInfos;
+	
+		/** 
+			Base class for all types of sensors.
+			\ingroup rtslam
+		*/
 		class SensorAbstract: public MapObject,
-		    public ChildOf<RobotAbstract> ,
-		    public boost::enable_shared_from_this<SensorAbstract>,
-		    public ParentOf<DataManagerAbstract> {
-
-				friend std::ostream& operator <<(std::ostream & s,
-				    jafar::rtslam::SensorAbstract const & sen);
-
+		                      public ChildOf<RobotAbstract>,
+		                      public boost::enable_shared_from_this<SensorAbstract>
+		{
 				// define the function linkToParentRobot().
-			ENABLE_LINK_TO_PARENT(RobotAbstract,Robot,SensorAbstract)
-				;
+				ENABLE_LINK_TO_PARENT(RobotAbstract,Robot,SensorAbstract);
 				// define the functions robotPtr() and robot().
-			ENABLE_ACCESS_TO_PARENT(RobotAbstract,robot)
-				;
-				// define the type DataManagerList, and the function dataManagerList().
-			ENABLE_ACCESS_TO_CHILDREN(DataManagerAbstract,DataManager,dataManager)
-				;
-
-				hardware::hardware_sensor_ptr_t hardwareSensorPtr;
-
+				ENABLE_ACCESS_TO_PARENT(RobotAbstract,robot);
+				
 			public:
-
-				enum type_enum {
-					PINHOLE, BARRETO
-				};
-				type_enum type;
-
+				
 				/**
 				 * Selectable LOCAL or REMOTE pose constructor.
 				 * Creates a sensor with the pose indexed in a map.
-				 * \param _rob the robot
+				 * \param robPtr the robot
 				 * \param inFilter flag indicating if the sensor state is part of the filter (REMOTE).
 				 */
-				SensorAbstract(const robot_ptr_t & _robPtr,
-				    const filtered_obj_t inFilter = UNFILTERED);
-
-				/**
-				 * Selectable LOCAL or REMOTE pose constructor.
-				 * Creates a sensor with the pose indexed in a map.
-				 * \param dummy a marker for simulation. Give value ObjectAbstract::FOR_SIMULATION.
-				 * \param _rob the robot
-				 */
-				SensorAbstract(const simulation_t dummy, const robot_ptr_t & _robPtr);
-
+				SensorAbstract(const robot_ptr_t & robPtr, const filtered_obj_t inFilter = UNFILTERED);
+				
 				/**
 				 * Mandatory virtual destructor.
 				 */
 				virtual ~SensorAbstract() {
 				}
 
+//				virtual RawInfos queryAvailableRaws() = 0; ///< get information about the available raws and the estimated dates for next one
+//				virtual void process(unsigned id) = 0; ///< process the given raw and throw away the previous unprocessed ones
+
+				enum type_enum {
+					PINHOLE, BARRETO
+				} type;
+				enum kind_enum {
+					PROPRIOCEPTIVE, EXTEROCEPTIVE
+				} kind;
+				virtual std::string categoryName() const {
+					return "SENSOR";
+				}
+
+				static IdFactory sensorIds;
+				void setId() { id(sensorIds.getId()); }
+				
 				void setPose(double x, double y, double z, double rollDeg,
 				    double pitchDeg, double yawDeg);
 				void setPoseStd(double x, double y, double z, double rollDeg,
@@ -115,52 +94,15 @@ namespace jafar {
 					           posStd, oriDegStd, oriDegStd, oriDegStd);
 				}
 
-				static IdFactory sensorIds;
-				void setId(){id(sensorIds.getId());}
 
-				/**
-				 * Sensor pose in robot
-				 */
+				/// Sensor pose in robot
 				Gaussian pose;
 
-				/**
-				 * Indices of sensor's global pose in map (this is either the \a ia of the robot, \a rob.ia to make it short, or the \b ia_union() of \a rob.ia and \a sen.ia)
-				 */
+				/// Indices of sensor's global pose in map (this is either the \a ia of the robot, \a rob.ia to make it short, or the \b ia_union() of \a rob.ia and \a sen.ia)
 				ind_array ia_globalPose;
-				/**
-				 * Flag indicating if the sensor pose is being filtered
-				 */
+				/// Flag indicating if the sensor pose is being filtered
 				bool isInFilter;
-				raw_ptr_t rawPtr;
-				unsigned rawCounter;
-
-			protected:
-				/**
-				 * Sensor parameters.
-				 * Derive this class for real sensors,
-				 * and use dynamic down-cast in the associated observation classes to access the derived parameters.
-				 */
-				//				ParametersAbstract* paramsAbs;
-
-			public:
-
-				void setHardwareSensor(hardware::hardware_sensor_ptr_t hardwareSensorPtr_)
-				{
-					hardwareSensorPtr = hardwareSensorPtr_;
-				}
 				
-				/*
-				 * Acquire raw data.
-				 */
-				virtual int acquireRaw() = 0;
-
-				virtual raw_ptr_t getRaw() = 0;
-
-
-			protected:
-
-			public:
-
 				/**
 				 * Get sensor pose in global frame.
 				 * This function composes robot pose with sensor pose to obtain the global sensor pose.
@@ -182,9 +124,71 @@ namespace jafar {
 				 */
 				void globalPose(jblas::vec7 & senGlobalPose, jblas::mat & SG_rs);
 
-				virtual std::string categoryName() const {
-					return "SENSOR";
+		};
+		
+		
+		/** 
+			Base class for proprioceptive sensors (that directly observe the state of the robot)
+			(IMU, odometry, GPS, movement models ...)
+			\ingroup rtslam
+		*/
+		class SensorProprioAbstract: public SensorAbstract {
+			public:
+				SensorProprioAbstract(const robot_ptr_t & robPtr, const filtered_obj_t inFilter = UNFILTERED):
+				  SensorAbstract(robPtr, inFilter) { kind = PROPRIOCEPTIVE; }
+				hardware::hardware_estimator_ptr_t hardwareEstimatorPtr;
+		};
+		
+		/** 
+			Base class for proprioceptive sensors that can be used for filter prediction step.
+			They must be able to predict the full pose, and be faster than all other sensors used
+			as observations or easily interpolated to simulate it.
+			Usually a movement model (eg constant velocity), odometry, 6D IMU...
+			\ingroup rtslam
+		*/
+		class SensorProprioPredictorAbstract: public SensorProprioAbstract {
+			public:
+				SensorProprioPredictorAbstract(const robot_ptr_t & robPtr, const filtered_obj_t inFilter = UNFILTERED):
+					SensorProprioAbstract(robPtr, inFilter) {}
+				virtual void predict(double t1, double t2) = 0;
+		
+		};
+		
+		/** 
+			Base class for exteroceptive sensors (that need to map the environment)
+			(cameras, lasers, ...)
+			\ingroup rtslam
+		*/
+		class SensorExteroAbstract: public SensorAbstract,
+		                            public ParentOf<DataManagerAbstract>
+		{
+				// define the type DataManagerList, and the function dataManagerList().
+				ENABLE_ACCESS_TO_CHILDREN(DataManagerAbstract,DataManager,dataManager);
+			
+				hardware::hardware_sensor_ptr_t hardwareSensorPtr;
+			
+			public:
+				
+				SensorExteroAbstract(const robot_ptr_t & robPtr, const filtered_obj_t inFilter = UNFILTERED):
+					SensorAbstract(robPtr, inFilter)
+				{
+					kind = EXTEROCEPTIVE; 
+					rawCounter = 0;
 				}
+
+				raw_ptr_t rawPtr;
+				unsigned rawCounter;
+
+				void setHardwareSensor(hardware::hardware_sensor_ptr_t hardwareSensorPtr_)
+				{
+					hardwareSensorPtr = hardwareSensorPtr_;
+				}
+				
+				virtual int acquireRaw() = 0;
+				virtual raw_ptr_t getRaw() = 0;
+
+				void process(unsigned id);
+
 
 		};
 

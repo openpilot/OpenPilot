@@ -22,13 +22,8 @@ namespace jafar {
 		///////////////////////////////////////
 
 		SensorPinHole::SensorPinHole(const robot_ptr_t & _robPtr, filtered_obj_t inFilter) :
-			SensorAbstract(_robPtr, inFilter) {
+			SensorExteroAbstract(_robPtr, inFilter) {
 			type = PINHOLE ;
-		}
-
-		SensorPinHole::SensorPinHole(const simulation_t dummy, const robot_ptr_t & _robPtr) :
-				SensorAbstract(ObjectAbstract::FOR_SIMULATION, _robPtr) {
-			type = PINHOLE;
 		}
 
 

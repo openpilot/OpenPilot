@@ -51,17 +51,7 @@ namespace jafar {
 			                                                  pose.ia())
 			        : _robPtr->pose.ia()) {
 			category = SENSOR;
-			rawCounter = 0;
 			isInFilter = (inFilter == FILTERED);
-		}
-
-		SensorAbstract::SensorAbstract(const simulation_t dummy,
-		    const robot_ptr_t & _robPtr) :
-			MapObject(_robPtr->mapPtr(), 7, UNFILTERED),
-			    pose(state, Gaussian::REMOTE),
-			    ia_globalPose(ublasExtra::ia_set(0, 0)) {
-			category = SENSOR;
-			isInFilter = false;
 		}
 
 		void SensorAbstract::setPose(double x, double y, double z, double rollDeg,
@@ -141,6 +131,17 @@ namespace jafar {
 			}
 		}
 
+		void SensorExteroAbstract::process(unsigned id)
+		{
+			// foreach dataManager
+			for (DataManagerList::iterator dmaIter = dataManagerList().begin(); dmaIter != dataManagerList().end(); ++dmaIter)
+			{
+				data_manager_ptr_t dmaPtr = *dmaIter;
+				dmaPtr->processKnown(getRaw());
+				dmaPtr->mapManagerPtr()->manage();
+				dmaPtr->detectNew(getRaw());
+			} // foreach dataManager
+		}
 
 
 	}

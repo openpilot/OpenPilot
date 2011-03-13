@@ -127,7 +127,7 @@ JFR_DEBUG("robot EULER: " << uncertEuler);*/
 		traj->refresh();
 	}
 	
-	SensorGdhe::SensorGdhe(ViewerAbstract *_viewer, rtslam::SensorAbstract *_slamRob, RobotGdhe *_dispMap):
+	SensorGdhe::SensorGdhe(ViewerAbstract *_viewer, rtslam::SensorExteroAbstract *_slamRob, RobotGdhe *_dispMap):
 		SensorDisplay(_viewer, _slamRob, _dispMap), viewerGdhe(PTR_CAST<ViewerGdhe*>(_viewer)) {}
 	
 	LandmarkGdhe::LandmarkGdhe(ViewerAbstract *_viewer, rtslam::LandmarkAbstract *_slamLmk, MapGdhe *_dispMap):

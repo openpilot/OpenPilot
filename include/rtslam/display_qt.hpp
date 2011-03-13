@@ -146,7 +146,7 @@ class SensorQt : public QObject, public SensorDisplay
 		QGraphicsTextItem* sensorpose_label;
 		qdisplay::ImageView* view();
 	public:
-		SensorQt(ViewerAbstract *_viewer, rtslam::SensorAbstract *_slamSen, RobotQt *_dispRob);
+		SensorQt(ViewerAbstract *_viewer, rtslam::SensorExteroAbstract *_slamSen, RobotQt *_dispRob);
 		~SensorQt();
 		void bufferize();
 		void render();

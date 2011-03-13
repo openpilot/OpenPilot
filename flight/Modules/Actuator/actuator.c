@@ -432,7 +432,6 @@ static void actuator_update_rate(UAVObjEvent * ev)
 	}
 }
 
-#define ALARM_SEQ 0b11110110110000	// pause, short, short, short, long
 
 
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
@@ -448,27 +447,48 @@ static bool set_channel(uint8_t mixer_channel, uint16_t value) {
 	switch(settings.ChannelType[mixer_channel]) {
 		case ACTUATORSETTINGS_CHANNELTYPE_PWMALARMBUZZER: {
 			// This is for buzzers that take a PWM input
-			bool buzz = false;
+
+			static uint32_t currBuzzTune = 0;
+			static uint32_t currBuzzTuneState;
+			uint32_t bewBuzzTune;
+
+			// Decide what tune to play
+			if (AlarmsGet(SYSTEMALARMS_ALARM_BATTERY) > SYSTEMALARMS_ALARM_WARNING) {
+				bewBuzzTune = 0b11110110110000;	// pause, short, short, short, long
+			} else if (AlarmsGet(SYSTEMALARMS_ALARM_GPS) >= SYSTEMALARMS_ALARM_WARNING) {
+				bewBuzzTune = 0x80000000;			// pause, short
+			} else {
+				bewBuzzTune = 0;
+			}
+
+			// Do we need to change tune?
+			if (bewBuzzTune != currBuzzTune) {
+				currBuzzTune = bewBuzzTune;
+				currBuzzTuneState = currBuzzTune;
+			}
+
+
+			// Play tune
+			bool buzzOn = false;
 			static portTickType lastSysTime = 0;
-			static uint32_t alarm_seq_state = 0;
 			portTickType thisSysTime = xTaskGetTickCount();
 			portTickType dT = 0;
 
 			// For now, only look at the battery alarm, because functions like AlarmsHasCritical() can block for some time; to be discussed
-			if (AlarmsGet(SYSTEMALARMS_ALARM_BATTERY) > SYSTEMALARMS_ALARM_WARNING) {
+			if (currBuzzTune) {
 				if(thisSysTime > lastSysTime)
 					dT = thisSysTime - lastSysTime;
-				buzz = (alarm_seq_state&1);	// Buzz when the LS bit is 1
+				buzzOn = (currBuzzTuneState&1);	// Buzz when the LS bit is 1
 				if (dT > 80) {
 					// Go to next bit in alarm_seq_state
-					alarm_seq_state >>= 1;
-					if (alarm_seq_state == 0)
-						alarm_seq_state = ALARM_SEQ;	// All done, re-init alarm_seq_state
+					currBuzzTuneState >>= 1;
+					if (currBuzzTuneState == 0)
+						currBuzzTuneState = currBuzzTune;	// All done, re-start the tune
 					lastSysTime = thisSysTime;
 				}
 			}
 			PIOS_Servo_Set(	settings.ChannelAddr[mixer_channel],
-							buzz?settings.ChannelMax[mixer_channel]:settings.ChannelMin[mixer_channel]);
+							buzzOn?settings.ChannelMax[mixer_channel]:settings.ChannelMin[mixer_channel]);
 			return true;
 		}
 		case ACTUATORSETTINGS_CHANNELTYPE_PWM:

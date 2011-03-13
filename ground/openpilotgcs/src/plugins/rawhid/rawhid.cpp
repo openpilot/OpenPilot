@@ -299,27 +299,39 @@ RawHID::RawHID(const QString &deviceName)
 	m_writeThread(NULL),
 	m_mutex(NULL)
 {
-        int opened = 0;
+
 	m_mutex = new QMutex(QMutex::Recursive);
 
 	// detect if the USB device is unplugged
 	QObject::connect(&dev, SIGNAL(deviceUnplugged(int)), this, SLOT(onDeviceUnplugged(int)));
-        QList<USBPortInfo> devices = USBMonitor::instance()->availableDevices(USBMonitor::idVendor_OpenPilot,-1,-1,USBMonitor::Running);
+
+       int opened = dev.open(USB_MAX_DEVICES, USBMonitor::idVendor_OpenPilot, -1, USB_USAGE_PAGE, USB_USAGE);
+       for (int i =0; i< opened; i++) {
+           if (deviceName == dev.getserial(i))
+               m_deviceNo = i;
+           else
+               dev.close(i);
+       }
+
+      /*
+        // TODO: NOT WORKING FOR MULTIPLE DEVICES with the same PID!
+       QList<USBPortInfo> devices = USBMonitor::instance()->availableDevices(USBMonitor::idVendor_OpenPilot,-1,-1,USBMonitor::Running);
         foreach( USBPortInfo device, devices) {
             if (deviceName == device.serialNumber) {
                 opened = dev.open(1,device.vendorID, device.productID,USB_USAGE_PAGE,USB_USAGE);
                 break;
             }
         }
+        */
 
     //didn't find the device we are trying to open (shouldnt happen)
-    if (opened == 0)
+    if (opened < 0)
     {
         qDebug() << "Error: cannot open device " << deviceName;
         return;
     }
 
-    m_deviceNo = 0;
+    //m_deviceNo = 0;
     m_readThread = new RawHIDReadThread(this);
     m_writeThread = new RawHIDWriteThread(this);
 

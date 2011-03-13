@@ -65,3 +65,18 @@ r2983
 r2984
 r2985
 r2988
+r3037
+  -empty_dir: branches/Experimental/Guidance-by-Corvus/Modules/Guidance/guidance.c
+  -empty_dir: branches/Experimental/Guidance-by-Corvus/Modules/Guidance/inc/guidance.h
+  -empty_dir: branches/Experimental/Guidance-by-Corvus/mixed_approach/Guidance/guidance.c
+  -empty_dir: branches/Experimental/Guidance-by-Corvus/mixed_approach/Guidance/inc/guidance.h
+  -empty_dir: branches/Experimental/Guidance-by-Corvus/mixed_approach/ManualControl/inc/manualcontrol.h
+  -empty_dir: branches/Experimental/Guidance-by-Corvus/mixed_approach/ManualControl/manualcontrol.c
+  -empty_dir: branches/Experimental/Guidance-by-Corvus/mixed_approach/Stabilization/inc/stabilization.h
+  -empty_dir: branches/Experimental/Guidance-by-Corvus/mixed_approach/Stabilization/stabilization.c
+  -empty_dir: branches/Experimental/Guidance-by-Corvus/mixed_approach/guidancesettings.xml
+  -empty_dir: branches/Experimental/Guidance-by-Corvus/mixed_approach/manualcontrolcommand.xml
+  -empty_dir: branches/Experimental/Guidance-by-Corvus/mixed_approach/manualcontrolsettings.xml
+  -empty_dir: branches/Experimental/Guidance-by-Corvus/mixed_approach/stabilizationsettings.xml
+  -empty_dir: branches/Experimental/Guidance-by-Corvus/uavobjectdefinitions/guidancesettings.xml
+  -empty_dir: branches/Experimental/Guidance-by-Corvus/uavobjectdefinitions/positiondesired.xml

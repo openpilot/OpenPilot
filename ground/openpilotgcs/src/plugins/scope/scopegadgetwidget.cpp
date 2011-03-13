@@ -207,6 +207,16 @@ void ScopeGadgetWidget::addLegend()
 //	legend->setFrameStyle(QFrame::Box | QFrame::Sunken);
 //	insertLegend(legend, QwtPlot::BottomLegend);
 
+        // Update the checked/unchecked state of the legend items
+        // -> this is necessary when hiding a legend where some plots are
+        //    not visible, and the un-hiding it.
+        foreach (QwtPlotItem *item, this->itemList()) {
+            bool on = item->isVisible();
+            QWidget *w = legend->find(item);
+            if ( w && w->inherits("QwtLegendItem") )
+                ((QwtLegendItem *)w)->setChecked(!on);
+        }
+
 	connect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)), this, SLOT(showCurve(QwtPlotItem *, bool)));
 }
 

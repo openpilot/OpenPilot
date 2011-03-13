@@ -27,6 +27,9 @@
 #ifndef LOGGINGPLUGIN_H_
 #define LOGGINGPLUGIN_H_
 
+#include <coreplugin/icore.h>
+#include <coreplugin/coreconstants.h>
+#include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/iconnection.h>
 #include <extensionsystem/iplugin.h>
 #include "uavobjectmanager.h"
@@ -120,6 +123,7 @@ public:
 
     LoggingConnection* getLogConnection() { return logConnection; };
     LogFile* getLogfile() { return logConnection->getLogfile();}
+    void setLogMenuTitle(QString str);
 
 
 signals:
@@ -134,7 +138,7 @@ protected:
 
     // These are used for replay, logging in its own thread
     UAVTalk * uavTalk;
-    LoggingConnection* logConnection;
+    LoggingConnection* logConnection;    
 
 private slots:
     void toggleLogging();
@@ -145,6 +149,7 @@ private slots:
 
 private:
     LoggingGadgetFactory *mf;
+    Core::Command* cmd;
 
 };
 #endif /* LoggingPLUGIN_H_ */

@@ -40,9 +40,6 @@
 #include <QWriteLocker>
 
 #include <extensionsystem/pluginmanager.h>
-#include <coreplugin/coreconstants.h>
-#include <coreplugin/actionmanager/actionmanager.h>
-#include <coreplugin/icore.h>
 #include <QKeySequence>
 #include "uavobjectmanager.h"
 
@@ -71,6 +68,8 @@ QStringList LoggingConnection::availableDevices()
 
 QIODevice* LoggingConnection::openDevice(const QString &deviceName)
 {
+    Q_UNUSED(deviceName)
+
     if (logFile.isOpen()){
         logFile.close();
     }
@@ -329,7 +328,7 @@ bool LoggingPlugin::initialize(const QStringList& args, QString *errMsg)
     Core::ActionContainer* ac = am->actionContainer(Core::Constants::M_TOOLS);
 
     // Command to start logging
-    Core::Command* cmd = am->registerAction(new QAction(this),
+    cmd = am->registerAction(new QAction(this),
                                             "LoggingPlugin.Logging",
                                             QList<int>() <<
                                             Core::Constants::C_GLOBAL_ID);
@@ -360,22 +359,21 @@ void LoggingPlugin::toggleLogging()
 {
     if(state == IDLE)
     {
-        /*QFileDialog * fd = new QFileDialog();
-        fd->setAcceptMode(QFileDialog::AcceptSave);
-        fd->setNameFilter("OpenPilot Log (*.opl)");
-        connect(fd, SIGNAL(fileSelected(QString)), this, SLOT(startLogging(QString)));
-        fd->exec();*/
 
         QString fileName = QFileDialog::getSaveFileName(NULL, tr("Start Log"),
                                     tr("OP-%0.opl").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss")),
                                     tr("OpenPilot Log (*.opl)"));
-        if(!fileName.isEmpty())
-            startLogging(fileName);
+        if (fileName.isEmpty())
+            return;
+
+        startLogging(fileName);
+        cmd->action()->setText(tr("Stop logging"));
 
     }
     else if(state == LOGGING)
     {
         stopLogging();
+        cmd->action()->setText(tr("Start logging..."));
     }
 }
 

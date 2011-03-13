@@ -234,6 +234,7 @@ class ConfigSetup: public kernel::KeyValueFileSaveLoad
 	jblas::vec6 SENSOR_POSE_CONSTVEL; /// sensor pose in constant velocity (x,y,z,roll,pitch,yaw) (deg)
 	jblas::vec6 SENSOR_POSE_INERTIAL; /// sensor pose in inertial (x,y,z,roll,pitch,yaw) (deg)
 
+	unsigned CAMERA_TYPE;      /// camera type (0 = firewire, 1 = firewire format7, 2 = USB)
 	std::string CAMERA_DEVICE; /// camera device (firewire ID or device)
 	unsigned IMG_WIDTH;        /// image width
 	unsigned IMG_HEIGHT;       /// image height
@@ -735,8 +736,15 @@ void demo_slam01_main(world_ptr_t *world) {
 
 		
 		#ifdef HAVE_VIAM
+		viam_hwcrop_t crop;
+		switch (configSetup.CAMERA_TYPE)
+		{
+			case 0: crop = VIAM_HW_FIXED; break;
+			case 1: crop = VIAM_HW_CROP; break;
+			default: crop = VIAM_HW_FIXED; break;
+		}
 		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, rawdata_mutex, 
-			configSetup.CAMERA_DEVICE, cv::Size(img_width,img_height), 0, 8, floatOpts[fFreq], intOpts[iTrigger], 
+			configSetup.CAMERA_DEVICE, cv::Size(img_width,img_height), 0, 8, crop, floatOpts[fFreq], intOpts[iTrigger], 
 			floatOpts[fShutter], mode, strOpts[sDataPath]));
 		senPtr11->setHardwareSensor(hardSen11);
 		#else
@@ -1390,6 +1398,7 @@ void ConfigSetup::loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFi
 	KeyValueFile_getItem(SENSOR_POSE_CONSTVEL);
 	KeyValueFile_getItem(SENSOR_POSE_INERTIAL);
 	
+	KeyValueFile_getItem(CAMERA_TYPE);
 	KeyValueFile_getItem(CAMERA_DEVICE);
 	KeyValueFile_getItem(IMG_WIDTH);
 	KeyValueFile_getItem(IMG_HEIGHT);
@@ -1442,6 +1451,7 @@ void ConfigSetup::saveKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile)
 	KeyValueFile_setItem(SENSOR_POSE_CONSTVEL);
 	KeyValueFile_setItem(SENSOR_POSE_INERTIAL);
 	
+	KeyValueFile_setItem(CAMERA_TYPE);
 	KeyValueFile_setItem(CAMERA_DEVICE);
 	KeyValueFile_setItem(IMG_WIDTH);
 	KeyValueFile_setItem(IMG_HEIGHT);

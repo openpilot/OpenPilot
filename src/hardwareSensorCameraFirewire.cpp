@@ -305,10 +305,10 @@ namespace hardware {
 		init(mode, dump_path, viamSize_to_size(hwmode.size));
 	}
 
-	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(boost::condition_variable &rawdata_condition, boost::mutex &rawdata_mutex, const std::string &camera_id, cv::Size size, int format, int depth, double freq, int trigger, double shutter, int mode, std::string dump_path):
+	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(boost::condition_variable &rawdata_condition, boost::mutex &rawdata_mutex, const std::string &camera_id, cv::Size size, int format, int depth, viam_hwcrop_t crop, double freq, int trigger, double shutter, int mode, std::string dump_path):
 		HardwareSensorAbstract(rawdata_condition, rawdata_mutex), index(0)
 	{
-		viam_hwmode_t hwmode = { size_to_viamSize(size), format_to_viamFormat(format, depth), VIAM_HW_FIXED, freq_to_viamFreq(freq), trigger_to_viamTrigger(trigger) };
+		viam_hwmode_t hwmode = { size_to_viamSize(size), format_to_viamFormat(format, depth), crop, freq_to_viamFreq(freq), trigger_to_viamTrigger(trigger) };
 		realFreq = viamFreq_to_freq(hwmode.fps);
 		std::cout << "Camera set to freq " << realFreq << " Hz (external trigger " << trigger << ")" << std::endl;
 		init(camera_id, hwmode, shutter, mode, dump_path);

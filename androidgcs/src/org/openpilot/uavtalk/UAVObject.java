@@ -17,12 +17,16 @@ public abstract class UAVObject {
 		}
 
 		public void event () {
-			setChanged();
-			notifyObservers(parent);
+			synchronized(this) {
+				setChanged();
+				notifyObservers(parent);
+			}
 		}
 		public void event (Object data) {
-			setChanged();
-			notifyObservers(data);
+			synchronized(this) {
+				setChanged();
+				notifyObservers(data);
+			}
 		}
 	}
 	

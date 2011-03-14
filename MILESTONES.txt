@@ -87,6 +87,11 @@ C: Eric Price (Corvus Corax)
 D: March 2011
 V: http://www.youtube.com/watch?v=QtaefhmGbio
 
+M: Dave's First Flight.  Pathetically delayed.
+C: David Ankers
+D: March 2011
+V: (to come)
+
 M: First CopterControl flight on a Tri
 C: ?
 D: ?

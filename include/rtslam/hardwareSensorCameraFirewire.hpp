@@ -18,7 +18,6 @@
 
 #ifdef HAVE_VIAM
 #include <viam/viamlib.h>
-#include <viam/viamcv.h>
 #endif
 
 #include <boost/thread.hpp>

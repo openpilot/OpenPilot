@@ -17,6 +17,11 @@
 #endif
 
 #include "rtslam/hardwareSensorCameraFirewire.hpp"
+
+#ifdef HAVE_VIAM
+#include <viam/viamcv.h>
+#endif
+
 #include <image/Image.hpp>
 
 namespace jafar {

@@ -12,7 +12,11 @@ import java.util.TimerTask;
 
 import org.openpilot.uavtalk.UAVObject.Acked;
 
+import android.util.Log;
+
 public class Telemetry {
+	
+	private final String TAG = "Telemetry";
 	
     public class TelemetryStats {
         public int txBytes;
@@ -133,7 +137,7 @@ public class Telemetry {
     /**
      * Register a new object for periodic updates (if enabled)
      */
-    private void registerObject(UAVObject obj)
+    private synchronized void registerObject(UAVObject obj)
     {
         // Setup object for periodic updates
         addObject(obj);
@@ -145,7 +149,7 @@ public class Telemetry {
     /**
      * Add an object in the list used for periodic updates
      */
-    private void addObject(UAVObject obj)
+    private synchronized void addObject(UAVObject obj)
     {
         // Check if object type is already in the list
     	ListIterator<ObjectTimeInfo> li = objList.listIterator();
@@ -169,7 +173,7 @@ public class Telemetry {
     /**
      * Update the object's timers
      */
-    private void setUpdatePeriod(UAVObject obj, int periodMs)
+    private synchronized void setUpdatePeriod(UAVObject obj, int periodMs)
     {
         // Find object type (not instance!) and update its period
     	ListIterator<ObjectTimeInfo> li = objList.listIterator();
@@ -186,7 +190,7 @@ public class Telemetry {
     /**
      * Connect to all instances of an object depending on the event mask specified
      */
-    private void connectToObjectInstances(UAVObject obj, int eventMask)
+    private synchronized void connectToObjectInstances(UAVObject obj, int eventMask)
     {
         List<UAVObject> objs = objMngr.getObjectInstances(obj.getObjID());
         ListIterator<UAVObject> li = objs.listIterator();
@@ -235,7 +239,7 @@ public class Telemetry {
     /**
      * Update an object based on its metadata properties
      */
-    private void updateObject(UAVObject obj)
+    private synchronized void updateObject(UAVObject obj)
     {
         // Get metadata
         UAVObject.Metadata metadata = obj.getMetadata();
@@ -287,12 +291,12 @@ public class Telemetry {
     /**
      * Called when a transaction is successfully completed (uavtalk event)
      */
-    private void transactionCompleted(UAVObject obj)
+    private synchronized void transactionCompleted(UAVObject obj)
     {
         // Check if there is a pending transaction and the objects match
         if ( transPending && transInfo.obj.getObjID() == obj.getObjID() )
         {
-        //    qDebug() << QString("Telemetry: transaction completed for %1").arg(obj->getName());
+        	Log.d(TAG,"Telemetry: transaction completed for " + obj.getName());
             // Complete transaction
         	transTimer.cancel();
             transPending = false;
@@ -302,16 +306,16 @@ public class Telemetry {
             processObjectQueue();
         } else
         {
-      //      qDebug() << "Error: received a transaction completed when did not expect it.";
+        	Log.e(TAG,"Error: received a transaction completed when did not expect it.");
         }
     }
 
     /**
      * Called when a transaction is not completed within the timeout period (timer event)
      */
-    private void transactionTimeout()
+    private synchronized void transactionTimeout()
     {
-//        qDebug() << "Telemetry: transaction timeout.";
+    	Log.d(TAG,"Telemetry: transaction timeout.");
         transTimer.cancel();
         // Proceed only if there is a pending transaction
         if ( transPending )
@@ -340,11 +344,11 @@ public class Telemetry {
     /**
      * Start an object transaction with UAVTalk, all information is stored in transInfo
      */
-    private void processObjectTransaction()
+    private synchronized void processObjectTransaction()
     {
         if (transPending)
         {
-        //    qDebug() << tr("Process Object transaction for %1").arg(transInfo.obj->getName());
+        	Log.d(TAG, "Process Object transaction for " + transInfo.obj.getName());
             // Initiate transaction
             if (transInfo.objRequest)
             {
@@ -366,17 +370,17 @@ public class Telemetry {
             }
         } else
         {
-      //      qDebug() << "Error: inside of processObjectTransaction with no transPending";
+        	Log.e(TAG,"Error: inside of processObjectTransaction with no transPending");
         }
     }
 
     /**
      * Process the event received from an object
      */
-    private void processObjectUpdates(UAVObject obj, int event, boolean allInstances, boolean priority)
+    private synchronized void processObjectUpdates(UAVObject obj, int event, boolean allInstances, boolean priority)
     {
         // Push event into queue
-//        qDebug() << "Push event into queue for obj " << QString("%1 event %2").arg(obj->getName()).arg(event);
+    	Log.d(TAG, "Push event into queue for obj " + obj.getName() + " event " + event);
         ObjectQueueInfo objInfo = new ObjectQueueInfo();
         objInfo.obj = obj;
         objInfo.event = event;
@@ -391,7 +395,7 @@ public class Telemetry {
             {
                 ++txErrors;
                 obj.transactionCompleted(false);
-                //qxtLog->warning(tr("Telemetry: priority event queue is full, event lost (%1)").arg(obj->getName()));
+                Log.w(TAG,"Telemetry: priority event queue is full, event lost " + obj.getName());
             }
         }
         else
@@ -410,25 +414,26 @@ public class Telemetry {
         // If there is no transaction in progress then process event
         if (!transPending)
         {
-        //    qDebug() << "No transaction pending, process object queue...";
+
             processObjectQueue();
+
         } else
         {
-       //     qDebug() << "Transaction pending, DO NOT process object queue...";
+        	Log.d(TAG,"Transaction pending, DO NOT process object queue...");
         }
     }
 
     /**
      * Process events from the object queue
      */
-    private void processObjectQueue()
+    private synchronized void processObjectQueue()
     {
-      //  qDebug() << "Process object queue " << tr("- Depth (%1 %2)").arg(objQueue.length()).arg(objPriorityQueue.length());
+      	Log.d(TAG, "Process object queue - Depth " + objQueue.size() + " priority " + objPriorityQueue.size());
 
         // Don nothing if a transaction is already in progress (should not happen)
         if (transPending)
         {
-//            qxtLog->error("Telemetry: Dequeue while a transaction pending!");
+        	Log.e(TAG,"Dequeue while a transaction pending");
             return;
         }
 

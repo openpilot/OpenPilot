@@ -55,7 +55,7 @@ public class TelemetryMonitor {
 	/**
 	 * Initiate object retrieval, initialize queue with objects to be retrieved.
 	 */
-	public void startRetrievingObjects()
+	public synchronized void startRetrievingObjects()
 	{
 	    // Clear object queue
 	    queue.clear();
@@ -108,7 +108,7 @@ public class TelemetryMonitor {
 	/**
 	 * Retrieve the next object in the queue
 	 */
-	public void retrieveNextObject()
+	public synchronized void retrieveNextObject()
 	{
 	    // If queue is empty return
 	    if ( queue.isEmpty() )
@@ -120,7 +120,12 @@ public class TelemetryMonitor {
 	    // Get next object from the queue
 	    UAVObject obj = queue.remove(0);
 	    
-//	    Log.d(TAG, "Retrieving object: " + obj.getName()) ;
+	    if(obj == null) {
+	    	Log.e(TAG, "Got null object forom transaction queue");
+	    	return;
+	    }
+	    	    
+	    Log.d(TAG, "Retrieving object: " + obj.getName()) ;
 	    // Connect to object
 	    obj.addTransactionCompleted(new Observer() {
 			public void update(Observable observable, Object data) {
@@ -137,10 +142,12 @@ public class TelemetryMonitor {
 	/**
 	 * Called by the retrieved object when a transaction is completed.
 	 */
-	public void transactionCompleted(UAVObject obj, boolean success)
+	public synchronized void transactionCompleted(UAVObject obj, boolean success)
 	{
 	    //QMutexLocker locker(mutex);
 	    // Disconnect from sending object
+		Log.d(TAG,"transactionCompleted");
+		// TODO: Need to be able to disconnect signals
 	    //obj->disconnect(this);
 	    objPending = null;
 	    

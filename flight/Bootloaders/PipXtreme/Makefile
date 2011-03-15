@@ -68,7 +68,7 @@ BOOT_MODEL    = $(MODEL)_NB
 endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = $(TOP)/build/bootloaders/pipxtreme
+OUTDIR = $(TOP)/build/bl_pipxtreme
 
 # Target file name (without extension).
 TARGET = PipXtreme_BL

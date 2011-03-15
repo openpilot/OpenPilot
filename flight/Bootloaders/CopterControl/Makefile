@@ -68,7 +68,7 @@ BOOT_MODEL    = $(MODEL)_NB
 endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = $(TOP)/build/bootloaders/coptercontrol
+OUTDIR = $(TOP)/build/bl_coptercontrol
 
 # Target file name (without extension).
 TARGET = CopterControl_BL

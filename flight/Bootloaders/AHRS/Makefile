@@ -54,7 +54,7 @@ MODEL    = MD
 
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = $(TOP)/build/bootloaders/ahrs
+OUTDIR = $(TOP)/build/bl_ahrs
 
 # Target file name (without extension).
 TARGET = AHRS_BL

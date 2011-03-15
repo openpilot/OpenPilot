@@ -13,6 +13,8 @@
 #ifndef RTSLAM_HPP_
 #define RTSLAM_HPP_
 
+#include <sys/time.h> 
+
 #include <map>
 #include <list>
 
@@ -52,6 +54,14 @@ namespace jafar {
 			int r = rand_r(&rand_state);
 // 			JFR_DEBUG_SEND(" value " << r << " state " << rand_state); JFR_DEBUG_END();
 			return r;
+		}
+		
+		inline double getNowTimestamp()
+		{
+			struct timeval tv;
+			struct timezone tz;
+			gettimeofday(&tv, &tz);
+			return tv.tv_sec+tv.tv_usec/10e-6;
 		}
 
 		// forward declarations

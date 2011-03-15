@@ -34,6 +34,7 @@ namespace jafar {
 			public:
 
 				double timestamp;
+				double arrival;
 				
 				virtual ~RawAbstract();
 

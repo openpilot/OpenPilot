@@ -192,6 +192,7 @@ namespace hardware {
 		while(true)
 		{
 			// acquire the image
+			int buff_write = getWritePos();
 			if (mode == 2)
 			{
 				index.wait(boost::lambda::_1 != last_processed_index);
@@ -212,7 +213,7 @@ namespace hardware {
 						break;
 					}
 					std::fstream f((oss.str() + std::string(".time")).c_str(), std::ios_base::in);
-					f >> bufferPtr[buff_write]->timestamp; f.close();
+					f >> bufferSpecPtr[buff_write]->timestamp; f.close();
 					last_processed_index = index();
 					break;
 				} //else  { boost::this_thread::yield(); continue; }
@@ -220,26 +221,24 @@ namespace hardware {
 			} else
 			{
 #ifdef HAVE_VIAM
-				r = viam_oneshot(handle, bank, buffer+buff_write, &pts, 1);
-				bufferPtr[buff_write]->timestamp = ts.tv_sec + ts.tv_usec*1e-6;
+				r = viam_oneshot(handle, bank, &(bufferImage[buff_write]), &pts, 1);
+				bufferSpecPtr[buff_write]->arrival = getNowTimestamp();
+				bufferSpecPtr[buff_write]->timestamp = ts.tv_sec + ts.tv_usec*1e-6;
 #endif
 			}
-			// update the buffer infos
-			boost::unique_lock<boost::mutex> l(mutex_data);
-			std::swap(buff_write, buff_ready);
+			// update the bufferImage infos
 			image_count++;
 			// dump the images
 			if (mode == 1)
 			{
 				std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << index();
-				bufferSpecPtr[buff_ready]->img->save(oss.str() + std::string(".pgm"));
+				bufferSpecPtr[buff_write]->img->save(oss.str() + std::string(".pgm"));
 				std::fstream f; f.open((oss.str() + std::string(".time")).c_str(), std::ios_base::out); 
-				f << std::setprecision(20) << bufferPtr[buff_ready]->timestamp << std::endl; f.close();
+				f << std::setprecision(20) << bufferSpecPtr[buff_write]->timestamp << std::endl; f.close();
 			}
-			l.unlock();
-			boost::unique_lock<boost::mutex> rawdata_lock(rawdata_mutex);
-			rawdata_condition.notify_all();
-			rawdata_lock.unlock();
+			
+			incWritePos();
+			condition.setAndNotify(1);
 		}
 	}
 
@@ -249,19 +248,16 @@ namespace hardware {
 		this->dump_path = dump_path;
 
 		// configure data
-		for(int i = 0; i < 3; ++i)
+		bufferImage.resize(bufferSize);
+		bufferSpecPtr.resize(bufferSize);
+		for(int i = 0; i < bufferSize; ++i)
 		{
-			buffer[i] = cvCreateImage(imgSize, 8, 1);
-			bufferPtr[i].reset(new RawImage()); bufferSpecPtr[i] = SPTR_CAST<RawImage>(bufferPtr[i]);
-			bufferSpecPtr[i]->setJafarImage(jafarImage_ptr_t(new image::Image(buffer[i])));
+			bufferImage[i] = cvCreateImage(imgSize, 8, 1);
+			buffer(i).reset(new RawImage());
+			bufferSpecPtr[i] = SPTR_CAST<RawImage>(buffer(i));
+			bufferSpecPtr[i]->setJafarImage(jafarImage_ptr_t(new image::Image(bufferImage[i])));
 		}
 		
-		buff_in_use = 0;
-		buff_write = 1;
-		buff_ready = 2;
-		image_count = 0;
-		//index = 0;
-		no_more_data = false;
 		found_first = 0;
 		first_index = 0;
 
@@ -269,8 +265,8 @@ namespace hardware {
 		preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::preloadTask,this));
 	}
 	
-	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(boost::condition_variable &rawdata_condition, boost::mutex &rawdata_mutex, cv::Size imgSize, std::string dump_path):
-		HardwareSensorAbstract(rawdata_condition, rawdata_mutex),index(0)
+	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(kernel::VariableCondition<int> &condition, cv::Size imgSize, std::string dump_path):
+		HardwareSensorAbstract(condition, 3)
 	{
 		init(2, dump_path, imgSize);
 	}
@@ -310,8 +306,8 @@ namespace hardware {
 		init(mode, dump_path, viamSize_to_size(hwmode.size));
 	}
 
-	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(boost::condition_variable &rawdata_condition, boost::mutex &rawdata_mutex, const std::string &camera_id, cv::Size size, int format, int depth, viam_hwcrop_t crop, double freq, int trigger, double shutter, int mode, std::string dump_path):
-		HardwareSensorAbstract(rawdata_condition, rawdata_mutex), index(0)
+	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(kernel::VariableCondition<int> &condition, int bufferSize, const std::string &camera_id, cv::Size size, int format, int depth, viam_hwcrop_t crop, double freq, int trigger, double shutter, int mode, std::string dump_path):
+		HardwareSensorAbstract(condition, bufferSize)
 	{
 		viam_hwmode_t hwmode = { size_to_viamSize(size), format_to_viamFormat(format, depth), crop, freq_to_viamFreq(freq), trigger_to_viamTrigger(trigger) };
 		realFreq = viamFreq_to_freq(hwmode.fps);
@@ -329,6 +325,7 @@ namespace hardware {
 #endif
 	}
 	
+#if 0
 	
 	int HardwareSensorCameraFirewire::acquireRaw(raw_ptr_t &rawPtr)
 	{
@@ -337,14 +334,14 @@ namespace hardware {
 		if (image_count > 0)
 		{
 			std::swap(buff_in_use, buff_ready);
-			rawPtr = bufferPtr[buff_in_use];
+			rawPtr = buffer[buff_in_use];
 			image_count = 0;
 			index.applyAndNotify(boost::lambda::_1++);
 			//index++;
 		}
 		if (no_more_data && missed_count == -1) return -2; else return missed_count;
 	}
-
+#endif
 
 }}}
 

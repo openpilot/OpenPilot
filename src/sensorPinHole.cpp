@@ -31,7 +31,7 @@ namespace jafar {
 
 			if (hardwareSensorPtr)
 			{
-				int res = hardwareSensorPtr->acquireRaw(rawPtr);
+				int res = hardwareSensorPtr->getLastUnreadRaw(rawPtr);
 				if (res >= 0) rawCounter++;
 				return res;
 			} else

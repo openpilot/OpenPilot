@@ -107,6 +107,7 @@
 #include "kernel/jafarDebug.hpp"
 #include "kernel/timingTools.hpp"
 #include "kernel/dataLog.hpp"
+#include "kernel/threads.hpp"
 #include "jmath/random.hpp"
 #include "jmath/matlab.hpp"
 #include "jmath/ublasExtra.hpp"
@@ -379,10 +380,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		distortion = configSetup.DISTORTION;
 	}
 	
-	
-	boost::condition_variable rawdata_condition;
-	boost::mutex rawdata_mutex;
-	//boost::mutex rawdata_condmutex;
+	kernel::VariableCondition<int> rawdata_condition(0);
 	boost::scoped_ptr<kernel::DataLogger> dataLogger;
 	if (intOpts[iLog])
 	{
@@ -732,7 +730,7 @@ void demo_slam01_main(world_ptr_t *world) {
 		dmPt11->linkToParentMapManager(mmPoint);
 		dmPt11->setObservationFactory(obsFact);
 		
-		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator(rawdata_condition, rawdata_mutex, floatOpts[fFreq], simulator, senPtr11->id(), robPtr1->id()));
+		hardware::hardware_sensor_raw_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator(rawdata_condition, floatOpts[fFreq], simulator, senPtr11->id(), robPtr1->id()));
 		senPtr11->setHardwareSensor(hardSen11);
 	} else
    #endif
@@ -778,14 +776,14 @@ void demo_slam01_main(world_ptr_t *world) {
 			case 1: crop = VIAM_HW_CROP; break;
 			default: crop = VIAM_HW_FIXED; break;
 		}
-		hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, rawdata_mutex, 
+		hardware::hardware_sensor_raw_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, 5+50,
 			configSetup.CAMERA_DEVICE, cv::Size(img_width,img_height), 0, 8, crop, floatOpts[fFreq], intOpts[iTrigger], 
 			floatOpts[fShutter], mode, strOpts[sDataPath]));
 		senPtr11->setHardwareSensor(hardSen11);
 		#else
 		if (intOpts[iReplay] & 1)
 		{
-			hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, rawdata_mutex, cv::Size(img_width,img_height),strOpts[sDataPath]));
+			hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, cv::Size(img_width,img_height),strOpts[sDataPath]));
 			senPtr11->setHardwareSensor(hardSen11);
 		}
 		#endif
@@ -855,7 +853,7 @@ int n_innovation = 0;
 		if ((*world)->exit()) break;
 		
 #if EVENT_BASED_RAW
-		boost::unique_lock<boost::mutex> rawdata_lock(rawdata_mutex);
+		//boost::unique_lock<boost::mutex> rawdata_lock(rawdata_mutex);
 #endif
 		bool had_data = false;
 		bool no_more_data = true;
@@ -896,7 +894,7 @@ int n_innovation = 0;
 				{
 					had_data=true;
 #if EVENT_BASED_RAW
-					rawdata_lock.unlock();
+					//rawdata_lock.unlock();
 #endif
 				}
 // cout << "\n************************************************** " << std::endl;
@@ -1022,8 +1020,8 @@ JFR_DEBUG("Robot state stdev after corrections " << stdevFromCov(robPtr1->state.
 #if EVENT_BASED_RAW
 		if (!had_data)
 		{
-			rawdata_condition.wait(rawdata_lock);
-			rawdata_lock.unlock();
+			rawdata_condition.wait(boost::lambda::_1 != 0);
+			rawdata_condition.set(0);
 		}
 #endif
 		

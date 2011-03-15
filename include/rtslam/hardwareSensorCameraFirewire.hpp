@@ -36,7 +36,7 @@ namespace hardware {
 This class allows to get images from firewire with non blocking procedure,
 using triple-buffering.
 */
-class HardwareSensorCameraFirewire: public HardwareSensorAbstract
+class HardwareSensorCameraFirewire: public HardwareSensorAbstract<raw_ptr_t>
 {
 	private:
 #ifdef HAVE_VIAM
@@ -45,20 +45,13 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 #endif
 		boost::mutex mutex_data;
 		
-		int buff_in_use;
-		int buff_ready;
-		int buff_write;
-		int image_count;
-		IplImage* buffer[3];
-		raw_ptr_t bufferPtr[3];
-		rawimage_ptr_t bufferSpecPtr[3];
+		std::vector<IplImage*> bufferImage;
+		std::vector<rawimage_ptr_t> bufferSpecPtr;
 		double realFreq;
-		bool no_more_data;
 		unsigned first_index;
 		int found_first; /// 0 = not found, 1 = found pgm, 2 = found png
 		
 		int mode;
-		kernel::VariableCondition<int> index;
 		std::string dump_path;
 		
 		boost::thread *preloadTask_thread;
@@ -87,16 +80,14 @@ class HardwareSensorCameraFirewire: public HardwareSensorAbstract
 		@param mode 0 = normal, 1 = dump used images, 2 = from dumped images
 		@param dump_path the path where the images are saved/read... Use a ram disk !!!
 		*/
-		HardwareSensorCameraFirewire(boost::condition_variable &rawdata_condition, boost::mutex &rawdata_mutex, const std::string &camera_id, cv::Size size, int format, int depth, viam_hwcrop_t crop, double freq, int trigger, double shutter, int mode = 0, std::string dump_path = ".");
+		HardwareSensorCameraFirewire(kernel::VariableCondition<int> &condition, int bufferSize, const std::string &camera_id, cv::Size size, int format, int depth, viam_hwcrop_t crop, double freq, int trigger, double shutter, int mode = 0, std::string dump_path = ".");
 #endif
 		/**
 		Same as before but assumes that mode=2, and doesn't need a camera
 		*/
-		HardwareSensorCameraFirewire(boost::condition_variable &rawdata_condition, boost::mutex &rawdata_mutex, cv::Size imgSize, std::string dump_path = ".");
+		HardwareSensorCameraFirewire(kernel::VariableCondition<int> &condition, cv::Size imgSize, std::string dump_path = ".");
 		
 		~HardwareSensorCameraFirewire();
-		
-		virtual int acquireRaw(raw_ptr_t &rawPtr);
 
 		double getFreq() { return realFreq; }
 };

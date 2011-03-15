@@ -34,9 +34,6 @@ namespace jafar {
 		class ObservationAbstract;
 		class DataManagerAbstract;
 
-		typedef struct { unsigned id; double timestamp; double arrival; } RawInfo;
-		typedef struct { std::vector<RawInfo> available; RawInfo next; double process_time; } RawInfos;
-	
 		/** 
 			Base class for all types of sensors.
 			\ingroup rtslam
@@ -132,11 +129,18 @@ namespace jafar {
 			(IMU, odometry, GPS, movement models ...)
 			\ingroup rtslam
 		*/
-		class SensorProprioAbstract: public SensorAbstract {
+		class SensorProprioAbstract: public SensorAbstract
+		{
+			protected:
+				hardware::hardware_sensor_vec_ptr_t hardwareSensorPtr;
 			public:
 				SensorProprioAbstract(const robot_ptr_t & robPtr, const filtered_obj_t inFilter = UNFILTERED):
 				  SensorAbstract(robPtr, inFilter) { kind = PROPRIOCEPTIVE; }
-				hardware::hardware_estimator_ptr_t hardwareEstimatorPtr;
+
+				void setHardwareSensor(hardware::hardware_sensor_vec_ptr_t hardwareSensorPtr_)
+				{
+					hardwareSensorPtr = hardwareSensorPtr_;
+				}
 		};
 		
 		/** 
@@ -146,7 +150,8 @@ namespace jafar {
 			Usually a movement model (eg constant velocity), odometry, 6D IMU...
 			\ingroup rtslam
 		*/
-		class SensorProprioPredictorAbstract: public SensorProprioAbstract {
+		class SensorProprioPredictorAbstract: public SensorProprioAbstract
+		{
 			public:
 				SensorProprioPredictorAbstract(const robot_ptr_t & robPtr, const filtered_obj_t inFilter = UNFILTERED):
 					SensorProprioAbstract(robPtr, inFilter) {}
@@ -162,10 +167,11 @@ namespace jafar {
 		class SensorExteroAbstract: public SensorAbstract,
 		                            public ParentOf<DataManagerAbstract>
 		{
+			protected:
 				// define the type DataManagerList, and the function dataManagerList().
 				ENABLE_ACCESS_TO_CHILDREN(DataManagerAbstract,DataManager,dataManager);
 			
-				hardware::hardware_sensor_ptr_t hardwareSensorPtr;
+				hardware::hardware_sensor_raw_ptr_t hardwareSensorPtr;
 			
 			public:
 				
@@ -179,7 +185,7 @@ namespace jafar {
 				raw_ptr_t rawPtr;
 				unsigned rawCounter;
 
-				void setHardwareSensor(hardware::hardware_sensor_ptr_t hardwareSensorPtr_)
+				void setHardwareSensor(hardware::hardware_sensor_raw_ptr_t hardwareSensorPtr_)
 				{
 					hardwareSensorPtr = hardwareSensorPtr_;
 				}

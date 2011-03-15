@@ -1,6 +1,9 @@
 #ifndef _MEAN_SHIFT_CLUSTERING_
 #define _MEAN_SHIFT_CLUSTERING_
 
+#include "jafarConfig.h"
+#ifdef HAVE_FLANN
+
 #include "jmath/jann.hpp"
 #include "jmath/jblas.hpp"
 #include <set>
@@ -237,4 +240,5 @@ namespace jafar {
 		};
 	}
 }
+#endif // HAVE_FLANN
 #endif

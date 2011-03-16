@@ -102,6 +102,18 @@ public abstract class UAVObject {
 		}
 	}
 
+	private CallbackListener updateRequestedListeners = new CallbackListener(this);
+	public void addUpdateRequestedObserver(Observer o) {
+		synchronized(updateRequestedListeners) {
+			updateRequestedListeners.addObserver(o);
+		}
+	}
+	void updateRequested() {
+		synchronized(updateRequestedListeners) {
+			updateRequestedListeners.event();
+		}
+	}
+
 	public abstract boolean isMetadata();
 	
 	/**

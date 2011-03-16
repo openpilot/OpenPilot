@@ -57,6 +57,8 @@ public class TelemetryMonitor {
 	 */
 	public synchronized void startRetrievingObjects()
 	{
+		Log.d(TAG, "Start retrieving objects");
+		
 	    // Clear object queue
 	    queue.clear();
 	    // Get all objects, add metaobjects, settings and data objects with OnChange update mode to the queue
@@ -101,7 +103,7 @@ public class TelemetryMonitor {
 	 */
 	public void stopRetrievingObjects()
 	{
-	    //qxtLog->debug("Object retrieval has been cancelled");
+		Log.d(TAG, "Stop retrieving objects");
 	    queue.clear();
 	}
 
@@ -113,6 +115,7 @@ public class TelemetryMonitor {
 	    // If queue is empty return
 	    if ( queue.isEmpty() )
 	    {
+	    	Log.d(TAG, "All objects retrieved: Connected Successfully");
 	        //qxtLog->debug("Object retrieval completed");
 	        //emit connected();
 	        return;
@@ -121,8 +124,7 @@ public class TelemetryMonitor {
 	    UAVObject obj = queue.remove(0);
 	    
 	    if(obj == null) {
-	    	Log.e(TAG, "Got null object forom transaction queue");
-	    	return;
+	    	throw new Error("Got null object forom transaction queue");
 	    }
 	    	    
 	    Log.d(TAG, "Retrieving object: " + obj.getName()) ;
@@ -130,6 +132,7 @@ public class TelemetryMonitor {
 	    obj.addTransactionCompleted(new Observer() {
 			public void update(Observable observable, Object data) {
 				UAVObject.TransactionResult result = (UAVObject.TransactionResult) data;
+				Log.d(TAG,"Got transaction completed event from " + result.obj.getName() + " status: " + result.success);
 				transactionCompleted(result.obj, result.success);
 			}	    	
 	    });
@@ -146,10 +149,15 @@ public class TelemetryMonitor {
 	{
 	    //QMutexLocker locker(mutex);
 	    // Disconnect from sending object
-		Log.d(TAG,"transactionCompleted");
+		Log.d(TAG,"transactionCompleted.  Status: " + success);
 		// TODO: Need to be able to disconnect signals
 	    //obj->disconnect(this);
 	    objPending = null;
+	    
+	    if(!success) {
+	    	Log.e(TAG, "Transaction failed: " + obj.getName() + " sending again.");
+	    	return;
+	    }
 	    
 	    // Process next object if telemetry is still available
 	    if ( ((String) gcsStatsObj.getField("Status").getValue()).compareTo("Connected") == 0 )
@@ -184,6 +192,7 @@ public class TelemetryMonitor {
 	public synchronized void processStatsUpdates()
 	{
 	    // Get telemetry stats
+		Log.d(TAG, "processStatsUpdates()");
 	    Telemetry.TelemetryStats telStats = tel.getStats();
 	    tel.resetStats();
 
@@ -221,9 +230,9 @@ public class TelemetryMonitor {
 	    	return;
 	    }
 	    UAVObjectField statusField = gcsStatsObj.getField("Status");
-	    String oldStatus = (String) statusField.getValue();
+	    String oldStatus = new String((String) statusField.getValue());
 	    
-	    System.out.println("GCS: " + statusField.getValue() + " Flight: " + flightStatsObj.getField("Status").getValue());
+	    Log.d(TAG,"GCS: " + statusField.getValue() + " Flight: " + flightStatsObj.getField("Status").getValue());
 
 	    if ( oldStatus.compareTo("Disconnected") == 0 )
 	    {
@@ -236,7 +245,7 @@ public class TelemetryMonitor {
 	        if ( ((String) flightStatsObj.getField("Status").getValue()).compareTo("HandshakeAck") == 0 )
 	        {
 	        	statusField.setValue("Connected");
-	        	System.out.println("Connected" + statusField.toString());
+	        	Log.d(TAG,"Connected" + statusField.toString());
 	        }
 	    }
 	    else if ( oldStatus.compareTo("Connected") == 0 )
@@ -251,31 +260,31 @@ public class TelemetryMonitor {
 	    // Force telemetry update if not yet connected
 	    boolean gcsStatusChanged = !oldStatus.equals(statusField.getValue());
 	    
-	    if(gcsStatusChanged)
-	    	System.out.println("GCS Status changed");
+	    if(gcsStatusChanged) {
+	    	Log.d(TAG,"GCS Status changed");
+	    	Log.d(TAG,"GCS: " + statusField.getValue() + " Flight: " + flightStatsObj.getField("Status").getValue());
+	    }
 	    boolean gcsConnected = ((String) statusField.getValue()).compareTo("Connected") == 0;
 	    boolean gcsDisconnected = ((String) statusField.getValue()).compareTo("Disconnected") == 0;
+	    boolean flightConnected = ((String) flightStatsObj.getField("Status").getValue()).compareTo("Connected") == 0;
 	    
-	    if (  gcsStatusChanged ||
-	    		((String) flightStatsObj.getField("Status").getValue()).compareTo("Disconnected") != 0 )
+	    if (  !gcsConnected || !flightConnected )
 	    {
-	    	System.out.println("Sending gcs status\n\n\n");
+	    	Log.d(TAG,"Sending gcs status");
 	        gcsStatsObj.updated();
 	    }
 
 	    // Act on new connections or disconnections
 	    if (gcsConnected && gcsStatusChanged)
 	    {
+	        Log.d(TAG,"Connection with the autopilot established");
 	    	setPeriod(STATS_UPDATE_PERIOD_MS);
-	    	System.out.println(TAG + " Connection with the autopilot established");
-	        //Log.d(TAG,"Connection with the autopilot established");
 	        startRetrievingObjects();
 	    }
 	    if (gcsDisconnected && gcsStatusChanged)
 	    {
+	        Log.d(TAG,"Trying to connect to the autopilot");
 	    	setPeriod(STATS_CONNECT_PERIOD_MS);
-	        System.out.println(TAG + " Connection with the autopilot lost");
-	        //Log.d(TAG,"Trying to connect to the autopilot");
 	        //emit disconnected();
 	    }
 	}

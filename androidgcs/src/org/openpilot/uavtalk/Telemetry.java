@@ -17,7 +17,10 @@ import android.util.Log;
 public class Telemetry {
 	
 	private final String TAG = "Telemetry";
-	
+	public static int LOGLEVEL = 0;
+	public static boolean WARN = LOGLEVEL > 1;
+	public static boolean DEBUG = LOGLEVEL > 0;
+
     public class TelemetryStats {
         public int txBytes;
         public int rxBytes;
@@ -227,7 +230,7 @@ public class Telemetry {
             }
             if ( (eventMask&EV_UPDATE_REQ) != 0)
             {
-            	obj.addUpdatedObserver(new Observer() {
+            	obj.addUpdateRequestedObserver(new Observer() {
 					public void update(Observable observable, Object data) {
 						updateRequested( (UAVObject) data);
 	            	}            		
@@ -293,10 +296,11 @@ public class Telemetry {
      */
     private synchronized void transactionCompleted(UAVObject obj)
     {
+    	if (DEBUG) Log.d(TAG,"UAVTalk transactionCompleted");
         // Check if there is a pending transaction and the objects match
         if ( transPending && transInfo.obj.getObjID() == obj.getObjID() )
         {
-        	Log.d(TAG,"Telemetry: transaction completed for " + obj.getName());
+        	if (DEBUG) Log.d(TAG,"Telemetry: transaction completed for " + obj.getName());
             // Complete transaction
         	transTimer.cancel();
             transPending = false;
@@ -315,7 +319,7 @@ public class Telemetry {
      */
     private synchronized void transactionTimeout()
     {
-    	Log.d(TAG,"Telemetry: transaction timeout.");
+    	if (DEBUG) Log.d(TAG,"Telemetry: transaction timeout.");
         transTimer.cancel();
         // Proceed only if there is a pending transaction
         if ( transPending )
@@ -348,7 +352,7 @@ public class Telemetry {
     {
         if (transPending)
         {
-        	Log.d(TAG, "Process Object transaction for " + transInfo.obj.getName());
+        	if (DEBUG) Log.d(TAG, "Process Object transaction for " + transInfo.obj.getName());
             // Initiate transaction
             if (transInfo.objRequest)
             {
@@ -380,7 +384,9 @@ public class Telemetry {
     private synchronized void processObjectUpdates(UAVObject obj, int event, boolean allInstances, boolean priority)
     {
         // Push event into queue
-    	Log.d(TAG, "Push event into queue for obj " + obj.getName() + " event " + event);
+    	if (DEBUG) Log.d(TAG, "Push event into queue for obj " + obj.getName() + " event " + event);
+    	if(event == 8 && obj.getName().compareTo("GCSTelemetryStats") == 0)
+    		Thread.dumpStack();
         ObjectQueueInfo objInfo = new ObjectQueueInfo();
         objInfo.obj = obj;
         objInfo.event = event;
@@ -414,12 +420,7 @@ public class Telemetry {
         // If there is no transaction in progress then process event
         if (!transPending)
         {
-
             processObjectQueue();
-
-        } else
-        {
-        	Log.d(TAG,"Transaction pending, DO NOT process object queue...");
         }
     }
 
@@ -428,7 +429,7 @@ public class Telemetry {
      */
     private synchronized void processObjectQueue()
     {
-      	Log.d(TAG, "Process object queue - Depth " + objQueue.size() + " priority " + objPriorityQueue.size());
+      	if (DEBUG) Log.d(TAG, "Process object queue - Depth " + objQueue.size() + " priority " + objPriorityQueue.size());
 
         // Don nothing if a transaction is already in progress (should not happen)
         if (transPending)
@@ -460,6 +461,9 @@ public class Telemetry {
             objQueue.clear();
             if ( objInfo.obj.getObjID() != objMngr.getObject("GCSTelemetryStats").getObjID() )
             {
+            	if (DEBUG) Log.d(TAG,"transactionCompleted(false) due to receiving object not GCSTelemetryStats while not connected.");
+            	System.out.println(gcsStatsObj.toString());
+            	System.out.println(objInfo.obj.toString());
                 objInfo.obj.transactionCompleted(false);
                 return;
             }
@@ -511,6 +515,8 @@ public class Telemetry {
      */
     private synchronized void processPeriodicUpdates()
     {
+    	
+    	if (DEBUG) Log.d(TAG, "processPeriodicUpdates()");
         // Stop timer
     	updateTimer.cancel();
 

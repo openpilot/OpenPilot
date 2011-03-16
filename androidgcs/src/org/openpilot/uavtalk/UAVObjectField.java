@@ -358,7 +358,7 @@ public class UAVObjectField {
     			//throw new Exception("Sorry I haven't implemented strings yet");
     		}
     		}
-    		obj.updated();
+    		//obj.updated();
     	}
     }
     

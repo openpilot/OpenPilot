@@ -178,6 +178,7 @@ SUBDIRS += plugin_uavobjectutil
 # Magic Waypoint gadget
 plugin_magicwaypoint.subdir = magicwaypoint
 plugin_magicwaypoint.depends = plugin_coreplugin
+plugin_magicwaypoint.depends = plugin_uavobjects
 SUBDIRS += plugin_magicwaypoint
 
 # UAV Settings Import/Export plugin

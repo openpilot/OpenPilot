@@ -10,7 +10,7 @@
 #define OBSERVATIONPINHOLEEUCLIDEANPOINT_HPP_
 
 #include "rtslam/observationAbstract.hpp"
-#include "rtslam/sensorPinHole.hpp"
+#include "rtslam/sensorPinhole.hpp"
 #include "rtslam/landmarkEuclideanPoint.hpp"
 #include "boost/shared_ptr.hpp"
 
@@ -23,7 +23,7 @@ namespace jafar {
 		class ObservationModelPinHoleEuclideanPoint: public ObservationModelAbstract
 		{
 			public:
-				typedef SensorPinHole sensor_spec_t;
+				typedef SensorPinhole sensor_spec_t;
 				typedef boost::shared_ptr<sensor_spec_t> sensor_spec_ptr_t;
 				typedef boost::weak_ptr<sensor_spec_t> sensor_spec_wptr_t;
 			protected:
@@ -45,7 +45,7 @@ namespace jafar {
 				}
 				virtual void linkToSensorSpecific( sensor_ptr_t ptr )
 				{
-					boost::shared_ptr<SensorPinHole> sptr = SPTR_CAST<SensorPinHole>( ptr );
+					boost::shared_ptr<SensorPinhole> sptr = SPTR_CAST<SensorPinhole>( ptr );
 					if( sptr==NULL )
 					{
 						std::cerr << __FILE__ << ":" << __LINE__ << " : cast unfair." << std::endl;

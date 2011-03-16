@@ -26,10 +26,9 @@
 
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/robotConstantVelocity.hpp"
-#include "rtslam/sensorPinHole.hpp"
+#include "rtslam/sensorPinhole.hpp"
 #include "rtslam/rawImageSimu.hpp"
 #include "rtslam/featurePointSimu.hpp"
-#include "rtslam/sensorPinHole.hpp"
 #include "rtslam/AppearanceImageSimu.hpp"
 #include "rtslam/landmarkEuclideanPoint.hpp"
 #include "rtslam/DesscriptorImagePointSimu.hpp"

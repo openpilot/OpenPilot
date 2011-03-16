@@ -27,7 +27,7 @@
 #include "rtslam/objectAbstract.hpp"
 #include "rtslam/robotAbstract.hpp"
 //#include "rtslam/robotConstantVelocity.hpp"
-#include "rtslam/sensorPinHole.hpp"
+#include "rtslam/sensorPinhole.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
 //#include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
 #include "rtslam/kalmanFilter.hpp"

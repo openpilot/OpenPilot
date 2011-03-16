@@ -1,5 +1,5 @@
 /**
- * \file sensorPinHole.hpp
+ * \file sensorPinhole.hpp
  *
  * Header file for pin-hole sensor.
  *
@@ -23,8 +23,8 @@
 namespace jafar {
 	namespace rtslam {
 
-		class SensorPinHole;
-		typedef boost::shared_ptr<SensorPinHole> pinhole_ptr_t;
+		class SensorPinhole;
+		typedef boost::shared_ptr<SensorPinhole> pinhole_ptr_t;
 
 
 		/**
@@ -32,7 +32,7 @@ namespace jafar {
 		 * This model accepts radial distortion model
 		 * \ingroup rtslam
 		 */
-		class SensorPinHole: public SensorExteroAbstract {
+		class SensorPinhole: public SensorExteroAbstract {
 
 			public:
 
@@ -41,7 +41,7 @@ namespace jafar {
 				 * \param _robPtr the robot to install to.
 				 * \param inFilter flag indicating in the sensor pose is filtered or not.
 				 */
-				SensorPinHole(const robot_ptr_t & _robPtr, filtered_obj_t inFilter = UNFILTERED);
+				SensorPinhole(const robot_ptr_t & _robPtr, filtered_obj_t inFilter = UNFILTERED);
 
 				/**
 				 * Selectable LOCAL or REMOTE pose constructor.
@@ -49,9 +49,9 @@ namespace jafar {
 				 * \param dummy a marker for simulation. Give value ObjectAbstract::FOR_SIMULATION.
 				 * \param _robPtr the robot
 				 */
-				SensorPinHole(const simulation_t dummy, const robot_ptr_t & _robPtr);
+				SensorPinhole(const simulation_t dummy, const robot_ptr_t & _robPtr);
 
-				~SensorPinHole(){}
+				~SensorPinhole(){}
 
 				SensorImageParameters params;
 

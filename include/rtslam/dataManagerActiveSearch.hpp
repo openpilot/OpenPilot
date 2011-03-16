@@ -91,7 +91,7 @@ namespace jafar {
 
 
 #include "rtslam/rawImage.hpp"
-#include "rtslam/sensorPinHole.hpp"
+#include "rtslam/sensorPinhole.hpp"
 
 namespace jafar {
   namespace rtslam {

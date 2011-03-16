@@ -35,7 +35,7 @@
 //#include "rtslam/robotOdometry.hpp"
 #include "rtslam/robotCenteredConstantVelocity.hpp"
 //#include "rtslam/robotInertial.hpp"
-#include "rtslam/sensorPinHole.hpp"
+#include "rtslam/sensorPinhole.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
 //#include "rtslam/landmarkEuclideanPoint.hpp"
 #include "rtslam/observationFactory.hpp"

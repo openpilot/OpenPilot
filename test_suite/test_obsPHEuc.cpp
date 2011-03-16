@@ -21,7 +21,7 @@
 #include "rtslam/objectAbstract.hpp"
 #include "rtslam/robotAbstract.hpp"
 #include "rtslam/robotConstantVelocity.hpp"
-#include "rtslam/sensorPinHole.hpp"
+#include "rtslam/sensorPinhole.hpp"
 #include "rtslam/landmarkEuclideanPoint.hpp"
 #include "rtslam/observationPinHoleEuclideanPoint.hpp"
 #include "rtslam/kalmanFilter.hpp"
@@ -55,7 +55,7 @@ void test_obsPHEuc01() {
 	robPtr->state.clear();
 	robPtr->pose.x(robFrame);
 
-	pinhole_ptr_t senPtr(new SensorPinHole(robPtr, MapObject::FILTERED));
+	pinhole_ptr_t senPtr(new SensorPinhole(robPtr, MapObject::FILTERED));
 	senPtr->linkToParentRobot(robPtr);
 	senPtr->state.clear();
 	senPtr->pose.x(robFrame);

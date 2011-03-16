@@ -24,7 +24,7 @@
 
 #include "rtslam/pinholeTools.hpp"
 #include "rtslam/robotConstantVelocity.hpp"
-#include "rtslam/sensorPinHole.hpp"
+#include "rtslam/sensorPinhole.hpp"
 
 using namespace std;
 using namespace jblas;
@@ -40,7 +40,7 @@ void test_senPH01(void) {
 	robconstvel_ptr_t robPtr(new RobotConstantVelocity(mapPtr));
 	robPtr->linkToParentMap(mapPtr);
 	std::cout<<"#"<<__LINE__<<std::endl;
-	pinhole_ptr_t senPtr(new SensorPinHole(robPtr, MapObject::FILTERED));
+	pinhole_ptr_t senPtr(new SensorPinhole(robPtr, MapObject::FILTERED));
 	senPtr->linkToParentRobot(robPtr);
   std::cout<<"#"<<__LINE__<<std::endl;
 

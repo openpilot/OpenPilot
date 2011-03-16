@@ -29,7 +29,7 @@
 //#include "rtslam/robotAbstract.hpp"
 #include "rtslam/robotConstantVelocity.hpp"
 //#include "rtslam/sensorAbstract.hpp"
-#include "rtslam/sensorPinHole.hpp"
+#include "rtslam/sensorPinhole.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
 #include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
 #include "rtslam/kalmanFilter.hpp"
@@ -68,7 +68,7 @@ robot_ptr_t newRobot(map_ptr_t & mapPtr, string name) {
 sensor_ptr_t newSensor(robot_ptr_t & robPtr, string name, MapObject::filtered_obj_t inFilter = MapObject::UNFILTERED) {
 	map_ptr_t mapPtr = robPtr->mapPtr();
 
-	pinhole_ptr_t senPtr(new SensorPinHole(robPtr, inFilter));
+	pinhole_ptr_t senPtr(new SensorPinhole(robPtr, inFilter));
 
 	size_t sid = senPtr->sensorIds.getId();
 	senPtr->id(sid);
@@ -89,7 +89,7 @@ map_ptr_t initSlam(size_t size_map) {
 
 	// Map object sizes;
 	std::size_t size_robCV = RobotConstantVelocity::size();
-	std::size_t size_senPH = SensorPinHole::size();
+	std::size_t size_senPH = SensorPinhole::size();
 
 
 	// Add 1 robots, 2 sensors

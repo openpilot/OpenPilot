@@ -6,7 +6,7 @@
  */
 
 #include "rtslam/pinholeTools.hpp"
-#include "rtslam/sensorPinHole.hpp"
+#include "rtslam/sensorPinhole.hpp"
 #include "rtslam/rawImage.hpp"
 
 #include "image/Image.hpp"
@@ -21,13 +21,13 @@ namespace jafar {
 		// Class sensor pin hole
 		///////////////////////////////////////
 
-		SensorPinHole::SensorPinHole(const robot_ptr_t & _robPtr, filtered_obj_t inFilter) :
+		SensorPinhole::SensorPinhole(const robot_ptr_t & _robPtr, filtered_obj_t inFilter) :
 			SensorExteroAbstract(_robPtr, inFilter) {
 			type = PINHOLE ;
 		}
 
 
-		int SensorPinHole::acquireRaw(){
+		int SensorPinhole::acquireRaw(){
 
 			if (hardwareSensorPtr)
 			{
@@ -49,7 +49,7 @@ namespace jafar {
 			}
 		}
 
-		raw_ptr_t SensorPinHole::getRaw() {
+		raw_ptr_t SensorPinhole::getRaw() {
 //			image_ptr_t ip = rawPtr;
 			return rawPtr;
 		}

@@ -20,7 +20,7 @@
 
 
 #include "rtslam/rawImage.hpp"
-#include "rtslam/sensorPinHole.hpp"
+#include "rtslam/sensorPinhole.hpp"
 #include "rtslam/descriptorImagePoint.hpp"
 
 // TODO simu

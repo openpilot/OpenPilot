@@ -23,7 +23,7 @@
 #include "jmath/random.hpp"
 #include "rtslam/mapAbstract.hpp"
 #include "rtslam/robotOdometry.hpp"
-#include "rtslam/sensorPinHole.hpp"
+#include "rtslam/sensorPinhole.hpp"
 #include "rtslam/landmarkEuclideanPoint.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
 #include "rtslam/observationPinHoleAnchoredHomogeneous.hpp"
@@ -83,7 +83,7 @@ void test_obsap01(void) {
 	robodo_ptr_t robPtr(new RobotOdometry(mapPtr));
 	robPtr->id(robPtr->robotIds.getId());
 	robPtr->linkToParentMap(mapPtr);
-	pinhole_ptr_t pinholePtr(new SensorPinHole(robPtr,MapObject::UNFILTERED));
+	pinhole_ptr_t pinholePtr(new SensorPinhole(robPtr,MapObject::UNFILTERED));
 	pinholePtr->id(pinholePtr->sensorIds.getId());
 	pinholePtr->linkToParentRobot(robPtr);
 	pinholePtr->params.setImgSize(imsz(0), imsz(1));

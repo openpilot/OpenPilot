@@ -11,7 +11,7 @@
 
 #include "rtslam/observationPinHoleEuclideanPoint.hpp"
 #include "rtslam/landmarkEuclideanPoint.hpp"
-#include "rtslam/sensorPinHole.hpp"
+#include "rtslam/sensorPinhole.hpp"
 #include "rtslam/robotAbstract.hpp"
 
 #include "kernel/IdFactory.hpp"

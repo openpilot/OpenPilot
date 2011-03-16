@@ -9,7 +9,7 @@
 #include "rtslam/dataManagerActiveSearch.hpp"
 #include "rtslam/observationAbstract.hpp"
 #include "rtslam/rawImage.hpp"
-#include "rtslam/sensorPinHole.hpp"
+#include "rtslam/sensorPinhole.hpp"
 #include "rtslam/descriptorImagePoint.hpp"
 
 #include "rtslam/imageTools.hpp"

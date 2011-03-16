@@ -175,6 +175,10 @@ namespace correl {
 			// current roi
 			cv::Rect im2_in_im2(0,0,im2_.width(),im2_.height());
 			image::ConvexRoi roi1_in_im2 = roi_in_im2 * im2_in_im2;
+			xres = roi1_in_im2.x() + roi1_in_im2.w()/2.;
+			yres = roi1_in_im2.y() + roi1_in_im2.h()/2.;
+			xstd = ystd = 0.;
+			if (roi1_in_im2.w() == 0 || roi1_in_im2.h() == 0) return 0.;
 			// global result tab
 			cv::Rect patch_in_im1(0, 0, im1.width(),im1.height());
 			cv::Rect hpatch_in_im1(0, 0, patch_in_im1.width/2, patch_in_im1.height/2);
@@ -310,8 +314,6 @@ namespace correl {
 
 			if (bestx == -1 || besty == -1) // the score was nowhere higher than the min score
 			{
-				xres = rect1_in_im2.x + rect1_in_im2.width/2;
-				yres = rect1_in_im2.y + rect1_in_im2.height/2;
 				if (results_ == NULL) delete results;
 				return 0.;
 			}

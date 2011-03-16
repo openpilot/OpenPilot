@@ -14,6 +14,7 @@
 
 #include "kernel/threads.hpp"
 
+#include "jmath/indirectArray.hpp"
 
 #include "rtslam/rawAbstract.hpp"
 
@@ -54,7 +55,6 @@ class HardwareSensorAbstract
 	public:
 		typedef ublas::vector<T> VecT;
 		typedef ublas::vector_indirect<VecT> VecIndT;
-//		typedef ublas::vector_indirect<jblas::vec> VecIndT;
 	
 	private:
 		int write_pos; /// next position where to write, oldest available reading
@@ -105,8 +105,46 @@ class HardwareSensorAbstract
 };
 
 
-typedef boost::shared_ptr<hardware::HardwareSensorAbstract<raw_ptr_t> > hardware_sensor_raw_ptr_t;
-typedef boost::shared_ptr<hardware::HardwareSensorAbstract<jblas::vec> > hardware_sensor_vec_ptr_t;
+class HardwareSensorProprioAbstract: public HardwareSensorAbstract<jblas::vec>
+{
+	public:
+	/*
+		TODO return some automatic information about what is provided
+		
+	enum locpart {
+		x=1,y=2,z=4,pos=7, 
+		qw=8,qx=16,qy=32,qz=64,q=120,
+		vx=128,vy=256,vz=512,vel=903,
+		vyaw=1024,vpitch=2048,vroll=4096,vela=7288
+	};
+	locpart bor(locpart a, locpart b) { return (locpart)((unsigned)a | (unsigned)b); }
+	locpart bor(locpart a, locpart b, locpart c) { return (locpart)((unsigned)bor(a,b) | (unsigned)c); }
+	locpart bor(locpart a, locpart b, locpart c, locpart d) { return (locpart)((unsigned)bor(a,b,c) | (unsigned)d); }
+	locpart bor(locpart a, locpart b, locpart c, locpart d, locpart e) { return (locpart)((unsigned)bor(a,b,c,d) | (unsigned)e); }
+	locpart bor(locpart a, locpart b, locpart c, locpart d, locpart e, locpart f) { return (locpart)((unsigned)bor(a,b,c,d,e) | (unsigned)f); }
+	
+	virtual ind_array get(locpart x);
+	*/
+	
+		HardwareSensorProprioAbstract(kernel::VariableCondition<int> &condition, unsigned bufferSize):
+			HardwareSensorAbstract(condition, bufferSize) {}
+		virtual int dataSize() = 0; /// number of measure variables provided (without timestamp and variance)
+		virtual int varianceSize() = 0; /// number of variance variables provided
+	
+	
+};
+
+class HardwareSensorExteroAbstract: public HardwareSensorAbstract<raw_ptr_t>
+{
+	public:
+		HardwareSensorExteroAbstract(kernel::VariableCondition<int> &condition, unsigned bufferSize):
+			HardwareSensorAbstract(condition, bufferSize) {}
+	
+	
+};
+
+typedef boost::shared_ptr<hardware::HardwareSensorExteroAbstract> hardware_sensorext_ptr_t;
+typedef boost::shared_ptr<hardware::HardwareSensorProprioAbstract> hardware_sensorprop_ptr_t;
 
 #endif
 

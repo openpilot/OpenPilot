@@ -64,7 +64,7 @@ namespace jafar {
 				}
 
 //				virtual RawInfos queryAvailableRaws() = 0; ///< get information about the available raws and the estimated dates for next one
-//				virtual void process(unsigned id) = 0; ///< process the given raw and throw away the previous unprocessed ones
+				virtual void process(unsigned id) = 0; ///< process the given raw and throw away the previous unprocessed ones
 
 				enum type_enum {
 					PINHOLE, BARRETO
@@ -132,15 +132,13 @@ namespace jafar {
 		class SensorProprioAbstract: public SensorAbstract
 		{
 			protected:
-				hardware::hardware_sensor_vec_ptr_t hardwareSensorPtr;
+				hardware::hardware_sensorprop_ptr_t hardwareSensorPtr;
 			public:
 				SensorProprioAbstract(const robot_ptr_t & robPtr, const filtered_obj_t inFilter = UNFILTERED):
 				  SensorAbstract(robPtr, inFilter) { kind = PROPRIOCEPTIVE; }
 
-				void setHardwareSensor(hardware::hardware_sensor_vec_ptr_t hardwareSensorPtr_)
-				{
-					hardwareSensorPtr = hardwareSensorPtr_;
-				}
+				void setHardwareSensor(hardware::hardware_sensorprop_ptr_t hardwareSensorPtr_)
+					{ hardwareSensorPtr = hardwareSensorPtr_; }
 		};
 		
 		/** 
@@ -155,7 +153,7 @@ namespace jafar {
 			public:
 				SensorProprioPredictorAbstract(const robot_ptr_t & robPtr, const filtered_obj_t inFilter = UNFILTERED):
 					SensorProprioAbstract(robPtr, inFilter) {}
-				virtual void predict(double t1, double t2) = 0;
+				virtual void predict(double t) = 0;
 		
 		};
 		
@@ -171,7 +169,7 @@ namespace jafar {
 				// define the type DataManagerList, and the function dataManagerList().
 				ENABLE_ACCESS_TO_CHILDREN(DataManagerAbstract,DataManager,dataManager);
 			
-				hardware::hardware_sensor_raw_ptr_t hardwareSensorPtr;
+				hardware::hardware_sensorext_ptr_t hardwareSensorPtr;
 			
 			public:
 				
@@ -185,10 +183,8 @@ namespace jafar {
 				raw_ptr_t rawPtr;
 				unsigned rawCounter;
 
-				void setHardwareSensor(hardware::hardware_sensor_raw_ptr_t hardwareSensorPtr_)
-				{
-					hardwareSensorPtr = hardwareSensorPtr_;
-				}
+				void setHardwareSensor(hardware::hardware_sensorext_ptr_t hardwareSensorPtr_)
+					{ hardwareSensorPtr = hardwareSensorPtr_; }
 				
 				virtual int acquireRaw() = 0;
 				virtual raw_ptr_t getRaw() = 0;

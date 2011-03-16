@@ -266,7 +266,7 @@ namespace hardware {
 	}
 	
 	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(kernel::VariableCondition<int> &condition, cv::Size imgSize, std::string dump_path):
-		HardwareSensorAbstract(condition, 3)
+		HardwareSensorExteroAbstract(condition, 3)
 	{
 		init(2, dump_path, imgSize);
 	}
@@ -307,7 +307,7 @@ namespace hardware {
 	}
 
 	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(kernel::VariableCondition<int> &condition, int bufferSize, const std::string &camera_id, cv::Size size, int format, int depth, viam_hwcrop_t crop, double freq, int trigger, double shutter, int mode, std::string dump_path):
-		HardwareSensorAbstract(condition, bufferSize)
+		HardwareSensorExteroAbstract(condition, bufferSize)
 	{
 		viam_hwmode_t hwmode = { size_to_viamSize(size), format_to_viamFormat(format, depth), crop, freq_to_viamFreq(freq), trigger_to_viamTrigger(trigger) };
 		realFreq = viamFreq_to_freq(hwmode.fps);

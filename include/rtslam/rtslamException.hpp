@@ -27,7 +27,8 @@ namespace jafar {
 					UNKNOWN_MATCHING_METHOD,
 					UNKNOWN_TYPES_FOR_FACTORY,
 					BUFFER_OVERFLOW,
-					SIMU_ERROR
+					SIMU_ERROR,
+					ERROR
 				//        MY_ERROR /**< my error */
 				};
 

@@ -36,7 +36,7 @@ namespace hardware {
 This class allows to get images from firewire with non blocking procedure,
 using triple-buffering.
 */
-class HardwareSensorCameraFirewire: public HardwareSensorAbstract<raw_ptr_t>
+class HardwareSensorCameraFirewire: public HardwareSensorExteroAbstract
 {
 	private:
 #ifdef HAVE_VIAM

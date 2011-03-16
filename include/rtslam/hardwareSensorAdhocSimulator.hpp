@@ -18,7 +18,7 @@ namespace jafar {
 namespace rtslam {
 namespace hardware {
 
-	class HardwareSensorAdhocSimulator: public HardwareSensorAbstract<raw_ptr_t>
+	class HardwareSensorAdhocSimulator: public HardwareSensorExteroAbstract
 	{
 		private:
 			double dt;
@@ -27,7 +27,7 @@ namespace hardware {
 			size_t robId, senId;
 		public:
 			HardwareSensorAdhocSimulator(kernel::VariableCondition<int> &condition, double freq, boost::shared_ptr<simu::AdhocSimulator> simulator, size_t robId, size_t senId):
-				HardwareSensorAbstract(condition, 3),
+				HardwareSensorExteroAbstract(condition, 3),
 				dt(1./freq), n(0), simulator(simulator), robId(robId), senId(senId) {}
 			int getLastUnreadRaw(raw_ptr_t& raw)
 			{

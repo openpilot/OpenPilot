@@ -286,10 +286,13 @@ namespace jafar {
 								obsPtr->events.measured = true;
 
 								// 1c. predict search area and appearance
-								RoiSpec roi(obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);
-								obsPtr->searchSize = roi.count();
-								if (obsPtr->searchSize > matcher->params.maxSearchSize) roi.scale(sqrt(matcher->params.maxSearchSize/(double)obsPtr->searchSize));
-
+                        RoiSpec roi;
+                        if(obsPtr->expectation.P().size1() == 2) // basically DsegMatcher handles it's own roi and (due to the size4 expectation) the following roi computation fails. - TODO clean up all this, is should not mess with One point ransac
+                        {
+                           (obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);
+                           obsPtr->searchSize = roi.count();
+                           if (obsPtr->searchSize > matcher->params.maxSearchSize) roi.scale(sqrt(matcher->params.maxSearchSize/(double)obsPtr->searchSize));
+                        }
 								// 1d. match predicted feature in search area
 								//						kernel::Chrono match_chrono;
 								matcher->match(rawData, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
@@ -625,10 +628,14 @@ namespace jafar {
 			#endif
 			
 			if (obsPtr->predictAppearance())
-			{
-				RoiSpec roi(obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);
-				obsPtr->searchSize = roi.count();
-				if (obsPtr->searchSize > matcher->params.maxSearchSize) roi.scale(sqrt(matcher->params.maxSearchSize/(double)obsPtr->searchSize));
+         {
+            RoiSpec roi;
+            if(obsPtr->expectation.P().size1() == 2) // basically DsegMatcher handles it's own roi and having a size4 expectation the following roi computation fails, hence the test  - TODO clean up all this, is should not mess with One point ransac
+            {
+               roi = RoiSpec(obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);
+               obsPtr->searchSize = roi.count();
+               if (obsPtr->searchSize > matcher->params.maxSearchSize) roi.scale(sqrt(matcher->params.maxSearchSize/(double)obsPtr->searchSize));
+            }
 				matcher->match(rawData, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
 // JFR_DEBUG("obs " << obsPtr->id() << " expected at " << obsPtr->expectation.x() << " measured with innovation " << obsPtr->measurement.x()-obsPtr->expectation.x());
 

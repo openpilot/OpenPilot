@@ -11,6 +11,7 @@
 
 #include "boost/shared_ptr.hpp"
 #include "rtslam/landmarkAbstract.hpp"
+#include "rtslam/ahpTools.hpp"
 
 /**
  * General namespace for Jafar environment.
@@ -61,15 +62,40 @@ namespace jafar {
 
         virtual size_t mySize() {return size();}
 
-        virtual size_t reparamSize() {return size();}
+        virtual size_t reparamSize() {/*return size();*/ vec6 v; return v.size();} // TODO clean up
 
         virtual vec reparametrize_func(const vec & lmk) const {
-          return lmk;
+          vec6 ret;
+          vec7 lmk1;
+          vec7 lmk2;
+          subrange(lmk1,0,3) = subrange(lmk,0,3);
+          subrange(lmk1,3,7) = subrange(lmk,3,7);
+          subrange(lmk2,0,3) = subrange(lmk,0,3);
+          subrange(lmk2,3,7) = subrange(lmk,7,11);
+          subrange(ret,0,3) = lmkAHP::ahp2euc(lmk1);
+          subrange(ret,3,6) = lmkAHP::ahp2euc(lmk2);
+          return ret;
         }
 
         void reparametrize_func(const vec & lmk, vec & lnew, mat & LNEW_lmk) const {
-          lnew = lmk;
-          LNEW_lmk = identity_mat(size());
+          vec7 lmk1;
+          vec7 lmk2;
+          vec3 euc1;
+          vec3 euc2;
+          mat EUC1_lmk1(3,7);
+          mat EUC2_lmk2(3,7);
+          LNEW_lmk.clear();
+          subrange(lmk1,0,3) = subrange(lmk,0,3);
+          subrange(lmk1,3,7) = subrange(lmk,3,7);
+          subrange(lmk2,0,3) = subrange(lmk,0,3);
+          subrange(lmk2,3,7) = subrange(lmk,7,11);
+          lmkAHP::ahp2euc(lmk1,euc1,EUC1_lmk1);
+          lmkAHP::ahp2euc(lmk2,euc2,EUC2_lmk2);
+          subrange(lnew,0,3) = euc1;
+          subrange(lnew,3,6) = euc2;
+          subrange(LNEW_lmk,0,3,0,7)  = EUC1_lmk1;
+          subrange(LNEW_lmk,3,6,0,3)  = subrange(EUC2_lmk2,0,3,0,3);
+          subrange(LNEW_lmk,3,6,7,11) = subrange(EUC2_lmk2,0,3,3,7);
         }
 
         virtual bool needToDie(DecisionMethod dieMet = ANY);

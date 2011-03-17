@@ -43,7 +43,7 @@ namespace jafar{
             featPtr->measurement.x(3) = set.segmentAt(bestId)->y2();
             featPtr->measurement.matchScore = 1; // No idea of what this thingy does, 1 sounds fine
 
-            featPtr->appearancePtr.reset(new AppearanceSegment());
+            featPtr->appearancePtr.reset(new AppearanceSegment(set.segmentAt(bestId)));
 
             ret = true;
          }

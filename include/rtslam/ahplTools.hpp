@@ -180,15 +180,18 @@ namespace jafar {
          }
 
 
-//         /**
-//          * Reparametrize to Euclidean.
-//          * \param ahp the anchored homogeneous point to be reparametrized.
-//          * \return the Euclidean point.
-//          */
-//         template<class VA>
-//         vec3 ahp2euc(const VA & ahp) {
-//            return subrange(ahp, 0, 3) + subrange(ahp, 3, 6) / ahp(6);
-//         }
+         /**
+          * Reparametrize to Euclidean.
+          * \param ahp the anchored homogeneous point to be reparametrized.
+          * \return the Euclidean points.
+          */
+         template<class VA>
+         vec6 ahpl2euc(const VA & ahpl) {
+            vec6 ret;
+            subrange(ret,0,3) = subrange(ahpl, 0, 3) + subrange(ahpl, 3, 6) / ahpl(6);
+            subrange(ret,3,6) = subrange(ahpl, 0, 3) + subrange(ahpl, 7, 10) / ahpl(10);
+            return ret;
+         }
 
 
 //         /**

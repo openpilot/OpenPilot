@@ -145,9 +145,11 @@ namespace jafar {
 
             virtual void desc_image(image::oimstream& os) const;
 
+            virtual void computeInnovation();
+      //      virtual void computeInnovationMean(vec &inn, const vec &meas, const vec &exp) const;
+
          public:
             double pixelNoise;
-
       };
 
    }

@@ -10,6 +10,7 @@
 #include "rtslam/display_gdhe.hpp"
 #include "rtslam/quatTools.hpp"
 #include "rtslam/ahpTools.hpp"
+#include "rtslam/landmarkAnchoredHomogeneousPointsLine.hpp"
 
 #include "jmath/angle.hpp"
 
@@ -297,7 +298,111 @@ JFR_DEBUG("robot EULER: " << uncertEuler);*/
 				break;
          }
          case LandmarkAbstract::LINE_AHPL: // DO SOMETHING
+         {
+            // Build display objects if it is the first time they are displayed
+            if (items_.size() != 5)
+            {
+               // clear
+               items_.clear();
+
+               // ellipsoids
+               gdhe::Ellipsoid *ell = new gdhe::Ellipsoid(12);
+               ell->setLabel("");
+               items_.push_back(ell);
+               viewerGdhe->client.addObject(ell, false);
+               ell = new gdhe::Ellipsoid(12);
+               ell->setLabel("");
+               items_.push_back(ell);
+               viewerGdhe->client.addObject(ell, false);
+               // segments
+               gdhe::Polyline *seg = new gdhe::Polyline();
+               items_.push_back(seg);
+               viewerGdhe->client.addObject(seg, false);
+               seg = new gdhe::Polyline();
+               items_.push_back(seg);
+               viewerGdhe->client.addObject(seg, false);
+               seg = new gdhe::Polyline();
+               items_.push_back(seg);
+               viewerGdhe->client.addObject(seg, false);
+            }
+            // Refresh the display objects every time
+            {
+               colorRGB c; c.set(255,255,255);
+
+               // ellipsoids
+               ItemList::iterator it = items_.begin();
+               jblas::vec xNew;  jblas::sym_mat pNew;
+               jblas::vec xNew1; jblas::sym_mat pNew1;
+               jblas::vec xNew2; jblas::sym_mat pNew2;
+               slamLmk_->reparametrize(LandmarkEuclideanPoint::size()*2, xNew, pNew);
+               //slamLmk_->reparametrize(LandmarkAnchoredHomogeneousPointsLine::reparamSize(), xNew, pNew);
+               xNew1 = subrange(xNew,0,3);
+               xNew2 = subrange(xNew,3,6);
+               pNew1 = subrange(pNew,0,3,0,3);
+               pNew2 = subrange(pNew,3,6,3,6);
+
+               gdhe::Ellipsoid *ell = PTR_CAST<gdhe::Ellipsoid*>(*it);
+               ell->setCompressed(xNew1, pNew1, viewerGdhe->ellipsesScale);
+               c = getColorRGB(ColorManager::getColorObject_prediction(phase_,events_)) ;
+               (*it)->setColor(c.R,c.G,c.B); //
+               (*it)->setLabelColor(c.R,c.G,c.B);
+               (*it)->setLabel(jmath::toStr(id_));
+               (*it)->refresh();
+               ++it;
+               ell = PTR_CAST<gdhe::Ellipsoid*>(*it);
+               ell->setCompressed(xNew2, pNew2, viewerGdhe->ellipsesScale);
+               c = getColorRGB(ColorManager::getColorObject_prediction(phase_,events_)) ;
+               (*it)->setColor(c.R,c.G,c.B); //
+               (*it)->setLabelColor(c.R,c.G,c.B);
+               (*it)->setLabel(jmath::toStr(id_));
+               (*it)->refresh();
+
+               // segments
+               ++it;
+               gdhe::Polyline *seg = PTR_CAST<gdhe::Polyline*>(*it);
+               seg->clear();
+               double id_std = sqrt(cov_(6,6))*viewerGdhe->ellipsesScale;
+               jblas::vec7 _state1 = subrange(state_,0,7);
+               jblas::vec3 position = lmkAHP::ahp2euc(_state1);
+               jblas::vec7 state = _state1;
+               state(6) = _state1(6) - id_std; if (state(6) < 1e-4) state(6) = 1e-4;
+               jblas::vec3 positionExt = lmkAHP::ahp2euc(state);
+               seg->addPoint(positionExt(0)-position(0), positionExt(1)-position(1), positionExt(2)-position(2));
+               state(6) = _state1(6) + id_std;
+               positionExt = lmkAHP::ahp2euc(state);
+               seg->addPoint(positionExt(0)-position(0), positionExt(1)-position(1), positionExt(2)-position(2));
+               (*it)->setColor(c.R,c.G,c.B);
+               (*it)->setPose(position(0), position(1), position(2), 0, 0, 0);
+               (*it)->refresh();
+               ++it;
+               seg = PTR_CAST<gdhe::Polyline*>(*it);
+               seg->clear();
+               id_std = sqrt(cov_(6,6))*viewerGdhe->ellipsesScale;
+               jblas::vec7 _state2 = subrange(state_,0,7);
+               subrange(_state2,3,7) = subrange(state_,7,11);
+               position = lmkAHP::ahp2euc(_state2);
+               state = _state2;
+               state(6) = _state2(6) - id_std; if (state(6) < 1e-4) state(6) = 1e-4;
+               positionExt = lmkAHP::ahp2euc(state);
+               seg->addPoint(positionExt(0)-position(0), positionExt(1)-position(1), positionExt(2)-position(2));
+               state(6) = _state2(6) + id_std;
+               positionExt = lmkAHP::ahp2euc(state);
+               seg->addPoint(positionExt(0)-position(0), positionExt(1)-position(1), positionExt(2)-position(2));
+               (*it)->setColor(c.R,c.G,c.B);
+               (*it)->setPose(position(0), position(1), position(2), 0, 0, 0);
+               (*it)->refresh();
+               // Linking segment
+               ++it;
+               seg = PTR_CAST<gdhe::Polyline*>(*it);
+               seg->clear();
+               seg->addPoint(xNew1(0), xNew1(1), xNew1(2));
+               seg->addPoint(xNew2(0), xNew2(1), xNew2(2));
+               (*it)->setColor(c.R,c.G,c.B);
+               (*it)->setPose(0,0,0,0,0,0);
+               (*it)->refresh();
+            }
             break;
+         }
 			default:
 				JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << type_);
 		}

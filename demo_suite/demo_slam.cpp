@@ -128,6 +128,7 @@
 #include "rtslam/featureAbstract.hpp"
 #include "rtslam/rawImage.hpp"
 #include "rtslam/descriptorImagePoint.hpp"
+#include "rtslam/descriptorSeg.hpp"
 #include "rtslam/dataManagerOnePointRansac.hpp"
 
 #include "rtslam/hardwareSensorCameraFirewire.hpp"
@@ -168,8 +169,8 @@ typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, S
 	AppearanceImagePoint, SensorAbstract::PINHOLE, LandmarkAbstract::PNT_AH> PinholeAhpObservationMaker;
 typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, SensorPinHole, LandmarkAnchoredHomogeneousPoint,
 	simu::AppearanceSimu, SensorAbstract::PINHOLE, LandmarkAbstract::PNT_AH> PinholeAhpSimuObservationMaker;
-typedef ImageSegmentObservationMaker<ObservationPinHoleAnchoredHomogeneousPointsLine, SensorPinHole, LandmarkAnchoredHomogeneousPointsLine,
-   AppearanceImageSegment, SensorAbstract::PINHOLE, LandmarkAbstract::LINE_AHPL> PinholeAhplObservationMaker;
+typedef SegmentObservationMaker<ObservationPinHoleAnchoredHomogeneousPointsLine, SensorPinHole, LandmarkAnchoredHomogeneousPointsLine,
+   AppearanceSegment, SensorAbstract::PINHOLE, LandmarkAbstract::LINE_AHPL> PinholeAhplObservationMaker;
 
 typedef DataManagerOnePointRansac<RawImage, SensorPinHole, FeatureImagePoint, image::ConvexRoi, ActiveSearchGrid, ImagePointHarrisDetector, ImagePointZnccMatcher> DataManager_ImagePoint_Ransac;
 typedef DataManagerOnePointRansac<simu::RawSimu, SensorPinHole, simu::FeatureSimu, image::ConvexRoi, ActiveSearchGrid, simu::DetectorSimu<image::ConvexRoi>, simu::MatcherSimu<image::ConvexRoi> > DataManager_ImagePoint_Ransac_Simu;
@@ -743,13 +744,16 @@ void demo_slam01_main(world_ptr_t *world) {
    #endif
    {
       #if SEGMENT_BASED
+/*
          if (configEstimation.MULTIVIEW_DESCRIPTOR)
             descFactory.reset(new DescriptorImageSegMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImagePointMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
          else
             descFactory.reset(new DescriptorImageSegFirstViewFactory(configEstimation.DESC_SIZE));
+*/
+            descFactory.reset(new DescriptorSegFirstViewFactory(configEstimation.DESC_SIZE));
 
          boost::shared_ptr<HDsegDetector> hdsegDetector(new HDsegDetector(3,configEstimation.PIX_NOISE,descFactory));
-         boost::shared_ptr<DsegMatcher> dsegMatcher(new DsegMatcher(0.1,0.1));
+         boost::shared_ptr<DsegMatcher> dsegMatcher(new DsegMatcher(configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE));
          boost::shared_ptr<DataManager_ImageSeg_Test> dmSeg(new DataManager_ImageSeg_Test(hdsegDetector, dsegMatcher, assGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
 
          dmSeg->linkToParentSensorSpec(senPtr11);

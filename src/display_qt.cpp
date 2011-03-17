@@ -363,7 +363,7 @@ std::cout << "connecting slots" << std::endl;
 #endif
 
 				}
-				break;
+            break;
          }
          case LandmarkDisplay::ltSeg:
          {
@@ -442,7 +442,6 @@ std::cout << "connecting slots" << std::endl;
             // Refresh the display objects every time
             {
                colorRGB c; c.set(255,255,255);
-
 /*
                lmk_state lmkstate = lmk_state_init;
                if (landmarkPhase_==LandmarkDisplay::init)      lmkstate = lmk_state_init ;
@@ -452,7 +451,6 @@ std::cout << "connecting slots" << std::endl;
                if (events_.matched)   lmkstateadvanced = lmk_events_matched ;
                if (updated_)   lmkstateadvanced = lmk_events_updated ;
 */
-
                // prediction points
                ItemList::iterator it = items_.begin();
                LineList::iterator lit = lines_.begin();
@@ -568,7 +566,6 @@ std::cout << "connecting slots" << std::endl;
 
                }
 #endif
-
             }
             break;
          }

@@ -209,16 +209,30 @@ namespace jafar {
       {
          if (events.predictedApp)
          {
-            app_img_seg_ptr_t predApp = SPTR_CAST<AppearanceImageSegment>(predictedAppearance);
-            os << predApp->patch << image::hsep;
+//            app_img_seg_ptr_t predApp = SPTR_CAST<AppearanceSegment>(predictedAppearance);
+//            os << predApp->patch << image::hsep;
+               os << image::hsep;
          }
 
          if (events.measured)
          {
-            app_img_seg_ptr_t obsApp = SPTR_CAST<AppearanceImageSegment>(observedAppearance);
-            os << obsApp->patch << image::endl;
+  //          app_img_seg_ptr_t obsApp = SPTR_CAST<AppearanceSegment>(observedAppearance);
+  //          os << obsApp->patch << image::endl;
+               os << image::endl;
          }
       }
+
+      void ObservationPinHoleAnchoredHomogeneousPointsLine::computeInnovation()
+      {
+         ObservationAbstract::computeInnovation();
+         JFR_DEBUG("measure \n " << measurement.x() << "\n" << measurement.P());
+         JFR_DEBUG("prediction \n " << expectation.x() << "\n" << expectation.P());
+         JFR_DEBUG("innovation\n " << innovation.x() << "\n" << innovation.P());
+      }
+
+//      void ObservationPinHoleAnchoredHomogeneousPointsLine::computeInnovationMean(vec &inn, const vec &meas, const vec &exp) const
+//		{
+//		}
 
    }
 }

@@ -1,5 +1,5 @@
 /*
- * descriptorImageSeg.cpp
+ * descriptorSeg.cpp
  *
  *  Created on: 24 feb. 2011
  *      Author: bhautboi@laas.fr
@@ -8,134 +8,122 @@
 #include "jmath/ublasExtra.hpp"
 #include "jmath/angle.hpp"
 
-#include "rtslam/descriptorImageSeg.hpp"
+#include "rtslam/descriptorSeg.hpp"
 #include "rtslam/rawImage.hpp"
 #include "rtslam/quatTools.hpp"
+
+#include "dseg/SegmentHypothesis.hpp"
 
 namespace jafar {
    namespace rtslam {
       using namespace ublasExtra;
       using namespace quaternion;
 
-      std::ostream& operator <<(std::ostream & s, ImgSegFeatureView const & fv)
+      std::ostream& operator <<(std::ostream & s, SegFeatureView const & fv)
       {
-         app_img_seg_ptr_t app = SPTR_CAST<AppearanceImageSegment>(fv.appearancePtr);
-         jblas::vec P(2); P(0) = sqrt(app->offset.P()(0,0)); P(1) = sqrt(app->offset.P()(1,1));
+         app_seg_ptr_t app = SPTR_CAST<AppearanceSegment>(fv.appearancePtr);
          s << "  -" << (fv.used ? " [*] " : " ") << "at frame " << fv.frame <<
             " by sensor " << fv.obsModelPtr->sensorPtr()->id() << " of " <<
             fv.obsModelPtr->sensorPtr()->typeName() << " at " << fv.senPose <<
-            ", with offset " << app->offset.x() << " +- " << P;
+            ", with hypothesis " << app->hypothesis();
          return s;
       }
-
-      image::oimstream& operator <<(image::oimstream & s, ImgSegFeatureView const & fv)
+      image::oimstream& operator <<(image::oimstream & s, SegFeatureView const & fv)
       {
-         app_img_seg_ptr_t app = SPTR_CAST<AppearanceImageSegment>(fv.appearancePtr);
-         s << app->patch;
+         app_seg_ptr_t app = SPTR_CAST<AppearanceSegment>(fv.appearancePtr);
+         //s << app->hypothesis();
          return s;
       }
 
       /***************************************************************************
-       * ImgSegFeatureView
+       * SegFeatureView
        **************************************************************************/
 
-      void ImgSegFeatureView::initFromObs(const observation_ptr_t & obsPtr, int descSize)
+      void SegFeatureView::initFromObs(const observation_ptr_t & obsPtr, int descSize)
       {
-         app_img_seg_ptr_t app(new AppearanceImageSegment(descSize, descSize, CV_8U));
-         rawimage_ptr_t rawPtr = SPTR_CAST<RawImage>(obsPtr->sensorPtr()->rawPtr);
-         if (rawPtr->img->extractPatch(app->patch, (int)obsPtr->measurement.x()(0), (int)obsPtr->measurement.x()(1), descSize, descSize))
-         {
-            app_img_seg_ptr_t obsApp = SPTR_CAST<AppearanceImageSegment>(obsPtr->observedAppearance);
-            app->offset = obsApp->offset;
-            appearancePtr = app;
-
-            senPose = obsPtr->sensorPtr()->globalPose();
-            obsModelPtr = obsPtr->model;
-            measurement = obsPtr->measurement.x();
-            frame = obsPtr->sensorPtr()->rawCounter;
-            used = false;
-         }
+         obs_ph_ahpl_ptr_t obsSpecPtr = SPTR_CAST<ObservationPinHoleAnchoredHomogeneousPointsLine>(obsPtr);
+         appearancePtr = obsSpecPtr->observedAppearance;
+         senPose = obsPtr->sensorPtr()->globalPose();
+         obsModelPtr = obsPtr->model;
+         measurement = obsPtr->measurement.x();
+         frame = obsPtr->sensorPtr()->rawCounter;
+         used = false;
       }
 
-
       /***************************************************************************
-       * DescriptorImageSegFirstView
+       * DescriptorSegFirstView
        **************************************************************************/
 
-      DescriptorImageSegFirstView::DescriptorImageSegFirstView(int descSize):
+      DescriptorSegFirstView::DescriptorSegFirstView(int descSize):
          DescriptorAbstract(),
          descSize(descSize)
       {
       }
 
-      DescriptorImageSegFirstView::~DescriptorImageSegFirstView() {
+      DescriptorSegFirstView::~DescriptorSegFirstView() {
       }
 
-      void DescriptorImageSegFirstView::addObservation(const observation_ptr_t & obsPtr)
+      void DescriptorSegFirstView::addObservation(const observation_ptr_t & obsPtr)
       {
          if (obsPtr->events.updated && !view.appearancePtr)
             view.initFromObs(obsPtr, descSize);
       }
 
 
-      bool DescriptorImageSegFirstView::predictAppearance(const observation_ptr_t & obsPtrNew) {
-/*
-         double zoom, rotation;
+      bool DescriptorSegFirstView::predictAppearance(const observation_ptr_t & obsPtrNew) {
          landmark_ptr_t lmkPtr = obsPtrNew->landmarkPtr();
-         //vec seg = lmkPtr->reparametrized(); // Dummy, we reparametrize the first point of the segment for the zoomRotation
-         vec3 seg;
-         seg[0] = 0;
-         seg[1] = 0;
-         seg[2] = 0;
-         quaternion::getZoomRotation(view.senPose, obsPtrNew->sensorPtr()->globalPose(), seg, zoom, rotation);
+         vec6 pnts = lmkPtr->reparametrized();
+         vec3 pnt1 = subrange(pnts, 0, 3);
+         vec3 pnt2 = subrange(pnts, 3, 6);
          // normally we must cast to the derived type
-         app_img_seg_ptr_t app_dst = SPTR_CAST<AppearanceImageSegment>(obsPtrNew->predictedAppearance);
-         app_img_seg_ptr_t app_src = SPTR_CAST<AppearanceImageSegment>(view.appearancePtr);
-         // rotate and zoom the patch, and cut it to the appropriate size
-         app_src->patch.rotateScale(jmath::radToDeg(rotation), zoom, app_dst->patch);
+         app_seg_ptr_t app_dst = SPTR_CAST<AppearanceSegment>(obsPtrNew->predictedAppearance);
+//         app_seg_ptr_t app_src = SPTR_CAST<AppearanceSegment>(view.appearancePtr);
+         // project the expected position of the segment in the image
+         pinhole_ptr_t pinHolePtr = SPTR_CAST<SensorPinHole>(obsPtrNew->sensorPtr());
+         vec3 v1 = quaternion::eucToFrame(view.senPose, pnt1);
+         vec2 exp1 = pinhole::projectPoint(pinHolePtr->params.intrinsic, pinHolePtr->params.distortion, v1);
+         vec3 v2 = quaternion::eucToFrame(view.senPose, pnt2);
+         vec2 exp2 = pinhole::projectPoint(pinHolePtr->params.intrinsic, pinHolePtr->params.distortion, v2);
+         double x_o = (exp1(0) + exp2(0))/2;
+         double y_o = (exp1(1) + exp2(1))/2;
+         double angle = atan2(exp2(1)-exp1(1),exp2(0)-exp1(0)) + M_PI_2;
+         // Build the hypothesis
+         dseg::SegmentHypothesis* hypothesis = new dseg::SegmentHypothesis(x_o, y_o, angle);
+         hypothesis->setExtremity1(exp1(0),exp1(1));
+         hypothesis->setExtremity2(exp2(0),exp2(1));
 
-         double alpha = zoom * cos(rotation);
-         double beta  = zoom * sin(rotation);
-         app_dst->offset.x()(0) = alpha*app_src->offset.x()(0) +  beta*app_src->offset.x()(1);
-         app_dst->offset.x()(1) = -beta*app_src->offset.x()(0) + alpha*app_src->offset.x()(1);
-         // this is an approximation for angle, but it's ok
-         app_dst->offset.P()(0,0) = alpha*app_src->offset.P()(0,0) +  beta*app_src->offset.P()(1,1);
-         app_dst->offset.P()(1,1) = -beta*app_src->offset.P()(0,0) + alpha*app_src->offset.P()(1,1);
-*/
-/*char buffer[256];
-sprintf(buffer, "descriptor_patch_%03d.png", obsPtrNew->id());
-app_src->patch.save(buffer);
-JFR_DEBUG("predict with desc " << this << " and view " << &view << " and app " << view.appearancePtr.get() << " and patch " << &(app_src->patch));
-sprintf(buffer, "predicted_patch_%03d.png", obsPtrNew->id());
-app_dst->patch.save(buffer);
-*/
-//         return true;
-            return false;
+         double sigma_u = 1; // TODO : set meaningfull values
+         double sigma_x0 = 5;
+         double sigma_v = 1;
+         double sigma_y0 = 5;
+         hypothesis->setUncertainty(sigma_u, sigma_x0, sigma_v, sigma_y0);
+         app_dst->setHypothesis(hypothesis);
+         return true;
       }
 
-      void DescriptorImageSegFirstView::desc_text(std::ostream& os) const
+      void DescriptorSegFirstView::desc_text(std::ostream& os) const
       {
          os << " of " << typeName() << "; " << view << std::endl;
       }
 
-      void DescriptorImageSegFirstView::desc_image(image::oimstream& os) const
+      void DescriptorSegFirstView::desc_image(image::oimstream& os) const
       {
          os << view << image::endl;
       }
 
       /***************************************************************************
-       * DescriptorImageSegMultiView
+       * DescriptorSegMultiView
        **************************************************************************/
+/*
 
-
-      DescriptorImageSegMultiView::DescriptorImageSegMultiView(int descSize, double scaleStep, double angleStep, PredictionType predictionType):
+      DescriptorSegMultiView::DescriptorSegMultiView(int descSize, double scaleStep, double angleStep, PredictionType predictionType):
          DescriptorAbstract(),
          lastObsFailed(false), descSize(descSize), scaleStep(scaleStep), angleStep(angleStep),
          predictionType(predictionType), cosAngleStep(cos(angleStep))
       {
       }
 
-      void DescriptorImageSegMultiView::addObservation(const observation_ptr_t & obsPtr)
+      void DescriptorSegMultiView::addObservation(const observation_ptr_t & obsPtr)
       {
          if (obsPtr->events.updated)
          {
@@ -148,17 +136,17 @@ app_dst->patch.save(buffer);
          }
       }
 
-      bool DescriptorImageSegMultiView::predictAppearance(const observation_ptr_t & obsPtr)
+      bool DescriptorSegMultiView::predictAppearance(const observation_ptr_t & obsPtr)
       {
-         ImgSegFeatureView* view_src;
+         SegFeatureView* view_src;
          getClosestView(obsPtr, view_src);
          if (!view_src) return false;
 
          landmark_ptr_t lmkPtr = obsPtr->landmarkPtr();
          jblas::vec lmk = lmkPtr->reparametrized();
 
-         app_img_seg_ptr_t app_dst = SPTR_CAST<AppearanceImageSegment>(obsPtr->predictedAppearance);
-         app_img_seg_ptr_t app_src = SPTR_CAST<AppearanceImageSegment>(view_src->appearancePtr);
+         app_seg_ptr_t app_dst = SPTR_CAST<AppearanceSegment>(obsPtr->predictedAppearance);
+         app_seg_ptr_t app_src = SPTR_CAST<AppearanceSegment>(view_src->appearancePtr);
 
          switch (predictionType)
          {
@@ -230,13 +218,13 @@ app_dst->patch.save(buffer);
          return true;
       }
 
-      bool DescriptorImageSegMultiView::isPredictionValid(const observation_ptr_t & obsPtr)
+      bool DescriptorSegMultiView::isPredictionValid(const observation_ptr_t & obsPtr)
       {
-         ImgSegFeatureView* tmp;
+         SegFeatureView* tmp;
          return getClosestView(obsPtr, tmp);
       }
 
-      void DescriptorImageSegMultiView::checkView(jblas::vec const &current_pov, double const &current_pov_norm2, jblas::vec const &lmk, ImgSegFeatureView &view, double &cosClosestAngle, ImgSegFeatureView* &closestView) const
+      void DescriptorSegMultiView::checkView(jblas::vec const &current_pov, double const &current_pov_norm2, jblas::vec const &lmk, SegFeatureView &view, double &cosClosestAngle, SegFeatureView* &closestView) const
       {
          jblas::vec stored_pov = lmk - ublas::subrange(view.senPose, 0, 3);
          double stored_pov_norm2 = jmath::sum_sqr(stored_pov(0), stored_pov(1), stored_pov(2));
@@ -249,12 +237,10 @@ app_dst->patch.save(buffer);
          view.used = false;
       }
 
-      bool DescriptorImageSegMultiView::getClosestView(const observation_ptr_t & obsPtr, ImgSegFeatureView* &closestView)
+      bool DescriptorSegMultiView::getClosestView(const observation_ptr_t & obsPtr, SegFeatureView* &closestView)
       {
-         /*
-         There are two criterias : angle, and distance. Angle is more important because it is more difficult
-         to fix, particularly if you don't know the normal. But if distance is too different, you can't use the view at all.
-         */
+         // There are two criterias : angle, and distance. Angle is more important because it is more difficult
+         // to fix, particularly if you don't know the normal. But if distance is too different, you can't use the view at all.
 
          // init vars
          closestView = NULL;
@@ -267,7 +253,7 @@ app_dst->patch.save(buffer);
          double current_pov_norm2 = jmath::sum_sqr(current_pov(0), current_pov(1), current_pov(2));
 
          // check with all the exisiting views
-         for(typename ImgSegFeatureViewList::iterator it = views.begin(); it < views.end(); it++)
+         for(typename SegFeatureViewList::iterator it = views.begin(); it < views.end(); it++)
             checkView(current_pov, current_pov_norm2, lmk, *it, cosClosestAngle, closestView);
 
          // if we can't have a good view, we add the last one and try with it
@@ -289,21 +275,21 @@ app_dst->patch.save(buffer);
          return (closestView && cosClosestAngle >= cosAngleStep);
       }
 
-      void DescriptorImageSegMultiView::desc_text(std::ostream& os) const
+      void DescriptorSegMultiView::desc_text(std::ostream& os) const
       {
          os << " of " << typeName() << "; " << views.size() << " view(s):";
-         for(ImgSegFeatureViewList::const_iterator it = views.begin(); it != views.end(); ++it)
+         for(SegFeatureViewList::const_iterator it = views.begin(); it != views.end(); ++it)
             os << std::endl << *it;
       }
 
-      void DescriptorImageSegMultiView::desc_image(image::oimstream& os) const
+      void DescriptorSegMultiView::desc_image(image::oimstream& os) const
       {
          int nviews = views.size();
          if (nviews == 0) return;
          int nvy = (int)(sqrt((double)nviews));
          int nvx = nviews/nvy; if (nvx*nvy < nviews) nvx++;
 
-         ImgSegFeatureViewList::const_iterator it = views.begin();
+         SegFeatureViewList::const_iterator it = views.begin();
          for(int x = 0, y = 0; it != views.end(); ++it, ++x)
          {
             if (x >= nvx) { x = 0; ++y; os << image::endl; }
@@ -312,5 +298,6 @@ app_dst->patch.save(buffer);
          os << image::endl;
       }
 
+*/
    }
 }

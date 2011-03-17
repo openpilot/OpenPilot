@@ -100,5 +100,43 @@ class ImageSegmentObservationMaker
       }
 };
 
+template<class ObsType, class SenType, class LmkType, class AppType,
+    SensorAbstract::type_enum SenTypeId, LandmarkAbstract::type_enum LmkTypeId>
+class SegmentObservationMaker
+  : public ObservationMakerAbstract
+{
+   private:
+      double reparTh;
+      int killSizeTh;
+      int killSearchTh;
+      double killMatchTh;
+      double killConsistencyTh;
+      double dmin;
+      int patchSize;
+   public:
+
+      SegmentObservationMaker(double _reparTh, int _killSizeTh, int _killSearchTh, double _killMatchTh, double _killConsistencyTh, double _dmin, int _patchSize):
+         ObservationMakerAbstract(SenTypeId, LmkTypeId), reparTh(_reparTh), killSizeTh(_killSizeTh), killSearchTh(_killSearchTh),
+         killMatchTh(_killMatchTh), killConsistencyTh(_killConsistencyTh), dmin(_dmin), patchSize(_patchSize) {}
+
+      observation_ptr_t create(const sensor_ptr_t &senPtr, const landmark_ptr_t &lmkPtr)
+      {
+         boost::shared_ptr<ObsType> res(new ObsType(senPtr, lmkPtr));
+         if (boost::is_same<AppType,AppearanceSegment>::value)
+         {
+            res->predictedAppearance.reset(new AppearanceSegment());
+            res->observedAppearance.reset(new AppearanceSegment());
+         } else
+         if (boost::is_same<AppType,simu::AppearanceSimu>::value)
+         {
+            res->predictedAppearance.reset(new simu::AppearanceSimu());
+            res->observedAppearance.reset(new simu::AppearanceSimu());
+         }
+         res->setup(reparTh, killSizeTh, killSearchTh, killMatchTh, killConsistencyTh, dmin);
+         return res;
+      }
+};
+
+
 
 }} // namespace jafar::rtslam

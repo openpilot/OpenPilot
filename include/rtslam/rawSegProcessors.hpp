@@ -16,7 +16,10 @@
 
 
 #include "dseg/DirectSegmentsTracker.hpp"
+#include "dseg/SegmentHypothesis.hpp"
+#include "dseg/SegmentsSet.hpp"
 #include "dseg/ConstantVelocityPredictor.hpp"
+#include "dseg/RtslamPredictor.hpp"
 #include "rtslam/hierarchicalDirectSegmentDetector.hpp"
 
 #include "rtslam/rawImage.hpp"
@@ -30,7 +33,7 @@ namespace rtslam {
    {
       private:
          dseg::DirectSegmentsTracker matcher;
-         dseg::ConstantVelocityPredictor predictor;
+         dseg::RtslamPredictor predictor;
 
       public:
          struct matcher_params_t {
@@ -42,34 +45,63 @@ namespace rtslam {
             double relevanceTh; ///< Mahalanobis distance for no information rejection
             double measStd;       ///<       measurement noise std deviation
             double measVar;       ///<       measurement noise variance
-            // DSEG
-            double translationError;
-            double rotationError;
          } params;
 
-      public:
-         DsegMatcher(double translationError, double rotationError):
-            matcher(), predictor(translationError,rotationError)
+      private :
+         void projectExtremities(const vec& meas, const vec& exp, vec& newMeas) const
          {
-            params.translationError = translationError;
-            params.rotationError = rotationError;
+            // extract predicted points
+            vec2 P1 = subrange(exp,0,2);
+            vec2 P2 = subrange(exp,2,4);
+            // extract measured line
+            vec2 L1 = subrange(meas,0,2);
+            vec2 L2 = subrange(meas,2,4);
+            // TODO : be carefull L1 != L2
+            // project predicted points on line
+            double u = (((P1(0) - L1(0))+(L2(0) - L1(0)))
+                       +((P1(1) - L1(1))+(L2(1) - L1(1))))
+                       /(norm_1(L1 - L2) * norm_1(L1 - L2));
+            subrange(newMeas,0,2) = L1 + u*(L2 - L1);
+
+            u = (((P2(0) - L1(0))+(L2(0) - L1(0)))
+                +((P2(1) - L1(1))+(L2(1) - L1(1))))
+                /(norm_1(L1 - L2) * norm_1(L1 - L2));
+            subrange(newMeas,2,4) = L1 + u*(L2 - L1);
+         }
+
+      public:
+         DsegMatcher(double lowInnov, double threshold, double mahalanobisTh, double relevanceTh, double measStd):
+            matcher(), predictor()
+         {
+            params.lowInnov = lowInnov;
+            params.threshold = threshold;
+            params.mahalanobisTh = mahalanobisTh;
+            params.relevanceTh = relevanceTh;
+            params.measStd = measStd;
          }
 
          void match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, const image::ConvexRoi & roi, Measurement & measure, appearance_ptr_t & app)
          {
             app_seg_ptr_t targetAppSpec = SPTR_CAST<AppearanceSegment>(targetApp);
             app_seg_ptr_t appSpec = SPTR_CAST<AppearanceSegment>(app);
-/*
-            measure.std(params.measStd);
-            measure.matchScore = matcher.match(targetAppSpec->patch, *(rawPtr->img),
-               roi, measure.x()(0), measure.x()(1));
-            measure.x() += targetAppSpec->offset.x();
-            measure.P() += targetAppSpec->offset.P(); // no cross terms
-            rawPtr->img->extractPatch(appSpec->patch, (int)measure.x()(0), (int)measure.x()(1), appSpec->patch.width(), appSpec->patch.height());
-            appSpec->offset.x()(0) = measure.x()(0) - ((int)(measure.x()(0)) + 0.5);
-            appSpec->offset.x()(1) = measure.x()(1) - ((int)(measure.x()(1)) + 0.5);
-            appSpec->offset.P() = measure.P();
-*/
+
+            dseg::SegmentsSet setin, setout;
+
+            setin.addSegment(targetAppSpec->hypothesis());
+            matcher.trackSegment(*(rawPtr->img),setin,&predictor,setout);
+
+            if(setout.count() > 0) {
+               measure.std(params.measStd);
+               measure.x(0) = setout.segmentAt(0)->x1();
+               measure.x(1) = setout.segmentAt(0)->y1();
+               measure.x(2) = setout.segmentAt(0)->x2();
+               measure.x(3) = setout.segmentAt(0)->y2();
+               measure.matchScore = 1;
+               appSpec->setHypothesis(setout.segmentAt(0));
+            }
+            else {
+               measure.matchScore = 0;
+            }
          }
    };
 
@@ -130,6 +162,7 @@ namespace rtslam {
             // extract observed appearance
             app_seg_ptr_t app_src = SPTR_CAST<AppearanceSegment>(featPtr->appearancePtr);
             app_seg_ptr_t app_dst = SPTR_CAST<AppearanceSegment>(obsPtr->observedAppearance);
+            app_dst->setHypothesis(app_src->hypothesis());
 //            app_src->patch.copyTo(app_dst->patch);
             /*app_src->patch.copy(app_dst->patch, (app_src->patch.width()-app_dst->patch.width())/2,
                   (app_src->patch.height()-app_dst->patch.height())/2, 0, 0,

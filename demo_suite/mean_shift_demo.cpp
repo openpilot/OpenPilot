@@ -1,5 +1,5 @@
 #include "jafarConfig.h"
-#ifdef HAVE_FLANN
+
 #include "jmath/mean_shift_clustering.hpp"
 #include "jmath/jblas.hpp"
 #include "jmath/random.hpp"
@@ -7,6 +7,7 @@
 using namespace jafar::jmath;
 using namespace jafar;
 int main(int argc, char** argv) {
+#ifdef HAVE_FLANN
   jblas::mat data(120,3);
 	jblas::vec3 sphere_center_0;
 	sphere_center_0[0] = 0;
@@ -35,5 +36,6 @@ int main(int argc, char** argv) {
 	jmath::mean_shift_clustering<double,3> filter(2.0,0.1,0.1,100,mean_shift_clustering<double,3>::NORMAL, 1.0);
 	size_t nb_clusters = filter.run(data);
 	std::cout << "found " << nb_clusters << " clusters"<< std::endl;
-}
 #endif // HAVE_FLANN
+}
+

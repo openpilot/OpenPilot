@@ -59,6 +59,8 @@ enum
             buf[0] = 2;
             buf[1] = 0;
 
+            cout << "Interval,Current,Volt,Cap,Cell1,Cell2,Cell3,Cell4,Cell5,Cell6,RPM,Temp1,Temp2,Temp3,Temp4,Period,Pulse" << endl;
+
             while (int received = hidHandle.receive(0, buf, BUF_LEN, 3500) ) {
                 ShowInf(buf);
             }
@@ -67,10 +69,10 @@ enum
 
         void ShowInf(char *pBuf)
 	{
-            qDebug() << "--------------------";
-		POWERLOG_HID_PACK Inf;
-		int i;
-		int Count;
+            // qDebug() << "--------------------";
+            POWERLOG_HID_PACK Inf;
+            int i;
+            int Count;
 	
 		Count=0;
 		Inf.Len = pBuf[Count];
@@ -80,7 +82,7 @@ enum
 		Count += sizeof(Inf.Type);
 
 		Inf.Interval = *((DWORD *)&pBuf[Count]);
-                printf("Interval:%ld\n",Inf.Interval);
+                printf("%ld,",Inf.Interval);
 
 		Count += sizeof(Inf.Interval);
 
@@ -145,13 +147,15 @@ enum
 		Inf.Pulse = *((USHORT *)&pBuf[Count]);
 		Count += sizeof(Inf.Pulse);
                 GetShowValue(QString("Pulse:"),Inf.Pulse,6,0);
+
+                printf("\n");
 	}
 
 }
 
 void GetShowValue(QString label,DWORD Value,WORD Len,WORD Dot)
 {
-    cout << label .toStdString() << " ";
+    //cout << label .toStdString() << " ";
 
     if(Value<0)
 	{
@@ -180,7 +184,7 @@ void GetShowValue(QString label,DWORD Value,WORD Len,WORD Dot)
 		else
                         printf("%ld",Value);
 	}
-    printf("\n");
+    printf(",");
 
 }
 

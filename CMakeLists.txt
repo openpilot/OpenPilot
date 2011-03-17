@@ -13,7 +13,7 @@ build_jafar_module(rtslam
   OPTIONAL_MODULES qdisplay gdhe dseg
 
   REQUIRED_EXTLIBS boost_thread boost_system boost_filesystem boost_regex
-  OPTIONAL_EXTLIBS qt4 viam MTI
+  OPTIONAL_EXTLIBS qt4 viam MTI posterLib
 
 #  CXXFLAGS -g -ggdb -O0 -Wall
 #  CXXFLAGS -O2 -g -DJFR_NDEBUG -DNDEBUG -DBOOST_UBLAS_NDEBUG -Wall -pthread

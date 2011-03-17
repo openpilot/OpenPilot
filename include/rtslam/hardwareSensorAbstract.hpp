@@ -68,6 +68,7 @@ class HardwareSensorAbstract
 		boost::condition_variable cond_offline_freed;
 		int image_count; /// image count since last image read
 		bool no_more_data;
+		double timestamps_correction;
 		
 		int bufferSize; /// size of the ring buffer
 		VecT buffer; /// the ring buffer
@@ -88,6 +89,7 @@ class HardwareSensorAbstract
 		int getLastUnreadPos() {
 			return (write_pos == 0 ? bufferSize-1 : write_pos-1);
 		}
+		bool isFull() { return (read_pos == write_pos); }
 		
 	public:
 		/** Constructor
@@ -95,8 +97,11 @@ class HardwareSensorAbstract
 		*/
 		HardwareSensorAbstract(kernel::VariableCondition<int> &condition, unsigned bufferSize):
 			write_pos(0), read_pos(bufferSize-1), condition(condition), index(0),
-		  image_count(0), no_more_data(false), bufferSize(bufferSize), buffer(bufferSize)
+		  image_count(0), no_more_data(false), timestamps_correction(0.0),
+		  bufferSize(bufferSize), buffer(bufferSize)
 		{}
+		void setSyncConfig(double timestamps_correction = 0.0)
+			{ this->timestamps_correction = timestamps_correction; }
 		
 		VecIndT getRaws(double t1, double t2); /// will also release the raws before the first one
 		RawInfos getUnreadRawInfos(); /// get timing informations about unread raws

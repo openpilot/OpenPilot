@@ -28,7 +28,7 @@ namespace jafar {
 					UNKNOWN_TYPES_FOR_FACTORY,
 					BUFFER_OVERFLOW,
 					SIMU_ERROR,
-					ERROR
+					GENERIC_ERROR
 				//        MY_ERROR /**< my error */
 				};
 

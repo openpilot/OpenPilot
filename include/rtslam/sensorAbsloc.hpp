@@ -57,7 +57,7 @@ namespace jafar {
 							ublas::subrange(INN_rs, 0,3, 0,3) = -jblas::identity_mat(3);
 							break;
 						default:
-							JFR_ERROR(RtslamException, RtslamException::ERROR,
+							JFR_ERROR(RtslamException, RtslamException::GENERIC_ERROR,
 							          "SensorAbsloc reading size " << innovation->size()+1 << " not supported.");
 					}
 					if (hardwareSensorPtr->varianceSize() == hardwareSensorPtr->dataSize())
@@ -91,7 +91,8 @@ namespace jafar {
 							}
 							break;
 						default:
-							JFR_ERROR(RtslamException, RtslamException::ERROR, "SensorAbsloc reading size " << reading.size() << " not supported.");
+							JFR_ERROR(RtslamException, RtslamException::GENERIC_ERROR,
+							          "SensorAbsloc reading size " << reading.size() << " not supported.");
 					}
 					
 					map_ptr_t mapPtr = robotPtr()->mapPtr();

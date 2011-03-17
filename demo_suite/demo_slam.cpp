@@ -135,6 +135,7 @@
 
 #include "rtslam/hardwareSensorCameraFirewire.hpp"
 #include "rtslam/hardwareEstimatorMti.hpp"
+#include "rtslam/hardwareSensorGpsGenom.hpp"
 
 #include "rtslam/display_qt.hpp"
 #include "rtslam/display_gdhe.hpp"
@@ -181,7 +182,7 @@ time_t rseed;
  * program parameters
  * ###########################################################################*/
 
-enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose, iMap, iRobot, iTrigger, iSimu, nIntOpts };
+enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose, iMap, iRobot, iTrigger, iGps, iSimu, nIntOpts };
 int intOpts[nIntOpts] = {0};
 const int nFirstIntOpt = 0, nLastIntOpt = nIntOpts-1;
 
@@ -215,6 +216,7 @@ struct option long_options[] = {
 	// double options
 	{"freq", 2, 0, 0}, // should be in config file
 	{"shutter", 2, 0, 0}, // should be in config file
+	{"gps", 2, 0, 0},
 	// string options
 	{"data-path", 1, 0, 0},
 	{"config-setup", 1, 0, 0},
@@ -362,8 +364,7 @@ class ConfigEstimation: public kernel::KeyValueFileSaveLoad
  * ###########################################################################*/
 
 
-void demo_slam01_main(world_ptr_t *world) {
-	
+void demo_slam01_main(world_ptr_t *world) { try {
 	vec intrinsic, distortion;
 	int img_width, img_height;
 	if (intOpts[iSimu] != 0)
@@ -788,6 +789,16 @@ void demo_slam01_main(world_ptr_t *world) {
 			senPtr11->setHardwareSensor(hardSen11);
 		}
 		#endif
+		
+		if (intOpts[iGps])
+		{
+			absloc_ptr_t senPtr13(new SensorAbsloc(robPtr1, MapObject::UNFILTERED));
+			senPtr13->setId();
+			hardware::hardware_sensorprop_ptr_t hardGps(
+				new hardware::HardwareSensorGpsGenom(rawdata_condition, 100, "mana-base", mode, strOpts[sDataPath]));
+			hardGps->setSyncConfig(0.0/*configSetup.GPS_TIMESTAMP_CORRECTION*/);
+			senPtr13->setHardwareSensor(hardGps);
+		}
 	}
 	
 	//--- force a first display with empty slam to ensure that all windows are loaded
@@ -1072,6 +1083,8 @@ std::cout << "average_robot_innovation " << average_robot_innovation << std::end
 	(*world)->slam_blocked(true);
 //	std::cout << "\nFINISHED ! Press a key to terminate." << std::endl;
 //	getchar();
+
+} catch (kernel::Exception &e) { std::cout << e.what(); }
 } // demo_slam01_main
 
 
@@ -1080,7 +1093,7 @@ std::cout << "average_robot_innovation " << average_robot_innovation << std::end
  * Display function
  * ###########################################################################*/
 
-void demo_slam01_display(world_ptr_t *world) {
+void demo_slam01_display(world_ptr_t *world) { try {
 //	static unsigned prev_t = 0;
 	kernel::Timer timer(display_period*1000);
 	while(true)
@@ -1197,6 +1210,8 @@ void demo_slam01_display(world_ptr_t *world) {
 		
 		if (intOpts[iDispQt]) break; else timer.wait();
 	}
+	
+} catch (kernel::Exception &e) { std::cout << e.what(); }
 }
 
 
@@ -1314,6 +1329,7 @@ void demo_slam01() {
 	* --simu 0/1
 	* --freq camera frequency in double Hz (with trigger==0/1)
 	* --shutter shutter time in double seconds (0=auto); for trigger modes 0,2,3 the value is relative between 0 and 1
+	* --gps whether use or not a gps
 	*
 	* You can use the following examples and only change values:
 	* online test (old mode=0):

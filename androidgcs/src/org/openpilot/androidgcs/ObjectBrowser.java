@@ -69,26 +69,12 @@ public class ObjectBrowser extends Activity {
         
         Log.d(TAG, "Launching Object Browser");
 
-        connected = false;
+        Log.d(TAG, "Start OP Telemetry Service");
+        startService( new Intent( this, OPTelemetryService.class ) );
         
         objMngr = new UAVObjectManager();
 		UAVObjectsInitialize.register(objMngr);
 
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter == null) {
-            // Device does not support Bluetooth
-        	Log.e(TAG, "Device does not support Bluetooth");
-        	return;
-        }
-        
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        } else {
-        	queryDevices();
-        }
-        
-		
 		UAVObject obj = objMngr.getObject("SystemStats");
 		if(obj != null)
 			obj.addUpdatedObserver(new Observer() {
@@ -116,84 +102,7 @@ public class ObjectBrowser extends Activity {
 				public void update(Observable observable, Object data) {
 					uavobjHandler.post(updateText);
 				}				
-			});
-		
-
+			});		
     }
     
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	if(requestCode == REQUEST_ENABLE_BT && resultCode == RESULT_OK) {
-    		//Log.d(TAG, "Bluetooth started succesfully");
-    		queryDevices();
-    	}
-    	if(requestCode == REQUEST_ENABLE_BT && resultCode != RESULT_OK) {
-    		//Log.d(TAG, "Bluetooth could not be started");
-    	}
-    	
-    }
-    
-    public void queryDevices() {
-    	Log.d(TAG, "Searching for devices");
-		Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-		// If there are paired devices
-		if (pairedDevices.size() > 0) {
-		    // Loop through paired devices
-		    for (BluetoothDevice device : pairedDevices) {
-		        // Add the name and address to an array adapter to show in a ListView
-		        //mArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-		    	Log.d(TAG, "Paired device: " + device.getName());
-		    	if(device.getName().compareTo(DEVICE_NAME) == 0) {
-		    		openTelmetryBluetooth(device);
-		    		openTelmetryBluetooth(device);
-		    		}
-		    }
-		}
-    	
-    }
-
-	private void openTelmetryBluetooth(BluetoothDevice device) {
-		Log.d(TAG, "Opening conncetion to " + device.getName());
-		socket = null;
-		connected = false;
-		try {
-			socket = device.createInsecureRfcommSocketToServiceRecord(MY_UUID);
-		} catch (IOException e) {
-			Log.e(TAG,"Unable to create Rfcomm socket");
-			//e.printStackTrace();			
-		}
-		
-		mBluetoothAdapter.cancelDiscovery();
-		
-		try {
-			socket.connect();
-		}
-		catch (IOException e) {
-			Log.e(TAG,"Unable to connect to requested device", e);
-            try {
-                socket.close();
-            } catch (IOException e2) {
-                //Log.e(TAG, "unable to close() socket during connection failure", e2);
-            }
-			return;
-		}
-
-		connected = true;
-		
-		try {
-			uavTalk = new UAVTalk(socket.getInputStream(), socket.getOutputStream(), objMngr);
-		} catch (IOException e) {
-			Log.e(TAG,"Error starting UAVTalk");
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-			return;
-		}
-		
-		Thread inputStream = uavTalk.getInputProcessThread();
-		inputStream.start();
-		
-		Telemetry tel = new Telemetry(uavTalk, objMngr);
-		TelemetryMonitor mon = new TelemetryMonitor(objMngr,tel);
-
-	}
 }

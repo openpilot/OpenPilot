@@ -1,7 +1,5 @@
 package org.openpilot.uavtalk;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,7 +28,10 @@ public class UAVTalk extends Observable {
 
 			inputProcessingThread = new Thread() {
 				public void run() {
-					processInputStream();
+					while(true) {
+						if( !processInputStream() )
+							break;
+					}
 				}
 			};
 		return inputProcessingThread;
@@ -173,37 +174,36 @@ public class UAVTalk extends Observable {
 	}
 
 	/**
-	 * Called each time there are data in the input buffer
+	 * Process any data in the queue
 	 */
-	public void processInputStream() {
+	public boolean processInputStream() {
 		int val;
 
-		while (true) {
-			try {
-				// inStream.wait();
-				val = inStream.read();
-			} /*
-			 * catch (InterruptedException e) { // TODO Auto-generated catch
-			 * block System.out.println("Connection was aborted\n");
-			 * e.printStackTrace(); break; }
-			 */catch (IOException e) {
-				// TODO Auto-generated catch block
-				System.out.println("Error reading from stream\n");
-				e.printStackTrace();
-				break;
-			}
-			if (val == -1) {
-				System.out
-						.println("End of stream, terminating processInputStream thread");
-				break;
-			}
+		try {
+			// inStream.wait();
+			val = inStream.read();
+		} /*
+		 * catch (InterruptedException e) { // TODO Auto-generated catch
+		 * block System.out.println("Connection was aborted\n");
+		 * e.printStackTrace(); break; }
+		 */catch (IOException e) {
+			 // TODO Auto-generated catch block
+			 System.out.println("Error reading from stream\n");
+			 e.printStackTrace();
+			 return false;
+		 }
+		 if (val == -1) {
+			 System.out.println("End of stream, terminating processInputStream thread");
+			 return false;
+		 }
 
-			// System.out.println("Received byte " + val + " in state + " +
-			// rxState);
-			processInputByte(val);
-		}
+		 // System.out.println("Received byte " + val + " in state + " +
+		 // rxState);
+		 processInputByte(val);
+		 return true;
 	}
 
+	
 	/**
 	 * Request an update for the specified object, on success the object data
 	 * would have been updated by the GCS. \param[in] obj Object to update
@@ -665,9 +665,6 @@ public class UAVTalk extends Observable {
 	public synchronized boolean transmitSingleObject(UAVObject obj, int type,
 			boolean allInstances) {
 		int length;
-		int dataOffset;
-		int objId;
-		int instId;
 		int allInstId = ALL_INSTANCES;
 
 		assert (objMngr != null && outStream != null);

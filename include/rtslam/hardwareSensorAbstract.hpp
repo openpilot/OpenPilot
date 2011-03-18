@@ -20,6 +20,24 @@
 
 namespace jafar {
 namespace rtslam {
+
+
+struct RawInfo
+{ unsigned id; double timestamp; double arrival;
+	RawInfo(unsigned id, double timestamp, double arrival): id(id), timestamp(timestamp), arrival(arrival) {}
+	RawInfo() {}
+};
+struct RawInfos
+	{ std::vector<RawInfo> available; RawInfo next; double process_time; };
+
+struct RawVec
+{
+	jblas::vec data;
+	double arrival;
+	RawVec(unsigned n): data(n), arrival(0.) {}
+	RawVec() {}
+};
+
 namespace hardware {
 
 //namespace ublas = boost::numeric::ublas;
@@ -31,11 +49,10 @@ typedef boost::shared_ptr<HardwareSensorAbstract> hardware_sensor_ptr_t;
 
 #if 1
 
-typedef struct { unsigned id; double timestamp; double arrival; } RawInfo;
-typedef struct { std::vector<RawInfo> available; RawInfo next; double process_time; } RawInfos;
-
 inline double getRawTimestamp(raw_ptr_t &raw) { return raw->timestamp; }
-inline double getRawTimestamp(jblas::vec &raw) { return raw(0); }
+inline double getRawTimestamp(RawVec &raw) { return raw.data(0); }
+inline double getRawArrival(raw_ptr_t &raw) { return raw->arrival; }
+inline double getRawArrival(RawVec &raw) { return raw.arrival; }
 
 /**
 	Generic implementation of hardware sensor based on ring buffer.
@@ -60,6 +77,8 @@ class HardwareSensorAbstract
 		int write_pos; /// next position where to write, oldest available reading
 		int read_pos;  /// oldest position not released (being read or not read at all)
 		
+		int last_sent_pos; /// position of the last raw sent
+		
 	protected:
 		kernel::VariableCondition<int> &condition; /// to notify when new data is available
 		kernel::VariableCondition<int> index;
@@ -69,6 +88,8 @@ class HardwareSensorAbstract
 		int image_count; /// image count since last image read
 		bool no_more_data;
 		double timestamps_correction;
+		double data_period;
+		double arrival_delay;
 		
 		int bufferSize; /// size of the ring buffer
 		VecT buffer; /// the ring buffer
@@ -84,19 +105,48 @@ class HardwareSensorAbstract
 			++image_count;
 		}
 		int getFirstUnreadPos() {
+			// don't need to lock, because will only be used and modified by reader
 			return read_pos;
 		}
 		int getLastUnreadPos() {
+			boost::unique_lock<boost::mutex> l(mutex_data);
 			return (write_pos == 0 ? bufferSize-1 : write_pos-1);
 		}
-		bool isFull() { return (read_pos == write_pos); }
+		/// release until id, excluding id
+		void releaseUntil(unsigned id) {
+			boost::unique_lock<boost::mutex> l(mutex_data);
+			read_pos = id;
+		}
+		/// release until id, including id
+		void release(unsigned id) {
+			boost::unique_lock<boost::mutex> l(mutex_data);
+			read_pos = id+1;
+			if (read_pos >= bufferSize) read_pos = 0;
+		}
+		bool isFull()
+		{
+			boost::unique_lock<boost::mutex> l(mutex_data);
+			return (read_pos == write_pos);
+		}
+		
+		/**
+			Provides approximate informations about the timings of data
+			@param data_period the period at which the data are arriving
+			@param arrival_delay the delay between the moment we get a data and its real date.
+			This is a starting point that must be overestimated,
+			it may be estimated more precisely afterwards.
+		*/
+		virtual void getTimingInfos(double &data_period, double &arrival_delay)
+			{ data_period = this->data_period; arrival_delay = this->arrival_delay; }
+		virtual void setTimingInfos(double data_period, double arrival_delay)
+			{ this->data_period = data_period; this->arrival_delay = arrival_delay; }
 		
 	public:
 		/** Constructor
 			@param condition to notify when new data is available
 		*/
 		HardwareSensorAbstract(kernel::VariableCondition<int> &condition, unsigned bufferSize):
-			write_pos(0), read_pos(bufferSize-1), condition(condition), index(0),
+			write_pos(0), read_pos(bufferSize-1), last_sent_pos(-1), condition(condition), index(0),
 		  image_count(0), no_more_data(false), timestamps_correction(0.0),
 		  bufferSize(bufferSize), buffer(bufferSize)
 		{}
@@ -107,10 +157,11 @@ class HardwareSensorAbstract
 		RawInfos getUnreadRawInfos(); /// get timing informations about unread raws
 		void getRaw(unsigned id, T& raw); /// will also release the raws before this one
 		int getLastUnreadRaw(T& raw); /// will also release the raws before this one
+		void getLastProcessedRaw(T& raw) { raw = buffer[last_sent_pos]; } /// for information only (display...)
 };
 
 
-class HardwareSensorProprioAbstract: public HardwareSensorAbstract<jblas::vec>
+class HardwareSensorProprioAbstract: public HardwareSensorAbstract<RawVec>
 {
 	public:
 	/*
@@ -237,15 +288,39 @@ typename HardwareSensorAbstract<T>::VecIndT HardwareSensorAbstract<T>::getRaws(d
 template<typename T>
 RawInfos HardwareSensorAbstract<T>::getUnreadRawInfos()
 {
-	// TODO
-	return RawInfos();
+	RawInfos result;
+	int first_stop, second_stop;
+	int first = getFirstUnreadPos(), last = getLastUnreadPos();
+	if (first <= last)
+	{
+		first_stop = last;
+		second_stop = -1;
+	} else
+	{
+		first_stop = bufferSize-1;
+		second_stop = last;
+	}
+	
+	for(int pos = first; pos <= first_stop; ++pos)
+		result.available.push_back(RawInfo(pos,getRawTimestamp(buffer(pos)),getRawArrival(buffer(pos))));
+	for(int pos = 0; pos <= second_stop; ++pos)
+		result.available.push_back(RawInfo(pos,getRawTimestamp(buffer(pos)),getRawArrival(buffer(pos))));
+
+	double data_period, arrival_delay;
+	getTimingInfos(data_period, arrival_delay);
+	data_period += result.available[result.available.size()-1].timestamp;
+	result.next = RawInfo(0,data_period,data_period+arrival_delay);
+	result.process_time = 0.;
+	
+	return result;
 }
 
 template<typename T>
 void HardwareSensorAbstract<T>::getRaw(unsigned id, T& raw)
 {
-	read_pos = id;
-	raw = buffer[read_pos];
+	releaseUntil(id);
+	raw = buffer[id];
+	last_sent_pos = id;
 }
 
 template<typename T>
@@ -255,14 +330,15 @@ int HardwareSensorAbstract<T>::getLastUnreadRaw(T& raw)
 	int missed_count = image_count-1;
 	if (image_count > 0)
 	{
-		read_pos = getLastUnreadPos();
-		raw = buffer[read_pos];
+		unsigned id = getLastUnreadPos();
+		releaseUntil(id);
+		last_sent_pos = id;
+		raw = buffer[id];
 		image_count = 0;
 		index.applyAndNotify(boost::lambda::_1++);
 	}
 	if (no_more_data && missed_count == -1) return -2; else return missed_count;
 }
-
 
 
 #endif

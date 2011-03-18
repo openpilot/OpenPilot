@@ -42,7 +42,7 @@ namespace hardware {
 		{
 			if (mode == 2)
 			{
-				f >> reading;
+				f >> reading.data;
 				boost::unique_lock<boost::mutex> l(mutex_data);
 				if (isFull()) cond_offline_full.notify_all();
 				if (f.eof()) { f.close(); return; }
@@ -70,25 +70,26 @@ namespace hardware {
 					}
 				}
 #endif
+				reading.arrival = getNowTimestamp();
 				pos = (double*)(data+16);
 				var = (float*)(data+48);
-				reading(0) = *date;
-				reading(1) = pos[0];
-				reading(2) = pos[1];
-				reading(3) = pos[2];
-				reading(4) = var[0];
-				reading(5) = var[1];
-				reading(6) = var[2];
+				reading.data(0) = *date;
+				reading.data(1) = pos[0];
+				reading.data(2) = pos[1];
+				reading.data(3) = pos[2];
+				reading.data(4) = var[0];
+				reading.data(5) = var[1];
+				reading.data(6) = var[2];
 				//std::cout << "GPS poster : " << std::setprecision(15) << reading << std::endl;
 				
-				buffer(getWritePos()) = reading;
-				buffer(getWritePos())(0) += timestamps_correction;
+				buffer(getWritePos()).data = reading.data;
+				buffer(getWritePos()).data(0) += timestamps_correction;
 				incWritePos();
 				
 				if (mode == 1)
 				{
 					// we put the maximum precision because we want repeatability with the original run
-					f << std::setprecision(50) << reading << std::endl;
+					f << std::setprecision(50) << reading.data << std::endl;
 				}
 				prev_date = *date;
 			}

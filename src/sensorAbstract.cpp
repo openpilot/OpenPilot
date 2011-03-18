@@ -42,16 +42,13 @@ namespace jafar {
 			return s;
 		}
 
-		SensorAbstract::SensorAbstract(const robot_ptr_t & _robPtr,
-		    const filtered_obj_t inFilter) :
-			    //          #check       ? # sensor in filter                                 : # not in filter
-			    MapObject(_robPtr->mapPtr(), 7, inFilter), pose(state,
-			                                                    Gaussian::REMOTE),
-			    ia_globalPose(inFilter == FILTERED ? ia_union(_robPtr->pose.ia(),
-			                                                  pose.ia())
-			        : _robPtr->pose.ia()) {
+		SensorAbstract::SensorAbstract(const robot_ptr_t & _robPtr, const filtered_obj_t inFilter):
+			MapObject(_robPtr->mapPtr(), 7, inFilter), pose(state, Gaussian::REMOTE), integrate_all(false),
+			ia_globalPose(inFilter == FILTERED ? ia_union(_robPtr->pose.ia(), pose.ia()) : _robPtr->pose.ia())
+		{
 			category = SENSOR;
 			isInFilter = (inFilter == FILTERED);
+			id(sensorIds.getId());
 		}
 
 		void SensorAbstract::setPose(double x, double y, double z, double rollDeg,
@@ -130,16 +127,17 @@ namespace jafar {
 				project(SG_rs, range(0, 7), range(7, 14)) = PG_s;
 			}
 		}
-
+		
 		void SensorExteroAbstract::process(unsigned id)
 		{
+			hardwareSensorPtr->getRaw(id, rawPtr);
 			// foreach dataManager
 			for (DataManagerList::iterator dmaIter = dataManagerList().begin(); dmaIter != dataManagerList().end(); ++dmaIter)
 			{
 				data_manager_ptr_t dmaPtr = *dmaIter;
-				dmaPtr->processKnown(getRaw());
+				dmaPtr->processKnown(rawPtr);
 				dmaPtr->mapManagerPtr()->manage();
-				dmaPtr->detectNew(getRaw());
+				dmaPtr->detectNew(rawPtr);
 			} // foreach dataManager
 		}
 

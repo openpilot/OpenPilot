@@ -42,10 +42,14 @@ namespace jafar {
 		                      public ChildOf<RobotAbstract>,
 		                      public boost::enable_shared_from_this<SensorAbstract>
 		{
+			private:
 				// define the function linkToParentRobot().
 				ENABLE_LINK_TO_PARENT(RobotAbstract,Robot,SensorAbstract);
 				// define the functions robotPtr() and robot().
 				ENABLE_ACCESS_TO_PARENT(RobotAbstract,robot);
+		
+			protected:
+				bool integrate_all;
 				
 			public:
 				
@@ -62,8 +66,10 @@ namespace jafar {
 				 */
 				virtual ~SensorAbstract() {
 				}
+				
+				void setIntegrationPolicy(bool integrate_all) { this->integrate_all = integrate_all; }
 
-//				virtual RawInfos queryAvailableRaws() = 0; ///< get information about the available raws and the estimated dates for next one
+				virtual RawInfos queryAvailableRaws() = 0; ///< get information about the available raws and the estimated dates for next one
 				virtual void process(unsigned id) = 0; ///< process the given raw and throw away the previous unprocessed ones
 
 				enum type_enum {
@@ -139,6 +145,9 @@ namespace jafar {
 
 				void setHardwareSensor(hardware::hardware_sensorprop_ptr_t hardwareSensorPtr_)
 					{ hardwareSensorPtr = hardwareSensorPtr_; }
+				
+				virtual RawInfos queryAvailableRaws() { return hardwareSensorPtr->getUnreadRawInfos(); }
+				//process(id) will do the filtering, so it is specific to each hardware
 		};
 		
 		/** 
@@ -186,9 +195,11 @@ namespace jafar {
 				void setHardwareSensor(hardware::hardware_sensorext_ptr_t hardwareSensorPtr_)
 					{ hardwareSensorPtr = hardwareSensorPtr_; }
 				
-				virtual int acquireRaw() = 0;
-				virtual raw_ptr_t getRaw() = 0;
+//				virtual int acquireRaw() = 0;
+//				virtual raw_ptr_t getRaw() = 0;
 
+				virtual raw_ptr_t getLastProcessedRaw() { raw_ptr_t raw; hardwareSensorPtr->getLastProcessedRaw(raw); return raw; }
+				virtual RawInfos queryAvailableRaws() { return hardwareSensorPtr->getUnreadRawInfos(); }
 				void process(unsigned id);
 
 

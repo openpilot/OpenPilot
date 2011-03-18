@@ -38,7 +38,7 @@ class HardwareSensorGpsGenom: public HardwareSensorProprioAbstract
 #ifdef HAVE_POSTERLIB
 		POSTER_ID posterId;
 #endif
-		jblas::vec reading;
+		RawVec reading;
 		int mode;
 		std::string dump_path;
 		

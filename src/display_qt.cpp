@@ -70,7 +70,7 @@ namespace display {
 			if (framenumber+1 > 0) avg_framerate = (slamSen_->rawPtr->timestamp-t)/(slamSen_->rawCounter-1-framenumber);
 			framenumber = slamSen_->rawCounter-1;
 			t = slamSen_->rawPtr->timestamp;
-			raw_ptr_t raw = slamSen_->getRaw();
+			raw_ptr_t raw = slamSen_->getLastProcessedRaw();
 			if (raw)
 			{
 				RawImage *rawImg = NULL;

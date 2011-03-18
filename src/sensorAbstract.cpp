@@ -43,7 +43,7 @@ namespace jafar {
 		}
 
 		SensorAbstract::SensorAbstract(const robot_ptr_t & _robPtr, const filtered_obj_t inFilter):
-			MapObject(_robPtr->mapPtr(), 7, inFilter), pose(state, Gaussian::REMOTE), integrate_all(false),
+			MapObject(_robPtr->mapPtr(), 7, inFilter), integrate_all(false), pose(state, Gaussian::REMOTE),
 			ia_globalPose(inFilter == FILTERED ? ia_union(_robPtr->pose.ia(), pose.ia()) : _robPtr->pose.ia())
 		{
 			category = SENSOR;
@@ -130,8 +130,10 @@ namespace jafar {
 		
 		void SensorExteroAbstract::process(unsigned id)
 		{
+			// get data
 			hardwareSensorPtr->getRaw(id, rawPtr);
-			// foreach dataManager
+			
+			// observe
 			for (DataManagerList::iterator dmaIter = dataManagerList().begin(); dmaIter != dataManagerList().end(); ++dmaIter)
 			{
 				data_manager_ptr_t dmaPtr = *dmaIter;

@@ -28,7 +28,7 @@ struct RawInfo
 	RawInfo() {}
 };
 struct RawInfos
-	{ std::vector<RawInfo> available; RawInfo next; double process_time; };
+	{ std::vector<RawInfo> available; RawInfo next; double process_time; bool integrate_all; };
 
 struct RawVec
 {
@@ -49,10 +49,10 @@ typedef boost::shared_ptr<HardwareSensorAbstract> hardware_sensor_ptr_t;
 
 #if 1
 
-inline double getRawTimestamp(raw_ptr_t &raw) { return raw->timestamp; }
-inline double getRawTimestamp(RawVec &raw) { return raw.data(0); }
-inline double getRawArrival(raw_ptr_t &raw) { return raw->arrival; }
-inline double getRawArrival(RawVec &raw) { return raw.arrival; }
+inline double extractRawTimestamp(raw_ptr_t &raw) { return raw->timestamp; }
+inline double extractRawTimestamp(RawVec &raw) { return raw.data(0); }
+inline double extractRawArrival(raw_ptr_t &raw) { return raw->arrival; }
+inline double extractRawArrival(RawVec &raw) { return raw.arrival; }
 
 /**
 	Generic implementation of hardware sensor based on ring buffer.
@@ -98,48 +98,42 @@ class HardwareSensorAbstract
 			// don't need to lock, because will only be used and modified by writer
 			return write_pos;
 		}
-		void incWritePos() {
-			boost::unique_lock<boost::mutex> l(mutex_data);
+		void incWritePos(bool locked = false) {
+			if (!locked) mutex_data.lock();
 			++write_pos;
 			if (write_pos >= bufferSize) write_pos = 0;
 			++image_count;
+			if (!locked) mutex_data.unlock();
 		}
 		int getFirstUnreadPos() {
 			// don't need to lock, because will only be used and modified by reader
 			return read_pos;
 		}
-		int getLastUnreadPos() {
-			boost::unique_lock<boost::mutex> l(mutex_data);
-			return (write_pos == 0 ? bufferSize-1 : write_pos-1);
+		int getLastUnreadPos(bool locked = false) {
+			if (!locked) mutex_data.lock();
+			int res = (write_pos == 0 ? bufferSize-1 : write_pos-1);
+			if (!locked) mutex_data.unlock();
+			return res;
 		}
 		/// release until id, excluding id
-		void releaseUntil(unsigned id) {
-			boost::unique_lock<boost::mutex> l(mutex_data);
+		void releaseUntil(unsigned id, bool locked = false) {
+			if (!locked) mutex_data.lock();
 			read_pos = id;
+			if (!locked) mutex_data.unlock();
 		}
 		/// release until id, including id
-		void release(unsigned id) {
-			boost::unique_lock<boost::mutex> l(mutex_data);
+		void release(unsigned id, bool locked = false) {
+			if (!locked) mutex_data.lock();
 			read_pos = id+1;
 			if (read_pos >= bufferSize) read_pos = 0;
+			if (!locked) mutex_data.unlock();
 		}
-		bool isFull()
+		bool isFull(bool locked = false)
 		{
-			boost::unique_lock<boost::mutex> l(mutex_data);
+			if (!locked) mutex_data.lock();
 			return (read_pos == write_pos);
+			if (!locked) mutex_data.unlock();
 		}
-		
-		/**
-			Provides approximate informations about the timings of data
-			@param data_period the period at which the data are arriving
-			@param arrival_delay the delay between the moment we get a data and its real date.
-			This is a starting point that must be overestimated,
-			it may be estimated more precisely afterwards.
-		*/
-		virtual void getTimingInfos(double &data_period, double &arrival_delay)
-			{ data_period = this->data_period; arrival_delay = this->arrival_delay; }
-		virtual void setTimingInfos(double data_period, double arrival_delay)
-			{ this->data_period = data_period; this->arrival_delay = arrival_delay; }
 		
 	public:
 		/** Constructor
@@ -152,12 +146,28 @@ class HardwareSensorAbstract
 		{}
 		void setSyncConfig(double timestamps_correction = 0.0)
 			{ this->timestamps_correction = timestamps_correction; }
+		/**
+			Provides approximate informations about the timings of data
+			@param data_period the period at which the data are arriving
+			@param arrival_delay the delay between the moment we get a data and its real date.
+			This is a starting point that must be overestimated,
+			it may be estimated more precisely afterwards.
+		*/
+		virtual void getTimingInfos(double &data_period, double &arrival_delay)
+			{ data_period = this->data_period; arrival_delay = this->arrival_delay; }
+		virtual void setTimingInfos(double data_period, double arrival_delay)
+			{ this->data_period = data_period; this->arrival_delay = arrival_delay; }
+		
 		
 		VecIndT getRaws(double t1, double t2); /// will also release the raws before the first one
-		RawInfos getUnreadRawInfos(); /// get timing informations about unread raws
+		int getUnreadRawInfos(RawInfos &infos); /// get timing informations about unread raws
 		void getRaw(unsigned id, T& raw); /// will also release the raws before this one
+		double getRawTimestamp(unsigned id);
 		int getLastUnreadRaw(T& raw); /// will also release the raws before this one
 		void getLastProcessedRaw(T& raw) { raw = buffer[last_sent_pos]; } /// for information only (display...)
+		
+		friend class rtslam::SensorProprioAbstract;
+		friend class rtslam::SensorExteroAbstract;
 };
 
 
@@ -240,14 +250,14 @@ typename HardwareSensorAbstract<T>::VecIndT HardwareSensorAbstract<T>::getRaws(d
 	{
 		j = (i_left+i_right)/2;
 		i = j % bufferSize;
-		if (getRawTimestamp(buffer(i)) >= t1) i_right = j; else i_left = j+1;
+		if (extractRawTimestamp(buffer(i)) >= t1) i_right = j; else i_left = j+1;
 	}
 	i = i_left % bufferSize;
 	i1 = (i-1 + bufferSize) % bufferSize;
-	if (t1 <= 1.0 && getRawTimestamp(buffer(i1)) < 0.0) i1 = i;
-	bool no_larger = (getRawTimestamp(buffer(i)) < t1);
+	if (t1 <= 1.0 && extractRawTimestamp(buffer(i1)) < 0.0) i1 = i;
+	bool no_larger = (extractRawTimestamp(buffer(i)) < t1);
 	bool no_smaller = (i == write_pos);
-	if (no_larger && getRawTimestamp(buffer(i1)) < 0.0)  // no data at all
+	if (no_larger && extractRawTimestamp(buffer(i1)) < 0.0)  // no data at all
 		return ublas::project(buffer, jmath::ublasExtra::ia_set(ublas::range(0,0)));
 	if (no_smaller) JFR_ERROR(RtslamException, RtslamException::BUFFER_OVERFLOW, "Missing data: increase buffer size !");
 	
@@ -260,7 +270,7 @@ typename HardwareSensorAbstract<T>::VecIndT HardwareSensorAbstract<T>::getRaws(d
 		{
 			j = (i_left+i_right)/2;
 			i = j % bufferSize;
-			if (getRawTimestamp(buffer(i)) >= t2) i_right = j; else i_left = j+1;
+			if (extractRawTimestamp(buffer(i)) >= t2) i_right = j; else i_left = j+1;
 		}
 		i = i_left % bufferSize;
 		i2 = i;
@@ -286,9 +296,9 @@ typename HardwareSensorAbstract<T>::VecIndT HardwareSensorAbstract<T>::getRaws(d
 
 
 template<typename T>
-RawInfos HardwareSensorAbstract<T>::getUnreadRawInfos()
+int HardwareSensorAbstract<T>::getUnreadRawInfos(RawInfos &infos)
 {
-	RawInfos result;
+	infos.available.clear();
 	int first_stop, second_stop;
 	int first = getFirstUnreadPos(), last = getLastUnreadPos();
 	if (first <= last)
@@ -302,17 +312,21 @@ RawInfos HardwareSensorAbstract<T>::getUnreadRawInfos()
 	}
 	
 	for(int pos = first; pos <= first_stop; ++pos)
-		result.available.push_back(RawInfo(pos,getRawTimestamp(buffer(pos)),getRawArrival(buffer(pos))));
+		infos.available.push_back(RawInfo(pos,extractRawTimestamp(buffer(pos)),extractRawArrival(buffer(pos))));
 	for(int pos = 0; pos <= second_stop; ++pos)
-		result.available.push_back(RawInfo(pos,getRawTimestamp(buffer(pos)),getRawArrival(buffer(pos))));
+		infos.available.push_back(RawInfo(pos,extractRawTimestamp(buffer(pos)),extractRawArrival(buffer(pos))));
 
 	double data_period, arrival_delay;
 	getTimingInfos(data_period, arrival_delay);
-	data_period += result.available[result.available.size()-1].timestamp;
-	result.next = RawInfo(0,data_period,data_period+arrival_delay);
-	result.process_time = 0.;
+	data_period += infos.available[infos.available.size()-1].timestamp;
+	infos.next = RawInfo(0,data_period,data_period+arrival_delay);
+	infos.process_time = 0.;
 	
-	return result;
+	if (infos.available.size() == 0)
+	{
+		if (no_more_data) return -2; else return -1;
+	}
+	return 0;
 }
 
 template<typename T>
@@ -324,14 +338,20 @@ void HardwareSensorAbstract<T>::getRaw(unsigned id, T& raw)
 }
 
 template<typename T>
+double HardwareSensorAbstract<T>::getRawTimestamp(unsigned id)
+{
+	return extractRawTimestamp(buffer[id]);
+}
+
+template<typename T>
 int HardwareSensorAbstract<T>::getLastUnreadRaw(T& raw)
 {
 	boost::unique_lock<boost::mutex> l(mutex_data);
 	int missed_count = image_count-1;
 	if (image_count > 0)
 	{
-		unsigned id = getLastUnreadPos();
-		releaseUntil(id);
+		unsigned id = getLastUnreadPos(true);
+		releaseUntil(id, true);
 		last_sent_pos = id;
 		raw = buffer[id];
 		image_count = 0;

@@ -29,7 +29,7 @@
  * STATUS: working fine, use it
  * This allows to have 0% cpu used for waiting/idle
  */
-#define EVENT_BASED_RAW 1
+//#define EVENT_BASED_RAW 1 // always enabled now
 
 /*
  * STATUS: in progress, do not use for now
@@ -132,6 +132,7 @@
 #include "rtslam/descriptorImagePoint.hpp"
 #include "rtslam/descriptorSeg.hpp"
 #include "rtslam/dataManagerOnePointRansac.hpp"
+#include "rtslam/sensorManager.hpp"
 
 #include "rtslam/hardwareSensorCameraFirewire.hpp"
 #include "rtslam/hardwareEstimatorMti.hpp"
@@ -778,9 +779,10 @@ void demo_slam01_main(world_ptr_t *world) { try {
 			case 1: crop = VIAM_HW_CROP; break;
 			default: crop = VIAM_HW_FIXED; break;
 		}
-		hardware::hardware_sensorext_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, 5+50,
+		hardware::hardware_sensor_firewire_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, 5+50,
 			configSetup.CAMERA_DEVICE, cv::Size(img_width,img_height), 0, 8, crop, floatOpts[fFreq], intOpts[iTrigger], 
 			floatOpts[fShutter], mode, strOpts[sDataPath]));
+		hardSen11->setTimingInfos(1.0/hardSen11->getFreq(), 1.0/hardSen11->getFreq());
 		senPtr11->setHardwareSensor(hardSen11);
 		#else
 		if (intOpts[iReplay] & 1)
@@ -797,9 +799,12 @@ void demo_slam01_main(world_ptr_t *world) { try {
 			hardware::hardware_sensorprop_ptr_t hardGps(
 				new hardware::HardwareSensorGpsGenom(rawdata_condition, 100, "mana-base", mode, strOpts[sDataPath]));
 			hardGps->setSyncConfig(0.0/*configSetup.GPS_TIMESTAMP_CORRECTION*/);
+			hardGps->setTimingInfos(1.0/20.0, 1.5/20.0);
 			senPtr13->setHardwareSensor(hardGps);
 		}
 	}
+	
+	sensor_manager_ptr_t sensorManager(new SensorManagerOneAndOne(mapPtr));
 	
 	//--- force a first display with empty slam to ensure that all windows are loaded
 // std::cout << "SLAM: forcing first initialization display" << std::endl;
@@ -859,120 +864,48 @@ int n_innovation = 0;
 	// Temporal loop
 	//if (dataLogger) dataLogger->log();
 	kernel::Chrono chrono;
-	double max_dt = 0;
+
 	for (; (*world)->t <= N_FRAMES;)
 	{
 		if ((*world)->exit()) break;
 		
-#if EVENT_BASED_RAW
-		//boost::unique_lock<boost::mutex> rawdata_lock(rawdata_mutex);
-#endif
 		bool had_data = false;
-		bool no_more_data = true;
-		//worldPtr->display_mutex.lock();
-		//if (intOpts[iRenderAll] && worldPtr->display_rendered != (*world)->t)
-		//	{ worldPtr->display_mutex.unlock(); boost::this_thread::yield(); continue; }
 		chrono.reset();
 
-		// FIXME if intOpts[iRenderAll], manage multisensors : ensure that only 1 sensor is processed, save its time to log it, and ensure that next time next sensor will be tried first
-		// FIRST LOOP FOR MEASUREMENT SPACES - ALL DM
-		// foreach robot
-		for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin();
-			robIter != mapPtr->robotList().end(); ++robIter)
+		SensorManagerAbstract::ProcessInfo pinfo = sensorManager->getNextDataToUse();
+		bool no_more_data = pinfo.no_more_data;
+		
+		if (pinfo.sen)
 		{
-			robot_ptr_t robPtr = *robIter;
-			// std::cout << "\n================================================== " << std::endl;
-			// std::cout << *robPtr << std::endl;
-
-			// foreach sensor
-			for (RobotAbstract::SensorList::iterator senIter = robPtr->sensorList().begin();
-				senIter != robPtr->sensorList().end(); ++senIter)
+			had_data = true;
+			if (intOpts[iReplay] == 2)
+				pinfo.sen->process_fake(pinfo.id); // just to release data
+			else
 			{
-				if ((*senIter)->kind == SensorAbstract::PROPRIOCEPTIVE) continue; // FIXME temporary
-				sensorext_ptr_t senPtr = SPTR_CAST<SensorExteroAbstract>(*senIter);
-				//					std::cout << "\n________________________________________________ " << std::endl;
-				//					std::cout << *senPtr << std::endl;
+				JFR_DEBUG("************** FRAME : " << (*world)->t);
+				
+				double newt = pinfo.sen->getRawTimestamp(pinfo.id);
+				robot_ptr_t robPtr = pinfo.sen->robotPtr();
+				robPtr->move(newt);
+				
+				JFR_DEBUG("Robot " << robPtr->id() << " state after move " << robPtr->state.x());
+				JFR_DEBUG("Robot state stdev after move " << stdevFromCov(robPtr1->state.P()));
+				robot_prediction = robPtr->state.x();
+				
+				pinfo.sen->process(pinfo.id);
+				
+				JFR_DEBUG("Robot state after corrections of sensor " << pinfo.sen->id() << " : " << robPtr1->state.x());
+				JFR_DEBUG("Robot state stdev after corrections " << stdevFromCov(robPtr1->state.P()));
+				average_robot_innovation += ublas::norm_2(robPtr->state.x() - robot_prediction);
+				n_innovation++;
+			}
+		}
+		
 
-				// get raw-data
-				int r = senPtr->acquireRaw();
-				if (r != -2) no_more_data = false;
-				if (r < 0)
-				{
-#if !EVENT_BASED_RAW
-					boost::this_thread::yield();
-#endif
-					continue;
-				} else
-				{
-					had_data=true;
-#if EVENT_BASED_RAW
-					//rawdata_lock.unlock();
-#endif
-				}
-// cout << "\n************************************************** " << std::endl;
-JFR_DEBUG("                 FRAME : " << (*world)->t);
-//				std::cout << "Robot: " << *robPtr << std::endl;
-//				std::cout << "Pert: " << robPtr->perturbation.P() << "\nPert Jac: " << robPtr->XNEW_pert << "\nState pert: " << robPtr->Q << std::endl;
-//				std::cout << "Robot state: " << robPtr->state.x() << std::endl;
-
-				if (intOpts[iReplay] != 2)
-				{
-					// move the filter time to the data raw.
-					robPtr->move(senPtr->getRaw()->timestamp);
-JFR_DEBUG("Robot state after move " << robPtr1->state.x());
-JFR_DEBUG("Robot state stdev after move " << sqrt(ublas::matrix_vector_range<jblas::sym_mat_indirect>(robPtr1->state.P(), ublas::range(0, robPtr1->state.P().size1()), ublas::range (0, robPtr1->state.P().size2()))));
-
-
-robot_prediction = robPtr->state.x();
-
-					// foreach dataManager
-					for (SensorExteroAbstract::DataManagerList::iterator dmaIter = senPtr->dataManagerList().begin();
-						dmaIter != senPtr->dataManagerList().end(); ++dmaIter)
-					{
-						data_manager_ptr_t dmaPtr = *dmaIter;
-						dmaPtr->processKnown(senPtr->getRaw());
-						dmaPtr->mapManagerPtr()->manage();
-						dmaPtr->detectNew(senPtr->getRaw());
-					} // foreach dataManager
-
-average_robot_innovation += ublas::norm_2(robPtr->state.x() - robot_prediction);
-n_innovation++;
-
-				} else
-				{
-					robPtr->move_fake(senPtr->getRaw()->timestamp);
-				}
-
-			} // for each sensor
-		} // for each robot
-
-		// NOW LOOP FOR STATE SPACE - ALL MM
+		// wait that display has finished if render all
 		if (had_data)
 		{
-JFR_DEBUG("Robot state after corrections " << robPtr1->state.x());
-JFR_DEBUG("Robot state stdev after corrections " << stdevFromCov(robPtr1->state.P()));
-			if (robPtr1->dt_or_dx > max_dt) max_dt = robPtr1->dt_or_dx;
-
-			// Output info
-//						std::cout << std::endl;
-//						std::cout << "dt: " << (int) (1000 * robPtr1->dt_or_dx) << "ms (match "
-//						<< total_match_time/1000 << " ms, update " << total_update_time/1000 << "ms). Lmk: [";
-//						std::cout << mmPoint->landmarkList().size() << "] ";
-//						for (MapManagerAbstract::LandmarkList::iterator lmkIter =
-//								mmPoint->landmarkList().begin(); lmkIter
-//								!= mmPoint->landmarkList().end(); lmkIter++) {
-//							std::cout << (*lmkIter)->id() << " ";
-//						}
-#if 0
-			for (MapAbstract::MapManagerList::iterator mmIter = mapPtr->mapManagerList().begin(); 
-				mmIter != mapPtr->mapManagerList().end(); ++mmIter)
-			{
-				map_manager_ptr_t mapMgr = *mmIter;
-				mapMgr->manage();
-			}
-#endif
-// cout << "SLAM: processed a frame: t " << (*world)->t << " display_t " << (*world)->display_t << std::endl;
-
+			// get render all status
 			bool renderAll;
 			#ifdef HAVE_MODULE_QDISPLAY
 			if (intOpts[iDispQt])
@@ -984,30 +917,23 @@ JFR_DEBUG("Robot state stdev after corrections " << stdevFromCov(robPtr1->state.
 			#endif
 			renderAll = (intOpts[iRenderAll] != 0);
 
+			// if render all, wait display has finished
 			if ((intOpts[iDispQt] || intOpts[iDispGdhe]) && renderAll)
 			{
 				boost::unique_lock<boost::mutex> display_lock((*world)->display_mutex);
 				while(!(*world)->display_rendered && !(*world)->exit()) (*world)->display_condition.wait(display_lock);
 				display_lock.unlock();
 			}
-
-		} // if had_data
-
-/*		if (no_more_data) // we wait the display to ensure that the last frame is displayed
-		{
-			boost::unique_lock<boost::mutex> display_lock((*world)->display_mutex);
-			while(!(*world)->display_rendered) (*world)->display_condition.wait(display_lock);
-			display_lock.unlock();
 		}
-*/
+
+		
+		// asking for display if display has finished
 		unsigned processed_t = (had_data ? (*world)->t : (*world)->t-1);
 		if ((*world)->display_t+1 < processed_t+1)
 		{
-//cout << "SLAM: checking if display has rendered" << std::endl;
 			boost::unique_lock<boost::mutex> display_lock((*world)->display_mutex);
 			if ((*world)->display_rendered)
 			{
-// cout << "SLAM: display has finished, let's bufferize this one" << std::endl;
 				#ifdef HAVE_MODULE_QDISPLAY
 				display::ViewerQt *viewerQt = NULL;
 				if (intOpts[iDispQt]) viewerQt = PTR_CAST<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
@@ -1029,18 +955,12 @@ JFR_DEBUG("Robot state stdev after corrections " << stdevFromCov(robPtr1->state.
 		
 		if (no_more_data) break;
 
-#if EVENT_BASED_RAW
 		if (!had_data)
 		{
 			rawdata_condition.wait(boost::lambda::_1 != 0);
 			rawdata_condition.set(0);
 		}
-#endif
 		
-		
-//		int t = (*world)->t;
-//		worldPtr->display_mutex.unlock();
-
 		bool doPause;
 		#ifdef HAVE_MODULE_QDISPLAY
 		if (intOpts[iDispQt])
@@ -1068,7 +988,6 @@ JFR_DEBUG("Robot state stdev after corrections " << stdevFromCov(robPtr1->state.
 			getchar(); // wait for key in replay mode
 			(*world)->slam_blocked(false);
 		}
-//std::cout << "one frame " << (*world)->t << " : " << mode << " " << had_data << std::endl;
 
 		if (had_data)
 		{
@@ -1077,8 +996,9 @@ JFR_DEBUG("Robot state stdev after corrections " << stdevFromCov(robPtr1->state.
 		}
 	} // temporal loop
 
-average_robot_innovation /= n_innovation;
-std::cout << "average_robot_innovation " << average_robot_innovation << std::endl;
+
+	average_robot_innovation /= n_innovation;
+	std::cout << "average_robot_innovation " << average_robot_innovation << std::endl;
 
 	(*world)->slam_blocked(true);
 //	std::cout << "\nFINISHED ! Press a key to terminate." << std::endl;

@@ -68,9 +68,12 @@ namespace jafar {
 				}
 				
 				void setIntegrationPolicy(bool integrate_all) { this->integrate_all = integrate_all; }
+				bool getIntegrationPolicy() { return integrate_all; }
 
-				virtual RawInfos queryAvailableRaws() = 0; ///< get information about the available raws and the estimated dates for next one
-				virtual void process(unsigned id) = 0; ///< process the given raw and throw away the previous unprocessed ones
+				virtual int queryAvailableRaws(RawInfos &infos) = 0; ///< get information about the available raws and the estimated dates for next one
+				virtual double getRawTimestamp(unsigned id) = 0;
+				virtual void process(unsigned id) = 0; ///< process the given raw and throw away the previous unprocessed ones \return innovation
+				virtual void process_fake(unsigned id) = 0; ///< don't do any predict or update, but let the data acquisition run smoothly
 
 				enum type_enum {
 					PINHOLE, BARRETO
@@ -146,8 +149,11 @@ namespace jafar {
 				void setHardwareSensor(hardware::hardware_sensorprop_ptr_t hardwareSensorPtr_)
 					{ hardwareSensorPtr = hardwareSensorPtr_; }
 				
-				virtual RawInfos queryAvailableRaws() { return hardwareSensorPtr->getUnreadRawInfos(); }
+				virtual int queryAvailableRaws(RawInfos &infos)
+					{ int res = hardwareSensorPtr->getUnreadRawInfos(infos); infos.integrate_all = integrate_all; return res; }
+				virtual double getRawTimestamp(unsigned id) { return hardwareSensorPtr->getRawTimestamp(id); } 
 				//process(id) will do the filtering, so it is specific to each hardware
+				void process_fake(unsigned id) { hardwareSensorPtr->releaseUntil(id); }
 		};
 		
 		/** 
@@ -199,10 +205,11 @@ namespace jafar {
 //				virtual raw_ptr_t getRaw() = 0;
 
 				virtual raw_ptr_t getLastProcessedRaw() { raw_ptr_t raw; hardwareSensorPtr->getLastProcessedRaw(raw); return raw; }
-				virtual RawInfos queryAvailableRaws() { return hardwareSensorPtr->getUnreadRawInfos(); }
+				virtual int queryAvailableRaws(RawInfos &infos)
+					{ int res = hardwareSensorPtr->getUnreadRawInfos(infos); infos.integrate_all = integrate_all; return res; }
+				virtual double getRawTimestamp(unsigned id) { return hardwareSensorPtr->getRawTimestamp(id); } 
 				void process(unsigned id);
-
-
+				void process_fake(unsigned id) { hardwareSensorPtr->releaseUntil(id); }
 		};
 
 	}

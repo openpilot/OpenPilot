@@ -66,7 +66,7 @@ namespace jafar {
 				
 				virtual void process(unsigned id)
 				{
-					jblas::vec reading;
+					RawVec reading;
 					hardwareSensorPtr->getRaw(id, reading);
 					
 					// TODO a vec hardware sensor should return some information about what it is returning
@@ -76,23 +76,23 @@ namespace jafar {
 					switch (innovation->size())
 					{
 						case 7: // POS+ORI
-							ublas::subrange(innovation->x(), 4, 8) = ublas::subrange(robotPtr()->pose.x(), 4, 8) - ublas::subrange(reading, 4, 8);
+							ublas::subrange(innovation->x(), 4, 8) = ublas::subrange(robotPtr()->pose.x(), 4, 8) - ublas::subrange(reading.data, 4, 8);
 							if (hasVar)
 							{
-								innovation->P()(4,4) = reading(4+7); innovation->P()(5,5) = reading(5+7);
-								innovation->P()(6,6) = reading(6+7); innovation->P()(7,7) = reading(7+7);
+								innovation->P()(4,4) = reading.data(4+7); innovation->P()(5,5) = reading.data(5+7);
+								innovation->P()(6,6) = reading.data(6+7); innovation->P()(7,7) = reading.data(7+7);
 							}
 						case 3: // POS
-							ublas::subrange(innovation->x(), 1, 4) = ublas::subrange(robotPtr()->pose.x(), 1, 4) - ublas::subrange(reading, 1, 4);
+							ublas::subrange(innovation->x(), 1, 4) = ublas::subrange(robotPtr()->pose.x(), 1, 4) - ublas::subrange(reading.data, 1, 4);
 							if (hasVar)
 							{
-								innovation->P()(1,1) = reading(1+7); innovation->P()(2,2) = reading(2+7);
-								innovation->P()(3,3) = reading(3+7);
+								innovation->P()(1,1) = reading.data(1+7); innovation->P()(2,2) = reading.data(2+7);
+								innovation->P()(3,3) = reading.data(3+7);
 							}
 							break;
 						default:
 							JFR_ERROR(RtslamException, RtslamException::GENERIC_ERROR,
-							          "SensorAbsloc reading size " << reading.size() << " not supported.");
+							          "SensorAbsloc reading size " << reading.data.size() << " not supported.");
 					}
 					
 					map_ptr_t mapPtr = robotPtr()->mapPtr();

@@ -83,6 +83,7 @@ namespace jafar {
 		class DescriptorAbstract;
 		class Gaussian;
 		class ExtendedKalmanFilterIndirect;
+		class SensorManagerAbstract;
 
 		// Pointers with boost::shared_ptr:
 		typedef boost::shared_ptr<WorldAbstract>       										world_ptr_t;
@@ -106,6 +107,7 @@ namespace jafar {
 		typedef boost::shared_ptr<Gaussian>						 										gaussian_ptr_t;
 
 		typedef boost::shared_ptr<ExtendedKalmanFilterIndirect>          	ekfInd_ptr_t;
+		typedef boost::shared_ptr<SensorManagerAbstract>                  sensor_manager_ptr_t;
 
 		typedef kernel::IdFactory<unsigned int, kernel::IdCollectorNone> 	IdFactory; // FIXME maybe we should change for a smarter IdFactory ? eg:
 		//typedef kernel::IdFactory<unsigned, kernel::IdCollectorList> IdFactory;

@@ -92,6 +92,7 @@ class HardwareSensorCameraFirewire: public HardwareSensorExteroAbstract
 		double getFreq() { return realFreq; }
 };
 
+typedef boost::shared_ptr<HardwareSensorCameraFirewire> hardware_sensor_firewire_ptr_t;
 
 }}}
 

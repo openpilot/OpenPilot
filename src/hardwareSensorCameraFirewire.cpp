@@ -164,9 +164,56 @@ namespace hardware {
 	{
 		struct timeval ts, *pts = &ts;
 		int r;
-		int last_processed_index = index()-1;
 
-		if (mode == 1)
+		while(true)
+		{
+			// acquire the image
+			if (mode == 2)
+			{
+				boost::unique_lock<boost::mutex> l(mutex_data);
+				while (isFull(true)) cond_offline_freed.wait(l);
+				l.unlock();
+				int buff_write = getWritePos();
+				while (true)
+				{
+					// FIXME manage multisensors : put sensor id in filename
+					std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << index_load+first_index;
+					if (found_first != 2 && bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".pgm")) && found_first == 0) found_first = 1;
+					if (found_first != 1 && bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".png")) && found_first == 0) found_first = 2;
+					if (!found_first) { first_index++; continue; }
+					
+					if (bufferSpecPtr[buff_write]->img->data() == NULL)
+					{
+						boost::unique_lock<boost::mutex> l(mutex_data);
+						no_more_data = true;
+						//std::cout << "No more images to read." << std::endl;
+						break;
+					}
+					std::fstream f((oss.str() + std::string(".time")).c_str(), std::ios_base::in);
+					f >> bufferSpecPtr[buff_write]->timestamp; f.close();
+					index_load++;
+					break;
+				} //else  { boost::this_thread::yield(); continue; }
+				if (no_more_data) break;
+			} else
+			{
+#ifdef HAVE_VIAM
+				int buff_write = getWritePos();
+				r = viam_oneshot(handle, bank, &(bufferImage[buff_write]), &pts, 1);
+				bufferSpecPtr[buff_write]->arrival = getNowTimestamp();
+				bufferSpecPtr[buff_write]->timestamp = ts.tv_sec + ts.tv_usec*1e-6;
+				last_timestamp = bufferSpecPtr[buff_write]->timestamp;
+#endif
+			}
+			incWritePos();
+			condition.setAndNotify(1);
+		}
+	}
+
+	void HardwareSensorCameraFirewire::saveTask(void)
+	{
+		int last_processed_index = index()-1;
+		//if (mode == 1)
 		{
 			#if 0
 			// TODO test
@@ -188,61 +235,22 @@ namespace hardware {
 			if (!r) {} // don't care
 			#endif
 		}
-
-		while(true)
+		
+		while (true)
 		{
-			// acquire the image
-			int buff_write = getWritePos();
-			if (mode == 2)
-			{
-				index.wait(boost::lambda::_1 != last_processed_index);
-				//if (index != last_processed_index)
-				while (true)
-				{
-					// FIXME manage multisensors : put sensor id in filename
-					std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << index()+first_index;
-					if (found_first != 2 && bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".pgm")) && found_first == 0) found_first = 1;
-					if (found_first != 1 && bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".png")) && found_first == 0) found_first = 2;
-					if (!found_first) { first_index++; continue; }
-					
-					if (bufferSpecPtr[buff_write]->img->data() == NULL)
-					{
-						boost::unique_lock<boost::mutex> l(mutex_data);
-						no_more_data = true;
-						//std::cout << "No more images to read." << std::endl;
-						break;
-					}
-					std::fstream f((oss.str() + std::string(".time")).c_str(), std::ios_base::in);
-					f >> bufferSpecPtr[buff_write]->timestamp; f.close();
-					last_processed_index = index();
-					break;
-				} //else  { boost::this_thread::yield(); continue; }
-				if (no_more_data) break;
-			} else
-			{
-#ifdef HAVE_VIAM
-				r = viam_oneshot(handle, bank, &(bufferImage[buff_write]), &pts, 1);
-				bufferSpecPtr[buff_write]->arrival = getNowTimestamp();
-				bufferSpecPtr[buff_write]->timestamp = ts.tv_sec + ts.tv_usec*1e-6;
-				last_timestamp = bufferSpecPtr[buff_write]->timestamp;
-#endif
-			}
-			// update the bufferImage infos
-			image_count++;
+			index.wait(boost::lambda::_1 != last_processed_index);
 			// dump the images
-			if (mode == 1)
+			//if (mode == 1)
 			{
 				std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << index();
-				bufferSpecPtr[buff_write]->img->save(oss.str() + std::string(".pgm"));
+				bufferSpecPtr[last_sent_pos]->img->save(oss.str() + std::string(".pgm"));
 				std::fstream f; f.open((oss.str() + std::string(".time")).c_str(), std::ios_base::out); 
-				f << std::setprecision(20) << bufferSpecPtr[buff_write]->timestamp << std::endl; f.close();
+				f << std::setprecision(20) << bufferSpecPtr[last_sent_pos]->timestamp << std::endl; f.close();
+				last_processed_index = index();
 			}
-JFR_DEBUG("Firewire write: wrote to pos " << buff_write);
-			incWritePos();
-			condition.setAndNotify(1);
 		}
 	}
-
+	
 	void HardwareSensorCameraFirewire::init(int mode, std::string dump_path, cv::Size imgSize)
 	{
 		this->mode = mode;
@@ -261,7 +269,12 @@ JFR_DEBUG("Firewire write: wrote to pos " << buff_write);
 		
 		found_first = 0;
 		first_index = 0;
+		index_load = 0;
 
+		// start save task
+		if (mode == 1)
+			saveTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::saveTask,this));
+		
 		// start acquire task
 		last_timestamp = getNowTimestamp();
 		preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::preloadTask,this));

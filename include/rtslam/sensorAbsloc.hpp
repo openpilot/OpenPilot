@@ -99,7 +99,7 @@ namespace jafar {
 					ind_array ia_x = mapPtr->ia_used_states();
 					mapPtr->filterPtr->correct(ia_x,*innovation,INN_rs,ia_rs);
 					
-					hardwareSensorPtr->release();
+					//hardwareSensorPtr->release();
 				}
 		};
 }}

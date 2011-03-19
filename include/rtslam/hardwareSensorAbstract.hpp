@@ -79,15 +79,14 @@ class HardwareSensorAbstract
 		bool buffer_full; /// when read_pos = write_pos, tells whether the buffer is full or empty
 		bool read_pos_used;  /// current read_pos is being used
 		
-		int last_sent_pos; /// position of the last raw sent
-		
 	protected:
 		kernel::VariableCondition<int> &condition; /// to notify when new data is available
-		kernel::VariableCondition<int> index;
+		kernel::VariableCondition<int> index; /// index of used data
 		boost::mutex mutex_data; /// mutex for using this object
 		boost::condition_variable cond_offline_full;
 		boost::condition_variable cond_offline_freed;
-		int image_count; /// image count since last image read
+		int data_count; /// image count since last image read
+		int last_sent_pos; /// position of the last raw sent
 		bool no_more_data;
 		double timestamps_correction;
 		double data_period;
@@ -96,18 +95,17 @@ class HardwareSensorAbstract
 		int bufferSize; /// size of the ring buffer
 		VecT buffer; /// the ring buffer
 		
-		int getWritePos() {
-			if (isFull()) JFR_ERROR(RtslamException, RtslamException::GENERIC_ERROR, "buffer of hardware is full"); // FIXME chose policty when full
+		int getWritePos(bool locked = false) {
+			if (isFull(locked)) JFR_ERROR(RtslamException, RtslamException::GENERIC_ERROR, "buffer of hardware is full"); // FIXME chose policty when full
 			// don't need to lock, because will only be used and modified by writer
 			return write_pos;
 		}
 		void incWritePos(bool locked = false) {
-			if (!locked) mutex_data.lock();
+			boost::unique_lock<boost::mutex> l(mutex_data, boost::defer_lock_t()); if (!locked) l.lock();
 			++write_pos;
 			if (write_pos >= bufferSize) write_pos = 0;
 			if (write_pos == read_pos) buffer_full = true; // full
-			++image_count;
-			if (!locked) mutex_data.unlock();
+			++data_count;
 		}
 		int getFirstUnreadPos() {
 			/// \warning check that buffer is not empty before
@@ -117,38 +115,37 @@ class HardwareSensorAbstract
 		}
 		int getLastUnreadPos(bool locked = false) {
 			/// \warning check that buffer is not empty before
-			if (!locked) mutex_data.lock();
-			int res = (write_pos == 0 ? bufferSize-1 : write_pos-1);
-			if (!locked) mutex_data.unlock();
-			return res;
+			boost::unique_lock<boost::mutex> l(mutex_data, boost::defer_lock_t()); if (!locked) l.lock();
+			return (write_pos == 0 ? bufferSize-1 : write_pos-1);
 		}
 		/// release until id, excluding id
 		void releaseUntil(unsigned id, bool locked = false) {
-			if (!locked) mutex_data.lock();
+			boost::unique_lock<boost::mutex> l(mutex_data, boost::defer_lock_t()); if (!locked) l.lock();
 			read_pos = id;
 			read_pos_used = true;
+			if (getFirstUnreadPos() == write_pos) buffer_full = false;
+			l.unlock();
+			cond_offline_freed.notify_all();
 			// cannot be full as id is not released
-			if (!locked) mutex_data.unlock();
 		}
 		/// release until id, including id
 		void release(unsigned id, bool locked = false) {
-			if (!locked) mutex_data.lock();
+			boost::unique_lock<boost::mutex> l(mutex_data, boost::defer_lock_t()); if (!locked) l.lock();
 			if (id != (unsigned)(bufferSize-1)) read_pos = id+1; else read_pos = 0;
 			if (write_pos == read_pos) buffer_full = false; // empty
 			read_pos_used = false;
-			if (!locked) mutex_data.unlock();
+			l.unlock();
+			cond_offline_freed.notify_all();
 		}
 		bool isFull(bool locked = false)
 		{
-			if (!locked) mutex_data.lock();
+			boost::unique_lock<boost::mutex> l(mutex_data, boost::defer_lock_t()); if (!locked) l.lock();
 			return (read_pos == write_pos && buffer_full);
-			if (!locked) mutex_data.unlock();
 		}
 		bool isEmpty(bool locked = false)
 		{
-			if (!locked) mutex_data.lock();
-			return (read_pos == write_pos && !buffer_full);
-			if (!locked) mutex_data.unlock();
+			boost::unique_lock<boost::mutex> l(mutex_data, boost::defer_lock_t()); if (!locked) l.lock();
+			return (getFirstUnreadPos() == write_pos && !buffer_full);
 		}
 		
 	public:
@@ -156,9 +153,9 @@ class HardwareSensorAbstract
 			@param condition to notify when new data is available
 		*/
 		HardwareSensorAbstract(kernel::VariableCondition<int> &condition, unsigned bufferSize):
-			write_pos(0), read_pos(0), buffer_full(false), read_pos_used(false), last_sent_pos(-1),
+			write_pos(0), read_pos(0), buffer_full(false), read_pos_used(false),
 		  condition(condition), index(0),
-		  image_count(0), no_more_data(false), timestamps_correction(0.0),
+		  data_count(0), no_more_data(false), timestamps_correction(0.0),
 		  bufferSize(bufferSize), buffer(bufferSize)
 		{}
 		void setSyncConfig(double timestamps_correction = 0.0)
@@ -180,10 +177,11 @@ class HardwareSensorAbstract
 		
 		VecIndT getRaws(double t1, double t2); /// will also release the raws before the first one
 		int getUnreadRawInfos(RawInfos &infos); /// get timing informations about unread raws
+		int getNextRawInfo(RawInfo &info); /// get info about next unread raw
 		void getRaw(unsigned id, T& raw); /// will also release the raws before this one
 		double getRawTimestamp(unsigned id);
 		int getLastUnreadRaw(T& raw); /// will also release the raws before this one
-		void getLastProcessedRaw(T& raw) { raw = buffer[last_sent_pos]; } /// for information only (display...)
+		void getLastProcessedRaw(T& raw) { raw = buffer(last_sent_pos); } /// for information only (display...)
 		void release() { release(read_pos); }
 		
 		friend class rtslam::SensorProprioAbstract;
@@ -355,11 +353,17 @@ int HardwareSensorAbstract<T>::getUnreadRawInfos(RawInfos &infos)
 }
 
 template<typename T>
-void HardwareSensorAbstract<T>::getRaw(unsigned id, T& raw)
+int HardwareSensorAbstract<T>::getNextRawInfo(RawInfo &info)
 {
-	releaseUntil(id);
-	raw = buffer[id];
-	last_sent_pos = id;
+	if (!isEmpty())
+	{
+		int first = getFirstUnreadPos();
+		info = RawInfo(first,extractRawTimestamp(buffer(first)),0.0);
+		return 0;
+	} else
+	{
+		if (no_more_data) return -2; else return -1;
+	}
 }
 
 template<typename T>
@@ -369,17 +373,28 @@ double HardwareSensorAbstract<T>::getRawTimestamp(unsigned id)
 }
 
 template<typename T>
+void HardwareSensorAbstract<T>::getRaw(unsigned id, T& raw)
+{
+	releaseUntil(id);
+	raw = buffer[id];
+	last_sent_pos = id;
+	index.applyAndNotify(boost::lambda::_1++);
+}
+
+template<typename T>
 int HardwareSensorAbstract<T>::getLastUnreadRaw(T& raw)
 {
 	boost::unique_lock<boost::mutex> l(mutex_data);
-	int missed_count = image_count-1;
-	if (image_count > 0)
+	int missed_count = data_count-1;
+	if (data_count > 0)
 	{
 		unsigned id = getLastUnreadPos(true);
 		releaseUntil(id, true);
-		last_sent_pos = id;
 		raw = buffer[id];
-		image_count = 0;
+		last_sent_pos = id;
+		boost::unique_lock<boost::mutex> l(mutex_data);
+		data_count = 0;
+		l.unlock();
 		index.applyAndNotify(boost::lambda::_1++);
 	}
 	if (no_more_data && missed_count == -1) return -2; else return missed_count;

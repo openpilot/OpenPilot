@@ -46,7 +46,7 @@ namespace rtslam {
 			unsigned id;
 			bool no_more_data; // in offline mode, all of the sensors has no more data, so we stop everything
 			ProcessInfo(sensor_ptr_t sen, unsigned id): sen(sen), id(id), no_more_data(false) {}
-			ProcessInfo(bool no_more_data): sen(), id(0), no_more_data(true) {}
+			ProcessInfo(bool no_more_data): sen(), id(0), no_more_data(no_more_data) {}
 			ProcessInfo(): sen(), id(0), no_more_data(false) {}
 		};
 		
@@ -54,7 +54,46 @@ namespace rtslam {
 		
 		virtual ProcessInfo getNextDataToUse() = 0;
 	};
+
 	
+	/**
+		This sensor managers is made for offline processing, it integrates
+		everything because we want repeatability and only the integrated data
+		was saved for offline replay.
+		So just return the oldest unprocessed data.
+		
+		\ingroup rtslam
+	*/
+	class SensorManagerReplay: public SensorManagerAbstract
+	{
+		public:
+			SensorManagerReplay(map_ptr_t mapPtr): SensorManagerAbstract(mapPtr) {}
+			
+			virtual ProcessInfo getNextDataToUse()
+			{
+				ProcessInfo result;
+				RawInfo info;
+				double oldest_timestamp = -1;
+				result.no_more_data = true;
+				
+				for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin();
+					robIter != mapPtr->robotList().end(); ++robIter)
+				{
+					for (RobotAbstract::SensorList::iterator senIter = (*robIter)->sensorList().begin();
+						senIter != (*robIter)->sensorList().end(); ++senIter)
+					{
+						int missed = (*senIter)->queryNextAvailableRaw(info);
+						if (missed != -2) result.no_more_data = false;
+						if (missed == 0 && (oldest_timestamp < 0 || info.timestamp < oldest_timestamp))
+							{ result.id = info.id; result.sen = (*senIter); oldest_timestamp = info.timestamp; }
+					}
+				}
+				
+				return result;
+			}
+		
+	};
+
 
 	/**
 		This sensor managers deals in a simple way with one sensor 

@@ -132,6 +132,7 @@ namespace jafar {
 		{
 			// get data
 			hardwareSensorPtr->getRaw(id, rawPtr);
+			rawCounter++;
 			
 			// observe
 			for (DataManagerList::iterator dmaIter = dataManagerList().begin(); dmaIter != dataManagerList().end(); ++dmaIter)
@@ -142,7 +143,7 @@ namespace jafar {
 				dmaPtr->detectNew(rawPtr);
 			}
 			
-			hardwareSensorPtr->release();
+			//hardwareSensorPtr->release();
 		}
 
 

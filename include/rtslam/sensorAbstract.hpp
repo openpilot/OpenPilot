@@ -71,6 +71,7 @@ namespace jafar {
 				bool getIntegrationPolicy() { return integrate_all; }
 
 				virtual int queryAvailableRaws(RawInfos &infos) = 0; ///< get information about the available raws and the estimated dates for next one
+				virtual int queryNextAvailableRaw(RawInfo &info) = 0; ///< get information about the next available raw
 				virtual double getRawTimestamp(unsigned id) = 0;
 				virtual void process(unsigned id) = 0; ///< process the given raw and throw away the previous unprocessed ones \return innovation
 				virtual void process_fake(unsigned id) = 0; ///< don't do any predict or update, but let the data acquisition run smoothly
@@ -151,6 +152,8 @@ namespace jafar {
 				
 				virtual int queryAvailableRaws(RawInfos &infos)
 					{ int res = hardwareSensorPtr->getUnreadRawInfos(infos); infos.integrate_all = integrate_all; return res; }
+				virtual int queryNextAvailableRaw(RawInfo &info)
+					{ return hardwareSensorPtr->getNextRawInfo(info); }
 				virtual double getRawTimestamp(unsigned id) { return hardwareSensorPtr->getRawTimestamp(id); } 
 				//process(id) will do the filtering, so it is specific to each hardware
 				void process_fake(unsigned id) { hardwareSensorPtr->releaseUntil(id); }
@@ -207,6 +210,8 @@ namespace jafar {
 				virtual raw_ptr_t getLastProcessedRaw() { raw_ptr_t raw; hardwareSensorPtr->getLastProcessedRaw(raw); return raw; }
 				virtual int queryAvailableRaws(RawInfos &infos)
 					{ int res = hardwareSensorPtr->getUnreadRawInfos(infos); infos.integrate_all = integrate_all; return res; }
+				virtual int queryNextAvailableRaw(RawInfo &info)
+					{ return hardwareSensorPtr->getNextRawInfo(info); }
 				virtual double getRawTimestamp(unsigned id) { return hardwareSensorPtr->getRawTimestamp(id); } 
 				void process(unsigned id);
 				void process_fake(unsigned id) { hardwareSensorPtr->releaseUntil(id); }

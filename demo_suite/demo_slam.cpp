@@ -213,11 +213,11 @@ struct option long_options[] = {
 	{"map", 2, 0, 0},
 	{"robot", 2, 0, 0}, // should be in config file
 	{"trigger", 2, 0, 0}, // should be in config file
+	{"gps", 2, 0, 0},
 	{"simu", 2, 0, 0},
 	// double options
 	{"freq", 2, 0, 0}, // should be in config file
 	{"shutter", 2, 0, 0}, // should be in config file
-	{"gps", 2, 0, 0},
 	// string options
 	{"data-path", 1, 0, 0},
 	{"config-setup", 1, 0, 0},
@@ -779,11 +779,12 @@ void demo_slam01_main(world_ptr_t *world) { try {
 			case 1: crop = VIAM_HW_CROP; break;
 			default: crop = VIAM_HW_FIXED; break;
 		}
-		hardware::hardware_sensor_firewire_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, 5+50,
+		hardware::hardware_sensor_firewire_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, 5/*+50*/,
 			configSetup.CAMERA_DEVICE, cv::Size(img_width,img_height), 0, 8, crop, floatOpts[fFreq], intOpts[iTrigger], 
 			floatOpts[fShutter], mode, strOpts[sDataPath]));
 		hardSen11->setTimingInfos(1.0/hardSen11->getFreq(), 1.0/hardSen11->getFreq());
 		senPtr11->setHardwareSensor(hardSen11);
+		senPtr11->setIntegrationPolicy(false);
 		#else
 		if (intOpts[iReplay] & 1)
 		{
@@ -801,10 +802,15 @@ void demo_slam01_main(world_ptr_t *world) { try {
 			hardGps->setSyncConfig(0.0/*configSetup.GPS_TIMESTAMP_CORRECTION*/);
 			hardGps->setTimingInfos(1.0/20.0, 1.5/20.0);
 			senPtr13->setHardwareSensor(hardGps);
+			senPtr13->setIntegrationPolicy(true);
 		}
 	}
 	
-	sensor_manager_ptr_t sensorManager(new SensorManagerOneAndOne(mapPtr));
+	sensor_manager_ptr_t sensorManager;
+	if (intOpts[iReplay] == 1)
+		sensorManager.reset(new SensorManagerReplay(mapPtr));
+	else
+		sensorManager.reset(new SensorManagerOneAndOne(mapPtr));
 	
 	//--- force a first display with empty slam to ensure that all windows are loaded
 // std::cout << "SLAM: forcing first initialization display" << std::endl;

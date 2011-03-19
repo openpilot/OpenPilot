@@ -43,11 +43,11 @@ class HardwareSensorCameraFirewire: public HardwareSensorExteroAbstract
 		viam_bank_t bank;
 		viam_handle_t handle;
 #endif
-		boost::mutex mutex_data;
 		
 		std::vector<IplImage*> bufferImage;
 		std::vector<rawimage_ptr_t> bufferSpecPtr;
 		double realFreq;
+		unsigned index_load;
 		unsigned first_index;
 		int found_first; /// 0 = not found, 1 = found pgm, 2 = found png
 		double last_timestamp;
@@ -57,6 +57,8 @@ class HardwareSensorCameraFirewire: public HardwareSensorExteroAbstract
 		
 		boost::thread *preloadTask_thread;
 		void preloadTask(void);
+		boost::thread *saveTask_thread;
+		void saveTask(void);
 	
 #ifdef HAVE_VIAM
 		cv::Size viamSize_to_size(viam_hwsize_t hwsize);

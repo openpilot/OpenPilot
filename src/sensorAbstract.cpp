@@ -140,7 +140,9 @@ namespace jafar {
 				dmaPtr->processKnown(rawPtr);
 				dmaPtr->mapManagerPtr()->manage();
 				dmaPtr->detectNew(rawPtr);
-			} // foreach dataManager
+			}
+			
+			hardwareSensorPtr->release();
 		}
 
 

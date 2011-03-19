@@ -76,6 +76,8 @@ class HardwareSensorAbstract
 	private:
 		int write_pos; /// next position where to write, oldest available reading
 		int read_pos;  /// oldest position not released (being read or not read at all)
+		bool buffer_full; /// when read_pos = write_pos, tells whether the buffer is full or empty
+		bool read_pos_used;  /// current read_pos is being used
 		
 		int last_sent_pos; /// position of the last raw sent
 		
@@ -95,6 +97,7 @@ class HardwareSensorAbstract
 		VecT buffer; /// the ring buffer
 		
 		int getWritePos() {
+			if (isFull()) JFR_ERROR(RtslamException, RtslamException::GENERIC_ERROR, "buffer of hardware is full"); // FIXME chose policty when full
 			// don't need to lock, because will only be used and modified by writer
 			return write_pos;
 		}
@@ -102,14 +105,18 @@ class HardwareSensorAbstract
 			if (!locked) mutex_data.lock();
 			++write_pos;
 			if (write_pos >= bufferSize) write_pos = 0;
+			if (write_pos == read_pos) buffer_full = true; // full
 			++image_count;
 			if (!locked) mutex_data.unlock();
 		}
 		int getFirstUnreadPos() {
+			/// \warning check that buffer is not empty before
 			// don't need to lock, because will only be used and modified by reader
-			return read_pos;
+			if (!read_pos_used) return read_pos;
+			if (read_pos != bufferSize-1) return read_pos+1; else return 0;
 		}
 		int getLastUnreadPos(bool locked = false) {
+			/// \warning check that buffer is not empty before
 			if (!locked) mutex_data.lock();
 			int res = (write_pos == 0 ? bufferSize-1 : write_pos-1);
 			if (!locked) mutex_data.unlock();
@@ -119,19 +126,28 @@ class HardwareSensorAbstract
 		void releaseUntil(unsigned id, bool locked = false) {
 			if (!locked) mutex_data.lock();
 			read_pos = id;
+			read_pos_used = true;
+			// cannot be full as id is not released
 			if (!locked) mutex_data.unlock();
 		}
 		/// release until id, including id
 		void release(unsigned id, bool locked = false) {
 			if (!locked) mutex_data.lock();
-			read_pos = id+1;
-			if (read_pos >= bufferSize) read_pos = 0;
+			if (id != (unsigned)(bufferSize-1)) read_pos = id+1; else read_pos = 0;
+			if (write_pos == read_pos) buffer_full = false; // empty
+			read_pos_used = false;
 			if (!locked) mutex_data.unlock();
 		}
 		bool isFull(bool locked = false)
 		{
 			if (!locked) mutex_data.lock();
-			return (read_pos == write_pos);
+			return (read_pos == write_pos && buffer_full);
+			if (!locked) mutex_data.unlock();
+		}
+		bool isEmpty(bool locked = false)
+		{
+			if (!locked) mutex_data.lock();
+			return (read_pos == write_pos && !buffer_full);
 			if (!locked) mutex_data.unlock();
 		}
 		
@@ -140,7 +156,8 @@ class HardwareSensorAbstract
 			@param condition to notify when new data is available
 		*/
 		HardwareSensorAbstract(kernel::VariableCondition<int> &condition, unsigned bufferSize):
-			write_pos(0), read_pos(bufferSize-1), last_sent_pos(-1), condition(condition), index(0),
+			write_pos(0), read_pos(0), buffer_full(false), read_pos_used(false), last_sent_pos(-1),
+		  condition(condition), index(0),
 		  image_count(0), no_more_data(false), timestamps_correction(0.0),
 		  bufferSize(bufferSize), buffer(bufferSize)
 		{}
@@ -159,12 +176,15 @@ class HardwareSensorAbstract
 			{ this->data_period = data_period; this->arrival_delay = arrival_delay; }
 		
 		
+		virtual double getLastTimestamp() = 0;
+		
 		VecIndT getRaws(double t1, double t2); /// will also release the raws before the first one
 		int getUnreadRawInfos(RawInfos &infos); /// get timing informations about unread raws
 		void getRaw(unsigned id, T& raw); /// will also release the raws before this one
 		double getRawTimestamp(unsigned id);
 		int getLastUnreadRaw(T& raw); /// will also release the raws before this one
 		void getLastProcessedRaw(T& raw) { raw = buffer[last_sent_pos]; } /// for information only (display...)
+		void release() { release(read_pos); }
 		
 		friend class rtslam::SensorProprioAbstract;
 		friend class rtslam::SensorExteroAbstract;
@@ -299,27 +319,32 @@ template<typename T>
 int HardwareSensorAbstract<T>::getUnreadRawInfos(RawInfos &infos)
 {
 	infos.available.clear();
-	int first_stop, second_stop;
-	int first = getFirstUnreadPos(), last = getLastUnreadPos();
-	if (first <= last)
+	if (!isEmpty())
 	{
-		first_stop = last;
-		second_stop = -1;
-	} else
-	{
-		first_stop = bufferSize-1;
-		second_stop = last;
+		int first_stop, second_stop;
+		int first = getFirstUnreadPos(), last = getLastUnreadPos();
+		JFR_DEBUG("getUnreadRawInfos: first " << first << " last " << last);
+
+		if (first <= last)
+		{
+			first_stop = last;
+			second_stop = -1;
+		} else
+		{
+			first_stop = bufferSize-1;
+			second_stop = last;
+		}
+		
+		for(int pos = first; pos <= first_stop; ++pos)
+			infos.available.push_back(RawInfo(pos,extractRawTimestamp(buffer(pos)),extractRawArrival(buffer(pos))));
+		for(int pos = 0; pos <= second_stop; ++pos)
+			infos.available.push_back(RawInfo(pos,extractRawTimestamp(buffer(pos)),extractRawArrival(buffer(pos))));
 	}
 	
-	for(int pos = first; pos <= first_stop; ++pos)
-		infos.available.push_back(RawInfo(pos,extractRawTimestamp(buffer(pos)),extractRawArrival(buffer(pos))));
-	for(int pos = 0; pos <= second_stop; ++pos)
-		infos.available.push_back(RawInfo(pos,extractRawTimestamp(buffer(pos)),extractRawArrival(buffer(pos))));
-
 	double data_period, arrival_delay;
 	getTimingInfos(data_period, arrival_delay);
-	data_period += infos.available[infos.available.size()-1].timestamp;
-	infos.next = RawInfo(0,data_period,data_period+arrival_delay);
+	double next_date = getLastTimestamp() + data_period;
+	infos.next = RawInfo(0,next_date,next_date+arrival_delay);
 	infos.process_time = 0.;
 	
 	if (infos.available.size() == 0)

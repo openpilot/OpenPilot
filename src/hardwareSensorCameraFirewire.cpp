@@ -224,6 +224,7 @@ namespace hardware {
 				r = viam_oneshot(handle, bank, &(bufferImage[buff_write]), &pts, 1);
 				bufferSpecPtr[buff_write]->arrival = getNowTimestamp();
 				bufferSpecPtr[buff_write]->timestamp = ts.tv_sec + ts.tv_usec*1e-6;
+				last_timestamp = bufferSpecPtr[buff_write]->timestamp;
 #endif
 			}
 			// update the bufferImage infos
@@ -236,7 +237,7 @@ namespace hardware {
 				std::fstream f; f.open((oss.str() + std::string(".time")).c_str(), std::ios_base::out); 
 				f << std::setprecision(20) << bufferSpecPtr[buff_write]->timestamp << std::endl; f.close();
 			}
-			
+JFR_DEBUG("Firewire write: wrote to pos " << buff_write);
 			incWritePos();
 			condition.setAndNotify(1);
 		}
@@ -262,6 +263,7 @@ namespace hardware {
 		first_index = 0;
 
 		// start acquire task
+		last_timestamp = getNowTimestamp();
 		preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::preloadTask,this));
 	}
 	

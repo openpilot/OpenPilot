@@ -50,6 +50,7 @@ class HardwareSensorCameraFirewire: public HardwareSensorExteroAbstract
 		double realFreq;
 		unsigned first_index;
 		int found_first; /// 0 = not found, 1 = found pgm, 2 = found png
+		double last_timestamp;
 		
 		int mode;
 		std::string dump_path;
@@ -89,6 +90,7 @@ class HardwareSensorCameraFirewire: public HardwareSensorExteroAbstract
 		
 		~HardwareSensorCameraFirewire();
 
+		virtual double getLastTimestamp() { boost::unique_lock<boost::mutex> l(mutex_data); return last_timestamp; }
 		double getFreq() { return realFreq; }
 };
 

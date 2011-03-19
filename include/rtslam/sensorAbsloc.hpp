@@ -98,6 +98,8 @@ namespace jafar {
 					map_ptr_t mapPtr = robotPtr()->mapPtr();
 					ind_array ia_x = mapPtr->ia_used_states();
 					mapPtr->filterPtr->correct(ia_x,*innovation,INN_rs,ia_rs);
+					
+					hardwareSensorPtr->release();
 				}
 		};
 }}

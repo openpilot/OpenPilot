@@ -84,6 +84,7 @@ namespace hardware {
 				
 				buffer(getWritePos()).data = reading.data;
 				buffer(getWritePos()).data(0) += timestamps_correction;
+				last_timestamp = reading.data(0);
 				incWritePos();
 				
 				if (mode == 1)
@@ -112,6 +113,7 @@ namespace hardware {
 		
 		// start acquire task
 		//preloadTask();
+		last_timestamp = getNowTimestamp();
 		preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorGpsGenom::preloadTask,this));
 		
 		if (mode == 2)

@@ -26,11 +26,12 @@ namespace hardware {
 			boost::shared_ptr<simu::AdhocSimulator> simulator;
 			size_t robId, senId;
 		protected:
-			virtual void getTimingInfos(double &data_period, double &arrival_delay) { data_period=0.; arrival_delay=0.; }
+			virtual void getTimingInfos(double &data_period, double &arrival_delay) { data_period=dt; arrival_delay=0.; }
 		public:
 			HardwareSensorAdhocSimulator(kernel::VariableCondition<int> &condition, double freq, boost::shared_ptr<simu::AdhocSimulator> simulator, size_t robId, size_t senId):
 				HardwareSensorExteroAbstract(condition, 3),
 				dt(1./freq), n(0), simulator(simulator), robId(robId), senId(senId) {}
+			virtual double getLastTimestamp() { return (n-1)*dt; }
 			int getLastUnreadRaw(raw_ptr_t& raw)
 			{
 				double t = n*dt;

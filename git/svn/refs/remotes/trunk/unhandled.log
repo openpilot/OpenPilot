@@ -9949,3 +9949,5 @@ r3041
 r3042
 r3043
 r3044
+r3045
+  -empty_dir: trunk/shared/uavobjectdefinition/batterysettings.xml

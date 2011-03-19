@@ -58,7 +58,7 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/ahrsstatus.h \
     $$UAVOBJECT_SYNTHETICS/ratedesired.h \
     $$UAVOBJECT_SYNTHETICS/firmwareiapobj.h \
     $$UAVOBJECT_SYNTHETICS/i2cstats.h \
-    $$UAVOBJECT_SYNTHETICS/batterysettings.h \
+    $$UAVOBJECT_SYNTHETICS/flightbatterysettings.h \
     $$UAVOBJECT_SYNTHETICS/taskinfo.h \
     $$UAVOBJECT_SYNTHETICS/flightplanstatus.h \
     $$UAVOBJECT_SYNTHETICS/flightplansettings.h \
@@ -103,7 +103,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/ahrsstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/ratedesired.cpp \
     $$UAVOBJECT_SYNTHETICS/firmwareiapobj.cpp \
     $$UAVOBJECT_SYNTHETICS/i2cstats.cpp \
-    $$UAVOBJECT_SYNTHETICS/batterysettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/flightbatterysettings.cpp \
     $$UAVOBJECT_SYNTHETICS/taskinfo.cpp \
     $$UAVOBJECT_SYNTHETICS/flightplanstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/flightplansettings.cpp \

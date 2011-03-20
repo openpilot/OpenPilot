@@ -1,5 +1,8 @@
 package org.openpilot.androidgcs;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import org.openpilot.uavtalk.Telemetry;
 import org.openpilot.uavtalk.TelemetryMonitor;
 import org.openpilot.uavtalk.UAVDataObject;
@@ -27,7 +30,7 @@ import android.widget.Toast;
 public class OPTelemetryService extends Service {
 
 	// Logging settings
-	private final String TAG = "OPTElemetryService";
+	private final String TAG = "OPTelemetryService";
 	public static int LOGLEVEL = 2;
 	public static boolean WARN = LOGLEVEL > 1;
 	public static boolean DEBUG = LOGLEVEL > 0;
@@ -44,10 +47,13 @@ public class OPTelemetryService extends Service {
 	private ServiceHandler mServiceHandler;
 
 	// Message ids
-	final int MSG_START = 0;
-	final int MSG_CONNECT_BT = 1;
-	final int MSG_CONNECT_FAKE = 2;
-	final int MSG_TOAST = 100;
+	static final int MSG_START        = 0;
+	static final int MSG_CONNECT_BT   = 1;
+	static final int MSG_CONNECT_FAKE = 2;
+	static final int MSG_DISCONNECT   = 3;
+	static final int MSG_TOAST        = 100;
+
+	private boolean terminate = false;
 
 	private Thread activeTelem;
 
@@ -65,12 +71,28 @@ public class OPTelemetryService extends Service {
 				System.out.println("HERE");
 				stopSelf(msg.arg2);
 			case MSG_CONNECT_BT:
+				terminate = false;
 				activeTelem = new BTTelemetryThread();
 				activeTelem.start();
 				break;
 			case MSG_CONNECT_FAKE:
+				terminate = false;
 				activeTelem = new FakeTelemetryThread();
 				activeTelem.start();
+				break;
+			case MSG_DISCONNECT:
+				terminate = true;
+				try {
+					activeTelem.join();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				activeTelem = null;
+
+				Intent intent = new Intent();
+				intent.setAction(INTENT_ACTION_DISCONNECTED);
+				sendBroadcast(intent,null);
+
 				break;
 			case MSG_TOAST:
 				Toast.makeText(OPTelemetryService.this, (String) msg.obj, Toast.LENGTH_SHORT);
@@ -129,8 +151,18 @@ public class OPTelemetryService extends Service {
 			msg.arg1 = MSG_CONNECT_FAKE;
 			mServiceHandler.sendMessage(msg);
 		}
+		public void openBTConnection() {
+			Message msg = mServiceHandler.obtainMessage();
+			msg.arg1 = MSG_CONNECT_BT;
+			mServiceHandler.sendMessage(msg);
+		}
+		public void stopConnection() {
+			Message msg = mServiceHandler.obtainMessage();
+			msg.arg1 = MSG_DISCONNECT;
+			mServiceHandler.sendMessage(msg);
+		}
 	};
-	
+
 	public void toastMessage(String msgText) {
 		Message msg = mServiceHandler.obtainMessage();
 		msg.arg1 = MSG_TOAST;
@@ -151,17 +183,17 @@ public class OPTelemetryService extends Service {
 			objMngr = new UAVObjectManager();
 			UAVObjectsInitialize.register(objMngr);
 		}
-		
+
 		public void run() {
-			System.out.println("Runnin fake thread");
+			System.out.println("Running fake thread");
 
 			Intent intent = new Intent();
 			intent.setAction(INTENT_ACTION_CONNECTED);
 			sendBroadcast(intent,null);
-			
+
 			//toastMessage("Started fake telemetry thread");
 			UAVDataObject systemStats = (UAVDataObject) objMngr.getObject("SystemStats");
-			while(true) {
+			while( !terminate ) {
 				systemStats.updated();
 				try {
 					Thread.sleep(1000);
@@ -176,7 +208,7 @@ public class OPTelemetryService extends Service {
 		private UAVObjectManager objMngr;
 		private UAVTalk uavTalk;
 		private Telemetry tel;
-		//private TelemetryMonitor mon;
+		private TelemetryMonitor mon;
 
 		public UAVObjectManager getObjectManager() { return objMngr; };
 
@@ -217,10 +249,21 @@ public class OPTelemetryService extends Service {
 
 			uavTalk = bt.getUavtalk();
 			tel = new Telemetry(uavTalk, objMngr);
-			new TelemetryMonitor(objMngr,tel);
+			mon = new TelemetryMonitor(objMngr,tel);
+			mon.addObserver(new Observer() {
+				public void update(Observable arg0, Object arg1) {
+					System.out.println("Mon updated. Connected: " + mon.getConnected() + " objects updated: " + mon.getObjectsUpdated());
+					if(mon.getConnected() /*&& mon.getObjectsUpdated()*/) {
+						Intent intent = new Intent();
+						intent.setAction(INTENT_ACTION_CONNECTED);
+						sendBroadcast(intent,null);					
+					}
+				}				
+			});
+
 
 			if (DEBUG) Log.d(TAG, "Entering UAVTalk processing loop");
-			while(true) {
+			while( !terminate ) {
 				if( !uavTalk.processInputStream() )
 					break;
 			}

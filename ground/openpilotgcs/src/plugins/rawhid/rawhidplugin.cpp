@@ -40,14 +40,15 @@
 // **********************************************************************
 
 RawHIDConnection::RawHIDConnection()
-    : m_usbMonitor(this)
 {
     //added by andrew
     RawHidHandle = NULL;
     enablePolling = true;
 
-    connect(&m_usbMonitor, SIGNAL(deviceDiscovered(USBPortInfo)), this, SLOT(onDeviceConnected()));
-    connect(&m_usbMonitor, SIGNAL(deviceRemoved(USBPortInfo)), this, SLOT(onDeviceDisconnected()));
+    m_usbMonitor = USBMonitor::instance();
+
+    connect(m_usbMonitor, SIGNAL(deviceDiscovered(USBPortInfo)), this, SLOT(onDeviceConnected()));
+    connect(m_usbMonitor, SIGNAL(deviceRemoved(USBPortInfo)), this, SLOT(onDeviceDisconnected()));
 
 }
 
@@ -56,9 +57,6 @@ RawHIDConnection::~RawHIDConnection()
 	if (RawHidHandle)
             if (RawHidHandle->isOpen())
                 RawHidHandle->close();
-
-        m_usbMonitor.quit();
-        m_usbMonitor.wait(500);
 }
 
 /**
@@ -85,7 +83,7 @@ QStringList RawHIDConnection::availableDevices()
 {
     QStringList devices;
 
-    QList<USBPortInfo> portsList = m_usbMonitor.availableDevices(USBMonitor::idVendor_OpenPilot, -1, -1,USBMonitor::Running);
+    QList<USBPortInfo> portsList = m_usbMonitor->availableDevices(USBMonitor::idVendor_OpenPilot, -1, -1,USBMonitor::Running);
     // We currently list devices by their serial number
     foreach(USBPortInfo prt, portsList) {
         devices.append(prt.serialNumber);
@@ -155,6 +153,8 @@ RawHIDPlugin::RawHIDPlugin()
 
 RawHIDPlugin::~RawHIDPlugin()
 {
+    m_usbMonitor->quit();
+    m_usbMonitor->wait(500);
 
 }
 
@@ -171,6 +171,9 @@ bool RawHIDPlugin::initialize(const QStringList & arguments, QString * errorStri
 {
     Q_UNUSED(arguments);
     Q_UNUSED(errorString);
+
+    // We have to create the USB Monitor here:
+    m_usbMonitor = new USBMonitor(this);
 
     return true;
 }

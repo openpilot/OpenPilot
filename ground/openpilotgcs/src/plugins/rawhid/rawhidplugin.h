@@ -76,7 +76,7 @@ private:
 
 protected:
     QMutex m_enumMutex;
-    USBMonitor m_usbMonitor;
+    USBMonitor* m_usbMonitor;
     bool m_deviceOpened;
 };
 
@@ -93,6 +93,8 @@ public:
     virtual void extensionsInitialized();
 private:
     RawHIDConnection *hidConnection;
+    USBMonitor* m_usbMonitor;
+
 };
 
 #endif // RAWHIDPLUGIN_H

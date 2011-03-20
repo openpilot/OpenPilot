@@ -1,6 +1,5 @@
 package org.openpilot.uavtalk;
 
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -91,7 +90,8 @@ public class UAVObjectField {
      * @param dataOut
      * @return the number of bytes added
      **/
-    public synchronized int pack(ByteBuffer dataOut) {
+    @SuppressWarnings("unchecked")
+	public synchronized int pack(ByteBuffer dataOut) {
         // Pack each element in output buffer
     	dataOut.order(ByteOrder.LITTLE_ENDIAN);
         switch (type)
@@ -152,7 +152,8 @@ public class UAVObjectField {
         return getNumBytes();    	
     }
     
-    public synchronized int unpack(ByteBuffer dataIn) {
+    @SuppressWarnings("unchecked")
+	public synchronized int unpack(ByteBuffer dataIn) {
         // Unpack each element from input buffer
     	dataIn.order(ByteOrder.LITTLE_ENDIAN);
         switch (type)
@@ -436,9 +437,9 @@ public class UAVObjectField {
         }    	
     }
     
-    public String toString() {
+	public String toString() {
         String sout = new String();
-        sout += name + ": " + ((List) data).toString() + " (" + units + ")\n";
+        sout += name + ": " + data.toString() + " (" + units + ")\n";
         return sout;    	
     }
 

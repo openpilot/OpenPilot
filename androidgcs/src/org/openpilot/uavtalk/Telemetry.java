@@ -630,7 +630,6 @@ public class Telemetry {
 	/**
 	 * Private variables
 	 */
-	private TelemetryStats stats;
     private UAVObjectManager objMngr;
     private UAVTalk utalk;
     private UAVObject gcsStatsObj;

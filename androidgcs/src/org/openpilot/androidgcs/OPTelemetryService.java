@@ -2,6 +2,7 @@ package org.openpilot.androidgcs;
 
 import org.openpilot.uavtalk.Telemetry;
 import org.openpilot.uavtalk.TelemetryMonitor;
+import org.openpilot.uavtalk.UAVDataObject;
 import org.openpilot.uavtalk.UAVObjectManager;
 import org.openpilot.uavtalk.UAVTalk;
 import org.openpilot.uavtalk.uavobjects.UAVObjectsInitialize;
@@ -13,69 +14,192 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.Message;
+import android.os.Process;
 import android.util.Log;
+import android.widget.Toast;
 
 public class OPTelemetryService extends Service {
+
+	// Logging settings
 	private final String TAG = "OPTElemetryService";
 	public static int LOGLEVEL = 2;
 	public static boolean WARN = LOGLEVEL > 1;
 	public static boolean DEBUG = LOGLEVEL > 0;
 
-	final int DISCONNECT_MESSAGE = 0;
-	final int CONNECT_MESSAGE = 1;
-	final int CONNECT_FAILED_MESSAGE = 2;
-	
-	private UAVObjectManager objMngr;
-	private UAVTalk uavTalk;
-	private Telemetry tel;
-	private TelemetryMonitor mon;
-	
-	private Handler handler;
+	// Intent category
+	public final static String INTENT_CATEGORY_GCS        = "org.openpilot.intent.category.GCS";
 
-	@Override
-	public IBinder onBind(Intent arg0) {
-		return null;
-	}
+	// Intent actions
+	public final static String INTENT_ACTION_CONNECTED    = "org.openpilot.intent.action.CONNECTED";
+	public final static String INTENT_ACTION_DISCONNECTED = "org.openpilot.intent.action.DISCONNECTED";
+
+	// Variables for local message handler thread
+	private Looper mServiceLooper;
+	private ServiceHandler mServiceHandler;
+
+	// Message ids
+	final int MSG_START = 0;
+	final int MSG_CONNECT_BT = 1;
+	final int MSG_CONNECT_FAKE = 2;
+	final int MSG_TOAST = 100;
+
+	private Thread activeTelem;
+
+	private final IBinder mBinder = new LocalBinder();
+
+	private final class ServiceHandler extends Handler {
+		public ServiceHandler(Looper looper) {
+			super(looper);
+		}
+		@Override
+		public void handleMessage(Message msg) {
+			switch(msg.arg1) {
+			case MSG_START:
+				Toast.makeText(OPTelemetryService.this, "HERE", Toast.LENGTH_SHORT);
+				System.out.println("HERE");
+				stopSelf(msg.arg2);
+			case MSG_CONNECT_BT:
+				activeTelem = new BTTelemetryThread();
+				activeTelem.start();
+				break;
+			case MSG_CONNECT_FAKE:
+				activeTelem = new FakeTelemetryThread();
+				activeTelem.start();
+				break;
+			case MSG_TOAST:
+				Toast.makeText(OPTelemetryService.this, (String) msg.obj, Toast.LENGTH_SHORT);
+				break;
+			default:
+				System.out.println(msg.toString());
+				throw new Error("Invalid message");
+			}
+		}
+	};
 
 	@Override
 	public void onCreate() {
-		super.onCreate();
-		
-		if (DEBUG) Log.d(TAG, "Telemetry Service started");
+		// Low priority thread for message handling with service
+		HandlerThread thread = new HandlerThread("TelemetryServiceHandler",
+				Process.THREAD_PRIORITY_BACKGROUND);
+		thread.start();
 
-		Thread telemetryThread = new Thread(telemetryRunnable);
-		telemetryThread.start();
- 	}
+		// Get the HandlerThread's Looper and use it for our Handler 
+		mServiceLooper = thread.getLooper();
+		mServiceHandler = new ServiceHandler(mServiceLooper);
+	}
+
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		Toast.makeText(this, "Telemetry service starting", Toast.LENGTH_SHORT).show();
+
+		System.out.println("Start");
+		// For each start request, send a message to start a job and deliver the
+		// start ID so we know which request we're stopping when we finish the job
+		Message msg = mServiceHandler.obtainMessage();
+		msg.arg1 = MSG_START;
+		msg.arg2 = startId;
+		mServiceHandler.sendMessage(msg);
+
+		// If we get killed, after returning from here, restart
+		return START_STICKY;
+	}
+
+	@Override
+	public IBinder onBind(Intent intent) {		
+		return mBinder;
+	}
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
+		Toast.makeText(this, "Telemetry service done", Toast.LENGTH_SHORT).show(); 
 	}
+
+	public class LocalBinder extends Binder {
+		public TelemTask getTelemTask(int id) {
+			return (TelemTask) activeTelem;
+		}
+		public void openFakeConnection() {
+			Message msg = mServiceHandler.obtainMessage();
+			msg.arg1 = MSG_CONNECT_FAKE;
+			mServiceHandler.sendMessage(msg);
+		}
+	};
 	
-	private final Runnable telemetryRunnable = new Runnable() {
+	public void toastMessage(String msgText) {
+		Message msg = mServiceHandler.obtainMessage();
+		msg.arg1 = MSG_TOAST;
+		msg.obj = msgText;
+		mServiceHandler.sendMessage(msg);
+	}
+
+	public interface TelemTask {
+		public UAVObjectManager getObjectManager();
+	};
+
+	// Fake class for testing, simply emits periodic updates on 
+	private class FakeTelemetryThread extends Thread implements TelemTask  {
+		private UAVObjectManager objMngr;
+		public UAVObjectManager getObjectManager() { return objMngr; };
+
+		FakeTelemetryThread() {
+			objMngr = new UAVObjectManager();
+			UAVObjectsInitialize.register(objMngr);
+		}
+		
+		public void run() {
+			System.out.println("Runnin fake thread");
+
+			Intent intent = new Intent();
+			intent.setAction(INTENT_ACTION_CONNECTED);
+			sendBroadcast(intent,null);
+			
+			//toastMessage("Started fake telemetry thread");
+			UAVDataObject systemStats = (UAVDataObject) objMngr.getObject("SystemStats");
+			while(true) {
+				systemStats.updated();
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					break;
+				}
+			}
+		}
+	}
+	private class BTTelemetryThread extends Thread implements TelemTask { 
+
+		private UAVObjectManager objMngr;
+		private UAVTalk uavTalk;
+		private Telemetry tel;
+		//private TelemetryMonitor mon;
+
+		public UAVObjectManager getObjectManager() { return objMngr; };
+
+		BTTelemetryThread() {
+			objMngr = new UAVObjectManager();
+			UAVObjectsInitialize.register(objMngr);
+		}
 
 		public void run() {			
 			if (DEBUG) Log.d(TAG, "Telemetry Thread started");
 
 			Looper.prepare();						
-			
-	        objMngr = new UAVObjectManager();
-			UAVObjectsInitialize.register(objMngr);
-			
-			postNotification(CONNECT_FAILED_MESSAGE, "Connecting");
+
 			BluetoothUAVTalk bt = new BluetoothUAVTalk(OPTelemetryService.this, BluetoothUAVTalk.DEVICE_NAME);
 			for( int i = 0; i < 10; i++ ) {
 				if (DEBUG) Log.d(TAG, "Attempting Bluetooth Connection");
-					
+
 				bt.connect(objMngr);
-				
+
 				if (DEBUG) Log.d(TAG, "Done attempting connection");
 				if( bt.getConnected() )
 					break;
-				
+
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
@@ -85,17 +209,15 @@ public class OPTelemetryService extends Service {
 				}
 			}
 			if( ! bt.getConnected() ) {
-				postNotification(CONNECT_FAILED_MESSAGE, "Could not connect to UAV");
 				return;
 			}
-			
-			postNotification(CONNECT_MESSAGE, "Connected to UAV port");
-			
+
+
 			if (DEBUG) Log.d(TAG, "Connected via bluetooth");
-			
+
 			uavTalk = bt.getUavtalk();
 			tel = new Telemetry(uavTalk, objMngr);
-			mon = new TelemetryMonitor(objMngr,tel);
+			new TelemetryMonitor(objMngr,tel);
 
 			if (DEBUG) Log.d(TAG, "Entering UAVTalk processing loop");
 			while(true) {
@@ -103,30 +225,23 @@ public class OPTelemetryService extends Service {
 					break;
 			}
 			if (DEBUG) Log.d(TAG, "UAVTalk stream disconnected");
-			postNotification(DISCONNECT_MESSAGE,"UAVTalk stream disconnected");
 		}
-	
+
 	};
-	
+
 	void postNotification(int id, String message) {
 		String ns = Context.NOTIFICATION_SERVICE;
 		NotificationManager mNManager = (NotificationManager) getSystemService(ns);
 		final Notification msg = new Notification(R.drawable.icon, message, System.currentTimeMillis());
-		
+
 		Context context = getApplicationContext(); 
 		CharSequence contentTitle = "OpenPilot";
 		CharSequence contentText = message; 
 		Intent msgIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://forums.openpilot.org"));
 		PendingIntent intent = PendingIntent.getActivity(this, 0, msgIntent, Intent.FLAG_ACTIVITY_NEW_TASK);		
-		
+
 		msg.setLatestEventInfo(context, contentTitle, contentText, intent);
-		
+
 		mNManager.notify(id, msg);
 	}
-	
-	public UAVObjectManager getObjMngr() { return objMngr; };
-	public UAVTalk getUavTalk() { return uavTalk; };
-	public Telemetry getTelemetry() { return tel; };
-	public TelemetryMonitor getTelemetryMonitor() { return mon; };
-
 }

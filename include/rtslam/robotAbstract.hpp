@@ -125,6 +125,8 @@ namespace jafar {
 				jblas::mat XNEW_x; ///<         Jacobian wrt state
 				jblas::mat XNEW_pert; ///<      Jacobian wrt perturbation
 				jblas::sym_mat Q; ///<          Process noise covariances matrix in state space, Q = XNEW_pert * perturbation.P * trans(XNEW_pert);
+				
+				jblas::vec origin;
 
 				virtual size_t mySize() = 0;
 				virtual size_t mySize_control() = 0;

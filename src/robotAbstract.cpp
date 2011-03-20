@@ -47,7 +47,8 @@ namespace jafar {
 			perturbation(_size_pert),
 			XNEW_x(_size_state, _size_state),
 			XNEW_pert(_size_state, _size_pert),
-			Q(_size_state, _size_state)
+			Q(_size_state, _size_state),
+			origin(0)
 		{
 			constantPerturbation = false;
 			category = ROBOT;
@@ -62,7 +63,8 @@ namespace jafar {
 			perturbation(_size_pert),
 			XNEW_x(_size_state, _size_state),
 			XNEW_pert(_size_state, _size_pert),
-			Q(_size_state, _size_state)
+			Q(_size_state, _size_state),
+			origin(0)
 		{
 			constantPerturbation = true;
 			category = ROBOT;

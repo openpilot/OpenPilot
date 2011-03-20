@@ -186,3 +186,9 @@ plugin_uavsettingsimportexport.subdir = uavsettingsimportexport
 plugin_uavsettingsimportexport.depends = plugin_coreplugin
 plugin_uavsettingsimportexport.depends += plugin_uavobjects
 SUBDIRS += plugin_uavsettingsimportexport
+
+# Junsi Powerlog plugin
+#plugin_powerlog.subdir = powerlog
+#plugin_powerlog.depends = plugin_coreplugin
+#plugin_powerlog.depends += plugin_rawhid
+#SUBDIRS += plugin_powerlog

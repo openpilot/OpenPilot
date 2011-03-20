@@ -21,7 +21,7 @@ namespace rtslam {
 namespace hardware {
 
 	void HardwareEstimatorMti::preloadTask(void)
-	{
+	{ try {
 #ifdef HAVE_MTI
 		INERTIAL_DATA data;
 #endif
@@ -74,7 +74,8 @@ namespace hardware {
 		
 		if (mode == 1 || mode == 2)
 			f.close();
-	}
+		
+	} catch (kernel::Exception &e) { std::cout << e.what(); throw e; } }
 
 	HardwareEstimatorMti::HardwareEstimatorMti(std::string device, double trigger_mode, double trigger_freq, double trigger_shutter, int bufferSize_, int mode, std::string dump_path):
 #ifdef HAVE_MTI

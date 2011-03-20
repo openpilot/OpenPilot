@@ -366,7 +366,8 @@ class ConfigEstimation: public kernel::KeyValueFileSaveLoad
  * ###########################################################################*/
 
 
-void demo_slam01_main(world_ptr_t *world) { try {
+void demo_slam01_main(world_ptr_t *world)
+{ try {
 	vec intrinsic, distortion;
 	int img_width, img_height;
 	if (intOpts[iSimu] != 0)
@@ -1015,8 +1016,7 @@ std::cout << "Frame " << (*world)->t << " using sen " << pinfo.sen->id() << " at
 //	std::cout << "\nFINISHED ! Press a key to terminate." << std::endl;
 //	getchar();
 
-} catch (kernel::Exception &e) { std::cout << e.what(); }
-} // demo_slam01_main
+} catch (kernel::Exception &e) { std::cout << e.what(); throw e; } } // demo_slam01_main
 
 
 /** ############################################################################
@@ -1024,7 +1024,8 @@ std::cout << "Frame " << (*world)->t << " using sen " << pinfo.sen->id() << " at
  * Display function
  * ###########################################################################*/
 
-void demo_slam01_display(world_ptr_t *world) { try {
+void demo_slam01_display(world_ptr_t *world)
+{ try {
 //	static unsigned prev_t = 0;
 	kernel::Timer timer(display_period*1000);
 	while(true)
@@ -1142,8 +1143,7 @@ void demo_slam01_display(world_ptr_t *world) { try {
 		if (intOpts[iDispQt]) break; else timer.wait();
 	}
 	
-} catch (kernel::Exception &e) { std::cout << e.what(); }
-}
+} catch (kernel::Exception &e) { std::cout << e.what(); throw e; } }
 
 
 /** ############################################################################
@@ -1275,7 +1275,7 @@ void demo_slam01() {
 	*   demo_slam --disp-2d=1 --disp-3d=1 --render-all=1 --replay=1 --dump=1 --rand-seed=1 --pause=0 --data-path=data/rtslam01
 	*/
 int main(int argc, char* const* argv)
-{
+{ try {
 	intOpts[iVerbose] = 5;
 	floatOpts[fFreq] = 60.0;
 	floatOpts[fShutter] = 0.0;
@@ -1355,14 +1355,13 @@ int main(int argc, char* const* argv)
 	intOpts[iDispGdhe] = 0;
 	#endif
 
-	try {
-		std::cout << "Loading config files " << strOpts[sConfigSetup] << " and " << strOpts[sConfigEstimation] << std::endl;
-		configSetup.load(strOpts[sConfigSetup]);
-		configEstimation.load(strOpts[sConfigEstimation]);
-		
-		demo_slam01();
-	} catch (kernel::Exception &e) { std::cout << e.what(); return 1; }
-}
+	std::cout << "Loading config files " << strOpts[sConfigSetup] << " and " << strOpts[sConfigEstimation] << std::endl;
+	configSetup.load(strOpts[sConfigSetup]);
+	configEstimation.load(strOpts[sConfigEstimation]);
+	
+	demo_slam01();
+	
+} catch (kernel::Exception &e) { std::cout << e.what();  throw e; } }
 
 
 

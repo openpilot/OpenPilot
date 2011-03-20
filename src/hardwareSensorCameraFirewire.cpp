@@ -161,7 +161,7 @@ namespace hardware {
 #endif
 
 	void HardwareSensorCameraFirewire::preloadTask(void)
-	{
+	{ try {
 		struct timeval ts, *pts = &ts;
 		int r;
 
@@ -208,10 +208,10 @@ namespace hardware {
 			incWritePos();
 			condition.setAndNotify(1);
 		}
-	}
+	} catch (kernel::Exception &e) { std::cout << e.what(); throw e; } }
 
 	void HardwareSensorCameraFirewire::saveTask(void)
-	{
+	{ try {
 		int last_processed_index = index();
 		//if (mode == 1)
 		{
@@ -249,7 +249,7 @@ namespace hardware {
 				last_processed_index = index();
 			}
 		}
-	}
+	} catch (kernel::Exception &e) { std::cout << e.what(); throw e; } }
 	
 	void HardwareSensorCameraFirewire::init(int mode, std::string dump_path, cv::Size imgSize)
 	{

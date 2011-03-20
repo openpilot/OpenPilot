@@ -22,7 +22,7 @@ namespace hardware {
 
 
 	void HardwareSensorGpsGenom::preloadTask(void)
-	{
+	{ try {
 		char data[256];
 #ifdef HAVE_POSTERLIB
 		H2TIME h2timestamp;
@@ -97,7 +97,7 @@ namespace hardware {
 			}
 			
 		}
-	}
+	} catch (kernel::Exception &e) { std::cout << e.what(); throw e; } }
 	
 	
 	HardwareSensorGpsGenom::HardwareSensorGpsGenom(kernel::VariableCondition<int> &condition, unsigned bufferSize, const std::string machine, int mode, std::string dump_path):

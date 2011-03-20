@@ -243,8 +243,9 @@ class ConfigSetup: public kernel::KeyValueFileSaveLoad
 {
  public:
 	/// SENSOR
-	jblas::vec6 SENSOR_POSE_CONSTVEL; /// sensor pose in constant velocity (x,y,z,roll,pitch,yaw) (deg)
-	jblas::vec6 SENSOR_POSE_INERTIAL; /// sensor pose in inertial (x,y,z,roll,pitch,yaw) (deg)
+	jblas::vec6 SENSOR_POSE_CONSTVEL; /// camera pose in constant velocity (x,y,z,roll,pitch,yaw) (m,deg)
+	jblas::vec6 SENSOR_POSE_INERTIAL; /// camera pose in inertial (x,y,z,roll,pitch,yaw) (m,deg)
+	jblas::vec6 GPS_POSE; /// GPS pose (x,y,z,roll,pitch,yaw) (m,deg)
 
 	unsigned CAMERA_TYPE;      /// camera type (0 = firewire, 1 = firewire format7, 2 = USB)
 	std::string CAMERA_DEVICE; /// camera device (firewire ID or device)
@@ -779,7 +780,7 @@ void demo_slam01_main(world_ptr_t *world) { try {
 			case 1: crop = VIAM_HW_CROP; break;
 			default: crop = VIAM_HW_FIXED; break;
 		}
-		hardware::hardware_sensor_firewire_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, 5/*+50*/,
+		hardware::hardware_sensor_firewire_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, 5+50,
 			configSetup.CAMERA_DEVICE, cv::Size(img_width,img_height), 0, 8, crop, floatOpts[fFreq], intOpts[iTrigger], 
 			floatOpts[fShutter], mode, strOpts[sDataPath]));
 		hardSen11->setTimingInfos(1.0/hardSen11->getFreq(), 1.0/hardSen11->getFreq());
@@ -797,12 +798,15 @@ void demo_slam01_main(world_ptr_t *world) { try {
 		{
 			absloc_ptr_t senPtr13(new SensorAbsloc(robPtr1, MapObject::UNFILTERED));
 			senPtr13->setId();
+			senPtr13->linkToParentRobot(robPtr1);
 			hardware::hardware_sensorprop_ptr_t hardGps(
-				new hardware::HardwareSensorGpsGenom(rawdata_condition, 100, "mana-base", mode, strOpts[sDataPath]));
+				new hardware::HardwareSensorGpsGenom(rawdata_condition, 200, "mana-base", mode, strOpts[sDataPath]));
 			hardGps->setSyncConfig(0.0/*configSetup.GPS_TIMESTAMP_CORRECTION*/);
 			hardGps->setTimingInfos(1.0/20.0, 1.5/20.0);
 			senPtr13->setHardwareSensor(hardGps);
 			senPtr13->setIntegrationPolicy(true);
+			senPtr13->setPose(configSetup.GPS_POSE[0], configSetup.GPS_POSE[1], configSetup.GPS_POSE[2],
+												configSetup.GPS_POSE[3], configSetup.GPS_POSE[4], configSetup.GPS_POSE[5]); // x,y,z,roll,pitch,yaw
 		}
 	}
 	
@@ -892,6 +896,7 @@ int n_innovation = 0;
 				
 				double newt = pinfo.sen->getRawTimestamp(pinfo.id);
 				robot_ptr_t robPtr = pinfo.sen->robotPtr();
+std::cout << "Frame " << (*world)->t << " using sen " << pinfo.sen->id() << " at time " << std::setprecision(16) << newt << std::endl;
 				robPtr->move(newt);
 				
 				JFR_DEBUG("Robot " << robPtr->id() << " state after move " << robPtr->state.x());
@@ -1374,6 +1379,7 @@ void ConfigSetup::loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFi
 {
 	KeyValueFile_getItem(SENSOR_POSE_CONSTVEL);
 	KeyValueFile_getItem(SENSOR_POSE_INERTIAL);
+	KeyValueFile_getItem(GPS_POSE);
 	
 	KeyValueFile_getItem(CAMERA_TYPE);
 	KeyValueFile_getItem(CAMERA_DEVICE);
@@ -1427,6 +1433,7 @@ void ConfigSetup::saveKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile)
 {
 	KeyValueFile_setItem(SENSOR_POSE_CONSTVEL);
 	KeyValueFile_setItem(SENSOR_POSE_INERTIAL);
+	KeyValueFile_setItem(GPS_POSE);
 	
 	KeyValueFile_setItem(CAMERA_TYPE);
 	KeyValueFile_setItem(CAMERA_DEVICE);

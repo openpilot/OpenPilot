@@ -212,7 +212,7 @@ namespace hardware {
 
 	void HardwareSensorCameraFirewire::saveTask(void)
 	{
-		int last_processed_index = index()-1;
+		int last_processed_index = index();
 		//if (mode == 1)
 		{
 			#if 0

@@ -154,7 +154,7 @@ class HardwareSensorAbstract
 		*/
 		HardwareSensorAbstract(kernel::VariableCondition<int> &condition, unsigned bufferSize):
 			write_pos(0), read_pos(0), buffer_full(false), read_pos_used(false),
-		  condition(condition), index(0),
+		  condition(condition), index(-1),
 		  data_count(0), no_more_data(false), timestamps_correction(0.0),
 		  bufferSize(bufferSize), buffer(bufferSize)
 		{}

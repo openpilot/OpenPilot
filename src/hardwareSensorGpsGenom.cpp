@@ -44,9 +44,9 @@ namespace hardware {
 			{
 				f >> reading.data;
 				boost::unique_lock<boost::mutex> l(mutex_data);
-				if (isFull()) cond_offline_full.notify_all();
-				if (f.eof()) { f.close(); return; }
-				while (isFull()) cond_offline_freed.wait(l);
+				if (isFull(true)) cond_offline_full.notify_all();
+				if (f.eof()) { cond_offline_full.notify_all(); f.close(); return; }
+				while (isFull(true)) cond_offline_freed.wait(l);
 				
 			} else
 			{
@@ -69,6 +69,7 @@ namespace hardware {
 						}
 					}
 				}
+				prev_date = *date;
 #endif
 				reading.arrival = getNowTimestamp();
 				pos = (double*)(data+16);
@@ -80,20 +81,21 @@ namespace hardware {
 				reading.data(4) = var[0];
 				reading.data(5) = var[1];
 				reading.data(6) = var[2];
-				//std::cout << "GPS poster : " << std::setprecision(15) << reading << std::endl;
-				
-				buffer(getWritePos()).data = reading.data;
-				buffer(getWritePos()).data(0) += timestamps_correction;
-				last_timestamp = reading.data(0);
-				incWritePos();
-				
-				if (mode == 1)
-				{
-					// we put the maximum precision because we want repeatability with the original run
-					f << std::setprecision(50) << reading.data << std::endl;
-				}
-				prev_date = *date;
+				//std::cout << "GPS poster : " << std::setprecision(15) << reading.data << std::endl;
 			}
+			
+			int buff_write = getWritePos();
+			buffer(buff_write).data = reading.data;
+			buffer(buff_write).data(0) += timestamps_correction;
+			last_timestamp = reading.data(0);
+			incWritePos();
+			
+			if (mode == 1)
+			{
+				// we put the maximum precision because we want repeatability with the original run
+				f << std::setprecision(50) << reading.data << std::endl;
+			}
+			
 		}
 	}
 	
@@ -102,14 +104,17 @@ namespace hardware {
 		HardwareSensorProprioAbstract(condition, bufferSize), reading(7), mode(mode), dump_path(dump_path)
 	{
 		// configure
+		if (mode == 0 || mode == 1)
+		{
 #ifdef HAVE_POSTERLIB
-		char *backup_poster_path = getenv("POSTER_PATH");
-		setenv("POSTER_PATH", machine.c_str(), 1);
-		if (posterFind("GPSInfo", &this->posterId) == ERROR) {
-			JFR_ERROR(RtslamException, RtslamException::GENERIC_ERROR, "Poster GPSInfo could not be found");
-		}
-		if (backup_poster_path) setenv("POSTER_PATH", backup_poster_path, 1); else unsetenv("POSTER_PATH");
+			char *backup_poster_path = getenv("POSTER_PATH");
+			setenv("POSTER_PATH", machine.c_str(), 1);
+			if (posterFind("GPSInfo", &this->posterId) == ERROR) {
+				JFR_ERROR(RtslamException, RtslamException::GENERIC_ERROR, "Poster GPSInfo could not be found");
+			}
+			if (backup_poster_path) setenv("POSTER_PATH", backup_poster_path, 1); else unsetenv("POSTER_PATH");
 #endif
+		}
 		
 		// start acquire task
 		//preloadTask();

@@ -40,7 +40,7 @@ namespace hardware {
 				f >> row;
 				boost::unique_lock<boost::mutex> l(mutex_data);
 				if (write_position == read_position) cond_offline.notify_all();
-				if (f.eof()) { f.close(); return; }
+				if (f.eof()) { cond_offline.notify_all(); f.close(); return; }
 				while (write_position == read_position) cond_data.wait(l);
 // std::cout << "MTI preload: put at write_position " << write_position << " (read_position " << read_position << ") ts " << std::setprecision(16) << row(0) << std::endl;
 			} else

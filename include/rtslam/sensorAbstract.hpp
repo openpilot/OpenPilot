@@ -143,6 +143,7 @@ namespace jafar {
 		{
 			protected:
 				hardware::hardware_sensorprop_ptr_t hardwareSensorPtr;
+				RawVec reading;
 			public:
 				SensorProprioAbstract(const robot_ptr_t & robPtr, const filtered_obj_t inFilter = UNFILTERED):
 				  SensorAbstract(robPtr, inFilter) { kind = PROPRIOCEPTIVE; }
@@ -156,7 +157,7 @@ namespace jafar {
 					{ return hardwareSensorPtr->getNextRawInfo(info); }
 				virtual double getRawTimestamp(unsigned id) { return hardwareSensorPtr->getRawTimestamp(id); } 
 				//process(id) will do the filtering, so it is specific to each hardware
-				void process_fake(unsigned id) { hardwareSensorPtr->releaseUntil(id); }
+				void process_fake(unsigned id) { hardwareSensorPtr->getRaw(id, reading); robotPtr()->move_fake(reading.data(0)); }
 		};
 		
 		/** 
@@ -188,6 +189,7 @@ namespace jafar {
 				ENABLE_ACCESS_TO_CHILDREN(DataManagerAbstract,DataManager,dataManager);
 			
 				hardware::hardware_sensorext_ptr_t hardwareSensorPtr;
+				raw_ptr_t rawPtr;
 			
 			public:
 				
@@ -198,7 +200,6 @@ namespace jafar {
 					rawCounter = 0;
 				}
 
-				raw_ptr_t rawPtr;
 				unsigned rawCounter;
 
 				void setHardwareSensor(hardware::hardware_sensorext_ptr_t hardwareSensorPtr_)
@@ -214,7 +215,7 @@ namespace jafar {
 					{ return hardwareSensorPtr->getNextRawInfo(info); }
 				virtual double getRawTimestamp(unsigned id) { return hardwareSensorPtr->getRawTimestamp(id); } 
 				void process(unsigned id);
-				void process_fake(unsigned id) { hardwareSensorPtr->releaseUntil(id); }
+				void process_fake(unsigned id) { hardwareSensorPtr->getRaw(id, rawPtr); robotPtr()->move_fake(rawPtr->timestamp); rawCounter++; }
 		};
 
 	}

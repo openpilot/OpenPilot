@@ -66,7 +66,6 @@ namespace jafar {
 				
 				virtual void process(unsigned id)
 				{
-					RawVec reading;
 					hardwareSensorPtr->getRaw(id, reading);
 					
 					// TODO a vec hardware sensor should return some information about what it is returning

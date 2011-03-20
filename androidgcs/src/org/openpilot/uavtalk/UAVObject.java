@@ -64,7 +64,7 @@ public abstract class UAVObject {
 		if(manually)
 			updatedManual();
 	}
-	void updated() { updated(true); };
+	public void updated() { updated(true); };
 	
 	private CallbackListener unpackedListeners = new CallbackListener(this);
 	public void addUnpackedObserver(Observer o) {

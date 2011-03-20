@@ -8,9 +8,6 @@ import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.openpilot.uavtalk.uavobjects.FlightTelemetryStats;
-import org.openpilot.uavtalk.uavobjects.GCSTelemetryStats;
-
 import android.util.Log;
 
 public class TelemetryMonitor {
@@ -26,7 +23,7 @@ public class TelemetryMonitor {
 
 	private UAVObjectManager objMngr;
 	private Telemetry tel;
-	private UAVObject objPending;
+//	private UAVObject objPending;
 	private UAVObject gcsStatsObj;
 	private UAVObject flightStatsObj;
 	private Timer periodicTask;
@@ -38,7 +35,7 @@ public class TelemetryMonitor {
 	{
 	    this.objMngr = objMngr;
 	    this.tel = tel;
-	    this.objPending = null;
+//	    this.objPending = null;
 	    queue = new ArrayList<UAVObject>();
 
 	    // Get stats objects
@@ -142,7 +139,7 @@ public class TelemetryMonitor {
 
 	    // Request update
 	    tel.updateRequested(obj);
-	    objPending = obj;
+//	    objPending = obj;
 	}
 
 	/**
@@ -155,7 +152,7 @@ public class TelemetryMonitor {
 		if (DEBUG) Log.d(TAG,"transactionCompleted.  Status: " + success);
 		// TODO: Need to be able to disconnect signals
 	    //obj->disconnect(this);
-	    objPending = null;
+//	    objPending = null;
 	    
 	    if(!success) {
 	    	Log.e(TAG, "Transaction failed: " + obj.getName() + " sending again.");

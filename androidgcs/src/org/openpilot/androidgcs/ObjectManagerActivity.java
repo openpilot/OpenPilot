@@ -85,7 +85,6 @@ public abstract class ObjectManagerActivity extends Activity {
 			// We've bound to LocalService, cast the IBinder and attempt to open a connection			
 			if (DEBUG) Log.d(TAG,"Service bound");
 			binder = (LocalBinder) service;			
-			binder.openFakeConnection();
 		}
 
 		public void onServiceDisconnected(ComponentName name) {

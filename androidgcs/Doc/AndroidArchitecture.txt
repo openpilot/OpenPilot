@@ -1,0 +1,31 @@
+------- TELEMETRY ---------
+The Telemetry system has been implemented, and is composed of a few
+major components:
+
+Telemetry.java - receives command to transmit objects through telemetry and
+also emits notification when transactions are completed
+
+TelemetryMonitor.java - monitors the FlightTelemetryStats and GCSTelemetryStats
+to establish when a working connection is in place.  Also initiates downloading
+all the objects on a new connection.
+
+UAVObjectManager.java - the central data store.  The data is actually stored
+within objects, but this maintains the handles to all of them.
+
+UAVTalk.java - the actual communication layer.  Can packetize an object and
+insert into stream and process the incoming stream and update objects
+accordingly.
+
+---- MESSAGE PASSING ----
+The current implementation/analog to the slots/sockets in QT are Observers
+which are registered as added to an Observable.  This is used extensibly within
+the telemetry system.  I will continue to use this _within_ the Telemetry
+module so it doesn't depend on any android features.
+
+In android there is a constraint that UI operations should all be done from the
+UI thread.  The most common way to do this is for the UI object (such as
+Activity) to instantiate a Handler to which messages or runnables are posted.
+
+So for external objects they will register a runnable somehow...
+
+

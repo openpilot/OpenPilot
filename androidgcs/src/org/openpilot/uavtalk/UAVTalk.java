@@ -197,8 +197,7 @@ public class UAVTalk extends Observable {
 			 return false;
 		 }
 
-		 // System.out.println("Received byte " + val + " in state + " +
-		 // rxState);
+		 //System.out.println("Received byte " + val + " in state + " + rxState);
 		 processInputByte(val);
 		 return true;
 	}

@@ -10,10 +10,10 @@ import java.util.TimerTask;
 
 import android.util.Log;
 
-public class TelemetryMonitor {
+public class TelemetryMonitor extends Observable{
 
 	private static final String TAG = "TelemetryMonitor";
-	public static int LOGLEVEL = 0;
+	public static int LOGLEVEL = 2;
 	public static boolean WARN = LOGLEVEL > 1;
 	public static boolean DEBUG = LOGLEVEL > 0;
 
@@ -30,6 +30,12 @@ public class TelemetryMonitor {
 	private int currentPeriod;
 	private long lastUpdateTime;
 	private List<UAVObject> queue;
+	
+	private boolean connected = false;
+	private boolean objects_updated = false;
+	
+	public boolean getConnected() { return connected; };
+	public boolean getObjectsUpdated() { return objects_updated; };
 	
 	public TelemetryMonitor(UAVObjectManager objMngr, Telemetry tel)
 	{
@@ -116,8 +122,9 @@ public class TelemetryMonitor {
 	    if ( queue.isEmpty() )
 	    {
 	    	if (DEBUG) Log.d(TAG, "All objects retrieved: Connected Successfully");
-	        //qxtLog->debug("Object retrieval completed");
-	        //emit connected();
+	    	objects_updated = true;
+	    	setChanged();
+	    	notifyObservers();
 	        return;
 	    }
 	    // Get next object from the queue
@@ -260,9 +267,9 @@ public class TelemetryMonitor {
 	    // Force telemetry update if not yet connected
 	    boolean gcsStatusChanged = !oldStatus.equals(statusField.getValue());
 	    
-	    boolean gcsConnected = ((String) statusField.getValue()).compareTo("Connected") == 0;
-	    boolean gcsDisconnected = ((String) statusField.getValue()).compareTo("Disconnected") == 0;
-	    boolean flightConnected = ((String) flightStatsObj.getField("Status").getValue()).compareTo("Connected") == 0;
+	    boolean gcsConnected = statusField.getValue().equals("Connected");
+	    boolean gcsDisconnected = statusField.getValue().equals("Disconnected");
+	    boolean flightConnected = flightStatsObj.getField("Status").equals("Connected");
 	    
 	    if (  !gcsConnected || !flightConnected )
 	    {
@@ -275,14 +282,21 @@ public class TelemetryMonitor {
 	    {
 	    	if (DEBUG) Log.d(TAG,"Connection with the autopilot established");
 	    	setPeriod(STATS_UPDATE_PERIOD_MS);
+	    	connected = true;
+	    	objects_updated = false;
 	        startRetrievingObjects();
+	        setChanged();
 	    }
 	    if (gcsDisconnected && gcsStatusChanged)
 	    {
 	    	if (DEBUG) Log.d(TAG,"Trying to connect to the autopilot");
 	    	setPeriod(STATS_CONNECT_PERIOD_MS);
-	        //emit disconnected();
+	    	connected = false;
+	    	objects_updated = false;
+	        setChanged();
 	    }
+        notifyObservers();
+
 	}
 
 	private void setPeriod(int ms) {

@@ -211,7 +211,7 @@ class HardwareSensorProprioAbstract: public HardwareSensorAbstract<RawVec>
 	*/
 	
 		HardwareSensorProprioAbstract(kernel::VariableCondition<int> &condition, unsigned bufferSize):
-			HardwareSensorAbstract(condition, bufferSize) {}
+			HardwareSensorAbstract<RawVec>(condition, bufferSize) {}
 		virtual int dataSize() = 0; /// number of measure variables provided (without timestamp and variance)
 		virtual int varianceSize() = 0; /// number of variance variables provided
 	
@@ -222,7 +222,7 @@ class HardwareSensorExteroAbstract: public HardwareSensorAbstract<raw_ptr_t>
 {
 	public:
 		HardwareSensorExteroAbstract(kernel::VariableCondition<int> &condition, unsigned bufferSize):
-			HardwareSensorAbstract(condition, bufferSize) {}
+			HardwareSensorAbstract<raw_ptr_t>(condition, bufferSize) {}
 	
 	
 };

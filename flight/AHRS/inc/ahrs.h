@@ -58,8 +58,7 @@ struct accel_sensor {
 		float z;
 	} filtered;
 	struct {
-		float bias[3];
-		float scale[3];
+		float scale[3][4];
 		float variance[3];
 	} calibration;
 };

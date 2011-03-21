@@ -694,6 +694,30 @@ bool get_accel_gyro_data()
 	return true;
 }
 
+/*
+ * @brief Perform calibration of a 3-axis field sensor using an affine transformation
+ * matrix.
+ *
+ * Computes result = scale * arg.
+ *
+ * @param result[out] The three-axis resultant field.
+ * @param scale[in] The 4x4 affine transformation matrix.  The fourth row is implicitly
+ * 	[0 0 0 1]
+ * @param arg[in] The 3-axis input field.  The 'w' component is implicitly 1.
+ */
+void calibration(float result[3], float scale[3][4], float arg[3])
+{
+	for (int row = 0; row < 3; ++row) {
+		result[row] = 0.0f;
+		int col;
+		for (col = 0; col < 3; ++col) {
+			result[row] += scale[row][col] * arg[col];
+		}
+		// fourth column: arg has an implicit w value of 1.0f.
+		result[row] += scale[row][col];
+	}
+}
+
 /**
  * @brief Downsample the analog data
  * @return none
@@ -711,25 +735,54 @@ void adc_callback(float * downsampled_data)
 	AHRSSettingsData settings;
 	AHRSSettingsGet(&settings);
 
+#if 0
+	// Get the Y data.  Third byte in.  Convert to m/s
+	float accel_filtered[3];
+	accel_filtered[1] = 0;
+	for (i = 0; i < adc_oversampling; i++)
+		accel_filtered[1] += valid_data_buffer[0 + i * PIOS_ADC_NUM_PINS] * fir_coeffs[i];
+	accel_filtered[1] /= (float) fir_coeffs[adc_oversampling];
+	// Get the X data which projects forward/backwards.  Fifth byte in.  Convert to m/s
+	accel_filtered[0] = 0;
+	for (i = 0; i < adc_oversampling; i++)
+		accel_filtered[0] += valid_data_buffer[2 + i * PIOS_ADC_NUM_PINS] * fir_coeffs[i];
+	accel_filtered[0] /= (float) fir_coeffs[adc_oversampling];
+
+	// Get the Z data.  Third byte in.  Convert to m/s
+	accel_filtered[2] = 0;
+	for (i = 0; i < adc_oversampling; i++)
+		accel_filtered[2] += valid_data_buffer[4 + i * PIOS_ADC_NUM_PINS] * fir_coeffs[i];
+	accel_filtered[2] /= (float) fir_coeffs[adc_oversampling];
+
+	float accel_scaled[3];
+	calibration(accel_scaled, accel_data.calibration.scale, accel_filtered);
+	accel_data.filtered.x = accel_scaled[0];
+	accel_data.filtered.y = accel_scaled[1];
+	accel_data.filtered.z = accel_scaled[2];
+#else
 	float accel[3], gyro[3];
 
+	float raw_accel[3] = {
+			downsampled_data[ACCEL_RAW_X_IDX],
+			downsampled_data[ACCEL_RAW_Y_IDX],
+			-downsampled_data[ACCEL_RAW_Z_IDX]
+	};
+
 	// Accel data is (y,x,z) in first third and fifth byte.  Convert to m/s^2
-	accel[0] = (downsampled_data[ACCEL_RAW_X_IDX] * accel_data.calibration.scale[0]) + accel_data.calibration.bias[0];
-	accel[1] = (downsampled_data[ACCEL_RAW_Y_IDX] * accel_data.calibration.scale[1]) + accel_data.calibration.bias[1];
-	accel[2] = (downsampled_data[ACCEL_RAW_Z_IDX] * accel_data.calibration.scale[2]) + accel_data.calibration.bias[2];
+	calibration(accel, accel_data.calibration.scale, raw_accel);
 
 	// Gyro data is (x,y,z) in second, fifth and seventh byte.  Convert to rad/s
 	gyro[0] = ( ( downsampled_data[GYRO_RAW_X_IDX] + gyro_data.calibration.tempcompfactor[0] * downsampled_data[GYRO_TEMP_RAW_XY_IDX] ) * gyro_data.calibration.scale[0]) + gyro_data.calibration.bias[0];
 	gyro[1] = ( ( downsampled_data[GYRO_RAW_Y_IDX] + gyro_data.calibration.tempcompfactor[1] * downsampled_data[GYRO_TEMP_RAW_XY_IDX] ) * gyro_data.calibration.scale[1]) + gyro_data.calibration.bias[1];
 	gyro[2] = ( ( downsampled_data[GYRO_RAW_Z_IDX] + gyro_data.calibration.tempcompfactor[2] * downsampled_data[GYRO_TEMP_RAW_Z_IDX]  ) * gyro_data.calibration.scale[2]) + gyro_data.calibration.bias[2];
-	
+
+#endif
 #if 0
 	static float gravity_tracking[3] = {0,0,0};
 	const float tau = 0.9999;
 	gravity_tracking[0] = tau * gravity_tracking[0]  + (1-tau) * accel[0];
 	gravity_tracking[1] = tau * gravity_tracking[1] + (1-tau) * accel[1];
 	gravity_tracking[2] = tau * gravity_tracking[2] + (1-tau) * (accel[2] + 9.81);
-
 	if(settings.BiasCorrectedRaw == AHRSSETTINGS_BIASCORRECTEDRAW_TRUE) {
 		accel[0] -= gravity_tracking[0];
 		accel[1] -= gravity_tracking[1];
@@ -912,31 +965,38 @@ void calibrate_sensors()
 /**
  * @brief Populate fields with initial values
  */
-void reset_values() {
-	accel_data.calibration.scale[0] = 0.0359;
-	accel_data.calibration.scale[1] = 0.0359;
-	accel_data.calibration.scale[2] = -0.0359;
-	accel_data.calibration.bias[0] = -73.5;
-	accel_data.calibration.bias[1] = -73.5;
-	accel_data.calibration.bias[2] = 73.5;
-	accel_data.calibration.variance[0] = 5e-4;
-	accel_data.calibration.variance[1] = 5e-4;
-	accel_data.calibration.variance[2] = 5e-4;
-	gyro_data.calibration.scale[0] = -0.017;
-	gyro_data.calibration.scale[1] = 0.017;
-	gyro_data.calibration.scale[2] = -0.017;
-	gyro_data.calibration.bias[0] = 23;
-	gyro_data.calibration.bias[1] = -23;
-	gyro_data.calibration.bias[2] = 23;
-	gyro_data.calibration.variance[0] = 1e-4;
-	gyro_data.calibration.variance[1] = 1e-4;
-	gyro_data.calibration.variance[2] = 1e-4;
-	gyro_data.calibration.tempcompfactor[0] = 0;
-	gyro_data.calibration.tempcompfactor[1] = 0;
-	gyro_data.calibration.tempcompfactor[2] = 0;
-	mag_data.calibration.scale[0] = -2;
-	mag_data.calibration.scale[1] = -2;
-	mag_data.calibration.scale[2] = -2;
+void reset_values()
+{
+	accel_data.calibration.scale[0][1] = 0;
+	accel_data.calibration.scale[1][0] = 0;
+	accel_data.calibration.scale[0][2] = 0;
+	accel_data.calibration.scale[2][0] = 0;
+	accel_data.calibration.scale[1][2] = 0;
+	accel_data.calibration.scale[2][1] = 0;
+
+	accel_data.calibration.scale[0][0] = 0.0359;
+	accel_data.calibration.scale[1][1] = 0.0359;
+	accel_data.calibration.scale[2][2] = 0.0359;
+	accel_data.calibration.scale[0][3] = -73.5;
+	accel_data.calibration.scale[1][3] = -73.5;
+	accel_data.calibration.scale[2][3] = -73.5;
+
+	accel_data.calibration.variance[0] = 1e-4;
+	accel_data.calibration.variance[1] = 1e-4;
+	accel_data.calibration.variance[2] = 1e-4;
+
+	gyro_data.calibration.scale[0] = -0.014;
+	gyro_data.calibration.scale[1] = 0.014;
+	gyro_data.calibration.scale[2] = -0.014;
+	gyro_data.calibration.bias[0] = -24;
+	gyro_data.calibration.bias[1] = -24;
+	gyro_data.calibration.bias[2] = -24;
+	gyro_data.calibration.variance[0] = 1;
+	gyro_data.calibration.variance[1] = 1;
+	gyro_data.calibration.variance[2] = 1;
+	mag_data.calibration.scale[0] = 1;
+	mag_data.calibration.scale[1] = 1;
+	mag_data.calibration.scale[2] = 1;
 	mag_data.calibration.bias[0] = 0;
 	mag_data.calibration.bias[1] = 0;
 	mag_data.calibration.bias[2] = 0;
@@ -1017,15 +1077,28 @@ void calibration_callback(AhrsObjHandle obj)
 	AHRSCalibrationData cal;
 	AHRSCalibrationGet(&cal);
 	if(cal.measure_var == AHRSCALIBRATION_MEASURE_VAR_SET){
+
+		accel_data.calibration.scale[0][1] = cal.accel_ortho[0];
+		accel_data.calibration.scale[1][0] = cal.accel_ortho[0];
+
+		accel_data.calibration.scale[0][2] = cal.accel_ortho[1];
+		accel_data.calibration.scale[2][0] = cal.accel_ortho[1];
+
+		accel_data.calibration.scale[1][2] = cal.accel_ortho[2];
+		accel_data.calibration.scale[2][1] = cal.accel_ortho[2];
+
 		for(int ct=0; ct<3; ct++)
 		{
-			accel_data.calibration.scale[ct] = cal.accel_scale[ct];
-			accel_data.calibration.bias[ct] = cal.accel_bias[ct];
+			accel_data.calibration.scale[ct][ct] = cal.accel_scale[ct];
+			accel_data.calibration.scale[ct][3] = cal.accel_bias[ct];
 			accel_data.calibration.variance[ct] = cal.accel_var[ct];
+
 			gyro_data.calibration.scale[ct] = cal.gyro_scale[ct];
 			gyro_data.calibration.bias[ct] = cal.gyro_bias[ct];
 			gyro_data.calibration.variance[ct] = cal.gyro_var[ct];
+#if 1
 			gyro_data.calibration.tempcompfactor[ct] = cal.gyro_tempcompfactor[ct];
+#endif
 			mag_data.calibration.bias[ct] = cal.mag_bias[ct];
 			mag_data.calibration.scale[ct] = cal.mag_scale[ct];
 			mag_data.calibration.variance[ct] = cal.mag_var[ct];
@@ -1038,7 +1111,8 @@ void calibration_callback(AhrsObjHandle obj)
 		INSSetMagVar(mag_var);
 		INSSetAccelVar(accel_data.calibration.variance);
 		INSSetGyroVar(gyro_data.calibration.variance);
-	}else if(cal.measure_var == AHRSCALIBRATION_MEASURE_VAR_MEASURE){
+	}
+	else if(cal.measure_var == AHRSCALIBRATION_MEASURE_VAR_MEASURE) {
 		calibrate_sensors();
 		send_calibration();
 	}

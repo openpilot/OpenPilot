@@ -10085,3 +10085,10 @@ r3052
   +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/Eigen/src/Core/util/Meta.h svn:mime-type text/plain
   +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/Eigen/src/Core/util/StaticAssert.h svn:mime-type text/plain
   +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/Eigen/src/Core/util/XprHelper.h svn:mime-type text/plain
+r3053
+  +file_prop: trunk/ground/openpilotgcs/src/plugins/config/alignment-calibration.cpp svn:mime-type text/plain
+  +file_prop: trunk/ground/openpilotgcs/src/plugins/config/assertions.h svn:mime-type text/plain
+  +file_prop: trunk/ground/openpilotgcs/src/plugins/config/calibration.h svn:mime-type text/plain
+  +file_prop: trunk/ground/openpilotgcs/src/plugins/config/gyro-calibration.cpp svn:mime-type text/plain
+  +file_prop: trunk/ground/openpilotgcs/src/plugins/config/legacy-calibration.cpp svn:mime-type text/plain
+  +file_prop: trunk/ground/openpilotgcs/src/plugins/config/twostep.cpp svn:mime-type text/plain

@@ -10072,3 +10072,16 @@ r3051
   +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/Eigen/src/Sparse/TriangularSolver.h svn:mime-type text/plain
   +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/Eigen/src/Sparse/UmfPackSupport.h svn:mime-type text/plain
   +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/README.OpenpilotGCS.txt svn:mime-type text/plain
+r3052
+  +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/Eigen/src/CMakeLists.txt svn:mime-type text/plain
+  +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/Eigen/src/Core/arch/CMakeLists.txt svn:mime-type text/plain
+  +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/Eigen/src/Core/util/CMakeLists.txt svn:mime-type text/plain
+  +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/Eigen/src/Core/util/Constants.h svn:mime-type text/plain
+  +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/Eigen/src/Core/util/DisableMSVCWarnings.h svn:mime-type text/plain
+  +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/Eigen/src/Core/util/EnableMSVCWarnings.h svn:mime-type text/plain
+  +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/Eigen/src/Core/util/ForwardDeclarations.h svn:mime-type text/plain
+  +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/Eigen/src/Core/util/Macros.h svn:mime-type text/plain
+  +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/Eigen/src/Core/util/Memory.h svn:mime-type text/plain
+  +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/Eigen/src/Core/util/Meta.h svn:mime-type text/plain
+  +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/Eigen/src/Core/util/StaticAssert.h svn:mime-type text/plain
+  +file_prop: trunk/ground/openpilotgcs/src/libs/eigen/Eigen/src/Core/util/XprHelper.h svn:mime-type text/plain

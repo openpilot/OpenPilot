@@ -41,6 +41,7 @@ USE_BOOTLOADER ?= NO
 
 USE_SPEKTRUM ?= NO
 
+USE_I2C ?= NO
 
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= YES
@@ -390,6 +391,10 @@ endif
 
 ifeq ($(USE_SPEKTRUM), YES)
 CDEFS += -DUSE_SPEKTRUM
+endif
+
+ifeq ($(USE_I2C), YES)
+CDEFS += -DUSE_I2C
 endif
 
 

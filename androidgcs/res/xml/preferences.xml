@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference android:title="@string/preference_checkbox_autoconnect" android:key="autoconnect" />
+    <ListPreference 
+    	android:title="@string/preference_checkbox_connection_type" 
+    	android:key="connection_type"
+		android:summary="@string/preference_connection_method_summary"
+		android:defaultValue="None"
+		android:entries="@array/connectTypeArray"
+		android:entryValues="@array/connectTypeValues" />
+</PreferenceScreen>

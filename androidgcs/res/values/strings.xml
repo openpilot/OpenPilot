@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">OpenPilot GCS</string>
+    <string name="app_name">OpenPilot GCS Home</string>
+    <string name="object_browser_name">OpenPilot Object Browser</string>
     <string name="menu_item_settings">Settings</string>
     <string name="menu_item_connect">Connect</string>
     <string name="menu_item_disconnect">Disconnect</string>
-    <string name="object_browser_title">OpenPilot Object Browser</string>
+    <string name="preference_title">Settings</string>
+    <string name="preference_checkbox_autoconnect">Automatically Connect</string>
+    <string name="preference_checkbox_connection_type">Connection Type</string>
+    <string name="preference_checkbox_bluetooth">Bluetooth</string>
+    <string name="preference_connection_method_summary">Select the connection method</string>
 </resources>

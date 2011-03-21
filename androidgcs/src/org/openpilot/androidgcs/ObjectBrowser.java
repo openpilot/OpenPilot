@@ -9,25 +9,16 @@ import java.util.Observer;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ExpandableListAdapter;
-import android.widget.ExpandableListView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.SimpleExpandableListAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
 import org.openpilot.uavtalk.UAVDataObject;
 import org.openpilot.uavtalk.UAVObject;
@@ -38,6 +29,7 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 	boolean connected;
 	SharedPreferences prefs;
 	ArrayAdapter<UAVDataObject> adapter;
+	List<UAVDataObject> allObjects;
 	
 	final Handler uavobjHandler = new Handler(); 
 	final Runnable updateText = new Runnable() {
@@ -51,7 +43,7 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);		
+		setContentView(R.layout.object_browser);		
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		prefs.registerOnSharedPreferenceChangeListener(this);
 	}
@@ -60,17 +52,31 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 	void onOPConnected() {
 		Toast.makeText(this,"Telemetry estabilished",Toast.LENGTH_SHORT);
 		Log.d(TAG, "onOPConnected()");
-		
+
 		List<List<UAVDataObject>> allobjects = objMngr.getDataObjects();
-		List<UAVDataObject> linearized = new ArrayList<UAVDataObject>();
+		allObjects = new ArrayList<UAVDataObject>();
 		ListIterator<List<UAVDataObject>> li = allobjects.listIterator();
 		while(li.hasNext()) {
-			linearized.addAll(li.next());
+			allObjects.addAll(li.next());
 		}
-		
-		adapter = new ArrayAdapter<UAVDataObject>(this,R.layout.object_view, linearized);
+
+		adapter = new ArrayAdapter<UAVDataObject>(this,R.layout.object_view, allObjects);
 		ListView objects = (ListView) findViewById(R.id.object_list);
 		objects.setAdapter(adapter);
+
+		objects.setOnItemClickListener(new OnItemClickListener() {
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+			      /*Toast.makeText(getApplicationContext(), ((TextView) view).getText(),
+			              Toast.LENGTH_SHORT).show();*/
+				Intent intent = new Intent(ObjectBrowser.this, ObjectEditor.class);
+				intent.putExtra("org.openpilot.androidgcs.ObjectName", allObjects.get(position).getName());
+				intent.putExtra("org.openpilot.androidgcs.ObjectId", allObjects.get(position).getObjID());
+				intent.putExtra("org.openpilot.androidgcs.InstId", allObjects.get(position).getInstID());
+				startActivity(intent);
+			}
+		});
+
 
 		UAVObject obj = objMngr.getObject("SystemStats");
 		if(obj != null)
@@ -81,7 +87,7 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 			});
 
 	}
-	
+
 	public void update() {
 		adapter.notifyDataSetChanged();
 	}
@@ -89,6 +95,6 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

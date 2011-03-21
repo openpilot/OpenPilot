@@ -26,6 +26,7 @@
 		</activity>
 
  		<activity android:name="Preferences" android:label="@string/preference_title"/>
+ 		<activity android:name="ObjectEditor" android:label="ObjectEditor" android:theme="@android:style/Theme.Dialog"/>
  		
 		<receiver android:name="TelemetryWidget">
 			<intent-filter>

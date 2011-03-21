@@ -14,6 +14,9 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 public abstract class ObjectManagerActivity extends Activity {
 
@@ -72,6 +75,31 @@ public abstract class ObjectManagerActivity extends Activity {
 		
 	}
 	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+		case R.id.menu_connect:
+			binder.openConnection();
+			return true;
+		case R.id.menu_disconnect:
+			binder.stopConnection();
+			return true;
+		case R.id.menu_settings:
+			startActivity(new Intent(this, Preferences.class));
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.options_menu, menu);
+		return true;
+	}
+
 	@Override
 	public void onStart() {
 		super.onStart();

@@ -16,6 +16,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
@@ -24,6 +25,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -48,8 +50,7 @@ public class OPTelemetryService extends Service {
 
 	// Message ids
 	static final int MSG_START        = 0;
-	static final int MSG_CONNECT_BT   = 1;
-	static final int MSG_CONNECT_FAKE = 2;
+	static final int MSG_CONNECT      = 1;
 	static final int MSG_DISCONNECT   = 3;
 	static final int MSG_TOAST        = 100;
 
@@ -70,14 +71,22 @@ public class OPTelemetryService extends Service {
 				Toast.makeText(OPTelemetryService.this, "HERE", Toast.LENGTH_SHORT);
 				System.out.println("HERE");
 				stopSelf(msg.arg2);
-			case MSG_CONNECT_BT:
+			case MSG_CONNECT:				
 				terminate = false;
-				activeTelem = new BTTelemetryThread();
-				activeTelem.start();
-				break;
-			case MSG_CONNECT_FAKE:
-				terminate = false;
-				activeTelem = new FakeTelemetryThread();
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
+				int connection_type = Integer.decode(prefs.getString("connection_type", ""));
+				switch(connection_type) {
+				case 0: // No connection
+					return;
+				case 1:
+					activeTelem = new FakeTelemetryThread();
+					break;
+				case 2:
+					activeTelem = new BTTelemetryThread();
+					break;
+				case 3:
+					throw new Error("Unsupported");
+				}
 				activeTelem.start();
 				break;
 			case MSG_DISCONNECT:
@@ -146,20 +155,18 @@ public class OPTelemetryService extends Service {
 		public TelemTask getTelemTask(int id) {
 			return (TelemTask) activeTelem;
 		}
-		public void openFakeConnection() {
+		public void openConnection() {
 			Message msg = mServiceHandler.obtainMessage();
-			msg.arg1 = MSG_CONNECT_FAKE;
-			mServiceHandler.sendMessage(msg);
-		}
-		public void openBTConnection() {
-			Message msg = mServiceHandler.obtainMessage();
-			msg.arg1 = MSG_CONNECT_BT;
+			msg.arg1 = MSG_CONNECT;
 			mServiceHandler.sendMessage(msg);
 		}
 		public void stopConnection() {
 			Message msg = mServiceHandler.obtainMessage();
 			msg.arg1 = MSG_DISCONNECT;
 			mServiceHandler.sendMessage(msg);
+		}
+		public boolean isConnected() {
+			return activeTelem != null;
 		}
 	};
 

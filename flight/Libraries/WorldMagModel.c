@@ -293,7 +293,9 @@ int WMM_GetMagVector(float Lat, float Lon, float AltEllipsoid, uint16_t Month, u
         Ellip = NULL;
     }
 
-    // ***********
+	B[0] = GeoMagneticElements->X * 1e-2;
+	B[1] = GeoMagneticElements->Y * 1e-2;
+	B[2] = GeoMagneticElements->Z * 1e-2;
 
     return returned;
 }

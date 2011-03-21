@@ -119,7 +119,8 @@ bool ConnectionManager::connectDevice()
 	// check if opening the device worked
 	if (!io_dev->isOpen())
 	{
-		qDebug() << "Error: io_dev->isOpen() returned FALSE .. could not open connection too " << connection_device.devName;
+		qDebug() << "Error: io_dev->isOpen() returned FALSE .. could not open connection to " << connection_device.devName
+			<< ": " << io_dev->errorString();
 
 		// close the device
 		try

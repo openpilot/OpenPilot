@@ -54,6 +54,7 @@
 
 static void gpsTask(void *parameters);
 static void setHomeLocation(GPSPositionData * gpsData);
+static float GravityAccel(float latitude, float longitude, float altitude);
 
 // ****************
 // Private constants
@@ -333,6 +334,21 @@ static void gpsTask(void *parameters)
 	}
 }
 
+/*
+ * Estimate the acceleration due to gravity for a particular location in LLA
+ */
+static float GravityAccel(float latitude, float longitude, float altitude)
+{
+	// WGS84 gravity model.  The effect of gravity over latitude is strong
+	// enough to change the estimated accelerometer bias in those apps.
+	double sinsq = sin((double)latitude);
+	sinsq *= sinsq;
+	// Likewise, over the altitude range of a high-altitude balloon, the effect
+	// due to change in altitude can also affect the model.
+	return (float)(9.7803267714 * (1 + 0.00193185138639*sinsq) / sqrt(1 - 0.00669437999013*sinsq)
+		- 3.086e-6*altitude);
+}
+
 // ****************
 
 static void setHomeLocation(GPSPositionData * gpsData)
@@ -363,6 +379,11 @@ static void setHomeLocation(GPSPositionData * gpsData)
 		// Compute magnetic flux direction at home location
 		if (WMM_GetMagVector(LLA[0], LLA[1], LLA[2], gps.Month, gps.Day, gps.Year, &home.Be[0]) >= 0)
 		{   // calculations appeared to go OK
+
+			// Compute local acceleration due to gravity.  Vehicles that span a very large
+			// range of altitude (say, weather balloons) may need to update this during the
+			// flight.
+			home.g_e = GravityAccel(LLA[0], LLA[1], LLA[2]);
 		    home.Set = HOMELOCATION_SET_TRUE;
 		    HomeLocationSet(&home);
 		}

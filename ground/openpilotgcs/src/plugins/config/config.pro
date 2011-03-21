@@ -7,6 +7,8 @@ include(../../plugins/uavtalk/uavtalk.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(../../plugins/uavobjects/uavobjects.pri)
 
+INCLUDEPATH += ../../libs/eigen
+
 OTHER_FILES += Config.pluginspec
 
 HEADERS += configplugin.h \
@@ -25,7 +27,9 @@ HEADERS += configplugin.h \
     mixercurvepoint.h \
     mixercurveline.h \
     configccpmwidget.h \
-	configstabilizationwidget.h
+	configstabilizationwidget.h \
+    assertions.h \
+    calibration.h
 
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
@@ -43,8 +47,12 @@ SOURCES += configplugin.cpp \
     mixercurvepoint.cpp \
     mixercurveline.cpp \
     configccpmwidget.cpp \
-	configstabilizationwidget.cpp
-
+	configstabilizationwidget.cpp \
+    twostep.cpp \
+    legacy-calibration.cpp \
+    gyro-calibration.cpp \
+    alignment-calibration.cpp
+    
 FORMS += settingswidget.ui \
     airframe.ui \
     telemetry.ui \

@@ -24,13 +24,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#include "configahrswidget.h"
 #include "configgadgetwidget.h"
 
 #include "fancytabwidget.h"
 #include "configservowidget.h"
 #include "configairframewidget.h"
 #include "configtelemetrywidget.h"
-#include "configahrswidget.h"
+
 #include "configstabilizationwidget.h"
 
 #include <QDebug>

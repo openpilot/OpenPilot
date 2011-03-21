@@ -27,6 +27,8 @@
 #ifndef CONFIGAHRSWIDGET_H
 #define CONFIGAHRSWIDGET_H
 
+#include <Eigen/StdVector>
+
 #include "ui_ahrs.h"
 #include "configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
@@ -39,6 +41,8 @@
 #include <QTimer>
 #include <QMutex>
 
+#include <Eigen/Core>
+
 class ConfigAHRSWidget: public ConfigTaskWidget
 {
     Q_OBJECT
@@ -46,7 +50,8 @@ class ConfigAHRSWidget: public ConfigTaskWidget
 public:
     ConfigAHRSWidget(QWidget *parent = 0);
     ~ConfigAHRSWidget();
-
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    
 private:
     void drawVariancesGraph();
     void displayPlane(QString elementID);
@@ -83,14 +88,12 @@ private:
     QList<double> mag_accum_y;
     QList<double> mag_accum_z;
 
-    double accel_data_x[6];
-    double accel_data_y[6];
-    double accel_data_z[6];
-    double mag_data_x[6];
-    double mag_data_y[6];
-    double mag_data_z[6];
+    // TODO: Store these in std::vectors
+    Eigen::Vector3f gyro_data[60];
+    Eigen::Vector3f accel_data[60];
+    Eigen::Vector3f mag_data[60];
     int position;
-
+    int n_positions;
 
     UAVObject::Metadata initialMdata;
 

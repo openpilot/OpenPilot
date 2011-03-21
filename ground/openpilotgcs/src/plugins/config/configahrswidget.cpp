@@ -35,6 +35,9 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 #include <QThread>
+#include <iostream>
+
+#include "calibration.h"
 
 #define sign(x) ((x < 0) ? -1 : 1)
 
@@ -289,6 +292,7 @@ void ConfigAHRSWidget::launchAccelBiasCalibration()
   */
 void ConfigAHRSWidget::accelBiasattitudeRawUpdated(UAVObject *obj)
 {
+	// TODO: THis one gets replaced with the multipoint calibratino below.
     UAVObjectField *accel_field = obj->getField(QString("accels"));
     Q_ASSERT(accel_field != 0);
 
@@ -563,6 +567,7 @@ void ConfigAHRSWidget::saveAHRSCalibration()
 void ConfigAHRSWidget::attitudeRawUpdated(UAVObject * obj)
 {
     QMutexLocker lock(&attitudeRawUpdateLock);
+
     UAVObjectField *accel_field = obj->getField(QString("accels"));
     UAVObjectField *gyro_field = obj->getField(QString("gyros"));
     UAVObjectField *mag_field = obj->getField(QString("magnetometers"));
@@ -578,45 +583,77 @@ void ConfigAHRSWidget::attitudeRawUpdated(UAVObject * obj)
         mag_accum_x.append(mag_field->getValue(0).toDouble());
         mag_accum_y.append(mag_field->getValue(1).toDouble());
         mag_accum_z.append(mag_field->getValue(2).toDouble());
+
         gyro_accum_x.append(gyro_field->getValue(0).toDouble());
         gyro_accum_y.append(gyro_field->getValue(1).toDouble());
         gyro_accum_z.append(gyro_field->getValue(2).toDouble());
     }
 
-    if(accel_accum_x.size() >= 20 && collectingData == true) {
+    if(accel_accum_x.size() >= 8 && collectingData == true) {
         collectingData = false;
         disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(attitudeRawUpdated(UAVObject*)));
         m_ahrs->sixPointsSave->setEnabled(true);
 
-        accel_data_x[position] = listMean(accel_accum_x);
-        accel_data_y[position] = listMean(accel_accum_y);
-        accel_data_z[position] = listMean(accel_accum_z);
-        mag_data_x[position] = listMean(mag_accum_x);
-        mag_data_y[position] = listMean(mag_accum_y);
-        mag_data_z[position] = listMean(mag_accum_z);
+        accel_data[position] << listMean(accel_accum_x),
+			listMean(accel_accum_y),
+			listMean(accel_accum_z);
 
-        position = (position + 1) % 6;
-        if(position == 1) {
-            m_ahrs->sixPointCalibInstructions->append("Place with left side down and click save position...");
-            displayPlane("plane-left");
+        mag_data[position] << listMean(mag_accum_x),
+			listMean(mag_accum_y),
+			listMean(mag_accum_z);
+
+        gyro_data[position] << listMean(gyro_accum_x),
+			listMean(gyro_accum_y),
+			listMean(gyro_accum_z);
+
+
+        std::cout << "observed accel: " << accel_data[position].transpose()
+			<< "\nobserved mag: " << mag_data[position].transpose()
+			<< "\nobserved gyro: " << gyro_data[position].transpose()
+			<< std::endl;
+
+        struct {
+        	const char* instructions;
+        	const char* display;
+        } instructions[] = {
+        		{ "Pitch up 45 deg and click save position...", "plane-horizontal" },
+        		{ "Pitch down 45 deg and click save position...", "plane-horizontal" },
+        		{ "Roll left 45 deg and click save position...", "plane-left" },
+        		{ "Roll right 45 deg and click save position...", "plane-left" },
+
+        		{ "Turn left 90 deg to 09:00 position and click save position...", "plane-horizontal" },
+        		{ "Pitch up 45 deg and click save position...", "plane-horizontal" },
+        		{ "Pitch down 45 deg and click save position...", "plane-horizontal" },
+        		{ "Roll left 45 deg and click save position...", "plane-left" },
+        		{ "Roll right 45 deg and click save position...", "plane-left" },
+
+        		{ "Turn left 90 deg to 06:00 position and click save position...", "plane-horizontal" },
+        		{ "Pitch up 45 deg and click save position...", "plane-horizontal" },
+        		{ "Pitch down 45 deg and click save position...", "plane-horizontal" },
+        		{ "Roll left 45 deg and click save position...", "plane-left" },
+        		{ "Roll right 45 deg and click save position...", "plane-left" },
+
+        		{ "Turn left 90 deg to 03:00 position and click save position...", "plane-horizontal" },
+        		{ "Pitch up 45 deg and click save position...", "plane-horizontal" },
+        		{ "Pitch down 45 deg and click save position...", "plane-horizontal" },
+        		{ "Roll left 45 deg and click save position...", "plane-left" },
+        		{ "Roll right 45 deg and click save position...", "plane-left" },
+
+        		{ "Place with nose vertically up and click save position...", "plane-up" },
+        		{ "Place with nose straight down and click save position...", "plane-down" },
+        		{ "Place upside down and click save position...", "plane-flip" },
+        };
+
+        n_positions = sizeof(instructions) / sizeof(instructions[0]);
+        position = (position + 1) % n_positions;
+
+        if (position != 0 && position < n_positions) {
+
+        	m_ahrs->sixPointCalibInstructions->append(instructions[position-1].instructions);
+        	displayPlane(instructions[position-1].display);
         }
-        if(position == 2) {
-            m_ahrs->sixPointCalibInstructions->append("Place upside down and click save position...");
-            displayPlane("plane-flip");
-        }
-        if(position == 3) {
-            m_ahrs->sixPointCalibInstructions->append("Place with right side down and click save position...");
-            displayPlane("plane-right");
-        }
-        if(position == 4) {
-            m_ahrs->sixPointCalibInstructions->append("Place with nose up and click save position...");
-            displayPlane("plane-up");
-        }
-        if(position == 5) {
-            m_ahrs->sixPointCalibInstructions->append("Place with nose down and click save position...");
-            displayPlane("plane-down");
-        }
-        if(position == 0) {
+        else if(position == 0) {
+        	position = n_positions;
             computeScaleBias();
             m_ahrs->sixPointsStart->setEnabled(true);
             m_ahrs->sixPointsSave->setEnabled(false);
@@ -650,6 +687,9 @@ void ConfigAHRSWidget::savePositionData()
     mag_accum_x.clear();
     mag_accum_y.clear();
     mag_accum_z.clear();
+    gyro_accum_x.clear();
+    gyro_accum_y.clear();
+    gyro_accum_z.clear();
 
     collectingData = true;
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
@@ -659,149 +699,160 @@ void ConfigAHRSWidget::savePositionData()
 }
 
 //*****************************************************************
-
-int LinearEquationsSolving(int nDim, double* pfMatr, double* pfVect, double* pfSolution)
+namespace {
+/**
+ * Updates the scale factors and offsets for a calibrated vector field.
+ * @param scale[out] Non-null pointer to a 3-element scale factor field.
+ * @param bias[out] Non-null pointer to a 3-element bias field.
+ * @param ortho[out] Optional pointer to a 3-element orthogonal correction field
+ * @param updateScale the source scale factor matrix.
+ * @param updateBias the source bias matrix.
+ */
+void
+updateScaleFactors(UAVObjectField *scale,
+		UAVObjectField *bias ,
+		UAVObjectField *ortho,
+		const Matrix3f& updateScale,
+		const Vector3f& updateBias)
 {
-  double fMaxElem;
-  double fAcc;
-
-  int i , j, k, m;
-
-  for(k=0; k<(nDim-1); k++) // base row of matrix
-  {
-    // search of line with max element
-    fMaxElem = fabs( pfMatr[k*nDim + k] );
-    m = k;
-    for(i=k+1; i<nDim; i++)
-    {
-      if(fMaxElem < fabs(pfMatr[i*nDim + k]) )
-      {
-        fMaxElem = pfMatr[i*nDim + k];
-        m = i;
-      }
+	// Compose a 4x4 affine transformation matrix composed of the scale factor,
+	// orthogonality correction, and bias.
+	Matrix4f calibration;
+    calibration << (Vector3f() << scale->getDouble(0), scale->getDouble(1), scale->getDouble(2)).finished().asDiagonal(),
+		(Vector3f() << bias->getDouble(0), bias->getDouble(1), bias->getDouble(2)).finished(),
+		Vector4f::UnitW().transpose();
+	
+    if (ortho) {
+    	calibration(1, 0) = calibration(0, 1) = ortho->getDouble(0);
+    	calibration(2, 0) = calibration(0, 2) = ortho->getDouble(1);
+    	calibration(1, 2) = calibration(2, 1) = ortho->getDouble(2);
     }
 
-    // permutation of base line (index k) and max element line(index m)
-    if(m != k)
-    {
-      for(i=k; i<nDim; i++)
-      {
-        fAcc               = pfMatr[k*nDim + i];
-        pfMatr[k*nDim + i] = pfMatr[m*nDim + i];
-        pfMatr[m*nDim + i] = fAcc;
-      }
-      fAcc = pfVect[k];
-      pfVect[k] = pfVect[m];
-      pfVect[m] = fAcc;
+	std::cout << "old calibration matrix: \n" << calibration << "\n";
+
+    Matrix4f update;
+    update << updateScale, updateBias, Vector4f::UnitW().transpose();
+	std::cout << "new calibration matrix update: \n" << update << "\n";
+
+    calibration = update * calibration;
+    scale->setDouble(calibration(0,0), 0);
+    scale->setDouble(calibration(1,1), 1);
+    scale->setDouble(calibration(2,2), 2);
+
+    bias->setDouble(calibration(0,3), 0);
+    bias->setDouble(calibration(1,3), 1);
+    bias->setDouble(calibration(2,3), 2);
+
+    if (ortho) {
+    	ortho->setDouble(calibration(0, 1), 0);
+    	ortho->setDouble(calibration(0, 2), 1);
+    	ortho->setDouble(calibration(1, 2), 2);
     }
-
-    if( pfMatr[k*nDim + k] == 0.) return 0; // needs improvement !!!
-
-    // triangulation of matrix with coefficients
-    for(j=(k+1); j<nDim; j++) // current row of matrix
-    {
-      fAcc = - pfMatr[j*nDim + k] / pfMatr[k*nDim + k];
-      for(i=k; i<nDim; i++)
-      {
-        pfMatr[j*nDim + i] = pfMatr[j*nDim + i] + fAcc*pfMatr[k*nDim + i];
-      }
-      pfVect[j] = pfVect[j] + fAcc*pfVect[k]; // free member recalculation
-    }
-  }
-
-  for(k=(nDim-1); k>=0; k--)
-  {
-    pfSolution[k] = pfVect[k];
-    for(i=(k+1); i<nDim; i++)
-    {
-      pfSolution[k] -= (pfMatr[k*nDim + i]*pfSolution[i]);
-    }
-    pfSolution[k] = pfSolution[k] / pfMatr[k*nDim + k];
-  }
-
-  return 1;
 }
-
-
-int SixPointInConstFieldCal( double ConstMag, double x[6], double y[6], double z[6], double S[3], double b[3] )
+/**
+ * Updates the offsets for a calibrated gyro field.
+ * @param scale[in] Non-null pointer to a 3-element scale factor field.
+ * @param bias[out] Non-null pointer to a 3-element bias field.
+ * @param updateBias the source bias matrix.
+ */
+void
+updateBias(UAVObjectField *scale,
+		UAVObjectField *bias ,
+		const Vector3f& updateBias)
 {
-  int i;
-  double A[5][5];
-  double f[5], c[5];
-  double xp, yp, zp, Sx;
+	Vector3f scale_factor = (Vector3f() << scale->getDouble(0), 
+		scale->getDouble(1), 
+		scale->getDouble(2)).finished();
+	Vector3f old_bias = (Vector3f() << bias->getDouble(0), 
+		bias->getDouble(1), 
+		bias->getDouble(2)).finished();
 
-  // Fill in matrix A -
-  // write six difference-in-magnitude equations of the form
-  // Sx^2(x2^2-x1^2) + 2*Sx*bx*(x2-x1) + Sy^2(y2^2-y1^2) + 2*Sy*by*(y2-y1) + Sz^2(z2^2-z1^2) + 2*Sz*bz*(z2-z1) = 0
-  // or in other words
-  // 2*Sx*bx*(x2-x1)/Sx^2  + Sy^2(y2^2-y1^2)/Sx^2  + 2*Sy*by*(y2-y1)/Sx^2  + Sz^2(z2^2-z1^2)/Sx^2  + 2*Sz*bz*(z2-z1)/Sx^2  = (x1^2-x2^2)
-  for (i=0;i<5;i++){
-      A[i][0] = 2.0 * (x[i+1] - x[i]);
-      A[i][1] = y[i+1]*y[i+1] - y[i]*y[i];
-      A[i][2] = 2.0 * (y[i+1] - y[i]);
-      A[i][3] = z[i+1]*z[i+1] - z[i]*z[i];
-      A[i][4] = 2.0 * (z[i+1] - z[i]);
-      f[i]    = x[i]*x[i] - x[i+1]*x[i+1];
-  }
+	// Convert to radians/second
+	Vector3f final_bias = -(M_PI)/180.0f * updateBias + old_bias;
 
-  // solve for c0=bx/Sx, c1=Sy^2/Sx^2; c2=Sy*by/Sx^2, c3=Sz^2/Sx^2, c4=Sz*bz/Sx^2
-  if (  !LinearEquationsSolving( 5, (double *)A, f, c) ) return 0;
-
-  // use one magnitude equation and c's to find Sx - doesn't matter which - all give the same answer
-  xp = x[0]; yp = y[0]; zp = z[0];
-  Sx = sqrt(ConstMag*ConstMag / (xp*xp + 2*c[0]*xp + c[0]*c[0] + c[1]*yp*yp + 2*c[2]*yp + c[2]*c[2]/c[1] + c[3]*zp*zp + 2*c[4]*zp + c[4]*c[4]/c[3]));
-
-  S[0] = Sx;
-  b[0] = Sx*c[0];
-  S[1] = sqrt(c[1]*Sx*Sx);
-  b[1] = c[2]*Sx*Sx/S[1];
-  S[2] = sqrt(c[3]*Sx*Sx);
-  b[2] = c[4]*Sx*Sx/S[2];
-
-  return 1;
+    bias->setDouble(final_bias(0), 0);
+    bias->setDouble(final_bias(1), 1);
+    bias->setDouble(final_bias(2), 2);
 }
+} // !namespace (anon)
 
 void ConfigAHRSWidget::computeScaleBias()
 {
+    // Extract the local magnetic and gravitational field vectors from HomeLocation.
+    UAVObject *home = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("HomeLocation")));
+    Vector3f localMagField;
+    localMagField << home->getField("Be")->getValue(0).toDouble(),
+		home->getField("Be")->getValue(1).toDouble(),
+		home->getField("Be")->getValue(2).toDouble();
+
+    float localGravity = home->getField("g_e")->getDouble();
+
+    Vector3f referenceField = Vector3f::UnitZ()*localGravity;
+    double noise = 0.04;
+    Vector3f accelBias;
+    Matrix3f accelScale;
+    std::cout << "number of samples: " << n_positions << "\n";
+    twostep_bias_scale(accelBias, accelScale, accel_data, n_positions, referenceField, noise*noise);
+    // Twostep computes an offset from the identity scalar, and a negative bias offset
+    accelScale += Matrix3f::Identity();
+    accelBias = -accelBias;
+    std::cout << "computed accel bias: " << accelBias.transpose()
+		<< "\ncomputed accel scale:\n" << accelScale<< std::endl;
+
+    // Apply the computed scale factor and bias to each sample
+    for (int i = 0; i < n_positions; ++i) {
+    	accel_data[i] = accelScale * accel_data[i] + accelBias;
+    }
+
+    // Magnetometer has excellent orthogonality, so only calibrate the scale factors.
+    Vector3f magBias;
+    Vector3f magScale;
+    noise = 4.0;
+    twostep_bias_scale(magBias, magScale, mag_data, n_positions, localMagField, noise*noise);
+    magScale += Vector3f::Ones();
+    magBias = -magBias;
+    std::cout << "computed mag bias: " << magBias.transpose()
+		<< "\ncomputed mag scale:\n" << magScale << std::endl;
+
+    // Apply the computed scale factor and bias to each sample
+    for (int i = 0; i < n_positions; ++i) {
+    	mag_data[i] = magScale.asDiagonal() * mag_data[i] + magBias;
+    }
+
+    // Calibrate gyro bias and acceleration sensitivity
+    Matrix3f accelSensitivity;
+    Vector3f gyroBias;
+    gyroscope_calibration(gyroBias, accelSensitivity, gyro_data, accel_data, n_positions);
+    std::cout << "gyro bias: " << gyroBias.transpose()
+		<< "\ngyro's acceleration sensitivity:\n" << accelSensitivity << std::endl;
+
+    // Calibrate alignment between the accelerometer and gyro, taking the accelerometer as the
+    // reference.
+    Vector3f magRotation;
+    calibration_misalignment(magRotation, accel_data, -Vector3f::UnitZ()*localGravity,
+			mag_data, localMagField, n_positions);
+    std::cout << "magnetometer rotation vector: " << magRotation.transpose() << std::endl;
+
+    // Update the calibration scalars
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
-    UAVObjectField *field;
-    double S[3], b[3];
+    updateScaleFactors(obj->getField(QString("accel_scale")),
+    		obj->getField(QString("accel_bias")),
+    		obj->getField(QString("accel_ortho")),
+    		accelScale,
+    		accelBias);
 
-    SixPointInConstFieldCal( 9.81, accel_data_x, accel_data_y, accel_data_z, S, b);
+    updateScaleFactors(obj->getField(QString("mag_scale")),
+    		obj->getField(QString("mag_bias")),
+    		NULL,
+    		magScale.asDiagonal(),
+    		magBias);
 
-    field = obj->getField(QString("gyro_bias"));
-    field->setDouble(-listMean(gyro_accum_x) * M_PI / 180.0f,0);
-    field->setDouble(-listMean(gyro_accum_y) * M_PI / 180.0f,1);
-    field->setDouble(-listMean(gyro_accum_z) * M_PI / 180.0f,2);
+	updateBias(obj->getField(QString("gyro_scale")),
+		obj->getField(QString("gyro_bias")),
+		gyroBias);
 
-    field = obj->getField(QString("accel_scale"));
-    field->setDouble(sign(S[0]) * S[0],0);
-    field->setDouble(sign(S[1]) * S[1],1);
-    field->setDouble(-sign(S[2]) * S[2],2);
-
-    field = obj->getField(QString("accel_bias"));
-    field->setDouble(sign(S[0]) * b[0],0);
-    field->setDouble(sign(S[1]) * b[1],1);
-    field->setDouble(-sign(S[2]) * b[2],2);
-
-    SixPointInConstFieldCal( 1000, mag_data_x, mag_data_y, mag_data_z, S, b);
-    field = obj->getField(QString("mag_scale"));
-    field->setDouble(-sign(S[0]) * S[0],0);
-    field->setDouble(-sign(S[1]) * S[1],1);
-    field->setDouble(-sign(S[2]) * S[2],2);
-
-    field = obj->getField(QString("mag_bias"));
-    field->setDouble(-sign(S[0]) * b[0], 0);
-    field->setDouble(-sign(S[1]) * b[1], 1);
-    field->setDouble(-sign(S[2]) * b[2], 2);
-
+	// TODO: Misalignment matrix between accelerometer and magnetometer
     obj->updated();
-
-    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
-    field = obj->getField(QString("BiasCorrectedRaw"));
-    field->setValue("TRUE");
-    obj->updated();
-
 
     position = -1; //set to run again
     m_ahrs->sixPointCalibInstructions->append("Computed accel and mag scale and bias...");
@@ -817,32 +868,42 @@ void ConfigAHRSWidget::sixPointCalibrationMode()
 
     // set accels to unity gain
     UAVObjectField *field = obj->getField(QString("accel_scale"));
-    field->setDouble(1,0);
-    field->setDouble(1,1);
-    field->setDouble(1,2);
+    // TODO: Figure out how to load these directly from the saved metadata
+    // about default values
+    field->setDouble(0.035, 0);
+    field->setDouble(0.035, 1);
+    field->setDouble(0.035, 2);
 
     field = obj->getField(QString("accel_bias"));
-    field->setDouble(0,0);
-    field->setDouble(0,1);
-    field->setDouble(0,2);
+    field->setDouble(-72.5, 0);
+    field->setDouble(-72.5, 1);
+    field->setDouble(72.5, 2);
 
+    field = obj->getField(QString("accel_ortho"));
+    for (int i = 0; i < 3; ++i) {
+    	field->setDouble(0, i);
+    }
+
+#if 1
     field = obj->getField(QString("gyro_bias"));
-    field->setDouble(0,0);
-    field->setDouble(0,1);
-    field->setDouble(0,2);
+    field->setDouble(28.5,0);
+    field->setDouble(-28.5,1);
+    field->setDouble(28.6,2);
+#endif
 
     field = obj->getField(QString("mag_scale"));
-    field->setDouble(1,0);
-    field->setDouble(1,1);
-    field->setDouble(1,2);
+    for (int i = 0; i < 3; ++i) {
+    	field->setDouble(-1, i);
+    }
 
     field = obj->getField(QString("mag_bias"));
-    field->setDouble(0,0);
-    field->setDouble(0,1);
-    field->setDouble(0,2);
+    for (int i = 0; i < 3; ++i) {
+    	field->setDouble(0, i);
+    }
 
     obj->updated();
 
+    // TODO: What is this?
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
     field = obj->getField(QString("BiasCorrectedRaw"));
     field->setValue("FALSE");
@@ -912,6 +973,7 @@ void ConfigAHRSWidget::drawVariancesGraph()
     gyro_z->setTransform(QTransform::fromScale(1,gyro_z_var),false);
 
     // Scale by 1e-3 because mag vars are much higher.
+    // TODO: Really?  This is the scale factor from mG to T
     field = obj->getField(QString("mag_var"));
     float mag_x_var = -1/steps*(1+steps+log10(1e-3*field->getValue(0).toFloat()));
     mag_x->setTransform(QTransform::fromScale(1,mag_x_var),false);

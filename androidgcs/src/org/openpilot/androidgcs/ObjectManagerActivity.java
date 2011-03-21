@@ -21,7 +21,7 @@ import android.view.MenuItem;
 public abstract class ObjectManagerActivity extends Activity {
 
 	private final String TAG = "ObjectManagerActivity";
-	private static int LOGLEVEL = 2;
+	private static int LOGLEVEL = 0;
 //	private static boolean WARN = LOGLEVEL > 1;
 	private static boolean DEBUG = LOGLEVEL > 0;
 
@@ -106,19 +106,38 @@ public abstract class ObjectManagerActivity extends Activity {
 		Intent intent = new Intent(this, OPTelemetryService.class);
 		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 	}
+	
+	public void onBind() {
+		
+	}
 
 	/** Defines callbacks for service binding, passed to bindService() */
 	private ServiceConnection mConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName arg0, IBinder service) {
 			// We've bound to LocalService, cast the IBinder and attempt to open a connection			
 			if (DEBUG) Log.d(TAG,"Service bound");
-			binder = (LocalBinder) service;			
+			mBound = true;
+			binder = (LocalBinder) service;
+			
+			if(binder.isConnected()) {
+				TelemTask task;
+				if((task = binder.getTelemTask(0)) != null) {
+					objMngr = task.getObjectManager();
+					mConnected = true;
+					onOPConnected();
+				}
+			
+			}
 		}
 
 		public void onServiceDisconnected(ComponentName name) {
 			mBound = false;
+			binder = null;
 			mConnected = false;
 			objMngr = null;
+			objMngr = null;
+			mConnected = false;
+			onOPDisconnected();
 		}
 	};
 }

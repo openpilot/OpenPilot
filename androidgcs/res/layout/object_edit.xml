@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+    <TextView android:layout_height="wrap_content" android:text="ObjectEditor: " android:id="@+id/object_edit_title" android:layout_alignParentTop="true" android:layout_width="wrap_content" android:layout_centerHorizontal="true" android:textStyle="bold"></TextView>
+    <TextView android:text="" android:id="@+id/object_edit_name" android:layout_toRightOf="@+id/object_edit_title" android:layout_alignTop="@+id/textView1" android:layout_alignBottom="@+id/textView1" android:layout_height="wrap_content" android:layout_width="50dip"></TextView>
+    <LinearLayout android:id="@+id/object_edit_fields" android:layout_height="match_parent" android:layout_width="match_parent" android:layout_alignParentBottom="true" android:orientation="vertical"></LinearLayout>
+</RelativeLayout>

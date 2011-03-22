@@ -59,17 +59,18 @@ namespace hardware {
 						if (h2timestamp.ntick != prev_ntick)
 						{
 							prev_ntick = h2timestamp.ntick;
-							posterRead(posterId, 0, data, 256);
-							date = (double*)(data+80+44);
-							if (*date != prev_date)
+							if (posterRead(posterId, 0, data, 256) != ERROR)
 							{
-								prev_date = *date;
-								break;
+								date = (double*)(data+80+44);
+								if (*date != prev_date)
+								{
+									prev_date = *date;
+									break;
+								}
 							}
 						}
 					}
 				}
-				prev_date = *date;
 #endif
 				reading.arrival = getNowTimestamp();
 				pos = (double*)(data+16);

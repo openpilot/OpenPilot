@@ -31,27 +31,12 @@
 #include "rawhid_global.h"
 
 #include <QThread>
-
-struct USBPortInfo {
-    QString friendName; ///< Friendly name.
-    QString physName;
-    QString enumName;   ///< It seems its the only one with meaning
-    QString serialNumber; // As a string as it can be anything, really...
-    QString manufacturer;
-    QString product;
-    QString devicePath; //only has meaning on windows
-    int UsagePage;
-    int Usage;
-    int vendorID;       ///< Vendor ID.
-    int productID;      ///< Product ID
-    int bcdDevice;
-};
+#include <QMutex>
 
 // Depending on the OS, we'll need different things:
 #if defined( Q_OS_MAC)
-
-// TODO
-
+#include <IOKit/IOKitLib.h>
+#include <IOKit/hid/IOHIDLib.h>
 #elif defined(Q_OS_UNIX)
 
 #include <libudev.h>
@@ -96,6 +81,25 @@ protected:
 };
 #endif
 #endif
+
+struct USBPortInfo {
+    //QString friendName; ///< Friendly name.
+    //QString physName;
+    //QString enumName;   ///< It seems its the only one with meaning
+    QString serialNumber; // As a string as it can be anything, really...
+    QString manufacturer;
+    QString product;
+#if defined(Q_OS_WIN32)
+    QString devicePath; //only has meaning on windows
+#elif  defined(Q_OS_MAC)
+    IOHIDDeviceRef dev_handle;
+#endif
+    int UsagePage;
+    int Usage;
+    int vendorID;       ///< Vendor ID.
+    int productID;      ///< Product ID
+    int bcdDevice;
+};
 
 /**
 *   A monitoring thread which will wait for device events.
@@ -154,14 +158,23 @@ private slots:
 
 private:
 
+    //! Mutex for modifying the list of available devices
+    QMutex * listMutex;
+
+    //! List of known devices maintained by callbacks
+    QList<USBPortInfo> knowndevices;
+
     Q_DISABLE_COPY(USBMonitor)
     static USBMonitor *m_instance;
 
+
     // Depending on the OS, we'll need different things:
 #if defined( Q_OS_MAC)
-
-// TODO
-
+    static void attach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev);
+    static void detach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev);
+    void addDevice(USBPortInfo info);
+    void removeDevice(IOHIDDeviceRef dev);
+    IOHIDManagerRef hid_manager;
 #elif defined(Q_OS_UNIX)
     struct udev *context;
     struct udev_monitor *monitor;
@@ -169,7 +182,6 @@ private:
     USBPortInfo makePortInfo(struct udev_device *dev);
 #elif defined (Q_OS_WIN32)
     GUID guid_hid;
-    QList<USBPortInfo> knowndevices;
     void setUpNotifications();
      /*!
      * Get specific property from registry.

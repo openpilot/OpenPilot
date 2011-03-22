@@ -27,9 +27,63 @@
 
 
 #include "usbmonitor.h"
+#include <IOKit/IOKitLib.h>
+#include <IOKit/hid/IOHIDLib.h>
+#include <CoreFoundation/CFString.h>
+#include <CoreFoundation/CFArray.h>
+#include <QMutexLocker>
 #include <QDebug>
 
 #define printf qDebug
+
+//! Local helper functions
+static bool HID_GetIntProperty(IOHIDDeviceRef dev, CFStringRef property, int * value);
+static bool HID_GetStrProperty(IOHIDDeviceRef dev, CFStringRef property, QString & value);
+
+/**
+  Initialize the USB monitor here
+  */
+USBMonitor::USBMonitor(QObject *parent): QThread(parent) {
+    hid_manager=NULL;
+    CFMutableDictionaryRef dict;
+    CFNumberRef num;
+    IOReturn ret;
+
+    m_instance = this;
+
+    listMutex = new QMutex();
+    knowndevices.clear();
+
+    hid_manager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
+    if (hid_manager == NULL || CFGetTypeID(hid_manager) != IOHIDManagerGetTypeID()) {
+        if (hid_manager) CFRelease(hid_manager);
+        Q_ASSERT(0);
+    }
+
+    // No matching filter
+    IOHIDManagerSetDeviceMatching(hid_manager, NULL);
+
+    // set up a callbacks for device attach & detach
+    IOHIDManagerScheduleWithRunLoop(hid_manager, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+    IOHIDManagerRegisterDeviceMatchingCallback(hid_manager, attach_callback, NULL);
+    IOHIDManagerRegisterDeviceRemovalCallback(hid_manager, detach_callback, NULL);
+    ret = IOHIDManagerOpen(hid_manager, kIOHIDOptionsTypeNone);
+    if (ret != kIOReturnSuccess) {
+        IOHIDManagerUnscheduleFromRunLoop(hid_manager,
+                                          CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+        CFRelease(hid_manager);
+        return;
+    }
+
+    start();
+}
+
+USBMonitor::~USBMonitor()
+{
+    //if(hid_manager != NULL)
+    //    IOHIDManagerUnscheduleFromRunLoop(hid_manager, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+    quit();
+}
 
 void USBMonitor::deviceEventReceived() {
 
@@ -44,20 +98,59 @@ USBMonitor* USBMonitor::instance()
 USBMonitor* USBMonitor::m_instance = 0;
 
 
+void USBMonitor::removeDevice(IOHIDDeviceRef dev) {
+    //QMutexLocker locker(listMutex);
+    for( int i = 0; i < knowndevices.length(); i++) {
+        USBPortInfo port = knowndevices.at(i);
+        if(port.dev_handle == dev) {
+            qDebug() << "Found device to remove";
+            knowndevices.removeAt(i);
+            emit deviceRemoved(port);
+            return;
+        }
+    }
 
-/**
-  Initialize the USB monitor here
-  */
-USBMonitor::USBMonitor(QObject *parent): QThread(parent) {
 
-    qDebug() << "TODO: implement the Mac version of USB Monitor!!!";
-
-    start(); // Start the thread event loop so that the socketnotifier works
 }
 
-USBMonitor::~USBMonitor()
+/**
+  * @brief Static callback for the USB driver to indicate device removed
+  */
+void USBMonitor::detach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev)
 {
-    quit();
+    //instance()->removeDevice(dev);
+}
+
+void USBMonitor::addDevice(USBPortInfo info) {
+    //QMutexLocker locker(listMutex);
+    knowndevices.append(info);
+    emit deviceDiscovered(info);
+}
+
+void USBMonitor::attach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev)
+{
+    bool got_properties = true;
+
+    CFTypeRef prop;
+    USBPortInfo deviceInfo;
+
+    deviceInfo.dev_handle = dev;
+
+    // Populate the device info structure
+    got_properties &= HID_GetIntProperty(dev, CFSTR( kIOHIDVendorIDKey ), &deviceInfo.vendorID);
+    got_properties &= HID_GetIntProperty(dev, CFSTR( kIOHIDProductIDKey ), &deviceInfo.productID);
+    got_properties &= HID_GetIntProperty(dev, CFSTR( kIOHIDVersionNumberKey ), &deviceInfo.bcdDevice);
+    got_properties &= HID_GetStrProperty(dev, CFSTR( kIOHIDSerialNumberKey ), deviceInfo.serialNumber);
+    got_properties &= HID_GetStrProperty(dev, CFSTR( kIOHIDProductKey ), deviceInfo.product);
+    got_properties &= HID_GetStrProperty(dev, CFSTR( kIOHIDManufacturerKey ), deviceInfo.manufacturer);
+    // TOOD: Eventually want to take array of usages if devices start needing that
+    got_properties &= HID_GetIntProperty(dev, CFSTR( kIOHIDPrimaryUsageKey ), &deviceInfo.Usage);
+    got_properties &= HID_GetIntProperty(dev, CFSTR( kIOHIDPrimaryUsagePageKey ), &deviceInfo.UsagePage);
+        qDebug() << "New device HAH";
+    if(got_properties) {
+        qDebug() << "New device";
+        instance()->addDevice(deviceInfo);
+    }
 }
 
 /**
@@ -65,16 +158,21 @@ Returns a list of all currently available devices
 */
 QList<USBPortInfo> USBMonitor::availableDevices()
 {
-    QList<USBPortInfo> devicesList;
-
-    return devicesList;
-
+    //QMutexLocker locker(listMutex);
+    qDebug() << "Queried available devices.  Count: " << knowndevices.count();
+    return knowndevices;
 }
 
 /**
-  Be a bit more picky and ask only for a specific type of device:
-     On OpenPilot, the bcdDeviceLSB indicates the run state: bootloader or running.
-     bcdDeviceMSB indicates the board model.
+  * @brief Be a bit more picky and ask only for a specific type of device:
+  * @param[in] vid VID to screen or -1 to ignore
+  * @param[in] pid PID to screen or -1 to ignore
+  * @param[in] bcdDeviceMSB MSB of bcdDevice to screen or -1 to ignore
+  * @param[in] bcdDeviceLSB LSB of bcdDevice to screen or -1 to ignore
+  * @return List of USBPortInfo that meet this criterion
+  * @note
+  *   On OpenPilot, the bcdDeviceLSB indicates the run state: bootloader or running.
+  *   bcdDeviceMSB indicates the board model.
   */
 QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceMSB, int bcdDeviceLSB)
 {
@@ -83,8 +181,48 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceM
 
     foreach (USBPortInfo port, allPorts) {
         if((port.vendorID==vid || vid==-1) && (port.productID==pid || pid==-1) && ((port.bcdDevice>>8)==bcdDeviceMSB || bcdDeviceMSB==-1) &&
-                ( (port.bcdDevice&0x00ff) ==bcdDeviceLSB || bcdDeviceLSB==-1))
+           ( (port.bcdDevice&0x00ff) ==bcdDeviceLSB || bcdDeviceLSB==-1))
             thePortsWeWant.append(port);
     }
+
+    qDebug() << "Queried filtered available devices.  Count: " << thePortsWeWant.count();
     return thePortsWeWant;
+}
+
+/**
+  * @brief Helper function get get a HID integer property
+  * @param[in] dev Device reference
+  * @param[in] property The property to get (constants defined in IOKIT)
+  * @param[out] value Pointer to integer to set
+  * @return True if successful, false otherwise
+  */
+static bool HID_GetIntProperty(IOHIDDeviceRef dev, CFStringRef property, int * value) {
+    CFTypeRef prop = IOHIDDeviceGetProperty(dev, property);
+    if (prop) {
+        if (CFNumberGetTypeID() == CFGetTypeID(prop)) { // if a number
+            CFNumberGetValue((CFNumberRef) prop, kCFNumberSInt32Type, value);
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+  * @brief Helper function get get a HID string property
+  * @param[in] dev Device reference
+  * @param[in] property The property to get (constants defined in IOKIT)
+  * @param[out] value The QString to set
+  * @return True if successful, false otherwise
+  */
+static bool HID_GetStrProperty(IOHIDDeviceRef dev, CFStringRef property, QString & value) {
+    CFTypeRef prop = IOHIDDeviceGetProperty(dev, property);
+    if (prop) {
+        if (CFStringGetTypeID() == CFGetTypeID(prop)) { // if a string
+            char buffer[2550];
+            bool success = CFStringGetCString ( (CFStringRef) prop, buffer, sizeof(buffer), kCFStringEncodingMacRoman );
+            value = QString(buffer);
+            return success;
+        }
+    }
+    return false;
 }

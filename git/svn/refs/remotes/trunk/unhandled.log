@@ -10101,3 +10101,18 @@ r3059
 r3060
 r3061
 r3062
+r3063
+  -empty_dir: trunk/ground/openpilotgcs/src/libs/glc_lib/include/GLC_Attribute
+  +file_prop: trunk/ground/openpilotgcs/src/libs/glc_lib/geometry/glc_pointcloud.cpp svn:eol-style native
+  +file_prop: trunk/ground/openpilotgcs/src/libs/glc_lib/geometry/glc_pointcloud.h svn:eol-style native
+  +file_prop: trunk/ground/openpilotgcs/src/libs/glc_lib/glc_errorlog.h svn:eol-style native
+  +file_prop: trunk/ground/openpilotgcs/src/libs/glc_lib/glc_log.cpp svn:eol-style native
+  +file_prop: trunk/ground/openpilotgcs/src/libs/glc_lib/glc_log.h svn:eol-style native
+  +file_prop: trunk/ground/openpilotgcs/src/libs/glc_lib/glc_openglstate.cpp svn:eol-style native
+  +file_prop: trunk/ground/openpilotgcs/src/libs/glc_lib/glc_openglstate.h svn:eol-style native
+  +file_prop: trunk/ground/openpilotgcs/src/libs/glc_lib/glc_openglstatemanager.cpp svn:eol-style native
+  +file_prop: trunk/ground/openpilotgcs/src/libs/glc_lib/glc_openglstatemanager.h svn:eol-style native
+  +file_prop: trunk/ground/openpilotgcs/src/libs/glc_lib/glc_tracelog.h svn:eol-style native
+  +file_prop: trunk/ground/openpilotgcs/src/libs/glc_lib/io/glc_fileloader.h svn:eol-style native
+  +file_prop: trunk/ground/openpilotgcs/src/libs/glc_lib/io/glc_worldreaderhandler.h svn:eol-style native
+  +file_prop: trunk/ground/openpilotgcs/src/libs/glc_lib/io/glc_worldreaderplugin.h svn:eol-style native

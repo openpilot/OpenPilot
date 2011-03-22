@@ -18,13 +18,8 @@
 		</activity>
 		
 		
-		<activity android:name="ObjectBrowser" android:label="@string/object_browser_name">
-			<intent-filter>
-				<action android:name="org.openpilot.intent.action.CONNECTED" />
-				<action android:name="org.openpilot.intent.action.DISCONNECTED" />
-			</intent-filter>
-		</activity>
-
+		<activity android:name="ObjectBrowser" android:label="@string/object_browser_name" />
+ 		<activity android:name="PFD" android:label="PFD"/>
  		<activity android:name="Preferences" android:label="@string/preference_title"/>
  		<activity android:name="ObjectEditor" android:label="ObjectEditor" android:theme="@android:style/Theme.Dialog"/>
  		

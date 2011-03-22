@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -104,45 +102,45 @@ bool GLC_Frustum::update(const GLC_Matrix4x4& compMatrix)
 	{
 		m_PreviousMatrix= compMatrix;
 		// Left plane
-		m_PlaneList[LeftPlane].setA(compMatrix.data()[3] + compMatrix.data()[0]);
-		m_PlaneList[LeftPlane].setB(compMatrix.data()[7] + compMatrix.data()[4]);
-		m_PlaneList[LeftPlane].setC(compMatrix.data()[11] + compMatrix.data()[8]);
-		m_PlaneList[LeftPlane].setD(compMatrix.data()[15] + compMatrix.data()[12]);
+		m_PlaneList[LeftPlane].setA(compMatrix.getData()[3] + compMatrix.getData()[0]);
+		m_PlaneList[LeftPlane].setB(compMatrix.getData()[7] + compMatrix.getData()[4]);
+		m_PlaneList[LeftPlane].setC(compMatrix.getData()[11] + compMatrix.getData()[8]);
+		m_PlaneList[LeftPlane].setD(compMatrix.getData()[15] + compMatrix.getData()[12]);
 		m_PlaneList[LeftPlane].normalize();
 
 		// Right plane
-		m_PlaneList[RightPlane].setA(compMatrix.data()[3] - compMatrix.data()[0]);
-		m_PlaneList[RightPlane].setB(compMatrix.data()[7] - compMatrix.data()[4]);
-		m_PlaneList[RightPlane].setC(compMatrix.data()[11] - compMatrix.data()[8]);
-		m_PlaneList[RightPlane].setD(compMatrix.data()[15] - compMatrix.data()[12]);
+		m_PlaneList[RightPlane].setA(compMatrix.getData()[3] - compMatrix.getData()[0]);
+		m_PlaneList[RightPlane].setB(compMatrix.getData()[7] - compMatrix.getData()[4]);
+		m_PlaneList[RightPlane].setC(compMatrix.getData()[11] - compMatrix.getData()[8]);
+		m_PlaneList[RightPlane].setD(compMatrix.getData()[15] - compMatrix.getData()[12]);
 		m_PlaneList[RightPlane].normalize();
 
 		//Top plane
-		m_PlaneList[TopPlane].setA(compMatrix.data()[3] + compMatrix.data()[1]);
-		m_PlaneList[TopPlane].setB(compMatrix.data()[7] + compMatrix.data()[5]);
-		m_PlaneList[TopPlane].setC(compMatrix.data()[11] + compMatrix.data()[9]);
-		m_PlaneList[TopPlane].setD(compMatrix.data()[15] + compMatrix.data()[13]);
+		m_PlaneList[TopPlane].setA(compMatrix.getData()[3] + compMatrix.getData()[1]);
+		m_PlaneList[TopPlane].setB(compMatrix.getData()[7] + compMatrix.getData()[5]);
+		m_PlaneList[TopPlane].setC(compMatrix.getData()[11] + compMatrix.getData()[9]);
+		m_PlaneList[TopPlane].setD(compMatrix.getData()[15] + compMatrix.getData()[13]);
 		m_PlaneList[TopPlane].normalize();
 
 		//Bottom plane
-		m_PlaneList[BottomPlane].setA(compMatrix.data()[3] - compMatrix.data()[1]);
-		m_PlaneList[BottomPlane].setB(compMatrix.data()[7] - compMatrix.data()[5]);
-		m_PlaneList[BottomPlane].setC(compMatrix.data()[11] - compMatrix.data()[9]);
-		m_PlaneList[BottomPlane].setD(compMatrix.data()[15] - compMatrix.data()[13]);
+		m_PlaneList[BottomPlane].setA(compMatrix.getData()[3] - compMatrix.getData()[1]);
+		m_PlaneList[BottomPlane].setB(compMatrix.getData()[7] - compMatrix.getData()[5]);
+		m_PlaneList[BottomPlane].setC(compMatrix.getData()[11] - compMatrix.getData()[9]);
+		m_PlaneList[BottomPlane].setD(compMatrix.getData()[15] - compMatrix.getData()[13]);
 		m_PlaneList[BottomPlane].normalize();
 
 		//Near plane
-		m_PlaneList[NearPlane].setA(compMatrix.data()[3] + compMatrix.data()[2]);
-		m_PlaneList[NearPlane].setB(compMatrix.data()[7] + compMatrix.data()[6]);
-		m_PlaneList[NearPlane].setC(compMatrix.data()[11] + compMatrix.data()[10]);
-		m_PlaneList[NearPlane].setD(compMatrix.data()[15] + compMatrix.data()[14]);
+		m_PlaneList[NearPlane].setA(compMatrix.getData()[3] + compMatrix.getData()[2]);
+		m_PlaneList[NearPlane].setB(compMatrix.getData()[7] + compMatrix.getData()[6]);
+		m_PlaneList[NearPlane].setC(compMatrix.getData()[11] + compMatrix.getData()[10]);
+		m_PlaneList[NearPlane].setD(compMatrix.getData()[15] + compMatrix.getData()[14]);
 		m_PlaneList[NearPlane].normalize();
 
 		//Far plane
-		m_PlaneList[FarPlane].setA(compMatrix.data()[3] - compMatrix.data()[2]);
-		m_PlaneList[FarPlane].setB(compMatrix.data()[7] - compMatrix.data()[6]);
-		m_PlaneList[FarPlane].setC(compMatrix.data()[11] - compMatrix.data()[10]);
-		m_PlaneList[FarPlane].setD(compMatrix.data()[15] - compMatrix.data()[14]);
+		m_PlaneList[FarPlane].setA(compMatrix.getData()[3] - compMatrix.getData()[2]);
+		m_PlaneList[FarPlane].setB(compMatrix.getData()[7] - compMatrix.getData()[6]);
+		m_PlaneList[FarPlane].setC(compMatrix.getData()[11] - compMatrix.getData()[10]);
+		m_PlaneList[FarPlane].setD(compMatrix.getData()[15] - compMatrix.getData()[14]);
 		m_PlaneList[FarPlane].normalize();
 		return true;
 	}

@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -39,8 +37,8 @@
 //////////////////////////////////////////////////////////////////////
 class GLC_LIB_EXPORT GLC_WireData
 {
-	friend QDataStream &operator<<(QDataStream &, const GLC_WireData &);
-	friend QDataStream &operator>>(QDataStream &, GLC_WireData &);
+	friend GLC_LIB_EXPORT QDataStream &operator<<(QDataStream &, const GLC_WireData &);
+	friend GLC_LIB_EXPORT QDataStream &operator>>(QDataStream &, GLC_WireData &);
 
 //////////////////////////////////////////////////////////////////////
 /*! @name Constructor / Destructor */
@@ -78,17 +76,17 @@ public:
 	//! Return this wire data bounding box
 	GLC_BoundingBox& boundingBox();
 
-	//! Return the number of polylines
-	inline int polylineCount() const
-	{return m_PolylinesCount;}
+	//! Return the number of vertice group
+	inline int verticeGroupCount() const
+	{return m_VerticeGroupCount;}
 
-	//! Return the polyline offset from the given index
-	inline GLuint polylineOffset(int index) const
-	{return m_PolylinesOffset.at(index);}
+	//! Return the vertice group offset from the given index
+	inline GLuint verticeGroupOffset(int index) const
+	{return m_VerticeGroupOffset.at(index);}
 
-	//! Return the polyline size from the given index
-	inline GLsizei polylineSize(int index) const
-	{return m_PolylinesSizes.at(index);}
+	//! Return the vertice group size from the given index
+	inline GLsizei verticeGroupSize(int index) const
+	{return m_VerticeGrouprSizes.at(index);}
 
 //@}
 
@@ -98,7 +96,7 @@ public:
 //////////////////////////////////////////////////////////////////////
 public:
 	//! Add a Polyline to this wire and returns its id if id are managed
-	GLC_uint addPolyline(const GLfloatVector&);
+	GLC_uint addVerticeGroup(const GLfloatVector&);
 
 	//! Clear the content of this wire Data and makes it empty
 	void clear();
@@ -123,7 +121,8 @@ public:
 	void useVBO(bool usage);
 
 	//! Render this wire data using Opengl
-	void glDraw(const GLC_RenderProperties&);
+	/*! The mode can be : GL_POINTS, GL_LINE_STRIP, GL_LINE_LOOP GL_LINES*/
+	void glDraw(const GLC_RenderProperties&, GLenum mode);
 
 private:
 	//! Create this wire data VBO id
@@ -152,24 +151,24 @@ private:
 	//! Wire data bounding box
 	GLC_BoundingBox* m_pBoundingBox;
 
-	//! Polylines size
-	IndexSizes m_PolylinesSizes;
+	//! Vector of Vertice group size
+	IndexSizes m_VerticeGrouprSizes;
 
-	//! Vector of polyline group offset
-	OffsetVectori m_PolylinesOffset;
+	//! Vector of vertice group offset
+	OffsetVectori m_VerticeGroupOffset;
 
-	//! Polyline groups id
-	QList<GLC_uint> m_PolylinesId;
+	//! Vertice groups id
+	QList<GLC_uint> m_VerticeGroupId;
 
-	//! The number of polylines
-	int m_PolylinesCount;
+	//! The number of vertice group
+	int m_VerticeGroupCount;
 
 	//! Class chunk id
 	static quint32 m_ChunkId;
 };
 
 //! Non-member stream operator
-QDataStream &operator<<(QDataStream &, const GLC_WireData &);
-QDataStream &operator>>(QDataStream &, GLC_WireData &);
+GLC_LIB_EXPORT QDataStream &operator<<(QDataStream &, const GLC_WireData &);
+GLC_LIB_EXPORT QDataStream &operator>>(QDataStream &, GLC_WireData &);
 
 #endif /* GLC_WIREDATA_H_ */

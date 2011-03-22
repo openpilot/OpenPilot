@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -77,12 +75,17 @@ public:
 
 	//! Return the list of attribute name
 	inline QList<QString> names() const
-	{return m_AttributesHash.keys();}
+	{return m_AttributesList;}
 
 	//! Return the value of the specified attributes
 	/*! Return NULL String if attribute doesn't exist*/
 	inline QString value(const QString& name) const
 	{return m_AttributesHash.value(name);}
+
+	//! Return the name of the specified attributes index
+	/*! Return empty String if attribute doesn't exist*/
+	inline QString name(int at) const
+	{return m_AttributesList.value(at);}
 
 //@}
 
@@ -91,13 +94,27 @@ public:
 //@{
 //////////////////////////////////////////////////////////////////////
 public:
-	//! Insert an attribute
+	//! Insert an attribute (if the attribute exists, it's updated)
 	inline void insert(const QString& name, const QString& value)
-	{m_AttributesHash.insert(name, value);}
+	{
+		if ((!m_AttributesHash.contains(name))) m_AttributesList.append(name);
+		m_AttributesHash.insert(name, value);
+	}
 
 	//! Remove an attribute
 	inline void remove(const QString& name)
-	{m_AttributesHash.remove(name);}
+	{
+		Q_ASSERT(m_AttributesHash.contains(name));
+		m_AttributesHash.remove(name);
+		m_AttributesList.removeOne(name);
+	}
+
+	//! Clear the content of this attribute
+	inline void clear()
+	{
+		m_AttributesHash.clear();
+		m_AttributesList.clear();
+	}
 
 //@}
 
@@ -118,6 +135,10 @@ public:
 private:
 	//! Attributes Hash table
 	QHash<QString, QString> m_AttributesHash;
+
+	//! the list of attribute name
+	QList<QString> m_AttributesList;
+
 };
 
 #endif /* GLC_ATTRIBUTES_H_ */

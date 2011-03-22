@@ -4,7 +4,7 @@ DEFINES += GLC_LIB_LIBRARY
 include(../../openpilotgcslibrary.pri)
 
 # GLC_lib qmake configuration
-TEMPLATE = lib
+#TEMPLATE = lib
 QT += opengl \
     core
 
@@ -13,7 +13,7 @@ QT += opengl \
 #    release \
 #    warn_on
 #TARGET = GLC_lib
-#VERSION = 2.0.0
+#VERSION = 2.1.0
 
 DEFINES += CREATE_GLC_LIB_DLL
 DEFINES += LIB3DS_EXPORTS
@@ -81,7 +81,11 @@ HEADERS_GLC_IO +=		io/glc_objmtlloader.h \
 						io/glc_3dxmltoworld.h \
 						io/glc_colladatoworld.h \
 						io/glc_worldto3dxml.h \
-						io/glc_bsreptoworld.h
+						io/glc_bsreptoworld.h \
+						io/glc_xmlutil.h \
+						io/glc_fileloader.h \
+						io/glc_worldreaderplugin.h \
+						io/glc_worldreaderhandler.h
 
 HEADERS_GLC_SCENEGRAPH +=	sceneGraph/glc_3dviewcollection.h \
 							sceneGraph/glc_3dviewinstance.h \
@@ -93,7 +97,8 @@ HEADERS_GLC_SCENEGRAPH +=	sceneGraph/glc_3dviewcollection.h \
 							sceneGraph/glc_worldhandle.h \
 							sceneGraph/glc_spacepartitioning.h \
 							sceneGraph/glc_octree.h \
-							sceneGraph/glc_octreenode.h
+							sceneGraph/glc_octreenode.h \
+							sceneGraph/glc_selectionset.h
 							
 HEADERS_GLC_GEOMETRY +=		geometry/glc_geometry.h \
 							geometry/glc_circle.h \
@@ -115,7 +120,8 @@ HEADERS_GLC_GEOMETRY +=		geometry/glc_geometry.h \
 							geometry/glc_polylines.h \
 							geometry/glc_disc.h \
 							geometry/glc_cone.h \
-							geometry/glc_sphere.h
+							geometry/glc_sphere.h \
+							geometry/glc_pointcloud.h
 
 HEADERS_GLC_SHADING +=	shading/glc_material.h \						
 						shading/glc_texture.h \
@@ -153,7 +159,11 @@ HEADERS_GLC += glc_global.h \
            glc_state.h \
            glc_config.h \
            glc_cachemanager.h \
-           glc_renderstatistics.h
+           glc_renderstatistics.h \
+           glc_log.h \
+           glc_errorlog.h \
+           glc_tracelog.h \
+           glc_openglstate.h
            
 HEADERS_GLC_3DWIDGET += 3DWidget/glc_3dwidget.h \
 						3DWidget/glc_cuttingplane.h \
@@ -222,7 +232,8 @@ SOURCES +=	io/glc_objmtlloader.cpp \
 			io/glc_3dxmltoworld.cpp \
 			io/glc_colladatoworld.cpp \
 			io/glc_worldto3dxml.cpp \
-			io/glc_bsreptoworld.cpp
+			io/glc_bsreptoworld.cpp \
+			io/glc_fileloader.cpp
 
 SOURCES +=	sceneGraph/glc_3dviewcollection.cpp \
 			sceneGraph/glc_3dviewinstance.cpp \
@@ -234,7 +245,8 @@ SOURCES +=	sceneGraph/glc_3dviewcollection.cpp \
 			sceneGraph/glc_worldhandle.cpp \
 			sceneGraph/glc_spacepartitioning.cpp \
 			sceneGraph/glc_octree.cpp \
-			sceneGraph/glc_octreenode.cpp
+			sceneGraph/glc_octreenode.cpp \
+			sceneGraph/glc_selectionset.cpp
 
 SOURCES +=	geometry/glc_geometry.cpp \
 			geometry/glc_circle.cpp \
@@ -256,7 +268,8 @@ SOURCES +=	geometry/glc_geometry.cpp \
 			geometry/glc_polylines.cpp \
 			geometry/glc_disc.cpp \
 			geometry/glc_cone.cpp \
-			geometry/glc_sphere.cpp
+			geometry/glc_sphere.cpp \
+			geometry/glc_pointcloud.cpp
 
 
 SOURCES +=	shading/glc_material.cpp \
@@ -293,7 +306,11 @@ SOURCES +=	glc_global.cpp \
 			glc_ext.cpp \
 			glc_state.cpp \
 			glc_cachemanager.cpp \
-			glc_renderstatistics.cpp
+			glc_renderstatistics.cpp \
+			glc_log.cpp \
+			glc_errorlog.cpp \
+			glc_tracelog.cpp \
+			glc_openglstate.cpp
 
 SOURCES +=	3DWidget/glc_3dwidget.cpp \
 			3DWidget/glc_cuttingplane.cpp \
@@ -353,7 +370,7 @@ HEADERS_INST = include/GLC_BoundingBox \
     		   include/GLC_RepCrossMover \
     		   include/GLC_RepTrackBallMover \
     		   include/GLC_TurnTableMover \
-    		   include/GLC_Attribute \
+    		   include/GLC_Attributes \
     		   include/GLC_Rectangle \
     		   include/GLC_Mesh \
     		   include/GLC_StructOccurence \
@@ -391,14 +408,24 @@ HEADERS_INST = include/GLC_BoundingBox \
     		   include/GLC_Ext \
     		   include/GLC_Cone \
     		   include/GLC_Sphere \
-    		   include/GLC_Axis
-    		   
+    		   include/GLC_Axis \
+    		   include/GLC_Log \
+    		   include/GLC_ErrorLog \
+    		   include/GLC_TraceLog \
+    		   include/glcXmlUtil \
+    		   include/GLC_OpenGLState \
+    		   include/GLC_FileLoader \
+    		   include/GLC_WorldReaderPlugin \
+    		   include/GLC_WorldReaderHandler \
+    		   include/GLC_PointCloud \
+    		   include/GLC_SelectionSet
+
     			   
 # Linux and macx install configuration
 unix {
     # Location of HEADERS and library
-    LIB_DIR = ./install/lib
-    INCLUDE_DIR = ./install/include
+    LIB_DIR = /usr/local/lib
+    INCLUDE_DIR = /usr/local/include
     # Adds a -P to preserve link
 	QMAKE_COPY_FILE = $${QMAKE_COPY_FILE} -P
 	include.path = $${INCLUDE_DIR}/GLC_lib
@@ -448,10 +475,10 @@ include_glc_3dwidget.files = $${HEADERS_GLC_3DWIDGET}
 target.path = $${LIB_DIR}
    
 # "make install" configuration options
-#INSTALLS += include_lib3ds include_glext include_quazip include_glc_maths include_glc_io
-#INSTALLS += include_glc_scengraph include_glc_geometry include_glc_shading include_glc_viewport
-#INSTALLS += include_glc_3dwidget
+INSTALLS += include_lib3ds include_glext include_quazip include_glc_maths include_glc_io
+INSTALLS += include_glc_scengraph include_glc_geometry include_glc_shading include_glc_viewport
+INSTALLS += include_glc_3dwidget
 
-#INSTALLS += target
-#INSTALLS +=include
+INSTALLS += target
+INSTALLS +=include
 

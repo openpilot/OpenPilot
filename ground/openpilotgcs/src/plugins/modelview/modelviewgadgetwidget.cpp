@@ -315,8 +315,12 @@ void ModelViewGadgetWidget::updateAttitude()
     QMatrix4x4 m0= m1 * m2;
     // convert QMatrix4x4 to GLC_Matrix4x4
     GLC_Matrix4x4 rootObjectRotation;
-    for (int i=0; i<16; i++){
-        rootObjectRotation.data()[i]= m0.data()[i];
+    {
+        double* newMatrixData = rootObjectRotation.setData();
+	double* oldMatrixData = (double*) m0.data();
+        for (int i=0; i<16; i++){
+            newMatrixData[i]= oldMatrixData[i];
+        }
     }
     // sets and updates the 3D model's matrix
     rootObject->structInstance()->setMatrix(rootObjectRotation);

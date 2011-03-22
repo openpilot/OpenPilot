@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -104,6 +102,9 @@ public:
 
 	//! Update widget representation
 	virtual void updateWidgetRep(){};
+
+	//! Set the visibility of 3DView Instance of this widget
+	void setVisible(bool visible);
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -163,6 +164,9 @@ protected:
 	//! Return the index of the given instance id
 	inline int indexOfIntsanceId(GLC_uint id)
 	{return m_InstanceIdList.indexOf(id);}
+
+	//! Reset the view state of this 3DWidget
+	virtual void resetViewState()= 0;
 
 //////////////////////////////////////////////////////////////////////
 // Private services function

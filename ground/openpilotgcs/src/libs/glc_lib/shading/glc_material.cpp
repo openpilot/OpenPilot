@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -473,6 +471,7 @@ void GLC_Material::glLoadTexture(void)
 // Execute OpenGL Material
 void GLC_Material::glExecute()
 {
+
 	GLfloat pAmbientColor[4]= {ambientColor().redF(),
 								ambientColor().greenF(),
 								ambientColor().blueF(),
@@ -497,10 +496,30 @@ void GLC_Material::glExecute()
 	{
 		glEnable(GL_TEXTURE_2D);
 		m_pTexture->glcBindTexture();
+		if (GLC_State::glslUsed())
+		{
+			if (GLC_Shader::hasActiveShader())
+			{
+				GLC_Shader::currentShaderHandle()->programShaderHandle()->setUniformValue("tex", GLint(0));
+				GLC_Shader::currentShaderHandle()->programShaderHandle()->setUniformValue("useTexture", true);
+			}
+		}
+
 	}
 	else
 	{
-		glDisable(GL_TEXTURE_2D);
+
+		if (GLC_State::glslUsed() && GLC_Shader::hasActiveShader())
+		{
+				glEnable(GL_TEXTURE_2D);
+				GLC_Shader::currentShaderHandle()->programShaderHandle()->setUniformValue("tex", GLint(0));
+				GLC_Shader::currentShaderHandle()->programShaderHandle()->setUniformValue("useTexture", false);
+		}
+		else
+		{
+			glDisable(GL_TEXTURE_2D);
+		}
+
 	}
 
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, pAmbientColor);
@@ -548,10 +567,26 @@ void GLC_Material::glExecute(float overwriteTransparency)
 	{
 		glEnable(GL_TEXTURE_2D);
 		m_pTexture->glcBindTexture();
+		if (GLC_State::glslUsed())
+		{
+			if (GLC_Shader::hasActiveShader())
+			{
+				GLC_Shader::currentShaderHandle()->programShaderHandle()->setUniformValue("tex", GLint(0));
+				GLC_Shader::currentShaderHandle()->programShaderHandle()->setUniformValue("useTexture", true);
+			}
+		}
 	}
 	else
 	{
 		glDisable(GL_TEXTURE_2D);
+		if (GLC_State::glslUsed())
+		{
+			if (GLC_Shader::hasActiveShader())
+			{
+				GLC_Shader::currentShaderHandle()->programShaderHandle()->setUniformValue("tex", GLint(0));
+				GLC_Shader::currentShaderHandle()->programShaderHandle()->setUniformValue("useTexture", false);
+			}
+		}
 	}
 
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, pAmbientColor);
@@ -568,7 +603,7 @@ void GLC_Material::glExecute(float overwriteTransparency)
 	{
 		const GLubyte* errString;
 		errString = gluErrorString(errCode);
-		qDebug("GLC_Material::GlExecute OpenGL Error %s", errString);
+		qDebug("GLC_Material::glExecute(float) OpenGL Error %s", errString);
 	}
 }
 

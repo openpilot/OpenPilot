@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -45,10 +43,10 @@ namespace glc
 //@{
 //////////////////////////////////////////////////////////////////////
 	//! test if the given 2D polygon is convex
-	bool polygon2DIsConvex(const QList<GLC_Point2d>& vertices);
+	GLC_LIB_EXPORT bool polygon2DIsConvex(const QList<GLC_Point2d>& vertices);
 
 	//! Test if the given 3d polygon is convex
-	bool polygonIsConvex(QList<GLuint>* pIndexList, const QList<float>& bulkList);
+	GLC_LIB_EXPORT bool polygonIsConvex(QList<GLuint>* pIndexList, const QList<float>& bulkList);
 
 	//! find intersection between two 2D segments
 	/*! Return the intersection as QVector of GLC_Point2d
@@ -103,6 +101,6 @@ namespace glc
 
 //@}
 
-}
+};
 
 #endif /*GLC_GEOMTOOLS_H_*/

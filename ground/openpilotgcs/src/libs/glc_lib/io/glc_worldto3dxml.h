@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -68,6 +66,9 @@ public:
 public:
 	//! Save the world to the specified file name
 	bool exportTo3dxml(const QString& filename, GLC_WorldTo3dxml::ExportType exportType, bool exportMaterial= true);
+
+	//! Save the given 3DRep into the given path name
+	bool exportReferenceTo3DRep(const GLC_3DRep* p3DRep, const QString& fullFileName);
 
 	//! Set the name of the 3dxml generator default is GLC_LIB
 	inline void setGeneratorName(const QString& generator)

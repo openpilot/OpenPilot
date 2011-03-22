@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -42,7 +40,7 @@ class GLC_LIB_EXPORT GLC_Octree : public GLC_SpacePartitioning
 //////////////////////////////////////////////////////////////////////
 /*! @name Constructor / Destructor */
 //@{
-//////////////////////////////////////////////////////////////////////s
+//////////////////////////////////////////////////////////////////////
 public:
 	//! Create an empty octree of the given 3D view collection
 	GLC_Octree(GLC_3DViewCollection*);
@@ -78,6 +76,9 @@ public:
 
 	//! Update this octree space partionning
 	virtual void updateSpacePartitioning();
+
+	//! Clear the space partionning
+	virtual void clear();
 
 	//! Set this octree depth
 	/*! If space partitionning is already done, update it*/

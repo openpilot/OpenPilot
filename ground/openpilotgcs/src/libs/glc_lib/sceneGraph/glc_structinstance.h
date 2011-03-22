@@ -3,8 +3,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -107,6 +105,10 @@ public:
 	inline GLC_Attributes* attributesHandle() const
 	{return m_pAttributes;}
 
+	//! Return the number of usage of this instance
+	inline int usageCount() const
+	{return *m_pNumberOfInstance;}
+
 //@}
 //////////////////////////////////////////////////////////////////////
 /*! \name Set Functions*/
@@ -121,7 +123,9 @@ public:
 	}
 
 	inline void structOccurenceDeleted(GLC_StructOccurence *pOccurence)
-	{m_ListOfOccurences.removeOne(pOccurence);}
+	{
+		m_ListOfOccurences.removeOne(pOccurence);
+	}
 
 	//! Move the instance by specified matrix
 	inline GLC_StructInstance* move(const GLC_Matrix4x4& matrix)

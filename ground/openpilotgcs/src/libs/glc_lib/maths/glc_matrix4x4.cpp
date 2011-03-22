@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -66,6 +64,8 @@ GLC_Matrix4x4& GLC_Matrix4x4::setColumn(int index, const GLC_Vector3d& vector)
 	m_Matrix[index]= vector.x();
 	m_Matrix[index + 1]= vector.y();
 	m_Matrix[index + 2]= vector.z();
+
+	m_Type= General;
 
 	return *this;
 }

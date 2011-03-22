@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -92,8 +90,7 @@ GLC_StructReference::~GLC_StructReference()
 // Get Functions
 //////////////////////////////////////////////////////////////////////
 
-// Return the list of occurence of this reference
-QList<GLC_StructOccurence*> GLC_StructReference::listOfStructOccurence() const
+QSet<GLC_StructOccurence*> GLC_StructReference::setOfStructOccurence() const
 {
 	QList<GLC_StructInstance*> instanceList= listOfStructInstances();
 	QSet<GLC_StructOccurence*> occurenceSet;
@@ -107,7 +104,7 @@ QList<GLC_StructOccurence*> GLC_StructReference::listOfStructOccurence() const
 			occurenceSet.insert(occurenceList.at(occIndex));
 		}
 	}
-	return occurenceSet.toList();
+	return occurenceSet;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -116,22 +113,165 @@ QList<GLC_StructOccurence*> GLC_StructReference::listOfStructOccurence() const
 // Set the reference representation
 void GLC_StructReference::setRepresentation(const GLC_3DRep& rep)
 {
-	Q_ASSERT(NULL == m_pRepresentation);
-	m_pRepresentation= new GLC_3DRep(rep);
-
-	// Update all occurence of this reference if exist
-	if (hasStructInstance())
+	// Unload occurence representation
 	{
-		GLC_StructInstance* pInstance= firstInstanceHandle();
-		if (pInstance->hasStructOccurence())
+		QSet<GLC_StructOccurence*> structOccurenceSet= this->setOfStructOccurence();
+		QSet<GLC_StructOccurence*>::iterator iOcc= structOccurenceSet.begin();
+		while (structOccurenceSet.constEnd() != iOcc)
 		{
-			QList<GLC_StructOccurence*> occurenceList= pInstance->listOfStructOccurences();
-			const int size= occurenceList.size();
-			for (int i= 0; i < size; ++i)
-			{
-				occurenceList[i]->checkForRepresentation();
-			}
+			(*iOcc)->remove3DViewInstance();
+			++iOcc;
 		}
+	}
+
+	if(NULL == m_pRepresentation)
+	{
+		m_pRepresentation= new GLC_3DRep(rep);
+	}
+	else
+	{
+		*(m_pRepresentation)= rep;
+	}
+
+	if (m_pRepresentation->isLoaded())
+	{
+		QSet<GLC_StructOccurence*> structOccurenceSet= this->setOfStructOccurence();
+		QSet<GLC_StructOccurence*>::iterator iOcc= structOccurenceSet.begin();
+		while (structOccurenceSet.constEnd() != iOcc)
+		{
+			GLC_StructOccurence* pOccurence= *iOcc;
+			Q_ASSERT(!pOccurence->has3DViewInstance());
+			if (pOccurence->useAutomatic3DViewInstanceCreation())
+			{
+				pOccurence->create3DViewInstance();
+			}
+			++iOcc;
+		}
+	}
+}
+
+GLC_Rep* GLC_StructReference::representationHandle() const
+{
+	Q_ASSERT(NULL != m_pRepresentation);
+	return m_pRepresentation;
+}
+
+QString GLC_StructReference::representationName() const
+{
+	if (NULL != m_pRepresentation)
+	{
+		return m_pRepresentation->name();
+	}
+	else return QString();
+}
+
+bool GLC_StructReference::representationIsLoaded() const
+{
+	if (NULL != m_pRepresentation)
+	{
+		return m_pRepresentation->isLoaded();
+	}
+	else return false;
+
+}
+
+QString GLC_StructReference::representationFileName() const
+{
+	if (NULL != m_pRepresentation)
+	{
+		return m_pRepresentation->fileName();
+	}
+	else return QString();
+}
+
+bool GLC_StructReference::representationIsEmpty() const
+{
+	if (NULL != m_pRepresentation)
+	{
+		return m_pRepresentation->isEmpty();
+	}
+	else return true;
+
+}
+
+void GLC_StructReference::setRepresentationName(const QString& representationName)
+{
+	if (NULL != m_pRepresentation)
+	{
+		m_pRepresentation->setName(representationName);
+	}
+}
+
+bool GLC_StructReference::loadRepresentation()
+{
+	Q_ASSERT(NULL != m_pRepresentation);
+	if (m_pRepresentation->load())
+	{
+		QSet<GLC_StructOccurence*> structOccurenceSet= this->setOfStructOccurence();
+		QSet<GLC_StructOccurence*>::iterator iOcc= structOccurenceSet.begin();
+		while (structOccurenceSet.constEnd() != iOcc)
+		{
+			GLC_StructOccurence* pOccurence= *iOcc;
+			Q_ASSERT(!pOccurence->has3DViewInstance());
+			if (pOccurence->useAutomatic3DViewInstanceCreation())
+			{
+				pOccurence->create3DViewInstance();
+			}
+			++iOcc;
+		}
+		return true;
+	}
+	else return false;
+}
+
+bool GLC_StructReference::unloadRepresentation()
+{
+	Q_ASSERT(NULL != m_pRepresentation);
+	if (m_pRepresentation->unload())
+	{
+		QSet<GLC_StructOccurence*> structOccurenceSet= this->setOfStructOccurence();
+		QSet<GLC_StructOccurence*>::iterator iOcc= structOccurenceSet.begin();
+		while (structOccurenceSet.constEnd() != iOcc)
+		{
+			(*iOcc)->remove3DViewInstance();
+			++iOcc;
+		}
+		return true;
+	}
+	else return false;
+}
+
+bool GLC_StructReference::addChild(GLC_StructOccurence* pOccurence)
+{
+	if (hasStructInstance() && firstInstanceHandle()->hasStructOccurence())
+	{
+		GLC_StructOccurence* pCurrentChildOccurence= pOccurence;
+
+		QSet<GLC_StructInstance*>::iterator iInstance= m_SetOfInstance.begin();
+		while (m_SetOfInstance.constEnd() != iInstance)
+		{
+			GLC_StructInstance* pCurrentInstance= *iInstance;
+			QList<GLC_StructOccurence*> occurenceList= pCurrentInstance->listOfStructOccurences();
+			const int occurenceCount= occurenceList.count();
+			for (int i= 0; i < occurenceCount; ++i)
+			{
+				GLC_StructOccurence* pCurrentOccurence= occurenceList.at(i);
+
+				if ((i != 0) || (NULL == pCurrentChildOccurence))
+				{
+					pCurrentChildOccurence= pOccurence->clone(pCurrentOccurence->worldHandle(), true);
+				}
+
+				pCurrentOccurence->addChild(pCurrentChildOccurence);
+			}
+			pCurrentChildOccurence= NULL;
+			++iInstance;
+		}
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 

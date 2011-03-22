@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -270,7 +268,7 @@ namespace glc
 	/*! \var Z_AXIS
 	 *  \brief Z axis Vector*/
 	const GLC_Vector3d Z_AXIS(0.0, 0.0, 1.0);
-}
+};
 
 //! Define GLC_Point3D
 typedef GLC_Vector3d GLC_Point3d;

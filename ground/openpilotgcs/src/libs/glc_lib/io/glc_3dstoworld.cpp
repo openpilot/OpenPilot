@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -223,6 +221,7 @@ void GLC_3dsToWorld::createMeshes(GLC_StructOccurence* pProduct, Lib3dsNode* pFa
 					GLC_Matrix4x4 trans(-pObjectData->pivot[0], -pObjectData->pivot[1], -pObjectData->pivot[2]);
 					// Compute the part matrix
 					nodeMat= nodeMat * trans * matInv; // I don't know why...
+					nodeMat.optimise();
 					// move the part by the matrix
 					pProduct->addChild((new GLC_StructInstance(new GLC_3DRep(representation)))->move(nodeMat));
 		    	}
@@ -375,13 +374,14 @@ void GLC_3dsToWorld::loadMaterial(Lib3dsMaterial* p3dsMaterial)
 	if (p3dsMaterial->texture1_map.name[0])
 	{
 		const QString textureName(p3dsMaterial->texture1_map.name);
+		// Retrieve the .3ds file path
+		QFileInfo fileInfo(m_FileName);
+		QString textureFileName(fileInfo.absolutePath() + QDir::separator());
+		textureFileName.append(textureName);
+
 		// TGA file type are not supported
 		if (!textureName.right(3).contains("TGA", Qt::CaseInsensitive))
 		{
-			// Retrieve the .3ds file path
-			QFileInfo fileInfo(m_FileName);
-			QString textureFileName(fileInfo.absolutePath() + QDir::separator());
-			textureFileName.append(textureName);
 			QFile textureFile(textureFileName);
 
 			if (textureFile.open(QIODevice::ReadOnly))
@@ -390,8 +390,21 @@ void GLC_3dsToWorld::loadMaterial(Lib3dsMaterial* p3dsMaterial)
 				GLC_Texture *pTexture = new GLC_Texture(m_pQGLContext, textureFile);
 				pMaterial->setTexture(pTexture);
 				m_ListOfAttachedFileName << textureFileName;
+				textureFile.close();
 			}
-			textureFile.close();
+			else
+			{
+				QStringList stringList(m_FileName);
+				stringList.append("Open File : " + textureFileName + " failed");
+				GLC_ErrorLog::addError(stringList);
+			}
+
+		}
+		else
+		{
+			QStringList stringList(m_FileName);
+			stringList.append("Image : " + textureFileName + " not suported");
+			GLC_ErrorLog::addError(stringList);
 		}
 	}
 

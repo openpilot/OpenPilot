@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -458,10 +456,10 @@ QDataStream &operator>>(QDataStream &stream, GLC_MeshData &meshData)
 
 	GLfloatVector position, normal, texel, color;
 
-	stream >> *(meshData.positionVectorHandle());
-	stream >> *(meshData.normalVectorHandle());
-	stream >> *(meshData.texelVectorHandle());
-	stream >> *(meshData.colorVectorHandle());
+	stream >> meshData.m_Positions;
+	stream >> meshData.m_Normals;
+	stream >> meshData.m_Texels;
+	stream >> meshData.m_Colors;
 
 	// List of lod serialisation
 	QList<GLC_Lod> lodsList;

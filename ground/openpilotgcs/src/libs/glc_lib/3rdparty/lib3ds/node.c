@@ -485,7 +485,7 @@ lib3ds_node_dump(Lib3dsNode *node, Lib3dsIntd level)
  * \ingroup node
  */
 Lib3dsBool
-lib3ds_node_read(Lib3dsNode *node, Lib3dsFile *file __attribute((unused)), Lib3dsIo *io)
+lib3ds_node_read(Lib3dsNode *node, Lib3dsFile *file, Lib3dsIo *io)
 {
   Lib3dsChunk c;
   Lib3dsWord chunk;

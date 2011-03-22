@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -41,8 +39,8 @@
 //////////////////////////////////////////////////////////////////////
 class GLC_LIB_EXPORT GLC_PrimitiveGroup
 {
-	friend QDataStream &operator<<(QDataStream &, const GLC_PrimitiveGroup &);
-	friend QDataStream &operator>>(QDataStream &, GLC_PrimitiveGroup &);
+	friend GLC_LIB_EXPORT QDataStream &operator<<(QDataStream &, const GLC_PrimitiveGroup &);
+	friend GLC_LIB_EXPORT QDataStream &operator>>(QDataStream &, GLC_PrimitiveGroup &);
 
 public:
 //////////////////////////////////////////////////////////////////////
@@ -314,7 +312,7 @@ private:
 };
 
 //! Non-member stream operator
-QDataStream &operator<<(QDataStream &, const GLC_PrimitiveGroup &);
-QDataStream &operator>>(QDataStream &, GLC_PrimitiveGroup &);
+GLC_LIB_EXPORT QDataStream &operator<<(QDataStream &, const GLC_PrimitiveGroup &);
+GLC_LIB_EXPORT QDataStream &operator>>(QDataStream &, GLC_PrimitiveGroup &);
 
 #endif /* GLC_PRIMITIVEGROUP_H_ */

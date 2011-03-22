@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -146,7 +144,7 @@ void GLC_Arrow::glDraw(const GLC_RenderProperties& renderProperties)
 		createWire();
 	}
 
-	m_WireData.glDraw(renderProperties);
+	m_WireData.glDraw(renderProperties, GL_LINE_STRIP);
 }
 
 void GLC_Arrow::createWire()
@@ -160,7 +158,7 @@ void GLC_Arrow::createWire()
 	floatVector.append(static_cast<float>(m_EndPoint.y()));
 	floatVector.append(static_cast<float>(m_EndPoint.z()));
 
-	GLC_Geometry::addPolyline(floatVector);
+	GLC_Geometry::addVerticeGroup(floatVector);
 
 	// Arrow Head
 	GLC_Point3d headPoint1(-m_HeadLenght, m_HeadLenght * tan(m_HeadAngle / 2.0), 0.0);
@@ -193,6 +191,6 @@ void GLC_Arrow::createWire()
 	floatVector.append(static_cast<float>(headPoint2.y()));
 	floatVector.append(static_cast<float>(headPoint2.z()));
 
-	GLC_Geometry::addPolyline(floatVector);
+	GLC_Geometry::addVerticeGroup(floatVector);
 
 }

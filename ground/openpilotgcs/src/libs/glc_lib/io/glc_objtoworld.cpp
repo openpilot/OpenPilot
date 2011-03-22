@@ -136,7 +136,12 @@ GLC_World* GLC_ObjToWorld::CreateWorldFromObj(QFile &file)
 		{
 			delete m_pMtlLoader;
 			m_pMtlLoader= NULL;
-			//qDebug() << "GLC_ObjToWorld::CreateWorldFromObj: Failed to load materials";
+			if (!mtlLibLine.isEmpty())
+			{
+				QStringList stringList(m_FileName);
+				stringList.append("Open Material File : " + mtlLibFileName + " failed");
+				GLC_ErrorLog::addError(stringList);
+			}
 		}
 		else
 		{
@@ -178,7 +183,7 @@ GLC_World* GLC_ObjToWorld::CreateWorldFromObj(QFile &file)
 	//! Test if there is meshes in the world
 	if (m_pWorld->rootOccurence()->childCount() == 0)
 	{
-		QString message= "GLC_ObjToWorld::CreateWorldFromObj : No mesh found!";
+		QString message= "GLC_ObjToWorld::CreateWorldFromObj " + m_FileName + " No mesh found!";
 		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::NoMeshFound);
 		clear();
 		throw(fileFormatException);
@@ -313,7 +318,7 @@ void GLC_ObjToWorld::changeGroup(QString line)
 	}
 	else
 	{
-		QString message= "GLC_ObjToWorld::changeGroup : something is wrong!!";
+		QString message= "GLC_ObjToWorld::changeGroup " + m_FileName + " something is wrong!!";
 		message.append("\nAt line : ");
 		message.append(QString::number(m_CurrentLineNumber));
 		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::FileNotSupported);
@@ -343,10 +348,13 @@ QList<float> GLC_ObjToWorld::extract3dVect(QString &line)
 		z= zString.toFloat(&zOk);
 		if (!(xOk && yOk && zOk))
 		{
-			QString message= "GLC_ObjToWorld::extract3dVect : failed to convert vector component to float";
+			QString message= "GLC_ObjToWorld::extract3dVect " + m_FileName + " failed to convert vector component to float";
 			message.append("\nAt ligne : ");
 			message.append(QString::number(m_CurrentLineNumber));
-			//qDebug() << message;
+			QStringList stringList(m_FileName);
+			stringList.append(message);
+			GLC_ErrorLog::addError(stringList);
+
 			//GLC_FileFormatException fileFormatException(message, m_FileName);
 			//clear();
 			//throw(fileFormatException);
@@ -378,10 +386,9 @@ QList<float> GLC_ObjToWorld::extract2dVect(QString &line)
 		y= yString.toFloat(&yOk);
 		if (!(xOk && yOk))
 		{
-			QString message= "GLC_ObjToWorld::extract2dVect : failed to convert vector component to double";
+			QString message= "GLC_ObjToWorld::extract2dVect " + m_FileName + " failed to convert vector component to double";
 			message.append("\nAt ligne : ");
 			message.append(QString::number(m_CurrentLineNumber));
-			qDebug() << message;
 			GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
 			clear();
 			throw(fileFormatException);
@@ -463,7 +470,9 @@ void GLC_ObjToWorld::extractFaceIndex(QString &line)
 	const int size= currentFaceIndex.size();
 	if (size < 3)
 	{
-		//qDebug() << "GLC_ObjToWorld::extractFaceIndex Face with less than 3 vertex found";
+		QStringList stringList(m_FileName);
+		stringList.append("GLC_ObjToWorld::extractFaceIndex Face with less than 3 vertex found");
+		GLC_ErrorLog::addError(stringList);
 		return;
 	}
 	//////////////////////////////////////////////////////////////////
@@ -492,9 +501,9 @@ void GLC_ObjToWorld::extractFaceIndex(QString &line)
 		QSet<GLuint>::iterator iIndexSet= indexSet.begin();
 		while (indexSet.constEnd() != iIndexSet)
 		{
-			m_pCurrentObjMesh->m_Normals[*iIndexSet * 3]= normal.X();
-			m_pCurrentObjMesh->m_Normals[*iIndexSet * 3 + 1]= normal.Y();
-			m_pCurrentObjMesh->m_Normals[*iIndexSet * 3 + 2]= normal.Z();
+			m_pCurrentObjMesh->m_Normals[*iIndexSet * 3]= normal.x();
+			m_pCurrentObjMesh->m_Normals[*iIndexSet * 3 + 1]= normal.y();
+			m_pCurrentObjMesh->m_Normals[*iIndexSet * 3 + 2]= normal.z();
 
 			++iIndexSet;
 		}
@@ -504,10 +513,9 @@ void GLC_ObjToWorld::extractFaceIndex(QString &line)
 	}
 	else
 	{
-		QString message= "GLC_ObjToWorld::extractFaceIndex : unknow face type";
+		QString message= "GLC_ObjToWorld::extractFaceIndex " + m_FileName + " unknow face type";
 		message.append("\nAt line : ");
 		message.append(QString::number(m_CurrentLineNumber));
-		qDebug() << message;
 		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::FileNotSupported);
 		clear();
 		throw(fileFormatException);
@@ -521,10 +529,9 @@ void GLC_ObjToWorld::setCurrentMaterial(QString &line)
 
 	if (!((streamString >> materialName).status() == QTextStream::Ok))
 	{
-		QString message= "GLC_ObjToWorld::SetCurrentMaterial : failed to extract materialName";
+		QString message= "GLC_ObjToWorld::SetCurrentMaterial " + m_FileName + " : failed to extract materialName";
 		message.append("\nAt line : ");
 		message.append(QString::number(m_CurrentLineNumber));
-		qDebug() << message;
 		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
 		clear();
 		throw(fileFormatException);
@@ -596,10 +603,9 @@ void GLC_ObjToWorld::extractVertexIndex(QString line, int &Coordinate, int &Norm
 			--Normal;
 			if (!(coordinateOk && textureCoordinateOk && normalOk))
 			{
-				QString message= "GLC_ObjToWorld::extractVertexIndex failed to convert String to int";
+				QString message= "GLC_ObjToWorld::extractVertexIndex " + m_FileName + " failed to convert String to int";
 				message.append("\nAt line : ");
 				message.append(QString::number(m_CurrentLineNumber));
-				qDebug() << message;
 				GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
 				clear();
 				throw(fileFormatException);
@@ -607,10 +613,9 @@ void GLC_ObjToWorld::extractVertexIndex(QString line, int &Coordinate, int &Norm
 		}
 		else
 		{
-			QString message= "GLC_ObjToWorld::extractVertexIndex this Obj file type is not supported";
+			QString message= "GLC_ObjToWorld::extractVertexIndex Obj file " + m_FileName + " type is not supported";
 			message.append("\nAt line : ");
 			message.append(QString::number(m_CurrentLineNumber));
-			qDebug() << message;
 			GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::FileNotSupported);
 			clear();
 			throw(fileFormatException);
@@ -633,10 +638,9 @@ void GLC_ObjToWorld::extractVertexIndex(QString line, int &Coordinate, int &Norm
 			Normal= -1;
 			if (!(coordinateOk && textureCoordinateOk))
 			{
-				QString message= "GLC_ObjToWorld::extractVertexIndex failed to convert String to int";
+				QString message= "GLC_ObjToWorld::extractVertexIndex " + m_FileName +  "failed to convert String to int";
 				message.append("\nAt line : ");
 				message.append(QString::number(m_CurrentLineNumber));
-				qDebug() << message;
 				GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
 				clear();
 				throw(fileFormatException);
@@ -644,10 +648,9 @@ void GLC_ObjToWorld::extractVertexIndex(QString line, int &Coordinate, int &Norm
 		}
 		else
 		{
-			QString message= "GLC_ObjToWorld::extractVertexIndex this Obj file type is not supported";
+			QString message= "GLC_ObjToWorld::extractVertexIndex " + m_FileName + " this Obj file type is not supported";
 			message.append("\nAt line : ");
 			message.append(QString::number(m_CurrentLineNumber));
-			qDebug() << message;
 			GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::FileNotSupported);
 			clear();
 			throw(fileFormatException);
@@ -669,10 +672,9 @@ void GLC_ObjToWorld::extractVertexIndex(QString line, int &Coordinate, int &Norm
 			--Normal;
 			if (!(coordinateOk && normalOk))
 			{
-				QString message= "GLC_ObjToWorld::extractVertexIndex failed to convert String to int";
+				QString message= "GLC_ObjToWorld::extractVertexIndex " + m_FileName + " failed to convert String to int";
 				message.append("\nAt line : ");
 				message.append(QString::number(m_CurrentLineNumber));
-				qDebug() << message;
 				GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
 				clear();
 				throw(fileFormatException);
@@ -680,10 +682,9 @@ void GLC_ObjToWorld::extractVertexIndex(QString line, int &Coordinate, int &Norm
 		}
 		else
 		{
-			QString message= "GLC_ObjToWorld::extractVertexIndex this Obj file type is not supported";
+			QString message= "GLC_ObjToWorld::extractVertexIndex " + m_FileName + " this Obj file type is not supported";
 			message.append("\nAt line : ");
 			message.append(QString::number(m_CurrentLineNumber));
-			qDebug() << message;
 			GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::FileNotSupported);
 			clear();
 			throw(fileFormatException);
@@ -702,10 +703,9 @@ void GLC_ObjToWorld::extractVertexIndex(QString line, int &Coordinate, int &Norm
 			Normal= -1;
 			if (!coordinateOk)
 			{
-				QString message= "GLC_ObjToWorld::extractVertexIndex failed to convert String to int";
+				QString message= "GLC_ObjToWorld::extractVertexIndex "  + m_FileName + " failed to convert String to int";
 				message.append("\nAt line : ");
 				message.append(QString::number(m_CurrentLineNumber));
-				qDebug() << message;
 				GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
 				clear();
 				throw(fileFormatException);
@@ -713,10 +713,9 @@ void GLC_ObjToWorld::extractVertexIndex(QString line, int &Coordinate, int &Norm
 		}
 		else
 		{
-			QString message= "GLC_ObjToWorld::extractVertexIndex this Obj file type is not supported";
+			QString message= "GLC_ObjToWorld::extractVertexIndex Obj " + m_FileName + " file type is not supported";
 			message.append("\nAt line : ");
 			message.append(QString::number(m_CurrentLineNumber));
-			qDebug() << message;
 			GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::FileNotSupported);
 			clear();
 			throw(fileFormatException);
@@ -724,10 +723,9 @@ void GLC_ObjToWorld::extractVertexIndex(QString line, int &Coordinate, int &Norm
  	}
  	else
  	{
-		QString message= "GLC_ObjToWorld::extractVertexIndex OBJ file not reconize";
+		QString message= "GLC_ObjToWorld::extractVertexIndex OBJ file " + m_FileName + " not reconize";
 		message.append("\nAt line : ");
 		message.append(QString::number(m_CurrentLineNumber));
-		qDebug() << message;
 		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::FileNotSupported);
 		clear();
 		throw(fileFormatException);
@@ -760,10 +758,9 @@ void GLC_ObjToWorld::setObjType(QString& ligne)
  	}
  	else
  	{
-		QString message= "GLC_ObjToWorld::setObjType OBJ file not reconize";
+		QString message= "GLC_ObjToWorld::setObjType OBJ file " + m_FileName + " not reconize";
 		message.append("\nAt line : ");
 		message.append(QString::number(m_CurrentLineNumber));
-		qDebug() << message;
 		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::FileNotSupported);
 		clear();
 		throw(fileFormatException);

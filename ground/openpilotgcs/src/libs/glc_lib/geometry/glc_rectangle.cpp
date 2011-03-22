@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -159,7 +157,7 @@ void GLC_Rectangle::createMeshAndWire()
 
 	// Add the first point of the rectangle for wire
 	verticeVector << -lgX; verticeVector << -lgY; verticeVector << 0.0f;
-	GLC_Geometry::addPolyline(verticeVector);
+	GLC_Geometry::addVerticeGroup(verticeVector);
 
 	// Set the material to use
 	GLC_Material* pMaterial;

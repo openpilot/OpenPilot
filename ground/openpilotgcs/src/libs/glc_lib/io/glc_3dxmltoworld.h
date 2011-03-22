@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -123,14 +121,14 @@ public:
 //////////////////////////////////////////////////////////////////////
 public:
 	//! Create an GLC_World from an input 3DXML File
-	GLC_World* createWorldFrom3dxml(QFile &, bool StructureOnly);
+	GLC_World* createWorldFrom3dxml(QFile &, bool StructureOnly, bool getExternalRef= false);
 
 	//! Create 3DRep from an 3DXML rep
 	GLC_3DRep create3DrepFrom3dxmlRep(const QString&);
 
 	//! Get the list of attached files
 	inline QStringList listOfAttachedFileName() const
-	{return m_ListOfAttachedFileName.toList();}
+	{return m_SetOfAttachedFileName.toList();}
 
 
 //@}
@@ -152,17 +150,11 @@ private:
 	//! Close all files and clear memmory
 	void clear();
 
-	//! Go to an Element of a xml
-	void goToElement(const QString&);
-
 	//! Go to a Rep of a xml
 	void goToRepId(const QString&);
 
 	//! Go to Polygonal Rep Type
 	void gotToPolygonalRepType();
-
-	// Return the content of an element
-	QString getContent(const QString&);
 
 	//! Read the specified attribute
 	QString readAttribute(const QString&, bool required= false);
@@ -186,7 +178,7 @@ private:
 	void loadExternalRef3D();
 
 	//! Add a reference from 3dxml to m_ExternalReferenceHash
-	GLC_StructReference* createReferenceRep(QString id= QString());
+	GLC_StructReference* createReferenceRep(QString id, GLC_3DRep* pRep);
 
 	//! Load Matrix
 	GLC_Matrix4x4 loadMatrix(const QString&);
@@ -200,14 +192,6 @@ private:
 
 	//! Load Level of detail
 	void loadLOD(GLC_Mesh*);
-
-	//! Return true if the end of specified element is not reached
-	inline bool endElementNotReached(const QString& element)
-	{return !m_pStreamReader->atEnd() && !(m_pStreamReader->isEndElement() && (m_pStreamReader->name() == element));}
-
-	//! Return true if the start of specified element is not reached
-	inline bool startElementNotReached(const QString& element)
-	{return !m_pStreamReader->atEnd() && !(m_pStreamReader->isStartElement() && (m_pStreamReader->name() == element));}
 
 	//! Load a face
 	void loadFace(GLC_Mesh*, const int lod, double accuracy);
@@ -260,6 +244,30 @@ private:
 	//! Set fileName of the given 3DRep
 	void setRepresentationFileName(GLC_3DRep* pRep);
 
+	//! Read next element from the stream
+	inline QXmlStreamReader::TokenType readNext();
+
+	//! Go to the given xml Element, return true on succes
+	inline bool goToElement(QXmlStreamReader* pReader, const QString& element);
+
+	// Return the content of an element
+	inline QString getContent(QXmlStreamReader* pReader, const QString& element);
+
+	//! Read the specified attribute
+	inline QString readAttribute(QXmlStreamReader* pReader, const QString& attribute);
+
+	//! Return true if the end of specified element is not reached
+	inline bool endElementNotReached(QXmlStreamReader* pReader, const QString& element);
+
+	//! Return true if the start of specified element is not reached
+	inline bool startElementNotReached(QXmlStreamReader* pReader, const QString& element);
+
+	//! Go to the end Element of a xml
+	inline void goToEndElement(QXmlStreamReader* pReader, const QString& element);
+
+	//! Check if the given file is binary
+	void checkFileValidity(QIODevice* pIODevice);
+
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -277,9 +285,6 @@ private:
 
 	//! The Quazip archive
 	QuaZip* m_p3dxmlArchive;
-
-	//! The Quazip file (Entry or archive)
-	QuaZipFile* m_p3dxmlFile;
 
 	//! The current file (if there is no archive)
 	QFile* m_pCurrentFile;
@@ -335,8 +340,8 @@ private:
 	//! Flag indicate the loading method
 	bool m_LoadStructureOnly;
 
-	//! The list of attached file name
-	QSet<QString> m_ListOfAttachedFileName;
+	//! The Set of attached file name
+	QSet<QString> m_SetOfAttachedFileName;
 
 	//! The current file name
 	QString m_CurrentFileName;
@@ -347,7 +352,76 @@ private:
 	//! Hash table of occurence specific attributes
 	QHash<unsigned int, OccurenceAttrib*> m_OccurenceAttrib;
 
+	//! bool get external ref 3D name
+	bool m_GetExternalRef3DName;
+
+	static QMutex m_ZipMutex;
+
+	QList<QByteArray> m_ByteArrayList;
 
 };
+
+QXmlStreamReader::TokenType GLC_3dxmlToWorld::readNext()
+{
+	QXmlStreamReader::TokenType token= m_pStreamReader->readNext();
+	if (QXmlStreamReader::PrematureEndOfDocumentError == m_pStreamReader->error())
+	{
+		//qDebug() << "QXmlStreamReader::PrematureEndOfDocumentError == m_pStreamReader->error()";
+		if (!m_ByteArrayList.isEmpty())
+		{
+			m_pStreamReader->addData(m_ByteArrayList.takeFirst());
+			return readNext();
+		}
+	}
+	return token;
+}
+
+bool GLC_3dxmlToWorld::goToElement(QXmlStreamReader* pReader, const QString& element)
+{
+	while(!pReader->atEnd() && !pReader->hasError() && !(pReader->isStartElement() && (pReader->name() == element)))
+	{
+		readNext();
+	}
+	return !pReader->atEnd() && !pReader->hasError();
+}
+
+QString GLC_3dxmlToWorld::getContent(QXmlStreamReader* pReader, const QString& element)
+{
+	QString content;
+	while(endElementNotReached(pReader, element))
+	{
+		readNext();
+		if (pReader->isCharacters() && !pReader->text().isEmpty())
+		{
+			content+= pReader->text().toString();
+		}
+	}
+
+	return content.trimmed();
+}
+
+QString GLC_3dxmlToWorld::readAttribute(QXmlStreamReader* pReader, const QString& attribute)
+{
+	return pReader->attributes().value(attribute).toString();
+}
+
+bool GLC_3dxmlToWorld::endElementNotReached(QXmlStreamReader* pReader, const QString& element)
+{
+	return !pReader->atEnd() && !pReader->hasError() && !(pReader->isEndElement() && (pReader->name() == element));
+}
+
+bool GLC_3dxmlToWorld::startElementNotReached(QXmlStreamReader* pReader, const QString& element)
+{
+	return !pReader->atEnd() && !pReader->hasError() && !(pReader->isStartElement() && (pReader->name() == element));
+}
+
+void GLC_3dxmlToWorld::goToEndElement(QXmlStreamReader* pReader, const QString& element)
+{
+	while(endElementNotReached(pReader, element))
+	{
+		readNext();
+	}
+}
+
 
 #endif /* GLC_3DXMLTOWORLD_H_ */

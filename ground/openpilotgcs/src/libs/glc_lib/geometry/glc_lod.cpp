@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -167,8 +165,6 @@ QDataStream &operator>>(QDataStream &stream, GLC_Lod &lod)
 	Q_ASSERT(chunckId == GLC_Lod::m_ChunkId);
 
 	stream >> lod.m_Accuracy;
-
-	QVector<GLuint> indexVector;
 	stream >> lod.m_IndexVector;
 	stream >> lod.m_TrianglesCount;
 

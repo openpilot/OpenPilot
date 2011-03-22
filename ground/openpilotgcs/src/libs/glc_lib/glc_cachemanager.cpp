@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -115,18 +113,9 @@ bool GLC_CacheManager::isUsable(const QDateTime& timeStamp, const QString& conte
 		{
 			GLC_BSRep binaryRep;
 			binaryRep.setAbsoluteFileName(cacheFileInfo.absoluteFilePath());
-			result= result && binaryRep.repIsUpToDate(timeStamp);
-		}
-		else
-		{
-			qDebug() << "file " << fileName << " not usable";
+			result= result && binaryRep.isUsable(timeStamp);
 		}
 	}
-	else
-	{
-		QFileInfo cacheFileInfo(m_Dir.absolutePath() + QDir::separator() + context + QDir::separator() + fileName+ '.' + GLC_BSRep::suffix());
-	}
-	if (! result) qDebug() << "NOT USABLE";
 
 	return result;
 }
@@ -134,7 +123,7 @@ bool GLC_CacheManager::isUsable(const QDateTime& timeStamp, const QString& conte
 // Return the binary serialized representation of the specified file
 GLC_BSRep GLC_CacheManager::binary3DRep(const QString& context, const QString& fileName) const
 {
-	const QString absoluteFileName(m_Dir.absolutePath() + QDir::separator() + context + QDir::separator() + fileName+ '.' + GLC_BSRep::suffix());
+	const QString absoluteFileName(m_Dir.absolutePath() + QDir::separator() + context + QDir::separator() + fileName + '.' + GLC_BSRep::suffix());
 	GLC_BSRep binaryRep(absoluteFileName);
 
 	return binaryRep;

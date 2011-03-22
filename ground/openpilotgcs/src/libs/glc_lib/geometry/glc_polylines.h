@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -78,7 +76,7 @@ public:
 public:
 	//! Add a Polyline to this wire and returns its id if id are managed
 	inline GLC_uint addPolyline(const GLfloatVector& data)
-	{return GLC_Geometry::m_WireData.addPolyline(data);}
+	{return GLC_Geometry::m_WireData.addVerticeGroup(data);}
 
 	//! Set this polylines from the given polylines and return a reference of this polylines
 	GLC_Polylines& operator=(const GLC_Polylines& polyline);

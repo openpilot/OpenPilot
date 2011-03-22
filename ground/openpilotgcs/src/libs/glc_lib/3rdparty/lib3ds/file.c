@@ -1940,13 +1940,6 @@ file_bounding_box_of_nodes_impl(Lib3dsNode *node, Lib3dsFile *file, Lib3dsBool i
         }
       }
       break;
-    case LIB3DS_UNKNOWN_NODE:
-    case LIB3DS_AMBIENT_NODE:
-    case LIB3DS_CAMERA_NODE:
-    case LIB3DS_TARGET_NODE:
-    case LIB3DS_LIGHT_NODE:
-    case LIB3DS_SPOT_NODE:
-      break;
    /*
     case LIB3DS_CAMERA_NODE:
     case LIB3DS_TARGET_NODE:

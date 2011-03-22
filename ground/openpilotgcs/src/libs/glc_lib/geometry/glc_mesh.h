@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -152,7 +150,7 @@ public:
 	inline bool containsLod(int lod) const
 	{return (NULL != m_MeshData.getLod(lod));}
 
-	//! Return true if the specified LOD conatins the specified material
+	//! Return true if the specified LOD contains the specified material
 	inline bool lodContainsMaterial(int lod, GLC_uint materialId) const
 	{
 		if (!m_PrimitiveGroups.contains(lod))return false;
@@ -178,6 +176,16 @@ public:
 	//! Return the mesh wire color
 	inline QColor wireColor() const
 	{return m_WireColor;}
+
+	//! Create a mesh of the given LOD index
+	GLC_Mesh* createMeshOfGivenLod(int lodIndex);
+
+	//! Create a mesh from the given LOD index
+	GLC_Mesh* createMeshFromGivenLod(int lodIndex);
+
+
+	//! Transform mesh vertice by the given matrix
+	GLC_Mesh& transformVertice(const GLC_Matrix4x4& matrix);
 
 //@}
 //////////////////////////////////////////////////////////////////////
@@ -356,6 +364,12 @@ private:
 
 	//! The primitive Selected render loop
 	void primitiveSelectedRenderLoop(const GLC_RenderProperties&, bool);
+
+	//! Copy index of this mesh from the given LOD into the given mesh
+	void copyIndex(int lod, GLC_Mesh* pLodMesh, QHash<GLuint, GLuint>& sourceToTargetIndexMap, QHash<GLuint, GLuint>& tagetToSourceIndexMap, int& maxIndex, int targetLod);
+
+	//! Copy Bulk data
+	void copyBulkData(GLC_Mesh* pLodMesh, const QHash<GLuint, GLuint>& tagetToSourceIndexMap, int maxIndex);
 
 //@}
 

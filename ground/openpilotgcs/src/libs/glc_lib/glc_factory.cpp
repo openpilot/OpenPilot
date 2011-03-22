@@ -2,8 +2,7 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
+ Copyright (C) 2011 JŽr™me Forrissier
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -25,13 +24,9 @@
 //! \file glc_factory.cpp implementation of the GLC_Factory class.
 
 #include "glc_factory.h"
-#include "io/glc_objtoworld.h"
-#include "io/glc_stltoworld.h"
-#include "io/glc_offtoworld.h"
-#include "io/glc_3dstoworld.h"
+#include "io/glc_fileloader.h"
 #include "io/glc_3dxmltoworld.h"
-#include "io/glc_colladatoworld.h"
-#include "io/glc_bsreptoworld.h"
+#include "io/glc_worldreaderplugin.h"
 
 #include "viewport/glc_panmover.h"
 #include "viewport/glc_zoommover.h"
@@ -50,6 +45,8 @@
 // init static member
 GLC_Factory* GLC_Factory::m_pFactory= NULL;
 QGLContext* GLC_Factory::m_pQGLContext= NULL;
+QList<GLC_WorldReaderPlugin*> GLC_Factory::m_WorldReaderPluginList;
+QSet<QString> GLC_Factory::m_SupportedExtensionSet;
 
 //////////////////////////////////////////////////////////////////////
 // static method
@@ -76,6 +73,7 @@ GLC_Factory* GLC_Factory::instance(const QGLContext *pContext)
 GLC_Factory::GLC_Factory(const QGLContext *pContext)
 {
 	m_pQGLContext= (const_cast<QGLContext*>(pContext));
+	loadPlugins();
 }
 
 // Destructor
@@ -98,6 +96,30 @@ GLC_3DRep GLC_Factory::createPoint(double x, double y, double z) const
 {
 	GLC_3DRep newPoint(new GLC_Point(x, y, z));
 	return newPoint;
+}
+
+GLC_3DRep GLC_Factory::createPointCloud(const GLfloatVector& data, const QColor& color)
+{
+	GLC_PointCloud* pPointCloud= new GLC_PointCloud();
+	pPointCloud->addPoint(data);
+	pPointCloud->setWireColor(color);
+	return GLC_3DRep(pPointCloud);
+}
+
+GLC_3DRep GLC_Factory::createPointCloud(const QList<GLC_Point3d>& pointList, const QColor& color)
+{
+	GLC_PointCloud* pPointCloud= new GLC_PointCloud();
+	pPointCloud->addPoint(pointList);
+	pPointCloud->setWireColor(color);
+	return GLC_3DRep(pPointCloud);
+}
+
+GLC_3DRep GLC_Factory::createPointCloud(const QList<GLC_Point3df>& pointList, const QColor& color)
+{
+	GLC_PointCloud* pPointCloud= new GLC_PointCloud();
+	pPointCloud->addPoint(pointList);
+	pPointCloud->setWireColor(color);
+	return GLC_3DRep(pPointCloud);
 }
 
 
@@ -195,80 +217,15 @@ GLC_3DViewInstance GLC_Factory::createCuttingPlane(const GLC_Point3d& point, con
 
 GLC_World GLC_Factory::createWorldFromFile(QFile &file, QStringList* pAttachedFileName) const
 {
-	GLC_World* pWorld= NULL;
-	if (QFileInfo(file).suffix().toLower() == "obj")
-	{
-		GLC_ObjToWorld objToWorld(m_pQGLContext);
-		connect(&objToWorld, SIGNAL(currentQuantum(int)), this, SIGNAL(currentQuantum(int)));
-		pWorld= objToWorld.CreateWorldFromObj(file);
-		if (NULL != pAttachedFileName)
-		{
-			(*pAttachedFileName)= objToWorld.listOfAttachedFileName();
-		}
-	}
-	else if (QFileInfo(file).suffix().toLower() == "stl")
-	{
-		GLC_StlToWorld stlToWorld;
-		connect(&stlToWorld, SIGNAL(currentQuantum(int)), this, SIGNAL(currentQuantum(int)));
-		pWorld= stlToWorld.CreateWorldFromStl(file);
-	}
-	else if (QFileInfo(file).suffix().toLower() == "off")
-	{
-		GLC_OffToWorld offToWorld;
-		connect(&offToWorld, SIGNAL(currentQuantum(int)), this, SIGNAL(currentQuantum(int)));
-		pWorld= offToWorld.CreateWorldFromOff(file);
-	}
-	else if (QFileInfo(file).suffix().toLower() == "3ds")
-	{
-		GLC_3dsToWorld studioToWorld(m_pQGLContext);
-		connect(&studioToWorld, SIGNAL(currentQuantum(int)), this, SIGNAL(currentQuantum(int)));
-		pWorld= studioToWorld.CreateWorldFrom3ds(file);
-		if (NULL != pAttachedFileName)
-		{
-			(*pAttachedFileName)= studioToWorld.listOfAttachedFileName();
-		}
-	}
-	else if (QFileInfo(file).suffix().toLower() == "3dxml")
-	{
-		GLC_3dxmlToWorld d3dxmlToWorld(m_pQGLContext);
-		connect(&d3dxmlToWorld, SIGNAL(currentQuantum(int)), this, SIGNAL(currentQuantum(int)));
-		pWorld= d3dxmlToWorld.createWorldFrom3dxml(file, false);
-		if (NULL != pAttachedFileName)
-		{
-			(*pAttachedFileName)= d3dxmlToWorld.listOfAttachedFileName();
-		}
-	}
-	else if (QFileInfo(file).suffix().toLower() == "dae")
-	{
-		GLC_ColladaToWorld colladaToWorld(m_pQGLContext);
-		connect(&colladaToWorld, SIGNAL(currentQuantum(int)), this, SIGNAL(currentQuantum(int)));
-		pWorld= colladaToWorld.CreateWorldFromCollada(file);
-		if (NULL != pAttachedFileName)
-		{
-			(*pAttachedFileName)= colladaToWorld.listOfAttachedFileName();
-		}
-	}
-	else if (QFileInfo(file).suffix().toLower() == "bsrep")
-	{
-		GLC_BSRepToWorld bsRepToWorld;
-		pWorld= bsRepToWorld.CreateWorldFromBSRep(file);
-		emit currentQuantum(100);
-	}
+	GLC_FileLoader* pLoader = createFileLoader();
+	connect(pLoader, SIGNAL(currentQuantum(int)), this, SIGNAL(currentQuantum(int)));
+	GLC_World world = pLoader->createWorldFromFile(file, pAttachedFileName);
+	delete pLoader;
 
-	if (NULL == pWorld)
-	{
-		// File extension not recognize or file not loaded
-		QString message(QString("GLC_Factory::createWorldFromFile File ") + file.fileName() + QString(" not loaded"));
-		GLC_FileFormatException fileFormatException(message, file.fileName(), GLC_FileFormatException::FileNotSupported);
-		throw(fileFormatException);
-	}
-	GLC_World resulWorld(*pWorld);
-	delete pWorld;
-
-	return resulWorld;
+	return world;
 }
 
-GLC_World GLC_Factory::createWorldStructureFrom3dxml(QFile &file) const
+GLC_World GLC_Factory::createWorldStructureFrom3dxml(QFile &file, bool GetExtRefName) const
 {
 	GLC_World* pWorld= NULL;
 
@@ -276,7 +233,7 @@ GLC_World GLC_Factory::createWorldStructureFrom3dxml(QFile &file) const
 	{
 		GLC_3dxmlToWorld d3dxmlToWorld(m_pQGLContext);
 		connect(&d3dxmlToWorld, SIGNAL(currentQuantum(int)), this, SIGNAL(currentQuantum(int)));
-		pWorld= d3dxmlToWorld.createWorldFrom3dxml(file, true);
+		pWorld= d3dxmlToWorld.createWorldFrom3dxml(file, true, GetExtRefName);
 	}
 
 	if (NULL == pWorld)
@@ -305,6 +262,11 @@ GLC_3DRep GLC_Factory::create3DRepFromFile(const QString& fileName) const
 
 	return rep;
 
+}
+
+GLC_FileLoader* GLC_Factory::createFileLoader() const
+{
+    return new GLC_FileLoader(m_pQGLContext);
 }
 
 GLC_Material* GLC_Factory::createMaterial() const
@@ -423,3 +385,70 @@ GLC_MoverController GLC_Factory::createDefaultMoverController(const QColor& colo
 
 	return defaultController;
 }
+
+
+void GLC_Factory::loadPlugins()
+{
+	Q_ASSERT(NULL != QCoreApplication::instance());
+	const QStringList libraryPath= QCoreApplication::libraryPaths();
+	foreach(QString path, libraryPath)
+	{
+		const QDir pluginsDir= QDir(path);
+		const QStringList pluginNames= pluginsDir.entryList(QDir::Files);
+		foreach (QString fileName, pluginNames)
+		{
+	         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
+	         QObject* pPlugin= loader.instance();
+	         GLC_WorldReaderPlugin* pWorldReader = qobject_cast<GLC_WorldReaderPlugin *>(pPlugin);
+	         if (pWorldReader)
+	         {
+	        	 m_WorldReaderPluginList.append(pWorldReader);
+	        	 m_SupportedExtensionSet.unite(QSet<QString>::fromList(pWorldReader->keys()));
+	         }
+		}
+	}
+
+	//qDebug() << m_WorldReaderPluginList.size() << " Loaded plugins.";
+}
+
+QList<GLC_WorldReaderPlugin*> GLC_Factory::worldReaderPlugins()
+{
+	if (NULL == m_pFactory)
+	{
+		instance();
+	}
+	return m_WorldReaderPluginList;
+}
+
+bool GLC_Factory::canBeLoaded(const QString& extension)
+{
+	if (NULL == m_pFactory)
+	{
+		instance();
+	}
+
+	return m_SupportedExtensionSet.contains(extension.toLower());
+}
+
+GLC_WorldReaderHandler* GLC_Factory::loadingHandler(const QString& fileName)
+{
+	if (NULL == m_pFactory)
+	{
+		instance();
+	}
+
+	const QString extension= QFileInfo(fileName).suffix();
+	if (canBeLoaded(extension))
+	{
+		foreach(GLC_WorldReaderPlugin* pPlugin, m_WorldReaderPluginList)
+		{
+			if (pPlugin->keys().contains(extension.toLower()))
+			{
+				return pPlugin->readerHandler();
+			}
+		}
+	}
+	return NULL;
+}
+
+

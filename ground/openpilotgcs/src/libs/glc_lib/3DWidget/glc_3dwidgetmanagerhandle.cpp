@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -103,6 +101,13 @@ void GLC_3DWidgetManagerHandle::clear()
 	m_3DWidgetHash.clear();
 	m_Collection.clear();
 	m_MapBetweenInstanceWidget.clear();
+}
+
+void GLC_3DWidgetManagerHandle::setWidgetVisible(GLC_uint id, bool visible)
+{
+	if (id == m_Active3DWidgetId) m_Active3DWidgetId= 0;
+	Q_ASSERT(m_3DWidgetHash.contains(id));
+	m_3DWidgetHash.value(id)->setVisible(visible);
 }
 
 glc::WidgetEventFlag GLC_3DWidgetManagerHandle::mouseDoubleClickEvent(QMouseEvent *)

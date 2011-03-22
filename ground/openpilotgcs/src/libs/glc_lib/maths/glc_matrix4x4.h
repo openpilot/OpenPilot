@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -43,6 +41,15 @@
 class GLC_LIB_EXPORT GLC_Matrix4x4
 {
 	friend class GLC_Vector3d;
+public:
+	//! matrix possible type
+	enum
+	{
+		General= 0x0000,
+		Direct= 0x0001,
+		Indirect= 0x0002,
+		Identity= 0x0003
+	};
 
 //////////////////////////////////////////////////////////////////////
 // Constructor
@@ -55,11 +62,17 @@ public:
 
 	//! Construct a matrix from another matrix
 	inline GLC_Matrix4x4(const GLC_Matrix4x4 &matrix)
-	{memcpy(m_Matrix, matrix.m_Matrix, sizeof(double) * 16);}
+	:m_Type(matrix.m_Type)
+	{
+		memcpy(m_Matrix, matrix.m_Matrix, sizeof(double) * 16);
+	}
 
 	//! Construct a matrix from an array of 16 double elements.
 	inline GLC_Matrix4x4(const double *pArray)
-	{memcpy(m_Matrix, pArray, sizeof(double) * 16);}
+	: m_Type(General)
+	{
+		memcpy(m_Matrix, pArray, sizeof(double) * 16);
+	}
 
 	//! Construct a Matrix from an array of 16 float elements.
 	inline GLC_Matrix4x4(const float *);
@@ -84,6 +97,9 @@ public:
 //@{
 //////////////////////////////////////////////////////////////////////
 public:
+	//! Copy the content of the given matrix in this matrix
+	inline GLC_Matrix4x4& operator = (const GLC_Matrix4x4 &matrix);
+
 	//! Return the product of this matrix to the given matrix
 	inline GLC_Matrix4x4 operator * (const GLC_Matrix4x4 &Mat) const;
 
@@ -107,13 +123,21 @@ public:
 	//! Return the determinant of this matrix
 	inline double determinant(void) const;
 
+	//! Return a pointer to the row first array of 16 elements of this matrix
+	/*! Don't modify data with this method*/
+	inline const double* getData(void)
+	{return m_Matrix;}
+
 	//! Return a const pointer to the row first array of 16 elements of this matrix
-	inline const double* data(void) const
+	inline const double* getData(void) const
 	{return m_Matrix;}
 
 	//! Return a pointer to the row first array of 16 elements of this matrix
-	inline double* data(void)
-	{return m_Matrix;}
+	inline double* setData(void)
+	{
+		m_Type= General;
+		return m_Matrix;
+	}
 
 	//! Return a QVector<double> which contains radians Euler angle of this matrix
 	QVector<double> toEuler(void) const;
@@ -142,6 +166,16 @@ public:
 	//! Return the inverse of this matrix
 	inline GLC_Matrix4x4 inverted() const
 	{return GLC_Matrix4x4(*this).invert();}
+
+	//! Return The type af this matrix
+	inline int type() const
+	{
+		return m_Type;
+	}
+
+	//! Return true if this matrix is direct
+	inline bool isDirect() const
+	{return (m_Type & Direct);}
 
 //@}
 
@@ -180,6 +214,9 @@ public:
 	//! Set this matrix column from the given 3d vector
 	GLC_Matrix4x4& setColumn(int index, const GLC_Vector3d& vector);
 
+	//! Optimise the usage of this matrix (Genral, Direct, Identity)
+	inline GLC_Matrix4x4& optimise(bool force= false);
+
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -215,12 +252,18 @@ private:
 //////////////////////////////////////////////////////////////////////
 private:
 
-	//! Number of elements in the matrix
+	//! Number of elements of this matrix
 	enum {TAILLEMAT4X4 = 16};
+
 	//! Matrix size
 	enum {DIMMAT4X4 = 4};
+
 	//! Matrix row first array
 	double m_Matrix[TAILLEMAT4X4];
+
+	//! the type of this matrix
+	int m_Type;
+
 /*
 the matrix :
 					a[00] a[04] a[08] a[12]
@@ -232,6 +275,7 @@ the matrix :
 					a[03] a[07] a[11] a[15]
  */
 //					Tx = 12,	Ty = 13,	Tz = 14
+
 };
 
 //! Return the determinant of the given Matrix 3X3
@@ -251,11 +295,13 @@ inline double getDeterminant3x3(const double *Mat3x3)
 //////////////////////////////////////////////////////////////////////
 
 GLC_Matrix4x4::GLC_Matrix4x4()
+: m_Type(Identity)
 {
 	setToIdentity();
 }
 
 GLC_Matrix4x4::GLC_Matrix4x4(const float *Tableau)
+: m_Type(General)
 {
 
 	for (int i=0; i < TAILLEMAT4X4; i++)
@@ -264,12 +310,14 @@ GLC_Matrix4x4::GLC_Matrix4x4(const float *Tableau)
 	}
 }
 GLC_Matrix4x4::GLC_Matrix4x4(const GLC_Vector3d &Vect, const double &dAngleRad)
+: m_Type(Direct)
 {
 	setToIdentity();
 	setMatRot(Vect, dAngleRad);
 }
 
 GLC_Matrix4x4::GLC_Matrix4x4(const GLC_Vector3d &Vect1, const GLC_Vector3d &Vect2)
+: m_Type(Direct)
 {
 	setToIdentity();
 	setMatRot(Vect1, Vect2);
@@ -277,6 +325,15 @@ GLC_Matrix4x4::GLC_Matrix4x4(const GLC_Vector3d &Vect1, const GLC_Vector3d &Vect
 
 GLC_Matrix4x4 GLC_Matrix4x4::operator * (const GLC_Matrix4x4 &Mat) const
 {
+	if (m_Type == Identity)
+	{
+		return Mat;
+	}
+	else if (Mat.m_Type == Identity)
+	{
+		return *this;
+	}
+
 	int Colonne;
 	int Ligne;
 	int i;
@@ -299,7 +356,24 @@ GLC_Matrix4x4 GLC_Matrix4x4::operator * (const GLC_Matrix4x4 &Mat) const
 			MatResult.m_Matrix[ IndexInt + Ligne]= ValInt;
 		}
 	}
+	if ((m_Type == Indirect) || (Mat.m_Type == Indirect))
+	{
+		MatResult.m_Type= Indirect;
+	}
+	else
+	{
+		MatResult.m_Type= m_Type & Mat.m_Type;
+	}
+
 	return MatResult;
+}
+
+GLC_Matrix4x4& GLC_Matrix4x4::operator = (const GLC_Matrix4x4 &matrix)
+{
+	m_Type= matrix.m_Type;
+	memcpy(m_Matrix, matrix.m_Matrix, sizeof(double) * 16);
+
+	return *this;
 }
 
 GLC_Vector3d GLC_Matrix4x4::operator * (const GLC_Vector3d &Vect) const
@@ -366,6 +440,9 @@ GLC_Matrix4x4 GLC_Matrix4x4::rotationMatrix() const
 	result.m_Matrix[12]= 0.0; result.m_Matrix[13]= 0.0; result.m_Matrix[14]= 0.0;
 	result.m_Matrix[3]= 0.0; result.m_Matrix[7]= 0.0; result.m_Matrix[11]= 0.0;
 	result.m_Matrix[15]= 1.0;
+
+	result.m_Type= General;
+
 	return result;
 }
 
@@ -386,6 +463,9 @@ GLC_Matrix4x4 GLC_Matrix4x4::isometricMatrix() const
 	result.m_Matrix[8]= result.m_Matrix[8] * invScaleZ;
 	result.m_Matrix[9]= result.m_Matrix[9] * invScaleZ;
 	result.m_Matrix[10]= result.m_Matrix[10] * invScaleZ;
+
+	result.m_Type= General;
+
 	return result;
 }
 
@@ -428,6 +508,8 @@ GLC_Matrix4x4& GLC_Matrix4x4::setMatRot(const GLC_Vector3d &Vect, const double &
 	m_Matrix[14]= 0.0;	//TZ
 	m_Matrix[15]= 1.0;
 
+	m_Type= Direct;
+
 	return *this;
 }
 
@@ -453,6 +535,8 @@ GLC_Matrix4x4& GLC_Matrix4x4::setMatTranslate(const GLC_Vector3d &Vect)
 	m_Matrix[2]= 0.0; m_Matrix[6]= 0.0; m_Matrix[10]= 1.0; m_Matrix[14]= Vect.m_Vector[2];
 	m_Matrix[3]= 0.0; m_Matrix[7]= 0.0; m_Matrix[11]= 0.0; m_Matrix[15]= 1.0;
 
+	m_Type= Direct;
+
 	return *this;
 }
 
@@ -463,6 +547,8 @@ GLC_Matrix4x4& GLC_Matrix4x4::setMatTranslate(const double Tx, const double Ty, 
 	m_Matrix[2]= 0.0; m_Matrix[6]= 0.0; m_Matrix[10]= 1.0; m_Matrix[14]= Tz;
 	m_Matrix[3]= 0.0; m_Matrix[7]= 0.0; m_Matrix[11]= 0.0; m_Matrix[15]= 1.0;
 
+	m_Type= Direct;
+
 	return *this;
 }
 
@@ -472,6 +558,8 @@ GLC_Matrix4x4& GLC_Matrix4x4::setMatScaling(const double sX, const double sY, co
 	m_Matrix[1]= 0.0; m_Matrix[5]= sY; m_Matrix[9]=  0.0; m_Matrix[13]= 0.0;
 	m_Matrix[2]= 0.0; m_Matrix[6]= 0.0; m_Matrix[10]= sZ; m_Matrix[14]= 0.0;
 	m_Matrix[3]= 0.0; m_Matrix[7]= 0.0; m_Matrix[11]= 0.0; m_Matrix[15]= 1.0;
+
+	m_Type= General;
 
 	return *this;
 }
@@ -502,6 +590,8 @@ GLC_Matrix4x4& GLC_Matrix4x4::setToIdentity()
 	m_Matrix[2]= 0.0; m_Matrix[6]= 0.0; m_Matrix[10]= 1.0; m_Matrix[14]= 0.0;
 	m_Matrix[3]= 0.0; m_Matrix[7]= 0.0; m_Matrix[11]= 0.0; m_Matrix[15]= 1.0;
 
+	m_Type= Identity;
+
 	return *this;
 }
 
@@ -521,9 +611,36 @@ GLC_Matrix4x4& GLC_Matrix4x4::transpose(void)
 		}
 	}
 
-	// Load the transposed in matrix in this matrix
+	// Load the transposed matrix in this matrix
 	memcpy(m_Matrix, MatT.m_Matrix, sizeof(double) * 16);
 
+	return *this;
+}
+
+GLC_Matrix4x4& GLC_Matrix4x4::optimise(bool force)
+{
+	if (force || (m_Type == General))
+	{
+		bool identityVal= (m_Matrix[0] == 1.0f) && (m_Matrix[4] == 0.0f) && (m_Matrix[8] ==  0.0f) && (m_Matrix[12] == 0.0f);
+		identityVal= identityVal && (m_Matrix[1] == 0.0f) && (m_Matrix[5] == 1.0f) && (m_Matrix[9] ==  0.0f) && (m_Matrix[13] == 0.0);
+		identityVal= identityVal && (m_Matrix[2] == 0.0f) && (m_Matrix[6] == 0.0f) && (m_Matrix[10] == 1.0f) && (m_Matrix[14] == 0.0);
+		identityVal= identityVal && (m_Matrix[3] == 0.0f) && (m_Matrix[7] == 0.0f) && (m_Matrix[11] == 0.0f) && (m_Matrix[15] == 1.0f);
+		if (identityVal)
+		{
+			m_Type= Identity;
+		}
+		else
+		{
+			if (determinant() > 0)
+			{
+				m_Type= Direct;
+			}
+			else
+			{
+				m_Type= Indirect;
+			}
+		}
+	}
 	return *this;
 }
 
@@ -609,6 +726,7 @@ GLC_Matrix4x4 GLC_Matrix4x4::getTranspose(void) const
 		}
 	}
 
+	MatT.m_Type= m_Type;
 	return MatT;
 }
 
@@ -631,6 +749,8 @@ GLC_Matrix4x4 GLC_Matrix4x4::getCoMat4x4(void) const
 		}
 	}
 
+
+	CoMat.m_Type= General;
 	return CoMat;
 }
 

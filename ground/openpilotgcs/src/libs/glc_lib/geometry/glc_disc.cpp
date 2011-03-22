@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -193,7 +191,7 @@ void GLC_Disc::createMeshAndWire()
 	GLC_Mesh::addTexels(texelVector);
 
 	// Add polyline to wire data
-	GLC_Geometry::addPolyline(wireData);
+	GLC_Geometry::addVerticeGroup(wireData);
 
 	// Set the material to use
 	GLC_Material* pDiscMaterial;

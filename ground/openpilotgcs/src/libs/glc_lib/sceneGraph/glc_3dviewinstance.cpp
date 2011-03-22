@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -303,6 +301,12 @@ void GLC_3DViewInstance::render(glc::RenderFlag renderFlag, bool useLod, GLC_Vie
 	// Save current OpenGL Matrix
 	glPushMatrix();
 	OpenglVisProperties();
+
+	// Change front face orientation if this instance absolute matrix is indirect
+	if (m_AbsoluteMatrix.type() == GLC_Matrix4x4::Indirect)
+	{
+		glFrontFace(GL_CW);
+	}
 	if(GLC_State::isInSelectionMode())
 	{
 		glColor3ubv(m_colorId); // D'ont use Alpha component
@@ -347,6 +351,13 @@ void GLC_3DViewInstance::render(glc::RenderFlag renderFlag, bool useLod, GLC_Vie
 	}
 	// Restore OpenGL Matrix
 	glPopMatrix();
+
+	// Restore front face orientation if this instance absolute matrix is indirect
+	if (m_AbsoluteMatrix.type() == GLC_Matrix4x4::Indirect)
+	{
+		glFrontFace(GL_CCW);
+	}
+
 }
 
 // Display the instance in Body selection mode

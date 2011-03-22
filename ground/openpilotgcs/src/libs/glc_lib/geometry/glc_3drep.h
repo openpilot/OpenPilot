@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -37,8 +35,8 @@
 //////////////////////////////////////////////////////////////////////
 class GLC_LIB_EXPORT GLC_3DRep : public GLC_Rep
 {
-	friend QDataStream &operator<<(QDataStream &, const GLC_3DRep &);
-	friend QDataStream &operator>>(QDataStream &, GLC_3DRep &);
+	friend GLC_LIB_EXPORT QDataStream &operator<<(QDataStream &, const GLC_3DRep &);
+	friend GLC_LIB_EXPORT QDataStream &operator>>(QDataStream &, GLC_3DRep &);
 
 //////////////////////////////////////////////////////////////////////
 /*! @name Constructor / Destructor */
@@ -55,7 +53,7 @@ public:
 	GLC_3DRep(const GLC_3DRep&);
 
 	//! Assignement operator
-	virtual GLC_3DRep &operator=(const GLC_3DRep&);
+	virtual GLC_3DRep &operator=(const GLC_Rep&);
 
 	//! Clone the representation
 	virtual GLC_Rep* clone() const;
@@ -132,7 +130,10 @@ public:
 public:
 	//! Add Geometry to the 3DRep
 	inline void addGeom(GLC_Geometry* pGeom)
-	{m_pGeomList->append(pGeom);}
+	{
+		m_pGeomList->append(pGeom);
+		*m_pIsLoaded= true;
+	}
 
 	//! Remove empty geometries and factorise materials
 	void clean();
@@ -153,13 +154,19 @@ public:
 	void replaceMaterial(GLC_uint, GLC_Material*);
 
 	//! Merge this 3Drep with another 3DRep
-	void merge(GLC_3DRep*);
+	void merge(const GLC_3DRep*);
+
+	//! Take the geometry of another 3DRep
+	void take(GLC_3DRep* pSource);
 
 	//! Copy VBO to the Client Side
 	void copyVboToClientSide();
 
 	//! Release client VBO
 	void releaseVboClientSide(bool update= false);
+
+	//! Transform 3DRep sub mesh vertice with the given matrix
+	void transformSubGeometries(const GLC_Matrix4x4& matrix);
 
 
 //@}
@@ -187,7 +194,7 @@ private:
 };
 
 //! Non-member stream operator
-QDataStream &operator<<(QDataStream &, const GLC_3DRep &);
-QDataStream &operator>>(QDataStream &, GLC_3DRep &);
+GLC_LIB_EXPORT QDataStream &operator<<(QDataStream &, const GLC_3DRep &);
+GLC_LIB_EXPORT QDataStream &operator>>(QDataStream &, GLC_3DRep &);
 
 #endif /* GLC_3DREP_H_ */

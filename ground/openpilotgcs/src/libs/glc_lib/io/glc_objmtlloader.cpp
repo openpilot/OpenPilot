@@ -198,11 +198,17 @@ void GLC_ObjMtlLoader::extractTextureFileName(QString &ligne)
 
 		QFile textureFile(textureFileName);
 
-		if (!textureFile.open(QIODevice::ReadOnly) || (textureFileName.right(3).contains("TGA", Qt::CaseInsensitive)))
+		if (!textureFile.open(QIODevice::ReadOnly))
 		{
-			m_LoadStatus= "GLC_ObjMtlLoader::extractTextureFileName File ";
-			//qDebug() << m_LoadStatus;
-			// Skip texture and continu loading
+			QStringList stringList(m_FileName);
+			stringList.append("Open File : " + textureFileName + " failed");
+			GLC_ErrorLog::addError(stringList);
+		}
+		else if ((textureFileName.right(3).contains("TGA", Qt::CaseInsensitive)))
+		{
+			QStringList stringList(m_FileName);
+			stringList.append("Image : " + textureFileName + " not suported");
+			GLC_ErrorLog::addError(stringList);
 		}
 		else
 		{

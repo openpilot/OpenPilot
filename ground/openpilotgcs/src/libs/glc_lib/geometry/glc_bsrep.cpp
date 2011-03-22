@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -25,6 +23,7 @@
 
 #include "glc_bsrep.h"
 #include "../glc_fileformatexception.h"
+#include "../glc_tracelog.h"
 
 // The binary rep suffix
 const QString GLC_BSRep::m_Suffix("BSRep");
@@ -33,8 +32,10 @@ const QString GLC_BSRep::m_Suffix("BSRep");
 const QUuid GLC_BSRep::m_Uuid("{d6f97789-36a9-4c2e-b667-0e66c27f839f}");
 
 // The binary rep version
-const quint32 GLC_BSRep::m_Version= 101;
+const quint32 GLC_BSRep::m_Version= 102;
 
+// Mutex used by compression
+QMutex GLC_BSRep::m_CompressionMutex;
 
 // Default constructor
 GLC_BSRep::GLC_BSRep(const QString& fileName, bool useCompression)
@@ -43,7 +44,6 @@ GLC_BSRep::GLC_BSRep(const QString& fileName, bool useCompression)
 , m_DataStream()
 , m_UseCompression(useCompression)
 , m_CompressionLevel(-1)
-, m_VersionIsCompatible(false)
 {
 	setAbsoluteFileName(fileName);
 	m_DataStream.setVersion(QDataStream::Qt_4_6);
@@ -68,36 +68,31 @@ GLC_BSRep::~GLC_BSRep()
 }
 
 // Return true if the binary rep is up to date
-bool GLC_BSRep::repIsUpToDate(const QDateTime& timeStamp)
+bool GLC_BSRep::isUsable(const QDateTime& timeStamp)
 {
-	//qDebug() << "GLC_BSRep::repIsUpToDate";
 	bool isUpToDate= false;
 	if (open(QIODevice::ReadOnly))
 	{
 		if (headerIsOk())
 		{
-			isUpToDate= m_VersionIsCompatible && timeStampOk(timeStamp);
+			isUpToDate= timeStampOk(timeStamp);
 			isUpToDate= isUpToDate && close();
-		}
-		else
-		{
-			QString message(QString("GLC_BSRep::loadRep File not recognise ") + m_FileInfo.fileName());
-			qDebug() << message;
-			GLC_FileFormatException fileFormatException(message, m_FileInfo.fileName(), GLC_FileFormatException::WrongFileFormat);
-			close();
-			throw(fileFormatException);
 		}
 	}
 	else
 	{
 		QString message(QString("GLC_BSRep::loadRep Enable to open the file ") + m_FileInfo.fileName());
-		qDebug() << message;
 		GLC_FileFormatException fileFormatException(message, m_FileInfo.fileName(), GLC_FileFormatException::FileNotFound);
 		close();
 		throw(fileFormatException);
 	}
 
-	if (!isUpToDate) qDebug() << "Rep is not up to date";
+	if (!isUpToDate && GLC_TraceLog::isEnable())
+	{
+		QStringList stringList("GLC_BSRep::isUsable");
+		stringList.append("File " + m_FileInfo.filePath() + " not Usable");
+		GLC_TraceLog::addTrace(stringList);
+	}
 	return isUpToDate;
 }
 
@@ -107,7 +102,6 @@ bool GLC_BSRep::repIsUpToDate(const QDateTime& timeStamp)
 // Load the binary rep
 GLC_3DRep GLC_BSRep::loadRep()
 {
-	//qDebug() << "GLC_BSRep::loadRep";
 	GLC_3DRep loadedRep;
 
 	if (open(QIODevice::ReadOnly))
@@ -124,7 +118,9 @@ GLC_3DRep GLC_BSRep::loadRep()
 				QByteArray CompresseBuffer;
 				m_DataStream >> CompresseBuffer;
 				QByteArray uncompressedBuffer= qUncompress(CompresseBuffer);
+				uncompressedBuffer.squeeze();
 				CompresseBuffer.clear();
+				CompresseBuffer.squeeze();
 				QDataStream bufferStream(uncompressedBuffer);
 				bufferStream >> loadedRep;
 			}
@@ -132,11 +128,11 @@ GLC_3DRep GLC_BSRep::loadRep()
 			{
 				m_DataStream >> loadedRep;
 			}
+			loadedRep.setFileName(m_FileInfo.filePath());
 
 			if (!close())
 			{
 				QString message(QString("GLC_BSRep::loadRep An error occur when loading file ") + m_FileInfo.fileName());
-				qDebug() << message;
 				GLC_FileFormatException fileFormatException(message, m_FileInfo.fileName(), GLC_FileFormatException::WrongFileFormat);
 				throw(fileFormatException);
 			}
@@ -144,7 +140,6 @@ GLC_3DRep GLC_BSRep::loadRep()
 		else
 		{
 			QString message(QString("GLC_BSRep::loadRep File not supported ") + m_FileInfo.fileName());
-			qDebug() << message;
 			GLC_FileFormatException fileFormatException(message, m_FileInfo.fileName(), GLC_FileFormatException::FileNotSupported);
 			close();
 			throw(fileFormatException);
@@ -153,7 +148,6 @@ GLC_3DRep GLC_BSRep::loadRep()
 	else
 	{
 		QString message(QString("GLC_BSRep::loadRep Enable to open the file ") + m_FileInfo.fileName());
-		qDebug() << message;
 		GLC_FileFormatException fileFormatException(message, m_FileInfo.fileName(), GLC_FileFormatException::FileNotFound);
 		close();
 		throw(fileFormatException);
@@ -176,6 +170,7 @@ GLC_BoundingBox GLC_BSRep::boundingBox()
 
 			m_DataStream >> boundingBox;
 		}
+		close();
 	}
 	return boundingBox;
 }
@@ -203,7 +198,7 @@ void GLC_BSRep::setAbsoluteFileName(const QString& fileName)
 // Save the GLC_3DRep in serialised binary
 bool GLC_BSRep::save(const GLC_3DRep& rep)
 {
-	qDebug() << "GLC_BSRep::save";
+
 	//! Check if the currentFileInfo is valid and writable
 	bool saveOk= open(QIODevice::WriteOnly);
 	if (saveOk)
@@ -214,21 +209,34 @@ bool GLC_BSRep::save(const GLC_3DRep& rep)
 		m_DataStream << rep.boundingBox();
 
 		// Compression usage
-		m_DataStream << m_UseCompression;
-		if (m_UseCompression)
+
+		if (m_UseCompression && (rep.faceCount() < 1000000))
 		{
+			m_DataStream << true;
 			QByteArray uncompressedBuffer;
-			QDataStream bufferStream(&uncompressedBuffer, QIODevice::WriteOnly);
-			bufferStream << rep;
+			{
+				QBuffer buffer(&uncompressedBuffer);
+				buffer.open(QIODevice::WriteOnly);
+				QDataStream bufferStream(&buffer);
+				bufferStream << rep;
+			}
 			m_DataStream << qCompress(uncompressedBuffer, m_CompressionLevel);
 		}
 		else
 		{
+			m_DataStream << false;
 			// Binary representation geometry
 			// Add the rep
 			m_DataStream << rep;
 		}
 
+		// Flag the file
+		qint64 offset= sizeof(QUuid);
+		offset+= sizeof(quint32);
+
+		m_pFile->seek(offset);
+		bool writeOk= true;
+		m_DataStream << writeOk;
 		// Close the file
 		saveOk= close();
 	}
@@ -239,7 +247,6 @@ bool GLC_BSRep::save(const GLC_3DRep& rep)
 // Open the file
 bool GLC_BSRep::open(QIODevice::OpenMode mode)
 {
-	//qDebug() << "Open :" << m_FileInfo.fileName();
 	bool openOk= m_FileInfo.exists();
 	if (openOk || (mode == QIODevice::WriteOnly))
 	{
@@ -252,10 +259,13 @@ bool GLC_BSRep::open(QIODevice::OpenMode mode)
 			m_DataStream.setDevice(m_pFile);
 		}
 	}
-	else
+	else if (GLC_TraceLog::isEnable())
 	{
-		qDebug() << "File info " << m_FileInfo.filePath() << " do not exists";
+		QStringList stringList("GLC_BSRep::open");
+		stringList.append("File " + m_FileInfo.filePath() + " doesn't exists");
+		GLC_TraceLog::addTrace(stringList);
 	}
+
 	return openOk;
 }
 
@@ -278,13 +288,14 @@ void GLC_BSRep::writeHeader(const QDateTime& dateTime)
 {
 	Q_ASSERT(m_pFile != NULL);
 	Q_ASSERT(m_DataStream.device() != NULL);
-	Q_ASSERT(m_pFile->openMode() == QIODevice::WriteOnly);
 
 	// Binary representation Header
 	// Add the magic number
 	m_DataStream << m_Uuid;
 	// Add the version
 	m_DataStream << m_Version;
+	bool writeFinished= false;
+	m_DataStream << writeFinished;
 
 	// Set the version of the data stream
 	m_DataStream.setVersion(QDataStream::Qt_4_6);
@@ -302,14 +313,16 @@ bool GLC_BSRep::headerIsOk()
 
 	QUuid uuid;
 	quint32 version;
+	bool writeFinished;
+
 	m_DataStream >> uuid;
 	m_DataStream >> version;
+	m_DataStream >> writeFinished;
 
 	// Set the version of the data stream
 	m_DataStream.setVersion(QDataStream::Qt_4_6);
 
-	bool headerOk= (uuid == m_Uuid);
-	m_VersionIsCompatible= (version == m_Version);
+	bool headerOk= (uuid == m_Uuid) && (version == m_Version) && writeFinished;
 
 	return headerOk;
 }

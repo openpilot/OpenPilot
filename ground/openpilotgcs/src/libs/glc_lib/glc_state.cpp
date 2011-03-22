@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -159,6 +157,7 @@ void GLC_State::init()
 void GLC_State::setVboSupport()
 {
 	m_VboSupported= glc::extensionIsSupported("ARB_vertex_buffer_object") && glc::loadVboExtension();
+	setVboUsage(m_UseVbo);
 }
 
 void GLC_State::setVboUsage(const bool vboUsed)
@@ -169,6 +168,7 @@ void GLC_State::setVboUsage(const bool vboUsed)
 void GLC_State::setGlslSupport()
 {
 	m_GlslSupported= glc::extensionIsSupported("GL_ARB_shading_language_100") && glc::loadGlSlExtension();
+	setGlslUsage(m_UseShader);
 }
 
 void GLC_State::setPointSpriteSupport()

@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -25,6 +23,7 @@
 #include "glc_3drep.h"
 #include "../glc_factory.h"
 #include "glc_mesh.h"
+#include "glc_errorlog.h"
 
 // Class chunk id
 quint32 GLC_3DRep::m_ChunkId= 0xA702;
@@ -45,6 +44,7 @@ GLC_3DRep::GLC_3DRep(GLC_Geometry* pGeom)
 , m_pType(new int(GLC_Rep::GLC_VBOGEOM))
 {
 	m_pGeomList->append(pGeom);
+	*m_pIsLoaded= true;
 	setName(pGeom->name());
 }
 
@@ -58,12 +58,17 @@ GLC_3DRep::GLC_3DRep(const GLC_3DRep& rep)
 }
 
 // Assignement operator
-GLC_3DRep& GLC_3DRep::operator=(const GLC_3DRep& rep)
+GLC_3DRep& GLC_3DRep::operator=(const GLC_Rep& rep)
 {
-	clear();
-	GLC_Rep::operator=(rep);
-	m_pGeomList= rep.m_pGeomList;
-	m_pType= rep.m_pType;
+	const GLC_3DRep* p3DRep= dynamic_cast<const GLC_3DRep*>(&rep);
+	Q_ASSERT(NULL != p3DRep);
+	if (this != &rep)
+	{
+		clear();
+		GLC_Rep::operator=(rep);
+		m_pGeomList= p3DRep->m_pGeomList;
+		m_pType= p3DRep->m_pType;
+	}
 
 	return *this;
 }
@@ -237,28 +242,37 @@ void GLC_3DRep::reverseNormals()
 // Load the representation
 bool GLC_3DRep::load()
 {
-	Q_ASSERT((!(*m_pIsLoaded)) == m_pGeomList->isEmpty());
-	if ((*m_pIsLoaded) || fileName().isEmpty())
+	bool loadSucces= false;
+
+	if(!(*m_pIsLoaded))
 	{
-		qDebug() << "GLC_3DRep::load() Allready loaded or empty fileName";
-		return false;
-	}
-	GLC_3DRep newRep= GLC_Factory::instance()->create3DRepFromFile(fileName());
-	if (!newRep.isEmpty())
-	{
-		const int size= newRep.m_pGeomList->size();
-		for (int i= 0; i < size; ++i)
+		Q_ASSERT(m_pGeomList->isEmpty());
+		if (fileName().isEmpty())
 		{
-			m_pGeomList->append(newRep.m_pGeomList->at(i));
+			QStringList stringList("GLC_3DRep::load");
+			stringList.append("Representation : " + GLC_Rep::name());
+			stringList.append("Empty File Name");
+			GLC_ErrorLog::addError(stringList);
 		}
-		newRep.m_pGeomList->clear();
-		(*m_pIsLoaded)= true;
-		return true;
+		else
+		{
+			GLC_3DRep newRep= GLC_Factory::instance()->create3DRepFromFile(fileName());
+			if (!newRep.isEmpty())
+			{
+				const int size= newRep.m_pGeomList->size();
+				for (int i= 0; i < size; ++i)
+				{
+					m_pGeomList->append(newRep.m_pGeomList->at(i));
+				}
+				newRep.m_pGeomList->clear();
+				(*m_pIsLoaded)= true;
+				loadSucces= true;
+			}
+		}
 	}
-	else
-	{
-		return false;
-	}
+
+	return loadSucces;
+
 }
 // Replace the representation
 void GLC_3DRep::replace(GLC_Rep* pRep)
@@ -302,7 +316,7 @@ void GLC_3DRep::replaceMaterial(GLC_uint oldId, GLC_Material* pNewMaterial)
 }
 
 // Merge this 3Drep with another 3DRep
-void GLC_3DRep::merge(GLC_3DRep* pRep)
+void GLC_3DRep::merge(const GLC_3DRep* pRep)
 {
 	// Get the number of geometry of pRep
 	const int pRepSize= pRep->m_pGeomList->size();
@@ -310,6 +324,17 @@ void GLC_3DRep::merge(GLC_3DRep* pRep)
 	{
 		addGeom(pRep->geomAt(i)->clone());
 	}
+}
+
+void GLC_3DRep::take(GLC_3DRep* pSource)
+{
+	// Get the number of geometry of pRep
+	const int pRepSize= pSource->m_pGeomList->size();
+	for (int i= 0; i < pRepSize; ++i)
+	{
+		addGeom(pSource->geomAt(i));
+	}
+	pSource->m_pGeomList->clear();
 }
 
 void GLC_3DRep::copyVboToClientSide()
@@ -332,24 +357,47 @@ void GLC_3DRep::releaseVboClientSide(bool update)
 	}
 }
 
+void GLC_3DRep::transformSubGeometries(const GLC_Matrix4x4& matrix)
+{
+	// Get the number of geometry of pRep
+	const int repCount= m_pGeomList->size();
+	qDebug() << "repCount " << repCount;
+	for (int i= 0; i < repCount; ++i)
+	{
+		GLC_Mesh* pCurrentMesh= dynamic_cast<GLC_Mesh*>(geomAt(i));
+		if (NULL != pCurrentMesh)
+		{
+			pCurrentMesh->transformVertice(matrix);
+		}
+	}
+}
+
 // UnLoad the representation
 bool GLC_3DRep::unload()
 {
-	Q_ASSERT((!(*m_pIsLoaded)) == m_pGeomList->isEmpty());
-	if (!(*m_pIsLoaded) || fileName().isEmpty())
+	bool unloadSucess= false;
+	if ((NULL != m_pGeomList) && !m_pGeomList->isEmpty())
 	{
-		qDebug() << "GLC_3DRep::unload() Not loaded or empty fileName";
-		return false;
-	}
+		if (fileName().isEmpty())
+		{
+			QStringList stringList("GLC_3DRep::unload()");
+			stringList.append("Cannot unload rep without filename");
+			GLC_ErrorLog::addError(stringList);
+		}
+		else
+		{
+			const int size= m_pGeomList->size();
+			for (int i= 0; i < size; ++i)
+			{
+				delete (*m_pGeomList)[i];
+			}
+			m_pGeomList->clear();
 
-	const int size= m_pGeomList->size();
-	for (int i= 0; i < size; ++i)
-	{
-		delete (*m_pGeomList)[i];
+			(*m_pIsLoaded)= false;
+			unloadSucess= true;
+		}
 	}
-
-	(*m_pIsLoaded)= false;
-	return true;
+	return unloadSucess;
 }
 
 //////////////////////////////////////////////////////////////////////

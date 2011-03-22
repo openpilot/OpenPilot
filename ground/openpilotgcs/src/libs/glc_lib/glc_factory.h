@@ -2,8 +2,7 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
+ Copyright (C) 2011 JŽr™me Forrissier
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -30,6 +29,7 @@
 #include <QObject>
 #include <QtOpenGL>
 #include <QString>
+#include <QSet>
 
 //class to built
 #include "geometry/glc_point.h"
@@ -42,6 +42,7 @@
 #include "geometry/glc_sphere.h"
 #include "geometry/glc_rectangle.h"
 #include "geometry/glc_3drep.h"
+#include "geometry/glc_pointcloud.h"
 #include "shading/glc_material.h"
 #include "shading/glc_texture.h"
 #include "sceneGraph/glc_world.h"
@@ -49,8 +50,12 @@
 #include "glc_boundingbox.h"
 #include "viewport/glc_movercontroller.h"
 #include "viewport/glc_viewport.h"
+#include "io/glc_fileloader.h"
 
 // end of class to built
+
+class GLC_WorldReaderHandler;
+class GLC_WorldReaderPlugin;
 
 #include "glc_config.h"
 //////////////////////////////////////////////////////////////////////
@@ -88,6 +93,13 @@ public:
 
 	GLC_3DRep createPoint(double x, double y, double z) const;
 
+	//! Create a cloud of points
+	GLC_3DRep createPointCloud(const GLfloatVector& data, const QColor& color);
+
+	GLC_3DRep createPointCloud(const QList<GLC_Point3d>& pointList, const QColor& color);
+
+	GLC_3DRep createPointCloud(const QList<GLC_Point3df>& pointList, const QColor& color);
+
 	//! Create a GLC_PointSprite
 	GLC_3DRep createPointSprite(float, GLC_Material*) const;
 
@@ -124,10 +136,13 @@ public:
 	GLC_World createWorldFromFile(QFile &file, QStringList* pAttachedFileName= NULL) const;
 
 	//! Create a GLC_World containing only the 3dxml structure
-	GLC_World createWorldStructureFrom3dxml(QFile &file) const;
+	GLC_World createWorldStructureFrom3dxml(QFile &file, bool GetExtRefName= false) const;
 
 	//! Create 3DRep from 3dxml or 3DRep file
 	GLC_3DRep create3DRepFromFile(const QString&) const;
+
+	//! Create a GLC_FileLoader
+	GLC_FileLoader* createFileLoader() const;
 
 	//! Create default material
 	GLC_Material* createMaterial() const;
@@ -156,11 +171,27 @@ public:
 	//! Create the default mover controller
 	GLC_MoverController createDefaultMoverController(const QColor&, GLC_Viewport*);
 
+	//! Return the list of world reader plugin
+	static QList<GLC_WorldReaderPlugin*> worldReaderPlugins();
+
+	//! Return true if the given file extension can be loaded
+	static bool canBeLoaded(const QString& extension);
+
+	//! Return an handle to the plugin tu use for the given file
+	static GLC_WorldReaderHandler* loadingHandler(const QString& fileName);
+
 //@}
 
 signals:
 	//! For progress bar management
 	void currentQuantum(int) const;
+
+//////////////////////////////////////////////////////////////////////
+// Private services functions
+//////////////////////////////////////////////////////////////////////
+private:
+	//! Load GLC_lib plugins
+	void loadPlugins();
 
 //////////////////////////////////////////////////////////////////////
 // Private members
@@ -172,6 +203,12 @@ private:
 
 	//! The QGLContext attached to the factory (rendering context)
 	static QGLContext* m_pQGLContext;
+
+	//! The list off worldReader plugins
+	static QList<GLC_WorldReaderPlugin*> m_WorldReaderPluginList;
+
+	//! The supported extension set
+	static QSet<QString> m_SupportedExtensionSet;
 
 };
 

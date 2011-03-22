@@ -32,7 +32,7 @@
 /***********************************************************************
  * Return the next byte in the pseudo-random sequence
  */
-static int decrypt_byte(unsigned long* pkeys, const unsigned long* pcrc_32_tab __attribute((unused)))
+static int decrypt_byte(unsigned long* pkeys, const unsigned long* pcrc_32_tab)
 {
     //(void) pcrc_32_tab; /* avoid "unused parameter" warning */
     unsigned temp;  /* POTENTIAL BUG:  temp*(temp^1) may overflow in an

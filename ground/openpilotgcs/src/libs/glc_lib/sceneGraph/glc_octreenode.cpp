@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -182,7 +180,7 @@ void GLC_OctreeNode::addInstance(GLC_3DViewInstance* pInstance, int depth)
 	m_Empty= false;
 	const GLC_BoundingBox instanceBox= pInstance->boundingBox();
 	// Check if the instance's bounding box intersect this node bounding box
-	if (intersect(instanceBox))
+	if (!instanceBox.isEmpty() && intersect(instanceBox))
 	{
 		if (0 == depth)
 		{

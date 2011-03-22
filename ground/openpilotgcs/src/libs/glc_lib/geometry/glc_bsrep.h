@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -31,6 +29,7 @@
 #include <QDataStream>
 #include <QUuid>
 #include <QDateTime>
+#include <QMutex>
 
 #include "../glc_config.h"
 #include "glc_3drep.h"
@@ -65,8 +64,8 @@ public:
 	inline QString absoluteFileName() const
 	{return m_FileInfo.fileName();}
 
-	//! Return true if the binary rep is up to date
-	bool repIsUpToDate(const QDateTime&);
+	//! Return true if the binary rep is usable
+	bool isUsable(const QDateTime&);
 
 	//! Load the binary rep
 	GLC_3DRep loadRep();
@@ -147,8 +146,8 @@ private:
 	//! The compression level
 	int m_CompressionLevel;
 
-	//! Flag to know if the version is compatible
-	bool m_VersionIsCompatible;
+	//! Compression Mutex
+	static QMutex m_CompressionMutex;
 
 };
 

@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -34,13 +32,17 @@ using namespace glc;
 
 
 GLC_Point::GLC_Point(const GLC_Point3d &setCoord)
-:GLC_Geometry("Point", true), m_Coordinate(setCoord)
+:GLC_Geometry("Point", true)
+, m_Coordinate(setCoord)
+, m_Size(1.0f)
 {
 
 }
 //! Construct an GLC_Point
 GLC_Point::GLC_Point(double x, double y, double z)
-:GLC_Geometry("Point", true), m_Coordinate(x, y, z)
+:GLC_Geometry("Point", true)
+, m_Coordinate(x, y, z)
+, m_Size(1.0f)
 {
 }
 
@@ -101,10 +103,12 @@ void GLC_Point::setCoordinate(double x, double y, double z)
 
 void GLC_Point::glDraw(const GLC_RenderProperties&)
 {
+	glPointSize(m_Size);
 	// Point Display
 	glBegin(GL_POINTS);
 		glVertex3dv(m_Coordinate.data());
 	glEnd();
+	glPointSize(1.0f);
 
 	// OpenGL error handler
 	GLenum error= glGetError();

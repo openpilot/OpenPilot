@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -30,6 +28,7 @@ QMutex glc::iDMutex;
 QMutex glc::geomIdMutex;
 QMutex glc::userIdMutex;
 QMutex glc::widget3dIdMutex;
+QMutex glc::shadingGroupIdMutex;
 
 GLC_uint glc::GLC_GenID(void)
 {
@@ -67,6 +66,15 @@ GLC_uint glc::GLC_Gen3DWidgetID(void)
 	return Id;
 }
 
+GLC_uint glc::GLC_GenShaderGroupID()
+{
+	static GLC_uint Id= 1;
+	glc::shadingGroupIdMutex.lock();
+	Id++;
+	glc::shadingGroupIdMutex.unlock();
+	return Id;
+}
+
 const QString glc::archivePrefix()
 {
 	return "glc_Zip::";
@@ -77,6 +85,16 @@ const QString glc::archiveInfix()
 	return "::glc_Zip::";
 }
 
+const QString glc::filePrefix()
+{
+	return "File::";
+}
+
+const QString glc::fileInfix()
+{
+	return "::File::";
+}
+
 bool glc::isArchiveString(const QString& fileName)
 {
 	bool inArchive= fileName.startsWith(archivePrefix());
@@ -84,25 +102,65 @@ bool glc::isArchiveString(const QString& fileName)
 	return inArchive;
 }
 
+bool glc::isFileString(const QString& fileName)
+{
+	bool inFile= fileName.startsWith(filePrefix());
+	inFile= inFile && fileName.contains(fileInfix());
+	return inFile;
+}
+
 QString glc::builtArchiveString(const QString& Archive, const QString& entry)
 {
 	return QString(archivePrefix() + Archive + archiveInfix() + entry);
 }
 
+QString glc::builtFileString(const QString& File, const QString& entry)
+{
+	const QString repFileName= QFileInfo(File).absolutePath() + QDir::separator() + entry;
+	return QString(filePrefix() + File + fileInfix() + repFileName);
+}
+
 QString glc::archiveFileName(const QString& archiveString)
 {
-	Q_ASSERT(isArchiveString(archiveString));
-	const int indexOfInfix= archiveString.indexOf(archiveInfix());
-	const int prefixLength= archivePrefix().length();
+	const bool isArchiveEncoded= isArchiveString(archiveString);
+	const bool isFileEncoded= isFileString(archiveString);
+
+	Q_ASSERT(isArchiveEncoded || isFileEncoded);
+	QString infix;
+	QString prefix;
+	if (isArchiveEncoded)
+	{
+		infix= archiveInfix();
+		prefix= archivePrefix();
+	}
+	else if (isFileEncoded)
+	{
+		infix= fileInfix();
+		prefix= filePrefix();
+	}
+	const int indexOfInfix= archiveString.indexOf(infix);
+	const int prefixLength= prefix.length();
 	const int length= indexOfInfix - prefixLength;
 	return archiveString.mid(prefixLength, length);
 }
 
 QString glc::archiveEntryFileName(const QString& archiveString)
 {
-	Q_ASSERT(isArchiveString(archiveString));
-	const int indexOfInfix= archiveString.indexOf(archiveInfix());
-	const int infixLength= archiveInfix().length();
+	const bool isArchiveEncoded= isArchiveString(archiveString);
+	const bool isFileEncoded= isFileString(archiveString);
+
+	Q_ASSERT(isArchiveEncoded || isFileEncoded);
+	QString infix;
+	if (isArchiveEncoded)
+	{
+		infix= archiveInfix();
+	}
+	else if (isFileEncoded)
+	{
+		infix= fileInfix();
+	}
+	const int indexOfInfix= archiveString.indexOf(infix);
+	const int infixLength= infix.length();
 	const int length= archiveString.length() - (indexOfInfix + infixLength);
 	return archiveString.right(length);
 }

@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -80,9 +78,8 @@ void GLC_Octree::updateViewableInstances(const GLC_Frustum& frustum)
 
 void GLC_Octree::updateSpacePartitioning()
 {
-	qDebug() << "Update space partitioning";
 	delete m_pRootNode;
-	m_pRootNode= new GLC_OctreeNode(m_pCollection->boundingBox());
+	m_pRootNode= new GLC_OctreeNode(m_pCollection->boundingBox(true));
 	// fill the octree
 	QList<GLC_3DViewInstance*> instanceList(m_pCollection->instancesHandle());
 	const int size= instanceList.size();
@@ -91,7 +88,12 @@ void GLC_Octree::updateSpacePartitioning()
 		m_pRootNode->addInstance(instanceList.at(i), m_OctreeDepth);
 	}
 	m_pRootNode->removeEmptyChildren();
-	qDebug() << "Update space partitioning DONE";
+}
+
+void GLC_Octree::clear()
+{
+	delete m_pRootNode;
+	m_pRootNode= NULL;
 }
 
 void GLC_Octree::setDepth(int depth)

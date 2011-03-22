@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -172,11 +170,35 @@ GLC_BoundingBox& GLC_BoundingBox::transform(const GLC_Matrix4x4& matrix)
 {
 	if (!m_IsEmpty)
 	{
-		GLC_Point3d newLower= matrix * m_Lower;
-		GLC_Point3d newUpper= matrix * m_Upper;
+		// Compute Transformed BoundingBox Corner
+		GLC_Point3d corner1(m_Lower);
+		GLC_Point3d corner7(m_Upper);
+		GLC_Point3d corner2(corner7.x(), corner1.y(), corner1.z());
+		GLC_Point3d corner3(corner7.x(), corner7.y(), corner1.z());
+		GLC_Point3d corner4(corner1.x(), corner7.y(), corner1.z());
+		GLC_Point3d corner5(corner1.x(), corner1.y(), corner7.z());
+		GLC_Point3d corner6(corner7.x(), corner1.y(), corner7.z());
+		GLC_Point3d corner8(corner1.x(), corner7.y(), corner7.z());
+
+		corner1 = (matrix * corner1);
+		corner2 = (matrix * corner2);
+		corner3 = (matrix * corner3);
+		corner4 = (matrix * corner4);
+		corner5 = (matrix * corner5);
+		corner6 = (matrix * corner6);
+		corner7 = (matrix * corner7);
+		corner8 = (matrix * corner8);
+
+		// Compute the new BoundingBox
 		GLC_BoundingBox boundingBox;
-		boundingBox.combine(newLower);
-		boundingBox.combine(newUpper);
+		boundingBox.combine(corner1);
+		boundingBox.combine(corner2);
+		boundingBox.combine(corner3);
+		boundingBox.combine(corner4);
+		boundingBox.combine(corner5);
+		boundingBox.combine(corner6);
+		boundingBox.combine(corner7);
+		boundingBox.combine(corner8);
 
 		m_Lower= boundingBox.m_Lower;
 		m_Upper= boundingBox.m_Upper;
@@ -191,8 +213,8 @@ QDataStream &operator<<(QDataStream &stream, const GLC_BoundingBox &bBox)
 	stream << chunckId;
 
 	stream << bBox.m_IsEmpty;
-	stream << bBox.lowerCorner();
-	stream << bBox.upperCorner();
+	stream << bBox.m_Lower;
+	stream << bBox.m_Upper;
 
 	return stream;
 }

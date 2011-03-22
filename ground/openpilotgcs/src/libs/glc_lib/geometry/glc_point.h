@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -68,6 +66,10 @@ public:
 	//! Return a copy of the geometry
 	virtual GLC_Geometry* clone() const;
 
+	//! Return the size of this point
+	inline GLfloat size() const
+	{return m_Size;}
+
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -80,6 +82,11 @@ public:
 
 	//! Set Point coordinate by 3 double
 	void setCoordinate(double x, double y, double z);
+
+	//! Set the size of this point
+	void setSize(GLfloat size)
+	{m_Size= size;}
+
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -99,8 +106,11 @@ private:
 //////////////////////////////////////////////////////////////////////
 
 private:
-	//! 4d point for point coordinate
+	//! Point for point coordinate
 	GLC_Point3d m_Coordinate;
+
+	//! Size of the point
+	GLfloat m_Size;
 
 };
 #endif //GLC_POINT_H_

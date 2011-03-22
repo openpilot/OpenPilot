@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -273,6 +271,11 @@ void GLC_Axis::create3DviewInstance()
 		GLC_3DWidget::add3DViewInstance(axisInstance);
 		GLC_3DWidget::add3DViewInstance(arrowInstance);
 	}
+}
+
+void GLC_Axis::resetViewState()
+{
+
 }
 
 void GLC_Axis::moveManipulatorRep(const GLC_Point3d& pos)

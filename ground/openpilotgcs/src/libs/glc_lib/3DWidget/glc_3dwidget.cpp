@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -97,6 +95,18 @@ void GLC_3DWidget::setWidgetManager(GLC_3DWidgetManagerHandle* pWidgetManagerHan
 	create3DviewInstance();
 }
 
+void GLC_3DWidget::setVisible(bool visible)
+{
+	if (NULL != m_pWidgetManagerHandle)
+	{
+		const int instanceCount= m_InstanceIdList.size();
+		for (int i= 0; i < instanceCount; ++i)
+		{
+			m_pWidgetManagerHandle->instanceHandle(m_InstanceIdList.at(i))->setVisibility(visible);
+		}
+		resetViewState();
+	}
+}
 //////////////////////////////////////////////////////////////////////
 // Interaction Functions
 //////////////////////////////////////////////////////////////////////

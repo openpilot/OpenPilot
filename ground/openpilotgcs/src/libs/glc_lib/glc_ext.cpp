@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -27,6 +25,7 @@
 #include <QString>
 #include <QGLContext>
 #include <QDebug>
+#include <QGLShaderProgram>
 
 #if !defined(Q_OS_MAC)
 // ARB_vertex_buffer_object
@@ -46,23 +45,6 @@ PFNGLGETBUFFERPOINTERVARBPROC		glGetBufferPointerv		= NULL;
 
 // glMultiDrawElement
 PFNGLMULTIDRAWELEMENTSPROC			glMultiDrawElements		= NULL;
-// GL_ARB_shader_objects
-PFNGLCREATEPROGRAMOBJECTARBPROC		glCreateProgram			= NULL;
-PFNGLDELETEPROGRAMPROC				glDeleteProgram			= NULL;
-PFNGLUSEPROGRAMOBJECTARBPROC		glUseProgram			= NULL;
-PFNGLCREATESHADEROBJECTARBPROC		glCreateShader			= NULL;
-PFNGLDELETESHADERPROC				glDeleteShader			= NULL;
-PFNGLSHADERSOURCEARBPROC			glShaderSource			= NULL;
-PFNGLCOMPILESHADERARBPROC			glCompileShader			= NULL;
-PFNGLATTACHOBJECTARBPROC			glAttachShader			= NULL;
-PFNGLDETACHOBJECTARBPROC			glDetachShader			= NULL;
-PFNGLLINKPROGRAMARBPROC				glLinkProgram			= NULL;
-PFNGLGETUNIFORMLOCATIONARBPROC		glGetUniformLocation	= NULL;
-PFNGLUNIFORM4FARBPROC				glUniform4f				= NULL;
-PFNGLUNIFORM1IARBPROC				glUniform1i				= NULL;
-PFNGLGETSHADERIVPROC				glGetShaderiv			= NULL;
-PFNGLGETPROGRAMIVARBPROC			glGetProgramiv			= NULL;
-PFNGLISPROGRAMARBPROC				glIsProgram				= NULL;
 
 // GL_point_parameters Point Sprite
 PFNGLPOINTPARAMETERFARBPROC			glPointParameterf		= NULL;
@@ -109,47 +91,7 @@ bool glc::loadVboExtension()
 // Load GLSL extensions
 bool glc::loadGlSlExtension()
 {
-	bool result= true;
-#if !defined(Q_OS_MAC)
-	const QGLContext* pContext= QGLContext::currentContext();
-	glCreateProgram				= (PFNGLCREATEPROGRAMOBJECTARBPROC)pContext->getProcAddress(QLatin1String("glCreateProgram"));
-	if (!glCreateProgram) qDebug() << "not glCreateProgram";
-	glDeleteProgram 			= (PFNGLDELETEPROGRAMPROC)pContext->getProcAddress(QLatin1String("glDeleteProgram"));
-	if (!glDeleteProgram) qDebug() << "not glDeleteProgram";
-	glUseProgram				= (PFNGLUSEPROGRAMOBJECTARBPROC)pContext->getProcAddress(QLatin1String("glUseProgram"));
-	if (!glUseProgram) qDebug() << "not glUseProgram";
-	glCreateShader				= (PFNGLCREATESHADEROBJECTARBPROC)pContext->getProcAddress(QLatin1String("glCreateShader"));
-	if (!glCreateShader) qDebug() << "not glCreateShader";
-	glDeleteShader				= (PFNGLDELETESHADERPROC)pContext->getProcAddress(QLatin1String("glDeleteShader"));
-	if (!glDeleteShader) qDebug() << "not glDeleteShader";
-	glShaderSource				= (PFNGLSHADERSOURCEARBPROC)pContext->getProcAddress(QLatin1String("glShaderSource"));
-	if (!glShaderSource) qDebug() << "not glShaderSource";
-	glCompileShader				= (PFNGLCOMPILESHADERARBPROC)pContext->getProcAddress(QLatin1String("glCompileShader"));
-	if (!glCompileShader) qDebug() << "not glCompileShader";
-	glAttachShader				= (PFNGLATTACHOBJECTARBPROC)pContext->getProcAddress(QLatin1String("glAttachShader"));
-	if (!glAttachShader) qDebug() << "not glAttachShader";
-	glDetachShader				= (PFNGLDETACHOBJECTARBPROC)pContext->getProcAddress(QLatin1String("glDetachShader"));
-	if (!glDetachShader) qDebug() << "not glDetachShader";
-	glLinkProgram				= (PFNGLLINKPROGRAMARBPROC)pContext->getProcAddress(QLatin1String("glLinkProgram"));
-	if (!glLinkProgram) qDebug() << "not glLinkProgram";
-	glGetUniformLocation		= (PFNGLGETUNIFORMLOCATIONARBPROC)pContext->getProcAddress(QLatin1String("glGetUniformLocation"));
-	if (!glGetUniformLocation) qDebug() << "not glGetUniformLocation";
-	glUniform4f					= (PFNGLUNIFORM4FARBPROC)pContext->getProcAddress(QLatin1String("glUniform4f"));
-	if (!glUniform4f) qDebug() << "not glUniform4f";
-	glUniform1i					= (PFNGLUNIFORM1IARBPROC)pContext->getProcAddress(QLatin1String("glUniform1i"));
-	if (!glUniform1i) qDebug() << "not glUniform1i";
-	glGetShaderiv				= (PFNGLGETSHADERIVPROC)pContext->getProcAddress(QLatin1String("glGetShaderiv"));
-	if (!glGetShaderiv) qDebug() << "not glGetShaderiv";
-	glGetProgramiv				= (PFNGLGETPROGRAMIVARBPROC)pContext->getProcAddress(QLatin1String("glGetProgramiv"));
-	if (!glGetProgramiv) qDebug() << "not glGetProgramiv";
-	glIsProgram					= (PFNGLISPROGRAMARBPROC)pContext->getProcAddress(QLatin1String("glIsProgram"));
-
-	result= glCreateProgram && glDeleteProgram && glUseProgram && glCreateShader && glDeleteShader &&
-    glShaderSource && glCompileShader && glAttachShader && glDetachShader && glLinkProgram &&
-    glGetUniformLocation && glUniform4f && glUniform1i && glGetShaderiv && glGetProgramiv && glIsProgram;
-
-#endif
-    return result;
+    return QGLShaderProgram::hasOpenGLShaderPrograms();
 }
 
 // Load Point Sprite extension

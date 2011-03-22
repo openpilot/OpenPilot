@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -229,7 +227,7 @@ void GLC_Cylinder::createMeshAndWire()
 		normalsVector[3 * i + 1 + 3 * vertexNumber]= sinNormalArray[i];
 		normalsVector[3 * i + 2 + 3 * vertexNumber]= 0.0f;
 
-		texelVector[2 * i + 2 * vertexNumber]= texelVector[i];
+		texelVector[2 * i + 2 * vertexNumber]= texelVector[2 * i];
 		texelVector[2 * i + 1 + 2 * vertexNumber]= 1.0f;
 
 		// Top Wire
@@ -248,7 +246,7 @@ void GLC_Cylinder::createMeshAndWire()
 			normalsVector[3 * i + 1 + 2 * 3 * vertexNumber]= 0.0f;
 			normalsVector[3 * i + 2 + 2 * 3 * vertexNumber]= -1.0f;
 
-			texelVector[2 * i + 2 * 2 * vertexNumber]= texelVector[i];
+			texelVector[2 * i + 2 * 2 * vertexNumber]= texelVector[2 * i];
 			texelVector[2 * i + 1 + 2 * 2 * vertexNumber]= 0.0f;
 
 			// Top Cap ends
@@ -260,8 +258,8 @@ void GLC_Cylinder::createMeshAndWire()
 			normalsVector[3 * i + 1 + 3 * 3 * vertexNumber]= 0.0f;
 			normalsVector[3 * i + 2 + 3 * 3 * vertexNumber]= 1.0f;
 
-			texelVector[2 * i + 3 * 2 * vertexNumber]= texelVector[i];
-			texelVector[2 * i + 1 + 3 * 2 * vertexNumber]= 0.0f;
+			texelVector[2 * i + 3 * 2 * vertexNumber]= texelVector[2 * i];
+			texelVector[2 * i + 1 + 3 * 2 * vertexNumber]= 1.0f;
 		}
 	}
 
@@ -271,8 +269,8 @@ void GLC_Cylinder::createMeshAndWire()
 	GLC_Mesh::addTexels(texelVector);
 
 	// Add polyline to wire data
-	GLC_Geometry::addPolyline(bottomWireData);
-	GLC_Geometry::addPolyline(topWireData);
+	GLC_Geometry::addVerticeGroup(bottomWireData);
+	GLC_Geometry::addVerticeGroup(topWireData);
 
 	// Set the material to use
 	GLC_Material* pCylinderMaterial;

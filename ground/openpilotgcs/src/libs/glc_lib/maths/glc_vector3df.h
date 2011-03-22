@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -143,17 +141,17 @@ public:
 //////////////////////////////////////////////////////////////////////
 public:
 	//! Return X Compound
-	inline float X(void) const
+	inline float x(void) const
 	{
 		return m_Vector[0];
 	}
 	//! Return Y Compound
-	inline float Y(void) const
+	inline float y(void) const
 	{
 		return m_Vector[1];
 	}
 	//! Return Z Compound
-	inline float Z(void) const
+	inline float z(void) const
 	{
 		return m_Vector[2];
 	}

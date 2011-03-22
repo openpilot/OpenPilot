@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -158,7 +156,7 @@ void GLC_Viewport::updateProjectionMat(void)
 	}
 
 	// Save the projection matrix
-	glGetDoublev(GL_PROJECTION_MATRIX, m_ProjectionMatrix.data());
+	glGetDoublev(GL_PROJECTION_MATRIX, m_ProjectionMatrix.setData());
 
 	glMatrixMode(GL_MODELVIEW);							// select The Modelview Matrix
 	glLoadIdentity();									// Reset The Modelview Matrix
@@ -226,7 +224,7 @@ GLC_Point3d GLC_Viewport::unProject(int x, int y) const
 	// OpenGL ccordinate of selected point
 	GLdouble pX, pY, pZ;
 	gluUnProject((GLdouble) x, (GLdouble) (m_WindowVSize - y) , Depth
-		, m_pViewCam->modelViewMatrix().data(), m_ProjectionMatrix.data(), Viewport, &pX, &pY, &pZ);
+		, m_pViewCam->modelViewMatrix().getData(), m_ProjectionMatrix.getData(), Viewport, &pX, &pY, &pZ);
 
 	return GLC_Point3d(pX, pY, pZ);
 }
@@ -252,8 +250,8 @@ QList<GLC_Point3d> GLC_Viewport::unproject(const QList<int>& list)const
 		const int y= m_WindowVSize - list.at(i + 1);
 		glReadPixels(x, y , 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &Depth);
 
-		gluUnProject(static_cast<GLdouble>(x), static_cast<GLdouble>(y) , Depth , m_pViewCam->modelViewMatrix().data()
-				, m_ProjectionMatrix.data(), Viewport, &pX, &pY, &pZ);
+		gluUnProject(static_cast<GLdouble>(x), static_cast<GLdouble>(y) , Depth , m_pViewCam->modelViewMatrix().getData()
+				, m_ProjectionMatrix.getData(), Viewport, &pX, &pY, &pZ);
 		unprojectedPoints.append(GLC_Point3d(pX, pY, pZ));
 	}
 

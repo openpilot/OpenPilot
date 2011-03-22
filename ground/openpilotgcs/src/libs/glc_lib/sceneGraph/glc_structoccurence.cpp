@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -28,6 +26,7 @@
 #include "glc_3dviewcollection.h"
 #include "glc_structreference.h"
 #include "glc_worldhandle.h"
+#include "../glc_errorlog.h"
 
 // Default constructor
 GLC_StructOccurence::GLC_StructOccurence()
@@ -38,10 +37,10 @@ GLC_StructOccurence::GLC_StructOccurence()
 , m_pParent(NULL)
 , m_Childs()
 , m_AbsoluteMatrix()
-, m_HasRepresentation(m_pStructInstance->structReference()->hasRepresentation())
 , m_OccurenceNumber(0)
 , m_IsVisible(true)
 , m_pRenderProperties(NULL)
+, m_AutomaticCreationOf3DViewInstance(true)
 {
 	// Update instance
 	m_pStructInstance->structOccurenceCreated(this);
@@ -57,10 +56,10 @@ GLC_StructOccurence::GLC_StructOccurence(GLC_StructInstance* pStructInstance, GL
 , m_pParent(NULL)
 , m_Childs()
 , m_AbsoluteMatrix()
-, m_HasRepresentation(pStructInstance->structReference()->hasRepresentation())
 , m_OccurenceNumber(0)
 , m_IsVisible(true)
 , m_pRenderProperties(NULL)
+, m_AutomaticCreationOf3DViewInstance(true)
 {
 	// Update the number of occurences
 	if (pStructInstance->hasStructOccurence())
@@ -95,7 +94,7 @@ GLC_StructOccurence::GLC_StructOccurence(GLC_StructInstance* pStructInstance, GL
 	// Update instance
 	m_pStructInstance->structOccurenceCreated(this);
 }
-// Construct Occurence withe the specified GLC_3DRep
+// Construct Occurence with the specified GLC_3DRep
 GLC_StructOccurence::GLC_StructOccurence(GLC_3DRep* pRep)
 : m_Uid(glc::GLC_GenID())
 , m_pWorldHandle(NULL)
@@ -104,13 +103,12 @@ GLC_StructOccurence::GLC_StructOccurence(GLC_3DRep* pRep)
 , m_pParent(NULL)
 , m_Childs()
 , m_AbsoluteMatrix()
-, m_HasRepresentation()
 , m_OccurenceNumber(0)
 , m_IsVisible(true)
 , m_pRenderProperties(NULL)
+, m_AutomaticCreationOf3DViewInstance(true)
 {
 	m_pStructInstance= new GLC_StructInstance(pRep);
-	m_HasRepresentation= m_pStructInstance->structReference()->hasRepresentation();
 	setName(m_pStructInstance->name());
 
 	// Update instance
@@ -126,10 +124,10 @@ GLC_StructOccurence::GLC_StructOccurence(GLC_WorldHandle* pWorldHandle, const GL
 , m_pParent(NULL)
 , m_Childs()
 , m_AbsoluteMatrix(structOccurence.m_AbsoluteMatrix)
-, m_HasRepresentation(structOccurence.m_HasRepresentation)
 , m_OccurenceNumber(0)
 , m_IsVisible(structOccurence.m_IsVisible)
 , m_pRenderProperties(NULL)
+, m_AutomaticCreationOf3DViewInstance(structOccurence.m_AutomaticCreationOf3DViewInstance)
 {
 	if (shareInstance)
 	{
@@ -147,7 +145,7 @@ GLC_StructOccurence::GLC_StructOccurence(GLC_WorldHandle* pWorldHandle, const GL
 	// Test if structOccurence has representation and has a shader
 	GLuint shaderId= 0;
 	bool instanceIsSelected= false;
-	if ((m_HasRepresentation) && (NULL != m_pWorldHandle) && (NULL != structOccurence.m_pWorldHandle))
+	if ((NULL != m_pWorldHandle) && (NULL != structOccurence.m_pWorldHandle) && structOccurence.m_pWorldHandle->collection()->contains(structOccurence.id()))
 	{
 		GLC_3DViewInstance* p3DViewInstance= structOccurence.m_pWorldHandle->collection()->instanceHandle(structOccurence.id());
 
@@ -224,6 +222,17 @@ GLC_StructOccurence::~GLC_StructOccurence()
 	else
 	{
 		m_pStructInstance->structOccurenceDeleted(this);
+		if (!m_pStructInstance->hasStructOccurence())
+		{
+
+			QStringList errorList;
+			errorList << "StructOccurence count error";
+			errorList << ("ref name = " + m_pStructInstance->structReference()->name());
+			GLC_ErrorLog::addError(errorList);
+
+			delete m_pStructInstance;
+			//delete m_pNumberOfOccurence;
+		}
 	}
 
 	delete m_pRenderProperties;
@@ -233,41 +242,95 @@ GLC_StructOccurence::~GLC_StructOccurence()
 // Get Functions
 //////////////////////////////////////////////////////////////////////
 
-// Get number of faces
+bool GLC_StructOccurence::hasRepresentation() const
+{
+	if ((NULL != m_pStructInstance) && (m_pStructInstance->hasStructOccurence()))
+	{
+		return this->structReference()->hasRepresentation();
+	}
+	else return false;
+}
+
+bool GLC_StructOccurence::has3DViewInstance() const
+{
+	if ( NULL != m_pWorldHandle)
+	{
+		return m_pWorldHandle->collection()->contains(m_Uid);
+	}
+	else return false;
+}
+
+bool GLC_StructOccurence::canBeAddedToChildren(GLC_StructOccurence* pOccurence) const
+{
+	bool canBeAdded= false;
+	if ((NULL != m_pStructInstance) && (m_pStructInstance->hasStructOccurence()) && (NULL != pOccurence->m_pStructInstance) && (NULL != pOccurence->structReference()))
+	{
+		if (this->structReference() != pOccurence->structReference())
+		{
+			QSet<GLC_StructReference*> thisRefSet= GLC_StructOccurence::parentsReferences(this);
+			thisRefSet << this->structReference();
+			QSet<GLC_StructReference*> childRefSet= pOccurence->childrenReferences();
+
+			canBeAdded= thisRefSet == (thisRefSet - childRefSet);
+		}
+	}
+	else
+	{
+		canBeAdded= true;
+	}
+	return canBeAdded;
+}
+
+QList<GLC_StructOccurence*> GLC_StructOccurence::subOccurenceList() const
+{
+	QList<GLC_StructOccurence*> subOccurence;
+	const int childCount= m_Childs.size();
+	for (int i= 0; i < childCount; ++i)
+	{
+		GLC_StructOccurence* pCurrentChild= m_Childs.at(i);
+		if (pCurrentChild->hasChild())
+		{
+			subOccurence.append(pCurrentChild->subOccurenceList());
+		}
+		else
+		{
+			subOccurence.append(pCurrentChild);
+		}
+	}
+
+	return subOccurence;
+}
+
 unsigned int GLC_StructOccurence::numberOfFaces() const
 {
 	unsigned int result= 0;
-	if (m_HasRepresentation)
+	if (hasRepresentation())
 	{
 		result= structInstance()->structReference()->numberOfFaces();
 	}
-	else
+
+	const int size= m_Childs.size();
+	for (int i= 0; i < size; ++i)
 	{
-		const int size= m_Childs.size();
-		for (int i= 0; i < size; ++i)
-		{
-			result+= m_Childs.at(i)->numberOfFaces();
-		}
+		result+= m_Childs.at(i)->numberOfFaces();
 	}
+
 	return result;
 }
 
-// Get number of vertex
 unsigned int GLC_StructOccurence::numberOfVertex() const
 {
 	unsigned int result= 0;
-	if (m_HasRepresentation)
+	if (hasRepresentation())
 	{
 		result= structInstance()->structReference()->numberOfVertex();
 	}
-	else
+	const int size= m_Childs.size();
+	for (int i= 0; i < size; ++i)
 	{
-		const int size= m_Childs.size();
-		for (int i= 0; i < size; ++i)
-		{
-			result+= m_Childs.at(i)->numberOfVertex();
-		}
+		result+= m_Childs.at(i)->numberOfVertex();
 	}
+
 	return result;
 }
 
@@ -276,19 +339,18 @@ unsigned int GLC_StructOccurence::numberOfMaterials() const
 {
 	unsigned int result= 0;
 	QSet<GLC_Material*> materialSet;
-	if (m_HasRepresentation)
+	if (hasRepresentation())
 	{
 		result= structInstance()->structReference()->numberOfMaterials();
 	}
-	else
+
+	const int size= m_Childs.size();
+	for (int i= 0; i < size; ++i)
 	{
-		const int size= m_Childs.size();
-		for (int i= 0; i < size; ++i)
-		{
-			materialSet.unite(m_Childs.at(i)->materialSet());
-		}
-		result= static_cast<unsigned int>(materialSet.size());
+		materialSet.unite(m_Childs.at(i)->materialSet());
 	}
+	result= static_cast<unsigned int>(materialSet.size());
+
 	return result;
 }
 
@@ -296,18 +358,17 @@ unsigned int GLC_StructOccurence::numberOfMaterials() const
 QSet<GLC_Material*> GLC_StructOccurence::materialSet() const
 {
 	QSet<GLC_Material*> materialSet;
-	if (m_HasRepresentation)
+	if (hasRepresentation())
 	{
 		materialSet= structInstance()->structReference()->materialSet();
 	}
-	else
+
+	const int size= m_Childs.size();
+	for (int i= 0; i < size; ++i)
 	{
-		const int size= m_Childs.size();
-		for (int i= 0; i < size; ++i)
-		{
-			materialSet.unite(m_Childs.at(i)->materialSet());
-		}
+		materialSet.unite(m_Childs.at(i)->materialSet());
 	}
+
 	return materialSet;
 }
 
@@ -321,9 +382,10 @@ GLC_StructOccurence* GLC_StructOccurence::clone(GLC_WorldHandle* pWorldHandle, b
 bool GLC_StructOccurence::isVisible() const
 {
 	bool isHidden= true;
-	if (m_HasRepresentation)
+
+	if ((NULL != m_pWorldHandle) && m_pWorldHandle->collection()->contains(m_Uid))
 	{
-		isHidden= !m_pWorldHandle->collection()->instanceHandle(id())->isVisible();
+		isHidden= !m_pWorldHandle->collection()->instanceHandle(m_Uid)->isVisible();
 	}
 	else if (childCount() > 0)
 	{
@@ -347,9 +409,9 @@ GLC_BoundingBox GLC_StructOccurence::boundingBox() const
 {
 	GLC_BoundingBox boundingBox;
 
-	if (!isOrphan() && (NULL != m_pWorldHandle))
+	if (NULL != m_pWorldHandle)
 	{
-		if (m_HasRepresentation)
+		if (has3DViewInstance())
 		{
 			Q_ASSERT(m_pWorldHandle->collection()->contains(id()));
 			boundingBox= m_pWorldHandle->collection()->instanceHandle(id())->boundingBox();
@@ -368,6 +430,7 @@ GLC_BoundingBox GLC_StructOccurence::boundingBox() const
 			}
 		}
 	}
+
 	return boundingBox;
 }
 
@@ -380,6 +443,38 @@ unsigned int GLC_StructOccurence::nodeCount() const
 		result+= m_Childs.at(i)->nodeCount();
 	}
 	return result;
+}
+
+QSet<GLC_StructReference*> GLC_StructOccurence::childrenReferences() const
+{
+	QSet<GLC_StructReference*> refChildrenSet;
+	const int childCount= m_Childs.size();
+	for (int i= 0; i < childCount; ++i)
+	{
+		GLC_StructOccurence* pCurrentChild= m_Childs.at(i);
+		if ((NULL != pCurrentChild->structInstance()) && (NULL != pCurrentChild->structReference()))
+		{
+			refChildrenSet << pCurrentChild->structReference();
+		}
+	}
+
+	return refChildrenSet;
+}
+
+QSet<GLC_StructReference*> GLC_StructOccurence::parentsReferences(const GLC_StructOccurence* pOccurence)
+{
+	QSet<GLC_StructReference*> parentSet;
+	GLC_StructOccurence* pParent= pOccurence->parent();
+	if (NULL != pParent)
+	{
+		if ((NULL != pParent->structInstance()) && (NULL != pParent->structReference()))
+		{
+			parentSet << pParent->structReference();
+			parentSet.unite(GLC_StructOccurence::parentsReferences(pParent));
+		}
+	}
+
+	return parentSet;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -398,9 +493,10 @@ GLC_StructOccurence* GLC_StructOccurence::updateAbsoluteMatrix()
 		m_AbsoluteMatrix= m_pStructInstance->relativeMatrix();
 	}
 	// If the occurence have a representation, update it.
-	if ((NULL != m_pWorldHandle) && m_HasRepresentation)
+
+	if ((NULL != m_pWorldHandle) && m_pWorldHandle->collection()->contains(m_Uid))
 	{
-		m_pWorldHandle->collection()->instanceHandle(id())->setMatrix(m_AbsoluteMatrix);
+		m_pWorldHandle->collection()->instanceHandle(m_Uid)->setMatrix(m_AbsoluteMatrix);
 	}
 	return this;
 }
@@ -470,11 +566,10 @@ bool GLC_StructOccurence::removeChild(GLC_StructOccurence* pChild)
 // Detach the occurence from the GLC_World
 void GLC_StructOccurence::detach()
 {
-	//qDebug() << "GLC_StructOccurence::detach() " << id();
 	if (NULL != m_pWorldHandle)
 	{
 		// retrieve renderProperties if needed
-		if (m_HasRepresentation)
+		if (m_pWorldHandle->collection()->contains(m_Uid))
 		{
 			GLC_3DViewInstance* pInstance= m_pWorldHandle->collection()->instanceHandle(m_Uid);
 			if (!pInstance->renderPropertiesHandle()->isDefault())
@@ -499,32 +594,39 @@ void GLC_StructOccurence::detach()
 // Reverse Normals of this Occurence and childs
 void GLC_StructOccurence::reverseNormals()
 {
-	if (m_HasRepresentation)
+	if (has3DViewInstance())
 	{
 		m_pWorldHandle->collection()->instanceHandle(id())->reverseGeometriesNormals();
 	}
 }
 
 // Check the presence of representation
-void GLC_StructOccurence::checkForRepresentation()
+bool GLC_StructOccurence::create3DViewInstance()
 {
-	if (NULL != m_pStructInstance)
+	bool creationSuccess= false;
+	if ((NULL != m_pWorldHandle) && hasRepresentation())
 	{
-		GLC_StructReference* pRef= m_pStructInstance->structReference();
-		if (NULL != pRef)
+		GLC_3DRep* p3DRep= dynamic_cast<GLC_3DRep*>(structReference()->representationHandle());
+		if (NULL != p3DRep)
 		{
-			if (pRef->hasRepresentation())
-			{
-				GLC_3DRep* p3DRep= dynamic_cast<GLC_3DRep*>(pRef->representationHandle());
-				GLC_3DViewInstance instance(*p3DRep);
-				instance.setName(name());
-				// Force instance representation id
-				instance.setId(id());
-				m_pWorldHandle->collection()->add(instance);
-			}
-			m_HasRepresentation= true;
+			GLC_3DViewInstance instance(*p3DRep);
+			instance.setName(name());
+			// Force instance representation id
+			instance.setId(id());
+			creationSuccess= m_pWorldHandle->collection()->add(instance);
+			m_pWorldHandle->collection()->setVisibility(m_Uid, m_IsVisible);
 		}
 	}
+	return creationSuccess;
+}
+
+bool GLC_StructOccurence::remove3DViewInstance()
+{
+	if (NULL != m_pWorldHandle)
+	{
+		return m_pWorldHandle->collection()->remove(m_Uid);
+	}
+	else return false;
 }
 
 // Set the occurence world Handle
@@ -556,28 +658,57 @@ void GLC_StructOccurence::setWorldHandle(GLC_WorldHandle* pWorldHandle)
 // Load the representation and return true if success
 bool GLC_StructOccurence::loadRepresentation()
 {
-	bool loadSucces= false;
-	if (m_HasRepresentation)
-	{
-		loadSucces=  m_pStructInstance->structReference()->representationHandle()->load();
-		if (NULL != m_pWorldHandle)
-		{
-			m_pWorldHandle->addOccurence(this);
-			m_pWorldHandle->collection()->setVisibility(m_Uid, m_IsVisible);
-		}
+	Q_ASSERT(!this->has3DViewInstance());
 
+	bool loadSuccess= false;
+	if (hasRepresentation())
+	{
+		GLC_StructReference* pReference= this->structReference();
+		if (pReference->representationIsLoaded())
+		{
+			loadSuccess= create3DViewInstance();
+		}
+		else
+		{
+			loadSuccess=  m_pStructInstance->structReference()->loadRepresentation();
+			if (loadSuccess && !m_AutomaticCreationOf3DViewInstance)
+			{
+				loadSuccess= create3DViewInstance();
+			}
+		}
 	}
-	return loadSucces;
+
+	return loadSuccess;
 }
 
 // UnLoad the representation and return true if success
 bool GLC_StructOccurence::unloadRepresentation()
 {
-	if (m_HasRepresentation)
+	bool unloadResult= false;
+	if (hasRepresentation())
 	{
-		return m_pStructInstance->structReference()->representationHandle()->unload();
+		GLC_StructReference* pRef= this->structReference();
+		if (pRef->representationIsLoaded())
+		{
+			if (this->has3DViewInstance())
+			{
+				unloadResult= m_pWorldHandle->collection()->remove(m_Uid);
+				QSet<GLC_StructOccurence*> occurenceSet= pRef->setOfStructOccurence();
+				QSet<GLC_StructOccurence*>::const_iterator iOcc= occurenceSet.constBegin();
+				bool unloadReferenceRep= true;
+				while (occurenceSet.constEnd() != iOcc)
+				{
+					unloadReferenceRep= unloadReferenceRep && !(*iOcc)->has3DViewInstance();
+					++iOcc;
+				}
+				if (unloadReferenceRep)
+				{
+					pRef->unloadRepresentation();
+				}
+			}
+		}
 	}
-	else return false;
+	return unloadResult;
 }
 
 unsigned int GLC_StructOccurence::updateOccurenceNumber(unsigned int n)
@@ -594,7 +725,7 @@ unsigned int GLC_StructOccurence::updateOccurenceNumber(unsigned int n)
 void GLC_StructOccurence::setVisibility(bool visibility)
 {
 	m_IsVisible= visibility;
-	if (m_HasRepresentation && (NULL != m_pWorldHandle))
+	if (has3DViewInstance())
 	{
 		m_pWorldHandle->collection()->setVisibility(m_Uid, m_IsVisible);
 	}
@@ -608,7 +739,7 @@ void GLC_StructOccurence::setVisibility(bool visibility)
 void GLC_StructOccurence::setRenderProperties(const GLC_RenderProperties& renderProperties)
 {
 	delete m_pRenderProperties;
-	if (m_HasRepresentation && (NULL != m_pWorldHandle))
+	if (has3DViewInstance())
 	{
 		m_pWorldHandle->collection()->instanceHandle(m_Uid)->setRenderProperties(renderProperties);
 	}
@@ -642,4 +773,44 @@ void GLC_StructOccurence::removeEmptyChildren()
 			++iChild;
 		}
 	}
+}
+
+void GLC_StructOccurence::setReference(GLC_StructReference* pRef)
+{
+	Q_ASSERT(m_pStructInstance->structReference() == NULL);
+	Q_ASSERT((*m_pNumberOfOccurence) == 1);
+
+	if (pRef->hasStructInstance())
+	{
+		GLC_StructInstance* pExistingInstance= pRef->firstInstanceHandle();
+		if (pExistingInstance->hasStructOccurence())
+		{
+			GLC_StructOccurence* pFirstOccurence= pExistingInstance->firstOccurenceHandle();
+			QList<GLC_StructOccurence*> childs= pFirstOccurence->m_Childs;
+			const int size= childs.size();
+			for (int i= 0; i < size; ++i)
+			{
+				GLC_StructOccurence* pChild= childs.at(i)->clone(m_pWorldHandle, true);
+				addChild(pChild);
+			}
+
+			QList<GLC_StructInstance*> instances= pRef->listOfStructInstances();
+			const int instanceCount= instances.size();
+			int i= 0;
+			bool continu= true;
+			while (continu && (i < instanceCount))
+			{
+				if (m_pStructInstance == instances.at(i))
+				{
+					continu= false;
+					delete m_pNumberOfOccurence;
+					m_pNumberOfOccurence= instances.at(i)->firstOccurenceHandle()->m_pNumberOfOccurence;
+					++(*m_pNumberOfOccurence);
+				}
+				++i;
+			}
+		}
+	}
+
+	m_pStructInstance->setReference(pRef);
 }

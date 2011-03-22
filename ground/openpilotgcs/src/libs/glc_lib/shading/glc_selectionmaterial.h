@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -33,6 +31,8 @@
 
 #include "../glc_config.h"
 
+class GLC_Material;
+
 //////////////////////////////////////////////////////////////////////
 //! \class GLC_SelectionMaterial
 /*! \brief GLC_SelectionMaterial : Material used for selection feedback*/
@@ -44,6 +44,21 @@ class GLC_LIB_EXPORT GLC_SelectionMaterial
 private:
 	GLC_SelectionMaterial();
 
+
+//////////////////////////////////////////////////////////////////////
+/*! \name Set Functions*/
+//@{
+//////////////////////////////////////////////////////////////////////
+public:
+	//! Use the given material as selection material
+	static void useMaterial(GLC_Material* pMaterial);
+
+	//! Use the default selection color
+	/*! if a selection material is used, unused it*/
+	static void useDefautSelectionColor();
+
+//@}
+
 //////////////////////////////////////////////////////////////////////
 /*! \name OpenGL Functions*/
 //@{
@@ -52,16 +67,15 @@ public:
 	//! Execute OpenGL Material
 	static void glExecute();
 	//! Init shader
-	inline static void initShader() {m_SelectionShader.createAndCompileProgrammShader();}
+	static void initShader();
 	//! delete shader
 	static void deleteShader();
 	//! Set shader
-	inline static void setShaders(QFile& vertex, QFile& fragment)
-	{m_SelectionShader.setVertexAndFragmentShader(vertex, fragment);}
+	static void setShaders(QFile& vertex, QFile& fragment);
 	//! Use shader
-	inline static void useShader() {m_SelectionShader.use();}
+	inline static void useShader() {m_pSelectionShader->use();}
 	//! Unused shader
-	inline static void unUseShader() {m_SelectionShader.unuse();}
+	inline static void unUseShader() {m_pSelectionShader->unuse();}
 
 //@}
 
@@ -71,7 +85,13 @@ public:
 
 private:
 		//! Selection Shader
-		static GLC_Shader m_SelectionShader;
+		static GLC_Shader* m_pSelectionShader;
+
+		//! Selection material id
+		static GLC_uint m_SelectionMaterialId;
+
+		//! Material of this selection material
+		static GLC_Material* m_pMaterial;
 
 };
 

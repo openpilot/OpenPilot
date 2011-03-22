@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -71,7 +69,6 @@ GLC_World* GLC_StlToWorld::CreateWorldFromStl(QFile &file)
 	if (!file.open(QIODevice::ReadOnly))
 	{
 		QString message(QString("GLC_StlToWorld::CreateWorldFromStl File ") + m_FileName + QString(" doesn't exist"));
-		qDebug() << message;
 		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::FileNotFound);
 		throw(fileFormatException);
 	}
@@ -221,7 +218,6 @@ void GLC_StlToWorld::scanFacet()
 		message.append(QString::number(m_CurrentLineNumber));
 		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
 		clear();
-		qDebug() << message;
 		throw(fileFormatException);
 	}
 	lineBuff.remove(0,12); // Remove first 12 chars
@@ -229,9 +225,9 @@ void GLC_StlToWorld::scanFacet()
 	GLC_Vector3df cur3dVect= extract3dVect(lineBuff);
 	for (int i= 0; i < 3; ++i)
 	{
-		m_NormalBulk.append(cur3dVect.X());
-		m_NormalBulk.append(cur3dVect.Y());
-		m_NormalBulk.append(cur3dVect.Z());
+		m_NormalBulk.append(cur3dVect.x());
+		m_NormalBulk.append(cur3dVect.y());
+		m_NormalBulk.append(cur3dVect.z());
 	}
 
 ////////////////////////////////////////////// Outer Loop////////////////////////////////
@@ -246,7 +242,6 @@ void GLC_StlToWorld::scanFacet()
 		message.append(QString::number(m_CurrentLineNumber));
 		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
 		clear();
-		qDebug() << message;
 		throw(fileFormatException);
 	}
 
@@ -271,9 +266,9 @@ void GLC_StlToWorld::scanFacet()
 		lineBuff= lineBuff.trimmed();
 
 		cur3dVect= extract3dVect(lineBuff);
-		m_VertexBulk.append(cur3dVect.X());
-		m_VertexBulk.append(cur3dVect.Y());
-		m_VertexBulk.append(cur3dVect.Z());
+		m_VertexBulk.append(cur3dVect.x());
+		m_VertexBulk.append(cur3dVect.y());
+		m_VertexBulk.append(cur3dVect.z());
 
 		m_CurrentFace.append(m_CurrentIndex);
 		++m_CurrentIndex;
@@ -291,7 +286,6 @@ void GLC_StlToWorld::scanFacet()
 		message.append(QString::number(m_CurrentLineNumber));
 		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
 		clear();
-		qDebug() << message;
 		throw(fileFormatException);
 	}
 
@@ -307,7 +301,6 @@ void GLC_StlToWorld::scanFacet()
 		message.append(QString::number(m_CurrentLineNumber));
 		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
 		clear();
-		qDebug() << message;
 		throw(fileFormatException);
 	}
 
@@ -338,7 +331,6 @@ GLC_Vector3df GLC_StlToWorld::extract3dVect(QString &line)
 			message.append(QString::number(m_CurrentLineNumber));
 			GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
 			clear();
-			qDebug() << message;
 			throw(fileFormatException);
 		}
 		else
@@ -370,7 +362,6 @@ void GLC_StlToWorld::LoadBinariStl(QFile &file)
 		QString message= "GLC_StlToWorld::LoadBinariStl : Failed to skip Header of binary STL";
 		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
 		clear();
-		qDebug() << message;
 		throw(fileFormatException);
 	}
 	// Read the number of facet
@@ -382,7 +373,6 @@ void GLC_StlToWorld::LoadBinariStl(QFile &file)
 		QString message= "GLC_StlToWorld::LoadBinariStl : Failed to read the number of facets of binary STL";
 		GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
 		clear();
-		qDebug() << message;
 		throw(fileFormatException);
 	}
 	for (quint32 i= 0; i < numberOfFacet; ++i)
@@ -396,7 +386,6 @@ void GLC_StlToWorld::LoadBinariStl(QFile &file)
 			QString message= "GLC_StlToWorld::LoadBinariStl : Failed to read the Normal of binary STL";
 			GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
 			clear();
-			qDebug() << message;
 			throw(fileFormatException);
 		}
 
@@ -411,7 +400,6 @@ void GLC_StlToWorld::LoadBinariStl(QFile &file)
 				QString message= "GLC_StlToWorld::LoadBinariStl : Failed to read the Vertex of binary STL";
 				GLC_FileFormatException fileFormatException(message, m_FileName, GLC_FileFormatException::WrongFileFormat);
 				clear();
-				qDebug() << message;
 				throw(fileFormatException);
 			}
 			m_VertexBulk.append(x);

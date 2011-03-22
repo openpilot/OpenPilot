@@ -2,8 +2,6 @@
 
  This file is part of the GLC-lib library.
  Copyright (C) 2005-2008 Laurent Ribon (laumaya@users.sourceforge.net)
- Version 2.0.0, packaged on July 2010.
-
  http://glc-lib.sourceforge.net
 
  GLC-lib is free software; you can redistribute it and/or modify
@@ -38,10 +36,10 @@ GLC_WireData::GLC_WireData()
 , m_Positions()
 , m_PositionSize(0)
 , m_pBoundingBox(NULL)
-, m_PolylinesSizes()
-, m_PolylinesOffset()
-, m_PolylinesId()
-, m_PolylinesCount(0)
+, m_VerticeGrouprSizes()
+, m_VerticeGroupOffset()
+, m_VerticeGroupId()
+, m_VerticeGroupCount(0)
 {
 
 }
@@ -53,10 +51,10 @@ GLC_WireData::GLC_WireData(const GLC_WireData& data)
 , m_Positions(data.positionVector())
 , m_PositionSize(data.m_PositionSize)
 , m_pBoundingBox(NULL)
-, m_PolylinesSizes(data.m_PolylinesSizes)
-, m_PolylinesOffset(data.m_PolylinesOffset)
-, m_PolylinesId(data.m_PolylinesId)
-, m_PolylinesCount(data.m_PolylinesCount)
+, m_VerticeGrouprSizes(data.m_VerticeGrouprSizes)
+, m_VerticeGroupOffset(data.m_VerticeGroupOffset)
+, m_VerticeGroupId(data.m_VerticeGroupId)
+, m_VerticeGroupCount(data.m_VerticeGroupCount)
 {
 	if (NULL != data.m_pBoundingBox)
 	{
@@ -77,10 +75,10 @@ GLC_WireData& GLC_WireData::operator=(const GLC_WireData& data)
 		{
 			m_pBoundingBox= new GLC_BoundingBox(*(data.m_pBoundingBox));
 		}
-		m_PolylinesSizes= data.m_PolylinesSizes;
-		m_PolylinesOffset= data.m_PolylinesOffset;
-		m_PolylinesId= data.m_PolylinesId;
-		m_PolylinesCount= data.m_PolylinesCount;
+		m_VerticeGrouprSizes= data.m_VerticeGrouprSizes;
+		m_VerticeGroupOffset= data.m_VerticeGroupOffset;
+		m_VerticeGroupId= data.m_VerticeGroupId;
+		m_VerticeGroupCount= data.m_VerticeGroupCount;
 	}
 	return *this;
 }
@@ -159,24 +157,24 @@ GLC_BoundingBox& GLC_WireData::boundingBox()
 //////////////////////////////////////////////////////////////////////
 
 
-GLC_uint GLC_WireData::addPolyline(const GLfloatVector& floatVector)
+GLC_uint GLC_WireData::addVerticeGroup(const GLfloatVector& floatVector)
 {
 	Q_ASSERT((floatVector.size() % 3) == 0);
 
-	++m_PolylinesCount;
+	++m_VerticeGroupCount;
 	m_Positions+= floatVector;
 
-	m_PolylinesSizes.append(static_cast<GLsizei>(floatVector.size() / 3));
+	m_VerticeGrouprSizes.append(static_cast<GLsizei>(floatVector.size() / 3));
 
-	if (m_PolylinesOffset.isEmpty())
+	if (m_VerticeGroupOffset.isEmpty())
 	{
-		m_PolylinesOffset.append(0);
+		m_VerticeGroupOffset.append(0);
 	}
-	int offset= m_PolylinesOffset.last() + m_PolylinesSizes.last();
-	m_PolylinesOffset.append(offset);
+	int offset= m_VerticeGroupOffset.last() + m_VerticeGrouprSizes.last();
+	m_VerticeGroupOffset.append(offset);
 
 	// The Polyline id
-	m_PolylinesId.append(m_NextPrimitiveLocalId);
+	m_VerticeGroupId.append(m_NextPrimitiveLocalId);
 	return m_NextPrimitiveLocalId++;
 }
 
@@ -188,10 +186,10 @@ void GLC_WireData::clear()
 	delete m_pBoundingBox;
 	m_pBoundingBox= NULL;
 
-	m_PolylinesSizes.clear();
-	m_PolylinesOffset.clear();
-	m_PolylinesId.clear();
-	m_PolylinesCount= 0;
+	m_VerticeGrouprSizes.clear();
+	m_VerticeGroupOffset.clear();
+	m_VerticeGroupId.clear();
+	m_VerticeGroupCount= 0;
 }
 
 void GLC_WireData::copyVboToClientSide()
@@ -238,7 +236,7 @@ void GLC_WireData::useVBO(bool use)
 	}
 }
 
-void GLC_WireData::glDraw(const GLC_RenderProperties&)
+void GLC_WireData::glDraw(const GLC_RenderProperties&, GLenum mode)
 {
 	Q_ASSERT(!isEmpty());
 	const bool vboIsUsed= GLC_State::vboUsed();
@@ -265,9 +263,9 @@ void GLC_WireData::glDraw(const GLC_RenderProperties&)
 	glEnableClientState(GL_VERTEX_ARRAY);
 
 	// Render polylines
-	for (int i= 0; i < m_PolylinesCount; ++i)
+	for (int i= 0; i < m_VerticeGroupCount; ++i)
 	{
-		glDrawArrays(GL_LINE_STRIP, m_PolylinesOffset.at(i), m_PolylinesSizes.at(i));
+		glDrawArrays(mode, m_VerticeGroupOffset.at(i), m_VerticeGrouprSizes.at(i));
 	}
 
 	// Desactivate VBO or Vertex Array
@@ -304,10 +302,10 @@ QDataStream &operator<<(QDataStream &stream, const GLC_WireData &wireData)
 	stream << wireData.positionVector();
 	stream << wireData.m_PositionSize;
 
-	stream << wireData.m_PolylinesSizes;
-	stream << wireData.m_PolylinesOffset;
-	stream << wireData.m_PolylinesId;
-	stream << wireData.m_PolylinesCount;
+	stream << wireData.m_VerticeGrouprSizes;
+	stream << wireData.m_VerticeGroupOffset;
+	stream << wireData.m_VerticeGroupId;
+	stream << wireData.m_VerticeGroupCount;
 
 	return stream;
 }
@@ -323,10 +321,10 @@ QDataStream &operator>>(QDataStream &stream, GLC_WireData &wireData)
 	stream >> wireData.m_Positions;
 	stream >> wireData.m_PositionSize;
 
-	stream >> wireData.m_PolylinesSizes;
-	stream >> wireData.m_PolylinesOffset;
-	stream >> wireData.m_PolylinesId;
-	stream >> wireData.m_PolylinesCount;
+	stream >> wireData.m_VerticeGrouprSizes;
+	stream >> wireData.m_VerticeGroupOffset;
+	stream >> wireData.m_VerticeGroupId;
+	stream >> wireData.m_VerticeGroupCount;
 
 	return stream;
 }

@@ -285,7 +285,12 @@ namespace jafar {
 			rot(0,0)=xr(0); rot(1,0)=xr(1), rot(2,0)=xr(2);
 			rot(0,1)=yr(0); rot(1,1)=yr(1), rot(2,1)=yr(2);
 			rot(0,2)=zr(0); rot(1,2)=zr(1), rot(2,2)=zr(2);
+			double initial_yaw = q2e(q)(2);
 			q = q2qc(R2q(rot));
+			vec3 e = q2e(q);
+			e(2) = initial_yaw;
+			q = e2q(e);
+			
 			
 			g(0)=0; g(1)=0; g(2) = -th_g; // update g
 			#endif

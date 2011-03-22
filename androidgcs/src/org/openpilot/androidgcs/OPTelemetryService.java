@@ -68,10 +68,10 @@ public class OPTelemetryService extends Service {
 		public void handleMessage(Message msg) {
 			switch(msg.arg1) {
 			case MSG_START:
-				Toast.makeText(OPTelemetryService.this, "HERE", Toast.LENGTH_SHORT);
-				System.out.println("HERE");
 				stopSelf(msg.arg2);
-			case MSG_CONNECT:				
+				break;
+			case MSG_CONNECT:	
+				Toast.makeText(getApplicationContext(), "Attempting connection", Toast.LENGTH_SHORT).show();
 				terminate = false;
 				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
 				int connection_type = Integer.decode(prefs.getString("connection_type", ""));
@@ -90,6 +90,7 @@ public class OPTelemetryService extends Service {
 				activeTelem.start();
 				break;
 			case MSG_DISCONNECT:
+				Toast.makeText(getApplicationContext(), "Disconnct", Toast.LENGTH_SHORT).show();
 				terminate = true;
 				try {
 					activeTelem.join();
@@ -101,6 +102,8 @@ public class OPTelemetryService extends Service {
 				Intent intent = new Intent();
 				intent.setAction(INTENT_ACTION_DISCONNECTED);
 				sendBroadcast(intent,null);
+				
+				stopSelf();
 
 				break;
 			case MSG_TOAST:
@@ -113,9 +116,9 @@ public class OPTelemetryService extends Service {
 		}
 	};
 
-	@Override
-	public void onCreate() {
-		// Low priority thread for message handling with service
+	public void startup() {
+		Toast.makeText(getApplicationContext(), "Telemetry service starting", Toast.LENGTH_SHORT).show();
+		
 		HandlerThread thread = new HandlerThread("TelemetryServiceHandler",
 				Process.THREAD_PRIORITY_BACKGROUND);
 		thread.start();
@@ -123,20 +126,27 @@ public class OPTelemetryService extends Service {
 		// Get the HandlerThread's Looper and use it for our Handler 
 		mServiceLooper = thread.getLooper();
 		mServiceHandler = new ServiceHandler(mServiceLooper);
+	
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
+		if(prefs.getBoolean("autoconnect", false)) {
+			Toast.makeText(getApplicationContext(), "Should auto connect", Toast.LENGTH_SHORT);
+			Message msg = mServiceHandler.obtainMessage();
+			msg.arg1 = MSG_CONNECT;
+			msg.arg2 = 0;
+			mServiceHandler.sendMessage(msg);
+		}				
+
+	}
+	
+	@Override
+	public void onCreate() {
+		startup();
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Toast.makeText(this, "Telemetry service starting", Toast.LENGTH_SHORT).show();
-
-		System.out.println("Start");
-		// For each start request, send a message to start a job and deliver the
-		// start ID so we know which request we're stopping when we finish the job
-		Message msg = mServiceHandler.obtainMessage();
-		msg.arg1 = MSG_START;
-		msg.arg2 = startId;
-		mServiceHandler.sendMessage(msg);
-
+		// Currently only using as bound service
+		
 		// If we get killed, after returning from here, restart
 		return START_STICKY;
 	}
@@ -156,6 +166,7 @@ public class OPTelemetryService extends Service {
 			return (TelemTask) activeTelem;
 		}
 		public void openConnection() {
+			Toast.makeText(getApplicationContext(), "Requested open connection", Toast.LENGTH_SHORT);
 			Message msg = mServiceHandler.obtainMessage();
 			msg.arg1 = MSG_CONNECT;
 			mServiceHandler.sendMessage(msg);

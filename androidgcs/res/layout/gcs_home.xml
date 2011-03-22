@@ -3,5 +3,12 @@
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
-    <Button android:layout_alignParentTop="true" android:layout_height="wrap_content" android:text="@string/object_browser_name" android:layout_width="wrap_content" android:id="@+id/launch_object_browser"></Button>
+    <Button 
+    	android:layout_alignParentTop="true" 
+    	android:layout_height="wrap_content" 
+    	android:text="@string/object_browser_name" 
+    	android:layout_width="wrap_content" 
+    	android:id="@+id/launch_object_browser" 
+    	android:drawableLeft="@drawable/browser_icon" android:layout_centerHorizontal="true"/>
+    <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/pfd_name" android:id="@+id/launch_pfd" android:drawableLeft="@drawable/browser_icon" android:layout_below="@+id/launch_object_browser" android:layout_alignLeft="@+id/launch_object_browser" android:layout_alignRight="@+id/launch_object_browser"></Button>
 </RelativeLayout>

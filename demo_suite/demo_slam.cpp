@@ -187,7 +187,7 @@ enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iL
 int intOpts[nIntOpts] = {0};
 const int nFirstIntOpt = 0, nLastIntOpt = nIntOpts-1;
 
-enum { fFreq = 0, fShutter, nFloatOpts };
+enum { fFreq = 0, fShutter, fHeading, nFloatOpts };
 double floatOpts[nFloatOpts] = {0.0};
 const int nFirstFloatOpt = nIntOpts, nLastFloatOpt = nIntOpts+nFloatOpts-1;
 
@@ -218,6 +218,7 @@ struct option long_options[] = {
 	// double options
 	{"freq", 2, 0, 0}, // should be in config file
 	{"shutter", 2, 0, 0}, // should be in config file
+	{"heading", 2, 0, 0},
 	// string options
 	{"data-path", 1, 0, 0},
 	{"config-setup", 1, 0, 0},
@@ -281,8 +282,11 @@ class ConfigSetup: public kernel::KeyValueFileSaveLoad
 	double PERT_RANWALKACC;  /// IMU a_bias random walk (m/s2 per sqrt(s))
 	double PERT_RANWALKGYRO; /// IMU w_bias random walk (rad/s per sqrt(s))
 
+	double UNCERT_HEADING;   /// initial heading uncertainty
+	
 	double IMU_TIMESTAMP_CORRECTION; /// correction to add to the IMU timestamp for synchronization (s)
-
+	double GPS_TIMESTAMP_CORRECTION; /// correction to add to the GPS timestamp for synchronization (s)
+	
 	/// SIMU INERTIAL
 	double SIMU_IMU_TIMESTAMP_CORRECTION;
 	double SIMU_IMU_FREQ;
@@ -599,6 +603,7 @@ void demo_slam01_main(world_ptr_t *world)
 
 	robPtr1->linkToParentMap(mapPtr);
 	robPtr1->pose.x(quaternion::originFrame());
+	robPtr1->setPoseStd(0,0,0, 0,0,floatOpts[fHeading], 0,0,0, 0,0,configSetup.UNCERT_HEADING);
 	if (dataLogger) dataLogger->addLoggable(*robPtr1.get());
 
 	if (intOpts[iSimu] != 0)
@@ -802,7 +807,7 @@ void demo_slam01_main(world_ptr_t *world)
 			senPtr13->linkToParentRobot(robPtr1);
 			hardware::hardware_sensorprop_ptr_t hardGps(
 				new hardware::HardwareSensorGpsGenom(rawdata_condition, 200, "mana-base", mode, strOpts[sDataPath]));
-			hardGps->setSyncConfig(0.0/*configSetup.GPS_TIMESTAMP_CORRECTION*/);
+			hardGps->setSyncConfig(configSetup.GPS_TIMESTAMP_CORRECTION);
 			hardGps->setTimingInfos(1.0/20.0, 1.5/20.0);
 			senPtr13->setHardwareSensor(hardGps);
 			senPtr13->setIntegrationPolicy(true);
@@ -1411,7 +1416,10 @@ void ConfigSetup::loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFi
 	KeyValueFile_getItem(PERT_RANWALKACC);
 	KeyValueFile_getItem(PERT_RANWALKGYRO);
 	
+	KeyValueFile_getItem(UNCERT_HEADING);
+	
 	KeyValueFile_getItem(IMU_TIMESTAMP_CORRECTION);
+	KeyValueFile_getItem(GPS_TIMESTAMP_CORRECTION);
 	
 	KeyValueFile_getItem(SIMU_IMU_TIMESTAMP_CORRECTION);
 	KeyValueFile_getItem(SIMU_IMU_FREQ);
@@ -1465,7 +1473,10 @@ void ConfigSetup::saveKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile)
 	KeyValueFile_setItem(PERT_RANWALKACC);
 	KeyValueFile_setItem(PERT_RANWALKGYRO);
 	
+	KeyValueFile_setItem(UNCERT_HEADING);
+	
 	KeyValueFile_setItem(IMU_TIMESTAMP_CORRECTION);
+	KeyValueFile_setItem(GPS_TIMESTAMP_CORRECTION);
 	
 	KeyValueFile_setItem(SIMU_IMU_TIMESTAMP_CORRECTION);
 	KeyValueFile_setItem(SIMU_IMU_FREQ);

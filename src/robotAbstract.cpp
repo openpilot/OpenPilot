@@ -9,6 +9,9 @@
 #include "rtslam/sensorAbstract.hpp"
 #include "rtslam/mapAbstract.hpp"
 
+#include "rtslam/quatTools.hpp"
+#include "jmath/angle.hpp"
+
 #include <boost/shared_ptr.hpp>
 
 namespace jafar {
@@ -71,7 +74,45 @@ namespace jafar {
 			self_time = -1.;
 		}
 
+		void RobotAbstract::setPoseDegStd(double x, double y, double z, double rollDeg,
+		    double pitchDeg, double yawDeg, double xStd, double yStd, double zStd,
+		    double rollDegStd, double pitchDegStd, double yawDegStd)
+		{
+			setPoseStd(x,y,z, jmath::degToRad(rollDeg), jmath::degToRad(pitchDeg), jmath::degToRad(yawDeg),
+			           xStd, yStd, zStd, jmath::degToRad(rollDegStd), jmath::degToRad(pitchDegStd), jmath::degToRad(yawDegStd));
+		}
 
+		void RobotAbstract::setPoseStd(double x, double y, double z, double roll,
+		    double pitch, double yaw, double xStd, double yStd, double zStd,
+		    double rollStd, double pitchStd, double yawStd)
+		{
+
+			const double pos_[3] = { x, y, z };
+			const double euler_[3] = { roll, pitch, yaw };
+
+			// convert euler pose to quat pose
+			ublas::subrange(pose.x(), 0, 3) = createVector<3> (pos_);
+
+			vec3 euler = createVector<3> (euler_);
+			ublas::subrange(pose.x(), 3, 7) = quaternion::e2q(euler);
+
+			// convert euler uncertainty to quaternion uncertainty
+			const double posStd_[3] = { xStd, yStd, zStd };
+			const double eulerStd_[3] = { rollStd, pitchStd, yawStd };
+
+			vec3 eulerStd = createVector<3> (eulerStd_);
+			Gaussian E(3);	E.std(eulerStd);
+			vec4 q;
+			mat Q_e(4, 3);
+
+			quaternion::e2q(euler, q, Q_e);
+
+			// write pose
+			subrange(pose.P(), 0,3, 0,3) = createSymMat<3>(posStd_);
+			subrange(pose.P(), 3,7, 3,7) = prod(Q_e, prod<mat>(E.P(), trans(Q_e)));
+		}
+		
+		
 		void RobotAbstract::computeStatePerturbation() {
 			Q = jmath::ublasExtra::prod_JPJt(perturbation.P(), XNEW_pert);
 //JFR_DEBUG("P " << perturbation.P());

@@ -91,6 +91,15 @@ namespace jafar {
 				virtual ~RobotAbstract() {
 				}
 
+				void setPoseDegStd(double x, double y, double z, double rollDeg,
+				    double pitchDeg, double yawDeg, double xStd, double yStd, double zStd,
+				    double rollDegStd, double pitchDegStd, double yawDegStd);
+		
+				void setPoseStd(double x, double y, double z, double roll,
+				    double pitch, double yaw, double xStd, double yStd, double zStd,
+				    double rollStd, double pitchStd, double yawStd);
+
+				
 				virtual std::string categoryName() const {
 					return "ROBOT";
 				}

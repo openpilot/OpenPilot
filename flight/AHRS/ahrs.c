@@ -132,6 +132,8 @@ uint8_t adc_oversampling = 15;
 //! Offset correction of barometric alt, to match gps data
 static float baro_offset = 0;
 
+static float mag_len = 0;
+
 typedef enum { AHRS_IDLE, AHRS_DATA_READY, AHRS_PROCESSING } states;
 volatile int32_t ekf_too_slow;
 volatile int32_t total_conversion_blocks;
@@ -861,7 +863,7 @@ void process_mag_data()
 		mag_data.updated =  (home.Set == HOMELOCATION_SET_TRUE) && 
 			((home.Be[0] != 0) || (home.Be[1] != 0) || (home.Be[2] != 0)) &&
 			((mag_data.raw.axis[MAG_RAW_X_IDX] != 0) || (mag_data.raw.axis[MAG_RAW_Y_IDX] != 0) || (mag_data.raw.axis[MAG_RAW_Z_IDX] != 0)) &&
-			((Blen < INSGPS_MAGLEN * (1 + INSGPS_MAGTOL)) && (Blen > INSGPS_MAGLEN * (1 - INSGPS_MAGTOL)));
+			((Blen < mag_len * (1 + INSGPS_MAGTOL)) && (Blen > mag_len * (1 - INSGPS_MAGTOL)));
 	}		
 }
 #else
@@ -1178,8 +1180,8 @@ void homelocation_callback(AhrsObjHandle obj)
 	HomeLocationData data;
 	HomeLocationGet(&data);
 
-	float Bmag = sqrt(pow(data.Be[0],2) + pow(data.Be[1],2) + pow(data.Be[2],2));
-	float Be[3] = {data.Be[0] / Bmag, data.Be[1] / Bmag, data.Be[2] / Bmag};
+	mag_len = sqrt(pow(data.Be[0],2) + pow(data.Be[1],2) + pow(data.Be[2],2));
+	float Be[3] = {data.Be[0] / mag_len, data.Be[1] / mag_len, data.Be[2] / mag_len};
 	
 	INSSetMagNorth(Be);
 }

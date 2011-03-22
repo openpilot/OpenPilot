@@ -200,8 +200,19 @@ public class OPTelemetryService extends Service {
 
 			//toastMessage("Started fake telemetry thread");
 			UAVDataObject systemStats = (UAVDataObject) objMngr.getObject("SystemStats");
+			UAVDataObject attitudeActual = (UAVDataObject) objMngr.getObject("AttitudeActual");
+			double roll = 0;
+			double pitch = 0; 
+			double yaw = 0;
 			while( !terminate ) {
+				attitudeActual.getField("Roll").setDouble(roll);
+				attitudeActual.getField("Pitch").setDouble(pitch);
+				attitudeActual.getField("Yaw").setDouble(yaw);
+				roll = (roll + 10) % 180;
+				pitch = (pitch + 10) % 180;
+				yaw = (yaw + 10) % 360;
 				systemStats.updated();
+				attitudeActual.updated();
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {

@@ -1351,7 +1351,11 @@ int main(int argc, char* const* argv)
 	if (!(intOpts[iReplay] & 1) && intOpts[iDump])
 	{
 		boost::filesystem::remove(strOpts[sDataPath] + "/setup.cfg");
-		boost::filesystem::copy_file(strOpts[sConfigSetup], strOpts[sDataPath] + "/setup.cfg"/*, boost::filesystem::copy_option::overwrite_if_exists*/);
+		boost::filesystem::remove(strOpts[sDataPath] + "/setup.cfg.maybe");
+		if (intOpts[iReplay] == 2)
+			boost::filesystem::copy_file(strOpts[sConfigSetup], strOpts[sDataPath] + "/setup.cfg.maybe"/*, boost::filesystem::copy_option::overwrite_if_exists*/);
+		else
+			boost::filesystem::copy_file(strOpts[sConfigSetup], strOpts[sDataPath] + "/setup.cfg"/*, boost::filesystem::copy_option::overwrite_if_exists*/);
 	}
 	#ifndef HAVE_MODULE_QDISPLAY
 	intOpts[iDispQt] = 0;

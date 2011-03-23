@@ -31,6 +31,7 @@ namespace hardware {
 			HardwareSensorAdhocSimulator(kernel::VariableCondition<int> &condition, double freq, boost::shared_ptr<simu::AdhocSimulator> simulator, size_t robId, size_t senId):
 				HardwareSensorExteroAbstract(condition, 3),
 				dt(1./freq), n(0), simulator(simulator), robId(robId), senId(senId) {}
+			virtual void start() {}
 			virtual double getLastTimestamp() { return (n-1)*dt; }
 			int getLastUnreadRaw(raw_ptr_t& raw)
 			{

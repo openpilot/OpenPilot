@@ -275,10 +275,15 @@ namespace hardware {
 		if (mode == 1)
 			saveTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::saveTask,this));
 		
+	}
+	
+	void HardwareSensorCameraFirewire::start()
+	{
 		// start acquire task
 		last_timestamp = getNowTimestamp();
 		preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::preloadTask,this));
 	}
+		
 	
 	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(kernel::VariableCondition<int> &condition, cv::Size imgSize, std::string dump_path):
 		HardwareSensorExteroAbstract(condition, 3)

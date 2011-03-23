@@ -158,6 +158,7 @@ class HardwareSensorAbstract
 		  data_count(0), no_more_data(false), timestamps_correction(0.0),
 		  bufferSize(bufferSize), buffer(bufferSize)
 		{}
+		virtual void start() = 0; ///< start the acquisition thread, once the object is configured
 		void setSyncConfig(double timestamps_correction = 0.0)
 			{ this->timestamps_correction = timestamps_correction; }
 		/**

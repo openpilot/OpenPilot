@@ -116,7 +116,10 @@ namespace hardware {
 			if (backup_poster_path) setenv("POSTER_PATH", backup_poster_path, 1); else unsetenv("POSTER_PATH");
 #endif
 		}
-		
+	}
+
+	void HardwareSensorGpsGenom::start()
+	{
 		// start acquire task
 		//preloadTask();
 		last_timestamp = getNowTimestamp();
@@ -128,6 +131,6 @@ namespace hardware {
 			cond_offline_full.wait(l);
 		}
 	}
-
+	
 }}}
 

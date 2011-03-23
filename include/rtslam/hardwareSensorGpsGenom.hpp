@@ -46,6 +46,7 @@ class HardwareSensorGpsGenom: public HardwareSensorProprioAbstract
 	public:
 		HardwareSensorGpsGenom(kernel::VariableCondition<int> &condition, unsigned bufferSize, const std::string machine, int mode = 0, std::string dump_path = ".");
 		
+		virtual void start();
 		virtual double getLastTimestamp() { boost::unique_lock<boost::mutex> l(mutex_data); return last_timestamp; }
 		virtual int dataSize() { return 3; }
 		virtual int varianceSize() { return 3; }

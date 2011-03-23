@@ -792,6 +792,7 @@ void demo_slam01_main(world_ptr_t *world)
 		hardSen11->setTimingInfos(1.0/hardSen11->getFreq(), 1.0/hardSen11->getFreq());
 		senPtr11->setHardwareSensor(hardSen11);
 		senPtr11->setIntegrationPolicy(false);
+		hardSen11->start();
 		#else
 		if (intOpts[iReplay] & 1)
 		{
@@ -813,6 +814,7 @@ void demo_slam01_main(world_ptr_t *world)
 			senPtr13->setIntegrationPolicy(true);
 			senPtr13->setPose(configSetup.GPS_POSE[0], configSetup.GPS_POSE[1], configSetup.GPS_POSE[2],
 												configSetup.GPS_POSE[3], configSetup.GPS_POSE[4], configSetup.GPS_POSE[5]); // x,y,z,roll,pitch,yaw
+			hardGps->start();
 		}
 	}
 	

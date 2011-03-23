@@ -92,6 +92,7 @@ class HardwareSensorCameraFirewire: public HardwareSensorExteroAbstract
 		
 		~HardwareSensorCameraFirewire();
 
+		virtual void start();
 		virtual double getLastTimestamp() { boost::unique_lock<boost::mutex> l(mutex_data); return last_timestamp; }
 		double getFreq() { return realFreq; }
 };

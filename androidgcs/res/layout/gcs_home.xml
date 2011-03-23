@@ -11,4 +11,5 @@
     	android:id="@+id/launch_object_browser" 
     	android:drawableLeft="@drawable/browser_icon" android:layout_centerHorizontal="true"/>
     <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/pfd_name" android:id="@+id/launch_pfd" android:drawableLeft="@drawable/browser_icon" android:layout_below="@+id/launch_object_browser" android:layout_alignLeft="@+id/launch_object_browser" android:layout_alignRight="@+id/launch_object_browser"></Button>
+    <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/location_name" android:id="@+id/launch_location" android:drawableLeft="@drawable/browser_icon" android:layout_below="@+id/launch_pfd" android:layout_alignLeft="@+id/launch_object_browser" android:layout_alignRight="@+id/launch_object_browser"></Button>
 </RelativeLayout>

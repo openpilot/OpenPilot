@@ -212,18 +212,45 @@ public class OPTelemetryService extends Service {
 			//toastMessage("Started fake telemetry thread");
 			UAVDataObject systemStats = (UAVDataObject) objMngr.getObject("SystemStats");
 			UAVDataObject attitudeActual = (UAVDataObject) objMngr.getObject("AttitudeActual");
+			UAVDataObject homeLocation = (UAVDataObject) objMngr.getObject("HomeLocation");
+			UAVDataObject positionActual = (UAVDataObject) objMngr.getObject("PositionActual");
+
+			homeLocation.getField("Latitude").setDouble(379420315);
+			homeLocation.getField("Longitude").setDouble(-88330078);
+			homeLocation.getField("ECEF").setDouble(497665694,0);
+			homeLocation.getField("ECEF").setDouble(-77336320,1);
+			homeLocation.getField("ECEF").setDouble(390037169,2);
+			homeLocation.getField("RNE").setDouble(-0.60757166,0);
+			homeLocation.getField("RNE").setDouble(0.09441550,1);
+			homeLocation.getField("RNE").setDouble(0.78863323,2);
+			homeLocation.getField("RNE").setDouble(0.15355512,3);
+			homeLocation.getField("RNE").setDouble(0.98814011,4);
+			homeLocation.getField("RNE").setDouble(0,5);
+			homeLocation.getField("RNE").setDouble(-0.77928013,6);
+			homeLocation.getField("RNE").setDouble(0.12109867,7);
+			homeLocation.getField("RNE").setDouble(-0.61486387,8);
+			homeLocation.getField("Be").setDouble(26702.78710938,0);
+			homeLocation.getField("Be").setDouble(-1468.33605957,1);
+			homeLocation.getField("Be").setDouble(34181.78515625,2);
+			
+			
 			double roll = 0;
 			double pitch = 0; 
 			double yaw = 0;
+			double north = 0;
+			double east = 0;
 			while( !terminate ) {
 				attitudeActual.getField("Roll").setDouble(roll);
 				attitudeActual.getField("Pitch").setDouble(pitch);
 				attitudeActual.getField("Yaw").setDouble(yaw);
+				positionActual.getField("North").setDouble(north += 100);
+				positionActual.getField("East").setDouble(east += 100);
 				roll = (roll + 10) % 180;
 				pitch = (pitch + 10) % 180;
 				yaw = (yaw + 10) % 360;
 				systemStats.updated();
 				attitudeActual.updated();
+				positionActual.updated();
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {

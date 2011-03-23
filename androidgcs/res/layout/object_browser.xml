@@ -2,5 +2,6 @@
 <RelativeLayout   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
-    <ListView android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/object_list"></ListView>
+    <Spinner android:layout_alignParentTop="true" android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/object_list_filter"></Spinner>
+    <ListView android:id="@+id/object_list" android:layout_height="wrap_content" android:layout_width="match_parent" android:layout_below="@+id/spinner1" android:layout_alignLeft="@+id/spinner1" android:layout_alignRight="@+id/spinner1"></ListView>
 </RelativeLayout>

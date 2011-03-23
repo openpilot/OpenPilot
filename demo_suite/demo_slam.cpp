@@ -144,6 +144,7 @@
 #include "rtslam/simuRawProcessors.hpp"
 #include "rtslam/hardwareSensorAdhocSimulator.hpp"
 #include "rtslam/hardwareEstimatorInertialAdhocSimulator.hpp"
+#include "rtslam/exporterSocket.hpp"
 
 
 /** ############################################################################
@@ -868,6 +869,8 @@ void demo_slam01_main(world_ptr_t *world)
 
 	//worldPtr->display_mutex.unlock();
 
+	boost::shared_ptr<ExporterSocket> exporter(new ExporterSocket(robPtr1, 30000));
+	
 jblas::vec robot_prediction;
 double average_robot_innovation = 0.;
 int n_innovation = 0;
@@ -917,6 +920,8 @@ std::cout << "Frame " << (*world)->t << " using sen " << pinfo.sen->id() << " at
 				JFR_DEBUG("Robot state stdev after corrections " << stdevFromCov(robPtr1->state.P()));
 				average_robot_innovation += ublas::norm_2(robPtr->state.x() - robot_prediction);
 				n_innovation++;
+				
+				exporter->exportCurrentState();
 			}
 		}
 		

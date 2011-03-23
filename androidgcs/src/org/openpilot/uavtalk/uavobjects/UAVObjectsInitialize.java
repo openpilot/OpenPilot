@@ -28,7 +28,7 @@
 
 package org.openpilot.uavtalk.uavobjects;
 
-import org.openpilot.uavtalk.uavobjects.*;
+//import org.openpilot.uavtalk.uavobjects.*;
 import org.openpilot.uavtalk.UAVObjectManager;
 
 public class UAVObjectsInitialize {

@@ -27,6 +27,12 @@ public class HomePage extends ObjectManagerActivity {
 			}			
 		});
 
+		Button location = (Button) findViewById(R.id.launch_location);
+		location.setOnClickListener(new OnClickListener() {
+			public void onClick(View arg0) {
+				startActivity(new Intent(HomePage.this, UAVLocation.class));	
+			}			
+		});
 	}
 
 }

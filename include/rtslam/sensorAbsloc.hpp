@@ -102,8 +102,8 @@ namespace jafar {
 							measurement->x()(2) = reading.data(3) - robotPtr()->origin(2);
 							if (hasVar)
 							{
-								measurement->P()(0,0) = jmath::sqr(reading.data(1+inns));
-								measurement->P()(1,1) = jmath::sqr(reading.data(2+inns));
+								measurement->P()(0,0) = jmath::sqr(reading.data(2+inns));
+								measurement->P()(1,1) = jmath::sqr(reading.data(1+inns));
 								measurement->P()(2,2) = jmath::sqr(reading.data(3+inns));
 							} else
 							{
@@ -126,11 +126,12 @@ namespace jafar {
 					if (first)
 					{
 						// for first reading we force initialization
-						robotPtr()->pose.P() = jblas::zero_mat(robotPtr()->pose.size());
+						//robotPtr()->pose.P() = jblas::zero_mat(robotPtr()->pose.size());
 						switch (innovation->size())
 						{
 							case 3: // POS
 								robotPtr()->origin = measurement->x() - (expectation->x()-p);
+								std::cout << std::setprecision(16) << "robot origin : " << robotPtr()->origin << std::endl;
 								ublas::subrange(robotPtr()->pose.x(), 0, 3) = jblas::zero_vec(3);
 								ublas::subrange(robotPtr()->pose.P(), 0,3, 0,3) = measurement->P();
 								break;

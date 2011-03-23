@@ -162,7 +162,7 @@ namespace simu {
 				
 				// create descriptor
 				boost::shared_ptr<simu::DescriptorSimu> descPtr(new simu::DescriptorSimu());
-				descPtr->addObservation(obsPtr);
+				//descPtr->addObservation(obsPtr);
 				obsPtr->landmarkPtr()->setDescriptor(descPtr);
 			}
 

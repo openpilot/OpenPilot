@@ -39,7 +39,7 @@ namespace jafar {
 		 * FeatureView
 		 **************************************************************************/
 		
-		void FeatureView::initFromObs(const observation_ptr_t & obsPtr, int descSize)
+		bool FeatureView::initFromObs(const observation_ptr_t & obsPtr, int descSize)
 		{
 			app_img_pnt_ptr_t app(new AppearanceImagePoint(descSize, descSize, CV_8U));
 			sensorext_ptr_t senPtr = SPTR_CAST<SensorExteroAbstract>(obsPtr->sensorPtr());
@@ -55,7 +55,9 @@ namespace jafar {
 				measurement = obsPtr->measurement.x();
 				frame = senPtr->rawCounter;
 				used = false;
-			}
+				return true;
+			} else
+				return false;
 		}
 		
 		
@@ -72,10 +74,11 @@ namespace jafar {
 		DescriptorImagePointFirstView::~DescriptorImagePointFirstView() {
 		}
 
-		void DescriptorImagePointFirstView::addObservation(const observation_ptr_t & obsPtr)
+		bool DescriptorImagePointFirstView::addObservation(const observation_ptr_t & obsPtr)
 		{
 			if (obsPtr->events.updated && !view.appearancePtr)
-				view.initFromObs(obsPtr, descSize);
+				return view.initFromObs(obsPtr, descSize);
+			else return false;
 		}
 
 
@@ -131,17 +134,20 @@ app_dst->patch.save(buffer);
 		{
 		}
 		
-		void DescriptorImagePointMultiView::addObservation(const observation_ptr_t & obsPtr)
+		bool DescriptorImagePointMultiView::addObservation(const observation_ptr_t & obsPtr)
 		{
 			if (obsPtr->events.updated)
 			{
-				lastValidView.initFromObs(obsPtr, descSize);
+				int res = lastValidView.initFromObs(obsPtr, descSize);
 				lastObsFailed = false;
+				return res;
 			}
 			else if (obsPtr->events.predicted && obsPtr->events.measured && !obsPtr->events.matched)
 			{
 				lastObsFailed = true;
+				return false;
 			}
+			return false;
 		}
 		
 		bool DescriptorImagePointMultiView::predictAppearance(const observation_ptr_t & obsPtr)

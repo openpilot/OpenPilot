@@ -49,7 +49,7 @@ namespace jafar {
 					obsModelPtr.reset();
 				}
 				
-				void initFromObs(const observation_ptr_t & obsPtr, int descSize);
+				bool initFromObs(const observation_ptr_t & obsPtr, int descSize);
 		};
 
 		std::ostream& operator <<(std::ostream & s, FeatureView const & fv);
@@ -73,7 +73,7 @@ namespace jafar {
 					return "Image-Point-First-View";
 				}
 
-				virtual void addObservation(const observation_ptr_t & obsPtr);
+				virtual bool addObservation(const observation_ptr_t & obsPtr);
 				virtual bool predictAppearance(const observation_ptr_t & obsPtrNew);
 				virtual bool isPredictionValid(const observation_ptr_t & obsPtr) { return true; }
 				
@@ -125,7 +125,7 @@ namespace jafar {
 					return "Image-Point-Multi-View";
 				}
 				
-				virtual void addObservation(const observation_ptr_t & obsPtr);
+				virtual bool addObservation(const observation_ptr_t & obsPtr);
 				virtual bool predictAppearance(const observation_ptr_t & obsPtr);
 				virtual bool isPredictionValid(const observation_ptr_t & obsPtr);
 				

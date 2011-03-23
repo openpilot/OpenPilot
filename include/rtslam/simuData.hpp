@@ -50,7 +50,7 @@ namespace simu {
 			boost::shared_ptr<AppearanceSimu> appPtr;
 			
 		public:
-			void addObservation(const observation_ptr_t & obsPtr)
+			bool addObservation(const observation_ptr_t & obsPtr)
 			{
 				if (obsPtr->events.updated)
 					appPtr = SPTR_CAST<AppearanceSimu>(obsPtr->observedAppearance);

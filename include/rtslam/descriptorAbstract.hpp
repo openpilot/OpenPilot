@@ -33,7 +33,7 @@ namespace jafar {
 				/**
 				 * Take an actual observation and use its appearance to improve the descriptor
 				 */
-				virtual void addObservation(const observation_ptr_t & obsPtr) = 0;
+				virtual bool addObservation(const observation_ptr_t & obsPtr) = 0;
 				/**
 				 * Fills in the predicted appearance in an observation
 				 */

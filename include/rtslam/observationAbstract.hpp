@@ -356,9 +356,9 @@ namespace jafar {
 					return true;
 				}
 				
-				virtual void updateDescriptor()
+				virtual bool updateDescriptor()
 				{
-					landmarkPtr()->descriptorPtr->addObservation(this->shared_from_this());
+					return landmarkPtr()->descriptorPtr->addObservation(this->shared_from_this());
 				}
 				virtual void updateVisibilityMap()
 				{

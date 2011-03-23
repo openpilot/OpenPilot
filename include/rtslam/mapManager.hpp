@@ -66,7 +66,7 @@ namespace jafar {
 					lmkIter--;
 					return lmkIter;
 				}
-				void unregisterLandmark(landmark_ptr_t lmkIter, bool liberateFilter = true);
+				void unregisterLandmark(landmark_ptr_t lmkPtr, bool liberateFilter = true);
 				LandmarkList::iterator unregisterLandmark(LandmarkList::iterator lmkIter, bool liberateFilter = true)
 				{ // FIXME do better than this! will crash if only one element.
 					landmark_ptr_t lmkPtr = *lmkIter;

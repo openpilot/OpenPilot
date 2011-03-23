@@ -74,7 +74,8 @@ public class OPTelemetryService extends Service {
 				Toast.makeText(getApplicationContext(), "Attempting connection", Toast.LENGTH_SHORT).show();
 				terminate = false;
 				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
-				int connection_type = Integer.decode(prefs.getString("connection_type", ""));
+				//int connection_type = Integer.decode(prefs.getString("connection_type", ""));
+				int connection_type = 1;
 				switch(connection_type) {
 				case 0: // No connection
 					return;
@@ -128,7 +129,7 @@ public class OPTelemetryService extends Service {
 		mServiceHandler = new ServiceHandler(mServiceLooper);
 	
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
-		if(prefs.getBoolean("autoconnect", false)) {
+		if(prefs.getBoolean("autoconnect", false) || true) {
 			Toast.makeText(getApplicationContext(), "Should auto connect", Toast.LENGTH_SHORT);
 			Message msg = mServiceHandler.obtainMessage();
 			msg.arg1 = MSG_CONNECT;

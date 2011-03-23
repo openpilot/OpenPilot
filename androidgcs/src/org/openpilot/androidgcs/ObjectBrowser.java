@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -46,6 +47,8 @@ public class ObjectBrowser extends ObjectManagerActivity implements OnSharedPref
 		setContentView(R.layout.object_browser);		
 		prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		prefs.registerOnSharedPreferenceChangeListener(this);
+		
+		Spinner objectFilter = (Spinner) findViewById(R.id.object_list_filter);
 	}
 
 	@Override

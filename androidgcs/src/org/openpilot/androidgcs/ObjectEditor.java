@@ -7,8 +7,6 @@ import org.openpilot.uavtalk.UAVObject;
 import org.openpilot.uavtalk.UAVObjectField;
 
 import android.os.Bundle;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class ObjectEditor extends ObjectManagerActivity {
@@ -35,17 +33,13 @@ public class ObjectEditor extends ObjectManagerActivity {
 		UAVObject obj = objMngr.getObject(objectID, instID);
 		Toast.makeText(getApplicationContext(), obj.toString(), Toast.LENGTH_SHORT);
 		
-		TextView objectName = (TextView) findViewById(R.id.object_edit_name);
-		objectName.setText(obj.getName());
+		ObjectEditView editView = (ObjectEditView) findViewById(R.id.object_edit_view);
+		editView.setName(obj.getName());
 		
-		LinearLayout fieldViewList = (LinearLayout) findViewById(R.id.object_edit_fields);
 		List<UAVObjectField> fields = obj.getFields();
 		ListIterator<UAVObjectField> li = fields.listIterator();
 		while(li.hasNext()) {
-			UAVObjectField field = li.next();
-			TextView fieldName = new TextView(this);
-			fieldName.setText(field.getName());
-			fieldViewList.addView(fieldName);
+			editView.addField(li.next());
 		}
 	}
 

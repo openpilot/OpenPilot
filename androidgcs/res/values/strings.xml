@@ -21,4 +21,7 @@
 	<string name="cardinal_south">S</string>
 	<string name="cardinal_west">W</string>
 	<string name="connected">Connected</string>
+	<string name="update_button">Update</string>
+	<string name="save_button">Save</string>
+	<string name="send_button">Send</string>
 </resources>

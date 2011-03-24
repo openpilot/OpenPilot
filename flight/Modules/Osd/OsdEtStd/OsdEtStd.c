@@ -33,6 +33,7 @@
 
 #include "flightbatterystate.h"
 #include "gpsposition.h"
+#include "attitudeactual.h"
 
 //
 // Configuration
@@ -424,8 +425,10 @@ static void Run(void)
 
 	if (newPosData) {
 		GPSPositionData positionData;
+		AttitudeActualData attitudeActualData;
 
 		GPSPositionGet(&positionData);
+		AttitudeActualGet(&attitudeActualData);
 
 		//DEBUG_MSG("%5d Pos: #stat=%d #sats=%d alt=%d\n\r", cnt,
 		//              positionData.Status, positionData.Satellites, (uint32_t)positionData.Altitude);
@@ -442,7 +445,7 @@ static void Run(void)
 		SetCoord(OSDMSG_LON_IDX, positionData.Longitude);
 		SetAltitude(positionData.Altitude);
 		SetNbSats(positionData.Satellites);
-		SetCourse(positionData.Heading);
+		SetCourse(attitudeActualData.Yaw);
 
 		newPosData = FALSE;
 	} else {

@@ -214,9 +214,9 @@ static void updateSensors(AttitudeRawData * attitudeRaw)
 	} while ( (i < 32) && (samples_remaining > 0) );
 	attitudeRaw->gyrotemp[0] = samples_remaining;
 	attitudeRaw->gyrotemp[1] = i;
-	x -= accelbias[0];
-	y -= accelbias[1];
-	z -= accelbias[2];
+	x -= accelbias[0] * i;
+	y -= accelbias[1] * i;
+	z -= accelbias[2] * i;
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = ((float)x * 0.004f * 9.81f) / i;
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = ((float)y * 0.004f * 9.81f) / i;
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = ((float)z * 0.004f * 9.81f) / i;

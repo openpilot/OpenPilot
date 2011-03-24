@@ -112,7 +112,7 @@ for i = 1:size(trajs)(1)
 	# final transformation matrix, rotation + translation
 	poses(i,1 )=t;
 
-	poses(i,2 )=O(1); poses(i,3)=O(2); poses(i,4)=O(3);
+	poses(i,2 )=O(1)/1000; poses(i,3)=O(2)/1000; poses(i,4)=O(3)/1000;
 
 	poses(i,5 )=x(1); poses(i,6 )=y(1); poses(i,7 )=z(1); 
 	poses(i,8 )=x(2); poses(i,9 )=y(2); poses(i,10)=z(2);

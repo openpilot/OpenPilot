@@ -30,85 +30,37 @@
 #include <coreplugin/icore.h>
 #include <coreplugin/threadmanager.h>
 
-#include <QMutexLocker>	// Pip
-
 TelemetryManager::TelemetryManager()
 {
-	telemetryMon = NULL;	// Pip
-	telemetry = NULL;		// Pip
-	utalk = NULL;			// Pip
+    moveToThread(Core::ICore::instance()->threadManager()->getRealTimeThread());
+    // Get UAVObjectManager instance
+    ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
+    objMngr = pm->getObject<UAVObjectManager>();
 
-	moveToThread(Core::ICore::instance()->threadManager()->getRealTimeThread());
-
-	mutex = new QMutex(QMutex::Recursive);	// Pip
-
-	QMutexLocker locker(mutex);	// Pip
-
-	// Get UAVObjectManager instance
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-	if (pm)	// Pip
-	{
-		objMngr = pm->getObject<UAVObjectManager>();
-		if (objMngr)
-			connect(objMngr, SIGNAL(destroyed(QObject *)), this, SLOT(onObjectDestroyed(QObject *)));	// Pip
-	}
-
-	// connect to start stop signals
-	connect(this, SIGNAL(myStart()), this, SLOT(onStart()), Qt::QueuedConnection);
-	connect(this, SIGNAL(myStop()), this, SLOT(onStop()), Qt::QueuedConnection);
+    // connect to start stop signals
+    connect(this, SIGNAL(myStart()), this, SLOT(onStart()),Qt::QueuedConnection);
+    connect(this, SIGNAL(myStop()), this, SLOT(onStop()),Qt::QueuedConnection);
 }
 
 TelemetryManager::~TelemetryManager()
 {
-	// Pip
-	mutex->lock();
-//		deleteObjects();
-	mutex->unlock();
-}
-
-void TelemetryManager::onObjectDestroyed(QObject *obj)		// Pip
-{
-	QMutexLocker locker(mutex);
-	deleteObjects();
 }
 
 void TelemetryManager::start(QIODevice *dev)
 {
-	device = dev;
+    device=dev;
     emit myStart();
 }
 
 void TelemetryManager::onStart()
 {
-	QMutexLocker locker(mutex);	// Pip
-
-	deleteObjects();	// Pip
-
-	// Get UAVObjectManager instance
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-	if (!pm) return;	// Pip
-	objMngr = pm->getObject<UAVObjectManager>();
-	if (!objMngr) return;	// Pip
-
-	utalk = new UAVTalk(device, objMngr);
-	if (utalk) telemetry = new Telemetry(utalk, objMngr);
-	if (telemetry) telemetryMon = new TelemetryMonitor(objMngr, telemetry);
-
-	if (!utalk || !telemetry || !telemetryMon)	// Pip
-	{
-		deleteObjects();
-		return;
-	}
-
-	// Pip
-	connect(objMngr, SIGNAL(destroyed(QObject *)), this, SLOT(onObjectDestroyed(QObject *)));
-	connect(utalk, SIGNAL(destroyed(QObject *)), this, SLOT(onObjectDestroyed(QObject *)));
-	connect(telemetry, SIGNAL(destroyed(QObject *)), this, SLOT(onObjectDestroyed(QObject *)));
-	connect(telemetryMon, SIGNAL(destroyed(QObject *)), this, SLOT(onObjectDestroyed(QObject *)));
-
-	connect(telemetryMon, SIGNAL(connected()), this, SLOT(onConnect()));
-	connect(telemetryMon, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
+    utalk = new UAVTalk(device, objMngr);
+    telemetry = new Telemetry(utalk, objMngr);
+    telemetryMon = new TelemetryMonitor(objMngr, telemetry);
+    connect(telemetryMon, SIGNAL(connected()), this, SLOT(onConnect()));
+    connect(telemetryMon, SIGNAL(disconnected()), this, SLOT(onDisconnect()));
 }
+
 
 void TelemetryManager::stop()
 {
@@ -117,12 +69,11 @@ void TelemetryManager::stop()
 
 void TelemetryManager::onStop()
 {
-	mutex->lock();			// Pip
-		if (telemetryMon) telemetryMon->disconnect(this);
-		deleteObjects();
-	mutex->unlock();
-
-	onDisconnect();
+    telemetryMon->disconnect(this);
+    delete telemetryMon;
+    delete telemetry;
+    delete utalk;
+    onDisconnect();
 }
 
 void TelemetryManager::onConnect()
@@ -133,32 +84,4 @@ void TelemetryManager::onConnect()
 void TelemetryManager::onDisconnect()
 {
     emit disconnected();
-}
-
-void TelemetryManager::deleteObjects()	// Pip
-{
-	if (!objMngr) return;	// we've already destroyed everything
-
-	objMngr = NULL;
-
-	if (telemetryMon)
-	{
-		disconnect(telemetryMon, SIGNAL(destroyed(QObject *)), this, 0);
-		delete telemetryMon;
-		telemetryMon = NULL;
-	}
-
-	if (telemetry)
-	{
-		disconnect(telemetry, SIGNAL(destroyed(QObject *)), this, 0);
-		delete telemetry;
-		telemetry = NULL;
-	}
-
-	if (utalk)
-	{
-		disconnect(utalk, SIGNAL(destroyed(QObject *)), this, 0);
-		delete utalk;
-		utalk = NULL;
-	}
 }

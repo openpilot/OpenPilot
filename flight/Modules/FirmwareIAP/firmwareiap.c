@@ -253,7 +253,9 @@ static void read_description(uint8_t * array)
 static void resetTask(UAVObjEvent * ev)
 {		
 	PIOS_LED_Toggle(LED1);
+#if (PIOS_LED_NUM > 1)
 	PIOS_LED_Toggle(LED2);
+#endif
 	
 	if((portTickType) (xTaskGetTickCount() - lastResetSysTime) > RESET_DELAY / portTICK_RATE_MS) {
 		lastResetSysTime = xTaskGetTickCount();

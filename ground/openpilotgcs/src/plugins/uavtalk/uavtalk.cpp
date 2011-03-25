@@ -56,6 +56,7 @@ const quint8 UAVTalk::crc_table[256] = {
 UAVTalk::UAVTalk(QIODevice* iodev, UAVObjectManager* objMngr)
 {
     io = iodev;
+
     this->objMngr = objMngr;
 
     rxState = STATE_SYNC;
@@ -67,22 +68,16 @@ UAVTalk::UAVTalk(QIODevice* iodev, UAVObjectManager* objMngr)
 
     memset(&stats, 0, sizeof(ComStats));
 
-	if (io)	// Pip
-		connect(io, SIGNAL(readyRead()), this, SLOT(processInputStream()));
+    connect(io, SIGNAL(readyRead()), this, SLOT(processInputStream()));
 }
 
 UAVTalk::~UAVTalk()
 {
-	// Pip
-	mutex->lock();
-		io = NULL;
-		objMngr = NULL;
-	mutex->unlock();
-
     // According to Qt, it is not necessary to disconnect upon
     // object deletion.
     //disconnect(io, SIGNAL(readyRead()), this, SLOT(processInputStream()));
 }
+
 
 /**
  * Reset the statistics counters
@@ -109,24 +104,9 @@ void UAVTalk::processInputStream()
 {
     quint8 tmp;
 
-	while (true)
+    while (io->bytesAvailable() > 0)
     {
-		mutex->lock();	// Pip
-			if (!io)
-			{
-				mutex->unlock();
-				break;
-			}
-			if (!io->isOpen() || io->bytesAvailable() <= 0)
-			{
-				mutex->unlock();
-				break;
-			}
-			qint64 bytes_read = io->read((char*)&tmp, sizeof(tmp));
-		mutex->unlock();
-
-		if (bytes_read <= 0) break;	// Pip
-
+        io->read((char*)&tmp, 1);
         processInputByte(tmp);
     }
 }
@@ -216,9 +196,6 @@ bool UAVTalk::objectTransaction(UAVObject* obj, quint8 type, bool allInstances)
  */
 bool UAVTalk::processInputByte(quint8 rxbyte)
 {
-	if (!objMngr || !io)	// Pip
-		return false;
-
     // Update stats
     stats.rxBytes++;
 
@@ -429,10 +406,7 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8* 
 {
     Q_UNUSED(length);
 
-	if (!objMngr || !io)	// Pip
-		return false;
-
-	UAVObject* obj = NULL;
+    UAVObject* obj = NULL;
     bool error = false;
     bool allInstances = (instId == ALL_INSTANCES? true : false);
 
@@ -531,10 +505,7 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8* 
  */
 UAVObject* UAVTalk::updateObject(quint32 objId, quint16 instId, quint8* data)
 {
-	if (!objMngr || !io)	// Pip
-		return NULL;
-
-	// Get object
+    // Get object
     UAVObject* obj = objMngr->getObject(objId, instId);
     // If the instance does not exist create it
     if (obj == NULL)
@@ -589,10 +560,7 @@ void UAVTalk::updateAck(UAVObject* obj)
  */
 bool UAVTalk::transmitObject(UAVObject* obj, quint8 type, bool allInstances)
 {   
-	if (!objMngr || !io)	// Pip
-		return false;
-
-	// If all instances are requested on a single instance object it is an error
+    // If all instances are requested on a single instance object it is an error
     if (allInstances && obj->isSingleInstance())
     {
         allInstances = false;
@@ -654,10 +622,7 @@ bool UAVTalk::transmitSingleObject(UAVObject* obj, quint8 type, bool allInstance
     quint16 instId;
     quint16 allInstId = ALL_INSTANCES;
 
-	if (!objMngr || !io)	// Pip
-		return false;
-
-	// Setup type and object id fields
+    // Setup type and object id fields
     objId = obj->getObjID();
     txBuffer[0] = SYNC_VAL;
     txBuffer[1] = type;

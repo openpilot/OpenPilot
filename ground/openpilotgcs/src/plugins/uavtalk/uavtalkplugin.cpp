@@ -31,27 +31,29 @@
 
 UAVTalkPlugin::UAVTalkPlugin()
 {
-	telMngr = NULL;	// Pip
+
 }
 
 UAVTalkPlugin::~UAVTalkPlugin()
 {
-	if (telMngr)	// Pip
-		telMngr->stop();
+
 }
 
 void UAVTalkPlugin::extensionsInitialized()
 {
+    // Get UAVObjectManager instance
+    ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
+    objMngr = pm->getObject<UAVObjectManager>();
+
     // Create TelemetryManager
     telMngr = new TelemetryManager();
-	if (!telMngr) return;	// Pip
     addAutoReleasedObject(telMngr);
 
     // Connect to connection manager so we get notified when the user connect to his device
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-	QObject::connect(cm, SIGNAL(deviceConnected(QIODevice *)),
-					 this, SLOT(onDeviceConnect(QIODevice *)));
-    QObject::connect(cm, SIGNAL(deviceDisconnected()),
+    QObject::connect(cm, SIGNAL(deviceConnected(QIODevice *)),
+                     this, SLOT(onDeviceConnect(QIODevice *)));
+    QObject::connect(cm, SIGNAL(deviceAboutToDisconnect()),
                      this, SLOT(onDeviceDisconnect()));
 }
 
@@ -65,18 +67,17 @@ bool UAVTalkPlugin::initialize(const QStringList & arguments, QString * errorStr
 
 void UAVTalkPlugin::shutdown()
 {
+
 }
 
 void UAVTalkPlugin::onDeviceConnect(QIODevice *dev)
 {
-	if (telMngr)	// Pip
-		telMngr->start(dev);
+    telMngr->start(dev);
 }
 
 void UAVTalkPlugin::onDeviceDisconnect()
 {
-	if (telMngr)	// Pip
-		telMngr->stop();
+    telMngr->stop();
 }
 
 Q_EXPORT_PLUGIN(UAVTalkPlugin)

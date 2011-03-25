@@ -74,7 +74,7 @@ ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
     // running the scopes if we are not connected and not replaying logs
     // Also listen to disconnect actions from the user
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-    connect(cm, SIGNAL(deviceDisconnected()), this, SLOT(stopPlotting()));
+    connect(cm, SIGNAL(deviceAboutToDisconnect()), this, SLOT(stopPlotting()));
     connect(cm, SIGNAL(deviceConnected(QIODevice*)), this, SLOT(startPlotting()));
 
     m_csvLoggingStarted=0;
@@ -89,7 +89,7 @@ ScopeGadgetWidget::ScopeGadgetWidget(QWidget *parent) : QwtPlot(parent)
     m_csvLoggingStartTime = QDateTime::currentDateTime();
 
     //Listen to autopilot connection events
-    connect(cm, SIGNAL(deviceDisconnected()), this, SLOT(csvLoggingDisconnect()));
+    connect(cm, SIGNAL(deviceAboutToDisconnect()), this, SLOT(csvLoggingDisconnect()));
     connect(cm, SIGNAL(deviceConnected(QIODevice*)), this, SLOT(csvLoggingConnect()));
 }
 

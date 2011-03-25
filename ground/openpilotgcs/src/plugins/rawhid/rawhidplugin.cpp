@@ -94,7 +94,7 @@ QStringList RawHIDConnection::availableDevices()
 QIODevice *RawHIDConnection::openDevice(const QString &deviceName)
 {
     //added by andrew
-	if (RawHidHandle)
+    if (RawHidHandle)
         closeDevice(deviceName);
     //end added by andrew
 

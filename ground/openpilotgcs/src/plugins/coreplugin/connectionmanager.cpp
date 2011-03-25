@@ -106,50 +106,44 @@ void ConnectionManager::init()
 */
 bool ConnectionManager::connectDevice()
 {
-	devListItem connection_device = findDevice(m_availableDevList->currentText());
-	if (!connection_device.connection)
-		return false;
+    devListItem connection_device = findDevice(m_availableDevList->currentText());
+    if (!connection_device.connection)
+        return false;
 
-	QIODevice *io_dev = connection_device.connection->openDevice(connection_device.devName);
-	if (!io_dev)
-		return false;
+    QIODevice *io_dev = connection_device.connection->openDevice(connection_device.devName);
+    if (!io_dev)
+        return false;
 
-	io_dev->open(QIODevice::ReadWrite);
+    io_dev->open(QIODevice::ReadWrite);
 
-	// check if opening the device worked
-	if (!io_dev->isOpen())
-	{
-		qDebug() << "Error: io_dev->isOpen() returned FALSE .. could not open connection to " << connection_device.devName
-			<< ": " << io_dev->errorString();
+    // check if opening the device worked
+    if (!io_dev->isOpen()) {
+        qDebug() << "Error: io_dev->isOpen() returned FALSE .. could not open connection to " << connection_device.devName
+                 << ": " << io_dev->errorString();
 
-		// close the device
-		try
-		{
-			connection_device.connection->closeDevice(connection_device.devName);
-		}
-		catch (...)
-		{	// handle exception
-			qDebug() << "Exception: connection_device.connection->closeDevice(" << connection_device.devName << ")";
-		}
+        // close the device
+        // EDOUARD: why do we close if we could not open ???
+        try {
+            connection_device.connection->closeDevice(connection_device.devName);
+        }
+        catch (...) {	// handle exception
+            qDebug() << "Exception: connection_device.connection->closeDevice(" << connection_device.devName << ")";
+        }
+        return false;
+    }
 
-		return false;
-	}
+    // we appear to have connected to the device OK
+    // remember the connection/device details
+    m_connectionDevice = connection_device;
+    m_ioDev = io_dev;
 
-	// we appear to have connected to the device OK
+    connect(m_connectionDevice.connection, SIGNAL(destroyed(QObject *)), this, SLOT(onConnectionDestroyed(QObject *)), Qt::QueuedConnection);
 
-	// remember the connection/device details
-	m_connectionDevice = connection_device;
-	m_ioDev = io_dev;
-
-	connect(m_connectionDevice.connection, SIGNAL(destroyed(QObject *)), this, SLOT(onConnectionDestroyed(QObject *)), Qt::QueuedConnection);
-
-	m_connectBtn->setText("Disconnect");
-	m_availableDevList->setEnabled(false);
-
-	// signal interested plugins that we connected to the device
-	emit deviceConnected(m_ioDev);
-
-	return true;
+    // signal interested plugins that we connected to the device
+    emit deviceConnected(m_ioDev);
+    m_connectBtn->setText("Disconnect");
+    m_availableDevList->setEnabled(false);
+    return true;
 }
 
 /**
@@ -158,30 +152,32 @@ bool ConnectionManager::connectDevice()
 */
 bool ConnectionManager::disconnectDevice()
 {
-	if (!m_ioDev)
-	{   // apparently we are already disconnected
+    if (!m_ioDev) {
+        // apparently we are already disconnected: this can
+        // happen if a plugin tries to force a disconnect whereas
+        // we are not connected. Just return.
+        return false;
+    }
 
-		m_connectionDevice.connection = NULL;
-		m_ioDev = NULL;
+    // We are connected - disconnect from the device
 
-		return false;
-	}
+    // signal interested plugins that user is disconnecting his device
+    emit deviceAboutToDisconnect();
 
-	// we appear to be connected - disconnect from the device
+    try {
+        if (m_connectionDevice.connection)
+            m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
+    } catch (...) {	// handle exception
+        qDebug() << "Exception: m_connectionDevice.connection->closeDevice(" << m_connectionDevice.devName << ")";
+    }
 
-	try
-	{
-		if (m_connectionDevice.connection)
-			m_connectionDevice.connection->closeDevice(m_connectionDevice.devName);
-	}
-	catch (...)
-	{	// handle exception
-		qDebug() << "Exception: m_connectionDevice.connection->closeDevice(" << m_connectionDevice.devName << ")";
-	}
+    m_connectionDevice.connection = NULL;
+    m_ioDev = NULL;
 
-	onConnectionClosed(m_connectionDevice.connection);
+    m_connectBtn->setText("Connect");
+    m_availableDevList->setEnabled(true);
 
-	return true;
+    return true;
 }
 
 /**
@@ -222,24 +218,11 @@ void ConnectionManager::aboutToRemoveObject(QObject *obj)
 		m_connectionsList.removeAt(m_connectionsList.indexOf(connection));
 }
 
-void ConnectionManager::onConnectionClosed(QObject *obj)	// Pip
-{
-	if (!m_connectionDevice.connection || m_connectionDevice.connection != obj)
-		return;
-
-	m_connectionDevice.connection = NULL;
-	m_ioDev = NULL;
-
-	m_connectBtn->setText("Connect");
-	m_availableDevList->setEnabled(true);
-
-	// signal interested plugins that user is disconnecting his device
-	emit deviceDisconnected();
-}
 
 void ConnectionManager::onConnectionDestroyed(QObject *obj)	// Pip
 {
-	onConnectionClosed(obj);
+        //onConnectionClosed(obj);
+        disconnectDevice();
 }
 
 /**
@@ -247,13 +230,14 @@ void ConnectionManager::onConnectionDestroyed(QObject *obj)	// Pip
 */
 void ConnectionManager::onConnectPressed()
 {
-	if (!m_ioDev || !m_connectionDevice.connection)
-	{	// connecting
-		connectDevice();
+    // Check if we have a ioDev already created:
+    if (!m_ioDev)
+    {	// connecting
+        connectDevice();
     }
     else
-	{	// disconnecting
-		disconnectDevice();
+    {	// disconnecting
+        disconnectDevice();
     }
 }
 
@@ -318,7 +302,8 @@ void ConnectionManager::unregisterAll(IConnection *connection)
 		{
 			if (m_connectionDevice.connection && m_connectionDevice.connection == connection)
 			{	// we are currently using the one we are about to erase
-				onConnectionClosed(m_connectionDevice.connection);
+                                //onConnectionClosed(m_connectionDevice.connection);
+                            disconnectDevice();
 			}
 
 			iter = m_devList.erase(iter);

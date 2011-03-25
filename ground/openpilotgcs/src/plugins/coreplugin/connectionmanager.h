@@ -81,7 +81,7 @@ protected:
 
 signals:
     void deviceConnected(QIODevice *dev);
-    void deviceDisconnected();
+    void deviceAboutToDisconnect();
 
 private slots:
     void objectAdded(QObject *obj);
@@ -90,7 +90,7 @@ private slots:
     void onConnectPressed();
     void devChanged(IConnection *connection);
 
-	void onConnectionClosed(QObject *obj);
+//	void onConnectionClosed(QObject *obj);
 	void onConnectionDestroyed(QObject *obj);
 
 protected:

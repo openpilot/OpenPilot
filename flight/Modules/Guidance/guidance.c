@@ -199,7 +199,7 @@ static void guidanceTask(void *parameters)
 				positionHoldLast = 1;
 			}
 			
-			if(guidanceSettings.GuidanceMode == GUIDANCESETTINGS_GUIDANCEMODE_DUAL_LOOP) 
+			if( manualControl.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_POSITIONHOLD ) 
 				updateVtolDesiredVelocity();
 			else
 				manualSetDesiredVelocity();			
@@ -302,7 +302,10 @@ static void updateVtolDesiredAttitude()
 	StabilizationSettingsGet(&stabSettings);
 	NedAccelGet(&nedAccel);
 	
-	stabDesired.Yaw = 0;	// try and face north
+	// Testing code - refactor into manual control command
+	ManualControlCommandData manualControlData;
+	ManualControlCommandGet(&manualControlData);
+	stabDesired.Yaw = stabSettings.MaximumRate[STABILIZATIONSETTINGS_MAXIMUMRATE_YAW] * manualControlData.Yaw;	
 	
 	// Compute desired north command
 	northError = velocityDesired.North - velocityActual.North;
@@ -351,7 +354,7 @@ static void updateVtolDesiredAttitude()
 	
 	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
 	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
 	
 	StabilizationDesiredSet(&stabDesired);
 }

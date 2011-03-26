@@ -444,12 +444,15 @@ $(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
 docs:
 	doxygen  $(DOXYGENDIR)/doxygen.cfg
 
-.PHONY: elf lss sym hex bin
+$(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
+
+.PHONY: elf lss sym hex bin bino
 elf: $(OUTDIR)/$(TARGET).elf
 lss: $(OUTDIR)/$(TARGET).lss 
 sym: $(OUTDIR)/$(TARGET).sym
 hex: $(OUTDIR)/$(TARGET).hex
 bin: $(OUTDIR)/$(TARGET).bin
+bino: $(OUTDIR)/$(TARGET).bin.o
 
 # Display sizes of sections.
 $(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))
@@ -467,6 +470,7 @@ clean_list :
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).sym
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).lss
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin.o
 	$(V1) $(REMOVE) $(ALLOBJ)
 	$(V1) $(REMOVE) $(LSTFILES)
 	$(V1) $(REMOVE) $(DEPFILES)

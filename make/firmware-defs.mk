@@ -27,6 +27,7 @@ MSG_FORMATERROR      := ${quote} Can not handle output-format${quote}
 MSG_MODINIT          := ${quote} MODINIT   ${quote}
 MSG_SIZE             := ${quote} SIZE      ${quote}
 MSG_LOAD_FILE        := ${quote} BIN/HEX   ${quote}
+MSG_BIN_OBJ          := ${quote} BINO      ${quote}
 MSG_EXTENDED_LISTING := ${quote} LIS       ${quote}
 MSG_SYMBOL_TABLE     := ${quote} NM        ${quote}
 MSG_LINKING          := ${quote} LD        ${quote}
@@ -57,6 +58,16 @@ gccversion :
 %.bin: %.elf
 	@echo $(MSG_LOAD_FILE) $(call toprel, $@)
 	$(V1) $(OBJCOPY) -O binary $< $@
+
+%.bin.o: %.bin
+	@echo $(MSG_BIN_OBJ) $(call toprel, $@)
+	$(V1) $(OBJCOPY) -I binary -O elf32-littlearm --binary-architecture arm \
+		--rename-section .data=.rodata,alloc,load,readonly,data,contents \
+		--wildcard \
+		--redefine-sym _binary_$(subst -,_,$(subst .,_,$(subst /,_,$<)))_start=_binary_start \
+		--redefine-sym _binary_$(subst -,_,$(subst .,_,$(subst /,_,$<)))_end=_binary_end \
+		--redefine-sym _binary_$(subst -,_,$(subst .,_,$(subst /,_,$<)))_size=_binary_size \
+		$< $@
 
 # Create extended listing file/disassambly from ELF output file.
 # using objdump testing: option -C

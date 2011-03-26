@@ -481,7 +481,7 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
 		default:
 			// Major error, this should not occur because only enter this block when one of these is true
 			AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
-			break;	
+			return;	
 	}
 	
 	// TOOD: Add assumption about order of stabilization desired and manual control stabilization mode fields having same order

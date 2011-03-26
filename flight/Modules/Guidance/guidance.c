@@ -97,9 +97,14 @@ int32_t GuidanceInitialize()
 	return 0;
 }
 
-static float northIntegral = 0;
-static float eastIntegral = 0;
-static float downIntegral = 0;
+static float northVelIntegral = 0;
+static float eastVelIntegral = 0;
+static float downVelIntegral = 0;
+
+static float northPosIntegral = 0;
+static float eastPosIntegral = 0;
+static float downPosIntegral = 0;
+
 static uint8_t positionHoldLast = 0;
 
 /**
@@ -207,9 +212,12 @@ static void guidanceTask(void *parameters)
 			
 		} else {
 			// Be cleaner and get rid of global variables
-			northIntegral = 0;
-			eastIntegral = 0;
-			downIntegral = 0;
+			northVelIntegral = 0;
+			eastVelIntegral = 0;
+			downVelIntegral = 0;
+			northPosIntegral = 0;
+			eastPosIntegral = 0;
+			downPosIntegral = 0;
 			positionHoldLast = 0;
 		}
 		
@@ -226,6 +234,10 @@ static void guidanceTask(void *parameters)
  */
 void updateVtolDesiredVelocity()
 {
+	static portTickType lastSysTime;
+	portTickType thisSysTime = xTaskGetTickCount();;
+	float dT;
+
 	GuidanceSettingsData guidanceSettings;
 	PositionActualData positionActual;
 	PositionDesiredData positionDesired;
@@ -236,21 +248,47 @@ void updateVtolDesiredVelocity()
 	PositionDesiredGet(&positionDesired);
 	VelocityDesiredGet(&velocityDesired);
 	
+	float northError;
+	float eastError;
+	float downError;
+	float northCommand;
+	float eastCommand;
+	float downCommand;
+	
+
+	// Check how long since last update
+	if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
+		dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;		
+	lastSysTime = thisSysTime;
+	
 	// Note all distances in cm
-	float dNorth = positionDesired.North - positionActual.North;
-	float dEast = positionDesired.East - positionActual.East;
-	float distance = sqrt(pow(dNorth, 2) + pow(dEast, 2));
-	float heading = atan2f(dEast, dNorth);
-	float groundspeed = bound(distance * guidanceSettings.HorizontalP[GUIDANCESETTINGS_HORIZONTALP_KP], 
-				  0, guidanceSettings.HorizontalP[GUIDANCESETTINGS_HORIZONTALP_MAX]);
+	// Compute desired north command
+	northError = positionDesired.North - positionActual.North;
+	northPosIntegral = bound(northPosIntegral + northError * dT * guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_KI], 
+			      -guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_ILIMIT],
+			      guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_ILIMIT]);
+	northCommand = (northError * guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_KP] +
+			northPosIntegral);
 	
-	velocityDesired.North = groundspeed * cosf(heading);
-	velocityDesired.East = groundspeed * sinf(heading);
+	eastError = positionDesired.East - positionActual.East;
+	eastPosIntegral = bound(eastPosIntegral + eastError * dT * guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_KI], 
+				 -guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_ILIMIT],
+				 guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_ILIMIT]);
+	eastCommand = (eastError * guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_KP] +
+		       northPosIntegral);
 	
-	float dDown = positionDesired.Down - positionActual.Down;
-	velocityDesired.Down = bound(dDown * guidanceSettings.VerticalP[GUIDANCESETTINGS_VERTICALP_KP],
-				     -guidanceSettings.VerticalP[GUIDANCESETTINGS_VERTICALP_MAX], 
-				     guidanceSettings.VerticalP[GUIDANCESETTINGS_VERTICALP_MAX]);
+	
+	velocityDesired.North = bound(northCommand,-guidanceSettings.HorizontalVelMax,guidanceSettings.HorizontalVelMax);
+	velocityDesired.East = bound(eastCommand,-guidanceSettings.HorizontalVelMax,guidanceSettings.HorizontalVelMax);
+
+	downError = positionDesired.Down - positionActual.Down;
+	downPosIntegral = bound(downPosIntegral + downError * dT * guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_KI], 
+				-guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_ILIMIT],
+				guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_ILIMIT]);
+	downCommand = (downError * guidanceSettings.VerticalPosPI[GUIDANCESETTINGS_VERTICALPOSPI_KP] + downPosIntegral);
+	velocityDesired.Down = bound(downCommand,
+				     -guidanceSettings.VerticalVelMax, 
+				     guidanceSettings.VerticalVelMax);
 	
 	VelocityDesiredSet(&velocityDesired);	
 }
@@ -309,29 +347,29 @@ static void updateVtolDesiredAttitude()
 	
 	// Compute desired north command
 	northError = velocityDesired.North - velocityActual.North;
-	northIntegral = bound(northIntegral + northError * dT, 
+	northVelIntegral = bound(northVelIntegral + northError * dT * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KI], 
 			      -guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_ILIMIT],
 			      guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_ILIMIT]);
 	northCommand = (northError * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KP] +
-			northIntegral * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KI] -
+			northVelIntegral -
 			nedAccel.North * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KD]);
 	
 	// Compute desired east command
 	eastError = velocityDesired.East - velocityActual.East;
-	eastIntegral = bound(eastIntegral + eastError * dT, 
+	eastVelIntegral = bound(eastVelIntegral + eastError * dT * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KI], 
 			     -guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_ILIMIT],
 			     guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_ILIMIT]);
 	eastCommand = (eastError * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KP] + 
-		       eastIntegral * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KI] - 
+		       eastVelIntegral - 
 		       nedAccel.East * guidanceSettings.HorizontalVelPID[GUIDANCESETTINGS_HORIZONTALVELPID_KD]);
 	
 	// Compute desired down command
 	downError = velocityDesired.Down - velocityActual.Down;
-	downIntegral =	bound(downIntegral + downError * dT, 
+	downVelIntegral = bound(downVelIntegral + downError * dT * guidanceSettings.VerticalVelPID[GUIDANCESETTINGS_VERTICALVELPID_KI], 
 			      -guidanceSettings.VerticalVelPID[GUIDANCESETTINGS_VERTICALVELPID_ILIMIT],
 			      guidanceSettings.VerticalVelPID[GUIDANCESETTINGS_VERTICALVELPID_ILIMIT]);	
 	downCommand = (downError * guidanceSettings.VerticalVelPID[GUIDANCESETTINGS_VERTICALVELPID_KP] +
-		       downIntegral * guidanceSettings.VerticalVelPID[GUIDANCESETTINGS_VERTICALVELPID_KI] -
+		       downVelIntegral -
 		       nedAccel.Down * guidanceSettings.VerticalVelPID[GUIDANCESETTINGS_VERTICALVELPID_KD]);
 	
 	stabDesired.Throttle = bound(downCommand, 0, 1);
@@ -373,8 +411,8 @@ static void manualSetDesiredVelocity()
 	GuidanceSettingsData guidanceSettings;
 	GuidanceSettingsGet(&guidanceSettings);
 	
-	velocityDesired.North = -guidanceSettings.HorizontalP[GUIDANCESETTINGS_HORIZONTALP_MAX] * cmd.Pitch;
-	velocityDesired.East = guidanceSettings.HorizontalP[GUIDANCESETTINGS_HORIZONTALP_MAX] * cmd.Roll;
+	velocityDesired.North = -guidanceSettings.HorizontalVelMax * cmd.Pitch;
+	velocityDesired.East = guidanceSettings.HorizontalVelMax * cmd.Roll;
 	velocityDesired.Down = 0;
 	
 	VelocityDesiredSet(&velocityDesired);	

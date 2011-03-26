@@ -35,6 +35,33 @@
 
 #define printf qDebug
 
+
+void printPortInfo(struct udev_device *dev)
+{
+    printf("   Node: %s", udev_device_get_devnode(dev));
+    printf("   Subsystem: %s", udev_device_get_subsystem(dev));
+    printf("   Devtype: %s", udev_device_get_devtype(dev));
+    printf("   Action: %s", udev_device_get_action(dev));
+    /* From here, we can call get_sysattr_value() for each file
+    in the device's /sys entry. The strings passed into these
+    functions (idProduct, idVendor, serial, etc.) correspond
+    directly to the files in the directory which represents
+    the USB device. Note that USB strings are Unicode, UCS2
+    encoded, but the strings returned from
+    udev_device_get_sysattr_value() are UTF-8 encoded. */
+    printf("  VID/PID/bcdDevice : %s %s %s",
+           udev_device_get_sysattr_value(dev,"idVendor"),
+           udev_device_get_sysattr_value(dev, "idProduct"),
+           udev_device_get_sysattr_value(dev,"bcdDevice"));
+    printf("  %s   -  %s",
+            udev_device_get_sysattr_value(dev,"manufacturer"),
+            udev_device_get_sysattr_value(dev,"product"));
+    printf("  serial: %s",
+            udev_device_get_sysattr_value(dev, "serial"));
+
+}
+
+
 void USBMonitor::deviceEventReceived() {
 
     qDebug() << "Device event";
@@ -46,8 +73,10 @@ void USBMonitor::deviceEventReceived() {
         QString action = QString(udev_device_get_action(dev));
         QString devtype = QString(udev_device_get_devtype(dev));
         if (action == "add" && devtype == "usb_device") {
+            printPortInfo(dev);
             emit deviceDiscovered(makePortInfo(dev));
         } else if (action == "remove" && devtype == "usb_device"){
+            printPortInfo(dev);
             emit deviceRemoved(makePortInfo(dev));
         }
 
@@ -147,6 +176,8 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceM
 }
 
 
+
+
 USBPortInfo USBMonitor::makePortInfo(struct udev_device *dev)
 {
     USBPortInfo prtInfo;
@@ -154,29 +185,9 @@ USBPortInfo USBMonitor::makePortInfo(struct udev_device *dev)
     //////////
     //  Debug info
     //////////
-    printf("   Node: %s", udev_device_get_devnode(dev));
-    printf("   Subsystem: %s", udev_device_get_subsystem(dev));
-    printf("   Devtype: %s", udev_device_get_devtype(dev));
-    printf("   Action: %s", udev_device_get_action(dev));
-    /* From here, we can call get_sysattr_value() for each file
-    in the device's /sys entry. The strings passed into these
-    functions (idProduct, idVendor, serial, etc.) correspond
-    directly to the files in the directory which represents
-    the USB device. Note that USB strings are Unicode, UCS2
-    encoded, but the strings returned from
-    udev_device_get_sysattr_value() are UTF-8 encoded. */
-    printf("  VID/PID/bcdDevice : %s %s %s",
-           udev_device_get_sysattr_value(dev,"idVendor"),
-           udev_device_get_sysattr_value(dev, "idProduct"),
-           udev_device_get_sysattr_value(dev,"bcdDevice"));
-    printf("  %s   -  %s",
-            udev_device_get_sysattr_value(dev,"manufacturer"),
-            udev_device_get_sysattr_value(dev,"product"));
-    printf("  serial: %s",
-            udev_device_get_sysattr_value(dev, "serial"));
-    //////////
-    //  Debug info end
-    //////////
+#ifdef DEBUG
+    printPortInfo(dev);
+#endif
 
 
     bool ok;

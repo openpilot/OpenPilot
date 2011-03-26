@@ -278,20 +278,30 @@ uavobjects_clean:
 #
 ##############################
 
-FW_TARGETS := openpilot ahrs coptercontrol pipxtreme ins
-BL_TARGETS := $(addprefix bl_, $(FW_TARGETS))
+FW_TARGETS    := openpilot ahrs coptercontrol pipxtreme ins
+BL_TARGETS    := $(addprefix bl_, $(FW_TARGETS))
+BLUPD_TARGETS := $(addprefix blupd_, $(FW_TARGETS))
+
+# FIXME: The INS build doesn't have a bootloader or bootloader
+#        updater yet so we need to filter them out to prevent errors.
+BL_TARGETS    := $(filter-out bl_ins, $(BL_TARGETS))
+BLUPD_TARGETS := $(filter-out blupd_ins, $(BLUPD_TARGETS))
 
 .PHONY: all_fw all_fw_clean
 all_fw:           $(addsuffix _bin,   $(FW_TARGETS))
 all_fw_clean:     $(addsuffix _clean, $(FW_TARGETS))
 
-.PHONY: all_bw all_bw_clean
+.PHONY: all_bl all_bl_clean
 all_bl:           $(addsuffix _elf,   $(BL_TARGETS))
 all_bl_clean:     $(addsuffix _clean, $(BL_TARGETS))
 
+.PHONY: all_blupd all_blupd_clean
+all_blupd:        $(addsuffix _elf,   $(BLUPD_TARGETS))
+all_blupd_clean:  $(addsuffix _clean, $(BLUPD_TARGETS))
+
 .PHONY: all_flight all_flight_clean
-all_flight:       all_fw all_bl
-all_flight_clean: all_fw_clean all_bl_clean
+all_flight:       all_fw all_bl all_blupd
+all_flight_clean: all_fw_clean all_bl_clean all_blupd_clean
 
 .PHONY: openpilot
 openpilot: openpilot_bin
@@ -307,6 +317,7 @@ openpilot_clean:
 
 .PHONY: bl_openpilot
 bl_openpilot: bl_openpilot_elf
+bl_openpilot_bino: bl_openpilot_elf
 
 bl_openpilot_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_openpilot/dep
@@ -316,6 +327,20 @@ bl_openpilot_%:
 bl_openpilot_clean:
 	$(V0) @echo " CLEAN     $@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bl_openpilot
+
+blupd_openpilot_%: bl_openpilot_bino
+	$(V1) mkdir -p $(BUILD_DIR)/blupd_openpilot/dep
+	$(V1) $(MAKE) -r --no-print-directory \
+		OUTDIR="$(BUILD_DIR)/blupd_openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
+		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
+		BOARD=STM3210E_OP MODEL=HD MODEL_SUFFIX=_OP USE_BOOTLOADER=YES \
+		BLOBJ=$(BUILD_DIR)/bl_openpilot/OpenPilot_BL.bin.o \
+		-C $(ROOT_DIR)/flight/Bootloaders/BootloaderUpdater $*
+
+.PHONY: blupd_openpilot_clean
+blupd_openpilot_clean:
+	$(V0) @echo " CLEAN     $@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/blupd_openpilot
 
 .PHONY: ahrs
 ahrs: ahrs_bin
@@ -331,6 +356,7 @@ ahrs_clean:
 
 .PHONY: bl_ahrs
 bl_ahrs: bl_ahrs_elf
+bl_ahrs_bino: bl_ahrs_elf
 
 bl_ahrs_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_ahrs/dep
@@ -340,6 +366,20 @@ bl_ahrs_%:
 bl_ahrs_clean:
 	$(V0) @echo " CLEAN     $@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bl_ahrs
+
+blupd_ahrs_%: bl_ahrs_bino bl_ahrs
+	$(V1) mkdir -p $(BUILD_DIR)/blupd_ahrs/dep
+	$(V1) $(MAKE) -r --no-print-directory \
+		OUTDIR="$(BUILD_DIR)/blupd_ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
+		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
+		BOARD=STM32103CB_AHRS MODEL=MD USE_BOOTLOADER=YES \
+		BLOBJ=$(BUILD_DIR)/bl_ahrs/AHRS_BL.bin.o \
+		-C $(ROOT_DIR)/flight/Bootloaders/BootloaderUpdater $*
+
+.PHONY: blupd_ahrs_clean
+blupd_ahrs_clean:
+	$(V0) @echo " CLEAN     $@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/blupd_ahrs
 
 .PHONY: coptercontrol
 coptercontrol: coptercontrol_bin
@@ -355,6 +395,7 @@ coptercontrol_clean:
 
 .PHONY: bl_coptercontrol
 bl_coptercontrol: bl_coptercontrol_elf
+bl_coptercontrol_bino: bl_coptercontrol_elf
 
 bl_coptercontrol_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_coptercontrol/dep
@@ -364,6 +405,20 @@ bl_coptercontrol_%:
 bl_coptercontrol_clean:
 	$(V0) @echo " CLEAN     $@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bl_coptercontrol
+
+blupd_coptercontrol_%: bl_coptercontrol_bino
+	$(V1) mkdir -p $(BUILD_DIR)/blupd_coptercontrol/dep
+	$(V1) $(MAKE) -r --no-print-directory \
+		OUTDIR="$(BUILD_DIR)/blupd_coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
+		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
+		BOARD=STM32103CB_CC_Rev1 MODEL=MD MODEL_SUFFIX=_CC USE_BOOTLOADER=YES \
+		BLOBJ=$(BUILD_DIR)/bl_coptercontrol/CopterControl_BL.bin.o \
+		-C $(ROOT_DIR)/flight/Bootloaders/BootloaderUpdater $*
+
+.PHONY: blupd_coptercontrol_clean
+blupd_coptercontrol_clean:
+	$(V0) @echo " CLEAN     $@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/blupd_coptercontrol
 
 .PHONY: pipxtreme
 pipxtreme: pipxtreme_bin
@@ -379,6 +434,7 @@ pipxtreme_clean:
 
 .PHONY: bl_pipxtreme
 bl_pipxtreme: bl_pipxtreme_elf
+bl_pipxtreme_bino: bl_pipxtreme_elf
 
 bl_pipxtreme_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_pipxtreme/dep
@@ -388,6 +444,21 @@ bl_pipxtreme_%:
 bl_pipxtreme_clean:
 	$(V0) @echo " CLEAN     $@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bl_pipxtreme
+
+blupd_pipxtreme_%: bl_pipxtreme_bino
+	$(V1) mkdir -p $(BUILD_DIR)/blupd_pipxtreme/dep
+	$(V1) $(MAKE) -r --no-print-directory \
+		OUTDIR="$(BUILD_DIR)/blupd_pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
+		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
+		BOARD=STM32103CB_PIPXTREME MODEL=MD MODEL_SUFFIX=_CC USE_BOOTLOADER=YES \
+		BLOBJ=$(BUILD_DIR)/bl_pipxtreme/PipXtreme_BL.bin.o \
+		-C $(ROOT_DIR)/flight/Bootloaders/BootloaderUpdater $*
+
+.PHONY: blupd_pipxtreme_clean
+blupd_pipxtreme_clean:
+	$(V0) @echo " CLEAN     $@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/blupd_pipxtreme
+
 
 .PHONY: ins
 ins: ins_bin

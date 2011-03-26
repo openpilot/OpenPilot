@@ -59,10 +59,10 @@ PROVIDE (   HardFault_Handler = 0 ) ;
 PROVIDE (   MemManage_Handler = 0 ) ;
 PROVIDE (   BusFault_Handler = 0 ) ;
 PROVIDE (   UsageFault_Handler = 0 ) ;
-PROVIDE (   SVC_Handler = 0 ) ;
+PROVIDE (   vPortSVCHandler = 0 ) ;
 PROVIDE (   DebugMon_Handler = 0 ) ;
-PROVIDE (   PendSV_Handler = 0 ) ;
-PROVIDE (   SysTick_Handler = 0 ) ;
+PROVIDE (   xPortPendSVHandler = 0 ) ;
+PROVIDE (   xPortSysTickHandler = 0 ) ;
 
 PROVIDE (   WWDG_IRQHandler = 0 ) ;
 PROVIDE (   PVD_IRQHandler = 0 ) ;

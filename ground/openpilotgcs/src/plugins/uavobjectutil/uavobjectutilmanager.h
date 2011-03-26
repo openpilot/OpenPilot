@@ -60,6 +60,8 @@ public:
 	int getTelemetrySerialPortSpeed(QString &speed);
 	int getTelemetrySerialPortSpeeds(QComboBox *comboBox);
 
+        int getBoardModel();
+
 private:
 	QMutex *mutex;
 

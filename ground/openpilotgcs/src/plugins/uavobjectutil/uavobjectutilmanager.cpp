@@ -32,6 +32,8 @@
 
 #include <QMutexLocker>
 #include <QDebug>
+#include <QEventLoop>
+#include <QTimer>
 
 // ******************************
 // constructor/destructor
@@ -113,6 +115,34 @@ void UAVObjectUtilManager::transactionCompleted(UAVObject *obj, bool success)
 	queue.dequeue();		// We can now remove the object, it's done.
 	saveNextObject();
 }
+
+/**
+  * Get the UAV Board model, for anyone interested. Return format is:
+  * (Board Type << 8) + BoardRevision.
+  */
+int UAVObjectUtilManager::getBoardModel()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    if (!pm)
+        return 0;
+    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+    if (!om)
+        return 0;
+
+    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
+    // The code below will ask for the object update and wait for the updated to be received,
+    // or the timeout of the timer, set to 1 second.
+    QEventLoop loop;
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
+    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
+    obj->requestUpdate();
+    loop.exec();
+
+    int boardType = (obj->getField("BoardType")->getValue().toInt()) << 8;
+    boardType += obj->getField("BoardRevision")->getValue().toInt();
+    return boardType;
+}
+
 
 // ******************************
 // HomeLocation

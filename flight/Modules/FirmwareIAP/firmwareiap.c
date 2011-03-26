@@ -185,6 +185,7 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
 				break;
 			default:
 				iap_state = IAP_STATE_READY;
+				last_time = 0; // Reset the time counter, as we are not doing a IAP reset
 				break;
 		}
 	}

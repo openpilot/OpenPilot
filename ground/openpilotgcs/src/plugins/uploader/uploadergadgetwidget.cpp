@@ -148,6 +148,8 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
                           // otherwise we won't find it when we stop the board.
         // The board is running, send the 1st IAP Reset order:
         fwIAP->getField("Command")->setValue("1122");
+        fwIAP->getField("BoardRevision")->setDouble(0);
+        fwIAP->getField("BoardType")->setDouble(0);
         connect(fwIAP,SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
         currentStep = IAP_STATE_STEP_1;
         clearLog();
@@ -226,6 +228,8 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             delete dfu;
             dfu = NULL;
             cm->resumePolling();
+            currentStep = IAP_STATE_READY;
+            m_config->boardStatus->setText("Bootloader?");
             return;
         }
         dfu->AbortOperation();
@@ -235,6 +239,8 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             delete dfu;
             dfu = NULL;
             cm->resumePolling();
+            currentStep = IAP_STATE_READY;
+            m_config->boardStatus->setText("Bootloader?");
             return;
         }
         //dfu.StatusRequest();

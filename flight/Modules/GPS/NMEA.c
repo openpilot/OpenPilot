@@ -44,13 +44,13 @@
 
 // Debugging
 #ifdef ENABLE_DEBUG_MSG
-#define DEBUG_MSG_IN			///< define to display the incoming NMEA messages
+//#define DEBUG_MSG_IN			///< define to display the incoming NMEA messages
 //#define DEBUG_PARS			///< define to display the incoming NMEA messages split into its parameters
 //#define DEBUG_MGSID_IN		///< define to display the the names of the incoming NMEA messages
 //#define NMEA_DEBUG_PKT		///< define to enable debug of all NMEA messages
 //#define NMEA_DEBUG_GGA		///< define to enable debug of GGA messages
 //#define NMEA_DEBUG_VTG		///< define to enable debug of VTG messages
-#define NMEA_DEBUG_RMC		///< define to enable debug of RMC messages
+//#define NMEA_DEBUG_RMC		///< define to enable debug of RMC messages
 //#define NMEA_DEBUG_GSA		///< define to enable debug of GSA messages
 //#define NMEA_DEBUG_GSV		///< define to enable debug of GSV messages
 //#define NMEA_DEBUG_ZDA		///< define to enable debug of ZDA messages
@@ -357,7 +357,7 @@ bool NMEA_update_position(char *nmea_sentence)
 
 	if (!parser->handler(&GpsData, &gpsDataUpdated, params, nbParams)) {
 		// Parse failed
-		DEBUG_MSG("PARSE FAILED (\"%s\")", params[0]);
+		DEBUG_MSG("PARSE FAILED (\"%s\")\n", params[0]);
 		return false;
 	}
 
@@ -512,8 +512,32 @@ static bool nmeaProcessGPVTG(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
  */
 static bool nmeaProcessGPZDA(GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam)
 {
+	if (nbParam != 7)
+		return false;
+
+	#ifdef NMEA_DEBUG_ZDA
+		DEBUG_MSG("\n Time=%s (hhmmss.ss)\n", param[1]);
+		DEBUG_MSG(" Date=%s/%s/%s (d/m/y)\n", param[2], param[3], param[4]);
+	#endif
+
+	*gpsDataUpdated = false;	// Here we will never provide a new GPS value
+
 	// No new data data extracted
-	*gpsDataUpdated = false;
+	GPSTimeData gpst;
+	GPSTimeGet(&gpst);
+
+	// get UTC time [hhmmss.sss]
+	float hms = NMEA_real_to_float(param[1]);
+	gpst.Second = (int)hms % 100;
+	gpst.Minute = (((int)hms - gpst.Second) / 100) % 100;
+	gpst.Hour = (int)hms / 10000;
+
+	// Get Date
+	gpst.Day = atoi(param[2]);
+	gpst.Month = atoi(param[3]);
+	gpst.Year = atoi(param[4]);
+
+	GPSTimeSet(&gpst);
 	return true;
 }
 

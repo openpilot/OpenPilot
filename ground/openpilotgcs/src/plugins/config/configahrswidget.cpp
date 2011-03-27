@@ -36,6 +36,7 @@
 #include <QtGui/QPushButton>
 #include <QThread>
 #include <iostream>
+#include <Eigen/align-function.h>
 
 #include "calibration.h"
 
@@ -205,6 +206,9 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     // Register for Home Location state changes
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("HomeLocation")));
     connect(obj, SIGNAL(objectUpdated(UAVObject*)), this , SLOT(enableHomeLocSave(UAVObject*)));
+
+    // Don't enable multi-point calibration until HomeLocation is set.
+    m_ahrs->sixPointsStart->setEnabled(obj->getField("Set")->getValue().toBool());
 
     // Connect the signals
     connect(m_ahrs->ahrsCalibStart, SIGNAL(clicked()), this, SLOT(launchAHRSCalibration()));
@@ -564,6 +568,7 @@ void ConfigAHRSWidget::saveAHRSCalibration()
 
 }
 
+FORCE_ALIGN_FUNC
 void ConfigAHRSWidget::attitudeRawUpdated(UAVObject * obj)
 {
     QMutexLocker lock(&attitudeRawUpdateLock);
@@ -774,8 +779,18 @@ updateBias(UAVObjectField *scale,
     bias->setDouble(final_bias(1), 1);
     bias->setDouble(final_bias(2), 2);
 }
+
+void
+updateRotation(UAVObjectField *rotation, const Vector3f& updateRotation)
+{
+	for (int i = 0; i < 3; ++i) {
+		rotation->setDouble(updateRotation[i], i);
+	}
+}
+
 } // !namespace (anon)
 
+FORCE_ALIGN_FUNC
 void ConfigAHRSWidget::computeScaleBias()
 {
     // Extract the local magnetic and gravitational field vectors from HomeLocation.
@@ -826,12 +841,12 @@ void ConfigAHRSWidget::computeScaleBias()
     std::cout << "gyro bias: " << gyroBias.transpose()
 		<< "\ngyro's acceleration sensitivity:\n" << accelSensitivity << std::endl;
 
-    // Calibrate alignment between the accelerometer and gyro, taking the accelerometer as the
+    // Calibrate alignment between the accelerometer and magnetometer, taking the mag as the
     // reference.
-    Vector3f magRotation;
-    calibration_misalignment(magRotation, accel_data, -Vector3f::UnitZ()*localGravity,
+    Vector3f accelRotation;
+    calibration_misalignment(accelRotation, accel_data, -Vector3f::UnitZ()*localGravity,
 			mag_data, localMagField, n_positions);
-    std::cout << "magnetometer rotation vector: " << magRotation.transpose() << std::endl;
+    std::cout << "magnetometer rotation vector: " << accelRotation.transpose() << std::endl;
 
     // Update the calibration scalars
     UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
@@ -851,7 +866,11 @@ void ConfigAHRSWidget::computeScaleBias()
 		obj->getField(QString("gyro_bias")),
 		gyroBias);
 
-	// TODO: Misalignment matrix between accelerometer and magnetometer
+#if 0
+	// TODO: Enable after v1.0 feature freeze is lifted.
+	updateRotation(obj->getField(QString("accel_rotation")), accelRotation);
+#endif
+
     obj->updated();
 
     position = -1; //set to run again
@@ -870,26 +889,24 @@ void ConfigAHRSWidget::sixPointCalibrationMode()
     UAVObjectField *field = obj->getField(QString("accel_scale"));
     // TODO: Figure out how to load these directly from the saved metadata
     // about default values
-    field->setDouble(0.035, 0);
-    field->setDouble(0.035, 1);
-    field->setDouble(0.035, 2);
+    field->setDouble(0.0359, 0);
+    field->setDouble(0.0359, 1);
+    field->setDouble(0.0359, 2);
 
     field = obj->getField(QString("accel_bias"));
-    field->setDouble(-72.5, 0);
-    field->setDouble(-72.5, 1);
-    field->setDouble(72.5, 2);
+    field->setDouble(-73.5, 0);
+    field->setDouble(-73.5, 1);
+    field->setDouble(73.5, 2);
 
     field = obj->getField(QString("accel_ortho"));
     for (int i = 0; i < 3; ++i) {
     	field->setDouble(0, i);
     }
 
-#if 1
     field = obj->getField(QString("gyro_bias"));
-    field->setDouble(28.5,0);
-    field->setDouble(-28.5,1);
-    field->setDouble(28.6,2);
-#endif
+    field->setDouble(23,0);
+    field->setDouble(-23,1);
+    field->setDouble(23,2);
 
     field = obj->getField(QString("mag_scale"));
     for (int i = 0; i < 3; ++i) {
@@ -901,9 +918,16 @@ void ConfigAHRSWidget::sixPointCalibrationMode()
     	field->setDouble(0, i);
     }
 
+#if 0
+    // TODO: Enable after the feature freeze is lifted.
+    field = obj->getField(QString("accel_rotation"));
+    for (int i = 0; i < 3; ++i) {
+    	field->setDouble(0, i);
+    }
+#endif
+
     obj->updated();
 
-    // TODO: What is this?
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
     field = obj->getField(QString("BiasCorrectedRaw"));
     field->setValue("FALSE");
@@ -1020,6 +1044,7 @@ void ConfigAHRSWidget::enableHomeLocSave(UAVObject * obj)
     UAVObjectField *field = obj->getField(QString("Set"));
     if (field) {
         m_ahrs->homeLocationSet->setEnabled(field->getValue().toBool());
+        m_ahrs->sixPointsStart->setEnabled(obj->getField("Set")->getValue().toBool());
     }
 }
 

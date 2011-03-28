@@ -59,6 +59,10 @@ class ImageView : public QObject, public QGraphicsItemGroup {
      * @param li a Line to display on the scene.
      */
     void addLine(Line* li);
+    /**
+     * @param li the Line to remove from this ImageView.
+     */
+    void removeLine(Line* li);
 
     void addPolyLine(qdisplay::PolyLine* pl);
 

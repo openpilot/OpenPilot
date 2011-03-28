@@ -107,6 +107,11 @@ void ImageView::addLine(Line* li)
   li->moveBy(pos().x(), pos().y());
 }
 
+void ImageView::removeLine(Line* li)
+{
+	li->setParentItem(0);
+}
+
 void ImageView::addPolyLine(qdisplay::PolyLine* pl)
 {
     addToGroup(pl);

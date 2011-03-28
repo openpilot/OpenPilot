@@ -45,6 +45,9 @@ void Shape::paint(QPainter *painter, const QStyleOptionGraphicsItem * opt, QWidg
     case ShapeEllipse:
       painter->drawEllipse(m_boundingRect);
       break;
+    case ShapeLine:
+      painter->drawLine(QPointF(m_boundingRect.left(), 0.), QPointF( m_boundingRect.right(), 0.));
+      break;
   }
 
 	// Setting the painter brush to the default brush Qt:NoBrush

@@ -20,7 +20,8 @@ class Shape : public QGraphicsItemGroup {
       ShapeCrossX,
       ShapeEllipse,
       ShapeRectangleFilled,
-      ShapeEllipseFilled
+      ShapeEllipseFilled,
+      ShapeLine
     };
     /**
       * Create an Shape to use with a Viewer to display a basic shape.
@@ -48,6 +49,16 @@ class Shape : public QGraphicsItemGroup {
      * @param y
      */
     inline void setPos(double x, double y) { QGraphicsItem::setPos(x,y); }
+    /**
+     * Set the rotation of the shape
+     * @param a
+     */
+    inline void setRotation(double a) { QGraphicsItem::setRotation(a); }
+    /**
+     * Set the scale of the shape
+     * @param s
+     */
+    inline void setScale(double s) { QGraphicsItem::setScale(s); }
     void setLabel(const char * text, double relX = 0, double relY = 0);
     void setFontSize(int s) { m_fontSize = s; }
     void setFontColor( int r, int g, int b) { m_fontColor.setRgb(r,g,b); if (m_label) m_label->setDefaultTextColor( m_fontColor ); }

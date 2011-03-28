@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
 
 #else /* HAVE_FLANN */
 
-	std::cout << "Please install the jann library to get this demo" << std::endl;
+	std::cout << "Please install the flann library to get this demo" << std::endl;
 
 #endif /* HAVE_FLANN */
 

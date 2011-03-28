@@ -3,5 +3,5 @@
 [svn-remote "svn"]
 	reposRoot = svn://svn.openpilot.org/OpenPilot
 	uuid = ebee16cc-31ac-478f-84a7-5cbb03baadba
-	branches-maxRev = 3089
-	tags-maxRev = 3089
+	branches-maxRev = 3090
+	tags-maxRev = 3090

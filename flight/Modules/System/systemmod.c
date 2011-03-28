@@ -162,6 +162,7 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 		// Get object data
 		ObjectPersistenceGet(&objper);
 
+		int retval = -1;
 		// Execute action
 		if (objper.Operation == OBJECTPERSISTENCE_OPERATION_LOAD) {
 			if (objper.Selection == OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT) {
@@ -171,13 +172,13 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 					return;
 				}
 				// Load selected instance
-				UAVObjLoad(obj, objper.InstanceID);
+				retval = UAVObjLoad(obj, objper.InstanceID);
 			} else if (objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLSETTINGS
 				   || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS) {
-				UAVObjLoadSettings();
+				retval = UAVObjLoadSettings();
 			} else if (objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLMETAOBJECTS
 				   || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS) {
-				UAVObjLoadMetaobjects();
+				retval = UAVObjLoadMetaobjects();
 			}
 		} else if (objper.Operation == OBJECTPERSISTENCE_OPERATION_SAVE) {
 			if (objper.Selection == OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT) {
@@ -187,13 +188,13 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 					return;
 				}
 				// Save selected instance
-				UAVObjSave(obj, objper.InstanceID);
+				retval = UAVObjSave(obj, objper.InstanceID);
 			} else if (objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLSETTINGS
 				   || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS) {
-				UAVObjSaveSettings();
+				retval = UAVObjSaveSettings();
 			} else if (objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLMETAOBJECTS
 				   || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS) {
-				UAVObjSaveMetaobjects();
+				retval = UAVObjSaveMetaobjects();
 			}
 		} else if (objper.Operation == OBJECTPERSISTENCE_OPERATION_DELETE) {
 			if (objper.Selection == OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT) {
@@ -203,14 +204,18 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 					return;
 				}
 				// Delete selected instance
-				UAVObjDelete(obj, objper.InstanceID);
+				retval = UAVObjDelete(obj, objper.InstanceID);
 			} else if (objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLSETTINGS
 				   || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS) {
-				UAVObjDeleteSettings();
+				retval = UAVObjDeleteSettings();
 			} else if (objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLMETAOBJECTS
 				   || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS) {
-				UAVObjDeleteMetaobjects();
+				retval = UAVObjDeleteMetaobjects();
 			}
+		}
+		if(retval == 0) { 
+			objper.Operation = OBJECTPERSISTENCE_OPERATION_COMPLETED;
+			ObjectPersistenceSet(&objper);
 		}
 	}
 }

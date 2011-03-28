@@ -74,11 +74,13 @@ void ConfigTaskWidget::saveNextObject()
 
 void ConfigTaskWidget::transactionCompleted(UAVObject* obj, bool success)
 {
-    Q_UNUSED(success);
-    // Disconnect from sending object
-    obj->disconnect(this);
-    queue.dequeue(); // We can now remove the object, it's done.
-    saveNextObject();
+    if(success &&
+       obj->getField("Operation")->getValue().toString().compare(QString("Completed")) == 0 ) {
+        // Disconnect from sending object
+        obj->disconnect(this);
+        queue.dequeue(); // We can now remove the object, it's done.
+        saveNextObject();
+    }
 }
 
 void ConfigTaskWidget::updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj)

@@ -10141,3 +10141,9 @@ r3084
 r3085
 r3086
 r3087
+r3088
+  -empty_dir: trunk/ground/openpilotgcs/src/plugins/config/configservowidget.cpp
+  -empty_dir: trunk/ground/openpilotgcs/src/plugins/config/configservowidget.h
+  -empty_dir: trunk/ground/openpilotgcs/src/plugins/config/settingswidget.ui
+  +file_prop: trunk/ground/openpilotgcs/src/plugins/config/configinputwidget.h svn:eol-style native
+  +file_prop: trunk/ground/openpilotgcs/src/plugins/config/configoutputwidget.h svn:eol-style native

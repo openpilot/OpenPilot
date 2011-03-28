@@ -24,16 +24,18 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 #include "configahrswidget.h"
 #include "configgadgetwidget.h"
 
 #include "fancytabwidget.h"
+#include "configairframewidget.h"
+#include "configccattitudewidget.h"
 #include "configinputwidget.h"
 #include "configoutputwidget.h"
-#include "configairframewidget.h"
+#include "configstabilizationwidget.h"
 #include "configtelemetrywidget.h"
 
-#include "configstabilizationwidget.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -77,7 +79,10 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     qwd = new ConfigTelemetryWidget(this);
     ftw->insertTab(5, qwd, QIcon(":/configgadget/images/XBee.svg"), QString("Telemetry"));
 
-//    qwd = new ConfigPipXtremeWidget(this);
+    qwd = new ConfigCCAttitudeWidget(this);
+    ftw->insertTab(5, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("CC Attitude"));
+
+    //    qwd = new ConfigPipXtremeWidget(this);
 //    ftw->insertTab(5, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));
 
     // *********************

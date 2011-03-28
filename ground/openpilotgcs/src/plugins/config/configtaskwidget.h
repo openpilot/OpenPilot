@@ -48,6 +48,8 @@ public:
     void updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj);
     UAVObjectManager* getObjectManager();
 
+    static double listMean(QList<double> list);
+
 public slots:
     void transactionCompleted(UAVObject* obj, bool success);
 

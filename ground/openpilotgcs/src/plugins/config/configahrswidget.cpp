@@ -670,14 +670,6 @@ void ConfigAHRSWidget::attitudeRawUpdated(UAVObject * obj)
     }
 }
 
-double ConfigAHRSWidget::listMean(QList<double> list)
-{
-    double accum = 0;
-    for(int i = 0; i < list.size(); i++)
-        accum += list[i];
-    return accum / list.size();
-}
-
 /**
   * Saves the data from the aircraft in one of six positions
   */

@@ -24,11 +24,12 @@ HEADERS += configplugin.h \
     configairframewidget.h \
     configtelemetrywidget.h \
     configahrswidget.h \
+    configccattitudewidget.h \
     mixercurvewidget.h \
     mixercurvepoint.h \
     mixercurveline.h \
     configccpmwidget.h \
-	configstabilizationwidget.h \
+    configstabilizationwidget.h \
     assertions.h \
     calibration.h
 
@@ -45,15 +46,16 @@ SOURCES += configplugin.cpp \
     configairframewidget.cpp \
     configtelemetrywidget.cpp \
     configahrswidget.cpp \
+    configccattitudewidget.cpp \
     mixercurvewidget.cpp \
     mixercurvepoint.cpp \
     mixercurveline.cpp \
     configccpmwidget.cpp \
-	configstabilizationwidget.cpp \
+    configstabilizationwidget.cpp \
     twostep.cpp \
     legacy-calibration.cpp \
     gyro-calibration.cpp \
-    alignment-calibration.cpp
+    alignment-calibration.cpp \
     
 FORMS +=  \
     airframe.ui \
@@ -62,6 +64,7 @@ FORMS +=  \
     ccpm.ui \
     stabilization.ui \
     input.ui \
-    output.ui
+    output.ui \
+    ccattitude.ui
 
 RESOURCES += configgadget.qrc

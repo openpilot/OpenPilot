@@ -98,8 +98,19 @@ void ConfigTaskWidget::updateObjectPersistance(ObjectPersistence::OperationOptio
 
 UAVObjectManager* ConfigTaskWidget::getObjectManager() {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    return pm->getObject<UAVObjectManager>();
+    UAVObjectManager * objMngr = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objMngr);
+    return objMngr;
 }
+
+double ConfigTaskWidget::listMean(QList<double> list)
+{
+    double accum = 0;
+    for(int i = 0; i < list.size(); i++)
+        accum += list[i];
+    return accum / list.size();
+}
+
 
 /**
   @}

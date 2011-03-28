@@ -97,7 +97,6 @@ private:
 
     UAVObject::Metadata initialMdata;
 
-    double listMean(QList<double> list);
     void computeGyroDrift();
 
 private slots:

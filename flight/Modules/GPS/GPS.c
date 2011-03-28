@@ -384,8 +384,8 @@ static void setHomeLocation(GPSPositionData * gpsData)
 			// range of altitude (say, weather balloons) may need to update this during the
 			// flight.
 			home.g_e = GravityAccel(LLA[0], LLA[1], LLA[2]);
-		    home.Set = HOMELOCATION_SET_TRUE;
-		    HomeLocationSet(&home);
+			home.Set = HOMELOCATION_SET_TRUE;
+			HomeLocationSet(&home);
 		}
 	}
 }

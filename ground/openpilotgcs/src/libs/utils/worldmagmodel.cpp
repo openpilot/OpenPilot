@@ -192,9 +192,9 @@ namespace Utils {
             return -6;  // error
 
         // set the returned values
-        Be[0] = GeoMagneticElements.X;
-        Be[1] = GeoMagneticElements.Y;
-        Be[2] = GeoMagneticElements.Z;
+        Be[0] = GeoMagneticElements.X * 1e-2;
+        Be[1] = GeoMagneticElements.Y * 1e-2;
+        Be[2] = GeoMagneticElements.Z * 1e-2;
 
         // ***********
 

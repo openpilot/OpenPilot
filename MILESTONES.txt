@@ -98,9 +98,9 @@ D: ?
 V: 
 
 M: First CopterControl flight on a Hexa
-C: ?
-D: ?
-V: 
+C: Edouard Lafargue
+D: March 2011
+V: http://vimeo.com/21476466
 
 M: First CopterControl flight on a Flybarless Heli
 C: ?

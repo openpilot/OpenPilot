@@ -36,6 +36,7 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->zeroBias,SIGNAL(clicked()),this,SLOT(startAccelCalibration()));
+    connect(ui->saveButton,SIGNAL(clicked()),this,SLOT(saveAttitudeSettings()));
 }
 
 ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()
@@ -111,4 +112,9 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
     mdata.flightTelemetryUpdatePeriod = 100;
     obj->setMetadata(mdata);
 
+}
+
+void ConfigCCAttitudeWidget::saveAttitudeSettings() {
+    UAVDataObject * obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeSettings")));
+    saveObjectToSD(obj);
 }

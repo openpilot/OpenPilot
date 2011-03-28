@@ -50,6 +50,7 @@ private slots:
     void attitudeRawUpdated(UAVObject *);
     void timeout();
     void startAccelCalibration();
+    void saveAttitudeSettings();
 
 private:
     QMutex startStop;

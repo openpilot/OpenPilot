@@ -35,6 +35,8 @@
 #include <QtGui/QWidget>
 #include <QList>
 
+#include "fancytabwidget.h"
+
 
 class ConfigGadgetWidget: public QWidget
 {
@@ -52,6 +54,7 @@ signals:
 
 protected:
         void resizeEvent(QResizeEvent * event);
+        FancyTabWidget *ftw;
 
 };
 

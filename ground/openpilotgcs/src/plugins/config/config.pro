@@ -6,6 +6,7 @@ include(../../openpilotgcsplugin.pri)
 include(../../plugins/uavtalk/uavtalk.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(../../plugins/uavobjects/uavobjects.pri)
+include(../../plugins/uavobjectutil/uavobjectutil.pri)
 
 INCLUDEPATH += ../../libs/eigen
 

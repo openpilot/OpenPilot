@@ -28,7 +28,6 @@
 #include "configahrswidget.h"
 #include "configgadgetwidget.h"
 
-#include "fancytabwidget.h"
 #include "configairframewidget.h"
 #include "configccattitudewidget.h"
 #include "configinputwidget.h"
@@ -36,6 +35,7 @@
 #include "configstabilizationwidget.h"
 #include "configtelemetrywidget.h"
 
+#include "uavobjectutilmanager.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -50,7 +50,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
-    FancyTabWidget *ftw = new FancyTabWidget(this, true);
+    ftw = new FancyTabWidget(this, true);
 
     ftw->setIconSize(64);
 
@@ -79,10 +79,8 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     qwd = new ConfigTelemetryWidget(this);
     ftw->insertTab(5, qwd, QIcon(":/configgadget/images/XBee.svg"), QString("Telemetry"));
 
-    qwd = new ConfigCCAttitudeWidget(this);
-    ftw->insertTab(5, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("CC Attitude"));
 
-    //    qwd = new ConfigPipXtremeWidget(this);
+//    qwd = new ConfigPipXtremeWidget(this);
 //    ftw->insertTab(5, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));
 
     // *********************
@@ -109,6 +107,31 @@ void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
 }
 
 void ConfigGadgetWidget::onAutopilotConnect() {
+
+    // First of all, check what Board type we are talking to, and
+    // if necessary, remove/add tabs in the config gadget:
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
+    if (utilMngr) {
+        int board = utilMngr->getBoardModel();
+        qDebug() << "Board model: " << board;
+        if ((board & 0xff00) == 1024) {
+            // CopterControl family
+            // Delete the INS panel, replace with CC Panel:
+            ftw->setCurrentIndex(0);
+            ftw->removeTab(3);
+            QWidget *qwd = new ConfigCCAttitudeWidget(this);
+            ftw->insertTab(3, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("Attitude"));
+        } else if ((board & 0xff00) == 256 ) {
+            // Mainboard family
+            ftw->setCurrentIndex(0);
+            ftw->removeTab(3);
+            QWidget *qwd = new ConfigAHRSWidget(this);
+            ftw->insertTab(3, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+        }
+    }
+
+
     emit autopilotConnected();
 }
 

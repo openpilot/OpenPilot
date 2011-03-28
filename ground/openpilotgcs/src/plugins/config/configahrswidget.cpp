@@ -887,6 +887,7 @@ void ConfigAHRSWidget::sixPointCalibrationMode()
 
     // set accels to unity gain
     UAVObjectField *field = obj->getField(QString("accel_scale"));
+    UAVObjectField *field2 = obj->getField(QString("gyro_scale"));
     // TODO: Figure out how to load these directly from the saved metadata
     // about default values
     field->setDouble(0.0359, 0);
@@ -904,9 +905,9 @@ void ConfigAHRSWidget::sixPointCalibrationMode()
     }
 
     field = obj->getField(QString("gyro_bias"));
-    field->setDouble(23,0);
-    field->setDouble(-23,1);
-    field->setDouble(23,2);
+    field->setDouble(28/0.017*field2->getDouble(0),0);
+    field->setDouble(-28/0.017*field2->getDouble(1),1);
+    field->setDouble(28/0.017*field2->getDouble(2),2);
 
     field = obj->getField(QString("mag_scale"));
     for (int i = 0; i < 3; ++i) {

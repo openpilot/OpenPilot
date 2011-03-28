@@ -14,7 +14,12 @@
 # else
 #  define FORCE_ALIGN_FUNC
 # endif
-#error Unknown compiler.  You may need to provide a definition of FORCE_ALIGN_FUNC
+#else
+# ifdef __MACOSX__
+#  define FORCE_ALIGN_FUNC
+# else
+#  error Unknown compiler.  You may need to provide a definition of FORCE_ALIGN_FUNC
+# endif
 #endif
 
 #endif // !defined OP_EIGEN_ALIGN_FUNCTION_H

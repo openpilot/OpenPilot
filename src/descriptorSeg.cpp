@@ -13,6 +13,7 @@
 #include "rtslam/quatTools.hpp"
 
 #include "dseg/SegmentHypothesis.hpp"
+#include "dseg/LineFitterKalman2.hpp"
 
 namespace jafar {
    namespace rtslam {
@@ -71,6 +72,7 @@ namespace jafar {
 
 
       bool DescriptorSegFirstView::predictAppearance(const observation_ptr_t & obsPtrNew) {
+/*
          landmark_ptr_t lmkPtr = obsPtrNew->landmarkPtr();
          vec6 pnts = lmkPtr->reparametrized();
          vec3 pnt1 = subrange(pnts, 0, 3);
@@ -84,20 +86,51 @@ namespace jafar {
          vec2 exp1 = pinhole::projectPoint(pinHolePtr->params.intrinsic, pinHolePtr->params.distortion, v1);
          vec3 v2 = quaternion::eucToFrame(view.senPose, pnt2);
          vec2 exp2 = pinhole::projectPoint(pinHolePtr->params.intrinsic, pinHolePtr->params.distortion, v2);
-         double x_o = (exp1(0) + exp2(0))/2;
-         double y_o = (exp1(1) + exp2(1))/2;
-         double angle = atan2(exp2(1)-exp1(1),exp2(0)-exp1(0)) + M_PI_2;
-         // Build the hypothesis
-         dseg::SegmentHypothesis* hypothesis = new dseg::SegmentHypothesis(x_o, y_o, angle);
-         hypothesis->setExtremity1(exp1(0),exp1(1));
-         hypothesis->setExtremity2(exp2(0),exp2(1));
+         JFR_DEBUG(exp1 << "\n" << exp2);
+          app_seg_ptr_t app_obs = SPTR_CAST<AppearanceSegment>(obsPtrNew->observedAppearance);
+         JFR_DEBUG(app_obs->hypothesis()->lineFitter().angle());
+         JFR_DEBUG(hypothesis->lineFitter().angle());
+*/
+         vec4 exp = obsPtrNew->expectation.x();
+         double x_o = (exp(0) + exp(2))/2;
+         double y_o = (exp(1) + exp(3))/2;
+         double angle = atan2(exp(3)-exp(1),exp(2)-exp(0)) - M_PI_2;
+         double distance = sqrt((exp(2)-exp(0))*(exp(2)-exp(0)) + (exp(3)-exp(1))*(exp(3)-exp(1)));
+         double distance_cube = distance * distance * distance;
+         double x1mx2 = exp(0) - exp(2);
+         double y1my2 = exp(1) - exp(3);
 
-         double sigma_u = 1; // TODO : set meaningfull values
-         double sigma_x0 = 5;
-         double sigma_v = 1;
-         double sigma_y0 = 5;
-         hypothesis->setUncertainty(sigma_u, sigma_x0, sigma_v, sigma_y0);
+        // Build the hypothesis
+         dseg::SegmentHypothesis* hypothesis = new dseg::SegmentHypothesis(x_o, y_o, angle);
+         hypothesis->setExtremity1(exp(0),exp(1));
+         hypothesis->setExtremity2(exp(2),exp(3));
+
+        // Compute uncertainty
+         mat44 SIGMA_exp;
+         mat44 sigma_cov;
+         SIGMA_exp.clear();
+         SIGMA_exp(0,0) = 0.5; // x0 wrt x1
+         SIGMA_exp(0,2) = 0.5; // x0 wrt x2
+         SIGMA_exp(1,1) = 0.5; // y0 wrt y1
+         SIGMA_exp(1,3) = 0.5; // y0 wrt y2
+         SIGMA_exp(2,1) = -(x1mx2*x1mx2) / distance_cube; // u wrt y1
+         SIGMA_exp(2,3) =  (x1mx2*x1mx2) / distance_cube; // u wrt y2
+         SIGMA_exp(3,0) = -(y1my2*y1my2) / distance_cube; // v wrt x1
+         SIGMA_exp(3,2) =  (y1my2*y1my2) / distance_cube; // v wrt x2
+         sigma_cov = jmath::ublasExtra::prod_JPJt(obsPtrNew->expectation.P() , SIGMA_exp); // sigma_cov = SIGMA_exp * P * SIGMA_exp'
+         vec4 sigma; // [sigma_x0 sigma_y0 sigma_u sigma_v]
+         sigma(0) = sqrt(sigma_cov(0,0));
+         sigma(1) = sqrt(sigma_cov(1,1));
+         sigma(2) = sqrt(sigma_cov(2,2));
+         sigma(3) = sqrt(sigma_cov(3,3));
+
+         JFR_DEBUG("distance_cube\n" << distance_cube << "SIGMA_exp\n" << SIGMA_exp << "sigma_cov \n" << sigma_cov);
+
+         hypothesis->setUncertainty(sigma(2), sigma(0), sigma(3), sigma(1));
+
+         app_seg_ptr_t app_dst = SPTR_CAST<AppearanceSegment>(obsPtrNew->predictedAppearance);
          app_dst->setHypothesis(hypothesis);
+
          return true;
       }
 

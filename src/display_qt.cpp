@@ -372,11 +372,10 @@ std::cout << "connecting slots" << std::endl;
             bool dispInit2 = events_.visible && !events_.predicted;
 
             // Build display objects if it is the first time they are displayed
-            if (items_.size() != 6)
+            if (items_.size() != 8)
             {
                // clear
                items_.clear();
-               lines_.clear();
                if (!dispPred2)
                {
                   predObs_.clear();
@@ -388,7 +387,6 @@ std::cout << "connecting slots" << std::endl;
                }
 
                qdisplay::Shape *s;
-               qdisplay::Line *l;
 
                // prediction point1
                s = new qdisplay::Shape(qdisplay::Shape::ShapeCross, predObs_(0), predObs_(1), 3, 3);
@@ -403,10 +401,10 @@ std::cout << "connecting slots" << std::endl;
                items_.push_back(s);
                dispSen_->view()->addShape(s);
                // prediction line
-               l = new qdisplay::Line(predObs_(0), predObs_(1), predObs_(2), predObs_(3));
-               l->setVisible(false);
-               lines_.push_back(l);
-               dispSen_->view()->addLine(l);
+               s = new qdisplay::Shape(qdisplay::Shape::ShapeLine,0,0,1,1);
+               s->setVisible(false);
+               items_.push_back(s);
+               dispSen_->view()->addShape(s);
                // prediction ellipse1
                vec pred = subrange(predObs_,0,2);
                mat predCov = subrange(predObsCov_,0,2,0,2);
@@ -433,11 +431,11 @@ std::cout << "connecting slots" << std::endl;
                s->setVisible(false);
                items_.push_back(s);
                dispSen_->view()->addShape(s);
-               // prediction line
-               l = new qdisplay::Line(measObs_(0), measObs_(1), measObs_(2), measObs_(3));
-               l->setVisible(false);
-               lines_.push_back(l);
-               dispSen_->view()->addLine(l);
+               // measure line
+               s = new qdisplay::Shape(qdisplay::Shape::ShapeLine,0,0,1,1);
+               s->setVisible(false);
+               items_.push_back(s);
+               dispSen_->view()->addShape(s);
             }
             // Refresh the display objects every time
             {
@@ -453,7 +451,6 @@ std::cout << "connecting slots" << std::endl;
 */
                // prediction points
                ItemList::iterator it = items_.begin();
-               LineList::iterator lit = lines_.begin();
                if (dispPred2)
                {
                   c = getColorRGB(ColorManager::getColorObject_prediction(landmarkPhase_,events_)) ;
@@ -470,16 +467,28 @@ std::cout << "connecting slots" << std::endl;
                   (*it)->setLabel(oss.str().c_str());
                   (*it)->setPos(predObs_(2), predObs_(3));
                   (*it)->setVisible(true);
+                  // prediction line
+                  ++it;
+                  (*it)->setColor(c.R,c.G,c.B); //
+                  double x1 = predObs_(0);
+                  double y1 = predObs_(1);
+                  double x2 = predObs_(2);
+                  double y2 = predObs_(3);
+                  double angle = 180 * atan2(y2-y1 , x2-x1) / M_PI;
+                  double scale = sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+                  (*it)->setPos((x1 + x2) / 2,(y1 + y2) / 2);
+                  (*it)->setRotation(angle);
+                  (*it)->setScale(scale);
+                  (*it)->setVisible(true);
                }
                else
                {
                   (*it)->setVisible(false);
                   ++it;
                   (*it)->setVisible(false);
+                  ++it;
+                  (*it)->setVisible(false);
                }
-               // prediction line
-               (*lit)->setColor(c.R,c.G,c.B); // Line color
-               (*lit)->setVisible(dispPred2);
 
                // prediction ellipses
                ++it;
@@ -537,6 +546,19 @@ std::cout << "connecting slots" << std::endl;
                   (*it)->setColor(c.R,c.G,c.B); // red
                   (*it)->setPos(measObs_(2), measObs_(3));
                   (*it)->setVisible(true);
+                  // measure line
+                  ++it;
+                  (*it)->setColor(c.R,c.G,c.B); //
+                  double x1 = measObs_(0);
+                  double y1 = measObs_(1);
+                  double x2 = measObs_(2);
+                  double y2 = measObs_(3);
+                  double angle = 180 * atan2(y2-y1 , x2-x1) / M_PI;
+                  double scale = sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+                  (*it)->setPos((x1 + x2) / 2,(y1 + y2) / 2);
+                  (*it)->setRotation(angle);
+                  (*it)->setScale(scale);
+                  (*it)->setVisible(true);
                }
                else
                {
@@ -544,10 +566,6 @@ std::cout << "connecting slots" << std::endl;
                   ++it;
                   (*it)->setVisible(false);
                }
-               // Measure line
-               ++lit;
-               (*lit)->setVisible(dispMeas2);
-               (*lit)->setColor(c.R,c.G,c.B);
 
 #if EMBED_PREDICTED_APP
                // display predicted appearance

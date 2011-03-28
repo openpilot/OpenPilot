@@ -21,9 +21,12 @@ namespace jafar {
 		std::ostream& operator <<(std::ostream & s, jafar::rtslam::LandmarkAbstract const & lmk) {
 			s << "LANDMARK " << lmk.id() << ": of " << lmk.typeName() << endl;
 			s << " .state:  " << lmk.state << endl;
-			DescriptorAbstract *desc = lmk.descriptorPtr.get();
-			s << " .descriptor:" << *desc << std::endl;
-			return s;
+         DescriptorAbstract *desc = lmk.descriptorPtr.get();
+         if(desc != NULL)
+            s << " .descriptor:" << *desc << std::endl;
+         else
+            s << " No descriptor " << std::endl;
+         return s;
 		}
 		
 		image::oimstream& operator <<(image::oimstream & s, jafar::rtslam::LandmarkAbstract const & lmk) {

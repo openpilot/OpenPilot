@@ -98,9 +98,12 @@ namespace jafar {
 						{
 							// try to match with low innovation
 							jblas::sym_mat P = jblas::identity_mat(obsCurrentPtr->expectation.size())*jmath::sqr(matcher->params.lowInnov);
-							RoiSpec roi(exp, P, 1.0);
-							obsCurrentPtr->searchSize = roi.count();
-							
+                     RoiSpec roi;
+                     if(obsCurrentPtr->expectation.P().size1() == 2) // basically DsegMatcher handles it's own roi and (due to the size4 expectation) the following roi computation fails. - TODO clean up all this, is should not mess with One point ransac
+                     {
+                        roi = RoiSpec(exp, P, 1.0);
+                        obsCurrentPtr->searchSize = roi.count();
+                     }
 							obsCurrentPtr->events.measured = true;
 							
 							matcher->match(rawData, obsCurrentPtr->predictedAppearance, roi, obsCurrentPtr->measurement, obsCurrentPtr->observedAppearance);
@@ -289,7 +292,7 @@ namespace jafar {
                         RoiSpec roi;
                         if(obsPtr->expectation.P().size1() == 2) // basically DsegMatcher handles it's own roi and (due to the size4 expectation) the following roi computation fails. - TODO clean up all this, is should not mess with One point ransac
                         {
-                           (obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);
+                           roi = RoiSpec(obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);
                            obsPtr->searchSize = roi.count();
                            if (obsPtr->searchSize > matcher->params.maxSearchSize) roi.scale(sqrt(matcher->params.maxSearchSize/(double)obsPtr->searchSize));
                         }

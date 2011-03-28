@@ -64,7 +64,7 @@ void test_ahp01(void) {
 	cout << "AHP_s = " << (MATLAB) AHP_s << endl;
 	cout << "AHP_v = " << (MATLAB) AHP_v << endl;
 	cout << "AHP_r = " << (MATLAB) AHP_r << endl;
-	cout << "[ahp_mat, AHP_s_mat, AHP_v_mat, AHP_r_mat] = fromBearingOnlyFrameAHM(F, v, r)" << endl;
+   cout << "[ahp_mat, AHP_s_mat, AHP_v_mat, AHP_r_mat] = fromFrameAhm(F, v, r)" << endl;
 	cout << "ahp_err = norm(ahp1 - ahp_mat)" << endl;
 	cout << "AHP_s_err = norm(AHP_s - AHP_s_mat)" << endl;
 	cout << "AHP_v_err = norm(AHP_v - AHP_v_mat)" << endl;
@@ -89,7 +89,7 @@ void test_ahp01(void) {
 	cout << "id = " << id << endl;
 	cout << "V_s = " << (MATLAB) V_s << endl;
 	cout << "V_ahp = " << (MATLAB) V_ahp << endl;
-	cout << "[v_mat, V_s_mat, V_ahp_mat] = toBearingOnlyFrameAHM(F, ahp)" << endl;
+   cout << "[v_mat, V_s_mat, V_ahp_mat] = toFrameAhm(F, ahp)" << endl;
 	cout << "v_err = norm(v2 - v_mat)" << endl;
 	cout << "V_s_err = norm(V_s - V_s_mat)" << endl;
 	cout << "V_ahp_err = norm(V_ahp - V_ahp_mat)" << endl;

@@ -200,9 +200,7 @@ class ObservationQt : public ObservationDisplay
 		// graphical objects
 		SensorQt *dispSen_; // not owner
 		typedef std::list<qdisplay::Shape*> ItemList;
-      typedef std::list<qdisplay::Line*>  LineList;
       ItemList items_;
-      LineList lines_;
    public:
 		ObservationQt(ViewerAbstract *_viewer, rtslam::ObservationAbstract *_slamObs, SensorQt *_dispSen);
 		~ObservationQt();

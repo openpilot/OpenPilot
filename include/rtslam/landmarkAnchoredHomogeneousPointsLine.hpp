@@ -12,6 +12,7 @@
 #include "boost/shared_ptr.hpp"
 #include "rtslam/landmarkAbstract.hpp"
 #include "rtslam/ahpTools.hpp"
+#include "rtslam/ahplTools.hpp"
 
 /**
  * General namespace for Jafar environment.

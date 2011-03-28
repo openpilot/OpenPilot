@@ -146,6 +146,7 @@ namespace jafar {
 			// P+ = F_x * P * F_x' + F_n * Q * F_n' :
          expectation.P() = ublasExtra::prod_JPJt(ublas::project(landmarkPtr()->mapManagerPtr()->mapPtr()->filterPtr->P(), ia_rsl, ia_rsl), EXP_rsl);
          JFR_DEBUG("EXP_rsl \n" << EXP_rsl);
+         JFR_DEBUG("ia_rsl \n" << ia_rsl);
          JFR_DEBUG("proj \n" << ublas::project(landmarkPtr()->mapManagerPtr()->mapPtr()->filterPtr->P(), ia_rsl, ia_rsl));
          JFR_DEBUG("expectation \n" << expectation.x() << "\n" << expectation.P());
 			// non-observable

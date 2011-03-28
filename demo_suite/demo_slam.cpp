@@ -743,6 +743,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	} else
    #endif
    {
+      boost::shared_ptr<DescriptorFactoryAbstract> descFactory;
       #if SEGMENT_BASED
 /*
          if (configEstimation.MULTIVIEW_DESCRIPTOR)
@@ -757,10 +758,9 @@ void demo_slam01_main(world_ptr_t *world) {
          boost::shared_ptr<DataManager_ImageSeg_Test> dmSeg(new DataManager_ImageSeg_Test(hdsegDetector, dsegMatcher, assGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
 
          dmSeg->linkToParentSensorSpec(senPtr11);
-         dmSeg->linkToParentMapManager(mmSeg);
+         dmSeg->linkToParentMapManager(mmPoint);
          dmSeg->setObservationFactory(obsFact);
       #else
-         boost::shared_ptr<DescriptorFactoryAbstract> descFactory;
          if (configEstimation.MULTIVIEW_DESCRIPTOR)
             descFactory.reset(new DescriptorImagePointMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImagePointMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
          else

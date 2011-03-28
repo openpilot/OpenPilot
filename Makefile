@@ -435,6 +435,30 @@ src/descriptorImageSeg.cpp.s:
 	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorImageSeg.cpp.s
 .PHONY : src/descriptorImageSeg.cpp.s
 
+src/descriptorSeg.o: src/descriptorSeg.cpp.o
+.PHONY : src/descriptorSeg.o
+
+# target to build an object file
+src/descriptorSeg.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorSeg.cpp.o
+.PHONY : src/descriptorSeg.cpp.o
+
+src/descriptorSeg.i: src/descriptorSeg.cpp.i
+.PHONY : src/descriptorSeg.i
+
+# target to preprocess a source file
+src/descriptorSeg.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorSeg.cpp.i
+.PHONY : src/descriptorSeg.cpp.i
+
+src/descriptorSeg.s: src/descriptorSeg.cpp.s
+.PHONY : src/descriptorSeg.s
+
+# target to generate assembly for a file
+src/descriptorSeg.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/descriptorSeg.cpp.s
+.PHONY : src/descriptorSeg.cpp.s
+
 src/display.o: src/display.cpp.o
 .PHONY : src/display.o
 
@@ -1515,6 +1539,30 @@ test_suite/test_ahp.cpp.s:
 	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_ahp.cpp.s
 .PHONY : test_suite/test_ahp.cpp.s
 
+test_suite/test_ahpl.o: test_suite/test_ahpl.cpp.o
+.PHONY : test_suite/test_ahpl.o
+
+# target to build an object file
+test_suite/test_ahpl.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_ahpl.cpp.o
+.PHONY : test_suite/test_ahpl.cpp.o
+
+test_suite/test_ahpl.i: test_suite/test_ahpl.cpp.i
+.PHONY : test_suite/test_ahpl.i
+
+# target to preprocess a source file
+test_suite/test_ahpl.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_ahpl.cpp.i
+.PHONY : test_suite/test_ahpl.cpp.i
+
+test_suite/test_ahpl.s: test_suite/test_ahpl.cpp.s
+.PHONY : test_suite/test_ahpl.s
+
+# target to generate assembly for a file
+test_suite/test_ahpl.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/test_suite_rtslam.dir/build.make modules/rtslam/CMakeFiles/test_suite_rtslam.dir/test_suite/test_ahpl.cpp.s
+.PHONY : test_suite/test_ahpl.cpp.s
+
 test_suite/test_display.o: test_suite/test_display.cpp.o
 .PHONY : test_suite/test_display.o
 
@@ -1968,6 +2016,9 @@ help:
 	@echo "... src/descriptorImageSeg.o"
 	@echo "... src/descriptorImageSeg.i"
 	@echo "... src/descriptorImageSeg.s"
+	@echo "... src/descriptorSeg.o"
+	@echo "... src/descriptorSeg.i"
+	@echo "... src/descriptorSeg.s"
 	@echo "... src/display.o"
 	@echo "... src/display.i"
 	@echo "... src/display.s"
@@ -2103,6 +2154,9 @@ help:
 	@echo "... test_suite/test_ahp.o"
 	@echo "... test_suite/test_ahp.i"
 	@echo "... test_suite/test_ahp.s"
+	@echo "... test_suite/test_ahpl.o"
+	@echo "... test_suite/test_ahpl.i"
+	@echo "... test_suite/test_ahpl.s"
 	@echo "... test_suite/test_display.o"
 	@echo "... test_suite/test_display.i"
 	@echo "... test_suite/test_display.s"

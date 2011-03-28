@@ -436,7 +436,7 @@ namespace jafar {
          }
 */
          template<class VS, class VA, class MA_s>
-         double linearityScore(const VS & senpose, const VA & ahp, const MA_s & AHP){
+         double linearityScore(const VS & senpose, const VA & ahpl, const MA_s & AHPL){
 /*
                vec3 euc = ahp2euc(ahp);
 
@@ -454,7 +454,7 @@ namespace jafar {
 //					std::cout << "rho="<<ahp(6)<<", sr="<<sigma_rho<<", sd="<<sigma_d<<", nh="<<norm_hw<<", nm="<<norm_m<<", cos="<<jmath::abs(cos_a)<<std::endl;
 //					std::cout << "linearity score: " << L << std::endl;
 
-               return L; */ return 0.0;
+               return L; */ return 1.0;// 0.0;
          }
 
       } // namespace landmarkAHPL

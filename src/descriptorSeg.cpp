@@ -104,6 +104,8 @@ namespace jafar {
          dseg::SegmentHypothesis* hypothesis = new dseg::SegmentHypothesis(x_o, y_o, angle);
          hypothesis->setExtremity1(exp(0),exp(1));
          hypothesis->setExtremity2(exp(2),exp(3));
+         app_seg_ptr_t app_src = SPTR_CAST<AppearanceSegment>(obsPtrNew->observedAppearance);
+         hypothesis->setGradientDescriptor(app_src->hypothesis()->gradientDescriptor());
 
         // Compute uncertainty
          mat44 SIGMA_exp;
@@ -126,7 +128,8 @@ namespace jafar {
 
          JFR_DEBUG("distance_cube\n" << distance_cube << "SIGMA_exp\n" << SIGMA_exp << "sigma_cov \n" << sigma_cov);
 
-         hypothesis->setUncertainty(sigma(2), sigma(0), sigma(3), sigma(1));
+     //    hypothesis->setUncertainty(sigma(2), sigma(0), sigma(3), sigma(1));
+        hypothesis->setUncertainty(0.05, 1, 0.05, 1);
 
          app_seg_ptr_t app_dst = SPTR_CAST<AppearanceSegment>(obsPtrNew->predictedAppearance);
          app_dst->setHypothesis(hypothesis);

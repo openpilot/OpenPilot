@@ -35,9 +35,9 @@ namespace jafar {
          type = PNT_PH_AHPL;
       }
 
-      void ObservationPinHoleAnchoredHomogeneousPointsLine::setup(double reparTh, int killSizeTh, int killSearchTh, double killMatchTh, double killConsistencyTh, double dmin)
+      void ObservationPinHoleAnchoredHomogeneousPointsLine::setup(double dmin)
       {
-         ObservationAbstract::setup(reparTh, killSizeTh, killSearchTh, killMatchTh, killConsistencyTh);
+         //ObservationAbstract::setup(reparTh, killSizeTh, killSearchTh, killMatchTh, killConsistencyTh);
          //ObservationAbstract::setup(_noiseStd, getPrior());
          Gaussian prior(2);
          prior.x(0) = 1/(3*dmin);
@@ -200,14 +200,11 @@ namespace jafar {
          return landmarkPtr()->descriptorPtr->predictAppearance(_this);
       }
 
-      bool ObservationPinHoleAnchoredHomogeneousPointsLine::voteForReparametrizingLandmark(){
-//			cout << "evaluating linearity for lmk: " << id() << endl;
-         return (lmkAHPL::linearityScore(sensorPtr()->globalPose(), landmarkPtr()->state.x(), landmarkPtr()->state.P()) < reparTh);
-      }
-
       void ObservationPinHoleAnchoredHomogeneousPointsLine::desc_image(image::oimstream& os) const
       {
-         if (events.predictedApp)
+         os << image::hsep;
+/*
+         if (tasks.predictedApp)
          {
 //            app_img_seg_ptr_t predApp = SPTR_CAST<AppearanceSegment>(predictedAppearance);
 //            os << predApp->patch << image::hsep;
@@ -220,8 +217,9 @@ namespace jafar {
   //          os << obsApp->patch << image::endl;
                os << image::endl;
          }
+*/
       }
-
+/*
       void ObservationPinHoleAnchoredHomogeneousPointsLine::computeInnovation()
       {
          ObservationAbstract::computeInnovation();
@@ -229,7 +227,7 @@ namespace jafar {
          JFR_DEBUG("prediction \n " << expectation.x() << "\n" << expectation.P());
          JFR_DEBUG("innovation\n " << innovation.x() << "\n" << innovation.P());
       }
-
+*/
 //      void ObservationPinHoleAnchoredHomogeneousPointsLine::computeInnovationMean(vec &inn, const vec &meas, const vec &exp) const
 //		{
 //		}

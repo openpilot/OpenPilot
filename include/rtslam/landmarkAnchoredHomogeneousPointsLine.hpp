@@ -99,7 +99,7 @@ namespace jafar {
           subrange(LNEW_lmk,3,6,7,11) = subrange(EUC2_lmk2,0,3,3,7);
         }
 
-        virtual bool needToDie(DecisionMethod dieMet = ANY);
+        virtual bool needToDie();
 
         virtual bool needToReparametrize(DecisionMethod met = ALL){
           return false; // TODO real reparametrization

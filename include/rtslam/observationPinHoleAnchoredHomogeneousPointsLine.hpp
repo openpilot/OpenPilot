@@ -127,7 +127,7 @@ namespace jafar {
             }
 
 
-            void setup(double reparTh, int killSizeTh, int killSearchTh, double killMatchTh, double killConsistencyTh, double dmin);
+            void setup(double dmin);
 
 //				void setup(double _pixNoise = 1.0);
 
@@ -141,12 +141,14 @@ namespace jafar {
                return measurement.matchScore;
             }
 
-            virtual bool voteForReparametrizingLandmark();
-
             virtual void desc_image(image::oimstream& os) const;
 
-            virtual void computeInnovation();
+      //      virtual void computeInnovation();
       //      virtual void computeInnovationMean(vec &inn, const vec &meas, const vec &exp) const;
+
+            double computeLinearityScore(){
+               return lmkAHPL::linearityScore(sensorPtr()->globalPose(), landmarkPtr()->state.x(), landmarkPtr()->state.P());
+            }
 
          public:
             double pixelNoise;

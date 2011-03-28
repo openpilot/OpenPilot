@@ -25,10 +25,10 @@ namespace jafar {
          LandmarkAbstract(_mapPtr, 11) {
           // Do nothing this constructor is not supposed to be called
           // Nothing reparametrizes to AHPL (yet)
-          assert(false);
+          //assert(false);
       }
 
-      bool LandmarkAnchoredHomogeneousPointsLine::needToDie(DecisionMethod dieMet){
+      bool LandmarkAnchoredHomogeneousPointsLine::needToDie(){
          double rho1 = state.x(6);
          double rho2 = state.x(10);
          if (rho1 < 0 || rho2 < 0)
@@ -36,7 +36,7 @@ namespace jafar {
             JFR_DEBUG( "Lmk AHP " << id() << " Killed by negative depth (" << rho1 << " " << rho2 << ")" );
             return true;
          }
-         return LandmarkAbstract::needToDie(dieMet);
+         return LandmarkAbstract::needToDie();
       }
 
    } // namespace rtslam

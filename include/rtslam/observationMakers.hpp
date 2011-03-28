@@ -132,7 +132,7 @@ class SegmentObservationMaker
             res->predictedAppearance.reset(new simu::AppearanceSimu());
             res->observedAppearance.reset(new simu::AppearanceSimu());
          }
-         res->setup(reparTh, killSizeTh, killSearchTh, killMatchTh, killConsistencyTh, dmin);
+         res->setup(dmin);
          return res;
       }
 };

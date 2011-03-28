@@ -99,11 +99,10 @@ USBMonitor* USBMonitor::m_instance = 0;
 
 
 void USBMonitor::removeDevice(IOHIDDeviceRef dev) {
-    //QMutexLocker locker(listMutex);
     for( int i = 0; i < knowndevices.length(); i++) {
         USBPortInfo port = knowndevices.at(i);
         if(port.dev_handle == dev) {
-            qDebug() << "Found device to remove";
+            QMutexLocker locker(listMutex);
             knowndevices.removeAt(i);
             emit deviceRemoved(port);
             return;
@@ -118,11 +117,12 @@ void USBMonitor::removeDevice(IOHIDDeviceRef dev) {
   */
 void USBMonitor::detach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev)
 {
-    //instance()->removeDevice(dev);
+
+    instance()->removeDevice(dev);
 }
 
 void USBMonitor::addDevice(USBPortInfo info) {
-    //QMutexLocker locker(listMutex);
+    QMutexLocker locker(listMutex);
     knowndevices.append(info);
     emit deviceDiscovered(info);
 }
@@ -146,9 +146,9 @@ void USBMonitor::attach_callback(void *context, IOReturn r, void *hid_mgr, IOHID
     // TOOD: Eventually want to take array of usages if devices start needing that
     got_properties &= HID_GetIntProperty(dev, CFSTR( kIOHIDPrimaryUsageKey ), &deviceInfo.Usage);
     got_properties &= HID_GetIntProperty(dev, CFSTR( kIOHIDPrimaryUsagePageKey ), &deviceInfo.UsagePage);
-        qDebug() << "New device HAH";
+
+    // Currently only enumerating objects that have the complete list of properties
     if(got_properties) {
-        qDebug() << "New device";
         instance()->addDevice(deviceInfo);
     }
 }
@@ -159,7 +159,6 @@ Returns a list of all currently available devices
 QList<USBPortInfo> USBMonitor::availableDevices()
 {
     //QMutexLocker locker(listMutex);
-    qDebug() << "Queried available devices.  Count: " << knowndevices.count();
     return knowndevices;
 }
 
@@ -185,7 +184,6 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceM
             thePortsWeWant.append(port);
     }
 
-    qDebug() << "Queried filtered available devices.  Count: " << thePortsWeWant.count();
     return thePortsWeWant;
 }
 

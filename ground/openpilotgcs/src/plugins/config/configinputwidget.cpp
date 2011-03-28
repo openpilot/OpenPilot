@@ -25,7 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "configservowidget.h"
+#include "configinputwidget.h"
 
 #include "uavtalk/telemetrymanager.h"
 
@@ -36,9 +36,9 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 
-ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
+ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
-    m_config = new Ui_SettingsWidget();
+    m_config = new Ui_InputWidget();
     m_config->setupUi(this);
 
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -47,51 +47,6 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
 	// First of all, put all the channel widgets into lists, so that we can
     // manipulate those:
 
-	// NOTE: for historical reasons, we have objects below called ch0 to ch7, but the convention for OP is Channel 1 to Channel 8.
-    outLabels << m_config->ch0OutValue
-            << m_config->ch1OutValue
-            << m_config->ch2OutValue
-            << m_config->ch3OutValue
-            << m_config->ch4OutValue
-            << m_config->ch5OutValue
-            << m_config->ch6OutValue
-            << m_config->ch7OutValue;
-
-    outSliders << m_config->ch0OutSlider
-            << m_config->ch1OutSlider
-            << m_config->ch2OutSlider
-            << m_config->ch3OutSlider
-            << m_config->ch4OutSlider
-            << m_config->ch5OutSlider
-            << m_config->ch6OutSlider
-            << m_config->ch7OutSlider;
-
-    outMin << m_config->ch0OutMin
-            << m_config->ch1OutMin
-            << m_config->ch2OutMin
-            << m_config->ch3OutMin
-            << m_config->ch4OutMin
-            << m_config->ch5OutMin
-            << m_config->ch6OutMin
-            << m_config->ch7OutMin;
-
-    outMax << m_config->ch0OutMax
-            << m_config->ch1OutMax
-            << m_config->ch2OutMax
-            << m_config->ch3OutMax
-            << m_config->ch4OutMax
-            << m_config->ch5OutMax
-            << m_config->ch6OutMax
-            << m_config->ch7OutMax;
-
-    reversals << m_config->ch0Rev
-            << m_config->ch1Rev
-            << m_config->ch2Rev
-            << m_config->ch3Rev
-            << m_config->ch4Rev
-            << m_config->ch5Rev
-            << m_config->ch6Rev
-            << m_config->ch7Rev;
 
 	inMaxLabels << m_config->ch0Max
 			<< m_config->ch1Max
@@ -161,16 +116,6 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_config->ch6Assign->addItems(channelsList);
     m_config->ch7Assign->addItems(channelsList);
 
-    // And for the channel output assignement options
-    m_config->ch0Output->addItem("None");
-    m_config->ch1Output->addItem("None");
-    m_config->ch2Output->addItem("None");
-    m_config->ch3Output->addItem("None");
-    m_config->ch4Output->addItem("None");
-    m_config->ch5Output->addItem("None");
-    m_config->ch6Output->addItem("None");
-    m_config->ch7Output->addItem("None");
-
     // And the flight mode settings:
     field = obj->getField(QString("FlightModePosition"));
     m_config->fmsModePos1->addItems(field->getOptions());
@@ -194,37 +139,7 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_config->armControl->clear();
     m_config->armControl->addItems(field->getOptions());
 
-    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
-    fieldList = obj->getFields();
-    foreach (UAVObjectField* field, fieldList) {
-        if (field->getUnits().contains("channel")) {
-            m_config->ch0Output->addItem(field->getName());
-            m_config->ch1Output->addItem(field->getName());
-            m_config->ch2Output->addItem(field->getName());
-            m_config->ch3Output->addItem(field->getName());
-            m_config->ch4Output->addItem(field->getName());
-            m_config->ch5Output->addItem(field->getName());
-            m_config->ch6Output->addItem(field->getName());
-            m_config->ch7Output->addItem(field->getName());
-        }
-    }
-
-	// set the RC input tneutral value textees
-	for (int i = 0; i < 8; i++)
-		inNeuLabels[i]->setText(QString::number(inSliders[i]->value()));
-
-	for (int i = 0; i < 8; i++) {
-        connect(outMin[i], SIGNAL(editingFinished()), this, SLOT(setChOutRange()));
-        connect(outMax[i], SIGNAL(editingFinished()), this, SLOT(setChOutRange()));
-        connect(reversals[i], SIGNAL(toggled(bool)), this, SLOT(reverseChannel(bool)));
-        // Now connect the channel out sliders to our signal to send updates in test mode
-        connect(outSliders[i], SIGNAL(valueChanged(int)), this, SLOT(sendChannelTest(int)));
-    }
-
-    connect(m_config->channelOutTest, SIGNAL(toggled(bool)), this, SLOT(runChannelTests(bool)));
-
     requestRCInputUpdate();
-    requestRCOutputUpdate();
 
     connect(m_config->saveRCInputToSD, SIGNAL(clicked()), this, SLOT(saveRCInputObject()));
     connect(m_config->saveRCInputToRAM, SIGNAL(clicked()), this, SLOT(sendRCInputUpdate()));
@@ -240,12 +155,7 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_config->saveArmToRAM, SIGNAL(clicked()), this, SLOT(sendRCInputUpdate()));
     connect(m_config->getArmCurrent, SIGNAL(clicked()), this, SLOT(requestRCInputUpdate()));
 
-    connect(m_config->saveRCOutputToSD, SIGNAL(clicked()), this, SLOT(saveRCOutputObject()));
-    connect(m_config->saveRCOutputToRAM, SIGNAL(clicked()), this, SLOT(sendRCOutputUpdate()));
-    connect(m_config->getRCOutputCurrent, SIGNAL(clicked()), this, SLOT(requestRCOutputUpdate()));
-
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestRCInputUpdate()));
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestRCOutputUpdate()));
 
 	connect(m_config->inSlider0, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged0(int)));
 	connect(m_config->inSlider1, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged1(int)));
@@ -274,7 +184,7 @@ ConfigServoWidget::ConfigServoWidget(QWidget *parent) : ConfigTaskWidget(parent)
 	}
 }
 
-ConfigServoWidget::~ConfigServoWidget()
+ConfigInputWidget::~ConfigInputWidget()
 {
    // Do nothing
 }
@@ -282,42 +192,42 @@ ConfigServoWidget::~ConfigServoWidget()
 // ************************************
 // slider value changed signals
 
-void ConfigServoWidget::onInSliderValueChanged0(int value)
+void ConfigInputWidget::onInSliderValueChanged0(int value)
 {
 	inNeuLabels[0]->setText(QString::number(value));
 }
 
-void ConfigServoWidget::onInSliderValueChanged1(int value)
+void ConfigInputWidget::onInSliderValueChanged1(int value)
 {
 	inNeuLabels[1]->setText(QString::number(value));
 }
 
-void ConfigServoWidget::onInSliderValueChanged2(int value)
+void ConfigInputWidget::onInSliderValueChanged2(int value)
 {
 	inNeuLabels[2]->setText(QString::number(value));
 }
 
-void ConfigServoWidget::onInSliderValueChanged3(int value)
+void ConfigInputWidget::onInSliderValueChanged3(int value)
 {
 	inNeuLabels[3]->setText(QString::number(value));
 }
 
-void ConfigServoWidget::onInSliderValueChanged4(int value)
+void ConfigInputWidget::onInSliderValueChanged4(int value)
 {
 	inNeuLabels[4]->setText(QString::number(value));
 }
 
-void ConfigServoWidget::onInSliderValueChanged5(int value)
+void ConfigInputWidget::onInSliderValueChanged5(int value)
 {
 	inNeuLabels[5]->setText(QString::number(value));
 }
 
-void ConfigServoWidget::onInSliderValueChanged6(int value)
+void ConfigInputWidget::onInSliderValueChanged6(int value)
 {
 	inNeuLabels[6]->setText(QString::number(value));
 }
 
-void ConfigServoWidget::onInSliderValueChanged7(int value)
+void ConfigInputWidget::onInSliderValueChanged7(int value)
 {
 	inNeuLabels[7]->setText(QString::number(value));
 }
@@ -325,20 +235,20 @@ void ConfigServoWidget::onInSliderValueChanged7(int value)
 // ************************************
 // telemetry start/stop connect/disconnect signals
 
-void ConfigServoWidget::onTelemetryStart()
+void ConfigInputWidget::onTelemetryStart()
 {
 }
 
-void ConfigServoWidget::onTelemetryStop()
+void ConfigInputWidget::onTelemetryStop()
 {
 }
 
-void ConfigServoWidget::onTelemetryConnect()
+void ConfigInputWidget::onTelemetryConnect()
 {
 	enableControls(true);
 }
 
-void ConfigServoWidget::onTelemetryDisconnect()
+void ConfigInputWidget::onTelemetryDisconnect()
 {
 	enableControls(false);
 	m_config->doRCInputCalibration->setChecked(false);
@@ -346,7 +256,7 @@ void ConfigServoWidget::onTelemetryDisconnect()
 
 // ************************************
 
-void ConfigServoWidget::enableControls(bool enable)
+void ConfigInputWidget::enableControls(bool enable)
 {
 	m_config->getRCInputCurrent->setEnabled(enable);
 	m_config->saveRCInputToRAM->setEnabled(enable);
@@ -360,9 +270,6 @@ void ConfigServoWidget::enableControls(bool enable)
 	m_config->saveArmToRAM->setEnabled(enable);
 	m_config->getArmCurrent->setEnabled(enable);
 
-	m_config->saveRCOutputToSD->setEnabled(enable);
-	m_config->saveRCOutputToRAM->setEnabled(enable);
-	m_config->getRCOutputCurrent->setEnabled(enable);
 
 	m_config->doRCInputCalibration->setEnabled(enable);
 
@@ -376,311 +283,6 @@ void ConfigServoWidget::enableControls(bool enable)
 	m_config->ch7Assign->setEnabled(enable);
 }
 
-// ************************************
-
-/**
-  Sends the channel value to the UAV to move the servo.
-  Returns immediately if we are not in testing mode
-  */
-void ConfigServoWidget::sendChannelTest(int value)
-{
-    // First of all, update the label:
-    QSlider *ob = (QSlider*)QObject::sender();
-    int index = outSliders.indexOf(ob);
-    if (reversals[index]->isChecked())
-        value = outMin[index]->value()-value+outMax[index]->value();
-    else
-        outLabels[index]->setText(QString::number(value));
-
-    outLabels[index]->setText(QString::number(value));
-    if (!m_config->channelOutTest->isChecked())
-        return;
-
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
-
-    UAVObjectField * channel = obj->getField("Channel");
-    channel->setValue(value,index);
-    obj->updated();
-
-}
-
-/**
-  Toggles the channel testing mode by making the GCS take over
-  the ActuatorCommand objects
-  */
-void ConfigServoWidget::runChannelTests(bool state)
-{
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorCommand")));
-    UAVObject::Metadata mdata = obj->getMetadata();
-    if (state)
-    {
-        accInitialData = mdata;
-        mdata.flightAccess = UAVObject::ACCESS_READONLY;
-        mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
-        mdata.gcsTelemetryAcked = false;
-        mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
-        mdata.gcsTelemetryUpdatePeriod = 100;
-    }
-    else
-    {
-        mdata = accInitialData; // Restore metadata
-    }
-    obj->setMetadata(mdata);
-
-}
-
-
-
-/********************************
-  *  Output settings
-  *******************************/
-
-/**
-  Request the current config from the board (RC Output)
-  */
-void ConfigServoWidget::requestRCOutputUpdate()
-{
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-
-    // Get the Airframe type from the system settings:
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
-    Q_ASSERT(obj);
-    obj->requestUpdate();
-    UAVObjectField *field = obj->getField(QString("AirframeType"));
-    m_config->aircraftType->setText(QString("Aircraft type: ") + field->getValue().toString());
-
-    // Reset all channel assignements:
-    m_config->ch0Output->setCurrentIndex(0);
-    m_config->ch1Output->setCurrentIndex(0);
-    m_config->ch2Output->setCurrentIndex(0);
-    m_config->ch3Output->setCurrentIndex(0);
-    m_config->ch4Output->setCurrentIndex(0);
-    m_config->ch5Output->setCurrentIndex(0);
-    m_config->ch6Output->setCurrentIndex(0);
-    m_config->ch7Output->setCurrentIndex(0);
-
-    // Get the channel assignements:
-    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
-    Q_ASSERT(obj);
-    obj->requestUpdate();
-    QList<UAVObjectField*> fieldList = obj->getFields();
-    foreach (UAVObjectField* field, fieldList) {
-        if (field->getUnits().contains("channel")) {
-            assignOutputChannel(obj,field->getName());
-        }
-    }
-
-    // Get Output rates for both banks
-    field = obj->getField(QString("ChannelUpdateFreq"));
-    m_config->outputRate1->setValue(field->getValue(0).toInt());
-    m_config->outputRate2->setValue(field->getValue(1).toInt());
-
-    // Get Channel ranges:
-    for (int i=0;i<8;i++) {
-        field = obj->getField(QString("ChannelMin"));
-        int minValue = field->getValue(i).toInt();
-        outMin[i]->setValue(minValue);
-        field = obj->getField(QString("ChannelMax"));
-        int maxValue = field->getValue(i).toInt();
-        outMax[i]->setValue(maxValue);
-        if (maxValue>minValue) {
-            outSliders[i]->setMinimum(minValue);
-            outSliders[i]->setMaximum(maxValue);
-            reversals[i]->setChecked(false);
-        } else {
-            outSliders[i]->setMinimum(maxValue);
-            outSliders[i]->setMaximum(minValue);
-            reversals[i]->setChecked(true);
-        }
-    }
-
-    field = obj->getField(QString("ChannelNeutral"));
-    for (int i=0; i<8; i++) {
-        int value = field->getValue(i).toInt();
-        outSliders[i]->setValue(value);
-        outLabels[i]->setText(QString::number(value));
-    }
-
-
-}
-
-/**
-  * Sends the config to the board, without saving to the SD card (RC Output)
-  */
-void ConfigServoWidget::sendRCOutputUpdate()
-{
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
-    Q_ASSERT(obj);
-
-    // Now send channel ranges:
-    UAVObjectField * field = obj->getField(QString("ChannelMax"));
-    for (int i = 0; i < 8; i++) {
-        field->setValue(outMax[i]->value(),i);
-    }
-
-    field = obj->getField(QString("ChannelMin"));
-    for (int i = 0; i < 8; i++) {
-        field->setValue(outMin[i]->value(),i);
-    }
-
-    field = obj->getField(QString("ChannelNeutral"));
-    for (int i = 0; i < 8; i++) {
-        field->setValue(outSliders[i]->value(),i);
-    }
-
-    field = obj->getField(QString("ChannelUpdateFreq"));
-    field->setValue(m_config->outputRate1->value(),0);
-    field->setValue(m_config->outputRate2->value(),1);
-
-    // Set Actuator assignement for each channel:
-    // Rule: if two channels have the same setting (which is wrong!) the higher channel
-    // will get the setting.
-
-    // First, reset all channel assignements:
-    QList<UAVObjectField*> fieldList = obj->getFields();
-    foreach (UAVObjectField* field, fieldList) {
-        // NOTE: we assume that all options in ActuatorSettings are a channel assignement
-        // except for the options called "ChannelXXX"
-        if (field->getUnits().contains("channel")) {
-            field->setValue(field->getOptions().last());
-        }
-    }
-
-    if (m_config->ch0Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch0Output->currentText());
-        field->setValue(field->getOptions().at(0)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch1Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch1Output->currentText());
-        field->setValue(field->getOptions().at(1)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch2Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch2Output->currentText());
-        field->setValue(field->getOptions().at(2)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch3Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch3Output->currentText());
-        field->setValue(field->getOptions().at(3)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch4Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch4Output->currentText());
-        field->setValue(field->getOptions().at(4)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch5Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch5Output->currentText());
-        field->setValue(field->getOptions().at(5)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch6Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch6Output->currentText());
-        field->setValue(field->getOptions().at(6)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch7Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch7Output->currentText());
-        field->setValue(field->getOptions().at(7)); // -> This way we don't depend on channel naming convention
-    }
-
-    // ... and send to the OP Board
-    obj->updated();
-
-
-}
-
-
-/**
-  Sends the config to the board and request saving into the SD card (RC Output)
-  */
-void ConfigServoWidget::saveRCOutputObject()
-{
-    // Send update so that the latest value is saved
-    sendRCOutputUpdate();
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
-    Q_ASSERT(obj);
-    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
-
-}
-
-
-/**
-  Sets the minimum/maximum value of the channel 0 to seven output sliders.
-  Have to do it here because setMinimum is not a slot.
-
-  One added trick: if the slider is at either its max or its min when the value
-  is changed, then keep it on the max/min.
-  */
-void ConfigServoWidget::setChOutRange()
-{
-    QSpinBox *spinbox = (QSpinBox*)QObject::sender();
-
-    int index = outMin.indexOf(spinbox); // This is the channel number
-    if (index < 0)
-        index = outMax.indexOf(spinbox); // We can't know if the signal came from min or max
-
-    QSlider *slider = outSliders[index];
-
-    int oldMini = slider->minimum();
-    int oldMaxi = slider->maximum();
-
-    if (outMin[index]->value()<outMax[index]->value())
-    {
-        slider->setRange(outMin[index]->value(), outMax[index]->value());
-        reversals[index]->setChecked(false);
-    }
-    else
-    {
-        slider->setRange(outMax[index]->value(), outMin[index]->value());
-        reversals[index]->setChecked(true);
-    }
-
-    if (slider->value() == oldMini)
-        slider->setValue(slider->minimum());
-
-//    if (slider->value() == oldMaxi)
-//        slider->setValue(slider->maximum());  // this can be dangerous if it happens to be controlling a motor at the time!
-}
-
-/**
-  Reverses the channel when the checkbox is clicked
-  */
-void ConfigServoWidget::reverseChannel(bool state)
-{
-    QCheckBox *checkbox = (QCheckBox*)QObject::sender();
-    int index = reversals.indexOf(checkbox); // This is the channel number
-
-    // Sanity check: if state became true, make sure the Maxvalue was higher than Minvalue
-    // the situations below can happen!
-    if (state && (outMax[index]->value()<outMin[index]->value()))
-        return;
-    if (!state && (outMax[index]->value()>outMin[index]->value()))
-        return;
-
-    // Now, swap the min & max values (only on the spinboxes, the slider
-    // does not change!
-    int temp = outMax[index]->value();
-    outMax[index]->setValue(outMin[index]->value());
-    outMin[index]->setValue(temp);
-
-    // Also update the channel value
-    // This is a trick to force the slider to update its value and
-    // emit the right signal itself, because our sendChannelTest(int) method
-    // relies on the object sender's identity.
-    if (outSliders[index]->value()<outSliders[index]->maximum()) {
-        outSliders[index]->setValue(outSliders[index]->value()+1);
-        outSliders[index]->setValue(outSliders[index]->value()-1);
-    } else {
-        outSliders[index]->setValue(outSliders[index]->value()-1);
-        outSliders[index]->setValue(outSliders[index]->value()+1);
-    }
-
-}
-
 
 /********************************
   *  Input settings
@@ -689,7 +291,7 @@ void ConfigServoWidget::reverseChannel(bool state)
 /**
   Request the current config from the board
   */
-void ConfigServoWidget::requestRCInputUpdate()
+void ConfigInputWidget::requestRCInputUpdate()
 {
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ManualControlSettings")));
     Q_ASSERT(obj);
@@ -769,7 +371,7 @@ void ConfigServoWidget::requestRCInputUpdate()
 /**
   * Sends the config to the board, without saving to the SD card
   */
-void ConfigServoWidget::sendRCInputUpdate()
+void ConfigInputWidget::sendRCInputUpdate()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -876,7 +478,7 @@ void ConfigServoWidget::sendRCInputUpdate()
 /**
   Sends the config to the board and request saving into the SD card
   */
-void ConfigServoWidget::saveRCInputObject()
+void ConfigInputWidget::saveRCInputObject()
 {
     // Send update so that the latest value is saved
     sendRCInputUpdate();
@@ -891,7 +493,7 @@ void ConfigServoWidget::saveRCInputObject()
 /**
   * Set the dropdown option for a channel Input assignement
   */
-void ConfigServoWidget::assignChannel(UAVDataObject *obj, QString str)
+void ConfigInputWidget::assignChannel(UAVDataObject *obj, QString str)
 {
     UAVObjectField* field = obj->getField(str);
     QStringList options = field->getOptions();
@@ -924,47 +526,10 @@ void ConfigServoWidget::assignChannel(UAVDataObject *obj, QString str)
 }
 
 /**
-  * Set the dropdown option for a channel output assignement
-  */
-void ConfigServoWidget::assignOutputChannel(UAVDataObject *obj, QString str)
-{
-    UAVObjectField* field = obj->getField(str);
-    QStringList options = field->getOptions();
-    switch (options.indexOf(field->getValue().toString())) {
-    case 0:
-        m_config->ch0Output->setCurrentIndex(m_config->ch0Output->findText(str));
-        break;
-    case 1:
-        m_config->ch1Output->setCurrentIndex(m_config->ch1Output->findText(str));
-        break;
-    case 2:
-        m_config->ch2Output->setCurrentIndex(m_config->ch2Output->findText(str));
-        break;
-    case 3:
-        m_config->ch3Output->setCurrentIndex(m_config->ch3Output->findText(str));
-        break;
-    case 4:
-        m_config->ch4Output->setCurrentIndex(m_config->ch4Output->findText(str));
-        break;
-    case 5:
-        m_config->ch5Output->setCurrentIndex(m_config->ch5Output->findText(str));
-        break;
-    case 6:
-        m_config->ch6Output->setCurrentIndex(m_config->ch6Output->findText(str));
-        break;
-    case 7:
-        m_config->ch7Output->setCurrentIndex(m_config->ch7Output->findText(str));
-        break;
-    }
-}
-
-
-
-/**
   * Updates the slider positions and min/max values
   *
   */
-void ConfigServoWidget::updateChannels(UAVObject* controlCommand)
+void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
 {
 
     QString fieldName = QString("Connected");
@@ -1002,7 +567,7 @@ void ConfigServoWidget::updateChannels(UAVObject* controlCommand)
 
 		field = controlCommand->getField(QString("Channel"));
 		for (int i = 0; i < 8; i++)
-			updateChannelInSlider(inSliders[i], inMinLabels[i], inMaxLabels[i], reversals[i], field->getValue(i).toInt());
+                        updateChannelInSlider(inSliders[i], inMinLabels[i], inMaxLabels[i], field->getValue(i).toInt());
 
         firstUpdate = false;
 	}
@@ -1062,11 +627,8 @@ void ConfigServoWidget::updateChannels(UAVObject* controlCommand)
 	}
 }
 
-void ConfigServoWidget::updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, QCheckBox *rev, int value)
+void ConfigInputWidget::updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, int value)
 {
-	Q_UNUSED(rev);
-
-//	if (!slider || !min || !max || !rev)
 	if (!slider || !min || !max)
 		return;
 

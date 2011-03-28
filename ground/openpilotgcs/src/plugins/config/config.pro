@@ -18,7 +18,8 @@ HEADERS += configplugin.h \
     configgadgetoptionspage.h \
     configgadget.h \
     fancytabwidget.h \
-    configservowidget.h \
+    configinputwidget.h \
+    configoutputwidget.h \
     configtaskwidget.h \
     configairframewidget.h \
     configtelemetrywidget.h \
@@ -39,7 +40,8 @@ SOURCES += configplugin.cpp \
     configgadget.cpp \
     fancytabwidget.cpp \
     configtaskwidget.cpp \
-    configservowidget.cpp \
+    configinputwidget.cpp \
+    configoutputwidget.cpp \
     configairframewidget.cpp \
     configtelemetrywidget.cpp \
     configahrswidget.cpp \
@@ -53,11 +55,13 @@ SOURCES += configplugin.cpp \
     gyro-calibration.cpp \
     alignment-calibration.cpp
     
-FORMS += settingswidget.ui \
+FORMS +=  \
     airframe.ui \
     telemetry.ui \
     ahrs.ui \
     ccpm.ui \
-    stabilization.ui
+    stabilization.ui \
+    input.ui \
+    output.ui
 
 RESOURCES += configgadget.qrc

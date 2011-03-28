@@ -24,10 +24,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGSERVOWIDGET_H
-#define CONFIGSERVOWIDGET_H
+#ifndef CONFIGOUTPUTWIDGET_H
+#define CONFIGOUTPUTWIDGET_H
 
-#include "ui_settingswidget.h"
+#include "ui_output.h"
 #include "configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
@@ -35,15 +35,15 @@
 #include <QtGui/QWidget>
 #include <QList>
 
-class Ui_SettingsWidget;
+class Ui_OutputWidget;
 
-class ConfigServoWidget: public ConfigTaskWidget
+class ConfigOutputWidget: public ConfigTaskWidget
 {
 	Q_OBJECT
 
 public:
-	ConfigServoWidget(QWidget *parent = 0);
-	~ConfigServoWidget();
+        ConfigOutputWidget(QWidget *parent = 0);
+        ~ConfigOutputWidget();
 
 public slots:
 	void onTelemetryStart();
@@ -51,17 +51,8 @@ public slots:
 	void onTelemetryConnect();
 	void onTelemetryDisconnect();
 
-	void onInSliderValueChanged0(int value);
-	void onInSliderValueChanged1(int value);
-	void onInSliderValueChanged2(int value);
-	void onInSliderValueChanged3(int value);
-	void onInSliderValueChanged4(int value);
-	void onInSliderValueChanged5(int value);
-	void onInSliderValueChanged6(int value);
-	void onInSliderValueChanged7(int value);
-
 private:
-	Ui_SettingsWidget *m_config;
+        Ui_OutputWidget *m_config;
 
 	QList<QSlider> sliders;
 
@@ -80,20 +71,11 @@ private:
 	QList<QCheckBox*> reversals;
 	QList<QLabel*> outLabels;
 
-	QList<QSlider*> inSliders;
-	QList<QLabel*> inMaxLabels;
-	QList<QLabel*> inMinLabels;
-	QList<QLabel*> inNeuLabels;
-
 	bool firstUpdate;
 
 	void enableControls(bool enable);
 
 private slots:
-	void updateChannels(UAVObject* obj);
-	void requestRCInputUpdate();
-	void sendRCInputUpdate();
-	void saveRCInputObject();
 	void requestRCOutputUpdate();
 	void sendRCOutputUpdate();
 	void saveRCOutputObject();

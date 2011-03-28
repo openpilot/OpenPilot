@@ -81,6 +81,7 @@ static void settingsUpdatedCb(UAVObjEvent * objEv);
 
 static float accelKi = 0;
 static float accelKp = 0;
+static float yawBiasRate = 0;
 static float gyroGain = 0.42;
 static int16_t accelbias[3];
 
@@ -137,6 +138,7 @@ static void AttitudeTask(void *parameters)
 			accelKp = 1;
 			// Decrease the rate of gyro learning during init
 			accelKi = .5 / (1 + xTaskGetTickCount() / 5000);
+			yawBiasRate = 0.01 / (1 + xTaskGetTickCount() / 5000);
 		} else if (init == 0) {
 			settingsUpdatedCb(AttitudeSettingsHandle());
 			init = 1;
@@ -177,29 +179,9 @@ static void updateSensors(AttitudeRawData * attitudeRaw)
 	// Because most crafts wont get enough information from gravity to zero yaw gyro
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] += gyro_correct_int[2];
 	gyro_correct_int[2] += - attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] * 
-		accelKi;
+		yawBiasRate;
 	
 	
-	// Get the accel data
-/*	uint8_t i = 0;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = 0;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = 0;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = 0; 
-	
-	do {
-		i++;
-		attitudeRaw->gyrotemp[0] = PIOS_ADXL345_Read(&accel_data);
-		
-		attitudeRaw->accels[ATTITUDERAW_ACCELS_X] += (float) accel_data.x * 0.004f * 9.81;
-		attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] += -(float) accel_data.y * 0.004f * 9.81;
-		attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] += -(float) accel_data.z * 0.004f * 9.81;
-	} while ( (i < 32) && (attitudeRaw->gyrotemp[0] > 0) );
-	attitudeRaw->gyrotemp[1] = i;
-	
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] /= i;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] /= i;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] /= i; 
-*/
 	int32_t x = 0;
 	int32_t y = 0;
 	int32_t z = 0;
@@ -312,6 +294,7 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	
 	accelKp = attitudeSettings.AccelKp;
 	accelKi = attitudeSettings.AccelKi;		
+	yawBiasRate = attitudeSettings.YawBiasRate;
 	gyroGain = attitudeSettings.GyroGain;
 	
 	accelbias[0] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_X];

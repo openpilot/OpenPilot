@@ -1,7 +1,7 @@
 /* $Id$ */
 
-#ifndef JMATH_PCA_HPP
-#define JMATH_PCA_HPP
+#ifndef JMATH_PCA_T_HPP
+#define JMATH_PCA_T_HPP
 
 #include "jafarConfig.h"
 
@@ -24,7 +24,8 @@ namespace jafar {
      *
      *  \ingroup jmath
      */
-    class PCA {
+    template<typename NUMTYPE>
+    class PCA_T {
       public:
 
       /*! Updating method flag
@@ -43,14 +44,14 @@ namespace jafar {
       /*! Default Constructor
        * @param basisOnly_ flag to compute only the PCA basis
        */
-      PCA(bool basisOnly_=false) : basis_only(basisOnly_) {};
+      PCA_T(bool basisOnly_=false) : basis_only(basisOnly_) {};
 
       /*! Constructor with direct computation
        * @param X_ input m*n matrix (ie n vectors of R(m))
        * @param dim_ subspace dimension in [1,min(m,n)] (default: min(m;n))
        * @param basisOnly_ flag to compute only the PCA basis
        */
-      PCA(const jblas::mat& X_, int dim_=0, bool basisOnly_ = false) {
+      PCA_T(const ublas::matrix<NUMTYPE>& X_, int dim_=0, bool basisOnly_ = false) {
         basis_only = basisOnly_;
         batchPCA(X_,dim_);
       };
@@ -58,7 +59,7 @@ namespace jafar {
       /*! Copy Constructor
        * @param pca_ PCA object
        */
-      PCA(PCA const & pca_) {
+      PCA_T(PCA_T const & pca_) {
         mean = pca_.mean;
         eigenvalues = pca_.eigenvalues;
         eigenvectors = pca_.eigenvectors;
@@ -68,7 +69,7 @@ namespace jafar {
       /*! assignment operator
        * @param pca_ PCA object
        */
-      PCA& operator= (PCA const & pca_) {
+      PCA_T& operator= (PCA_T const & pca_) {
         mean = pca_.mean;
         eigenvalues = pca_.eigenvalues;
         eigenvectors = pca_.eigenvectors;
@@ -78,25 +79,25 @@ namespace jafar {
 
       //Accessors
       /// Mean accessor
-      jblas::vec& getMean() {
+      ublas::vector<NUMTYPE>& getMean() {
         JFR_PRECOND(mean.size() != 0, "PCA::getMean: no results available");
         return mean;
       };
 
       /// Eigen Vectors accessor
-      jblas::mat& getEigenVectors() {
+      ublas::matrix<NUMTYPE>& getEigenVectors() {
         JFR_PRECOND(eigenvectors.size2() != 0, "PCA::getEigenVectors: no results available");
         return eigenvectors;
       };
 
       /// Eigen Values accessor
-      jblas::vec& getEigenValues() {
+      ublas::vector<NUMTYPE>& getEigenValues() {
         JFR_PRECOND(eigenvalues.size() != 0, "PCA::getEigenValues: no results available");
         return eigenvalues;
       }
 
       /// Coefficients accessor
-      jblas::mat& getCoefficients() {
+      ublas::matrix<NUMTYPE>& getCoefficients() {
         JFR_PRECOND(coefficients.size2() != 0, "PCA::getEigenValues: no results available");
         return coefficients;
       };
@@ -106,7 +107,7 @@ namespace jafar {
        * @param X_ input m*n matrix (ie n vectors of R(m))
        * @param dim_ subspace dimension in [1,min(m,n)] (default: min(m;n))
        */
-      void batchPCA(const jblas::mat& X_, int dim_=0);
+      void batchPCA(const ublas::matrix<NUMTYPE>& X_, int dim_=0);
 
 
       /*! update the PCA with a new vector
@@ -114,19 +115,19 @@ namespace jafar {
        * @param f_ update flag 
        * @param thd_ threshold used if UFlag = ore 
        */
-      void updatePCA(const jblas::vec& I_, UFlag f_=preserve, double thd_=0.25);
+      void updatePCA(const ublas::vector<NUMTYPE>& I_, UFlag f_=preserve, NUMTYPE thd_=0.25);
 
       /*! Project an Input vector on the eigenspace.
        * @param I_ input vector
        * @return the image vector
        */
-      jblas::vec project(const jblas::vec& I_) const;
+      ublas::vector<NUMTYPE> project(const ublas::vector<NUMTYPE>& I_) const;
 
       /*! Reconstruct full vector from its projection
        * @param P_ projection vector
        * @return reconstructed vector
        */
-      jblas::vec reconstruct(const jblas::vec& I_) const;
+      ublas::vector<NUMTYPE> reconstruct(const ublas::vector<NUMTYPE>& I_) const;
 
       private:
 
@@ -142,13 +143,21 @@ namespace jafar {
       };
 #endif
       bool basis_only;
-      jblas::mat eigenvectors,coefficients;
-      jblas::vec mean, eigenvalues;
+      ublas::matrix<NUMTYPE> eigenvectors,coefficients;
+      ublas::vector<NUMTYPE> mean, eigenvalues;
 
-    }; // class PCA
+    }; // class PCA_T
   } // namespace jmath
 } // namespace jafar
 
+#include <jmath/pca.hxx>
+
+namespace jafar{
+  namespace jmath {
+    typedef PCA_T<double> PCA;
+  }
+}
 #endif // HAVE_LAPACK
 #endif // HAVE_BOOST_SANDBOX
-#endif // JMATH_PCA_HPP
+#endif // JMATH_PCA_T_HPP
+

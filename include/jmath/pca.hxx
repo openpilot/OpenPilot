@@ -18,14 +18,16 @@ namespace ublas = boost::numeric::ublas;
 using namespace std;
 using namespace jafar::jmath;
 
-void PCA::batchPCA(const jblas::mat& X_, int dim_) {
+template<typename T>
+void PCA_T<T>::batchPCA(const ublas::matrix<T>& X_, int dim_) {
   int m = X_.size1();
   int n = X_.size2();
 
-  JFR_PRECOND((0 < dim_) && (dim_ <= min(m,n)),
+  JFR_PRECOND((0 >= dim_) && (dim_ <= min(m,n)),
 	      "PCA::batchPCA: wrong dimension input. must be in [1," << min(m,n) << "]");
-
-  jblas::mat centeredX(X_);
+  if(dim_ == 0)
+    dim_ = min(m,n);
+  ublas::matrix<T> centeredX(X_);
   // compute mean and center X
   mean.resize(m);
   for (int i=0; i<m; i++) {
@@ -39,10 +41,10 @@ void PCA::batchPCA(const jblas::mat& X_, int dim_) {
   }
   // compute svd
   if (m <= n) {
-    ublas::matrix<double,ublas::column_major> A = ublas::prod(centeredX,ublas::trans(centeredX));
+    ublas::matrix<T,ublas::column_major> A = ublas::prod(centeredX,ublas::trans(centeredX));
     A /= n;
-		jblas::up_sym_adapt_column_major s_A(A);
-    jblas::vec alpha(m);
+    ublas::symmetric_adaptor<ublas::matrix<T, ublas::column_major>, ublas::upper > s_A(A);
+    ublas::vector<T> alpha(m);
     int ierr = lapack::syev('V',s_A,alpha);	  
     if (ierr!=0)
       JFR_RUN_TIME("PCA::batchPCA: error in lapack::syev() function, ierr=" << ierr);
@@ -53,10 +55,10 @@ void PCA::batchPCA(const jblas::mat& X_, int dim_) {
       ublas::column(eigenvectors,i) = ublas::column(A,m-i-1);
     }
   } else {
-    ublas::matrix<double,ublas::column_major> A = ublas::prod(ublas::trans(centeredX),centeredX);
+    ublas::matrix<T,ublas::column_major> A = ublas::prod(ublas::trans(centeredX),centeredX);
     A /= n;
-		jblas::up_sym_adapt_column_major s_A(A);
-    jblas::vec alpha(n);
+    ublas::symmetric_adaptor<ublas::matrix<T, ublas::column_major>, ublas::upper > s_A(A);
+    ublas::vector<T> alpha(n);
     int ierr = lapack::syev('V',s_A,alpha);
     if (ierr!=0)
       JFR_RUN_TIME("PCA::batchPCA: error in lapack::syev() function, ierr=" << ierr);
@@ -68,7 +70,7 @@ void PCA::batchPCA(const jblas::mat& X_, int dim_) {
     }
     eigenvectors = ublas::prod(centeredX,eigenvectors);
     for(int j=0; j<n; j++) {
-      jblas::mat_column Uc(eigenvectors,j);
+      ublas::matrix_column< ublas::matrix<T> > Uc(eigenvectors,j);
       Uc /= sqrt(n * eigenvalues(j));
     }
   }
@@ -83,53 +85,53 @@ void PCA::batchPCA(const jblas::mat& X_, int dim_) {
     coefficients = ublas::prod(ublas::trans(eigenvectors),centeredX); 
 }
 
-
-void PCA::updatePCA(const jblas::vec& I_, UFlag f_, double thd_) {
+template<typename T>
+void PCA_T<T>::updatePCA(const ublas::vector<T>& I_, UFlag f_, T thd_) {
   JFR_PRECOND(mean.size() != 0,
 	      "PCA::project: no eigenspace available");
   JFR_PRECOND(I_.size() == eigenvectors.size1(),
 	      "PCA::project: wrong size of the input vector. should be " << eigenvectors.size1());
   int n = eigenvectors.size2();
-  jblas::vec meanp = (n*mean+I_)/static_cast<double>(n+1);
-  jblas::vec a = ublas::prod(ublas::trans(eigenvectors),(I_-mean));
-  jblas::vec y = ublas::prod(eigenvectors,a)+mean;
-  jblas::vec h = y-I_;
-  double normh = ublas::norm_2(h);
+  ublas::vector<T> meanp = (n*mean+I_)/static_cast<T>(n+1);
+  ublas::vector<T> a = ublas::prod(ublas::trans(eigenvectors),(I_-mean));
+  ublas::vector<T> y = ublas::prod(eigenvectors,a)+mean;
+  ublas::vector<T> h = y-I_;
+  T normh = ublas::norm_2(h);
   if (normh > 0) 
     h /= normh;
   else
     h.clear();
-  double gamma = ublas::inner_prod(ublas::trans(h),(I_-mean));
-  ublas::matrix<double,ublas::column_major> D(a.size()+1,a.size()+1);
+  T gamma = ublas::inner_prod(ublas::trans(h),(I_-mean));
+  ublas::matrix<T,ublas::column_major> D(a.size()+1,a.size()+1);
   D.clear();
   ublas::project(D,ublas::range(0,a.size()),
 		 ublas::range(0,a.size())) = ublas::outer_prod(a,a);
-  D /= static_cast<double>(n)/static_cast<double>((n+1)*(n+1));
+  D /= static_cast<T>(n)/static_cast<T>((n+1)*(n+1));
   for(std::size_t i=0; i < a.size(); i++) {
-    D(i,i) += static_cast<double>(n)/static_cast<double>(n+1)*eigenvalues(i);
-    D(D.size1()-1,i) = static_cast<double>(n)/static_cast<double>((n+1)*(n+1))*gamma*a(i);
-    D(i,D.size2()-1) = static_cast<double>(n)/static_cast<double>((n+1)*(n+1))*gamma*a(i);
-    D(D.size1()-1,D.size2()-1) = static_cast<double>(n)/static_cast<double>((n+1)*(n+1))*gamma*gamma;
+    D(i,i) += static_cast<T>(n)/static_cast<T>(n+1)*eigenvalues(i);
+    D(D.size1()-1,i) = static_cast<T>(n)/static_cast<T>((n+1)*(n+1))*gamma*a(i);
+    D(i,D.size2()-1) = static_cast<T>(n)/static_cast<T>((n+1)*(n+1))*gamma*a(i);
+    D(D.size1()-1,D.size2()-1) = static_cast<T>(n)/static_cast<T>((n+1)*(n+1))*gamma*gamma;
   }
-	jblas::up_sym_adapt_column_major s_D(D);
-  jblas::vec alphap(D.size1());
+  ublas::symmetric_adaptor<ublas::matrix<T, ublas::column_major>, ublas::upper > s_D(D);
+  ublas::vector<T> alphap(D.size1());
   int ierr = lapack::syev('V',s_D,alphap);	  
   if (ierr!=0)
     JFR_RUN_TIME("PCA::updatePCA: error in lapack::syev() function, ierr=" << ierr);
-  jblas::mat R(D.size1(),D.size2());
+  ublas::matrix<T> R(D.size1(),D.size2());
   eigenvalues.resize(eigenvalues.size()+1);
   for(std::size_t i=0;i<eigenvalues.size();i++) {
     eigenvalues(i) = alphap(eigenvalues.size()-i-1);
     ublas::column(R,i) = ublas::column(D,D.size2()-i-1);
   }
-  jblas::mat Up(eigenvectors.size1(),eigenvectors.size2()+1);
+  ublas::matrix<T> Up(eigenvectors.size1(),eigenvectors.size2()+1);
   Up.clear();
   ublas::project(Up,ublas::range(0,eigenvectors.size1()),
 		 ublas::range(0,eigenvectors.size2())).assign(eigenvectors);
   ublas::column(Up,Up.size2()-1) = h;
   eigenvectors = ublas::prod(Up,R);
   if (!basis_only) {
-    jblas::vec etha = ublas::prod(ublas::trans(Up),(mean-meanp));
+    ublas::vector<T> etha = ublas::prod(ublas::trans(Up),(mean-meanp));
     coefficients.resize(coefficients.size1()+1,coefficients.size2()+1);
     for(std::size_t i=0; i<coefficients.size2()-1; i++) {
       coefficients(coefficients.size1()-1,i) = 0;
@@ -161,15 +163,16 @@ void PCA::updatePCA(const jblas::vec& I_, UFlag f_, double thd_) {
   }
 }
 
-jblas::vec PCA::project(const jblas::vec& I_) const {
+template<typename T>
+ublas::vector<T> PCA_T<T>::project(const ublas::vector<T>& I_) const {
   JFR_PRECOND(mean.size() != 0,
 	      "PCA::project: no eigenspace available");
   JFR_PRECOND(I_.size() == eigenvectors.size1(),
 	      "PCA::project: wrong size of the input vector. should be " << eigenvectors.size1());
   return ublas::prod(ublas::trans(eigenvectors),(I_-mean));
 }
-
-jblas::vec PCA::reconstruct(const jblas::vec& P_) const {
+template<typename T>
+ublas::vector<T> PCA_T<T>::reconstruct(const ublas::vector<T>& P_) const {
   JFR_PRECOND(mean.size() != 0,
 	      "PCA::project: no eigenspace available");
   JFR_PRECOND(P_.size() <= eigenvectors.size2(),

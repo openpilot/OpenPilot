@@ -32,7 +32,8 @@ HEADERS += configplugin.h \
     configccpmwidget.h \
     configstabilizationwidget.h \
     assertions.h \
-    calibration.h
+    calibration.h \
+    defaultattitudewidget.h
 
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
@@ -57,6 +58,7 @@ SOURCES += configplugin.cpp \
     legacy-calibration.cpp \
     gyro-calibration.cpp \
     alignment-calibration.cpp \
+    defaultattitudewidget.cpp
     
 FORMS +=  \
     airframe.ui \
@@ -66,6 +68,7 @@ FORMS +=  \
     stabilization.ui \
     input.ui \
     output.ui \
-    ccattitude.ui
+    ccattitude.ui \
+    defaultattitude.ui
 
 RESOURCES += configgadget.qrc

@@ -73,6 +73,8 @@ void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
         field->setDouble(field->getDouble(1) + y_bias,1);
         field->setDouble(field->getDouble(2) + z_bias,2);
         settings->updated();
+        ui->status->setText("Calibration done.");
+
     }
 }
 
@@ -95,6 +97,8 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
     x_accum.clear();
     y_accum.clear();
     z_accum.clear();
+
+    ui->status->setText("Calibrating...");
 
     // Set up to receive updates
     UAVDataObject * obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));

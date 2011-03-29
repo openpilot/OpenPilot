@@ -34,6 +34,7 @@
 #include "configoutputwidget.h"
 #include "configstabilizationwidget.h"
 #include "configtelemetrywidget.h"
+#include "defaultattitudewidget.h"
 
 #include "uavobjectutilmanager.h"
 
@@ -70,7 +71,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     qwd = new ConfigOutputWidget(this);
     ftw->insertTab(2, qwd, QIcon(":/configgadget/images/Servo.png"), QString("Output"));
 
-    qwd = new ConfigAHRSWidget(this);
+    qwd = new DefaultAttitudeWidget(this);
     ftw->insertTab(3, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
 
     qwd = new ConfigStabilizationWidget(this);

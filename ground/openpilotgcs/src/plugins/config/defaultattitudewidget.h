@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configgadgetconfiguration.cpp
+ * @file       defaultccattitudewidget.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief The Configuration Gadget used to update settings in the firmware
+ * @brief Placeholder for attitude settings widget until board connected.
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,22 +24,32 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "configgadgetconfiguration.h"
+#ifndef DEFAULTATTITUDEWIDGET_H
+#define DEFAULTATTITUDEWIDGET_H
 
-ConfigGadgetConfiguration::ConfigGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
-    IUAVGadgetConfiguration(classId, parent)
+#include "ui_defaultattitude.h"
+#include "configtaskwidget.h"
+#include "extensionsystem/pluginmanager.h"
+#include "uavobjectmanager.h"
+#include "uavobject.h"
+#include <QtGui/QWidget>
+#include <QTimer>
+#include <QMutex>
+
+class Ui_Widget;
+
+class DefaultAttitudeWidget : public ConfigTaskWidget
 {
-    Q_UNUSED(qSettings);
+    Q_OBJECT
 
-}
+public:
+    explicit DefaultAttitudeWidget(QWidget *parent = 0);
+    ~DefaultAttitudeWidget();
 
-IUAVGadgetConfiguration *ConfigGadgetConfiguration::clone()
-{
-    ConfigGadgetConfiguration *m = new ConfigGadgetConfiguration(this->classId());
-    return m;
-}
+private slots:
 
-void ConfigGadgetConfiguration::saveConfig(QSettings* settings) const {
+private:
+    Ui_defaultattitude *ui;
+};
 
-    Q_UNUSED(settings)
-}
+#endif // DEFAULTATTITUDEWIDGET_H

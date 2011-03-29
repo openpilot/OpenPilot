@@ -77,7 +77,7 @@ public:
     SerialConnection();
     virtual ~SerialConnection();
 
-    virtual QStringList availableDevices();
+    virtual QList <Core::IConnection::device> availableDevices();
     virtual QIODevice *openDevice(const QString &deviceName);
     virtual void closeDevice(const QString &deviceName);
 

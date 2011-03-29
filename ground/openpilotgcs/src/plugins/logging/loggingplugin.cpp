@@ -58,10 +58,13 @@ void LoggingConnection::onEnumerationChanged()
         emit availableDevChanged(this);
 }
 
-QStringList LoggingConnection::availableDevices()
+QList <Core::IConnection::device> LoggingConnection::availableDevices()
 {
-    QStringList list;
-    list << "Logfile replay...";
+    QList <device> list;
+    device d;
+    d.displayName="Logfile replay...";
+    d.name="Logfile replay...";
+    list <<d;
 
     return list;
 }

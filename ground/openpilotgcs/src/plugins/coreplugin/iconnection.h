@@ -49,7 +49,14 @@ public:
     /**
     *   Return the list of devices found on the system
     */
-    virtual QStringList availableDevices() = 0;
+    struct device
+    {
+        QString name;
+        QString displayName;
+        bool operator==(device i){return this->name==i.name;}
+    };
+
+    virtual QList <device> availableDevices() = 0;
 
     /**
     *   Open a device, and return a QIODevice interface from it

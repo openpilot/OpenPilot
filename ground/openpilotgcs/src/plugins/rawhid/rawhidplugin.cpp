@@ -79,14 +79,17 @@ void RawHIDConnection::onDeviceDisconnected()
 /**
   Returns the list of all currently available devices
   */
-QStringList RawHIDConnection::availableDevices()
+QList < Core::IConnection::device> RawHIDConnection::availableDevices()
 {
-    QStringList devices;
+    QList < Core::IConnection::device> devices;
 
     QList<USBPortInfo> portsList = m_usbMonitor->availableDevices(USBMonitor::idVendor_OpenPilot, -1, -1,USBMonitor::Running);
     // We currently list devices by their serial number
+    device dev;
     foreach(USBPortInfo prt, portsList) {
-        devices.append(prt.serialNumber);
+        dev.name=prt.serialNumber;
+        dev.displayName=prt.product;
+        devices.append(dev);
     }
     return devices;
 }

@@ -106,11 +106,11 @@ void ConnectionManager::init()
 */
 bool ConnectionManager::connectDevice()
 {
-    devListItem connection_device = findDevice(m_availableDevList->currentText());
+    devListItem connection_device = findDevice(m_availableDevList->itemData(m_availableDevList->currentIndex(),Qt::ToolTipRole).toString());
     if (!connection_device.connection)
         return false;
 
-    QIODevice *io_dev = connection_device.connection->openDevice(connection_device.devName);
+    QIODevice *io_dev = connection_device.connection->openDevice(connection_device.Name);
     if (!io_dev)
         return false;
 
@@ -244,15 +244,15 @@ void ConnectionManager::onConnectPressed()
 /**
 *   Find a device by its displayed (visible on screen) name
 */
-devListItem ConnectionManager::findDevice(const QString &displayedName)
+devListItem ConnectionManager::findDevice(const QString &devName)
 {
 	foreach (devListItem d, m_devList)
     {
-		if (d.displayedName == displayedName)
+                if (d.devName == devName)
             return d;
     }
 
-    qDebug() << "findDevice: cannot find " << displayedName << " in device list";
+    qDebug() << "findDevice: cannot find " << devName << " in device list";
 
     devListItem d;
     d.connection = NULL;
@@ -316,13 +316,13 @@ void ConnectionManager::unregisterAll(IConnection *connection)
 /**
 *   Register a device from a specific connection plugin
 */
-void ConnectionManager::registerDevice(IConnection *conn, const QString &devN, const QString &disp)
+void ConnectionManager::registerDevice(IConnection *conn, const QString &devN, const QString &name, const QString &disp)
 {
     devListItem d;
     d.connection = conn;
     d.devName = devN;
-    d.displayedName = disp;
-
+    d.Name = name;
+    d.displayName=disp;
     m_devList.append(d);
 }
 
@@ -340,21 +340,22 @@ void ConnectionManager::devChanged(IConnection *connection)
     unregisterAll(connection);
 
     //and add them back in the list
-    QStringList availableDev = connection->availableDevices();
-	foreach (QString dev, availableDev)
+    QList <IConnection::device> availableDev = connection->availableDevices();
+        foreach (IConnection::device dev, availableDev)
     {
-        QString cbName = connection->shortName() + ": " + dev;
-        registerDevice(connection, dev, cbName);
+        QString cbName = connection->shortName() + ": " + dev.name;
+        registerDevice(connection,cbName,dev.name,dev.displayName);
     }
 
     //add all the list again to the combobox
 	foreach (devListItem d, m_devList)
     {
-        m_availableDevList->addItem(d.displayedName);
+        m_availableDevList->addItem(d.displayName);
+        m_availableDevList->setItemData(m_availableDevList->count()-1,(const QString)d.devName,Qt::ToolTipRole);
     }
 
-    //disable connection button if the list is empty
-	if (m_availableDevList->count() > 0)
+    //disable connection button if the liNameif (m_availableDevList->count() > 0)
+    if (m_availableDevList->count() > 0)
         m_connectBtn->setEnabled(true);
     else
         m_connectBtn->setEnabled(false);

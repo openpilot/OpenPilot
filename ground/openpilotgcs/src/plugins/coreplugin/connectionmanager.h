@@ -54,7 +54,8 @@ struct devListItem
 {
     IConnection *connection;
     QString devName;
-    QString displayedName;
+    QString Name;
+    QString displayName;
 };
 
 
@@ -76,8 +77,8 @@ public:
 
 protected:
     void unregisterAll(IConnection *connection);
-    void registerDevice(IConnection *conn, const QString &devN, const QString &disp);
-    devListItem findDevice(const QString &displayedName);
+    void registerDevice(IConnection *conn, const QString &devN, const QString &name, const QString &disp);
+    devListItem findDevice(const QString &devName);
 
 signals:
     void deviceConnected(QIODevice *dev);

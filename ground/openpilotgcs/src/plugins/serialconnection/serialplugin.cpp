@@ -53,13 +53,13 @@ SerialEnumerationThread::~SerialEnumerationThread()
 
 void SerialEnumerationThread::run()
 {
-    QStringList devices = m_serial->availableDevices();
+    QList <Core::IConnection::device> devices = m_serial->availableDevices();
 
     while(m_running)
     {
         if(!m_serial->deviceOpened())
         {
-            QStringList newDev = m_serial->availableDevices();
+            QList <Core::IConnection::device> newDev = m_serial->availableDevices();
             if(devices != newDev)
             {
                 devices = newDev;
@@ -111,9 +111,9 @@ bool sortPorts(const QextPortInfo &s1,const QextPortInfo &s2)
     return s1.portName<s2.portName;
 }
 
-QStringList SerialConnection::availableDevices()
+QList <Core::IConnection::device> SerialConnection::availableDevices()
 {
-    QStringList list;
+    QList <Core::IConnection::device> list;
 
     if (enablePolling) {
         QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
@@ -121,7 +121,10 @@ QStringList SerialConnection::availableDevices()
         //sort the list by port number (nice idea from PT_Dreamer :))
         qSort(ports.begin(), ports.end(),sortPorts);
         foreach( QextPortInfo port, ports ) {
-           list.append(port.friendName);
+           device d;
+           d.displayName=port.friendName;
+           d.name=port.friendName;
+           list.append(d);
         }
     }
 

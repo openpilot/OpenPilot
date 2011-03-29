@@ -160,12 +160,14 @@ void IPconnectionConnection::onEnumerationChanged()
 
 
 
-QStringList IPconnectionConnection::availableDevices()
+QList <Core::IConnection::device> IPconnectionConnection::availableDevices()
 {
-    QStringList list;
-
+    QList <Core::IConnection::device> list;
+    device d;
+    d.displayName=(const QString )m_config->HostName();
+    d.name=(const QString )m_config->HostName();
     //we only have one "device" as defined by the configuration m_config
-    list.append((const QString )m_config->HostName());
+    list.append(d);
 
     return list;
 }

@@ -84,6 +84,9 @@ static float accelKp = 0;
 static float yawBiasRate = 0;
 static float gyroGain = 0.42;
 static int16_t accelbias[3];
+static float rotationQuat[4] = {1,0,0,0};
+static float q[4] = {1,0,0,0};
+static int8_t rotate = 0;
 
 /**
  * Initialise the module, called on startup
@@ -202,13 +205,14 @@ static void updateSensors(AttitudeRawData * attitudeRaw)
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = ((float)x * 0.004f * 9.81f) / i;
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = ((float)y * 0.004f * 9.81f) / i;
 	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = ((float)z * 0.004f * 9.81f) / i;
+	
+	if(rotate) {
+		// TODO: rotate sensors too so stabilization is well behaved
+	}
 }
 
 static void updateAttitude(AttitudeRawData * attitudeRaw)
 {
-	AttitudeActualData attitudeActual;
-	AttitudeActualGet(&attitudeActual);
-		
 	static portTickType lastSysTime = 0;
 	static portTickType thisSysTime;
 	
@@ -220,7 +224,6 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 	lastSysTime = thisSysTime;
 	
 	// Bad practice to assume structure order, but saves memory
-	float * q = &attitudeActual.q1;
 	float gyro[3];
 	gyro[0] = attitudeRaw->gyros[0];
 	gyro[1] = attitudeRaw->gyros[1];
@@ -277,13 +280,18 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 	q[2] = q[2] / qmag;
 	q[3] = q[3] / qmag;
 	
-	attitudeActual.q1 = q[0];
-	attitudeActual.q2 = q[1];
-	attitudeActual.q3 = q[2];
-	attitudeActual.q4 = q[3];
+	AttitudeActualData attitudeActual;
+	AttitudeActualGet(&attitudeActual);
+	
+	if(rotate) {
+		// Rotate the attitude q from the state q to allow board to be mounted at weird angles
+		quat_mult(q,rotationQuat,&attitudeActual.q1);
+	} else {
+		quat_copy(q, &attitudeActual.q1);
+	}
 	
 	// Convert into eueler degrees (makes assumptions about RPY order)
-	Quaternion2RPY(q,&attitudeActual.Roll);	
+	Quaternion2RPY(&attitudeActual.q1,&attitudeActual.Roll);	
 
 	AttitudeActualSet(&attitudeActual);
 }
@@ -300,6 +308,37 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	accelbias[0] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_X];
 	accelbias[1] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Y];
 	accelbias[2] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Z];
+	
+	// Indicates not to expend cycles on rotation
+	if(attitudeSettings.RotationQuaternion[0] == 126) {
+		rotate = 0;
+		rotationQuat[0] = 1;
+		rotationQuat[1] = rotationQuat[2] = rotationQuat[3] = 0;
+		return;
+	}
+	
+	rotate = 1;
+	
+	rotationQuat[0] = (float) attitudeSettings.RotationQuaternion[0] / 127.0;
+	rotationQuat[1] = (float) attitudeSettings.RotationQuaternion[1] / 127.0f;
+	rotationQuat[2] = (float) attitudeSettings.RotationQuaternion[2] / 127.0f;
+	rotationQuat[3] = (float) attitudeSettings.RotationQuaternion[3] / 127.0f;
+	
+	float len = sqrt(rotationQuat[0] * rotationQuat[0] + rotationQuat[1] * rotationQuat[1] +
+		     rotationQuat[2] * rotationQuat[2] + rotationQuat[3] * rotationQuat[3]);
+	
+	// Sanitize input. Shouldn't do anything functional.
+	if(len < 1e-3) { 
+		// Really wrong value
+		rotationQuat[0] = 1;
+		rotationQuat[1] = rotationQuat[2] = rotationQuat[3] = 0;
+		rotate = 0;
+	} else {
+		rotationQuat[0] /= len;
+		rotationQuat[1] /= len;
+		rotationQuat[2] /= len;
+		rotationQuat[3] /= len;
+	}
 	
 }
 /**

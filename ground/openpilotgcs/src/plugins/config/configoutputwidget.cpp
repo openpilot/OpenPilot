@@ -35,6 +35,7 @@
 #include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
+#include <QMessageBox>
 
 ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
@@ -190,6 +191,21 @@ void ConfigOutputWidget::enableControls(bool enable)
   */
 void ConfigOutputWidget::runChannelTests(bool state)
 {
+    // Confirm this is definitely what they want
+    if(state) {
+        QMessageBox mbox;
+        mbox.setText(QString(tr("This option will requires you to be in the armed state and will start your motors by the amount selected on the sliders.  It is recommended to remove any blades from motors.  Are you sure you want to do this?")));
+        mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        int retval = mbox.exec();
+        if(retval != QMessageBox::Yes) {
+            state = false;
+            qDebug() << "Cancelled";
+            m_config->channelOutTest->setChecked(false);
+            return;
+        }
+    }
+
+    qDebug() << "Running with state " << state;
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 

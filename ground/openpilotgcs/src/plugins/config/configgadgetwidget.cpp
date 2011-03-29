@@ -65,7 +65,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     ftw->insertTab(0, qwd, QIcon(":/configgadget/images/Airframe.png"), QString("Aircraft"));
 
     qwd = new ConfigInputWidget(this);
-    ftw->insertTab(1, qwd, QIcon(":/configgadget/images/transmitter.svg"), QString("Input"));
+    ftw->insertTab(1, qwd, QIcon(":/configgadget/images/Transmitter.png"), QString("Input"));
 
     qwd = new ConfigOutputWidget(this);
     ftw->insertTab(2, qwd, QIcon(":/configgadget/images/Servo.png"), QString("Output"));

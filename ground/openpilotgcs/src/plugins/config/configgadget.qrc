@@ -11,6 +11,6 @@
         <file>images/ccpm_setup.svg</file>
         <file>images/PipXtreme.png</file>
         <file>images/gyroscope.svg</file>
-        <file>images/transmitter.svg</file>
+        <file>images/Transmitter.png</file>
     </qresource>
 </RCC>

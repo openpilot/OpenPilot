@@ -50,13 +50,14 @@ public:
 
     static double listMean(QList<double> list);
 
-public slots:
-    void transactionCompleted(UAVObject* obj, bool success);
+private slots:
+    void objectPersistenceTransactionCompleted(UAVObject* obj, bool success);
+    void objectPersistenceUpdated(UAVObject * obj);
 
 private:
     QQueue<UAVObject*> queue;
     void saveNextObject();
-
+    enum {IDLE, AWAITING_ACK, AWAITING_COMPLETED} saveState;
 
 
 };

@@ -25,18 +25,18 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "configtaskwidget.h"
-
 #include <QtGui/QWidget>
 
 
 ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent)
 {
-
+    saveState = IDLE;
+    queue.clear();
 }
 
 ConfigTaskWidget::~ConfigTaskWidget()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void ConfigTaskWidget::saveObjectToSD(UAVObject *obj)
@@ -56,10 +56,15 @@ void ConfigTaskWidget::saveNextObject()
     {
         return;
     }
+
+    Q_ASSERT(saveState == IDLE);
+
     // Get next object from the queue
     UAVObject* obj = queue.head();
     ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( getObjectManager()->getObject(ObjectPersistence::NAME) );
-    connect(objper, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(transactionCompleted(UAVObject*,bool)));
+    connect(objper, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(objectPersistenceTransactionCompleted(UAVObject*,bool)));
+    connect(objper, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(objectPersistenceUpdated(UAVObject *)));
+    saveState = AWAITING_ACK;
     if (obj != NULL)
     {
         ObjectPersistence::DataFields data;
@@ -72,13 +77,46 @@ void ConfigTaskWidget::saveNextObject()
     }
 }
 
-void ConfigTaskWidget::transactionCompleted(UAVObject* obj, bool success)
+/**
+  * @brief Process the transactionCompleted message from Telemetry indicating request sent successfully
+  * @param[in] The object just transsacted.  Must be ObjectPersistance
+  * @param[in] success Indicates that the transaction did not time out
+  *
+  * After a failed transaction (usually timeout) resends the save request.  After a succesful
+  * transaction will then wait for a save completed update from the autopilot.
+  */
+void ConfigTaskWidget::objectPersistenceTransactionCompleted(UAVObject* obj, bool success)
 {
-    if(success &&
-       obj->getField("Operation")->getValue().toString().compare(QString("Completed")) == 0 ) {
-        // Disconnect from sending object
+    if(success) {
+        Q_ASSERT(obj->getName().compare("ObjectPersistence") == 0);
+        Q_ASSERT(saveState == AWAITING_ACK);
+        saveState = AWAITING_COMPLETED;
+        disconnect(obj, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(objectPersistenceTransactionCompleted(UAVObject*,bool)));
+    } else if (!success) {
+        // Can be caused by timeout errors on sending.  Send again.
+        saveNextObject();
+    }
+}
+
+/**
+  * @brief Process the ObjectPersistence updated message to confirm the right object saved
+  * then requests next object be saved.
+  * @param[in] The object just received.  Must be ObjectPersistance
+  */
+void ConfigTaskWidget::objectPersistenceUpdated(UAVObject * obj)
+{
+    Q_ASSERT(obj->getName().compare("ObjectPersistence") == 0);
+    if(saveState == AWAITING_COMPLETED) {
+        // Check flight is saying it completed.  This is the only thing flight should do to trigger an update.
+        Q_ASSERT( obj->getField("Operation")->getValue().toString().compare(QString("Completed")) == 0 );
+
+        // Check right object saved
+        UAVObject* savingObj = queue.head();
+        Q_ASSERT( obj->getField("ObjectID")->getValue() == savingObj->getObjID() );
+
         obj->disconnect(this);
         queue.dequeue(); // We can now remove the object, it's done.
+        saveState = IDLE;
         saveNextObject();
     }
 }

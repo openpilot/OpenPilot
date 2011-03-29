@@ -91,7 +91,6 @@ void ConfigCCAttitudeWidget::timeout() {
 void ConfigCCAttitudeWidget::startAccelCalibration() {
     QMutexLocker locker(&startStop);
 
-    qDebug() << "Click";
     updates = 0;
     x_accum.clear();
     y_accum.clear();

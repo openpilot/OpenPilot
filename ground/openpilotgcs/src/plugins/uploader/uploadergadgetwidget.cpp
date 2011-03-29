@@ -196,8 +196,8 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
 
         // The board is now reset: we have to disconnect telemetry
         Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-        QString dli = cm->getCurrentDevice().devName;
-        QString dlj = cm->getCurrentDevice().displayedName;
+        QString dli = cm->getCurrentDevice().Name;
+        QString dlj = cm->getCurrentDevice().devName;
         cm->disconnectDevice();
         // Tell connections to stop their polling threads: otherwise it will mess up DFU
         cm->suspendPolling();

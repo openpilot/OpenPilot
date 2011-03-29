@@ -12,9 +12,9 @@
         <field name="gyro_tempcompfactor" units="raw/raw" type="float" elementnames="X,Y,Z" defaultvalue="0"/>
         <field name="mag_bias" units="mGau" type="float" elementnames="X,Y,Z" defaultvalue="0"/>
         <field name="mag_scale" units="(mGau)/lsb" type="float" elementnames="X,Y,Z" defaultvalue="1"/>
-        <field name="mag_var" units="mGau^2" type="float" elementnames="X,Y,Z" defaultvalue="5e-5"/>
-        <field name="vel_var" units="(m/s)^2" type="float" elements="1" defaultvalue="0.4"/>
-        <field name="pos_var" units="m^2" type="float" elements="1" defaultvalue="0.4"/>
+        <field name="mag_var" units="mGau^2" type="float" elementnames="X,Y,Z" defaultvalue="50"/>
+        <field name="vel_var" units="(m/s)^2" type="float" elements="1" defaultvalue="10"/>
+        <field name="pos_var" units="m^2" type="float" elements="1" defaultvalue="0.04"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

@@ -41,7 +41,7 @@
 #include "pureimage.h"
 #include <QList>
 #include <QMutex>
-
+#include <QReadWriteLock>
 namespace core {
     class PureImageCache
     {
@@ -58,6 +58,7 @@ namespace core {
     private:
         QString gtilecache;
         QMutex Mcounter;
+        QReadWriteLock lock;
         static qlonglong ConnCounter;
 
     };

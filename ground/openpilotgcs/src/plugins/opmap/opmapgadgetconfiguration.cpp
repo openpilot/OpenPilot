@@ -41,6 +41,11 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId,  QSettings* 
     m_useMemoryCache(true),
     m_cacheLocation(Utils::PathUtils().GetStoragePath() + "mapscache" + QDir::separator())
 {
+    QSettings set(QSettings::IniFormat, QSettings::UserScope,QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS"));
+    QDir dir(set.fileName());
+    QFileInfo f(dir.absolutePath());
+    f.dir().absolutePath();
+    m_cacheLocation=f.dir().absolutePath()+QDir::separator() + "mapscache" + QDir::separator();
 
     //if a saved configuration exists load it
     if(qSettings != 0) {
@@ -94,4 +99,7 @@ void OPMapGadgetConfiguration::saveConfig(QSettings* qSettings) const {
    qSettings->setValue("accessMode", m_accessMode);
    qSettings->setValue("useMemoryCache", m_useMemoryCache);
    qSettings->setValue("cacheLocation", Utils::PathUtils().RemoveStoragePath(m_cacheLocation));
+}
+void OPMapGadgetConfiguration::setCacheLocation(QString cacheLocation){
+    m_cacheLocation = cacheLocation;
 }

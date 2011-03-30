@@ -71,6 +71,7 @@ namespace core {
         bool UsePlacemarkCache;//TODO GetSet
         static const double EarthRadiusKm;
         double GetDistance(internals::PointLatLng p1,internals::PointLatLng p2);
+        QMutex mutex;
 
     protected:
         static short timelapse;

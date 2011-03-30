@@ -72,7 +72,7 @@ public slots:
     void setShowTileGridLines(bool showTileGridLines) { m_showTileGridLines = showTileGridLines; }
     void setAccessMode(QString accessMode) { m_accessMode = accessMode; }
     void setUseMemoryCache(bool useMemoryCache) { m_useMemoryCache = useMemoryCache; }
-    void setCacheLocation(QString cacheLocation) { m_cacheLocation = cacheLocation; }
+    void setCacheLocation(QString cacheLocation);
 
 private:
     QString m_mapProvider;

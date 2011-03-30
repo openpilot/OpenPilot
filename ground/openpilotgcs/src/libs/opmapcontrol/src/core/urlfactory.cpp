@@ -80,7 +80,6 @@ namespace core {
     void UrlFactory::setIsCorrectGoogleVersions(bool value)
     {
         isCorrectedGoogleVersions=value;
-
     }
 
     bool UrlFactory::IsCorrectGoogleVersions()
@@ -90,6 +89,7 @@ namespace core {
 
     void UrlFactory::TryCorrectGoogleVersions()
     {
+        QMutexLocker locker(&mutex);
         if(CorrectGoogleVersions && !IsCorrectGoogleVersions())
         {
             QNetworkReply *reply;

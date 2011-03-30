@@ -26,36 +26,19 @@
 */
 #include "pureimagecache.h"
 #include <QDateTime>
-
+#include <QSettings>
 //#define DEBUG_PUREIMAGECACHE
 namespace core {
     qlonglong PureImageCache::ConnCounter=0;
 
     PureImageCache::PureImageCache()
     {
-        gtilecache=QDir::currentPath()+QDir::separator()+"mapscache"+QDir::separator();
-        QDir d;
-        if(!d.exists(gtilecache))
-        {
-            d.mkdir(gtilecache);
-#ifdef DEBUG_PUREIMAGECACHE
-            qDebug()<<"Create Cache directory";
-#endif //DEBUG_PUREIMAGECACHE
-        }
-        {
-            QString db=gtilecache+"Data.qmdb";
-            if(!QFileInfo(db).exists())
-            {
-#ifdef DEBUG_PUREIMAGECACHE
-                qDebug()<<"Try to create EmptyDB";
-#endif //DEBUG_PUREIMAGECACHE
-                CreateEmptyDB(db);
-            }
-        }
+
     }
 
     void PureImageCache::setGtileCache(const QString &value)
     {
+        lock.lockForWrite();
         gtilecache=value;
         QDir d;
         if(!d.exists(gtilecache))
@@ -75,6 +58,7 @@ namespace core {
                 CreateEmptyDB(db);
             }
         }
+        lock.unlock();
     }
     QString PureImageCache::GtileCache()
     {
@@ -187,6 +171,9 @@ namespace core {
     }
     bool PureImageCache::PutImageToCache(const QByteArray &tile, const MapType::Types &type,const Point &pos,const int &zoom)
     {
+        if(gtilecache.isEmpty()|gtilecache.isNull())
+            return false;
+        lock.lockForRead();
 #ifdef DEBUG_PUREIMAGECACHE
         qDebug()<<"PutImageToCache Start:";//<<pos;
 #endif //DEBUG_PUREIMAGECACHE
@@ -222,11 +209,15 @@ namespace core {
             }
         }
         QSqlDatabase::removeDatabase(QString::number(id));
+        lock.unlock();
         return true;
     }
     QByteArray PureImageCache::GetImageFromCache(MapType::Types type, Point pos, int zoom)
     {
+        lock.lockForRead();
         QByteArray ar;
+        if(gtilecache.isEmpty()|gtilecache.isNull())
+            return ar;
         QString dir=gtilecache;
         Mcounter.lock();
         qlonglong id=++ConnCounter;
@@ -260,10 +251,13 @@ namespace core {
             }
         }
         QSqlDatabase::removeDatabase(QString::number(id));
+        lock.unlock();
         return ar;
     }
     void PureImageCache::deleteOlderTiles(int const& days)
     {
+        if(gtilecache.isEmpty()|gtilecache.isNull())
+            return;
         QList<long> add;
         bool ret=true;
         QString dir=gtilecache;

@@ -34,6 +34,7 @@
 
 volatile bool Simulator::isStarted = false;
 
+const float Simulator::GEE = 9.81;
 const float Simulator::FT2M = 0.3048;
 const float Simulator::KT2MPS = 0.514444444;
 const float Simulator::INHG2KPA = 3.386;

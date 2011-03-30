@@ -156,6 +156,7 @@ private slots:
 	virtual void processUpdate(const QByteArray& data) = 0;
 
 protected:
+        static const float GEE;
         static const float FT2M;
         static const float KT2MPS;
         static const float INHG2KPA;

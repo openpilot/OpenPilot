@@ -207,6 +207,9 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
         float dstX = 0;
         float dstY = 0;
         float dstZ = 0;
+        float accX = 0;
+        float accY = 0;
+        float accZ = 0;
         float rollRate=0;
         float pitchRate=0;
         float yawRate=0;
@@ -259,11 +262,11 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
 
                         case XplaneSimulator::LocVelDistTraveled:
                             dstX = *((float*)(buf.data()+4*1));
-                            dstY = *((float*)(buf.data()+4*2));
-                            dstZ = *((float*)(buf.data()+4*3));
+                            dstY = - *((float*)(buf.data()+4*3));
+                            dstZ = *((float*)(buf.data()+4*2));
                             velX = *((float*)(buf.data()+4*4));
-                            velY = *((float*)(buf.data()+4*5));
-                            velZ = *((float*)(buf.data()+4*6));
+                            velY = - *((float*)(buf.data()+4*6));
+                            velZ = *((float*)(buf.data()+4*5));
                             break;
 
                         case XplaneSimulator::AngularVelocities:
@@ -271,6 +274,12 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
                             rollRate = *((float*)(buf.data()+4*2));
                             yawRate = *((float*)(buf.data()+4*3));
                             break;
+
+                        case XplaneSimulator::Gload:
+			    accX = *((float*)(buf.data()+4*6)) * GEE;
+			    accY = *((float*)(buf.data()+4*7)) * GEE;
+			    accZ = *((float*)(buf.data()+4*5)) * GEE;
+			    break;
 
 			default:
 				break;
@@ -353,17 +362,17 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
                 // Update VelocityActual.{Nort,East,Down}
                 VelocityActual::DataFields velocityActualData;
                 memset(&velocityActualData, 0, sizeof(VelocityActual::DataFields));
-                velocityActualData.North = velX*100;
-                velocityActualData.East = velY*100;
-                velocityActualData.Down = velZ*100;
+                velocityActualData.North = velY*100;
+                velocityActualData.East = velX*100;
+                velocityActualData.Down = -velZ*100;
                 velActual->setData(velocityActualData);
 
                 // Update PositionActual.{Nort,East,Down}
                 PositionActual::DataFields positionActualData;
                 memset(&positionActualData, 0, sizeof(PositionActual::DataFields));
-                positionActualData.North = (dstX-initX)*100;
-                positionActualData.East = (dstY-initY)*100;
-                positionActualData.Down = (dstZ-initZ)*100;
+                positionActualData.North = (dstY-initY)*100;
+                positionActualData.East = (dstX-initX)*100;
+                positionActualData.Down = -(dstZ-initZ)*100;
                 posActual->setData(positionActualData);
 
                 // Update AttitudeRaw object (filtered gyros only for now)
@@ -375,6 +384,9 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
                 //rawData.gyros_filtered[2] = cos(DEG2RAD * roll) * yawRate - sin(DEG2RAD * roll) * pitchRate;
                 rawData.gyros[1] = pitchRate;
                 rawData.gyros[2] = yawRate;
+                rawData.accels[0] = accX;
+                rawData.accels[1] = accY;
+                rawData.accels[2] = -accZ;
                 attRaw->setData(rawData);
 
 

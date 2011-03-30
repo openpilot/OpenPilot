@@ -289,7 +289,7 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
 	for (int t=0;t<3;t++) {
 		rawData.accels[t]=current.ddX*Rbe[t][0]
 				+current.ddY*Rbe[t][1]
-				+(current.ddZ+9.81)*Rbe[t][2];
+				+(current.ddZ+GEE)*Rbe[t][2];
 	}
 	rawData.accels[2]=-rawData.accels[2];
 

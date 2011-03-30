@@ -434,34 +434,34 @@ void Telemetry::processPeriodicUpdates()
     // Iterate through each object and update its timer, if zero then transmit object.
     // Also calculate smallest delay to next update (will be used for setting timeToNextUpdateMs)
     qint32 minDelay = MAX_UPDATE_PERIOD_MS;
-    ObjectTimeInfo objinfo;
+    ObjectTimeInfo *objinfo;
     qint32 elapsedMs = 0;
     QTime time;
     qint32 offset;
     for (int n = 0; n < objList.length(); ++n)
     {
-        objinfo = objList[n];
+        objinfo = &objList[n];
         // If object is configured for periodic updates
-        if (objinfo.updatePeriodMs > 0)
+        if (objinfo->updatePeriodMs > 0)
         {
-            objinfo.timeToNextUpdateMs -= timeToNextUpdateMs;
+            objinfo->timeToNextUpdateMs -= timeToNextUpdateMs;
             // Check if time for the next update
-            if (objinfo.timeToNextUpdateMs <= 0)
+            if (objinfo->timeToNextUpdateMs <= 0)
             {
                 // Reset timer
-                offset = (-objinfo.timeToNextUpdateMs) % objinfo.updatePeriodMs;
-                objinfo.timeToNextUpdateMs = objinfo.updatePeriodMs - offset;
+                offset = (-objinfo->timeToNextUpdateMs) % objinfo->updatePeriodMs;
+                objinfo->timeToNextUpdateMs = objinfo->updatePeriodMs - offset;
                 // Send object
                 time.start();
-                processObjectUpdates(objinfo.obj, EV_UPDATED_MANUAL, true, false);
+                processObjectUpdates(objinfo->obj, EV_UPDATED_MANUAL, true, false);
                 elapsedMs = time.elapsed();
                 // Update timeToNextUpdateMs with the elapsed delay of sending the object;
                 timeToNextUpdateMs += elapsedMs;
             }
             // Update minimum delay
-            if (objinfo.timeToNextUpdateMs < minDelay)
+            if (objinfo->timeToNextUpdateMs < minDelay)
             {
-                minDelay = objinfo.timeToNextUpdateMs;
+                minDelay = objinfo->timeToNextUpdateMs;
             }
         }
     }

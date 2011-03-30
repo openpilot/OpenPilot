@@ -338,25 +338,19 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
         // issue manual update
         // update every time (50ms)
         attActual->setData(attActualData);
-        attActual->updated();
+        //attActual->updated();
         attRaw->setData(rawData);
-        attRaw->updated();
-        // update every 5th time (250 ms)
-        if ( ! ((old.i-1) % 5) ) {
-                velActual->setData(velData);
-                velActual->updated();
-                posActual->setData(posData);
-                posActual->updated();
-                altActual->setData(altActualData);
-                altActual->updated();
-                gpsPos->setData(gpsData);
-                gpsPos->updated();
-        }
-        // update every 20th time (1000ms)
-        if ( ! ((old.i-1) % 20) ) {
-                posHome->setData(homeData);
-                posHome->updated();
-        }
+        //attRaw->updated();
+	velActual->setData(velData);
+	//velActual->updated();
+	posActual->setData(posData);
+	//posActual->updated();
+	altActual->setData(altActualData);
+	//altActual->updated();
+	gpsPos->setData(gpsData);
+	//gpsPos->updated();
+	posHome->setData(homeData);
+	//posHome->updated();
 }
 
 /**

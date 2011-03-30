@@ -22,8 +22,7 @@ template<typename T>
 void PCA_T<T>::batchPCA(const ublas::matrix<T>& X_, int dim_) {
   int m = X_.size1();
   int n = X_.size2();
-
-  JFR_PRECOND((0 >= dim_) && (dim_ <= min(m,n)),
+  JFR_PRECOND((0 <= dim_) && (dim_ <= min(m,n)),
 	      "PCA::batchPCA: wrong dimension input. must be in [1," << min(m,n) << "]");
   if(dim_ == 0)
     dim_ = min(m,n);

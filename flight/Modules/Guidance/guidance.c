@@ -275,7 +275,7 @@ void updateVtolDesiredVelocity()
 				 -guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_ILIMIT],
 				 guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_ILIMIT]);
 	eastCommand = (eastError * guidanceSettings.HorizontalPosPI[GUIDANCESETTINGS_HORIZONTALPOSPI_KP] +
-		       northPosIntegral);
+		       eastPosIntegral);
 	
 	
 	velocityDesired.North = bound(northCommand,-guidanceSettings.HorizontalVelMax,guidanceSettings.HorizontalVelMax);

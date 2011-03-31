@@ -210,6 +210,7 @@ static void guidanceTask(void *parameters)
 				PositionActualGet(&positionActual);
 				positionDesired.North = positionActual.North;
 				positionDesired.East = positionActual.East;
+				positionDesired.Down = positionActual.Down;
 				PositionDesiredSet(&positionDesired);
 				positionHoldLast = 1;
 			}
@@ -347,7 +348,6 @@ static void updateFixedDesiredAttitude()
 	float accelDesired;
 	float accelError;
 
-	float powerActual;
 	float powerError;
 	float powerCommand;
 
@@ -372,20 +372,16 @@ static void updateFixedDesiredAttitude()
 	// current speed - lacking forward airspeed we use groundspeed :( TODO get airspeed sensor!
 	speedActual = sqrt(pow(velocityActual.East, 2) + pow(velocityActual.North, 2) + pow(velocityActual.Down, 2));
 
-	// We assume that the Throttle setting gives us control over the power distribution
-	// therefore we make a control loop over this
-	powerActual = attitudeRaw.accels[0] * speedActual - GEE * velocityActual.Down;
-
 	// Compute desired roll command
 	courseError = RAD2DEG * (atan2f(velocityDesired.East,velocityDesired.North) - atan2f(velocityActual.East,velocityActual.North));
 	if (courseError<-180.) courseError+=360.;
 	if (courseError>180.) courseError-=360.;
 
-	courseIntegral = bound(courseIntegral + courseError * dT, 
+	courseIntegral = bound(courseIntegral + courseError * dT * guidanceSettings.CoursePI[GUIDANCESETTINGS_COURSEPI_KI], 
 			      -guidanceSettings.CoursePI[GUIDANCESETTINGS_COURSEPI_ILIMIT],
 			      guidanceSettings.CoursePI[GUIDANCESETTINGS_COURSEPI_ILIMIT]);
 	courseCommand = (courseError * guidanceSettings.CoursePI[GUIDANCESETTINGS_COURSEPI_KP] +
-			courseIntegral * guidanceSettings.CoursePI[GUIDANCESETTINGS_COURSEPI_KI]);
+			courseIntegral);
 	
 	stabDesired.Roll = bound( courseCommand, -guidanceSettings.MaxRollPitch, guidanceSettings.MaxRollPitch );
 
@@ -412,22 +408,22 @@ static void updateFixedDesiredAttitude()
 	
 	accelError = accelDesired - attitudeRaw.accels[0];
 
-	accelIntegral = bound(accelIntegral + accelError * dT, 
+	accelIntegral = bound(accelIntegral + accelError * dT * guidanceSettings.AccelPI[GUIDANCESETTINGS_ACCELPI_KI], 
 			     -guidanceSettings.AccelPI[GUIDANCESETTINGS_ACCELPI_ILIMIT],
 			     guidanceSettings.AccelPI[GUIDANCESETTINGS_ACCELPI_ILIMIT]);
 	accelCommand = (accelError * guidanceSettings.AccelPI[GUIDANCESETTINGS_ACCELPI_KP] + 
-		       accelIntegral * guidanceSettings.AccelPI[GUIDANCESETTINGS_ACCELPI_KI]);
+		       accelIntegral);
 
 	stabDesired.Pitch = bound(-accelCommand,
 				      -guidanceSettings.MaxRollPitch, guidanceSettings.MaxRollPitch);
 
 	// Compute desired power command
-	powerError =  -( velocityDesired.Down - velocityActual.Down ) + speedError;
-	powerIntegral =	bound(powerIntegral + powerError * dT, 
+	powerError =  -( velocityDesired.Down - velocityActual.Down ) * guidanceSettings.ClimbRateBoostFactor + speedError;
+	powerIntegral =	bound(powerIntegral + powerError * dT * guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_KI], 
 			      -guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT],
 			      guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT]);	
 	powerCommand = 0.5+(powerError * guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_KP] +
-		       powerIntegral * guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_KI]);
+		       powerIntegral);
 	
 	stabDesired.Throttle = bound(powerCommand, 0, 1);
 

@@ -91,7 +91,10 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
     connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
 
-    // *********************
+    // And check whether by any chance we are not already connected
+    if (telMngr->isConnected())
+        onAutopilotConnect();
+
 }
 
 ConfigGadgetWidget::~ConfigGadgetWidget()

@@ -341,10 +341,16 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
 		attActualData.Roll = roll;   //roll;
 		attActualData.Pitch = pitch;  // pitch
                 attActualData.Yaw = heading; // Yaw
-		//		attActualData.q1 = 0;
-		//		attActualData.q2 = 0;
-		//		attActualData.q3 = 0;
-		//		attActualData.q4 = 0;
+		float rpy[3];
+		float quat[4];
+		rpy[0] = roll;
+		rpy[1] = pitch;
+		rpy[2] = heading;
+		Utils::CoordinateConversions().RPY2Quaternion(rpy,quat);
+		attActualData.q1 = quat[0];
+		attActualData.q2 = quat[1];
+		attActualData.q3 = quat[2];
+		attActualData.q4 = quat[3];
 		attActual->setData(attActualData);
 
 		// Update gps objects

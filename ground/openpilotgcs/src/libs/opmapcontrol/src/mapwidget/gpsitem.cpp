@@ -28,10 +28,10 @@
 #include "gpsitem.h"
 namespace mapcontrol
 {
-    GPSItem::GPSItem(MapGraphicItem* map,OPMapWidget* parent):map(map),mapwidget(parent),showtrail(true),trailtime(5),traildistance(50),autosetreached(true)
+    GPSItem::GPSItem(MapGraphicItem* map,OPMapWidget* parent,QString uavPic):map(map),mapwidget(parent),showtrail(true),showtrailline(true),trailtime(5),traildistance(50),autosetreached(true)
     ,autosetdistance(100)
     {
-        pic.load(QString::fromUtf8(":/markers/images/mapquad.png"));
+        pic.load(uavPic);
        // Don't scale but trust the image we are given
        // pic=pic.scaled(50,33,Qt::IgnoreAspectRatio);
         localposition=map->FromLatLngToLocal(mapwidget->CurrentPosition());
@@ -39,15 +39,12 @@ namespace mapcontrol
         this->setZValue(4);
         trail=new QGraphicsItemGroup();
         trail->setParentItem(map);
-
-
+        trailLine=new QGraphicsItemGroup();
+        trailLine->setParentItem(map);
         this->setFlag(QGraphicsItem::ItemIgnoresTransformations,true);
         mapfollowtype=UAVMapFollowType::None;
         trailtype=UAVTrailType::ByDistance;
         timer.start();
-
-       // rect=QRectF(0,0,renderer.defaultSize().width()*0.05,renderer.defaultSize().height()*0.05);
-
     }
     GPSItem::~GPSItem()
     {
@@ -78,6 +75,9 @@ namespace mapcontrol
                 if(timer.elapsed()>trailtime*1000)
                 {
                     trail->addToGroup(new TrailItem(position,altitude,Qt::green,this));
+                    if(!lasttrailline.IsEmpty())
+                        trailLine->addToGroup((new TrailLineItem(lasttrailline,position,Qt::green,map)));
+                    lasttrailline=position;
                     timer.restart();
                 }
 
@@ -87,6 +87,10 @@ namespace mapcontrol
                 if(qAbs(internals::PureProjection::DistanceBetweenLatLng(lastcoord,position)*1000)>traildistance)
                 {
                     trail->addToGroup(new TrailItem(position,altitude,Qt::green,this));
+                    if(!lasttrailline.IsEmpty())
+
+                        trailLine->addToGroup((new TrailLineItem(lasttrailline,position,Qt::green,this)));
+                    lasttrailline=position;
                     lastcoord=position;
                 }
             }
@@ -170,7 +174,12 @@ namespace mapcontrol
             TrailItem* w=qgraphicsitem_cast<TrailItem*>(i);
             if(w)
                 w->setPos(map->FromLatLngToLocal(w->coord).X(),map->FromLatLngToLocal(w->coord).Y());
-            //this->update();
+        }
+        foreach(QGraphicsItem* i,trailLine->childItems())
+        {
+            TrailLineItem* ww=qgraphicsitem_cast<TrailLineItem*>(i);
+            if(ww)
+                ww->setLine(map->FromLatLngToLocal(ww->coord1).X(),map->FromLatLngToLocal(ww->coord1).Y(),map->FromLatLngToLocal(ww->coord2).X(),map->FromLatLngToLocal(ww->coord2).Y());
         }
 
     }
@@ -184,10 +193,18 @@ namespace mapcontrol
     {
         showtrail=value;
         trail->setVisible(value);
+
+    }
+    void GPSItem::SetShowTrailLine(const bool &value)
+    {
+        showtrailline=value;
+        trailLine->setVisible(value);
     }
     void GPSItem::DeleteTrail()const
     {
         foreach(QGraphicsItem* i,trail->childItems())
+            delete i;
+        foreach(QGraphicsItem* i,trailLine->childItems())
             delete i;
     }
     double GPSItem::Distance3D(const internals::PointLatLng &coord, const int &altitude)
@@ -195,5 +212,9 @@ namespace mapcontrol
        return sqrt(pow(internals::PureProjection::DistanceBetweenLatLng(this->coord,coord)*1000,2)+
        pow(this->altitude-altitude,2));
 
+    }
+    void GPSItem::SetUavPic(QString UAVPic)
+    {
+        pic.load(":/uavs/images/"+UAVPic);
     }
 }

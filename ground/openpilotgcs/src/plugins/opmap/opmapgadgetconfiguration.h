@@ -46,6 +46,7 @@ Q_PROPERTY(bool showTileGridLines READ showTileGridLines WRITE setShowTileGridLi
 Q_PROPERTY(QString accessMode READ accessMode WRITE setAccessMode)
 Q_PROPERTY(bool useMemoryCache READ useMemoryCache WRITE setUseMemoryCache)
 Q_PROPERTY(QString cacheLocation READ cacheLocation WRITE setCacheLocation)
+Q_PROPERTY(QString uavSymbol READ uavSymbol WRITE setUavSymbol)
 
 public:
     explicit OPMapGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
@@ -62,6 +63,7 @@ public:
     QString accessMode() const { return m_accessMode; }
     bool useMemoryCache() const { return m_useMemoryCache; }
     QString cacheLocation() const { return m_cacheLocation; }
+    QString uavSymbol() const { return m_uavSymbol; }
 
 public slots:
     void setMapProvider(QString provider) { m_mapProvider = provider; }
@@ -73,7 +75,7 @@ public slots:
     void setAccessMode(QString accessMode) { m_accessMode = accessMode; }
     void setUseMemoryCache(bool useMemoryCache) { m_useMemoryCache = useMemoryCache; }
     void setCacheLocation(QString cacheLocation);
-
+    void setUavSymbol(QString symbol){m_uavSymbol=symbol;}
 private:
     QString m_mapProvider;
     int m_defaultZoom;
@@ -84,6 +86,7 @@ private:
     QString m_accessMode;
     bool m_useMemoryCache;
     QString m_cacheLocation;
+    QString m_uavSymbol;
 
 };
 

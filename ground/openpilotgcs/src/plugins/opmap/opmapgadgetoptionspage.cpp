@@ -82,6 +82,21 @@ QWidget *OPMapGadgetOptionsPage::createPage(QWidget *parent)
     m_page->lineEditCacheLocation->setPromptDialogTitle(tr("Choose Cache Directory"));
     m_page->lineEditCacheLocation->setPath(m_config->cacheLocation());
 
+    QDir dir(":/uavs/images/");
+    QStringList list=dir.entryList();
+    foreach(QString i,list)
+    {
+        QIcon icon(QPixmap(":/uavs/images/"+i));
+        m_page->uavSymbolComboBox->addItem(icon,QString(),i);
+    }
+    for(int x=0;x<m_page->uavSymbolComboBox->count();++x)
+    {
+        if(m_page->uavSymbolComboBox->itemData(x).toString()==m_config->uavSymbol())
+        {
+            m_page->uavSymbolComboBox->setCurrentIndex(x);
+        }
+    }
+
     connect(m_page->pushButtonCacheDefaults, SIGNAL(clicked()), this, SLOT(on_pushButtonCacheDefaults_clicked()));
 
     return w;
@@ -113,6 +128,7 @@ void OPMapGadgetOptionsPage::apply()
     m_config->setAccessMode(m_page->accessModeComboBox->currentText());
     m_config->setUseMemoryCache(m_page->checkBoxUseMemoryCache->isChecked());
     m_config->setCacheLocation(m_page->lineEditCacheLocation->path());
+    m_config->setUavSymbol(m_page->uavSymbolComboBox->itemData(m_page->uavSymbolComboBox->currentIndex()).toString());
 }
 
 void OPMapGadgetOptionsPage::finish()

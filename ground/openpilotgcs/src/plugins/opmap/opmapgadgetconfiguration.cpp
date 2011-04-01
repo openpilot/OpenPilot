@@ -39,7 +39,8 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId,  QSettings* 
     m_showTileGridLines(false),
     m_accessMode("ServerAndCache"),
     m_useMemoryCache(true),
-    m_cacheLocation(Utils::PathUtils().GetStoragePath() + "mapscache" + QDir::separator())
+    m_cacheLocation(Utils::PathUtils().GetStoragePath() + "mapscache" + QDir::separator()),
+    m_uavSymbol(QString::fromUtf8(":/uavs/images/mapquad.png"))
 {
     QSettings set(QSettings::IniFormat, QSettings::UserScope,QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS"));
     QDir dir(set.fileName());
@@ -58,14 +59,14 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId,  QSettings* 
         QString accessMode= qSettings->value("accessMode").toString();
         bool useMemoryCache= qSettings->value("useMemoryCache").toBool();
         QString cacheLocation= qSettings->value("cacheLocation").toString();
-
+        QString uavSymbol=qSettings->value("uavSymbol").toString();
         if (!mapProvider.isEmpty()) m_mapProvider = mapProvider;
         m_defaultZoom = zoom;
         m_defaultLatitude = latitude;
         m_defaultLongitude = longitude;
         m_useOpenGL = useOpenGL;
         m_showTileGridLines = showTileGridLines;
-
+        m_uavSymbol=uavSymbol;
         if (!accessMode.isEmpty()) m_accessMode = accessMode;
         m_useMemoryCache = useMemoryCache;
         if (!cacheLocation.isEmpty()) m_cacheLocation = Utils::PathUtils().InsertStoragePath(cacheLocation);
@@ -85,7 +86,7 @@ IUAVGadgetConfiguration * OPMapGadgetConfiguration::clone()
     m->m_accessMode = m_accessMode;
     m->m_useMemoryCache = m_useMemoryCache;
     m->m_cacheLocation = m_cacheLocation;
-
+    m->m_uavSymbol=m_uavSymbol;
     return m;
 }
 
@@ -98,6 +99,7 @@ void OPMapGadgetConfiguration::saveConfig(QSettings* qSettings) const {
    qSettings->setValue("showTileGridLines", m_showTileGridLines);
    qSettings->setValue("accessMode", m_accessMode);
    qSettings->setValue("useMemoryCache", m_useMemoryCache);
+   qSettings->setValue("uavSymbol", m_uavSymbol);
    qSettings->setValue("cacheLocation", Utils::PathUtils().RemoveStoragePath(m_cacheLocation));
 }
 void OPMapGadgetConfiguration::setCacheLocation(QString cacheLocation){

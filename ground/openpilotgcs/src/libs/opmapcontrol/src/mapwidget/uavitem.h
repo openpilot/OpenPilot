@@ -39,6 +39,7 @@
 #include <QtSvg/QSvgRenderer>
 #include "opmapwidget.h"
 #include "trailitem.h"
+#include "traillineitem.h"
 namespace mapcontrol
 {
     class WayPointItem;
@@ -54,7 +55,7 @@ namespace mapcontrol
         Q_INTERFACES(QGraphicsItem)
     public:
                 enum { Type = UserType + 2 };
-        UAVItem(MapGraphicItem* map,OPMapWidget* parent);
+        UAVItem(MapGraphicItem* map,OPMapWidget* parent, QString uavPic=QString::fromUtf8(":/uavs/images/mapquad.png"));
         ~UAVItem();
         /**
         * @brief Sets the UAV position
@@ -143,11 +144,23 @@ namespace mapcontrol
         */
         bool ShowTrail()const{return showtrail;}
         /**
+        * @brief Returns true if UAV trail line is shown
+        *
+        * @return bool
+        */
+        bool ShowTrailLine()const{return showtrailline;}
+        /**
         * @brief Used to define if the UAV displays a trail
         *
         * @param value
         */
         void SetShowTrail(bool const& value);
+        /**
+        * @brief Used to define if the UAV displays a trail line
+        *
+        * @param value
+        */
+        void SetShowTrailLine(bool const& value);
         /**
         * @brief Deletes all the trail points
         */
@@ -178,6 +191,8 @@ namespace mapcontrol
         void SetAutoSetDistance(double const& value){autosetdistance=value;}
 
         int type() const;
+
+        void SetUavPic(QString UAVPic);
     private:
         MapGraphicItem* map;
 
@@ -190,8 +205,11 @@ namespace mapcontrol
         core::Point localposition;
         OPMapWidget* mapwidget;
         QGraphicsItemGroup* trail;
+        QGraphicsItemGroup * trailLine;
+        internals::PointLatLng lasttrailline;
         QTime timer;
         bool showtrail;
+        bool showtrailline;
         int trailtime;
         int traildistance;
         bool autosetreached;

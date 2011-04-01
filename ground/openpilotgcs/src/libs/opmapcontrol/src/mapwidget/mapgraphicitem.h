@@ -121,8 +121,14 @@ namespace mapcontrol
         */
         void SetZoomStep(int const& value);
 
-
+        /**
+        * @brief Ask Stacey
+        *
+        * @param value
+        */
+        void SetShowDragons(bool const& value);
     private:
+        bool showDragons;
         bool SetZoomToFitRect(internals::RectLatLng const& rect);
         internals::Core *core;
         Configuration *config;
@@ -149,6 +155,7 @@ namespace mapcontrol
         QRectF maprect;
         bool isSelected;
         bool isMouseOverMarker;
+        QPixmap dragons;
         void SetIsMouseOverMarker(bool const& value){isMouseOverMarker = value;}
 
         qreal rotation;

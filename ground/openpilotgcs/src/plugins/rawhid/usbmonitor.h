@@ -118,8 +118,8 @@ public:
     enum USBConstants {
         idVendor_OpenPilot = 0x20a0,
         idProduct_OpenPilot = 0x415a,
-        idProduct_PipXtreme = 0x415b,
-        idProduct_CopterControl = 0x415c
+        idProduct_CopterControl = 0x415b,
+        idProduct_PipXtreme = 0x415c
     };
 
     static USBMonitor *instance();

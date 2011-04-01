@@ -30,7 +30,8 @@
 #include <coreplugin/icore.h>
 #include <coreplugin/threadmanager.h>
 
-TelemetryManager::TelemetryManager()
+TelemetryManager::TelemetryManager() :
+    autopilotConnected(false)
 {
     moveToThread(Core::ICore::instance()->threadManager()->getRealTimeThread());
     // Get UAVObjectManager instance
@@ -44,6 +45,11 @@ TelemetryManager::TelemetryManager()
 
 TelemetryManager::~TelemetryManager()
 {
+}
+
+bool TelemetryManager::isConnected()
+{
+    return autopilotConnected;
 }
 
 void TelemetryManager::start(QIODevice *dev)
@@ -78,10 +84,12 @@ void TelemetryManager::onStop()
 
 void TelemetryManager::onConnect()
 {
+    autopilotConnected = true;
     emit connected();
 }
 
 void TelemetryManager::onDisconnect()
 {
+    autopilotConnected = false;
     emit disconnected();
 }

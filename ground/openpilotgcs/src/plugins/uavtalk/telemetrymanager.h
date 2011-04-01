@@ -46,6 +46,7 @@ public:
 
     void start(QIODevice *dev);
     void stop();
+    bool isConnected();
 
 signals:
     void connected();
@@ -65,6 +66,7 @@ private:
     Telemetry* telemetry;
     TelemetryMonitor* telemetryMon;
     QIODevice *device;
+    bool autopilotConnected;
 };
 
 #endif // TELEMETRYMANAGER_H

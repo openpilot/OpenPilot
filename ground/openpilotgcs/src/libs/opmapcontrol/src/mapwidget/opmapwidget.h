@@ -348,6 +348,7 @@ namespace mapcontrol
         void SetShowHome(bool const& value);
         bool ShowHome()const{return showhome;}
         void SetShowDiagnostics(bool const& value);
+        void SetUavPic(QString UAVPic);
     private:
         internals::Core *core;
         MapGraphicItem *map;

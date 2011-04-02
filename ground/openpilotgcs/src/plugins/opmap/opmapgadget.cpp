@@ -51,5 +51,6 @@ void OPMapGadget::loadConfiguration(IUAVGadgetConfiguration *config)
     m_widget->setAccessMode(m->accessMode());
     m_widget->setUseMemoryCache(m->useMemoryCache());
     m_widget->setCacheLocation(m->cacheLocation());
+    m_widget->SetUavPic(m->uavSymbol());
 }
 

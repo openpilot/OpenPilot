@@ -115,6 +115,7 @@ public:
     void setUseMemoryCache(bool useMemoryCache);
     void setCacheLocation(QString cacheLocation);
     void setMapMode(opMapModeType mode);
+     void SetUavPic(QString UAVPic);
 
 public slots:
     void homePositionUpdated(UAVObject *);
@@ -193,6 +194,8 @@ private slots:
     void onShowDiagnostics_toggled(bool show);
     void onShowUAVAct_toggled(bool show);
     void onShowHomeAct_toggled(bool show);
+    void onShowTrailLineAct_toggled(bool show);
+    void onShowTrailAct_toggled(bool show);
     void onGoZoomInAct_triggered();
     void onGoZoomOutAct_triggered();
     void onGoMouseClickAct_triggered();
@@ -304,6 +307,8 @@ private:
     QList<QAction *> uavTrailTypeAct;
     QAction *clearUAVtrailAct;
     QActionGroup *uavTrailTimeActGroup;
+    QAction *showTrailLineAct;
+    QAction *showTrailAct;
     QList<QAction *> uavTrailTimeAct;
     QActionGroup *uavTrailDistanceActGroup;
     QList<QAction *> uavTrailDistanceAct;

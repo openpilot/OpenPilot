@@ -33,7 +33,7 @@ namespace mapcontrol
 {
     MapGraphicItem::MapGraphicItem(internals::Core *core, Configuration *configuration):core(core),config(configuration),MapRenderTransform(1), maxZoom(17),minZoom(2),zoomReal(0),isSelected(false),rotation(0),zoomDigi(0)
     {
-
+        dragons.load(QString::fromUtf8(":/markers/images/dragons1.jpg"));
         showTileGridLines=false;
         isMouseOverMarker=false;
         maprect=QRectF(0,0,1022,680);
@@ -347,6 +347,7 @@ namespace mapcontrol
     }
     void MapGraphicItem::DrawMap2D(QPainter *painter)
     {
+        painter->drawImage(this->boundingRect(),dragons.toImage());
          if(!lastimage.isNull())
             painter->drawImage(core->GetrenderOffset().X()-lastimagepoint.X(),core->GetrenderOffset().Y()-lastimagepoint.Y(),lastimage);
 

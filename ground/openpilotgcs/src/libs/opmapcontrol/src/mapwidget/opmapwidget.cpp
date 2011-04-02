@@ -79,6 +79,15 @@ namespace mapcontrol
         }
 
     }
+    void OPMapWidget::SetUavPic(QString UAVPic)
+    {
+        if(UAV!=0)
+            UAV->SetUavPic(UAVPic);
+        if(GPS!=0)
+            GPS->SetUavPic(UAVPic);
+
+
+    }
     void OPMapWidget::SetShowUAV(const bool &value)
     {
         if(value && UAV==0)

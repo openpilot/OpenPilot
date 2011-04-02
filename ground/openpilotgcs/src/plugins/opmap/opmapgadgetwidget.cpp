@@ -511,6 +511,10 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
         uavTrailDistanceSubMenu.addAction(uavTrailDistanceAct.at(i));
     menu.addMenu(&uavTrailDistanceSubMenu);
 
+    menu.addAction(showTrailAct);
+
+    menu.addAction(showTrailLineAct);
+
     menu.addAction(clearUAVtrailAct);
 
     // ****
@@ -621,9 +625,9 @@ void OPMapGadgetWidget::updatePosition()
         return;
 
     QMutexLocker locker(&m_map_mutex);
-
-    if (!telemetry_connected)
-        return;
+//Pip I'm sorry, I know this was here with a purpose vvv
+    //if (!telemetry_connected)
+      //  return;
 
     double latitude;
     double longitude;
@@ -651,6 +655,7 @@ void OPMapGadgetWidget::updatePosition()
     m_widget->labelUAVPos->setText(str);
 
     m_map->UAV->SetUAVPos(uav_pos, uav_altitude_meters); // set the maps UAV position
+   // qDebug()<<"UAVPOSITION"<<uav_pos.ToString();
     m_map->UAV->SetUAVHeading(uav_heading_degrees);      // set the maps UAV heading
 
 	if (!getGPSPosition(latitude, longitude, altitude))
@@ -1545,6 +1550,18 @@ void OPMapGadgetWidget::createActions()
         uavTrailTypeAct.append(uavTrailType_act);
     }
 
+    showTrailAct = new QAction(tr("Show Trail dots"), this);
+    showTrailAct->setStatusTip(tr("Show/Hide the Trail dots"));
+    showTrailAct->setCheckable(true);
+    showTrailAct->setChecked(true);
+    connect(showTrailAct, SIGNAL(toggled(bool)), this, SLOT(onShowTrailAct_toggled(bool)));
+
+    showTrailLineAct = new QAction(tr("Show Trail lines"), this);
+    showTrailLineAct->setStatusTip(tr("Show/Hide the Trail lines"));
+    showTrailLineAct->setCheckable(true);
+    showTrailLineAct->setChecked(true);
+    connect(showTrailLineAct, SIGNAL(toggled(bool)), this, SLOT(onShowTrailLineAct_toggled(bool)));
+
     clearUAVtrailAct = new QAction(tr("Clear UAV trail"), this);
     clearUAVtrailAct->setStatusTip(tr("Clear the UAV trail"));
     connect(clearUAVtrailAct, SIGNAL(triggered()), this, SLOT(onClearUAVtrailAct_triggered()));
@@ -1641,6 +1658,24 @@ void OPMapGadgetWidget::onShowUAVAct_toggled(bool show)
 
     m_map->UAV->setVisible(show);
     m_map->GPS->setVisible(show);
+}
+
+void OPMapGadgetWidget::onShowTrailAct_toggled(bool show)
+{
+    if (!m_widget || !m_map)
+        return;
+
+    m_map->UAV->SetShowTrail(show);
+    m_map->GPS->SetShowTrail(show);
+}
+
+void OPMapGadgetWidget::onShowTrailLineAct_toggled(bool show)
+{
+    if (!m_widget || !m_map)
+        return;
+
+    m_map->UAV->SetShowTrailLine(show);
+    m_map->GPS->SetShowTrailLine(show);
 }
 
 void OPMapGadgetWidget::onMapModeActGroup_triggered(QAction *action)
@@ -2329,3 +2364,8 @@ bool OPMapGadgetWidget::setHomeLocationObject()
 }
 
 // *************************************************************************************
+
+void OPMapGadgetWidget::SetUavPic(QString UAVPic)
+{
+    m_map->SetUavPic(UAVPic);
+}

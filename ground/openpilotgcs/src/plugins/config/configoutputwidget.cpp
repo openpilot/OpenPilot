@@ -337,8 +337,8 @@ void ConfigOutputWidget::sendChannelTest(int value)
 			if (!links[i]->checkState()) continue;
 
 			int val = in_value;
-			if (val < outMin[i]) val = outMin[i];
-			if (val > outMax[i]) val = outMax[i];
+			if (val < outSliders[i]->minimum()) val = outSliders[i]->minimum();
+			if (val > outSliders[i]->maximum()) val = outSliders[i]->maximum();
 
 			if (outSliders[i]->value() == val) continue;
 

@@ -226,7 +226,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QPushButton" name="getRCInputCurrent">
        <property name="geometry">
         <rect>
-         <x>250</x>
+         <x>260</x>
          <y>280</y>
          <width>93</width>
          <height>27</height>
@@ -353,7 +353,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QPushButton" name="saveRCInputToSD">
        <property name="geometry">
         <rect>
-         <x>430</x>
+         <x>460</x>
          <y>280</y>
          <width>93</width>
          <height>27</height>
@@ -428,7 +428,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QPushButton" name="saveRCInputToRAM">
        <property name="geometry">
         <rect>
-         <x>340</x>
+         <x>360</x>
          <y>280</y>
          <width>93</width>
          <height>27</height>
@@ -1187,6 +1187,123 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="ch0Rev">
+       <property name="geometry">
+        <rect>
+         <x>560</x>
+         <y>40</y>
+         <width>21</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label">
+       <property name="geometry">
+        <rect>
+         <x>560</x>
+         <y>20</y>
+         <width>31</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Rev.</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="ch1Rev">
+       <property name="geometry">
+        <rect>
+         <x>560</x>
+         <y>70</y>
+         <width>21</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="ch2Rev">
+       <property name="geometry">
+        <rect>
+         <x>560</x>
+         <y>100</y>
+         <width>21</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="ch3Rev">
+       <property name="geometry">
+        <rect>
+         <x>560</x>
+         <y>130</y>
+         <width>21</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="ch4Rev">
+       <property name="geometry">
+        <rect>
+         <x>560</x>
+         <y>160</y>
+         <width>21</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="ch5Rev">
+       <property name="geometry">
+        <rect>
+         <x>560</x>
+         <y>190</y>
+         <width>21</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="ch6Rev">
+       <property name="geometry">
+        <rect>
+         <x>560</x>
+         <y>220</y>
+         <width>21</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="ch7Rev">
+       <property name="geometry">
+        <rect>
+         <x>560</x>
+         <y>250</y>
+         <width>21</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </widget>

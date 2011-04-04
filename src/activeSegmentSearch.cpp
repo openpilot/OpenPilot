@@ -43,10 +43,42 @@ namespace jafar {
 
       // Functions to fill in cells
       void ActiveSegmentSearchGrid::addObs(const vec4 & p) {
-         veci2 cell = pix2cell(p);
-         if (projectionsCount(cell(0), cell(1)) == -1)
-            projectionsCount(cell(0), cell(1)) = 0;
-         projectionsCount(cell(0), cell(1))++;
+			veci4 cell = pix2cell(p);
+			int x0 = cell(0);
+			int y0 = cell(1);
+			int dx = abs(cell(2) - cell(0));
+			int dy = abs(cell(3) - cell(1));
+			int sx = (cell(0) < cell(2)) ? 1 : -1;
+			int sy = (cell(1) < cell(3)) ? 1 : -1;
+			float err = dx - dy;
+			float _2err;
+
+			if (projectionsCount(x0, y0) == -1)
+				projectionsCount(x0, y0) = 0;
+			projectionsCount(x0, y0)++;
+			while(x0 != cell(2) || y0 != cell(3))
+			{
+				_2err = 2*err;
+
+				if(_2err > -dy)
+				{
+					err -= dy;
+					x0 += sx;
+
+					if (projectionsCount(x0, y0) == -1)
+						projectionsCount(x0, y0) = 0;
+					projectionsCount(x0, y0)++;
+				}
+				if(_2err < dx)
+				{
+					err  += dx;
+					y0 += sy;
+
+					if (projectionsCount(x0, y0) == -1)
+						projectionsCount(x0, y0) = 0;
+					projectionsCount(x0, y0)++;
+				}
+			}
       }
 
       void ActiveSegmentSearchGrid::clear() {
@@ -74,7 +106,8 @@ namespace jafar {
                   k++;
                }
             }
-         }
+			}
+			JFR_DEBUG(projectionsCount);
          if (k > 0) { // number of empty inner cells
             //				int idx = (double) rtslam::rand() / RAND_MAX * k;
             int idx = rtslam::rand() % k; // between 0 and k-1

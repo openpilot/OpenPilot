@@ -99,10 +99,12 @@ namespace jafar {
              * Get cell corresponding to pixel
              */
             template<class Vec>
-            veci2 pix2cell(const Vec & pix) {
-               veci2 cell;
+				veci4 pix2cell(const Vec & pix) {
+					veci4 cell;
                cell(0) = (pix(0) - offset(0)) / cellSize(0);
-               cell(1) = (pix(1) - offset(1)) / cellSize(1);
+					cell(1) = (pix(1) - offset(1)) / cellSize(1);
+					cell(2) = (pix(2) - offset(0)) / cellSize(0);
+					cell(3) = (pix(3) - offset(1)) / cellSize(1);
                return cell;
             }
 

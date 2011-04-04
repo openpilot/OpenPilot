@@ -48,14 +48,37 @@ namespace rtslam {
          } params;
 
       private :
-         void projectExtremities(const vec& meas, const vec& exp, vec& newMeas) const
-         {
+			void projectExtremities(const vec4& meas, const vec4& exp, vec4& newMeas) const
+			{
             // extract predicted points
             vec2 P1 = subrange(exp,0,2);
-            vec2 P2 = subrange(exp,2,4);
+				vec2 P2 = subrange(exp,2,4);
+				double P12_2 = (P2(0) - P1(0))*(P2(0) - P1(0)) // Square(distance(P1,P2))
+							  +   (P2(1) - P1(1))*(P2(1) - P1(1));
+				double P12 = sqrt(P12_2);
             // extract measured line
             vec2 L1 = subrange(meas,0,2);
             vec2 L2 = subrange(meas,2,4);
+				double L12_2 = (L2(0) - L1(0))*(L2(0) - L1(0)) // Square(distance(L1,L2))
+							+   (L2(1) - L1(1))*(L2(1) - L1(1));
+
+				// compute predicted center
+				vec2 Pc = (P1 + P2) / 2;
+				// project on measured line
+				double u = (((Pc(0) - L1(0))*(L2(0) - L1(0)))
+							  +((Pc(1) - L1(1))*(L2(1) - L1(1))))
+							  /(L12_2);
+				vec2 Lc = L1 + u*(L2 - L1);
+
+				// compute measured orientation
+				double angle = atan2(L2(1) - L1(1), L2(0) - L1(0));
+
+				// compute extremities
+				newMeas[0] = Lc[0] - P12 * cos(angle) / 2;
+				newMeas[1] = Lc[1] - P12 * sin(angle) / 2;
+				newMeas[2] = Lc[0] + P12 * cos(angle) / 2;
+				newMeas[3] = Lc[1] + P12 * sin(angle) / 2;
+/*
             // TODO : be carefull L1 != L2
             // project predicted points on line
             double u = (((P1(0) - L1(0))+(L2(0) - L1(0)))
@@ -63,10 +86,11 @@ namespace rtslam {
                        /(norm_1(L1 - L2) * norm_1(L1 - L2));
             subrange(newMeas,0,2) = L1 + u*(L2 - L1);
 
-            u = (((P2(0) - L1(0))+(L2(0) - L1(0)))
-                +((P2(1) - L1(1))+(L2(1) - L1(1))))
+				u = (((P2(0) - L2(0))+(L1(0) - L2(0)))
+					 +((P2(1) - L2(1))+(L1(1) - L2(1))))
                 /(norm_1(L1 - L2) * norm_1(L1 - L2));
-            subrange(newMeas,2,4) = L1 + u*(L2 - L1);
+				subrange(newMeas,2,4) = L2 + u*(L1 - L2);
+*/
          }
 
       public:
@@ -91,12 +115,31 @@ namespace rtslam {
             matcher.trackSegment(*(rawPtr->img),setin,&predictor,setout);
 
             if(setout.count() > 0) {
-               measure.std(params.measStd);
-               measure.x(0) = setout.segmentAt(0)->x1();
+					measure.std(params.measStd);
+					vec4 pred;
+					vec4 obs;
+					vec4 projected;
+
+					pred(0) = targetAppSpec->hypothesis()->x1();
+					pred(1) = targetAppSpec->hypothesis()->y1();
+					pred(2) = targetAppSpec->hypothesis()->x2();
+					pred(3) = targetAppSpec->hypothesis()->y2();
+
+					obs(0) = setout.segmentAt(0)->x1();
+					obs(1) = setout.segmentAt(0)->y1();
+					obs(2) = setout.segmentAt(0)->x2();
+					obs(3) = setout.segmentAt(0)->y2();
+
+					projectExtremities(obs,pred, projected);
+
+					measure.x() = projected;
+/*
+					measure.x(0) = setout.segmentAt(0)->x1();
                measure.x(1) = setout.segmentAt(0)->y1();
                measure.x(2) = setout.segmentAt(0)->x2();
                measure.x(3) = setout.segmentAt(0)->y2();
-               measure.matchScore = 1;
+*/
+					measure.matchScore = 1;
                appSpec->setHypothesis(setout.segmentAt(0));
             }
             else {

@@ -128,8 +128,7 @@ namespace jafar {
 
          JFR_DEBUG("distance_cube\n" << distance_cube << "SIGMA_exp\n" << SIGMA_exp << "sigma_cov \n" << sigma_cov);
 
-     //    hypothesis->setUncertainty(sigma(2), sigma(0), sigma(3), sigma(1));
-        hypothesis->setUncertainty(0.05, 1, 0.05, 1);
+         hypothesis->setUncertainty(sigma(2), sigma(0), sigma(3), sigma(1));
 
          app_seg_ptr_t app_dst = SPTR_CAST<AppearanceSegment>(obsPtrNew->predictedAppearance);
          app_dst->setHypothesis(hypothesis);

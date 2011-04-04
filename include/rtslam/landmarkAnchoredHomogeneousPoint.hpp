@@ -14,6 +14,7 @@
 #include "rtslam/landmarkAbstract.hpp"
 #include "rtslam/quatTools.hpp"
 #include "rtslam/ahpTools.hpp"
+#include "rtslam/landmarkEuclideanPoint.hpp"
 
 /**
  * General namespace for Jafar environment.
@@ -59,7 +60,7 @@ namespace jafar {
 
 				virtual size_t mySize() {return size();}
 
-            virtual size_t reparamSize() {return LandmarkAnchoredHomogeneousPoint::size();} // ????? Shouldn't it be LandmarkEuclidianPoint::size() ? (bhautboi)
+				virtual size_t reparamSize() {return LandmarkEuclideanPoint::size();}
 
 				virtual vec reparametrize_func(const vec & lmk) const {
 					return lmkAHP::ahp2euc(lmk);

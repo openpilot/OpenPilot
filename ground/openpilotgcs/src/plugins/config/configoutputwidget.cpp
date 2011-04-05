@@ -94,7 +94,16 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
             << m_config->ch6Rev
             << m_config->ch7Rev;
 
-    UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
+	links << m_config->ch0Link
+			<< m_config->ch1Link
+			<< m_config->ch2Link
+			<< m_config->ch3Link
+			<< m_config->ch4Link
+			<< m_config->ch5Link
+			<< m_config->ch6Link
+			<< m_config->ch7Link;
+
+	UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
     QList<UAVObjectField*> fieldList = obj->getFields();
     foreach (UAVObjectField* field, fieldList) {
         if (field->getUnits().contains("channel")) {
@@ -120,7 +129,12 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 
     connect(m_config->channelOutTest, SIGNAL(toggled(bool)), this, SLOT(runChannelTests(bool)));
 
-    requestRCOutputUpdate();
+	for (int i = 0; i < links.count(); i++)
+		links[i]->setChecked(false);
+	for (int i = 0; i < links.count(); i++)
+		connect(links[i], SIGNAL(toggled(bool)), this, SLOT(linkToggled(bool)));
+
+	requestRCOutputUpdate();
 
     connect(m_config->saveRCOutputToSD, SIGNAL(clicked()), this, SLOT(saveRCOutputObject()));
     connect(m_config->saveRCOutputToRAM, SIGNAL(clicked()), this, SLOT(sendRCOutputUpdate()));
@@ -184,6 +198,36 @@ void ConfigOutputWidget::enableControls(bool enable)
 }
 
 // ************************************
+
+/**
+  Toggles the channel linked state for use in testing mode
+  */
+void ConfigOutputWidget::linkToggled(bool state)
+{
+	// find the minimum slider value for the linked ones
+	int min = 10000;
+	int linked_count = 0;
+	for (int i = 0; i < outSliders.count(); i++)
+	{
+		if (!links[i]->checkState()) continue;
+		int value = outSliders[i]->value();
+		if (min > value) min = value;
+		linked_count++;
+	}
+
+	if (linked_count <= 0)
+		return;		// no linked channels
+
+	if (!m_config->channelOutTest->checkState())
+		return;	// we are not in Test Output mode
+
+	// set the linked channels to the same value
+	for (int i = 0; i < outSliders.count(); i++)
+	{
+		if (!links[i]->checkState()) continue;
+		outSliders[i]->setValue(min);
+	}
+}
 
 /**
   Toggles the channel testing mode by making the GCS take over
@@ -271,24 +315,47 @@ void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString str)
   */
 void ConfigOutputWidget::sendChannelTest(int value)
 {
-    // First of all, update the label:
-    QSlider *ob = (QSlider*)QObject::sender();
+	int in_value = value;
+
+	QSlider *ob = (QSlider *)QObject::sender();
+	if (!ob) return;
     int index = outSliders.indexOf(ob);
-    if (reversals[index]->isChecked())
-        value = outMin[index]->value()-value+outMax[index]->value();
-    else
-        outLabels[index]->setText(QString::number(value));
+	if (index < 0) return;
 
-    outLabels[index]->setText(QString::number(value));
-    if (!m_config->channelOutTest->isChecked())
-        return;
+	if (reversals[index]->isChecked())
+		value = outMin[index]->value() - value + outMax[index]->value();	// the chsnnel is reversed
 
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
+	// update the label
+	outLabels[index]->setText(QString::number(value));
 
-    UAVObjectField * channel = obj->getField("Channel");
-    channel->setValue(value,index);
+	if (links[index]->checkState())
+	{	// the channel is linked to other channels
+		// set the linked channels to the same value
+		for (int i = 0; i < outSliders.count(); i++)
+		{
+			if (i == index) continue;
+			if (!links[i]->checkState()) continue;
+
+			int val = in_value;
+			if (val < outSliders[i]->minimum()) val = outSliders[i]->minimum();
+			if (val > outSliders[i]->maximum()) val = outSliders[i]->maximum();
+
+			if (outSliders[i]->value() == val) continue;
+
+			outSliders[i]->setValue(val);
+			outLabels[i]->setText(QString::number(val));
+		}
+	}
+
+	if (!m_config->channelOutTest->isChecked())
+		return;
+
+	UAVDataObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
+	if (!obj) return;
+	UAVObjectField *channel = obj->getField("Channel");
+	if (!channel) return;
+	channel->setValue(value, index);
     obj->updated();
-
 }
 
 

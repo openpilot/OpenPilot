@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>617</width>
+    <width>727</width>
     <height>395</height>
    </rect>
   </property>
@@ -1300,6 +1300,147 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="text">
         <string>Rev.</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_2">
+       <property name="geometry">
+        <rect>
+         <x>590</x>
+         <y>50</y>
+         <width>101</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Link (Test outputs)</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="ch0Link">
+       <property name="geometry">
+        <rect>
+         <x>610</x>
+         <y>70</y>
+         <width>21</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Only used with Test Output mode</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="ch1Link">
+       <property name="geometry">
+        <rect>
+         <x>610</x>
+         <y>100</y>
+         <width>21</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Only used with Test Output mode</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="ch2Link">
+       <property name="geometry">
+        <rect>
+         <x>610</x>
+         <y>130</y>
+         <width>21</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Only used with Test Output mode</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="ch3Link">
+       <property name="geometry">
+        <rect>
+         <x>610</x>
+         <y>160</y>
+         <width>21</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Only used with Test Output mode</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="ch4Link">
+       <property name="geometry">
+        <rect>
+         <x>610</x>
+         <y>190</y>
+         <width>21</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Only used with Test Output mode</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="ch5Link">
+       <property name="geometry">
+        <rect>
+         <x>610</x>
+         <y>220</y>
+         <width>21</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Only used with Test Output mode</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="ch6Link">
+       <property name="geometry">
+        <rect>
+         <x>610</x>
+         <y>250</y>
+         <width>21</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Only used with Test Output mode</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="ch7Link">
+       <property name="geometry">
+        <rect>
+         <x>610</x>
+         <y>280</y>
+         <width>21</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Only used with Test Output mode</string>
+       </property>
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </widget>

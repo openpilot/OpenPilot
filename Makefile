@@ -118,11 +118,13 @@ QT_SDK_DIR := $(TOOLS_DIR)/qtsdk-2010.02
 .PHONY: qt_sdk_install
 qt_sdk_install: QT_SDK_URL  := http://get.qt.nokia.com/qtsdk/qt-sdk-linux-x86-opensource-2010.02.bin
 qt_sdk_install: QT_SDK_FILE := $(notdir $(QT_SDK_URL))
-qt_sdk_install: qt_sdk_clean $(TOOLS_DIR)
-	# download the source only if it's newer than what we already have
+# order-only prereq on directory existance:
+qt_sdk_install : | $(DL_DIR) $(TOOLS_DIR)
+qt_sdk_install: qt_sdk_clean
+        # download the source only if it's newer than what we already have
 	$(V1) wget -N -P "$(DL_DIR)" "$(QT_SDK_URL)"
 
-	#installer is an executable, make it executable and run it
+        #installer is an executable, make it executable and run it
 	$(V1) chmod u+x "$(DL_DIR)/$(QT_SDK_FILE)"
 	"$(DL_DIR)/$(QT_SDK_FILE)" --installdir "$(QT_SDK_DIR)"
 
@@ -136,11 +138,13 @@ ARM_SDK_DIR := $(TOOLS_DIR)/arm-2009q3
 .PHONY: arm_sdk_install
 arm_sdk_install: ARM_SDK_URL  := http://www.codesourcery.com/sgpp/lite/arm/portal/package5353/public/arm-none-eabi/arm-2009q3-68-arm-none-eabi-i686-pc-linux-gnu.tar.bz2
 arm_sdk_install: ARM_SDK_FILE := $(notdir $(ARM_SDK_URL))
-arm_sdk_install: arm_sdk_clean $(TOOLS_DIR)
-	# download the source only if it's newer than what we already have
+# order-only prereq on directory existance:
+arm_sdk_install: | $(DL_DIR) $(TOOLS_DIR)
+arm_sdk_install: arm_sdk_clean
+        # download the source only if it's newer than what we already have
 	$(V1) wget -N -P "$(DL_DIR)" "$(ARM_SDK_URL)"
 
-	# binary only release so just extract it
+        # binary only release so just extract it
 	$(V1) tar -C $(TOOLS_DIR) -xjf "$(DL_DIR)/$(ARM_SDK_FILE)"
 
 .PHONY: arm_sdk_clean
@@ -153,16 +157,18 @@ OPENOCD_DIR := $(TOOLS_DIR)/openocd
 .PHONY: openocd_install
 openocd_install: OPENOCD_URL  := http://sourceforge.net/projects/openocd/files/openocd/0.4.0/openocd-0.4.0.tar.bz2/download
 openocd_install: OPENOCD_FILE := openocd-0.4.0.tar.bz2
-openocd_install: openocd_clean $(TOOLS_DIR)
-	# download the source only if it's newer than what we already have
+# order-only prereq on directory existance:
+openocd_install: | $(DL_DIR) $(TOOLS_DIR)
+openocd_install: openocd_clean
+        # download the source only if it's newer than what we already have
 	$(V1) wget -N -P "$(DL_DIR)" --trust-server-name "$(OPENOCD_URL)"
 
-	# extract the source
+        # extract the source
 	$(V1) [ ! -d "$(DL_DIR)/openocd-build" ] || $(RM) -r "$(DL_DIR)/openocd-build"
 	$(V1) mkdir -p "$(DL_DIR)/openocd-build"
 	$(V1) tar -C $(DL_DIR)/openocd-build -xjf "$(DL_DIR)/$(OPENOCD_FILE)"
 
-	# build and install
+        # build and install
 	$(V1) mkdir -p "$(OPENOCD_DIR)"
 	$(V1) ( \
 	  cd $(DL_DIR)/openocd-build/openocd-0.4.0 ; \
@@ -171,7 +177,7 @@ openocd_install: openocd_clean $(TOOLS_DIR)
 	  $(MAKE) install ; \
 	)
 
-	# delete the extracted source when we're done
+        # delete the extracted source when we're done
 	$(V1) [ ! -d "$(DL_DIR)/openocd-build" ] || $(RM) -r "$(DL_DIR)/openocd-build"
 
 .PHONY: openocd_clean

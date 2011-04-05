@@ -65,7 +65,7 @@ private:
 
 	QList<QSlider> sliders;
 
-        void updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, int value);
+        void updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, int value, bool reversed);
 
 	void assignChannel(UAVDataObject *obj, QString str);
 	void assignOutputChannel(UAVDataObject *obj, QString str);
@@ -78,6 +78,7 @@ private:
 	QList<QLabel*> inMaxLabels;
 	QList<QLabel*> inMinLabels;
 	QList<QLabel*> inNeuLabels;
+        QList<QCheckBox*> inRevCheckboxes;
 
 	bool firstUpdate;
 
@@ -88,6 +89,7 @@ private slots:
 	void requestRCInputUpdate();
 	void sendRCInputUpdate();
 	void saveRCInputObject();
+        void reverseCheckboxClicked(bool state);
 };
 
 #endif

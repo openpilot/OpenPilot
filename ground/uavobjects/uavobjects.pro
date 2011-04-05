@@ -20,6 +20,7 @@ isEmpty(QMAKESPEC) {
     win32:SPEC = win32-g++
     macx-g++:SPEC = macx-g++
     linux-g++:SPEC = linux-g++
+    linux-g++-64:SPEC = linux-g++-64
 } else {
     SPEC = $$QMAKESPEC
 }

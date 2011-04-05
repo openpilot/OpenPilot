@@ -69,6 +69,7 @@ private:
 	QList<QSpinBox*> outMin;
 	QList<QSpinBox*> outMax;
 	QList<QCheckBox*> reversals;
+	QList<QCheckBox*> links;
 	QList<QLabel*> outLabels;
 
 	bool firstUpdate;
@@ -83,6 +84,7 @@ private slots:
 	void sendChannelTest(int value);
 	void setChOutRange();
 	void reverseChannel(bool state);
+	void linkToggled(bool state);
 };
 
 #endif

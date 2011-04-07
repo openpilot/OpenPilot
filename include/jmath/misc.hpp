@@ -4,6 +4,7 @@
 #include <cmath>
 #include <string>
 #include <sstream>
+#include "jmath/jblas.hpp"
 
 namespace jafar {
 namespace jmath {
@@ -77,6 +78,15 @@ inline double evalGaussian(double sigma, double x, double y)
 inline double evalGaussian(double sigmax, double sigmay, double x, double y)
 {
 	return 1.0/(2.0*M_PI*sigmax*sigmay)*exp(-(x*x)/(2.0*sigmax*sigmax) - (y*y)/(2.0*sigmay*sigmay));
+}
+
+template <typename SYM_MAT>
+inline jblas::vec stdevFromCov(SYM_MAT &P)
+{
+	jblas::vec x = ublas::matrix_vector_range<SYM_MAT>(P, ublas::range(0, P.size1()), ublas::range (0, P.size2()));
+	jblas::vec res(x.size());
+	for(size_t i = 0; i < x.size(); ++i) res(i) = sqrt(x(i));
+	return res;
 }
 
 

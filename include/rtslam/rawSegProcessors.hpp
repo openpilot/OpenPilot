@@ -14,6 +14,7 @@
 #ifndef RAWSEGPROCESSORS_HPP
 #define RAWSEGPROCESSORS_HPP
 
+#ifdef HAVE_MODULE_DSEG
 
 #include "dseg/DirectSegmentsTracker.hpp"
 #include "dseg/SegmentHypothesis.hpp"
@@ -51,7 +52,7 @@ namespace rtslam {
          } params;
 
       private :
-			void projectExtremities(const vec4& meas, const vec4& exp, vec4& newMeas) const
+			void projectExtremities(const vec4& meas, const vec4& exp, vec4& newMeas, float* stdRatio) const
 			{
             // extract predicted points
             vec2 P1 = subrange(exp,0,2);
@@ -64,6 +65,7 @@ namespace rtslam {
             vec2 L2 = subrange(meas,2,4);
 				double L12_2 = (L2(0) - L1(0))*(L2(0) - L1(0)) // Square(distance(L1,L2))
 							+   (L2(1) - L1(1))*(L2(1) - L1(1));
+				double L12 = sqrt(L12_2);
 
 				// compute predicted center
 				vec2 Pc = (P1 + P2) / 2;
@@ -94,6 +96,8 @@ namespace rtslam {
                 /(norm_1(L1 - L2) * norm_1(L1 - L2));
 				subrange(newMeas,2,4) = L2 + u*(L1 - L2);
 */
+
+				*stdRatio = P12 / L12;
          }
 
       public:
@@ -124,10 +128,10 @@ namespace rtslam {
 				matcher.trackSegment(preprocDsegImage,setin,&predictor,setout);
 
             if(setout.count() > 0) {
-					measure.std(params.measStd);
 					vec4 pred;
 					vec4 obs;
 					vec4 projected;
+					float ratio;
 
 					pred(0) = targetAppSpec->hypothesis()->x1();
 					pred(1) = targetAppSpec->hypothesis()->y1();
@@ -139,12 +143,13 @@ namespace rtslam {
 					obs(2) = setout.segmentAt(0)->x2();
 					obs(3) = setout.segmentAt(0)->y2();
 
-					projectExtremities(obs,pred, projected);
+					projectExtremities(obs,pred, projected, &ratio);
 					measure.x() = projected;
-
+					measure.std(params.measStd * ratio);
 					measure.matchScore = 1;
+
                appSpec->setHypothesis(setout.segmentAt(0));
-            }
+				}
             else {
                measure.matchScore = 0;
             }
@@ -254,5 +259,7 @@ namespace rtslam {
    };
 
 }}
+
+#endif //HAVE_MODULE_DSEG
 
 #endif // RAWSEGPROCESSORS_HPP

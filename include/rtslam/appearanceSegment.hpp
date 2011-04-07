@@ -1,6 +1,8 @@
 #ifndef APPEARANCESEGMENT_HPP
 #define APPEARANCESEGMENT_HPP
 
+#ifdef HAVE_MODULE_DSEG
+
 #include "rtslam/appearanceAbstract.hpp"
 #include "dseg/SegmentsSet.hpp"
 #include "dseg/SegmentHypothesis.hpp"
@@ -49,5 +51,7 @@ namespace jafar
       };
    }
 }
+
+#endif //HAVE_MODULE_DSEG
 
 #endif // APPEARANCESEGMENT_HPP

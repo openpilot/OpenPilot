@@ -154,12 +154,6 @@ using namespace jafar::jmath::ublasExtra;
 using namespace jafar::rtslam;
 using namespace boost;
 
-jblas::vec sqrt(jblas::vec x)
-{
-	jblas::vec res(x.size());
-	for(size_t i = 0; i < x.size(); ++i) res(i) = sqrt(x(i));
-	return res;
-}
 
 typedef ImagePointObservationMaker<ObservationPinHoleEuclideanPoint, SensorPinHole, LandmarkEuclideanPoint,
 	 AppearanceImagePoint, SensorAbstract::PINHOLE, LandmarkAbstract::PNT_EUC> PinholeEucpObservationMaker;
@@ -945,7 +939,7 @@ n_innovation++;
 		if (had_data)
 		{
 JFR_DEBUG("Robot state after corrections " << robPtr1->state.x());
-JFR_DEBUG("Robot state stdev after corrections " << sqrt(ublas::matrix_vector_range<jblas::sym_mat_indirect>(robPtr1->state.P(), ublas::range(0, robPtr1->state.P().size1()), ublas::range (0, robPtr1->state.P().size2()))));
+JFR_DEBUG("Robot state stdev after corrections " << stdevFromCov(robPtr1->state.P()));
 			if (robPtr1->dt_or_dx > max_dt) max_dt = robPtr1->dt_or_dx;
 
 			// Output info

@@ -5,6 +5,8 @@
  *      Author: bhautboi@laas.fr
  */
 
+#ifdef HAVE_MODULE_DSEG
+
 #include "jmath/ublasExtra.hpp"
 #include "jmath/angle.hpp"
 
@@ -115,18 +117,19 @@ namespace jafar {
          SIGMA_exp(0,2) = 0.5; // x0 wrt x2
          SIGMA_exp(1,1) = 0.5; // y0 wrt y1
          SIGMA_exp(1,3) = 0.5; // y0 wrt y2
-         SIGMA_exp(2,1) = -(x1mx2*x1mx2) / distance_cube; // u wrt y1
+			SIGMA_exp(2,0) =  (x1mx2*y1my2) / distance_cube; // u wrt x1
+			SIGMA_exp(2,2) = -(x1mx2*y1my2) / distance_cube; // u wrt x2
+			SIGMA_exp(2,1) = -(x1mx2*x1mx2) / distance_cube; // u wrt y1
          SIGMA_exp(2,3) =  (x1mx2*x1mx2) / distance_cube; // u wrt y2
          SIGMA_exp(3,0) = -(y1my2*y1my2) / distance_cube; // v wrt x1
          SIGMA_exp(3,2) =  (y1my2*y1my2) / distance_cube; // v wrt x2
+			SIGMA_exp(3,1) =  (x1mx2*y1my2) / distance_cube; // v wrt y1
+			SIGMA_exp(3,3) = -(x1mx2*y1my2) / distance_cube; // v wrt y2
          sigma_cov = jmath::ublasExtra::prod_JPJt(obsPtrNew->expectation.P() , SIGMA_exp); // sigma_cov = SIGMA_exp * P * SIGMA_exp'
-         vec4 sigma; // [sigma_x0 sigma_y0 sigma_u sigma_v]
-         sigma(0) = sqrt(sigma_cov(0,0));
-         sigma(1) = sqrt(sigma_cov(1,1));
-         sigma(2) = sqrt(sigma_cov(2,2));
-         sigma(3) = sqrt(sigma_cov(3,3));
+			vec4 sigma = 10*stdevFromCov(sigma_cov); // [sigma_x0 sigma_y0 sigma_u sigma_v]
 
          JFR_DEBUG("distance_cube\n" << distance_cube << "SIGMA_exp\n" << SIGMA_exp << "sigma_cov \n" << sigma_cov);
+std::cout << obsPtrNew->id() << "\nexp " << exp << " P " << stdevFromCov(obsPtrNew->expectation.P()) << "\nSIGMA_exp " << SIGMA_exp << "\nsigma " << sigma << std::endl;
 
          hypothesis->setUncertainty(sigma(2), sigma(0), sigma(3), sigma(1));
 
@@ -336,3 +339,5 @@ namespace jafar {
 */
    }
 }
+
+#endif //HAVE_MODULE_DSEG

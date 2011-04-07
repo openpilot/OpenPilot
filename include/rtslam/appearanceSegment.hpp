@@ -3,6 +3,8 @@
 
 #include "rtslam/appearanceAbstract.hpp"
 #include "dseg/SegmentsSet.hpp"
+#include "dseg/SegmentHypothesis.hpp"
+#include "jmath/misc.hpp"
 
 namespace jafar
 {
@@ -29,7 +31,21 @@ namespace jafar
             {
                m_hypothesis = dseg::SegmentsSet();
                m_hypothesis.addSegment(_hypothesis);
-            }
+				}
+
+				jblas::vec4 realObs()
+				{
+					jblas::vec4 ret;
+					ret.clear();
+					if(m_hypothesis.count() > 0)
+					{
+						ret[0] = m_hypothesis.segmentAt(0)->x1();
+						ret[1] = m_hypothesis.segmentAt(0)->y1();
+						ret[2] = m_hypothesis.segmentAt(0)->x2();
+						ret[3] = m_hypothesis.segmentAt(0)->y2();
+					}
+					return ret;
+				}
       };
    }
 }

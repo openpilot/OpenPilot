@@ -20,7 +20,7 @@
 #include "dseg/SegmentsSet.hpp"
 #include "dseg/ConstantVelocityPredictor.hpp"
 #include "dseg/RtslamPredictor.hpp"
-#include "rtslam/hierarchicalDirectSegmentDetector.hpp"
+#include "dseg/HierarchicalDirectSegmentsDetector.hpp"
 
 #include "rtslam/rawImage.hpp"
 #include "rtslam/sensorPinHole.hpp"
@@ -28,6 +28,9 @@
 
 namespace jafar {
 namespace rtslam {
+
+	boost::weak_ptr<RawImage> lastDsegImage;
+	dseg::PreprocessedImage preprocDsegImage;
 
    class DsegMatcher
    {
@@ -105,14 +108,20 @@ namespace rtslam {
          }
 
          void match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, const image::ConvexRoi & roi, Measurement & measure, appearance_ptr_t & app)
-         {
+			{
+				if(rawPtr != lastDsegImage.lock())
+				{
+					matcher.preprocessImage(*(rawPtr->img),preprocDsegImage);
+					lastDsegImage = rawPtr;
+				}
+
             app_seg_ptr_t targetAppSpec = SPTR_CAST<AppearanceSegment>(targetApp);
             app_seg_ptr_t appSpec = SPTR_CAST<AppearanceSegment>(app);
 
             dseg::SegmentsSet setin, setout;
 
             setin.addSegment(targetAppSpec->hypothesis());
-            matcher.trackSegment(*(rawPtr->img),setin,&predictor,setout);
+				matcher.trackSegment(preprocDsegImage,setin,&predictor,setout);
 
             if(setout.count() > 0) {
 					measure.std(params.measStd);
@@ -131,14 +140,8 @@ namespace rtslam {
 					obs(3) = setout.segmentAt(0)->y2();
 
 					projectExtremities(obs,pred, projected);
-
 					measure.x() = projected;
-/*
-					measure.x(0) = setout.segmentAt(0)->x1();
-               measure.x(1) = setout.segmentAt(0)->y1();
-               measure.x(2) = setout.segmentAt(0)->x2();
-               measure.x(3) = setout.segmentAt(0)->y2();
-*/
+
 					measure.matchScore = 1;
                appSpec->setHypothesis(setout.segmentAt(0));
             }
@@ -151,7 +154,7 @@ namespace rtslam {
    class HDsegDetector
    {
       private:
-         HierarchicalDirectSegmentDetector detector;
+			dseg::HierarchicalDirectSegmentsDetector detector;
          boost::shared_ptr<DescriptorFactoryAbstract> descFactory;
 
       public:
@@ -179,25 +182,56 @@ namespace rtslam {
             featPtr.reset(new FeatureSegment());
             featPtr->measurement.std(params.measStd);
 
-            ret = detector.detectIn(*(rawData->img.get()), featPtr, &roi);
+				dseg::SegmentsSet set;
+				detector.detectSegment(*(rawData->img.get()), &roi, set);
 
-            if(ret)
-            {
-               // Don't extract yet
+				if(set.count() > 0)
+				{
+					int bestId = -1;
 
-               /*
-               // extract appearance
-               vec pix = featPtr->measurement.x();
-               boost::shared_ptr<AppearanceImagePoint> appPtr = SPTR_CAST<AppearanceImagePoint>(featPtr->appearancePtr);
-               rawData->img->extractPatch(appPtr->patch, (int)pix(0), (int)pix(1), params.patchSize, params.patchSize);
-               appPtr->offset.x()(0) = pix(0) - ((int)pix(0) + 0.5);
-               appPtr->offset.x()(1) = pix(1) - ((int)pix(1) + 0.5);
-               appPtr->offset.P() = jblas::zero_mat(2); // by definition this is our landmark projection
-               */
-            }
+					double bestSqrLength = -1;
+					for(int i=0 ; i<set.count() ; i++)
+					{
+						const dseg::SegmentHypothesis* seg = set.segmentAt(i);
 
-            JFR_DEBUG("returning " << (ret ? "true" : "false"));
-            return ret;
+						double dx = seg->x1() - seg->x2();
+						double dy = seg->y1() - seg->y2();
+						double sqrLength = dx*dx + dy*dy;
+
+						// If this segment is longer than the previous best
+						if(sqrLength > bestSqrLength)
+						{
+								vec2 v1,v2;
+
+								v1[0] = seg->x1();
+								v1[1] = seg->y1();
+								v2[0] = seg->x2();
+								v2[1] = seg->y2();
+
+								if(roi.isIn(v1) || roi.isIn(v2))
+								{
+									// Consider this segment as
+									bestId = i;
+									bestSqrLength = sqrLength;
+								}
+						}
+					}
+
+					if(bestId >= 0)
+					{
+						featPtr->measurement.x(0) = set.segmentAt(bestId)->x1();
+						featPtr->measurement.x(1) = set.segmentAt(bestId)->y1();
+						featPtr->measurement.x(2) = set.segmentAt(bestId)->x2();
+						featPtr->measurement.x(3) = set.segmentAt(bestId)->y2();
+						featPtr->measurement.matchScore = 1;
+
+						featPtr->appearancePtr.reset(new AppearanceSegment(set.segmentAt(bestId)));
+
+						ret = true;
+					}
+				}
+
+				return ret;
          }
 
          void fillDataObs(const boost::shared_ptr<FeatureSegment> & featPtr, boost::shared_ptr<ObservationAbstract> & obsPtr)

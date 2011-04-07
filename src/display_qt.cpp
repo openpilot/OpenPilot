@@ -9,6 +9,8 @@
 
 #include "qdisplay/imout.hpp"
 #include "rtslam/display_qt.hpp"
+#include "rtslam/observationPinHoleAnchoredHomogeneousPointsLine.hpp"
+#include "rtslam/appearanceSegment.hpp"
 
 namespace jafar {
 namespace rtslam {
@@ -371,6 +373,10 @@ std::cout << "connecting slots" << std::endl;
             bool dispMeas2 = events_.visible && (events_.measured || events_.matched || !events_.predicted);
             bool dispInit2 = events_.visible && !events_.predicted;
 
+//				ObservationPinHoleAnchoredHomogeneousPointsLine* slamObsSpec = static_cast<ObservationPinHoleAnchoredHomogeneousPointsLine*>(slamObs_);
+				AppearanceSegment* appSpec = static_cast<AppearanceSegment*>(slamObs_->observedAppearance.get());
+				vec4 realObs = appSpec->realObs();
+
             // Build display objects if it is the first time they are displayed
             if (items_.size() != 8)
             {
@@ -420,14 +426,14 @@ std::cout << "connecting slots" << std::endl;
                items_.push_back(s);
                dispSen_->view()->addShape(s);
                // measure point1
-               s = new qdisplay::Shape(qdisplay::Shape::ShapeCrossX, measObs_(0), measObs_(1), 3, 3);
-               s->setFontSize(viewerQt->fontSize);
+					s = new qdisplay::Shape(qdisplay::Shape::ShapeCrossX, measObs_(0), measObs_(1), 3, 3);
+					s->setFontSize(viewerQt->fontSize);
                s->setVisible(false);
                items_.push_back(s);
                dispSen_->view()->addShape(s);
                // measure point2
-               s = new qdisplay::Shape(qdisplay::Shape::ShapeCrossX, measObs_(2), measObs_(3), 3, 3);
-               s->setFontSize(viewerQt->fontSize);
+					s = new qdisplay::Shape(qdisplay::Shape::ShapeCrossX, measObs_(2), measObs_(3), 3, 3);
+					s->setFontSize(viewerQt->fontSize);
                s->setVisible(false);
                items_.push_back(s);
                dispSen_->view()->addShape(s);
@@ -532,8 +538,8 @@ std::cout << "connecting slots" << std::endl;
                      (*it)->setLabel("");
                   }
                   (*it)->setColor(c.R,c.G,c.B); // red
-                  (*it)->setPos(measObs_(0), measObs_(1));
-                  (*it)->setVisible(true);
+						(*it)->setPos(measObs_(0), measObs_(1));
+						(*it)->setVisible(true);
                   ++it;
                   if (dispInit2)
                   {
@@ -544,15 +550,15 @@ std::cout << "connecting slots" << std::endl;
                      (*it)->setLabel("");
                   }
                   (*it)->setColor(c.R,c.G,c.B); // red
-                  (*it)->setPos(measObs_(2), measObs_(3));
-                  (*it)->setVisible(true);
+						(*it)->setPos(measObs_(2), measObs_(3));
+						(*it)->setVisible(true);
                   // measure line
                   ++it;
                   (*it)->setColor(c.R,c.G,c.B); //
-                  double x1 = measObs_(0);
-                  double y1 = measObs_(1);
-                  double x2 = measObs_(2);
-                  double y2 = measObs_(3);
+						double x1 = realObs(0);
+						double y1 = realObs(1);
+						double x2 = realObs(2);
+						double y2 = realObs(3);
                   double angle = 180 * atan2(y2-y1 , x2-x1) / M_PI;
                   double scale = sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
                   (*it)->setPos((x1 + x2) / 2,(y1 + y2) / 2);

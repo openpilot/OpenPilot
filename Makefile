@@ -699,30 +699,6 @@ src/hardwareSensorCameraFirewire.cpp.s:
 	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareSensorCameraFirewire.cpp.s
 .PHONY : src/hardwareSensorCameraFirewire.cpp.s
 
-src/hierarchicalDirectSegmentDetector.o: src/hierarchicalDirectSegmentDetector.cpp.o
-.PHONY : src/hierarchicalDirectSegmentDetector.o
-
-# target to build an object file
-src/hierarchicalDirectSegmentDetector.cpp.o:
-	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hierarchicalDirectSegmentDetector.cpp.o
-.PHONY : src/hierarchicalDirectSegmentDetector.cpp.o
-
-src/hierarchicalDirectSegmentDetector.i: src/hierarchicalDirectSegmentDetector.cpp.i
-.PHONY : src/hierarchicalDirectSegmentDetector.i
-
-# target to preprocess a source file
-src/hierarchicalDirectSegmentDetector.cpp.i:
-	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hierarchicalDirectSegmentDetector.cpp.i
-.PHONY : src/hierarchicalDirectSegmentDetector.cpp.i
-
-src/hierarchicalDirectSegmentDetector.s: src/hierarchicalDirectSegmentDetector.cpp.s
-.PHONY : src/hierarchicalDirectSegmentDetector.s
-
-# target to generate assembly for a file
-src/hierarchicalDirectSegmentDetector.cpp.s:
-	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hierarchicalDirectSegmentDetector.cpp.s
-.PHONY : src/hierarchicalDirectSegmentDetector.cpp.s
-
 src/innovation.o: src/innovation.cpp.o
 .PHONY : src/innovation.o
 
@@ -2049,9 +2025,6 @@ help:
 	@echo "... src/hardwareSensorCameraFirewire.o"
 	@echo "... src/hardwareSensorCameraFirewire.i"
 	@echo "... src/hardwareSensorCameraFirewire.s"
-	@echo "... src/hierarchicalDirectSegmentDetector.o"
-	@echo "... src/hierarchicalDirectSegmentDetector.i"
-	@echo "... src/hierarchicalDirectSegmentDetector.s"
 	@echo "... src/innovation.o"
 	@echo "... src/innovation.i"
 	@echo "... src/innovation.s"

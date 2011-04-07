@@ -53,9 +53,13 @@ namespace jafar {
 			float err = dx - dy;
 			float _2err;
 
-			if (projectionsCount(x0, y0) == -1)
-				projectionsCount(x0, y0) = 0;
-			projectionsCount(x0, y0)++;
+			if(x0 >= 0 && x0 < projectionsCount.size1() &&
+				y0 >= 0 && y0 < projectionsCount.size2())
+			{
+				if (projectionsCount(x0, y0) == -1)
+					projectionsCount(x0, y0) = 0;
+				projectionsCount(x0, y0)++;
+			}
 			while(x0 != cell(2) || y0 != cell(3))
 			{
 				_2err = 2*err;
@@ -64,16 +68,16 @@ namespace jafar {
 				{
 					err -= dy;
 					x0 += sx;
-
-					if (projectionsCount(x0, y0) == -1)
-						projectionsCount(x0, y0) = 0;
-					projectionsCount(x0, y0)++;
 				}
 				if(_2err < dx)
 				{
 					err  += dx;
 					y0 += sy;
+				}
 
+				if(x0 >= 0 && x0 < projectionsCount.size1() &&
+					y0 >= 0 && y0 < projectionsCount.size2())
+				{
 					if (projectionsCount(x0, y0) == -1)
 						projectionsCount(x0, y0) = 0;
 					projectionsCount(x0, y0)++;

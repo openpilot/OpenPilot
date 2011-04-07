@@ -73,7 +73,7 @@ namespace jafar {
                return "Image-Seg-First-View";
             }
 
-            virtual void addObservation(const observation_ptr_t & obsPtr);
+            virtual bool addObservation(const observation_ptr_t & obsPtr);
             virtual bool predictAppearance(const observation_ptr_t & obsPtrNew);
             virtual bool isPredictionValid(const observation_ptr_t & obsPtr) { return true; }
 
@@ -125,7 +125,7 @@ namespace jafar {
                return "Image-Seg-Multi-View";
             }
 
-            virtual void addObservation(const observation_ptr_t & obsPtr);
+            virtual bool addObservation(const observation_ptr_t & obsPtr);
             virtual bool predictAppearance(const observation_ptr_t & obsPtr);
             virtual bool isPredictionValid(const observation_ptr_t & obsPtr);
 

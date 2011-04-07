@@ -154,7 +154,7 @@ namespace jafar {
 
 
     template<>
-    bool DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc>::
+    bool DataManagerActiveSearch<RawImage, SensorPinhole, QuickHarrisDetector, correl::FastTranslationMatcherZncc>::
 		match(const boost::shared_ptr<RawImage> & rawPtr, const appearance_ptr_t & targetApp, image::ConvexRoi &roi, Measurement & measure, const appearance_ptr_t & app)
     {
 					app_img_pnt_ptr_t targetAppImg = SPTR_CAST<AppearanceImagePoint>(targetApp);
@@ -177,7 +177,7 @@ namespace jafar {
     }
 
 //    template<>
-//    bool DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
+//    bool DataManagerActiveSearch<RawImage, SensorPinhole, QuickHarrisDetector, correl::Explorer<correl::Zncc> >::
 //		detect(const boost::shared_ptr<RawImage> & rawPtr, cv::Rect &roi)
 //    {
 //			feat_img_pnt_ptr_t featPtr(new FeatureImagePoint(detectorParams_.patchSize,
@@ -210,7 +210,7 @@ namespace jafar {
     //void DataManagerActiveSearch<RawImage,SensorSpec>::
     // FIXME make this more abstract...
     template<>
-    void DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc>::
+    void DataManagerActiveSearch<RawImage, SensorPinhole, QuickHarrisDetector, correl::FastTranslationMatcherZncc>::
     detectNewObs( boost::shared_ptr<RawImage> rawData )
     {
     	if (mapManagerPtr()->mapSpaceForInit()) {

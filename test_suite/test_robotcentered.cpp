@@ -58,9 +58,9 @@ using namespace jafar::jmath::ublasExtra;
 using namespace jafar::rtslam;
 using namespace boost;
 
-typedef ImagePointObservationMaker<ObservationPinHoleEuclideanPoint, SensorPinHole, LandmarkEuclideanPoint,
+typedef ImagePointObservationMaker<ObservationPinHoleEuclideanPoint, SensorPinhole, LandmarkEuclideanPoint,
     SensorAbstract::PINHOLE, LandmarkAbstract::PNT_EUC> PinholeEucpObservationMaker;
-typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, SensorPinHole,
+typedef ImagePointObservationMaker<ObservationPinholeAnchoredHomogeneousPoint, SensorPinhole,
     LandmarkAnchoredHomogeneousPoint, SensorAbstract::PINHOLE, LandmarkAbstract::PNT_AH> PinholeAhpObservationMaker;
 
 int mode = 0;
@@ -155,7 +155,7 @@ void demo_slam01_main(world_ptr_t *world) {
 	robPtr1->constantPerturbation = false;
 
 	// 3. Create sensors.
-	pinhole_ptr_t senPtr11(new SensorPinHole(robPtr1, MapObject::UNFILTERED));
+	pinhole_ptr_t senPtr11(new SensorPinhole(robPtr1, MapObject::UNFILTERED));
 	senPtr11->setId();
 	senPtr11->linkToParentRobot(robPtr1);
 	senPtr11->state.clear();
@@ -169,8 +169,8 @@ void demo_slam01_main(world_ptr_t *world) {
 	boost::shared_ptr<ActiveSearchGrid> asGrid(new ActiveSearchGrid(IMG_WIDTH, IMG_HEIGHT, GRID_HCELLS, GRID_VCELLS, GRID_MARGIN, GRID_SEPAR));
 	boost::shared_ptr<QuickHarrisDetector> harrisDetector(new QuickHarrisDetector(HARRIS_CONV_SIZE, HARRIS_TH, HARRIS_EDDGE));
 	boost::shared_ptr<correl::FastTranslationMatcherZncc> znccMatcher(new correl::FastTranslationMatcherZncc(0.8,0.25));
-	boost::shared_ptr<DataManagerActiveSearch<RawImage, SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc> > dmPt11(new DataManagerActiveSearch<RawImage,
-			SensorPinHole, QuickHarrisDetector, correl::FastTranslationMatcherZncc> ());
+	boost::shared_ptr<DataManagerActiveSearch<RawImage, SensorPinhole, QuickHarrisDetector, correl::FastTranslationMatcherZncc> > dmPt11(new DataManagerActiveSearch<RawImage,
+			SensorPinhole, QuickHarrisDetector, correl::FastTranslationMatcherZncc> ());
 	dmPt11->linkToParentSensorSpec(senPtr11);
 	dmPt11->linkToParentMapManager(mmPoint);
 	dmPt11->setActiveSearchGrid(asGrid);

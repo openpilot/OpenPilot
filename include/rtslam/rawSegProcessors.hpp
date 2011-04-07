@@ -24,7 +24,7 @@
 #include "dseg/HierarchicalDirectSegmentsDetector.hpp"
 
 #include "rtslam/rawImage.hpp"
-#include "rtslam/sensorPinHole.hpp"
+#include "rtslam/sensorPinhole.hpp"
 #include "rtslam/descriptorImageSeg.hpp"
 
 namespace jafar {

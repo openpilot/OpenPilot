@@ -42,7 +42,8 @@ namespace jafar {
       void ImgSegFeatureView::initFromObs(const observation_ptr_t & obsPtr, int descSize)
       {
          app_img_seg_ptr_t app(new AppearanceImageSegment(descSize, descSize, CV_8U));
-         rawimage_ptr_t rawPtr = SPTR_CAST<RawImage>(obsPtr->sensorPtr()->rawPtr);
+				 sensorext_ptr_t senPtr = SPTR_CAST<SensorExteroAbstract>(obsPtr->sensorPtr());
+         rawimage_ptr_t rawPtr = SPTR_CAST<RawImage>(senPtr->rawPtr);
          if (rawPtr->img->extractPatch(app->patch, (int)obsPtr->measurement.x()(0), (int)obsPtr->measurement.x()(1), descSize, descSize))
          {
             app_img_seg_ptr_t obsApp = SPTR_CAST<AppearanceImageSegment>(obsPtr->observedAppearance);
@@ -52,7 +53,7 @@ namespace jafar {
             senPose = obsPtr->sensorPtr()->globalPose();
             obsModelPtr = obsPtr->model;
             measurement = obsPtr->measurement.x();
-            frame = obsPtr->sensorPtr()->rawCounter;
+            frame = senPtr->rawCounter;
             used = false;
          }
       }
@@ -71,11 +72,15 @@ namespace jafar {
       DescriptorImageSegFirstView::~DescriptorImageSegFirstView() {
       }
 
-      void DescriptorImageSegFirstView::addObservation(const observation_ptr_t & obsPtr)
-      {
-         if (obsPtr->events.updated && !view.appearancePtr)
-            view.initFromObs(obsPtr, descSize);
-      }
+			bool DescriptorImageSegFirstView::addObservation(const observation_ptr_t & obsPtr)
+			{
+				if (obsPtr->events.updated && !view.appearancePtr)
+				{
+					view.initFromObs(obsPtr, descSize);
+					return true;
+				} else
+					return false;
+			}
 
 
       bool DescriptorImageSegFirstView::predictAppearance(const observation_ptr_t & obsPtrNew) {
@@ -135,18 +140,21 @@ app_dst->patch.save(buffer);
       {
       }
 
-      void DescriptorImageSegMultiView::addObservation(const observation_ptr_t & obsPtr)
-      {
-         if (obsPtr->events.updated)
-         {
-            lastValidView.initFromObs(obsPtr, descSize);
-            lastObsFailed = false;
-         }
-         else if (obsPtr->events.predicted && obsPtr->events.measured && !obsPtr->events.matched)
-         {
-            lastObsFailed = true;
-         }
-      }
+			bool DescriptorImageSegMultiView::addObservation(const observation_ptr_t & obsPtr)
+			{
+				if (obsPtr->events.updated)
+				{
+					lastValidView.initFromObs(obsPtr, descSize);
+					lastObsFailed = false;
+					return true;
+				}
+				else if (obsPtr->events.predicted && obsPtr->events.measured && !obsPtr->events.matched)
+				{
+					lastObsFailed = true;
+					return false;
+				}
+				return false;
+			}
 
       bool DescriptorImageSegMultiView::predictAppearance(const observation_ptr_t & obsPtr)
       {

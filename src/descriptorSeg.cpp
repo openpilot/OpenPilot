@@ -45,11 +45,12 @@ namespace jafar {
       void SegFeatureView::initFromObs(const observation_ptr_t & obsPtr, int descSize)
       {
          obs_ph_ahpl_ptr_t obsSpecPtr = SPTR_CAST<ObservationPinHoleAnchoredHomogeneousPointsLine>(obsPtr);
+				 sensorext_ptr_t senPtr = SPTR_CAST<SensorExteroAbstract>(obsPtr->sensorPtr());
          appearancePtr = obsSpecPtr->observedAppearance;
          senPose = obsPtr->sensorPtr()->globalPose();
          obsModelPtr = obsPtr->model;
          measurement = obsPtr->measurement.x();
-         frame = obsPtr->sensorPtr()->rawCounter;
+         frame = senPtr->rawCounter;
          used = false;
       }
 
@@ -66,11 +67,15 @@ namespace jafar {
       DescriptorSegFirstView::~DescriptorSegFirstView() {
       }
 
-      void DescriptorSegFirstView::addObservation(const observation_ptr_t & obsPtr)
-      {
-         if (obsPtr->events.updated && !view.appearancePtr)
-            view.initFromObs(obsPtr, descSize);
-      }
+			bool DescriptorSegFirstView::addObservation(const observation_ptr_t & obsPtr)
+			{
+				if (obsPtr->events.updated && !view.appearancePtr)
+				{
+					view.initFromObs(obsPtr, descSize);
+					return true;
+				}
+				return false;
+			}
 
 
       bool DescriptorSegFirstView::predictAppearance(const observation_ptr_t & obsPtrNew) {
@@ -83,7 +88,7 @@ namespace jafar {
          app_seg_ptr_t app_dst = SPTR_CAST<AppearanceSegment>(obsPtrNew->predictedAppearance);
 //         app_seg_ptr_t app_src = SPTR_CAST<AppearanceSegment>(view.appearancePtr);
          // project the expected position of the segment in the image
-         pinhole_ptr_t pinHolePtr = SPTR_CAST<SensorPinHole>(obsPtrNew->sensorPtr());
+         pinhole_ptr_t pinHolePtr = SPTR_CAST<SensorPinhole>(obsPtrNew->sensorPtr());
          vec3 v1 = quaternion::eucToFrame(view.senPose, pnt1);
          vec2 exp1 = pinhole::projectPoint(pinHolePtr->params.intrinsic, pinHolePtr->params.distortion, v1);
          vec3 v2 = quaternion::eucToFrame(view.senPose, pnt2);
@@ -161,18 +166,21 @@ std::cout << obsPtrNew->id() << "\nexp " << exp << " P " << stdevFromCov(obsPtrN
       {
       }
 
-      void DescriptorSegMultiView::addObservation(const observation_ptr_t & obsPtr)
-      {
-         if (obsPtr->events.updated)
-         {
-            lastValidView.initFromObs(obsPtr, descSize);
-            lastObsFailed = false;
-         }
-         else if (obsPtr->events.predicted && obsPtr->events.measured && !obsPtr->events.matched)
-         {
-            lastObsFailed = true;
-         }
-      }
+			bool DescriptorSegMultiView::addObservation(const observation_ptr_t & obsPtr)
+			{
+				if (obsPtr->events.updated)
+				{
+					lastValidView.initFromObs(obsPtr, descSize);
+					lastObsFailed = false;
+					return true;
+				}
+				else if (obsPtr->events.predicted && obsPtr->events.measured && !obsPtr->events.matched)
+				{
+					lastObsFailed = true;
+					return false;
+				}
+				return false;
+			}
 
       bool DescriptorSegMultiView::predictAppearance(const observation_ptr_t & obsPtr)
       {

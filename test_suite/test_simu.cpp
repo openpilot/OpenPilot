@@ -47,7 +47,7 @@ void test_simu01(void) {
 	robPtr->linkToParentMap(mapPtr);
 	raw_ptr_t      rawSimu(new RawImageSimu()) ;
 	feature_ptr_t  featureSimu(new FeaturePointSimu());
-	sensor_ptr_t   senPH(new SensorPinHole(robPtr, MapObject::FILTERED));
+	sensor_ptr_t   senPH(new SensorPinhole(robPtr, MapObject::FILTERED));
 	senPH->linkToParentRobot(robPtr);
 	appearance_ptr_t      appSimu(new AppearenceImageSimu()) ;
 	landmark_ptr_t lmk(new LandmarkEuclideanPoint(mapPtr)) ;

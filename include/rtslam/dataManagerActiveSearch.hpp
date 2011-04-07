@@ -96,7 +96,7 @@ namespace jafar {
 namespace jafar {
   namespace rtslam {
 
-//    typedef DataManagerActiveSearch<RawImage,SensorPinHole> DataManagerActiveSearch_Image_PH;
+//    typedef DataManagerActiveSearch<RawImage,SensorPinhole> DataManagerActiveSearch_Image_PH;
 
   }
 }//namespace jafar::rtslam

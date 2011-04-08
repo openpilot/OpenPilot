@@ -53,7 +53,11 @@ namespace simu {
 			bool addObservation(const observation_ptr_t & obsPtr)
 			{
 				if (obsPtr->events.updated)
+				{
 					appPtr = SPTR_CAST<AppearanceSimu>(obsPtr->observedAppearance);
+					return true;
+				} else
+					return false;
 			}
 			bool predictAppearance(const observation_ptr_t & obsPtr)
 			{

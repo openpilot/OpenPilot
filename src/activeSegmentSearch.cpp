@@ -53,8 +53,8 @@ namespace jafar {
 			float err = dx - dy;
 			float _2err;
 
-			if(x0 >= 0 && x0 < projectionsCount.size1() &&
-				y0 >= 0 && y0 < projectionsCount.size2())
+			if(x0 >= 0 && x0 < (int)projectionsCount.size1() &&
+				y0 >= 0 && y0 < (int)projectionsCount.size2())
 			{
 				if (projectionsCount(x0, y0) == -1)
 					projectionsCount(x0, y0) = 0;
@@ -75,8 +75,8 @@ namespace jafar {
 					y0 += sy;
 				}
 
-				if(x0 >= 0 && x0 < projectionsCount.size1() &&
-					y0 >= 0 && y0 < projectionsCount.size2())
+				if(x0 >= 0 && x0 < (int)projectionsCount.size1() &&
+					y0 >= 0 && y0 < (int)projectionsCount.size2())
 				{
 					if (projectionsCount(x0, y0) == -1)
 						projectionsCount(x0, y0) = 0;

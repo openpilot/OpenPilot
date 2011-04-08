@@ -116,6 +116,9 @@ namespace hardware {
 //if (!mti.set_outputSkipFactor(49))
 //std::cout << "mti.set_outputFactor failed" << std::endl;
 #endif
+		} else
+		{
+			realFreq = trigger_freq;
 		}
 		
 	}

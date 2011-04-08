@@ -195,7 +195,7 @@ namespace rtslam {
 					int bestId = -1;
 
 					double bestSqrLength = -1;
-					for(int i=0 ; i<set.count() ; i++)
+					for(size_t i=0 ; i<set.count() ; i++)
 					{
 						const dseg::SegmentHypothesis* seg = set.segmentAt(i);
 

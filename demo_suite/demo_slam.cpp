@@ -907,7 +907,7 @@ int n_innovation = 0;
 				
 				double newt = pinfo.sen->getRawTimestamp(pinfo.id);
 				robot_ptr_t robPtr = pinfo.sen->robotPtr();
-std::cout << "Frame " << (*world)->t << " using sen " << pinfo.sen->id() << " at time " << std::setprecision(16) << newt << std::endl;
+//std::cout << "Frame " << (*world)->t << " using sen " << pinfo.sen->id() << " at time " << std::setprecision(16) << newt << std::endl;
 				robPtr->move(newt);
 				
 				JFR_DEBUG("Robot " << robPtr->id() << " state after move " << robPtr->state.x());

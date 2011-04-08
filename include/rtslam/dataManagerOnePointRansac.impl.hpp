@@ -223,7 +223,7 @@ namespace jafar {
 			//###
 			//### Process some other observations with Active Search
 			//### 
-			ObsList &activeSearchList = ((ransacSetList.size() == 0) || (best_set->size() <= 1) ? obsVisibleList : best_set->pendingObs);
+			ObsList activeSearchList = ((ransacSetList.size() == 0) || (best_set->size() <= 1) ? obsVisibleList : best_set->pendingObs);
 			// FIXME don't search again landmarks that failed as base
 			
 			JFR_DEBUG_BEGIN(); JFR_DEBUG_SEND("Updating with ActiveSearch:");

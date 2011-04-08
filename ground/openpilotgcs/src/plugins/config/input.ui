@@ -364,7 +364,7 @@ p, li { white-space: pre-wrap; }
 Applies and Saves all settings to SD</string>
        </property>
        <property name="text">
-        <string>Save to SD</string>
+        <string>Save</string>
        </property>
       </widget>
       <widget class="QLabel" name="ch4Cur">
@@ -439,7 +439,7 @@ p, li { white-space: pre-wrap; }
 Be sure to set the Neutral position on all sliders before sending!</string>
        </property>
        <property name="text">
-        <string>Save to RAM</string>
+        <string>Apply</string>
        </property>
       </widget>
       <widget class="QComboBox" name="ch0Assign">
@@ -1341,7 +1341,7 @@ p, li { white-space: pre-wrap; }
 Be sure to set the Neutral position on all sliders before sending!</string>
        </property>
        <property name="text">
-        <string>Save to RAM</string>
+        <string>Apply</string>
        </property>
       </widget>
       <widget class="QPushButton" name="saveFmsToSD">
@@ -1358,7 +1358,7 @@ Be sure to set the Neutral position on all sliders before sending!</string>
 Applies and Saves all settings to SD</string>
        </property>
        <property name="text">
-        <string>Save to SD</string>
+        <string>Save</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_15">
@@ -1741,14 +1741,14 @@ if you have not done so already.</string>
          <item>
           <widget class="QPushButton" name="saveArmToRAM">
            <property name="text">
-            <string>Save to RAM</string>
+            <string>Apply</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="saveArmToSD">
            <property name="text">
-            <string>Save to SD</string>
+            <string>Save</string>
            </property>
           </widget>
          </item>

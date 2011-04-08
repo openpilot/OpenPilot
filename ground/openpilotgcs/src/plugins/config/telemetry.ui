@@ -87,7 +87,7 @@ p, li { white-space: pre-wrap; }
 Beware of not locking yourself out!</string>
     </property>
     <property name="text">
-     <string>Save to RAM</string>
+     <string>Apply</string>
     </property>
    </widget>
    <widget class="QPushButton" name="getTelemetryCurrent">
@@ -120,7 +120,7 @@ Beware of not locking yourself out!</string>
 Beware of not locking yourself out!</string>
     </property>
     <property name="text">
-     <string>Save to SD</string>
+     <string>Save</string>
     </property>
    </widget>
   </widget>

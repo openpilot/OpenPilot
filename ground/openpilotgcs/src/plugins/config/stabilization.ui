@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>639</width>
-    <height>465</height>
+    <height>470</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -625,14 +625,14 @@ automatically every 300ms, which will help for fast tuning.</string>
      <item>
       <widget class="QPushButton" name="saveStabilizationToRAM">
        <property name="text">
-        <string>Save to RAM</string>
+        <string>Apply</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="saveStabilizationToSD">
        <property name="text">
-        <string>Save to SD</string>
+        <string>Save</string>
        </property>
       </widget>
      </item>

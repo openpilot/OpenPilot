@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>727</width>
+    <width>663</width>
     <height>395</height>
    </rect>
   </property>
@@ -849,7 +849,7 @@ p, li { white-space: pre-wrap; }
 Applies and Saves all settings to SD</string>
        </property>
        <property name="text">
-        <string>Save to SD</string>
+        <string>Save</string>
        </property>
       </widget>
       <widget class="QPushButton" name="getRCOutputCurrent">
@@ -882,7 +882,7 @@ Applies and Saves all settings to SD</string>
 Be sure to set the Neutral position on all sliders before sending!</string>
        </property>
        <property name="text">
-        <string>Save to RAM</string>
+        <string>Apply</string>
        </property>
       </widget>
       <widget class="QFrame" name="frame">
@@ -1305,14 +1305,14 @@ p, li { white-space: pre-wrap; }
       <widget class="QLabel" name="label_2">
        <property name="geometry">
         <rect>
-         <x>590</x>
+         <x>600</x>
          <y>50</y>
-         <width>101</width>
+         <width>31</width>
          <height>17</height>
         </rect>
        </property>
        <property name="text">
-        <string>Link (Test outputs)</string>
+        <string>Link</string>
        </property>
       </widget>
       <widget class="QCheckBox" name="ch0Link">

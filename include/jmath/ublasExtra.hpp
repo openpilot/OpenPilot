@@ -98,6 +98,7 @@ namespace jafar {
 			template<int size, typename W>
 			jblas::sym_mat createSymMat(const W std[size]) {
 				jblas::sym_mat out(size);
+				out.clear();
 				for (std::size_t i = 0; i < size; ++i)
 					out(i,i) = std[i] * std[i];
 				return out;

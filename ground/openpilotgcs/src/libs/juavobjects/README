@@ -1,2 +1,7 @@
-compile with ant
-depends on juavtalk and the generated java code from uavobjgenerator in the build dir
+3 Steps to build the lib as a jar-file:
+ 1 run "make uavobjects_java" from the op-root
+ 2 run "ant" from the juavtalk path
+ 3 run "ant" here
+ 
+ -> the juavobjects.jar should now be in the build dir
+

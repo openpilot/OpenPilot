@@ -1,0 +1,39 @@
+<project default="package">
+
+  <property name="version.num" value="0.1.1" />
+  <property name="build.dir" value="../../../../../build/juavtalk"/>
+  <property name="jar.file" value="${build.dir}/juavtalk.jar"/>
+  <property name="src.dir" value="src"/>
+  <property name="classes.dir" 	value="${build.dir}/classes"/>
+
+	
+  <target name="compile" depends="clean">
+    <mkdir dir="${build.dir}" />
+    <mkdir dir="${classes.dir}" />
+    <javac srcdir="${src.dir}" destdir="${classes.dir}" />
+  </target>
+  
+  <target name="jar" depends="compile">
+
+     <manifest file="${build.dir}/MANIFEST.MF">
+        <attribute name="Built-By" value="${user.name}" />
+        <attribute name="Implementation-Version" value="${version.num}"/> 
+    </manifest>
+
+    <jar destfile="${jar.file}"
+         basedir="${classes.dir}"
+         includes="**/*.class"
+         manifest="${build.dir}/MANIFEST.MF"
+         />
+  </target>
+
+  <target name="clean">
+       <delete dir="${build.dir}" />
+       <delete>
+         <fileset dir="." includes="${jar.file}"/>
+       </delete>  
+  </target>
+  
+  <target name="package" depends="compile,jar" />
+</project>
+

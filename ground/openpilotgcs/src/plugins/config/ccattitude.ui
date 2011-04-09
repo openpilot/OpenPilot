@@ -125,7 +125,7 @@
         <string>Click to permanently save the accel bias in the CopterControl Flash.</string>
        </property>
        <property name="text">
-        <string>Save to SD</string>
+        <string>Save</string>
        </property>
       </widget>
      </item>

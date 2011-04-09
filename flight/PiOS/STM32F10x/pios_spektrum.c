@@ -188,13 +188,15 @@ uint8_t PIOS_SPEKTRUM_Bind(void)
 */
 int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 {
-	static uint16_t channel = 0, sync_word = 0;
-	uint8_t channeln = 0, frame = 0;
+	static uint16_t channel = 0; /*, sync_word = 0;*/
+	uint8_t channeln = 0, frame = 0, datalength=0;
 	uint16_t data = 0;
 	byte_array[bytecount] = b;
 	bytecount++;
 	if (sync == 0) {
-		sync_word = (prev_byte << 8) + b;
+		//sync_word = (prev_byte << 8) + b;
+#if 0
+		/* maybe create object to show this  data */
 		if(bytecount==1)
 		{
 			/* record losscounter into channel8 */
@@ -202,19 +204,38 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 			/* instant write */
 			CaptureValue[7]=b;
 		}
-		if (((sync_word & 0x00FE) == 0) && (bytecount == 2)) {
-			/* sync low byte always 0x01, high byte seems to be random when switching TX on off on, loss counter??? */
-			if (sync_word & 0x01) {
+#endif
+		/* Known sync bytes, 0x01, 0x02, 0x12 */
+		if (bytecount == 2) {
+			if (b == 0x01) {
+				datalength=0; // 10bit
+				//frames=1;
 				sync = 1;
 				bytecount = 2;
+			}
+			else if(b == 0x02) {
+				datalength=0; // 10bit
+				//frames=2;
+				sync = 1;
+				bytecount = 2;
+			}
+			else if(b == 0x12) {
+				datalength=1; // 11bit
+				//frames=2;
+				sync = 1;
+				bytecount = 2;
+			}
+			else
+			{
+				bytecount = 0;
 			}
 		}
 	} else {
 		if ((bytecount % 2) == 0) {
 			channel = (prev_byte << 8) + b;
 			frame = channel >> 15;
-			channeln = (channel >> 10) & 0x0F;
-			data = channel & 0x03FF;
+			channeln = (channel >> (10+datalength)) & 0x0F;
+			data = channel & (0x03FF+(0x0400*datalength));
 			if(channeln==0 && data<10) // discard frame if throttle misbehaves
 			{
 				frame_error=1;
@@ -271,14 +292,14 @@ void PIOS_SPEKTRUM_irq_handler() {
 	/* Clear timer interrupt pending bit */
 	TIM_ClearITPendingBit(pios_spektrum_cfg.timer, TIM_IT_Update);
 
-	/* sync between frames, TODO! DX7SE */
+	/* sync between frames */
 	sync = 0;
 	bytecount = 0;
 	prev_byte = 0xFF;
 	frame_error=0;
 	sync_of++;
 	/* watchdog activated */
-	if (sync_of > 6) {
+	if (sync_of > 12) {
 		/* signal lost */
 		sync_of = 0;
 		for (int i = 0; i < 12; i++)

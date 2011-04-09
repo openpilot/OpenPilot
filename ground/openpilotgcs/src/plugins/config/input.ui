@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -364,7 +364,7 @@ p, li { white-space: pre-wrap; }
 Applies and Saves all settings to SD</string>
        </property>
        <property name="text">
-        <string>Save to SD</string>
+        <string>Save</string>
        </property>
       </widget>
       <widget class="QLabel" name="ch4Cur">
@@ -439,7 +439,7 @@ p, li { white-space: pre-wrap; }
 Be sure to set the Neutral position on all sliders before sending!</string>
        </property>
        <property name="text">
-        <string>Save to RAM</string>
+        <string>Apply</string>
        </property>
       </widget>
       <widget class="QComboBox" name="ch0Assign">
@@ -1341,7 +1341,7 @@ p, li { white-space: pre-wrap; }
 Be sure to set the Neutral position on all sliders before sending!</string>
        </property>
        <property name="text">
-        <string>Save to RAM</string>
+        <string>Apply</string>
        </property>
       </widget>
       <widget class="QPushButton" name="saveFmsToSD">
@@ -1358,7 +1358,7 @@ Be sure to set the Neutral position on all sliders before sending!</string>
 Applies and Saves all settings to SD</string>
        </property>
        <property name="text">
-        <string>Save to SD</string>
+        <string>Save</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_15">
@@ -1635,15 +1635,21 @@ if you have not done so already.</string>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
           <widget class="QLabel" name="label_17">
+           <property name="font">
+            <font>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
+           </property>
            <property name="text">
-            <string>Arm airframe using throttle off, plus:</string>
+            <string>Arm airframe using throttle off and:</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QComboBox" name="armControl">
            <property name="toolTip">
-            <string>Indicate the control used for arming the airframe.</string>
+            <string>Indicate the control used for arming the airframe, in addition to setting the throttle to its minimum position. In other terms &quot;Throttle Off&quot;.</string>
            </property>
           </widget>
          </item>
@@ -1674,7 +1680,7 @@ if you have not done so already.</string>
          <item>
           <widget class="QSpinBox" name="armTimeout">
            <property name="toolTip">
-            <string>After the time indicated here, the frame will be disarmed.</string>
+            <string>After the time indicated here, the frame go back to disarmed state.</string>
            </property>
            <property name="maximum">
             <number>64</number>
@@ -1741,14 +1747,14 @@ if you have not done so already.</string>
          <item>
           <widget class="QPushButton" name="saveArmToRAM">
            <property name="text">
-            <string>Save to RAM</string>
+            <string>Apply</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="saveArmToSD">
            <property name="text">
-            <string>Save to SD</string>
+            <string>Save</string>
            </property>
           </widget>
          </item>

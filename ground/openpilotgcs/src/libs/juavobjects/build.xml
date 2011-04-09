@@ -1,10 +1,10 @@
 <project default="package">
 
   <property name="version.num" value="0.1.1" />
-  <property name="build.dir" value="../../../../build/"/>
-  <property name="jar.file" value="${build.dir}/juavobjects/juavobjects.jar"/>
-  <property name="src.dir" value="${build.dir}/juavobjects/src"/>
-  <property name="classes.dir" 	value="${build.dir}/juavobjects/classes"/>
+  <property name="build.dir" value="../../../../../build/"/>
+  <property name="jar.file" value="${build.dir}/uavobject-synthetics/java/juavobjects.jar"/>
+  <property name="src.dir" value="${build.dir}/uavobject-synthetics/java/src"/>
+  <property name="classes.dir" 	value="${build.dir}/uavobject-synthetics/java/classes"/>
 
 	
   <target name="compile" depends="clean">

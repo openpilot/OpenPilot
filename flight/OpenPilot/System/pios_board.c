@@ -512,7 +512,7 @@ const struct pios_spektrum_cfg pios_spektrum_cfg = {
 		.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,	/* For 1 uS accuracy */
 		.TIM_ClockDivision = TIM_CKD_DIV1,
 		.TIM_CounterMode = TIM_CounterMode_Up,
-		.TIM_Period = ((1000000 / 60) - 1), //60hz
+		.TIM_Period = ((1000000 / 120) - 1), //11ms-10*16b/115200bps, atleast one interrupt between frames
 		.TIM_RepetitionCounter = 0x0000,
 	},
 	.gpio_init = { //used for bind feature

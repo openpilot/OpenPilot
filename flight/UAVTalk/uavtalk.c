@@ -242,7 +242,6 @@ static int32_t objectTransaction(UAVObjHandle obj, uint16_t instId, uint8_t type
  */
 int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
 {
-	static uint8_t tmpBuffer[4];
 	static UAVObjHandle obj;
 	static uint8_t type;
 	static uint16_t packet_size;
@@ -314,6 +313,7 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
 			}
 			
 			rxCount = 0;
+			objId = 0;
 			state = STATE_OBJID;
 			break;
 			
@@ -322,12 +322,13 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
 			// update the CRC
 			cs = updateCRCbyte(cs, rxbyte);
 			
-			tmpBuffer[rxCount++] = rxbyte;
+			objId += rxbyte << (8*(rxCount++));
+
 			if (rxCount < 4)
 				break;
 			
 			// Search for object, if not found reset state machine
-			objId = (tmpBuffer[3] << 24) | (tmpBuffer[2] << 16) | (tmpBuffer[1] << 8) | (tmpBuffer[0]);
+
 			obj = UAVObjGetByID(objId);
 			if (obj == 0)
 			{
@@ -358,6 +359,7 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
 				break;
 			}
 			
+			instId = 0;
 			// Check if this is a single instance object (i.e. if the instance ID field is coming next)
 			if (UAVObjIsSingleInstance(obj))
 			{
@@ -366,7 +368,7 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
 					state = STATE_DATA;
 				else
 					state = STATE_CS;
-				instId = 0;
+
 				rxCount = 0;
 			}
 			else
@@ -382,11 +384,10 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
 			// update the CRC
 			cs = updateCRCbyte(cs, rxbyte);
 			
-			tmpBuffer[rxCount++] = rxbyte;
+			instId += rxbyte << (8*(rxCount++));
+
 			if (rxCount < 2)
 				break;
-			
-			instId = (tmpBuffer[1] << 8) | (tmpBuffer[0]);
 			
 			rxCount = 0;
 			

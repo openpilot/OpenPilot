@@ -163,18 +163,18 @@ QString UAVObjectGeneratorJava::deSerializeJavaValue(int type,QString name)
             return (name.append("=arr[pos++];\n"));
 
         case FIELDTYPE_UINT8:
-            return (name.append("=arr[pos++];\n")); /*todo implement & check */
+            return (name.append("=arr[pos++]&0xFF;\n")); /*test */
 
         case FIELDTYPE_INT16:
         case FIELDTYPE_UINT16:
-            return (QString("        pos+=2;\n")); /*todo implement & check */
+            return (name.append("=((arr[pos++]&0xff)<<0) | ((arr[pos++]&0xff)<<8) ;\n")); /* test */
 
         case FIELDTYPE_UINT32:
         case FIELDTYPE_INT32:
-            return (QString("        pos+=4;\n")); /*todo implement & test */
+            return (name.append("=((arr[pos++]&0xff)<<0) | ((arr[pos++]&0xff)<<8) | ((arr[pos++]&0xff)<<16) | ((arr[pos++]&0xff)<<24) ;\n")); /*test */
 
         case FIELDTYPE_FLOAT32:
-	    return (QString("        pos+=4;\n")); /*todo implement & test */
+	  return (name.append("=Float.intBitsToFloat(((arr[pos++]&0xff)<<0) | ((arr[pos++]&0xff)<<8) | ((arr[pos++]&0xff)<<16) | ((arr[pos++]&0xff)<<24) );  ")); // OK
 
         default:
             cout << "Warning: unresolved type " << type << " for " << name.toStdString() << endl;
@@ -198,8 +198,8 @@ bool UAVObjectGeneratorJava::process_object(ObjectInfo* info)
     QString type,fieldsinit,serialize_code,serialize_code_inner,deserialize_code,gettersetter;
 
     QString fielddesc=QString("    public final UAVObjectFieldDescription[] getFieldDescriptions() { return new UAVObjectFieldDescription[] {");
-    QString fieldgetter=QString("    public Object getField(byte fieldid,byte arr_pos) { switch(fieldid) {\n");
-    QString fieldsetter=QString("    public void setField(byte fieldid,byte arr_pos,Object obj) { switch(fieldid) {\n");
+    QString fieldgetter=QString("    public Object getField(int fieldid,int arr_pos) { switch(fieldid) {\n");
+    QString fieldsetter=QString("    public void setField(int fieldid,int arr_pos,Object obj) { switch(fieldid) {\n");
 
     for (int n = 0; n < info->fields.length(); ++n) {
         FieldInfo* act_field_info=info->fields[n];

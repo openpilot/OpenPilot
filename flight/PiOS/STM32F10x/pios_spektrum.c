@@ -299,7 +299,7 @@ void PIOS_SPEKTRUM_irq_handler() {
 	frame_error=0;
 	sync_of++;
 	/* watchdog activated */
-	if (sync_of > 6) {
+	if (sync_of > 12) {
 		/* signal lost */
 		sync_of = 0;
 		for (int i = 0; i < 12; i++)

@@ -124,7 +124,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="backgroundID"/>
+      <widget class="QLineEdit" name="backgroundID">
+       <property name="toolTip">
+        <string>XML ID of the SVG source file used to display the dial background.</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QLabel" name="label_3">
@@ -134,7 +138,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="foregroundID"/>
+      <widget class="QLineEdit" name="foregroundID">
+       <property name="toolTip">
+        <string>XML ID of the SVG source file used to display the dial foreground (above everything else, needles included).</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -156,13 +164,6 @@
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
-         <item>
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Indicator 1</string>
-           </property>
-          </widget>
-         </item>
          <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
@@ -212,6 +213,9 @@
              <width>16777215</width>
              <height>16777215</height>
             </size>
+           </property>
+           <property name="toolTip">
+            <string>XML ID of the SVG source file used to display the first needle/indicator.</string>
            </property>
           </widget>
          </item>
@@ -359,13 +363,6 @@
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_6">
-         <item>
-          <widget class="QLabel" name="label_16">
-           <property name="text">
-            <string>Indicator 2</string>
-           </property>
-          </widget>
-         </item>
          <item>
           <spacer name="horizontalSpacer_2">
            <property name="orientation">
@@ -551,13 +548,6 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_9">
          <item>
-          <widget class="QLabel" name="label_22">
-           <property name="text">
-            <string>Indicator 3</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <spacer name="horizontalSpacer_3">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -735,6 +725,19 @@
       </layout>
      </widget>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

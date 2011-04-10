@@ -28,11 +28,11 @@ include $(TOP)/make/firmware-defs.mk
 
 # Set developer code and compile options
 # Set to YES for debugging
-DEBUG ?= NO
+DEBUG ?= YES
 USE_BOOTLOADER ?= NO
 
 # Set to YES when using Code Sourcery toolchain
-CODE_SOURCERY ?= YES
+CODE_SOURCERY ?= NO
 
 ifeq ($(CODE_SOURCERY), YES)
 REMOVE_CMD = cs-rm
@@ -264,7 +264,7 @@ CFLAGS += -mcpu=$(MCU)
 CFLAGS += $(CDEFS)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 
-CFLAGS += -mapcs-frame
+CFLAGS += -mapcs-frame -ffunction-sections
 CFLAGS += -fomit-frame-pointer
 ifeq ($(CODE_SOURCERY), YES)
 CFLAGS += -fpromote-loop-indices

@@ -79,6 +79,7 @@ static void manualControlTask(void *parameters);
 static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutral, int16_t deadband_percent);
 static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time);
 static bool okToArm(void);
+static bool validInputRange(int16_t min, int16_t max, uint16_t value);
 
 #define assumptions1 ( \
 		((int)MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NONE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)       && \
@@ -262,10 +263,39 @@ static void manualControlTask(void *parameters)
 		} else
 			ManualControlCommandGet(&cmd);	/* Under GCS control */
 
-
+		// decide if we have valid manual input or not
+		bool valid_input_detected = ManualControlCommandReadOnly(&cmd) >= 0;
+		if (!validInputRange(settings.ChannelMin[settings.Throttle], settings.ChannelMax[settings.Throttle], cmd.Channel[settings.Throttle]))
+			valid_input_detected = FALSE;
+		if (!validInputRange(settings.ChannelMin[settings.Roll], settings.ChannelMax[settings.Roll], cmd.Channel[settings.Roll]))
+			valid_input_detected = FALSE;
+		if (!validInputRange(settings.ChannelMin[settings.Yaw], settings.ChannelMax[settings.Yaw], cmd.Channel[settings.Yaw]))
+			valid_input_detected = FALSE;
+		if (!validInputRange(settings.ChannelMin[settings.Pitch], settings.ChannelMax[settings.Pitch], cmd.Channel[settings.Pitch]))
+			valid_input_detected = FALSE;
+		// Implement hysteresis loop on connection status
+		if (valid_input_detected)
+		{
+			if (++connected_count > 10)
+			{
+				connection_state = CONNECTED;
+				connected_count = 0;
+				disconnected_count = 0;
+			}
+		}
+		else
+		{
+			if (++disconnected_count > 10)
+			{
+				connection_state = DISCONNECTED;
+				connected_count = 0;
+				disconnected_count = 0;
+			}
+		}
+/*
 		// Implement hysteresis loop on connection status
 		// Must check both Max and Min in case they reversed
-		if (!ManualControlCommandReadOnly(&cmd) &&
+ 		if (!ManualControlCommandReadOnly(&cmd) &&
 			cmd.Channel[settings.Throttle] < settings.ChannelMax[settings.Throttle] - CONNECTION_OFFSET &&
 			cmd.Channel[settings.Throttle] < settings.ChannelMin[settings.Throttle] - CONNECTION_OFFSET) {
 			if (disconnected_count++ > 10) {
@@ -282,7 +312,7 @@ static void manualControlTask(void *parameters)
 			} else
 				connected_count++;
 		}
-
+*/
 		if (connection_state == DISCONNECTED) {
 			cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
 			cmd.Throttle = -1;	// Shut down engine with no control
@@ -583,6 +613,21 @@ static bool okToArm(void)
 	}
 
 	return true;
+}
+
+/**
+ * @brief Determine if the manual input value is within acceptable limits
+ * @returns return TRUE if so, otherwise return FALSE
+ */
+bool validInputRange(int16_t min, int16_t max, uint16_t value)
+{
+	if (min > max)
+	{
+		int16_t tmp = min;
+		min = max;
+		max = tmp;
+	}
+	return (value >= min - CONNECTION_OFFSET && value <= max + CONNECTION_OFFSET);
 }
 
 //

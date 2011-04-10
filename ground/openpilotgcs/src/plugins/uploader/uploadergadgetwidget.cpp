@@ -56,6 +56,11 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 
     connect(m_config->refreshPorts, SIGNAL(clicked()), this, SLOT(getSerialPorts()));
 
+    // And check whether by any chance we are not already connected
+    if (telMngr->isConnected())
+        onAutopilotConnect();
+
+
 }
 
 

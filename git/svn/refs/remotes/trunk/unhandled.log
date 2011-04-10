@@ -10214,3 +10214,16 @@ r3147
 r3148
 r3149
 r3150
+r3151
+  +file_prop: trunk/flight/AHRS/Makefile svn:eol-style native
+  +file_prop: trunk/flight/AHRS/ahrs.c svn:eol-style native
+  +file_prop: trunk/flight/AHRS/ahrs_timer.c svn:eol-style native
+  +file_prop: trunk/flight/AHRS/inc/ahrs.h svn:eol-style native
+  +file_prop: trunk/flight/AHRS/inc/ahrs_fsm.h svn:eol-style native
+  +file_prop: trunk/flight/AHRS/inc/ahrs_timer.h svn:eol-style native
+  +file_prop: trunk/flight/AHRS/inc/insgps.h svn:eol-style native
+  +file_prop: trunk/flight/AHRS/inc/pios_config.h svn:eol-style native
+  +file_prop: trunk/flight/AHRS/insgps13state.c svn:eol-style native
+  +file_prop: trunk/flight/AHRS/insgps16state.c svn:eol-style native
+  +file_prop: trunk/flight/AHRS/pios_board.c svn:eol-style native
+  +file_prop: trunk/flight/AHRS/test.c svn:eol-style native

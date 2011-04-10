@@ -38,6 +38,7 @@
 #include <iostream>
 #include <Eigen/align-function.h>
 
+#include "assertions.h"
 #include "calibration.h"
 
 #define sign(x) ((x < 0) ? -1 : 1)
@@ -221,7 +222,7 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     */
     connect(m_ahrs->ahrsSettingsSaveRAM, SIGNAL(clicked()), this, SLOT(ahrsSettingsSaveRAM()));
     connect(m_ahrs->ahrsSettingsSaveSD, SIGNAL(clicked()), this, SLOT(ahrsSettingsSaveSD()));
-    connect(m_ahrs->sixPointsStart, SIGNAL(clicked()), this, SLOT(sixPointCalibrationMode()));
+    connect(m_ahrs->sixPointsStart, SIGNAL(clicked()), this, SLOT(multiPointCalibrationMode()));
     connect(m_ahrs->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
     connect(m_ahrs->startDriftCalib, SIGNAL(clicked()),this, SLOT(launchGyroDriftCalibration()));
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(ahrsSettingsRequest()));
@@ -697,55 +698,49 @@ void ConfigAHRSWidget::savePositionData()
 
 //*****************************************************************
 namespace {
+
+/*
+ * Calibrated scale factors should be real values with scale factor less than 10% from nominal
+ */
+bool checkScaleFactors(const Vector3f& scalars)
+{
+	return isReal(scalars) &&
+		scalars.cwise().abs().maxCoeff() < 1.10f;
+}
+
+/*
+ * Calibrated offsets should be real values.  TODO: Add range checks
+ */
+bool checkOffsets(const Vector3f& offsets)
+{
+	return isReal(offsets);
+}
+
 /**
- * Updates the scale factors and offsets for a calibrated vector field.
- * @param scale[out] Non-null pointer to a 3-element scale factor field.
- * @param bias[out] Non-null pointer to a 3-element bias field.
- * @param ortho[out] Optional pointer to a 3-element orthogonal correction field
- * @param updateScale the source scale factor matrix.
- * @param updateBias the source bias matrix.
+ * Given a UAVObjectField that is a 3-tuple, produce an Eigen::Vector3f
+ * from it.
+ */
+Vector3f
+tupleToVector(UAVObjectField *tuple)
+{
+	return (Vector3f() << tuple->getDouble(0),
+			tuple->getDouble(1),
+			tuple->getDouble(2)).finished();
+}
+
+/**
+ * Convert a 3-vector to a 3-tuple
+ * @param v A 3-vector
+ * @param tuple[in] Assign the elements of this three-tuple to the elements of v
  */
 void
-updateScaleFactors(UAVObjectField *scale,
-		UAVObjectField *bias ,
-		UAVObjectField *ortho,
-		const Matrix3f& updateScale,
-		const Vector3f& updateBias)
+vectorToTuple(UAVObjectField *tuple, const Vector3f& v)
 {
-	// Compose a 4x4 affine transformation matrix composed of the scale factor,
-	// orthogonality correction, and bias.
-	Matrix4f calibration;
-    calibration << (Vector3f() << scale->getDouble(0), scale->getDouble(1), scale->getDouble(2)).finished().asDiagonal(),
-		(Vector3f() << bias->getDouble(0), bias->getDouble(1), bias->getDouble(2)).finished(),
-		Vector4f::UnitW().transpose();
-	
-    if (ortho) {
-    	calibration(1, 0) = calibration(0, 1) = ortho->getDouble(0);
-    	calibration(2, 0) = calibration(0, 2) = ortho->getDouble(1);
-    	calibration(1, 2) = calibration(2, 1) = ortho->getDouble(2);
-    }
-
-	std::cout << "old calibration matrix: \n" << calibration << "\n";
-
-    Matrix4f update;
-    update << updateScale, updateBias, Vector4f::UnitW().transpose();
-	std::cout << "new calibration matrix update: \n" << update << "\n";
-
-    calibration = update * calibration;
-    scale->setDouble(calibration(0,0), 0);
-    scale->setDouble(calibration(1,1), 1);
-    scale->setDouble(calibration(2,2), 2);
-
-    bias->setDouble(calibration(0,3), 0);
-    bias->setDouble(calibration(1,3), 1);
-    bias->setDouble(calibration(2,3), 2);
-
-    if (ortho) {
-    	ortho->setDouble(calibration(0, 1), 0);
-    	ortho->setDouble(calibration(0, 2), 1);
-    	ortho->setDouble(calibration(1, 2), 2);
-    }
+	for (int i = 0; i < 3; ++i) {
+		tuple->setDouble(v(i), i);
+	}
 }
+
 /**
  * Updates the offsets for a calibrated gyro field.
  * @param scale[in] Non-null pointer to a 3-element scale factor field.
@@ -757,11 +752,11 @@ updateBias(UAVObjectField *scale,
 		UAVObjectField *bias ,
 		const Vector3f& updateBias)
 {
-	Vector3f scale_factor = (Vector3f() << scale->getDouble(0), 
-		scale->getDouble(1), 
+	Vector3f scale_factor = (Vector3f() << scale->getDouble(0),
+		scale->getDouble(1),
 		scale->getDouble(2)).finished();
-	Vector3f old_bias = (Vector3f() << bias->getDouble(0), 
-		bias->getDouble(1), 
+	Vector3f old_bias = (Vector3f() << bias->getDouble(0),
+		bias->getDouble(1),
 		bias->getDouble(2)).finished();
 
 	// Convert to radians/second
@@ -781,6 +776,88 @@ updateRotation(UAVObjectField *rotation, const Vector3f& updateRotation)
 }
 
 } // !namespace (anon)
+
+
+/**
+ * Updates the scale factors and offsets for a calibrated vector field.
+ * @param scale[out] Non-null pointer to a 3-element scale factor field.
+ * @param bias[out] Non-null pointer to a 3-element bias field.
+ * @param ortho[out] Optional pointer to a 3-element orthogonal correction field
+ * @param updateScale the source scale factor matrix.
+ * @param updateBias the source bias matrix.
+ * @param oldScale The original sensor scale factor
+ * @param oldBias The original bias value
+ * @param oldOrtho Optional.  The original orthogonality scale factor value.
+ * @return true if successful, false otherwise.
+ */
+bool
+ConfigAHRSWidget::updateScaleFactors(UAVObjectField *scale,
+		UAVObjectField *bias ,
+		UAVObjectField *ortho,
+		const Matrix3f& updateScale,
+		const Vector3f& updateBias,
+		const Vector3f& oldScale,
+		const Vector3f& oldBias,
+		const Vector3f& oldOrtho)
+{
+	// Compose a 4x4 affine transformation matrix composed of the scale factor,
+	// orthogonality correction, and bias.
+	Matrix4f calibration;
+	calibration << tupleToVector(scale).asDiagonal(),
+		tupleToVector(bias),
+		Vector4f::UnitW().transpose();
+
+	if (ortho) {
+		Vector3f orthof = tupleToVector(ortho);
+		calibration(1, 0) = calibration(0, 1) = orthof(0);
+		calibration(2, 0) = calibration(0, 2) = orthof(1);
+		calibration(1, 2) = calibration(2, 1) = orthof(2);
+	}
+
+	std::cout << "old calibration matrix: \n" << calibration << "\n";
+
+	Matrix4f update;
+	update << updateScale, updateBias, Vector4f::UnitW().transpose();
+	std::cout << "new calibration matrix update: \n" << update << "\n";
+
+	calibration = update * calibration;
+
+	if (checkOffsets(updateBias) && checkScaleFactors(updateScale.diagonal())) {
+		// Apply the new calibration
+		vectorToTuple(scale, calibration.diagonal().start<3>());
+		vectorToTuple(bias, calibration.col(3).start<3>());
+	
+		if (ortho) {
+			ortho->setDouble(calibration(0, 1), 0);
+			ortho->setDouble(calibration(0, 2), 1);
+			ortho->setDouble(calibration(1, 2), 2);
+		}
+		return true;
+    }
+    else {
+    	// Give the user the calibration data and restore their settings.
+		std::ostringstream msg;
+		msg << "Scale factors and/or offsets are out of range.\n";
+		msg << "Please see the troubleshooting section of the manual and retry.\n\n"
+			"The following values were computed:\n";
+		msg << qPrintable(scale->getName()) << ": "
+			<< calibration.diagonal().start<3>().transpose() << "\n";
+		vectorToTuple(scale, oldScale);
+
+		if (ortho) {
+			msg << qPrintable(ortho->getName()) << ": "
+				<< calibration(0,1) << ", " << calibration(0,2) << ", " << calibration(1,2) << "\n";
+			vectorToTuple(ortho, oldOrtho);
+		}
+
+		msg << qPrintable(bias->getName()) << ": "
+			<< calibration.col(3).start<3>().transpose() << "\n";
+		vectorToTuple(bias, oldBias);
+
+		m_ahrs->sixPointCalibInstructions->append(msg.str().c_str());
+		return false;
+    }
+}
 
 FORCE_ALIGN_FUNC
 void ConfigAHRSWidget::computeScaleBias()
@@ -840,19 +917,27 @@ void ConfigAHRSWidget::computeScaleBias()
 			mag_data, localMagField, n_positions);
     std::cout << "magnetometer rotation vector: " << accelRotation.transpose() << std::endl;
 
-    // Update the calibration scalars
-    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
-    updateScaleFactors(obj->getField(QString("accel_scale")),
-    		obj->getField(QString("accel_bias")),
-    		obj->getField(QString("accel_ortho")),
-    		accelScale,
-    		accelBias);
+    // Update the calibration scalars with a clear message box
+    m_ahrs->sixPointCalibInstructions->clear();
+	UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
 
-    updateScaleFactors(obj->getField(QString("mag_scale")),
+
+    bool success = updateScaleFactors(obj->getField(QString("accel_scale")),
+			obj->getField(QString("accel_bias")),
+			obj->getField(QString("accel_ortho")),
+			accelScale,
+			accelBias,
+			saved_accel_scale,
+			saved_accel_bias,
+			saved_accel_ortho);
+
+    success &= updateScaleFactors(obj->getField(QString("mag_scale")),
     		obj->getField(QString("mag_bias")),
     		NULL,
     		magScale.asDiagonal(),
-    		magBias);
+    		magBias,
+    		saved_mag_scale,
+    		saved_mag_bias);
 
 	updateBias(obj->getField(QString("gyro_scale")),
 		obj->getField(QString("gyro_bias")),
@@ -866,63 +951,22 @@ void ConfigAHRSWidget::computeScaleBias()
     obj->updated();
 
     position = -1; //set to run again
-    m_ahrs->sixPointCalibInstructions->append("Computed accel and mag scale and bias...");
+	if (success)
+		m_ahrs->sixPointCalibInstructions->append("Computed new accel and mag scale and bias.");
 
 }
 
 /**
-  Six point calibration mode
+  Multi-point calibration mode
   */
-void ConfigAHRSWidget::sixPointCalibrationMode()
+FORCE_ALIGN_FUNC
+void ConfigAHRSWidget::multiPointCalibrationMode()
 {
-    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
+	cacheCurrentCalibration();
+	resetCalibrationDefaults();
 
-    // set accels to unity gain
-    UAVObjectField *field = obj->getField(QString("accel_scale"));
-    UAVObjectField *field2 = obj->getField(QString("gyro_scale"));
-    // TODO: Figure out how to load these directly from the saved metadata
-    // about default values
-    field->setDouble(0.0359, 0);
-    field->setDouble(0.0359, 1);
-    field->setDouble(0.0359, 2);
-
-    field = obj->getField(QString("accel_bias"));
-    field->setDouble(-73.5, 0);
-    field->setDouble(-73.5, 1);
-    field->setDouble(73.5, 2);
-
-    field = obj->getField(QString("accel_ortho"));
-    for (int i = 0; i < 3; ++i) {
-    	field->setDouble(0, i);
-    }
-
-    field = obj->getField(QString("gyro_bias"));
-    field->setDouble(28/0.017*field2->getDouble(0),0);
-    field->setDouble(-28/0.017*field2->getDouble(1),1);
-    field->setDouble(28/0.017*field2->getDouble(2),2);
-
-    field = obj->getField(QString("mag_scale"));
-    for (int i = 0; i < 3; ++i) {
-    	field->setDouble(-1, i);
-    }
-
-    field = obj->getField(QString("mag_bias"));
-    for (int i = 0; i < 3; ++i) {
-    	field->setDouble(0, i);
-    }
-
-#if 0
-    // TODO: Enable after the feature freeze is lifted.
-    field = obj->getField(QString("accel_rotation"));
-    for (int i = 0; i < 3; ++i) {
-    	field->setDouble(0, i);
-    }
-#endif
-
-    obj->updated();
-
-    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
-    field = obj->getField(QString("BiasCorrectedRaw"));
+	UAVObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
+    UAVObjectField *field = obj->getField(QString("BiasCorrectedRaw"));
     field->setValue("FALSE");
     obj->updated();
 
@@ -943,12 +987,97 @@ void ConfigAHRSWidget::sixPointCalibrationMode()
 
     /* Show instructions and enable controls */
     m_ahrs->sixPointCalibInstructions->clear();
-    m_ahrs->sixPointCalibInstructions->append("Place horizontally and click save position...");
+    m_ahrs->sixPointCalibInstructions->append("Stand facing Earth's magnetic N or S.  Place the vehicle horizontally facing forward and click save position...");
     displayPlane("plane-horizontal");
     m_ahrs->sixPointsStart->setEnabled(false);
     m_ahrs->sixPointsSave->setEnabled(true);
     position = 0;
 
+}
+
+/**
+ * Read the current calibration scalars and offsets from the target board, and
+ * save them for later use. In the event of a calibration failure, if the
+ * calibration method began by resetting calibration values, they may be
+ * restored later with this information.
+ */
+void ConfigAHRSWidget::cacheCurrentCalibration()
+{
+    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
+    struct field_t {
+    	const char* field_name;
+    	Vector3f& cache;
+    } fields[] = {
+    		{ "accel_scale", this->saved_accel_scale },
+    		{ "accel_bias", this->saved_accel_bias },
+    		{ "accel_ortho", this->saved_accel_ortho },
+// TODO: Enable after V1.0 feature freeze is lifted.
+//    		{ "accel_rotation", this->saved_accel_rotation },
+    		{ "gyro_bias", this->saved_gyro_bias },
+    		{ "mag_scale", this->saved_mag_scale },
+    		{ "mag_bias", this->saved_mag_bias },
+    		{ NULL, this->saved_mag_bias }, // sentinnel
+    };
+    for (field_t* i = fields; i->field_name != NULL; ++i) {
+    	UAVObjectField* field = obj->getField(QString(i->field_name));
+    	if (field) {
+    		i->cache = tupleToVector(field);
+    	}
+    	else {
+    		qDebug() << "WARNING: AHRSCalibration field not found: " << i->field_name << "\n";
+    	}
+    }
+}
+
+/**
+ * Reset all calibration scalars to their default values.
+ */
+void ConfigAHRSWidget::resetCalibrationDefaults()
+{
+    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
+
+    // set accels to unity gain
+    UAVObjectField *field = obj->getField(QString("accel_scale"));
+    // TODO: Figure out how to load these directly from the saved metadata
+    // about default values
+    field->setDouble(0.0359, 0);
+    field->setDouble(0.0359, 1);
+    field->setDouble(0.0359, 2);
+
+    field = obj->getField(QString("accel_bias"));
+    field->setDouble(-73.5, 0);
+    field->setDouble(-73.5, 1);
+    field->setDouble(73.5, 2);
+
+    field = obj->getField(QString("accel_ortho"));
+    for (int i = 0; i < 3; ++i) {
+    	field->setDouble(0, i);
+    }
+
+    field = obj->getField(QString("gyro_bias"));
+    UAVObjectField *field2 = obj->getField(QString("gyro_scale"));
+    field->setDouble(28/-0.017*field2->getDouble(0),0);
+    field->setDouble(-28/0.017*field2->getDouble(1),1);
+    field->setDouble(28/-0.017*field2->getDouble(2),2);
+
+    field = obj->getField(QString("mag_scale"));
+    for (int i = 0; i < 3; ++i) {
+    	field->setDouble(-1, i);
+    }
+
+    field = obj->getField(QString("mag_bias"));
+    for (int i = 0; i < 3; ++i) {
+    	field->setDouble(0, i);
+    }
+
+#if 0
+	// TODO: Enable after v1.0 feature freeze is lifted.
+    field = obj->getField(QString("accel_rotation"));
+    for (int i = 0; i < 3; ++i) {
+    	field->setDouble(0, i);
+    }
+#endif
+    obj->updated();
 }
 
 /**

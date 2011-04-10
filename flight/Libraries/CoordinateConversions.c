@@ -334,6 +334,34 @@ uint8_t RotFrom2Vectors(const float v1b[3], const float v1e[3], const float v2b[
 	return 1;
 }
 
+void Rv2Rot(float Rv[3], float R[3][3])
+{
+	// Compute rotation matrix from a rotation vector
+	// To save .text space, uses Quaternion2R()
+	float q[4];
+
+	float angle = VectorMagnitude(Rv);
+	if (angle <= 0.00048828125f) {
+		// angle < sqrt(2*machine_epsilon(float)), so flush cos(x) to 1.0f
+		q[0] = 1.0f;
+
+        // and flush sin(x/2)/x to 0.5
+		q[1] = 0.5f*Rv[0];
+		q[2] = 0.5f*Rv[1];
+		q[3] = 0.5f*Rv[2];
+		// This prevents division by zero, while retaining full accuracy
+	}
+	else {
+		q[0] = cosf(angle*0.5f);
+		float scale = sinf(angle*0.5f) / angle;
+		q[1] = scale*Rv[0];
+		q[2] = scale*Rv[1];
+		q[3] = scale*Rv[2];
+	}
+
+	Quaternion2R(q, R);
+}
+
 // ****** Vector Cross Product ********
 void CrossProduct(const float v1[3], const float v2[3], float result[3])
 {

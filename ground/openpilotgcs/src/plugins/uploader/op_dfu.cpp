@@ -707,7 +707,7 @@ OP_DFU::Status DFUObject::UploadFirmwareT(const QString &sfile, const bool &veri
         return ret;
     }
 
-    emit operationProgress(QString("Erasing memory, please wait..."));
+    emit operationProgress(QString("Erasing, please wait..."));
 
     if (debug) qDebug() << "Erasing memory";
     if( StatusRequest() == OP_DFU::abort) return OP_DFU::abort;

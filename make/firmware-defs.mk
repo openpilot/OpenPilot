@@ -9,6 +9,7 @@ OBJCOPY = $(TCHAIN_PREFIX)objcopy
 OBJDUMP = $(TCHAIN_PREFIX)objdump
 SIZE    = $(TCHAIN_PREFIX)size
 NM      = $(TCHAIN_PREFIX)nm
+STRIP   = $(TCHAIN_PREFIX)strip
 
 THUMB   = -mthumb
 
@@ -28,6 +29,7 @@ MSG_MODINIT          := ${quote} MODINIT   ${quote}
 MSG_SIZE             := ${quote} SIZE      ${quote}
 MSG_LOAD_FILE        := ${quote} BIN/HEX   ${quote}
 MSG_BIN_OBJ          := ${quote} BINO      ${quote}
+MSG_STRIP_FILE       := ${quote} STRIP     ${quote}
 MSG_EXTENDED_LISTING := ${quote} LIS       ${quote}
 MSG_SYMBOL_TABLE     := ${quote} NM        ${quote}
 MSG_LINKING          := ${quote} LD        ${quote}
@@ -53,6 +55,11 @@ gccversion :
 %.hex: %.elf
 	@echo $(MSG_LOAD_FILE) $(call toprel, $@)
 	$(V1) $(OBJCOPY) -O ihex $< $@
+
+# Create stripped output file (.elf.stripped) from ELF output file.
+%.elf.stripped: %.elf
+	@echo $(MSG_STRIP_FILE) $(call toprel, $@)
+	$(V1) $(STRIP) --strip-unneeded $< -o $@
 
 # Create final output file (.bin) from ELF output file.
 %.bin: %.elf

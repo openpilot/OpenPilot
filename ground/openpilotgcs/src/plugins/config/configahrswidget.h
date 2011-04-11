@@ -135,7 +135,7 @@ private slots:
     void savePositionData();
     void computeScaleBias();
     void multiPointCalibrationMode();
-    void sixPointCalibrationMode();
+//    void sixPointCalibrationMode();      // this function no longer exists
     void attitudeRawUpdated(UAVObject * obj);
     void accelBiasattitudeRawUpdated(UAVObject*);
     void driftCalibrationAttitudeRawUpdated(UAVObject*);

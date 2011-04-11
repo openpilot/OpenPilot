@@ -39,6 +39,16 @@
 #include <iostream>
 #include <iomanip>
 
+#if defined(__APPLE__) || defined(_WIN32)
+  // Qt bug work around
+  #ifndef isnan
+	extern "C" int isnan(double);
+  #endif
+  #ifndef isinf
+	extern "C" int isinf(double);
+  #endif
+#endif
+
 /*
  * Alas, this implementation is a fairly direct copy of the contents of the
  * following papers.  You don't have a chance at understanding it without

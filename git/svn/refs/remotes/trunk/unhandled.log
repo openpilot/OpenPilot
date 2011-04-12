@@ -10232,3 +10232,11 @@ r3154
 r3155
 r3156
 r3157
+r3158
+  +file_prop: trunk/hardware/Production/FOSS%20JTAG/Assembly/FOSS%20JTAG%203D%20Bottom.pdf svn:mime-type application/octet-stream
+  +file_prop: trunk/hardware/Production/FOSS%20JTAG/Assembly/FOSS%20JTAG%203D%20Top.pdf svn:mime-type application/octet-stream
+  +file_prop: trunk/hardware/Production/FOSS%20JTAG/BOM/FOSS%20JTAG%20BOM.xls svn:mime-type application/octet-stream
+  +file_prop: trunk/hardware/Production/FOSS%20JTAG/FOSS%20JTAG%20Schematic.pdf svn:mime-type application/octet-stream
+  +file_prop: trunk/hardware/Production/FOSS%20JTAG/FOSS%20JTAG.PcbDoc svn:mime-type application/octet-stream
+  +file_prop: trunk/hardware/Production/FOSS%20JTAG/FOSS%20JTAG.SchDoc svn:mime-type application/octet-stream
+  +file_prop: trunk/hardware/Production/FOSS%20JTAG/Gerbers/Gerbers%20and%20Drill%20files%20for%20FOSS%20JTAG%20Version%201.zip svn:mime-type application/octet-stream

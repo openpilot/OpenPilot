@@ -384,17 +384,20 @@ static void updateFixedDesiredAttitude()
 	courseCommand = (courseError * guidanceSettings.CoursePI[GUIDANCESETTINGS_COURSEPI_KP] +
 		courseIntegral);
 	
-	stabDesired.Roll = bound( courseCommand, -guidanceSettings.MaxRollPitch, guidanceSettings.MaxRollPitch );
+	stabDesired.Roll = bound( guidanceSettings.RollLimit[GUIDANCESETTINGS_ROLLLIMIT_NEUTRAL] +
+		courseCommand,
+		guidanceSettings.RollLimit[GUIDANCESETTINGS_ROLLLIMIT_MIN],
+		guidanceSettings.RollLimit[GUIDANCESETTINGS_ROLLLIMIT_MAX] );
 
 	// Compute desired yaw command
 	if (speedActual>0) {
-		// rate is speed dependent and roll dependent. The faster the plane, the slower it turns at a given roll rate.
+		// rate is speed dependent and roll dependent. The faster the plane, the slower it turns at a given roll angle.
 		// (A "fixed roll angle level turn" is a turn at fixed G rate)
 		//stabDesired.Yaw = RAD2DEG * tanf(stabDesired.Roll / RAD2DEG) * 100. * GEE / speedActual;
 		// this is a global rate - translate to local since rates are always local
 		//stabDesired.Yaw = stabDesired.Yaw * cosf(stabDesired.Roll / RAD2DEG);
 		// tan = sin/cos - so tan*cos = sin
-		stabDesired.Yaw = RAD2DEG * sinf(stabDesired.Roll / RAD2DEG) * 100. * GEE / speedActual;
+		stabDesired.Yaw = RAD2DEG * sinf((stabDesired.Roll-guidanceSettings.RollLimit[GUIDANCESETTINGS_ROLLLIMIT_NEUTRAL]) / RAD2DEG) * 100. * GEE / speedActual;
 	} else {
 		stabDesired.Yaw = 0;
 	}
@@ -408,25 +411,29 @@ static void updateFixedDesiredAttitude()
 		guidanceSettings.SpeedP[GUIDANCESETTINGS_SPEEDP_MAX]);
 	
 	accelError = accelDesired - attitudeRaw.accels[0];
-
 	accelIntegral = bound(accelIntegral + accelError * dT * guidanceSettings.AccelPI[GUIDANCESETTINGS_ACCELPI_KI], 
 		-guidanceSettings.AccelPI[GUIDANCESETTINGS_ACCELPI_ILIMIT],
 		guidanceSettings.AccelPI[GUIDANCESETTINGS_ACCELPI_ILIMIT]);
 	accelCommand = (accelError * guidanceSettings.AccelPI[GUIDANCESETTINGS_ACCELPI_KP] + 
-		accelIntegral);
+		 accelIntegral);
 
-	stabDesired.Pitch = bound(-accelCommand,
-		-guidanceSettings.MaxRollPitch, guidanceSettings.MaxRollPitch);
+	stabDesired.Pitch = bound(guidanceSettings.PitchLimit[GUIDANCESETTINGS_PITCHLIMIT_NEUTRAL] +
+		-accelCommand,
+		guidanceSettings.PitchLimit[GUIDANCESETTINGS_PITCHLIMIT_MIN],
+		guidanceSettings.PitchLimit[GUIDANCESETTINGS_PITCHLIMIT_MAX]);
 
 	// Compute desired power command
 	powerError =  -( velocityDesired.Down - velocityActual.Down ) * guidanceSettings.ClimbRateBoostFactor + speedError;
 	powerIntegral =	bound(powerIntegral + powerError * dT * guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_KI], 
 		-guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT],
-		guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT]);	
-	powerCommand = 0.5+(powerError * guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_KP] +
+		guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_ILIMIT]);
+	powerCommand = (powerError * guidanceSettings.PowerPI[GUIDANCESETTINGS_POWERPI_KP] +
 		powerIntegral);
 	
-	stabDesired.Throttle = bound(powerCommand, 0, 1);
+	stabDesired.Throttle = bound( guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_NEUTRAL] +
+		powerCommand,
+		guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MIN],
+		guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MAX]);
 
 	if(guidanceSettings.ThrottleControl == GUIDANCESETTINGS_THROTTLECONTROL_FALSE) {
 		// For now override throttle with manual control.  Disable at your risk, quad goes to China.
@@ -521,16 +528,23 @@ static void updateVtolDesiredAttitude()
 		downVelIntegral -
 		nedAccel.Down * guidanceSettings.VerticalVelPID[GUIDANCESETTINGS_VERTICALVELPID_KD]);
 	
-	stabDesired.Throttle = bound(downCommand, 0, 1);
+	stabDesired.Throttle = bound(guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_NEUTRAL] +
+		downCommand,
+		guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MIN],
+		guidanceSettings.ThrottleLimit[GUIDANCESETTINGS_THROTTLELIMIT_MAX]);
 	
 	// Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
 	// craft should move similarly for 5 deg roll versus 5 deg pitch
-	stabDesired.Pitch = bound(-northCommand * cosf(attitudeActual.Yaw * M_PI / 180) + 
-		-eastCommand * sinf(attitudeActual.Yaw * M_PI / 180),
-		-guidanceSettings.MaxRollPitch, guidanceSettings.MaxRollPitch);
-	stabDesired.Roll = bound(-northCommand * sinf(attitudeActual.Yaw * M_PI / 180) + 
-		eastCommand * cosf(attitudeActual.Yaw * M_PI / 180),
-		-guidanceSettings.MaxRollPitch, guidanceSettings.MaxRollPitch);
+	stabDesired.Pitch = bound(guidanceSettings.PitchLimit[GUIDANCESETTINGS_PITCHLIMIT_NEUTRAL] +
+		(-northCommand * cosf(attitudeActual.Yaw * M_PI / 180)) +
+		(-eastCommand * sinf(attitudeActual.Yaw * M_PI / 180)),
+		guidanceSettings.PitchLimit[GUIDANCESETTINGS_PITCHLIMIT_MIN],
+		guidanceSettings.PitchLimit[GUIDANCESETTINGS_PITCHLIMIT_MAX]);
+	stabDesired.Roll = bound(guidanceSettings.RollLimit[GUIDANCESETTINGS_ROLLLIMIT_NEUTRAL] +
+		(-northCommand * sinf(attitudeActual.Yaw * M_PI / 180)) +
+		(eastCommand * cosf(attitudeActual.Yaw * M_PI / 180)),
+		guidanceSettings.RollLimit[GUIDANCESETTINGS_ROLLLIMIT_MIN],
+		guidanceSettings.RollLimit[GUIDANCESETTINGS_ROLLLIMIT_MAX] );
 	
 	if(guidanceSettings.ThrottleControl == GUIDANCESETTINGS_THROTTLECONTROL_FALSE) {
 		// For now override throttle with manual control.  Disable at your risk, quad goes to China.

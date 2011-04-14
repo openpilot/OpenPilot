@@ -1,3 +1,0 @@
-pios_board.h should be the same as the pios_board.h of the PipX main FW,
-and should be migrated to a PipX include in the main PiOS directory once
-we move this to the main SVN.

@@ -119,6 +119,9 @@
 
 /* wrap operation to be able to do operations on vector/matrix in jafar */
 %template(add) jafar::jmath::add<jblas::vec>;
+%template(add) jafar::jmath::add<jblas::vec2>;
+%template(add) jafar::jmath::add<jblas::vec3>;
+%template(add) jafar::jmath::add<jblas::vec4>;
 %template(sub) jafar::jmath::sub<jblas::vec>;
 %template(sub) jafar::jmath::sub<jblas::vec2>;
 %template(sub) jafar::jmath::sub<jblas::vec3>;
@@ -128,6 +131,7 @@
 %template(div) jafar::jmath::div<jblas::vec, double>;
 %template(div) jafar::jmath::div<jblas::vec, int>;
 %template(assignVec3) jafar::jmath::assignVec3<jblas::vec,jblas::vec3>;
+
 /* matrix */
 %template(add) jafar::jmath::add<jblas::mat>;
 %template(sub) jafar::jmath::sub<jblas::mat>;

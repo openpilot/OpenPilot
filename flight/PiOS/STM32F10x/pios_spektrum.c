@@ -45,7 +45,7 @@
 
 /* Local Variables, use pios_usart */
 static uint16_t CaptureValue[12],CaptureValueTemp[12];
-static uint8_t prev_byte = 0xFF, sync = 0, bytecount = 0, frame_error=0, byte_array[20] = { 0 };
+static uint8_t prev_byte = 0xFF, sync = 0, bytecount = 0, datalength=0, frame_error=0, byte_array[20] = { 0 };
 
 uint8_t sync_of = 0;
 
@@ -189,7 +189,7 @@ uint8_t PIOS_SPEKTRUM_Bind(void)
 int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 {
 	static uint16_t channel = 0; /*, sync_word = 0;*/
-	uint8_t channeln = 0, frame = 0, datalength=0;
+	uint8_t channeln = 0, frame = 0;
 	uint16_t data = 0;
 	byte_array[bytecount] = b;
 	bytecount++;

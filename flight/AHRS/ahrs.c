@@ -95,6 +95,8 @@ void altitude_callback(AhrsObjHandle obj);
 void calibration_callback(AhrsObjHandle obj);
 void gps_callback(AhrsObjHandle obj);
 void settings_callback(AhrsObjHandle obj);
+void affine_rotate(float scale[3][4], float rotation[3]);
+void calibration(float result[3], float scale[3][4], float arg[3]);
 
 /* Bootloader related functions and var*/
 static uint32_t	iap_calc_crc(void);
@@ -696,7 +698,7 @@ bool get_accel_gyro_data()
 	return true;
 }
 
-/*
+/**
  * @brief Perform calibration of a 3-axis field sensor using an affine transformation
  * matrix.
  *
@@ -717,6 +719,36 @@ void calibration(float result[3], float scale[3][4], float arg[3])
 		}
 		// fourth column: arg has an implicit w value of 1.0f.
 		result[row] += scale[row][col];
+	}
+}
+
+/**
+ * @brief Scale an affine transformation matrix by a rotation, defined by a
+ * rotation vector.  scale <- rotation * scale
+ *
+ * @param scale[in,out] The affine transformation matrix to be rotated
+ * @param rotation[in] The rotation vector defining the rotation
+ */
+void affine_rotate(float scale[3][4], float rotation[3])
+{
+	// Rotate the scale factor matrix in-place
+	float rmatrix[3][3];
+	Rv2Rot(rotation, rmatrix);
+
+	float ret[3][4];
+	for (int row = 0; row < 3; ++row) {
+		for (int col = 0; col < 4; ++col) {
+			ret[row][col] = 0.0f;
+			for (int i = 0; i < 3; ++i) {
+				ret[row][col] += rmatrix[row][i] * scale[i][col];
+			}
+		}
+	}
+	// copy output to argument
+	for (int row = 0; row < 3; ++row) {
+		for (int col = 0; col < 4; ++col) {
+			scale[row][col] = ret[row][col];
+		}
 	}
 }
 
@@ -1088,6 +1120,16 @@ void calibration_callback(AhrsObjHandle obj)
 
 		accel_data.calibration.scale[1][2] = cal.accel_ortho[2];
 		accel_data.calibration.scale[2][1] = cal.accel_ortho[2];
+
+#if 0
+		// TODO: Enable after v1.0 feature freeze.
+		float rotation[3] = { cal.accel_rotation[0],
+				cal.accel_rotation[1],
+				cal.accel_rotation[2],
+		};
+
+		affine_rotate(accel_data.calibration.scale, rotation);
+#endif
 
 		for(int ct=0; ct<3; ct++)
 		{

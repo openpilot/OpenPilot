@@ -8,7 +8,7 @@
  * @{
  * @addtogroup Config plugin
  * @{
- * @brief Impliments low-level calibration algorithms
+ * @brief Implements low-level calibration algorithms
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -39,13 +39,23 @@
 #include <iostream>
 #include <iomanip>
 
+#if defined(__APPLE__) || defined(_WIN32)
+  // Qt bug work around
+  #ifndef isnan
+	extern "C" int isnan(double);
+  #endif
+  #ifndef isinf
+	extern "C" int isinf(double);
+  #endif
+#endif
+
 /*
  * Alas, this implementation is a fairly direct copy of the contents of the
  * following papers.  You don't have a chance at understanding it without
  * reading these first.  Any bugs should be presumed to be JB's fault rather
  * than Alonso and Shuster until proven otherwise.
  *
- * Reference [1]: "A New Algorithm for Attitude-independant magnetometer
+ * Reference [1]: "A New Algorithm for Attitude-independent magnetometer
  * calibration", Robert Alonso and Malcolmn D. Shuster, Flight Mechanics/
  * Estimation Theory Symposium, NASA Goddard, 1994, pp 513-527
  *
@@ -237,7 +247,7 @@ theta_to_sane(const Matrix<double, 6, 1>& theta)
  *       b is the bias in the global reference frame
  *       \epsilon_k is the noise at the kth sample
  * This implementation makes the assumption that \epsilon is a constant white,
- * guassian noise source that is common to all k.  The misalignment matrix O
+ * gaussian noise source that is common to all k.  The misalignment matrix O
  * is not computed, and the off-diagonal elements of D, corresponding to the
  * misalignment scale factors are not either.
  *
@@ -385,7 +395,7 @@ E_theta(const Matrix<double, 9, 1>& theta)
 }
 
 /**
- * Compute the gradiant of the squared norm of b with respect to theta.  Note
+ * Compute the gradient of the squared norm of b with respect to theta.  Note
  * that b itself is just a function of theta.  Therefore, this function
  * computes \frac{\delta,\delta\theta'}\left|b(\theta')\right|
  * From eq 55 of [2].
@@ -409,12 +419,12 @@ dnormb_dtheta(const Matrix<double, 9, 1>& theta)
 			-2*IE_inv_c.coeff(1)*IE_inv_c.coeff(2)).finished();
 }
 
-// The gradiant of the cost function with respect to theta, at a particular
+// The gradient of the cost function with respect to theta, at a particular
 // value of theta.
 // @param centerL: The center of the samples theta'
 // @param centerMag: The center of the magnitude data
 // @param theta: The estimate of the bias and scale factor
-// @return the gradiant of the cost function with respect to the
+// @return the gradient of the cost function with respect to the
 // current value of the estimate, theta'
 Matrix<double, 9, 1>
 dJ_dtheta(const Matrix<double, 9, 1>& centerL, 
@@ -452,12 +462,12 @@ dJ_dtheta(const Matrix<double, 9, 1>& centerL,
  *       b is the bias in the global reference frame
  *       \epsilon_k is the noise at the kth sample
  *
- * After computing the scale factor and bias matricies, the optimal estimate is
+ * After computing the scale factor and bias matrices, the optimal estimate is
  * given by 
  * \tilde{B}_k = (I_{3x3} + D)B_k - b
  *
  * This implementation makes the assumption that \epsilon is a constant white,
- * guassian noise source that is common to all k.  The misalignment matrix O
+ * gaussian noise source that is common to all k.  The misalignment matrix O
  * is not computed.
  *
  * @param bias[out] The computed bias, in the global frame
@@ -477,7 +487,7 @@ void twostep_bias_scale(Vector3f& bias,
 {
 	// Define L_k by eq 51 for k = 1 .. n_samples
 	Matrix<double, Dynamic, 9> fullSamples(n_samples, 9);
-	// \hbar{L} by eq 52, simplified by obesrving that the common noise term
+	// \hbar{L} by eq 52, simplified by observing that the common noise term
 	// makes this a simple average.
 	Matrix<double, 1, 9> centerSample = Matrix<double, 1, 9>::Zero();
 	// Define the sample differences z_k by eq 23 a)
@@ -534,11 +544,11 @@ void twostep_bias_scale(Vector3f& bias,
 	// By eq 57a
 	P_theta_theta_inv.ldlt().solve(estimateSummation, &estimate);
 
-	// estimate i+1 = estimate_i - Fisher^{-1}(at estimate_i)*gradiant(theta)
+	// estimate i+1 = estimate_i - Fisher^{-1}(at estimate_i)*gradient(theta)
 	// Fisher^{-1} = \tilde{Fisher}^-1 + \hbar{Fisher}^{-1}
 	size_t count = 0;
 	double eta = 10000;
-	while (count++ < 2000 && eta > 1e-8) {
+	while (count++ < 200 && eta > 1e-8) {
 		static bool warned = false;
 		if (hasNaN(estimate)) {
 			std::cout << "WARNING: found NaN at time " << count << "\n";
@@ -583,17 +593,26 @@ void twostep_bias_scale(Vector3f& bias,
 	std::cout << "terminated at eta = " << eta 
 		<< " after " << count << " iterations\n";
 	
-	// Transform the estimated parameters from [c | E] back into [b | D].
-	// See eq 63-65
-	SelfAdjointEigenSolver<Matrix3d> eig_E(E_theta(estimate));
-	Vector3d S = eig_E.eigenvalues();
-	Vector3d W; W << -1 + sqrt(1 + S.coeff(0)),
-			 -1 + sqrt(1 + S.coeff(1)),
-			 -1 + sqrt(1 + S.coeff(2));
-	scale = (eig_E.eigenvectors() * W.asDiagonal() * 
-			eig_E.eigenvectors().transpose()) .cast<float>();
+	if (!isnan(eta) && !isinf(eta)) {
+		// Transform the estimated parameters from [c | E] back into [b | D].
+		// See eq 63-65
+		SelfAdjointEigenSolver<Matrix3d> eig_E(E_theta(estimate));
+		Vector3d S = eig_E.eigenvalues();
+		Vector3d W; W << -1 + sqrt(1 + S.coeff(0)),
+				 -1 + sqrt(1 + S.coeff(1)),
+				 -1 + sqrt(1 + S.coeff(2));
+		scale = (eig_E.eigenvectors() * W.asDiagonal() *
+				eig_E.eigenvectors().transpose()) .cast<float>();
 
-	(Matrix3f::Identity() + scale).ldlt().solve(
-			estimate.start<3>().cast<float>(), &bias);
+		(Matrix3f::Identity() + scale).ldlt().solve(
+				estimate.start<3>().cast<float>(), &bias);
+	}
+	else {
+		// return nonsense data.  The eigensolver can fall ingo
+		// an infinite loop otherwise.
+		// TODO: Add error code return
+		scale = Matrix3f::Ones()*std::numeric_limits<float>::quiet_NaN();
+		bias = Vector3f::Zero();
+	}
 }
 

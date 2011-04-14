@@ -90,17 +90,20 @@ V: http://www.youtube.com/watch?v=QtaefhmGbio
 M: Dave's First Flight.  Pathetically delayed.
 C: David Ankers
 D: March 2011
-V: (to come)
-
-M: First CopterControl flight on a Tri
-C: ?
-D: ?
-V: 
+V: http://vimeo.com/22221798
 
 M: First CopterControl flight on a Hexa
 C: Edouard Lafargue
+
 D: March 2011
+
 V: http://vimeo.com/21476466
+
+
+M: First CopterControl flight on a Tri
+C: Gary Mortimer and the Scorpion
+D: March 2011
+V: http://vimeo.com/22104334
 
 M: First CopterControl flight on a Flybarless Heli
 C: ?

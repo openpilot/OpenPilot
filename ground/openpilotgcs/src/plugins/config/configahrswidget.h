@@ -99,6 +99,29 @@ private:
 
     void computeGyroDrift();
 
+
+    // Saved parameters for calibration.  In the event of a calibration failure,
+    // the old parameters will be restored.
+    Eigen::Vector3f saved_gyro_bias;
+
+    Eigen::Vector3f saved_accel_bias;
+    Eigen::Vector3f saved_accel_scale;
+    Eigen::Vector3f saved_accel_ortho;
+    Eigen::Vector3f saved_accel_rotation;
+
+    Eigen::Vector3f saved_mag_scale;
+    Eigen::Vector3f saved_mag_bias;
+
+    bool
+    updateScaleFactors(UAVObjectField *scale,
+    		UAVObjectField *bias ,
+    		UAVObjectField *ortho,
+    		const Eigen::Matrix3f& updateScale,
+    		const Eigen::Vector3f& updateBias,
+    		const Eigen::Vector3f& oldScale,
+    		const Eigen::Vector3f& oldBias,
+    		const Eigen::Vector3f& oldOrtho = Eigen::Vector3f::Zero());
+
 private slots:
     void enableHomeLocSave(UAVObject *obj);
     void launchAHRSCalibration();
@@ -111,11 +134,14 @@ private slots:
     void ahrsSettingsSaveSD();
     void savePositionData();
     void computeScaleBias();
-    void sixPointCalibrationMode();
+    void multiPointCalibrationMode();
+//    void sixPointCalibrationMode();      // this function no longer exists
     void attitudeRawUpdated(UAVObject * obj);
     void accelBiasattitudeRawUpdated(UAVObject*);
     void driftCalibrationAttitudeRawUpdated(UAVObject*);
     void launchGyroDriftCalibration();
+    void resetCalibrationDefaults();
+    void cacheCurrentCalibration();
 
 protected:
     void showEvent(QShowEvent *event);

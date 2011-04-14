@@ -673,10 +673,10 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.3075467"
-     inkscape:cx="64.615075"
-     inkscape:cy="52.121615"
-     inkscape:current-layer="g3368"
+     inkscape:zoom="4.6775774"
+     inkscape:cx="16.739671"
+     inkscape:cy="42.715036"
+     inkscape:current-layer="foreground"
      id="namedview3608"
      showgrid="false"
      inkscape:window-width="1366"
@@ -891,7 +891,7 @@
        width="7.7278037"
        height="13.085983"
        x="557.29553"
-       y="346.98621"
+       y="347.21689"
        inkscape:label="#rect4552-27" />
     <rect
        y="395.55762"
@@ -2679,15 +2679,15 @@
          sodipodi:role="line">Stabilization</tspan></text>
     <text
        id="text4917"
-       y="3.1758516"
+       y="5.1758518"
        x="63.426441"
        style="font-size:44.39514542px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
        xml:space="preserve"><tspan
          style="font-size:2.48068142px;writing-mode:tb-rl;fill:#ffffff;fill-opacity:1"
          y="63.426441"
-         x="3.1758516"
+         x="5.1758518"
          id="tspan4919"
-         sodipodi:role="line">AHRS</tspan></text>
+         sodipodi:role="line">INS</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-weight:normal;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Bitstream Vera Sans"
@@ -2749,7 +2749,7 @@
        id="nolink"
        inkscape:label="#g10909">
       <rect
-         style="fill:#453e3e;fill-opacity:0.86363637;fill-rule:evenodd;stroke:#000000;stroke-width:0.99921262000000000;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         style="fill:#453e3e;fill-opacity:0.86363639;fill-rule:evenodd;stroke:#000000;stroke-width:0.99921262;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
          id="rect3370"
          width="93.746948"
          height="79.063599"

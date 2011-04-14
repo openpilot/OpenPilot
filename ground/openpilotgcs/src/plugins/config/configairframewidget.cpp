@@ -834,7 +834,7 @@ void ConfigAirframeWidget::requestAircraftUpdate()
             field = obj->getField(QString("VTOLMotorS"));
             Q_ASSERT(field);
             m_aircraft->multiMotor3->setCurrentIndex(m_aircraft->multiMotor3->findText(field->getValue().toString()));
-            field = obj->getField(QString("FixedWingYaw"));
+            field = obj->getField(QString("FixedWingYaw1"));
             Q_ASSERT(field);
             m_aircraft->triYawChannel->setCurrentIndex(m_aircraft->multiMotor3->findText(field->getValue().toString()));
 

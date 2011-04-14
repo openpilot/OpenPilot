@@ -56,6 +56,11 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 
     connect(m_config->refreshPorts, SIGNAL(clicked()), this, SLOT(getSerialPorts()));
 
+    // And check whether by any chance we are not already connected
+    if (telMngr->isConnected())
+        onAutopilotConnect();
+
+
 }
 
 
@@ -113,7 +118,7 @@ void UploaderGadgetWidget::onAutopilotConnect(){
 }
 
 /**
-  Enables widget buttons if autopilot connected
+  Enables widget buttons if autopilot disconnected
   */
 void UploaderGadgetWidget::onAutopilotDisconnect(){
     m_config->haltButton->setEnabled(false);
@@ -385,6 +390,9 @@ void UploaderGadgetWidget::systemRescue()
             delete dfu;
             dfu = NULL;
         }
+        // Avoid dumb users pressing Rescue twice. It can happen.
+        m_config->rescueButton->setEnabled(false);
+
         // Now we're good to go:
         clearLog();
         log("**********************************************************");
@@ -418,6 +426,7 @@ void UploaderGadgetWidget::systemRescue()
             delete dfu;
             dfu = NULL;
             cm->resumePolling();
+            m_config->rescueButton->setEnabled(true);
             return;
         }
         if(!dfu->findDevices() || (dfu->numberOfDevices != 1))
@@ -427,6 +436,7 @@ void UploaderGadgetWidget::systemRescue()
             delete dfu;
             dfu = NULL;
             cm->resumePolling();
+            m_config->rescueButton->setEnabled(true);
             return;
         }
         rescueStep = RESCUE_POWER1;
@@ -449,10 +459,13 @@ void UploaderGadgetWidget::systemRescue()
         repaint();
         if(!dfu->findDevices())
         {
+            // We will only end up here in case somehow all the boards
+            // disappeared, including the one we detected earlier.
             log("Could not detect any board, aborting!");
             delete dfu;
             dfu = NULL;
             cm->resumePolling();
+            m_config->rescueButton->setEnabled(true);
             return;
         }
         log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
@@ -461,6 +474,7 @@ void UploaderGadgetWidget::systemRescue()
             delete dfu;
             dfu = NULL;
             cm->resumePolling();
+            m_config->rescueButton->setEnabled(true);
             return;
         }
         for(int i=0;i<dfu->numberOfDevices;i++) {

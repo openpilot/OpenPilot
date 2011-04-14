@@ -38,6 +38,9 @@ uint16_t ECEF2LLA(double ECEF[3], double LLA[3]);
 
 void RneFromLLA(double LLA[3], float Rne[3][3]);
 
+    // ****** find rotation matrix from rotation vector
+void Rv2Rot(float Rv[3], float R[3][3]);
+
 	// ****** find roll, pitch, yaw from quaternion ********
 void Quaternion2RPY(const float q[4], float rpy[3]);
 

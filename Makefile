@@ -266,7 +266,7 @@ uavobjects_clean:
 #
 ##############################
 
-FW_TARGETS := openpilot ahrs coptercontrol pipxtreme
+FW_TARGETS := openpilot ahrs coptercontrol pipxtreme ins
 BL_TARGETS := $(addprefix bl_, $(FW_TARGETS))
 
 .PHONY: all_fw all_fw_clean
@@ -376,6 +376,31 @@ bl_pipxtreme_%:
 bl_pipxtreme_clean:
 	$(V0) @echo " CLEAN     $@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bl_pipxtreme
+
+.PHONY: ins
+ins: ins_bin
+
+ins_%: uavobjects_flight
+	$(V1) mkdir -p $(BUILD_DIR)/ins/dep
+	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/ins" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/INS $*
+
+.PHONY: ins_clean
+ins_clean:
+	$(V0) @echo " CLEAN     $@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/ins
+
+.PHONY: bl_ins
+bl_ins: bl_ins_elf
+
+bl_ins_%:
+	$(V1) mkdir -p $(BUILD_DIR)/bl_ins/dep
+	$(V1) $(MAKE) -r --no-print-directory OUTDIR="$(BUILD_DIR)/bl_ins" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" -C $(ROOT_DIR)/flight/Bootloaders/INS $*
+
+.PHONY: bl_ins_clean
+bl_ins_clean:
+	$(V0) @echo " CLEAN     $@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/bl_ins
+
 
 .PHONY: sim_posix
 sim_posix: sim_posix_elf

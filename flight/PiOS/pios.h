@@ -98,13 +98,23 @@
 #if defined(PIOS_INCLUDE_HMC5843)
 #include <pios_hmc5843.h>
 #endif
+#if defined(PIOS_INCLUDE_HMC5883)
+#include <pios_hmc5883.h>
+#endif
 #if defined(PIOS_INCLUDE_I2C_ESC)
 #include <pios_i2c_esc.h>
+#endif
+#if defined(PIOS_INCLUDE_IMU3000)
+#include <pios_imu3000.h>
 #endif
 #include <pios_iap.h>
 
 #if defined(PIOS_INCLUDE_ADXL345)
 #include <pios_adxl345.h>
+#endif
+
+#if defined(PIOS_INCLUDE_BMA180)
+#include <pios_bma180.h>
 #endif
 
 #if defined(PIOS_INCLUDE_FLASH)

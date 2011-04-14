@@ -51,7 +51,7 @@
 #endif
 
 #ifndef PIOS_USB_VERSION_ID
-#define PIOS_USB_VERSION_ID		0x0401	/* OpenPilot (01) Bootloader (01) */
+#define PIOS_USB_VERSION_ID		0x0401	/* CopterControl (04) Bootloader (01) */
 #endif
 
 /* Internal defines which are used by PIOS USB HID (don't touch) */

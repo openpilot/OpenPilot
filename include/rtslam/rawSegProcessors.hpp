@@ -119,8 +119,8 @@ namespace rtslam {
 					lastDsegImage = rawPtr;
 				}
 
-            app_seg_ptr_t targetAppSpec = SPTR_CAST<AppearanceSegment>(targetApp);
-            app_seg_ptr_t appSpec = SPTR_CAST<AppearanceSegment>(app);
+				app_img_seg_ptr_t targetAppSpec = SPTR_CAST<AppearanceImageSegment>(targetApp);
+				app_img_seg_ptr_t appSpec = SPTR_CAST<AppearanceImageSegment>(app);
 
             dseg::SegmentsSet setin, setout;
 
@@ -164,7 +164,8 @@ namespace rtslam {
 
       public:
          struct detector_params_t {
-            // RANSAC
+				int patchSize;  ///<       descriptor patch size
+				// RANSAC
             double measStd;       ///<       measurement noise std deviation
             double measVar;       ///<       measurement noise variance
             // HDSEG
@@ -172,19 +173,20 @@ namespace rtslam {
          } params;
 
       public:
-         HDsegDetector(int hierarchyLevel, double measStd,
+			HDsegDetector(int patchSize, int hierarchyLevel, double measStd,
             boost::shared_ptr<DescriptorFactoryAbstract> const &descFactory):
             detector(), descFactory(descFactory)
          {
-            params.hierarchyLevel = hierarchyLevel;
+				params.patchSize = patchSize;
+				params.hierarchyLevel = hierarchyLevel;
             params.measStd = measStd;
             params.measVar = measStd * measStd;
          }
 
-         bool detect(const boost::shared_ptr<RawImage> & rawData, const image::ConvexRoi &roi, boost::shared_ptr<FeatureSegment> & featPtr)
+			bool detect(const boost::shared_ptr<RawImage> & rawData, const image::ConvexRoi &roi, boost::shared_ptr<FeatureImageSegment> & featPtr)
          {
             bool ret = false;
-            featPtr.reset(new FeatureSegment());
+				featPtr.reset(new FeatureImageSegment());
             featPtr->measurement.std(params.measStd);
 
 				dseg::SegmentsSet set;
@@ -230,7 +232,17 @@ namespace rtslam {
 						featPtr->measurement.x(3) = set.segmentAt(bestId)->y2();
 						featPtr->measurement.matchScore = 1;
 
-						featPtr->appearancePtr.reset(new AppearanceSegment(set.segmentAt(bestId)));
+						featPtr->appearancePtr.reset(new AppearanceImageSegment(params.patchSize, params.patchSize, JfrImage_CS_GRAY, set.segmentAt(bestId)));
+
+						// extract appearance
+						vec pix = featPtr->measurement.x();
+						pix[0] = ( pix[0] + pix[2] )/2;
+						pix[1] = ( pix[1] + pix[3] )/2;
+						boost::shared_ptr<AppearanceImageSegment> appPtr = SPTR_CAST<AppearanceImageSegment>(featPtr->appearancePtr);
+						rawData->img->extractPatch(appPtr->patch, (int)pix(0), (int)pix(1), params.patchSize, params.patchSize);
+						appPtr->offset.x()(0) = pix(0) - ((int)pix(0) + 0.5);
+						appPtr->offset.x()(1) = pix(1) - ((int)pix(1) + 0.5);
+						appPtr->offset.P() = jblas::zero_mat(2); // by definition this is our landmark projection
 
 						ret = true;
 					}
@@ -239,17 +251,17 @@ namespace rtslam {
 				return ret;
          }
 
-         void fillDataObs(const boost::shared_ptr<FeatureSegment> & featPtr, boost::shared_ptr<ObservationAbstract> & obsPtr)
+			void fillDataObs(const boost::shared_ptr<FeatureImageSegment> & featPtr, boost::shared_ptr<ObservationAbstract> & obsPtr)
          {
             // extract observed appearance
-            app_seg_ptr_t app_src = SPTR_CAST<AppearanceSegment>(featPtr->appearancePtr);
-            app_seg_ptr_t app_dst = SPTR_CAST<AppearanceSegment>(obsPtr->observedAppearance);
+				app_img_seg_ptr_t app_src = SPTR_CAST<AppearanceImageSegment>(featPtr->appearancePtr);
+				app_img_seg_ptr_t app_dst = SPTR_CAST<AppearanceImageSegment>(obsPtr->observedAppearance);
             app_dst->setHypothesis(app_src->hypothesis());
-//            app_src->patch.copyTo(app_dst->patch);
+				app_src->patch.copyTo(app_dst->patch);
             /*app_src->patch.copy(app_dst->patch, (app_src->patch.width()-app_dst->patch.width())/2,
                   (app_src->patch.height()-app_dst->patch.height())/2, 0, 0,
                   app_dst->patch.width(), app_dst->patch.height());*/
-            //app_dst->offset = app_src->offset;
+				app_dst->offset = app_src->offset;
 
             // create descriptor
             descriptor_ptr_t descPtr(descFactory->createDescriptor());

@@ -699,6 +699,30 @@ src/hardwareSensorCameraFirewire.cpp.s:
 	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareSensorCameraFirewire.cpp.s
 .PHONY : src/hardwareSensorCameraFirewire.cpp.s
 
+src/hardwareSensorGpsGenom.o: src/hardwareSensorGpsGenom.cpp.o
+.PHONY : src/hardwareSensorGpsGenom.o
+
+# target to build an object file
+src/hardwareSensorGpsGenom.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareSensorGpsGenom.cpp.o
+.PHONY : src/hardwareSensorGpsGenom.cpp.o
+
+src/hardwareSensorGpsGenom.i: src/hardwareSensorGpsGenom.cpp.i
+.PHONY : src/hardwareSensorGpsGenom.i
+
+# target to preprocess a source file
+src/hardwareSensorGpsGenom.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareSensorGpsGenom.cpp.i
+.PHONY : src/hardwareSensorGpsGenom.cpp.i
+
+src/hardwareSensorGpsGenom.s: src/hardwareSensorGpsGenom.cpp.s
+.PHONY : src/hardwareSensorGpsGenom.s
+
+# target to generate assembly for a file
+src/hardwareSensorGpsGenom.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/hardwareSensorGpsGenom.cpp.s
+.PHONY : src/hardwareSensorGpsGenom.cpp.s
+
 src/innovation.o: src/innovation.cpp.o
 .PHONY : src/innovation.o
 
@@ -1395,29 +1419,29 @@ src/sensorAbstract.cpp.s:
 	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorAbstract.cpp.s
 .PHONY : src/sensorAbstract.cpp.s
 
-src/sensorPinHole.o: src/sensorPinHole.cpp.o
-.PHONY : src/sensorPinHole.o
+src/sensorPinhole.o: src/sensorPinhole.cpp.o
+.PHONY : src/sensorPinhole.o
 
 # target to build an object file
-src/sensorPinHole.cpp.o:
-	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorPinHole.cpp.o
-.PHONY : src/sensorPinHole.cpp.o
+src/sensorPinhole.cpp.o:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorPinhole.cpp.o
+.PHONY : src/sensorPinhole.cpp.o
 
-src/sensorPinHole.i: src/sensorPinHole.cpp.i
-.PHONY : src/sensorPinHole.i
+src/sensorPinhole.i: src/sensorPinhole.cpp.i
+.PHONY : src/sensorPinhole.i
 
 # target to preprocess a source file
-src/sensorPinHole.cpp.i:
-	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorPinHole.cpp.i
-.PHONY : src/sensorPinHole.cpp.i
+src/sensorPinhole.cpp.i:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorPinhole.cpp.i
+.PHONY : src/sensorPinhole.cpp.i
 
-src/sensorPinHole.s: src/sensorPinHole.cpp.s
-.PHONY : src/sensorPinHole.s
+src/sensorPinhole.s: src/sensorPinhole.cpp.s
+.PHONY : src/sensorPinhole.s
 
 # target to generate assembly for a file
-src/sensorPinHole.cpp.s:
-	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorPinHole.cpp.s
-.PHONY : src/sensorPinHole.cpp.s
+src/sensorPinhole.cpp.s:
+	cd /home/bhautboi/jafar && $(MAKE) -f modules/rtslam/CMakeFiles/rtslam.dir/build.make modules/rtslam/CMakeFiles/rtslam.dir/src/sensorPinhole.cpp.s
+.PHONY : src/sensorPinhole.cpp.s
 
 src/visibilityMap.o: src/visibilityMap.cpp.o
 .PHONY : src/visibilityMap.o
@@ -2025,6 +2049,9 @@ help:
 	@echo "... src/hardwareSensorCameraFirewire.o"
 	@echo "... src/hardwareSensorCameraFirewire.i"
 	@echo "... src/hardwareSensorCameraFirewire.s"
+	@echo "... src/hardwareSensorGpsGenom.o"
+	@echo "... src/hardwareSensorGpsGenom.i"
+	@echo "... src/hardwareSensorGpsGenom.s"
 	@echo "... src/innovation.o"
 	@echo "... src/innovation.i"
 	@echo "... src/innovation.s"
@@ -2112,9 +2139,9 @@ help:
 	@echo "... src/sensorAbstract.o"
 	@echo "... src/sensorAbstract.i"
 	@echo "... src/sensorAbstract.s"
-	@echo "... src/sensorPinHole.o"
-	@echo "... src/sensorPinHole.i"
-	@echo "... src/sensorPinHole.s"
+	@echo "... src/sensorPinhole.o"
+	@echo "... src/sensorPinhole.i"
+	@echo "... src/sensorPinhole.s"
 	@echo "... src/visibilityMap.o"
 	@echo "... src/visibilityMap.i"
 	@echo "... src/visibilityMap.s"

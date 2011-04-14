@@ -17,6 +17,12 @@
 #include "rtslam/gaussian.hpp"
 #include "boost/shared_ptr.hpp"
 
+
+#ifdef HAVE_MODULE_DSEG
+	#include "dseg/SegmentsSet.hpp"
+	#include "dseg/SegmentHypothesis.hpp"
+#endif
+
 namespace jafar {
 	namespace rtslam {
 
@@ -47,7 +53,9 @@ namespace jafar {
 				void computePatchIntegrals();
 		};
 
-      class AppearanceImageSegment;
+#ifdef HAVE_MODULE_DSEG
+
+		class AppearanceImageSegment;
       typedef boost::shared_ptr<AppearanceImageSegment> app_img_seg_ptr_t;
 
       /** Appearence for matching
@@ -59,23 +67,47 @@ namespace jafar {
          public:
             image::Image patch;
             unsigned int patchSum;
-            unsigned int patchSquareSum;
+				unsigned int patchSquareSum;
             Gaussian offset; ///< offset between the center of the patch and the real position of the feature
-         public:
-            AppearanceImageSegment(const image::Image& patch, Gaussian const &offset);
-            AppearanceImageSegment(int width, int height, int depth):
-               patch(width, height, depth, JfrImage_CS_GRAY), offset(2) {
+				dseg::SegmentsSet m_hypothesis;
+			public:
+				AppearanceImageSegment(const image::Image& patch, Gaussian const &offset, dseg::SegmentHypothesis* _hypothesis = NULL);
+				AppearanceImageSegment(int width, int height, int depth, dseg::SegmentHypothesis* _hypothesis = NULL):
+					patch(width, height, depth, JfrImage_CS_GRAY), offset(2) {
+					if(_hypothesis != NULL)m_hypothesis.addSegment(_hypothesis);
 //					cout << "Created patch with " << width << "x" << height << " pixels; depth: " << depth << "; color space: " << JfrImage_CS_GRAY << endl;
             }
             virtual ~AppearanceImageSegment();
             virtual AppearanceAbstract* clone();
 
+				dseg::SegmentHypothesis* hypothesis() {return m_hypothesis.segmentAt(0);}
+				void setHypothesis(dseg::SegmentHypothesis* _hypothesis)
+				{
+					m_hypothesis = dseg::SegmentsSet();
+					m_hypothesis.addSegment(_hypothesis);
+				}
+
+				jblas::vec4 realObs()
+				{
+					jblas::vec4 ret;
+					ret.clear();
+					if(m_hypothesis.count() > 0)
+					{
+						ret[0] = m_hypothesis.segmentAt(0)->x1();
+						ret[1] = m_hypothesis.segmentAt(0)->y1();
+						ret[2] = m_hypothesis.segmentAt(0)->x2();
+						ret[3] = m_hypothesis.segmentAt(0)->y2();
+					}
+					return ret;
+				}
          private:
             void computePatchIntegrals();
       };
 	}
 
 }
+
+#endif //HAVE_MODULE_DSEG
 
 #endif // #ifndef __AppearenceImageSimu_H__
 /*

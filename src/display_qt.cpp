@@ -374,7 +374,7 @@ std::cout << "connecting slots" << std::endl;
             bool dispInit2 = events_.visible && !events_.predicted;
 
 //				ObservationPinHoleAnchoredHomogeneousPointsLine* slamObsSpec = static_cast<ObservationPinHoleAnchoredHomogeneousPointsLine*>(slamObs_);
-				AppearanceSegment* appSpec = static_cast<AppearanceSegment*>(slamObs_->observedAppearance.get());
+				AppearanceImageSegment* appSpec = static_cast<AppearanceImageSegment*>(slamObs_->observedAppearance.get());
 				vec4 realObs = appSpec->realObs();
 
             // Build display objects if it is the first time they are displayed

@@ -49,19 +49,20 @@ namespace jafar {
        *
       **/
 
-      AppearanceImageSegment::AppearanceImageSegment(const image::Image& patch, Gaussian const &offset):
+		AppearanceImageSegment::AppearanceImageSegment(const image::Image& patch, Gaussian const &offset, dseg::SegmentHypothesis* _hypothesis):
          offset(offset)
       {
          patch.copyTo(this->patch);
          computePatchIntegrals();
-      }
+			if(_hypothesis != NULL)m_hypothesis.addSegment(_hypothesis);
+		}
 
       AppearanceImageSegment::~AppearanceImageSegment() {
       }
 
       AppearanceAbstract* AppearanceImageSegment::clone()
       {
-         AppearanceImageSegment* app = new AppearanceImageSegment(patch.width(), patch.height(), patch.depth());
+			AppearanceImageSegment* app = new AppearanceImageSegment(patch.width(), patch.height(), patch.depth(), hypothesis());
          patch.copy(app->patch,0,0,0,0);
          app->patchSum = patchSum;
          app->patchSquareSum = patchSquareSum;

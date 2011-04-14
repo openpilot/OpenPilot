@@ -86,7 +86,7 @@
  * STATUS: in progress, do not use for now
  * This uses HDseg powered Segment based slam instead of the usual point based slam.
  */
-#define SEGMENT_BASED 0
+#define SEGMENT_BASED 1
 
 #if SEGMENT_BASED
 	#ifndef HAVE_MODULE_DSEG
@@ -175,28 +175,14 @@ typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, S
 	AppearanceImagePoint, SensorAbstract::PINHOLE, LandmarkAbstract::PNT_AH> PinholeAhpObservationMaker;
 typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, SensorPinhole, LandmarkAnchoredHomogeneousPoint,
 	simu::AppearanceSimu, SensorAbstract::PINHOLE, LandmarkAbstract::PNT_AH> PinholeAhpSimuObservationMaker;
-
 typedef DataManagerOnePointRansac<RawImage, SensorPinhole, FeatureImagePoint, image::ConvexRoi, ActiveSearchGrid, ImagePointHarrisDetector, ImagePointZnccMatcher> DataManager_ImagePoint_Ransac;
 typedef DataManagerOnePointRansac<simu::RawSimu, SensorPinhole, simu::FeatureSimu, image::ConvexRoi, ActiveSearchGrid, simu::DetectorSimu<image::ConvexRoi>, simu::MatcherSimu<image::ConvexRoi> > DataManager_ImagePoint_Ransac_Simu;
 
 #if SEGMENT_BASED
 typedef SegmentObservationMaker<ObservationPinHoleAnchoredHomogeneousPointsLine, SensorPinhole, LandmarkAnchoredHomogeneousPointsLine,
-   AppearanceSegment, SensorAbstract::PINHOLE, LandmarkAbstract::LINE_AHPL> PinholeAhplObservationMaker;
-typedef DataManagerOnePointRansac<RawImage, SensorPinhole, FeatureSegment, image::ConvexRoi, ActiveSegmentSearchGrid, HDsegDetector, DsegMatcher> DataManager_ImageSeg_Test;
+   AppearanceImageSegment, SensorAbstract::PINHOLE, LandmarkAbstract::LINE_AHPL> PinholeAhplObservationMaker;
+typedef DataManagerOnePointRansac<RawImage, SensorPinhole, FeatureImageSegment, image::ConvexRoi, ActiveSegmentSearchGrid, HDsegDetector, DsegMatcher> DataManager_ImageSeg_Test;
 #endif
-
-int mode = 0;
-time_t rseed;
-
-
-/** ############################################################################
- * #############################################################################
- * program parameters
- * ###########################################################################*/
-
-enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iVerbose, iMap, iRobot, iTrigger, iGps, iSimu, iExport, nIntOpts };
-int intOpts[nIntOpts] = {0};
-const int nFirstIntOpt = 0, nLastIntOpt = nIntOpts-1;
 
 enum { fFreq = 0, fShutter, fHeading, nFloatOpts };
 double floatOpts[nFloatOpts] = {0.0};
@@ -760,15 +746,15 @@ void demo_slam01_main(world_ptr_t *world)
    {
       boost::shared_ptr<DescriptorFactoryAbstract> descFactory;
       #if SEGMENT_BASED
-/*
-         if (configEstimation.MULTIVIEW_DESCRIPTOR)
-            descFactory.reset(new DescriptorImageSegMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImagePointMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
-         else
-            descFactory.reset(new DescriptorImageSegFirstViewFactory(configEstimation.DESC_SIZE));
-*/
-            descFactory.reset(new DescriptorSegFirstViewFactory(configEstimation.DESC_SIZE));
 
-         boost::shared_ptr<HDsegDetector> hdsegDetector(new HDsegDetector(3,configEstimation.PIX_NOISE,descFactory));
+         if (configEstimation.MULTIVIEW_DESCRIPTOR)
+				descFactory.reset(new DescriptorImageSegMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImageSegMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
+         else
+				descFactory.reset(new DescriptorImageSegFirstViewFactory(configEstimation.DESC_SIZE));
+
+//            descFactory.reset(new DescriptorSegFirstViewFactory(configEstimation.DESC_SIZE));
+
+			boost::shared_ptr<HDsegDetector> hdsegDetector(new HDsegDetector(configEstimation.PATCH_SIZE, 3,configEstimation.PIX_NOISE,descFactory));
          boost::shared_ptr<DsegMatcher> dsegMatcher(new DsegMatcher(configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE));
          boost::shared_ptr<DataManager_ImageSeg_Test> dmSeg(new DataManager_ImageSeg_Test(hdsegDetector, dsegMatcher, assGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
 

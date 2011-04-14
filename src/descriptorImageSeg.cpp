@@ -41,12 +41,14 @@ namespace jafar {
 
       void ImgSegFeatureView::initFromObs(const observation_ptr_t & obsPtr, int descSize)
       {
-         app_img_seg_ptr_t app(new AppearanceImageSegment(descSize, descSize, CV_8U));
+			app_img_seg_ptr_t obsApp = SPTR_CAST<AppearanceImageSegment>(obsPtr->observedAppearance);
+			app_img_seg_ptr_t app(new AppearanceImageSegment(descSize, descSize, CV_8U,obsApp->hypothesis()));
 				 sensorext_ptr_t senPtr = SPTR_CAST<SensorExteroAbstract>(obsPtr->sensorPtr());
          rawimage_ptr_t rawPtr = SPTR_CAST<RawImage>(senPtr->rawPtr);
-         if (rawPtr->img->extractPatch(app->patch, (int)obsPtr->measurement.x()(0), (int)obsPtr->measurement.x()(1), descSize, descSize))
-         {
-            app_img_seg_ptr_t obsApp = SPTR_CAST<AppearanceImageSegment>(obsPtr->observedAppearance);
+			int patchx = (obsPtr->measurement.x()(0) + obsPtr->measurement.x()(2))/2;
+			int patchy = (obsPtr->measurement.x()(1) + obsPtr->measurement.x()(3))/2;
+			if (rawPtr->img->extractPatch(app->patch, patchx, patchy, descSize, descSize))
+			{
             app->offset = obsApp->offset;
             appearancePtr = app;
 
@@ -84,7 +86,6 @@ namespace jafar {
 
 
       bool DescriptorImageSegFirstView::predictAppearance(const observation_ptr_t & obsPtrNew) {
-/*
          double zoom, rotation;
          landmark_ptr_t lmkPtr = obsPtrNew->landmarkPtr();
          //vec seg = lmkPtr->reparametrized(); // Dummy, we reparametrize the first point of the segment for the zoomRotation
@@ -106,7 +107,7 @@ namespace jafar {
          // this is an approximation for angle, but it's ok
          app_dst->offset.P()(0,0) = alpha*app_src->offset.P()(0,0) +  beta*app_src->offset.P()(1,1);
          app_dst->offset.P()(1,1) = -beta*app_src->offset.P()(0,0) + alpha*app_src->offset.P()(1,1);
-*/
+
 /*char buffer[256];
 sprintf(buffer, "descriptor_patch_%03d.png", obsPtrNew->id());
 app_src->patch.save(buffer);
@@ -114,8 +115,48 @@ JFR_DEBUG("predict with desc " << this << " and view " << &view << " and app " <
 sprintf(buffer, "predicted_patch_%03d.png", obsPtrNew->id());
 app_dst->patch.save(buffer);
 */
-//         return true;
-            return false;
+
+			vec4 exp = obsPtrNew->expectation.x();
+			double x_o = (exp(0) + exp(2))/2;
+			double y_o = (exp(1) + exp(3))/2;
+			double angle = atan2(exp(3)-exp(1),exp(2)-exp(0)) - M_PI_2;
+			double distance = sqrt((exp(2)-exp(0))*(exp(2)-exp(0)) + (exp(3)-exp(1))*(exp(3)-exp(1)));
+			double distance_cube = distance * distance * distance;
+			double x1mx2 = exp(0) - exp(2);
+			double y1my2 = exp(1) - exp(3);
+
+		  // Build the hypothesis
+			dseg::SegmentHypothesis* hypothesis = new dseg::SegmentHypothesis(x_o, y_o, angle);
+			hypothesis->setExtremity1(exp(0),exp(1));
+			hypothesis->setExtremity2(exp(2),exp(3));
+			hypothesis->setGradientDescriptor(app_src->hypothesis()->gradientDescriptor());
+
+		  // Compute uncertainty
+			mat44 SIGMA_exp;
+			mat44 sigma_cov;
+			SIGMA_exp.clear();
+			SIGMA_exp(0,0) = 0.5; // x0 wrt x1
+			SIGMA_exp(0,2) = 0.5; // x0 wrt x2
+			SIGMA_exp(1,1) = 0.5; // y0 wrt y1
+			SIGMA_exp(1,3) = 0.5; // y0 wrt y2
+			SIGMA_exp(2,0) =  (x1mx2*y1my2) / distance_cube; // u wrt x1
+			SIGMA_exp(2,2) = -(x1mx2*y1my2) / distance_cube; // u wrt x2
+			SIGMA_exp(2,1) = -(x1mx2*x1mx2) / distance_cube; // u wrt y1
+			SIGMA_exp(2,3) =  (x1mx2*x1mx2) / distance_cube; // u wrt y2
+			SIGMA_exp(3,0) = -(y1my2*y1my2) / distance_cube; // v wrt x1
+			SIGMA_exp(3,2) =  (y1my2*y1my2) / distance_cube; // v wrt x2
+			SIGMA_exp(3,1) =  (x1mx2*y1my2) / distance_cube; // v wrt y1
+			SIGMA_exp(3,3) = -(x1mx2*y1my2) / distance_cube; // v wrt y2
+			sigma_cov = jmath::ublasExtra::prod_JPJt(obsPtrNew->expectation.P() , SIGMA_exp); // sigma_cov = SIGMA_exp * P * SIGMA_exp'
+			vec4 sigma = 2*stdevFromCov(sigma_cov); // [sigma_x0 sigma_y0 sigma_u sigma_v]
+
+//			JFR_DEBUG("distance_cube\n" << distance_cube << "SIGMA_exp\n" << SIGMA_exp << "sigma_cov \n" << sigma_cov);
+//			std::cout << obsPtrNew->id() << "\nexp " << exp << " P " << stdevFromCov(obsPtrNew->expectation.P()) << "\nSIGMA_exp " << SIGMA_exp << "\nsigma " << sigma << std::endl;
+
+			hypothesis->setUncertainty(sigma(2), sigma(0), sigma(3), sigma(1));
+			app_dst->setHypothesis(hypothesis);
+
+			return true;
       }
 
       void DescriptorImageSegFirstView::desc_text(std::ostream& os) const

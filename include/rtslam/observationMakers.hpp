@@ -125,10 +125,10 @@ class SegmentObservationMaker
       observation_ptr_t create(const sensor_ptr_t &senPtr, const landmark_ptr_t &lmkPtr)
       {
          boost::shared_ptr<ObsType> res(new ObsType(senPtr, lmkPtr));
-         if (boost::is_same<AppType,AppearanceSegment>::value)
+			if (boost::is_same<AppType,AppearanceImageSegment>::value)
          {
-            res->predictedAppearance.reset(new AppearanceSegment());
-            res->observedAppearance.reset(new AppearanceSegment());
+				res->predictedAppearance.reset(new AppearanceImageSegment(patchSize, patchSize, CV_8U));
+				res->observedAppearance.reset(new AppearanceImageSegment(patchSize, patchSize, CV_8U));
          } else
          if (boost::is_same<AppType,simu::AppearanceSimu>::value)
          {

@@ -146,6 +146,8 @@ extern uint32_t pios_i2c_main_adapter_id;
 #define PIOS_BMP085_EOC_EXTI_LINE               EXTI_Line15
 #define PIOS_BMP085_EOC_IRQn                    EXTI15_10_IRQn
 #define PIOS_BMP085_EOC_PRIO                    PIOS_IRQ_PRIO_LOW
+#define PIOS_BMP085_XCLR_GPIO_PORT              GPIOC        // Not actually connected on OP mainboard
+#define PIOS_BMP085_XCLR_GPIO_PIN               GPIO_Pin_14  // Not actually connected on OP mainboard
 //#define PIOS_BMP085_OVERSAMPLING                2
 #define PIOS_BMP085_OVERSAMPLING                3
 

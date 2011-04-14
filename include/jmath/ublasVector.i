@@ -34,6 +34,14 @@ namespace boost { namespace numeric { namespace ublas {
     }
     }
 
+		%extend {
+			vector __add__(vector const& y) const { return (*self) + y; }
+			vector __sub__(vector const& y) const { return (*self) - y; }
+			vector __mul__(double y) const { return (*self) * y; }
+			vector __div__(double y) const { return (*self) / y; }
+		}
+
+
 #if defined(BOOST_VERSION) && (BOOST_VERSION < 103300)
     %rename(set) insert;
     void insert (size_type i, const_reference t);
@@ -66,6 +74,14 @@ namespace boost { namespace numeric { namespace ublas {
       	return (*self)(i);
     	}
     }
+/*
+		%extend {
+			vector_range __add__(vector_range const& y) const { return (*self) + y; }
+			vector_range __sub__(vector_range const& y) const { return (*self) - y; }
+			vector_range __mul__(double y) const { return (*self) * y; }
+			vector_range __div__(double y) const { return (*self) / y; }
+		}
+*/
   };
 
   template<class T, std::size_t N>
@@ -86,6 +102,13 @@ namespace boost { namespace numeric { namespace ublas {
       return (*self)(i);
     }
     }
+
+		%extend {
+			bounded_vector __add__(bounded_vector const& y) const { return (*self) + y; }
+			bounded_vector __sub__(bounded_vector const& y) const { return (*self) - y; }
+			bounded_vector __mul__(double y) const { return (*self) * y; }
+			bounded_vector __div__(double y) const { return (*self) / y; }
+		}
 
 #if defined(BOOST_VERSION) && (BOOST_VERSION < 103300)
     %rename(set) insert;

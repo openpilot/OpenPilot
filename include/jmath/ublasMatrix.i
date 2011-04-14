@@ -31,6 +31,13 @@ namespace boost { namespace numeric { namespace ublas {
     }
     }
 
+		%extend {
+			matrix __add__(matrix const& y) const { return (*self) + y; }
+			matrix __sub__(matrix const& y) const { return (*self) - y; }
+			matrix __mul__(double y) const { return (*self) * y; }
+			matrix __div__(double y) const { return (*self) / y; }
+		}
+
 #if defined(BOOST_VERSION) && (BOOST_VERSION < 103300)
     %rename(set) insert;
     void insert (size_type i, size_type j, const_reference t);
@@ -76,6 +83,14 @@ namespace boost { namespace numeric { namespace ublas {
     }
     }
 
+		%extend {
+			symmetric_matrix __add__(symmetric_matrix const& y) const { return (*self) + y; }
+			symmetric_matrix __sub__(symmetric_matrix const& y) const { return (*self) - y; }
+			symmetric_matrix __mul__(double y) const { return (*self) * y; }
+			symmetric_matrix __div__(double y) const { return (*self) / y; }
+		}
+
+
 #if defined(BOOST_VERSION) && (BOOST_VERSION < 103300)    
     %rename(set) insert;
     void insert (size_type i, size_type j, const_reference t);
@@ -109,7 +124,14 @@ namespace boost { namespace numeric { namespace ublas {
       return (*self)(i,j);
     }
     }
-
+/*
+		%extend {
+			matrix_range __add__(matrix_range const& y) const { return (*self) + y; }
+			matrix_range __sub__(matrix_range const& y) const { return (*self) - y; }
+			matrix_range __mul__(double y) const { return (*self) * y; }
+			matrix_range __div__(double y) const { return (*self) / y; }
+		}
+*/
   };
 
   template<class T, std::size_t M, 
@@ -123,6 +145,14 @@ namespace boost { namespace numeric { namespace ublas {
     bounded_matrix (const bounded_matrix &m);
     template<class A2>
     bounded_matrix (const matrix<T, A2, F> &m);
+
+		%extend {
+			bounded_matrix __add__(bounded_matrix const& y) const { return (*self) + y; }
+			bounded_matrix __sub__(bounded_matrix const& y) const { return (*self) - y; }
+			bounded_matrix __mul__(double y) const { return (*self) * y; }
+			bounded_matrix __div__(double y) const { return (*self) / y; }
+		}
+
   };
 
 }}}

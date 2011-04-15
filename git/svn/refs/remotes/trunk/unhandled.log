@@ -10248,3 +10248,12 @@ r3163
   -empty_dir: trunk/flight/Bootloaders/CopterControl/inc/README
   -empty_dir: trunk/flight/Bootloaders/PipXtreme/inc/README
 r3164
+r3165
+  +file_prop: trunk/hardware/Production/CopterControl/Assembly/CopterControl%203D%20Top.pdf svn:mime-type application/octet-stream
+  +file_prop: trunk/hardware/Production/CopterControl/Assembly/CopterControl%20Assembly.pdf svn:mime-type application/octet-stream
+  +file_prop: trunk/hardware/Production/CopterControl/Assembly/CopterControl%20Dimensions.png svn:mime-type application/octet-stream
+  +file_prop: trunk/hardware/Production/CopterControl/BOM/CopterControl%20BOM.xls svn:mime-type application/octet-stream
+  +file_prop: trunk/hardware/Production/CopterControl/CopterControl%20Schematic.pdf svn:mime-type application/octet-stream
+  +file_prop: trunk/hardware/Production/CopterControl/CopterControl.PcbDoc svn:mime-type application/octet-stream
+  +file_prop: trunk/hardware/Production/CopterControl/CopterControl.SchDoc svn:mime-type application/octet-stream
+  +file_prop: trunk/hardware/Production/CopterControl/Gerbers/Gerbers%20for%20CopterControl%20Final.zip svn:mime-type application/octet-stream

@@ -84,8 +84,8 @@ static float accelKp = 0;
 static float yawBiasRate = 0;
 static float gyroGain = 0.42;
 static int16_t accelbias[3];
-static float rotationQuat[4] = {1,0,0,0};
 static float q[4] = {1,0,0,0};
+static float R[3][3];
 static int8_t rotate = 0;
 
 /**
@@ -175,16 +175,6 @@ static void updateSensors(AttitudeRawData * attitudeRaw)
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] = (gyro[2] - GYRO_NEUTRAL) * gyroGain;
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = -(gyro[3] - GYRO_NEUTRAL) * gyroGain;
 	
-	// Applying integral component here so it can be seen on the gyros and correct bias
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] += gyro_correct_int[0];
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] += gyro_correct_int[1];
-
-	// Because most crafts wont get enough information from gravity to zero yaw gyro
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] += gyro_correct_int[2];
-	gyro_correct_int[2] += - attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] * 
-		yawBiasRate;
-	
-	
 	int32_t x = 0;
 	int32_t y = 0;
 	int32_t z = 0;
@@ -199,16 +189,38 @@ static void updateSensors(AttitudeRawData * attitudeRaw)
 	} while ( (i < 32) && (samples_remaining > 0) );
 	attitudeRaw->gyrotemp[0] = samples_remaining;
 	attitudeRaw->gyrotemp[1] = i;
-	x -= accelbias[0] * i;
-	y -= accelbias[1] * i;
-	z -= accelbias[2] * i;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = ((float)x * 0.004f * 9.81f) / i;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = ((float)y * 0.004f * 9.81f) / i;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = ((float)z * 0.004f * 9.81f) / i;
+	
+	float accel[3] = {(float) x / i, (float) y / i, (float) z / i};
 	
 	if(rotate) {
 		// TODO: rotate sensors too so stabilization is well behaved
-	}
+		float vec_out[3];
+		rot_mult(R, accel, vec_out);
+		attitudeRaw->accels[0] = vec_out[0];
+		attitudeRaw->accels[1] = vec_out[1];
+		attitudeRaw->accels[2] = vec_out[2];
+		rot_mult(R, attitudeRaw->gyros, vec_out);
+		attitudeRaw->gyros[0] = vec_out[0];
+		attitudeRaw->gyros[1] = vec_out[1];
+		attitudeRaw->gyros[2] = vec_out[2];
+	} else {
+		attitudeRaw->accels[0] = accel[0];
+		attitudeRaw->accels[1] = accel[1];
+		attitudeRaw->accels[2] = accel[2];
+	}		
+	
+	// Scale accels and correct bias
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = (attitudeRaw->accels[ATTITUDERAW_ACCELS_X] - accelbias[0]) * 0.004f * 9.81f;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = (attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] - accelbias[1]) * 0.004f * 9.81f;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = (attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] - accelbias[2]) * 0.004f * 9.81f;
+	
+	// Applying integral component here so it can be seen on the gyros and correct bias
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] += gyro_correct_int[0];
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] += gyro_correct_int[1];
+	
+	// Because most crafts wont get enough information from gravity to zero yaw gyro
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] += gyro_correct_int[2];
+	gyro_correct_int[2] += - attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] * yawBiasRate;			
 }
 
 static void updateAttitude(AttitudeRawData * attitudeRaw)
@@ -283,12 +295,7 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 	AttitudeActualData attitudeActual;
 	AttitudeActualGet(&attitudeActual);
 	
-	if(rotate) {
-		// Rotate the attitude q from the state q to allow board to be mounted at weird angles
-		quat_mult(q,rotationQuat,&attitudeActual.q1);
-	} else {
-		quat_copy(q, &attitudeActual.q1);
-	}
+	quat_copy(q, &attitudeActual.q1);
 	
 	// Convert into eueler degrees (makes assumptions about RPY order)
 	Quaternion2RPY(&attitudeActual.q1,&attitudeActual.Roll);	
@@ -299,6 +306,8 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	AttitudeSettingsData attitudeSettings;
 	AttitudeSettingsGet(&attitudeSettings);
+	
+	float rotationQuat[4];
 	
 	accelKp = attitudeSettings.AccelKp;
 	accelKi = attitudeSettings.AccelKi;		
@@ -340,6 +349,7 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 		rotationQuat[3] /= len;
 	}
 	
+	Quaternion2R(rotationQuat, R);
 }
 /**
   * @}

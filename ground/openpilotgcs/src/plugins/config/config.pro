@@ -3,6 +3,7 @@ TARGET = Config
 QT += svg
 
 include(../../openpilotgcsplugin.pri)
+include(../../libs/utils/utils.pri)
 include(../../plugins/uavtalk/uavtalk.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(../../plugins/uavobjects/uavobjects.pri)

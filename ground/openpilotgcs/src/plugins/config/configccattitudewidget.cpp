@@ -26,6 +26,7 @@
  */
 #include "configccattitudewidget.h"
 #include "ui_ccattitude.h"
+#include "utils/coordinateconversions.h"
 #include <QMutexLocker>
 #include <QErrorMessage>
 #include <QDebug>
@@ -37,6 +38,9 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->zeroBias,SIGNAL(clicked()),this,SLOT(startAccelCalibration()));
     connect(ui->saveButton,SIGNAL(clicked()),this,SLOT(saveAttitudeSettings()));
+    connect(ui->rollBias,SIGNAL(valueChanged(int)),this,SLOT(attitudeBiasChanged(int)));
+    connect(ui->pitchBias,SIGNAL(valueChanged(int)),this,SLOT(attitudeBiasChanged(int)));
+    connect(ui->yawBias,SIGNAL(valueChanged(int)),this,SLOT(attitudeBiasChanged(int)));
 }
 
 ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()
@@ -88,6 +92,25 @@ void ConfigCCAttitudeWidget::timeout() {
     QErrorMessage errmsg;
     errmsg.showMessage("Calibration timed out before receiving required updates");
     errmsg.exec();
+}
+
+void ConfigCCAttitudeWidget::attitudeBiasChanged(int val) {
+    UAVDataObject * settings = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeSettings")));
+    UAVObjectField * field = settings->getField("RotationQuaternion");
+
+    float RPY[3], q[4];
+    RPY[0] = ui->rollBias->value();
+    RPY[1] = ui->pitchBias->value();
+    RPY[2] = ui->yawBias->value();
+
+    Utils::CoordinateConversions().RPY2Quaternion(RPY,q);
+
+    field->setDouble(q[0]*127,0);
+    field->setDouble(q[1]*127,1);
+    field->setDouble(q[2]*127,2);
+    field->setDouble(q[3]*127,3);
+
+    settings->updated();
 }
 
 void ConfigCCAttitudeWidget::startAccelCalibration() {

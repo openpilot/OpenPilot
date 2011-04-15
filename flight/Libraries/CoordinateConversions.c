@@ -376,6 +376,10 @@ float VectorMagnitude(const float v[3])
 	return(sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]));
 }
 
+/**
+ * @brief Compute the inverse of a quaternion 
+ * @param [in][out] q The matrix to invert
+ */
 void quat_inverse(float q[4]) 
 {
 	q[1] = -q[1];
@@ -383,6 +387,11 @@ void quat_inverse(float q[4])
 	q[3] = -q[3];
 }
 
+/**
+ * @brief Duplicate a quaternion
+ * @param[in] q quaternion in
+ * @param[out] qnew quaternion to copy to
+ */
 void quat_copy(const float q[4], float qnew[4]) 
 {
 	qnew[0] = q[0];
@@ -391,10 +400,29 @@ void quat_copy(const float q[4], float qnew[4])
 	qnew[3] = q[3];
 }
 
+/**
+ * @brief Multiply two quaternions into a third
+ * @param[in] q1 First quaternion
+ * @param[in] q2 Second quaternion
+ * @param[out] qout Output quaternion
+ */
 void quat_mult(const float q1[4], const float q2[4], float qout[4]) 
 {
 	qout[0] = q1[0]*q2[0] - q1[1]*q2[1] - q1[2]*q2[2] - q1[3]*q2[3];
 	qout[1] = q1[0]*q2[1] + q1[1]*q2[0] + q1[2]*q2[3] - q1[3]*q2[2];
 	qout[2] = q1[0]*q2[2] - q1[1]*q2[3] + q1[2]*q2[0] + q1[3]*q2[1];
 	qout[3] = q1[0]*q2[3] + q1[1]*q2[2] - q1[2]*q2[1] + q1[3]*q2[0];
+}
+
+/**
+ * @brief Rotate a vector by a rotation matrix
+ * @param[in] R a three by three rotation matrix (first index is row)
+ * @param[in] vec the source vector
+ * @param[out] vec_out the output vector
+ */
+void rot_mult(float R[3][3], const float vec[3], float vec_out[3]) 
+{
+	vec_out[0] = R[0][0] * vec[0] + R[0][1] * vec[1] + R[0][2] * vec[2];
+	vec_out[1] = R[1][0] * vec[0] + R[1][1] * vec[1] + R[1][2] * vec[2];
+	vec_out[2] = R[2][0] * vec[0] + R[2][1] * vec[1] + R[2][2] * vec[2];
 }

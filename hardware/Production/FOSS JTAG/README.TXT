@@ -16,7 +16,8 @@ the included files on any board produced or hardware derived from this design.
 For more details, please see: http://creativecommons.org/licenses/by-sa/3.0/au/deed.en
 
 OpenPilot is a non-commercial project and is releasing these files to share with the wider community, 
-please respect this and play fair. 
+please respect this and play fair. If there are any questions or items that need clarifying please contact
+one of the OpenPilot forum administrators. 
 
 
 ** History **

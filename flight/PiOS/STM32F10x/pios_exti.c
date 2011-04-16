@@ -47,7 +47,11 @@ void EXTI15_10_IRQHandler(void)
 #if defined(PIOS_INCLUDE_BMP085)
 	if (EXTI_GetITStatus(PIOS_BMP085_EOC_EXTI_LINE) != RESET) {
 		/* Read the ADC Value */
+#if defined(PIOS_INCLUDE_FREERTOS)
 		xSemaphoreGiveFromISR(PIOS_BMP085_EOC, &xHigherPriorityTaskWoken);
+#else
+		PIOS_BMP085_EOC=1;
+#endif
 
 		/* Clear the EXTI line pending bit */
 		EXTI_ClearITPendingBit(PIOS_BMP085_EOC_EXTI_LINE);

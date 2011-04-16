@@ -9,6 +9,8 @@
 #include "STM32103CB_PIPXTREME_Rev1.h"
 #elif USE_STM32103CB_CC_Rev1
 #include "STM32103CB_CC_Rev1.h"
+#elif USE_STM3210E_INS
+#include "STM3210E_INS.h"
 #endif
 
 #endif /* PIOS_BOARD_H_ */

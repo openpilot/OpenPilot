@@ -110,6 +110,12 @@ C: ?
 D: ?
 V: 
 
+M: First Y6 CopterControl flight
+C: ?
+D: ?
+V: 
+
+
 
 An incomplete list of some future Milestones is below:
 

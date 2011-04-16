@@ -34,11 +34,15 @@
 #if defined(PIOS_INCLUDE_BMP085)
 #if !defined(PIOS_INCLUDE_EXTI)
 #error PIOS_EXTI Must be included in the project!
-#endif
+#endif /* PIOS_INCLUDE_EXTI */
 
 /* Glocal Variables */
 ConversionTypeTypeDef CurrentRead;
+#if defined(PIOS_INCLUDE_FREERTOS)
 xSemaphoreHandle PIOS_BMP085_EOC;
+#else
+int32_t PIOS_BMP085_EOC;
+#endif
 
 /* Local Variables */
 static BMP085CalibDataTypeDef CalibData;
@@ -60,10 +64,14 @@ void PIOS_BMP085_Init(void)
 	EXTI_InitTypeDef EXTI_InitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;
 
+#if defined(PIOS_INCLUDE_FREERTOS)
 	/* Semaphore used by ISR to signal End-Of-Conversion */
 	vSemaphoreCreateBinary(PIOS_BMP085_EOC);
 	/* Must start off empty so that first transfer waits for EOC */
 	xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
+#else
+	PIOS_BMP085_EOC = 0;
+#endif
 
 	/* Enable EOC GPIO clock */
 	RCC_APB2PeriphClockCmd(PIOS_BMP085_EOC_CLK | RCC_APB2Periph_AFIO, ENABLE);
@@ -88,7 +96,12 @@ void PIOS_BMP085_Init(void)
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 
-	/* Read all 22 bytes of calibration data in one transfer, this is a very optimised way of doing things */
+	/* Configure XCLR pin as push/pull alternate funtion output */
+	GPIO_InitStructure.GPIO_Pin = PIOS_BMP085_XCLR_GPIO_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_Init(PIOS_BMP085_XCLR_GPIO_PORT, &GPIO_InitStructure);
+
+	/* Read all 22 bytes of calibration data in one transfer, this is a very optimized way of doing things */
 	uint8_t Data[BMP085_CALIB_LEN];
 	while (!PIOS_BMP085_Read(BMP085_CALIB_ADDR, Data, BMP085_CALIB_LEN))
 		continue;
@@ -254,4 +267,32 @@ bool PIOS_BMP085_Write(uint8_t address, uint8_t buffer)
 	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
 }
 
-#endif
+/**
+* @brief Run self-test operation.
+* \return 0 if self-test failed
+* \return any non-0 number if test passed
+*/
+int32_t PIOS_BMP085_Test()
+{
+	// TODO: Is there a better way to test this than just checking that pressure/temperature has changed?
+	int32_t passed = 1;
+	int32_t cur_value = 0;
+
+	cur_value = Temperature;
+	PIOS_BMP085_StartADC(TemperatureConv);
+	PIOS_DELAY_WaitmS(5);
+	PIOS_BMP085_ReadADC();
+	if (cur_value == Temperature)
+		passed = 0;
+
+	cur_value=Pressure;
+	PIOS_BMP085_StartADC(PressureConv);
+	PIOS_DELAY_WaitmS(26);
+	PIOS_BMP085_ReadADC();
+	if (cur_value == Pressure)
+		passed = 0;
+
+	return passed;
+}
+
+#endif /* PIOS_INCLUDE_BMP085 */

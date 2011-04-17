@@ -12,5 +12,6 @@
         <file>images/PipXtreme.png</file>
         <file>images/gyroscope.svg</file>
         <file>images/Transmitter.png</file>
+        <file>images/help.png</file>
     </qresource>
 </RCC>

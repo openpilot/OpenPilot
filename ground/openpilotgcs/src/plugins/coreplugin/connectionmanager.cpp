@@ -315,6 +315,9 @@ void ConnectionManager::unregisterAll(IConnection *connection)
 
 /**
 *   Register a device from a specific connection plugin
+*   @param devN contains the connection shortname + device name which is diplayed in the tooltip
+*  @param disp is the name that is displayed in the dropdown menu
+*  @param name is the actual device name
 */
 void ConnectionManager::registerDevice(IConnection *conn, const QString &devN, const QString &name, const QString &disp)
 {
@@ -344,7 +347,8 @@ void ConnectionManager::devChanged(IConnection *connection)
         foreach (IConnection::device dev, availableDev)
     {
         QString cbName = connection->shortName() + ": " + dev.name;
-        registerDevice(connection,cbName,dev.name,dev.displayName);
+        QString disp = connection->shortName() + " : " + dev.displayName;
+        registerDevice(connection,cbName,dev.name,disp);
     }
 
     //add all the list again to the combobox

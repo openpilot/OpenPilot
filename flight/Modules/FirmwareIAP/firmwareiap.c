@@ -47,7 +47,6 @@
 
 #define RESET_DELAY         500 /* delay between sending reset ot INS */
 
-
 #define TICKS2MS(t)	((t)/portTICK_RATE_MS)
 #define MS2TICKS(m)	((m)*portTICK_RATE_MS)
 
@@ -56,14 +55,12 @@ const uint32_t    iap_time_2_high_end = 5000;
 const uint32_t    iap_time_3_low_end = 500;
 const uint32_t    iap_time_3_high_end = 5000;
 
-// Local macro for reading internal flash memory
-#define MEM8(addr)  (*((volatile uint8_t  *)(addr)))
-
 // Private types
 
 // Private variables
-const static uint8_t 	version[] = { 0, 0, 1 };
-const static uint16_t	SVN = 12345;
+// TODO: Ed: those two variables below are not used, shall we remove them ?
+//const static uint8_t 	version[] = { 0, 0, 1 };
+//const static uint16_t	SVN = 12345;
 static uint8_t reset_count = 0;
 static portTickType lastResetSysTime;
 
@@ -249,7 +246,7 @@ static uint8_t *FLASH_If_Read(uint32_t SectorAddress)
 static void read_description(uint8_t * array)
 {
 	uint8_t x = 0;
-	for (uint32_t i = START_OF_USER_CODE + SIZE_OF_CODE; i < START_OF_USER_CODE + SIZE_OF_CODE + SIZE_OF_DESCRIPTION; ++i) {
+	for (uint32_t i = START_OF_USER_CODE + SIZE_OF_CODE; i < START_OF_USER_CODE + SIZE_OF_CODE + FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM; ++i) {
 		array[x] = *FLASH_If_Read(i);
 		++x;
 	}
@@ -263,7 +260,7 @@ static void read_cpuserial(uint8_t * array)
 {
 	uint8_t x = 0;
 	for (uint8_t i = 0; i < 12; i++) {
-		array[x] = MEM8(0x1ffff7e8 + i);
+		array[x] = *FLASH_If_Read(0x1ffff7e8 + i);
 		++x;
 	}
 }

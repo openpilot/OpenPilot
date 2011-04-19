@@ -90,7 +90,9 @@ namespace gdhe {
 			*/
 			void convert()
 			{
-std::cout << "starting conversion task !" << std::endl;
+				std::cout << "starting conversion task !" << std::endl;
+				convert_done = false;
+				convert_end = false;
 				while(true)
 				{
 					// wait for a task

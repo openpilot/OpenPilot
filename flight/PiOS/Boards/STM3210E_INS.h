@@ -91,6 +91,8 @@ TIM8  |           |           |           |
 #define BOARD_READABLE	TRUE
 #define BOARD_WRITABLA	TRUE
 #define MAX_DEL_RETRYS	3
+#define EKF_RATE		75
+
 
 //------------------------
 // PIOS_LED
@@ -158,12 +160,9 @@ extern uint32_t pios_i2c_gyro_adapter_id;
 extern uint32_t pios_com_gps_id;
 #define PIOS_COM_GPS                    (pios_com_gps_id)
 
-#ifdef PIOS_ENABLE_AUX_UART
-#define PIOS_COM_AUX_BAUDRATE           57600
 extern uint32_t pios_com_aux_id;
 #define PIOS_COM_AUX                    (pios_com_aux_id)
 #define PIOS_COM_DEBUG                  PIOS_COM_AUX
-#endif
 
 //-------------------------
 // Delay Timer

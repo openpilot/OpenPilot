@@ -110,11 +110,16 @@
 #define PIOS_IMU3000_PWRMGMT_PLL_Z_CLK    0X03
 #define PIOS_IMU3000_PWRMGMT_STOP_CLK     0X07
 
+struct pios_imu3000_data {
+	int16_t x;
+	int16_t y;
+	int16_t z;
+};
 
 /* Public Functions */
 extern void PIOS_IMU3000_Init(void);
 extern bool PIOS_IMU3000_NewDataAvailable(void);
-extern void PIOS_IMU3000_ReadGyros(int16_t out[3]);
+extern uint8_t PIOS_IMU3000_ReadGyros(struct pios_imu3000_data * data);
 extern uint8_t PIOS_IMU3000_ReadID();
 extern uint8_t PIOS_IMU3000_Test();
 

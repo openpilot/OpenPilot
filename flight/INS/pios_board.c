@@ -41,10 +41,10 @@
  * NOTE: Leave this declared as const data so that it ends up in the 
  * .rodata section (ie. Flash) rather than in the .bss section (RAM).
  */
-void PIOS_SPI_op_mag_irq_handler(void);
-void DMA1_Channel5_IRQHandler() __attribute__ ((alias("PIOS_SPI_op_mag_irq_handler")));
-void DMA1_Channel4_IRQHandler() __attribute__ ((alias("PIOS_SPI_op_mag_irq_handler")));
-static const struct pios_spi_cfg pios_spi_op_mag_cfg = {
+void PIOS_SPI_op_irq_handler(void);
+void DMA1_Channel5_IRQHandler() __attribute__ ((alias("PIOS_SPI_op_irq_handler")));
+void DMA1_Channel4_IRQHandler() __attribute__ ((alias("PIOS_SPI_op_irq_handler")));
+static const struct pios_spi_cfg pios_spi_op_cfg = {
 	.regs = SPI2,
 	.init = {
 		 .SPI_Mode = SPI_Mode_Slave,
@@ -61,7 +61,7 @@ static const struct pios_spi_cfg pios_spi_op_mag_cfg = {
 		.ahb_clk = RCC_AHBPeriph_DMA1,
 
 		.irq = {
-			.handler = PIOS_SPI_op_mag_irq_handler,
+			.handler = PIOS_SPI_op_irq_handler,
 			.flags =
 			(DMA1_FLAG_TC4 | DMA1_FLAG_TE4 | DMA1_FLAG_HT4 |
 			 DMA1_FLAG_GL4),
@@ -144,11 +144,11 @@ static const struct pios_spi_cfg pios_spi_op_mag_cfg = {
 		 },
 };
 
-uint32_t pios_spi_op_mag_id;
-void PIOS_SPI_op_mag_irq_handler(void)
+uint32_t pios_spi_op_id;
+void PIOS_SPI_op_irq_handler(void)
 {
 	/* Call into the generic code to handle the IRQ for this specific device */
-	PIOS_SPI_IRQ_Handler(pios_spi_op_mag_id);
+	PIOS_SPI_IRQ_Handler(pios_spi_op_id);
 }
 
 /* SPI1 Interface
@@ -318,53 +318,52 @@ void PIOS_USART_gps_irq_handler(void)
 
 #endif /* PIOS_INCLUDE_GPS */
 
-#ifdef PIOS_COM_AUX
+#ifdef PIOS_INCLUDE_COM_AUX
 /*
  * AUX USART
  */
 void PIOS_USART_aux_irq_handler(void);
-void USART4_IRQHandler()
-    __attribute__ ((alias("PIOS_USART_aux_irq_handler")));
+void USART3_IRQHandler() __attribute__ ((alias ("PIOS_USART_aux_irq_handler")));
 const struct pios_usart_cfg pios_usart_aux_cfg = {
-	.regs = USART4,
-	.init = {
-#if defined (PIOS_USART_BAUDRATE)
-		 .USART_BaudRate = PIOS_USART_BAUDRATE,
-#else
-		 .USART_BaudRate = 57600,
-#endif
-		 .USART_WordLength = USART_WordLength_8b,
-		 .USART_Parity = USART_Parity_No,
-		 .USART_StopBits = USART_StopBits_1,
-		 .USART_HardwareFlowControl =
-		 USART_HardwareFlowControl_None,
-		 .USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
-		 },
-	.irq = {
-		.handler = PIOS_USART_aux_irq_handler,
-		.init = {
-			 .NVIC_IRQChannel = USART4_IRQn,
-			 .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
-			 .NVIC_IRQChannelSubPriority = 0,
-			 .NVIC_IRQChannelCmd = ENABLE,
-			 },
-		},
-	.rx = {
-	       .gpio = GPIOB,
-	       .init = {
-			.GPIO_Pin = GPIO_Pin_11,
-			.GPIO_Speed = GPIO_Speed_2MHz,
-			.GPIO_Mode = GPIO_Mode_IPU,
-			},
-	       },
-	.tx = {
-	       .gpio = GPIOB,
-	       .init = {
-			.GPIO_Pin = GPIO_Pin_10,
-			.GPIO_Speed = GPIO_Speed_2MHz,
-			.GPIO_Mode = GPIO_Mode_AF_PP,
-			},
-	       },
+  .regs = USART3,
+  .remap = GPIO_PartialRemap_USART3,
+  .init = {
+    #if defined (PIOS_COM_AUX_BAUDRATE)
+        .USART_BaudRate        = PIOS_COM_AUX_BAUDRATE,
+    #else
+        .USART_BaudRate        = 57600,
+    #endif
+    .USART_WordLength          = USART_WordLength_8b,
+    .USART_Parity              = USART_Parity_No,
+    .USART_StopBits            = USART_StopBits_1,
+    .USART_HardwareFlowControl = USART_HardwareFlowControl_None,
+    .USART_Mode                = USART_Mode_Rx | USART_Mode_Tx,
+  },
+  .irq = {
+    .handler = PIOS_USART_aux_irq_handler,
+    .init    = {
+      .NVIC_IRQChannel                   = USART3_IRQn,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+      .NVIC_IRQChannelSubPriority        = 0,
+      .NVIC_IRQChannelCmd                = ENABLE,
+    },
+  },
+  .rx   = {
+    .gpio = GPIOC,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_11,
+      .GPIO_Speed = GPIO_Speed_2MHz,
+      .GPIO_Mode  = GPIO_Mode_IPU,
+    },
+  },
+  .tx   = {
+    .gpio = GPIOC,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_10,
+      .GPIO_Speed = GPIO_Speed_2MHz,
+      .GPIO_Mode  = GPIO_Mode_AF_PP,
+    },
+  },
 };
 
 static uint32_t pios_usart_aux_id;
@@ -373,7 +372,7 @@ void PIOS_USART_aux_irq_handler(void)
 	PIOS_USART_IRQ_Handler(pios_usart_aux_id);
 }
 
-#endif /* PIOS_COM_AUX */
+#endif /* PIOS_INCLUDE_COM_AUX */
 
 
 #if defined(PIOS_INCLUDE_I2C)
@@ -554,6 +553,15 @@ void PIOS_Board_Init(void) {
 		PIOS_DEBUG_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_GPS */
+
+#if defined(PIOS_INCLUDE_COM_AUX)
+    if (PIOS_USART_Init(&pios_usart_aux_id, &pios_usart_aux_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+	if (PIOS_COM_Init(&pios_com_aux_id, &pios_usart_com_driver, pios_usart_aux_id)) {
+		PIOS_DEBUG_Assert(0);
+	}
+#endif	/* PIOS_INCLUDE_COM_AUX */
 #endif	/* PIOS_INCLUDE_COM */
 
 #if defined (PIOS_INCLUDE_I2C)
@@ -583,15 +591,15 @@ void PIOS_Board_Init(void) {
 
 	PIOS_BMA180_Attach(pios_spi_accel_id);
 
-// #include "ahrs_spi_comm.h"
-//	InsInitComms();
-//
-//	/* Set up the SPI interface to the OP board */
-//	if (PIOS_SPI_Init(&pios_spi_op_id, &pios_spi_op_cfg)) {
-//		PIOS_DEBUG_Assert(0);
-//	}
-//
-//	InsConnect(pios_spi_op_id);
+
+	/* Set up the SPI interface to the OP board */
+	#include "ahrs_spi_comm.h"
+	AhrsInitComms();
+	if (PIOS_SPI_Init(&pios_spi_op_id, &pios_spi_op_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+
+	AhrsConnect(pios_spi_op_id);
 #endif /* PIOS_INCLUDE_SPI */
 }
 

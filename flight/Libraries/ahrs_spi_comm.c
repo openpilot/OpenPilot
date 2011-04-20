@@ -33,7 +33,7 @@
 #include "pios_spi.h"
 #include "pios_irq.h"
 #include "ahrs_spi_program_slave.h"
-#include "STM32103CB_AHRS.h"
+//#include "STM32103CB_AHRS.h"
 #endif
 
 /*transmit and receive packet magic numbers.

@@ -1,7 +1,16 @@
-# SENSOR
+# SENSORS
 SENSOR_POSE_CONSTVEL: [6](0, 0, 0, -90, 0, -90)
-SENSOR_POSE_INERTIAL: [6](0.04, 0.01, -0.035, 90, 0, 90)
+
+# flea hand held setup
+SENSOR_POSE_INERTIAL: [6](-0.002, -0.005, -0.029, 90, 0, 90)
+# on mana platine with left marlin
+#SENSOR_POSE_INERTIAL: [6](0.005, 0.185, 0.002, -90, 0, -90)
+
+# mana
 GPS_POSE: [6](-0.87, 0.12, 0.37, 0.0, 0.0, 0.0)
+#robufast
+#GPS_POSE: [6](-1.36, 0.0, 0.14, 0.0, 0.0, 0.0)
+
 
 CAMERA_TYPE: 0
 CAMERA_DEVICE: 0x00b09d010063565b

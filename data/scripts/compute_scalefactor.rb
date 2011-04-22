@@ -40,7 +40,7 @@ while (slam_line = slam_file.gets)
 	if slam_vec.length <= slam_col+1 then next end
 	
 	while (truth_line = truth_file.gets)
-		if truth_line[0] == 35 or slam_line[0] == 0 or slam_line[0] == 10 then next end
+		if truth_line[0] == 35 or truth_line[0] == 0 or truth_line[0] == 10 then next end
 		truth_vec = truth_line.split(' ')
 		if truth_vec.length <= truth_col+1 then next end
 		break

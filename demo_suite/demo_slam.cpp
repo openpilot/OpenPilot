@@ -493,21 +493,21 @@ void demo_slam01_main(world_ptr_t *world)
 		switch (intOpts[iSimu]/10)
 		{
 			case 1: {
-				// regular grid
+				// 3D regular grid
 				const int npoints_ = 3*11*13; npoints = npoints_;
 				for(int i = 0, z = -1; z <= 1; ++z) for(int y = -3; y <= 7; ++y) for(int x = -6; x <= 6; ++x, ++i)
 					{ points[i][0] = x*1.0; points[i][1] = y*1.0; points[i][2] = z*1.0; }
 				break;
 			}
 			case 2: {
-				// flat square
+				// 2D square
 				const int npoints_ = 5; npoints = npoints_;
 				double tmp[npoints_][3] = { {5,-1,-1}, {5,-1,1}, {5,1,1}, {5,1,-1}, {5,0,0} };
 				memcpy(points, tmp, npoints*3*sizeof(double));
 				break;
 			}
 			case 3: {
-				// square
+				// almost 2D square
 				const int npoints_ = 5; npoints = npoints_;
 				double tmp[npoints_][3] = { {5,-1,-1}, {5,-1,1}, {5,1,1}, {5,1,-1}, {4,0,0} };
 				memcpy(points, tmp, npoints*3*sizeof(double));
@@ -741,7 +741,7 @@ void demo_slam01_main(world_ptr_t *world)
 		dmPt11->linkToParentMapManager(mmPoint);
 		dmPt11->setObservationFactory(obsFact);
 		
-		hardware::hardware_sensorext_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator(rawdata_condition, floatOpts[fFreq], simulator, senPtr11->id(), robPtr1->id()));
+		hardware::hardware_sensorext_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator(rawdata_condition, floatOpts[fFreq], simulator, robPtr1->id(), senPtr11->id()));
 		senPtr11->setHardwareSensor(hardSen11);
 	} else
    #endif
@@ -903,9 +903,10 @@ int n_innovation = 0;
 				pinfo.sen->process_fake(pinfo.id); // just to release data
 			else
 			{
-				JFR_DEBUG("************** FRAME : " << (*world)->t);
-				
 				double newt = pinfo.sen->getRawTimestamp(pinfo.id);
+				
+				JFR_DEBUG("************** FRAME : " << (*world)->t << " (" << newt << ")");
+				
 				robot_ptr_t robPtr = pinfo.sen->robotPtr();
 //std::cout << "Frame " << (*world)->t << " using sen " << pinfo.sen->id() << " at time " << std::setprecision(16) << newt << std::endl;
 				robPtr->move(newt);
@@ -1269,7 +1270,7 @@ void demo_slam01() {
 	* --robot 0=constant vel, 1=inertial
 	* --map 0=odometry, 1=global, 2=local/multimap
 	* --trigger 0=internal, 1=external mode 1, 2=external mode 0, 3=external mode 14 (PointGrey (Flea) only)
-	* --simu 0/1
+	* --simu 0 or <environment id>*10+<trajectory id> (
 	* --freq camera frequency in double Hz (with trigger==0/1)
 	* --shutter shutter time in double seconds (0=auto); for trigger modes 0,2,3 the value is relative between 0 and 1
 	* --gps whether use or not a gps

@@ -176,14 +176,14 @@ class HardwareSensorAbstract
 		
 		virtual double getLastTimestamp() = 0;
 		
-		VecIndT getRaws(double t1, double t2); /// will also release the raws before the first one
-		int getUnreadRawInfos(RawInfos &infos); /// get timing informations about unread raws
-		int getNextRawInfo(RawInfo &info); /// get info about next unread raw
-		void getRaw(unsigned id, T& raw); /// will also release the raws before this one
-		double getRawTimestamp(unsigned id);
-		int getLastUnreadRaw(T& raw); /// will also release the raws before this one
-		void getLastProcessedRaw(T& raw) { raw = buffer(last_sent_pos); } /// for information only (display...)
-		void release() { release(read_pos); }
+		virtual VecIndT getRaws(double t1, double t2); /// will also release the raws before the first one
+		virtual int getUnreadRawInfos(RawInfos &infos); /// get timing informations about unread raws
+		virtual int getNextRawInfo(RawInfo &info); /// get info about next unread raw
+		virtual void getRaw(unsigned id, T& raw); /// will also release the raws before this one
+		virtual double getRawTimestamp(unsigned id);
+		virtual int getLastUnreadRaw(T& raw); /// will also release the raws before this one
+		virtual void getLastProcessedRaw(T& raw) { raw = buffer(last_sent_pos); } /// for information only (display...)
+		virtual void release() { release(read_pos); }
 		
 		friend class rtslam::SensorProprioAbstract;
 		friend class rtslam::SensorExteroAbstract;
@@ -308,7 +308,7 @@ typename HardwareSensorAbstract<T>::VecIndT HardwareSensorAbstract<T>::getRaws(d
 	} else
 	{
 		return ublas::project(buffer, 
-			jmath::ublasExtra::ia_concat(jmath::ublasExtra::ia_set(ublas::range(i1,buffer.size1())),
+			jmath::ublasExtra::ia_concat(jmath::ublasExtra::ia_set(ublas::range(i1,buffer.size())),
 			                             jmath::ublasExtra::ia_set(ublas::range(0,i2+1))));
 	}
 }

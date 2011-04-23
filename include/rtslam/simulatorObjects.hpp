@@ -78,7 +78,7 @@ namespace simu {
 			@warning a waypoint must be consistent, meaning that the time necessary to change state for each component must be the same
 			@return whether the point was coherent and was accepted
 			*/
-			bool hasEnded(double t) const { if (traj.size() == 0) return false; return (t > traj.back().t); }
+			bool hasEnded(double t) const { if (traj.size() == 0) return true; return (t > traj.back().t); }
 			void addWaypoint(double x, double y, double z, double yaw, double pitch, double roll,
 			                 double vx, double vy, double vz, double vyaw, double vpitch, double vroll)
 			{

@@ -459,7 +459,7 @@ uint8_t isBiggerThanAvailable(DFUTransfer type, uint32_t size) {
 uint32_t CalcFirmCRC() {
 	switch (currentProgrammingDestination) {
 	case Self_flash:
-		return crc_memory_calc();
+		return FLASH_crc_memory_calc();
 		break;
 	case Remote_flash_via_spi:
 		return 0;

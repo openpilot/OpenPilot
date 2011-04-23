@@ -99,8 +99,6 @@ void affine_rotate(float scale[3][4], float rotation[3]);
 void calibration(float result[3], float scale[3][4], float arg[3]);
 
 /* Bootloader related functions and var*/
-static uint32_t	iap_calc_crc(void);
-static void read_description(uint8_t *);
 void firmwareiapobj_callback(AhrsObjHandle obj);
 volatile uint8_t reset_count=0;
 
@@ -1232,6 +1230,7 @@ void firmwareiapobj_callback(AhrsObjHandle obj)
 {
 	FirmwareIAPObjData firmwareIAPObj;
 	FirmwareIAPObjGet(&firmwareIAPObj);
+	CRC_Ini();
 	if(firmwareIAPObj.ArmReset==0)
 		reset_count=0;
 	if(firmwareIAPObj.ArmReset==1)
@@ -1249,35 +1248,15 @@ void firmwareiapobj_callback(AhrsObjHandle obj)
 			}
 		}
 	}
-	else if(firmwareIAPObj.BoardType==BOARD_TYPE && firmwareIAPObj.crc!=iap_calc_crc())
+	else if(firmwareIAPObj.BoardType==BOARD_TYPE && firmwareIAPObj.crc!=FLASH_crc_memory_calc())
 	{
-		read_description(firmwareIAPObj.Description);
-		firmwareIAPObj.crc=iap_calc_crc();
+		FLASH_read_description(firmwareIAPObj.Description,SIZE_OF_DESCRIPTION);
+		CRC_Ini();
+		firmwareIAPObj.crc=FLASH_crc_memory_calc();
 		firmwareIAPObj.BoardRevision=BOARD_REVISION;
 		FirmwareIAPObjSet(&firmwareIAPObj);
 	}
 }
-
-static uint32_t iap_calc_crc(void)
-{
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
-	CRC_ResetDR();
-	CRC_CalcBlockCRC((uint32_t *) START_OF_USER_CODE, (SIZE_OF_CODE) >> 2);
-	return CRC_GetCRC();
-}
-static uint8_t *FLASH_If_Read(uint32_t SectorAddress)
-{
-	return (uint8_t *) (SectorAddress);
-}
-static void read_description(uint8_t * array)
-{
-	uint8_t x = 0;
-	for (uint32_t i = START_OF_USER_CODE + SIZE_OF_CODE; i < START_OF_USER_CODE + SIZE_OF_CODE + SIZE_OF_DESCRIPTION; ++i) {
-		array[x] = *FLASH_If_Read(i);
-		++x;
-	}
-}
-
 
 /**
  * @}

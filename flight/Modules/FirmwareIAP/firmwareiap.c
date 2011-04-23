@@ -67,10 +67,6 @@ static portTickType lastResetSysTime;
 // Private functions
 static void FirmwareIAPCallback(UAVObjEvent* ev);
 
-static uint32_t	iap_calc_crc(void);
-
-static void read_description(uint8_t *);
-
 FirmwareIAPObjData 	data;
 
 static uint32_t	get_time(void);
@@ -97,7 +93,7 @@ static void resetTask(UAVObjEvent *);
 int32_t FirmwareIAPInitialize()
 {
 	data.BoardType= BOARD_TYPE;
-	read_description(data.Description);
+	FLASH_read_description(data.Description,FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM);
 	PIOS_SYS_SerialNumberGetBinary(data.CPUSerial);
 	data.BoardRevision= BOARD_REVISION;
 	data.ArmReset=0;
@@ -131,12 +127,14 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
 		this_time = get_time();
 		delta = this_time - last_time;
 		last_time = this_time;
-		if((data.BoardType==BOARD_TYPE)&&(data.crc != iap_calc_crc()))
+		CRC_Ini();
+		if((data.BoardType==BOARD_TYPE)&&(data.crc != FLASH_crc_memory_calc()))
 		{
-			read_description(data.Description);
+			FLASH_read_description(data.Description,FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM);
 			PIOS_SYS_SerialNumberGetBinary(data.CPUSerial);
 			data.BoardRevision=BOARD_REVISION;
-			data.crc = iap_calc_crc();
+			CRC_Ini();
+			data.crc = FLASH_crc_memory_calc();
 			FirmwareIAPObjSet( &data );
 		}
 		if((data.ArmReset==1)&&(iap_state!=IAP_STATE_RESETTING))
@@ -213,41 +211,6 @@ static uint32_t get_time(void)
 	ticks = xTaskGetTickCount();
 	
 	return TICKS2MS(ticks);
-}
-
-
-
-/*!
- * \brief   Calculate the CRC value of the code in flash.
- * \param   None
- * \return  calculated CRC value using STM32's builtin CRC hardware
- *
- * \note
- *	I copied this function as the function crc calc function in pios_bl_helper.c
- *	is only included when the PIOS_BL_HELPER is defined, but this also includes
- *	the flash unlock and erase functions.  It is safer to only have the flash
- *	functions in the bootloader.
- *
- */
-
-static uint32_t iap_calc_crc(void)
-{
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
-	CRC_ResetDR();
-	CRC_CalcBlockCRC((uint32_t *) START_OF_USER_CODE, (SIZE_OF_CODE) >> 2);
-	return CRC_GetCRC();
-}
-static uint8_t *FLASH_If_Read(uint32_t SectorAddress)
-{
-	return (uint8_t *) (SectorAddress);
-}
-static void read_description(uint8_t * array)
-{
-	uint8_t x = 0;
-	for (uint32_t i = START_OF_USER_CODE + SIZE_OF_CODE; i < START_OF_USER_CODE + SIZE_OF_CODE + FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM; ++i) {
-		array[x] = *FLASH_If_Read(i);
-		++x;
-	}
 }
 
 /**

@@ -35,9 +35,9 @@ extern uint8_t *FLASH_If_Read(uint32_t SectorAddress);
 
 extern uint8_t FLASH_Ini();
 
-extern uint32_t crc_memory_calc();
+extern uint32_t FLASH_crc_memory_calc();
 
-extern void read_description(uint8_t * array);
+extern void FLASH_read_description(uint8_t * array, uint8_t size);
 
 extern uint8_t FLASH_Start();
 

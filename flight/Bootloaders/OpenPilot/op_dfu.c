@@ -525,7 +525,7 @@ uint32_t CalcFirmCRC() {
 	struct opahrs_msg_v0 rsp;
 	switch (currentProgrammingDestination) {
 	case Self_flash:
-		return crc_memory_calc();
+		return FLASH_crc_memory_calc();
 		break;
 	case Remote_flash_via_spi:
 		PIOS_OPAHRS_bl_FwupVerify(&rsp);

@@ -96,7 +96,7 @@ int main() {
 	}
 	PIOS_Board_Init();
 	boot_status = idle;
-	Fw_crc = crc_memory_calc();
+	Fw_crc = FLASH_crc_memory_calc();
 	PIOS_LED_On(LED1);
 	while (1) {
 		process_spi_request();
@@ -146,7 +146,7 @@ void process_spi_request(void) {
 
 	case OPAHRS_MSG_V0_REQ_FWUP_VERIFY:
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_FWUP_STATUS);
-		Fw_crc = crc_memory_calc();
+		Fw_crc = FLASH_crc_memory_calc();
 		lfsm_user_set_tx_v0(&user_tx_v0);
 		boot_status = idle;
 		PIOS_LED_Off(LED1);

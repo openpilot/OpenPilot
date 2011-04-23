@@ -1247,10 +1247,10 @@ void firmwareiapobj_callback(AhrsObjHandle obj)
 			}
 		}
 	}
-	else if(firmwareIAPObj.BoardType==BOARD_TYPE && firmwareIAPObj.crc!=FLASH_crc_memory_calc())
+	else if(firmwareIAPObj.BoardType==BOARD_TYPE && firmwareIAPObj.crc!=PIOS_BL_HELPER_CRC_Memory_Calc())
 	{
-		FLASH_read_description(firmwareIAPObj.Description,SIZE_OF_DESCRIPTION);
-		firmwareIAPObj.crc=FLASH_crc_memory_calc();
+		PIOS_BL_HELPER_FLASH_Read_Description(firmwareIAPObj.Description,SIZE_OF_DESCRIPTION);
+		firmwareIAPObj.crc=PIOS_BL_HELPER_CRC_Memory_Calc();
 		firmwareIAPObj.BoardRevision=BOARD_REVISION;
 		FirmwareIAPObjSet(&firmwareIAPObj);
 	}

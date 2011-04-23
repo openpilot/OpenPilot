@@ -93,7 +93,7 @@ static void resetTask(UAVObjEvent *);
 int32_t FirmwareIAPInitialize()
 {
 	data.BoardType= BOARD_TYPE;
-	FLASH_read_description(data.Description,FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM);
+	PIOS_BL_HELPER_FLASH_Read_Description(data.Description,FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM);
 	PIOS_SYS_SerialNumberGetBinary(data.CPUSerial);
 	data.BoardRevision= BOARD_REVISION;
 	data.ArmReset=0;
@@ -127,12 +127,12 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
 		this_time = get_time();
 		delta = this_time - last_time;
 		last_time = this_time;
-		if((data.BoardType==BOARD_TYPE)&&(data.crc != FLASH_crc_memory_calc()))
+		if((data.BoardType==BOARD_TYPE)&&(data.crc != PIOS_BL_HELPER_CRC_Memory_Calc()))
 		{
-			FLASH_read_description(data.Description,FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM);
+			PIOS_BL_HELPER_FLASH_Read_Description(data.Description,FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM);
 			PIOS_SYS_SerialNumberGetBinary(data.CPUSerial);
 			data.BoardRevision=BOARD_REVISION;
-			data.crc = FLASH_crc_memory_calc();
+			data.crc = PIOS_BL_HELPER_CRC_Memory_Calc();
 			FirmwareIAPObjSet( &data );
 		}
 		if((data.ArmReset==1)&&(iap_state!=IAP_STATE_RESETTING))

@@ -158,7 +158,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 			uint8_t result = 0;
 			switch (currentProgrammingDestination) {
 			case Self_flash:
-				result = FLASH_Ini();
+				result = PIOS_BL_HELPER_FLASH_Ini();
 				break;
 			case Remote_flash_via_spi:
 				result = TRUE;
@@ -195,7 +195,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 					if (TransferType == FW) {
 						switch (currentProgrammingDestination) {
 						case Self_flash:
-							result = FLASH_Start();
+							result = PIOS_BL_HELPER_FLASH_Start();
 							break;
 						case Remote_flash_via_spi:
 							PIOS_OPAHRS_bl_FwupStart(&rsp);
@@ -525,7 +525,7 @@ uint32_t CalcFirmCRC() {
 	struct opahrs_msg_v0 rsp;
 	switch (currentProgrammingDestination) {
 	case Self_flash:
-		return FLASH_crc_memory_calc();
+		return PIOS_BL_HELPER_CRC_Memory_Calc();
 		break;
 	case Remote_flash_via_spi:
 		PIOS_OPAHRS_bl_FwupVerify(&rsp);
@@ -574,7 +574,7 @@ bool flash_read(uint8_t * buffer, uint32_t adr, DFUProgType type) {
 		break;
 	case Self_flash:
 		for (uint8_t x = 0; x < 4; ++x) {
-			buffer[x] = *FLASH_If_Read(adr + x);
+			buffer[x] = *PIOS_BL_HELPER_FLASH_If_Read(adr + x);
 		}
 		return TRUE;
 		break;

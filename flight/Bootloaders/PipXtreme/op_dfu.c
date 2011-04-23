@@ -116,10 +116,10 @@ void DataDownload(DownloadAction action) {
 				}
 				break;
 			case Self_flash:
-				SendBuffer[6 + (x * 4)] = *FLASH_If_Read(offset);
-				SendBuffer[7 + (x * 4)] = *FLASH_If_Read(offset + 1);
-				SendBuffer[8 + (x * 4)] = *FLASH_If_Read(offset + 2);
-				SendBuffer[9 + (x * 4)] = *FLASH_If_Read(offset + 3);
+				SendBuffer[6 + (x * 4)] = *PIOS_BL_HELPER_FLASH_If_Read(offset);
+				SendBuffer[7 + (x * 4)] = *PIOS_BL_HELPER_FLASH_If_Read(offset + 1);
+				SendBuffer[8 + (x * 4)] = *PIOS_BL_HELPER_FLASH_If_Read(offset + 2);
+				SendBuffer[9 + (x * 4)] = *PIOS_BL_HELPER_FLASH_If_Read(offset + 3);
 				break;
 			}
 */
@@ -178,7 +178,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 			uint8_t result = 0;
 			switch (currentProgrammingDestination) {
 			case Self_flash:
-				result = FLASH_Ini();
+				result = PIOS_BL_HELPER_FLASH_Ini();
 				break;
 			case Remote_flash_via_spi:
 				result = TRUE;
@@ -214,7 +214,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 					if (TransferType == FW) {
 						switch (currentProgrammingDestination) {
 						case Self_flash:
-							result = FLASH_Start();
+							result = PIOS_BL_HELPER_FLASH_Start();
 							break;
 						case Remote_flash_via_spi:
 							result = FALSE;
@@ -459,7 +459,7 @@ uint8_t isBiggerThanAvailable(DFUTransfer type, uint32_t size) {
 uint32_t CalcFirmCRC() {
 	switch (currentProgrammingDestination) {
 	case Self_flash:
-		return FLASH_crc_memory_calc();
+		return PIOS_BL_HELPER_CRC_Memory_Calc();
 		break;
 	case Remote_flash_via_spi:
 		return 0;
@@ -484,7 +484,7 @@ bool flash_read(uint8_t * buffer, uint32_t adr, DFUProgType type) {
 		break;
 	case Self_flash:
 		for (uint8_t x = 0; x < 4; ++x) {
-			buffer[x] = *FLASH_If_Read(adr + x);
+			buffer[x] = *PIOS_BL_HELPER_FLASH_If_Read(adr + x);
 		}
 		return TRUE;
 		break;

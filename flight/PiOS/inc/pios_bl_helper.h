@@ -31,16 +31,16 @@
 #ifndef PIOS_BL_HELPER_H_
 #define PIOS_BL_HELPER_H_
 
-extern uint8_t *FLASH_If_Read(uint32_t SectorAddress);
+extern uint8_t *PIOS_BL_HELPER_FLASH_If_Read(uint32_t SectorAddress);
 
-extern uint8_t FLASH_Ini();
+extern uint8_t PIOS_BL_HELPER_FLASH_Ini();
 
-extern uint32_t FLASH_crc_memory_calc();
+extern uint32_t PIOS_BL_HELPER_CRC_Memory_Calc();
 
-extern void FLASH_read_description(uint8_t * array, uint8_t size);
+extern void PIOS_BL_HELPER_FLASH_Read_Description(uint8_t * array, uint8_t size);
 
-extern uint8_t FLASH_Start();
+extern uint8_t PIOS_BL_HELPER_FLASH_Start();
 
-extern void CRC_Ini();
+extern void PIOS_BL_HELPER_CRC_Ini();
 
 #endif /* PIOS_BL_HELPER_H_ */

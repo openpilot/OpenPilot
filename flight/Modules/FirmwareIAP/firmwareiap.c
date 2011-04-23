@@ -71,8 +71,6 @@ static uint32_t	iap_calc_crc(void);
 
 static void read_description(uint8_t *);
 
-static void read_cpuserial(uint8_t *);
-
 FirmwareIAPObjData 	data;
 
 static uint32_t	get_time(void);
@@ -100,7 +98,7 @@ int32_t FirmwareIAPInitialize()
 {
 	data.BoardType= BOARD_TYPE;
 	read_description(data.Description);
-	read_cpuserial(data.CPUSerial);
+	PIOS_SYS_SerialNumberGetBinary(data.CPUSerial);
 	data.BoardRevision= BOARD_REVISION;
 	data.ArmReset=0;
 	data.crc = 0;
@@ -136,7 +134,7 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
 		if((data.BoardType==BOARD_TYPE)&&(data.crc != iap_calc_crc()))
 		{
 			read_description(data.Description);
-			read_cpuserial(data.CPUSerial);
+			PIOS_SYS_SerialNumberGetBinary(data.CPUSerial);
 			data.BoardRevision=BOARD_REVISION;
 			data.crc = iap_calc_crc();
 			FirmwareIAPObjSet( &data );
@@ -248,19 +246,6 @@ static void read_description(uint8_t * array)
 	uint8_t x = 0;
 	for (uint32_t i = START_OF_USER_CODE + SIZE_OF_CODE; i < START_OF_USER_CODE + SIZE_OF_CODE + FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM; ++i) {
 		array[x] = *FLASH_If_Read(i);
-		++x;
-	}
-}
-
-/**
- * Read the CPU Serial number.
- * @param array has to be 12 bytes long.
- */
-static void read_cpuserial(uint8_t * array)
-{
-	uint8_t x = 0;
-	for (uint8_t i = 0; i < 12; i++) {
-		array[x] = *FLASH_If_Read(0x1ffff7e8 + i);
 		++x;
 	}
 }

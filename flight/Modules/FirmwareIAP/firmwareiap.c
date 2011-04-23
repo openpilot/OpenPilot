@@ -127,13 +127,11 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
 		this_time = get_time();
 		delta = this_time - last_time;
 		last_time = this_time;
-		CRC_Ini();
 		if((data.BoardType==BOARD_TYPE)&&(data.crc != FLASH_crc_memory_calc()))
 		{
 			FLASH_read_description(data.Description,FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM);
 			PIOS_SYS_SerialNumberGetBinary(data.CPUSerial);
 			data.BoardRevision=BOARD_REVISION;
-			CRC_Ini();
 			data.crc = FLASH_crc_memory_calc();
 			FirmwareIAPObjSet( &data );
 		}

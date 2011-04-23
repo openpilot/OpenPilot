@@ -75,6 +75,7 @@ uint8_t FLASH_Start()
 
 uint32_t FLASH_crc_memory_calc()
 {
+	CRC_Ini();
 	CRC_ResetDR();
 	CRC_CalcBlockCRC((uint32_t *) START_OF_USER_CODE, (SIZE_OF_CODE) >> 2);
 	return CRC_GetCRC();

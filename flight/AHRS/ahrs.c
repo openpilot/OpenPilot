@@ -1230,7 +1230,6 @@ void firmwareiapobj_callback(AhrsObjHandle obj)
 {
 	FirmwareIAPObjData firmwareIAPObj;
 	FirmwareIAPObjGet(&firmwareIAPObj);
-	CRC_Ini();
 	if(firmwareIAPObj.ArmReset==0)
 		reset_count=0;
 	if(firmwareIAPObj.ArmReset==1)
@@ -1251,7 +1250,6 @@ void firmwareiapobj_callback(AhrsObjHandle obj)
 	else if(firmwareIAPObj.BoardType==BOARD_TYPE && firmwareIAPObj.crc!=FLASH_crc_memory_calc())
 	{
 		FLASH_read_description(firmwareIAPObj.Description,SIZE_OF_DESCRIPTION);
-		CRC_Ini();
 		firmwareIAPObj.crc=FLASH_crc_memory_calc();
 		firmwareIAPObj.BoardRevision=BOARD_REVISION;
 		FirmwareIAPObjSet(&firmwareIAPObj);

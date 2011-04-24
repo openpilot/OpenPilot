@@ -60,10 +60,6 @@ areyousureyoushouldberunningthis:
 	@echo "     ahrs_program      - Program the firmware onto the AHRS board"
 	@echo "     coptercontrol     - Build firmware for the CopterControl board"
 	@echo
-	@echo "       NOTE: To build firmware to be chain loaded from a bootloader, use"
-	@echo "                 make openpilot USE_BOOTLOADER=YES"
-	@echo "             Don't forget to do a clean between builds with/without bootloader"
-	@echo
 	@echo "   [Simulation]"
 	@echo "     sim_posix         - Build OpenPilot simulation firmware for"
 	@echo "                         a POSIX compatible system (Linux, Mac OS X, ...)"
@@ -299,11 +295,11 @@ all_fw:           $(addsuffix _bin,   $(FW_TARGETS))
 all_fw_clean:     $(addsuffix _clean, $(FW_TARGETS))
 
 .PHONY: all_bl all_bl_clean
-all_bl:           $(addsuffix _elf,   $(BL_TARGETS))
+all_bl:           $(addsuffix _bin,   $(BL_TARGETS))
 all_bl_clean:     $(addsuffix _clean, $(BL_TARGETS))
 
 .PHONY: all_blupd all_blupd_clean
-all_blupd:        $(addsuffix _elf,   $(BLUPD_TARGETS))
+all_blupd:        $(addsuffix _bin,   $(BLUPD_TARGETS))
 all_blupd_clean:  $(addsuffix _clean, $(BLUPD_TARGETS))
 
 .PHONY: all_flight all_flight_clean
@@ -326,8 +322,8 @@ openpilot_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/openpilot
 
 .PHONY: bl_openpilot
-bl_openpilot: bl_openpilot_elf
-bl_openpilot_bino: bl_openpilot_elf
+bl_openpilot: bl_openpilot_bin
+bl_openpilot_bino: bl_openpilot_bin
 
 bl_openpilot_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_openpilot/dep
@@ -340,6 +336,9 @@ bl_openpilot_%:
 bl_openpilot_clean:
 	$(V0) @echo " CLEAN     $@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bl_openpilot
+
+.PHONY: blupd_openpilot
+blupd_openpilot: blupd_openpilot_bin
 
 blupd_openpilot_%: bl_openpilot_bino
 	$(V1) mkdir -p $(BUILD_DIR)/blupd_openpilot/dep
@@ -371,8 +370,8 @@ ahrs_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/ahrs
 
 .PHONY: bl_ahrs
-bl_ahrs: bl_ahrs_elf
-bl_ahrs_bino: bl_ahrs_elf
+bl_ahrs: bl_ahrs_bin
+bl_ahrs_bino: bl_ahrs_bin
 
 bl_ahrs_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_ahrs/dep
@@ -385,6 +384,9 @@ bl_ahrs_%:
 bl_ahrs_clean:
 	$(V0) @echo " CLEAN     $@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bl_ahrs
+
+.PHONY: blupd_ahrs
+blupd_ahrs: blupd_ahrs_bin
 
 blupd_ahrs_%: bl_ahrs_bino bl_ahrs
 	$(V1) mkdir -p $(BUILD_DIR)/blupd_ahrs/dep
@@ -416,8 +418,8 @@ coptercontrol_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/coptercontrol
 
 .PHONY: bl_coptercontrol
-bl_coptercontrol: bl_coptercontrol_elf
-bl_coptercontrol_bino: bl_coptercontrol_elf
+bl_coptercontrol: bl_coptercontrol_bin
+bl_coptercontrol_bino: bl_coptercontrol_bin
 
 bl_coptercontrol_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_coptercontrol/dep
@@ -430,6 +432,9 @@ bl_coptercontrol_%:
 bl_coptercontrol_clean:
 	$(V0) @echo " CLEAN     $@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bl_coptercontrol
+
+.PHONY: blupd_coptercontrol
+blupd_coptercontrol: blupd_coptercontrol_bin
 
 blupd_coptercontrol_%: bl_coptercontrol_bino
 	$(V1) mkdir -p $(BUILD_DIR)/blupd_coptercontrol/dep
@@ -461,8 +466,8 @@ pipxtreme_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/pipxtreme
 
 .PHONY: bl_pipxtreme
-bl_pipxtreme: bl_pipxtreme_elf
-bl_pipxtreme_bino: bl_pipxtreme_elf
+bl_pipxtreme: bl_pipxtreme_bin
+bl_pipxtreme_bino: bl_pipxtreme_bin
 
 bl_pipxtreme_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_pipxtreme/dep
@@ -475,6 +480,9 @@ bl_pipxtreme_%:
 bl_pipxtreme_clean:
 	$(V0) @echo " CLEAN     $@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bl_pipxtreme
+
+.PHONY: blupd_pipxtreme
+blupd_pipxtreme: blupd_pipxtreme_bin
 
 blupd_pipxtreme_%: bl_pipxtreme_bino
 	$(V1) mkdir -p $(BUILD_DIR)/blupd_pipxtreme/dep

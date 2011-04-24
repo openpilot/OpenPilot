@@ -1,8 +1,7 @@
-MEMORY
-{
-    FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 0x00020000
-    SRAM (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00005000
-}
+/* Stub out these functions since we don't use them anyway */
+PROVIDE (   vPortSVCHandler = 0 ) ;
+PROVIDE (   xPortPendSVHandler = 0 ) ;
+PROVIDE (   xPortSysTickHandler = 0 ) ;
 
 _estack = 0x20004FF0;
 

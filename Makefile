@@ -4,6 +4,26 @@ TOOLS_DIR=$(ROOT_DIR)/tools
 BUILD_DIR=$(ROOT_DIR)/build
 DL_DIR=$(ROOT_DIR)/downloads
 
+# Clean out undesirable variables from the environment and command-line
+# to remove the chance that they will cause problems with our build
+define SANITIZE_VAR
+$(if $(filter-out undefined,$(origin $(1))),
+  $(info *NOTE*      Sanitized $(2) variable '$(1)' from $(origin $(1)))
+  MAKEOVERRIDES = $(filter-out $(1)=%,$(MAKEOVERRIDES))
+  override $(1) :=
+  unexport $(1)
+)
+endef
+
+# These specific variables can influence gcc in unexpected (and undesirable) ways
+SANITIZE_GCC_VARS := TMPDIR GCC_EXEC_PREFIX COMPILER_PATH LIBRARY_PATH
+SANITIZE_GCC_VARS += CFLAGS CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH OBJC_INCLUDE_PATH DEPENDENCIES_OUTPUT
+$(foreach var, $(SANITIZE_GCC_VARS), $(eval $(call SANITIZE_VAR,$(var),disallowed)))
+
+# These specific variables used to be valid but now they make no sense
+SANITIZE_DEPRECATED_VARS := USE_BOOTLOADER
+$(foreach var, $(SANITIZE_DEPRECATED_VARS), $(eval $(call SANITIZE_VAR,$(var),deprecated)))
+
 # We almost need to consider autoconf/automake instead of this
 # I don't know if windows supports uname :-(
 QT_SPEC=win32-g++

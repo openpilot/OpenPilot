@@ -471,9 +471,13 @@ OOCD_CL=-d0
 # interface and board/target settings (using the OOCD target-library here)
 UNAME := $(shell uname)
 ifeq ($(UNAME), Darwin)
-  OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.openpilot.osx.cfg -f ../Project/OpenOCD/stm32.cfg
+  OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.openpilot.posix.cfg -f ../Project/OpenOCD/stm32.cfg
 else
-  OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.openpilot.cfg -f ../Project/OpenOCD/stm32.cfg
+  ifeq ($(UNAME), Linux)
+    OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.openpilot.posix.cfg -f ../Project/OpenOCD/stm32.cfg
+  else
+    OOCD_CL+=-f ../Project/OpenOCD/floss-jtag.openpilot.win.cfg -f ../Project/OpenOCD/stm32.cfg
+  endif
 endif
 # initialize
 OOCD_CL+=-c init

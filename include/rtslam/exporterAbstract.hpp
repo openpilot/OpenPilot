@@ -25,6 +25,7 @@ namespace rtslam {
 		public:
 			ExporterAbstract(robot_ptr_t robPtr): robPtr(robPtr) {}
 			virtual void exportCurrentState() = 0;
+			virtual void stop() {}
 	};
 	
 	

@@ -50,11 +50,14 @@ namespace rtslam {
 	
 			void sendTask()
 			{
-				while (true)
+				bool stop = false;
+				while (!stop)
 				{
-					condition_send.wait(boost::lambda::_1 == 1, false);
+					condition_send.wait(boost::lambda::_1 != 0, false);
+					if (condition_send.var < 0) stop = true;
 					condition_send.var = 0;
 					condition_send.unlock();
+					if (stop) break;
 					
 					boost::unique_lock<boost::mutex> l(mutex_data);
 					bool remove_sock = false;
@@ -121,6 +124,8 @@ namespace rtslam {
 				} else
 					std::cout << "ExporterSocket: not finished sending previous message, connect less clients!" << std::endl;
 			}
+			
+			virtual void stop() { condition_send.setAndNotify(-1); }
 	};
 	
 

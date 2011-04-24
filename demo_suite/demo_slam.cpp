@@ -1025,6 +1025,7 @@ int n_innovation = 0;
 	average_robot_innovation /= n_innovation;
 	std::cout << "average_robot_innovation " << average_robot_innovation << std::endl;
 
+	exporter->stop();
 	(*world)->slam_blocked(true);
 //	std::cout << "\nFINISHED ! Press a key to terminate." << std::endl;
 //	getchar();

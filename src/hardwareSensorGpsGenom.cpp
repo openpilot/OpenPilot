@@ -114,6 +114,9 @@ namespace hardware {
 				JFR_ERROR(RtslamException, RtslamException::GENERIC_ERROR, "Poster GPSInfo could not be found");
 			}
 			if (backup_poster_path) setenv("POSTER_PATH", backup_poster_path, 1); else unsetenv("POSTER_PATH");
+#else
+			JFR_ERROR(RtslamException, RtslamException::MISSING_DEPENDENCY,
+			          "You must install posterlib (pocolibs) if you want to use online GPS sensor");
 #endif
 		}
 	}

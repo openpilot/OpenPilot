@@ -221,8 +221,9 @@ endif
 all_ground: openpilotgcs
 
 # Convenience target for the GCS
-.PHONY: gcs
+.PHONY: gcs gcs_clean
 gcs: openpilotgcs
+gcs_clean: openpilotgcs_clean
 
 .PHONY: openpilotgcs
 openpilotgcs:  uavobjects_gcs
@@ -243,6 +244,11 @@ endif
 else
 	$(error $@ is currently only available on Windows)
 endif
+
+.PHONY: openpilotgcs_clean
+openpilotgcs_clean:
+	$(V0) @echo " CLEAN     $@"
+	$(V1) [ ! -d "$(BUILD_DIR)/ground/openpilotgcs" ] || $(RM) -r "$(BUILD_DIR)/ground/openpilotgcs"
 
 .PHONY: uavobjgenerator
 uavobjgenerator:
@@ -270,6 +276,7 @@ uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
 	$(V1) $(UAVOBJGENERATOR) -v -none $(UAVOBJ_XML_DIR) $(ROOT_DIR)
 
 uavobjects_clean:
+	$(V0) @echo " CLEAN     $@"
 	$(V1) [ ! -d "$(UAVOBJ_OUT_DIR)" ] || $(RM) -r "$(UAVOBJ_OUT_DIR)"
 
 ##############################

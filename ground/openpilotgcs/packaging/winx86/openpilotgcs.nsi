@@ -20,16 +20,9 @@
 
 # This script requires Unicode NSIS 2.46 or higher:
 # http://www.scratchpaper.com/
-#
-# Optionally used SubWCRev utility to extract SVN info from working copy.
-# SubWCRev is a part of TortoiseSVN client distribution:
-# http://tortoisesvn.net/
-# SubWCRev is also available separately:
-# http://sourceforge.net/projects/tortoisesvn/files/Tools/1.6.7/SubWCRev-1.6.7.18415.msi/download
 
 # Features:
 #  - Installs to the user local appdata path, no admin rights required.
-#  - Multilingual, needs translations for custom installer strings.
 #
 # TODO:
 #  - optionally install for all users (to Program Files with admin rights on Vista/7).
@@ -69,7 +62,7 @@
 
   VIProductVersion ${PRODUCT_VERSION}
   VIAddVersionKey "ProductName" "${INSTALLER_NAME}"
-  VIAddVersionKey "FileVersion" ${FILE_VERSION}
+  VIAddVersionKey "FileVersion" "${FILE_VERSION}"
   VIAddVersionKey "Comments" "${INSTALLER_NAME}. ${BUILD_DESCRIPTION}"
   VIAddVersionKey "CompanyName" "The OpenPilot Team, http://www.openpilot.org"
   VIAddVersionKey "LegalTrademarks" "${PRODUCT_NAME} is a trademark of The OpenPilot Team"

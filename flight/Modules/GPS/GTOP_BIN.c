@@ -197,6 +197,7 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 		rx_packet->data.speed_over_ground = swap4Bytes(rx_packet->data.speed_over_ground);
 		rx_packet->data.year = swap2Bytes(rx_packet->data.year);
 
+#if !defined(PIOS_GPS_PURISTIC)
 		// set the gps time object
 		GPSTimeData GpsTime;
 //		GPSTimeGet(&GpsTime);
@@ -208,6 +209,7 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 			GpsTime.Month = rx_packet->data.month;    // month
 			GpsTime.Year = rx_packet->data.year;      // year
 		GPSTimeSet(&GpsTime);
+#endif //PIOS_GPS_PURISTIC
 
 		// set the gps position object
 		GPSPositionData	GpsData;
@@ -231,12 +233,14 @@ int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volati
 			GpsData.VDOP            = 99.99;                                                                            // not available in binary mode
 		GPSPositionSet(&GpsData);
 
+#if !defined(PIOS_GPS_PURISTIC)
 		// set the number of satellites
 //		GPSSatellitesData SattelliteData;
 ////		GPSSatellitesGet(&SattelliteData);
 //			memset(&SattelliteData, 0, sizeof(SattelliteData));
 //			SattelliteData.SatsInView = rx_packet->data.satellites_used;                                                    //
 //		GPSSatellitesSet(&SattelliteData);
+#endif //PIOS_GPS_PURISTIC
 
 		// remove the spent binary packet from the buffer
 		gps_rx_buffer_wr -= sizeof(t_gps_bin_packet);

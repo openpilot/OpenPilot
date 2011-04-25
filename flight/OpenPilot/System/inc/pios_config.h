@@ -66,6 +66,7 @@
 #define PIOS_INCLUDE_RTC
 #define PIOS_INCLUDE_WDG
 #define PIOS_INCLUDE_I2C_ESC
+#define PIOS_INCLUDE_BL_HELPER
 
 /* Defaults for Logging */
 #define LOG_FILENAME 			"PIOS.LOG"
@@ -88,6 +89,9 @@
 
 /* Stabilization options */
 #define PIOS_QUATERNION_STABILIZATION
+
+/* GPS options */
+#define PIOS_GPS_SETS_HOMELOCATION
 
 
 #endif /* PIOS_CONFIG_H */

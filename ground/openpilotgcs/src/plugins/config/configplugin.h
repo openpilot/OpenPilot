@@ -57,10 +57,12 @@ private slots:
     void onAutopilotConnect();
     void onAutopilotDisconnect();
     void eraseDone(UAVObject *);
+    void eraseFailed();
 
  private:
     ConfigGadgetFactory *cf;
     Core::Command* cmd;
+    bool settingsErased;
 
 };
 

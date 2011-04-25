@@ -121,6 +121,7 @@ void ConfigPlugin::eraseAllSettings()
     if (msgBox.exec() != QMessageBox::Ok)
             return;
 
+    settingsErased = false;
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager * objMngr = pm->getObject<UAVObjectManager>();
     Q_ASSERT(objMngr);
@@ -132,7 +133,25 @@ void ConfigPlugin::eraseAllSettings()
     data.Selection = ObjectPersistence::SELECTION_ALLSETTINGS;
     objper->setData(data);
     objper->updated();
+    QTimer::singleShot(1500,this,SLOT(eraseFailed()));
 
+}
+
+void ConfigPlugin::eraseFailed()
+{
+    if (settingsErased)
+        return;
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager * objMngr = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objMngr);
+    ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( objMngr->getObject(ObjectPersistence::NAME));
+    disconnect(objper, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(eraseDone(UAVObject *)));
+    QMessageBox msgBox;
+    msgBox.setText(tr("Error trying to erase settings."));
+    msgBox.setInformativeText(tr("Power-cycle your board. Settings might be inconsistent."));
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+    msgBox.exec();
 }
 
 void ConfigPlugin::eraseDone(UAVObject * obj)
@@ -147,6 +166,7 @@ void ConfigPlugin::eraseDone(UAVObject * obj)
 
     disconnect(objper, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(eraseDone(UAVObject *)));
     if (obj->getField("Operation")->getValue().toString().compare(QString("Completed")) == 0) {
+        settingsErased = true;
         msgBox.setText(tr("Settings erased."));
         msgBox.setInformativeText(tr("Please now power-cycle your board to complete reset."));
     } else {

@@ -58,9 +58,6 @@ const uint32_t    iap_time_3_high_end = 5000;
 // Private types
 
 // Private variables
-// TODO: Ed: those two variables below are not used, shall we remove them ?
-//const static uint8_t 	version[] = { 0, 0, 1 };
-//const static uint16_t	SVN = 12345;
 static uint8_t reset_count = 0;
 static portTickType lastResetSysTime;
 

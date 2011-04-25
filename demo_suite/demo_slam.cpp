@@ -797,7 +797,7 @@ void demo_slam01_main(world_ptr_t *world)
 		#else
 		if (intOpts[iReplay] & 1)
 		{
-			hardware::hardware_sensor_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, cv::Size(img_width,img_height),strOpts[sDataPath]));
+			hardware::hardware_sensorext_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, cv::Size(img_width,img_height),strOpts[sDataPath]));
 			senPtr11->setHardwareSensor(hardSen11);
 		}
 		#endif

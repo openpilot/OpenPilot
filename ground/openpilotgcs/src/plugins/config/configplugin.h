@@ -28,11 +28,22 @@
 #define CONFIGPLUGIN_H
 
 #include <extensionsystem/iplugin.h>
+#include <coreplugin/icore.h>
+#include <coreplugin/coreconstants.h>
+#include <coreplugin/actionmanager/actionmanager.h>
+#include "uavtalk/telemetrymanager.h"
+#include "objectpersistence.h"
+
+
+#include <QMessageBox>
+
 
 class ConfigGadgetFactory;
 
 class ConfigPlugin : public ExtensionSystem::IPlugin
 {
+    Q_OBJECT
+
 public:
     ConfigPlugin();
     ~ConfigPlugin();
@@ -40,8 +51,17 @@ public:
     void extensionsInitialized();
     bool initialize(const QStringList & arguments, QString * errorString);
     void shutdown();
+
+private slots:
+    void eraseAllSettings();
+    void onAutopilotConnect();
+    void onAutopilotDisconnect();
+    void eraseDone(UAVObject *);
+
  private:
     ConfigGadgetFactory *cf;
+    Core::Command* cmd;
+
 };
 
 #endif // CONFIGPLUGIN_H

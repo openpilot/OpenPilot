@@ -38,9 +38,21 @@ UAVTalkPlugin::~UAVTalkPlugin()
 {
 
 }
-
+/**
+  * Called once all the plugins which depend on us have been loaded
+  */
 void UAVTalkPlugin::extensionsInitialized()
 {
+}
+
+/**
+  * Called at startup, before any plugin which depends on us is initialized
+  */
+bool UAVTalkPlugin::initialize(const QStringList & arguments, QString * errorString)
+{
+    // Done
+    Q_UNUSED(arguments);
+    Q_UNUSED(errorString);
     // Get UAVObjectManager instance
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
     objMngr = pm->getObject<UAVObjectManager>();
@@ -55,13 +67,6 @@ void UAVTalkPlugin::extensionsInitialized()
                      this, SLOT(onDeviceConnect(QIODevice *)));
     QObject::connect(cm, SIGNAL(deviceAboutToDisconnect()),
                      this, SLOT(onDeviceDisconnect()));
-}
-
-bool UAVTalkPlugin::initialize(const QStringList & arguments, QString * errorString)
-{
-    // Done
-    Q_UNUSED(arguments);
-    Q_UNUSED(errorString);
     return true;
 }
 

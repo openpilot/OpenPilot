@@ -167,7 +167,7 @@ void ConfigPlugin::eraseDone(UAVObject * obj)
     disconnect(objper, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(eraseDone(UAVObject *)));
     if (obj->getField("Operation")->getValue().toString().compare(QString("Completed")) == 0) {
         settingsErased = true;
-        msgBox.setText(tr("Settings erased."));
+        msgBox.setText(tr("Settings are now erased."));
         msgBox.setInformativeText(tr("Please now power-cycle your board to complete reset."));
     } else {
         msgBox.setText(tr("Error trying to erase settings."));

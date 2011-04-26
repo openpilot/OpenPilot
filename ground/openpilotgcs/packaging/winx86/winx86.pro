@@ -5,67 +5,46 @@ TEMPLATE = subdirs
 # Some Windows packaging magic (for release build only)
 equals(copydata, 1):win32:CONFIG(release, debug|release) {
 
-    WINX86_PATH = packaging/winx86
-    SVN_INFO_TEMPLATE = svninfo.tpl
-    SVN_INFO_MAKEFILE = svninfo.mk
-    NSIS_TEMPLATE = openpilotgcs.tpl
-    NSIS_HEADER = openpilotgcs.nsh
-
-    # Check for SubWCRev.exe executable required to get some useful SVN repository info.
-    # For example, currently checked out SVN revision (highest for the working copy).
-    # SubWCRev is a part of TortoiseSVN client distribution:
-    # http://tortoisesvn.net/
-    # SubWCRev is also available separately:
-    # http://sourceforge.net/projects/tortoisesvn/files/Tools/1.6.7/SubWCRev-1.6.7.18415.msi/download
-
-    # Default location is TortoiseSVN bin folder.
-    # FIXME: it should try to find in the PATH first, and use hardcoded reference last
-    SUBWCREV_EXE = $$targetPath(\"$$(ProgramFiles)/TortoiseSVN/bin/SubWCRev.exe\")
-
-    exists($$SUBWCREV_EXE) {
-        message("SubWCRev found: $${SUBWCREV_EXE}")
-        svninfo.commands += @echo Copying stubs... $$addNewline()
-        svninfo.commands += $(COPY_FILE)
-        svninfo.commands +=   $$targetPath($$GCS_SOURCE_TREE/$$WINX86_PATH/$$SVN_INFO_MAKEFILE)
-        svninfo.commands +=   $$targetPath($$GCS_BUILD_TREE/$$WINX86_PATH/$$SVN_INFO_MAKEFILE)
-        svninfo.commands +=   $$addNewline()
-        svninfo.commands += $(COPY_FILE)
-        svninfo.commands +=   $$targetPath($$GCS_SOURCE_TREE/$$WINX86_PATH/$$NSIS_HEADER)
-        svninfo.commands +=   $$targetPath($$GCS_BUILD_TREE/$$WINX86_PATH/$$NSIS_HEADER)
-        svninfo.commands +=   $$addNewline()
-        svninfo.commands += @echo Executing $${SUBWCREV_EXE} $$SVN_INFO_TEMPLATE $$SVN_INFO_MAKEFILE $$addNewline()
-        svninfo.commands += -@$$SUBWCREV_EXE $$targetPath($$GCS_SOURCE_TREE)
-        svninfo.commands +=   $$targetPath($$GCS_SOURCE_TREE/$$WINX86_PATH/$$SVN_INFO_TEMPLATE)
-        svninfo.commands +=   $$targetPath($$GCS_BUILD_TREE/$$WINX86_PATH/$$SVN_INFO_MAKEFILE)
-        svninfo.commands +=   $$addNewline()
-        svninfo.commands += @echo Executing $${SUBWCREV_EXE} $$NSIS_TEMPLATE $$NSIS_HEADER $$addNewline()
-        svninfo.commands += -@$$SUBWCREV_EXE $$targetPath($$GCS_SOURCE_TREE)
-        svninfo.commands +=   $$targetPath($$GCS_SOURCE_TREE/$$WINX86_PATH/$$NSIS_TEMPLATE)
-        svninfo.commands +=   $$targetPath($$GCS_BUILD_TREE/$$WINX86_PATH/$$NSIS_HEADER)
-        svninfo.commands +=   $$addNewline()
-    } else {
-        message("SubWCRev not found, SVN info is not available")
-        svninfo.commands += $(COPY_FILE)
-        svninfo.commands +=   $$targetPath($$GCS_SOURCE_TREE/$$WINX86_PATH/$$SVN_INFO_MAKEFILE)
-        svninfo.commands +=   $$targetPath($$GCS_BUILD_TREE/$$WINX86_PATH/$$SVN_INFO_MAKEFILE)
-        svninfo.commands +=   $$addNewline()
-        svninfo.commands += $(COPY_FILE)
-        svninfo.commands +=   $$targetPath($$GCS_SOURCE_TREE/$$WINX86_PATH/$$NSIS_HEADER)
-        svninfo.commands +=   $$targetPath($$GCS_BUILD_TREE/$$WINX86_PATH/$$NSIS_HEADER)
-        svninfo.commands +=   $$addNewline()
+    # We need this Windows macro since building under Unix-like shell the top level
+    # targetPath macro will use forward slashes which don't work for such Windows
+    # commands like pushd, etc. But note that we still use targetPath for $(COPY_FILE)
+    # parameters because this command is different under native Windows and Unix-like
+    # build environments.
+    defineReplace(winTargetPath) {
+        return($$replace(1, /, \\))
     }
-    svninfo.target = svninfo.dummy
-    QMAKE_EXTRA_TARGETS += svninfo
-    force.depends += svninfo
+
+    # Some file locations
+    WINX86_PATH     = packaging/winx86
+    NSIS_HEADER     = openpilotgcs.nsh
+    HEADER_MAKER    = make_header.cmd
+    INSTALLER_MAKER = make_installer.cmd
+
+    # copy defaults first (will be used if no git available)
+    git.commands += @echo Copying default version info... $$addNewline()
+    git.commands += $(COPY_FILE)
+    git.commands +=   $$targetPath($$GCS_SOURCE_TREE/$$WINX86_PATH/$$NSIS_HEADER)
+    git.commands +=   $$targetPath($$GCS_BUILD_TREE/$$WINX86_PATH/$$NSIS_HEADER)
+    git.commands +=   $$addNewline()
+
+    # extract repository info if command line git is available
+    git.commands += $$winTargetPath($$GCS_SOURCE_TREE/$$WINX86_PATH/$$HEADER_MAKER)
+    git.commands +=   $$winTargetPath($$GCS_SOURCE_TREE)
+    git.commands +=   $$winTargetPath($$GCS_BUILD_TREE/$$WINX86_PATH/$$NSIS_HEADER)
+    git.commands +=   $$addNewline()
+
+    git.target = git.dummy
+    QMAKE_EXTRA_TARGETS += git
+    force.depends += git
 
     # Redefine FORCE target to collect data every time
     force.target = FORCE
     QMAKE_EXTRA_TARGETS += force
 
     # Create installer build target - this WILL NOT run during build, run it by hand
-    message("Run \"make installer\" in $$GCS_BUILD_TREE/$$WINX86_PATH to build Windows installer (Unicode NSIS 2.46+ required)")
-    nsis.target = installer
-    nsis.depends = svninfo
-    nsis.commands += @$$targetPath($$GCS_SOURCE_TREE/$$WINX86_PATH/Makefile.cmd)
+    message("Run \"make gcs_installer\" in $$GCS_BUILD_TREE/$$WINX86_PATH to build Windows installer (Unicode NSIS 2.46+ required)")
+    nsis.target = gcs_installer
+    nsis.depends = git
+    nsis.commands += @$$winTargetPath($$GCS_SOURCE_TREE/$$WINX86_PATH/$$INSTALLER_MAKER)
     QMAKE_EXTRA_TARGETS += nsis
 }

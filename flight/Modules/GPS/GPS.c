@@ -53,8 +53,11 @@
 // Private functions
 
 static void gpsTask(void *parameters);
+
+#ifdef PIOS_GPS_SETS_HOMELOCATION
 static void setHomeLocation(GPSPositionData * gpsData);
 static float GravityAccel(float latitude, float longitude, float altitude);
+#endif
 
 // ****************
 // Private constants
@@ -65,11 +68,19 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 #define GPS_TIMEOUT_MS                  500
 #define GPS_COMMAND_RESEND_TIMEOUT_MS   2000
 
+#ifdef PIOS_GPS_SETS_HOMELOCATION
 // Unfortunately need a good size stack for the WMM calculation
-#ifdef ENABLE_GPS_BINARY_GTOP
-	#define STACK_SIZE_BYTES            800
+	#ifdef ENABLE_GPS_BINARY_GTOP
+		#define STACK_SIZE_BYTES            800
+	#else
+		#define STACK_SIZE_BYTES            800
+	#endif
 #else
-	#define STACK_SIZE_BYTES            800
+	#ifdef ENABLE_GPS_BINARY_GTOP
+		#define STACK_SIZE_BYTES            440
+	#else
+		#define STACK_SIZE_BYTES            440
+	#endif
 #endif
 
 #define TASK_PRIORITY                   (tskIDLE_PRIORITY + 1)
@@ -311,12 +322,15 @@ static void gpsTask(void *parameters)
 		else
 		{	// we appear to be receiving GPS sentences OK, we've had an update
 
+			GPSPositionGet(&GpsData);
+
+#ifdef PIOS_GPS_SETS_HOMELOCATION
 			HomeLocationData home;
 			HomeLocationGet(&home);
 
-			GPSPositionGet(&GpsData);
 			if ((GpsData.Status == GPSPOSITION_STATUS_FIX3D) && (home.Set == HOMELOCATION_SET_FALSE))
 				setHomeLocation(&GpsData);
+#endif
 
 			//criteria for GPS-OK taken from this post...
 			//http://forums.openpilot.org/topic/1523-professors-insgps-in-svn/page__view__findpost__p__5220
@@ -334,6 +348,7 @@ static void gpsTask(void *parameters)
 	}
 }
 
+#ifdef PIOS_GPS_SETS_HOMELOCATION
 /*
  * Estimate the acceleration due to gravity for a particular location in LLA
  */
@@ -389,6 +404,7 @@ static void setHomeLocation(GPSPositionData * gpsData)
 		}
 	}
 }
+#endif
 
 // ****************
 

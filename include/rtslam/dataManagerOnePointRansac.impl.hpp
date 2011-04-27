@@ -148,7 +148,7 @@ namespace jafar {
 				for(RansacSetList::iterator rsIter = ransacSetList.begin(); rsIter != ransacSetList.end(); ++rsIter)
 					if (!best_set || (*rsIter)->size() > best_set->size()) best_set = *rsIter;
 
-				// if there are too much updates to do bufferized, randomly move out some of them
+				// if there are too many updates to do bufferized, randomly move out some of them
 				// to pending, they may be processed in active search if really necessary
 				while (best_set->size() > 1 && best_set->size() > algorithmParams.n_updates_ransac)
 				{

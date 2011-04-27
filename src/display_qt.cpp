@@ -12,6 +12,11 @@
 #include "rtslam/observationPinHoleAnchoredHomogeneousPointsLine.hpp"
 #include "rtslam/appearanceSegment.hpp"
 
+#ifdef HAVE_MODULE_DSEG
+	#include "dseg/SegmentHypothesis.hpp"
+	#include "dseg/GradientStatsDescriptor.hpp"
+#endif
+
 namespace jafar {
 namespace rtslam {
 namespace display {
@@ -460,7 +465,8 @@ std::cout << "connecting slots" << std::endl;
                if (dispPred2)
                {
                   c = getColorRGB(ColorManager::getColorObject_prediction(landmarkPhase_,events_)) ;
-                  std::ostringstream oss; oss << id_; if (dispMeas2) oss << " - " << int(match_score*100);
+						//std::ostringstream oss; oss << id_; if (dispMeas2) oss << " - " << int(match_score*100);
+						std::ostringstream oss; oss << id_; if (dispMeas2) oss << " - " << int(appSpec->hypothesis()->gradientDescriptor().meanGradients());
 
                   (*it)->setColor(c.R,c.G,c.B); //
                   (*it)->setFontColor(c.R,c.G,c.B); //

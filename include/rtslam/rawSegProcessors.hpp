@@ -22,6 +22,7 @@
 #include "dseg/ConstantVelocityPredictor.hpp"
 #include "dseg/RtslamPredictor.hpp"
 #include "dseg/HierarchicalDirectSegmentsDetector.hpp"
+#include "dseg/GradientStatsDescriptor.hpp"
 
 #include "rtslam/rawImage.hpp"
 #include "rtslam/sensorPinhole.hpp"
@@ -203,7 +204,8 @@ namespace rtslam {
 
 						double dx = seg->x1() - seg->x2();
 						double dy = seg->y1() - seg->y2();
-						double sqrLength = dx*dx + dy*dy;
+						double sqrLength = sqrt(dx*dx + dy*dy);
+						sqrLength *= seg->gradientDescriptor().meanGradients();
 
 						// If this segment is longer than the previous best
 						if(sqrLength > bestSqrLength)
@@ -236,13 +238,19 @@ namespace rtslam {
 
 						// extract appearance
 						vec pix = featPtr->measurement.x();
-						pix[0] = ( pix[0] + pix[2] )/2;
-						pix[1] = ( pix[1] + pix[3] )/2;
+						vec2 center;
+						center[0] = ( pix[0] + pix[2] )/2;
+						center[1] = ( pix[1] + pix[3] )/2;
+
 						boost::shared_ptr<AppearanceImageSegment> appPtr = SPTR_CAST<AppearanceImageSegment>(featPtr->appearancePtr);
-						rawData->img->extractPatch(appPtr->patch, (int)pix(0), (int)pix(1), params.patchSize, params.patchSize);
-						appPtr->offset.x()(0) = pix(0) - ((int)pix(0) + 0.5);
-						appPtr->offset.x()(1) = pix(1) - ((int)pix(1) + 0.5);
-						appPtr->offset.P() = jblas::zero_mat(2); // by definition this is our landmark projection
+						rawData->img->extractPatch(appPtr->patch, (int)center(0), (int)center(1), params.patchSize, params.patchSize);
+						appPtr->offsetTop.x()(0) = pix(0) - ((int)center(0) - params.patchSize);
+						appPtr->offsetTop.x()(1) = pix(1) - ((int)center(1) - params.patchSize);
+						appPtr->offsetTop.P() = jblas::zero_mat(2); // by definition this is our landmark projection
+
+						appPtr->offsetBottom.x()(0) = pix(2) - ((int)center(0) - params.patchSize);
+						appPtr->offsetBottom.x()(1) = pix(3) - ((int)center(1) - params.patchSize);
+						appPtr->offsetBottom.P() = jblas::zero_mat(2); // by definition this is our landmark projection
 
 						ret = true;
 					}
@@ -261,7 +269,8 @@ namespace rtslam {
             /*app_src->patch.copy(app_dst->patch, (app_src->patch.width()-app_dst->patch.width())/2,
                   (app_src->patch.height()-app_dst->patch.height())/2, 0, 0,
                   app_dst->patch.width(), app_dst->patch.height());*/
-				app_dst->offset = app_src->offset;
+				app_dst->offsetTop = app_src->offsetTop;
+				app_dst->offsetBottom = app_src->offsetBottom;
 
             // create descriptor
             descriptor_ptr_t descPtr(descFactory->createDescriptor());

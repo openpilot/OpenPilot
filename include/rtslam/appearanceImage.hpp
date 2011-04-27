@@ -66,14 +66,15 @@ namespace jafar {
       class AppearanceImageSegment: public AppearanceAbstract {
          public:
             image::Image patch;
-            unsigned int patchSum;
-				unsigned int patchSquareSum;
-            Gaussian offset; ///< offset between the center of the patch and the real position of the feature
+				unsigned int patchMeanLeft;
+				unsigned int patchMeanRight;
+				Gaussian offsetTop;
+				Gaussian offsetBottom;
 				dseg::SegmentsSet m_hypothesis;
 			public:
-				AppearanceImageSegment(const image::Image& patch, Gaussian const &offset, dseg::SegmentHypothesis* _hypothesis = NULL);
+				AppearanceImageSegment(const image::Image& patch, Gaussian const &offsetTop, Gaussian const &offsetBottom, dseg::SegmentHypothesis* _hypothesis = NULL);
 				AppearanceImageSegment(int width, int height, int depth, dseg::SegmentHypothesis* _hypothesis = NULL):
-					patch(width, height, depth, JfrImage_CS_GRAY), offset(2) {
+					patch(width, height, depth, JfrImage_CS_GRAY), offsetTop(2), offsetBottom(2) {
 					if(_hypothesis != NULL)m_hypothesis.addSegment(_hypothesis);
 //					cout << "Created patch with " << width << "x" << height << " pixels; depth: " << depth << "; color space: " << JfrImage_CS_GRAY << endl;
             }
@@ -101,7 +102,7 @@ namespace jafar {
 					return ret;
 				}
          private:
-            void computePatchIntegrals();
+				void computePatchMeans();
       };
 	}
 

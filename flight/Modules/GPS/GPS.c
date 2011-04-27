@@ -322,11 +322,12 @@ static void gpsTask(void *parameters)
 		else
 		{	// we appear to be receiving GPS sentences OK, we've had an update
 
+			GPSPositionGet(&GpsData);
+
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 			HomeLocationData home;
 			HomeLocationGet(&home);
 
-			GPSPositionGet(&GpsData);
 			if ((GpsData.Status == GPSPOSITION_STATUS_FIX3D) && (home.Set == HOMELOCATION_SET_FALSE))
 				setHomeLocation(&GpsData);
 #endif

@@ -408,7 +408,7 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8* 
 
     UAVObject* obj = NULL;
     bool error = false;
-    bool allInstances = (instId == ALL_INSTANCES? true : false);
+    bool allInstances =  (instId == ALL_INSTANCES);
 
     // Process message type
     switch (type) {

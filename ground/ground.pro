@@ -2,21 +2,20 @@
 # Top level Qt-Creator project file
 #
 
-# This meta-project allows qt-creator users to open
-# and configure a single project and to build all
-# required software to produce a GCS.  This includes
-# regenerating all uavobject output.
+# This meta-project allows qt-creator users to open and configure a
+# single project and to build all required software to produce a GCS.
+# This includes regenerating all uavobject output.
 #
-# NOTE: To use this meta-project, you MUST perform these
-# steps once for each SVN checkout:
+# NOTE: to use this meta-project, you MUST perform these steps once
+# for each source tree checkout:
 # - Open <top>/ground/ground.pro in qt-creator
 # - Select the "Projects" tab
 # - Under Build Settings/General heading, click "Show Details"
 # - Activate "Shadow Build"
 # - Set your Build Directory to <top>/build/ground
 #
-# <top> = The full path to the base of your svn tree which should
-# contain "flight", "ground", etc.
+# <top> = the full path to the base of your git source tree which
+# should contain "flight", "ground", etc.
 
 # There is a small problem with dependencies. qmake needs synthetic
 # files when it generates GCS Makefiles. But we do not have

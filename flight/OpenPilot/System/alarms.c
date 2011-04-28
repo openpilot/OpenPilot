@@ -77,7 +77,6 @@ int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity
     {
     	alarms.Alarm[alarm] = severity;
     	SystemAlarmsSet(&alarms);
-    	SystemAlarmsUpdated(); // force telemetry update since the alarm was changed
     }
 
     // Release lock

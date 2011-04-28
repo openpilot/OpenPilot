@@ -66,6 +66,7 @@
 #define PIOS_INCLUDE_RTC
 #define PIOS_INCLUDE_WDG
 #define PIOS_INCLUDE_I2C_ESC
+#define PIOS_INCLUDE_BL_HELPER
 
 /* Defaults for Logging */
 #define LOG_FILENAME 			"PIOS.LOG"

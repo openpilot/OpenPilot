@@ -1,5 +1,5 @@
 define connect
-	target remote localhost:3334
+	target remote localhost:3333
 	monitor cortex_m3 vector_catch all
 	file ./Build/PipXtreme.elf
 end

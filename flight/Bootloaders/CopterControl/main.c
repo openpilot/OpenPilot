@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotBL OpenPilot BootLoader
- * @brief These files contain the code to the OpenPilot MB Bootloader.
+ * @addtogroup CopterControlBL CopterControl BootLoader
+ * @brief These files contain the code to the CopterControl Bootloader.
  *
  * @{
  * @file       main.c
@@ -71,7 +71,7 @@ void jump_to_app();
 
 #define BLUE LED1
 // #define RED	LED4
-#define LED_PWM_TIMER	TIM3
+#define LED_PWM_TIMER	TIM1
 int main() {
 	/* NOTE: Do NOT modify the following start-up sequence */
 	/* Any new initialization functions should be added in OpenPilotInit() */

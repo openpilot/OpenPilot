@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotBL OpenPilot BootLoader
+ * @addtogroup CopterControlBL CopterControl BootLoader
  * @{
  *
  * @file       stopwatch.c
@@ -34,9 +34,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // Local definitions
 /////////////////////////////////////////////////////////////////////////////
-
-//#define STOPWATCH_TIMER_BASE                 TIM6
-//#define STOPWATCH_TIMER_RCC   RCC_APB1Periph_TIM6
 
 uint32_t STOPWATCH_Init(u32 resolution, TIM_TypeDef* TIM) {
 	uint32_t STOPWATCH_TIMER_RCC;

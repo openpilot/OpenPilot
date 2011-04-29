@@ -275,7 +275,7 @@ app_dst->patch.save(buffer);
          double current_pov_norm2 = jmath::sum_sqr(current_pov(0), current_pov(1), current_pov(2));
 
          // check with all the exisiting views
-         for(typename ImgSegFeatureViewList::iterator it = views.begin(); it < views.end(); it++)
+         for(ImgSegFeatureViewList::iterator it = views.begin(); it < views.end(); it++)
             checkView(current_pov, current_pov_norm2, lmk, *it, cosClosestAngle, closestView);
 
          // if we can't have a good view, we add the last one and try with it

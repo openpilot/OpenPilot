@@ -1291,6 +1291,7 @@ void demo_slam01() {
 int main(int argc, char* const* argv)
 { try {
 	intOpts[iVerbose] = 5;
+	intOpts[iMap] = 1;
 	floatOpts[fFreq] = 60.0;
 	floatOpts[fShutter] = 0.0;
 	strOpts[sDataPath] = ".";

@@ -30,6 +30,8 @@ include $(TOP)/make/firmware-defs.mk
 # Set to YES to compile for debugging
 DEBUG ?= NO
 
+# Set to YES to build a FW version that will erase all flash memory
+ERASE_FLASH ?= NO
 # Set to YES to use the Servo output pins for debugging via scope or logic analyser
 ENABLE_DEBUG_PINS ?= NO
 
@@ -144,6 +146,7 @@ SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
 SRC += $(OPUAVOBJ)/uavobjectsinit_linker.c
+SRC += $(OPSYSTEM)/pios_usb_hid_desc.c
 else
 ## TESTCODE
 SRC += $(OPTESTS)/test_common.c
@@ -205,7 +208,7 @@ SRC += $(PIOSSTM32F10X)/pios_wdg.c
 
 # PIOS USB related files (seperated to make code maintenance more easy)
 SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
-SRC += $(PIOSSTM32F10X)/pios_usb_hid_desc.c
+#SRC += $(PIOSSTM32F10X)/pios_usb_hid_desc.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_prop.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c

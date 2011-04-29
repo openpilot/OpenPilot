@@ -194,7 +194,7 @@ time_t rseed;
  * program parameters
  * ###########################################################################*/
 
-enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iVerbose, iMap, iRobot, iTrigger, iGps, iSimu, nIntOpts };
+enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iVerbose, iMap, iRobot, iTrigger, iGps, iSimu, iExport, nIntOpts };
 int intOpts[nIntOpts] = {0};
 const int nFirstIntOpt = 0, nLastIntOpt = nIntOpts-1;
 
@@ -226,6 +226,7 @@ struct option long_options[] = {
 	{"trigger", 2, 0, 0}, // should be in config file
 	{"gps", 2, 0, 0},
 	{"simu", 2, 0, 0},
+	{"export", 2, 0, 0},
 	// double options
 	{"freq", 2, 0, 0}, // should be in config file
 	{"shutter", 2, 0, 0}, // should be in config file
@@ -879,7 +880,14 @@ void demo_slam01_main(world_ptr_t *world)
 
 	//worldPtr->display_mutex.unlock();
 
-	boost::shared_ptr<ExporterSocket> exporter(new ExporterSocket(robPtr1, 30000));
+	boost::shared_ptr<ExporterAbstract> exporter;
+	switch (intOpts[iExport])
+	{
+		case 1: exporter.reset(new ExporterSocket(robPtr1, 30000)); break;
+		case 2: exporter.reset(new ExporterPoster(robPtr1)); break;
+	}
+
+	
 	
 jblas::vec robot_prediction;
 double average_robot_innovation = 0.;
@@ -932,7 +940,7 @@ int n_innovation = 0;
 				average_robot_innovation += ublas::norm_2(robPtr->state.x() - robot_prediction);
 				n_innovation++;
 				
-				exporter->exportCurrentState();
+				if (exporter) exporter->exportCurrentState();
 			}
 		}
 		
@@ -1035,7 +1043,7 @@ int n_innovation = 0;
 	average_robot_innovation /= n_innovation;
 	std::cout << "average_robot_innovation " << average_robot_innovation << std::endl;
 
-	exporter->stop();
+	if (exporter) exporter->stop();
 	(*world)->slam_blocked(true);
 //	std::cout << "\nFINISHED ! Press a key to terminate." << std::endl;
 //	getchar();
@@ -1272,6 +1280,7 @@ void demo_slam01() {
 	* --rand-seed=0/1/n, 0=generate new one, 1=in replay use the saved one, n=use seed n
 	* --pause=0/n 0=don't, n=pause for frames>n (needs --replay 1)
 	* --log=0/1/filename -> log result in text file
+	* --export=0/1/2 -> Off/socket/poster
 	* --verbose=0/1/2/3/4/5 -> Off/Trace/Warning/Debug/VerboseDebug/VeryVerboseDebug
 	* --data-path=/mnt/ram/rtslam
 	* --config-setup=data/setup.cfg
@@ -1364,6 +1373,7 @@ int main(int argc, char* const* argv)
 		else
 			strOpts[sConfigSetup] = "data/setup.cfg";
 	}
+	if (intOpts[iReplay] & 1) intOpts[iExport] = 0;
 	if (strOpts[sConfigSetup][0] == '@' && strOpts[sConfigSetup][1] == '/')
 		strOpts[sConfigSetup] = strOpts[sDataPath] + strOpts[sConfigSetup].substr(1);
 	if (strOpts[sConfigEstimation][0] == '@' && strOpts[sConfigEstimation][1] == '/')

@@ -184,7 +184,7 @@ time_t rseed;
  * program parameters
  * ###########################################################################*/
 
-enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iLog, iVerbose, iMap, iRobot, iTrigger, iGps, iSimu, nIntOpts };
+enum { iDispQt = 0, iDispGdhe, iRenderAll, iReplay, iDump, iRandSeed, iPause, iVerbose, iMap, iRobot, iTrigger, iGps, iSimu, nIntOpts };
 int intOpts[nIntOpts] = {0};
 const int nFirstIntOpt = 0, nLastIntOpt = nIntOpts-1;
 
@@ -192,13 +192,14 @@ enum { fFreq = 0, fShutter, fHeading, nFloatOpts };
 double floatOpts[nFloatOpts] = {0.0};
 const int nFirstFloatOpt = nIntOpts, nLastFloatOpt = nIntOpts+nFloatOpts-1;
 
-enum { sDataPath = 0, sConfigSetup, sConfigEstimation, nStrOpts };
+enum { sDataPath = 0, sConfigSetup, sConfigEstimation, sLog, nStrOpts };
 std::string strOpts[nStrOpts];
 const int nFirstStrOpt = nIntOpts+nFloatOpts, nLastStrOpt = nIntOpts+nFloatOpts+nStrOpts-1;
 
 enum { bHelp = 0, bUsage, nBreakingOpts };
 const int nFirstBreakingOpt = nIntOpts+nFloatOpts+nStrOpts, nLastBreakingOpt = nIntOpts+nFloatOpts+nStrOpts+nBreakingOpts-1;
 
+/// !!WARNING!! be careful that options are in the same order above and below
 
 struct option long_options[] = {
 	// int options
@@ -209,7 +210,6 @@ struct option long_options[] = {
 	{"dump", 2, 0, 0},
 	{"rand-seed", 2, 0, 0},
 	{"pause", 2, 0, 0},
-	{"log", 2, 0, 0},
 	{"verbose", 2, 0, 0},
 	{"map", 2, 0, 0},
 	{"robot", 2, 0, 0}, // should be in config file
@@ -224,6 +224,7 @@ struct option long_options[] = {
 	{"data-path", 1, 0, 0},
 	{"config-setup", 1, 0, 0},
 	{"config-estimation", 1, 0, 0},
+	{"log", 1, 0, 0},
 	// breaking options
 	{"help",0,0,0},
 	{"usage",0,0,0},
@@ -392,9 +393,9 @@ void demo_slam01_main(world_ptr_t *world)
 	
 	kernel::VariableCondition<int> rawdata_condition(0);
 	boost::scoped_ptr<kernel::DataLogger> dataLogger;
-	if (intOpts[iLog])
+	if (!strOpts[sLog].empty())
 	{
-		dataLogger.reset(new kernel::DataLogger(strOpts[sDataPath] + "/rtslam.log"));
+		dataLogger.reset(new kernel::DataLogger(strOpts[sDataPath] + "/" + strOpts[sLog]));
 		dataLogger->writeCurrentDate();
 		dataLogger->writeNewLine();
 		
@@ -1261,7 +1262,7 @@ void demo_slam01() {
 	* --dump=0/1  (needs --data-path)
 	* --rand-seed=0/1/n, 0=generate new one, 1=in replay use the saved one, n=use seed n
 	* --pause=0/n 0=don't, n=pause for frames>n (needs --replay 1)
-	* --log=0/1 -> log result in text file
+	* --log=0/1/filename -> log result in text file
 	* --verbose=0/1/2/3/4/5 -> Off/Trace/Warning/Debug/VerboseDebug/VeryVerboseDebug
 	* --data-path=/mnt/ram/rtslam
 	* --config-setup=data/setup.cfg
@@ -1373,6 +1374,12 @@ int main(int argc, char* const* argv)
 	intOpts[iDispGdhe] = 0;
 	#endif
 
+	if (strOpts[sLog].size() == 1)
+	{
+		if (strOpts[sLog][0] == '0') strOpts[sLog] = ""; else
+		if (strOpts[sLog][0] == '1') strOpts[sLog] = "rtslam.log";
+	}
+	
 	std::cout << "Loading config files " << strOpts[sConfigSetup] << " and " << strOpts[sConfigEstimation] << std::endl;
 	configSetup.load(strOpts[sConfigSetup]);
 	configEstimation.load(strOpts[sConfigEstimation]);

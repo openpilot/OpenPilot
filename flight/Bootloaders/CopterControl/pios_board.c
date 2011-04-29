@@ -52,8 +52,8 @@ void PIOS_Board_Init(void) {
 	FLASH_SetLatency(FLASH_Latency_2);
 
 	/* Delay system */
-	PIOS_DELAY_Init();	
-	
+	PIOS_DELAY_Init();
+
 	/* Initialize the PiOS library */
 	PIOS_GPIO_Init();
 

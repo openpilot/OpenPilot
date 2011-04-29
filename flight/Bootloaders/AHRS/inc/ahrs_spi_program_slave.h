@@ -24,12 +24,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
- #ifndef AHRS_SPI_PROGRAM_SLAVE_H
+#ifndef AHRS_SPI_PROGRAM_SLAVE_H
 #define AHRS_SPI_PROGRAM_SLAVE_H
 
 /** Check if OpenPilot is trying to program AHRS
-* If so, it will program the FLASH then return
-* If not it just returns.
-*/
+ * If so, it will program the FLASH then return
+ * If not it just returns.
+ */
 void AhrsProgramReceive(uint32_t spi_id);
 #endif //AHRS_PROGRAM_SLAVE_H

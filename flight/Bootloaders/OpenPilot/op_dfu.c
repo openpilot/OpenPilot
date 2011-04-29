@@ -78,7 +78,7 @@ extern Port_t ssp_port;
 extern DFUPort ProgPort;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
-void sendData(uint8_t * buf,uint16_t size);
+void sendData(uint8_t * buf, uint16_t size);
 uint32_t CalcFirmCRC(void);
 
 void DataDownload(DownloadAction action) {
@@ -101,8 +101,8 @@ void DataDownload(DownloadAction action) {
 		for (uint8_t x = 0; x < packetSize; ++x) {
 			partoffset = (downPacketCurrent * 14 * 4) + (x * 4);
 			offset = baseOfAdressType(downType) + partoffset;
-			if(!flash_read(SendBuffer+(6+x*4),offset,currentProgrammingDestination))
-			{
+			if (!flash_read(SendBuffer + (6 + x * 4), offset,
+					currentProgrammingDestination)) {
 				DeviceState = Last_operation_failed;
 			}
 		}
@@ -111,14 +111,14 @@ void DataDownload(DownloadAction action) {
 			DeviceState = Last_operation_Success;
 			Aditionals = (uint32_t) Download;
 		}
-		sendData(SendBuffer+1,63);
+		sendData(SendBuffer + 1, 63);
 	}
 }
 void processComand(uint8_t *xReceive_Buffer) {
 
 	Command = xReceive_Buffer[COMMAND];
 #ifdef DEBUG_SSP
-	char str[63]={0};
+	char str[63]= {0};
 	sprintf(str,"Received COMMAND:%d|",Command);
 	PIOS_COM_SendString(PIOS_COM_TELEM_USB,str);
 #endif
@@ -339,7 +339,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 			Buffer[11] = devicesTable[Data0 - 1].FW_Crc >> 16;
 			Buffer[12] = devicesTable[Data0 - 1].FW_Crc >> 8;
 			Buffer[13] = devicesTable[Data0 - 1].FW_Crc;
-			Buffer[14] = devicesTable[Data0 - 1].devID>>8;
+			Buffer[14] = devicesTable[Data0 - 1].devID >> 8;
 			Buffer[15] = devicesTable[Data0 - 1].devID;
 		}
 		sendData(Buffer + 1, 63);
@@ -387,8 +387,8 @@ void processComand(uint8_t *xReceive_Buffer) {
 		break;
 	case Download_Req:
 #ifdef DEBUG_SSP
-			sprintf(str,"COMMAND:DOWNLOAD_REQ 1 Status=%d|",DeviceState);
-			PIOS_COM_SendString(PIOS_COM_TELEM_USB,str);
+		sprintf(str,"COMMAND:DOWNLOAD_REQ 1 Status=%d|",DeviceState);
+		PIOS_COM_SendString(PIOS_COM_TELEM_USB,str);
 #endif
 		if (DeviceState == DFUidle) {
 #ifdef DEBUG_SSP
@@ -545,17 +545,16 @@ uint32_t CalcFirmCRC() {
 	}
 
 }
-void sendData(uint8_t * buf,uint16_t size)
-{
-if (ProgPort == Usb) {
+void sendData(uint8_t * buf, uint16_t size) {
+	if (ProgPort == Usb) {
 
-			PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, buf, size);
-			if(DeviceState == downloading)
-				PIOS_DELAY_WaitmS(10);
+		PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, buf, size);
+		if (DeviceState == downloading)
+			PIOS_DELAY_WaitmS(10);
 
-		} else if (ProgPort == Serial) {
-			ssp_SendData(&ssp_port, buf, size);
-		}
+	} else if (ProgPort == Serial) {
+		ssp_SendData(&ssp_port, buf, size);
+	}
 }
 
 bool flash_read(uint8_t * buffer, uint32_t adr, DFUProgType type) {

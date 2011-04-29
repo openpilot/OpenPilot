@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
-* @addtogroup CopterControlBL CopterControl BootLoader
+ * @addtogroup CopterControlBL CopterControl BootLoader
  * @brief These files contain the code to the CopterControl Bootloader.
  *
  * @{
@@ -70,7 +70,7 @@ extern DFUStates DeviceState;
 extern uint8_t JumpToApp;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
-void sendData(uint8_t * buf,uint16_t size);
+void sendData(uint8_t * buf, uint16_t size);
 uint32_t CalcFirmCRC(void);
 
 void DataDownload(DownloadAction action) {
@@ -93,8 +93,8 @@ void DataDownload(DownloadAction action) {
 		for (uint8_t x = 0; x < packetSize; ++x) {
 			partoffset = (downPacketCurrent * 14 * 4) + (x * 4);
 			offset = baseOfAdressType(downType) + partoffset;
-			if(!flash_read(SendBuffer+(6+x*4),offset,currentProgrammingDestination))
-			{
+			if (!flash_read(SendBuffer + (6 + x * 4), offset,
+					currentProgrammingDestination)) {
 				DeviceState = Last_operation_failed;
 			}
 		}
@@ -103,14 +103,14 @@ void DataDownload(DownloadAction action) {
 			DeviceState = Last_operation_Success;
 			Aditionals = (uint32_t) Download;
 		}
-		sendData(SendBuffer+1,63);
+		sendData(SendBuffer + 1, 63);
 	}
 }
 void processComand(uint8_t *xReceive_Buffer) {
 
 	Command = xReceive_Buffer[COMMAND];
 #ifdef DEBUG_SSP
-	char str[63]={0};
+	char str[63]= {0};
 	sprintf(str,"Received COMMAND:%d|",Command);
 	PIOS_COM_SendString(PIOS_COM_TELEM_USB,str);
 #endif
@@ -139,7 +139,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 	case EnterDFU:
 		if (((DeviceState == BLidle) && (Data0 < numberOfDevices))
 				|| (DeviceState == DFUidle)) {
-			if (Data0 > 0)//PORQUE???
+			if (Data0 > 0)
 				OPDfuIni(TRUE);
 			DeviceState = DFUidle;
 			currentProgrammingDestination = devicesTable[Data0].programmingType;
@@ -196,7 +196,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 						}
 					}
 					if (result != 1) {
-						DeviceState = Last_operation_failed;//ok
+						DeviceState = Last_operation_failed;
 						Aditionals = (uint32_t) Command;
 					} else {
 
@@ -287,7 +287,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 			Buffer[11] = devicesTable[Data0 - 1].FW_Crc >> 16;
 			Buffer[12] = devicesTable[Data0 - 1].FW_Crc >> 8;
 			Buffer[13] = devicesTable[Data0 - 1].FW_Crc;
-			Buffer[14] = devicesTable[Data0 - 1].devID>>8;
+			Buffer[14] = devicesTable[Data0 - 1].devID >> 8;
 			Buffer[15] = devicesTable[Data0 - 1].devID;
 		}
 		sendData(Buffer + 1, 63);
@@ -322,8 +322,8 @@ void processComand(uint8_t *xReceive_Buffer) {
 		break;
 	case Download_Req:
 #ifdef DEBUG_SSP
-			sprintf(str,"COMMAND:DOWNLOAD_REQ 1 Status=%d|",DeviceState);
-			PIOS_COM_SendString(PIOS_COM_TELEM_USB,str);
+		sprintf(str,"COMMAND:DOWNLOAD_REQ 1 Status=%d|",DeviceState);
+		PIOS_COM_SendString(PIOS_COM_TELEM_USB,str);
 #endif
 		if (DeviceState == DFUidle) {
 #ifdef DEBUG_SSP
@@ -395,7 +395,7 @@ void OPDfuIni(uint8_t discover) {
 	numberOfDevices = 1;
 	devicesTable[0] = dev;
 	if (discover) {
-	//TODO check other devices trough spi or whatever
+		//TODO check other devices trough spi or whatever
 	}
 }
 uint32_t baseOfAdressType(DFUTransfer type) {
@@ -438,10 +438,9 @@ uint32_t CalcFirmCRC() {
 	}
 
 }
-void sendData(uint8_t * buf,uint16_t size)
-{
+void sendData(uint8_t * buf, uint16_t size) {
 	PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, buf, size);
-	if(DeviceState == downloading)
+	if (DeviceState == downloading)
 		PIOS_DELAY_WaitmS(20);//this is an hack, we should check wtf is wrong with hid
 }
 

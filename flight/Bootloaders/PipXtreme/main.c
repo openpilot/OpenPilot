@@ -53,12 +53,11 @@ uint32_t sweep_steps2 = 100; // * 5 mS -> 500 mS
 
 
 ////////////////////////////////////////
-uint8_t tempcount=0;
-
+uint8_t tempcount = 0;
 
 /* Extern variables ----------------------------------------------------------*/
 DFUStates DeviceState;
-int16_t status=0;
+int16_t status = 0;
 uint8_t JumpToApp = FALSE;
 uint8_t GO_dfu = FALSE;
 uint8_t USB_connected = FALSE;
@@ -94,11 +93,11 @@ int main() {
 
 	if (GO_dfu == TRUE) {
 		PIOS_Board_Init();
-		if(User_DFU_request == TRUE)
+		if (User_DFU_request == TRUE)
 			DeviceState = DFUidle;
 		else
 			DeviceState = BLidle;
-		STOPWATCH_Init(100,LED_PWM_TIMER);
+		STOPWATCH_Init(100, LED_PWM_TIMER);
 	} else
 		JumpToApp = TRUE;
 
@@ -161,7 +160,8 @@ int main() {
 
 		if (STOPWATCH_ValueGet(LED_PWM_TIMER) > 100 * 50 * 100)
 			STOPWATCH_Reset(LED_PWM_TIMER);
-		if ((STOPWATCH_ValueGet(LED_PWM_TIMER) > 60000) && (DeviceState == BLidle))
+		if ((STOPWATCH_ValueGet(LED_PWM_TIMER) > 60000) && (DeviceState
+				== BLidle))
 			JumpToApp = TRUE;
 
 		processRX();

@@ -49,7 +49,7 @@ public:
     void freeze();
     typedef enum { STATUSICON_OK, STATUSICON_RUNNING, STATUSICON_FAIL, STATUSICON_INFO} StatusIcon;
     QString setOpenFileName();
-
+    QString setSaveFileName();
 private:
     Ui_deviceWidget *myDevice;
     int deviceID;

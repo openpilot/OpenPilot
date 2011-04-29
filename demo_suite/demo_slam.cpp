@@ -88,6 +88,12 @@
  */
 #define SEGMENT_BASED 0
 
+#if SEGMENT_BASED
+	#ifndef HAVE_MODULE_DSEG
+	#error "dseg module is required for segment based slam"
+	#endif
+#endif
+
 
 /** ############################################################################
  * #############################################################################
@@ -122,6 +128,7 @@
 #include "rtslam/sensorPinhole.hpp"
 #include "rtslam/sensorAbsloc.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPoint.hpp"
+#include "rtslam/landmarkAnchoredHomogeneousPointsLine.hpp"
 //#include "rtslam/landmarkEuclideanPoint.hpp"
 #include "rtslam/observationFactory.hpp"
 #include "rtslam/observationMakers.hpp"
@@ -168,12 +175,15 @@ typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, S
 	AppearanceImagePoint, SensorAbstract::PINHOLE, LandmarkAbstract::PNT_AH> PinholeAhpObservationMaker;
 typedef ImagePointObservationMaker<ObservationPinHoleAnchoredHomogeneousPoint, SensorPinhole, LandmarkAnchoredHomogeneousPoint,
 	simu::AppearanceSimu, SensorAbstract::PINHOLE, LandmarkAbstract::PNT_AH> PinholeAhpSimuObservationMaker;
-typedef SegmentObservationMaker<ObservationPinHoleAnchoredHomogeneousPointsLine, SensorPinhole, LandmarkAnchoredHomogeneousPointsLine,
-   AppearanceSegment, SensorAbstract::PINHOLE, LandmarkAbstract::LINE_AHPL> PinholeAhplObservationMaker;
 
 typedef DataManagerOnePointRansac<RawImage, SensorPinhole, FeatureImagePoint, image::ConvexRoi, ActiveSearchGrid, ImagePointHarrisDetector, ImagePointZnccMatcher> DataManager_ImagePoint_Ransac;
 typedef DataManagerOnePointRansac<simu::RawSimu, SensorPinhole, simu::FeatureSimu, image::ConvexRoi, ActiveSearchGrid, simu::DetectorSimu<image::ConvexRoi>, simu::MatcherSimu<image::ConvexRoi> > DataManager_ImagePoint_Ransac_Simu;
+
+#if SEGMENT_BASED
+typedef SegmentObservationMaker<ObservationPinHoleAnchoredHomogeneousPointsLine, SensorPinhole, LandmarkAnchoredHomogeneousPointsLine,
+   AppearanceSegment, SensorAbstract::PINHOLE, LandmarkAbstract::LINE_AHPL> PinholeAhplObservationMaker;
 typedef DataManagerOnePointRansac<RawImage, SensorPinhole, FeatureSegment, image::ConvexRoi, ActiveSegmentSearchGrid, HDsegDetector, DsegMatcher> DataManager_ImageSeg_Test;
+#endif
 
 int mode = 0;
 time_t rseed;

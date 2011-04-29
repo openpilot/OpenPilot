@@ -13,6 +13,7 @@
 #include "rtslam/featurePoint.hpp"
 #include "rtslam/descriptorImagePoint.hpp"
 #include "rtslam/descriptorImageSeg.hpp"
+#include "rtslam/descriptorSeg.hpp"
 #include "rtslam/simuData.hpp"
 
 namespace jafar {
@@ -100,6 +101,8 @@ class ImageSegmentObservationMaker
       }
 };
 
+#ifdef HAVE_MODULE_DSEG
+
 template<class ObsType, class SenType, class LmkType, class AppType,
     SensorAbstract::type_enum SenTypeId, LandmarkAbstract::type_enum LmkTypeId>
 class SegmentObservationMaker
@@ -137,6 +140,6 @@ class SegmentObservationMaker
       }
 };
 
-
+#endif
 
 }} // namespace jafar::rtslam

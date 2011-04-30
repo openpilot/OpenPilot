@@ -8,7 +8,7 @@ module Rtslam
 
 # The common origin is the initial position of the truth with null orientation
 # in the truth frame.
-	
+# The truth file has to be manually cut and start simultaneously with slam file
 	
 def Rtslam.sync_truth(slam_filename, truth_filename, res_filename)
 	# transforms
@@ -52,12 +52,12 @@ def Rtslam.sync_truth(slam_filename, truth_filename, res_filename)
 	truth_sp_col=-1
 	truth_sr_col=-1
 
-	truth_sx=0.002
-	truth_sy=0.002
-	truth_sz=0.002
-	truth_sw=0.02
-	truth_sp=0.02
-	truth_sr=0.02
+	truth_sx=0.001
+	truth_sy=0.001
+	truth_sz=0.001
+	truth_sw=2.0/200.0
+	truth_sp=2.0/200.0
+	truth_sr=2.0/200.0
 
 	# format
 	slam_ncol=45
@@ -125,12 +125,6 @@ def Rtslam.sync_truth(slam_filename, truth_filename, res_filename)
 		# convert to robot center
 		rtruth_raw_t3d = Geom::T3D::composeToEuler(truth_raw_t3d, truth2rtruth_t3d)
 		rslam_raw_t3d = Geom::T3D::composeToEuler(slam_raw_t3d, slam2rslam_t3d)
-		if init then
-print(truth_raw_t3d)
-print(rtruth_raw_t3d)
-print(slam_raw_t3d)
-print(rslam_raw_t3d)
-		end
 		
 		# 
 		if (init) then
@@ -142,8 +136,13 @@ print(rslam_raw_t3d)
 			
 			truth_transfo_t3d = Geom::T3D::composeToEuler(rtruth_final_t3d, Geom::T3D::invToEuler(rtruth_raw_t3d))
 			slam_transfo_t3d = Geom::T3D::composeToEuler(rslam_final_t3d, Geom::T3D::invToEuler(rslam_raw_t3d))
-print(truth_transfo_t3d)
-print(slam_transfo_t3d)
+# print(Jafar::Geom::print(truth_raw_t3d))
+# print(Jafar::Geom::print(truth2rtruth_t3d))
+# print(Jafar::Geom::print(rtruth_raw_t3d))
+# print(Jafar::Geom::print(slam_raw_t3d))
+# print(Jafar::Geom::print(rslam_raw_t3d))
+# print(Jafar::Geom::print(truth_transfo_t3d))
+# print(Jafar::Geom::print(slam_transfo_t3d))
 			
 			# remove cov
 			truth_transfo_t3d.set(truth_transfo_t3d.getX)
@@ -154,19 +153,18 @@ print(slam_transfo_t3d)
 			rslam_final_t3d = Geom::T3D::composeToEuler(slam_transfo_t3d, rslam_raw_t3d)
 			rtruth_final_t3d = Geom::T3D::composeToEuler(truth_transfo_t3d, rtruth_raw_t3d)
 			
-#			rslam_final_t3d = rslam_raw_t3d
-#			rtruth_final_t3d = rtruth_raw_t3d
-			
 			# interpolation FIXME deal better with angles and modulo
 			coeff = (slam_final_t - truth_prev_t) / (truth_final_t - truth_prev_t)
-			rtruth_inter_t3d = Geom::T3DEuler.new(rtruth_prev_t3d.getX + (rtruth_final_t3d.getX - rtruth_prev_t3d.getX) * coeff)
+			rtruth_inter_t3d = Geom::T3DEuler.new(
+				rtruth_prev_t3d.getX    + (rtruth_final_t3d.getX    - rtruth_prev_t3d.getX   ) * coeff,
+				rtruth_prev_t3d.getXCov + (rtruth_final_t3d.getXCov - rtruth_prev_t3d.getXCov) * coeff)
 		end
 		
 		# error
 		error_final_t3d = Geom::T3D::composeToEuler(rslam_final_t3d, Geom::T3D::invToEuler(rtruth_inter_t3d))
 	
 		rslam_final_t3d_dev = rslam_final_t3d.getXStdDev
-		rtruth_final_t3d_dev = rtruth_final_t3d.getXStdDev
+		rtruth_final_t3d_dev = rtruth_inter_t3d.getXStdDev
 		error_final_t3d_dev = error_final_t3d.getXStdDev
 		
 		res_line = "\
@@ -175,8 +173,8 @@ print(slam_transfo_t3d)
 #{rslam_final_t3d.getX.get(3)} #{rslam_final_t3d.getX.get(4)} #{rslam_final_t3d.getX.get(5)} \
 #{rslam_final_t3d_dev.get(0)} #{rslam_final_t3d_dev.get(1)} #{rslam_final_t3d_dev.get(2)} \
 #{rslam_final_t3d_dev.get(3)} #{rslam_final_t3d_dev.get(4)} #{rslam_final_t3d_dev.get(5)} \
-#{rtruth_final_t3d.getX.get(0)} #{rtruth_final_t3d.getX.get(1)} #{rtruth_final_t3d.getX.get(2)} \
-#{rtruth_final_t3d.getX.get(3)} #{rtruth_final_t3d.getX.get(4)} #{rtruth_final_t3d.getX.get(5)} \
+#{rtruth_inter_t3d.getX.get(0)} #{rtruth_inter_t3d.getX.get(1)} #{rtruth_inter_t3d.getX.get(2)} \
+#{rtruth_inter_t3d.getX.get(3)} #{rtruth_inter_t3d.getX.get(4)} #{rtruth_inter_t3d.getX.get(5)} \
 #{rtruth_final_t3d_dev.get(0)} #{rtruth_final_t3d_dev.get(1)} #{rtruth_final_t3d_dev.get(2)} \
 #{rtruth_final_t3d_dev.get(3)} #{rtruth_final_t3d_dev.get(4)} #{rtruth_final_t3d_dev.get(5)} \
 #{error_final_t3d.getX.get(0)} #{error_final_t3d.getX.get(1)} #{error_final_t3d.getX.get(2)} \

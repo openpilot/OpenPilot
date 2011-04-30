@@ -27,6 +27,6 @@ MACHINES="\
 RUNPATH=/home/croussil/Libs/jafar/build_release/modules/rtslam
 
 for machine in $MACHINES; do
-	ssh -t $machine "cd $RUNPATH; screen -S rtslam -t rtslam -d -m bash data/scripts/run_loop.sh"
+	ssh -t $machine "cd $RUNPATH; screen -S rtslam -t rtslam -d -m data/scripts/nees_loop.sh"
 	sleep 1
 done

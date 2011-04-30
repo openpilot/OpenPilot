@@ -90,7 +90,7 @@ namespace jafar {
     template<class T>
     T inv(const T& mat)
     {
-      T invmat;
+      T invmat(mat.size1(), mat.size2());
       jmath::ublasExtra::inv(mat, invmat);
       return invmat;
     }
@@ -100,7 +100,13 @@ namespace jafar {
     {
       return ublas::trans(mat);
     }
-    
+
+    template<class T>
+     double inner_prod(const T& vec1, const T& vec2)
+    {
+      return ublas::inner_prod(vec1, vec2);
+    }
+
     jblas::vec rangeToVec(const jblas::vec_range& r)
     {
       return r;

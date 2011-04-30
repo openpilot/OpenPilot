@@ -49,6 +49,8 @@
 %include "jmath/ublasExtra.hpp"
 %include "jmath/misc.hpp"
 
+%template(sqr) jafar::jmath::sqr<double>;
+
 %template(setSizeValue) jafar::jmath::setSizeValue<jblas::vec>;
 %template(setValue) jafar::jmath::setValueVec<jblas::vec>;
 %template(print) jafar::jmath::print<jblas::vec>;
@@ -139,6 +141,7 @@
 %template(mul) jafar::jmath::scalmul<jblas::mat,int>;
 %template(mul) jafar::jmath::scalmul<jblas::mat,double>;
 %template(mul) jafar::jmath::vecmatmul<jblas::mat,jblas::vec>;
+%template(mul) jafar::jmath::vecmatmul<jblas::sym_mat,jblas::vec>;
 %template(mul) jafar::jmath::vecmatmul<jblas::mat33,jblas::vec3>;
 %template(mul) jafar::jmath::vecmatmul<jblas::mat33,jblas::vec>;
 %template(mul) jafar::jmath::vecmatmul<jblas::mat44,jblas::vec>;
@@ -148,6 +151,8 @@
 %template(mul) jafar::jmath::matmatmul<jblas::sym_mat,jblas::mat,jblas::mat>;
 %template(mul) jafar::jmath::matmatmul<jblas::sym_mat,jblas::sym_mat,jblas::sym_mat>;
 %template(mul) jafar::jmath::matmatmul<jblas::mat,jblas::sym_mat,jblas::mat>;
+%template(inner_prod) jafar::jmath::inner_prod<jblas::vec>;
+%template(prod_xt_P_x) jafar::jmath::ublasExtra::prod_xt_P_x<jblas::sym_mat,jblas::vec>;
 %template(div) jafar::jmath::div<jblas::mat, double>;
 %template(div) jafar::jmath::div<jblas::mat, float>;
 %template(div) jafar::jmath::div<jblas::mat, int>;
@@ -155,6 +160,8 @@
 %template(div) jafar::jmath::div<jblas::mat33, float>;
 %template(inv) jafar::jmath::inv<jblas::mat44>;
 %template(inv) jafar::jmath::inv<jblas::mat>;
+%template(inv) jafar::jmath::inv<jblas::sym_mat>;
+%template(trans) jafar::jmath::trans<jblas::vec>;
 %template(trans) jafar::jmath::trans<jblas::mat>;
 %template(trans) jafar::jmath::trans<jblas::mat22>;
 %template(assignMat) jafar::jmath::assignMat<jblas::sym_mat,jblas::mat>;

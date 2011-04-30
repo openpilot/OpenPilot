@@ -289,7 +289,7 @@ void MainWindow::extensionsInitialized()
     if ( ! qs->allKeys().count() ){
         QMessageBox msgBox;
         msgBox.setText(tr("No configuration file could be found."));
-        msgBox.setInformativeText(tr("Do you want to load an example configuration?"));
+        msgBox.setInformativeText(tr("Do you want to load the default configuration?"));
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         msgBox.setDefaultButton(QMessageBox::Yes);
         if ( msgBox.exec() == QMessageBox::Yes ){

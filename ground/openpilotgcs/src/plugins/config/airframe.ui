@@ -73,7 +73,7 @@
        <item>
         <widget class="QStackedWidget" name="airframesWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="fixedWing">
           <property name="enabled">
@@ -464,202 +464,213 @@
          <widget class="QWidget" name="multiRotor">
           <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1">
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0,0">
+            <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0">
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,0">
                <item>
-                <widget class="QLabel" name="label_15">
-                 <property name="text">
-                  <string>Frame type:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QComboBox" name="multirotorFrameType">
-                 <property name="toolTip">
-                  <string>Select the Multirotor frame type here.</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_5">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,0,0">
-               <item>
-                <layout class="QVBoxLayout" name="verticalLayout_20">
+                <layout class="QVBoxLayout" name="verticalLayout_24">
                  <item>
-                  <widget class="QLabel" name="label_4">
-                   <property name="font">
-                    <font>
-                     <weight>75</weight>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>Mix Level</string>
-                   </property>
-                  </widget>
+                  <layout class="QHBoxLayout" name="horizontalLayout_5">
+                   <item>
+                    <widget class="QLabel" name="label_15">
+                     <property name="text">
+                      <string>Frame type:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QComboBox" name="multirotorFrameType">
+                     <property name="toolTip">
+                      <string>Select the Multirotor frame type here.</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_5">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
                  </item>
                  <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_19">
+                  <layout class="QHBoxLayout" name="horizontalLayout_22">
                    <item>
-                    <layout class="QVBoxLayout" name="verticalLayout_22">
+                    <layout class="QVBoxLayout" name="verticalLayout_20">
                      <item>
-                      <widget class="QLabel" name="label_43">
-                       <property name="text">
-                        <string>100</string>
+                      <widget class="QLabel" name="label_4">
+                       <property name="font">
+                        <font>
+                         <weight>75</weight>
+                         <bold>true</bold>
+                        </font>
                        </property>
-                       <property name="alignment">
-                        <set>Qt::AlignCenter</set>
+                       <property name="text">
+                        <string>Mix Level</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QSlider" name="mrRollMixLevel">
-                       <property name="toolTip">
-                        <string>Weight of Roll mixing in percent.
+                      <layout class="QHBoxLayout" name="horizontalLayout_19">
+                       <item>
+                        <layout class="QVBoxLayout" name="verticalLayout_22">
+                         <item>
+                          <widget class="QLabel" name="label_43">
+                           <property name="text">
+                            <string>100</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QSlider" name="mrRollMixLevel">
+                           <property name="toolTip">
+                            <string>Weight of Roll mixing in percent.
 Typical values are 100% for + configuration and 50% for X configuration on quads.</string>
-                       </property>
-                       <property name="maximum">
-                        <number>100</number>
-                       </property>
-                       <property name="value">
-                        <number>100</number>
-                       </property>
-                       <property name="orientation">
-                        <enum>Qt::Vertical</enum>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_42">
-                       <property name="text">
-                        <string>R</string>
-                       </property>
-                       <property name="alignment">
-                        <set>Qt::AlignCenter</set>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </item>
-                   <item>
-                    <layout class="QVBoxLayout" name="verticalLayout_23">
-                     <item>
-                      <widget class="QLabel" name="label_44">
-                       <property name="text">
-                        <string>100</string>
-                       </property>
-                       <property name="alignment">
-                        <set>Qt::AlignCenter</set>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QSlider" name="mrPitchMixLevel">
-                       <property name="toolTip">
-                        <string>Weight of Pitch mixing in percent.
+                           </property>
+                           <property name="maximum">
+                            <number>100</number>
+                           </property>
+                           <property name="value">
+                            <number>100</number>
+                           </property>
+                           <property name="orientation">
+                            <enum>Qt::Vertical</enum>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QLabel" name="label_42">
+                           <property name="text">
+                            <string>R</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </item>
+                       <item>
+                        <layout class="QVBoxLayout" name="verticalLayout_23">
+                         <item>
+                          <widget class="QLabel" name="label_44">
+                           <property name="text">
+                            <string>100</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QSlider" name="mrPitchMixLevel">
+                           <property name="toolTip">
+                            <string>Weight of Pitch mixing in percent.
 Typical values are 100% for + configuration and 50% for X configuration on quads.</string>
-                       </property>
-                       <property name="maximum">
-                        <number>100</number>
-                       </property>
-                       <property name="value">
-                        <number>100</number>
-                       </property>
-                       <property name="orientation">
-                        <enum>Qt::Vertical</enum>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_40">
-                       <property name="text">
-                        <string>P</string>
-                       </property>
-                       <property name="alignment">
-                        <set>Qt::AlignCenter</set>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </item>
-                   <item>
-                    <layout class="QVBoxLayout" name="verticalLayout_21">
-                     <item>
-                      <widget class="QLabel" name="label_45">
-                       <property name="text">
-                        <string>50</string>
-                       </property>
-                       <property name="alignment">
-                        <set>Qt::AlignCenter</set>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QSlider" name="mrYawMixLevel">
-                       <property name="toolTip">
-                        <string>Weight of Yaw mixing in percent.
+                           </property>
+                           <property name="maximum">
+                            <number>100</number>
+                           </property>
+                           <property name="value">
+                            <number>100</number>
+                           </property>
+                           <property name="orientation">
+                            <enum>Qt::Vertical</enum>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QLabel" name="label_40">
+                           <property name="text">
+                            <string>P</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </item>
+                       <item>
+                        <layout class="QVBoxLayout" name="verticalLayout_21">
+                         <item>
+                          <widget class="QLabel" name="label_45">
+                           <property name="text">
+                            <string>50</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QSlider" name="mrYawMixLevel">
+                           <property name="toolTip">
+                            <string>Weight of Yaw mixing in percent.
 Typical value is 50% for + or X configuration on quads.</string>
-                       </property>
-                       <property name="minimum">
-                        <number>-100</number>
-                       </property>
-                       <property name="maximum">
-                        <number>100</number>
-                       </property>
-                       <property name="value">
-                        <number>50</number>
-                       </property>
-                       <property name="orientation">
-                        <enum>Qt::Vertical</enum>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_6">
-                       <property name="autoFillBackground">
-                        <bool>false</bool>
-                       </property>
-                       <property name="text">
-                        <string>Y</string>
-                       </property>
-                       <property name="alignment">
-                        <set>Qt::AlignCenter</set>
-                       </property>
-                      </widget>
+                           </property>
+                           <property name="minimum">
+                            <number>0</number>
+                           </property>
+                           <property name="maximum">
+                            <number>100</number>
+                           </property>
+                           <property name="value">
+                            <number>50</number>
+                           </property>
+                           <property name="orientation">
+                            <enum>Qt::Vertical</enum>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QLabel" name="label_6">
+                           <property name="autoFillBackground">
+                            <bool>false</bool>
+                           </property>
+                           <property name="text">
+                            <string>Y</string>
+                           </property>
+                           <property name="alignment">
+                            <set>Qt::AlignCenter</set>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </item>
+                      </layout>
                      </item>
                     </layout>
+                   </item>
+                   <item>
+                    <widget class="QGraphicsView" name="quadShape">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>110</width>
+                       <height>110</height>
+                      </size>
+                     </property>
+                    </widget>
                    </item>
                   </layout>
                  </item>
                 </layout>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_13">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
                </item>
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -718,10 +729,11 @@ Typical value is 50% for + or X configuration on quads.</string>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>110</width>
-                     <height>110</height>
+                     <width>120</width>
+                     <height>120</height>
                     </size>
                    </property>
+                   <zorder></zorder>
                   </widget>
                  </item>
                  <item>
@@ -736,13 +748,23 @@ Typical value is 50% for + or X configuration on quads.</string>
               </layout>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1,3,4">
+              <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1,3">
+               <property name="spacing">
+                <number>10</number>
+               </property>
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_10">
                  <item>
                   <widget class="QLabel" name="label_23">
                    <property name="text">
-                    <string>Tricopter Yaw Ch</string>
+                    <string>Tricopter Yaw</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_2">
+                   <property name="text">
+                    <string>channel:</string>
                    </property>
                   </widget>
                  </item>
@@ -783,7 +805,7 @@ Typical value is 50% for + or X configuration on quads.</string>
                <item>
                 <widget class="QGroupBox" name="groupBox">
                  <property name="title">
-                  <string>Motors</string>
+                  <string>Motor output channels:</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_10">
                   <property name="spacing">
@@ -967,22 +989,6 @@ p, li { white-space: pre-wrap; }
                    </layout>
                   </item>
                  </layout>
-                </widget>
-               </item>
-               <item>
-                <widget class="QGraphicsView" name="quadShape">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>110</width>
-                   <height>110</height>
-                  </size>
-                 </property>
                 </widget>
                </item>
               </layout>
@@ -2223,8 +2229,120 @@ p, li { white-space: pre-wrap; }
      <y>214</y>
     </hint>
     <hint type="destinationlabel">
-     <x>118</x>
-     <y>215</y>
+     <x>127</x>
+     <y>214</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mrRollMixLevel</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_43</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>42</x>
+     <y>220</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>43</x>
+     <y>171</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mrPitchMixLevel</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_44</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>83</x>
+     <y>228</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>82</x>
+     <y>168</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mrYawMixLevel</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_45</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>120</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>121</x>
+     <y>172</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>elevonSlider1</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_18</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>236</x>
+     <y>253</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>226</x>
+     <y>310</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>elevonSlider2</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_25</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>306</x>
+     <y>273</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>301</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>customFFSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>customFeedForwardValue</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>651</x>
+     <y>112</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>600</x>
+     <y>112</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>customFFMaxAccel</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_OSD</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>659</x>
+     <y>211</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>581</x>
+     <y>218</y>
     </hint>
    </hints>
   </connection>

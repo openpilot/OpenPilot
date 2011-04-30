@@ -193,3 +193,4 @@ M: Architecture co-lead
 N: Alex Vrubel
 E: alex.vrubel (plus) openpilot (at) gmail (dot) com
 D: Russian translation of the GCS
+

@@ -164,7 +164,10 @@ QList <Core::IConnection::device> IPconnectionConnection::availableDevices()
 {
     QList <Core::IConnection::device> list;
     device d;
-    d.displayName=(const QString )m_config->HostName();
+    if (m_config->HostName().length()>1)
+        d.displayName=(const QString )m_config->HostName();
+    else
+        d.displayName="Unconfigured";
     d.name=(const QString )m_config->HostName();
     //we only have one "device" as defined by the configuration m_config
     list.append(d);

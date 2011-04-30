@@ -49,7 +49,6 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     connect(m_stabilization->saveStabilizationToSD, SIGNAL(clicked()), this, SLOT(saveStabilizationUpdate()));
     connect(m_stabilization->saveStabilizationToRAM, SIGNAL(clicked()), this, SLOT(sendStabilizationUpdate()));
     connect(m_stabilization->getStabilizationCurrent, SIGNAL(clicked()), this, SLOT(requestStabilizationUpdate()));
-    connect(m_stabilization->resetStabilizationToDefaults, SIGNAL(clicked()), this, SLOT(resetStabilizationToDefaults()));
 
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestStabilizationUpdate()));
 
@@ -268,10 +267,6 @@ void ConfigStabilizationWidget::saveStabilizationUpdate()
     updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
 }
 
-
-void ConfigStabilizationWidget::resetStabilizationToDefaults()
-{
-}
 
 void ConfigStabilizationWidget::realtimeUpdateToggle(bool state)
 {

@@ -143,3 +143,25 @@ $($(1):.c=.s) : %.s : %.c
 	$(V1) $(CC) -S $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
 endef
 
+# ---------------------------------------------------------------------------
+#  # Options for OpenOCD flash-programming
+# see openocd.pdf/openocd.texi for further information
+# #
+# OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).elf                                                                                                                                                                                               
+# if OpenOCD is in the $PATH just set OPENOCDEXE=openocd
+OOCD_EXE=openocd
+# debug level
+OOCD_CL=-d0
+# interface and board/target settings (using the OOCD target-library here)
+OOCD_CL+=-s $(TOP)/flight/Project/OpenOCD
+OOCD_CL+=-f foss-jtag.revb.cfg -f stm32.cfg
+
+# initialize
+OOCD_CL+=-c init
+# show the targets
+OOCD_CL+=-c targets
+# commands to prepare flash-write
+OOCD_CL+= -c "reset halt"
+# flash erase
+OOCD_CL+=-c "stm32x mass_erase 0"
+# flash-write

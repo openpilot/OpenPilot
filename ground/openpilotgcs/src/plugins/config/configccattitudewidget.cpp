@@ -28,7 +28,7 @@
 #include "ui_ccattitude.h"
 #include "utils/coordinateconversions.h"
 #include <QMutexLocker>
-#include <QErrorMessage>
+#include <QMessageBox>
 #include <QDebug>
 
 ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
@@ -89,9 +89,12 @@ void ConfigCCAttitudeWidget::timeout() {
     disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(attitudeRawUpdated(UAVObject*)));
     disconnect(&timer,SIGNAL(timeout()),this,SLOT(timeout()));
 
-    QErrorMessage errmsg;
-    errmsg.showMessage("Calibration timed out before receiving required updates");
-    errmsg.exec();
+    QMessageBox msgBox;
+    msgBox.setText(tr("Calibration timed out before receiving required updates."));
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+    msgBox.exec();
+
 }
 
 void ConfigCCAttitudeWidget::attitudeBiasChanged(int val) {
@@ -121,7 +124,7 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
     y_accum.clear();
     z_accum.clear();
 
-    ui->status->setText("Calibrating...");
+    ui->status->setText(tr("Calibrating..."));
 
     // Set up to receive updates
     UAVDataObject * obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));

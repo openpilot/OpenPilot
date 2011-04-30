@@ -330,41 +330,15 @@ else
 	quote = 
 endif
 
-# ---------------------------------------------------------------------------
-# Options for OpenOCD flash-programming
-# see openocd.pdf/openocd.texi for further information
-#
-OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).elf
-# if OpenOCD is in the $PATH just set OOCD_EXE=openocd
-OOCD_EXE=openocd
-# debug level
-OOCD_CL=-d0
-# interface and board/target settings (using the OOCD target-library here)
-UNAME := $(shell uname)
-
-ifeq ($(UNAME), Darwin)
-  OOCD_CL+=-f ../../Project/OpenOCD/floss-jtag.openpilot.osx.cfg -f ../../Project/OpenOCD/stm32.cfg
-else
-  OOCD_CL+=-f ../../Project/OpenOCD/floss-jtag.openpilot.cfg -f ../../Project/OpenOCD/stm32.cfg
-endif
-# initialize
-OOCD_CL+=-c init
-# show the targets
-OOCD_CL+=-c targets
-# commands to prepare flash-write
-OOCD_CL+= -c "reset halt"
-# flash erase 
-OOCD_CL+=-c "stm32x mass_erase 0"
-# flash-write
-OOCD_CL+=-c "flash write_image $(OOCD_LOADFILE)" 
+OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).elf  
+# Program                                                                                                                                                                                                                            
+OOCD_CL+=-c "flash write_image $(OOCD_LOADFILE)"
 # Verify
 OOCD_CL+=-c "verify_image $(OOCD_LOADFILE)"
 # reset target
 OOCD_CL+=-c "reset run"
 # terminate OOCD after programming
 OOCD_CL+=-c shutdown
-# ---------------------------------------------------------------------------
-
 
 # Define programs and commands.
 CC      = $(TCHAIN_PREFIX)gcc

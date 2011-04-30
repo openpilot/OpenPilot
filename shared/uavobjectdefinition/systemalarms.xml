@@ -5,7 +5,7 @@
         elementnames="OutOfMemory,StackOverflow,CPUOverload,EventSystem,SDCard,Telemetry,ManualControl,Actuator,Attitude,Stabilization,Guidance,AHRSComms,Battery,FlightTime,I2C,GPS" defaultvalue="Uninitialised"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
-        <telemetryflight acked="true" updatemode="periodic" period="4000"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
         <logging updatemode="periodic" period="1000"/>
     </object>
 </xml>

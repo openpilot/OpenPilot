@@ -441,6 +441,7 @@ void UploaderGadgetWidget::systemRescue()
         }
         rescueStep = RESCUE_POWER1;
         log("Connect Power in 2 second...");
+        log("(not required on CopterControl)");
         QTimer::singleShot(1000, this, SLOT(systemRescue()));
         break;
     case RESCUE_POWER1:

@@ -69,7 +69,7 @@ VersionDialog::VersionDialog(QWidget *parent)
 #endif
 
      const QString description = tr(
-        "<h3>OpenPilot GCS %1</h3>"
+        "<h3>OpenPilot GCS %1 %9 (%10)</h3>"
         "Based on Qt %2 (%3 bit)<br/>"
         "<br/>"
         "Built on %4 at %5<br />"
@@ -87,7 +87,7 @@ VersionDialog::VersionDialog(QWidget *parent)
         "PARTICULAR PURPOSE.</small><br/>")
         .arg(version, QLatin1String(QT_VERSION_STR), QString::number(QSysInfo::WordSize),
              QLatin1String(__DATE__), QLatin1String(__TIME__), QLatin1String(GCS_YEAR), 
-             (QLatin1String(GCS_AUTHOR)), ideRev);
+             (QLatin1String(GCS_AUTHOR)), ideRev).arg(QLatin1String(GCS_VERSION_TYPE), QLatin1String(GCS_VERSION_CODENAME));
 
     QLabel *copyRightLabel = new QLabel(description);
     copyRightLabel->setWordWrap(true);

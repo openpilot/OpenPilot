@@ -68,7 +68,7 @@ private slots:
     void newObject(UAVObject* obj);
     void newInstance(UAVObject* obj);
     void processPeriodicUpdates();
-    void transactionCompleted(UAVObject* obj);
+    void transactionCompleted(UAVObject* obj, bool success);
     void transactionTimeout();
 
 private:

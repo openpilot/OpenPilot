@@ -84,10 +84,6 @@ int main()
 
 	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
-	
-#if ERASE_FLASH
-	PIOS_Flash_W25X_EraseChip();
-#endif
 
 	/* Initialize the system thread */
 	SystemModInitialize();
@@ -114,6 +110,10 @@ void OpenPilotInit()
 	
 	PIOS_Board_Init();
 	
+#if ERASE_FLASH
+	PIOS_Flash_W25X_EraseChip();
+#endif
+
 	/* Initialize modules */
 	InitModules();
 }

@@ -9,6 +9,13 @@ module Rtslam
 # The common origin is the initial position of the truth with null orientation
 # in the truth frame.
 # The truth file has to be manually cut and start simultaneously with slam file
+#
+# You can apply it on a sequence of log files :
+# (0..99).each { |i| Rtslam::sync_truth("path/rtslam_#{sprintf('%03d',i)}.log", "path/mocap_trunc.dat", "path/slamocap_#{sprintf('%03d',i)}.log") }
+#
+# TODO:
+# - deal correctly with angles and modulo for interpolation
+# - read full cov matrix for slam ?
 	
 def Rtslam.sync_truth(slam_filename, truth_filename, res_filename)
 	# transforms
@@ -67,6 +74,17 @@ def Rtslam.sync_truth(slam_filename, truth_filename, res_filename)
 	truth_file = File.open(truth_filename)
 	res_file = File.open(res_filename,"w")
 
+	res_line = "#t \
+slam_x slam_y slam_z slam_w slam_p slam_r \
+slam_sx slam_sy slam_sz slam_sw slam_sp slam_sr \
+truth_x truth_y truth_z truth_w truth_p truth_r \
+truth_sx truth_sy truth_sz truth_sw truth_sp truth_sr \
+error_x error_y error_z error_w error_p error_r \
+error_sx error_sy error_sz error_sw error_sp error_sr \
+nees_x nees_y nees_z nees_w nees_p nees_r \
+nees"
+	res_file.puts(res_line)
+	
 	init = true
 	
 	truth_final_t = 0
@@ -162,7 +180,9 @@ def Rtslam.sync_truth(slam_filename, truth_filename, res_filename)
 		
 		# error
 		error_final_t3d = Geom::T3D::composeToEuler(rslam_final_t3d, Geom::T3D::invToEuler(rtruth_inter_t3d))
-	
+		#error_final_nees = Jmath::inner_prod(error_final_t3d.getX, Jmath::mul(Jmath::inv(error_final_t3d.getXCov), error_final_t3d.getX))
+		error_final_nees = Jmath::prod_xt_P_x(error_final_t3d.getXCov, error_final_t3d.getX)
+
 		rslam_final_t3d_dev = rslam_final_t3d.getXStdDev
 		rtruth_final_t3d_dev = rtruth_inter_t3d.getXStdDev
 		error_final_t3d_dev = error_final_t3d.getXStdDev
@@ -180,7 +200,14 @@ def Rtslam.sync_truth(slam_filename, truth_filename, res_filename)
 #{error_final_t3d.getX.get(0)} #{error_final_t3d.getX.get(1)} #{error_final_t3d.getX.get(2)} \
 #{error_final_t3d.getX.get(3)} #{error_final_t3d.getX.get(4)} #{error_final_t3d.getX.get(5)} \
 #{error_final_t3d_dev.get(0)} #{error_final_t3d_dev.get(1)} #{error_final_t3d_dev.get(2)} \
-#{error_final_t3d_dev.get(3)} #{error_final_t3d_dev.get(4)} #{error_final_t3d_dev.get(5)}"
+#{error_final_t3d_dev.get(3)} #{error_final_t3d_dev.get(4)} #{error_final_t3d_dev.get(5)} \
+#{Jmath::sqr(error_final_t3d.getX.get(0))/error_final_t3d.getXCov.get(0,0)} \
+#{Jmath::sqr(error_final_t3d.getX.get(1))/error_final_t3d.getXCov.get(1,1)} \
+#{Jmath::sqr(error_final_t3d.getX.get(2))/error_final_t3d.getXCov.get(2,2)} \
+#{Jmath::sqr(error_final_t3d.getX.get(3))/error_final_t3d.getXCov.get(3,3)} \
+#{Jmath::sqr(error_final_t3d.getX.get(4))/error_final_t3d.getXCov.get(4,4)} \
+#{Jmath::sqr(error_final_t3d.getX.get(5))/error_final_t3d.getXCov.get(5,5)} \
+#{error_final_nees}"
 		
 		res_file.puts(res_line)
 	end

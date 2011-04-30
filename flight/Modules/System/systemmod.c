@@ -51,9 +51,11 @@
 
 // Private constants
 #define SYSTEM_UPDATE_PERIOD_MS 1000
+#define LED_BLINK_RATE 10						// Will give LED rate of 5 Hz
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998	// calibrated by running tests/test_cpuload.c
 											  // must be updated if the FreeRTOS or compiler
 											  // optimisation options are changed.
+
 #if defined(PIOS_MANUAL_STACK_SIZE)
 #define STACK_SIZE_BYTES PIOS_MANUAL_STACK_SIZE
 #else
@@ -142,7 +144,7 @@ static void systemTask(void *parameters)
 
 		// Wait until next period
 		if(manualControlCommandData.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE) {
-			vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / 2);
+			vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / LED_BLINK_RATE);
 		} else {
 			vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS);
 		}

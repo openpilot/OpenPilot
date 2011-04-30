@@ -33,12 +33,13 @@
 
 // Private constants
 #define SYNC_VAL			0x3C
-#define TYPE_MASK			0xFC
+#define TYPE_MASK			0xF8
 #define TYPE_VER			0x20
 #define TYPE_OBJ			(TYPE_VER | 0x00)
 #define TYPE_OBJ_REQ		(TYPE_VER | 0x01)
 #define TYPE_OBJ_ACK		(TYPE_VER | 0x02)
 #define TYPE_ACK			(TYPE_VER | 0x03)
+#define TYPE_NACK			(TYPE_VER | 0x04)
 
 #define MIN_HEADER_LENGTH	8	// sync(1), type (1), size (2), object ID (4)
 #define MAX_HEADER_LENGTH	10	// sync(1), type (1), size (2), object ID (4), instance ID (2, not used in single objects)
@@ -89,7 +90,8 @@ static uint8_t updateCRC(uint8_t crc, const uint8_t* data, int32_t length);
 static int32_t objectTransaction(UAVObjHandle objectId, uint16_t instId, uint8_t type, int32_t timeout);
 static int32_t sendObject(UAVObjHandle obj, uint16_t instId, uint8_t type);
 static int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type);
-static int32_t receiveObject(uint8_t type, UAVObjHandle obj, uint16_t instId, uint8_t* data, int32_t length);
+static int32_t sendNack(uint32_t objId);
+static int32_t receiveObject(uint8_t type, uint32_t objId, uint16_t instId, uint8_t* data, int32_t length);
 static void updateAck(UAVObjHandle obj, uint16_t instId);
 
 /**
@@ -328,9 +330,11 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
 				break;
 			
 			// Search for object, if not found reset state machine
+			// except if we got a OBJ_REQ for an object which does not
+			// exist, in which case we'll send a NACK
 
 			obj = UAVObjGetByID(objId);
-			if (obj == 0)
+			if (obj == 0 && type != TYPE_OBJ_REQ)
 			{
 				stats.rxErrors++;
 				state = STATE_SYNC;
@@ -338,7 +342,7 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
 			}
 			
 			// Determine data length
-			if (type == TYPE_OBJ_REQ || type == TYPE_ACK)
+			if (type == TYPE_OBJ_REQ || type == TYPE_ACK || type == TYPE_NACK)
 				length = 0;
 			else
 				length = UAVObjGetNumBytes(obj);
@@ -360,8 +364,15 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
 			}
 			
 			instId = 0;
+			if (obj == 0)
+			{
+				// If this is a NACK, we skip to Checksum
+				state = STATE_CS;
+				rxCount = 0;
+
+			}
 			// Check if this is a single instance object (i.e. if the instance ID field is coming next)
-			if (UAVObjIsSingleInstance(obj))
+			else if (UAVObjIsSingleInstance(obj))
 			{
 				// If there is a payload get it, otherwise receive checksum
 				if (length > 0)
@@ -432,7 +443,7 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
 			}
 			
 			xSemaphoreTakeRecursive(lock, portMAX_DELAY);
-			receiveObject(type, obj, instId, rxBuffer, length);
+			receiveObject(type, objId, instId, rxBuffer, length);
 			stats.rxObjectBytes += length;
 			stats.rxObjects++;
 			xSemaphoreGiveRecursive(lock);
@@ -451,17 +462,22 @@ int32_t UAVTalkProcessInputStream(uint8_t rxbyte)
 
 /**
  * Receive an object. This function process objects received through the telemetry stream.
- * \param[in] type Type of received message (TYPE_OBJ, TYPE_OBJ_REQ, TYPE_OBJ_ACK, TYPE_ACK)
- * \param[in] obj Handle of the received object
+ * \param[in] type Type of received message (TYPE_OBJ, TYPE_OBJ_REQ, TYPE_OBJ_ACK, TYPE_ACK, TYPE_NACK)
+ * \param[in] objId ID of the object to work on
  * \param[in] instId The instance ID of UAVOBJ_ALL_INSTANCES for all instances.
  * \param[in] data Data buffer
  * \param[in] length Buffer length
  * \return 0 Success
  * \return -1 Failure
  */
-static int32_t receiveObject(uint8_t type, UAVObjHandle obj, uint16_t instId, uint8_t* data, int32_t length)
+static int32_t receiveObject(uint8_t type, uint32_t objId, uint16_t instId, uint8_t* data, int32_t length)
 {
+	static UAVObjHandle obj;
 	int32_t ret = 0;
+
+	// Get the handle to the Object. Will be zero
+	// if object does not exist.
+	obj = UAVObjGetByID(objId);
 	
 	// Process message type
 	switch (type) {
@@ -501,7 +517,13 @@ static int32_t receiveObject(uint8_t type, UAVObjHandle obj, uint16_t instId, ui
 			break;
 		case TYPE_OBJ_REQ:
 			// Send requested object if message is of type OBJ_REQ
-			sendObject(obj, instId, TYPE_OBJ);
+			if (obj == 0)
+				sendNack(objId);
+			else
+				sendObject(obj, instId, TYPE_OBJ);
+			break;
+		case TYPE_NACK:
+			// Do nothing on flight side, let it time out.
 			break;
 		case TYPE_ACK:
 			// All instances, not allowed for ACK messages
@@ -672,6 +694,44 @@ static int32_t sendSingleObject(UAVObjHandle obj, uint16_t instId, uint8_t type)
 	// Done
 	return 0;
 }
+
+/**
+ * Send a NACK through the telemetry link.
+ * \param[in] objId Object ID to send a NACK for
+ * \return 0 Success
+ * \return -1 Failure
+ */
+static int32_t sendNack(uint32_t objId)
+{
+	int32_t dataOffset;
+
+	txBuffer[0] = SYNC_VAL;  // sync byte
+	txBuffer[1] = TYPE_NACK;
+	// data length inserted here below
+	txBuffer[4] = (uint8_t)(objId & 0xFF);
+	txBuffer[5] = (uint8_t)((objId >> 8) & 0xFF);
+	txBuffer[6] = (uint8_t)((objId >> 16) & 0xFF);
+	txBuffer[7] = (uint8_t)((objId >> 24) & 0xFF);
+
+	dataOffset = 8;
+
+	// Store the packet length
+	txBuffer[2] = (uint8_t)((dataOffset) & 0xFF);
+	txBuffer[3] = (uint8_t)(((dataOffset) >> 8) & 0xFF);
+
+	// Calculate checksum
+	txBuffer[dataOffset] = updateCRC(0, txBuffer, dataOffset);
+
+	// Send buffer
+	if (outStream!=NULL) (*outStream)(txBuffer, dataOffset+CHECKSUM_LENGTH);
+
+	// Update stats
+	stats.txBytes += dataOffset+CHECKSUM_LENGTH;
+
+	// Done
+	return 0;
+}
+
 
 /**
  * Update the crc value with new data.

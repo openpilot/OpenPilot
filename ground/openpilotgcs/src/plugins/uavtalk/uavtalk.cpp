@@ -655,18 +655,22 @@ bool UAVTalk::transmitObject(UAVObject* obj, quint8 type, bool allInstances)
  */
 bool UAVTalk::transmitNack(quint32 objId)
 {
+    int dataOffset = 8;
+
     txBuffer[0] = SYNC_VAL;
     txBuffer[1] = TYPE_NACK;
-    qToLittleEndian<quint16>(0x0, &txBuffer[2]); // Length
     qToLittleEndian<quint32>(objId, &txBuffer[4]);
 
     // Calculate checksum
-    txBuffer[8] = updateCRC(0, txBuffer, 8);
+    txBuffer[dataOffset] = updateCRC(0, txBuffer, dataOffset);
+
+    qToLittleEndian<quint16>(dataOffset, &txBuffer[2]);
+
 
     // Send buffer, check that the transmit backlog does not grow above limit
     if ( io->bytesToWrite() < TX_BUFFER_SIZE )
     {
-        io->write((const char*)txBuffer, 8+CHECKSUM_LENGTH);
+        io->write((const char*)txBuffer, dataOffset+CHECKSUM_LENGTH);
     }
     else
     {

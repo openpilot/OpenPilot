@@ -66,7 +66,7 @@ private slots:
 
 private:
     // Constants
-    static const int TYPE_MASK = 0xFC;
+    static const int TYPE_MASK = 0xF8;
     static const int TYPE_VER = 0x20;
     static const int TYPE_OBJ = (TYPE_VER | 0x00);
     static const int TYPE_OBJ_REQ = (TYPE_VER | 0x01);

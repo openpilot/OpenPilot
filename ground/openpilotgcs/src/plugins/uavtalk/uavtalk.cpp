@@ -273,7 +273,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             rxObjId = (qint32)qFromLittleEndian<quint32>(rxTmpBuffer);
             {
                 UAVObject *rxObj = objMngr->getObject(rxObjId);
-                if (rxObj == NULL && rxType != TYPE_NACK)
+                if (rxObj == NULL && rxType != TYPE_OBJ_REQ)
                 {
                     stats.rxErrors++;
                     rxState = STATE_SYNC;
@@ -303,9 +303,10 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
                 }
 
                 // Check if this is a single instance object (i.e. if the instance ID field is coming next)
-                if (rxType == TYPE_NACK)
+                if (rxObj == NULL)
                 {
-                   // If this is a NACK, just skip to checksum
+                   // This is a non-existing object, just skip to checksum
+                   // and we'll send a NACK next.
                    rxState   = STATE_CS;
                    rxInstId = 0;
                    rxCount = 0;

@@ -110,7 +110,7 @@ void OpenPilotInit()
 	
 	PIOS_Board_Init();
 	
-#if ERASE_FLASH
+#ifdef ERASE_FLASH
 	PIOS_Flash_W25X_EraseChip();
 #endif
 

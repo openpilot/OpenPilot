@@ -392,7 +392,9 @@ endif
 ifeq ($(USE_BOOTLOADER), YES)
 CDEFS += -DUSE_BOOTLOADER
 endif
-
+ifeq ($(ERASE_FLASH), YES)
+CDEFS += -DERASE_FLASH
+endif
 ifeq ($(USE_SPEKTRUM), YES)
 CDEFS += -DUSE_SPEKTRUM
 endif

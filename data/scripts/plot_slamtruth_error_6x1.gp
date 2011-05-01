@@ -39,7 +39,7 @@ plotheight="((1-$globtmargin-$globbmargin)/2.0)"
 script_header=`cat<<EOF
 
 set terminal postscript eps color "Helvetica" 12 size 14cm,7cm
-set output 'plot_error.eps'
+set output 'plot_slamtruth_error_6x1.eps'
 
 #set term wxt size 1280,640
 
@@ -104,8 +104,8 @@ unset multiplot
 #pause -1
 
 set output
-!epstopdf --outfile=plot_error.pdf plot_error.eps
-!evince plot_error.pdf
+!epstopdf --outfile=plot_slamtruth_error_6x1.pdf plot_slamtruth_error_6x1.eps
+!evince plot_slamtruth_error_6x1.pdf
 quit
 
 EOF

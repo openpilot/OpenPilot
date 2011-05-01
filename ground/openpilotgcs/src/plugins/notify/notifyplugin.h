@@ -35,7 +35,10 @@
 #include "notifypluginconfiguration.h"
 
 #include <QSettings>
-#include <phonon>
+#include <Phonon/MediaObject>
+#include <Phonon/Path>
+#include <Phonon/AudioOutput>
+#include <Phonon/Global>
 
 class NotifyPluginOptionsPage;
 

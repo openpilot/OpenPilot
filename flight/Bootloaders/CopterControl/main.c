@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotBL OpenPilot BootLoader
- * @brief These files contain the code to the OpenPilot MB Bootloader.
+ * @addtogroup CopterControlBL CopterControl BootLoader
+ * @brief These files contain the code to the CopterControl Bootloader.
  *
  * @{
  * @file       main.c
@@ -53,12 +53,11 @@ uint32_t sweep_steps2 = 100; // * 5 mS -> 500 mS
 
 
 ////////////////////////////////////////
-uint8_t tempcount=0;
-
+uint8_t tempcount = 0;
 
 /* Extern variables ----------------------------------------------------------*/
 DFUStates DeviceState;
-int16_t status=0;
+int16_t status = 0;
 uint8_t JumpToApp = FALSE;
 uint8_t GO_dfu = FALSE;
 uint8_t USB_connected = FALSE;
@@ -70,13 +69,8 @@ uint8_t processRX();
 void jump_to_app();
 
 #define BLUE LED1
-// #define RED	LED4
-#define LED_PWM_TIMER	TIM3
+#define LED_PWM_TIMER	TIM1
 int main() {
-	/* NOTE: Do NOT modify the following start-up sequence */
-	/* Any new initialization functions should be added in OpenPilotInit() */
-
-	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
 	if (BSL_HOLD_STATE == 0)
 		USB_connected = TRUE;
@@ -94,11 +88,11 @@ int main() {
 
 	if (GO_dfu == TRUE) {
 		PIOS_Board_Init();
-		if(User_DFU_request == TRUE)
+		if (User_DFU_request == TRUE)
 			DeviceState = DFUidle;
 		else
 			DeviceState = BLidle;
-		STOPWATCH_Init(100,LED_PWM_TIMER);
+		STOPWATCH_Init(100, LED_PWM_TIMER);
 	} else
 		JumpToApp = TRUE;
 
@@ -107,8 +101,6 @@ int main() {
 	while (TRUE) {
 		if (JumpToApp == TRUE)
 			jump_to_app();
-		//pwm_period = 50; // *100 uS -> 5 mS
-		//pwm_sweep_steps =100; // * 5 mS -> 500 mS
 
 		switch (DeviceState) {
 		case Last_operation_Success:
@@ -161,7 +153,8 @@ int main() {
 
 		if (STOPWATCH_ValueGet(LED_PWM_TIMER) > 100 * 50 * 100)
 			STOPWATCH_Reset(LED_PWM_TIMER);
-		if ((STOPWATCH_ValueGet(LED_PWM_TIMER) > 60000) && (DeviceState == BLidle))
+		if ((STOPWATCH_ValueGet(LED_PWM_TIMER) > 60000) && (DeviceState
+				== BLidle))
 			JumpToApp = TRUE;
 
 		processRX();
@@ -178,7 +171,6 @@ void jump_to_app() {
 		RCC_APB1PeriphResetCmd(0xffffffff, DISABLE);
 		_SetCNTR(0); // clear interrupt mask
 		_SetISTR(0); // clear all requests
-
 		JumpAddress = *(__IO uint32_t*) (START_OF_USER_CODE + 4);
 		Jump_To_Application = (pFunction) JumpAddress;
 		/* Initialize user application's Stack Pointer */

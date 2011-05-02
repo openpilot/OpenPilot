@@ -24,7 +24,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 #ifndef PIOS_CONFIG_H
 #define PIOS_CONFIG_H
 

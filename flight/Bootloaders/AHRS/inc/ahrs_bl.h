@@ -23,31 +23,30 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 #ifndef AHRS_BL_H
 #define AHRS_BL_H
-
 
 /* PIOS Includes */
 #include <pios.h>
 
 /** Start programming
-returns: true if FLASH erased and ready to program
-*/
-bool StartProgramming(void);
+ returns: true if FLASH erased and ready to program
+ */
+bool
+StartProgramming(void);
 
 /** Write a block to FLASH
-buffer contains the data to be written
-returns: true if FLASH programmed correctly
-*/
-bool WriteData(uint32_t offset, uint8_t *buffer, uint32_t size);
+ buffer contains the data to be written
+ returns: true if FLASH programmed correctly
+ */
+bool
+WriteData(uint32_t offset, uint8_t *buffer, uint32_t size);
 
 /** Read a block from FLASH
-returns: true if FLASH read correctly.
-Buffer is set to the read data
-*/
-bool ReadData(uint32_t offset, uint8_t *buffer, uint32_t size);
-
-
+ returns: true if FLASH read correctly.
+ Buffer is set to the read data
+ */
+bool
+ReadData(uint32_t offset, uint8_t *buffer, uint32_t size);
 
 #endif /* AHRS_BL_H */

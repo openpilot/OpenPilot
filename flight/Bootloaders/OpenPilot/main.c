@@ -55,17 +55,17 @@ uint32_t sweep_steps2 = 100; // * 5 mS -> 500 mS
 
 
 ////////////////////////////////////////
-uint8_t tempcount=0;
-
+uint8_t tempcount = 0;
 
 /// SSP SECTION
 /// SSP TIME SOURCE
 #define SSP_TIMER	TIM7
-uint32_t ssp_time=0;
+uint32_t ssp_time = 0;
 #define MAX_PACKET_DATA_LEN	255
 #define MAX_PACKET_BUF_SIZE	(1+1+MAX_PACKET_DATA_LEN+2)
 #define UART_BUFFER_SIZE 1024
-uint8_t rx_buffer[UART_BUFFER_SIZE] __attribute__ ((aligned(4)));    // align to 32-bit to try and provide speed improvement;
+uint8_t rx_buffer[UART_BUFFER_SIZE] __attribute__ ((aligned(4)));
+// align to 32-bit to try and provide speed improvement;
 // master buffers...
 uint8_t SSP_TxBuf[MAX_PACKET_BUF_SIZE];
 uint8_t SSP_RxBuf[MAX_PACKET_BUF_SIZE];
@@ -84,7 +84,7 @@ t_fifo_buffer ssp_buffer;
 /* Extern variables ----------------------------------------------------------*/
 DFUStates DeviceState;
 DFUPort ProgPort;
-int16_t status=0;
+int16_t status = 0;
 uint8_t JumpToApp = FALSE;
 uint8_t GO_dfu = FALSE;
 uint8_t USB_connected = FALSE;
@@ -125,14 +125,14 @@ int main() {
 		else
 			ProgPort = Serial;
 		PIOS_Board_Init();
-		if(User_DFU_request == TRUE)
+		if (User_DFU_request == TRUE)
 			DeviceState = DFUidle;
 		else
 			DeviceState = BLidle;
-		STOPWATCH_Init(100,LED_PWM_TIMER);
+		STOPWATCH_Init(100, LED_PWM_TIMER);
 		if (ProgPort == Serial) {
-			fifoBuf_init(&ssp_buffer,rx_buffer,UART_BUFFER_SIZE);
-			STOPWATCH_Init(100,SSP_TIMER);//nao devia ser 1000?
+			fifoBuf_init(&ssp_buffer, rx_buffer, UART_BUFFER_SIZE);
+			STOPWATCH_Init(100, SSP_TIMER);//nao devia ser 1000?
 			STOPWATCH_Reset(SSP_TIMER);
 			ssp_Init(&ssp_port, &SSP_PortConfig);
 		}
@@ -144,10 +144,10 @@ int main() {
 	while (TRUE) {
 		if (ProgPort == Serial) {
 			ssp_ReceiveProcess(&ssp_port);
-			status=ssp_SendProcess(&ssp_port);
-			while((status!=SSP_TX_IDLE) && (status!=SSP_TX_ACKED)){
+			status = ssp_SendProcess(&ssp_port);
+			while ((status != SSP_TX_IDLE) && (status != SSP_TX_ACKED)) {
 				ssp_ReceiveProcess(&ssp_port);
-				status=ssp_SendProcess(&ssp_port);
+				status = ssp_SendProcess(&ssp_port);
 			}
 		}
 		if (JumpToApp == TRUE)
@@ -206,7 +206,8 @@ int main() {
 
 		if (STOPWATCH_ValueGet(LED_PWM_TIMER) > 100 * 50 * 100)
 			STOPWATCH_Reset(LED_PWM_TIMER);
-		if ((STOPWATCH_ValueGet(LED_PWM_TIMER) > 60000) && (DeviceState == BLidle))
+		if ((STOPWATCH_ValueGet(LED_PWM_TIMER) > 60000) && (DeviceState
+				== BLidle))
 			JumpToApp = TRUE;
 
 		processRX();
@@ -272,17 +273,15 @@ uint32_t sspTimeSource() {
 }
 void SSP_CallBack(uint8_t *buf, uint16_t len) {
 	fifoBuf_putData(&ssp_buffer, buf, len);
-	}
+}
 int16_t SSP_SerialRead(void) {
-	if(PIOS_COM_ReceiveBufferUsed(PIOS_COM_TELEM_RF)>0)
-	{
+	if (PIOS_COM_ReceiveBufferUsed(PIOS_COM_TELEM_RF) > 0) {
 		return PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_RF);
-	}
-	else
+	} else
 		return -1;
 }
 void SSP_SerialWrite(uint8_t value) {
-	PIOS_COM_SendChar(PIOS_COM_TELEM_RF,value);
+	PIOS_COM_SendChar(PIOS_COM_TELEM_RF, value);
 }
 uint32_t SSP_GetTime(void) {
 	return sspTimeSource();

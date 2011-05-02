@@ -233,7 +233,7 @@ void deviceWidget::downloadFirmware()
     }
 
     myDevice->retrieveButton->setEnabled(false);
-    filename = setOpenFileName();
+    filename = setSaveFileName();
 
     if (filename.isEmpty()) {
         status("Empty filename", STATUSICON_FAIL);
@@ -308,6 +308,18 @@ QString deviceWidget::setOpenFileName()
     QFileDialog::Options options;
     QString selectedFilter;
     QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Select firmware file"),
+                                                    "",
+                                                    tr("Firmware Files (*.bin)"),
+                                                    &selectedFilter,
+                                                    options);
+    return fileName;
+}
+QString deviceWidget::setSaveFileName()
+{
+    QFileDialog::Options options;
+    QString selectedFilter;
+    QString fileName = QFileDialog::getSaveFileName(this,
                                                     tr("Select firmware file"),
                                                     "",
                                                     tr("Firmware Files (*.bin)"),

@@ -1,0 +1,12 @@
+<xml>
+    <object name="CCGuidanceSettings" singleinstance="true" settings="true">
+        <description>Settings for the @ref CCGuidanceModule</description>
+        <field name="Pitch" units="deg" type="float" elementnames="Kp,Min,Max,Neutral" defaultvalue="2,-10,20,5"/>
+        <field name="Roll" units="deg" type="float" elementnames="Kp,Max,Neutral" defaultvalue="2,35,0"/>
+        <field name="UpdatePeriod" units="" type="int32" elements="1" defaultvalue="100"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="never" period="0"/>
+    </object>
+</xml>

@@ -25,7 +25,8 @@ locations (but any other locations are fine as well):
  - Python            in C:\Python27
  - CodeSourcery G++  in C:\CodeSourcery
  - QtSDK             in C:\Qt\2010.05
- - msysGit           in C:\Program Files\Git
+ - msysGit           in %ProgramFiles%\Git
+ - Unicode NSIS      in %ProgramFiles%\NSIS\Unicode
 
 Also it is assumed that you have the C:\Program Files\Git\cmd\ directory in
 the PATH. Usually this is the case for msysGit installation if you have

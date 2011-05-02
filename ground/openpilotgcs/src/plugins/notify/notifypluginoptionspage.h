@@ -38,7 +38,10 @@
 #include <QItemSelectionModel>
 #include <QDebug>
 #include <QtCore/QSettings>
-#include <phonon>
+#include <Phonon/MediaObject>
+#include <Phonon/Path>
+#include <Phonon/AudioOutput>
+#include <Phonon/Global>
 
 class NotifyTableModel;
 

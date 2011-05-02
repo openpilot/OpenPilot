@@ -184,7 +184,6 @@ static void actuatorTask(void* parameters)
 		}
 		if(nMixers < 2) //Nothing can fly with less than two mixers.
 		{
-			AlarmsSet(SYSTEMALARMS_ALARM_ACTUATOR, SYSTEMALARMS_ALARM_WARNING);
 			setFailsafe(); // So that channels like PWM buzzer keep working
 			continue;
 		}

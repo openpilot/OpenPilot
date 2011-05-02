@@ -803,15 +803,18 @@ void demo_slam01_main(world_ptr_t *world)
 			configSetup.CAMERA_DEVICE, cv::Size(img_width,img_height), 0, 8, crop, floatOpts[fFreq], intOpts[iTrigger], 
 			floatOpts[fShutter], mode, strOpts[sDataPath]));
 		hardSen11->setTimingInfos(1.0/hardSen11->getFreq(), 1.0/hardSen11->getFreq());
+		senPtr11->setHardwareSensor(hardSen11);
+		senPtr11->setIntegrationPolicy(false);
+		hardSen11->start();
 		#else
 		if (intOpts[iReplay] & 1)
 		{
 			hardware::hardware_sensorext_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, cv::Size(img_width,img_height),strOpts[sDataPath]));
+			senPtr11->setHardwareSensor(hardSen11);
+			senPtr11->setIntegrationPolicy(false);
+			hardSen11->start();
 		}
 		#endif
-		senPtr11->setHardwareSensor(hardSen11);
-		senPtr11->setIntegrationPolicy(false);
-		hardSen11->start();
 		
 		if (intOpts[iGps])
 		{

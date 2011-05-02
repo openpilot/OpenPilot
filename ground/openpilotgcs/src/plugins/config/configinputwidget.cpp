@@ -575,9 +575,9 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
     QString fieldName = QString("Connected");
     UAVObjectField *field = controlCommand->getField(fieldName);
     if (field->getValue().toBool())
-        m_config->RCInputConnected->setText("RC Receiver Connected");
+        m_config->RCInputConnected->setText("RC Receiver connected");
     else
-        m_config->RCInputConnected->setText("RC Receiver Not Connected");
+        m_config->RCInputConnected->setText("RC Receiver not connected or invalid input configuration (missing channels)");
 
     if (m_config->doRCInputCalibration->isChecked()) {
         if (firstUpdate) {

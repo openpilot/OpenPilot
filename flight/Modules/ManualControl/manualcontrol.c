@@ -199,17 +199,6 @@ static void manualControlTask(void *parameters)
 
 		if (!ManualControlCommandReadOnly(&cmd)) {
 
-			// Check settings, if error raise alarm
-			if (settings.Roll >= MANUALCONTROLSETTINGS_ROLL_NONE ||
-				settings.Pitch >= MANUALCONTROLSETTINGS_PITCH_NONE ||
-				settings.Yaw >= MANUALCONTROLSETTINGS_YAW_NONE ||
-				settings.Throttle >= MANUALCONTROLSETTINGS_THROTTLE_NONE ||
-				settings.FlightMode >= MANUALCONTROLSETTINGS_FLIGHTMODE_NONE) {
-				AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
-				cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
-				ManualControlCommandSet(&cmd);
-				continue;
-			}
 			// Read channel values in us
 			// TODO: settings.InputMode is currently ignored because PIOS will not allow runtime
 			// selection of PWM and PPM. The configuration is currently done at compile time in
@@ -225,6 +214,18 @@ static void manualControlTask(void *parameters)
 				scaledChannel[n] = scaleChannel(cmd.Channel[n], settings.ChannelMax[n],	settings.ChannelMin[n], settings.ChannelNeutral[n], 0);
 			}
 
+			// Check settings, if error raise alarm
+			if (settings.Roll >= MANUALCONTROLSETTINGS_ROLL_NONE ||
+			    settings.Pitch >= MANUALCONTROLSETTINGS_PITCH_NONE ||
+			    settings.Yaw >= MANUALCONTROLSETTINGS_YAW_NONE ||
+			    settings.Throttle >= MANUALCONTROLSETTINGS_THROTTLE_NONE ||
+			    settings.FlightMode >= MANUALCONTROLSETTINGS_FLIGHTMODE_NONE) {
+				AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
+				cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
+				ManualControlCommandSet(&cmd);
+				continue;
+			}
+			
 			// Scale channels to -1 -> +1 range
 			cmd.Roll 		= scaledChannel[settings.Roll];
 			cmd.Pitch 		= scaledChannel[settings.Pitch];

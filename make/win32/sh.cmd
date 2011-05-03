@@ -9,6 +9,7 @@ rem
 rem See also:
 rem   README.txt
 rem   http://wiki.openpilot.org/display/Doc/GCS+Development+on+Windows
+rem   http://wiki.openpilot.org/display/Doc/Firmware+Development+on+Windows
 rem
 rem Based on the msys.bat file from the MSYS package 
 rem   http://www.mingw.org/wiki/msys
@@ -63,7 +64,7 @@ rem Any shell script can be passed to it via command line of this batch file.
 rem --------------------------------------------------------------------------
 
 if not exist "%MSYSGIT%\bash.exe" goto no_bash
-call %COMSPEC% /c "%MSYSGIT%\bash" --login -i %*
+call "%MSYSGIT%\bash.exe" --login -i %*
 goto :eof
 
 :no_bash

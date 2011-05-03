@@ -41,7 +41,7 @@
 #include "openpilot.h"
 #include "systemmod.h"
 #include "objectpersistence.h"
-#include "manualcontrolcommand.h"
+#include "flightstatus.h"
 #include "systemstats.h"
 #include "i2cstats.h"
 #include "watchdogstatus.h"
@@ -139,11 +139,11 @@ static void systemTask(void *parameters)
 		}
 #endif
 
-		ManualControlCommandData manualControlCommandData;
-		ManualControlCommandGet(&manualControlCommandData);
+		FlightStatusData flightStatus;
+		FlightStatusGet(&flightStatus);
 
 		// Wait until next period
-		if(manualControlCommandData.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE) {
+		if(flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) {
 			vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / (LED_BLINK_RATE_HZ * 2) );
 		} else {
 			vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS);

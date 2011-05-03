@@ -160,6 +160,7 @@ ifndef TESTAPP
 SRC += $(OPUAVSYNTHDIR)/objectpersistence.c
 SRC += $(OPUAVSYNTHDIR)/gcstelemetrystats.c
 SRC += $(OPUAVSYNTHDIR)/flighttelemetrystats.c
+SRC += $(OPUAVSYNTHDIR)/flightstatus.c
 SRC += $(OPUAVSYNTHDIR)/systemstats.c
 SRC += $(OPUAVSYNTHDIR)/systemalarms.c
 SRC += $(OPUAVSYNTHDIR)/systemsettings.c

@@ -7384,6 +7384,7 @@
 				65C35E5E12EFB2F3004811C2 /* flightplansettings.xml */,
 				65C35E5F12EFB2F3004811C2 /* flightplanstatus.xml */,
 				65C35E6012EFB2F3004811C2 /* flighttelemetrystats.xml */,
+				65078B09136FCEE600536549 /* flightstatus.xml */,
 				65C35E6112EFB2F3004811C2 /* gcstelemetrystats.xml */,
 				65C35E6212EFB2F3004811C2 /* gpsposition.xml */,
 				65C35E6312EFB2F3004811C2 /* gpssatellites.xml */,
@@ -7411,7 +7412,6 @@
 				65C35E7712EFB2F3004811C2 /* velocityactual.xml */,
 				65C35E7812EFB2F3004811C2 /* velocitydesired.xml */,
 				65C35E7912EFB2F3004811C2 /* watchdogstatus.xml */,
-				65078B09136FCEE600536549 /* flightstatus.xml */,
 			);
 			path = uavobjectdefinition;
 			sourceTree = "<group>";

@@ -1,0 +1,19 @@
+REGEDIT4
+
+[HKEY_CLASSES_ROOT\.sh]
+@="shfile"
+
+[HKEY_CLASSES_ROOT\shfile]
+@="shell script"
+"AlwaysShowExt"=""
+"BrowserFlags"=dword:00000008
+"EditFlags"=dword:00000000
+
+[HKEY_CLASSES_ROOT\shfile\shell]
+@=""
+
+[HKEY_CLASSES_ROOT\shfile\shell\open]
+
+[HKEY_CLASSES_ROOT\shfile\shell\open\command]
+@="cmd.exe /c call sh \"%1\" %*"
+

@@ -9,6 +9,7 @@ rem
 rem See also:
 rem   README.txt
 rem   http://wiki.openpilot.org/display/Doc/GCS+Development+on+Windows
+rem   http://wiki.openpilot.org/display/Doc/Firmware+Development+on+Windows
 rem
 rem Based on the msys.bat file from the MSYS package 
 rem   http://www.mingw.org/wiki/msys
@@ -28,15 +29,23 @@ rem To build the OpenPilot software we need few tools in the PATH.
 rem Here we attempt to guess tools location using PATH or set them
 rem directly using hard-coded locations, if not found in PATH.
 rem You may want to update paths according to your installation.
+rem
+rem Also you can add any paths below just by adding extra call :which
+rem lines with the following parameters:
+rem  - environment variable which will be set to the path found (or empty)
+rem  - expected directory which will be tried if not found in the current PATH
+rem  - any executable file which is expected to be found in PATH or directory
+rem All they will be added to the PATH in order of appearance.
 rem --------------------------------------------------------------------------
 
 set NOT_FOUND=
+set PATH_DIRS=
 
-call :which PYTHON        "C:\Python27"                  python.exe
-call :which CODESOURCERY  "C:\CodeSourcery\bin"          cs-make.exe
-call :which QTSDK         "C:\Qt\2010.05\qt\bin"         qmake.exe
-call :which QTMINGW       "C:\Qt\2010.05\mingw\bin"      mingw32-make.exe
 call :which MSYSGIT       "%ProgramFiles%\Git\bin"       git.exe
+call :which QTMINGW       "C:\Qt\2010.05\mingw\bin"      mingw32-make.exe
+call :which QTSDK         "C:\Qt\2010.05\qt\bin"         qmake.exe
+call :which CODESOURCERY  "C:\CodeSourcery\bin"          cs-make.exe
+call :which PYTHON        "C:\Python27"                  python.exe
 call :which UNSIS         "%ProgramFiles%\NSIS\Unicode"  makensis.exe
 
 if "%NOT_FOUND%" == "" goto set_path
@@ -54,7 +63,7 @@ rem --------------------------------------------------------------------------
 
 :set_path
 set PATH=%SYSTEMROOT%\system32;%SYSTEMROOT%
-set PATH=%MSYSGIT%;%QTMINGW%;%QTSDK%;%CODESOURCERY%;%PYTHON%;%UNSIS%;%PATH%
+set PATH=%PATH_DIRS%;%PATH%
 rem echo PATH: %PATH%
 
 rem --------------------------------------------------------------------------
@@ -63,7 +72,7 @@ rem Any shell script can be passed to it via command line of this batch file.
 rem --------------------------------------------------------------------------
 
 if not exist "%MSYSGIT%\bash.exe" goto no_bash
-call %COMSPEC% /c "%MSYSGIT%\bash" --login -i %*
+call "%MSYSGIT%\bash.exe" --login -i %*
 goto :eof
 
 :no_bash
@@ -103,4 +112,7 @@ rem echo %3: found at: %FP%
 rem set results regardless of was it found or not
 set %1=%FP%
 rem echo %1=%FP%
+if "%FP%" == "" goto :eof
+if not "%PATH_DIRS%" == "" set PATH_DIRS=%PATH_DIRS%;
+set PATH_DIRS=%PATH_DIRS%%FP%
 goto :eof

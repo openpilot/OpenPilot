@@ -838,7 +838,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QPushButton" name="saveRCOutputToSD">
        <property name="geometry">
         <rect>
-         <x>490</x>
+         <x>530</x>
          <y>310</y>
          <width>93</width>
          <height>27</height>
@@ -855,7 +855,7 @@ Applies and Saves all settings to SD</string>
       <widget class="QPushButton" name="getRCOutputCurrent">
        <property name="geometry">
         <rect>
-         <x>270</x>
+         <x>330</x>
          <y>310</y>
          <width>93</width>
          <height>27</height>
@@ -871,7 +871,7 @@ Applies and Saves all settings to SD</string>
       <widget class="QPushButton" name="saveRCOutputToRAM">
        <property name="geometry">
         <rect>
-         <x>380</x>
+         <x>430</x>
          <y>310</y>
          <width>93</width>
          <height>27</height>
@@ -1441,6 +1441,19 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="text">
         <string/>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="spinningArmed">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>310</y>
+         <width>301</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Motors at neutral (spinning) when armed</string>
        </property>
       </widget>
      </widget>

@@ -183,6 +183,9 @@ void ScopeGadgetOptionsPage::on_cmbUAVObjects_currentIndexChanged(QString val)
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(val) );
 
+    if (obj == NULL)
+        return; // Rare case: the config contained a UAVObject name which does not exist anymore.
+
     QList<UAVObjectField*> fieldList = obj->getFields();
     foreach (UAVObjectField* field, fieldList) {
         if(field->getType() == UAVObjectField::STRING || field->getType() == UAVObjectField::ENUM )

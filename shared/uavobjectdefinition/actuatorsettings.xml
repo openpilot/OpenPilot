@@ -22,6 +22,7 @@
         <field name="ChannelMin" units="us" type="int16" elements="8" defaultvalue="1000"/>
         <field name="ChannelType" units="" type="enum" elements="8" options="PWM,MK,ASTEC4,PWM Alarm Buzzer" defaultvalue="PWM"/>
         <field name="ChannelAddr" units="" type="uint8" elements="8" defaultvalue="0,1,2,3,4,5,6,7"/>
+        <field name="MotorsSpinWhileArmed" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

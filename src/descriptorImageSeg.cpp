@@ -64,15 +64,28 @@ namespace jafar {
 //				app->patch.rotateScale(-jmath::radToDeg(rotation), 1, patch);
 //				patch.copyTo(app->patch);
 
-				app->offsetTop = obsApp->offsetTop;
-				app->offsetBottom = obsApp->offsetBottom;
+				vec pix = obsPtr->measurement.x();
+				vec2 center;
+				center[0] = ( pix[0] + pix[2] )/2;
+				center[1] = ( pix[1] + pix[3] )/2;
+
+				app->offsetTop.x()(0) = pix(0) - (x1+x2)/2;
+				app->offsetTop.x()(1) = pix(1) - (y1+y2)/2;
+				app->offsetTop.P() = jblas::zero_mat(2); // by definition this is our landmark projection
+
+				app->offsetBottom.x()(0) = pix(2) - (x1+x2)/2;
+				app->offsetBottom.x()(1) = pix(3) - (y1+y2)/2;
+				app->offsetBottom.P() = jblas::zero_mat(2); // by definition this is our landmark projection
+
 				appearancePtr = app;
 
-            senPose = obsPtr->sensorPtr()->globalPose();
-            obsModelPtr = obsPtr->model;
-            measurement = obsPtr->measurement.x();
-            frame = senPtr->rawCounter;
-            used = false;
+				senPose = obsPtr->sensorPtr()->globalPose();
+				obsModelPtr = obsPtr->model;
+				measurement = obsPtr->measurement.x();
+				frame = senPtr->rawCounter;
+				used = false;
+
+				app->computePatchMeans();
          }
       }
 

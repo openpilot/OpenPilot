@@ -74,7 +74,9 @@ namespace jafar {
 			public:
 				AppearanceImageSegment(const image::Image& patch, Gaussian const &offsetTop, Gaussian const &offsetBottom, dseg::SegmentHypothesis* _hypothesis = NULL);
 				AppearanceImageSegment(int width, int height, int depth, dseg::SegmentHypothesis* _hypothesis = NULL):
-					patch(width, height, depth, JfrImage_CS_GRAY), offsetTop(2), offsetBottom(2) {
+					patch(width, height, depth, JfrImage_CS_GRAY),
+					patchMeanLeft(0),patchMeanRight(0),
+					offsetTop(2), offsetBottom(2) {
 					if(_hypothesis != NULL)m_hypothesis.addSegment(_hypothesis);
 //					cout << "Created patch with " << width << "x" << height << " pixels; depth: " << depth << "; color space: " << JfrImage_CS_GRAY << endl;
             }
@@ -101,7 +103,7 @@ namespace jafar {
 					}
 					return ret;
 				}
-         private:
+
 				void computePatchMeans();
       };
 	}

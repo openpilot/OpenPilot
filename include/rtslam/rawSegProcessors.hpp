@@ -34,7 +34,10 @@ namespace rtslam {
 	boost::weak_ptr<RawImage> lastDsegImage;
 	dseg::PreprocessedImage preprocDsegImage;
 
-   class DsegMatcher
+	boost::weak_ptr<RawImage> lastDsegImageForDetection;
+	dseg::PyramidSP* preprocDsegPyramid;
+
+	class DsegMatcher
    {
       private:
          dseg::DirectSegmentsTracker matcher;
@@ -190,8 +193,14 @@ namespace rtslam {
 				featPtr.reset(new FeatureImageSegment());
             featPtr->measurement.std(params.measStd);
 
+				if(rawData != lastDsegImageForDetection.lock())
+				{
+					preprocDsegPyramid = detector.computePyramid(*(rawData->img));
+					lastDsegImageForDetection = rawData;
+				}
+
 				dseg::SegmentsSet set;
-				detector.detectSegment(*(rawData->img.get()), &roi, set);
+				detector.detectSegment(preprocDsegPyramid, *(rawData->img.get()), &roi, set);
 
 				if(set.count() > 0)
 				{

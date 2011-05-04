@@ -39,6 +39,7 @@ chi_max_1x1=10.2728
 names=("x (cm)" "y (cm)" "z (cm)" "yaw (deg)" "pitch (deg)" "roll (deg)")
 coeff_pos=100
 coeff_angle=57.2958
+nsigma=2.57
 
 globlmargin=0.033
 globrmargin=0.012
@@ -59,7 +60,8 @@ script_header=`cat<<EOF
 # set terminal postscript eps color "Helvetica" 12 size 14cm,7cm
 # set output 'plot_slamtruth_error_6xn.eps'
 
-set terminal png enhanced font "arial,12" size 1440,720 truecolor
+#set terminal png enhanced font "arial,12" size 1440,720 truecolor
+set terminal png enhanced font "arial,26" size 3000,1500 truecolor
 set output 'plot_slamtruth_error_6xn.png'
 
 # set term wxt size 1440,720
@@ -105,15 +107,15 @@ set format x ($i<3?"":"%g")
 set format y ($i%3?"":"%g")
 
 plot \
-	for [j=$ARGV_FILENUMMIN:$(($ARGV_FILENUMMAX))] file(j) using 1:((3*\$ $((2+30+$i)))*${coeffs[$i]}) with points pt 0 lc rgb "#FFD0D0" title "", \
-	for [j=$ARGV_FILENUMMIN:$(($ARGV_FILENUMMAX-1))] file(j) using 1:((-3*\$ $((2+30+$i)))*${coeffs[$i]}) with points pt 0 lc rgb "#FFD0D0" title "", \
-	file($ARGV_FILENUMMAX) using 1:((-3*\$ $((2+30+$i)))*${coeffs[$i]}) with points pt 0 lc rgb "#FFD0D0" title "Error 3 sigma uncert", \
+	for [j=$ARGV_FILENUMMIN:$(($ARGV_FILENUMMAX))] file(j) using 1:(($nsigma*\$ $((2+30+$i)))*${coeffs[$i]}) with points pt 0 lc rgb "#FFD0D0" title "", \
+	for [j=$ARGV_FILENUMMIN:$(($ARGV_FILENUMMAX-1))] file(j) using 1:((-$nsigma*\$ $((2+30+$i)))*${coeffs[$i]}) with points pt 0 lc rgb "#FFD0D0" title "", \
+	file($ARGV_FILENUMMAX) using 1:((-$nsigma*\$ $((2+30+$i)))*${coeffs[$i]}) with points pt 0 lc rgb "#FFD0D0" title "Error 99% confidence area", \
 	for [j=$ARGV_FILENUMMIN:$(($ARGV_FILENUMMAX-1))] file(j) using 1:((\$ $((2+24+$i)))*${coeffs[$i]}) with points pt 0 lc rgb "#D0D0FF" title "", \
 	file($ARGV_FILENUMMAX) using 1:((\$ $((2+24+$i)))*${coeffs[$i]}) with points pt 0 lc rgb "#D0D0FF" title "Error ${names[$i]}", \
-	"$ARGV_FILEAVERAGE" using 1:((3*\$ $((2+30+$i)))*${coeffs[$i]}) with lines lt 2 lw 1 lc rgb "red" title "Average error 3 sigma uncert", \
-	"$ARGV_FILEAVERAGE" using 1:((-3*\$ $((2+30+$i)))*${coeffs[$i]}) with lines lt 2 lw 1 lc rgb "red" title "", \
-	"$ARGV_FILEAVERAGE" using 1:((3*\$ $((2+6+$i)))*${coeffs[$i]}) with lines lt 2 lw 1 lc rgb "dark-red" title "Average slam 3 sigma uncert", \
-	"$ARGV_FILEAVERAGE" using 1:((-3*\$ $((2+6+$i)))*${coeffs[$i]}) with lines lt 2 lw 1 lc rgb "dark-red" title "", \
+	"$ARGV_FILEAVERAGE" using 1:(($nsigma*\$ $((2+30+$i)))*${coeffs[$i]}) with lines lt 2 lw 1 lc rgb "red" title "Average error 99% confidence area", \
+	"$ARGV_FILEAVERAGE" using 1:((-$nsigma*\$ $((2+30+$i)))*${coeffs[$i]}) with lines lt 2 lw 1 lc rgb "red" title "", \
+	"$ARGV_FILEAVERAGE" using 1:(($nsigma*\$ $((2+6+$i)))*${coeffs[$i]}) with lines lt 2 lw 1 lc rgb "dark-red" title "Average slam 99% confidence area", \
+	"$ARGV_FILEAVERAGE" using 1:((-$nsigma*\$ $((2+6+$i)))*${coeffs[$i]}) with lines lt 2 lw 1 lc rgb "dark-red" title "", \
 	"$ARGV_FILEAVERAGE" using 1:((\$ $((2+24+$i)))*${coeffs[$i]}) with lines lt 1 lw 1 lc rgb "blue" title "Average error"
 
 EOF

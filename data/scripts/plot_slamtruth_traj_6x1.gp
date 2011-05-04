@@ -9,6 +9,13 @@
 
 ARGV_FILE=$1
 
+# ymin_pos=-100
+# ymax_pos=250
+# ymin_angle=-180
+# ymax_angle=180
+# tmin=0
+# tmax=56
+
 ymin_pos=-30
 ymax_pos=30
 ymin_angle=-40
@@ -39,8 +46,12 @@ plotheight="((1-$globtmargin-$globbmargin)/2.0)"
 script_header=`cat<<EOF
 
 
-set terminal postscript eps color "Helvetica" 12 size 14cm,7cm
-set output 'plot_slamtruth_traj_6x1.eps'
+# set terminal postscript eps color "Helvetica" 12 size 14cm,7cm
+# set output 'plot_slamtruth_traj_6x1.eps'
+
+#set terminal png enhanced font "arial,12" size 1440,720 truecolor
+set terminal png enhanced font "arial,26" size 3000,1500 truecolor
+set output 'plot_slamtruth_traj_6x1.png'
 
 #set term wxt size 1280,640
 
@@ -104,10 +115,10 @@ unset multiplot
 #pause -1
 
 
-set output
-!epstopdf --outfile=plot_slamtruth_traj_6x1.pdf plot_slamtruth_traj_6x1.eps
-!evince plot_slamtruth_traj_6x1.pdf
-quit
+# set output
+# !epstopdf --outfile=plot_slamtruth_traj_6x1.pdf plot_slamtruth_traj_6x1.eps
+# !evince plot_slamtruth_traj_6x1.pdf
+# quit
 
 EOF
 `

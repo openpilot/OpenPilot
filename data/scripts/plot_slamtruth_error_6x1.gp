@@ -9,18 +9,26 @@
 
 ARGV_FILE=$1
 
-ymin_pos=-8
-ymax_pos=8
-ymin_angle=-3
-ymax_angle=3
+ymin_pos=-30
+ymax_pos=30
+ymin_angle=-6
+ymax_angle=6
 tmin=0
-tmax=70
+tmax=56
+
+#ymin_pos=-8
+#ymax_pos=8
+#ymin_angle=-3
+#ymax_angle=3
+#tmin=0
+#tmax=70
 
 ##
 
 names=("x (cm)" "y (cm)" "z (cm)" "yaw (deg)" "pitch (deg)" "roll (deg)")
 coeff_pos=100
 coeff_angle=57.2958
+nsigma=2.57
 
 globlmargin=0.033
 globrmargin=0.012
@@ -38,8 +46,12 @@ plotheight="((1-$globtmargin-$globbmargin)/2.0)"
 ## HEADER
 script_header=`cat<<EOF
 
-set terminal postscript eps color "Helvetica" 12 size 14cm,7cm
-set output 'plot_slamtruth_error_6x1.eps'
+#set terminal postscript eps color "Helvetica" 12 size 14cm,7cm
+#set output 'plot_slamtruth_error_6x1.eps'
+
+#set terminal png enhanced font "arial,12" size 1440,720 truecolor
+set terminal png enhanced font "arial,26" size 3000,1500 truecolor
+set output 'plot_slamtruth_error_6x1.png'
 
 #set term wxt size 1280,640
 
@@ -82,9 +94,11 @@ set format x ($i<3?"":"%g")
 set format y ($i%3?"":"%g")
 
 plot \
-	"$ARGV_FILE" using 1:((\$ $((2+24+$i)))*${coeffs[$i]}) with lines lt 1 lw 1 lc rgb "blue" title "error ${names[$i]}", \
-	"$ARGV_FILE" using 1:((3*\$ $((2+30+$i)))*${coeffs[$i]}) with lines lt 2 lw 1 lc rgb "red" title "3 sigma uncert", \
-	"$ARGV_FILE" using 1:((-3*\$ $((2+30+$i)))*${coeffs[$i]}) with lines lt 2 lw 1 lc rgb "red" title ""
+	"$ARGV_FILE" using 1:((\$ $((2+24+$i)))*${coeffs[$i]}) with lines lt 1 lw 1 lc rgb "blue" title "Error ${names[$i]}", \
+	"$ARGV_FILE" using 1:(($nsigma*\$ $((2+30+$i)))*${coeffs[$i]}) with lines lt 2 lw 1 lc rgb "red" title "Error 99% confidence area", \
+	"$ARGV_FILE" using 1:((-$nsigma*\$ $((2+30+$i)))*${coeffs[$i]}) with lines lt 2 lw 1 lc rgb "red" title "", \
+	"$ARGV_FILE" using 1:(($nsigma*\$ $((2+6+$i)))*${coeffs[$i]}) with lines lt 2 lw 1 lc rgb "dark-red" title "Slam 99% confidence area", \
+	"$ARGV_FILE" using 1:((-$nsigma*\$ $((2+6+$i)))*${coeffs[$i]}) with lines lt 2 lw 1 lc rgb "dark-red" title ""
 
 EOF
 `
@@ -103,10 +117,10 @@ unset multiplot
 # prevent window from closing at the end
 #pause -1
 
-set output
-!epstopdf --outfile=plot_slamtruth_error_6x1.pdf plot_slamtruth_error_6x1.eps
-!evince plot_slamtruth_error_6x1.pdf
-quit
+#set output
+#!epstopdf --outfile=plot_slamtruth_error_6x1.pdf plot_slamtruth_error_6x1.eps
+#!evince plot_slamtruth_error_6x1.pdf
+#quit
 
 EOF
 `

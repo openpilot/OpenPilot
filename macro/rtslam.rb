@@ -15,7 +15,7 @@ module Rtslam
 #
 # TODO:
 # - deal correctly with angles and modulo for interpolation
-# - read full cov matrix for slam ?
+# - read full cov matrix for slam, for real 6D NEES
 	
 def Rtslam.sync_truth(slam_filename, truth_filename, res_filename)
 	
@@ -130,14 +130,14 @@ nees"
 	# get slam line
 	while (slam_line = slam_file.gets)
 		if slam_line[0] == 35 or slam_line[0] == 0 or slam_line[0] == 10 then next end
-		slam_strvec = slam_line.split(' ')
-		if slam_strvec.length < slam_ncol then next end
+		slam_vec = slam_line.split(' ').map{|s| s.to_f}
+		if slam_vec.length < slam_ncol then next end
 		
-		slam_raw_t = slam_strvec[slam_t_col].to_f
-		slam_raw_arr = [slam_strvec[slam_x_col].to_f*slam_scale, slam_strvec[slam_y_col].to_f*slam_scale, slam_strvec[slam_z_col].to_f*slam_scale,
-		                slam_strvec[slam_w_col].to_f, slam_strvec[slam_p_col].to_f, slam_strvec[slam_r_col].to_f]
-		slamP_raw_arr = [slam_strvec[slam_sx_col].to_f*slam_scale, slam_strvec[slam_sy_col].to_f*slam_scale, slam_strvec[slam_sz_col].to_f*slam_scale,
-		                 slam_strvec[slam_sw_col].to_f, slam_strvec[slam_sp_col].to_f, slam_strvec[slam_sr_col].to_f]
+		slam_raw_t = slam_vec[slam_t_col]
+		slam_raw_arr = [slam_vec[slam_x_col]*slam_scale, slam_vec[slam_y_col]*slam_scale, slam_vec[slam_z_col]*slam_scale,
+		                slam_vec[slam_w_col]           , slam_vec[slam_p_col]           , slam_vec[slam_r_col]           ]
+		slamP_raw_arr = [slam_vec[slam_sx_col]*slam_scale, slam_vec[slam_sy_col]*slam_scale, slam_vec[slam_sz_col]*slam_scale,
+		                 slam_vec[slam_sw_col]           , slam_vec[slam_sp_col]           , slam_vec[slam_sr_col]           ]
 		slam_raw_vec = Jmath::arrayToVec(slam_raw_arr)
 		slamP_raw_vec = Jmath::arrayToVec(slamP_raw_arr)
 		slam_raw_t3d = Geom::T3DEuler.new(slam_raw_vec, slamP_raw_vec)
@@ -151,12 +151,12 @@ nees"
 			
 			while (truth_line = truth_file.gets)
 				if truth_line[0] == 35 or truth_line[0] == 0 or truth_line[0] == 10 then next end
-				truth_strvec = truth_line.split(' ')
-				if truth_strvec.length < truth_ncol then next end
+				truth_vec = truth_line.split(' ').map{|s| s.to_f}
+				if truth_vec.length < truth_ncol then next end
 				
-				truth_raw_t = truth_strvec[truth_t_col].to_f
-				truth_raw_arr = [truth_strvec[truth_x_col].to_f, truth_strvec[truth_y_col].to_f, truth_strvec[truth_z_col].to_f,
-												truth_strvec[truth_w_col].to_f, truth_strvec[truth_p_col].to_f, truth_strvec[truth_r_col].to_f]
+				truth_raw_t = truth_vec[truth_t_col]
+				truth_raw_arr = [truth_vec[truth_x_col], truth_vec[truth_y_col], truth_vec[truth_z_col],
+												 truth_vec[truth_w_col], truth_vec[truth_p_col], truth_vec[truth_r_col]]
 				truth_raw_vec = Jmath::arrayToVec(truth_raw_arr)
 				truth_raw_t3d = Geom::T3DEuler.new(truth_raw_vec, truthP_raw_vec)
 				

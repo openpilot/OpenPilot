@@ -1216,6 +1216,7 @@ void demo_slam01() {
 		f >> rseed;
 		f.close();
 	}
+	intOpts[iRandSeed] = rseed;
 	std::cout << "Random seed " << rseed << std::endl;
 	rtslam::srand(rseed);
 

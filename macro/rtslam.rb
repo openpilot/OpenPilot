@@ -18,16 +18,14 @@ module Rtslam
 # - read full cov matrix for slam ?
 	
 def Rtslam.sync_truth(slam_filename, truth_filename, res_filename)
-	# transforms
-	truth2rtruth_arr = [-0.013, -0.005, -0.012, 0, 0, 0]
-	truth2rtruth_vec = Jmath::arrayToVec(truth2rtruth_arr)
-	truth2rtruth_t3d = Geom::T3DEuler.new(truth2rtruth_vec)
-
-	slam2rslam_arr = [0, 0, 0, 0, 0, Math::PI]
-	slam2rslam_vec = Jmath::arrayToVec(slam2rslam_arr)
-	slam2rslam_t3d = Geom::T3DEuler.new(slam2rslam_vec)
 	
-	# values
+	# slam
+	# slam inertial
+	truth2rtruth_arr = [-0.013, -0.005, -0.012, 0, 0, 0]
+	slam2rslam_arr = [0, 0, 0, 0, 0, Math::PI]
+	slam_scale=1
+	slam_ncol=45
+	
 	slam_t_col=0
 	slam_x_col=1
 	slam_y_col=2
@@ -36,6 +34,38 @@ def Rtslam.sync_truth(slam_filename, truth_filename, res_filename)
 	slam_p_col=9
 	slam_r_col=10
 
+	slam_sx_col=23
+	slam_sy_col=24
+	slam_sz_col=25
+	slam_sw_col=30
+	slam_sp_col=31
+	slam_sr_col=32
+	
+	# slam constvel
+# 	truth2rtruth_arr = [-0.015, 0.00, 0.02, 0, 0, 0]
+# 	slam2rslam_arr = [0, 0, 0, 0, 0, 0]
+# 	slam_scale=2.05
+# 	slam_ncol=33
+# 	
+# 	slam_t_col=0
+# 	slam_x_col=1
+# 	slam_y_col=2
+# 	slam_z_col=3
+# 	slam_w_col=8
+# 	slam_p_col=9
+# 	slam_r_col=10
+# 
+# 	slam_sx_col=17
+# 	slam_sy_col=18
+# 	slam_sz_col=19
+# 	slam_sw_col=24
+# 	slam_sp_col=25
+# 	slam_sr_col=26
+
+
+	# truth
+	truth_ncol=20
+
 	truth_t_col=0
 	truth_x_col=1
 	truth_y_col=2
@@ -43,15 +73,7 @@ def Rtslam.sync_truth(slam_filename, truth_filename, res_filename)
 	truth_w_col=19
 	truth_p_col=18
 	truth_r_col=17
-
-	# uncertainties (sigmas)
-	slam_sx_col=23
-	slam_sy_col=24
-	slam_sz_col=25
-	slam_sw_col=30
-	slam_sp_col=31
-	slam_sr_col=32
-
+	
 	truth_sx_col=-1
 	truth_sy_col=-1
 	truth_sz_col=-1
@@ -66,10 +88,15 @@ def Rtslam.sync_truth(slam_filename, truth_filename, res_filename)
 	truth_sp=2.0/200.0
 	truth_sr=2.0/200.0
 
-	# format
-	slam_ncol=45
-	truth_ncol=20
 
+	# transforms
+	truth2rtruth_vec = Jmath::arrayToVec(truth2rtruth_arr)
+	truth2rtruth_t3d = Geom::T3DEuler.new(truth2rtruth_vec)
+
+	slam2rslam_vec = Jmath::arrayToVec(slam2rslam_arr)
+	slam2rslam_t3d = Geom::T3DEuler.new(slam2rslam_vec)
+
+	
 	slam_file = File.open(slam_filename)
 	truth_file = File.open(truth_filename)
 	res_file = File.open(res_filename,"w")
@@ -107,9 +134,9 @@ nees"
 		if slam_strvec.length < slam_ncol then next end
 		
 		slam_raw_t = slam_strvec[slam_t_col].to_f
-		slam_raw_arr = [slam_strvec[slam_x_col].to_f, slam_strvec[slam_y_col].to_f, slam_strvec[slam_z_col].to_f,
+		slam_raw_arr = [slam_strvec[slam_x_col].to_f*slam_scale, slam_strvec[slam_y_col].to_f*slam_scale, slam_strvec[slam_z_col].to_f*slam_scale,
 		                slam_strvec[slam_w_col].to_f, slam_strvec[slam_p_col].to_f, slam_strvec[slam_r_col].to_f]
-		slamP_raw_arr = [slam_strvec[slam_sx_col].to_f, slam_strvec[slam_sy_col].to_f, slam_strvec[slam_sz_col].to_f,
+		slamP_raw_arr = [slam_strvec[slam_sx_col].to_f*slam_scale, slam_strvec[slam_sy_col].to_f*slam_scale, slam_strvec[slam_sz_col].to_f*slam_scale,
 		                 slam_strvec[slam_sw_col].to_f, slam_strvec[slam_sp_col].to_f, slam_strvec[slam_sr_col].to_f]
 		slam_raw_vec = Jmath::arrayToVec(slam_raw_arr)
 		slamP_raw_vec = Jmath::arrayToVec(slamP_raw_arr)
@@ -176,6 +203,13 @@ nees"
 			rtruth_inter_t3d = Geom::T3DEuler.new(
 				rtruth_prev_t3d.getX    + (rtruth_final_t3d.getX    - rtruth_prev_t3d.getX   ) * coeff,
 				rtruth_prev_t3d.getXCov + (rtruth_final_t3d.getXCov - rtruth_prev_t3d.getXCov) * coeff)
+# 			for i in (3..5)
+# 				diff = rtruth_final_t3d.getX(i) - rtruth_prev_t3d.getX(i)
+# 				if diff > Math::PI
+# 				rtruth_prev_t3d.getX * (1-coeff) + rtruth_final_t3d.getX * coeff
+# 				
+# 				if rtruth_prev_t3d.getX(i) < -pi/2 and rtruth_final_t3d.getX(i) > pi/2 then
+					
 		end
 		
 		# error

@@ -81,6 +81,10 @@ E: joe (dot) hlebasko(plus) openpilot (at) gmail (dot) com
 D: Production Main Board & Production OP GPS
 M: Hardware Architecture Team
 
+N: Mark James
+E: mjames (plus) openpilot (at) gmail (dot) com
+D: Some of Silk Icon set used in GCS - http://www.famfamfam.com/lab/icons/silk 
+
 N: Sami Korhonen
 E: samik (dot) korhonen (plus) openpilot (at) gmail (dot) com
 D: GPS Module, Spektrum RC Module, OSD work 

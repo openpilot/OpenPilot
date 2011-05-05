@@ -60,6 +60,8 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
     curveMax=1.0;
 
 
+    setFrameStyle(QFrame::NoFrame);
+    setStyleSheet("background:transparent");
 
     QGraphicsScene *scene = new QGraphicsScene(this);
     QSvgRenderer *renderer = new QSvgRenderer();

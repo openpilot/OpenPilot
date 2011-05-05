@@ -191,34 +191,40 @@ static void actuatorTask(void* parameters)
 		AlarmsClear(SYSTEMALARMS_ALARM_ACTUATOR);
 
 		bool armed = manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE;
-		armed &= desired.Throttle > 0.00; //zero throttle stops the motors
-
+		bool positiveThrottle = desired.Throttle >= 0.00;
+		bool spinWhileArmed = settings.MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE && 
+		                         manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE;
+		
 		float curve1 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve1);
 		float curve2 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve2);
 		for(int ct=0; ct < MAX_MIX_ACTUATORS; ct++)
 		{
-			if(mixers[ct].type != MIXERSETTINGS_MIXER1TYPE_DISABLED)
-			{
-				status[ct] = ProcessMixer(ct, curve1, curve2, &mixerSettings, &desired, dT);
+			if(mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_DISABLED)
+				continue;
+			
+			status[ct] = ProcessMixer(ct, curve1, curve2, &mixerSettings, &desired, dT);
+			
+			// Motors have additional protection for when to be on
+			if(mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) {					
 
-				if(!armed &&
-				   mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR)
+				// If not armed or motors aren't meant to spin all the time
+				if( !armed ||
+				   (!spinWhileArmed && !positiveThrottle))
 				{
-					command.Channel[ct] = settings.ChannelMin[ct]; //force zero throttle
 					filterAccumulator[ct] = 0;
-					lastResult[ct] = 0;
-				}else
-				{
-					// For motors when armed keep above neutral
-					if((mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) && (status[ct] < 0)) 
-						status[ct] = 0;
-						
-					command.Channel[ct] = scaleChannel(status[ct],
-									   settings.ChannelMax[ct],
-									   settings.ChannelMin[ct],
-									   settings.ChannelNeutral[ct]);
-				}
+					lastResult[ct] = 0;					
+					status[ct] = -1;  //force min throttle
+				} 
+				// If armed meant to keep spinning, 
+				else if ((spinWhileArmed && !positiveThrottle) ||
+					 (status[ct] < 0) )
+					status[ct] = 0;					
 			}
+			
+			command.Channel[ct] = scaleChannel(status[ct],
+							   settings.ChannelMax[ct],
+							   settings.ChannelMin[ct],
+							   settings.ChannelNeutral[ct]);
 		}
 		MixerStatusSet(&mixerStatus);
 
@@ -442,7 +448,7 @@ static bool set_channel(uint8_t mixer_channel, uint16_t value) {
 	
 	ActuatorSettingsData settings;
 	ActuatorSettingsGet(&settings);
-		
+	
 	switch(settings.ChannelType[mixer_channel]) {
 		case ACTUATORSETTINGS_CHANNELTYPE_PWMALARMBUZZER: {
 			// This is for buzzers that take a PWM input
@@ -495,19 +501,7 @@ static bool set_channel(uint8_t mixer_channel, uint16_t value) {
 			return true;
 #if defined(PIOS_INCLUDE_I2C_ESC)
 		case ACTUATORSETTINGS_CHANNELTYPE_MK: 
-		{
-			ManualControlCommandData manual;
-			ManualControlCommandGet(&manual);
-			/* Unfortunately MK controller take forever to start so keep */
-			/* them spinning when armed */			 
-			if(manual.Armed)
-				value = (value < 0) ? 1 : value;
-			else 
-				value = 0;
-
 			return PIOS_SetMKSpeed(settings.ChannelAddr[mixer_channel],value);
-			break;
-		}
 		case ACTUATORSETTINGS_CHANNELTYPE_ASTEC4:
 			return PIOS_SetAstec4Speed(settings.ChannelAddr[mixer_channel],value);
 			break;

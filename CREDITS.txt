@@ -81,13 +81,21 @@ E: joe (dot) hlebasko(plus) openpilot (at) gmail (dot) com
 D: Production Main Board & Production OP GPS
 M: Hardware Architecture Team
 
+N: Mark James
+E: mjames (plus) openpilot (at) gmail (dot) com
+D: Some of Silk Icon set used in GCS - http://www.famfamfam.com/lab/icons/silk 
+
 N: Sami Korhonen
 E: samik (dot) korhonen (plus) openpilot (at) gmail (dot) com
-D: GPS Module, Spektrum RC Module 
+D: GPS Module, Spektrum RC Module, OSD work 
 
 N: Thorsten Klose
-E: thorsten.klose (at) dmx (dot) de
+E: thorsten (dot) klose (at) dmx (dot) de
 D: Embedded STM32 infrastructure  
+
+N: Hallvard Kristiansen
+E: hal (at) fleshmx (dot) com
+D: GCS Artwork, Quad layout diagrams
 
 N: Edouard Lafargue 
 E: edouard (at) lafargue (dot) name
@@ -138,7 +146,7 @@ D: The GLC_lib as used in the ModelView Plugin
 D: See: http://www.glc-lib.net/
 
 N: Julien Rouviere
-E: julien.rouviere (plus) openpilot (at) gmail (dot) com
+E: julien (dot) rouviere (plus) openpilot (at) gmail (dot) com
 D: GCS Core Developer
 D: GCS Framework and Plugins for the GCS
 
@@ -191,6 +199,6 @@ D: Module architecture and UAVTalk/UAVObjects implementation.
 M: Architecture co-lead
 
 N: Alex Vrubel
-E: alex.vrubel (plus) openpilot (at) gmail (dot) com
+E: alex (dot) vrubel (plus) openpilot (at) gmail (dot) com
 D: Russian translation of the GCS
 

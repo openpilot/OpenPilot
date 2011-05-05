@@ -37,7 +37,7 @@ ENABLE_DEBUG_PINS ?= NO
 ENABLE_AUX_UART ?= NO
 
 #
-OVERRIDE USE_BOOTLOADER = NO
+override USE_BOOTLOADER = NO
 
 
 # Set to YES when using Code Sourcery toolchain

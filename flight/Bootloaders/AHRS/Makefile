@@ -29,7 +29,7 @@ include $(TOP)/make/firmware-defs.mk
 # Set developer code and compile options
 # Set to YES for debugging
 DEBUG ?= NO
-OVERRIDE USE_BOOTLOADER = NO
+override USE_BOOTLOADER = NO
 
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= YES

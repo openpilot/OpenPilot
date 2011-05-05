@@ -35,7 +35,7 @@ namespace Constants {
 #define GCS_VERSION_MAJOR 1
 #define GCS_VERSION_MINOR 0
 #define GCS_VERSION_RELEASE 0
-const char * const GCS_VERSION_TYPE = "Beta";
+const char * const GCS_VERSION_TYPE = "Alpha";
 const char * const GCS_VERSION_CODENAME = "Pascal";
 
 #define STRINGIFY_INTERNAL(x) #x

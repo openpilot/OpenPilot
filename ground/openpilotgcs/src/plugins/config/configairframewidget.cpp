@@ -1003,7 +1003,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
     } else if (frameType == "HexaX" || frameType == "Hexacopter X" ) {
         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Multirotor"));
         m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Hexacopter X"));
-        quad->setElementId("quad-hexa-X");
+        quad->setElementId("quad-hexa-H");
         m_aircraft->multiMotor4->setEnabled(true);
         m_aircraft->multiMotor5->setEnabled(true);
         m_aircraft->multiMotor6->setEnabled(true);

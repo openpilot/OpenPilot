@@ -47,6 +47,9 @@
          <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
 Leave at 50Hz for fixed wing.</string>
         </property>
+        <property name="maximum">
+         <number>400</number>
+        </property>
        </widget>
       </item>
       <item row="0" column="3">
@@ -88,6 +91,9 @@ Leave at 50Hz for fixed wing.</string>
          <string>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
 Leave at 50Hz for fixed wing.</string>
         </property>
+        <property name="maximum">
+         <number>400</number>
+        </property>
        </widget>
       </item>
       <item row="1" column="2">
@@ -100,7 +106,7 @@ Leave at 50Hz for fixed wing.</string>
 Leave at 50Hz for fixed wing.</string>
         </property>
         <property name="maximum">
-         <number>9999</number>
+         <number>400</number>
         </property>
        </widget>
       </item>
@@ -114,7 +120,7 @@ Leave at 50Hz for fixed wing.</string>
 Leave at 50Hz for fixed wing.</string>
         </property>
         <property name="maximum">
-         <number>9999</number>
+         <number>400</number>
         </property>
        </widget>
       </item>
@@ -1093,47 +1099,63 @@ Applies and Saves all settings to SD</string>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>ch0Output</tabstop>
+  <tabstop>outputRate1</tabstop>
+  <tabstop>outputRate2</tabstop>
+  <tabstop>outputRate3</tabstop>
+  <tabstop>outputRate4</tabstop>
   <tabstop>ch0OutMin</tabstop>
-  <tabstop>ch0OutSlider</tabstop>
   <tabstop>ch0OutMax</tabstop>
-  <tabstop>ch0Rev</tabstop>
-  <tabstop>ch1Output</tabstop>
   <tabstop>ch1OutMin</tabstop>
-  <tabstop>ch1OutSlider</tabstop>
   <tabstop>ch1OutMax</tabstop>
-  <tabstop>ch1Rev</tabstop>
-  <tabstop>ch2Output</tabstop>
   <tabstop>ch2OutMin</tabstop>
-  <tabstop>ch2OutSlider</tabstop>
   <tabstop>ch2OutMax</tabstop>
-  <tabstop>ch2Rev</tabstop>
-  <tabstop>ch3Output</tabstop>
   <tabstop>ch3OutMin</tabstop>
-  <tabstop>ch3OutSlider</tabstop>
   <tabstop>ch3OutMax</tabstop>
-  <tabstop>ch3Rev</tabstop>
-  <tabstop>ch4Output</tabstop>
   <tabstop>ch4OutMin</tabstop>
-  <tabstop>ch4OutSlider</tabstop>
   <tabstop>ch4OutMax</tabstop>
-  <tabstop>ch4Rev</tabstop>
-  <tabstop>ch5Output</tabstop>
   <tabstop>ch5OutMin</tabstop>
-  <tabstop>ch5OutSlider</tabstop>
   <tabstop>ch5OutMax</tabstop>
-  <tabstop>ch5Rev</tabstop>
-  <tabstop>ch6Output</tabstop>
   <tabstop>ch6OutMin</tabstop>
-  <tabstop>ch6OutSlider</tabstop>
   <tabstop>ch6OutMax</tabstop>
-  <tabstop>ch6Rev</tabstop>
-  <tabstop>ch7Output</tabstop>
   <tabstop>ch7OutMin</tabstop>
-  <tabstop>ch7OutSlider</tabstop>
   <tabstop>ch7OutMax</tabstop>
+  <tabstop>ch0Output</tabstop>
+  <tabstop>ch0OutSlider</tabstop>
+  <tabstop>ch0Rev</tabstop>
+  <tabstop>ch0Link</tabstop>
+  <tabstop>ch1Output</tabstop>
+  <tabstop>ch1OutSlider</tabstop>
+  <tabstop>ch1Rev</tabstop>
+  <tabstop>ch1Link</tabstop>
+  <tabstop>ch2Output</tabstop>
+  <tabstop>ch2OutSlider</tabstop>
+  <tabstop>ch2Rev</tabstop>
+  <tabstop>ch2Link</tabstop>
+  <tabstop>ch3Output</tabstop>
+  <tabstop>ch3OutSlider</tabstop>
+  <tabstop>ch3Rev</tabstop>
+  <tabstop>ch3Link</tabstop>
+  <tabstop>ch4Output</tabstop>
+  <tabstop>ch4OutSlider</tabstop>
+  <tabstop>ch4Rev</tabstop>
+  <tabstop>ch4Link</tabstop>
+  <tabstop>ch5Output</tabstop>
+  <tabstop>ch5OutSlider</tabstop>
+  <tabstop>ch5Rev</tabstop>
+  <tabstop>ch5Link</tabstop>
+  <tabstop>ch6Output</tabstop>
+  <tabstop>ch6OutSlider</tabstop>
+  <tabstop>ch6Rev</tabstop>
+  <tabstop>ch6Link</tabstop>
+  <tabstop>ch7Output</tabstop>
+  <tabstop>ch7OutSlider</tabstop>
   <tabstop>ch7Rev</tabstop>
+  <tabstop>ch7Link</tabstop>
+  <tabstop>spinningArmed</tabstop>
+  <tabstop>channelOutTest</tabstop>
+  <tabstop>getRCOutputCurrent</tabstop>
   <tabstop>saveRCOutputToRAM</tabstop>
+  <tabstop>saveRCOutputToSD</tabstop>
  </tabstops>
  <resources/>
  <connections/>

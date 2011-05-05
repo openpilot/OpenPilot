@@ -366,9 +366,9 @@ static void manualControlTask(void *parameters)
 
 						if (connection_state == CONNECTED) {
 							// Should use RC input only if RX is connected
-							if (armingInputLevel <= -0.90)
+							if (armingInputLevel <= -0.50)
 								manualArm = true;
-							else if (armingInputLevel >= +0.90)
+							else if (armingInputLevel >= +0.50)
 								manualDisarm = true;
 						}
 

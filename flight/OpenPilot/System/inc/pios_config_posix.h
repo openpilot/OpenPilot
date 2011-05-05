@@ -56,4 +56,7 @@
 /* Stabilization options */
 #define PIOS_QUATERNION_STABILIZATION
 
+/* GPS options */
+#define PIOS_GPS_SETS_HOMELOCATION
+
 #endif /* PIOS_CONFIG_POSIX_H */

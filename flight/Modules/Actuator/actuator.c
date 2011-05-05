@@ -195,32 +195,36 @@ static void actuatorTask(void* parameters)
 		bool spinWhileArmed = settings.MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE && 
 		                         manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE;
 		
-		bool zeroMotors = !armed || (!spinWhileArmed && !positiveThrottle);
-
 		float curve1 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve1);
 		float curve2 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve2);
 		for(int ct=0; ct < MAX_MIX_ACTUATORS; ct++)
 		{
-			if(mixers[ct].type != MIXERSETTINGS_MIXER1TYPE_DISABLED)
-			{
-				status[ct] = ProcessMixer(ct, curve1, curve2, &mixerSettings, &desired, dT);
+			if(mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_DISABLED)
+				continue;
+			
+			status[ct] = ProcessMixer(ct, curve1, curve2, &mixerSettings, &desired, dT);
+			
+			// Motors have additional protection for when to be on
+			if(mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) {					
 
-				if(zeroMotors && mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR)
+				// If not armed or motors aren't meant to spin all the time
+				if( !armed ||
+				   (!spinWhileArmed && !positiveThrottle))
 				{
-					command.Channel[ct] = settings.ChannelMin[ct]; //force zero throttle
 					filterAccumulator[ct] = 0;
-					lastResult[ct] = 0;
-				} else {
-					// For motors when armed and throttle (or flag to keep spinning) keep above neutral
-					if((mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) && (status[ct] < 0)) 
-						status[ct] = 0;
-						
-					command.Channel[ct] = scaleChannel(status[ct],
-									   settings.ChannelMax[ct],
-									   settings.ChannelMin[ct],
-									   settings.ChannelNeutral[ct]);
-				}
+					lastResult[ct] = 0;					
+					status[ct] = -1;  //force min throttle
+				} 
+				// If armed meant to keep spinning, 
+				else if ((spinWhileArmed && !positiveThrottle) ||
+					 (status[ct] < 0) )
+					status[ct] = 0;					
 			}
+			
+			command.Channel[ct] = scaleChannel(status[ct],
+							   settings.ChannelMax[ct],
+							   settings.ChannelMin[ct],
+							   settings.ChannelNeutral[ct]);
 		}
 		MixerStatusSet(&mixerStatus);
 

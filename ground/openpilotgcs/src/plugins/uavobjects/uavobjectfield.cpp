@@ -552,6 +552,7 @@ void UAVObjectField::setValue(const QVariant& value, quint32 index)
             case ENUM:
             {
                 qint8 tmpenum = options.indexOf( value.toString() );
+                Q_ASSERT(tmpenum >= 0); // To catch any programming errors where we set invalid values
                 memcpy(&data[offset + numBytesPerElement*index], &tmpenum, numBytesPerElement);
                 break;
             }

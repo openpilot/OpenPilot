@@ -32,6 +32,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
+#include "uavobjectutilmanager.h"
 #include <QtGui/QWidget>
 #include <QList>
 

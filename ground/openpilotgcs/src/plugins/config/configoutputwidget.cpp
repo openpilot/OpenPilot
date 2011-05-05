@@ -318,7 +318,10 @@ void ConfigOutputWidget::setSpinningArmed(bool val)
     if (!obj) return;
     UAVObjectField *field = obj->getField("MotorsSpinWhileArmed");
     if (!field) return;
-    field->setValue(val);
+    if(val)
+        field->setValue("TRUE");
+    else
+        field->setValue("FALSE");
 }
 
 /**
@@ -384,13 +387,6 @@ void ConfigOutputWidget::requestRCOutputUpdate()
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-    // Get the Airframe type from the system settings:
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("SystemSettings")));
-    Q_ASSERT(obj);
-    obj->requestUpdate();
-    UAVObjectField *field = obj->getField(QString("AirframeType"));
-    m_config->aircraftType->setText(QString("Aircraft type: ") + field->getValue().toString());
-
     // Reset all channel assignements:
     m_config->ch0Output->setCurrentIndex(0);
     m_config->ch1Output->setCurrentIndex(0);
@@ -402,7 +398,7 @@ void ConfigOutputWidget::requestRCOutputUpdate()
     m_config->ch7Output->setCurrentIndex(0);
 
     // Get the channel assignements:
-    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
+    UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
     Q_ASSERT(obj);
     obj->requestUpdate();
     QList<UAVObjectField*> fieldList = obj->getFields();
@@ -413,13 +409,43 @@ void ConfigOutputWidget::requestRCOutputUpdate()
     }
 
     // Get the SpinWhileArmed setting
-    field = obj->getField(QString("MotorsSpinWhileArmed"));
-    m_config->spinningArmed->setChecked(field->getValue().toBool());
+    UAVObjectField *field = obj->getField(QString("MotorsSpinWhileArmed"));
+    m_config->spinningArmed->setChecked(field->getValue().toString().contains("TRUE"));
 
     // Get Output rates for both banks
     field = obj->getField(QString("ChannelUpdateFreq"));
+    UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
     m_config->outputRate1->setValue(field->getValue(0).toInt());
     m_config->outputRate2->setValue(field->getValue(1).toInt());
+    if (utilMngr) {
+        int board = utilMngr->getBoardModel();
+        if ((board & 0xff00) == 1024) {
+            // CopterControl family
+            m_config->chBank1->setText("1-3");
+            m_config->chBank2->setText("4");
+            m_config->chBank3->setText("5");
+            m_config->chBank4->setText("6");
+            m_config->outputRate1->setEnabled(true);
+            m_config->outputRate2->setEnabled(true);
+            m_config->outputRate3->setEnabled(true);
+            m_config->outputRate4->setEnabled(true);
+            m_config->outputRate3->setValue(field->getValue(2).toInt());
+            m_config->outputRate4->setValue(field->getValue(3).toInt());
+        } else if ((board & 0xff00) == 256 ) {
+            // Mainboard family
+            m_config->outputRate1->setEnabled(true);
+            m_config->outputRate2->setEnabled(true);
+            m_config->outputRate3->setEnabled(false);
+            m_config->outputRate4->setEnabled(false);
+            m_config->chBank1->setText("1-4");
+            m_config->chBank2->setText("5-8");
+            m_config->chBank3->setText("-");
+            m_config->chBank4->setText("-");
+            m_config->outputRate3->setValue(0);
+            m_config->outputRate4->setValue(0);
+        }
+    }
+
 
     // Get Channel ranges:
     for (int i=0;i<8;i++) {
@@ -479,6 +505,8 @@ void ConfigOutputWidget::sendRCOutputUpdate()
     field = obj->getField(QString("ChannelUpdateFreq"));
     field->setValue(m_config->outputRate1->value(),0);
     field->setValue(m_config->outputRate2->value(),1);
+    field->setValue(m_config->outputRate3->value(),2);
+    field->setValue(m_config->outputRate4->value(),3);
 
     // Set Actuator assignement for each channel:
     // Rule: if two channels have the same setting (which is wrong!) the higher channel

@@ -307,7 +307,6 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	AttitudeSettingsData attitudeSettings;
 	AttitudeSettingsGet(&attitudeSettings);
 	
-	float rotationQuat[4];
 	
 	accelKp = attitudeSettings.AccelKp;
 	accelKi = attitudeSettings.AccelKi;		
@@ -319,37 +318,22 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	accelbias[2] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Z];
 	
 	// Indicates not to expend cycles on rotation
-	if(attitudeSettings.RotationQuaternion[0] == 126) {
+	if(attitudeSettings.BoardRotation[0] == 0 && attitudeSettings.BoardRotation[1] == 0 &&
+	   attitudeSettings.BoardRotation[2] == 0) {
 		rotate = 0;
-		rotationQuat[0] = 1;
-		rotationQuat[1] = rotationQuat[2] = rotationQuat[3] = 0;
-		return;
-	}
-	
-	rotate = 1;
-	
-	rotationQuat[0] = (float) attitudeSettings.RotationQuaternion[0] / 127.0;
-	rotationQuat[1] = (float) attitudeSettings.RotationQuaternion[1] / 127.0f;
-	rotationQuat[2] = (float) attitudeSettings.RotationQuaternion[2] / 127.0f;
-	rotationQuat[3] = (float) attitudeSettings.RotationQuaternion[3] / 127.0f;
-	
-	float len = sqrt(rotationQuat[0] * rotationQuat[0] + rotationQuat[1] * rotationQuat[1] +
-		     rotationQuat[2] * rotationQuat[2] + rotationQuat[3] * rotationQuat[3]);
-	
-	// Sanitize input. Shouldn't do anything functional.
-	if(len < 1e-3) { 
-		// Really wrong value
-		rotationQuat[0] = 1;
-		rotationQuat[1] = rotationQuat[2] = rotationQuat[3] = 0;
-		rotate = 0;
+		
+		// Shouldn't be used but to be safe
+		float rotationQuat[4] = {1,0,0,0};
+		Quaternion2R(rotationQuat, R);
 	} else {
-		rotationQuat[0] /= len;
-		rotationQuat[1] /= len;
-		rotationQuat[2] /= len;
-		rotationQuat[3] /= len;
-	}
-	
-	Quaternion2R(rotationQuat, R);
+		float rotationQuat[4];
+		const float rpy[3] = {attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_ROLL], 
+			attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_PITCH], 
+			attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_YAW]};
+		RPY2Quaternion(rpy, rotationQuat);
+		Quaternion2R(rotationQuat, R);
+		rotate = 1;
+	}		
 }
 /**
   * @}

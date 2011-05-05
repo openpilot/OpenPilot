@@ -47,11 +47,12 @@ public:
     ~ConfigCCAttitudeWidget();
 
 private slots:
-    void attitudeRawUpdated(UAVObject *);
+    void attitudeRawUpdated(UAVObject * obj);
     void timeout();
     void startAccelCalibration();
-    void attitudeBiasChanged(int val);
     void saveAttitudeSettings();
+    void applyAttitudeSettings();
+    void getCurrentAttitudeSettings();
 
 private:
     QMutex startStop;

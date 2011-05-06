@@ -37,10 +37,13 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->zeroBias,SIGNAL(clicked()),this,SLOT(startAccelCalibration()));
-    connect(ui->saveButton,SIGNAL(clicked()),this,SLOT(saveAttitudeSettings()));
-    connect(ui->rollBias,SIGNAL(valueChanged(int)),this,SLOT(attitudeBiasChanged(int)));
-    connect(ui->pitchBias,SIGNAL(valueChanged(int)),this,SLOT(attitudeBiasChanged(int)));
-    connect(ui->yawBias,SIGNAL(valueChanged(int)),this,SLOT(attitudeBiasChanged(int)));
+    connect(ui->saveButton,SIGNAL(clicked()),this,SLOT(saveAttitudeSettings()));        
+    connect(ui->applyButton,SIGNAL(clicked()),this,SLOT(applyAttitudeSettings()));
+    connect(ui->getCurrentButton,SIGNAL(clicked()),this,SLOT(getCurrentAttitudeSettings()));
+
+    // Make it smart:
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(getCurrentAttitudeSettings()));
+    getCurrentAttitudeSettings(); // The 1st time this panel is instanciated, the autopilot is already connected.
 }
 
 ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()
@@ -97,23 +100,24 @@ void ConfigCCAttitudeWidget::timeout() {
 
 }
 
-void ConfigCCAttitudeWidget::attitudeBiasChanged(int val) {
+void ConfigCCAttitudeWidget::applyAttitudeSettings() {
     UAVDataObject * settings = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeSettings")));
-    UAVObjectField * field = settings->getField("RotationQuaternion");
+    UAVObjectField * field = settings->getField("BoardRotation");
 
-    float RPY[3], q[4];
-    RPY[0] = ui->rollBias->value();
-    RPY[1] = ui->pitchBias->value();
-    RPY[2] = ui->yawBias->value();
-
-    Utils::CoordinateConversions().RPY2Quaternion(RPY,q);
-
-    field->setDouble(q[0]*127,0);
-    field->setDouble(q[1]*127,1);
-    field->setDouble(q[2]*127,2);
-    field->setDouble(q[3]*127,3);
+    field->setValue(ui->rollBias->value(),0);
+    field->setValue(ui->pitchBias->value(),1);
+    field->setValue(ui->yawBias->value(),2);
 
     settings->updated();
+}
+
+void ConfigCCAttitudeWidget::getCurrentAttitudeSettings() {
+    UAVDataObject * settings = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeSettings")));
+    settings->requestUpdate();
+    UAVObjectField * field = settings->getField("BoardRotation");
+    ui->rollBias->setValue(field->getDouble(0));
+    ui->pitchBias->setValue(field->getDouble(1));
+    ui->yawBias->setValue(field->getDouble(2));
 }
 
 void ConfigCCAttitudeWidget::startAccelCalibration() {
@@ -144,6 +148,8 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
 }
 
 void ConfigCCAttitudeWidget::saveAttitudeSettings() {
+    applyAttitudeSettings();
+
     UAVDataObject * obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeSettings")));
     saveObjectToSD(obj);
 }

@@ -167,10 +167,12 @@ namespace jafar {
 
       void ActiveSegmentSearchGrid::setFailed(const image::ConvexRoi & roi)
       {
-         vec2 p; p(0) = roi.x()+roi.w()/2; p(1) = roi.y()+roi.h()/2;
-         veci2 cell = pix2cell(p);
+			vec4 p;
+			p(0) = roi.x()+roi.w()/2; p(1) = roi.y()+roi.h()/2;
+			p(2) = roi.x()+roi.w()/2; p(3) = roi.y()+roi.h()/2;
+			veci4 cell = pix2cell(p);
          projectionsCount(cell(0), cell(1)) = -1;
-      }
+		}
 
 #if 0
       ////////////////////////////////////////////////////////

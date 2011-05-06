@@ -79,7 +79,25 @@ namespace simu {
 				{
 					measure.matchScore = 1.0;
 					measure.x() = it->second->measurement.x() + noise->get(); // simulation noise
-					return roi.isIn(measure.x());
+
+					bool matched = false;
+					vec2 meas1, meas2;
+
+					switch(type)
+					{
+						case LandmarkAbstract::POINT :
+							matched = roi.isIn(measure.x());
+							break;
+						case LandmarkAbstract::LINE :
+							meas1[0] = measure.x()[0] ; meas1[1] = measure.x()[1];
+							meas2[0] = measure.x()[2] ; meas2[1] = measure.x()[3];
+							matched = roi.isIn(meas1) || roi.isIn(meas2);
+							break;
+						default :
+							break;
+					}
+
+					return matched;
 				} else
 				{
 					measure.matchScore = 0.0;
@@ -130,8 +148,29 @@ namespace simu {
 				for (RawSimu::ObsList::iterator it = rawData->obs.begin(); it != rawData->obs.end(); ++it)
 				{
 					boost::shared_ptr<AppearanceSimu> app = SPTR_CAST<AppearanceSimu>(it->second->appearancePtr);
-					if (app->type == type && roi.isIn(it->second->measurement.x()))
-						roiObs.push_back(it->second);
+					vec measurement = it->second->measurement.x();
+					if (app->type == type)
+					{
+						bool push = false;
+						vec2 meas1, meas2;
+
+						switch(type)
+						{
+							case LandmarkAbstract::POINT :
+								push = roi.isIn(measurement);
+								break;
+							case LandmarkAbstract::LINE :
+								meas1[0] = measurement[0] ; meas1[1] = measurement[1];
+								meas2[0] = measurement[2] ; meas2[1] = measurement[3];
+								push = roi.isIn(meas1) || roi.isIn(meas2);
+								break;
+							default :
+								break;
+						}
+
+						if(push)
+							roiObs.push_back(it->second);
+					}
 				}
 				
 				if (roiObs.size() > 0)

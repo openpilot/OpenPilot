@@ -182,7 +182,11 @@ typedef DataManagerOnePointRansac<simu::RawSimu, SensorPinhole, simu::FeatureSim
 #if SEGMENT_BASED
 typedef SegmentObservationMaker<ObservationPinHoleAnchoredHomogeneousPointsLine, SensorPinhole, LandmarkAnchoredHomogeneousPointsLine,
    AppearanceImageSegment, SensorAbstract::PINHOLE, LandmarkAbstract::LINE_AHPL> PinholeAhplObservationMaker;
+typedef SegmentObservationMaker<ObservationPinHoleAnchoredHomogeneousPointsLine, SensorPinhole, LandmarkAnchoredHomogeneousPointsLine,
+	simu::AppearanceSimu, SensorAbstract::PINHOLE, LandmarkAbstract::LINE_AHPL> PinholeAhplSimuObservationMaker;
+
 typedef DataManagerOnePointRansac<RawImage, SensorPinhole, FeatureImageSegment, image::ConvexRoi, ActiveSegmentSearchGrid, HDsegDetector, DsegMatcher> DataManager_ImageSeg_Test;
+typedef DataManagerOnePointRansac<simu::RawSimu, SensorPinhole, simu::FeatureSimu, image::ConvexRoi, ActiveSegmentSearchGrid, simu::DetectorSimu<image::ConvexRoi>, simu::MatcherSimu<image::ConvexRoi> > DataManager_Segment_Ransac_Simu;
 #endif
 
 int mode = 0;
@@ -435,7 +439,15 @@ void demo_slam01_main(world_ptr_t *world)
 	// pin-hole parameters in BOOST format
 	boost::shared_ptr<ObservationFactory> obsFact(new ObservationFactory());
 #if SEGMENT_BASED
-   obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhplObservationMaker(configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5, configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
+	if (intOpts[iSimu] != 0)
+	{
+		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhplSimuObservationMaker(
+			configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5, configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
+	} else
+	{
+		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhplObservationMaker(
+			configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5, configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
+	}
 #else
 	if (intOpts[iSimu] != 0)
 	{
@@ -496,14 +508,54 @@ void demo_slam01_main(world_ptr_t *world)
 	if (intOpts[iSimu] != 0)
 	{
 		simulator.reset(new simu::AdhocSimulator());
-		jblas::vec3 pose;
-		
+		#if SEGMENT_BASED
+			jblas::vec11 pose;
+		#else
+			jblas::vec3 pose;
+		#endif
+
 		const int maxnpoints = 1000;
 		int npoints = 0;
-		double points[maxnpoints][3];
-		
+		#if SEGMENT_BASED
+			double points[maxnpoints][11];
+		#else
+			double points[maxnpoints][3];
+		#endif
+
 		switch (intOpts[iSimu]/10)
 		{
+		#if SEGMENT_BASED
+			case 1: {
+				// 3D cube
+				const int npoints_ = 12; npoints = npoints_;
+				double tmp[npoints_][11] = {
+					{0,0,0,5,-1,-1,1,5,-1, 1,1}, {0,0,0,5,1,1,1,5,1,-1,1}, {0,0,0,5,-1,1,1,5, 1,1,1}, {0,0,0,5,-1,-1,1,5,1,-1,1},
+					{0,0,0,3,-1,-1,1,3,-1, 1,1}, {0,0,0,3,1,1,1,3,1,-1,1}, {0,0,0,3,-1,1,1,3, 1,1,1}, {0,0,0,3,-1,-1,1,3,1,-1,1},
+					{0,0,0,5,-1,-1,1,3,-1,-1,1}, {0,0,0,5,1,1,1,3,1, 1,1}, {0,0,0,5,-1,1,1,3,-1,1,1}, {0,0,0,5, 1,-1,1,3,1,-1,1}
+				};
+				memcpy(points, tmp, npoints*11*sizeof(double));
+				break;
+			}
+			case 2: {
+				// 2D square
+				const int npoints_ = 4; npoints = npoints_;
+				double tmp[npoints_][11] = {
+					{0,0,0,5,-1,-1,1,5,-1,1,1}, {0,0,0,5,1,1,1,5,1,-1,1}, {0,0,0,5,-1,1,1,5,1,1,1}, {0,0,0,5,-1,-1,1,5,1,-1,1}
+				};
+				memcpy(points, tmp, npoints*11*sizeof(double));
+				break;
+			}
+			case 3: {
+				// almost 2D square
+				const int npoints_ = 4; npoints = npoints_;
+				double tmp[npoints_][11] = {
+					{0,0,0,4,-1,-1,1,4,-1,1,1}, {0,0,0,4,1,1,1,4,1,-1,1}, {0,0,0,5,-1,1,1,5,1,1,1}, {0,0,0,5,-1,-1,1,5,1,-1,1}
+				};
+				memcpy(points, tmp, npoints*11*sizeof(double));
+				break;
+			}
+			default: npoints = 0;
+		#else
 			case 1: {
 				// 3D regular grid
 				const int npoints_ = 3*11*13; npoints = npoints_;
@@ -526,13 +578,21 @@ void demo_slam01_main(world_ptr_t *world)
 				break;
 			}
 			default: npoints = 0;
+		#endif
 		}
 		
 		// add landmarks
 		for(int i = 0; i < npoints; ++i)
 		{
 			pose(0) = points[i][0]; pose(1) = points[i][1]; pose(2) = points[i][2];
+		#if !SEGMENT_BASED
 			simu::Landmark *lmk = new simu::Landmark(LandmarkAbstract::POINT, pose);
+		#else
+			pose(3) = points[i][3]; pose(4) = points[i][4]; pose(5) = points[i][5];
+			pose(6) = points[i][6]; pose(7) = points[i][7]; pose(8) = points[i][8];
+			pose(9) = points[i][9]; pose(10) = points[i][10];
+			simu::Landmark *lmk = new simu::Landmark(LandmarkAbstract::LINE, pose);
+		#endif
 			simulator->addLandmark(lmk);
 		}
 	}
@@ -729,6 +789,9 @@ void demo_slam01_main(world_ptr_t *world)
 		simu::Sensor *sen = new simu::Sensor(senPtr11->id(), pose, senPtr11);
 		simulator->addSensor(robPtr1->id(), sen);
 		simulator->addObservationModel(robPtr1->id(), senPtr11->id(), LandmarkAbstract::POINT, new ObservationModelPinHoleEuclideanPoint(senPtr11));
+		#if SEGMENT_BASED
+			simulator->addObservationModel(robPtr1->id(), senPtr11->id(), LandmarkAbstract::LINE, new ObservationModelPinHoleAnchoredHomogeneousPointsLine(senPtr11));
+		#endif
 	}
 	
 	// 3b. Create data manager.
@@ -741,22 +804,34 @@ void demo_slam01_main(world_ptr_t *world)
 	int ransac_ntries = 0;
    #endif
 
-   #if !SEGMENT_BASED
 	if (intOpts[iSimu] != 0)
 	{
-		boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
-		boost::shared_ptr<simu::MatcherSimu<image::ConvexRoi> > matcher(new simu::MatcherSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, configEstimation.PATCH_SIZE, configEstimation.MAX_SEARCH_SIZE, configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
-		
-		boost::shared_ptr<DataManager_ImagePoint_Ransac_Simu> dmPt11(new DataManager_ImagePoint_Ransac_Simu(detector, matcher, asGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
+		#if SEGMENT_BASED
+			boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::LINE, 4, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
+			boost::shared_ptr<simu::MatcherSimu<image::ConvexRoi> > matcher(new simu::MatcherSimu<image::ConvexRoi>(LandmarkAbstract::LINE, 4, configEstimation.PATCH_SIZE, configEstimation.MAX_SEARCH_SIZE, configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
 
-		dmPt11->linkToParentSensorSpec(senPtr11);
-		dmPt11->linkToParentMapManager(mmPoint);
-		dmPt11->setObservationFactory(obsFact);
-		
-		hardware::hardware_sensorext_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator(rawdata_condition, floatOpts[fFreq], simulator, robPtr1->id(), senPtr11->id()));
-		senPtr11->setHardwareSensor(hardSen11);
+			boost::shared_ptr<DataManager_Segment_Ransac_Simu> dmPt11(new DataManager_Segment_Ransac_Simu(detector, matcher, assGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
+
+			dmPt11->linkToParentSensorSpec(senPtr11);
+			dmPt11->linkToParentMapManager(mmPoint);
+			dmPt11->setObservationFactory(obsFact);
+
+			hardware::hardware_sensorext_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator(rawdata_condition, floatOpts[fFreq], simulator, robPtr1->id(), senPtr11->id()));
+			senPtr11->setHardwareSensor(hardSen11);
+		#else
+			boost::shared_ptr<simu::DetectorSimu<image::ConvexRoi> > detector(new simu::DetectorSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
+			boost::shared_ptr<simu::MatcherSimu<image::ConvexRoi> > matcher(new simu::MatcherSimu<image::ConvexRoi>(LandmarkAbstract::POINT, 2, configEstimation.PATCH_SIZE, configEstimation.MAX_SEARCH_SIZE, configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE, configEstimation.PIX_NOISE*configEstimation.PIX_NOISE_SIMUFACTOR));
+
+			boost::shared_ptr<DataManager_ImagePoint_Ransac_Simu> dmPt11(new DataManager_ImagePoint_Ransac_Simu(detector, matcher, asGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
+
+			dmPt11->linkToParentSensorSpec(senPtr11);
+			dmPt11->linkToParentMapManager(mmPoint);
+			dmPt11->setObservationFactory(obsFact);
+
+			hardware::hardware_sensorext_ptr_t hardSen11(new hardware::HardwareSensorAdhocSimulator(rawdata_condition, floatOpts[fFreq], simulator, robPtr1->id(), senPtr11->id()));
+			senPtr11->setHardwareSensor(hardSen11);
+		#endif
 	} else
-   #endif
    {
       boost::shared_ptr<DescriptorFactoryAbstract> descFactory;
       #if SEGMENT_BASED

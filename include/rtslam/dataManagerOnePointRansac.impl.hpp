@@ -646,7 +646,28 @@ namespace jafar {
                roi = RoiSpec(obsPtr->expectation.x(), obsPtr->expectation.P() + matcher->params.measVar*identity_mat(2), matcher->params.mahalanobisTh);
                obsPtr->searchSize = roi.count();
                if (obsPtr->searchSize > matcher->params.maxSearchSize) roi.scale(sqrt(matcher->params.maxSearchSize/(double)obsPtr->searchSize));
-            }
+				}
+				else // Segment
+				{
+					// Rough approximation, this won't be used by Dseg Matcher, only by the simulator
+					vec2 p1, p2;
+					vec2 var1, var2;
+					p1[0] = obsPtr->expectation.x()[0]; p1[1] = obsPtr->expectation.x()[1];
+					p2[0] = obsPtr->expectation.x()[2]; p2[1] = obsPtr->expectation.x()[3];
+					var1[0] = (obsPtr->expectation.P()(0,0) + matcher->params.measVar) * matcher->params.mahalanobisTh;
+					var1[1] = (obsPtr->expectation.P()(1,1) + matcher->params.measVar) * matcher->params.mahalanobisTh;
+					var2[0] = (obsPtr->expectation.P()(2,2) + matcher->params.measVar) * matcher->params.mahalanobisTh;
+					var2[1] = (obsPtr->expectation.P()(3,3) + matcher->params.measVar) * matcher->params.mahalanobisTh;
+
+					int basex = min(p1[0]-var1[0],p2[0]-var2[0]);
+					int basey = min(p1[1]-var1[1],p2[1]-var2[1]);
+					cv::Rect rect(
+						basex, basey,
+						max(p1[0]+var1[0],p2[0]+var2[0]) - basex,
+						max(p1[1]+var1[1],p2[1]+var2[1]) - basey
+					);
+					roi = RoiSpec(rect);
+				}
 				matcher->match(rawData, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
 // JFR_DEBUG("obs " << obsPtr->id() << " expected at " << obsPtr->expectation.x() << " measured with innovation " << obsPtr->measurement.x()-obsPtr->expectation.x());
 

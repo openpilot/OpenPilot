@@ -379,8 +379,11 @@ std::cout << "connecting slots" << std::endl;
             bool dispInit2 = events_.visible && !events_.predicted;
 
 //				ObservationPinHoleAnchoredHomogeneousPointsLine* slamObsSpec = static_cast<ObservationPinHoleAnchoredHomogeneousPointsLine*>(slamObs_);
-				AppearanceImageSegment* appSpec = static_cast<AppearanceImageSegment*>(slamObs_->observedAppearance.get());
-				vec4 realObs = appSpec->realObs();
+				AppearanceImageSegment* appSpec = dynamic_cast<AppearanceImageSegment*>(slamObs_->observedAppearance.get());
+				vec4 realObs;
+				realObs.clear();
+				if(appSpec != NULL)
+					realObs = appSpec->realObs();
 
             // Build display objects if it is the first time they are displayed
             if (items_.size() != 8)
@@ -466,7 +469,8 @@ std::cout << "connecting slots" << std::endl;
                {
                   c = getColorRGB(ColorManager::getColorObject_prediction(landmarkPhase_,events_)) ;
 						//std::ostringstream oss; oss << id_; if (dispMeas2) oss << " - " << int(match_score*100);
-						std::ostringstream oss; oss << id_; if (dispMeas2) oss << " - " << int(appSpec->hypothesis()->gradientDescriptor().meanGradients());
+						std::ostringstream oss;
+						oss << id_; if (dispMeas2 && appSpec != NULL) oss << " - " << int(appSpec->hypothesis()->gradientDescriptor().meanGradients());
 
                   (*it)->setColor(c.R,c.G,c.B); //
                   (*it)->setFontColor(c.R,c.G,c.B); //

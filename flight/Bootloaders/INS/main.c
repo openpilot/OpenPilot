@@ -89,14 +89,13 @@ int main() {
 	if (GO_dfu == FALSE) {
 		jump_to_app();
 	}
-	if(PIOS_IAP_CheckRequest())
-	{
+	if (PIOS_IAP_CheckRequest()) {
 		PIOS_DELAY_WaitmS(1000);
 		PIOS_IAP_ClearRequest();
 	}
 	PIOS_Board_Init();
 	boot_status = idle;
-	Fw_crc = crc_memory_calc();
+	Fw_crc = PIOS_BL_HELPER_CRC_Memory_Calc();
 	PIOS_LED_On(LED1);
 	while (1) {
 		process_spi_request();
@@ -146,7 +145,7 @@ void process_spi_request(void) {
 
 	case OPAHRS_MSG_V0_REQ_FWUP_VERIFY:
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_FWUP_STATUS);
-		Fw_crc = crc_memory_calc();
+		Fw_crc = PIOS_BL_HELPER_CRC_Memory_Calc();
 		lfsm_user_set_tx_v0(&user_tx_v0);
 		boot_status = idle;
 		PIOS_LED_Off(LED1);
@@ -160,7 +159,8 @@ void process_spi_request(void) {
 		//PIOS_LED_On(LED1);
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_VERSIONS);
 		user_tx_v0.payload.user.v.rsp.versions.bl_version = BOOTLOADER_VERSION;
-		user_tx_v0.payload.user.v.rsp.versions.hw_version = (BOARD_TYPE << 8) | BOARD_REVISION;
+		user_tx_v0.payload.user.v.rsp.versions.hw_version = (BOARD_TYPE << 8)
+				| BOARD_REVISION;
 		user_tx_v0.payload.user.v.rsp.versions.fw_crc = Fw_crc;
 		lfsm_user_set_tx_v0(&user_tx_v0);
 		break;
@@ -212,13 +212,13 @@ void process_spi_request(void) {
 		lfsm_user_set_tx_v0(&user_tx_v0);
 		break;
 	case OPAHRS_MSG_V0_REQ_FWDN_DATA:
-			opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_FWDN_DATA);
-			uint32_t adr=user_rx_v0.payload.user.v.req.fwdn_data.adress;
-			for(uint8_t x=0;x<4;++x)
-			{
-				user_tx_v0.payload.user.v.rsp.fw_dn.data[x]=*FLASH_If_Read(adr+x);
-			}
-			lfsm_user_set_tx_v0(&user_tx_v0);
+		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_FWDN_DATA);
+		uint32_t adr = user_rx_v0.payload.user.v.req.fwdn_data.adress;
+		for (uint8_t x = 0; x < 4; ++x) {
+			user_tx_v0.payload.user.v.rsp.fw_dn.data[x]
+					= *PIOS_BL_HELPER_FLASH_If_Read(adr + x);
+		}
+		lfsm_user_set_tx_v0(&user_tx_v0);
 		break;
 	case OPAHRS_MSG_V0_REQ_FWUP_START:
 		FLASH_Unlock();
@@ -226,7 +226,7 @@ void process_spi_request(void) {
 		user_tx_v0.payload.user.v.rsp.fwup_status.status = boot_status;
 		lfsm_user_set_tx_v0(&user_tx_v0);
 		PIOS_LED_On(LED1);
-		if (FLASH_Start() == TRUE) {
+		if (PIOS_BL_HELPER_FLASH_Start() == TRUE) {
 			boot_status = started;
 			PIOS_LED_Off(LED1);
 		} else {

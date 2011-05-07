@@ -33,6 +33,8 @@
 #include "op_dfu.h"
 #include <QWidget>
 #include <QFileDialog>
+#include <QErrorMessage>
+#include <QByteArray>
 #include <QtSvg/QGraphicsSvgItem>
 #include <QtSvg/QSvgRenderer>
 

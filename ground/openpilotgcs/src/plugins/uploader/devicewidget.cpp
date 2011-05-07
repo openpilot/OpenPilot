@@ -199,6 +199,49 @@ void deviceWidget::uploadFirmware()
         return;
     }
 
+    // TODO : parse the firmware last 100 bytes and see whether it is
+    // packaged:
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly)) {
+        status("Can't open file", STATUSICON_FAIL);
+        return;
+    }
+
+    QByteArray arr = file.readAll();
+    QByteArray desc = arr.right(100);
+    if (desc.startsWith("OpFw")) {
+        // This looks like a binary with a description at the end
+        /*
+        #  4 bytes: header: "OpFw"
+        #  4 bytes: GIT commit tag (short version of SHA1)
+        #  4 bytes: Unix timestamp of compile time
+        #  2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
+        #  26 bytes: commit tag if it is there, otherwise "Unreleased". Zero-padded
+        #   ---- 40 bytes limit ---
+        #  20 bytes: SHA1 sum of the firmware.
+        #  40 bytes: free for now.
+        */
+        // I don't want to use structs, ok ?
+        QByteArray gitCommitTag = desc.mid(4,4);
+        quint32 buildDate = desc.at(8)&0xFF;
+        for (int i=1;i<4;i++) {
+            buildDate = buildDate<<8;
+            buildDate += desc.at(8+i) & 0xFF;
+        }
+
+        myDevice->buildDate->setText(QDateTime::fromTime_t(buildDate).toString());
+        QByteArray targetPlatform = desc.mid(12,2);
+        // TODO: check platform compatibility
+        QString dscText = QString(desc.mid(14,26));
+        myDevice->description->setText(dscText);
+
+        return;
+
+    } else {
+        // TODO : tell the user that the firmware is not packaged.
+    }
+
+
     status("Starting firmware upload", STATUSICON_RUNNING);
     // We don't know which device was used previously, so we
     // are cautious and reenter DFU for this deviceID:

@@ -16,6 +16,7 @@
 #  26 bytes: commit tag if it is there, otherwise "Unreleased". Zero-padded
 #   ---- 40 bytes limit ---
 #  20 bytes: SHA1 sum of the firmware.
+#  40 bytes: free for now.
 
 import binascii
 import os
@@ -48,7 +49,7 @@ if len(hs) == 0 :
 	print "Unreleased: get branch name instead"
 	hs = os.popen('git branch --contains HEAD').read()
 
-file.write(hs[0:25])
+file.write(hs[0:26])
 file.write("\0"*(26-len(hs)))
 
 ## Now we are at the 40 bytes mark.
@@ -60,6 +61,10 @@ with open('build/coptercontrol/CopterControl.bin','rb') as f:
     for chunk in iter(lambda: f.read(8192), ''): 
          sha1.update(chunk)
 file.write(sha1.digest())
+
+# Pad will null bytes:
+file.write('\0'*40)
+
 
 file.close()
 

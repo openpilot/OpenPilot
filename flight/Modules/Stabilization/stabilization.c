@@ -143,10 +143,6 @@ static void stabilizationTask(void* parameters)
 			continue;
 		} 
 		
-		// Clear alarms
-		AlarmsClear(SYSTEMALARMS_ALARM_STABILIZATION);		
-
-		
 		// Check how long since last update
 		thisSysTime = xTaskGetTickCount();
 		if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
@@ -159,9 +155,6 @@ static void stabilizationTask(void* parameters)
 		AttitudeRawGet(&attitudeRaw);
 		RateDesiredGet(&rateDesired);
 		SystemSettingsGet(&systemSettings);
-
-		if(PARSE_FLIGHT_MODE(flightStatus.FlightMode) == FLIGHTMODE_MANUAL)
-			return;
 
 #if defined(PIOS_QUATERNION_STABILIZATION)
 		// Quaternion calculation of error in each axis.  Uses more memory.
@@ -269,7 +262,8 @@ static void stabilizationTask(void* parameters)
 		// Save dT
 		actuatorDesired.UpdateTime = dT * 1000;
 		
-		
+		if(PARSE_FLIGHT_MODE(flightStatus.FlightMode) == FLIGHTMODE_MANUAL)
+			shouldUpdate = 0;
 		
 		if(shouldUpdate)
 		{
@@ -285,6 +279,9 @@ static void stabilizationTask(void* parameters)
 			ZeroPids();
 		}
 		
+		
+		// Clear alarms
+		AlarmsClear(SYSTEMALARMS_ALARM_STABILIZATION);				
 	}
 }
 

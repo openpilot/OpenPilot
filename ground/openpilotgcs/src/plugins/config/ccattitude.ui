@@ -239,8 +239,6 @@
        </item>
       </layout>
      </widget>
-     <zorder>verticalLayoutWidget</zorder>
-     <zorder>groupBox_2</zorder>
     </widget>
    </item>
    <item>
@@ -257,6 +255,20 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="getCurrentButton">
+       <property name="text">
+        <string>Get Current</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="applyButton">
+       <property name="text">
+        <string>Apply</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="saveButton">

@@ -63,41 +63,57 @@ areyousureyoushouldberunningthis:
 	@echo "   If you're sure you want to be using this, you may wish to try the following targets:"
 	@echo
 	@echo "   [Tool Installers]"
-	@echo "     qt_sdk_install    - Install the QT v4.6.2 tools"
-	@echo "     arm_sdk_install   - Install the Code Sourcery ARM gcc toolchain"
-	@echo "     openocd_install   - Install the OpenOCD JTAG daemon"
+	@echo "     qt_sdk_install       - Install the QT v4.6.2 tools"
+	@echo "     arm_sdk_install      - Install the Code Sourcery ARM gcc toolchain"
+	@echo "     openocd_install      - Install the OpenOCD JTAG daemon"
 	@echo
 	@echo "   [Big Hammer]"
-	@echo "     all               - Generate UAVObjects, build openpilot firmware and gcs"
-	@echo "     all_clean         - Remove your build directory ($(BUILD_DIR))"
+	@echo "     all                  - Generate UAVObjects, build openpilot firmware and gcs"
+	@echo "     all_flight           - Build all firmware, bootloaders and bootloader updaters"
+	@echo "     all_fw               - Build only firmware for all boards"
+	@echo "     all_bl               - Build only bootloaders for all boards"
+	@echo "     all_blupd            - Build only bootloader updaters for all boards"
+	@echo
+	@echo "     all_clean            - Remove your build directory ($(BUILD_DIR))"
+	@echo "     all_flight_clean     - Remove all firmware, bootloaders and bootloader updaters"
+	@echo "     all_fw_clean         - Remove firmware for all boards"
+	@echo "     all_bl_clean         - Remove bootlaoders for all boards"
+	@echo "     all_blupd_clean      - Remove bootloader updaters for all boards"
 	@echo
 	@echo "   [Firmware]"
-	@echo "     openpilot         - Build firmware for the OpenPilot board"
-	@echo "     openpilot_clean   - Delete all build output for the OpenPilot firmware"
-	@echo "     openpilot_program - Program the firmware onto the OpenPilot board"
-	@echo "     ahrs              - Build firmware for the AHRS board"
-	@echo "     ahrs_clean        - Delete all build output for the AHRS firmware"
-	@echo "     ahrs_program      - Program the firmware onto the AHRS board"
-	@echo "     coptercontrol     - Build firmware for the CopterControl board"
+	@echo "     <board>              - Build firmware for <board>"
+	@echo "                            supported boards are ($(FW_TARGETS))"
+	@echo "     <board>_clean        - Remove firmware for <board>"
+	@echo "     <board>_program      - Use OpenOCD + JTAG to write firmware to <board>"
+	@echo
+	@echo "   [Bootloader]"
+	@echo "     bl_<board>           - Build bootloader for <board>"
+	@echo "                            supported boards are ($(BL_TARGETS))"
+	@echo "     bl_<board>_clean     - Remove bootloader for <board>"
+	@echo "     bl_<board>_program   - Use OpenOCD + JTAG to write bootloader to <board>"
+	@echo
+	@echo "   [Bootloader Updater]"
+	@echo "     blupd_<board>        - Build bootloader updater for <board>"
+	@echo "                            supported boards are ($(BLUPD_TARGETS))"
+	@echo "     blupd_<board>_clean  - Remove bootloader updater for <board>"
 	@echo
 	@echo "   [Simulation]"
-	@echo "     sim_posix         - Build OpenPilot simulation firmware for"
-	@echo "                         a POSIX compatible system (Linux, Mac OS X, ...)"
-	@echo "     sim_posix_clean   - Delete all build output for the POSIX simulation"
-	@echo "     sim_win32         - Build OpenPilot simulation firmware for"
-	@echo "                         Windows using mingw and msys"
-	@echo "     sim_win32_clean   - Delete all build output for the win32 simulation"
+	@echo "     sim_posix            - Build OpenPilot simulation firmware for"
+	@echo "                            a POSIX compatible system (Linux, Mac OS X, ...)"
+	@echo "     sim_posix_clean      - Delete all build output for the POSIX simulation"
+	@echo "     sim_win32            - Build OpenPilot simulation firmware for"
+	@echo "                            Windows using mingw and msys"
+	@echo "     sim_win32_clean      - Delete all build output for the win32 simulation"
 	@echo
 	@echo "   [GCS]"
-	@echo "     gcs               - Build the Ground Control System application"
+	@echo "     gcs                  - Build the Ground Control System (GCS) application"
+	@echo "     gcs_clean            - Remove the Ground Control System (GCS) application"
 	@echo
 	@echo "   [UAVObjects]"
-	@echo "     uavobjects        - Generate source files from the UAVObject definition XML files"
-	@echo "     uavobjects_test   - parse xml-files - check for valid, duplicate ObjId's, ... "
-	@echo "     uavobjects_flight - Generate flight source files from the UAVObject definition XML files"
-	@echo "     uavobjects_gcs    - Generate groundstation source files from the UAVObject definition XML files"
-	@echo "     uavobjects_python - Generate python source files from the UAVObject definition XML files"
-	@echo "     uavobjects_matlab - Generate matlab source files from the UAVObject definition XML files"
+	@echo "     uavobjects           - Generate source files from the UAVObject definition XML files"
+	@echo "     uavobjects_test      - parse xml-files - check for valid, duplicate ObjId's, ... "
+	@echo "     uavobjects_<group>   - Generate source files from a subset of the UAVObject definition XML files"
+	@echo "                            supported groups are ($(UAVOBJ_TARGETS))"
 	@echo
 	@echo "   Note: All tools will be installed into $(TOOLS_DIR)"
 	@echo "         All build output will be placed in $(BUILD_DIR)"
@@ -274,8 +290,9 @@ uavobjgenerator:
 	  $(MAKE) --no-print-directory -w ; \
 	)
 
+UAVOBJ_TARGETS := gcs flight python matlab java
 .PHONY:uavobjects
-uavobjects:  uavobjects_gcs uavobjects_flight uavobjects_python uavobjects_matlab uavobjects_java
+uavobjects:  $(addprefix uavobjects_, $(UAVOBJ_TARGETS))
 
 UAVOBJ_XML_DIR := $(ROOT_DIR)/shared/uavobjectdefinition
 UAVOBJ_OUT_DIR := $(BUILD_DIR)/uavobject-synthetics

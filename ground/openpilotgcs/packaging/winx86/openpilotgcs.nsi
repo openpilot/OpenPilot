@@ -248,12 +248,13 @@ SectionEnd
 
 Section "un.Maps cache" UnSecCache
   ; Remove maps cache
-  RMDir /r /rebootok "$PROFILE\OpenPilot"
+  RMDir /r /rebootok "$APPDATA\OpenPilot\mapscache"
 SectionEnd
 
 Section /o "un.Configuration" UnSecConfig
   ; Remove configuration
-  RMDir /r /rebootok "$APPDATA\OpenPilot"
+  Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS.db"
+  Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS.ini"
 SectionEnd
 
 ;--------------------------------

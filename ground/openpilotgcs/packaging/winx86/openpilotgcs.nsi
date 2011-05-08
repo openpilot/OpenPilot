@@ -108,6 +108,11 @@
   !define MUI_LANGDLL_ALWAYSSHOW
 
 ;--------------------------------
+; Settings for MUI_PAGE_FINISH
+  !define MUI_FINISHPAGE_RUN
+  !define MUI_FINISHPAGE_RUN_FUNCTION "RunApplication"
+
+;--------------------------------
 ; Pages
 
   !insertmacro MUI_PAGE_WELCOME
@@ -123,8 +128,6 @@
   !insertmacro MUI_UNPAGE_INSTFILES
   !insertmacro MUI_UNPAGE_FINISH
 
-; !define MUI_FINISHPAGE_RUN "$INSTDIR\bin\openpilotgcs.exe"
- 
 ;--------------------------------
 ; Supported languages, license files and translations
 
@@ -279,4 +282,13 @@ Function un.onInit
 
   !insertmacro MUI_UNGETLANGUAGE
   
+FunctionEnd
+
+;--------------------------------
+; Function to run the application from installer
+
+Function RunApplication
+
+  Exec '"$INSTDIR\bin\openpilotgcs.exe"'
+
 FunctionEnd

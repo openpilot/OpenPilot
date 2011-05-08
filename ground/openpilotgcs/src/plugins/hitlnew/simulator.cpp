@@ -125,6 +125,7 @@ void Simulator::onStart()
 	UAVObjectManager* objManager = pm->getObject<UAVObjectManager>();
 	actDesired = ActuatorDesired::GetInstance(objManager);
         manCtrlCommand = ManualControlCommand::GetInstance(objManager);
+        flightStatus = FlightStatus::GetInstance(objManager);
 	posHome = HomeLocation::GetInstance(objManager);
 	velActual = VelocityActual::GetInstance(objManager);
 	posActual = PositionActual::GetInstance(objManager);

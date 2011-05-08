@@ -59,7 +59,9 @@ private:
     QByteArray downloadedFirmware;
     QString filename;
     QGraphicsSvgItem *devicePic;
+    QByteArray descriptionArray;
     void status(QString str, StatusIcon ic);
+    bool populateStructuredDescription(QByteArray arr);
 
 
 signals:

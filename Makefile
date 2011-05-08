@@ -383,7 +383,7 @@ blupd_openpilot_%: bl_openpilot_bino
 		$(MAKE) -r --no-print-directory \
 		OUTDIR="$(BUILD_DIR)/blupd_openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
 		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
-		BOARD=STM3210E_OP MODEL=HD MODEL_SUFFIX=_OP USE_BOOTLOADER=YES \
+		BOARD=STM3210E_OP MODEL=HD MODEL_SUFFIX=_OP \
 		BLOBJ=$(BUILD_DIR)/bl_openpilot/OpenPilot_BL.bin.o $*
 
 .PHONY: blupd_openpilot_clean
@@ -431,7 +431,7 @@ blupd_ahrs_%: bl_ahrs_bino bl_ahrs
 		$(MAKE) -r --no-print-directory \
 		OUTDIR="$(BUILD_DIR)/blupd_ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
 		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
-		BOARD=STM32103CB_AHRS MODEL=MD USE_BOOTLOADER=YES \
+		BOARD=STM32103CB_AHRS MODEL=MD \
 		BLOBJ=$(BUILD_DIR)/bl_ahrs/AHRS_BL.bin.o $*
 
 .PHONY: blupd_ahrs_clean
@@ -479,7 +479,7 @@ blupd_coptercontrol_%: bl_coptercontrol_bino
 		$(MAKE) -r --no-print-directory \
 		OUTDIR="$(BUILD_DIR)/blupd_coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
 		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
-		BOARD=STM32103CB_CC_Rev1 MODEL=MD MODEL_SUFFIX=_CC USE_BOOTLOADER=YES \
+		BOARD=STM32103CB_CC_Rev1 MODEL=MD MODEL_SUFFIX=_CC \
 		BLOBJ=$(BUILD_DIR)/bl_coptercontrol/CopterControl_BL.bin.o $*
 
 .PHONY: blupd_coptercontrol_clean
@@ -527,7 +527,7 @@ blupd_pipxtreme_%: bl_pipxtreme_bino
 		$(MAKE) -r --no-print-directory \
 		OUTDIR="$(BUILD_DIR)/blupd_pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
 		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
-		BOARD=STM32103CB_PIPXTREME MODEL=MD MODEL_SUFFIX=_CC USE_BOOTLOADER=YES \
+		BOARD=STM32103CB_PIPXTREME MODEL=MD MODEL_SUFFIX=_CC \
 		BLOBJ=$(BUILD_DIR)/bl_pipxtreme/PipXtreme_BL.bin.o $*
 
 .PHONY: blupd_pipxtreme_clean

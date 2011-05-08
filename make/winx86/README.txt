@@ -46,8 +46,8 @@ Now you need to copy two files to your msysGit installation folders.
 Assuming that you installed the msysGit into C:\Program Files\Git\,
 you have to copy:
 
-   make\winx86\make    ->  C:\Program Files\Git\bin\
-   make\winx86\sh.cmd  ->  C:\Program Files\Git\cmd\
+   make\winx86\bin\make    ->  C:\Program Files\Git\bin\
+   make\winx86\cmd\sh.cmd  ->  C:\Program Files\Git\cmd\
 
 If you have msysGit installed into another directory, you need to update paths
 accordingly. Also if you have tools installed into different directories and
@@ -93,7 +93,7 @@ software and flight firmware built in the end.
 4) To build parts of the system you can use, for example, such commands:
 
    user@pc /d/Work/OpenPilot/git (master)
-   $ make -j2 USE_BOOTLOADER=YES GCS_BUIL_CONF=release gcs coptercontrol bl_coptercontrol
+   $ make -j2 GCS_BUILD_CONF=release gcs coptercontrol
 
 or to completely remove the build directory:
 
@@ -109,7 +109,7 @@ or to completely remove the build directory:
    #!/bin/sh
    # This is the cc_make_release.sh file used to build CC release software
    cd D:/Work/OpenPilot/git
-   make -j2 USE_BOOTLOADER=YES GCS_BUIL_CONF=release gcs coptercontrol bl_coptercontrol
+   make -j2 GCS_BUILD_CONF=release gcs coptercontrol
    echo RC=$?
 
 2) Run it typing:
@@ -170,7 +170,7 @@ to get rid of git bash welcome message on every script invocation.
 
 Currently there may be some problems running scripts which contain spaces in
 file names or located in directories which contain spaces in full paths.
-It results in in strange "file not found" or other errors.
+It results in strange "file not found" or other errors.
 
 It is recommended to avoid using such names with spaces.
 

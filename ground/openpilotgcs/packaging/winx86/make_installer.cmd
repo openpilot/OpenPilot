@@ -16,4 +16,4 @@ for %%D in (%0) do set NSI=%%~dD%%~pD\openpilotgcs.nsi
 
 rem Build installer
 echo Generating Windows installer...
-"%NSISC%" /V2 %NSI%
+"%NSISC%" /V3 %NSI%

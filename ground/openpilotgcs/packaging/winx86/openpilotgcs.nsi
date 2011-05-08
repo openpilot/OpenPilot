@@ -105,6 +105,7 @@
   !define MUI_LANGDLL_REGISTRY_ROOT "HKCU" 
   !define MUI_LANGDLL_REGISTRY_KEY "Software\OpenPilot" 
   !define MUI_LANGDLL_REGISTRY_VALUENAME "Installer Language"
+  !define MUI_LANGDLL_ALWAYSSHOW
 
 ;--------------------------------
 ; Pages

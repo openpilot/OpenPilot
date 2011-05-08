@@ -257,6 +257,11 @@ Section /o "un.Configuration" UnSecConfig
   Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS.ini"
 SectionEnd
 
+Section "-un.Profile" UnSecProfile
+  ; Remove OpenPilot user profile subdirectory if empty
+  RMDir "$APPDATA\OpenPilot"
+SectionEnd
+
 ;--------------------------------
 ; Uninstall section descriptions
 

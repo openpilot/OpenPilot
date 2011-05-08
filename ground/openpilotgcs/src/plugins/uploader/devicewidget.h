@@ -37,6 +37,7 @@
 #include <QByteArray>
 #include <QtSvg/QGraphicsSvgItem>
 #include <QtSvg/QSvgRenderer>
+#include <QCryptographicHash>
 
 using namespace OP_DFU;
 

@@ -261,10 +261,32 @@ void deviceWidget::uploadFirmware()
     QByteArray desc = arr.right(100);
     if (populateStructuredDescription(desc)) {
         descriptionArray = desc;
+        // Now do sanity checking:
+        // - Check whether board type matches firmware:
+        int board = m_dfu->devices[deviceID].ID;
+        int firmwareBoard = ((desc.at(12)&0xff)<<8) + (desc.at(13)&0xff);
+        if (firmwareBoard != board) {
+            status("Error: firmware does not match board", STATUSICON_FAIL);
+            return;
+        }
+
+        // Check the firmware embedded in the file:
+        QByteArray firmwareHash = desc.mid(40,20);
+        QByteArray fileHash = QCryptographicHash::hash(arr.left(arr.length()-100), QCryptographicHash::Sha1);
+        if (firmwareHash != fileHash) {
+            status("Error: firmware file corrupt", STATUSICON_FAIL);
+            return;
+        }
+
+
+
     } else {
-        // TODO : tell the user that the firmware is not packaged.
+        // The firmware is not packaged, just upload the text in the description field
+        // if it is there.
         descriptionArray.clear();
     }
+
+
 
 
     status("Starting firmware upload", STATUSICON_RUNNING);

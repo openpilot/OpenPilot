@@ -53,7 +53,7 @@ FLASH_TOOL = OPENOCD
 USE_THUMB_MODE = YES
 
 # List of modules to include
-MODULES =  Telemetry Actuator Stabilization Guidance ManualControl FlightPlan
+MODULES =  Telemetry Actuator Stabilization Guidance ManualControl FlightPlan GPS
 #MODULES =  Telemetry ManualControl Actuator Attitude Stabilization
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
@@ -170,6 +170,7 @@ SRC += $(PIOSPOSIX)/pios_udp.c
 SRC += $(PIOSPOSIX)/pios_com.c
 SRC += $(PIOSPOSIX)/pios_servo.c
 SRC += $(PIOSPOSIX)/pios_wdg.c
+SRC += $(PIOSPOSIX)/pios_debug.c
 
 ## Libraries for flight calculations
 #SRC += $(FLIGHTLIB)/fifo_buffer.c

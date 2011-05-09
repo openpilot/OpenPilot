@@ -1,0 +1,57 @@
+FAQ
+
+
+
+
+
+################################################################################
+1. Make a video of a SLAM run
+
+First, run SLAM offline with options
+"--diplay-2D=1 --display-3D=1 --replay=1 --render-all=1 --dump=1 --ransom-seed=1"
+in addition to the other options (type of robot, map, ...)
+
+Then make up a title image with dimensions 1280x512 (with at least one colored
+pixel), and put it along with the rendered images.
+Copy rtslam/data/scripts/legend.png along with the rendered images.
+From the path where the rendered images are, launch 
+rtslam/data/scripts/video_create.sh <nframes-title> <start> <end> <fps>
+
+################################################################################
+2. Make a video of a raw sequence
+
+Use video_raw.sh script.
+
+################################################################################
+3. Be able to reproduce a SLAM run
+
+All the information you need to save if you want to reproduce a SLAM run:
+- the source version (commit number, if your working tree is clean)
+- a copy of the config files setup.png and estimation.png that were used
+- the random seed used
+- the command line that started the run
+
+################################################################################
+4. Study of a SLAM run
+
+You can use the scripts:
+- plot_slamtruth_traj_6x1.gp
+- plot_slamtruth_error_6x1.gp
+- plot_slamtruth_nees_1x1.gp
+- plot_slamtruth_nees_6x1.gp
+
+################################################################################
+5. Make a Monte Carlo study of a SLAM setup and sequence
+
+Two ways to obtain the data:
+- with one or multiple distant machines using ssh and screen, with the scripts
+  montecarlo_start.sh and montecarlo_clean.sh. You can modify the
+- using a cluster, such as cacao at LAAS. TODO
+
+Then you can use the scripts:
+- plot_slamtruth_traj_6xn.gp
+- plot_slamtruth_error_6xn.gp
+- plot_slamtruth_nees_1xn.gp
+- plot_slamtruth_nees_6xn.gp
+
+

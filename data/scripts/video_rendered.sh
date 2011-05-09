@@ -35,43 +35,47 @@ for ((i = $first; \$i <= $last; i++)); do
 
 # 3D/2D/legend from individual images
 
-# 	convert \
-# 		rendered-3D_\$num.png \
-# 		rendered-2D_2-\$num.png \
-# 		+append \
-# 		png:- \
-# 	| convert \
-# 		legend.png \
-# 		- \
-# 		-append \
-# 		-quality 100 \
-# 		jpg:-
+	convert rendered-2D_2-\$num.png -resize 640x480 ppm:- \
+		| convert rendered-3D_\$num.png - +append ppm:- \
+			| convert legend.png - -append -quality 100 jpg:-
+
 
 # 3D/2D/legend from 3D/2D and legend
 
-	convert \
-		legend.png \
-		rendered_\$num.png \
-		-append \
-		-quality 100 \
-		jpg:-
+#	convert \
+#		legend.png \
+#		rendered_\$num.png \
+#		-append \
+#		-quality 100 \
+#		jpg:-
 
 done;
 
 EOF
 )
 
+npass=1
+x264_string_mp="-ovc x264 -x264encopts crf=25:pass=\$p"
+x264_string="-ovc x264 -x264encopts crf=25"
+#webm_string="-ovc lavc -ffourcc VP80 -of lavf -lavfopts format=webm -lavcopts vcodec=libvpx:vqscale=22:vpass=\$p"
+webm_string="-ovc lavc -ffourcc VP80 -of lavf -lavfopts format=webm -lavcopts vcodec=libvpx:vqscale=22:vpass=2"
+#webm_string="-ovc lavc -ffourcc VP80 -of lavf -lavfopts format=webm -lavcopts vcodec=libvpx:vqscale=22.0"
+#webm_string="-ovc lavc -ffourcc VP80 -of lavf -lavfopts format=webm -lavcopts vcodec=libvpx:vbitrate=50"
 
 ###############################################################################
 script_process_video=$(cat<<EOF
 
+for ((p = 1; \$p <= $npass; p++)); do
+
 mencoder \
 	- \
 	-demuxer lavf -lavfdopts format=mjpeg \
-	-ovc x264 -x264encopts crf=22.0 \
+	$x264_string \
 	-vf scale=1280:512 -fps $fps \
 	-noskip \
 	-o rendered.avi
+
+done
 
 EOF
 )

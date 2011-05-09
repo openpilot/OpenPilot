@@ -53,7 +53,6 @@ ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()
 
 void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
     QMutexLocker locker(&startStop);
-    UAVDataObject * attitudeRaw = dynamic_cast<UAVDataObject*>(obj);
 
     ui->zeroBiasProgress->setValue((float) updates / NUM_ACCEL_UPDATES * 100);
 
@@ -87,7 +86,6 @@ void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
 
 void ConfigCCAttitudeWidget::timeout() {
     QMutexLocker locker(&startStop);
-    UAVObjectManager * objMngr = getObjectManager();
     UAVDataObject * obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
     disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(attitudeRawUpdated(UAVObject*)));
     disconnect(&timer,SIGNAL(timeout()),this,SLOT(timeout()));
@@ -108,6 +106,11 @@ void ConfigCCAttitudeWidget::applyAttitudeSettings() {
     field->setValue(ui->pitchBias->value(),1);
     field->setValue(ui->yawBias->value(),2);
 
+    field = settings->getField("ZeroDuringArming");
+    // Handling of boolean values is done through enums on
+    // uavobjects...
+    field->setValue((ui->zeroGyroBiasOnArming->isChecked()) ? "TRUE": "FALSE");
+
     settings->updated();
 }
 
@@ -118,6 +121,12 @@ void ConfigCCAttitudeWidget::getCurrentAttitudeSettings() {
     ui->rollBias->setValue(field->getDouble(0));
     ui->pitchBias->setValue(field->getDouble(1));
     ui->yawBias->setValue(field->getDouble(2));
+    field = settings->getField("ZeroDuringArming");
+    // Handling of boolean values is done through enums on
+    // uavobjects...
+    bool enabled = (field->getValue().toString() == "FALSE") ? false : true;
+    ui->zeroGyroBiasOnArming->setChecked(enabled);
+
 }
 
 void ConfigCCAttitudeWidget::startAccelCalibration() {

@@ -44,7 +44,7 @@ args = parser.parse_args()
 print args
 
 if args.append == True:
-	print 'Appending description blog directly to ' + args.firmware
+	print 'Appending description blob directly to ' + args.firmware
 	filename = args.firmware
 	file = open(filename,"ab")
 else:

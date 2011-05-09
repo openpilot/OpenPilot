@@ -59,3 +59,8 @@ ground/uavobjgenerator/uavobjgenerator.pro.user
 ground/uavobjects/uavobjects.pro.user
 ground/ground.pro.user
 
+# Ignore GNU global tags files
+GPATH
+GRTAGS
+GSYMS
+GTAGS

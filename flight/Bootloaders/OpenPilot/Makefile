@@ -36,10 +36,6 @@ ENABLE_DEBUG_PINS ?= NO
 # Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs  
 ENABLE_AUX_UART ?= NO
 
-#
-override USE_BOOTLOADER = NO
-
-
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= NO
 
@@ -60,12 +56,6 @@ MCU      = cortex-m3
 CHIP     = STM32F103RET
 BOARD    = STM3210E_OP
 MODEL	 = HD
-ifeq ($(USE_BOOTLOADER), YES)
-BOOT_MODEL    = $(MODEL)_BL
-
-else
-BOOT_MODEL    = $(MODEL)_NB
-endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
 OUTDIR = $(TOP)/build/bl_openpilot
@@ -193,7 +183,7 @@ CPPSRCARM =
 # Even though the DOS/Win* filesystem matches both .s and .S the same,
 # it will preserve the spelling of the filenames, and gcc itself does
 # care about how the name is spelled on its command-line.
-ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL).S
+ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL)_OP.S
 
 # List Assembler source files here which must be assembled in ARM-Mode..
 ASRCARM = 
@@ -271,10 +261,6 @@ endif
 ifeq ($(ENABLE_AUX_UART), YES)
 CDEFS += -DPIOS_ENABLE_AUX_UART
 endif
-ifeq ($(USE_BOOTLOADER), YES)
-CDEFS += -DUSE_BOOTLOADER
-endif
-
 
 # Place project-specific -D and/or -U options for 
 # Assembler with preprocessor here.
@@ -302,9 +288,10 @@ CSTANDARD = -std=gnu99
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
 
 ifeq ($(DEBUG),YES)
-CFLAGS = -g$(DEBUGF) -DDEBUG
+CFLAGS = -DDEBUG
 endif
 
+CFLAGS += -g$(DEBUGF)
 CFLAGS += -O$(OPT)
 ifeq ($(DEBUG),NO)
 CFLAGS += -ffunction-sections
@@ -344,7 +331,7 @@ MATH_LIB = -lm
 #    --cref:    add cross reference to  map file
 LDFLAGS = -nostartfiles -Wl,-Map=$(OUTDIR)/$(TARGET).map,--cref,--gc-sections
 ifeq ($(DEBUG),NO)
-LDFLAGS += -Wl,-static -Wl,-s
+LDFLAGS += -Wl,-static
 endif
 LDFLAGS += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
 LDFLAGS += -lc
@@ -353,13 +340,14 @@ LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc 
 
 # Set linker-script name depending on selected submodel name
-LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_stm32f10x_$(MODEL).ld
+LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_memory.ld
+LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_BL_sections.ld
 
-OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).elf  
+OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).bin
 # Program                                                                                                                                                                                                                            
-OOCD_CL+=-c "flash write_image $(OOCD_LOADFILE)"
+OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) 0x08000000 bin"
 # Verify
-OOCD_CL+=-c "verify_image $(OOCD_LOADFILE)"
+OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) 0x08000000 bin"
 # reset target
 OOCD_CL+=-c "reset run"
 # terminate OOCD after programming
@@ -411,7 +399,7 @@ ${OUTDIR}/InitMods.c: Makefile
 # Program the device.
 ifeq ($(FLASH_TOOL),OPENOCD)
 # Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
-program: $(OUTDIR)/$(TARGET).elf
+program: $(OUTDIR)/$(TARGET).bin
 	@echo ${quote}Programming with OPENOCD${quote}
 	$(OOCD_EXE) $(OOCD_CL)
 endif
@@ -443,12 +431,15 @@ $(eval $(call PARTIAL_COMPILE_TEMPLATE, SRC))
 # Compile: create assembler files from C source files. ARM only
 $(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
 
-.PHONY: elf lss sym hex bin
+$(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
+
+.PHONY: elf lss sym hex bin bino
 elf: $(OUTDIR)/$(TARGET).elf
 lss: $(OUTDIR)/$(TARGET).lss 
 sym: $(OUTDIR)/$(TARGET).sym
 hex: $(OUTDIR)/$(TARGET).hex
 bin: $(OUTDIR)/$(TARGET).bin
+bino: $(OUTDIR)/$(TARGET).bin.o
 
 # Display sizes of sections.
 $(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))
@@ -470,6 +461,7 @@ clean_list :
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).sym
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).lss
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin.o
 	$(V1) $(REMOVE) $(ALLOBJ)
 	$(V1) $(REMOVE) $(LSTFILES)
 	$(V1) $(REMOVE) $(DEPFILES)

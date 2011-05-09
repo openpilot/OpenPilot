@@ -29,7 +29,6 @@ include $(TOP)/make/firmware-defs.mk
 # Set developer code and compile options
 # Set to YES for debugging
 DEBUG ?= NO
-USE_BOOTLOADER ?= YES
 
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= YES
@@ -50,11 +49,6 @@ MCU      = cortex-m3
 CHIP     = STM32F103CBT
 BOARD    = STM32103CB_AHRS
 MODEL    = MD
-ifeq ($(USE_BOOTLOADER), YES)
-BOOT_MODEL    = $(MODEL)_BL
-else
-BOOT_MODEL    = $(MODEL)_NB
-endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
 OUTDIR = $(TOP)/build/ahrs
@@ -229,9 +223,8 @@ CDEFS = -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
 CDEFS += -DIN_AHRS
-ifeq ($(USE_BOOTLOADER), YES)
 CDEFS += -DUSE_BOOTLOADER
-endif
+
 # Place project-specific -D and/or -U options for
 # Assembler with preprocessor here.
 #ADEFS = -DUSE_IRQ_ASM_WRAPPER
@@ -303,16 +296,17 @@ LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc
 
 # Set linker-script name depending on selected submodel name
-LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_$(BOARD)_$(BOOT_MODEL).ld
+LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_memory.ld
+LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_sections.ld
 
-OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).elf  
+OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).bin
 # Program
-OOCD_CL+=-c "flash write_image $(OOCD_LOADFILE)"
+OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) 0x08002000 bin"
 # Verify
-OOCD_CL+=-c "verify_image $(OOCD_LOADFILE)"
+OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) 0x08002000 bin"
 # reset target
 OOCD_CL+=-c "reset run"
-# # terminate OOCD after programming
+# terminate OOCD after programming
 OOCD_CL+=-c shutdown
 
 
@@ -352,18 +346,11 @@ endif
 endif
 
 # Program the device.
-ifeq ($(USE_BOOTLOADER), YES)
-# Program the device with OP Upload Tool".
-program: $(OUTDIR)/$(TARGET).bin
-	@echo ${quote}Programming with OP Upload Tool${quote}
-	../../ground/src/experimental/upload-build-desktop/debug/OPUploadTool -d 1 -p $(OUTDIR)/$(TARGET).bin
-else
 ifeq ($(FLASH_TOOL),OPENOCD)
 # Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
-program: $(OUTDIR)/$(TARGET).elf
+program: $(OUTDIR)/$(TARGET).bin
 	@echo ${quote}Programming with OPENOCD${quote}
 	$(OOCD_EXE) $(OOCD_CL)
-endif
 endif
 
 # Link: create ELF output file from object files.
@@ -393,12 +380,15 @@ $(eval $(call PARTIAL_COMPILE_TEMPLATE, SRC))
 # Compile: create assembler files from C source files. ARM only
 $(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
 
-.PHONY: elf lss sym hex bin
+$(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
+
+.PHONY: elf lss sym hex bin bino
 elf: $(OUTDIR)/$(TARGET).elf
 lss: $(OUTDIR)/$(TARGET).lss
 sym: $(OUTDIR)/$(TARGET).sym
 hex: $(OUTDIR)/$(TARGET).hex
 bin: $(OUTDIR)/$(TARGET).bin
+bino: $(OUTDIR)/$(TARGET).bin.o
 
 # Display sizes of sections.
 $(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))
@@ -420,6 +410,7 @@ clean_list :
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).sym
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).lss
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin.o
 	$(V1) $(REMOVE) $(ALLOBJ)
 	$(V1) $(REMOVE) $(LSTFILES)
 	$(V1) $(REMOVE) $(DEPFILES)

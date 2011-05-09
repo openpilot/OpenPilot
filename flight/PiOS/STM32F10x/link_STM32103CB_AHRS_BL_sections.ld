@@ -1,9 +1,3 @@
-MEMORY
-{
-    FLASH (rx) : ORIGIN = 0x08003000, LENGTH = 116K
-    SRAM (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00005000
-}
-
 _estack = 0x20004FF0;
 
 /* Section Definitions */
@@ -15,17 +9,17 @@ SECTIONS
         *(.text .text.* .gnu.linkonce.t.*)
         *(.glue_7t) *(.glue_7)
         *(.rodata .rodata* .gnu.linkonce.r.*)
-    } > FLASH
+    } > BL_FLASH
 
     .ARM.extab :
     {
         *(.ARM.extab* .gnu.linkonce.armextab.*)
-    } > FLASH
+    } > BL_FLASH
 
     .ARM.exidx :
     {
         *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-    } > FLASH
+    } > BL_FLASH
 
     . = ALIGN(4);
     _etext = .;

@@ -1,1 +1,1 @@
-LIBS += -lcore -l$$qtLibraryTarget(Utils)
+LIBS += -l$$qtLibraryTarget(Utils)

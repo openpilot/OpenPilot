@@ -3,8 +3,6 @@ TARGET = opmapwidget
 DEFINES += OPMAPWIDGET_LIBRARY
 include(../../../../openpilotgcslibrary.pri)
 
-include(../../../utils/utils.pri)
-
 # DESTDIR = ../build
 SOURCES += mapgraphicitem.cpp \
     opmapwidget.cpp \
@@ -22,6 +20,9 @@ LIBS += -L../build \
     -lcore \
     -linternals \
     -lcore
+
+# order of linking matters
+include(../../../utils/utils.pri)
 
 POST_TARGETDEPS  += ../build/libcore.a
 POST_TARGETDEPS  += ../build/libinternals.a

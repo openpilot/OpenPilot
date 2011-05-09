@@ -22,6 +22,9 @@
  # 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  #####
 
+WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
+TOP      := $(realpath $(WHEREAMI)/../../../)
+include $(TOP)/make/firmware-defs.mk
 
 # Set developer code and compile options
 # Set to YES to compile for debugging
@@ -32,12 +35,6 @@ ENABLE_DEBUG_PINS ?= NO
 
 # Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs  
 ENABLE_AUX_UART ?= NO
-
-#
-USE_BOOTLOADER ?= YES
-
-# Set to the source bootloader binary
-SOURCE_BL ?= NULL
 
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= NO
@@ -54,11 +51,6 @@ endif
 
 FLASH_TOOL = OPENOCD
 
-# YES enables -mthumb option to flags for source-files listed 
-# in SRC and CPPSRC
-USE_THUMB_MODE = YES
-
-
 # MCU name, submodel and board
 # - MCU used for compiler-option (-mcpu)
 # - MODEL used for linker-script name (-T) and passed as define
@@ -67,12 +59,6 @@ MCU      = cortex-m3
 CHIP     = STM32F103CBT
 BOARD    ?= NULL
 MODEL	 ?= NULL
-
-ifeq ($(USE_BOOTLOADER), YES)
-BOOT_MODEL    = $(MODEL)_BL
-else
-BOOT_MODEL    = $(MODEL)_NB
-endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
 OUTDIR = ../../../build/bootloaders/BootloaderUpdater
@@ -160,7 +146,7 @@ CPPSRCARM =
 # Even though the DOS/Win* filesystem matches both .s and .S the same,
 # it will preserve the spelling of the filenames, and gcc itself does
 # care about how the name is spelled on its command-line.
-ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL).S
+ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL)$(MODEL_SUFFIX).S
 
 # List Assembler source files here which must be assembled in ARM-Mode..
 ASRCARM = 
@@ -238,10 +224,7 @@ endif
 ifeq ($(ENABLE_AUX_UART), YES)
 CDEFS += -DPIOS_ENABLE_AUX_UART
 endif
-ifeq ($(USE_BOOTLOADER), YES)
 CDEFS += -DUSE_BOOTLOADER
-endif
-
 
 # Place project-specific -D and/or -U options for 
 # Assembler with preprocessor here.
@@ -269,9 +252,10 @@ CSTANDARD = -std=gnu99
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
 
 ifeq ($(DEBUG),YES)
-CFLAGS = -g$(DEBUGF) -DDEBUG
+CFLAGS = -DDEBUG
 endif
 
+CFLAGS += -g$(DEBUGF)
 CFLAGS += -O$(OPT)
 ifeq ($(DEBUG),NO)
 CFLAGS += -ffunction-sections
@@ -311,7 +295,7 @@ MATH_LIB = -lm
 #    --cref:    add cross reference to  map file
 LDFLAGS = -nostartfiles -Wl,-Map=$(OUTDIR)/$(TARGET).map,--cref,--gc-sections
 ifeq ($(DEBUG),NO)
-LDFLAGS += -Wl,-static -Wl,-s
+LDFLAGS += -Wl,-static
 endif
 LDFLAGS += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
 LDFLAGS += -lc
@@ -320,62 +304,25 @@ LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc 
 
 # Set linker-script name depending on selected submodel name
-LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_$(BOARD)_$(BOOT_MODEL).ld
+LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_memory.ld
+LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_sections.ld
 
-# Test if quotes are needed for the echo-command
-result = ${shell echo "test"}
-ifeq (${result}, test)
-	quote = '
-else
-	quote = 
-endif
-
-OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).elf  
+OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).bin
 # Program                                                                                                                                                                                                                            
-OOCD_CL+=-c "flash write_image $(OOCD_LOADFILE)"
+OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) 0x08003000 bin"
 # Verify
-OOCD_CL+=-c "verify_image $(OOCD_LOADFILE)"
+OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) 0x08003000 bin"
 # reset target
 OOCD_CL+=-c "reset run"
 # terminate OOCD after programming
 OOCD_CL+=-c shutdown
+# ---------------------------------------------------------------------------
+
 
 # Define programs and commands.
-CC      = $(TCHAIN_PREFIX)gcc
-CPP     = $(TCHAIN_PREFIX)g++
-AR      = $(TCHAIN_PREFIX)ar
-OBJCOPY = $(TCHAIN_PREFIX)objcopy
-OBJDUMP = $(TCHAIN_PREFIX)objdump
-SIZE    = $(TCHAIN_PREFIX)size
-NM      = $(TCHAIN_PREFIX)nm
 REMOVE  = $(REMOVE_CMD) -f
 ###SHELL   = sh
 ###COPY    = cp
-
-
-
-# Define Messages
-# English
-MSG_ERRORS_NONE = Errors: none
-MSG_BEGIN = ${quote}-------- begin (mode: $(RUN_MODE)) --------${quote}
-MSG_END = ${quote}--------  end  --------${quote}
-MSG_MODINIT = ${quote}**** Generating ModInit.c${quote}
-MSG_SIZE_BEFORE = ${quote}Size before:${quote} 
-MSG_SIZE_AFTER = ${quote}Size after build:${quote}
-MSG_LOAD_FILE = ${quote}Creating load file:${quote}
-MSG_EXTENDED_LISTING = ${quote}Creating Extended Listing/Disassembly:${quote}
-MSG_SYMBOL_TABLE = ${quote}Creating Symbol Table:${quote}
-MSG_LINKING = ${quote}**** Linking :${quote}
-MSG_COMPILING = ${quote}**** Compiling C :${quote}
-MSG_COMPILING_ARM = ${quote}**** Compiling C (ARM-only):${quote}
-MSG_COMPILINGCPP = ${quote}Compiling C++ :${quote}
-MSG_COMPILINGCPP_ARM = ${quote}Compiling C++ (ARM-only):${quote}
-MSG_ASSEMBLING = ${quote}**** Assembling:${quote}
-MSG_ASSEMBLING_ARM = ${quote}****Assembling (ARM-only):${quote}
-MSG_CLEANING = ${quote}Cleaning project:${quote}
-MSG_FORMATERROR = ${quote}Can not handle output-format${quote}
-MSG_ASMFROMC = ${quote}Creating asm-File from C-Source:${quote}
-MSG_ASMFROMC_ARM = ${quote}Creating asm-File from C-Source (ARM-only):${quote}
 
 # List of all source files.
 ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
@@ -392,14 +339,7 @@ DEPFILES   = $(addprefix $(OUTDIR)/dep/, $(addsuffix .o.d, $(ALLSRCBASE)))
 
 
 # Default target.
-#all: begin gccversion sizebefore build sizeafter finished end
-all: begin gccversion build sizeafter finished end
-
-elf: $(OUTDIR)/$(TARGET).elf 
-lss: $(OUTDIR)/$(TARGET).lss
-sym: $(OUTDIR)/$(TARGET).sym
-hex: $(OUTDIR)/$(TARGET).hex
-bin: $(OUTDIR)/$(TARGET).bin
+all: build
 
 ifeq ($(LOADFORMAT),ihex)
 build: elf hex sym
@@ -415,185 +355,80 @@ endif
 endif
 endif
 
-# Eye candy.
-begin:
-##	@echo
-	@echo $(MSG_BEGIN)
-ifeq ($(SOURCE_BL), NULL)
-	@echo ${quote}Please specify the source bootloader binary with SOURCE_BL=source_name${quote}
-	@exit 2 
-endif
-ifeq ($(BOARD), NULL)
-	@echo ${quote}Please specify the board name with BOARD=board_name (STM3210E_OP,STM32103CB_AHRS,STM32103CB_PIPXTREME,STM32103CB_CC_Rev1)${quote}
-	@exit 2 
-endif
-ifeq ($(MODEL), NULL)
-	@echo ${quote}Please specify the chip model with MODEL=MD/HD${quote}
-	@exit 2 
-endif
-	python file_to_array.py $(SOURCE_BL) bl_array.h
-#UNAME := $(shell python file_to_array.py $(SOURCE_BL) bl_array.h)
-
-	
-###########################################################################################################
-
-finished:
-##	@echo $(MSG_ERRORS_NONE)
-
-end:
-	@echo $(MSG_END)
-##	@echo
-
-# Display sizes of sections.
-ELFSIZE = $(SIZE) -A  $(OUTDIR)/$(TARGET).elf
-
-sizebefore:
-#	@if [ -f  $(OUTDIR)/$(TARGET).elf ]; then echo; echo $(MSG_SIZE_BEFORE); $(ELFSIZE); echo; fi
-
-sizeafter:
-#	@if [ -f  $(OUTDIR)/$(TARGET).elf ]; then echo; echo $(MSG_SIZE_AFTER); $(ELFSIZE); echo; fi
-	@echo $(MSG_SIZE_AFTER)
-	$(ELFSIZE)
-	
-# Display compiler version information.
-gccversion : 
-	@$(CC) --version
-#	@echo $(ALLOBJ)
-
 # Program the device.
 ifeq ($(FLASH_TOOL),OPENOCD)
 # Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
-program: $(OUTDIR)/$(TARGET).elf
+program: $(OUTDIR)/$(TARGET).bin
 	@echo ${quote}Programming with OPENOCD${quote}
 	$(OOCD_EXE) $(OOCD_CL)
 endif
 
-# Create final output file (.hex) from ELF output file.
-%.hex: %.elf
-##	@echo
-	@echo $(MSG_LOAD_FILE) $@
-	$(OBJCOPY) -O ihex $< $@
-	
-# Create final output file (.bin) from ELF output file.
-%.bin: %.elf
-##	@echo
-	@echo $(MSG_LOAD_FILE) $@
-	$(OBJCOPY) -O binary $< $@
-
-# Create extended listing file/disassambly from ELF output file.
-# using objdump testing: option -C
-%.lss: %.elf
-##	@echo
-	@echo $(MSG_EXTENDED_LISTING) $@
-	$(OBJDUMP) -h -S -C -r $< > $@
-#	$(OBJDUMP) -x -S $< > $@
-
-# Create a symbol table from ELF output file.
-%.sym: %.elf
-##	@echo
-	@echo $(MSG_SYMBOL_TABLE) $@
-	$(NM) -n $< > $@
-
 # Link: create ELF output file from object files.
-.SECONDARY : $(TARGET).elf
-.PRECIOUS : $(ALLOBJ)
-%.elf:  $(ALLOBJ)
-	@echo $(MSG_LINKING) $@
-# use $(CC) for C-only projects or $(CPP) for C++-projects:
-	$(CC) $(THUMB) $(CFLAGS) $(ALLOBJ) --output $@ $(LDFLAGS)
-#	$(CPP) $(THUMB) $(CFLAGS) $(ALLOBJ) --output $@ $(LDFLAGS)
-
+$(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ) $(BLOBJ)))
 
 # Assemble: create object files from assembler source files.
-define ASSEMBLE_TEMPLATE
-$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
-##	@echo
-	@echo $(MSG_ASSEMBLING) $$<  to  $$@
-	$(CC) -c $(THUMB) $$(ASFLAGS) $$< -o $$@ 
-endef
 $(foreach src, $(ASRC), $(eval $(call ASSEMBLE_TEMPLATE, $(src)))) 
 
 # Assemble: create object files from assembler source files. ARM-only
-define ASSEMBLE_ARM_TEMPLATE
-$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
-##	@echo
-	@echo $(MSG_ASSEMBLING_ARM) $$<  to  $$@
-	$(CC) -c $$(ASFLAGS) $$< -o $$@ 
-endef
 $(foreach src, $(ASRCARM), $(eval $(call ASSEMBLE_ARM_TEMPLATE, $(src)))) 
 
-
 # Compile: create object files from C source files.
-define COMPILE_C_TEMPLATE
-$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
-##	@echo
-	@echo $(MSG_COMPILING) $$<  to  $$@
-	$(CC) -c $(THUMB) $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@ 
-endef
 $(foreach src, $(SRC), $(eval $(call COMPILE_C_TEMPLATE, $(src)))) 
 
 # Compile: create object files from C source files. ARM-only
-define COMPILE_C_ARM_TEMPLATE
-$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
-##	@echo
-	@echo $(MSG_COMPILING_ARM) $$<  to  $$@
-	$(CC) -c $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@ 
-endef
 $(foreach src, $(SRCARM), $(eval $(call COMPILE_C_ARM_TEMPLATE, $(src)))) 
 
-
 # Compile: create object files from C++ source files.
-define COMPILE_CPP_TEMPLATE
-$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
-##	@echo
-	@echo $(MSG_COMPILINGCPP) $$<  to  $$@
-	$(CC) -c $(THUMB) $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@ 
-endef
 $(foreach src, $(CPPSRC), $(eval $(call COMPILE_CPP_TEMPLATE, $(src)))) 
 
 # Compile: create object files from C++ source files. ARM-only
-define COMPILE_CPP_ARM_TEMPLATE
-$(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
-##	@echo
-	@echo $(MSG_COMPILINGCPP_ARM) $$<  to  $$@
-	$(CC) -c $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@ 
-endef
 $(foreach src, $(CPPSRCARM), $(eval $(call COMPILE_CPP_ARM_TEMPLATE, $(src)))) 
 
-
 # Compile: create assembler files from C source files. ARM/Thumb
-$(SRC:.c=.s) : %.s : %.c
-	@echo $(MSG_ASMFROMC) $< to $@
-	$(CC) $(THUMB) -S $(CFLAGS) $(CONLYFLAGS) $< -o $@
+$(eval $(call PARTIAL_COMPILE_TEMPLATE, SRC))
 
 # Compile: create assembler files from C source files. ARM only
-$(SRCARM:.c=.s) : %.s : %.c
-	@echo $(MSG_ASMFROMC_ARM) $< to $@
-	$(CC) -S $(CFLAGS) $(CONLYFLAGS) $< -o $@
+$(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
+
+$(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
+
+.PHONY: elf lss sym hex bin bino
+elf: $(OUTDIR)/$(TARGET).elf
+elf.stripped: $(OUTDIR)/$(TARGET).elf.stripped
+lss: $(OUTDIR)/$(TARGET).lss
+sym: $(OUTDIR)/$(TARGET).sym
+hex: $(OUTDIR)/$(TARGET).hex
+bin: $(OUTDIR)/$(TARGET).bin
+bino: $(OUTDIR)/$(TARGET).bin.o
+
+# Display sizes of sections.
+$(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))
+.PHONY: size
+size: $(OUTDIR)/$(TARGET).elf_size
 
 # Generate Doxygen documents
 docs:
 	doxygen  $(DOXYGENDIR)/doxygen.cfg
-	
+
 # Target: clean project.
 clean: begin clean_list finished end
 
 clean_list :
-##	@echo
 	@echo $(MSG_CLEANING)
-	$(REMOVE) $(OUTDIR)/$(TARGET).map
-	$(REMOVE) $(OUTDIR)/$(TARGET).elf
-	$(REMOVE) $(OUTDIR)/$(TARGET).hex
-	$(REMOVE) $(OUTDIR)/$(TARGET).bin
-	$(REMOVE) $(OUTDIR)/$(TARGET).sym
-	$(REMOVE) $(OUTDIR)/$(TARGET).lss
-	$(REMOVE) $(ALLOBJ)
-	$(REMOVE) $(LSTFILES)
-	$(REMOVE) $(DEPFILES)
-	$(REMOVE) $(SRC:.c=.s)
-	$(REMOVE) $(SRCARM:.c=.s)
-	$(REMOVE) $(CPPSRC:.cpp=.s)
-	$(REMOVE) $(CPPSRCARM:.cpp=.s)
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).map
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).elf
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).hex
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).sym
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).lss
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin.o
+	$(V1) $(REMOVE) $(ALLOBJ)
+	$(V1) $(REMOVE) $(LSTFILES)
+	$(V1) $(REMOVE) $(DEPFILES)
+	$(V1) $(REMOVE) $(SRC:.c=.s)
+	$(V1) $(REMOVE) $(SRCARM:.c=.s)
+	$(V1) $(REMOVE) $(CPPSRC:.cpp=.s)
+	$(V1) $(REMOVE) $(CPPSRCARM:.cpp=.s)
 
 
 # Create output files directory
@@ -611,9 +446,5 @@ else
 -include $(shell mkdir -p $(OUTDIR) 2>/dev/null) $(shell mkdir $(OUTDIR)/dep 2>/dev/null) $(wildcard $(OUTDIR)/dep/*)
 endif
 
-
-
 # Listing of phony targets.
-.PHONY : all begin finish end sizebefore sizeafter gccversion \
-build elf hex bin lss sym clean clean_list program
-
+.PHONY : all build clean clean_list program

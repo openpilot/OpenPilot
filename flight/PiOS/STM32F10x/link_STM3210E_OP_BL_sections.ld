@@ -1,41 +1,3 @@
-/**
- ******************************************************************************
- *
- * @file       link_stm32f10x_HD_NB.ld   
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2009.   
- * @brief      PiOS linker for the OpenPilot board
- * @see        The GNU Public License (GPL) Version 3
- *
- *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
- * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
- * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- */
-
-
-/* Memory Spaces Definitions */
-MEMORY
-{
-  RAM (xrw) :     ORIGIN = 0x20000000, LENGTH = 64K
-  FLASH (rx) :    ORIGIN = 0x08000000, LENGTH = 512K
-  FLASHB1 (rx) :  ORIGIN = 0x00000000, LENGTH = 0
-  EXTMEMB0 (rx) : ORIGIN = 0x00000000, LENGTH = 0
-  EXTMEMB1 (rx) : ORIGIN = 0x00000000, LENGTH = 0
-  EXTMEMB2 (rx) : ORIGIN = 0x00000000, LENGTH = 0
-  EXTMEMB3 (rx) : ORIGIN = 0x00000000, LENGTH = 0
-}
-
 /* This is the size of the stack for early init and for all FreeRTOS IRQs */
 _irq_stack_size = 0x400;
 
@@ -59,10 +21,10 @@ PROVIDE (   HardFault_Handler = 0 ) ;
 PROVIDE (   MemManage_Handler = 0 ) ;
 PROVIDE (   BusFault_Handler = 0 ) ;
 PROVIDE (   UsageFault_Handler = 0 ) ;
-PROVIDE (   SVC_Handler = 0 ) ;
+PROVIDE (   vPortSVCHandler = 0 ) ;
 PROVIDE (   DebugMon_Handler = 0 ) ;
-PROVIDE (   PendSV_Handler = 0 ) ;
-PROVIDE (   SysTick_Handler = 0 ) ;
+PROVIDE (   xPortPendSVHandler = 0 ) ;
+PROVIDE (   xPortSysTickHandler = 0 ) ;
 
 PROVIDE (   WWDG_IRQHandler = 0 ) ;
 PROVIDE (   PVD_IRQHandler = 0 ) ;
@@ -207,7 +169,7 @@ SECTIONS
     {
         KEEP(*(.isr_vector))            /* Startup code */
         . = ALIGN(4);
-    } >FLASH
+    } > BL_FLASH
 
     /* for some STRx devices, the beginning of the startup code is stored in the .flashtext section, which goes to FLASH */
     .flashtext :
@@ -215,7 +177,7 @@ SECTIONS
         . = ALIGN(4);
         *(.flashtext)            /* Startup code */
         . = ALIGN(4);
-    } >FLASH
+    } > BL_FLASH
  
     
     /* init sections */
@@ -226,7 +188,7 @@ SECTIONS
         KEEP(*(.initcalluavobj.init))
 	. = ALIGN(4);
 	__uavobj_initcall_end   = .;
-    } >FLASH
+    } > BL_FLASH
 
     /* the program code is stored in the .text section, which goes to Flash */
     .text :
@@ -244,7 +206,7 @@ SECTIONS
          _etext = .;
             /* This is used by the startup in order to initialize the .data secion */
          _sidata = _etext;
-    } >FLASH
+    } > BL_FLASH
     
 
     /* 

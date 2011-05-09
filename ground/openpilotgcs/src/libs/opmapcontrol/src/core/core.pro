@@ -1,8 +1,5 @@
 include (../common.pri)
 
-include(../../../utils/utils.pri)
-
-
 SOURCES += opmaps.cpp \
     pureimagecache.cpp \
     pureimage.cpp \

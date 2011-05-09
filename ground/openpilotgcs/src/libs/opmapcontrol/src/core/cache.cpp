@@ -25,7 +25,6 @@
 * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 #include "cache.h"
-#include "utils/pathutils.h"
 #include <QSettings>
 
 namespace core {
@@ -54,7 +53,11 @@ namespace core {
     {
         if(cache.isNull()|cache.isEmpty())
         {
-            cache= Utils::PathUtils().GetStoragePath()+"mapscache"+QDir::separator();
+            QSettings set(QSettings::IniFormat, QSettings::UserScope,QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS"));
+            QDir dir(set.fileName());
+            QFileInfo f(dir.absolutePath());
+            f.dir().absolutePath();
+            cache=f.dir().absolutePath()+QDir::separator()+"mapscache"+QDir::separator();
             setCacheLocation(cache);
         }
     }

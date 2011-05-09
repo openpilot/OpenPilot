@@ -1,3 +1,6 @@
+# Set up a default goal
+.DEFAULT_GOAL := help
+
 # Set up some macros for common directories within the tree
 ROOT_DIR=$(CURDIR)
 TOOLS_DIR=$(ROOT_DIR)/tools
@@ -56,11 +59,13 @@ export V1    := $(AT)
 else ifeq ($(V), 1)
 endif
 
-.PHONY: areyousureyoushouldberunningthis
-areyousureyoushouldberunningthis:
+.PHONY: help
+help:
 	@echo
-	@echo "   This Makefile will probably only work on Linux and Mac right now."
-	@echo "   If you're sure you want to be using this, you may wish to try the following targets:"
+	@echo "   This Makefile is known to work on Linux and Mac in a standard shell environment."
+	@echo "   It also works on Windows by following the instructions in make/winx86/README.txt."
+	@echo
+	@echo "   Here is a summary of the available targets:"
 	@echo
 	@echo "   [Tool Installers]"
 	@echo "     qt_sdk_install       - Install the QT v4.6.2 tools"

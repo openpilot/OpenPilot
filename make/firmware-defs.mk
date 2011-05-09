@@ -71,9 +71,9 @@ gccversion :
 	$(V1) $(OBJCOPY) -I binary -O elf32-littlearm --binary-architecture arm \
 		--rename-section .data=.rodata,alloc,load,readonly,data,contents \
 		--wildcard \
-		--redefine-sym _binary_$(subst -,_,$(subst .,_,$(subst /,_,$<)))_start=_binary_start \
-		--redefine-sym _binary_$(subst -,_,$(subst .,_,$(subst /,_,$<)))_end=_binary_end \
-		--redefine-sym _binary_$(subst -,_,$(subst .,_,$(subst /,_,$<)))_size=_binary_size \
+		--redefine-sym _binary_$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$<))))_start=_binary_start \
+		--redefine-sym _binary_$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$<))))_end=_binary_end \
+		--redefine-sym _binary_$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$<))))_size=_binary_size \
 		$< $@
 
 # Create extended listing file/disassambly from ELF output file.

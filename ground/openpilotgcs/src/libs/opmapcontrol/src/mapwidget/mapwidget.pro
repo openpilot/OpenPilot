@@ -3,6 +3,8 @@ TARGET = opmapwidget
 DEFINES += OPMAPWIDGET_LIBRARY
 include(../../../../openpilotgcslibrary.pri)
 
+include(../../../utils/utils.pri)
+
 # DESTDIR = ../build
 SOURCES += mapgraphicitem.cpp \
     opmapwidget.cpp \
@@ -15,6 +17,7 @@ SOURCES += mapgraphicitem.cpp \
     mapripform.cpp \
     mapripper.cpp \
     traillineitem.cpp
+
 LIBS += -L../build \
     -lcore \
     -linternals \

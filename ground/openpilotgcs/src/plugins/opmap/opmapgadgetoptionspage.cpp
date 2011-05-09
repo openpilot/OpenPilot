@@ -109,11 +109,7 @@ void OPMapGadgetOptionsPage::on_pushButtonCacheDefaults_clicked()
     m_page->accessModeComboBox->setCurrentIndex(index);
 
     m_page->checkBoxUseMemoryCache->setChecked(true);
-    QSettings set(QSettings::IniFormat, QSettings::UserScope,QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS"));
-    QDir dir(set.fileName());
-    QFileInfo f(dir.absolutePath());
-    f.dir().absolutePath();
-    m_page->lineEditCacheLocation->setPath(f.dir().absolutePath()+QDir::separator() + "mapscache" + QDir::separator());
+    m_page->lineEditCacheLocation->setPath(Utils::PathUtils().GetStoragePath() + "mapscache" + QDir::separator());
 
 }
 

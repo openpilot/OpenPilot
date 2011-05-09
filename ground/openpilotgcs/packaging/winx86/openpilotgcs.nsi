@@ -31,7 +31,7 @@
 
 ;--------------------------------
 ; Paths
-  
+
   ; Tree root locations (relative to this script location)
   !define NSIS_DATA_TREE "."
   !define GCS_BUILD_TREE "..\..\..\..\build\ground\openpilotgcs"
@@ -39,7 +39,7 @@
 
   ; Default installation folder
   InstallDir "$LOCALAPPDATA\OpenPilot"
-  
+
   ; Get installation folder from registry if available
   InstallDirRegKey HKCU "Software\OpenPilot" "Install Location"
 
@@ -83,7 +83,7 @@
 
   ; Compression level
   SetCompressor /solid lzma
-  
+
 ;--------------------------------
 ; Branding
 
@@ -97,7 +97,7 @@
   !define MUI_WELCOMEFINISHPAGE_BITMAP_NOSTRETCH
   !define MUI_UNWELCOMEFINISHPAGE_BITMAP "${NSIS_DATA_TREE}\resources\welcome.bmp"
   !define MUI_UNWELCOMEFINISHPAGE_BITMAP_NOSTRETCH
-	
+
 ;--------------------------------
 ; Language selection dialog settings
 
@@ -105,6 +105,12 @@
   !define MUI_LANGDLL_REGISTRY_ROOT "HKCU" 
   !define MUI_LANGDLL_REGISTRY_KEY "Software\OpenPilot" 
   !define MUI_LANGDLL_REGISTRY_VALUENAME "Installer Language"
+  !define MUI_LANGDLL_ALWAYSSHOW
+
+;--------------------------------
+; Settings for MUI_PAGE_FINISH
+  !define MUI_FINISHPAGE_RUN
+  !define MUI_FINISHPAGE_RUN_FUNCTION "RunApplication"
 
 ;--------------------------------
 ; Pages
@@ -115,27 +121,25 @@
   !insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_INSTFILES
   !insertmacro MUI_PAGE_FINISH
-  
+
   !insertmacro MUI_UNPAGE_WELCOME
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_COMPONENTS
   !insertmacro MUI_UNPAGE_INSTFILES
   !insertmacro MUI_UNPAGE_FINISH
 
-; !define MUI_FINISHPAGE_RUN "$INSTDIR\bin\openpilotgcs.exe"
- 
 ;--------------------------------
 ; Supported languages, license files and translations
 
   !include "${NSIS_DATA_TREE}\translations\languages.nsh"
-  
+
 ;--------------------------------
 ; Reserve files
-  
+
   ; If you are using solid compression, files that are required before
   ; the actual installation should be stored first in the data block,
   ; because this will make your installer start faster.
-  
+
   !insertmacro MUI_RESERVEFILE_LANGDLL
 
 ;--------------------------------
@@ -191,7 +195,7 @@ SectionEnd
 Section ; create uninstall info
   ; Write the installation path into the registry
   WriteRegStr HKCU "Software\OpenPilot" "Install Location" $INSTDIR
-  
+
   ; Write the uninstall keys for Windows
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayName" "OpenPilot GCS"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "UninstallString" '"$INSTDIR\Uninstall.exe"'
@@ -213,7 +217,7 @@ SectionEnd
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecLocalization} $(DESC_InSecLocalization)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecShortcuts} $(DESC_InSecShortcuts)
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
- 
+
 ;--------------------------------
 ; Installer functions
 
@@ -248,12 +252,18 @@ SectionEnd
 
 Section "un.Maps cache" UnSecCache
   ; Remove maps cache
-  RMDir /r /rebootok "$PROFILE\OpenPilot"
+  RMDir /r /rebootok "$APPDATA\OpenPilot\mapscache"
 SectionEnd
 
 Section /o "un.Configuration" UnSecConfig
   ; Remove configuration
-  RMDir /r /rebootok "$APPDATA\OpenPilot"
+  Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS.db"
+  Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS.ini"
+SectionEnd
+
+Section "-un.Profile" UnSecProfile
+  ; Remove OpenPilot user profile subdirectory if empty
+  RMDir "$APPDATA\OpenPilot"
 SectionEnd
 
 ;--------------------------------
@@ -264,12 +274,21 @@ SectionEnd
     !insertmacro MUI_DESCRIPTION_TEXT ${UnSecCache} $(DESC_UnSecCache)
     !insertmacro MUI_DESCRIPTION_TEXT ${UnSecConfig} $(DESC_UnSecConfig)
   !insertmacro MUI_UNFUNCTION_DESCRIPTION_END
- 
+
 ;--------------------------------
 ; Uninstaller functions
 
 Function un.onInit
 
   !insertmacro MUI_UNGETLANGUAGE
-  
+
+FunctionEnd
+
+;--------------------------------
+; Function to run the application from installer
+
+Function RunApplication
+
+  Exec '"$INSTDIR\bin\openpilotgcs.exe"'
+
 FunctionEnd

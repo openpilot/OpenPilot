@@ -46,8 +46,8 @@ Now you need to copy two files to your msysGit installation folders.
 Assuming that you installed the msysGit into C:\Program Files\Git\,
 you have to copy:
 
-   make\win32\make    ->  C:\Program Files\Git\bin\
-   make\win32\sh.cmd  ->  C:\Program Files\Git\cmd\
+   make\winx86\make    ->  C:\Program Files\Git\bin\
+   make\winx86\sh.cmd  ->  C:\Program Files\Git\cmd\
 
 If you have msysGit installed into another directory, you need to update paths
 accordingly. Also if you have tools installed into different directories and

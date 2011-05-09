@@ -9,6 +9,7 @@
 /* Begin PBXFileReference section */
 		65003B31121249CA00C183DD /* pios_wdg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_wdg.c; sourceTree = "<group>"; };
 		6502584212CA4D2600583CDF /* insgps13state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insgps13state.c; path = ../../AHRS/insgps13state.c; sourceTree = SOURCE_ROOT; };
+		65078B09136FCEE600536549 /* flightstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = flightstatus.xml; sourceTree = "<group>"; };
 		6509C7E912CA57DC002E5DC2 /* insgps16state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insgps16state.c; path = ../../AHRS/insgps16state.c; sourceTree = SOURCE_ROOT; };
 		650D8E2112DFE16400D05CC9 /* actuator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actuator.c; sourceTree = "<group>"; };
 		650D8E2312DFE16400D05CC9 /* actuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = actuator.h; sourceTree = "<group>"; };
@@ -7383,6 +7384,7 @@
 				65C35E5E12EFB2F3004811C2 /* flightplansettings.xml */,
 				65C35E5F12EFB2F3004811C2 /* flightplanstatus.xml */,
 				65C35E6012EFB2F3004811C2 /* flighttelemetrystats.xml */,
+				65078B09136FCEE600536549 /* flightstatus.xml */,
 				65C35E6112EFB2F3004811C2 /* gcstelemetrystats.xml */,
 				65C35E6212EFB2F3004811C2 /* gpsposition.xml */,
 				65C35E6312EFB2F3004811C2 /* gpssatellites.xml */,

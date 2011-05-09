@@ -37,7 +37,7 @@
 #include "systemsettings.h"
 #include "actuatordesired.h"
 #include "actuatorcommand.h"
-#include "manualcontrolcommand.h"
+#include "flightstatus.h"
 #include "mixersettings.h"
 #include "mixerstatus.h"
 
@@ -135,7 +135,7 @@ static void actuatorTask(void* parameters)
 	MixerSettingsData mixerSettings;
 	ActuatorDesiredData desired;
 	MixerStatusData mixerStatus;
-	ManualControlCommandData manualControl;
+	FlightStatusData flightStatus;
 	
 	ActuatorSettingsGet(&settings);
 	PIOS_Servo_SetHz(&settings.ChannelUpdateFreq[0], ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM);
@@ -165,7 +165,7 @@ static void actuatorTask(void* parameters)
 		lastSysTime = thisSysTime;
 
 
-		ManualControlCommandGet(&manualControl);
+		FlightStatusGet(&flightStatus);
 		SystemSettingsGet(&sysSettings);
 		MixerStatusGet(&mixerStatus);
 		MixerSettingsGet (&mixerSettings);
@@ -190,10 +190,9 @@ static void actuatorTask(void* parameters)
 
 		AlarmsClear(SYSTEMALARMS_ALARM_ACTUATOR);
 
-		bool armed = manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE;
+		bool armed = flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED;
 		bool positiveThrottle = desired.Throttle >= 0.00;
-		bool spinWhileArmed = settings.MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE && 
-		                         manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE;
+		bool spinWhileArmed = settings.MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE;
 		
 		float curve1 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve1);
 		float curve2 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve2);

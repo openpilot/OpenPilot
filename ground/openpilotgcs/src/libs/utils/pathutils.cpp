@@ -96,12 +96,16 @@ QString PathUtils::InsertDataPath(QString path)
 QString PathUtils::GetStoragePath()
 {
     // This routine works with "/" as the standard:
-    // Figure out root:  Up one from 'bin'
-    const QString homeDirPath = QDir::home().canonicalPath();
+    // Work out where the settings are stored on the machine
+    QSettings set(QSettings::IniFormat, QSettings::UserScope,QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS"));
+    QFileInfo f(set.fileName());
+    QDir dir(f.absoluteDir());
+
+    const QString homeDirPath = dir.canonicalPath();
     QString storagePath = homeDirPath;
     storagePath += QLatin1Char('/');
-    storagePath += QLatin1String("OpenPilot");
-    storagePath += QLatin1Char('/');
+    // storagePath += QLatin1String("OpenPilot");
+    // storagePath += QLatin1Char('/');
    return storagePath;
 }
 
@@ -118,7 +122,6 @@ QString PathUtils::RemoveStoragePath(QString path)
         return QString("%%STOREPATH%%") + goodPath.right(i);
     } else
         return goodPath;
-
 }
 
 /**

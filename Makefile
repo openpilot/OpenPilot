@@ -62,8 +62,8 @@ endif
 .PHONY: help
 help:
 	@echo
-	@echo "   This Makefile is know to work on Linux and Mac in a standard shell environment."
-	@echo "   it also works on Windows by following the instructions in make/winx86/README.txt."
+	@echo "   This Makefile is known to work on Linux and Mac in a standard shell environment."
+	@echo "   It also works on Windows by following the instructions in make/winx86/README.txt."
 	@echo
 	@echo "   Here is a summary of the available targets:"
 	@echo

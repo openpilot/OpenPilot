@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>307</height>
+    <height>343</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -143,6 +143,18 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="zeroGyroBiasOnArming">
+     <property name="toolTip">
+      <string>If enabled, a fast recalibration of gyro zero point will be done
+whenever the frame is armed. Do not move the airframe while
+arming it in that case!</string>
+     </property>
+     <property name="text">
+      <string>Zero gyro bias upon airframe arming</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -240,6 +252,19 @@
       </layout>
      </widget>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">

@@ -46,6 +46,7 @@
 #include "homelocation.h"
 #include "attituderaw.h"
 #include "gcstelemetrystats.h"
+#include "flightstatus.h"
 
 #include "utils/coordinateconversions.h"
 
@@ -170,6 +171,7 @@ protected:
 
 	ActuatorDesired* actDesired;
         ManualControlCommand* manCtrlCommand;
+        FlightStatus* flightStatus;
         BaroAltitude* altActual;
 	AttitudeActual* attActual;
 	VelocityActual* velActual;

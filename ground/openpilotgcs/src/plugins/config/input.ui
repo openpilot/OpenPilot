@@ -919,9 +919,9 @@ Neutral should be put at the bottom of the slider for the throttle.</string>
       <widget class="QLabel" name="RCInputConnected">
        <property name="geometry">
         <rect>
-         <x>270</x>
+         <x>260</x>
          <y>0</y>
-         <width>251</width>
+         <width>291</width>
          <height>41</height>
         </rect>
        </property>
@@ -968,7 +968,7 @@ Neutral should be put at the bottom of the slider for the throttle.</string>
         </rect>
        </property>
        <property name="text">
-        <string>RC Receiver Type:</string>
+        <string>Receiver Type:</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1200,6 +1200,11 @@ p, li { white-space: pre-wrap; }
          <height>22</height>
         </rect>
        </property>
+       <property name="toolTip">
+        <string>Check this to reverse the channel.
+(Useful for transmitters without channel
+reversal capabilities).</string>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -1226,6 +1231,11 @@ p, li { white-space: pre-wrap; }
          <height>22</height>
         </rect>
        </property>
+       <property name="toolTip">
+        <string>Check this to reverse the channel.
+(Useful for transmitters without channel
+reversal capabilities).</string>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -1238,6 +1248,11 @@ p, li { white-space: pre-wrap; }
          <width>21</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="toolTip">
+        <string>Check this to reverse the channel.
+(Useful for transmitters without channel
+reversal capabilities).</string>
        </property>
        <property name="text">
         <string/>
@@ -1252,6 +1267,11 @@ p, li { white-space: pre-wrap; }
          <height>22</height>
         </rect>
        </property>
+       <property name="toolTip">
+        <string>Check this to reverse the channel.
+(Useful for transmitters without channel
+reversal capabilities).</string>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -1264,6 +1284,11 @@ p, li { white-space: pre-wrap; }
          <width>21</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="toolTip">
+        <string>Check this to reverse the channel.
+(Useful for transmitters without channel
+reversal capabilities).</string>
        </property>
        <property name="text">
         <string/>
@@ -1278,6 +1303,11 @@ p, li { white-space: pre-wrap; }
          <height>22</height>
         </rect>
        </property>
+       <property name="toolTip">
+        <string>Check this to reverse the channel.
+(Useful for transmitters without channel
+reversal capabilities).</string>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -1291,6 +1321,11 @@ p, li { white-space: pre-wrap; }
          <height>22</height>
         </rect>
        </property>
+       <property name="toolTip">
+        <string>Check this to reverse the channel.
+(Useful for transmitters without channel
+reversal capabilities).</string>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -1303,6 +1338,11 @@ p, li { white-space: pre-wrap; }
          <width>21</width>
          <height>22</height>
         </rect>
+       </property>
+       <property name="toolTip">
+        <string>Check this to reverse the channel.
+(Useful for transmitters without channel
+reversal capabilities).</string>
        </property>
        <property name="text">
         <string/>

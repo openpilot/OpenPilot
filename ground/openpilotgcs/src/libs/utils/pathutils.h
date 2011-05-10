@@ -33,6 +33,7 @@
 #include "../extensionsystem/pluginmanager.h"
 #include <QDir>
 #include <QApplication>
+#include <QSettings>
 
 namespace Utils {
 

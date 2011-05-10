@@ -6,10 +6,10 @@ SUBDIRS   = \
     qtconcurrent \
     aggregation \
     extensionsystem \
+    utils \
     opmapcontrol \
     qwt \
     qextserialport \
-    utils \
     glc_lib\
     sdlgamepad \
     libqxt

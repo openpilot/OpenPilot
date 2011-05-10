@@ -53,7 +53,6 @@ ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()
 
 void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
     QMutexLocker locker(&startStop);
-    UAVDataObject * attitudeRaw = dynamic_cast<UAVDataObject*>(obj);
 
     ui->zeroBiasProgress->setValue((float) updates / NUM_ACCEL_UPDATES * 100);
 
@@ -63,7 +62,9 @@ void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
         x_accum.append(field->getDouble(0));
         y_accum.append(field->getDouble(1));
         z_accum.append(field->getDouble(2));
-    } else {
+	qDebug("update %d: %f, %f, %f\n",updates,field->getDouble(0),field->getDouble(1),field->getDouble(2));
+    } else if ( updates == NUM_ACCEL_UPDATES ) {
+	updates++;
         timer.stop();
         disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(attitudeRawUpdated(UAVObject*)));
         disconnect(&timer,SIGNAL(timeout()),this,SLOT(timeout()));
@@ -79,15 +80,19 @@ void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
         field->setDouble(field->getDouble(0) + x_bias,0);
         field->setDouble(field->getDouble(1) + y_bias,1);
         field->setDouble(field->getDouble(2) + z_bias,2);
+	qDebug("New X bias: %f\n", field->getDouble(0)+x_bias);
+	qDebug("New Y bias: %f\n", field->getDouble(1)+y_bias);
+	qDebug("New Z bias: %f\n", field->getDouble(2)+z_bias);
         settings->updated();
         ui->status->setText("Calibration done.");
-
+    } else {
+	// Possible to get here if weird threading stuff happens.  Just ignore updates.
+	qDebug("Unexpected accel update received.");
     }
 }
 
 void ConfigCCAttitudeWidget::timeout() {
     QMutexLocker locker(&startStop);
-    UAVObjectManager * objMngr = getObjectManager();
     UAVDataObject * obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));
     disconnect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(attitudeRawUpdated(UAVObject*)));
     disconnect(&timer,SIGNAL(timeout()),this,SLOT(timeout()));
@@ -108,6 +113,11 @@ void ConfigCCAttitudeWidget::applyAttitudeSettings() {
     field->setValue(ui->pitchBias->value(),1);
     field->setValue(ui->yawBias->value(),2);
 
+    field = settings->getField("ZeroDuringArming");
+    // Handling of boolean values is done through enums on
+    // uavobjects...
+    field->setValue((ui->zeroGyroBiasOnArming->isChecked()) ? "TRUE": "FALSE");
+
     settings->updated();
 }
 
@@ -118,6 +128,12 @@ void ConfigCCAttitudeWidget::getCurrentAttitudeSettings() {
     ui->rollBias->setValue(field->getDouble(0));
     ui->pitchBias->setValue(field->getDouble(1));
     ui->yawBias->setValue(field->getDouble(2));
+    field = settings->getField("ZeroDuringArming");
+    // Handling of boolean values is done through enums on
+    // uavobjects...
+    bool enabled = (field->getValue().toString() == "FALSE") ? false : true;
+    ui->zeroGyroBiasOnArming->setChecked(enabled);
+
 }
 
 void ConfigCCAttitudeWidget::startAccelCalibration() {
@@ -135,7 +151,7 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
     connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(attitudeRawUpdated(UAVObject*)));
 
     // Set up timeout timer
-    timer.start(2000);
+    timer.start(10000);
     connect(&timer,SIGNAL(timeout()),this,SLOT(timeout()));
 
     // Speed up updates

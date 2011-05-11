@@ -29,10 +29,12 @@
 #include <cmath>
 #include <qwaitcondition.h>
 #include <QMetaType>
+#include <QApplication>
 
 using namespace OP_DFU;
 
-DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname): debug(_debug),use_serial(_use_serial),mready(true)
+DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname):
+    debug(_debug),use_serial(_use_serial),mready(true)
 {
     info = NULL;
 
@@ -88,6 +90,10 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname): debug(_debu
             if (debug)
                 qDebug() << ".";
             delay::msleep(500);
+            // processEvents enables XP to process the system
+            // plug/unplug events, otherwise it will not process
+            // those events before the end of the call!
+            QApplication::processEvents();
             devices = USBMonitor::instance()->availableDevices(0x20a0,-1,-1,USBMonitor::Bootloader);
             count++;
         }
@@ -95,6 +101,7 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname): debug(_debu
            hidHandle.open(1,devices.first().vendorID,devices.first().productID,0,0);
         } else {
            qDebug() << "More than one device, don't know what to do!";
+           mready = false;
        }
 
     }

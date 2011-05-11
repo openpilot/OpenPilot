@@ -143,18 +143,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="zeroGyroBiasOnArming">
-     <property name="toolTip">
-      <string>If enabled, a fast recalibration of gyro zero point will be done
-whenever the frame is armed. Do not move the airframe while
-arming it in that case!</string>
-     </property>
-     <property name="text">
-      <string>Zero gyro bias upon airframe arming</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -251,6 +239,18 @@ arming it in that case!</string>
        </item>
       </layout>
      </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="zeroGyroBiasOnArming">
+     <property name="toolTip">
+      <string>If enabled, a fast recalibration of gyro zero point will be done
+whenever the frame is armed. Do not move the airframe while
+arming it in that case!</string>
+     </property>
+     <property name="text">
+      <string>Zero gyro bias upon airframe arming</string>
+     </property>
     </widget>
    </item>
    <item>

@@ -13,3 +13,4 @@ objs/
 tmp/
 *.tmp
 stats/
+Makefile

@@ -1,0 +1,12 @@
+<xml>
+    <object name="AccessoryDesired" singleinstance="true" settings="false">
+        <description>Desired Auxillary actuator settings.  Comes from @ref ManualControlModule.</description>
+        <field name="Accessory1" units="%" type="float" elements="1"/>
+        <field name="Accessory2" units="%" type="float" elements="1" />
+        <field name="Accessory3" units="%" type="float" elements="1" />
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+        <logging updatemode="never" period="0"/>
+    </object>
+</xml>

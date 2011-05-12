@@ -265,10 +265,27 @@ void ConfigOutputWidget::runChannelTests(bool state)
         mdata.gcsTelemetryAcked = false;
         mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
         mdata.gcsTelemetryUpdatePeriod = 100;
+
+        // Prevent stupid users from touching the minimum & maximum ranges while
+        // moving the sliders. Thanks Ivan for the tip :)
+        foreach (QSpinBox* box, outMin) {
+            box->setEnabled(false);
+        }
+        foreach (QSpinBox* box, outMax) {
+            box->setEnabled(false);
+        }
+
     }
     else
     {
         mdata = accInitialData; // Restore metadata
+        foreach (QSpinBox* box, outMin) {
+            box->setEnabled(true);
+        }
+        foreach (QSpinBox* box, outMax) {
+            box->setEnabled(true);
+        }
+
     }
     obj->setMetadata(mdata);
 

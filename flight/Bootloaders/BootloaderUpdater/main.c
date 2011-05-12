@@ -39,9 +39,9 @@ void error(int);
  * data.  This is non-intuitive for _binary_size where you
  * might expect its value to hold the size but you'd be wrong.
  */
-extern void _binary_start;
-extern void _binary_end;
-extern void _binary_size;
+extern uint32_t _binary_start;
+extern uint32_t _binary_end;
+extern uint32_t _binary_size;
 const uint32_t * embedded_image_start = (uint32_t *) &(_binary_start);
 const uint32_t * embedded_image_end   = (uint32_t *) &(_binary_end);
 const uint32_t   embedded_image_size  = (uint32_t)   &(_binary_size);

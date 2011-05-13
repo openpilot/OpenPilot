@@ -9,6 +9,7 @@
 /* Begin PBXFileReference section */
 		65003B31121249CA00C183DD /* pios_wdg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_wdg.c; sourceTree = "<group>"; };
 		6502584212CA4D2600583CDF /* insgps13state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insgps13state.c; path = ../../AHRS/insgps13state.c; sourceTree = SOURCE_ROOT; };
+		65078B09136FCEE600536549 /* flightstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = flightstatus.xml; sourceTree = "<group>"; };
 		6509C7E912CA57DC002E5DC2 /* insgps16state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insgps16state.c; path = ../../AHRS/insgps16state.c; sourceTree = SOURCE_ROOT; };
 		650D8E2112DFE16400D05CC9 /* actuator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = actuator.c; sourceTree = "<group>"; };
 		650D8E2312DFE16400D05CC9 /* actuator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = actuator.h; sourceTree = "<group>"; };
@@ -3124,6 +3125,52 @@
 		65FBE14412E7C98100176B5A /* pios_servo_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_servo_priv.h; sourceTree = "<group>"; };
 		65FC66AA123F30F100B04F74 /* ahrs_timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ahrs_timer.c; path = ../../AHRS/ahrs_timer.c; sourceTree = SOURCE_ROOT; };
 		65FC66AB123F312A00B04F74 /* ahrs_timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_timer.h; sourceTree = "<group>"; };
+		65FF4BB513791C3300146BE4 /* ahrs_slave_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_slave_test.c; sourceTree = "<group>"; };
+		65FF4BB613791C3300146BE4 /* ahrs_spi_program.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_spi_program.c; sourceTree = "<group>"; };
+		65FF4BB713791C3300146BE4 /* ahrs_spi_program_master.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_spi_program_master.c; sourceTree = "<group>"; };
+		65FF4BB813791C3300146BE4 /* ahrs_spi_program_slave.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_spi_program_slave.c; sourceTree = "<group>"; };
+		65FF4BB913791C3300146BE4 /* bl_fsm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bl_fsm.c; sourceTree = "<group>"; };
+		65FF4BBB13791C3300146BE4 /* ahrs_bl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_bl.h; sourceTree = "<group>"; };
+		65FF4BBC13791C3300146BE4 /* ahrs_spi_program.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program.h; sourceTree = "<group>"; };
+		65FF4BBD13791C3300146BE4 /* ahrs_spi_program_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program_master.h; sourceTree = "<group>"; };
+		65FF4BBE13791C3300146BE4 /* ahrs_spi_program_slave.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program_slave.h; sourceTree = "<group>"; };
+		65FF4BBF13791C3300146BE4 /* bl_fsm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bl_fsm.h; sourceTree = "<group>"; };
+		65FF4BC013791C3300146BE4 /* pios_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_config.h; sourceTree = "<group>"; };
+		65FF4BC113791C3300146BE4 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		65FF4BC213791C3300146BE4 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		65FF4BC313791C3300146BE4 /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_board.c; sourceTree = "<group>"; };
+		65FF4BC613791C3300146BE4 /* pios_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_config.h; sourceTree = "<group>"; };
+		65FF4BC713791C3300146BE4 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		65FF4BC813791C3300146BE4 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		65FF4BC913791C3300146BE4 /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_board.c; sourceTree = "<group>"; };
+		65FF4BCA13791C3300146BE4 /* test.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = test.bin; sourceTree = "<group>"; };
+		65FF4BCD13791C3300146BE4 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		65FF4BCE13791C3300146BE4 /* op_dfu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = op_dfu.h; sourceTree = "<group>"; };
+		65FF4BCF13791C3300146BE4 /* pios_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_config.h; sourceTree = "<group>"; };
+		65FF4BD013791C3300146BE4 /* pios_usb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usb.h; sourceTree = "<group>"; };
+		65FF4BD113791C3300146BE4 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		65FF4BD213791C3300146BE4 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		65FF4BD313791C3300146BE4 /* op_dfu.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = op_dfu.c; sourceTree = "<group>"; };
+		65FF4BD413791C3300146BE4 /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_board.c; sourceTree = "<group>"; };
+		65FF4BD713791C3300146BE4 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		65FF4BD813791C3300146BE4 /* op_dfu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = op_dfu.h; sourceTree = "<group>"; };
+		65FF4BD913791C3300146BE4 /* pios_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_config.h; sourceTree = "<group>"; };
+		65FF4BDA13791C3300146BE4 /* pios_usb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usb.h; sourceTree = "<group>"; };
+		65FF4BDB13791C3300146BE4 /* ssp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ssp.h; sourceTree = "<group>"; };
+		65FF4BDC13791C3300146BE4 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		65FF4BDD13791C3300146BE4 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		65FF4BDE13791C3300146BE4 /* op_dfu.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = op_dfu.c; sourceTree = "<group>"; };
+		65FF4BDF13791C3300146BE4 /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_board.c; sourceTree = "<group>"; };
+		65FF4BE013791C3300146BE4 /* ssp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ssp.c; sourceTree = "<group>"; };
+		65FF4BE113791C3300146BE4 /* ssp_timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ssp_timer.c; sourceTree = "<group>"; };
+		65FF4BE413791C3300146BE4 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		65FF4BE513791C3300146BE4 /* op_dfu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = op_dfu.h; sourceTree = "<group>"; };
+		65FF4BE613791C3300146BE4 /* pios_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_config.h; sourceTree = "<group>"; };
+		65FF4BE713791C3300146BE4 /* pios_usb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_usb.h; sourceTree = "<group>"; };
+		65FF4BE813791C3300146BE4 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		65FF4BE913791C3300146BE4 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		65FF4BEA13791C3300146BE4 /* op_dfu.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = op_dfu.c; sourceTree = "<group>"; };
+		65FF4BEB13791C3300146BE4 /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_board.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -3504,6 +3551,7 @@
 		657CEEB5121DBC49007A1FBE /* flight */ = {
 			isa = PBXGroup;
 			children = (
+				65FF4BB313791C3300146BE4 /* Bootloaders */,
 				65F93B9012EE09280047DB36 /* PipXtreme */,
 				65B7E6AC120DF1CD000C1123 /* AHRS */,
 				65E6DF7012E02E8E00058553 /* CopterControl */,
@@ -7383,6 +7431,7 @@
 				65C35E5E12EFB2F3004811C2 /* flightplansettings.xml */,
 				65C35E5F12EFB2F3004811C2 /* flightplanstatus.xml */,
 				65C35E6012EFB2F3004811C2 /* flighttelemetrystats.xml */,
+				65078B09136FCEE600536549 /* flightstatus.xml */,
 				65C35E6112EFB2F3004811C2 /* gcstelemetrystats.xml */,
 				65C35E6212EFB2F3004811C2 /* gpsposition.xml */,
 				65C35E6312EFB2F3004811C2 /* gpssatellites.xml */,
@@ -8232,6 +8281,140 @@
 				65F93CFB12EE09290047DB36 /* uavtalk_comms.h */,
 				65F93CFC12EE09290047DB36 /* usb_conf.h */,
 				65F93CFD12EE09290047DB36 /* watchdog.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		65FF4BB313791C3300146BE4 /* Bootloaders */ = {
+			isa = PBXGroup;
+			children = (
+				65FF4BB413791C3300146BE4 /* AHRS */,
+				65FF4BC413791C3300146BE4 /* BootloaderUpdater */,
+				65FF4BCB13791C3300146BE4 /* CopterControl */,
+				65FF4BD513791C3300146BE4 /* OpenPilot */,
+				65FF4BE213791C3300146BE4 /* PipXtreme */,
+			);
+			name = Bootloaders;
+			path = ../../Bootloaders;
+			sourceTree = SOURCE_ROOT;
+		};
+		65FF4BB413791C3300146BE4 /* AHRS */ = {
+			isa = PBXGroup;
+			children = (
+				65FF4BB513791C3300146BE4 /* ahrs_slave_test.c */,
+				65FF4BB613791C3300146BE4 /* ahrs_spi_program.c */,
+				65FF4BB713791C3300146BE4 /* ahrs_spi_program_master.c */,
+				65FF4BB813791C3300146BE4 /* ahrs_spi_program_slave.c */,
+				65FF4BB913791C3300146BE4 /* bl_fsm.c */,
+				65FF4BBA13791C3300146BE4 /* inc */,
+				65FF4BC113791C3300146BE4 /* main.c */,
+				65FF4BC213791C3300146BE4 /* Makefile */,
+				65FF4BC313791C3300146BE4 /* pios_board.c */,
+			);
+			path = AHRS;
+			sourceTree = "<group>";
+		};
+		65FF4BBA13791C3300146BE4 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65FF4BBB13791C3300146BE4 /* ahrs_bl.h */,
+				65FF4BBC13791C3300146BE4 /* ahrs_spi_program.h */,
+				65FF4BBD13791C3300146BE4 /* ahrs_spi_program_master.h */,
+				65FF4BBE13791C3300146BE4 /* ahrs_spi_program_slave.h */,
+				65FF4BBF13791C3300146BE4 /* bl_fsm.h */,
+				65FF4BC013791C3300146BE4 /* pios_config.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		65FF4BC413791C3300146BE4 /* BootloaderUpdater */ = {
+			isa = PBXGroup;
+			children = (
+				65FF4BC513791C3300146BE4 /* inc */,
+				65FF4BC713791C3300146BE4 /* main.c */,
+				65FF4BC813791C3300146BE4 /* Makefile */,
+				65FF4BC913791C3300146BE4 /* pios_board.c */,
+				65FF4BCA13791C3300146BE4 /* test.bin */,
+			);
+			path = BootloaderUpdater;
+			sourceTree = "<group>";
+		};
+		65FF4BC513791C3300146BE4 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65FF4BC613791C3300146BE4 /* pios_config.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		65FF4BCB13791C3300146BE4 /* CopterControl */ = {
+			isa = PBXGroup;
+			children = (
+				65FF4BCC13791C3300146BE4 /* inc */,
+				65FF4BD113791C3300146BE4 /* main.c */,
+				65FF4BD213791C3300146BE4 /* Makefile */,
+				65FF4BD313791C3300146BE4 /* op_dfu.c */,
+				65FF4BD413791C3300146BE4 /* pios_board.c */,
+			);
+			path = CopterControl;
+			sourceTree = "<group>";
+		};
+		65FF4BCC13791C3300146BE4 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65FF4BCD13791C3300146BE4 /* common.h */,
+				65FF4BCE13791C3300146BE4 /* op_dfu.h */,
+				65FF4BCF13791C3300146BE4 /* pios_config.h */,
+				65FF4BD013791C3300146BE4 /* pios_usb.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		65FF4BD513791C3300146BE4 /* OpenPilot */ = {
+			isa = PBXGroup;
+			children = (
+				65FF4BD613791C3300146BE4 /* inc */,
+				65FF4BDC13791C3300146BE4 /* main.c */,
+				65FF4BDD13791C3300146BE4 /* Makefile */,
+				65FF4BDE13791C3300146BE4 /* op_dfu.c */,
+				65FF4BDF13791C3300146BE4 /* pios_board.c */,
+				65FF4BE013791C3300146BE4 /* ssp.c */,
+				65FF4BE113791C3300146BE4 /* ssp_timer.c */,
+			);
+			path = OpenPilot;
+			sourceTree = "<group>";
+		};
+		65FF4BD613791C3300146BE4 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65FF4BD713791C3300146BE4 /* common.h */,
+				65FF4BD813791C3300146BE4 /* op_dfu.h */,
+				65FF4BD913791C3300146BE4 /* pios_config.h */,
+				65FF4BDA13791C3300146BE4 /* pios_usb.h */,
+				65FF4BDB13791C3300146BE4 /* ssp.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		65FF4BE213791C3300146BE4 /* PipXtreme */ = {
+			isa = PBXGroup;
+			children = (
+				65FF4BE313791C3300146BE4 /* inc */,
+				65FF4BE813791C3300146BE4 /* main.c */,
+				65FF4BE913791C3300146BE4 /* Makefile */,
+				65FF4BEA13791C3300146BE4 /* op_dfu.c */,
+				65FF4BEB13791C3300146BE4 /* pios_board.c */,
+			);
+			path = PipXtreme;
+			sourceTree = "<group>";
+		};
+		65FF4BE313791C3300146BE4 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65FF4BE413791C3300146BE4 /* common.h */,
+				65FF4BE513791C3300146BE4 /* op_dfu.h */,
+				65FF4BE613791C3300146BE4 /* pios_config.h */,
+				65FF4BE713791C3300146BE4 /* pios_usb.h */,
 			);
 			path = inc;
 			sourceTree = "<group>";

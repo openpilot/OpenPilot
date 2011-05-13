@@ -33,8 +33,11 @@
 #include "op_dfu.h"
 #include <QWidget>
 #include <QFileDialog>
+#include <QErrorMessage>
+#include <QByteArray>
 #include <QtSvg/QGraphicsSvgItem>
 #include <QtSvg/QSvgRenderer>
+#include <QCryptographicHash>
 
 using namespace OP_DFU;
 
@@ -49,7 +52,7 @@ public:
     void freeze();
     typedef enum { STATUSICON_OK, STATUSICON_RUNNING, STATUSICON_FAIL, STATUSICON_INFO} StatusIcon;
     QString setOpenFileName();
-
+    QString setSaveFileName();
 private:
     Ui_deviceWidget *myDevice;
     int deviceID;
@@ -57,7 +60,9 @@ private:
     QByteArray downloadedFirmware;
     QString filename;
     QGraphicsSvgItem *devicePic;
+    QByteArray descriptionArray;
     void status(QString str, StatusIcon ic);
+    bool populateStructuredDescription(QByteArray arr);
 
 
 signals:

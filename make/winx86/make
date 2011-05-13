@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# This file is to be put into C:\Program Files\Git\bin\ subdirectory
+# (or similar, depeding on where the msysGit package was installed)
+# to provide a make command to unix-like build environment on Windows.
+#
+# See also:
+#   README.txt
+#   http://wiki.openpilot.org/display/Doc/GCS+Development+on+Windows
+#   http://wiki.openpilot.org/display/Doc/Firmware+Development+on+Windows
+#
+
+mingw32-make.exe $*

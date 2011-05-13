@@ -32,6 +32,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
+#include "uavobjectutilmanager.h"
 #include <QtGui/QWidget>
 #include <QList>
 
@@ -85,6 +86,7 @@ private slots:
 	void setChOutRange();
 	void reverseChannel(bool state);
 	void linkToggled(bool state);
+        void setSpinningArmed(bool val);
 };
 
 #endif

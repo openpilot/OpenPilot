@@ -59,19 +59,20 @@ public:
     void resetStats();
 
 signals:
-    void transactionCompleted(UAVObject* obj);
+    void transactionCompleted(UAVObject* obj, bool success);
 
 private slots:
     void processInputStream(void);
 
 private:
     // Constants
-    static const int TYPE_MASK = 0xFC;
+    static const int TYPE_MASK = 0xF8;
     static const int TYPE_VER = 0x20;
     static const int TYPE_OBJ = (TYPE_VER | 0x00);
     static const int TYPE_OBJ_REQ = (TYPE_VER | 0x01);
     static const int TYPE_OBJ_ACK = (TYPE_VER | 0x02);
     static const int TYPE_ACK = (TYPE_VER | 0x03);
+    static const int TYPE_NACK = (TYPE_VER | 0x04);
 
     static const int MIN_HEADER_LENGTH = 8; // sync(1), type (1), size(2), object ID(4)
     static const int MAX_HEADER_LENGTH = 10; // sync(1), type (1), size(2), object ID (4), instance ID(2, not used in single objects)
@@ -83,6 +84,8 @@ private:
     static const int MAX_PACKET_LENGTH = (MAX_HEADER_LENGTH + MAX_PAYLOAD_LENGTH + CHECKSUM_LENGTH);
 
     static const quint16 ALL_INSTANCES = 0xFFFF;
+    static const quint16 OBJID_NOTFOUND = 0x0000;
+
     static const int TX_BUFFER_SIZE = 2*1024;
     static const quint8 crc_table[256];
 
@@ -117,6 +120,8 @@ private:
     bool receiveObject(quint8 type, quint32 objId, quint16 instId, quint8* data, qint32 length);
     UAVObject* updateObject(quint32 objId, quint16 instId, quint8* data);
     void updateAck(UAVObject* obj);
+    void updateNack(UAVObject* obj);
+    bool transmitNack(quint32 objId);
     bool transmitObject(UAVObject* obj, quint8 type, bool allInstances);
     bool transmitSingleObject(UAVObject* obj, quint8 type, bool allInstances);
     quint8 updateCRC(quint8 crc, const quint8 data);

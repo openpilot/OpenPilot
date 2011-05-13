@@ -11,6 +11,8 @@
 #include "STM32103CB_CC_Rev1.h"
 #elif USE_STM3210E_INS
 #include "STM3210E_INS.h"
+#else
+#error Board definition has not been provided.
 #endif
 
 #endif /* PIOS_BOARD_H_ */

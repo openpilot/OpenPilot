@@ -36,10 +36,6 @@ ENABLE_DEBUG_PINS ?= NO
 # Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs  
 ENABLE_AUX_UART ?= NO
 
-#
-OVERRIDE USE_BOOTLOADER = NO
-
-
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= NO
 
@@ -60,12 +56,6 @@ MCU      = cortex-m3
 CHIP     = STM32F103CBT
 BOARD    = STM32103CB_CC_Rev1
 MODEL	 = MD
-ifeq ($(USE_BOOTLOADER), YES)
-BOOT_MODEL    = $(MODEL)_BL
-
-else
-BOOT_MODEL    = $(MODEL)_NB
-endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
 OUTDIR = $(TOP)/build/bl_coptercontrol
@@ -112,7 +102,7 @@ DOXYGENDIR = ../Doc/Doxygen
 SRC += $(OPSYSTEM)/main.c
 SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(OPSYSTEM)/op_dfu.c
-SRC += $(OPSYSTEM)/stopwatch.c
+SRC += $(FLIGHTLIB)/stopwatch.c
 
 
 ## PIOS Hardware (STM32F10x)
@@ -121,35 +111,21 @@ SRC += $(PIOSSTM32F10X)/pios_led.c
 SRC += $(PIOSSTM32F10X)/pios_delay.c
 SRC += $(PIOSSTM32F10X)/pios_usart.c
 SRC += $(PIOSSTM32F10X)/pios_irq.c
-#SRC += $(PIOSSTM32F10X)/pios_adc.c
-#SRC += $(PIOSSTM32F10X)/pios_servo.c
-#SRC += $(PIOSSTM32F10X)/pios_i2c.c
-#SRC += $(PIOSSTM32F10X)/pios_spi.c
-#SRC += $(PIOSSTM32F10X)/pios_ppm.c
-#SRC += $(PIOSSTM32F10X)/pios_pwm.c
-#SRC += $(PIOSSTM32F10X)/pios_spektrum.c
 SRC += $(PIOSSTM32F10X)/pios_debug.c
 SRC += $(PIOSSTM32F10X)/pios_gpio.c
-#SRC += $(PIOSSTM32F10X)/pios_exti.c
-#SRC += $(PIOSSTM32F10X)/pios_wdg.c
 
 
 # PIOS USB related files (seperated to make code maintenance more easy)
 SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_desc.c
-#SRC += $(PIOSSTM32F10X)/pios_usb_hid_endp.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_prop.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
 
 ## PIOS Hardware (Common)
-#SRC += $(PIOSCOMMON)/pios_sdcard.c
 SRC += $(PIOSCOMMON)/pios_com.c
-#SRC += $(PIOSCOMMON)/pios_bmp085.c
-#SRC += $(PIOSCOMMON)/pios_opahrs_v0.c
 SRC += $(PIOSCOMMON)/pios_bl_helper.c
 SRC += $(PIOSCOMMON)/pios_iap.c
-#SRC += $(PIOSCOMMON)/pios_opahrs_proto.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 
 ## Libraries for flight calculations
@@ -160,22 +136,18 @@ SRC += $(CMSISDIR)/core_cm3.c
 SRC += $(CMSISDIR)/system_stm32f10x.c
 
 ## Used parts of the STM-Library
-#SRC += $(STMSPDSRCDIR)/stm32f10x_adc.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_bkp.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_crc.c
-#SRC += $(STMSPDSRCDIR)/stm32f10x_dac.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_dma.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_exti.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_flash.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_gpio.c
-#SRC += $(STMSPDSRCDIR)/stm32f10x_i2c.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_pwr.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_rcc.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_rtc.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_spi.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_tim.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_usart.c
-#SRC += $(STMSPDSRCDIR)/stm32f10x_iwdg.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_dbgmcu.c
 SRC += $(STMSPDSRCDIR)/misc.c
 
@@ -286,10 +258,6 @@ endif
 ifeq ($(ENABLE_AUX_UART), YES)
 CDEFS += -DPIOS_ENABLE_AUX_UART
 endif
-ifeq ($(USE_BOOTLOADER), YES)
-CDEFS += -DUSE_BOOTLOADER
-endif
-
 
 # Place project-specific -D and/or -U options for 
 # Assembler with preprocessor here.
@@ -317,9 +285,10 @@ CSTANDARD = -std=gnu99
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
 
 ifeq ($(DEBUG),YES)
-CFLAGS = -g$(DEBUGF) -DDEBUG
+CFLAGS += -DDEBUG
 endif
 
+CFLAGS += -g$(DEBUGF)
 CFLAGS += -O$(OPT)
 ifeq ($(DEBUG),NO)
 CFLAGS += -ffunction-sections
@@ -359,7 +328,7 @@ MATH_LIB = -lm
 #    --cref:    add cross reference to  map file
 LDFLAGS = -nostartfiles -Wl,-Map=$(OUTDIR)/$(TARGET).map,--cref,--gc-sections
 ifeq ($(DEBUG),NO)
-LDFLAGS += -Wl,-static -Wl,-s
+LDFLAGS += -Wl,-static
 endif
 LDFLAGS += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
 LDFLAGS += -lc
@@ -368,13 +337,14 @@ LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc 
 
 # Set linker-script name depending on selected submodel name
-LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_stm32f10x_$(MODEL).ld
+LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_memory.ld
+LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_BL_sections.ld
 
-OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).elf  
-# Program                                                                                                                                                                                                                            
-OOCD_CL+=-c "flash write_image $(OOCD_LOADFILE)"
+OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).bin
+# Program
+OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) 0x08000000 bin"
 # Verify
-OOCD_CL+=-c "verify_image $(OOCD_LOADFILE)"
+OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) 0x08000000 bin"
 # reset target
 OOCD_CL+=-c "reset run"
 # terminate OOCD after programming
@@ -426,7 +396,7 @@ ${OUTDIR}/InitMods.c: Makefile
 # Program the device.
 ifeq ($(FLASH_TOOL),OPENOCD)
 # Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
-program: $(OUTDIR)/$(TARGET).elf
+program: $(OUTDIR)/$(TARGET).bin
 	@echo ${quote}Programming with OPENOCD${quote}
 	$(OOCD_EXE) $(OOCD_CL)
 endif
@@ -462,12 +432,15 @@ $(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
 docs:
 	doxygen  $(DOXYGENDIR)/doxygen.cfg
 
-.PHONY: elf lss sym hex bin
+$(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
+
+.PHONY: elf lss sym hex bin bino
 elf: $(OUTDIR)/$(TARGET).elf
 lss: $(OUTDIR)/$(TARGET).lss 
 sym: $(OUTDIR)/$(TARGET).sym
 hex: $(OUTDIR)/$(TARGET).hex
 bin: $(OUTDIR)/$(TARGET).bin
+bino: $(OUTDIR)/$(TARGET).bin.o
 
 # Display sizes of sections.
 $(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))
@@ -485,6 +458,7 @@ clean_list :
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).sym
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).lss
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin.o
 	$(V1) $(REMOVE) $(ALLOBJ)
 	$(V1) $(REMOVE) $(LSTFILES)
 	$(V1) $(REMOVE) $(DEPFILES)

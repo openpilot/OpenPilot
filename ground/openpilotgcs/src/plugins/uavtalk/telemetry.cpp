@@ -50,7 +50,7 @@ Telemetry::Telemetry(UAVTalk* utalk, UAVObjectManager* objMngr)
     connect(objMngr, SIGNAL(newObject(UAVObject*)), this, SLOT(newObject(UAVObject*)));
     connect(objMngr, SIGNAL(newInstance(UAVObject*)), this, SLOT(newInstance(UAVObject*)));
     // Listen to transaction completions
-    connect(utalk, SIGNAL(transactionCompleted(UAVObject*)), this, SLOT(transactionCompleted(UAVObject*)));
+    connect(utalk, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(transactionCompleted(UAVObject*,bool)));
     // Get GCS stats object
     gcsStatsObj = GCSTelemetryStats::GetInstance(objMngr);
     // Setup transaction timer
@@ -207,7 +207,7 @@ void Telemetry::updateObject(UAVObject* obj)
 /**
  * Called when a transaction is successfully completed (uavtalk event)
  */
-void Telemetry::transactionCompleted(UAVObject* obj)
+void Telemetry::transactionCompleted(UAVObject* obj, bool success)
 {
     // Check if there is a pending transaction and the objects match
     if ( transPending && transInfo.obj->getObjID() == obj->getObjID() )
@@ -217,7 +217,7 @@ void Telemetry::transactionCompleted(UAVObject* obj)
         transTimer->stop();
         transPending = false;
         // Send signal
-        obj->emitTransactionCompleted(true);
+        obj->emitTransactionCompleted(success);
         // Process new object updates from queue
         processObjectQueue();
     } else

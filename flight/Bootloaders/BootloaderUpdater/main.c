@@ -27,12 +27,24 @@
  */
 /* Bootloader Includes */
 #include <pios.h>
-#include <bl_array.h>
+#include <stdbool.h>
+
 #define MAX_WRI_RETRYS 3
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
 extern void FLASH_Download();
 void error(int);
+
+/* The ADDRESSES of the _binary_* symbols are the important
+ * data.  This is non-intuitive for _binary_size where you
+ * might expect its value to hold the size but you'd be wrong.
+ */
+extern uint32_t _binary_start;
+extern uint32_t _binary_end;
+extern uint32_t _binary_size;
+const uint32_t * embedded_image_start = (uint32_t *) &(_binary_start);
+const uint32_t * embedded_image_end   = (uint32_t *) &(_binary_end);
+const uint32_t   embedded_image_size  = (uint32_t)   &(_binary_size);
 
 int main() {
 
@@ -43,63 +55,70 @@ int main() {
 	PIOS_LED_Off(LED1);
 
 	/// Self overwrite check
-	uint32_t base_adress = SCB->VTOR;
-	if (0x08000000 + (sizeof(dataArray)) > base_adress)
+	uint32_t base_address = SCB->VTOR;
+	if ((0x08000000 + embedded_image_size) > base_address)
 		error(LED1);
 	///
 	FLASH_Unlock();
 
 	/// Bootloader memory space erase
-	uint32_t pageAdress;
-	pageAdress = 0x08000000;
-	uint8_t fail = FALSE;
-	while ((pageAdress < base_adress) || (fail == TRUE)) {
+	uint32_t pageAddress;
+	pageAddress = 0x08000000;
+	bool fail = false;
+	while ((pageAddress < base_address) && (fail == false)) {
 		for (int retry = 0; retry < MAX_DEL_RETRYS; ++retry) {
-			if (FLASH_ErasePage(pageAdress) == FLASH_COMPLETE) {
-				fail = FALSE;
+			if (FLASH_ErasePage(pageAddress) == FLASH_COMPLETE) {
+				fail = false;
 				break;
 			} else {
-				fail = TRUE;
+				fail = true;
 			}
 		}
 #ifdef STM32F10X_HD
-		pageAdress += 2048;
+		pageAddress += 2048;
 #elif defined (STM32F10X_MD)
-		pageAdress += 1024;
+		pageAddress += 1024;
 #endif
 	}
 
-	if (fail == TRUE)
+	if (fail == true)
 		error(LED1);
 
 
 	///
 
 	/// Bootloader programing
-	for (int x = 0; x < sizeof(dataArray)/sizeof(uint32_t); ++x) {
-		int result = 0;
+	for (uint32_t offset = 0; offset < embedded_image_size/sizeof(uint32_t); ++offset) {
+		bool result = false;
 		PIOS_LED_Toggle(LED1);
-		for (int retry = 0; retry < MAX_WRI_RETRYS; ++retry) {
-			if (result == 0) {
-				result = (FLASH_ProgramWord(0x08000000 + (x * 4), dataArray[x])
-						== FLASH_COMPLETE) ? 1 : 0;
+		for (uint8_t retry = 0; retry < MAX_WRI_RETRYS; ++retry) {
+			if (result == false) {
+				result = (FLASH_ProgramWord(0x08000000 + (offset * 4), embedded_image_start[offset])
+						== FLASH_COMPLETE) ? true : false;
 			}
 		}
-		if (result == 0)
+		if (result == false)
 			error(LED1);
 	}
 	///
-	for (int x=0;x<3;++x) {
+	for (uint8_t x = 0; x < 3; ++x) {
 			PIOS_LED_On(LED1);
 			PIOS_DELAY_WaitmS(1000);
 			PIOS_LED_Off(LED1);
 			PIOS_DELAY_WaitmS(1000);
-		}
+	}
+
+	/// Invalidate the bootloader updater so we won't run
+	/// the update again on the next power cycle.
+	FLASH_ProgramWord(base_address, 0);
+	FLASH_Lock();
+
 	for (;;) {
 		PIOS_DELAY_WaitmS(1000);
 	}
 
 }
+
 void error(int led) {
 	for (;;) {
 		PIOS_LED_On(led);

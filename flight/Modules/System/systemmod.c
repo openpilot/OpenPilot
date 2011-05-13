@@ -41,7 +41,7 @@
 #include "openpilot.h"
 #include "systemmod.h"
 #include "objectpersistence.h"
-#include "manualcontrolcommand.h"
+#include "flightstatus.h"
 #include "systemstats.h"
 #include "i2cstats.h"
 #include "watchdogstatus.h"
@@ -51,11 +51,16 @@
 
 // Private constants
 #define SYSTEM_UPDATE_PERIOD_MS 1000
+#define LED_BLINK_RATE_HZ 5
+
+#ifndef IDLE_COUNTS_PER_SEC_AT_NO_LOAD
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998	// calibrated by running tests/test_cpuload.c
 											  // must be updated if the FreeRTOS or compiler
 											  // optimisation options are changed.
-#if defined(PIOS_MANUAL_STACK_SIZE)
-#define STACK_SIZE_BYTES PIOS_MANUAL_STACK_SIZE
+#endif
+
+#if defined(PIOS_SYSTEM_STACK_SIZE)
+#define STACK_SIZE_BYTES PIOS_SYSTEM_STACK_SIZE
 #else
 #define STACK_SIZE_BYTES 924
 #endif
@@ -137,12 +142,12 @@ static void systemTask(void *parameters)
 		}
 #endif
 
-		ManualControlCommandData manualControlCommandData;
-		ManualControlCommandGet(&manualControlCommandData);
+		FlightStatusData flightStatus;
+		FlightStatusGet(&flightStatus);
 
 		// Wait until next period
-		if(manualControlCommandData.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE) {
-			vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / 2);
+		if(flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) {
+			vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / (LED_BLINK_RATE_HZ * 2) );
 		} else {
 			vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS);
 		}

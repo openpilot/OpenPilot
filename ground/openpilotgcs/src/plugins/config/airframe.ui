@@ -73,7 +73,7 @@
        <item>
         <widget class="QStackedWidget" name="airframesWidget">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="fixedWing">
           <property name="enabled">
@@ -620,7 +620,7 @@ Typical values are 100% for + configuration and 50% for X configuration on quads
 Typical value is 50% for + or X configuration on quads.</string>
                            </property>
                            <property name="minimum">
-                            <number>0</number>
+                            <number>-100</number>
                            </property>
                            <property name="maximum">
                             <number>100</number>
@@ -666,6 +666,15 @@ Typical value is 50% for + or X configuration on quads.</string>
                        <height>110</height>
                       </size>
                      </property>
+                     <property name="styleSheet">
+                      <string notr="true">background:transparent</string>
+                     </property>
+                     <property name="frameShape">
+                      <enum>QFrame::NoFrame</enum>
+                     </property>
+                     <property name="frameShadow">
+                      <enum>QFrame::Plain</enum>
+                     </property>
                     </widget>
                    </item>
                   </layout>
@@ -679,6 +688,19 @@ Typical value is 50% for + or X configuration on quads.</string>
                  </property>
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_11">
+                   <item>
+                    <spacer name="horizontalSpacer_13">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
                    <item>
                     <widget class="QLabel" name="label_24">
                      <property name="text">
@@ -733,7 +755,9 @@ Typical value is 50% for + or X configuration on quads.</string>
                      <height>120</height>
                     </size>
                    </property>
-                   <zorder></zorder>
+                   <property name="styleSheet">
+                    <string notr="true">background:transparent</string>
+                   </property>
                   </widget>
                  </item>
                  <item>
@@ -2289,12 +2313,12 @@ p, li { white-space: pre-wrap; }
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>236</x>
-     <y>253</y>
+     <x>124</x>
+     <y>126</y>
     </hint>
     <hint type="destinationlabel">
-     <x>226</x>
-     <y>310</y>
+     <x>124</x>
+     <y>126</y>
     </hint>
    </hints>
   </connection>
@@ -2305,12 +2329,12 @@ p, li { white-space: pre-wrap; }
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>306</x>
-     <y>273</y>
+     <x>124</x>
+     <y>126</y>
     </hint>
     <hint type="destinationlabel">
-     <x>301</x>
-     <y>315</y>
+     <x>124</x>
+     <y>126</y>
     </hint>
    </hints>
   </connection>
@@ -2321,12 +2345,12 @@ p, li { white-space: pre-wrap; }
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>651</x>
-     <y>112</y>
+     <x>115</x>
+     <y>117</y>
     </hint>
     <hint type="destinationlabel">
-     <x>600</x>
-     <y>112</y>
+     <x>115</x>
+     <y>117</y>
     </hint>
    </hints>
   </connection>
@@ -2337,12 +2361,12 @@ p, li { white-space: pre-wrap; }
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>659</x>
-     <y>211</y>
+     <x>115</x>
+     <y>117</y>
     </hint>
     <hint type="destinationlabel">
-     <x>581</x>
-     <y>218</y>
+     <x>115</x>
+     <y>117</y>
     </hint>
    </hints>
   </connection>

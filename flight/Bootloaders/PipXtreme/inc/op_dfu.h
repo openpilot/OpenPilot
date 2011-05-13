@@ -1,4 +1,4 @@
- /**
+/**
  ******************************************************************************
  *
  * @file       op_dfu.h
@@ -29,18 +29,17 @@
 #include "common.h"
 /* Includes ------------------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
-typedef struct
-{
-	uint8_t 	programmingType;
-	uint8_t 	readWriteFlags;
-	uint32_t 	startOfUserCode;
-	uint32_t 	sizeOfCode;
-	uint8_t 	sizeOfDescription;
-	uint8_t 	BL_Version;
-	uint16_t 	devID;
-	DeviceType  devType;
-	uint32_t 	FW_Crc;
-}Device;
+typedef struct {
+	uint8_t programmingType;
+	uint8_t readWriteFlags;
+	uint32_t startOfUserCode;
+	uint32_t sizeOfCode;
+	uint8_t sizeOfDescription;
+	uint8_t BL_Version;
+	uint16_t devID;
+	DeviceType devType;
+	uint32_t FW_Crc;
+} Device;
 
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/

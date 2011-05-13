@@ -10,7 +10,7 @@
         <field name="Yaw" units="degrees" type="float" elements="1"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
-        <telemetryflight acked="false" updatemode="periodic" period="500"/>
+        <telemetryflight acked="false" updatemode="periodic" period="100"/>
         <logging updatemode="never" period="0"/>
     </object>
 </xml>

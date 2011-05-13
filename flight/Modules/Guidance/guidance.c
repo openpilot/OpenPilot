@@ -51,7 +51,7 @@
 #include "positiondesired.h"	// object that will be updated by the module
 #include "positionactual.h"
 #include "manualcontrol.h"
-#include "manualcontrolcommand.h"
+#include "flightstatus.h"
 #include "nedaccel.h"
 #include "stabilizationdesired.h"
 #include "stabilizationsettings.h"
@@ -121,7 +121,7 @@ static void guidanceTask(void *parameters)
 {
 	SystemSettingsData systemSettings;
 	GuidanceSettingsData guidanceSettings;
-	ManualControlCommandData manualControl;
+	FlightStatusData flightStatus;
 
 	portTickType thisTime;
 	portTickType lastUpdateTime;
@@ -189,11 +189,11 @@ static void guidanceTask(void *parameters)
 		NedAccelSet(&accelData);
 		
 		
-		ManualControlCommandGet(&manualControl);
+		FlightStatusGet(&flightStatus);
 		SystemSettingsGet(&systemSettings);
 		GuidanceSettingsGet(&guidanceSettings);
 		
-		if ((PARSE_FLIGHT_MODE(manualControl.FlightMode) == FLIGHTMODE_GUIDANCE) &&
+		if ((PARSE_FLIGHT_MODE(flightStatus.FlightMode) == FLIGHTMODE_GUIDANCE) &&
 			((systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWING) ||
 			(systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGELEVON) ||
 			(systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGVTAIL) ||
@@ -215,7 +215,7 @@ static void guidanceTask(void *parameters)
 				positionHoldLast = 1;
 			}
 			
-			if( manualControl.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_POSITIONHOLD ) 
+			if( flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ) 
 				updateVtolDesiredVelocity();
 			else
 				manualSetDesiredVelocity();			

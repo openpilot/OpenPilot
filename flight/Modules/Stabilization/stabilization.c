@@ -39,9 +39,10 @@
 #include "stabilizationdesired.h"
 #include "attitudeactual.h"
 #include "attituderaw.h"
-#include "manualcontrolcommand.h"
+#include "flightstatus.h"
 #include "systemsettings.h"
 #include "ahrssettings.h"
+#include "manualcontrol.h" // Just to get a macro
 #include "CoordinateConversions.h"
 
 // Private constants
@@ -125,7 +126,7 @@ static void stabilizationTask(void* parameters)
 	AttitudeActualData attitudeActual;
 	AttitudeRawData attitudeRaw;
 	SystemSettingsData systemSettings;
-	ManualControlCommandData manualControl;
+	FlightStatusData flightStatus;
 	
 	SettingsUpdatedCb((UAVObjEvent *) NULL);
 	
@@ -148,13 +149,13 @@ static void stabilizationTask(void* parameters)
 			dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
 		lastSysTime = thisSysTime;
 		
-		ManualControlCommandGet(&manualControl);
+		FlightStatusGet(&flightStatus);
 		StabilizationDesiredGet(&stabDesired);
 		AttitudeActualGet(&attitudeActual);
 		AttitudeRawGet(&attitudeRaw);
 		RateDesiredGet(&rateDesired);
 		SystemSettingsGet(&systemSettings);
-		
+
 #if defined(PIOS_QUATERNION_STABILIZATION)
 		// Quaternion calculation of error in each axis.  Uses more memory.
 		float rpy_desired[3];
@@ -261,11 +262,8 @@ static void stabilizationTask(void* parameters)
 		// Save dT
 		actuatorDesired.UpdateTime = dT * 1000;
 		
-		if(manualControl.FlightMode == MANUALCONTROLCOMMAND_FLIGHTMODE_MANUAL)
-		{
+		if(PARSE_FLIGHT_MODE(flightStatus.FlightMode) == FLIGHTMODE_MANUAL)
 			shouldUpdate = 0;
-		}
-		
 		
 		if(shouldUpdate)
 		{
@@ -275,14 +273,15 @@ static void stabilizationTask(void* parameters)
 			ActuatorDesiredSet(&actuatorDesired);
 		}
 		
-		if(manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_FALSE ||
+		if(flightStatus.Armed != FLIGHTSTATUS_ARMED_ARMED ||
 		   !shouldUpdate || (stabDesired.Throttle < 0))
 		{
 			ZeroPids();
 		}
 		
+		
 		// Clear alarms
-		AlarmsClear(SYSTEMALARMS_ALARM_STABILIZATION);		
+		AlarmsClear(SYSTEMALARMS_ALARM_STABILIZATION);				
 	}
 }
 

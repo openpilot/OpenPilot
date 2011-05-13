@@ -2,15 +2,11 @@
     <object name="ManualControlCommand" singleinstance="true" settings="false">
         <description>The output from the @ref ManualControlModule which descodes the receiver inputs.  Overriden by GCS for fly-by-wire control.</description>
         <field name="Connected" units="" type="enum" elements="1" options="False,True"/>
-        <field name="Armed" units="" type="enum" elements="1" options="False,True"/>
         <field name="Roll" units="%" type="float" elements="1"/>
         <field name="Pitch" units="%" type="float" elements="1"/>
         <field name="Yaw" units="%" type="float" elements="1"/>
         <field name="Throttle" units="%" type="float" elements="1"/>
-	
-	<!-- Note these enumerated values should be the same as ManualControlSettings -->
-        <field name="FlightMode" units="" type="enum" elements="1" options="Manual,Stabilized1,Stabilized2,Stabilized3,VelocityControl,PositionHold"/>
-	
+		
         <field name="Accessory1" units="%" type="float" elements="1"/>
         <field name="Accessory2" units="%" type="float" elements="1"/>
         <field name="Accessory3" units="%" type="float" elements="1"/>

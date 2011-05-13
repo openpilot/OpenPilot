@@ -273,7 +273,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
             rxObjId = (qint32)qFromLittleEndian<quint32>(rxTmpBuffer);
             {
                 UAVObject *rxObj = objMngr->getObject(rxObjId);
-                if (rxObj == NULL)
+                if (rxObj == NULL && rxType != TYPE_OBJ_REQ)
                 {
                     stats.rxErrors++;
                     rxState = STATE_SYNC;
@@ -281,7 +281,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
                 }
 
                 // Determine data length
-                if (rxType == TYPE_OBJ_REQ || rxType == TYPE_ACK)
+                if (rxType == TYPE_OBJ_REQ || rxType == TYPE_ACK || rxType == TYPE_NACK)
                     rxLength = 0;
                 else
                     rxLength = rxObj->getNumBytes();
@@ -303,7 +303,15 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
                 }
 
                 // Check if this is a single instance object (i.e. if the instance ID field is coming next)
-                if (rxObj->isSingleInstance())
+                if (rxObj == NULL)
+                {
+                   // This is a non-existing object, just skip to checksum
+                   // and we'll send a NACK next.
+                   rxState   = STATE_CS;
+                   rxInstId = 0;
+                   rxCount = 0;
+                }
+                else if (rxObj->isSingleInstance())
                 {
                     // If there is a payload get it, otherwise receive checksum
                     if (rxLength > 0)
@@ -395,7 +403,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
 
 /**
  * Receive an object. This function process objects received through the telemetry stream.
- * \param[in] type Type of received message (TYPE_OBJ, TYPE_OBJ_REQ, TYPE_OBJ_ACK, TYPE_ACK)
+ * \param[in] type Type of received message (TYPE_OBJ, TYPE_OBJ_REQ, TYPE_OBJ_ACK, TYPE_ACK, TYPE_NACK)
  * \param[in] obj Handle of the received object
  * \param[in] instId The instance ID of UAVOBJ_ALL_INSTANCES for all instances.
  * \param[in] data Data buffer
@@ -471,7 +479,27 @@ bool UAVTalk::receiveObject(quint8 type, quint32 objId, quint16 instId, quint8* 
         }
         else
         {
+            // Object was not found, transmit a NACK with the
+            // objId which was not found.
+            transmitNack(objId);
             error = true;
+        }
+        break;
+    case TYPE_NACK:
+        // All instances, not allowed for NACK messages
+        if (!allInstances)
+        {
+            // Get object
+            obj = objMngr->getObject(objId, instId);
+            // Check if object exists:
+            if (obj != NULL)
+            {
+                updateNack(obj);
+            }
+            else
+            {
+             error = true;
+            }
         }
         break;
     case TYPE_ACK:
@@ -542,14 +570,28 @@ UAVObject* UAVTalk::updateObject(quint32 objId, quint16 instId, quint8* data)
 /**
  * Check if a transaction is pending and if yes complete it.
  */
+void UAVTalk::updateNack(UAVObject* obj)
+{
+    if (respObj != NULL && respObj->getObjID() == obj->getObjID() && (respObj->getInstID() == obj->getInstID() || respAllInstances))
+    {
+        respObj = NULL;
+        emit transactionCompleted(obj, false);
+    }
+}
+
+
+/**
+ * Check if a transaction is pending and if yes complete it.
+ */
 void UAVTalk::updateAck(UAVObject* obj)
 {
     if (respObj != NULL && respObj->getObjID() == obj->getObjID() && (respObj->getInstID() == obj->getInstID() || respAllInstances))
     {
         respObj = NULL;
-        emit transactionCompleted(obj);
+        emit transactionCompleted(obj, true);
     }
 }
+
 
 /**
  * Send an object through the telemetry link.
@@ -605,6 +647,43 @@ bool UAVTalk::transmitObject(UAVObject* obj, quint8 type, bool allInstances)
     {
         return false;
     }
+}
+
+/**
+ * Transmit a NACK through the telemetry link.
+ * \param[in] objId the ObjectID we rejected
+ */
+bool UAVTalk::transmitNack(quint32 objId)
+{
+    int dataOffset = 8;
+
+    txBuffer[0] = SYNC_VAL;
+    txBuffer[1] = TYPE_NACK;
+    qToLittleEndian<quint32>(objId, &txBuffer[4]);
+
+    // Calculate checksum
+    txBuffer[dataOffset] = updateCRC(0, txBuffer, dataOffset);
+
+    qToLittleEndian<quint16>(dataOffset, &txBuffer[2]);
+
+
+    // Send buffer, check that the transmit backlog does not grow above limit
+    if ( io->bytesToWrite() < TX_BUFFER_SIZE )
+    {
+        io->write((const char*)txBuffer, dataOffset+CHECKSUM_LENGTH);
+    }
+    else
+    {
+        ++stats.txErrors;
+        return false;
+    }
+
+    // Update stats
+    stats.txBytes += 8+CHECKSUM_LENGTH;
+
+    // Done
+    return true;
+
 }
 
 

@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotBL OpenPilot BootLoader
- * @brief These files contain the code to the OpenPilot MB Bootloader.
+ * @addtogroup CopterControlBL CopterControl BootLoader
+ * @brief These files contain the code to the CopterControl Bootloader.
  *
  * @{
  * @file       common.c
@@ -51,7 +51,8 @@ typedef enum {
 	uploadingStarting, //9
 	outsideDevCapabilities, //10
 	CRC_Fail,//11
-	failed_jump,//12
+	failed_jump,
+//12
 } DFUStates;
 /**************************************************/
 /* OP_DFU commands                       */
@@ -74,9 +75,8 @@ typedef enum {
 } DFUCommands;
 
 typedef enum {
-	High_Density,
-	Medium_Density
-}DeviceType;
+	High_Density, Medium_Density
+} DeviceType;
 /**************************************************/
 /* OP_DFU transfer types                       */
 /**************************************************/

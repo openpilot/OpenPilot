@@ -2,11 +2,12 @@
     <object name="AttitudeSettings" singleinstance="true" settings="true">
         <description>Settings for the @ref Attitude module used on CopterControl</description>
         <field name="AccelBias" units="lsb" type="int16" elementnames="X,Y,Z" defaultvalue="0"/>
-        <field name="RotationQuaternion" units="quaternion * 255" type="int8" elementnames="q1,q2,q3,q4" defaultvalue="127,0,0,0"/>
+        <field name="BoardRotation" units="deg" type="int8" elementnames="Roll,Pitch,Yaw" defaultvalue="0,0,0"/>
         <field name="GyroGain" units="(rad/s)/lsb" type="float" elements="1" defaultvalue="0.42"/>
         <field name="AccelKp" units="channel" type="float" elements="1" defaultvalue="0.01"/>
         <field name="AccelKi" units="channel" type="float" elements="1" defaultvalue="0.0001"/>
         <field name="YawBiasRate" units="channel" type="float" elements="1" defaultvalue="0.000001"/>
+	<field name="ZeroDuringArming" units="channel" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

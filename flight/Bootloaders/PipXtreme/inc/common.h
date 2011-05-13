@@ -51,7 +51,8 @@ typedef enum {
 	uploadingStarting, //9
 	outsideDevCapabilities, //10
 	CRC_Fail,//11
-	failed_jump,//12
+	failed_jump,
+//12
 } DFUStates;
 /**************************************************/
 /* OP_DFU commands                       */
@@ -74,9 +75,8 @@ typedef enum {
 } DFUCommands;
 
 typedef enum {
-	High_Density,
-	Medium_Density
-}DeviceType;
+	High_Density, Medium_Density
+} DeviceType;
 /**************************************************/
 /* OP_DFU transfer types                       */
 /**************************************************/

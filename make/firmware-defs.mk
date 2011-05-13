@@ -9,6 +9,7 @@ OBJCOPY = $(TCHAIN_PREFIX)objcopy
 OBJDUMP = $(TCHAIN_PREFIX)objdump
 SIZE    = $(TCHAIN_PREFIX)size
 NM      = $(TCHAIN_PREFIX)nm
+STRIP   = $(TCHAIN_PREFIX)strip
 
 THUMB   = -mthumb
 
@@ -27,6 +28,8 @@ MSG_FORMATERROR      := ${quote} Can not handle output-format${quote}
 MSG_MODINIT          := ${quote} MODINIT   ${quote}
 MSG_SIZE             := ${quote} SIZE      ${quote}
 MSG_LOAD_FILE        := ${quote} BIN/HEX   ${quote}
+MSG_BIN_OBJ          := ${quote} BINO      ${quote}
+MSG_STRIP_FILE       := ${quote} STRIP     ${quote}
 MSG_EXTENDED_LISTING := ${quote} LIS       ${quote}
 MSG_SYMBOL_TABLE     := ${quote} NM        ${quote}
 MSG_LINKING          := ${quote} LD        ${quote}
@@ -53,10 +56,25 @@ gccversion :
 	@echo $(MSG_LOAD_FILE) $(call toprel, $@)
 	$(V1) $(OBJCOPY) -O ihex $< $@
 
+# Create stripped output file (.elf.stripped) from ELF output file.
+%.elf.stripped: %.elf
+	@echo $(MSG_STRIP_FILE) $(call toprel, $@)
+	$(V1) $(STRIP) --strip-unneeded $< -o $@
+
 # Create final output file (.bin) from ELF output file.
 %.bin: %.elf
 	@echo $(MSG_LOAD_FILE) $(call toprel, $@)
 	$(V1) $(OBJCOPY) -O binary $< $@
+
+%.bin.o: %.bin
+	@echo $(MSG_BIN_OBJ) $(call toprel, $@)
+	$(V1) $(OBJCOPY) -I binary -O elf32-littlearm --binary-architecture arm \
+		--rename-section .data=.rodata,alloc,load,readonly,data,contents \
+		--wildcard \
+		--redefine-sym _binary_$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$<))))_start=_binary_start \
+		--redefine-sym _binary_$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$<))))_end=_binary_end \
+		--redefine-sym _binary_$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$<))))_size=_binary_size \
+		$< $@
 
 # Create extended listing file/disassambly from ELF output file.
 # using objdump testing: option -C
@@ -144,10 +162,9 @@ $($(1):.c=.s) : %.s : %.c
 endef
 
 # ---------------------------------------------------------------------------
-#  # Options for OpenOCD flash-programming
+# Options for OpenOCD flash-programming
 # see openocd.pdf/openocd.texi for further information
-# #
-# OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).elf                                                                                                                                                                                               
+
 # if OpenOCD is in the $PATH just set OPENOCDEXE=openocd
 OOCD_EXE=openocd
 # debug level
@@ -162,6 +179,3 @@ OOCD_CL+=-c init
 OOCD_CL+=-c targets
 # commands to prepare flash-write
 OOCD_CL+= -c "reset halt"
-# flash erase
-OOCD_CL+=-c "stm32x mass_erase 0"
-# flash-write

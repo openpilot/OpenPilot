@@ -410,6 +410,15 @@ size: $(OUTDIR)/$(TARGET).elf_size
 docs:
 	doxygen  $(DOXYGENDIR)/doxygen.cfg
 
+# Install: install binary file with prefix/suffix into install directory
+install: $(OUTDIR)/$(TARGET).bin
+ifneq ($(INSTALL_DIR),)
+	@echo $(MSG_INSTALLING) $(call toprel, $<)
+	$(V1) $(INSTALL) -D $< $(INSTALL_DIR)/$(INSTALL_PFX)$(TARGET)$(INSTALL_SFX).bin
+else
+	$(error INSTALL_DIR must be specified for $@)
+endif
+
 # Target: clean project.
 clean: begin clean_list finished end
 
@@ -430,7 +439,6 @@ clean_list :
 	$(V1) $(REMOVE) $(CPPSRC:.cpp=.s)
 	$(V1) $(REMOVE) $(CPPSRCARM:.cpp=.s)
 
-
 # Create output files directory
 # all known MS Windows OS define the ComSpec environment variable
 ifdef ComSpec
@@ -447,4 +455,4 @@ else
 endif
 
 # Listing of phony targets.
-.PHONY : all build clean clean_list program
+.PHONY : all build clean clean_list program install

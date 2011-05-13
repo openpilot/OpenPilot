@@ -1,6 +1,16 @@
 # Set up a default goal
 .DEFAULT_GOAL := help
 
+# Tried the best to support parallel (-j) builds. But since this Makefile
+# uses other Makefiles to build few targets which in turn have similar
+# dependencies on uavobjects and other generated files, it is difficult
+# to support parallel builds perfectly.
+#
+# Looks like it works for -j8, but fails for -j (unlimited jobs).
+# So probably not a bad idea is to build release in single thread.
+#
+#.NOTPARALLEL:
+
 # Locate the root of the tree
 WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
 ROOT_DIR := $(realpath $(WHEREAMI)/../)
@@ -37,8 +47,7 @@ help:
 	@echo "     - release packages will be placed in $(RELEASE_DIR)"
 	@echo
 
-# Clean and create release directories
-# Use dependence on uavobjects to make sure the build directory exists
+# Clean and build uavobjects since all parts depend on them
 uavobjects: all_clean
 	$(V1) $(MAKE) -C $(ROOT_DIR) $@
 
@@ -91,7 +100,7 @@ release_fw: | fw_common fw_pwm fw_spektrum # fw_ppm
 
 release_blupd: | $(BLUPD_TARGETS)
 
-release_ground:
+release_ground: | ground_package
 
 .PHONY: help uavobjects all_clean release release_flight release_fw release_blupd release_ground
 
@@ -110,3 +119,15 @@ endif
 ifneq ($(V),1)
 MAKEFLAGS += --no-print-directory
 endif
+
+# Platform-dependent stuff
+PLATFORM := win32
+UNAME := $(shell uname)
+ifeq ($(UNAME), Linux)
+  PLATFORM := linux
+endif
+ifeq ($(UNAME), Darwin)
+  PLATFORM := osx
+endif
+
+include $(WHEREAMI)/Makefile.$(PLATFORM)

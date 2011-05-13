@@ -1,0 +1,11 @@
+#
+# Windows-specific packaging
+#
+
+# Generate GCS installer
+gcs_installer: uavobjects
+	$(V1) $(MAKE) -C $(ROOT_DIR) GCS_BUILD_CONF=release $@
+
+ground_package: | gcs_installer
+
+.PHONY: gcs_installer ground_package

@@ -143,6 +143,8 @@ static void AttitudeTask(void *parameters)
 		FlightStatusGet(&flightStatus);
 		
 		if(xTaskGetTickCount() < 10000) {
+			// Force settings update to make sure rotation loaded
+			settingsUpdatedCb(AttitudeSettingsHandle());
 			// For first 5 seconds use accels to get gyro bias
 			accelKp = 1;
 			// Decrease the rate of gyro learning during init

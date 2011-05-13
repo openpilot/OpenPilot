@@ -73,8 +73,10 @@ GCSControlGadgetWidget::GCSControlGadgetWidget(QWidget *parent) : QLabel(parent)
     rightX = 0;
     rightY = 0;
 
-	m_gcscontrol->widgetLeftStick->enableOpenGL(true);
-	m_gcscontrol->widgetRightStick->enableOpenGL(true);
+    // No point enabling OpenGL for the joysticks, and causes
+    // issues on some computers:
+//    m_gcscontrol->widgetLeftStick->enableOpenGL(true);
+//    m_gcscontrol->widgetRightStick->enableOpenGL(true);
 }
 
 GCSControlGadgetWidget::~GCSControlGadgetWidget()

@@ -105,6 +105,11 @@ C: Gary Mortimer and the Scorpion
 D: March 2011
 V: http://vimeo.com/22104334
 
+M: First Y6 OpenPilot flight
+C: Sami Korhonen (Sambas)
+D: May 2011
+V: http://www.vimeo.com/23637586
+
 M: First CopterControl flight on a Flybarless Heli
 C: ?
 D: ?

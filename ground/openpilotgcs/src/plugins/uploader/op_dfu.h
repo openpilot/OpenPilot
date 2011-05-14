@@ -12,6 +12,7 @@
 #include <QMetaType>
 #include <QCryptographicHash>
 #include <QList>
+#include <QVariant>
 #include <iostream>
 #include "delay.h"
 #include <qextserialport/src/qextserialport.h>
@@ -124,12 +125,13 @@ namespace OP_DFU {
         bool ready() { return mready; }
 
         // Upload (send to device) commands
-        OP_DFU::Status UploadDescription(QString description);
+        OP_DFU::Status UploadDescription(QVariant description);
         bool UploadFirmware(const QString &sfile, const bool &verify,int device);
 
         // Download (get from device) commands:
         // DownloadDescription is synchronous
         QString DownloadDescription(int const & numberOfChars);
+        QByteArray DownloadDescriptionAsBA(int const & numberOfChars);
         // Asynchronous firmware download: initiates fw download,
         // and a downloadFinished signal is emitted when download
         // if finished:

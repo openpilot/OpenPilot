@@ -117,9 +117,16 @@ void deviceWidget::populate()
 
     int size=((OP_DFU::device)m_dfu->devices[deviceID]).SizeOfDesc;
     m_dfu->enterDFU(deviceID);
-    QString str = m_dfu->DownloadDescription(size);
-    myDevice->description->setMaxLength(size);
-    myDevice->description->setText(str.left(str.indexOf(QChar(255))));
+    QByteArray desc = m_dfu->DownloadDescriptionAsBA(size);
+    if (! populateStructuredDescription(desc)) {
+        // desc was not a structured description
+        QString str = m_dfu->DownloadDescription(size);
+        myDevice->description->setMaxLength(size);
+        myDevice->description->setText(str.left(str.indexOf(QChar(255))));
+        myDevice->buildDate->setText("Warning: development firmware");
+        myDevice->commitTag->setText("");
+    }
+
 
     status("Ready...", STATUSICON_INFO);
 
@@ -135,6 +142,51 @@ void deviceWidget::freeze()
    myDevice->updateButton->setEnabled(false);
    myDevice->verifyButton->setEnabled(false);
    myDevice->retrieveButton->setEnabled(false);
+}
+
+
+/**
+  Populates the widget field with the description in case
+  it is structured properly
+  */
+bool deviceWidget::populateStructuredDescription(QByteArray desc)
+{
+    if (desc.startsWith("OpFw")) {
+        // This looks like a binary with a description at the end
+        /*
+        #  4 bytes: header: "OpFw"
+        #  4 bytes: GIT commit tag (short version of SHA1)
+        #  4 bytes: Unix timestamp of compile time
+        #  2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
+        #  26 bytes: commit tag if it is there, otherwise "Unreleased". Zero-padded
+        #   ---- 40 bytes limit ---
+        #  20 bytes: SHA1 sum of the firmware.
+        #  40 bytes: free for now.
+        */
+        // I don't want to use structs, ok ?
+        quint32 gitCommitTag = desc.at(4)&0xFF;
+        for (int i=1;i<4;i++) {
+            gitCommitTag = gitCommitTag<<8;
+            gitCommitTag += desc.at(4+i) & 0xFF;
+        }
+        myDevice->commitTag->setText("GIT tag 0x" + QString::number(gitCommitTag,16));
+        quint32 buildDate = desc.at(8)&0xFF;
+        for (int i=1;i<4;i++) {
+            buildDate = buildDate<<8;
+            buildDate += desc.at(8+i) & 0xFF;
+        }
+
+        myDevice->buildDate->setText(QString("Build time: ") + QDateTime::fromTime_t(buildDate).toString());
+        QByteArray targetPlatform = desc.mid(12,2);
+        // TODO: check platform compatibility
+        QString dscText = QString(desc.mid(14,26));
+        myDevice->description->setText(dscText);
+
+        return true;
+    }
+
+    return false;
+
 }
 
 /**
@@ -198,6 +250,44 @@ void deviceWidget::uploadFirmware()
         status("Empty filename", STATUSICON_FAIL);
         return;
     }
+
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly)) {
+        status("Can't open file", STATUSICON_FAIL);
+        return;
+    }
+
+    QByteArray arr = file.readAll();
+    QByteArray desc = arr.right(100);
+    if (populateStructuredDescription(desc)) {
+        descriptionArray = desc;
+        // Now do sanity checking:
+        // - Check whether board type matches firmware:
+        int board = m_dfu->devices[deviceID].ID;
+        int firmwareBoard = ((desc.at(12)&0xff)<<8) + (desc.at(13)&0xff);
+        if (firmwareBoard != board) {
+            status("Error: firmware does not match board", STATUSICON_FAIL);
+            return;
+        }
+
+        // Check the firmware embedded in the file:
+        QByteArray firmwareHash = desc.mid(40,20);
+        QByteArray fileHash = QCryptographicHash::hash(arr.left(arr.length()-100), QCryptographicHash::Sha1);
+        if (firmwareHash != fileHash) {
+            status("Error: firmware file corrupt", STATUSICON_FAIL);
+            return;
+        }
+
+
+
+    } else {
+        // The firmware is not packaged, just upload the text in the description field
+        // if it is there.
+        descriptionArray.clear();
+    }
+
+
+
 
     status("Starting firmware upload", STATUSICON_RUNNING);
     // We don't know which device was used previously, so we
@@ -277,15 +367,27 @@ void deviceWidget::uploadFinished(OP_DFU::Status retstatus)
         status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
         return;
     } else
-    if(!myDevice->description->text().isEmpty()) {
+    if (!descriptionArray.isEmpty()) {
+        // We have a structured array to save
         status(QString("Updating description"), STATUSICON_RUNNING);
         repaint(); // Make sure the text above shows right away
-        retstatus = m_dfu->UploadDescription(myDevice->description->text());
+        retstatus = m_dfu->UploadDescription(descriptionArray);
         if( retstatus != OP_DFU::Last_operation_Success) {
             status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
             return;
         }
+
+    } else if (!myDevice->description->text().isEmpty()) {
+       // Fallback: we save the description field:
+       status(QString("Updating description"), STATUSICON_RUNNING);
+       repaint(); // Make sure the text above shows right away
+       retstatus = m_dfu->UploadDescription(myDevice->description->text());
+       if( retstatus != OP_DFU::Last_operation_Success) {
+           status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
+           return;
+       }
     }
+
     status("Upload successful", STATUSICON_OK);
 
 }

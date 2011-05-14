@@ -77,21 +77,23 @@ int32_t PIOS_FLASHFS_Init()
 		if(PIOS_FLAHFS_CleabObjectTableHeader() < 0)
 			return -1;
 	}
-	
-	bool found = true;
+
 	int32_t addr = OBJECT_TABLE_START;
 	struct objectHeader header;
 	numObjects = 0;
 		
 	// Loop through header area while objects detect to count how many saved
-	while(found && addr < OBJECT_TABLE_END) {
+	while(addr < OBJECT_TABLE_END) {
 		// Read the instance data
 		if (PIOS_Flash_W25X_ReadData(addr, (uint8_t *)&header, sizeof(header)) != 0)
 			return -1;
+		
+		// Counting number of valid headers	
 		if(header.objMagic != OBJ_MAGIC) 
-			found = false;
-		else 
-			numObjects++;		
+			break;
+		
+		numObjects++;
+		addr += sizeof(header);
 	}
 	
 	return 0;
@@ -121,22 +123,22 @@ static int32_t PIOS_FLAHFS_CleabObjectTableHeader()
  */
 static int32_t PIOS_FLASHFS_GetObjAddress(uint32_t objId, uint16_t instId) 
 {
-	bool found = true;
 	int32_t addr = OBJECT_TABLE_START;
 	struct objectHeader header;
 		
 	// Loop through header area while objects detect to count how many saved
-	while(found && addr < OBJECT_TABLE_END) {
+	while(addr < OBJECT_TABLE_END) {
 		// Read the instance data
 		if (PIOS_Flash_W25X_ReadData(addr, (uint8_t *) &header, sizeof(header)) != 0)
 			return -1;
 		if(header.objMagic != OBJ_MAGIC) 
-			found = false;
+			break; // stop searching once hit first non-object header
 		else if (header.objId == objId && header.instId == instId)
 			break;
+		addr += sizeof(header);
 	}
 	
-	if (found)
+	if (header.objId == objId && header.instId == instId)
 		return header.address;
 	
 	return -1;
@@ -154,7 +156,6 @@ static int32_t PIOS_FLASHFS_GetObjAddress(uint32_t objId, uint16_t instId)
  */
 int32_t PIOS_FLASHFS_GetNewAddress(uint32_t objId, uint16_t instId)
 {
-	int32_t addr = OBJECT_TABLE_START;
 	struct objectHeader header;
 
 	if(numObjects < 0)
@@ -164,8 +165,10 @@ int32_t PIOS_FLASHFS_GetNewAddress(uint32_t objId, uint16_t instId)
 	header.objMagic = OBJ_MAGIC;
 	header.objId = objId;
 	header.instId = instId;
-	header.address = SECTOR_SIZE * numObjects;
+	header.address = OBJECT_TABLE_END + SECTOR_SIZE * numObjects;
 	
+	int32_t addr = OBJECT_TABLE_START + sizeof(header) * numObjects;
+
 	// No room for this header in object table
 	if((addr + sizeof(header)) > OBJECT_TABLE_END) 
 		return -2;		
@@ -245,7 +248,7 @@ int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 	// Object currently not saved
 	if(addr < 0) 
 		return -1;
-	
+
 	struct fileHeader header;
 	
 	// Load header

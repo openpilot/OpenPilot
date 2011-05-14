@@ -40,11 +40,13 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId,  QSettings* 
     m_accessMode("ServerAndCache"),
     m_useMemoryCache(true),
     m_cacheLocation(Utils::PathUtils().GetStoragePath() + "mapscache" + QDir::separator()),
-    m_uavSymbol(QString::fromUtf8(":/uavs/images/mapquad.png"))
+	m_uavSymbol(QString::fromUtf8(":/uavs/images/mapquad.png")),
+	m_maxUpdateRate(2000)	// ms
 {
 
     //if a saved configuration exists load it
-    if(qSettings != 0) {
+	if (qSettings != 0) {
+
         QString mapProvider  = qSettings->value("mapProvider").toString();
         int zoom = qSettings->value("defaultZoom").toInt();
         double latitude= qSettings->value("defaultLatitude").toDouble();
@@ -55,16 +57,25 @@ OPMapGadgetConfiguration::OPMapGadgetConfiguration(QString classId,  QSettings* 
         bool useMemoryCache= qSettings->value("useMemoryCache").toBool();
         QString cacheLocation= qSettings->value("cacheLocation").toString();
         QString uavSymbol=qSettings->value("uavSymbol").toString();
+		int max_update_rate = qSettings->value("maxUpdateRate").toInt();
+
         if (!mapProvider.isEmpty()) m_mapProvider = mapProvider;
         m_defaultZoom = zoom;
         m_defaultLatitude = latitude;
         m_defaultLongitude = longitude;
         m_useOpenGL = useOpenGL;
         m_showTileGridLines = showTileGridLines;
-        m_uavSymbol=uavSymbol;
-        if (!accessMode.isEmpty()) m_accessMode = accessMode;
+		m_uavSymbol = uavSymbol;
+
+		m_maxUpdateRate = max_update_rate;
+		if (m_maxUpdateRate < 100 || m_maxUpdateRate > 5000)
+			m_maxUpdateRate = 2000;
+
+		if (!accessMode.isEmpty())
+			m_accessMode = accessMode;
         m_useMemoryCache = useMemoryCache;
-        if (!cacheLocation.isEmpty()) m_cacheLocation = Utils::PathUtils().InsertStoragePath(cacheLocation);
+		if (!cacheLocation.isEmpty())
+			m_cacheLocation = Utils::PathUtils().InsertStoragePath(cacheLocation);
     }
 }
 
@@ -81,7 +92,9 @@ IUAVGadgetConfiguration * OPMapGadgetConfiguration::clone()
     m->m_accessMode = m_accessMode;
     m->m_useMemoryCache = m_useMemoryCache;
     m->m_cacheLocation = m_cacheLocation;
-    m->m_uavSymbol=m_uavSymbol;
+	m->m_uavSymbol = m_uavSymbol;
+	m->m_maxUpdateRate = m_maxUpdateRate;
+
     return m;
 }
 
@@ -96,6 +109,7 @@ void OPMapGadgetConfiguration::saveConfig(QSettings* qSettings) const {
    qSettings->setValue("useMemoryCache", m_useMemoryCache);
    qSettings->setValue("uavSymbol", m_uavSymbol);
    qSettings->setValue("cacheLocation", Utils::PathUtils().RemoveStoragePath(m_cacheLocation));
+   qSettings->setValue("maxUpdateRate", m_maxUpdateRate);
 }
 void OPMapGadgetConfiguration::setCacheLocation(QString cacheLocation){
     m_cacheLocation = cacheLocation;

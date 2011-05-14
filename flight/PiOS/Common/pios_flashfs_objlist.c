@@ -33,7 +33,7 @@
 #include "uavobjectmanager.h"
 
 // Private functions
-static int32_t PIOS_FLASHFS_EraseLocationHeader();
+static int32_t PIOS_FLAHFS_CleabObjectTableHeader();
 static int32_t PIOS_FLASHFS_GetObjAddress(uint32_t objId, uint16_t instId);
 static int32_t PIOS_FLASHFS_GetNewAddress(uint32_t objId, uint16_t instId);
 
@@ -56,9 +56,9 @@ struct fileHeader {
 } __attribute__((packed));
 
 
-
+#define OBJECT_TABLE_MAGIC 0x85FB3C33
 #define OBJ_MAGIC          0x3015AE71
-#define OBJECT_TABLE_START 0
+#define OBJECT_TABLE_START 0x00000010
 #define OBJECT_TABLE_END   0x00001000
 #define SECTOR_SIZE        0x00001000
 
@@ -68,11 +68,21 @@ struct fileHeader {
  */
 int32_t PIOS_FLASHFS_Init()
 {
-	numObjects = 0;
+	
+	// Check for valid object table or create one
+	uint32_t object_table_magic;
+	if (PIOS_Flash_W25X_ReadData(0, (uint8_t *)&object_table_magic, sizeof(object_table_magic)) != 0)
+		return -1;	
+	if(object_table_magic != OBJECT_TABLE_MAGIC) {
+		if(PIOS_FLAHFS_CleabObjectTableHeader() < 0)
+			return -1;
+	}
+	
 	bool found = true;
 	int32_t addr = OBJECT_TABLE_START;
 	struct objectHeader header;
-	
+	numObjects = 0;
+		
 	// Loop through header area while objects detect to count how many saved
 	while(found && addr < OBJECT_TABLE_END) {
 		// Read the instance data
@@ -82,17 +92,24 @@ int32_t PIOS_FLASHFS_Init()
 			found = false;
 		else 
 			numObjects++;		
-	}	
+	}
+	
+	return 0;
 }
 
 /**
  * @brief Erase the headers for all objects in the flash chip
  * @return 0 if successful, -1 if not
  */
-static int32_t PIOS_FLASHFS_EraseLocationHeader() 
+static int32_t PIOS_FLAHFS_CleabObjectTableHeader() 
 {
 	if(PIOS_Flash_W25X_EraseSector(OBJECT_TABLE_START) != 0)
 		return -1;
+
+	uint32_t object_table_magic = OBJECT_TABLE_MAGIC;
+	if (PIOS_Flash_W25X_WriteData(0, (uint8_t *)&object_table_magic, sizeof(object_table_magic)) != 0)
+		return -1;
+
 	return 0;
 }
 
@@ -100,7 +117,7 @@ static int32_t PIOS_FLASHFS_EraseLocationHeader()
  * @brief Get the address of an object
  * @param obj UAVObjHandle for that object
  * @parma instId Instance id for that object
- * @return 0 if success, -1 if not found
+ * @return address if successful, -1 if not found
  */
 static int32_t PIOS_FLASHFS_GetObjAddress(uint32_t objId, uint16_t instId) 
 {
@@ -121,6 +138,8 @@ static int32_t PIOS_FLASHFS_GetObjAddress(uint32_t objId, uint16_t instId)
 	
 	if (found)
 		return header.address;
+	
+	return -1;
 }
 
 /**
@@ -186,10 +205,9 @@ int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 	struct fileHeader header = {
 		.id = objId,
 		.instId = instId,
-		.size = UAVObjGetNumBytes(obj);
+		.size = UAVObjGetNumBytes(obj)
 	};
 	
-	uint32_t addr = (objEntry->id & FLASH_MASK);
 	PIOS_Flash_W25X_EraseSector(addr);
 
 	// Save header
@@ -197,7 +215,9 @@ int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 	PIOS_Flash_W25X_WriteData(addr, (uint8_t *) &header, sizeof(header));
 		
 	// Save data
-	PIOS_Flash_W25X_WriteData(addr + sizeof(header), data,objEntry->numBytes);	
+	PIOS_Flash_W25X_WriteData(addr + sizeof(header), data, UAVObjGetNumBytes(obj));	
+	
+	return 0;
 }
 
 /**
@@ -231,8 +251,10 @@ int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 		return -2;
 	
 	// Read the instance data
-	if (PIOS_Flash_W25X_ReadData(addr + sizeof(header), data, objEntry->numBytes) != 0)
-		return -3
+	if (PIOS_Flash_W25X_ReadData(addr + sizeof(header), data, UAVObjGetNumBytes(obj)) != 0)
+		return -3;
+	
+	return 0;
 }
 
 /**
@@ -258,4 +280,6 @@ int32_t PIOS_FLASHFS_ObjDelete(UAVObjHandle obj, uint16_t instId)
 
 	if(PIOS_Flash_W25X_EraseSector(addr) != 0)
 		return -2;
+	
+	return 0;
 }

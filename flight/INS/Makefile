@@ -420,7 +420,8 @@ docs:
 install: $(OUTDIR)/$(TARGET).bin
 ifneq ($(INSTALL_DIR),)
 	@echo $(MSG_INSTALLING) $(call toprel, $<)
-	$(V1) $(INSTALL) -D $< $(INSTALL_DIR)/$(INSTALL_PFX)$(TARGET)$(INSTALL_SFX).bin
+	$(V1) mkdir -p $(INSTALL_DIR)
+	$(V1) $(INSTALL) $< $(INSTALL_DIR)/$(INSTALL_PFX)$(TARGET)$(INSTALL_SFX).bin
 else
 	$(error INSTALL_DIR must be specified for $@)
 endif

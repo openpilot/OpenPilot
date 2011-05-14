@@ -222,6 +222,14 @@ int8_t PIOS_Flash_W25X_WriteData(uint32_t addr, uint8_t * data, uint16_t len)
 	return 0;
 }
 
+/** 
+ * @brief Read data from a location in flash memory
+ * @param[in] addr Address in flash to write to
+ * @param[in] data Pointer to data to write from flash
+ * @param[in] len Length of data to write (max 256 bytes)
+ * @return Zero if success or error code
+ * @retval -1 Unable to claim SPI bus
+ */
 int8_t PIOS_Flash_W25X_ReadData(uint32_t addr, uint8_t * data, uint16_t len)
 {
 	if(PIOS_Flash_W25X_ClaimBus() == -1)

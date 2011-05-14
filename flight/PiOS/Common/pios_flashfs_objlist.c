@@ -208,14 +208,18 @@ int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 		.size = UAVObjGetNumBytes(obj)
 	};
 	
-	PIOS_Flash_W25X_EraseSector(addr);
+	if(PIOS_Flash_W25X_EraseSector(addr) != 0)
+		return -2;
 
 	// Save header
 	// This information IS redundant with the object table id.  Oh well.  Better safe than sorry.	
-	PIOS_Flash_W25X_WriteData(addr, (uint8_t *) &header, sizeof(header));
+	
+	if(PIOS_Flash_W25X_WriteData(addr, (uint8_t *) &header, sizeof(header)) != 0)
+		return -3;
 		
 	// Save data
-	PIOS_Flash_W25X_WriteData(addr + sizeof(header), data, UAVObjGetNumBytes(obj));	
+	if(PIOS_Flash_W25X_WriteData(addr + sizeof(header), data, UAVObjGetNumBytes(obj)) != 0)
+		return -4;
 	
 	return 0;
 }
@@ -226,8 +230,9 @@ int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data)
  * @param[in] instId The instance of the object to save
  * @return 0 if success or error code
  * @retval -1 if object not in file table
- * @retval -2 if loaded data instId or objId don't match
- * @retval -3 if unable to retrieve instance data
+ * @retval -2 if unable to retrieve object header
+ * @retval -3 if loaded data instId or objId don't match
+ * @retval -4 if unable to retrieve instance data
  * @note This uses one sector on the flash chip per object so that no buffering in ram
  * must be done when erasing the sector before a save
  */
@@ -245,14 +250,15 @@ int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 	
 	// Load header
 	// This information IS redundant with the object table id.  Oh well.  Better safe than sorry.
-	PIOS_Flash_W25X_ReadData(addr, (uint8_t *) &header, sizeof(header));
+	if(PIOS_Flash_W25X_ReadData(addr, (uint8_t *) &header, sizeof(header)) != 0)
+		return -2;
 	
 	if((header.id != objId) || (header.instId != instId))
-		return -2;
+		return -3;
 	
 	// Read the instance data
 	if (PIOS_Flash_W25X_ReadData(addr + sizeof(header), data, UAVObjGetNumBytes(obj)) != 0)
-		return -3;
+		return -4;
 	
 	return 0;
 }

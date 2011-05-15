@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# make command replacement for Windows
+# simple install command replacement for Windows
 #
 # This file should be put into C:\Program Files\Git\bin\ subdirectory
 # (or similar, depeding on where the msysGit package was installed)
@@ -12,4 +12,4 @@
 #   http://wiki.openpilot.org/display/Doc/Firmware+Development+on+Windows
 #
 
-mingw32-make.exe $*
+cp -f $*

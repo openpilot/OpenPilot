@@ -4,12 +4,8 @@
 # Tried the best to support parallel (-j) builds. But since this Makefile
 # uses other Makefiles to build few targets which in turn have similar
 # dependencies on uavobjects and other generated files, it is difficult
-# to support parallel builds perfectly.
-#
-# Looks like it works for -j8, but fails for -j (unlimited jobs).
-# So probably not a bad idea is to build release in single thread.
-#
-#.NOTPARALLEL:
+# to support parallel builds perfectly. But at least it was tested with
+# -j (unlimited job number) on Windows and Linux.
 
 # Locate the root of the tree
 WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
@@ -41,9 +37,11 @@ help:
 	@echo
 	@echo "   [Release build and packaging]"
 	@echo "     release              - Build and package the OpenPilot release"
+	@echo "     release_flight       - Build and package the OpenPilot flight firmware"
 	@echo
 	@echo "   Notes:"
 	@echo "     - the build directory will be removed first on every run"
+	@echo "       unless CLEAN_BUILD=NO is defined (recommended for testing only)"
 	@echo "     - release packages will be placed in $(RELEASE_DIR)"
 	@echo
 
@@ -52,7 +50,9 @@ uavobjects: all_clean
 	$(V1) $(MAKE) -C $(ROOT_DIR) $@
 
 all_clean:
+ifneq ($(CLEAN_BUILD), NO)
 	$(V1) $(MAKE) -C $(ROOT_DIR) $@
+endif
 
 # Install template:
 #   $1 = target

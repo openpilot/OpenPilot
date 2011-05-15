@@ -37,17 +37,18 @@ locations (but any other locations are fine as well):
  - QtSDK             in C:\Qt\2010.05
  - msysGit           in %ProgramFiles%\Git
  - Unicode NSIS      in %ProgramFiles%\NSIS\Unicode
+ - OpenOCD           in C:\OpenOCD\0.4.0\bin
 
 Also it is assumed that you have the C:\Program Files\Git\cmd\ directory in
 the PATH. Usually this is the case for msysGit installation if you have chosen
 the 2nd option: put only git and gitk in the PATH (it is recommended option).
 
-Now you need to copy two files to your msysGit installation folders.
+Now you need to copy few files to your msysGit installation folders.
 Assuming that you installed the msysGit into C:\Program Files\Git\,
 you have to copy:
 
-   make\winx86\bin\make    ->  C:\Program Files\Git\bin\
-   make\winx86\cmd\sh.cmd  ->  C:\Program Files\Git\cmd\
+   make\winx86\bin\*  ->  C:\Program Files\Git\bin\
+   make\winx86\cmd\*  ->  C:\Program Files\Git\cmd\
 
 If you have msysGit installed into another directory, you need to update paths
 accordingly. Also if you have tools installed into different directories and

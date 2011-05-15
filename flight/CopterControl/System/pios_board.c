@@ -678,8 +678,10 @@ void PIOS_Board_Init(void) {
 		PIOS_DEBUG_Assert(0);
 	}
 
-	PIOS_Flash_W25X_Init(pios_spi_flash_accel_id);
+	PIOS_Flash_W25X_Init(pios_spi_flash_accel_id);	
 	PIOS_ADXL345_Attach(pios_spi_flash_accel_id);
+	
+	PIOS_FLASHFS_Init();
 
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 	/* SPEKTRUM init must come before comms */

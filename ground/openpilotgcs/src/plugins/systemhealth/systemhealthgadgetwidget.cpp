@@ -151,6 +151,16 @@ void SystemHealthGadgetWidget::setSystemFile(QString dfn)
          QGraphicsScene *l_scene = scene();
          l_scene->setSceneRect(background->boundingRect());
          fitInView(background, Qt::KeepAspectRatio );
+
+         // Check whether the autopilot is connected already, by the way:
+         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+         UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+         TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
+         if (telMngr->isConnected()) {
+             onAutopilotConnect();
+             SystemAlarms* obj = dynamic_cast<SystemAlarms*>(objManager->getObject(QString("SystemAlarms")));
+             updateAlarms(obj);
+         }
        }
    }
    else

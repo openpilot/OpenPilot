@@ -33,7 +33,7 @@
 #include "uavobjectmanager.h"
 
 // Private functions
-static int32_t PIOS_FLAHFS_CleabObjectTableHeader();
+static int32_t PIOS_FLASHFS_CleabObjectTableHeader();
 static int32_t PIOS_FLASHFS_GetObjAddress(uint32_t objId, uint16_t instId);
 static int32_t PIOS_FLASHFS_GetNewAddress(uint32_t objId, uint16_t instId);
 
@@ -74,7 +74,7 @@ int32_t PIOS_FLASHFS_Init()
 	if (PIOS_Flash_W25X_ReadData(0, (uint8_t *)&object_table_magic, sizeof(object_table_magic)) != 0)
 		return -1;	
 	if(object_table_magic != OBJECT_TABLE_MAGIC) {
-		if(PIOS_FLAHFS_CleabObjectTableHeader() < 0)
+		if(PIOS_FLASHFS_CleabObjectTableHeader() < 0)
 			return -1;
 	}
 
@@ -103,7 +103,7 @@ int32_t PIOS_FLASHFS_Init()
  * @brief Erase the headers for all objects in the flash chip
  * @return 0 if successful, -1 if not
  */
-static int32_t PIOS_FLAHFS_CleabObjectTableHeader() 
+static int32_t PIOS_FLASHFS_CleabObjectTableHeader() 
 {
 	if(PIOS_Flash_W25X_EraseSector(OBJECT_TABLE_START) != 0)
 		return -1;

@@ -141,18 +141,19 @@ static void AttitudeTask(void *parameters)
 		
 		FlightStatusData flightStatus;
 		FlightStatusGet(&flightStatus);
-		
-		if(xTaskGetTickCount() < 10000) {
-			// For first 5 seconds use accels to get gyro bias
+
+		if(xTaskGetTickCount() < 7000) {
+			// Force settings update to make sure rotation loaded
+			settingsUpdatedCb(AttitudeSettingsHandle());
+			// For first 7 seconds use accels to get gyro bias
 			accelKp = 1;
-			// Decrease the rate of gyro learning during init
-			accelKi = .5 / (1 + xTaskGetTickCount() / 5000);
-			yawBiasRate = 0.01 / (1 + xTaskGetTickCount() / 5000);
+			accelKi = 0.9;
+			yawBiasRate = 0.23;
 			init = 0;
 		} 	
 		else if (zero_during_arming && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
 			accelKi = .01;
-			yawBiasRate = 0.1;
+			yawBiasRate = 0.23;
 			init = 0;			
 		} else if (init == 0) {
 			settingsUpdatedCb(AttitudeSettingsHandle());

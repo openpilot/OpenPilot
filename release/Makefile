@@ -24,6 +24,7 @@ BLUPD_DIR    := $(FW_DIR)/bootloader_updaters
 # Setup targets
 FW_TARGETS_COMMON := ahrs pipxtreme
 FW_TARGETS_INPUT  := coptercontrol openpilot
+FW_TARGETS_TOOLS  := coptercontrol
 FW_TARGETS        := $(FW_TARGETS_COMMON) $(FW_TARGETS_INPUT)
 BL_TARGETS        := $(addprefix bl_, $(FW_TARGETS))
 BLUPD_TARGETS     := $(addprefix blupd_, $(FW_TARGETS))
@@ -76,8 +77,8 @@ endef
 # Firmware for different input drivers
 $(eval $(call INSTALL_TEMPLATE,fw_common,uavobjects,$(FW_DIR),,-$(RELEASE_LBL),,,$(FW_TARGETS_COMMON),install))
 $(eval $(call INSTALL_TEMPLATE,fw_pwm,uavobjects,$(FW_DIR),,-pwm-$(RELEASE_LBL),,clean,$(FW_TARGETS_INPUT),install))
-$(eval $(call INSTALL_TEMPLATE,fw_spektrum,uavobjects fw_pwm,$(FW_DIR),,-spektrum-$(RELEASE_LBL),USE_SPEKTRUM=YES,clean,$(FW_TARGETS_INPUT),install))
-$(eval $(call INSTALL_TEMPLATE,fw_ppm,uavobjects fw_spektrum,$(FW_DIR),,-ppm-$(RELEASE_LBL),USE_PPM=YES,clean,$(FW_TARGETS_INPUT),install))
+$(eval $(call INSTALL_TEMPLATE,fw_spektrum,uavobjects,$(FW_DIR),,-spektrum-$(RELEASE_LBL),USE_SPEKTRUM=YES,clean,$(FW_TARGETS_INPUT),install))
+$(eval $(call INSTALL_TEMPLATE,fw_ppm,uavobjects,$(FW_DIR),,-ppm-$(RELEASE_LBL),USE_PPM=YES,clean,$(FW_TARGETS_INPUT),install))
 
 # Bootloaders (change 'bin' to 'install' to install bootloaders too)
 $(eval $(call INSTALL_TEMPLATE,all_bl,uavobjects,$(BL_DIR),,-$(RELEASE_LBL),,,$(BL_TARGETS),bin))
@@ -88,19 +89,30 @@ $(eval $(call INSTALL_TEMPLATE,blupd_ahrs,all_bl,$(BLUPD_DIR),AHRS_,-$(RELEASE_L
 $(eval $(call INSTALL_TEMPLATE,blupd_openpilot,all_bl,$(BLUPD_DIR),OpenPilot_,-$(RELEASE_LBL),,,blupd_openpilot,install))
 $(eval $(call INSTALL_TEMPLATE,blupd_pipxtreme,all_bl,$(BLUPD_DIR),PipXtreme_,-$(RELEASE_LBL),,,blupd_pipxtreme,install))
 
+# CopterControl flash eraser tool (change fw_spektrum to fw_ppm if fw_ppm is enabled in release_fw target below)
+$(eval $(call INSTALL_TEMPLATE,fw_tools,uavobjects,$(BLUPD_DIR),,-FlashEraser-$(RELEASE_LBL),ERASE_FLASH=YES,clean,$(FW_TARGETS_TOOLS),install))
+
 # Order-only dependencies
 # They are bit complicated to support parallel (-j) builds and to
-# create the pwm/ppm/spektrum targets in a sequence of build steps
+# create the pwm/ppm/spektrum and CC flash eraser targets in a sequence of build steps
 
-release: | release_flight release_ground
+fw_pwm: |		# default dependencies
 
-release_flight: | release_fw release_blupd
+fw_spektrum: | fw_pwm	# sequential build
+
+fw_ppm: | fw_spektrum   # sequential build
+
+fw_tools: | fw_spektrum # sequential build, replace fw_spektrum by fw_ppm if uncommented below
 
 release_fw: | fw_common fw_pwm fw_spektrum # fw_ppm
 
 release_blupd: | $(BLUPD_TARGETS)
 
+release_flight: | release_fw release_blupd fw_tools
+
 release_ground: | ground_package
+
+release: | release_flight release_ground
 
 .PHONY: help uavobjects all_clean release release_flight release_fw release_blupd release_ground
 

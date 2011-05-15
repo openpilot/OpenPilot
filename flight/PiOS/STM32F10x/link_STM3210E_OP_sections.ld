@@ -163,7 +163,12 @@ PROVIDE ( SCB             = (SCS_BASE + 0x0D00) ) ;
 
 SECTIONS
 {
-     
+    .boardinfo :
+    {
+	. = ALIGN(4);
+	PROVIDE(pios_board_info_blob = .);
+    } > BD_INFO
+
     /* for Cortex devices, the beginning of the startup code is stored in the .isr_vector section, which goes to FLASH */
     .isr_vector :
     {
@@ -208,7 +213,6 @@ SECTIONS
          _sidata = _etext;
     } >FLASH
     
-
     /* 
      * This stack is used both as the initial sp during early init as well as ultimately
      * being used as the STM32's MSP (Main Stack Pointer) which is the same stack that

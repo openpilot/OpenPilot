@@ -3,6 +3,12 @@ _estack = 0x20004FF0;
 /* Section Definitions */
 SECTIONS
 {
+    .boardinfo :
+    {
+	. = ALIGN(4);
+	PROVIDE(pios_board_info_blob = .);
+    } > BD_INFO
+
     .text :
     {
         KEEP(*(.isr_vector .isr_vector.*))

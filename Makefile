@@ -265,8 +265,8 @@ gcs_clean: openpilotgcs_clean
 .PHONY: openpilotgcs
 openpilotgcs:  uavobjects_gcs
 	$(V1) mkdir -p $(BUILD_DIR)/ground/$@
-	$(V1) ( cd $(BUILD_DIR)/ground/$@ ; \
-	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) ; \
+	$(V1) ( cd $(BUILD_DIR)/ground/$@ && \
+	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) && \
 	  $(MAKE) -w ; \
 	)
 
@@ -290,8 +290,8 @@ openpilotgcs_clean:
 .PHONY: uavobjgenerator
 uavobjgenerator:
 	$(V1) mkdir -p $(BUILD_DIR)/ground/$@
-	$(V1) ( cd $(BUILD_DIR)/ground/$@ ; \
-	  $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
+	$(V1) ( cd $(BUILD_DIR)/ground/$@ && \
+	  $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+=debug && \
 	  $(MAKE) --no-print-directory -w ; \
 	)
 
@@ -306,7 +306,7 @@ $(UAVOBJ_OUT_DIR):
 	$(V1) mkdir -p $@
 
 uavobjects_%: $(UAVOBJ_OUT_DIR) uavobjgenerator
-	$(V1) ( cd $(UAVOBJ_OUT_DIR) ; \
+	$(V1) ( cd $(UAVOBJ_OUT_DIR) && \
 	  $(UAVOBJGENERATOR) -$* $(UAVOBJ_XML_DIR) $(ROOT_DIR) ; \
 	)
 

@@ -3171,6 +3171,8 @@
 		65FF4BE913791C3300146BE4 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		65FF4BEA13791C3300146BE4 /* op_dfu.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = op_dfu.c; sourceTree = "<group>"; };
 		65FF4BEB13791C3300146BE4 /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_board.c; sourceTree = "<group>"; };
+		65FF4D5E137EDEC100146BE4 /* pios_flashfs_objlist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_flashfs_objlist.c; sourceTree = "<group>"; };
+		65FF4D61137EFA4F00146BE4 /* pios_flashfs_objlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_flashfs_objlist.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -7657,6 +7659,7 @@
 				65E8F03711EFF25C00BBF654 /* printf-stdarg.c */,
 				6528CCB412E406B800CF5144 /* pios_adxl345.c */,
 				6512D60712ED4CB8008175E5 /* pios_flash_w25x.c */,
+				65FF4D5E137EDEC100146BE4 /* pios_flashfs_objlist.c */,
 			);
 			name = Common;
 			path = ../../PiOS/Common;
@@ -7681,6 +7684,7 @@
 				65E8F03E11EFF25C00BBF654 /* pios_debug.h */,
 				65E8F03F11EFF25C00BBF654 /* pios_delay.h */,
 				65E8F04011EFF25C00BBF654 /* pios_exti.h */,
+				65FF4D61137EFA4F00146BE4 /* pios_flashfs_objlist.h */,
 				65E8F04111EFF25C00BBF654 /* pios_gpio.h */,
 				65E8F04211EFF25C00BBF654 /* pios_hmc5843.h */,
 				65E8F04311EFF25C00BBF654 /* pios_i2c.h */,

@@ -268,6 +268,10 @@ void deviceWidget::uploadFirmware()
         if (firmwareBoard != board) {
             status("Error: firmware does not match board", STATUSICON_FAIL);
             return;
+        } else {
+            // Not a structured description: warn user
+            myDevice->buildDate->setText("Warning: development firmware");
+            myDevice->commitTag->setText("");
         }
 
         // Check the firmware embedded in the file:

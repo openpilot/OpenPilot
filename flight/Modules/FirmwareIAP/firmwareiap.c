@@ -30,6 +30,7 @@
 #include "openpilot.h"
 #include "firmwareiap.h"
 #include "firmwareiapobj.h"
+#include "flightstatus.h"
 
 // Private constants
 #define IAP_CMD_STEP_1      1122
@@ -156,6 +157,16 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
 			case IAP_STATE_STEP_2:
 				if( data.Command == IAP_CMD_STEP_3 ) {
 					if( delta > iap_time_3_low_end && delta < iap_time_3_high_end ) {
+						
+						FlightStatusData flightStatus;
+						FlightStatusGet(&flightStatus);
+						
+						if(flightStatus.Armed != FLIGHTSTATUS_ARMED_DISARMED) {
+							// Abort any attempts if not disarmed
+							iap_state = IAP_STATE_READY;
+							break;
+						}
+							
 						// we've met the three sequence of command numbers
 						// we've met the time requirements.
 						PIOS_IAP_SetRequest1();

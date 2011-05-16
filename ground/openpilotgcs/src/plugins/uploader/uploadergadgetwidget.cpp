@@ -115,6 +115,18 @@ void UploaderGadgetWidget::onAutopilotConnect(){
     m_config->bootButton->setEnabled(false);
     m_config->rescueButton->setEnabled(false);
     m_config->telemetryLink->setEnabled(false);
+
+    // Add a very simple widget with Board model & serial number
+    // Delete all previous tabs:
+    while (m_config->systemElements->count()) {
+         QWidget *qw = m_config->systemElements->widget(0);
+         m_config->systemElements->removeTab(0);
+         delete qw;
+    }
+    runningDeviceWidget* dw = new runningDeviceWidget(this);
+    dw->populate();
+    m_config->systemElements->addTab(dw, QString("Connected Device"));
+
 }
 
 /**

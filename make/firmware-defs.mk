@@ -10,6 +10,7 @@ OBJDUMP = $(TCHAIN_PREFIX)objdump
 SIZE    = $(TCHAIN_PREFIX)size
 NM      = $(TCHAIN_PREFIX)nm
 STRIP   = $(TCHAIN_PREFIX)strip
+INSTALL = install
 
 THUMB   = -mthumb
 
@@ -43,6 +44,7 @@ MSG_CLEANING         := ${quote} CLEAN     ${quote}
 MSG_ASMFROMC         := ${quote} AS(C)     ${quote}
 MSG_ASMFROMC_ARM     := ${quote} AS(C)-ARM ${quote}
 MSG_PYMITEINIT       := ${quote} PY        ${quote}
+MSG_INSTALLING       := ${quote} INSTALL   ${quote}
 
 toprel = $(subst $(realpath $(TOP))/,,$(abspath $(1)))
 

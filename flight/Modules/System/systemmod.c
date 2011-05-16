@@ -59,8 +59,8 @@
 											  // optimisation options are changed.
 #endif
 
-#if defined(PIOS_MANUAL_STACK_SIZE)
-#define STACK_SIZE_BYTES PIOS_MANUAL_STACK_SIZE
+#if defined(PIOS_SYSTEM_STACK_SIZE)
+#define STACK_SIZE_BYTES PIOS_SYSTEM_STACK_SIZE
 #else
 #define STACK_SIZE_BYTES 924
 #endif

@@ -66,6 +66,8 @@ const int uav_trail_time_list[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};              
 
 const int uav_trail_distance_list[] = {1, 2, 5, 10, 20, 50, 100, 200, 500};             // meters
 
+const int max_update_rate_list[] = {100, 200, 500, 1000, 2000, 5000};                   // milliseconds
+
 // *************************************************************************************
 
 
@@ -89,15 +91,17 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 	obm = NULL;
 	obum = NULL;
 
-    prev_tile_number = 0;
+	m_prev_tile_number = 0;
 
-    min_zoom = max_zoom = 0;
+	m_min_zoom = m_max_zoom = 0;
 
     m_map_mode = Normal_MapMode;
 
-    telemetry_connected = false;
+	m_maxUpdateRate = max_update_rate_list[4];	// 2 seconds
 
-    context_menu_lat_lon = mouse_lat_lon = internals::PointLatLng(0, 0);
+	m_telemetry_connected = false;
+
+	m_context_menu_lat_lon = m_mouse_lat_lon = internals::PointLatLng(0, 0);
 
     setMouseTracking(true);
 
@@ -123,20 +127,20 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // **************
     // default home position
 
-    home_position.coord = pos_lat_lon;
-    home_position.altitude = altitude;
-    home_position.locked = false;
+	m_home_position.coord = pos_lat_lon;
+	m_home_position.altitude = altitude;
+	m_home_position.locked = false;
 
     // **************
     // default magic waypoint params
 
-    magic_waypoint.map_wp_item = NULL;
-    magic_waypoint.coord = home_position.coord;
-    magic_waypoint.altitude = altitude;
-    magic_waypoint.description = "Magic waypoint";
-    magic_waypoint.locked = false;
-    magic_waypoint.time_seconds = 0;
-    magic_waypoint.hold_time_seconds = 0;
+	m_magic_waypoint.map_wp_item = NULL;
+	m_magic_waypoint.coord = m_home_position.coord;
+	m_magic_waypoint.altitude = altitude;
+	m_magic_waypoint.description = "Magic waypoint";
+	m_magic_waypoint.locked = false;
+	m_magic_waypoint.time_seconds = 0;
+	m_magic_waypoint.hold_time_seconds = 0;
 
     // **************
     // create the widget that holds the user controls and the map
@@ -157,8 +161,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     m_widget->horizontalSliderZoom->setMinimum(m_map->MinZoom());			//
     m_widget->horizontalSliderZoom->setMaximum(m_map->MaxZoom() + max_digital_zoom);	//
 
-    min_zoom = m_widget->horizontalSliderZoom->minimum();	// minimum zoom we can accept
-    max_zoom = m_widget->horizontalSliderZoom->maximum();	// maximum zoom we can accept
+	m_min_zoom = m_widget->horizontalSliderZoom->minimum();	// minimum zoom we can accept
+	m_max_zoom = m_widget->horizontalSliderZoom->maximum();	// maximum zoom we can accept
 
     m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::MousePositionWithoutCenter);	    // set how the mouse wheel zoom functions
     m_map->SetFollowMouse(true);				    // we want a contiuous mouse position reading
@@ -262,10 +266,10 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_map, SIGNAL(WPInserted(int const&, WayPointItem*)), this, SLOT(WPInserted(int const&, WayPointItem*)));
     connect(m_map, SIGNAL(WPDeleted(int const&)), this, SLOT(WPDeleted(int const&)));
 
-    m_map->SetCurrentPosition(home_position.coord);         // set the map position
-    m_map->Home->SetCoord(home_position.coord);             // set the HOME position
-    m_map->UAV->SetUAVPos(home_position.coord, 0.0);        // set the UAV position
-    m_map->GPS->SetUAVPos(home_position.coord, 0.0);        // set the UAV position
+	m_map->SetCurrentPosition(m_home_position.coord);         // set the map position
+	m_map->Home->SetCoord(m_home_position.coord);             // set the HOME position
+	m_map->UAV->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
+	m_map->GPS->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
 
     // **************
     // create various context menu (mouse right click menu) actions
@@ -300,13 +304,14 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     // create the desired timers
 
     m_updateTimer = new QTimer();
-    m_updateTimer->setInterval(200);
+	m_updateTimer->setInterval(m_maxUpdateRate);
     connect(m_updateTimer, SIGNAL(timeout()), this, SLOT(updatePosition()));
     m_updateTimer->start();
 
     m_statusUpdateTimer = new QTimer();
-    m_statusUpdateTimer->setInterval(100);
-    connect(m_statusUpdateTimer, SIGNAL(timeout()), this, SLOT(updateMousePos()));
+	m_statusUpdateTimer->setInterval(200);
+//	m_statusUpdateTimer->setInterval(m_maxUpdateRate);
+	connect(m_statusUpdateTimer, SIGNAL(timeout()), this, SLOT(updateMousePos()));
     m_statusUpdateTimer->start();
 
     // **************
@@ -385,22 +390,22 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
     QString s;
 
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     if (event->reason() != QContextMenuEvent::Mouse)
         return;	// not a mouse click event
 
     // current mouse position
     QPoint p = m_map->mapFromGlobal(event->globalPos());
-    context_menu_lat_lon = m_map->GetFromLocalToLatLng(p);
-//    context_menu_lat_lon = m_map->currentMousePosition();
+	m_context_menu_lat_lon = m_map->GetFromLocalToLatLng(p);
+//    m_context_menu_lat_lon = m_map->currentMousePosition();
 
     if (!m_map->contentsRect().contains(p))
         return;					    // the mouse click was not on the map
 
     // show the mouse position
-    s = QString::number(context_menu_lat_lon.Lat(), 'f', 7) + "  " + QString::number(context_menu_lat_lon.Lng(), 'f', 7);
+	s = QString::number(m_context_menu_lat_lon.Lat(), 'f', 7) + "  " + QString::number(m_context_menu_lat_lon.Lng(), 'f', 7);
     m_widget->labelMousePos->setText(s);
 
     // find out if we have a waypoint under the mouse cursor
@@ -424,6 +429,13 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
     menu.addAction(reloadAct);
 
     menu.addSeparator();
+
+	QMenu maxUpdateRateSubMenu(tr("&Max Update Rate ") + "(" + QString::number(m_maxUpdateRate) + " ms)", this);
+	for (int i = 0; i < maxUpdateRateAct.count(); i++)
+		maxUpdateRateSubMenu.addAction(maxUpdateRateAct.at(i));
+	menu.addMenu(&maxUpdateRateSubMenu);
+
+	menu.addSeparator();
 
     switch (m_map_mode)
     {
@@ -612,58 +624,81 @@ void OPMapGadgetWidget::keyPressEvent(QKeyEvent* event)
 // *************************************************************************************
 // timer signals
 
-
 /**
   Updates the UAV position on the map. It is called every 200ms
   by a timer.
 
   TODO: consider updating upon object update, not timer.
+
+  from Pip: No don't update on object update - had reports that peoples PC's can't cope with high update rates - have had to allow user to set map update from 100ms to 5 seconds (depending on their PC's graphics processing ability), so this needs to be kept on a timer.
   */
 void OPMapGadgetWidget::updatePosition()
 {
-    if (!m_widget || !m_map)
-        return;
+	double uav_latitude, uav_longitude, uav_altitude, uav_yaw;
+	double gps_latitude, gps_longitude, gps_altitude, gps_heading;
+
+	internals::PointLatLng uav_pos;
+	internals::PointLatLng gps_pos;
+
+	if (!m_widget || !m_map)
+		return;
 
     QMutexLocker locker(&m_map_mutex);
-//Pip I'm sorry, I know this was here with a purpose vvv
-    //if (!telemetry_connected)
-      //  return;
+// Pip I'm sorry, I know this was here with a purpose vvv
+// from Pip: let you off :)
+	//if (!telemetry_connected)
+	//	return;
 
-    double latitude;
-    double longitude;
-    double altitude;
+	// *************
+	// get the current UAV details
 
     // get current UAV position
-	if (!getUAVPosition(latitude, longitude, altitude))
+	if (!getUAVPosition(uav_latitude, uav_longitude, uav_altitude))
         return;
 
     // get current UAV heading
-    float yaw = getUAV_Yaw();
+	uav_yaw = getUAV_Yaw();
 
-    internals::PointLatLng uav_pos = internals::PointLatLng(latitude, longitude);	// current UAV position
-    float uav_heading_degrees = yaw;                                                // current UAV heading
-    float uav_altitude_meters = altitude;                                           // current UAV height
-    float uav_ground_speed_meters_per_second = 0; //data.Groundspeed;               // current UAV ground speed
+	uav_pos = internals::PointLatLng(uav_latitude, uav_longitude);
 
-    // display the UAV lat/lon position
+	// *************
+	// get the current GPS details
+
+	// get current GPS position
+	if (!getGPSPosition(gps_latitude, gps_longitude, gps_altitude))
+		return;
+
+	// get current GPS heading
+//	gps_heading = getGPS_Heading();
+	gps_heading = 0;
+
+	gps_pos = internals::PointLatLng(gps_latitude, gps_longitude);
+
+	// *************
+	// display the UAV position
+
     QString str =
             "lat: " + QString::number(uav_pos.Lat(), 'f', 7) +
             " lon: " + QString::number(uav_pos.Lng(), 'f', 7) +
-            " " + QString::number(uav_heading_degrees, 'f', 1) + "deg" +
-            " " + QString::number(uav_altitude_meters, 'f', 1) + "m" +
-            " " + QString::number(uav_ground_speed_meters_per_second, 'f', 1) + "m/s";
+			" " + QString::number(uav_yaw, 'f', 1) + "deg" +
+			" " + QString::number(uav_altitude, 'f', 1) + "m";
+//            " " + QString::number(uav_ground_speed_meters_per_second, 'f', 1) + "m/s";
     m_widget->labelUAVPos->setText(str);
 
-    m_map->UAV->SetUAVPos(uav_pos, uav_altitude_meters); // set the maps UAV position
-   // qDebug()<<"UAVPOSITION"<<uav_pos.ToString();
-    m_map->UAV->SetUAVHeading(uav_heading_degrees);      // set the maps UAV heading
+	// *************
+	// set the UAV icon position on the map
 
-	if (!getGPSPosition(latitude, longitude, altitude))
-        return;
+	m_map->UAV->SetUAVPos(uav_pos, uav_altitude);        // set the maps UAV position
+//	qDebug()<<"UAVPOSITION"<<uav_pos.ToString();
+	m_map->UAV->SetUAVHeading(uav_yaw);                  // set the maps UAV heading
 
-    uav_pos = internals::PointLatLng(latitude, longitude);	// current UAV position
-    m_map->GPS->SetUAVPos(uav_pos, uav_altitude_meters); // set the maps UAV position
-    m_map->GPS->SetUAVHeading(uav_heading_degrees);      // set the maps UAV heading
+	// *************
+	// set the GPS icon position on the map
+
+	m_map->GPS->SetUAVPos(gps_pos, gps_altitude); // set the maps GPS position
+	m_map->GPS->SetUAVHeading(gps_heading);       // set the maps GPS heading
+
+	// *************
 }
 
 /**
@@ -672,8 +707,8 @@ void OPMapGadgetWidget::updatePosition()
  */
 void OPMapGadgetWidget::updateMousePos()
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     QMutexLocker locker(&m_map_mutex);
 
@@ -696,14 +731,14 @@ void OPMapGadgetWidget::updateMousePos()
     // find out if we have a waypoint under the mouse cursor
     mapcontrol::WayPointItem *wp = qgraphicsitem_cast<mapcontrol::WayPointItem *>(item);
 
-    if (mouse_lat_lon == lat_lon)
+	if (m_mouse_lat_lon == lat_lon)
         return;                 // the mouse has not moved
 
-    mouse_lat_lon = lat_lon;    // yes it has!
+	m_mouse_lat_lon = lat_lon;    // yes it has!
 
     internals::PointLatLng home_lat_lon = m_map->Home->Coord();
 
-    QString s = QString::number(mouse_lat_lon.Lat(), 'f', 7) + "  " + QString::number(mouse_lat_lon.Lng(), 'f', 7);
+	QString s = QString::number(m_mouse_lat_lon.Lat(), 'f', 7) + "  " + QString::number(m_mouse_lat_lon.Lng(), 'f', 7);
     if (wp)
     {
         s += "  wp[" + QString::number(wp->Number()) + "]";
@@ -718,8 +753,8 @@ void OPMapGadgetWidget::updateMousePos()
     {
         s += "  home";
 
-        double dist = distance(home_lat_lon, mouse_lat_lon);
-        double bear = bearing(home_lat_lon, mouse_lat_lon);
+		double dist = distance(home_lat_lon, m_mouse_lat_lon);
+		double bear = bearing(home_lat_lon, m_mouse_lat_lon);
         s += "  " + QString::number(dist * 1000, 'f', 1) + "m";
         s += "  " + QString::number(bear, 'f', 1) + "deg";
     }
@@ -753,22 +788,22 @@ void OPMapGadgetWidget::updateMousePos()
   */
 void OPMapGadgetWidget::zoomChanged(double zoomt, double zoom, double zoomd)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     QString s = "tot:" + QString::number(zoomt, 'f', 1) + " rea:" + QString::number(zoom, 'f', 1) + " dig:" + QString::number(zoomd, 'f', 1);
     m_widget->labelMapZoom->setText(s);
 
     int i_zoom = (int)(zoomt + 0.5);
 
-    if (i_zoom < min_zoom) i_zoom = min_zoom;
+	if (i_zoom < m_min_zoom) i_zoom = m_min_zoom;
     else
-    if (i_zoom > max_zoom) i_zoom = max_zoom;
+	if (i_zoom > m_max_zoom) i_zoom = m_max_zoom;
 
     if (m_widget->horizontalSliderZoom->value() != i_zoom)
 	m_widget->horizontalSliderZoom->setValue(i_zoom);	// set the GUI zoom slider position
 
-    int index0_zoom = i_zoom - min_zoom;			// zoom level starting at index level '0'
+	int index0_zoom = i_zoom - m_min_zoom;			// zoom level starting at index level '0'
     if (index0_zoom < zoomAct.count())
 	zoomAct.at(index0_zoom)->setChecked(true);		// set the right-click context menu zoom level
 }
@@ -779,8 +814,8 @@ void OPMapGadgetWidget::OnMapDrag()
 
 void OPMapGadgetWidget::OnCurrentPositionChanged(internals::PointLatLng point)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     QString coord_str = QString::number(point.Lat(), 'f', 7) + "   " + QString::number(point.Lng(), 'f', 7) + " ";
     m_widget->labelMapPos->setText(coord_str);
@@ -791,8 +826,8 @@ void OPMapGadgetWidget::OnCurrentPositionChanged(internals::PointLatLng point)
   */
 void OPMapGadgetWidget::OnTilesStillToLoad(int number)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
 //	if (prev_tile_number < number || m_widget->progressBarMap->maximum() < number)
 //	    m_widget->progressBarMap->setMaximum(number);
@@ -804,7 +839,7 @@ void OPMapGadgetWidget::OnTilesStillToLoad(int number)
 
 //	m_widget->labelNumTilesToLoad->setText(QString::number(number));
 
-	prev_tile_number = number;
+	m_prev_tile_number = number;
 }
 
 /**
@@ -812,8 +847,8 @@ void OPMapGadgetWidget::OnTilesStillToLoad(int number)
   */
 void OPMapGadgetWidget::OnTileLoadStart()
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     m_widget->progressBarMap->setVisible(true);
 }
@@ -826,8 +861,8 @@ void OPMapGadgetWidget::OnTileLoadStart()
 
 void OPMapGadgetWidget::OnTileLoadComplete()
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     m_widget->progressBarMap->setVisible(false);
 }
@@ -878,11 +913,11 @@ void OPMapGadgetWidget::WPValuesChanged(WayPointItem *waypoint)
 
         case MagicWaypoint_MapMode:
             // update our copy of the magic waypoint
-            if (magic_waypoint.map_wp_item && magic_waypoint.map_wp_item == waypoint)
+			if (m_magic_waypoint.map_wp_item && m_magic_waypoint.map_wp_item == waypoint)
             {
-                magic_waypoint.coord = waypoint->Coord();
-                magic_waypoint.altitude = waypoint->Altitude();
-                magic_waypoint.description = waypoint->Description();
+				m_magic_waypoint.coord = waypoint->Coord();
+				m_magic_waypoint.altitude = waypoint->Altitude();
+				m_magic_waypoint.description = waypoint->Description();
 
                 // move the UAV to the magic waypoint position
                 // moveToMagicWaypointPosition();
@@ -930,8 +965,8 @@ void OPMapGadgetWidget::on_toolButtonMapHome_clicked()
 
 void OPMapGadgetWidget::on_toolButtonMapUAV_clicked()
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     QMutexLocker locker(&m_map_mutex);
 
@@ -940,16 +975,16 @@ void OPMapGadgetWidget::on_toolButtonMapUAV_clicked()
 
 void OPMapGadgetWidget::on_toolButtonMapUAVheading_clicked()
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     followUAVheadingAct->toggle();
 }
 
 void OPMapGadgetWidget::on_horizontalSliderZoom_sliderMoved(int position)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     QMutexLocker locker(&m_map_mutex);
 
@@ -982,7 +1017,7 @@ void OPMapGadgetWidget::on_toolButtonMoveToWP_clicked()
 
 void OPMapGadgetWidget::onTelemetryConnect()
 {
-    telemetry_connected = true;
+	m_telemetry_connected = true;
 
 	if (!obum) return;
 
@@ -998,14 +1033,14 @@ void OPMapGadgetWidget::onTelemetryConnect()
 	setHome(internals::PointLatLng(LLA[0], LLA[1]));
 
     if (m_map)
-        m_map->SetCurrentPosition(home_position.coord);         // set the map position
+		m_map->SetCurrentPosition(m_home_position.coord);         // set the map position
 
     // ***********************
 }
 
 void OPMapGadgetWidget::onTelemetryDisconnect()
 {
-    telemetry_connected = false;
+	m_telemetry_connected = false;
 }
 
 // Updates the Home position icon whenever the HomePosition object is updated
@@ -1027,8 +1062,8 @@ void OPMapGadgetWidget::homePositionUpdated(UAVObject *hp)
   */
 void OPMapGadgetWidget::setHome(QPointF pos)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     double latitude = pos.x();
     double longitude = pos.y();
@@ -1051,8 +1086,8 @@ void OPMapGadgetWidget::setHome(QPointF pos)
   */
 void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     if (pos_lat_lon.Lat() != pos_lat_lon.Lat() || pos_lat_lon.Lng() != pos_lat_lon.Lng())
         return;; // nan prevention
@@ -1074,9 +1109,9 @@ void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon)
 
     // *********
 
-    home_position.coord = internals::PointLatLng(latitude, longitude);
+	m_home_position.coord = internals::PointLatLng(latitude, longitude);
 
-    m_map->Home->SetCoord(home_position.coord);
+	m_map->Home->SetCoord(m_home_position.coord);
     m_map->Home->RefreshPos();
 
     // move the magic waypoint to keep it within the safe area boundry
@@ -1089,52 +1124,74 @@ void OPMapGadgetWidget::setHome(internals::PointLatLng pos_lat_lon)
   */
 void OPMapGadgetWidget::goHome()
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     followUAVpositionAct->setChecked(false);
 
-    internals::PointLatLng home_pos = home_position.coord;	// get the home location
+	internals::PointLatLng home_pos = m_home_position.coord;	// get the home location
     m_map->SetCurrentPosition(home_pos);                    // center the map onto the home location
 }
 
 
 void OPMapGadgetWidget::zoomIn()
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     int zoom = m_map->ZoomTotal() + 1;
 
-    if (zoom < min_zoom) zoom = min_zoom;
+	if (zoom < m_min_zoom) zoom = m_min_zoom;
     else
-    if (zoom > max_zoom) zoom = max_zoom;
+	if (zoom > m_max_zoom) zoom = m_max_zoom;
 
     m_map->SetZoom(zoom);
 }
 
 void OPMapGadgetWidget::zoomOut()
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     int zoom = m_map->ZoomTotal() - 1;
 
-    if (zoom < min_zoom) zoom = min_zoom;
+	if (zoom < m_min_zoom) zoom = m_min_zoom;
     else
-    if (zoom > max_zoom) zoom = max_zoom;
+	if (zoom > m_max_zoom) zoom = m_max_zoom;
 
     m_map->SetZoom(zoom);
 }
 
+void OPMapGadgetWidget::setMaxUpdateRate(int update_rate)
+{
+	if (!m_widget || !m_map)
+		return;
+
+	int list_size = sizeof(max_update_rate_list) / sizeof(max_update_rate_list[0]);
+	int min_rate = max_update_rate_list[0];
+	int max_rate = max_update_rate_list[list_size - 1];
+
+	if (update_rate < min_rate) update_rate = min_rate;
+	else
+	if (update_rate > max_rate) update_rate = max_rate;
+
+	m_maxUpdateRate = update_rate;
+
+	if (m_updateTimer)
+		m_updateTimer->setInterval(m_maxUpdateRate);
+
+//	if (m_statusUpdateTimer)
+//		m_statusUpdateTimer->setInterval(m_maxUpdateRate);
+}
+
 void OPMapGadgetWidget::setZoom(int zoom)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
-    if (zoom < min_zoom) zoom = min_zoom;
+	if (zoom < m_min_zoom) zoom = m_min_zoom;
     else
-    if (zoom > max_zoom) zoom = max_zoom;
+	if (zoom > m_max_zoom) zoom = m_max_zoom;
 
     internals::MouseWheelZoomType::Types zoom_type = m_map->GetMouseWheelZoomType();
     m_map->SetMouseWheelZoomType(internals::MouseWheelZoomType::ViewCenter);
@@ -1146,8 +1203,8 @@ void OPMapGadgetWidget::setZoom(int zoom)
 
 void OPMapGadgetWidget::setPosition(QPointF pos)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     double latitude = pos.y();
     double longitude = pos.x();
@@ -1168,48 +1225,48 @@ void OPMapGadgetWidget::setPosition(QPointF pos)
 
 void OPMapGadgetWidget::setMapProvider(QString provider)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     m_map->SetMapType(mapcontrol::Helper::MapTypeFromString(provider));
 }
 
 void OPMapGadgetWidget::setAccessMode(QString accessMode)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     m_map->configuration->SetAccessMode(mapcontrol::Helper::AccessModeFromString(accessMode));
 }
 
 void OPMapGadgetWidget::setUseOpenGL(bool useOpenGL)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     m_map->SetUseOpenGL(useOpenGL);
 }
 
 void OPMapGadgetWidget::setShowTileGridLines(bool showTileGridLines)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     m_map->SetShowTileGridLines(showTileGridLines);
 }
 
 void OPMapGadgetWidget::setUseMemoryCache(bool useMemoryCache)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     m_map->configuration->SetUseMemoryCache(useMemoryCache);
 }
 
 void OPMapGadgetWidget::setCacheLocation(QString cacheLocation)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     cacheLocation = cacheLocation.simplified();	// remove any surrounding spaces
 
@@ -1235,8 +1292,8 @@ void OPMapGadgetWidget::setCacheLocation(QString cacheLocation)
 
 void OPMapGadgetWidget::setMapMode(opMapModeType mode)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     if (mode != Normal_MapMode && mode != MagicWaypoint_MapMode)
         mode = Normal_MapMode;  // fix error
@@ -1268,12 +1325,12 @@ void OPMapGadgetWidget::setMapMode(opMapModeType mode)
             hideMagicWaypointControls();
 
             // delete the magic waypoint from the map
-            if (magic_waypoint.map_wp_item)
+			if (m_magic_waypoint.map_wp_item)
             {
-                magic_waypoint.coord = magic_waypoint.map_wp_item->Coord();
-                magic_waypoint.altitude = magic_waypoint.map_wp_item->Altitude();
-                magic_waypoint.description = magic_waypoint.map_wp_item->Description();
-                magic_waypoint.map_wp_item = NULL;
+				m_magic_waypoint.coord = m_magic_waypoint.map_wp_item->Coord();
+				m_magic_waypoint.altitude = m_magic_waypoint.map_wp_item->Altitude();
+				m_magic_waypoint.description = m_magic_waypoint.map_wp_item->Description();
+				m_magic_waypoint.map_wp_item = NULL;
             }
             m_map->WPDeleteAll();
 
@@ -1320,10 +1377,10 @@ void OPMapGadgetWidget::setMapMode(opMapModeType mode)
             m_waypoint_list_mutex.unlock();
 
             // restore the magic waypoint on the map
-            magic_waypoint.map_wp_item = m_map->WPCreate(magic_waypoint.coord, magic_waypoint.altitude, magic_waypoint.description);
-            magic_waypoint.map_wp_item->setZValue(10 + magic_waypoint.map_wp_item->Number());
-            magic_waypoint.map_wp_item->SetShowNumber(false);
-            magic_waypoint.map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker3.png"));
+			m_magic_waypoint.map_wp_item = m_map->WPCreate(m_magic_waypoint.coord, m_magic_waypoint.altitude, m_magic_waypoint.description);
+			m_magic_waypoint.map_wp_item->setZValue(10 + m_magic_waypoint.map_wp_item->Number());
+			m_magic_waypoint.map_wp_item->SetShowNumber(false);
+			m_magic_waypoint.map_wp_item->picture.load(QString::fromUtf8(":/opmap/images/waypoint_marker3.png"));
 
             break;
     }
@@ -1334,8 +1391,10 @@ void OPMapGadgetWidget::setMapMode(opMapModeType mode)
 
 void OPMapGadgetWidget::createActions()
 {
-    if (!m_widget)
-	return;
+	int list_size;
+
+	if (!m_widget || !m_map)
+		return;
 
     // ***********************
     // create menu actions
@@ -1503,7 +1562,7 @@ void OPMapGadgetWidget::createActions()
     zoomActGroup = new QActionGroup(this);
     connect(zoomActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onZoomActGroup_triggered(QAction *)));
     zoomAct.clear();
-    for (int i = min_zoom; i <= max_zoom; i++)
+	for (int i = m_min_zoom; i <= m_max_zoom; i++)
     {
         QAction *zoom_act = new QAction(QString::number(i), zoomActGroup);
         zoom_act->setCheckable(true);
@@ -1511,7 +1570,22 @@ void OPMapGadgetWidget::createActions()
         zoomAct.append(zoom_act);
     }
 
-    // *****
+	maxUpdateRateActGroup = new QActionGroup(this);
+	connect(maxUpdateRateActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onMaxUpdateRateActGroup_triggered(QAction *)));
+	maxUpdateRateAct.clear();
+	list_size = sizeof(max_update_rate_list) / sizeof(max_update_rate_list[0]);
+	for (int i = 0; i < list_size; i++)
+	{
+		QAction *maxUpdateRate_act;
+		int j = max_update_rate_list[i];
+		maxUpdateRate_act = new QAction(QString::number(j), maxUpdateRateActGroup);
+		maxUpdateRate_act->setCheckable(true);
+		maxUpdateRate_act->setData(j);
+		maxUpdateRate_act->setChecked(j == m_maxUpdateRate);
+		maxUpdateRateAct.append(maxUpdateRate_act);
+	}
+
+	// *****
     // safe area
 
     showSafeAreaAct = new QAction(tr("Show Safe Area"), this);
@@ -1523,7 +1597,8 @@ void OPMapGadgetWidget::createActions()
     safeAreaActGroup = new QActionGroup(this);
     connect(safeAreaActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onSafeAreaActGroup_triggered(QAction *)));
     safeAreaAct.clear();
-    for (int i = 0; i < (int)(sizeof(safe_area_radius_list) / sizeof(safe_area_radius_list[0])); i++)
+	list_size = sizeof(safe_area_radius_list) / sizeof(safe_area_radius_list[0]);
+	for (int i = 0; i < list_size; i++)
     {
         int safeArea = safe_area_radius_list[i];
         QAction *safeArea_act = new QAction(QString::number(safeArea) + "m", safeAreaActGroup);
@@ -1569,7 +1644,8 @@ void OPMapGadgetWidget::createActions()
     uavTrailTimeActGroup = new QActionGroup(this);
     connect(uavTrailTimeActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onUAVTrailTimeActGroup_triggered(QAction *)));
     uavTrailTimeAct.clear();
-    for (int i = 0; i < (int)(sizeof(uav_trail_time_list) / sizeof(uav_trail_time_list[0])); i++)
+	list_size = sizeof(uav_trail_time_list) / sizeof(uav_trail_time_list[0]);
+	for (int i = 0; i < list_size; i++)
     {
         int uav_trail_time = uav_trail_time_list[i];
         QAction *uavTrailTime_act = new QAction(QString::number(uav_trail_time) + " sec", uavTrailTimeActGroup);
@@ -1582,7 +1658,8 @@ void OPMapGadgetWidget::createActions()
     uavTrailDistanceActGroup = new QActionGroup(this);
     connect(uavTrailDistanceActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onUAVTrailDistanceActGroup_triggered(QAction *)));
     uavTrailDistanceAct.clear();
-    for (int i = 0; i < (int)(sizeof(uav_trail_distance_list) / sizeof(uav_trail_distance_list[0])); i++)
+	list_size = sizeof(uav_trail_distance_list) / sizeof(uav_trail_distance_list[0]);
+	for (int i = 0; i < list_size; i++)
     {
         int uav_trail_distance = uav_trail_distance_list[i];
         QAction *uavTrailDistance_act = new QAction(QString::number(uav_trail_distance) + " meters", uavTrailDistanceActGroup);
@@ -1599,62 +1676,59 @@ void OPMapGadgetWidget::createActions()
 
 void OPMapGadgetWidget::onReloadAct_triggered()
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     m_map->ReloadMap();
 }
 
 void OPMapGadgetWidget::onCopyMouseLatLonToClipAct_triggered()
 {
-//    QClipboard *clipboard = qApp->clipboard();
     QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(QString::number(context_menu_lat_lon.Lat(), 'f', 7) + ", " + QString::number(context_menu_lat_lon.Lng(), 'f', 7), QClipboard::Clipboard);
+	clipboard->setText(QString::number(m_context_menu_lat_lon.Lat(), 'f', 7) + ", " + QString::number(m_context_menu_lat_lon.Lng(), 'f', 7), QClipboard::Clipboard);
 }
 
 void OPMapGadgetWidget::onCopyMouseLatToClipAct_triggered()
 {
-//    QClipboard *clipboard = qApp->clipboard();
     QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(QString::number(context_menu_lat_lon.Lat(), 'f', 7), QClipboard::Clipboard);
+	clipboard->setText(QString::number(m_context_menu_lat_lon.Lat(), 'f', 7), QClipboard::Clipboard);
 }
 
 void OPMapGadgetWidget::onCopyMouseLonToClipAct_triggered()
 {
-//    QClipboard *clipboard = qApp->clipboard();
     QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(QString::number(context_menu_lat_lon.Lng(), 'f', 7), QClipboard::Clipboard);
+	clipboard->setText(QString::number(m_context_menu_lat_lon.Lng(), 'f', 7), QClipboard::Clipboard);
 }
 
 
 void OPMapGadgetWidget::onShowCompassAct_toggled(bool show)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     m_map->SetShowCompass(show);
 }
 
 void OPMapGadgetWidget::onShowDiagnostics_toggled(bool show)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     m_map->SetShowDiagnostics(show);
 }
 
 void OPMapGadgetWidget::onShowHomeAct_toggled(bool show)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     m_map->Home->setVisible(show);
 }
 
 void OPMapGadgetWidget::onShowUAVAct_toggled(bool show)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     m_map->UAV->setVisible(show);
     m_map->GPS->setVisible(show);
@@ -1662,8 +1736,8 @@ void OPMapGadgetWidget::onShowUAVAct_toggled(bool show)
 
 void OPMapGadgetWidget::onShowTrailAct_toggled(bool show)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     m_map->UAV->SetShowTrail(show);
     m_map->GPS->SetShowTrail(show);
@@ -1671,8 +1745,8 @@ void OPMapGadgetWidget::onShowTrailAct_toggled(bool show)
 
 void OPMapGadgetWidget::onShowTrailLineAct_toggled(bool show)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     m_map->UAV->SetShowTrailLine(show);
     m_map->GPS->SetShowTrailLine(show);
@@ -1700,42 +1774,50 @@ void OPMapGadgetWidget::onGoZoomOutAct_triggered()
 
 void OPMapGadgetWidget::onZoomActGroup_triggered(QAction *action)
 {
-    if (!m_widget || !action)
-        return;
+	if (!m_widget || !m_map || !action)
+		return;
 
     setZoom(action->data().toInt());
 }
 
+void OPMapGadgetWidget::onMaxUpdateRateActGroup_triggered(QAction *action)
+{
+	if (!m_widget || !m_map || !action)
+		return;
+
+	setMaxUpdateRate(action->data().toInt());
+}
+
 void OPMapGadgetWidget::onGoMouseClickAct_triggered()
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     m_map->SetCurrentPosition(m_map->currentMousePosition());   // center the map onto the mouse position
 }
 
 void OPMapGadgetWidget::onSetHomeAct_triggered()
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
-    setHome(context_menu_lat_lon);
+	setHome(m_context_menu_lat_lon);
 
     setHomeLocationObject();  // update the HomeLocation UAVObject
 }
 
 void OPMapGadgetWidget::onGoHomeAct_triggered()
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     goHome();
 }
 
 void OPMapGadgetWidget::onGoUAVAct_triggered()
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     double latitude;
     double longitude;
@@ -1750,8 +1832,8 @@ void OPMapGadgetWidget::onGoUAVAct_triggered()
 
 void OPMapGadgetWidget::onFollowUAVpositionAct_toggled(bool checked)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     if (m_widget->toolButtonMapUAV->isChecked() != checked)
         m_widget->toolButtonMapUAV->setChecked(checked);
@@ -1761,8 +1843,8 @@ void OPMapGadgetWidget::onFollowUAVpositionAct_toggled(bool checked)
 
 void OPMapGadgetWidget::onFollowUAVheadingAct_toggled(bool checked)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     if (m_widget->toolButtonMapUAVheading->isChecked() != checked)
         m_widget->toolButtonMapUAVheading->setChecked(checked);
@@ -1772,8 +1854,8 @@ void OPMapGadgetWidget::onFollowUAVheadingAct_toggled(bool checked)
 
 void OPMapGadgetWidget::onUAVTrailTypeActGroup_triggered(QAction *action)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map || !action)
+		return;
 
     int trail_type_idx = action->data().toInt();
 
@@ -1785,8 +1867,8 @@ void OPMapGadgetWidget::onUAVTrailTypeActGroup_triggered(QAction *action)
 
 void OPMapGadgetWidget::onClearUAVtrailAct_triggered()
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     m_map->UAV->DeleteTrail();
     m_map->GPS->DeleteTrail();
@@ -1794,8 +1876,8 @@ void OPMapGadgetWidget::onClearUAVtrailAct_triggered()
 
 void OPMapGadgetWidget::onUAVTrailTimeActGroup_triggered(QAction *action)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map || !action)
+		return;
 
     int trail_time = (double)action->data().toInt();
 
@@ -1804,8 +1886,8 @@ void OPMapGadgetWidget::onUAVTrailTimeActGroup_triggered(QAction *action)
 
 void OPMapGadgetWidget::onUAVTrailDistanceActGroup_triggered(QAction *action)
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map || !action)
+		return;
 
     int trail_distance = action->data().toInt();
 
@@ -1818,8 +1900,8 @@ void OPMapGadgetWidget::onUAVTrailDistanceActGroup_triggered(QAction *action)
 /*
 void OPMapGadgetWidget::onAddWayPointAct_triggered()
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     if (m_map_mode != Normal_MapMode)
         return;
@@ -1866,8 +1948,8 @@ void OPMapGadgetWidget::onAddWayPointAct_triggered()
 /*
 void OPMapGadgetWidget::onEditWayPointAct_triggered()
 {
-    if (!m_widget || !m_map)
-        return;
+	if (!m_widget || !m_map)
+		return;
 
     if (m_map_mode != Normal_MapMode)
         return;
@@ -2010,7 +2092,7 @@ void OPMapGadgetWidget::onShowSafeAreaAct_toggled(bool show)
 
 void OPMapGadgetWidget::onSafeAreaActGroup_triggered(QAction *action)
 {
-    if (!m_widget || !m_map)
+	if (!m_widget || !m_map || !action)
         return;
 
     int radius = action->data().toInt();
@@ -2033,10 +2115,10 @@ void OPMapGadgetWidget::homeMagicWaypoint()
     if (m_map_mode != MagicWaypoint_MapMode)
         return;
 
-    magic_waypoint.coord = home_position.coord;
+	m_magic_waypoint.coord = m_home_position.coord;
 
-    if (magic_waypoint.map_wp_item)
-        magic_waypoint.map_wp_item->SetCoord(magic_waypoint.coord);
+	if (m_magic_waypoint.map_wp_item)
+		m_magic_waypoint.map_wp_item->SetCoord(m_magic_waypoint.coord);
 }
 
 // *************************************************************************************
@@ -2134,8 +2216,8 @@ void OPMapGadgetWidget::keepMagicWaypointWithInSafeArea()
 {
 
     // calcute the bearing and distance from the home position to the magic waypoint
-    double dist = distance(home_position.coord, magic_waypoint.coord);
-    double bear = bearing(home_position.coord, magic_waypoint.coord);
+	double dist = distance(m_home_position.coord, m_magic_waypoint.coord);
+	double bear = bearing(m_home_position.coord, m_magic_waypoint.coord);
 
     // get the maximum safe distance - in kilometers
     double boundry_dist = (double)m_map->Home->SafeArea() / 1000;
@@ -2147,12 +2229,12 @@ void OPMapGadgetWidget::keepMagicWaypointWithInSafeArea()
 
     // move the magic waypoint
 
-    magic_waypoint.coord = destPoint(home_position.coord, bear, dist);
+	m_magic_waypoint.coord = destPoint(m_home_position.coord, bear, dist);
 
     if (m_map_mode == MagicWaypoint_MapMode)
     {   // move the on-screen waypoint
-        if (magic_waypoint.map_wp_item)
-            magic_waypoint.map_wp_item->SetCoord(magic_waypoint.coord);
+		if (m_magic_waypoint.map_wp_item)
+			m_magic_waypoint.map_wp_item->SetCoord(m_magic_waypoint.coord);
     }
 }
 
@@ -2289,7 +2371,21 @@ bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, doub
     return true;
 }
 
-// *************************************************************************************
+double OPMapGadgetWidget::getUAV_Yaw()
+{
+	if (!obm)
+		return 0;
+
+	UAVObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("AttitudeActual")));
+	double yaw = obj->getField(QString("Yaw"))->getDouble();
+
+	if (yaw != yaw) yaw = 0; // nan detection
+
+	while (yaw < 0) yaw += 360;
+	while (yaw >= 360) yaw -= 360;
+
+	return yaw;
+}
 
 bool OPMapGadgetWidget::getGPSPosition(double &latitude, double &longitude, double &altitude)
 {
@@ -2306,22 +2402,6 @@ bool OPMapGadgetWidget::getGPSPosition(double &latitude, double &longitude, doub
 	altitude = LLA[2];
 
     return true;
-}
-
-double OPMapGadgetWidget::getUAV_Yaw()
-{
-	if (!obm)
-		return 0;
-
-	UAVObject *obj = dynamic_cast<UAVDataObject*>(obm->getObject(QString("AttitudeActual")));
-    double yaw = obj->getField(QString("Yaw"))->getDouble();
-
-    if (yaw != yaw) yaw = 0; // nan detection
-
-    while (yaw < 0) yaw += 360;
-    while (yaw >= 360) yaw -= 360;
-
-    return yaw;
 }
 
 // *************************************************************************************
@@ -2359,7 +2439,7 @@ bool OPMapGadgetWidget::setHomeLocationObject()
 	if (!obum)
 		return false;
 
-	double LLA[3] = {home_position.coord.Lat(), home_position.coord.Lng(), home_position.altitude};
+	double LLA[3] = {m_home_position.coord.Lat(), m_home_position.coord.Lng(), m_home_position.altitude};
 	return (obum->setHomeLocation(LLA, true) >= 0);
 }
 

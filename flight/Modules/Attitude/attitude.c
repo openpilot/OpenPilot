@@ -152,6 +152,7 @@ static void AttitudeTask(void *parameters)
 			init = 0;
 		} 	
 		else if (zero_during_arming && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
+			accelKp = 1;
 			accelKi = 0.9;
 			yawBiasRate = 0.23;
 			init = 0;			

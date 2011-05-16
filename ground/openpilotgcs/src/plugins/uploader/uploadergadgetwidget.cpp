@@ -358,13 +358,13 @@ void UploaderGadgetWidget::systemBoot()
         log("Could not enter DFU mode.");
         delete dfu;
         dfu = NULL;
+        m_config->bootButton->setEnabled(true);
         return;
     }
     log("Booting system...");
     dfu->JumpToApp();
     // Restart the polling thread
     cm->resumePolling();
-    m_config->bootButton->setEnabled(true);
     m_config->rescueButton->setEnabled(true);
     m_config->telemetryLink->setEnabled(true);
     m_config->boardStatus->setText("Running");

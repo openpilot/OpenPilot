@@ -36,6 +36,7 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 #include <QMessageBox>
+#include <QSignalMapper>
 
 ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
@@ -160,6 +161,21 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
             connect(tm, SIGNAL(disconnected()), this, SLOT(onTelemetryDisconnect()));
         }
     }
+
+    // Connect all the help buttons to signal mapper that passes button name to SLOT function
+    QSignalMapper* signalMapper = new QSignalMapper(this);
+    connect( m_config->channelRateHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
+    signalMapper->setMapping(m_config->channelRateHelp, m_config->channelRateHelp->objectName());
+    connect( m_config->channelValuesHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
+    signalMapper->setMapping(m_config->channelValuesHelp, m_config->channelValuesHelp->objectName());
+    connect( m_config->spinningArmedlHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
+    signalMapper->setMapping(m_config->spinningArmedlHelp, m_config->spinningArmedlHelp->objectName());
+    connect( m_config->testOutputsHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
+    signalMapper->setMapping(m_config->testOutputsHelp, m_config->testOutputsHelp->objectName());
+    connect( m_config->commandHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
+    signalMapper->setMapping(m_config->commandHelp, QString("commandHelp"));
+
+    connect(signalMapper, SIGNAL(mapped(const QString &)), parent, SLOT(showHelp(const QString &)));
 }
 
 ConfigOutputWidget::~ConfigOutputWidget()

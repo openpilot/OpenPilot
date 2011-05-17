@@ -95,31 +95,18 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
             << m_config->ch6Rev
             << m_config->ch7Rev;
 
-	links << m_config->ch0Link
-			<< m_config->ch1Link
-			<< m_config->ch2Link
-			<< m_config->ch3Link
-			<< m_config->ch4Link
-			<< m_config->ch5Link
-			<< m_config->ch6Link
-			<< m_config->ch7Link;
+    links << m_config->ch0Link
+              << m_config->ch1Link
+              << m_config->ch2Link
+              << m_config->ch3Link
+              << m_config->ch4Link
+              << m_config->ch5Link
+              << m_config->ch6Link
+              << m_config->ch7Link;
 
-/*
-        UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
-    QList<UAVObjectField*> fieldList = obj->getFields();
-    foreach (UAVObjectField* field, fieldList) {
-        if (field->getUnits().contains("channel")) {
-            m_config->ch0Output->addItem(field->getName());
-            m_config->ch1Output->addItem(field->getName());
-            m_config->ch2Output->addItem(field->getName());
-            m_config->ch3Output->addItem(field->getName());
-            m_config->ch4Output->addItem(field->getName());
-            m_config->ch5Output->addItem(field->getName());
-            m_config->ch6Output->addItem(field->getName());
-            m_config->ch7Output->addItem(field->getName());
-        }
-    }
-    */
+    // Register for ActuatorSettings changes:
+    UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
+    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(requestRCOutputUpdate()));
 
 
     for (int i = 0; i < 8; i++) {
@@ -141,6 +128,9 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 
     connect(m_config->saveRCOutputToSD, SIGNAL(clicked()), this, SLOT(saveRCOutputObject()));
     connect(m_config->saveRCOutputToRAM, SIGNAL(clicked()), this, SLOT(sendRCOutputUpdate()));
+
+    // Actually, this is not really needed since we are subscribing to the object updates already
+    // TODO: remove those buttons on all config gadget panels.
     connect(m_config->getRCOutputCurrent, SIGNAL(clicked()), this, SLOT(requestRCOutputUpdate()));
 
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestRCOutputUpdate()));
@@ -435,7 +425,6 @@ void ConfigOutputWidget::requestRCOutputUpdate()
     // Get the channel assignements:
     UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
     Q_ASSERT(obj);
-    obj->requestUpdate();
     QList<UAVObjectField*> fieldList = obj->getFields();
     foreach (UAVObjectField* field, fieldList) {
         if (field->getUnits().contains("channel")) {

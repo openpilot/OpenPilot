@@ -100,7 +100,7 @@ DFUObject::DFUObject(bool _debug,bool _use_serial,QString portname):
        if (devices.length()==1) {
            hidHandle.open(1,devices.first().vendorID,devices.first().productID,0,0);
         } else {
-           qDebug() << "More than one device, don't know what to do!";
+           qDebug() << devices.length()  << " device(s) detected, don't know what to do!";
            mready = false;
        }
 

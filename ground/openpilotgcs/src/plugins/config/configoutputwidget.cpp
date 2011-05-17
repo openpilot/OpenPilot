@@ -104,7 +104,8 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 			<< m_config->ch6Link
 			<< m_config->ch7Link;
 
-	UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
+/*
+        UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
     QList<UAVObjectField*> fieldList = obj->getFields();
     foreach (UAVObjectField* field, fieldList) {
         if (field->getUnits().contains("channel")) {
@@ -118,6 +119,7 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
             m_config->ch7Output->addItem(field->getName());
         }
     }
+    */
 
 
     for (int i = 0; i < 8; i++) {
@@ -308,7 +310,7 @@ void ConfigOutputWidget::runChannelTests(bool state)
 }
 
 /**
-  * Set the dropdown option for a channel output assignement
+  * Set the label for a channel output assignement
   */
 void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString str)
 {
@@ -316,28 +318,28 @@ void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString str)
     QStringList options = field->getOptions();
     switch (options.indexOf(field->getValue().toString())) {
     case 0:
-        m_config->ch0Output->setCurrentIndex(m_config->ch0Output->findText(str));
+        m_config->ch0Output->setText(str);
         break;
     case 1:
-        m_config->ch1Output->setCurrentIndex(m_config->ch1Output->findText(str));
+        m_config->ch1Output->setText(str);
         break;
     case 2:
-        m_config->ch2Output->setCurrentIndex(m_config->ch2Output->findText(str));
+        m_config->ch2Output->setText(str);
         break;
     case 3:
-        m_config->ch3Output->setCurrentIndex(m_config->ch3Output->findText(str));
+        m_config->ch3Output->setText(str);
         break;
     case 4:
-        m_config->ch4Output->setCurrentIndex(m_config->ch4Output->findText(str));
+        m_config->ch4Output->setText(str);
         break;
     case 5:
-        m_config->ch5Output->setCurrentIndex(m_config->ch5Output->findText(str));
+        m_config->ch5Output->setText(str);
         break;
     case 6:
-        m_config->ch6Output->setCurrentIndex(m_config->ch6Output->findText(str));
+        m_config->ch6Output->setText(str);
         break;
     case 7:
-        m_config->ch7Output->setCurrentIndex(m_config->ch7Output->findText(str));
+        m_config->ch7Output->setText(str);
         break;
     }
 }
@@ -421,14 +423,14 @@ void ConfigOutputWidget::requestRCOutputUpdate()
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
     // Reset all channel assignements:
-    m_config->ch0Output->setCurrentIndex(0);
-    m_config->ch1Output->setCurrentIndex(0);
-    m_config->ch2Output->setCurrentIndex(0);
-    m_config->ch3Output->setCurrentIndex(0);
-    m_config->ch4Output->setCurrentIndex(0);
-    m_config->ch5Output->setCurrentIndex(0);
-    m_config->ch6Output->setCurrentIndex(0);
-    m_config->ch7Output->setCurrentIndex(0);
+    m_config->ch0Output->setText("-");
+    m_config->ch1Output->setText("-");
+    m_config->ch2Output->setText("-");
+    m_config->ch3Output->setText("-");
+    m_config->ch4Output->setText("-");
+    m_config->ch5Output->setText("-");
+    m_config->ch6Output->setText("-");
+    m_config->ch7Output->setText("-");
 
     // Get the channel assignements:
     UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
@@ -541,56 +543,8 @@ void ConfigOutputWidget::sendRCOutputUpdate()
     field->setValue(m_config->outputRate3->value(),2);
     field->setValue(m_config->outputRate4->value(),3);
 
-    // Set Actuator assignement for each channel:
-    // Rule: if two channels have the same setting (which is wrong!) the higher channel
-    // will get the setting.
-
-    // First, reset all channel assignements:
-    QList<UAVObjectField*> fieldList = obj->getFields();
-    foreach (UAVObjectField* field, fieldList) {
-        // NOTE: we assume that all options in ActuatorSettings are a channel assignement
-        // except for the options called "ChannelXXX"
-        if (field->getUnits().contains("channel")) {
-            field->setValue(field->getOptions().last());
-        }
-    }
-
-    if (m_config->ch0Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch0Output->currentText());
-        field->setValue(field->getOptions().at(0)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch1Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch1Output->currentText());
-        field->setValue(field->getOptions().at(1)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch2Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch2Output->currentText());
-        field->setValue(field->getOptions().at(2)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch3Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch3Output->currentText());
-        field->setValue(field->getOptions().at(3)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch4Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch4Output->currentText());
-        field->setValue(field->getOptions().at(4)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch5Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch5Output->currentText());
-        field->setValue(field->getOptions().at(5)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch6Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch6Output->currentText());
-        field->setValue(field->getOptions().at(6)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch7Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch7Output->currentText());
-        field->setValue(field->getOptions().at(7)); // -> This way we don't depend on channel naming convention
-    }
-
     // ... and send to the OP Board
     obj->updated();
-
 
 }
 

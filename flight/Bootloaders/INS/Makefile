@@ -29,7 +29,6 @@ include $(TOP)/make/firmware-defs.mk
 # Set developer code and compile options
 # Set to YES for debugging
 DEBUG ?= NO
-OVERRIDE USE_BOOTLOADER = NO
 
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= YES
@@ -203,9 +202,6 @@ DEBUGF = dwarf-2
 CDEFS = -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
-ifeq ($(USE_BOOTLOADER), YES)
-CDEFS += -DUSE_BOOTLOADER
-endif
 # Place project-specific -D and/or -U options for 
 # Assembler with preprocessor here.
 #ADEFS = -DUSE_IRQ_ASM_WRAPPER
@@ -232,9 +228,10 @@ CSTANDARD = -std=gnu99
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
 
 ifeq ($(DEBUG),YES)
-CFLAGS = -g$(DEBUGF)
+CFLAGS = 
 endif
 
+CFLAGS += -g$(DEBUGF)
 CFLAGS += -O$(OPT)
 ifeq ($(DEBUG),NO)
 CFLAGS += -fdata-sections -ffunction-sections
@@ -275,7 +272,7 @@ MATH_LIB = -lm
 #    --cref:    add cross reference to  map file
 LDFLAGS = -nostartfiles -Wl,-Map=$(OUTDIR)/$(TARGET).map,--cref,--gc-sections
 ifeq ($(DEBUG),NO)
-LDFLAGS += -Wl,-static -Wl,-s
+LDFLAGS += -Wl,-static
 endif
 LDFLAGS += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
 LDFLAGS += -lc
@@ -284,41 +281,19 @@ LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc 
 
 # Set linker-script name depending on selected submodel name
-LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_stm32f10x_$(MODEL).ld
+LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_memory.ld
+LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_BL_sections.ld
 
-# ---------------------------------------------------------------------------
-# Options for OpenOCD flash-programming
-# see openocd.pdf/openocd.texi for further information
-#
-OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).elf
-# if OpenOCD is in the $PATH just set OPENOCDEXE=openocd
-OOCD_EXE=openocd
-# debug level
-OOCD_CL=-d0
-# interface and board/target settings (using the OOCD target-library here)
-UNAME := $(shell uname)
-ifeq ($(UNAME), Darwin)
-  OOCD_CL+=-f ../../Project/OpenOCD/floss-jtag.ahrs.osx.cfg -f ../../Project/OpenOCD/stm32.cfg
-else
-  OOCD_CL+=-f ../../Project/OpenOCD/floss-jtag.ahrs.cfg -f ../../Project/OpenOCD/stm32.cfg
-endif
-# initialize
-OOCD_CL+=-c init
-# show the targets
-OOCD_CL+=-c targets
-# commands to prepare flash-write
-OOCD_CL+= -c "reset halt"
-# flash erase 
-OOCD_CL+=-c "stm32x mass_erase 0"
-# flash-write
-OOCD_CL+=-c "flash write_image $(OOCD_LOADFILE)" 
+OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).bin
+# Program                                                                                                                                                                                                                            
+OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) 0x08000000 bin"
 # Verify
-OOCD_CL+=-c "verify_image $(OOCD_LOADFILE)"
+OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) 0x08000000 bin"
 # reset target
 OOCD_CL+=-c "reset run"
 # terminate OOCD after programming
 OOCD_CL+=-c shutdown
-# ---------------------------------------------------------------------------
+
 
 
 # Define programs and commands.
@@ -359,7 +334,7 @@ endif
 # Program the device.
 ifeq ($(FLASH_TOOL),OPENOCD)
 # Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
-program: $(OUTDIR)/$(TARGET).elf
+program: $(OUTDIR)/$(TARGET).bin
 	@echo "Programming with OPENOCD"
 	$(OOCD_EXE) $(OOCD_CL)
 endif
@@ -391,12 +366,15 @@ $(eval $(call PARTIAL_COMPILE_TEMPLATE, SRC))
 # Compile: create assembler files from C source files. ARM only
 $(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
 
+$(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
+
 .PHONY: elf lss sym hex bin
 elf: $(OUTDIR)/$(TARGET).elf
 lss: $(OUTDIR)/$(TARGET).lss 
 sym: $(OUTDIR)/$(TARGET).sym
 hex: $(OUTDIR)/$(TARGET).hex
 bin: $(OUTDIR)/$(TARGET).bin
+bino: $(OUTDIR)/$(TARGET).bin.o
 
 # Display sizes of sections.
 $(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))
@@ -406,6 +384,16 @@ size: $(OUTDIR)/$(TARGET).elf_size
 # Generate Doxygen documents
 docs:
 	doxygen  $(DOXYGENDIR)/doxygen.cfg
+
+# Install: install binary file with prefix/suffix into install directory
+install: $(OUTDIR)/$(TARGET).bin
+ifneq ($(INSTALL_DIR),)
+	@echo $(MSG_INSTALLING) $(call toprel, $<)
+	$(V1) mkdir -p $(INSTALL_DIR)
+	$(V1) $(INSTALL) $< $(INSTALL_DIR)/$(INSTALL_PFX)$(TARGET)$(INSTALL_SFX).bin
+else
+	$(error INSTALL_DIR must be specified for $@)
+endif
 
 # Target: clean project.
 clean: clean_list
@@ -418,6 +406,7 @@ clean_list :
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).sym
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).lss
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin.o	
 	$(V1) $(REMOVE) $(ALLOBJ)
 	$(V1) $(REMOVE) $(LSTFILES)
 	$(V1) $(REMOVE) $(DEPFILES)
@@ -443,4 +432,4 @@ else
 endif
 
 # Listing of phony targets.
-.PHONY : all build clean clean_list program
+.PHONY : all build clean clean_list program install

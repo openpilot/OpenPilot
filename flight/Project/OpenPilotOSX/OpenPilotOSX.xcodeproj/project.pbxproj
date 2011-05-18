@@ -100,6 +100,31 @@
 		6589A983131DE24F006BD67C /* taskmonitor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = taskmonitor.c; sourceTree = "<group>"; };
 		6589A9DB131DEE76006BD67C /* pios_rtc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_rtc.c; sourceTree = "<group>"; };
 		6589A9E2131DF1C7006BD67C /* pios_rtc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_rtc.h; sourceTree = "<group>"; };
+		6598854A13843E81006777AA /* ahrs_slave_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_slave_test.c; sourceTree = "<group>"; };
+		6598854B13843E81006777AA /* ahrs_spi_program.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_spi_program.c; sourceTree = "<group>"; };
+		6598854C13843E81006777AA /* ahrs_spi_program_master.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_spi_program_master.c; sourceTree = "<group>"; };
+		6598854D13843E81006777AA /* ahrs_spi_program_slave.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_spi_program_slave.c; sourceTree = "<group>"; };
+		6598854E13843E81006777AA /* bl_fsm.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bl_fsm.c; sourceTree = "<group>"; };
+		6598855013843E81006777AA /* ahrs_spi_program.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program.h; sourceTree = "<group>"; };
+		6598855113843E81006777AA /* ahrs_spi_program_master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program_master.h; sourceTree = "<group>"; };
+		6598855213843E81006777AA /* ahrs_spi_program_slave.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_spi_program_slave.h; sourceTree = "<group>"; };
+		6598855313843E81006777AA /* bl_fsm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bl_fsm.h; sourceTree = "<group>"; };
+		6598855413843E81006777AA /* ins_bl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ins_bl.h; sourceTree = "<group>"; };
+		6598855513843E81006777AA /* pios_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_config.h; sourceTree = "<group>"; };
+		6598855613843E81006777AA /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		6598855713843E81006777AA /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6598855813843E81006777AA /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_board.c; sourceTree = "<group>"; };
+		6598855A13843E91006777AA /* ahrs_timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ahrs_timer.c; sourceTree = "<group>"; };
+		6598855C13843E91006777AA /* ahrs_timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ahrs_timer.h; sourceTree = "<group>"; };
+		6598855D13843E91006777AA /* ins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ins.h; sourceTree = "<group>"; };
+		6598855E13843E91006777AA /* ins_fsm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ins_fsm.h; sourceTree = "<group>"; };
+		6598855F13843E91006777AA /* insgps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = insgps.h; sourceTree = "<group>"; };
+		6598856013843E91006777AA /* pios_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_config.h; sourceTree = "<group>"; };
+		6598856113843E91006777AA /* ins.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ins.c; sourceTree = "<group>"; };
+		6598856213843E91006777AA /* insgps13state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = insgps13state.c; sourceTree = "<group>"; };
+		6598856313843E91006777AA /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		6598856413843E91006777AA /* pios_board.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_board.c; sourceTree = "<group>"; };
+		6598856513843E91006777AA /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
 		659ED317122226B60011010E /* ahrssettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrssettings.xml; sourceTree = "<group>"; };
 		65B35D7F121C261E003EAD18 /* bin.pro */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bin.pro; sourceTree = "<group>"; };
 		65B35D80121C261E003EAD18 /* openpilotgcs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = openpilotgcs; sourceTree = "<group>"; };
@@ -3553,6 +3578,7 @@
 		657CEEB5121DBC49007A1FBE /* flight */ = {
 			isa = PBXGroup;
 			children = (
+				6598855913843E91006777AA /* INS */,
 				65FF4BB313791C3300146BE4 /* Bootloaders */,
 				65F93B9012EE09280047DB36 /* PipXtreme */,
 				65B7E6AC120DF1CD000C1123 /* AHRS */,
@@ -3593,6 +3619,62 @@
 				657CF024121F49CD007A1FBE /* WMMInternal.h */,
 				657CEEB9121DBC63007A1FBE /* CoordinateConversions.h */,
 				657CEEBA121DBC63007A1FBE /* WorldMagModel.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		6598854913843E81006777AA /* INS */ = {
+			isa = PBXGroup;
+			children = (
+				6598854A13843E81006777AA /* ahrs_slave_test.c */,
+				6598854B13843E81006777AA /* ahrs_spi_program.c */,
+				6598854C13843E81006777AA /* ahrs_spi_program_master.c */,
+				6598854D13843E81006777AA /* ahrs_spi_program_slave.c */,
+				6598854E13843E81006777AA /* bl_fsm.c */,
+				6598854F13843E81006777AA /* inc */,
+				6598855613843E81006777AA /* main.c */,
+				6598855713843E81006777AA /* Makefile */,
+				6598855813843E81006777AA /* pios_board.c */,
+			);
+			path = INS;
+			sourceTree = "<group>";
+		};
+		6598854F13843E81006777AA /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				6598855013843E81006777AA /* ahrs_spi_program.h */,
+				6598855113843E81006777AA /* ahrs_spi_program_master.h */,
+				6598855213843E81006777AA /* ahrs_spi_program_slave.h */,
+				6598855313843E81006777AA /* bl_fsm.h */,
+				6598855413843E81006777AA /* ins_bl.h */,
+				6598855513843E81006777AA /* pios_config.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		6598855913843E91006777AA /* INS */ = {
+			isa = PBXGroup;
+			children = (
+				6598855A13843E91006777AA /* ahrs_timer.c */,
+				6598855B13843E91006777AA /* inc */,
+				6598856113843E91006777AA /* ins.c */,
+				6598856213843E91006777AA /* insgps13state.c */,
+				6598856313843E91006777AA /* Makefile */,
+				6598856413843E91006777AA /* pios_board.c */,
+				6598856513843E91006777AA /* test.c */,
+			);
+			name = INS;
+			path = ../../INS;
+			sourceTree = SOURCE_ROOT;
+		};
+		6598855B13843E91006777AA /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				6598855C13843E91006777AA /* ahrs_timer.h */,
+				6598855D13843E91006777AA /* ins.h */,
+				6598855E13843E91006777AA /* ins_fsm.h */,
+				6598855F13843E91006777AA /* insgps.h */,
+				6598856013843E91006777AA /* pios_config.h */,
 			);
 			path = inc;
 			sourceTree = "<group>";
@@ -8292,6 +8374,7 @@
 		65FF4BB313791C3300146BE4 /* Bootloaders */ = {
 			isa = PBXGroup;
 			children = (
+				6598854913843E81006777AA /* INS */,
 				65FF4BB413791C3300146BE4 /* AHRS */,
 				65FF4BC413791C3300146BE4 /* BootloaderUpdater */,
 				65FF4BCB13791C3300146BE4 /* CopterControl */,

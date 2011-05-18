@@ -1,0 +1,11 @@
+MEMORY
+{
+  RAM (xrw)     : ORIGIN = 0x20000000,       LENGTH =  64K
+  BL_FLASH (rx) : ORIGIN = 0x08000000,       LENGTH =  8K
+  FLASH (rx)    : ORIGIN = 0x08000000 + 8K,  LENGTH = 512K - 8k
+  FLASHB1 (rx)  : ORIGIN = 0x00000000,       LENGTH = 0
+  EXTMEMB0 (rx) : ORIGIN = 0x00000000,       LENGTH = 0
+  EXTMEMB1 (rx) : ORIGIN = 0x00000000,       LENGTH = 0
+  EXTMEMB2 (rx) : ORIGIN = 0x00000000,       LENGTH = 0
+  EXTMEMB3 (rx) : ORIGIN = 0x00000000,       LENGTH = 0
+}

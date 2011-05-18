@@ -11,9 +11,10 @@ NSIS_HEADER   := $(BUILD_DIR)/ground/openpilotgcs/packaging/openpilotgcs.nsh
 
 $(NSIS_HEADER): $(NSIS_TEMPLATE)
 	$(V0) @echo " PY        $@"
+	$(V1) mkdir -p "$(dir $@)"
 	$(V1) $(VERSION_CMD) --template="$<" --outfile="$@"
 
-nsis: $(NSIS_HEADER) gcs release_flight
+nsis: gcs release_flight $(NSIS_HEADER)
 	$(NSIS_CMD) $(NSIS_OPTS) $(NSIS_SCRIPT)
 
 gcs: uavobjects

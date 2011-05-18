@@ -132,7 +132,7 @@ MAKEFLAGS += --no-print-directory
 endif
 
 # Platform-dependent stuff
-PLATFORM := win32
+PLATFORM := winx86
 UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
   PLATFORM := linux

@@ -279,6 +279,7 @@ dependent targets.
         TAG_OR_HASH8 = r.tag(r.hash(8, 'untagged')),
         UNIXTIME = r.time(),
         DATE = r.time('%Y%m%d'),
+        DATETIME = r.time('%Y%m%d %H:%M'),
         BOARD_TYPE = args.type,
         BOARD_REVISION = args.revision,
         SHA1 = sha1(args.image),

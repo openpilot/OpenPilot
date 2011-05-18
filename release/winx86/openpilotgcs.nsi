@@ -34,8 +34,8 @@
 
   ; Tree root locations (relative to this script location)
   !define NSIS_DATA_TREE "."
-  !define GCS_BUILD_TREE "..\..\..\..\build\ground\openpilotgcs"
-  !define WINX86_PATH "packaging\winx86"
+  !define GCS_BUILD_TREE "..\..\build\ground\openpilotgcs"
+  !define GCS_PKG_TREE "${GCS_BUILD_TREE}\packaging"
 
   ; Default installation folder
   InstallDir "$LOCALAPPDATA\OpenPilot"
@@ -55,10 +55,10 @@
 ; !define PRODUCT_VERSION "0.0.0.0"
 ; !define FILE_VERSION "0.0.0.0"
 ; !define BUILD_DESCRIPTION "Unknown revision."
-  !include "${GCS_BUILD_TREE}\${WINX86_PATH}\openpilotgcs.nsh"
+  !include "${GCS_PKG_TREE}\openpilotgcs.nsh"
 
   Name "${PRODUCT_NAME}"
-  OutFile "${GCS_BUILD_TREE}\${WINX86_PATH}\${OUT_FILE}"
+  OutFile "${RELEASE_DIR}\${OUT_FILE}"
 
   VIProductVersion ${PRODUCT_VERSION}
   VIAddVersionKey "ProductName" "${INSTALLER_NAME}"

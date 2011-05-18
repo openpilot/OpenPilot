@@ -2,9 +2,23 @@
 # Windows-specific packaging
 #
 
+NSIS_CMD      := makensis.exe
+NSIS_OPTS     := /V3
+NSIS_DIR      := $(ROOT_DIR)/release/winx86
+NSIS_SCRIPT   := $(NSIS_DIR)/openpilotgcs.nsi
+NSIS_TEMPLATE := $(NSIS_DIR)/openpilotgcs.tpl
+NSIS_HEADER   := $(BUILD_DIR)/ground/openpilotgcs/packaging/openpilotgcs.nsh
+
+$(NSIS_HEADER): $(NSIS_TEMPLATE)
+	$(V0) @echo " PY        $@"
+	$(V1) $(VERSION_CMD) --template="$<" --outfile="$@"
+
+nsis: $(NSIS_HEADER) gcs
+	$(NSIS_CMD) $(NSIS_OPTS) $(NSIS_SCRIPT)
+
 gcs: uavobjects
 	$(V1) $(MAKE) -C $(ROOT_DIR) GCS_BUILD_CONF=release $@
 
-ground_package: | gcs
+ground_package: | nsis
 
-.PHONY: gcs ground_package
+.PHONY: nsis gcs ground_package

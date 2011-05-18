@@ -13,7 +13,7 @@ ROOT_DIR := $(realpath $(WHEREAMI)/../)
 
 # Set up some macros
 BUILD_DIR    := $(ROOT_DIR)/build
-VERSION_CMD  := python $(ROOT_DIR)/make/scripts/version-info.py --path=$(ROOT_DIR) 
+VERSION_CMD  := python $(ROOT_DIR)/make/scripts/version-info.py --path="$(ROOT_DIR)"
 RELEASE_LBL  := $(shell $(VERSION_CMD) --format=\$${DATE}-\$${TAG_OR_HASH8})
 RELEASE_DIR  := $(BUILD_DIR)/release-$(RELEASE_LBL)
 FW_DIR       := $(RELEASE_DIR)/firmware-$(RELEASE_LBL)

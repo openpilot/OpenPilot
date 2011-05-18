@@ -270,18 +270,6 @@ openpilotgcs:  uavobjects_gcs
 	  $(MAKE) -w ; \
 	)
 
-.PHONY: gcs_installer
-gcs_installer: openpilotgcs
-ifeq ($(QT_SPEC), win32-g++)
-ifeq ($(GCS_BUILD_CONF), release)
-	$(V1) cd $(BUILD_DIR)/ground/openpilotgcs/packaging/winx86 && $(MAKE) -r --no-print-directory $@
-else
-	$(error $@ can be generated for release build only (GCS_BUILD_CONF=release))
-endif
-else
-	$(error $@ is currently only available on Windows)
-endif
-
 .PHONY: openpilotgcs_clean
 openpilotgcs_clean:
 	$(V0) @echo " CLEAN     $@"

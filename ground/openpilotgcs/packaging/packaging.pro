@@ -1,7 +1,6 @@
 include(../openpilotgcs.pri)
 
 TEMPLATE = subdirs
-SUBDIRS = winx86
 
 # Copy Qt runtime libraries into the build directory (to run or package)
 equals(copydata, 1) {

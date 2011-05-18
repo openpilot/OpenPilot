@@ -1,0 +1,10 @@
+#
+# Linux-specific packaging
+#
+
+gcs: uavobjects
+	$(V1) $(MAKE) -C $(ROOT_DIR) GCS_BUILD_CONF=release $@
+
+ground_package: | gcs
+
+.PHONY: gcs ground_package

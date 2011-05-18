@@ -143,6 +143,36 @@ int UAVObjectUtilManager::getBoardModel()
     return boardType;
 }
 
+/**
+  * Get the UAV Board CPU Serial Number, for anyone interested. Return format is a byte array
+  */
+QByteArray UAVObjectUtilManager::getBoardCPUSerial()
+{
+    QByteArray cpuSerial;
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    if (!pm)
+        return 0;
+    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+    if (!om)
+        return 0;
+
+    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
+    // The code below will ask for the object update and wait for the updated to be received,
+    // or the timeout of the timer, set to 1 second.
+    QEventLoop loop;
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
+    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
+    obj->requestUpdate();
+    loop.exec();
+
+    UAVObjectField* cpuField = obj->getField("CPUSerial");
+    for (int i = 0; i < cpuField->getNumElements(); ++i) {
+        cpuSerial.append(cpuField->getValue(i).toUInt());
+    }
+    return cpuSerial;
+}
+
+
 
 // ******************************
 // HomeLocation

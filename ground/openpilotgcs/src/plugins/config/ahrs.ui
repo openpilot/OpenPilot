@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>720</width>
-    <height>501</height>
+    <height>509</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -41,17 +41,57 @@
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
-               <widget class="QLabel" name="label_3">
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>#1: Multi-Point Calibration</string>
-                </property>
-               </widget>
+               <layout class="QHBoxLayout" name="horizontalLayout_2">
+                <item>
+                 <widget class="QPushButton" name="multiPointHelp">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>20</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="configgadget.qrc">
+                    <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_3">
+                  <property name="font">
+                   <font>
+                    <weight>75</weight>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>#1: Multi-Point Calibration</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </item>
               <item>
                <widget class="QGraphicsView" name="sixPointsHelp">
@@ -111,17 +151,57 @@
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_4">
               <item>
-               <widget class="QLabel" name="label">
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>#2: Sensor noise calibration</string>
-                </property>
-               </widget>
+               <layout class="QHBoxLayout" name="horizontalLayout_8">
+                <item>
+                 <widget class="QPushButton" name="sensorNoiseHelp">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>20</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="configgadget.qrc">
+                    <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label">
+                  <property name="font">
+                   <font>
+                    <weight>75</weight>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>#2: Sensor noise calibration</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </item>
               <item>
                <widget class="QGraphicsView" name="ahrsBargraph">
@@ -197,17 +277,51 @@ Hint: run this with engines at cruising speed.</string>
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_5">
               <item>
-               <widget class="QLabel" name="label_5">
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>#3: Accelerometer Bias calibration</string>
-                </property>
-               </widget>
+               <layout class="QHBoxLayout" name="horizontalLayout_9">
+                <item>
+                 <widget class="QPushButton" name="accelBiasHelp">
+                  <property name="maximumSize">
+                   <size>
+                    <width>20</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="configgadget.qrc">
+                    <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_5">
+                  <property name="font">
+                   <font>
+                    <weight>75</weight>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>#3: Accelerometer Bias calibration</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -253,17 +367,51 @@ Hint: run this with engines at cruising speed.</string>
             <item>
              <layout class="QVBoxLayout" name="gyroDriftLayout">
               <item>
-               <widget class="QLabel" name="label_6">
-                <property name="font">
-                 <font>
-                  <weight>75</weight>
-                  <bold>true</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>#4 Gyro temperature drift calibration</string>
-                </property>
-               </widget>
+               <layout class="QHBoxLayout" name="horizontalLayout_11">
+                <item>
+                 <widget class="QPushButton" name="gyroDriftHelp">
+                  <property name="maximumSize">
+                   <size>
+                    <width>20</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="configgadget.qrc">
+                    <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_6">
+                  <property name="font">
+                   <font>
+                    <weight>75</weight>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>#4 Gyro temperature drift calibration</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_6">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -433,7 +581,36 @@ p, li { white-space: pre-wrap; }
        <item>
         <layout class="QHBoxLayout" name="ahrsSettingsLayout">
          <item>
+          <widget class="QPushButton" name="insAlgorithmHelp">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="configgadget.qrc">
+             <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QLabel" name="label_2">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
            <property name="text">
             <string>INS Algorithm:</string>
            </property>
@@ -462,7 +639,36 @@ p, li { white-space: pre-wrap; }
           </spacer>
          </item>
          <item>
+          <widget class="QPushButton" name="homeLocationHelp">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="configgadget.qrc">
+             <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QLabel" name="label_4">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
            <property name="text">
             <string>Home Location:</string>
            </property>
@@ -551,6 +757,29 @@ new home location unless it is in indoor mode.</string>
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="commandHelp">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="configgadget.qrc">
+         <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="ahrsSettingsRequest">
        <property name="toolTip">
         <string>Refresh this screen with current values from the board.</string>
@@ -590,7 +819,9 @@ specific calibration button on top of the screen.</string>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="configgadget.qrc"/>
+ </resources>
  <connections/>
  <buttongroups>
   <buttongroup name="buttonGroup"/>

@@ -66,6 +66,7 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/ahrsstatus.h \
     $$UAVOBJECT_SYNTHETICS/watchdogstatus.h \
     $$UAVOBJECT_SYNTHETICS/nedaccel.h \
     $$UAVOBJECT_SYNTHETICS/sonaraltitude.h \
+    $$UAVOBJECT_SYNTHETICS/flightstatus.h \
     $$UAVOBJECT_SYNTHETICS/attitudesettings.h
 
 SOURCES += $$UAVOBJECT_SYNTHETICS/ahrsstatus.cpp \
@@ -112,4 +113,5 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/ahrsstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/nedaccel.cpp \
     $$UAVOBJECT_SYNTHETICS/sonaraltitude.cpp \
     $$UAVOBJECT_SYNTHETICS/uavobjectsinit.cpp \
+    $$UAVOBJECT_SYNTHETICS/flightstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/attitudesettings.cpp

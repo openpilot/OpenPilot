@@ -115,6 +115,18 @@ void UploaderGadgetWidget::onAutopilotConnect(){
     m_config->bootButton->setEnabled(false);
     m_config->rescueButton->setEnabled(false);
     m_config->telemetryLink->setEnabled(false);
+
+    // Add a very simple widget with Board model & serial number
+    // Delete all previous tabs:
+    while (m_config->systemElements->count()) {
+         QWidget *qw = m_config->systemElements->widget(0);
+         m_config->systemElements->removeTab(0);
+         delete qw;
+    }
+    runningDeviceWidget* dw = new runningDeviceWidget(this);
+    dw->populate();
+    m_config->systemElements->addTab(dw, QString("Connected Device"));
+
 }
 
 /**
@@ -149,6 +161,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
 
     switch (currentStep) {
     case IAP_STATE_READY:
+        m_config->haltButton->setEnabled(false);
         getSerialPorts(); // Useful in case a new serial port appeared since the initial list,
                           // otherwise we won't find it when we stop the board.
         // The board is running, send the 1st IAP Reset order:
@@ -167,6 +180,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             log("Reset did NOT happen");
             currentStep = IAP_STATE_READY;
             disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
+            m_config->haltButton->setEnabled(true);
             break;
         }
         delay::msleep(600);
@@ -181,6 +195,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             log("Reset did NOT happen");
             currentStep = IAP_STATE_READY;
             disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
+            m_config->haltButton->setEnabled(true);
             break;
         }
         delay::msleep(600);
@@ -196,6 +211,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             log("Oops, failure step 3");
             log("Reset did NOT happen");
             disconnect(fwIAP, SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(goToBootloader(UAVObject*, bool)));
+            m_config->haltButton->setEnabled(true);
             break;
         }
 
@@ -235,6 +251,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             cm->resumePolling();
             currentStep = IAP_STATE_READY;
             m_config->boardStatus->setText("Bootloader?");
+            m_config->haltButton->setEnabled(true);
             return;
         }
         dfu->AbortOperation();
@@ -348,7 +365,6 @@ void UploaderGadgetWidget::systemBoot()
     dfu->JumpToApp();
     // Restart the polling thread
     cm->resumePolling();
-    m_config->bootButton->setEnabled(true);
     m_config->rescueButton->setEnabled(true);
     m_config->telemetryLink->setEnabled(true);
     m_config->boardStatus->setText("Running");

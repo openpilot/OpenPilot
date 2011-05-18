@@ -30,7 +30,7 @@
     <number>5</number>
    </property>
    <item row="1" column="0">
-    <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,0,0,0" rowminimumheight="22,22,22,0,22">
+    <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,0,0,0,0" rowminimumheight="22,22,22,0,22,0">
      <item row="2" column="0">
       <spacer name="horizontalSpacer_4">
        <property name="orientation">
@@ -246,6 +246,19 @@
        </property>
        <property name="text">
         <string>Use OpenGL</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="3">
+      <widget class="QComboBox" name="maxUpdateRateComboBox"/>
+     </item>
+     <item row="5" column="2">
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>Default Max Update Rate </string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
      </item>

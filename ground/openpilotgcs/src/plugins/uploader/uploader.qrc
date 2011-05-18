@@ -9,5 +9,6 @@
         <file>images/deviceID-0301.svg</file>
         <file>images/deviceID-0201.svg</file>
         <file>images/deviceID-0101.svg</file>
+        <file>images/application-certificate.svg</file>
     </qresource>
 </RCC>

@@ -37,6 +37,7 @@
 #include <QThread>
 #include <iostream>
 #include <Eigen/align-function.h>
+#include <QSignalMapper>
 
 #include "assertions.h"
 #include "calibration.h"
@@ -227,6 +228,24 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_ahrs->startDriftCalib, SIGNAL(clicked()),this, SLOT(launchGyroDriftCalibration()));
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(ahrsSettingsRequest()));
 
+    // Connect all the help buttons to signal mapper that passes button name to SLOT function
+    QSignalMapper* signalMapper = new QSignalMapper(this);
+    connect( m_ahrs->multiPointHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
+    signalMapper->setMapping(m_ahrs->multiPointHelp, m_ahrs->multiPointHelp->objectName());
+    connect( m_ahrs->sensorNoiseHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
+    signalMapper->setMapping(m_ahrs->sensorNoiseHelp, m_ahrs->sensorNoiseHelp->objectName());
+    connect( m_ahrs->accelBiasHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
+    signalMapper->setMapping(m_ahrs->accelBiasHelp, m_ahrs->accelBiasHelp->objectName());
+    connect( m_ahrs->gyroDriftHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
+    signalMapper->setMapping(m_ahrs->gyroDriftHelp, m_ahrs->gyroDriftHelp->objectName());
+    connect( m_ahrs->commandHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
+    signalMapper->setMapping(m_ahrs->commandHelp, QString("commandHelp"));
+    connect( m_ahrs->insAlgorithmHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
+    signalMapper->setMapping(m_ahrs->insAlgorithmHelp, m_ahrs->insAlgorithmHelp->objectName());
+    connect( m_ahrs->homeLocationHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
+    signalMapper->setMapping(m_ahrs->homeLocationHelp, m_ahrs->homeLocationHelp->objectName());
+
+    connect(signalMapper, SIGNAL(mapped(const QString &)), parent, SLOT(showHelp(const QString &)));
 
 }
 

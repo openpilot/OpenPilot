@@ -34,6 +34,9 @@
 #include "objectpersistence.h"
 #include <QtGui/QWidget>
 #include <QList>
+//#include <QtWebKit/QWebView>
+#include <QTextBrowser>
+#include "utils/pathutils.h"
 
 #include "fancytabwidget.h"
 
@@ -41,6 +44,7 @@
 class ConfigGadgetWidget: public QWidget
 {
     Q_OBJECT
+    QTextBrowser* help;
 
 public:
     ConfigGadgetWidget(QWidget *parent = 0);
@@ -48,6 +52,10 @@ public:
 
 public slots:
     void onAutopilotConnect();
+    void showHelp(const QString &helpName);
+
+private slots:
+    bool eventFilter(QObject *obj, QEvent *event);
 
 signals:
     void autopilotConnected();

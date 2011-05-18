@@ -36,9 +36,6 @@ ENABLE_DEBUG_PINS ?= NO
 # Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs
 ENABLE_AUX_UART ?= NO
 
-#
-USE_BOOTLOADER ?= YES
-
 USE_SPEKTRUM ?= NO
 
 
@@ -55,13 +52,12 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-MODULES =  Actuator Telemetry GPS ManualControl Altitude AHRSComms Stabilization Guidance FirmwareIAP FlightPlan
-
+MODULES = Actuator Telemetry GPS ManualControl Altitude AHRSComms Stabilization Guidance FirmwareIAP
+PYMODULES = FlightPlan
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
 #MODULES = Telemetry
 #MODULES += Osd/OsdEtStd
-
 
 # MCU name, submodel and board
 # - MCU used for compiler-option (-mcpu)
@@ -71,12 +67,6 @@ MCU      = cortex-m3
 CHIP     = STM32F103RET
 BOARD    = STM3210E_OP
 MODEL	 = HD
-ifeq ($(USE_BOOTLOADER), YES)
-BOOT_MODEL    = $(MODEL)_BL
-
-else
-BOOT_MODEL    = $(MODEL)_NB
-endif
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
 OUTDIR = $(TOP)/build/openpilot
@@ -133,17 +123,19 @@ UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 
-MODNAMES = $(notdir ${MODULES})
+MODNAMES = $(notdir ${MODULES} ${PYMODULES})
 
 ifndef TESTAPP
 
-## PyMite files
+## PyMite files and modules
 SRC += $(OUTDIR)/pmlib_img.c
 SRC += $(OUTDIR)/pmlib_nat.c
 SRC += $(OUTDIR)/pmlibusr_img.c
 SRC += $(OUTDIR)/pmlibusr_nat.c
-SRC += $(wildcard ${PYMITEVM}/*.c)
-SRC += $(wildcard ${PYMITEPLAT}/*.c)
+PYSRC += $(wildcard ${PYMITEVM}/*.c)
+PYSRC += $(wildcard ${PYMITEPLAT}/*.c)
+PYSRC += ${foreach MOD, ${PYMODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
+SRC += $(PYSRC)
 
 ## MODULES
 SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
@@ -326,7 +318,7 @@ EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/ARM_CM3
 EXTRAINCDIRS  += $(AHRSBOOTLOADERINC)
 EXTRAINCDIRS  += $(PYMITEINC)
 
-EXTRAINCDIRS += ${foreach MOD, ${MODULES}, $(OPMODULEDIR)/${MOD}/inc} ${OPMODULEDIR}/System/inc
+EXTRAINCDIRS += ${foreach MOD, ${MODULES} ${PYMODULES}, $(OPMODULEDIR)/${MOD}/inc} ${OPMODULEDIR}/System/inc
 
 
 # List any extra directories to look for library files here.
@@ -377,9 +369,7 @@ endif
 ifeq ($(ENABLE_AUX_UART), YES)
 CDEFS += -DPIOS_ENABLE_AUX_UART
 endif
-ifeq ($(USE_BOOTLOADER), YES)
 CDEFS += -DUSE_BOOTLOADER
-endif
 
 ifeq ($(USE_SPEKTRUM), YES)
 CDEFS += -DUSE_SPEKTRUM
@@ -458,13 +448,14 @@ LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc
 
 # Set linker-script name depending on selected submodel name
-LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_$(BOARD)_$(BOOT_MODEL).ld
+LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_memory.ld
+LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_sections.ld
 
-OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).elf  
-# Program                                                                                                                                                                                                                            
-OOCD_CL+=-c "flash write_image $(OOCD_LOADFILE)"
+OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).bin
+# Program
+OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) 0x08005000 bin"
 # Verify
-OOCD_CL+=-c "verify_image $(OOCD_LOADFILE)"
+OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) 0x08005000 bin"
 # reset target
 OOCD_CL+=-c "reset run"
 # terminate OOCD after programming
@@ -491,7 +482,7 @@ LSTFILES   = $(addprefix $(OUTDIR)/, $(addsuffix .lst, $(ALLSRCBASE)))
 DEPFILES   = $(addprefix $(OUTDIR)/dep/, $(addsuffix .o.d, $(ALLSRCBASE)))
 
 # Default target.
-all: gencode gccversion build
+all: gccversion build
 
 ifeq ($(LOADFORMAT),ihex)
 build: elf hex lss sym
@@ -510,6 +501,8 @@ endif
 # Generate intermediate code
 gencode: ${OUTDIR}/InitMods.c ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h 
 
+$(PYSRC): gencode
+
 # Generate code for module initialization
 ${OUTDIR}/InitMods.c: Makefile
 	@echo $(MSG_MODINIT) $(call toprel, $@)
@@ -527,18 +520,11 @@ ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/p
 	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -u -o $(OUTDIR)/pmlibusr_img.c --native-file=$(OUTDIR)/pmlibusr_nat.c $(FLIGHTPLANS)/test.py
 
 # Program the device.
-ifeq ($(USE_BOOTLOADER), YES)
-# Program the device with OP Upload Tool".
-program: $(OUTDIR)/$(TARGET).bin
-	@echo ${quote}Programming with OP Upload Tool${quote}
-	../../ground/src/experimental/upload-build-desktop/debug/OPUploadTool -d 0 -p $(OUTDIR)/$(TARGET).bin
-else
 ifeq ($(FLASH_TOOL),OPENOCD)
 # Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
-program: $(OUTDIR)/$(TARGET).elf
+program: $(OUTDIR)/$(TARGET).bin
 	@echo ${quote}Programming with OPENOCD${quote}
 	$(OOCD_EXE) $(OOCD_CL)
-endif
 endif
 
 # Link: create ELF output file from object files.
@@ -568,12 +554,15 @@ $(eval $(call PARTIAL_COMPILE_TEMPLATE, SRC))
 # Compile: create assembler files from C source files. ARM only
 $(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
 
-.PHONY: elf lss sym hex bin
+$(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
+
+.PHONY: elf lss sym hex bin bino
 elf:  $(OUTDIR)/$(TARGET).elf
 lss:  $(OUTDIR)/$(TARGET).lss
 sym:  $(OUTDIR)/$(TARGET).sym
 hex:  $(OUTDIR)/$(TARGET).hex
 bin:  $(OUTDIR)/$(TARGET).bin
+bino: $(OUTDIR)/$(TARGET).bin.o
 
 # Display sizes of sections.
 $(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))
@@ -583,6 +572,16 @@ size: $(OUTDIR)/$(TARGET).elf_size
 # Generate Doxygen documents
 docs:
 	doxygen  $(DOXYGENDIR)/doxygen.cfg
+
+# Install: install binary file with prefix/suffix into install directory
+install: $(OUTDIR)/$(TARGET).bin
+ifneq ($(INSTALL_DIR),)
+	@echo $(MSG_INSTALLING) $(call toprel, $<)
+	$(V1) mkdir -p $(INSTALL_DIR)
+	$(V1) $(INSTALL) $< $(INSTALL_DIR)/$(INSTALL_PFX)$(TARGET)$(INSTALL_SFX).bin
+else
+	$(error INSTALL_DIR must be specified for $@)
+endif
 
 # Target: clean project.
 clean: clean_list
@@ -595,6 +594,7 @@ clean_list :
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).sym
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).lss
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin.o
 	$(V1) $(REMOVE) $(wildcard $(OUTDIR)/*.c)
 	$(V1) $(REMOVE) $(wildcard $(OUTDIR)/*.h)
 	$(V1) $(REMOVE) $(ALLOBJ)
@@ -622,5 +622,4 @@ else
 endif
 
 # Listing of phony targets.
-.PHONY : all build clean clean_list program gencode
-
+.PHONY : all build clean clean_list program gencode install

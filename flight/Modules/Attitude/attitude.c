@@ -53,6 +53,7 @@
 #include "attituderaw.h"
 #include "attitudeactual.h"
 #include "attitudesettings.h"
+#include "flightstatus.h"
 #include "CoordinateConversions.h"
 #include "pios_flash_w25x.h"
 
@@ -87,6 +88,7 @@ static int16_t accelbias[3];
 static float q[4] = {1,0,0,0};
 static float R[3][3];
 static int8_t rotate = 0;
+static bool zero_during_arming = false;
 
 /**
  * Initialise the module, called on startup
@@ -133,15 +135,27 @@ static void AttitudeTask(void *parameters)
 	PIOS_FLASH_DISABLE;		
 	PIOS_ADXL345_Init();
 			
+	zero_during_arming = false;
 	// Main task loop
 	while (1) {
 		
-		if(xTaskGetTickCount() < 10000) {
-			// For first 5 seconds use accels to get gyro bias
+		FlightStatusData flightStatus;
+		FlightStatusGet(&flightStatus);
+
+		if(xTaskGetTickCount() < 7000) {
+			// Force settings update to make sure rotation loaded
+			settingsUpdatedCb(AttitudeSettingsHandle());
+			// For first 7 seconds use accels to get gyro bias
 			accelKp = 1;
-			// Decrease the rate of gyro learning during init
-			accelKi = .5 / (1 + xTaskGetTickCount() / 5000);
-			yawBiasRate = 0.01 / (1 + xTaskGetTickCount() / 5000);
+			accelKi = 0.9;
+			yawBiasRate = 0.23;
+			init = 0;
+		} 	
+		else if (zero_during_arming && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
+			accelKp = 1;
+			accelKi = 0.9;
+			yawBiasRate = 0.23;
+			init = 0;			
 		} else if (init == 0) {
 			settingsUpdatedCb(AttitudeSettingsHandle());
 			init = 1;
@@ -312,6 +326,8 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	accelKi = attitudeSettings.AccelKi;		
 	yawBiasRate = attitudeSettings.YawBiasRate;
 	gyroGain = attitudeSettings.GyroGain;
+	
+	zero_during_arming = attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE;
 	
 	accelbias[0] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_X];
 	accelbias[1] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Y];

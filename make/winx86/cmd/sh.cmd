@@ -1,6 +1,6 @@
 @echo off
 rem
-rem This file is to be put into C:\Program Files\Git\cmd\ subdirectory
+rem This file should be put into C:\Program Files\Git\cmd\ subdirectory
 rem (or similar, depeding on where the msysGit package was installed)
 rem to provide a shell prompt in the unix-like build environment on Windows.
 rem
@@ -56,6 +56,7 @@ call :which QTSDK         "C:\Qt\2010.05\qt\bin"         qmake.exe
 call :which CODESOURCERY  "C:\CodeSourcery\bin"          cs-make.exe
 call :which PYTHON        "C:\Python27"                  python.exe
 call :which UNSIS         "%ProgramFiles%\NSIS\Unicode"  makensis.exe
+call :which OPENOCDBIN    "C:\OpenOCD\0.4.0\bin"         openocd.exe
 
 if "%NOT_FOUND%" == "" goto set_path
 

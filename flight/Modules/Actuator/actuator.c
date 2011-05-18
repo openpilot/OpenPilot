@@ -37,7 +37,7 @@
 #include "systemsettings.h"
 #include "actuatordesired.h"
 #include "actuatorcommand.h"
-#include "manualcontrolcommand.h"
+#include "flightstatus.h"
 #include "mixersettings.h"
 #include "mixerstatus.h"
 
@@ -135,7 +135,7 @@ static void actuatorTask(void* parameters)
 	MixerSettingsData mixerSettings;
 	ActuatorDesiredData desired;
 	MixerStatusData mixerStatus;
-	ManualControlCommandData manualControl;
+	FlightStatusData flightStatus;
 	
 	ActuatorSettingsGet(&settings);
 	PIOS_Servo_SetHz(&settings.ChannelUpdateFreq[0], ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM);
@@ -165,7 +165,7 @@ static void actuatorTask(void* parameters)
 		lastSysTime = thisSysTime;
 
 
-		ManualControlCommandGet(&manualControl);
+		FlightStatusGet(&flightStatus);
 		SystemSettingsGet(&sysSettings);
 		MixerStatusGet(&mixerStatus);
 		MixerSettingsGet (&mixerSettings);
@@ -182,7 +182,7 @@ static void actuatorTask(void* parameters)
 				nMixers ++;
 			}
 		}
-		if(nMixers < 2) //Nothing can fly with less than two mixers.
+		if((nMixers < 2) && !ActuatorCommandReadOnly(dummy)) //Nothing can fly with less than two mixers. 
 		{
 			setFailsafe(); // So that channels like PWM buzzer keep working
 			continue;
@@ -190,17 +190,20 @@ static void actuatorTask(void* parameters)
 
 		AlarmsClear(SYSTEMALARMS_ALARM_ACTUATOR);
 
-		bool armed = manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE;
+		bool armed = flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED;
 		bool positiveThrottle = desired.Throttle >= 0.00;
-		bool spinWhileArmed = settings.MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE && 
-		                         manualControl.Armed == MANUALCONTROLCOMMAND_ARMED_TRUE;
+		bool spinWhileArmed = settings.MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE;
 		
 		float curve1 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve1);
 		float curve2 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve2);
 		for(int ct=0; ct < MAX_MIX_ACTUATORS; ct++)
 		{
-			if(mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_DISABLED)
+			if(mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_DISABLED) {
+				// Set to minimum if disabled.  This is not the same as saying PWM pulse = 0 us
+				status[ct] = -1;
+				command.Channel[ct] = 0;
 				continue;
+			}
 			
 			status[ct] = ProcessMixer(ct, curve1, curve2, &mixerSettings, &desired, dT);
 			
@@ -401,13 +404,18 @@ static void setFailsafe()
 	// Reset ActuatorCommand to safe values
 	for (int n = 0; n < ACTUATORCOMMAND_CHANNEL_NUMELEM; ++n)
 	{
+		
 		if(mixers[n].type == MIXERSETTINGS_MIXER1TYPE_MOTOR)
 		{
 			command.Channel[n] = settings.ChannelMin[n];
 		}
-		else
+		else if(mixers[n].type == MIXERSETTINGS_MIXER1TYPE_SERVO)
 		{
 			command.Channel[n] = settings.ChannelNeutral[n];
+		}
+		else
+		{
+			command.Channel[n] = 0;
 		}
 	}
 

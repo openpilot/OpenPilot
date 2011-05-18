@@ -37,17 +37,18 @@ locations (but any other locations are fine as well):
  - QtSDK             in C:\Qt\2010.05
  - msysGit           in %ProgramFiles%\Git
  - Unicode NSIS      in %ProgramFiles%\NSIS\Unicode
+ - OpenOCD           in C:\OpenOCD\0.4.0\bin
 
 Also it is assumed that you have the C:\Program Files\Git\cmd\ directory in
 the PATH. Usually this is the case for msysGit installation if you have chosen
 the 2nd option: put only git and gitk in the PATH (it is recommended option).
 
-Now you need to copy two files to your msysGit installation folders.
+Now you need to copy few files to your msysGit installation folders.
 Assuming that you installed the msysGit into C:\Program Files\Git\,
 you have to copy:
 
-   make\win32\make    ->  C:\Program Files\Git\bin\
-   make\win32\sh.cmd  ->  C:\Program Files\Git\cmd\
+   make\winx86\bin\*  ->  C:\Program Files\Git\bin\
+   make\winx86\cmd\*  ->  C:\Program Files\Git\cmd\
 
 If you have msysGit installed into another directory, you need to update paths
 accordingly. Also if you have tools installed into different directories and
@@ -93,7 +94,7 @@ software and flight firmware built in the end.
 4) To build parts of the system you can use, for example, such commands:
 
    user@pc /d/Work/OpenPilot/git (master)
-   $ make -j2 USE_BOOTLOADER=YES GCS_BUIL_CONF=release gcs coptercontrol bl_coptercontrol
+   $ make -j2 GCS_BUILD_CONF=release gcs coptercontrol
 
 or to completely remove the build directory:
 
@@ -109,7 +110,7 @@ or to completely remove the build directory:
    #!/bin/sh
    # This is the cc_make_release.sh file used to build CC release software
    cd D:/Work/OpenPilot/git
-   make -j2 USE_BOOTLOADER=YES GCS_BUIL_CONF=release gcs coptercontrol bl_coptercontrol
+   make -j2 GCS_BUILD_CONF=release gcs coptercontrol
    echo RC=$?
 
 2) Run it typing:
@@ -170,7 +171,7 @@ to get rid of git bash welcome message on every script invocation.
 
 Currently there may be some problems running scripts which contain spaces in
 file names or located in directories which contain spaces in full paths.
-It results in in strange "file not found" or other errors.
+It results in strange "file not found" or other errors.
 
 It is recommended to avoid using such names with spaces.
 

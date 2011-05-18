@@ -575,3 +575,12 @@ sim_win32_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/sitl_win32
 	$(V1) $(MAKE) --no-print-directory \
 		-C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.win32 $*
+
+##############################
+#
+# Release packaging components
+#
+##############################
+.PHONY: release
+release:
+	$(V1) cd $@ && $(MAKE) --no-print-directory $@

@@ -51,10 +51,13 @@
   !define INSTALLER_NAME "OpenPilot GCS Installer"
 
   ; Read automatically generated version info
-; !define OUT_FILE "OpenPilotGCS-XXXX-install.exe"
+; !define RELEASE_LBL "${DATE}-${TAG_OR_HASH8}"
+; !define RELEASE_DIR "..\..\build\release-$${RELEASE_LBL}"
+; !define OUT_FILE "OpenPilotGCS-$${RELEASE_LBL}-install.exe"
+; !define FIRMWARE_DIR "firmware-$${RELEASE_LBL}"
 ; !define PRODUCT_VERSION "0.0.0.0"
-; !define FILE_VERSION "0.0.0.0"
-; !define BUILD_DESCRIPTION "Unknown revision."
+; !define FILE_VERSION "${TAG_OR_BRANCH}:${HASH8} ${DATETIME}"
+; !define BUILD_DESCRIPTION "${TAG_OR_BRANCH}:${HASH8} built using ${ORIGIN} as origin, committed ${DATETIME} as ${HASH}"
   !include "${GCS_PKG_TREE}\openpilotgcs.nsh"
 
   Name "${PRODUCT_NAME}"
@@ -149,6 +152,8 @@ Section "Core files" InSecCore
   SectionIn RO
   SetOutPath "$INSTDIR\bin"
   File /r "${GCS_BUILD_TREE}\bin\*"
+  SetOutPath "$INSTDIR\share\${FIRMWARE_DIR}"
+  File /r "${RELEASE_DIR}\${FIRMWARE_DIR}\*"
 SectionEnd
 
 Section "Plugins" InSecPlugins

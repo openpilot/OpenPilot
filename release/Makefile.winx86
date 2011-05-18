@@ -13,7 +13,7 @@ $(NSIS_HEADER): $(NSIS_TEMPLATE)
 	$(V0) @echo " PY        $@"
 	$(V1) $(VERSION_CMD) --template="$<" --outfile="$@"
 
-nsis: $(NSIS_HEADER) gcs
+nsis: $(NSIS_HEADER) gcs release_flight
 	$(NSIS_CMD) $(NSIS_OPTS) $(NSIS_SCRIPT)
 
 gcs: uavobjects

@@ -15,6 +15,7 @@
 !define RELEASE_LBL "${DATE}-${TAG_OR_HASH8}"
 !define RELEASE_DIR "..\..\build\release-$${RELEASE_LBL}"
 !define OUT_FILE "OpenPilotGCS-$${RELEASE_LBL}-install.exe"
+!define FIRMWARE_DIR "firmware-$${RELEASE_LBL}"
 
 ; Installer version info
 !define PRODUCT_VERSION "0.0.0.0"

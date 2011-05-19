@@ -44,6 +44,8 @@
 #define BMA_RANGE_ADDR    0x35
 
 /* Accel range  */
+#define BMA_RANGE_MASK    0x0E          
+#define BMA_RANGE_SHIFT   1
 #define BMA_RANGE_1G      0x00		// +/- 1G ADC resolution 0.13 mg/LSB
 #define BMA_RANGE_1_5G    0x01		// +/- 1.5G ADC resolution 0.19 mg/LSB
 #define BMA_RANGE_2G      0x02		// +/- 2G ADC resolution 0.25 mg/LSB    *** default ***
@@ -53,6 +55,8 @@
 #define BMA_RANGE_16G     0x06		// +/- 16G ADC resolution 1.98 mg/LSB
 
 /* Measurement bandwidth */
+#define BMA_BW_MASK       0xF0
+#define BMA_BW_SHIFT      4
 #define BMA_BW_10HZ       0x00
 #define BMA_BW_20HZ       0x01
 #define BMA_BW_40HZ       0x02
@@ -71,9 +75,6 @@ struct pios_bma180_data {
 };
 
 /* Public Functions */
-int32_t PIOS_BMA180_WriteEnable(uint8_t _we);
-int32_t PIOS_BMA180_GetReg(uint8_t reg);
-void PIOS_BMA180_SetReg(uint8_t reg, uint8_t data);
 void PIOS_BMA180_Attach(uint32_t spi_id);
 void PIOS_BMA180_Init();
 int32_t PIOS_BMA180_Read(struct pios_bma180_data * data);

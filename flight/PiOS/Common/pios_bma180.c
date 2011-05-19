@@ -33,8 +33,11 @@
 #include "pios.h"
 
 static uint32_t PIOS_SPI_ACCEL;
-static uint8_t EEPROM_WRITEABLE=0;
 
+static int32_t PIOS_BMA180_GetReg(uint8_t reg);
+static int32_t PIOS_BMA180_SetReg(uint8_t reg, uint8_t data);
+static int32_t PIOS_BMA180_SelectBW(uint8_t bw);
+static int32_t PIOS_BMA180_SetRange(uint8_t range);
 
 /**
  * @brief Claim the SPI bus for the accel communications and select this chip
@@ -56,27 +59,6 @@ int32_t PIOS_BMA180_ReleaseBus()
 {
 	PIOS_BMA_DISABLE;
 	return PIOS_SPI_ReleaseBus(PIOS_SPI_ACCEL);
-}
-
-/**
- * @brief Set the EEPROM write-enable bit.  Must be set to 1 (unlocked) before writing control registers.
- * @return returns 0 if successful or < 0 if failure
- * @param _we[in] bit to set, 1 to enable writes or 0 to disable writes
- */
-int32_t PIOS_BMA180_WriteEnable(uint8_t _we)
-{
-	uint8_t addr_reg[2] = {BMA_WE_ADDR,0};
-
-	if(PIOS_BMA180_ClaimBus() != 0)
-		return -1;
-	addr_reg[1] = PIOS_SPI_TransferByte(PIOS_SPI_ACCEL,(0x80 | BMA_WE_ADDR) );
-	addr_reg[1] &= 0xEF;
-	addr_reg[1] |= ( (0x01 & _we) << 4);
-	PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,addr_reg,NULL,sizeof(addr_reg),NULL);
-	PIOS_BMA180_ReleaseBus();
-	EEPROM_WRITEABLE=_we;
-	
-	return 0;
 }
 
 /**
@@ -104,49 +86,46 @@ int32_t PIOS_BMA180_GetReg(uint8_t reg)
  * @param reg[in] address of register to be written
  * @param data[in] data that is to be written to register
  */
-void PIOS_BMA180_SetReg(uint8_t reg, uint8_t data)
+int32_t PIOS_BMA180_SetReg(uint8_t reg, uint8_t data)
 {
-	uint8_t reg_data[2] = { (0x7F & reg), data};
-	PIOS_BMA180_ClaimBus();
-	PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,reg_data,NULL,2,NULL);
+	if(PIOS_BMA180_ClaimBus() != 0)
+		return -1;
+	
+	PIOS_SPI_TransferByte(PIOS_SPI_ACCEL, 0x7f & reg);
+	PIOS_SPI_TransferByte(PIOS_SPI_ACCEL, data);
+
 	PIOS_BMA180_ReleaseBus();
+	
+	return 0;
 }
 
 /**
  * @brief Select the bandwidth the digital filter pass allows.
- * @return none
+ * @return 0 if successful, -1 if not
  * @param rate[in] Bandwidth setting to be used
  * 
  * EEPROM must be write-enabled before calling this function.
  */
-void PIOS_BMA180_SelectBW(uint8_t bw)
+static int32_t PIOS_BMA180_SelectBW(uint8_t bw)
 {
-	uint8_t addr_reg[2] = { BMA_BW_ADDR, 0};
-
-	PIOS_BMA180_ClaimBus();
-	addr_reg[1] = PIOS_SPI_TransferByte(PIOS_SPI_ACCEL,(0x80|BMA_BW_ADDR));
-	addr_reg[1] &= 0x0F;
-	addr_reg[1] |= (bw << 4);
-	PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,addr_reg,NULL,sizeof(addr_reg),NULL);
-	PIOS_BMA180_ReleaseBus();	
+	uint8_t reg;
+	reg = PIOS_BMA180_GetReg(BMA_BW_ADDR);
+	reg = (reg & ~BMA_BW_MASK) | ((bw << BMA_BW_SHIFT) & BMA_BW_MASK);
+	return PIOS_BMA180_SetReg(BMA_BW_ADDR, reg);
 }
 
 /**
  * @brief Select the full scale acceleration range.
- * @return none
+ * @return 0 if successful, -1 if not
  * @param rate[in] Range setting to be used
  *
  */
-void PIOS_BMA180_SetRange(uint8_t range) 
+static int32_t PIOS_BMA180_SetRange(uint8_t range) 
 {
-	uint8_t addr_reg[2] = { BMA_RANGE_ADDR, 0};
-
-	PIOS_BMA180_ClaimBus();
-	addr_reg[1] = PIOS_SPI_TransferByte(PIOS_SPI_ACCEL,(0x80|BMA_RANGE_ADDR));
-	addr_reg[1] &= 0x0F;
-	addr_reg[1] |= (range << 4);
-	PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,addr_reg,NULL,sizeof(addr_reg),NULL);
-	PIOS_BMA180_ReleaseBus();	
+	uint8_t reg;
+	reg = PIOS_BMA180_GetReg(BMA_RANGE_ADDR);
+	reg = (reg & ~BMA_RANGE_MASK) | ((range << BMA_RANGE_SHIFT) & BMA_RANGE_MASK);
+	return PIOS_BMA180_SetReg(BMA_RANGE_ADDR, reg);
 }
 
 /**
@@ -162,20 +141,15 @@ void PIOS_BMA180_Attach(uint32_t spi_id)
  */
 void PIOS_BMA180_Init()
 {
-/*
-	PIOS_BMA180_ReleaseBus();
-	PIOS_BMA180_WriteEnable(1);
-	PIOS_BMA180_SelectRate(BMA_RATE_3200);
+	if(0){
+	PIOS_BMA180_SelectBW(BMA_BW_150HZ);
 	PIOS_BMA180_SetRange(BMA_RANGE_8G);
-	PIOS_BMA180_FifoDepth(16);
-	PIOS_BMA180_SetMeasure(1); 
-	PIOS_BMA180_WriteEnable(0);
-*/
+	}
 }
 
 /**
  * @brief Read a single set of values from the x y z channels
- * @returns The number of samples remaining in the fifo or < 0 if failure
+ * @returns 0 if successful
  * @retval -1 unable to claim bus
  * @retval -2 unable to transfer data
  */
@@ -183,9 +157,8 @@ int32_t PIOS_BMA180_Read(struct pios_bma180_data * data)
 {
 	// To save memory use same buffer for in and out but offset by
 	// a byte
-	uint8_t buf[7] = {0,0,0,0,0,0};
+	uint8_t buf[7] = {BMA_X_LSB_ADDR | 0x80,0,0,0,0,0};
 	uint8_t rec[7] = {0,0,0,0,0,0};
-	buf[0] = BMA_X_LSB_ADDR | 0x80 ; // Multibyte read starting at X LSB
 	
 	if(PIOS_BMA180_ClaimBus() != 0)
 		return -1;
@@ -194,11 +167,20 @@ int32_t PIOS_BMA180_Read(struct pios_bma180_data * data)
 	PIOS_BMA180_ReleaseBus();	
 	
 	//        |    MSB        |   LSB       | 0 | new_data |
-	data->x = ( (rec[2] << 8) | rec[1] ) >> 2;
-	data->y = ( (rec[4] << 8) | rec[3] ) >> 2;
-	data->z = ( (rec[6] << 8) | rec[5] ) >> 2;
+	data->x = ( (rec[2] << 8) | rec[1] ) / 4;
+	data->y = ( (rec[4] << 8) | rec[3] ) / 4;
+	data->z = ( (rec[6] << 8) | rec[5] ) / 4;
 	
 	return 0; // return number of remaining entries
+}
+
+/**
+ * @brief Returns the scale the BMA180 chip is using
+ * @return Scale (m / s^2) / LSB
+ */
+float PIOS_BMA_GetScale()
+{
+	return 1;
 }
 
 /**
@@ -218,11 +200,15 @@ int32_t PIOS_BMA180_Test()
 		return -2;
 	PIOS_BMA180_ReleaseBus();
 	
-	if(rec[1] != 0x3)
+	struct pios_bma180_data data;
+	if(PIOS_BMA180_Read(&data) != 0)
 		return -3;
 	
-	if(rec[2] < 0x12)
+	if(rec[1] != 0x3)
 		return -4;
+	
+	if(rec[2] < 0x12)
+		return -5;
 
 	return 0;
 }

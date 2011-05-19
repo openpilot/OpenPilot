@@ -163,7 +163,6 @@ PROVIDE ( SCB             = (SCS_BASE + 0x0D00) ) ;
 
 SECTIONS
 {
-     
     /* for Cortex devices, the beginning of the startup code is stored in the .isr_vector section, which goes to FLASH */
     .isr_vector :
     {
@@ -313,6 +312,13 @@ SECTIONS
     __exidx_start = .;
     __exidx_end = .;
     
+    .boardinfo :
+    {
+	. = ALIGN(4);
+	KEEP(*(.boardinfo))
+	. = ALIGN(4);
+    } > BD_INFO
+
     /* after that it's only debugging information. */
     
     /* remove the debugging information from the standard libraries */

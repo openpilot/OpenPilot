@@ -1,4 +1,4 @@
-include(../openpilotgcs.pri)
+include(openpilotgcs.pri)
 
 TEMPLATE = subdirs
 

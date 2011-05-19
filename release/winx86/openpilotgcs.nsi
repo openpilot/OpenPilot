@@ -35,7 +35,6 @@
   ; Tree root locations (relative to this script location)
   !define NSIS_DATA_TREE "."
   !define GCS_BUILD_TREE "..\..\build\ground\openpilotgcs"
-  !define GCS_PKG_TREE "${GCS_BUILD_TREE}\packaging"
 
   ; Default installation folder
   InstallDir "$LOCALAPPDATA\OpenPilot"
@@ -58,7 +57,7 @@
 ; !define PRODUCT_VERSION "0.0.0.0"
 ; !define FILE_VERSION "${TAG_OR_BRANCH}:${HASH8} ${DATETIME}"
 ; !define BUILD_DESCRIPTION "${TAG_OR_BRANCH}:${HASH8} built using ${ORIGIN} as origin, committed ${DATETIME} as ${HASH}"
-  !include "${GCS_PKG_TREE}\openpilotgcs.nsh"
+  !include "${GCS_BUILD_TREE}\openpilotgcs.nsh"
 
   Name "${PRODUCT_NAME}"
   OutFile "${RELEASE_DIR}\${OUT_FILE}"

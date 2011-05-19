@@ -139,7 +139,6 @@ struct pios_bma180_data bma180_data;
  */
 int main()
 {
-	reset_values();
 
 	PIOS_Board_Init();
 

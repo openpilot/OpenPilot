@@ -55,6 +55,9 @@ static volatile uint32_t RawPressure;
 static volatile uint32_t Pressure;
 static volatile uint16_t Temperature;
 
+static int32_t PIOS_BMP085_Read(uint8_t address, uint8_t * buffer, uint8_t len);
+static int32_t PIOS_BMP085_Write(uint8_t address, uint8_t buffer);
+
 /**
 * Initialise the BMP085 sensor
 */
@@ -103,7 +106,7 @@ void PIOS_BMP085_Init(void)
 
 	/* Read all 22 bytes of calibration data in one transfer, this is a very optimized way of doing things */
 	uint8_t Data[BMP085_CALIB_LEN];
-	while (!PIOS_BMP085_Read(BMP085_CALIB_ADDR, Data, BMP085_CALIB_LEN))
+	while (PIOS_BMP085_Read(BMP085_CALIB_ADDR, Data, BMP085_CALIB_LEN) != 0)
 		continue;
 
 	/* Parameters AC1-AC6 */
@@ -133,10 +136,10 @@ void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type)
 {
 	/* Start the conversion */
 	if (Type == TemperatureConv) {
-		while (!PIOS_BMP085_Write(BMP085_CTRL_ADDR, BMP085_TEMP_ADDR))
+		while (PIOS_BMP085_Write(BMP085_CTRL_ADDR, BMP085_TEMP_ADDR) != 0)
 			continue;
 	} else if (Type == PressureConv) {
-		while (!PIOS_BMP085_Write(BMP085_CTRL_ADDR, BMP085_PRES_ADDR))
+		while (PIOS_BMP085_Write(BMP085_CTRL_ADDR, BMP085_PRES_ADDR) != 0)
 			continue;
 	}
 
@@ -158,7 +161,7 @@ void PIOS_BMP085_ReadADC(void)
 	/* Read and store the 16bit result */
 	if (CurrentRead == TemperatureConv) {
 		/* Read the temperature conversion */
-		while (!PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 2))
+		while (PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 2) != 0)
 			continue;
 		RawTemperature = ((Data[0] << 8) | Data[1]);
 
@@ -168,7 +171,7 @@ void PIOS_BMP085_ReadADC(void)
 		Temperature = (B5 + 8) >> 4;
 	} else {
 		/* Read the pressure conversion */
-		while (!PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 3))
+		while (PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 3) != 0)
 			continue;
 		RawPressure = ((Data[0] << 16) | (Data[1] << 8) | Data[2]) >> (8 - BMP085_OVERSAMPLING);
 
@@ -208,10 +211,8 @@ int32_t PIOS_BMP085_GetPressure(void)
 * \param[in] len number of bytes which should be read
 * \return 0 if operation was successful
 * \return -1 if error during I2C transfer
-* \return -2 if BMP085 blocked by another task (retry it!)
-* \return -4 if invalid length
 */
-bool PIOS_BMP085_Read(uint8_t address, uint8_t * buffer, uint8_t len)
+int32_t PIOS_BMP085_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 {
 	uint8_t addr_buffer[] = {
 		address,
@@ -235,7 +236,7 @@ bool PIOS_BMP085_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 		 }
 	};
 
-	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list)) ? 0 : -1;
 }
 
 /**
@@ -244,9 +245,8 @@ bool PIOS_BMP085_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 * \param[in] buffer source buffer
 * \return 0 if operation was successful
 * \return -1 if error during I2C transfer
-* \return -2 if BMP085 blocked by another task (retry it!)
 */
-bool PIOS_BMP085_Write(uint8_t address, uint8_t buffer)
+int32_t PIOS_BMP085_Write(uint8_t address, uint8_t buffer)
 {
 	uint8_t data[] = {
 		address,
@@ -264,35 +264,37 @@ bool PIOS_BMP085_Write(uint8_t address, uint8_t buffer)
 		,
 	};
 
-	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list)) ? 0 : -1;
 }
 
 /**
 * @brief Run self-test operation.
-* \return 0 if self-test failed
-* \return any non-0 number if test passed
+* \return 0 if self-test succeed, -1 if failed
 */
 int32_t PIOS_BMP085_Test()
 {
 	// TODO: Is there a better way to test this than just checking that pressure/temperature has changed?
-	int32_t passed = 1;
 	int32_t cur_value = 0;
 
+	if(PIOS_BMP085_Read(BMP085_ADC_MSB, (uint8_t *) &cur_value, 1) != 0)
+		return -1;
+	return 0;
+			    
 	cur_value = Temperature;
 	PIOS_BMP085_StartADC(TemperatureConv);
 	PIOS_DELAY_WaitmS(5);
 	PIOS_BMP085_ReadADC();
 	if (cur_value == Temperature)
-		passed = 0;
+		return -1;
 
 	cur_value=Pressure;
 	PIOS_BMP085_StartADC(PressureConv);
 	PIOS_DELAY_WaitmS(26);
 	PIOS_BMP085_ReadADC();
 	if (cur_value == Pressure)
-		passed = 0;
-
-	return passed;
+		return -1;
+	
+	return 0;
 }
 
 #endif /* PIOS_INCLUDE_BMP085 */

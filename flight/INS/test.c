@@ -94,7 +94,7 @@ void blink(int led, int times)
 
 void test_accel()
 {
-	if(PIOS_BMA180_Test())
+	if(PIOS_BMA180_Test() == 0)
 		blink(LED1, 1);
 	else
 		blink(LED2, 1);
@@ -103,7 +103,7 @@ void test_accel()
 #if defined (PIOS_INCLUDE_HMC5883)
 void test_mag()
 {
-	if(PIOS_HMC5883_Test())
+	if(PIOS_HMC5883_Test() == 0)
 		blink(LED1, 2);
 	else
 		blink(LED2, 2);
@@ -113,7 +113,7 @@ void test_mag()
 #if defined (PIOS_INCLUDE_BMP085)
 void test_pressure()
 {
-	if(PIOS_BMP085_Test())
+	if(PIOS_BMP085_Test() == 0)
 		blink(LED1, 3);
 	else
 		blink(LED2, 3);
@@ -123,7 +123,7 @@ void test_pressure()
 #if defined (PIOS_INCLUDE_IMU3000)
 void test_imu()
 {
-	if(PIOS_IMU3000_Test())
+	if(PIOS_IMU3000_Test() == 0)
 		blink(LED1, 4);
 	else
 		blink(LED2, 4);
@@ -165,51 +165,6 @@ int main()
 		PIOS_DELAY_WaitmS(3000);
 	}
 
-}
-
-
-
-/**
- * @brief Populate fields with initial values
- */
-void reset_values()
-{
-	accel_data.calibration.scale[0][1] = 0;
-	accel_data.calibration.scale[1][0] = 0;
-	accel_data.calibration.scale[0][2] = 0;
-	accel_data.calibration.scale[2][0] = 0;
-	accel_data.calibration.scale[1][2] = 0;
-	accel_data.calibration.scale[2][1] = 0;
-
-	accel_data.calibration.scale[0][0] = 0.0359;
-	accel_data.calibration.scale[1][1] = 0.0359;
-	accel_data.calibration.scale[2][2] = 0.0359;
-	accel_data.calibration.scale[0][3] = -73.5;
-	accel_data.calibration.scale[1][3] = -73.5;
-	accel_data.calibration.scale[2][3] = -73.5;
-
-	accel_data.calibration.variance[0] = 1e-4;
-	accel_data.calibration.variance[1] = 1e-4;
-	accel_data.calibration.variance[2] = 1e-4;
-
-	gyro_data.calibration.scale[0] = -0.014;
-	gyro_data.calibration.scale[1] = 0.014;
-	gyro_data.calibration.scale[2] = -0.014;
-	gyro_data.calibration.bias[0] = -24;
-	gyro_data.calibration.bias[1] = -24;
-	gyro_data.calibration.bias[2] = -24;
-	gyro_data.calibration.variance[0] = 1;
-	gyro_data.calibration.variance[1] = 1;
-	gyro_data.calibration.variance[2] = 1;
-	mag_data.calibration.scale[0] = 1;
-	mag_data.calibration.scale[1] = 1;
-	mag_data.calibration.scale[2] = 1;
-	mag_data.calibration.bias[0] = 0;
-	mag_data.calibration.bias[1] = 0;
-	mag_data.calibration.bias[2] = 0;
-	mag_data.calibration.variance[0] = 50;
-	mag_data.calibration.variance[1] = 50;
-	mag_data.calibration.variance[2] = 50;
 }
 
 

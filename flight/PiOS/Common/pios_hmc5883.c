@@ -322,18 +322,15 @@ static bool PIOS_HMC5883_Write(uint8_t address, uint8_t buffer)
 
 /**
  * @brief Run self-test operation.  Do not call this during operational use!!
- * \return 0 if test failed
- * \return non-zero value if test succeeded
+ * \return 0 if success, -1 if test failed
  */
 int32_t PIOS_HMC5883_Test(void)
 {
 	/* Verify that ID matches (HMC5883 ID is null-terminated ASCII string "H43") */
 	char id[4];
 	PIOS_HMC5883_ReadID((uint8_t *)id);
-	if(!strncmp("H43\0",id,4))
-		return 0;
-	else
-		return 1;
+	if(strncmp("H43\0",id,4) != 0) // match H43
+		return -1;
 
 	int32_t passed = 1;
 	uint8_t registers[3] = {0,0,0};

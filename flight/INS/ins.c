@@ -413,11 +413,18 @@ void print_ekf_binary() {}
 
 extern void PIOS_Board_Init(void);
 
+static void panic() 
+{
+	while(1) {
+		PIOS_LED_Toggle(LED2);
+		PIOS_DELAY_WaitmS(100);
+	}
+}
 /**
  * @brief INS Main function
  */
 int main()
-{
+{	
 	gps_data.quality = -1;
 	uint32_t up_time_real = 0;
 	uint32_t up_time = 0;
@@ -433,16 +440,36 @@ int main()
 	reset_values();
 
 	PIOS_Board_Init();
+	PIOS_LED_Off(LED1);
+	PIOS_LED_On(LED2);
 
 #if defined(PIOS_INCLUDE_HMC5883) && defined(PIOS_INCLUDE_I2C)
 	// Get 3 ID bytes
 	strcpy((char *)mag_data.id, "ZZZ");
 	PIOS_HMC5883_ReadID(mag_data.id);
 #endif
+	PIOS_LED_Off(LED1);
+	PIOS_LED_Off(LED2);
+	
 
-	while(!AhrsLinkReady()) {
-		AhrsPoll();
-	}
+	// Sensor test
+	if(PIOS_IMU3000_Test() == 0)
+		panic();
+
+	/*
+	if(PIOS_BMA180_Test() == 0)
+		panic();
+
+	if(PIOS_HMC5883_Test() == 0)
+		panic();
+	
+	
+	if(PIOS_BMP085_Test() == 0)
+		panic(); */
+	
+	//while(!AhrsLinkReady()) {
+	//	AhrsPoll();
+	//}
 
 	/* we didn't connect the callbacks before because we have to wait
 	for all data to be up to date before doing anything*/
@@ -538,41 +565,25 @@ int main()
  */
 bool get_accel_gyro_data()
 {
-//	struct pios_bma180_data accel;
-//	struct pios_imu3000_data gyro;
+	struct pios_bma180_data accel;
+	struct pios_imu3000_data gyro;
 
-	//PIOS_BMA180_Read(&accel);
-	//PIOS_IMU3000_ReadGyros(&gyro);
+	PIOS_BMA180_Read(&accel);
+	PIOS_IMU3000_ReadGyros(&gyro);
 
-	accel_data.raw.x=0;
-	accel_data.raw.y=0;
-	accel_data.raw.z=-9;
-	gyro_data.raw.x=0;
-	gyro_data.raw.y=0;
-	gyro_data.raw.z=0;
-	accel_data.filtered.x = 0;
-	accel_data.filtered.y = 0;
-	accel_data.filtered.z = -9.8;
-	gyro_data.filtered.x = 0;
-	gyro_data.filtered.y = 0;
-	gyro_data.filtered.z = 0;
-/*
-	PIOS_BMA180_Read(&accel[1]);
-	accel_data.raw.x=accel[1].x;
-	accel_data.raw.y=accel[1].y;
-	accel_data.raw.z=accel[1].z;
-	PIOS_IMU3000_Read(&gyro[1]);
-	gyro_data.raw.x=gyro[1].x;
-	gyro_data.raw.y=gyro[1].y;
-	gyro_data.raw.z=gyro[1].z;
+	accel_data.raw.x=accel.x;
+	accel_data.raw.y=accel.y;
+	accel_data.raw.z=accel.z;
+	gyro_data.raw.x=gyro.x;
+	gyro_data.raw.y=gyro.y;
+	gyro_data.raw.z=gyro.z;
+	accel_data.filtered.x = accel.x;
+	accel_data.filtered.y = accel.y;
+	accel_data.filtered.z = accel.z;
+	gyro_data.filtered.x = gyro.x;
+	gyro_data.filtered.y = gyro.y;
+	gyro_data.filtered.z = gyro.z;
 
-	accel_data.filtered.x = ((float)(accel[0].x + accel[1].x)) / 2;
-	accel_data.filtered.y = ((float)(accel[0].y + accel[1].y)) / 2;
-	accel_data.filtered.z = ((float)(accel[0].z + accel[1].z)) / 2;
-	gyro_data.filtered.x = ((float)(gyro[0].x + gyro[1].x)) / 2;
-	gyro_data.filtered.y = ((float)(gyro[0].y + gyro[1].y)) / 2;
-	gyro_data.filtered.z = ((float)(gyro[0].z + gyro[1].z)) / 2;
-*/
 	return true;
 }
 

@@ -143,6 +143,22 @@
 		659885AD138450D2006777AA /* link_STM3210E_INS_sections.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = link_STM3210E_INS_sections.ld; sourceTree = "<group>"; };
 		659885AE138450D2006777AA /* link_STM3210E_INS_BL_sections.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = link_STM3210E_INS_BL_sections.ld; sourceTree = "<group>"; };
 		659885AF138450D2006777AA /* link_STM3210E_INS_memory.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = link_STM3210E_INS_memory.ld; sourceTree = "<group>"; };
+		659885CF13845855006777AA /* pios_imu3000.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_imu3000.c; sourceTree = "<group>"; };
+		659885D013845855006777AA /* pios_hmc5883.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_hmc5883.c; sourceTree = "<group>"; };
+		659885D113845855006777AA /* pios_bma180.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_bma180.c; sourceTree = "<group>"; };
+		659885D213845855006777AA /* pios_bl_helper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_bl_helper.c; sourceTree = "<group>"; };
+		659885D313845855006777AA /* pios_i2c_esc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_i2c_esc.c; sourceTree = "<group>"; };
+		659885D413845855006777AA /* pios_hcsr04.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_hcsr04.c; sourceTree = "<group>"; };
+		65988600138467D4006777AA /* pios_imu3000.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_imu3000.h; sourceTree = "<group>"; };
+		65988601138467D4006777AA /* pios_ppm_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_ppm_priv.h; sourceTree = "<group>"; };
+		65988602138467D4006777AA /* pios_hmc5883.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_hmc5883.h; sourceTree = "<group>"; };
+		65988603138467D4006777AA /* pios_bma180.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_bma180.h; sourceTree = "<group>"; };
+		65988604138467D4006777AA /* pios_bl_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_bl_helper.h; sourceTree = "<group>"; };
+		65988605138467D4006777AA /* pios_spektrum_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_spektrum_priv.h; sourceTree = "<group>"; };
+		65988606138467D4006777AA /* pios_initcall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_initcall.h; sourceTree = "<group>"; };
+		65988607138467D4006777AA /* pios_iap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_iap.h; sourceTree = "<group>"; };
+		65988608138467D4006777AA /* pios_i2c_esc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_i2c_esc.h; sourceTree = "<group>"; };
+		65988609138467D4006777AA /* pios_hcsr04.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_hcsr04.h; sourceTree = "<group>"; };
 		659ED317122226B60011010E /* ahrssettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrssettings.xml; sourceTree = "<group>"; };
 		65B35D7F121C261E003EAD18 /* bin.pro */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bin.pro; sourceTree = "<group>"; };
 		65B35D80121C261E003EAD18 /* openpilotgcs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = openpilotgcs; sourceTree = "<group>"; };
@@ -7750,17 +7766,23 @@
 		65E8F03011EFF25C00BBF654 /* Common */ = {
 			isa = PBXGroup;
 			children = (
-				654612D812B5E9A900B719D0 /* pios_iap.c */,
+				6528CCB412E406B800CF5144 /* pios_adxl345.c */,
+				659885D213845855006777AA /* pios_bl_helper.c */,
+				659885D113845855006777AA /* pios_bma180.c */,
 				65E8F03111EFF25C00BBF654 /* pios_bmp085.c */,
 				65E8F03211EFF25C00BBF654 /* pios_com.c */,
+				6512D60712ED4CB8008175E5 /* pios_flash_w25x.c */,
+				65FF4D5E137EDEC100146BE4 /* pios_flashfs_objlist.c */,
 				65E8F03311EFF25C00BBF654 /* pios_hmc5843.c */,
+				659885D013845855006777AA /* pios_hmc5883.c */,
+				659885D413845855006777AA /* pios_hcsr04.c */,
+				659885CF13845855006777AA /* pios_imu3000.c */,
+				659885D313845855006777AA /* pios_i2c_esc.c */,
+				654612D812B5E9A900B719D0 /* pios_iap.c */,
 				65E8F03411EFF25C00BBF654 /* pios_opahrs.c */,
 				65E8F03511EFF25C00BBF654 /* pios_opahrs_proto.c */,
 				65E8F03611EFF25C00BBF654 /* pios_sdcard.c */,
 				65E8F03711EFF25C00BBF654 /* printf-stdarg.c */,
-				6528CCB412E406B800CF5144 /* pios_adxl345.c */,
-				6512D60712ED4CB8008175E5 /* pios_flash_w25x.c */,
-				65FF4D5E137EDEC100146BE4 /* pios_flashfs_objlist.c */,
 			);
 			name = Common;
 			path = ../../PiOS/Common;
@@ -7769,6 +7791,16 @@
 		65E8F03811EFF25C00BBF654 /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				65988600138467D4006777AA /* pios_imu3000.h */,
+				65988601138467D4006777AA /* pios_ppm_priv.h */,
+				65988602138467D4006777AA /* pios_hmc5883.h */,
+				65988603138467D4006777AA /* pios_bma180.h */,
+				65988604138467D4006777AA /* pios_bl_helper.h */,
+				65988605138467D4006777AA /* pios_spektrum_priv.h */,
+				65988606138467D4006777AA /* pios_initcall.h */,
+				65988607138467D4006777AA /* pios_iap.h */,
+				65988608138467D4006777AA /* pios_i2c_esc.h */,
+				65988609138467D4006777AA /* pios_hcsr04.h */,
 				6528CCE212E40F6700CF5144 /* pios_adxl345.h */,
 				6512D60512ED4CA2008175E5 /* pios_flash_w25x.h */,
 				6526645B122DF972006F9A3C /* pios_wdg.h */,

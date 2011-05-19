@@ -187,23 +187,26 @@ uint8_t PIOS_BMA180_Read(struct pios_bma180_data * data)
 
 /**
  * @brief Test SPI and chip functionality by reading chip ID register
- * @return 0 if test failed, any other value signals test succeeded.
+ * @return 0 if success, -1 if failure.
  *
  */
 uint8_t PIOS_BMA180_Test()
 {
-	uint8_t data = 0;
-	uint8_t pass = 0;
-	PIOS_BMA180_ClaimBus();
-	data = PIOS_SPI_TransferByte(PIOS_SPI_ACCEL,(0x80 | BMA_CHIPID_ADDR) );
-	data &= 0x07;
-	if(0x03 == data)
-		pass = 1;
-	data = PIOS_SPI_TransferByte(PIOS_SPI_ACCEL,(0x80 | BMA_VERSION_ADDR) );
-	if(0x12 == data)
-		pass = 1 && pass;			// Only passes if first and second test passS
+	// Read chip ID then version ID
+	uint8_t buf[3] = {0x80 | BMA_CHIPID_ADDR, 0, 0};
+	uint8_t rec[3] = {0,0, 0};
+
+	PIOS_BMA180_ClaimBus();	
+	PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,&buf[0],&rec[0],sizeof(buf),NULL);	
 	PIOS_BMA180_ReleaseBus();
-	return pass;
+	
+	if((rec[1] & 0x07) != 0x3)
+		return -1;
+	
+	if(rec[2] != 0x12)
+		return -1;
+
+	return 0;
 }
 
 /**

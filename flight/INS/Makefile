@@ -204,7 +204,7 @@ LINKERSCRIPTPATH = $(PIOSSTM32F10X)
 # (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
 
 ifeq ($(DEBUG),YES)
-CFLAGS += -Os
+CFLAGS += -O0
 CFLAGS += -DGENERAL_COV
 else
 CFLAGS += -Os

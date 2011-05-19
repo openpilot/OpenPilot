@@ -204,6 +204,9 @@ extern uint32_t pios_com_aux_id;
 #define PIOS_GPIO_CLKS                          { PIOS_GPIO_1_GPIO_CLK }
 #define PIOS_GPIO_NUM                           1
 
+//------------------------
+// BMA180
+//------------------------
 #define PIOS_BMA_ENABLE                        PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,0)
 #define PIOS_BMA_DISABLE                       PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,1)
 

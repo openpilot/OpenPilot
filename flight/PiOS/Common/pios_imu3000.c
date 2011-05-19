@@ -50,8 +50,8 @@ typedef struct {
 /* Local Variables */
 
 static void PIOS_IMU3000_Config(PIOS_IMU3000_ConfigTypeDef * IMU3000_Config_Struct);
-static bool PIOS_IMU3000_Read(uint8_t address, uint8_t * buffer, uint8_t len);
-static bool PIOS_IMU3000_Write(uint8_t address, uint8_t buffer);
+static int32_t PIOS_IMU3000_Read(uint8_t address, uint8_t * buffer, uint8_t len);
+static int32_t PIOS_IMU3000_Write(uint8_t address, uint8_t buffer);
 
 /**
  * @brief Initialize the IMU3000 3-axis gyro sensor.
@@ -109,22 +109,22 @@ static void PIOS_IMU3000_Config(PIOS_IMU3000_ConfigTypeDef * IMU3000_Config_Stru
 	// TODO: Add checks against current config so we only update what has changed
 
 	// FIFO storage
-	while (!PIOS_IMU3000_Write(PIOS_IMU3000_FIFO_EN_REG, IMU3000_Config_Struct->Fifo_store)) ;
+	while (PIOS_IMU3000_Write(PIOS_IMU3000_FIFO_EN_REG, IMU3000_Config_Struct->Fifo_store) != 0);
 
 	// Sample rate divider
-	while (!PIOS_IMU3000_Write(PIOS_IMU3000_SMPLRT_DIV_REG, IMU3000_Config_Struct->Smpl_rate_div)) ;
+	while (PIOS_IMU3000_Write(PIOS_IMU3000_SMPLRT_DIV_REG, IMU3000_Config_Struct->Smpl_rate_div) != 0) ;
 
 	// Digital low-pass filter and scale
-	while (!PIOS_IMU3000_Write(PIOS_IMU3000_DLPF_CFG_REG, IMU3000_Config_Struct->DigLPF_Scale)) ;
+	while (PIOS_IMU3000_Write(PIOS_IMU3000_DLPF_CFG_REG, IMU3000_Config_Struct->DigLPF_Scale) != 0) ;
 
 	// Interrupt configuration
-	while (!PIOS_IMU3000_Write(PIOS_IMU3000_INT_CFG_REG, IMU3000_Config_Struct->Interrupt_cfg)) ;
+	while (PIOS_IMU3000_Write(PIOS_IMU3000_INT_CFG_REG, IMU3000_Config_Struct->Interrupt_cfg) != 0) ;
 
 	// Interrupt configuration
-	while (!PIOS_IMU3000_Write(PIOS_IMU3000_USER_CTRL_REG, IMU3000_Config_Struct->User_ctl)) ;
+	while (PIOS_IMU3000_Write(PIOS_IMU3000_USER_CTRL_REG, IMU3000_Config_Struct->User_ctl) != 0) ;
 
 	// Interrupt configuration
-	while (!PIOS_IMU3000_Write(PIOS_IMU3000_PWR_MGMT_REG, IMU3000_Config_Struct->Pwr_mgmt_clk)) ;
+	while (PIOS_IMU3000_Write(PIOS_IMU3000_PWR_MGMT_REG, IMU3000_Config_Struct->Pwr_mgmt_clk) != 0) ;
 }
 
 /**
@@ -140,12 +140,13 @@ uint8_t PIOS_IMU3000_ReadGyros(struct pios_imu3000_data * data)
 
 /**
  * @brief Read the identification bytes from the IMU3000 sensor
- * \return ID read from IMU3000
+ * \return ID read from IMU3000 or -1 if failure
 */
-uint8_t PIOS_IMU3000_ReadID()
+int32_t PIOS_IMU3000_ReadID()
 {
 	uint8_t id;
-	while (!PIOS_IMU3000_Read(0x00, &id, 1)) ;
+	if(PIOS_IMU3000_Read(0x00, &id, 1) != 0)
+		return -1;
 	return id;
 }
 
@@ -158,7 +159,7 @@ uint8_t PIOS_IMU3000_ReadID()
 * \return -1 if error during I2C transfer
 * \return -4 if invalid length
 */
-static bool PIOS_IMU3000_Read(uint8_t address, uint8_t * buffer, uint8_t len)
+static int32_t PIOS_IMU3000_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 {
 	uint8_t addr_buffer[] = {
 		address,
@@ -182,7 +183,7 @@ static bool PIOS_IMU3000_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 		 }
 	};
 
-	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+	return PIOS_I2C_Transfer(PIOS_I2C_GYRO_ADAPTER, txn_list, NELEMENTS(txn_list)) ? 0 : -1;
 }
 
 /**
@@ -192,7 +193,7 @@ static bool PIOS_IMU3000_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 * \return 0 if operation was successful
 * \return -1 if error during I2C transfer
 */
-static bool PIOS_IMU3000_Write(uint8_t address, uint8_t buffer)
+static int32_t PIOS_IMU3000_Write(uint8_t address, uint8_t buffer)
 {
 	uint8_t data[] = {
 		address,
@@ -210,7 +211,7 @@ static bool PIOS_IMU3000_Write(uint8_t address, uint8_t buffer)
 		,
 	};
 
-	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+	return PIOS_I2C_Transfer(PIOS_I2C_GYRO_ADAPTER, txn_list, NELEMENTS(txn_list)) ? 0 : -1;
 }
 
 /**
@@ -221,7 +222,15 @@ static bool PIOS_IMU3000_Write(uint8_t address, uint8_t buffer)
 uint8_t PIOS_IMU3000_Test(void)
 {
 	/* Verify that ID matches (IMU3000 ID is 0x69) */
-	return ( !(0x69 ^ PIOS_IMU3000_ReadID()) );
+	int32_t id = 0;
+	id = PIOS_IMU3000_ReadID();
+	if(id < 0)
+		return -1;
+	
+	if(id != PIOS_IMU3000_I2C_ADDR)
+		return -2;
+	
+	return 0;
 }
 
 /**

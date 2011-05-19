@@ -71,13 +71,13 @@ struct pios_bma180_data {
 };
 
 /* Public Functions */
-void PIOS_BMA180_WriteEnable(uint8_t _we);
-uint8_t PIOS_BMA180_GetReg(uint8_t reg);
+int32_t PIOS_BMA180_WriteEnable(uint8_t _we);
+int32_t PIOS_BMA180_GetReg(uint8_t reg);
 void PIOS_BMA180_SetReg(uint8_t reg, uint8_t data);
 void PIOS_BMA180_Attach(uint32_t spi_id);
 void PIOS_BMA180_Init();
-uint8_t PIOS_BMA180_Read(struct pios_bma180_data * data);
-uint8_t PIOS_BMA180_Test();
+int32_t PIOS_BMA180_Read(struct pios_bma180_data * data);
+int32_t PIOS_BMA180_Test();
 
 #endif /* PIOS_BMA180_H */
 

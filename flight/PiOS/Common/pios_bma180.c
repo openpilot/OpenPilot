@@ -38,52 +38,64 @@ static uint8_t EEPROM_WRITEABLE=0;
 
 /**
  * @brief Claim the SPI bus for the accel communications and select this chip
+ * @return 0 if successful, -1 if unable to claim bus
  */
-void PIOS_BMA180_ClaimBus()
+int32_t PIOS_BMA180_ClaimBus()
 {
-	PIOS_SPI_ClaimBus(PIOS_SPI_ACCEL);
+	if(PIOS_SPI_ClaimBus(PIOS_SPI_ACCEL) != 0)
+		return -1;
 	PIOS_BMA_ENABLE;
+	return 0;
 }
 
 /**
  * @brief Release the SPI bus for the accel communications and end the transaction
+ * @return 0 if successful
  */
-void PIOS_BMA180_ReleaseBus()
+int32_t PIOS_BMA180_ReleaseBus()
 {
 	PIOS_BMA_DISABLE;
-	PIOS_SPI_ReleaseBus(PIOS_SPI_ACCEL);
+	return PIOS_SPI_ReleaseBus(PIOS_SPI_ACCEL);
 }
 
 /**
  * @brief Set the EEPROM write-enable bit.  Must be set to 1 (unlocked) before writing control registers.
- * @return none
+ * @return returns 0 if successful or < 0 if failure
  * @param _we[in] bit to set, 1 to enable writes or 0 to disable writes
  */
-void PIOS_BMA180_WriteEnable(uint8_t _we)
+int32_t PIOS_BMA180_WriteEnable(uint8_t _we)
 {
 	uint8_t addr_reg[2] = {BMA_WE_ADDR,0};
 
-	PIOS_BMA180_ClaimBus();
+	if(PIOS_BMA180_ClaimBus() != 0)
+		return -1;
 	addr_reg[1] = PIOS_SPI_TransferByte(PIOS_SPI_ACCEL,(0x80 | BMA_WE_ADDR) );
 	addr_reg[1] &= 0xEF;
 	addr_reg[1] |= ( (0x01 & _we) << 4);
 	PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,addr_reg,NULL,sizeof(addr_reg),NULL);
 	PIOS_BMA180_ReleaseBus();
 	EEPROM_WRITEABLE=_we;
+	
+	return 0;
 }
 
 /**
  * @brief Read a register from BMA180
- * @returns The register value
+ * @returns The register value or -1 if failure to get bus
  * @param reg[in] Register address to be read
  */
-uint8_t PIOS_BMA180_GetReg(uint8_t reg)
+int32_t PIOS_BMA180_GetReg(uint8_t reg)
 {
 	uint8_t data;
-	PIOS_BMA180_ClaimBus();
-	data = PIOS_SPI_TransferByte(PIOS_SPI_ACCEL,(0x80 | reg) );
+	
+	if(PIOS_BMA180_ClaimBus() != 0)
+		return -1;	
+
+	PIOS_SPI_TransferByte(PIOS_SPI_ACCEL,(0x80 | reg) ); // request byte
+	data = PIOS_SPI_TransferByte(PIOS_SPI_ACCEL,0 );     // receive response
+	
 	PIOS_BMA180_ReleaseBus();
-	return(data);
+	return data;
 }
 
 /**
@@ -163,9 +175,11 @@ void PIOS_BMA180_Init()
 
 /**
  * @brief Read a single set of values from the x y z channels
- * @returns The number of samples remaining in the fifo
+ * @returns The number of samples remaining in the fifo or < 0 if failure
+ * @retval -1 unable to claim bus
+ * @retval -2 unable to transfer data
  */
-uint8_t PIOS_BMA180_Read(struct pios_bma180_data * data)
+int32_t PIOS_BMA180_Read(struct pios_bma180_data * data)
 {
 	// To save memory use same buffer for in and out but offset by
 	// a byte
@@ -173,8 +187,10 @@ uint8_t PIOS_BMA180_Read(struct pios_bma180_data * data)
 	uint8_t rec[7] = {0,0,0,0,0,0};
 	buf[0] = BMA_X_LSB_ADDR | 0x80 ; // Multibyte read starting at X LSB
 	
-	PIOS_BMA180_ClaimBus();
-	PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,&buf[0],&rec[0],7,NULL);
+	if(PIOS_BMA180_ClaimBus() != 0)
+		return -1;
+	if(PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,&buf[0],&rec[0],7,NULL) != 0)
+		return -2;
 	PIOS_BMA180_ReleaseBus();	
 	
 	//        |    MSB        |   LSB       | 0 | new_data |
@@ -190,21 +206,23 @@ uint8_t PIOS_BMA180_Read(struct pios_bma180_data * data)
  * @return 0 if success, -1 if failure.
  *
  */
-uint8_t PIOS_BMA180_Test()
+int32_t PIOS_BMA180_Test()
 {
 	// Read chip ID then version ID
 	uint8_t buf[3] = {0x80 | BMA_CHIPID_ADDR, 0, 0};
 	uint8_t rec[3] = {0,0, 0};
 
-	PIOS_BMA180_ClaimBus();	
-	PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,&buf[0],&rec[0],sizeof(buf),NULL);	
+	if(PIOS_BMA180_ClaimBus() != 0)
+		return -1;
+	if(PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,&buf[0],&rec[0],sizeof(buf),NULL) != 0)
+		return -2;
 	PIOS_BMA180_ReleaseBus();
 	
-	if((rec[1] & 0x07) != 0x3)
-		return -1;
+	if(rec[1] != 0x3)
+		return -3;
 	
-	if(rec[2] != 0x12)
-		return -1;
+	if(rec[2] < 0x12)
+		return -4;
 
 	return 0;
 }

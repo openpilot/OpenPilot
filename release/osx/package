@@ -1,0 +1,29 @@
+#!/bin/bash
+
+OP_BASE=~/Documents/Programming/OpenPilot
+RELEASE_NAME=20110519-460cc1ad
+
+REL_DIR=${OP_BASE}/build/release-${RELEASE_NAME}
+TEMP_FILE=${REL_DIR}/OpenPilot-temp.dmg
+OUT_FILE=${REL_DIR}/OpenPilot-${RELEASE_NAME}.dmg
+VOL_NAME=OpenPilot
+
+APP_PATH=${OP_BASE}/build/ground/openpilotgcs/bin/OpenPilot\ GCS.app
+FW_PATH="${OP_BASE}/build/release-${RELEASE_NAME}/firmware-${RELEASE_NAME}"
+
+rm ${TEMP_FILE}
+rm ${OUT_FILE}
+
+hdiutil convert "${OP_BASE}/release/osx/OpenPilot.dmg" -format UDRW -o "${TEMP_FILE}"
+device=$(hdiutil attach  ${TEMP_FILE} | \
+         egrep '^/dev/' | sed 1q | awk '{print $1}')
+
+# packaging goes here
+cp -r "${APP_PATH}" "/Volumes/${VOL_NAME}"
+cp -r "${FW_PATH}" "/Volumes/${VOL_NAME}/firmware"
+
+hdiutil detach ${device}
+hdiutil convert ${TEMP_FILE} -format UDZO -o ${OUT_FILE}
+
+rm ${TEMP_FILE}
+

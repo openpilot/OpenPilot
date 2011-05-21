@@ -11,7 +11,7 @@ from subprocess import Popen, PIPE
 from re import search, MULTILINE
 from datetime import datetime
 from string import Template
-import argparse
+import optparse
 import hashlib
 import sys
 
@@ -240,29 +240,39 @@ dependent targets.
     """
 
     # Parse command line.
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+    class RawDescriptionHelpFormatter(optparse.IndentedHelpFormatter):
+        """optparse formatter function to pretty print raw epilog"""
+        def format_epilog(self, epilog):
+            if epilog:
+                return "\n" + epilog + "\n"
+            else:
+                return ""
+
+    parser = optparse.OptionParser(
+        formatter=RawDescriptionHelpFormatter(),
         description = "Performs variable substitution in template file or string.",
         epilog = main.__doc__);
 
-    parser.add_argument('--path', default='.',
+    parser.add_option('--path', default='.',
                         help='path to the git repository');
-    parser.add_argument('--info', action='store_true',
+    parser.add_option('--info', action='store_true',
                         help='print repository info to stdout');
-    parser.add_argument('--format',
+    parser.add_option('--format',
                         help='format string to print to stdout');
-    parser.add_argument('--template',
+    parser.add_option('--template',
                         help='name of template file');
-    parser.add_argument('--outfile',
+    parser.add_option('--outfile',
                         help='name of output file');
-    parser.add_argument('--image',
+    parser.add_option('--image',
                         help='name of image file for sha1 calculation');
-    parser.add_argument('--type', default="",
+    parser.add_option('--type', default="",
                         help='board type, for example, 0x04 for CopterControl');
-    parser.add_argument('--revision', default = "",
+    parser.add_option('--revision', default = "",
                         help='board revision, for example, 0x01');
 
-    args = parser.parse_args()
+    (args, positional_args) = parser.parse_args()
+    if len(positional_args) != 0:
+        parser.error("incorrect number of arguments, try --help for help")
 
     # Process arguments.  No advanced error handling is here.
     # Any error will raise an exception and terminate process

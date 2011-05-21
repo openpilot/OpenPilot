@@ -576,13 +576,16 @@ $(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
 
 $(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
 
-.PHONY: elf lss sym hex bin bino
+$(eval $(call OPF_TEMPLATE,$(OUTDIR)/$(TARGET).bin,0x04,0x01))
+
+.PHONY: elf lss sym hex bin bino opf
 elf: $(OUTDIR)/$(TARGET).elf
 lss: $(OUTDIR)/$(TARGET).lss
 sym: $(OUTDIR)/$(TARGET).sym
 hex: $(OUTDIR)/$(TARGET).hex
 bin: $(OUTDIR)/$(TARGET).bin
 bino: $(OUTDIR)/$(TARGET).bin.o
+opf: $(OUTDIR)/$(TARGET).opf
 
 # Display sizes of sections.
 $(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))

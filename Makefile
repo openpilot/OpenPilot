@@ -321,7 +321,7 @@ BL_TARGETS    := $(filter-out bl_ins, $(BL_TARGETS))
 BLUPD_TARGETS := $(filter-out blupd_ins, $(BLUPD_TARGETS))
 
 .PHONY: all_fw all_fw_clean
-all_fw:           $(addsuffix _bin,   $(FW_TARGETS))
+all_fw:           $(addsuffix _opf,   $(FW_TARGETS))
 all_fw_clean:     $(addsuffix _clean, $(FW_TARGETS))
 
 .PHONY: all_bl all_bl_clean
@@ -337,7 +337,7 @@ all_flight:       all_fw all_bl all_blupd
 all_flight_clean: all_fw_clean all_bl_clean all_blupd_clean
 
 .PHONY: openpilot
-openpilot: openpilot_bin
+openpilot: openpilot_opf
 
 openpilot_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/openpilot/dep
@@ -385,7 +385,7 @@ blupd_openpilot_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/blupd_openpilot
 
 .PHONY: ahrs
-ahrs: ahrs_bin
+ahrs: ahrs_opf
 
 ahrs_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/ahrs/dep
@@ -433,7 +433,7 @@ blupd_ahrs_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/blupd_ahrs
 
 .PHONY: coptercontrol
-coptercontrol: coptercontrol_bin
+coptercontrol: coptercontrol_opf
 
 coptercontrol_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/coptercontrol/dep
@@ -481,7 +481,7 @@ blupd_coptercontrol_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/blupd_coptercontrol
 
 .PHONY: pipxtreme
-pipxtreme: pipxtreme_bin
+pipxtreme: pipxtreme_opf
 
 pipxtreme_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/pipxtreme/dep
@@ -530,7 +530,7 @@ blupd_pipxtreme_clean:
 
 
 .PHONY: ins
-ins: ins_bin
+ins: ins_opf
 
 ins_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/ins/dep

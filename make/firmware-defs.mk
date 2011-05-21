@@ -45,6 +45,8 @@ MSG_ASMFROMC         := ${quote} AS(C)     ${quote}
 MSG_ASMFROMC_ARM     := ${quote} AS(C)-ARM ${quote}
 MSG_PYMITEINIT       := ${quote} PY        ${quote}
 MSG_INSTALLING       := ${quote} INSTALL   ${quote}
+MSG_OPFIRMWARE       := ${quote} OPF       ${quote}
+MSG_FWDESC           := ${quote} FWDESC    ${quote}
 
 toprel = $(subst $(realpath $(TOP))/,,$(abspath $(1)))
 
@@ -65,6 +67,10 @@ gccversion :
 
 # Create final output file (.bin) from ELF output file.
 %.bin: %.elf
+	@echo $(MSG_LOAD_FILE) $(call toprel, $@)
+	$(V1) $(OBJCOPY) -O binary $< $@
+
+%.bin: %.o
 	@echo $(MSG_LOAD_FILE) $(call toprel, $@)
 	$(V1) $(OBJCOPY) -O binary $< $@
 
@@ -94,6 +100,28 @@ define SIZE_TEMPLATE
 $(1)_size: $(1)
 	@echo $(MSG_SIZE) $$(call toprel, $$<)
 	$(V1) $(SIZE) -A $$<
+endef
+
+# OpenPilot firmware image template
+#  $(1) = path to bin file
+#  $(2) = boardtype in hex
+#  $(3) = board revision in hex
+define OPF_TEMPLATE
+$(1).firmwareinfo.c: $(1) $(TOP)/make/templates/firmwareinfotemplate.c
+	@echo $(MSG_FWDESC) $$(call toprel, $$@)
+	$(V1) python $(TOP)/make/scripts/version-info.py \
+		--path=$(TOP) \
+		--template=$(TOP)/make/templates/firmwareinfotemplate.c \
+		--outfile=$$@ \
+		--image=$(1) \
+		--type=$(2) \
+		--revision=$(3)
+
+$(eval $(call COMPILE_C_TEMPLATE, $(1).firmwareinfo.c))
+
+$(OUTDIR)/$(notdir $(basename $(1))).opf : $(1) $(1).firmwareinfo.bin
+	@echo $(MSG_OPFIRMWARE) $$(call toprel, $$@)
+	$(V1) cat $(1) $(1).firmwareinfo.bin > $$@
 endef
 
 # Assemble: create object files from assembler source files.

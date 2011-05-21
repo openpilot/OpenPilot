@@ -22,6 +22,8 @@ device=$(hdiutil attach  ${TEMP_FILE} | \
 cp -r "${APP_PATH}" "/Volumes/${VOL_NAME}"
 cp -r "${FW_PATH}" "/Volumes/${VOL_NAME}/firmware"
 
+${OP_BASE}/release/osx/libraries "/Volumes/${VOL_NAME}/OpenPilot GCS.app"
+
 hdiutil detach ${device}
 hdiutil convert ${TEMP_FILE} -format UDZO -o ${OUT_FILE}
 

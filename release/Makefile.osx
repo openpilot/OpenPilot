@@ -7,4 +7,9 @@ gcs: uavobjects
 
 ground_package: | gcs
 
+package: release_ground release_flight 
+	$(ROOT_DIR)/release/osx/package
+
+release: | package 
+
 .PHONY: gcs ground_package

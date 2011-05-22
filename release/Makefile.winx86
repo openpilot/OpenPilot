@@ -14,12 +14,12 @@ $(NSIS_HEADER): $(NSIS_TEMPLATE)
 	$(V1) mkdir -p "$(dir $@)"
 	$(V1) $(VERSION_CMD) --template="$<" --outfile="$@"
 
-nsis: gcs release_flight $(NSIS_HEADER)
+package: gcs release_flight $(NSIS_HEADER)
 	$(NSIS_CMD) $(NSIS_OPTS) $(NSIS_SCRIPT)
 
 gcs: uavobjects
 	$(V1) $(MAKE) -C $(ROOT_DIR) GCS_BUILD_CONF=release $@
 
-ground_package: | nsis
+ground_package: | package
 
-.PHONY: nsis gcs ground_package
+.PHONY: gcs ground_package package

@@ -33,8 +33,8 @@ It is expected that you have the following tools installed into the listed
 locations (but any other locations are fine as well):
 
  - Python            in C:\Python27
- - CodeSourcery G++  in C:\CodeSourcery
  - QtSDK             in C:\Qt\2010.05
+ - CodeSourcery G++  in %ProgramFiles%\CodeSourcery\Sourcery G++ Lite
  - msysGit           in %ProgramFiles%\Git
  - Unicode NSIS      in %ProgramFiles%\NSIS\Unicode
  - OpenOCD           in C:\OpenOCD\0.4.0\bin
@@ -54,6 +54,10 @@ If you have msysGit installed into another directory, you need to update paths
 accordingly. Also if you have tools installed into different directories and
 they are not in the PATH, then you may want to update paths in the sh.cmd
 script too (it is self-documented).
+
+Note for Windows 64-bit users: 64-bit systems use %ProgramFiles(x86)% folder
+as default for program files instead of %ProgramFiles%. You have to check where
+your tools are installed and update paths above accordingly.
 
 
 3. How to use it?

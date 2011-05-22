@@ -11,7 +11,7 @@ from subprocess import Popen, PIPE
 from re import search, MULTILINE
 from datetime import datetime
 from string import Template
-import argparse
+import optparse
 import hashlib
 import sys
 
@@ -82,6 +82,14 @@ class Repo:
             if m:
                 self._branch = m.group(1)
 
+    def _get_dirty(self):
+        """Check for dirty state of repository"""
+        self._dirty = False
+        self._exec('update-index --refresh --unmerged')
+        self._exec('diff-index --name-only --exit-code --quiet HEAD')
+        if self._rc:
+            self._dirty = True
+
     def __init__(self, path = "."):
         """Initialize object instance and read repo info"""
         self._path = path
@@ -92,12 +100,14 @@ class Repo:
             self._get_time()
             self._get_tag()
             self._get_branch()
+            self._get_dirty()
         else:
             self._hash = None
             self._origin = None
             self._time = None
             self._tag = None
             self._branch = None
+            self._dirty = None
 
     def path(self):
         """Return the repository path"""
@@ -141,6 +151,13 @@ class Repo:
         else:
             return self._branch
 
+    def dirty(self, dirty = "-dirty", clean = ""):
+        """Return git repository dirty state or empty string"""
+        if self._dirty:
+            return dirty
+        else:
+            return clean
+
     def info(self):
         """Print some repository info"""
         print "path:       ", self.path()
@@ -151,6 +168,7 @@ class Repo:
         print "short hash: ", self.hash(8)
         print "branch:     ", self.branch()
         print "commit tag: ", self.tag()
+        print "dirty:      ", self.dirty('yes', 'no')
 
 def file_from_template(tpl_name, out_name, dict):
     """Create or update file from template using dictionary
@@ -240,29 +258,39 @@ dependent targets.
     """
 
     # Parse command line.
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+    class RawDescriptionHelpFormatter(optparse.IndentedHelpFormatter):
+        """optparse formatter function to pretty print raw epilog"""
+        def format_epilog(self, epilog):
+            if epilog:
+                return "\n" + epilog + "\n"
+            else:
+                return ""
+
+    parser = optparse.OptionParser(
+        formatter=RawDescriptionHelpFormatter(),
         description = "Performs variable substitution in template file or string.",
         epilog = main.__doc__);
 
-    parser.add_argument('--path', default='.',
+    parser.add_option('--path', default='.',
                         help='path to the git repository');
-    parser.add_argument('--info', action='store_true',
+    parser.add_option('--info', action='store_true',
                         help='print repository info to stdout');
-    parser.add_argument('--format',
+    parser.add_option('--format',
                         help='format string to print to stdout');
-    parser.add_argument('--template',
+    parser.add_option('--template',
                         help='name of template file');
-    parser.add_argument('--outfile',
+    parser.add_option('--outfile',
                         help='name of output file');
-    parser.add_argument('--image',
+    parser.add_option('--image',
                         help='name of image file for sha1 calculation');
-    parser.add_argument('--type', default="",
+    parser.add_option('--type', default="",
                         help='board type, for example, 0x04 for CopterControl');
-    parser.add_argument('--revision', default = "",
+    parser.add_option('--revision', default = "",
                         help='board revision, for example, 0x01');
 
-    args = parser.parse_args()
+    (args, positional_args) = parser.parse_args()
+    if len(positional_args) != 0:
+        parser.error("incorrect number of arguments, try --help for help")
 
     # Process arguments.  No advanced error handling is here.
     # Any error will raise an exception and terminate process
@@ -277,6 +305,7 @@ dependent targets.
         HASH8 = r.hash(8),
         TAG_OR_BRANCH = r.tag(r.branch('unreleased')),
         TAG_OR_HASH8 = r.tag(r.hash(8, 'untagged')),
+        DIRTY = r.dirty(),
         UNIXTIME = r.time(),
         DATE = r.time('%Y%m%d'),
         DATETIME = r.time('%Y%m%d %H:%M'),

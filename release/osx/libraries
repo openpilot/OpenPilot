@@ -20,7 +20,7 @@ do
 done
 
 # should be redundant but some libs missed by main app and macdeployqt
-for f in ${QT_LIBS} SDL
+for f in ${QT_LIBS}
 do
     echo "Copying ${f}"
     cp -r /Library/Frameworks/${f}.framework "${APP}/Contents/Frameworks/"
@@ -44,4 +44,4 @@ done
 echo "Deleting unnecessary files"
 find "${APP}/Contents/Frameworks" -iname "current" -exec rm -rf \{\} \;
 find "${APP}/Contents/Frameworks" -iname "4.0" -exec rm -rf \{\} \;
-find "${APP}/Contents/Frameworks" -iname "*_debug*" -exec rm -rf \{\} \;
+find "${APP}/Contents/Frameworks" -iname "*_debug" -exec rm -rf \{\} \;

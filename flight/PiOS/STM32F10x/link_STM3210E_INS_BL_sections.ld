@@ -24,26 +24,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-/* Memory Spaces Definitions */
-MEMORY
-{
-  RAM (xrw) :     ORIGIN = 0x20000000, LENGTH = 64K
-  FLASH (rx) :    ORIGIN = 0x08000000, LENGTH = 512K
-  FLASHB1 (rx) :  ORIGIN = 0x00000000, LENGTH = 0
-  EXTMEMB0 (rx) : ORIGIN = 0x00000000, LENGTH = 0
-  EXTMEMB1 (rx) : ORIGIN = 0x00000000, LENGTH = 0
-  EXTMEMB2 (rx) : ORIGIN = 0x00000000, LENGTH = 0
-  EXTMEMB3 (rx) : ORIGIN = 0x00000000, LENGTH = 0
-}
-
-_estack = 0x20004FF0;
-
 /* This is the size of the stack for early init and for all FreeRTOS IRQs */
 _irq_stack_size = 0x400;
 
 /* Check valid alignment for VTOR */
-ASSERT(ORIGIN(FLASH) == ALIGN(ORIGIN(FLASH), 0x80), "Start of memory region flash not aligned for startup vector table");
+ASSERT(ORIGIN(BL_FLASH) == ALIGN(ORIGIN(BL_FLASH), 0x80), "Start of memory region flash not aligned for startup vector table");
 
 /*
 this sends all unreferenced IRQHandlers to reset
@@ -210,7 +195,7 @@ SECTIONS
     {
         KEEP(*(.isr_vector))            /* Startup code */
         . = ALIGN(4);
-    } >FLASH
+    } > BL_FLASH
 
     /* for some STRx devices, the beginning of the startup code is stored in the .flashtext section, which goes to FLASH */
     .flashtext :
@@ -218,7 +203,7 @@ SECTIONS
         . = ALIGN(4);
         *(.flashtext)            /* Startup code */
         . = ALIGN(4);
-    } >FLASH
+    } > BL_FLASH
  
     
     /* init sections */
@@ -229,7 +214,7 @@ SECTIONS
         KEEP(*(.initcalluavobj.init))
 	. = ALIGN(4);
 	__uavobj_initcall_end   = .;
-    } >FLASH
+    } > BL_FLASH
 
     /* the program code is stored in the .text section, which goes to Flash */
     .text :
@@ -247,7 +232,7 @@ SECTIONS
          _etext = .;
             /* This is used by the startup in order to initialize the .data secion */
          _sidata = _etext;
-    } >FLASH
+    } > BL_FLASH
     
 
     /* 
@@ -354,6 +339,13 @@ SECTIONS
     __exidx_start = .;
     __exidx_end = .;
     
+    .boardinfo :
+    {
+	. = ALIGN(4);
+	KEEP(*(.boardinfo))
+	. = ALIGN(4);
+    } > BD_INFO
+
     /* after that it's only debugging information. */
     
     /* remove the debugging information from the standard libraries */

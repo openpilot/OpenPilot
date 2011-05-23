@@ -46,7 +46,7 @@ MSG_ASMFROMC_ARM     := ${quote} AS(C)-ARM ${quote}
 MSG_PYMITEINIT       := ${quote} PY        ${quote}
 MSG_INSTALLING       := ${quote} INSTALL   ${quote}
 MSG_OPFIRMWARE       := ${quote} OPF       ${quote}
-MSG_FWDESC           := ${quote} FWDESC    ${quote}
+MSG_FWINFO           := ${quote} FWINFO    ${quote}
 
 toprel = $(subst $(realpath $(TOP))/,,$(abspath $(1)))
 
@@ -108,7 +108,7 @@ endef
 #  $(3) = board revision in hex
 define OPF_TEMPLATE
 $(1).firmwareinfo.c: $(1) $(TOP)/make/templates/firmwareinfotemplate.c
-	@echo $(MSG_FWDESC) $$(call toprel, $$@)
+	@echo $(MSG_FWINFO) $$(call toprel, $$@)
 	$(V1) python $(TOP)/make/scripts/version-info.py \
 		--path=$(TOP) \
 		--template=$(TOP)/make/templates/firmwareinfotemplate.c \

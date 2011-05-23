@@ -18,7 +18,7 @@ RELEASE_LBL  := $(shell $(VERSION_CMD) --format=\$${DATE}-\$${TAG_OR_HASH8}\$${D
 RELEASE_DIR  := $(BUILD_DIR)/release-$(RELEASE_LBL)
 FW_DIR       := $(RELEASE_DIR)/firmware-$(RELEASE_LBL)
 BL_DIR       := $(FW_DIR)/bootloaders
-BLUPD_DIR    := $(FW_DIR)/bootloader_updaters
+BU_DIR       := $(FW_DIR)/bootloader_updaters
 
 # Clean build options (recommended for package testing only)
 ifeq ($(CLEAN_BUILD), NO)
@@ -38,7 +38,7 @@ FW_TARGETS_INPUT  := coptercontrol openpilot
 FW_TARGETS_TOOLS  := coptercontrol
 FW_TARGETS        := $(FW_TARGETS_COMMON) $(FW_TARGETS_INPUT)
 BL_TARGETS        := $(addprefix bl_, $(FW_TARGETS))
-BLUPD_TARGETS     := $(addprefix blupd_, $(FW_TARGETS))
+BU_TARGETS        := $(addprefix bu_, $(FW_TARGETS))
 
 help:
 	@echo
@@ -106,13 +106,13 @@ $(eval $(call INSTALL_TEMPLATE,fw_ppm,uavobjects,$(FW_DIR),,-ppm-$(RELEASE_LBL),
 $(eval $(call INSTALL_TEMPLATE,all_bl,uavobjects,$(BL_DIR),,-$(RELEASE_LBL),,,$(BL_TARGETS),bin))
 
 # Bootloader Updaters
-$(eval $(call INSTALL_TEMPLATE,blupd_coptercontrol,all_bl,$(BLUPD_DIR),CopterControl_,-$(RELEASE_LBL),,,blupd_coptercontrol,install))
-$(eval $(call INSTALL_TEMPLATE,blupd_ahrs,all_bl,$(BLUPD_DIR),AHRS_,-$(RELEASE_LBL),,,blupd_ahrs,install))
-$(eval $(call INSTALL_TEMPLATE,blupd_openpilot,all_bl,$(BLUPD_DIR),OpenPilot_,-$(RELEASE_LBL),,,blupd_openpilot,install))
-$(eval $(call INSTALL_TEMPLATE,blupd_pipxtreme,all_bl,$(BLUPD_DIR),PipXtreme_,-$(RELEASE_LBL),,,blupd_pipxtreme,install))
+$(eval $(call INSTALL_TEMPLATE,bu_coptercontrol,all_bl,$(BU_DIR),CopterControl_,-$(RELEASE_LBL),,,bu_coptercontrol,install))
+$(eval $(call INSTALL_TEMPLATE,bu_ahrs,all_bl,$(BU_DIR),AHRS_,-$(RELEASE_LBL),,,bu_ahrs,install))
+$(eval $(call INSTALL_TEMPLATE,bu_openpilot,all_bl,$(BU_DIR),OpenPilot_,-$(RELEASE_LBL),,,bu_openpilot,install))
+$(eval $(call INSTALL_TEMPLATE,bu_pipxtreme,all_bl,$(BU_DIR),PipXtreme_,-$(RELEASE_LBL),,,bu_pipxtreme,install))
 
 # CopterControl flash eraser tool
-$(eval $(call INSTALL_TEMPLATE,fw_tools,uavobjects,$(BLUPD_DIR),,-FlashEraser-$(RELEASE_LBL),ERASE_FLASH=YES,clean,$(FW_TARGETS_TOOLS),install))
+$(eval $(call INSTALL_TEMPLATE,fw_tools,uavobjects,$(BU_DIR),,-FlashEraser-$(RELEASE_LBL),ERASE_FLASH=YES,clean,$(FW_TARGETS_TOOLS),install))
 
 # Order-only dependencies
 # They are bit complicated to support parallel (-j) builds and to create
@@ -128,15 +128,15 @@ fw_tools: | fw_spektrum # ordered build, replace fw_spektrum by fw_ppm if uncomm
 
 release_fw: | fw_common fw_pwm fw_spektrum # fw_ppm
 
-release_blupd: | $(BLUPD_TARGETS)
+release_bu: | $(BU_TARGETS)
 
-release_flight: | release_fw release_blupd fw_tools
+release_flight: | release_fw release_bu fw_tools
 
 release_ground: | ground_package
 
 release: | release_flight release_ground
 
-.PHONY: help uavobjects all_clean release release_flight release_fw release_blupd release_ground
+.PHONY: help uavobjects all_clean release release_flight release_fw release_bu release_ground
 
 # Decide on a verbosity level based on the V= parameter
 export AT := @

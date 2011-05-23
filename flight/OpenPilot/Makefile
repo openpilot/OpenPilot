@@ -25,6 +25,13 @@
 WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
 TOP      := $(realpath $(WHEREAMI)/../../)
 include $(TOP)/make/firmware-defs.mk
+include $(TOP)/make/boards/$(BOARD_NAME)/board-info.mk
+
+# Target file name (without extension).
+TARGET := fw_$(BOARD_NAME)
+
+# Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
+OUTDIR := $(TOP)/build/$(TARGET)
 
 # Set developer code and compile options
 # Set to YES to compile for debugging
@@ -58,21 +65,6 @@ PYMODULES = FlightPlan
 #MODULES = Telemetry MK/MKSerial
 #MODULES = Telemetry
 #MODULES += Osd/OsdEtStd
-
-# MCU name, submodel and board
-# - MCU used for compiler-option (-mcpu)
-# - MODEL used for linker-script name (-T) and passed as define
-# - BOARD just passed as define (optional)
-MCU      = cortex-m3
-CHIP     = STM32F103RET
-BOARD    = STM3210E_OP
-MODEL	 = HD
-
-# Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = $(TOP)/build/openpilot
-
-# Target file name (without extension).
-TARGET = OpenPilot
 
 # Paths
 OPSYSTEM = ./System
@@ -287,7 +279,7 @@ CPPSRCARM =
 # Even though the DOS/Win* filesystem matches both .s and .S the same,
 # it will preserve the spelling of the filenames, and gcc itself does
 # care about how the name is spelled on its command-line.
-ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL)_OP.S
+ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL)$(MODEL_SUFFIX).S
 
 # List Assembler source files here which must be assembled in ARM-Mode..
 ASRCARM =
@@ -453,9 +445,9 @@ LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_sections.ld
 
 OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).bin
 # Program
-OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) 0x08005000 bin"
+OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) $(START_OF_FW_CODE) bin"
 # Verify
-OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) 0x08005000 bin"
+OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) $(START_OF_FW_CODE) bin"
 # reset target
 OOCD_CL+=-c "reset run"
 # terminate OOCD after programming
@@ -556,7 +548,7 @@ $(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
 
 $(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
 
-$(eval $(call OPF_TEMPLATE,$(OUTDIR)/$(TARGET).bin,0x01,0x01))
+$(eval $(call OPF_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BOARD_TYPE),$(BOARD_REVISION)))
 
 .PHONY: elf lss sym hex bin bino opf
 elf:  $(OUTDIR)/$(TARGET).elf

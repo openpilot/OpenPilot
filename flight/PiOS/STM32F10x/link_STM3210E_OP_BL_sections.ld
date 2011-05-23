@@ -2,7 +2,7 @@
 _irq_stack_size = 0x400;
 
 /* Check valid alignment for VTOR */
-ASSERT(ORIGIN(FLASH) == ALIGN(ORIGIN(FLASH), 0x80), "Start of memory region flash not aligned for startup vector table");
+ASSERT(ORIGIN(BL_FLASH) == ALIGN(ORIGIN(BL_FLASH), 0x80), "Start of memory region flash not aligned for startup vector table");
 
 /*
 this sends all unreferenced IRQHandlers to reset

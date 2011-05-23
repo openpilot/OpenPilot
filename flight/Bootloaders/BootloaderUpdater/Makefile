@@ -25,6 +25,13 @@
 WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
 TOP      := $(realpath $(WHEREAMI)/../../../)
 include $(TOP)/make/firmware-defs.mk
+include $(TOP)/make/boards/$(BOARD_NAME)/board-info.mk
+
+# Target file name (without extension).
+TARGET = bu_$(BOARD_NAME)
+
+# Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
+OUTDIR := $(TOP)/build/$(TARGET)
 
 # Set developer code and compile options
 # Set to YES to compile for debugging
@@ -50,21 +57,6 @@ REMOVE_CMD = rm
 endif
 
 FLASH_TOOL = OPENOCD
-
-# MCU name, submodel and board
-# - MCU used for compiler-option (-mcpu)
-# - MODEL used for linker-script name (-T) and passed as define
-# - BOARD just passed as define (optional)
-MCU      = cortex-m3
-CHIP     = STM32F103CBT
-BOARD    ?= NULL
-MODEL	 ?= NULL
-
-# Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = ../../../build/bootloaders/BootloaderUpdater
-
-# Target file name (without extension).
-TARGET = BL_Updater
 
 # Paths
 OPSYSTEM = .
@@ -309,9 +301,9 @@ LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_sections.ld
 
 OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).bin
 # Program                                                                                                                                                                                                                            
-OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) 0x08003000 bin"
+OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) $(START_OF_FW_CODE) bin"
 # Verify
-OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) 0x08003000 bin"
+OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) $(START_OF_FW_CODE) bin"
 # reset target
 OOCD_CL+=-c "reset run"
 # terminate OOCD after programming
@@ -364,6 +356,7 @@ program: $(OUTDIR)/$(TARGET).bin
 endif
 
 # Link: create ELF output file from object files.
+BLOBJ := $(TOP)/build/bl_$(BOARD_NAME)/bl_$(BOARD_NAME).bin.o
 $(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ) $(BLOBJ)))
 
 # Assemble: create object files from assembler source files.
@@ -392,14 +385,16 @@ $(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
 
 $(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
 
-.PHONY: elf lss sym hex bin bino
+$(eval $(call OPF_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BOARD_TYPE),$(BOARD_REVISION)))
+
+.PHONY: elf lss sym hex bin bino opf
 elf: $(OUTDIR)/$(TARGET).elf
-elf.stripped: $(OUTDIR)/$(TARGET).elf.stripped
 lss: $(OUTDIR)/$(TARGET).lss
 sym: $(OUTDIR)/$(TARGET).sym
 hex: $(OUTDIR)/$(TARGET).hex
 bin: $(OUTDIR)/$(TARGET).bin
 bino: $(OUTDIR)/$(TARGET).bin.o
+opf: $(OUTDIR)/$(TARGET).opf
 
 # Display sizes of sections.
 $(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))

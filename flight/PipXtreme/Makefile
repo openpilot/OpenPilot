@@ -25,6 +25,13 @@
 WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
 TOP      := $(realpath $(WHEREAMI)/../../)
 include $(TOP)/make/firmware-defs.mk
+include $(TOP)/make/boards/$(BOARD_NAME)/board-info.mk
+
+# Target file name (without extension).
+TARGET := fw_$(BOARD_NAME)
+
+# Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
+OUTDIR := $(TOP)/build/$(TARGET)
 
 # Debugging (YES/NO) ?
 DEBUG ?= NO
@@ -42,23 +49,6 @@ FLASH_TOOL = OPENOCD
 
 # Include the USB files (YES/NO) ?
 USE_USB = YES
-
-# MCU name, submodel and board
-# - MCU used for compiler-option (-mcpu)
-# - MODEL used for linker-script name (-T) and passed as define
-# - BOARD just passed as define (optional)
-MCU      = cortex-m3
-CHIP     = STM32F103CBT
-BOARD    = STM32103CB_PIPXTREME
-#CHIP     = STM32F103C8T
-#BOARD    = STM32103C8_PIPXTREME
-MODEL    = MD
-
-# Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = $(TOP)/build/pipxtreme
-
-# Target file name (without extension).
-TARGET = PipXtreme
 
 # Paths
 HOME_DIR = ./
@@ -192,7 +182,7 @@ CPPSRCARM =
 # Even though the DOS/Win* filesystem matches both .s and .S the same,
 # it will preserve the spelling of the filenames, and gcc itself does
 # care about how the name is spelled on its command-line.
-ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL).S
+ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL)$(MODEL_SUFFIX).S
 
 # List Assembler source files here which must be assembled in ARM-Mode..
 ASRCARM = 
@@ -342,9 +332,9 @@ LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_sections.ld
 
 OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).bin
 # Program                                                                                                                                                                                                                            
-OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) 0x08003000 bin"
+OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) $(START_OF_FW_CODE) bin"
 # Verify
-OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) 0x08003000 bin"
+OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) $(START_OF_FW_CODE) bin"
 # reset target
 OOCD_CL+=-c "reset run"
 # terminate OOCD after programming
@@ -422,7 +412,7 @@ $(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
 
 $(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
 
-$(eval $(call OPF_TEMPLATE,$(OUTDIR)/$(TARGET).bin,0x03,0x01))
+$(eval $(call OPF_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BOARD_TYPE),$(BOARD_REVISION)))
 
 .PHONY: elf lss sym hex bin bino opf
 elf: $(OUTDIR)/$(TARGET).elf

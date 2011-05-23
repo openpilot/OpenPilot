@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       link_STM3210E_INS_HD_BL.ld   
+ * @file       link_STM3210E_INS_HD_NB.ld   
  * @author     David "Buzz" Carlson (buzz@chebuzz.com)
- * 				The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
+ * 				The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011. 
  * @brief      PiOS linker for the OpenPilot INS board
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -23,21 +23,6 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
-/* Memory Spaces Definitions */
-MEMORY
-{
-  RAM (xrw) :     ORIGIN = 0x20000000, LENGTH = 64K
-  FLASH (rx) :    ORIGIN = 0x08005000, LENGTH = 492K
-  FLASHB1 (rx) :  ORIGIN = 0x00000000, LENGTH = 0
-  EXTMEMB0 (rx) : ORIGIN = 0x00000000, LENGTH = 0
-  EXTMEMB1 (rx) : ORIGIN = 0x00000000, LENGTH = 0
-  EXTMEMB2 (rx) : ORIGIN = 0x00000000, LENGTH = 0
-  EXTMEMB3 (rx) : ORIGIN = 0x00000000, LENGTH = 0
-}
-
-_estack = 0x20004FF0;
 
 /* This is the size of the stack for early init and for all FreeRTOS IRQs */
 _irq_stack_size = 0x400;
@@ -62,10 +47,10 @@ PROVIDE (   HardFault_Handler = 0 ) ;
 PROVIDE (   MemManage_Handler = 0 ) ;
 PROVIDE (   BusFault_Handler = 0 ) ;
 PROVIDE (   UsageFault_Handler = 0 ) ;
-PROVIDE (   SVC_Handler = 0 ) ;
+PROVIDE (   vPortSVCHandler = 0 ) ;
 PROVIDE (   DebugMon_Handler = 0 ) ;
-PROVIDE (   PendSV_Handler = 0 ) ;
-PROVIDE (   SysTick_Handler = 0 ) ;
+PROVIDE (   xPortPendSVHandler = 0 ) ;
+PROVIDE (   xPortSysTickHandler = 0 ) ;
 
 PROVIDE (   WWDG_IRQHandler = 0 ) ;
 PROVIDE (   PVD_IRQHandler = 0 ) ;
@@ -204,13 +189,18 @@ PROVIDE ( SCB             = (SCS_BASE + 0x0D00) ) ;
 
 SECTIONS
 {
-     
+    .boardinfo :
+    {
+	. = ALIGN(4);
+	PROVIDE(pios_board_info_blob = .);
+    } > BD_INFO
+
     /* for Cortex devices, the beginning of the startup code is stored in the .isr_vector section, which goes to FLASH */
     .isr_vector :
     {
         KEEP(*(.isr_vector))            /* Startup code */
         . = ALIGN(4);
-    } >FLASH
+    } > FLASH
 
     /* for some STRx devices, the beginning of the startup code is stored in the .flashtext section, which goes to FLASH */
     .flashtext :
@@ -218,7 +208,7 @@ SECTIONS
         . = ALIGN(4);
         *(.flashtext)            /* Startup code */
         . = ALIGN(4);
-    } >FLASH
+    } > FLASH
  
     
     /* init sections */
@@ -229,7 +219,7 @@ SECTIONS
         KEEP(*(.initcalluavobj.init))
 	. = ALIGN(4);
 	__uavobj_initcall_end   = .;
-    } >FLASH
+    } > FLASH
 
     /* the program code is stored in the .text section, which goes to Flash */
     .text :
@@ -247,7 +237,7 @@ SECTIONS
          _etext = .;
             /* This is used by the startup in order to initialize the .data secion */
          _sidata = _etext;
-    } >FLASH
+    } > FLASH
     
 
     /* 

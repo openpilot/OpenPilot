@@ -69,7 +69,7 @@ class Repo:
     def _get_tag(self):
         """Get and store git tag for the HEAD commit"""
         self._tag = None
-        self._exec('describe --exact-match HEAD')
+        self._exec('describe --tags --exact-match HEAD')
         if self._rc == 0:
             self._tag = self._out.strip(' \t\n\r')
 

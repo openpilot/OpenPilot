@@ -1,14 +1,10 @@
+PROVIDE(pios_board_info_blob = ORIGIN(BD_INFO));
+
 _estack = 0x20004FF0;
 
 /* Section Definitions */
 SECTIONS
 {
-    .boardinfo :
-    {
-	. = ALIGN(4);
-	PROVIDE(pios_board_info_blob = .);
-    } > BD_INFO
-
     .text :
     {
         PROVIDE (pios_isr_vector_table_base = .);

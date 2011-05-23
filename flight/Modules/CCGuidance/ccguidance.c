@@ -55,6 +55,7 @@
 #define STACK_SIZE_BYTES 256
 #define TASK_PRIORITY (tskIDLE_PRIORITY+2)
 #define RAD2DEG (180.0/M_PI)
+#define DEG2RAD (M_PI/180.0)
 #define GEE 9.81
 // Private types
 
@@ -67,6 +68,8 @@ static uint8_t positionHoldLast = 0;
 // Private functions
 static void ccguidanceTask(void *parameters);
 static float bound(float val, float min, float max);
+static float sphereDistance(float lat1,float long1,float lat2,float long2);
+static float sphereCourse(float lat1,float long1,float lat2,float long2);
 
 /**
  * Initialise the module, called on startup
@@ -164,7 +167,12 @@ static void ccguidanceTask(void *parameters)
 
 				/* 2. Heading */
 
-				courseError = RAD2DEG * atan2f(positionDesired.East-positionActual.Longitude,positionDesired.North-positionActual.Latitude) - positionActual.Heading;
+				courseError = sphereCourse(
+					positionActual.Latitude,
+					positionActual.Longitude,
+					positionDesired.North,
+					positionDesired.East
+					) - positionActual.Heading;
 				if (courseError<-180.) courseError+=360.;
 				if (courseError>180.) courseError-=360.;
 
@@ -222,3 +230,38 @@ static float bound(float val, float min, float max)
 	}
 	return val;
 }
+
+/**
+ * calculate spherical distance and course between two coordinate pairs
+ * see http://de.wikipedia.org/wiki/Orthodrome for details
+ */
+static float sphereDistance(float lat1, float long1, float lat2, float long2)
+{
+	float zeta=(RAD2DEG * acos (
+		sin(DEG2RAD*lat1) * sin(DEG2RAD*lat2)
+		+ cos(DEG2RAD*lat1) * cos(DEG2RAD*lat2) * cos(DEG2RAD*(long2-long1))
+	));
+	if (isnan(zeta)) {
+		zeta=0;
+	}
+	return zeta;
+
+}
+static float sphereCourse(float lat1, float long1, float lat2, float long2)
+{
+	float zeta = sphereDistance(lat1,long1,lat2,long2);
+	float angle = RAD2DEG * acos(
+			( sin(DEG2RAD*lat2) - sin(DEG2RAD*lat1) * cos(DEG2RAD*zeta) )
+			/ ( cos(DEG2RAD*lat1) * sin(DEG2RAD*zeta) )
+		);
+	if (isnan(angle)) angle=0;
+	float diff=long2-long1;
+	if (diff>180) diff-=360;
+	if (diff<-180) diff+=360;
+	if (diff>=0) {
+		return angle;
+	} else {
+		return -angle;
+	}
+}
+

@@ -172,6 +172,7 @@ SECTIONS
     /* for Cortex devices, the beginning of the startup code is stored in the .isr_vector section, which goes to FLASH */
     .isr_vector :
     {
+        PROVIDE (pios_isr_vector_table_base = .);
         KEEP(*(.isr_vector))            /* Startup code */
         . = ALIGN(4);
     } >FLASH

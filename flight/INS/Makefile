@@ -217,7 +217,6 @@ CDEFS = -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
 CDEFS += -DIN_INS
-CDEFS += -DUSE_BOOTLOADER
 
 # Place project-specific -D and/or -U options for
 # Assembler with preprocessor here.

@@ -216,7 +216,6 @@ endif
 ifeq ($(ENABLE_AUX_UART), YES)
 CDEFS += -DPIOS_ENABLE_AUX_UART
 endif
-CDEFS += -DUSE_BOOTLOADER
 
 # Place project-specific -D and/or -U options for 
 # Assembler with preprocessor here.

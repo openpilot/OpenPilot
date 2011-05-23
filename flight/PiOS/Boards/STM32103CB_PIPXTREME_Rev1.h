@@ -58,18 +58,6 @@ TIM4  |                     STOPWATCH                    |
 //------------------------
 // BOOTLOADER_SETTINGS
 //------------------------
-#define BOOTLOADER_VERSION	0
-#define BOARD_TYPE		0x03
-#define BOARD_REVISION		0x01
-#define MEM_SIZE		(0x20000 - 0x00400) // 128K - 1K (reserved for config data)
-#define SIZE_OF_DESCRIPTION	100
-#define START_OF_USER_CODE	(uint32_t)0x08003000
-#define SIZE_OF_CODE		(uint32_t)(MEM_SIZE-(START_OF_USER_CODE-0x08000000)-SIZE_OF_DESCRIPTION)
-#ifdef STM32F10X_HD
-		#define HW_TYPE			0 //0=high_density 1=medium_density;
-#elif STM32F10X_MD
-		#define HW_TYPE			1 //0=high_density 1=medium_density;
-#endif
 #define BOARD_READABLE	TRUE
 #define BOARD_WRITABLA	TRUE
 #define MAX_DEL_RETRYS	3

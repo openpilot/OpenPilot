@@ -24,13 +24,18 @@ namespace simu {
 	{
 		public:
 			LandmarkAbstract::geometry_t type;
+			jblas::vec4 exp;
+			jblas::vec4 obs;
 			size_t id;
 		public:
 			AppearanceSimu() {}
 			AppearanceSimu(LandmarkAbstract::geometry_t type, size_t id): type(type), id(id) {}
 			AppearanceAbstract* clone() { return new AppearanceSimu(*this); }
 			
-		
+			jblas::vec4 realObs()
+			{
+				return obs;
+			}
 	};
 	
 	class FeatureSimu: public rtslam::FeatureAbstract
@@ -64,6 +69,12 @@ namespace simu {
 				boost::shared_ptr<AppearanceSimu> app_dst = SPTR_CAST<AppearanceSimu>(obsPtr->predictedAppearance);
 				boost::shared_ptr<AppearanceSimu> app_src = appPtr;
 				*app_dst = *app_src;
+
+				if(app_dst->type == LandmarkAbstract::LINE)
+				{
+					app_dst->exp = obsPtr->expectation.x();
+				}
+
 				return true;
 			}
 			bool isPredictionValid(const observation_ptr_t & obsPtr) { return true; }

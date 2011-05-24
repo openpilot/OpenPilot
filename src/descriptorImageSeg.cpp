@@ -77,6 +77,9 @@ namespace jafar {
 				app->offsetBottom.x()(1) = pix(3) - (y1+y2)/2;
 				app->offsetBottom.P() = jblas::zero_mat(2); // by definition this is our landmark projection
 
+				app->patchMeanLeft = obsApp->patchMeanLeft;
+				app->patchMeanRight = obsApp->patchMeanRight;
+
 				appearancePtr = app;
 
 				senPose = obsPtr->sensorPtr()->globalPose();
@@ -84,8 +87,6 @@ namespace jafar {
 				measurement = obsPtr->measurement.x();
 				frame = senPtr->rawCounter;
 				used = false;
-
-				app->computePatchMeans();
          }
       }
 
@@ -126,6 +127,7 @@ namespace jafar {
          // normally we must cast to the derived type
          app_img_seg_ptr_t app_dst = SPTR_CAST<AppearanceImageSegment>(obsPtrNew->predictedAppearance);
          app_img_seg_ptr_t app_src = SPTR_CAST<AppearanceImageSegment>(view.appearancePtr);
+
          // rotate and zoom the patch, and cut it to the appropriate size
          app_src->patch.rotateScale(jmath::radToDeg(rotation), zoom, app_dst->patch);
 
@@ -187,6 +189,9 @@ app_dst->patch.save(buffer);
 
 //			JFR_DEBUG("distance_cube\n" << distance_cube << "SIGMA_exp\n" << SIGMA_exp << "sigma_cov \n" << sigma_cov);
 //			std::cout << obsPtrNew->id() << "\nexp " << exp << " P " << stdevFromCov(obsPtrNew->expectation.P()) << "\nSIGMA_exp " << SIGMA_exp << "\nsigma " << sigma << std::endl;
+
+			app_dst->patchMeanLeft = app_src->patchMeanLeft;
+			app_dst->patchMeanRight = app_src->patchMeanRight;
 
 			hypothesis->setUncertainty(sigma(2), sigma(0), sigma(3), sigma(1));
 			app_dst->setHypothesis(hypothesis);
@@ -257,6 +262,8 @@ app_dst->patch.save(buffer);
 					app_dst->offsetBottom.x()(1) = app_src->offsetBottom.x()(1) + ((app_src->patch.height()-app_dst->patch.height())%2) * 0.5;
 					app_dst->offsetTop.P() = app_src->offsetTop.P();
 					app_dst->offsetBottom.P() = app_src->offsetBottom.P();
+					app_dst->patchMeanLeft = app_src->patchMeanLeft;
+					app_dst->patchMeanRight = app_src->patchMeanRight;
 				}
             case ptAffine:
             {
@@ -275,6 +282,8 @@ app_dst->patch.save(buffer);
 					app_dst->offsetTop.P()(1,1) = -beta*app_src->offsetTop.P()(0,0) + alpha*app_src->offsetTop.P()(1,1);
 					app_dst->offsetBottom.P()(0,0) = alpha*app_src->offsetBottom.P()(0,0) +  beta*app_src->offsetBottom.P()(1,1);
 					app_dst->offsetBottom.P()(1,1) = -beta*app_src->offsetBottom.P()(0,0) + alpha*app_src->offsetBottom.P()(1,1);
+					app_dst->patchMeanLeft = app_src->patchMeanLeft;
+					app_dst->patchMeanRight = app_src->patchMeanRight;
 				}
             case ptHomographic:
             {

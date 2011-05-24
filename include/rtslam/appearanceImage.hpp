@@ -103,8 +103,6 @@ namespace jafar {
 					}
 					return ret;
 				}
-
-				void computePatchMeans();
       };
 	}
 

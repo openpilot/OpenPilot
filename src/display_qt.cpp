@@ -11,6 +11,7 @@
 #include "rtslam/display_qt.hpp"
 #include "rtslam/observationPinHoleAnchoredHomogeneousPointsLine.hpp"
 #include "rtslam/appearanceSegment.hpp"
+#include "rtslam/simuData.hpp"
 
 #ifdef HAVE_MODULE_DSEG
 	#include "dseg/SegmentHypothesis.hpp"
@@ -380,10 +381,13 @@ std::cout << "connecting slots" << std::endl;
 
 //				ObservationPinHoleAnchoredHomogeneousPointsLine* slamObsSpec = static_cast<ObservationPinHoleAnchoredHomogeneousPointsLine*>(slamObs_);
 				AppearanceImageSegment* appSpec = dynamic_cast<AppearanceImageSegment*>(slamObs_->observedAppearance.get());
+				simu::AppearanceSimu* simuAppSpec = dynamic_cast<simu::AppearanceSimu*>(slamObs_->observedAppearance.get());
 				vec4 realObs;
 				realObs.clear();
 				if(appSpec != NULL)
 					realObs = appSpec->realObs();
+				else if(simuAppSpec != NULL)
+					realObs = simuAppSpec->realObs();
 
             // Build display objects if it is the first time they are displayed
             if (items_.size() != 8)
@@ -468,10 +472,11 @@ std::cout << "connecting slots" << std::endl;
                if (dispPred2)
                {
                   c = getColorRGB(ColorManager::getColorObject_prediction(landmarkPhase_,events_)) ;
-						//std::ostringstream oss; oss << id_; if (dispMeas2) oss << " - " << int(match_score*100);
+						std::ostringstream oss; oss << id_; if (dispMeas2) oss << " - " << int(match_score*100);
+/*
 						std::ostringstream oss;
-						oss << id_; if (dispMeas2 && appSpec != NULL) oss << " - " << int(appSpec->hypothesis()->gradientDescriptor().meanGradients());
-
+						oss << id_; if (dispMeas2 && appSpec != NULL) oss << " - " <<  int(appSpec->hypothesis()->gradientDescriptor().meanGradients());
+*/
                   (*it)->setColor(c.R,c.G,c.B); //
                   (*it)->setFontColor(c.R,c.G,c.B); //
                   (*it)->setLabel(oss.str().c_str());

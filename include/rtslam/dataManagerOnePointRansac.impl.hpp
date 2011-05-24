@@ -104,6 +104,27 @@ namespace jafar {
                         roi = RoiSpec(exp, P, 1.0);
                         obsCurrentPtr->searchSize = roi.count();
                      }
+							else // Segment
+							{
+								// Rough approximation, this won't be used by Dseg Matcher, only by the simulator
+								vec2 p1, p2;
+								vec2 var1, var2;
+								p1[0] = obsCurrentPtr->expectation.x()[0]; p1[1] = obsCurrentPtr->expectation.x()[1];
+								p2[0] = obsCurrentPtr->expectation.x()[2]; p2[1] = obsCurrentPtr->expectation.x()[3];
+								var1[0] = (obsCurrentPtr->expectation.P()(0,0) + matcher->params.measVar) * matcher->params.mahalanobisTh;
+								var1[1] = (obsCurrentPtr->expectation.P()(1,1) + matcher->params.measVar) * matcher->params.mahalanobisTh;
+								var2[0] = (obsCurrentPtr->expectation.P()(2,2) + matcher->params.measVar) * matcher->params.mahalanobisTh;
+								var2[1] = (obsCurrentPtr->expectation.P()(3,3) + matcher->params.measVar) * matcher->params.mahalanobisTh;
+
+								int basex = min(p1[0]-var1[0],p2[0]-var2[0]);
+								int basey = min(p1[1]-var1[1],p2[1]-var2[1]);
+								cv::Rect rect(
+									basex, basey,
+									max(p1[0]+var1[0],p2[0]+var2[0]) - basex,
+									max(p1[1]+var1[1],p2[1]+var2[1]) - basey
+								);
+								roi = RoiSpec(rect);
+							}
 							obsCurrentPtr->events.measured = true;
 							
 							matcher->match(rawData, obsCurrentPtr->predictedAppearance, roi, obsCurrentPtr->measurement, obsCurrentPtr->observedAppearance);
@@ -296,6 +317,27 @@ namespace jafar {
                            obsPtr->searchSize = roi.count();
                            if (obsPtr->searchSize > matcher->params.maxSearchSize) roi.scale(sqrt(matcher->params.maxSearchSize/(double)obsPtr->searchSize));
                         }
+								else // Segment
+								{
+									// Rough approximation, this won't be used by Dseg Matcher, only by the simulator
+									vec2 p1, p2;
+									vec2 var1, var2;
+									p1[0] = obsPtr->expectation.x()[0]; p1[1] = obsPtr->expectation.x()[1];
+									p2[0] = obsPtr->expectation.x()[2]; p2[1] = obsPtr->expectation.x()[3];
+									var1[0] = (obsPtr->expectation.P()(0,0) + matcher->params.measVar) * matcher->params.mahalanobisTh;
+									var1[1] = (obsPtr->expectation.P()(1,1) + matcher->params.measVar) * matcher->params.mahalanobisTh;
+									var2[0] = (obsPtr->expectation.P()(2,2) + matcher->params.measVar) * matcher->params.mahalanobisTh;
+									var2[1] = (obsPtr->expectation.P()(3,3) + matcher->params.measVar) * matcher->params.mahalanobisTh;
+
+									int basex = min(p1[0]-var1[0],p2[0]-var2[0]);
+									int basey = min(p1[1]-var1[1],p2[1]-var2[1]);
+									cv::Rect rect(
+										basex, basey,
+										max(p1[0]+var1[0],p2[0]+var2[0]) - basex,
+										max(p1[1]+var1[1],p2[1]+var2[1]) - basey
+									);
+									roi = RoiSpec(rect);
+								}
 								// 1d. match predicted feature in search area
 								//						kernel::Chrono match_chrono;
 								matcher->match(rawData, obsPtr->predictedAppearance, roi, obsPtr->measurement, obsPtr->observedAppearance);
@@ -415,7 +457,7 @@ namespace jafar {
 
 						// 2d. Create lmk descriptor
 						detector->fillDataObs(featPtr, obsPtr);
-						
+
 						// FIXME maybe adjust roi to prevent from detecting points too close to edge compared to descriptor size
 						// it would be better if we could check that the descriptor cannot be build before adding the landmark to the map...
 						if (obsPtr->updateDescriptor())
@@ -544,6 +586,7 @@ namespace jafar {
 				if (remainingObsCount <= 0) { obsBasePtr.reset(); return; }
 				int n = rtslam::rand()%remainingObsCount;
 				obsBasePtr = obsVisibleList[n];
+
 // JFR_DEBUG("getOneMatchedBaseObs: trying obs " << obsBasePtr->id() << " already matched " << obsBasePtr->events.matched);
 				// try to match (if not yet matched)
 				if (!obsBasePtr->events.matched)
@@ -634,12 +677,14 @@ namespace jafar {
 		bool DataManagerOnePointRansac<RawSpec,SensorSpec,FeatureSpec,RoiSpec,FeatureManagerSpec,DetectorSpec,MatcherSpec>::
 		matchWithExpectedInnovation(boost::shared_ptr<RawSpec> rawData,  observation_ptr_t obsPtr)
 		{
+
 			#if PROJECT_MEAN_VISIBILITY
 			obsPtr->project();
 			#endif
-			
+
 			if (obsPtr->predictAppearance())
          {
+
             RoiSpec roi;
             if(obsPtr->expectation.P().size1() == 2) // basically DsegMatcher handles it's own roi and having a size4 expectation the following roi computation fails, hence the test  - TODO clean up all this, is should not mess with One point ransac
             {

@@ -69,7 +69,7 @@ TIM8  | Servo 5   | Servo 6   | Servo 7   | Servo 8
 // BOOTLOADER_SETTINGS
 //------------------------
 #define BOARD_READABLE	TRUE
-#define BOARD_WRITABLA	TRUE
+#define BOARD_WRITABLE	TRUE
 #define MAX_DEL_RETRYS	3
 
 //------------------------

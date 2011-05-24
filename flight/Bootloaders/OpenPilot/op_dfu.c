@@ -452,7 +452,7 @@ void OPDfuIni(uint8_t discover) {
 	Device dev;
 
 	dev.programmingType = Self_flash;
-	dev.readWriteFlags = (BOARD_READABLE | (BOARD_WRITABLA << 1));
+	dev.readWriteFlags = (BOARD_READABLE | (BOARD_WRITABLE << 1));
 	dev.startOfUserCode = bdinfo->fw_base;
 	dev.sizeOfCode = bdinfo->fw_size;
 	dev.sizeOfDescription = bdinfo->desc_size;

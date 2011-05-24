@@ -170,7 +170,7 @@ void process_spi_request(void) {
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_MEM_MAP);
 		user_tx_v0.payload.user.v.rsp.mem_map.density = bdinfo->hw_type;
 		user_tx_v0.payload.user.v.rsp.mem_map.rw_flags = (BOARD_READABLE
-				| (BOARD_WRITABLA << 1));
+				| (BOARD_WRITABLE << 1));
 		user_tx_v0.payload.user.v.rsp.mem_map.size_of_code_memory
 				= bdinfo->fw_size;
 		user_tx_v0.payload.user.v.rsp.mem_map.size_of_description

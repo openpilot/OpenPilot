@@ -407,8 +407,6 @@ opf: $(OUTDIR)/$(TARGET).opf
 
 # Display sizes of sections.
 $(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))
-.PHONY: size
-size: $(OUTDIR)/$(TARGET).elf_size
 
 # Generate Doxygen documents
 docs:

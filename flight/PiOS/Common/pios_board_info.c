@@ -13,4 +13,8 @@ const struct pios_board_info __attribute__((__used__)) __attribute__((__section_
   .fw_size    = FW_BANK_SIZE - FW_DESC_SIZE,
   .desc_base  = FW_BANK_BASE + FW_BANK_SIZE - FW_DESC_SIZE,
   .desc_size  = FW_DESC_SIZE,
+#ifdef EE_BANK_BASE
+  .ee_base    = EE_BANK_BASE,
+  .ee_size    = EE_BANK_SIZE,
+#endif
 };

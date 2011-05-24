@@ -47,6 +47,8 @@ MSG_PYMITEINIT       := ${quote} PY        ${quote}
 MSG_INSTALLING       := ${quote} INSTALL   ${quote}
 MSG_OPFIRMWARE       := ${quote} OPF       ${quote}
 MSG_FWINFO           := ${quote} FWINFO    ${quote}
+MSG_JTAG_PROGRAM     := ${quote} JTAG-PGM  ${quote}
+MSG_JTAG_WIPE        := ${quote} JTAG-WIPE ${quote}
 
 toprel = $(subst $(realpath $(TOP))/,,$(abspath $(1)))
 
@@ -96,6 +98,9 @@ gccversion :
 	$(V1) $(NM) -n $< > $@
 
 define SIZE_TEMPLATE
+.PHONY: size
+size: $(1)_size
+
 .PHONY: $(1)_size
 $(1)_size: $(1)
 	@echo $(MSG_SIZE) $$(call toprel, $$<)
@@ -191,21 +196,48 @@ $($(1):.c=.s) : %.s : %.c
 	$(V1) $(CC) -S $$(CFLAGS) $$(CONLYFLAGS) $$< -o $$@
 endef
 
+# $(1) = Name of binary image to write
+# $(2) = Base of flash region to write/wipe
+# $(3) = Size of flash region to write/wipe
+define JTAG_TEMPLATE
 # ---------------------------------------------------------------------------
 # Options for OpenOCD flash-programming
 # see openocd.pdf/openocd.texi for further information
 
 # if OpenOCD is in the $PATH just set OPENOCDEXE=openocd
-OOCD_EXE=openocd
+OOCD_EXE ?= openocd
+
 # debug level
-OOCD_CL=-d0
+OOCD_JTAG_SETUP  = -d0
 # interface and board/target settings (using the OOCD target-library here)
-OOCD_CL+=-s $(TOP)/flight/Project/OpenOCD
-OOCD_CL+=-f foss-jtag.revb.cfg -f stm32.cfg
+OOCD_JTAG_SETUP += -s $(TOP)/flight/Project/OpenOCD
+OOCD_JTAG_SETUP += -f foss-jtag.revb.cfg -f stm32.cfg
 
 # initialize
-OOCD_CL+=-c init
+OOCD_BOARD_RESET = -c init
 # show the targets
-OOCD_CL+=-c targets
+#OOCD_BOARD_RESET += -c targets
 # commands to prepare flash-write
-OOCD_CL+= -c "reset halt"
+OOCD_BOARD_RESET += -c "reset halt"
+
+.PHONY: program
+program: $(1)
+	@echo $(MSG_JTAG_PROGRAM) $$(call toprel, $$<)
+	$(V1) $(OOCD_EXE) \
+		$$(OOCD_JTAG_SETUP) \
+		$$(OOCD_BOARD_RESET) \
+		-c "flash write_image erase $$< $(2) bin" \
+		-c "verify_image $$< $(2) bin" \
+		-c "reset run" \
+		-c "shutdown"
+
+.PHONY: wipe
+wipe:
+	@echo $(MSG_JTAG_WIPE) wiping $(3) bytes starting from $(2)
+	$(V1) $(OOCD_EXE) \
+		$$(OOCD_JTAG_SETUP) \
+		$$(OOCD_BOARD_RESET) \
+		-c "flash erase_address pad $(2) $(3)" \
+		-c "reset run" \
+		-c "shutdown"
+endef

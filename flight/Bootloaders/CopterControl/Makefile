@@ -343,20 +343,8 @@ LDFLAGS += -lc -lgcc
 LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_memory.ld
 LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_BL_sections.ld
 
-OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).bin
-# Program
-OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) $(BL_BANK_BASE) bin"
-# Verify
-OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) $(BL_BANK_BASE) bin"
-# reset target
-OOCD_CL+=-c "reset run"
-# terminate OOCD after programming
-OOCD_CL+=-c shutdown
-
 # Define programs and commands.
 REMOVE  = $(REMOVE_CMD) -f
-###SHELL   = sh
-###COPY    = cp
 
 # List of all source files.
 ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
@@ -396,14 +384,6 @@ ${OUTDIR}/InitMods.c: Makefile
 	@echo ${quote}${foreach MOD, ${MODNAMES}, ${MOD}Initialize();}${quote}  >> ${OUTDIR}/InitMods.c
 	@echo ${quote}}${quote} >> ${OUTDIR}/InitMods.c
 
-# Program the device.
-ifeq ($(FLASH_TOOL),OPENOCD)
-# Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
-program: $(OUTDIR)/$(TARGET).bin
-	@echo ${quote}Programming with OPENOCD${quote}
-	$(OOCD_EXE) $(OOCD_CL)
-endif
-
 # Link: create ELF output file from object files.
 $(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ)))
 
@@ -432,6 +412,9 @@ $(eval $(call PARTIAL_COMPILE_TEMPLATE, SRC))
 $(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
 
 $(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
+
+# Add jtag targets (program and wipe)
+$(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BL_BANK_BASE),$(BL_BANK_SIZE)))
 
 .PHONY: elf lss sym hex bin bino
 elf: $(OUTDIR)/$(TARGET).elf
@@ -497,4 +480,4 @@ else
 endif
 
 # Listing of phony targets.
-.PHONY : all build clean clean_list program install
+.PHONY : all build clean clean_list install

@@ -85,6 +85,9 @@
 /*
  * STATUS: in progress, do not use for now
  * This uses HDseg powered Segment based slam instead of the usual point based slam.
+ * 0 use points
+ * 1 use segments
+ * 2 use both sgments and points
  */
 #define SEGMENT_BASED 0
 
@@ -448,7 +451,8 @@ void demo_slam01_main(world_ptr_t *world)
 		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeAhplObservationMaker(
 			configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5, configEstimation.D_MIN, configEstimation.PATCH_SIZE)));
 	}
-#else
+#endif
+#if SEGMENT_BASED != 1
 	if (intOpts[iSimu] != 0)
 	{
 		obsFact->addMaker(boost::shared_ptr<ObservationMakerAbstract>(new PinholeEucpSimuObservationMaker(
@@ -477,31 +481,44 @@ void demo_slam01_main(world_ptr_t *world)
 	mapPtr->linkToParentWorld(worldPtr);
 	
    // 1b. Create map manager.
+	landmark_factory_ptr_t pointLmkFactory;
+	landmark_factory_ptr_t segLmkFactory;
 #if SEGMENT_BASED
-   landmark_factory_ptr_t lmkFactory(new LandmarkFactory<LandmarkAnchoredHomogeneousPointsLine, LandmarkAnchoredHomogeneousPointsLine>());
-#else
-   landmark_factory_ptr_t lmkFactory(new LandmarkFactory<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint>());
+   segLmkFactory.reset(new LandmarkFactory<LandmarkAnchoredHomogeneousPointsLine, LandmarkAnchoredHomogeneousPointsLine>());
+#endif
+#if SEGMENT_BASED != 1
+   pointLmkFactory.reset(new LandmarkFactory<LandmarkAnchoredHomogeneousPoint, LandmarkEuclideanPoint>());
 #endif
 	map_manager_ptr_t mmPoint;
+	map_manager_ptr_t mmSeg;
 	switch(intOpts[iMap])
 	{
 		case 0: { // odometry
-			mmPoint.reset(new MapManagerOdometry(
-			  lmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE));
+			if(pointLmkFactory != NULL)
+				mmPoint.reset(new MapManagerOdometry(pointLmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE));
+			if(segLmkFactory != NULL)
+				mmSeg.reset(new MapManagerOdometry(segLmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE));
 			break;
 		}
 		case 1: { // global
-			mmPoint.reset(new MapManagerGlobal(
-			  lmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5));
+			if(pointLmkFactory != NULL)
+				mmPoint.reset(new MapManagerGlobal(pointLmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5));
+			if(segLmkFactory != NULL)
+				mmSeg.reset(new MapManagerGlobal(segLmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE, 30, 0.5, 0.5));
 			break;
 		}
 		case 2: { // local/multimap
-			mmPoint.reset(new MapManagerLocal(
-			  lmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE));
+			if(pointLmkFactory != NULL)
+				mmPoint.reset(new MapManagerLocal(pointLmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE));
+			if(segLmkFactory != NULL)
+				mmSeg.reset(new MapManagerLocal(segLmkFactory, configEstimation.REPARAM_TH, configEstimation.KILL_SEARCH_SIZE));
 			break;	
 		}
 	}
-	mmPoint->linkToParentMap(mapPtr);
+	if(mmPoint != NULL)
+		mmPoint->linkToParentMap(mapPtr);
+	if(mmSeg != NULL)
+		mmSeg->linkToParentMap(mapPtr);
 
 	// simulation environment
 	boost::shared_ptr<simu::AdhocSimulator> simulator;
@@ -839,30 +856,30 @@ void demo_slam01_main(world_ptr_t *world)
 		#endif
 	} else
    {
-      boost::shared_ptr<DescriptorFactoryAbstract> descFactory;
+      boost::shared_ptr<DescriptorFactoryAbstract> pointDescFactory;
+      boost::shared_ptr<DescriptorFactoryAbstract> segDescFactory;
       #if SEGMENT_BASED
 
          if (configEstimation.MULTIVIEW_DESCRIPTOR)
-				descFactory.reset(new DescriptorImageSegMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImageSegMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
+				segDescFactory.reset(new DescriptorImageSegMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImageSegMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
          else
-				descFactory.reset(new DescriptorImageSegFirstViewFactory(configEstimation.DESC_SIZE));
+				segDescFactory.reset(new DescriptorImageSegFirstViewFactory(configEstimation.DESC_SIZE));
 
-//            descFactory.reset(new DescriptorSegFirstViewFactory(configEstimation.DESC_SIZE));
-
-			boost::shared_ptr<HDsegDetector> hdsegDetector(new HDsegDetector(configEstimation.PATCH_SIZE, 3,configEstimation.PIX_NOISE,descFactory));
+			boost::shared_ptr<HDsegDetector> hdsegDetector(new HDsegDetector(configEstimation.PATCH_SIZE, 3,configEstimation.PIX_NOISE,segDescFactory));
          boost::shared_ptr<DsegMatcher> dsegMatcher(new DsegMatcher(configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE));
          boost::shared_ptr<DataManager_ImageSeg_Test> dmSeg(new DataManager_ImageSeg_Test(hdsegDetector, dsegMatcher, assGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
 
          dmSeg->linkToParentSensorSpec(senPtr11);
-         dmSeg->linkToParentMapManager(mmPoint);
+         dmSeg->linkToParentMapManager(mmSeg);
          dmSeg->setObservationFactory(obsFact);
-      #else
+		#endif
+		#if SEGMENT_BASED != 1
          if (configEstimation.MULTIVIEW_DESCRIPTOR)
-            descFactory.reset(new DescriptorImagePointMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImagePointMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
+            pointDescFactory.reset(new DescriptorImagePointMultiViewFactory(configEstimation.DESC_SIZE, configEstimation.DESC_SCALE_STEP, jmath::degToRad(configEstimation.DESC_ANGLE_STEP), (DescriptorImagePointMultiView::PredictionType)configEstimation.DESC_PREDICTION_TYPE));
          else
-            descFactory.reset(new DescriptorImagePointFirstViewFactory(configEstimation.DESC_SIZE));
+            pointDescFactory.reset(new DescriptorImagePointFirstViewFactory(configEstimation.DESC_SIZE));
 
-         boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(configEstimation.HARRIS_CONV_SIZE, configEstimation.HARRIS_TH, configEstimation.HARRIS_EDDGE, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, descFactory));
+         boost::shared_ptr<ImagePointHarrisDetector> harrisDetector(new ImagePointHarrisDetector(configEstimation.HARRIS_CONV_SIZE, configEstimation.HARRIS_TH, configEstimation.HARRIS_EDDGE, configEstimation.PATCH_SIZE, configEstimation.PIX_NOISE, pointDescFactory));
          boost::shared_ptr<ImagePointZnccMatcher> znccMatcher(new ImagePointZnccMatcher(configEstimation.MIN_SCORE, configEstimation.PARTIAL_POSITION, configEstimation.PATCH_SIZE, configEstimation.MAX_SEARCH_SIZE, configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE));
 
          boost::shared_ptr<DataManager_ImagePoint_Ransac> dmPt11(new DataManager_ImagePoint_Ransac(harrisDetector, znccMatcher, asGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));

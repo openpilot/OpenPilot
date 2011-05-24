@@ -85,11 +85,16 @@ help:
 	@echo "     all_bl_clean         - Remove bootlaoders for all boards"
 	@echo "     all_bu_clean         - Remove bootloader updaters for all boards"
 	@echo
+	@echo "     all_<board>          - Build all available images for <board>"
+	@echo "     all_<board>_clean    - Remove all available images for <board>"
+	@echo
 	@echo "   [Firmware]"
 	@echo "     <board>              - Build firmware for <board>"
+	@echo "                            supported boards are ($(ALL_BOARDS))"
+	@echo "     fw_<board>           - Build firmware for <board>"
 	@echo "                            supported boards are ($(FW_TARGETS))"
-	@echo "     <board>_clean        - Remove firmware for <board>"
-	@echo "     <board>_program      - Use OpenOCD + JTAG to write firmware to <board>"
+	@echo "     fw_<board>_clean     - Remove firmware for <board>"
+	@echo "     fw_<board>_program   - Use OpenOCD + JTAG to write firmware to <board>"
 	@echo
 	@echo "   [Bootloader]"
 	@echo "     bl_<board>           - Build bootloader for <board>"
@@ -376,6 +381,19 @@ bu_$(1)_clean:
 	$(V1) $(RM) -fr $(BUILD_DIR)/bu_$(1)
 endef
 
+# $(1) = Canonical board name all in lower case (e.g. coptercontrol)
+define BOARD_PHONY_TEMPLATE
+.PHONY: all_$(1)
+all_$(1): $$(filter fw_$(1), $$(FW_TARGETS))
+all_$(1): $$(filter bl_$(1), $$(BL_TARGETS))
+all_$(1): $$(filter bu_$(1), $$(BU_TARGETS))
+
+.PHONY: all_$(1)_clean
+all_$(1)_clean: $$(addsuffix _clean, $$(filter fw_$(1), $$(FW_TARGETS)))
+all_$(1)_clean: $$(addsuffix _clean, $$(filter bl_$(1), $$(BL_TARGETS)))
+all_$(1)_clean: $$(addsuffix _clean, $$(filter bu_$(1), $$(BU_TARGETS)))
+endef
+
 ALL_BOARDS := openpilot ahrs coptercontrol pipxtreme ins
 
 # Friendly names of each board (used to find source tree)
@@ -409,6 +427,8 @@ all_bu_clean:  $(addsuffix _clean, $(BU_TARGETS))
 .PHONY: all_flight all_flight_clean
 all_flight:       all_fw all_bl all_bu
 all_flight_clean: all_fw_clean all_bl_clean all_bu_clean
+
+$(foreach board, $(ALL_BOARDS), $(eval $(call BOARD_PHONY_TEMPLATE,$(board))))
 
 # Expand the bootloader updater rules
 $(foreach board, $(ALL_BOARDS), $(eval $(call BU_TEMPLATE,$(board),$($(board)_friendly))))

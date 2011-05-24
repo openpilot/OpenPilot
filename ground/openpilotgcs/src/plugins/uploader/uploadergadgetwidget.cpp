@@ -291,7 +291,10 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         /*
         m_config->haltButton->setEnabled(false);
         m_config->resetButton->setEnabled(false);
+        */
+        // Need to re-enable in case we were not connected
         m_config->bootButton->setEnabled(true);
+        /*
         m_config->telemetryLink->setEnabled(false);
         m_config->rescueButton->setEnabled(false);
         */
@@ -359,6 +362,7 @@ void UploaderGadgetWidget::systemBoot()
         delete dfu;
         dfu = NULL;
         m_config->bootButton->setEnabled(true);
+        m_config->rescueButton->setEnabled(true); // Boot not possible, maybe Rescue OK?
         return;
     }
     log("Booting system...");
@@ -503,7 +507,7 @@ void UploaderGadgetWidget::systemRescue()
         }
         m_config->haltButton->setEnabled(false);
         m_config->resetButton->setEnabled(false);
-        //m_config->bootButton->setEnabled(true);
+        m_config->bootButton->setEnabled(true);
         m_config->rescueButton->setEnabled(false);
         currentStep = IAP_STATE_BOOTLOADER; // So that we can boot from the GUI afterwards.
     }

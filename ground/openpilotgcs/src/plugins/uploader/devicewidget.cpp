@@ -268,12 +268,7 @@ void deviceWidget::uploadFirmware()
         if (firmwareBoard != board) {
             status("Error: firmware does not match board", STATUSICON_FAIL);
             return;
-        } else {
-            // Not a structured description: warn user
-            myDevice->buildDate->setText("Warning: development firmware");
-            myDevice->commitTag->setText("");
         }
-
         // Check the firmware embedded in the file:
         QByteArray firmwareHash = desc.mid(40,20);
         QByteArray fileHash = QCryptographicHash::hash(arr.left(arr.length()-100), QCryptographicHash::Sha1);
@@ -281,16 +276,11 @@ void deviceWidget::uploadFirmware()
             status("Error: firmware file corrupt", STATUSICON_FAIL);
             return;
         }
-
-
-
     } else {
         // The firmware is not packaged, just upload the text in the description field
         // if it is there.
         descriptionArray.clear();
     }
-
-
 
 
     status("Starting firmware upload", STATUSICON_RUNNING);

@@ -14,11 +14,23 @@ ROOT_DIR := $(realpath $(WHEREAMI)/../)
 # Set up some macros
 BUILD_DIR    := $(ROOT_DIR)/build
 VERSION_CMD  := python $(ROOT_DIR)/make/scripts/version-info.py --path="$(ROOT_DIR)"
-RELEASE_LBL  := $(shell $(VERSION_CMD) --format=\$${DATE}-\$${TAG_OR_HASH8})
+RELEASE_LBL  := $(shell $(VERSION_CMD) --format=\$${DATE}-\$${TAG_OR_HASH8}\$${DIRTY})
 RELEASE_DIR  := $(BUILD_DIR)/release-$(RELEASE_LBL)
 FW_DIR       := $(RELEASE_DIR)/firmware-$(RELEASE_LBL)
 BL_DIR       := $(FW_DIR)/bootloaders
 BLUPD_DIR    := $(FW_DIR)/bootloader_updaters
+
+# Clean build options (recommended for package testing only)
+ifeq ($(CLEAN_BUILD), NO)
+CLEAN_GROUND := NO
+CLEAN_FLIGHT := YES
+else ifeq ($(CLEAN_BUILD), NEVER)
+CLEAN_GROUND := NO
+CLEAN_FLIGHT := NO
+else
+CLEAN_GROUND := YES
+CLEAN_FLIGHT := YES
+endif
 
 # Setup targets
 FW_TARGETS_COMMON := ahrs pipxtreme
@@ -35,14 +47,23 @@ help:
 	@echo
 	@echo "   Here is a summary of the available targets:"
 	@echo
-	@echo "   [Release build and packaging]"
-	@echo "     release              - Build and package the OpenPilot release"
-	@echo "     release_flight       - Build and package the OpenPilot flight firmware"
+	@echo "   [Packaging]"
+	@echo "     release        - Build and package the OpenPilot distributable"
+	@echo "     release_flight - Build and package the OpenPilot flight firmware only"
 	@echo
 	@echo "   Notes:"
-	@echo "     - the build directory will be removed first on every run"
-	@echo "       unless CLEAN_BUILD=NO is defined (recommended for testing only)"
-	@echo "     - release packages will be placed in $(RELEASE_DIR)"
+	@echo "     - package will be placed in $(RELEASE_DIR)"
+	@echo
+	@echo "     - the build directory will be removed first on every run unless one"
+	@echo "       of CLEAN_BUILD=NO or CLEAN_BUILD=NEVER options is defined."
+	@echo
+	@echo "       CLEAN_BUILD=NO means no clean before build except for multi-input"
+	@echo "       firmware binaries like CopterControl or OpenPilot. This usually is"
+	@echo "       safe."
+	@echo
+	@echo "       CLEAN_BUILD=NEVER means no clean will be done at all. This will,"
+	@echo "       probably, give invalid multi-input firmware and is recommended"
+	@echo "       for package testing only. Do not use for release builds."
 	@echo
 
 # Clean and build uavobjects since all parts depend on them
@@ -50,7 +71,7 @@ uavobjects: all_clean
 	$(V1) $(MAKE) -C $(ROOT_DIR) $@
 
 all_clean:
-ifneq ($(CLEAN_BUILD), NO)
+ifneq ($(CLEAN_GROUND), NO)
 	$(V1) $(MAKE) -C $(ROOT_DIR) $@
 endif
 
@@ -61,13 +82,15 @@ endif
 #   $4 = installed file name prefix (optional)
 #   $5 = installed file name suffix (optional)
 #   $6 = extra make options (for instance, USE_SPEKTRUM=YES)
-#   $7 = optional target suffix (for instance, clean, if target must be cleaned first)
+#   $7 = optional 'clean' string to clean target before rebuild
 #   $8 = list of targets to install (without _install suffix)
 #   $9 = inner make target (usually install, but can be other to just build)
 define INSTALL_TEMPLATE
 $(1): $(2)
-ifneq ($(7),)
+ifeq ($(7),clean)
+ifneq ($$(CLEAN_FLIGHT), NO)
 	$$(V1) +$(MAKE) -C $(ROOT_DIR) $(6) $(addsuffix _$(7), $(8))
+endif
 endif
 	$$(V1) +$(MAKE) -C $(ROOT_DIR) INSTALL_DIR=$(3) INSTALL_PFX=$(4) INSTALL_SFX=$(5) $(6) $(addsuffix _$(9), $(8))
 .PHONY: $(1)

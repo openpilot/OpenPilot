@@ -82,6 +82,14 @@ class Repo:
             if m:
                 self._branch = m.group(1)
 
+    def _get_dirty(self):
+        """Check for dirty state of repository"""
+        self._dirty = False
+        self._exec('update-index --refresh --unmerged')
+        self._exec('diff-index --name-only --exit-code --quiet HEAD')
+        if self._rc:
+            self._dirty = True
+
     def __init__(self, path = "."):
         """Initialize object instance and read repo info"""
         self._path = path
@@ -92,12 +100,14 @@ class Repo:
             self._get_time()
             self._get_tag()
             self._get_branch()
+            self._get_dirty()
         else:
             self._hash = None
             self._origin = None
             self._time = None
             self._tag = None
             self._branch = None
+            self._dirty = None
 
     def path(self):
         """Return the repository path"""
@@ -141,6 +151,13 @@ class Repo:
         else:
             return self._branch
 
+    def dirty(self, dirty = "-dirty", clean = ""):
+        """Return git repository dirty state or empty string"""
+        if self._dirty:
+            return dirty
+        else:
+            return clean
+
     def info(self):
         """Print some repository info"""
         print "path:       ", self.path()
@@ -151,6 +168,7 @@ class Repo:
         print "short hash: ", self.hash(8)
         print "branch:     ", self.branch()
         print "commit tag: ", self.tag()
+        print "dirty:      ", self.dirty('yes', 'no')
 
 def file_from_template(tpl_name, out_name, dict):
     """Create or update file from template using dictionary
@@ -287,6 +305,7 @@ dependent targets.
         HASH8 = r.hash(8),
         TAG_OR_BRANCH = r.tag(r.branch('unreleased')),
         TAG_OR_HASH8 = r.tag(r.hash(8, 'untagged')),
+        DIRTY = r.dirty(),
         UNIXTIME = r.time(),
         DATE = r.time('%Y%m%d'),
         DATETIME = r.time('%Y%m%d %H:%M'),

@@ -468,9 +468,9 @@ LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_sections.ld
 
 OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).bin
 # Program
-OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) $(START_OF_FW_CODE) bin"
+OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) $(FW_BANK_BASE) bin"
 # Verify
-OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) $(START_OF_FW_CODE) bin"
+OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) $(FW_BANK_BASE) bin"
 # reset target
 OOCD_CL+=-c "reset run"
 # terminate OOCD after programming

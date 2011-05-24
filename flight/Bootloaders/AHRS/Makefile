@@ -204,7 +204,9 @@ BLONLY_CDEFS += -DBOARD_TYPE=$(BOARD_TYPE)
 BLONLY_CDEFS += -DBOARD_REVISION=$(BOARD_REVISION)
 BLONLY_CDEFS += -DHW_TYPE=$(HW_TYPE)
 BLONLY_CDEFS += -DBOOTLOADER_VERSION=$(BOOTLOADER_VERSION)
-BLONLY_CDEFS += -DSTART_OF_USER_CODE=$(START_OF_FW_CODE)
+BLONLY_CDEFS += -DFW_BANK_BASE=$(FW_BANK_BASE)
+BLONLY_CDEFS += -DFW_BANK_SIZE=$(FW_BANK_SIZE)
+BLONLY_CDEFS += -DFW_DESC_SIZE=$(FW_DESC_SIZE)
 
 # Place project-specific -D and/or -U options for 
 # Assembler with preprocessor here.
@@ -291,9 +293,9 @@ LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_BL_sections.ld
 
 OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).bin
 # Program                                                                                                                                                                                                                            
-OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) $(START_OF_BL_CODE) bin"
+OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) $(BL_BANK_BASE) bin"
 # Verify
-OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) $(START_OF_BL_CODE) bin"
+OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) $(BL_BANK_BASE) bin"
 # reset target
 OOCD_CL+=-c "reset run"
 # terminate OOCD after programming

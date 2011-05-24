@@ -57,12 +57,16 @@
 #define RAD2DEG (180.0/M_PI)
 #define DEG2RAD (M_PI/180.0)
 #define GEE 9.81
+#define OLD_ALTITUDE_UNSET -10000
+#define OLD_ALTITUDE_TEST_UNSET -9000
 // Private types
 
 // Private variables
 static xTaskHandle ccguidanceTaskHandle;
 static xQueueHandle queue;
 static uint8_t positionHoldLast = 0;
+static float oldAltitude = OLD_ALTITUDE_UNSET;
+static float verticalVelIntegral = 0;
 
 
 // Private functions
@@ -102,9 +106,13 @@ static void ccguidanceTask(void *parameters)
 
 	portTickType thisTime;
 	portTickType lastUpdateTime;
+	float dT;
 	UAVObjEvent ev;
 
 	float altitudeError;
+	static float altitudeDelta;
+	float verticalVelocity;
+	float verticalError;
 	float courseError;
 	
 	// Main task loop
@@ -124,8 +132,10 @@ static void ccguidanceTask(void *parameters)
 		thisTime = xTaskGetTickCount();
 		if( (thisTime - lastUpdateTime) < (ccguidanceSettings.UpdatePeriod / portTICK_RATE_MS) )
 			continue;
-		
-		lastUpdateTime = xTaskGetTickCount();
+
+		dT = (thisTime - lastUpdateTime) / portTICK_RATE_MS / 1000.0f;
+
+		lastUpdateTime = thisTime;
 		
 		ManualControlCommandGet(&manualControl);
 		FlightStatusGet(&flightStatus);
@@ -158,15 +168,40 @@ static void ccguidanceTask(void *parameters)
 				/* main position hold loop */
 				/* 1. Altitude */
 
+				// Compute vertical velocity from gps altitude
+				// filter over 10 samples
+				#define SMOOTH_FACTOR 10
+				if (oldAltitude < OLD_ALTITUDE_TEST_UNSET) {
+					oldAltitude = positionActual.Altitude;
+					altitudeDelta = 0;
+				} else {
+					altitudeDelta = (SMOOTH_FACTOR -1 * altitudeDelta + ((positionActual.Altitude - oldAltitude) / dT)) / SMOOTH_FACTOR;
+				}
+
+				// Compute desired vertical velocity (proportional with max)
 				altitudeError = positionDesired.Down - positionActual.Altitude;
-				stabDesired.Pitch = bound(
+				verticalVelocity = bound(
+					altitudeError * ccguidanceSettings.Climb[CCGUIDANCESETTINGS_CLIMB_KP],
+					- ccguidanceSettings.Climb[CCGUIDANCESETTINGS_CLIMB_MAX],
+					ccguidanceSettings.Climb[CCGUIDANCESETTINGS_CLIMB_MAX]
+					);
+
+				// Compute desired pitch (PI loop)
+				verticalError = verticalVelocity - altitudeDelta;
+				verticalVelIntegral = bound (
+					verticalVelIntegral + verticalError * dT * ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_KI],
+					-ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_ILIMIT],
+					ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_ILIMIT]
+					);
+				stabDesired.Pitch = bound (
 					ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_NEUTRAL] +
-					ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_KP] * altitudeError,
+					verticalError * ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_KP] +
+					verticalVelIntegral,
 					ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_MIN],
-					ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_MAX]);
+					ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_MAX]
+					);
 
 				/* 2. Heading */
-
 				courseError = sphereCourse(
 					positionActual.Latitude,
 					positionActual.Longitude,
@@ -212,6 +247,8 @@ static void ccguidanceTask(void *parameters)
 		} else {
 			// reset globals...
 			positionHoldLast = 0;
+			verticalVelIntegral = 0;
+			oldAltitude = OLD_ALTITUDE_UNSET;
 		}
 		
 	}

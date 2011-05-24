@@ -18,7 +18,8 @@ RELEASE_LBL  := $(shell $(VERSION_CMD) --format=\$${DATE}-\$${TAG_OR_HASH8}\$${D
 RELEASE_DIR  := $(BUILD_DIR)/release-$(RELEASE_LBL)
 FW_DIR       := $(RELEASE_DIR)/firmware-$(RELEASE_LBL)
 BL_DIR       := $(FW_DIR)/bootloaders
-BU_DIR       := $(FW_DIR)/bootloader_updaters
+BU_DIR       := $(FW_DIR)/bootloader-updaters
+FE_DIR       := $(FW_DIR)/flash-erase-tools
 
 # Clean build options (recommended for package testing only)
 ifeq ($(CLEAN_BUILD), NO)
@@ -32,13 +33,16 @@ CLEAN_GROUND := YES
 CLEAN_FLIGHT := YES
 endif
 
-# Setup targets
-FW_TARGETS_COMMON := ahrs pipxtreme
-FW_TARGETS_INPUT  := coptercontrol openpilot
-FW_TARGETS_TOOLS  := coptercontrol
-FW_TARGETS        := $(FW_TARGETS_COMMON) $(FW_TARGETS_INPUT)
-BL_TARGETS        := $(addprefix bl_, $(FW_TARGETS))
-BU_TARGETS        := $(addprefix bu_, $(FW_TARGETS))
+# Set up targets
+FW_STEMS_COMMON   := ahrs pipxtreme
+FW_STEMS_INPUT    := coptercontrol openpilot
+FW_STEMS_TOOLS    := coptercontrol
+FW_STEMS_ALL      := $(FW_STEMS_COMMON) $(FW_STEMS_INPUT)
+FW_TARGETS_COMMON := $(addprefix fw_, $(FW_STEMS_COMMON))
+FW_TARGETS_INPUT  := $(addprefix fw_, $(FW_STEMS_INPUT))
+FW_TARGETS_TOOLS  := $(addprefix fw_, $(FW_STEMS_TOOLS))
+BL_TARGETS        := $(addprefix bl_, $(FW_STEMS_ALL))
+BU_TARGETS        := $(addprefix bu_, $(FW_STEMS_ALL))
 
 help:
 	@echo
@@ -102,17 +106,14 @@ $(eval $(call INSTALL_TEMPLATE,fw_pwm,uavobjects,$(FW_DIR),,-pwm-$(RELEASE_LBL),
 $(eval $(call INSTALL_TEMPLATE,fw_spektrum,uavobjects,$(FW_DIR),,-spektrum-$(RELEASE_LBL),USE_SPEKTRUM=YES,clean,$(FW_TARGETS_INPUT),install))
 $(eval $(call INSTALL_TEMPLATE,fw_ppm,uavobjects,$(FW_DIR),,-ppm-$(RELEASE_LBL),USE_PPM=YES,clean,$(FW_TARGETS_INPUT),install))
 
-# Bootloaders (change 'bin' to 'install' to install bootloaders too)
-$(eval $(call INSTALL_TEMPLATE,all_bl,uavobjects,$(BL_DIR),,-$(RELEASE_LBL),,,$(BL_TARGETS),bin))
+# Bootloaders (change 'install' to 'bin' if you don't want to install bootloaders)
+$(eval $(call INSTALL_TEMPLATE,all_bl,uavobjects,$(BL_DIR),,-$(RELEASE_LBL),,,$(BL_TARGETS),install))
 
-# Bootloader Updaters
-$(eval $(call INSTALL_TEMPLATE,bu_coptercontrol,all_bl,$(BU_DIR),CopterControl_,-$(RELEASE_LBL),,,bu_coptercontrol,install))
-$(eval $(call INSTALL_TEMPLATE,bu_ahrs,all_bl,$(BU_DIR),AHRS_,-$(RELEASE_LBL),,,bu_ahrs,install))
-$(eval $(call INSTALL_TEMPLATE,bu_openpilot,all_bl,$(BU_DIR),OpenPilot_,-$(RELEASE_LBL),,,bu_openpilot,install))
-$(eval $(call INSTALL_TEMPLATE,bu_pipxtreme,all_bl,$(BU_DIR),PipXtreme_,-$(RELEASE_LBL),,,bu_pipxtreme,install))
+# Bootloader updaters
+$(eval $(call INSTALL_TEMPLATE,all_bu,all_bl,$(BU_DIR),,-$(RELEASE_LBL),,,$(BU_TARGETS),install))
 
 # CopterControl flash eraser tool
-$(eval $(call INSTALL_TEMPLATE,fw_tools,uavobjects,$(BU_DIR),,-FlashEraser-$(RELEASE_LBL),ERASE_FLASH=YES,clean,$(FW_TARGETS_TOOLS),install))
+$(eval $(call INSTALL_TEMPLATE,fw_tools,uavobjects,$(FE_DIR),,-flash-erase-$(RELEASE_LBL),ERASE_FLASH=YES,clean,$(FW_TARGETS_TOOLS),install))
 
 # Order-only dependencies
 # They are bit complicated to support parallel (-j) builds and to create
@@ -128,7 +129,7 @@ fw_tools: | fw_spektrum # ordered build, replace fw_spektrum by fw_ppm if uncomm
 
 release_fw: | fw_common fw_pwm fw_spektrum # fw_ppm
 
-release_bu: | $(BU_TARGETS)
+release_bu: | all_bu
 
 release_flight: | release_fw release_bu fw_tools
 

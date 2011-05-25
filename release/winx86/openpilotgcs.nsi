@@ -151,8 +151,6 @@ Section "Core files" InSecCore
   SectionIn RO
   SetOutPath "$INSTDIR\bin"
   File /r "${GCS_BUILD_TREE}\bin\*"
-  SetOutPath "$INSTDIR\share\${FIRMWARE_DIR}"
-  File /r "${RELEASE_DIR}\${FIRMWARE_DIR}\*"
 SectionEnd
 
 Section "Plugins" InSecPlugins
@@ -183,6 +181,11 @@ SectionEnd
 Section "Localization" InSecLocalization
   SetOutPath "$INSTDIR\share\openpilotgcs\translations"
   File /r "${GCS_BUILD_TREE}\share\openpilotgcs\translations\*.qm"
+SectionEnd
+
+Section "Firmware" InSecFirmware
+  SetOutPath "$INSTDIR\firmware\${FIRMWARE_DIR}"
+  File /r "${RELEASE_DIR}\${FIRMWARE_DIR}\*"
 SectionEnd
 
 Section "Shortcuts" InSecShortcuts
@@ -219,6 +222,7 @@ SectionEnd
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecResources} $(DESC_InSecResources)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecSounds} $(DESC_InSecSounds)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecLocalization} $(DESC_InSecLocalization)
+    !insertmacro MUI_DESCRIPTION_TEXT ${InSecFirmware} $(DESC_InSecFirmware)
     !insertmacro MUI_DESCRIPTION_TEXT ${InSecShortcuts} $(DESC_InSecShortcuts)
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
@@ -239,6 +243,7 @@ Section "un.OpenPilot GCS" UnSecProgram
   RMDir /r /rebootok "$INSTDIR\bin"
   RMDir /r /rebootok "$INSTDIR\lib"
   RMDir /r /rebootok "$INSTDIR\share"
+  RMDir /r /rebootok "$INSTDIR\firmware"
   Delete /rebootok "$INSTDIR\Uninstall.exe"
 
   ; Remove directory

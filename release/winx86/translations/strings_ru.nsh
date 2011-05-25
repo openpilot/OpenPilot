@@ -30,6 +30,7 @@
   LangString DESC_InSecResources ${LANG_RUSSIAN} "Ресурсы GCS (диаграммы, приборы, пиктограммы, 3d-модели, PFD)."
   LangString DESC_InSecSounds ${LANG_RUSSIAN} "Звуковые файлы (используются для звуковых уведомлений о событиях)."
   LangString DESC_InSecLocalization ${LANG_RUSSIAN} "Файлы языковой поддержки (для поддерживаемых языков)."
+  LangString DESC_InSecFirmware ${LANG_RUSSIAN} "Файлы прошивок OpenPilot."
   LangString DESC_InSecShortcuts ${LANG_RUSSIAN} "Установка ярлыков для приложения."
 
 ;--------------------------------

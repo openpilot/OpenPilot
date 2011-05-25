@@ -235,6 +235,13 @@ def sha1(file):
         hex_stream = lambda s:",".join(['0x'+hex(ord(c))[2:].zfill(2) for c in s])
         return hex_stream(sha1.digest())
 
+def xtrim(string, length):
+    """Trim string up to length bytes, adding '+' if truncated"""
+    if len(string) <= length:
+        return string
+    else:
+        return string[:length-1] + '+'
+
 def main():
     """This utility uses git repository in the current working directory
 or from the given path to extract some info about it and HEAD commit.
@@ -306,6 +313,7 @@ dependent targets.
         TAG_OR_BRANCH = r.tag(r.branch('unreleased')),
         TAG_OR_HASH8 = r.tag(r.hash(8, 'untagged')),
         DIRTY = r.dirty(),
+        FWTAG = xtrim(r.tag(r.branch('unreleased')) + r.dirty(), 25),
         UNIXTIME = r.time(),
         DATE = r.time('%Y%m%d'),
         DATETIME = r.time('%Y%m%d %H:%M'),

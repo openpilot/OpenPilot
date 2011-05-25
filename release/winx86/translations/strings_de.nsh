@@ -30,6 +30,7 @@
   LangString DESC_InSecResources ${LANG_GERMAN} "GCS Resourcen (Diagramme, Ziffernblätter, Kartensymbole, 3d-Modelle, PFD)."
   LangString DESC_InSecSounds ${LANG_GERMAN} "GCS Sounddateien (benötigt für akustische Ereignisbenachrichtigungen)."
   LangString DESC_InSecLocalization ${LANG_GERMAN} "GCS Lokalisierung (für unterstützte Sprachen)."
+  LangString DESC_InSecFirmware ${LANG_GERMAN} "OpenPilot firmware binaries."
   LangString DESC_InSecShortcuts ${LANG_GERMAN} "Installiere Verknüpfungen unter Startmenü->Anwendungen."
 
 ;--------------------------------

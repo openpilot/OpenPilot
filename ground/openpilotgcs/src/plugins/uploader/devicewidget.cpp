@@ -42,6 +42,8 @@ deviceWidget::deviceWidget(QWidget *parent) :
 
     QPixmap pix = QPixmap(QString(":uploader/images/view-refresh.svg"));
     myDevice->statusIcon->setPixmap(pix);
+
+    myDevice->certifiedFW->setText("");
 }
 
 
@@ -123,6 +125,9 @@ void deviceWidget::populate()
         QString str = m_dfu->DownloadDescription(size);
         myDevice->description->setMaxLength(size);
         myDevice->description->setText(str.left(str.indexOf(QChar(255))));
+        QPixmap pix = QPixmap(QString(":uploader/images/gtk-info.svg"));
+        myDevice->certifiedFW->setPixmap(pix);
+        myDevice->certifiedFW->setToolTip(tr("Custom Firmware Build"));
         myDevice->buildDate->setText("Warning: development firmware");
         myDevice->commitTag->setText("");
     }
@@ -182,6 +187,9 @@ bool deviceWidget::populateStructuredDescription(QByteArray desc)
         QString dscText = QString(desc.mid(14,26));
         myDevice->description->setText(dscText);
 
+        QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
+        myDevice->certifiedFW->setPixmap(pix);
+        myDevice->certifiedFW->setToolTip(tr("Official Firmware Build"));
         return true;
     }
 
@@ -406,7 +414,7 @@ QString deviceWidget::setOpenFileName()
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("Select firmware file"),
                                                     "",
-                                                    tr("Firmware Files (*.bin)"),
+                                                    tr("Firmware Files (*.bin *.opfw)"),
                                                     &selectedFilter,
                                                     options);
     return fileName;

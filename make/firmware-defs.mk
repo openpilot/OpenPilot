@@ -45,7 +45,7 @@ MSG_ASMFROMC         := ${quote} AS(C)     ${quote}
 MSG_ASMFROMC_ARM     := ${quote} AS(C)-ARM ${quote}
 MSG_PYMITEINIT       := ${quote} PY        ${quote}
 MSG_INSTALLING       := ${quote} INSTALL   ${quote}
-MSG_OPFIRMWARE       := ${quote} OPF       ${quote}
+MSG_OPFIRMWARE       := ${quote} OPFW      ${quote}
 MSG_FWINFO           := ${quote} FWINFO    ${quote}
 MSG_JTAG_PROGRAM     := ${quote} JTAG-PGM  ${quote}
 MSG_JTAG_WIPE        := ${quote} JTAG-WIPE ${quote}
@@ -111,7 +111,7 @@ endef
 #  $(1) = path to bin file
 #  $(2) = boardtype in hex
 #  $(3) = board revision in hex
-define OPF_TEMPLATE
+define OPFW_TEMPLATE
 $(1).firmwareinfo.c: $(1) $(TOP)/make/templates/firmwareinfotemplate.c
 	@echo $(MSG_FWINFO) $$(call toprel, $$@)
 	$(V1) python $(TOP)/make/scripts/version-info.py \
@@ -124,7 +124,7 @@ $(1).firmwareinfo.c: $(1) $(TOP)/make/templates/firmwareinfotemplate.c
 
 $(eval $(call COMPILE_C_TEMPLATE, $(1).firmwareinfo.c))
 
-$(OUTDIR)/$(notdir $(basename $(1))).opf : $(1) $(1).firmwareinfo.bin
+$(OUTDIR)/$(notdir $(basename $(1))).opfw : $(1) $(1).firmwareinfo.bin
 	@echo $(MSG_OPFIRMWARE) $$(call toprel, $$@)
 	$(V1) cat $(1) $(1).firmwareinfo.bin > $$@
 endef

@@ -320,8 +320,8 @@ uavobjects_clean:
 # $(2) = Name of board used in source tree (e.g. CopterControl)
 define FW_TEMPLATE
 .PHONY: $(1) fw_$(1)
-$(1): fw_$(1)_opf
-fw_$(1): fw_$(1)_opf
+$(1): fw_$(1)_opfw
+fw_$(1): fw_$(1)_opfw
 
 fw_$(1)_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/fw_$(1)/dep
@@ -364,7 +364,7 @@ endef
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
 define BU_TEMPLATE
 .PHONY: bu_$(1)
-bu_$(1): bu_$(1)_opf
+bu_$(1): bu_$(1)_opfw
 
 bu_$(1)_%: bl_$(1)_bino
 	$(V1) mkdir -p $(BUILD_DIR)/bu_$(1)/dep
@@ -413,7 +413,7 @@ BL_TARGETS := $(filter-out bl_ins, $(BL_TARGETS))
 BU_TARGETS := $(filter-out bu_ins, $(BU_TARGETS))
 
 .PHONY: all_fw all_fw_clean
-all_fw:        $(addsuffix _opf,   $(FW_TARGETS))
+all_fw:        $(addsuffix _opfw,  $(FW_TARGETS))
 all_fw_clean:  $(addsuffix _clean, $(FW_TARGETS))
 
 .PHONY: all_bl all_bl_clean
@@ -421,7 +421,7 @@ all_bl:        $(addsuffix _bin,   $(BL_TARGETS))
 all_bl_clean:  $(addsuffix _clean, $(BL_TARGETS))
 
 .PHONY: all_bu all_bu_clean
-all_bu:        $(addsuffix _opf,   $(BU_TARGETS))
+all_bu:        $(addsuffix _opfw,  $(BU_TARGETS))
 all_bu_clean:  $(addsuffix _clean, $(BU_TARGETS))
 
 .PHONY: all_flight all_flight_clean

@@ -112,7 +112,9 @@ endef
 #  $(2) = boardtype in hex
 #  $(3) = board revision in hex
 define OPFW_TEMPLATE
-$(1).firmwareinfo.c: $(1) $(TOP)/make/templates/firmwareinfotemplate.c
+FORCE:
+
+$(1).firmwareinfo.c: $(1) $(TOP)/make/templates/firmwareinfotemplate.c FORCE
 	@echo $(MSG_FWINFO) $$(call toprel, $$@)
 	$(V1) python $(TOP)/make/scripts/version-info.py \
 		--path=$(TOP) \

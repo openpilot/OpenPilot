@@ -45,4 +45,11 @@ SECTIONS
 
     . = ALIGN(4);
     _end = . ;
+
+    .boardinfo :
+    {
+	. = ALIGN(4);
+	KEEP(*(.boardinfo))
+	. = ALIGN(4);
+    } > BD_INFO
 }

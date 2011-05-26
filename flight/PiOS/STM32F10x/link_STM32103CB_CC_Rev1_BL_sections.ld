@@ -61,6 +61,12 @@ SECTIONS
     . = ALIGN(4);
     _end = . ;
 
+    .boardinfo :
+    {
+	. = ALIGN(4);
+	KEEP(*(.boardinfo))
+    } > BD_INFO
+
     /* Stabs debugging sections.  */
     .stab          0 : { *(.stab) }
     .stabstr       0 : { *(.stabstr) }

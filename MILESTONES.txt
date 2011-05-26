@@ -111,9 +111,9 @@ D: May 2011
 V: http://www.vimeo.com/23637586
 
 M: First CopterControl flight on a Flybarless Heli
-C: ?
-D: ?
-V: 
+C: Oleg Semyonov (Osnwt)
+D: May 2011
+V: http://www.youtube.com/watch?v=-J8cxqzxxWw
 
 M: First Y6 CopterControl flight
 C: ?

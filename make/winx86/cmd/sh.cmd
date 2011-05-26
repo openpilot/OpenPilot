@@ -53,7 +53,7 @@ set PATH_DIRS=
 call :which MSYSGIT       "%ProgramFiles%\Git\bin"       git.exe
 call :which QTMINGW       "C:\Qt\2010.05\mingw\bin"      mingw32-make.exe
 call :which QTSDK         "C:\Qt\2010.05\qt\bin"         qmake.exe
-call :which CODESOURCERY  "C:\CodeSourcery\bin"          cs-make.exe
+call :which CODESOURCERY  "%ProgramFiles%\CodeSourcery\Sourcery G++ Lite\bin" cs-make.exe
 call :which PYTHON        "C:\Python27"                  python.exe
 call :which UNSIS         "%ProgramFiles%\NSIS\Unicode"  makensis.exe
 call :which OPENOCDBIN    "C:\OpenOCD\0.4.0\bin"         openocd.exe

@@ -87,17 +87,29 @@ void EXTI9_5_IRQHandler(void)
 /**
 * Handle external line 4 interrupt requests
 */
-#if defined(PIOS_INCLUDE_USB)
+#if defined(PIOS_INCLUDE_IMU3000)
+extern void PIOS_IMU3000_IRQHandler();
+#endif
+
 void EXTI4_IRQHandler(void)
 {
+#if defined(PIOS_INCLUDE_USB)
 	if (EXTI_GetITStatus(PIOS_USB_DETECT_EXTI_LINE) != RESET) {
 		/* Clear the EXTI line pending bit */
 		EXTI_ClearITPendingBit(PIOS_USB_DETECT_EXTI_LINE);
 	}
-}
 #endif /* PIOS_INCLUDE_USB */
+#if defined (PIOS_INCLUDE_BMA180)
+	if (EXTI_GetITStatus(PIOS_BMA180_DRDY_EXTI_LINE) != RESET) {
+		PIOS_BMA180_IRQHandler();
+		EXTI_ClearITPendingBit(PIOS_BMA180_DRDY_EXTI_LINE);
+	}
+#endif
+}
 
+#if defined(PIOS_INCLUDE_IMU3000)
 extern void PIOS_IMU3000_IRQHandler();
+#endif
 void EXTI1_IRQHandler(void)
 {
 #if defined(PIOS_INCLUDE_IMU3000)

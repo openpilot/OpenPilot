@@ -42,6 +42,7 @@
 #define BMA_WE_ADDR       0x0D
 #define BMA_BW_ADDR       0x20
 #define BMA_RANGE_ADDR    0x35
+#define BMA_CTRREG3       0x21
 
 /* Accel range  */
 #define BMA_RANGE_MASK    0x0E          
@@ -68,6 +69,8 @@
 #define BMA_BW_HP1HZ      0x08		// High-pass, 1Hz
 #define BMA_BW_BP0_300HZ  0x09      // Band-pass, 0.3Hz-300Hz
 
+#define BMA_NEW_DAT_INT   0x02
+
 struct pios_bma180_data {
 	int16_t x;
 	int16_t y;
@@ -79,6 +82,7 @@ void PIOS_BMA180_Attach(uint32_t spi_id);
 void PIOS_BMA180_Init();
 int32_t PIOS_BMA180_ReadAccels(int16_t * data);
 int32_t PIOS_BMA180_Test();
+void PIOS_BMA180_IRQHandler(void);
 
 #endif /* PIOS_BMA180_H */
 

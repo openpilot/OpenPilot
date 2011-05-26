@@ -38,6 +38,47 @@ static int32_t PIOS_BMA180_GetReg(uint8_t reg);
 static int32_t PIOS_BMA180_SetReg(uint8_t reg, uint8_t data);
 static int32_t PIOS_BMA180_SelectBW(uint8_t bw);
 static int32_t PIOS_BMA180_SetRange(uint8_t range);
+static int32_t PIOS_BMA180_EnableIrq();
+volatile bool pios_bma180_data_ready = false;
+
+/**
+ * @brief Initialize with good default settings
+ */
+void PIOS_BMA180_Init()
+{
+	GPIO_InitTypeDef GPIO_InitStructure;
+	EXTI_InitTypeDef EXTI_InitStructure;
+	NVIC_InitTypeDef NVIC_InitStructure;
+	
+	/* Enable DRDY GPIO clock */
+	RCC_APB2PeriphClockCmd(PIOS_BMA180_DRDY_CLK | RCC_APB2Periph_AFIO, ENABLE);
+	
+	/* Configure EOC pin as input floating */
+	GPIO_InitStructure.GPIO_Pin = PIOS_BMA180_DRDY_GPIO_PIN;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_Init(PIOS_BMA180_DRDY_GPIO_PORT, &GPIO_InitStructure);
+	
+	/* Configure the End Of Conversion (EOC) interrupt */
+	GPIO_EXTILineConfig(PIOS_BMA180_DRDY_PORT_SOURCE, PIOS_BMA180_DRDY_PIN_SOURCE);
+	EXTI_InitStructure.EXTI_Line = PIOS_BMA180_DRDY_EXTI_LINE;
+	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
+	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStructure);
+	
+	/* Enable and set EOC EXTI Interrupt to the lowest priority */
+	NVIC_InitStructure.NVIC_IRQChannel = PIOS_BMA180_DRDY_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_BMA180_DRDY_PRIO;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+	
+	pios_bma180_data_ready = false;
+	
+	PIOS_BMA180_SelectBW(BMA_BW_150HZ);
+	PIOS_BMA180_SetRange(BMA_RANGE_8G);
+	PIOS_BMA180_EnableIrq();
+}
 
 /**
  * @brief Claim the SPI bus for the accel communications and select this chip
@@ -47,7 +88,7 @@ int32_t PIOS_BMA180_ClaimBus()
 {
 	if(PIOS_SPI_ClaimBus(PIOS_SPI_ACCEL) != 0)
 		return -1;
-	PIOS_BMA_ENABLE;
+	PIOS_BMA180_ENABLE;
 	return 0;
 }
 
@@ -57,7 +98,7 @@ int32_t PIOS_BMA180_ClaimBus()
  */
 int32_t PIOS_BMA180_ReleaseBus()
 {
-	PIOS_BMA_DISABLE;
+	PIOS_BMA180_DISABLE;
 	return PIOS_SPI_ReleaseBus(PIOS_SPI_ACCEL);
 }
 
@@ -128,23 +169,17 @@ static int32_t PIOS_BMA180_SetRange(uint8_t range)
 	return PIOS_BMA180_SetReg(BMA_RANGE_ADDR, reg);
 }
 
+static int32_t PIOS_BMA180_EnableIrq() 
+{
+	return PIOS_BMA180_SetReg(BMA_CTRREG3, BMA_NEW_DAT_INT);
+}
+
 /**
  * @brief Connect to the correct SPI bus
  */
 void PIOS_BMA180_Attach(uint32_t spi_id)
 {
 	PIOS_SPI_ACCEL = spi_id;
-}
-
-/**
- * @brief Initialize with good default settings
- */
-void PIOS_BMA180_Init()
-{
-	if(0){
-	PIOS_BMA180_SelectBW(BMA_BW_150HZ);
-	PIOS_BMA180_SetRange(BMA_RANGE_8G);
-	}
 }
 
 /**
@@ -197,12 +232,15 @@ int32_t PIOS_BMA180_Test()
 	// Read chip ID then version ID
 	uint8_t buf[3] = {0x80 | BMA_CHIPID_ADDR, 0, 0};
 	uint8_t rec[3] = {0,0, 0};
+	int32_t retval;
 
 	if(PIOS_BMA180_ClaimBus() != 0)
 		return -1;
-	if(PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,&buf[0],&rec[0],sizeof(buf),NULL) != 0)
-		return -2;
+	retval = PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,&buf[0],&rec[0],sizeof(buf),NULL);
 	PIOS_BMA180_ReleaseBus();
+	
+	if(retval != 0)
+		return -2;
 	
 	int16_t data[3];
 	if(PIOS_BMA180_ReadAccels(data) != 0)
@@ -215,6 +253,14 @@ int32_t PIOS_BMA180_Test()
 		return -5;
 
 	return 0;
+}
+
+/**
+ * @brief IRQ Handler
+ */
+void PIOS_BMA180_IRQHandler(void)
+{
+	pios_bma180_data_ready = true;
 }
 
 /**

@@ -207,8 +207,17 @@ extern uint32_t pios_com_aux_id;
 //------------------------
 // BMA180
 //------------------------
-#define PIOS_BMA_ENABLE                        PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,0)
-#define PIOS_BMA_DISABLE                       PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,1)
+#define PIOS_BMA180_ENABLE                      PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,0)
+#define PIOS_BMA180_DISABLE                     PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,1)
+#define PIOS_BMA180_DRDY_GPIO_PORT              GPIOC
+#define PIOS_BMA180_DRDY_GPIO_PIN               GPIO_Pin_4
+#define PIOS_BMA180_DRDY_PORT_SOURCE            GPIO_PortSourceGPIOC
+#define PIOS_BMA180_DRDY_PIN_SOURCE             GPIO_PinSource4
+#define PIOS_BMA180_DRDY_CLK                    RCC_APB2Periph_GPIOC
+#define PIOS_BMA180_DRDY_EXTI_LINE              EXTI_Line4
+#define PIOS_BMA180_DRDY_IRQn                   EXTI4_IRQn
+#define PIOS_BMA180_DRDY_PRIO                   PIOS_IRQ_PRIO_LOW
+
 
 //------------------------
 // PIOS_HMC5883

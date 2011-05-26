@@ -232,6 +232,11 @@ void PIOS_HMC5883_ReadMag(int16_t out[3])
 					    + buffer[2 * i + 1]) * 1000 / PIOS_HMC5883_Sensitivity_8_1Ga;
 		break;
 	}
+	
+	// Data reads out as X,Z,Y
+	int16_t temp = out[2];
+	out[2] = out[1];
+	out[1] = temp;
 }
 
 

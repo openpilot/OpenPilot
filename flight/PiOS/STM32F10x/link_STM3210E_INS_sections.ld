@@ -1,3 +1,5 @@
+_estack = 0x20004FF0;
+
 /* This is the size of the stack for early init and for all FreeRTOS IRQs */
 _irq_stack_size = 0x400;
 

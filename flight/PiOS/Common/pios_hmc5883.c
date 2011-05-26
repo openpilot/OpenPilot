@@ -357,8 +357,8 @@ int32_t PIOS_HMC5883_Test(void)
 	 uint8_t values[6];
 	 while (!PIOS_HMC5883_Read(PIOS_HMC5883_DATAOUT_XMSB_REG, values, 6)) ;
 	 int16_t x = (int16_t) (((uint16_t) values[0] << 8) + values[1]);
-	 int16_t y = (int16_t) (((uint16_t) values[2] << 8) + values[3]);
-	 int16_t z = (int16_t) (((uint16_t) values[4] << 8) + values[5]);
+	 int16_t z = (int16_t) (((uint16_t) values[2] << 8) + values[3]);
+	 int16_t y = (int16_t) (((uint16_t) values[4] << 8) + values[5]);
 
 	 if(abs(abs(x) - 766) > 20)
 		 passed &= 0;

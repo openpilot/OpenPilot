@@ -609,9 +609,9 @@ bool get_accel_gyro_data()
 	accel_data.filtered.x = accel[0] * 0.0025;
 	accel_data.filtered.y = accel[1] * 0.0025;
 	accel_data.filtered.z = accel[2] * 0.0025;
-	gyro_data.filtered.x = gyro[0] * 0.00763 * DEG_TO_RAD;;
-	gyro_data.filtered.y = gyro[1] * 0.00763 * DEG_TO_RAD;;
-	gyro_data.filtered.z = gyro[2] * 0.00763 * DEG_TO_RAD;;
+	gyro_data.filtered.x = -gyro[1] * 0.00763 * DEG_TO_RAD;;
+	gyro_data.filtered.y = -gyro[0] * 0.00763 * DEG_TO_RAD;;
+	gyro_data.filtered.z = -gyro[2] * 0.00763 * DEG_TO_RAD;;
 
 	
 	AttitudeRawData raw;

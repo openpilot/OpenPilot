@@ -132,8 +132,14 @@ static void PIOS_IMU3000_Config(PIOS_IMU3000_ConfigTypeDef * IMU3000_Config_Stru
  * \param[out] int16_t array of size 3 to store X, Z, and Y magnetometer readings
  * \returns The number of samples remaining in the fifo
 */
-uint8_t PIOS_IMU3000_ReadGyros(struct pios_imu3000_data * data)
+int32_t PIOS_IMU3000_ReadGyros(int16_t * data)
 {
+	uint8_t buf[6];
+	if(PIOS_IMU3000_Read(PIOS_IMU3000_GYRO_X_OUT_MSB, (uint8_t *) buf, sizeof(buf)) < 0)
+		return -1;
+	data[0] = buf[0] << 8 | buf[1];
+	data[1] = buf[2] << 8 | buf[3];
+	data[2] = buf[4] << 8 | buf[5];
 	return 0;
 }
 

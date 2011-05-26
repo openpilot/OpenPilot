@@ -149,11 +149,12 @@ void PIOS_BMA180_Init()
 
 /**
  * @brief Read a single set of values from the x y z channels
+ * @param[out] data Int16 array of (x,y,z) sensor values
  * @returns 0 if successful
  * @retval -1 unable to claim bus
  * @retval -2 unable to transfer data
  */
-int32_t PIOS_BMA180_Read(struct pios_bma180_data * data)
+int32_t PIOS_BMA180_ReadAccels(int16_t * data)
 {
 	// To save memory use same buffer for in and out but offset by
 	// a byte
@@ -167,9 +168,12 @@ int32_t PIOS_BMA180_Read(struct pios_bma180_data * data)
 	PIOS_BMA180_ReleaseBus();	
 	
 	//        |    MSB        |   LSB       | 0 | new_data |
-	data->x = ( (rec[2] << 8) | rec[1] ) / 4;
-	data->y = ( (rec[4] << 8) | rec[3] ) / 4;
-	data->z = ( (rec[6] << 8) | rec[5] ) / 4;
+	data[0] = (rec[2] << 8) | rec[1];
+	data[1] = (rec[4] << 8) | rec[3];
+	data[2] = (rec[6] << 8) | rec[5];
+	data[0] /= 4;
+	data[1] /= 4;
+	data[2] /= 4;
 	
 	return 0; // return number of remaining entries
 }
@@ -200,8 +204,8 @@ int32_t PIOS_BMA180_Test()
 		return -2;
 	PIOS_BMA180_ReleaseBus();
 	
-	struct pios_bma180_data data;
-	if(PIOS_BMA180_Read(&data) != 0)
+	int16_t data[3];
+	if(PIOS_BMA180_ReadAccels(data) != 0)
 		return -3;
 	
 	if(rec[1] != 0x3)

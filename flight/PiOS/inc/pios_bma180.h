@@ -77,7 +77,7 @@ struct pios_bma180_data {
 /* Public Functions */
 void PIOS_BMA180_Attach(uint32_t spi_id);
 void PIOS_BMA180_Init();
-int32_t PIOS_BMA180_Read(struct pios_bma180_data * data);
+int32_t PIOS_BMA180_ReadAccels(int16_t * data);
 int32_t PIOS_BMA180_Test();
 
 #endif /* PIOS_BMA180_H */

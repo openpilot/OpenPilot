@@ -119,7 +119,7 @@ struct pios_imu3000_data {
 /* Public Functions */
 extern void PIOS_IMU3000_Init(void);
 extern bool PIOS_IMU3000_NewDataAvailable(void);
-extern uint8_t PIOS_IMU3000_ReadGyros(struct pios_imu3000_data * data);
+extern int32_t PIOS_IMU3000_ReadGyros(int16_t * data);
 extern int32_t PIOS_IMU3000_ReadID();
 extern uint8_t PIOS_IMU3000_Test();
 

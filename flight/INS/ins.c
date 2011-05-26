@@ -553,11 +553,12 @@ int main()
 		// Get any mag data available
 		process_mag_data();
 
+		total_conversion_blocks++;
+		
 		counter_val = timer_count();
 		idle_counts = counter_val - last_counter_idle_start;
 		last_counter_idle_end = counter_val;
-
-
+		
 		if(ISNAN(accel_data.filtered.x + accel_data.filtered.y + accel_data.filtered.z) ||
 		   ISNAN(gyro_data.filtered.x + gyro_data.filtered.y + gyro_data.filtered.z) ||
 		   ACCEL_OOB(accel_data.filtered.x + accel_data.filtered.y + accel_data.filtered.z) ||
@@ -567,12 +568,12 @@ int main()
 			continue;
 		}
 
-		print_ekf_binary();
+//		print_ekf_binary();
 
 		/* If algorithm changed reinit.  This could go in callback but wouldn't be synchronous */
 		if (ahrs_algorithm != last_ahrs_algorithm)
-			ins_init_algorithm();
-		last_ahrs_algorithm = ahrs_algorithm;
+			ins_init_algorithm(); 
+		last_ahrs_algorithm = ahrs_algorithm; 
 
 		switch(ahrs_algorithm) {
 			case AHRSSETTINGS_ALGORITHM_SIMPLE:
@@ -603,20 +604,32 @@ bool get_accel_gyro_data()
 
 	PIOS_BMA180_ReadAccels(accel);
 	PIOS_IMU3000_ReadGyros(gyro);
+	
+	// Not the swaping of channel orders
+	accel_data.filtered.x = accel[0] * 0.0025;
+	accel_data.filtered.y = accel[1] * 0.0025;
+	accel_data.filtered.z = accel[2] * 0.0025;
+	gyro_data.filtered.x = gyro[0] * 0.00763 * DEG_TO_RAD;;
+	gyro_data.filtered.y = gyro[1] * 0.00763 * DEG_TO_RAD;;
+	gyro_data.filtered.z = gyro[2] * 0.00763 * DEG_TO_RAD;;
 
-	accel_data.raw.x = accel[0];
-	accel_data.raw.y = accel[1];
-	accel_data.raw.z = accel[2];
-	gyro_data.raw.x = gyro[0];
-	gyro_data.raw.y = gyro[1];
-	gyro_data.raw.z = gyro[2];
-	accel_data.filtered.x = accel[0];
-	accel_data.filtered.y = accel[1];
-	accel_data.filtered.z = accel[2];
-	gyro_data.filtered.x = gyro[0];
-	gyro_data.filtered.y = gyro[1];
-	gyro_data.filtered.z = gyro[2];
-
+	
+	AttitudeRawData raw;
+		
+	raw.gyros[0] = gyro_data.filtered.x * RAD_TO_DEG;
+	raw.gyros[1] = gyro_data.filtered.y * RAD_TO_DEG;
+	raw.gyros[2] = gyro_data.filtered.z * RAD_TO_DEG;
+	
+	raw.accels[0] = accel_data.filtered.x;
+	raw.accels[1] = accel_data.filtered.y;
+	raw.accels[2] = accel_data.filtered.z;
+	
+	raw.magnetometers[0] = mag_data.scaled.axis[0];
+	raw.magnetometers[1] = mag_data.scaled.axis[1];
+	raw.magnetometers[2] = mag_data.scaled.axis[2];
+	
+	AttitudeRawSet(&raw);
+	
 	return true;
 }
 
@@ -850,6 +863,8 @@ void reset_values()
 	mag_data.calibration.variance[0] = 50;
 	mag_data.calibration.variance[1] = 50;
 	mag_data.calibration.variance[2] = 50;
+	
+	ahrs_algorithm = AHRSSETTINGS_ALGORITHM_SIMPLE;
 }
 
 void send_attitude(void)

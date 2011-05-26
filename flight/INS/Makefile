@@ -86,7 +86,7 @@ OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 # use file-extension c for "c-only"-files
 
 ## INS:
-SRC = test.c
+SRC = ins.c
 SRC += pios_board.c
 SRC += ahrs_timer.c
 SRC += insgps13state.c

@@ -36,7 +36,7 @@
 #include <pios_spi_priv.h>
 
 /* SPI2 Interface
- *      - Used for mainboard communications and magnetometer
+ *      - Used for mainboard communications
  *
  * NOTE: Leave this declared as const data so that it ends up in the 
  * .rodata section (ie. Flash) rather than in the .bss section (RAM).

@@ -33,6 +33,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+/* 
+ TODO:
+  BMP085 - Pressure
+  IMU3000 interrupt
+  BMA180 interrupt
+ */
+
 /* OpenPilot Includes */
 #include "ins.h"
 #include "pios.h"
@@ -413,16 +420,29 @@ void print_ekf_binary() {}
 
 extern void PIOS_Board_Init(void);
 
-static void panic() 
+static void panic(int blinks) 
 {
+	int blinked = 0;
 	while(1) {
-		PIOS_LED_Toggle(LED2);
-		PIOS_DELAY_WaitmS(100);
+		blinked++;
+		if(blinked  > blinks) {
+			blinked = 0;
+			PIOS_DELAY_WaitmS(1000);
+		}			
+		PIOS_LED_On(LED2);
+		PIOS_DELAY_WaitmS(200);
+		PIOS_LED_Off(LED2);
+		PIOS_DELAY_WaitmS(200);
 	}
 }
 /**
  * @brief INS Main function
  */
+
+int16_t accel_data_glob[3];
+int16_t gyro_data_glob[3];
+int16_t mag_data_glob[3];
+
 int main()
 {	
 	gps_data.quality = -1;
@@ -450,26 +470,39 @@ int main()
 #endif
 	PIOS_LED_Off(LED1);
 	PIOS_LED_Off(LED2);
-	
+
+	// Sensors need a second to start
+	PIOS_DELAY_WaitmS(100);
 
 	// Sensor test
-	if(PIOS_IMU3000_Test() == 0)
-		panic();
+	if(PIOS_IMU3000_Test() != 0)
+		panic(1);
+	
+	if(PIOS_BMA180_Test() != 0)
+		panic(2);
 
-	/*
-	if(PIOS_BMA180_Test() == 0)
-		panic();
-
-	if(PIOS_HMC5883_Test() == 0)
-		panic();
+	if(PIOS_HMC5883_Test() != 0)
+		panic(3);	
 	
+	if(PIOS_BMP085_Test() != 0)
+		panic(4); 
 	
-	if(PIOS_BMP085_Test() == 0)
-		panic(); */
-	
-	//while(!AhrsLinkReady()) {
-	//	AhrsPoll();
-	//}
+	// Flash warning light while trying to connect
+	uint16_t time_val = PIOS_DELAY_GetuS();
+	uint16_t ms_count = 0;
+	extern int32_t PIOS_DELAY_DiffuS(uint16_t ref);
+	while(!AhrsLinkReady()) {
+		AhrsPoll();
+		if(PIOS_DELAY_DiffuS(time_val) > 10000) {
+			ms_count += 10;
+			time_val = PIOS_DELAY_GetuS();
+		}
+		if(ms_count > 100) {
+			PIOS_LED_Toggle(LED2);
+			ms_count = 0;
+		}
+	}
+	PIOS_LED_Off(LED2);
 
 	/* we didn't connect the callbacks before because we have to wait
 	for all data to be up to date before doing anything*/
@@ -565,24 +598,24 @@ int main()
  */
 bool get_accel_gyro_data()
 {
-	struct pios_bma180_data accel;
-	struct pios_imu3000_data gyro;
+	int16_t accel[3];
+	int16_t gyro[3];
 
-	PIOS_BMA180_Read(&accel);
-	PIOS_IMU3000_ReadGyros(&gyro);
+	PIOS_BMA180_ReadAccels(accel);
+	PIOS_IMU3000_ReadGyros(gyro);
 
-	accel_data.raw.x=accel.x;
-	accel_data.raw.y=accel.y;
-	accel_data.raw.z=accel.z;
-	gyro_data.raw.x=gyro.x;
-	gyro_data.raw.y=gyro.y;
-	gyro_data.raw.z=gyro.z;
-	accel_data.filtered.x = accel.x;
-	accel_data.filtered.y = accel.y;
-	accel_data.filtered.z = accel.z;
-	gyro_data.filtered.x = gyro.x;
-	gyro_data.filtered.y = gyro.y;
-	gyro_data.filtered.z = gyro.z;
+	accel_data.raw.x = accel[0];
+	accel_data.raw.y = accel[1];
+	accel_data.raw.z = accel[2];
+	gyro_data.raw.x = gyro[0];
+	gyro_data.raw.y = gyro[1];
+	gyro_data.raw.z = gyro[2];
+	accel_data.filtered.x = accel[0];
+	accel_data.filtered.y = accel[1];
+	accel_data.filtered.z = accel[2];
+	gyro_data.filtered.x = gyro[0];
+	gyro_data.filtered.y = gyro[1];
+	gyro_data.filtered.z = gyro[2];
 
 	return true;
 }

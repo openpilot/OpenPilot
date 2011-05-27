@@ -9,8 +9,12 @@ const struct pios_board_info __attribute__((__used__)) __attribute__((__section_
   .board_rev  = BOARD_REVISION,
   .bl_rev     = BOOTLOADER_VERSION,
   .hw_type    = HW_TYPE,
-  .fw_base    = START_OF_USER_CODE,
-  .fw_size    = SIZE_OF_CODE,
-  .desc_base  = START_OF_USER_CODE + SIZE_OF_CODE,
-  .desc_size  = SIZE_OF_DESCRIPTION,
+  .fw_base    = FW_BANK_BASE,
+  .fw_size    = FW_BANK_SIZE - FW_DESC_SIZE,
+  .desc_base  = FW_BANK_BASE + FW_BANK_SIZE - FW_DESC_SIZE,
+  .desc_size  = FW_DESC_SIZE,
+#ifdef EE_BANK_BASE
+  .ee_base    = EE_BANK_BASE,
+  .ee_size    = EE_BANK_SIZE,
+#endif
 };

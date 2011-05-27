@@ -62,7 +62,7 @@ const struct fw_version_info fw_version_blob __attribute__((used)) __attribute__
 	.timestamp = ${UNIXTIME},
 	.board_type = ${BOARD_TYPE},
 	.board_revision = ${BOARD_REVISION},
-	.commit_tag_name = "${TAG_OR_BRANCH}${DIRTY}",
+	.commit_tag_name = "${FWTAG}",
 	.sha1sum = { ${SHA1} },
 }; 
 

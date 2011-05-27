@@ -16,5 +16,7 @@ Symbols:
 
 Capital A = OpenPilot Logo
 Capital B = CC-BY-SA
+Capital B = CC-BY-NC-SA
+Capital D = RoHS
 
  

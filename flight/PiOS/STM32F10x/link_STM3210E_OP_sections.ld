@@ -158,20 +158,16 @@ PROVIDE ( SysTick         = (SCS_BASE + 0x0010) ) ;
 PROVIDE ( NVIC            = (SCS_BASE + 0x0100) ) ;
 PROVIDE ( SCB             = (SCS_BASE + 0x0D00) ) ;
 
+PROVIDE(pios_board_info_blob = ORIGIN(BD_INFO));
 
 /* Sections Definitions */
 
 SECTIONS
 {
-    .boardinfo :
-    {
-	. = ALIGN(4);
-	PROVIDE(pios_board_info_blob = .);
-    } > BD_INFO
-
     /* for Cortex devices, the beginning of the startup code is stored in the .isr_vector section, which goes to FLASH */
     .isr_vector :
     {
+        PROVIDE (pios_isr_vector_table_base = .);
         KEEP(*(.isr_vector))            /* Startup code */
         . = ALIGN(4);
     } >FLASH

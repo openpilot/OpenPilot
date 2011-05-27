@@ -268,8 +268,8 @@ static void manualControlTask(void *parameters)
 
 				// Set accessory channels
 				cmd.Accessory1 = (settings.Accessory1 != MANUALCONTROLSETTINGS_ACCESSORY1_NONE) ? scaledChannel[settings.Accessory1] : 0;
-				cmd.Accessory2 = (settings.Accessory1 != MANUALCONTROLSETTINGS_ACCESSORY2_NONE) ? scaledChannel[settings.Accessory2] : 0;
-				cmd.Accessory3 = (settings.Accessory1 != MANUALCONTROLSETTINGS_ACCESSORY3_NONE) ? scaledChannel[settings.Accessory3] : 0;
+				cmd.Accessory2 = (settings.Accessory2 != MANUALCONTROLSETTINGS_ACCESSORY2_NONE) ? scaledChannel[settings.Accessory2] : 0;
+				cmd.Accessory3 = (settings.Accessory3 != MANUALCONTROLSETTINGS_ACCESSORY3_NONE) ? scaledChannel[settings.Accessory3] : 0;
 
 				processFlightMode(&settings, flightMode);
 				processArm(&cmd, &settings);

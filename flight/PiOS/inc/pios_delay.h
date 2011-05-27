@@ -36,6 +36,8 @@
 extern int32_t PIOS_DELAY_Init(void);
 extern int32_t PIOS_DELAY_WaituS(uint16_t uS);
 extern int32_t PIOS_DELAY_WaitmS(uint16_t mS);
+extern uint16_t PIOS_DELAY_GetuS();
+extern int32_t PIOS_DELAY_DiffuS(uint16_t ref);
 
 #endif /* PIOS_DELAY_H */
 

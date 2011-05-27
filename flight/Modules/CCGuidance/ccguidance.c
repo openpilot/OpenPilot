@@ -203,10 +203,10 @@ static void ccguidanceTask(void *parameters)
 
 				/* 2. Heading */
 				courseError = sphereCourse(
-					positionActual.Latitude,
-					positionActual.Longitude,
-					positionDesired.North,
-					positionDesired.East
+					positionActual.Latitude * 1e-7,
+					positionActual.Longitude * 1e-7,
+					positionDesired.North * 1e-7,
+					positionDesired.East * 1e-7
 					) - positionActual.Heading;
 				if (courseError<-180.) courseError+=360.;
 				if (courseError>180.) courseError-=360.;

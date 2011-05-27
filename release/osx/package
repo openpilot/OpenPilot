@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# the following environment variables must be set
+: ${ROOT_DIR?} ${BUILD_DIR?} ${RELEASE_LBL?} ${RELEASE_DIR?} ${FW_DIR?}
+
+# more variables
+APP_PATH="${BUILD_DIR}/ground/openpilotgcs/bin/OpenPilot GCS.app"
+TEMP_FILE="${RELEASE_DIR}/OpenPilot-temp.dmg"
+OUT_FILE="${RELEASE_DIR}/OpenPilot-${RELEASE_LBL}.dmg"
+VOL_NAME="OpenPilot"
+
+# prepare the stage
+rm -f "${TEMP_FILE}"
+rm -f "${OUT_FILE}"
+
+hdiutil convert "${ROOT_DIR}/release/osx/OpenPilot.dmg" \
+	-format UDRW -o "${TEMP_FILE}"
+device=$(hdiutil attach  "${TEMP_FILE}" | \
+         egrep '^/dev/' | sed 1q | awk '{print $1}')
+
+# packaging goes here
+cp -r "${APP_PATH}" "/Volumes/${VOL_NAME}"
+cp -r "${FW_DIR}" "/Volumes/${VOL_NAME}/firmware"
+
+"${ROOT_DIR}/release/osx/libraries" \
+	"/Volumes/${VOL_NAME}/OpenPilot GCS.app" || exit 1
+
+hdiutil detach ${device}
+hdiutil convert "${TEMP_FILE}" -format UDZO -o "${OUT_FILE}"
+
+# cleanup
+rm "${TEMP_FILE}"

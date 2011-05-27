@@ -36,6 +36,7 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 #include <QMessageBox>
+#include <QSignalMapper>
 
 ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
@@ -94,29 +95,18 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
             << m_config->ch6Rev
             << m_config->ch7Rev;
 
-	links << m_config->ch0Link
-			<< m_config->ch1Link
-			<< m_config->ch2Link
-			<< m_config->ch3Link
-			<< m_config->ch4Link
-			<< m_config->ch5Link
-			<< m_config->ch6Link
-			<< m_config->ch7Link;
+    links << m_config->ch0Link
+              << m_config->ch1Link
+              << m_config->ch2Link
+              << m_config->ch3Link
+              << m_config->ch4Link
+              << m_config->ch5Link
+              << m_config->ch6Link
+              << m_config->ch7Link;
 
-	UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
-    QList<UAVObjectField*> fieldList = obj->getFields();
-    foreach (UAVObjectField* field, fieldList) {
-        if (field->getUnits().contains("channel")) {
-            m_config->ch0Output->addItem(field->getName());
-            m_config->ch1Output->addItem(field->getName());
-            m_config->ch2Output->addItem(field->getName());
-            m_config->ch3Output->addItem(field->getName());
-            m_config->ch4Output->addItem(field->getName());
-            m_config->ch5Output->addItem(field->getName());
-            m_config->ch6Output->addItem(field->getName());
-            m_config->ch7Output->addItem(field->getName());
-        }
-    }
+    // Register for ActuatorSettings changes:
+    UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
+    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(requestRCOutputUpdate()));
 
 
     for (int i = 0; i < 8; i++) {
@@ -138,6 +128,9 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 
     connect(m_config->saveRCOutputToSD, SIGNAL(clicked()), this, SLOT(saveRCOutputObject()));
     connect(m_config->saveRCOutputToRAM, SIGNAL(clicked()), this, SLOT(sendRCOutputUpdate()));
+
+    // Actually, this is not really needed since we are subscribing to the object updates already
+    // TODO: remove those buttons on all config gadget panels.
     connect(m_config->getRCOutputCurrent, SIGNAL(clicked()), this, SLOT(requestRCOutputUpdate()));
 
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestRCOutputUpdate()));
@@ -160,6 +153,21 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
             connect(tm, SIGNAL(disconnected()), this, SLOT(onTelemetryDisconnect()));
         }
     }
+
+    // Connect all the help buttons to signal mapper that passes button name to SLOT function
+    QSignalMapper* signalMapper = new QSignalMapper(this);
+    connect( m_config->channelRateHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
+    signalMapper->setMapping(m_config->channelRateHelp, m_config->channelRateHelp->objectName());
+    connect( m_config->channelValuesHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
+    signalMapper->setMapping(m_config->channelValuesHelp, m_config->channelValuesHelp->objectName());
+    connect( m_config->spinningArmedlHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
+    signalMapper->setMapping(m_config->spinningArmedlHelp, m_config->spinningArmedlHelp->objectName());
+    connect( m_config->testOutputsHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
+    signalMapper->setMapping(m_config->testOutputsHelp, m_config->testOutputsHelp->objectName());
+    connect( m_config->commandHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
+    signalMapper->setMapping(m_config->commandHelp, QString("commandHelp"));
+
+    connect(signalMapper, SIGNAL(mapped(const QString &)), parent, SLOT(showHelp(const QString &)));
 }
 
 ConfigOutputWidget::~ConfigOutputWidget()
@@ -292,7 +300,7 @@ void ConfigOutputWidget::runChannelTests(bool state)
 }
 
 /**
-  * Set the dropdown option for a channel output assignement
+  * Set the label for a channel output assignement
   */
 void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString str)
 {
@@ -300,28 +308,28 @@ void ConfigOutputWidget::assignOutputChannel(UAVDataObject *obj, QString str)
     QStringList options = field->getOptions();
     switch (options.indexOf(field->getValue().toString())) {
     case 0:
-        m_config->ch0Output->setCurrentIndex(m_config->ch0Output->findText(str));
+        m_config->ch0Output->setText(str);
         break;
     case 1:
-        m_config->ch1Output->setCurrentIndex(m_config->ch1Output->findText(str));
+        m_config->ch1Output->setText(str);
         break;
     case 2:
-        m_config->ch2Output->setCurrentIndex(m_config->ch2Output->findText(str));
+        m_config->ch2Output->setText(str);
         break;
     case 3:
-        m_config->ch3Output->setCurrentIndex(m_config->ch3Output->findText(str));
+        m_config->ch3Output->setText(str);
         break;
     case 4:
-        m_config->ch4Output->setCurrentIndex(m_config->ch4Output->findText(str));
+        m_config->ch4Output->setText(str);
         break;
     case 5:
-        m_config->ch5Output->setCurrentIndex(m_config->ch5Output->findText(str));
+        m_config->ch5Output->setText(str);
         break;
     case 6:
-        m_config->ch6Output->setCurrentIndex(m_config->ch6Output->findText(str));
+        m_config->ch6Output->setText(str);
         break;
     case 7:
-        m_config->ch7Output->setCurrentIndex(m_config->ch7Output->findText(str));
+        m_config->ch7Output->setText(str);
         break;
     }
 }
@@ -405,19 +413,18 @@ void ConfigOutputWidget::requestRCOutputUpdate()
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
     // Reset all channel assignements:
-    m_config->ch0Output->setCurrentIndex(0);
-    m_config->ch1Output->setCurrentIndex(0);
-    m_config->ch2Output->setCurrentIndex(0);
-    m_config->ch3Output->setCurrentIndex(0);
-    m_config->ch4Output->setCurrentIndex(0);
-    m_config->ch5Output->setCurrentIndex(0);
-    m_config->ch6Output->setCurrentIndex(0);
-    m_config->ch7Output->setCurrentIndex(0);
+    m_config->ch0Output->setText("-");
+    m_config->ch1Output->setText("-");
+    m_config->ch2Output->setText("-");
+    m_config->ch3Output->setText("-");
+    m_config->ch4Output->setText("-");
+    m_config->ch5Output->setText("-");
+    m_config->ch6Output->setText("-");
+    m_config->ch7Output->setText("-");
 
     // Get the channel assignements:
     UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
     Q_ASSERT(obj);
-    obj->requestUpdate();
     QList<UAVObjectField*> fieldList = obj->getFields();
     foreach (UAVObjectField* field, fieldList) {
         if (field->getUnits().contains("channel")) {
@@ -525,56 +532,8 @@ void ConfigOutputWidget::sendRCOutputUpdate()
     field->setValue(m_config->outputRate3->value(),2);
     field->setValue(m_config->outputRate4->value(),3);
 
-    // Set Actuator assignement for each channel:
-    // Rule: if two channels have the same setting (which is wrong!) the higher channel
-    // will get the setting.
-
-    // First, reset all channel assignements:
-    QList<UAVObjectField*> fieldList = obj->getFields();
-    foreach (UAVObjectField* field, fieldList) {
-        // NOTE: we assume that all options in ActuatorSettings are a channel assignement
-        // except for the options called "ChannelXXX"
-        if (field->getUnits().contains("channel")) {
-            field->setValue(field->getOptions().last());
-        }
-    }
-
-    if (m_config->ch0Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch0Output->currentText());
-        field->setValue(field->getOptions().at(0)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch1Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch1Output->currentText());
-        field->setValue(field->getOptions().at(1)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch2Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch2Output->currentText());
-        field->setValue(field->getOptions().at(2)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch3Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch3Output->currentText());
-        field->setValue(field->getOptions().at(3)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch4Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch4Output->currentText());
-        field->setValue(field->getOptions().at(4)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch5Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch5Output->currentText());
-        field->setValue(field->getOptions().at(5)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch6Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch6Output->currentText());
-        field->setValue(field->getOptions().at(6)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch7Output->currentIndex() != 0) {
-        field = obj->getField(m_config->ch7Output->currentText());
-        field->setValue(field->getOptions().at(7)); // -> This way we don't depend on channel naming convention
-    }
-
     // ... and send to the OP Board
     obj->updated();
-
 
 }
 

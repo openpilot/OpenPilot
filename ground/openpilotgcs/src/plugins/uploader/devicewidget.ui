@@ -137,19 +137,36 @@
        </item>
       </layout>
      </item>
-     <item row="3" column="0" colspan="2">
-      <widget class="QLabel" name="buildDate">
-       <property name="text">
-        <string>Build Date</string>
-       </property>
-      </widget>
-     </item>
      <item row="6" column="0">
       <widget class="QLabel" name="commitTag">
        <property name="text">
         <string>Commit tag</string>
        </property>
       </widget>
+     </item>
+     <item row="3" column="0" colspan="2">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLabel" name="certifiedFW">
+         <property name="text">
+          <string>certified</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="buildDate">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>buildDate</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

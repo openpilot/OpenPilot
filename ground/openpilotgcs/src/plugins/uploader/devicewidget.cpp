@@ -42,6 +42,8 @@ deviceWidget::deviceWidget(QWidget *parent) :
 
     QPixmap pix = QPixmap(QString(":uploader/images/view-refresh.svg"));
     myDevice->statusIcon->setPixmap(pix);
+
+    myDevice->certifiedFW->setText("");
 }
 
 
@@ -123,6 +125,9 @@ void deviceWidget::populate()
         QString str = m_dfu->DownloadDescription(size);
         myDevice->description->setMaxLength(size);
         myDevice->description->setText(str.left(str.indexOf(QChar(255))));
+        QPixmap pix = QPixmap(QString(":uploader/images/gtk-info.svg"));
+        myDevice->certifiedFW->setPixmap(pix);
+        myDevice->certifiedFW->setToolTip(tr("Custom Firmware Build"));
         myDevice->buildDate->setText("Warning: development firmware");
         myDevice->commitTag->setText("");
     }
@@ -182,6 +187,9 @@ bool deviceWidget::populateStructuredDescription(QByteArray desc)
         QString dscText = QString(desc.mid(14,26));
         myDevice->description->setText(dscText);
 
+        QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
+        myDevice->certifiedFW->setPixmap(pix);
+        myDevice->certifiedFW->setToolTip(tr("Official Firmware Build"));
         return true;
     }
 
@@ -269,7 +277,6 @@ void deviceWidget::uploadFirmware()
             status("Error: firmware does not match board", STATUSICON_FAIL);
             return;
         }
-
         // Check the firmware embedded in the file:
         QByteArray firmwareHash = desc.mid(40,20);
         QByteArray fileHash = QCryptographicHash::hash(arr.left(arr.length()-100), QCryptographicHash::Sha1);
@@ -277,16 +284,11 @@ void deviceWidget::uploadFirmware()
             status("Error: firmware file corrupt", STATUSICON_FAIL);
             return;
         }
-
-
-
     } else {
         // The firmware is not packaged, just upload the text in the description field
         // if it is there.
         descriptionArray.clear();
     }
-
-
 
 
     status("Starting firmware upload", STATUSICON_RUNNING);
@@ -412,7 +414,7 @@ QString deviceWidget::setOpenFileName()
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("Select firmware file"),
                                                     "",
-                                                    tr("Firmware Files (*.bin)"),
+                                                    tr("Firmware Files (*.bin *.opfw)"),
                                                     &selectedFilter,
                                                     options);
     return fileName;

@@ -49,7 +49,9 @@ OPMapGadgetOptionsPage::OPMapGadgetOptionsPage(OPMapGadgetConfiguration *config,
 
 QWidget *OPMapGadgetOptionsPage::createPage(QWidget *parent)
 {
-    m_page = new Ui::OPMapGadgetOptionsPage();
+	int index;
+
+	m_page = new Ui::OPMapGadgetOptionsPage();
     QWidget *w = new QWidget(parent);
     m_page->setupUi(w);
 
@@ -61,9 +63,22 @@ QWidget *OPMapGadgetOptionsPage::createPage(QWidget *parent)
     m_page->accessModeComboBox->clear();
     m_page->accessModeComboBox->addItems(mapcontrol::Helper::AccessModeTypes());
 
-    int index = m_page->providerComboBox->findText(m_config->mapProvider());
-    index = (index >= 0) ? index : 0;
-    m_page->providerComboBox->setCurrentIndex(index);
+	index = m_page->providerComboBox->findText(m_config->mapProvider());
+	index = (index >= 0) ? index : 0;
+	m_page->providerComboBox->setCurrentIndex(index);
+
+	// populate the map max update rate combobox
+	m_page->maxUpdateRateComboBox->clear();
+	m_page->maxUpdateRateComboBox->addItem("100ms", 100);
+	m_page->maxUpdateRateComboBox->addItem("200ms", 200);
+	m_page->maxUpdateRateComboBox->addItem("500ms", 500);
+	m_page->maxUpdateRateComboBox->addItem("1 sec", 1000);
+	m_page->maxUpdateRateComboBox->addItem("2 sec", 2000);
+	m_page->maxUpdateRateComboBox->addItem("5 sec", 5000);
+
+	index = m_page->maxUpdateRateComboBox->findData(m_config->maxUpdateRate());
+	index = (index >= 0) ? index : 4;
+	m_page->maxUpdateRateComboBox->setCurrentIndex(index);
 
     m_page->zoomSpinBox->setValue(m_config->zoom());
     m_page->latitudeSpinBox->setValue(m_config->latitude());
@@ -125,6 +140,7 @@ void OPMapGadgetOptionsPage::apply()
     m_config->setUseMemoryCache(m_page->checkBoxUseMemoryCache->isChecked());
     m_config->setCacheLocation(m_page->lineEditCacheLocation->path());
     m_config->setUavSymbol(m_page->uavSymbolComboBox->itemData(m_page->uavSymbolComboBox->currentIndex()).toString());
+	m_config->setMaxUpdateRate(m_page->maxUpdateRateComboBox->itemData(m_page->maxUpdateRateComboBox->currentIndex()).toInt());
 }
 
 void OPMapGadgetOptionsPage::finish()

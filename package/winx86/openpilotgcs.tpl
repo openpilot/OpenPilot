@@ -12,10 +12,10 @@
 #
 
 ; Some names, paths and constants
-!define RELEASE_LBL "${DATE}-${TAG_OR_HASH8}${DIRTY}"
-!define RELEASE_DIR "..\..\build\release-$${RELEASE_LBL}"
-!define OUT_FILE "OpenPilot-$${RELEASE_LBL}-install.exe"
-!define FIRMWARE_DIR "firmware-$${RELEASE_LBL}"
+!define PACKAGE_LBL "${DATE}-${TAG_OR_HASH8}${DIRTY}"
+!define PACKAGE_DIR "..\..\build\package-$${PACKAGE_LBL}"
+!define OUT_FILE "OpenPilot-$${PACKAGE_LBL}-install.exe"
+!define FIRMWARE_DIR "firmware-$${PACKAGE_LBL}"
 
 ; Installer version info
 !define PRODUCT_VERSION "0.0.0.0"

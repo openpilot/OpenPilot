@@ -14,9 +14,9 @@ ROOT_DIR := $(realpath $(WHEREAMI)/../)
 # Set up some macros
 BUILD_DIR    := $(ROOT_DIR)/build
 VERSION_CMD  := python $(ROOT_DIR)/make/scripts/version-info.py --path="$(ROOT_DIR)"
-RELEASE_LBL  := $(shell $(VERSION_CMD) --format=\$${DATE}-\$${TAG_OR_HASH8}\$${DIRTY})
-RELEASE_DIR  := $(BUILD_DIR)/release-$(RELEASE_LBL)
-FW_DIR       := $(RELEASE_DIR)/firmware-$(RELEASE_LBL)
+PACKAGE_LBL  := $(shell $(VERSION_CMD) --format=\$${DATE}-\$${TAG_OR_HASH8}\$${DIRTY})
+PACKAGE_DIR  := $(BUILD_DIR)/package-$(PACKAGE_LBL)
+FW_DIR       := $(PACKAGE_DIR)/firmware-$(PACKAGE_LBL)
 BL_DIR       := $(FW_DIR)/bootloaders
 BU_DIR       := $(FW_DIR)/bootloader-updaters
 FE_DIR       := $(FW_DIR)/flash-erase-tools
@@ -52,11 +52,11 @@ help:
 	@echo "   Here is a summary of the available targets:"
 	@echo
 	@echo "   [Packaging]"
-	@echo "     release        - Build and package the OpenPilot distributable"
-	@echo "     release_flight - Build and package the OpenPilot flight firmware only"
+	@echo "     package        - Build and package the OpenPilot distributable"
+	@echo "     package_flight - Build and package the OpenPilot flight firmware only"
 	@echo
 	@echo "   Notes:"
-	@echo "     - package will be placed in $(RELEASE_DIR)"
+	@echo "     - package will be placed in $(PACKAGE_DIR)"
 	@echo
 	@echo "     - the build directory will be removed first on every run unless one"
 	@echo "       of CLEAN_BUILD=NO or CLEAN_BUILD=NEVER options is defined."
@@ -101,19 +101,19 @@ endif
 endef
 
 # Firmware for different input drivers
-$(eval $(call INSTALL_TEMPLATE,fw_common,uavobjects,$(FW_DIR),,-$(RELEASE_LBL),,,$(FW_TARGETS_COMMON),install))
-$(eval $(call INSTALL_TEMPLATE,fw_pwm,uavobjects,$(FW_DIR),,-pwm-$(RELEASE_LBL),,clean,$(FW_TARGETS_INPUT),install))
-$(eval $(call INSTALL_TEMPLATE,fw_spektrum,uavobjects,$(FW_DIR),,-spektrum-$(RELEASE_LBL),USE_SPEKTRUM=YES,clean,$(FW_TARGETS_INPUT),install))
-$(eval $(call INSTALL_TEMPLATE,fw_ppm,uavobjects,$(FW_DIR),,-ppm-$(RELEASE_LBL),USE_PPM=YES,clean,$(FW_TARGETS_INPUT),install))
+$(eval $(call INSTALL_TEMPLATE,fw_common,uavobjects,$(FW_DIR),,-$(PACKAGE_LBL),,,$(FW_TARGETS_COMMON),install))
+$(eval $(call INSTALL_TEMPLATE,fw_pwm,uavobjects,$(FW_DIR),,-pwm-$(PACKAGE_LBL),,clean,$(FW_TARGETS_INPUT),install))
+$(eval $(call INSTALL_TEMPLATE,fw_spektrum,uavobjects,$(FW_DIR),,-spektrum-$(PACKAGE_LBL),USE_SPEKTRUM=YES,clean,$(FW_TARGETS_INPUT),install))
+$(eval $(call INSTALL_TEMPLATE,fw_ppm,uavobjects,$(FW_DIR),,-ppm-$(PACKAGE_LBL),USE_PPM=YES,clean,$(FW_TARGETS_INPUT),install))
 
 # Bootloaders (change 'install' to 'bin' if you don't want to install bootloaders)
-$(eval $(call INSTALL_TEMPLATE,all_bl,uavobjects,$(BL_DIR),,-$(RELEASE_LBL),,,$(BL_TARGETS),install))
+$(eval $(call INSTALL_TEMPLATE,all_bl,uavobjects,$(BL_DIR),,-$(PACKAGE_LBL),,,$(BL_TARGETS),install))
 
 # Bootloader updaters
-$(eval $(call INSTALL_TEMPLATE,all_bu,all_bl,$(BU_DIR),,-$(RELEASE_LBL),,,$(BU_TARGETS),install))
+$(eval $(call INSTALL_TEMPLATE,all_bu,all_bl,$(BU_DIR),,-$(PACKAGE_LBL),,,$(BU_TARGETS),install))
 
 # CopterControl flash eraser tool
-$(eval $(call INSTALL_TEMPLATE,fw_tools,uavobjects,$(FE_DIR),,-flash-erase-$(RELEASE_LBL),ERASE_FLASH=YES,clean,$(FW_TARGETS_TOOLS),install))
+$(eval $(call INSTALL_TEMPLATE,fw_tools,uavobjects,$(FE_DIR),,-flash-erase-$(PACKAGE_LBL),ERASE_FLASH=YES,clean,$(FW_TARGETS_TOOLS),install))
 
 # Order-only dependencies
 # They are bit complicated to support parallel (-j) builds and to create
@@ -127,17 +127,17 @@ fw_ppm: | fw_spektrum   # ordered build
 
 fw_tools: | fw_spektrum # ordered build, replace fw_spektrum by fw_ppm if uncommented below
 
-release_fw: | fw_common fw_pwm fw_spektrum # fw_ppm
+package_fw: | fw_common fw_pwm fw_spektrum # fw_ppm
 
-release_bu: | all_bu
+package_bu: | all_bu
 
-release_flight: | release_fw release_bu fw_tools
+package_flight: | package_fw package_bu fw_tools
 
-release_ground: | ground_package
+package_ground: | ground_package
 
-release: | release_flight release_ground
+package: | package_flight package_ground
 
-.PHONY: help uavobjects all_clean release release_flight release_fw release_bu release_ground
+.PHONY: help uavobjects all_clean package package_flight package_fw package_bu package_ground
 
 # Decide on a verbosity level based on the V= parameter
 export AT := @

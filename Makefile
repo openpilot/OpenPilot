@@ -457,9 +457,9 @@ sim_win32_%: uavobjects_flight
 
 ##############################
 #
-# Release packaging components
+# Packaging components
 #
 ##############################
-.PHONY: release
-release:
+.PHONY: package
+package:
 	$(V1) cd $@ && $(MAKE) --no-print-directory $@

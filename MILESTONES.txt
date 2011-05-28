@@ -112,17 +112,18 @@ C: Oleg Semyonov (osnwt)
 D: May 2011
 V: http://www.youtube.com/watch?v=-J8cxqzxxWw
 
-M: First Y6 CopterControl flight
-C: ?
-D: ?
-V:
+M: First V8 Octo OpenPilot flight
+C: Sami Korhonen (Sambas)
+D: May 2011
+V: http://vimeo.com/24258192
+
 
 
 
 An incomplete list of some future Milestones is below:
 
+* First Y6 CopterControl flight
 * First Helicopter flight with OpenPilot
-* First Octo flight with OpenPilot
 * First successful flight using the GCS only and no RC TX
 * First use of Magic Waypoint
 * First Flybarless Helicopter flight with OpenPilot

@@ -114,6 +114,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
     splitter->setCollapsible(0, false);
     splitter->setCollapsible(1, false);
     pageTree->header()->setVisible(false);
+//    pageTree->setIconSize(QSize(24, 24));
 
     connect(pageTree, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
         this, SLOT(pageSelected()));
@@ -150,6 +151,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
                 }
             }
             categoryItem = new QTreeWidgetItem(pageTree);
+            categoryItem->setIcon(0, page->icon());
             categoryItem->setText(0, trCategories);
             categoryItem->setData(0, Qt::UserRole, qVariantFromValue(pageData));
             categories.insert(currentCategory, categoryItem);

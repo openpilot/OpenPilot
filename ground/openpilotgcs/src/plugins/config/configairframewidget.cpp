@@ -1547,7 +1547,7 @@ bool ConfigAirframeWidget::setupMixer(double mixerFactors[8][3])
             setupQuadMotor(channel, mixerFactors[i][0]*pFactor,
                        rFactor*mixerFactors[i][1], yFactor*mixerFactors[i][2]);
     }
-    obj->updated();
+    // obj->updated(); // Let caller do this...
     return true;
 }
 
@@ -1591,7 +1591,7 @@ void ConfigAirframeWidget::setupMotors(QList<QString> motorList)
         field = obj->getField(motor);
         field->setValue(mmList.takeFirst()->currentText());
     }
-    obj->updated(); // Save...
+    // obj->updated(); // Do not Save, let the caller do it...
 }
 
 
@@ -2051,12 +2051,10 @@ void ConfigAirframeWidget::sendAircraftUpdate()
             }
             obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
             Q_ASSERT(obj);
-            field = obj->getField("FixedWingYaw1");
-            field->setValue(m_aircraft->triYawChannel->currentText());
-            // No need to send a obj->updated() here because setupMotors
-            // will do it.
             motorList << "VTOLMotorNW" << "VTOLMotorNE" << "VTOLMotorS";
             setupMotors(motorList);
+            field = obj->getField("FixedWingYaw1");
+            field->setValue(m_aircraft->triYawChannel->currentText());
 
             // Motor 1 to 6, Y6 Layout:
             //     pitch   roll    yaw
@@ -2135,10 +2133,18 @@ void ConfigAirframeWidget::sendAircraftUpdate()
             field->setValue(m_aircraft->customMixerTable->item(5,i)->text(),ti);
         }
 
-        obj->updated();
+        // obj->updated();
     }
 
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
+    Q_ASSERT(obj);
+    obj->updated();
+
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(obj);
+    obj->updated();
+
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
     UAVObjectField* field = obj->getField(QString("AirframeType"));
     field->setValue(airframeType);
     obj->updated();

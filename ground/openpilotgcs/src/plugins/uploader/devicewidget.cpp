@@ -168,17 +168,18 @@ bool deviceWidget::populateStructuredDescription(QByteArray desc)
         #  20 bytes: SHA1 sum of the firmware.
         #  40 bytes: free for now.
         */
-        // I don't want to use structs, ok ?
-        quint32 gitCommitTag = desc.at(4)&0xFF;
+
+        // Note: the ARM binary is big-endian:
+        quint32 gitCommitTag = desc.at(7)&0xFF;
         for (int i=1;i<4;i++) {
             gitCommitTag = gitCommitTag<<8;
-            gitCommitTag += desc.at(4+i) & 0xFF;
+            gitCommitTag += desc.at(7-i) & 0xFF;
         }
         myDevice->commitTag->setText("GIT tag 0x" + QString::number(gitCommitTag,16));
-        quint32 buildDate = desc.at(8)&0xFF;
+        quint32 buildDate = desc.at(11)&0xFF;
         for (int i=1;i<4;i++) {
             buildDate = buildDate<<8;
-            buildDate += desc.at(8+i) & 0xFF;
+            buildDate += desc.at(11-i) & 0xFF;
         }
 
         myDevice->buildDate->setText(QString("Build time: ") + QDateTime::fromTime_t(buildDate).toString());

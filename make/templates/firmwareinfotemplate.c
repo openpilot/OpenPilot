@@ -38,7 +38,7 @@
  *   4 bytes: GIT commit tag (short version of SHA1).
  *   4 bytes: Unix timestamp of compile time.
  *   2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
- *  26 bytes: commit tag if it is there, otherwise branch name. Zero-padded.
+ *  26 bytes: commit tag if it is there, otherwise branch name. '-dirty' may be added if needed. Zero-padded.
  *  ---- 40 bytes limit ---
  *  20 bytes: SHA1 sum of the firmware.
  *  40 bytes: free for now.
@@ -62,7 +62,7 @@ const struct fw_version_info fw_version_blob __attribute__((used)) __attribute__
 	.timestamp = ${UNIXTIME},
 	.board_type = ${BOARD_TYPE},
 	.board_revision = ${BOARD_REVISION},
-	.commit_tag_name = "${TAG_OR_BRANCH}",
+	.commit_tag_name = "${FWTAG}",
 	.sha1sum = { ${SHA1} },
 }; 
 

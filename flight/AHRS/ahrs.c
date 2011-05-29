@@ -33,6 +33,7 @@
 
 /* OpenPilot Includes */
 #include "ahrs.h"
+#include <pios_board_info.h>
 #include "pios.h"
 #include "ahrs_timer.h"
 #include "ahrs_spi_comm.h"
@@ -1228,6 +1229,8 @@ void homelocation_callback(AhrsObjHandle obj)
 
 void firmwareiapobj_callback(AhrsObjHandle obj) 
 {
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+
 	FirmwareIAPObjData firmwareIAPObj;
 	FirmwareIAPObjGet(&firmwareIAPObj);
 	if(firmwareIAPObj.ArmReset==0)
@@ -1235,7 +1238,7 @@ void firmwareiapobj_callback(AhrsObjHandle obj)
 	if(firmwareIAPObj.ArmReset==1)
 	{
 
-		if((firmwareIAPObj.BoardType==BOARD_TYPE) || (firmwareIAPObj.BoardType==0xFF))
+		if((firmwareIAPObj.BoardType==bdinfo->board_type) || (firmwareIAPObj.BoardType==0xFF))
 		{
 
 			++reset_count;
@@ -1247,11 +1250,11 @@ void firmwareiapobj_callback(AhrsObjHandle obj)
 			}
 		}
 	}
-	else if(firmwareIAPObj.BoardType==BOARD_TYPE && firmwareIAPObj.crc!=PIOS_BL_HELPER_CRC_Memory_Calc())
+	else if(firmwareIAPObj.BoardType==bdinfo->board_type && firmwareIAPObj.crc!=PIOS_BL_HELPER_CRC_Memory_Calc())
 	{
-		PIOS_BL_HELPER_FLASH_Read_Description(firmwareIAPObj.Description,SIZE_OF_DESCRIPTION);
+		PIOS_BL_HELPER_FLASH_Read_Description(firmwareIAPObj.Description,bdinfo->desc_size);
 		firmwareIAPObj.crc=PIOS_BL_HELPER_CRC_Memory_Calc();
-		firmwareIAPObj.BoardRevision=BOARD_REVISION;
+		firmwareIAPObj.BoardRevision=bdinfo->board_rev;
 		FirmwareIAPObjSet(&firmwareIAPObj);
 	}
 }

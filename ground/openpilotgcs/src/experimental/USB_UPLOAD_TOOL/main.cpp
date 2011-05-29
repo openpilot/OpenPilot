@@ -324,13 +324,5 @@ int main(int argc, char *argv[])
 
         return 0;
     }
-//    OP_DFU dfu(true);
-//    //dfu.findDevices();
-//    dfu.enterDFU(1);
-//    dfu.UploadFirmware("c:/ahrs.bin",true,1);
-//    // dfu.UploadDescription("josemanuel");
-//    //  QString str=dfu.DownloadDescription(12);
-    // dfu.JumpToApp();
-    // qDebug()<<"Description="<<str;
     return a.exec();
 }

@@ -1,0 +1,20 @@
+#
+# MacOSX-specific packaging
+#
+
+osx_package: gcs package_flight
+	( \
+	  ROOT_DIR="$(ROOT_DIR)" \
+	  BUILD_DIR="$(BUILD_DIR)" \
+	  PACKAGE_LBL="$(PACKAGE_LBL)" \
+	  PACKAGE_DIR="$(PACKAGE_DIR)" \
+	  FW_DIR="$(FW_DIR)" \
+	  "$(ROOT_DIR)/package/osx/package" \
+	)
+
+gcs: uavobjects
+	$(V1) $(MAKE) -C $(ROOT_DIR) GCS_BUILD_CONF=release $@
+
+ground_package: | osx_package
+
+.PHONY: gcs ground_package osx_package

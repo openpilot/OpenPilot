@@ -104,6 +104,28 @@ int32_t PIOS_DELAY_WaitmS(uint16_t mS)
 	return 0;
 }
 
+/**
+ * @brief Query the Delay timer for the current uS 
+ * @return A microsecond value
+ */
+uint16_t PIOS_DELAY_GetuS()
+{
+	return PIOS_DELAY_TIMER->CNT;
+}
+
+/**
+ * @brief Compute the difference between now and a reference time
+ * @param[in] the reference time to compare now to
+ * @return The number of uS since the delay
+ * 
+ * @note the user is responsible for worrying about rollover on the 16 bit uS counter
+ */
+int32_t PIOS_DELAY_DiffuS(uint16_t ref)
+{
+	int32_t ret_t = ref;
+	return (int16_t) (PIOS_DELAY_GetuS() - ret_t);
+}
+
 #endif
 
 /**

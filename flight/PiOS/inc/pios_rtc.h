@@ -27,12 +27,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_SERVO_H
-#define PIOS_SERVO_H
+#ifndef PIOS_RTC_H
+#define PIOS_RTC_H
 
 /* Public Functions */
-extern void PIOS_RTC_Start();
+extern void PIOS_RTC_Init();
 extern uint32_t PIOS_RTC_Counter();
+extern float PIOS_RTC_Rate();
+extern float PIOS_RTC_MsPerTick();
 
 #endif /* PIOS_SERVO_H */
 

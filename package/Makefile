@@ -103,7 +103,7 @@ endef
 # Firmware for different input drivers
 $(eval $(call INSTALL_TEMPLATE,fw_common,uavobjects,$(FW_DIR),,-$(PACKAGE_LBL),,,$(FW_TARGETS_COMMON),install))
 $(eval $(call INSTALL_TEMPLATE,fw_pwm,uavobjects,$(FW_DIR),,-pwm-$(PACKAGE_LBL),,clean,$(FW_TARGETS_INPUT),install))
-$(eval $(call INSTALL_TEMPLATE,fw_spektrum,uavobjects,$(FW_DIR),,-spektrum-$(PACKAGE_LBL),USE_SPEKTRUM=YES,clean,$(FW_TARGETS_INPUT),install))
+$(eval $(call INSTALL_TEMPLATE,fw_spektrum,uavobjects,$(FW_DIR),,-dsm2sat-$(PACKAGE_LBL),USE_SPEKTRUM=YES,clean,$(FW_TARGETS_INPUT),install))
 $(eval $(call INSTALL_TEMPLATE,fw_ppm,uavobjects,$(FW_DIR),,-ppm-$(PACKAGE_LBL),USE_PPM=YES,clean,$(FW_TARGETS_INPUT),install))
 
 # Bootloaders (change 'install' to 'bin' if you don't want to install bootloaders)

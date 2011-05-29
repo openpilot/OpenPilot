@@ -50,8 +50,3 @@ IUAVGadgetConfiguration *ConfigGadgetFactory::createConfiguration(QSettings* qSe
 {
     return new ConfigGadgetConfiguration(QString("ConfigGadget"), qSettings);
 }
-
-IOptionsPage *ConfigGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
-{
-    return new ConfigGadgetOptionsPage(qobject_cast<ConfigGadgetConfiguration*>(config));
-}

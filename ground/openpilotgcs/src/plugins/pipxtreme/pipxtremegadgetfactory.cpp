@@ -49,8 +49,3 @@ IUAVGadgetConfiguration * PipXtremeGadgetFactory::createConfiguration(QSettings 
 {
 	return new PipXtremeGadgetConfiguration(QString("PipXtreme"), qSettings);
 }
-
-IOptionsPage * PipXtremeGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
-{
-	return new PipXtremeGadgetOptionsPage(qobject_cast<PipXtremeGadgetConfiguration *>(config));
-}

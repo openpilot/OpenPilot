@@ -387,20 +387,44 @@ class Gyros(TestCase):
         elif expRotDetection == -1 or expRotDetection == +1:
             self._checkSensor(  data, 
                                 checkFrom=0.25, checkTo=.5, 
-                                expValue=expRotDetection*350, meanTol=50, ppMax = 100)
+                                expValue=expRotDetection*350, meanTol=100, ppMax = 100)
         else:
             raise ValueError()
            
         
     def testGyroX(self):
         """Gyro X"""
-        print
+        print "Static, Level"
         self._checkGyroAtLevel(self.tf.levelLog.gyro[0])
+        print "Yaw Right"
+        self._checkGyroAtRot(self.tf.yawRLog.gyro[0], 0)
+        print "Yaw Left"
+        self._checkGyroAtRot(self.tf.yawLLog.gyro[0], 0)
+        print "Pitch Forward"
+        self._checkGyroAtRot(self.tf.pitchFWLog.gyro[0], 0)
+        print "Pitch Backward"
+        self._checkGyroAtRot(self.tf.pitchBWLog.gyro[0], 0)
+        print "Roll Right"
+        self._checkGyroAtRot(self.tf.rollRLog.gyro[0], -1)
+        print "Roll Left"
+        self._checkGyroAtRot(self.tf.rollLLog.gyro[0], +1)
         
     def testGyroY(self):
         """Gyro Y"""
-        print
+        print "Static, Level"
         self._checkGyroAtLevel(self.tf.levelLog.gyro[1])
+        print "Yaw Right"
+        self._checkGyroAtRot(self.tf.yawRLog.gyro[1], 0)
+        print "Yaw Left"
+        self._checkGyroAtRot(self.tf.yawLLog.gyro[1], 0)
+        print "Pitch Forward"
+        self._checkGyroAtRot(self.tf.pitchFWLog.gyro[1], -1)
+        print "Pitch Backward"
+        self._checkGyroAtRot(self.tf.pitchBWLog.gyro[1], +1)
+        print "Roll Right"
+        self._checkGyroAtRot(self.tf.rollRLog.gyro[1], 0)
+        print "Roll Left"
+        self._checkGyroAtRot(self.tf.rollLLog.gyro[1], 0)
 
     def testGyroZ(self):
         """Gyro Z"""

@@ -32,7 +32,7 @@
 #include <coreplugin/iuavgadget.h>
 
 ConfigGadgetFactory::ConfigGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("ConfigGadget"), tr("Config Gadget"), parent)
+        IUAVGadgetFactory(QString("ConfigGadget"), tr("Config"), parent)
 {
 }
 

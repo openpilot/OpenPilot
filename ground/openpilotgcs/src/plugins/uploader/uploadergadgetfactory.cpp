@@ -33,7 +33,7 @@
 #include <coreplugin/iuavgadget.h>
 
 UploaderGadgetFactory::UploaderGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("Uploader"), tr("Uploader Gadget"), parent)
+        IUAVGadgetFactory(QString("Uploader"), tr("Uploader"), parent)
 {
 }
 

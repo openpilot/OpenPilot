@@ -209,6 +209,7 @@ class TestFixture(object):
     def measureSensors(self):
         self.startSensorReporting(20)
         
+        self.calLog = SensorLog()
         self.levelLog = SensorLog()
         self.yawRLog = SensorLog()
         self.yawLLog = SensorLog()
@@ -217,10 +218,24 @@ class TestFixture(object):
         self.rollRLog = SensorLog()
         self.rollLLog = SensorLog()
         
-        print "Level ",
         testFixture.setRotServo(TestFixture.ROT_CENTER)
         testFixture.setTiltServo(TestFixture.TILT_LEVEL)
         time.sleep(1)
+        print "Calibrating Accels ",
+        self.recordSensors(20, 1000/20, self.calLog)
+        self.calLog.extract()
+        self.calLog.meanAccel = []
+        for i in range(3):
+            self.calLog.meanAccel.append(sum(self.calLog.accel[i])/len(self.calLog.accel[i]))
+        print " Current bias: (%d %d %d)" % tuple(self.objMan.AttitudeSettings.AccelBias.value)   
+        print " Average Accels: (%.4f %.4f %.4f)" % tuple(self.calLog.meanAccel)
+        self.objMan.AttitudeSettings.AccelBias.value[0] += self.calLog.meanAccel[0] / (0.004 * 9.81)
+        self.objMan.AttitudeSettings.AccelBias.value[1] += self.calLog.meanAccel[1] / (0.004 * 9.81)
+        self.objMan.AttitudeSettings.AccelBias.value[2] += (self.calLog.meanAccel[2] + 9.81) / (0.004 * 9.81)
+        print " New bias: (%d %d %d)" % tuple(self.objMan.AttitudeSettings.AccelBias.value)
+        self.objMan.AttitudeSettings.updated()
+        
+        print "Level ",
         self.recordSensors(20, 1000/20, self.levelLog)
         self.levelLog.extract()
         

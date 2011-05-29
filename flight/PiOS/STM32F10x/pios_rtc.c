@@ -34,7 +34,7 @@
 #if defined(PIOS_INCLUDE_RTC)
 
 #ifndef PIOS_RTC_PRESCALAR
-#define PIOS_RTC_PRESCALAR 0
+#define PIOS_RTC_PRESCALAR 100
 #endif
 
 void PIOS_RTC_Init()
@@ -48,6 +48,13 @@ void PIOS_RTC_Init()
 	RTC_WaitForLastTask();
 	RTC_WaitForSynchro();
 	RTC_WaitForLastTask();
+
+#if defined(PIOS_INCLUDE_SPEKTRUM)
+	/* Enable the RTC Second interrupt */
+	RTC_ITConfig( RTC_IT_SEC, ENABLE );
+	/* Wait until last write operation on RTC registers has finished */
+	RTC_WaitForLastTask();
+#endif
 	RTC_SetPrescaler(PIOS_RTC_PRESCALAR);	// counting at 8e6 / 128
 	RTC_WaitForLastTask();
 	RTC_SetCounter(0);

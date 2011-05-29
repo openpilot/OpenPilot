@@ -27,8 +27,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_SERVO_H
-#define PIOS_SERVO_H
+#ifndef PIOS_RTC_H
+#define PIOS_RTC_H
 
 /* Public Functions */
 extern void PIOS_RTC_Init();

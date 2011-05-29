@@ -44,26 +44,21 @@
 /**
  * @Note Framesyncing:
  * The code resets the watchdog timer whenever a single byte is received, so what watchdog code
- * is never called if regularly getting bytes
- 
-/**
- * Constants
+ * is never called if regularly getting bytes.
+ * RTC timer is running @625Hz, supervisor timer has divider 5 so frame sync comes every 1/125Hz=8ms.
+ * Good for both 11ms and 22ms framecycles
  */
 
 /* Global Variables */
 
-/* Local Variables, use pios_usart */
+/* Local Variables */
 static uint16_t CaptureValue[12],CaptureValueTemp[12];
 static uint8_t prev_byte = 0xFF, sync = 0, bytecount = 0, datalength=0, frame_error=0, byte_array[20] = { 0 };
-
-
-#define MAX_UPDATE_DELAY_MS 100
-static uint32_t last_updated_time = 0;
-static uint32_t max_update_period = 0;
 uint8_t sync_of = 0;
+uint16_t supv_timer=0;
 
 /**
-* Initialise the onboard USARTs
+* Bind and Initialise Spektrum satellite receiver
 */
 void PIOS_SPEKTRUM_Init(void)
 {
@@ -72,8 +67,15 @@ void PIOS_SPEKTRUM_Init(void)
 		PIOS_SPEKTRUM_Bind();
 	}
 
-	last_updated_time = 0;
-	max_update_period = MAX_UPDATE_DELAY_MS * 1000 * PIOS_RTC_Rate();
+	/* Init RTC supervisor timer interrupt */
+	NVIC_InitTypeDef NVIC_InitStructure;
+	NVIC_InitStructure.NVIC_IRQChannel = RTC_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+	/* Init RTC clock */
+	PIOS_RTC_Init();
 }
 
 /**
@@ -84,7 +86,6 @@ void PIOS_SPEKTRUM_Init(void)
 */
 int16_t PIOS_SPEKTRUM_Get(int8_t Channel)
 {
-	if(PIOS_RTC_Counter() - last_updated_time
 	/* Return error if channel not available */
 	if (Channel >= 12) {
 		return -1;
@@ -223,8 +224,7 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 }
 
 /* Interrupt handler for USART */
-void SPEKTRUM_IRQHandler(uint32_t usart_id)
-{
+void SPEKTRUM_IRQHandler(uint32_t usart_id) {
 	/* by always reading DR after SR make sure to clear any error interrupts */
 	volatile uint16_t sr = pios_spektrum_cfg.pios_usart_spektrum_cfg->regs->SR;
 	volatile uint8_t b = pios_spektrum_cfg.pios_usart_spektrum_cfg->regs->DR;
@@ -240,38 +240,34 @@ void SPEKTRUM_IRQHandler(uint32_t usart_id)
 		/* Disable TXE interrupt (TXEIE=0) */
 		USART_ITConfig(pios_spektrum_cfg.pios_usart_spektrum_cfg->regs, USART_IT_TXE, DISABLE);
 	}
-	/* clear "watchdog" timer */
-	TIM_SetCounter(pios_spektrum_cfg.timer, 0);
+	/* byte arrived so clear "watchdog" timer */
+	supv_timer=0;
 }
 
 /**
- *@brief This function is called when a spektrum word hasnt been decoded for too long
+ *@brief This function is called between frames and when a spektrum word hasnt been decoded for too long
+ *@brief clears the channel values
  */
-void PIOS_SPEKTRUM_timeout() {
-	for (int i = 0; i < 12; i++)
-	{
-		CaptureValue[i] = 0;
-		CaptureValueTemp[i] = 0;
-	}
-}	
-	/* Clear timer interrupt pending bit */
-	TIM_ClearITPendingBit(pios_spektrum_cfg.timer, TIM_IT_Update);
-
-	/* sync between frames */
-	sync = 0;
-	bytecount = 0;
-	prev_byte = 0xFF;
-	frame_error=0;
-	sync_of++;
-	/* watchdog activated */
-	if (sync_of > 12) {
-		/* signal lost */
-		sync_of = 0;
-		for (int i = 0; i < 12; i++)
-		{
-			CaptureValue[i] = 0;
-			CaptureValueTemp[i] = 0;
+void PIOS_SPEKTRUM_irq_handler() {
+	/* 125hz */
+	supv_timer++;
+	if(supv_timer > 5) {
+		/* sync between frames */
+		sync = 0;
+		bytecount = 0;
+		prev_byte = 0xFF;
+		frame_error = 0;
+		sync_of++;
+		/* watchdog activated after 100ms silence */
+		if (sync_of > 12) {
+			/* signal lost */
+			sync_of = 0;
+			for (int i = 0; i < 12; i++) {
+				CaptureValue[i] = 0;
+				CaptureValueTemp[i] = 0;
+			}
 		}
+		supv_timer = 0;
 	}
 }
 

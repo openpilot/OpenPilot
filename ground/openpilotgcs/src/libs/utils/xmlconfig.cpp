@@ -38,6 +38,7 @@
 #include <QRect>
 #include <QSize>
 #include <QPoint>
+#include <QtCore/QUrl>
 
 #define NUM_PREFIX "arr_"
 
@@ -84,6 +85,10 @@ void XmlConfig::handleNode(QDomElement* node, QSettings::SettingsMap &map, QStri
     if ( nodeName.startsWith(NUM_PREFIX) ){
         nodeName.replace(NUM_PREFIX, "");
     }
+    // Xml tags are restrictive with allowed characters,
+    // so we urlencode and replace % with __PCT__ on file
+    nodeName = nodeName.replace("__PCT__", "%");
+    nodeName = QUrl::fromPercentEncoding(nodeName.toAscii());
 
     if ( nodeName == XmlConfig::rootName )
         ;
@@ -99,7 +104,7 @@ void XmlConfig::handleNode(QDomElement* node, QSettings::SettingsMap &map, QStri
             handleNode( static_cast<QDomElement*>(&child), map, path);
         }
         else if ( child.isText() ){
-            qDebug() << "Key: " << path << " Value:" << node->text();
+//            qDebug() << "Key: " << path << " Value:" << node->text();
             map.insert(path, stringToVariant(node->text()));
         }
         else{
@@ -123,6 +128,10 @@ bool XmlConfig::writeXmlFile(QIODevice &device, const QSettings::SettingsMap &ma
             if ( elem == "" ){
                 continue;
             }
+            // Xml tags are restrictive with allowed characters,
+            // so we urlencode and replace % with __PCT__ on file
+            elem = QString(QUrl::toPercentEncoding(elem));
+            elem = elem.replace("%", "__PCT__");
             // For arrays, QT will use simple numbers as keys, which is not a valid element in XML.
             // Therefore we prefixed these.
             if ( elem.startsWith(NUM_PREFIX) ){

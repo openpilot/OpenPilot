@@ -91,6 +91,7 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
                 m_defaultIndex = 0;
                 startFromOne = true;
                 m_uavGadgetList->insertItem(0, im->gadgetName(classId), classId);
+                m_uavGadgetList->setItemIcon(0, im->gadgetIcon(classId));
                 m_uavGadgetList->insertSeparator(1);
             } else {
 
@@ -101,6 +102,7 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
                         break;
                 }
                 m_uavGadgetList->insertItem(i, im->gadgetName(classId), classId);
+                m_uavGadgetList->setItemIcon(i, im->gadgetIcon(classId));
             }
             ++index;
         }

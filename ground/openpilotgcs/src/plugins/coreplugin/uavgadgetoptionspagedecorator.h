@@ -43,7 +43,7 @@ class CORE_EXPORT UAVGadgetOptionsPageDecorator : public Core::IOptionsPage
 {
 Q_OBJECT
 public:
-    explicit UAVGadgetOptionsPageDecorator(IOptionsPage *page, IUAVGadgetConfiguration *config, QObject *parent = 0);
+    explicit UAVGadgetOptionsPageDecorator(IOptionsPage *page, IUAVGadgetConfiguration *config, bool isSingleConfigurationGadget = false, QObject *parent = 0);
 
     QString id() const { return m_id; }
     QString trName() const { return m_id; }
@@ -66,6 +66,7 @@ private slots:
 private:
     IOptionsPage *m_optionsPage;
     IUAVGadgetConfiguration *m_config;
+    bool m_isSingleConfigurationGadget;
     UAVGadgetInstanceManager *m_instanceManager;
     QString m_id;
     QString m_category;

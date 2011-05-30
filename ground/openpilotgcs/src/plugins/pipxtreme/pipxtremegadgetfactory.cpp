@@ -31,7 +31,7 @@
 #include <coreplugin/iuavgadget.h>
 
 PipXtremeGadgetFactory::PipXtremeGadgetFactory(QObject *parent) :
-		IUAVGadgetFactory(QString("PipXtreme"), tr("PipXtreme Gadget"), parent)
+                IUAVGadgetFactory(QString("PipXtreme"), tr("PipXtreme"), parent)
 {
 }
 
@@ -48,9 +48,4 @@ Core::IUAVGadget* PipXtremeGadgetFactory::createGadget(QWidget *parent)
 IUAVGadgetConfiguration * PipXtremeGadgetFactory::createConfiguration(QSettings *qSettings)
 {
 	return new PipXtremeGadgetConfiguration(QString("PipXtreme"), qSettings);
-}
-
-IOptionsPage * PipXtremeGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
-{
-	return new PipXtremeGadgetOptionsPage(qobject_cast<PipXtremeGadgetConfiguration *>(config));
 }

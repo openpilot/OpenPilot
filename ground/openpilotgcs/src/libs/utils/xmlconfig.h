@@ -26,13 +26,18 @@
 #ifndef XMLCONFIG_H
 #define XMLCONFIG_H
 
-#include "importexport_global.h"
+#if defined(QTCREATOR_UTILS_LIB)
+#  define XMLCONFIG_EXPORT Q_DECL_EXPORT
+#else
+#  define XMLCONFIG_EXPORT Q_DECL_IMPORT
+#endif
 
+#include <QtCore/qglobal.h>
 #include <QSettings>
 #include <QDomElement>
 #include <QObject>
 
-class IMPORTEXPORT_EXPORT XmlConfig : QObject
+class XMLCONFIG_EXPORT XmlConfig : QObject
 {
 
 public:

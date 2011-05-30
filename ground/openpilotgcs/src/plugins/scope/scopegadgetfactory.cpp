@@ -33,7 +33,7 @@
 
 ScopeGadgetFactory::ScopeGadgetFactory(QObject *parent) :
         IUAVGadgetFactory(QString("ScopeGadget"),
-                          tr("Scope Gadget"),
+                          tr("Scope"),
                           parent)
 {
 }

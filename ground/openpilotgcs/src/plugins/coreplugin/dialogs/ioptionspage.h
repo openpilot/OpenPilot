@@ -32,6 +32,7 @@
 #include <coreplugin/core_global.h>
 
 #include <QtCore/QObject>
+#include <QtGui/QIcon>
 
 QT_BEGIN_NAMESPACE
 class QWidget;
@@ -43,8 +44,13 @@ class CORE_EXPORT IOptionsPage : public QObject
 {
     Q_OBJECT
 public:
-    IOptionsPage(QObject *parent = 0) : QObject(parent) {}
+    IOptionsPage(QObject *parent = 0) :
+        QObject(parent),
+        m_icon(QIcon()) {}
     virtual ~IOptionsPage() {}
+
+    void setIcon(QIcon icon) { m_icon = icon; }
+    QIcon icon() { return m_icon; }
 
     /*  gadget options pages can leave these 4 functions as is,
         since they are decorated by UAVGadgetOptionsPageDecorator,
@@ -57,6 +63,8 @@ public:
     virtual QWidget *createPage(QWidget *parent) = 0;
     virtual void apply() = 0;
     virtual void finish() = 0;
+private:
+    QIcon m_icon;
 };
 
 } // namespace Core

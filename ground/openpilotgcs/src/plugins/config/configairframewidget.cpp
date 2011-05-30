@@ -2049,14 +2049,16 @@ void ConfigAirframeWidget::sendAircraftUpdate()
                 m_aircraft->mrStatusLabel->setText("Error: Assign a Yaw channel");
                 return;
             }
+            // Need to setup motors first because setupMotors(..) will call resetActuators()
+            // and reset the Yaw channel to disabled.
+            motorList << "VTOLMotorNW" << "VTOLMotorNE" << "VTOLMotorS";
+            setupMotors(motorList);
+
             obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
             Q_ASSERT(obj);
             field = obj->getField("FixedWingYaw1");
             field->setValue(m_aircraft->triYawChannel->currentText());
-            // No need to send a obj->updated() here because setupMotors
-            // will do it.
-            motorList << "VTOLMotorNW" << "VTOLMotorNE" << "VTOLMotorS";
-            setupMotors(motorList);
+            obj->updated();
 
             // Motor 1 to 6, Y6 Layout:
             //     pitch   roll    yaw

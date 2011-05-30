@@ -195,9 +195,9 @@ extern uint32_t pios_com_aux_id;
 // GPIO
 // Not used, but pios_gpio.c expects something
 //-------------------------
-#define PIOS_GPIO_1_PORT			GPIOA
-#define PIOS_GPIO_1_PIN				GPIO_Pin_1
-#define PIOS_GPIO_1_GPIO_CLK		RCC_APB2Periph_GPIOA
+#define PIOS_GPIO_1_PORT                        GPIOA
+#define PIOS_GPIO_1_PIN                         GPIO_Pin_1
+#define PIOS_GPIO_1_GPIO_CLK                    RCC_APB2Periph_GPIOA
 
 #define PIOS_GPIO_PORTS                         { PIOS_GPIO_1_PORT }
 #define PIOS_GPIO_PINS                          { PIOS_GPIO_1_PIN }

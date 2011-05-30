@@ -30,6 +30,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include "fifo_buffer.h"
+
 #ifndef PIOS_BMA180_H
 #define PIOS_BMA180_H
 
@@ -42,32 +44,37 @@
 #define BMA_WE_ADDR       0x0D
 #define BMA_BW_ADDR       0x20
 #define BMA_RANGE_ADDR    0x35
+#define BMA_OFFSET_LSB1   0x35
+#define BMA_GAIN_Y        0x33
 #define BMA_CTRREG3       0x21
+#define BMA_CTRREG0       0x0D
 
 /* Accel range  */
 #define BMA_RANGE_MASK    0x0E          
 #define BMA_RANGE_SHIFT   1
-#define BMA_RANGE_1G      0x00		// +/- 1G ADC resolution 0.13 mg/LSB
-#define BMA_RANGE_1_5G    0x01		// +/- 1.5G ADC resolution 0.19 mg/LSB
-#define BMA_RANGE_2G      0x02		// +/- 2G ADC resolution 0.25 mg/LSB    *** default ***
-#define BMA_RANGE_3G      0x03		// +/- 3G ADC resolution 0.38 mg/LSB
-#define BMA_RANGE_4G      0x04		// +/- 4G ADC resolution 0.50 mg/LSB
-#define BMA_RANGE_8G      0x05		// +/- 8G ADC resolution 0.99 mg/LSB
-#define BMA_RANGE_16G     0x06		// +/- 16G ADC resolution 1.98 mg/LSB
+enum bma180_range { BMA_RANGE_1G = 0x00,
+	BMA_RANGE_1_5G = 0x01,
+	BMA_RANGE_2G = 0x02,
+	BMA_RANGE_3G = 0x03,
+	BMA_RANGE_4G = 0x04,
+	BMA_RANGE_8G = 0x05,
+	BMA_RANGE_16G = 0x06
+};
 
 /* Measurement bandwidth */
 #define BMA_BW_MASK       0xF0
 #define BMA_BW_SHIFT      4
-#define BMA_BW_10HZ       0x00
-#define BMA_BW_20HZ       0x01
-#define BMA_BW_40HZ       0x02
-#define BMA_BW_75HZ       0x03
-#define BMA_BW_150HZ      0x04      // *** default ***
-#define BMA_BW_300HZ      0x05
-#define BMA_BW_600HZ      0x06
-#define BMA_BW_1200HZ     0x07
-#define BMA_BW_HP1HZ      0x08		// High-pass, 1Hz
-#define BMA_BW_BP0_300HZ  0x09      // Band-pass, 0.3Hz-300Hz
+enum bma180_bandwidth { BMA_BW_10HZ = 0x00,
+	BMA_BW_20HZ = 0x01,
+	BMA_BW_40HZ = 0x02,
+	BMA_BW_75HZ = 0x03,
+	BMA_BW_150HZ = 0x04,
+	BMA_BW_300HZ = 0x05,
+	BMA_BW_600HZ = 0x06,
+	BMA_BW_1200HZ =0x07,
+	BMA_BW_HP1HZ = 0x08,    // High-pass, 1 Hz
+	BMA_BW_BP0_300HZ = 0x09 // Band-pass, 0.3Hz-300Hz
+};
 
 #define BMA_NEW_DAT_INT   0x02
 
@@ -80,9 +87,11 @@ struct pios_bma180_data {
 /* Public Functions */
 void PIOS_BMA180_Attach(uint32_t spi_id);
 void PIOS_BMA180_Init();
+float PIOS_BMA180_GetScale();
 int32_t PIOS_BMA180_ReadAccels(int16_t * data);
 int32_t PIOS_BMA180_Test();
 void PIOS_BMA180_IRQHandler(void);
+t_fifo_buffer * PIOS_BMA180_GetFifo();
 
 #endif /* PIOS_BMA180_H */
 

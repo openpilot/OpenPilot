@@ -443,6 +443,9 @@ int16_t accel_data_glob[3];
 int16_t gyro_data_glob[3];
 int16_t mag_data_glob[3];
 
+uint32_t pin;
+int16_t accel[3];
+
 int main()
 {	
 	gps_data.quality = -1;
@@ -597,18 +600,34 @@ int main()
  *
  * This function will act as the HAL for the new INS sensors
  */
+uint16_t accel_samples = 0;
 bool get_accel_gyro_data()
 {
 	int16_t accel[3];
+	int32_t accel_accum[3] = {0, 0, 0};
+	accel_samples = 0;
+	
 	int16_t gyro[3];
 
-	PIOS_BMA180_ReadAccels(accel);
+	t_fifo_buffer * accel_fifo = PIOS_BMA180_GetFifo();
+	while(fifoBuf_getUsed(accel_fifo) < sizeof(accel));
+	while(fifoBuf_getUsed(accel_fifo) >= sizeof(accel)) {	
+		accel_samples++;
+		fifoBuf_getData(accel_fifo, (uint8_t *) accel, sizeof(accel));
+		accel_accum[0] += accel[0];
+		accel_accum[1] += accel[1];
+		accel_accum[2] += accel[2];
+	}
+	accel[0] = accel_accum[0] / accel_samples;
+	accel[1] = accel_accum[1] / accel_samples;
+	accel[2] = accel_accum[2] / accel_samples;
+	
 	PIOS_IMU3000_ReadGyros(gyro);
 	
 	// Not the swaping of channel orders
-	accel_data.filtered.x = accel[0] * 0.0025;
-	accel_data.filtered.y = accel[1] * 0.0025;
-	accel_data.filtered.z = accel[2] * 0.0025;
+	accel_data.filtered.x = accel[0] * PIOS_BMA180_GetScale();
+	accel_data.filtered.y = accel[1] * PIOS_BMA180_GetScale();
+	accel_data.filtered.z = accel[2] * PIOS_BMA180_GetScale();
 	gyro_data.filtered.x = -gyro[1] * 0.00763 * DEG_TO_RAD;;
 	gyro_data.filtered.y = -gyro[0] * 0.00763 * DEG_TO_RAD;;
 	gyro_data.filtered.z = -gyro[2] * 0.00763 * DEG_TO_RAD;;

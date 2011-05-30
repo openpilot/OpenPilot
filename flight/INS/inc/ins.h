@@ -57,11 +57,6 @@ struct mag_sensor {
 //! Contains the data from the accelerometer
 struct accel_sensor {
 	struct {
-		uint16_t x;
-		uint16_t y;
-		uint16_t z;
-	} raw;
-	struct {
 		float x;
 		float y;
 		float z;

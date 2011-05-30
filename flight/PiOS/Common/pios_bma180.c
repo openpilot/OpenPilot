@@ -31,15 +31,22 @@
  */
 
 #include "pios.h"
+#include "fifo_buffer.h"
 
 static uint32_t PIOS_SPI_ACCEL;
 
 static int32_t PIOS_BMA180_GetReg(uint8_t reg);
 static int32_t PIOS_BMA180_SetReg(uint8_t reg, uint8_t data);
-static int32_t PIOS_BMA180_SelectBW(uint8_t bw);
-static int32_t PIOS_BMA180_SetRange(uint8_t range);
+static int32_t PIOS_BMA180_SelectBW(enum bma180_bandwidth bw);
+static int32_t PIOS_BMA180_SetRange(enum bma180_range range);
+static int32_t PIOS_BMA180_Config();
 static int32_t PIOS_BMA180_EnableIrq();
+
 volatile bool pios_bma180_data_ready = false;
+
+#define PIOS_BMA180_MAX_DOWNSAMPLE 10
+static int16_t pios_bma180_buffer[PIOS_BMA180_MAX_DOWNSAMPLE * 3];
+static t_fifo_buffer pios_bma180_fifo;
 
 /**
  * @brief Initialize with good default settings
@@ -75,8 +82,12 @@ void PIOS_BMA180_Init()
 	
 	pios_bma180_data_ready = false;
 	
-	PIOS_BMA180_SelectBW(BMA_BW_150HZ);
+	fifoBuf_init(&pios_bma180_fifo, (uint8_t *) pios_bma180_buffer, sizeof(pios_bma180_buffer));
+	
+	PIOS_BMA180_Config();	
+	PIOS_BMA180_SelectBW(BMA_BW_600HZ);
 	PIOS_BMA180_SetRange(BMA_RANGE_8G);
+	PIOS_DELAY_WaituS(50);
 	PIOS_BMA180_EnableIrq();
 }
 
@@ -140,6 +151,52 @@ int32_t PIOS_BMA180_SetReg(uint8_t reg, uint8_t data)
 	return 0;
 }
 
+
+static int32_t PIOS_BMA180_EnableEeprom() {
+	// Enable EEPROM writing
+	int32_t byte = PIOS_BMA180_GetReg(BMA_CTRREG0);
+	if(byte < 0)
+		return -1;
+	byte |= 0x10;                                      // Set bit 4
+	if(PIOS_BMA180_SetReg(BMA_CTRREG0,(uint8_t) byte) < 0)    // Have to set ee_w to		
+		return -1;
+	return 0;
+}
+
+static int32_t PIOS_BMA180_DisableEeprom() {
+	// Enable EEPROM writing
+	int32_t byte = PIOS_BMA180_GetReg(BMA_CTRREG0);
+	if(byte < 0)
+		return -1;
+	byte |= 0x10;                                      // Set bit 4
+	if(PIOS_BMA180_SetReg(BMA_CTRREG0,(uint8_t) byte) < 0)    // Have to set ee_w to		
+		return -1;
+	return 0;
+}
+
+/**
+ * @brief Set the default register settings
+ * @return 0 if successful, -1 if not
+ */
+static int32_t PIOS_BMA180_Config() 
+{
+	/*
+	0x35 = 0x81  //smp-skip = 1 for less interrupts
+	0x33 = 0x81  //shadow-dis = 1, update MSB and LSB synchronously
+	0x27 = 0x01  //dis-i2c
+	0x21 = 0x02  //new_data_int = 1
+	 */
+		
+	if(PIOS_BMA180_SetReg(BMA_OFFSET_LSB1, 0x81) < 0)
+		return -1;
+	if(PIOS_BMA180_SetReg(BMA_GAIN_Y, 0x81) < 0)
+		return -1;
+	if(PIOS_BMA180_SetReg(BMA_CTRREG3, 0xFF) < 0)
+		return -1;
+	
+	return 0;
+}
+
 /**
  * @brief Select the bandwidth the digital filter pass allows.
  * @return 0 if successful, -1 if not
@@ -147,7 +204,7 @@ int32_t PIOS_BMA180_SetReg(uint8_t reg, uint8_t data)
  * 
  * EEPROM must be write-enabled before calling this function.
  */
-static int32_t PIOS_BMA180_SelectBW(uint8_t bw)
+static int32_t PIOS_BMA180_SelectBW(enum bma180_bandwidth bw)
 {
 	uint8_t reg;
 	reg = PIOS_BMA180_GetReg(BMA_BW_ADDR);
@@ -161,7 +218,7 @@ static int32_t PIOS_BMA180_SelectBW(uint8_t bw)
  * @param rate[in] Range setting to be used
  *
  */
-static int32_t PIOS_BMA180_SetRange(uint8_t range) 
+static int32_t PIOS_BMA180_SetRange(enum bma180_range range) 
 {
 	uint8_t reg;
 	reg = PIOS_BMA180_GetReg(BMA_RANGE_ADDR);
@@ -171,7 +228,17 @@ static int32_t PIOS_BMA180_SetRange(uint8_t range)
 
 static int32_t PIOS_BMA180_EnableIrq() 
 {
-	return PIOS_BMA180_SetReg(BMA_CTRREG3, BMA_NEW_DAT_INT);
+
+	if(PIOS_BMA180_EnableEeprom() < 0)
+		return -1;
+
+	if(PIOS_BMA180_SetReg(BMA_CTRREG3, BMA_NEW_DAT_INT) < 0)
+		return -1;
+
+	if(PIOS_BMA180_DisableEeprom() < 0)
+		return -1;
+
+	return 0;
 }
 
 /**
@@ -217,10 +284,16 @@ int32_t PIOS_BMA180_ReadAccels(int16_t * data)
  * @brief Returns the scale the BMA180 chip is using
  * @return Scale (m / s^2) / LSB
  */
-float PIOS_BMA_GetScale()
+float PIOS_BMA180_GetScale()
 {
-	return 1;
+	return 9.81 / 1024;
 }
+
+t_fifo_buffer * PIOS_BMA180_GetFifo()
+{
+	return &pios_bma180_fifo;
+}
+
 
 /**
  * @brief Test SPI and chip functionality by reading chip ID register
@@ -255,12 +328,21 @@ int32_t PIOS_BMA180_Test()
 	return 0;
 }
 
+uint32_t pios_bma180_count = 0;
 /**
  * @brief IRQ Handler
  */
 void PIOS_BMA180_IRQHandler(void)
 {
-	pios_bma180_data_ready = true;
+	int16_t accels[3];
+	pios_bma180_count++;
+	
+	if(PIOS_BMA180_ReadAccels(accels) < 0)
+		return;
+	if(fifoBuf_getFree(&pios_bma180_fifo) < sizeof(accels))
+		return;
+	
+	fifoBuf_putData(&pios_bma180_fifo, accels, sizeof(accels));
 }
 
 /**

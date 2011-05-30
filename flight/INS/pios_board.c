@@ -590,6 +590,7 @@ void PIOS_Board_Init(void) {
 	}
 
 	PIOS_BMA180_Attach(pios_spi_accel_id);
+	PIOS_BMA180_Init();
 
 
 	/* Set up the SPI interface to the OP board */

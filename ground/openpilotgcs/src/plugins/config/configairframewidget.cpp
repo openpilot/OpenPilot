@@ -2056,16 +2056,8 @@ void ConfigAirframeWidget::sendAircraftUpdate()
 
             obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
             Q_ASSERT(obj);
-<<<<<<< HEAD
-            motorList << "VTOLMotorNW" << "VTOLMotorNE" << "VTOLMotorS";
-            setupMotors(motorList);
             field = obj->getField("FixedWingYaw1");
             field->setValue(m_aircraft->triYawChannel->currentText());
-=======
-            field = obj->getField("FixedWingYaw1");
-            field->setValue(m_aircraft->triYawChannel->currentText());
-            obj->updated();
->>>>>>> eb337c6e5c4b6f6dba7c3019886c42097dd37d6c
 
             // Motor 1 to 6, Y6 Layout:
             //     pitch   roll    yaw

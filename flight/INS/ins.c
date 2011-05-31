@@ -607,8 +607,6 @@ bool get_accel_gyro_data()
 	int32_t accel_accum[3] = {0, 0, 0};
 	accel_samples = 0;
 	
-	int16_t gyro[3];
-
 	t_fifo_buffer * accel_fifo = PIOS_BMA180_GetFifo();
 	while(fifoBuf_getUsed(accel_fifo) < sizeof(accel));
 	while(fifoBuf_getUsed(accel_fifo) >= sizeof(accel)) {	
@@ -622,7 +620,20 @@ bool get_accel_gyro_data()
 	accel[1] = accel_accum[1] / accel_samples;
 	accel[2] = accel_accum[2] / accel_samples;
 	
-	PIOS_IMU3000_ReadGyros(gyro);
+	int16_t gyro_fifo[4 * 100];
+	uint8_t gyro_len;
+	int32_t gyro_accum[3] = {0, 0, 0};
+	int16_t gyro[3];	
+	gyro_len = PIOS_IMU3000_ReadFifo((uint8_t *) gyro_fifo, sizeof(gyro_fifo));
+	gyro_len /= 8;
+	for(int i = 0; i < gyro_len; i++) {
+		gyro_accum[0] += gyro_fifo[i * 4];
+		gyro_accum[1] += gyro_fifo[1 + i * 4];
+		gyro_accum[2] += gyro_fifo[2 + i * 4];
+	}
+	gyro[0] = gyro_accum[0] / gyro_len;
+	gyro[1] = gyro_accum[1] / gyro_len;
+	gyro[2] = gyro_accum[2] / gyro_len;
 	
 	// Not the swaping of channel orders
 	accel_data.filtered.x = accel[0] * PIOS_BMA180_GetScale();

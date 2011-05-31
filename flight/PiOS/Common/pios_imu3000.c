@@ -157,6 +157,69 @@ int32_t PIOS_IMU3000_ReadID()
 }
 
 /**
+ * @brief Reads the data from the IMU3000 FIFO
+ * \param[out] buffer destination buffer
+ * \param[in] len maximum number of bytes which should be read
+ * \return number of bytes transferred if operation was successful
+ * \return -1 if error during I2C transfer
+ */
+int32_t PIOS_IMU3000_ReadFifo(uint8_t * buffer, uint16_t len)
+{
+	uint16_t fifo_level;
+
+	uint8_t addr_buffer[] = {
+		0x3A,
+	};
+	
+
+	const struct pios_i2c_txn txn_list[] = {
+		{
+			.info = __func__,
+			.addr = PIOS_IMU3000_I2C_ADDR,
+			.rw = PIOS_I2C_TXN_WRITE,
+			.len = sizeof(addr_buffer),
+			.buf = addr_buffer,
+		}
+		,
+		{
+			.info = __func__,
+			.addr = PIOS_IMU3000_I2C_ADDR,
+			.rw = PIOS_I2C_TXN_READ,
+			.len = 2,
+			.buf = (uint8_t *) &fifo_level,
+		}
+	};
+	
+	// Get the number of bytes in the fifo
+	PIOS_I2C_Transfer(PIOS_I2C_GYRO_ADAPTER, txn_list, NELEMENTS(txn_list));
+	addr_buffer[0] = 0x3C;
+	
+	
+	if(len > fifo_level)
+		len = fifo_level;
+	len &= 0x01f8; // only read chunks of 8 bytes (includes footer)
+	
+	const struct pios_i2c_txn txn_list2[] = {
+		{
+			.info = __func__,
+			.addr = PIOS_IMU3000_I2C_ADDR,
+			.rw = PIOS_I2C_TXN_WRITE,
+			.len = sizeof(addr_buffer),
+			.buf = addr_buffer,
+		}
+		,
+		{
+			.info = __func__,
+			.addr = PIOS_IMU3000_I2C_ADDR,
+			.rw = PIOS_I2C_TXN_READ,
+			.len = len,
+			.buf = buffer,
+		}
+	};	
+	return PIOS_I2C_Transfer(PIOS_I2C_GYRO_ADAPTER, txn_list2, NELEMENTS(txn_list)) ? len : -1;
+}
+
+/**
 * @brief Reads one or more bytes from IMU3000 into a buffer
 * \param[in] address IMU3000 register address (depends on size)
 * \param[out] buffer destination buffer

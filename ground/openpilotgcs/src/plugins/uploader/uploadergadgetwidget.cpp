@@ -556,9 +556,9 @@ UploaderGadgetWidget::~UploaderGadgetWidget()
          delete qw;
     }
     if (pd)
-        delete pd;
+        pd->deleteLater();;
     if (t)
-        delete t;
+        t->deleteLater();;
 
 }
 

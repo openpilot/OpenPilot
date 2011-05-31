@@ -56,6 +56,7 @@ public:
     void apply();
     void finish();
     bool saveSettingsOnExit() const;
+    bool autoConnect() const;
     void readSettings(QSettings* qs);
     void saveSettings(QSettings* qs);
 
@@ -75,6 +76,7 @@ private:
     Ui::GeneralSettings *m_page;
     QString m_language;
     bool m_saveSettingsOnExit;
+    bool m_autoConnect;
     QPointer<QWidget> m_dialog;
     QList<QTextCodec *> m_codecs;
 

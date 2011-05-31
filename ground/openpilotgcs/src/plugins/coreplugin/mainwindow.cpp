@@ -873,6 +873,11 @@ MimeDatabase *MainWindow::mimeDatabase() const
     return m_mimeDatabase;
 }
 
+GeneralSettings * MainWindow::generalSettings() const
+{
+    return m_generalSettings;
+}
+
 IContext *MainWindow::contextObject(QWidget *widget)
 {
     return m_contextWidgets.value(widget);

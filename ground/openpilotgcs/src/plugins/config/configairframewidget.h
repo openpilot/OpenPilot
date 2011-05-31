@@ -89,6 +89,7 @@ private slots:
     void updateCustomThrottle1CurveValue(QList<double> list, double value);
     void updateCustomThrottle2CurveValue(QList<double> list, double value);
     void enableFFTest();
+    void openHelp();
 
 protected:
     void showEvent(QShowEvent *event);

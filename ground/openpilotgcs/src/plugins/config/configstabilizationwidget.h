@@ -55,6 +55,7 @@ private slots:
     void sendStabilizationUpdate();
     void saveStabilizationUpdate();
     void realtimeUpdateToggle(bool);
+    void openHelp();
 
     void updateRateRollKP(double);
     void updateRateRollKI(double);

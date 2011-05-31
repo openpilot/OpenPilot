@@ -130,64 +130,6 @@ Beware of not locking yourself out!</string>
      <string>Save</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="telemetryHelp">
-    <property name="geometry">
-     <rect>
-      <x>45</x>
-      <y>198</y>
-      <width>20</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="maximumSize">
-     <size>
-      <width>20</width>
-      <height>20</height>
-     </size>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="configgadget.qrc">
-      <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="commandHelp">
-    <property name="geometry">
-     <rect>
-      <x>45</x>
-      <y>284</y>
-      <width>20</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="maximumSize">
-     <size>
-      <width>20</width>
-      <height>20</height>
-     </size>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="icon">
-     <iconset resource="configgadget.qrc">
-      <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-    </property>
-   </widget>
   </widget>
  </widget>
  <resources>

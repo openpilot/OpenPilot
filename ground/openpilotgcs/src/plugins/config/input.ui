@@ -6,14 +6,57 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>617</width>
-    <height>395</height>
+    <width>622</width>
+    <height>435</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="inputHelp">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="configgadget.qrc">
+         <normaloff>:/configgadget/images/help.png</normaloff>:/configgadget/images/help.png</iconset>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -893,7 +936,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QCheckBox" name="doRCInputCalibration">
        <property name="geometry">
         <rect>
-         <x>40</x>
+         <x>20</x>
          <y>283</y>
          <width>181</width>
          <height>22</height>
@@ -1354,93 +1397,6 @@ reversal capabilities).</string>
         <string/>
        </property>
       </widget>
-      <widget class="QPushButton" name="commandHelp">
-       <property name="geometry">
-        <rect>
-         <x>230</x>
-         <y>284</y>
-         <width>20</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="configgadget.qrc">
-         <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="runCalibrationHelp">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>284</y>
-         <width>20</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="configgadget.qrc">
-         <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="receiverTypeHelp">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>20</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="configgadget.qrc">
-         <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-       </property>
-      </widget>
      </widget>
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
@@ -1760,87 +1716,6 @@ if you have not done so already.</string>
         </property>
        </widget>
       </widget>
-      <widget class="QPushButton" name="flightModeSwPosHelp">
-       <property name="geometry">
-        <rect>
-         <x>5</x>
-         <y>0</y>
-         <width>20</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="configgadget.qrc">
-         <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="stabilizationModePerAxis">
-       <property name="geometry">
-        <rect>
-         <x>5</x>
-         <y>130</y>
-         <width>20</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="configgadget.qrc">
-         <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="commandHelp_2">
-       <property name="geometry">
-        <rect>
-         <x>240</x>
-         <y>314</y>
-         <width>20</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="configgadget.qrc">
-         <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-       </property>
-      </widget>
      </widget>
      <widget class="QWidget" name="tab_4">
       <attribute name="title">
@@ -1849,29 +1724,6 @@ if you have not done so already.</string>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QPushButton" name="armPositionHelp">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>20</width>
-             <height>20</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="configgadget.qrc">
-             <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-           </property>
-          </widget>
-         </item>
          <item>
           <widget class="QLabel" name="label_17">
            <property name="font">
@@ -1909,29 +1761,6 @@ if you have not done so already.</string>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QPushButton" name="armingTimeoutHelp">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>20</width>
-             <height>20</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="configgadget.qrc">
-             <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-           </property>
-          </widget>
-         </item>
          <item>
           <widget class="QLabel" name="label_18">
            <property name="text">
@@ -1998,29 +1827,6 @@ if you have not done so already.</string>
             </size>
            </property>
           </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="commandHelp_3">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>20</width>
-             <height>20</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="configgadget.qrc">
-             <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-           </property>
-          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="getArmCurrent">

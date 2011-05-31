@@ -35,7 +35,8 @@
 #include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
-#include <QSignalMapper>
+#include <QDesktopServices>
+#include <QUrl>
 
 ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
@@ -201,29 +202,8 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
         }
     }
 
-    // Connect all the help buttons to signal mapper that passes button name to SLOT function
-    QSignalMapper* signalMapper = new QSignalMapper(this);
-    connect( m_config->receiverTypeHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_config->receiverTypeHelp, m_config->receiverTypeHelp->objectName());
-    connect( m_config->runCalibrationHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_config->runCalibrationHelp, m_config->runCalibrationHelp->objectName());
-    connect( m_config->commandHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_config->commandHelp, QString("commandHelp"));
-    connect( m_config->flightModeSwPosHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_config->flightModeSwPosHelp, m_config->flightModeSwPosHelp->objectName());
-    connect( m_config->stabilizationModePerAxis, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_config->stabilizationModePerAxis, m_config->stabilizationModePerAxis->objectName());
-    connect( m_config->commandHelp_2, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_config->commandHelp_2, QString("commandHelp"));
-    connect( m_config->armPositionHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_config->armPositionHelp, m_config->armPositionHelp->objectName());
-    connect( m_config->armingTimeoutHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_config->armingTimeoutHelp, m_config->armingTimeoutHelp->objectName());
-    connect( m_config->commandHelp_3, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_config->commandHelp_2, QString("commandHelp"));
-
-    connect(signalMapper, SIGNAL(mapped(const QString &)), parent, SLOT(showHelp(const QString &)));
-
+    // Connect the help button
+    connect(m_config->inputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 }
 
 ConfigInputWidget::~ConfigInputWidget()
@@ -719,3 +699,10 @@ void ConfigInputWidget::updateChannelInSlider(QSlider *slider, QLabel *min, QLab
         slider->setValue(value);
     }
 }
+
+void ConfigInputWidget::openHelp()
+{
+
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Input+Configuration", QUrl::StrictMode) );
+}
+

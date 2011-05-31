@@ -15,35 +15,55 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <spacer name="horizontalSpacer_6">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="stabilizationHelp">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="configgadget.qrc">
+         <normaloff>:/configgadget/images/help.png</normaloff>:/configgadget/images/help.png</iconset>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QFrame" name="piFactors">
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <item>
-           <widget class="QPushButton" name="rateStabiHelp">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="configgadget.qrc">
-              <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-            </property>
-           </widget>
-          </item>
           <item>
            <widget class="QLabel" name="label_8">
             <property name="font">
@@ -272,29 +292,6 @@ value as YawRate Kp.</string>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <widget class="QPushButton" name="attitudeStabiHelp">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>20</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="configgadget.qrc">
-              <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-            </property>
-           </widget>
-          </item>
           <item>
            <widget class="QLabel" name="label_9">
             <property name="font">
@@ -528,29 +525,6 @@ flying style.</string>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QPushButton" name="angleLimitsHelp">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>20</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="configgadget.qrc">
-            <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QLabel" name="label_5">
           <property name="font">
            <font>
@@ -652,29 +626,6 @@ flying style.</string>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QPushButton" name="updateRealTimeHelp">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="configgadget.qrc">
-         <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QCheckBox" name="realTimeUpdates">
        <property name="toolTip">
         <string>If you check this, the GCS will udpate the stabilization factors
@@ -697,29 +648,6 @@ automatically every 300ms, which will help for fast tuning.</string>
         </size>
        </property>
       </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="commandHelp">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="configgadget.qrc">
-         <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-       </property>
-      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="getStabilizationCurrent">

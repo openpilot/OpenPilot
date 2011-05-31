@@ -4,10 +4,12 @@ include(../shared/qtsingleapplication/qtsingleapplication.pri)
 TEMPLATE = app
 TARGET = $$GCS_APP_TARGET
 DESTDIR = $$GCS_APP_PATH
+QT += xml
 
 SOURCES += main.cpp
 
 include(../rpath.pri)
+include(../libs/utils/utils.pri)
 
 win32 {
     CONFIG(debug, debug|release):LIBS *= -lExtensionSystemd -lAggregationd  -lQExtSerialPortd

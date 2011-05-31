@@ -28,7 +28,7 @@
  */
 #include "importexportgadgetwidget.h"
 #include "ui_importexportgadgetwidget.h"
-#include "xmlconfig.h"
+#include "utils/xmlconfig.h"
 #include "coreplugin/uavgadgetinstancemanager.h"
 #include "coreplugin/icore.h"
 #include <extensionsystem/pluginmanager.h>

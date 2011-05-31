@@ -33,7 +33,7 @@
 
 LineardialGadgetFactory::LineardialGadgetFactory(QObject *parent) :
         IUAVGadgetFactory(QString("LineardialGadget"),
-                          tr("Bargraph Dial Gadget"),
+                          tr("Bargraph Dial"),
                           parent)
 {
 }

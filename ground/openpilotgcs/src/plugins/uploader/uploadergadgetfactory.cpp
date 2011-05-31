@@ -33,7 +33,7 @@
 #include <coreplugin/iuavgadget.h>
 
 UploaderGadgetFactory::UploaderGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("Uploader"), tr("Uploader Gadget"), parent)
+        IUAVGadgetFactory(QString("Uploader"), tr("Uploader"), parent)
 {
 }
 
@@ -50,10 +50,5 @@ Core::IUAVGadget* UploaderGadgetFactory::createGadget(QWidget *parent)
 IUAVGadgetConfiguration *UploaderGadgetFactory::createConfiguration(QSettings* qSettings)
 {
     return new UploaderGadgetConfiguration(QString("Uploader"), qSettings);
-}
-
-IOptionsPage *UploaderGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
-{
-    return new UploaderGadgetOptionsPage(qobject_cast<UploaderGadgetConfiguration*>(config));
 }
 

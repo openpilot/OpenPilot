@@ -90,6 +90,7 @@ private slots:
 	void sendRCInputUpdate();
 	void saveRCInputObject();
         void reverseCheckboxClicked(bool state);
+        void openHelp();
 };
 
 #endif

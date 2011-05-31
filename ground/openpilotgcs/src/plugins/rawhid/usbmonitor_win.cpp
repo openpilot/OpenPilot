@@ -195,14 +195,11 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
                             USBPortInfo temp=knowndevices.at(x);
                             emit deviceRemoved(temp);
                             found=true;
-                            qDebug()<<"REMOVED"<<temp.product;
                             break;
                         }
                     }
                     if(!found)
                         emit deviceRemoved(info);
-                    qDebug()<<"REMOVED2";
-
                 }
                 break;
 

@@ -111,7 +111,7 @@ public:
     Core::ThreadManager *threadManager() const;
     Core::ModeManager *modeManager() const;
     Core::MimeDatabase *mimeDatabase() const;
-
+    Internal::GeneralSettings *generalSettings() const;
     QSettings *settings(QSettings::Scope scope) const;
     inline SettingsDatabase *settingsDatabase() const { return m_settingsDatabase; }
     IContext * currentContextObject() const;

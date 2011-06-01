@@ -27,6 +27,7 @@
  */
 #include "uavobject.h"
 #include <QtEndian>
+#include <QDebug>
 
 /**
  * Constructor
@@ -224,7 +225,7 @@ UAVObjectField* UAVObject::getField(const QString& name)
         }
     }
     // If this point is reached then the field was not found
-    Q_ASSERT_X(0,"UAVObject::getField",QString("Non existant field " + name + " requested.  This indicates a bug.  Make sure you also have null checking for non-debug code.").toAscii());
+    qWarning()<<"UAVObject::getField Non existant field "<<name<<" requested.  This indicates a bug.  Make sure you also have null checking for non-debug code.";
     return NULL;
 }
 

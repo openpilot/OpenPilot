@@ -177,6 +177,7 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
                 info.devicePath=deviceID;
                 if( wParam == DBT_DEVICEARRIVAL )
                 {
+                    qDebug()<<"INSERTION";
                     if(infoFromHandle(guid,info,devInfo,i)==0)
                         break;
                     knowndevices.append(info);
@@ -186,19 +187,19 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
                 }
                 else if( wParam == DBT_DEVICEREMOVECOMPLETE )
                 {
+                    bool found=false;
                     for(int x=0;x<knowndevices.count();++x)
                     {
                         if(knowndevices[x].devicePath==deviceID)
                         {
-                            emit deviceRemoved(knowndevices[x]);
-                            //qDebug()<<"REMOVED"<<knowndevices[x].product;
-                            knowndevices.removeAt(x);
+                            USBPortInfo temp=knowndevices.at(x);
+                            emit deviceRemoved(temp);
+                            found=true;
                             break;
                         }
                     }
-                    emit deviceRemoved(info);
-
-
+                    if(!found)
+                        emit deviceRemoved(info);
                 }
                 break;
 

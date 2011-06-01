@@ -32,7 +32,7 @@
 #include <coreplugin/iuavgadget.h>
 
 ConfigGadgetFactory::ConfigGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("ConfigGadget"), tr("Config"), parent)
+        IUAVGadgetFactory(QString("ConfigGadget"), tr("Config Gadget"), parent)
 {
 }
 
@@ -49,4 +49,9 @@ Core::IUAVGadget* ConfigGadgetFactory::createGadget(QWidget *parent)
 IUAVGadgetConfiguration *ConfigGadgetFactory::createConfiguration(QSettings* qSettings)
 {
     return new ConfigGadgetConfiguration(QString("ConfigGadget"), qSettings);
+}
+
+IOptionsPage *ConfigGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
+{
+    return new ConfigGadgetOptionsPage(qobject_cast<ConfigGadgetConfiguration*>(config));
 }

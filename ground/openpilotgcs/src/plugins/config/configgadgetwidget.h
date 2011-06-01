@@ -52,10 +52,6 @@ public:
 
 public slots:
     void onAutopilotConnect();
-    void showHelp(const QString &helpName);
-
-private slots:
-    bool eventFilter(QObject *obj, QEvent *event);
 
 signals:
     void autopilotConnected();

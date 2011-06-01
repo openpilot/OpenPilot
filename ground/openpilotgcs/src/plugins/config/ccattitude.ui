@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>331</width>
-    <height>324</height>
+    <width>455</width>
+    <height>428</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,29 +18,6 @@
     <layout class="QVBoxLayout" name="verticalLayout_8">
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_7">
-       <item>
-        <widget class="QPushButton" name="attitudeRotationHelp">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="configgadget.qrc">
-           <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-         </property>
-        </widget>
-       </item>
        <item>
         <widget class="QLabel" name="label_6">
          <property name="font">
@@ -159,29 +136,6 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <item>
-        <widget class="QPushButton" name="attitudeCalibHelp">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="configgadget.qrc">
-           <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QLabel" name="label_7">
          <property name="font">
           <font>
@@ -285,29 +239,6 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <widget class="QPushButton" name="zeroOnArmHelp">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="configgadget.qrc">
-         <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QCheckBox" name="zeroGyroBiasOnArming">
        <property name="toolTip">
         <string>If enabled, a fast recalibration of gyro zero point will be done
@@ -363,7 +294,7 @@ arming it in that case!</string>
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="commandHelp">
+      <widget class="QPushButton" name="ccAttitudeHelp">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -372,16 +303,25 @@ arming it in that case!</string>
        </property>
        <property name="maximumSize">
         <size>
-         <width>20</width>
-         <height>20</height>
+         <width>32</width>
+         <height>32</height>
         </size>
        </property>
        <property name="text">
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="configgadget.qrc">
-         <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
+        <iconset resource="../coreplugin/core.qrc">
+         <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -411,23 +351,10 @@ arming it in that case!</string>
      </item>
     </layout>
    </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
   </layout>
  </widget>
  <resources>
-  <include location="configgadget.qrc"/>
+  <include location="../coreplugin/core.qrc"/>
  </resources>
  <connections/>
 </ui>

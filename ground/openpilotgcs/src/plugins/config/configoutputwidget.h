@@ -87,6 +87,7 @@ private slots:
 	void reverseChannel(bool state);
 	void linkToggled(bool state);
         void setSpinningArmed(bool val);
+        void openHelp();
 };
 
 #endif

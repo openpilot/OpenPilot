@@ -126,6 +126,7 @@ private slots:
     void enableHomeLocSave(UAVObject *obj);
     void launchAHRSCalibration();
     void saveAHRSCalibration();
+    void openHelp();
     void launchAccelBiasCalibration();
     void calibPhase2();
     void incrementProgress();

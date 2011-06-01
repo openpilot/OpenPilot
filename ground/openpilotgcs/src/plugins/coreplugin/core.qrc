@@ -60,5 +60,6 @@
         <file>images/world.png</file>
         <file>images/cog.png</file>
         <file>OpenPilotGCS.xml</file>
+        <file>images/helpicon.svg</file>
     </qresource>
 </RCC>

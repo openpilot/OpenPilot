@@ -33,11 +33,14 @@ It is expected that you have the following tools installed into the listed
 locations (but any other locations are fine as well):
 
  - Python            in C:\Python27
- - QtSDK             in C:\Qt\2010.05
+ - QtSDK             in C:\Qt\2010.05 or C:\QtSDK (depending on SDK version)
  - CodeSourcery G++  in %ProgramFiles%\CodeSourcery\Sourcery G++ Lite
  - msysGit           in %ProgramFiles%\Git
  - Unicode NSIS      in %ProgramFiles%\NSIS\Unicode
- - OpenOCD           in C:\OpenOCD\0.4.0\bin
+ - OpenOCD           in C:\OpenOCD\0.4.0\bin (optional)
+
+The SDL library and headers should be installed into Qt directories to build
+the GCS. Check the wiki or ground/openpilotgcs/copydata.pro for details.
 
 Also it is assumed that you have the C:\Program Files\Git\cmd\ directory in
 the PATH. Usually this is the case for msysGit installation if you have chosen

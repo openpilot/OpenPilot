@@ -34,7 +34,8 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 #include <math.h>
-#include <QSignalMapper>
+#include <QDesktopServices>
+#include <QUrl>
 
 /**
   Helper delegate for the custom mixer editor table.
@@ -193,32 +194,8 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
 
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestAircraftUpdate()));
 
-    // Connect all the help buttons to signal mapper that passes button name to SLOT function
-    QSignalMapper* signalMapper = new QSignalMapper(this);
-    connect( m_aircraft->acftTypeHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_aircraft->acftTypeHelp, m_aircraft->acftTypeHelp->objectName());
-    connect( m_aircraft->airplaneTypeHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_aircraft->airplaneTypeHelp, m_aircraft->airplaneTypeHelp->objectName());
-    connect( m_aircraft->channelAssignmentHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_aircraft->channelAssignmentHelp, m_aircraft->channelAssignmentHelp->objectName());
-    connect( m_aircraft->commandHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_aircraft->commandHelp, QString("commandHelp"));
-    connect( m_aircraft->throttleCurveHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_aircraft->throttleCurveHelp, QString("throttleCurveHelp"));
-    connect( m_aircraft->multiFrameTypeHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_aircraft->multiFrameTypeHelp, m_aircraft->multiFrameTypeHelp->objectName());
-    connect( m_aircraft->throttleCurveHelp_2, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_aircraft->throttleCurveHelp_2, QString("throttleCurveHelp"));
-    connect( m_aircraft->tricopterYawHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_aircraft->tricopterYawHelp, m_aircraft->tricopterYawHelp->objectName());
-    connect( m_aircraft->motorOutputChanHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_aircraft->motorOutputChanHelp, m_aircraft->motorOutputChanHelp->objectName());
-    connect( m_aircraft->feedForwardHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_aircraft->feedForwardHelp, m_aircraft->feedForwardHelp->objectName());
-    connect( m_aircraft->commandHelp_2, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_aircraft->commandHelp_2, QString("commandHelp"));
-
-    connect(signalMapper, SIGNAL(mapped(const QString &)), parent, SLOT(showHelp(const QString &)));
+    // Connect the help button
+    connect(m_aircraft->airframeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 }
 
 ConfigAirframeWidget::~ConfigAirframeWidget()
@@ -2159,5 +2136,11 @@ void ConfigAirframeWidget::saveAircraftUpdate()
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
     saveObjectToSD(obj);
 
+}
+
+void ConfigAirframeWidget::openHelp()
+{
+
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Airframe+configuration", QUrl::StrictMode) );
 }
 

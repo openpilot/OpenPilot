@@ -59,10 +59,13 @@ bool optionsPageLessThan(const IOptionsPage *p1, const IOptionsPage *p2)
     const UAVGadgetOptionsPageDecorator *gp2 = qobject_cast<const UAVGadgetOptionsPageDecorator*>(p2);
     if (gp1 && (gp2 == NULL))
         return false;
+
     if (gp2 && (gp1 == NULL))
         return true;
+
     if (const int cc = QString::localeAwareCompare(p1->trCategory(), p2->trCategory()))
         return cc < 0;
+
     return QString::localeAwareCompare(p1->trName(), p2->trName()) < 0;
 }
 
@@ -97,6 +100,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
     }
     if (m_windowWidth > 0 && m_windowHeight > 0)
         resize(m_windowWidth, m_windowHeight);
+
     buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
 
     connect(buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(apply()));
@@ -105,10 +109,12 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
     
     connect(this, SIGNAL(settingsDialogShown(Core::Internal::SettingsDialog*)), m_instanceManager, SLOT(settingsDialogShown(Core::Internal::SettingsDialog*)));
     connect(this, SIGNAL(settingsDialogRemoved()), m_instanceManager, SLOT(settingsDialogRemoved()));
+    connect(this, SIGNAL(categoryItemSelected()), this, SLOT(categoryItemSelectedShowChildInstead()), Qt::QueuedConnection);
 
     splitter->setCollapsible(0, false);
     splitter->setCollapsible(1, false);
     pageTree->header()->setVisible(false);
+//    pageTree->setIconSize(QSize(24, 24));
 
     connect(pageTree, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
         this, SLOT(pageSelected()));
@@ -129,44 +135,34 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
         item->setText(0, page->trName());
         item->setData(0, Qt::UserRole, qVariantFromValue(pageData));
 
-        QStringList categoriesId = page->category().split(QLatin1Char('|'));
-        QStringList trCategories = page->trCategory().split(QLatin1Char('|'));
-        QString currentCategory = categoriesId.at(0);
+        QString trCategories = page->trCategory();
+        QString currentCategory = page->category();
 
-        QTreeWidgetItem *treeitem;
+        QTreeWidgetItem *categoryItem;
         if (!categories.contains(currentCategory)) {
-            if (!firstUavGadgetOptionsPageFound)
-            {
+            // Above the first gadget option we insert a separator
+            if (!firstUavGadgetOptionsPageFound) {
                 UAVGadgetOptionsPageDecorator *pd = qobject_cast<UAVGadgetOptionsPageDecorator*>(page);
-                if (pd)
-                {
+                if (pd) {
                     firstUavGadgetOptionsPageFound = true;
                     QTreeWidgetItem *separator = new QTreeWidgetItem(pageTree);
-                    separator->setFlags(item->flags() & ~Qt::ItemIsSelectable & ~Qt::ItemIsEnabled);
+                    separator->setFlags(separator->flags() & ~Qt::ItemIsSelectable & ~Qt::ItemIsEnabled);
                     separator->setText(0, QString(30, 0xB7));
                 }
             }
-            treeitem = new QTreeWidgetItem(pageTree);
-            treeitem->setText(0, trCategories.at(0));
-            treeitem->setData(0, Qt::UserRole, qVariantFromValue(pageData));
-            categories.insert(currentCategory, treeitem);
+            categoryItem = new QTreeWidgetItem(pageTree);
+            categoryItem->setIcon(0, page->icon());
+            categoryItem->setText(0, trCategories);
+            categoryItem->setData(0, Qt::UserRole, qVariantFromValue(pageData));
+            categories.insert(currentCategory, categoryItem);
         }
 
-        int catCount = 1;
-        while (catCount < categoriesId.count()) {
-            if (!categories.contains(currentCategory + QLatin1Char('|') + categoriesId.at(catCount))) {
-                treeitem = new QTreeWidgetItem(categories.value(currentCategory));
-                currentCategory +=  QLatin1Char('|') + categoriesId.at(catCount);
-                treeitem->setText(0, trCategories.at(catCount));
-                treeitem->setData(0, Qt::UserRole, qVariantFromValue(pageData));
-                categories.insert(currentCategory, treeitem);
-            } else {
-                currentCategory +=  QLatin1Char('|') + categoriesId.at(catCount);
-            }
-            ++catCount;
+        QList<QTreeWidgetItem *> *categoryItemList = m_categoryItemsMap.value(currentCategory);
+        if (!categoryItemList) {
+             categoryItemList = new QList<QTreeWidgetItem *>();
+             m_categoryItemsMap.insert(currentCategory, categoryItemList);
         }
-
-        categories.value(currentCategory)->addChild(item);
+        categoryItemList->append(item);
 
         m_pages.append(page);
         stackedPages->addWidget(page->createPage(stackedPages));
@@ -179,6 +175,16 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
         index++;
     }
 
+    foreach(QString category, m_categoryItemsMap.keys()) {
+        QList<QTreeWidgetItem *> *categoryItemList = m_categoryItemsMap.value(category);
+        if (categoryItemList->size() > 1) {
+            foreach (QTreeWidgetItem *item, *categoryItemList) {
+                QTreeWidgetItem *categoryItem = categories.value(category);
+                categoryItem->addChild(item);
+            }
+        }
+    }
+
     QList<int> sizes;
     sizes << 150 << 300;
     splitter->setSizes(sizes);
@@ -189,22 +195,49 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
 
 SettingsDialog::~SettingsDialog()
 {
+    foreach(QString category, m_categoryItemsMap.keys()) {
+        QList<QTreeWidgetItem *> *categoryItemList = m_categoryItemsMap.value(category);
+        delete categoryItemList;
+    }
 }
 
 void SettingsDialog::pageSelected()
 {
     QTreeWidgetItem *item = pageTree->currentItem();
+    if (!item)
+        return;
+
     PageData data = item->data(0, Qt::UserRole).value<PageData>();
     int index = data.index;
     m_currentCategory = data.category;
     m_currentPage = data.id;
     stackedPages->setCurrentIndex(index);
+    // If user selects a toplevel item, select the first child for them
+    // I.e. Top level items are not really selectable
+    if ((pageTree->indexOfTopLevelItem(item) >= 0) && (item->childCount() > 0)) {
+        emit categoryItemSelected();
+    }
+}
+
+void SettingsDialog::categoryItemSelectedShowChildInstead()
+{
+    QTreeWidgetItem *item = pageTree->currentItem();
+    item->setExpanded(true);
+    pageTree->setCurrentItem(item->child(0), 0, QItemSelectionModel::SelectCurrent);
 }
 
 void SettingsDialog::deletePage()
 {
     QTreeWidgetItem *item = pageTree->currentItem();
-    item->parent()->removeChild(item);
+    PageData data = item->data(0, Qt::UserRole).value<PageData>();
+    QString category = data.category;
+    QList<QTreeWidgetItem *> *categoryItemList = m_categoryItemsMap.value(category);
+    QTreeWidgetItem *parentItem = item->parent();
+    parentItem->removeChild(item);
+    categoryItemList->removeOne(item);
+    if (parentItem->childCount() == 1) {
+        parentItem->removeChild(parentItem->child(0));
+    }
     pageSelected();
 }
 
@@ -227,11 +260,20 @@ void SettingsDialog::insertPage(IOptionsPage* page)
     if (!categoryItem)
         return;
 
+    // If this category has no child right now
+    // we need to add the "default child"
+    QList<QTreeWidgetItem *> *categoryItemList = m_categoryItemsMap.value(page->category());
+    if (categoryItem->childCount() == 0) {
+        QTreeWidgetItem *defaultItem = categoryItemList->at(0);
+        categoryItem->addChild(defaultItem);
+    }
+
     QTreeWidgetItem *item = new QTreeWidgetItem;
     item->setText(0, page->trName());
     item->setData(0, Qt::UserRole, qVariantFromValue(pageData));
 
     categoryItem->addChild(item);
+    categoryItemList->append(item);
 
     m_pages.append(page);
     stackedPages->addWidget(page->createPage(stackedPages));
@@ -256,7 +298,7 @@ void SettingsDialog::accept()
 {
     m_applied = true;
     foreach (IOptionsPage *page, m_pages) {
-            page->apply();
+        page->apply();
         page->finish();
     }
     done(QDialog::Accepted);
@@ -266,14 +308,15 @@ void SettingsDialog::reject()
 {
     foreach (IOptionsPage *page, m_pages)
         page->finish();
+
     done(QDialog::Rejected);
 }
 
 void SettingsDialog::apply()
 {
-    foreach (IOptionsPage *page, m_pages) {
-            page->apply();
-    }
+    foreach (IOptionsPage *page, m_pages)
+        page->apply();
+
     m_applied = true;
 }
 

@@ -10,6 +10,8 @@ struct pios_board_info {
   uint32_t fw_size;
   uint32_t desc_base;
   uint32_t desc_size;
+  uint32_t ee_base;
+  uint32_t ee_size;
 } __attribute__((packed));
 
 extern const struct pios_board_info pios_board_info_blob;

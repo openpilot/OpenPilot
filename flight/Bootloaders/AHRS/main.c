@@ -33,6 +33,7 @@
 
 /* OpenPilot Includes */
 #include "ahrs_bl.h"
+#include <pios_board_info.h>
 #include "pios_opahrs_proto.h"
 #include "bl_fsm.h"		/* lfsm_state */
 #include "stm32f10x_flash.h"
@@ -108,6 +109,7 @@ static struct opahrs_msg_v0 link_rx_v0;
 static struct opahrs_msg_v0 user_tx_v0;
 static struct opahrs_msg_v0 user_rx_v0;
 void process_spi_request(void) {
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
 	bool msg_to_process = FALSE;
 
 	PIOS_IRQ_Disable();
@@ -166,15 +168,15 @@ void process_spi_request(void) {
 		break;
 	case OPAHRS_MSG_V0_REQ_MEM_MAP:
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_MEM_MAP);
-		user_tx_v0.payload.user.v.rsp.mem_map.density = HW_TYPE;
+		user_tx_v0.payload.user.v.rsp.mem_map.density = bdinfo->hw_type;
 		user_tx_v0.payload.user.v.rsp.mem_map.rw_flags = (BOARD_READABLE
-				| (BOARD_WRITABLA << 1));
+				| (BOARD_WRITABLE << 1));
 		user_tx_v0.payload.user.v.rsp.mem_map.size_of_code_memory
-				= SIZE_OF_CODE;
+				= bdinfo->fw_size;
 		user_tx_v0.payload.user.v.rsp.mem_map.size_of_description
-				= SIZE_OF_DESCRIPTION;
+				= bdinfo->desc_size;
 		user_tx_v0.payload.user.v.rsp.mem_map.start_of_user_code
-				= START_OF_USER_CODE;
+				= bdinfo->fw_base;
 		lfsm_user_set_tx_v0(&user_tx_v0);
 		break;
 	case OPAHRS_MSG_V0_REQ_SERIAL:
@@ -192,7 +194,7 @@ void process_spi_request(void) {
 		PIOS_LED_On(LED1);
 		opahrs_msg_v0_init_user_tx(&user_tx_v0, OPAHRS_MSG_V0_RSP_FWUP_STATUS);
 		if (!(user_rx_v0.payload.user.v.req.fwup_data.adress
-				< START_OF_USER_CODE)) {
+				< bdinfo->fw_base)) {
 			for (uint8_t x = 0; x
 					< user_rx_v0.payload.user.v.req.fwup_data.size; ++x) {
 				if (FLASH_ProgramWord(
@@ -250,13 +252,10 @@ void process_spi_request(void) {
 	return;
 }
 void jump_to_app() {
-	//while(TRUE)
-	//{
-	//	PIOS_LED_Toggle(LED1);
-	//	PIOS_DELAY_WaitmS(1000);
-	//}
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+
 	PIOS_LED_On(LED1);
-	if (((*(__IO uint32_t*) START_OF_USER_CODE) & 0x2FFE0000) == 0x20000000) { /* Jump to user application */
+	if (((*(__IO uint32_t*) bdinfo->fw_base) & 0x2FFE0000) == 0x20000000) { /* Jump to user application */
 		FLASH_Lock();
 		RCC_APB2PeriphResetCmd(0xffffffff, ENABLE);
 		RCC_APB1PeriphResetCmd(0xffffffff, ENABLE);
@@ -265,10 +264,10 @@ void jump_to_app() {
 		//_SetCNTR(0); // clear interrupt mask
 		//_SetISTR(0); // clear all requests
 
-		JumpAddress = *(__IO uint32_t*) (START_OF_USER_CODE + 4);
+		JumpAddress = *(__IO uint32_t*) (bdinfo->fw_base + 4);
 		Jump_To_Application = (pFunction) JumpAddress;
 		/* Initialize user application's Stack Pointer */
-		__set_MSP(*(__IO uint32_t*) START_OF_USER_CODE);
+		__set_MSP(*(__IO uint32_t*) bdinfo->fw_base);
 		Jump_To_Application();
 	} else {
 		boot_status = jump_failed;

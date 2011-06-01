@@ -140,43 +140,5 @@ void ConfigGadgetWidget::onAutopilotConnect() {
     emit autopilotConnected();
 }
 
-void ConfigGadgetWidget::showHelp(const QString &helpName)
-{
-    // Close any previous help windows still open
-    if(help != 0) {
-        help->close();
-    }
-
-    // Make help windows with given filename and resize to config gadget width
-    help = new QTextBrowser(this);
-    help->setSource(QUrl::fromLocalFile( QString(Utils::PathUtils().InsertDataPath("%%DATAPATH%%help/")) +
-					 helpName + QString(".html") ));
-    QSize size = help->sizeHint();
-    size.setWidth(this->width());
-    help->resize(size);
-
-    // Now catch closing events, show the window and give it focus
-    help->installEventFilter(this);
-    help->show();
-    help->setFocus();
-}
-
-bool ConfigGadgetWidget::eventFilter(QObject *obj, QEvent *event)
-{
-    // If help is open and we get a close event, close the help window
-    // Close events currently are any key press and the mouse leaving the help window
-
-    //printf("event type: %d\n",event->type());
-    if(help != 0) {
-        if (event->type() == QEvent::Leave || event->type() == QEvent::KeyPress) {
-            help->close();
-            help=0;
-            return true;
-        }
-    } 
-
-    // standard event processing
-    return QObject::eventFilter(obj, event);
-}
 
 

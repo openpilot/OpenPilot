@@ -32,6 +32,7 @@
 #include <QSettings>
 #include <QtCore/QMap>
 #include <QtCore/QStringList>
+#include <QtGui/QIcon>
 #include "core_global.h"
 #include "uavconfiginfo.h"
 
@@ -68,9 +69,10 @@ public:
     void cloneConfiguration(IUAVGadgetConfiguration *config);
     void applyChanges(IUAVGadgetConfiguration *config);
     void configurationNameEdited(QString text, bool hasText = true);
-    QStringList classIds() const { return m_classIds.keys(); }
+    QStringList classIds() const { return m_classIdNameMap.keys(); }
     QStringList configurationNames(QString classId) const;
     QString gadgetName(QString classId) const;
+    QIcon gadgetIcon(QString classId) const;
 
 signals:
     void configurationChanged(IUAVGadgetConfiguration* config);
@@ -91,7 +93,8 @@ private:
     QList<IUAVGadgetFactory*> m_factories;
     QList<IUAVGadgetConfiguration*> m_configurations;
     QList<IOptionsPage*> m_optionsPages;
-    QMap<QString, QString> m_classIds;
+    QMap<QString, QString> m_classIdNameMap;
+    QMap<QString, QIcon> m_classIdIconMap;
     QMap<QString, QStringList> m_takenNames;
     QList<IUAVGadgetConfiguration*> m_provisionalConfigs;
     QList<IUAVGadgetConfiguration*> m_provisionalDeletes;

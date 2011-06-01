@@ -32,7 +32,7 @@
 #include <coreplugin/iuavgadget.h>
 
 OPMapGadgetFactory::OPMapGadgetFactory(QObject *parent) :
-                IUAVGadgetFactory(QString("OPMapGadget"), tr("OPMap Gadget"), parent)
+                IUAVGadgetFactory(QString("OPMapGadget"), tr("OPMap"), parent)
 {
 }
 

@@ -17,7 +17,11 @@
    <item>
     <layout class="QGridLayout" name="gridLayout">
      <item row="2" column="0" colspan="3">
-      <widget class="QLineEdit" name="description"/>
+      <widget class="QLineEdit" name="description">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item row="4" column="0">
       <widget class="QLabel" name="deviceID">

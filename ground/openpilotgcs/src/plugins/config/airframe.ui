@@ -30,29 +30,6 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QPushButton" name="acftTypeHelp">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>20</width>
-             <height>20</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="configgadget.qrc">
-             <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QLabel" name="label">
            <property name="font">
             <font>
@@ -102,7 +79,7 @@
        <item>
         <widget class="QStackedWidget" name="airframesWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="fixedWing">
           <property name="enabled">
@@ -116,23 +93,6 @@
             <layout class="QVBoxLayout" name="verticalLayout_6">
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_3">
-               <item>
-                <widget class="QPushButton" name="airplaneTypeHelp">
-                 <property name="maximumSize">
-                  <size>
-                   <width>20</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="configgadget.qrc">
-                   <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-                 </property>
-                </widget>
-               </item>
                <item>
                 <widget class="QLabel" name="label_5">
                  <property name="sizePolicy">
@@ -172,23 +132,6 @@
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_23">
-               <item>
-                <widget class="QPushButton" name="channelAssignmentHelp">
-                 <property name="maximumSize">
-                  <size>
-                   <width>20</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="configgadget.qrc">
-                   <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-                 </property>
-                </widget>
-               </item>
                <item>
                 <widget class="QLabel" name="label_7">
                  <property name="font">
@@ -452,23 +395,6 @@
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_15">
                    <item>
-                    <widget class="QPushButton" name="throttleCurveHelp">
-                     <property name="maximumSize">
-                      <size>
-                       <width>20</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                     <property name="icon">
-                      <iconset resource="configgadget.qrc">
-                       <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
                     <widget class="QLabel" name="label_13">
                      <property name="font">
                       <font>
@@ -587,29 +513,6 @@
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_5">
                    <item>
-                    <widget class="QPushButton" name="multiFrameTypeHelp">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="maximumSize">
-                      <size>
-                       <width>20</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                     <property name="icon">
-                      <iconset resource="configgadget.qrc">
-                       <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
                     <widget class="QLabel" name="label_15">
                      <property name="font">
                       <font>
@@ -650,29 +553,6 @@
                     <layout class="QVBoxLayout" name="verticalLayout_20">
                      <item>
                       <layout class="QHBoxLayout" name="horizontalLayout_25">
-                       <item>
-                        <widget class="QPushButton" name="mixLevelHelp">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>20</width>
-                           <height>20</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string/>
-                         </property>
-                         <property name="icon">
-                          <iconset resource="configgadget.qrc">
-                           <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-                         </property>
-                        </widget>
-                       </item>
                        <item>
                         <widget class="QLabel" name="label_4">
                          <property name="font">
@@ -886,29 +766,6 @@ Typical value is 50% for + or X configuration on quads.</string>
                     </spacer>
                    </item>
                    <item>
-                    <widget class="QPushButton" name="throttleCurveHelp_2">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="maximumSize">
-                      <size>
-                       <width>20</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                     <property name="icon">
-                      <iconset resource="configgadget.qrc">
-                       <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
                     <widget class="QLabel" name="label_24">
                      <property name="font">
                       <font>
@@ -985,7 +842,7 @@ Typical value is 50% for + or X configuration on quads.</string>
               </layout>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1,0,3">
+              <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1,3">
                <property name="spacing">
                 <number>10</number>
                </property>
@@ -993,29 +850,6 @@ Typical value is 50% for + or X configuration on quads.</string>
                 <layout class="QVBoxLayout" name="verticalLayout_10">
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_26">
-                   <item>
-                    <widget class="QPushButton" name="tricopterYawHelp">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="maximumSize">
-                      <size>
-                       <width>20</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                     <property name="icon">
-                      <iconset resource="configgadget.qrc">
-                       <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-                     </property>
-                    </widget>
-                   </item>
                    <item>
                     <widget class="QLabel" name="label_23">
                      <property name="font">
@@ -1072,46 +906,6 @@ Typical value is 50% for + or X configuration on quads.</string>
                  </item>
                  <item>
                   <spacer name="verticalSpacer_4">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QVBoxLayout" name="verticalLayout_26">
-                 <item>
-                  <widget class="QPushButton" name="motorOutputChanHelp">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>20</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="icon">
-                    <iconset resource="configgadget.qrc">
-                     <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <spacer name="verticalSpacer_3">
                    <property name="orientation">
                     <enum>Qt::Vertical</enum>
                    </property>
@@ -2137,19 +1931,34 @@ p, li { white-space: pre-wrap; }
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="commandHelp">
+          <widget class="QPushButton" name="airframeHelp">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="maximumSize">
             <size>
-             <width>20</width>
-             <height>20</height>
+             <width>32</width>
+             <height>32</height>
             </size>
            </property>
            <property name="text">
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="configgadget.qrc">
-             <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
+            <iconset resource="../coreplugin/core.qrc">
+             <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>32</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -2196,29 +2005,6 @@ p, li { white-space: pre-wrap; }
         <layout class="QVBoxLayout" name="verticalLayout_11" stretch="0,1,0,0,0,0">
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_24">
-           <item>
-            <widget class="QPushButton" name="feedForwardHelp">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>20</width>
-               <height>20</height>
-              </size>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="icon">
-              <iconset resource="configgadget.qrc">
-               <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-             </property>
-            </widget>
-           </item>
            <item>
             <widget class="QLabel" name="label_19">
              <property name="font">
@@ -2531,29 +2317,6 @@ p, li { white-space: pre-wrap; }
             </spacer>
            </item>
            <item>
-            <widget class="QPushButton" name="commandHelp_2">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>20</width>
-               <height>20</height>
-              </size>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="icon">
-              <iconset resource="configgadget.qrc">
-               <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="QPushButton" name="ffGetCurrent">
              <property name="toolTip">
               <string>Request current settings from the board.</string>
@@ -2608,7 +2371,7 @@ p, li { white-space: pre-wrap; }
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="configgadget.qrc"/>
+  <include location="../coreplugin/core.qrc"/>
  </resources>
  <connections>
   <connection>

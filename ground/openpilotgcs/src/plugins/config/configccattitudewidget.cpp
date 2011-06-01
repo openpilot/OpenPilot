@@ -30,7 +30,8 @@
 #include <QMutexLocker>
 #include <QMessageBox>
 #include <QDebug>
-#include <QSignalMapper>
+#include <QDesktopServices>
+#include <QUrl>
 
 ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
         ConfigTaskWidget(parent),
@@ -46,18 +47,8 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(getCurrentAttitudeSettings()));
     getCurrentAttitudeSettings(); // The 1st time this panel is instanciated, the autopilot is already connected.
 
-    // Connect all the help buttons to signal mapper that passes button name to SLOT function
-    QSignalMapper* signalMapper = new QSignalMapper(this);
-    connect( ui->attitudeRotationHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(ui->attitudeRotationHelp, ui->attitudeRotationHelp->objectName());
-    connect( ui->attitudeCalibHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(ui->attitudeCalibHelp, ui->attitudeCalibHelp->objectName());
-    connect( ui->zeroOnArmHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(ui->zeroOnArmHelp, ui->zeroOnArmHelp->objectName());
-    connect( ui->commandHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(ui->commandHelp, QString("commandHelp"));
-
-    connect(signalMapper, SIGNAL(mapped(const QString &)), parent, SLOT(showHelp(const QString &)));
+    // Connect the help button
+    connect(ui->ccAttitudeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 }
 
 ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()
@@ -183,3 +174,10 @@ void ConfigCCAttitudeWidget::saveAttitudeSettings() {
     UAVDataObject * obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeSettings")));
     saveObjectToSD(obj);
 }
+
+void ConfigCCAttitudeWidget::openHelp()
+{
+
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/CopterControl+Attitude+Configuration", QUrl::StrictMode) );
+}
+

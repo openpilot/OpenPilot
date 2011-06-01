@@ -53,6 +53,7 @@ private slots:
     void saveAttitudeSettings();
     void applyAttitudeSettings();
     void getCurrentAttitudeSettings();
+    void openHelp();
 
 private:
     QMutex startStop;

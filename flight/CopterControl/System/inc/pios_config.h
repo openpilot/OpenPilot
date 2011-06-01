@@ -64,6 +64,7 @@
 #define PIOS_INCLUDE_FREERTOS
 #define PIOS_INCLUDE_GPIO
 #define PIOS_INCLUDE_EXTI
+#define PIOS_INCLUDE_RTC
 #define PIOS_INCLUDE_WDG
 #define PIOS_INCLUDE_BL_HELPER
 
@@ -92,7 +93,7 @@
 /* Task stack sizes */
 #define PIOS_ACTUATOR_STACK_SIZE       1020
 #define PIOS_MANUAL_STACK_SIZE          724
-#define PIOS_SYSTEM_STACK_SIZE          504
+#define PIOS_SYSTEM_STACK_SIZE          560
 #define PIOS_STABILIZATION_STACK_SIZE   524
 #define PIOS_TELEM_STACK_SIZE           500
 

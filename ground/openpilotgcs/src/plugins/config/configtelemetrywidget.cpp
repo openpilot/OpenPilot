@@ -32,7 +32,6 @@
 #include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
-#include <QSignalMapper>
 
 
 ConfigTelemetryWidget::ConfigTelemetryWidget(QWidget *parent) : ConfigTaskWidget(parent)
@@ -54,15 +53,6 @@ ConfigTelemetryWidget::ConfigTelemetryWidget(QWidget *parent) : ConfigTaskWidget
     connect(m_telemetry->getTelemetryCurrent, SIGNAL(clicked()), this, SLOT(requestTelemetryUpdate()));
 
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestTelemetryUpdate()));
-
-    // Connect all the help buttons to signal mapper that passes button name to SLOT function
-    QSignalMapper* signalMapper = new QSignalMapper(this);
-    connect( m_telemetry->telemetryHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_telemetry->telemetryHelp, m_telemetry->telemetryHelp->objectName());
-    connect( m_telemetry->commandHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_telemetry->commandHelp, QString("commandHelp"));
-
-    connect(signalMapper, SIGNAL(mapped(const QString &)), parent, SLOT(showHelp(const QString &)));
 }
 
 ConfigTelemetryWidget::~ConfigTelemetryWidget()

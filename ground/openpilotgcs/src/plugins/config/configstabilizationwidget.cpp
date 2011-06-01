@@ -32,8 +32,8 @@
 #include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
-#include <QSignalMapper>
-
+#include <QDesktopServices>
+#include <QUrl>
 
 ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
@@ -74,20 +74,8 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     connect(m_stabilization->pitchKi, SIGNAL(valueChanged(double)), this, SLOT(updatePitchKI(double)));
     connect(m_stabilization->pitchILimit, SIGNAL(valueChanged(double)), this, SLOT(updatePitchILimit(double)));
 
-    // Connect all the help buttons to signal mapper that passes button name to SLOT function
-    QSignalMapper* signalMapper = new QSignalMapper(this);
-    connect( m_stabilization->rateStabiHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_stabilization->rateStabiHelp, m_stabilization->rateStabiHelp->objectName());
-    connect( m_stabilization->attitudeStabiHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_stabilization->attitudeStabiHelp, m_stabilization->attitudeStabiHelp->objectName());
-    connect( m_stabilization->angleLimitsHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_stabilization->angleLimitsHelp, m_stabilization->angleLimitsHelp->objectName());
-    connect( m_stabilization->updateRealTimeHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_stabilization->updateRealTimeHelp, m_stabilization->updateRealTimeHelp->objectName());
-    connect( m_stabilization->commandHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_stabilization->commandHelp, m_stabilization->commandHelp->objectName());
-
-    connect(signalMapper, SIGNAL(mapped(const QString &)), parent, SLOT(showHelp(const QString &)));
+    // Connect the help button
+    connect(m_stabilization->stabilizationHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 }
 
 ConfigStabilizationWidget::~ConfigStabilizationWidget()
@@ -288,5 +276,11 @@ void ConfigStabilizationWidget::realtimeUpdateToggle(bool state)
         updateTimer.start(300);
     else
         updateTimer.stop();
+}
+
+void ConfigStabilizationWidget::openHelp()
+{
+
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Stabilization+panel", QUrl::StrictMode) );
 }
 

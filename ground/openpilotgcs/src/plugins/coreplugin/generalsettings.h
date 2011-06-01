@@ -57,6 +57,7 @@ public:
     void finish();
     bool saveSettingsOnExit() const;
     bool autoConnect() const;
+    bool autoSelect() const;
     void readSettings(QSettings* qs);
     void saveSettings(QSettings* qs);
 
@@ -65,6 +66,7 @@ private slots:
     void resetLanguage();
     void resetExternalEditor();
     void showHelpForExternalEditor();
+    void slotAutoConnect();
 #ifdef Q_OS_UNIX
     void resetTerminal();
 #endif
@@ -77,6 +79,7 @@ private:
     QString m_language;
     bool m_saveSettingsOnExit;
     bool m_autoConnect;
+    bool m_autoSelect;
     QPointer<QWidget> m_dialog;
     QList<QTextCodec *> m_codecs;
 

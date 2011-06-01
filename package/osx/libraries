@@ -1,8 +1,8 @@
 #!/bin/bash
 
 APP="${1?}"
-PLUGINS="${APP}/Contents/PlugIns"
-OP_PLUGINS="${APP}/Contents/PlugIns/OpenPilot"
+PLUGINS="${APP}/Contents/Plugins"
+OP_PLUGINS="${APP}/Contents/Plugins/OpenPilot"
 QT_LIBS="QtGui QtCore QtSvg QtSql QtOpenGL QtNetwork QtXml QtDBus QtScript phonon"
 
 echo "Processing Qt libraries in $1"

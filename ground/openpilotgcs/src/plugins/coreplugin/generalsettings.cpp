@@ -45,7 +45,8 @@ using namespace Core::Internal;
 
 GeneralSettings::GeneralSettings():
     m_dialog(0),
-    m_saveSettingsOnExit(true)
+    m_saveSettingsOnExit(true),
+    m_autoConnect(true),m_autoSelect(true)
 {
 }
 
@@ -113,8 +114,10 @@ QWidget *GeneralSettings::createPage(QWidget *parent)
     m_page->setupUi(w);
 
     fillLanguageBox();
+    connect(m_page->checkAutoConnect,SIGNAL(stateChanged(int)),this,SLOT(slotAutoConnect(int)));
     m_page->checkBoxSaveOnExit->setChecked(m_saveSettingsOnExit);
-
+    m_page->checkAutoConnect->setChecked(m_autoConnect);
+    m_page->checkAutoSelect->setChecked(m_autoSelect);
     m_page->colorButton->setColor(StyleHelper::baseColor());
 #ifdef Q_OS_UNIX
     m_page->terminalEdit->setText(ConsoleProcess::terminalEmulator(Core::ICore::instance()->settings()));
@@ -146,6 +149,8 @@ void GeneralSettings::apply()
     StyleHelper::setBaseColor(m_page->colorButton->color());
 
     m_saveSettingsOnExit = m_page->checkBoxSaveOnExit->isChecked();
+    m_autoConnect = m_page->checkAutoConnect->isChecked();
+    m_autoSelect = m_page->checkAutoSelect->isChecked();
 #ifdef Q_OS_UNIX
 	ConsoleProcess::setTerminalEmulator(Core::ICore::instance()->settings(),
                                         m_page->terminalEdit->text());
@@ -163,6 +168,8 @@ void GeneralSettings::readSettings(QSettings* qs)
     qs->beginGroup(QLatin1String("General"));
     m_language = qs->value(QLatin1String("OverrideLanguage"),QLocale::system().name()).toString();
     m_saveSettingsOnExit = qs->value(QLatin1String("SaveSettingsOnExit"),m_saveSettingsOnExit).toBool();
+    m_autoConnect = qs->value(QLatin1String("AutoConnect"),m_autoConnect).toBool();
+    m_autoSelect = qs->value(QLatin1String("AutoSelect"),m_autoSelect).toBool();
     qs->endGroup();
 
 }
@@ -177,6 +184,8 @@ void GeneralSettings::saveSettings(QSettings* qs)
         qs->setValue(QLatin1String("OverrideLanguage"), m_language);
 
     qs->setValue(QLatin1String("SaveSettingsOnExit"), m_saveSettingsOnExit);
+    qs->setValue(QLatin1String("AutoConnect"), m_autoConnect);
+    qs->setValue(QLatin1String("AutoSelect"), m_autoSelect);
     qs->endGroup();
 }
 
@@ -240,4 +249,22 @@ void GeneralSettings::setLanguage(const QString &locale)
 bool GeneralSettings::saveSettingsOnExit() const
 {
     return m_saveSettingsOnExit;
+}
+
+bool GeneralSettings::autoConnect() const
+{
+    return m_autoConnect;
+}
+
+bool GeneralSettings::autoSelect() const
+{
+    return m_autoSelect;
+}
+
+void GeneralSettings::slotAutoConnect(int value)
+{
+    if (value==Qt::Checked)
+        m_page->checkAutoSelect->setEnabled(false);
+    else
+        m_page->checkAutoSelect->setEnabled(true);
 }

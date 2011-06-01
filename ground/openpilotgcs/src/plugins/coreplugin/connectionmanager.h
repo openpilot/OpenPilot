@@ -30,7 +30,8 @@
 #define CONNECTIONMANAGER_H
 
 #include <QWidget>
-
+#include "mainwindow.h"
+#include "generalsettings.h"
 #include <QtCore/QVector>
 #include <QtCore/QIODevice>
 #include <QtCore/QLinkedList>
@@ -108,6 +109,7 @@ protected:
 
 private:
 	bool connectDevice();
+        Internal::MainWindow *m_mainWindow;
 
 };
 

@@ -245,8 +245,9 @@ QString XmlConfig::variantToString(const QVariant &v)
         result = QLatin1String("@Variant(");
         result += QString::fromLatin1(a.toBase64().constData());
         result += QLatin1Char(')');
-        qDebug() << "Variant Type: " << v.type();
-        qDebug()<< "Variant: " << result;
+	// These were being much too noisy!!
+        //qDebug() << "Variant Type: " << v.type();
+        //qDebug()<< "Variant: " << result;
 #else
         Q_ASSERT(!"QSettings: Cannot save custom types without QDataStream support");
 #endif

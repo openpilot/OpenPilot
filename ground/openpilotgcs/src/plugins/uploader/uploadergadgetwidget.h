@@ -78,10 +78,10 @@ private:
      bool resetOnly;
      void clearLog();
      QString getPortDevice(const QString &friendName);
-     QProgressDialog* pd;
-     QTimer* t;
+     QProgressDialog* m_progress;
+     QTimer* m_timer;
      QLineEdit* openFileNameLE;
-     QEventLoop q;
+     QEventLoop m_eventloop;
 private slots:
     void error(QString errorString,int errorNumber);
     void info(QString infoString,int infoNumber);

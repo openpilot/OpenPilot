@@ -35,6 +35,8 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     currentStep = IAP_STATE_READY;
     resetOnly=false;
     dfu = NULL;
+    m_timer = 0;
+    m_progress = 0;
 
     // Listen to autopilot connection events
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -430,28 +432,28 @@ void UploaderGadgetWidget::systemRescue()
     log("** Follow those instructions to attempt a system rescue **");
     log("**********************************************************");
     log("You will be prompted to first connect USB, then system power");
-    pd = new QProgressDialog(tr("Please connect the board (USB only!)"), tr("Cancel"), 0, 20);
-    QProgressBar * bar=new QProgressBar(pd);
+    m_progress = new QProgressDialog(tr("Please connect the board (USB only!)"), tr("Cancel"), 0, 20);
+    QProgressBar * bar=new QProgressBar(m_progress);
     bar->setFormat("Timeout");
-    pd->setBar(bar);
-    pd->setMinimumDuration(0);
-    pd->setRange(0,20);
-    connect(pd, SIGNAL(canceled()), this, SLOT(cancel()));
-    t = new QTimer(this);
-    connect(t, SIGNAL(timeout()), this, SLOT(perform()));
-    t->start(1000);
-    connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)),&q, SLOT(quit()));
-    q.exec();
-    if(!t->isActive())
+    m_progress->setBar(bar);
+    m_progress->setMinimumDuration(0);
+    m_progress->setRange(0,20);
+    connect(m_progress, SIGNAL(canceled()), this, SLOT(cancel()));
+    m_timer = new QTimer(this);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(perform()));
+    m_timer->start(1000);
+    connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)),&m_eventloop, SLOT(quit()));
+    m_eventloop.exec();
+    if(!m_timer->isActive())
     {
-        pd->close();
-        t->stop();
+        m_progress->close();
+        m_timer->stop();
         QMessageBox::warning(this,tr("Openpilot Uploader"),tr("No board connection was detected!"));
         m_config->rescueButton->setEnabled(true);
         return;
     }
-    pd->close();
-    t->stop();
+    m_progress->close();
+    m_timer->stop();
     log("... Detecting First Board...");
     repaint();
     dfu = new DFUObject(DFU_DEBUG, false, QString());
@@ -477,8 +479,8 @@ void UploaderGadgetWidget::systemRescue()
     if(QMessageBox::question(this,tr("OpenPilot Uploader"),tr("If you want to search for other boards connect power now and press Yes"),QMessageBox::Yes,QMessageBox::No)==QMessageBox::Yes)
     {
         log("\nWaiting...");
-        QTimer::singleShot(3000, &q, SLOT(quit()));
-        q.exec();
+        QTimer::singleShot(3000, &m_eventloop, SLOT(quit()));
+        m_eventloop.exec();
         log("Detecting second board...");
         repaint();
         if(!dfu->findDevices())
@@ -517,17 +519,17 @@ void UploaderGadgetWidget::systemRescue()
 }
 void UploaderGadgetWidget::perform()
 {
-    if(pd->value()==19)
+    if(m_progress->value()==19)
     {
-        t->stop();
-        q.exit();
+        m_timer->stop();
+        m_eventloop.exit();
     }
-    pd->setValue(pd->value()+1);
+    m_progress->setValue(m_progress->value()+1);
 }
 void UploaderGadgetWidget::cancel()
 {
-    t->stop();
-    q.exit();
+    m_timer->stop();
+    m_eventloop.exit();
 }
 
 /**
@@ -554,12 +556,16 @@ UploaderGadgetWidget::~UploaderGadgetWidget()
          QWidget *qw = m_config->systemElements->widget(0);
          m_config->systemElements->removeTab(0);
          delete qw;
+         qw = 0;
     }
-    if (pd)
-        delete pd;
-    if (t)
-        delete t;
-
+    if (m_progress) {
+        delete m_progress;
+        m_progress = 0;
+    }
+    if (m_timer) {
+        delete m_timer;
+        m_timer = 0;
+    }
 }
 
 

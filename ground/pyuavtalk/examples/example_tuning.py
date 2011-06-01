@@ -42,18 +42,18 @@ def printUsage():
     appName = os.path.basename(sys.argv[0])
     print
     print "usage:"
-    print "  %s port objDefPath " % appName
-    print "  for example: %s COM30 D:\Projects\Fred\OpenPilot\git\\build\uavobject-synthetics\python " % appName
+    print "  %s port " % appName
+    print "  for example: %s COM30 " % appName
     print 
     
 if __name__ == '__main__':
     try:
-        if len(sys.argv) != 3:
+        if len(sys.argv) != 2:
           print "ERROR: Incorrect number of arguments"
           printUsage()
           sys.exit(2)
         
-        port, objPath = sys.argv[1:]
+        port = sys.argv[1]
     
         if port[:3].upper() == "COM":
             _port = int(port[3:])-1
@@ -62,7 +62,8 @@ if __name__ == '__main__':
             
         serPort = serial.Serial(_port, 57600, timeout=.5)
         uavTalk = UavTalk(serPort)
-        objMan = ObjManager(uavTalk, objPath)
+        objMan = ObjManager(uavTalk)
+        objMan.importDefinitions()
         uavTalk.start()
         
         import objectpersistence

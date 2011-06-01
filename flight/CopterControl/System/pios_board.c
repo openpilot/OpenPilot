@@ -348,39 +348,38 @@ void PIOS_USART_spektrum_irq_handler(void)
 }
 
 #include <pios_spektrum_priv.h>
-void TIM2_IRQHandler();
-void TIM2_IRQHandler() __attribute__ ((alias ("PIOS_TIM2_irq_handler")));
+void RTC_IRQHandler();
+void RTC_IRQHandler() __attribute__ ((alias ("PIOS_SUPV_irq_handler")));
 const struct pios_spektrum_cfg pios_spektrum_cfg = {
 	.pios_usart_spektrum_cfg = &pios_usart_spektrum_cfg,
-	.tim_base_init = {
-		.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,	/* For 1 uS accuracy */
-		.TIM_ClockDivision = TIM_CKD_DIV1,
-		.TIM_CounterMode = TIM_CounterMode_Up,
-		.TIM_Period = ((1000000 / 120) - 1), //11ms-10*16b/115200bps atleast one interrupt between frames
-		.TIM_RepetitionCounter = 0x0000,
-	},
 	.gpio_init = { //used for bind feature
 		.GPIO_Mode = GPIO_Mode_Out_PP,
 		.GPIO_Speed = GPIO_Speed_2MHz,
 	},
 	.remap = 0,
 	.irq = {
-		.handler = TIM2_IRQHandler,
+		.handler = RTC_IRQHandler,
 		.init    = {
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
 			.NVIC_IRQChannelSubPriority        = 0,
 			.NVIC_IRQChannelCmd                = ENABLE,
 		},
 	},
-	.timer = TIM2,
 	.port = GPIOB,
-	.ccr = TIM_IT_Update,
 	.pin = GPIO_Pin_11,
 };
 
-void PIOS_TIM2_irq_handler()
-{
-	PIOS_SPEKTRUM_irq_handler(pios_usart_spektrum_id);
+void PIOS_SUPV_irq_handler() {
+	if (RTC_GetITStatus(RTC_IT_SEC))
+	{
+		/* Call the right handler */
+		PIOS_SPEKTRUM_irq_handler(pios_usart_spektrum_id);
+
+		/* Wait until last write operation on RTC registers has finished */
+		RTC_WaitForLastTask();
+		/* Clear the RTC Second interrupt */
+		RTC_ClearITPendingBit(RTC_IT_SEC);
+	}
 }
 #endif	/* PIOS_INCLUDE_SPEKTRUM */
 
@@ -441,14 +440,12 @@ const struct pios_servo_channel pios_servo_channels[] = {
 		.channel = TIM_Channel_1,
 		.pin = GPIO_Pin_4,
 	},  	
-#ifndef PIOS_INCLUDE_SPEKTRUM
 	{
 		.timer = TIM2,
 		.port = GPIOA,
 		.channel = TIM_Channel_3,
 		.pin = GPIO_Pin_2,
 	},	
-#endif
 };
 
 const struct pios_servo_cfg pios_servo_cfg = {

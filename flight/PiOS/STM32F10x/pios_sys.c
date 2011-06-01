@@ -186,7 +186,7 @@ int32_t PIOS_SYS_SerialNumberGet(char *str)
 void NVIC_Configuration(void)
 {
 	/* Set the Vector Table base address as specified in .ld file */
-	extern void pios_isr_vector_table_base;
+	extern void *pios_isr_vector_table_base;
 	NVIC_SetVectorTable((uint32_t)&pios_isr_vector_table_base, 0x0);
 
 	/* 4 bits for Interrupt priorities so no sub priorities */

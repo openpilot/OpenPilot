@@ -49,7 +49,7 @@ class UavtalkDemo():
         self.objMan = None
         self.connMan = None
         
-    def setup(self, port, uavdefPath):
+    def setup(self, port):
         print "Opening Port \"%s\"" % port
         if port[:3].upper() == "COM":
             _port = int(port[3:])-1
@@ -63,7 +63,8 @@ class UavtalkDemo():
         self.uavTalk = UavTalk(serPort)
         
         print "Starting ObjectManager"
-        self.objMan = ObjManager(self.uavTalk, uavdefPath)
+        self.objMan = ObjManager(self.uavTalk)
+        self.objMan.importDefinitions()
         
         print "Starting UavTalk"
         self.uavTalk.start()
@@ -157,23 +158,23 @@ def printUsage():
     appName = os.path.basename(sys.argv[0])
     print
     print "usage:"
-    print "  %s port objDefPath o|w|g|s" % appName
+    print "  %s port o|w|g|s" % appName
     print "  o: Show Attitude using an \"observer\""
     print "  w: Show Attitude waiting for updates from flight"
     print "  g: Show Attitude performing get operations"
     print "  s: Drive Servo"
     print
-    print "  for example: %s COM30 D:\Projects\Fred\OpenPilot\git\\build\uavobject-synthetics\python o" % appName
+    print "  for example: %s COM30 o" % appName
     print 
     
 if __name__ == '__main__':
     
-    if len(sys.argv) != 4:
+    if len(sys.argv) != 3:
         print "ERROR: Incorrect number of arguments"
         printUsage()
         sys.exit(2)
         
-    port, objPath, option = sys.argv[1:]
+    port, option = sys.argv[1:]
 
     if option not in ["o","w","g","s"]:
         print "ERROR: Invalid option"
@@ -185,7 +186,7 @@ if __name__ == '__main__':
 
     try:
         demo = UavtalkDemo()
-        demo.setup(port, objPath)
+        demo.setup(port)
 
         if option == "o":        
             demo.showAttitudeViaObserver()      # will not return

@@ -354,11 +354,12 @@ void ConnectionManager::devChanged(IConnection *connection)
     {
         m_availableDevList->addItem(d.displayName);
         m_availableDevList->setItemData(m_availableDevList->count()-1,(const QString)d.devName,Qt::ToolTipRole);
-        if(!m_ioDev && m_mainWindow->generalSettings()->autoConnect() && d.displayName.startsWith("USB"))
+        if(!m_ioDev && d.displayName.startsWith("USB"))
         {
-            qDebug()<<"INSERTION"<<d.displayName;
-            m_availableDevList->setCurrentIndex(m_availableDevList->count()-1);
-            connectDevice();
+            if(m_mainWindow->generalSettings()->autoConnect() || m_mainWindow->generalSettings()->autoSelect())
+                m_availableDevList->setCurrentIndex(m_availableDevList->count()-1);
+            if(m_mainWindow->generalSettings()->autoConnect())
+                connectDevice();
         }
     }
     if(m_ioDev)//if a device is connected make it the one selected on the dropbox

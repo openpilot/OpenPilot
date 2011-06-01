@@ -48,7 +48,6 @@ GeneralSettings::GeneralSettings():
     m_saveSettingsOnExit(true),
     m_autoConnect(true),m_autoSelect(true)
 {
-    connect(m_page->checkAutoConnect,SIGNAL(stateChanged(int)),this,SLOT(slotAutoConnect(int)));
 }
 
 QString GeneralSettings::id() const
@@ -115,6 +114,7 @@ QWidget *GeneralSettings::createPage(QWidget *parent)
     m_page->setupUi(w);
 
     fillLanguageBox();
+    connect(m_page->checkAutoConnect,SIGNAL(stateChanged(int)),this,SLOT(slotAutoConnect(int)));
     m_page->checkBoxSaveOnExit->setChecked(m_saveSettingsOnExit);
     m_page->checkAutoConnect->setChecked(m_autoConnect);
     m_page->checkAutoSelect->setChecked(m_autoSelect);

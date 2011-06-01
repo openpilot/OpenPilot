@@ -66,7 +66,7 @@ private slots:
     void resetLanguage();
     void resetExternalEditor();
     void showHelpForExternalEditor();
-    void slotAutoConnect();
+    void slotAutoConnect(int);
 #ifdef Q_OS_UNIX
     void resetTerminal();
 #endif

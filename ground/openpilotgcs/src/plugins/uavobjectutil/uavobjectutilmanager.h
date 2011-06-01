@@ -62,6 +62,7 @@ public:
 
         int getBoardModel();
         QByteArray getBoardCPUSerial();
+        QString getBoardDescription();
 
 private:
 	QMutex *mutex;

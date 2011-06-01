@@ -102,6 +102,9 @@ void runningDeviceWidget::populate()
     QString serial = utilMngr->getBoardCPUSerial().toHex();
     myDevice->cpuSerial->setText(serial);
 
+    QString description = utilMngr->getBoardDescription();
+    myDevice->description->setText(description);
+
     status("Ready...", STATUSICON_INFO);
 
 }

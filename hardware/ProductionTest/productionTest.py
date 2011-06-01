@@ -27,7 +27,6 @@ class DeviceInfo(object):
 class TestFixtureSettings(object):
     def __init__(self):
         self.port = "COM30"
-        self.uavObjDefsPath = 'D:\Projects\Fred\OpenPilot\git\\build\uavobject-synthetics\python'
         
         self.rotServo = 5
         self.tltServo = 6
@@ -112,7 +111,8 @@ class TestFixture(object):
         
         print "Starting UavTalk"
         self.uavTalk = UavTalk(self.port)
-        self.objMan = ObjManager(self.uavTalk, self.settings.uavObjDefsPath)
+        self.objMan = ObjManager(self.uavTalk)
+        self.objMan.importDefinitions()
         self.uavTalk.start()
         
         import actuatorcommand

@@ -31,7 +31,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
-#include "objectpersistence.h"
+#include "uavobjectutilmanager.h"
 #include <QQueue>
 #include <QtGui/QWidget>
 #include <QList>
@@ -45,20 +45,12 @@ public:
     ConfigTaskWidget(QWidget *parent = 0);
     ~ConfigTaskWidget();
     void saveObjectToSD(UAVObject *obj);
-    void updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj);
     UAVObjectManager* getObjectManager();
-
     static double listMean(QList<double> list);
 
 private slots:
-    void objectPersistenceTransactionCompleted(UAVObject* obj, bool success);
-    void objectPersistenceUpdated(UAVObject * obj);
 
 private:
-    QQueue<UAVObject*> queue;
-    void saveNextObject();
-    enum {IDLE, AWAITING_ACK, AWAITING_COMPLETED} saveState;
-
 
 };
 

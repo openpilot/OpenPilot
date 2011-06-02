@@ -63,17 +63,21 @@ public:
         int getBoardModel();
         QByteArray getBoardCPUSerial();
         QString getBoardDescription();
+        UAVObjectManager* getObjectManager();
+        void saveObjectToSD(UAVObject *obj);
+
 
 private:
 	QMutex *mutex;
-
 	QQueue<UAVObject *> queue;
-
+        enum {IDLE, AWAITING_ACK, AWAITING_COMPLETED} saveState;
 	void saveNextObject();
-	void saveObjectToSD(UAVObject *obj);
 
 private slots:
-	void transactionCompleted(UAVObject *obj, bool success);
+        //void transactionCompleted(UAVObject *obj, bool success);
+        void objectPersistenceTransactionCompleted(UAVObject* obj, bool success);
+        void objectPersistenceUpdated(UAVObject * obj);
+
 
 };
 

@@ -84,9 +84,7 @@ void ConfigTelemetryWidget::requestTelemetryUpdate()
   */
 void ConfigTelemetryWidget::sendTelemetryUpdate()
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("TelemetrySettings")));
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("TelemetrySettings")));
     Q_ASSERT(obj);
     UAVObjectField* field = obj->getField(QString("Speed"));
     field->setValue(m_telemetry->telemetrySpeed->currentText());
@@ -100,11 +98,9 @@ void ConfigTelemetryWidget::saveTelemetryUpdate()
 {
     // Send update so that the latest value is saved
     sendTelemetryUpdate();
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("TelemetrySettings")));
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("TelemetrySettings")));
     Q_ASSERT(obj);
-    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+    saveObjectToSD(obj);
 }
 
 

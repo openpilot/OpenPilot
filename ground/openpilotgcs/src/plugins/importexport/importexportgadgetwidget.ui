@@ -83,7 +83,49 @@
    <item row="2" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="helpButton">
+       <property name="maximumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../coreplugin/core.qrc">
+         <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="exportButton">
+       <property name="toolTip">
+        <string>Export the GCS settings selected in the checkboxes above.</string>
+       </property>
        <property name="text">
         <string>Export</string>
        </property>
@@ -91,6 +133,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="importButton">
+       <property name="toolTip">
+        <string>Import settings from the config file, only for the items checked above.</string>
+       </property>
        <property name="text">
         <string>Import</string>
        </property>
@@ -98,45 +143,15 @@
      </item>
      <item>
       <widget class="QPushButton" name="resetButton">
+       <property name="toolTip">
+        <string>Resets your GCS configuration to its default configuration.</string>
+       </property>
        <property name="text">
         <string>Reset Config</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="helpButton">
-       <property name="text">
-        <string>Help</string>
-       </property>
-      </widget>
-     </item>
     </layout>
-   </item>
-   <item row="1" column="1">
-    <widget class="QGroupBox" name="groupBoxFormat">
-     <property name="title">
-      <string>Format</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QRadioButton" name="radioButtonXmlFormat">
-        <property name="text">
-         <string>XML Format</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="radioButtonIniFormat">
-        <property name="text">
-         <string>INI Format</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
    </item>
   </layout>
  </widget>
@@ -148,6 +163,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../coreplugin/core.qrc"/>
+ </resources>
  <connections/>
 </ui>

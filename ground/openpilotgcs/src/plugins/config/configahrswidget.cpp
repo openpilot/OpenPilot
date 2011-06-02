@@ -568,8 +568,7 @@ void ConfigAHRSWidget::saveAHRSCalibration()
     UAVObjectField *field = obj->getField(QString("measure_var"));
     field->setValue("SET");
     obj->updated();
-    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
-
+    saveObjectToSD(obj);
 }
 
 FORCE_ALIGN_FUNC

@@ -30,8 +30,6 @@
 #include <extensionsystem/iplugin.h>
 #include "importexport_global.h"
 
-class ImportExportGadgetFactory;
-
 class IMPORTEXPORT_EXPORT ImportExportPlugin : public ExtensionSystem::IPlugin
 {
     Q_OBJECT
@@ -44,7 +42,6 @@ public:
     bool initialize(const QStringList & arguments, QString * errorString);
     void shutdown();
 private:
-    ImportExportGadgetFactory *mf;
 
 private slots:
     void importExport();

@@ -534,11 +534,9 @@ void ConfigOutputWidget::saveRCOutputObject()
 {
     // Send update so that the latest value is saved
     sendRCOutputUpdate();
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
     Q_ASSERT(obj);
-    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+    saveObjectToSD(obj);
 
 }
 

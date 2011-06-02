@@ -1195,11 +1195,9 @@ void ConfigccpmWidget::saveccpmUpdate()
     ShowDisclaimer(0);
     // Send update so that the latest value is saved
     sendccpmUpdate();
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(obj);
-    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+    saveObjectToSD(obj);
 }
 
 void ConfigccpmWidget::resizeEvent(QResizeEvent* event)
@@ -1506,8 +1504,7 @@ void ConfigccpmWidget::SwashLvlFinishButtonPressed()
     }
 
     obj->updated();
-
-    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+    saveObjectToSD(obj);
 
     //restore Flight control of ActuatorCommand
     enableSwashplateLevellingControl(false);

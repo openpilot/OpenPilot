@@ -262,11 +262,9 @@ void ConfigStabilizationWidget::saveStabilizationUpdate()
 {
     // Send update so that the latest value is saved
     sendStabilizationUpdate();
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("StabilizationSettings")));
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("StabilizationSettings")));
     Q_ASSERT(obj);
-    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+    saveObjectToSD(obj);
 }
 
 

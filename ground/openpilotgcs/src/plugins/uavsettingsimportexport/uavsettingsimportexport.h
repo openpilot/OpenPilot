@@ -28,6 +28,7 @@
 #define UAVSETTINGSIMPORTEXPORT_H 
 
 #include <extensionsystem/iplugin.h> 
+#include "uavobjectutil/uavobjectutilmanager.h"
 
 class UAVSettingsImportExportPlugin : public ExtensionSystem::IPlugin 
 { 
@@ -42,7 +43,8 @@ public:
    void shutdown(); 
 
 private slots:
-    void importExport();
+   void importUAVSettings();
+   void exportUAVSettings();
 
 }; 
 

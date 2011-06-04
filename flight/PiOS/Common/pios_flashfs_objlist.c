@@ -56,7 +56,7 @@ struct fileHeader {
 } __attribute__((packed));
 
 
-#define OBJECT_TABLE_MAGIC 0x85FB3C33
+#define OBJECT_TABLE_MAGIC 0x85FB3C34
 #define OBJ_MAGIC          0x3015AE71
 #define OBJECT_TABLE_START 0x00000010
 #define OBJECT_TABLE_END   0x00001000
@@ -194,6 +194,7 @@ int32_t PIOS_FLASHFS_GetNewAddress(uint32_t objId, uint16_t instId)
 int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data) 
 {
 	uint32_t objId = UAVObjGetID(obj);
+	uint8_t crc = 0;
 
 	int32_t addr = PIOS_FLASHFS_GetObjAddress(objId, instId);
 	
@@ -215,13 +216,22 @@ int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 		return -2;
 
 	// Save header
-	// This information IS redundant with the object table id.  Oh well.  Better safe than sorry.	
-	
+	// This information IS redundant with the object table id.  Oh well.  Better safe than sorry.		
 	if(PIOS_Flash_W25X_WriteData(addr, (uint8_t *) &header, sizeof(header)) != 0)
 		return -3;
-		
+	
+	// Update CRC
+	crc = PIOS_CRC_updateCRC(0, (uint8_t *) &header, sizeof(header));
+	
 	// Save data
 	if(PIOS_Flash_W25X_WriteData(addr + sizeof(header), data, UAVObjGetNumBytes(obj)) != 0)
+		return -4;
+
+	// Update CRC
+	crc = PIOS_CRC_updateCRC(crc, (uint8_t *) data, UAVObjGetNumBytes(obj));
+
+	// Save CRC (written so will work when CRC changes to uint16)
+	if(PIOS_Flash_W25X_WriteData(addr + sizeof(header) + UAVObjGetNumBytes(obj), (uint8_t *) &crc, sizeof(crc)) != 0)
 		return -4;
 	
 	return 0;
@@ -236,12 +246,16 @@ int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data)
  * @retval -2 if unable to retrieve object header
  * @retval -3 if loaded data instId or objId don't match
  * @retval -4 if unable to retrieve instance data
+ * @retval -5 if unable to read CRC
+ * @retval -6 if CRC doesn't match
  * @note This uses one sector on the flash chip per object so that no buffering in ram
  * must be done when erasing the sector before a save
  */
 int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 {
 	uint32_t objId = UAVObjGetID(obj);
+	uint8_t crc = 0;
+	uint8_t crcFlash = 0;
 	
 	int32_t addr = PIOS_FLASHFS_GetObjAddress(objId, instId);
 		
@@ -256,13 +270,31 @@ int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 	if(PIOS_Flash_W25X_ReadData(addr, (uint8_t *) &header, sizeof(header)) != 0)
 		return -2;
 	
+	// Update CRC
+	crc = PIOS_CRC_updateCRC(0, (uint8_t *) &header, sizeof(header));
+
 	if((header.id != objId) || (header.instId != instId))
 		return -3;
+
+	// To avoid having to allocate the RAM for a copy of the object, we read once bytewise
+	// and compute the CRC (inefficient)
+	for(uint32_t i = 0; i < UAVObjGetNumBytes(obj); i++) {
+		uint8_t byte;
+		PIOS_Flash_W25X_ReadData(addr + sizeof(header) + i, &byte, 1);
+		crc = PIOS_CRC_updateByte(crc, byte);
+	}
+
+	// Read CRC (written so will work when CRC changes to uint16)
+	if(PIOS_Flash_W25X_ReadData(addr + sizeof(header) + UAVObjGetNumBytes(obj), (uint8_t *) &crcFlash, sizeof(crcFlash)) != 0)
+		return -5;
 	
+	if(crc != crcFlash)
+		return -6;
+
 	// Read the instance data
 	if (PIOS_Flash_W25X_ReadData(addr + sizeof(header), data, UAVObjGetNumBytes(obj)) != 0)
 		return -4;
-	
+
 	return 0;
 }
 

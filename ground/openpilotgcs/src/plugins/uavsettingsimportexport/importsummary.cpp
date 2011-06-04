@@ -84,6 +84,7 @@ void ImportSummaryDialog::doTheSaving()
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     UAVObjectUtilManager *utilManager = pm->getObject<UAVObjectUtilManager>();
+    connect(utilManager, SIGNAL(saveCompleted(int,bool)), this, SLOT(updateSaveCompletion()));
 
     for(int i=0; i < ui->importSummaryList->rowCount(); i++) {
         QString uavObjectName = ui->importSummaryList->item(i,1)->text();
@@ -91,10 +92,15 @@ void ImportSummaryDialog::doTheSaving()
         if (box->isChecked()) {
             UAVObject* obj = objManager->getObject(uavObjectName);
             utilManager->saveObjectToSD(obj);
-            ui->progressBar->setValue(i);
             this->repaint();
         }
     }
+}
+
+
+void ImportSummaryDialog::updateSaveCompletion()
+{
+    ui->progressBar->setValue(ui->progressBar->value()+1);
 }
 
 void ImportSummaryDialog::changeEvent(QEvent *e)

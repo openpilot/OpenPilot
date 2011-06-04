@@ -67,6 +67,8 @@ public:
         UAVObjectManager* getObjectManager();
         void saveObjectToSD(UAVObject *obj);
 
+signals:
+        void saveCompleted(int objectID, bool status);
 
 private:
 	QMutex *mutex;

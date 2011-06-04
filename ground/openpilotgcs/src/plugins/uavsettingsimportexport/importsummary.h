@@ -57,8 +57,10 @@ protected:
 private:
     Ui::ImportSummaryDialog *ui;
 
-private slots:
+public slots:
+    void updateSaveCompletion();
 
+private slots:
     void doTheSaving();
 
 };

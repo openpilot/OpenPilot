@@ -172,6 +172,7 @@ void UAVObjectUtilManager::objectPersistenceOperationFailed()
         obj->disconnect(this);
         queue.dequeue(); // We can now remove the object, it failed anyway.
         saveState = IDLE;
+        emit saveCompleted(obj->getField("ObjectID")->getValue().toInt(), false);
         saveNextObject();
     }
 }
@@ -199,6 +200,7 @@ void UAVObjectUtilManager::objectPersistenceUpdated(UAVObject * obj)
         obj->disconnect(this);
         queue.dequeue(); // We can now remove the object, it's done.
         saveState = IDLE;
+        emit saveCompleted(obj->getField("ObjectID")->getValue().toInt(), true);
         saveNextObject();
     }
 }

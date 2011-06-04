@@ -38,7 +38,7 @@ C: Cathy Moss
 D: October 2010
 
 M: First OpenPilot night flight
-C: Dale Schintock
+C: Dale Schinstock
 D: October 2010
 V: http://www.youtube.com/watch?v=yk8ckeRMV8U
 
@@ -53,7 +53,7 @@ D: November 2010
 V: http://vimeo.com/17488702
 
 M: First solid OpenPilot Position Hold
-C: Dale Schintock
+C: Dale Schinstock
 D: December 2010
 V: http://www.youtube.com/watch?v=BBCGVP0Vpgw
 

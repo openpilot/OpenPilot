@@ -42,6 +42,7 @@
 #include "stabilizationdesired.h"
 #include "flighttelemetrystats.h"
 #include "flightstatus.h"
+#include "accessorydesired.h"
 
 // Private constants
 #if defined(PIOS_MANUAL_STACK_SIZE)
@@ -75,6 +76,7 @@ static ArmState_t armState;
 static portTickType lastSysTime;
 
 // Private functions
+static void updateAccessoryDesired(ManualControlCommandData * cmd);
 static void updateActuatorDesired(ManualControlCommandData * cmd);
 static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualControlSettingsData * settings);
 static void processFlightMode(ManualControlSettingsData * settings, float flightMode);
@@ -294,15 +296,28 @@ static void manualControlTask(void *parameters)
 				break;
 			case FLIGHTMODE_MANUAL:
 				updateActuatorDesired(&cmd);
+				updateAccessoryDesired(&cmd);
 				break;
 			case FLIGHTMODE_STABILIZED:
 				updateStabilizationDesired(&cmd, &settings);
+				updateAccessoryDesired(&cmd);
 				break;
 			case FLIGHTMODE_GUIDANCE:
+				updateAccessoryDesired(&cmd);
 				// TODO: Implement
 				break;
 		}	
 	}
+}
+
+static void updateAccessoryDesired(ManualControlCommandData * cmd) 
+{
+	AccessoryDesiredData accessory;
+	AccessoryDesiredGet(&accessory);
+	accessory.Accessory1 = cmd->Accessory1;
+	accessory.Accessory2 = cmd->Accessory2;
+	accessory.Accessory3 = cmd->Accessory3;
+	AccessoryDesiredSet(&accessory);	
 }
 
 static void updateActuatorDesired(ManualControlCommandData * cmd) 

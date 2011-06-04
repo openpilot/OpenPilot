@@ -236,7 +236,7 @@ void updateVtolDesiredVelocity()
 {
 	static portTickType lastSysTime;
 	portTickType thisSysTime = xTaskGetTickCount();;
-	float dT;
+	float dT = 0;
 
 	GuidanceSettingsData guidanceSettings;
 	PositionActualData positionActual;
@@ -304,7 +304,7 @@ static void updateVtolDesiredAttitude()
 {
 	static portTickType lastSysTime;
 	portTickType thisSysTime = xTaskGetTickCount();;
-	float dT;
+	float dT = 0;
 
 	VelocityDesiredData velocityDesired;
 	VelocityActualData velocityActual;

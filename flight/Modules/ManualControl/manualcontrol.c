@@ -76,7 +76,6 @@ static ArmState_t armState;
 static portTickType lastSysTime;
 
 // Private functions
-static void updateAccessoryDesired(ManualControlCommandData * cmd);
 static void updateActuatorDesired(ManualControlCommandData * cmd);
 static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualControlSettingsData * settings);
 static void processFlightMode(ManualControlSettingsData * settings, float flightMode);
@@ -268,10 +267,20 @@ static void manualControlTask(void *parameters)
 				cmd.Throttle       = scaledChannel[settings.Throttle];
 				flightMode         = scaledChannel[settings.FlightMode];
 
-				// Set accessory channels
-				cmd.Accessory1 = (settings.Accessory1 != MANUALCONTROLSETTINGS_ACCESSORY1_NONE) ? scaledChannel[settings.Accessory1] : 0;
-				cmd.Accessory2 = (settings.Accessory2 != MANUALCONTROLSETTINGS_ACCESSORY2_NONE) ? scaledChannel[settings.Accessory2] : 0;
-				cmd.Accessory3 = (settings.Accessory3 != MANUALCONTROLSETTINGS_ACCESSORY3_NONE) ? scaledChannel[settings.Accessory3] : 0;
+				AccessoryDesiredData accessory;
+				// Set Accessory 1
+				accessory.AccessoryVal = scaledChannel[settings.Accessory1];
+				if(AccessoryDesiredInstSet(0, &accessory) != 0)
+					   AccessoryDesiredCreateInstance();
+				// Set Accessory 2
+				accessory.AccessoryVal = scaledChannel[settings.Accessory2];
+				if(AccessoryDesiredInstSet(1, &accessory) != 0)
+					AccessoryDesiredCreateInstance();
+				// Set Accsesory 3
+				accessory.AccessoryVal = scaledChannel[settings.Accessory3];
+				if(AccessoryDesiredInstSet(2, &accessory) != 0)
+					AccessoryDesiredCreateInstance();
+
 
 				processFlightMode(&settings, flightMode);
 				processArm(&cmd, &settings);
@@ -296,28 +305,15 @@ static void manualControlTask(void *parameters)
 				break;
 			case FLIGHTMODE_MANUAL:
 				updateActuatorDesired(&cmd);
-				updateAccessoryDesired(&cmd);
 				break;
 			case FLIGHTMODE_STABILIZED:
 				updateStabilizationDesired(&cmd, &settings);
-				updateAccessoryDesired(&cmd);
 				break;
 			case FLIGHTMODE_GUIDANCE:
-				updateAccessoryDesired(&cmd);
 				// TODO: Implement
 				break;
 		}	
 	}
-}
-
-static void updateAccessoryDesired(ManualControlCommandData * cmd) 
-{
-	AccessoryDesiredData accessory;
-	AccessoryDesiredGet(&accessory);
-	accessory.Accessory1 = cmd->Accessory1;
-	accessory.Accessory2 = cmd->Accessory2;
-	accessory.Accessory3 = cmd->Accessory3;
-	AccessoryDesiredSet(&accessory);	
 }
 
 static void updateActuatorDesired(ManualControlCommandData * cmd) 

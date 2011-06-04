@@ -38,6 +38,7 @@
 
 #include <QtGlobal>
 #include <QObject>
+#include <QTimer>
 #include <QMutex>
 #include <QQueue>
 #include <QComboBox>
@@ -72,11 +73,13 @@ private:
 	QQueue<UAVObject *> queue;
         enum {IDLE, AWAITING_ACK, AWAITING_COMPLETED} saveState;
 	void saveNextObject();
+        QTimer failureTimer;
 
 private slots:
         //void transactionCompleted(UAVObject *obj, bool success);
         void objectPersistenceTransactionCompleted(UAVObject* obj, bool success);
         void objectPersistenceUpdated(UAVObject * obj);
+        void objectPersistenceOperationFailed();
 
 
 };

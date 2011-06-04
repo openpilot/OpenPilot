@@ -37,6 +37,7 @@
 #include <QtPlugin> 
 #include <QStringList> 
 #include <QDebug>
+#include <QCheckBox>
 
 // for menu item
 #include <coreplugin/coreconstants.h>
@@ -135,9 +136,14 @@ void UAVSettingsImportExportPlugin::importUAVSettings()
         return;
     }
 
+    // We are now ok: setup the import summary dialog & update it as we
+    // go along.
+    ImportSummaryDialog swui;
+
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVObjectUtilManager *utilManager = pm->getObject<UAVObjectUtilManager>();
+    swui.show();
+
     QDomNode node = root.firstChild();
     while (!node.isNull()) {
         QDomElement e = node.toElement();
@@ -145,17 +151,17 @@ void UAVSettingsImportExportPlugin::importUAVSettings()
         //  - Read each object
          QString uavObjectName  = e.attribute("name");
          uint uavObjectID = e.attribute("id").toUInt(NULL,16);
+
          // Sanity Check:
          UAVObject* obj = objManager->getObject(uavObjectName);
-         if (uavObjectID != obj->getObjID()) {
-             qDebug() << "Mismatch for Object " << uavObjectName << uavObjectID << " - " << obj->getObjID();
-             QMessageBox msgBox;
-             msgBox.setText(tr("File Object Mismatch: aborting."));
-             msgBox.setInformativeText(tr("Found a mismatch between file object definition and current object definition."));
-             msgBox.setStandardButtons(QMessageBox::Ok);
-             msgBox.exec();
-             return;
+         if (obj == NULL) {
+             // This object is unknown!
+             qDebug() << "Object Unknown:" << uavObjectName << uavObjectID;
+             swui.addLine(uavObjectName, false);
 
+         } else if(uavObjectID != obj->getObjID()) {
+             qDebug() << "Mismatch for Object " << uavObjectName << uavObjectID << " - " << obj->getObjID();
+            swui.addLine(uavObjectName, false);
          } else {
              //  - Update each field
              //  - Issue and "updated" command
@@ -178,15 +184,14 @@ void UAVSettingsImportExportPlugin::importUAVSettings()
                  field = field.nextSibling();
              }
              obj->updated();
-             utilManager->saveObjectToSD(obj);
+             swui.addLine(uavObjectName, true);
          }
         }
         node = node.nextSibling();
     }
-    QMessageBox msgBox;
-    msgBox.setText(tr("Settings restored."));
-    msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.exec();
+    swui.exec();
+
+
 
 }
 

@@ -29,6 +29,7 @@
 
 #include <extensionsystem/iplugin.h> 
 #include "uavobjectutil/uavobjectutilmanager.h"
+#include "importsummary.h"
 
 class UAVSettingsImportExportPlugin : public ExtensionSystem::IPlugin 
 { 

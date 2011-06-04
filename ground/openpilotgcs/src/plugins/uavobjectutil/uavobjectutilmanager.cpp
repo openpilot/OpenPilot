@@ -41,6 +41,11 @@
 UAVObjectUtilManager::UAVObjectUtilManager()
 {
     mutex = new QMutex(QMutex::Recursive);
+    saveState = IDLE;
+    failureTimer.stop();
+    failureTimer.setSingleShot(true);
+    failureTimer.setInterval(1000);
+    connect(&failureTimer, SIGNAL(timeout()),this,SLOT(objectPersistenceOperationFailed()));
 }
 
 UAVObjectUtilManager::~UAVObjectUtilManager()
@@ -70,14 +75,22 @@ UAVObjectManager* UAVObjectUtilManager::getObjectManager() {
 // ******************************
 // SD card saving
 //
+
+/*
+  Add a new object to save in the queue
+  */
 void UAVObjectUtilManager::saveObjectToSD(UAVObject *obj)
 {
     // Add to queue
     queue.enqueue(obj);
+    qDebug() << "Enqueue object: " << obj->getName();
+
+
     // If queue length is one, then start sending (call sendNextObject)
     // Otherwise, do nothing, it's sending anyway
     if (queue.length()==1)
         saveNextObject();
+
 
 }
 
@@ -92,6 +105,8 @@ void UAVObjectUtilManager::saveNextObject()
 
     // Get next object from the queue
     UAVObject* obj = queue.head();
+    qDebug() << "Request board to save object " << obj->getName();
+
     ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( getObjectManager()->getObject(ObjectPersistence::NAME) );
     connect(objper, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(objectPersistenceTransactionCompleted(UAVObject*,bool)));
     connect(objper, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(objectPersistenceUpdated(UAVObject *)));
@@ -106,6 +121,11 @@ void UAVObjectUtilManager::saveNextObject()
         objper->setData(data);
         objper->updated();
     }
+    // Now: we are going to get two "objectUpdated" messages (one coming from GCS, one coming from Flight, which
+    // will confirm the object was properly received by both sides) and then one "transactionCompleted" indicating
+    // that the Flight side did not only receive the object but it did receive it without error. Last we will get
+    // a last "objectUpdated" message coming from flight side, where we'll get the results of the objectPersistence
+    // operation we asked for (saved, other).
 }
 
 /**
@@ -121,13 +141,42 @@ void UAVObjectUtilManager::objectPersistenceTransactionCompleted(UAVObject* obj,
     if(success) {
         Q_ASSERT(obj->getName().compare("ObjectPersistence") == 0);
         Q_ASSERT(saveState == AWAITING_ACK);
+        // Two things can happen:
+        // Either the Object Save Request did actually go through, and then we should get in
+        // "AWAITING_COMPLETED" mode, or the Object Save Request did _not_ go through, for example
+        // because the object does not exist and then we will never get a subsequent update.
+        // For this reason, we will arm a 1 second timer to make provision for this and not block
+        // the queue:
         saveState = AWAITING_COMPLETED;
         disconnect(obj, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(objectPersistenceTransactionCompleted(UAVObject*,bool)));
+        failureTimer.start(1000); // Create a timeout
     } else if (!success) {
         // Can be caused by timeout errors on sending.  Send again.
+        qDebug() << "objectPersistenceTranscationCompleted (error)";
         saveNextObject();
     }
 }
+
+/**
+  * @brief Object persistence operation failed, i.e. we never got an update
+  * from the board saying "completed".
+  */
+void UAVObjectUtilManager::objectPersistenceOperationFailed()
+{
+    qDebug() << "objectPersistenceOperationFailed";
+    if(saveState == AWAITING_COMPLETED) {
+        //TODO: some warning that this operation failed somehow
+        // We have to disconnect the object persistence 'updated' signal
+        // and ask to save the next object:
+        UAVObject *obj = getObjectManager()->getObject(ObjectPersistence::NAME);
+        obj->disconnect(this);
+        queue.dequeue(); // We can now remove the object, it failed anyway.
+        saveState = IDLE;
+        saveNextObject();
+    }
+}
+
+
 
 /**
   * @brief Process the ObjectPersistence updated message to confirm the right object saved
@@ -136,8 +185,10 @@ void UAVObjectUtilManager::objectPersistenceTransactionCompleted(UAVObject* obj,
   */
 void UAVObjectUtilManager::objectPersistenceUpdated(UAVObject * obj)
 {
+    qDebug() << "objectPersistenceUpdated: " << obj->getField("Operation")->getValue().toString();
     Q_ASSERT(obj->getName().compare("ObjectPersistence") == 0);
     if(saveState == AWAITING_COMPLETED) {
+        failureTimer.stop();
         // Check flight is saying it completed.  This is the only thing flight should do to trigger an update.
         Q_ASSERT( obj->getField("Operation")->getValue().toString().compare(QString("Completed")) == 0 );
 

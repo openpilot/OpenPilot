@@ -237,6 +237,7 @@ QString UAVObjectParser::parseXML(QString& xml, QString& filename)
  * Calculate the unique object ID based on the object information.
  * The ID will change if the object definition changes, this is intentional
  * and is used to avoid connecting objects with incompatible configurations.
+ * The LSB is set to zero and is reserved for metadata
  */
 void UAVObjectParser::calculateID(ObjectInfo* info)
 {
@@ -252,7 +253,7 @@ void UAVObjectParser::calculateID(ObjectInfo* info)
         hash = updateHash(info->fields[n]->type, hash);
     }
     // Done
-    info->id = hash;
+    info->id = hash & 0xFFFFFFFE;
 }
 
 /**
@@ -263,7 +264,7 @@ void UAVObjectParser::calculateID(ObjectInfo* info)
  */
 quint32 UAVObjectParser::updateHash(quint32 value, quint32 hash)
 {
-    return (hash ^ ((hash<<5) + (hash>>2) + value)) & 0xFFFFFFFE;
+    return (hash ^ ((hash<<5) + (hash>>2) + value));
 }
 
 /**

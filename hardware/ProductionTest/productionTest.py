@@ -6,6 +6,7 @@ import logging
 import serial
 import traceback
 import sys
+import ConfigParser
 
 from openpilot.uavtalk.uavobject import *
 from openpilot.uavtalk.uavtalk import *
@@ -24,18 +25,34 @@ class DeviceInfo(object):
     def __str__(self):
         return "%s Rev:%s SN:%s" % (self.deviceType, self.deviceRevision, self.deviceSerialNumber)
         
+class ServoSettings(object):
+    pass
+
 class TestFixtureSettings(object):
     def __init__(self):
-        self.port = "COM30"
+
+        self.rotServo = ServoSettings()
+        self.tltServo = ServoSettings()
+                
+        config = ConfigParser.ConfigParser()
+        config.read('productionTest.ini')
         
-        self.rotServo = 5
-        self.tltServo = 6
-        self.rotServoCenter = 1250
-        self.rotServoLeft = self.rotServoCenter + 950
-        self.rotServoRight = self.rotServoCenter - 950
-        self.tltServoLevel = 1210
-        self.tltServoFW = self.tltServoLevel + 950
-        self.tltServoBW = self.tltServoLevel - 950
+        self.port = config.get('TestFixture','Port')
+            
+        self.rotServo.channel = config.getint('TestFixture.RotationServo', 'Channel')
+        self.rotServo.center = config.getint('TestFixture.RotationServo', 'Center')
+        self.rotServo.left = config.getint('TestFixture.RotationServo', 'Left')
+        self.rotServo.right = config.getint('TestFixture.RotationServo', 'Right')
+        self.rotServo.minSpeed = config.getint('TestFixture.RotationServo', 'MinSpeed')
+        self.rotServo.maxSpeed = config.getint('TestFixture.RotationServo', 'MaxSpeed')
+        
+        self.tltServo.channel = config.getint('TestFixture.TiltServo', 'Channel')
+        self.tltServo.level = config.getint('TestFixture.TiltServo', 'Center')
+        self.tltServo.forward = config.getint('TestFixture.TiltServo', 'Forward')
+        self.tltServo.backward = config.getint('TestFixture.TiltServo', 'Backward')
+        self.tltServo.minSpeed = config.getint('TestFixture.TiltServo', 'MinSpeed')
+        self.tltServo.maxSpeed = config.getint('TestFixture.TiltServo', 'MaxSpeed')
+        
     
 class SensorLog(object):
     def __init__(self):
@@ -93,6 +110,7 @@ class TestFixture(object):
     ROT_RIGHT = 5
     
     def __init__(self):
+        print "Reading settings"
         self.settings = TestFixtureSettings()
         
     def setup(self):
@@ -153,25 +171,25 @@ class TestFixture(object):
         self.uavTalk.sendObject(self.actuatorCmd)
         
     def setTiltServo(self, p):
-        servo = self.settings.tltServo
+        servo = self.settings.tltServo.channel
         if p == TestFixture.TILT_FW:
-            pos = self.settings.tltServoFW
+            pos = self.settings.tltServo.forward
         elif p == TestFixture.TILT_LEVEL:
-            pos = self.settings.tltServoLevel
+            pos = self.settings.tltServo.level
         elif p == TestFixture.TILT_BW:
-            pos = self.settings.tltServoBW
+            pos = self.settings.tltServo.backward
         else:
             raise ValueError()
         self.setServo(servo, pos)
             
     def setRotServo(self, p):
-        servo = self.settings.rotServo
+        servo = self.settings.rotServo.channel
         if p == TestFixture.ROT_LEFT:
-            pos = self.settings.rotServoLeft
+            pos = self.settings.rotServo.left
         elif p == TestFixture.ROT_CENTER:
-            pos = self.settings.rotServoCenter
+            pos = self.settings.rotServo.center
         elif p == TestFixture.ROT_RIGHT:
-            pos = self.settings.rotServoRight
+            pos = self.settings.rotServo.right
         else:
             raise ValueError()
         self.setServo(servo, pos)
@@ -379,7 +397,8 @@ class Gyros(TestCase):
                             checkFrom=0.0, checkTo=1.0, 
                             expValue=0, meanTol=5, ppMax = 10)   
         
-    def _checkGyroAtRot(self, data, expRotDetection):
+    def _checkGyroAtRot(self, data, expRotDetection, servoData):
+        
         if expRotDetection == 0:
             self._checkSensor(  data, 
                                 checkFrom=0.25, checkTo=.5, 
@@ -387,7 +406,9 @@ class Gyros(TestCase):
         elif expRotDetection == -1 or expRotDetection == +1:
             self._checkSensor(  data, 
                                 checkFrom=0.25, checkTo=.5, 
-                                expValue=expRotDetection*350, meanTol=100, ppMax = 100)
+                                expValue = expRotDetection*(servoData.maxSpeed+servoData.minSpeed)/2, 
+                                meanTol = (servoData.maxSpeed-servoData.minSpeed), 
+                                ppMax = (servoData.maxSpeed-servoData.minSpeed))
         else:
             raise ValueError()
            
@@ -397,51 +418,51 @@ class Gyros(TestCase):
         print "Static, Level"
         self._checkGyroAtLevel(self.tf.levelLog.gyro[0])
         print "Yaw Right"
-        self._checkGyroAtRot(self.tf.yawRLog.gyro[0], 0)
+        self._checkGyroAtRot(self.tf.yawRLog.gyro[0], 0, self.tf.settings.rotServo)
         print "Yaw Left"
-        self._checkGyroAtRot(self.tf.yawLLog.gyro[0], 0)
+        self._checkGyroAtRot(self.tf.yawLLog.gyro[0], 0, self.tf.settings.rotServo)
         print "Pitch Forward"
-        self._checkGyroAtRot(self.tf.pitchFWLog.gyro[0], 0)
+        self._checkGyroAtRot(self.tf.pitchFWLog.gyro[0], 0, self.tf.settings.tltServo)
         print "Pitch Backward"
-        self._checkGyroAtRot(self.tf.pitchBWLog.gyro[0], 0)
+        self._checkGyroAtRot(self.tf.pitchBWLog.gyro[0], 0, self.tf.settings.tltServo)
         print "Roll Right"
-        self._checkGyroAtRot(self.tf.rollRLog.gyro[0], -1)
+        self._checkGyroAtRot(self.tf.rollRLog.gyro[0], -1, self.tf.settings.tltServo)
         print "Roll Left"
-        self._checkGyroAtRot(self.tf.rollLLog.gyro[0], +1)
+        self._checkGyroAtRot(self.tf.rollLLog.gyro[0], +1, self.tf.settings.tltServo)
         
     def testGyroY(self):
         """Gyro Y"""
         print "Static, Level"
         self._checkGyroAtLevel(self.tf.levelLog.gyro[1])
         print "Yaw Right"
-        self._checkGyroAtRot(self.tf.yawRLog.gyro[1], 0)
+        self._checkGyroAtRot(self.tf.yawRLog.gyro[1], 0, self.tf.settings.rotServo)
         print "Yaw Left"
-        self._checkGyroAtRot(self.tf.yawLLog.gyro[1], 0)
+        self._checkGyroAtRot(self.tf.yawLLog.gyro[1], 0, self.tf.settings.rotServo)
         print "Pitch Forward"
-        self._checkGyroAtRot(self.tf.pitchFWLog.gyro[1], -1)
+        self._checkGyroAtRot(self.tf.pitchFWLog.gyro[1], -1, self.tf.settings.tltServo)
         print "Pitch Backward"
-        self._checkGyroAtRot(self.tf.pitchBWLog.gyro[1], +1)
+        self._checkGyroAtRot(self.tf.pitchBWLog.gyro[1], +1, self.tf.settings.tltServo)
         print "Roll Right"
-        self._checkGyroAtRot(self.tf.rollRLog.gyro[1], 0)
+        self._checkGyroAtRot(self.tf.rollRLog.gyro[1], 0, self.tf.settings.tltServo)
         print "Roll Left"
-        self._checkGyroAtRot(self.tf.rollLLog.gyro[1], 0)
+        self._checkGyroAtRot(self.tf.rollLLog.gyro[1], 0, self.tf.settings.tltServo)
 
     def testGyroZ(self):
         """Gyro Z"""
         print "Static, Level"
         self._checkGyroAtLevel(self.tf.levelLog.gyro[2])
         print "Yaw Right"
-        self._checkGyroAtRot(self.tf.yawRLog.gyro[2], +1)
+        self._checkGyroAtRot(self.tf.yawRLog.gyro[2], +1, self.tf.settings.rotServo)
         print "Yaw Left"
-        self._checkGyroAtRot(self.tf.yawLLog.gyro[2], -1)
+        self._checkGyroAtRot(self.tf.yawLLog.gyro[2], -1, self.tf.settings.rotServo)
         print "Pitch Forward"
-        self._checkGyroAtRot(self.tf.pitchFWLog.gyro[2], 0)
+        self._checkGyroAtRot(self.tf.pitchFWLog.gyro[2], 0, self.tf.settings.tltServo)
         print "Pitch Backward"
-        self._checkGyroAtRot(self.tf.pitchBWLog.gyro[2], 0)
+        self._checkGyroAtRot(self.tf.pitchBWLog.gyro[2], 0, self.tf.settings.tltServo)
         print "Roll Right"
-        self._checkGyroAtRot(self.tf.rollRLog.gyro[2], 0)
+        self._checkGyroAtRot(self.tf.rollRLog.gyro[2], 0, self.tf.settings.tltServo)
         print "Roll Left"
-        self._checkGyroAtRot(self.tf.rollLLog.gyro[2], 0)
+        self._checkGyroAtRot(self.tf.rollLLog.gyro[2], 0, self.tf.settings.tltServo)
         
         
 class Accels(TestCase):

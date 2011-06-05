@@ -171,6 +171,11 @@ static void manualControlTask(void *parameters)
 	uint8_t disconnected_count = 0;
 	uint8_t connected_count = 0;
 
+	// For now manual instantiate extra instances of Accessory Desired.  In future should be done dynamically
+	// this includes not even registering it if not used
+	AccessoryDesiredCreateInstance();
+	AccessoryDesiredCreateInstance();
+
 	// Make sure unarmed on power up
 	ManualControlCommandGet(&cmd);
 	FlightStatusGet(&flightStatus);
@@ -268,18 +273,24 @@ static void manualControlTask(void *parameters)
 				flightMode         = scaledChannel[settings.FlightMode];
 
 				AccessoryDesiredData accessory;
+				// Set Accessory 0
+				if(settings.Accessory0 != MANUALCONTROLSETTINGS_ACCESSORY0_NONE) {
+					accessory.AccessoryVal = scaledChannel[settings.Accessory0];
+					if(AccessoryDesiredInstSet(0, &accessory) != 0)
+						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
+				}
 				// Set Accessory 1
-				accessory.AccessoryVal = scaledChannel[settings.Accessory1];
-				if(AccessoryDesiredInstSet(0, &accessory) != 0)
-					   AccessoryDesiredCreateInstance();
-				// Set Accessory 2
-				accessory.AccessoryVal = scaledChannel[settings.Accessory2];
-				if(AccessoryDesiredInstSet(1, &accessory) != 0)
-					AccessoryDesiredCreateInstance();
-				// Set Accsesory 3
-				accessory.AccessoryVal = scaledChannel[settings.Accessory3];
-				if(AccessoryDesiredInstSet(2, &accessory) != 0)
-					AccessoryDesiredCreateInstance();
+				if(settings.Accessory1 != MANUALCONTROLSETTINGS_ACCESSORY1_NONE) {
+					accessory.AccessoryVal = scaledChannel[settings.Accessory1];
+					if(AccessoryDesiredInstSet(1, &accessory) != 0)
+						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
+				}
+				// Set Accsesory 2
+				if(settings.Accessory2 != MANUALCONTROLSETTINGS_ACCESSORY2_NONE) {
+					accessory.AccessoryVal = scaledChannel[settings.Accessory2];
+					if(AccessoryDesiredInstSet(2, &accessory) != 0)
+						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
+				}
 
 
 				processFlightMode(&settings, flightMode);

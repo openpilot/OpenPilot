@@ -1,7 +1,7 @@
 define connect
 	target remote localhost:3333
 	monitor cortex_m3 vector_catch all
-	file ./build/coptercontrol/CopterControl.elf
+	file ./build/fw_coptercontrol/fw_coptercontrol.elf
 end
 #monitor reset halt
 

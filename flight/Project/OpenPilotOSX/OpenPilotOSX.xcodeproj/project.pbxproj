@@ -2736,6 +2736,8 @@
 		65E6E06112E031E300058553 /* STM32103CB_CC_Rev1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STM32103CB_CC_Rev1.h; sourceTree = "<group>"; };
 		65E6E06212E031E300058553 /* STM32103CB_PIPXTREME_Rev1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STM32103CB_PIPXTREME_Rev1.h; sourceTree = "<group>"; };
 		65E6E09912E037C800058553 /* pios_adc_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_adc_priv.h; sourceTree = "<group>"; };
+		65E8C743139A6D0900E1F979 /* pios_crc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_crc.c; sourceTree = "<group>"; };
+		65E8C745139A6D1A00E1F979 /* pios_crc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_crc.h; sourceTree = "<group>"; };
 		65E8EF1F11EEA61E00BBF654 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../OpenPilot/Makefile; sourceTree = SOURCE_ROOT; };
 		65E8EF2011EEA61E00BBF654 /* Makefile.posix */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.posix; path = ../../OpenPilot/Makefile.posix; sourceTree = SOURCE_ROOT; };
 		65E8EF5C11EEA61E00BBF654 /* alarms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = alarms.c; path = ../../OpenPilot/System/alarms.c; sourceTree = SOURCE_ROOT; };
@@ -7660,6 +7662,7 @@
 				6528CCB412E406B800CF5144 /* pios_adxl345.c */,
 				6512D60712ED4CB8008175E5 /* pios_flash_w25x.c */,
 				65FF4D5E137EDEC100146BE4 /* pios_flashfs_objlist.c */,
+				65E8C743139A6D0900E1F979 /* pios_crc.c */,
 			);
 			name = Common;
 			path = ../../PiOS/Common;
@@ -7669,13 +7672,7 @@
 			isa = PBXGroup;
 			children = (
 				6528CCE212E40F6700CF5144 /* pios_adxl345.h */,
-				6512D60512ED4CA2008175E5 /* pios_flash_w25x.h */,
-				6526645B122DF972006F9A3C /* pios_wdg.h */,
-				651CF9EF120B700D00EEFD70 /* pios_usb_hid_desc.h */,
-				651CF9F0120B700D00EEFD70 /* pios_usb_hid_istr.h */,
-				651CF9F1120B700D00EEFD70 /* pios_usb_hid_prop.h */,
-				651CF9F2120B700D00EEFD70 /* pios_usb_hid_pwr.h */,
-				651CF9F3120B700D00EEFD70 /* usb_conf.h */,
+				65E8C745139A6D1A00E1F979 /* pios_crc.h */,
 				65E8F03A11EFF25C00BBF654 /* pios_adc.h */,
 				65E6E09912E037C800058553 /* pios_adc_priv.h */,
 				65E8F03B11EFF25C00BBF654 /* pios_bmp085.h */,
@@ -7684,6 +7681,7 @@
 				65E8F03E11EFF25C00BBF654 /* pios_debug.h */,
 				65E8F03F11EFF25C00BBF654 /* pios_delay.h */,
 				65E8F04011EFF25C00BBF654 /* pios_exti.h */,
+				6512D60512ED4CA2008175E5 /* pios_flash_w25x.h */,
 				65FF4D61137EFA4F00146BE4 /* pios_flashfs_objlist.h */,
 				65E8F04111EFF25C00BBF654 /* pios_gpio.h */,
 				65E8F04211EFF25C00BBF654 /* pios_hmc5843.h */,
@@ -7709,6 +7707,12 @@
 				65E8F05211EFF25C00BBF654 /* pios_usart_priv.h */,
 				65E8F05311EFF25C00BBF654 /* pios_usb.h */,
 				65E8F05511EFF25C00BBF654 /* pios_usb_hid.h */,
+				651CF9EF120B700D00EEFD70 /* pios_usb_hid_desc.h */,
+				651CF9F0120B700D00EEFD70 /* pios_usb_hid_istr.h */,
+				651CF9F1120B700D00EEFD70 /* pios_usb_hid_prop.h */,
+				651CF9F2120B700D00EEFD70 /* pios_usb_hid_pwr.h */,
+				6526645B122DF972006F9A3C /* pios_wdg.h */,
+				651CF9F3120B700D00EEFD70 /* usb_conf.h */,
 				65E8F05611EFF25C00BBF654 /* stm32f10x_conf.h */,
 			);
 			name = inc;

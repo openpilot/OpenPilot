@@ -117,6 +117,10 @@ C: Sami Korhonen (Sambas)
 D: May 2011
 V: http://vimeo.com/24258192
 
+M: First CopterControl flip on a Flybarless Heli
+C: 
+D: 
+V: 
 
 
 

@@ -132,6 +132,8 @@
 #include <usb_lib.h>
 #endif
 
+#include <pios_crc.h>
+
 #define NELEMENTS(x) (sizeof(x) / sizeof(*(x)))
 
 #endif /* PIOS_H */

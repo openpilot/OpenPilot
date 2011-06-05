@@ -106,7 +106,7 @@ void UAVSettingsImportExportPlugin::importUAVSettings()
 {
     // ask for file name
     QString fileName;
-    QString filters = tr("UAVSettings XML files (*.xml)");
+    QString filters = tr("UAVSettings XML files (*.uav);; XML files (*.xml)");
     fileName = QFileDialog::getOpenFileName(0, tr("Import UAV Settings"), "", filters);
     if (fileName.isEmpty()) {
         return;
@@ -170,7 +170,8 @@ void UAVSettingsImportExportPlugin::importUAVSettings()
                  QDomElement f = field.toElement();
                  if (f.tagName() == "field") {
                      UAVObjectField *uavfield = obj->getField(f.attribute("name"));
-                     if (f.attribute("elements").toInt() == 1) {
+                     QStringList list = f.attribute("values").split(",");
+                     if (list.length() == 1) {
                          uavfield->setValue(f.attribute("values"));
                      } else {
                      // This is an enum:
@@ -200,11 +201,19 @@ void UAVSettingsImportExportPlugin::exportUAVSettings()
 {
     // ask for file name
     QString fileName;
-    QString filters = tr("UAVSettings XML files (*.xml)");
+    QString filters = tr("UAVSettings XML files (*.uav)");
 
     fileName = QFileDialog::getSaveFileName(0, tr("Save UAV Settings File As"), "", filters);
     if (fileName.isEmpty()) {
         return;
+    }
+
+    bool fullExport = false;
+    // If the filename ends with .xml, we will do a full export, otherwise, a simple export
+    if (fileName.endsWith(".xml")) {
+        fullExport = true;
+    } else if (!fileName.endsWith(".uav")) {
+        fileName.append(".uav");
     }
 
     // generate an XML first (used for all export formats as a formatted data source)
@@ -226,10 +235,12 @@ void UAVSettingsImportExportPlugin::exportUAVSettings()
                 QDomElement o = doc.createElement("object");
                 o.setAttribute("name", obj->getName());
                 o.setAttribute("id", QString("0x")+ QString().setNum(obj->getObjID(),16).toUpper());
-                QDomElement d = doc.createElement("description");
-                QDomText t = doc.createTextNode(obj->getDescription().remove("@Ref ", Qt::CaseInsensitive));
-                d.appendChild(t);
-                o.appendChild(d);
+                if (fullExport) {
+                    QDomElement d = doc.createElement("description");
+                    QDomText t = doc.createTextNode(obj->getDescription().remove("@Ref ", Qt::CaseInsensitive));
+                    d.appendChild(t);
+                    o.appendChild(d);
+                }
 
                 // iterate over fields
                 QList<UAVObjectField*> fieldList = obj->getFields();
@@ -247,11 +258,13 @@ void UAVSettingsImportExportPlugin::exportUAVSettings()
 
                     f.setAttribute("name", field->getName());
                     f.setAttribute("values", vals);
-                    f.setAttribute("type", field->getTypeAsString());
-                    f.setAttribute("units", field->getUnits());
-                    f.setAttribute("elements", nelem);
-                    if (field->getType() == UAVObjectField::ENUM) {
-                        f.setAttribute("options", field->getOptions().join(","));
+                    if (fullExport) {
+                        f.setAttribute("type", field->getTypeAsString());
+                        f.setAttribute("units", field->getUnits());
+                        f.setAttribute("elements", nelem);
+                        if (field->getType() == UAVObjectField::ENUM) {
+                            f.setAttribute("options", field->getOptions().join(","));
+                        }
                     }
                     o.appendChild(f);
                 }

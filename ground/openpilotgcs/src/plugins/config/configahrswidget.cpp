@@ -216,7 +216,12 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     // Connect the signals
     connect(m_ahrs->ahrsCalibStart, SIGNAL(clicked()), this, SLOT(launchAHRSCalibration()));
     connect(m_ahrs->accelBiasStart, SIGNAL(clicked()), this, SLOT(launchAccelBiasCalibration()));
-    connect(m_ahrs->ahrsSettingsRequest, SIGNAL(clicked()), this, SLOT(ahrsSettingsRequest()));
+
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(ahrsSettingsRequest()));
+    obj = getObjectManager()->getObject(QString("HomeLocation"));
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(ahrsSettingsRequest()));
+
     /*
     connect(m_ahrs->algorithm, SIGNAL(currentIndexChanged(int)), this, SLOT(ahrsSettingsSave()));
     connect(m_ahrs->indoorFlight, SIGNAL(stateChanged(int)), this, SLOT(homeLocationSave()));
@@ -227,7 +232,9 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_ahrs->sixPointsStart, SIGNAL(clicked()), this, SLOT(multiPointCalibrationMode()));
     connect(m_ahrs->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
     connect(m_ahrs->startDriftCalib, SIGNAL(clicked()),this, SLOT(launchGyroDriftCalibration()));
+
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(ahrsSettingsRequest()));
+    ahrsSettingsRequest();
 
     // Connect the help button
     connect(m_ahrs->ahrsHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
@@ -1138,14 +1145,13 @@ void ConfigAHRSWidget::drawVariancesGraph()
 void ConfigAHRSWidget::ahrsSettingsRequest()
 {
 
-    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
-    obj->requestUpdate();
+    UAVObject *obj = getObjectManager()->getObject(QString("AHRSSettings"));
     UAVObjectField *field = obj->getField(QString("Algorithm"));
     if (field)
         m_ahrs->algorithm->setCurrentIndex(m_ahrs->algorithm->findText(field->getValue().toString()));
     drawVariancesGraph();
 
-    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("HomeLocation")));
+    obj = getObjectManager()->getObject(QString("HomeLocation"));
     field = obj->getField(QString("Set"));
     if (field)
         m_ahrs->homeLocationSet->setEnabled(field->getValue().toBool());

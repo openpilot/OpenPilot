@@ -97,9 +97,13 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
 
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
-
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlCommand")));
     connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateChannels(UAVObject*)));
+
+    // Register for ManualControlSettings changes:
+    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
+    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(requestRCInputUpdate()));
+
 
     // Get the receiver types supported by OpenPilot and fill the corresponding
     // dropdown menu:
@@ -155,7 +159,6 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     connect(m_config->saveRCInputToSD, SIGNAL(clicked()), this, SLOT(saveRCInputObject()));
     connect(m_config->saveRCInputToRAM, SIGNAL(clicked()), this, SLOT(sendRCInputUpdate()));
-    connect(m_config->getRCInputCurrent, SIGNAL(clicked()), this, SLOT(requestRCInputUpdate()));
 
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestRCInputUpdate()));
 
@@ -181,12 +184,13 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     enableControls(false);
 
+    // Ed's note: don't know who added this, this goes against the design
+    // of this plugin (there is a autopilotconnected event managed by the
+    // parent.
     // Listen to telemetry connection events
     if (pm) {
         TelemetryManager *tm = pm->getObject<TelemetryManager>();
         if (tm) {
-            connect(tm, SIGNAL(myStart()), this, SLOT(onTelemetryStart()));
-            connect(tm, SIGNAL(myStop()), this, SLOT(onTelemetryStop()));
             connect(tm, SIGNAL(connected()), this, SLOT(onTelemetryConnect()));
             connect(tm, SIGNAL(disconnected()), this, SLOT(onTelemetryDisconnect()));
         }
@@ -286,14 +290,19 @@ void ConfigInputWidget::onTelemetryDisconnect()
 
 // ************************************
 
+/*
+  Enable or disable some controls depending on whether we are connected
+  or not to the board. Actually, this i mostly useless IMHO, I don't
+  know who added this into the code (Ed's note)
+  */
 void ConfigInputWidget::enableControls(bool enable)
 {
-	m_config->getRCInputCurrent->setEnabled(enable);
-	m_config->saveRCInputToRAM->setEnabled(enable);
+        // m_config->saveRCInputToRAM->setEnabled(enable);
 	m_config->saveRCInputToSD->setEnabled(enable);
 
 	m_config->doRCInputCalibration->setEnabled(enable);
 
+        /*
 	m_config->ch0Assign->setEnabled(enable);
 	m_config->ch1Assign->setEnabled(enable);
 	m_config->ch2Assign->setEnabled(enable);
@@ -302,6 +311,7 @@ void ConfigInputWidget::enableControls(bool enable)
 	m_config->ch5Assign->setEnabled(enable);
 	m_config->ch6Assign->setEnabled(enable);
 	m_config->ch7Assign->setEnabled(enable);
+        */
 }
 
 
@@ -316,7 +326,7 @@ void ConfigInputWidget::requestRCInputUpdate()
 {
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ManualControlSettings")));
     Q_ASSERT(obj);
-    obj->requestUpdate();
+    //obj->requestUpdate();
     UAVObjectField *field;
 
     // Now update all the slider values:

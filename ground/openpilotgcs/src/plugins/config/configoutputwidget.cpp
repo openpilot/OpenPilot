@@ -120,21 +120,16 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 
     connect(m_config->channelOutTest, SIGNAL(toggled(bool)), this, SLOT(runChannelTests(bool)));
 
-	for (int i = 0; i < links.count(); i++)
-		links[i]->setChecked(false);
-	for (int i = 0; i < links.count(); i++)
-		connect(links[i], SIGNAL(toggled(bool)), this, SLOT(linkToggled(bool)));
-
-	requestRCOutputUpdate();
+    for (int i = 0; i < links.count(); i++)
+        links[i]->setChecked(false);
+    for (int i = 0; i < links.count(); i++)
+        connect(links[i], SIGNAL(toggled(bool)), this, SLOT(linkToggled(bool)));
 
     connect(m_config->saveRCOutputToSD, SIGNAL(clicked()), this, SLOT(saveRCOutputObject()));
     connect(m_config->saveRCOutputToRAM, SIGNAL(clicked()), this, SLOT(sendRCOutputUpdate()));
 
-    // Actually, this is not really needed since we are subscribing to the object updates already
-    // TODO: remove those buttons on all config gadget panels.
-    connect(m_config->getRCOutputCurrent, SIGNAL(clicked()), this, SLOT(requestRCOutputUpdate()));
-
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestRCOutputUpdate()));
+    requestRCOutputUpdate();
 
     firstUpdate = true;
 
@@ -193,7 +188,6 @@ void ConfigOutputWidget::enableControls(bool enable)
 {
 	m_config->saveRCOutputToSD->setEnabled(enable);
 	m_config->saveRCOutputToRAM->setEnabled(enable);
-	m_config->getRCOutputCurrent->setEnabled(enable);
 }
 
 // ************************************
@@ -203,29 +197,30 @@ void ConfigOutputWidget::enableControls(bool enable)
   */
 void ConfigOutputWidget::linkToggled(bool state)
 {
-	// find the minimum slider value for the linked ones
-	int min = 10000;
-	int linked_count = 0;
-	for (int i = 0; i < outSliders.count(); i++)
-	{
-		if (!links[i]->checkState()) continue;
-		int value = outSliders[i]->value();
-		if (min > value) min = value;
-		linked_count++;
-	}
+    Q_UNUSED(state)
+    // find the minimum slider value for the linked ones
+    int min = 10000;
+    int linked_count = 0;
+    for (int i = 0; i < outSliders.count(); i++)
+    {
+        if (!links[i]->checkState()) continue;
+        int value = outSliders[i]->value();
+        if (min > value) min = value;
+        linked_count++;
+    }
 
-	if (linked_count <= 0)
-		return;		// no linked channels
+    if (linked_count <= 0)
+        return;		// no linked channels
 
-	if (!m_config->channelOutTest->checkState())
-		return;	// we are not in Test Output mode
+    if (!m_config->channelOutTest->checkState())
+            return;	// we are not in Test Output mode
 
-	// set the linked channels to the same value
-	for (int i = 0; i < outSliders.count(); i++)
-	{
-		if (!links[i]->checkState()) continue;
-		outSliders[i]->setValue(min);
-	}
+    // set the linked channels to the same value
+    for (int i = 0; i < outSliders.count(); i++)
+    {
+        if (!links[i]->checkState()) continue;
+        outSliders[i]->setValue(min);
+    }
 }
 
 /**
@@ -237,7 +232,7 @@ void ConfigOutputWidget::runChannelTests(bool state)
     // Confirm this is definitely what they want
     if(state) {
         QMessageBox mbox;
-        mbox.setText(QString(tr("This option will requires you to be in the armed state and will start your motors by the amount selected on the sliders.  It is recommended to remove any blades from motors.  Are you sure you want to do this?")));
+        mbox.setText(QString(tr("This option will start your motors by the amount selected on the sliders regardless of transmitter.  It is recommended to remove any blades from motors.  Are you sure you want to do this?")));
         mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         int retval = mbox.exec();
         if(retval != QMessageBox::Yes) {
@@ -545,8 +540,8 @@ void ConfigOutputWidget::saveRCOutputObject()
   Sets the minimum/maximum value of the channel 0 to seven output sliders.
   Have to do it here because setMinimum is not a slot.
 
-  One added trick: if the slider is at either its max or its min when the value
-  is changed, then keep it on the max/min.
+  One added trick: if the slider is at its min when the value
+  is changed, then keep it on the min.
   */
 void ConfigOutputWidget::setChOutRange()
 {
@@ -559,7 +554,7 @@ void ConfigOutputWidget::setChOutRange()
     QSlider *slider = outSliders[index];
 
     int oldMini = slider->minimum();
-    int oldMaxi = slider->maximum();
+//    int oldMaxi = slider->maximum();
 
     if (outMin[index]->value()<outMax[index]->value())
     {

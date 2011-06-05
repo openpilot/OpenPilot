@@ -42,15 +42,15 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     m_stabilization = new Ui_StabilizationWidget();
     m_stabilization->setupUi(this);
 
-    // Now connect the widget to the ManualControlCommand / Channel UAVObject
-    //UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("StabilizationSettings")));
 
     requestStabilizationUpdate();
     connect(m_stabilization->saveStabilizationToSD, SIGNAL(clicked()), this, SLOT(saveStabilizationUpdate()));
     connect(m_stabilization->saveStabilizationToRAM, SIGNAL(clicked()), this, SLOT(sendStabilizationUpdate()));
-    connect(m_stabilization->getStabilizationCurrent, SIGNAL(clicked()), this, SLOT(requestStabilizationUpdate()));
 
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestStabilizationUpdate()));
+    // Now connect the widget to the StabilizationSettings object
+    UAVObject *obj = getObjectManager()->getObject(QString("StabilizationSettings"));
+    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(requestStabilizationUpdate()));
 
     // Create a timer to regularly send the object update in case
     // we want realtime updates.
@@ -180,7 +180,9 @@ void ConfigStabilizationWidget::updatePitchILimit(double val)
   */
 void ConfigStabilizationWidget::requestStabilizationUpdate()
 {
-    stabSettings->requestUpdate();
+    // Not needed anymore as this slot is called whenever we get
+    // a signal that the object was just updated
+    // stabSettings->requestUpdate();
     StabilizationSettings::DataFields stabData = stabSettings->getData();
     // Now fill in all the fields, this is fairly tedious:
     m_stabilization->rateRollKp->setValue(stabData.RollRatePI[StabilizationSettings::ROLLRATEPI_KP]);
@@ -270,10 +272,11 @@ void ConfigStabilizationWidget::saveStabilizationUpdate()
 
 void ConfigStabilizationWidget::realtimeUpdateToggle(bool state)
 {
-    if (state)
+    if (state) {
         updateTimer.start(300);
-    else
+    } else {
         updateTimer.stop();
+    }
 }
 
 void ConfigStabilizationWidget::openHelp()

@@ -326,13 +326,6 @@ arming it in that case!</string>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="getCurrentButton">
-       <property name="text">
-        <string>Get Current</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="applyButton">
        <property name="text">
         <string>Apply</string>

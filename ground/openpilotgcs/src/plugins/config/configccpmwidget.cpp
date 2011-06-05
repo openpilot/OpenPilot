@@ -1276,7 +1276,7 @@ void ConfigccpmWidget::SwashLvlStartButtonPressed()
             // Get the channel assignements:
             obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
             Q_ASSERT(obj);
-            obj->requestUpdate();
+            // obj->requestUpdate();
             MinField = obj->getField(QString("ChannelMin"));
             NeutralField = obj->getField(QString("ChannelNeutral"));
             MaxField = obj->getField(QString("ChannelMax"));

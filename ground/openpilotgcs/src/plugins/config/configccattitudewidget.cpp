@@ -41,11 +41,12 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
     connect(ui->zeroBias,SIGNAL(clicked()),this,SLOT(startAccelCalibration()));
     connect(ui->saveButton,SIGNAL(clicked()),this,SLOT(saveAttitudeSettings()));        
     connect(ui->applyButton,SIGNAL(clicked()),this,SLOT(applyAttitudeSettings()));
-    connect(ui->getCurrentButton,SIGNAL(clicked()),this,SLOT(getCurrentAttitudeSettings()));
 
     // Make it smart:
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(getCurrentAttitudeSettings()));
     getCurrentAttitudeSettings(); // The 1st time this panel is instanciated, the autopilot is already connected.
+    UAVObject * settings = getObjectManager()->getObject(QString("AttitudeSettings"));
+    connect(settings,SIGNAL(objectUpdated(UAVObject*)), this, SLOT(getCurrentAttitudeSettings()));
 
     // Connect the help button
     connect(ui->ccAttitudeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
@@ -128,7 +129,6 @@ void ConfigCCAttitudeWidget::applyAttitudeSettings() {
 
 void ConfigCCAttitudeWidget::getCurrentAttitudeSettings() {
     UAVDataObject * settings = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeSettings")));
-    settings->requestUpdate();
     UAVObjectField * field = settings->getField("BoardRotation");
     ui->rollBias->setValue(field->getDouble(0));
     ui->pitchBias->setValue(field->getDouble(1));

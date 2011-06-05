@@ -43,16 +43,17 @@ ConfigTelemetryWidget::ConfigTelemetryWidget(QWidget *parent) : ConfigTaskWidget
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-    UAVObject *obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("TelemetrySettings")));
+    UAVObject *obj = objManager->getObject(QString("TelemetrySettings"));
     UAVObjectField *field = obj->getField(QString("Speed"));
     m_telemetry->telemetrySpeed->addItems(field->getOptions());
 
     requestTelemetryUpdate();
     connect(m_telemetry->saveTelemetryToSD, SIGNAL(clicked()), this, SLOT(saveTelemetryUpdate()));
     connect(m_telemetry->saveTelemetryToRAM, SIGNAL(clicked()), this, SLOT(sendTelemetryUpdate()));
-    connect(m_telemetry->getTelemetryCurrent, SIGNAL(clicked()), this, SLOT(requestTelemetryUpdate()));
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(requestTelemetryUpdate()));
 
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestTelemetryUpdate()));
+    requestTelemetryUpdate();
 }
 
 ConfigTelemetryWidget::~ConfigTelemetryWidget()
@@ -74,7 +75,6 @@ void ConfigTelemetryWidget::requestTelemetryUpdate()
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("TelemetrySettings")));
     Q_ASSERT(obj);
-    obj->requestUpdate();
     UAVObjectField *field = obj->getField(QString("Speed"));
     m_telemetry->telemetrySpeed->setCurrentIndex(m_telemetry->telemetrySpeed->findText(field->getValue().toString()));
 }

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>557</width>
-    <height>462</height>
+    <height>467</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1403,16 +1403,6 @@ if you have not done so already.</string>
        </property>
        <property name="flat">
         <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="getRCInputCurrent">
-       <property name="toolTip">
-        <string>Retrieve settings from OpenPilot</string>
-       </property>
-       <property name="text">
-        <string>Get Current</string>
        </property>
       </widget>
      </item>

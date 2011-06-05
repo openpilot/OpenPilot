@@ -216,10 +216,10 @@ static void actuatorTask(void* parameters)
 			case MIXERSETTINGS_CURVE2SOURCE_YAW:
 				curve2 = MixerCurve(desired.Yaw,mixerSettings.ThrottleCurve2);
 				break;
+			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY0:
 			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY1:
 			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY2:
-			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY3:
-				if(AccessoryDesiredInstGet(mixerSettings.Curve2Source - MIXERSETTINGS_CURVE2SOURCE_ACCESSORY1,&accessory) == 0)
+				if(AccessoryDesiredInstGet(mixerSettings.Curve2Source - MIXERSETTINGS_CURVE2SOURCE_ACCESSORY0,&accessory) == 0)
 					curve2 = MixerCurve(accessory.AccessoryVal,mixerSettings.ThrottleCurve2);
 				else 
 					curve2 = 0;				
@@ -255,10 +255,10 @@ static void actuatorTask(void* parameters)
 			}
 			
 			// If an accessory channel is selected 
-			if( (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_ACCESSORY1) ||
-			    (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_ACCESSORY2) ||
-			   (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_ACCESSORY3)) {
-				if(AccessoryDesiredInstGet(mixerSettings.Curve2Source - MIXERSETTINGS_CURVE2SOURCE_ACCESSORY1,&accessory) == 0)
+			if( (mixers[ct].type >= MIXERSETTINGS_MIXER1TYPE_ACCESSORY0) && 
+			   (mixers[ct].type <= MIXERSETTINGS_MIXER1TYPE_ACCESSORY2))
+			{
+				if(AccessoryDesiredInstGet(mixerSettings.Curve2Source - MIXERSETTINGS_CURVE2SOURCE_ACCESSORY0,&accessory) == 0)
 					status[ct] = accessory.AccessoryVal;
 				else
 					status[ct] = -1;

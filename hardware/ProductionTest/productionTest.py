@@ -253,6 +253,9 @@ class TestFixture(object):
         print " New bias: (%d %d %d)" % tuple(self.objMan.AttitudeSettings.AccelBias.value)
         self.objMan.AttitudeSettings.updated()
         
+        # Some delay after calibrating the accels
+        time.sleep(.5)
+        
         print "Level ",
         self.recordSensors(20, 1000/20, self.levelLog)
         self.levelLog.extract()
@@ -274,13 +277,13 @@ class TestFixture(object):
         testFixture.setTiltServo(TestFixture.TILT_BW)
         time.sleep(1)
         testFixture.setTiltServo(TestFixture.TILT_FW)
-        self.recordSensors(20, 1000/20, self.pitchFWLog)
+        self.recordSensors(20, 2000/20, self.pitchFWLog)
         self.pitchFWLog.extract()
         
         print "Pitch Backward",
         testFixture.setRotServo(TestFixture.ROT_CENTER)
         testFixture.setTiltServo(TestFixture.TILT_BW)
-        self.recordSensors(20, 1000/20, self.pitchBWLog)
+        self.recordSensors(20, 2000/20, self.pitchBWLog)
         self.pitchBWLog.extract()
         
         print "Roll Right",
@@ -288,12 +291,12 @@ class TestFixture(object):
         testFixture.setTiltServo(TestFixture.TILT_BW)
         time.sleep(1)
         testFixture.setTiltServo(TestFixture.TILT_FW)
-        self.recordSensors(20, 1000/20, self.rollRLog)
+        self.recordSensors(20, 2000/20, self.rollRLog)
         self.rollRLog.extract()
         
         print "Roll Left",
         testFixture.setTiltServo(TestFixture.TILT_BW)
-        self.recordSensors(20, 1000/20, self.rollLLog)
+        self.recordSensors(20, 2000/20, self.rollLLog)
         self.rollLLog.extract()
         
         testFixture.setRotServo(TestFixture.ROT_CENTER)
@@ -344,6 +347,23 @@ class TestCase(unittest.TestCase):
             
         return name
     
+    def _checkTol(self, value, exp, tol):
+        return value >= exp-tol and value <= exp+tol
+        
+    def _checkSensor(self, data, checkFrom, checkTo, expValue, meanTol, ppMax):
+        fromIndex = int(float(len(data))*checkFrom)
+        toIndex = int(float(len(data))*checkTo)
+        
+        minVal = min(data[fromIndex:toIndex])
+        maxVal = max(data[fromIndex:toIndex])
+        meanVal = sum(data[fromIndex:toIndex]) / (toIndex-fromIndex)
+        ppVal = maxVal-minVal
+        
+        print " Raw: ", data
+        print " Measured: min=%.1f max=%.1f mean=%.1f pp=%.1f " % (minVal, maxVal, meanVal, ppVal)
+        self.assertTrue(self._checkTol(meanVal, expValue, meanTol))
+        self.assertTrue(ppVal < ppMax)
+    
 
 class RxTxChannels(TestCase):
             
@@ -374,24 +394,7 @@ class RxTxChannels(TestCase):
 
         
 class Gyros(TestCase):
-    
-    def _checkTol(self, value, exp, tol):
-        return value >= exp-tol and value <= exp+tol
-    
-    def _checkSensor(self, data, checkFrom, checkTo, expValue, meanTol, ppMax):
-        fromIndex = int(float(len(data))*checkFrom)
-        toIndex = int(float(len(data))*checkTo)
         
-        minVal = min(data[fromIndex:toIndex])
-        maxVal = max(data[fromIndex:toIndex])
-        meanVal = sum(data[fromIndex:toIndex]) / (toIndex-fromIndex)
-        ppVal = maxVal-minVal
-        
-        print " Raw: ", data
-        print " Measured: min=%.1f max=%.1f mean=%.1f pp=%.1f " % (minVal, maxVal, meanVal, ppVal)
-        self.assertTrue(self._checkTol(meanVal, expValue, meanTol))
-        self.assertTrue(ppVal < ppMax)
-    
     def _checkGyroAtLevel(self, data):
         self._checkSensor(  data, 
                             checkFrom=0.0, checkTo=1.0, 
@@ -401,11 +404,11 @@ class Gyros(TestCase):
         
         if expRotDetection == 0:
             self._checkSensor(  data, 
-                                checkFrom=0.25, checkTo=.5, 
+                                checkFrom=0.12, checkTo=.25, 
                                 expValue=0, meanTol=30, ppMax = 50)
         elif expRotDetection == -1 or expRotDetection == +1:
             self._checkSensor(  data, 
-                                checkFrom=0.25, checkTo=.5, 
+                                checkFrom=0.12, checkTo=.25, 
                                 expValue = expRotDetection*(servoData.maxSpeed+servoData.minSpeed)/2, 
                                 meanTol = (servoData.maxSpeed-servoData.minSpeed), 
                                 ppMax = (servoData.maxSpeed-servoData.minSpeed))
@@ -466,18 +469,77 @@ class Gyros(TestCase):
         
         
 class Accels(TestCase):
+        
+    # checks accel sensor while there is not movement
+    def _checkAccel(self, data, checkFrom, checkTo, expectedAcc, highTolerance = False):
+        if highTolerance:
+            meanTol = 5
+        else:
+            meanTol = 2
+        self._checkSensor(  data, 
+                            checkFrom=checkFrom, checkTo=checkTo, 
+                            expValue=9.81*expectedAcc, meanTol=meanTol, ppMax = 1)
+        
+    # checks accel sensor while there is movement on an axis that should not be registered by the accel sensor
+    # The mean value should be correct, but the pp on the signal is allowed to bigger
+    def _checkAccelAtRot(self, data, checkFrom, checkTo, expectedAcc):
+        self._checkSensor(  data, 
+                            checkFrom=checkFrom, checkTo=checkTo, 
+                            expValue=9.81*expectedAcc, meanTol=1, ppMax = 5) 
+        
+        
     def testAccelsX(self):
         """Accel X"""
-        self.assertTrue(True)
-
+        print "Static, Level"
+        self._checkAccel(self.tf.levelLog.accel[0], 0, 1, 0)
+        print "Yawed Right"
+        self._checkAccel(self.tf.yawRLog.accel[0], .8, 1, 0)
+        print "Yawed Left"
+        self._checkAccel(self.tf.yawLLog.accel[0], .8, 1, 0)
+        print "Rolled left"
+        self._checkAccel(self.tf.rollLLog.accel[0], .80, 1, 0)
+        print "Rolled Right"
+        self._checkAccel(self.tf.rollRLog.accel[0], .80, 1, 0)
+        print "Pitched Forward"
+        self._checkAccel(self.tf.pitchFWLog.accel[0], .80, 1, -1, highTolerance=True)
+        print "Pitched Backward"
+        self._checkAccel(self.tf.pitchBWLog.accel[0], .80, 1, 1, highTolerance=True)
+         
     def testAccelsY(self):
-        """Accel Y""" 
-        self.assertTrue(True)
-
+        """Accel Y"""
+        print "Static, Level"
+        self._checkAccel(self.tf.levelLog.accel[1], 0, 1, 0)
+        print "Yawed Right"
+        self._checkAccel(self.tf.yawRLog.accel[1], 0.8, 1, 0)
+        print "Yawed Left"
+        self._checkAccel(self.tf.yawLLog.accel[1], 0.8, 1, 0)
+        print "Rolled left"
+        self._checkAccel(self.tf.rollLLog.accel[1], .80, 1, -1, highTolerance=True)
+        print "Rolled Right"
+        self._checkAccel(self.tf.rollRLog.accel[1], .80, 1, 1, highTolerance=True)
+        print "Pitched Forward"
+        self._checkAccel(self.tf.pitchFWLog.accel[1], .80, 1, 0)
+        print "Pitched Backward"
+        self._checkAccel(self.tf.pitchBWLog.accel[1], .80, 1, 0)
+        
     def testAccelsZ(self):
         """Accel Z"""
-        self.assertTrue(True)
+        print "Static, Level"
+        self._checkAccel(self.tf.levelLog.accel[2], 0, 1, -1)
+        print "Yawed Right"
+        self._checkAccel(self.tf.yawRLog.accel[2], 0.8, 1, -1)
+        print "Yawed Left"
+        self._checkAccel(self.tf.yawLLog.accel[2], 0.8, 1, -1)
+        print "Rolled left"
+        self._checkAccel(self.tf.rollLLog.accel[2], .80, 1, 0)
+        print "Rolled Right"
+        self._checkAccel(self.tf.rollRLog.accel[2], .80, 1, 0)
+        print "Pitched Forward"
+        self._checkAccel(self.tf.pitchFWLog.accel[2], .80, 1, 0)
+        print "Pitched Backward"
+        self._checkAccel(self.tf.pitchBWLog.accel[2], .80, 1, 0)
 
+        
 class USB(TestCase):
     def testUSB(self):
         """USB"""
@@ -515,24 +577,11 @@ if __name__ == '__main__':
         testFixture.setRotServo(TestFixture.ROT_CENTER)
         testFixture.setTiltServo(TestFixture.TILT_LEVEL)
             
+#        testFixture.setTiltServo(TestFixture.TILT_BW)
+#        testFixture.setRotServo(TestFixture.ROT_RIGHT)
 #        while True:
-#            if False:    
-#                testFixture.setRotServo(TestFixture.ROT_LEFT)
-#                time.sleep(2)
-#                testFixture.setRotServo(TestFixture.ROT_CENTER)
-#                time.sleep(2)
-#                testFixture.setRotServo(TestFixture.ROT_RIGHT)
-#                time.sleep(2)
-#            else:
-#                testFixture.setTiltServo(TestFixture.TILT_FW)
-#                time.sleep(2)
-#                testFixture.setTiltServo(TestFixture.TILT_LEVEL)
-#                time.sleep(2)
-#                testFixture.setTiltServo(TestFixture.TILT_BW)
-#                time.sleep(2)
+#            time.sleep(1)
             
-            
-        
         
         testFixture.measureSensors()
         testFixture.dumpSensorData()

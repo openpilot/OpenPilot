@@ -6,7 +6,7 @@
         <field name="AccelTime" units="ms" type="float" elements="1" defaultvalue="0"/>
         <field name="DecelTime" units="ms" type="float" elements="1" defaultvalue="0"/>
         <field name="ThrottleCurve1" units="percent" type="float" elements="5" elementnames="0,25,50,75,100" defaultvalue="0,0.25,0.5,0.75,1"/>
-        <field name="Curve2Source" units="" type="enum" elements="1" options="Throttle,Roll,Pitch,Yaw,Accessory1,Accessory2,Accessory3" defaultvalue="Disabled"/>
+        <field name="Curve2Source" units="" type="enum" elements="1" options="Throttle,Roll,Pitch,Yaw,Accessory1,Accessory2,Accessory3" defaultvalue="Throttle"/>
         <field name="ThrottleCurve2" units="percent" type="float" elements="5" elementnames="0,25,50,75,100" defaultvalue="0,0.25,0.5,0.75,1"/>
         <field name="Mixer1Type" units="" type="enum" elements="1" options="Disabled,Motor,Servo,Accessory1,Accessory2,Accessory3" defaultvalue="Disabled"/>
         <field name="Mixer1Vector" units="" type="int8" elements="5" elementnames="ThrottleCurve1,ThrottleCurve2,Roll,Pitch,Yaw" defaultvalue="0"/>

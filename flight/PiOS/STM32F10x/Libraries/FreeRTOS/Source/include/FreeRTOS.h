@@ -1,38 +1,44 @@
 /*
-    FreeRTOS V6.1.1 - Copyright (C) 2011 Real Time Engineers Ltd.
+    FreeRTOS V7.0.1 - Copyright (C) 2011 Real Time Engineers Ltd.
+	
+
+	FreeRTOS supports many tools and architectures. V7.0.0 is sponsored by:
+	Atollic AB - Atollic provides professional embedded systems development 
+	tools for C/C++ development, code analysis and test automation.  
+	See http://www.atollic.com
+	
 
     ***************************************************************************
-    *                                                                         *
-    * If you are:                                                             *
-    *                                                                         *
-    *    + New to FreeRTOS,                                                   *
-    *    + Wanting to learn FreeRTOS or multitasking in general quickly       *
-    *    + Looking for basic training,                                        *
-    *    + Wanting to improve your FreeRTOS skills and productivity           *
-    *                                                                         *
-    * then take a look at the FreeRTOS books - available as PDF or paperback  *
-    *                                                                         *
-    *        "Using the FreeRTOS Real Time Kernel - a Practical Guide"        *
-    *                  http://www.FreeRTOS.org/Documentation                  *
-    *                                                                         *
-    * A pdf reference manual is also available.  Both are usually delivered   *
-    * to your inbox within 20 minutes to two hours when purchased between 8am *
-    * and 8pm GMT (although please allow up to 24 hours in case of            *
-    * exceptional circumstances).  Thank you for your support!                *
-    *                                                                         *
+     *                                                                       *
+     *    FreeRTOS tutorial books are available in pdf and paperback.        *
+     *    Complete, revised, and edited pdf reference manuals are also       *
+     *    available.                                                         *
+     *                                                                       *
+     *    Purchasing FreeRTOS documentation will not only help you, by       *
+     *    ensuring you get running as quickly as possible and with an        *
+     *    in-depth knowledge of how to use FreeRTOS, it will also help       *
+     *    the FreeRTOS project to continue with its mission of providing     *
+     *    professional grade, cross platform, de facto standard solutions    *
+     *    for microcontrollers - completely free of charge!                  *
+     *                                                                       *
+     *    >>> See http://www.FreeRTOS.org/Documentation for details. <<<     *
+     *                                                                       *
+     *    Thank you for using FreeRTOS, and thank you for your support!      *
+     *                                                                       *
     ***************************************************************************
+
 
     This file is part of the FreeRTOS distribution.
 
     FreeRTOS is free software; you can redistribute it and/or modify it under
     the terms of the GNU General Public License (version 2) as published by the
     Free Software Foundation AND MODIFIED BY the FreeRTOS exception.
-    ***NOTE*** The exception to the GPL is included to allow you to distribute
-    a combined work that includes FreeRTOS without being obliged to provide the
-    source code for proprietary components outside of the FreeRTOS kernel.
-    FreeRTOS is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+    >>>NOTE<<< The modification to the GPL is included to allow you to
+    distribute a combined work that includes FreeRTOS without being obliged to
+    provide the source code for proprietary components outside of the FreeRTOS
+    kernel.  FreeRTOS is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
     more details. You should have received a copy of the GNU General Public
     License and the FreeRTOS license exception along with FreeRTOS; if not it
     can be viewed here: http://www.freertos.org/a00114.html and also obtained
@@ -148,6 +154,10 @@ typedef portBASE_TYPE (*pdTASK_HOOK_CODE)( void * );
 	#define configUSE_MUTEXES 0
 #endif
 
+#ifndef configUSE_TIMERS
+	#define configUSE_TIMERS 0
+#endif
+
 #ifndef configUSE_COUNTING_SEMAPHORES
 	#define configUSE_COUNTING_SEMAPHORES 0
 #endif
@@ -169,27 +179,40 @@ typedef portBASE_TYPE (*pdTASK_HOOK_CODE)( void * );
 #endif
 
 #if configMAX_TASK_NAME_LEN < 1
-	#undef configMAX_TASK_NAME_LEN
-	#define configMAX_TASK_NAME_LEN 1
+	#error configMAX_TASK_NAME_LEN must be set to a minimum of 1 in FreeRTOSConfig.h
 #endif
 
 #ifndef INCLUDE_xTaskResumeFromISR
 	#define INCLUDE_xTaskResumeFromISR 1
 #endif
 
+#ifndef configASSERT
+	#define configASSERT( x )
+#endif
+
+/* The timers module relies on xTaskGetSchedulerState(). */
+#if configUSE_TIMERS == 1
+
+	#ifndef configTIMER_TASK_PRIORITY
+		#error If configUSE_TIMERS is set to 1 then configTIMER_TASK_PRIORITY must also be defined.
+	#endif /* configTIMER_TASK_PRIORITY */
+
+	#ifndef configTIMER_QUEUE_LENGTH
+		#error If configUSE_TIMERS is set to 1 then configTIMER_QUEUE_LENGTH must also be defined.
+	#endif /* configTIMER_QUEUE_LENGTH */
+
+	#ifndef configTIMER_TASK_STACK_DEPTH
+		#error If configUSE_TIMERS is set to 1 then configTIMER_TASK_STACK_DEPTH must also be defined.
+	#endif /* configTIMER_TASK_STACK_DEPTH */
+
+#endif /* configUSE_TIMERS */
+
 #ifndef INCLUDE_xTaskGetSchedulerState
 	#define INCLUDE_xTaskGetSchedulerState 0
 #endif
 
-#if ( configUSE_MUTEXES == 1 )
-	/* xTaskGetCurrentTaskHandle is used by the priority inheritance mechanism
-	within the mutex implementation so must be available if mutexes are used. */
-	#undef INCLUDE_xTaskGetCurrentTaskHandle
-	#define INCLUDE_xTaskGetCurrentTaskHandle 1
-#else
-	#ifndef INCLUDE_xTaskGetCurrentTaskHandle
-		#define INCLUDE_xTaskGetCurrentTaskHandle 0
-	#endif
+#ifndef INCLUDE_xTaskGetCurrentTaskHandle
+	#define INCLUDE_xTaskGetCurrentTaskHandle 0
 #endif
 
 
@@ -203,11 +226,10 @@ typedef portBASE_TYPE (*pdTASK_HOOK_CODE)( void * );
 
 
 #ifndef configQUEUE_REGISTRY_SIZE
-	#define configQUEUE_REGISTRY_SIZE 0
+	#define configQUEUE_REGISTRY_SIZE 0U
 #endif
 
-#if configQUEUE_REGISTRY_SIZE < 1
-	#define configQUEUE_REGISTRY_SIZE 0
+#if ( configQUEUE_REGISTRY_SIZE < 1U )
 	#define vQueueAddToRegistry( xQueue, pcName )
 	#define vQueueUnregisterQueue( xQueue )
 #endif
@@ -380,6 +402,26 @@ typedef portBASE_TYPE (*pdTASK_HOOK_CODE)( void * );
 	#define traceTASK_INCREMENT_TICK( xTickCount )
 #endif
 
+#ifndef traceTIMER_CREATE
+	#define traceTIMER_CREATE( pxNewTimer )
+#endif
+
+#ifndef traceTIMER_CREATE_FAILED
+	#define traceTIMER_CREATE_FAILED()
+#endif
+
+#ifndef traceTIMER_COMMAND_SEND
+	#define traceTIMER_COMMAND_SEND( xTimer, xMessageID, xMessageValueValue, xReturn )
+#endif
+
+#ifndef traceTIMER_EXPIRED
+	#define traceTIMER_EXPIRED( pxTimer )
+#endif
+
+#ifndef traceTIMER_COMMAND_RECEIVED
+	#define traceTIMER_COMMAND_RECEIVED( pxTimer, xMessageID, xMessageValue )
+#endif
+
 #ifndef configGENERATE_RUN_TIME_STATS
 	#define configGENERATE_RUN_TIME_STATS 0
 #endif
@@ -415,7 +457,7 @@ typedef portBASE_TYPE (*pdTASK_HOOK_CODE)( void * );
 #endif
 
 #ifndef pvPortMallocAligned
-	#define pvPortMallocAligned( x, puxStackBuffer ) ( ( puxStackBuffer == NULL ) ? ( pvPortMalloc( x ) ) : ( puxStackBuffer ) )
+	#define pvPortMallocAligned( x, puxStackBuffer ) ( ( ( puxStackBuffer ) == NULL ) ? ( pvPortMalloc( ( x ) ) ) : ( puxStackBuffer ) )
 #endif
 
 #ifndef vPortFreeAligned

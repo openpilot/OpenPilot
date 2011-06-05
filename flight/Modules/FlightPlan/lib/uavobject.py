@@ -288,7 +288,7 @@ class UAVObject:
 		uint32_t type;  
 		uint32_t numElements;  
 		uint8_t const *tmpStr;
-		int8_t tmpInt8;
+		int8_t tmpInt8 = 0;
 		int16_t tmpInt16;
 		int32_t tmpInt32;
 		float tmpFloat;		

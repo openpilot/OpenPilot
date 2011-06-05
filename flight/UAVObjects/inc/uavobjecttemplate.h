@@ -82,6 +82,9 @@ int32_t $(NAME)Initialize();
 UAVObjHandle $(NAME)Handle();
 void $(NAME)SetDefaults(UAVObjHandle obj, uint16_t instId);
 
+// set/Get functions
+$(SETGETFIELDSEXTERN)
+
 #endif // $(NAMEUC)_H
 
 /**

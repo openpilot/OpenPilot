@@ -105,6 +105,11 @@ UAVObjHandle $(NAME)Handle()
 }
 
 /**
+ * Get/Set object Functions
+ */
+$(SETGETFIELDS)
+
+/**
  * @}
  */
 

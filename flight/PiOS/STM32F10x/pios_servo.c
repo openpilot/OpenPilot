@@ -34,7 +34,6 @@
 
 /* Private Function Prototypes */
 
-uint16_t servo_positions[8];
 /**
 * Initialise Servos
 */
@@ -174,19 +173,15 @@ void PIOS_Servo_Set(uint8_t Servo, uint16_t Position)
 
 		switch(pios_servo_cfg.channels[Servo].channel) {
 			case TIM_Channel_1:
-				servo_positions[Servo] = Position;
 				TIM_SetCompare1(pios_servo_cfg.channels[Servo].timer, Position);
 				break;
 			case TIM_Channel_2:
-				servo_positions[Servo] = Position;
 				TIM_SetCompare2(pios_servo_cfg.channels[Servo].timer, Position);
 				break;
 			case TIM_Channel_3:
-				servo_positions[Servo] = Position;
 				TIM_SetCompare3(pios_servo_cfg.channels[Servo].timer, Position);
 				break;
 			case TIM_Channel_4:
-				servo_positions[Servo] = Position;
 				TIM_SetCompare4(pios_servo_cfg.channels[Servo].timer, Position);
 				break;
 		}	 	

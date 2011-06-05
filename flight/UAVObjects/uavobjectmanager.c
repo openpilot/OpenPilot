@@ -994,6 +994,17 @@ int32_t UAVObjSetData(UAVObjHandle obj, const void *dataIn)
 }
 
 /**
+ * Set the object data
+ * \param[in] obj The object handle
+ * \param[in] dataIn The object's data structure
+ * \return 0 if success or -1 if failure
+ */
+int32_t UAVObjSetDataField(UAVObjHandle obj, const void* dataIn, uint32_t offset, uint32_t size)
+{
+	return UAVObjSetInstanceDataField(obj, 0, dataIn, offset, size);
+}
+
+/**
  * Get the object data
  * \param[in] obj The object handle
  * \param[out] dataOut The object's data structure
@@ -1002,6 +1013,17 @@ int32_t UAVObjSetData(UAVObjHandle obj, const void *dataIn)
 int32_t UAVObjGetData(UAVObjHandle obj, void *dataOut)
 {
 	  return UAVObjGetInstanceData(obj, 0, dataOut);
+}
+
+/**
+ * Get the object data
+ * \param[in] obj The object handle
+ * \param[out] dataOut The object's data structure
+ * \return 0 if success or -1 if failure
+ */
+int32_t UAVObjGetDataField(UAVObjHandle obj, void* dataOut, uint32_t offset, uint32_t size)
+{
+	return UAVObjGetInstanceDataField(obj, 0, dataOut, offset, size);
 }
 
 /**
@@ -1053,6 +1075,63 @@ int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint16_t instId,
 }
 
 /**
+ * Set the data of a specific object instance
+ * \param[in] obj The object handle
+ * \param[in] instId The object instance ID
+ * \param[in] dataIn The object's data structure
+ * \return 0 if success or -1 if failure
+ */
+int32_t UAVObjSetInstanceDataField(UAVObjHandle obj, uint16_t instId, const void* dataIn, uint32_t offset, uint32_t size)
+{
+	ObjectList* objEntry;
+	ObjectInstList* instEntry;
+	UAVObjMetadata* mdata;
+
+	// Lock
+	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+
+	// Cast to object info
+	objEntry = (ObjectList*)obj;
+
+	// Check access level
+	if ( !objEntry->isMetaobject )
+	{
+		mdata = (UAVObjMetadata*)(objEntry->linkedObj->instances.data);
+		if ( mdata->access == ACCESS_READONLY )
+		{
+			xSemaphoreGiveRecursive(mutex);
+			return -1;
+		}
+	}
+
+	// Get instance information
+	instEntry = getInstance(objEntry, instId);
+	if ( instEntry == NULL )
+	{
+		// Error, unlock and return
+		xSemaphoreGiveRecursive(mutex);
+		return -1;
+	}
+
+	// return if we set too much of what we have
+	if ( (size + offset) > objEntry->numBytes) {
+		// Error, unlock and return
+		xSemaphoreGiveRecursive(mutex);		
+		return -1;
+	}
+
+	// Set data
+	memcpy(instEntry->data + offset, dataIn, size);
+
+	// Fire event
+	sendEvent(objEntry, instId, EV_UPDATED);
+
+	// Unlock
+	xSemaphoreGiveRecursive(mutex);
+	return 0;
+}
+
+/**
  * Get the data of a specific object instance
  * \param[in] obj The object handle
  * \param[in] instId The object instance ID
@@ -1084,6 +1163,49 @@ int32_t UAVObjGetInstanceData(UAVObjHandle obj, uint16_t instId,
 	  // Unlock
 	  xSemaphoreGiveRecursive(mutex);
 	  return 0;
+}
+
+/**
+ * Get the data of a specific object instance
+ * \param[in] obj The object handle
+ * \param[in] instId The object instance ID
+ * \param[out] dataOut The object's data structure
+ * \return 0 if success or -1 if failure
+ */
+int32_t UAVObjGetInstanceDataField(UAVObjHandle obj, uint16_t instId, void* dataOut, uint32_t offset, uint32_t size)
+{
+	ObjectList* objEntry;
+	ObjectInstList* instEntry;
+
+	// Lock
+	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+
+	// Cast to object info
+	objEntry = (ObjectList*)obj;
+
+	// Get instance information
+	instEntry = getInstance(objEntry, instId);
+	if ( instEntry == NULL )
+	{
+		// Error, unlock and return
+		xSemaphoreGiveRecursive(mutex);
+		return -1;
+	}
+
+	// return if we request too much of what we can give
+	if ( (size + offset) > objEntry->numBytes) 
+	{
+		// Error, unlock and return
+		xSemaphoreGiveRecursive(mutex);
+		return -1;
+	}
+	
+	// Set data
+	memcpy(dataOut, instEntry->data + offset, size);
+
+	// Unlock
+	xSemaphoreGiveRecursive(mutex);
+	return 0;
 }
 
 /**

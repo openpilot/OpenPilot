@@ -254,8 +254,11 @@ int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 {
 	uint32_t objId = UAVObjGetID(obj);
+	uint16_t objSize = UAVObjGetNumBytes(obj);
 	uint8_t crc = 0;
 	uint8_t crcFlash = 0;
+	const uint8_t crc_read_step = 8;
+	uint8_t crc_read_buffer[crc_read_step];
 	
 	int32_t addr = PIOS_FLASHFS_GetObjAddress(objId, instId);
 		
@@ -276,23 +279,23 @@ int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instId, uint8_t * data)
 	if((header.id != objId) || (header.instId != instId))
 		return -3;
 
-	// To avoid having to allocate the RAM for a copy of the object, we read once bytewise
-	// and compute the CRC (inefficient)
-	for(uint32_t i = 0; i < UAVObjGetNumBytes(obj); i++) {
-		uint8_t byte;
-		PIOS_Flash_W25X_ReadData(addr + sizeof(header) + i, &byte, 1);
-		crc = PIOS_CRC_updateByte(crc, byte);
+	// To avoid having to allocate the RAM for a copy of the object, we read by chunks
+	// and compute the CRC
+	for(uint32_t i = 0; i < objSize; i += crc_read_step) {
+		PIOS_Flash_W25X_ReadData(addr + sizeof(header) + i, crc_read_buffer, crc_read_step);
+		uint8_t valid_bytes = ((i + crc_read_step) >= objSize) ? objSize - i : crc_read_step;
+		crc = PIOS_CRC_updateCRC(crc, crc_read_buffer, valid_bytes);
 	}
 
 	// Read CRC (written so will work when CRC changes to uint16)
-	if(PIOS_Flash_W25X_ReadData(addr + sizeof(header) + UAVObjGetNumBytes(obj), (uint8_t *) &crcFlash, sizeof(crcFlash)) != 0)
+	if(PIOS_Flash_W25X_ReadData(addr + sizeof(header) + objSize, (uint8_t *) &crcFlash, sizeof(crcFlash)) != 0)
 		return -5;
 	
 	if(crc != crcFlash)
 		return -6;
 
 	// Read the instance data
-	if (PIOS_Flash_W25X_ReadData(addr + sizeof(header), data, UAVObjGetNumBytes(obj)) != 0)
+	if (PIOS_Flash_W25X_ReadData(addr + sizeof(header), data, objSize) != 0)
 		return -4;
 
 	return 0;

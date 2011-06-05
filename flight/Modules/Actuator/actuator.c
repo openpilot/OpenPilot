@@ -201,7 +201,7 @@ static void actuatorTask(void* parameters)
 		
 		float curve1 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve1);
 		//The source for the secondary curve is selectable
-		float curve2;
+		float curve2 = 0;
 		AccessoryDesiredData accessory;
 		switch(mixerSettings.Curve2Source) {
 			case MIXERSETTINGS_CURVE2SOURCE_THROTTLE:
@@ -260,8 +260,8 @@ static void actuatorTask(void* parameters)
 			   (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_ACCESSORY3)) {
 				if(AccessoryDesiredInstGet(mixerSettings.Curve2Source - MIXERSETTINGS_CURVE2SOURCE_ACCESSORY1,&accessory) == 0)
 					status[ct] = accessory.AccessoryVal;
-				else 
-					status[ct] = -1;				
+				else
+					status[ct] = -1;
 			}
 			
 			command.Channel[ct] = scaleChannel(status[ct],

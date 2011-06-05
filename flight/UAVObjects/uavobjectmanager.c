@@ -1114,8 +1114,11 @@ int32_t UAVObjSetInstanceDataField(UAVObjHandle obj, uint16_t instId, const void
 	}
 
 	// return if we set too much of what we have
-	if ( (size + offset) > objEntry->numBytes)
+	if ( (size + offset) > objEntry->numBytes) {
+		// Error, unlock and return
+		xSemaphoreGiveRecursive(mutex);		
 		return -1;
+	}
 
 	// Set data
 	memcpy(instEntry->data + offset, dataIn, size);
@@ -1190,9 +1193,13 @@ int32_t UAVObjGetInstanceDataField(UAVObjHandle obj, uint16_t instId, void* data
 	}
 
 	// return if we request too much of what we can give
-	if ( (size + offset) > objEntry->numBytes)
+	if ( (size + offset) > objEntry->numBytes) 
+	{
+		// Error, unlock and return
+		xSemaphoreGiveRecursive(mutex);
 		return -1;
-
+	}
+	
 	// Set data
 	memcpy(dataOut, instEntry->data + offset, size);
 

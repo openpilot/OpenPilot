@@ -55,7 +55,7 @@ ImportSummaryDialog::~ImportSummaryDialog()
   Adds a new line about a UAVObject along with its status
   (whether it got saved OK or not)
   */
-void ImportSummaryDialog::addLine(QString uavObjectName, bool status)
+void ImportSummaryDialog::addLine(QString uavObjectName, QString text, bool status)
 {
     ui->importSummaryList->setRowCount(ui->importSummaryList->rowCount()+1);
     int row = ui->importSummaryList->rowCount()-1;
@@ -64,11 +64,10 @@ void ImportSummaryDialog::addLine(QString uavObjectName, bool status)
     QTableWidgetItem *objName = new QTableWidgetItem(uavObjectName);
     ui->importSummaryList->setItem(row, 1, objName);
     QCheckBox *box = dynamic_cast<QCheckBox*>(ui->importSummaryList->cellWidget(row,0));
+    ui->importSummaryList->setItem(row,2,new QTableWidgetItem(text));
     if (status) {
-        ui->importSummaryList->setItem(row,2,new QTableWidgetItem("OK"));
         box->setChecked(true);
     } else {
-        ui->importSummaryList->setItem(row,2,new QTableWidgetItem("Mismatch"));
         box->setChecked(false);
         box->setEnabled(false);
     }

@@ -157,35 +157,44 @@ void UAVSettingsImportExportPlugin::importUAVSettings()
          if (obj == NULL) {
              // This object is unknown!
              qDebug() << "Object Unknown:" << uavObjectName << uavObjectID;
-             swui.addLine(uavObjectName, false);
+             swui.addLine(uavObjectName, "Error", false);
 
-         } else if(uavObjectID != obj->getObjID()) {
-             qDebug() << "Mismatch for Object " << uavObjectName << uavObjectID << " - " << obj->getObjID();
-            swui.addLine(uavObjectName, false);
          } else {
              //  - Update each field
              //  - Issue and "updated" command
+             bool error=false;
              QDomNode field = node.firstChild();
              while(!field.isNull()) {
                  QDomElement f = field.toElement();
                  if (f.tagName() == "field") {
                      UAVObjectField *uavfield = obj->getField(f.attribute("name"));
-                     QStringList list = f.attribute("values").split(",");
-                     if (list.length() == 1) {
-                         uavfield->setValue(f.attribute("values"));
-                     } else {
-                     // This is an enum:
-                         int i=0;
+                     if (uavfield) {
                          QStringList list = f.attribute("values").split(",");
-                         foreach (QString element, list) {
-                             uavfield->setValue(element,i++);
+                         if (list.length() == 1) {
+                             uavfield->setValue(f.attribute("values"));
+                         } else {
+                         // This is an enum:
+                             int i=0;
+                             QStringList list = f.attribute("values").split(",");
+                             foreach (QString element, list) {
+                                 uavfield->setValue(element,i++);
+                             }
                          }
+                         error = false;
+                     } else {
+                         error = true;
                      }
                  }
                  field = field.nextSibling();
              }
              obj->updated();
-             swui.addLine(uavObjectName, true);
+             if (error) {
+                 swui.addLine(uavObjectName, "Error", false);
+             } else if (uavObjectID != obj->getObjID()) {
+                  qDebug() << "Mismatch for Object " << uavObjectName << uavObjectID << " - " << obj->getObjID();
+                 swui.addLine(uavObjectName, "Warning", true);
+              } else
+                 swui.addLine(uavObjectName, "OK", true);
          }
         }
         node = node.nextSibling();

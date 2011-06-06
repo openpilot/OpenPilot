@@ -48,7 +48,7 @@ class ImportSummaryDialog : public QDialog
 public:
     ImportSummaryDialog(QWidget *parent=0);
     ~ImportSummaryDialog();
-    void addLine(QString objectName, bool status);
+    void addLine(QString objectName, QString text, bool status);
 
 protected:
     void showEvent(QShowEvent *event);

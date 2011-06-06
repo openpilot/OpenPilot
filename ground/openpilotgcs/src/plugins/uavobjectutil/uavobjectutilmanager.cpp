@@ -150,9 +150,14 @@ void UAVObjectUtilManager::objectPersistenceTransactionCompleted(UAVObject* obj,
         saveState = AWAITING_COMPLETED;
         disconnect(obj, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(objectPersistenceTransactionCompleted(UAVObject*,bool)));
         failureTimer.start(1000); // Create a timeout
-    } else if (!success) {
-        // Can be caused by timeout errors on sending.  Send again.
+    } else {
+        // Can be caused by timeout errors on sending.  Forget it and send next.
         qDebug() << "objectPersistenceTranscationCompleted (error)";
+        UAVObject *obj = getObjectManager()->getObject(ObjectPersistence::NAME);
+        obj->disconnect(this);
+        queue.dequeue(); // We can now remove the object, it failed anyway.
+        saveState = IDLE;
+        emit saveCompleted(obj->getField("ObjectID")->getValue().toInt(), false);
         saveNextObject();
     }
 }

@@ -602,12 +602,13 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
                         valueScaled = 0;
         }
 
-        // Bound
-		if (valueScaled >  1.0) valueScaled =  1.0;
-		else
-		if (valueScaled < -1.0) valueScaled = -1.0;
+        if(valueScaled < -(1.0 / 3.0))
+            m_config->fmsSlider->setValue(-100);
+        else if (valueScaled > (1.0/3.0))
+            m_config->fmsSlider->setValue(100);
+        else
+            m_config->fmsSlider->setValue(0);
 
-		m_config->fmsSlider->setValue(valueScaled * 100);
 	}
 }
 

@@ -158,7 +158,7 @@ void UAVSettingsImportExportPlugin::importUAVSettings()
          if (obj == NULL) {
              // This object is unknown!
              qDebug() << "Object Unknown:" << uavObjectName << uavObjectID;
-             swui.addLine(uavObjectName, "Error", false);
+             swui.addLine(uavObjectName, "Error (object Unknown)", false);
 
          } else {
              //  - Update each field
@@ -190,10 +190,10 @@ void UAVSettingsImportExportPlugin::importUAVSettings()
              }
              obj->updated();
              if (error) {
-                 swui.addLine(uavObjectName, "Error", false);
+                 swui.addLine(uavObjectName, "Warning (Object field unknown)", true);
              } else if (uavObjectID != obj->getObjID()) {
                   qDebug() << "Mismatch for Object " << uavObjectName << uavObjectID << " - " << obj->getObjID();
-                 swui.addLine(uavObjectName, "Warning", true);
+                 swui.addLine(uavObjectName, "Warning (ObjectID mismatch)", true);
               } else
                  swui.addLine(uavObjectName, "OK", true);
          }

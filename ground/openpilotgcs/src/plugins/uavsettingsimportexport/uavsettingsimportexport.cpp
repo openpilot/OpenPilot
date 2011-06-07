@@ -158,7 +158,7 @@ void UAVSettingsImportExportPlugin::importUAVSettings()
          if (obj == NULL) {
              // This object is unknown!
              qDebug() << "Object Unknown:" << uavObjectName << uavObjectID;
-             swui.addLine(uavObjectName, "Error (object Unknown)", false);
+             swui.addLine(uavObjectName, "Error (object unknown)", false);
 
          } else {
              //  - Update each field

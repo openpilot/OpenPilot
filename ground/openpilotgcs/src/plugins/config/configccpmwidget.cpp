@@ -1533,7 +1533,7 @@ int ConfigccpmWidget::ShowDisclaimer(int messageID)
             break;
         case 1:
             // Not Tested disclaimer
-             msgBox.setInformativeText("<h2>The CCPM mixer code has not been used to fly a helicopter!</h2><p><font color=red>Use it at your own risk!</font><p>Do you wish to continue?");
+             msgBox.setInformativeText("<h2>The CCPM mixer code needs more testing!</h2><p><font color=red>Use it at your own risk!</font><p>Do you wish to continue?");
              msgBox.setStandardButtons(QMessageBox::Yes |  QMessageBox::Cancel);
              msgBox.setDefaultButton(QMessageBox::Cancel);
              msgBox.setIcon(QMessageBox::Warning);

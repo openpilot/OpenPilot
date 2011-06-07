@@ -62,6 +62,21 @@ double ConfigTaskWidget::listMean(QList<double> list)
     return accum / list.size();
 }
 
+// ************************************
+// telemetry start/stop connect/disconnect signals
+
+void ConfigTaskWidget::onAutopilotDisconnect()
+{
+        enableControls(false);
+}
+
+void ConfigTaskWidget::onAutopilotConnect()
+{
+        enableControls(true);
+        refreshValues();
+}
+
+
 
 /**
   @}

@@ -32,6 +32,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
+#include "uavtalk/telemetrymanager.h"
 #include <QtGui/QWidget>
 #include <QList>
 #include <QItemDelegate>
@@ -57,6 +58,7 @@ private:
     void updateCustomAirframeUI();
     bool setupMixer(double mixerFactors[8][3]);
     void setupMotors(QList<QString> motorList);
+    virtual void enableControls(bool enable);
 
     void resetField(UAVObjectField * field);
     void resetMixer (MixerCurveWidget *mixer, int numElements);
@@ -72,7 +74,7 @@ private:
     UAVObject::Metadata accInitialData;
 
 private slots:
-    void requestAircraftUpdate();
+    virtual void refreshValues();
     void sendAircraftUpdate();
     void saveAircraftUpdate();
     void setupAirframeUI(QString type);

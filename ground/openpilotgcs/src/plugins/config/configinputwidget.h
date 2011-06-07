@@ -46,10 +46,6 @@ public:
         ~ConfigInputWidget();
 
 public slots:
-	void onTelemetryStart();
-	void onTelemetryStop();
-	void onTelemetryConnect();
-	void onTelemetryDisconnect();
 
 	void onInSliderValueChanged0(int value);
 	void onInSliderValueChanged1(int value);
@@ -82,11 +78,11 @@ private:
 
 	bool firstUpdate;
 
-	void enableControls(bool enable);
+        virtual void enableControls(bool enable);
 
 private slots:
 	void updateChannels(UAVObject* obj);
-	void requestRCInputUpdate();
+        virtual void refreshValues();
 	void sendRCInputUpdate();
 	void saveRCInputObject();
         void reverseCheckboxClicked(bool state);

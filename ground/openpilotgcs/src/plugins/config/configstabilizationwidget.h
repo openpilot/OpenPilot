@@ -49,9 +49,10 @@ private:
     Ui_StabilizationWidget *m_stabilization;
     StabilizationSettings* stabSettings;
     QTimer updateTimer;
+    virtual void enableControls(bool enable);
 
 private slots:
-    void requestStabilizationUpdate();
+    virtual void refreshValues();
     void sendStabilizationUpdate();
     void saveStabilizationUpdate();
     void realtimeUpdateToggle(bool);

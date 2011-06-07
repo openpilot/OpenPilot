@@ -47,13 +47,14 @@ ConfigTelemetryWidget::ConfigTelemetryWidget(QWidget *parent) : ConfigTaskWidget
     UAVObjectField *field = obj->getField(QString("Speed"));
     m_telemetry->telemetrySpeed->addItems(field->getOptions());
 
-    requestTelemetryUpdate();
     connect(m_telemetry->saveTelemetryToSD, SIGNAL(clicked()), this, SLOT(saveTelemetryUpdate()));
     connect(m_telemetry->saveTelemetryToRAM, SIGNAL(clicked()), this, SLOT(sendTelemetryUpdate()));
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(requestTelemetryUpdate()));
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
 
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestTelemetryUpdate()));
-    requestTelemetryUpdate();
+    enableControls(false);
+    refreshValues();
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
+    connect(parent, SIGNAL(autopilotDisconnected()),this, SLOT(onAutopilotDisconnect()));
 }
 
 ConfigTelemetryWidget::~ConfigTelemetryWidget()
@@ -66,10 +67,16 @@ ConfigTelemetryWidget::~ConfigTelemetryWidget()
  * Telemetry Settings
  *****************************/
 
+void ConfigTelemetryWidget::enableControls(bool enable)
+{
+    m_telemetry->saveTelemetryToSD->setEnabled(enable);
+    //m_telemetry->saveTelemetryToRAM->setEnabled(enable);
+}
+
 /**
   Request telemetry settings from the board
   */
-void ConfigTelemetryWidget::requestTelemetryUpdate()
+void ConfigTelemetryWidget::refreshValues()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -102,5 +109,3 @@ void ConfigTelemetryWidget::saveTelemetryUpdate()
     Q_ASSERT(obj);
     saveObjectToSD(obj);
 }
-
-

@@ -218,23 +218,23 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_ahrs->accelBiasStart, SIGNAL(clicked()), this, SLOT(launchAccelBiasCalibration()));
 
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(ahrsSettingsRequest()));
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
     obj = getObjectManager()->getObject(QString("HomeLocation"));
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(ahrsSettingsRequest()));
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
 
-    /*
-    connect(m_ahrs->algorithm, SIGNAL(currentIndexChanged(int)), this, SLOT(ahrsSettingsSave()));
-    connect(m_ahrs->indoorFlight, SIGNAL(stateChanged(int)), this, SLOT(homeLocationSave()));
-    connect(m_ahrs->homeLocation, SIGNAL(clicked()), this, SLOT(homeLocationSaveSD()));
-    */
     connect(m_ahrs->ahrsSettingsSaveRAM, SIGNAL(clicked()), this, SLOT(ahrsSettingsSaveRAM()));
     connect(m_ahrs->ahrsSettingsSaveSD, SIGNAL(clicked()), this, SLOT(ahrsSettingsSaveSD()));
     connect(m_ahrs->sixPointsStart, SIGNAL(clicked()), this, SLOT(multiPointCalibrationMode()));
     connect(m_ahrs->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
     connect(m_ahrs->startDriftCalib, SIGNAL(clicked()),this, SLOT(launchGyroDriftCalibration()));
 
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(ahrsSettingsRequest()));
-    ahrsSettingsRequest();
+    // Order is important: 1st request the settings (it will also enable the controls)
+    // then explicitely disable them. They will be re-enabled right afterwards by the
+    // configgadgetwidget if the autopilot is actually connected.
+    refreshValues();
+    // when the AHRS Widget is instanciated, the autopilot is always connected // enableControls(false);
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
+    connect(parent, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
 
     // Connect the help button
     connect(m_ahrs->ahrsHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
@@ -263,6 +263,13 @@ void ConfigAHRSWidget::resizeEvent(QResizeEvent *event)
     m_ahrs->sixPointsHelp->fitInView(paperplane,Qt::KeepAspectRatio);
 }
 
+
+void ConfigAHRSWidget::enableControls(bool enable)
+{
+    //m_ahrs->ahrsSettingsSaveRAM->setEnabled(enable);
+    m_ahrs->ahrsSettingsSaveSD->setEnabled(enable);
+}
+
 /**
   Starts an accelerometer bias calibration.
   */
@@ -281,7 +288,7 @@ void ConfigAHRSWidget::launchAccelBiasCalibration()
     accel_accum_y.clear();
     accel_accum_z.clear();
 
-    UAVDataObject* ahrsCalib = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
+//    UAVDataObject* ahrsCalib = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
 //    ahrsCalib->getField("accel_bias")->setDouble(0,0);
 //    ahrsCalib->getField("accel_bias")->setDouble(0,1);
 //    ahrsCalib->getField("accel_bias")->setDouble(0,2);
@@ -416,6 +423,7 @@ void ConfigAHRSWidget::launchGyroDriftCalibration()
   */
 void ConfigAHRSWidget::driftCalibrationAttitudeRawUpdated(UAVObject* obj) {
 
+    Q_UNUSED(obj)
     // This is necessary to prevent a race condition on disconnect signal and another update
     if (collectingData == true) {
         /**
@@ -1142,7 +1150,7 @@ void ConfigAHRSWidget::drawVariancesGraph()
 /**
   Request current settings from the AHRS
   */
-void ConfigAHRSWidget::ahrsSettingsRequest()
+void ConfigAHRSWidget::refreshValues()
 {
 
     UAVObject *obj = getObjectManager()->getObject(QString("AHRSSettings"));

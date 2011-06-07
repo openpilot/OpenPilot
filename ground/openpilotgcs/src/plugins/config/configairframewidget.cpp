@@ -172,7 +172,6 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     connect(m_aircraft->fixedWingType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupAirframeUI(QString)));
     connect(m_aircraft->multirotorFrameType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupAirframeUI(QString)));
     connect(m_aircraft->aircraftType, SIGNAL(currentIndexChanged(int)), this, SLOT(switchAirframeType(int)));
-    requestAircraftUpdate();
 
     connect(m_aircraft->fwThrottleReset, SIGNAL(clicked()), this, SLOT(resetFwMixer()));
     connect(m_aircraft->mrThrottleCurveReset, SIGNAL(clicked()), this, SLOT(resetMrMixer()));
@@ -191,23 +190,40 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     connect(m_aircraft->ffTestBox2, SIGNAL(clicked(bool)), this, SLOT(enableFFTest()));
     connect(m_aircraft->ffTestBox3, SIGNAL(clicked(bool)), this, SLOT(enableFFTest()));
 
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestAircraftUpdate()));
+    enableControls(false);
+    refreshValues();
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
+    connect(parent, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
+
     // Register for ManualControlSettings changes:
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
-    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(requestAircraftUpdate()));
+    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(requestAircraftUpdate()));
+    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
-    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(requestAircraftUpdate()));
+    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
 
     // Connect the help button
     connect(m_aircraft->airframeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
+
 }
 
 ConfigAirframeWidget::~ConfigAirframeWidget()
 {
    // Do nothing
 }
+
+/**
+  Enable or disable controls depending on whether we're ronnected or not
+  */
+void ConfigAirframeWidget::enableControls(bool enable)
+{
+   //m_aircraft->saveAircraftToRAM->setEnabled(enable);
+   m_aircraft->saveAircraftToSD->setEnabled(enable);
+   //m_aircraft->ffApply->setEnabled(enable);
+   m_aircraft->ffSave->setEnabled(enable);
+}
+
 
 /**
   Slot for switching the airframe type. We do it explicitely
@@ -446,14 +462,13 @@ void ConfigAirframeWidget::updateCustomThrottle2CurveValue(QList<double> list, d
   * Aircraft settings
   **************************/
 /**
-  Request the current value of the SystemSettings which holds the aircraft type
+  Refreshes the current value of the SystemSettings which holds the aircraft type
   */
-void ConfigAirframeWidget::requestAircraftUpdate()
+void ConfigAirframeWidget::refreshValues()
 {
     // Get the Airframe type from the system settings:
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
     Q_ASSERT(obj);
-    // obj->requestUpdate();
     UAVObjectField *field = obj->getField(QString("AirframeType"));
     Q_ASSERT(field);
     // At this stage, we will need to have some hardcoded settings in this code, this
@@ -463,7 +478,6 @@ void ConfigAirframeWidget::requestAircraftUpdate()
 
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(obj);
-    //obj->requestUpdate();
     field = obj->getField(QString("ThrottleCurve1"));
     Q_ASSERT(field);
     QList<double> curveValues;

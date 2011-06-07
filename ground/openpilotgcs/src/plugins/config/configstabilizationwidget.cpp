@@ -43,14 +43,17 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     m_stabilization->setupUi(this);
 
 
-    requestStabilizationUpdate();
     connect(m_stabilization->saveStabilizationToSD, SIGNAL(clicked()), this, SLOT(saveStabilizationUpdate()));
     connect(m_stabilization->saveStabilizationToRAM, SIGNAL(clicked()), this, SLOT(sendStabilizationUpdate()));
 
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestStabilizationUpdate()));
+    enableControls(false);
+    refreshValues();
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
+    connect(parent, SIGNAL(autopilotDisconnected()),this, SLOT(onAutopilotDisconnect()));
+
     // Now connect the widget to the StabilizationSettings object
     UAVObject *obj = getObjectManager()->getObject(QString("StabilizationSettings"));
-    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(requestStabilizationUpdate()));
+    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
 
     // Create a timer to regularly send the object update in case
     // we want realtime updates.
@@ -83,6 +86,12 @@ ConfigStabilizationWidget::~ConfigStabilizationWidget()
    // Do nothing
 }
 
+
+void ConfigStabilizationWidget::enableControls(bool enable)
+{
+    //m_stabilization->saveStabilizationToRAM->setEnabled(enable);
+    m_stabilization->saveStabilizationToSD->setEnabled(enable);
+}
 
 void ConfigStabilizationWidget::updateRateRollKP(double val)
 {
@@ -178,9 +187,9 @@ void ConfigStabilizationWidget::updatePitchILimit(double val)
 /**
   Request stabilization settings from the board
   */
-void ConfigStabilizationWidget::requestStabilizationUpdate()
+void ConfigStabilizationWidget::refreshValues()
 {
-    // Not needed anymore as this slot is called whenever we get
+    // Not needed anymore as this slot is only called whenever we get
     // a signal that the object was just updated
     // stabSettings->requestUpdate();
     StabilizationSettings::DataFields stabData = stabSettings->getData();

@@ -97,18 +97,17 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
             << m_config->ch7Rev;
 
     links << m_config->ch0Link
-              << m_config->ch1Link
-              << m_config->ch2Link
-              << m_config->ch3Link
-              << m_config->ch4Link
-              << m_config->ch5Link
-              << m_config->ch6Link
-              << m_config->ch7Link;
+          << m_config->ch1Link
+          << m_config->ch2Link
+          << m_config->ch3Link
+          << m_config->ch4Link
+          << m_config->ch5Link
+          << m_config->ch6Link
+          << m_config->ch7Link;
 
     // Register for ActuatorSettings changes:
     UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
-    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(requestRCOutputUpdate()));
-
+    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
 
     for (int i = 0; i < 8; i++) {
         connect(outMin[i], SIGNAL(editingFinished()), this, SLOT(setChOutRange()));
@@ -128,27 +127,14 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     connect(m_config->saveRCOutputToSD, SIGNAL(clicked()), this, SLOT(saveRCOutputObject()));
     connect(m_config->saveRCOutputToRAM, SIGNAL(clicked()), this, SLOT(sendRCOutputUpdate()));
 
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestRCOutputUpdate()));
-    requestRCOutputUpdate();
+    enableControls(false);
+    refreshValues();
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
+    connect(parent, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
 
     firstUpdate = true;
 
     connect(m_config->spinningArmed, SIGNAL(toggled(bool)), this, SLOT(setSpinningArmed(bool)));
-
-    enableControls(false);
-
-    // Listen to telemetry connection events
-    if (pm)
-    {
-        TelemetryManager *tm = pm->getObject<TelemetryManager>();
-        if (tm)
-        {
-            connect(tm, SIGNAL(myStart()), this, SLOT(onTelemetryStart()));
-            connect(tm, SIGNAL(myStop()), this, SLOT(onTelemetryStop()));
-            connect(tm, SIGNAL(connected()), this, SLOT(onTelemetryConnect()));
-            connect(tm, SIGNAL(disconnected()), this, SLOT(onTelemetryDisconnect()));
-        }
-    }
 
     // Connect the help button
     connect(m_config->outputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
@@ -160,34 +146,12 @@ ConfigOutputWidget::~ConfigOutputWidget()
 }
 
 
-
-// ************************************
-// telemetry start/stop connect/disconnect signals
-
-void ConfigOutputWidget::onTelemetryStart()
-{
-}
-
-void ConfigOutputWidget::onTelemetryStop()
-{
-}
-
-void ConfigOutputWidget::onTelemetryConnect()
-{
-	enableControls(true);
-}
-
-void ConfigOutputWidget::onTelemetryDisconnect()
-{
-	enableControls(false);
-}
-
 // ************************************
 
 void ConfigOutputWidget::enableControls(bool enable)
 {
 	m_config->saveRCOutputToSD->setEnabled(enable);
-	m_config->saveRCOutputToRAM->setEnabled(enable);
+        //m_config->saveRCOutputToRAM->setEnabled(enable);
 }
 
 // ************************************
@@ -391,7 +355,7 @@ void ConfigOutputWidget::sendChannelTest(int value)
 /**
   Request the current config from the board (RC Output)
   */
-void ConfigOutputWidget::requestRCOutputUpdate()
+void ConfigOutputWidget::refreshValues()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();

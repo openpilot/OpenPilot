@@ -55,6 +55,7 @@ public:
 private:
     void drawVariancesGraph();
     void displayPlane(QString elementID);
+    virtual void enableControls(bool enable);
 
     Ui_AHRSWidget *m_ahrs;
     QGraphicsSvgItem *paperplane;
@@ -130,7 +131,9 @@ private slots:
     void launchAccelBiasCalibration();
     void calibPhase2();
     void incrementProgress();
-    void ahrsSettingsRequest();
+
+    virtual void refreshValues();
+    //void ahrsSettingsRequest();
     void ahrsSettingsSaveRAM();
     void ahrsSettingsSaveSD();
     void savePositionData();

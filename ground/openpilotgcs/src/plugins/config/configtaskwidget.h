@@ -48,9 +48,15 @@ public:
     UAVObjectManager* getObjectManager();
     static double listMean(QList<double> list);
 
+public slots:
+    void onAutopilotDisconnect();
+    void onAutopilotConnect();
+
 private slots:
+    virtual void refreshValues() = 0;
 
 private:
+    virtual void enableControls(bool enable) = 0;
 
 };
 

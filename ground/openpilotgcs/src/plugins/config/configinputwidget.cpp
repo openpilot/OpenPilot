@@ -43,8 +43,8 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_config = new Ui_InputWidget();
     m_config->setupUi(this);
 
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-	UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
 	// First of all, put all the channel widgets into lists, so that we can
     // manipulate those:
@@ -102,7 +102,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     // Register for ManualControlSettings changes:
     obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
-    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(requestRCInputUpdate()));
+    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
 
 
     // Get the receiver types supported by OpenPilot and fill the corresponding
@@ -155,12 +155,14 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_config->armControl->clear();
     m_config->armControl->addItems(field->getOptions());
 
-    requestRCInputUpdate();
 
     connect(m_config->saveRCInputToSD, SIGNAL(clicked()), this, SLOT(saveRCInputObject()));
     connect(m_config->saveRCInputToRAM, SIGNAL(clicked()), this, SLOT(sendRCInputUpdate()));
 
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestRCInputUpdate()));
+    enableControls(false);
+    refreshValues();
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
+    connect(parent, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
 
     connect(m_config->inSlider0, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged0(int)));
     connect(m_config->inSlider1, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged1(int)));
@@ -181,20 +183,6 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_config->ch7Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
 
     firstUpdate = true;
-
-    enableControls(false);
-
-    // Ed's note: don't know who added this, this goes against the design
-    // of this plugin (there is a autopilotconnected event managed by the
-    // parent.
-    // Listen to telemetry connection events
-    if (pm) {
-        TelemetryManager *tm = pm->getObject<TelemetryManager>();
-        if (tm) {
-            connect(tm, SIGNAL(connected()), this, SLOT(onTelemetryConnect()));
-            connect(tm, SIGNAL(disconnected()), this, SLOT(onTelemetryDisconnect()));
-        }
-    }
 
     // Connect the help button
     connect(m_config->inputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
@@ -266,27 +254,6 @@ void ConfigInputWidget::onInSliderValueChanged7(int value)
 	inNeuLabels[7]->setText(QString::number(value));
 }
 
-// ************************************
-// telemetry start/stop connect/disconnect signals
-
-void ConfigInputWidget::onTelemetryStart()
-{
-}
-
-void ConfigInputWidget::onTelemetryStop()
-{
-}
-
-void ConfigInputWidget::onTelemetryConnect()
-{
-	enableControls(true);
-}
-
-void ConfigInputWidget::onTelemetryDisconnect()
-{
-	enableControls(false);
-	m_config->doRCInputCalibration->setChecked(false);
-}
 
 // ************************************
 
@@ -297,21 +264,11 @@ void ConfigInputWidget::onTelemetryDisconnect()
   */
 void ConfigInputWidget::enableControls(bool enable)
 {
-        // m_config->saveRCInputToRAM->setEnabled(enable);
+        //m_config->saveRCInputToRAM->setEnabled(enable);
 	m_config->saveRCInputToSD->setEnabled(enable);
-
 	m_config->doRCInputCalibration->setEnabled(enable);
 
-        /*
-	m_config->ch0Assign->setEnabled(enable);
-	m_config->ch1Assign->setEnabled(enable);
-	m_config->ch2Assign->setEnabled(enable);
-	m_config->ch3Assign->setEnabled(enable);
-	m_config->ch4Assign->setEnabled(enable);
-	m_config->ch5Assign->setEnabled(enable);
-	m_config->ch6Assign->setEnabled(enable);
-	m_config->ch7Assign->setEnabled(enable);
-        */
+        m_config->doRCInputCalibration->setChecked(false);
 }
 
 
@@ -322,7 +279,7 @@ void ConfigInputWidget::enableControls(bool enable)
 /**
   Request the current config from the board
   */
-void ConfigInputWidget::requestRCInputUpdate()
+void ConfigInputWidget::refreshValues()
 {
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ManualControlSettings")));
     Q_ASSERT(obj);

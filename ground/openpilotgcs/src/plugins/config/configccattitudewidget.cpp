@@ -43,18 +43,29 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
     connect(ui->applyButton,SIGNAL(clicked()),this,SLOT(applyAttitudeSettings()));
 
     // Make it smart:
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(getCurrentAttitudeSettings()));
-    getCurrentAttitudeSettings(); // The 1st time this panel is instanciated, the autopilot is already connected.
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
+    connect(parent, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
+
+    enableControls(true);
+    refreshValues(); // The 1st time this panel is instanciated, the autopilot is already connected.
     UAVObject * settings = getObjectManager()->getObject(QString("AttitudeSettings"));
-    connect(settings,SIGNAL(objectUpdated(UAVObject*)), this, SLOT(getCurrentAttitudeSettings()));
+    connect(settings,SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
 
     // Connect the help button
     connect(ui->ccAttitudeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
+
+
 }
 
 ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()
 {
     delete ui;
+}
+
+void ConfigCCAttitudeWidget::enableControls(bool enable)
+{
+    //ui->applyButton->setEnabled(enable);
+    ui->saveButton->setEnabled(enable);
 }
 
 void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
@@ -127,7 +138,7 @@ void ConfigCCAttitudeWidget::applyAttitudeSettings() {
     settings->updated();
 }
 
-void ConfigCCAttitudeWidget::getCurrentAttitudeSettings() {
+void ConfigCCAttitudeWidget::refreshValues() {
     UAVDataObject * settings = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeSettings")));
     UAVObjectField * field = settings->getField("BoardRotation");
     ui->rollBias->setValue(field->getDouble(0));

@@ -38,7 +38,7 @@
 
 class Ui_Widget;
 
-class DefaultAttitudeWidget : public ConfigTaskWidget
+class DefaultAttitudeWidget : public QWidget
 {
     Q_OBJECT
 

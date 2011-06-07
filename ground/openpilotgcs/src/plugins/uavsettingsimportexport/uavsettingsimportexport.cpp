@@ -25,13 +25,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/*
- * TODO:
- *  - write import functions
- *  - split formats into different files/classes
- *  - better error handling (not a lot of QMessageBoxes)
- */
-
 #include "uavsettingsimportexport.h"
 
 #include <QtPlugin> 
@@ -157,8 +150,8 @@ void UAVSettingsImportExportPlugin::importUAVSettings()
          UAVObject* obj = objManager->getObject(uavObjectName);
          if (obj == NULL) {
              // This object is unknown!
-             qDebug() << "Object Unknown:" << uavObjectName << uavObjectID;
-             swui.addLine(uavObjectName, "Error (object unknown)", false);
+             qDebug() << "Object unknown:" << uavObjectName << uavObjectID;
+             swui.addLine(uavObjectName, "Error (Object unknown)", false);
 
          } else {
              //  - Update each field

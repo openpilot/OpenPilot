@@ -88,6 +88,7 @@ bool UAVSettingsImportExportPlugin::initialize(const QStringList& args, QString 
                              "UAVSettingsImportExportPlugin.UAVSettingsImport",
                              QList<int>() <<
                              Core::Constants::C_GLOBAL_ID);
+    cmd->setDefaultKeySequence(QKeySequence("Ctrl+I"));
     cmd->action()->setText(tr("Import UAV Settings..."));
     ac->addAction(cmd, Core::Constants::G_FILE_SAVE);
     connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(importUAVSettings()));

@@ -29,6 +29,8 @@
 
 #include <QDialog>
 #include <QCheckBox>
+#include <QDesktopServices>
+#include <QUrl>
 #include "ui_importsummarydialog.h"
 #include "uavdataobject.h"
 #include "uavobjectmanager.h"
@@ -62,6 +64,7 @@ public slots:
 
 private slots:
     void doTheSaving();
+    void openHelp();
 
 };
 

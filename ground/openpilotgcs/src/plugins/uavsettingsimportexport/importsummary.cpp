@@ -44,11 +44,23 @@ ImportSummaryDialog::ImportSummaryDialog( QWidget *parent) :
 
    connect( ui->closeButton, SIGNAL(clicked()), this, SLOT(close()));
    connect(ui->saveToFlash, SIGNAL(clicked()), this, SLOT(doTheSaving()));
+
+   // Connect the help button
+   connect(ui->helpButton, SIGNAL(clicked()), this, SLOT(openHelp()));
+
 }
 
 ImportSummaryDialog::~ImportSummaryDialog()
 {
     delete ui;
+}
+
+/*
+  Open the right page on the wiki
+  */
+void ImportSummaryDialog::openHelp()
+{
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/UAV+Settings+import-export", QUrl::StrictMode) );
 }
 
 /*

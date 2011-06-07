@@ -38,6 +38,8 @@
 #include <QDesktopServices>
 #include <QUrl>
 
+#include "manualcontrolsettings.h"
+
 ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     m_config = new Ui_InputWidget();
@@ -547,7 +549,7 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
                 mdata.flightAccess = UAVObject::ACCESS_READONLY;
                 obj->setMetadata(mdata);
                 UAVObjectField *field = obj->getField("Channel");
-                for (int i=0; i< field->getNumElements(); i++) {
+                for (uint i=0; i< field->getNumElements(); i++) {
                     field->setValue(0,i);
                 }
                 obj->updated();
@@ -574,17 +576,17 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
         }
         firstUpdate = true;
     }
+
     //Update the Flight mode channel slider
-    UAVObject* obj = getObjectManager()->getObject("ManualControlSettings");
-    // Find the channel currently assigned to flightmode
-    field = obj->getField("FlightMode");
-    int chIndex = field->getOptions().indexOf(field->getValue().toString());
-    if (chIndex < field->getOptions().length() - 1) {
+    ManualControlSettings * manualSettings = ManualControlSettings::GetInstance(getObjectManager());
+    ManualControlSettings::DataFields manualSettingsData = manualSettings->getData();
+    uint chIndex = manualSettingsData.FlightMode;
+    if (chIndex < manualSettings->FLIGHTMODEPOSITION_NUMELEM - 1) {
         float valueScaled;
 
-        int chMin = inSliders[chIndex]->minimum();
-        int chMax = inSliders[chIndex]->maximum();
-        int chNeutral = inSliders[chIndex]->value();
+        int chMin = manualSettingsData.ChannelMin[chIndex];
+        int chMax = manualSettingsData.ChannelMax[chIndex];
+        int chNeutral = manualSettingsData.ChannelNeutral[chIndex];
 
         int value = controlCommand->getField("Channel")->getValue(chIndex).toInt();
         if ((chMax > chMin && value >= chNeutral) || (chMin > chMax && value <= chNeutral))

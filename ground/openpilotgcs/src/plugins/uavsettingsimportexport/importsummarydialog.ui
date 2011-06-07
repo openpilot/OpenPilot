@@ -69,7 +69,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_3">
+      <widget class="QPushButton" name="helpButton">
        <property name="maximumSize">
         <size>
          <width>32</width>

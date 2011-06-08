@@ -534,35 +534,34 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
 
     if (m_config->doRCInputCalibration->isChecked()) {
         if (firstUpdate) {
-                // Increase the data rate from the board so that the sliders
-                // move faster
-                UAVObject::Metadata mdata = controlCommand->getMetadata();
-                mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-                mccDataRate = mdata.flightTelemetryUpdatePeriod;
-                mdata.flightTelemetryUpdatePeriod = 150;
-                controlCommand->setMetadata(mdata);
+            // Increase the data rate from the board so that the sliders
+            // move faster
+            UAVObject::Metadata mdata = controlCommand->getMetadata();
+            mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+            mccDataRate = mdata.flightTelemetryUpdatePeriod;
+            mdata.flightTelemetryUpdatePeriod = 150;
+            controlCommand->setMetadata(mdata);
 
-                // Also protect the user by setting all values to zero
-                // and making the ActuatorCommand object readonly
-                UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
-                mdata = obj->getMetadata();
-                mdata.flightAccess = UAVObject::ACCESS_READONLY;
-                obj->setMetadata(mdata);
-                UAVObjectField *field = obj->getField("Channel");
-                for (uint i=0; i< field->getNumElements(); i++) {
-                    field->setValue(0,i);
-                }
-                obj->updated();
-
+            // Also protect the user by setting all values to zero
+            // and making the ActuatorCommand object readonly
+            UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
+            mdata = obj->getMetadata();
+            mdata.flightAccess = UAVObject::ACCESS_READONLY;
+            obj->setMetadata(mdata);
+            UAVObjectField *field = obj->getField("Channel");
+            for (uint i=0; i< field->getNumElements(); i++) {
+                field->setValue(0,i);
             }
+            obj->updated();
+        }
 
         field = controlCommand->getField(QString("Channel"));
         for (int i = 0; i < 8; i++)
             updateChannelInSlider(inSliders[i], inMinLabels[i], inMaxLabels[i], field->getValue(i).toInt(),inRevCheckboxes[i]->isChecked());
         firstUpdate = false;
-        }
-        else {
-        if (!firstUpdate) {
+    }
+    else {
+        if (!firstUpdate) {           
             // Restore original data rate from the board:
             UAVObject::Metadata mdata = controlCommand->getMetadata();
             mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
@@ -573,6 +572,22 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
             mdata = obj->getMetadata();
             mdata.flightAccess = UAVObject::ACCESS_READWRITE;
             obj->setMetadata(mdata);
+
+            // Set some slider values to better defaults
+            ManualControlSettings * manualSettings = ManualControlSettings::GetInstance(getObjectManager());
+            ManualControlSettings::DataFields manualSettingsData = manualSettings->getData();
+            uint throttleIndex = manualSettingsData.Throttle;
+            uint flightModeIndex = manualSettingsData.FlightMode;
+            if(throttleIndex < manualSettings->THROTTLE_NONE) {
+                // Throttle neutral defaults to 5% of range
+                manualSettingsData.ChannelNeutral[throttleIndex] = 0.05 * (manualSettingsData.ChannelMax[throttleIndex] - manualSettingsData.ChannelMin[throttleIndex]) + manualSettingsData.ChannelMin[throttleIndex];
+                qDebug() << manualSettingsData.ChannelNeutral[throttleIndex];
+            }
+            if(flightModeIndex < manualSettings->FLIGHTMODE_NONE) {
+                // Flight mode neutral defaults to 50% of range
+                manualSettingsData.ChannelNeutral[flightModeIndex] = 0.5 * (manualSettingsData.ChannelMax[flightModeIndex] - manualSettingsData.ChannelMin[flightModeIndex]) + manualSettingsData.ChannelMin[flightModeIndex];
+            }
+            manualSettings->setData(manualSettingsData);
         }
         firstUpdate = true;
     }
@@ -591,17 +606,17 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
         int value = controlCommand->getField("Channel")->getValue(chIndex).toInt();
         if ((chMax > chMin && value >= chNeutral) || (chMin > chMax && value <= chNeutral))
         {
-                if (chMax != chNeutral)
-                        valueScaled = (float)(value - chNeutral) / (float)(chMax - chNeutral);
-                else
-                        valueScaled = 0;
+            if (chMax != chNeutral)
+                valueScaled = (float)(value - chNeutral) / (float)(chMax - chNeutral);
+            else
+                valueScaled = 0;
         }
         else
         {
-                if (chMin != chNeutral)
-                        valueScaled = (float)(value - chNeutral) / (float)(chNeutral - chMin);
-                else
-                        valueScaled = 0;
+            if (chMin != chNeutral)
+                valueScaled = (float)(value - chNeutral) / (float)(chNeutral - chMin);
+            else
+                valueScaled = 0;
         }
 
         if(valueScaled < -(1.0 / 3.0))
@@ -611,7 +626,7 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
         else
             m_config->fmsSlider->setValue(0);
 
-	}
+    }
 }
 
 void ConfigInputWidget::updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, int value, bool reversed)

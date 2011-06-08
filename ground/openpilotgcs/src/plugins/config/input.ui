@@ -52,7 +52,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Current channel value.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>1000</string>
+          <string>1500</string>
          </property>
         </widget>
        </item>
@@ -160,7 +160,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Current channel value.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>1000</string>
+          <string>1500</string>
          </property>
         </widget>
        </item>
@@ -268,7 +268,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Current channel value.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>1000</string>
+          <string>1500</string>
          </property>
         </widget>
        </item>
@@ -376,7 +376,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Current channel value.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>1000</string>
+          <string>1500</string>
          </property>
         </widget>
        </item>
@@ -484,7 +484,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Current channel value.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>1000</string>
+          <string>1500</string>
          </property>
         </widget>
        </item>
@@ -592,7 +592,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Current channel value.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>1000</string>
+          <string>1500</string>
          </property>
         </widget>
        </item>
@@ -700,7 +700,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Current channel value.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>1000</string>
+          <string>1500</string>
          </property>
         </widget>
        </item>
@@ -912,7 +912,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Current channel value.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>1000</string>
+          <string>1500</string>
          </property>
         </widget>
        </item>
@@ -1460,5 +1460,134 @@ Applies and Saves all settings to SD</string>
  <resources>
   <include location="../coreplugin/core.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>inSlider0</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ch0Cur</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>291</x>
+     <y>93</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>150</x>
+     <y>104</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>inSlider1</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ch1Cur</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>283</x>
+     <y>137</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>160</x>
+     <y>138</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>inSlider2</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ch2Cur</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>341</x>
+     <y>163</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>156</x>
+     <y>167</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>inSlider3</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ch3Cur</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>283</x>
+     <y>211</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>159</x>
+     <y>210</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>inSlider4</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ch4Cur</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>287</x>
+     <y>239</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>156</x>
+     <y>242</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>inSlider5</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ch5Cur</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>309</x>
+     <y>272</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>164</x>
+     <y>276</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>inSlider6</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ch6Cur</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>282</x>
+     <y>300</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>144</x>
+     <y>311</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>inSlider7</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ch7Cur</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>278</x>
+     <y>339</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>168</x>
+     <y>340</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

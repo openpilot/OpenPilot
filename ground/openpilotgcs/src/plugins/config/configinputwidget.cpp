@@ -70,15 +70,6 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 			<< m_config->ch6Min
 			<< m_config->ch7Min;
 
-	inNeuLabels << m_config->ch0Cur
-			<< m_config->ch1Cur
-			<< m_config->ch2Cur
-			<< m_config->ch3Cur
-			<< m_config->ch4Cur
-			<< m_config->ch5Cur
-			<< m_config->ch6Cur
-			<< m_config->ch7Cur;
-
 	inSliders << m_config->inSlider0
 			  << m_config->inSlider1
 			  << m_config->inSlider2
@@ -97,6 +88,14 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
                         << m_config->ch6Rev
                         << m_config->ch7Rev;
 
+        inChannelAssign << m_config->ch0Assign
+                        << m_config->ch1Assign
+                        << m_config->ch2Assign
+                        << m_config->ch3Assign
+                        << m_config->ch4Assign
+                        << m_config->ch5Assign
+                        << m_config->ch6Assign
+                        << m_config->ch7Assign;
 
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlCommand")));
@@ -166,15 +165,6 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
     connect(parent, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
 
-    connect(m_config->inSlider0, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged0(int)));
-    connect(m_config->inSlider1, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged1(int)));
-    connect(m_config->inSlider2, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged2(int)));
-    connect(m_config->inSlider3, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged3(int)));
-    connect(m_config->inSlider4, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged4(int)));
-    connect(m_config->inSlider5, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged5(int)));
-    connect(m_config->inSlider6, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged6(int)));
-    connect(m_config->inSlider7, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged7(int)));
-
     connect(m_config->ch0Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
     connect(m_config->ch1Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
     connect(m_config->ch2Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
@@ -213,49 +203,6 @@ void ConfigInputWidget::reverseCheckboxClicked(bool state)
     }
 }
 
-// ************************************
-// slider value changed signals
-
-void ConfigInputWidget::onInSliderValueChanged0(int value)
-{
-	inNeuLabels[0]->setText(QString::number(value));
-}
-
-void ConfigInputWidget::onInSliderValueChanged1(int value)
-{
-	inNeuLabels[1]->setText(QString::number(value));
-}
-
-void ConfigInputWidget::onInSliderValueChanged2(int value)
-{
-	inNeuLabels[2]->setText(QString::number(value));
-}
-
-void ConfigInputWidget::onInSliderValueChanged3(int value)
-{
-	inNeuLabels[3]->setText(QString::number(value));
-}
-
-void ConfigInputWidget::onInSliderValueChanged4(int value)
-{
-	inNeuLabels[4]->setText(QString::number(value));
-}
-
-void ConfigInputWidget::onInSliderValueChanged5(int value)
-{
-	inNeuLabels[5]->setText(QString::number(value));
-}
-
-void ConfigInputWidget::onInSliderValueChanged6(int value)
-{
-	inNeuLabels[6]->setText(QString::number(value));
-}
-
-void ConfigInputWidget::onInSliderValueChanged7(int value)
-{
-	inNeuLabels[7]->setText(QString::number(value));
-}
-
 
 // ************************************
 
@@ -269,8 +216,6 @@ void ConfigInputWidget::enableControls(bool enable)
         //m_config->saveRCInputToRAM->setEnabled(enable);
 	m_config->saveRCInputToSD->setEnabled(enable);
 	m_config->doRCInputCalibration->setEnabled(enable);
-
-        m_config->doRCInputCalibration->setChecked(false);
 }
 
 
@@ -319,14 +264,9 @@ void ConfigInputWidget::refreshValues()
     m_config->receiverType->setCurrentIndex(m_config->receiverType->findText(field->getValue().toString()));
 
     // Reset all channel assignement dropdowns:
-    m_config->ch0Assign->setCurrentIndex(0);
-    m_config->ch1Assign->setCurrentIndex(0);
-    m_config->ch2Assign->setCurrentIndex(0);
-    m_config->ch3Assign->setCurrentIndex(0);
-    m_config->ch4Assign->setCurrentIndex(0);
-    m_config->ch5Assign->setCurrentIndex(0);
-    m_config->ch6Assign->setCurrentIndex(0);
-    m_config->ch7Assign->setCurrentIndex(0);
+    foreach (QComboBox *combo, inChannelAssign) {
+        combo->setCurrentIndex(0);
+    }
 
     // Update all channels assignements
     QList<UAVObjectField *> fieldList = obj->getFields();
@@ -553,6 +493,10 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
                 field->setValue(0,i);
             }
             obj->updated();
+
+            // Last, make sure the user won't apply/save during calibration
+            m_config->saveRCInputToRAM->setEnabled(false);
+            m_config->saveRCInputToSD->setEnabled(false);
         }
 
         field = controlCommand->getField(QString("Channel"));
@@ -574,20 +518,42 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
             obj->setMetadata(mdata);
 
             // Set some slider values to better defaults
-            ManualControlSettings * manualSettings = ManualControlSettings::GetInstance(getObjectManager());
-            ManualControlSettings::DataFields manualSettingsData = manualSettings->getData();
-            uint throttleIndex = manualSettingsData.Throttle;
-            uint flightModeIndex = manualSettingsData.FlightMode;
-            if(throttleIndex < manualSettings->THROTTLE_NONE) {
-                // Throttle neutral defaults to 5% of range
-                manualSettingsData.ChannelNeutral[throttleIndex] = 0.05 * (manualSettingsData.ChannelMax[throttleIndex] - manualSettingsData.ChannelMin[throttleIndex]) + manualSettingsData.ChannelMin[throttleIndex];
-                qDebug() << manualSettingsData.ChannelNeutral[throttleIndex];
+            // Find what channel we used for throttle, set it 5% about min:
+            int throttleChannel = -1;
+            int fmChannel = -1;
+            for (int i=0; i < inChannelAssign.length(); i++) {
+                if (inChannelAssign.at(i)->currentText() == "Throttle") {
+                    // TODO: this is very ugly, because this relies on the name of the
+                    // channel input, everywhere else in the gadget we don't rely on the
+                    // naming...
+                    throttleChannel = i;
+                }
+                if (inChannelAssign.at(i)->currentText() == "FlightMode") {
+                    // TODO: this is very ugly, because this relies on the name of the
+                    // channel input, everywhere else in the gadget we don't rely on the
+                    // naming...
+                    fmChannel = i;
+                }
             }
-            if(flightModeIndex < manualSettings->FLIGHTMODE_NONE) {
-                // Flight mode neutral defaults to 50% of range
-                manualSettingsData.ChannelNeutral[flightModeIndex] = 0.5 * (manualSettingsData.ChannelMax[flightModeIndex] - manualSettingsData.ChannelMin[flightModeIndex]) + manualSettingsData.ChannelMin[flightModeIndex];
+
+            // Throttle neutral defaults to 2% of range
+            if (throttleChannel > -1) {
+                inSliders.at(throttleChannel)->setValue(
+                            inSliders.at(throttleChannel)->minimum() +
+                            (inSliders.at(throttleChannel)->maximum()-
+                             inSliders.at(throttleChannel)->minimum())*0.02);
             }
-            manualSettings->setData(manualSettingsData);
+
+            // Flight mode at 50% of range:
+            if (fmChannel > -1) {
+                inSliders.at(fmChannel)->setValue(
+                            inSliders.at(fmChannel)->minimum()+
+                            (inSliders.at(fmChannel)->maximum()-
+                             inSliders.at(fmChannel)->minimum())*0.5);
+            }
+
+            m_config->saveRCInputToRAM->setEnabled(true);
+            m_config->saveRCInputToSD->setEnabled(true);
         }
         firstUpdate = true;
     }

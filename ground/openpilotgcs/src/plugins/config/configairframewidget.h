@@ -59,7 +59,7 @@ private:
     void setupMotors(QList<QString> motorList);
 
     void resetField(UAVObjectField * field);
-    void resetMixer (MixerCurveWidget *mixer, int numElements);
+    void resetMixer (MixerCurveWidget *mixer, int numElements, double maxvalue);
     void resetActuators();
     //void setMixerChannel(int channelNumber, bool channelIsMotor, QList<double> vector);
     void setupQuadMotor(int channel, double roll, double pitch, double yaw);

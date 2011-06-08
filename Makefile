@@ -92,19 +92,19 @@ help:
 	@echo "     <board>              - Build firmware for <board>"
 	@echo "                            supported boards are ($(ALL_BOARDS))"
 	@echo "     fw_<board>           - Build firmware for <board>"
-	@echo "                            supported boards are ($(FW_TARGETS))"
+	@echo "                            supported boards are ($(FW_BOARDS))"
 	@echo "     fw_<board>_clean     - Remove firmware for <board>"
 	@echo "     fw_<board>_program   - Use OpenOCD + JTAG to write firmware to <board>"
 	@echo
 	@echo "   [Bootloader]"
 	@echo "     bl_<board>           - Build bootloader for <board>"
-	@echo "                            supported boards are ($(BL_TARGETS))"
+	@echo "                            supported boards are ($(BL_BOARDS))"
 	@echo "     bl_<board>_clean     - Remove bootloader for <board>"
 	@echo "     bl_<board>_program   - Use OpenOCD + JTAG to write bootloader to <board>"
 	@echo
 	@echo "   [Bootloader Updater]"
 	@echo "     bu_<board>           - Build bootloader updater for <board>"
-	@echo "                            supported boards are ($(BU_TARGETS))"
+	@echo "                            supported boards are ($(BU_BOARDS))"
 	@echo "     bu_<board>_clean     - Remove bootloader updater for <board>"
 	@echo
 	@echo "   [Simulation]"
@@ -403,14 +403,20 @@ pipxtreme_friendly     := PipXtreme
 ins_friendly           := INS
 ahrs_friendly          := AHRS
 
-FW_TARGETS := $(addprefix fw_, $(ALL_BOARDS))
-BL_TARGETS := $(addprefix bl_, $(ALL_BOARDS))
-BU_TARGETS := $(addprefix bu_, $(ALL_BOARDS))
+# Start out assuming that we'll build fw, bl and bu for all boards
+FW_BOARDS  := $(ALL_BOARDS)
+BL_BOARDS  := $(ALL_BOARDS)
+BU_BOARDS  := $(ALL_BOARDS)
 
 # FIXME: The INS build doesn't have a bootloader or bootloader
 #        updater yet so we need to filter them out to prevent errors.
-BL_TARGETS := $(filter-out bl_ins, $(BL_TARGETS))
-BU_TARGETS := $(filter-out bu_ins, $(BU_TARGETS))
+BL_BOARDS  := $(filter-out ins, $(ALL_BOARDS))
+BU_BOARDS  := $(filter-out ins, $(ALL_BOARDS))
+
+# Generate the targets for whatever boards are left in each list
+FW_TARGETS := $(addprefix fw_, $(FW_BOARDS))
+BL_TARGETS := $(addprefix bl_, $(BL_BOARDS))
+BU_TARGETS := $(addprefix bu_, $(BU_BOARDS))
 
 .PHONY: all_fw all_fw_clean
 all_fw:        $(addsuffix _opfw,  $(FW_TARGETS))
@@ -428,6 +434,7 @@ all_bu_clean:  $(addsuffix _clean, $(BU_TARGETS))
 all_flight:       all_fw all_bl all_bu
 all_flight_clean: all_fw_clean all_bl_clean all_bu_clean
 
+# Expand the groups of targets for each board
 $(foreach board, $(ALL_BOARDS), $(eval $(call BOARD_PHONY_TEMPLATE,$(board))))
 
 # Expand the bootloader updater rules

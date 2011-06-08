@@ -277,7 +277,7 @@ openpilotgcs:  uavobjects_gcs
 
 .PHONY: openpilotgcs_clean
 openpilotgcs_clean:
-	$(V0) @echo " CLEAN     $@"
+	$(V0) @echo " CLEAN      $@"
 	$(V1) [ ! -d "$(BUILD_DIR)/ground/openpilotgcs" ] || $(RM) -r "$(BUILD_DIR)/ground/openpilotgcs"
 
 .PHONY: uavobjgenerator
@@ -307,7 +307,7 @@ uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
 	$(V1) $(UAVOBJGENERATOR) -v -none $(UAVOBJ_XML_DIR) $(ROOT_DIR)
 
 uavobjects_clean:
-	$(V0) @echo " CLEAN     $@"
+	$(V0) @echo " CLEAN      $@"
 	$(V1) [ ! -d "$(UAVOBJ_OUT_DIR)" ] || $(RM) -r "$(UAVOBJ_OUT_DIR)"
 
 ##############################
@@ -335,7 +335,7 @@ fw_$(1)_%: uavobjects_flight
 .PHONY: $(1)_clean
 $(1)_clean: fw_$(1)_clean
 fw_$(1)_clean:
-	$(V0) @echo " CLEAN     $$@"
+	$(V0) @echo " CLEAN      $$@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/fw_$(1)
 endef
 
@@ -357,7 +357,7 @@ bl_$(1)_%:
 
 .PHONY: bl_$(1)_clean
 bl_$(1)_clean:
-	$(V0) @echo " CLEAN     $$@"
+	$(V0) @echo " CLEAN      $$@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bl_$(1)
 endef
 
@@ -377,7 +377,7 @@ bu_$(1)_%: bl_$(1)_bino
 
 .PHONY: bu_$(1)_clean
 bu_$(1)_clean:
-	$(V0) @echo " CLEAN     $$@"
+	$(V0) @echo " CLEAN      $$@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bu_$(1)
 endef
 

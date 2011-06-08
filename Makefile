@@ -71,6 +71,7 @@ help:
 	@echo "     qt_sdk_install       - Install the QT v4.6.2 tools"
 	@echo "     arm_sdk_install      - Install the Code Sourcery ARM gcc toolchain"
 	@echo "     openocd_install      - Install the OpenOCD JTAG daemon"
+	@echo "     stm32flash_install   - Install the stm32flash tool for unbricking boards"
 	@echo
 	@echo "   [Big Hammer]"
 	@echo "     all                  - Generate UAVObjects, build openpilot firmware and gcs"
@@ -225,6 +226,25 @@ openocd_install: openocd_clean
 .PHONY: openocd_clean
 openocd_clean:
 	$(V1) [ ! -d "$(OPENOCD_DIR)" ] || $(RM) -r "$(OPENOCD_DIR)"
+
+STM32FLASH_DIR := $(TOOLS_DIR)/stm32flash
+
+.PHONY: stm32flash_install
+stm32flash_install: STM32FLASH_URL := http://stm32flash.googlecode.com/svn/trunk
+stm32flash_install: STM32FLASH_REV := 52
+stm32flash_install: stm32flash_clean
+        # download the source
+	$(V0) @echo " DOWNLOAD     $(STM32FLASH_URL) @ r$(STM32FLASH_REV)"
+	$(V1) svn export -q -r "$(STM32FLASH_REV)" "$(STM32FLASH_URL)" "$(STM32FLASH_DIR)"
+
+        # build
+	$(V0) @echo " BUILD        $(STM32FLASH_DIR)"
+	$(V1) $(MAKE) --silent -C $(STM32FLASH_DIR) all
+
+.PHONY: stm32flash_clean
+stm32flash_clean:
+	$(V0) @echo " CLEAN        $(STM32FLASH_DIR)"
+	$(V1) [ ! -d "$(STM32FLASH_DIR)" ] || $(RM) -r "$(STM32FLASH_DIR)"
 
 ##############################
 #

@@ -108,6 +108,10 @@ help:
 	@echo "                            supported boards are ($(BU_BOARDS))"
 	@echo "     bu_<board>_clean     - Remove bootloader updater for <board>"
 	@echo
+	@echo "   [Unbrick a board]"
+	@echo "     unbrick_<board>      - Use the STM32's built in boot ROM to write a bootloader to <board>"
+	@echo "                            supported boards are ($(BL_BOARDS))"
+	@echo
 	@echo "   [Simulation]"
 	@echo "     sim_posix            - Build OpenPilot simulation firmware for"
 	@echo "                            a POSIX compatible system (Linux, Mac OS X, ...)"
@@ -374,6 +378,20 @@ bl_$(1)_%:
 		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
 		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
 		$$*
+
+.PHONY: unbrick_$(1)
+unbrick_$(1): bl_$(1)_hex
+$(if $(filter-out undefined,$(origin UNBRICK_TTY)),
+	$(V0) @echo " UNBRICK    $(1) via $$(UNBRICK_TTY)"
+	$(V1) $(STM32FLASH_DIR)/stm32flash \
+		-w $(BUILD_DIR)/bl_$(1)/bl_$(1).hex \
+		-g 0x0 \
+		$$(UNBRICK_TTY)
+,
+	$(V0) @echo
+	$(V0) @echo "ERROR: You must specify UNBRICK_TTY=<serial-device> to use for unbricking."
+	$(V0) @echo "       eg. $$(MAKE) $$@ UNBRICK_TTY=/dev/ttyUSB0"
+)
 
 .PHONY: bl_$(1)_clean
 bl_$(1)_clean:

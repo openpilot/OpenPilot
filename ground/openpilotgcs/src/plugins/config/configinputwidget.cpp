@@ -581,7 +581,7 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
     ManualControlSettings * manualSettings = ManualControlSettings::GetInstance(getObjectManager());
     ManualControlSettings::DataFields manualSettingsData = manualSettings->getData();
     uint chIndex = manualSettingsData.FlightMode;
-    if (chIndex < manualSettings->FLIGHTMODEPOSITION_NUMELEM - 1) {
+    if (chIndex < manualSettings->FLIGHTMODE_NONE) {
         float valueScaled;
 
         int chMin = manualSettingsData.ChannelMin[chIndex];

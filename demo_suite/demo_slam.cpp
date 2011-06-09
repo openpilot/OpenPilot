@@ -600,6 +600,14 @@ void demo_slam01_main(world_ptr_t *world)
 				memcpy(points, tmp, npoints*3*sizeof(double));
 				break;
 			}
+		case 4: {
+			// far 3D regular grid
+			const int npoints_ = 3*11*13; npoints = npoints_;
+			for(int i = 0, z = -1; z <= 1; ++z) for(int y = -3; y <= 7; ++y) for(int x = -6; x <= 6; ++x, ++i)
+				{ points[i][0] = x*1.0+100; points[i][1] = y*10.0; points[i][2] = z*10.0; }
+			break;
+		}
+		
 			default: npoints = 0;
 		#endif
 		}
@@ -722,7 +730,6 @@ void demo_slam01_main(world_ptr_t *world)
 				rob->addWaypoint(0,0,0, 0,0,0, 0,0,0, 0,0,0);
 				break;
 			}
-		
 			// two coplanar circles
 			case 2: {
 				double VEL = 0.5;
@@ -775,6 +782,29 @@ void demo_slam01_main(world_ptr_t *world)
 				rob->addWaypoint(0 ,+1,-0.5 , 0,0,0, 0,0   ,+VEL/2, 0,0,0);
 				rob->addWaypoint(0 ,+1,-0.1 , 0,0,0, 0,0   ,+VEL/2, 0,0,0);
 				rob->addWaypoint(0 ,+1,0 , 0,0,0, 0,0   ,0, 0,0,0);
+				break;
+			}
+		
+			// horiz loop with rotation (always goes forward)
+			case 5: {
+				double VEL = 0.5;
+				rob->addWaypoint(0,0,0, 0,0,0, VEL/5,0,0, 0,0,0);
+				rob->addWaypoint(1,0,0, 0,0,0, VEL,0,0, 0,0,0);
+				rob->addWaypoint(3,2,0, 1*M_PI/2,0,0, 0,VEL,0, 100,0,0);
+				rob->addWaypoint(1,4,0, 2*M_PI/2,0,0, -VEL,0,0, 0,0,0);
+				rob->addWaypoint(-1,4,0, 2*M_PI/2,0,0, -VEL,0,0, 0,0,0);
+				rob->addWaypoint(-3,2,0, 3*M_PI/2,0,0, 0,-VEL,0, 100,0,0);
+				rob->addWaypoint(-1,0,0, 4*M_PI/2,0,0, VEL,0,0, 0,0,0);
+				rob->addWaypoint(0,0,0, 4*M_PI/2,0,0, 0,0,0, 0,0,0);
+				break;
+			}
+		
+			// straight line
+			case 6: {
+				double VEL = 0.5;
+				rob->addWaypoint(0,0,0, 0,0,0, 0,0,0, 0,0,0);
+				rob->addWaypoint(1,0,0, 0,0,0, VEL,0,0, 0,0,0);
+				rob->addWaypoint(20,0,0, 0,0,0, VEL,0,0, 0,0,0);
 				break;
 			}
 		}

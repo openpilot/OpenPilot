@@ -89,23 +89,30 @@ namespace simu {
 
 			bool addWaypoint(jblas::vec pose)
 			{
-				JFR_ASSERT(pose.size() == 12, "pose must be size 12");
+				JFR_ASSERT(pose.size() == 12, "pose must be size 12 (pos,ori,vpos,vori)");
 				Waypoint p; p.pose.clear();
 				p.pose = pose;
 				if (traj.size() == 0)
 				{
-					p.t = 0;
+					p.t = 0.;
 				} else
 				{
 					Waypoint &lastp = traj.back();
-					bool initt = false;
+					p.t = 0.;
+					// find max time
 					for(int i = 0; i < 6; ++i)
 					{
 						double avg_vel = (p.pose(i+6) + lastp.pose(i+6)) / 2;
 						double t = (p.pose(i) - lastp.pose(i)) / avg_vel;
-						if (!initt && t > 1e-6) p.t = t; else
-						if (std::abs(t-p.t) > 1e-6) return false;
+						if (t > p.t) p.t = t;
 					}
+					// correct all speeds wrt max time
+					for(int i = 0; i < 6; ++i)
+					{
+						double avg_vel = (p.pose(i) - lastp.pose(i)) / p.t;
+						p.pose(i+6) = 2*avg_vel - lastp.pose(i+6);
+					}
+					
 					p.t += lastp.t;
 				}
 				traj.push_back(p);

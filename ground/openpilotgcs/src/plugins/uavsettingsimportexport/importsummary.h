@@ -1,12 +1,13 @@
 /**
  ******************************************************************************
- * @file
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @see        The GNU Public License (GPL) Version 3
+ *
+ * @file       importsummary.h
+ * @author     (C) 2011 The OpenPilot Team, http://www.openpilot.org
  * @addtogroup GCSPlugins GCS Plugins
  * @{
- * @addtogroup importexportplugin
+ * @addtogroup UAVSettingsImportExport UAVSettings Import/Export Plugin
  * @{
+ * @brief UAVSettings Import/Export Plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -23,33 +24,48 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef IMPORTEXPORTDIALOG_H
-#define IMPORTEXPORTDIALOG_H
+#ifndef IMPORTSUMMARY_H
+#define IMPORTSUMMARY_H
 
 #include <QDialog>
+#include <QCheckBox>
+#include <QDesktopServices>
+#include <QUrl>
+#include "ui_importsummarydialog.h"
+#include "uavdataobject.h"
+#include "uavobjectmanager.h"
+#include "extensionsystem/pluginmanager.h"
+#include "uavobjectutil/uavobjectutilmanager.h"
+
+
 
 namespace Ui {
-    class ImportExportDialog;
+    class ImportSummaryDialog;
 }
 
-class ImportExportDialog : public QDialog
+class ImportSummaryDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit ImportExportDialog(QWidget *parent = 0);
-    ~ImportExportDialog();
+    ImportSummaryDialog(QWidget *parent=0);
+    ~ImportSummaryDialog();
+    void addLine(QString objectName, QString text, bool status);
 
 protected:
+    void showEvent(QShowEvent *event);
     void changeEvent(QEvent *e);
 
 private:
-    Ui::ImportExportDialog *ui;
+    Ui::ImportSummaryDialog *ui;
+
+public slots:
+    void updateSaveCompletion();
+
+private slots:
+    void doTheSaving();
+    void openHelp();
+
 };
 
-#endif // IMPORTEXPORTDIALOG_H
-
-/**
- * @}
- * @}
- */
+#endif // IMPORTSUMMARY_H

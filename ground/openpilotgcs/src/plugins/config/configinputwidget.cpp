@@ -38,13 +38,15 @@
 #include <QDesktopServices>
 #include <QUrl>
 
+#include "manualcontrolsettings.h"
+
 ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     m_config = new Ui_InputWidget();
     m_config->setupUi(this);
 
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-	UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
 	// First of all, put all the channel widgets into lists, so that we can
     // manipulate those:
@@ -68,15 +70,6 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 			<< m_config->ch6Min
 			<< m_config->ch7Min;
 
-	inNeuLabels << m_config->ch0Cur
-			<< m_config->ch1Cur
-			<< m_config->ch2Cur
-			<< m_config->ch3Cur
-			<< m_config->ch4Cur
-			<< m_config->ch5Cur
-			<< m_config->ch6Cur
-			<< m_config->ch7Cur;
-
 	inSliders << m_config->inSlider0
 			  << m_config->inSlider1
 			  << m_config->inSlider2
@@ -95,11 +88,23 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
                         << m_config->ch6Rev
                         << m_config->ch7Rev;
 
+        inChannelAssign << m_config->ch0Assign
+                        << m_config->ch1Assign
+                        << m_config->ch2Assign
+                        << m_config->ch3Assign
+                        << m_config->ch4Assign
+                        << m_config->ch5Assign
+                        << m_config->ch6Assign
+                        << m_config->ch7Assign;
 
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
-
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlCommand")));
     connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateChannels(UAVObject*)));
+
+    // Register for ManualControlSettings changes:
+    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
+    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
+
 
     // Get the receiver types supported by OpenPilot and fill the corresponding
     // dropdown menu:
@@ -151,22 +156,14 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_config->armControl->clear();
     m_config->armControl->addItems(field->getOptions());
 
-    requestRCInputUpdate();
 
     connect(m_config->saveRCInputToSD, SIGNAL(clicked()), this, SLOT(saveRCInputObject()));
     connect(m_config->saveRCInputToRAM, SIGNAL(clicked()), this, SLOT(sendRCInputUpdate()));
-    connect(m_config->getRCInputCurrent, SIGNAL(clicked()), this, SLOT(requestRCInputUpdate()));
 
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestRCInputUpdate()));
-
-    connect(m_config->inSlider0, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged0(int)));
-    connect(m_config->inSlider1, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged1(int)));
-    connect(m_config->inSlider2, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged2(int)));
-    connect(m_config->inSlider3, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged3(int)));
-    connect(m_config->inSlider4, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged4(int)));
-    connect(m_config->inSlider5, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged5(int)));
-    connect(m_config->inSlider6, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged6(int)));
-    connect(m_config->inSlider7, SIGNAL(valueChanged(int)),this, SLOT(onInSliderValueChanged7(int)));
+    enableControls(false);
+    refreshValues();
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
+    connect(parent, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
 
     connect(m_config->ch0Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
     connect(m_config->ch1Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
@@ -178,19 +175,6 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_config->ch7Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
 
     firstUpdate = true;
-
-    enableControls(false);
-
-    // Listen to telemetry connection events
-    if (pm) {
-        TelemetryManager *tm = pm->getObject<TelemetryManager>();
-        if (tm) {
-            connect(tm, SIGNAL(myStart()), this, SLOT(onTelemetryStart()));
-            connect(tm, SIGNAL(myStop()), this, SLOT(onTelemetryStop()));
-            connect(tm, SIGNAL(connected()), this, SLOT(onTelemetryConnect()));
-            connect(tm, SIGNAL(disconnected()), this, SLOT(onTelemetryDisconnect()));
-        }
-    }
 
     // Connect the help button
     connect(m_config->inputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
@@ -219,89 +203,19 @@ void ConfigInputWidget::reverseCheckboxClicked(bool state)
     }
 }
 
-// ************************************
-// slider value changed signals
-
-void ConfigInputWidget::onInSliderValueChanged0(int value)
-{
-	inNeuLabels[0]->setText(QString::number(value));
-}
-
-void ConfigInputWidget::onInSliderValueChanged1(int value)
-{
-	inNeuLabels[1]->setText(QString::number(value));
-}
-
-void ConfigInputWidget::onInSliderValueChanged2(int value)
-{
-	inNeuLabels[2]->setText(QString::number(value));
-}
-
-void ConfigInputWidget::onInSliderValueChanged3(int value)
-{
-	inNeuLabels[3]->setText(QString::number(value));
-}
-
-void ConfigInputWidget::onInSliderValueChanged4(int value)
-{
-	inNeuLabels[4]->setText(QString::number(value));
-}
-
-void ConfigInputWidget::onInSliderValueChanged5(int value)
-{
-	inNeuLabels[5]->setText(QString::number(value));
-}
-
-void ConfigInputWidget::onInSliderValueChanged6(int value)
-{
-	inNeuLabels[6]->setText(QString::number(value));
-}
-
-void ConfigInputWidget::onInSliderValueChanged7(int value)
-{
-	inNeuLabels[7]->setText(QString::number(value));
-}
-
-// ************************************
-// telemetry start/stop connect/disconnect signals
-
-void ConfigInputWidget::onTelemetryStart()
-{
-}
-
-void ConfigInputWidget::onTelemetryStop()
-{
-}
-
-void ConfigInputWidget::onTelemetryConnect()
-{
-	enableControls(true);
-}
-
-void ConfigInputWidget::onTelemetryDisconnect()
-{
-	enableControls(false);
-	m_config->doRCInputCalibration->setChecked(false);
-}
 
 // ************************************
 
+/*
+  Enable or disable some controls depending on whether we are connected
+  or not to the board. Actually, this i mostly useless IMHO, I don't
+  know who added this into the code (Ed's note)
+  */
 void ConfigInputWidget::enableControls(bool enable)
 {
-	m_config->getRCInputCurrent->setEnabled(enable);
-	m_config->saveRCInputToRAM->setEnabled(enable);
+        //m_config->saveRCInputToRAM->setEnabled(enable);
 	m_config->saveRCInputToSD->setEnabled(enable);
-
 	m_config->doRCInputCalibration->setEnabled(enable);
-
-	m_config->ch0Assign->setEnabled(enable);
-	m_config->ch1Assign->setEnabled(enable);
-	m_config->ch2Assign->setEnabled(enable);
-	m_config->ch3Assign->setEnabled(enable);
-	m_config->ch4Assign->setEnabled(enable);
-	m_config->ch5Assign->setEnabled(enable);
-	m_config->ch6Assign->setEnabled(enable);
-	m_config->ch7Assign->setEnabled(enable);
 }
 
 
@@ -312,11 +226,11 @@ void ConfigInputWidget::enableControls(bool enable)
 /**
   Request the current config from the board
   */
-void ConfigInputWidget::requestRCInputUpdate()
+void ConfigInputWidget::refreshValues()
 {
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ManualControlSettings")));
     Q_ASSERT(obj);
-    obj->requestUpdate();
+    //obj->requestUpdate();
     UAVObjectField *field;
 
     // Now update all the slider values:
@@ -350,14 +264,9 @@ void ConfigInputWidget::requestRCInputUpdate()
     m_config->receiverType->setCurrentIndex(m_config->receiverType->findText(field->getValue().toString()));
 
     // Reset all channel assignement dropdowns:
-    m_config->ch0Assign->setCurrentIndex(0);
-    m_config->ch1Assign->setCurrentIndex(0);
-    m_config->ch2Assign->setCurrentIndex(0);
-    m_config->ch3Assign->setCurrentIndex(0);
-    m_config->ch4Assign->setCurrentIndex(0);
-    m_config->ch5Assign->setCurrentIndex(0);
-    m_config->ch6Assign->setCurrentIndex(0);
-    m_config->ch7Assign->setCurrentIndex(0);
+    foreach (QComboBox *combo, inChannelAssign) {
+        combo->setCurrentIndex(0);
+    }
 
     // Update all channels assignements
     QList<UAVObjectField *> fieldList = obj->getFields();
@@ -508,11 +417,9 @@ void ConfigInputWidget::saveRCInputObject()
 {
     // Send update so that the latest value is saved
     sendRCInputUpdate();
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ManualControlSettings")));
     Q_ASSERT(obj);
-    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+    saveObjectToSD(obj);
 }
 
 
@@ -567,35 +474,38 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
 
     if (m_config->doRCInputCalibration->isChecked()) {
         if (firstUpdate) {
-                // Increase the data rate from the board so that the sliders
-                // move faster
-                UAVObject::Metadata mdata = controlCommand->getMetadata();
-                mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-                mccDataRate = mdata.flightTelemetryUpdatePeriod;
-                mdata.flightTelemetryUpdatePeriod = 150;
-                controlCommand->setMetadata(mdata);
+            // Increase the data rate from the board so that the sliders
+            // move faster
+            UAVObject::Metadata mdata = controlCommand->getMetadata();
+            mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+            mccDataRate = mdata.flightTelemetryUpdatePeriod;
+            mdata.flightTelemetryUpdatePeriod = 150;
+            controlCommand->setMetadata(mdata);
 
-                // Also protect the user by setting all values to zero
-                // and making the ActuatorCommand object readonly
-                UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
-                mdata = obj->getMetadata();
-                mdata.flightAccess = UAVObject::ACCESS_READONLY;
-                obj->setMetadata(mdata);
-                UAVObjectField *field = obj->getField("Channel");
-                for (int i=0; i< field->getNumElements(); i++) {
-                    field->setValue(0,i);
-                }
-                obj->updated();
-
+            // Also protect the user by setting all values to zero
+            // and making the ActuatorCommand object readonly
+            UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
+            mdata = obj->getMetadata();
+            mdata.flightAccess = UAVObject::ACCESS_READONLY;
+            obj->setMetadata(mdata);
+            UAVObjectField *field = obj->getField("Channel");
+            for (uint i=0; i< field->getNumElements(); i++) {
+                field->setValue(0,i);
             }
+            obj->updated();
+
+            // Last, make sure the user won't apply/save during calibration
+            m_config->saveRCInputToRAM->setEnabled(false);
+            m_config->saveRCInputToSD->setEnabled(false);
+        }
 
         field = controlCommand->getField(QString("Channel"));
         for (int i = 0; i < 8; i++)
             updateChannelInSlider(inSliders[i], inMinLabels[i], inMaxLabels[i], field->getValue(i).toInt(),inRevCheckboxes[i]->isChecked());
         firstUpdate = false;
-        }
-        else {
-        if (!firstUpdate) {
+    }
+    else {
+        if (!firstUpdate) {           
             // Restore original data rate from the board:
             UAVObject::Metadata mdata = controlCommand->getMetadata();
             mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
@@ -606,44 +516,83 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
             mdata = obj->getMetadata();
             mdata.flightAccess = UAVObject::ACCESS_READWRITE;
             obj->setMetadata(mdata);
+
+            // Set some slider values to better defaults
+            // Find what channel we used for throttle, set it 5% about min:
+            int throttleChannel = -1;
+            int fmChannel = -1;
+            for (int i=0; i < inChannelAssign.length(); i++) {
+                if (inChannelAssign.at(i)->currentText() == "Throttle") {
+                    // TODO: this is very ugly, because this relies on the name of the
+                    // channel input, everywhere else in the gadget we don't rely on the
+                    // naming...
+                    throttleChannel = i;
+                }
+                if (inChannelAssign.at(i)->currentText() == "FlightMode") {
+                    // TODO: this is very ugly, because this relies on the name of the
+                    // channel input, everywhere else in the gadget we don't rely on the
+                    // naming...
+                    fmChannel = i;
+                }
+            }
+
+            // Throttle neutral defaults to 2% of range
+            if (throttleChannel > -1) {
+                inSliders.at(throttleChannel)->setValue(
+                            inSliders.at(throttleChannel)->minimum() +
+                            (inSliders.at(throttleChannel)->maximum()-
+                             inSliders.at(throttleChannel)->minimum())*0.02);
+            }
+
+            // Flight mode at 50% of range:
+            if (fmChannel > -1) {
+                inSliders.at(fmChannel)->setValue(
+                            inSliders.at(fmChannel)->minimum()+
+                            (inSliders.at(fmChannel)->maximum()-
+                             inSliders.at(fmChannel)->minimum())*0.5);
+            }
+
+            m_config->saveRCInputToRAM->setEnabled(true);
+            m_config->saveRCInputToSD->setEnabled(true);
         }
         firstUpdate = true;
     }
+
     //Update the Flight mode channel slider
-    UAVObject* obj = getObjectManager()->getObject("ManualControlSettings");
-    // Find the channel currently assigned to flightmode
-    field = obj->getField("FlightMode");
-    int chIndex = field->getOptions().indexOf(field->getValue().toString());
-    if (chIndex < field->getOptions().length() - 1) {
+    ManualControlSettings * manualSettings = ManualControlSettings::GetInstance(getObjectManager());
+    ManualControlSettings::DataFields manualSettingsData = manualSettings->getData();
+    uint chIndex = manualSettingsData.FlightMode;
+    if (chIndex < manualSettings->FLIGHTMODE_NONE) {
         float valueScaled;
 
-        int chMin = inSliders[chIndex]->minimum();
-        int chMax = inSliders[chIndex]->maximum();
-        int chNeutral = inSliders[chIndex]->value();
+        int chMin = manualSettingsData.ChannelMin[chIndex];
+        int chMax = manualSettingsData.ChannelMax[chIndex];
+        int chNeutral = manualSettingsData.ChannelNeutral[chIndex];
 
         int value = controlCommand->getField("Channel")->getValue(chIndex).toInt();
         if ((chMax > chMin && value >= chNeutral) || (chMin > chMax && value <= chNeutral))
         {
-                if (chMax != chNeutral)
-                        valueScaled = (float)(value - chNeutral) / (float)(chMax - chNeutral);
-                else
-                        valueScaled = 0;
+            if (chMax != chNeutral)
+                valueScaled = (float)(value - chNeutral) / (float)(chMax - chNeutral);
+            else
+                valueScaled = 0;
         }
         else
         {
-                if (chMin != chNeutral)
-                        valueScaled = (float)(value - chNeutral) / (float)(chNeutral - chMin);
-                else
-                        valueScaled = 0;
+            if (chMin != chNeutral)
+                valueScaled = (float)(value - chNeutral) / (float)(chNeutral - chMin);
+            else
+                valueScaled = 0;
         }
 
-        // Bound
-		if (valueScaled >  1.0) valueScaled =  1.0;
-		else
-		if (valueScaled < -1.0) valueScaled = -1.0;
+        if(valueScaled < -(1.0 / 3.0))
+            m_config->fmsSlider->setValue(-100);
+        else if (valueScaled > (1.0/3.0))
+            m_config->fmsSlider->setValue(100);
+        else
+            m_config->fmsSlider->setValue(0);
 
-		m_config->fmsSlider->setValue(valueScaled * 100);
-	}
+    }
 }
 
 void ConfigInputWidget::updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, int value, bool reversed)

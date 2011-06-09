@@ -30,8 +30,6 @@
 
 ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent)
 {
-    saveState = IDLE;
-    queue.clear();
 }
 
 ConfigTaskWidget::~ConfigTaskWidget()
@@ -41,100 +39,13 @@ ConfigTaskWidget::~ConfigTaskWidget()
 
 void ConfigTaskWidget::saveObjectToSD(UAVObject *obj)
 {
-    // Add to queue
-    queue.enqueue(obj);
-    // If queue length is one, then start sending (call sendNextObject)
-    // Otherwise, do nothing, it's sending anyway
-    if (queue.length()==1)
-        saveNextObject();
-
+    // saveObjectToSD is now handled by the UAVUtils plugin in one
+    // central place (and one central queue)
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
+    utilMngr->saveObjectToSD(obj);
 }
 
-void ConfigTaskWidget::saveNextObject()
-{
-    if ( queue.isEmpty() )
-    {
-        return;
-    }
-
-    Q_ASSERT(saveState == IDLE);
-
-    // Get next object from the queue
-    UAVObject* obj = queue.head();
-    ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( getObjectManager()->getObject(ObjectPersistence::NAME) );
-    connect(objper, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(objectPersistenceTransactionCompleted(UAVObject*,bool)));
-    connect(objper, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(objectPersistenceUpdated(UAVObject *)));
-    saveState = AWAITING_ACK;
-    if (obj != NULL)
-    {
-        ObjectPersistence::DataFields data;
-        data.Operation = ObjectPersistence::OPERATION_SAVE;
-        data.Selection = ObjectPersistence::SELECTION_SINGLEOBJECT;
-        data.ObjectID = obj->getObjID();
-        data.InstanceID = obj->getInstID();
-        objper->setData(data);
-        objper->updated();
-    }
-}
-
-/**
-  * @brief Process the transactionCompleted message from Telemetry indicating request sent successfully
-  * @param[in] The object just transsacted.  Must be ObjectPersistance
-  * @param[in] success Indicates that the transaction did not time out
-  *
-  * After a failed transaction (usually timeout) resends the save request.  After a succesful
-  * transaction will then wait for a save completed update from the autopilot.
-  */
-void ConfigTaskWidget::objectPersistenceTransactionCompleted(UAVObject* obj, bool success)
-{
-    if(success) {
-        Q_ASSERT(obj->getName().compare("ObjectPersistence") == 0);
-        Q_ASSERT(saveState == AWAITING_ACK);
-        saveState = AWAITING_COMPLETED;
-        disconnect(obj, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(objectPersistenceTransactionCompleted(UAVObject*,bool)));
-    } else if (!success) {
-        // Can be caused by timeout errors on sending.  Send again.
-        saveNextObject();
-    }
-}
-
-/**
-  * @brief Process the ObjectPersistence updated message to confirm the right object saved
-  * then requests next object be saved.
-  * @param[in] The object just received.  Must be ObjectPersistance
-  */
-void ConfigTaskWidget::objectPersistenceUpdated(UAVObject * obj)
-{
-    Q_ASSERT(obj->getName().compare("ObjectPersistence") == 0);
-    if(saveState == AWAITING_COMPLETED) {
-        // Check flight is saying it completed.  This is the only thing flight should do to trigger an update.
-        Q_ASSERT( obj->getField("Operation")->getValue().toString().compare(QString("Completed")) == 0 );
-
-        // Check right object saved
-        UAVObject* savingObj = queue.head();
-        Q_ASSERT( obj->getField("ObjectID")->getValue() == savingObj->getObjID() );
-
-        obj->disconnect(this);
-        queue.dequeue(); // We can now remove the object, it's done.
-        saveState = IDLE;
-        saveNextObject();
-    }
-}
-
-void ConfigTaskWidget::updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj)
-{
-    ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( getObjectManager()->getObject(ObjectPersistence::NAME) );
-    if (obj != NULL)
-    {
-        ObjectPersistence::DataFields data;
-        data.Operation = op;
-        data.Selection = ObjectPersistence::SELECTION_SINGLEOBJECT;
-        data.ObjectID = obj->getObjID();
-        data.InstanceID = obj->getInstID();
-        objper->setData(data);
-        objper->updated();
-    }
-}
 
 UAVObjectManager* ConfigTaskWidget::getObjectManager() {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -150,6 +61,21 @@ double ConfigTaskWidget::listMean(QList<double> list)
         accum += list[i];
     return accum / list.size();
 }
+
+// ************************************
+// telemetry start/stop connect/disconnect signals
+
+void ConfigTaskWidget::onAutopilotDisconnect()
+{
+        enableControls(false);
+}
+
+void ConfigTaskWidget::onAutopilotConnect()
+{
+        enableControls(true);
+        refreshValues();
+}
+
 
 
 /**

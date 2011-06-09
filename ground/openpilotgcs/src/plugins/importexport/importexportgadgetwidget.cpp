@@ -48,9 +48,8 @@ ImportExportGadgetWidget::ImportExportGadgetWidget(QWidget *parent) :
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     ui->setupUi(this);
     ui->configFile->setExpectedKind(Utils::PathChooser::File);
-    ui->configFile->setPromptDialogFilter(tr("INI file (*.ini);; XML file (*.xml)"));
+    ui->configFile->setPromptDialogFilter(tr("XML file (*.xml)"));
     ui->configFile->setPromptDialogTitle(tr("Choose configuration file"));
-
 
 }
 
@@ -70,17 +69,22 @@ void ImportExportGadgetWidget::changeEvent(QEvent *e)
         break;
     }
 }
-void ImportExportGadgetWidget::loadConfiguration(const ImportExportGadgetConfiguration* config)
-{
-    if ( !config )
-        return;
-
-    ui->configFile->setPath(config->getIniFile());
-}
 
 void ImportExportGadgetWidget::on_exportButton_clicked()
 {
     QString file = ui->configFile->path();
+    if (file.isEmpty()) {
+        QMessageBox msgBox;
+        msgBox.setText(tr("Empty File name."));
+        msgBox.setInformativeText(tr("Please choose an export file name."));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+        return;
+    }
+    // Add a "XML" extension to the file in case it does not exist:
+    if (!file.endsWith(".xml"))
+        file.append(".xml");
+
     qDebug() << "Export pressed! Write to file " << QFileInfo(file).absoluteFilePath();
 
     if ( QFileInfo(file).exists() ){
@@ -133,18 +137,7 @@ void ImportExportGadgetWidget::exportConfiguration(const QString& fileName)
     bool doAllGadgets = ui->checkBoxAllGadgets->isChecked();
     bool doPlugins = ui->checkBoxPlugins->isChecked();
 
-    QSettings::Format format;
-    if ( ui->radioButtonIniFormat->isChecked() ){
-        format = QSettings::IniFormat;
-    }
-    else if ( ui->radioButtonXmlFormat->isChecked() ){
-        format = XmlConfig::XmlSettingsFormat;
-    }
-    else {
-        qWarning() << "Program Error in ImportExportGadgetWidget::exportConfiguration: unknown format. Assume XML!";
-        format = XmlConfig::XmlSettingsFormat;
-    }
-
+    QSettings::Format format = XmlConfig::XmlSettingsFormat;
     QSettings qs(fileName, format);
 
     if (doGeneral) {
@@ -193,19 +186,7 @@ void ImportExportGadgetWidget::importConfiguration(const QString& fileName)
     bool doAllGadgets = ui->checkBoxAllGadgets->isChecked();
     bool doPlugins = ui->checkBoxPlugins->isChecked();
 
-    QSettings::Format format;
-    if ( ui->radioButtonIniFormat->isChecked() ){
-        format = QSettings::IniFormat;
-    }
-    else if ( ui->radioButtonXmlFormat->isChecked() ){
-        format = XmlConfig::XmlSettingsFormat;
-    }
-    else {
-        qWarning() << "Program Error in ImportExportGadgetWidget::exportConfiguration: unknown format. Assume XML!";
-        format = XmlConfig::XmlSettingsFormat;
-    }
-
-    QSettings qs(fileName, format);
+    QSettings qs(fileName, XmlConfig::XmlSettingsFormat);
 
     if ( doAllGadgets ) {
         Core::ICore::instance()->uavGadgetInstanceManager()->readSettings(&qs);

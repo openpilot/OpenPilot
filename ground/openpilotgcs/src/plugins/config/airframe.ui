@@ -1963,16 +1963,6 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="getAircraftCurrent">
-           <property name="toolTip">
-            <string>Retrieve settings from OpenPilot</string>
-           </property>
-           <property name="text">
-            <string>Get Current</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QPushButton" name="saveAircraftToRAM">
            <property name="toolTip">
             <string>Send to board, but don't save permanently (flash or SD).</string>
@@ -2315,16 +2305,6 @@ p, li { white-space: pre-wrap; }
               </size>
              </property>
             </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="ffGetCurrent">
-             <property name="toolTip">
-              <string>Request current settings from the board.</string>
-             </property>
-             <property name="text">
-              <string>Get Current</string>
-             </property>
-            </widget>
            </item>
            <item>
             <widget class="QPushButton" name="ffApply">

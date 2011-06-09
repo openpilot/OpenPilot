@@ -674,16 +674,6 @@ new home location unless it is in indoor mode.</string>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="ahrsSettingsRequest">
-       <property name="toolTip">
-        <string>Refresh this screen with current values from the board.</string>
-       </property>
-       <property name="text">
-        <string>Request</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="ahrsSettingsSaveRAM">
        <property name="toolTip">
         <string>Save settings to the board (RAM only).

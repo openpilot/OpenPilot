@@ -46,9 +46,10 @@ public:
 
 private:
     Ui_TelemetryWidget *m_telemetry;
+    void enableControls(bool enable);
 
 private slots:
-    void requestTelemetryUpdate();
+    virtual void refreshValues();
     void sendTelemetryUpdate();
     void saveTelemetryUpdate();
 

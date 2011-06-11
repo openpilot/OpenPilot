@@ -471,6 +471,7 @@ void ConfigAirframeWidget::requestAircraftUpdate()
     // is a straight line (that's how the mixer works on the mainboard):
     double temp=0; //used to check if default value(all 0s) is being returned
     if (field->getValue(0).toInt() <= -10) {
+        double temp=1;
         for (double i=0; i<field->getNumElements(); i++) {
             curveValues.append(i/(field->getNumElements()-1));
         }
@@ -1757,13 +1758,26 @@ void ConfigAirframeWidget::updateCustomAirframeUI()
     QList<double> curveValues;
     // If the 1st element of the curve is <= -10, then the curve
     // is a straight line (that's how the mixer works on the mainboard):
+    double temp=0; //used to check if default value(all 0s) is being returned
     if (field->getValue(0).toInt() <= -10) {
+        double temp=1;
         for (double i=0; i<field->getNumElements(); i++) {
             curveValues.append(i/(field->getNumElements()-1));
         }
     } else {
+        double value;
         for (unsigned int i=0; i < field->getNumElements(); i++) {
-            curveValues.append(field->getValue(i).toDouble());
+            value=field->getValue(i).toDouble();
+            temp+=value;
+            curveValues.append(value);
+        }
+    }
+
+    // Setup all Throttle1 curves for all types of airframes
+    if(temp==0)
+    {   curveValues.clear();
+        for (double i=0; i<field->getNumElements(); i++) {
+            curveValues.append(1*(i/(field->getNumElements()-1)));
         }
     }
     m_aircraft->customThrottle1Curve->initCurve(curveValues);

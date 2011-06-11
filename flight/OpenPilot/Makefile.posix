@@ -162,6 +162,7 @@ CFLAGS_UAVOBJECTS = $(UAVOBJDEFINE)
 endif
 
 ## PIOS Hardware (posix)
+SRC += $(PIOSPOSIX)/pios_crc.c
 SRC += $(PIOSPOSIX)/pios_sys.c
 SRC += $(PIOSPOSIX)/pios_led.c
 SRC += $(PIOSPOSIX)/pios_delay.c

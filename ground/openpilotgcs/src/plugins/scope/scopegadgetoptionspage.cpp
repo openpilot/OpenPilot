@@ -132,7 +132,7 @@ QWidget* ScopeGadgetOptionsPage::createPage(QWidget *parent)
 
 void ScopeGadgetOptionsPage::on_btnColor_clicked()
  {
-     QColor color = QColorDialog::getColor( QColor(options_page->btnColor->text()), options_page->widget);
+     QColor color = QColorDialog::getColor( QColor(options_page->btnColor->text()));
      if (color.isValid()) {
          setButtonColor(color);
      }

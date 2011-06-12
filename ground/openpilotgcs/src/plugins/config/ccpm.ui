@@ -843,7 +843,7 @@
                <number>3</number>
               </property>
               <item row="0" column="0">
-               <widget class="QCheckBox" name="ccmpCollectivePassthrough">
+               <widget class="QCheckBox" name="ccpmCollectivePassthrough">
                 <property name="text">
                  <string>Collective Pass through</string>
                 </property>
@@ -870,12 +870,12 @@
                </widget>
               </item>
               <item row="1" column="0">
-               <layout class="QHBoxLayout" name="horizontalLayout_13">
+               <layout class="QHBoxLayout" name="ccpmCollectiveChannelBox">
                 <property name="sizeConstraint">
                  <enum>QLayout::SetMinimumSize</enum>
                 </property>
                 <item>
-                 <widget class="QLabel" name="ccpmEngineLabel_2">
+                 <widget class="QLabel" name="ccpmCollectiveChLabel">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
@@ -900,12 +900,15 @@
                   <property name="text">
                    <string>Collective Ch</string>
                   </property>
+                  <property name="wordWrap">
+                   <bool>true</bool>
+                  </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QComboBox" name="ccpmCollectiveChannel">
                   <property name="enabled">
-                   <bool>false</bool>
+                   <bool>true</bool>
                   </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1003,7 +1006,7 @@
               <item>
                <widget class="QSlider" name="ccpmRevoSlider">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
@@ -1430,7 +1433,7 @@
               <item>
                <widget class="QSlider" name="ccpmCyclicScale">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
@@ -1548,7 +1551,7 @@
               <item>
                <widget class="QSlider" name="ccpmRollScale">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
@@ -1666,7 +1669,7 @@
               <item>
                <widget class="QSlider" name="ccpmCollectiveScale">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
@@ -1784,7 +1787,7 @@
               <item>
                <widget class="QSlider" name="ccpmPitchScale">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="Expanding">

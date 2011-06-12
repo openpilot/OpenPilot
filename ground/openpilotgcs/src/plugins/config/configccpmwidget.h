@@ -103,6 +103,8 @@ private:
         void SwashLvlCancelButtonPressed();
         void SwashLvlFinishButtonPressed();
 
+        void UpdatCCPMUIOptions();
+
         void enableSwashplateLevellingControl(bool state);
         void setSwashplateLevel(int percent);
         void SwashLvlSpinBoxChanged(int value);

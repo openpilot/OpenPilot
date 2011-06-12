@@ -185,6 +185,8 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_ccpm->ccpmServoYChannel->setCurrentIndex(8);
     m_ccpm->ccpmServoZChannel->addItems(channels);
     m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
+    m_ccpm->ccpmCollectiveChannel->addItems(channels);
+    m_ccpm->ccpmCollectiveChannel->setCurrentIndex(8);
 
     QStringList Types;
     Types << "CCPM 2 Servo 90º" << "CCPM 3 Servo 120º" << "CCPM 3 Servo 140º" << "FP 2 Servo 90º"  << "Custom - User Angles" << "Custom - Advanced Settings"  ;
@@ -196,6 +198,8 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     //disable changing number of points in curves until UAVObjects have more than 5
     m_ccpm->NumCurvePoints->setEnabled(0);
+    
+    
 
     UpdateType();
 
@@ -237,7 +241,13 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_ccpm->SwashLvlCancelButton, SIGNAL(clicked()), this, SLOT(SwashLvlCancelButtonPressed()));
     connect(m_ccpm->SwashLvlFinishButton, SIGNAL(clicked()), this, SLOT(SwashLvlFinishButtonPressed()));
 
+    connect(m_ccpm->ccpmCollectivePassthrough, SIGNAL(clicked()), this, SLOT(UpdatCCPMUIOptions()));
+    connect(m_ccpm->ccpmLinkCyclic, SIGNAL(clicked()), this, SLOT(UpdatCCPMUIOptions()));
+    connect(m_ccpm->ccpmLinkRoll, SIGNAL(clicked()), this, SLOT(UpdatCCPMUIOptions()));
 
+
+    
+    
    // connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestccpmUpdate()));
 
 }
@@ -253,7 +263,8 @@ void ConfigccpmWidget::UpdateType()
     QString TypeText;
     double AdjustmentAngle=0;
 
-
+    UpdatCCPMUIOptions();
+    
     TypeInt = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
     TypeText = m_ccpm->ccpmType->currentText();
     SingleServoIndex = m_ccpm->ccpmSingleServo->currentIndex();
@@ -362,6 +373,9 @@ void ConfigccpmWidget::UpdateType()
                                                             m_ccpm->ccpmAdvancedSettingsTable->verticalHeader()->width())/6);
         }
 
+    
+    
+    
     //update UI
     ccpmSwashplateUpdate();
 
@@ -827,6 +841,47 @@ void ConfigccpmWidget::UpdateMixer()
 /**************************
   * ccpm settings
   **************************/
+/*
+ Get the state of the UI check boxes and change the visibility of sliders
+ */
+void ConfigccpmWidget::UpdatCCPMUIOptions()
+{
+    int ccpmCollectivePassthroughState;
+    int ccpmLinkCyclicState;
+    int ccpmLinkRollState;
+    
+    //get the user options
+    ccpmCollectivePassthroughState=m_ccpm->ccpmCollectivePassthrough->isChecked();
+    ccpmLinkCyclicState=m_ccpm->ccpmLinkCyclic->isChecked();
+    ccpmLinkRollState=m_ccpm->ccpmLinkRoll->isChecked();
+    
+    //set which sliders are user...
+    m_ccpm->ccpmRevoMixingBox->setVisible(0);
+    
+    m_ccpm->ccpmPitchMixingBox->setVisible(!ccpmCollectivePassthroughState&&ccpmLinkCyclicState);
+    m_ccpm->ccpmCollectiveScalingBox->setVisible(ccpmCollectivePassthroughState||!ccpmLinkCyclicState);
+
+    m_ccpm->ccpmCollectiveChLabel->setVisible(ccpmCollectivePassthroughState);
+    m_ccpm->ccpmCollectiveChannel->setVisible(ccpmCollectivePassthroughState);
+
+    
+    
+    m_ccpm->ccpmCyclicScalingBox->setVisible((ccpmCollectivePassthroughState||!ccpmLinkCyclicState)&&ccpmLinkRollState);
+    if (ccpmLinkCyclicState)
+    {
+        m_ccpm->ccpmPitchScalingBox->setVisible(0);
+        m_ccpm->ccpmRollScalingBox->setVisible(0);
+        m_ccpm->ccpmLinkRoll->setVisible(0);
+        
+    }
+    else
+    {
+        m_ccpm->ccpmPitchScalingBox->setVisible(!ccpmLinkRollState);
+        m_ccpm->ccpmRollScalingBox->setVisible(!ccpmLinkRollState);
+        m_ccpm->ccpmLinkRoll->setVisible(1);
+    }
+
+}
 /**
   Request the current value of the SystemSettings which holds the ccpm type
   */

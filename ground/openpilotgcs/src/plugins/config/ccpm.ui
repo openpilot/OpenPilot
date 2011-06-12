@@ -1369,7 +1369,7 @@
           </layout>
          </item>
          <item row="0" column="4">
-          <widget class="QGroupBox" name="ccpmCyclicMixingBox">
+          <widget class="QGroupBox" name="ccpmCyclicScalingBox">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -1428,7 +1428,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QSlider" name="ccpmCollectiveSlider_2">
+               <widget class="QSlider" name="ccpmCyclicScale">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -1490,7 +1490,7 @@
           </widget>
          </item>
          <item row="0" column="6">
-          <widget class="QGroupBox" name="ccpmRollMixingBox">
+          <widget class="QGroupBox" name="ccpmRollScalingBox">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -1546,7 +1546,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QSlider" name="ccpmCollectiveSlider_3">
+               <widget class="QSlider" name="ccpmRollScale">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -1608,7 +1608,7 @@
           </widget>
          </item>
          <item row="0" column="3">
-          <widget class="QGroupBox" name="ccpmPitchMixingBox_2">
+          <widget class="QGroupBox" name="ccpmCollectiveScalingBox">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -1664,7 +1664,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QSlider" name="ccpmCollectiveSlider_5">
+               <widget class="QSlider" name="ccpmCollectiveScale">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -1726,7 +1726,7 @@
           </widget>
          </item>
          <item row="0" column="5">
-          <widget class="QGroupBox" name="ccpmPitchMixingBox_3">
+          <widget class="QGroupBox" name="ccpmPitchScalingBox">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -1782,7 +1782,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QSlider" name="ccpmCollectiveSlider_6">
+               <widget class="QSlider" name="ccpmPitchScale">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
@@ -3709,7 +3709,7 @@
   <connection>
    <sender>ccpmCollectivespinBox_5</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>ccpmCollectiveSlider_5</receiver>
+   <receiver>ccpmCollectiveScale</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -3723,7 +3723,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>ccpmCollectiveSlider_5</sender>
+   <sender>ccpmCollectiveScale</sender>
    <signal>sliderMoved(int)</signal>
    <receiver>ccpmCollectivespinBox_5</receiver>
    <slot>setValue(int)</slot>
@@ -3739,7 +3739,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>ccpmCollectiveSlider_2</sender>
+   <sender>ccpmCyclicScale</sender>
    <signal>sliderMoved(int)</signal>
    <receiver>ccpmCollectivespinBox_2</receiver>
    <slot>setValue(int)</slot>
@@ -3757,7 +3757,7 @@
   <connection>
    <sender>ccpmCollectivespinBox_2</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>ccpmCollectiveSlider_2</receiver>
+   <receiver>ccpmCyclicScale</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -3771,7 +3771,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>ccpmCollectiveSlider_6</sender>
+   <sender>ccpmPitchScale</sender>
    <signal>sliderMoved(int)</signal>
    <receiver>ccpmCollectivespinBox_6</receiver>
    <slot>setValue(int)</slot>
@@ -3789,7 +3789,7 @@
   <connection>
    <sender>ccpmCollectivespinBox_6</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>ccpmCollectiveSlider_6</receiver>
+   <receiver>ccpmPitchScale</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -3805,7 +3805,7 @@
   <connection>
    <sender>ccpmCollectivespinBox_3</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>ccpmCollectiveSlider_3</receiver>
+   <receiver>ccpmRollScale</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -3819,7 +3819,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>ccpmCollectiveSlider_3</sender>
+   <sender>ccpmRollScale</sender>
    <signal>sliderMoved(int)</signal>
    <receiver>ccpmCollectivespinBox_3</receiver>
    <slot>setValue(int)</slot>

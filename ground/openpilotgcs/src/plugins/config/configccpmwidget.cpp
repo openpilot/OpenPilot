@@ -864,10 +864,10 @@ void ConfigccpmWidget::UpdatCCPMUIOptions()
     m_ccpm->ccpmCollectiveChLabel->setVisible(ccpmCollectivePassthroughState);
     m_ccpm->ccpmCollectiveChannel->setVisible(ccpmCollectivePassthroughState);
 
-    
+    m_ccpm->ccpmLinkCyclic->setVisible(!ccpmCollectivePassthroughState);
     
     m_ccpm->ccpmCyclicScalingBox->setVisible((ccpmCollectivePassthroughState||!ccpmLinkCyclicState)&&ccpmLinkRollState);
-    if (ccpmLinkCyclicState)
+    if (!ccpmCollectivePassthroughState&&ccpmLinkCyclicState)
     {
         m_ccpm->ccpmPitchScalingBox->setVisible(0);
         m_ccpm->ccpmRollScalingBox->setVisible(0);

@@ -937,7 +937,7 @@
          <item row="0" column="1">
           <widget class="QGroupBox" name="ccpmRevoMixingBox">
            <property name="enabled">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
@@ -3617,12 +3617,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>283</x>
-     <y>400</y>
+     <x>261</x>
+     <y>496</y>
     </hint>
     <hint type="destinationlabel">
-     <x>294</x>
-     <y>550</y>
+     <x>269</x>
+     <y>546</y>
     </hint>
    </hints>
   </connection>
@@ -3633,12 +3633,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>294</x>
-     <y>550</y>
+     <x>269</x>
+     <y>546</y>
     </hint>
     <hint type="destinationlabel">
-     <x>283</x>
-     <y>482</y>
+     <x>261</x>
+     <y>511</y>
     </hint>
    </hints>
   </connection>
@@ -3649,12 +3649,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>241</x>
-     <y>550</y>
+     <x>216</x>
+     <y>546</y>
     </hint>
     <hint type="destinationlabel">
-     <x>230</x>
-     <y>484</y>
+     <x>208</x>
+     <y>511</y>
     </hint>
    </hints>
   </connection>
@@ -3665,12 +3665,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>230</x>
-     <y>313</y>
+     <x>208</x>
+     <y>412</y>
     </hint>
     <hint type="destinationlabel">
-     <x>241</x>
-     <y>550</y>
+     <x>216</x>
+     <y>546</y>
     </hint>
    </hints>
   </connection>
@@ -3697,12 +3697,140 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>257</x>
-     <y>535</y>
+     <x>301</x>
+     <y>546</y>
     </hint>
     <hint type="destinationlabel">
      <x>277</x>
      <y>401</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ccpmCollectivespinBox_5</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ccpmCollectiveSlider_5</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>296</x>
+     <y>534</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>306</x>
+     <y>480</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ccpmCollectiveSlider_5</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>ccpmCollectivespinBox_5</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>308</x>
+     <y>328</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>292</x>
+     <y>534</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ccpmCollectiveSlider_2</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>ccpmCollectivespinBox_2</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>358</x>
+     <y>306</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>355</x>
+     <y>538</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ccpmCollectivespinBox_2</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ccpmCollectiveSlider_2</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>341</x>
+     <y>538</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>351</x>
+     <y>376</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ccpmCollectiveSlider_6</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>ccpmCollectivespinBox_6</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>417</x>
+     <y>306</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>406</x>
+     <y>531</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ccpmCollectivespinBox_6</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ccpmCollectiveSlider_6</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>394</x>
+     <y>531</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>408</x>
+     <y>302</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ccpmCollectivespinBox_3</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ccpmCollectiveSlider_3</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>455</x>
+     <y>529</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>458</x>
+     <y>466</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ccpmCollectiveSlider_3</sender>
+   <signal>sliderMoved(int)</signal>
+   <receiver>ccpmCollectivespinBox_3</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>461</x>
+     <y>388</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>474</x>
+     <y>533</y>
     </hint>
    </hints>
   </connection>

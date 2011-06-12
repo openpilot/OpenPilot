@@ -46,6 +46,7 @@ UAVOBJSRCFILENAMES += gpsposition
 UAVOBJSRCFILENAMES += gpssatellites
 UAVOBJSRCFILENAMES += gpstime
 UAVOBJSRCFILENAMES += guidancesettings
+UAVOBJSRCFILENAMES += ccguidancesettings
 UAVOBJSRCFILENAMES += homelocation
 UAVOBJSRCFILENAMES += i2cstats
 UAVOBJSRCFILENAMES += manualcontrolcommand

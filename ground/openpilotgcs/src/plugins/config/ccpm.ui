@@ -843,14 +843,14 @@
                <number>3</number>
               </property>
               <item row="0" column="0">
-               <widget class="QCheckBox" name="checkBox">
+               <widget class="QCheckBox" name="ccmpCollectivePassthrough">
                 <property name="text">
                  <string>Collective Pass through</string>
                 </property>
                </widget>
               </item>
               <item row="3" column="0">
-               <widget class="QCheckBox" name="checkBox_2">
+               <widget class="QCheckBox" name="ccpmLinkRoll">
                 <property name="text">
                  <string>Link Roll/Pitch</string>
                 </property>
@@ -860,7 +860,7 @@
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QCheckBox" name="checkBox_3">
+               <widget class="QCheckBox" name="ccpmLinkCyclic">
                 <property name="text">
                  <string>Link Cyclic/Collective</string>
                 </property>
@@ -937,7 +937,7 @@
          <item row="0" column="1">
           <widget class="QGroupBox" name="ccpmRevoMixingBox">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
@@ -1371,7 +1371,7 @@
          <item row="0" column="4">
           <widget class="QGroupBox" name="ccpmCyclicScalingBox">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
@@ -1474,7 +1474,7 @@
              </layout>
             </item>
             <item>
-             <widget class="QSpinBox" name="ccpmCollectivespinBox_2">
+             <widget class="QSpinBox" name="ccpmCyclicScaleBox">
               <property name="maximum">
                <number>100</number>
               </property>
@@ -1492,7 +1492,7 @@
          <item row="0" column="6">
           <widget class="QGroupBox" name="ccpmRollScalingBox">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
@@ -1592,7 +1592,7 @@
              </layout>
             </item>
             <item>
-             <widget class="QSpinBox" name="ccpmCollectivespinBox_3">
+             <widget class="QSpinBox" name="ccpmRollScaleBox">
               <property name="maximum">
                <number>100</number>
               </property>
@@ -1610,7 +1610,7 @@
          <item row="0" column="3">
           <widget class="QGroupBox" name="ccpmCollectiveScalingBox">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
@@ -1710,7 +1710,7 @@
              </layout>
             </item>
             <item>
-             <widget class="QSpinBox" name="ccpmCollectivespinBox_5">
+             <widget class="QSpinBox" name="ccpmCollectivesScaleBox">
               <property name="maximum">
                <number>100</number>
               </property>
@@ -1728,7 +1728,7 @@
          <item row="0" column="5">
           <widget class="QGroupBox" name="ccpmPitchScalingBox">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
@@ -1828,7 +1828,7 @@
              </layout>
             </item>
             <item>
-             <widget class="QSpinBox" name="ccpmCollectivespinBox_6">
+             <widget class="QSpinBox" name="ccpmPitchScaleBox">
               <property name="maximum">
                <number>100</number>
               </property>
@@ -3707,7 +3707,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>ccpmCollectivespinBox_5</sender>
+   <sender>ccpmCollectivesScaleBox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>ccpmCollectiveScale</receiver>
    <slot>setValue(int)</slot>
@@ -3725,7 +3725,7 @@
   <connection>
    <sender>ccpmCollectiveScale</sender>
    <signal>sliderMoved(int)</signal>
-   <receiver>ccpmCollectivespinBox_5</receiver>
+   <receiver>ccpmCollectivesScaleBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -3741,7 +3741,7 @@
   <connection>
    <sender>ccpmCyclicScale</sender>
    <signal>sliderMoved(int)</signal>
-   <receiver>ccpmCollectivespinBox_2</receiver>
+   <receiver>ccpmCyclicScaleBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -3755,7 +3755,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>ccpmCollectivespinBox_2</sender>
+   <sender>ccpmCyclicScaleBox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>ccpmCyclicScale</receiver>
    <slot>setValue(int)</slot>
@@ -3773,7 +3773,7 @@
   <connection>
    <sender>ccpmPitchScale</sender>
    <signal>sliderMoved(int)</signal>
-   <receiver>ccpmCollectivespinBox_6</receiver>
+   <receiver>ccpmPitchScaleBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -3787,7 +3787,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>ccpmCollectivespinBox_6</sender>
+   <sender>ccpmPitchScaleBox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>ccpmPitchScale</receiver>
    <slot>setValue(int)</slot>
@@ -3803,7 +3803,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>ccpmCollectivespinBox_3</sender>
+   <sender>ccpmRollScaleBox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>ccpmRollScale</receiver>
    <slot>setValue(int)</slot>
@@ -3821,7 +3821,7 @@
   <connection>
    <sender>ccpmRollScale</sender>
    <signal>sliderMoved(int)</signal>
-   <receiver>ccpmCollectivespinBox_3</receiver>
+   <receiver>ccpmRollScaleBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">

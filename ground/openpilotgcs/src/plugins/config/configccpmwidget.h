@@ -85,6 +85,7 @@ private:
 
         int MixerChannelData[6];
         int ShowDisclaimer(int messageID);
+        virtual void enableControls(bool enable) { Q_UNUSED(enable)}; // Not used by this widget
 
     private slots:
         void ccpmSwashplateUpdate();
@@ -109,10 +110,14 @@ private:
         void setSwashplateLevel(int percent);
         void SwashLvlSpinBoxChanged(int value);
         void FocusChanged(QWidget *oldFocus, QWidget *newFocus);
+
+        virtual void refreshValues() {}; // Not used
+
     public slots:
         void requestccpmUpdate();
         void sendccpmUpdate();
         void saveccpmUpdate();
+
 protected:
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);

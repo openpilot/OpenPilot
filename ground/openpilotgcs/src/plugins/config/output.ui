@@ -1144,16 +1144,6 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="getRCOutputCurrent">
-       <property name="toolTip">
-        <string>Retrieve settings from OpenPilot</string>
-       </property>
-       <property name="text">
-        <string>Get Current</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="saveRCOutputToRAM">
        <property name="toolTip">
         <string>Send to OpenPilot but don't write in SD.
@@ -1225,7 +1215,6 @@ Applies and Saves all settings to SD</string>
   <tabstop>ch7Rev</tabstop>
   <tabstop>ch7Link</tabstop>
   <tabstop>channelOutTest</tabstop>
-  <tabstop>getRCOutputCurrent</tabstop>
   <tabstop>saveRCOutputToRAM</tabstop>
   <tabstop>saveRCOutputToSD</tabstop>
  </tabstops>

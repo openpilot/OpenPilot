@@ -1250,11 +1250,9 @@ void ConfigccpmWidget::saveccpmUpdate()
     ShowDisclaimer(0);
     // Send update so that the latest value is saved
     sendccpmUpdate();
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(obj);
-    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+    saveObjectToSD(obj);
 }
 
 void ConfigccpmWidget::resizeEvent(QResizeEvent* event)
@@ -1331,7 +1329,7 @@ void ConfigccpmWidget::SwashLvlStartButtonPressed()
             // Get the channel assignements:
             obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
             Q_ASSERT(obj);
-            obj->requestUpdate();
+            // obj->requestUpdate();
             MinField = obj->getField(QString("ChannelMin"));
             NeutralField = obj->getField(QString("ChannelNeutral"));
             MaxField = obj->getField(QString("ChannelMax"));
@@ -1561,8 +1559,7 @@ void ConfigccpmWidget::SwashLvlFinishButtonPressed()
     }
 
     obj->updated();
-
-    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+    saveObjectToSD(obj);
 
     //restore Flight control of ActuatorCommand
     enableSwashplateLevellingControl(false);
@@ -1591,7 +1588,7 @@ int ConfigccpmWidget::ShowDisclaimer(int messageID)
             break;
         case 1:
             // Not Tested disclaimer
-             msgBox.setInformativeText("<h2>The CCPM mixer code has not been used to fly a helicopter!</h2><p><font color=red>Use it at your own risk!</font><p>Do you wish to continue?");
+             msgBox.setInformativeText("<h2>The CCPM mixer code needs more testing!</h2><p><font color=red>Use it at your own risk!</font><p>Do you wish to continue?");
              msgBox.setStandardButtons(QMessageBox::Yes |  QMessageBox::Cancel);
              msgBox.setDefaultButton(QMessageBox::Cancel);
              msgBox.setIcon(QMessageBox::Warning);

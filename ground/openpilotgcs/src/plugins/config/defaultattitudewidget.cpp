@@ -31,7 +31,7 @@
 #include <QDebug>
 
 DefaultAttitudeWidget::DefaultAttitudeWidget(QWidget *parent) :
-        ConfigTaskWidget(parent),
+        QWidget(parent),
         ui(new Ui_defaultattitude)
 {
     ui->setupUi(this);

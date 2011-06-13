@@ -219,8 +219,9 @@ void ConnectionManager::aboutToRemoveObject(QObject *obj)
 
 void ConnectionManager::onConnectionDestroyed(QObject *obj)	// Pip
 {
-        //onConnectionClosed(obj);
-        disconnectDevice();
+    Q_UNUSED(obj)
+    //onConnectionClosed(obj);
+    disconnectDevice();
 }
 
 /**

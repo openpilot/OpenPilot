@@ -38,6 +38,7 @@
 
 #include <QtGlobal>
 #include <QObject>
+#include <QTimer>
 #include <QMutex>
 #include <QQueue>
 #include <QComboBox>
@@ -63,17 +64,25 @@ public:
         int getBoardModel();
         QByteArray getBoardCPUSerial();
         QString getBoardDescription();
+        UAVObjectManager* getObjectManager();
+        void saveObjectToSD(UAVObject *obj);
+
+signals:
+        void saveCompleted(int objectID, bool status);
 
 private:
 	QMutex *mutex;
-
 	QQueue<UAVObject *> queue;
-
+        enum {IDLE, AWAITING_ACK, AWAITING_COMPLETED} saveState;
 	void saveNextObject();
-	void saveObjectToSD(UAVObject *obj);
+        QTimer failureTimer;
 
 private slots:
-	void transactionCompleted(UAVObject *obj, bool success);
+        //void transactionCompleted(UAVObject *obj, bool success);
+        void objectPersistenceTransactionCompleted(UAVObject* obj, bool success);
+        void objectPersistenceUpdated(UAVObject * obj);
+        void objectPersistenceOperationFailed();
+
 
 };
 

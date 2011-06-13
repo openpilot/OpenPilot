@@ -219,6 +219,9 @@ static void actuatorTask(void* parameters)
 			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY0:
 			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY1:
 			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY2:
+			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY3:
+			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY4:
+			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY5:
 				if(AccessoryDesiredInstGet(mixerSettings.Curve2Source - MIXERSETTINGS_CURVE2SOURCE_ACCESSORY0,&accessory) == 0)
 					curve2 = MixerCurve(accessory.AccessoryVal,mixerSettings.ThrottleCurve2);
 				else 
@@ -254,11 +257,16 @@ static void actuatorTask(void* parameters)
 					status[ct] = 0;					
 			}
 			
-			// If an accessory channel is selected 
+			// If an accessory channel is selected for direct bypass mode
+			// In this configuration the accessory channel is scaled and mapped
+			// directly to output.  Note: THERE IS NO SAFETY CHECK HERE FOR ARMING
+			// these also will not be updated in failsafe mode.  I'm not sure what 
+			// the correct behavior is since it seems domain specific.  I don't love
+			// this code
 			if( (mixers[ct].type >= MIXERSETTINGS_MIXER1TYPE_ACCESSORY0) && 
 			   (mixers[ct].type <= MIXERSETTINGS_MIXER1TYPE_ACCESSORY2))
 			{
-				if(AccessoryDesiredInstGet(mixerSettings.Curve2Source - MIXERSETTINGS_CURVE2SOURCE_ACCESSORY0,&accessory) == 0)
+				if(AccessoryDesiredInstGet(mixers[ct].type - MIXERSETTINGS_MIXER1TYPE_ACCESSORY0,&accessory) == 0)
 					status[ct] = accessory.AccessoryVal;
 				else
 					status[ct] = -1;

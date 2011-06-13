@@ -290,13 +290,11 @@ void MainWindow::extensionsInitialized()
     if ( ! qs->allKeys().count() ){
         QMessageBox msgBox;
         msgBox.setText(tr("No configuration file could be found."));
-        msgBox.setInformativeText(tr("Do you want to load the default configuration?"));
-        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-        msgBox.setDefaultButton(QMessageBox::Yes);
-        if ( msgBox.exec() == QMessageBox::Yes ){
-            qDebug() << "Load default config from resource /core/OpenPilotGCS.xml";
-            qs = &defaultSettings;
-        }
+        msgBox.setInformativeText(tr("The default configuration will be loaded."));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+        qDebug() << "Load default config from resource /core/OpenPilotGCS.xml";
+        qs = &defaultSettings;
     }
 
     m_uavGadgetInstanceManager = new UAVGadgetInstanceManager(this);

@@ -13,8 +13,8 @@
 
 #include <QWidget>
 #include <QString>
+#include "importexport_global.h"
 #include <coreplugin/iconfigurableplugin.h>
-#include "importexportgadgetconfiguration.h"
 
 namespace Ui
 {
@@ -27,8 +27,6 @@ class IMPORTEXPORT_EXPORT ImportExportGadgetWidget : public QWidget
 public:
     ImportExportGadgetWidget(QWidget *parent = 0);
     ~ImportExportGadgetWidget();
-
-    void loadConfiguration(const ImportExportGadgetConfiguration* config);
 
 signals:
     void done();

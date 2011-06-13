@@ -52,9 +52,11 @@ public:
 
 public slots:
     void onAutopilotConnect();
+    void onAutopilotDisconnect();
 
 signals:
     void autopilotConnected();
+    void autopilotDisconnected();
 
 protected:
         void resizeEvent(QResizeEvent * event);

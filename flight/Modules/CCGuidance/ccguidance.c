@@ -148,7 +148,7 @@ static void ccguidanceTask(void *parameters)
 				/* When enter position hold mode save current position */
 				positionDesired.North = positionActual.Latitude;
 				positionDesired.East = positionActual.Longitude;
-				positionDesired.Down = positionActual.Altitude;
+				positionDesired.Down = positionActual.Altitude + 1;
 				PositionDesiredSet(&positionDesired);
 				positionHoldLast = 1;
 			}

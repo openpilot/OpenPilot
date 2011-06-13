@@ -2315,9 +2315,13 @@ tskTCB *pxNewTCB;
 #if ( INCLUDE_uxTaskGetRunTime == 1 )
 unsigned portBASE_TYPE uxTaskGetRunTime( xTaskHandle xTask )
 {
+	unsigned long runTime;
+	
 	tskTCB *pxTCB;
 	pxTCB = prvGetTCBFromHandle( xTask );
-	return pxTCB->ulRunTimeCounter;
+	runTime = pxTCB->ulRunTimeCounter;
+	pxTCB->ulRunTimeCounter = 0;
+	return runTime;
 }
 
 #endif

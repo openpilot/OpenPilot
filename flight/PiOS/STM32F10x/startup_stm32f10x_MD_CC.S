@@ -61,6 +61,40 @@ defined in linker script */
   .type  Reset_Handler, %function
 Reset_Handler:
 
+/*
+ * From COrtex-M3 reference manual:
+ * - Handler IRQ always use SP_main
+ * - Process use SP_main or SP_process
+ * Here, we will use beginning of SRAM for IRQ (SP_main)
+ * and end of heap for initialization (SP_process).
+ * Once the schedule starts, all threads will use their own stack
+ * from heap and NOBOBY should use SP_process again.
+ */
+ /* Do set/reset the stack pointers */
+  LDR r0, =_irq_stack_top
+  MSR msp, r0
+  LDR r0, =_init_stack_top
+  MSR psp, r0
+/* DO
+ * - stay in thread process mode
+ * - stay in privilege level
+ * - use process stack
+ */
+  add r0, #2
+  MSR control, r0
+  ISB
+/* Fill IRQ stack for watermark monitoring */
+  ldr  r2, =_irq_stack_end
+  b  LoopFillIRQStack
+
+FillIRQStack:
+  movw  r3, #0xA5A5
+  str  r3, [r2], #4
+
+LoopFillIRQStack:
+  ldr  r3, = _irq_stack_top
+  cmp  r2, r3
+  bcc  FillIRQStack
 /* Copy the data segment initializers from flash to SRAM */  
   movs  r1, #0
   b  LoopCopyDataInit
@@ -119,7 +153,7 @@ Infinite_Loop:
     
     
 g_pfnVectors:
-  .word  _estack
+  .word  _irq_stack_top /*_irq_stack_top */
   .word  Reset_Handler
   .word  NMI_Handler
   .word  HardFault_Handler

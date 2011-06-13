@@ -118,7 +118,7 @@ static void systemTask(void *parameters)
 	ObjectPersistenceConnectCallback(&objectUpdatedCb);
 
 	// Main system loop
-	while (1) {		
+	while (1) {
 		// Update the system statistics
 		updateStats();
 
@@ -263,6 +263,48 @@ static void updateWDGstats()
 /**
  * Called periodically to update the system stats
  */
+static uint16_t GetFreeIrqStackSize(void)
+{
+	uint32_t i = 0x200;
+
+#if !defined(ARCH_POSIX) && !defined(ARCH_WIN32) && defined(CHECK_IRQ_STACK)
+extern uint32_t _irq_stack_top;
+extern uint32_t _irq_stack_end;
+uint32_t pattern = 0x0000A5A5;
+uint32_t *ptr = &_irq_stack_end;
+
+#if 1 /* the ugly way accurate but takes more time, useful for debugging */
+	uint32_t stack_size = (((uint32_t)&_irq_stack_top - (uint32_t)&_irq_stack_end) & ~3 ) / 4;
+
+	for (i=0; i< stack_size; i++)
+	{
+		if (ptr[i] != pattern)
+		{
+			i=i*4;
+			break;
+		}
+	}
+#else /* faster way but not accurate */
+	if (*(volatile uint32_t *)((uint32_t)ptr + IRQSTACK_LIMIT_CRITICAL) != pattern)
+	{
+		i = IRQSTACK_LIMIT_CRITICAL - 1;
+	}
+	else if (*(volatile uint32_t *)((uint32_t)ptr + IRQSTACK_LIMIT_WARNING) != pattern)
+	{
+		i = IRQSTACK_LIMIT_WARNING - 1;
+	}
+	else
+	{
+		i = IRQSTACK_LIMIT_WARNING;
+	}
+#endif
+#endif
+	return i;
+}
+
+/**
+ * Called periodically to update the system stats
+ */
 static void updateStats()
 {
 	static portTickType lastTickCount = 0;
@@ -277,6 +319,9 @@ static void updateStats()
 #else
 	stats.HeapRemaining = xPortGetFreeHeapSize();
 #endif
+
+	// Get Irq stack status
+	stats.IRQStackRemaining = GetFreeIrqStackSize();
 
 	// When idleCounterClear was not reset by the idle-task, it means the idle-task did not run
 	if (idleCounterClear) {
@@ -319,6 +364,17 @@ static void updateSystemAlarms()
 	} else {
 		AlarmsClear(SYSTEMALARMS_ALARM_OUTOFMEMORY);
 	}
+
+#if !defined(ARCH_POSIX) && !defined(ARCH_WIN32) && defined(CHECK_IRQ_STACK)
+	// Check IRQ stack
+	if (stats.IRQStackRemaining < IRQSTACK_LIMIT_CRITICAL) {
+		AlarmsSet(SYSTEMALARMS_ALARM_OUTOFMEMORY, SYSTEMALARMS_ALARM_CRITICAL);
+	} else if (stats.IRQStackRemaining < IRQSTACK_LIMIT_WARNING) {
+		AlarmsSet(SYSTEMALARMS_ALARM_OUTOFMEMORY, SYSTEMALARMS_ALARM_WARNING);
+	} else {
+		AlarmsClear(SYSTEMALARMS_ALARM_OUTOFMEMORY);
+	}
+#endif
 
 	// Check CPU load
 	if (stats.CPULoad > CPULOAD_LIMIT_CRITICAL) {

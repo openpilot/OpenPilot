@@ -81,7 +81,7 @@ static union xRTOS_HEAP
 		volatile unsigned long ulDummy;
 	#endif	
 	unsigned char ucHeap[ configTOTAL_HEAP_SIZE ];
-} xHeap;
+} xHeap __attribute__ ((section (".heap")));
 
 static size_t xNextFreeByte = ( size_t ) 0;
 /*-----------------------------------------------------------*/

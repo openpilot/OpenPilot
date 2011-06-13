@@ -71,6 +71,10 @@ configKERNEL_INTERRUPT_PRIORITY setting.  Here 15 corresponds to the lowest
 NVIC value of 255. */
 #define configLIBRARY_KERNEL_INTERRUPT_PRIORITY	15
 
+#if !defined(ARCH_POSIX) && !defined(ARCH_WIN32)
+#define CHECK_IRQ_STACK
+#endif
+
 /**
   * @}
   */

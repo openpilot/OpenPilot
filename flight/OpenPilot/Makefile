@@ -44,6 +44,7 @@ ENABLE_DEBUG_PINS ?= NO
 ENABLE_AUX_UART ?= NO
 
 USE_SPEKTRUM ?= NO
+USE_SBUS ?= NO
 
 
 # Set to YES when using Code Sourcery toolchain
@@ -170,6 +171,7 @@ SRC += $(PIOSSTM32F10X)/pios_spi.c
 SRC += $(PIOSSTM32F10X)/pios_ppm.c
 SRC += $(PIOSSTM32F10X)/pios_pwm.c
 SRC += $(PIOSSTM32F10X)/pios_spektrum.c
+SRC += $(PIOSSTM32F10X)/pios_sbus.c
 SRC += $(PIOSSTM32F10X)/pios_debug.c
 SRC += $(PIOSSTM32F10X)/pios_gpio.c
 SRC += $(PIOSSTM32F10X)/pios_exti.c
@@ -365,6 +367,9 @@ endif
 
 ifeq ($(USE_SPEKTRUM), YES)
 CDEFS += -DUSE_SPEKTRUM
+endif
+ifeq ($(USE_SBUS), YES)
+CDEFS += -DUSE_SBUS
 endif
 
 

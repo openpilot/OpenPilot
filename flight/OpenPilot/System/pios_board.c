@@ -539,6 +539,10 @@ void PIOS_SUPV_irq_handler() {
 }
 #endif	/* PIOS_COM_SPEKTRUM */
 
+#if defined(PIOS_INCLUDE_SBUS)
+#error PIOS_INCLUDE_SBUS not implemented
+#endif	/* PIOS_INCLUDE_SBUS */
+
 static uint32_t pios_usart_telem_rf_id;
 void PIOS_USART_telem_irq_handler(void)
 {

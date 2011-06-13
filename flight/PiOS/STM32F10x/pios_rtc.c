@@ -49,7 +49,7 @@ void PIOS_RTC_Init()
 	RTC_WaitForSynchro();
 	RTC_WaitForLastTask();
 
-#if defined(PIOS_INCLUDE_SPEKTRUM)
+#if defined(PIOS_INCLUDE_SPEKTRUM) || defined(PIOS_INCLUDE_SBUS)
 	/* Enable the RTC Second interrupt */
 	RTC_ITConfig( RTC_IT_SEC, ENABLE );
 	/* Wait until last write operation on RTC registers has finished */

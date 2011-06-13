@@ -44,6 +44,8 @@
 
 #if defined(USE_SPEKTRUM)
 #define PIOS_INCLUDE_SPEKTRUM
+#elif defined(USE_SBUS)
+#define PIOS_INCLUDE_SBUS
 #else
 //#define PIOS_INCLUDE_PPM
 #define PIOS_INCLUDE_PWM

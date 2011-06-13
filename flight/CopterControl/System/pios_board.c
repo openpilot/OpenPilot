@@ -383,6 +383,95 @@ void PIOS_SUPV_irq_handler() {
 }
 #endif	/* PIOS_INCLUDE_SPEKTRUM */
 
+#if defined(PIOS_INCLUDE_SBUS)
+/*
+ * SBUS USART
+ */
+void PIOS_USART_sbus_irq_handler(void);
+void USART3_IRQHandler() __attribute__ ((alias ("PIOS_USART_sbus_irq_handler")));
+const struct pios_usart_cfg pios_usart_sbus_cfg = {
+	.regs = USART3,
+	.init = {
+	#if defined (PIOS_COM_SBUS_BAUDRATE)
+		.USART_BaudRate        = PIOS_COM_SBUS_BAUDRATE,
+	#else
+		.USART_BaudRate        = 115200,
+	#endif
+		.USART_WordLength          = USART_WordLength_8b,
+		.USART_Parity              = USART_Parity_No,
+		.USART_StopBits            = USART_StopBits_1,
+		.USART_HardwareFlowControl = USART_HardwareFlowControl_None,
+		.USART_Mode                = USART_Mode_Rx,
+	},
+	.irq = {
+		.handler = PIOS_USART_sbus_irq_handler,
+		.init = {
+			.NVIC_IRQChannel                   = USART3_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		  },
+	},
+	.rx = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_11,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode  = GPIO_Mode_IPU,
+		},
+	},
+	.tx = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_10,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode  = GPIO_Mode_IN_FLOATING,
+		},
+	},
+};
+
+static uint32_t pios_usart_sbus_id;
+void PIOS_USART_sbus_irq_handler(void)
+{
+	SBUS_IRQHandler(pios_usart_sbus_id);
+}
+
+#include <pios_sbus_priv.h>
+void RTC_IRQHandler();
+void RTC_IRQHandler() __attribute__ ((alias ("PIOS_SUPV_irq_handler")));
+const struct pios_sbus_cfg pios_sbus_cfg = {
+	.pios_usart_sbus_cfg = &pios_usart_sbus_cfg,
+	.gpio_init = { //used for bind feature
+		.GPIO_Mode = GPIO_Mode_Out_PP,
+		.GPIO_Speed = GPIO_Speed_2MHz,
+	},
+	.remap = 0,
+	.irq = {
+		.handler = RTC_IRQHandler,
+		.init    = {
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+	.port = GPIOB,
+	.pin = GPIO_Pin_11,
+};
+
+void PIOS_SUPV_irq_handler() {
+	if (RTC_GetITStatus(RTC_IT_SEC))
+	{
+		/* Call the right handler */
+		PIOS_SBUS_irq_handler(pios_usart_sbus_id);
+
+		/* Wait until last write operation on RTC registers has finished */
+		RTC_WaitForLastTask();
+		/* Clear the RTC Second interrupt */
+		RTC_ClearITPendingBit(RTC_IT_SEC);
+	}
+}
+#endif	/* PIOS_INCLUDE_SBUS */
+
 static uint32_t pios_usart_telem_rf_id;
 void PIOS_USART_telem_irq_handler(void)
 {
@@ -659,6 +748,7 @@ uint32_t pios_com_telem_rf_id;
 uint32_t pios_com_telem_usb_id;
 uint32_t pios_com_gps_id;
 uint32_t pios_com_spektrum_id;
+uint32_t pios_com_sbus_id;
 
 /**
  * PIOS_Board_Init()
@@ -691,6 +781,19 @@ void PIOS_Board_Init(void) {
 		PIOS_DEBUG_Assert(0);
 	}
 #endif
+
+#if defined(PIOS_INCLUDE_SBUS)
+	/* SBUS init must come before comms */
+	PIOS_SBUS_Init();
+
+	if (PIOS_USART_Init(&pios_usart_sbus_id, &pios_usart_sbus_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+	if (PIOS_COM_Init(&pios_com_sbus_id, &pios_usart_com_driver, pios_usart_sbus_id)) {
+		PIOS_DEBUG_Assert(0);
+	}
+#endif
+
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
 	UAVObjInitialize();

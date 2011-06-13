@@ -2,13 +2,12 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup PIOS_SPEKTRUM Spektrum receiver functions
- * @brief Code to read Spektrum input
+ * @addtogroup PIOS_SBUS Futaba S.Bus receiver functions
+ * @brief Code to read Futaba S.Bus input
  * @{
  *
- * @file       pios_spektrum.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
+ * @file       pios_sbus.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
  * @brief      USART commands. Inits USARTs, controls USARTs & Interrupt handlers. (STM32 dependent)
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -31,14 +30,14 @@
 
 /* Project Includes */
 #include "pios.h"
-#include "pios_spektrum_priv.h"
+#include "pios_sbus_priv.h"
 
-#if defined(PIOS_INCLUDE_SPEKTRUM)
-#if defined(PIOS_INCLUDE_PWM) || defined(PIOS_INCLUDE_SBUS)
-#error "Both SPEKTRUM and either of PWM or SBUS inputs defined, choose only one"
+#if defined(PIOS_INCLUDE_SBUS)
+#if defined(PIOS_INCLUDE_PWM) || defined(PIOS_INCLUDE_SPEKTRUM)
+#error "Both SBUS and either of PWM or SPEKTRUM inputs defined, choose only one"
 #endif
 #if defined(PIOS_COM_AUX)
-#error "AUX com cannot be used with SPEKTRUM"
+#error "AUX com cannot be used with SBUS"
 #endif
 
 /**
@@ -58,15 +57,10 @@ uint8_t sync_of = 0;
 uint16_t supv_timer=0;
 
 /**
-* Bind and Initialise Spektrum satellite receiver
+* Bind and Initialise S.Bus receiver
 */
-void PIOS_SPEKTRUM_Init(void)
+void PIOS_SBUS_Init(void)
 {
-	// TODO: need setting flag for bind on next powerup
-	if (0) {
-		PIOS_SPEKTRUM_Bind();
-	}
-
 	/* Init RTC supervisor timer interrupt */
 	NVIC_InitTypeDef NVIC_InitStructure;
 	NVIC_InitStructure.NVIC_IRQChannel = RTC_IRQn;
@@ -84,7 +78,7 @@ void PIOS_SPEKTRUM_Init(void)
 * \output -1 Channel not available
 * \output >0 Channel value
 */
-int16_t PIOS_SPEKTRUM_Get(int8_t Channel)
+int16_t PIOS_SBUS_Get(int8_t Channel)
 {
 	/* Return error if channel not available */
 	if (Channel >= 12) {
@@ -94,60 +88,14 @@ int16_t PIOS_SPEKTRUM_Get(int8_t Channel)
 }
 
 /**
-* Spektrum bind function
-* \output 1 Successful bind
-* \output 0 Bind failed
-* \note Applications shouldn't call these functions directly
-*/
-uint8_t PIOS_SPEKTRUM_Bind(void)
-{
-	GPIO_InitTypeDef GPIO_InitStructure = pios_spektrum_cfg.gpio_init;
-	GPIO_InitStructure.GPIO_Pin = pios_spektrum_cfg.pin;
-	GPIO_Init(pios_spektrum_cfg.port, &GPIO_InitStructure);
-
-	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
-	//PIOS_DELAY_WaitmS(75);
-	/* RX line, drive high for 10us */
-	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
-	PIOS_DELAY_WaituS(10);
-	/* RX line, drive low for 120us */
-	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive high for 120us */
-	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive low for 120us */
-	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive high for 120us */
-	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive low for 120us */
-	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive high for 120us */
-	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive low for 120us */
-	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive high for 120us */
-	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
-	PIOS_DELAY_WaituS(120);
-	/* RX line, set input and wait for data, PIOS_SPEKTRUM_Init */
-
-	return 1;
-}
-
-/**
 * Decodes a byte
-* \param[in] b byte which should be spektrum decoded
+* \param[in] b byte which should be sbus decoded
 * \return 0 if no error
 * \return -1 if USART not available
 * \return -2 if buffer full (retry)
 * \note Applications shouldn't call these functions directly
 */
-int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
+int32_t PIOS_SBUS_Decode(uint8_t b)
 {
 	static uint16_t channel = 0; /*, sync_word = 0;*/
 	uint8_t channeln = 0, frame = 0;
@@ -224,31 +172,31 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 }
 
 /* Interrupt handler for USART */
-void SPEKTRUM_IRQHandler(uint32_t usart_id) {
+void SBUS_IRQHandler(uint32_t usart_id) {
 	/* by always reading DR after SR make sure to clear any error interrupts */
-	volatile uint16_t sr = pios_spektrum_cfg.pios_usart_spektrum_cfg->regs->SR;
-	volatile uint8_t b = pios_spektrum_cfg.pios_usart_spektrum_cfg->regs->DR;
+	volatile uint16_t sr = pios_sbus_cfg.pios_usart_sbus_cfg->regs->SR;
+	volatile uint8_t b = pios_sbus_cfg.pios_usart_sbus_cfg->regs->DR;
 	
 	/* check if RXNE flag is set */
 	if (sr & USART_SR_RXNE) {
-		if (PIOS_SPEKTRUM_Decode(b) < 0) {
+		if (PIOS_SBUS_Decode(b) < 0) {
 			/* Here we could add some error handling */
 		}
 	} 
 
 	if (sr & USART_SR_TXE) {	// check if TXE flag is set
 		/* Disable TXE interrupt (TXEIE=0) */
-		USART_ITConfig(pios_spektrum_cfg.pios_usart_spektrum_cfg->regs, USART_IT_TXE, DISABLE);
+		USART_ITConfig(pios_sbus_cfg.pios_usart_sbus_cfg->regs, USART_IT_TXE, DISABLE);
 	}
 	/* byte arrived so clear "watchdog" timer */
 	supv_timer=0;
 }
 
 /**
- *@brief This function is called between frames and when a spektrum word hasnt been decoded for too long
+ *@brief This function is called between frames and when a sbus word hasnt been decoded for too long
  *@brief clears the channel values
  */
-void PIOS_SPEKTRUM_irq_handler() {
+void PIOS_SBUS_irq_handler() {
 	/* 125hz */
 	supv_timer++;
 	if(supv_timer > 5) {

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>483</width>
-    <height>154</height>
+    <height>174</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -89,7 +89,7 @@
           <string>Export the GCS settings selected in the checkboxes above.</string>
          </property>
          <property name="text">
-          <string>Export</string>
+          <string>Export...</string>
          </property>
         </widget>
        </item>
@@ -99,7 +99,7 @@
           <string>Import settings from the config file, only for the items checked above.</string>
          </property>
          <property name="text">
-          <string>Import</string>
+          <string>Import...</string>
          </property>
         </widget>
        </item>

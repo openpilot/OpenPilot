@@ -37,6 +37,7 @@
 #include <QSettings>
 #include <QMessageBox>
 #include <QFileInfo>
+#include <QFileDialog>
 #include <QDesktopServices>
 #include <QUrl>
 #include <QDir>
@@ -47,10 +48,8 @@ ImportExportGadgetWidget::ImportExportGadgetWidget(QWidget *parent) :
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     ui->setupUi(this);
-    ui->configFile->setExpectedKind(Utils::PathChooser::File);
-    ui->configFile->setPromptDialogFilter(tr("XML file (*.xml)"));
-    ui->configFile->setPromptDialogTitle(tr("Choose configuration file"));
 
+	filename = "";
 }
 
 ImportExportGadgetWidget::~ImportExportGadgetWidget()
@@ -72,35 +71,21 @@ void ImportExportGadgetWidget::changeEvent(QEvent *e)
 
 void ImportExportGadgetWidget::on_exportButton_clicked()
 {
-    QString file = ui->configFile->path();
-    if (file.isEmpty()) {
-        QMessageBox msgBox;
-        msgBox.setText(tr("Empty File name."));
-        msgBox.setInformativeText(tr("Please choose an export file name."));
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.exec();
-        return;
-    }
-    // Add a "XML" extension to the file in case it does not exist:
-    if (!file.endsWith(".xml"))
+	QString file = filename;
+	QString filter = tr("GCS Settings file (*.xml)");
+	file = QFileDialog::getSaveFileName(this, tr("Save GCS Settings too file .."), QFileInfo(file).absoluteFilePath(), filter).trimmed();
+	if (file.isEmpty()) {
+		return;
+	}
+
+	// Add a "XML" extension to the file in case it does not exist:
+	if (!file.toLower().endsWith(".xml"))
         file.append(".xml");
+
+	filename = file;
 
     qDebug() << "Export pressed! Write to file " << QFileInfo(file).absoluteFilePath();
 
-    if ( QFileInfo(file).exists() ){
-        QMessageBox msgBox;
-        msgBox.setText(tr("File already exists."));
-        msgBox.setInformativeText(tr("Do you want to overwrite the existing file?"));
-        msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-        msgBox.setDefaultButton(QMessageBox::Ok);
-        if ( msgBox.exec() == QMessageBox::Ok ){
-            QFileInfo(file).absoluteDir().remove(QFileInfo(file).fileName());
-        }
-        else{
-            qDebug() << "Export canceled!";
-            return;
-        }
-    }
     QMessageBox msgBox;
     QDir dir = QFileInfo(file).absoluteDir();
     if (! dir.exists()) {
@@ -163,8 +148,17 @@ void ImportExportGadgetWidget::writeError(const QString& msg) const
 
 void ImportExportGadgetWidget::on_importButton_clicked()
 {
-    QString file = ui->configFile->path();
+	QString file = filename;
+	QString filter = tr("GCS Settings file (*.xml)");
+	file = QFileDialog::getOpenFileName(this, tr("Load GCS Settings from file .."), QFileInfo(file).absoluteFilePath(), filter).trimmed();
+	if (file.isEmpty()) {
+		return;
+	}
+
+	filename = file;
+
     qDebug() << "Import pressed! Read from file " << QFileInfo(file).absoluteFilePath();
+
     QMessageBox msgBox;
     if (! QFileInfo(file).isReadable()) {
         msgBox.setText(tr("Can't read file ") + QFileInfo(file).absoluteFilePath());

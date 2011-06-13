@@ -37,6 +37,7 @@
 #include <QtGui/QPushButton>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QMessageBox>
 
 #include "manualcontrolsettings.h"
 
@@ -494,15 +495,34 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
             }
             obj->updated();
 
+            // OP-534: make sure the airframe can NEVER arm
+            obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ManualControlSettings")));
+            field = obj->getField("Arming");
+            field->setValue("Always Disarmed");
+            obj->updated();
+
             // Last, make sure the user won't apply/save during calibration
             m_config->saveRCInputToRAM->setEnabled(false);
             m_config->saveRCInputToSD->setEnabled(false);
+
+            // Reset all slider values to zero
+            field = controlCommand->getField(QString("Channel"));
+            for (int i = 0; i < 8; i++)
+                updateChannelInSlider(inSliders[i], inMinLabels[i], inMaxLabels[i], field->getValue(i).toInt(),inRevCheckboxes[i]->isChecked());
+            firstUpdate = false;
+            // Tell a few things to the user:
+            QMessageBox msgBox;
+            msgBox.setText(tr("Arming Settings are now set to Always Disarmed for your safety."));
+            msgBox.setDetailedText(tr("You will have to reconfigure arming settings yourself afterwards."));
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.setDefaultButton(QMessageBox::Ok);
+            msgBox.exec();
+
         }
 
         field = controlCommand->getField(QString("Channel"));
         for (int i = 0; i < 8; i++)
             updateChannelInSlider(inSliders[i], inMinLabels[i], inMaxLabels[i], field->getValue(i).toInt(),inRevCheckboxes[i]->isChecked());
-        firstUpdate = false;
     }
     else {
         if (!firstUpdate) {           

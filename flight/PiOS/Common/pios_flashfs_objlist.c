@@ -105,7 +105,7 @@ int32_t PIOS_FLASHFS_Init()
  */
 static int32_t PIOS_FLASHFS_CleabObjectTableHeader() 
 {
-	if(PIOS_Flash_W25X_EraseSector(OBJECT_TABLE_START) != 0)
+	if(PIOS_Flash_W25X_EraseSector(0) != 0)
 		return -1;
 
 	uint32_t object_table_magic = OBJECT_TABLE_MAGIC;

@@ -845,6 +845,17 @@ void ConfigccpmWidget::UpdateMixer()
   **************************/
 /*
  Get the state of the UI check boxes and change the visibility of sliders
+ typedef struct {
+ uint SwasplateType:3;
+ uint FirstServoIndex:2;
+ uint CorrectionAngle:9;
+ uint ccpmCollectivePassthroughState:1;
+ uint ccpmLinkCyclicState:1;
+ uint ccpmLinkRollState:1;
+ uint CollectiveChannel:3;
+ uint padding:12;
+ } __attribute__((packed))  heliGUISettingsStruct;
+
  */
 void ConfigccpmWidget::UpdatCCPMOptionsFromUI()
 {
@@ -859,10 +870,29 @@ void ConfigccpmWidget::UpdatCCPMOptionsFromUI()
     GUIConfigData.heli.ccpmLinkCyclicState = m_ccpm->ccpmLinkCyclic->isChecked();
     GUIConfigData.heli.ccpmLinkRollState = m_ccpm->ccpmLinkRoll->isChecked();
     
+    //correction angle
+    GUIConfigData.heli.CorrectionAngle = m_ccpm->ccpmCorrectionAngle->value();
     
+    //CollectiveChannel
+    GUIConfigData.heli.CollectiveChannel = m_ccpm->ccpmCollectiveChannel->currentIndex();
 }
 void ConfigccpmWidget::UpdatCCPMUIFromOptions()
 {
+    //swashplate config
+    m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->count() - (GUIConfigData.heli.SwasplateType +1));
+    m_ccpm->ccpmSingleServo->setCurrentIndex(GUIConfigData.heli.FirstServoIndex);
+    
+    //ccpm mixing options
+    m_ccpm->ccpmCollectivePassthrough->setChecked(GUIConfigData.heli.ccpmCollectivePassthroughState);
+    m_ccpm->ccpmLinkCyclic->setChecked(GUIConfigData.heli.ccpmLinkCyclicState);
+    m_ccpm->ccpmLinkRoll->setChecked(GUIConfigData.heli.ccpmLinkRollState);
+    
+    //correction angle
+    m_ccpm->ccpmCorrectionAngle->setValue(GUIConfigData.heli.CorrectionAngle);
+    
+    //CollectiveChannel
+    m_ccpm->ccpmCollectiveChannel->setCurrentIndex(GUIConfigData.heli.CollectiveChannel);
+    
 }
 
 
@@ -923,7 +953,7 @@ void ConfigccpmWidget::requestccpmUpdate()
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
     field = obj->getField(QString("GUIConfigData"));
     GUIConfigData.UAVObject=field->getValue().toUInt();
-    
+    UpdatCCPMUIFromOptions();   
 
     
     obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));

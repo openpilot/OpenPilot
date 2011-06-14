@@ -1054,20 +1054,22 @@ int n_innovation = 0;
 			{
 				double newt = pinfo.sen->getRawTimestamp(pinfo.id);
 				
-				JFR_DEBUG("************** FRAME : " << (*world)->t << " (" << newt << ")");
+				JFR_DEBUG("************** FRAME : " << (*world)->t << " (" << std::setprecision(16) << newt << std::setprecision(6) << ")");
 				
 				robot_ptr_t robPtr = pinfo.sen->robotPtr();
 //std::cout << "Frame " << (*world)->t << " using sen " << pinfo.sen->id() << " at time " << std::setprecision(16) << newt << std::endl;
 				robPtr->move(newt);
 				
-				JFR_DEBUG("Robot " << robPtr->id() << " state after move " << robPtr->state.x());
-				JFR_DEBUG("Robot state stdev after move " << stdevFromCov(robPtr1->state.P()));
+				jblas::vec euler = quaternion::q2e(ublas::subrange(robPtr->state.x(), 3, 7));
+				JFR_DEBUG("Robot " << robPtr->id() << " state after move " << robPtr->state.x() << " ; euler " << euler);
+				JFR_DEBUG("Robot state stdev after move " << stdevFromCov(robPtr->state.P()));
 				robot_prediction = robPtr->state.x();
 				
 				pinfo.sen->process(pinfo.id);
 				
-				JFR_DEBUG("Robot state after corrections of sensor " << pinfo.sen->id() << " : " << robPtr1->state.x());
-				JFR_DEBUG("Robot state stdev after corrections " << stdevFromCov(robPtr1->state.P()));
+				euler = quaternion::q2e(ublas::subrange(robPtr->state.x(), 3, 7));
+				JFR_DEBUG("Robot state after corrections of sensor " << pinfo.sen->id() << " : " << robPtr->state.x() << " ; euler " << euler);
+				JFR_DEBUG("Robot state stdev after corrections " << stdevFromCov(robPtr->state.P()));
 				average_robot_innovation += ublas::norm_2(robPtr->state.x() - robot_prediction);
 				n_innovation++;
 				

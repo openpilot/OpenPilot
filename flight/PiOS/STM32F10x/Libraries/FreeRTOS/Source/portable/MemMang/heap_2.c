@@ -81,7 +81,7 @@ static union xRTOS_HEAP
 		volatile unsigned long ulDummy;
 	#endif
 	unsigned char ucHeap[ configTOTAL_HEAP_SIZE ];
-} xHeap;
+} xHeap __attribute__ ((section (".heap")));
 
 /* Define the linked list structure.  This is used to link free blocks in order
 of their size. */

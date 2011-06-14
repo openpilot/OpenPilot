@@ -80,6 +80,9 @@ NVIC value of 255. */
 #define portGET_RUN_TIME_COUNTER_VALUE()  PIOS_RTC_Counter()
 #endif
 
+#if !defined(ARCH_POSIX) && !defined(ARCH_WIN32)
+#define CHECK_IRQ_STACK
+#endif
 
 /**
   * @}

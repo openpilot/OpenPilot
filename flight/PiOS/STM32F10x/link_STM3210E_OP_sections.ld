@@ -261,6 +261,16 @@ SECTIONS
          _ebss = . ;
     } >RAM
     
+    .heap (NOLOAD) :
+    {
+        _sheap = . ;
+        *(.heap)
+        . = ALIGN(4);
+        _eheap = . ;
+        _init_stack_top = . - 4 ;
+         . = ALIGN(4);
+    } > RAM
+    
     PROVIDE ( end = _ebss );
     PROVIDE ( _end = _ebss );
 

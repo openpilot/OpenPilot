@@ -264,7 +264,7 @@ void ConfigccpmWidget::UpdateType()
     QString TypeText;
     double AdjustmentAngle=0;
 
-    UpdatCCPMUIOptions();
+    UpdatCCPMOptionsFromUI();
     SetUIComponentVisibilities();
     
     TypeInt = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
@@ -846,7 +846,7 @@ void ConfigccpmWidget::UpdateMixer()
 /*
  Get the state of the UI check boxes and change the visibility of sliders
  */
-void ConfigccpmWidget::UpdatCCPMUIOptions()
+void ConfigccpmWidget::UpdatCCPMOptionsFromUI()
 {
     if (updatingFromHardware) return;
     //get the user options
@@ -861,10 +861,14 @@ void ConfigccpmWidget::UpdatCCPMUIOptions()
     
     
 }
+void ConfigccpmWidget::UpdatCCPMUIFromOptions()
+{
+}
+
 
 void ConfigccpmWidget::SetUIComponentVisibilities()
 {
-    UpdatCCPMUIOptions();
+    UpdatCCPMOptionsFromUI();
     //set which sliders are user...
     m_ccpm->ccpmRevoMixingBox->setVisible(0);
     
@@ -915,6 +919,13 @@ void ConfigccpmWidget::requestccpmUpdate()
     int i,j;
     UAVObjectField *field;
     UAVDataObject* obj;
+    
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
+    field = obj->getField(QString("GUIConfigData"));
+    GUIConfigData.UAVObject=field->getValue().toUInt();
+    
+
+    
     obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));
     Q_ASSERT(obj);
 
@@ -1180,9 +1191,16 @@ void ConfigccpmWidget::sendccpmUpdate()
 
     if (SwashLvlConfigurationInProgress)return;
     ShowDisclaimer(1);
+    
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
+    field = obj->getField(QString("GUIConfigData"));
+    field->setValue(GUIConfigData.UAVObject);
+    obj->updated();
+
+    
     obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));
         Q_ASSERT(obj);
 

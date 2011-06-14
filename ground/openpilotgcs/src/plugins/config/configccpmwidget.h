@@ -59,12 +59,12 @@ typedef struct {
     uint CollectiveChannel:3;
     uint padding:12;
     uint padding2:32;
-} __attribute__((packed))  ccpmGUISettingsStruct;
+} __attribute__((packed))  heliGUISettingsStruct;
 
 typedef union 
 {
     uint                    UAVObject;
-    ccpmGUISettingsStruct   heli;
+    heliGUISettingsStruct   heli;
 } GUIConfigDataUnion;
 
 class ConfigccpmWidget: public ConfigTaskWidget
@@ -125,7 +125,9 @@ private:
         void SwashLvlCancelButtonPressed();
         void SwashLvlFinishButtonPressed();
 
-        void UpdatCCPMUIOptions();
+        void UpdatCCPMOptionsFromUI();
+        void UpdatCCPMUIFromOptions();
+        
         void SetUIComponentVisibilities();
 
         void enableSwashplateLevellingControl(bool state);

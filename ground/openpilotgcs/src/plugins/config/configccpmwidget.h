@@ -61,7 +61,11 @@ typedef struct {
     uint padding2:32;
 } __attribute__((packed))  ccpmGUISettingsStruct;
 
-
+typedef union 
+{
+    uint                    UAVObject;
+    ccpmGUISettingsStruct   heli;
+} GUIConfigDataUnion;
 
 class ConfigccpmWidget: public ConfigTaskWidget
 {
@@ -96,7 +100,7 @@ private:
         SwashplateServoSettingsStruct oldSwashLvlConfiguration;
         SwashplateServoSettingsStruct newSwashLvlConfiguration;
 
-        ccpmGUISettingsStruct ccpmGUISettings; 
+        GUIConfigDataUnion GUIConfigData; 
     
         int MixerChannelData[6];
         int ShowDisclaimer(int messageID);

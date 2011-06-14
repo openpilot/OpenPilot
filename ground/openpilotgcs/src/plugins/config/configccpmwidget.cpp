@@ -851,13 +851,13 @@ void ConfigccpmWidget::UpdatCCPMUIOptions()
     if (updatingFromHardware) return;
     //get the user options
     //swashplate config
-    ccpmGUISettings.SwasplateType = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
-    ccpmGUISettings.FirstServoIndex = m_ccpm->ccpmSingleServo->currentIndex();
+    GUIConfigData.heli.SwasplateType = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
+    GUIConfigData.heli.FirstServoIndex = m_ccpm->ccpmSingleServo->currentIndex();
     
     //ccpm mixing options
-    ccpmGUISettings.ccpmCollectivePassthroughState = m_ccpm->ccpmCollectivePassthrough->isChecked();
-    ccpmGUISettings.ccpmLinkCyclicState = m_ccpm->ccpmLinkCyclic->isChecked();
-    ccpmGUISettings.ccpmLinkRollState = m_ccpm->ccpmLinkRoll->isChecked();
+    GUIConfigData.heli.ccpmCollectivePassthroughState = m_ccpm->ccpmCollectivePassthrough->isChecked();
+    GUIConfigData.heli.ccpmLinkCyclicState = m_ccpm->ccpmLinkCyclic->isChecked();
+    GUIConfigData.heli.ccpmLinkRollState = m_ccpm->ccpmLinkRoll->isChecked();
     
     
 }
@@ -868,16 +868,16 @@ void ConfigccpmWidget::SetUIComponentVisibilities()
     //set which sliders are user...
     m_ccpm->ccpmRevoMixingBox->setVisible(0);
     
-    m_ccpm->ccpmPitchMixingBox->setVisible(!ccpmGUISettings.ccpmCollectivePassthroughState && ccpmGUISettings.ccpmLinkCyclicState);
-    m_ccpm->ccpmCollectiveScalingBox->setVisible(ccpmGUISettings.ccpmCollectivePassthroughState || !ccpmGUISettings.ccpmLinkCyclicState);
+    m_ccpm->ccpmPitchMixingBox->setVisible(!GUIConfigData.heli.ccpmCollectivePassthroughState && GUIConfigData.heli.ccpmLinkCyclicState);
+    m_ccpm->ccpmCollectiveScalingBox->setVisible(GUIConfigData.heli.ccpmCollectivePassthroughState || !GUIConfigData.heli.ccpmLinkCyclicState);
 
-    m_ccpm->ccpmCollectiveChLabel->setVisible(ccpmGUISettings.ccpmCollectivePassthroughState);
-    m_ccpm->ccpmCollectiveChannel->setVisible(ccpmGUISettings.ccpmCollectivePassthroughState);
+    m_ccpm->ccpmCollectiveChLabel->setVisible(GUIConfigData.heli.ccpmCollectivePassthroughState);
+    m_ccpm->ccpmCollectiveChannel->setVisible(GUIConfigData.heli.ccpmCollectivePassthroughState);
 
-    m_ccpm->ccpmLinkCyclic->setVisible(!ccpmGUISettings.ccpmCollectivePassthroughState);
+    m_ccpm->ccpmLinkCyclic->setVisible(!GUIConfigData.heli.ccpmCollectivePassthroughState);
     
-    m_ccpm->ccpmCyclicScalingBox->setVisible((ccpmGUISettings.ccpmCollectivePassthroughState || !ccpmGUISettings.ccpmLinkCyclicState) && ccpmGUISettings.ccpmLinkRollState);
-    if (!ccpmGUISettings.ccpmCollectivePassthroughState && ccpmGUISettings.ccpmLinkCyclicState)
+    m_ccpm->ccpmCyclicScalingBox->setVisible((GUIConfigData.heli.ccpmCollectivePassthroughState || !GUIConfigData.heli.ccpmLinkCyclicState) && GUIConfigData.heli.ccpmLinkRollState);
+    if (!GUIConfigData.heli.ccpmCollectivePassthroughState && GUIConfigData.heli.ccpmLinkCyclicState)
     {
         m_ccpm->ccpmPitchScalingBox->setVisible(0);
         m_ccpm->ccpmRollScalingBox->setVisible(0);
@@ -886,8 +886,8 @@ void ConfigccpmWidget::SetUIComponentVisibilities()
     }
     else
     {
-        m_ccpm->ccpmPitchScalingBox->setVisible(!ccpmGUISettings.ccpmLinkRollState);
-        m_ccpm->ccpmRollScalingBox->setVisible(!ccpmGUISettings.ccpmLinkRollState);
+        m_ccpm->ccpmPitchScalingBox->setVisible(!GUIConfigData.heli.ccpmLinkRollState);
+        m_ccpm->ccpmRollScalingBox->setVisible(!GUIConfigData.heli.ccpmLinkRollState);
         m_ccpm->ccpmLinkRoll->setVisible(1);
     }
 

@@ -188,7 +188,7 @@ namespace jafar {
 
 			// Fill VNEW_q
 			// VNEW_q = d(R(q)*v) / dq
-			rotate_by_dq(q, v, VNEW_q);
+			rotate_by_dq(q, am-ab, VNEW_q); VNEW_q *= _dt;
 			subrange(_XNEW_x, 7, 10, 3, 7) = VNEW_q;
 			#if AVGSPEED
 			subrange(_XNEW_x, 0, 3, 3, 7) = VNEW_q*_dt/2;

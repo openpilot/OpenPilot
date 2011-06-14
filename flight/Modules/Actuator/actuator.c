@@ -32,6 +32,7 @@
 
 
 #include "openpilot.h"
+#include "accessorydesired.h"
 #include "actuator.h"
 #include "actuatorsettings.h"
 #include "systemsettings.h"
@@ -74,7 +75,6 @@ static int16_t scaleChannel(float value, int16_t max, int16_t min, int16_t neutr
 static void setFailsafe();
 static float MixerCurve(const float throttle, const float* curve);
 static bool set_channel(uint8_t mixer_channel, uint16_t value);
-
 float ProcessMixer(const int index, const float curve1, const float curve2,
 		   MixerSettingsData* mixerSettings, ActuatorDesiredData* desired,
 		   const float period);
@@ -200,7 +200,35 @@ static void actuatorTask(void* parameters)
 		bool spinWhileArmed = MotorsSpinWhileArmed == ACTUATORSETTINGS_MOTORSSPINWHILEARMED_TRUE;
 		
 		float curve1 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve1);
-		float curve2 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve2);
+		//The source for the secondary curve is selectable
+		float curve2 = 0;
+		AccessoryDesiredData accessory;
+		switch(mixerSettings.Curve2Source) {
+			case MIXERSETTINGS_CURVE2SOURCE_THROTTLE:
+				curve2 = MixerCurve(desired.Throttle,mixerSettings.ThrottleCurve2);
+				break;
+			case MIXERSETTINGS_CURVE2SOURCE_ROLL:
+				curve2 = MixerCurve(desired.Roll,mixerSettings.ThrottleCurve2);
+				break;
+			case MIXERSETTINGS_CURVE2SOURCE_PITCH:
+				curve2 = MixerCurve(desired.Pitch,mixerSettings.ThrottleCurve2);
+				break;
+			case MIXERSETTINGS_CURVE2SOURCE_YAW:
+				curve2 = MixerCurve(desired.Yaw,mixerSettings.ThrottleCurve2);
+				break;
+			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY0:
+			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY1:
+			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY2:
+			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY3:
+			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY4:
+			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY5:
+				if(AccessoryDesiredInstGet(mixerSettings.Curve2Source - MIXERSETTINGS_CURVE2SOURCE_ACCESSORY0,&accessory) == 0)
+					curve2 = MixerCurve(accessory.AccessoryVal,mixerSettings.ThrottleCurve2);
+				else 
+					curve2 = 0;				
+				break;
+		}
+		
 		for(int ct=0; ct < MAX_MIX_ACTUATORS; ct++)
 		{
 			if(mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_DISABLED) {
@@ -228,7 +256,22 @@ static void actuatorTask(void* parameters)
 					 (status[ct] < 0) )
 					status[ct] = 0;					
 			}
-
+			
+			// If an accessory channel is selected for direct bypass mode
+			// In this configuration the accessory channel is scaled and mapped
+			// directly to output.  Note: THERE IS NO SAFETY CHECK HERE FOR ARMING
+			// these also will not be updated in failsafe mode.  I'm not sure what 
+			// the correct behavior is since it seems domain specific.  I don't love
+			// this code
+			if( (mixers[ct].type >= MIXERSETTINGS_MIXER1TYPE_ACCESSORY0) && 
+			   (mixers[ct].type <= MIXERSETTINGS_MIXER1TYPE_ACCESSORY2))
+			{
+				if(AccessoryDesiredInstGet(mixers[ct].type - MIXERSETTINGS_MIXER1TYPE_ACCESSORY0,&accessory) == 0)
+					status[ct] = accessory.AccessoryVal;
+				else
+					status[ct] = -1;
+			}
+			
 			command.Channel[ct] = scaleChannel(status[ct],
 							   ChannelMax[ct],
 							   ChannelMin[ct],
@@ -451,8 +494,6 @@ static void actuator_update_rate(UAVObjEvent * ev)
 		PIOS_Servo_SetHz(&ChannelUpdateFreq[0], ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM);
 	}
 }
-
-
 
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
 static bool set_channel(uint8_t mixer_channel, uint16_t value) {

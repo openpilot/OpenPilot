@@ -46,6 +46,7 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     SwashLvlConfigurationInProgress=0;
     SwashLvlState=0;
     SwashLvlServoInterlock=0;
+    updatingFromHardware=FALSE;
 
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
     //ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -241,9 +242,9 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_ccpm->SwashLvlCancelButton, SIGNAL(clicked()), this, SLOT(SwashLvlCancelButtonPressed()));
     connect(m_ccpm->SwashLvlFinishButton, SIGNAL(clicked()), this, SLOT(SwashLvlFinishButtonPressed()));
 
-    connect(m_ccpm->ccpmCollectivePassthrough, SIGNAL(clicked()), this, SLOT(UpdatCCPMUIOptions()));
-    connect(m_ccpm->ccpmLinkCyclic, SIGNAL(clicked()), this, SLOT(UpdatCCPMUIOptions()));
-    connect(m_ccpm->ccpmLinkRoll, SIGNAL(clicked()), this, SLOT(UpdatCCPMUIOptions()));
+    connect(m_ccpm->ccpmCollectivePassthrough, SIGNAL(clicked()), this, SLOT(SetUIComponentVisibilities()));
+    connect(m_ccpm->ccpmLinkCyclic, SIGNAL(clicked()), this, SLOT(SetUIComponentVisibilities()));
+    connect(m_ccpm->ccpmLinkRoll, SIGNAL(clicked()), this, SLOT(SetUIComponentVisibilities()));
 
 
     
@@ -264,6 +265,7 @@ void ConfigccpmWidget::UpdateType()
     double AdjustmentAngle=0;
 
     UpdatCCPMUIOptions();
+    SetUIComponentVisibilities();
     
     TypeInt = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
     TypeText = m_ccpm->ccpmType->currentText();
@@ -846,28 +848,36 @@ void ConfigccpmWidget::UpdateMixer()
  */
 void ConfigccpmWidget::UpdatCCPMUIOptions()
 {
-    int ccpmCollectivePassthroughState;
-    int ccpmLinkCyclicState;
-    int ccpmLinkRollState;
-    
+    if (updatingFromHardware) return;
     //get the user options
-    ccpmCollectivePassthroughState=m_ccpm->ccpmCollectivePassthrough->isChecked();
-    ccpmLinkCyclicState=m_ccpm->ccpmLinkCyclic->isChecked();
-    ccpmLinkRollState=m_ccpm->ccpmLinkRoll->isChecked();
+    //swashplate config
+    ccpmGUISettings.SwasplateType = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
+    ccpmGUISettings.FirstServoIndex = m_ccpm->ccpmSingleServo->currentIndex();
     
+    //ccpm mixing options
+    ccpmGUISettings.ccpmCollectivePassthroughState = m_ccpm->ccpmCollectivePassthrough->isChecked();
+    ccpmGUISettings.ccpmLinkCyclicState = m_ccpm->ccpmLinkCyclic->isChecked();
+    ccpmGUISettings.ccpmLinkRollState = m_ccpm->ccpmLinkRoll->isChecked();
+    
+    
+}
+
+void ConfigccpmWidget::SetUIComponentVisibilities()
+{
+    UpdatCCPMUIOptions();
     //set which sliders are user...
     m_ccpm->ccpmRevoMixingBox->setVisible(0);
     
-    m_ccpm->ccpmPitchMixingBox->setVisible(!ccpmCollectivePassthroughState&&ccpmLinkCyclicState);
-    m_ccpm->ccpmCollectiveScalingBox->setVisible(ccpmCollectivePassthroughState||!ccpmLinkCyclicState);
+    m_ccpm->ccpmPitchMixingBox->setVisible(!ccpmGUISettings.ccpmCollectivePassthroughState && ccpmGUISettings.ccpmLinkCyclicState);
+    m_ccpm->ccpmCollectiveScalingBox->setVisible(ccpmGUISettings.ccpmCollectivePassthroughState || !ccpmGUISettings.ccpmLinkCyclicState);
 
-    m_ccpm->ccpmCollectiveChLabel->setVisible(ccpmCollectivePassthroughState);
-    m_ccpm->ccpmCollectiveChannel->setVisible(ccpmCollectivePassthroughState);
+    m_ccpm->ccpmCollectiveChLabel->setVisible(ccpmGUISettings.ccpmCollectivePassthroughState);
+    m_ccpm->ccpmCollectiveChannel->setVisible(ccpmGUISettings.ccpmCollectivePassthroughState);
 
-    m_ccpm->ccpmLinkCyclic->setVisible(!ccpmCollectivePassthroughState);
+    m_ccpm->ccpmLinkCyclic->setVisible(!ccpmGUISettings.ccpmCollectivePassthroughState);
     
-    m_ccpm->ccpmCyclicScalingBox->setVisible((ccpmCollectivePassthroughState||!ccpmLinkCyclicState)&&ccpmLinkRollState);
-    if (!ccpmCollectivePassthroughState&&ccpmLinkCyclicState)
+    m_ccpm->ccpmCyclicScalingBox->setVisible((ccpmGUISettings.ccpmCollectivePassthroughState || !ccpmGUISettings.ccpmLinkCyclicState) && ccpmGUISettings.ccpmLinkRollState);
+    if (!ccpmGUISettings.ccpmCollectivePassthroughState && ccpmGUISettings.ccpmLinkCyclicState)
     {
         m_ccpm->ccpmPitchScalingBox->setVisible(0);
         m_ccpm->ccpmRollScalingBox->setVisible(0);
@@ -876,8 +886,8 @@ void ConfigccpmWidget::UpdatCCPMUIOptions()
     }
     else
     {
-        m_ccpm->ccpmPitchScalingBox->setVisible(!ccpmLinkRollState);
-        m_ccpm->ccpmRollScalingBox->setVisible(!ccpmLinkRollState);
+        m_ccpm->ccpmPitchScalingBox->setVisible(!ccpmGUISettings.ccpmLinkRollState);
+        m_ccpm->ccpmRollScalingBox->setVisible(!ccpmGUISettings.ccpmLinkRollState);
         m_ccpm->ccpmLinkRoll->setVisible(1);
     }
 
@@ -898,7 +908,8 @@ void ConfigccpmWidget::requestccpmUpdate()
     int isCCPM=0;
 
     if (SwashLvlConfigurationInProgress)return;
-
+    updatingFromHardware=TRUE;
+    
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     int i,j;
@@ -1151,6 +1162,7 @@ void ConfigccpmWidget::requestccpmUpdate()
 
 
 
+    updatingFromHardware=FALSE;
 
     ccpmSwashplateUpdate();
 

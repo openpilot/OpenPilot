@@ -49,6 +49,20 @@ typedef struct {
     int Min[CCPM_MAX_SWASH_SERVOS];
 } SwashplateServoSettingsStruct;
 
+typedef struct {
+    uint SwasplateType:3;
+    uint FirstServoIndex:2;
+    uint CorrectionAngle:9;
+    uint ccpmCollectivePassthroughState:1;
+    uint ccpmLinkCyclicState:1;
+    uint ccpmLinkRollState:1;
+    uint CollectiveChannel:3;
+    uint padding:12;
+    uint padding2:32;
+} __attribute__((packed))  ccpmGUISettingsStruct;
+
+
+
 class ConfigccpmWidget: public ConfigTaskWidget
 {
     Q_OBJECT
@@ -82,10 +96,13 @@ private:
         SwashplateServoSettingsStruct oldSwashLvlConfiguration;
         SwashplateServoSettingsStruct newSwashLvlConfiguration;
 
-
+        ccpmGUISettingsStruct ccpmGUISettings; 
+    
         int MixerChannelData[6];
         int ShowDisclaimer(int messageID);
         virtual void enableControls(bool enable) { Q_UNUSED(enable)}; // Not used by this widget
+    
+        bool updatingFromHardware;
 
     private slots:
         void ccpmSwashplateUpdate();
@@ -105,6 +122,7 @@ private:
         void SwashLvlFinishButtonPressed();
 
         void UpdatCCPMUIOptions();
+        void SetUIComponentVisibilities();
 
         void enableSwashplateLevellingControl(bool state);
         void setSwashplateLevel(int percent);

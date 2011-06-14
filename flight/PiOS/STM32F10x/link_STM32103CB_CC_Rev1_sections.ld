@@ -1,5 +1,7 @@
-/* This is the size of the stack for early init and for all FreeRTOS IRQs */
+/* This is the size of the stack for all FreeRTOS IRQs */
 _irq_stack_size = 0x180;
+/* This is the size of the stack for early init: life span is until scheduler starts */
+_init_stack_size = 0x80;
 
 /* Stub out these functions since we don't use them anyway */
 PROVIDE (   vPortSVCHandler = 0 ) ;
@@ -86,11 +88,17 @@ SECTIONS
     .heap (NOLOAD) :
     {
         _sheap = . ;
+        _sheap_pre_rtos = . ;
         *(.heap)
         . = ALIGN(4);
         _eheap = . ;
+        _eheap_pre_rtos = . ;
+        _init_stack_end = . ; 
+        _sheap_post_rtos = . ;
+        . = . + _init_stack_size ;
+        . = ALIGN(4);
+        _eheap_post_rtos = . ;
         _init_stack_top = . - 4 ;
-         . = ALIGN(4);
     } > SRAM
 
     . = ALIGN(4);

@@ -33,6 +33,8 @@
 
 .global  g_pfnVectors
 .global  Default_Handler
+.global  vTaskStartScheduler
+.global  xPortIncreaseHeapSize
 
 /* start address for the initialization values of the .data section. 
 defined in linker script */
@@ -124,6 +126,19 @@ LoopFillZerobss:
   bcc  FillZerobss
 /* Call the application's entry point.*/
   bl  main
+/* Switches stack back momentarily to MSP */
+  add r0, #0
+  msr control, r0
+/* add heap_post_rtos to the heap (if the capability/function exist) */
+  ldr r0, = _init_stack_size
+  bl xPortIncreaseHeapSize
+/* Start the FreeRTOS scheduler which never returns.*/
+  bl vTaskStartScheduler
+/* If all is well we will never reach here as the scheduler will now be running. */
+/* If we do get here, it will most likely be because we ran out of heap space. */
+/* let the Memory manager handler figure it out (at least for now, it will make it more obvious */
+  bl  MemManage_Handler
+/* will never return here for now until mem manager give up */
   bx  lr
 .size  Reset_Handler, .-Reset_Handler
 

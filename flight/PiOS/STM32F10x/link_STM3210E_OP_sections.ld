@@ -1,5 +1,7 @@
 /* This is the size of the stack for early init and for all FreeRTOS IRQs */
 _irq_stack_size = 0x400;
+/* This is the size of the stack for early init: life span is until scheduler starts */
+_init_stack_size = 0x400;
 
 /* Check valid alignment for VTOR */
 ASSERT(ORIGIN(FLASH) == ALIGN(ORIGIN(FLASH), 0x80), "Start of memory region flash not aligned for startup vector table");
@@ -264,11 +266,17 @@ SECTIONS
     .heap (NOLOAD) :
     {
         _sheap = . ;
+        _sheap_pre_rtos = . ;
         *(.heap)
         . = ALIGN(4);
         _eheap = . ;
+        _eheap_pre_rtos = . ;
+        _init_stack_end = . ; 
+        _sheap_post_rtos = . ;
+        . = . + _init_stack_size ;
+        . = ALIGN(4);
+        _eheap_post_rtos = . ;
         _init_stack_top = . - 4 ;
-         . = ALIGN(4);
     } > RAM
     
     PROVIDE ( end = _ebss );

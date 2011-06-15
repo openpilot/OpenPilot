@@ -168,7 +168,7 @@ Infinite_Loop:
     
     
 g_pfnVectors:
-  .word  _irq_stack_top /*_irq_stack_top */
+  .word  _irq_stack_top
   .word  Reset_Handler
   .word  NMI_Handler
   .word  HardFault_Handler

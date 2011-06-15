@@ -36,6 +36,8 @@
 .global  g_pfnVectors
 .global  SystemInit_ExtMemCtl_Dummy
 .global  Default_Handler
+.global  vTaskStartScheduler
+.global  xPortIncreaseHeapSize
 
 /* start address for the initialization values of the .data section. 
 defined in linker script */
@@ -71,7 +73,6 @@ Reset_Handler:
 /* restore original stack pointer */  
   LDR r0, =_irq_stack_top
   MSR msp, r0
-
   LDR r0, =_init_stack_top
   MSR psp, r0
 /* DO
@@ -94,7 +95,6 @@ LoopFillIRQStack:
   ldr  r3, = _irq_stack_top
   cmp  r2, r3
   bcc  FillIRQStack
-
 /* Copy the data segment initializers from flash to SRAM */  
   movs  r1, #0
   b  LoopCopyDataInit
@@ -124,7 +124,20 @@ LoopFillZerobss:
   bcc  FillZerobss
 /* Call the application's entry point.*/
   bl  main
-  bx  lr    
+/* Switches stack back momentarily to MSP */
+  add r0, #0
+  msr control, r0
+/* add heap_post_rtos to the heap (if the capability/function exist) */
+  ldr r0, = _init_stack_size
+  bl xPortIncreaseHeapSize
+/* Start the FreeRTOS scheduler which never returns.*/
+  bl vTaskStartScheduler
+/* If all is well we will never reach here as the scheduler will now be running. */
+/* If we do get here, it will most likely be because we ran out of heap space. */
+/* let the Memory manager handler figure it out (at least for now, it will make it more obvious */
+  bl  MemManage_Handler
+/* will never return here for now until mem manager give up */
+  bx  lr
 .size  Reset_Handler, .-Reset_Handler
 
 /**
@@ -296,13 +309,13 @@ g_pfnVectors:
     
   .weak  NMI_Handler
   .thumb_set NMI_Handler,Default_Handler
-  
+
   .weak  HardFault_Handler
   .thumb_set HardFault_Handler,Default_Handler
-  
+
   .weak  MemManage_Handler
   .thumb_set MemManage_Handler,Default_Handler
-  
+
   .weak  BusFault_Handler
   .thumb_set BusFault_Handler,Default_Handler
 

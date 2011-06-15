@@ -88,7 +88,14 @@ int main()
 	/* Initialize the system thread */
 	SystemModInitialize();
 
-	/* Start the FreeRTOS scheduler */
+	/* only do this for posix and win32 since the caller will take care
+	 * of starting the scheduler and increase the heap and swith back to
+	 * MSP stack. (all arch specific is hidden from here and take care by reset handler)
+	 * LED blinking in case of scheduler returning back should be handled in NMI or other
+	 * appropriate handlers like mem manager.
+	 */
+#if defined(ARCH_POSIX) || defined(ARCH_WIN32)
+	/* Start the FreeRTOS scheduler which never returns.*/
 	vTaskStartScheduler();
 
 	/* If all is well we will never reach here as the scheduler will now be running. */
@@ -100,7 +107,7 @@ int main()
 		PIOS_LED_Toggle(LED2);
 		PIOS_DELAY_WaitmS(100);
 	}
-
+#endif
 	return 0;
 }
 

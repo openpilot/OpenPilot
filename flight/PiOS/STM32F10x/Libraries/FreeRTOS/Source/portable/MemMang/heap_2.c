@@ -101,6 +101,7 @@ static xBlockLink xStart, xEnd;
 /* Keeps track of the number of free bytes remaining, but says nothing about
 fragmentation. */
 static size_t xFreeBytesRemaining = configTOTAL_HEAP_SIZE;
+static size_t currentTOTAL_HEAP_SISE = configTOTAL_HEAP_SIZE;
 
 /* STATIC FUNCTIONS ARE DEFINED AS MACROS TO MINIMIZE THE FUNCTION CALL DEPTH. */
 
@@ -140,13 +141,13 @@ xBlockLink *pxFirstFreeBlock;														\
 	xStart.xBlockSize = ( size_t ) 0;												\
 																					\
 	/* xEnd is used to mark the end of the list of free blocks. */					\
-	xEnd.xBlockSize = configTOTAL_HEAP_SIZE;										\
+	xEnd.xBlockSize = currentTOTAL_HEAP_SISE;										\
 	xEnd.pxNextFreeBlock = NULL;													\
 																					\
 	/* To start with there is a single free block that is sized to take up the		\
 	entire heap space. */															\
 	pxFirstFreeBlock = ( void * ) xHeap.ucHeap;										\
-	pxFirstFreeBlock->xBlockSize = configTOTAL_HEAP_SIZE;							\
+	pxFirstFreeBlock->xBlockSize = currentTOTAL_HEAP_SISE;							\
 	pxFirstFreeBlock->pxNextFreeBlock = &xEnd;										\
 }
 /*-----------------------------------------------------------*/
@@ -181,7 +182,7 @@ void *pvReturn = NULL;
 			}
 		}
 
-		if( ( xWantedSize > 0 ) && ( xWantedSize < configTOTAL_HEAP_SIZE ) )
+		if( ( xWantedSize > 0 ) && ( xWantedSize < currentTOTAL_HEAP_SISE ) )
 		{
 			/* Blocks are stored in byte order - traverse the list from the start
 			(smallest) block until one of adequate size is found. */
@@ -276,3 +277,13 @@ void vPortInitialiseBlocks( void )
 {
 	/* This just exists to keep the linker quiet. */
 }
+
+void xPortIncreaseHeapSize( size_t bytes )
+{
+	vTaskSuspendAll();
+	currentTOTAL_HEAP_SISE = configTOTAL_HEAP_SIZE + bytes;
+	xEnd.xBlockSize = currentTOTAL_HEAP_SISE;
+	xFreeBytesRemaining += bytes;
+	xTaskResumeAll();
+}
+/*-----------------------------------------------------------*/

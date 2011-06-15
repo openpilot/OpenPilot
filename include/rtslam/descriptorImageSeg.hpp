@@ -9,6 +9,8 @@
 #ifndef DESCRIPTORIMAGESEG_H_
 #define DESCRIPTORIMAGESEG_H_
 
+#ifdef HAVE_MODULE_DSEG
+
 #include "boost/shared_ptr.hpp"
 
 //#include "rtslam/rtSlam.hpp"
@@ -155,5 +157,8 @@ namespace jafar {
 
    }
 }
+
+#endif /* HAVE_MODULE_DSEG */
+
 #endif /* DESCRIPTORIMAGESEG_H_ */
 

@@ -44,11 +44,13 @@ namespace jafar {
 			}
 		}
 
-      /**
-       *
-       *  AppearanceImageSegment
-       *
-      **/
+		
+#ifdef HAVE_MODULE_DSEG
+		/**
+		 *
+		 *  AppearanceImageSegment
+		 *
+		**/
 
 		AppearanceImageSegment::AppearanceImageSegment(const image::Image& patch, Gaussian const &offsetTop, 
 			Gaussian const& offsetBottom, dseg::SegmentHypothesis* _hypothesis):
@@ -70,6 +72,9 @@ namespace jafar {
 			app->offsetTop = offsetTop;
 			app->offsetBottom = offsetBottom;
 			return app;
-      }
+		}
+		
+#endif
+
 	}
 }

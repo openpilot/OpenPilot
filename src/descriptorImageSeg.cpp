@@ -5,6 +5,8 @@
  *      Author: bhautboi@laas.fr
  */
 
+#ifdef HAVE_MODULE_DSEG
+
 #include "jmath/ublasExtra.hpp"
 #include "jmath/angle.hpp"
 
@@ -414,3 +416,5 @@ app_dst->patch.save(buffer);
 
    }
 }
+
+#endif /* HAVE_MODULE_DSEG */

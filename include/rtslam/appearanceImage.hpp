@@ -104,11 +104,13 @@ namespace jafar {
 					return ret;
 				}
       };
+			
+#endif //HAVE_MODULE_DSEG
+
 	}
 
 }
 
-#endif //HAVE_MODULE_DSEG
 
 #endif // #ifndef __AppearenceImageSimu_H__
 /*

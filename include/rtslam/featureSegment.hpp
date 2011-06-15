@@ -27,6 +27,8 @@
 #ifndef __FeatureSEGMENT_H__
 #define __FeatureSEGMENT_H__
 
+#ifdef HAVE_MODULE_DSEG
+
 #include "rtslam/featureAbstract.hpp"
 #include "rtslam/appearanceImage.hpp"
 #include "rtslam/appearanceSegment.hpp"
@@ -72,6 +74,8 @@ namespace jafar {
    }
 
 }
+
+#endif /* HAVE_MODULE_DSEG */
 
 #endif // #ifndef __FeatureSEGMENT_H__
 /*

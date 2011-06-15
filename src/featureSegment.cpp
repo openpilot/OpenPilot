@@ -12,6 +12,8 @@
  * \ingroup rtslam
  */
 
+#ifdef HAVE_MODULE_DSEG
+
 #include "rtslam/featureSegment.hpp"
 
 namespace jafar {
@@ -37,3 +39,4 @@ namespace jafar {
    }
 }
 
+#endif /* HAVE_MODULE_DSEG */

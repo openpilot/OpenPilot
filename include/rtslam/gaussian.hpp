@@ -397,7 +397,7 @@ namespace jafar {
 				 * For local storage, the mean and covariance data is shown.
 				 * For remote storage, the size of the remote Gaussian is also shown, and the indirect array too.
 				 */
-				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::Gaussian const & g_) {
+				friend std::ostream& operator <<(std::ostream & s, Gaussian const & g_) {
 
 					if (g_.storage() == LOCAL) {
 						if (g_.hasNullCov()) {

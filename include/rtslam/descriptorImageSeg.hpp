@@ -60,7 +60,7 @@ namespace jafar {
        * the first time it was viewed.
        * In addition it only uses scale and rotation for predicting appearance.
        */
-      class DescriptorImageSegFirstView: public jafar::rtslam::DescriptorAbstract {
+      class DescriptorImageSegFirstView: public DescriptorAbstract {
          protected:
             ImgSegFeatureView view;
          protected:
@@ -100,7 +100,7 @@ namespace jafar {
        * different points of view.
        * it can use an homography to predict the appearance
        */
-      class DescriptorImageSegMultiView: public jafar::rtslam::DescriptorAbstract
+      class DescriptorImageSegMultiView: public DescriptorAbstract
       {
          public:
             typedef std::vector<ImgSegFeatureView> ImgSegFeatureViewList; ///< a ImgSegFeatureView list

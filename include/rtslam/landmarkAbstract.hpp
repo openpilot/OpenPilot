@@ -29,7 +29,7 @@ namespace jafar {
 
 		// Forward declarations of children
 		class ObservationAbstract;
-		class MapManagerAbstract;
+//		class MapManagerAbstract;
 
 
 		/** Base class for all landmarks defined in the module
@@ -40,8 +40,8 @@ namespace jafar {
 		class LandmarkAbstract: public MapObject, public ChildOf<MapManagerAbstract> , public boost::enable_shared_from_this<
 		    LandmarkAbstract>, public ParentOf<ObservationAbstract> {
 
-				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::LandmarkAbstract const & obs);
-				friend image::oimstream& operator <<(image::oimstream & s, jafar::rtslam::LandmarkAbstract const & lmk);
+				friend std::ostream& operator <<(std::ostream & s, LandmarkAbstract const & obs);
+				friend image::oimstream& operator <<(image::oimstream & s, LandmarkAbstract const & lmk);
 				
 				// define the function linkToParentMapManager().
 		       ENABLE_LINK_TO_PARENT(MapManagerAbstract,MapManager,LandmarkAbstract)

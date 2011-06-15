@@ -33,7 +33,7 @@ namespace jafar {
 		 * Operator << for class rawAbstract.
 		 * It shows some informations
 		 */
-		std::ostream& operator <<(std::ostream & s, jafar::rtslam::RawImage const & rawIS) {
+		std::ostream& operator <<(std::ostream & s, RawImage const & rawIS) {
 			s << " I am a raw-data image structure" << endl;
 			return s;
 		}

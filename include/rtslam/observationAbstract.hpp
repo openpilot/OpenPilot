@@ -121,8 +121,8 @@ namespace jafar {
 		    public boost::enable_shared_from_this<ObservationAbstract>,
 		    public ChildOf<DataManagerAbstract> {
 
-				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObservationAbstract const & obs);
-				friend image::oimstream& operator <<(image::oimstream & s, jafar::rtslam::ObservationAbstract const & obs);
+				friend std::ostream& operator <<(std::ostream & s, ObservationAbstract const & obs);
+				friend image::oimstream& operator <<(image::oimstream & s, ObservationAbstract const & obs);
 
 				// define the function linkToParentLandmark().
 				ENABLE_LINK_TO_PARENT(LandmarkAbstract,Landmark,ObservationAbstract)

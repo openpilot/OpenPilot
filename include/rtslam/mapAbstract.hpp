@@ -60,7 +60,7 @@ namespace jafar {
 				 * - landmarks
 				 *   - observations of landmark from each sensor
 				 */
-				friend std::ostream& operator <<(std::ostream & s, jafar::rtslam::MapAbstract const & map);
+				friend std::ostream& operator <<(std::ostream & s, MapAbstract const & map);
 
 			public:
 

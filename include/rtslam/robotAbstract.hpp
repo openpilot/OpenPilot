@@ -46,7 +46,7 @@ namespace jafar {
 		class RobotAbstract: public MapObject, public ChildOf<MapAbstract> , public boost::enable_shared_from_this<
 		    RobotAbstract>, public ParentOf<SensorAbstract>, public kernel::DataLoggable {
 
-				friend ostream& operator <<(ostream & s, jafar::rtslam::RobotAbstract const & rob);
+				friend ostream& operator <<(ostream & s, RobotAbstract const & rob);
 
 			public:
 

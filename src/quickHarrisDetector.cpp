@@ -15,7 +15,7 @@ namespace jafar {
 		using namespace std;
 		using namespace image;
 
-		jafar::rtslam::QuickHarrisDetector::QuickHarrisDetector(
+		QuickHarrisDetector::QuickHarrisDetector(
 		    int convolutionBoxSize, float threshold, float edge
 #if GAUSSIAN_MASK_APPROX
 		    , int convolutionGaussianApproxCoeffsNumber
@@ -127,7 +127,7 @@ namespace jafar {
 			return success;
 		}
 
-		void jafar::rtslam::QuickHarrisDetector::quickDerivatives(
+		void QuickHarrisDetector::quickDerivatives(
 		    const jafar::image::Image & image, image::ConvexRoi & roi) {
 			const uchar* pix_center;
 			const uchar* pix_right;
@@ -214,7 +214,7 @@ namespace jafar {
 		}
 
 
-		bool jafar::rtslam::QuickHarrisDetector::quickConvolutionWithBestPoint(
+		bool QuickHarrisDetector::quickConvolutionWithBestPoint(
 		    const image::ConvexRoi & roi, int pixMax[2], float & scoreMax) {
 			
 			int shift_derv = 1;
@@ -382,7 +382,7 @@ std::cout << "  high " << int_upLeft->im_high_curv << " "  << " low " << int_upL
 
 		}
 
-		void jafar::rtslam::QuickHarrisDetector::writeHarrisImagesAsPPM(image::ConvexRoi & roi) {
+		void QuickHarrisDetector::writeHarrisImagesAsPPM(image::ConvexRoi & roi) {
 			FILE *pFile_x = fopen("/home/jsola/im_x.ppm", "w");
 			FILE *pFile_y = fopen("/home/jsola/im_y.ppm", "w");
 			FILE *pFile_xx = fopen("/home/jsola/im_xx.ppm", "w");

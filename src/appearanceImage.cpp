@@ -50,20 +50,21 @@ namespace jafar {
        *
       **/
 
-		AppearanceImageSegment::AppearanceImageSegment(const image::Image& patch, Gaussian const &offsetTop, Gaussian const& offsetBottom, dseg::SegmentHypothesis* _hypothesis):
+		AppearanceImageSegment::AppearanceImageSegment(const image::Image& patch, Gaussian const &offsetTop, 
+			Gaussian const& offsetBottom, dseg::SegmentHypothesis* _hypothesis):
 			offsetTop(offsetTop), offsetBottom(offsetBottom)
-      {
-         patch.copyTo(this->patch);
+		{
+			patch.copyTo(this->patch);
 			if(_hypothesis != NULL)m_hypothesis.addSegment(_hypothesis);
 		}
 
-      AppearanceImageSegment::~AppearanceImageSegment() {
-      }
+		AppearanceImageSegment::~AppearanceImageSegment() {
+		}
 
-      AppearanceAbstract* AppearanceImageSegment::clone()
-      {
+		AppearanceAbstract* AppearanceImageSegment::clone()
+		{
 			AppearanceImageSegment* app = new AppearanceImageSegment(patch.width(), patch.height(), patch.depth(), hypothesis());
-         patch.copy(app->patch,0,0,0,0);
+			patch.copy(app->patch,0,0,0,0);
 			app->patchMeanLeft = patchMeanLeft;
 			app->patchMeanRight = patchMeanRight;
 			app->offsetTop = offsetTop;

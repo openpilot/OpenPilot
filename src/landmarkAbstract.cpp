@@ -18,7 +18,7 @@ namespace jafar {
 
 		IdFactory LandmarkAbstract::landmarkIds = IdFactory();
 
-		std::ostream& operator <<(std::ostream & s, jafar::rtslam::LandmarkAbstract const & lmk) {
+		std::ostream& operator <<(std::ostream & s, LandmarkAbstract const & lmk) {
 			s << "LANDMARK " << lmk.id() << ": of " << lmk.typeName() << endl;
 			s << " .state:  " << lmk.state << endl;
          DescriptorAbstract *desc = lmk.descriptorPtr.get();
@@ -29,7 +29,7 @@ namespace jafar {
          return s;
 		}
 		
-		image::oimstream& operator <<(image::oimstream & s, jafar::rtslam::LandmarkAbstract const & lmk) {
+		image::oimstream& operator <<(image::oimstream & s, LandmarkAbstract const & lmk) {
 			DescriptorAbstract *desc = lmk.descriptorPtr.get();
 			s << *desc;
 			return s;

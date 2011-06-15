@@ -19,7 +19,7 @@ namespace jafar {
 		 * Operator << for class ObjectAbstract.
 		 * It shows different information of the object.
 		 */
-		std::ostream& operator <<(std::ostream & s, jafar::rtslam::ObjectAbstract const & obj) {
+		std::ostream& operator <<(std::ostream & s, ObjectAbstract const & obj) {
 			s << obj.categoryName() << " " << obj.id() << ": ";
 			if (obj.name().size() > 0)
 				s << obj.name() << ", ";

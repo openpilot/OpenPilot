@@ -9,6 +9,9 @@ build_jafar_module(gdhe
   #OPTIONAL_EXTLIBS 
   #CXXFLAGS
   #CPPFLAGS_MODULE -Wno-long-long -pedantic -pedantic-errors
+#  ROBOTPKG_CATEGORY graphics
+  ROBOTPKG_CATEGORY wip
+  SHORT_DESCRIPTION "Jafar module to talk to a gdhe server in c++"
 )
 # $Id$ #
 

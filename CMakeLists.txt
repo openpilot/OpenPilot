@@ -17,4 +17,9 @@ build_jafar_module(rtslam
 
 #  CXXFLAGS -g -ggdb -O0 -Wall
 #  CXXFLAGS -O2 -g -DJFR_NDEBUG -DNDEBUG -DBOOST_UBLAS_NDEBUG -Wall -pthread
+
+#  ROBOTPKG_CATEGORY localization
+  ROBOTPKG_CATEGORY wip
+  SHORT_DESCRIPTION "Jafar module to do fast and generic EKF Slam."
+
 )

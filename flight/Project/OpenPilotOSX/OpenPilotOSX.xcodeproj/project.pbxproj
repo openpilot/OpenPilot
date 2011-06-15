@@ -2687,6 +2687,8 @@
 		65C35EA812F0A834004811C2 /* eventdispatcher.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = eventdispatcher.c; sourceTree = "<group>"; };
 		65C35F6612F0DC2D004811C2 /* attitude.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = attitude.c; sourceTree = "<group>"; };
 		65C35F6812F0DC2D004811C2 /* attitude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = attitude.h; sourceTree = "<group>"; };
+		65C9903C13A871B90082BD60 /* camerastab.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = camerastab.c; sourceTree = "<group>"; };
+		65C9903E13A871B90082BD60 /* camerastab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = camerastab.h; sourceTree = "<group>"; };
 		65D2CA841248F9A400B1E7D6 /* mixersettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixersettings.xml; sourceTree = "<group>"; };
 		65D2CA851248F9A400B1E7D6 /* mixerstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixerstatus.xml; sourceTree = "<group>"; };
 		65E410AE12F65AEA00725888 /* attitudesettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = attitudesettings.xml; sourceTree = "<group>"; };
@@ -3205,6 +3207,7 @@
 				650D8E2812DFE16400D05CC9 /* Altitude */,
 				65C35F6512F0DC2D004811C2 /* Attitude */,
 				650D8E2E12DFE16400D05CC9 /* Battery */,
+				65C9903B13A871B90082BD60 /* CameraStab */,
 				650D8E3212DFE16400D05CC9 /* Example */,
 				650D8E3B12DFE16400D05CC9 /* FirmwareIAP */,
 				650D8E3F12DFE16400D05CC9 /* FlightPlan */,
@@ -7494,6 +7497,23 @@
 			isa = PBXGroup;
 			children = (
 				65C35F6812F0DC2D004811C2 /* attitude.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		65C9903B13A871B90082BD60 /* CameraStab */ = {
+			isa = PBXGroup;
+			children = (
+				65C9903C13A871B90082BD60 /* camerastab.c */,
+				65C9903D13A871B90082BD60 /* inc */,
+			);
+			path = CameraStab;
+			sourceTree = "<group>";
+		};
+		65C9903D13A871B90082BD60 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65C9903E13A871B90082BD60 /* camerastab.h */,
 			);
 			path = inc;
 			sourceTree = "<group>";

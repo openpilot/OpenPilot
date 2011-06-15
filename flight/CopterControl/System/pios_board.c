@@ -204,9 +204,9 @@ void PIOS_ADC_handler() {
  * Telemetry USART
  */
 void PIOS_USART_telem_irq_handler(void);
-void USART1_IRQHandler() __attribute__ ((alias ("PIOS_USART_telem_irq_handler")));
+void PIOS_IRQH_TELEMETRY() __attribute__ ((alias ("PIOS_USART_telem_irq_handler")));
 const struct pios_usart_cfg pios_usart_telem_cfg = {
-  .regs  = USART1,
+  .regs  = PIOS_USART_TELEMETRY,
   .init = {
     #if defined (PIOS_COM_TELEM_BAUDRATE)
         .USART_BaudRate        = PIOS_COM_TELEM_BAUDRATE,
@@ -222,24 +222,24 @@ const struct pios_usart_cfg pios_usart_telem_cfg = {
   .irq = {
     .handler = PIOS_USART_telem_irq_handler,
     .init    = {
-      .NVIC_IRQChannel                   = USART1_IRQn,
+      .NVIC_IRQChannel                   = PIOS_IRQC_TELEMETRY,
       .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
       .NVIC_IRQChannelSubPriority        = 0,
       .NVIC_IRQChannelCmd                = ENABLE,
     },
   },
   .rx   = {
-    .gpio = GPIOA,
+    .gpio = PIOS_GPIO_TELEMETRY,
     .init = {
-      .GPIO_Pin   = GPIO_Pin_10,
+      .GPIO_Pin   = PIOS_RXIO_TELEMETRY,
       .GPIO_Speed = GPIO_Speed_2MHz,
       .GPIO_Mode  = GPIO_Mode_IPU,
     },
   },
   .tx   = {
-    .gpio = GPIOA,
+    .gpio = PIOS_GPIO_TELEMETRY,
     .init = {
-      .GPIO_Pin   = GPIO_Pin_9,
+      .GPIO_Pin   = PIOS_TXIO_TELEMETRY,
       .GPIO_Speed = GPIO_Speed_2MHz,
       .GPIO_Mode  = GPIO_Mode_AF_PP,
     },
@@ -251,9 +251,9 @@ const struct pios_usart_cfg pios_usart_telem_cfg = {
  * GPS USART
  */
 void PIOS_USART_gps_irq_handler(void);
-void USART3_IRQHandler() __attribute__ ((alias ("PIOS_USART_gps_irq_handler")));
+void PIOS_IRQH_GPS() __attribute__ ((alias ("PIOS_USART_gps_irq_handler")));
 const struct pios_usart_cfg pios_usart_gps_cfg = {
-  .regs = USART3,
+  .regs = PIOS_USART_GPS,
   .init = {
     #if defined (PIOS_COM_GPS_BAUDRATE)
         .USART_BaudRate        = PIOS_COM_GPS_BAUDRATE,
@@ -269,24 +269,24 @@ const struct pios_usart_cfg pios_usart_gps_cfg = {
   .irq = {
     .handler = PIOS_USART_gps_irq_handler,
     .init    = {
-      .NVIC_IRQChannel                   = USART3_IRQn,
+      .NVIC_IRQChannel                   = PIOS_IRQC_GPS,
       .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
       .NVIC_IRQChannelSubPriority        = 0,
       .NVIC_IRQChannelCmd                = ENABLE,
     },
   },
   .rx   = {
-    .gpio = GPIOB,
+    .gpio = PIOS_GPIO_GPS,
     .init = {
-      .GPIO_Pin   = GPIO_Pin_11,
+      .GPIO_Pin   = PIOS_RXIO_GPS,
       .GPIO_Speed = GPIO_Speed_2MHz,
       .GPIO_Mode  = GPIO_Mode_IPU,
     },
   },
   .tx   = {
-    .gpio = GPIOB,
+    .gpio = PIOS_GPIO_GPS,
     .init = {
-      .GPIO_Pin   = GPIO_Pin_10,
+      .GPIO_Pin   = PIOS_TXIO_GPS,
       .GPIO_Speed = GPIO_Speed_2MHz,
       .GPIO_Mode  = GPIO_Mode_AF_PP,
     },
@@ -299,9 +299,9 @@ const struct pios_usart_cfg pios_usart_gps_cfg = {
  * SPEKTRUM USART
  */
 void PIOS_USART_spektrum_irq_handler(void);
-void USART3_IRQHandler() __attribute__ ((alias ("PIOS_USART_spektrum_irq_handler")));
+void PIOS_IRQH_SPEKTRUM() __attribute__ ((alias ("PIOS_USART_spektrum_irq_handler")));
 const struct pios_usart_cfg pios_usart_spektrum_cfg = {
-	.regs = USART3,
+	.regs = PIOS_USART_SPEKTRUM,
 	.init = {
 	#if defined (PIOS_COM_SPEKTRUM_BAUDRATE)
 		.USART_BaudRate        = PIOS_COM_SPEKTRUM_BAUDRATE,
@@ -317,24 +317,24 @@ const struct pios_usart_cfg pios_usart_spektrum_cfg = {
 	.irq = {
 		.handler = PIOS_USART_spektrum_irq_handler,
 		.init = {
-			.NVIC_IRQChannel                   = USART3_IRQn,
+			.NVIC_IRQChannel                   = PIOS_IRQC_SPEKTRUM,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
 			.NVIC_IRQChannelSubPriority        = 0,
 			.NVIC_IRQChannelCmd                = ENABLE,
 		  },
 	},
 	.rx = {
-		.gpio = GPIOB,
+		.gpio = PIOS_GPIO_SPEKTRUM,
 		.init = {
-			.GPIO_Pin   = GPIO_Pin_11,
+			.GPIO_Pin   = PIOS_RXIO_SPEKTRUM,
 			.GPIO_Speed = GPIO_Speed_2MHz,
 			.GPIO_Mode  = GPIO_Mode_IPU,
 		},
 	},
 	.tx = {
-		.gpio = GPIOB,
+		.gpio = PIOS_GPIO_SPEKTRUM,
 		.init = {
-			.GPIO_Pin   = GPIO_Pin_10,
+			.GPIO_Pin   = PIOS_TXIO_SPEKTRUM,
 			.GPIO_Speed = GPIO_Speed_2MHz,
 			.GPIO_Mode  = GPIO_Mode_IN_FLOATING,
 		},
@@ -365,8 +365,8 @@ const struct pios_spektrum_cfg pios_spektrum_cfg = {
 			.NVIC_IRQChannelCmd                = ENABLE,
 		},
 	},
-	.port = GPIOB,
-	.pin = GPIO_Pin_11,
+	.port = PIOS_GPIO_SPEKTRUM,
+	.pin = PIOS_RXIO_SPEKTRUM,
 };
 
 void PIOS_SUPV_irq_handler() {
@@ -388,9 +388,9 @@ void PIOS_SUPV_irq_handler() {
  * SBUS USART
  */
 void PIOS_USART_sbus_irq_handler(void);
-void USART3_IRQHandler() __attribute__ ((alias ("PIOS_USART_sbus_irq_handler")));
+void PIOS_IRQH_SBUS() __attribute__ ((alias ("PIOS_USART_sbus_irq_handler")));
 const struct pios_usart_cfg pios_usart_sbus_cfg = {
-	.regs = USART3,
+	.regs = PIOS_USART_SBUS,
 	.init = {
 	#if defined (PIOS_COM_SBUS_BAUDRATE)
 		.USART_BaudRate        = PIOS_COM_SBUS_BAUDRATE,
@@ -406,24 +406,24 @@ const struct pios_usart_cfg pios_usart_sbus_cfg = {
 	.irq = {
 		.handler = PIOS_USART_sbus_irq_handler,
 		.init = {
-			.NVIC_IRQChannel                   = USART3_IRQn,
+			.NVIC_IRQChannel                   = PIOS_IRQC_SBUS,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
 			.NVIC_IRQChannelSubPriority        = 0,
 			.NVIC_IRQChannelCmd                = ENABLE,
 		  },
 	},
 	.rx = {
-		.gpio = GPIOB,
+		.gpio = PIOS_GPIO_SBUS,
 		.init = {
-			.GPIO_Pin   = GPIO_Pin_11,
+			.GPIO_Pin   = PIOS_RXIO_SBUS,
 			.GPIO_Speed = GPIO_Speed_2MHz,
 			.GPIO_Mode  = GPIO_Mode_IPU,
 		},
 	},
 	.tx = {
-		.gpio = GPIOB,
+		.gpio = PIOS_GPIO_SBUS,
 		.init = {
-			.GPIO_Pin   = GPIO_Pin_10,
+			.GPIO_Pin   = PIOS_TXIO_SBUS,
 			.GPIO_Speed = GPIO_Speed_2MHz,
 			.GPIO_Mode  = GPIO_Mode_IN_FLOATING,
 		},
@@ -454,8 +454,8 @@ const struct pios_sbus_cfg pios_sbus_cfg = {
 			.NVIC_IRQChannelCmd                = ENABLE,
 		},
 	},
-	.port = GPIOB,
-	.pin = GPIO_Pin_11,
+	.port = PIOS_GPIO_SBUS,
+	.pin = PIOS_RXIO_SBUS,
 };
 
 void PIOS_SUPV_irq_handler() {

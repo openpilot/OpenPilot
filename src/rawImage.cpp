@@ -5,8 +5,8 @@
  * \ingroup rtslam
  */
 
-#include "cv.h"
-#include "highgui.h"
+//#include "cv.h"
+//#include "highgui.h"
 
 
 #include "boost/shared_ptr.hpp"

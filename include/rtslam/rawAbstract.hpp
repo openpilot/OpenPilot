@@ -18,7 +18,7 @@
 
 #include "rtslam/objectAbstract.hpp"
 #include "rtslam/measurement.hpp"
-#include <cv.h> // opencv 
+#include <opencv/cv.h> // opencv 
 
 namespace jafar {
 	namespace rtslam {

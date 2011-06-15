@@ -101,6 +101,11 @@ SECTIONS
         _init_stack_top = . - 4 ;
     } > SRAM
 
+    
+/* keep the heap section at the end of the SRAM */
+/* this will allow to claim the remaining bytes not used
+/* at run time! (done by the reset vector).
+
     . = ALIGN(4);
     _end = . ;
 

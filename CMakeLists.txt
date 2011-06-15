@@ -16,6 +16,9 @@ build_jafar_module(correl
   #CPPFLAGS
   #CXXFLAGS
   #CPPFLAGS_MODULE
+#  ROBOTPKG_CATEGORY image
+  ROBOTPKG_CATEGORY wip
+  SHORT_DESCRIPTION "Jafar module with image correlation functions"
 )
 
 

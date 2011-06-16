@@ -128,7 +128,13 @@ LoopFillZerobss:
   add r0, #0
   msr control, r0
 /* add heap_post_rtos to the heap (if the capability/function exist) */
+/* Also claim the unused memory (between end of heap to end of memory */
+/* CAREFULL: the heap section must be the last section in RAM in order this to work */
   ldr r0, = _init_stack_size
+  ldr r1, = _eheap_post_rtos
+  ldr r2, = _eram
+  subs r2, r2, r1
+  adds r0, r0, r2
   bl xPortIncreaseHeapSize
 /* Start the FreeRTOS scheduler which never returns.*/
   bl vTaskStartScheduler

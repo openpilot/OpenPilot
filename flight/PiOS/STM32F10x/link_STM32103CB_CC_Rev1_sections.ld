@@ -11,6 +11,8 @@ PROVIDE (   xPortSysTickHandler = 0 ) ;
 PROVIDE(pios_board_info_blob = ORIGIN(BD_INFO));
 
 _estack = 0x20004FF0;
+/* there is probably a way to get that from the MEMORY section */
+_eram = 0x20005000;
 
 /* Section Definitions */
 SECTIONS

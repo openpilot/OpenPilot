@@ -49,7 +49,7 @@ defined in linker script */
 .word  _ebss
 
 .equ  BootRAM, 0xF108F85F
-.equ  _eram, 0x20005000
+
 /**
  * @brief  This is the code that gets called when the processor first
  *          starts execution following a reset event. Only the absolutely

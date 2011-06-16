@@ -200,6 +200,7 @@ void PIOS_ADC_handler() {
 
 #include "pios_usart_priv.h"
 
+#if defined(PIOS_INCLUDE_TELEMETRY_RF)
 /*
  * Telemetry USART
  */
@@ -245,6 +246,7 @@ const struct pios_usart_cfg pios_usart_telem_cfg = {
     },
   },
 };
+#endif /* PIOS_INCLUDE_TELEMETRY_RF */
 
 #if defined(PIOS_INCLUDE_GPS)
 /*
@@ -472,11 +474,13 @@ void PIOS_SUPV_irq_handler() {
 }
 #endif	/* PIOS_INCLUDE_SBUS */
 
+#if defined(PIOS_INCLUDE_TELEMETRY_RF)
 static uint32_t pios_usart_telem_rf_id;
 void PIOS_USART_telem_irq_handler(void)
 {
 	PIOS_USART_IRQ_Handler(pios_usart_telem_rf_id);
 }
+#endif /* PIOS_INCLUDE_TELEMETRY_RF */
 
 #if defined(PIOS_INCLUDE_GPS)
 static uint32_t pios_usart_gps_id;
@@ -807,12 +811,14 @@ void PIOS_Board_Init(void) {
 
 	/* Initialize the PiOS library */
 #if defined(PIOS_INCLUDE_COM)
+#if defined(PIOS_INCLUDE_TELEMETRY_RF)
 	if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
 	if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id)) {
 		PIOS_DEBUG_Assert(0);
 	}
+#endif /* PIOS_INCLUDE_TELEMETRY_RF */
 #if defined(PIOS_INCLUDE_GPS)
 	if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
 		PIOS_DEBUG_Assert(0);

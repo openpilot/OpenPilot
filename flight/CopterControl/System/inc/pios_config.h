@@ -55,9 +55,11 @@
  * and optionally define PIOS_PORT_* to USART port numbers
  */
 
-/* Current defaults */
+/* Current defaults - mimic original behavior */
 #define USE_TELEMETRY
+#if !defined(USE_SPEKTRUM)
 #define USE_GPS
+#endif
 
 /* Serial telemetry: USART1 or USART3 */
 #if !defined(PIOS_PORT_TELEMETRY)
@@ -103,6 +105,7 @@
 #define PIOS_GPIO_TELEMETRY	USART_GPIO(PIOS_PORT_TELEMETRY)
 #define PIOS_RXIO_TELEMETRY	USART_RXIO(PIOS_PORT_TELEMETRY)
 #define PIOS_TXIO_TELEMETRY	USART_TXIO(PIOS_PORT_TELEMETRY)
+#define PIOS_INCLUDE_TELEMETRY_RF
 #endif
 
 #if defined(USE_GPS)

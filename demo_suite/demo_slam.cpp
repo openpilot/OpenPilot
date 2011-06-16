@@ -1001,7 +1001,7 @@ void demo_slam_init()
 		
 		if (intOpts[iGps])
 		{
-			absloc_ptr_t senPtr13(new SensorAbsloc(robPtr1, MapObject::UNFILTERED));
+			absloc_ptr_t senPtr13(new SensorAbsloc(robPtr1, MapObject::UNFILTERED, intOpts[iGps] == 2));
 			senPtr13->setId();
 			senPtr13->linkToParentRobot(robPtr1);
 			hardware::hardware_sensorprop_ptr_t hardGps(
@@ -1450,7 +1450,7 @@ void demo_slam_run() {
 	* --simu 0 or <environment id>*10+<trajectory id> (
 	* --freq camera frequency in double Hz (with trigger==0/1)
 	* --shutter shutter time in double seconds (0=auto); for trigger modes 0,2,3 the value is relative between 0 and 1
-	* --gps whether use or not a gps
+	* --gps=0/1/2 -> Off/Relative/Absolute
 	*
 	* You can use the following examples and only change values:
 	* online test (old mode=0):

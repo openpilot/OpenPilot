@@ -45,11 +45,12 @@ namespace jafar {
 				jblas::mat EXP_q;
 				bool hasVar;
 				int inns;
+				bool absolute;
 			public:
-				SensorAbsloc(const robot_ptr_t & robPtr, const filtered_obj_t inFilter = UNFILTERED):
+				SensorAbsloc(const robot_ptr_t & robPtr, const filtered_obj_t inFilter = UNFILTERED, bool absolute = false):
 				  SensorProprioAbstract(robPtr, inFilter),
 					ia_rs(ia_globalPose), innovation(NULL), measurement(NULL), expectation(NULL),
-				  hasVar(false), inns(0)
+				  hasVar(false), inns(0), absolute(absolute)
 				{}
 				~SensorAbsloc() { delete innovation; delete measurement; }
 				virtual void setHardwareSensor(hardware::hardware_sensorprop_ptr_t hardwareSensorPtr_)
@@ -123,7 +124,7 @@ namespace jafar {
 							          "SensorAbsloc reading size " << reading.data.size() << " not supported.");
 					}
 
-					if (first)
+					if (first && !absolute)
 					{
 						// for first reading we force initialization
 						//robotPtr()->pose.P() = jblas::zero_mat(robotPtr()->pose.size());

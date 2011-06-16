@@ -739,17 +739,42 @@ void ConfigccpmWidget::ccpmSwashplateUpdate()
 
 void ConfigccpmWidget::UpdateMixer()
 {
-    int i,j,Type,ThisEnable[6];
-    float CollectiveConstant,CorrectionAngle,ThisAngle[6];
+    bool useCCPM;
+    bool useCyclic;
+    int i,j,ThisEnable[6];
+    float CollectiveConstant,PitchConstant,RollConstant,ThisAngle[6];
     //QTableWidgetItem *newItem;// = new QTableWidgetItem();
     QString Channel;
 
-    Type = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
-    CollectiveConstant=m_ccpm->ccpmCollectiveSlider->value()/100.0;
-    CorrectionAngle=m_ccpm->ccpmCorrectionAngle->value();
+    //Type = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
+    //CollectiveConstant=m_ccpm->ccpmCollectiveSlider->value()/100.0;
+    //CorrectionAngle=m_ccpm->ccpmCorrectionAngle->value();
+    UpdatCCPMOptionsFromUI();
+ 
+    useCCPM = !(GUIConfigData.heli.ccpmCollectivePassthroughState || !GUIConfigData.heli.ccpmLinkCyclicState);
+    useCyclic = GUIConfigData.heli.ccpmLinkRollState;
 
+    CollectiveConstant = (float)GUIConfigData.heli.SliderValue0 / 100.00;
 
-    if (Type>0)
+    if (useCCPM) 
+    {//cyclic = 1 - collective
+        PitchConstant = 1-CollectiveConstant;
+        RollConstant = PitchConstant;
+    }
+    else
+    {
+        PitchConstant = (float)GUIConfigData.heli.SliderValue1 / 100.00;;
+        if (useCyclic) 
+        {
+            RollConstant = PitchConstant;
+        }   
+        else
+        {
+            RollConstant = (float)GUIConfigData.heli.SliderValue2 / 100.00;;
+        }               
+    }
+
+    if (GUIConfigData.heli.SwasplateType>0)
     {//not advanced settings
         //get the channel data from the ui
         MixerChannelData[0] = m_ccpm->ccpmEngineChannel->currentIndex();
@@ -813,8 +838,8 @@ void ConfigccpmWidget::UpdateMixer()
                 {//Swashplate
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,1)->setText(QString("%1").arg(0));//ThrottleCurve1
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,2)->setText(QString("%1").arg((int)(127.0*CollectiveConstant)));//ThrottleCurve2
-                    m_ccpm->ccpmAdvancedSettingsTable->item(i,3)->setText(QString("%1").arg((int)(127.0*(1-CollectiveConstant)*sin((180+CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Roll
-                    m_ccpm->ccpmAdvancedSettingsTable->item(i,4)->setText(QString("%1").arg((int)(127.0*(1-CollectiveConstant)*cos((CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Pitch
+                    m_ccpm->ccpmAdvancedSettingsTable->item(i,3)->setText(QString("%1").arg((int)(127.0*(RollConstant)*sin((180+GUIConfigData.heli.CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Roll
+                    m_ccpm->ccpmAdvancedSettingsTable->item(i,4)->setText(QString("%1").arg((int)(127.0*(PitchConstant)*cos((GUIConfigData.heli.CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Pitch
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,5)->setText(QString("%1").arg(0));//Yaw
 
                 }
@@ -859,6 +884,9 @@ void ConfigccpmWidget::UpdateMixer()
  */
 void ConfigccpmWidget::UpdatCCPMOptionsFromUI()
 {
+    bool useCCPM;
+    bool useCyclic;
+    
     if (updatingFromHardware) return;
     //get the user options
     //swashplate config
@@ -869,12 +897,36 @@ void ConfigccpmWidget::UpdatCCPMOptionsFromUI()
     GUIConfigData.heli.ccpmCollectivePassthroughState = m_ccpm->ccpmCollectivePassthrough->isChecked();
     GUIConfigData.heli.ccpmLinkCyclicState = m_ccpm->ccpmLinkCyclic->isChecked();
     GUIConfigData.heli.ccpmLinkRollState = m_ccpm->ccpmLinkRoll->isChecked();
+    useCCPM = !(GUIConfigData.heli.ccpmCollectivePassthroughState || !GUIConfigData.heli.ccpmLinkCyclicState);
+    useCyclic = GUIConfigData.heli.ccpmLinkRollState;
     
     //correction angle
     GUIConfigData.heli.CorrectionAngle = m_ccpm->ccpmCorrectionAngle->value();
     
     //CollectiveChannel
     GUIConfigData.heli.CollectiveChannel = m_ccpm->ccpmCollectiveChannel->currentIndex();
+    
+    //update sliders
+    if (useCCPM) 
+    {
+        GUIConfigData.heli.SliderValue0 = m_ccpm->ccpmCollectiveSlider->value();
+    }
+    else
+    {
+        GUIConfigData.heli.SliderValue0 = m_ccpm->ccpmCollectiveScale->value();
+    }
+    if (useCyclic) 
+    {
+        GUIConfigData.heli.SliderValue1 = m_ccpm->ccpmCyclicScale->value();
+    }
+    else
+    {
+        GUIConfigData.heli.SliderValue1 = m_ccpm->ccpmPitchScale->value();
+    }    
+    GUIConfigData.heli.SliderValue2 = m_ccpm->ccpmRollScale->value();
+    //GUIConfigData.heli.RevoSlider = m_ccpm->ccpmREVOScale->value();
+    
+    
 }
 void ConfigccpmWidget::UpdatCCPMUIFromOptions()
 {
@@ -893,6 +945,18 @@ void ConfigccpmWidget::UpdatCCPMUIFromOptions()
     //CollectiveChannel
     m_ccpm->ccpmCollectiveChannel->setCurrentIndex(GUIConfigData.heli.CollectiveChannel);
     
+    //update sliders
+    m_ccpm->ccpmCollectiveScale->setValue(GUIConfigData.heli.SliderValue0);
+    m_ccpm->ccpmCollectiveScaleBox->setValue(GUIConfigData.heli.SliderValue0);
+    m_ccpm->ccpmCyclicScale->setValue(GUIConfigData.heli.SliderValue1);
+    m_ccpm->ccpmCyclicScaleBox->setValue(GUIConfigData.heli.SliderValue1);
+    m_ccpm->ccpmPitchScale->setValue(GUIConfigData.heli.SliderValue1);
+    m_ccpm->ccpmPitchScaleBox->setValue(GUIConfigData.heli.SliderValue1);
+    m_ccpm->ccpmRollScale->setValue(GUIConfigData.heli.SliderValue2);
+    m_ccpm->ccpmRollScaleBox->setValue(GUIConfigData.heli.SliderValue2);
+    m_ccpm->ccpmCollectiveSlider->setValue(GUIConfigData.heli.SliderValue0);
+    m_ccpm->ccpmCollectivespinBox->setValue(GUIConfigData.heli.SliderValue0);
+    //m_ccpm->ccpmREVOScale->setValue(GUIConfigData.heli.RevoSlider);
 }
 
 
@@ -952,7 +1016,8 @@ void ConfigccpmWidget::requestccpmUpdate()
     
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
     field = obj->getField(QString("GUIConfigData"));
-    GUIConfigData.UAVObject=field->getValue().toUInt();
+    GUIConfigData.UAVObject[0]=field->getValue(0).toUInt();
+    GUIConfigData.UAVObject[1]=field->getValue(1).toUInt();
     UpdatCCPMUIFromOptions();   
 
     
@@ -1040,6 +1105,7 @@ void ConfigccpmWidget::requestccpmUpdate()
 
 
     //just call it user angles for now....
+    /*
     m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("Custom - User Angles"));
 
     if (NumServos>1)
@@ -1070,9 +1136,11 @@ void ConfigccpmWidget::requestccpmUpdate()
     {//must be a custom config... "Custom - Advanced Settings"
         m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("Custom - Advanced Settings"));
     }
-
+    
     HeadRotation=0;
-    //calculate the angles
+    
+    HeadRotation=m_ccpm->ccpmSingleServo->currentIndex();
+   //calculate the angles
     for(j=0;j<NumServos;j++)
     {
         //MixerDataFromHeli[i][2]=(127.0*(1-CollectiveConstant)*sin((CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Roll
@@ -1088,7 +1156,7 @@ void ConfigccpmWidget::requestccpmUpdate()
 
     }
     //set the head rotation
-    m_ccpm->ccpmSingleServo->setCurrentIndex(HeadRotation);
+    //m_ccpm->ccpmSingleServo->setCurrentIndex(HeadRotation);
 
     //calculate the un rotated angles
     for(j=0;j<NumServos;j++)
@@ -1108,15 +1176,19 @@ void ConfigccpmWidget::requestccpmUpdate()
 
     }
 
-    m_ccpm->ccpmAngleW->setValue(ServoAngles[SortAngles[0]]);
-    m_ccpm->ccpmAngleX->setValue(ServoAngles[SortAngles[1]]);
-    m_ccpm->ccpmAngleY->setValue(ServoAngles[SortAngles[2]]);
-    m_ccpm->ccpmAngleZ->setValue(ServoAngles[SortAngles[3]]);
+    //m_ccpm->ccpmAngleW->setValue(ServoAngles[SortAngles[0]]);
+    //m_ccpm->ccpmAngleX->setValue(ServoAngles[SortAngles[1]]);
+    //m_ccpm->ccpmAngleY->setValue(ServoAngles[SortAngles[2]]);
+    //m_ccpm->ccpmAngleZ->setValue(ServoAngles[SortAngles[3]]);
 
-    m_ccpm->ccpmServoWChannel->setCurrentIndex(ServoChannels[SortAngles[0]]);
-    m_ccpm->ccpmServoXChannel->setCurrentIndex(ServoChannels[SortAngles[1]]);
-    m_ccpm->ccpmServoYChannel->setCurrentIndex(ServoChannels[SortAngles[2]]);
-    m_ccpm->ccpmServoZChannel->setCurrentIndex(ServoChannels[SortAngles[3]]);
+    //m_ccpm->ccpmServoWChannel->setCurrentIndex(ServoChannels[SortAngles[0]]);
+    //m_ccpm->ccpmServoXChannel->setCurrentIndex(ServoChannels[SortAngles[1]]);
+    //m_ccpm->ccpmServoYChannel->setCurrentIndex(ServoChannels[SortAngles[2]]);
+    //m_ccpm->ccpmServoZChannel->setCurrentIndex(ServoChannels[SortAngles[3]]);
+    m_ccpm->ccpmServoWChannel->setCurrentIndex(ServoChannels[0]);
+    m_ccpm->ccpmServoXChannel->setCurrentIndex(ServoChannels[1]);
+    m_ccpm->ccpmServoYChannel->setCurrentIndex(ServoChannels[2]);
+    m_ccpm->ccpmServoZChannel->setCurrentIndex(ServoChannels[3]);
 
 
     //Types << "CCPM 2 Servo 90�" << "CCPM 3 Servo 120�" << "CCPM 3 Servo 140�" << "FP 2 Servo 90�"  << "Custom - User Angles" << "Custom - Advanced Settings"  ;
@@ -1182,7 +1254,7 @@ void ConfigccpmWidget::requestccpmUpdate()
     {
 
     }
-
+*/
 
 
 
@@ -1204,7 +1276,7 @@ void ConfigccpmWidget::requestccpmUpdate()
 
 
     updatingFromHardware=FALSE;
-
+    UpdatCCPMUIFromOptions();
     ccpmSwashplateUpdate();
 
 }
@@ -1220,15 +1292,19 @@ void ConfigccpmWidget::sendccpmUpdate()
     UAVDataObject* obj;
 
     if (SwashLvlConfigurationInProgress)return;
-    ShowDisclaimer(1);
+    //ShowDisclaimer(1);
+    
     
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
+    UpdatCCPMOptionsFromUI();
     obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
     field = obj->getField(QString("GUIConfigData"));
-    field->setValue(GUIConfigData.UAVObject);
+    field->setValue(GUIConfigData.UAVObject[0],0);
+    field->setValue(GUIConfigData.UAVObject[1],1);
     obj->updated();
+   
 
     
     obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));
@@ -1297,7 +1373,9 @@ void ConfigccpmWidget::sendccpmUpdate()
         }
 
         obj->updated();
-
+    
+    
+ 
 
 }
 

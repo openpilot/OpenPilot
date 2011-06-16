@@ -56,14 +56,16 @@ typedef struct {
     uint ccpmCollectivePassthroughState:1;
     uint ccpmLinkCyclicState:1;
     uint ccpmLinkRollState:1;
-    uint CollectiveChannel:3;
-    uint padding:12;
-    uint padding2:32;
+    uint CollectiveChannel:3;//20bits
+    uint SliderValue0:7;
+    uint SliderValue1:7;
+    uint SliderValue2:7;//41bits
+    uint padding:23;
 } __attribute__((packed))  heliGUISettingsStruct;
 
-typedef union 
+typedef union
 {
-    uint                    UAVObject;
+    uint                    UAVObject[2];
     heliGUISettingsStruct   heli;
 } GUIConfigDataUnion;
 
@@ -100,12 +102,12 @@ private:
         SwashplateServoSettingsStruct oldSwashLvlConfiguration;
         SwashplateServoSettingsStruct newSwashLvlConfiguration;
 
-        GUIConfigDataUnion GUIConfigData; 
-    
+        GUIConfigDataUnion GUIConfigData;
+
         int MixerChannelData[6];
         int ShowDisclaimer(int messageID);
         virtual void enableControls(bool enable) { Q_UNUSED(enable)}; // Not used by this widget
-    
+
         bool updatingFromHardware;
 
     private slots:
@@ -127,7 +129,7 @@ private:
 
         void UpdatCCPMOptionsFromUI();
         void UpdatCCPMUIFromOptions();
-        
+
         void SetUIComponentVisibilities();
 
         void enableSwashplateLevellingControl(bool state);

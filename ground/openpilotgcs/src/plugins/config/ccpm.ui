@@ -75,7 +75,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>3</number>
        </property>
        <widget class="QWidget" name="BasicTab">
         <attribute name="title">
@@ -1585,7 +1585,7 @@
                </layout>
               </item>
               <item>
-               <widget class="QSpinBox" name="ccpmCollectivesScaleBox">
+               <widget class="QSpinBox" name="ccpmCollectiveScaleBox">
                 <property name="maximum">
                  <number>100</number>
                 </property>
@@ -3823,7 +3823,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>ccpmCollectivesScaleBox</sender>
+   <sender>ccpmCollectiveScaleBox</sender>
    <signal>valueChanged(int)</signal>
    <receiver>ccpmCollectiveScale</receiver>
    <slot>setValue(int)</slot>
@@ -3841,7 +3841,7 @@
   <connection>
    <sender>ccpmCollectiveScale</sender>
    <signal>sliderMoved(int)</signal>
-   <receiver>ccpmCollectivesScaleBox</receiver>
+   <receiver>ccpmCollectiveScaleBox</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">

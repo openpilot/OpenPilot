@@ -60,13 +60,17 @@ typedef struct {
     uint SliderValue0:7;
     uint SliderValue1:7;
     uint SliderValue2:7;//41bits
-    uint padding:23;
+    uint ServoIndexW:4;
+    uint ServoIndexX:4;
+    uint ServoIndexY:4;
+    uint ServoIndexZ:4;//57bits
+    uint padding:7;
 } __attribute__((packed))  heliGUISettingsStruct;
 
 typedef union
 {
-    uint                    UAVObject[2];
-    heliGUISettingsStruct   heli;
+    uint                    UAVObject[2];//32bits * 2
+    heliGUISettingsStruct   heli;//64bits
 } GUIConfigDataUnion;
 
 class ConfigccpmWidget: public ConfigTaskWidget

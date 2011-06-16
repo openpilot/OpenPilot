@@ -734,6 +734,7 @@ void ConfigccpmWidget::ccpmSwashplateRedraw()
 void ConfigccpmWidget::ccpmSwashplateUpdate()
 {
     ccpmSwashplateRedraw();
+    SetUIComponentVisibilities();
     UpdateMixer();
 }
 
@@ -926,6 +927,11 @@ void ConfigccpmWidget::UpdatCCPMOptionsFromUI()
     GUIConfigData.heli.SliderValue2 = m_ccpm->ccpmRollScale->value();
     //GUIConfigData.heli.RevoSlider = m_ccpm->ccpmREVOScale->value();
     
+    //servo assignments
+    GUIConfigData.heli.ServoIndexW = m_ccpm->ccpmServoWChannel->currentIndex();
+    GUIConfigData.heli.ServoIndexX = m_ccpm->ccpmServoXChannel->currentIndex();
+    GUIConfigData.heli.ServoIndexY = m_ccpm->ccpmServoYChannel->currentIndex();
+    GUIConfigData.heli.ServoIndexZ = m_ccpm->ccpmServoZChannel->currentIndex();
     
 }
 void ConfigccpmWidget::UpdatCCPMUIFromOptions()
@@ -957,6 +963,13 @@ void ConfigccpmWidget::UpdatCCPMUIFromOptions()
     m_ccpm->ccpmCollectiveSlider->setValue(GUIConfigData.heli.SliderValue0);
     m_ccpm->ccpmCollectivespinBox->setValue(GUIConfigData.heli.SliderValue0);
     //m_ccpm->ccpmREVOScale->setValue(GUIConfigData.heli.RevoSlider);
+    
+    //servo assignments
+    m_ccpm->ccpmServoWChannel->setCurrentIndex(GUIConfigData.heli.ServoIndexW);
+    m_ccpm->ccpmServoXChannel->setCurrentIndex(GUIConfigData.heli.ServoIndexX);
+    m_ccpm->ccpmServoYChannel->setCurrentIndex(GUIConfigData.heli.ServoIndexY);
+    m_ccpm->ccpmServoZChannel->setCurrentIndex(GUIConfigData.heli.ServoIndexZ);
+
 }
 
 

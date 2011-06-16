@@ -48,7 +48,11 @@ namespace hardware {
 #ifdef HAVE_MTI
 				if (!mti->read(&data)) continue;
 				boost::unique_lock<boost::mutex> l(mutex_data);
-				if (write_position == read_position) JFR_ERROR(RtslamException, RtslamException::BUFFER_OVERFLOW, "Data not read: Increase MTI buffer size !");
+				if (write_position == read_position)
+				{
+					//JFR_ERROR(RtslamException, RtslamException::BUFFER_OVERFLOW, "Data not read: Increase MTI buffer size !");
+					++read_position; if (read_position >= bufferSize) read_position = 0;
+				}
 				row(0) = data.TIMESTAMP_FILTERED;
 				row(1) = data.ACC[0];
 				row(2) = data.ACC[1];

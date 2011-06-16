@@ -218,6 +218,8 @@ const int nFirstBreakingOpt = nIntOpts+nFloatOpts+nStrOpts, nLastBreakingOpt = n
 
 /// !!WARNING!! be careful that options are in the same order above and below
 
+#ifndef GENOM
+
 struct option long_options[] = {
 	// int options
 	{"disp-2d", 2, 0, 0},
@@ -248,6 +250,7 @@ struct option long_options[] = {
 	{"usage",0,0,0},
 };
 
+#endif
 
 /** ############################################################################
  * #############################################################################
@@ -389,9 +392,64 @@ class ConfigEstimation: public kernel::KeyValueFileSaveLoad
  * Slam function
  * ###########################################################################*/
 
+world_ptr_t worldPtr;
+boost::scoped_ptr<kernel::DataLogger> dataLogger;
+sensor_manager_ptr_t sensorManager;
+boost::shared_ptr<ExporterAbstract> exporter;
+#ifdef HAVE_MODULE_QDISPLAY
+display::ViewerQt *viewerQt = NULL;
+#endif
+#ifdef HAVE_MODULE_GDHE
+display::ViewerGdhe *viewerGdhe = NULL;
+#endif
+kernel::VariableCondition<int> rawdata_condition(0);
 
-void demo_slam01_main(world_ptr_t *world)
+
+void demo_slam_init()
 { try {
+		
+	worldPtr.reset(new WorldAbstract());
+
+	std::cout << "Loading config files " << strOpts[sConfigSetup] << " and " << strOpts[sConfigEstimation] << std::endl;
+	configSetup.load(strOpts[sConfigSetup]);
+	configEstimation.load(strOpts[sConfigEstimation]);
+	
+	// deal with the random seed
+	rseed = time(NULL);
+	if (intOpts[iRandSeed] != 0 && intOpts[iRandSeed] != 1)
+		rseed = intOpts[iRandSeed];
+	if (!(intOpts[iReplay] & 1) && intOpts[iDump]) {
+		std::fstream f((strOpts[sDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::out);
+		f << rseed << std::endl;
+		f.close();
+	}
+	else if ((intOpts[iReplay] & 1) && intOpts[iRandSeed] == 1) {
+		std::fstream f((strOpts[sDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::in);
+		f >> rseed;
+		f.close();
+	}
+	intOpts[iRandSeed] = rseed;
+	std::cout << "Random seed " << rseed << std::endl;
+	rtslam::srand(rseed);
+
+	#ifdef HAVE_MODULE_QDISPLAY
+	if (intOpts[iDispQt])
+	{
+		display::ViewerQt *viewerQt = new display::ViewerQt(8, configEstimation.MAHALANOBIS_TH, false, "data/rendered2D_%02d-%06d.png");
+		worldPtr->addDisplayViewer(viewerQt, display::ViewerQt::id());
+	}
+	#endif
+	#ifdef HAVE_MODULE_GDHE
+	if (intOpts[iDispGdhe])
+	{
+		display::ViewerGdhe *viewerGdhe = new display::ViewerGdhe("camera", configEstimation.MAHALANOBIS_TH, "localhost");
+		boost::filesystem::path ram_path("/mnt/ram");
+		if (boost::filesystem::exists(ram_path) && boost::filesystem::is_directory(ram_path))
+			viewerGdhe->setConvertTempPath("/mnt/ram");
+		worldPtr->addDisplayViewer(viewerGdhe, display::ViewerGdhe::id());
+	}
+	#endif
+	
 	vec intrinsic, distortion;
 	int img_width, img_height;
 	if (intOpts[iSimu] != 0)
@@ -409,14 +467,13 @@ void demo_slam01_main(world_ptr_t *world)
 		distortion = configSetup.DISTORTION;
 	}
 	
-	kernel::VariableCondition<int> rawdata_condition(0);
-	boost::scoped_ptr<kernel::DataLogger> dataLogger;
 	if (!strOpts[sLog].empty())
 	{
 		dataLogger.reset(new kernel::DataLogger(strOpts[sDataPath] + "/" + strOpts[sLog]));
 		dataLogger->writeCurrentDate();
 		dataLogger->writeNewLine();
-		
+#ifndef GENOM
+// FIXME do it for genom
 		// write options to log
 		std::ostringstream oss;
 		for(int i = 0; i < nIntOpts; ++i)
@@ -426,6 +483,7 @@ void demo_slam01_main(world_ptr_t *world)
 		for(int i = 0; i < nStrOpts; ++i)
 			{ oss << long_options[i+nFirstStrOpt].name << " = " << strOpts[i]; dataLogger->writeComment(oss.str()); oss.str(""); }
 		dataLogger->writeNewLine();
+#endif
 	}
 
 	switch (intOpts[iVerbose])
@@ -472,9 +530,6 @@ void demo_slam01_main(world_ptr_t *world)
 	// --- INIT ------------------------------------------------------------------
 	// ---------------------------------------------------------------------------
 	// INIT : 1 map and map-manager, 2 robs, 3 sens and data-manager.
-	world_ptr_t worldPtr = *world;
-	//worldPtr->display_mutex.lock();
-
 
 	// 1. Create maps.
 	map_ptr_t mapPtr(new MapAbstract(configEstimation.MAP_SIZE));
@@ -961,7 +1016,6 @@ void demo_slam01_main(world_ptr_t *world)
 		}
 	}
 	
-	sensor_manager_ptr_t sensorManager;
 	if (intOpts[iReplay] == 1)
 		sensorManager.reset(new SensorManagerReplay(mapPtr));
 	else
@@ -970,11 +1024,10 @@ void demo_slam01_main(world_ptr_t *world)
 	//--- force a first display with empty slam to ensure that all windows are loaded
 // std::cout << "SLAM: forcing first initialization display" << std::endl;
 	#ifdef HAVE_MODULE_QDISPLAY
-	display::ViewerQt *viewerQt = NULL;
 	if (intOpts[iDispQt])
 	{
-		viewerQt = PTR_CAST<display::ViewerQt*> ((*world)->getDisplayViewer(display::ViewerQt::id()));
-		viewerQt->bufferize(*world);
+		viewerQt = PTR_CAST<display::ViewerQt*> (worldPtr->getDisplayViewer(display::ViewerQt::id()));
+		viewerQt->bufferize(worldPtr);
 		
 		// initializing stuff for controlling run/pause from viewer
 		boost::unique_lock<boost::mutex> runStatus_lock(viewerQt->runStatus.mutex);
@@ -984,25 +1037,12 @@ void demo_slam01_main(world_ptr_t *world)
 	}
 	#endif
 	#ifdef HAVE_MODULE_GDHE
-	display::ViewerGdhe *viewerGdhe = NULL;
 	if (intOpts[iDispGdhe])
 	{
-		viewerGdhe = PTR_CAST<display::ViewerGdhe*> ((*world)->getDisplayViewer(display::ViewerGdhe::id()));
-		viewerGdhe->bufferize(*world);
+		viewerGdhe = PTR_CAST<display::ViewerGdhe*> (worldPtr->getDisplayViewer(display::ViewerGdhe::id()));
+		viewerGdhe->bufferize(worldPtr);
 	}
 	#endif
-
-	if (intOpts[iDispQt] || intOpts[iDispGdhe])
-	{
-		boost::unique_lock<boost::mutex> display_lock((*world)->display_mutex);
-		(*world)->display_rendered = false;
-		display_lock.unlock();
-		(*world)->display_condition.notify_all();
-// std::cout << "SLAM: now waiting for this display to finish" << std::endl;
-		display_lock.lock();
-		while(!(*world)->display_rendered) (*world)->display_condition.wait(display_lock);
-		display_lock.unlock();
-	}
 
 // std::cout << "SLAM: starting slam" << std::endl;
 
@@ -1011,15 +1051,33 @@ void demo_slam01_main(world_ptr_t *world)
 
 	//worldPtr->display_mutex.unlock();
 
-	boost::shared_ptr<ExporterAbstract> exporter;
 	switch (intOpts[iExport])
 	{
 		case 1: exporter.reset(new ExporterSocket(robPtr1, 30000)); break;
 		case 2: exporter.reset(new ExporterPoster(robPtr1)); break;
 	}
 
-	
-	
+} catch (kernel::Exception &e) { std::cout << e.what(); throw e; } } // demo_slam_init
+
+
+
+
+void demo_slam_main(world_ptr_t *world)
+{ try {
+
+	// wait for display to be ready if enabled
+	if (intOpts[iDispQt] || intOpts[iDispGdhe])
+	{
+		boost::unique_lock<boost::mutex> display_lock(worldPtr->display_mutex);
+		worldPtr->display_rendered = false;
+		display_lock.unlock();
+		worldPtr->display_condition.notify_all();
+// std::cout << "SLAM: now waiting for this display to finish" << std::endl;
+		display_lock.lock();
+		while(!worldPtr->display_rendered) worldPtr->display_condition.wait(display_lock);
+		display_lock.unlock();
+	}
+		
 jblas::vec robot_prediction;
 double average_robot_innovation = 0.;
 int n_innovation = 0;
@@ -1181,7 +1239,7 @@ int n_innovation = 0;
 //	std::cout << "\nFINISHED ! Press a key to terminate." << std::endl;
 //	getchar();
 
-} catch (kernel::Exception &e) { std::cout << e.what(); throw e; } } // demo_slam01_main
+} catch (kernel::Exception &e) { std::cout << e.what(); throw e; } } // demo_slam_main
 
 
 /** ############################################################################
@@ -1189,7 +1247,7 @@ int n_innovation = 0;
  * Display function
  * ###########################################################################*/
 
-void demo_slam01_display(world_ptr_t *world)
+void demo_slam_display(world_ptr_t *world)
 { try {
 //	static unsigned prev_t = 0;
 	kernel::Timer timer(display_period*1000);
@@ -1316,7 +1374,7 @@ void demo_slam01_display(world_ptr_t *world)
  * Exit function
  * ###########################################################################*/
 
-void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
+void demo_slam_exit(world_ptr_t *world, boost::thread *thread_main) {
 	(*world)->exit(true);
 	(*world)->display_condition.notify_all();
 // 	std::cout << "EXITING !!!" << std::endl;
@@ -1329,50 +1387,13 @@ void demo_slam01_exit(world_ptr_t *world, boost::thread *thread_main) {
  * Demo function
  * ###########################################################################*/
 
-void demo_slam01() {
-	world_ptr_t worldPtr(new WorldAbstract());
-
-	// deal with the random seed
-	rseed = time(NULL);
-	if (intOpts[iRandSeed] != 0 && intOpts[iRandSeed] != 1)
-		rseed = intOpts[iRandSeed];
-	if (!(intOpts[iReplay] & 1) && intOpts[iDump]) {
-		std::fstream f((strOpts[sDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::out);
-		f << rseed << std::endl;
-		f.close();
-	}
-	else if ((intOpts[iReplay] & 1) && intOpts[iRandSeed] == 1) {
-		std::fstream f((strOpts[sDataPath] + std::string("/rseed.log")).c_str(), std::ios_base::in);
-		f >> rseed;
-		f.close();
-	}
-	intOpts[iRandSeed] = rseed;
-	std::cout << "Random seed " << rseed << std::endl;
-	rtslam::srand(rseed);
-
-	#ifdef HAVE_MODULE_QDISPLAY
-	if (intOpts[iDispQt])
-	{
-		display::ViewerQt *viewerQt = new display::ViewerQt(8, configEstimation.MAHALANOBIS_TH, false, "data/rendered2D_%02d-%06d.png");
-		worldPtr->addDisplayViewer(viewerQt, display::ViewerQt::id());
-	}
-	#endif
-	#ifdef HAVE_MODULE_GDHE
-	if (intOpts[iDispGdhe])
-	{
-		display::ViewerGdhe *viewerGdhe = new display::ViewerGdhe("camera", configEstimation.MAHALANOBIS_TH, "localhost");
-		boost::filesystem::path ram_path("/mnt/ram");
-		if (boost::filesystem::exists(ram_path) && boost::filesystem::is_directory(ram_path))
-			viewerGdhe->setConvertTempPath("/mnt/ram");
-		worldPtr->addDisplayViewer(viewerGdhe, display::ViewerGdhe::id());
-	}
-	#endif
+void demo_slam_run() {
 
 	// to start with qt display
 	if (intOpts[iDispQt]) // at least 2d
 	{
 		#ifdef HAVE_MODULE_QDISPLAY
-		qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam01_display,display_priority,(qdisplay::FUNC)&demo_slam01_main,slam_priority,display_period,&worldPtr,(qdisplay::EXIT_FUNC)&demo_slam01_exit);
+		qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam_display,display_priority,(qdisplay::FUNC)&demo_slam_main,slam_priority,display_period,&worldPtr,(qdisplay::EXIT_FUNC)&demo_slam_exit);
 		#else
 		std::cout << "Please install qdisplay module if you want 2D display" << std::endl;
 		#endif
@@ -1381,9 +1402,9 @@ void demo_slam01() {
 	{
 		#ifdef HAVE_MODULE_GDHE
 		kernel::setCurrentThreadPriority(display_priority);
-		boost::thread *thread_disp = new boost::thread(boost::bind(demo_slam01_display,&worldPtr));
+		boost::thread *thread_disp = new boost::thread(boost::bind(demo_slam_display,&worldPtr));
 		kernel::setCurrentThreadPriority(slam_priority);
-		demo_slam01_main(&worldPtr);
+		demo_slam_main(&worldPtr);
 		delete thread_disp;
 		#else
 		std::cout << "Please install gdhe module if you want 3D display" << std::endl;
@@ -1391,7 +1412,7 @@ void demo_slam01() {
 	} else // none
 	{
 		kernel::setCurrentThreadPriority(slam_priority);
-		demo_slam01_main(&worldPtr);
+		demo_slam_main(&worldPtr);
 	}
 
 	JFR_DEBUG("Terminated");
@@ -1403,6 +1424,8 @@ void demo_slam01() {
  * #############################################################################
  * main function
  * ###########################################################################*/
+
+#ifndef GENOM
 
 /**
 	* Program options:
@@ -1534,15 +1557,16 @@ int main(int argc, char* const* argv)
 		if (strOpts[sLog][0] == '1') strOpts[sLog] = "rtslam.log";
 	}
 	
-	std::cout << "Loading config files " << strOpts[sConfigSetup] << " and " << strOpts[sConfigEstimation] << std::endl;
-	configSetup.load(strOpts[sConfigSetup]);
-	configEstimation.load(strOpts[sConfigEstimation]);
 	
-	demo_slam01();
+	demo_slam_init();
+	std::cout << "Sensors are calibrating..." << std::flush;
+	if (intOpts[iRobot] == 1 && !(intOpts[iReplay] | 1)) sleep(3);
+	std::cout << " done." << std::endl;
+	demo_slam_run();
 	
 } catch (kernel::Exception &e) { std::cout << e.what();  throw e; } }
 
-
+#endif
 
 /** ############################################################################
  * #############################################################################

@@ -136,14 +136,11 @@ namespace hardware {
 		for(int i = 0; i < bufferSize; ++i) buffer(i,0) = -1.;
 		// start acquire task
 		preloadTask_thread = new boost::thread(boost::bind(&HardwareEstimatorMti::preloadTask,this));
-		std::cout << "Mti is initializating..." << std::flush;
 		if (mode == 2)
 		{ // wait that log has been read before first frame
 			boost::unique_lock<boost::mutex> l(mutex_data);
 			cond_offline.wait(l);
 		}
-		else
-			sleep(3); // give some time to the time estimator to converge and to g to be initialized.
 		std::cout << " done." << std::endl;
 	}
 	

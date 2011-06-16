@@ -66,6 +66,7 @@ static uint32_t txErrors;
 static uint32_t txRetries;
 static TelemetrySettingsData settings;
 static uint32_t timeOfLastObjectUpdate;
+static UAVTalkConnection uavTalkCon;
 
 // Private functions
 static void telemetryTxTask(void *parameters);
@@ -102,7 +103,7 @@ int32_t TelemetryInitialize(void)
 	updateSettings();
 
 	// Initialise UAVTalk
-	UAVTalkInitialize(&transmitData);
+	UAVTalkInitialize(&uavTalkCon, &transmitData);
 
 	// Process all registered objects and connect queue for updates
 	UAVObjIterate(&registerObject);
@@ -221,7 +222,7 @@ static void processObjEvent(UAVObjEvent * ev)
 			if (ev->event == EV_UPDATED || ev->event == EV_UPDATED_MANUAL) {
 				// Send update to GCS (with retries)
 				while (retries < MAX_RETRIES && success == -1) {
-					success = UAVTalkSendObject(ev->obj, ev->instId, metadata.telemetryAcked, REQ_TIMEOUT_MS);	// call blocks until ack is received or timeout
+					success = UAVTalkSendObject(&uavTalkCon, ev->obj, ev->instId, metadata.telemetryAcked, REQ_TIMEOUT_MS);	// call blocks until ack is received or timeout
 					++retries;
 				}
 				// Update stats
@@ -232,7 +233,7 @@ static void processObjEvent(UAVObjEvent * ev)
 			} else if (ev->event == EV_UPDATE_REQ) {
 				// Request object update from GCS (with retries)
 				while (retries < MAX_RETRIES && success == -1) {
-					success = UAVTalkSendObjectRequest(ev->obj, ev->instId, REQ_TIMEOUT_MS);	// call blocks until update is received or timeout
+					success = UAVTalkSendObjectRequest(&uavTalkCon, ev->obj, ev->instId, REQ_TIMEOUT_MS);	// call blocks until update is received or timeout
 					++retries;
 				}
 				// Update stats
@@ -309,7 +310,7 @@ static void telemetryRxTask(void *parameters)
 		// TODO: Currently we periodically check the buffer for data, update once the PIOS_COM is made blocking
 		len = PIOS_COM_ReceiveBufferUsed(inputPort);
 		for (int32_t n = 0; n < len; ++n) {
-			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(inputPort));
+			UAVTalkProcessInputStream(&uavTalkCon, PIOS_COM_ReceiveBuffer(inputPort));
 		}
 		vTaskDelay(5);	// <- remove when blocking calls are implemented
 
@@ -403,8 +404,8 @@ static void updateTelemetryStats()
 	uint32_t timeNow;
 
 	// Get stats
-	UAVTalkGetStats(&utalkStats);
-	UAVTalkResetStats();
+	UAVTalkGetStats(&uavTalkCon, &utalkStats);
+	UAVTalkResetStats(&uavTalkCon);
 
 	// Get object data
 	FlightTelemetryStatsGet(&flightStats);

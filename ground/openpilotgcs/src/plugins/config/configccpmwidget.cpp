@@ -25,6 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "configccpmwidget.h"
+#include "mixersettings.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -1385,10 +1386,31 @@ void ConfigccpmWidget::sendccpmUpdate()
             field->setValue(m_ccpm->CurveSettings->item(i, 1)->text().toDouble(),i);
         }
 
+    
+    field = obj->getField(QString("Curve2Source"));
+    
+    //mapping of collective input to curve 2...
+    //MixerSettings.Curve2Source = Throttle,Roll,Pitch,Yaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5
+    //check if we are using throttle or directly from a channel...
+    if (GUIConfigData.heli.ccpmCollectivePassthroughState)
+    {// input channel
+        field->setValue("Accessory0");
         obj->updated();
-    
-    
  
+        obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
+        Q_ASSERT(obj);
+        field = obj->getField(QString("Accessory0"));
+        field->setValue(tr( "Channel%1" ).arg(GUIConfigData.heli.CollectiveChannel+1));
+        
+    }
+    else
+    {// throttle
+        
+        field->setValue("Throttle");
+    }
+    
+    obj->updated();
+    
 
 }
 

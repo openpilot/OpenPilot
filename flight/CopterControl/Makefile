@@ -37,6 +37,9 @@ OUTDIR := $(TOP)/build/$(TARGET)
 # Set to YES to compile for debugging
 DEBUG ?= NO
 
+# Include objects that are just nice information to show
+DIAGNOSTICS ?= NO
+
 # Set to YES to build a FW version that will erase all flash memory
 ERASE_FLASH ?= NO
 # Set to YES to use the Servo output pins for debugging via scope or logic analyser
@@ -156,16 +159,20 @@ SRC += $(OPUAVSYNTHDIR)/actuatorsettings.c
 SRC += $(OPUAVSYNTHDIR)/attituderaw.c
 SRC += $(OPUAVSYNTHDIR)/attitudeactual.c
 SRC += $(OPUAVSYNTHDIR)/manualcontrolcommand.c
-SRC += $(OPUAVSYNTHDIR)/taskinfo.c
 SRC += $(OPUAVSYNTHDIR)/i2cstats.c
 SRC += $(OPUAVSYNTHDIR)/watchdogstatus.c
 SRC += $(OPUAVSYNTHDIR)/telemetrysettings.c
-SRC += $(OPUAVSYNTHDIR)/ratedesired.c
 SRC += $(OPUAVSYNTHDIR)/manualcontrolsettings.c
 SRC += $(OPUAVSYNTHDIR)/mixersettings.c
-SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
 SRC += $(OPUAVSYNTHDIR)/firmwareiapobj.c
 SRC += $(OPUAVSYNTHDIR)/attitudesettings.c
+
+ifeq ($(DIAGNOISTCS),YES)
+SRC += $(OPUAVSYNTHDIR)/taskinfo.c
+SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
+SRC += $(OPUAVSYNTHDIR)/ratedesired.c
+endif
+
 #${wildcard ${OBJ}/$(shell echo $(VAR) | tr A-Z a-z)/*.c}
 #SRC += ${foreach OBJ, ${UAVOBJECTS}, $(UAVOBJECTS)/$(OBJ).c}
 # Cant use until i can automatically generate list of UAVObjects
@@ -415,6 +422,10 @@ CSTANDARD = -std=gnu99
 
 ifeq ($(DEBUG),YES)
 CFLAGS = -DDEBUG
+endif
+
+ifeq ($(DIAGNOSTICS),YES)
+CFLAGS = -DDIAGNOSTICS
 endif
 
 CFLAGS += -g$(DEBUGF)

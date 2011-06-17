@@ -168,11 +168,13 @@ static void actuatorTask(void* parameters)
 		lastSysTime = thisSysTime;
 
 		FlightStatusGet(&flightStatus);
-		MixerStatusGet(&mixerStatus);
 		MixerSettingsGet (&mixerSettings);
 		ActuatorDesiredGet(&desired);
 		ActuatorCommandGet(&command);
 
+#if defined(DIAGNOSTICS)
+		MixerStatusGet(&mixerStatus);
+#endif
 		ActuatorSettingsMotorsSpinWhileArmedGet(&MotorsSpinWhileArmed);
 		ActuatorSettingsChannelMaxGet(ChannelMax);
 		ActuatorSettingsChannelMinGet(ChannelMin);
@@ -277,7 +279,9 @@ static void actuatorTask(void* parameters)
 							   ChannelMin[ct],
 							   ChannelNeutral[ct]);
 		}
+#if defined(DIAGNOSTICS)
 		MixerStatusSet(&mixerStatus);
+#endif
 
 		// Store update time
 		command.UpdateTime = 1000*dT;

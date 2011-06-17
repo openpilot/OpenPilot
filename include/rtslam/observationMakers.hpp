@@ -64,6 +64,8 @@ class ImagePointObservationMaker
 		*/
 };
 
+#ifdef HAVE_MODULE_DSEG
+
 template<class ObsType, class SenType, class LmkType, class AppType,
     SensorAbstract::type_enum SenTypeId, LandmarkAbstract::type_enum LmkTypeId>
 class ImageSegmentObservationMaker
@@ -101,7 +103,6 @@ class ImageSegmentObservationMaker
       }
 };
 
-#ifdef HAVE_MODULE_DSEG
 
 template<class ObsType, class SenType, class LmkType, class AppType,
     SensorAbstract::type_enum SenTypeId, LandmarkAbstract::type_enum LmkTypeId>

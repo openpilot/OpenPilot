@@ -373,6 +373,7 @@ std::cout << "connecting slots" << std::endl;
 				}
             break;
          }
+#ifdef HAVE_MODULE_DSEG
          case LandmarkDisplay::ltSeg:
          {
             bool dispPred2 = events_.visible && events_.predicted;
@@ -608,6 +609,7 @@ std::cout << "connecting slots" << std::endl;
             }
             break;
          }
+#endif
 			default:
 				JFR_ERROR(RtslamException, RtslamException::UNKNOWN_FEATURE_TYPE, "Don't know how to display this type of landmark: " << landmarkGeomType_);
 		}

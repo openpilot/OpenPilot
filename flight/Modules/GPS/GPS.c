@@ -108,7 +108,7 @@ static uint32_t numParsingErrors;
  * \return -1 if initialisation failed
  * \return 0 on success
  */
-
+module_initcall(GPSInitialize, 0);
 int32_t GPSInitialize(void)
 {
 	signed portBASE_TYPE xReturn;

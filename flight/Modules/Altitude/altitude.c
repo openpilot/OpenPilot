@@ -37,6 +37,7 @@
  */
 
 #include "openpilot.h"
+#include "altitude.h"
 #include "baroaltitude.h"	// object that will be updated by the module
 #if defined(PIOS_INCLUDE_HCSR04)
 #include "sonaraltitude.h"	// object that will be updated by the module
@@ -66,6 +67,7 @@ static void altitudeTask(void *parameters);
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
+module_initcall(AltitudeInitialize, 0);
 int32_t AltitudeInitialize()
 {
 	// Start main task

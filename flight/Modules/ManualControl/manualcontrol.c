@@ -143,6 +143,7 @@ static bool validInputRange(int16_t min, int16_t max, uint16_t value);
 /**
  * Module initialization
  */
+module_initcall(ManualControlInitialize, 0);
 int32_t ManualControlInitialize()
 {
 	/* Check the assumptions about uavobject enum's are correct */

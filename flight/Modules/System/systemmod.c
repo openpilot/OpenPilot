@@ -87,6 +87,7 @@ static void systemTask(void *parameters);
  * Initialise the module, called on startup.
  * \returns 0 on success or -1 if initialisation failed
  */
+module_initcall(SystemModInitialize, 0);
 int32_t SystemModInitialize(void)
 {
 	// Initialize vars
@@ -102,9 +103,6 @@ int32_t SystemModInitialize(void)
 static void systemTask(void *parameters)
 {
 	portTickType lastSysTime;
-
-	// System initialization
-	OpenPilotInit();
 
 	// Register task
 	TaskMonitorAdd(TASKINFO_RUNNING_SYSTEM, systemTaskHandle);

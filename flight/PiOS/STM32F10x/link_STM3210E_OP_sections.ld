@@ -195,6 +195,16 @@ SECTIONS
 	__uavobj_initcall_end   = .;
     } >FLASH
 
+    /* module sections */
+    .initcallmodule.init :
+    {
+        . = ALIGN(4);
+	__module_initcall_start = .;
+        KEEP(*(.initcallmodule.init))
+	. = ALIGN(4);
+	__module_initcall_end   = .;
+    } >FLASH
+
     /* the program code is stored in the .text section, which goes to Flash */
     .text :
     {

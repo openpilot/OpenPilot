@@ -89,6 +89,7 @@ static void SettingsUpdatedCb(UAVObjEvent * ev);
 /**
  * Module initialization
  */
+module_initcall(StabilizationInitialize, 0);
 int32_t StabilizationInitialize()
 {
 	// Initialize variables

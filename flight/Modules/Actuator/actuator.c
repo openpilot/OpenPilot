@@ -90,6 +90,7 @@ typedef struct {
  * @brief Module initialization
  * @return 0
  */
+module_initcall(ActuatorInitialize, 0);
 int32_t ActuatorInitialize()
 {
 	// Create object queue

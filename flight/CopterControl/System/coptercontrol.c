@@ -48,6 +48,9 @@ extern void InitModules(void);
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
 
+/* Init module section */
+extern initcall_t __module_initcall_start[], __module_initcall_end[];
+
 /**
 * OpenPilot Main function:
 *
@@ -65,8 +68,30 @@ int main()
 	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
 
-	/* Initialize the system thread */
-	SystemModInitialize();
+	/* Architecture dependant Hardware and
+	 * core subsystem initialisation
+	 * (see pios_board.c for your arch)
+	 * */
+	PIOS_Board_Init();
+
+#ifdef ERASE_FLASH
+	PIOS_Flash_W25X_EraseChip();
+	while(TRUE){};
+#endif
+
+	/* Initialize modules */
+	/* TODO: add id so we can parse this list later and replace module on the fly */
+	/* property flag will be add to give information like:
+	 *  - importance of the module (can be dropped or required for flight
+	 *  - parameter to enable feature at run-time (based on user setup on GCS)
+	 *  All this will be handled by bootloader. this section will add a function pointer
+	 *  and a pointer to a 32 bit in RAM with all the flags.
+	 *  Limited on CC this could be mapped on RAM for OP so we can grow the list at run-time.
+	 */
+	initcall_t *fn;
+	int32_t ret;
+	for (fn = __module_initcall_start; fn < __module_initcall_end; fn++)
+			ret = (*fn)();
 
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
 	/* Start the FreeRTOS scheduler which never returns.*/
@@ -79,29 +104,6 @@ int main()
 
 	return 0;
 }
-
-/**
- * Initialize the hardware, libraries and modules (called by the System thread in systemmod.c)
- */
-void OpenPilotInit()
-{
-
-	/* Architecture dependant Hardware and
-	 * core subsystem initialisation
-	 * (see pios_board.c for your arch)
-	 * */
-	
-	PIOS_Board_Init();
-	
-#ifdef ERASE_FLASH
-	PIOS_Flash_W25X_EraseChip();
-	while(TRUE){};
-#endif
-
-	/* Initialize modules */
-	InitModules();
-}
-
 
 /**
  * @}

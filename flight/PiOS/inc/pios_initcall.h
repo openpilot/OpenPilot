@@ -55,7 +55,13 @@ typedef int32_t (*initcall_t)(void);
 	static initcall_t __initcall_##fn##id __attribute__((__used__)) \
 	__attribute__((__section__(".initcall" level ".init"))) = fn
 
+/* TODO: add param later */
+#define __define_module_initcall(level,fn,param) \
+	static initcall_t __initcall_##fn __attribute__((__used__)) \
+	__attribute__((__section__(".initcall" level ".init"))) = fn
+
 #define uavobj_initcall(fn)		__define_initcall("uavobj",fn,1)
+#define module_initcall(fn, param)		__define_module_initcall("module",fn,param)
 
 #endif	/* PIOS_INITCALL_H */
 

@@ -31,6 +31,7 @@
  */
 
 #include "openpilot.h"
+#include "telemetry.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "telemetrysettings.h"
@@ -85,6 +86,7 @@ static void updateSettings();
  * \return -1 if initialisation failed
  * \return 0 on success
  */
+module_initcall(TelemetryInitialize, 0);
 int32_t TelemetryInitialize(void)
 {
 	UAVObjEvent ev;
@@ -130,6 +132,7 @@ int32_t TelemetryInitialize(void)
 	
 	return 0;
 }
+
 
 /**
  * Register a new object, adds object to local list and connects the queue depending on the object's

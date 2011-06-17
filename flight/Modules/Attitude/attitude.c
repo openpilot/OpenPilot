@@ -94,6 +94,7 @@ static bool zero_during_arming = false;
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
+module_initcall(AttitudeInitialize, 0);
 int32_t AttitudeInitialize(void)
 {
 	// Initialize quaternion

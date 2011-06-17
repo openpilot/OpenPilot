@@ -31,6 +31,7 @@
 
 #include "openpilot.h"
 #include "pm.h"
+#include "flightplan.h"
 #include "flightplanstatus.h"
 #include "flightplancontrol.h"
 #include "flightplansettings.h"
@@ -56,6 +57,7 @@ extern unsigned char usrlib_img[];
 /**
  * Module initialization
  */
+module_initcall(FlightPlanInitialize, 0);
 int32_t FlightPlanInitialize()
 {
 	taskHandle = NULL;

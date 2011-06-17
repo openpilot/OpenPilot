@@ -82,6 +82,7 @@ static void updateVtolDesiredAttitude();
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
+module_initcall(GuidanceInitialize, 0);
 int32_t GuidanceInitialize()
 {
 	// Create object queue

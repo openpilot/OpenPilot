@@ -39,6 +39,7 @@
  */
 
 #define uavobj_initcall(fn)
+#define module_initcall(fn, param)
 
 #endif	/* PIOS_INITCALL_H */
 

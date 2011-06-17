@@ -113,6 +113,7 @@ private:
         virtual void enableControls(bool enable) { Q_UNUSED(enable)}; // Not used by this widget
 
         bool updatingFromHardware;
+        bool updatingToHardware;
 
     private slots:
         void ccpmSwashplateUpdate();

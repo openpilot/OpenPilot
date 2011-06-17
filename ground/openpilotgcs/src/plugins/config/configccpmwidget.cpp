@@ -48,6 +48,7 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     SwashLvlState=0;
     SwashLvlServoInterlock=0;
     updatingFromHardware=FALSE;
+    updatingToHardware=FALSE;
 
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
     //ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -1020,6 +1021,7 @@ void ConfigccpmWidget::requestccpmUpdate()
     int isCCPM=0;
 
     if (SwashLvlConfigurationInProgress)return;
+    if (updatingToHardware)return;
     updatingFromHardware=TRUE;
     
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -1306,6 +1308,7 @@ void ConfigccpmWidget::sendccpmUpdate()
     UAVDataObject* obj;
 
     if (SwashLvlConfigurationInProgress)return;
+    updatingToHardware=TRUE;
     //ShowDisclaimer(1);
     
     
@@ -1386,6 +1389,7 @@ void ConfigccpmWidget::sendccpmUpdate()
             field->setValue(m_ccpm->CurveSettings->item(i, 1)->text().toDouble(),i);
         }
 
+    obj->updated();
     
     field = obj->getField(QString("Curve2Source"));
     
@@ -1410,7 +1414,7 @@ void ConfigccpmWidget::sendccpmUpdate()
     }
     
     obj->updated();
-    
+    updatingToHardware=FALSE;
 
 }
 

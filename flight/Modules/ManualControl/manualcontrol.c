@@ -42,6 +42,7 @@
 #include "stabilizationdesired.h"
 #include "flighttelemetrystats.h"
 #include "flightstatus.h"
+#include "accessorydesired.h"
 
 // Private constants
 #if defined(PIOS_MANUAL_STACK_SIZE)
@@ -171,6 +172,11 @@ static void manualControlTask(void *parameters)
 	uint8_t disconnected_count = 0;
 	uint8_t connected_count = 0;
 
+	// For now manual instantiate extra instances of Accessory Desired.  In future should be done dynamically
+	// this includes not even registering it if not used
+	AccessoryDesiredCreateInstance();
+	AccessoryDesiredCreateInstance();
+
 	// Make sure unarmed on power up
 	ManualControlCommandGet(&cmd);
 	FlightStatusGet(&flightStatus);
@@ -267,10 +273,26 @@ static void manualControlTask(void *parameters)
 				cmd.Throttle       = scaledChannel[settings.Throttle];
 				flightMode         = scaledChannel[settings.FlightMode];
 
-				// Set accessory channels
-				cmd.Accessory1 = (settings.Accessory1 != MANUALCONTROLSETTINGS_ACCESSORY1_NONE) ? scaledChannel[settings.Accessory1] : 0;
-				cmd.Accessory2 = (settings.Accessory2 != MANUALCONTROLSETTINGS_ACCESSORY2_NONE) ? scaledChannel[settings.Accessory2] : 0;
-				cmd.Accessory3 = (settings.Accessory3 != MANUALCONTROLSETTINGS_ACCESSORY3_NONE) ? scaledChannel[settings.Accessory3] : 0;
+				AccessoryDesiredData accessory;
+				// Set Accessory 0
+				if(settings.Accessory0 != MANUALCONTROLSETTINGS_ACCESSORY0_NONE) {
+					accessory.AccessoryVal = scaledChannel[settings.Accessory0];
+					if(AccessoryDesiredInstSet(0, &accessory) != 0)
+						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
+				}
+				// Set Accessory 1
+				if(settings.Accessory1 != MANUALCONTROLSETTINGS_ACCESSORY1_NONE) {
+					accessory.AccessoryVal = scaledChannel[settings.Accessory1];
+					if(AccessoryDesiredInstSet(1, &accessory) != 0)
+						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
+				}
+				// Set Accsesory 2
+				if(settings.Accessory2 != MANUALCONTROLSETTINGS_ACCESSORY2_NONE) {
+					accessory.AccessoryVal = scaledChannel[settings.Accessory2];
+					if(AccessoryDesiredInstSet(2, &accessory) != 0)
+						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
+				}
+
 
 				processFlightMode(&settings, flightMode);
 				processArm(&cmd, &settings);

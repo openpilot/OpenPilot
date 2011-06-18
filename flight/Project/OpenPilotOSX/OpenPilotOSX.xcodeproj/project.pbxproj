@@ -2738,6 +2738,7 @@
 		65E6E09912E037C800058553 /* pios_adc_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_adc_priv.h; sourceTree = "<group>"; };
 		65E8C743139A6D0900E1F979 /* pios_crc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_crc.c; sourceTree = "<group>"; };
 		65E8C745139A6D1A00E1F979 /* pios_crc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_crc.h; sourceTree = "<group>"; };
+		65E8C788139AA2A800E1F979 /* accessorydesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = accessorydesired.xml; sourceTree = "<group>"; };
 		65E8EF1F11EEA61E00BBF654 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../OpenPilot/Makefile; sourceTree = SOURCE_ROOT; };
 		65E8EF2011EEA61E00BBF654 /* Makefile.posix */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.posix; path = ../../OpenPilot/Makefile.posix; sourceTree = SOURCE_ROOT; };
 		65E8EF5C11EEA61E00BBF654 /* alarms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = alarms.c; path = ../../OpenPilot/System/alarms.c; sourceTree = SOURCE_ROOT; };
@@ -7418,6 +7419,7 @@
 		65C35E4F12EFB2F3004811C2 /* uavobjectdefinition */ = {
 			isa = PBXGroup;
 			children = (
+				65E8C788139AA2A800E1F979 /* accessorydesired.xml */,
 				65C35E5012EFB2F3004811C2 /* actuatorcommand.xml */,
 				65C35E5112EFB2F3004811C2 /* actuatordesired.xml */,
 				65C35E5212EFB2F3004811C2 /* actuatorsettings.xml */,

@@ -23,7 +23,8 @@ SOURCES += uavobject.cpp \
 OTHER_FILES += UAVObjects.pluginspec
 
 # Add in all of the synthetic/generated uavobject files
-HEADERS += $$UAVOBJECT_SYNTHETICS/ahrsstatus.h \
+HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
+    $$UAVOBJECT_SYNTHETICS/ahrsstatus.h \
     $$UAVOBJECT_SYNTHETICS/ahrscalibration.h \
     $$UAVOBJECT_SYNTHETICS/baroaltitude.h \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.h \
@@ -69,7 +70,8 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/ahrsstatus.h \
     $$UAVOBJECT_SYNTHETICS/flightstatus.h \
     $$UAVOBJECT_SYNTHETICS/attitudesettings.h
 
-SOURCES += $$UAVOBJECT_SYNTHETICS/ahrsstatus.cpp \
+SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
+    $$UAVOBJECT_SYNTHETICS/ahrsstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/ahrscalibration.cpp \
     $$UAVOBJECT_SYNTHETICS/baroaltitude.cpp \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.cpp \

@@ -107,7 +107,8 @@ namespace hardware {
 				config.syncOutOffset = 0; // no offset
 				// number of ns to define pulse width
 				if (trigger_shutter < 1e-6 || trigger_mode != 1) trigger_shutter = 0.5e-3;
-				config.syncOutPulseWidth = trigger_shutter/1e-9;
+//				config.syncOutPulseWidth = trigger_shutter/1e-9; // new driver
+				config.syncOutPulseWidth = trigger_shutter/33.9e-9; // old driver
 	
 				// Set SyncOut settings
 				if (!mti->set_syncOut(config.syncOutMode, config.syncOutPulsePolarity,

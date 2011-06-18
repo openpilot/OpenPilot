@@ -7,9 +7,9 @@
         <field name="Yaw" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
         <field name="Throttle" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
         <field name="FlightMode" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
+        <field name="Accessory0" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
         <field name="Accessory1" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
         <field name="Accessory2" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
-        <field name="Accessory3" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
         <field name="Arming" units="" type="enum" elements="1" options="Always Disarmed,Always Armed,Roll Left,Roll Right,Pitch Forward,Pitch Aft,Yaw Left,Yaw Right" defaultvalue="Always Disarmed"/>
 	
 	<!-- Note these options should be identical to those in StabilizationDesired.StabilizationMode -->

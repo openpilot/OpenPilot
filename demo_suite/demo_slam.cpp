@@ -306,6 +306,7 @@ class ConfigSetup: public kernel::KeyValueFileSaveLoad
 	double PERT_RANWALKGYRO; /// IMU w_bias random walk (rad/s per sqrt(s))
 
 	double UNCERT_HEADING;   /// initial heading uncertainty
+	double UNCERT_ATTITUDE;   /// initial attitude angles uncertainty
 	
 	double IMU_TIMESTAMP_CORRECTION; /// correction to add to the IMU timestamp for synchronization (s)
 	double GPS_TIMESTAMP_CORRECTION; /// correction to add to the GPS timestamp for synchronization (s)
@@ -762,7 +763,8 @@ void demo_slam_init()
 
 	robPtr1->linkToParentMap(mapPtr);
 	robPtr1->pose.x(quaternion::originFrame());
-	robPtr1->setPoseStd(0,0,0, 0,0,floatOpts[fHeading], 0,0,0, 0,0,configSetup.UNCERT_HEADING);
+	robPtr1->setPoseStd(0,0,0, 0,0,floatOpts[fHeading], 
+	                    0,0,0, configSetup.UNCERT_ATTITUDE,configSetup.UNCERT_ATTITUDE,configSetup.UNCERT_HEADING);
 	if (dataLogger) dataLogger->addLoggable(*robPtr1.get());
 
 	if (intOpts[iSimu] != 0)
@@ -1615,6 +1617,7 @@ void ConfigSetup::loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFi
 	KeyValueFile_getItem(PERT_RANWALKGYRO);
 	
 	KeyValueFile_getItem(UNCERT_HEADING);
+	KeyValueFile_getItem(UNCERT_ATTITUDE);
 	
 	KeyValueFile_getItem(IMU_TIMESTAMP_CORRECTION);
 	KeyValueFile_getItem(GPS_TIMESTAMP_CORRECTION);
@@ -1672,6 +1675,7 @@ void ConfigSetup::saveKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile)
 	KeyValueFile_setItem(PERT_RANWALKGYRO);
 	
 	KeyValueFile_setItem(UNCERT_HEADING);
+	KeyValueFile_setItem(UNCERT_ATTITUDE);
 	
 	KeyValueFile_setItem(IMU_TIMESTAMP_CORRECTION);
 	KeyValueFile_setItem(GPS_TIMESTAMP_CORRECTION);

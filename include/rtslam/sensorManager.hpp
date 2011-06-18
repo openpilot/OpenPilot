@@ -38,7 +38,6 @@ namespace rtslam {
 	{
 		protected:
 			map_ptr_t mapPtr;
-			bool started;
 			double start_date;
 			bool all_init;
 		public:
@@ -53,14 +52,15 @@ namespace rtslam {
 			ProcessInfo(): sen(), id(0), no_more_data(false) {}
 		};
 		
-		SensorManagerAbstract(map_ptr_t mapPtr): mapPtr(mapPtr), started(false), start_date(0.), all_init(false) {}
+		SensorManagerAbstract(map_ptr_t mapPtr): mapPtr(mapPtr), start_date(0.), all_init(false) {}
 		
+		void setStartDate(double start_date) { this->start_date = start_date; }
 		virtual ProcessInfo getNextDataToUse() = 0;
 		
 		/**
 			@return 0 if no more sensor to init, 1 if needs to wait for data to init, 2 if returned correctly a data for init
 			*/
-		int getNextDataToInit(ProcessInfo &result, double date)
+		int getNextDataToInit(ProcessInfo &result)
 		{
 			// TODO set an order for init
 			RawInfos infos;
@@ -77,14 +77,14 @@ namespace rtslam {
 						if (infos.available.size() > 0)
 						{
 							RawInfo &info = infos.available.front();
-							if (info.timestamp > date) // if we anyway don't have data before the start date, use the first one
+							if (info.timestamp > start_date) // if we anyway don't have data before the start date, use the first one
 							{
 								result = ProcessInfo((*senIter), info.id);
 								return 2;
 							} else // else find the last one before the start date
 							{
 								for(std::vector<RawInfo>::reverse_iterator rawIter = infos.available.rbegin(); rawIter != infos.available.rend(); ++rawIter)
-									if ((*rawIter).timestamp <= date)
+									if ((*rawIter).timestamp <= start_date)
 									{
 										result = ProcessInfo((*senIter), (*rawIter).id);
 										return 2;
@@ -120,6 +120,18 @@ namespace rtslam {
 				RawInfo info;
 				double oldest_timestamp = -1;
 				result.no_more_data = true;
+				
+				if (!all_init)
+				{
+					ProcessInfo result;
+					int res;
+					while ((res = getNextDataToInit(result)) == 1)
+					{
+						if (res == 0) { all_init = true; break; } else
+						if (res == 2) { return result; } else
+						usleep(1000);
+					}
+				}
 				
 				for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin();
 					robIter != mapPtr->robotList().end(); ++robIter)
@@ -159,17 +171,11 @@ namespace rtslam {
 			
 			virtual ProcessInfo getNextDataToUse()
 			{
-				if (!started)
-				{
-					start_date = getNowTimestamp();
-					started = true;
-				}
-				
-				if (!all_init) // FIXME offline, how to know the start date ?
+				if (!all_init)
 				{
 					ProcessInfo result;
 					int res;
-					while ((res = getNextDataToInit(result, start_date)) == 1)
+					while ((res = getNextDataToInit(result)) == 1)
 					{
 						if (res == 0) { all_init = true; break; } else
 						if (res == 2) { return result; } else

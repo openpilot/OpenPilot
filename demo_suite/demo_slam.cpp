@@ -1101,6 +1101,26 @@ void demo_slam_main(world_ptr_t *world)
 				(*senIter)->start();
 		}
 	}
+
+	// wait for their init
+	std::cout << "Sensors are calibrating..." << std::flush;
+	if ((intOpts[iRobot] == 1 || intOpts[iGps] != 0) && !(intOpts[iReplay] & 1)) sleep(3);
+	std::cout << " done." << std::endl;
+					
+	// set the start date
+	double start_date;
+	if (!(intOpts[iReplay] & 1) && intOpts[iDump]) {
+		start_date = getNowTimestamp();
+		std::fstream f((strOpts[sDataPath] + std::string("/sdate.log")).c_str(), std::ios_base::out);
+		f << std::setprecision(19) << start_date << std::endl;
+		f.close();
+	}
+	else if (intOpts[iReplay] & 1) {
+		std::fstream f((strOpts[sDataPath] + std::string("/sdate.log")).c_str(), std::ios_base::in);
+		f >> start_date;
+		f.close();
+	}
+	sensorManager->setStartDate(start_date);
 	
 	// start other hardware sensors
 	for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin();
@@ -1114,7 +1134,6 @@ void demo_slam_main(world_ptr_t *world)
 		}
 	}
 		
-
 		
 jblas::vec robot_prediction;
 double average_robot_innovation = 0.;

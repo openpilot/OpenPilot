@@ -92,7 +92,10 @@ void OpenPilotInit()
 	
 #ifdef ERASE_FLASH
 	PIOS_Flash_W25X_EraseChip();
-	while(TRUE){};
+	while(TRUE){
+		PIOS_LED_Toggle(LED1);
+		PIOS_DELAY_WaitmS(50);
+	};
 #endif
 
 	/* Initialize modules */

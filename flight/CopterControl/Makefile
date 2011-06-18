@@ -65,7 +65,9 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-MODULES = Telemetry Attitude Stabilization Actuator ManualControl FirmwareIAP
+MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP 
+# Telemetry must be last to grab the optional modules
+MODULES += Telemetry
 
 # Paths
 OPSYSTEM = ./System

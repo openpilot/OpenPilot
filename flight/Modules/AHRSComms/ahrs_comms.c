@@ -72,6 +72,10 @@ static void ahrscommsTask(void *parameters);
 int32_t AHRSCommsInitialize(void)
 {
 	// Start main task
+	AHRSStatusInitialize();
+	AHRSCalibrationInitialize();
+	AttitudeRawInitialize();
+	
 	xTaskCreate(ahrscommsTask, (signed char *)"AHRSComms", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_AHRSCOMMS, taskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_AHRS);

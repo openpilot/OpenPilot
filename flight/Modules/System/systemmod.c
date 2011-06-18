@@ -43,7 +43,9 @@
 #include "objectpersistence.h"
 #include "flightstatus.h"
 #include "systemstats.h"
+#include "systemsettings.h"
 #include "i2cstats.h"
+#include "taskinfo.h"
 #include "watchdogstatus.h"
 #include "taskmonitor.h"
 #include "pios_config.h"
@@ -78,11 +80,12 @@ static int32_t stackOverflow;
 // Private functions
 static void objectUpdatedCb(UAVObjEvent * ev);
 static void updateStats();
-static void updateI2Cstats();
-static void updateWDGstats();
 static void updateSystemAlarms();
 static void systemTask(void *parameters);
-
+#if defined(DIAGNOSTICS)
+static void updateI2Cstats();
+static void updateWDGstats();
+#endif
 /**
  * Initialise the module, called on startup.
  * \returns 0 on success or -1 if initialisation failed
@@ -106,6 +109,16 @@ static void systemTask(void *parameters)
 	// System initialization
 	OpenPilotInit();
 
+	// Must registers objects here for system thread because ObjectManager started in OpenPilotInit
+	SystemSettingsInitialize();
+	SystemStatsInitialize();
+	ObjectPersistenceInitialize();
+#if defined(DIAGNOSTICS)
+	TaskInfoInitialize();
+	I2CStatsInitialize();
+	WatchdogStatusInitialize();
+#endif
+
 	// Register task
 	TaskMonitorAdd(TASKINFO_RUNNING_SYSTEM, systemTaskHandle);
 
@@ -124,9 +137,10 @@ static void systemTask(void *parameters)
 
 		// Update the system alarms
 		updateSystemAlarms();
+#if defined(DIAGNOSTICS)
 		updateI2Cstats();
 		updateWDGstats();
-		
+#endif
 		// Update the task status object
 		TaskMonitorUpdateAll();
 
@@ -228,9 +242,7 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 /**
  * Called periodically to update the I2C statistics 
  */
-#if defined(ARCH_POSIX) || defined(ARCH_WIN32)
-static void updateI2Cstats() {} //Posix and win32 don't have I2C
-#else
+#if defined(DIAGNOSTICS)
 static void updateI2Cstats() 
 {
 #if defined(PIOS_INCLUDE_I2C)
@@ -250,7 +262,6 @@ static void updateI2Cstats()
 	I2CStatsSet(&i2cStats);
 #endif
 }
-#endif
 
 static void updateWDGstats() 
 {
@@ -259,6 +270,8 @@ static void updateWDGstats()
 	watchdogStatus.ActiveFlags = PIOS_WDG_GetActiveFlags();
 	WatchdogStatusSet(&watchdogStatus);
 }
+#endif
+
 
 /**
  * Called periodically to update the system stats

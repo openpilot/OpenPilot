@@ -111,6 +111,10 @@ static uint32_t numParsingErrors;
 
 int32_t GPSInitialize(void)
 {
+	GPSPositionInitialize();
+	GPSTimeInitialize();
+	HomeLocationInitialize();
+	
 	signed portBASE_TYPE xReturn;
 
 	// TODO: Get gps settings object

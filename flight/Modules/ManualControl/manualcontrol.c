@@ -149,6 +149,13 @@ int32_t ManualControlInitialize()
 	/* Check the assumptions about uavobject enum's are correct */
 	if(!assumptions) 
 		return -1;
+	
+	AccessoryDesiredInitialize();
+	ManualControlSettingsInitialize();
+	ManualControlCommandInitialize();
+	FlightStatusInitialize();
+	StabilizationDesiredInitialize();
+	
 	// Start main task
 	xTaskCreate(manualControlTask, (signed char *)"ManualControl", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_MANUALCONTROL, taskHandle);

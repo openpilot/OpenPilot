@@ -40,8 +40,6 @@
 #include "attitudeactual.h"
 #include "attituderaw.h"
 #include "flightstatus.h"
-#include "systemsettings.h"
-#include "ahrssettings.h"
 #include "manualcontrol.h" // Just to get a macro
 #include "CoordinateConversions.h"
 
@@ -92,7 +90,12 @@ static void SettingsUpdatedCb(UAVObjEvent * ev);
 int32_t StabilizationInitialize()
 {
 	// Initialize variables
-	
+	StabilizationSettingsInitialize();
+	ActuatorDesiredInitialize();
+#if defined(DIAGNOSTICS)
+	RateDesiredInitialize();
+#endif
+
 	// Create object queue
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 	
@@ -125,7 +128,6 @@ static void stabilizationTask(void* parameters)
 	RateDesiredData rateDesired;
 	AttitudeActualData attitudeActual;
 	AttitudeRawData attitudeRaw;
-	SystemSettingsData systemSettings;
 	FlightStatusData flightStatus;
 	
 	SettingsUpdatedCb((UAVObjEvent *) NULL);
@@ -153,7 +155,6 @@ static void stabilizationTask(void* parameters)
 		StabilizationDesiredGet(&stabDesired);
 		AttitudeActualGet(&attitudeActual);
 		AttitudeRawGet(&attitudeRaw);
-		SystemSettingsGet(&systemSettings);
 
 #if defined(DIAGNOSTICS)
 		RateDesiredGet(&rateDesired);

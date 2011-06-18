@@ -96,6 +96,10 @@ static bool zero_during_arming = false;
  */
 int32_t AttitudeInitialize(void)
 {
+	AttitudeActualInitialize();
+	AttitudeRawInitialize();
+	AttitudeSettingsInitialize();
+
 	// Initialize quaternion
 	AttitudeActualData attitude;
 	AttitudeActualGet(&attitude);

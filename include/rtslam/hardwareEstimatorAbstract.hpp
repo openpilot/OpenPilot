@@ -43,6 +43,8 @@ namespace hardware {
 			the increment of a physical quantity since last reading (odometry, ...)
 			*/
 			virtual jblas::ind_array incrementValues() = 0;
+		
+			virtual void start() {}
 	};
 
 }}}

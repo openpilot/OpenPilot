@@ -38,6 +38,9 @@ namespace rtslam {
 	{
 		protected:
 			map_ptr_t mapPtr;
+			bool started;
+			double start_date;
+			bool all_init;
 		public:
 		
 		struct ProcessInfo
@@ -50,9 +53,51 @@ namespace rtslam {
 			ProcessInfo(): sen(), id(0), no_more_data(false) {}
 		};
 		
-		SensorManagerAbstract(map_ptr_t mapPtr): mapPtr(mapPtr) {}
+		SensorManagerAbstract(map_ptr_t mapPtr): mapPtr(mapPtr), started(false), start_date(0.), all_init(false) {}
 		
 		virtual ProcessInfo getNextDataToUse() = 0;
+		
+		/**
+			@return 0 if no more sensor to init, 1 if needs to wait for data to init, 2 if returned correctly a data for init
+			*/
+		int getNextDataToInit(ProcessInfo &result, double date)
+		{
+			// TODO set an order for init
+			RawInfos infos;
+			bool hasSensorMissingData = false;
+			for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin();
+				robIter != mapPtr->robotList().end(); ++robIter)
+			{
+				for (RobotAbstract::SensorList::iterator senIter = (*robIter)->sensorList().begin();
+					senIter != (*robIter)->sensorList().end(); ++senIter)
+				{
+					if ((*senIter)->getUseForInit())
+					{
+						(*senIter)->queryAvailableRaws(infos);
+						if (infos.available.size() > 0)
+						{
+							RawInfo &info = infos.available.front();
+							if (info.timestamp > date) // if we anyway don't have data before the start date, use the first one
+							{
+								result = ProcessInfo((*senIter), info.id);
+								return 2;
+							} else // else find the last one before the start date
+							{
+								for(std::vector<RawInfo>::reverse_iterator rawIter = infos.available.rbegin(); rawIter != infos.available.rend(); ++rawIter)
+									if ((*rawIter).timestamp <= date)
+									{
+										result = ProcessInfo((*senIter), (*rawIter).id);
+										return 2;
+									}
+							}
+						} else
+							hasSensorMissingData = true;
+					}
+				}
+			}
+			
+			if (hasSensorMissingData) return 1; else return 0;
+		}
 	};
 
 	
@@ -114,6 +159,25 @@ namespace rtslam {
 			
 			virtual ProcessInfo getNextDataToUse()
 			{
+				if (!started)
+				{
+					start_date = getNowTimestamp();
+					started = true;
+				}
+				
+				if (!all_init) // FIXME offline, how to know the start date ?
+				{
+					ProcessInfo result;
+					int res;
+					while ((res = getNextDataToInit(result, start_date)) == 1)
+					{
+						if (res == 0) { all_init = true; break; } else
+						if (res == 2) { return result; } else
+						usleep(1000);
+					}
+				}
+
+    
 				if (!senAllPtr || !senLastPtr)
 				{
 					for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin();
@@ -127,7 +191,8 @@ namespace rtslam {
 					}
 				}
 				
-				int resAll, resLast;
+				
+				int resAll=0, resLast=0;
 				if (senAllPtr) resAll = senAllPtr->queryAvailableRaws(infosAll);
 				if (senLastPtr) resLast = senLastPtr->queryAvailableRaws(infosLast);
 				

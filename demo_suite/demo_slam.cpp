@@ -753,7 +753,9 @@ void demo_slam_init()
 				configSetup.MTI_DEVICE, intOpts[iTrigger], floatOpts[fFreq], floatOpts[fShutter], 1024, mode, strOpts[sDataPath]));
 			if (intOpts[iTrigger] != 0) floatOpts[fFreq] = hardEst1_->getFreq();
 			hardEst1_->setSyncConfig(configSetup.IMU_TIMESTAMP_CORRECTION);
-			hardEst1_->start();
+			//hardEst1_->setUseForInit(true);
+			//hardEst1_->setNeedInit(true);
+			//hardEst1_->start();
 			hardEst1 = hardEst1_;
 		}
 		robPtr1_->setHardwareEstimator(hardEst1);
@@ -990,13 +992,17 @@ void demo_slam_init()
 		hardSen11->setTimingInfos(1.0/hardSen11->getFreq(), 1.0/hardSen11->getFreq());
 		senPtr11->setHardwareSensor(hardSen11);
 		senPtr11->setIntegrationPolicy(false);
-		hardSen11->start();
+		senPtr11->setUseForInit(false);
+		senPtr11->setNeedInit(false);
+		//hardSen11->start();
 		#else
 		if (intOpts[iReplay] & 1)
 		{
 			hardware::hardware_sensorext_ptr_t hardSen11(new hardware::HardwareSensorCameraFirewire(rawdata_condition, cv::Size(img_width,img_height),strOpts[sDataPath]));
 			senPtr11->setHardwareSensor(hardSen11);
 			senPtr11->setIntegrationPolicy(false);
+			senPtr11->setUseForInit(false);
+			senPtr11->setNeedInit(false);
 			hardSen11->start();
 		}
 		#endif
@@ -1012,9 +1018,11 @@ void demo_slam_init()
 			hardGps->setTimingInfos(1.0/20.0, 1.5/20.0);
 			senPtr13->setHardwareSensor(hardGps);
 			senPtr13->setIntegrationPolicy(true);
+			senPtr13->setUseForInit(true);
+			senPtr13->setNeedInit(true);
 			senPtr13->setPose(configSetup.GPS_POSE[0], configSetup.GPS_POSE[1], configSetup.GPS_POSE[2],
 												configSetup.GPS_POSE[3], configSetup.GPS_POSE[4], configSetup.GPS_POSE[5]); // x,y,z,roll,pitch,yaw
-			hardGps->start();
+			//hardGps->start();
 		}
 	}
 	
@@ -1079,6 +1087,34 @@ void demo_slam_main(world_ptr_t *world)
 		while(!worldPtr->display_rendered) worldPtr->display_condition.wait(display_lock);
 		display_lock.unlock();
 	}
+
+	// start hardware sensors that need long init
+	map_ptr_t mapPtr = (*world)->mapList().front();
+	for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin();
+		robIter != mapPtr->robotList().end(); ++robIter)
+	{
+		if ((*robIter)->hardwareEstimatorPtr) (*robIter)->hardwareEstimatorPtr->start();
+		for (RobotAbstract::SensorList::iterator senIter = (*robIter)->sensorList().begin();
+			senIter != (*robIter)->sensorList().end(); ++senIter)
+		{
+			if ((*senIter)->getNeedInit())
+				(*senIter)->start();
+		}
+	}
+	
+	// start other hardware sensors
+	for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin();
+		robIter != mapPtr->robotList().end(); ++robIter)
+	{
+		for (RobotAbstract::SensorList::iterator senIter = (*robIter)->sensorList().begin();
+			senIter != (*robIter)->sensorList().end(); ++senIter)
+		{
+			if (!(*senIter)->getNeedInit())
+				(*senIter)->start();
+		}
+	}
+		
+
 		
 jblas::vec robot_prediction;
 double average_robot_innovation = 0.;
@@ -1389,6 +1425,7 @@ void demo_slam_exit(world_ptr_t *world, boost::thread *thread_main) {
  * Demo function
  * ###########################################################################*/
 
+
 void demo_slam_run() {
 
 	// to start with qt display
@@ -1561,9 +1598,6 @@ int main(int argc, char* const* argv)
 	
 	
 	demo_slam_init();
-	std::cout << "Sensors are calibrating..." << std::flush;
-	if (intOpts[iRobot] == 1 && !(intOpts[iReplay] | 1)) sleep(3);
-	std::cout << " done." << std::endl;
 	demo_slam_run();
 	
 } catch (kernel::Exception &e) { std::cout << e.what();  throw e; } }

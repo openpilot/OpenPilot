@@ -176,13 +176,14 @@ class HardwareSensorAbstract
 		
 		virtual double getLastTimestamp() = 0;
 		
-		virtual VecIndT getRaws(double t1, double t2); /// will also release the raws before the first one
-		virtual int getUnreadRawInfos(RawInfos &infos); /// get timing informations about unread raws
-		virtual int getNextRawInfo(RawInfo &info); /// get info about next unread raw
-		virtual void getRaw(unsigned id, T& raw); /// will also release the raws before this one
+		virtual VecIndT getRaws(double t1, double t2); ///< will also release the raws before the first one
+		virtual int getUnreadRawInfos(RawInfos &infos); ///< get timing informations about unread raws
+		virtual int getNextRawInfo(RawInfo &info); ///< get info about next unread raw
+		virtual void getRaw(unsigned id, T& raw); ///< will also release the raws before this one
+		virtual void observeRaw(unsigned id, T& raw); ///< get raw but doesn't release raws before
 		virtual double getRawTimestamp(unsigned id);
-		virtual int getLastUnreadRaw(T& raw); /// will also release the raws before this one
-		virtual void getLastProcessedRaw(T& raw) { raw = buffer(last_sent_pos); } /// for information only (display...)
+		virtual int getLastUnreadRaw(T& raw); ///< will also release the raws before this one
+		virtual void getLastProcessedRaw(T& raw) { raw = buffer(last_sent_pos); } ///< for information only (display...)
 		virtual void release() { release(read_pos); }
 		
 		friend class rtslam::SensorProprioAbstract;
@@ -371,6 +372,12 @@ template<typename T>
 double HardwareSensorAbstract<T>::getRawTimestamp(unsigned id)
 {
 	return extractRawTimestamp(buffer[id]);
+}
+
+template<typename T>
+void HardwareSensorAbstract<T>::observeRaw(unsigned id, T& raw)
+{
+	raw = buffer[id];
 }
 
 template<typename T>

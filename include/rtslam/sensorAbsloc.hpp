@@ -68,10 +68,49 @@ namespace jafar {
 						hasVar = true;
 				}
 				
+				
+				virtual void init(unsigned id)
+				{
+					RawInfos infos;
+					queryAvailableRaws(infos);
+					
+					// find minimum variance
+					jblas::vec3 min_var; min_var(0) = min_var(1) = min_var(2) = 1e3;
+					for(std::vector<RawInfo>::iterator it = infos.available.begin(); it != infos.available.end(); ++it)
+					{
+						hardwareSensorPtr->observeRaw((*it).id, reading);
+						for(int i = 0; i < 3; ++i) if (reading.data(i+1+inns) < min_var(i)) min_var(i) = reading.data(i+1+inns);
+						if ((*it).id == id) break;
+					}
+					
+					// do the average using only readings with variance between min and 2*min
+					jblas::vec3 average; average.clear();
+					jblas::vec3 sum_coeffs; sum_coeffs.clear();
+					for(std::vector<RawInfo>::iterator it = infos.available.begin(); it != infos.available.end(); ++it)
+					{
+						hardwareSensorPtr->observeRaw((*it).id, reading);
+						for(int i = 0; i < 3; ++i)
+							if (reading.data(i+1+inns) < 2*min_var(i))
+								{ average(i) += reading.data(i+1)*reading.data(i+1+inns); sum_coeffs(i) += reading.data(i+1+inns); }
+						if ((*it).id == id) break;
+					}
+					for(int i = 0; i < 3; ++i) average(i) /= sum_coeffs(i);
+					
+					// now initialize the robot state with this variance
+					for(int i = 0; i < 3; ++i) { reading.data(i+1) = average(i); reading.data(i+1+inns) = min_var(i); }
+				}
+				
+
 				virtual void process(unsigned id)
 				{
-					hardwareSensorPtr->getRaw(id, reading);
-					
+					if (use_for_init)
+					{
+						init(id);
+					} else
+					{
+						hardwareSensorPtr->getRaw(id, reading);
+					}
+						
 					// TODO a vec hardware sensor should return some information about what it is returning
 					// just like robots should be able to do with, including whether the info is measure or variance.
 					// pos(x/y/z)(gps,baro,mocap), ori (mocap,mag), vel(gps), gyr(y/p/r), acc(x/y/z)
@@ -87,6 +126,7 @@ namespace jafar {
 					jblas::vec T = ublas::subrange(pose.x(), 0, 3);
 					jblas::vec p = ublas::subrange(robotPtr()->pose.x(), 0, 3);
 					jblas::vec q = ublas::subrange(robotPtr()->pose.x(), 3, 7);
+					jblas::vec Tr = quaternion::rotate(q,T);
 
 					switch (innovation->size())
 					{
@@ -95,7 +135,7 @@ namespace jafar {
 							ublas::subrange(EXP_rs, 0,3, 0,3) = jblas::identity_mat(3);
 							ublas::subrange(EXP_rs, 0,3, 3,7) = EXP_q;
 						
-							expectation->x() = p + quaternion::rotate(q,T);
+							expectation->x() = p + Tr;
 							expectation->P() = ublasExtra::prod_JPJt(ublas::project(robotPtr()->mapPtr()->filterPtr->P(), ia_rs, ia_rs), EXP_rs);
 							
 							measurement->x()(0) = reading.data(2) - robotPtr()->origin(0);
@@ -124,29 +164,58 @@ namespace jafar {
 							          "SensorAbsloc reading size " << reading.data.size() << " not supported.");
 					}
 
-					if (first && !absolute)
+					if (first)
 					{
 						// for first reading we force initialization
-						//robotPtr()->pose.P() = jblas::zero_mat(robotPtr()->pose.size());
-						switch (innovation->size())
+						if (absolute)
 						{
-							case 3: // POS
-								robotPtr()->origin = measurement->x() - (expectation->x()-p);
-								std::cout << std::setprecision(16) << "robot origin : " << robotPtr()->origin << std::endl;
-								ublas::subrange(robotPtr()->pose.x(), 0, 3) = jblas::zero_vec(3);
-								ublas::subrange(robotPtr()->pose.P(), 0,3, 0,3) = measurement->P();
-								break;
-							default:
-								break;
+							switch (innovation->size())
+							{
+								case 3: // POS
+									robotPtr()->origin = jblas::zero_vec(3);
+									ublas::subrange(robotPtr()->pose.x(), 0,3) = measurement->x() - Tr;
+									ublas::subrange(robotPtr()->pose.P(), 0,3, 0,3) = measurement->P() + 
+										ublasExtra::prod_JPJt(ublas::subrange(robotPtr()->pose.P(), 3,7, 3,7), EXP_q);
+									break;
+								default:
+									break;
+							}
+						} else
+						{
+							switch (innovation->size())
+							{
+								case 3: // POS
+									robotPtr()->origin = measurement->x() - Tr;
+									ublas::subrange(robotPtr()->pose.x(), 0, 3) = jblas::zero_vec(3);
+									ublas::subrange(robotPtr()->pose.P(), 0,3, 0,3) = measurement->P() + 
+										ublasExtra::prod_JPJt(ublas::subrange(robotPtr()->pose.P(), 3,7, 3,7), EXP_q);
+									break;
+								default:
+									break;
+							}
 						}
+						
+						std::cout << std::setprecision(16) << "robot origin: " << robotPtr()->origin << 
+							" ; initial position: " << ublas::subrange(robotPtr()->pose.x(), 0,3) << 
+							" ; initial pose var: " << ublas::subrange(robotPtr()->pose.P(), 0,3, 0,3) << std::endl;
+						
 					} else
 					{
 						map_ptr_t mapPtr = robotPtr()->mapPtr();
 						ind_array ia_x = mapPtr->ia_used_states();
 						mapPtr->filterPtr->correct(ia_x,*innovation,INN_rs,ia_rs);
 					}
+
+					if (use_for_init)
+					{
+						use_for_init = false;
+						hardwareSensorPtr->getRaw(id, reading); // just to free
+					}
+					
 					//hardwareSensorPtr->release();
 				}
+
+				
 		};
 }}
 

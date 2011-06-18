@@ -43,7 +43,7 @@ namespace jafar {
 		}
 
 		SensorAbstract::SensorAbstract(const robot_ptr_t & _robPtr, const filtered_obj_t inFilter):
-			MapObject(_robPtr->mapPtr(), 7, inFilter), integrate_all(false), pose(state, Gaussian::REMOTE),
+			MapObject(_robPtr->mapPtr(), 7, inFilter), integrate_all(false), use_for_init(false), need_init(false), pose(state, Gaussian::REMOTE),
 			ia_globalPose(inFilter == FILTERED ? ia_union(_robPtr->pose.ia(), pose.ia()) : _robPtr->pose.ia())
 		{
 			category = SENSOR;

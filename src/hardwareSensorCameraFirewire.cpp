@@ -164,6 +164,8 @@ namespace hardware {
 	{ try {
 		struct timeval ts, *pts = &ts;
 		int r;
+		bool emptied_buffers = false;
+		double date = 0.;
 
 		while(true)
 		{
@@ -199,7 +201,9 @@ namespace hardware {
 			{
 #ifdef HAVE_VIAM
 				int buff_write = getWritePos();
+				if (!emptied_buffers) date = getNowTimestamp();
 				r = viam_oneshot(handle, bank, &(bufferImage[buff_write]), &pts, 1);
+				if (!emptied_buffers) { date = getNowTimestamp()-date; if (date < 0.004) continue; else emptied_buffers = true; }
 				bufferSpecPtr[buff_write]->arrival = getNowTimestamp();
 				bufferSpecPtr[buff_write]->timestamp = ts.tv_sec + ts.tv_usec*1e-6;
 				last_timestamp = bufferSpecPtr[buff_write]->timestamp;

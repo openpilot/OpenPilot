@@ -25,6 +25,8 @@ namespace hardware {
 #ifdef HAVE_MTI
 		INERTIAL_DATA data;
 #endif
+		//bool emptied_buffers = false; // done in driver
+		//double date = 0.;
 		jblas::vec row(10);
 		std::fstream f;
 		if (mode == 1 || mode == 2)
@@ -47,7 +49,9 @@ namespace hardware {
 			} else
 			{
 #ifdef HAVE_MTI
+				//if (!emptied_buffers) date = getNowTimestamp();
 				if (!mti->read(&data)) continue;
+				//if (!emptied_buffers) { date = getNowTimestamp()-date; if (date < 0.002) continue; else emptied_buffers = true; }
 				l.lock();
 				if (write_position == read_position) JFR_ERROR(RtslamException, RtslamException::BUFFER_OVERFLOW, "Data not read: Increase MTI buffer size !");
 				row(0) = data.TIMESTAMP_FILTERED;

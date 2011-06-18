@@ -35,10 +35,11 @@ namespace hardware {
 		
 		while (true)
 		{
+			boost::unique_lock<boost::mutex> l(mutex_data, boost::defer_lock_t());
 			if (mode == 2)
 			{
 				f >> row;
-				boost::unique_lock<boost::mutex> l(mutex_data);
+				l.lock();
 				if (write_position == read_position) cond_offline.notify_all();
 				if (f.eof()) { cond_offline.notify_all(); f.close(); return; }
 				while (write_position == read_position) cond_data.wait(l);
@@ -47,7 +48,7 @@ namespace hardware {
 			{
 #ifdef HAVE_MTI
 				if (!mti->read(&data)) continue;
-				boost::unique_lock<boost::mutex> l(mutex_data);
+				l.lock();
 				if (write_position == read_position)
 				{
 					//JFR_ERROR(RtslamException, RtslamException::BUFFER_OVERFLOW, "Data not read: Increase MTI buffer size !");
@@ -68,6 +69,7 @@ namespace hardware {
 			ublas::matrix_row<jblas::mat>(buffer, write_position) = row;
 			buffer(write_position,0) += timestamps_correction;
 			++write_position; if (write_position >= bufferSize) write_position = 0;
+			l.unlock();
 			
 			if (mode == 1)
 			{

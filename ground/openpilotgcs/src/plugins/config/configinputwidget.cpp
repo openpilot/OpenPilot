@@ -538,7 +538,7 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
             obj->setMetadata(mdata);
 
             // Set some slider values to better defaults
-            // Find what channel we used for throttle, set it 5% about min:
+            // Find what channel we used for throttle, set it 2% about min:
             int throttleChannel = -1;
             int fmChannel = -1;
             for (int i=0; i < inChannelAssign.length(); i++) {
@@ -558,10 +558,17 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
 
             // Throttle neutral defaults to 2% of range
             if (throttleChannel > -1) {
-                inSliders.at(throttleChannel)->setValue(
-                            inSliders.at(throttleChannel)->minimum() +
-                            (inSliders.at(throttleChannel)->maximum()-
-                             inSliders.at(throttleChannel)->minimum())*0.02);
+                if (inRevCheckboxes[throttleChannel]->isChecked()) {
+                    inSliders.at(throttleChannel)->setValue(
+                                inSliders.at(throttleChannel)->maximum() -
+                                (inSliders.at(throttleChannel)->maximum()-
+                                 inSliders.at(throttleChannel)->minimum())*0.02);
+                } else {
+                    inSliders.at(throttleChannel)->setValue(
+                                inSliders.at(throttleChannel)->minimum() +
+                                (inSliders.at(throttleChannel)->maximum()-
+                                 inSliders.at(throttleChannel)->minimum())*0.02);
+                }
             }
 
             // Flight mode at 50% of range:

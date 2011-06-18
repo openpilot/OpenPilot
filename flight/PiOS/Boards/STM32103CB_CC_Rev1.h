@@ -162,7 +162,7 @@ extern uint32_t pios_com_spektrum_id;
 #endif
 
 #ifdef PIOS_INCLUDE_SBUS
-#define PIOS_COM_SBUS_BAUDRATE          115200
+#define PIOS_COM_SBUS_BAUDRATE          100000
 extern uint32_t pios_com_sbus_id;
 #define PIOS_COM_SBUS                   (pios_com_sbus_id)
 #endif

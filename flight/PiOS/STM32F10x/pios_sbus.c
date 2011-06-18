@@ -33,195 +33,193 @@
 #include "pios_sbus_priv.h"
 
 #if defined(PIOS_INCLUDE_SBUS)
-#if defined(PIOS_INCLUDE_PWM) || defined(PIOS_INCLUDE_SPEKTRUM)
-#error "Both SBUS and either of PWM or SPEKTRUM inputs defined, choose only one"
-#endif
-#if defined(PIOS_COM_AUX)
-#error "AUX com cannot be used with SBUS"
-#endif
-
-/**
- * @Note Framesyncing:
- * The code resets the watchdog timer whenever a single byte is received, so what watchdog code
- * is never called if regularly getting bytes.
- * RTC timer is running @625Hz, supervisor timer has divider 5 so frame sync comes every 1/125Hz=8ms.
- * Good for both 11ms and 22ms framecycles
- */
 
 /* Global Variables */
 
 /* Local Variables */
-static uint16_t CaptureValue[12],CaptureValueTemp[12];
-static uint8_t prev_byte = 0xFF, sync = 0, bytecount = 0, datalength=0, frame_error=0, byte_array[20] = { 0 };
-uint8_t sync_of = 0;
-uint16_t supv_timer=0;
+static uint16_t channel_data[SBUS_NUMBER_OF_CHANNELS];
+static uint8_t received_data[SBUS_FRAME_LENGTH - 2];
+static uint8_t receive_timer;
+static uint8_t failsafe_timer;
+static uint8_t frame_found;
 
 /**
-* Bind and Initialise S.Bus receiver
-*/
+ * reset_channels function clears all channel data in case of
+ * lost signal or explicit failsafe flag from the S.Bus data stream
+ */
+static void reset_channels(void)
+{
+	for (int i = 0; i < SBUS_NUMBER_OF_CHANNELS; i++) {
+		channel_data[i] = 0;
+	}
+}
+
+/**
+ * unroll_channels function computes channel_data[] from received_data[]
+ * For efficiency it unrolls first 8 channel without loops
+ */
+static void unroll_channels(void)
+{
+	uint8_t *s = received_data;
+	uint16_t *d = channel_data;
+
+#if (SBUS_NUMBER_OF_CHANNELS != 8)
+#error Current S.Bus code unrolls only first 8 channels
+#endif
+
+#define F(v,s) ((v) >> s) & 0x7ff
+	*d++ = F(s[0] | s[1] << 8, 0);
+	*d++ = F(s[1] | s[2] << 8, 3);
+	*d++ = F(s[2] | s[3] << 8 | s[4] << 16, 6);
+	*d++ = F(s[4] | s[5] << 8, 1);
+	*d++ = F(s[5] | s[6] << 8, 4);
+	*d++ = F(s[6] | s[7] << 8 | s[8] << 16, 7);
+	*d++ = F(s[8] | s[9] << 8, 2);
+	*d   = F(s[9] | s[10] << 8, 5);
+}
+
+/**
+ * Initialise S.Bus receiver interface
+ */
 void PIOS_SBUS_Init(void)
 {
+	/* Enable USART input invertor clock */
+	PIOS_GPIO_INV_FUNCTION;
+
+	/* Set invertor pin mode */
+	static const GPIO_InitTypeDef GPIO_InitStructure = {
+		.GPIO_Pin = PIOS_GPIO_INV_PIN,
+		.GPIO_Mode = GPIO_Mode_Out_PP,
+		.GPIO_Speed = GPIO_Speed_2MHz,
+	};
+	GPIO_Init(PIOS_GPIO_INV_PORT, &GPIO_InitStructure);
+
+	/* Enable invertor */
+	GPIO_WriteBit(PIOS_GPIO_INV_PORT, PIOS_GPIO_INV_PIN, Bit_SET);
+
 	/* Init RTC supervisor timer interrupt */
-	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure.NVIC_IRQChannel = RTC_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	static const NVIC_InitTypeDef NVIC_InitStructure = {
+		.NVIC_IRQChannel = RTC_IRQn,
+		.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+		.NVIC_IRQChannelSubPriority = 0,
+		.NVIC_IRQChannelCmd = ENABLE,
+	};
 	NVIC_Init(&NVIC_InitStructure);
+
 	/* Init RTC clock */
 	PIOS_RTC_Init();
 }
 
 /**
-* Get the value of an input channel
-* \param[in] Channel Number of the channel desired
-* \output -1 Channel not available
-* \output >0 Channel value
-*/
-int16_t PIOS_SBUS_Get(int8_t Channel)
+ * Get the value of an input channel
+ * \param[in] channel Number of the channel desired (zero based)
+ * \output -1 channel not available
+ * \output >0 channel value
+ */
+int16_t PIOS_SBUS_Get(int8_t channel)
 {
-	/* Return error if channel not available */
-	if (Channel >= 12) {
+	/* return error if channel is not available */
+	if (channel >= SBUS_NUMBER_OF_CHANNELS) {
 		return -1;
 	}
-	return CaptureValue[Channel];
+	return channel_data[channel];
 }
 
 /**
-* Decodes a byte
-* \param[in] b byte which should be sbus decoded
-* \return 0 if no error
-* \return -1 if USART not available
-* \return -2 if buffer full (retry)
-* \note Applications shouldn't call these functions directly
-*/
-int32_t PIOS_SBUS_Decode(uint8_t b)
+ * Decodes a byte
+ * \param[in] b byte which should be decoded
+ */
+void PIOS_SBUS_Decode(uint8_t b)
 {
-	static uint16_t channel = 0; /*, sync_word = 0;*/
-	uint8_t channeln = 0, frame = 0;
-	uint16_t data = 0;
-	byte_array[bytecount] = b;
-	bytecount++;
-	if (sync == 0) {
-		//sync_word = (prev_byte << 8) + b;
-#if 0
-		/* maybe create object to show this  data */
-		if(bytecount==1)
-		{
-			/* record losscounter into channel8 */
-			CaptureValueTemp[7]=b;
-			/* instant write */
-			CaptureValue[7]=b;
-		}
-#endif
-		/* Known sync bytes, 0x01, 0x02, 0x12 */
-		if (bytecount == 2) {
-			if (b == 0x01) {
-				datalength=0; // 10bit
-				//frames=1;
-				sync = 1;
-				bytecount = 2;
-			}
-			else if(b == 0x02) {
-				datalength=0; // 10bit
-				//frames=2;
-				sync = 1;
-				bytecount = 2;
-			}
-			else if(b == 0x12) {
-				datalength=1; // 11bit
-				//frames=2;
-				sync = 1;
-				bytecount = 2;
-			}
-			else
-			{
-				bytecount = 0;
-			}
+	static uint8_t byte_count;
+
+	if (frame_found == 0) {
+		/* no frame found yet, waiting for start byte */
+		if (b == SBUS_SOF_BYTE) {
+			byte_count = 0;
+			frame_found = 1;
 		}
 	} else {
-		if ((bytecount % 2) == 0) {
-			channel = (prev_byte << 8) + b;
-			frame = channel >> 15;
-			channeln = (channel >> (10+datalength)) & 0x0F;
-			data = channel & (0x03FF+(0x0400*datalength));
-			if(channeln==0 && data<10) // discard frame if throttle misbehaves
-			{
-				frame_error=1;
+		/* do not store start and end of frame bytes */
+		if (byte_count < SBUS_FRAME_LENGTH - 2) {
+			/* store next byte */
+			received_data[byte_count++] = b;
+		} else {
+			if (b == SBUS_EOF_BYTE) {
+				/* full frame received */
+				uint8_t flags = received_data[SBUS_FRAME_LENGTH - 3];
+				if (flags & SBUS_FLAG_FL) {
+					/* frame lost, do not update */
+				} else if (flags & SBUS_FLAG_FS) {
+					/* failsafe flag active */
+					reset_channels();
+				} else {
+					/* data looking good */
+					unroll_channels();
+					failsafe_timer = 0;
+				}
+			} else {
+				/* discard whole frame */
 			}
-			if (channeln < 12 && !frame_error)
-				CaptureValueTemp[channeln] = data;
+
+			/* prepare for the next frame */
+			frame_found = 0;
 		}
 	}
-	if (bytecount == 16) {
-		//PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEM_RF,byte_array,16); //00 2c 58 84 b0 dc ff
-		bytecount = 0;
-		sync = 0;
-		sync_of = 0;
-		if (!frame_error)
-		{
-			for(int i=0;i<12;i++)
-			{
-				CaptureValue[i] = CaptureValueTemp[i];
-			}
-		}
-		frame_error=0;
-	}
-	prev_byte = b;
-	return 0;
 }
 
 /* Interrupt handler for USART */
-void SBUS_IRQHandler(uint32_t usart_id) {
+void SBUS_IRQHandler(uint32_t usart_id)
+{
 	/* by always reading DR after SR make sure to clear any error interrupts */
 	volatile uint16_t sr = pios_sbus_cfg.pios_usart_sbus_cfg->regs->SR;
 	volatile uint8_t b = pios_sbus_cfg.pios_usart_sbus_cfg->regs->DR;
-	
-	/* check if RXNE flag is set */
+
+	/* process received byte if new one has arrived */
 	if (sr & USART_SR_RXNE) {
-		if (PIOS_SBUS_Decode(b) < 0) {
-			/* Here we could add some error handling */
-		}
+		PIOS_SBUS_Decode(b);
+
+		/* byte has arrived, clear receive timer */
+		receive_timer = 0;
 	} 
 
-	if (sr & USART_SR_TXE) {	// check if TXE flag is set
+	/* ignore TXE interrupts */
+	if (sr & USART_SR_TXE) {
 		/* Disable TXE interrupt (TXEIE=0) */
 		USART_ITConfig(pios_sbus_cfg.pios_usart_sbus_cfg->regs, USART_IT_TXE, DISABLE);
 	}
-	/* byte arrived so clear "watchdog" timer */
-	supv_timer=0;
 }
 
 /**
- *@brief This function is called between frames and when a sbus word hasnt been decoded for too long
- *@brief clears the channel values
+ * Input data superviser is called periodically and provides
+ * two functions: frame syncing and failsafe triggering.
+ *
+ * S.Bus frames come at 7ms (HS) or 14ms (FS) rate at 100000bps. RTC
+ * timer is running at 625Hz (1.6ms). So with divider 2 it gives
+ * 3.2ms pause between frames which is good for both S.Bus data rates.
+ *
+ * Data receive function must clear the receive_timer to confirm new
+ * data reception. If no new data received in 100ms, we must call the
+ * failsafe function which clears all channels.
  */
-void PIOS_SBUS_irq_handler() {
-	/* 125hz */
-	supv_timer++;
-	if(supv_timer > 5) {
-		/* sync between frames */
-		sync = 0;
-		bytecount = 0;
-		prev_byte = 0xFF;
-		frame_error = 0;
-		sync_of++;
-		/* watchdog activated after 100ms silence */
-		if (sync_of > 12) {
-			/* signal lost */
-			sync_of = 0;
-			for (int i = 0; i < 12; i++) {
-				CaptureValue[i] = 0;
-				CaptureValueTemp[i] = 0;
-			}
-		}
-		supv_timer = 0;
+void PIOS_SBUS_irq_handler()
+{
+	/* waiting for new frame if no bytes were received in 3.2ms */
+	if (++receive_timer > 2) {
+		receive_timer = 0;
+		frame_found = 0;
+	}
+
+	/* activate failsafe if no frames have arrived in 102.4ms */
+	if (++failsafe_timer > 64) {
+		failsafe_timer = 0;
+		reset_channels();
 	}
 }
 
 #endif
 
 /** 
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

@@ -55,12 +55,6 @@
  * and optionally define PIOS_PORT_* to USART port numbers
  */
 
-/* Current defaults - mimic original behavior */
-#define USE_TELEMETRY
-#if !defined(USE_SPEKTRUM)
-#define USE_GPS
-#endif
-
 /* Serial telemetry: USART1 or USART3 */
 #if !defined(PIOS_PORT_TELEMETRY)
 #define PIOS_PORT_TELEMETRY	1
@@ -177,6 +171,9 @@
 #define PIOS_GPIO_SBUS		USART_GPIO(PIOS_PORT_SBUS)
 #define PIOS_RXIO_SBUS		USART_RXIO(PIOS_PORT_SBUS)
 #define PIOS_TXIO_SBUS		USART_TXIO(PIOS_PORT_SBUS)
+#define PIOS_GPIO_INV_PORT	GPIOB
+#define PIOS_GPIO_INV_PIN	GPIO_Pin_2
+#define PIOS_GPIO_INV_FUNCTION	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE)
 #define PIOS_INCLUDE_SBUS
 #endif
 

@@ -35,6 +35,36 @@
 #include <pios_stm32.h>
 #include <pios_usart_priv.h>
 
+/*
+ * S.Bus serial port settings:
+ *  100000bps inverted serial stream, 8 bits, even parity, 2 stop bits
+ *  frame period is 7ms (HS) or 14ms (FS)
+ *
+ * Frame structure:
+ *  1 byte  - 0x0f (start of frame byte)
+ * 22 bytes - channel data (11 bit/channel, 16 channels, LSB first)
+ *  1 byte  - bit flags:
+ *                   0x01 - digital channel 1,
+ *                   0x02 - digital channel 2,
+ *                   0x04 - lost frame flag,
+ *                   0x08 - failsafe flag,
+ *                   0xf0 - reserved
+ *  1 byte  - 0x00 (end of frame byte)
+ */
+#define SBUS_FRAME_LENGTH		(1+22+1+1)
+#define SBUS_SOF_BYTE			0x0f
+#define SBUS_EOF_BYTE			0x00
+#define SBUS_FLAG_DG1			0x01
+#define SBUS_FLAG_DG2			0x02
+#define SBUS_FLAG_FL			0x04
+#define SBUS_FLAG_FS			0x08
+
+/*
+ * S.Bus protocol provides up to 16 analog and 2 digital channels.
+ * Only 8 channels are currently supported by the OpenPilot.
+ */
+#define	SBUS_NUMBER_OF_CHANNELS		8
+
 struct pios_sbus_cfg {
 	const struct pios_usart_cfg *pios_usart_sbus_cfg;
 	GPIO_InitTypeDef gpio_init;
@@ -43,11 +73,9 @@ struct pios_sbus_cfg {
 	GPIO_TypeDef *port;
 	uint16_t pin;
 };
+extern const struct pios_sbus_cfg pios_sbus_cfg;
 
 extern void PIOS_SBUS_irq_handler();
-
-extern uint8_t pios_sbus_num_channels;
-extern const struct pios_sbus_cfg pios_sbus_cfg;
 
 #endif /* PIOS_SBUS_PRIV_H */
 

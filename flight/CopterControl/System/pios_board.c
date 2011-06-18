@@ -397,11 +397,11 @@ const struct pios_usart_cfg pios_usart_sbus_cfg = {
 	#if defined (PIOS_COM_SBUS_BAUDRATE)
 		.USART_BaudRate        = PIOS_COM_SBUS_BAUDRATE,
 	#else
-		.USART_BaudRate        = 115200,
+		.USART_BaudRate        = 100000,
 	#endif
 		.USART_WordLength          = USART_WordLength_8b,
-		.USART_Parity              = USART_Parity_No,
-		.USART_StopBits            = USART_StopBits_1,
+		.USART_Parity              = USART_Parity_Even,
+		.USART_StopBits            = USART_StopBits_2,
 		.USART_HardwareFlowControl = USART_HardwareFlowControl_None,
 		.USART_Mode                = USART_Mode_Rx,
 	},

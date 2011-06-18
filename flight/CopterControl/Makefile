@@ -45,6 +45,8 @@ ENABLE_DEBUG_PINS ?= NO
 # Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs
 ENABLE_AUX_UART ?= NO
 
+USE_TELEMETRY ?= YES
+USE_GPS ?= NO
 USE_SPEKTRUM ?= NO
 USE_SBUS ?= NO
 
@@ -380,17 +382,21 @@ endif
 ifeq ($(ERASE_FLASH), YES)
 CDEFS += -DERASE_FLASH
 endif
+ifeq ($(USE_TELEMETRY), YES)
+CDEFS += -DUSE_TELEMETRY
+endif
+ifeq ($(USE_GPS), YES)
+CDEFS += -DUSE_GPS
+endif
 ifeq ($(USE_SPEKTRUM), YES)
 CDEFS += -DUSE_SPEKTRUM
 endif
 ifeq ($(USE_SBUS), YES)
 CDEFS += -DUSE_SBUS
 endif
-
 ifeq ($(USE_I2C), YES)
 CDEFS += -DUSE_I2C
 endif
-
 
 # Place project-specific -D and/or -U options for
 # Assembler with preprocessor here.

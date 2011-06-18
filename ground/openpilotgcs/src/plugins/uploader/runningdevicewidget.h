@@ -29,7 +29,7 @@
 #define RUNNINGDEVICEWIDGET_H
 
 #include "ui_runningdevicewidget.h"
-#include "uploadergadgetwidget.h"
+
 #include <QWidget>
 #include <QErrorMessage>
 #include <QtSvg/QGraphicsSvgItem>

@@ -270,9 +270,9 @@ QByteArray UAVObjectUtilManager::getBoardCPUSerial()
 /**
   * Get the UAV Board Description, for anyone interested.
   */
-QString UAVObjectUtilManager::getBoardDescription()
+QByteArray UAVObjectUtilManager::getBoardDescription()
 {
-    QString description;
+    QByteArray ret;
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     if (!pm)
         return 0;
@@ -291,10 +291,10 @@ QString UAVObjectUtilManager::getBoardDescription()
 
     UAVObjectField* descriptionField = obj->getField("Description");
     // Description starts with an offset of
-    for (int i = 14; i < descriptionField->getNumElements(); ++i) {
-        description.append(descriptionField->getValue(i).toChar());
+    for (int i = 0; i < descriptionField->getNumElements(); ++i) {
+        ret.append(descriptionField->getValue(i).toInt());
     }
-    return description;
+    return ret;
 }
 
 

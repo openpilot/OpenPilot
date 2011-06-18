@@ -52,20 +52,23 @@
 #include <QThread>
 #include <QMessageBox>
 #include <QTimer>
-
+#include "devicedescriptorstruct.h"
 #include <QProgressDialog>
 
 using namespace OP_DFU;
 
+
 class UploaderGadgetWidget : public QWidget
 {
     Q_OBJECT
+
 
 public:
     UploaderGadgetWidget(QWidget *parent = 0);
    ~UploaderGadgetWidget();
     typedef enum { IAP_STATE_READY, IAP_STATE_STEP_1, IAP_STATE_STEP_2, IAP_STEP_RESET, IAP_STATE_BOOTLOADER} IAPStep;
     void log(QString str);
+    static bool descriptionToStructure(QByteArray desc,deviceDescriptorStruct * struc);
 
 public slots:
     void onAutopilotConnect();

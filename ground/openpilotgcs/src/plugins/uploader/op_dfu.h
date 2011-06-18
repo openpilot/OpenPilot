@@ -108,7 +108,7 @@ namespace OP_DFU {
         Q_OBJECT;
 
         public:
-
+        static quint32 CRCFromQBArray(QByteArray array, quint32 Size);
         //DFUObject(bool debug);
         DFUObject(bool debug,bool use_serial,QString port);
 
@@ -152,7 +152,7 @@ namespace OP_DFU {
 
         // Helper functions:
         QString StatusToString(OP_DFU::Status  const & status);
-        quint32 CRC32WideFast(quint32 Crc, quint32 Size, quint32 *Buffer);
+        static quint32 CRC32WideFast(quint32 Crc, quint32 Size, quint32 *Buffer);
 
 
 
@@ -179,7 +179,7 @@ namespace OP_DFU {
         // USB Bootloader:
         pjrc_rawhid hidHandle;
         int setStartBit(int command){ return command|0x20; }
-        quint32 CRCFromQBArray(QByteArray array, quint32 Size);
+
         void CopyWords(char * source, char* destination, int count);
         void printProgBar( int const & percent,QString const& label);
         bool StartUpload(qint32  const &numberOfBytes, TransferTypes const & type,quint32 crc);

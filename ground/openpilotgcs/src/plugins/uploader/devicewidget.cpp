@@ -56,8 +56,8 @@ void deviceWidget::showEvent(QShowEvent *event)
     // the result is usually a ahrsbargraph that is way too small.
     if (devicePic)
     {
-       myDevice->gVDevice->fitInView(devicePic,Qt::KeepAspectRatio);
-   }
+        myDevice->gVDevice->fitInView(devicePic,Qt::KeepAspectRatio);
+    }
 }
 
 void deviceWidget::resizeEvent(QResizeEvent* event)
@@ -79,7 +79,6 @@ void deviceWidget::setDfu(DFUObject *dfu)
 
 QString deviceWidget::idToBoardName(int id)
 {
-    qDebug()<<"idToBoard"<<id;
     switch (id | 0x0011) {
     case 0x0111://MB
         return QString("Board Name: OpenPilot MainBoard");
@@ -156,7 +155,7 @@ void deviceWidget::populate()
     QByteArray desc = m_dfu->DownloadDescriptionAsBA(size);
 
     if (! populateBoardStructuredDescription(desc)) {
-//TODO
+        //TODO
         // desc was not a structured description
         QString str = m_dfu->DownloadDescription(size);
         //myDevice->lblDescription->setMaxLength(size);
@@ -179,9 +178,9 @@ void deviceWidget::populate()
   */
 void deviceWidget::freeze()
 {
-   myDevice->description->setEnabled(false);
-   myDevice->updateButton->setEnabled(false);
-   myDevice->retrieveButton->setEnabled(false);
+    myDevice->description->setEnabled(false);
+    myDevice->updateButton->setEnabled(false);
+    myDevice->retrieveButton->setEnabled(false);
 }
 
 /**
@@ -190,64 +189,64 @@ void deviceWidget::freeze()
   */
 bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
 {
-   if(UploaderGadgetWidget::descriptionToStructure(desc,&onBoardDescrition))
-   {
-       myDevice->lblGitTag->setText("GIT tag "+onBoardDescrition.gitTag);
-       myDevice->lblBuildDate->setText(QString("Build time: ") + onBoardDescrition.buildDate);
-       if(onBoardDescrition.description.startsWith("release",Qt::CaseInsensitive))
-       {
-           myDevice->lblDescription->setText(QString("FW Release:")+onBoardDescrition.description);
-           QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
-           myDevice->lblCertified->setPixmap(pix);
-           myDevice->lblCertified->setToolTip(tr("Official Firmware Build"));
+    if(UploaderGadgetWidget::descriptionToStructure(desc,&onBoardDescrition))
+    {
+        myDevice->lblGitTag->setText("GIT tag "+onBoardDescrition.gitTag);
+        myDevice->lblBuildDate->setText(QString("Build time: ") + onBoardDescrition.buildDate);
+        if(onBoardDescrition.description.startsWith("release",Qt::CaseInsensitive))
+        {
+            myDevice->lblDescription->setText(QString("FW Release:")+onBoardDescrition.description);
+            QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
+            myDevice->lblCertified->setPixmap(pix);
+            myDevice->lblCertified->setToolTip(tr("Official Firmware Build"));
 
-       }
-       else
-       {
-           myDevice->lblDescription->setText(QString("Beta or Custom Firmware:")+onBoardDescrition.description);
-           QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
-           myDevice->lblCertified->setPixmap(pix);
-           myDevice->lblCertified->setToolTip(tr("Custom Firmware Build"));
-       }
+        }
+        else
+        {
+            myDevice->lblDescription->setText(QString("Beta or Custom Firmware:")+onBoardDescrition.description);
+            QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
+            myDevice->lblCertified->setPixmap(pix);
+            myDevice->lblCertified->setToolTip(tr("Custom Firmware Build"));
+        }
 
-       myDevice->lblBrdName->setText(idToBoardName(onBoardDescrition.boardType<<8));
+        myDevice->lblBrdName->setText(idToBoardName(onBoardDescrition.boardType<<8));
 
-       return true;
-   }
+        return true;
+    }
 
-   return false;
+    return false;
 
 }
 bool deviceWidget::populateLoadedStructuredDescription(QByteArray desc)
 {
-   if(UploaderGadgetWidget::descriptionToStructure(desc,&LoadedDescrition))
-   {
+    if(UploaderGadgetWidget::descriptionToStructure(desc,&LoadedDescrition))
+    {
         myDevice->lblGitTagL->setText("GIT tag "+LoadedDescrition.gitTag);
-       myDevice->lblBuildDateL->setText(QString("Build time: ") + LoadedDescrition.buildDate);
-       if(LoadedDescrition.description.startsWith("release",Qt::CaseInsensitive))
-       {
-           myDevice->lblDescriptionL->setText(tr("FW Release:"));
-           myDevice->description->setText(LoadedDescrition.description);
-           QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
-           myDevice->lblCertifiedL->setPixmap(pix);
-           myDevice->lblCertifiedL->setToolTip(tr("Official Firmware Build"));
+        myDevice->lblBuildDateL->setText(QString("Build time: ") + LoadedDescrition.buildDate);
+        if(LoadedDescrition.description.startsWith("release",Qt::CaseInsensitive))
+        {
+            myDevice->lblDescriptionL->setText(tr("FW Release:"));
+            myDevice->description->setText(LoadedDescrition.description);
+            QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
+            myDevice->lblCertifiedL->setPixmap(pix);
+            myDevice->lblCertifiedL->setToolTip(tr("Official Firmware Build"));
 
-       }
-       else
-       {
-           myDevice->lblDescriptionL->setText(tr("Beta or Custom Firmware:"));
-           myDevice->description->setText(LoadedDescrition.description);
-           QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
-           myDevice->lblCertifiedL->setPixmap(pix);
-           myDevice->lblCertifiedL->setToolTip(tr("Custom Firmware Build"));
-       }
+        }
+        else
+        {
+            myDevice->lblDescriptionL->setText(tr("Beta or Custom Firmware:"));
+            myDevice->description->setText(LoadedDescrition.description);
+            QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
+            myDevice->lblCertifiedL->setPixmap(pix);
+            myDevice->lblCertifiedL->setToolTip(tr("Custom Firmware Build"));
+        }
 
-       myDevice->lblBrdNameL->setText(idToBoardName(LoadedDescrition.boardType<<8));
+        myDevice->lblBrdNameL->setText(idToBoardName(LoadedDescrition.boardType<<8));
 
-       return true;
-   }
+        return true;
+    }
 
-   return false;
+    return false;
 
 }
 /**
@@ -315,7 +314,7 @@ void deviceWidget::loadFirmware()
     myDevice->lblCRCL->setText(QString("FW CRC: ") + QString::number(DFUObject::CRCFromQBArray(loadedFW,m_dfu->devices[deviceID].SizeOfCode)));
     if (populateLoadedStructuredDescription(desc))
     {
-           myDevice->youdont->setChecked(true);
+        myDevice->youdont->setChecked(true);
         myDevice->verticalGroupBox_loaded->setVisible(true);
         if(myDevice->lblCRC->text()==myDevice->lblCRCL->text())
         {
@@ -352,7 +351,7 @@ void deviceWidget::loadFirmware()
         myDevice->verticalGroupBox_loaded->setVisible(false);
     }
     myDevice->statusIcon->setPixmap(px);
-  //myDevice->updateButton->setEnabled(true);
+    //myDevice->updateButton->setEnabled(true);
 
 }
 
@@ -475,26 +474,26 @@ void deviceWidget::uploadFinished(OP_DFU::Status retstatus)
         status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
         return;
     } else
-    if (!descriptionArray.isEmpty()) {
-        // We have a structured array to save
-        status(QString("Updating description"), STATUSICON_RUNNING);
-        repaint(); // Make sure the text above shows right away
-        retstatus = m_dfu->UploadDescription(descriptionArray);
-        if( retstatus != OP_DFU::Last_operation_Success) {
-            status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
-            return;
-        }
+        if (!descriptionArray.isEmpty()) {
+            // We have a structured array to save
+            status(QString("Updating description"), STATUSICON_RUNNING);
+            repaint(); // Make sure the text above shows right away
+            retstatus = m_dfu->UploadDescription(descriptionArray);
+            if( retstatus != OP_DFU::Last_operation_Success) {
+                status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
+                return;
+            }
 
-    } else if (!myDevice->description->text().isEmpty()) {
-       // Fallback: we save the description field:
-       status(QString("Updating description"), STATUSICON_RUNNING);
-       repaint(); // Make sure the text above shows right away
-       retstatus = m_dfu->UploadDescription(myDevice->description->text());
-       if( retstatus != OP_DFU::Last_operation_Success) {
-           status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
-           return;
-       }
-    }
+        } else if (!myDevice->description->text().isEmpty()) {
+            // Fallback: we save the description field:
+            status(QString("Updating description"), STATUSICON_RUNNING);
+            repaint(); // Make sure the text above shows right away
+            retstatus = m_dfu->UploadDescription(myDevice->description->text());
+            if( retstatus != OP_DFU::Last_operation_Success) {
+                status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
+                return;
+            }
+        }
 
     status("Upload successful", STATUSICON_OK);
 

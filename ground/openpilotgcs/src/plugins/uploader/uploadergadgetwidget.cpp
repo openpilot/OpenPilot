@@ -56,15 +56,10 @@ bool UploaderGadgetWidget::descriptionToStructure(QByteArray desc,deviceDescript
        }
        struc->buildDate= QDateTime::fromTime_t(buildDate).toString();
        QByteArray targetPlatform = desc.mid(12,2);
-       qDebug()<<"targetPlatform"<<(int)targetPlatform.at(0);
-       qDebug()<<"targetPlatform"<<(int)targetPlatform.at(1);
-
        // TODO: check platform compatibility
        QString dscText = QString(desc.mid(14,26));
-       qDebug()<<"dscText"<<dscText;
        struc->boardType=(int)targetPlatform.at(0);
        struc->boardRevision=(int)targetPlatform.at(1);
-       qDebug()<<"type"<<struc->boardType<<"rev"<<struc->boardRevision;
        struc->description=dscText;
        return true;
    }

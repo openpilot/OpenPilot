@@ -32,7 +32,7 @@
 
 #include "openpilot.h"
 
-int32_t BatteryInitialize(void);
+int32_t CameraStabInitialize(void);
 
 #endif // BATTERY_H
 

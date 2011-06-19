@@ -65,13 +65,16 @@
  */
 #define	SBUS_NUMBER_OF_CHANNELS		8
 
+/*
+ * S.Bus configuration includes USART and programmable invertor
+ */
 struct pios_sbus_cfg {
 	const struct pios_usart_cfg *pios_usart_sbus_cfg;
-	GPIO_InitTypeDef gpio_init;
-	uint32_t remap;		/* GPIO_Remap_* */
-	struct stm32_irq irq;
-	GPIO_TypeDef *port;
-	uint16_t pin;
+	void (*gpio_clk_func)(uint32_t periph, FunctionalState state);
+	uint32_t gpio_clk_periph;
+	GPIO_TypeDef* gpio_inv_port;
+	GPIO_InitTypeDef gpio_inv_init;
+	BitAction gpio_inv_enable;
 };
 extern const struct pios_sbus_cfg pios_sbus_cfg;
 

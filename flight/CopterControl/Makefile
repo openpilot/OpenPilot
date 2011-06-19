@@ -383,35 +383,34 @@ ifeq ($(ERASE_FLASH), YES)
 CDEFS += -DERASE_FLASH
 endif
 
+# USART port functions. NO means do not use this function.
+# YES means use with default USART port number (hardware-dependent).
+# Number means use with specified USART port number (this value).
 ifneq ($(USE_TELEMETRY), NO)
-ifeq ($(USE_TELEMETRY), YES)
 CDEFS += -DUSE_TELEMETRY
-else
-CDEFS += -DUSE_TELEMETRY -DPIOS_PORT_TELEMETRY=$(USE_TELEMETRY)
+ifneq ($(USE_TELEMETRY), YES)
+CDEFS += -DPIOS_PORT_TELEMETRY=$(USE_TELEMETRY)
 endif
 endif
 
 ifneq ($(USE_GPS), NO)
-ifeq ($(USE_GPS), YES)
 CDEFS += -DUSE_GPS
-else
-CDEFS += -DUSE_GPS -DPIOS_PORT_GPS=$(USE_GPS)
+ifneq ($(USE_GPS), YES)
+CDEFS += -DPIOS_PORT_GPS=$(USE_GPS)
 endif
 endif
 
 ifneq ($(USE_SPEKTRUM), NO)
-ifeq ($(USE_SPEKTRUM), YES)
 CDEFS += -DUSE_SPEKTRUM
-else
-CDEFS += -DUSE_SPEKTRUM -DPIOS_PORT_SPEKTRUM=$(USE_SPEKTRUM)
+ifneq ($(USE_SPEKTRUM), YES)
+CDEFS += -DPIOS_PORT_SPEKTRUM=$(USE_SPEKTRUM)
 endif
 endif
 
 ifneq ($(USE_SBUS), NO)
-ifeq ($(USE_SBUS), YES)
 CDEFS += -DUSE_SBUS
-else
-CDEFS += -DUSE_SBUS -DPIOS_PORT_SBUS=$(USE_SBUS)
+ifneq ($(USE_SBUS), YES)
+CDEFS += -DPIOS_PORT_SBUS=$(USE_SBUS)
 endif
 endif
 

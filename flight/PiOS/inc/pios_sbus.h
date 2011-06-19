@@ -34,7 +34,6 @@
 
 /* Public Functions */
 extern void PIOS_SBUS_Init(void);
-extern void PIOS_SBUS_Decode(uint8_t b);
 extern int16_t PIOS_SBUS_Get(int8_t Channel);
 extern void SBUS_IRQHandler(uint32_t usart_id);
 

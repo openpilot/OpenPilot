@@ -33,7 +33,6 @@
 
 #if defined(PIOS_INCLUDE_SPI)
 
-
 #include <pios_spi_priv.h>
 
 /* Flash/Accel Interface
@@ -199,6 +198,101 @@ void PIOS_ADC_handler() {
 #if defined(PIOS_INCLUDE_USART)
 
 #include "pios_usart_priv.h"
+
+/*
+ * Define USART port configurations and check for conflicts
+ * making sure they do not conflict with each other and with I2C.
+ */
+#define USART_GPIO(port)	(((port) == 1) ? GPIOA : GPIOB)
+#define USART_RXIO(port)	(((port) == 1) ? GPIO_Pin_10 : GPIO_Pin_11)
+#define USART_TXIO(port)	(((port) == 1) ? GPIO_Pin_9  : GPIO_Pin_10)
+ 
+#if defined(USE_TELEMETRY)
+#if defined(USE_I2C) && (PIOS_PORT_TELEMETRY == 3)
+#error defined(USE_I2C) && (PIOS_PORT_TELEMETRY == 3)
+#endif
+#if (PIOS_PORT_TELEMETRY == 1)
+#define PIOS_USART_TELEMETRY	USART1
+#define PIOS_IRQH_TELEMETRY	USART1_IRQHandler
+#define PIOS_IRQC_TELEMETRY	USART1_IRQn
+#else
+#define PIOS_USART_TELEMETRY	USART3
+#define PIOS_IRQH_TELEMETRY	USART3_IRQHandler
+#define PIOS_IRQC_TELEMETRY	USART3_IRQn
+#endif
+#define PIOS_GPIO_TELEMETRY	USART_GPIO(PIOS_PORT_TELEMETRY)
+#define PIOS_RXIO_TELEMETRY	USART_RXIO(PIOS_PORT_TELEMETRY)
+#define PIOS_TXIO_TELEMETRY	USART_TXIO(PIOS_PORT_TELEMETRY)
+#endif
+
+#if defined(USE_GPS)
+#if defined(USE_I2C) && (PIOS_PORT_GPS == 3)
+#error defined(USE_I2C) && (PIOS_PORT_GPS == 3)
+#endif
+#if defined(USE_TELEMETRY) && (PIOS_PORT_TELEMETRY == PIOS_PORT_GPS)
+#error defined(USE_TELEMETRY) && (PIOS_PORT_TELEMETRY == PIOS_PORT_GPS)
+#endif
+#if (PIOS_PORT_GPS == 1)
+#define PIOS_USART_GPS		USART1
+#define PIOS_IRQH_GPS		USART1_IRQHandler
+#define PIOS_IRQC_GPS		USART1_IRQn
+#else
+#define PIOS_USART_GPS		USART3
+#define PIOS_IRQH_GPS		USART3_IRQHandler
+#define PIOS_IRQC_GPS		USART3_IRQn
+#endif
+#define PIOS_GPIO_GPS		USART_GPIO(PIOS_PORT_GPS)
+#define PIOS_RXIO_GPS		USART_RXIO(PIOS_PORT_GPS)
+#define PIOS_TXIO_GPS		USART_TXIO(PIOS_PORT_GPS)
+#endif
+
+#if defined(USE_SPEKTRUM)
+#if defined(USE_I2C) && (PIOS_PORT_SPEKTRUM == 3)
+#error defined(USE_I2C) && (PIOS_PORT_SPEKTRUM == 3)
+#endif
+#if defined(USE_TELEMETRY) && (PIOS_PORT_SPEKTRUM == PIOS_PORT_TELEMETRY)
+#error defined(USE_TELEMETRY) && (PIOS_PORT_SPEKTRUM == PIOS_PORT_TELEMETRY)
+#endif
+#if defined(USE_GPS) && (PIOS_PORT_SPEKTRUM == PIOS_PORT_GPS)
+#error defined(USE_GPS) && (PIOS_PORT_SPEKTRUM == PIOS_PORT_GPS)
+#endif
+#if defined(USE_SBUS)
+#error defined(USE_SPEKTRUM) && defined(USE_SBUS)
+#endif
+#if (PIOS_PORT_SPEKTRUM == 1)
+#define PIOS_USART_SPEKTRUM	USART1
+#define PIOS_IRQH_SPEKTRUM	USART1_IRQHandler
+#define PIOS_IRQC_SPEKTRUM	USART1_IRQn
+#else
+#define PIOS_USART_SPEKTRUM	USART3
+#define PIOS_IRQH_SPEKTRUM	USART3_IRQHandler
+#define PIOS_IRQC_SPEKTRUM	USART3_IRQn
+#endif
+#define PIOS_GPIO_SPEKTRUM	USART_GPIO(PIOS_PORT_SPEKTRUM)
+#define PIOS_RXIO_SPEKTRUM	USART_RXIO(PIOS_PORT_SPEKTRUM)
+#define PIOS_TXIO_SPEKTRUM	USART_TXIO(PIOS_PORT_SPEKTRUM)
+#endif
+
+#if defined(USE_SBUS)
+#if (PIOS_PORT_SBUS != 1)
+#error (PIOS_PORT_SBUS != 1)
+#endif
+#if defined(USE_TELEMETRY) && (PIOS_PORT_SBUS == PIOS_PORT_TELEMETRY)
+#error defined(USE_TELEMETRY) && (PIOS_PORT_SBUS == PIOS_PORT_TELEMETRY)
+#endif
+#if defined(USE_GPS) && (PIOS_PORT_SBUS == PIOS_PORT_GPS)
+#error defined(USE_GPS) && (PIOS_PORT_SBUS == PIOS_PORT_GPS)
+#endif
+#if defined(USE_SPEKTRUM)
+#error defined(USE_SPEKTRUM) && defined(USE_SBUS)
+#endif
+#define PIOS_USART_SBUS		USART1
+#define PIOS_IRQH_SBUS		USART1_IRQHandler
+#define PIOS_IRQC_SBUS		USART1_IRQn
+#define PIOS_GPIO_SBUS		USART_GPIO(PIOS_PORT_SBUS)
+#define PIOS_RXIO_SBUS		USART_RXIO(PIOS_PORT_SBUS)
+#define PIOS_TXIO_SBUS		USART_TXIO(PIOS_PORT_SBUS)
+#endif
 
 #if defined(PIOS_INCLUDE_TELEMETRY_RF)
 /*
@@ -442,22 +536,19 @@ void PIOS_USART_sbus_irq_handler(void)
 void RTC_IRQHandler();
 void RTC_IRQHandler() __attribute__ ((alias ("PIOS_SUPV_irq_handler")));
 const struct pios_sbus_cfg pios_sbus_cfg = {
+	/* USART configuration structure */
 	.pios_usart_sbus_cfg = &pios_usart_sbus_cfg,
-	.gpio_init = { //used for bind feature
+
+	/* Invertor configuration */
+	.gpio_clk_func = RCC_APB2PeriphClockCmd,
+	.gpio_clk_periph = RCC_APB2Periph_GPIOB,
+	.gpio_inv_port = GPIOB,
+	.gpio_inv_init = {
+		.GPIO_Pin = GPIO_Pin_2,
 		.GPIO_Mode = GPIO_Mode_Out_PP,
 		.GPIO_Speed = GPIO_Speed_2MHz,
 	},
-	.remap = 0,
-	.irq = {
-		.handler = RTC_IRQHandler,
-		.init    = {
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-			.NVIC_IRQChannelSubPriority        = 0,
-			.NVIC_IRQChannelCmd                = ENABLE,
-		},
-	},
-	.port = PIOS_GPIO_SBUS,
-	.pin = PIOS_RXIO_SBUS,
+	.gpio_inv_enable = Bit_SET,
 };
 
 void PIOS_SUPV_irq_handler() {
@@ -786,18 +877,6 @@ void PIOS_Board_Init(void) {
 	}
 #endif
 
-#if defined(PIOS_INCLUDE_SBUS)
-	/* SBUS init must come before comms */
-	PIOS_SBUS_Init();
-
-	if (PIOS_USART_Init(&pios_usart_sbus_id, &pios_usart_sbus_cfg)) {
-		PIOS_DEBUG_Assert(0);
-	}
-	if (PIOS_COM_Init(&pios_com_sbus_id, &pios_usart_com_driver, pios_usart_sbus_id)) {
-		PIOS_DEBUG_Assert(0);
-	}
-#endif
-
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
 	UAVObjInitialize();
@@ -827,7 +906,17 @@ void PIOS_Board_Init(void) {
 		PIOS_DEBUG_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_GPS */
-#endif	/* PIOS_INCLUDE_COM */
+#if defined(PIOS_INCLUDE_SBUS)
+	PIOS_SBUS_Init();
+
+	if (PIOS_USART_Init(&pios_usart_sbus_id, &pios_usart_sbus_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+	if (PIOS_COM_Init(&pios_com_sbus_id, &pios_usart_com_driver, pios_usart_sbus_id)) {
+		PIOS_DEBUG_Assert(0);
+	}
+#endif  /* PIOS_INCLUDE_SBUS */
+#endif  /* PIOS_INCLUDE_COM */
 
 	/* Remap AFIO pin */
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);

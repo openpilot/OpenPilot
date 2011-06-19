@@ -66,10 +66,8 @@ enum {ROLL,PITCH,YAW,MAX_AXES};
 typedef struct {
 	float p;
 	float i;
-	float d;
 	float iLim;
 	float iAccumulator;
-	float lastErr;
 } pid_type;
 
 // Private variables
@@ -287,17 +285,14 @@ static void stabilizationTask(void* parameters)
 
 float ApplyPid(pid_type * pid, const float err)
 {
-	float diff = (err - pid->lastErr);
-	pid->lastErr = err;
-	pid->iAccumulator += err * pid->i * dT;
-	if(fabs(pid->iAccumulator) > pid->iLim) {
-		if(pid->iAccumulator >0) {
-			pid->iAccumulator = pid->iLim;
-		} else {
-			pid->iAccumulator = -pid->iLim;
-		}
+	// Scale up accumulator by 1000 while computing to avoid losing precision
+	pid->iAccumulator += err * (pid->i * dT * 1000);
+	if(pid->iAccumulator > (pid->iLim * 1000)) {
+		pid->iAccumulator = pid->iLim * 1000;
+	} else if (pid->iAccumulator < -(pid->iLim * 1000)) {
+		pid->iAccumulator = -pid->iLim * 1000;
 	}
-	return ((err * pid->p) + pid->iAccumulator + (diff * pid->d / dT));
+	return (err * pid->p) + pid->iAccumulator / 1000;
 }
 
 
@@ -305,7 +300,6 @@ static void ZeroPids(void)
 {
 	for(int8_t ct = 0; ct < PID_MAX; ct++) {
 		pids[ct].iAccumulator = 0;
-		pids[ct].lastErr = 0;
 	}
 }
 

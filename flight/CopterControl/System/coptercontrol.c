@@ -90,6 +90,10 @@ int main()
 	 */
 	initcall_t *fn;
 	int32_t ret;
+
+	/* this one needs to be done first */
+	SystemModInitialize();
+
 	for (fn = __module_initcall_start; fn < __module_initcall_end; fn++)
 			ret = (*fn)();
 
@@ -102,7 +106,7 @@ int main()
     vTaskStartScheduler();
 #endif
 
-	return 0;
+    return 0;
 }
 
 /**

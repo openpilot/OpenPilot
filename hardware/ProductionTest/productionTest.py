@@ -153,8 +153,10 @@ class TestFixture(object):
         
         print "Taking control of self.actuatorCmd"
         self.objMan.waitObjUpdate(self.actuatorCmd, request=True, timeout=1)
-        self.actuatorCmdMeta.access.value = UAVMetaDataObject.Access.READONLY
-        self.uavTalk.sendObject(self.actuatorCmdMeta)
+        self.objMan.ActuatorCommand.metadata.access.value = UAVMetaDataObject.Access.READONLY
+        self.objMan.ActuatorCommand.metadata.updated()   
+        self.objMan.ManualControlCommand.metadata.access.value = UAVMetaDataObject.Access.READONLY
+        self.objMan.ManualControlCommand.metadata.updated()
         
         self.devInfo = DeviceInfo("CopterControl", "A", "0000001")
     

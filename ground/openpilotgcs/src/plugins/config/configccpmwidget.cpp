@@ -175,7 +175,10 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     QStringList channels;
     channels << "Channel1" << "Channel2" <<
-            "Channel3" << "Channel4" << "Channel5" << "Channel6" << "Channel7" << "Channel8" << "None" ;
+    "Channel3" << "Channel4" << "Channel5" << "Channel6" << "Channel7" << "Channel8"  ;
+    m_ccpm->ccpmCollectiveChannel->addItems(channels);
+    m_ccpm->ccpmCollectiveChannel->setCurrentIndex(8);
+    channels << "None" ;
     m_ccpm->ccpmEngineChannel->addItems(channels);
     m_ccpm->ccpmEngineChannel->setCurrentIndex(8);
     m_ccpm->ccpmTailChannel->addItems(channels);
@@ -188,8 +191,6 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_ccpm->ccpmServoYChannel->setCurrentIndex(8);
     m_ccpm->ccpmServoZChannel->addItems(channels);
     m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
-    m_ccpm->ccpmCollectiveChannel->addItems(channels);
-    m_ccpm->ccpmCollectiveChannel->setCurrentIndex(8);
 
     QStringList Types;
     Types << "CCPM 2 Servo 90º" << "CCPM 3 Servo 120º" << "CCPM 3 Servo 140º" << "FP 2 Servo 90º"  << "Custom - User Angles" << "Custom - Advanced Settings"  ;

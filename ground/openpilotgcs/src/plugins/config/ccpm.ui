@@ -943,7 +943,7 @@
                 <item>
                  <widget class="QLabel" name="ccpmCollectiveChLabel">
                   <property name="enabled">
-                   <bool>false</bool>
+                   <bool>true</bool>
                   </property>
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -965,11 +965,17 @@
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>12</pointsize>
+                    <pointsize>11</pointsize>
                    </font>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
                   </property>
                   <property name="text">
                    <string>Collective Ch</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                   <property name="wordWrap">
                    <bool>true</bool>

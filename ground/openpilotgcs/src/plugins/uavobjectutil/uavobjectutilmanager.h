@@ -63,7 +63,7 @@ public:
 
         int getBoardModel();
         QByteArray getBoardCPUSerial();
-        QString getBoardDescription();
+        QByteArray getBoardDescription();
         UAVObjectManager* getObjectManager();
         void saveObjectToSD(UAVObject *obj);
 

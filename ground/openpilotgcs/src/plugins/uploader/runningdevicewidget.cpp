@@ -25,7 +25,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "runningdevicewidget.h"
-
+#include "devicedescriptorstruct.h"
+#include "uploadergadgetwidget.h"
 runningDeviceWidget::runningDeviceWidget(QWidget *parent) :
     QWidget(parent)
 {
@@ -102,9 +103,12 @@ void runningDeviceWidget::populate()
     QString serial = utilMngr->getBoardCPUSerial().toHex();
     myDevice->cpuSerial->setText(serial);
 
-    QString description = utilMngr->getBoardDescription();
-    myDevice->description->setText(description);
-
+    QByteArray description = utilMngr->getBoardDescription();
+    deviceDescriptorStruct devDesc;
+    UploaderGadgetWidget::descriptionToStructure(description,&devDesc);
+    myDevice->description->setText(devDesc.description);
+    myDevice->lblGitTag->setText(QString("Git Tag:")+devDesc.gitTag);
+    myDevice->lblFwDate->setText(QString("FW Build Date:")+devDesc.buildDate);
     status("Ready...", STATUSICON_INFO);
 
 }

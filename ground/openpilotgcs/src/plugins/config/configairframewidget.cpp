@@ -384,7 +384,7 @@ void ConfigAirframeWidget::resetMrMixer()
 {
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     UAVObjectField* field = obj->getField(QString("ThrottleCurve1"));
-    resetMixer(m_aircraft->multiThrottleCurve, field->getNumElements(),0.95);
+    resetMixer(m_aircraft->multiThrottleCurve, field->getNumElements(),0.9);
 }
 
 /**
@@ -493,7 +493,7 @@ void ConfigAirframeWidget::refreshValues()
         }
         if(temp==0)
         {
-            m_aircraft->multiThrottleCurve->initLinearCurve(field->getNumElements(),0.95);;
+            m_aircraft->multiThrottleCurve->initLinearCurve(field->getNumElements(),0.9);;
             m_aircraft->fixedWingThrottle->initLinearCurve(field->getNumElements(),(double)1);
         }
         else

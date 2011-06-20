@@ -179,6 +179,8 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     // Connect the help button
     connect(m_config->inputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
+    connect(m_config->receiverError, SIGNAL(clicked()), this, SLOT(receiverHelp()));
+
 }
 
 ConfigInputWidget::~ConfigInputWidget()
@@ -655,4 +657,52 @@ void ConfigInputWidget::openHelp()
 
     QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Input+Configuration", QUrl::StrictMode) );
 }
+void ConfigInputWidget::receiverHelp()
+{
+    QString unassigned;
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    UAVDataObject* controlCommand = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
 
+    UAVObjectField *field;
+
+    field= controlCommand->getField("Roll");
+    if(field->getValue().toString()=="None")
+        unassigned.append("Roll");
+
+    field =controlCommand->getField("Pitch");
+    if(field->getValue().toString()=="None")
+    {
+        if(unassigned.length()>0)
+            unassigned.append(" ,");
+        unassigned.append("Pitch");
+    }
+
+    field =controlCommand->getField("Yaw");
+    if(field->getValue().toString()=="None")
+    {
+        if(unassigned.length()>0)
+            unassigned.append(" ,");
+        unassigned.append("Yaw");
+    }
+
+    field =controlCommand->getField("Throttle");
+    if(field->getValue().toString()=="None")
+    {
+        if(unassigned.length()>0)
+            unassigned.append(" ,");
+        unassigned.append("Throttle");
+    }
+
+    field =controlCommand->getField("FlightMode");
+    if(field->getValue().toString()=="None")
+    {
+        if(unassigned.length()>0)
+            unassigned.append(" ,");
+        unassigned.append("FlightMode");
+    }
+    if(unassigned.length()>0)
+        QMessageBox::information(this,"Not all required channels are assigned",QString("Channel left to assign:")+unassigned);
+    else
+        QMessageBox::information(this,"Receiver not connected","All the required channels are assigned, however no receiver signal is being detected");
+}

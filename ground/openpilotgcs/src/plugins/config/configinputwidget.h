@@ -79,6 +79,7 @@ private slots:
 	void saveRCInputObject();
         void reverseCheckboxClicked(bool state);
         void openHelp();
+        void receiverHelp();
 };
 
 #endif

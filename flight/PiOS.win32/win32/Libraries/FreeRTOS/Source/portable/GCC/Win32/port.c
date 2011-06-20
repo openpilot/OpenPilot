@@ -941,3 +941,8 @@ void vPortExitCritical( void )
 		}
 	}
 }
+
+unsigned long ulPortGetTimerValue( void )
+{
+	return (unsigned long) clock();
+}

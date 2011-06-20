@@ -71,6 +71,7 @@ help:
 	@echo "     qt_sdk_install       - Install the QT v4.6.2 tools"
 	@echo "     arm_sdk_install      - Install the Code Sourcery ARM gcc toolchain"
 	@echo "     openocd_install      - Install the OpenOCD JTAG daemon"
+	@echo "     stm32flash_install   - Install the stm32flash tool for unbricking boards"
 	@echo
 	@echo "   [Big Hammer]"
 	@echo "     all                  - Generate UAVObjects, build openpilot firmware and gcs"
@@ -92,20 +93,24 @@ help:
 	@echo "     <board>              - Build firmware for <board>"
 	@echo "                            supported boards are ($(ALL_BOARDS))"
 	@echo "     fw_<board>           - Build firmware for <board>"
-	@echo "                            supported boards are ($(FW_TARGETS))"
+	@echo "                            supported boards are ($(FW_BOARDS))"
 	@echo "     fw_<board>_clean     - Remove firmware for <board>"
 	@echo "     fw_<board>_program   - Use OpenOCD + JTAG to write firmware to <board>"
 	@echo
 	@echo "   [Bootloader]"
 	@echo "     bl_<board>           - Build bootloader for <board>"
-	@echo "                            supported boards are ($(BL_TARGETS))"
+	@echo "                            supported boards are ($(BL_BOARDS))"
 	@echo "     bl_<board>_clean     - Remove bootloader for <board>"
 	@echo "     bl_<board>_program   - Use OpenOCD + JTAG to write bootloader to <board>"
 	@echo
 	@echo "   [Bootloader Updater]"
 	@echo "     bu_<board>           - Build bootloader updater for <board>"
-	@echo "                            supported boards are ($(BU_TARGETS))"
+	@echo "                            supported boards are ($(BU_BOARDS))"
 	@echo "     bu_<board>_clean     - Remove bootloader updater for <board>"
+	@echo
+	@echo "   [Unbrick a board]"
+	@echo "     unbrick_<board>      - Use the STM32's built in boot ROM to write a bootloader to <board>"
+	@echo "                            supported boards are ($(BL_BOARDS))"
 	@echo
 	@echo "   [Simulation]"
 	@echo "     sim_posix            - Build OpenPilot simulation firmware for"
@@ -226,6 +231,25 @@ openocd_install: openocd_clean
 openocd_clean:
 	$(V1) [ ! -d "$(OPENOCD_DIR)" ] || $(RM) -r "$(OPENOCD_DIR)"
 
+STM32FLASH_DIR := $(TOOLS_DIR)/stm32flash
+
+.PHONY: stm32flash_install
+stm32flash_install: STM32FLASH_URL := http://stm32flash.googlecode.com/svn/trunk
+stm32flash_install: STM32FLASH_REV := 52
+stm32flash_install: stm32flash_clean
+        # download the source
+	$(V0) @echo " DOWNLOAD     $(STM32FLASH_URL) @ r$(STM32FLASH_REV)"
+	$(V1) svn export -q -r "$(STM32FLASH_REV)" "$(STM32FLASH_URL)" "$(STM32FLASH_DIR)"
+
+        # build
+	$(V0) @echo " BUILD        $(STM32FLASH_DIR)"
+	$(V1) $(MAKE) --silent -C $(STM32FLASH_DIR) all
+
+.PHONY: stm32flash_clean
+stm32flash_clean:
+	$(V0) @echo " CLEAN        $(STM32FLASH_DIR)"
+	$(V1) [ ! -d "$(STM32FLASH_DIR)" ] || $(RM) -r "$(STM32FLASH_DIR)"
+
 ##############################
 #
 # Set up paths to tools
@@ -277,7 +301,7 @@ openpilotgcs:  uavobjects_gcs
 
 .PHONY: openpilotgcs_clean
 openpilotgcs_clean:
-	$(V0) @echo " CLEAN     $@"
+	$(V0) @echo " CLEAN      $@"
 	$(V1) [ ! -d "$(BUILD_DIR)/ground/openpilotgcs" ] || $(RM) -r "$(BUILD_DIR)/ground/openpilotgcs"
 
 .PHONY: uavobjgenerator
@@ -307,7 +331,7 @@ uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
 	$(V1) $(UAVOBJGENERATOR) -v -none $(UAVOBJ_XML_DIR) $(ROOT_DIR)
 
 uavobjects_clean:
-	$(V0) @echo " CLEAN     $@"
+	$(V0) @echo " CLEAN      $@"
 	$(V1) [ ! -d "$(UAVOBJ_OUT_DIR)" ] || $(RM) -r "$(UAVOBJ_OUT_DIR)"
 
 ##############################
@@ -335,7 +359,7 @@ fw_$(1)_%: uavobjects_flight
 .PHONY: $(1)_clean
 $(1)_clean: fw_$(1)_clean
 fw_$(1)_clean:
-	$(V0) @echo " CLEAN     $$@"
+	$(V0) @echo " CLEAN      $$@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/fw_$(1)
 endef
 
@@ -355,9 +379,23 @@ bl_$(1)_%:
 		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
 		$$*
 
+.PHONY: unbrick_$(1)
+unbrick_$(1): bl_$(1)_hex
+$(if $(filter-out undefined,$(origin UNBRICK_TTY)),
+	$(V0) @echo " UNBRICK    $(1) via $$(UNBRICK_TTY)"
+	$(V1) $(STM32FLASH_DIR)/stm32flash \
+		-w $(BUILD_DIR)/bl_$(1)/bl_$(1).hex \
+		-g 0x0 \
+		$$(UNBRICK_TTY)
+,
+	$(V0) @echo
+	$(V0) @echo "ERROR: You must specify UNBRICK_TTY=<serial-device> to use for unbricking."
+	$(V0) @echo "       eg. $$(MAKE) $$@ UNBRICK_TTY=/dev/ttyUSB0"
+)
+
 .PHONY: bl_$(1)_clean
 bl_$(1)_clean:
-	$(V0) @echo " CLEAN     $$@"
+	$(V0) @echo " CLEAN      $$@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bl_$(1)
 endef
 
@@ -377,7 +415,7 @@ bu_$(1)_%: bl_$(1)_bino
 
 .PHONY: bu_$(1)_clean
 bu_$(1)_clean:
-	$(V0) @echo " CLEAN     $$@"
+	$(V0) @echo " CLEAN      $$@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bu_$(1)
 endef
 
@@ -403,14 +441,20 @@ pipxtreme_friendly     := PipXtreme
 ins_friendly           := INS
 ahrs_friendly          := AHRS
 
-FW_TARGETS := $(addprefix fw_, $(ALL_BOARDS))
-BL_TARGETS := $(addprefix bl_, $(ALL_BOARDS))
-BU_TARGETS := $(addprefix bu_, $(ALL_BOARDS))
+# Start out assuming that we'll build fw, bl and bu for all boards
+FW_BOARDS  := $(ALL_BOARDS)
+BL_BOARDS  := $(ALL_BOARDS)
+BU_BOARDS  := $(ALL_BOARDS)
 
 # FIXME: The INS build doesn't have a bootloader or bootloader
 #        updater yet so we need to filter them out to prevent errors.
-BL_TARGETS := $(filter-out bl_ins, $(BL_TARGETS))
-BU_TARGETS := $(filter-out bu_ins, $(BU_TARGETS))
+BL_BOARDS  := $(filter-out ins, $(ALL_BOARDS))
+BU_BOARDS  := $(filter-out ins, $(ALL_BOARDS))
+
+# Generate the targets for whatever boards are left in each list
+FW_TARGETS := $(addprefix fw_, $(FW_BOARDS))
+BL_TARGETS := $(addprefix bl_, $(BL_BOARDS))
+BU_TARGETS := $(addprefix bu_, $(BU_BOARDS))
 
 .PHONY: all_fw all_fw_clean
 all_fw:        $(addsuffix _opfw,  $(FW_TARGETS))
@@ -428,6 +472,7 @@ all_bu_clean:  $(addsuffix _clean, $(BU_TARGETS))
 all_flight:       all_fw all_bl all_bu
 all_flight_clean: all_fw_clean all_bl_clean all_bu_clean
 
+# Expand the groups of targets for each board
 $(foreach board, $(ALL_BOARDS), $(eval $(call BOARD_PHONY_TEMPLATE,$(board))))
 
 # Expand the bootloader updater rules

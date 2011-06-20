@@ -283,8 +283,8 @@ void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
 void GCSControlGadget::axesValues(QListInt16 values)
 {
     int chMax = values.length();
-    if (rollChannel > chMax || pitchChannel > chMax ||
-            yawChannel > chMax || throttleChannel > chMax ) {
+    if (rollChannel >= chMax || pitchChannel >= chMax ||
+            yawChannel >= chMax || throttleChannel >= chMax ) {
         qDebug() << "GCSControl: configuration is inconsistent with current joystick! Aborting update.";
         return;
     }

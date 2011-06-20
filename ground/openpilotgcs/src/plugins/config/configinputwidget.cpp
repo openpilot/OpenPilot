@@ -538,7 +538,7 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
             obj->setMetadata(mdata);
 
             // Set some slider values to better defaults
-            // Find what channel we used for throttle, set it 5% about min:
+            // Find some channels first
             int throttleChannel = -1;
             int fmChannel = -1;
             for (int i=0; i < inChannelAssign.length(); i++) {

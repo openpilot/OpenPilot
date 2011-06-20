@@ -142,7 +142,9 @@ class UavtalkDemo():
     def driveServo(self):
         print "Taking control of self.actuatorCmd"
         self.objMan.ActuatorCommand.metadata.access.value = UAVMetaDataObject.Access.READONLY
-        self.objMan.ActuatorCommand.metadata.updated()
+        self.objMan.ActuatorCommand.metadata.updated()   
+        self.objMan.ManualControlCommand.metadata.access.value = UAVMetaDataObject.Access.READONLY
+        self.objMan.ManualControlCommand.metadata.updated()
         
         while True:
             self.objMan.ActuatorCommand.Channel.value[0] = 1000

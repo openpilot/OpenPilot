@@ -57,7 +57,20 @@ extern unsigned char usrlib_img[];
 /**
  * Module initialization
  */
-module_initcall(FlightPlanInitialize, 0);
+int32_t FlightPlanStart()
+{
+	taskHandle = NULL;
+
+	// Start VM thread
+	xTaskCreate(flightPlanTask, (signed char *)"FlightPlan", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_FLIGHTPLAN, taskHandle);
+
+	return 0;
+}
+
+/**
+ * Module initialization
+ */
 int32_t FlightPlanInitialize()
 {
 	taskHandle = NULL;
@@ -71,13 +84,9 @@ int32_t FlightPlanInitialize()
 	// Listen for FlightPlanControl updates
 	FlightPlanControlConnectQueue(queue);
 
-	// Start VM thread
-	xTaskCreate(flightPlanTask, (signed char *)"FlightPlan", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_FLIGHTPLAN, taskHandle);
-
 	return 0;
 }
-
+module_initcall(FlightPlanInitialize, 0, FlightPlanStart, 0, MODULE_EXEC_NOORDER_FLAG);
 /**
  * Module task
  */

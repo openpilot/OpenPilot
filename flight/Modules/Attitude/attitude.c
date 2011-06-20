@@ -94,7 +94,21 @@ static bool zero_during_arming = false;
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-module_initcall(AttitudeInitialize, 0);
+int32_t AttitudeStart(void)
+{
+
+	// Start main task
+	xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_ATTITUDE, taskHandle);
+	PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
+
+	return 0;
+}
+
+/**
+ * Initialise the module, called on startup
+ * \returns 0 on success or -1 if initialisation failed
+ */
 int32_t AttitudeInitialize(void)
 {
 	// Initialize quaternion
@@ -105,21 +119,19 @@ int32_t AttitudeInitialize(void)
 	attitude.q3 = 0;
 	attitude.q4 = 0;
 	AttitudeActualSet(&attitude);
+
+	AttitudeSettingsConnectCallback(&settingsUpdatedCb);
 	
 	// Create queue for passing gyro data, allow 2 back samples in case
 	gyro_queue = xQueueCreate(1, sizeof(float) * 4);
-	if(gyro_queue == NULL) 
+	if(gyro_queue == NULL)
 		return -1;
 	PIOS_ADC_SetQueue(gyro_queue);
-	
-	AttitudeSettingsConnectCallback(&settingsUpdatedCb);
-	
-	// Start main task
-	xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_ATTITUDE, taskHandle);
-	PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
+
 	return 0;
 }
+
+module_initcall(AttitudeInitialize, 0, AttitudeStart, 0, MODULE_EXEC_NOORDER_FLAG);
 
 /**
  * Module thread, should not return.

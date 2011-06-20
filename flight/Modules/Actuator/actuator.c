@@ -85,12 +85,24 @@ typedef struct {
 	int8_t matrix[5];
 } __attribute__((packed)) Mixer_t;
 
+/**
+ * @brief Module initialization
+ * @return 0
+ */
+int32_t ActuatorStart()
+{
+	// Start main task
+	xTaskCreate(actuatorTask, (signed char*)"Actuator", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_ACTUATOR, taskHandle);
+	PIOS_WDG_RegisterFlag(PIOS_WDG_ACTUATOR);
+
+	return 0;
+}
 
 /**
  * @brief Module initialization
  * @return 0
  */
-module_initcall(ActuatorInitialize, 0);
 int32_t ActuatorInitialize()
 {
 	// Create object queue
@@ -101,14 +113,10 @@ int32_t ActuatorInitialize()
 	
 	// If settings change, update the output rate
 	ActuatorSettingsConnectCallback(actuator_update_rate);
-	
-	// Start main task
-	xTaskCreate(actuatorTask, (signed char*)"Actuator", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_ACTUATOR, taskHandle);
-	PIOS_WDG_RegisterFlag(PIOS_WDG_ACTUATOR);
-	
+
 	return 0;
 }
+module_initcall(ActuatorInitialize, 0, ActuatorStart, 0, MODULE_EXEC_NOORDER_FLAG);
 
 /**
  * @brief Main Actuator module task

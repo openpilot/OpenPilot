@@ -84,18 +84,34 @@ static void updateSystemAlarms();
 static void systemTask(void *parameters);
 
 /**
- * Initialise the module, called on startup.
- * \returns 0 on success or -1 if initialisation failed
+ * Create the module task.
+ * \returns 0 on success or -1 if initialization failed
  */
-int32_t SystemModInitialize(void)
+int32_t SystemModStart(void)
 {
 	// Initialize vars
 	stackOverflow = 0;
 	// Create system task
 	xTaskCreate(systemTask, (signed char *)"System", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &systemTaskHandle);
+	// Register task
+	TaskMonitorAdd(TASKINFO_RUNNING_SYSTEM, systemTaskHandle);
+
 	return 0;
 }
 
+/**
+ * Initialize the module, called on startup.
+ * \returns 0 on success or -1 if initialization failed
+ */
+int32_t SystemModInitialize(void)
+{
+
+	SystemModStart();
+
+	return 0;
+}
+
+module_initcall(SystemModInitialize, 0, 0, 0, MODULE_EXEC_FIRST_FLAG);
 /**
  * System task, periodically executes every SYSTEM_UPDATE_PERIOD_MS
  */
@@ -103,8 +119,8 @@ static void systemTask(void *parameters)
 {
 	portTickType lastSysTime;
 
-	// Register task
-	TaskMonitorAdd(TASKINFO_RUNNING_SYSTEM, systemTaskHandle);
+	/* create all modules thread */
+	MODULE_TASKCREATE_ALL();
 
 	// Initialize vars
 	idleCounter = 0;

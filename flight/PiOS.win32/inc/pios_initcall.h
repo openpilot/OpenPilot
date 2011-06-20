@@ -39,7 +39,10 @@
  */
 
 #define uavobj_initcall(fn)
-#define module_initcall(fn, param)
+#define module_initcall(ifn, iparam, sfn, sparam, flags)
+
+#define MODULE_TASKCREATE_ALL();
+
 
 #endif	/* PIOS_INITCALL_H */
 

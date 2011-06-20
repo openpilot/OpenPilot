@@ -1075,6 +1075,8 @@ void demo_slam_init()
 void demo_slam_main(world_ptr_t *world)
 { try {
 
+	robot_ptr_t robotPtr;
+		
 	// wait for display to be ready if enabled
 	if (intOpts[iDispQt] || intOpts[iDispGdhe])
 	{
@@ -1100,6 +1102,7 @@ void demo_slam_main(world_ptr_t *world)
 			if ((*senIter)->getNeedInit())
 				(*senIter)->start();
 		}
+		robotPtr = *robIter;
 	}
 
 	// wait for their init
@@ -1189,6 +1192,18 @@ int n_innovation = 0;
 				n_innovation++;
 				
 				if (exporter) exporter->exportCurrentState();
+#ifdef GENOM // export genom
+				jblas::vec euler_x(3);
+				jblas::sym_mat euler_P(3,3);
+				quaternion::q2e(ublas::subrange(robotPtr->state.x(), 3, 7), ublas::subrange(robotPtr->state.P(), 3,7, 3,7), euler_x, euler_P);
+				jblas::vec stateX(6);
+				ublas::subrange(stateX,0,3) = ublas::subrange(robotPtr->state.x(),0,3);
+				ublas::subrange(stateX,3,6) = euler_x;
+				jblas::vec stateP(6);
+				for(int i = 0; i < 3; ++i) stateP(i) = robotPtr->state.P(i,i);
+				for(int i = 0; i < 3; ++i) stateP(3+i) = euler_P(i,i);
+				updatePoster(newt, (*world)->t, stateX, stateP);
+#endif
 			}
 		}
 		

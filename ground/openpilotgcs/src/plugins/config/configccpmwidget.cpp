@@ -193,7 +193,7 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
 
     QStringList Types;
-    Types << "CCPM 2 Servo 90º" << "CCPM 3 Servo 120º" << "CCPM 3 Servo 140º" << "FP 2 Servo 90º"  << "Custom - User Angles" << "Custom - Advanced Settings"  ;
+    Types << "CCPM 2 Servo 90º" << "CCPM 3 Servo 90º" << "CCPM 4 Servo 90º" << "CCPM 3 Servo 120º" << "CCPM 3 Servo 140º" << "FP 2 Servo 90º"  << "Custom - User Angles" << "Custom - Advanced Settings"  ;
     m_ccpm->ccpmType->addItems(Types);
     m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->count() - 1);
     requestccpmUpdate();
@@ -322,6 +322,31 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=2;
 
+        }
+        if (TypeText.compare(QString("CCPM 3 Servo 90º"), Qt::CaseInsensitive)==0)
+        {
+            m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
+            m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
+            m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 180,360));
+            m_ccpm->ccpmAngleZ->setValue(0);
+            m_ccpm->ccpmAngleZ->setEnabled(0);
+            m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
+            m_ccpm->ccpmServoZChannel->setEnabled(0);
+            m_ccpm->ccpmCorrectionAngle->setValue(0);
+            NumServosDefined=3;
+        
+        }
+        if (TypeText.compare(QString("CCPM 4 Servo 90º"), Qt::CaseInsensitive)==0)
+        {
+            m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
+            m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
+            m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 180,360));
+            m_ccpm->ccpmAngleZ->setValue(fmod(AdjustmentAngle + 270,360));
+            m_ccpm->ccpmCorrectionAngle->setValue(0);
+            m_ccpm->ccpmSingleServo->setEnabled(0);
+            m_ccpm->ccpmSingleServo->setCurrentIndex(0);
+            NumServosDefined=4;
+        
         }
         if (TypeText.compare(QString("CCPM 3 Servo 120º"), Qt::CaseInsensitive)==0)
         {

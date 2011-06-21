@@ -11,6 +11,10 @@ GPS_POSE: [6](-0.87, 0.12, 0.37, 0.0, 0.0, 0.0)
 #robufast
 #GPS_POSE: [6](-1.36, 0.0, 0.14, 0.0, 0.0, 0.0)
 
+# hand-held
+ROBOT_POSE: [6](0,0,0, 0,0,0)
+# mana
+#ROBOT_POSE: [6](0,0,-0.64, 0,0,0)
 
 CAMERA_TYPE: 0
 CAMERA_DEVICE: 0x00b09d010063565b

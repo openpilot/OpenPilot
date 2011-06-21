@@ -138,6 +138,7 @@ namespace jafar {
 				jblas::vec origin_sensors; ///< origin to get the initial state position at 0 / absolute sensors
 				jblas::vec origin_export; ///< origin of the exported position in absolute coordinates
 				void setOrigin(jblas::vec3 pos) { origin_export = pos; }
+				jblas::vec robot_pose; ///< the pose of the true robot in the slam robot frame, for exported position
 
 				virtual size_t mySize() = 0;
 				virtual size_t mySize_control() = 0;

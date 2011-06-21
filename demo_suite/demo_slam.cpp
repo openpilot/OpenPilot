@@ -270,6 +270,7 @@ class ConfigSetup: public kernel::KeyValueFileSaveLoad
 	jblas::vec6 SENSOR_POSE_CONSTVEL; /// camera pose in constant velocity (x,y,z,roll,pitch,yaw) (m,deg)
 	jblas::vec6 SENSOR_POSE_INERTIAL; /// camera pose in inertial (x,y,z,roll,pitch,yaw) (m,deg)
 	jblas::vec6 GPS_POSE; /// GPS pose (x,y,z,roll,pitch,yaw) (m,deg)
+	jblas::vec6 ROBOT_POSE; /// the transformation between the slam robot (the main sensor, camera or imu) and the real robot = pose of the real robot in the slam robot frame, just like the other sensors
 
 	unsigned CAMERA_TYPE;      /// camera type (0 = firewire, 1 = firewire format7, 2 = USB)
 	std::string CAMERA_DEVICE; /// camera device (firewire ID or device)
@@ -767,6 +768,7 @@ void demo_slam_init()
 	robPtr1->pose.x(quaternion::originFrame());
 	robPtr1->setPoseStd(0,0,0, 0,0,floatOpts[fHeading], 
 	                    0,0,0, configSetup.UNCERT_ATTITUDE,configSetup.UNCERT_ATTITUDE,configSetup.UNCERT_HEADING);
+	robPtr1->robot_pose = configSetup.ROBOT_POSE;
 	if (dataLogger) dataLogger->addLoggable(*robPtr1.get());
 
 	if (intOpts[iSimu] != 0)
@@ -1652,6 +1654,7 @@ void ConfigSetup::loadKeyValueFile(jafar::kernel::KeyValueFile const& keyValueFi
 	KeyValueFile_getItem(SENSOR_POSE_CONSTVEL);
 	KeyValueFile_getItem(SENSOR_POSE_INERTIAL);
 	KeyValueFile_getItem(GPS_POSE);
+	KeyValueFile_getItem(ROBOT_POSE);
 	
 	KeyValueFile_getItem(CAMERA_TYPE);
 	KeyValueFile_getItem(CAMERA_DEVICE);
@@ -1710,6 +1713,7 @@ void ConfigSetup::saveKeyValueFile(jafar::kernel::KeyValueFile& keyValueFile)
 	KeyValueFile_setItem(SENSOR_POSE_CONSTVEL);
 	KeyValueFile_setItem(SENSOR_POSE_INERTIAL);
 	KeyValueFile_setItem(GPS_POSE);
+	KeyValueFile_setItem(ROBOT_POSE);
 	
 	KeyValueFile_setItem(CAMERA_TYPE);
 	KeyValueFile_setItem(CAMERA_DEVICE);

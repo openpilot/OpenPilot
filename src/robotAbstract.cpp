@@ -51,7 +51,7 @@ namespace jafar {
 			XNEW_x(_size_state, _size_state),
 			XNEW_pert(_size_state, _size_pert),
 			Q(_size_state, _size_state),
-			origin_sensors(3), origin_export(3)
+			origin_sensors(3), origin_export(3), robot_pose(6)
 		{
 			constantPerturbation = false;
 			category = ROBOT;
@@ -59,6 +59,7 @@ namespace jafar {
 			Q.clear();
 			origin_sensors.clear();
 			origin_export.clear();
+			robot_pose.clear();
 		}
 
 		RobotAbstract::RobotAbstract(const simulation_t dummy, const map_ptr_t & _mapPtr, const size_t _size_state, const size_t _size_control, const size_t _size_pert) :
@@ -69,13 +70,14 @@ namespace jafar {
 			XNEW_x(_size_state, _size_state),
 			XNEW_pert(_size_state, _size_pert),
 			Q(_size_state, _size_state),
-			origin_sensors(3), origin_export(3)
+			origin_sensors(3), origin_export(3), robot_pose(6)
 		{
 			constantPerturbation = true;
 			category = ROBOT;
 			self_time = -1.;
 			origin_sensors.clear();
 			origin_export.clear();
+			robot_pose.clear();
 		}
 
 		void RobotAbstract::setPoseDegStd(double x, double y, double z, double rollDeg,

@@ -85,8 +85,8 @@
 #define AUXUART_BAUDRATE		19200
 
 /* Alarm Thresholds */
-#define HEAP_LIMIT_WARNING             220
-#define HEAP_LIMIT_CRITICAL            150
+#define HEAP_LIMIT_WARNING             156
+#define HEAP_LIMIT_CRITICAL            130
 #define CPULOAD_LIMIT_WARNING		80
 #define CPULOAD_LIMIT_CRITICAL		95
 

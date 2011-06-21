@@ -174,12 +174,12 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_config->ch5Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
     connect(m_config->ch6Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
     connect(m_config->ch7Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
-
+    connect(m_config->doRCInputCalibration,SIGNAL(stateChanged(int)),this,SLOT(updateTips(int)));
     firstUpdate = true;
 
     // Connect the help button
     connect(m_config->inputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
-    connect(m_config->receiverError, SIGNAL(clicked()), this, SLOT(receiverHelp()));
+
 
 }
 
@@ -471,10 +471,15 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
     QString fieldName = QString("Connected");
     UAVObjectField *field = controlCommand->getField(fieldName);
     if (field->getValue().toBool())
+    {
         m_config->RCInputConnected->setText("RC Receiver connected");
+        m_config->lblMissingInputs->setText("");
+    }
     else
+    {
         m_config->RCInputConnected->setText("RC Receiver not connected or invalid input configuration (missing channels)");
-
+        receiverHelp();
+    }
     if (m_config->doRCInputCalibration->isChecked()) {
         if (firstUpdate) {
             // Increase the data rate from the board so that the sliders
@@ -702,7 +707,32 @@ void ConfigInputWidget::receiverHelp()
         unassigned.append("FlightMode");
     }
     if(unassigned.length()>0)
-        QMessageBox::information(this,"Not all required channels are assigned",QString("Channel left to assign:")+unassigned);
+        m_config->lblMissingInputs->setText(QString("Channels left to assign:")+unassigned);
     else
-        QMessageBox::information(this,"Receiver not connected","All the required channels are assigned, however no receiver signal is being detected");
+        m_config->lblMissingInputs->setText("");
+}
+void ConfigInputWidget::updateTips(int value)
+{
+    if(value==Qt::Checked)
+    {
+        m_config->ch0Cur->setToolTip("Current channel value");
+        m_config->ch1Cur->setToolTip("Current channel value");
+        m_config->ch2Cur->setToolTip("Current channel value");
+        m_config->ch3Cur->setToolTip("Current channel value");
+        m_config->ch4Cur->setToolTip("Current channel value");
+        m_config->ch5Cur->setToolTip("Current channel value");
+        m_config->ch6Cur->setToolTip("Current channel value");
+        m_config->ch7Cur->setToolTip("Current channel value");
+    }
+    else
+    {
+        m_config->ch0Cur->setToolTip("Channel neutral point");
+        m_config->ch1Cur->setToolTip("Channel neutral point");
+        m_config->ch2Cur->setToolTip("Channel neutral point");
+        m_config->ch3Cur->setToolTip("Channel neutral point");
+        m_config->ch4Cur->setToolTip("Channel neutral point");
+        m_config->ch5Cur->setToolTip("Channel neutral point");
+        m_config->ch6Cur->setToolTip("Channel neutral point");
+        m_config->ch7Cur->setToolTip("Channel neutral point");
+    }
 }

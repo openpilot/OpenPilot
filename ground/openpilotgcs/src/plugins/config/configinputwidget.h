@@ -71,7 +71,7 @@ private:
 	bool firstUpdate;
 
         virtual void enableControls(bool enable);
-
+        void receiverHelp();
 private slots:
 	void updateChannels(UAVObject* obj);
         virtual void refreshValues();
@@ -79,7 +79,7 @@ private slots:
 	void saveRCInputObject();
         void reverseCheckboxClicked(bool state);
         void openHelp();
-        void receiverHelp();
+        void updateTips(int);
 };
 
 #endif

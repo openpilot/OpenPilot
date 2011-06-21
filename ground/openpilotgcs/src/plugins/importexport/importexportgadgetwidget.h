@@ -41,8 +41,10 @@ private:
     void importConfiguration(const QString& fileName);
     QList<Core::IConfigurablePlugin*> getConfigurables();
 
+	QString filename;
+
 private slots:
-    void on_resetButton_clicked();
+	void on_resetButton_clicked();
     void on_helpButton_clicked();
     void on_importButton_clicked();
     void on_exportButton_clicked();

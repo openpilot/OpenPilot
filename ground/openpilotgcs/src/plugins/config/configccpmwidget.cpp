@@ -372,12 +372,7 @@ void ConfigccpmWidget::UpdateType()
   */
 void ConfigccpmWidget::resetMixer(MixerCurveWidget *mixer, int numElements)
 {
-    QList<double> curveValues;
-    for (double i=0; i<numElements; i++) {
-        curveValues.append(i/(numElements-1));
-    }
-    // Setup all Throttle1 curves for all types of airframes
-    mixer->initCurve(curveValues);
+    mixer->initLinearCurve(numElements,(double)1);
 }
 
 void ConfigccpmWidget::UpdateCurveWidgets()

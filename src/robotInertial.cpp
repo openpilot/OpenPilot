@@ -306,6 +306,7 @@ namespace jafar {
 			log.writeComment(oss.str());
 			log.writeLegendTokens("time");
 			
+			log.writeLegendTokens("absx absy absz");
 			log.writeLegendTokens("x y z");
 			log.writeLegendTokens("qw qx qy qz");
 			log.writeLegendTokens("yaw pitch roll");
@@ -330,6 +331,7 @@ namespace jafar {
 			quaternion::q2e(ublas::subrange(state.x(), 3, 7), ublas::project(state.P(), ublas::range(3, 7), ublas::range(3,7)), euler_x, euler_P);
 			
 			log.writeData(self_time);
+			for(int i = 0 ; i < 3 ; ++i) log.writeData(state.x()(i)+origin_sensors(i)-origin_export(i));
 			for(int i = 0 ; i < 7 ; ++i) log.writeData(state.x()(i));
 			for(int i = 0 ; i < 3 ; ++i) log.writeData(euler_x(2-i));
 			for(int i = 7 ; i < 10; ++i) log.writeData(state.x()(i));

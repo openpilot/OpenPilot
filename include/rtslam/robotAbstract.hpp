@@ -135,7 +135,9 @@ namespace jafar {
 				jblas::mat XNEW_pert; ///<      Jacobian wrt perturbation
 				jblas::sym_mat Q; ///<          Process noise covariances matrix in state space, Q = XNEW_pert * perturbation.P * trans(XNEW_pert);
 				
-				jblas::vec origin;
+				jblas::vec origin_sensors; ///< origin to get the initial state position at 0 / absolute sensors
+				jblas::vec origin_export; ///< origin of the exported position in absolute coordinates
+				void setOrigin(jblas::vec3 pos) { origin_export = pos; }
 
 				virtual size_t mySize() = 0;
 				virtual size_t mySize_control() = 0;

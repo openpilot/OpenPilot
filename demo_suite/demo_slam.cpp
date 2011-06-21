@@ -1197,7 +1197,7 @@ int n_innovation = 0;
 				jblas::sym_mat euler_P(3,3);
 				quaternion::q2e(ublas::subrange(robotPtr->state.x(), 3, 7), ublas::subrange(robotPtr->state.P(), 3,7, 3,7), euler_x, euler_P);
 				jblas::vec stateX(6);
-				ublas::subrange(stateX,0,3) = ublas::subrange(robotPtr->state.x(),0,3);
+				ublas::subrange(stateX,0,3) = ublas::subrange(robotPtr->state.x(),0,3)+robotPtr->origin_sensors-robotPtr->origin_export;
 				ublas::subrange(stateX,3,6) = euler_x;
 				jblas::vec stateP(6);
 				for(int i = 0; i < 3; ++i) stateP(i) = robotPtr->state.P(i,i);

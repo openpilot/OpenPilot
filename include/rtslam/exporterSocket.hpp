@@ -107,7 +107,8 @@ namespace rtslam {
 					jblas::vec &state = robPtr->mapPtr()->filterPtr->x();
 					jblas::sym_mat &stateCov = robPtr->mapPtr()->filterPtr->P();
 					message[0] = robPtr->self_time;
-					for(int i = 0; i < 7; ++i) message[i+1] = state(i);
+					for(int i = 0; i < 3; ++i) message[i+1] = state(i)+robPtr->origin_sensors(i)-robPtr->origin_export(i);
+					for(int i = 3; i < 7; ++i) message[i+1] = state(i);
 					jblas::vec3 euler = quaternion::q2e(ublas::subrange(state,3,7));
 					for(int i = 7; i < 10; ++i) message[i+1] = euler(i-7);
 					std::swap(message[7+1], message[9+1]); // convention roll/pitch/yaw to yaw/pitch/roll

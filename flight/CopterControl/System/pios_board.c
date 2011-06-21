@@ -200,6 +200,38 @@ void PIOS_ADC_handler() {
 #include "pios_usart_priv.h"
 
 /*
+ * Serial port configuration.
+ * TODO: This should be dynamic in the future.
+ * But for now define any compatile combination of:
+ *   USE_I2C (shared with USART3)
+ *   USE_TELEMETRY
+ *   USE_GPS
+ *   USE_SPEKTRUM
+ *   USE_SBUS (USART1 only, it needs an invertor)
+ * and optionally define PIOS_PORT_* to USART port numbers
+ */
+
+/* Serial telemetry: USART1 or USART3 */
+#if !defined(PIOS_PORT_TELEMETRY)
+#define PIOS_PORT_TELEMETRY	1
+#endif
+
+/* GPS receiver: USART1 or USART3 */
+#if !defined(PIOS_PORT_GPS)
+#define PIOS_PORT_GPS		3
+#endif
+
+/* Spektrum satellite receiver: USART1 or USART3 */
+#if !defined(PIOS_PORT_SPEKTRUM)
+#define PIOS_PORT_SPEKTRUM	3
+#endif
+
+/* Futaba S.Bus receiver: USART1 only (needs invertor) */
+#if !defined(PIOS_PORT_SBUS)
+#define PIOS_PORT_SBUS		1
+#endif
+
+/*
  * Define USART port configurations and check for conflicts
  * making sure they do not conflict with each other and with I2C.
  */

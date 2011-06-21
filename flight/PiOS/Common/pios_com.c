@@ -38,7 +38,7 @@
 
 static bool PIOS_COM_validate(struct pios_com_dev * com_dev)
 {
-	return (com_dev->magic == PIOS_COM_DEV_MAGIC);
+	return (com_dev && (com_dev->magic == PIOS_COM_DEV_MAGIC));
 }
 
 #if defined(PIOS_INCLUDE_FREERTOS) && 0
@@ -298,7 +298,9 @@ int32_t PIOS_COM_ReceiveBufferUsed(uint32_t com_id)
 
 	if (!PIOS_COM_validate(com_dev)) {
 		/* Undefined COM port for this board (see pios_board.c) */
-	PIOS_DEBUG_Assert(0);
+		/* This is commented out so com_id=NULL can be used to disable telemetry */
+		//PIOS_DEBUG_Assert(0);
+		return 0;
 	}
 
 	if (!com_dev->driver->rx_avail) {

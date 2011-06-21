@@ -409,7 +409,46 @@ kernel::VariableCondition<int> rawdata_condition(0);
 
 void demo_slam_init()
 { try {
+	// preprocess options
+	if (intOpts[iReplay] & 1) mode = 2; else
+		if (intOpts[iDump]) mode = 1; else
+			mode = 0;
+	if (strOpts[sConfigSetup] == "#!@")
+	{
+		if (intOpts[iReplay] & 1)
+			strOpts[sConfigSetup] = strOpts[sDataPath] + "/setup.cfg";
+		else
+			strOpts[sConfigSetup] = "data/setup.cfg";
+	}
+	if (intOpts[iReplay] & 1) intOpts[iExport] = 0;
+	if (strOpts[sConfigSetup][0] == '@' && strOpts[sConfigSetup][1] == '/')
+		strOpts[sConfigSetup] = strOpts[sDataPath] + strOpts[sConfigSetup].substr(1);
+	if (strOpts[sConfigEstimation][0] == '@' && strOpts[sConfigEstimation][1] == '/')
+		strOpts[sConfigEstimation] = strOpts[sDataPath] + strOpts[sConfigEstimation].substr(1);
+	if (!(intOpts[iReplay] & 1) && intOpts[iDump])
+	{
+		boost::filesystem::remove(strOpts[sDataPath] + "/setup.cfg");
+		boost::filesystem::remove(strOpts[sDataPath] + "/setup.cfg.maybe");
+		if (intOpts[iReplay] == 2)
+			boost::filesystem::copy_file(strOpts[sConfigSetup], strOpts[sDataPath] + "/setup.cfg.maybe"/*, boost::filesystem::copy_option::overwrite_if_exists*/);
+		else
+			boost::filesystem::copy_file(strOpts[sConfigSetup], strOpts[sDataPath] + "/setup.cfg"/*, boost::filesystem::copy_option::overwrite_if_exists*/);
+	}
+	#ifndef HAVE_MODULE_QDISPLAY
+	intOpts[iDispQt] = 0;
+	#endif
+	#ifndef HAVE_MODULE_GDHE
+	intOpts[iDispGdhe] = 0;
+	#endif
+
+	if (strOpts[sLog].size() == 1)
+	{
+		if (strOpts[sLog][0] == '0') strOpts[sLog] = ""; else
+		if (strOpts[sLog][0] == '1') strOpts[sLog] = "rtslam.log";
+	}
 		
+		
+	// init
 	worldPtr.reset(new WorldAbstract());
 
 	std::cout << "Loading config files " << strOpts[sConfigSetup] << " and " << strOpts[sConfigEstimation] << std::endl;
@@ -1593,45 +1632,6 @@ int main(int argc, char* const* argv)
 			std::cerr << "Unknown option " << c << std::endl;
 		}
 	}
-
-	// consistency
-	if (intOpts[iReplay] & 1) mode = 2; else
-		if (intOpts[iDump]) mode = 1; else
-			mode = 0;
-	if (strOpts[sConfigSetup] == "#!@")
-	{
-		if (intOpts[iReplay] & 1)
-			strOpts[sConfigSetup] = strOpts[sDataPath] + "/setup.cfg";
-		else
-			strOpts[sConfigSetup] = "data/setup.cfg";
-	}
-	if (intOpts[iReplay] & 1) intOpts[iExport] = 0;
-	if (strOpts[sConfigSetup][0] == '@' && strOpts[sConfigSetup][1] == '/')
-		strOpts[sConfigSetup] = strOpts[sDataPath] + strOpts[sConfigSetup].substr(1);
-	if (strOpts[sConfigEstimation][0] == '@' && strOpts[sConfigEstimation][1] == '/')
-		strOpts[sConfigEstimation] = strOpts[sDataPath] + strOpts[sConfigEstimation].substr(1);
-	if (!(intOpts[iReplay] & 1) && intOpts[iDump])
-	{
-		boost::filesystem::remove(strOpts[sDataPath] + "/setup.cfg");
-		boost::filesystem::remove(strOpts[sDataPath] + "/setup.cfg.maybe");
-		if (intOpts[iReplay] == 2)
-			boost::filesystem::copy_file(strOpts[sConfigSetup], strOpts[sDataPath] + "/setup.cfg.maybe"/*, boost::filesystem::copy_option::overwrite_if_exists*/);
-		else
-			boost::filesystem::copy_file(strOpts[sConfigSetup], strOpts[sDataPath] + "/setup.cfg"/*, boost::filesystem::copy_option::overwrite_if_exists*/);
-	}
-	#ifndef HAVE_MODULE_QDISPLAY
-	intOpts[iDispQt] = 0;
-	#endif
-	#ifndef HAVE_MODULE_GDHE
-	intOpts[iDispGdhe] = 0;
-	#endif
-
-	if (strOpts[sLog].size() == 1)
-	{
-		if (strOpts[sLog][0] == '0') strOpts[sLog] = ""; else
-		if (strOpts[sLog][0] == '1') strOpts[sLog] = "rtslam.log";
-	}
-	
 	
 	demo_slam_init();
 	demo_slam_run();

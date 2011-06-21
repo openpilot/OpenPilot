@@ -263,7 +263,7 @@ ConfigccpmWidget::~ConfigccpmWidget()
 
 void ConfigccpmWidget::UpdateType()
 {
-    int TypeInt,SingleServoIndex;
+    int TypeInt,SingleServoIndex,NumServosDefined;
     QString TypeText;
     double AdjustmentAngle=0;
 
@@ -305,6 +305,7 @@ void ConfigccpmWidget::UpdateType()
     //m_ccpm->customThrottleCurve2Value->setVisible(1);
     //m_ccpm->label_41->setVisible(1);
 
+    NumServosDefined=1;
     //set values for pre defined heli types
         if (TypeText.compare(QString("CCPM 2 Servo 90º"), Qt::CaseInsensitive)==0)
         {
@@ -319,6 +320,7 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmServoYChannel->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
             m_ccpm->ccpmCorrectionAngle->setValue(0);
+            NumServosDefined=2;
 
         }
         if (TypeText.compare(QString("CCPM 3 Servo 120º"), Qt::CaseInsensitive)==0)
@@ -331,7 +333,8 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
             m_ccpm->ccpmCorrectionAngle->setValue(0);
-
+            NumServosDefined=3;
+            
         }
         if (TypeText.compare(QString("CCPM 3 Servo 140º"), Qt::CaseInsensitive)==0)
         {
@@ -343,6 +346,7 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
             m_ccpm->ccpmCorrectionAngle->setValue(0);
+            NumServosDefined=3;
 
         }
         if (TypeText.compare(QString("FP 2 Servo 90º"), Qt::CaseInsensitive)==0)
@@ -369,7 +373,18 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->PitchCurve->setVisible(0);
             //m_ccpm->customThrottleCurve2Value->setVisible(0);
             //m_ccpm->label_41->setVisible(0);
+            NumServosDefined=2;
         }
+
+    //set the visibility of the swashplate servo selection boxes
+    m_ccpm->ccpmServoWLabel->setVisible(NumServosDefined>=1);
+    m_ccpm->ccpmServoXLabel->setVisible(NumServosDefined>=2);
+    m_ccpm->ccpmServoYLabel->setVisible(NumServosDefined>=3);
+    m_ccpm->ccpmServoZLabel->setVisible(NumServosDefined>=4);
+    m_ccpm->ccpmServoWChannel->setVisible(NumServosDefined>=1);
+    m_ccpm->ccpmServoXChannel->setVisible(NumServosDefined>=2);
+    m_ccpm->ccpmServoYChannel->setVisible(NumServosDefined>=3);
+    m_ccpm->ccpmServoZChannel->setVisible(NumServosDefined>=4);
 
 
         m_ccpm->ccpmAdvancedSettingsTable->resizeColumnsToContents();

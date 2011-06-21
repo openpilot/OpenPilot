@@ -48,13 +48,13 @@ bool UploaderGadgetWidget::descriptionToStructure(QByteArray desc,deviceDescript
            gitCommitTag = gitCommitTag<<8;
            gitCommitTag += desc.at(7-i) & 0xFF;
        }
-       struc->gitTag="0x" + QString::number(gitCommitTag,16);
+       struc->gitTag=QString::number(gitCommitTag,16);
        quint32 buildDate = desc.at(11)&0xFF;
        for (int i=1;i<4;i++) {
            buildDate = buildDate<<8;
            buildDate += desc.at(11-i) & 0xFF;
        }
-       struc->buildDate= QDateTime::fromTime_t(buildDate).toString();
+       struc->buildDate= QDateTime::fromTime_t(buildDate).toLocalTime().toString("yyyy MMMM dd HH:mm:ss");
        QByteArray targetPlatform = desc.mid(12,2);
        // TODO: check platform compatibility
        QString dscText = QString(desc.mid(14,26));

@@ -45,6 +45,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="lbldevID">
+            <property name="text">
+             <string>DeviceID</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QLabel" name="lblHWRev">
             <property name="text">
              <string>lblHWRev</string>
@@ -52,9 +59,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="lbldevID">
+           <widget class="QLabel" name="lblCPU">
             <property name="text">
-             <string>DeviceID</string>
+             <string>lblCPU</string>
             </property>
            </widget>
           </item>
@@ -89,7 +96,7 @@
              <string>Loads the firmware</string>
             </property>
             <property name="text">
-             <string>Load</string>
+             <string>Open</string>
             </property>
            </widget>
           </item>
@@ -102,7 +109,7 @@
              <string>Update the firmware on this board.</string>
             </property>
             <property name="text">
-             <string>Update...</string>
+             <string>Flash</string>
             </property>
            </widget>
           </item>
@@ -184,16 +191,23 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_8">
           <item>
-           <widget class="QLabel" name="lblBuildDate">
+           <widget class="QLabel" name="lblBrdName">
             <property name="text">
-             <string>lblBuildDate</string>
+             <string>lblBrdName</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="lblCRC">
+           <widget class="QLabel" name="lblDescription">
             <property name="text">
-             <string>lblCRC</string>
+             <string>lblDescription</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lblBuildDate">
+            <property name="text">
+             <string>lblBuildDate</string>
             </property>
            </widget>
           </item>
@@ -205,9 +219,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="lblBrdName">
+           <widget class="QLabel" name="lblCRC">
             <property name="text">
-             <string>lblBrdName</string>
+             <string>lblCRC</string>
             </property>
            </widget>
           </item>
@@ -224,13 +238,6 @@
          </widget>
         </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QLabel" name="lblDescription">
-        <property name="text">
-         <string>lblDescription</string>
-        </property>
-       </widget>
       </item>
      </layout>
     </widget>
@@ -249,16 +256,23 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QLabel" name="lblBuildDateL">
+           <widget class="QLabel" name="lblBrdNameL">
             <property name="text">
-             <string>lblBuildDate</string>
+             <string>lblBrdName</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="lblCRCL">
+           <widget class="QLabel" name="lblDescritpionL">
             <property name="text">
-             <string>lblCRC</string>
+             <string>lblDescritpionL</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lblBuildDateL">
+            <property name="text">
+             <string>lblBuildDate</string>
             </property>
            </widget>
           </item>
@@ -270,9 +284,16 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="lblBrdNameL">
+           <widget class="QLabel" name="lblCRCL">
             <property name="text">
-             <string>lblBrdName</string>
+             <string>lblCRC</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lblFirmwareSizeL">
+            <property name="text">
+             <string>lblFirmwareSizeL</string>
             </property>
            </widget>
           </item>
@@ -287,19 +308,21 @@
         </item>
        </layout>
       </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupCustom">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QLabel" name="lblDescriptionL">
-          <property name="text">
-           <string>Description:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="description"/>
-        </item>
-       </layout>
+       <widget class="QLabel" name="lblX">
+        <property name="text">
+         <string>Custom description:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="description"/>
       </item>
      </layout>
     </widget>

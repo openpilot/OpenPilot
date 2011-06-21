@@ -179,7 +179,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     // Connect the help button
     connect(m_config->inputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
-
+    updateTips(Qt::Unchecked);
 
 }
 

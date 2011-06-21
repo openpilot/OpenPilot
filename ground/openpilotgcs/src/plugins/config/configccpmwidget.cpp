@@ -783,6 +783,40 @@ void ConfigccpmWidget::ccpmSwashplateUpdate()
     ccpmSwashplateRedraw();
     SetUIComponentVisibilities();
     UpdateMixer();
+    
+    if((m_ccpm->ccpmServoWChannel->currentIndex()==8)&&(m_ccpm->ccpmServoWChannel->isEnabled()))
+    {
+        m_ccpm->ccpmServoWLabel->setText("<font color=red>Servo W</font>");   
+    }
+    else
+    {
+        m_ccpm->ccpmServoWLabel->setText("<font color=black>Servo W</font>");   
+    }
+    if((m_ccpm->ccpmServoXChannel->currentIndex()==8)&&(m_ccpm->ccpmServoXChannel->isEnabled()))
+    {
+        m_ccpm->ccpmServoXLabel->setText("<font color=red>Servo X</font>");   
+    }
+    else
+    {
+        m_ccpm->ccpmServoXLabel->setText("<font color=black>Servo X</font>");   
+    }
+    if((m_ccpm->ccpmServoYChannel->currentIndex()==8)&&(m_ccpm->ccpmServoYChannel->isEnabled()))
+    {
+        m_ccpm->ccpmServoYLabel->setText("<font color=red>Servo Y</font>");   
+    }
+    else
+    {
+        m_ccpm->ccpmServoYLabel->setText("<font color=black>Servo Y</font>");   
+    }
+    if((m_ccpm->ccpmServoZChannel->currentIndex()==8)&&(m_ccpm->ccpmServoZChannel->isEnabled()))
+    {
+        m_ccpm->ccpmServoZLabel->setText("<font color=red>Servo Z</font>");   
+    }
+    else
+    {
+        m_ccpm->ccpmServoZLabel->setText("<font color=black>Servo Z</font>");   
+    }
+
 }
 
 void ConfigccpmWidget::UpdateMixer()

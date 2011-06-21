@@ -136,6 +136,7 @@ private:
         void UpdatCCPMUIFromOptions();
 
         void SetUIComponentVisibilities();
+        void ccpmChannelCheck();
 
         void enableSwashplateLevellingControl(bool state);
         void setSwashplateLevel(int percent);

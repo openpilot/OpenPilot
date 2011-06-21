@@ -410,7 +410,17 @@ void ConfigccpmWidget::UpdateType()
     m_ccpm->ccpmServoXChannel->setVisible(NumServosDefined>=2);
     m_ccpm->ccpmServoYChannel->setVisible(NumServosDefined>=3);
     m_ccpm->ccpmServoZChannel->setVisible(NumServosDefined>=4);
-
+    
+    //set the visibility of the swashplate angle selection boxes
+    m_ccpm->ccpmServoWLabel_2->setVisible(NumServosDefined>=1);
+    m_ccpm->ccpmServoXLabel_2->setVisible(NumServosDefined>=2);
+    m_ccpm->ccpmServoYLabel_2->setVisible(NumServosDefined>=3);
+    m_ccpm->ccpmServoZLabel_2->setVisible(NumServosDefined>=4);
+    m_ccpm->ccpmAngleW->setVisible(NumServosDefined>=1);
+    m_ccpm->ccpmAngleX->setVisible(NumServosDefined>=2);
+    m_ccpm->ccpmAngleY->setVisible(NumServosDefined>=3);
+    m_ccpm->ccpmAngleZ->setVisible(NumServosDefined>=4);
+    
 
         m_ccpm->ccpmAdvancedSettingsTable->resizeColumnsToContents();
         for (int i=0;i<6;i++) {
@@ -783,7 +793,10 @@ void ConfigccpmWidget::ccpmSwashplateUpdate()
     ccpmSwashplateRedraw();
     SetUIComponentVisibilities();
     UpdateMixer();
-    
+}
+
+void ConfigccpmWidget::ccpmChannelCheck()
+{
     if((m_ccpm->ccpmServoWChannel->currentIndex()==8)&&(m_ccpm->ccpmServoWChannel->isEnabled()))
     {
         m_ccpm->ccpmServoWLabel->setText("<font color=red>Servo W</font>");   
@@ -817,6 +830,24 @@ void ConfigccpmWidget::ccpmSwashplateUpdate()
         m_ccpm->ccpmServoZLabel->setText("<font color=black>Servo Z</font>");   
     }
 
+    if((m_ccpm->ccpmEngineChannel->currentIndex()==8)&&(m_ccpm->ccpmEngineChannel->isEnabled()))
+    {
+        m_ccpm->ccpmEngineLabel->setText("<font color=red>Engine</font>");   
+    }
+    else
+    {
+        m_ccpm->ccpmEngineLabel->setText("<font color=black>Engine</font>");   
+    }
+    
+    if((m_ccpm->ccpmTailChannel->currentIndex()==8)&&(m_ccpm->ccpmTailChannel->isEnabled()))
+    {
+        m_ccpm->ccpmTailLabel->setText("<font color=red>Tail Rotor</font>");   
+    }
+    else
+    {
+        m_ccpm->ccpmTailLabel->setText("<font color=black>Tail Rotor</font>");   
+    }
+    
 }
 
 void ConfigccpmWidget::UpdateMixer()
@@ -828,6 +859,7 @@ void ConfigccpmWidget::UpdateMixer()
     //QTableWidgetItem *newItem;// = new QTableWidgetItem();
     QString Channel;
 
+    ccpmChannelCheck();
     //Type = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
     //CollectiveConstant=m_ccpm->ccpmCollectiveSlider->value()/100.0;
     //CorrectionAngle=m_ccpm->ccpmCorrectionAngle->value();

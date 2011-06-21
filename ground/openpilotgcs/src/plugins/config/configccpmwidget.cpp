@@ -719,7 +719,7 @@ void ConfigccpmWidget::GenerateCurve()
 void ConfigccpmWidget::ccpmSwashplateRedraw()
 {
     double angle[CCPM_MAX_SWASH_SERVOS],CorrectionAngle,x,y,w,h,radius,CenterX,CenterY;
-    int used[CCPM_MAX_SWASH_SERVOS],i;
+    int used[CCPM_MAX_SWASH_SERVOS],defined[CCPM_MAX_SWASH_SERVOS],i;
 
     CorrectionAngle=m_ccpm->ccpmCorrectionAngle->value();
 
@@ -730,6 +730,10 @@ void ConfigccpmWidget::ccpmSwashplateRedraw()
 
     SwashplateImg->setPos(CenterX-200,CenterY-200);
 
+    defined[0]=(m_ccpm->ccpmServoWChannel->isEnabled());
+    defined[1]=(m_ccpm->ccpmServoXChannel->isEnabled());
+    defined[2]=(m_ccpm->ccpmServoYChannel->isEnabled());
+    defined[3]=(m_ccpm->ccpmServoZChannel->isEnabled());
     used[0]=((m_ccpm->ccpmServoWChannel->currentIndex()<8)&&(m_ccpm->ccpmServoWChannel->isEnabled()));
     used[1]=((m_ccpm->ccpmServoXChannel->currentIndex()<8)&&(m_ccpm->ccpmServoXChannel->isEnabled()));
     used[2]=((m_ccpm->ccpmServoYChannel->currentIndex()<8)&&(m_ccpm->ccpmServoYChannel->isEnabled()));
@@ -766,7 +770,7 @@ void ConfigccpmWidget::ccpmSwashplateRedraw()
         x=CenterX-(radius*sin(angle[i]));
         y=CenterY+(radius*cos(angle[i]));
         ServoLines[i]->setLine(CenterX,CenterY,x,y);
-        ServoLines[i]->setVisible(used[i]!=0);
+        ServoLines[i]->setVisible(defined[i]!=0);
     }
 
     //m_ccpm->SwashplateImage->centerOn (CenterX, CenterY);

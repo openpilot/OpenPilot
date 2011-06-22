@@ -94,21 +94,21 @@ static void SettingsUpdatedCb(UAVObjEvent * ev);
 int32_t StabilizationInitialize()
 {
 	// Initialize variables
-	
+
 	// Create object queue
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
-	
+
 	// Listen for updates.
 	//	AttitudeActualConnectQueue(queue);
 	AttitudeRawConnectQueue(queue);
-	
+
 	StabilizationSettingsConnectCallback(SettingsUpdatedCb);
 	SettingsUpdatedCb(StabilizationSettingsHandle());
 	// Start main task
 	xTaskCreate(stabilizationTask, (signed char*)"Stabilization", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_STABILIZATION, taskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_STABILIZATION);
-	
+
 	return 0;
 }
 
@@ -120,8 +120,8 @@ static void stabilizationTask(void* parameters)
 	portTickType lastSysTime;
 	portTickType thisSysTime;
 	UAVObjEvent ev;
-	
-	
+
+
 	ActuatorDesiredData actuatorDesired;
 	StabilizationDesiredData stabDesired;
 	RateDesiredData rateDesired;
@@ -129,28 +129,28 @@ static void stabilizationTask(void* parameters)
 	AttitudeRawData attitudeRaw;
 	SystemSettingsData systemSettings;
 	FlightStatusData flightStatus;
-	
+
 	SettingsUpdatedCb((UAVObjEvent *) NULL);
-	
+
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	ZeroPids();
 	while(1) {
 		PIOS_WDG_UpdateFlag(PIOS_WDG_STABILIZATION);
-		
+
 		// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
 		if ( xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )
 		{
 			AlarmsSet(SYSTEMALARMS_ALARM_STABILIZATION,SYSTEMALARMS_ALARM_WARNING);
 			continue;
-		} 
-		
+		}
+
 		// Check how long since last update
 		thisSysTime = xTaskGetTickCount();
 		if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
 			dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
 		lastSysTime = thisSysTime;
-		
+
 		FlightStatusGet(&flightStatus);
 		StabilizationDesiredGet(&stabDesired);
 		AttitudeActualGet(&attitudeActual);
@@ -164,11 +164,11 @@ static void stabilizationTask(void* parameters)
 		float q_desired[4];
 		float q_error[4];
 		float local_error[3];
-		
+
 		// Essentially zero errors for anything in rate or none
 		if(stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)
-			rpy_desired[0] = stabDesired.Roll;		
-		else 
+			rpy_desired[0] = stabDesired.Roll;
+		else
 			rpy_desired[0] = attitudeActual.Roll;
 
 		if(stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)
@@ -180,13 +180,13 @@ static void stabilizationTask(void* parameters)
 			rpy_desired[2] = stabDesired.Yaw;
 		else
 			rpy_desired[2] = attitudeActual.Yaw;
-		
+
 		RPY2Quaternion(rpy_desired, q_desired);
 		quat_inverse(q_desired);
 		quat_mult(q_desired, &attitudeActual.q1, q_error);
 		quat_inverse(q_error);
 		Quaternion2RPY(q_error, local_error);
-		
+
 #else
 		// Simpler algorithm for CC, less memory
 		float local_error[3] = {stabDesired.Roll - attitudeActual.Roll,
@@ -194,16 +194,16 @@ static void stabilizationTask(void* parameters)
 			stabDesired.Yaw - attitudeActual.Yaw};
 		local_error[2] = fmod(local_error[2] + 180, 360) - 180;
 #endif
-			
-		
+
+
 		for(uint8_t i = 0; i < MAX_AXES; i++) {
 			gyro_filtered[i] = gyro_filtered[i] * gyro_alpha + attitudeRaw.gyros[i] * (1 - gyro_alpha);
 		}
-		
+
 		float *attitudeDesiredAxis = &stabDesired.Roll;
 		float *actuatorDesiredAxis = &actuatorDesired.Roll;
 		float *rateDesiredAxis = &rateDesired.Roll;
-		
+
 		//Calculate desired rate
 		for(int8_t ct=0; ct< MAX_AXES; ct++)
 		{
@@ -212,13 +212,13 @@ static void stabilizationTask(void* parameters)
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
 					rateDesiredAxis[ct] = attitudeDesiredAxis[ct];
 					break;
-					
+
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
 					rateDesiredAxis[ct] = ApplyPid(&pids[PID_ROLL + ct], local_error[ct]);
 					break;
 			}
 		}
-		
+
 		uint8_t shouldUpdate = 1;
 		RateDesiredSet(&rateDesired);
 		ActuatorDesiredGet(&actuatorDesired);
@@ -234,7 +234,7 @@ static void stabilizationTask(void* parameters)
 				{
 					rateDesiredAxis[ct] = -settings.MaximumRate[ct];
 				}
-				
+
 			}
 			switch(stabDesired.StabilizationMode[ct])
 			{
@@ -262,16 +262,16 @@ static void stabilizationTask(void* parameters)
 						break;
 				}
 					break;
-					
+
 			}
 		}
-		
+
 		// Save dT
 		actuatorDesired.UpdateTime = dT * 1000;
-		
+
 		if(PARSE_FLIGHT_MODE(flightStatus.FlightMode) == FLIGHTMODE_MANUAL)
 			shouldUpdate = 0;
-		
+
 		if(shouldUpdate)
 		{
 			actuatorDesired.Throttle = stabDesired.Throttle;
@@ -279,16 +279,16 @@ static void stabilizationTask(void* parameters)
 				actuatorDesired.NumLongUpdates++;
 			ActuatorDesiredSet(&actuatorDesired);
 		}
-		
+
 		if(flightStatus.Armed != FLIGHTSTATUS_ARMED_ARMED ||
 		   !shouldUpdate || (stabDesired.Throttle < 0))
 		{
 			ZeroPids();
 		}
-		
-		
+
+
 		// Clear alarms
-		AlarmsClear(SYSTEMALARMS_ALARM_STABILIZATION);				
+		AlarmsClear(SYSTEMALARMS_ALARM_STABILIZATION);
 	}
 }
 
@@ -296,15 +296,15 @@ float ApplyPid(pid_type * pid, const float err)
 {
 	float diff = (err - pid->lastErr);
 	pid->lastErr = err;
-	pid->iAccumulator += err * pid->i * dT;
-	if(fabs(pid->iAccumulator) > pid->iLim) {
-		if(pid->iAccumulator >0) {
-			pid->iAccumulator = pid->iLim;
-		} else {
-			pid->iAccumulator = -pid->iLim;
-		}
+
+	// Scale up accumulator by 1000 while computing to avoid losing precision
+	pid->iAccumulator += err * (pid->i * dT * 1000);
+	if(pid->iAccumulator > (pid->iLim * 1000)) {
+		pid->iAccumulator = pid->iLim * 1000;
+	} else if (pid->iAccumulator < -(pid->iLim * 1000)) {
+		pid->iAccumulator = -pid->iLim * 1000;
 	}
-	return ((err * pid->p) + pid->iAccumulator + (diff * pid->d / dT));
+	return ((err * pid->p) + pid->iAccumulator / 1000 + (diff * pid->d / dT));
 }
 
 
@@ -335,7 +335,7 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 {
 	memset(pids,0,sizeof (pid_type) * PID_MAX);
 	StabilizationSettingsGet(&settings);
-	
+
 	float * data = settings.RollRatePI;
 	for(int8_t pid=0; pid < PID_MAX; pid++)
 	{
@@ -346,7 +346,7 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 
 	// The dT has some jitter iteration to iteration that we don't want to
 	// make thie result unpredictable.  Still, it's nicer to specify the constant
-	// based on a time (in ms) rather than a fixed multiplier.  The error between 
+	// based on a time (in ms) rather than a fixed multiplier.  The error between
 	// update rates on OP (~300 Hz) and CC (~475 Hz) is negligible for this
 	// calculation
 	const float fakeDt = 0.0025;

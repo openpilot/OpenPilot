@@ -77,6 +77,8 @@ static xTaskHandle taskHandle;
 static StabilizationSettingsData settings;
 static xQueueHandle queue;
 float dT = 1;
+float gyro_alpha = 0;
+float gyro_filtered[3] = {0,0,0};
 pid_type pids[PID_MAX];
 
 // Private functions
@@ -193,6 +195,11 @@ static void stabilizationTask(void* parameters)
 		local_error[2] = fmod(local_error[2] + 180, 360) - 180;
 #endif
 			
+		
+		for(uint8_t i = 0; i < MAX_AXES; i++) {
+			gyro_filtered[i] = gyro_filtered[i] * gyro_alpha + attitudeRaw.gyros[i] * (1 - gyro_alpha);
+		}
+		
 		float *attitudeDesiredAxis = &stabDesired.Roll;
 		float *actuatorDesiredAxis = &actuatorDesired.Roll;
 		float *rateDesiredAxis = &rateDesired.Roll;
@@ -234,7 +241,7 @@ static void stabilizationTask(void* parameters)
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
 				{
-					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rateDesiredAxis[ct]-attitudeRaw.gyros[ct]);
+					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rateDesiredAxis[ct] - gyro_filtered[ct]);
 					actuatorDesiredAxis[ct] = bound(command);
 					break;
 				}
@@ -336,6 +343,17 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 		pids[pid].i = *data++;
 		pids[pid].iLim = *data++;
 	}
+
+	// The dT has some jitter iteration to iteration that we don't want to
+	// make thie result unpredictable.  Still, it's nicer to specify the constant
+	// based on a time (in ms) rather than a fixed multiplier.  The error between 
+	// update rates on OP (~300 Hz) and CC (~475 Hz) is negligible for this
+	// calculation
+	const float fakeDt = 0.0025;
+	if(settings.GyroTau < 0.0001)
+		gyro_alpha = 0;   // not trusting this to resolve to 0
+	else
+		gyro_alpha = exp(-fakeDt  / settings.GyroTau);
 }
 
 

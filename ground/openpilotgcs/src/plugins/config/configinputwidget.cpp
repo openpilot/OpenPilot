@@ -679,7 +679,7 @@ void ConfigInputWidget::receiverHelp()
     if(field->getValue().toString()=="None")
     {
         if(unassigned.length()>0)
-            unassigned.append(" ,");
+            unassigned.append(", ");
         unassigned.append("Pitch");
     }
 
@@ -687,7 +687,7 @@ void ConfigInputWidget::receiverHelp()
     if(field->getValue().toString()=="None")
     {
         if(unassigned.length()>0)
-            unassigned.append(" ,");
+            unassigned.append(", ");
         unassigned.append("Yaw");
     }
 
@@ -695,7 +695,7 @@ void ConfigInputWidget::receiverHelp()
     if(field->getValue().toString()=="None")
     {
         if(unassigned.length()>0)
-            unassigned.append(" ,");
+            unassigned.append(", ");
         unassigned.append("Throttle");
     }
 
@@ -703,7 +703,7 @@ void ConfigInputWidget::receiverHelp()
     if(field->getValue().toString()=="None")
     {
         if(unassigned.length()>0)
-            unassigned.append(" ,");
+            unassigned.append(", ");
         unassigned.append("FlightMode");
     }
     if(unassigned.length()>0)

@@ -58,12 +58,12 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_ccpm->SwashplateImage->setScene(new QGraphicsScene(this));
 
     m_ccpm->SwashLvlSwashplateImage->setScene(m_ccpm->SwashplateImage->scene());
-    m_ccpm->SwashLvlSwashplateImage->setSceneRect(-50,-30,500,500);
-    m_ccpm->SwashLvlSwashplateImage->scale(.85,.85);
+    m_ccpm->SwashLvlSwashplateImage->setSceneRect(-50,-50,500,500);
+    //m_ccpm->SwashLvlSwashplateImage->scale(.85,.85);
 
     //m_ccpm->SwashplateImage->setSceneRect(SwashplateImg->boundingRect());
     m_ccpm->SwashplateImage->setSceneRect(-50,-30,500,500);
-    m_ccpm->SwashplateImage->scale(.85,.85);
+    //m_ccpm->SwashplateImage->scale(.85,.85);
 
 
 
@@ -251,7 +251,7 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
 
     
-    
+   ccpmSwashplateRedraw(); 
    // connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestccpmUpdate()));
 
 }
@@ -433,7 +433,7 @@ void ConfigccpmWidget::UpdateType()
     
     //update UI
     ccpmSwashplateUpdate();
-
+    
 }
 
 /**
@@ -730,13 +730,33 @@ void ConfigccpmWidget::ccpmSwashplateRedraw()
 {
     double angle[CCPM_MAX_SWASH_SERVOS],CorrectionAngle,x,y,w,h,radius,CenterX,CenterY;
     int used[CCPM_MAX_SWASH_SERVOS],defined[CCPM_MAX_SWASH_SERVOS],i;
+    
+    QRect size;
+    double scale,xscale,yscale;
 
+
+    size = m_ccpm->SwashplateImage->rect();
+    xscale=size.width();
+    yscale=size.height();
+    scale=xscale;
+    if (yscale<scale)scale=yscale;
+    scale/=460.00;
+    m_ccpm->SwashplateImage->resetTransform ();
+    m_ccpm->SwashplateImage->scale(scale,scale);  
+    
+    size = m_ccpm->SwashLvlSwashplateImage->rect();
+    xscale=size.width();
+    yscale=size.height();
+    scale=xscale;
+    if (yscale<scale)scale=yscale;
+    scale/=590.00;
+    m_ccpm->SwashLvlSwashplateImage->resetTransform ();
+    m_ccpm->SwashLvlSwashplateImage->scale(scale,scale);  
+    
     CorrectionAngle=m_ccpm->ccpmCorrectionAngle->value();
 
-    //CenterX=m_ccpm->SwashplateImage->scene()->sceneRect().center().x();
-   // CenterY=m_ccpm->SwashplateImage->scene()->sceneRect().center().y();
     CenterX=200;
-    CenterY=220;
+    CenterY=200;
 
     SwashplateImg->setPos(CenterX-200,CenterY-200);
 
@@ -1563,6 +1583,7 @@ void ConfigccpmWidget::showEvent(QShowEvent *event)
         m_ccpm->ccpmAdvancedSettingsTable->setColumnWidth(i,(m_ccpm->ccpmAdvancedSettingsTable->width()-
                                                         m_ccpm->ccpmAdvancedSettingsTable->verticalHeader()->width())/6);
     }
+    ccpmSwashplateRedraw();
 }
 
 

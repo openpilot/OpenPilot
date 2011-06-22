@@ -233,6 +233,8 @@ static void manualControlTask(void *parameters)
 				cmd.Channel[n] = PIOS_PPM_Get(n);
 #elif defined(PIOS_INCLUDE_SPEKTRUM)
 				cmd.Channel[n] = PIOS_SPEKTRUM_Get(n);
+#elif defined(PIOS_INCLUDE_SBUS)
+				cmd.Channel[n] = PIOS_SBUS_Get(n);
 #endif
 				scaledChannel[n] = scaleChannel(cmd.Channel[n], settings.ChannelMax[n],	settings.ChannelMin[n], settings.ChannelNeutral[n]);
 			}

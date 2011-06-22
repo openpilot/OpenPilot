@@ -32,8 +32,8 @@
 #include "pios.h"
 
 #if defined(PIOS_INCLUDE_HCSR04)
-#if !defined(PIOS_INCLUDE_SPEKTRUM)
-#error Only supported with spektrum interface!
+#if !(defined(PIOS_INCLUDE_SPEKTRUM) || defined(PIOS_INCLUDE_SBUS))
+#error Only supported with Spektrum or S.Bus interface!
 #endif
 
 /* Local Variables */

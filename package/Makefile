@@ -33,16 +33,15 @@ CLEAN_GROUND := YES
 CLEAN_FLIGHT := YES
 endif
 
-# Set up targets
-FW_STEMS_COMMON   := ahrs pipxtreme
-FW_STEMS_INPUT    := coptercontrol openpilot
-FW_STEMS_TOOLS    := coptercontrol
-FW_STEMS_ALL      := $(FW_STEMS_COMMON) $(FW_STEMS_INPUT)
-FW_TARGETS_COMMON := $(addprefix fw_, $(FW_STEMS_COMMON))
-FW_TARGETS_INPUT  := $(addprefix fw_, $(FW_STEMS_INPUT))
-FW_TARGETS_TOOLS  := $(addprefix fw_, $(FW_STEMS_TOOLS))
-BL_TARGETS        := $(addprefix bl_, $(FW_STEMS_ALL))
-BU_TARGETS        := $(addprefix bu_, $(FW_STEMS_ALL))
+# Set up targets (PPM target seems to be broken at the moment)
+FW_TARGETS_COMMON := $(addprefix fw_, ahrs pipxtreme)
+FW_TARGETS_PWM    := $(addprefix fw_, coptercontrol openpilot)
+FW_TARGETS_DSM2   := $(addprefix fw_, coptercontrol openpilot)
+FW_TARGETS_SBUS   := $(addprefix fw_, coptercontrol)
+FW_TARGETS_PPM    := $(addprefix fw_, openpilot)
+FW_TARGETS_TOOLS  := $(addprefix fw_, coptercontrol)
+BL_TARGETS        := $(addprefix bl_, coptercontrol openpilot ahrs pipxtreme)
+BU_TARGETS        := $(addprefix bu_, coptercontrol openpilot ahrs pipxtreme)
 
 help:
 	@echo
@@ -102,9 +101,10 @@ endef
 
 # Firmware for different input drivers
 $(eval $(call INSTALL_TEMPLATE,fw_common,uavobjects,$(FW_DIR),,-$(PACKAGE_LBL),,,$(FW_TARGETS_COMMON),install))
-$(eval $(call INSTALL_TEMPLATE,fw_pwm,uavobjects,$(FW_DIR),,-pwm-$(PACKAGE_LBL),,clean,$(FW_TARGETS_INPUT),install))
-$(eval $(call INSTALL_TEMPLATE,fw_spektrum,uavobjects,$(FW_DIR),,-dsm2sat-$(PACKAGE_LBL),USE_SPEKTRUM=YES,clean,$(FW_TARGETS_INPUT),install))
-$(eval $(call INSTALL_TEMPLATE,fw_ppm,uavobjects,$(FW_DIR),,-ppm-$(PACKAGE_LBL),USE_PPM=YES,clean,$(FW_TARGETS_INPUT),install))
+$(eval $(call INSTALL_TEMPLATE,fw_pwm,uavobjects,$(FW_DIR),,-pwm-$(PACKAGE_LBL),,clean,$(FW_TARGETS_PWM),install))
+$(eval $(call INSTALL_TEMPLATE,fw_dsm2,uavobjects,$(FW_DIR),,-dsm2sat-$(PACKAGE_LBL),USE_SPEKTRUM=YES,clean,$(FW_TARGETS_DSM2),install))
+$(eval $(call INSTALL_TEMPLATE,fw_sbus,uavobjects,$(FW_DIR),,-sbus-$(PACKAGE_LBL),USE_SBUS=YES USE_TELEMETRY=3,clean,$(FW_TARGETS_SBUS),install))
+$(eval $(call INSTALL_TEMPLATE,fw_ppm,uavobjects,$(FW_DIR),,-ppm-$(PACKAGE_LBL),USE_PPM=YES,clean,$(FW_TARGETS_PPM),install))
 
 # Bootloaders (change 'install' to 'bin' if you don't want to install bootloaders)
 $(eval $(call INSTALL_TEMPLATE,all_bl,uavobjects,$(BL_DIR),,-$(PACKAGE_LBL),,,$(BL_TARGETS),install))
@@ -119,15 +119,17 @@ $(eval $(call INSTALL_TEMPLATE,fw_tools,uavobjects,$(FE_DIR),,-flash-erase-$(PAC
 # They are bit complicated to support parallel (-j) builds and to create
 # the pwm/ppm/spektrum and CC flash eraser targets in some fixed order
 
-fw_pwm: |		# default dependencies, will be built first
+fw_pwm:     |		# default dependencies, will be built first
 
-fw_spektrum: | fw_pwm	# ordered build
+fw_dsm2:    | fw_pwm	# ordered build
 
-fw_ppm: | fw_spektrum   # ordered build
+fw_sbus:    | fw_dsm2	# ordered build
 
-fw_tools: | fw_spektrum # ordered build, replace fw_spektrum by fw_ppm if uncommented below
+fw_ppm:     | fw_sbus   # ordered build
 
-package_fw: | fw_common fw_pwm fw_spektrum # fw_ppm
+fw_tools:   | fw_ppm    # ordered build
+
+package_fw: | fw_common fw_pwm fw_dsm2 fw_sbus fw_ppm
 
 package_bu: | all_bu
 

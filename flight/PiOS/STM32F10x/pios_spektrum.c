@@ -34,8 +34,8 @@
 #include "pios_spektrum_priv.h"
 
 #if defined(PIOS_INCLUDE_SPEKTRUM)
-#if defined(PIOS_INCLUDE_PWM)
-#error "Both PWM and SPEKTRUM input defined, choose only one"
+#if defined(PIOS_INCLUDE_PWM) || defined(PIOS_INCLUDE_SBUS)
+#error "Both SPEKTRUM and either of PWM or SBUS inputs defined, choose only one"
 #endif
 #if defined(PIOS_COM_AUX)
 #error "AUX com cannot be used with SPEKTRUM"

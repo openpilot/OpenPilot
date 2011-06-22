@@ -45,7 +45,10 @@ ENABLE_DEBUG_PINS ?= NO
 # Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs
 ENABLE_AUX_UART ?= NO
 
+USE_TELEMETRY ?= YES
+USE_GPS ?= NO
 USE_SPEKTRUM ?= NO
+USE_SBUS ?= NO
 
 USE_I2C ?= NO
 
@@ -182,6 +185,7 @@ SRC += $(PIOSSTM32F10X)/pios_spi.c
 SRC += $(PIOSSTM32F10X)/pios_ppm.c
 SRC += $(PIOSSTM32F10X)/pios_pwm.c
 SRC += $(PIOSSTM32F10X)/pios_spektrum.c
+SRC += $(PIOSSTM32F10X)/pios_sbus.c
 SRC += $(PIOSSTM32F10X)/pios_debug.c
 SRC += $(PIOSSTM32F10X)/pios_gpio.c
 SRC += $(PIOSSTM32F10X)/pios_exti.c
@@ -376,14 +380,41 @@ endif
 ifeq ($(ERASE_FLASH), YES)
 CDEFS += -DERASE_FLASH
 endif
-ifeq ($(USE_SPEKTRUM), YES)
+
+# USART port functions. NO means do not use this function.
+# YES means use with default USART port number (hardware-dependent).
+# Number means use with specified USART port number (this value).
+ifneq ($(USE_TELEMETRY), NO)
+CDEFS += -DUSE_TELEMETRY
+ifneq ($(USE_TELEMETRY), YES)
+CDEFS += -DPIOS_PORT_TELEMETRY=$(USE_TELEMETRY)
+endif
+endif
+
+ifneq ($(USE_GPS), NO)
+CDEFS += -DUSE_GPS
+ifneq ($(USE_GPS), YES)
+CDEFS += -DPIOS_PORT_GPS=$(USE_GPS)
+endif
+endif
+
+ifneq ($(USE_SPEKTRUM), NO)
 CDEFS += -DUSE_SPEKTRUM
+ifneq ($(USE_SPEKTRUM), YES)
+CDEFS += -DPIOS_PORT_SPEKTRUM=$(USE_SPEKTRUM)
+endif
+endif
+
+ifneq ($(USE_SBUS), NO)
+CDEFS += -DUSE_SBUS
+ifneq ($(USE_SBUS), YES)
+CDEFS += -DPIOS_PORT_SBUS=$(USE_SBUS)
+endif
 endif
 
 ifeq ($(USE_I2C), YES)
 CDEFS += -DUSE_I2C
 endif
-
 
 # Place project-specific -D and/or -U options for
 # Assembler with preprocessor here.

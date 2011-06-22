@@ -1164,6 +1164,7 @@ void demo_slam_main(world_ptr_t *world)
 		f >> start_date;
 		f.close();
 	}
+	std::cout << "slam start date: " << std::setprecision(16) << start_date << std::endl;
 	sensorManager->setStartDate(start_date);
 	
 	// start other hardware sensors

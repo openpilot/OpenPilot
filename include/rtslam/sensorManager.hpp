@@ -125,12 +125,12 @@ namespace rtslam {
 				{
 					ProcessInfo result;
 					int res;
-					while ((res = getNextDataToInit(result)) == 1)
-					{
+					do {
+						res = getNextDataToInit(result);
 						if (res == 0) { all_init = true; break; } else
 						if (res == 2) { return result; } else
 						usleep(1000);
-					}
+					} while (res == 1);
 				}
 				
 				for (MapAbstract::RobotList::iterator robIter = mapPtr->robotList().begin();
@@ -175,12 +175,12 @@ namespace rtslam {
 				{
 					ProcessInfo result;
 					int res;
-					while ((res = getNextDataToInit(result)) == 1)
-					{
+					do {
+						res = getNextDataToInit(result);
 						if (res == 0) { all_init = true; break; } else
 						if (res == 2) { return result; } else
 						usleep(1000);
-					}
+					} while (res == 1);
 				}
 
     

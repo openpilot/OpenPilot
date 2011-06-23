@@ -49,11 +49,12 @@
 
 #include "accessorydesired.h"
 #include "attitudeactual.h"
+#include "camerastabsettings.h"
 
 //
 // Configuration
 //
-#define SAMPLE_PERIOD_MS		50
+#define SAMPLE_PERIOD_MS		10
 
 // Private types
 
@@ -73,6 +74,8 @@ int32_t CameraStabInitialize(void)
 	ev.instId = 0;
 	ev.event = 0;
 
+	CameraStabSettingsInitialize();
+
 	EventPeriodicCallbackCreate(&ev, attitudeUpdated, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
 
 	return 0;
@@ -85,25 +88,46 @@ static void attitudeUpdated(UAVObjEvent* ev)
 
 	float attitude;
 	AccessoryDesiredData accessory;
-	float rollConst = 1.0/35.0;
-	float pitchConst = 1.0/35.0;
-	float yawConst = 1.0/35.0;
-	
-	
-	AttitudeActualRollGet(&attitude);
-	accessory.AccessoryVal = attitude * rollConst;
-	if(AccessoryDesiredInstSet(0, &accessory) != 0)
-		AccessoryDesiredCreateInstance();
 
-	AttitudeActualPitchGet(&attitude);
-	accessory.AccessoryVal = attitude * pitchConst;
-	if(AccessoryDesiredInstSet(1, &accessory) != 0)
-		AccessoryDesiredCreateInstance();
+	CameraStabSettingsData cameraStab;
+	CameraStabSettingsGet(&cameraStab);
 
-	AttitudeActualYawGet(&attitude);
-	accessory.AccessoryVal = attitude * yawConst;
-	if(AccessoryDesiredInstSet(2, &accessory) != 0)
-		AccessoryDesiredCreateInstance();
+	// Read any input channels
+	float inputs[3] = {0,0,0};
+	if(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_ROLL] != CAMERASTABSETTINGS_INPUTS_NONE) {
+		if(AccessoryDesiredInstGet(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_ROLL] - CAMERASTABSETTINGS_INPUTS_ACCESSORY0, &accessory) != 0)
+			inputs[0] = accessory.AccessoryVal * cameraStab.InputRange[CAMERASTABSETTINGS_INPUTRANGE_ROLL];
+	}
+	if(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_PITCH] != CAMERASTABSETTINGS_INPUTS_NONE) {
+		if(AccessoryDesiredInstGet(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_PITCH] - CAMERASTABSETTINGS_INPUTS_ACCESSORY0, &accessory) != 0)
+			inputs[1] = accessory.AccessoryVal * cameraStab.InputRange[CAMERASTABSETTINGS_INPUTRANGE_PITCH];
+	}
+	if(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_YAW] != CAMERASTABSETTINGS_INPUTS_NONE) {
+		if(AccessoryDesiredInstGet(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_YAW] - CAMERASTABSETTINGS_INPUTS_ACCESSORY0, &accessory) != 0)
+			inputs[2] = accessory.AccessoryVal * cameraStab.InputRange[CAMERASTABSETTINGS_INPUTRANGE_YAW];
+	}
+
+	// Set output channels
+	if(cameraStab.Outputs[CAMERASTABSETTINGS_OUTPUTS_ROLL] != CAMERASTABSETTINGS_OUTPUTS_NONE) {
+		AttitudeActualRollGet(&attitude);
+		accessory.AccessoryVal = (attitude + inputs[0]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL];
+		if(AccessoryDesiredInstSet(cameraStab.Outputs[CAMERASTABSETTINGS_OUTPUTS_ROLL] - CAMERASTABSETTINGS_OUTPUTS_ACCESSORY0, &accessory) != 0)
+			AccessoryDesiredCreateInstance();
+	}
+
+	if(cameraStab.Outputs[CAMERASTABSETTINGS_OUTPUTS_PITCH] != CAMERASTABSETTINGS_OUTPUTS_NONE) {
+		AttitudeActualPitchGet(&attitude);
+		accessory.AccessoryVal = (attitude + inputs[1])  / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH];
+		if(AccessoryDesiredInstSet(cameraStab.Outputs[CAMERASTABSETTINGS_OUTPUTS_PITCH] - CAMERASTABSETTINGS_OUTPUTS_ACCESSORY0, &accessory) != 0)
+			AccessoryDesiredCreateInstance();
+	}
+
+	if(cameraStab.Outputs[CAMERASTABSETTINGS_OUTPUTS_YAW] != CAMERASTABSETTINGS_OUTPUTS_NONE) {
+		AttitudeActualYawGet(&attitude);
+		accessory.AccessoryVal = (attitude + inputs[2])  / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_YAW];
+		if(AccessoryDesiredInstSet(cameraStab.Outputs[CAMERASTABSETTINGS_OUTPUTS_YAW] - CAMERASTABSETTINGS_OUTPUTS_ACCESSORY0, &accessory) != 0)
+			AccessoryDesiredCreateInstance();
+	}
 }
 
 /**

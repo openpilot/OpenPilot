@@ -336,13 +336,38 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 	memset(pids,0,sizeof (pid_type) * PID_MAX);
 	StabilizationSettingsGet(&settings);
 
-	float * data = settings.RollRatePI;
-	for(int8_t pid=0; pid < PID_MAX; pid++)
-	{
-		pids[pid].p = *data++;
-		pids[pid].i = *data++;
-		pids[pid].iLim = *data++;
-	}
+	// Set the roll rate PID constants
+	pids[0].p = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KP];
+	pids[0].i = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KI];
+	pids[0].d = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KD];
+	pids[0].iLim = settings.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_ILIMIT];
+
+	// Set the pitch rate PID constants
+	pids[1].p = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KP];
+	pids[1].i = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KI];
+	pids[1].d = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KD];
+	pids[1].iLim = settings.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_ILIMIT];
+
+	// Set the yaw rate PID constants
+	pids[2].p = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KP];
+	pids[2].i = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KI];
+	pids[2].d = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KD];
+	pids[2].iLim = settings.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_ILIMIT];
+
+	// Set the roll attitude PI constants
+	pids[3].p = settings.RollPI[STABILIZATIONSETTINGS_ROLLPI_KP];
+	pids[3].i = settings.RollPI[STABILIZATIONSETTINGS_ROLLPI_KI];
+	pids[3].iLim = settings.RollPI[STABILIZATIONSETTINGS_ROLLPI_ILIMIT];
+
+	// Set the pitch attitude PI constants
+	pids[4].p = settings.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KP];
+	pids[4].i = settings.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KI];
+	pids[4].iLim = settings.PitchPI[STABILIZATIONSETTINGS_PITCHPI_ILIMIT];
+
+	// Set the yaw attitude PI constants
+	pids[5].p = settings.YawPI[STABILIZATIONSETTINGS_YAWPI_KP];
+	pids[5].i = settings.YawPI[STABILIZATIONSETTINGS_YAWPI_KI];
+	pids[5].iLim = settings.YawPI[STABILIZATIONSETTINGS_YAWPI_ILIMIT];
 
 	// The dT has some jitter iteration to iteration that we don't want to
 	// make thie result unpredictable.  Still, it's nicer to specify the constant

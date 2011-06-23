@@ -7,9 +7,9 @@
 	<field name="ManualRate" units="degrees/sec" type="float" elementnames="Roll,Pitch,Yaw" defaultvalue="150,150,150"/>
 	<field name="MaximumRate" units="degrees/sec" type="float" elementnames="Roll,Pitch,Yaw" defaultvalue="300,300,300"/>
 
-	<field name="RollRatePI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="0.002,0,0.3"/>
-	<field name="PitchRatePI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="0.002,0,0.3"/>
-	<field name="YawRatePI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="0.0035,0.0035,0.3"/>
+	<field name="RollRatePID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.002,0,0,0.3"/>
+	<field name="PitchRatePID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.002,0,0,0.3"/>
+	<field name="YawRatePID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.0035,0.0035,0,0.3"/>
 	<field name="RollPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2,0,50"/>
 	<field name="PitchPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2,0,50"/>
 	<field name="YawPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="2,0,50"/>

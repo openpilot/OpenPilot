@@ -95,15 +95,15 @@ static void attitudeUpdated(UAVObjEvent* ev)
 	// Read any input channels
 	float inputs[3] = {0,0,0};
 	if(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_ROLL] != CAMERASTABSETTINGS_INPUTS_NONE) {
-		if(AccessoryDesiredInstGet(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_ROLL] - CAMERASTABSETTINGS_INPUTS_ACCESSORY0, &accessory) != 0)
+		if(AccessoryDesiredInstGet(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_ROLL] - CAMERASTABSETTINGS_INPUTS_ACCESSORY0, &accessory) == 0)
 			inputs[0] = accessory.AccessoryVal * cameraStab.InputRange[CAMERASTABSETTINGS_INPUTRANGE_ROLL];
 	}
 	if(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_PITCH] != CAMERASTABSETTINGS_INPUTS_NONE) {
-		if(AccessoryDesiredInstGet(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_PITCH] - CAMERASTABSETTINGS_INPUTS_ACCESSORY0, &accessory) != 0)
+		if(AccessoryDesiredInstGet(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_PITCH] - CAMERASTABSETTINGS_INPUTS_ACCESSORY0, &accessory) == 0)
 			inputs[1] = accessory.AccessoryVal * cameraStab.InputRange[CAMERASTABSETTINGS_INPUTRANGE_PITCH];
 	}
 	if(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_YAW] != CAMERASTABSETTINGS_INPUTS_NONE) {
-		if(AccessoryDesiredInstGet(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_YAW] - CAMERASTABSETTINGS_INPUTS_ACCESSORY0, &accessory) != 0)
+		if(AccessoryDesiredInstGet(cameraStab.Inputs[CAMERASTABSETTINGS_INPUTS_YAW] - CAMERASTABSETTINGS_INPUTS_ACCESSORY0, &accessory) == 0)
 			inputs[2] = accessory.AccessoryVal * cameraStab.InputRange[CAMERASTABSETTINGS_INPUTRANGE_YAW];
 	}
 

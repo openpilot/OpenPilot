@@ -11,15 +11,15 @@
         <field name="Accessory1" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
         <field name="Accessory2" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
         <field name="Arming" units="" type="enum" elements="1" options="Always Disarmed,Always Armed,Roll Left,Roll Right,Pitch Forward,Pitch Aft,Yaw Left,Yaw Right" defaultvalue="Always Disarmed"/>
-	
+
 	<!-- Note these options should be identical to those in StabilizationDesired.StabilizationMode -->
-        <field name="Stabilization1Settings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Attitude" defaultvalue="Attitude,Attitude,Rate"/>
-        <field name="Stabilization2Settings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Attitude" defaultvalue="Attitude,Attitude,Rate"/>
-        <field name="Stabilization3Settings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Attitude" defaultvalue="Attitude,Attitude,Rate"/>
-	
+        <field name="Stabilization1Settings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Attitude,AxisLock" defaultvalue="Attitude,Attitude,Rate"/>
+        <field name="Stabilization2Settings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Attitude,AxisLock" defaultvalue="Attitude,Attitude,Rate"/>
+        <field name="Stabilization3Settings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Attitude,AxisLock" defaultvalue="Attitude,Attitude,Rate"/>
+
 	<!-- Note these options values should be identical to those defined in FlightMode -->
         <field name="FlightModePosition" units="" type="enum" elements="3" options="Manual,Stabilized1,Stabilized2,Stabilized3,VelocityControl,PositionHold" defaultvalue="Manual,Stabilized1,Stabilized2"/>
-	
+
         <field name="ChannelMax" units="us" type="int16" elements="8" defaultvalue="2000"/>
         <field name="ChannelNeutral" units="us" type="int16" elements="8" defaultvalue="1500"/>
         <field name="ChannelMin" units="us" type="int16" elements="8" defaultvalue="1000"/>

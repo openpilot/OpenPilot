@@ -143,10 +143,6 @@ void deviceWidget::populate()
     myDevice->lblMaxCode->setText(QString("Max code size: ") +QString::number(m_dfu->devices[deviceID].SizeOfCode));
     myDevice->lblCRC->setText(QString("Firmware CRC: ") + QString::number(m_dfu->devices[deviceID].FW_CRC));
     myDevice->lblBLVer->setText(QString("BL version: ") + QString::number(m_dfu->devices[deviceID].BL_Version));
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
-    QString serial = utilMngr->getBoardCPUSerial().toHex();
-    myDevice->lblCPU->setText(QString("CPU serial number: "+serial));
     int size=((OP_DFU::device)m_dfu->devices[deviceID]).SizeOfDesc;
     m_dfu->enterDFU(deviceID);
     QByteArray desc = m_dfu->DownloadDescriptionAsBA(size);

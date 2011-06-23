@@ -55,7 +55,21 @@ namespace rtslam {
 		SensorManagerAbstract(map_ptr_t mapPtr): mapPtr(mapPtr), start_date(0.), all_init(false) {}
 		
 		void setStartDate(double start_date) { this->start_date = start_date; }
-		virtual ProcessInfo getNextDataToUse() = 0;
+		virtual ProcessInfo getNextDataToUse_func() = 0;
+
+		ProcessInfo getNextDataToUse()
+		{
+			ProcessInfo pinfo;
+			while (true)
+			{
+				pinfo = getNextDataToUse_func();
+				if (pinfo.sen && pinfo.sen->getRawTimestamp(pinfo.id) < start_date)
+					pinfo.sen->discard(pinfo.id);
+				else
+					break;
+			}
+			return pinfo;
+		}
 		
 		/**
 			@return 0 if no more sensor to init, 1 if needs to wait for data to init, 2 if returned correctly a data for init
@@ -114,7 +128,7 @@ namespace rtslam {
 		public:
 			SensorManagerReplay(map_ptr_t mapPtr): SensorManagerAbstract(mapPtr) {}
 			
-			virtual ProcessInfo getNextDataToUse()
+			virtual ProcessInfo getNextDataToUse_func()
 			{
 				ProcessInfo result;
 				RawInfo info;
@@ -169,7 +183,7 @@ namespace rtslam {
 		public:
 			SensorManagerOneAndOne(map_ptr_t mapPtr): SensorManagerAbstract(mapPtr) {}
 			
-			virtual ProcessInfo getNextDataToUse()
+			virtual ProcessInfo getNextDataToUse_func()
 			{
 				if (!all_init)
 				{

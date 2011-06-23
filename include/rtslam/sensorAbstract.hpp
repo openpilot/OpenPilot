@@ -81,6 +81,7 @@ namespace jafar {
 				virtual double getRawTimestamp(unsigned id) = 0;
 				virtual void process(unsigned id) = 0; ///< process the given raw and throw away the previous unprocessed ones \return innovation
 				virtual void process_fake(unsigned id) = 0; ///< don't do any predict or update, but let the data acquisition run smoothly
+				virtual void discard(unsigned id) = 0; ///< discard a data without using it
 				virtual void init(double date) { use_for_init = false; } ///< use previous data to initialize the robot if needed
 				virtual void start() = 0;
 
@@ -167,6 +168,7 @@ namespace jafar {
 				virtual double getRawTimestamp(unsigned id) { return hardwareSensorPtr->getRawTimestamp(id); } 
 				//process(id) will do the filtering, so it is specific to each hardware
 				void process_fake(unsigned id) { hardwareSensorPtr->getRaw(id, reading); robotPtr()->move_fake(reading.data(0)); }
+				void discard(unsigned id) { hardwareSensorPtr->getRaw(id, reading); }
 		};
 		
 		/** 
@@ -226,6 +228,7 @@ namespace jafar {
 				virtual double getRawTimestamp(unsigned id) { return hardwareSensorPtr->getRawTimestamp(id); } 
 				void process(unsigned id);
 				void process_fake(unsigned id) { hardwareSensorPtr->getRaw(id, rawPtr); robotPtr()->move_fake(rawPtr->timestamp); rawCounter++; }
+				void discard(unsigned id) { hardwareSensorPtr->getRaw(id, rawPtr); }
 		};
 
 	}

@@ -38,6 +38,7 @@ class TestFixtureSettings(object):
         config.read('productionTest.ini')
         
         self.port = config.get('TestFixture','Port')
+        self.tester = config.get('TestFixture','Tester') 
             
         self.rotServo.channel = config.getint('TestFixture.RotationServo', 'Channel')
         self.rotServo.center = config.getint('TestFixture.RotationServo', 'Center')
@@ -99,7 +100,9 @@ class SensorLog(object):
         self._dumpOneSensor(file, "AccelX", self.accel[0])
         self._dumpOneSensor(file, "AccelY", self.accel[1])
         self._dumpOneSensor(file, "AccelZ", self.accel[2])
-     
+        
+def _hex02(value):
+    return "%02X" % value
 
 class TestFixture(object):
     TILT_FW = 0
@@ -147,6 +150,15 @@ class TestFixture(object):
         
         print "Getting all Data"
         self.objMan.requestAllObjUpdate()
+        
+        print "Collecting BoardInfo"
+        if self.objMan.FirmwareIAPObj.BoardType.value == 4:
+            type = "CopterControl"
+        else:
+            type = "Unknown"
+        rev = str(self.objMan.FirmwareIAPObj.BoardRevision.value)
+        sn = "".join(map(_hex02, self.objMan.FirmwareIAPObj.CPUSerial.value))
+        self.devInfo = DeviceInfo(type, rev, sn)
             
         print "Disabling automatic updates"
         self.objMan.disableAllAutomaticUpdates()
@@ -157,17 +169,12 @@ class TestFixture(object):
         self.objMan.ActuatorCommand.metadata.updated()   
         self.objMan.ManualControlCommand.metadata.access.value = UAVMetaDataObject.Access.READONLY
         self.objMan.ManualControlCommand.metadata.updated()
-        
-        self.devInfo = DeviceInfo("CopterControl", "A", "0000001")
+              
     
     def stop(self):
         if self.uavTalk:
             self.uavTalk.stop()
-           
-#    def importAllObjectDefs(self):
-#        import actuatorcommand
-#        import attituderaw
-        
+               
     def setServo(self, servo, pos):
         self.actuatorCmd.Channel.value[servo-1] = pos
         self.uavTalk.sendObject(self.actuatorCmd)
@@ -266,12 +273,12 @@ class TestFixture(object):
         testFixture.setRotServo(TestFixture.ROT_LEFT)
         time.sleep(1)
         testFixture.setRotServo(TestFixture.ROT_RIGHT)
-        self.recordSensors(20, 1000/20, self.yawRLog)
+        self.recordSensors(20, 2000/20, self.yawRLog)
         self.yawRLog.extract()
         
         print "Yaw Left",
         testFixture.setRotServo(TestFixture.ROT_LEFT)
-        self.recordSensors(20, 1000/20, self.yawLLog)
+        self.recordSensors(20, 2000/20, self.yawLLog)
         self.yawLLog.extract()
         
         print "Pitch Forward",
@@ -583,17 +590,18 @@ if __name__ == '__main__':
 #        testFixture.setRotServo(TestFixture.ROT_RIGHT)
 #        while True:
 #            time.sleep(1)
-            
+             
+        devInfo = "%s-%s" % (testFixture.devInfo.deviceType, testFixture.devInfo.deviceSerialNumber)
         
         testFixture.measureSensors()
         testFixture.dumpSensorData()
         
-        fp = file('my_report.html', 'wb')
+        fp = file("testReport-%s.html" % (devInfo), 'wb')
         myTestRunner = HTMLTestRunner.HTMLTestRunner(
                     stream=fp,
                     title='',
                     description='%s'%devInfoStr,
-                    tester="Fred",
+                    tester=testFixture.settings.tester,
                     verbosity=2)
     
         #myTestRunner = unittest.TextTestRunner(verbosity=2)

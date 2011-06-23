@@ -22,7 +22,8 @@ HEADERS += uploadergadget.h \
     SSP/qssp.h \
     SSP/qsspt.h \
     SSP/common.h \
-    runningdevicewidget.h
+    runningdevicewidget.h \
+    devicedescriptorstruct.h
 SOURCES += uploadergadget.cpp \
     uploadergadgetconfiguration.cpp \
     uploadergadgetfactory.cpp \
@@ -35,7 +36,8 @@ SOURCES += uploadergadget.cpp \
     SSP/port.cpp \
     SSP/qssp.cpp \
     SSP/qsspt.cpp \
-    runningdevicewidget.cpp
+    runningdevicewidget.cpp \
+    devicedescriptorstruct.cpp
 OTHER_FILES += Uploader.pluginspec
 
 FORMS += \

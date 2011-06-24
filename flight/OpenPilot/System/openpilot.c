@@ -91,42 +91,17 @@ int main()
 	 * */
 	PIOS_Board_Init();
 
-#if !defined(ARCH_POSIX) && !defined(ARCH_WIN32)
-
 	/* Initialize modules */
 	MODULE_INITIALISE_ALL();
 
+#if INCLUDE_TEST_TASKS
 	/* Create test tasks */
-	/* keep this just because it was there */
-	//xTaskCreate(TaskTesting, (signed portCHAR *)"Testing", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
-	//xTaskCreate(TaskHIDTest, (signed portCHAR *)"HIDTest", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
-	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
-	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
-
-#else
-	/* only do this for posix and win32 since the caller will take care
-	 * of starting the scheduler and increase the heap and swith back to
-	 * MSP stack. (all arch specific is hidden from here and take care by reset handler)
-	 * LED blinking in case of scheduler returning back should be handled in NMI or other
-	 * appropriate handlers like mem manager.
-	 */
-
-	/* Initialize modules */
-	InitModules();
-
-	/* Start the FreeRTOS scheduler which never returns.*/
-	vTaskStartScheduler();
-
-	/* If all is well we will never reach here as the scheduler will now be running. */
-	/* If we do get here, it will most likely be because we ran out of heap space. */
-	PIOS_LED_Off(LED1);
-	PIOS_LED_Off(LED2);
-	for(;;) {
-		PIOS_LED_Toggle(LED1);
-		PIOS_LED_Toggle(LED2);
-		PIOS_DELAY_WaitmS(100);
-	}
+	xTaskCreate(TaskTesting, (signed portCHAR *)"Testing", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
+	xTaskCreate(TaskHIDTest, (signed portCHAR *)"HIDTest", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
+	xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
+	xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 #endif
+
 	return 0;
 }
 

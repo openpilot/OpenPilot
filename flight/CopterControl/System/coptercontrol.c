@@ -79,15 +79,6 @@ int main()
 	/* Initialize modules */
 	MODULE_INITIALISE_ALL();
 
-#if defined(ARCH_POSIX) || defined(ARCH_WIN32)
-	/* Start the FreeRTOS scheduler which never returns.*/
-	/* only do this for posix and win32 since the caller will take care
-	 * of starting the scheduler and increase the heap and swith back to
-	 * MSP stack. (all arch specific is hidden from here and take care by reset handler)
-	 */
-    vTaskStartScheduler();
-#endif
-
     return 0;
 }
 

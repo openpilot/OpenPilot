@@ -94,9 +94,9 @@ void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
         float y_bias = listMean(y_accum) / ACCEL_SCALE;
         float z_bias = (listMean(z_accum) + 9.81) / ACCEL_SCALE;
 
-        float x_gyro_bias = listMean(x_gyro_accum);
-        float y_gyro_bias = listMean(y_gyro_accum);
-        float z_gyro_bias = listMean(z_gyro_accum);
+        float x_gyro_bias = listMean(x_gyro_accum) * 100.0f;
+        float y_gyro_bias = listMean(y_gyro_accum) * 100.0f;
+        float z_gyro_bias = listMean(z_gyro_accum) * 100.0f;
         obj->setMetadata(initialMdata);
 
         AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(getObjectManager())->getData();

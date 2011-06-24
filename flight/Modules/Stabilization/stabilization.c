@@ -79,6 +79,8 @@ static xQueueHandle queue;
 float dT = 1;
 float gyro_alpha = 0;
 float gyro_filtered[3] = {0,0,0};
+float axis_lock_accum[3] = {0,0,0};
+uint8_t max_axis_lock = 0;
 pid_type pids[PID_MAX];
 
 // Private functions
@@ -203,18 +205,32 @@ static void stabilizationTask(void* parameters)
 		float *attitudeDesiredAxis = &stabDesired.Roll;
 		float *actuatorDesiredAxis = &actuatorDesired.Roll;
 		float *rateDesiredAxis = &rateDesired.Roll;
+		float *actualRateAxis = &attitudeRaw.gyros[0];
 
 		//Calculate desired rate
-		for(int8_t ct=0; ct< MAX_AXES; ct++)
+		for(uint8_t i=0; i< MAX_AXES; i++)
 		{
-			switch(stabDesired.StabilizationMode[ct])
+			switch(stabDesired.StabilizationMode[i])
 			{
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
-					rateDesiredAxis[ct] = attitudeDesiredAxis[ct];
+					rateDesiredAxis[i] = attitudeDesiredAxis[i];
+					axis_lock_accum[i] = 0;
 					break;
 
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
-					rateDesiredAxis[ct] = ApplyPid(&pids[PID_ROLL + ct], local_error[ct]);
+					rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], local_error[i]);
+					axis_lock_accum[i] = 0;
+					break;
+
+				case STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK:
+					// Track accumulated error between axis lock
+					axis_lock_accum[i] += (attitudeDesiredAxis[i] - actualRateAxis[i]) * dT;
+					if(axis_lock_accum[i] > max_axis_lock)
+						axis_lock_accum[i] = max_axis_lock;
+					else if(axis_lock_accum[i] < -max_axis_lock)
+						axis_lock_accum[i] = -max_axis_lock;
+
+					rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], axis_lock_accum[i]);
 					break;
 			}
 		}
@@ -225,17 +241,11 @@ static void stabilizationTask(void* parameters)
 		//Calculate desired command
 		for(int8_t ct=0; ct< MAX_AXES; ct++)
 		{
-			if(fabs(rateDesiredAxis[ct]) > settings.MaximumRate[ct])
-			{
-				if(rateDesiredAxis[ct] > 0)
-				{
-					rateDesiredAxis[ct] = settings.MaximumRate[ct];
-				}else
-				{
-					rateDesiredAxis[ct] = -settings.MaximumRate[ct];
-				}
+			if(rateDesiredAxis[ct] > settings.MaximumRate[ct])
+				rateDesiredAxis[ct] = settings.MaximumRate[ct];
+			else if(rateDesiredAxis[ct] < settings.MaximumRate[ct])
+				rateDesiredAxis[ct] = -settings.MaximumRate[ct];
 
-			}
 			switch(stabDesired.StabilizationMode[ct])
 			{
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
@@ -314,6 +324,8 @@ static void ZeroPids(void)
 		pids[ct].iAccumulator = 0;
 		pids[ct].lastErr = 0;
 	}
+	for(uint8_t i = 0; i < 3; i++)
+		axis_lock_accum[i] = 0;
 }
 
 
@@ -368,6 +380,9 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 	pids[5].p = settings.YawPI[STABILIZATIONSETTINGS_YAWPI_KP];
 	pids[5].i = settings.YawPI[STABILIZATIONSETTINGS_YAWPI_KI];
 	pids[5].iLim = settings.YawPI[STABILIZATIONSETTINGS_YAWPI_ILIMIT];
+
+	// Maximum deviation to accumulate for axis lock
+	max_axis_lock = settings.MaxAxisLock;
 
 	// The dT has some jitter iteration to iteration that we don't want to
 	// make thie result unpredictable.  Still, it's nicer to specify the constant

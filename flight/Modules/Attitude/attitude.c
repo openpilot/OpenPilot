@@ -276,7 +276,7 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 		accel_err[1] /= accel_mag;
 		accel_err[2] /= accel_mag;
 
-		// Accumulate integral of error.  Scale here so that units are (rad/s) but Ki has units of s
+		// Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
 		gyro_correct_int[0] += accel_err[0] * accelKi;
 		gyro_correct_int[1] += accel_err[1] * accelKi;
 		//gyro_correct_int[2] += accel_err[2] * settings.AccelKI * dT;

@@ -79,7 +79,10 @@ void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
         x_accum.append(field->getDouble(0));
         y_accum.append(field->getDouble(1));
         z_accum.append(field->getDouble(2));
-	qDebug("update %d: %f, %f, %f\n",updates,field->getDouble(0),field->getDouble(1),field->getDouble(2));
+        field = obj->getField(QString("gyros"));
+        x_gyro_accum.append(field->getDouble(0));
+        y_gyro_accum.append(field->getDouble(1));
+        z_gyro_accum.append(field->getDouble(2));;
     } else if ( updates == NUM_ACCEL_UPDATES ) {
 	updates++;
         timer.stop();
@@ -90,6 +93,9 @@ void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
         float y_bias = listMean(y_accum) / ACCEL_SCALE;
         float z_bias = (listMean(z_accum) + 9.81) / ACCEL_SCALE;
 
+        float x_gyro_bias = listMean(x_gyro_accum);
+        float y_gyro_bias = listMean(y_gyro_accum);
+        float z_gyro_bias = listMean(z_gyro_accum);
         obj->setMetadata(initialMdata);
 
         UAVDataObject * settings = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeSettings")));
@@ -97,9 +103,11 @@ void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
         field->setDouble(field->getDouble(0) + x_bias,0);
         field->setDouble(field->getDouble(1) + y_bias,1);
         field->setDouble(field->getDouble(2) + z_bias,2);
-	qDebug("New X bias: %f\n", field->getDouble(0)+x_bias);
-	qDebug("New Y bias: %f\n", field->getDouble(1)+y_bias);
-	qDebug("New Z bias: %f\n", field->getDouble(2)+z_bias);
+        field = settings->getField("GyroBias");
+        field->setDouble(x_gyro_bias,0);
+        field->setDouble(y_gyro_bias,1);
+        field->setDouble(z_gyro_bias,2);
+        settings->getField("BiasCorrectedGyro")->setValue("True");
         settings->updated();
         ui->status->setText("Calibration done.");
     } else {
@@ -159,8 +167,16 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
     x_accum.clear();
     y_accum.clear();
     z_accum.clear();
+    x_gyro_accum.clear();
+    y_gyro_accum.clear();
+    z_gyro_accum.clear();
 
     ui->status->setText(tr("Calibrating..."));
+
+    // Disable gyro bias correction to see raw data
+    UAVDataObject * settings = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeSettings")));
+    settings->getField("BiasCorrectedGyro")->setValue("False");
+    settings->updated();
 
     // Set up to receive updates
     UAVDataObject * obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));

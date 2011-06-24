@@ -205,7 +205,6 @@ static void stabilizationTask(void* parameters)
 		float *attitudeDesiredAxis = &stabDesired.Roll;
 		float *actuatorDesiredAxis = &actuatorDesired.Roll;
 		float *rateDesiredAxis = &rateDesired.Roll;
-		float *actualRateAxis = &attitudeRaw.gyros[0];
 
 		//Calculate desired rate
 		for(uint8_t i=0; i< MAX_AXES; i++)
@@ -224,7 +223,7 @@ static void stabilizationTask(void* parameters)
 
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK:
 					// Track accumulated error between axis lock
-					axis_lock_accum[i] += (attitudeDesiredAxis[i] - actualRateAxis[i]) * dT;
+					axis_lock_accum[i] += (attitudeDesiredAxis[i] - gyro_filtered[i]) * dT;
 					if(axis_lock_accum[i] > max_axis_lock)
 						axis_lock_accum[i] = max_axis_lock;
 					else if(axis_lock_accum[i] < -max_axis_lock)
@@ -243,13 +242,14 @@ static void stabilizationTask(void* parameters)
 		{
 			if(rateDesiredAxis[ct] > settings.MaximumRate[ct])
 				rateDesiredAxis[ct] = settings.MaximumRate[ct];
-			else if(rateDesiredAxis[ct] < settings.MaximumRate[ct])
+			else if(rateDesiredAxis[ct] < -settings.MaximumRate[ct])
 				rateDesiredAxis[ct] = -settings.MaximumRate[ct];
 
 			switch(stabDesired.StabilizationMode[ct])
 			{
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
+				case STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK:
 				{
 					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rateDesiredAxis[ct] - gyro_filtered[ct]);
 					actuatorDesiredAxis[ct] = bound(command);

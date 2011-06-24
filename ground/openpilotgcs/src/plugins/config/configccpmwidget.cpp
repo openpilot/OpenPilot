@@ -25,6 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "configccpmwidget.h"
+#include "mixersettings.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -32,6 +33,7 @@
 #include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
+#include <QBrush>
 #include <math.h>
 #include <QMessageBox>
 
@@ -41,11 +43,14 @@
 ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     int i;
+    
     m_ccpm = new Ui_ccpmWidget();
     m_ccpm->setupUi(this);
     SwashLvlConfigurationInProgress=0;
     SwashLvlState=0;
     SwashLvlServoInterlock=0;
+    updatingFromHardware=FALSE;
+    updatingToHardware=FALSE;
 
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
     //ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -55,12 +60,12 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_ccpm->SwashplateImage->setScene(new QGraphicsScene(this));
 
     m_ccpm->SwashLvlSwashplateImage->setScene(m_ccpm->SwashplateImage->scene());
-    m_ccpm->SwashLvlSwashplateImage->setSceneRect(-50,-30,500,500);
-    m_ccpm->SwashLvlSwashplateImage->scale(.85,.85);
+    m_ccpm->SwashLvlSwashplateImage->setSceneRect(-50,-50,500,500);
+    //m_ccpm->SwashLvlSwashplateImage->scale(.85,.85);
 
     //m_ccpm->SwashplateImage->setSceneRect(SwashplateImg->boundingRect());
     m_ccpm->SwashplateImage->setSceneRect(-50,-30,500,500);
-    m_ccpm->SwashplateImage->scale(.85,.85);
+    //m_ccpm->SwashplateImage->scale(.85,.85);
 
 
 
@@ -72,9 +77,10 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     SwashplateImg->setSharedRenderer(renderer);
     SwashplateImg->setElementId("Swashplate");
     SwashplateImg->setObjectName("Swashplate");
+    //SwashplateImg->setScale(0.75);
     m_ccpm->SwashplateImage->scene()->addItem(SwashplateImg);
 
-    QFont serifFont("Times", 16, QFont::Bold);
+    QFont serifFont("Times", 24, QFont::Bold);
     QPen pen;  // creates a default pen
 
     pen.setStyle(Qt::DotLine);
@@ -83,6 +89,19 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     pen.setCapStyle(Qt::RoundCap);
     pen.setJoinStyle(Qt::RoundJoin);
 
+    
+    QBrush brush(Qt::darkBlue);
+    QPen pen2;  // creates a default pen
+    
+    //pen2.setStyle(Qt::DotLine);
+    pen2.setWidth(1);
+    pen2.setBrush(Qt::blue);
+    //pen2.setCapStyle(Qt::RoundCap);
+    //pen2.setJoinStyle(Qt::RoundJoin);
+    
+    
+   //brush.setStyle(Qt::RadialGradientPattern);
+    
     QList<QString> ServoNames;
     ServoNames << "ServoW" << "ServoX" << "ServoY" << "ServoZ" ;
 
@@ -96,10 +115,16 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
         m_ccpm->SwashplateImage->scene()->addItem(Servos[i]);
 
         ServosText[i] = new QGraphicsTextItem();
-        ServosText[i]->setDefaultTextColor(Qt::red);
+        ServosText[i]->setDefaultTextColor(Qt::yellow);
         ServosText[i]->setPlainText(QString("-"));
         ServosText[i]->setFont(serifFont);
+        
+        ServosTextCircles[i] = new QGraphicsEllipseItem(1,1,30,30);
+        ServosTextCircles[i]->setBrush(brush);
+        ServosTextCircles[i]->setPen(pen2);
+        m_ccpm->SwashplateImage->scene()->addItem(ServosTextCircles[i]);
         m_ccpm->SwashplateImage->scene()->addItem(ServosText[i]);
+        
 
 
         SwashLvlSpinBoxes[i] = new QSpinBox(m_ccpm->SwashLvlSwashplateImage);       // use QGraphicsView
@@ -172,7 +197,10 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     QStringList channels;
     channels << "Channel1" << "Channel2" <<
-            "Channel3" << "Channel4" << "Channel5" << "Channel6" << "Channel7" << "Channel8" << "None" ;
+    "Channel3" << "Channel4" << "Channel5" << "Channel6" << "Channel7" << "Channel8"  ;
+    m_ccpm->ccpmCollectiveChannel->addItems(channels);
+    m_ccpm->ccpmCollectiveChannel->setCurrentIndex(8);
+    channels << "None" ;
     m_ccpm->ccpmEngineChannel->addItems(channels);
     m_ccpm->ccpmEngineChannel->setCurrentIndex(8);
     m_ccpm->ccpmTailChannel->addItems(channels);
@@ -187,7 +215,7 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
 
     QStringList Types;
-    Types << "CCPM 2 Servo 90º" << "CCPM 3 Servo 120º" << "CCPM 3 Servo 140º" << "FP 2 Servo 90º"  << "Custom - User Angles" << "Custom - Advanced Settings"  ;
+    Types << "CCPM 2 Servo 90º" << "CCPM 3 Servo 90º" << "CCPM 4 Servo 90º" << "CCPM 3 Servo 120º" << "CCPM 3 Servo 140º" << "FP 2 Servo 90º"  << "Custom - User Angles" << "Custom - Advanced Settings"  ;
     m_ccpm->ccpmType->addItems(Types);
     m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->count() - 1);
     requestccpmUpdate();
@@ -196,6 +224,8 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     //disable changing number of points in curves until UAVObjects have more than 5
     m_ccpm->NumCurvePoints->setEnabled(0);
+    
+    
 
     UpdateType();
 
@@ -237,7 +267,13 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_ccpm->SwashLvlCancelButton, SIGNAL(clicked()), this, SLOT(SwashLvlCancelButtonPressed()));
     connect(m_ccpm->SwashLvlFinishButton, SIGNAL(clicked()), this, SLOT(SwashLvlFinishButtonPressed()));
 
+    connect(m_ccpm->ccpmCollectivePassthrough, SIGNAL(clicked()), this, SLOT(SetUIComponentVisibilities()));
+    connect(m_ccpm->ccpmLinkCyclic, SIGNAL(clicked()), this, SLOT(SetUIComponentVisibilities()));
+    connect(m_ccpm->ccpmLinkRoll, SIGNAL(clicked()), this, SLOT(SetUIComponentVisibilities()));
 
+
+    
+   ccpmSwashplateRedraw(); 
    // connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestccpmUpdate()));
 
 }
@@ -249,11 +285,13 @@ ConfigccpmWidget::~ConfigccpmWidget()
 
 void ConfigccpmWidget::UpdateType()
 {
-    int TypeInt,SingleServoIndex;
+    int TypeInt,SingleServoIndex,NumServosDefined;
     QString TypeText;
     double AdjustmentAngle=0;
 
-
+    UpdatCCPMOptionsFromUI();
+    SetUIComponentVisibilities();
+    
     TypeInt = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
     TypeText = m_ccpm->ccpmType->currentText();
     SingleServoIndex = m_ccpm->ccpmSingleServo->currentIndex();
@@ -266,7 +304,7 @@ void ConfigccpmWidget::UpdateType()
     m_ccpm->ccpmAngleX->setEnabled(TypeInt==1);
     m_ccpm->ccpmAngleY->setEnabled(TypeInt==1);
     m_ccpm->ccpmAngleZ->setEnabled(TypeInt==1);
-    m_ccpm->ccpmCorrectionAngle->setEnabled(TypeInt==1);
+    m_ccpm->ccpmCorrectionAngle->setEnabled(TypeInt!=0);
 
     m_ccpm->ccpmServoWChannel->setEnabled(TypeInt>0);
     m_ccpm->ccpmServoXChannel->setEnabled(TypeInt>0);
@@ -289,6 +327,7 @@ void ConfigccpmWidget::UpdateType()
     //m_ccpm->customThrottleCurve2Value->setVisible(1);
     //m_ccpm->label_41->setVisible(1);
 
+    NumServosDefined=4;
     //set values for pre defined heli types
         if (TypeText.compare(QString("CCPM 2 Servo 90º"), Qt::CaseInsensitive)==0)
         {
@@ -302,8 +341,34 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
             m_ccpm->ccpmServoYChannel->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            m_ccpm->ccpmCorrectionAngle->setValue(0);
+            //m_ccpm->ccpmCorrectionAngle->setValue(0);
+            NumServosDefined=2;
 
+        }
+        if (TypeText.compare(QString("CCPM 3 Servo 90º"), Qt::CaseInsensitive)==0)
+        {
+            m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
+            m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
+            m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 180,360));
+            m_ccpm->ccpmAngleZ->setValue(0);
+            m_ccpm->ccpmAngleZ->setEnabled(0);
+            m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
+            m_ccpm->ccpmServoZChannel->setEnabled(0);
+            //m_ccpm->ccpmCorrectionAngle->setValue(0);
+            NumServosDefined=3;
+        
+        }
+        if (TypeText.compare(QString("CCPM 4 Servo 90º"), Qt::CaseInsensitive)==0)
+        {
+            m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
+            m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
+            m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 180,360));
+            m_ccpm->ccpmAngleZ->setValue(fmod(AdjustmentAngle + 270,360));
+            //m_ccpm->ccpmCorrectionAngle->setValue(0);
+            m_ccpm->ccpmSingleServo->setEnabled(0);
+            m_ccpm->ccpmSingleServo->setCurrentIndex(0);
+            NumServosDefined=4;
+        
         }
         if (TypeText.compare(QString("CCPM 3 Servo 120º"), Qt::CaseInsensitive)==0)
         {
@@ -314,8 +379,9 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmAngleZ->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            m_ccpm->ccpmCorrectionAngle->setValue(0);
-
+            //m_ccpm->ccpmCorrectionAngle->setValue(0);
+            NumServosDefined=3;
+            
         }
         if (TypeText.compare(QString("CCPM 3 Servo 140º"), Qt::CaseInsensitive)==0)
         {
@@ -326,7 +392,8 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmAngleZ->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            m_ccpm->ccpmCorrectionAngle->setValue(0);
+            //m_ccpm->ccpmCorrectionAngle->setValue(0);
+            NumServosDefined=3;
 
         }
         if (TypeText.compare(QString("FP 2 Servo 90º"), Qt::CaseInsensitive)==0)
@@ -341,7 +408,7 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
             m_ccpm->ccpmServoYChannel->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            m_ccpm->ccpmCorrectionAngle->setValue(0);
+            //m_ccpm->ccpmCorrectionAngle->setValue(0);
 
             m_ccpm->ccpmCollectivespinBox->setEnabled(0);
             m_ccpm->ccpmCollectiveSlider->setEnabled(0);
@@ -353,8 +420,29 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->PitchCurve->setVisible(0);
             //m_ccpm->customThrottleCurve2Value->setVisible(0);
             //m_ccpm->label_41->setVisible(0);
+            NumServosDefined=2;
         }
 
+    //set the visibility of the swashplate servo selection boxes
+    m_ccpm->ccpmServoWLabel->setVisible(NumServosDefined>=1);
+    m_ccpm->ccpmServoXLabel->setVisible(NumServosDefined>=2);
+    m_ccpm->ccpmServoYLabel->setVisible(NumServosDefined>=3);
+    m_ccpm->ccpmServoZLabel->setVisible(NumServosDefined>=4);
+    m_ccpm->ccpmServoWChannel->setVisible(NumServosDefined>=1);
+    m_ccpm->ccpmServoXChannel->setVisible(NumServosDefined>=2);
+    m_ccpm->ccpmServoYChannel->setVisible(NumServosDefined>=3);
+    m_ccpm->ccpmServoZChannel->setVisible(NumServosDefined>=4);
+    
+    //set the visibility of the swashplate angle selection boxes
+    m_ccpm->ccpmServoWLabel_2->setVisible(NumServosDefined>=1);
+    m_ccpm->ccpmServoXLabel_2->setVisible(NumServosDefined>=2);
+    m_ccpm->ccpmServoYLabel_2->setVisible(NumServosDefined>=3);
+    m_ccpm->ccpmServoZLabel_2->setVisible(NumServosDefined>=4);
+    m_ccpm->ccpmAngleW->setVisible(NumServosDefined>=1);
+    m_ccpm->ccpmAngleX->setVisible(NumServosDefined>=2);
+    m_ccpm->ccpmAngleY->setVisible(NumServosDefined>=3);
+    m_ccpm->ccpmAngleZ->setVisible(NumServosDefined>=4);
+    
 
         m_ccpm->ccpmAdvancedSettingsTable->resizeColumnsToContents();
         for (int i=0;i<6;i++) {
@@ -362,9 +450,12 @@ void ConfigccpmWidget::UpdateType()
                                                             m_ccpm->ccpmAdvancedSettingsTable->verticalHeader()->width())/6);
         }
 
+    
+    
+    
     //update UI
     ccpmSwashplateUpdate();
-
+    
 }
 
 /**
@@ -655,17 +746,43 @@ void ConfigccpmWidget::GenerateCurve()
 void ConfigccpmWidget::ccpmSwashplateRedraw()
 {
     double angle[CCPM_MAX_SWASH_SERVOS],CorrectionAngle,x,y,w,h,radius,CenterX,CenterY;
-    int used[CCPM_MAX_SWASH_SERVOS],i;
+    int used[CCPM_MAX_SWASH_SERVOS],defined[CCPM_MAX_SWASH_SERVOS],i;
+    QRectF bounds;
+    QRect size;
+    double scale,xscale,yscale;
 
+
+    size = m_ccpm->SwashplateImage->rect();
+    xscale=size.width();
+    yscale=size.height();
+    scale=xscale;
+    if (yscale<scale)scale=yscale;
+    scale/=460.00;
+    m_ccpm->SwashplateImage->resetTransform ();
+    m_ccpm->SwashplateImage->scale(scale,scale);  
+    
+    size = m_ccpm->SwashLvlSwashplateImage->rect();
+    xscale=size.width();
+    yscale=size.height();
+    scale=xscale;
+    if (yscale<scale)scale=yscale;
+    scale/=590.00;
+    m_ccpm->SwashLvlSwashplateImage->resetTransform ();
+    m_ccpm->SwashLvlSwashplateImage->scale(scale,scale);  
+    
     CorrectionAngle=m_ccpm->ccpmCorrectionAngle->value();
 
-    //CenterX=m_ccpm->SwashplateImage->scene()->sceneRect().center().x();
-   // CenterY=m_ccpm->SwashplateImage->scene()->sceneRect().center().y();
     CenterX=200;
-    CenterY=220;
+    CenterY=200;
 
-    SwashplateImg->setPos(CenterX-200,CenterY-200);
+    bounds=SwashplateImg->boundingRect();
+    
+    SwashplateImg->setPos(CenterX-bounds.width()/2,CenterY-bounds.height()/2);
 
+    defined[0]=(m_ccpm->ccpmServoWChannel->isEnabled());
+    defined[1]=(m_ccpm->ccpmServoXChannel->isEnabled());
+    defined[2]=(m_ccpm->ccpmServoYChannel->isEnabled());
+    defined[3]=(m_ccpm->ccpmServoZChannel->isEnabled());
     used[0]=((m_ccpm->ccpmServoWChannel->currentIndex()<8)&&(m_ccpm->ccpmServoWChannel->isEnabled()));
     used[1]=((m_ccpm->ccpmServoXChannel->currentIndex()<8)&&(m_ccpm->ccpmServoXChannel->isEnabled()));
     used[2]=((m_ccpm->ccpmServoYChannel->currentIndex()<8)&&(m_ccpm->ccpmServoYChannel->isEnabled()));
@@ -684,11 +801,28 @@ void ConfigccpmWidget::ccpmSwashplateRedraw()
         Servos[i]->setPos(x, y);
         Servos[i]->setVisible(used[i]!=0);
 
-        radius=170;
-        x=CenterX-(radius*sin(angle[i]))-10.00;
-        y=CenterY+(radius*cos(angle[i]))-10.00;
+        radius=150;
+        bounds=ServosText[i]->boundingRect();
+        x=CenterX-(radius*sin(angle[i]))-bounds.width()/2;
+        y=CenterY+(radius*cos(angle[i]))-bounds.height()/2;
+        
         ServosText[i]->setPos(x, y);
         ServosText[i]->setVisible(used[i]!=0);
+ 
+        if (bounds.width()>bounds.height())
+        {
+            bounds.setHeight(bounds.width());
+        }
+        else
+        {
+            bounds.setWidth(bounds.height());
+        }
+        x=CenterX-(radius*sin(angle[i]))-bounds.width()/2;
+        y=CenterY+(radius*cos(angle[i]))-bounds.height()/2;
+        
+        ServosTextCircles[i]->setRect(bounds);
+        ServosTextCircles[i]->setPos(x, y);
+        ServosTextCircles[i]->setVisible(used[i]!=0);
 
         w=SwashLvlSpinBoxes[i]->width()/2;
         h=SwashLvlSpinBoxes[i]->height()/2;
@@ -702,7 +836,7 @@ void ConfigccpmWidget::ccpmSwashplateRedraw()
         x=CenterX-(radius*sin(angle[i]));
         y=CenterY+(radius*cos(angle[i]));
         ServoLines[i]->setLine(CenterX,CenterY,x,y);
-        ServoLines[i]->setVisible(used[i]!=0);
+        ServoLines[i]->setVisible(defined[i]!=0);
     }
 
     //m_ccpm->SwashplateImage->centerOn (CenterX, CenterY);
@@ -713,22 +847,104 @@ void ConfigccpmWidget::ccpmSwashplateRedraw()
 void ConfigccpmWidget::ccpmSwashplateUpdate()
 {
     ccpmSwashplateRedraw();
+    SetUIComponentVisibilities();
     UpdateMixer();
+}
+
+void ConfigccpmWidget::ccpmChannelCheck()
+{
+    if((m_ccpm->ccpmServoWChannel->currentIndex()==8)&&(m_ccpm->ccpmServoWChannel->isEnabled()))
+    {
+        m_ccpm->ccpmServoWLabel->setText("<font color=red>Servo W</font>");   
+    }
+    else
+    {
+        m_ccpm->ccpmServoWLabel->setText("<font color=black>Servo W</font>");   
+    }
+    if((m_ccpm->ccpmServoXChannel->currentIndex()==8)&&(m_ccpm->ccpmServoXChannel->isEnabled()))
+    {
+        m_ccpm->ccpmServoXLabel->setText("<font color=red>Servo X</font>");   
+    }
+    else
+    {
+        m_ccpm->ccpmServoXLabel->setText("<font color=black>Servo X</font>");   
+    }
+    if((m_ccpm->ccpmServoYChannel->currentIndex()==8)&&(m_ccpm->ccpmServoYChannel->isEnabled()))
+    {
+        m_ccpm->ccpmServoYLabel->setText("<font color=red>Servo Y</font>");   
+    }
+    else
+    {
+        m_ccpm->ccpmServoYLabel->setText("<font color=black>Servo Y</font>");   
+    }
+    if((m_ccpm->ccpmServoZChannel->currentIndex()==8)&&(m_ccpm->ccpmServoZChannel->isEnabled()))
+    {
+        m_ccpm->ccpmServoZLabel->setText("<font color=red>Servo Z</font>");   
+    }
+    else
+    {
+        m_ccpm->ccpmServoZLabel->setText("<font color=black>Servo Z</font>");   
+    }
+
+    if((m_ccpm->ccpmEngineChannel->currentIndex()==8)&&(m_ccpm->ccpmEngineChannel->isEnabled()))
+    {
+        m_ccpm->ccpmEngineLabel->setText("<font color=red>Engine</font>");   
+    }
+    else
+    {
+        m_ccpm->ccpmEngineLabel->setText("<font color=black>Engine</font>");   
+    }
+    
+    if((m_ccpm->ccpmTailChannel->currentIndex()==8)&&(m_ccpm->ccpmTailChannel->isEnabled()))
+    {
+        m_ccpm->ccpmTailLabel->setText("<font color=red>Tail Rotor</font>");   
+    }
+    else
+    {
+        m_ccpm->ccpmTailLabel->setText("<font color=black>Tail Rotor</font>");   
+    }
+    
 }
 
 void ConfigccpmWidget::UpdateMixer()
 {
-    int i,j,Type,ThisEnable[6];
-    float CollectiveConstant,CorrectionAngle,ThisAngle[6];
+    bool useCCPM;
+    bool useCyclic;
+    int i,j,ThisEnable[6];
+    float CollectiveConstant,PitchConstant,RollConstant,ThisAngle[6];
     //QTableWidgetItem *newItem;// = new QTableWidgetItem();
     QString Channel;
 
-    Type = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
-    CollectiveConstant=m_ccpm->ccpmCollectiveSlider->value()/100.0;
-    CorrectionAngle=m_ccpm->ccpmCorrectionAngle->value();
+    ccpmChannelCheck();
+    //Type = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
+    //CollectiveConstant=m_ccpm->ccpmCollectiveSlider->value()/100.0;
+    //CorrectionAngle=m_ccpm->ccpmCorrectionAngle->value();
+    UpdatCCPMOptionsFromUI();
+ 
+    useCCPM = !(GUIConfigData.heli.ccpmCollectivePassthroughState || !GUIConfigData.heli.ccpmLinkCyclicState);
+    useCyclic = GUIConfigData.heli.ccpmLinkRollState;
 
+    CollectiveConstant = (float)GUIConfigData.heli.SliderValue0 / 100.00;
 
-    if (Type>0)
+    if (useCCPM) 
+    {//cyclic = 1 - collective
+        PitchConstant = 1-CollectiveConstant;
+        RollConstant = PitchConstant;
+    }
+    else
+    {
+        PitchConstant = (float)GUIConfigData.heli.SliderValue1 / 100.00;;
+        if (useCyclic) 
+        {
+            RollConstant = PitchConstant;
+        }   
+        else
+        {
+            RollConstant = (float)GUIConfigData.heli.SliderValue2 / 100.00;;
+        }               
+    }
+
+    if (GUIConfigData.heli.SwasplateType>0)
     {//not advanced settings
         //get the channel data from the ui
         MixerChannelData[0] = m_ccpm->ccpmEngineChannel->currentIndex();
@@ -792,8 +1008,8 @@ void ConfigccpmWidget::UpdateMixer()
                 {//Swashplate
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,1)->setText(QString("%1").arg(0));//ThrottleCurve1
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,2)->setText(QString("%1").arg((int)(127.0*CollectiveConstant)));//ThrottleCurve2
-                    m_ccpm->ccpmAdvancedSettingsTable->item(i,3)->setText(QString("%1").arg((int)(127.0*(1-CollectiveConstant)*sin((180+CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Roll
-                    m_ccpm->ccpmAdvancedSettingsTable->item(i,4)->setText(QString("%1").arg((int)(127.0*(1-CollectiveConstant)*cos((CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Pitch
+                    m_ccpm->ccpmAdvancedSettingsTable->item(i,3)->setText(QString("%1").arg((int)(127.0*(RollConstant)*sin((180+GUIConfigData.heli.CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Roll
+                    m_ccpm->ccpmAdvancedSettingsTable->item(i,4)->setText(QString("%1").arg((int)(127.0*(PitchConstant)*cos((GUIConfigData.heli.CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Pitch
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,5)->setText(QString("%1").arg(0));//Yaw
 
                 }
@@ -822,6 +1038,140 @@ void ConfigccpmWidget::UpdateMixer()
 /**************************
   * ccpm settings
   **************************/
+/*
+ Get the state of the UI check boxes and change the visibility of sliders
+ typedef struct {
+ uint SwasplateType:3;
+ uint FirstServoIndex:2;
+ uint CorrectionAngle:9;
+ uint ccpmCollectivePassthroughState:1;
+ uint ccpmLinkCyclicState:1;
+ uint ccpmLinkRollState:1;
+ uint CollectiveChannel:3;
+ uint padding:12;
+ } __attribute__((packed))  heliGUISettingsStruct;
+
+ */
+void ConfigccpmWidget::UpdatCCPMOptionsFromUI()
+{
+    bool useCCPM;
+    bool useCyclic;
+    
+    if (updatingFromHardware) return;
+    //get the user options
+    //swashplate config
+    GUIConfigData.heli.SwasplateType = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
+    GUIConfigData.heli.FirstServoIndex = m_ccpm->ccpmSingleServo->currentIndex();
+    
+    //ccpm mixing options
+    GUIConfigData.heli.ccpmCollectivePassthroughState = m_ccpm->ccpmCollectivePassthrough->isChecked();
+    GUIConfigData.heli.ccpmLinkCyclicState = m_ccpm->ccpmLinkCyclic->isChecked();
+    GUIConfigData.heli.ccpmLinkRollState = m_ccpm->ccpmLinkRoll->isChecked();
+    useCCPM = !(GUIConfigData.heli.ccpmCollectivePassthroughState || !GUIConfigData.heli.ccpmLinkCyclicState);
+    useCyclic = GUIConfigData.heli.ccpmLinkRollState;
+    
+    //correction angle
+    GUIConfigData.heli.CorrectionAngle = m_ccpm->ccpmCorrectionAngle->value();
+    
+    //CollectiveChannel
+    GUIConfigData.heli.CollectiveChannel = m_ccpm->ccpmCollectiveChannel->currentIndex();
+    
+    //update sliders
+    if (useCCPM) 
+    {
+        GUIConfigData.heli.SliderValue0 = m_ccpm->ccpmCollectiveSlider->value();
+    }
+    else
+    {
+        GUIConfigData.heli.SliderValue0 = m_ccpm->ccpmCollectiveScale->value();
+    }
+    if (useCyclic) 
+    {
+        GUIConfigData.heli.SliderValue1 = m_ccpm->ccpmCyclicScale->value();
+    }
+    else
+    {
+        GUIConfigData.heli.SliderValue1 = m_ccpm->ccpmPitchScale->value();
+    }    
+    GUIConfigData.heli.SliderValue2 = m_ccpm->ccpmRollScale->value();
+    //GUIConfigData.heli.RevoSlider = m_ccpm->ccpmREVOScale->value();
+    
+    //servo assignments
+    GUIConfigData.heli.ServoIndexW = m_ccpm->ccpmServoWChannel->currentIndex();
+    GUIConfigData.heli.ServoIndexX = m_ccpm->ccpmServoXChannel->currentIndex();
+    GUIConfigData.heli.ServoIndexY = m_ccpm->ccpmServoYChannel->currentIndex();
+    GUIConfigData.heli.ServoIndexZ = m_ccpm->ccpmServoZChannel->currentIndex();
+    
+}
+void ConfigccpmWidget::UpdatCCPMUIFromOptions()
+{
+    //swashplate config
+    m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->count() - (GUIConfigData.heli.SwasplateType +1));
+    m_ccpm->ccpmSingleServo->setCurrentIndex(GUIConfigData.heli.FirstServoIndex);
+    
+    //ccpm mixing options
+    m_ccpm->ccpmCollectivePassthrough->setChecked(GUIConfigData.heli.ccpmCollectivePassthroughState);
+    m_ccpm->ccpmLinkCyclic->setChecked(GUIConfigData.heli.ccpmLinkCyclicState);
+    m_ccpm->ccpmLinkRoll->setChecked(GUIConfigData.heli.ccpmLinkRollState);
+    
+    //correction angle
+    m_ccpm->ccpmCorrectionAngle->setValue(GUIConfigData.heli.CorrectionAngle);
+    
+    //CollectiveChannel
+    m_ccpm->ccpmCollectiveChannel->setCurrentIndex(GUIConfigData.heli.CollectiveChannel);
+    
+    //update sliders
+    m_ccpm->ccpmCollectiveScale->setValue(GUIConfigData.heli.SliderValue0);
+    m_ccpm->ccpmCollectiveScaleBox->setValue(GUIConfigData.heli.SliderValue0);
+    m_ccpm->ccpmCyclicScale->setValue(GUIConfigData.heli.SliderValue1);
+    m_ccpm->ccpmCyclicScaleBox->setValue(GUIConfigData.heli.SliderValue1);
+    m_ccpm->ccpmPitchScale->setValue(GUIConfigData.heli.SliderValue1);
+    m_ccpm->ccpmPitchScaleBox->setValue(GUIConfigData.heli.SliderValue1);
+    m_ccpm->ccpmRollScale->setValue(GUIConfigData.heli.SliderValue2);
+    m_ccpm->ccpmRollScaleBox->setValue(GUIConfigData.heli.SliderValue2);
+    m_ccpm->ccpmCollectiveSlider->setValue(GUIConfigData.heli.SliderValue0);
+    m_ccpm->ccpmCollectivespinBox->setValue(GUIConfigData.heli.SliderValue0);
+    //m_ccpm->ccpmREVOScale->setValue(GUIConfigData.heli.RevoSlider);
+    
+    //servo assignments
+    m_ccpm->ccpmServoWChannel->setCurrentIndex(GUIConfigData.heli.ServoIndexW);
+    m_ccpm->ccpmServoXChannel->setCurrentIndex(GUIConfigData.heli.ServoIndexX);
+    m_ccpm->ccpmServoYChannel->setCurrentIndex(GUIConfigData.heli.ServoIndexY);
+    m_ccpm->ccpmServoZChannel->setCurrentIndex(GUIConfigData.heli.ServoIndexZ);
+
+}
+
+
+void ConfigccpmWidget::SetUIComponentVisibilities()
+{
+    UpdatCCPMOptionsFromUI();
+    //set which sliders are user...
+    m_ccpm->ccpmRevoMixingBox->setVisible(0);
+    
+    m_ccpm->ccpmPitchMixingBox->setVisible(!GUIConfigData.heli.ccpmCollectivePassthroughState && GUIConfigData.heli.ccpmLinkCyclicState);
+    m_ccpm->ccpmCollectiveScalingBox->setVisible(GUIConfigData.heli.ccpmCollectivePassthroughState || !GUIConfigData.heli.ccpmLinkCyclicState);
+
+    m_ccpm->ccpmCollectiveChLabel->setVisible(GUIConfigData.heli.ccpmCollectivePassthroughState);
+    m_ccpm->ccpmCollectiveChannel->setVisible(GUIConfigData.heli.ccpmCollectivePassthroughState);
+
+    m_ccpm->ccpmLinkCyclic->setVisible(!GUIConfigData.heli.ccpmCollectivePassthroughState);
+    
+    m_ccpm->ccpmCyclicScalingBox->setVisible((GUIConfigData.heli.ccpmCollectivePassthroughState || !GUIConfigData.heli.ccpmLinkCyclicState) && GUIConfigData.heli.ccpmLinkRollState);
+    if (!GUIConfigData.heli.ccpmCollectivePassthroughState && GUIConfigData.heli.ccpmLinkCyclicState)
+    {
+        m_ccpm->ccpmPitchScalingBox->setVisible(0);
+        m_ccpm->ccpmRollScalingBox->setVisible(0);
+        m_ccpm->ccpmLinkRoll->setVisible(0);
+        
+    }
+    else
+    {
+        m_ccpm->ccpmPitchScalingBox->setVisible(!GUIConfigData.heli.ccpmLinkRollState);
+        m_ccpm->ccpmRollScalingBox->setVisible(!GUIConfigData.heli.ccpmLinkRollState);
+        m_ccpm->ccpmLinkRoll->setVisible(1);
+    }
+
+}
 /**
   Request the current value of the SystemSettings which holds the ccpm type
   */
@@ -838,12 +1188,22 @@ void ConfigccpmWidget::requestccpmUpdate()
     int isCCPM=0;
 
     if (SwashLvlConfigurationInProgress)return;
-
+    if (updatingToHardware)return;
+    updatingFromHardware=TRUE;
+    
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     int i,j;
     UAVObjectField *field;
     UAVDataObject* obj;
+    
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
+    field = obj->getField(QString("GUIConfigData"));
+    GUIConfigData.UAVObject[0]=field->getValue(0).toUInt();
+    GUIConfigData.UAVObject[1]=field->getValue(1).toUInt();
+    UpdatCCPMUIFromOptions();   
+
+    
     obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));
     Q_ASSERT(obj);
 
@@ -928,6 +1288,7 @@ void ConfigccpmWidget::requestccpmUpdate()
 
 
     //just call it user angles for now....
+    /*
     m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("Custom - User Angles"));
 
     if (NumServos>1)
@@ -958,9 +1319,11 @@ void ConfigccpmWidget::requestccpmUpdate()
     {//must be a custom config... "Custom - Advanced Settings"
         m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("Custom - Advanced Settings"));
     }
-
+    
     HeadRotation=0;
-    //calculate the angles
+    
+    HeadRotation=m_ccpm->ccpmSingleServo->currentIndex();
+   //calculate the angles
     for(j=0;j<NumServos;j++)
     {
         //MixerDataFromHeli[i][2]=(127.0*(1-CollectiveConstant)*sin((CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Roll
@@ -976,7 +1339,7 @@ void ConfigccpmWidget::requestccpmUpdate()
 
     }
     //set the head rotation
-    m_ccpm->ccpmSingleServo->setCurrentIndex(HeadRotation);
+    //m_ccpm->ccpmSingleServo->setCurrentIndex(HeadRotation);
 
     //calculate the un rotated angles
     for(j=0;j<NumServos;j++)
@@ -996,15 +1359,19 @@ void ConfigccpmWidget::requestccpmUpdate()
 
     }
 
-    m_ccpm->ccpmAngleW->setValue(ServoAngles[SortAngles[0]]);
-    m_ccpm->ccpmAngleX->setValue(ServoAngles[SortAngles[1]]);
-    m_ccpm->ccpmAngleY->setValue(ServoAngles[SortAngles[2]]);
-    m_ccpm->ccpmAngleZ->setValue(ServoAngles[SortAngles[3]]);
+    //m_ccpm->ccpmAngleW->setValue(ServoAngles[SortAngles[0]]);
+    //m_ccpm->ccpmAngleX->setValue(ServoAngles[SortAngles[1]]);
+    //m_ccpm->ccpmAngleY->setValue(ServoAngles[SortAngles[2]]);
+    //m_ccpm->ccpmAngleZ->setValue(ServoAngles[SortAngles[3]]);
 
-    m_ccpm->ccpmServoWChannel->setCurrentIndex(ServoChannels[SortAngles[0]]);
-    m_ccpm->ccpmServoXChannel->setCurrentIndex(ServoChannels[SortAngles[1]]);
-    m_ccpm->ccpmServoYChannel->setCurrentIndex(ServoChannels[SortAngles[2]]);
-    m_ccpm->ccpmServoZChannel->setCurrentIndex(ServoChannels[SortAngles[3]]);
+    //m_ccpm->ccpmServoWChannel->setCurrentIndex(ServoChannels[SortAngles[0]]);
+    //m_ccpm->ccpmServoXChannel->setCurrentIndex(ServoChannels[SortAngles[1]]);
+    //m_ccpm->ccpmServoYChannel->setCurrentIndex(ServoChannels[SortAngles[2]]);
+    //m_ccpm->ccpmServoZChannel->setCurrentIndex(ServoChannels[SortAngles[3]]);
+    m_ccpm->ccpmServoWChannel->setCurrentIndex(ServoChannels[0]);
+    m_ccpm->ccpmServoXChannel->setCurrentIndex(ServoChannels[1]);
+    m_ccpm->ccpmServoYChannel->setCurrentIndex(ServoChannels[2]);
+    m_ccpm->ccpmServoZChannel->setCurrentIndex(ServoChannels[3]);
 
 
     //Types << "CCPM 2 Servo 90º" << "CCPM 3 Servo 120º" << "CCPM 3 Servo 140º" << "FP 2 Servo 90º"  << "Custom - User Angles" << "Custom - Advanced Settings"  ;
@@ -1070,7 +1437,7 @@ void ConfigccpmWidget::requestccpmUpdate()
     {
 
     }
-
+*/
 
 
 
@@ -1091,7 +1458,8 @@ void ConfigccpmWidget::requestccpmUpdate()
 
 
 
-
+    updatingFromHardware=FALSE;
+    UpdatCCPMUIFromOptions();
     ccpmSwashplateUpdate();
 
 }
@@ -1107,10 +1475,22 @@ void ConfigccpmWidget::sendccpmUpdate()
     UAVDataObject* obj;
 
     if (SwashLvlConfigurationInProgress)return;
-    ShowDisclaimer(1);
+    updatingToHardware=TRUE;
+    //ShowDisclaimer(1);
+    
+    
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
+    UpdatCCPMOptionsFromUI();
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
+    field = obj->getField(QString("GUIConfigData"));
+    field->setValue(GUIConfigData.UAVObject[0],0);
+    field->setValue(GUIConfigData.UAVObject[1],1);
+    obj->updated();
+   
+
+    
     obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));
         Q_ASSERT(obj);
 
@@ -1176,8 +1556,32 @@ void ConfigccpmWidget::sendccpmUpdate()
             field->setValue(m_ccpm->CurveSettings->item(i, 1)->text().toDouble(),i);
         }
 
+    obj->updated();
+    
+    field = obj->getField(QString("Curve2Source"));
+    
+    //mapping of collective input to curve 2...
+    //MixerSettings.Curve2Source = Throttle,Roll,Pitch,Yaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5
+    //check if we are using throttle or directly from a channel...
+    if (GUIConfigData.heli.ccpmCollectivePassthroughState)
+    {// input channel
+        field->setValue("Accessory0");
         obj->updated();
-
+ 
+        obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
+        Q_ASSERT(obj);
+        field = obj->getField(QString("Accessory0"));
+        field->setValue(tr( "Channel%1" ).arg(GUIConfigData.heli.CollectiveChannel+1));
+        
+    }
+    else
+    {// throttle
+        
+        field->setValue("Throttle");
+    }
+    
+    obj->updated();
+    updatingToHardware=FALSE;
 
 }
 
@@ -1215,6 +1619,7 @@ void ConfigccpmWidget::showEvent(QShowEvent *event)
         m_ccpm->ccpmAdvancedSettingsTable->setColumnWidth(i,(m_ccpm->ccpmAdvancedSettingsTable->width()-
                                                         m_ccpm->ccpmAdvancedSettingsTable->verticalHeader()->width())/6);
     }
+    ccpmSwashplateRedraw();
 }
 
 

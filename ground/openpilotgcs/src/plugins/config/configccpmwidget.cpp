@@ -33,6 +33,7 @@
 #include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
+#include <QBrush>
 #include <math.h>
 #include <QMessageBox>
 
@@ -42,6 +43,7 @@
 ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     int i;
+    
     m_ccpm = new Ui_ccpmWidget();
     m_ccpm->setupUi(this);
     SwashLvlConfigurationInProgress=0;
@@ -75,9 +77,10 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     SwashplateImg->setSharedRenderer(renderer);
     SwashplateImg->setElementId("Swashplate");
     SwashplateImg->setObjectName("Swashplate");
+    //SwashplateImg->setScale(0.75);
     m_ccpm->SwashplateImage->scene()->addItem(SwashplateImg);
 
-    QFont serifFont("Times", 16, QFont::Bold);
+    QFont serifFont("Times", 24, QFont::Bold);
     QPen pen;  // creates a default pen
 
     pen.setStyle(Qt::DotLine);
@@ -86,6 +89,19 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     pen.setCapStyle(Qt::RoundCap);
     pen.setJoinStyle(Qt::RoundJoin);
 
+    
+    QBrush brush(Qt::darkBlue);
+    QPen pen2;  // creates a default pen
+    
+    //pen2.setStyle(Qt::DotLine);
+    pen2.setWidth(1);
+    pen2.setBrush(Qt::blue);
+    //pen2.setCapStyle(Qt::RoundCap);
+    //pen2.setJoinStyle(Qt::RoundJoin);
+    
+    
+   //brush.setStyle(Qt::RadialGradientPattern);
+    
     QList<QString> ServoNames;
     ServoNames << "ServoW" << "ServoX" << "ServoY" << "ServoZ" ;
 
@@ -99,10 +115,16 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
         m_ccpm->SwashplateImage->scene()->addItem(Servos[i]);
 
         ServosText[i] = new QGraphicsTextItem();
-        ServosText[i]->setDefaultTextColor(Qt::red);
+        ServosText[i]->setDefaultTextColor(Qt::yellow);
         ServosText[i]->setPlainText(QString("-"));
         ServosText[i]->setFont(serifFont);
+        
+        ServosTextCircles[i] = new QGraphicsEllipseItem(1,1,30,30);
+        ServosTextCircles[i]->setBrush(brush);
+        ServosTextCircles[i]->setPen(pen2);
+        m_ccpm->SwashplateImage->scene()->addItem(ServosTextCircles[i]);
         m_ccpm->SwashplateImage->scene()->addItem(ServosText[i]);
+        
 
 
         SwashLvlSpinBoxes[i] = new QSpinBox(m_ccpm->SwashLvlSwashplateImage);       // use QGraphicsView
@@ -282,7 +304,7 @@ void ConfigccpmWidget::UpdateType()
     m_ccpm->ccpmAngleX->setEnabled(TypeInt==1);
     m_ccpm->ccpmAngleY->setEnabled(TypeInt==1);
     m_ccpm->ccpmAngleZ->setEnabled(TypeInt==1);
-    m_ccpm->ccpmCorrectionAngle->setEnabled(TypeInt==1);
+    m_ccpm->ccpmCorrectionAngle->setEnabled(TypeInt!=0);
 
     m_ccpm->ccpmServoWChannel->setEnabled(TypeInt>0);
     m_ccpm->ccpmServoXChannel->setEnabled(TypeInt>0);
@@ -305,7 +327,7 @@ void ConfigccpmWidget::UpdateType()
     //m_ccpm->customThrottleCurve2Value->setVisible(1);
     //m_ccpm->label_41->setVisible(1);
 
-    NumServosDefined=1;
+    NumServosDefined=4;
     //set values for pre defined heli types
         if (TypeText.compare(QString("CCPM 2 Servo 90º"), Qt::CaseInsensitive)==0)
         {
@@ -319,7 +341,7 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
             m_ccpm->ccpmServoYChannel->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            m_ccpm->ccpmCorrectionAngle->setValue(0);
+            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=2;
 
         }
@@ -332,7 +354,7 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmAngleZ->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            m_ccpm->ccpmCorrectionAngle->setValue(0);
+            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=3;
         
         }
@@ -342,7 +364,7 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
             m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 180,360));
             m_ccpm->ccpmAngleZ->setValue(fmod(AdjustmentAngle + 270,360));
-            m_ccpm->ccpmCorrectionAngle->setValue(0);
+            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             m_ccpm->ccpmSingleServo->setEnabled(0);
             m_ccpm->ccpmSingleServo->setCurrentIndex(0);
             NumServosDefined=4;
@@ -357,7 +379,7 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmAngleZ->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            m_ccpm->ccpmCorrectionAngle->setValue(0);
+            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=3;
             
         }
@@ -370,7 +392,7 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmAngleZ->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            m_ccpm->ccpmCorrectionAngle->setValue(0);
+            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=3;
 
         }
@@ -386,7 +408,7 @@ void ConfigccpmWidget::UpdateType()
             m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
             m_ccpm->ccpmServoYChannel->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            m_ccpm->ccpmCorrectionAngle->setValue(0);
+            //m_ccpm->ccpmCorrectionAngle->setValue(0);
 
             m_ccpm->ccpmCollectivespinBox->setEnabled(0);
             m_ccpm->ccpmCollectiveSlider->setEnabled(0);
@@ -730,7 +752,7 @@ void ConfigccpmWidget::ccpmSwashplateRedraw()
 {
     double angle[CCPM_MAX_SWASH_SERVOS],CorrectionAngle,x,y,w,h,radius,CenterX,CenterY;
     int used[CCPM_MAX_SWASH_SERVOS],defined[CCPM_MAX_SWASH_SERVOS],i;
-    
+    QRectF bounds;
     QRect size;
     double scale,xscale,yscale;
 
@@ -758,7 +780,9 @@ void ConfigccpmWidget::ccpmSwashplateRedraw()
     CenterX=200;
     CenterY=200;
 
-    SwashplateImg->setPos(CenterX-200,CenterY-200);
+    bounds=SwashplateImg->boundingRect();
+    
+    SwashplateImg->setPos(CenterX-bounds.width()/2,CenterY-bounds.height()/2);
 
     defined[0]=(m_ccpm->ccpmServoWChannel->isEnabled());
     defined[1]=(m_ccpm->ccpmServoXChannel->isEnabled());
@@ -782,11 +806,28 @@ void ConfigccpmWidget::ccpmSwashplateRedraw()
         Servos[i]->setPos(x, y);
         Servos[i]->setVisible(used[i]!=0);
 
-        radius=170;
-        x=CenterX-(radius*sin(angle[i]))-10.00;
-        y=CenterY+(radius*cos(angle[i]))-10.00;
+        radius=150;
+        bounds=ServosText[i]->boundingRect();
+        x=CenterX-(radius*sin(angle[i]))-bounds.width()/2;
+        y=CenterY+(radius*cos(angle[i]))-bounds.height()/2;
+        
         ServosText[i]->setPos(x, y);
         ServosText[i]->setVisible(used[i]!=0);
+ 
+        if (bounds.width()>bounds.height())
+        {
+            bounds.setHeight(bounds.width());
+        }
+        else
+        {
+            bounds.setWidth(bounds.height());
+        }
+        x=CenterX-(radius*sin(angle[i]))-bounds.width()/2;
+        y=CenterY+(radius*cos(angle[i]))-bounds.height()/2;
+        
+        ServosTextCircles[i]->setRect(bounds);
+        ServosTextCircles[i]->setPos(x, y);
+        ServosTextCircles[i]->setVisible(used[i]!=0);
 
         w=SwashLvlSpinBoxes[i]->width()/2;
         h=SwashLvlSpinBoxes[i]->height()/2;

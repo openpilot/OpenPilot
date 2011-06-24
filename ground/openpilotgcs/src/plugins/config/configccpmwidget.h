@@ -34,6 +34,7 @@
 #include "uavobject.h"
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
+#include <QGraphicsEllipseItem>
 #include <QtGui/QWidget>
 #include <QList>
 
@@ -96,6 +97,7 @@ private:
         QGraphicsSvgItem *Servos[CCPM_MAX_SWASH_SERVOS];
         QGraphicsTextItem *ServosText[CCPM_MAX_SWASH_SERVOS];
         QGraphicsLineItem *ServoLines[CCPM_MAX_SWASH_SERVOS];
+        QGraphicsEllipseItem *ServosTextCircles[CCPM_MAX_SWASH_SERVOS];
         QSpinBox *SwashLvlSpinBoxes[CCPM_MAX_SWASH_SERVOS];
 
         bool SwashLvlConfigurationInProgress;

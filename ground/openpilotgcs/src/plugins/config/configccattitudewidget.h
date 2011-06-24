@@ -60,6 +60,7 @@ private:
     Ui_ccattitude *ui;
     QTimer timer;
     UAVObject::Metadata initialMdata;
+    quint8 initialBiasCorrected;
 
     int updates;
 

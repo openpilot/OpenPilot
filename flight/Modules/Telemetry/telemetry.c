@@ -143,7 +143,7 @@ int32_t TelemetryInitialize(void)
 	return 0;
 }
 
-module_initcall(TelemetryInitialize, 0, TelemetryStart, 0, MODULE_EXEC_LAST_FLAG);
+MODULE_INITCALL(TelemetryInitialize, 0, TelemetryStart, 0, MODULE_EXEC_LAST_FLAG);
 
 /**
  * Register a new object, adds object to local list and connects the queue depending on the object's

@@ -38,8 +38,8 @@
  * and we cannot define a linker script for each of them atm
  */
 
-#define uavobj_initcall(fn)
-#define module_initcall(ifn, iparam, sfn, sparam, flags)
+#define UAVOBJ_INITCALL(fn)
+#define MODULE_INITCALL(ifn, iparam, sfn, sparam, flags)
 
 #define MODULE_TASKCREATE_ALL();
 

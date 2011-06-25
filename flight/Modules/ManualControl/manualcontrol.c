@@ -170,7 +170,7 @@ int32_t ManualControlInitialize()
 	//ManualControlStart();
 	return 0;
 }
-module_initcall(ManualControlInitialize, 0, ManualControlStart, 0, MODULE_EXEC_NOORDER_FLAG);
+MODULE_INITCALL(ManualControlInitialize, 0, ManualControlStart, 0, MODULE_EXEC_NOORDER_FLAG);
 
 /**
  * Module task

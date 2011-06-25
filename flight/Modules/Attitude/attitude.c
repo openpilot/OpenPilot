@@ -131,7 +131,7 @@ int32_t AttitudeInitialize(void)
 	return 0;
 }
 
-module_initcall(AttitudeInitialize, 0, AttitudeStart, 0, MODULE_EXEC_NOORDER_FLAG);
+MODULE_INITCALL(AttitudeInitialize, 0, AttitudeStart, 0, MODULE_EXEC_NOORDER_FLAG);
 
 /**
  * Module thread, should not return.

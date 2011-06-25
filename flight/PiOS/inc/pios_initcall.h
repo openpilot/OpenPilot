@@ -76,7 +76,7 @@ extern initmodule_t __module_initcall_start[], __module_initcall_end[];
 #define UAVOBJ_INITCALL(fn)		__define_initcall("uavobj",fn,1)
 #define MODULE_INITCALL(ifn, iparam, sfn, sparam, flags)		__define_module_initcall("module", ifn, iparam, sfn, sparam, flags)
 
-#define MODULE_INITIALISE_ALL(); for (initmodule_t *fn = __module_initcall_start; fn < __module_initcall_end; fn++) \
+#define MODULE_INITIALISE_ALL  { for (initmodule_t *fn = __module_initcall_start; fn < __module_initcall_end; fn++) \
 									if (fn->fn_minit && ( (fn->flag & MODULE_EXEC_FIRST_FLAG) == MODULE_EXEC_FIRST_FLAG) ) \
 										(fn->fn_minit)(); \
 								for (initmodule_t *fn = __module_initcall_start; fn < __module_initcall_end; fn++) \
@@ -84,11 +84,11 @@ extern initmodule_t __module_initcall_start[], __module_initcall_end[];
 										(fn->fn_minit)(); \
 								for (initmodule_t *fn = __module_initcall_start; fn < __module_initcall_end; fn++) \
 									if (fn->fn_minit && ( (fn->flag & MODULE_EXEC_LAST_FLAG) == MODULE_EXEC_LAST_FLAG) ) \
-									    (fn->fn_minit)();
+									    (fn->fn_minit)(); }
 
-#define MODULE_TASKCREATE_ALL(); for (initmodule_t *fn = __module_initcall_start; fn < __module_initcall_end; fn++) \
+#define MODULE_TASKCREATE_ALL  { for (initmodule_t *fn = __module_initcall_start; fn < __module_initcall_end; fn++) \
 		if (fn->fn_tinit) \
-		   (fn->fn_tinit)();
+		   (fn->fn_tinit)(); }
 
 #endif	/* PIOS_INITCALL_H */
 

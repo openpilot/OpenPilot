@@ -77,7 +77,7 @@ int main()
 #endif
 
 	/* Initialize modules */
-	MODULE_INITIALISE_ALL();
+	MODULE_INITIALISE_ALL
 
     return 0;
 }

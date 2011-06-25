@@ -41,9 +41,9 @@
 #define UAVOBJ_INITCALL(fn)
 #define MODULE_INITCALL(ifn, iparam, sfn, sparam, flags)
 
-#define MODULE_TASKCREATE_ALL();
+#define MODULE_TASKCREATE_ALL
 
-#define MODULE_INITIALISE_ALL(); \
+#define MODULE_INITIALISE_ALL { \
 	/* Initialize modules */ \
 	InitModules(); \
 	/* Start the FreeRTOS scheduler which never returns.*/ \
@@ -56,7 +56,7 @@
 		PIOS_LED_Toggle(LED1); \
 		PIOS_LED_Toggle(LED2); \
 		PIOS_DELAY_WaitmS(100); \
-	}
+	}; }
 
 #endif	/* PIOS_INITCALL_H */
 

@@ -92,7 +92,7 @@ int main()
 	PIOS_Board_Init();
 
 	/* Initialize modules */
-	MODULE_INITIALISE_ALL();
+	MODULE_INITIALISE_ALL
 
 #if INCLUDE_TEST_TASKS
 	/* Create test tasks */

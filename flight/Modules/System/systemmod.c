@@ -120,7 +120,7 @@ static void systemTask(void *parameters)
 	portTickType lastSysTime;
 
 	/* create all modules thread */
-	MODULE_TASKCREATE_ALL();
+	MODULE_TASKCREATE_ALL
 
 	// Initialize vars
 	idleCounter = 0;

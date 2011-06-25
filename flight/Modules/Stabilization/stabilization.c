@@ -81,6 +81,7 @@ float gyro_alpha = 0;
 float gyro_filtered[3] = {0,0,0};
 float axis_lock_accum[3] = {0,0,0};
 uint8_t max_axis_lock = 0;
+uint8_t max_axislock_rate = 0;
 pid_type pids[PID_MAX];
 
 // Private functions
@@ -222,14 +223,20 @@ static void stabilizationTask(void* parameters)
 					break;
 
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK:
-					// Track accumulated error between axis lock
-					axis_lock_accum[i] += (attitudeDesiredAxis[i] - gyro_filtered[i]) * dT;
-					if(axis_lock_accum[i] > max_axis_lock)
-						axis_lock_accum[i] = max_axis_lock;
-					else if(axis_lock_accum[i] < -max_axis_lock)
-						axis_lock_accum[i] = -max_axis_lock;
+					if(fabs(attitudeDesiredAxis[i]) > max_axislock_rate) {
+						// While getting strong commands act like rate mode
+						rateDesiredAxis[i] = attitudeDesiredAxis[i];
+						axis_lock_accum[i] = 0;
+					} else {
+						// For weaker commands or no command simply attitude lock (almost) on no gyro change
+						axis_lock_accum[i] += (attitudeDesiredAxis[i] - gyro_filtered[i]) * dT;
+						if(axis_lock_accum[i] > max_axis_lock)
+							axis_lock_accum[i] = max_axis_lock;
+						else if(axis_lock_accum[i] < -max_axis_lock)
+							axis_lock_accum[i] = -max_axis_lock;
 
-					rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], axis_lock_accum[i]);
+						rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], axis_lock_accum[i]);
+					}
 					break;
 			}
 		}
@@ -383,6 +390,7 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 
 	// Maximum deviation to accumulate for axis lock
 	max_axis_lock = settings.MaxAxisLock;
+	max_axislock_rate = settings.MaxAxisLockRate;
 
 	// The dT has some jitter iteration to iteration that we don't want to
 	// make thie result unpredictable.  Still, it's nicer to specify the constant

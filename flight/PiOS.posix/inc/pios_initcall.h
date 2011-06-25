@@ -38,14 +38,22 @@
  * and we cannot define a linker script for each of them atm
  */
 
+extern void InitModules();
+extern void StartModules();
+
 #define UAVOBJ_INITCALL(fn)
 #define MODULE_INITCALL(ifn, iparam, sfn, sparam, flags)
 
-#define MODULE_TASKCREATE_ALL
+#define MODULE_TASKCREATE_ALL { \
+	/* Start all module threads */ \
+	StartModules(); \
+	}
 
 #define MODULE_INITIALISE_ALL { \
 	/* Initialize modules */ \
 	InitModules(); \
+	/* Initialize the system thread */ \
+	SystemModInitialize(); \
 	/* Start the FreeRTOS scheduler which never returns.*/ \
 	vTaskStartScheduler(); \
 	/* If all is well we will never reach here as the scheduler will now be running. */ \

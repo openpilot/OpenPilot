@@ -62,9 +62,6 @@ static void TaskSDCard(void *pvParameters);
 int32_t CONSOLE_Parse(uint8_t port, char c);
 void OP_ADC_NotifyChange(uint32_t pin, uint32_t pin_value);
 
-/* Prototype of generated InitModules() function */
-extern void InitModules(void);
-
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
 

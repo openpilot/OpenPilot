@@ -42,9 +42,6 @@
 
 /* Global Variables */
 
-/* Prototype of generated InitModules() function */
-extern void InitModules(void);
-
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
 

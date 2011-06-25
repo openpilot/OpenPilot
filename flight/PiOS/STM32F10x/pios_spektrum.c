@@ -51,8 +51,15 @@
 
 /* Global Variables */
 
+/* Provide a RCVR driver */
+static int32_t PIOS_SPEKTRUM_Get(uint32_t chan_id);
+
+const struct pios_rcvr_driver pios_spektrum_rcvr_driver = {
+	.read = PIOS_SPEKTRUM_Get,
+};
+
 /* Local Variables */
-static uint16_t CaptureValue[12],CaptureValueTemp[12];
+static uint16_t CaptureValue[PIOS_SPEKTRUM_NUM_INPUTS],CaptureValueTemp[PIOS_SPEKTRUM_NUM_INPUTS];
 static uint8_t prev_byte = 0xFF, sync = 0, bytecount = 0, datalength=0, frame_error=0, byte_array[20] = { 0 };
 uint8_t sync_of = 0;
 uint16_t supv_timer=0;
@@ -84,13 +91,13 @@ void PIOS_SPEKTRUM_Init(void)
 * \output -1 Channel not available
 * \output >0 Channel value
 */
-int16_t PIOS_SPEKTRUM_Get(int8_t Channel)
+static int32_t PIOS_SPEKTRUM_Get(uint32_t chan_id)
 {
 	/* Return error if channel not available */
-	if (Channel >= 12) {
+	if (chan_id >= PIOS_SPEKTRUM_NUM_INPUTS) {
 		return -1;
 	}
-	return CaptureValue[Channel];
+	return CaptureValue[chan_id];
 }
 
 /**
@@ -201,7 +208,7 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 			{
 				frame_error=1;
 			}
-			if (channeln < 12 && !frame_error)
+			if (channeln < PIOS_SPEKTRUM_NUM_INPUTS && !frame_error)
 				CaptureValueTemp[channeln] = data;
 		}
 	}
@@ -212,7 +219,7 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 		sync_of = 0;
 		if (!frame_error)
 		{
-			for(int i=0;i<12;i++)
+			for(int i=0;i<PIOS_SPEKTRUM_NUM_INPUTS;i++)
 			{
 				CaptureValue[i] = CaptureValueTemp[i];
 			}
@@ -224,7 +231,7 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 }
 
 /* Interrupt handler for USART */
-void SPEKTRUM_IRQHandler(uint32_t usart_id) {
+void PIOS_SPEKTRUM_irq_handler(uint32_t usart_id) {
 	/* by always reading DR after SR make sure to clear any error interrupts */
 	volatile uint16_t sr = pios_spektrum_cfg.pios_usart_spektrum_cfg->regs->SR;
 	volatile uint8_t b = pios_spektrum_cfg.pios_usart_spektrum_cfg->regs->DR;
@@ -248,7 +255,7 @@ void SPEKTRUM_IRQHandler(uint32_t usart_id) {
  *@brief This function is called between frames and when a spektrum word hasnt been decoded for too long
  *@brief clears the channel values
  */
-void PIOS_SPEKTRUM_irq_handler() {
+void PIOS_SPEKTRUMSV_irq_handler() {
 	/* 125hz */
 	supv_timer++;
 	if(supv_timer > 5) {
@@ -262,7 +269,7 @@ void PIOS_SPEKTRUM_irq_handler() {
 		if (sync_of > 12) {
 			/* signal lost */
 			sync_of = 0;
-			for (int i = 0; i < 12; i++) {
+			for (int i = 0; i < PIOS_SPEKTRUM_NUM_INPUTS; i++) {
 				CaptureValue[i] = 0;
 				CaptureValueTemp[i] = 0;
 			}

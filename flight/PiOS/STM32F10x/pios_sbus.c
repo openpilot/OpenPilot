@@ -36,6 +36,13 @@
 
 /* Global Variables */
 
+/* Provide a RCVR driver */
+static int32_t PIOS_SBUS_Get(uint32_t chan_id);
+
+const struct pios_rcvr_driver pios_sbus_rcvr_driver = {
+	.read = PIOS_SBUS_Get,
+};
+
 /* Local Variables */
 static uint16_t channel_data[SBUS_NUMBER_OF_CHANNELS];
 static uint8_t received_data[SBUS_FRAME_LENGTH - 2];
@@ -154,19 +161,19 @@ void PIOS_SBUS_Init(void)
  * \output -1 channel not available
  * \output >0 channel value
  */
-int16_t PIOS_SBUS_Get(int8_t channel)
+static int32_t PIOS_SBUS_Get(uint32_t chan_id)
 {
 	/* return error if channel is not available */
-	if (channel >= SBUS_NUMBER_OF_CHANNELS) {
+	if (chan_id >= SBUS_NUMBER_OF_CHANNELS) {
 		return -1;
 	}
-	return channel_data[channel];
+	return channel_data[chan_id];
 }
 
 /**
  * Interrupt handler for USART
  */
-void SBUS_IRQHandler(uint32_t usart_id)
+void PIOS_SBUS_irq_handler(uint32_t usart_id)
 {
 	/* by always reading DR after SR make sure to clear any error interrupts */
 	volatile uint16_t sr = pios_sbus_cfg.pios_usart_sbus_cfg->regs->SR;
@@ -198,7 +205,7 @@ void SBUS_IRQHandler(uint32_t usart_id)
  * data reception. If no new data received in 100ms, we must call the
  * failsafe function which clears all channels.
  */
-void PIOS_SBUS_irq_handler()
+void PIOS_SBUSSV_irq_handler()
 {
 	/* waiting for new frame if no bytes were received in 3.2ms */
 	if (++receive_timer > 2) {

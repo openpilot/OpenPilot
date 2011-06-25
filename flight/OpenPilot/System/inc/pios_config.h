@@ -42,6 +42,8 @@
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
 
+#define PIOS_INCLUDE_RCVR
+
 #if defined(USE_SPEKTRUM)
 #define PIOS_INCLUDE_SPEKTRUM
 #elif defined(USE_SBUS)

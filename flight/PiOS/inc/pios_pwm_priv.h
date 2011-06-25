@@ -57,6 +57,10 @@ extern void PIOS_PWM_irq_handler(TIM_TypeDef * timer);
 extern uint8_t pios_pwm_num_channels;
 extern const struct pios_pwm_cfg pios_pwm_cfg;
 
+extern const struct pios_rcvr_driver pios_pwm_rcvr_driver;
+
+extern void PIOS_PWM_Init(void);
+
 #endif /* PIOS_PWM_PRIV_H */
 
 /**

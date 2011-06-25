@@ -34,8 +34,14 @@
 
 #if defined(PIOS_INCLUDE_PPM)
 
-/* Local Variables */
+/* Provide a RCVR driver */
+static int32_t PIOS_PPM_Get(uint32_t chan_id);
 
+const struct pios_rcvr_driver pios_ppm_rcvr_driver = {
+	.read = PIOS_PPM_Get,
+};
+
+/* Local Variables */
 static TIM_ICInitTypeDef TIM_ICInitStructure;
 static uint8_t PulseIndex;
 static uint32_t PreviousValue;
@@ -208,13 +214,13 @@ void PIOS_PPM_Init(void)
 * \output -1 Channel not available
 * \output >0 Channel value
 */
-int32_t PIOS_PPM_Get(int8_t Channel)
+static int32_t PIOS_PPM_Get(uint32_t chan_id)
 {
 	/* Return error if channel not available */
-	if (Channel >= PIOS_PPM_NUM_INPUTS) {
+	if (chan_id >= PIOS_PPM_NUM_INPUTS) {
 		return -1;
 	}
-	return CaptureValue[Channel];
+	return CaptureValue[chan_id];
 }
 
 /**

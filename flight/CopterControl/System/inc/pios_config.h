@@ -43,6 +43,8 @@
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
 
+#define PIOS_INCLUDE_RCVR
+
 /* Receiver interfaces - only one allowed */
 #if !defined(USE_SPEKTRUM) && !defined(USE_SBUS)
 //#define PIOS_INCLUDE_PPM

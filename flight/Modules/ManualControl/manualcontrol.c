@@ -209,19 +209,12 @@ static void manualControlTask(void *parameters)
 		if (!ManualControlCommandReadOnly(&cmd)) {
 
 			// Read channel values in us
-			// TODO: settings.InputMode is currently ignored because PIOS will not allow runtime
-			// selection of PWM and PPM. The configuration is currently done at compile time in
-			// the pios_config.h file.
 			for (int n = 0; n < MANUALCONTROLCOMMAND_CHANNEL_NUMELEM; ++n) {
-#if defined(PIOS_INCLUDE_PWM)
-				cmd.Channel[n] = PIOS_PWM_Get(n);
-#elif defined(PIOS_INCLUDE_PPM)
-				cmd.Channel[n] = PIOS_PPM_Get(n);
-#elif defined(PIOS_INCLUDE_SPEKTRUM)
-				cmd.Channel[n] = PIOS_SPEKTRUM_Get(n);
-#elif defined(PIOS_INCLUDE_SBUS)
-				cmd.Channel[n] = PIOS_SBUS_Get(n);
-#endif
+				if (pios_rcvr_channel_to_id_map[n]) {
+					cmd.Channel[n] = PIOS_RCVR_Read(pios_rcvr_channel_to_id_map[n]);
+				} else {
+					cmd.Channel[n] = -1;
+				}
 				scaledChannel[n] = scaleChannel(cmd.Channel[n], settings.ChannelMax[n],	settings.ChannelMin[n], settings.ChannelNeutral[n]);
 			}
 

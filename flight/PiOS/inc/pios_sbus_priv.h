@@ -76,9 +76,16 @@ struct pios_sbus_cfg {
 	GPIO_InitTypeDef gpio_inv_init;
 	BitAction gpio_inv_enable;
 };
-extern const struct pios_sbus_cfg pios_sbus_cfg;
 
 extern void PIOS_SBUS_irq_handler();
+extern void PIOS_SBUSSV_irq_handler();
+
+extern uint8_t pios_sbus_num_channels;
+extern const struct pios_sbus_cfg pios_sbus_cfg;
+
+extern const struct pios_rcvr_driver pios_sbus_rcvr_driver;
+
+extern void PIOS_SBUS_Init(void);
 
 #endif /* PIOS_SBUS_PRIV_H */
 

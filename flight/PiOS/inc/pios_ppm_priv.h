@@ -59,6 +59,10 @@ extern uint8_t pios_ppm_num_channels;
 extern const struct pios_ppm_cfg pios_ppm_cfg;
 extern const struct pios_ppmsv_cfg pios_ppmsv_cfg;
 
+extern const struct pios_rcvr_driver pios_ppm_rcvr_driver;
+
+extern void PIOS_PPM_Init(void);
+
 #endif /* PIOS_PPM_PRIV_H */
 
 /**

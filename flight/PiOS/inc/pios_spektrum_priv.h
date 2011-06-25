@@ -45,9 +45,14 @@ struct pios_spektrum_cfg {
 };
 
 extern void PIOS_SPEKTRUM_irq_handler();
+extern void PIOS_SPEKTRUMSV_irq_handler();
 
 extern uint8_t pios_spektrum_num_channels;
 extern const struct pios_spektrum_cfg pios_spektrum_cfg;
+
+extern const struct pios_rcvr_driver pios_spektrum_rcvr_driver;
+
+extern void PIOS_SPEKTRUM_Init(void);
 
 #endif /* PIOS_PWM_PRIV_H */
 

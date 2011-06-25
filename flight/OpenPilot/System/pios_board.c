@@ -497,13 +497,13 @@ const struct pios_usart_cfg pios_usart_spektrum_cfg = {
   },
 };
 
+#include <pios_spektrum_priv.h>
 static uint32_t pios_usart_spektrum_id;
 void PIOS_USART_spektrum_irq_handler(void)
 {
-	SPEKTRUM_IRQHandler(pios_usart_spektrum_id);
+	PIOS_SPEKTRUM_irq_handler(pios_usart_spektrum_id);
 }
 
-#include <pios_spektrum_priv.h>
 void RTC_IRQHandler();
 void RTC_IRQHandler() __attribute__ ((alias ("PIOS_SUPV_irq_handler")));
 const struct pios_spektrum_cfg pios_spektrum_cfg = {
@@ -525,11 +525,11 @@ const struct pios_spektrum_cfg pios_spektrum_cfg = {
 	.pin = GPIO_Pin_10,
 };
 
-void PIOS_SUPV_irq_handler() {
+void PIOS_SUPV_irq_handler(void) {
 	if (RTC_GetITStatus(RTC_IT_SEC))
 	{
 		/* Call the right handler */
-		PIOS_SPEKTRUM_irq_handler(pios_usart_spektrum_id);
+		PIOS_SPEKTRUMSV_irq_handler(pios_usart_spektrum_id);
 
 		/* Wait until last write operation on RTC registers has finished */
 		RTC_WaitForLastTask();
@@ -802,7 +802,7 @@ const struct pios_ppmsv_cfg pios_ppmsv_cfg = {
 	.ccr = TIM_IT_Update,
 };
 
-void PIOS_TIM6_irq_handler()
+void PIOS_TIM6_irq_handler(void)
 {
 	PIOS_PPMSV_irq_handler();
 }
@@ -844,7 +844,7 @@ const struct pios_ppm_cfg pios_ppm_cfg = {
 	.ccr = TIM_IT_CC2,
 };
 
-void PIOS_TIM1_CC_irq_handler()
+void PIOS_TIM1_CC_irq_handler(void)
 {
 	PIOS_PPM_irq_handler();
 }
@@ -1013,6 +1013,13 @@ static const struct stm32_gpio pios_debug_pins[] = {
 
 #endif /* PIOS_ENABLE_DEBUG_PINS */
 
+#if defined(PIOS_INCLUDE_RCVR)
+#include "pios_rcvr_priv.h"
+
+uint32_t pios_rcvr_channel_to_id_map[PIOS_RCVR_MAX_DEVS];
+uint32_t pios_rcvr_max_channel;
+#endif /* PIOS_INCLUDE_RCVR */
+
 extern const struct pios_com_driver pios_usb_com_driver;
 
 uint32_t pios_com_telem_rf_id;
@@ -1050,18 +1057,6 @@ void PIOS_Board_Init(void) {
 	PIOS_SDCARD_MountFS(0);
 #endif /* PIOS_INCLUDE_SPI */
 
-#if defined(PIOS_INCLUDE_SPEKTRUM)
-	/* SPEKTRUM init must come before comms */
-	PIOS_RTC_Init();  // Spektrum uses RTC to check for frame failures
-	PIOS_SPEKTRUM_Init();
-
-	if (PIOS_USART_Init(&pios_usart_spektrum_id, &pios_usart_spektrum_cfg)) {
-		PIOS_DEBUG_Assert(0);
-	}
-	if (PIOS_COM_Init(&pios_com_spektrum_id, &pios_usart_com_driver, pios_usart_spektrum_id)) {
-		PIOS_DEBUG_Assert(0);
-	}
-#endif
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
 	UAVObjInitialize();
@@ -1105,11 +1100,59 @@ void PIOS_Board_Init(void) {
 	PIOS_ADC_Init();
 	PIOS_GPIO_Init();
 
+#if defined(PIOS_INCLUDE_SPEKTRUM)
+#if (PIOS_SPEKTRUM_NUM_INPUTS > PIOS_RCVR_MAX_DEVS)
+#error More receiver inputs than available devices
+#endif
+	/* SPEKTRUM init must come before comms */
+	PIOS_SPEKTRUM_Init();
+
+	if (PIOS_USART_Init(&pios_usart_spektrum_id, &pios_usart_spektrum_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
+	if (PIOS_COM_Init(&pios_com_spektrum_id, &pios_usart_com_driver, pios_usart_spektrum_id)) {
+		PIOS_DEBUG_Assert(0);
+	}
+	for (uint8_t i = 0; i < PIOS_SPEKTRUM_NUM_INPUTS; i++) {
+		if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
+				   &pios_spektrum_rcvr_driver,
+				   i)) {
+			pios_rcvr_max_channel++;
+		} else {
+			PIOS_DEBUG_Assert(0);
+		}
+	}
+#endif
+
 #if defined(PIOS_INCLUDE_PWM)
+#if (PIOS_PWM_NUM_INPUTS > PIOS_RCVR_MAX_DEVS)
+#error More receiver inputs than available devices
+#endif
 	PIOS_PWM_Init();
+	for (uint8_t i = 0; i < PIOS_PWM_NUM_INPUTS; i++) {
+		if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
+			   &pios_pwm_rcvr_driver,
+			   i)) {
+			pios_rcvr_max_channel++;
+		} else {
+			PIOS_DEBUG_Assert(0);
+		}
+	}
 #endif
 #if defined(PIOS_INCLUDE_PPM)
+#if (PIOS_PPM_NUM_INPUTS > PIOS_RCVR_MAX_DEVS)
+#error More receiver inputs than available devices
+#endif
 	PIOS_PPM_Init();
+	for (uint8_t i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
+		if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
+			   &pios_ppm_rcvr_driver,
+			   i)) {
+			pios_rcvr_max_channel++;
+		} else {
+			PIOS_DEBUG_Assert(0);
+		}
+	}
 #endif
 #if defined(PIOS_INCLUDE_USB_HID)
 	PIOS_USB_HID_Init(0);

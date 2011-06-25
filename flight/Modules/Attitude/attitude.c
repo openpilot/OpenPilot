@@ -158,7 +158,10 @@ static void AttitudeTask(void *parameters)
 			yawBiasRate = 0.23;
 			init = 0;
 		} else if (init == 0) {
-			settingsUpdatedCb(AttitudeSettingsHandle());
+			// Reload settings (all the rates)
+			AttitudeSettingsAccelKiGet(&accelKi);
+			AttitudeSettingsAccelKpGet(&accelKp);
+			AttitudeSettingsYawBiasRateGet(&yawBiasRate);
 			init = 1;
 		}
 

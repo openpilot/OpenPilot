@@ -37,8 +37,10 @@ runningDeviceWidget::runningDeviceWidget(QWidget *parent) :
     // Initialization of the Device icon display
     myDevice->devicePicture->setScene(new QGraphicsScene(this));
 
+    /*
     QPixmap pix = QPixmap(QString(":uploader/images/view-refresh.svg"));
     myDevice->statusIcon->setPixmap(pix);
+    */
 }
 
 
@@ -104,7 +106,7 @@ void runningDeviceWidget::populate()
     myDevice->devicePicture->fitInView(devicePic,Qt::KeepAspectRatio);
 
     QString serial = utilMngr->getBoardCPUSerial().toHex();
-     myDevice->lblCPU->setText(QString("CPU serial number: "+serial));
+     myDevice->CPUSerial->setText(serial);
 
     QByteArray description = utilMngr->getBoardDescription();
     deviceDescriptorStruct devDesc;
@@ -120,7 +122,7 @@ void runningDeviceWidget::populate()
         }
         else
         {
-            myDevice->lblFWTag->setText(QString("Firmware tag: ")+devDesc.description+QString(" (beta or custom build)"));
+            myDevice->lblFWTag->setText(QString("Firmware tag: ")+devDesc.description);
             QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
             myDevice->lblCertified->setPixmap(pix);
             myDevice->lblCertified->setToolTip(tr("Custom Firmware Build"));
@@ -138,13 +140,14 @@ void runningDeviceWidget::populate()
         myDevice->lblCertified->setPixmap(pix);
         myDevice->lblCertified->setToolTip(tr("Custom Firmware Build"));
     }
-    status("Ready...", STATUSICON_INFO);
+    //status("Ready...", STATUSICON_INFO);
 }
 
 
 /**
   Updates status message
   */
+/*
 void runningDeviceWidget::status(QString str, StatusIcon ic)
 {
     QPixmap px;
@@ -164,3 +167,4 @@ void runningDeviceWidget::status(QString str, StatusIcon ic)
     }
     myDevice->statusIcon->setPixmap(px);
 }
+*/

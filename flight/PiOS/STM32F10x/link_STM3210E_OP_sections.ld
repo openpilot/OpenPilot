@@ -3,7 +3,7 @@ _irq_stack_size = 0x400;
 /* This is the size of the stack for early init: life span is until scheduler starts */
 _init_stack_size = 0x400;
 /* there is probably a way to get that from the MEMORY section */
-_eram = 0x20010000;
+_eram = ORIGIN(RAM) + LENGTH(RAM);
 
 /* Check valid alignment for VTOR */
 ASSERT(ORIGIN(FLASH) == ALIGN(ORIGIN(FLASH), 0x80), "Start of memory region flash not aligned for startup vector table");

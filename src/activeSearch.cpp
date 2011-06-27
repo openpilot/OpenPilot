@@ -44,6 +44,8 @@ namespace jafar {
 		// Functions to fill in cells
 		void ActiveSearchGrid::addObs(const vec2 & p) {
 			veci2 cell = pix2cell(p);
+			if (cell(0) < 0 || cell(1) < 0 || cell(0) >= gridSize(0) || cell(1) >= gridSize(1))
+				return;
 			if (projectionsCount(cell(0), cell(1)) == -1)
 				projectionsCount(cell(0), cell(1)) = 0;
 			projectionsCount(cell(0), cell(1))++;

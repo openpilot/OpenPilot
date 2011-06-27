@@ -159,7 +159,16 @@ namespace jafar {
 					r2i = r2i * r2; //                    r2i = r^(2*(i+1))
 					s += d(i) * r2i; //                   s = 1 + d_0 * r^2 + d_1 * r^4 + d_2 * r^6 + ...
 				}
-				if (s < 0.5) s = 1.0; // because the model is not valid too much out of the image, avoid to wrongly bring them back in the field of view
+				/*
+					The model is not valid out of the image, and it can bring back landmarks very quickly after they got out.
+					We should compute the point where the monotony changes by solving d/du u.f(u,v) = 0, but it would require a lot
+					more computations to check the validity of the transform than to compute the distortion... and it should be done
+					manually for every size of d (fortunately only 2 or 3 usually).
+					So we just make a rough test on s, no camera should have a distortion greater than this, and anyway it will just
+					prevent from observing some points on the borders of the image. In that case the landmark will seem to suddenly
+					jump outside of the image.
+				*/
+				if (s < 0.6) s = 1.0;
 				return s;
 			}
 

@@ -587,6 +587,8 @@ std::cout << "connecting slots" << std::endl;
                   (*it)->setVisible(false);
                   ++it;
                   (*it)->setVisible(false);
+                  ++it;
+                  (*it)->setVisible(false);
                }
 
 #if EMBED_PREDICTED_APP

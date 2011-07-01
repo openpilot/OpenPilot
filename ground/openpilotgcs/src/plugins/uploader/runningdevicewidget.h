@@ -55,7 +55,7 @@ private:
     Ui_runningDeviceWidget *myDevice;
     int deviceID;
     QGraphicsSvgItem *devicePic;
-    void status(QString str, StatusIcon ic);
+    //void status(QString str, StatusIcon ic);
 
 
 signals:

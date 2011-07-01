@@ -580,7 +580,10 @@ std::cout << "connecting slots" << std::endl;
                   (*it)->setPos((x1 + x2) / 2,(y1 + y2) / 2);
                   (*it)->setRotation(angle);
                   (*it)->setScale(scale);
-                  (*it)->setVisible(true);
+						if(match_score > 0.01)
+							(*it)->setVisible(true);
+						else
+							(*it)->setVisible(false);
                }
                else
                {

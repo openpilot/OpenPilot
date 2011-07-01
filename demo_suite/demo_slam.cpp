@@ -89,7 +89,7 @@
  * 1 use segments
  * 2 use both sgments and points
  */
-#define SEGMENT_BASED 0
+#define SEGMENT_BASED 2
 
 #if SEGMENT_BASED
 	#ifndef HAVE_MODULE_DSEG

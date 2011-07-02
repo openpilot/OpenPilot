@@ -422,6 +422,35 @@ const struct pios_usart_cfg pios_usart_gps_cfg = {
 };
 #endif
 
+#if defined(PIOS_INCLUDE_RTC)
+/*
+ * Realtime Clock (RTC)
+ */
+#include <pios_rtc_priv.h>
+
+void PIOS_RTC_IRQ_Handler (void);
+void RTC_IRQHandler() __attribute__ ((alias ("PIOS_RTC_IRQ_Handler")));
+const struct pios_rtc_cfg pios_rtc_main_cfg = {
+	.clksrc = RCC_RTCCLKSource_HSE_Div128,
+	.prescaler = 100,
+	.irq = {
+		.handler = PIOS_RTC_IRQ_Handler,
+		.init = {
+			.NVIC_IRQChannel                   = RTC_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		  },
+	},
+};
+
+void PIOS_RTC_IRQ_Handler (void)
+{
+	PIOS_RTC_irq_handler ();
+}
+
+#endif
+
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 /*
  * SPEKTRUM USART
@@ -476,8 +505,6 @@ void PIOS_USART_spektrum_irq_handler(void)
 	PIOS_SPEKTRUM_irq_handler(pios_usart_spektrum_id);
 }
 
-void RTC_IRQHandler();
-void RTC_IRQHandler() __attribute__ ((alias ("PIOS_SUPV_irq_handler")));
 const struct pios_spektrum_cfg pios_spektrum_cfg = {
 	.pios_usart_spektrum_cfg = &pios_usart_spektrum_cfg,
 	.gpio_init = { //used for bind feature
@@ -485,30 +512,10 @@ const struct pios_spektrum_cfg pios_spektrum_cfg = {
 		.GPIO_Speed = GPIO_Speed_2MHz,
 	},
 	.remap = 0,
-	.irq = {
-		.handler = RTC_IRQHandler,
-		.init    = {
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-			.NVIC_IRQChannelSubPriority        = 0,
-			.NVIC_IRQChannelCmd                = ENABLE,
-		},
-	},
 	.port = PIOS_GPIO_SPEKTRUM,
 	.pin = PIOS_RXIO_SPEKTRUM,
 };
 
-void PIOS_SUPV_irq_handler() {
-	if (RTC_GetITStatus(RTC_IT_SEC))
-	{
-		/* Call the right handler */
-		PIOS_SPEKTRUMSV_irq_handler(pios_usart_spektrum_id);
-
-		/* Wait until last write operation on RTC registers has finished */
-		RTC_WaitForLastTask();
-		/* Clear the RTC Second interrupt */
-		RTC_ClearITPendingBit(RTC_IT_SEC);
-	}
-}
 #endif	/* PIOS_INCLUDE_SPEKTRUM */
 
 #if defined(PIOS_INCLUDE_SBUS)
@@ -565,8 +572,6 @@ void PIOS_USART_sbus_irq_handler(void)
 }
 
 #include <pios_sbus_priv.h>
-void RTC_IRQHandler();
-void RTC_IRQHandler() __attribute__ ((alias ("PIOS_SUPV_irq_handler")));
 const struct pios_sbus_cfg pios_sbus_cfg = {
 	/* USART configuration structure */
 	.pios_usart_sbus_cfg = &pios_usart_sbus_cfg,
@@ -583,18 +588,6 @@ const struct pios_sbus_cfg pios_sbus_cfg = {
 	.gpio_inv_enable = Bit_SET,
 };
 
-void PIOS_SUPV_irq_handler() {
-	if (RTC_GetITStatus(RTC_IT_SEC))
-	{
-		/* Call the right handler */
-		PIOS_SBUSSV_irq_handler(pios_usart_sbus_id);
-
-		/* Wait until last write operation on RTC registers has finished */
-		RTC_WaitForLastTask();
-		/* Clear the RTC Second interrupt */
-		RTC_ClearITPendingBit(RTC_IT_SEC);
-	}
-}
 #endif	/* PIOS_INCLUDE_SBUS */
 
 #if defined(PIOS_INCLUDE_TELEMETRY_RF)
@@ -908,6 +901,11 @@ void PIOS_Board_Init(void) {
 	EventDispatcherInitialize();
 	UAVObjInitialize();
 	UAVObjectsInitializeAll();
+
+#if defined(PIOS_INCLUDE_RTC)
+	/* Initialize the real-time clock and its associated tick */
+	PIOS_RTC_Init(&pios_rtc_main_cfg);
+#endif
 
 	/* Initialize the alarms library */
 	AlarmsInitialize();

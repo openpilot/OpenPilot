@@ -50,6 +50,8 @@ static uint8_t receive_timer;
 static uint8_t failsafe_timer;
 static uint8_t frame_found;
 
+static void PIOS_SBUS_Supervisor(uint32_t sbus_id);
+
 /**
  * reset_channels() function clears all channel data in case of
  * lost signal or explicit failsafe flag from the S.Bus data stream
@@ -142,17 +144,9 @@ void PIOS_SBUS_Init(void)
 		      pios_sbus_cfg.gpio_inv_init.GPIO_Pin,
 		      pios_sbus_cfg.gpio_inv_enable);
 
-	/* Init RTC supervisor timer interrupt */
-	static const NVIC_InitTypeDef NVIC_InitStructure = {
-		.NVIC_IRQChannel = RTC_IRQn,
-		.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-		.NVIC_IRQChannelSubPriority = 0,
-		.NVIC_IRQChannelCmd = ENABLE,
-	};
-	NVIC_Init(&NVIC_InitStructure);
-
-	/* Init RTC clock */
-	PIOS_RTC_Init();
+	if (!PIOS_RTC_RegisterTickCallback(PIOS_SBUS_Supervisor, 0)) {
+		PIOS_DEBUG_Assert(0);
+	}
 }
 
 /**
@@ -205,7 +199,7 @@ void PIOS_SBUS_irq_handler(uint32_t usart_id)
  * data reception. If no new data received in 100ms, we must call the
  * failsafe function which clears all channels.
  */
-void PIOS_SBUSSV_irq_handler()
+static void PIOS_SBUS_Supervisor(uint32_t sbus_id)
 {
 	/* waiting for new frame if no bytes were received in 3.2ms */
 	if (++receive_timer > 2) {

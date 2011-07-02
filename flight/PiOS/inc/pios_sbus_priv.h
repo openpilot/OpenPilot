@@ -78,7 +78,6 @@ struct pios_sbus_cfg {
 };
 
 extern void PIOS_SBUS_irq_handler();
-extern void PIOS_SBUSSV_irq_handler();
 
 extern uint8_t pios_sbus_num_channels;
 extern const struct pios_sbus_cfg pios_sbus_cfg;

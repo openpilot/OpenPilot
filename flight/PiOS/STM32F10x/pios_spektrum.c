@@ -64,6 +64,8 @@ static uint8_t prev_byte = 0xFF, sync = 0, bytecount = 0, datalength=0, frame_er
 uint8_t sync_of = 0;
 uint16_t supv_timer=0;
 
+static void PIOS_SPEKTRUM_Supervisor(uint32_t spektrum_id);
+
 /**
 * Bind and Initialise Spektrum satellite receiver
 */
@@ -74,15 +76,9 @@ void PIOS_SPEKTRUM_Init(void)
 		PIOS_SPEKTRUM_Bind();
 	}
 
-	/* Init RTC supervisor timer interrupt */
-	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure.NVIC_IRQChannel = RTC_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
-	/* Init RTC clock */
-	PIOS_RTC_Init();
+	if (!PIOS_RTC_RegisterTickCallback(PIOS_SPEKTRUM_Supervisor, 0)) {
+		PIOS_DEBUG_Assert(0);
+	}
 }
 
 /**
@@ -255,7 +251,7 @@ void PIOS_SPEKTRUM_irq_handler(uint32_t usart_id) {
  *@brief This function is called between frames and when a spektrum word hasnt been decoded for too long
  *@brief clears the channel values
  */
-void PIOS_SPEKTRUMSV_irq_handler() {
+static void PIOS_SPEKTRUM_Supervisor(uint32_t spektrum_id) {
 	/* 125hz */
 	supv_timer++;
 	if(supv_timer > 5) {

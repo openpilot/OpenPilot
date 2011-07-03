@@ -44,6 +44,7 @@
 
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
+extern void Stack_Change(void);
 
 /**
 * OpenPilot Main function:
@@ -68,13 +69,23 @@ int main()
 	 * */
 	PIOS_Board_Init();
 
-#ifdef ERASE_FLASH
-	PIOS_Flash_W25X_EraseChip();
-	while(TRUE){};
-#endif
-
 	/* Initialize modules */
 	MODULE_INITIALISE_ALL
+
+	/* swap the stack to use the IRQ stack */
+	Stack_Change();
+
+	/* Start the FreeRTOS scheduler which should never returns.*/
+	vTaskStartScheduler();
+
+	/* If all is well we will never reach here as the scheduler will now be running. */
+
+	/* Do some indication to user that something bad just happened */
+	PIOS_LED_Off(LED1); \
+	for(;;) { \
+		PIOS_LED_Toggle(LED1); \
+		PIOS_DELAY_WaitmS(100); \
+	};
 
     return 0;
 }

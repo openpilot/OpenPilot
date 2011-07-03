@@ -35,6 +35,7 @@
 .global  Default_Handler
 .global  vTaskStartScheduler
 .global  xPortIncreaseHeapSize
+.global  Stack_Change
 
 /* start address for the initialization values of the .data section. 
 defined in linker script */
@@ -49,6 +50,7 @@ defined in linker script */
 .word  _ebss
 
 .equ  BootRAM, 0xF108F85F
+.equ  WWDG, 0x40002C00
 
 /**
  * @brief  This is the code that gets called when the processor first
@@ -127,9 +129,25 @@ LoopFillZerobss:
   bcc  FillZerobss
 /* Call the application's entry point.*/
   bl  main
+/* will never return here */
+  bx  lr
+.size  Reset_Handler, .-Reset_Handler
+
+/**
+ * @brief  This is the code that swaps stack (from end of heap to irq_stack).
+ *         Also reclaim the heap that was used as a stack.
+ * @param  None     
+ * @retval : None       
+*/
+  .section  .text.Stack_Change
+  .weak  Stack_Change
+  .type  Stack_Change, %function
+Stack_Change:
+  mov r4, lr
 /* Switches stack back momentarily to MSP */
-  add r0, #0
+  movs r0, #0
   msr control, r0
+Heap_Reclaim:
 /* add heap_post_rtos to the heap (if the capability/function exist) */
 /* Also claim the unused memory (between end of heap to end of memory */
 /* CAREFULL: the heap section must be the last section in RAM in order this to work */
@@ -139,23 +157,17 @@ LoopFillZerobss:
   subs r2, r2, r1
   adds r0, r0, r2
   bl xPortIncreaseHeapSize
-/* Start the FreeRTOS scheduler which never returns.*/
-  bl vTaskStartScheduler
-/* If all is well we will never reach here as the scheduler will now be running. */
-/* If we do get here, it will most likely be because we ran out of heap space. */
-/* let the Memory manager handler figure it out (at least for now, it will make it more obvious */
-  bl  MemManage_Handler
-/* will never return here for now until mem manager give up */
-  bx  lr
-.size  Reset_Handler, .-Reset_Handler
+  bx r4
+  .size  Stack_Change, .-Stack_Change
+
 
 /**
- * @brief  This is the code that gets called when the processor receives an 
+ * @brief  This is the code that gets called when the processor receives an
  *         unexpected interrupt.  This simply enters an infinite loop, preserving
  *         the system state for examination by a debugger.
  *
- * @param  None     
- * @retval : None       
+ * @param  None
+ * @retval : None
 */
     .section  .text.Default_Handler,"ax",%progbits
 Default_Handler:

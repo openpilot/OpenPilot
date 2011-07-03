@@ -64,6 +64,8 @@ void OP_ADC_NotifyChange(uint32_t pin, uint32_t pin_value);
 
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
+extern void Stack_Change(void);
+static void Stack_Change_Weak () __attribute__ ((weakref ("Stack_Change")));
 
 /**
 * OpenPilot Main function:
@@ -98,6 +100,21 @@ int main()
 	xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
 	xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
 #endif
+
+	/* swap the stack to use the IRQ stack (does nothing in sim mode) */
+	Stack_Change_Weak();
+
+	/* Start the FreeRTOS scheduler which should never returns.*/
+	vTaskStartScheduler();
+
+	/* If all is well we will never reach here as the scheduler will now be running. */
+
+	/* Do some indication to user that something bad just happened */
+	PIOS_LED_Off(LED1); \
+	for(;;) { \
+		PIOS_LED_Toggle(LED1); \
+		PIOS_DELAY_WaitmS(100); \
+	};
 
 	return 0;
 }

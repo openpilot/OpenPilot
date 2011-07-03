@@ -82,6 +82,9 @@ float gyro_filtered[3] = {0,0,0};
 float axis_lock_accum[3] = {0,0,0};
 uint8_t max_axis_lock = 0;
 uint8_t max_axislock_rate = 0;
+float weak_leveling_kp = 0;
+uint8_t weak_leveling_max = 0;
+
 pid_type pids[PID_MAX];
 
 // Private functions
@@ -217,6 +220,20 @@ static void stabilizationTask(void* parameters)
 					axis_lock_accum[i] = 0;
 					break;
 
+				case STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING:
+				{
+					float weak_leveling = local_error[i] * weak_leveling_kp;
+
+					if(weak_leveling > weak_leveling_max)
+						weak_leveling = weak_leveling_max;
+					if(weak_leveling < -weak_leveling_max)
+						weak_leveling = -weak_leveling_max;
+
+					rateDesiredAxis[i] = attitudeDesiredAxis[i] + weak_leveling;
+
+					axis_lock_accum[i] = 0;
+					break;
+				}
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
 					rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], local_error[i]);
 					axis_lock_accum[i] = 0;
@@ -257,6 +274,7 @@ static void stabilizationTask(void* parameters)
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK:
+				case STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING:
 				{
 					float command = ApplyPid(&pids[PID_RATE_ROLL + ct],  rateDesiredAxis[ct] - gyro_filtered[ct]);
 					actuatorDesiredAxis[ct] = bound(command);
@@ -391,6 +409,10 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 	// Maximum deviation to accumulate for axis lock
 	max_axis_lock = settings.MaxAxisLock;
 	max_axislock_rate = settings.MaxAxisLockRate;
+
+	// Settings for weak leveling
+	weak_leveling_kp = settings.WeakLevelingKp;
+	weak_leveling_max = settings.MaxWeakLevelingRate;
 
 	// The dT has some jitter iteration to iteration that we don't want to
 	// make thie result unpredictable.  Still, it's nicer to specify the constant

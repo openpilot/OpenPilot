@@ -122,7 +122,7 @@ C: Michel Pet
 D: June 2011
 V: http://www.youtube.com/watch?v=QsE2MQELPZY
 
-M: First Height Hold using Sonar
+M: First Altitude Hold using Sonar
 C: 
 D: 
 V: 

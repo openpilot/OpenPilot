@@ -2,6 +2,8 @@
 _irq_stack_size = 0x180;
 /* This is the size of the stack for early init: life span is until scheduler starts */
 _init_stack_size = 0x80;
+/* there is probably a way to get that from the MEMORY section */
+_eram = ORIGIN(SRAM) + LENGTH(SRAM);
 
 /* Stub out these functions since we don't use them anyway */
 PROVIDE (   vPortSVCHandler = 0 ) ;
@@ -9,10 +11,6 @@ PROVIDE (   xPortPendSVHandler = 0 ) ;
 PROVIDE (   xPortSysTickHandler = 0 ) ;
 
 PROVIDE(pios_board_info_blob = ORIGIN(BD_INFO));
-
-_estack = 0x20004FF0;
-/* there is probably a way to get that from the MEMORY section */
-_eram = ORIGIN(SRAM) + LENGTH(SRAM);
 
 /* Section Definitions */
 SECTIONS

@@ -33,7 +33,6 @@
 
 .global  g_pfnVectors
 .global  Default_Handler
-.global  vTaskStartScheduler
 .global  xPortIncreaseHeapSize
 .global  Stack_Change
 
@@ -50,8 +49,6 @@ defined in linker script */
 .word  _ebss
 
 .equ  BootRAM, 0xF108F85F
-.equ  WWDG, 0x40002C00
-
 /**
  * @brief  This is the code that gets called when the processor first
  *          starts execution following a reset event. Only the absolutely
@@ -78,14 +75,19 @@ Reset_Handler:
  /* Do set/reset the stack pointers */
   LDR r0, =_irq_stack_top
   MSR msp, r0
-  LDR r0, =_init_stack_top
-  MSR psp, r0
+  LDR r2, =_init_stack_top
+  MSR psp, r2
+  /* check if irq and init stack are the same */
+  /* if they are, we don't do stack swap */
+  /* and lets bypass the monitoring as well for now */
+  cmp  r0, r2
+  beq SectionBssInit
 /* DO
  * - stay in thread process mode
  * - stay in privilege level
  * - use process stack
  */
-  add r0, #2
+  movs r0, #2
   MSR control, r0
   ISB
 /* Fill IRQ stack for watermark monitoring */
@@ -100,6 +102,8 @@ LoopFillIRQStack:
   ldr  r3, = _irq_stack_top
   cmp  r2, r3
   bcc  FillIRQStack
+
+SectionBssInit:
 /* Copy the data segment initializers from flash to SRAM */  
   movs  r1, #0
   b  LoopCopyDataInit
@@ -136,8 +140,8 @@ LoopFillZerobss:
 /**
  * @brief  This is the code that swaps stack (from end of heap to irq_stack).
  *         Also reclaim the heap that was used as a stack.
- * @param  None     
- * @retval : None       
+ * @param  None
+ * @retval : None
 */
   .section  .text.Stack_Change
   .weak  Stack_Change

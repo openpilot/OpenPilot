@@ -36,8 +36,8 @@
 .global  g_pfnVectors
 .global  SystemInit_ExtMemCtl_Dummy
 .global  Default_Handler
-.global  vTaskStartScheduler
 .global  xPortIncreaseHeapSize
+.global  Stack_Change
 
 /* start address for the initialization values of the .data section. 
 defined in linker script */
@@ -73,14 +73,19 @@ Reset_Handler:
 /* restore original stack pointer */  
   LDR r0, =_irq_stack_top
   MSR msp, r0
-  LDR r0, =_init_stack_top
-  MSR psp, r0
+  LDR r2, =_init_stack_top
+  MSR psp, r2
+  /* check if irq and init stack are the same */
+  /* if they are, we don't do stack swap */
+  /* and lets bypass the monitoring as well for now */
+  cmp  r0, r2
+  beq SectionBssInit
 /* DO
  * - stay in thread process mode
  * - stay in privilege level
  * - use process stack
  */
-  add r0, #2
+  movs r0, #2
   MSR control, r0
   ISB
 /* Fill IRQ stack for watermark monitoring */
@@ -95,6 +100,8 @@ LoopFillIRQStack:
   ldr  r3, = _irq_stack_top
   cmp  r2, r3
   bcc  FillIRQStack
+
+SectionBssInit:
 /* Copy the data segment initializers from flash to SRAM */  
   movs  r1, #0
   b  LoopCopyDataInit
@@ -166,12 +173,12 @@ SystemInit_ExtMemCtl_Dummy:
   .size  SystemInit_ExtMemCtl_Dummy, .-SystemInit_ExtMemCtl_Dummy
 
 /**
- * @brief  This is the code that gets called when the processor receives an 
+ * @brief  This is the code that gets called when the processor receives an
  *         unexpected interrupt.  This simply enters an infinite loop, preserving
  *         the system state for examination by a debugger.
  *
- * @param  None     
- * @retval : None       
+ * @param  None
+ * @retval : None
 */
     .section  .text.Default_Handler,"ax",%progbits
 Default_Handler:

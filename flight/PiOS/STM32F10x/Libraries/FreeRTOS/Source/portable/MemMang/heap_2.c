@@ -280,10 +280,15 @@ void vPortInitialiseBlocks( void )
 
 void xPortIncreaseHeapSize( size_t bytes )
 {
+	xBlockLink *pxNewBlockLink;
 	vTaskSuspendAll();
 	currentTOTAL_HEAP_SISE = configTOTAL_HEAP_SIZE + bytes;
 	xEnd.xBlockSize = currentTOTAL_HEAP_SISE;
 	xFreeBytesRemaining += bytes;
+	/* Insert the new block into the list of free blocks. */
+	pxNewBlockLink = ( void * ) &xHeap.ucHeap[ configTOTAL_HEAP_SIZE ];
+	pxNewBlockLink->xBlockSize = bytes;
+	prvInsertBlockIntoFreeList( ( pxNewBlockLink ) );
 	xTaskResumeAll();
 }
 /*-----------------------------------------------------------*/

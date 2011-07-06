@@ -122,7 +122,7 @@ C: Michel Pet
 D: June 2011
 V: http://www.youtube.com/watch?v=QsE2MQELPZY
 
-M: MoveControl first flight
+M: First MoveControl flight
 C: Werner Backes
 D: July 2011
 V: http://vimeo.com/25983655

@@ -136,16 +136,16 @@ static void AttitudeTask(void *parameters)
 	PIOS_FLASH_DISABLE;
 	PIOS_ADXL345_Init();
 
-	zero_during_arming = false;
+	// Force settings update to make sure rotation loaded
+	settingsUpdatedCb(AttitudeSettingsHandle());
+
 	// Main task loop
 	while (1) {
 
 		FlightStatusData flightStatus;
 		FlightStatusGet(&flightStatus);
 
-		if(xTaskGetTickCount() < 7000) {
-			// Force settings update to make sure rotation loaded
-			settingsUpdatedCb(AttitudeSettingsHandle());
+		if((xTaskGetTickCount() < 7000) && (xTaskGetTickCount() > 1000)) {
 			// For first 7 seconds use accels to get gyro bias
 			accelKp = 1;
 			accelKi = 0.9;

@@ -45,10 +45,7 @@ ENABLE_DEBUG_PINS ?= NO
 # Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs
 ENABLE_AUX_UART ?= NO
 
-USE_TELEMETRY ?= YES
 USE_GPS ?= NO
-USE_SPEKTRUM ?= NO
-USE_SBUS ?= NO
 
 USE_I2C ?= NO
 
@@ -169,6 +166,7 @@ SRC += $(OPUAVSYNTHDIR)/mixersettings.c
 SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
 SRC += $(OPUAVSYNTHDIR)/firmwareiapobj.c
 SRC += $(OPUAVSYNTHDIR)/attitudesettings.c
+SRC += $(OPUAVSYNTHDIR)/hwsettings.c
 #${wildcard ${OBJ}/$(shell echo $(VAR) | tr A-Z a-z)/*.c}
 #SRC += ${foreach OBJ, ${UAVOBJECTS}, $(UAVOBJECTS)/$(OBJ).c}
 # Cant use until i can automatically generate list of UAVObjects
@@ -388,32 +386,8 @@ endif
 # USART port functions. NO means do not use this function.
 # YES means use with default USART port number (hardware-dependent).
 # Number means use with specified USART port number (this value).
-ifneq ($(USE_TELEMETRY), NO)
-CDEFS += -DUSE_TELEMETRY
-ifneq ($(USE_TELEMETRY), YES)
-CDEFS += -DPIOS_PORT_TELEMETRY=$(USE_TELEMETRY)
-endif
-endif
-
 ifneq ($(USE_GPS), NO)
 CDEFS += -DUSE_GPS
-ifneq ($(USE_GPS), YES)
-CDEFS += -DPIOS_PORT_GPS=$(USE_GPS)
-endif
-endif
-
-ifneq ($(USE_SPEKTRUM), NO)
-CDEFS += -DUSE_SPEKTRUM
-ifneq ($(USE_SPEKTRUM), YES)
-CDEFS += -DPIOS_PORT_SPEKTRUM=$(USE_SPEKTRUM)
-endif
-endif
-
-ifneq ($(USE_SBUS), NO)
-CDEFS += -DUSE_SBUS
-ifneq ($(USE_SBUS), YES)
-CDEFS += -DPIOS_PORT_SBUS=$(USE_SBUS)
-endif
 endif
 
 ifeq ($(USE_I2C), YES)

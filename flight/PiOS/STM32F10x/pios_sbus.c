@@ -135,17 +135,17 @@ static void process_byte(uint8_t b)
 /**
  * Initialise S.Bus receiver interface
  */
-void PIOS_SBUS_Init(void)
+void PIOS_SBUS_Init(const struct pios_sbus_cfg *cfg)
 {
-	/* Enable USART input invertor clock and enable the invertor */
-	(*pios_sbus_cfg.gpio_clk_func)(pios_sbus_cfg.gpio_clk_periph, ENABLE);
-	GPIO_Init(pios_sbus_cfg.gpio_inv_port, &pios_sbus_cfg.gpio_inv_init);
-	GPIO_WriteBit(pios_sbus_cfg.gpio_inv_port,
-		      pios_sbus_cfg.gpio_inv_init.GPIO_Pin,
-		      pios_sbus_cfg.gpio_inv_enable);
+	/* Enable inverter clock and enable the inverter */
+	(*cfg->gpio_clk_func)(cfg->gpio_clk_periph, ENABLE);
+	GPIO_Init(cfg->inv.gpio, &cfg->inv.init);
+	GPIO_WriteBit(cfg->inv.gpio,
+		      cfg->inv.init.GPIO_Pin,
+		      cfg->gpio_inv_enable);
 
 	if (!PIOS_RTC_RegisterTickCallback(PIOS_SBUS_Supervisor, 0)) {
-		PIOS_DEBUG_Assert(0);
+		PIOS_Assert(0);
 	}
 }
 
@@ -169,9 +169,14 @@ static int32_t PIOS_SBUS_Get(uint32_t chan_id)
  */
 void PIOS_SBUS_irq_handler(uint32_t usart_id)
 {
+	/* Grab the config for this device from the underlying USART device */
+	const struct pios_usart_cfg * cfg;
+	cfg = PIOS_USART_GetConfig(usart_id);
+	PIOS_Assert(cfg);
+  
 	/* by always reading DR after SR make sure to clear any error interrupts */
-	volatile uint16_t sr = pios_sbus_cfg.pios_usart_sbus_cfg->regs->SR;
-	volatile uint8_t b = pios_sbus_cfg.pios_usart_sbus_cfg->regs->DR;
+	volatile uint16_t sr = cfg->regs->SR;
+	volatile uint8_t b = cfg->regs->DR;
 
 	/* process received byte if one has arrived */
 	if (sr & USART_SR_RXNE) {
@@ -183,7 +188,7 @@ void PIOS_SBUS_irq_handler(uint32_t usart_id)
 	/* ignore TXE interrupts */
 	if (sr & USART_SR_TXE) {
 		/* disable TXE interrupt (TXEIE=0) */
-		USART_ITConfig(pios_sbus_cfg.pios_usart_sbus_cfg->regs, USART_IT_TXE, DISABLE);
+		USART_ITConfig(cfg->regs, USART_IT_TXE, DISABLE);
 	}
 }
 

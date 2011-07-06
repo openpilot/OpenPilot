@@ -34,12 +34,6 @@
 #include "pios_spektrum_priv.h"
 
 #if defined(PIOS_INCLUDE_SPEKTRUM)
-#if defined(PIOS_INCLUDE_PWM) || defined(PIOS_INCLUDE_SBUS)
-#error "Both SPEKTRUM and either of PWM or SBUS inputs defined, choose only one"
-#endif
-#if defined(PIOS_COM_AUX)
-#error "AUX com cannot be used with SPEKTRUM"
-#endif
 
 /**
  * @Note Framesyncing:
@@ -65,15 +59,16 @@ uint8_t sync_of = 0;
 uint16_t supv_timer=0;
 
 static void PIOS_SPEKTRUM_Supervisor(uint32_t spektrum_id);
+static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg);
 
 /**
 * Bind and Initialise Spektrum satellite receiver
 */
-void PIOS_SPEKTRUM_Init(void)
+void PIOS_SPEKTRUM_Init(const struct pios_spektrum_cfg * cfg, bool bind)
 {
 	// TODO: need setting flag for bind on next powerup
-	if (0) {
-		PIOS_SPEKTRUM_Bind();
+	if (bind) {
+		PIOS_SPEKTRUM_Bind(cfg);
 	}
 
 	if (!PIOS_RTC_RegisterTickCallback(PIOS_SPEKTRUM_Supervisor, 0)) {
@@ -98,48 +93,45 @@ static int32_t PIOS_SPEKTRUM_Get(uint32_t chan_id)
 
 /**
 * Spektrum bind function
-* \output 1 Successful bind
-* \output 0 Bind failed
-* \note Applications shouldn't call these functions directly
+* \output true Successful bind
+* \output false Bind failed
 */
-uint8_t PIOS_SPEKTRUM_Bind(void)
+static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg)
 {
-	GPIO_InitTypeDef GPIO_InitStructure = pios_spektrum_cfg.gpio_init;
-	GPIO_InitStructure.GPIO_Pin = pios_spektrum_cfg.pin;
-	GPIO_Init(pios_spektrum_cfg.port, &GPIO_InitStructure);
+	GPIO_Init(cfg->bind.gpio, &cfg->bind.init);
 
-	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
+	GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	//PIOS_DELAY_WaitmS(75);
 	/* RX line, drive high for 10us */
-	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
+	GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(10);
 	/* RX line, drive low for 120us */
-	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
+	GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(120);
 	/* RX line, drive high for 120us */
-	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
+	GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(120);
 	/* RX line, drive low for 120us */
-	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
+	GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(120);
 	/* RX line, drive high for 120us */
-	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
+	GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(120);
 	/* RX line, drive low for 120us */
-	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
+	GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(120);
 	/* RX line, drive high for 120us */
-	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
+	GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(120);
 	/* RX line, drive low for 120us */
-	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
+	GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(120);
 	/* RX line, drive high for 120us */
-	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
+	GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(120);
 	/* RX line, set input and wait for data, PIOS_SPEKTRUM_Init */
 
-	return 1;
+	return true;
 }
 
 /**
@@ -150,7 +142,7 @@ uint8_t PIOS_SPEKTRUM_Bind(void)
 * \return -2 if buffer full (retry)
 * \note Applications shouldn't call these functions directly
 */
-int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
+static int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 {
 	static uint16_t channel = 0; /*, sync_word = 0;*/
 	uint8_t channeln = 0, frame = 0;
@@ -226,11 +218,16 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 	return 0;
 }
 
-/* Interrupt handler for USART */
+/* Custom interrupt handler for USART */
 void PIOS_SPEKTRUM_irq_handler(uint32_t usart_id) {
+	/* Grab the config for this device from the underlying USART device */
+	const struct pios_usart_cfg * cfg;
+	cfg = PIOS_USART_GetConfig(usart_id);
+	PIOS_Assert(cfg);
+  
 	/* by always reading DR after SR make sure to clear any error interrupts */
-	volatile uint16_t sr = pios_spektrum_cfg.pios_usart_spektrum_cfg->regs->SR;
-	volatile uint8_t b = pios_spektrum_cfg.pios_usart_spektrum_cfg->regs->DR;
+	volatile uint16_t sr = cfg->regs->SR;
+	volatile uint8_t b = cfg->regs->DR;
 	
 	/* check if RXNE flag is set */
 	if (sr & USART_SR_RXNE) {
@@ -241,7 +238,7 @@ void PIOS_SPEKTRUM_irq_handler(uint32_t usart_id) {
 
 	if (sr & USART_SR_TXE) {	// check if TXE flag is set
 		/* Disable TXE interrupt (TXEIE=0) */
-		USART_ITConfig(pios_spektrum_cfg.pios_usart_spektrum_cfg->regs, USART_IT_TXE, DISABLE);
+		USART_ITConfig(cfg->regs, USART_IT_TXE, DISABLE);
 	}
 	/* byte arrived so clear "watchdog" timer */
 	supv_timer=0;

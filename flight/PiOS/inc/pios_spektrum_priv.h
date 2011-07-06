@@ -36,21 +36,15 @@
 #include <pios_usart_priv.h>
 
 struct pios_spektrum_cfg {
-	const struct pios_usart_cfg * pios_usart_spektrum_cfg;
-	GPIO_InitTypeDef gpio_init;
+	struct stm32_gpio bind;
 	uint32_t remap;		/* GPIO_Remap_* */
-	GPIO_TypeDef * port;
-	uint16_t pin;
 };
 
 extern void PIOS_SPEKTRUM_irq_handler();
 
-extern uint8_t pios_spektrum_num_channels;
-extern const struct pios_spektrum_cfg pios_spektrum_cfg;
-
 extern const struct pios_rcvr_driver pios_spektrum_rcvr_driver;
 
-extern void PIOS_SPEKTRUM_Init(void);
+extern void PIOS_SPEKTRUM_Init(const struct pios_spektrum_cfg * cfg, bool bind);
 
 #endif /* PIOS_PWM_PRIV_H */
 

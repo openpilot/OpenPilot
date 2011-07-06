@@ -34,8 +34,6 @@
 /* Global Types */
 
 /* Public Functions */
-extern uint8_t PIOS_SPEKTRUM_Bind(void);
-extern int32_t PIOS_SPEKTRUM_Decode(uint8_t b);
 
 #endif /* PIOS_SPEKTRUM_H */
 

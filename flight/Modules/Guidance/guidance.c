@@ -105,7 +105,7 @@ int32_t GuidanceInitialize()
 	
 	return 0;
 }
-MODULE_INITCALL(GuidanceInitialize, 0, GuidanceStart, 0, MODULE_EXEC_NOORDER_FLAG);
+MODULE_INITCALL(GuidanceInitialize, 0, GuidanceStart, 0, MODULE_EXEC_NOORDER_FLAG)
 
 static float northVelIntegral = 0;
 static float eastVelIntegral = 0;

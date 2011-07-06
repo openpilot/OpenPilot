@@ -88,7 +88,7 @@ static void resetTask(UAVObjEvent *);
  * \note
  *
  */
-MODULE_INITCALL(FirmwareIAPInitialize, 0, 0, 0, MODULE_EXEC_NOORDER_FLAG);
+MODULE_INITCALL(FirmwareIAPInitialize, 0, 0, 0, MODULE_EXEC_NOORDER_FLAG)
 int32_t FirmwareIAPInitialize()
 {
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;

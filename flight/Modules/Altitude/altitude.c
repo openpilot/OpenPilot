@@ -90,7 +90,7 @@ int32_t AltitudeInitialize()
 
 	return 0;
 }
-MODULE_INITCALL(AltitudeInitialize, 0, AltitudeStart, 0, MODULE_EXEC_NOORDER_FLAG);
+MODULE_INITCALL(AltitudeInitialize, 0, AltitudeStart, 0, MODULE_EXEC_NOORDER_FLAG)
 /**
  * Module thread, should not return.
  */

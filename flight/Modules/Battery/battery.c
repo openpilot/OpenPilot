@@ -75,7 +75,7 @@ static void onTimer(UAVObjEvent* ev);
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-MODULE_INITCALL(BatteryInitialize, 0, 0, 0, MODULE_EXEC_NOORDER_FLAG);
+MODULE_INITCALL(BatteryInitialize, 0, 0, 0, MODULE_EXEC_NOORDER_FLAG)
 int32_t BatteryInitialize(void)
 {
 	static UAVObjEvent ev;

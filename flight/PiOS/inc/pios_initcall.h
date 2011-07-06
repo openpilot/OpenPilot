@@ -71,7 +71,7 @@ extern initmodule_t __module_initcall_start[], __module_initcall_end[];
 
 #define __define_module_initcall(level,ifn,iparam,sfn,sparam, param) \
 	static initmodule_t __initcall_##fn __attribute__((__used__)) \
-	__attribute__((__section__(".initcall" level ".init"))) = { .flag = param, .param_minit = iparam, .fn_minit = ifn, .param_tinit = sparam, .fn_tinit = sfn }
+	__attribute__((__section__(".initcall" level ".init"))) = { .flag = param, .param_minit = iparam, .fn_minit = ifn, .param_tinit = sparam, .fn_tinit = sfn };
 
 #define UAVOBJ_INITCALL(fn)		__define_initcall("uavobj",fn,1)
 #define MODULE_INITCALL(ifn, iparam, sfn, sparam, flags)		__define_module_initcall("module", ifn, iparam, sfn, sparam, flags)

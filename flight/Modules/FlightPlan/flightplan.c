@@ -86,7 +86,7 @@ int32_t FlightPlanInitialize()
 
 	return 0;
 }
-MODULE_INITCALL(FlightPlanInitialize, 0, FlightPlanStart, 0, MODULE_EXEC_NOORDER_FLAG);
+MODULE_INITCALL(FlightPlanInitialize, 0, FlightPlanStart, 0, MODULE_EXEC_NOORDER_FLAG)
 /**
  * Module task
  */

@@ -383,9 +383,6 @@ ifeq ($(ERASE_FLASH), YES)
 CDEFS += -DERASE_FLASH
 endif
 
-# USART port functions. NO means do not use this function.
-# YES means use with default USART port number (hardware-dependent).
-# Number means use with specified USART port number (this value).
 ifneq ($(USE_GPS), NO)
 CDEFS += -DUSE_GPS
 endif

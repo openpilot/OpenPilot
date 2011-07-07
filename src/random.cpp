@@ -1,6 +1,8 @@
 /* $Id$ */
 
 #include <cmath>
+#include <unistd.h>
+#include <sys/time.h>
 
 #include "kernel/jafarException.hpp"
 #include "kernel/jafarDebug.hpp"
@@ -9,7 +11,17 @@
 
 using namespace jblas;
 
-using namespace jafar::jmath;
+namespace jafar {
+namespace jmath {
+
+
+unsigned get_srand()
+{
+	struct timeval tv;
+	struct timezone tz;
+	gettimeofday(&tv, &tz);
+	return tv.tv_sec + tv.tv_usec + getpid();
+}
 
 /*
  * class UniformDistribution
@@ -153,3 +165,6 @@ vec MultiDimNormalDistribution::get() {
   }
   return u;
 }
+
+}}
+

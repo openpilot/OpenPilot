@@ -14,6 +14,12 @@
 namespace jafar {
   namespace jmath {
 
+		/**
+			returns a good random "random seed"
+		*/
+		unsigned get_srand();
+		
+		
     /** Uniform distribution generator using the Boost random
      * library. Have a look at demoRandom.tcl.
      *

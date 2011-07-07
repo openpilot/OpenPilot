@@ -208,11 +208,7 @@ void PIOS_ADC_handler() {
 static const struct pios_usart_cfg pios_usart_aux_cfg = {
 	.regs = USART3,
 	.init = {
-#if defined (PIOS_USART_BAUDRATE)
-		 .USART_BaudRate = PIOS_USART_BAUDRATE,
-#else
-		 .USART_BaudRate = 57600,
-#endif
+		 .USART_BaudRate = 230400,
 		 .USART_WordLength = USART_WordLength_8b,
 		 .USART_Parity = USART_Parity_No,
 		 .USART_StopBits = USART_StopBits_1,

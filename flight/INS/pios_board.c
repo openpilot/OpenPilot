@@ -268,11 +268,7 @@ void PIOS_SPI_accel_irq_handler(void)
 static const struct pios_usart_cfg pios_usart_gps_cfg = {
 	.regs = USART1,
 	.init = {
-#if defined (PIOS_USART_BAUDRATE)
-		 .USART_BaudRate = PIOS_USART_BAUDRATE,
-#else
 		 .USART_BaudRate = 57600,
-#endif
 		 .USART_WordLength = USART_WordLength_8b,
 		 .USART_Parity = USART_Parity_No,
 		 .USART_StopBits = USART_StopBits_1,
@@ -316,11 +312,7 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
 static const struct pios_usart_cfg pios_usart_aux_cfg = {
 	.regs = USART4,
 	.init = {
-#if defined (PIOS_USART_BAUDRATE)
-		 .USART_BaudRate = PIOS_USART_BAUDRATE,
-#else
 		 .USART_BaudRate = 57600,
-#endif
 		 .USART_WordLength = USART_WordLength_8b,
 		 .USART_Parity = USART_Parity_No,
 		 .USART_StopBits = USART_StopBits_1,

@@ -141,13 +141,11 @@ extern uint32_t pios_i2c_main_adapter_id;
 //-------------------------
 #define PIOS_COM_MAX_DEVS			4
 
-#define PIOS_COM_TELEM_BAUDRATE         57600
 extern uint32_t pios_com_telem_rf_id;
 #define PIOS_COM_TELEM_RF               (pios_com_telem_rf_id)
 #define PIOS_COM_DEBUG                  PIOS_COM_TELEM_RF
 
 #if defined(PIOS_INCLUDE_GPS)
-#define PIOS_COM_GPS_BAUDRATE           57600
 extern uint32_t pios_com_gps_id;
 #define PIOS_COM_GPS                    (pios_com_gps_id)
 #endif	/* PIOS_INCLUDE_GPS */
@@ -156,13 +154,11 @@ extern uint32_t pios_com_telem_usb_id;
 #define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
 
 #ifdef PIOS_INCLUDE_SPEKTRUM
-#define PIOS_COM_SPEKTRUM_BAUDRATE      115200
 extern uint32_t pios_com_spektrum_id;
 #define PIOS_COM_SPEKTRUM               (pios_com_spektrum_id)
 #endif
 
 #ifdef PIOS_INCLUDE_SBUS
-#define PIOS_COM_SBUS_BAUDRATE          100000
 extern uint32_t pios_com_sbus_id;
 #define PIOS_COM_SBUS                   (pios_com_sbus_id)
 #endif

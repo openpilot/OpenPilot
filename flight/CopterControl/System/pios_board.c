@@ -208,11 +208,7 @@ void PIOS_ADC_handler() {
 static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
   .regs  = USART1,
   .init = {
-    #if defined (PIOS_COM_TELEM_BAUDRATE)
-        .USART_BaudRate        = PIOS_COM_TELEM_BAUDRATE,
-    #else
-        .USART_BaudRate        = 57600,
-    #endif
+    .USART_BaudRate            = 57600,
     .USART_WordLength          = USART_WordLength_8b,
     .USART_Parity              = USART_Parity_No,
     .USART_StopBits            = USART_StopBits_1,
@@ -249,11 +245,7 @@ static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
 static const struct pios_usart_cfg pios_usart_telem_flexi_cfg = {
   .regs  = USART3,
   .init = {
-    #if defined (PIOS_COM_TELEM_BAUDRATE)
-        .USART_BaudRate        = PIOS_COM_TELEM_BAUDRATE,
-    #else
-        .USART_BaudRate        = 57600,
-    #endif
+    .USART_BaudRate            = 57600,
     .USART_WordLength          = USART_WordLength_8b,
     .USART_Parity              = USART_Parity_No,
     .USART_StopBits            = USART_StopBits_1,
@@ -295,11 +287,7 @@ static const struct pios_usart_cfg pios_usart_telem_flexi_cfg = {
 static const struct pios_usart_cfg pios_usart_gps_main_cfg = {
   .regs = USART1,
   .init = {
-    #if defined (PIOS_COM_GPS_BAUDRATE)
-        .USART_BaudRate        = PIOS_COM_GPS_BAUDRATE,
-    #else
-        .USART_BaudRate        = 57600,
-    #endif
+    .USART_BaudRate            = 57600,
     .USART_WordLength          = USART_WordLength_8b,
     .USART_Parity              = USART_Parity_No,
     .USART_StopBits            = USART_StopBits_1,
@@ -336,11 +324,7 @@ static const struct pios_usart_cfg pios_usart_gps_main_cfg = {
 static const struct pios_usart_cfg pios_usart_gps_flexi_cfg = {
   .regs = USART3,
   .init = {
-    #if defined (PIOS_COM_GPS_BAUDRATE)
-        .USART_BaudRate        = PIOS_COM_GPS_BAUDRATE,
-    #else
-        .USART_BaudRate        = 57600,
-    #endif
+    .USART_BaudRate            = 57600,
     .USART_WordLength          = USART_WordLength_8b,
     .USART_Parity              = USART_Parity_No,
     .USART_StopBits            = USART_StopBits_1,
@@ -384,11 +368,7 @@ static const struct pios_usart_cfg pios_usart_gps_flexi_cfg = {
 static const struct pios_usart_cfg pios_usart_spektrum_main_cfg = {
 	.regs = USART1,
 	.init = {
-	#if defined (PIOS_COM_SPEKTRUM_BAUDRATE)
-		.USART_BaudRate        = PIOS_COM_SPEKTRUM_BAUDRATE,
-	#else
-		.USART_BaudRate        = 115200,
-	#endif
+		.USART_BaudRate            = 115200,
 		.USART_WordLength          = USART_WordLength_8b,
 		.USART_Parity              = USART_Parity_No,
 		.USART_StopBits            = USART_StopBits_1,
@@ -437,11 +417,7 @@ static const struct pios_spektrum_cfg pios_spektrum_main_cfg = {
 static const struct pios_usart_cfg pios_usart_spektrum_flexi_cfg = {
 	.regs = USART3,
 	.init = {
-	#if defined (PIOS_COM_SPEKTRUM_BAUDRATE)
-		.USART_BaudRate        = PIOS_COM_SPEKTRUM_BAUDRATE,
-	#else
-		.USART_BaudRate        = 115200,
-	#endif
+		.USART_BaudRate            = 115200,
 		.USART_WordLength          = USART_WordLength_8b,
 		.USART_Parity              = USART_Parity_No,
 		.USART_StopBits            = USART_StopBits_1,
@@ -498,11 +474,7 @@ static const struct pios_spektrum_cfg pios_spektrum_flexi_cfg = {
 static const struct pios_usart_cfg pios_usart_sbus_main_cfg = {
 	.regs = USART1,
 	.init = {
-	#if defined (PIOS_COM_SBUS_BAUDRATE)
-		.USART_BaudRate        = PIOS_COM_SBUS_BAUDRATE,
-	#else
-		.USART_BaudRate        = 100000,
-	#endif
+		.USART_BaudRate            = 100000,
 		.USART_WordLength          = USART_WordLength_8b,
 		.USART_Parity              = USART_Parity_Even,
 		.USART_StopBits            = USART_StopBits_2,

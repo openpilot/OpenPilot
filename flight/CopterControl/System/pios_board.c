@@ -1063,12 +1063,10 @@ void PIOS_Board_Init(void) {
 		}
 #endif	/* PIOS_INCLUDE_SPEKTRUM */
 		break;
-#if THIS_IS_NOT_YET_A_VALID_INPUT_MODE
 	case MANUALCONTROLSETTINGS_INPUTMODE_SBUS:
 #if defined(PIOS_INCLUDE_SBUS)
-		if (hwsettings_cc_mainport == HWSETTINGS_CC_MAINPORT_SBUS ||
-		    hwsettings_cc_flexiport == HWSETTINGS_CC_FLEXIPORT_SBUS) {
-			for (uint8_t i = 0; i < PIOS_SBUS_NUM_INPUTS; i++) {
+		if (hwsettings_cc_mainport == HWSETTINGS_CC_MAINPORT_SBUS) {
+			for (uint8_t i = 0; i < SBUS_NUMBER_OF_CHANNELS && i < pios_rcvr_max_channel; i++) {
 				if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
 						    &pios_sbus_rcvr_driver,
 						    i)) {
@@ -1080,7 +1078,6 @@ void PIOS_Board_Init(void) {
 		}
 #endif  /* PIOS_INCLUDE_SBUS */
 		break;
-#endif	/* THIS_IS_NOT_YET_A_VALID_INPUT_MODE */
 	}
 
 	/* Remap AFIO pin */

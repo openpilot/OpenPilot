@@ -1154,7 +1154,7 @@ void demo_slam_main(world_ptr_t *world)
 	// set the start date
 	double start_date;
 	if (!(intOpts[iReplay] & 1) && intOpts[iDump]) {
-		start_date = getNowTimestamp();
+		start_date = kernel::Clock::getTime();
 		std::fstream f((strOpts[sDataPath] + std::string("/sdate.log")).c_str(), std::ios_base::out);
 		f << std::setprecision(19) << start_date << std::endl;
 		f.close();

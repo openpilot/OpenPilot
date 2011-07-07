@@ -9,6 +9,7 @@
  * \ingroup rtslam
  */
 
+#include "kernel/timingTools.hpp"
 #include "rtslam/hardwareSensorGpsGenom.hpp"
 
 #ifdef HAVE_POSTERLIB
@@ -72,7 +73,7 @@ namespace hardware {
 					}
 				}
 #endif
-				reading.arrival = getNowTimestamp();
+				reading.arrival = kernel::Clock::getTime();
 				pos = (double*)(data+16);
 				var = (float*)(data+48);
 				reading.data(0) = *date;
@@ -125,7 +126,7 @@ namespace hardware {
 	{
 		// start acquire task
 		//preloadTask();
-		last_timestamp = getNowTimestamp();
+		last_timestamp = kernel::Clock::getTime();
 		preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorGpsGenom::preloadTask,this));
 		
 		if (mode == 2)

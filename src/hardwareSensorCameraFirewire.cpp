@@ -16,6 +16,7 @@
 #include <boost/regex.hpp>
 #endif
 
+#include "kernel/timingTools.hpp"
 #include "rtslam/hardwareSensorCameraFirewire.hpp"
 
 #ifdef HAVE_VIAM
@@ -201,10 +202,10 @@ namespace hardware {
 			{
 #ifdef HAVE_VIAM
 				int buff_write = getWritePos();
-				//if (!emptied_buffers) date = getNowTimestamp();
+				//if (!emptied_buffers) date = kernel::Clock::getTime();
 				r = viam_oneshot(handle, bank, &(bufferImage[buff_write]), &pts, 1);
-				//if (!emptied_buffers) { date = getNowTimestamp()-date; if (date < 0.004) continue; else emptied_buffers = true; }
-				bufferSpecPtr[buff_write]->arrival = getNowTimestamp();
+				//if (!emptied_buffers) { date = kernel::Clock::getTime()-date; if (date < 0.004) continue; else emptied_buffers = true; }
+				bufferSpecPtr[buff_write]->arrival = kernel::Clock::getTime();
 				bufferSpecPtr[buff_write]->timestamp = ts.tv_sec + ts.tv_usec*1e-6;
 				last_timestamp = bufferSpecPtr[buff_write]->timestamp;
 #endif
@@ -284,7 +285,7 @@ namespace hardware {
 	void HardwareSensorCameraFirewire::start()
 	{
 		// start acquire task
-		last_timestamp = getNowTimestamp();
+		last_timestamp = kernel::Clock::getTime();
 		preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::preloadTask,this));
 	}
 		

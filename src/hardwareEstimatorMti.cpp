@@ -49,9 +49,9 @@ namespace hardware {
 			} else
 			{
 #ifdef HAVE_MTI
-				//if (!emptied_buffers) date = getNowTimestamp();
+				//if (!emptied_buffers) date = kernel::Clock::getTime();
 				if (!mti->read(&data)) continue;
-				//if (!emptied_buffers) { date = getNowTimestamp()-date; if (date < 0.002) continue; else emptied_buffers = true; }
+				//if (!emptied_buffers) { date = kernel::Clock::getTime()-date; if (date < 0.002) continue; else emptied_buffers = true; }
 				l.lock();
 				if (write_position == read_position) JFR_ERROR(RtslamException, RtslamException::BUFFER_OVERFLOW, "Data not read: Increase MTI buffer size !");
 				row(0) = data.TIMESTAMP_FILTERED;

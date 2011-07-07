@@ -242,7 +242,7 @@ namespace rtslam {
 				
 				// one of each
 				bool no_more_data = ((resAll == -2) && (resLast == -2));
-				double tnow = getNowTimestamp();
+				double tnow = kernel::Clock::getTime();
 					
 				if (infosAll.available.size() > 0)
 				{ // has all

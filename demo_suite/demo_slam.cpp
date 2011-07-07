@@ -456,7 +456,7 @@ void demo_slam_init()
 	configEstimation.load(strOpts[sConfigEstimation]);
 	
 	// deal with the random seed
-	rseed = time(NULL);
+	rseed = jmath::get_srand();
 	if (intOpts[iRandSeed] != 0 && intOpts[iRandSeed] != 1)
 		rseed = intOpts[iRandSeed];
 	if (!(intOpts[iReplay] & 1) && intOpts[iDump]) {

@@ -869,7 +869,7 @@ void PIOS_Board_Init(void) {
 
 	/* Set up the SPI interface to the serial flash */
 	if (PIOS_SPI_Init(&pios_spi_flash_accel_id, &pios_spi_flash_accel_cfg)) {
-		PIOS_DEBUG_Assert(0);
+		PIOS_Assert(0);
 	}
 
 	PIOS_Flash_W25X_Init(pios_spi_flash_accel_id);	
@@ -1022,13 +1022,13 @@ void PIOS_Board_Init(void) {
 	case MANUALCONTROLSETTINGS_INPUTMODE_PWM:
 #if defined(PIOS_INCLUDE_PWM)
 		PIOS_PWM_Init();
-		for (uint8_t i = 0; i < PIOS_PWM_NUM_INPUTS; i++) {
+		for (uint8_t i = 0; i < PIOS_PWM_NUM_INPUTS && i < pios_rcvr_max_channel; i++) {
 			if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
 					    &pios_pwm_rcvr_driver,
 					    i)) {
 				pios_rcvr_max_channel++;
 			} else {
-				PIOS_DEBUG_Assert(0);
+				PIOS_Assert(0);
 			}
 		}
 #endif	/* PIOS_INCLUDE_PWM */
@@ -1036,13 +1036,13 @@ void PIOS_Board_Init(void) {
 	case MANUALCONTROLSETTINGS_INPUTMODE_PPM:
 #if defined(PIOS_INCLUDE_PPM)
 		PIOS_PPM_Init();
-		for (uint8_t i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
+		for (uint8_t i = 0; i < PIOS_PPM_NUM_INPUTS && i < pios_rcvr_max_channel; i++) {
 			if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
 					    &pios_ppm_rcvr_driver,
 					    i)) {
 				pios_rcvr_max_channel++;
 			} else {
-				PIOS_DEBUG_Assert(0);
+				PIOS_Assert(0);
 			}
 		}
 #endif	/* PIOS_INCLUDE_PPM */
@@ -1051,7 +1051,7 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 		if (hwsettings_cc_mainport == HWSETTINGS_CC_MAINPORT_SPEKTRUM ||
 		    hwsettings_cc_flexiport == HWSETTINGS_CC_FLEXIPORT_SPEKTRUM) {
-			for (uint8_t i = 0; i < PIOS_SPEKTRUM_NUM_INPUTS; i++) {
+			for (uint8_t i = 0; i < PIOS_SPEKTRUM_NUM_INPUTS && i < pios_rcvr_max_channel; i++) {
 				if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
 						    &pios_spektrum_rcvr_driver,
 						    i)) {
@@ -1094,7 +1094,7 @@ void PIOS_Board_Init(void) {
 	PIOS_USB_HID_Init(0);
 #if defined(PIOS_INCLUDE_COM)
 	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, 0)) {
-		PIOS_DEBUG_Assert(0);
+		PIOS_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_COM */
 #endif	/* PIOS_INCLUDE_USB_HID */

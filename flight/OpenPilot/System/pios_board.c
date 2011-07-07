@@ -1024,7 +1024,7 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_SPI)	
 	/* Set up the SPI interface to the SD card */
 	if (PIOS_SPI_Init(&pios_spi_sdcard_id, &pios_spi_sdcard_cfg)) {
-		PIOS_DEBUG_Assert(0);
+		PIOS_Assert(0);
 	}
 
 	/* Enable and mount the SDCard */
@@ -1053,7 +1053,7 @@ void PIOS_Board_Init(void) {
 
 	/* Set up the SPI interface to the AHRS */
 	if (PIOS_SPI_Init(&pios_spi_ahrs_id, &pios_spi_ahrs_cfg)) {
-		PIOS_DEBUG_Assert(0);
+		PIOS_Assert(0);
 	}
 
 	/* Bind the AHRS comms layer to the AHRS SPI link */
@@ -1064,20 +1064,20 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_TELEMETRY_RF)
 	uint32_t pios_usart_telem_rf_id;
 	if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_cfg)) {
-		PIOS_DEBUG_Assert(0);
+		PIOS_Assert(0);
 	}
 	if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id)) {
-		PIOS_DEBUG_Assert(0);
+		PIOS_Assert(0);
 	}
 #endif /* PIOS_INCLUDE_TELEMETRY_RF */
 
 #if defined(PIOS_INCLUDE_GPS)
 	uint32_t pios_usart_gps_id;
 	if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
-		PIOS_DEBUG_Assert(0);
+		PIOS_Assert(0);
 	}
 	if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id)) {
-		PIOS_DEBUG_Assert(0);
+		PIOS_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_GPS */
 #endif
@@ -1095,15 +1095,15 @@ void PIOS_Board_Init(void) {
 
 	uint32_t pios_usart_spektrum_id;
 	if (PIOS_USART_Init(&pios_usart_spektrum_id, &pios_usart_spektrum_cfg)) {
-		PIOS_DEBUG_Assert(0);
+		PIOS_Assert(0);
 	}
-	for (uint8_t i = 0; i < PIOS_SPEKTRUM_NUM_INPUTS; i++) {
+	for (uint8_t i = 0; i < PIOS_SPEKTRUM_NUM_INPUTS && i < pios_rcvr_max_channel; i++) {
 		if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
 				   &pios_spektrum_rcvr_driver,
 				   i)) {
 			pios_rcvr_max_channel++;
 		} else {
-			PIOS_DEBUG_Assert(0);
+			PIOS_Assert(0);
 		}
 	}
 #endif
@@ -1113,13 +1113,13 @@ void PIOS_Board_Init(void) {
 #error More receiver inputs than available devices
 #endif
 	PIOS_PWM_Init();
-	for (uint8_t i = 0; i < PIOS_PWM_NUM_INPUTS; i++) {
+	for (uint8_t i = 0; i < PIOS_PWM_NUM_INPUTS && i < pios_rcvr_max_channel; i++) {
 		if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
 			   &pios_pwm_rcvr_driver,
 			   i)) {
 			pios_rcvr_max_channel++;
 		} else {
-			PIOS_DEBUG_Assert(0);
+			PIOS_Assert(0);
 		}
 	}
 #endif
@@ -1128,13 +1128,13 @@ void PIOS_Board_Init(void) {
 #error More receiver inputs than available devices
 #endif
 	PIOS_PPM_Init();
-	for (uint8_t i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
+	for (uint8_t i = 0; i < PIOS_PPM_NUM_INPUTS && i < pios_rcvr_max_channel; i++) {
 		if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
 			   &pios_ppm_rcvr_driver,
 			   i)) {
 			pios_rcvr_max_channel++;
 		} else {
-			PIOS_DEBUG_Assert(0);
+			PIOS_Assert(0);
 		}
 	}
 #endif
@@ -1142,14 +1142,14 @@ void PIOS_Board_Init(void) {
 	PIOS_USB_HID_Init(0);
 #if defined(PIOS_INCLUDE_COM)
 	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, 0)) {
-		PIOS_DEBUG_Assert(0);
+		PIOS_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_COM */
 #endif  /* PIOS_INCLUDE_USB_HID */
 
 #if defined(PIOS_INCLUDE_I2C)
 	if (PIOS_I2C_Init(&pios_i2c_main_adapter_id, &pios_i2c_main_adapter_cfg)) {
-		PIOS_DEBUG_Assert(0);
+		PIOS_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_I2C */
 	PIOS_IAP_Init();

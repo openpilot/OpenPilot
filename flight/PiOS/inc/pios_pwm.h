@@ -30,9 +30,4 @@
 #ifndef PIOS_PWM_H
 #define PIOS_PWM_H
 
-/* Public Functions */
-extern void PIOS_PWM_Init(void);
-extern int32_t PIOS_PWM_Get(int8_t Channel);
-//extern void PIOS_PWM_irq_handler(TIM_TypeDef * timer);
-
 #endif /* PIOS_PWM_H */

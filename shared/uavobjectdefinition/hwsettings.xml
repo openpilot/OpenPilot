@@ -1,0 +1,11 @@
+<xml>
+    <object name="HwSettings" singleinstance="true" settings="true">
+        <description>Selection of optional hardware configurations.</description>
+	<field name="CC_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,Spektrum,ComAux,I2C" defaultvalue="Disabled"/>
+	<field name="CC_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,S.Bus,GPS,Spektrum,ComAux" defaultvalue="Telemetry"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="never" period="0"/>
+    </object>
+</xml>

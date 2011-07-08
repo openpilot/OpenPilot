@@ -36,12 +36,21 @@
 
 /* Global Variables */
 
+/* Provide a RCVR driver */
+static int32_t PIOS_SBUS_Get(uint32_t chan_id);
+
+const struct pios_rcvr_driver pios_sbus_rcvr_driver = {
+	.read = PIOS_SBUS_Get,
+};
+
 /* Local Variables */
 static uint16_t channel_data[SBUS_NUMBER_OF_CHANNELS];
 static uint8_t received_data[SBUS_FRAME_LENGTH - 2];
 static uint8_t receive_timer;
 static uint8_t failsafe_timer;
 static uint8_t frame_found;
+
+static void PIOS_SBUS_Supervisor(uint32_t sbus_id);
 
 /**
  * reset_channels() function clears all channel data in case of
@@ -126,26 +135,18 @@ static void process_byte(uint8_t b)
 /**
  * Initialise S.Bus receiver interface
  */
-void PIOS_SBUS_Init(void)
+void PIOS_SBUS_Init(const struct pios_sbus_cfg *cfg)
 {
-	/* Enable USART input invertor clock and enable the invertor */
-	(*pios_sbus_cfg.gpio_clk_func)(pios_sbus_cfg.gpio_clk_periph, ENABLE);
-	GPIO_Init(pios_sbus_cfg.gpio_inv_port, &pios_sbus_cfg.gpio_inv_init);
-	GPIO_WriteBit(pios_sbus_cfg.gpio_inv_port,
-		      pios_sbus_cfg.gpio_inv_init.GPIO_Pin,
-		      pios_sbus_cfg.gpio_inv_enable);
+	/* Enable inverter clock and enable the inverter */
+	(*cfg->gpio_clk_func)(cfg->gpio_clk_periph, ENABLE);
+	GPIO_Init(cfg->inv.gpio, &cfg->inv.init);
+	GPIO_WriteBit(cfg->inv.gpio,
+		      cfg->inv.init.GPIO_Pin,
+		      cfg->gpio_inv_enable);
 
-	/* Init RTC supervisor timer interrupt */
-	static const NVIC_InitTypeDef NVIC_InitStructure = {
-		.NVIC_IRQChannel = RTC_IRQn,
-		.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-		.NVIC_IRQChannelSubPriority = 0,
-		.NVIC_IRQChannelCmd = ENABLE,
-	};
-	NVIC_Init(&NVIC_InitStructure);
-
-	/* Init RTC clock */
-	PIOS_RTC_Init();
+	if (!PIOS_RTC_RegisterTickCallback(PIOS_SBUS_Supervisor, 0)) {
+		PIOS_Assert(0);
+	}
 }
 
 /**
@@ -154,23 +155,28 @@ void PIOS_SBUS_Init(void)
  * \output -1 channel not available
  * \output >0 channel value
  */
-int16_t PIOS_SBUS_Get(int8_t channel)
+static int32_t PIOS_SBUS_Get(uint32_t chan_id)
 {
 	/* return error if channel is not available */
-	if (channel >= SBUS_NUMBER_OF_CHANNELS) {
+	if (chan_id >= SBUS_NUMBER_OF_CHANNELS) {
 		return -1;
 	}
-	return channel_data[channel];
+	return channel_data[chan_id];
 }
 
 /**
  * Interrupt handler for USART
  */
-void SBUS_IRQHandler(uint32_t usart_id)
+void PIOS_SBUS_irq_handler(uint32_t usart_id)
 {
+	/* Grab the config for this device from the underlying USART device */
+	const struct pios_usart_cfg * cfg;
+	cfg = PIOS_USART_GetConfig(usart_id);
+	PIOS_Assert(cfg);
+  
 	/* by always reading DR after SR make sure to clear any error interrupts */
-	volatile uint16_t sr = pios_sbus_cfg.pios_usart_sbus_cfg->regs->SR;
-	volatile uint8_t b = pios_sbus_cfg.pios_usart_sbus_cfg->regs->DR;
+	volatile uint16_t sr = cfg->regs->SR;
+	volatile uint8_t b = cfg->regs->DR;
 
 	/* process received byte if one has arrived */
 	if (sr & USART_SR_RXNE) {
@@ -182,7 +188,7 @@ void SBUS_IRQHandler(uint32_t usart_id)
 	/* ignore TXE interrupts */
 	if (sr & USART_SR_TXE) {
 		/* disable TXE interrupt (TXEIE=0) */
-		USART_ITConfig(pios_sbus_cfg.pios_usart_sbus_cfg->regs, USART_IT_TXE, DISABLE);
+		USART_ITConfig(cfg->regs, USART_IT_TXE, DISABLE);
 	}
 }
 
@@ -198,7 +204,7 @@ void SBUS_IRQHandler(uint32_t usart_id)
  * data reception. If no new data received in 100ms, we must call the
  * failsafe function which clears all channels.
  */
-void PIOS_SBUS_irq_handler()
+static void PIOS_SBUS_Supervisor(uint32_t sbus_id)
 {
 	/* waiting for new frame if no bytes were received in 3.2ms */
 	if (++receive_timer > 2) {

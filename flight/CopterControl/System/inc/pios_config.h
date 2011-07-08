@@ -43,25 +43,17 @@
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
 
-/* Receiver interfaces - only one allowed */
-#if !defined(USE_SPEKTRUM) && !defined(USE_SBUS)
+#define PIOS_INCLUDE_RCVR
+
+/* Supported receiver interfaces */
+#define PIOS_INCLUDE_SPEKTRUM
+#define PIOS_INCLUDE_SBUS
 //#define PIOS_INCLUDE_PPM
 #define PIOS_INCLUDE_PWM
-#endif
 
-/* USART-based PIOS modules */
-#if defined(USE_TELEMETRY)
+/* Supported USART-based PIOS modules */
 #define PIOS_INCLUDE_TELEMETRY_RF
-#endif
-#if defined(USE_GPS)
-#define PIOS_INCLUDE_GPS
-#endif
-#if defined(USE_SPEKTRUM)
-#define PIOS_INCLUDE_SPEKTRUM
-#endif
-#if defined(USE_SBUS)
-#define PIOS_INCLUDE_SBUS
-#endif
+//#define PIOS_INCLUDE_GPS
 
 #define PIOS_INCLUDE_SERVO
 #define PIOS_INCLUDE_SPI
@@ -95,8 +87,8 @@
 
 /* Alarm Thresholds */
 #define HEAP_LIMIT_WARNING             220
-#define HEAP_LIMIT_CRITICAL            150
-#define CPULOAD_LIMIT_WARNING		80
+#define HEAP_LIMIT_CRITICAL             40
+#define CPULOAD_LIMIT_WARNING		85
 #define CPULOAD_LIMIT_CRITICAL		95
 
 /* Task stack sizes */

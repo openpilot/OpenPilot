@@ -90,7 +90,7 @@ static const struct pios_spi_cfg pios_spi_port_cfg =
 		.ahb_clk = RCC_AHBPeriph_DMA1,
 		.irq =
 		{
-			.handler = PIOS_SPI_port_irq_handler,
+			.handler = NULL,
 		      .flags   = (DMA1_FLAG_TC2 | DMA1_FLAG_TE2 | DMA1_FLAG_HT2 | DMA1_FLAG_GL2),
 		      .init    = {
 			.NVIC_IRQChannel                   = DMA1_Channel2_IRQn,
@@ -189,11 +189,11 @@ void PIOS_SPI_port_irq_handler(void)
 extern void PIOS_ADC_handler(void);
 void DMA1_Channel1_IRQHandler() __attribute__ ((alias("PIOS_ADC_handler")));
 // Remap the ADC DMA handler to this one
-const struct pios_adc_cfg pios_adc_cfg = {
+static const struct pios_adc_cfg pios_adc_cfg = {
 	.dma = {
 		.ahb_clk  = RCC_AHBPeriph_DMA1,
 		.irq = {
-			.handler = PIOS_ADC_DMA_Handler,
+			.handler = NULL,
 			.flags   = (DMA1_FLAG_TC1 | DMA1_FLAG_TE1 | DMA1_FLAG_HT1 | DMA1_FLAG_GL1),
 			.init    = {
 				.NVIC_IRQChannel                   = DMA1_Channel1_IRQn,
@@ -245,10 +245,7 @@ void PIOS_ADC_handler() {
 /*
  * SERIAL USART
  */
-void PIOS_USART_serial_irq_handler(void);
-void USART1_IRQHandler() __attribute__ ((alias ("PIOS_USART_serial_irq_handler")));
-
-const struct pios_usart_cfg pios_usart_serial_cfg =
+static const struct pios_usart_cfg pios_usart_serial_cfg =
 {
 	.regs = USART1,
 	.init =
@@ -262,7 +259,7 @@ const struct pios_usart_cfg pios_usart_serial_cfg =
 	},
 	.irq =
 	{
-		.handler = PIOS_USART_serial_irq_handler,
+		.handler = NULL,
 		.init =
 		{
 			.NVIC_IRQChannel = USART1_IRQn,
@@ -292,12 +289,6 @@ const struct pios_usart_cfg pios_usart_serial_cfg =
 		},
 	},
 };
-
-static uint32_t pios_usart_serial_id;
-void PIOS_USART_serial_irq_handler(void)
-{
-	PIOS_USART_IRQ_Handler(pios_usart_serial_id);
-}
 
 #endif /* PIOS_INCLUDE_USART */
 
@@ -334,6 +325,7 @@ void PIOS_Board_Init(void) {
 	// Delay system
 	PIOS_DELAY_Init();
 
+	uint32_t pios_usart_serial_id;
 	if (PIOS_USART_Init(&pios_usart_serial_id, &pios_usart_serial_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}

@@ -135,12 +135,10 @@ extern uint32_t pios_i2c_gyro_adapter_id;
 //-------------------------
 #define PIOS_COM_MAX_DEVS               2
 
-#define PIOS_COM_GPS_BAUDRATE           57600
 extern uint32_t pios_com_gps_id;
 #define PIOS_COM_GPS                    (pios_com_gps_id)
 
 #ifdef PIOS_ENABLE_AUX_UART
-#define PIOS_COM_AUX_BAUDRATE           57600
 extern uint32_t pios_com_aux_id;
 #define PIOS_COM_AUX                    (pios_com_aux_id)
 #define PIOS_COM_DEBUG                  PIOS_COM_AUX

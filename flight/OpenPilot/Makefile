@@ -43,10 +43,6 @@ ENABLE_DEBUG_PINS ?= NO
 # Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs
 ENABLE_AUX_UART ?= NO
 
-USE_SPEKTRUM ?= NO
-USE_SBUS ?= NO
-
-
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= YES
 
@@ -193,6 +189,7 @@ SRC += $(PIOSCOMMON)/pios_hcsr04.c
 SRC += $(PIOSCOMMON)/pios_i2c_esc.c
 SRC += $(PIOSCOMMON)/pios_iap.c
 SRC += $(PIOSCOMMON)/pios_bl_helper.c
+SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 SRC += $(FLIGHTLIB)/ahrs_spi_comm.c
 SRC += $(FLIGHTLIB)/ahrs_comm_objects.c
@@ -361,14 +358,6 @@ endif
 ifeq ($(ENABLE_AUX_UART), YES)
 CDEFS += -DPIOS_ENABLE_AUX_UART
 endif
-
-ifeq ($(USE_SPEKTRUM), YES)
-CDEFS += -DUSE_SPEKTRUM
-endif
-ifeq ($(USE_SBUS), YES)
-CDEFS += -DUSE_SBUS
-endif
-
 
 # Place project-specific -D and/or -U options for
 # Assembler with preprocessor here.

@@ -2,12 +2,13 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS_RTC RTC Functions
+ * @addtogroup PIOS_RCVR RCVR layer functions
+ * @brief Hardware communication layer
  * @{
  *
- * @file       pios_rtc.h  
+ * @file       pios_rcvr.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      RTC functions header.
+ * @brief      RCVR layer functions header
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -27,20 +28,22 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_RTC_H
-#define PIOS_RTC_H
+#ifndef PIOS_RCVR_H
+#define PIOS_RCVR_H
 
-#include <stdbool.h>
+extern uint32_t pios_rcvr_channel_to_id_map[];
+
+struct pios_rcvr_driver {
+  void    (*init)(uint32_t id);
+  int32_t (*read)(uint32_t id);
+};
 
 /* Public Functions */
-extern uint32_t PIOS_RTC_Counter();
-extern float PIOS_RTC_Rate();
-extern float PIOS_RTC_MsPerTick();
-extern bool PIOS_RTC_RegisterTickCallback(void (*fn)(uint32_t id), uint32_t data);
+extern int32_t PIOS_RCVR_Read(uint32_t rcvr_id);
 
-#endif /* PIOS_RTC_H */
+#endif /* PIOS_RCVR_H */
 
 /**
- * @}
- * @}
- */
+  * @}
+  * @}
+  */

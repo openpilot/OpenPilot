@@ -33,9 +33,6 @@
 /* Global Types */
 
 /* Public Functions */
-extern void PIOS_SBUS_Init(void);
-extern int16_t PIOS_SBUS_Get(int8_t Channel);
-extern void SBUS_IRQHandler(uint32_t usart_id);
 
 #endif /* PIOS_SBUS_H */
 

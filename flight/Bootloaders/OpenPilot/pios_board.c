@@ -60,7 +60,7 @@ const struct pios_spi_cfg
 					.ahb_clk = RCC_AHBPeriph_DMA1,
 
 					.irq = {
-						.handler = PIOS_SPI_ahrs_irq_handler,
+						.handler = NULL,
 						.flags = (DMA1_FLAG_TC4 | DMA1_FLAG_TE4 | DMA1_FLAG_HT4 | DMA1_FLAG_GL4),
 						.init = {
 							.NVIC_IRQChannel = DMA1_Channel4_IRQn,
@@ -143,9 +143,9 @@ void PIOS_SPI_ahrs_irq_handler(void) {
 /*
  * Telemetry USART
  */
-void PIOS_USART_telem_irq_handler(void);
-void USART2_IRQHandler() __attribute__ ((alias ("PIOS_USART_telem_irq_handler")));
-const struct pios_usart_cfg pios_usart_telem_cfg = { .regs = USART2, .init = {
+const struct pios_usart_cfg pios_usart_telem_cfg = {
+	.regs = USART2,
+	.init = {
 #if defined (PIOS_COM_TELEM_BAUDRATE)
 		.USART_BaudRate = PIOS_COM_TELEM_BAUDRATE,
 #else
@@ -157,7 +157,7 @@ const struct pios_usart_cfg pios_usart_telem_cfg = { .regs = USART2, .init = {
 		.USART_HardwareFlowControl = USART_HardwareFlowControl_None,
 		.USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
 	}, .irq = {
-		.handler = PIOS_USART_telem_irq_handler,
+		.handler = NULL,
 		.init = {
 			.NVIC_IRQChannel = USART2_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
@@ -179,11 +179,6 @@ const struct pios_usart_cfg pios_usart_telem_cfg = { .regs = USART2, .init = {
 			.GPIO_Mode = GPIO_Mode_AF_PP,
 		},
 	}, };
-
-static uint32_t pios_usart_telem_rf_id;
-void PIOS_USART_telem_irq_handler(void) {
-	PIOS_USART_IRQ_Handler(pios_usart_telem_rf_id);
-}
 
 #endif	/* PIOS_INCLUDE_USART */
 
@@ -218,6 +213,7 @@ void PIOS_Board_Init(void) {
 
 	/* Initialize the PiOS library */
 #if defined(PIOS_INCLUDE_COM)
+	uint32_t pios_usart_telem_rf_id;
 	if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}

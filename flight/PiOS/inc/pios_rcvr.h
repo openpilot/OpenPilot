@@ -8,8 +8,7 @@
  *
  * @file       pios_rcvr.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	       Parts by Thorsten Klose (tk@midibox.org)
- * @brief      COM layer functions header
+ * @brief      RCVR layer functions header
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/

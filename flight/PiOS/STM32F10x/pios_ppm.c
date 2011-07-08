@@ -134,6 +134,13 @@ void PIOS_PPM_Init(void)
 	/* Enable timers */
 	TIM_Cmd(pios_ppm_cfg.timer, ENABLE);
 
+#ifdef MOVECOPTER
+	if(pios_ppm_cfg.remap) {
+		/* Warning, I don't think this will work for multiple remaps at once */
+		GPIO_PinRemapConfig(pios_ppm_cfg.remap, ENABLE);
+	}
+#endif
+
 	/* Supervisor Setup */
 	/* Flush counter variables */
 	for (i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {

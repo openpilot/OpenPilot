@@ -44,7 +44,7 @@ ENABLE_DEBUG_PINS ?= NO
 ENABLE_AUX_UART ?= NO
 
 # Set to YES when using Code Sourcery toolchain
-CODE_SOURCERY ?= NO
+CODE_SOURCERY ?= YES
 
 # Remove command is different for Code Sourcery on Windows
 ifeq ($(CODE_SOURCERY), YES)

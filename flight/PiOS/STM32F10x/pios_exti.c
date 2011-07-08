@@ -35,6 +35,9 @@
 
 #if defined(PIOS_INCLUDE_EXTI)
 
+extern void PIOS_AK8974_IRQHandler(void);
+
+
 /**
 * Handle external lines 15 to 10 interrupt requests
 */
@@ -42,6 +45,13 @@ void EXTI15_10_IRQHandler(void)
 {
 #if defined(PIOS_INCLUDE_FREERTOS)
 	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+#endif
+
+#if defined(PIOS_INCLUDE_AK8974)
+	if (EXTI_GetITStatus(PIOS_AK8974_DRDY_EXTI_LINE) != RESET) {
+		PIOS_AK8974_IRQHandler();
+		EXTI_ClearITPendingBit(PIOS_AK8974_DRDY_EXTI_LINE);
+	}
 #endif
 
 #if defined(PIOS_INCLUDE_BMP085)

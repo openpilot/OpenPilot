@@ -44,7 +44,7 @@ ENABLE_DEBUG_PINS ?= NO
 ENABLE_AUX_UART ?= NO
 
 # Set to YES when using Code Sourcery toolchain
-CODE_SOURCERY ?= NO
+CODE_SOURCERY ?= YES
 
 # Toolchain prefix (i.e arm-elf- -> arm-elf-gcc.exe)
 TCHAIN_PREFIX ?= arm-none-eabi-

@@ -31,7 +31,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
+/* GIT test*/
 /* OpenPilot Includes */
 #include "openpilot.h"
 #include "uavobjectsinit.h"

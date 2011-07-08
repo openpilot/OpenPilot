@@ -35,7 +35,7 @@ OUTDIR := $(TOP)/build/$(TARGET)
 
 # Set developer code and compile options
 # Set to YES to compile for debugging
-DEBUG ?= NO
+DEBUG ?= YES
 
 # Set to YES to build a FW version that will erase all flash memory
 ERASE_FLASH ?= NO
@@ -47,7 +47,7 @@ ENABLE_AUX_UART ?= NO
 
 USE_GPS ?= NO
 
-USE_I2C ?= NO
+USE_I2C ?= YES
 
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= YES
@@ -201,10 +201,17 @@ SRC += $(PIOSSTM32F10X)/pios_usb_hid_prop.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
 
 ## PIOS Hardware (Common)
+<<<<<<< HEAD
 SRC += $(PIOSCOMMON)/pios_crc.c
 SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
 SRC += $(PIOSCOMMON)/pios_flash_w25x.c
 SRC += $(PIOSCOMMON)/pios_adxl345.c
+=======
+#SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
+#SRC += $(PIOSCOMMON)/pios_flash_w25x.c
+#SRC += $(PIOSCOMMON)/pios_adxl345.c
+SRC += $(PIOSCOMMON)/pios_ak8974.c
+>>>>>>> Initial MoveCopter branch.
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_i2c_esc.c
 SRC += $(PIOSCOMMON)/pios_iap.c

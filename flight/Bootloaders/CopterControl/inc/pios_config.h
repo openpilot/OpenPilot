@@ -42,6 +42,7 @@
 #define PIOS_INCLUDE_COM
 #define PIOS_INCLUDE_GPIO
 #define PIOS_NO_GPS
+#define MOVECOPTER
 
 #endif /* PIOS_CONFIG_H */
 /**

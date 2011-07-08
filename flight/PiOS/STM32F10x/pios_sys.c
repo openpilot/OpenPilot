@@ -61,7 +61,17 @@ void PIOS_SYS_Init(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
 	GPIO_InitStructure.GPIO_Pin = 0xffff;
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+#ifdef MOVECOPTER
+	/* enable PS3MOVE pwr regulator */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_Init(GPIOD, &GPIO_InitStructure);
+	GPIO_SetBits(GPIOD, GPIO_Pin_11);
+#else
+	GPIO_Init(GPIOD, &GPIO_InitStructure);
+#endif
+
 #if (PIOS_USB_ENABLED)
 	GPIO_InitStructure.GPIO_Pin = 0xffff & ~GPIO_Pin_11 & ~GPIO_Pin_12;	/* Exclude USB pins */
 #endif
@@ -72,6 +82,13 @@ void PIOS_SYS_Init(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
 	GPIO_InitStructure.GPIO_Pin = PIOS_USB_DETECT_GPIO_PIN;
 	GPIO_Init(PIOS_USB_DETECT_GPIO_PORT, &GPIO_InitStructure);
+#ifdef MOVECOPTER
+	/* Enable signaling to the host that an USB device is present */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_Init(GPIOD, &GPIO_InitStructure);
+	GPIO_SetBits(GPIOD, GPIO_Pin_6);
+#endif /* MOVECOPTER */
 #endif
 
 	/* Initialise Basic NVIC */

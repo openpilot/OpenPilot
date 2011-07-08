@@ -56,13 +56,19 @@
 #include "flightstatus.h"
 #include "CoordinateConversions.h"
 #include "pios_flash_w25x.h"
+#if defined(PIOS_INCLUDE_AK8974)
+#include "pios_ak8974.h"
+#endif
 
 // Private constants
 #define STACK_SIZE_BYTES 540
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 
 #define UPDATE_RATE  2.0f
-#define GYRO_NEUTRAL 1665
+//#define GYRO_NEUTRAL 1665
+// wb! #define GYRO_NEUTRAL 1665
+// neutral position for LPR425AL (1.5V)
+#define GYRO_NEUTRAL 1861
 
 #define PI_MOD(x) (fmod(x + M_PI, M_PI * 2) - M_PI)
 // Private types
@@ -74,7 +80,7 @@ static xTaskHandle taskHandle;
 static void AttitudeTask(void *parameters);
 
 static float gyro_correct_int[3] = {0,0,0};
-static xQueueHandle gyro_queue;
+static xQueueHandle sensor_queue;
 
 static void updateSensors(AttitudeRawData *);
 static void updateAttitude(AttitudeRawData *);
@@ -83,7 +89,9 @@ static void settingsUpdatedCb(UAVObjEvent * objEv);
 static float accelKi = 0;
 static float accelKp = 0;
 static float yawBiasRate = 0;
-static float gyroGain = 0.42;
+//static float gyroGain = 0.42;
+// assumed data for LPR425AL
+static float gyroGain = 1.24;
 static int16_t accelbias[3];
 static float q[4] = {1,0,0,0};
 static float R[3][3];
@@ -106,10 +114,10 @@ int32_t AttitudeInitialize(void)
 	AttitudeActualSet(&attitude);
 	
 	// Create queue for passing gyro data, allow 2 back samples in case
-	gyro_queue = xQueueCreate(1, sizeof(float) * 4);
-	if(gyro_queue == NULL) 
+	sensor_queue = xQueueCreate(1, sizeof(float) * PIOS_ADC_NUM_PINS);
+	if(sensor_queue == NULL)
 		return -1;
-	PIOS_ADC_SetQueue(gyro_queue);
+	PIOS_ADC_SetQueue(sensor_queue);
 	
 	AttitudeSettingsConnectCallback(&settingsUpdatedCb);
 	
@@ -133,8 +141,14 @@ static void AttitudeTask(void *parameters)
 
 	// Keep flash CS pin high while talking accel
 	PIOS_FLASH_DISABLE;		
+
+#if defined(PIOS_INCLUDE_AK8974)
+	PIOS_AK8974_Init();
+#endif
+#if defined(PIOS_INCLUDE_ADXL345)
 	PIOS_ADXL345_Init();
-			
+#endif
+
 	zero_during_arming = false;
 	// Main task loop
 	while (1) {
@@ -174,37 +188,67 @@ static void AttitudeTask(void *parameters)
 
 static void updateSensors(AttitudeRawData * attitudeRaw) 
 {	
+#if defined(PIOS_INCLUDE_ADXL345)
 	struct pios_adxl345_data accel_data;
 	float gyro[4];
+
+#endif
+#if defined(PIOS_INCLUDE_KXSC4)
+	float sensors[PIOS_ADC_NUM_PINS];
+
+#endif
+
 	
 	// Only wait the time for two nominal updates before setting an alarm
-	if(xQueueReceive(gyro_queue, (void * const) gyro, UPDATE_RATE * 2) == errQUEUE_EMPTY) {
+	if(xQueueReceive(sensor_queue, (void * const) sensors, UPDATE_RATE * 2) == errQUEUE_EMPTY) {
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
 		return;
 	}
 	
 	
 	// First sample is temperature
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = -(gyro[1] - GYRO_NEUTRAL) * gyroGain;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] = (gyro[2] - GYRO_NEUTRAL) * gyroGain;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = -(gyro[3] - GYRO_NEUTRAL) * gyroGain;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = -(sensors[4] - GYRO_NEUTRAL) * gyroGain;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] = (sensors[5] - GYRO_NEUTRAL) * gyroGain;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = -(sensors[6] - GYRO_NEUTRAL) * gyroGain;
+
+
 	
+#if defined(PIOS_INCLUDE_ADXL345)
+
 	int32_t x = 0;
 	int32_t y = 0;
 	int32_t z = 0;
 	uint8_t i = 0;
+
+
 	uint8_t samples_remaining;
+
 	do {
 		i++;
 		samples_remaining = PIOS_ADXL345_Read(&accel_data);
+
 		x +=  accel_data.x;
 		y += -accel_data.y;
 		z += -accel_data.z;
 	} while ( (i < 32) && (samples_remaining > 0) );
+
+
+
 	attitudeRaw->gyrotemp[0] = samples_remaining;
 	attitudeRaw->gyrotemp[1] = i;
+
 	
 	float accel[3] = {(float) x / i, (float) y / i, (float) z / i};
+#endif
+
+#if defined(PIOS_INCLUDE_KXSC4)
+//	int32_t x = sensors[0];
+//	int32_t y = sensors[1];
+//	int32_t z = sensors[2];
+
+	float accel[3] = {sensors[0], sensors[1], -sensors[2]};
+
+#endif
 	
 	if(rotate) {
 		// TODO: rotate sensors too so stabilization is well behaved
@@ -224,17 +268,32 @@ static void updateSensors(AttitudeRawData * attitudeRaw)
 	}		
 	
 	// Scale accels and correct bias
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = (attitudeRaw->accels[ATTITUDERAW_ACCELS_X] - accelbias[0]) * 0.004f * 9.81f;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = (attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] - accelbias[1]) * 0.004f * 9.81f;
-	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = (attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] - accelbias[2]) * 0.004f * 9.81f;
-	
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_X] = (attitudeRaw->accels[ATTITUDERAW_ACCELS_X] - accelbias[0]) * 0.00366f * 9.81f;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] = (attitudeRaw->accels[ATTITUDERAW_ACCELS_Y] - accelbias[1]) * 0.00366f * 9.81f;
+	attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] = (attitudeRaw->accels[ATTITUDERAW_ACCELS_Z] - accelbias[2]) * 0.00366f * 9.81f;
+
+
+
 	// Applying integral component here so it can be seen on the gyros and correct bias
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] += gyro_correct_int[0];
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] += gyro_correct_int[1];
 	
 	// Because most crafts wont get enough information from gravity to zero yaw gyro
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] += gyro_correct_int[2];
-	gyro_correct_int[2] += - attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] * yawBiasRate;			
+	gyro_correct_int[2] += - attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] * yawBiasRate;
+#if defined(PIOS_INCLUDE_AK8974)
+
+	int16_t magbuffer[3];
+
+	// experimetal magnetometer support for MoveCopter
+
+		if (PIOS_AK8974_NewDataAvailable() ) {
+			PIOS_AK8974_ReadMag (magbuffer);
+			attitudeRaw->magnetometers[ATTITUDERAW_MAGNETOMETERS_X] = (float)magbuffer[0];
+			attitudeRaw->magnetometers[ATTITUDERAW_MAGNETOMETERS_Y] = (float)magbuffer[1];
+			attitudeRaw->magnetometers[ATTITUDERAW_MAGNETOMETERS_Z] = (float)magbuffer[2];
+		}
+#endif
 }
 
 static void updateAttitude(AttitudeRawData * attitudeRaw)

@@ -33,27 +33,27 @@
 #ifndef PIOS_CONFIG_H
 #define PIOS_CONFIG_H
 
+#define MOVECOPTER
+
 /* Enable/Disable PiOS Modules */
 #define PIOS_INCLUDE_ADC
 #define PIOS_INCLUDE_DELAY
 #if defined(USE_I2C)
 #define PIOS_INCLUDE_I2C
-#define PIOS_INCLUDE_I2C_ESC
+//#define PIOS_INCLUDE_I2C_ESC
 #endif
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
 
-#define PIOS_INCLUDE_RCVR
+//#define PIOS_INCLUDE_RCVR
 
 /* Supported receiver interfaces */
-#define PIOS_INCLUDE_SPEKTRUM
-#define PIOS_INCLUDE_SBUS
-//#define PIOS_INCLUDE_PPM
-#define PIOS_INCLUDE_PWM
-
-/* Supported USART-based PIOS modules */
-#define PIOS_INCLUDE_TELEMETRY_RF
+//#define PIOS_INCLUDE_SPEKTRUM
 //#define PIOS_INCLUDE_GPS
+//#define PIOS_INCLUDE_SBUS
+#define PIOS_INCLUDE_PPM
+//#define PIOS_INCLUDE_PWM
+
 
 #define PIOS_INCLUDE_SERVO
 #define PIOS_INCLUDE_SPI
@@ -69,11 +69,14 @@
 #define PIOS_INCLUDE_WDG
 #define PIOS_INCLUDE_BL_HELPER
 
-#define PIOS_INCLUDE_ADXL345
-#define PIOS_INCLUDE_FLASH
+// #define PIOS_INCLUDE_ADXL345
+#define PIOS_INCLUDE_AK8974
+#define PIOS_INCLUDE_KXSC4
+
+//#define PIOS_INCLUDE_FLASH
 
 /* A really shitty setting saving implementation */
-#define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
+//#define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
 
 /* Defaults for Logging */
 #define LOG_FILENAME 			"PIOS.LOG"
@@ -86,8 +89,8 @@
 #define AUXUART_BAUDRATE		19200
 
 /* Alarm Thresholds */
-#define HEAP_LIMIT_WARNING             220
-#define HEAP_LIMIT_CRITICAL             40
+#define HEAP_LIMIT_WARNING		220
+#define HEAP_LIMIT_CRITICAL		 40
 #define CPULOAD_LIMIT_WARNING		85
 #define CPULOAD_LIMIT_CRITICAL		95
 

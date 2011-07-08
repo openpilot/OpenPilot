@@ -38,7 +38,7 @@
 #define PIOS_NO_GPS
 //#define DEBUG_SSP
 #define PIOS_INCLUDE_IRQ
-
+#define MOVECOPTER
 #endif /* PIOS_CONFIG_H */
 /**
  * @}

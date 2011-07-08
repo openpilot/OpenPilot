@@ -1080,7 +1080,7 @@ void PIOS_Board_Init(void) {
 	if (PIOS_USART_Init(&pios_usart_spektrum_id, &pios_usart_spektrum_cfg)) {
 		PIOS_Assert(0);
 	}
-	for (uint8_t i = 0; i < PIOS_SPEKTRUM_NUM_INPUTS && i < pios_rcvr_max_channel; i++) {
+	for (uint8_t i = 0; i < PIOS_SPEKTRUM_NUM_INPUTS && i < PIOS_RCVR_MAX_DEVS; i++) {
 		if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
 				   &pios_spektrum_rcvr_driver,
 				   i)) {
@@ -1096,7 +1096,7 @@ void PIOS_Board_Init(void) {
 #error More receiver inputs than available devices
 #endif
 	PIOS_PWM_Init();
-	for (uint8_t i = 0; i < PIOS_PWM_NUM_INPUTS && i < pios_rcvr_max_channel; i++) {
+	for (uint8_t i = 0; i < PIOS_PWM_NUM_INPUTS && i < PIOS_RCVR_MAX_DEVS; i++) {
 		if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
 			   &pios_pwm_rcvr_driver,
 			   i)) {
@@ -1111,7 +1111,7 @@ void PIOS_Board_Init(void) {
 #error More receiver inputs than available devices
 #endif
 	PIOS_PPM_Init();
-	for (uint8_t i = 0; i < PIOS_PPM_NUM_INPUTS && i < pios_rcvr_max_channel; i++) {
+	for (uint8_t i = 0; i < PIOS_PPM_NUM_INPUTS && i < PIOS_RCVR_MAX_DEVS; i++) {
 		if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
 			   &pios_ppm_rcvr_driver,
 			   i)) {

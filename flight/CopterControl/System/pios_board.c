@@ -632,18 +632,64 @@ const struct pios_servo_cfg pios_servo_cfg = {
 	.num_channels = NELEMENTS(pios_servo_channels),
 };
 
+#if defined(PIOS_INCLUDE_PWM) && defined(PIOS_INCLUDE_PPM)
+#error Cannot define both PIOS_INCLUDE_PWM and PIOS_INCLUDE_PPM at the same time (yet)
+#endif
+
 /*
  * PPM Inputs
  */
 #if defined(PIOS_INCLUDE_PPM)
 #include <pios_ppm_priv.h>
-#endif
+
+void TIM4_IRQHandler();
+void TIM4_IRQHandler() __attribute__ ((alias ("PIOS_TIM4_irq_handler")));
+const struct pios_ppm_cfg pios_ppm_cfg = {
+	.tim_base_init = {
+		.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,	/* For 1 uS accuracy */
+		.TIM_ClockDivision = TIM_CKD_DIV1,
+		.TIM_CounterMode = TIM_CounterMode_Up,
+		.TIM_Period = 0xFFFF, /* shared timer, make sure init correctly in outputs */
+		.TIM_RepetitionCounter = 0x0000,
+	},
+	.tim_ic_init = {
+		.TIM_Channel = TIM_Channel_1,
+		.TIM_ICPolarity = TIM_ICPolarity_Rising,
+		.TIM_ICSelection = TIM_ICSelection_DirectTI,
+		.TIM_ICPrescaler = TIM_ICPSC_DIV1,
+		.TIM_ICFilter = 0x0,
+	},
+	.gpio_init = {
+		.GPIO_Pin = GPIO_Pin_6,
+		.GPIO_Mode = GPIO_Mode_IPD,
+		.GPIO_Speed = GPIO_Speed_2MHz,
+	},
+	.remap = 0,
+	.irq = {
+		.handler = TIM4_IRQHandler,
+		.init    = {
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+	.timer = TIM4,
+	.port = GPIOB,
+	.ccr = TIM_IT_CC1,
+};
+
+void PIOS_TIM4_irq_handler()
+{
+	PIOS_PPM_irq_handler();
+}
+#endif	/* PIOS_INCLUDE_PPM */
 
 /* 
  * PWM Inputs 
  */
 #if defined(PIOS_INCLUDE_PWM)
 #include <pios_pwm_priv.h>
+
 static const struct pios_pwm_channel pios_pwm_channels[] = {
 	{
 		.timer = TIM4,

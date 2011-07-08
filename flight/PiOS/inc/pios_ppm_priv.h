@@ -34,13 +34,6 @@
 #include <pios.h>
 #include <pios_stm32.h>
 
-struct pios_ppmsv_cfg {
-	TIM_TimeBaseInitTypeDef tim_base_init;
-	struct stm32_irq irq;
-	TIM_TypeDef * timer;
-	uint16_t ccr;
-};
-
 struct pios_ppm_cfg {
 	TIM_TimeBaseInitTypeDef tim_base_init;
 	TIM_ICInitTypeDef tim_ic_init;
@@ -53,11 +46,9 @@ struct pios_ppm_cfg {
 };
 
 extern void PIOS_PPM_irq_handler();
-extern void PIOS_PPMSV_irq_handler();
 
 extern uint8_t pios_ppm_num_channels;
 extern const struct pios_ppm_cfg pios_ppm_cfg;
-extern const struct pios_ppmsv_cfg pios_ppmsv_cfg;
 
 extern const struct pios_rcvr_driver pios_ppm_rcvr_driver;
 

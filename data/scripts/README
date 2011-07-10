@@ -26,8 +26,8 @@ Use video_raw.sh script.
 3. Be able to reproduce a SLAM run
 
 All the information you need to save if you want to reproduce a SLAM run:
-- the source version (commit number, if your working tree is clean)
-- a copy of the config files setup.png and estimation.png that were used
+- the source code version (commit number, if your working tree is clean)
+- a copy of the config files setup.cfg and estimation.cfg that were used
 - the random seed used
 - the command line that started the run
 
@@ -44,9 +44,14 @@ You can use the scripts:
 5. Make a Monte Carlo study of a SLAM setup and sequence
 
 Two ways to obtain the data:
-- with one or multiple distant machines using ssh and screen, with the scripts
-  montecarlo_start.sh and montecarlo_clean.sh. You can modify the
+- with one or multiple distant machines using ssh and screen, with the script
+  montecarlo_start.sh. You can modify the
 - using a cluster, such as cacao at LAAS. TODO
+
+You have to transform the data with the sync_truth jafar_irb function:
+ (0..99).each { |i| Rtslam::sync_truth("/mnt/.../01/results/rtslam_#{sprintf('%03d',i)}.log", "/mnt/.../01/truth.dat", "/mnt/.../01/results/slamocap_#{sprintf('%03d',i)}.log") }
+and to compute the average:
+./average_files.rb /mnt/.../01/results/slamocap_%03d.log 0 99 /mnt/.../01/results/slamocap_avg.log
 
 Then you can use the scripts:
 - plot_slamtruth_traj_6xn.gp

@@ -27,19 +27,19 @@ def Rtslam.sync_truth(slam_filename, truth_filename, res_filename)
 	slam_ncol=45
 	
 	slam_t_col=0
-	slam_x_col=1
-	slam_y_col=2
-	slam_z_col=3
-	slam_w_col=8
-	slam_p_col=9
-	slam_r_col=10
+	slam_x_col=4
+	slam_y_col=5
+	slam_z_col=6
+	slam_w_col=11
+	slam_p_col=12
+	slam_r_col=13
 
-	slam_sx_col=23
-	slam_sy_col=24
-	slam_sz_col=25
-	slam_sw_col=30
-	slam_sp_col=31
-	slam_sr_col=32
+	slam_sx_col=26
+	slam_sy_col=27
+	slam_sz_col=28
+	slam_sw_col=33
+	slam_sp_col=34
+	slam_sr_col=35
 	
 	# slam constvel
 # 	truth2rtruth_arr = [-0.015, 0.00, 0.02, 0, 0, 0]
@@ -48,19 +48,19 @@ def Rtslam.sync_truth(slam_filename, truth_filename, res_filename)
 # 	slam_ncol=33
 # 	
 # 	slam_t_col=0
-# 	slam_x_col=1
-# 	slam_y_col=2
-# 	slam_z_col=3
-# 	slam_w_col=8
-# 	slam_p_col=9
-# 	slam_r_col=10
+# 	slam_x_col=4
+# 	slam_y_col=5
+# 	slam_z_col=6
+# 	slam_w_col=11
+# 	slam_p_col=12
+# 	slam_r_col=13
 # 
-# 	slam_sx_col=17
-# 	slam_sy_col=18
-# 	slam_sz_col=19
-# 	slam_sw_col=24
-# 	slam_sp_col=25
-# 	slam_sr_col=26
+# 	slam_sx_col=20
+# 	slam_sy_col=21
+# 	slam_sz_col=22
+# 	slam_sw_col=27
+# 	slam_sp_col=28
+# 	slam_sr_col=29
 
 
 	# truth

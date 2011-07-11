@@ -22,7 +22,10 @@ namespace hardware {
 
 	class HardwareEstimatorAbstract
 	{
+		protected:
+			bool started;
 		public:
+			HardwareEstimatorAbstract(): started(false) {}
 			/**
 			Returns all reading between t1 and t2, plus the last before t1 and the first after t2.
 			Each line is one reading, first element is timestamp (double seconds), the rest is the command.

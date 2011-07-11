@@ -78,7 +78,6 @@ class HardwareSensorAbstract
 		int read_pos;  /// oldest position not released (being read or not read at all)
 		bool buffer_full; /// when read_pos = write_pos, tells whether the buffer is full or empty
 		bool read_pos_used;  /// current read_pos is being used
-		bool started; /// has the start() command been already run ?
 		
 	protected:
 		kernel::VariableCondition<int> &condition; /// to notify when new data is available
@@ -92,6 +91,7 @@ class HardwareSensorAbstract
 		double timestamps_correction;
 		double data_period;
 		double arrival_delay;
+		bool started; /// has the start() command been already run ?
 		
 		int bufferSize; /// size of the ring buffer
 		VecT buffer; /// the ring buffer
@@ -154,9 +154,9 @@ class HardwareSensorAbstract
 			@param condition to notify when new data is available
 		*/
 		HardwareSensorAbstract(kernel::VariableCondition<int> &condition, unsigned bufferSize):
-			write_pos(0), read_pos(0), buffer_full(false), read_pos_used(false), started(false),
+			write_pos(0), read_pos(0), buffer_full(false), read_pos_used(false),
 		  condition(condition), index(-1),
-		  data_count(0), no_more_data(false), timestamps_correction(0.0),
+		  data_count(0), no_more_data(false), timestamps_correction(0.0), started(false),
 		  bufferSize(bufferSize), buffer(bufferSize)
 		{}
 		virtual void start() = 0; ///< start the acquisition thread, once the object is configured

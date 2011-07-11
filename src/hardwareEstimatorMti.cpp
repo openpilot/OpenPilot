@@ -140,6 +140,8 @@ namespace hardware {
 
 	void HardwareEstimatorMti::start()
 	{
+		if (started) { std::cout << "Warning: This HardwareEstimatorMti has already been started" << std::endl; return; }
+		started = true;
 		for(int i = 0; i < bufferSize; ++i) buffer(i,0) = -1.;
 		// start acquire task
 		preloadTask_thread = new boost::thread(boost::bind(&HardwareEstimatorMti::preloadTask,this));

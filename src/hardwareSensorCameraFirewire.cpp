@@ -285,6 +285,8 @@ namespace hardware {
 	void HardwareSensorCameraFirewire::start()
 	{
 		// start acquire task
+		if (started) { std::cout << "Warning: This HardwareSensorCameraFirewire has already been started" << std::endl; return; }
+		started = true;
 		last_timestamp = kernel::Clock::getTime();
 		preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::preloadTask,this));
 	}

@@ -126,6 +126,8 @@ namespace hardware {
 	{
 		// start acquire task
 		//preloadTask();
+		if (started) { std::cout << "Warning: This HardwareSensorGpsGenom has already been started" << std::endl; return; }
+		started = true;
 		last_timestamp = kernel::Clock::getTime();
 		preloadTask_thread = new boost::thread(boost::bind(&HardwareSensorGpsGenom::preloadTask,this));
 		

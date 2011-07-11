@@ -1044,7 +1044,7 @@ void demo_slam_init()
 			senPtr11->setIntegrationPolicy(false);
 			senPtr11->setUseForInit(false);
 			senPtr11->setNeedInit(false);
-			hardSen11->start();
+			//hardSen11->start();
 		}
 		#endif
 		

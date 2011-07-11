@@ -7,6 +7,8 @@
 
 #ifdef HAVE_MODULE_DSEG
 
+//#define EXTEND_SEGMENTS
+
 #include "jmath/ublasExtra.hpp"
 #include "jmath/angle.hpp"
 
@@ -101,6 +103,8 @@ namespace jafar {
          DescriptorAbstract(),
          descSize(descSize)
       {
+				left_extremity = 1;
+				right_extremity = 1;
       }
 
       DescriptorImageSegFirstView::~DescriptorImageSegFirstView() {
@@ -108,6 +112,68 @@ namespace jafar {
 
 			bool DescriptorImageSegFirstView::addObservation(const observation_ptr_t & obsPtr)
 			{
+				#ifdef EXTEND_SEGMENTS
+					// extend landmarks
+					app_img_seg_ptr_t appSpec = SPTR_CAST<AppearanceImageSegment>(view.appearancePtr);
+					if(appSpec != NULL) {
+						vec7 sg = obsPtr->sensorPtr()->globalPose();
+
+						vec4 screenRealObs = appSpec->realObs();
+						vec4 screenPredObs = obsPtr->measurement.x();
+						vec ahplRealObs(11);
+						vec ahplPredObs(11);
+						
+						vec2 invDist;
+						invDist[0] = 1;
+						invDist[1] = 1;
+						obsPtr->model->backProject_func(sg, screenRealObs, invDist, ahplRealObs);
+						obsPtr->model->backProject_func(sg, screenPredObs, invDist, ahplPredObs);
+
+						vec7 ahp2euc;
+						for(int i=0 ; i<7 ; i++) {
+							ahp2euc[i] = ahplPredObs[i];
+						}
+						vec3 predLeft = lmkAHP::ahp2euc(ahp2euc);
+						for(int i=0 ; i<4 ; i++) {
+							ahp2euc[i+3] = ahplPredObs[i+7];
+						}
+						vec3 predRight = lmkAHP::ahp2euc(ahp2euc);
+						for(int i=0 ; i<7 ; i++) {
+							ahp2euc[i] = ahplRealObs[i];
+						}
+						vec3 realLeft = lmkAHP::ahp2euc(ahp2euc);
+						for(int i=0 ; i<4 ; i++) {
+							ahp2euc[i+3] = ahplRealObs[i+7];
+						}
+						vec3 realRight = lmkAHP::ahp2euc(ahp2euc);
+						vec3 middle = (predLeft + predRight)/2;
+
+						realLeft = realLeft - middle;
+						realRight = realRight - middle;
+						predLeft = predLeft - middle;
+						predRight = predRight - middle;
+						float left = (realLeft[0]*predLeft[0]+realLeft[1]*predLeft[1]+realLeft[2]*predLeft[2]) / ((predLeft[0]*predLeft[0])+(predLeft[1]*predLeft[1])+(predLeft[2]*predLeft[2]));
+						float right = (realRight[0]*predRight[0]+realRight[1]*predRight[1]+realRight[2]*predRight[2]) / ((predRight[0]*predRight[0])+(predRight[1]*predRight[1])+(predRight[2]*predRight[2]));
+
+//						if(left > left_extremity) {
+							left_extremity = left;
+/*
+						}
+						if(right > right_extremity) {
+*/
+							right_extremity = right;
+//						}
+						JFR_DEBUG("addObservation " << obsPtr->landmarkPtr()->id() << " left " << left_extremity << " right " << right_extremity
+						<< "\n(" << screenRealObs << ";" << screenPredObs << ")"
+						<< "\n left (" << realLeft << ";" << predLeft << ")"
+						<< "\n right (" << realRight << ";" << predRight << ")"
+						<< "");
+					}
+				#else
+					left_extremity = 1;
+					right_extremity = 1;
+				#endif
+
 				if (obsPtr->events.updated && !view.appearancePtr)
 				{
 					view.initFromObs(obsPtr, descSize);

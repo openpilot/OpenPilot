@@ -89,7 +89,12 @@
  * 1 use segments
  * 2 use both sgments and points
  */
-#define SEGMENT_BASED 2
+#define SEGMENT_BASED 0
+#if SEGMENT_BASED>1
+	#define SEGMENT_NOISE_FACTOR 5
+#else
+	#define SEGMENT_NOISE_FACTOR 1
+#endif
 
 #if SEGMENT_BASED
 	#ifndef HAVE_MODULE_DSEG
@@ -995,8 +1000,8 @@ void demo_slam_init()
          else
 				segDescFactory.reset(new DescriptorImageSegFirstViewFactory(configEstimation.DESC_SIZE));
 
-			boost::shared_ptr<HDsegDetector> hdsegDetector(new HDsegDetector(configEstimation.PATCH_SIZE, 3,configEstimation.PIX_NOISE,segDescFactory));
-         boost::shared_ptr<DsegMatcher> dsegMatcher(new DsegMatcher(configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE));
+			boost::shared_ptr<HDsegDetector> hdsegDetector(new HDsegDetector(configEstimation.PATCH_SIZE, 3,configEstimation.PIX_NOISE*SEGMENT_NOISE_FACTOR,segDescFactory));
+         boost::shared_ptr<DsegMatcher> dsegMatcher(new DsegMatcher(configEstimation.RANSAC_LOW_INNOV, configEstimation.MATCH_TH, configEstimation.MAHALANOBIS_TH, configEstimation.RELEVANCE_TH, configEstimation.PIX_NOISE*SEGMENT_NOISE_FACTOR));
          boost::shared_ptr<DataManager_ImageSeg_Test> dmSeg(new DataManager_ImageSeg_Test(hdsegDetector, dsegMatcher, assGrid, configEstimation.N_UPDATES_TOTAL, configEstimation.N_UPDATES_RANSAC, ransac_ntries, configEstimation.N_INIT, configEstimation.N_RECOMP_GAINS));
 
          dmSeg->linkToParentSensorSpec(senPtr11);

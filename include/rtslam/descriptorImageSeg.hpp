@@ -81,6 +81,13 @@ namespace jafar {
 
             virtual void desc_text(std::ostream& os) const;
             virtual void desc_image(image::oimstream& os) const;
+
+				float getLeftExtremity() {return left_extremity;}
+				float getRightExtremity() {return right_extremity;}
+
+         private:
+            float left_extremity;
+            float right_extremity;
       };
 
       class DescriptorImageSegFirstViewFactory: public DescriptorFactoryAbstract

@@ -12,6 +12,12 @@
 #include "rtslam/ahpTools.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPointsLine.hpp"
 
+#ifdef HAVE_MODULE_DSEG
+#include "rtslam/descriptorImageSeg.hpp"
+#endif
+
+//#define DISPLAY_SEGMENT_DEPTH
+
 #include "jmath/angle.hpp"
 
 namespace jafar {
@@ -297,10 +303,14 @@ JFR_DEBUG("robot EULER: " << uncertEuler);*/
 				}
 				break;
          }
-         case LandmarkAbstract::LINE_AHPL: // DO SOMETHING
+         case LandmarkAbstract::LINE_AHPL:
          {
             // Build display objects if it is the first time they are displayed
-            if (items_.size() != 5)
+            #ifdef DISPLAY_SEGMENT_DEPTH
+               if (items_.size() != 5)
+            #else
+               if (items_.size() != 3)
+            #endif
             {
                // clear
                items_.clear();
@@ -318,12 +328,14 @@ JFR_DEBUG("robot EULER: " << uncertEuler);*/
                gdhe::Polyline *seg = new gdhe::Polyline();
                items_.push_back(seg);
                viewerGdhe->client.addObject(seg, false);
-               seg = new gdhe::Polyline();
-               items_.push_back(seg);
-               viewerGdhe->client.addObject(seg, false);
-               seg = new gdhe::Polyline();
-               items_.push_back(seg);
-               viewerGdhe->client.addObject(seg, false);
+               #ifdef DISPLAY_SEGMENT_DEPTH
+                   seg = new gdhe::Polyline();
+                   items_.push_back(seg);
+                   viewerGdhe->client.addObject(seg, false);
+                   seg = new gdhe::Polyline();
+                   items_.push_back(seg);
+                   viewerGdhe->client.addObject(seg, false);
+               #endif
             }
             // Refresh the display objects every time
             {
@@ -358,40 +370,54 @@ JFR_DEBUG("robot EULER: " << uncertEuler);*/
                (*it)->refresh();
 
                // segments
-               ++it;
-               gdhe::Polyline *seg = PTR_CAST<gdhe::Polyline*>(*it);
-               seg->clear();
-               double id_std = sqrt(cov_(6,6))*viewerGdhe->ellipsesScale;
-               jblas::vec7 _state1 = subrange(state_,0,7);
-               jblas::vec3 position = lmkAHP::ahp2euc(_state1);
-               jblas::vec7 state = _state1;
-               state(6) = _state1(6) - id_std; if (state(6) < 1e-4) state(6) = 1e-4;
-               jblas::vec3 positionExt = lmkAHP::ahp2euc(state);
-               seg->addPoint(positionExt(0)-position(0), positionExt(1)-position(1), positionExt(2)-position(2));
-               state(6) = _state1(6) + id_std;
-               positionExt = lmkAHP::ahp2euc(state);
-               seg->addPoint(positionExt(0)-position(0), positionExt(1)-position(1), positionExt(2)-position(2));
-               (*it)->setColor(c.R,c.G,c.B);
-               (*it)->setPose(position(0), position(1), position(2), 0, 0, 0);
-               (*it)->refresh();
-               ++it;
-               seg = PTR_CAST<gdhe::Polyline*>(*it);
-               seg->clear();
-               id_std = sqrt(cov_(6,6))*viewerGdhe->ellipsesScale;
-               jblas::vec7 _state2 = subrange(state_,0,7);
-               subrange(_state2,3,7) = subrange(state_,7,11);
-               position = lmkAHP::ahp2euc(_state2);
-               state = _state2;
-               state(6) = _state2(6) - id_std; if (state(6) < 1e-4) state(6) = 1e-4;
-               positionExt = lmkAHP::ahp2euc(state);
-               seg->addPoint(positionExt(0)-position(0), positionExt(1)-position(1), positionExt(2)-position(2));
-               state(6) = _state2(6) + id_std;
-               positionExt = lmkAHP::ahp2euc(state);
-               seg->addPoint(positionExt(0)-position(0), positionExt(1)-position(1), positionExt(2)-position(2));
-               (*it)->setColor(c.R,c.G,c.B);
-               (*it)->setPose(position(0), position(1), position(2), 0, 0, 0);
-               (*it)->refresh();
+               gdhe::Polyline *seg;
+               #ifdef DISPLAY_SEGMENT_DEPTH
+                  ++it;
+                  seg = PTR_CAST<gdhe::Polyline*>(*it);
+                  seg->clear();
+                  double id_std = sqrt(cov_(6,6))*viewerGdhe->ellipsesScale;
+                  jblas::vec7 _state1 = subrange(state_,0,7);
+                  jblas::vec3 position = lmkAHP::ahp2euc(_state1);
+                  jblas::vec7 state = _state1;
+                  state(6) = _state1(6) - id_std; if (state(6) < 1e-4) state(6) = 1e-4;
+                  jblas::vec3 positionExt = lmkAHP::ahp2euc(state);
+                  seg->addPoint(positionExt(0)-position(0), positionExt(1)-position(1), positionExt(2)-position(2));
+                  state(6) = _state1(6) + id_std;
+                  positionExt = lmkAHP::ahp2euc(state);
+                  seg->addPoint(positionExt(0)-position(0), positionExt(1)-position(1), positionExt(2)-position(2));
+                  (*it)->setColor(c.R,c.G,c.B);
+                  (*it)->setPose(position(0), position(1), position(2), 0, 0, 0);
+                  (*it)->refresh();
+                  ++it;
+                  seg = PTR_CAST<gdhe::Polyline*>(*it);
+                  seg->clear();
+                  id_std = sqrt(cov_(6,6))*viewerGdhe->ellipsesScale;
+                  jblas::vec7 _state2 = subrange(state_,0,7);
+                  subrange(_state2,3,7) = subrange(state_,7,11);
+                  position = lmkAHP::ahp2euc(_state2);
+                  state = _state2;
+                  state(6) = _state2(6) - id_std; if (state(6) < 1e-4) state(6) = 1e-4;
+                  positionExt = lmkAHP::ahp2euc(state);
+                  seg->addPoint(positionExt(0)-position(0), positionExt(1)-position(1), positionExt(2)-position(2));
+                  state(6) = _state2(6) + id_std;
+                  positionExt = lmkAHP::ahp2euc(state);
+                  seg->addPoint(positionExt(0)-position(0), positionExt(1)-position(1), positionExt(2)-position(2));
+                  (*it)->setColor(c.R,c.G,c.B);
+                  (*it)->setPose(position(0), position(1), position(2), 0, 0, 0);
+                  (*it)->refresh();
+               #endif
                // Linking segment
+				#ifdef HAVE_MODULE_DSEG
+					jblas::vec3 xMiddle = (xNew1 + xNew2)/2;
+					desc_img_seg_fv_ptr_t descriptorSpec = SPTR_CAST<DescriptorImageSegFirstView>(slamLmk_->descriptorPtr);
+					float left_extremity = 1.0;
+					float right_extremity = 1.0;
+					if(descriptorSpec != NULL) {
+						left_extremity = descriptorSpec->getLeftExtremity();
+						right_extremity = descriptorSpec->getRightExtremity();
+					}
+					xNew1 = left_extremity * (xNew1 - xMiddle) + xMiddle;
+					xNew2 = right_extremity * (xNew2 - xMiddle) + xMiddle;
                ++it;
                seg = PTR_CAST<gdhe::Polyline*>(*it);
                seg->clear();
@@ -400,6 +426,7 @@ JFR_DEBUG("robot EULER: " << uncertEuler);*/
                (*it)->setColor(c.R,c.G,c.B);
                (*it)->setPose(0,0,0,0,0,0);
                (*it)->refresh();
+				#endif
             }
             break;
          }

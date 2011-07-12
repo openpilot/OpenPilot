@@ -1,6 +1,6 @@
 /*
     FreeRTOS V7.0.1 - Copyright (C) 2011 Real Time Engineers Ltd.
-	
+
 
     ***************************************************************************
      *                                                                       *
@@ -101,7 +101,7 @@ static xBlockLink xStart, xEnd;
 /* Keeps track of the number of free bytes remaining, but says nothing about
 fragmentation. */
 static size_t xFreeBytesRemaining = configTOTAL_HEAP_SIZE;
-static size_t currentTOTAL_HEAP_SISE = configTOTAL_HEAP_SIZE;
+static size_t currentTOTAL_HEAP_SIZE = configTOTAL_HEAP_SIZE;
 
 /* STATIC FUNCTIONS ARE DEFINED AS MACROS TO MINIMIZE THE FUNCTION CALL DEPTH. */
 
@@ -141,13 +141,13 @@ xBlockLink *pxFirstFreeBlock;														\
 	xStart.xBlockSize = ( size_t ) 0;												\
 																					\
 	/* xEnd is used to mark the end of the list of free blocks. */					\
-	xEnd.xBlockSize = currentTOTAL_HEAP_SISE;										\
+	xEnd.xBlockSize = currentTOTAL_HEAP_SIZE;										\
 	xEnd.pxNextFreeBlock = NULL;													\
 																					\
 	/* To start with there is a single free block that is sized to take up the		\
 	entire heap space. */															\
 	pxFirstFreeBlock = ( void * ) xHeap.ucHeap;										\
-	pxFirstFreeBlock->xBlockSize = currentTOTAL_HEAP_SISE;							\
+	pxFirstFreeBlock->xBlockSize = currentTOTAL_HEAP_SIZE;							\
 	pxFirstFreeBlock->pxNextFreeBlock = &xEnd;										\
 }
 /*-----------------------------------------------------------*/
@@ -182,7 +182,7 @@ void *pvReturn = NULL;
 			}
 		}
 
-		if( ( xWantedSize > 0 ) && ( xWantedSize < currentTOTAL_HEAP_SISE ) )
+		if( ( xWantedSize > 0 ) && ( xWantedSize < currentTOTAL_HEAP_SIZE ) )
 		{
 			/* Blocks are stored in byte order - traverse the list from the start
 			(smallest) block until one of adequate size is found. */
@@ -221,7 +221,7 @@ void *pvReturn = NULL;
 					/* Insert the new block into the list of free blocks. */
 					prvInsertBlockIntoFreeList( ( pxNewBlockLink ) );
 				}
-				
+
 				xFreeBytesRemaining -= pxBlock->xBlockSize;
 			}
 		}
@@ -282,8 +282,8 @@ void xPortIncreaseHeapSize( size_t bytes )
 {
 	xBlockLink *pxNewBlockLink;
 	vTaskSuspendAll();
-	currentTOTAL_HEAP_SISE = configTOTAL_HEAP_SIZE + bytes;
-	xEnd.xBlockSize = currentTOTAL_HEAP_SISE;
+	currentTOTAL_HEAP_SIZE = configTOTAL_HEAP_SIZE + bytes;
+	xEnd.xBlockSize = currentTOTAL_HEAP_SIZE;
 	xFreeBytesRemaining += bytes;
 	/* Insert the new block into the list of free blocks. */
 	pxNewBlockLink = ( void * ) &xHeap.ucHeap[ configTOTAL_HEAP_SIZE ];

@@ -175,6 +175,11 @@
 %template(getElementAt) jafar::jmath::getMatElementAt<jblas::mat33>;
 %template(getElementAt) jafar::jmath::getMatElementAt<jblas::mat44>;
 
+%template(setElementAt) jafar::jmath::setElementAt<jblas::vec>;
+%template(setElementAt) jafar::jmath::setElementAt<jblas::vec2>;
+%template(setElementAt) jafar::jmath::setElementAt<jblas::vec3>;
+%template(setElementAt) jafar::jmath::setElementAt<jblas::vec4>;
+
 %include "jmath/random.hpp"
 
 %include "jmath/angle.hpp"

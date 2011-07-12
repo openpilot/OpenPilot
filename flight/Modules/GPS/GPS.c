@@ -109,19 +109,27 @@ static uint32_t numParsingErrors;
  * \return 0 on success
  */
 
-int32_t GPSInitialize(void)
+int32_t GPSStart(void)
 {
-	signed portBASE_TYPE xReturn;
-
-	// TODO: Get gps settings object
-	gpsPort = PIOS_COM_GPS;
-
 	// Start gps task
-	xReturn = xTaskCreate(gpsTask, (signed char *)"GPS", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &gpsTaskHandle);
+	xTaskCreate(gpsTask, (signed char *)"GPS", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &gpsTaskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_GPS, gpsTaskHandle);
 
 	return 0;
 }
+/**
+ * Initialise the gps module
+ * \return -1 if initialisation failed
+ * \return 0 on success
+ */
+int32_t GPSInitialize(void)
+{
+	// TODO: Get gps settings object
+	gpsPort = PIOS_COM_GPS;
+
+	return 0;
+}
+MODULE_INITCALL(GPSInitialize, 0, GPSStart, 0, MODULE_EXEC_NOORDER_FLAG)
 
 // ****************
 /**

@@ -81,9 +81,11 @@ static union xRTOS_HEAP
 		volatile unsigned long ulDummy;
 	#endif	
 	unsigned char ucHeap[ configTOTAL_HEAP_SIZE ];
-} xHeap;
+} xHeap __attribute__ ((section (".heap")));
 
 static size_t xNextFreeByte = ( size_t ) 0;
+static size_t currentTOTAL_HEAP_SISE = configTOTAL_HEAP_SIZE;
+
 /*-----------------------------------------------------------*/
 
 void *pvPortMalloc( size_t xWantedSize )
@@ -102,7 +104,7 @@ void *pvReturn = NULL;
 	vTaskSuspendAll();
 	{
 		/* Check there is enough room left for the allocation. */
-		if( ( ( xNextFreeByte + xWantedSize ) < configTOTAL_HEAP_SIZE ) &&
+		if( ( ( xNextFreeByte + xWantedSize ) < currentTOTAL_HEAP_SISE ) &&
 			( ( xNextFreeByte + xWantedSize ) > xNextFreeByte )	)/* Check for overflow. */
 		{
 			/* Return the next free byte then increment the index past this
@@ -145,8 +147,14 @@ void vPortInitialiseBlocks( void )
 
 size_t xPortGetFreeHeapSize( void )
 {
-	return ( configTOTAL_HEAP_SIZE - xNextFreeByte );
+	return ( currentTOTAL_HEAP_SISE - xNextFreeByte );
 }
+/*-----------------------------------------------------------*/
 
-
-
+void xPortIncreaseHeapSize( size_t bytes )
+{
+	vTaskSuspendAll();
+	currentTOTAL_HEAP_SISE = configTOTAL_HEAP_SIZE + bytes;
+	xTaskResumeAll();
+}
+/*-----------------------------------------------------------*/

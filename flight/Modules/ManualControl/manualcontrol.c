@@ -144,19 +144,27 @@ static bool validInputRange(int16_t min, int16_t max, uint16_t value);
 /**
  * Module initialization
  */
-int32_t ManualControlInitialize()
+int32_t ManualControlStart()
 {
 	/* Check the assumptions about uavobject enum's are correct */
-	if(!assumptions) 
+	if(!assumptions)
 		return -1;
 	// Start main task
 	xTaskCreate(manualControlTask, (signed char *)"ManualControl", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_MANUALCONTROL, taskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_MANUAL);
+	return 0;
+}
 
+/**
+ * Module initialization
+ */
+int32_t ManualControlInitialize()
+{
 
 	return 0;
 }
+MODULE_INITCALL(ManualControlInitialize, 0, ManualControlStart, 0, MODULE_EXEC_NOORDER_FLAG)
 
 /**
  * Module task
@@ -621,3 +629,4 @@ bool validInputRange(int16_t min, int16_t max, uint16_t value)
   * @}
   * @}
   */
+

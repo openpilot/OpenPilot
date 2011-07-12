@@ -38,7 +38,22 @@
  * and we cannot define a linker script for each of them atm
  */
 
-#define uavobj_initcall(fn)
+extern void InitModules();
+extern void StartModules();
+
+#define UAVOBJ_INITCALL(fn)
+#define MODULE_INITCALL(ifn, iparam, sfn, sparam, flags)
+
+#define MODULE_TASKCREATE_ALL { \
+	/* Start all module threads */ \
+	StartModules(); \
+	}
+
+#define MODULE_INITIALISE_ALL { \
+	/* Initialize modules */ \
+	InitModules(); \
+	/* Initialize the system thread */ \
+	SystemModInitialize();}
 
 #endif	/* PIOS_INITCALL_H */
 

@@ -89,26 +89,39 @@ static void SettingsUpdatedCb(UAVObjEvent * ev);
 /**
  * Module initialization
  */
-int32_t StabilizationInitialize()
+int32_t StabilizationStart()
 {
 	// Initialize variables
 	
-	// Create object queue
-	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
-	
-	// Listen for updates.
-	//	AttitudeActualConnectQueue(queue);
-	AttitudeRawConnectQueue(queue);
-	
-	StabilizationSettingsConnectCallback(SettingsUpdatedCb);
-	SettingsUpdatedCb(StabilizationSettingsHandle());
 	// Start main task
 	xTaskCreate(stabilizationTask, (signed char*)"Stabilization", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_STABILIZATION, taskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_STABILIZATION);
-	
 	return 0;
 }
+
+/**
+ * Module initialization
+ */
+int32_t StabilizationInitialize()
+{
+	// Initialize variables
+
+	// Create object queue
+	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+
+	// Listen for updates.
+	//	AttitudeActualConnectQueue(queue);
+	AttitudeRawConnectQueue(queue);
+
+	StabilizationSettingsConnectCallback(SettingsUpdatedCb);
+	SettingsUpdatedCb(StabilizationSettingsHandle());
+	// Start main task
+
+	return 0;
+}
+
+MODULE_INITCALL(StabilizationInitialize, 0, StabilizationStart, 0, MODULE_EXEC_NOORDER_FLAG)
 
 /**
  * Module task

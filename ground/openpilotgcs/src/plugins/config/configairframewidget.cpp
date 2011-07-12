@@ -374,7 +374,7 @@ void ConfigAirframeWidget::resetFwMixer()
 {
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     UAVObjectField* field = obj->getField(QString("ThrottleCurve1"));
-    resetMixer(m_aircraft->fixedWingThrottle, field->getNumElements());
+    resetMixer(m_aircraft->fixedWingThrottle, field->getNumElements(),1);
 }
 
 /**
@@ -384,7 +384,7 @@ void ConfigAirframeWidget::resetMrMixer()
 {
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     UAVObjectField* field = obj->getField(QString("ThrottleCurve1"));
-    resetMixer(m_aircraft->multiThrottleCurve, field->getNumElements());
+    resetMixer(m_aircraft->multiThrottleCurve, field->getNumElements(),0.9);
 }
 
 /**
@@ -394,7 +394,7 @@ void ConfigAirframeWidget::resetCt1Mixer()
 {
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     UAVObjectField* field = obj->getField(QString("ThrottleCurve1"));
-    resetMixer(m_aircraft->customThrottle1Curve, field->getNumElements());
+    resetMixer(m_aircraft->customThrottle1Curve, field->getNumElements(),1);
 }
 
 /**
@@ -404,21 +404,17 @@ void ConfigAirframeWidget::resetCt2Mixer()
 {
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     UAVObjectField* field = obj->getField(QString("ThrottleCurve2"));
-    resetMixer(m_aircraft->customThrottle2Curve, field->getNumElements());
+    resetMixer(m_aircraft->customThrottle2Curve, field->getNumElements(),1);
 }
 
 
 /**
   Resets a mixer curve
   */
-void ConfigAirframeWidget::resetMixer(MixerCurveWidget *mixer, int numElements)
+void ConfigAirframeWidget::resetMixer(MixerCurveWidget *mixer, int numElements, double maxvalue)
 {
-    QList<double> curveValues;
-    for (double i=0; i<numElements; i++) {
-        curveValues.append(i/(numElements-1));
-    }
     // Setup all Throttle1 curves for all types of airframes
-    mixer->initCurve(curveValues);
+    mixer->initLinearCurve((quint32)numElements,maxvalue);
 }
 
 /**
@@ -484,18 +480,29 @@ void ConfigAirframeWidget::refreshValues()
     // If the 1st element of the curve is <= -10, then the curve
     // is a straight line (that's how the mixer works on the mainboard):
     if (field->getValue(0).toInt() <= -10) {
-        for (double i=0; i<field->getNumElements(); i++) {
-            curveValues.append(i/(field->getNumElements()-1));
-        }
-    } else {
+        m_aircraft->multiThrottleCurve->initLinearCurve(field->getNumElements(),(double)1);
+        m_aircraft->fixedWingThrottle->initLinearCurve(field->getNumElements(),(double)1);
+    }
+    else {
+        double temp=0;
+        double value;
         for (unsigned int i=0; i < field->getNumElements(); i++) {
-            curveValues.append(field->getValue(i).toDouble());
+            value=field->getValue(i).toDouble();
+            temp+=value;
+            curveValues.append(value);
+        }
+        if(temp==0)
+        {
+            m_aircraft->multiThrottleCurve->initLinearCurve(field->getNumElements(),0.9);;
+            m_aircraft->fixedWingThrottle->initLinearCurve(field->getNumElements(),(double)1);
+        }
+        else
+        {
+            m_aircraft->multiThrottleCurve->initCurve(curveValues);
+            m_aircraft->fixedWingThrottle->initCurve(curveValues);
         }
     }
     // Setup all Throttle1 curves for all types of airframes
-    m_aircraft->fixedWingThrottle->initCurve(curveValues);
-    m_aircraft->multiThrottleCurve->initCurve(curveValues);
-
     // Load the Settings for fixed wing frames:
     if (frameType.startsWith("FixedWing")) {
          // Then retrieve how channels are setup
@@ -1754,31 +1761,32 @@ void ConfigAirframeWidget::updateCustomAirframeUI()
     // If the 1st element of the curve is <= -10, then the curve
     // is a straight line (that's how the mixer works on the mainboard):
     if (field->getValue(0).toInt() <= -10) {
-        for (double i=0; i<field->getNumElements(); i++) {
-            curveValues.append(i/(field->getNumElements()-1));
-        }
+        m_aircraft->customThrottle1Curve->initLinearCurve(field->getNumElements(),(double)1);
     } else {
+        double temp=0;
+        double value;
         for (unsigned int i=0; i < field->getNumElements(); i++) {
-            curveValues.append(field->getValue(i).toDouble());
+            value=field->getValue(i).toDouble();
+            temp+=value;
+            curveValues.append(value);
         }
+        if(temp==0)
+            m_aircraft->customThrottle1Curve->initLinearCurve(field->getNumElements(),(double)1);
+        else
+            m_aircraft->customThrottle1Curve->initCurve(curveValues);
     }
-    m_aircraft->customThrottle1Curve->initCurve(curveValues);
-
     field = obj->getField(QString("ThrottleCurve2"));
     curveValues.clear();;
     // If the 1st element of the curve is <= -10, then the curve
     // is a straight line (that's how the mixer works on the mainboard):
     if (field->getValue(0).toInt() <= -10) {
-        for (double i=0; i<field->getNumElements(); i++) {
-            curveValues.append(i/(field->getNumElements()-1));
-        }
+        m_aircraft->customThrottle2Curve->initLinearCurve(field->getNumElements(),(double)1);
     } else {
         for (unsigned int i=0; i < field->getNumElements(); i++) {
             curveValues.append(field->getValue(i).toDouble());
         }
+        m_aircraft->customThrottle2Curve->initCurve(curveValues);
     }
-    m_aircraft->customThrottle2Curve->initCurve(curveValues);
-
     // Retrieve Feed Forward:
     field = obj->getField(QString("FeedForward"));
     m_aircraft->customFFSlider->setValue(field->getDouble()*100);

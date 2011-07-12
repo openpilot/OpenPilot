@@ -45,7 +45,7 @@ ENABLE_DEBUG_PINS ?= NO
 # Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs
 ENABLE_AUX_UART ?= NO
 
-USE_SPEKTRUM ?= NO
+USE_GPS ?= NO
 
 USE_I2C ?= NO
 
@@ -166,6 +166,7 @@ SRC += $(OPUAVSYNTHDIR)/mixersettings.c
 SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
 SRC += $(OPUAVSYNTHDIR)/firmwareiapobj.c
 SRC += $(OPUAVSYNTHDIR)/attitudesettings.c
+SRC += $(OPUAVSYNTHDIR)/hwsettings.c
 #${wildcard ${OBJ}/$(shell echo $(VAR) | tr A-Z a-z)/*.c}
 #SRC += ${foreach OBJ, ${UAVOBJECTS}, $(UAVOBJECTS)/$(OBJ).c}
 # Cant use until i can automatically generate list of UAVObjects
@@ -185,6 +186,7 @@ SRC += $(PIOSSTM32F10X)/pios_spi.c
 SRC += $(PIOSSTM32F10X)/pios_ppm.c
 SRC += $(PIOSSTM32F10X)/pios_pwm.c
 SRC += $(PIOSSTM32F10X)/pios_spektrum.c
+SRC += $(PIOSSTM32F10X)/pios_sbus.c
 SRC += $(PIOSSTM32F10X)/pios_debug.c
 SRC += $(PIOSSTM32F10X)/pios_gpio.c
 SRC += $(PIOSSTM32F10X)/pios_exti.c
@@ -207,6 +209,7 @@ SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_i2c_esc.c
 SRC += $(PIOSCOMMON)/pios_iap.c
 SRC += $(PIOSCOMMON)/pios_bl_helper.c
+SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 ## Libraries for flight calculations
 SRC += $(FLIGHTLIB)/fifo_buffer.c
@@ -379,14 +382,14 @@ endif
 ifeq ($(ERASE_FLASH), YES)
 CDEFS += -DERASE_FLASH
 endif
-ifeq ($(USE_SPEKTRUM), YES)
-CDEFS += -DUSE_SPEKTRUM
+
+ifneq ($(USE_GPS), NO)
+CDEFS += -DUSE_GPS
 endif
 
 ifeq ($(USE_I2C), YES)
 CDEFS += -DUSE_I2C
 endif
-
 
 # Place project-specific -D and/or -U options for
 # Assembler with preprocessor here.

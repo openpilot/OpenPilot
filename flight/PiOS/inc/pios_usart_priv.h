@@ -48,26 +48,8 @@ struct pios_usart_cfg {
 	struct stm32_irq irq;
 };
 
-enum pios_usart_dev_magic {
-	PIOS_USART_DEV_MAGIC = 0x11223344,
-};
-
-struct pios_usart_dev {
-	enum pios_usart_dev_magic     magic;
-	const struct pios_usart_cfg * cfg;
-
-	// align to 32-bit to try and provide speed improvement;
-	uint8_t rx_buffer[PIOS_USART_RX_BUFFER_SIZE] __attribute__ ((aligned(4)));
-	t_fifo_buffer rx;
-
-	// align to 32-bit to try and provide speed improvement;
-        uint8_t tx_buffer[PIOS_USART_TX_BUFFER_SIZE] __attribute__ ((aligned(4)));
-	t_fifo_buffer tx;
-};
-
 extern int32_t PIOS_USART_Init(uint32_t * usart_id, const struct pios_usart_cfg * cfg);
-
-extern void PIOS_USART_IRQ_Handler(uint32_t usart_id);
+extern const struct pios_usart_cfg * PIOS_USART_GetConfig(uint32_t usart_id);
 
 #endif /* PIOS_USART_PRIV_H */
 

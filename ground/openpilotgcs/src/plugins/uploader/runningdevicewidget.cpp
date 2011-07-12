@@ -25,7 +25,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "runningdevicewidget.h"
-
+#include "devicedescriptorstruct.h"
+#include "uploadergadgetwidget.h"
 runningDeviceWidget::runningDeviceWidget(QWidget *parent) :
     QWidget(parent)
 {
@@ -68,8 +69,11 @@ void runningDeviceWidget::populate()
     UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
     int id = utilMngr->getBoardModel();
 
-    myDevice->deviceID->setText(QString("Device ID: ") + QString::number(id, 16));
-
+    myDevice->lblDeviceID->setText(QString("Device ID: ") + QString::number(id, 16));
+    myDevice->lblBoardName->setText(deviceDescriptorStruct::idToBoardName(id));
+    myDevice->lblHWRev->setText(QString(tr("HW Revision: "))+QString::number(id & 0x0011, 16));
+    qDebug()<<"CRC"<<utilMngr->getFirmwareCRC();
+    myDevice->lblCRC->setText(QString(tr("Firmware CRC: "))+QVariant(utilMngr->getFirmwareCRC()).toString());
     // DeviceID tells us what sort of HW we have detected:
     // display a nice icon:
     myDevice->devicePicture->scene()->clear();
@@ -100,13 +104,41 @@ void runningDeviceWidget::populate()
     myDevice->devicePicture->fitInView(devicePic,Qt::KeepAspectRatio);
 
     QString serial = utilMngr->getBoardCPUSerial().toHex();
-    myDevice->cpuSerial->setText(serial);
+     myDevice->lblCPU->setText(QString("CPU serial number: "+serial));
 
-    QString description = utilMngr->getBoardDescription();
-    myDevice->description->setText(description);
+    QByteArray description = utilMngr->getBoardDescription();
+    deviceDescriptorStruct devDesc;
+    if(UploaderGadgetWidget::descriptionToStructure(description,&devDesc))
+    {
+        if(devDesc.description.startsWith("release",Qt::CaseInsensitive))
+        {
+            myDevice->lblFWTag->setText(QString("Firmware tag: ")+devDesc.description);
+            QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
+            myDevice->lblCertified->setPixmap(pix);
+            myDevice->lblCertified->setToolTip(tr("Official Firmware Build"));
 
+        }
+        else
+        {
+            myDevice->lblFWTag->setText(QString("Firmware tag: ")+devDesc.description+QString(" (beta or custom build)"));
+            QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
+            myDevice->lblCertified->setPixmap(pix);
+            myDevice->lblCertified->setToolTip(tr("Custom Firmware Build"));
+        }
+        myDevice->lblGitCommitTag->setText("Git commit tag: "+devDesc.gitTag);
+        myDevice->lblFWDate->setText(QString("Firmware date: ") + devDesc.buildDate);
+    }
+    else
+    {
+
+        myDevice->lblFWTag->setText(QString("Firmware tag: ")+QString(description).left(QString(description).indexOf(QChar(255))));
+        myDevice->lblGitCommitTag->setText("Git commit tag: Unknown");
+        myDevice->lblFWDate->setText(QString("Firmware date: Unknown"));
+        QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
+        myDevice->lblCertified->setPixmap(pix);
+        myDevice->lblCertified->setToolTip(tr("Custom Firmware Build"));
+    }
     status("Ready...", STATUSICON_INFO);
-
 }
 
 

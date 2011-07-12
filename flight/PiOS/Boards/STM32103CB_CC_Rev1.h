@@ -141,13 +141,11 @@ extern uint32_t pios_i2c_main_adapter_id;
 //-------------------------
 #define PIOS_COM_MAX_DEVS			4
 
-#define PIOS_COM_TELEM_BAUDRATE         57600
 extern uint32_t pios_com_telem_rf_id;
 #define PIOS_COM_TELEM_RF               (pios_com_telem_rf_id)
 #define PIOS_COM_DEBUG                  PIOS_COM_TELEM_RF
 
 #if defined(PIOS_INCLUDE_GPS)
-#define PIOS_COM_GPS_BAUDRATE           57600
 extern uint32_t pios_com_gps_id;
 #define PIOS_COM_GPS                    (pios_com_gps_id)
 #endif	/* PIOS_INCLUDE_GPS */
@@ -156,9 +154,13 @@ extern uint32_t pios_com_telem_usb_id;
 #define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
 
 #ifdef PIOS_INCLUDE_SPEKTRUM
-#define PIOS_COM_SPEKTRUM_BAUDRATE      115200
 extern uint32_t pios_com_spektrum_id;
 #define PIOS_COM_SPEKTRUM               (pios_com_spektrum_id)
+#endif
+
+#ifdef PIOS_INCLUDE_SBUS
+extern uint32_t pios_com_sbus_id;
+#define PIOS_COM_SBUS                   (pios_com_sbus_id)
 #endif
 
 //-------------------------
@@ -219,10 +221,26 @@ extern uint32_t pios_com_spektrum_id;
 #define PIOS_ADC_RATE		(72.0e6 / 1.0 / 8.0 / 252.0 / (PIOS_ADC_NUM_CHANNELS >> PIOS_ADC_USE_ADC2))
 #define PIOS_ADC_MAX_OVERSAMPLING               36
 
+//------------------------
+// PIOS_RCVR
+// See also pios_board.c
+//------------------------
+#define PIOS_RCVR_MAX_DEVS                      12
+
 //-------------------------
-// Receiver PWM inputs
+// Receiver PPM input
 //-------------------------
-#define PIOS_PWM_MAX_INPUTS                     6
+#define PIOS_PPM_NUM_INPUTS                     6  //Could be more if needed
+
+//-------------------------
+// Receiver PWM input
+//-------------------------
+#define PIOS_PWM_NUM_INPUTS                     6
+
+//-------------------------
+// Receiver SPEKTRUM input
+//-------------------------
+#define PIOS_SPEKTRUM_NUM_INPUTS                12
 
 //-------------------------
 // Servo outputs

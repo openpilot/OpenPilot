@@ -28,7 +28,7 @@
 
 // Private constants
 #define MAX_QUEUE_SIZE 20
-#define STACK_SIZE configMINIMAL_STACK_SIZE
+#define STACK_SIZE 96
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 3)
 #define MAX_UPDATE_PERIOD_MS 1000
 

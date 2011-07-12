@@ -2,12 +2,12 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS_RTC RTC Functions
+ * @addtogroup   PIOS_SBUS Futaba S.Bus receiver functions
  * @{
  *
- * @file       pios_rtc.h  
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      RTC functions header.
+ * @file       pios_sbus.h  
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
+ * @brief      Futaba S.Bus functions header.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -27,18 +27,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_RTC_H
-#define PIOS_RTC_H
+#ifndef PIOS_SBUS_H
+#define PIOS_SBUS_H
 
-#include <stdbool.h>
+/* Global Types */
 
 /* Public Functions */
-extern uint32_t PIOS_RTC_Counter();
-extern float PIOS_RTC_Rate();
-extern float PIOS_RTC_MsPerTick();
-extern bool PIOS_RTC_RegisterTickCallback(void (*fn)(uint32_t id), uint32_t data);
 
-#endif /* PIOS_RTC_H */
+#endif /* PIOS_SBUS_H */
 
 /**
  * @}

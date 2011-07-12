@@ -42,12 +42,12 @@
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
 
-#if defined(USE_SPEKTRUM)
+#define PIOS_INCLUDE_RCVR
+
 #define PIOS_INCLUDE_SPEKTRUM
-#else
-//#define PIOS_INCLUDE_PPM
+//#define PIOS_INCLUDE_SBUS
 #define PIOS_INCLUDE_PWM
-#endif
+//#define PIOS_INCLUDE_PPM
 
 #define PIOS_INCLUDE_SERVO
 #define PIOS_INCLUDE_SPI

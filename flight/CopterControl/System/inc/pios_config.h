@@ -30,10 +30,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 #ifndef PIOS_CONFIG_H
 #define PIOS_CONFIG_H
-
 
 /* Enable/Disable PiOS Modules */
 #define PIOS_INCLUDE_ADC
@@ -45,14 +43,17 @@
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
 
-#if defined(USE_SPEKTRUM)
+#define PIOS_INCLUDE_RCVR
+
+/* Supported receiver interfaces */
 #define PIOS_INCLUDE_SPEKTRUM
-#else
-#define PIOS_INCLUDE_GPS
+#define PIOS_INCLUDE_SBUS
 //#define PIOS_INCLUDE_PPM
 #define PIOS_INCLUDE_PWM
-#endif
 
+/* Supported USART-based PIOS modules */
+#define PIOS_INCLUDE_TELEMETRY_RF
+//#define PIOS_INCLUDE_GPS
 
 #define PIOS_INCLUDE_SERVO
 #define PIOS_INCLUDE_SPI
@@ -85,9 +86,9 @@
 #define AUXUART_BAUDRATE		19200
 
 /* Alarm Thresholds */
-#define HEAP_LIMIT_WARNING             156
-#define HEAP_LIMIT_CRITICAL            130
-#define CPULOAD_LIMIT_WARNING		80
+#define HEAP_LIMIT_WARNING             220
+#define HEAP_LIMIT_CRITICAL             40
+#define CPULOAD_LIMIT_WARNING		85
 #define CPULOAD_LIMIT_CRITICAL		95
 
 /* Task stack sizes */

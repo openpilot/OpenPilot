@@ -34,12 +34,6 @@
 #include "pios_spektrum_priv.h"
 
 #if defined(PIOS_INCLUDE_SPEKTRUM)
-#if defined(PIOS_INCLUDE_PWM)
-#error "Both PWM and SPEKTRUM input defined, choose only one"
-#endif
-#if defined(PIOS_COM_AUX)
-#error "AUX com cannot be used with SPEKTRUM"
-#endif
 
 /**
  * @Note Framesyncing:
@@ -51,31 +45,35 @@
 
 /* Global Variables */
 
+/* Provide a RCVR driver */
+static int32_t PIOS_SPEKTRUM_Get(uint32_t chan_id);
+
+const struct pios_rcvr_driver pios_spektrum_rcvr_driver = {
+	.read = PIOS_SPEKTRUM_Get,
+};
+
 /* Local Variables */
-static uint16_t CaptureValue[12],CaptureValueTemp[12];
+static uint16_t CaptureValue[PIOS_SPEKTRUM_NUM_INPUTS],CaptureValueTemp[PIOS_SPEKTRUM_NUM_INPUTS];
 static uint8_t prev_byte = 0xFF, sync = 0, bytecount = 0, datalength=0, frame_error=0, byte_array[20] = { 0 };
 uint8_t sync_of = 0;
 uint16_t supv_timer=0;
 
+static void PIOS_SPEKTRUM_Supervisor(uint32_t spektrum_id);
+static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg);
+
 /**
 * Bind and Initialise Spektrum satellite receiver
 */
-void PIOS_SPEKTRUM_Init(void)
+void PIOS_SPEKTRUM_Init(const struct pios_spektrum_cfg * cfg, bool bind)
 {
 	// TODO: need setting flag for bind on next powerup
-	if (0) {
-		PIOS_SPEKTRUM_Bind();
+	if (bind) {
+		PIOS_SPEKTRUM_Bind(cfg);
 	}
 
-	/* Init RTC supervisor timer interrupt */
-	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure.NVIC_IRQChannel = RTC_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
-	/* Init RTC clock */
-	PIOS_RTC_Init();
+	if (!PIOS_RTC_RegisterTickCallback(PIOS_SPEKTRUM_Supervisor, 0)) {
+		PIOS_DEBUG_Assert(0);
+	}
 }
 
 /**
@@ -84,59 +82,56 @@ void PIOS_SPEKTRUM_Init(void)
 * \output -1 Channel not available
 * \output >0 Channel value
 */
-int16_t PIOS_SPEKTRUM_Get(int8_t Channel)
+static int32_t PIOS_SPEKTRUM_Get(uint32_t chan_id)
 {
 	/* Return error if channel not available */
-	if (Channel >= 12) {
+	if (chan_id >= PIOS_SPEKTRUM_NUM_INPUTS) {
 		return -1;
 	}
-	return CaptureValue[Channel];
+	return CaptureValue[chan_id];
 }
 
 /**
 * Spektrum bind function
-* \output 1 Successful bind
-* \output 0 Bind failed
-* \note Applications shouldn't call these functions directly
+* \output true Successful bind
+* \output false Bind failed
 */
-uint8_t PIOS_SPEKTRUM_Bind(void)
+static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg)
 {
-	GPIO_InitTypeDef GPIO_InitStructure = pios_spektrum_cfg.gpio_init;
-	GPIO_InitStructure.GPIO_Pin = pios_spektrum_cfg.pin;
-	GPIO_Init(pios_spektrum_cfg.port, &GPIO_InitStructure);
+	GPIO_Init(cfg->bind.gpio, &cfg->bind.init);
 
-	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
+	GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	//PIOS_DELAY_WaitmS(75);
 	/* RX line, drive high for 10us */
-	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
+	GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(10);
 	/* RX line, drive low for 120us */
-	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
+	GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(120);
 	/* RX line, drive high for 120us */
-	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
+	GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(120);
 	/* RX line, drive low for 120us */
-	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
+	GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(120);
 	/* RX line, drive high for 120us */
-	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
+	GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(120);
 	/* RX line, drive low for 120us */
-	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
+	GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(120);
 	/* RX line, drive high for 120us */
-	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
+	GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(120);
 	/* RX line, drive low for 120us */
-	pios_spektrum_cfg.port->BRR = pios_spektrum_cfg.pin;
+	GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(120);
 	/* RX line, drive high for 120us */
-	pios_spektrum_cfg.port->BSRR = pios_spektrum_cfg.pin;
+	GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 	PIOS_DELAY_WaituS(120);
 	/* RX line, set input and wait for data, PIOS_SPEKTRUM_Init */
 
-	return 1;
+	return true;
 }
 
 /**
@@ -147,7 +142,7 @@ uint8_t PIOS_SPEKTRUM_Bind(void)
 * \return -2 if buffer full (retry)
 * \note Applications shouldn't call these functions directly
 */
-int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
+static int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 {
 	static uint16_t channel = 0; /*, sync_word = 0;*/
 	uint8_t channeln = 0, frame = 0;
@@ -201,7 +196,7 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 			{
 				frame_error=1;
 			}
-			if (channeln < 12 && !frame_error)
+			if (channeln < PIOS_SPEKTRUM_NUM_INPUTS && !frame_error)
 				CaptureValueTemp[channeln] = data;
 		}
 	}
@@ -212,7 +207,7 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 		sync_of = 0;
 		if (!frame_error)
 		{
-			for(int i=0;i<12;i++)
+			for(int i=0;i<PIOS_SPEKTRUM_NUM_INPUTS;i++)
 			{
 				CaptureValue[i] = CaptureValueTemp[i];
 			}
@@ -223,11 +218,16 @@ int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 	return 0;
 }
 
-/* Interrupt handler for USART */
-void SPEKTRUM_IRQHandler(uint32_t usart_id) {
+/* Custom interrupt handler for USART */
+void PIOS_SPEKTRUM_irq_handler(uint32_t usart_id) {
+	/* Grab the config for this device from the underlying USART device */
+	const struct pios_usart_cfg * cfg;
+	cfg = PIOS_USART_GetConfig(usart_id);
+	PIOS_Assert(cfg);
+  
 	/* by always reading DR after SR make sure to clear any error interrupts */
-	volatile uint16_t sr = pios_spektrum_cfg.pios_usart_spektrum_cfg->regs->SR;
-	volatile uint8_t b = pios_spektrum_cfg.pios_usart_spektrum_cfg->regs->DR;
+	volatile uint16_t sr = cfg->regs->SR;
+	volatile uint8_t b = cfg->regs->DR;
 	
 	/* check if RXNE flag is set */
 	if (sr & USART_SR_RXNE) {
@@ -238,7 +238,7 @@ void SPEKTRUM_IRQHandler(uint32_t usart_id) {
 
 	if (sr & USART_SR_TXE) {	// check if TXE flag is set
 		/* Disable TXE interrupt (TXEIE=0) */
-		USART_ITConfig(pios_spektrum_cfg.pios_usart_spektrum_cfg->regs, USART_IT_TXE, DISABLE);
+		USART_ITConfig(cfg->regs, USART_IT_TXE, DISABLE);
 	}
 	/* byte arrived so clear "watchdog" timer */
 	supv_timer=0;
@@ -248,7 +248,7 @@ void SPEKTRUM_IRQHandler(uint32_t usart_id) {
  *@brief This function is called between frames and when a spektrum word hasnt been decoded for too long
  *@brief clears the channel values
  */
-void PIOS_SPEKTRUM_irq_handler() {
+static void PIOS_SPEKTRUM_Supervisor(uint32_t spektrum_id) {
 	/* 125hz */
 	supv_timer++;
 	if(supv_timer > 5) {
@@ -262,7 +262,7 @@ void PIOS_SPEKTRUM_irq_handler() {
 		if (sync_of > 12) {
 			/* signal lost */
 			sync_of = 0;
-			for (int i = 0; i < 12; i++) {
+			for (int i = 0; i < PIOS_SPEKTRUM_NUM_INPUTS; i++) {
 				CaptureValue[i] = 0;
 				CaptureValueTemp[i] = 0;
 			}

@@ -153,6 +153,9 @@ static void TaskTesting(void *pvParameters)
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u,%u,%u,%u,%u,%u,%u,%u\r", PIOS_SPEKTRUM_Get(0), PIOS_SPEKTRUM_Get(1), PIOS_SPEKTRUM_Get(2), PIOS_SPEKTRUM_Get(3), PIOS_SPEKTRUM_Get(4), PIOS_SPEKTRUM_Get(5), PIOS_SPEKTRUM_Get(6), PIOS_SPEKTRUM_Get(7));
 #endif
+#if defined(PIOS_INCLUDE_SBUS)
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u,%u,%u,%u,%u,%u,%u,%u\r", PIOS_SBUS_Get(0), PIOS_SBUS_Get(1), PIOS_SBUS_Get(2), PIOS_SBUS_Get(3), PIOS_SBUS_Get(4), PIOS_SBUS_Get(5), PIOS_SBUS_Get(6), PIOS_SBUS_Get(7));
+#endif
 #if defined(PIOS_INCLUDE_PWM)
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u,%u,%u,%u,%u,%u,%u,%u uS\r", PIOS_PWM_Get(0), PIOS_PWM_Get(1), PIOS_PWM_Get(2), PIOS_PWM_Get(3), PIOS_PWM_Get(4), PIOS_PWM_Get(5), PIOS_PWM_Get(6), PIOS_PWM_Get(7));
 #endif

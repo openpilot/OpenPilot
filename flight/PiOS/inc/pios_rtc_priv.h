@@ -2,13 +2,13 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS_SPEKTRUM SPEKTRUM Functions
- * @brief PIOS interface to read and write from spektrum port
+ * @addtogroup   PIOS_RTC RTC Functions
+ * @brief PIOS interface for RTC tick
  * @{
  *
- * @file       pios_spektrum_priv.h
+ * @file       pios_rtc_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Servo private structures.
+ * @brief      ADC private definitions.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -28,27 +28,25 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_SPEKTRUM_PRIV_H
-#define PIOS_SPEKTRUM_PRIV_H
+#ifndef PIOS_RTC_PRIV_H
+#define PIOS_RTC_PRIV_H
 
 #include <pios.h>
 #include <pios_stm32.h>
-#include <pios_usart_priv.h>
 
-struct pios_spektrum_cfg {
-	struct stm32_gpio bind;
-	uint32_t remap;		/* GPIO_Remap_* */
+struct pios_rtc_cfg {
+  uint32_t         clksrc;
+  uint32_t         prescaler;
+  struct stm32_irq irq;
 };
 
-extern void PIOS_SPEKTRUM_irq_handler();
+extern void PIOS_RTC_Init(const struct pios_rtc_cfg * cfg);
 
-extern const struct pios_rcvr_driver pios_spektrum_rcvr_driver;
-
-extern void PIOS_SPEKTRUM_Init(const struct pios_spektrum_cfg * cfg, bool bind);
-
-#endif /* PIOS_PWM_PRIV_H */
+extern void PIOS_RTC_irq_handler(void);
+#endif /* PIOS_RTC_PRIV_H */
 
 /**
  * @}
  * @}
  */
+

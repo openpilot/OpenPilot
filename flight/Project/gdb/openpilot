@@ -1,7 +1,7 @@
 define connect
 	target remote localhost:3333
 	monitor cortex_m3 vector_catch all
-	file ./build/openpilot/OpenPilot.elf
+	file ./build/fw_openpilot/fw_openpilot.elf
 end
 #monitor reset halt
 

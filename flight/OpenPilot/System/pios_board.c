@@ -30,6 +30,7 @@
 #include <pios.h>
 #include <openpilot.h>
 #include <uavobjectsinit.h>
+#include "manualcontrolsettings.h"
 
 //#define I2C_DEBUG_PIN			0
 //#define USART_GPS_DEBUG_PIN		1
@@ -1069,28 +1070,12 @@ void PIOS_Board_Init(void) {
 	PIOS_ADC_Init();
 	PIOS_GPIO_Init();
 
-#if defined(PIOS_INCLUDE_SPEKTRUM)
-#if (PIOS_SPEKTRUM_NUM_INPUTS > PIOS_RCVR_MAX_DEVS)
-#error More receiver inputs than available devices
-#endif
-	/* SPEKTRUM init must come before comms */
-	PIOS_SPEKTRUM_Init(&pios_spektrum_cfg, false);
+	/* Configure the selected receiver */
+	uint8_t manualcontrolsettings_inputmode;
+	ManualControlSettingsInputModeGet(&manualcontrolsettings_inputmode);
 
-	uint32_t pios_usart_spektrum_id;
-	if (PIOS_USART_Init(&pios_usart_spektrum_id, &pios_usart_spektrum_cfg)) {
-		PIOS_Assert(0);
-	}
-	for (uint8_t i = 0; i < PIOS_SPEKTRUM_NUM_INPUTS && i < PIOS_RCVR_MAX_DEVS; i++) {
-		if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
-				   &pios_spektrum_rcvr_driver,
-				   i)) {
-			pios_rcvr_max_channel++;
-		} else {
-			PIOS_Assert(0);
-		}
-	}
-#endif
-
+	switch (manualcontrolsettings_inputmode) {
+		case MANUALCONTROLSETTINGS_INPUTMODE_PWM:
 #if defined(PIOS_INCLUDE_PWM)
 #if (PIOS_PWM_NUM_INPUTS > PIOS_RCVR_MAX_DEVS)
 #error More receiver inputs than available devices
@@ -1105,7 +1090,9 @@ void PIOS_Board_Init(void) {
 			PIOS_Assert(0);
 		}
 	}
-#endif
+#endif  /* PIOS_INCLUDE_PWM */
+			break;
+		case MANUALCONTROLSETTINGS_INPUTMODE_PPM:
 #if defined(PIOS_INCLUDE_PPM)
 #if (PIOS_PPM_NUM_INPUTS > PIOS_RCVR_MAX_DEVS)
 #error More receiver inputs than available devices
@@ -1120,7 +1107,39 @@ void PIOS_Board_Init(void) {
 			PIOS_Assert(0);
 		}
 	}
+#endif	/* PIOS_INCLUDE_PPM */
+			break;
+		case MANUALCONTROLSETTINGS_INPUTMODE_SPEKTRUM:
+#if defined(PIOS_INCLUDE_SPEKTRUM)
+#if (PIOS_SPEKTRUM_NUM_INPUTS > PIOS_RCVR_MAX_DEVS)
+#error More receiver inputs than available devices
 #endif
+			/* SPEKTRUM init must come before comms */
+			PIOS_SPEKTRUM_Init(&pios_spektrum_cfg, false);
+
+			uint32_t pios_usart_spektrum_id;
+			if (PIOS_USART_Init(&pios_usart_spektrum_id, &pios_usart_spektrum_cfg)) {
+				PIOS_Assert(0);
+			}
+			for (uint8_t i = 0; i < PIOS_SPEKTRUM_NUM_INPUTS && i < PIOS_RCVR_MAX_DEVS; i++) {
+				if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
+						    &pios_spektrum_rcvr_driver,
+						    i)) {
+					pios_rcvr_max_channel++;
+				} else {
+					PIOS_Assert(0);
+				}
+			}
+#endif
+			break;
+		case MANUALCONTROLSETTINGS_INPUTMODE_SBUS:
+#if defined(PIOS_INCLUDE_SBUS)
+#error SBUS NOT ON OP YET
+#endif  /* PIOS_INCLUDE_SBUS */
+			break;
+	}
+
+
 #if defined(PIOS_INCLUDE_USB_HID)
 	PIOS_USB_HID_Init(0);
 #if defined(PIOS_INCLUDE_COM)

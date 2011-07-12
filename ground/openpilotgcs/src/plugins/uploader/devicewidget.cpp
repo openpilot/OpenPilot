@@ -406,7 +406,7 @@ void deviceWidget::uploadFirmware()
     connect(m_dfu, SIGNAL(progressUpdated(int)), this, SLOT(setProgress(int)));
     connect(m_dfu, SIGNAL(operationProgress(QString)), this, SLOT(dfuStatus(QString)));
     connect(m_dfu, SIGNAL(uploadFinished(OP_DFU::Status)), this, SLOT(uploadFinished(OP_DFU::Status)));
-    bool retstatus = m_dfu->UploadFirmware(filename.toAscii(),verify, deviceID);
+    bool retstatus = m_dfu->UploadFirmware(filename,verify, deviceID);
     if(!retstatus ) {
         status("Could not start upload", STATUSICON_FAIL);
         return;

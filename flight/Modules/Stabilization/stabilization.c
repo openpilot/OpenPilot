@@ -100,7 +100,7 @@ static void SettingsUpdatedCb(UAVObjEvent * ev);
 int32_t StabilizationStart()
 {
 	// Initialize variables
-	
+
 	// Start main task
 	xTaskCreate(stabilizationTask, (signed char*)"Stabilization", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_STABILIZATION, taskHandle);
@@ -329,7 +329,7 @@ static void stabilizationTask(void* parameters)
 		}
 
 		if(flightStatus.Armed != FLIGHTSTATUS_ARMED_ARMED ||
-		   !shouldUpdate || (stabDesired.Throttle < 0))
+		   !shouldUpdate)
 		{
 			ZeroPids();
 		}

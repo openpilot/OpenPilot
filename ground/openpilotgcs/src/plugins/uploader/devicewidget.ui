@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>516</width>
-    <height>582</height>
+    <width>576</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,99 +33,120 @@
           <property name="styleSheet">
            <string notr="true">background: transparent</string>
           </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
          </widget>
         </item>
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_4">
+         <layout class="QVBoxLayout" name="verticalLayout_10">
           <item>
-           <widget class="QLabel" name="lblDevName">
-            <property name="text">
-             <string>lblDevName</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_4">
+              <item>
+               <widget class="QLabel" name="lblDevName">
+                <property name="text">
+                 <string>lblDevName</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="lbldevID">
+                <property name="text">
+                 <string>DeviceID</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="lblHWRev">
+                <property name="text">
+                 <string>lblHWRev</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="lblAccess">
+                <property name="text">
+                 <string>RW</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="lblBLVer">
+                <property name="text">
+                 <string>BL Version</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="lblMaxCode">
+                <property name="text">
+                 <string>MaxCodeSize</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_6">
+              <item>
+               <widget class="QPushButton" name="pbLoad">
+                <property name="toolTip">
+                 <string>Loads the firmware</string>
+                </property>
+                <property name="text">
+                 <string>Load...</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="youdont">
+                <property name="text">
+                 <string>I know what I'm doing</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="updateButton">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="toolTip">
+                 <string>Update the firmware on this board.</string>
+                </property>
+                <property name="text">
+                 <string>Flash</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="retrieveButton">
+                <property name="toolTip">
+                 <string>Download the current board firmware to your computer</string>
+                </property>
+                <property name="text">
+                 <string>Retrieve...</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </item>
           <item>
-           <widget class="QLabel" name="lbldevID">
-            <property name="text">
-             <string>DeviceID</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lblHWRev">
-            <property name="text">
-             <string>lblHWRev</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lblAccess">
-            <property name="text">
-             <string>RW</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lblBLVer">
-            <property name="text">
-             <string>BL Version</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lblMaxCode">
-            <property name="text">
-             <string>MaxCodeSize</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_6">
-          <item>
-           <widget class="QPushButton" name="pbLoad">
-            <property name="toolTip">
-             <string>Loads the firmware</string>
-            </property>
-            <property name="text">
-             <string>Open</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="updateButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="toolTip">
-             <string>Update the firmware on this board.</string>
-            </property>
-            <property name="text">
-             <string>Flash</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="retrieveButton">
-            <property name="toolTip">
-             <string>Download the current board firmware to your computer</string>
-            </property>
-            <property name="text">
-             <string>Retrieve...</string>
+           <widget class="QProgressBar" name="progressBar">
+            <property name="value">
+             <number>0</number>
             </property>
            </widget>
           </item>
          </layout>
         </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QProgressBar" name="progressBar">
-        <property name="value">
-         <number>0</number>
-        </property>
-       </widget>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
@@ -160,149 +181,211 @@
         </item>
        </layout>
       </item>
-      <item>
-       <widget class="QCheckBox" name="youdont">
-        <property name="text">
-         <string>I know what I'm doing</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="verticalGroupBox_3">
-     <property name="title">
-      <string>Firmware currently on the device</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_5">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Firmware:</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_9">
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_8">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Board name:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Description:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Build date:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>GIT Tag:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>CRC:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="verticalGroupBox_3">
+       <property name="title">
+        <string>On Device</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
-           <widget class="QLabel" name="lblBrdName">
-            <property name="text">
-             <string>lblBrdName</string>
-            </property>
-           </widget>
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <item>
+             <widget class="QLabel" name="lblBrdName">
+              <property name="text">
+               <string>lblBrdName</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lblDescription">
+              <property name="text">
+               <string>lblDescription</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lblBuildDate">
+              <property name="text">
+               <string>lblBuildDate</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lblGitTag">
+              <property name="text">
+               <string>lblGitTag</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lblCRC">
+              <property name="text">
+               <string>lblCRC</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
-           <widget class="QLabel" name="lblDescription">
+           <widget class="QLabel" name="lblCertified">
             <property name="text">
-             <string>lblDescription</string>
+             <string>lblCertified</string>
             </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lblBuildDate">
-            <property name="text">
-             <string>lblBuildDate</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lblGitTag">
-            <property name="text">
-             <string>lblGitTag</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lblCRC">
-            <property name="text">
-             <string>lblCRC</string>
+            <property name="scaledContents">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
          </layout>
         </item>
-        <item>
-         <widget class="QLabel" name="lblCertified">
-          <property name="text">
-           <string>lblCertified</string>
-          </property>
-          <property name="scaledContents">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
        </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="verticalGroupBox_loaded">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="title">
-      <string>Loaded Firmware</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="verticalGroupBox_loaded">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="title">
+        <string>Loaded</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="QLabel" name="lblBrdNameL">
-            <property name="text">
-             <string>lblBrdName</string>
-            </property>
-           </widget>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <widget class="QLabel" name="lblBrdNameL">
+              <property name="text">
+               <string>lblBrdName</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lblDescritpionL">
+              <property name="text">
+               <string>lblDescritpionL</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lblBuildDateL">
+              <property name="text">
+               <string>lblBuildDate</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lblGitTagL">
+              <property name="text">
+               <string>lblGitTag</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lblCRCL">
+              <property name="text">
+               <string>lblCRC</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
-           <widget class="QLabel" name="lblDescritpionL">
+           <widget class="QLabel" name="lblCertifiedL">
             <property name="text">
-             <string>lblDescritpionL</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lblBuildDateL">
-            <property name="text">
-             <string>lblBuildDate</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lblGitTagL">
-            <property name="text">
-             <string>lblGitTag</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lblCRCL">
-            <property name="text">
-             <string>lblCRC</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lblFirmwareSizeL">
-            <property name="text">
-             <string>lblFirmwareSizeL</string>
+             <string>lblCertifiedL</string>
             </property>
            </widget>
           </item>
          </layout>
         </item>
-        <item>
-         <widget class="QLabel" name="lblCertifiedL">
-          <property name="text">
-           <string>lblCertifiedL</string>
-          </property>
-         </widget>
-        </item>
        </layout>
-      </item>
-     </layout>
-    </widget>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QGroupBox" name="groupCustom">

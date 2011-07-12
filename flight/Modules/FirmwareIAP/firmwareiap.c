@@ -100,7 +100,7 @@ int32_t FirmwareIAPInitialize()
 	data.ArmReset=0;
 	data.crc = 0;
 	FirmwareIAPObjSet( &data );
-	FirmwareIAPObjConnectCallback( &FirmwareIAPCallback );
+	if(bdinfo->magic==PIOS_BOARD_INFO_BLOB_MAGIC) FirmwareIAPObjConnectCallback( &FirmwareIAPCallback );
 	return 0;
 }
 

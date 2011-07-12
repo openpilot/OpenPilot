@@ -121,13 +121,28 @@ int32_t AttitudeInitialize(void)
 	attitude.q4 = 0;
 	AttitudeActualSet(&attitude);
 
-	AttitudeSettingsConnectCallback(&settingsUpdatedCb);
-	
+	// Cannot trust the values to init right above if BL runs
+	gyro_correct_int[0] = 0;
+	gyro_correct_int[1] = 0;
+	gyro_correct_int[2] = 0;
+
+	q[0] = 1;
+	q[1] = 0;
+	q[2] = 0;
+	q[3] = 0;
+	for(uint8_t i = 0; i < 3; i++)
+		for(uint8_t j = 0; j < 3; j++)
+			R[i][j] = 0;
+
 	// Create queue for passing gyro data, allow 2 back samples in case
 	gyro_queue = xQueueCreate(1, sizeof(float) * 4);
 	if(gyro_queue == NULL)
 		return -1;
+
+
 	PIOS_ADC_SetQueue(gyro_queue);
+
+	AttitudeSettingsConnectCallback(&settingsUpdatedCb);
 
 	return 0;
 }
@@ -139,7 +154,6 @@ MODULE_INITCALL(AttitudeInitialize, 0, AttitudeStart, 0, MODULE_EXEC_NOORDER_FLA
  */
 static void AttitudeTask(void *parameters)
 {
-
 	uint8_t init = 0;
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 
@@ -148,6 +162,7 @@ static void AttitudeTask(void *parameters)
 	// Keep flash CS pin high while talking accel
 	PIOS_FLASH_DISABLE;
 	PIOS_ADXL345_Init();
+
 
 	// Force settings update to make sure rotation loaded
 	settingsUpdatedCb(AttitudeSettingsHandle());
@@ -259,14 +274,11 @@ static void updateSensors(AttitudeRawData * attitudeRaw)
 
 static void updateAttitude(AttitudeRawData * attitudeRaw)
 {
+	float dT;
+	portTickType thisSysTime = xTaskGetTickCount();
 	static portTickType lastSysTime = 0;
-	static portTickType thisSysTime;
 
-	static float dT = 0;
-
-	thisSysTime = xTaskGetTickCount();
-	if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
-		dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
+	dT = (thisSysTime == lastSysTime) ? 0.001 : (portMAX_DELAY & (thisSysTime - lastSysTime)) / portTICK_RATE_MS / 1000.0f;
 	lastSysTime = thisSysTime;
 
 	// Bad practice to assume structure order, but saves memory
@@ -325,6 +337,15 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 	q[1] = q[1] / qmag;
 	q[2] = q[2] / qmag;
 	q[3] = q[3] / qmag;
+
+	// If quaternion has become inappropriately short or is nan reinit.
+	// THIS SHOULD NEVER ACTUALLY HAPPEN
+	if((fabs(qmag) < 1e-3) || (qmag != qmag)) {
+		q[0] = 1;
+		q[1] = 0;
+		q[2] = 0;
+		q[3] = 0;
+	}
 
 	AttitudeActualData attitudeActual;
 	AttitudeActualGet(&attitudeActual);

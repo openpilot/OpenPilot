@@ -11,8 +11,8 @@ ARGV_FILE=$1
 
 # ymin_pos=-100
 # ymax_pos=250
-# ymin_angle=-180
-# ymax_angle=180
+# ymin_angle=-200
+# ymax_angle=200
 # tmin=0
 # tmax=56
 
@@ -37,6 +37,7 @@ globbmargin=0.045
 coeffs=($coeff_pos $coeff_pos $coeff_pos $coeff_angle $coeff_angle $coeff_angle)
 ymin=($ymin_pos $ymin_pos $ymin_pos $ymin_angle $ymin_angle $ymin_angle)
 ymax=($ymax_pos $ymax_pos $ymax_pos $ymax_angle $ymax_angle $ymax_angle)
+functions=(identity identity identity continuous continuous continuous)
 
 plotwidth="((1-$globlmargin-$globrmargin)/3.0)"
 plotheight="((1-$globtmargin-$globbmargin)/2.0)"
@@ -64,6 +65,12 @@ set border lw 0.5
 
 #set multiplot layout 2,3 title "Trajectories comparison (wrt time in s)"
 set multiplot layout 2,3
+
+k=0
+prev_a=0
+continuous(a)=((prev_a>pi/2&&a<-pi/2 ? k=k+1 : (prev_a<-pi/2&&a>pi/2 ? k=k-1 : k)), prev_a=a, a+k*2*pi)
+identity(a)=a
+
 
 EOF
 `
@@ -94,8 +101,8 @@ set format x ($i<3?"":"%g")
 set format y ($i%3?"":"%g")
 
 plot \
-	"$ARGV_FILE" using 1:((\$ $((2+$i)))*${coeffs[$i]}) with lines lt 1 lw 1 lc rgb "blue" title "slam ${names[$i]}", \
-	"$ARGV_FILE" using 1:((\$ $((2+12+$i)))*${coeffs[$i]}) with lines lt 2 lw 1 lc rgb "red" title "mocap ${names[$i]}"
+	"$ARGV_FILE" using 1:(${functions[$i]}(\$ $((2+$i)))*${coeffs[$i]}) with lines lt 1 lw 1 lc rgb "blue" title "slam ${names[$i]}", \
+	"$ARGV_FILE" using 1:(${functions[$i]}(\$ $((2+12+$i)))*${coeffs[$i]}) with lines lt 2 lw 1 lc rgb "red" title "mocap ${names[$i]}"
 
 EOF
 `

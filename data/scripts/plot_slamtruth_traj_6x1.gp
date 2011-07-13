@@ -31,8 +31,10 @@ coeff_angle=57.2958
 
 globlmargin=0.033
 globrmargin=0.012
-globtmargin=0.015
-globbmargin=0.045
+#globtmargin=0.015
+#globbmargin=0.045
+globtmargin=0.02
+globbmargin=0.065
 
 coeffs=($coeff_pos $coeff_pos $coeff_pos $coeff_angle $coeff_angle $coeff_angle)
 ymin=($ymin_pos $ymin_pos $ymin_pos $ymin_angle $ymin_angle $ymin_angle)
@@ -51,7 +53,8 @@ script_header=`cat<<EOF
 # set output 'plot_slamtruth_traj_6x1.eps'
 
 #set terminal png enhanced font "arial,12" size 1440,720 truecolor
-set terminal png enhanced font "arial,26" size 3000,1500 truecolor
+#set terminal png enhanced font "arial,26" size 3000,1500 truecolor
+set terminal png enhanced font "arial,26" size 3000,750 truecolor
 set output 'plot_slamtruth_traj_6x1.png'
 
 #set term wxt size 1280,640

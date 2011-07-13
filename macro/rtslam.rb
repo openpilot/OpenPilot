@@ -1,5 +1,6 @@
 require 'jafar/kernel'
 require 'jafar/geom'
+require 'jafar/jmath'
 require 'jafar/rtslam/rtslam'
 Jafar.register_module Jafar::Rtslam
 
@@ -14,8 +15,7 @@ module Rtslam
 # (0..99).each { |i| Rtslam::sync_truth("path/rtslam_#{sprintf('%03d',i)}.log", "path/mocap_trunc.dat", "path/slamocap_#{sprintf('%03d',i)}.log") }
 #
 # TODO:
-# - deal correctly with angles and modulo for interpolation
-# - read full cov matrix for slam, for real 6D NEES
+# - read full cov matrix for slam, for real 6D NEES : need to put it in log
 	
 def Rtslam.sync_truth(slam_filename, truth_filename, res_filename)
 	
@@ -198,18 +198,28 @@ nees"
 			rslam_final_t3d = Geom::T3D::composeToEuler(slam_transfo_t3d, rslam_raw_t3d)
 			rtruth_final_t3d = Geom::T3D::composeToEuler(truth_transfo_t3d, rtruth_raw_t3d)
 			
-			# interpolation FIXME deal better with angles and modulo
+			# interpolation
 			coeff = (slam_final_t - truth_prev_t) / (truth_final_t - truth_prev_t)
 			rtruth_inter_t3d = Geom::T3DEuler.new(
 				rtruth_prev_t3d.getX    + (rtruth_final_t3d.getX    - rtruth_prev_t3d.getX   ) * coeff,
 				rtruth_prev_t3d.getXCov + (rtruth_final_t3d.getXCov - rtruth_prev_t3d.getXCov) * coeff)
-# 			for i in (3..5)
-# 				diff = rtruth_final_t3d.getX(i) - rtruth_prev_t3d.getX(i)
-# 				if diff > Math::PI
-# 				rtruth_prev_t3d.getX * (1-coeff) + rtruth_final_t3d.getX * coeff
-# 				
-# 				if rtruth_prev_t3d.getX(i) < -pi/2 and rtruth_final_t3d.getX(i) > pi/2 then
-					
+			
+ 			for i in (3..5) # deal correctly with angles and modulo
+ 				if (rtruth_final_t3d.getX().get(i) - rtruth_prev_t3d.getX().get(i)).abs > Math::PI then
+					if rtruth_final_t3d.getX().get(i) < rtruth_prev_t3d.getX().get(i) then
+						rtruth_inter_t3d.getX().set(i, rtruth_inter_t3d.getX().get(i) + 2*Math::PI * coeff)
+					else
+						rtruth_inter_t3d.getX().set(i, rtruth_inter_t3d.getX().get(i) + 2*Math::PI * (1-coeff))
+					end
+					if rtruth_inter_t3d.getX().get(i) > Math::PI then
+						rtruth_inter_t3d.getX().set(i, rtruth_inter_t3d.getX().get(i) - 2*Math::PI)
+					end
+					if rtruth_inter_t3d.getX().get(i) <= -Math::PI then
+						rtruth_inter_t3d.getX().set(i, rtruth_inter_t3d.getX().get(i) + 2*Math::PI)
+					end
+				end
+			end
+			
 		end
 		
 		# error

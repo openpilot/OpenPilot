@@ -434,7 +434,7 @@ static const struct pios_usart_cfg pios_usart_spektrum_flexi_cfg = {
 		  },
 	},
 	.rx = {
-		.gpio = GPIOA,
+		.gpio = GPIOB,
 		.init = {
 			.GPIO_Pin   = GPIO_Pin_11,
 			.GPIO_Speed = GPIO_Speed_2MHz,
@@ -442,7 +442,7 @@ static const struct pios_usart_cfg pios_usart_spektrum_flexi_cfg = {
 		},
 	},
 	.tx = {
-		.gpio = GPIOA,
+		.gpio = GPIOB,
 		.init = {
 			.GPIO_Pin   = GPIO_Pin_10,
 			.GPIO_Speed = GPIO_Speed_2MHz,

@@ -98,37 +98,23 @@ static int32_t PIOS_SPEKTRUM_Get(uint32_t chan_id)
 */
 static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg)
 {
-	GPIO_Init(cfg->bind.gpio, &cfg->bind.init);
+#define BIND_PULSES 5
 
-	GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
-	//PIOS_DELAY_WaitmS(75);
-	/* RX line, drive high for 10us */
+	GPIO_Init(cfg->bind.gpio, &cfg->bind.init);
+	/* RX line, set high */
 	GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
-	PIOS_DELAY_WaituS(10);
-	/* RX line, drive low for 120us */
-	GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive high for 120us */
-	GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive low for 120us */
-	GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive high for 120us */
-	GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive low for 120us */
-	GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive high for 120us */
-	GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive low for 120us */
-	GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
-	PIOS_DELAY_WaituS(120);
-	/* RX line, drive high for 120us */
-	GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
-	PIOS_DELAY_WaituS(120);
+
+	/* on CC works upto 140ms, I guess bind window is around 20-140ms after powerup */
+	PIOS_DELAY_WaitmS(60);
+
+	for (int i = 0; i < BIND_PULSES ; i++) {
+		/* RX line, drive low for 120us */
+		GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
+		PIOS_DELAY_WaituS(120);
+		/* RX line, drive high for 120us */
+		GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
+		PIOS_DELAY_WaituS(120);
+	}
 	/* RX line, set input and wait for data, PIOS_SPEKTRUM_Init */
 
 	return true;

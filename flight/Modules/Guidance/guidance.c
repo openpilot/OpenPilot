@@ -82,6 +82,19 @@ static void updateVtolDesiredAttitude();
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
+int32_t GuidanceStart()
+{
+	// Start main task
+	xTaskCreate(guidanceTask, (signed char *)"Guidance", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &guidanceTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_GUIDANCE, guidanceTaskHandle);
+
+	return 0;
+}
+
+/**
+ * Initialise the module, called on startup
+ * \returns 0 on success or -1 if initialisation failed
+ */
 int32_t GuidanceInitialize()
 {
 	// Create object queue
@@ -90,12 +103,9 @@ int32_t GuidanceInitialize()
 	// Listen for updates.
 	AttitudeRawConnectQueue(queue);
 	
-	// Start main task
-	xTaskCreate(guidanceTask, (signed char *)"Guidance", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &guidanceTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_GUIDANCE, guidanceTaskHandle);
-
 	return 0;
 }
+MODULE_INITCALL(GuidanceInitialize, 0, GuidanceStart, 0, MODULE_EXEC_NOORDER_FLAG)
 
 static float northVelIntegral = 0;
 static float eastVelIntegral = 0;

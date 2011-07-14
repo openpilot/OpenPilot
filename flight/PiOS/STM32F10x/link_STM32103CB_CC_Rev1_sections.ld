@@ -1,11 +1,16 @@
+/* This is the size of the stack for all FreeRTOS IRQs */
+_irq_stack_size = 0x180;
+/* This is the size of the stack for early init: life span is until scheduler starts */
+_init_stack_size = 0x80;
+/* there is probably a way to get that from the MEMORY section */
+_eram = ORIGIN(SRAM) + LENGTH(SRAM);
+
 /* Stub out these functions since we don't use them anyway */
 PROVIDE (   vPortSVCHandler = 0 ) ;
 PROVIDE (   xPortPendSVHandler = 0 ) ;
 PROVIDE (   xPortSysTickHandler = 0 ) ;
 
 PROVIDE(pios_board_info_blob = ORIGIN(BD_INFO));
-
-_estack = 0x20004FF0;
 
 /* Section Definitions */
 SECTIONS
@@ -29,6 +34,16 @@ SECTIONS
 	__uavobj_initcall_end   = .;
     } >FLASH
 
+    /* module sections */
+    .initcallmodule.init :
+    {
+        . = ALIGN(4);
+	__module_initcall_start = .;
+        KEEP(*(.initcallmodule.init))
+	. = ALIGN(4);
+	__module_initcall_end   = .;
+    } >FLASH
+    
     .ARM.extab :
     {
         *(.ARM.extab* .gnu.linkonce.armextab.*)
@@ -43,6 +58,23 @@ SECTIONS
     _etext = .;
     _sidata = .;
 
+    /* 
+     * This stack is used both as the initial sp during early init as well as ultimately
+     * being used as the STM32's MSP (Main Stack Pointer) which is the same stack that
+     * is used for _all_ interrupt handlers.  The end of this stack should be placed
+     * against the lowest address in RAM so that a stack overrun results in a hard fault
+     * at the first access beyond the end of the stack.
+     */
+    .irq_stack :
+    {
+         . = ALIGN(4);
+         _irq_stack_end = . ;
+         . = . + _irq_stack_size ;
+         . = ALIGN(4);
+         _irq_stack_top = . - 4 ;
+         . = ALIGN(4);
+    } > SRAM
+    
     .data : AT (_etext)
     {
         _sdata = .;
@@ -51,6 +83,8 @@ SECTIONS
         _edata = . ;
     } > SRAM
 
+
+    
     /* .bss section which is used for uninitialized data */
     .bss (NOLOAD) :
     {
@@ -60,6 +94,27 @@ SECTIONS
         . = ALIGN(4);
         _ebss = . ;
     } > SRAM
+    
+    .heap (NOLOAD) :
+    {
+        _sheap = . ;
+        _sheap_pre_rtos = . ;
+        *(.heap)
+        . = ALIGN(4);
+        _eheap = . ;
+        _eheap_pre_rtos = . ;
+        _init_stack_end = . ; 
+        _sheap_post_rtos = . ;
+        . = . + _init_stack_size ;
+        . = ALIGN(4);
+        _eheap_post_rtos = . ;
+        _init_stack_top = . - 4 ;
+    } > SRAM
+
+    
+/* keep the heap section at the end of the SRAM */
+/* this will allow to claim the remaining bytes not used
+/* at run time! (done by the reset vector).
 
     . = ALIGN(4);
     _end = . ;

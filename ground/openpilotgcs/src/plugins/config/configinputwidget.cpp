@@ -174,11 +174,13 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_config->ch5Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
     connect(m_config->ch6Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
     connect(m_config->ch7Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
-
+    connect(m_config->doRCInputCalibration,SIGNAL(stateChanged(int)),this,SLOT(updateTips(int)));
     firstUpdate = true;
 
     // Connect the help button
     connect(m_config->inputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
+    updateTips(Qt::Unchecked);
+
 }
 
 ConfigInputWidget::~ConfigInputWidget()
@@ -469,10 +471,15 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
     QString fieldName = QString("Connected");
     UAVObjectField *field = controlCommand->getField(fieldName);
     if (field->getValue().toBool())
+    {
         m_config->RCInputConnected->setText("RC Receiver connected");
+        m_config->lblMissingInputs->setText("");
+    }
     else
+    {
         m_config->RCInputConnected->setText("RC Receiver not connected or invalid input configuration (missing channels)");
-
+        receiverHelp();
+    }
     if (m_config->doRCInputCalibration->isChecked()) {
         if (firstUpdate) {
             // Increase the data rate from the board so that the sliders
@@ -655,4 +662,77 @@ void ConfigInputWidget::openHelp()
 
     QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Input+Configuration", QUrl::StrictMode) );
 }
+void ConfigInputWidget::receiverHelp()
+{
+    QString unassigned;
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    UAVDataObject* controlCommand = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
 
+    UAVObjectField *field;
+
+    field= controlCommand->getField("Roll");
+    if(field->getValue().toString()=="None")
+        unassigned.append("Roll");
+
+    field =controlCommand->getField("Pitch");
+    if(field->getValue().toString()=="None")
+    {
+        if(unassigned.length()>0)
+            unassigned.append(", ");
+        unassigned.append("Pitch");
+    }
+
+    field =controlCommand->getField("Yaw");
+    if(field->getValue().toString()=="None")
+    {
+        if(unassigned.length()>0)
+            unassigned.append(", ");
+        unassigned.append("Yaw");
+    }
+
+    field =controlCommand->getField("Throttle");
+    if(field->getValue().toString()=="None")
+    {
+        if(unassigned.length()>0)
+            unassigned.append(", ");
+        unassigned.append("Throttle");
+    }
+
+    field =controlCommand->getField("FlightMode");
+    if(field->getValue().toString()=="None")
+    {
+        if(unassigned.length()>0)
+            unassigned.append(", ");
+        unassigned.append("FlightMode");
+    }
+    if(unassigned.length()>0)
+        m_config->lblMissingInputs->setText(QString("Channels left to assign:")+unassigned);
+    else
+        m_config->lblMissingInputs->setText("");
+}
+void ConfigInputWidget::updateTips(int value)
+{
+    if(value==Qt::Checked)
+    {
+        m_config->ch0Cur->setToolTip("Current channel value");
+        m_config->ch1Cur->setToolTip("Current channel value");
+        m_config->ch2Cur->setToolTip("Current channel value");
+        m_config->ch3Cur->setToolTip("Current channel value");
+        m_config->ch4Cur->setToolTip("Current channel value");
+        m_config->ch5Cur->setToolTip("Current channel value");
+        m_config->ch6Cur->setToolTip("Current channel value");
+        m_config->ch7Cur->setToolTip("Current channel value");
+    }
+    else
+    {
+        m_config->ch0Cur->setToolTip("Channel neutral point");
+        m_config->ch1Cur->setToolTip("Channel neutral point");
+        m_config->ch2Cur->setToolTip("Channel neutral point");
+        m_config->ch3Cur->setToolTip("Channel neutral point");
+        m_config->ch4Cur->setToolTip("Channel neutral point");
+        m_config->ch5Cur->setToolTip("Channel neutral point");
+        m_config->ch6Cur->setToolTip("Channel neutral point");
+        m_config->ch7Cur->setToolTip("Channel neutral point");
+    }
+}

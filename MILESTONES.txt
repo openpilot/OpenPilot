@@ -127,6 +127,12 @@ C: Werner Backes
 D: July 2011
 V: http://vimeo.com/25983655
 
+M: CopterControl Y4 flight
+C: Mat Wellington
+D: July 2011
+V: http://www.youtube.com/watch?v=TxZ4MDGIj1o
+
+
 M: First Altitude Hold using Sonar
 C: 
 D: 

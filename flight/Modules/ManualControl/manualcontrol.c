@@ -87,76 +87,32 @@ static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time)
 static bool okToArm(void);
 static bool validInputRange(int16_t min, int16_t max, uint16_t value);
 
-#define assumptions1 ( \
-		((int)MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NONE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)       && \
-		((int)MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_RATE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)       && \
-		((int)MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_ATTITUDE  == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)      \
-		)
-
-#define assumptions3 ( \
-		((int)MANUALCONTROLSETTINGS_STABILIZATION2SETTINGS_NONE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)      && \
-		((int)MANUALCONTROLSETTINGS_STABILIZATION2SETTINGS_RATE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)      && \
-		((int)MANUALCONTROLSETTINGS_STABILIZATION2SETTINGS_ATTITUDE  == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)     \
-		)
-
-#define assumptions5 ( \
-		((int)MANUALCONTROLSETTINGS_STABILIZATION3SETTINGS_NONE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_NONE)      && \
-		((int)MANUALCONTROLSETTINGS_STABILIZATION3SETTINGS_RATE      == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_RATE)      && \
-		((int)MANUALCONTROLSETTINGS_STABILIZATION3SETTINGS_ATTITUDE  == (int)STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE)     \
-		)
-
-
-
-#define ARMING_CHANNEL_ROLL     0
-#define ARMING_CHANNEL_PITCH    1
-#define ARMING_CHANNEL_YAW      2
-
-#define assumptions7 ( \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT           -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_ROLL) 	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_ROLLRIGHT          -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_ROLL) 	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_PITCHFORWARD       -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_PITCH) 	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_PITCHAFT           -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_PITCH) 	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_YAWLEFT            -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_YAW) 		&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_YAWRIGHT           -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 	== ARMING_CHANNEL_YAW)		\
-		)
-
-#define assumptions8 ( \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT           -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	== 0) 	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_ROLLRIGHT          -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	!= 0) 	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_PITCHFORWARD       -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	== 0) 	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_PITCHAFT           -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	!= 0) 	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_YAWLEFT            -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	== 0)	&& \
-		( ((int)MANUALCONTROLSETTINGS_ARMING_YAWRIGHT           -(int)MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2 	!= 0)	\
-		)
-
-
-#define assumptions_flightmode ( \
-		( (int)MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_MANUAL == (int) FLIGHTSTATUS_FLIGHTMODE_MANUAL) && \
-		( (int)MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED1 == (int) FLIGHTSTATUS_FLIGHTMODE_STABILIZED1) && \
-		( (int)MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED2 == (int) FLIGHTSTATUS_FLIGHTMODE_STABILIZED2) && \
-		( (int)MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED3 == (int) FLIGHTSTATUS_FLIGHTMODE_STABILIZED3) && \
-		( (int)MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_VELOCITYCONTROL == (int) FLIGHTSTATUS_FLIGHTMODE_VELOCITYCONTROL) && \
-		( (int)MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD == (int) FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD) \
-		)
-
 #define assumptions (assumptions1 && assumptions3 && assumptions5 && assumptions7 && assumptions8 && assumptions_flightmode)
+
+/**
+ * Module initialization
+ */
+int32_t ManualControlStart()
+{
+	/* Check the assumptions about uavobject enum's are correct */
+	if(!assumptions)
+		return -1;
+	// Start main task
+	xTaskCreate(manualControlTask, (signed char *)"ManualControl", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_MANUALCONTROL, taskHandle);
+	PIOS_WDG_RegisterFlag(PIOS_WDG_MANUAL);
+	return 0;
+}
 
 /**
  * Module initialization
  */
 int32_t ManualControlInitialize()
 {
-	/* Check the assumptions about uavobject enum's are correct */
-	if(!assumptions) 
-		return -1;
-	// Start main task
-	xTaskCreate(manualControlTask, (signed char *)"ManualControl", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_MANUALCONTROL, taskHandle);
-	PIOS_WDG_RegisterFlag(PIOS_WDG_MANUAL);
-
 
 	return 0;
 }
+MODULE_INITCALL(ManualControlInitialize, 0, ManualControlStart, 0, MODULE_EXEC_NOORDER_FLAG)
 
 /**
  * Module task
@@ -295,14 +251,14 @@ static void manualControlTask(void *parameters)
 				ManualControlCommandSet(&cmd);
 
 			}
-			
+
 		} else {
 			ManualControlCommandGet(&cmd);	/* Under GCS control */
 		}
 
 
 		FlightStatusGet(&flightStatus);
-		
+
 		// Depending on the mode update the Stabilization or Actuator objects
 		switch(PARSE_FLIGHT_MODE(flightStatus.FlightMode)) {
 			case FLIGHTMODE_UNDEFINED:
@@ -318,11 +274,11 @@ static void manualControlTask(void *parameters)
 			case FLIGHTMODE_GUIDANCE:
 				// TODO: Implement
 				break;
-		}	
+		}
 	}
 }
 
-static void updateActuatorDesired(ManualControlCommandData * cmd) 
+static void updateActuatorDesired(ManualControlCommandData * cmd)
 {
 	ActuatorDesiredData actuator;
 	ActuatorDesiredGet(&actuator);
@@ -330,17 +286,17 @@ static void updateActuatorDesired(ManualControlCommandData * cmd)
 	actuator.Pitch = cmd->Pitch;
 	actuator.Yaw = cmd->Yaw;
 	actuator.Throttle = (cmd->Throttle < 0) ? -1 : cmd->Throttle;
-	ActuatorDesiredSet(&actuator);	
+	ActuatorDesiredSet(&actuator);
 }
 
 static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualControlSettingsData * settings)
 {
 	StabilizationDesiredData stabilization;
 	StabilizationDesiredGet(&stabilization);
-	
+
 	StabilizationSettingsData stabSettings;
 	StabilizationSettingsGet(&stabSettings);
-		
+
 	uint8_t * stab_settings;
 	FlightStatusData flightStatus;
 	FlightStatusGet(&flightStatus);
@@ -357,30 +313,36 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
 		default:
 			// Major error, this should not occur because only enter this block when one of these is true
 			AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
-			return;	
+			return;
 	}
-	
+
 	// TOOD: Add assumption about order of stabilization desired and manual control stabilization mode fields having same order
 	stabilization.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL]  = stab_settings[0];
 	stabilization.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = stab_settings[1];
 	stabilization.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW]   = stab_settings[2];
-	
+
 	stabilization.Roll = (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Roll :
 	     (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Roll * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_ROLL] :
+	     (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING) ? cmd->Roll * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_ROLL] :
 	     (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Roll * stabSettings.RollMax :
+	     (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Roll * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_ROLL] :
 	     0; // this is an invalid mode
 					      ;
 	stabilization.Pitch = (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Pitch :
 	     (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Pitch * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_PITCH] :
+	     (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING) ? cmd->Pitch * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_PITCH] :
 	     (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Pitch * stabSettings.PitchMax :
+	     (stab_settings[1] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Pitch * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_PITCH] :
 	     0; // this is an invalid mode
 
 	stabilization.Yaw = (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Yaw :
 	     (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW] :
-	     (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? fmod(cmd->Yaw * 180.0, 360) :
+	     (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING) ? cmd->Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW] :
+	     (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Yaw * stabSettings.YawMax :
+	     (stab_settings[2] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW] :
 	     0; // this is an invalid mode
-	
-	stabilization.Throttle = (cmd->Throttle < 0) ? -1 : cmd->Throttle; 
+
+	stabilization.Throttle = (cmd->Throttle < 0) ? -1 : cmd->Throttle;
 	StabilizationDesiredSet(&stabilization);
 }
 
@@ -466,11 +428,11 @@ static void setArmedIfChanged(uint8_t val) {
  * @param[out] cmd The structure to set the armed in
  * @param[in] settings Settings indicating the necessary position
  */
-static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData * settings) 
-{	
+static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData * settings)
+{
 
 	bool lowThrottle = cmd->Throttle <= 0;
-	
+
 	if (settings->Arming == MANUALCONTROLSETTINGS_ARMING_ALWAYSDISARMED) {
 		// In this configuration we always disarm
 		setArmedIfChanged(FLIGHTSTATUS_ARMED_DISARMED);
@@ -478,7 +440,7 @@ static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData
 		// Not really needed since this function not called when disconnected
 		if (cmd->Connected == MANUALCONTROLCOMMAND_CONNECTED_FALSE)
 			return;
-		
+
 		// The throttle is not low, in case we where arming or disarming, abort
 		if (!lowThrottle) {
 			switch(armState) {
@@ -495,20 +457,20 @@ static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData
 			}
 			return;
 		}
-		
+
 		// The rest of these cases throttle is low
 		if (settings->Arming == MANUALCONTROLSETTINGS_ARMING_ALWAYSARMED) {
 			// In this configuration, we go into armed state as soon as the throttle is low, never disarm
 			setArmedIfChanged(FLIGHTSTATUS_ARMED_ARMED);
 			return;
 		}
-		
-		
+
+
 		// When the configuration is not "Always armed" and no "Always disarmed",
 		// the state will not be changed when the throttle is not low
 		static portTickType armedDisarmStart;
 		float armingInputLevel = 0;
-		
+
 		// Calc channel see assumptions7
 		int8_t sign = ((settings->Arming-MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)%2) ? -1 : 1;
 		switch ( (settings->Arming-MANUALCONTROLSETTINGS_ARMING_ROLLLEFT)/2 ) {
@@ -516,26 +478,26 @@ static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData
 			case ARMING_CHANNEL_PITCH:   armingInputLevel = sign * cmd->Pitch;   break;
 			case ARMING_CHANNEL_YAW:     armingInputLevel = sign * cmd->Yaw;     break;
 		}
-		
+
 		bool manualArm = false;
 		bool manualDisarm = false;
-		
+
 		if (armingInputLevel <= -ARMED_THRESHOLD)
 			manualArm = true;
 		else if (armingInputLevel >= +ARMED_THRESHOLD)
 			manualDisarm = true;
-			
+
 		switch(armState) {
 			case ARM_STATE_DISARMED:
 				setArmedIfChanged(FLIGHTSTATUS_ARMED_DISARMED);
-				
+
 				// only allow arming if it's OK too
 				if (manualArm && okToArm()) {
 					armedDisarmStart = lastSysTime;
 					armState = ARM_STATE_ARMING_MANUAL;
 				}
 				break;
-				
+
 			case ARM_STATE_ARMING_MANUAL:
 				setArmedIfChanged(FLIGHTSTATUS_ARMED_ARMING);
 
@@ -544,7 +506,7 @@ static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData
 				else if (!manualArm)
 					armState = ARM_STATE_DISARMED;
 				break;
-				
+
 			case ARM_STATE_ARMED:
 				// When we get here, the throttle is low,
 				// we go immediately to disarming due to timeout, also when the disarming mechanism is not enabled
@@ -552,19 +514,19 @@ static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData
 				armState = ARM_STATE_DISARMING_TIMEOUT;
 				setArmedIfChanged(FLIGHTSTATUS_ARMED_ARMED);
 				break;
-				
+
 			case ARM_STATE_DISARMING_TIMEOUT:
 				// We get here when armed while throttle low, even when the arming timeout is not enabled
 				if ((settings->ArmedTimeout != 0) && (timeDifferenceMs(armedDisarmStart, lastSysTime) > settings->ArmedTimeout))
 					armState = ARM_STATE_DISARMED;
-		
+
 				// Switch to disarming due to manual control when needed
 				if (manualDisarm) {
 					armedDisarmStart = lastSysTime;
 					armState = ARM_STATE_DISARMING_MANUAL;
 				}
 				break;
-				
+
 			case ARM_STATE_DISARMING_MANUAL:
 				if (manualDisarm &&(timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS))
 					armState = ARM_STATE_DISARMED;
@@ -581,25 +543,25 @@ static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData
  * @param[in] settings The settings which indicate which position is which mode
  * @param[in] flightMode the value of the switch position
  */
-static void processFlightMode(ManualControlSettingsData * settings, float flightMode) 
+static void processFlightMode(ManualControlSettingsData * settings, float flightMode)
 {
 	FlightStatusData flightStatus;
 	FlightStatusGet(&flightStatus);
-	
+
 	uint8_t newMode;
 	// Note here the code is ass
-	if (flightMode < -FLIGHT_MODE_LIMIT) 
+	if (flightMode < -FLIGHT_MODE_LIMIT)
 		newMode = settings->FlightModePosition[0];
-	else if (flightMode > FLIGHT_MODE_LIMIT) 
+	else if (flightMode > FLIGHT_MODE_LIMIT)
 		newMode = settings->FlightModePosition[2];
-	else 
-		newMode = settings->FlightModePosition[1];	
-	
+	else
+		newMode = settings->FlightModePosition[1];
+
 	if(flightStatus.FlightMode != newMode) {
 		flightStatus.FlightMode = newMode;
 		FlightStatusSet(&flightStatus);
 	}
-		
+
 }
 
 /**
@@ -621,3 +583,4 @@ bool validInputRange(int16_t min, int16_t max, uint16_t value)
   * @}
   * @}
   */
+

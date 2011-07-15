@@ -5,6 +5,16 @@
 
 #include <pios_rcvr_priv.h>
 
+enum pios_rcvr_dev_magic {
+  PIOS_RCVR_DEV_MAGIC = 0x99aabbcc,
+};
+
+struct pios_rcvr_dev {
+  enum pios_rcvr_dev_magic        magic;
+  uint32_t                        lower_id;
+  const struct pios_rcvr_driver * driver;
+};
+
 static bool PIOS_RCVR_validate(struct pios_rcvr_dev * rcvr_dev)
 {
   return (rcvr_dev->magic == PIOS_RCVR_DEV_MAGIC);
@@ -56,8 +66,8 @@ int32_t PIOS_RCVR_Init(uint32_t * rcvr_id, const struct pios_rcvr_driver * drive
   rcvr_dev = (struct pios_rcvr_dev *) PIOS_RCVR_alloc();
   if (!rcvr_dev) goto out_fail;
 
-  rcvr_dev->driver = driver;
-  rcvr_dev->id     = lower_id;
+  rcvr_dev->driver   = driver;
+  rcvr_dev->lower_id = lower_id;
 
   *rcvr_id = (uint32_t)rcvr_dev;
   return(0);
@@ -66,7 +76,7 @@ out_fail:
   return(-1);
 }
 
-int32_t PIOS_RCVR_Read(uint32_t rcvr_id)
+int32_t PIOS_RCVR_Read(uint32_t rcvr_id, uint8_t channel)
 {
   struct pios_rcvr_dev * rcvr_dev = (struct pios_rcvr_dev *)rcvr_id;
 
@@ -77,7 +87,7 @@ int32_t PIOS_RCVR_Read(uint32_t rcvr_id)
 
   PIOS_DEBUG_Assert(rcvr_dev->driver->read);
 
-  return rcvr_dev->driver->read(rcvr_dev->id);
+  return rcvr_dev->driver->read(rcvr_dev->lower_id, channel);
 }
 
 #endif

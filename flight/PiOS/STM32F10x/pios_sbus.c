@@ -37,7 +37,7 @@
 /* Global Variables */
 
 /* Provide a RCVR driver */
-static int32_t PIOS_SBUS_Get(uint32_t chan_id);
+static int32_t PIOS_SBUS_Get(uint32_t rcvr_id, uint8_t channel);
 
 const struct pios_rcvr_driver pios_sbus_rcvr_driver = {
 	.read = PIOS_SBUS_Get,
@@ -155,13 +155,13 @@ void PIOS_SBUS_Init(const struct pios_sbus_cfg *cfg)
  * \output -1 channel not available
  * \output >0 channel value
  */
-static int32_t PIOS_SBUS_Get(uint32_t chan_id)
+static int32_t PIOS_SBUS_Get(uint32_t rcvr_id, uint8_t channel)
 {
 	/* return error if channel is not available */
-	if (chan_id >= SBUS_NUMBER_OF_CHANNELS) {
+	if (channel >= SBUS_NUMBER_OF_CHANNELS) {
 		return -1;
 	}
-	return channel_data[chan_id];
+	return channel_data[channel];
 }
 
 /**

@@ -46,7 +46,7 @@
 /* Global Variables */
 
 /* Provide a RCVR driver */
-static int32_t PIOS_SPEKTRUM_Get(uint32_t chan_id);
+static int32_t PIOS_SPEKTRUM_Get(uint32_t rcvr_id, uint8_t channel);
 
 const struct pios_rcvr_driver pios_spektrum_rcvr_driver = {
 	.read = PIOS_SPEKTRUM_Get,
@@ -82,13 +82,13 @@ void PIOS_SPEKTRUM_Init(const struct pios_spektrum_cfg * cfg, bool bind)
 * \output -1 Channel not available
 * \output >0 Channel value
 */
-static int32_t PIOS_SPEKTRUM_Get(uint32_t chan_id)
+static int32_t PIOS_SPEKTRUM_Get(uint32_t rcvr_id, uint8_t channel)
 {
 	/* Return error if channel not available */
-	if (chan_id >= PIOS_SPEKTRUM_NUM_INPUTS) {
+	if (channel >= PIOS_SPEKTRUM_NUM_INPUTS) {
 		return -1;
 	}
-	return CaptureValue[chan_id];
+	return CaptureValue[channel];
 }
 
 /**

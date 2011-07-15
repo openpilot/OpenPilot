@@ -122,16 +122,20 @@ C: Michel Pet
 D: June 2011
 V: http://www.youtube.com/watch?v=QsE2MQELPZY
 
-M: First MoveControl flight
+M: First MoveCopter flight
 C: Werner Backes
 D: July 2011
 V: http://vimeo.com/25983655
 
-M: CopterControl Y4 flight
+M: First Y4 CopterControl flight
 C: Mat Wellington
 D: July 2011
 V: http://www.youtube.com/watch?v=TxZ4MDGIj1o
 
+M: First V-Tail4 CopterControl flight
+C: Mat Wellington
+D: July 2011
+V: http://www.youtube.com/watch?v=YE4Fd9vdg1I
 
 M: First Altitude Hold using Sonar
 C: 

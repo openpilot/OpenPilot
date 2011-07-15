@@ -33,7 +33,7 @@
 #include "uavobjectmanager.h"
 
 // Private functions
-static int32_t PIOS_FLASHFS_CleabObjectTableHeader();
+static int32_t PIOS_FLASHFS_ClearObjectTableHeader();
 static int32_t PIOS_FLASHFS_GetObjAddress(uint32_t objId, uint16_t instId);
 static int32_t PIOS_FLASHFS_GetNewAddress(uint32_t objId, uint16_t instId);
 
@@ -73,16 +73,16 @@ int32_t PIOS_FLASHFS_Init()
 	// Check for valid object table or create one
 	uint32_t object_table_magic;
 	uint8_t magic_fail_count = 0;
-	bool magic_good = 0;
+	bool magic_good = false;
 
 	while(!magic_good) {
 		if (PIOS_Flash_W25X_ReadData(0, (uint8_t *)&object_table_magic, sizeof(object_table_magic)) != 0)
 			return -1;
 		if(object_table_magic != OBJECT_TABLE_MAGIC) {
 			if(magic_fail_count++ > MAX_BADMAGIC) {
-				if(PIOS_FLASHFS_CleabObjectTableHeader() < 0)
-					return -1;
-				magic_good = true;
+				magic_fail_count = 0;
+				PIOS_FLASHFS_ClearObjectTableHeader();
+				PIOS_DELAY_WaituS(100);
 			} else {
 				PIOS_DELAY_WaituS(100);
 			}
@@ -119,7 +119,7 @@ int32_t PIOS_FLASHFS_Init()
  * @brief Erase the headers for all objects in the flash chip
  * @return 0 if successful, -1 if not
  */
-static int32_t PIOS_FLASHFS_CleabObjectTableHeader()
+static int32_t PIOS_FLASHFS_ClearObjectTableHeader()
 {
 	if(PIOS_Flash_W25X_EraseSector(0) != 0)
 		return -1;

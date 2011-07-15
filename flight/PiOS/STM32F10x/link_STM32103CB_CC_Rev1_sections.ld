@@ -1,7 +1,7 @@
 /* This is the size of the stack for all FreeRTOS IRQs */
 _irq_stack_size = 0x180;
 /* This is the size of the stack for early init: life span is until scheduler starts */
-_init_stack_size = 0x80;
+_init_stack_size = 0x100;
 /* there is probably a way to get that from the MEMORY section */
 _eram = ORIGIN(SRAM) + LENGTH(SRAM);
 
@@ -43,7 +43,7 @@ SECTIONS
 	. = ALIGN(4);
 	__module_initcall_end   = .;
     } >FLASH
-    
+
     .ARM.extab :
     {
         *(.ARM.extab* .gnu.linkonce.armextab.*)
@@ -58,7 +58,7 @@ SECTIONS
     _etext = .;
     _sidata = .;
 
-    /* 
+    /*
      * This stack is used both as the initial sp during early init as well as ultimately
      * being used as the STM32's MSP (Main Stack Pointer) which is the same stack that
      * is used for _all_ interrupt handlers.  The end of this stack should be placed
@@ -74,7 +74,7 @@ SECTIONS
          _irq_stack_top = . - 4 ;
          . = ALIGN(4);
     } > SRAM
-    
+
     .data : AT (_etext)
     {
         _sdata = .;
@@ -84,7 +84,7 @@ SECTIONS
     } > SRAM
 
 
-    
+
     /* .bss section which is used for uninitialized data */
     .bss (NOLOAD) :
     {
@@ -94,7 +94,7 @@ SECTIONS
         . = ALIGN(4);
         _ebss = . ;
     } > SRAM
-    
+
     .heap (NOLOAD) :
     {
         _sheap = . ;
@@ -103,7 +103,7 @@ SECTIONS
         . = ALIGN(4);
         _eheap = . ;
         _eheap_pre_rtos = . ;
-        _init_stack_end = . ; 
+        _init_stack_end = . ;
         _sheap_post_rtos = . ;
         . = . + _init_stack_size ;
         . = ALIGN(4);
@@ -111,7 +111,7 @@ SECTIONS
         _init_stack_top = . - 4 ;
     } > SRAM
 
-    
+
 /* keep the heap section at the end of the SRAM */
 /* this will allow to claim the remaining bytes not used
 /* at run time! (done by the reset vector).

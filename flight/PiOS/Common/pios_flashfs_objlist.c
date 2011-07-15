@@ -80,9 +80,10 @@ int32_t PIOS_FLASHFS_Init()
 			return -1;
 		if(object_table_magic != OBJECT_TABLE_MAGIC) {
 			if(magic_fail_count++ > MAX_BADMAGIC) {
-				magic_fail_count = 0;
 				PIOS_FLASHFS_ClearObjectTableHeader();
-				PIOS_DELAY_WaituS(100);
+				PIOS_LED_Toggle(LED1);
+				magic_fail_count = 0;
+				magic_good = true;
 			} else {
 				PIOS_DELAY_WaituS(100);
 			}

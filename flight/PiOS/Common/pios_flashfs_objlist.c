@@ -56,7 +56,7 @@ struct fileHeader {
 } __attribute__((packed));
 
 
-#define OBJECT_TABLE_MAGIC 0x85FB3C34
+#define OBJECT_TABLE_MAGIC 0x85FB3C35
 #define OBJ_MAGIC          0x3015AE71
 #define OBJECT_TABLE_START 0x00000010
 #define OBJECT_TABLE_END   0x00001000

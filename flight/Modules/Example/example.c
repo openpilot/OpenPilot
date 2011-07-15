@@ -59,4 +59,4 @@ void ExampleInitialize(void)
 {
 	ExampleModEventInitialize();
 }
-MODULE_INITCALL(ExampleInitialize, 0, ExampleStart, 0, MODULE_EXEC_NOORDER_FLAG)
+MODULE_INITCALL(ExampleInitialize, ExampleStart)

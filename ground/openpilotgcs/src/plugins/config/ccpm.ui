@@ -48,11 +48,6 @@
        </item>
        <item row="0" column="1">
         <widget class="QComboBox" name="ccpmType">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
          <property name="toolTip">
           <string>Select aircraft type here</string>
          </property>
@@ -75,7 +70,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="BasicTab">
         <attribute name="title">
@@ -113,11 +108,6 @@
                <height>16777215</height>
               </size>
              </property>
-             <property name="font">
-              <font>
-               <pointsize>11</pointsize>
-              </font>
-             </property>
              <property name="title">
               <string>Outputs</string>
              </property>
@@ -151,11 +141,6 @@
                   <height>16777215</height>
                  </size>
                 </property>
-                <property name="font">
-                 <font>
-                  <pointsize>11</pointsize>
-                 </font>
-                </property>
                </widget>
               </item>
               <item row="1" column="1">
@@ -177,11 +162,6 @@
                   <width>100</width>
                   <height>16777215</height>
                  </size>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>11</pointsize>
-                 </font>
                 </property>
                </widget>
               </item>
@@ -251,11 +231,6 @@
                <width>190</width>
                <height>16777215</height>
               </size>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>11</pointsize>
-              </font>
              </property>
              <property name="title">
               <string>Swashplate Outputs</string>
@@ -559,11 +534,6 @@
                <width>190</width>
                <height>16777215</height>
               </size>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>11</pointsize>
-              </font>
              </property>
              <property name="title">
               <string>Swashplate Servo Angles</string>
@@ -890,11 +860,6 @@
                <height>16777215</height>
               </size>
              </property>
-             <property name="font">
-              <font>
-               <pointsize>11</pointsize>
-              </font>
-             </property>
              <property name="title">
               <string>CCPM Options</string>
              </property>
@@ -1216,11 +1181,6 @@
                <height>600</height>
               </size>
              </property>
-             <property name="font">
-              <font>
-               <pointsize>8</pointsize>
-              </font>
-             </property>
              <property name="title">
               <string>REVO</string>
              </property>
@@ -1353,11 +1313,6 @@
                <width>50</width>
                <height>600</height>
               </size>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>8</pointsize>
-              </font>
              </property>
              <property name="title">
               <string>CCPM</string>
@@ -1511,11 +1466,6 @@
                <height>600</height>
               </size>
              </property>
-             <property name="font">
-              <font>
-               <pointsize>8</pointsize>
-              </font>
-             </property>
              <property name="title">
               <string>Collective</string>
              </property>
@@ -1628,11 +1578,6 @@
                <width>50</width>
                <height>600</height>
               </size>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>8</pointsize>
-              </font>
              </property>
              <property name="title">
               <string>Cyclic</string>
@@ -1750,11 +1695,6 @@
                <height>600</height>
               </size>
              </property>
-             <property name="font">
-              <font>
-               <pointsize>8</pointsize>
-              </font>
-             </property>
              <property name="title">
               <string>Pitch</string>
              </property>
@@ -1867,11 +1807,6 @@
                <width>50</width>
                <height>600</height>
               </size>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>8</pointsize>
-              </font>
              </property>
              <property name="title">
               <string>Roll</string>
@@ -2270,11 +2205,6 @@
              <height>600</height>
             </size>
            </property>
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-            </font>
-           </property>
            <property name="title">
             <string>Position</string>
            </property>
@@ -2292,11 +2222,6 @@
              <widget class="QLabel" name="label_17">
               <property name="enabled">
                <bool>true</bool>
-              </property>
-              <property name="font">
-               <font>
-                <pointsize>7</pointsize>
-               </font>
               </property>
               <property name="text">
                <string>Max</string>
@@ -2374,11 +2299,6 @@
              <widget class="QLabel" name="label_18">
               <property name="enabled">
                <bool>true</bool>
-              </property>
-              <property name="font">
-               <font>
-                <pointsize>7</pointsize>
-               </font>
               </property>
               <property name="text">
                <string>Min</string>
@@ -2815,11 +2735,6 @@
                <width>250</width>
                <height>273</height>
               </size>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>8</pointsize>
-              </font>
              </property>
              <property name="verticalScrollBarPolicy">
               <enum>Qt::ScrollBarAsNeeded</enum>

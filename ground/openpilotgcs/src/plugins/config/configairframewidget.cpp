@@ -1787,15 +1787,6 @@ void ConfigAirframeWidget::updateCustomAirframeUI()
         }
         m_aircraft->customThrottle2Curve->initCurve(curveValues);
     }
-    // Retrieve Feed Forward:
-    field = obj->getField(QString("FeedForward"));
-    m_aircraft->customFFSlider->setValue(field->getDouble()*100);
-    field = obj->getField(QString("AccelTime"));
-    m_aircraft->customFFaccel->setValue(field->getDouble());
-    field = obj->getField(QString("DecelTime"));
-    m_aircraft->customFFdecel->setValue(field->getDouble());
-    field = obj->getField(QString("MaxAccel"));
-    m_aircraft->customFFMaxAccel->setValue(field->getDouble());
 
     // Update the table:
     for (int i=0; i<8; i++) {
@@ -2098,13 +2089,6 @@ void ConfigAirframeWidget::sendAircraftUpdate()
 
         UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
         UAVObjectField* field = obj->getField(QString("FeedForward"));
-        field->setDouble((double)m_aircraft->customFFSlider->value()/100);
-        field = obj->getField(QString("AccelTime"));
-        field->setDouble(m_aircraft->customFFaccel->value());
-        field = obj->getField(QString("DecelTime"));
-        field->setDouble(m_aircraft->customFFdecel->value());
-        field = obj->getField(QString("MaxAccel"));
-        field->setDouble(m_aircraft->customFFMaxAccel->value());
 
         // Curve is also common to all quads:
         field = obj->getField("ThrottleCurve1");

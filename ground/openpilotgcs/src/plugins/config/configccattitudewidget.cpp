@@ -110,7 +110,6 @@ void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
         attitudeSettingsData.BiasCorrectGyro = initialBiasCorrected;
         AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
 
-        ui->status->setText("Calibration done.");
     } else {
 	// Possible to get here if weird threading stuff happens.  Just ignore updates.
 	qDebug("Unexpected accel update received.");
@@ -161,8 +160,6 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
     x_gyro_accum.clear();
     y_gyro_accum.clear();
     z_gyro_accum.clear();
-
-    ui->status->setText(tr("Calibrating..."));
 
     // Disable gyro bias correction to see raw data
     AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(getObjectManager())->getData();

@@ -865,7 +865,7 @@ void PIOS_I2C_main_adapter_er_irq_handler(void)
 #if defined(PIOS_INCLUDE_RCVR)
 #include "pios_rcvr_priv.h"
 
-uint32_t pios_rcvr_channel_to_id_map[PIOS_RCVR_MAX_DEVS];
+struct pios_rcvr_channel_map pios_rcvr_channel_to_id_map[PIOS_RCVR_MAX_CHANNELS];
 uint32_t pios_rcvr_max_channel;
 #endif /* PIOS_INCLUDE_RCVR */
 
@@ -1040,28 +1040,32 @@ void PIOS_Board_Init(void) {
 	case MANUALCONTROLSETTINGS_INPUTMODE_PWM:
 #if defined(PIOS_INCLUDE_PWM)
 		PIOS_PWM_Init();
-		for (uint8_t i = 0; i < PIOS_PWM_NUM_INPUTS && i < PIOS_RCVR_MAX_DEVS; i++) {
-			if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
-					    &pios_pwm_rcvr_driver,
-					    i)) {
-				pios_rcvr_max_channel++;
-			} else {
-				PIOS_Assert(0);
-			}
+		uint32_t pios_pwm_rcvr_id;
+		if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, 0)) {
+		  PIOS_Assert(0);
+		}
+		for (uint8_t i = 0;
+		     i < PIOS_PWM_NUM_INPUTS && pios_rcvr_max_channel < NELEMENTS(pios_rcvr_channel_to_id_map);
+		     i++) {
+			pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].id = pios_pwm_rcvr_id;
+			pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].channel = i;
+			pios_rcvr_max_channel++;
 		}
 #endif	/* PIOS_INCLUDE_PWM */
 		break;
 	case MANUALCONTROLSETTINGS_INPUTMODE_PPM:
 #if defined(PIOS_INCLUDE_PPM)
 		PIOS_PPM_Init();
-		for (uint8_t i = 0; i < PIOS_PPM_NUM_INPUTS && i < PIOS_RCVR_MAX_DEVS; i++) {
-			if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
-					    &pios_ppm_rcvr_driver,
-					    i)) {
-				pios_rcvr_max_channel++;
-			} else {
-				PIOS_Assert(0);
-			}
+		uint32_t pios_ppm_rcvr_id;
+		if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, 0)) {
+		  PIOS_Assert(0);
+		}
+		for (uint8_t i = 0;
+		     i < PIOS_PPM_NUM_INPUTS && pios_rcvr_max_channel < NELEMENTS(pios_rcvr_channel_to_id_map);
+		     i++) {
+			pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].id = pios_ppm_rcvr_id;
+			pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].channel = i;
+			pios_rcvr_max_channel++;
 		}
 #endif	/* PIOS_INCLUDE_PPM */
 		break;
@@ -1069,30 +1073,34 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 		if (hwsettings_cc_mainport == HWSETTINGS_CC_MAINPORT_SPEKTRUM ||
 		    hwsettings_cc_flexiport == HWSETTINGS_CC_FLEXIPORT_SPEKTRUM) {
-			for (uint8_t i = 0; i < PIOS_SPEKTRUM_NUM_INPUTS && i < PIOS_RCVR_MAX_DEVS; i++) {
-				if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
-						    &pios_spektrum_rcvr_driver,
-						    i)) {
-					pios_rcvr_max_channel++;
-				} else {
-					PIOS_Assert(0);
-				}
-			}		
+			uint32_t pios_spektrum_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_spektrum_rcvr_id, &pios_spektrum_rcvr_driver, 0)) {
+				PIOS_Assert(0);
+			}
+			for (uint8_t i = 0;
+			     i < PIOS_SPEKTRUM_NUM_INPUTS && pios_rcvr_max_channel < NELEMENTS(pios_rcvr_channel_to_id_map);
+			     i++) {
+				pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].id = pios_spektrum_rcvr_id;
+				pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].channel = i;
+				pios_rcvr_max_channel++;
+			}
 		}
 #endif	/* PIOS_INCLUDE_SPEKTRUM */
 		break;
 	case MANUALCONTROLSETTINGS_INPUTMODE_SBUS:
 #if defined(PIOS_INCLUDE_SBUS)
 		if (hwsettings_cc_mainport == HWSETTINGS_CC_MAINPORT_SBUS) {
-			for (uint8_t i = 0; i < SBUS_NUMBER_OF_CHANNELS && i < PIOS_RCVR_MAX_DEVS; i++) {
-				if (!PIOS_RCVR_Init(&pios_rcvr_channel_to_id_map[pios_rcvr_max_channel],
-						    &pios_sbus_rcvr_driver,
-						    i)) {
-					pios_rcvr_max_channel++;
-				} else {
-					PIOS_Assert(0);
-				}
-			}		
+			uint32_t pios_sbus_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_sbus_rcvr_id, &pios_sbus_rcvr_driver, 0)) {
+				PIOS_Assert(0);
+			}
+			for (uint8_t i = 0;
+			     i < SBUS_NUMBER_OF_CHANNELS && pios_rcvr_max_channel < NELEMENTS(pios_rcvr_channel_to_id_map);
+			     i++) {
+				pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].id = pios_sbus_rcvr_id;
+				pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].channel = i;
+				pios_rcvr_max_channel++;
+			}
 		}
 #endif  /* PIOS_INCLUDE_SBUS */
 		break;

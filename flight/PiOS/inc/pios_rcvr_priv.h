@@ -36,16 +36,6 @@
 
 extern uint32_t pios_rcvr_max_channel;
 
-enum pios_rcvr_dev_magic {
-  PIOS_RCVR_DEV_MAGIC = 0x99aabbcc,
-};
-
-struct pios_rcvr_dev {
-  enum pios_rcvr_dev_magic        magic;
-  uint32_t                        id;
-  const struct pios_rcvr_driver * driver;
-};
-
 extern int32_t PIOS_RCVR_Init(uint32_t * rcvr_id, const struct pios_rcvr_driver * driver, const uint32_t lower_id);
 
 extern void PIOS_RCVR_IRQ_Handler(uint32_t rcvr_id);

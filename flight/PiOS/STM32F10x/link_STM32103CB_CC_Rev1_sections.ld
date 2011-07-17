@@ -2,8 +2,6 @@
 _irq_stack_size = 0x180;
 /* This is the size of the stack for early init: life span is until scheduler starts */
 _init_stack_size = 0x100;
-/* there is probably a way to get that from the MEMORY section */
-_eram = ORIGIN(SRAM) + LENGTH(SRAM);
 
 /* Stub out these functions since we don't use them anyway */
 PROVIDE (   vPortSVCHandler = 0 ) ;
@@ -91,12 +89,11 @@ SECTIONS
         _sbss = . ;
         *(.bss .bss.*)
         *(COMMON)
-        . = ALIGN(4);
-        _ebss = . ;
     } > SRAM
 
     .heap (NOLOAD) :
     {
+        . = ALIGN(4);
         _sheap = . ;
         _sheap_pre_rtos = . ;
         *(.heap)
@@ -111,13 +108,22 @@ SECTIONS
         _init_stack_top = . - 4 ;
     } > SRAM
 
+    
+    _free_ram = . ;
+    .free_ram (NOLOAD) :
+    {
+	. = ORIGIN(SRAM) + LENGTH(SRAM) - _free_ram ;
+        /* This is used by the startup in order to initialize the .bss section */
+	_ebss = . ;
+	_eram = . ;
+    } > SRAM
 
-/* keep the heap section at the end of the SRAM */
-/* this will allow to claim the remaining bytes not used
-/* at run time! (done by the reset vector).
+    /* keep the heap section at the end of the SRAM
+     * this will allow to claim the remaining bytes not used
+     * at run time! (done by the reset vector).
+     */
 
-    . = ALIGN(4);
-    _end = . ;
+    PROVIDE ( _end = _ebss ) ;
 
     /* Stabs debugging sections.  */
     .stab          0 : { *(.stab) }

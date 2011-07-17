@@ -2,8 +2,6 @@
 _irq_stack_size = 0x400;
 /* This is the size of the stack for early init: life span is until scheduler starts */
 _init_stack_size = 0x400;
-/* there is probably a way to get that from the MEMORY section */
-_eram = ORIGIN(RAM) + LENGTH(RAM);
 
 /* Check valid alignment for VTOR */
 ASSERT(ORIGIN(FLASH) == ALIGN(ORIGIN(FLASH), 0x80), "Start of memory region flash not aligned for startup vector table");
@@ -264,19 +262,16 @@ SECTIONS
     .bss :
     {
             . = ALIGN(4);
-        /* This is used by the startup in order to initialize the .bss secion */
+        /* This is used by the startup in order to initialize the .bss section */
         _sbss = .;
         
         *(.bss)
         *(COMMON)
-        
-            . = ALIGN(4);
-            /* This is used by the startup in order to initialize the .bss secion */
-         _ebss = . ;
     } >RAM
     
     .heap (NOLOAD) :
     {
+        . = ALIGN(4);
         _sheap = . ;
         _sheap_pre_rtos = . ;
         *(.heap)
@@ -290,10 +285,20 @@ SECTIONS
         _eheap_post_rtos = . ;
         _init_stack_top = . - 4 ;
     } > RAM
-    
-    /* keep the heap section at the end of the SRAM */
-    /* this will allow to claim the remaining bytes not used
-    /* at run time! (done by the reset vector).
+
+    _free_ram = . ;
+    .free_ram (NOLOAD) :
+    {
+	. = ORIGIN(RAM) + LENGTH(RAM) - _free_ram ;
+        /* This is used by the startup in order to initialize the .bss section */
+	_ebss = . ;
+	_eram = . ;
+    } > RAM
+
+    /* keep the heap section at the end of the SRAM
+     * this will allow to claim the remaining bytes not used
+     * at run time! (done by the reset vector).
+     */
 
     PROVIDE ( end = _ebss );
     PROVIDE ( _end = _ebss );

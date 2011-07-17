@@ -35,7 +35,7 @@
 #if defined(PIOS_INCLUDE_PWM)
 
 /* Provide a RCVR driver */
-static int32_t PIOS_PWM_Get(uint32_t chan_id);
+static int32_t PIOS_PWM_Get(uint32_t rcvr_id, uint8_t chan_id);
 
 const struct pios_rcvr_driver pios_pwm_rcvr_driver = {
 	.read = PIOS_PWM_Get,
@@ -140,13 +140,13 @@ void PIOS_PWM_Init(void)
 * \output -1 Channel not available
 * \output >0 Channel value
 */
-static int32_t PIOS_PWM_Get(uint32_t chan_id)
+static int32_t PIOS_PWM_Get(uint32_t rcvr_id, uint8_t channel)
 {
 	/* Return error if channel not available */
-	if (chan_id >= pios_pwm_cfg.num_channels) {
+	if (channel >= pios_pwm_cfg.num_channels) {
 		return -1;
 	}
-	return CaptureValue[chan_id];
+	return CaptureValue[channel];
 }
 
 void PIOS_PWM_irq_handler(TIM_TypeDef * timer)

@@ -113,7 +113,6 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     QString fieldName = QString("InputMode");
     UAVObjectField *field = obj->getField(fieldName);
     m_config->receiverType->addItems(field->getOptions());
-    m_config->receiverType->setDisabled(true); // This option does not work for now, it is a compile-time option.
 
     // Fill in the dropdown menus for the channel RC Input assignement.
     QStringList channelsList;

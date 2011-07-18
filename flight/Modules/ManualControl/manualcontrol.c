@@ -166,8 +166,9 @@ static void manualControlTask(void *parameters)
 
 			// Read channel values in us
 			for (int n = 0; n < MANUALCONTROLCOMMAND_CHANNEL_NUMELEM; ++n) {
-				if (pios_rcvr_channel_to_id_map[n]) {
-					cmd.Channel[n] = PIOS_RCVR_Read(pios_rcvr_channel_to_id_map[n]);
+				if (pios_rcvr_channel_to_id_map[n].id) {
+					cmd.Channel[n] = PIOS_RCVR_Read(pios_rcvr_channel_to_id_map[n].id,
+									pios_rcvr_channel_to_id_map[n].channel);
 				} else {
 					cmd.Channel[n] = -1;
 				}

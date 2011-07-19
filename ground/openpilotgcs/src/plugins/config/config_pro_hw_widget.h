@@ -24,10 +24,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGTELEMETRYWIDGET_H
-#define CONFIGTELEMETRYWIDGET_H
+#ifndef CONFIGPROHWWIDGET_H
+#define CONFIGPROHWWIDGET_H
 
-#include "ui_telemetry.h"
+#include "ui_pro_hw_settings.h"
 #include "configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
@@ -36,16 +36,16 @@
 #include <QList>
 
 
-class ConfigTelemetryWidget: public ConfigTaskWidget
+class ConfigProHWWidget: public ConfigTaskWidget
 {
     Q_OBJECT
 
 public:
-    ConfigTelemetryWidget(QWidget *parent = 0);
-    ~ConfigTelemetryWidget();
+    ConfigProHWWidget(QWidget *parent = 0);
+    ~ConfigProHWWidget();
 
 private:
-    Ui_TelemetryWidget *m_telemetry;
+    Ui_PRO_HW_Widget *m_telemetry;
     void enableControls(bool enable);
 
 private slots:
@@ -55,4 +55,4 @@ private slots:
 
 };
 
-#endif // ConfigTelemetryWidget_H
+#endif // CONFIGPROHWWIDGET_H

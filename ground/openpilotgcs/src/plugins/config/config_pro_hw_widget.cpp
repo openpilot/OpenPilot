@@ -24,7 +24,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "configtelemetrywidget.h"
+#include "config_pro_hw_widget.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -34,9 +34,9 @@
 #include <QtGui/QPushButton>
 
 
-ConfigTelemetryWidget::ConfigTelemetryWidget(QWidget *parent) : ConfigTaskWidget(parent)
+ConfigProHWWidget::ConfigProHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
-    m_telemetry = new Ui_TelemetryWidget();
+    m_telemetry = new Ui_PRO_HW_Widget();
     m_telemetry->setupUi(this);
 
     // Now connect the widget to the ManualControlCommand / Channel UAVObject
@@ -57,7 +57,7 @@ ConfigTelemetryWidget::ConfigTelemetryWidget(QWidget *parent) : ConfigTaskWidget
     connect(parent, SIGNAL(autopilotDisconnected()),this, SLOT(onAutopilotDisconnect()));
 }
 
-ConfigTelemetryWidget::~ConfigTelemetryWidget()
+ConfigProHWWidget::~ConfigProHWWidget()
 {
    // Do nothing
 }
@@ -67,7 +67,7 @@ ConfigTelemetryWidget::~ConfigTelemetryWidget()
  * Telemetry Settings
  *****************************/
 
-void ConfigTelemetryWidget::enableControls(bool enable)
+void ConfigProHWWidget::enableControls(bool enable)
 {
     m_telemetry->saveTelemetryToSD->setEnabled(enable);
     //m_telemetry->saveTelemetryToRAM->setEnabled(enable);
@@ -76,7 +76,7 @@ void ConfigTelemetryWidget::enableControls(bool enable)
 /**
   Request telemetry settings from the board
   */
-void ConfigTelemetryWidget::refreshValues()
+void ConfigProHWWidget::refreshValues()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -89,7 +89,7 @@ void ConfigTelemetryWidget::refreshValues()
 /**
   Send telemetry settings to the board
   */
-void ConfigTelemetryWidget::sendTelemetryUpdate()
+void ConfigProHWWidget::sendTelemetryUpdate()
 {
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("TelemetrySettings")));
     Q_ASSERT(obj);
@@ -101,7 +101,7 @@ void ConfigTelemetryWidget::sendTelemetryUpdate()
 /**
   Send telemetry settings to the board and request saving to SD card
   */
-void ConfigTelemetryWidget::saveTelemetryUpdate()
+void ConfigProHWWidget::saveTelemetryUpdate()
 {
     // Send update so that the latest value is saved
     sendTelemetryUpdate();

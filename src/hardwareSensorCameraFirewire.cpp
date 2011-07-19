@@ -167,6 +167,7 @@ namespace hardware {
 		int r;
 		//bool emptied_buffers = false;
 		//double date = 0.;
+		int ndigit = 0;
 
 		while(true)
 		{
@@ -180,9 +181,15 @@ namespace hardware {
 				while (true)
 				{
 					// FIXME manage multisensors : put sensor id in filename
-					std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << index_load+first_index;
-					if (found_first != 2 && bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".pgm")) && found_first == 0) found_first = 1;
-					if (found_first != 1 && bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".png")) && found_first == 0) found_first = 2;
+					std::ostringstream oss;
+					for (int i = 3; i <= 7; ++i)
+					{
+						if (!found_first) ndigit = i;
+						oss.str(""); oss << dump_path << "/image_" << std::setw(ndigit) << std::setfill('0') << index_load+first_index;
+						if (found_first != 2 && bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".pgm")) && found_first == 0) found_first = 1;
+						if (found_first != 1 && bufferSpecPtr[buff_write]->img->load(oss.str() + std::string(".png")) && found_first == 0) found_first = 2;
+						if (found_first) break;
+					}
 					if (!found_first) { first_index++; continue; }
 					
 					if (bufferSpecPtr[buff_write]->img->data() == NULL)
@@ -313,7 +320,7 @@ namespace hardware {
 			remain = saveTask_cond.var;
 			saveTask_cond.unlock();
 			
-			std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << save_index;
+			std::ostringstream oss; oss << dump_path << "/image_" << std::setw(7) << std::setfill('0') << save_index;
 			image->img->save(oss.str() + std::string(".pgm"));
 			std::fstream f; f.open((oss.str() + std::string(".time")).c_str(), std::ios_base::out); 
 			f << std::setprecision(20) << image->timestamp << std::endl; f.close();

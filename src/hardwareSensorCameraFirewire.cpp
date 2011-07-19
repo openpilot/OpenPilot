@@ -215,6 +215,7 @@ namespace hardware {
 		}
 	} catch (kernel::Exception &e) { std::cout << e.what(); throw e; } }
 
+#if 0
 	void HardwareSensorCameraFirewire::saveTask(void)
 	{ try {
 		int last_processed_index = index();
@@ -255,6 +256,76 @@ namespace hardware {
 			}
 		}
 	} catch (kernel::Exception &e) { std::cout << e.what(); throw e; } }
+#endif
+	
+	void HardwareSensorCameraFirewire::savePushTask(void)
+	{ try {
+		int last_processed_index = index();
+		
+		// clean previously existing files
+		#if 0
+		// TODO test
+		boost::filesystem::path bdump_path(dump_path);
+		if (!exists(bdump_path) || !is_directory(bdump_path)) create_directory(bdump_path);
+		
+		boost::regex pattern1("*.pgm");
+		boost::regex pattern2("*.time");
+		for (boost::filesystem::recursive_directory_iterator it(bdump_path), end; it != end; ++it)
+		{
+			std::string name = it->path().leaf();
+			if (boost::regex_match(name, pattern1) || boost::regex_match(name, pattern2))
+				remove(it->path());
+		}
+		//remove(bdump_path / "*.pgm"); // FIXME possible ?
+		#else
+		std::ostringstream oss; oss << "mkdir -p " << dump_path << " ; rm -f " << dump_path << "/*.pgm ; rm -f " << dump_path << "/*.time" << std::endl;
+		int r = system(oss.str().c_str());
+		if (!r) {} // don't care
+		#endif
+		
+		while (true)
+		{
+			index.wait(boost::lambda::_1 != last_processed_index);
+			// push image to file for saving
+			saveTask_cond.lock();
+			bufferSave.push_front(rawimage_ptr_t(static_cast<RawImage*>(bufferSpecPtr[last_sent_pos]->clone())));
+			saveTask_cond.var++;
+			saveTask_cond.unlock();
+			saveTask_cond.notify();
+			last_processed_index = index();
+		}
+	} catch (kernel::Exception &e) { std::cout << e.what(); throw e; } }
+	
+	
+	void HardwareSensorCameraFirewire::saveTask(void)
+	{ try {
+		
+		int save_index = index();
+		int remain = 0, prev_remain = 0;
+		
+		while (true)
+		{
+			// wait for and get next data to save
+			saveTask_cond.wait(boost::lambda::_1 != 0, false);
+			rawimage_ptr_t image = bufferSave.back();
+			bufferSave.pop_back();
+			saveTask_cond.var--;
+			remain = saveTask_cond.var;
+			saveTask_cond.unlock();
+			
+			std::ostringstream oss; oss << dump_path << "/image_" << std::setw(4) << std::setfill('0') << save_index;
+			image->img->save(oss.str() + std::string(".pgm"));
+			std::fstream f; f.open((oss.str() + std::string(".time")).c_str(), std::ios_base::out); 
+			f << std::setprecision(20) << image->timestamp << std::endl; f.close();
+			
+			if (remain > prev_remain || (remain == 0 && prev_remain != 0))
+				std::cout << save_index << ": " << remain << " in queue." << std::endl;
+			prev_remain = remain;
+			
+			++save_index;
+		}
+	} catch (kernel::Exception &e) { std::cout << e.what(); throw e; } }
+	
 	
 	void HardwareSensorCameraFirewire::init(int mode, std::string dump_path, cv::Size imgSize)
 	{
@@ -276,9 +347,12 @@ namespace hardware {
 		first_index = 0;
 		index_load = 0;
 
-		// start save task
+		// start save tasks
 		if (mode == 1)
+		{
 			saveTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::saveTask,this));
+			savePushTask_thread = new boost::thread(boost::bind(&HardwareSensorCameraFirewire::savePushTask,this));
+		}
 		
 	}
 	
@@ -293,7 +367,7 @@ namespace hardware {
 		
 	
 	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(kernel::VariableCondition<int> &condition, cv::Size imgSize, std::string dump_path):
-		HardwareSensorExteroAbstract(condition, 3)
+		HardwareSensorExteroAbstract(condition, 3), saveTask_cond(0)
 	{
 		init(2, dump_path, imgSize);
 	}
@@ -334,7 +408,7 @@ namespace hardware {
 	}
 
 	HardwareSensorCameraFirewire::HardwareSensorCameraFirewire(kernel::VariableCondition<int> &condition, int bufferSize, const std::string &camera_id, cv::Size size, int format, int depth, viam_hwcrop_t crop, double freq, int trigger, double shutter, int mode, std::string dump_path):
-		HardwareSensorExteroAbstract(condition, bufferSize)
+		HardwareSensorExteroAbstract(condition, bufferSize), saveTask_cond(0)
 	{
 		viam_hwmode_t hwmode = { size_to_viamSize(size), format_to_viamFormat(format, depth), crop, freq_to_viamFreq(freq), trigger_to_viamTrigger(trigger) };
 		realFreq = viamFreq_to_freq(hwmode.fps);
@@ -349,6 +423,7 @@ namespace hardware {
 #ifdef HAVE_VIAM
 		if (mode == 0 || mode == 1)
 			viam_release(handle);
+		saveTask_cond.wait(boost::lambda::_1 == 0);
 #endif
 	}
 	

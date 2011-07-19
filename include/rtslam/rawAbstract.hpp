@@ -37,6 +37,7 @@ namespace jafar {
 				double arrival;
 				
 				virtual ~RawAbstract();
+				virtual RawAbstract* clone() = 0;
 
 				virtual std::string categoryName() const {
 					return "RAW";

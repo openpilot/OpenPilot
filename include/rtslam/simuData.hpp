@@ -86,6 +86,7 @@ namespace simu {
 		public:
 			typedef std::map<size_t,featuresimu_ptr_t> ObsList;
 			ObsList obs;
+			virtual RawAbstract* clone() { RawSimu *raw = new RawSimu(); *raw = *this; return raw; }
 	};
 	
 	

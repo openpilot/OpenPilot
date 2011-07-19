@@ -46,6 +46,7 @@ class HardwareSensorCameraFirewire: public HardwareSensorExteroAbstract
 		
 		std::vector<IplImage*> bufferImage;
 		std::vector<rawimage_ptr_t> bufferSpecPtr;
+		std::list<rawimage_ptr_t> bufferSave;
 		double realFreq;
 		unsigned index_load;
 		unsigned first_index;
@@ -57,6 +58,9 @@ class HardwareSensorCameraFirewire: public HardwareSensorExteroAbstract
 		
 		boost::thread *preloadTask_thread;
 		void preloadTask(void);
+		boost::thread *savePushTask_thread;
+		void savePushTask(void);
+		kernel::VariableCondition<size_t> saveTask_cond;
 		boost::thread *saveTask_thread;
 		void saveTask(void);
 	

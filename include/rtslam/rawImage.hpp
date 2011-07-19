@@ -35,6 +35,7 @@ namespace jafar {
 				RawImage();
 				~RawImage(){}
 
+				virtual RawAbstract* clone();
 
 				jafarImage_ptr_t img;
 

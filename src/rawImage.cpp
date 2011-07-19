@@ -41,6 +41,17 @@ namespace jafar {
 		RawImage::RawImage(){
 		}
 
+		RawAbstract* RawImage::clone()
+		{
+			RawImage *cloned = new RawImage();
+			cloned->timestamp = timestamp;
+			cloned->arrival = arrival;
+			cloned->img.reset(new image::Image());
+			(*cloned->img) = img->clone();
+			return cloned;
+		}
+		
+		
 		void RawImage::setJafarImage(jafarImage_ptr_t img_) {
 			this->img = img_;
 		}

@@ -86,7 +86,15 @@ bool UAVSettingsImportExportPlugin::initialize(const QStringList& args, QString 
     ac->addAction(cmd, Core::Constants::G_FILE_SAVE);
     connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(importUAVSettings()));
 
-   return true; 
+    cmd = am->registerAction(new QAction(this),
+                             "UAVSettingsImportExportPlugin.UAVDataExport",
+                             QList<int>() <<
+                             Core::Constants::C_GLOBAL_ID);
+    cmd->action()->setText(tr("Export UAV Data..."));
+    ac->addAction(cmd, Core::Constants::G_FILE_SAVE);
+    connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(exportUAVData()));
+
+    return true;
 } 
 
 void UAVSettingsImportExportPlugin::extensionsInitialized() 
@@ -199,32 +207,16 @@ void UAVSettingsImportExportPlugin::importUAVSettings()
 
 }
 
-// Slot called by the menu manager on user action
-void UAVSettingsImportExportPlugin::exportUAVSettings()
+// Create an XML document from UAVObject database
+QString UAVSettingsImportExportPlugin::createXMLDocument(
+        const QString docName, const bool isSettings, const bool fullExport)
 {
-    // ask for file name
-    QString fileName;
-    QString filters = tr("UAVSettings XML files (*.uav)");
-
-    fileName = QFileDialog::getSaveFileName(0, tr("Save UAV Settings File As"), "", filters);
-    if (fileName.isEmpty()) {
-        return;
-    }
-
-    bool fullExport = false;
-    // If the filename ends with .xml, we will do a full export, otherwise, a simple export
-    if (fileName.endsWith(".xml")) {
-        fullExport = true;
-    } else if (!fileName.endsWith(".uav")) {
-        fileName.append(".uav");
-    }
-
     // generate an XML first (used for all export formats as a formatted data source)
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-    QDomDocument doc("UAVSettings");
-    QDomElement root = doc.createElement("settings");
+    QDomDocument doc(docName);
+    QDomElement root = doc.createElement(isSettings ? "settings" : "data");
     doc.appendChild(root);
 
     // iterate over settings objects
@@ -232,7 +224,7 @@ void UAVSettingsImportExportPlugin::exportUAVSettings()
 
     foreach (QList<UAVDataObject*> list, objList) {
         foreach (UAVDataObject* obj, list) {
-            if (obj->isSettings()) {
+            if (obj->isSettings() == isSettings) {
 
                 // add each object to the XML
                 QDomElement o = doc.createElement("object");
@@ -275,10 +267,37 @@ void UAVSettingsImportExportPlugin::exportUAVSettings()
             }
         }
     }
+
+    return doc.toString(4);
+}
+
+// Slot called by the menu manager on user action
+void UAVSettingsImportExportPlugin::exportUAVSettings()
+{
+    // ask for file name
+    QString fileName;
+    QString filters = tr("UAVSettings XML files (*.uav)");
+
+    fileName = QFileDialog::getSaveFileName(0, tr("Save UAV Settings File As"), "", filters);
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    bool fullExport = false;
+    // If the filename ends with .xml, we will do a full export, otherwise, a simple export
+    if (fileName.endsWith(".xml")) {
+        fullExport = true;
+    } else if (!fileName.endsWith(".uav")) {
+        fileName.append(".uav");
+    }
+
+    // generate an XML first (used for all export formats as a formatted data source)
+    QString xml = createXMLDocument("UAVSettings", true, fullExport);
+
     // save file
     QFile file(fileName);
     if (file.open(QIODevice::WriteOnly) &&
-            (file.write(doc.toString(4).toAscii()) != -1)) {
+            (file.write(xml.toAscii()) != -1)) {
         file.close();
     } else {
         QMessageBox::critical(0,
@@ -294,7 +313,58 @@ void UAVSettingsImportExportPlugin::exportUAVSettings()
     msgBox.exec();
 }
 
-void UAVSettingsImportExportPlugin::shutdown() 
+// Slot called by the menu manager on user action
+void UAVSettingsImportExportPlugin::exportUAVData()
+{
+    if (QMessageBox::question(0, tr("Are you sure?"),
+        tr("This option is only useful for passing your current "
+           "system data to the technical support staff. "
+           "Do you really want to export?"),
+           QMessageBox::Ok | QMessageBox::Cancel,
+           QMessageBox::Ok) != QMessageBox::Ok) {
+        return;
+    }
+
+    // ask for file name
+    QString fileName;
+    QString filters = tr("UAVData XML files (*.uav)");
+
+    fileName = QFileDialog::getSaveFileName(0, tr("Save UAV Data File As"), "", filters);
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    bool fullExport = false;
+    // If the filename ends with .xml, we will do a full export, otherwise, a simple export
+    if (fileName.endsWith(".xml")) {
+        fullExport = true;
+    } else if (!fileName.endsWith(".uav")) {
+        fileName.append(".uav");
+    }
+
+    // generate an XML first (used for all export formats as a formatted data source)
+    QString xml = createXMLDocument("UAVData", false, fullExport);
+
+    // save file
+    QFile file(fileName);
+    if (file.open(QIODevice::WriteOnly) &&
+            (file.write(xml.toAscii()) != -1)) {
+        file.close();
+    } else {
+        QMessageBox::critical(0,
+                              tr("UAV Data Export"),
+                              tr("Unable to save data: ") + fileName,
+                              QMessageBox::Ok);
+        return;
+    }
+
+    QMessageBox msgBox;
+    msgBox.setText(tr("Data saved."));
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.exec();
+}
+
+void UAVSettingsImportExportPlugin::shutdown()
 { 
    // Do nothing 
 }

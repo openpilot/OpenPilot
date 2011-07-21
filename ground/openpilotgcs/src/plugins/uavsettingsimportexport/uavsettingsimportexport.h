@@ -43,9 +43,15 @@ public:
    bool initialize(const QStringList & arguments, QString * errorString); 
    void shutdown(); 
 
+private:
+   QString createXMLDocument(const QString docName,
+                             const bool isSettings,
+                             const bool fullExport);
+
 private slots:
    void importUAVSettings();
    void exportUAVSettings();
+   void exportUAVData();
 
 }; 
 

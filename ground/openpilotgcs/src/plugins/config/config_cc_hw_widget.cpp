@@ -69,6 +69,7 @@ ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
 ConfigCCHWWidget::~ConfigCCHWWidget()
 {
    // Do nothing
+    delete smartsave;
 }
 
 

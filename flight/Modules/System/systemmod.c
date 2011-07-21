@@ -74,6 +74,8 @@ static uint32_t idleCounter;
 static uint32_t idleCounterClear;
 static xTaskHandle systemTaskHandle;
 static int32_t stackOverflow;
+static xTaskHandle taskHandle;
+static portSTACK_TYPE *idleStackMarkPtr = NULL;
 
 // Private functions
 static void objectUpdatedCb(UAVObjEvent * ev);
@@ -318,9 +320,34 @@ uint32_t *ptr = &_irq_stack_end;
 /**
  * Called periodically to update the system stats
  */
+static uint16_t GetFreeIdleStackSize(void)
+{
+	uint32_t i = configMINIMAL_STACK_SIZE;
+
+#if !defined(ARCH_POSIX) && !defined(ARCH_WIN32) && defined(CHECK_IRQ_STACK)
+uint32_t pattern = 0xA5A5A5A5;
+uint32_t *ptr = (uint32_t *)idleStackMarkPtr;
+	if ((uint32_t)idleStackMarkPtr != 0)
+	{
+		for (i=0; i< configMINIMAL_STACK_SIZE; i++)
+		{
+			if (*ptr++ != pattern)
+			{
+				break;
+			}
+		}
+	}
+#endif
+	return i*4;
+}
+
+
+/**
+ * Called periodically to update the system stats
+ */
 static void updateStats()
 {
-	static portTickType lastTickCount = 0;
+	static portTickType lastTickCount = 0;TaskMonitorAdd(TASKINFO_RUNNING_MANUALCONTROL, taskHandle);
 	SystemStatsData stats;
 
 	// Get stats and update
@@ -332,6 +359,12 @@ static void updateStats()
 #else
 	stats.HeapRemaining = xPortGetFreeHeapSize();
 #endif
+
+	// Get Idle stack status
+	stats.IdleStackRemaining = GetFreeIdleStackSize();
+
+	// Get Events stack status
+	//stats.EventsStackRemaining = GetFreeEventsStackSize();
 
 	// Get Irq stack status
 	stats.IRQStackRemaining = GetFreeIrqStackSize();
@@ -429,7 +462,7 @@ static void updateSystemAlarms()
 /**
  * Called by the RTOS when the CPU is idle, used to measure the CPU idle time.
  */
-void vApplicationIdleHook(void)
+void vApplicationIdleHook(void *data)
 {
 	// Called when the scheduler has no tasks to run
 	if (idleCounterClear == 0) {
@@ -438,6 +471,16 @@ void vApplicationIdleHook(void)
 		idleCounter = 0;
 		idleCounterClear = 0;
 	}
+
+	/* update stack start for monitoring */
+	volatile uint8_t set_done = FALSE;
+
+	if ((set_done == FALSE) && (data != NULL))
+	{
+		idleStackMarkPtr = (portSTACK_TYPE *)data;
+		set_done = TRUE;
+	}
+
 }
 
 /**

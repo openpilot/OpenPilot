@@ -363,6 +363,8 @@ static void prvInitialiseTaskLists( void ) PRIVILEGED_FUNCTION;
  */
 static portTASK_FUNCTION_PROTO( prvIdleTask, pvParameters );
 
+static xTaskHandle idleTaskHandle;
+
 /*
  * Utility to free all memory allocated by the scheduler to hold a TCB,
  * including the stack pointed to by the TCB.
@@ -1090,7 +1092,7 @@ void vTaskStartScheduler( void )
 portBASE_TYPE xReturn;
 
 	/* Add the idle task at the lowest priority. */
-	xReturn = xTaskCreate( prvIdleTask, ( signed char * ) "IDLE", tskIDLE_STACK_SIZE, ( void * ) NULL, ( tskIDLE_PRIORITY | portPRIVILEGE_BIT ), ( xTaskHandle * ) NULL );
+	xReturn = xTaskCreate( prvIdleTask, ( signed char * ) "IDLE", tskIDLE_STACK_SIZE, ( void * ) NULL, ( tskIDLE_PRIORITY | portPRIVILEGE_BIT ), &idleTaskHandle );
 
 	#if ( configUSE_TIMERS == 1 )
 	{
@@ -1974,14 +1976,24 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 
 		#if ( configUSE_IDLE_HOOK == 1 )
 		{
-			extern void vApplicationIdleHook( void );
+			extern void vApplicationIdleHook( void *data );
 
 			/* Call the user defined function from within the idle task.  This
 			allows the application designer to add background functionality
 			without the overhead of a separate task.
 			NOTE: vApplicationIdleHook() MUST NOT, UNDER ANY CIRCUMSTANCES,
 			CALL A FUNCTION THAT MIGHT BLOCK. */
-			vApplicationIdleHook();
+
+			/* send stack start for monitoring */
+			volatile uint8_t set_done = 0x0;
+			volatile portSTACK_TYPE *idleStackpx = NULL;
+			if (set_done == 0x0)
+			{
+				tskTCB * idleTaskHandlepx = (tskTCB * )idleTaskHandle;
+				idleStackpx = idleTaskHandlepx->pxStack;
+				set_done = 0x1;
+			}
+			vApplicationIdleHook((void *)idleStackpx);
 		}
 		#endif
 	}

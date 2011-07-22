@@ -1984,16 +1984,9 @@ static portTASK_FUNCTION( prvIdleTask, pvParameters )
 			NOTE: vApplicationIdleHook() MUST NOT, UNDER ANY CIRCUMSTANCES,
 			CALL A FUNCTION THAT MIGHT BLOCK. */
 
-			/* send stack start for monitoring */
-			volatile uint8_t set_done = 0x0;
-			volatile portSTACK_TYPE *idleStackpx = NULL;
-			if (set_done == 0x0)
-			{
-				tskTCB * idleTaskHandlepx = (tskTCB * )idleTaskHandle;
-				idleStackpx = idleTaskHandlepx->pxStack;
-				set_done = 0x1;
-			}
-			vApplicationIdleHook((void *)idleStackpx);
+			/* send stack remaining */
+			//vApplicationIdleHook((void *)uxTaskGetStackHighWaterMark( idleTaskHandle ));
+			vApplicationIdleHook((void *)idleTaskHandle);
 		}
 		#endif
 	}

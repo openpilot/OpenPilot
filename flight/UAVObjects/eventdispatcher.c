@@ -32,7 +32,7 @@
 #if defined(PIOS_EVENTDISPATCHER_STACK_SIZE)
 #define STACK_SIZE PIOS_EVENTDISPATCHER_STACK_SIZE
 #else
-#define STACK_SIZE configMINIMAL_STACK_SIZE
+#define STACK_SIZE configMINIMAL_STACK_SIZE * 4
 #endif /* PIOS_EVENTDISPATCHER_STACK_SIZE */
 
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 3)
@@ -95,7 +95,7 @@ int32_t EventDispatcherInitialize()
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(EventCallbackInfo));
 
 	// Create task
-	xTaskCreate( eventTask, (signed char*)"Event", STACK_SIZE, NULL, TASK_PRIORITY, &eventTaskHandle );
+	xTaskCreate( eventTask, (signed char*)"Event", STACK_SIZE/4, NULL, TASK_PRIORITY, &eventTaskHandle );
 
 	// Done
 	return 0;
@@ -303,6 +303,9 @@ static void eventTask()
 		if ((xTaskGetTickCount()*portTICK_RATE_MS) >= timeToNextUpdateMs )
 		{
 			timeToNextUpdateMs = processPeriodicUpdates();
+
+			/* update our remaining stack status here */
+			stats.EventDispatcherStackRemaining = uxTaskGetStackHighWaterMark( eventTaskHandle ) * 4;
 		}
 	}
 }

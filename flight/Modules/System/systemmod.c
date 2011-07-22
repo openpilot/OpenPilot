@@ -73,9 +73,8 @@
 static uint32_t idleCounter;
 static uint32_t idleCounterClear;
 static xTaskHandle systemTaskHandle;
+static xTaskHandle idleTaskHandle;
 static int32_t stackOverflow;
-static xTaskHandle taskHandle;
-static portSTACK_TYPE *idleStackMarkPtr = NULL;
 
 // Private functions
 static void objectUpdatedCb(UAVObjEvent * ev);
@@ -317,38 +316,15 @@ uint32_t *ptr = &_irq_stack_end;
 	return i;
 }
 
-/**
- * Called periodically to update the system stats
- */
-static uint16_t GetFreeIdleStackSize(void)
-{
-	uint32_t i = configMINIMAL_STACK_SIZE;
-
-#if !defined(ARCH_POSIX) && !defined(ARCH_WIN32) && defined(CHECK_IRQ_STACK)
-uint32_t pattern = 0xA5A5A5A5;
-uint32_t *ptr = (uint32_t *)idleStackMarkPtr;
-	if ((uint32_t)idleStackMarkPtr != 0)
-	{
-		for (i=0; i< configMINIMAL_STACK_SIZE; i++)
-		{
-			if (*ptr++ != pattern)
-			{
-				break;
-			}
-		}
-	}
-#endif
-	return i*4;
-}
-
 
 /**
  * Called periodically to update the system stats
  */
 static void updateStats()
 {
-	static portTickType lastTickCount = 0;TaskMonitorAdd(TASKINFO_RUNNING_MANUALCONTROL, taskHandle);
+	static portTickType lastTickCount = 0;
 	SystemStatsData stats;
+	EventStats evStats;
 
 	// Get stats and update
 	SystemStatsGet(&stats);
@@ -361,10 +337,11 @@ static void updateStats()
 #endif
 
 	// Get Idle stack status
-	stats.IdleStackRemaining = GetFreeIdleStackSize();
+	stats.IdleStackRemaining = uxTaskGetStackHighWaterMark( idleTaskHandle ) * 4;
 
 	// Get Events stack status
-	//stats.EventsStackRemaining = GetFreeEventsStackSize();
+	EventGetStats(&evStats);
+	stats.EventDispatcherStackRemaining = evStats.EventDispatcherStackRemaining;
 
 	// Get Irq stack status
 	stats.IRQStackRemaining = GetFreeIrqStackSize();
@@ -472,13 +449,10 @@ void vApplicationIdleHook(void *data)
 		idleCounterClear = 0;
 	}
 
-	/* update stack start for monitoring */
-	volatile uint8_t set_done = FALSE;
-
-	if ((set_done == FALSE) && (data != NULL))
+	/* update idle stack remaining */
+	if (data != NULL)
 	{
-		idleStackMarkPtr = (portSTACK_TYPE *)data;
-		set_done = TRUE;
+		idleTaskHandle = (xTaskHandle) data;
 	}
 
 }

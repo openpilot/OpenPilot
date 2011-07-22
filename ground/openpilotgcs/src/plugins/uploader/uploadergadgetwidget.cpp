@@ -54,7 +54,7 @@ bool UploaderGadgetWidget::descriptionToStructure(QByteArray desc,deviceDescript
            buildDate = buildDate<<8;
            buildDate += desc.at(11-i) & 0xFF;
        }
-       struc->buildDate= QDateTime::fromTime_t(buildDate).toLocalTime().toString("yyyy MMMM dd HH:mm:ss");
+       struc->buildDate= QDateTime::fromTime_t(buildDate).toUTC().toString("yyyyMMdd HH:mm");
        QByteArray targetPlatform = desc.mid(12,2);
        // TODO: check platform compatibility
        QString dscText = QString(desc.mid(14,26));

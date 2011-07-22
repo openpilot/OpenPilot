@@ -7,10 +7,10 @@
  * @{
  *
  * @file       pios_delay.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
+ * @author     Michael Smith Copyright (C) 2011
  * @brief      Delay Functions 
- *                 - Provides a micro-second granular delay using a TIM 
+ *                 - Provides a micro-second granular delay using the CPU
+ *                   cycle counter.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -31,71 +31,99 @@
  */
 
 /* Project Includes */
-#include "pios.h"
+#include <pios.h>
 
-#if defined(PIOS_INCLUDE_DELAY)
+/* these should be defined by CMSIS, but they aren't */
+#define DWT_CTRL	(*(volatile unsigned long *)0xe0001000)
+#define DWT_CYCCNT	(*(volatile unsigned long *)0xe0001004)
+
+/* cycles per microsecond */
+static uint32_t us_ticks;
 
 /**
-* Initialises the Timer used by PIOS_DELAY functions<BR>
-* This is called from pios.c as part of the main() function
-* at system start up.
-* \return < 0 if initialisation failed
-*/
+ * Initialises the Timer used by PIOS_DELAY functions.
+ *
+ * \return always zero (success)
+ */
 
 int32_t PIOS_DELAY_Init(void)
 {
-	/* Enable timer clock */
-	PIOS_DELAY_TIMER_RCC_FUNC;
+	RCC_ClocksTypeDef	clocks;
 
-	/* Time base configuration */
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-	TIM_TimeBaseStructure.TIM_Period = 65535;	// maximum value
-	TIM_TimeBaseStructure.TIM_Prescaler = 72 - 1;	// for 1 uS accuracy fixed to 72Mhz
-	TIM_TimeBaseStructure.TIM_ClockDivision = 0;
-	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_TimeBaseInit(PIOS_DELAY_TIMER, &TIM_TimeBaseStructure);
+	/* compute the number of system clocks per microsecond */
+	RCC_GetClocksFreq(&clocks);
+	us_ticks = clocks.SYSCLK_Frequency / 1000000;
 
-	/* Enable counter */
-	TIM_Cmd(PIOS_DELAY_TIMER, ENABLE);
+	/* turn on access to the DWT registers */
+	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 
-	/* No error */
+	/* enable the CPU cycle counter */
+	DWT_CTRL |= 1;
+
 	return 0;
 }
 
 /**
-* Waits for a specific number of uS<BR>
-* Example:<BR>
-* \code
-*   // Wait for 500 uS
-*   PIOS_DELAY_Wait_uS(500);
-* \endcode
-* \param[in] uS delay (1..65535 microseconds)
-* \return < 0 on errors
-*/
+ * Waits for a specific number of uS
+ *
+ * Example:<BR>
+ * \code
+ *   // Wait for 500 uS
+ *   PIOS_DELAY_Wait_uS(500);
+ * \endcode
+ * \param[in] uS delay (1..65535 microseconds)
+ * \return < 0 on errors
+ */
 int32_t PIOS_DELAY_WaituS(uint16_t uS)
 {
-	uint16_t start = PIOS_DELAY_TIMER->CNT;
+	uint32_t	deadline;
 
-	/* Note that this event works on 16bit counter wrap-arounds */
-	while ((uint16_t) (PIOS_DELAY_TIMER->CNT - start) <= uS) ;
+	/*
+	 * This logic is mildly sneaky and depends on C's casting behaviour from
+	 * unsigned to signed when the MSB is set.
+	 *
+	 * We also depend on the difference between the deadline and DWT_CYCCNT
+	 * never starting off at more than half of the counter period.  Since we
+	 * can't be asked to wait more than 65.5ms, the counter would have to wrap
+	 * in 131ms (approx 32THz for the 32-bit counter) for this to be a problem.
+	 *
+	 * If we are stopped by the debugger for more than half the counter period,
+	 * and the cycle counter doesn't stop (it normally does), the delay will be
+	 * protracted.
+	 */
+	deadline = DWT_CYCCNT + (uS * us_ticks);
+	while ((int32_t)(deadline - DWT_CYCCNT) > 0) {
+	}
 
 	/* No error */
 	return 0;
 }
 
 /**
-* Waits for a specific number of mS<BR>
-* Example:<BR>
-* \code
-*   // Wait for 500 mS
-*   PIOS_DELAY_Wait_mS(500);
-* \endcode
-* \param[in] mS delay (1..65535 milliseconds)
-* \return < 0 on errors
-*/
+ * Waits for a specific number of mS
+ *
+ * If FreeRTOS is configured, and the delay is longer than a tick, wait whole
+ * ticks using the RTOS.  Fractional remainders or periods shorter than a tick
+ * are busy-waited.
+ *
+ * Example:<BR>
+ * \code
+ *   // Wait for 500 mS
+ *   PIOS_DELAY_Wait_mS(500);
+ * \endcode
+ * \param[in] mS delay (1..65535 milliseconds)
+ * \return < 0 on errors
+ */
 int32_t PIOS_DELAY_WaitmS(uint16_t mS)
 {
+#if 0 // XXX cannot do this if the scheduler hasn't started yet...
+#ifdef PIOS_INCLUDE_FREERTOS
+	if (mS > portTICK_RATE_MS) {
+		vTaskDelay(mS / portTICK_RATE_MS);
+		mS = mS % portTICK_RATE_MS;
+	}
+#endif
+#endif
 	for (int i = 0; i < mS; i++) {
 		PIOS_DELAY_WaituS(1000);
 	}
@@ -104,29 +132,6 @@ int32_t PIOS_DELAY_WaitmS(uint16_t mS)
 	return 0;
 }
 
-/**
- * @brief Query the Delay timer for the current uS 
- * @return A microsecond value
- */
-uint16_t PIOS_DELAY_GetuS()
-{
-	return PIOS_DELAY_TIMER->CNT;
-}
-
-/**
- * @brief Compute the difference between now and a reference time
- * @param[in] the reference time to compare now to
- * @return The number of uS since the delay
- * 
- * @note the user is responsible for worrying about rollover on the 16 bit uS counter
- */
-int32_t PIOS_DELAY_DiffuS(uint16_t ref)
-{
-	int32_t ret_t = ref;
-	return (int16_t) (PIOS_DELAY_GetuS() - ret_t);
-}
-
-#endif
 
 /**
   * @}

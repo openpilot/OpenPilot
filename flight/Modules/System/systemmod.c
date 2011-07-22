@@ -337,7 +337,11 @@ static void updateStats()
 #endif
 
 	// Get Idle stack status
+#if defined(ARCH_POSIX) || defined(ARCH_WIN32)
+	stats.IdleStackRemaining = 10000;
+#else
 	stats.IdleStackRemaining = uxTaskGetStackHighWaterMark( idleTaskHandle ) * 4;
+#endif
 
 	// Get Events stack status
 	EventGetStats(&evStats);

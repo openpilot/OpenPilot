@@ -305,7 +305,11 @@ static void eventTask()
 			timeToNextUpdateMs = processPeriodicUpdates();
 
 			/* update our remaining stack status here */
+#if defined(ARCH_POSIX) || defined(ARCH_WIN32)
+			stats.EventDispatcherStackRemaining = 10000;
+#else
 			stats.EventDispatcherStackRemaining = uxTaskGetStackHighWaterMark( eventTaskHandle ) * 4;
+#endif
 		}
 	}
 }

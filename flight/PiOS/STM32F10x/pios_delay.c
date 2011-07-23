@@ -62,7 +62,7 @@ int32_t PIOS_DELAY_Init(void)
 	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 
 	/* enable the CPU cycle counter */
-	DWT_CTRL |= CYCCENTENA;
+	DWT_CTRL |= CYCCNTENA;
 
 	return 0;
 }

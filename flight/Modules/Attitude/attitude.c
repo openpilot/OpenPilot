@@ -142,9 +142,6 @@ static void AttitudeTask(void *parameters)
 	// Keep flash CS pin high while talking accel
 	PIOS_FLASH_DISABLE;		
 
-#if defined(PIOS_INCLUDE_AK8974)
-	PIOS_AK8974_Init();
-#endif
 #if defined(PIOS_INCLUDE_ADXL345)
 	PIOS_ADXL345_Init();
 #endif

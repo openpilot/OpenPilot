@@ -118,14 +118,6 @@ TIM4  |                     STOPWATCH                    |
 #define TX_LED_TOGGLE					PIOS_LED_Toggle(LED4)
 
 // *****************************************************************
-// Delay Timer
-
-//#define PIOS_DELAY_TIMER				TIM2
-//#define PIOS_DELAY_TIMER_RCC_FUNC		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE)
-#define PIOS_DELAY_TIMER				TIM1
-#define PIOS_DELAY_TIMER_RCC_FUNC		RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE)
-
-// *****************************************************************
 // Timer interrupt
 
 #define TIMER_INT_TIMER					TIM3

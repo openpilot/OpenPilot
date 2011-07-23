@@ -145,12 +145,6 @@ extern uint32_t pios_com_aux_id;
 #endif
 
 //-------------------------
-// Delay Timer
-//-------------------------
-#define PIOS_DELAY_TIMER                        TIM2
-#define PIOS_DELAY_TIMER_RCC_FUNC               RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE)
-
-//-------------------------
 // System Settings
 //-------------------------
 #define PIOS_MASTER_CLOCK                       72000000

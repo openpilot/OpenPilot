@@ -80,12 +80,6 @@ TIM8  |           |           |           |
 #define PIOS_LED_CLKS				{ PIOS_LED_LED1_GPIO_CLK }
 
 //-------------------------
-// Delay Timer
-//-------------------------
-#define PIOS_DELAY_TIMER			TIM2
-#define PIOS_DELAY_TIMER_RCC_FUNC		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE)
-
-//-------------------------
 // System Settings
 //-------------------------
 #define PIOS_MASTER_CLOCK			72000000

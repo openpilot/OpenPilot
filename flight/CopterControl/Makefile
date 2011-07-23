@@ -200,18 +200,11 @@ SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_prop.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
 
-## PIOS Hardware (Common)
-<<<<<<< HEAD
 SRC += $(PIOSCOMMON)/pios_crc.c
-SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
-SRC += $(PIOSCOMMON)/pios_flash_w25x.c
-SRC += $(PIOSCOMMON)/pios_adxl345.c
-=======
 #SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
 #SRC += $(PIOSCOMMON)/pios_flash_w25x.c
 #SRC += $(PIOSCOMMON)/pios_adxl345.c
 SRC += $(PIOSCOMMON)/pios_ak8974.c
->>>>>>> Initial MoveCopter branch.
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_i2c_esc.c
 SRC += $(PIOSCOMMON)/pios_iap.c

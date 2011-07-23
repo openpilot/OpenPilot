@@ -60,23 +60,8 @@ TIM4  |           |           |           | Servo 4
 //------------------------
 // BOOTLOADER_SETTINGS
 //------------------------
-//#define FUNC_ID				2
-//#define HW_VERSION			69
-
-#define BOOTLOADER_VERSION	0
-#define BOARD_TYPE		0x04
-#define BOARD_REVISION		0x01
-#define MEM_SIZE			0x20000 //128K
-#define SIZE_OF_DESCRIPTION	100
-#define START_OF_USER_CODE	(uint32_t)0x08003000
-#define SIZE_OF_CODE		(uint32_t)(MEM_SIZE-(START_OF_USER_CODE-0x08000000)-SIZE_OF_DESCRIPTION)
-#ifdef STM32F10X_HD
-		#define HW_TYPE			0 //0=high_density 1=medium_density;
-#elif STM32F10X_MD
-		#define HW_TYPE			1 //0=high_density 1=medium_density;
-#endif
 #define BOARD_READABLE	TRUE
-#define BOARD_WRITABLA	TRUE
+#define BOARD_WRITABLE	TRUE
 #define MAX_DEL_RETRYS	3
 
 
@@ -159,7 +144,7 @@ extern uint32_t pios_i2c_main_adapter_id;
 //
 // See also pios_board.c
 //-------------------------
-#define PIOS_COM_MAX_DEVS			4
+#define PIOS_COM_MAX_DEVS			1
 
 #define PIOS_COM_TELEM_BAUDRATE         57600
 
@@ -283,6 +268,12 @@ extern uint32_t pios_com_spektrum_id;
 #define PIOS_ADC_RATE		(72.0e6 / 4.0 / 2.0 / 252.0 / (PIOS_ADC_NUM_CHANNELS >> PIOS_ADC_USE_ADC2))
 #define PIOS_ADC_MAX_OVERSAMPLING              16
 
+//------------------------
+// PIOS_RCVR
+// See also pios_board.c
+//------------------------
+#define PIOS_RCVR_MAX_DEVS                      12
+
 //-------------------------
 // Receiver PWM inputs
 //-------------------------
@@ -291,7 +282,7 @@ extern uint32_t pios_com_spektrum_id;
 //-------------------------
 // Receiver PPM input
 //-------------------------
-#define PIOS_PPM_NUM_INPUTS                     10  //Could be more if needed
+#define PIOS_PPM_NUM_INPUTS                     9  //Could be more if needed
 #define PIOS_PPM_SUPV_ENABLED                   0
 
 //-------------------------

@@ -4,8 +4,11 @@ BOOTLOADER_VERSION  := 0x00
 HW_TYPE             := 0x01
 
 MCU                 := cortex-m3
-CHIP                := STM32F103CBT
-BOARD               := STM32103CB_CC_Rev1
+# CHIP                := STM32F103CBT
+CHIP                := STM32F103VBT
+# BOARD               := STM32103CB_CC_Rev1
+BOARD               := STM32103VB_MOVECOPTER
+
 MODEL               := MD
 MODEL_SUFFIX        := _CC
 

@@ -570,21 +570,21 @@ const struct pios_servo_channel pios_servo_channels[] = {
 	{ /* needs to remap to alternative function */
 		.timer = TIM3,
 		.port = GPIOC,
-		.channel = TIM_Channel_1,
-		.pin = GPIO_Pin_6,
+		.channel = TIM_Channel_3,
+		.pin = GPIO_Pin_8,
 	},
 	{ /* needs to remap to alternative function */
 		.timer = TIM3,
 		.port = GPIOC,
 		.channel = TIM_Channel_2,
 		.pin = GPIO_Pin_7,
-	}, 
+	},
 	{ /* needs to remap to alternative function */
 		.timer = TIM3,
 		.port = GPIOC,
-		.channel = TIM_Channel_3,
-		.pin = GPIO_Pin_8,
-	}, 
+		.channel = TIM_Channel_1,
+		.pin = GPIO_Pin_6,
+	},
 	{ /* needs to remap to alternative function */
 		.timer = TIM4,
 		.port = GPIOD,
@@ -654,6 +654,50 @@ const struct pios_servo_cfg pios_servo_cfg = {
 #if defined(PIOS_INCLUDE_PPM)
 #include <pios_ppm_priv.h>
 
+#if defined(MOVECOPTER)
+void TIM1_CC_IRQHandler();
+void TIM1_CC_IRQHandler() __attribute__ ((alias ("PIOS_TIM1_CC_irq_handler")));
+const struct pios_ppm_cfg pios_ppm_cfg = {
+	.tim_base_init = {
+		.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,	/* For 1 uS accuracy */
+		.TIM_ClockDivision = TIM_CKD_DIV1,
+		.TIM_CounterMode = TIM_CounterMode_Up,
+		.TIM_Period = 0xFFFF,
+		.TIM_RepetitionCounter = 0x0000,
+	},
+	.tim_ic_init = {
+			.TIM_ICPolarity = TIM_ICPolarity_Rising,
+			.TIM_ICSelection = TIM_ICSelection_DirectTI,
+			.TIM_ICPrescaler = TIM_ICPSC_DIV1,
+			.TIM_ICFilter = 0x0,
+			.TIM_Channel = TIM_Channel_2,
+	},
+	.gpio_init = {
+			.GPIO_Mode = GPIO_Mode_IPD,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Pin = GPIO_Pin_11,
+	},
+	.remap = GPIO_FullRemap_TIM1,
+	.irq = {
+		.handler = TIM1_CC_IRQHandler,
+		.init    = {
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+			.NVIC_IRQChannel = TIM1_CC_IRQn,
+		},
+	},
+	.timer = TIM1,
+	.port = GPIOE,
+	.ccr = TIM_IT_CC2,
+};
+
+void PIOS_TIM1_CC_irq_handler()
+{
+	PIOS_PPM_irq_handler();
+}
+
+#else
 void TIM4_IRQHandler();
 void TIM4_IRQHandler() __attribute__ ((alias ("PIOS_TIM4_irq_handler")));
 const struct pios_ppm_cfg pios_ppm_cfg = {
@@ -694,6 +738,7 @@ void PIOS_TIM4_irq_handler()
 {
 	PIOS_PPM_irq_handler();
 }
+#endif	/* MOVECOPTER */
 #endif	/* PIOS_INCLUDE_PPM */
 
 /* 
@@ -798,95 +843,7 @@ void PIOS_TIM4_irq_handler()
 #endif
 
 
-/*
- * PPM Input
- */
-#if defined(PIOS_INCLUDE_PPM)
-#include <pios_ppm_priv.h>
-void TIM6_IRQHandler();
-void TIM6_IRQHandler() __attribute__ ((alias ("PIOS_TIM6_irq_handler")));
-const struct pios_ppmsv_cfg pios_ppmsv_cfg = {
-	.tim_base_init = {
-		.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,	/* For 1 uS accuracy */
-		.TIM_ClockDivision = TIM_CKD_DIV1,
-		.TIM_CounterMode = TIM_CounterMode_Up,
-		.TIM_Period = ((1000000 / 25) - 1), /* 25 Hz */
-		.TIM_RepetitionCounter = 0x0000,
-	},
-	.irq = {
-		.handler = TIM6_IRQHandler,
-		.init    = {
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-			.NVIC_IRQChannelSubPriority        = 0,
-			.NVIC_IRQChannelCmd                = ENABLE,
-		},
-	},
-	.timer = TIM6,
-	.ccr = TIM_IT_Update,
-};
 
-void PIOS_TIM6_irq_handler()
-{
-	PIOS_PPMSV_irq_handler();
-}
-
-void TIM1_CC_IRQHandler();
-void TIM1_CC_IRQHandler() __attribute__ ((alias ("PIOS_TIM1_CC_irq_handler")));
-const struct pios_ppm_cfg pios_ppm_cfg = {
-	.tim_base_init = {
-		.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1,	/* For 1 uS accuracy */
-		.TIM_ClockDivision = TIM_CKD_DIV1,
-		.TIM_CounterMode = TIM_CounterMode_Up,
-		.TIM_Period = 0xFFFF,
-		.TIM_RepetitionCounter = 0x0000,
-	},
-	.tim_ic_init = {
-			.TIM_ICPolarity = TIM_ICPolarity_Rising,
-			.TIM_ICSelection = TIM_ICSelection_DirectTI,
-			.TIM_ICPrescaler = TIM_ICPSC_DIV1,
-			.TIM_ICFilter = 0x0,
-			.TIM_Channel = TIM_Channel_2,
-	},
-#ifdef MOVECOPTER
-	.gpio_init = {
-			.GPIO_Mode = GPIO_Mode_IPD,
-			.GPIO_Speed = GPIO_Speed_2MHz,
-			.GPIO_Pin = GPIO_Pin_11,
-	},
-	.remap = GPIO_FullRemap_TIM1,
-#else
-	.gpio_init = {
-			.GPIO_Mode = GPIO_Mode_IPD,
-			.GPIO_Speed = GPIO_Speed_2MHz,
-			.GPIO_Pin = GPIO_Pin_9,
-	},
-	.remap = 0,
-#endif
-	.irq = {
-		.handler = TIM1_CC_IRQHandler,
-		.init    = {
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
-			.NVIC_IRQChannelSubPriority        = 0,
-			.NVIC_IRQChannelCmd                = ENABLE,
-			.NVIC_IRQChannel = TIM1_CC_IRQn,
-		},
-	},
-	.timer = TIM1,
-#ifdef MOVECOPTER
-	.port = GPIOE,
-#else
-	.port = GPIOA,
-
-#endif
-	.ccr = TIM_IT_CC2,
-};
-
-void PIOS_TIM1_CC_irq_handler()
-{
-	PIOS_PPM_irq_handler();
-}
-
-#endif //PPM
 
 
 
@@ -1009,7 +966,7 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 	/* SPEKTRUM init must come before comms */
 	PIOS_SPEKTRUM_Init();
-
+#endif
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
 	UAVObjInitialize();
@@ -1142,6 +1099,10 @@ void PIOS_Board_Init(void) {
 			if (PIOS_I2C_Init(&pios_i2c_main_adapter_id, &pios_i2c_main_adapter_cfg)) {
 				PIOS_Assert(0);
 			}
+#if defined(PIOS_INCLUDE_AK8974)
+#include "pios_ak8974.h"
+			PIOS_AK8974_Init();
+#endif  /* PIOS_INCLUDE_AK8974 */
 		}
 #endif	/* PIOS_INCLUDE_I2C */
 		break;

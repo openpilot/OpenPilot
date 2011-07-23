@@ -45,7 +45,7 @@
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_LED
 
-//#define PIOS_INCLUDE_RCVR
+#define PIOS_INCLUDE_RCVR
 
 /* Supported receiver interfaces */
 //#define PIOS_INCLUDE_SPEKTRUM
@@ -56,7 +56,7 @@
 
 
 #define PIOS_INCLUDE_SERVO
-#define PIOS_INCLUDE_SPI
+//#define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_SYS
 #define PIOS_INCLUDE_USART
 #define PIOS_INCLUDE_USB_HID

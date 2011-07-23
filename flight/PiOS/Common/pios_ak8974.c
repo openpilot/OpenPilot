@@ -32,14 +32,12 @@
 /* Project Includes */
 #include "pios.h"
 
-
-#define PIOS_INCLUDE_AK8974
-
 #if defined(PIOS_INCLUDE_AK8974)
 
 /*
- AK8974 registers. This data was taken from akm8974.c, a Linux kernel patch
-*/
+ * AK8974 registers. Based on a Linux kernel patch (akm8974.c) and the datasheet
+ * for AKM8975 which is a similiar device
+ */
 
 #define AK8974_SELFTEST	 			0x0C
 #define AK8974_INFO	 				0x0D

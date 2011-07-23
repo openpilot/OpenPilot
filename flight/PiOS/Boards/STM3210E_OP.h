@@ -202,6 +202,11 @@ extern uint32_t pios_com_sbus_id;
 #define PIOS_RCVR_MAX_CHANNELS			12
 
 //-------------------------
+// Receiver PPM input
+//-------------------------
+#define PIOS_PPM_NUM_INPUTS                     8
+
+//-------------------------
 // Receiver PWM input
 //-------------------------
 #define PIOS_PWM_NUM_INPUTS                     8

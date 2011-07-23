@@ -42,7 +42,7 @@ const struct pios_rcvr_driver pios_ppm_rcvr_driver = {
 };
 
 #define PIOS_PPM_IN_MIN_NUM_CHANNELS		4
-#define PIOS_PPM_IN_MAX_NUM_CHANNELS		8
+#define PIOS_PPM_IN_MAX_NUM_CHANNELS		PIOS_PPM_NUM_INPUTS
 #define PIOS_PPM_STABLE_CHANNEL_COUNT		25	// frames
 #define PIOS_PPM_IN_MIN_SYNC_PULSE_US		7000	// microseconds
 #define PIOS_PPM_IN_MIN_CHANNEL_PULSE_US	750	// microseconds
@@ -59,7 +59,7 @@ static uint32_t CaptureValue[PIOS_PPM_IN_MAX_NUM_CHANNELS];
 static uint32_t CaptureValueNewFrame[PIOS_PPM_IN_MAX_NUM_CHANNELS];
 static uint32_t LargeCounter;
 static int8_t NumChannels;
-static int8_t NumChannelsPrev;
+static int8_t NumChannelsPrevFrame;
 static uint8_t NumChannelCounter;
 
 static uint8_t supv_timer = 0;
@@ -79,7 +79,7 @@ void PIOS_PPM_Init(void)
 	DeltaTime = 0;
 	LargeCounter = 0;
 	NumChannels = -1;
-	NumChannelsPrev = -1;
+	NumChannelsPrevFrame = -1;
 	NumChannelCounter = 0;
 	Tracking = FALSE;
 	Fresh = FALSE;
@@ -254,7 +254,7 @@ void PIOS_PPM_irq_handler(void)
 				}
 				for (uint32_t i = NumChannels;
 				     i < PIOS_PPM_IN_MAX_NUM_CHANNELS; i++) {
-					CaptureValue[i] = 0;
+					CaptureValue[i] = PIOS_PPM_INPUT_INVALID;
 				}
 			}
 
@@ -270,7 +270,7 @@ void PIOS_PPM_irq_handler(void)
 			/* Valid pulse duration 0.75 to 2.5 ms*/
 			if (DeltaTime > PIOS_PPM_IN_MIN_CHANNEL_PULSE_US
 			    && DeltaTime < PIOS_PPM_IN_MAX_CHANNEL_PULSE_US
-			    && PulseIndex < PIOS_PPM_IN_MAX_NUM_INPUTS) {
+			    && PulseIndex < PIOS_PPM_IN_MAX_NUM_CHANNELS) {
 
 				CaptureValueNewFrame[PulseIndex] = DeltaTime;
 				PulseIndex++;

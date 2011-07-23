@@ -99,7 +99,6 @@ void PIOS_PPM_Init(void)
 			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
 			break;
 #ifdef STM32F10X_HD
-
 		case (int32_t)TIM5:
 			NVIC_InitStructure.NVIC_IRQChannel = TIM5_IRQn;
 			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
@@ -190,10 +189,10 @@ void PIOS_PPM_irq_handler(void)
 		LargeCounter = LargeCounter + pios_ppm_cfg.timer->ARR;
 	}
 
-
 	/* Signal edge interrupt */
 	if (TIM_GetITStatus(pios_ppm_cfg.timer, pios_ppm_cfg.ccr) == SET) {
 		PreviousTime = CurrentTime;
+
 		switch((int32_t) pios_ppm_cfg.ccr) {
 			case (int32_t)TIM_IT_CC1:
 				CurrentTime = TIM_GetCapture1(pios_ppm_cfg.timer);
@@ -220,13 +219,11 @@ void PIOS_PPM_irq_handler(void)
 
 		PreviousTime = CurrentTime;
 
-
 		/* Sync pulse detection */
 		if (DeltaTime > PIOS_PPM_IN_MIN_SYNC_PULSE_US) {
 			Fresh = TRUE;
 			Tracking = TRUE;
 			PulseIndex = 0;
-			/* Valid pulse duration 0.75 to 2.5 ms*/
 		} else if (Tracking) {
 			/* Valid pulse duration 0.75 to 2.5 ms*/
 			if (DeltaTime > PIOS_PPM_IN_MIN_CHANNEL_PULSE_US

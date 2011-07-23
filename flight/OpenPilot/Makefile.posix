@@ -173,6 +173,8 @@ SRC += $(PIOSPOSIX)/pios_servo.c
 SRC += $(PIOSPOSIX)/pios_wdg.c
 SRC += $(PIOSPOSIX)/pios_debug.c
 
+SRC += $(PIOSPOSIX)/pios_rcvr.c
+
 ## Libraries for flight calculations
 #SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/WorldMagModel.c

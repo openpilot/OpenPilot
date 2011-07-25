@@ -112,10 +112,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
     QString fieldName = QString("InputMode");
     UAVObjectField *field = obj->getField(fieldName);
-    m_config->receiverType->addItems(field->getOptions());
-    m_config->receiverType->setDisabled(true); // This option does not work for now, it is a compile-time option.
-
-    // Fill in the dropdown menus for the channel RC Input assignement.
+     // Fill in the dropdown menus for the channel RC Input assignement.
     QStringList channelsList;
         channelsList << "None";
     QList<UAVObjectField*> fieldList = obj->getFields();
@@ -264,7 +261,7 @@ void ConfigInputWidget::refreshValues()
 
     // Update receiver type
     field = obj->getField(QString("InputMode"));
-    m_config->receiverType->setCurrentIndex(m_config->receiverType->findText(field->getValue().toString()));
+    m_config->receiverType->setText(field->getValue().toString());
 
     // Reset all channel assignement dropdowns:
     foreach (QComboBox *combo, inChannelAssign) {
@@ -332,10 +329,6 @@ void ConfigInputWidget::sendRCInputUpdate()
     for (int i = 0; i < 8; i++)
         field->setValue(inSliders[i]->value(), i);
 
-    // Set RC Receiver type:
-    fieldName = QString("InputMode");
-    field = obj->getField(fieldName);
-    field->setValue(m_config->receiverType->currentText());
 
     // Set Roll/Pitch/Yaw/Etc assignement:
     // Rule: if two channels have the same setting (which is wrong!) the higher channel

@@ -36,7 +36,8 @@ private:
     QEventLoop loop;
     QList<UAVObject *> objects;
 protected:
-
+public slots:
+    void enableControls(bool value);
 
 };
 

@@ -38,90 +38,52 @@ ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     m_telemetry = new Ui_CC_HW_Widget();
     m_telemetry->setupUi(this);
-    smartsave=new smartSaveButton(m_telemetry->saveTelemetryToRAM,m_telemetry->saveTelemetryToSD);
-    // Now connect the widget to the ManualControlCommand / Channel UAVObject
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-
-    UAVObject *obj = objManager->getObject(QString("TelemetrySettings"));
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
-    smartsave->addObject(obj);
-    UAVObjectField *field = obj->getField(QString("Speed"));
-    m_telemetry->telemetrySpeed->addItems(field->getOptions());
-
-    obj = objManager->getObject(QString("HwSettings"));
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
-    smartsave->addObject(obj);
-    field = obj->getField(QString("CC_FlexiPort"));
-    m_telemetry->cbFlexi->addItems(field->getOptions());
-
-    field = obj->getField(QString("CC_MainPort"));
-    m_telemetry->cbTele->addItems(field->getOptions());
-
-    connect(smartsave, SIGNAL(preProcessOperations()), this, SLOT(saveTelemetryUpdate()));
-
+    setupButtons(m_telemetry->saveTelemetryToRAM,m_telemetry->saveTelemetryToSD);
+    addObjectToWidget("TelemetrySettings","Speed",m_telemetry->telemetrySpeed);
+    addObjectToWidget("HwSettings","CC_FlexiPort",m_telemetry->cbFlexi);
+    addObjectToWidget("HwSettings","CC_MainPort",m_telemetry->cbTele);
+    addObjectToWidget("ManualControlSettings","InputMode",m_telemetry->receiverType);
     enableControls(false);
-    refreshValues();
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
-    connect(parent, SIGNAL(autopilotDisconnected()),this, SLOT(onAutopilotDisconnect()));
+    populateWidgets();
+    refreshWidgetsValues();
 }
 
 ConfigCCHWWidget::~ConfigCCHWWidget()
 {
-   // Do nothing
-    delete smartsave;
+    // Do nothing
 }
 
-
-/*******************************
- * Telemetry Settings
- *****************************/
-
-void ConfigCCHWWidget::enableControls(bool enable)
-{
-    m_telemetry->saveTelemetryToSD->setEnabled(enable);
-    //m_telemetry->saveTelemetryToRAM->setEnabled(enable);
-}
-
-/**
-  Request telemetry settings from the board
-  */
 void ConfigCCHWWidget::refreshValues()
 {
-    qDebug()<<"refreshvalues";
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("TelemetrySettings")));
-    Q_ASSERT(obj);
-    UAVObjectField *field = obj->getField(QString("Speed"));
-    m_telemetry->telemetrySpeed->setCurrentIndex(m_telemetry->telemetrySpeed->findText(field->getValue().toString()));
-    qDebug()<<field->getValue().toString();
-    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("HwSettings")));
-    Q_ASSERT(obj);
-    field = obj->getField(QString("CC_FlexiPort"));
-    m_telemetry->cbFlexi->setCurrentIndex(m_telemetry->cbFlexi->findText(field->getValue().toString()));
-    qDebug()<<field->getValue().toString();
-    field = obj->getField(QString("CC_MainPort"));
-    m_telemetry->cbTele->setCurrentIndex(m_telemetry->cbTele->findText(field->getValue().toString()));
-    qDebug()<<field->getValue().toString();
 }
 
-
-/**
-  Send telemetry settings to the board and request saving to SD card
-  */
-void ConfigCCHWWidget::saveTelemetryUpdate()
+void ConfigCCHWWidget::widgetsContentsChanged()
 {
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("TelemetrySettings")));
-    Q_ASSERT(obj);
-    UAVObjectField* field = obj->getField(QString("Speed"));
-    field->setValue(m_telemetry->telemetrySpeed->currentText());
-    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("HwSettings")));
-    Q_ASSERT(obj);
-    field = obj->getField(QString("CC_FlexiPort"));
-    field->setValue(m_telemetry->cbFlexi->currentText());
-    field = obj->getField(QString("CC_MainPort"));
-    field->setValue(m_telemetry->cbTele->currentText());
-
-
+    enableControls(false);
+    if((m_telemetry->cbFlexi->currentText()==m_telemetry->cbTele->currentText()) && m_telemetry->cbTele->currentText()!="Disabled")
+    {
+        m_telemetry->problems->setText("Warning-You have configured the main port and the flexi port for the same function, this is currently not suported");
+    }
+    else if((m_telemetry->cbTele->currentText()=="Spektrum" ||m_telemetry->cbFlexi->currentText()=="Spektrum") && m_telemetry->receiverType->currentText()!="Spektrum")
+    {
+        m_telemetry->problems->setText("Warning-You have at least one port configured as 'Spektrum' however thats not your selected input type");
+    }
+    else if(m_telemetry->cbTele->currentText()=="S.Bus"  && m_telemetry->receiverType->currentText()!="S.Bus")
+    {
+        m_telemetry->problems->setText("Warning-You have at least one port configured as 'S.Bus' however thats not your selected input type");
+    }
+    else if(m_telemetry->cbTele->currentText()!="S.Bus"  && m_telemetry->receiverType->currentText()=="S.Bus")
+    {
+        m_telemetry->problems->setText("Warning-You have at selected 'S.Bus' as your input type however you have no port configured for that protocol");
+    }
+    else if((m_telemetry->cbTele->currentText()!="Spektrum" && m_telemetry->cbFlexi->currentText()!="Spektrum") && m_telemetry->receiverType->currentText()=="Spektrum")
+    {
+        m_telemetry->problems->setText("Warning-You have at selected 'Spektrum' as your input type however you have no port configured for that protocol");
+    }
+    else
+    {
+        m_telemetry->problems->setText("");
+        enableControls(true);
+    }
 }
+

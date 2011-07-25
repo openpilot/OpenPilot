@@ -39,22 +39,11 @@ ConfigProHWWidget::ConfigProHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_telemetry = new Ui_PRO_HW_Widget();
     m_telemetry->setupUi(this);
 
-    // Now connect the widget to the ManualControlCommand / Channel UAVObject
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-
-    UAVObject *obj = objManager->getObject(QString("TelemetrySettings"));
-    UAVObjectField *field = obj->getField(QString("Speed"));
-    m_telemetry->telemetrySpeed->addItems(field->getOptions());
-
-    connect(m_telemetry->saveTelemetryToSD, SIGNAL(clicked()), this, SLOT(saveTelemetryUpdate()));
-    connect(m_telemetry->saveTelemetryToRAM, SIGNAL(clicked()), this, SLOT(sendTelemetryUpdate()));
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
-
+    setupButtons(m_telemetry->saveTelemetryToRAM,m_telemetry->saveTelemetryToSD);
+    addObjectToWidget("TelemetrySettings","Speed",m_telemetry->telemetrySpeed);
     enableControls(false);
-    refreshValues();
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
-    connect(parent, SIGNAL(autopilotDisconnected()),this, SLOT(onAutopilotDisconnect()));
+    populateWidgets();
+    refreshWidgetsValues();
 }
 
 ConfigProHWWidget::~ConfigProHWWidget()
@@ -63,49 +52,9 @@ ConfigProHWWidget::~ConfigProHWWidget()
 }
 
 
-/*******************************
- * Telemetry Settings
- *****************************/
-
-void ConfigProHWWidget::enableControls(bool enable)
-{
-    m_telemetry->saveTelemetryToSD->setEnabled(enable);
-    //m_telemetry->saveTelemetryToRAM->setEnabled(enable);
-}
-
 /**
   Request telemetry settings from the board
   */
 void ConfigProHWWidget::refreshValues()
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("TelemetrySettings")));
-    Q_ASSERT(obj);
-    UAVObjectField *field = obj->getField(QString("Speed"));
-    m_telemetry->telemetrySpeed->setCurrentIndex(m_telemetry->telemetrySpeed->findText(field->getValue().toString()));
-}
-
-/**
-  Send telemetry settings to the board
-  */
-void ConfigProHWWidget::sendTelemetryUpdate()
-{
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("TelemetrySettings")));
-    Q_ASSERT(obj);
-    UAVObjectField* field = obj->getField(QString("Speed"));
-    field->setValue(m_telemetry->telemetrySpeed->currentText());
-    obj->updated();
-}
-
-/**
-  Send telemetry settings to the board and request saving to SD card
-  */
-void ConfigProHWWidget::saveTelemetryUpdate()
-{
-    // Send update so that the latest value is saved
-    sendTelemetryUpdate();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("TelemetrySettings")));
-    Q_ASSERT(obj);
-    saveObjectToSD(obj);
 }

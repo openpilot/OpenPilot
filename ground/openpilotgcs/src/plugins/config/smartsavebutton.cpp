@@ -111,3 +111,9 @@ void smartSaveButton::saving_finished(int id, bool result)
         loop.quit();
     }
 }
+
+void smartSaveButton::enableControls(bool value)
+{
+    bupdate->setEnabled(value);
+    bsave->setEnabled(value);
+}

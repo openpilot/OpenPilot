@@ -35,28 +35,45 @@
 #include <QQueue>
 #include <QtGui/QWidget>
 #include <QList>
-
-
+#include <QLabel>
+#include "smartsavebutton.h"
 class ConfigTaskWidget: public QWidget
 {
     Q_OBJECT
 
 public:
+    struct objectToWidget
+    {
+        UAVObject * object;
+        UAVObjectField * field;
+        QWidget * widget;
+    };
+
     ConfigTaskWidget(QWidget *parent = 0);
     ~ConfigTaskWidget();
     void saveObjectToSD(UAVObject *obj);
     UAVObjectManager* getObjectManager();
     static double listMean(QList<double> list);
-
+    void addObjectToWidget(QString object,QString field,QWidget * widget);
+    void setupButtons(QPushButton * update,QPushButton * save);
 public slots:
     void onAutopilotDisconnect();
     void onAutopilotConnect();
 
 private slots:
-    virtual void refreshValues() = 0;
-
+    virtual void refreshValues()=0;
+    virtual void updateObjectsFromWidgets();
 private:
-    virtual void enableControls(bool enable) = 0;
+    QList <objectToWidget*> objOfInterest;
+    ExtensionSystem::PluginManager *pm;
+    UAVObjectManager *objManager;
+    smartSaveButton *smartsave;
+protected slots:
+    virtual void widgetsContentsChanged();
+    virtual void populateWidgets();
+    virtual void refreshWidgetsValues();
+protected:
+    virtual void enableControls(bool enable);
 
 };
 

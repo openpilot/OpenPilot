@@ -28,13 +28,34 @@
 #include <QtGui/QWidget>
 
 
-ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent)
+ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),smartsave(NULL)
 {
+    pm = ExtensionSystem::PluginManager::instance();
+    objManager = pm->getObject<UAVObjectManager>();
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
+    connect(parent, SIGNAL(autopilotDisconnected()),this, SLOT(onAutopilotDisconnect()));
+}
+void ConfigTaskWidget::addObjectToWidget(QString object, QString field, QWidget * widget)
+{
+    UAVObject *obj = objManager->getObject(QString(object));
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
+    //smartsave->addObject(obj);
+    UAVObjectField *_field = obj->getField(QString(field));
+    objectToWidget * ow=new objectToWidget();
+    ow->field=_field;
+    ow->object=obj;
+    ow->widget=widget;
+    objOfInterest.append(ow);
+    smartsave->addObject(obj);
+    if(QComboBox * cb=qobject_cast<QComboBox *>(widget))
+    {
+        connect(cb,SIGNAL(currentIndexChanged(int)),this,SLOT(widgetsContentsChanged()));
+    }
 }
 
 ConfigTaskWidget::~ConfigTaskWidget()
 {
-    // Do nothing
+    delete smartsave;
 }
 
 void ConfigTaskWidget::saveObjectToSD(UAVObject *obj)
@@ -73,8 +94,71 @@ void ConfigTaskWidget::onAutopilotDisconnect()
 void ConfigTaskWidget::onAutopilotConnect()
 {
         enableControls(true);
-        refreshValues();
+        refreshWidgetsValues();
 }
+
+void ConfigTaskWidget::populateWidgets()
+{
+    foreach(objectToWidget * ow,objOfInterest)
+    {
+        if(QComboBox * cb=qobject_cast<QComboBox *>(ow->widget))
+        {
+            cb->addItems(ow->field->getOptions());
+            cb->setCurrentIndex(cb->findText(ow->field->getValue().toString()));
+        }
+        else if(QLabel * cb=qobject_cast<QLabel *>(ow->widget))
+        {
+            cb->setText(ow->field->getValue().toString());
+        }
+    }
+}
+
+void ConfigTaskWidget::refreshWidgetsValues()
+{
+    foreach(objectToWidget * ow,objOfInterest)
+    {
+        if(QComboBox * cb=qobject_cast<QComboBox *>(ow->widget))
+        {
+            cb->setCurrentIndex(cb->findText(ow->field->getValue().toString()));
+        }
+        else if(QLabel * cb=qobject_cast<QLabel *>(ow->widget))
+        {
+            cb->setText(ow->field->getValue().toString());
+        }
+    }
+}
+
+void ConfigTaskWidget::updateObjectsFromWidgets()
+{
+    foreach(objectToWidget * ow,objOfInterest)
+    {
+        if(QComboBox * cb=qobject_cast<QComboBox *>(ow->widget))
+        {
+            ow->field->setValue(cb->currentText());
+        }
+        else if(QLabel * cb=qobject_cast<QLabel *>(ow->widget))
+        {
+            ow->field->setValue(cb->text());
+        }
+    }
+}
+
+void ConfigTaskWidget::setupButtons(QPushButton *update, QPushButton *save)
+{
+    smartsave=new smartSaveButton(update,save);
+    connect(smartsave, SIGNAL(preProcessOperations()), this, SLOT(updateObjectsFromWidgets()));
+}
+
+void ConfigTaskWidget::enableControls(bool enable)
+{
+    if(smartsave)
+        smartsave->enableControls(enable);
+}
+
+void ConfigTaskWidget::widgetsContentsChanged()
+{
+}
+
 
 
 

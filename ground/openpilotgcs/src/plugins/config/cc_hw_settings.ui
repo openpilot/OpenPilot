@@ -31,7 +31,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap>:/configgadget/images/coptercontrol.svg</pixmap>
+           <pixmap resource="configgadget.qrc">:/configgadget/images/coptercontrol.svg</pixmap>
           </property>
           <property name="scaledContents">
            <bool>true</bool>
@@ -87,7 +87,7 @@
         <item row="0" column="1">
          <widget class="QLabel" name="label_7">
           <property name="text">
-           <string>dkwtc</string>
+           <string>Receiver type</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -95,7 +95,7 @@
          </widget>
         </item>
         <item row="0" column="2">
-         <widget class="QComboBox" name="comboBox_4"/>
+         <widget class="QComboBox" name="receiverType"/>
         </item>
        </layout>
       </item>
@@ -139,6 +139,19 @@
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="problems">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::AutoText</enum>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
         <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
@@ -196,6 +209,8 @@ Beware of not locking yourself out!</string>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="configgadget.qrc"/>
+ </resources>
  <connections/>
 </ui>

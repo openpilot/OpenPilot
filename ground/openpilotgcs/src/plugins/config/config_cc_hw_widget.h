@@ -43,16 +43,12 @@ class ConfigCCHWWidget: public ConfigTaskWidget
 public:
     ConfigCCHWWidget(QWidget *parent = 0);
     ~ConfigCCHWWidget();
+private slots:
+    void refreshValues();
+    void widgetsContentsChanged();
 
 private:
     Ui_CC_HW_Widget *m_telemetry;
-    void enableControls(bool enable);
-    smartSaveButton *smartsave;
-
-private slots:
-    virtual void refreshValues();
-    void saveTelemetryUpdate();
-
 };
 
 #endif // CONFIGCCHWWIDGET_H

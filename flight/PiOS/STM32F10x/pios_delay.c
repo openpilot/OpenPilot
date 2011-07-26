@@ -37,7 +37,7 @@
 
 /* these should be defined by CMSIS, but they aren't */
 #define DWT_CTRL	(*(volatile uint32_t *)0xe0001000)
-#define CYCCNTENA	(1<<1)
+#define CYCCNTENA	(1<<0)
 #define DWT_CYCCNT	(*(volatile uint32_t *)0xe0001004)
 
 
@@ -57,6 +57,7 @@ int32_t PIOS_DELAY_Init(void)
 	/* compute the number of system clocks per microsecond */
 	RCC_GetClocksFreq(&clocks);
 	us_ticks = clocks.SYSCLK_Frequency / 1000000;
+	PIOS_DEBUG_Assert(us_ticks > 1);
 
 	/* turn on access to the DWT registers */
 	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
@@ -75,18 +76,32 @@ int32_t PIOS_DELAY_Init(void)
  *   // Wait for 500 uS
  *   PIOS_DELAY_Wait_uS(500);
  * \endcode
- * \param[in] uS delay (1..65535 microseconds)
+ * \param[in] uS delay
  * \return < 0 on errors
  */
-int32_t PIOS_DELAY_WaituS(uint16_t uS)
+int32_t PIOS_DELAY_WaituS(uint32_t uS)
 {
-	uint16_t	deadline;
+	uint32_t	elapsed = 0;
+	uint32_t	last_count = DWT_CYCCNT;
+	
+	for (;;) {
+		uint32_t current_count = DWT_CYCCNT;
+		uint32_t elapsed_uS;
 
-	/* calculate the time at which we should stop waiting */
-	deadline = PIOS_DELAY_GetuS() + uS;
+		/* measure the time elapsed since the last time we checked */
+		elapsed += current_count - last_count;
+		last_count = current_count;
 
-	/* and wait until that time has arrived */
-	while (PIOS_DELAY_DiffuS(deadline) < 0) {
+		/* convert to microseconds */
+		elapsed_uS = elapsed / us_ticks;
+		if (elapsed_uS >= uS)
+			break;
+
+		/* reduce the delay by the elapsed time */
+		uS -= elapsed_uS;
+
+		/* keep fractional microseconds for the next iteration */
+		elapsed %= us_ticks;
 	}
 
 	/* No error */
@@ -104,7 +119,7 @@ int32_t PIOS_DELAY_WaituS(uint16_t uS)
  * \param[in] mS delay (1..65535 milliseconds)
  * \return < 0 on errors
  */
-int32_t PIOS_DELAY_WaitmS(uint16_t mS)
+int32_t PIOS_DELAY_WaitmS(uint32_t mS)
 {
 	while (mS--) {
 		PIOS_DELAY_WaituS(1000);
@@ -118,22 +133,9 @@ int32_t PIOS_DELAY_WaitmS(uint16_t mS)
  * @brief Query the Delay timer for the current uS 
  * @return A microsecond value
  */
-uint16_t PIOS_DELAY_GetuS()
+uint32_t PIOS_DELAY_GetuS()
 {
 	return DWT_CYCCNT / us_ticks;
-}
-
-/**
- * @brief Compute the difference between now and a reference time
- * @param[in] the reference time to compare now to
- * @return The number of uS since the delay
- * 
- * @note the user is responsible for worrying about rollover on the 16 bit uS counter
- */
-int32_t PIOS_DELAY_DiffuS(uint16_t ref)
-{
-	int32_t ret_t = ref;
-	return (int16_t) (PIOS_DELAY_GetuS() - ret_t);
 }
 
 #endif

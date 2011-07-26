@@ -39,7 +39,7 @@ RUNPATH=/home/croussil/Libs/jafar/build_release/modules/rtslam
 NUM_FILE=nees.log
 MAX_NUM=100
 
-if [[ "$1" -ne "0" ]]; then
+if [[ "$1" != "0" ]]; then
 	# START
 
 	for machine in $MACHINES; do

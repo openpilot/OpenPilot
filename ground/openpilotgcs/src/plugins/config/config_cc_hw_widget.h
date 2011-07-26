@@ -24,35 +24,31 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGTELEMETRYWIDGET_H
-#define CONFIGTELEMETRYWIDGET_H
+#ifndef CONFIGCCHWWIDGET_H
+#define CONFIGCCHWWIDGET_H
 
-#include "ui_telemetry.h"
+#include "ui_cc_hw_settings.h"
 #include "configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include <QtGui/QWidget>
 #include <QList>
+#include "smartsavebutton.h"
 
-
-class ConfigTelemetryWidget: public ConfigTaskWidget
+class ConfigCCHWWidget: public ConfigTaskWidget
 {
     Q_OBJECT
 
 public:
-    ConfigTelemetryWidget(QWidget *parent = 0);
-    ~ConfigTelemetryWidget();
+    ConfigCCHWWidget(QWidget *parent = 0);
+    ~ConfigCCHWWidget();
+private slots:
+    void refreshValues();
+    void widgetsContentsChanged();
 
 private:
-    Ui_TelemetryWidget *m_telemetry;
-    void enableControls(bool enable);
-
-private slots:
-    virtual void refreshValues();
-    void sendTelemetryUpdate();
-    void saveTelemetryUpdate();
-
+    Ui_CC_HW_Widget *m_telemetry;
 };
 
-#endif // ConfigTelemetryWidget_H
+#endif // CONFIGCCHWWIDGET_H

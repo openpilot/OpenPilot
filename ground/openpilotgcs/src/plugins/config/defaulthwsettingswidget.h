@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configgadgetwidget.h
+ * @file       defaultccattitudewidget.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief The Configuration Gadget used to update settings in the firmware
+ * @brief Placeholder for attitude settings widget until board connected.
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,45 +24,32 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGGADGETWIDGET_H
-#define CONFIGGADGETWIDGET_H
+#ifndef DEFAULTHWSETTINGSt_H
+#define DEFAULTHWSETTINGSt_H
 
-#include "uavtalk/telemetrymanager.h"
+#include "ui_defaulthwsettings.h"
+#include "configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
-#include "objectpersistence.h"
 #include <QtGui/QWidget>
-#include <QList>
-//#include <QtWebKit/QWebView>
-#include <QTextBrowser>
-#include "utils/pathutils.h"
+#include <QTimer>
+#include <QMutex>
 
-#include "fancytabwidget.h"
+class Ui_Widget;
 
-
-class ConfigGadgetWidget: public QWidget
+class DefaultHwSettingsWidget : public QWidget
 {
     Q_OBJECT
-    QTextBrowser* help;
 
 public:
-    ConfigGadgetWidget(QWidget *parent = 0);
-    ~ConfigGadgetWidget();
-    enum widgetTabs {hardware=0, aircraft, input, output, ins, stabilization};
+    explicit DefaultHwSettingsWidget(QWidget *parent = 0);
+    ~DefaultHwSettingsWidget();
 
-public slots:
-    void onAutopilotConnect();
-    void onAutopilotDisconnect();
+private slots:
 
-signals:
-    void autopilotConnected();
-    void autopilotDisconnected();
-
-protected:
-        void resizeEvent(QResizeEvent * event);
-        FancyTabWidget *ftw;
-
+private:
+    Ui_defaulthwsettings *ui;
 };
 
-#endif // CONFIGGADGETWIDGET_H
+#endif // DEFAULTHWSETTINGSt_H

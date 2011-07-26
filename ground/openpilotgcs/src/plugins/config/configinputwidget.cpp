@@ -110,10 +110,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     // Get the receiver types supported by OpenPilot and fill the corresponding
     // dropdown menu:
     obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
-    QString fieldName = QString("InputMode");
-    UAVObjectField *field = obj->getField(fieldName);
-    m_config->receiverType->addItems(field->getOptions());
-
+    UAVObjectField * field;
     // Fill in the dropdown menus for the channel RC Input assignement.
     QStringList channelsList;
         channelsList << "None";
@@ -263,7 +260,7 @@ void ConfigInputWidget::refreshValues()
 
     // Update receiver type
     field = obj->getField(QString("InputMode"));
-    m_config->receiverType->setCurrentIndex(m_config->receiverType->findText(field->getValue().toString()));
+    m_config->receiverType->setText(field->getValue().toString());
 
     // Reset all channel assignement dropdowns:
     foreach (QComboBox *combo, inChannelAssign) {
@@ -330,11 +327,6 @@ void ConfigInputWidget::sendRCInputUpdate()
     field = obj->getField(fieldName);
     for (int i = 0; i < 8; i++)
         field->setValue(inSliders[i]->value(), i);
-
-    // Set RC Receiver type:
-    fieldName = QString("InputMode");
-    field = obj->getField(fieldName);
-    field->setValue(m_config->receiverType->currentText());
 
     // Set Roll/Pitch/Yaw/Etc assignement:
     // Rule: if two channels have the same setting (which is wrong!) the higher channel

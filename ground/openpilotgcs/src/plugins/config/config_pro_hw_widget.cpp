@@ -1,8 +1,8 @@
 /**
  ******************************************************************************
  *
- * @file       configgadgetwidget.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @file       configtelemetrywidget.h
+ * @author     E. Lafargue & The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
@@ -24,45 +24,37 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGGADGETWIDGET_H
-#define CONFIGGADGETWIDGET_H
+#include "config_pro_hw_widget.h"
 
-#include "uavtalk/telemetrymanager.h"
-#include "extensionsystem/pluginmanager.h"
-#include "uavobjectmanager.h"
-#include "uavobject.h"
-#include "objectpersistence.h"
+#include <QDebug>
+#include <QStringList>
 #include <QtGui/QWidget>
-#include <QList>
-//#include <QtWebKit/QWebView>
-#include <QTextBrowser>
-#include "utils/pathutils.h"
-
-#include "fancytabwidget.h"
+#include <QtGui/QTextEdit>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QPushButton>
 
 
-class ConfigGadgetWidget: public QWidget
+ConfigProHWWidget::ConfigProHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
-    Q_OBJECT
-    QTextBrowser* help;
+    m_telemetry = new Ui_PRO_HW_Widget();
+    m_telemetry->setupUi(this);
 
-public:
-    ConfigGadgetWidget(QWidget *parent = 0);
-    ~ConfigGadgetWidget();
-    enum widgetTabs {hardware=0, aircraft, input, output, ins, stabilization};
+    setupButtons(m_telemetry->saveTelemetryToRAM,m_telemetry->saveTelemetryToSD);
+    addUAVObjectToWidgetRelation("TelemetrySettings","Speed",m_telemetry->telemetrySpeed);
+    enableControls(false);
+    populateWidgets();
+    refreshWidgetsValues();
+}
 
-public slots:
-    void onAutopilotConnect();
-    void onAutopilotDisconnect();
+ConfigProHWWidget::~ConfigProHWWidget()
+{
+   // Do nothing
+}
 
-signals:
-    void autopilotConnected();
-    void autopilotDisconnected();
 
-protected:
-        void resizeEvent(QResizeEvent * event);
-        FancyTabWidget *ftw;
-
-};
-
-#endif // CONFIGGADGETWIDGET_H
+/**
+  Request telemetry settings from the board
+  */
+void ConfigProHWWidget::refreshValues()
+{
+}

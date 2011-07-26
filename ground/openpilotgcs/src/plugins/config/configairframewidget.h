@@ -58,7 +58,6 @@ private:
     void updateCustomAirframeUI();
     bool setupMixer(double mixerFactors[8][3]);
     void setupMotors(QList<QString> motorList);
-    virtual void enableControls(bool enable);
 
     void resetField(UAVObjectField * field);
     void resetMixer (MixerCurveWidget *mixer, int numElements, double maxvalue);
@@ -74,9 +73,9 @@ private:
     UAVObject::Metadata accInitialData;
 
 private slots:
-    virtual void refreshValues();
-    void sendAircraftUpdate();
-    void saveAircraftUpdate();
+    virtual void refreshWidgetsValues();
+    void updateObjectsFromWidgets();
+   // void saveAircraftUpdate();
     void setupAirframeUI(QString type);
     void toggleAileron2(int index);
     void toggleElevator2(int index);

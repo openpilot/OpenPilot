@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configgadgetwidget.h
+ * @file       DefaultHwSettingsWidget.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief The Configuration Gadget used to update settings in the firmware
+ * @brief Placeholder for attitude panel until board is connected.
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,45 +24,21 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGGADGETWIDGET_H
-#define CONFIGGADGETWIDGET_H
+#include "defaulthwsettingswidget.h"
+#include "ui_defaultattitude.h"
+#include <QMutexLocker>
+#include <QErrorMessage>
+#include <QDebug>
 
-#include "uavtalk/telemetrymanager.h"
-#include "extensionsystem/pluginmanager.h"
-#include "uavobjectmanager.h"
-#include "uavobject.h"
-#include "objectpersistence.h"
-#include <QtGui/QWidget>
-#include <QList>
-//#include <QtWebKit/QWebView>
-#include <QTextBrowser>
-#include "utils/pathutils.h"
-
-#include "fancytabwidget.h"
-
-
-class ConfigGadgetWidget: public QWidget
+DefaultHwSettingsWidget::DefaultHwSettingsWidget(QWidget *parent) :
+        QWidget(parent),
+        ui(new Ui_defaulthwsettings)
 {
-    Q_OBJECT
-    QTextBrowser* help;
+    ui->setupUi(this);
+}
 
-public:
-    ConfigGadgetWidget(QWidget *parent = 0);
-    ~ConfigGadgetWidget();
-    enum widgetTabs {hardware=0, aircraft, input, output, ins, stabilization};
+DefaultHwSettingsWidget::~DefaultHwSettingsWidget()
+{
+    delete ui;
+}
 
-public slots:
-    void onAutopilotConnect();
-    void onAutopilotDisconnect();
-
-signals:
-    void autopilotConnected();
-    void autopilotDisconnected();
-
-protected:
-        void resizeEvent(QResizeEvent * event);
-        FancyTabWidget *ftw;
-
-};
-
-#endif // CONFIGGADGETWIDGET_H

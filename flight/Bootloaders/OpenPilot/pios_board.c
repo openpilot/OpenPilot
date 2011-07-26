@@ -60,7 +60,6 @@ const struct pios_spi_cfg
 					.ahb_clk = RCC_AHBPeriph_DMA1,
 
 					.irq = {
-						.handler = NULL,
 						.flags = (DMA1_FLAG_TC4 | DMA1_FLAG_TE4 | DMA1_FLAG_HT4 | DMA1_FLAG_GL4),
 						.init = {
 							.NVIC_IRQChannel = DMA1_Channel4_IRQn,
@@ -157,7 +156,6 @@ const struct pios_usart_cfg pios_usart_telem_cfg = {
 		.USART_HardwareFlowControl = USART_HardwareFlowControl_None,
 		.USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
 	}, .irq = {
-		.handler = NULL,
 		.init = {
 			.NVIC_IRQChannel = USART2_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
@@ -188,6 +186,21 @@ const struct pios_usart_cfg pios_usart_telem_cfg = {
 
 #endif	/* PIOS_INCLUDE_COM */
 
+#if defined(PIOS_INCLUDE_USB_HID)
+#include "pios_usb_hid_priv.h"
+
+static const struct pios_usb_hid_cfg pios_usb_hid_main_cfg = {
+  .irq = {
+    .init    = {
+      .NVIC_IRQChannel                   = USB_LP_CAN1_RX0_IRQn,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+      .NVIC_IRQChannelSubPriority        = 0,
+      .NVIC_IRQChannelCmd                = ENABLE,
+    },
+  },
+};
+#endif	/* PIOS_INCLUDE_USB_HID */
+
 extern const struct pios_com_driver pios_usb_com_driver;
 
 uint32_t pios_com_telem_rf_id;
@@ -200,7 +213,11 @@ uint32_t pios_com_telem_usb_id;
  * initializes all the core subsystems on this specific hardware
  * called from System/openpilot.c
  */
+static bool board_init_complete = false;
 void PIOS_Board_Init(void) {
+	if (board_init_complete) {
+		return;
+	}
 
 	/* Enable Prefetch Buffer */
 	FLASH_PrefetchBufferCmd(FLASH_PrefetchBuffer_Enable);
@@ -226,13 +243,14 @@ void PIOS_Board_Init(void) {
 	PIOS_GPIO_Init();
 
 #if defined(PIOS_INCLUDE_USB_HID)
-	PIOS_USB_HID_Init(0);
+	uint32_t pios_usb_hid_id;
+	PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_main_cfg);
 #if defined(PIOS_INCLUDE_COM)
-	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, 0)) {
-		PIOS_DEBUG_Assert(0);
+	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, pios_usb_hid_id)) {
+		PIOS_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_COM */
-#endif  /* PIOS_INCLUDE_USB_HID */
+#endif	/* PIOS_INCLUDE_USB_HID */
 
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);//TODO Tirar
 
@@ -243,6 +261,8 @@ void PIOS_Board_Init(void) {
 
 	/* Bind the AHRS comms layer to the AHRS SPI link */
 	PIOS_OPAHRS_Attach(pios_spi_ahrs_id);
+
+	board_init_complete = true;
 }
 
 /**

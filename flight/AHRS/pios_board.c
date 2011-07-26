@@ -54,7 +54,6 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
 		.ahb_clk = RCC_AHBPeriph_DMA1,
 
 		.irq = {
-			.handler = NULL,
 			.flags =
 			(DMA1_FLAG_TC4 | DMA1_FLAG_TE4 | DMA1_FLAG_HT4 |
 			 DMA1_FLAG_GL4),
@@ -157,7 +156,6 @@ static const struct pios_adc_cfg pios_adc_cfg = {
 	.dma = {
 		.ahb_clk  = RCC_AHBPeriph_DMA1,
 		.irq = {
-			.handler = NULL,
 			.flags   = (DMA1_FLAG_TC1 | DMA1_FLAG_TE1 | DMA1_FLAG_HT1 | DMA1_FLAG_GL1),
 			.init    = {
 				.NVIC_IRQChannel                   = DMA1_Channel1_IRQn,
@@ -217,7 +215,6 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 		 .USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
 		 },
 	.irq = {
-		.handler = NULL,
 		.init = {
 			 .NVIC_IRQChannel = USART3_IRQn,
 			 .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
@@ -294,7 +291,6 @@ static const struct pios_i2c_adapter_cfg pios_i2c_main_adapter_cfg = {
 			 },
 		},
 	.event = {
-		  .handler = NULL,
 		  .flags = 0,	/* FIXME: check this */
 		  .init = {
 			   .NVIC_IRQChannel = I2C1_EV_IRQn,
@@ -304,7 +300,6 @@ static const struct pios_i2c_adapter_cfg pios_i2c_main_adapter_cfg = {
 			   },
 		  },
 	.error = {
-		  .handler = NULL,
 		  .flags = 0,	/* FIXME: check this */
 		  .init = {
 			   .NVIC_IRQChannel = I2C1_ER_IRQn,

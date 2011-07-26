@@ -203,10 +203,9 @@ uint32_t LedPWM(uint32_t pwm_period, uint32_t pwm_sweep_steps, uint32_t count) {
 
 uint8_t processRX() {
 	while (PIOS_COM_ReceiveBufferUsed(PIOS_COM_TELEM_USB) >= 63) {
-		for (int32_t x = 0; x < 63; ++x) {
-			mReceive_Buffer[x] = PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_USB);
+		if (PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_USB, mReceive_Buffer, 63, 0) == 63) {
+			processComand(mReceive_Buffer);
 		}
-		processComand(mReceive_Buffer);
 	}
 	return TRUE;
 }

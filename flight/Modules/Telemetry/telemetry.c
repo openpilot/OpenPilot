@@ -305,7 +305,6 @@ static void telemetryTxPriTask(void *parameters)
 static void telemetryRxTask(void *parameters)
 {
 	uint32_t inputPort;
-	int32_t len;
 
 	// Task loop
 	while (1) {
@@ -320,13 +319,15 @@ static void telemetryRxTask(void *parameters)
 		}
 
 		// Block until data are available
-		// TODO: Currently we periodically check the buffer for data, update once the PIOS_COM is made blocking
-		len = PIOS_COM_ReceiveBufferUsed(inputPort);
-		for (int32_t n = 0; n < len; ++n) {
-			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(inputPort));
-		}
-		vTaskDelay(5);	// <- remove when blocking calls are implemented
+		uint8_t serial_data[1];
+		uint16_t bytes_to_process;
 
+		bytes_to_process = PIOS_COM_ReceiveBuffer(inputPort, serial_data, sizeof(serial_data), 500);
+		if (bytes_to_process > 0) {
+			for (uint8_t i = 0; i < bytes_to_process; i++) {
+				UAVTalkProcessInputStream(serial_data[i]);
+			}
+		}
 	}
 }
 

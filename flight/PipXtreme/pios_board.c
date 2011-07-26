@@ -90,7 +90,6 @@ static const struct pios_spi_cfg pios_spi_port_cfg =
 		.ahb_clk = RCC_AHBPeriph_DMA1,
 		.irq =
 		{
-			.handler = NULL,
 		      .flags   = (DMA1_FLAG_TC2 | DMA1_FLAG_TE2 | DMA1_FLAG_HT2 | DMA1_FLAG_GL2),
 		      .init    = {
 			.NVIC_IRQChannel                   = DMA1_Channel2_IRQn,
@@ -193,7 +192,6 @@ static const struct pios_adc_cfg pios_adc_cfg = {
 	.dma = {
 		.ahb_clk  = RCC_AHBPeriph_DMA1,
 		.irq = {
-			.handler = NULL,
 			.flags   = (DMA1_FLAG_TC1 | DMA1_FLAG_TE1 | DMA1_FLAG_HT1 | DMA1_FLAG_GL1),
 			.init    = {
 				.NVIC_IRQChannel                   = DMA1_Channel1_IRQn,
@@ -259,7 +257,6 @@ static const struct pios_usart_cfg pios_usart_serial_cfg =
 	},
 	.irq =
 	{
-		.handler = NULL,
 		.init =
 		{
 			.NVIC_IRQChannel = USART1_IRQn,
@@ -302,6 +299,21 @@ static const struct pios_usart_cfg pios_usart_serial_cfg =
 
 // ***********************************************************************************
 
+#if defined(PIOS_INCLUDE_USB_HID)
+#include "pios_usb_hid_priv.h"
+
+static const struct pios_usb_hid_cfg pios_usb_hid_main_cfg = {
+  .irq = {
+    .init    = {
+      .NVIC_IRQChannel                   = USB_LP_CAN1_RX0_IRQn,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+      .NVIC_IRQChannelSubPriority        = 0,
+      .NVIC_IRQChannelCmd                = ENABLE,
+    },
+  },
+};
+#endif	/* PIOS_INCLUDE_USB_HID */
+
 extern const struct pios_com_driver pios_usb_com_driver;
 
 uint32_t pios_com_serial_id;
@@ -334,13 +346,14 @@ void PIOS_Board_Init(void) {
 	}
 
 #if defined(PIOS_INCLUDE_USB_HID)
-	PIOS_USB_HID_Init(0);
+	uint32_t pios_usb_hid_id;
+	PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_main_cfg);
 #if defined(PIOS_INCLUDE_COM)
-	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, 0)) {
-		PIOS_DEBUG_Assert(0);
+	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, pios_usb_hid_id)) {
+		PIOS_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_COM */
-#endif  /* PIOS_INCLUDE_USB_HID */
+#endif	/* PIOS_INCLUDE_USB_HID */
 
 	// ADC system
 	// PIOS_ADC_Init();

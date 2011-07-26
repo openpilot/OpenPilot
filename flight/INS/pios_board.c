@@ -61,7 +61,6 @@ static const struct pios_spi_cfg pios_spi_op_mag_cfg = {
 		.ahb_clk = RCC_AHBPeriph_DMA1,
 
 		.irq = {
-			.handler = NULL,
 			.flags =
 			(DMA1_FLAG_TC4 | DMA1_FLAG_TE4 | DMA1_FLAG_HT4 |
 			 DMA1_FLAG_GL4),
@@ -175,7 +174,6 @@ static const struct pios_spi_cfg pios_spi_accel_cfg = {
 			.ahb_clk  = RCC_AHBPeriph_DMA1,
 
 			.irq = {
-					.handler = NULL,
 					.flags   = (DMA1_FLAG_TC2 | DMA1_FLAG_TE2 | DMA1_FLAG_HT2 | DMA1_FLAG_GL2),
 					.init    = {
 							.NVIC_IRQChannel                   = DMA1_Channel2_IRQn,
@@ -277,7 +275,6 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
 		 .USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
 		 },
 	.irq = {
-		.handler = NULL,
 		.init = {
 			 .NVIC_IRQChannel = USART1_IRQn,
 			 .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
@@ -321,7 +318,6 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 		 .USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
 		 },
 	.irq = {
-		.handler = NULL,
 		.init = {
 			 .NVIC_IRQChannel = USART4_IRQn,
 			 .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
@@ -393,7 +389,6 @@ static const struct pios_i2c_adapter_cfg pios_i2c_pres_mag_adapter_cfg = {
 			 },
 		},
 	.event = {
-		  .handler = NULL,
 		  .flags = 0,	/* FIXME: check this */
 		  .init = {
 			   .NVIC_IRQChannel = I2C1_EV_IRQn,
@@ -403,7 +398,6 @@ static const struct pios_i2c_adapter_cfg pios_i2c_pres_mag_adapter_cfg = {
 			   },
 		  },
 	.error = {
-		  .handler = NULL,
 		  .flags = 0,	/* FIXME: check this */
 		  .init = {
 			   .NVIC_IRQChannel = I2C1_ER_IRQn,
@@ -461,7 +455,6 @@ static const struct pios_i2c_adapter_cfg pios_i2c_gyro_adapter_cfg = {
     },
   },
   .event = {
-    .handler = NULL,
     .flags   = 0,		/* FIXME: check this */
     .init = {
       .NVIC_IRQChannel                   = I2C2_EV_IRQn,
@@ -471,7 +464,6 @@ static const struct pios_i2c_adapter_cfg pios_i2c_gyro_adapter_cfg = {
     },
   },
   .error = {
-    .handler = NULL,
     .flags   = 0,		/* FIXME: check this */
     .init = {
       .NVIC_IRQChannel                   = I2C2_ER_IRQn,

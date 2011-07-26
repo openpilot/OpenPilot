@@ -34,7 +34,35 @@
 
 #if defined(PIOS_INCLUDE_COM)
 
+#include "fifo_buffer.h"
 #include <pios_com_priv.h>
+
+#if !defined(PIOS_INCLUDE_FREERTOS)
+#include "pios_delay.h"		/* PIOS_DELAY_WaitmS */
+#endif
+
+enum pios_com_dev_magic {
+  PIOS_COM_DEV_MAGIC = 0xaa55aa55,
+};
+
+struct pios_com_dev {
+	enum pios_com_dev_magic magic;
+	uint32_t lower_id;
+	const struct pios_com_driver * driver;
+
+#if defined(PIOS_INCLUDE_FREERTOS)
+	xSemaphoreHandle tx_sem;
+	xSemaphoreHandle rx_sem;
+#endif
+
+	// align to 32-bit to try and provide speed improvement;
+	uint8_t rx_buffer[PIOS_COM_RX_BUFFER_SIZE] __attribute__ ((aligned(4)));
+	t_fifo_buffer rx;
+
+	// align to 32-bit to try and provide speed improvement;
+        uint8_t tx_buffer[PIOS_COM_TX_BUFFER_SIZE] __attribute__ ((aligned(4)));
+	t_fifo_buffer tx;
+};
 
 static bool PIOS_COM_validate(struct pios_com_dev * com_dev)
 {
@@ -70,6 +98,11 @@ static struct pios_com_dev * PIOS_COM_alloc(void)
 }
 #endif
 
+static uint16_t PIOS_COM_TxOutCallback(uint32_t context, uint8_t * buf, uint16_t buf_len, uint16_t * headroom, bool * need_yield);
+static uint16_t PIOS_COM_RxInCallback(uint32_t context, uint8_t * buf, uint16_t buf_len, uint16_t * headroom, bool * need_yield);
+static void PIOS_COM_UnblockRx(struct pios_com_dev * com_dev, bool * need_yield);
+static void PIOS_COM_UnblockTx(struct pios_com_dev * com_dev, bool * need_yield);
+
 /**
   * Initialises COM layer
   * \param[out] handle
@@ -77,24 +110,124 @@ static struct pios_com_dev * PIOS_COM_alloc(void)
   * \param[in] id
   * \return < 0 if initialisation failed
   */
-int32_t PIOS_COM_Init(uint32_t * com_id, const struct pios_com_driver * driver, const uint32_t lower_id)
+int32_t PIOS_COM_Init(uint32_t * com_id, const struct pios_com_driver * driver, uint32_t lower_id)
 {
-	PIOS_DEBUG_Assert(com_id);
-	PIOS_DEBUG_Assert(driver);
+	PIOS_Assert(com_id);
+	PIOS_Assert(driver);
+	PIOS_Assert(driver->bind_tx_cb);
+	PIOS_Assert(driver->bind_rx_cb);
 
 	struct pios_com_dev * com_dev;
 
 	com_dev = (struct pios_com_dev *) PIOS_COM_alloc();
 	if (!com_dev) goto out_fail;
 
-	com_dev->driver = driver;
-	com_dev->id     = lower_id;
+	com_dev->driver   = driver;
+	com_dev->lower_id = lower_id;
 
+	/* Clear buffer counters */
+	fifoBuf_init(&com_dev->rx, com_dev->rx_buffer, sizeof(com_dev->rx_buffer));
+	fifoBuf_init(&com_dev->tx, com_dev->tx_buffer, sizeof(com_dev->tx_buffer));
+
+#if defined(PIOS_INCLUDE_FREERTOS)
+	/* Create semaphores before binding callbacks */
+	vSemaphoreCreateBinary(com_dev->rx_sem);
+	vSemaphoreCreateBinary(com_dev->tx_sem);
+#endif
+	/* Bind our callbacks into the lower layer */
+	(com_dev->driver->bind_rx_cb)(lower_id, PIOS_COM_RxInCallback, (uint32_t)com_dev);
+	(com_dev->driver->bind_tx_cb)(lower_id, PIOS_COM_TxOutCallback, (uint32_t)com_dev);
+
+	if (com_dev->driver->rx_start) {
+		/* Start the receiver */
+		(com_dev->driver->rx_start)(com_dev->lower_id,
+					    fifoBuf_getFree(&com_dev->rx));
+	}
 	*com_id = (uint32_t)com_dev;
 	return(0);
 
 out_fail:
 	return(-1);
+}
+
+static void PIOS_COM_UnblockRx(struct pios_com_dev * com_dev, bool * need_yield)
+{
+#if defined(PIOS_INCLUDE_FREERTOS)
+	static signed portBASE_TYPE xHigherPriorityTaskWoken;
+	xSemaphoreGiveFromISR(com_dev->rx_sem, &xHigherPriorityTaskWoken);
+
+	if (xHigherPriorityTaskWoken != pdFALSE) {
+		*need_yield = true;
+	} else {
+		*need_yield = false;
+	}
+#else
+	*need_yield = false;
+#endif
+}
+
+static void PIOS_COM_UnblockTx(struct pios_com_dev * com_dev, bool * need_yield)
+{
+#if defined(PIOS_INCLUDE_FREERTOS)
+	static signed portBASE_TYPE xHigherPriorityTaskWoken;
+	xSemaphoreGiveFromISR(com_dev->tx_sem, &xHigherPriorityTaskWoken);
+
+	if (xHigherPriorityTaskWoken != pdFALSE) {
+		*need_yield = true;
+	} else {
+		*need_yield = false;
+	}
+#else
+	*need_yield = false;
+#endif
+}
+
+static uint16_t PIOS_COM_RxInCallback(uint32_t context, uint8_t * buf, uint16_t buf_len, uint16_t * headroom, bool * need_yield)
+{
+	struct pios_com_dev * com_dev = (struct pios_com_dev *)context;
+
+	bool valid = PIOS_COM_validate(com_dev);
+	PIOS_Assert(valid);
+
+	PIOS_IRQ_Disable();
+	uint16_t bytes_into_fifo = fifoBuf_putData(&com_dev->rx, buf, buf_len);
+	PIOS_IRQ_Enable();
+
+	if (bytes_into_fifo > 0) {
+		/* Data has been added to the buffer */
+		PIOS_COM_UnblockRx(com_dev, need_yield);
+	}
+
+	if (headroom) {
+		*headroom = fifoBuf_getFree(&com_dev->rx);
+	}
+
+	return (bytes_into_fifo);
+}
+
+static uint16_t PIOS_COM_TxOutCallback(uint32_t context, uint8_t * buf, uint16_t buf_len, uint16_t * headroom, bool * need_yield)
+{
+	struct pios_com_dev * com_dev = (struct pios_com_dev *)context;
+
+	bool valid = PIOS_COM_validate(com_dev);
+	PIOS_Assert(valid);
+	PIOS_Assert(buf);
+	PIOS_Assert(buf_len);
+
+	PIOS_IRQ_Disable();
+	uint16_t bytes_from_fifo = fifoBuf_getData(&com_dev->tx, buf, buf_len);
+	PIOS_IRQ_Enable();
+
+	if (bytes_from_fifo > 0) {
+		/* More space has been made in the buffer */
+		PIOS_COM_UnblockTx(com_dev, need_yield);
+	}
+
+	if (headroom) {
+		*headroom = fifoBuf_getUsed(&com_dev->tx);
+	}
+
+	return (bytes_from_fifo);
 }
 
 /**
@@ -115,7 +248,7 @@ int32_t PIOS_COM_ChangeBaud(uint32_t com_id, uint32_t baud)
 
 	/* Invoke the driver function if it exists */
 	if (com_dev->driver->set_baud) {
-		com_dev->driver->set_baud(com_dev->id, baud);
+		com_dev->driver->set_baud(com_dev->lower_id, baud);
 	}
 
 	return 0;
@@ -140,12 +273,24 @@ int32_t PIOS_COM_SendBufferNonBlocking(uint32_t com_id, const uint8_t *buffer, u
 		return -1;
 	}
 
-	/* Invoke the driver function if it exists */
-	if (com_dev->driver->tx_nb) {
-		return com_dev->driver->tx_nb(com_dev->id, buffer, len);
+	if (len >= fifoBuf_getFree(&com_dev->tx)) {
+		/* Buffer cannot accept all requested bytes (retry) */
+		return -2;
 	}
 
-	return 0;
+	PIOS_IRQ_Disable();
+	uint16_t bytes_into_fifo = fifoBuf_putData(&com_dev->tx, buffer, len);
+	PIOS_IRQ_Enable();
+
+	if (bytes_into_fifo > 0) {
+		/* More data has been put in the tx buffer, make sure the tx is started */
+		if (com_dev->driver->tx_start) {
+			com_dev->driver->tx_start(com_dev->lower_id,
+						  fifoBuf_getUsed(&com_dev->tx));
+		}
+	}
+
+	return (0);
 }
 
 /**
@@ -166,12 +311,25 @@ int32_t PIOS_COM_SendBuffer(uint32_t com_id, const uint8_t *buffer, uint16_t len
 		return -1;
 	}
 
-	/* Invoke the driver function if it exists */
-	if (com_dev->driver->tx) {
-		return com_dev->driver->tx(com_dev->id, buffer, len);
-	}
+	int32_t rc;
+	do {
+	  rc = PIOS_COM_SendBufferNonBlocking(com_id, buffer, len);
 
-	return 0;
+#if defined(PIOS_INCLUDE_FREERTOS)
+	  if (rc == -2) {
+	    /* Make sure the transmitter is running while we wait */
+	    if (com_dev->driver->tx_start) {
+	      (com_dev->driver->tx_start)(com_dev->lower_id,
+					  fifoBuf_getUsed(&com_dev->tx));
+	    }
+	    if (xSemaphoreTake(com_dev->tx_sem, portMAX_DELAY) != pdTRUE) {
+	      return -3;
+	    }
+	  }
+#endif
+	} while (rc == -2);
+
+	return rc;
 }
 
 /**
@@ -273,18 +431,46 @@ int32_t PIOS_COM_SendFormattedString(uint32_t com_id, const char *format, ...)
 * \param[in] port COM port
 * \returns Byte from buffer
 */
-uint8_t PIOS_COM_ReceiveBuffer(uint32_t com_id)
+uint16_t PIOS_COM_ReceiveBuffer(uint32_t com_id, uint8_t * buf, uint16_t buf_len, uint32_t timeout_ms)
 {
+	PIOS_Assert(buf);
+	PIOS_Assert(buf_len);
+
 	struct pios_com_dev * com_dev = (struct pios_com_dev *)com_id;
 
 	if (!PIOS_COM_validate(com_dev)) {
 		/* Undefined COM port for this board (see pios_board.c) */
-		PIOS_DEBUG_Assert(0);
+		PIOS_Assert(0);
 	}
 
-	PIOS_DEBUG_Assert(com_dev->driver->rx);
+ check_again:
+	PIOS_IRQ_Disable();
+	uint16_t bytes_from_fifo = fifoBuf_getData(&com_dev->rx, buf, buf_len);
+	PIOS_IRQ_Enable();
 
-	return com_dev->driver->rx(com_dev->id);
+	if (bytes_from_fifo == 0 && timeout_ms > 0) {
+		/* No more bytes in receive buffer */
+		/* Make sure the receiver is running while we wait */
+		if (com_dev->driver->rx_start) {
+			/* Notify the lower layer that there is now room in the rx buffer */
+			(com_dev->driver->rx_start)(com_dev->lower_id,
+						    fifoBuf_getFree(&com_dev->rx));
+		}
+#if defined(PIOS_INCLUDE_FREERTOS)
+		if (xSemaphoreTake(com_dev->rx_sem, timeout_ms / portTICK_RATE_MS) == pdTRUE) {
+			/* Make sure we don't come back here again */
+			timeout_ms = 0;
+			goto check_again;
+		}
+#else
+		PIOS_DELAY_WaitmS(1);
+		timeout_ms--;
+		goto check_again;
+#endif
+	}
+
+	/* Return received byte */
+	return (bytes_from_fifo);
 }
 
 /**
@@ -298,16 +484,10 @@ int32_t PIOS_COM_ReceiveBufferUsed(uint32_t com_id)
 
 	if (!PIOS_COM_validate(com_dev)) {
 		/* Undefined COM port for this board (see pios_board.c) */
-		/* This is commented out so com_id=NULL can be used to disable telemetry */
-		//PIOS_DEBUG_Assert(0);
-		return 0;
+		PIOS_Assert(0);
 	}
 
-	if (!com_dev->driver->rx_avail) {
-		return 0;
-	}
-
-	return com_dev->driver->rx_avail(com_dev->id);
+	return (fifoBuf_getUsed(&com_dev->rx));
 }
 
 #endif

@@ -34,16 +34,6 @@
 
 #include <pios.h>
 
-enum pios_com_dev_magic {
-  PIOS_COM_DEV_MAGIC = 0xaa55aa55,
-};
-
-struct pios_com_dev {
-	enum pios_com_dev_magic magic;
-	uint32_t id;
-	const struct pios_com_driver * driver;
-};
-
 extern int32_t PIOS_COM_ReceiveHandler(uint32_t com_id);
 
 #endif /* PIOS_COM_PRIV_H */

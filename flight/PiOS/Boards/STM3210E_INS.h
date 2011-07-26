@@ -125,15 +125,14 @@ extern uint32_t pios_i2c_gyro_adapter_id;
 //-------------------------
 #define PIOS_USART_MAX_DEVS             2
 
-#define PIOS_USART_RX_BUFFER_SIZE       256
-#define PIOS_USART_TX_BUFFER_SIZE       256
-
 //-------------------------
 // PIOS_COM
 //
 // See also pios_board.c
 //-------------------------
 #define PIOS_COM_MAX_DEVS               2
+#define PIOS_COM_RX_BUFFER_SIZE			256
+#define PIOS_COM_TX_BUFFER_SIZE			256
 
 extern uint32_t pios_com_gps_id;
 #define PIOS_COM_GPS                    (pios_com_gps_id)

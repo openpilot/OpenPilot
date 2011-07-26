@@ -44,9 +44,9 @@ const struct pios_rcvr_driver pios_ppm_rcvr_driver = {
 #define PIOS_PPM_IN_MIN_NUM_CHANNELS		4
 #define PIOS_PPM_IN_MAX_NUM_CHANNELS		PIOS_PPM_NUM_INPUTS
 #define PIOS_PPM_STABLE_CHANNEL_COUNT		25	// frames
-#define PIOS_PPM_IN_MIN_SYNC_PULSE_US		7000	// microseconds
+#define PIOS_PPM_IN_MIN_SYNC_PULSE_US		3800	// microseconds
 #define PIOS_PPM_IN_MIN_CHANNEL_PULSE_US	750	// microseconds
-#define PIOS_PPM_IN_MAX_CHANNEL_PULSE_US	2400   // microseconds
+#define PIOS_PPM_IN_MAX_CHANNEL_PULSE_US	2250   // microseconds
 #define PIOS_PPM_INPUT_INVALID			0
 
 /* Local Variables */
@@ -170,7 +170,7 @@ void PIOS_PPM_Init(void)
 static int32_t PIOS_PPM_Get(uint32_t rcvr_id, uint8_t channel)
 {
 	/* Return error if channel not available */
-	if (channel > PIOS_PPM_IN_MAX_NUM_CHANNELS) {
+	if (channel >= PIOS_PPM_IN_MAX_NUM_CHANNELS) {
 		return -1;
 	}
 	return CaptureValue[channel];

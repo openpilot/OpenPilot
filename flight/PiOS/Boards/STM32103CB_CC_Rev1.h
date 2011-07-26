@@ -231,7 +231,7 @@ extern uint32_t pios_com_sbus_id;
 //-------------------------
 // Receiver PPM input
 //-------------------------
-#define PIOS_PPM_NUM_INPUTS                     8
+#define PIOS_PPM_NUM_INPUTS                     12
 
 //-------------------------
 // Receiver PWM input

@@ -8,6 +8,7 @@ smartSaveButton::smartSaveButton(QPushButton * update, QPushButton * save):bupda
 }
 void smartSaveButton::processClick()
 {
+    emit beginOp();
     bool save=false;
     QPushButton *button=bupdate;
     if(sender()==bsave)
@@ -23,6 +24,7 @@ void smartSaveButton::processClick()
     bool error=false;
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
+    qDebug()<<"smartbutton:save";
     foreach(UAVObject * obj,objects)
     {
         up_result=false;
@@ -73,11 +75,13 @@ void smartSaveButton::processClick()
     if(!error)
     {
         button->setIcon(QIcon(":/uploader/images/dialog-apply.svg"));
+        emit saveSuccessfull();
     }
     else
     {
         button->setIcon(QIcon(":/uploader/images/process-stop.svg"));
     }
+    emit endOp();
 }
 
 void smartSaveButton::setObjects(QList<UAVObject *> list)

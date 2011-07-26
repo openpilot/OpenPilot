@@ -10,6 +10,7 @@
 #include <QEventLoop>
 #include "uavobjectutilmanager.h"
 #include <QObject>
+#include <QDebug>
 class smartSaveButton:public QObject
 {
 public:
@@ -21,6 +22,9 @@ public:
     void clearObjects();
 signals:
     void preProcessOperations();
+    void saveSuccessfull();
+    void beginOp();
+    void endOp();
 private slots:
     void processClick();
     void transaction_finished(UAVObject* obj, bool result);

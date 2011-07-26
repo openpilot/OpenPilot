@@ -39,10 +39,10 @@ ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_telemetry = new Ui_CC_HW_Widget();
     m_telemetry->setupUi(this);
     setupButtons(m_telemetry->saveTelemetryToRAM,m_telemetry->saveTelemetryToSD);
-    addObjectToWidget("TelemetrySettings","Speed",m_telemetry->telemetrySpeed);
-    addObjectToWidget("HwSettings","CC_FlexiPort",m_telemetry->cbFlexi);
-    addObjectToWidget("HwSettings","CC_MainPort",m_telemetry->cbTele);
-    addObjectToWidget("ManualControlSettings","InputMode",m_telemetry->receiverType);
+    addUAVObjectToWidgetRelation("TelemetrySettings","Speed",m_telemetry->telemetrySpeed);
+    addUAVObjectToWidgetRelation("HwSettings","CC_FlexiPort",m_telemetry->cbFlexi);
+    addUAVObjectToWidgetRelation("HwSettings","CC_MainPort",m_telemetry->cbTele);
+    addUAVObjectToWidgetRelation("ManualControlSettings","InputMode",m_telemetry->receiverType);
     enableControls(false);
     populateWidgets();
     refreshWidgetsValues();
@@ -59,26 +59,27 @@ void ConfigCCHWWidget::refreshValues()
 
 void ConfigCCHWWidget::widgetsContentsChanged()
 {
+    ConfigTaskWidget::widgetsContentsChanged();
     enableControls(false);
     if((m_telemetry->cbFlexi->currentText()==m_telemetry->cbTele->currentText()) && m_telemetry->cbTele->currentText()!="Disabled")
     {
-        m_telemetry->problems->setText("Warning-You have configured the main port and the flexi port for the same function, this is currently not suported");
+        m_telemetry->problems->setText("Warning: you have configured the MainPort and the FlexiPort for the same function, this is currently not suported");
     }
     else if((m_telemetry->cbTele->currentText()=="Spektrum" ||m_telemetry->cbFlexi->currentText()=="Spektrum") && m_telemetry->receiverType->currentText()!="Spektrum")
     {
-        m_telemetry->problems->setText("Warning-You have at least one port configured as 'Spektrum' however thats not your selected input type");
+        m_telemetry->problems->setText("Warning: you have at least one port configured as 'Spektrum' however that is not your selected input type");
     }
     else if(m_telemetry->cbTele->currentText()=="S.Bus"  && m_telemetry->receiverType->currentText()!="S.Bus")
     {
-        m_telemetry->problems->setText("Warning-You have at least one port configured as 'S.Bus' however thats not your selected input type");
+        m_telemetry->problems->setText("Warning: you have at least one port configured as 'S.Bus' however that is not your selected input type");
     }
     else if(m_telemetry->cbTele->currentText()!="S.Bus"  && m_telemetry->receiverType->currentText()=="S.Bus")
     {
-        m_telemetry->problems->setText("Warning-You have at selected 'S.Bus' as your input type however you have no port configured for that protocol");
+        m_telemetry->problems->setText("Warning: you have selected 'S.Bus' as your input type however you have no port configured for that protocol");
     }
     else if((m_telemetry->cbTele->currentText()!="Spektrum" && m_telemetry->cbFlexi->currentText()!="Spektrum") && m_telemetry->receiverType->currentText()=="Spektrum")
     {
-        m_telemetry->problems->setText("Warning-You have at selected 'Spektrum' as your input type however you have no port configured for that protocol");
+        m_telemetry->problems->setText("Warning: you have at selected 'Spektrum' as your input type however you have no port configured for that protocol");
     }
     else
     {

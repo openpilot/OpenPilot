@@ -24,7 +24,6 @@ void smartSaveButton::processClick()
     bool error=false;
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
-    qDebug()<<"smartbutton:save";
     foreach(UAVObject * obj,objects)
     {
         up_result=false;

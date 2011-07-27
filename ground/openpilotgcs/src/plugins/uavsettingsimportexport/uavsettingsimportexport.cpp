@@ -218,10 +218,21 @@ QString UAVSettingsImportExportPlugin::createXMLDocument(
     QDomDocument doc(docName);
     QDomElement root = doc.createElement(isSettings ? "settings" : "data");
     doc.appendChild(root);
+    QDomElement versionInfo =doc.createElement("versionInfo");
+    root.appendChild(versionInfo);
+    QDomElement fw=doc.createElement("Embedded");
+    UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
 
+    fw.setAttribute("gitcommittag",utilMngr->getBoardDescriptionStruct().gitTag);
+    fw.setAttribute("fwtag",utilMngr->getBoardDescriptionStruct().description);
+    fw.setAttribute("cpuSerial",QString(utilMngr->getBoardCPUSerial().toHex()));
+
+    versionInfo.appendChild(fw);
+    QDomElement gcs=doc.createElement("GCS");
+    gcs.setAttribute("revision",QString::fromLatin1(Core::Constants::GCS_REVISION_STR));
+    versionInfo.appendChild(gcs);
     // iterate over settings objects
     QList< QList<UAVDataObject*> > objList = objManager->getDataObjects();
-
     foreach (QList<UAVDataObject*> list, objList) {
         foreach (UAVDataObject* obj, list) {
             if (obj->isSettings() == isSettings) {

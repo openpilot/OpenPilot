@@ -30,7 +30,7 @@
 #include <extensionsystem/iplugin.h> 
 #include "uavobjectutil/uavobjectutilmanager.h"
 #include "importsummary.h"
-
+#include "../../../../../build/ground/openpilotgcs/gcsversioninfo.h"
 class UAVSettingsImportExportPlugin : public ExtensionSystem::IPlugin 
 { 
     Q_OBJECT

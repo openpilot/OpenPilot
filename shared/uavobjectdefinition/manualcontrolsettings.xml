@@ -1,7 +1,7 @@
 <xml>
     <object name="ManualControlSettings" singleinstance="true" settings="true">
         <description>Settings to indicate how to decode receiver input by @ref ManualControlModule.</description>
-        <field name="InputMode" units="" type="enum" elements="1" options="PWM,PPM,Spektrum,S.Bus" defaultvalue="PWM"/>
+        <field name="InputMode" units="" type="enum" elements="1" options="PWM,PPM,Spektrum,S.Bus,GCS" defaultvalue="PWM"/>
         <field name="Roll" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
         <field name="Pitch" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>
         <field name="Yaw" units="channel" type="enum" elements="1" options="Channel1,Channel2,Channel3,Channel4,Channel5,Channel6,Channel7,Channel8,None" defaultvalue="None"/>

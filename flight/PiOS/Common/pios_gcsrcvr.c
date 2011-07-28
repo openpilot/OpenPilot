@@ -2,13 +2,13 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS_SPEKTRUM SPEKTRUM Functions
- * @brief PIOS interface to read and write from spektrum port
+ * @addtogroup   PIOS_GCSRCVR GCS Receiver Input Functions
+ * @brief		Code to read the channels within the GCS Receiver UAVObject
  * @{
  *
- * @file       pios_spektrum_priv.h
+ * @file       pios_gcsrcvr.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Servo private structures.
+ * @brief      GCS Input functions (STM32 dependent)
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -28,25 +28,48 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_SPEKTRUM_PRIV_H
-#define PIOS_SPEKTRUM_PRIV_H
+/* Project Includes */
+#include "pios.h"
 
-#include <pios.h>
-#include <pios_stm32.h>
-#include <pios_usart_priv.h>
+#if defined(PIOS_INCLUDE_GCSRCVR)
 
-struct pios_spektrum_cfg {
-	struct stm32_gpio bind;
-	uint32_t remap;		/* GPIO_Remap_* */
+#include "pios_gcsrcvr_priv.h"
+
+static GCSReceiverData gcsreceiverdata;
+
+/* Provide a RCVR driver */
+static int32_t PIOS_GCSRCVR_Get(uint32_t rcvr_id, uint8_t channel);
+
+const struct pios_rcvr_driver pios_gcsrcvr_rcvr_driver = {
+	.read = PIOS_GCSRCVR_Get,
 };
 
-extern const struct pios_rcvr_driver pios_spektrum_rcvr_driver;
+static void gcsreceiver_updated(UAVObjEvent * ev)
+{
+	if (ev->obj == GCSReceiverHandle()) {
+		GCSReceiverGet(&gcsreceiverdata);
+	}
+}
 
-extern int32_t PIOS_SPEKTRUM_Init(uint32_t * spektrum_id, const struct pios_spektrum_cfg *cfg, const struct pios_com_driver * driver, uint32_t lower_id, bool bind);
+void PIOS_GCSRCVR_Init(void)
+{
+	/* Register uavobj callback */
+	GCSReceiverConnectCallback (gcsreceiver_updated);
+}
 
-#endif /* PIOS_SPEKTRUM_PRIV_H */
+static int32_t PIOS_GCSRCVR_Get(uint32_t rcvr_id, uint8_t channel)
+{
+	if (channel >= GCSRECEIVER_CHANNEL_NUMELEM) {
+		/* channel is out of range */
+		return -1;
+	}
 
-/**
- * @}
- * @}
- */
+	return (gcsreceiverdata.Channel[channel]);
+}
+
+#endif	/* PIOS_INCLUDE_GCSRCVR */
+
+/** 
+  * @}
+  * @}
+  */

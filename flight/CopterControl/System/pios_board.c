@@ -856,6 +856,10 @@ void PIOS_I2C_main_adapter_er_irq_handler(void)
 
 #endif /* PIOS_INCLUDE_I2C */
 
+#if defined(PIOS_INCLUDE_GCSRCVR)
+#include "pios_gcsrcvr_priv.h"
+#endif	/* PIOS_INCLUDE_GCSRCVR */
+
 #if defined(PIOS_INCLUDE_RCVR)
 #include "pios_rcvr_priv.h"
 
@@ -1141,6 +1145,22 @@ void PIOS_Board_Init(void) {
 			}
 		}
 #endif  /* PIOS_INCLUDE_SBUS */
+		break;
+	case MANUALCONTROLSETTINGS_INPUTMODE_GCS:
+#if defined(PIOS_INCLUDE_GCSRCVR)
+		PIOS_GCSRCVR_Init();
+		uint32_t pios_gcsrcvr_rcvr_id;
+		if (PIOS_RCVR_Init(&pios_gcsrcvr_rcvr_id, &pios_gcsrcvr_rcvr_driver, 0)) {
+		  PIOS_Assert(0);
+		}
+		for (uint8_t i = 0;
+		     i < GCSRECEIVER_CHANNEL_NUMELEM && pios_rcvr_max_channel < NELEMENTS(pios_rcvr_channel_to_id_map);
+		     i++) {
+			pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].id = pios_gcsrcvr_rcvr_id;
+			pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].channel = i;
+			pios_rcvr_max_channel++;
+		}
+#endif	/* PIOS_INCLUDE_GCSRCVR */
 		break;
 	}
 

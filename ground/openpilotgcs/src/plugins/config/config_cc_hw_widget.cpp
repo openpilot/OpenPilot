@@ -67,19 +67,19 @@ void ConfigCCHWWidget::widgetsContentsChanged()
     }
     else if((m_telemetry->cbTele->currentText()=="Spektrum" ||m_telemetry->cbFlexi->currentText()=="Spektrum") && m_telemetry->receiverType->currentText()!="Spektrum")
     {
-        m_telemetry->problems->setText("Warning: you have at least one port configured as 'Spektrum' however that is not your selected input type");
+        m_telemetry->problems->setText("Warning: you have a port configured as 'Spektrum' however that is not your selected receiver type");
     }
     else if(m_telemetry->cbTele->currentText()=="S.Bus"  && m_telemetry->receiverType->currentText()!="S.Bus")
     {
-        m_telemetry->problems->setText("Warning: you have at least one port configured as 'S.Bus' however that is not your selected input type");
+        m_telemetry->problems->setText("Warning: you have a port configured as 'S.Bus' however that is not your selected receiver type");
     }
     else if(m_telemetry->cbTele->currentText()!="S.Bus"  && m_telemetry->receiverType->currentText()=="S.Bus")
     {
-        m_telemetry->problems->setText("Warning: you have selected 'S.Bus' as your input type however you have no port configured for that protocol");
+        m_telemetry->problems->setText("Warning: you have selected 'S.Bus' as your receiver type however you have no port configured for that protocol");
     }
     else if((m_telemetry->cbTele->currentText()!="Spektrum" && m_telemetry->cbFlexi->currentText()!="Spektrum") && m_telemetry->receiverType->currentText()=="Spektrum")
     {
-        m_telemetry->problems->setText("Warning: you have at selected 'Spektrum' as your input type however you have no port configured for that protocol");
+        m_telemetry->problems->setText("Warning: you have selected 'Spektrum' as your receiver type however you have no port configured for that protocol");
     }
     else
     {

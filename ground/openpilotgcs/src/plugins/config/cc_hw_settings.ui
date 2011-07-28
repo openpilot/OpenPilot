@@ -167,7 +167,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Changes on this page require an Hw reboot to be applied</string>
+           <string>Changes on this page only take effect after board reset or power cycle</string>
           </property>
           <property name="wordWrap">
            <bool>true</bool>

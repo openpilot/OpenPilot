@@ -246,8 +246,12 @@ static void PIOS_USART_RegisterRxCallback(uint32_t usart_id, pios_com_callback r
 	bool valid = PIOS_USART_validate(usart_dev);
 	PIOS_Assert(valid);
 
-	usart_dev->rx_in_cb = rx_in_cb;
+	/* 
+	 * Order is important in these assignments since ISR uses _cb
+	 * field to determine if it's ok to dereference _cb and _context
+	 */
 	usart_dev->rx_in_context = context;
+	usart_dev->rx_in_cb = rx_in_cb;
 }
 
 static void PIOS_USART_RegisterTxCallback(uint32_t usart_id, pios_com_callback tx_out_cb, uint32_t context)
@@ -257,8 +261,12 @@ static void PIOS_USART_RegisterTxCallback(uint32_t usart_id, pios_com_callback t
 	bool valid = PIOS_USART_validate(usart_dev);
 	PIOS_Assert(valid);
 
-	usart_dev->tx_out_cb = tx_out_cb;
+	/* 
+	 * Order is important in these assignments since ISR uses _cb
+	 * field to determine if it's ok to dereference _cb and _context
+	 */
 	usart_dev->tx_out_context = context;
+	usart_dev->tx_out_cb = tx_out_cb;
 }
 
 static void PIOS_USART_generic_irq_handler(uint32_t usart_id)

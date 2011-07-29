@@ -119,8 +119,6 @@ extern uint32_t pios_i2c_main_adapter_id;
 // See also pios_board.c
 //-------------------------
 #define PIOS_COM_MAX_DEVS			2
-#define PIOS_COM_RX_BUFFER_SIZE			256
-#define PIOS_COM_TX_BUFFER_SIZE			256
 
 extern uint32_t pios_com_aux_id;
 #define PIOS_COM_AUX				(pios_com_aux_id)

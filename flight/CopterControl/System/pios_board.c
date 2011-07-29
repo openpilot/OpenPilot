@@ -522,6 +522,14 @@ static const struct pios_sbus_cfg pios_sbus_cfg = {
 
 #include "pios_com_priv.h"
 
+#define PIOS_COM_TELEM_RF_RX_BUF_LEN 192
+#define PIOS_COM_TELEM_RF_TX_BUF_LEN 192
+
+#define PIOS_COM_GPS_RX_BUF_LEN 96
+
+#define PIOS_COM_TELEM_USB_RX_BUF_LEN 192
+#define PIOS_COM_TELEM_USB_TX_BUF_LEN 192
+
 #endif	/* PIOS_INCLUDE_COM */
 
 #if defined(PIOS_INCLUDE_RTC)
@@ -926,7 +934,14 @@ void PIOS_Board_Init(void) {
 			if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_main_cfg)) {
 				PIOS_Assert(0);
 			}
-			if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id)) {
+
+			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
+			PIOS_Assert(rx_buffer);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id,
+					  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
+					  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
 				PIOS_Assert(0);
 			}
 		}
@@ -959,7 +974,12 @@ void PIOS_Board_Init(void) {
 			if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_main_cfg)) {
 				PIOS_Assert(0);
 			}
-			if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id)) {
+
+			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
+			PIOS_Assert(rx_buffer);
+			if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
+					  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
+					  NULL, 0)) {
 				PIOS_Assert(0);
 			}
 		}
@@ -1003,7 +1023,13 @@ void PIOS_Board_Init(void) {
 			if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_flexi_cfg)) {
 				PIOS_Assert(0);
 			}
-			if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id)) {
+			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
+			PIOS_Assert(rx_buffer);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id,
+  					  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
+					  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
 				PIOS_Assert(0);
 			}
 		}
@@ -1016,7 +1042,11 @@ void PIOS_Board_Init(void) {
 			if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_flexi_cfg)) {
 				PIOS_Assert(0);
 			}
-			if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id)) {
+			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
+			PIOS_Assert(rx_buffer);
+			if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
+					  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
+					  NULL, 0)) {
 				PIOS_Assert(0);
 			}
 		}
@@ -1140,7 +1170,13 @@ void PIOS_Board_Init(void) {
 	uint32_t pios_usb_hid_id;
 	PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_main_cfg);
 #if defined(PIOS_INCLUDE_COM)
-	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, pios_usb_hid_id)) {
+	uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
+	uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
+	PIOS_Assert(rx_buffer);
+	PIOS_Assert(tx_buffer);
+	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, pios_usb_hid_id,
+			  rx_buffer, PIOS_COM_TELEM_USB_RX_BUF_LEN,
+			  tx_buffer, PIOS_COM_TELEM_USB_TX_BUF_LEN)) {
 		PIOS_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_COM */

@@ -55,12 +55,10 @@ struct pios_com_dev {
 	xSemaphoreHandle rx_sem;
 #endif
 
-	// align to 32-bit to try and provide speed improvement;
-	uint8_t rx_buffer[PIOS_COM_RX_BUFFER_SIZE] __attribute__ ((aligned(4)));
-	t_fifo_buffer rx;
+	bool has_rx;
+	bool has_tx;
 
-	// align to 32-bit to try and provide speed improvement;
-        uint8_t tx_buffer[PIOS_COM_TX_BUFFER_SIZE] __attribute__ ((aligned(4)));
+	t_fifo_buffer rx;
 	t_fifo_buffer tx;
 };
 
@@ -110,12 +108,16 @@ static void PIOS_COM_UnblockTx(struct pios_com_dev * com_dev, bool * need_yield)
   * \param[in] id
   * \return < 0 if initialisation failed
   */
-int32_t PIOS_COM_Init(uint32_t * com_id, const struct pios_com_driver * driver, uint32_t lower_id)
+int32_t PIOS_COM_Init(uint32_t * com_id, const struct pios_com_driver * driver, uint32_t lower_id, uint8_t * rx_buffer, uint16_t rx_buffer_len, uint8_t * tx_buffer, uint16_t tx_buffer_len)
 {
 	PIOS_Assert(com_id);
 	PIOS_Assert(driver);
-	PIOS_Assert(driver->bind_tx_cb);
-	PIOS_Assert(driver->bind_rx_cb);
+
+	bool has_rx = (rx_buffer && rx_buffer_len > 0);
+	bool has_tx = (tx_buffer && tx_buffer_len > 0);
+	PIOS_Assert(has_rx || has_tx);
+	PIOS_Assert(driver->bind_tx_cb || !has_tx);
+	PIOS_Assert(driver->bind_rx_cb || !has_rx);
 
 	struct pios_com_dev * com_dev;
 
@@ -125,24 +127,30 @@ int32_t PIOS_COM_Init(uint32_t * com_id, const struct pios_com_driver * driver, 
 	com_dev->driver   = driver;
 	com_dev->lower_id = lower_id;
 
-	/* Clear buffer counters */
-	fifoBuf_init(&com_dev->rx, com_dev->rx_buffer, sizeof(com_dev->rx_buffer));
-	fifoBuf_init(&com_dev->tx, com_dev->tx_buffer, sizeof(com_dev->tx_buffer));
+	com_dev->has_rx = has_rx;
+	com_dev->has_tx = has_tx;
 
+	if (has_rx) {
+		fifoBuf_init(&com_dev->rx, rx_buffer, rx_buffer_len);
 #if defined(PIOS_INCLUDE_FREERTOS)
-	/* Create semaphores before binding callbacks */
-	vSemaphoreCreateBinary(com_dev->rx_sem);
-	vSemaphoreCreateBinary(com_dev->tx_sem);
-#endif
-	/* Bind our callbacks into the lower layer */
-	(com_dev->driver->bind_rx_cb)(lower_id, PIOS_COM_RxInCallback, (uint32_t)com_dev);
-	(com_dev->driver->bind_tx_cb)(lower_id, PIOS_COM_TxOutCallback, (uint32_t)com_dev);
-
-	if (com_dev->driver->rx_start) {
-		/* Start the receiver */
-		(com_dev->driver->rx_start)(com_dev->lower_id,
-					    fifoBuf_getFree(&com_dev->rx));
+		vSemaphoreCreateBinary(com_dev->rx_sem);
+#endif	/* PIOS_INCLUDE_FREERTOS */
+		(com_dev->driver->bind_rx_cb)(lower_id, PIOS_COM_RxInCallback, (uint32_t)com_dev);
+		if (com_dev->driver->rx_start) {
+			/* Start the receiver */
+			(com_dev->driver->rx_start)(com_dev->lower_id,
+						    fifoBuf_getFree(&com_dev->rx));
+		}
 	}
+
+	if (has_tx) {
+		fifoBuf_init(&com_dev->tx, tx_buffer, tx_buffer_len);
+#if defined(PIOS_INCLUDE_FREERTOS)
+		vSemaphoreCreateBinary(com_dev->tx_sem);
+#endif	/* PIOS_INCLUDE_FREERTOS */
+		(com_dev->driver->bind_tx_cb)(lower_id, PIOS_COM_TxOutCallback, (uint32_t)com_dev);
+	}
+
 	*com_id = (uint32_t)com_dev;
 	return(0);
 
@@ -188,6 +196,7 @@ static uint16_t PIOS_COM_RxInCallback(uint32_t context, uint8_t * buf, uint16_t 
 
 	bool valid = PIOS_COM_validate(com_dev);
 	PIOS_Assert(valid);
+	PIOS_Assert(com_dev->has_rx);
 
 	PIOS_IRQ_Disable();
 	uint16_t bytes_into_fifo = fifoBuf_putData(&com_dev->rx, buf, buf_len);
@@ -213,6 +222,7 @@ static uint16_t PIOS_COM_TxOutCallback(uint32_t context, uint8_t * buf, uint16_t
 	PIOS_Assert(valid);
 	PIOS_Assert(buf);
 	PIOS_Assert(buf_len);
+	PIOS_Assert(com_dev->has_tx);
 
 	PIOS_IRQ_Disable();
 	uint16_t bytes_from_fifo = fifoBuf_getData(&com_dev->tx, buf, buf_len);
@@ -273,6 +283,8 @@ int32_t PIOS_COM_SendBufferNonBlocking(uint32_t com_id, const uint8_t *buffer, u
 		return -1;
 	}
 
+	PIOS_Assert(com_dev->has_tx);
+
 	if (len >= fifoBuf_getFree(&com_dev->tx)) {
 		/* Buffer cannot accept all requested bytes (retry) */
 		return -2;
@@ -310,6 +322,8 @@ int32_t PIOS_COM_SendBuffer(uint32_t com_id, const uint8_t *buffer, uint16_t len
 		/* Undefined COM port for this board (see pios_board.c) */
 		return -1;
 	}
+
+	PIOS_Assert(com_dev->has_tx);
 
 	int32_t rc;
 	do {
@@ -442,6 +456,7 @@ uint16_t PIOS_COM_ReceiveBuffer(uint32_t com_id, uint8_t * buf, uint16_t buf_len
 		/* Undefined COM port for this board (see pios_board.c) */
 		PIOS_Assert(0);
 	}
+	PIOS_Assert(com_dev->has_rx);
 
  check_again:
 	PIOS_IRQ_Disable();
@@ -487,6 +502,7 @@ int32_t PIOS_COM_ReceiveBufferUsed(uint32_t com_id)
 		PIOS_Assert(0);
 	}
 
+	PIOS_Assert(com_dev->has_rx);
 	return (fifoBuf_getUsed(&com_dev->rx));
 }
 

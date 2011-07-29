@@ -346,6 +346,21 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 #endif /* PIOS_COM_AUX */
 
 
+#if defined(PIOS_INCLUDE_COM)
+
+#include <pios_com_priv.h>
+
+#if 0
+#define PIOS_COM_AUX_TX_BUF_LEN 192
+static uint8_t pios_com_aux_tx_buffer[PIOS_COM_AUX_TX_BUF_LEN];
+#endif
+
+#define PIOS_COM_GPS_RX_BUF_LEN 96
+static uint8_t pios_com_gps_rx_buffer[PIOS_COM_GPS_RX_BUF_LEN];
+
+
+#endif /* PIOS_INCLUDE_COM */
+
 #if defined(PIOS_INCLUDE_I2C)
 
 #include <pios_i2c_priv.h>
@@ -517,7 +532,9 @@ void PIOS_Board_Init(void) {
 	if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
-	if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id)) {
+	if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
+			  pios_com_gps_rx_buffer, sizeof(pios_com_gps_rx_buffer),
+			  NULL, 0)) {
 		PIOS_DEBUG_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_GPS */

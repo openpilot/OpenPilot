@@ -31,6 +31,12 @@
 
 #include <pios_com_priv.h>
 
+#define PIOS_COM_TELEM_USB_RX_BUF_LEN 192
+#define PIOS_COM_TELEM_USB_TX_BUF_LEN 192
+
+static uint8_t pios_com_telem_usb_rx_buffer[PIOS_COM_TELEM_USB_RX_BUF_LEN];
+static uint8_t pios_com_telem_usb_tx_buffer[PIOS_COM_TELEM_USB_TX_BUF_LEN];
+
 #endif /* PIOS_INCLUDE_COM */
 
 // ***********************************************************************************
@@ -81,7 +87,9 @@ void PIOS_Board_Init(void) {
 	uint32_t pios_usb_hid_id;
 	PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_main_cfg);
 #if defined(PIOS_INCLUDE_COM)
-	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, pios_usb_hid_id)) {
+	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, pios_usb_hid_id,
+			  pios_com_telem_usb_rx_buffer, sizeof(pios_com_telem_usb_rx_buffer),
+			  pios_com_telem_usb_tx_buffer, sizeof(pios_com_telem_usb_tx_buffer))) {
 		PIOS_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_COM */

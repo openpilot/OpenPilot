@@ -150,8 +150,6 @@ extern uint32_t pios_spi_port_id;
 // See also pios_board.c
 //-------------------------
 #define PIOS_COM_MAX_DEVS               2
-#define PIOS_COM_RX_BUFFER_SIZE			512
-#define PIOS_COM_TX_BUFFER_SIZE			512
 
 extern uint32_t pios_com_serial_id;
 #define PIOS_COM_SERIAL                 (pios_com_serial_id)

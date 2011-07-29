@@ -246,6 +246,9 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 
 #include <pios_com_priv.h>
 
+#define PIOS_COM_AUX_TX_BUF_LEN 192
+static uint8_t pios_com_aux_tx_buffer[PIOS_COM_AUX_TX_BUF_LEN];
+
 #endif /* PIOS_INCLUDE_COM */
 
 #if defined(PIOS_INCLUDE_I2C)
@@ -370,12 +373,16 @@ void PIOS_Board_Init(void) {
 	/* Communication system */
 #if !defined(PIOS_ENABLE_DEBUG_PINS)
 #if defined(PIOS_INCLUDE_COM)
-	uint32_t pios_usart_aux_id;
-	if (PIOS_USART_Init(&pios_usart_aux_id, &pios_usart_aux_cfg)) {
-		PIOS_DEBUG_Assert(0);
-	}
-	if (PIOS_COM_Init(&pios_com_aux_id, &pios_usart_com_driver, pios_usart_aux_id)) {
-		PIOS_DEBUG_Assert(0);
+	{
+		uint32_t pios_usart_aux_id;
+		if (PIOS_USART_Init(&pios_usart_aux_id, &pios_usart_aux_cfg)) {
+			PIOS_DEBUG_Assert(0);
+		}
+		if (PIOS_COM_Init(&pios_com_aux_id, &pios_usart_com_driver, pios_usart_aux_id,
+				  NULL, 0,
+				  pios_com_aux_tx_buffer, sizeof(pios_com_aux_tx_buffer))) {
+			PIOS_DEBUG_Assert(0);
+		}
 	}
 #endif	/* PIOS_INCLUDE_COM */
 #endif

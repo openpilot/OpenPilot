@@ -324,7 +324,6 @@ static void updateStats()
 {
 	static portTickType lastTickCount = 0;
 	SystemStatsData stats;
-	EventStats evStats;
 
 	// Get stats and update
 	SystemStatsGet(&stats);
@@ -342,10 +341,6 @@ static void updateStats()
 #else
 	stats.IdleStackRemaining = uxTaskGetStackHighWaterMark( idleTaskHandle ) * 4;
 #endif
-
-	// Get Events stack status
-	EventGetStats(&evStats);
-	stats.EventDispatcherStackRemaining = evStats.EventDispatcherStackRemaining;
 
 	// Get Irq stack status
 	stats.IRQStackRemaining = GetFreeIrqStackSize();

@@ -276,6 +276,8 @@ static void eventTask()
 	int32_t delayMs;
 	EventCallbackInfo evInfo;
 
+	TaskMonitorAdd( TASKINFO_RUNNING_EVENTDISPATCHER, eventTaskHandle );
+
 	// Initialize time
 	timeToNextUpdateMs = xTaskGetTickCount()*portTICK_RATE_MS;
 
@@ -303,13 +305,6 @@ static void eventTask()
 		if ((xTaskGetTickCount()*portTICK_RATE_MS) >= timeToNextUpdateMs )
 		{
 			timeToNextUpdateMs = processPeriodicUpdates();
-
-			/* update our remaining stack status here */
-#if defined(ARCH_POSIX) || defined(ARCH_WIN32)
-			stats.EventDispatcherStackRemaining = 10000;
-#else
-			stats.EventDispatcherStackRemaining = uxTaskGetStackHighWaterMark( eventTaskHandle ) * 4;
-#endif
 		}
 	}
 }

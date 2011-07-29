@@ -32,7 +32,6 @@
  */
 typedef struct {
 	uint32_t eventErrors;
-	uint32_t EventDispatcherStackRemaining;
 } EventStats;
 
 // Public functions

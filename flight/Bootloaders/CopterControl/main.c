@@ -28,7 +28,6 @@
 /* Bootloader Includes */
 #include <pios.h>
 #include <pios_board_info.h>
-#include "stopwatch.h"
 #include "op_dfu.h"
 #include "usb_lib.h"
 #include "pios_iap.h"
@@ -47,9 +46,9 @@ pFunction Jump_To_Application;
 uint32_t JumpAddress;
 
 /// LEDs PWM
-uint32_t period1 = 50; // *100 uS -> 5 mS
+uint32_t period1 = 5000; // 5 mS
 uint32_t sweep_steps1 = 100; // * 5 mS -> 500 mS
-uint32_t period2 = 50; // *100 uS -> 5 mS
+uint32_t period2 = 5000; // 5 mS
 uint32_t sweep_steps2 = 100; // * 5 mS -> 500 mS
 
 
@@ -70,7 +69,6 @@ uint8_t processRX();
 void jump_to_app();
 
 #define BLUE LED1
-#define LED_PWM_TIMER	TIM1
 int main() {
 	PIOS_SYS_Init();
 	if (BSL_HOLD_STATE == 0)
@@ -93,13 +91,17 @@ int main() {
 			DeviceState = DFUidle;
 		else
 			DeviceState = BLidle;
-		STOPWATCH_Init(100, LED_PWM_TIMER);
 	} else
 		JumpToApp = TRUE;
 
-	STOPWATCH_Reset(LED_PWM_TIMER);
-
+	uint32_t stopwatch = 0;
+	uint32_t prev_ticks = PIOS_DELAY_GetuS();
 	while (TRUE) {
+		/* Update the stopwatch */
+		uint32_t elapsed_ticks = PIOS_DELAY_GetuSSince(prev_ticks);
+		prev_ticks += elapsed_ticks;
+		stopwatch += elapsed_ticks;
+
 		if (JumpToApp == TRUE)
 			jump_to_app();
 
@@ -107,19 +109,19 @@ int main() {
 		case Last_operation_Success:
 		case uploadingStarting:
 		case DFUidle:
-			period1 = 50;
+			period1 = 5000;
 			sweep_steps1 = 100;
 			PIOS_LED_Off(BLUE);
 			period2 = 0;
 			break;
 		case uploading:
-			period1 = 50;
+			period1 = 5000;
 			sweep_steps1 = 100;
-			period2 = 25;
+			period2 = 2500;
 			sweep_steps2 = 50;
 			break;
 		case downloading:
-			period1 = 25;
+			period1 = 2500;
 			sweep_steps1 = 50;
 			PIOS_LED_Off(BLUE);
 			period2 = 0;
@@ -130,14 +132,14 @@ int main() {
 			period2 = 0;
 			break;
 		default://error
-			period1 = 50;
+			period1 = 5000;
 			sweep_steps1 = 100;
-			period2 = 50;
+			period2 = 5000;
 			sweep_steps2 = 100;
 		}
 
 		if (period1 != 0) {
-			if (LedPWM(period1, sweep_steps1, STOPWATCH_ValueGet(LED_PWM_TIMER)))
+			if (LedPWM(period1, sweep_steps1, stopwatch))
 				PIOS_LED_On(BLUE);
 			else
 				PIOS_LED_Off(BLUE);
@@ -145,16 +147,16 @@ int main() {
 			PIOS_LED_On(BLUE);
 
 		if (period2 != 0) {
-			if (LedPWM(period2, sweep_steps2, STOPWATCH_ValueGet(LED_PWM_TIMER)))
+			if (LedPWM(period2, sweep_steps2, stopwatch))
 				PIOS_LED_On(BLUE);
 			else
 				PIOS_LED_Off(BLUE);
 		} else
 			PIOS_LED_Off(BLUE);
 
-		if (STOPWATCH_ValueGet(LED_PWM_TIMER) > 100 * 50 * 100)
-			STOPWATCH_Reset(LED_PWM_TIMER);
-		if ((STOPWATCH_ValueGet(LED_PWM_TIMER) > 60000) && (DeviceState
+		if (stopwatch > 50 * 1000 * 1000)
+			stopwatch = 0;
+		if ((stopwatch > 6 * 1000 * 1000) && (DeviceState
 				== BLidle))
 			JumpToApp = TRUE;
 

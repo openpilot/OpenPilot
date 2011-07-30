@@ -958,11 +958,6 @@ void PIOS_Board_Init(void) {
 			if (PIOS_SBUS_Init(&pios_sbus_id, &pios_sbus_cfg, &pios_usart_com_driver, pios_usart_sbus_id)) {
 				PIOS_Assert(0);
 			}
-
-			uint32_t pios_rcvr_id;
-			if (PIOS_RCVR_Init(&pios_rcvr_id, &pios_sbus_rcvr_driver, pios_sbus_id)) {
-				PIOS_Assert(0);
-			}
 		}
 #endif	/* PIOS_INCLUDE_SBUS */
 		break;
@@ -994,11 +989,6 @@ void PIOS_Board_Init(void) {
 
 			uint32_t pios_spektrum_id;
 			if (PIOS_SPEKTRUM_Init(&pios_spektrum_id, &pios_spektrum_main_cfg, &pios_usart_com_driver, pios_usart_spektrum_id, false)) {
-				PIOS_Assert(0);
-			}
-
-			uint32_t pios_rcvr_id;
-			if (PIOS_RCVR_Init(&pios_rcvr_id, &pios_spektrum_rcvr_driver, pios_spektrum_id)) {
 				PIOS_Assert(0);
 			}
 		}
@@ -1061,11 +1051,6 @@ void PIOS_Board_Init(void) {
 
 			uint32_t pios_spektrum_id;
 			if (PIOS_SPEKTRUM_Init(&pios_spektrum_id, &pios_spektrum_flexi_cfg, &pios_usart_com_driver, pios_usart_spektrum_id, false)) {
-				PIOS_Assert(0);
-			}
-
-			uint32_t pios_rcvr_id;
-			if (PIOS_RCVR_Init(&pios_rcvr_id, &pios_spektrum_rcvr_driver, pios_spektrum_id)) {
 				PIOS_Assert(0);
 			}
 		}

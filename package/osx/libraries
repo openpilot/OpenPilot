@@ -3,7 +3,7 @@
 APP="${1?}"
 PLUGINS="${APP}/Contents/Plugins"
 OP_PLUGINS="${APP}/Contents/Plugins/OpenPilot"
-QT_LIBS="QtGui QtCore QtSvg QtSql QtOpenGL QtNetwork QtXml QtDBus QtScript phonon"
+QT_LIBS="QtGui QtCore QtSvg QtSql QtOpenGL QtNetwork QtXml QtDBus QtScript phonon SDL"
 
 echo "Processing Qt libraries in $1"
 macdeployqt "${APP}"
@@ -18,6 +18,7 @@ do
 	    "${f}"
     done
 done
+
 
 # should be redundant but some libs missed by main app and macdeployqt
 for f in ${QT_LIBS}

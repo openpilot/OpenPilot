@@ -55,7 +55,7 @@ static const struct pios_spi_cfg
 					.ahb_clk = RCC_AHBPeriph_DMA1,
 
 					.irq = {
-						.handler = PIOS_SPI_op_irq_handler,
+						.handler = NULL,
 						.flags = (DMA1_FLAG_TC4 | DMA1_FLAG_TE4 | DMA1_FLAG_HT4 | DMA1_FLAG_GL4),
 						.init = {
 							.NVIC_IRQChannel = DMA1_Channel4_IRQn,

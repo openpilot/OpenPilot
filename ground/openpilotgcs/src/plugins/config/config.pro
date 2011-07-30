@@ -24,7 +24,8 @@ HEADERS += configplugin.h \
     configoutputwidget.h \
     configtaskwidget.h \
     configairframewidget.h \
-    configtelemetrywidget.h \
+    config_pro_hw_widget.h \
+    config_cc_hw_widget.h \
     configahrswidget.h \
     configccattitudewidget.h \
     mixercurvewidget.h \
@@ -34,7 +35,9 @@ HEADERS += configplugin.h \
     configstabilizationwidget.h \
     assertions.h \
     calibration.h \
-    defaultattitudewidget.h
+    defaultattitudewidget.h \
+    smartsavebutton.h \
+    defaulthwsettingswidget.h
 
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
@@ -47,7 +50,8 @@ SOURCES += configplugin.cpp \
     configinputwidget.cpp \
     configoutputwidget.cpp \
     configairframewidget.cpp \
-    configtelemetrywidget.cpp \
+    config_pro_hw_widget.cpp \
+    config_cc_hw_widget.cpp \
     configahrswidget.cpp \
     configccattitudewidget.cpp \
     mixercurvewidget.cpp \
@@ -59,17 +63,21 @@ SOURCES += configplugin.cpp \
     legacy-calibration.cpp \
     gyro-calibration.cpp \
     alignment-calibration.cpp \
-    defaultattitudewidget.cpp
+    defaultattitudewidget.cpp \
+    smartsavebutton.cpp \
+    defaulthwsettingswidget.cpp
     
 FORMS +=  \
     airframe.ui \
-    telemetry.ui \
+    cc_hw_settings.ui \
+    pro_hw_settings.ui \
     ahrs.ui \
     ccpm.ui \
     stabilization.ui \
     input.ui \
     output.ui \
     ccattitude.ui \
-    defaultattitude.ui
+    defaultattitude.ui \
+    defaulthwsettings.ui
 
 RESOURCES += configgadget.qrc

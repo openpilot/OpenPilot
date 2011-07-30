@@ -33,9 +33,10 @@
 #include "configinputwidget.h"
 #include "configoutputwidget.h"
 #include "configstabilizationwidget.h"
-#include "configtelemetrywidget.h"
+#include "config_pro_hw_widget.h"
+#include "config_cc_hw_widget.h"
 #include "defaultattitudewidget.h"
-
+#include "defaulthwsettingswidget.h"
 #include "uavobjectutilmanager.h"
 
 #include <QDebug>
@@ -62,23 +63,24 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     // *********************
     QWidget *qwd;
 
+    qwd = new DefaultHwSettingsWidget(this);
+    ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.svg"), QString("HW Settings"));
+
     qwd = new ConfigAirframeWidget(this);
-    ftw->insertTab(0, qwd, QIcon(":/configgadget/images/Airframe.png"), QString("Aircraft"));
+    ftw->insertTab(ConfigGadgetWidget::aircraft, qwd, QIcon(":/configgadget/images/Airframe.png"), QString("Aircraft"));
 
     qwd = new ConfigInputWidget(this);
-    ftw->insertTab(1, qwd, QIcon(":/configgadget/images/Transmitter.png"), QString("Input"));
+    ftw->insertTab(ConfigGadgetWidget::input, qwd, QIcon(":/configgadget/images/Transmitter.png"), QString("Input"));
 
     qwd = new ConfigOutputWidget(this);
-    ftw->insertTab(2, qwd, QIcon(":/configgadget/images/Servo.png"), QString("Output"));
+    ftw->insertTab(ConfigGadgetWidget::output, qwd, QIcon(":/configgadget/images/Servo.png"), QString("Output"));
 
     qwd = new DefaultAttitudeWidget(this);
-    ftw->insertTab(3, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+    ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
 
     qwd = new ConfigStabilizationWidget(this);
-    ftw->insertTab(4, qwd, QIcon(":/configgadget/images/gyroscope.svg"), QString("Stabilization"));
+    ftw->insertTab(ConfigGadgetWidget::stabilization, qwd, QIcon(":/configgadget/images/gyroscope.svg"), QString("Stabilization"));
 
-    qwd = new ConfigTelemetryWidget(this);
-    ftw->insertTab(5, qwd, QIcon(":/configgadget/images/XBee.svg"), QString("Telemetry"));
 
 
 //    qwd = new ConfigPipXtremeWidget(this);
@@ -128,16 +130,24 @@ void ConfigGadgetWidget::onAutopilotConnect() {
         if ((board & 0xff00) == 1024) {
             // CopterControl family
             // Delete the INS panel, replace with CC Panel:
-            ftw->setCurrentIndex(0);
-            ftw->removeTab(3);
+            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+            ftw->removeTab(ConfigGadgetWidget::ins);
             QWidget *qwd = new ConfigCCAttitudeWidget(this);
-            ftw->insertTab(3, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("Attitude"));
+            ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("Attitude"));
+            ftw->removeTab(ConfigGadgetWidget::hardware);
+            qwd = new ConfigCCHWWidget(this);
+            ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.svg"), QString("HW Settings"));
+            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
         } else if ((board & 0xff00) == 256 ) {
             // Mainboard family
-            ftw->setCurrentIndex(0);
-            ftw->removeTab(3);
+            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+            ftw->removeTab(ConfigGadgetWidget::ins);
             QWidget *qwd = new ConfigAHRSWidget(this);
-            ftw->insertTab(3, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+            ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+            ftw->removeTab(ConfigGadgetWidget::hardware);
+            qwd = new ConfigProHWWidget(this);
+            ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.svg"), QString("HW Settings"));
+            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
         }
     }
     emit autopilotConnected();

@@ -34,22 +34,29 @@
 
 #if defined(PIOS_INCLUDE_PPM)
 
-/* Local Variables */
+/* Provide a RCVR driver */
+static int32_t PIOS_PPM_Get(uint32_t rcvr_id, uint8_t channel);
 
+const struct pios_rcvr_driver pios_ppm_rcvr_driver = {
+	.read = PIOS_PPM_Get,
+};
+
+/* Local Variables */
 static TIM_ICInitTypeDef TIM_ICInitStructure;
 static uint8_t PulseIndex;
 static uint32_t PreviousValue;
 static uint32_t CurrentValue;
 static uint32_t CapturedValue;
 static uint32_t CaptureValue[PIOS_PPM_NUM_INPUTS];
-
-static uint8_t SupervisorState = 0;
 static uint32_t CapCounter[PIOS_PPM_NUM_INPUTS];
+static uint16_t TimerCounter;
+
+static uint8_t supv_timer = 0;
+static uint8_t SupervisorState = 0;
 static uint32_t CapCounterPrev[PIOS_PPM_NUM_INPUTS];
 
-/**
-* Initialises all the LED's
-*/
+static void PIOS_PPM_Supervisor(uint32_t ppm_id);
+
 void PIOS_PPM_Init(void)
 {
 	/* Flush counter variables */
@@ -59,6 +66,7 @@ void PIOS_PPM_Init(void)
 	PreviousValue = 0;
 	CurrentValue = 0;
 	CapturedValue = 0;
+	TimerCounter = 0;
 
 	for (i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
 		CaptureValue[i] = 0;
@@ -121,13 +129,12 @@ void PIOS_PPM_Init(void)
 	TIM_TimeBaseInit(pios_ppm_cfg.timer, &TIM_TimeBaseStructure);
 
 	/* Enable the Capture Compare Interrupt Request */
-	TIM_ITConfig(pios_ppm_cfg.timer, pios_ppm_cfg.ccr, ENABLE);
+	TIM_ITConfig(pios_ppm_cfg.timer, pios_ppm_cfg.ccr | TIM_IT_Update, ENABLE);
 
 	/* Enable timers */
 	TIM_Cmd(pios_ppm_cfg.timer, ENABLE);
 
 	/* Supervisor Setup */
-#if (PIOS_PPM_SUPV_ENABLED)
 	/* Flush counter variables */
 	for (i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
 		CapCounter[i] = 0;
@@ -136,70 +143,15 @@ void PIOS_PPM_Init(void)
 		CapCounterPrev[i] = 0;
 	}
 
-	NVIC_InitStructure = pios_ppmsv_cfg.irq.init;
-
-	/* Enable appropriate clock to timer module */
-	switch((int32_t) pios_ppmsv_cfg.timer) {
-		case (int32_t)TIM1:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM1_CC_IRQn;
-			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
-			break;
-		case (int32_t)TIM2:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
-			break;
-		case (int32_t)TIM3:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
-			break;
-		case (int32_t)TIM4:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
-			break;
-#ifdef STM32F10X_HD
-
-		case (int32_t)TIM5:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM5_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
-			break;
-		case (int32_t)TIM6:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM6_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
-			break;
-		case (int32_t)TIM7:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
-			break;
-		case (int32_t)TIM8:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM8_CC_IRQn;
-			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
-			break;
-#endif
-	}
-
-	/* Configure interrupts */
-	NVIC_Init(&NVIC_InitStructure);
-
-	/* Time base configuration */
-	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-	TIM_TimeBaseStructure = pios_ppmsv_cfg.tim_base_init;
-	TIM_TimeBaseInit(pios_ppmsv_cfg.timer, &TIM_TimeBaseStructure);
-
-	/* Enable the CCx Interrupt Request */
-	TIM_ITConfig(pios_ppmsv_cfg.timer, pios_ppmsv_cfg.ccr, ENABLE);
-
-	/* Clear update pending flag */
-	TIM_ClearFlag(pios_ppmsv_cfg.timer, TIM_FLAG_Update);
-
-	/* Enable counter */
-	TIM_Cmd(pios_ppmsv_cfg.timer, ENABLE);
-#endif
-
 	/* Setup local variable which stays in this scope */
 	/* Doing this here and using a local variable saves doing it in the ISR */
 	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
 	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
 	TIM_ICInitStructure.TIM_ICFilter = 0x0;
+
+	if (!PIOS_RTC_RegisterTickCallback(PIOS_PPM_Supervisor, 0)) {
+		PIOS_DEBUG_Assert(0);
+	}
 }
 
 /**
@@ -208,13 +160,13 @@ void PIOS_PPM_Init(void)
 * \output -1 Channel not available
 * \output >0 Channel value
 */
-int32_t PIOS_PPM_Get(int8_t Channel)
+static int32_t PIOS_PPM_Get(uint32_t rcvr_id, uint8_t channel)
 {
 	/* Return error if channel not available */
-	if (Channel >= PIOS_PPM_NUM_INPUTS) {
+	if (channel >= PIOS_PPM_NUM_INPUTS) {
 		return -1;
 	}
-	return CaptureValue[Channel];
+	return CaptureValue[channel];
 }
 
 /**
@@ -224,6 +176,15 @@ int32_t PIOS_PPM_Get(int8_t Channel)
 */
 void PIOS_PPM_irq_handler(void)
 {
+	if (TIM_GetITStatus(pios_ppm_cfg.timer, TIM_IT_Update) == SET) {
+		TimerCounter+=pios_ppm_cfg.timer->ARR;
+		TIM_ClearITPendingBit(pios_ppm_cfg.timer, TIM_IT_Update);
+		if (TIM_GetITStatus(pios_ppm_cfg.timer, pios_ppm_cfg.ccr) != SET) {
+			return;
+		}
+	}
+
+
 	/* Do this as it's more efficient */
 	if (TIM_GetITStatus(pios_ppm_cfg.timer, pios_ppm_cfg.ccr) == SET) {
 		PreviousValue = CurrentValue;
@@ -241,37 +202,44 @@ void PIOS_PPM_irq_handler(void)
 				CurrentValue = TIM_GetCapture4(pios_ppm_cfg.timer);
 				break;
 		}
-	}
+		CurrentValue+=TimerCounter;
+		if(CurrentValue > 0xFFFF) {
+			CurrentValue-=0xFFFF;
+		}
 
-	/* Clear TIMx Capture compare interrupt pending bit */
-	TIM_ClearITPendingBit(pios_ppm_cfg.timer, pios_ppm_cfg.ccr);
+		/* Clear TIMx Capture compare interrupt pending bit */
+		TIM_ClearITPendingBit(pios_ppm_cfg.timer, pios_ppm_cfg.ccr);
 
-	/* Capture computation */
-	if (CurrentValue > PreviousValue) {
-		CapturedValue = (CurrentValue - PreviousValue);
-	} else {
-		CapturedValue = ((0xFFFF - PreviousValue) + CurrentValue);
-	}
+		/* Capture computation */
+		if (CurrentValue > PreviousValue) {
+			CapturedValue = (CurrentValue - PreviousValue);
+		} else {
+			CapturedValue = ((0xFFFF - PreviousValue) + CurrentValue);
+		}
 
-	/* sync pulse */
-	if (CapturedValue > 8000) {
-		PulseIndex = 0;
-		/* trying to detect bad pulses, not sure this is working correctly yet. I need a scope :P */
-	} else if (CapturedValue > 750 && CapturedValue < 2500) {
-		if (PulseIndex < PIOS_PPM_NUM_INPUTS) {
-			CaptureValue[PulseIndex] = CapturedValue;
-			CapCounter[PulseIndex]++;
-			PulseIndex++;
+		/* sync pulse */
+		if (CapturedValue > 8000) {
+			PulseIndex = 0;
+			/* trying to detect bad pulses, not sure this is working correctly yet. I need a scope :P */
+		} else if (CapturedValue > 750 && CapturedValue < 2500) {
+			if (PulseIndex < PIOS_PPM_NUM_INPUTS) {
+				CaptureValue[PulseIndex] = CapturedValue;
+				CapCounter[PulseIndex]++;
+				PulseIndex++;
+			}
 		}
 	}
 }
 
-/**
-* This function handles TIM3 global interrupt request.
-*/
-void PIOS_PPMSV_irq_handler(void) {
-	/* Clear timer interrupt pending bit */
-	TIM_ClearITPendingBit(pios_ppmsv_cfg.timer, pios_ppmsv_cfg.ccr);
+static void PIOS_PPM_Supervisor(uint32_t ppm_id) {
+	/* 
+	 * RTC runs at 625Hz so divide down the base rate so
+	 * that this loop runs at 25Hz.
+	 */
+	if(++supv_timer < 25) {
+		return;
+	}
+	supv_timer = 0;
 
 	/* Simple state machine */
 	if (SupervisorState == 0) {

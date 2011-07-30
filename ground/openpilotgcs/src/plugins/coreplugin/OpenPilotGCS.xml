@@ -1539,6 +1539,50 @@
           <enableVbo>false</enableVbo>
         </data>
       </Hexacopter>
+      <Joe__PCT__27s__PCT__2014__PCT__22__PCT__20Quad__PCT__20__PCT__2B>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/multi/joes_cnc/J14-Q_+.3DS</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </Joe__PCT__27s__PCT__2014__PCT__22__PCT__20Quad__PCT__20__PCT__2B>
+      <Joe__PCT__27s__PCT__2014__PCT__22__PCT__20Quad__PCT__20X__PCT__20>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/multi/joes_cnc/J14-Q_X.3DS</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </Joe__PCT__27s__PCT__2014__PCT__22__PCT__20Quad__PCT__20X__PCT__20>
+      <Joe__PCT__27s__PCT__2014__PCT__22__PCT__20T__PCT__20Quad__PCT__20__PCT__2B>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/multi/joes_cnc/J14-QT_+.3DS</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </Joe__PCT__27s__PCT__2014__PCT__22__PCT__20T__PCT__20Quad__PCT__20__PCT__2B>
+      <Joe__PCT__27s__PCT__2014__PCT__22__PCT__20T__PCT__20Quad__PCT__20X>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/multi/joes_cnc/J14-QT_X.3DS</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </Joe__PCT__27s__PCT__2014__PCT__22__PCT__20T__PCT__20Quad__PCT__20X>
       <Quadcopter>
         <configInfo>
           <locked>false</locked>

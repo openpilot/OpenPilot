@@ -42,18 +42,16 @@
 
 /* Global Variables */
 
-/* Prototype of generated InitModules() function */
-extern void InitModules(void);
-
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
+extern void Stack_Change(void);
 
 /**
 * OpenPilot Main function:
 *
 * Initialize PiOS<BR>
 * Create the "System" task (SystemModInitializein Modules/System/systemmod.c) <BR>
-* Start FreeRTOS Scheduler (vTaskStartScheduler)<BR>
+* Start FreeRTOS Scheduler (vTaskStartScheduler) (Now handled by caller)
 * If something goes wrong, blink LED1 and LED2 every 100ms
 *
 */
@@ -65,43 +63,32 @@ int main()
 	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
 
-	/* Initialize the system thread */
-	SystemModInitialize();
-	
-	/* Start the FreeRTOS scheduler */
-	vTaskStartScheduler();
-
-	/* If all is well we will never reach here as the scheduler will now be running. */
-	/* If we do get here, it will most likely be because we ran out of heap space. */
-
-	return 0;
-}
-
-/**
- * Initialize the hardware, libraries and modules (called by the System thread in systemmod.c)
- */
-void OpenPilotInit()
-{
-
 	/* Architecture dependant Hardware and
 	 * core subsystem initialisation
 	 * (see pios_board.c for your arch)
 	 * */
-	
 	PIOS_Board_Init();
-	
-#ifdef ERASE_FLASH
-	PIOS_Flash_W25X_EraseChip();
-	while(TRUE){
-		PIOS_LED_Toggle(LED1);
-		PIOS_DELAY_WaitmS(50);
-	};
-#endif
 
 	/* Initialize modules */
-	InitModules();
-}
+	MODULE_INITIALISE_ALL
 
+	/* swap the stack to use the IRQ stack */
+	Stack_Change();
+
+	/* Start the FreeRTOS scheduler which should never returns.*/
+	vTaskStartScheduler();
+
+	/* If all is well we will never reach here as the scheduler will now be running. */
+
+	/* Do some indication to user that something bad just happened */
+	PIOS_LED_Off(LED1); \
+	for(;;) { \
+		PIOS_LED_Toggle(LED1); \
+		PIOS_DELAY_WaitmS(100); \
+	};
+
+    return 0;
+}
 
 /**
  * @}

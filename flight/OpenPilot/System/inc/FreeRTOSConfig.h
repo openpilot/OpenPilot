@@ -87,6 +87,9 @@ do {\
 #define configCHECK_FOR_STACK_OVERFLOW	1
 #endif
 
+#if !defined(ARCH_POSIX) && !defined(ARCH_WIN32)
+#define CHECK_IRQ_STACK
+#endif
 
 /**
   * @}

@@ -1,13 +1,16 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_RTC RTC Functions
+ * @brief PIOS interface for RTC tick
+ * @{
  *
- * @file       configtelemetrytwidget.h
+ * @file       pios_rtc_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @addtogroup GCSPlugins GCS Plugins
- * @{
- * @addtogroup ConfigPlugin Config Plugin
- * @{
- * @brief Telemetry configuration panel
+ * @brief      ADC private definitions.
+ * @see        The GNU Public License (GPL) Version 3
+ *
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,35 +27,26 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGTELEMETRYWIDGET_H
-#define CONFIGTELEMETRYWIDGET_H
 
-#include "ui_telemetry.h"
-#include "configtaskwidget.h"
-#include "extensionsystem/pluginmanager.h"
-#include "uavobjectmanager.h"
-#include "uavobject.h"
-#include <QtGui/QWidget>
-#include <QList>
+#ifndef PIOS_RTC_PRIV_H
+#define PIOS_RTC_PRIV_H
 
+#include <pios.h>
+#include <pios_stm32.h>
 
-class ConfigTelemetryWidget: public ConfigTaskWidget
-{
-    Q_OBJECT
-
-public:
-    ConfigTelemetryWidget(QWidget *parent = 0);
-    ~ConfigTelemetryWidget();
-
-private:
-    Ui_TelemetryWidget *m_telemetry;
-    void enableControls(bool enable);
-
-private slots:
-    virtual void refreshValues();
-    void sendTelemetryUpdate();
-    void saveTelemetryUpdate();
-
+struct pios_rtc_cfg {
+  uint32_t         clksrc;
+  uint32_t         prescaler;
+  struct stm32_irq irq;
 };
 
-#endif // ConfigTelemetryWidget_H
+extern void PIOS_RTC_Init(const struct pios_rtc_cfg * cfg);
+
+extern void PIOS_RTC_irq_handler(void);
+#endif /* PIOS_RTC_PRIV_H */
+
+/**
+ * @}
+ * @}
+ */
+

@@ -27,6 +27,7 @@
 #include "configccattitudewidget.h"
 #include "ui_ccattitude.h"
 #include "utils/coordinateconversions.h"
+#include "attitudesettings.h"
 #include <QMutexLocker>
 #include <QMessageBox>
 #include <QDebug>
@@ -48,7 +49,7 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
 
     enableControls(true);
     refreshValues(); // The 1st time this panel is instanciated, the autopilot is already connected.
-    UAVObject * settings = getObjectManager()->getObject(QString("AttitudeSettings"));
+    UAVObject * settings = AttitudeSettings::GetInstance(getObjectManager());
     connect(settings,SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
 
     // Connect the help button
@@ -79,7 +80,10 @@ void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
         x_accum.append(field->getDouble(0));
         y_accum.append(field->getDouble(1));
         z_accum.append(field->getDouble(2));
-	qDebug("update %d: %f, %f, %f\n",updates,field->getDouble(0),field->getDouble(1),field->getDouble(2));
+        field = obj->getField(QString("gyros"));
+        x_gyro_accum.append(field->getDouble(0));
+        y_gyro_accum.append(field->getDouble(1));
+        z_gyro_accum.append(field->getDouble(2));;
     } else if ( updates == NUM_ACCEL_UPDATES ) {
 	updates++;
         timer.stop();
@@ -90,18 +94,22 @@ void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
         float y_bias = listMean(y_accum) / ACCEL_SCALE;
         float z_bias = (listMean(z_accum) + 9.81) / ACCEL_SCALE;
 
+        float x_gyro_bias = listMean(x_gyro_accum) * 100.0f;
+        float y_gyro_bias = listMean(y_gyro_accum) * 100.0f;
+        float z_gyro_bias = listMean(z_gyro_accum) * 100.0f;
         obj->setMetadata(initialMdata);
 
-        UAVDataObject * settings = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeSettings")));
-        UAVObjectField * field = settings->getField("AccelBias");
-        field->setDouble(field->getDouble(0) + x_bias,0);
-        field->setDouble(field->getDouble(1) + y_bias,1);
-        field->setDouble(field->getDouble(2) + z_bias,2);
-	qDebug("New X bias: %f\n", field->getDouble(0)+x_bias);
-	qDebug("New Y bias: %f\n", field->getDouble(1)+y_bias);
-	qDebug("New Z bias: %f\n", field->getDouble(2)+z_bias);
-        settings->updated();
-        ui->status->setText("Calibration done.");
+        AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(getObjectManager())->getData();
+        // We offset the gyro bias by current bias to help precision
+        attitudeSettingsData.AccelBias[0] += x_bias;
+        attitudeSettingsData.AccelBias[1] += y_bias;
+        attitudeSettingsData.AccelBias[2] += z_bias;
+        attitudeSettingsData.GyroBias[0] = -x_gyro_bias;
+        attitudeSettingsData.GyroBias[1] = -y_gyro_bias;
+        attitudeSettingsData.GyroBias[2] = -z_gyro_bias;
+        attitudeSettingsData.BiasCorrectGyro = initialBiasCorrected;
+        AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
+
     } else {
 	// Possible to get here if weird threading stuff happens.  Just ignore updates.
 	qDebug("Unexpected accel update received.");
@@ -123,32 +131,22 @@ void ConfigCCAttitudeWidget::timeout() {
 }
 
 void ConfigCCAttitudeWidget::applyAttitudeSettings() {
-    UAVDataObject * settings = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeSettings")));
-    UAVObjectField * field = settings->getField("BoardRotation");
-
-    field->setValue(ui->rollBias->value(),0);
-    field->setValue(ui->pitchBias->value(),1);
-    field->setValue(ui->yawBias->value(),2);
-
-    field = settings->getField("ZeroDuringArming");
-    // Handling of boolean values is done through enums on
-    // uavobjects...
-    field->setValue((ui->zeroGyroBiasOnArming->isChecked()) ? "TRUE": "FALSE");
-
-    settings->updated();
+    AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(getObjectManager())->getData();
+    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_ROLL] = ui->rollBias->value();
+    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_PITCH] = ui->pitchBias->value();
+    attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_YAW] = ui->yawBias->value();
+    attitudeSettingsData.ZeroDuringArming = ui->zeroGyroBiasOnArming->isChecked() ? AttitudeSettings::ZERODURINGARMING_TRUE :
+                                                                                 AttitudeSettings::ZERODURINGARMING_FALSE;
+    AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
 }
 
 void ConfigCCAttitudeWidget::refreshValues() {
-    UAVDataObject * settings = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeSettings")));
-    UAVObjectField * field = settings->getField("BoardRotation");
-    ui->rollBias->setValue(field->getDouble(0));
-    ui->pitchBias->setValue(field->getDouble(1));
-    ui->yawBias->setValue(field->getDouble(2));
-    field = settings->getField("ZeroDuringArming");
-    // Handling of boolean values is done through enums on
-    // uavobjects...
-    bool enabled = (field->getValue().toString() == "FALSE") ? false : true;
-    ui->zeroGyroBiasOnArming->setChecked(enabled);
+    AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(getObjectManager())->getData();
+
+    ui->rollBias->setValue(attitudeSettingsData.BoardRotation[0]);
+    ui->pitchBias->setValue(attitudeSettingsData.BoardRotation[1]);
+    ui->yawBias->setValue(attitudeSettingsData.BoardRotation[2]);
+    ui->zeroGyroBiasOnArming->setChecked(attitudeSettingsData.ZeroDuringArming == AttitudeSettings::ZERODURINGARMING_TRUE);
 
 }
 
@@ -159,8 +157,15 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
     x_accum.clear();
     y_accum.clear();
     z_accum.clear();
+    x_gyro_accum.clear();
+    y_gyro_accum.clear();
+    z_gyro_accum.clear();
 
-    ui->status->setText(tr("Calibrating..."));
+    // Disable gyro bias correction to see raw data
+    AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(getObjectManager())->getData();
+    initialBiasCorrected = attitudeSettingsData.BiasCorrectGyro;
+    attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_FALSE;
+    AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
 
     // Set up to receive updates
     UAVDataObject * obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeRaw")));

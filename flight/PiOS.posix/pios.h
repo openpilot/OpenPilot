@@ -65,6 +65,7 @@
 #include <pios_wdg.h>
 #include <pios_debug.h>
 #include <pios_crc.h>
+#include <pios_rcvr.h>
 
 #define NELEMENTS(x) (sizeof(x) / sizeof(*(x)))
 

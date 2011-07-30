@@ -69,7 +69,7 @@ static void ahrscommsTask(void *parameters);
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t AHRSCommsInitialize(void)
+int32_t AHRSCommsStart(void)
 {
 	// Start main task
 	AHRSStatusInitialize();
@@ -82,6 +82,17 @@ int32_t AHRSCommsInitialize(void)
 
 	return 0;
 }
+
+/**
+ * Initialise the module, called on startup
+ * \returns 0 on success or -1 if initialisation failed
+ */
+int32_t AHRSCommsInitialize(void)
+{
+
+	return 0;
+}
+MODULE_INITCALL(AHRSCommsInitialize, AHRSCommsStart)
 
 /**
  * Module thread, should not return.

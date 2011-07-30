@@ -19,13 +19,9 @@ PACKAGE_DIR  := $(BUILD_DIR)/package-$(PACKAGE_LBL)
 FW_DIR       := $(PACKAGE_DIR)/firmware-$(PACKAGE_LBL)
 BL_DIR       := $(FW_DIR)/bootloaders
 BU_DIR       := $(FW_DIR)/bootloader-updaters
-FE_DIR       := $(FW_DIR)/flash-erase-tools
 
 # Clean build options (recommended for package testing only)
 ifeq ($(CLEAN_BUILD), NO)
-CLEAN_GROUND := NO
-CLEAN_FLIGHT := YES
-else ifeq ($(CLEAN_BUILD), NEVER)
 CLEAN_GROUND := NO
 CLEAN_FLIGHT := NO
 else
@@ -33,16 +29,11 @@ CLEAN_GROUND := YES
 CLEAN_FLIGHT := YES
 endif
 
-# Set up targets
-FW_STEMS_COMMON   := ahrs pipxtreme
-FW_STEMS_INPUT    := coptercontrol openpilot
-FW_STEMS_TOOLS    := coptercontrol
-FW_STEMS_ALL      := $(FW_STEMS_COMMON) $(FW_STEMS_INPUT)
-FW_TARGETS_COMMON := $(addprefix fw_, $(FW_STEMS_COMMON))
-FW_TARGETS_INPUT  := $(addprefix fw_, $(FW_STEMS_INPUT))
-FW_TARGETS_TOOLS  := $(addprefix fw_, $(FW_STEMS_TOOLS))
-BL_TARGETS        := $(addprefix bl_, $(FW_STEMS_ALL))
-BU_TARGETS        := $(addprefix bu_, $(FW_STEMS_ALL))
+# Set up targets (PPM target seems to be broken at the moment)
+FW_TARGETS        := $(addprefix fw_, ahrs pipxtreme coptercontrol openpilot)
+FW_TARGETS_TOOLS  := $(addprefix fw_, coptercontrol)
+BL_TARGETS        := $(addprefix bl_, coptercontrol openpilot ahrs pipxtreme)
+BU_TARGETS        := $(addprefix bu_, coptercontrol openpilot ahrs pipxtreme)
 
 help:
 	@echo
@@ -58,16 +49,9 @@ help:
 	@echo "   Notes:"
 	@echo "     - package will be placed in $(PACKAGE_DIR)"
 	@echo
-	@echo "     - the build directory will be removed first on every run unless one"
-	@echo "       of CLEAN_BUILD=NO or CLEAN_BUILD=NEVER options is defined."
-	@echo
-	@echo "       CLEAN_BUILD=NO means no clean before build except for multi-input"
-	@echo "       firmware binaries like CopterControl or OpenPilot. This usually is"
-	@echo "       safe."
-	@echo
-	@echo "       CLEAN_BUILD=NEVER means no clean will be done at all. This will,"
-	@echo "       probably, give invalid multi-input firmware and is recommended"
-	@echo "       for package testing only. Do not use for release builds."
+	@echo "     - the build directory will be removed first on every run unless"
+	@echo "       CLEAN_BUILD=NO is defined. It means no clean before build."
+	@echo "       This usually is safe."
 	@echo
 
 # Clean and build uavobjects since all parts depend on them
@@ -100,11 +84,8 @@ endif
 .PHONY: $(1)
 endef
 
-# Firmware for different input drivers
-$(eval $(call INSTALL_TEMPLATE,fw_common,uavobjects,$(FW_DIR),,-$(PACKAGE_LBL),,,$(FW_TARGETS_COMMON),install))
-$(eval $(call INSTALL_TEMPLATE,fw_pwm,uavobjects,$(FW_DIR),,-pwm-$(PACKAGE_LBL),,clean,$(FW_TARGETS_INPUT),install))
-$(eval $(call INSTALL_TEMPLATE,fw_spektrum,uavobjects,$(FW_DIR),,-dsm2sat-$(PACKAGE_LBL),USE_SPEKTRUM=YES,clean,$(FW_TARGETS_INPUT),install))
-$(eval $(call INSTALL_TEMPLATE,fw_ppm,uavobjects,$(FW_DIR),,-ppm-$(PACKAGE_LBL),USE_PPM=YES,clean,$(FW_TARGETS_INPUT),install))
+# Firmware
+$(eval $(call INSTALL_TEMPLATE,all_fw,uavobjects,$(FW_DIR),,-$(PACKAGE_LBL),,,$(FW_TARGETS),install))
 
 # Bootloaders (change 'install' to 'bin' if you don't want to install bootloaders)
 $(eval $(call INSTALL_TEMPLATE,all_bl,uavobjects,$(BL_DIR),,-$(PACKAGE_LBL),,,$(BL_TARGETS),install))
@@ -112,32 +93,14 @@ $(eval $(call INSTALL_TEMPLATE,all_bl,uavobjects,$(BL_DIR),,-$(PACKAGE_LBL),,,$(
 # Bootloader updaters
 $(eval $(call INSTALL_TEMPLATE,all_bu,all_bl,$(BU_DIR),,-$(PACKAGE_LBL),,,$(BU_TARGETS),install))
 
-# CopterControl flash eraser tool
-$(eval $(call INSTALL_TEMPLATE,fw_tools,uavobjects,$(FE_DIR),,-flash-erase-$(PACKAGE_LBL),ERASE_FLASH=YES,clean,$(FW_TARGETS_TOOLS),install))
-
 # Order-only dependencies
-# They are bit complicated to support parallel (-j) builds and to create
-# the pwm/ppm/spektrum and CC flash eraser targets in some fixed order
-
-fw_pwm: |		# default dependencies, will be built first
-
-fw_spektrum: | fw_pwm	# ordered build
-
-fw_ppm: | fw_spektrum   # ordered build
-
-fw_tools: | fw_spektrum # ordered build, replace fw_spektrum by fw_ppm if uncommented below
-
-package_fw: | fw_common fw_pwm fw_spektrum # fw_ppm
-
-package_bu: | all_bu
-
-package_flight: | package_fw package_bu fw_tools
+package_flight: | all_fw all_bu
 
 package_ground: | ground_package
 
 package: | package_flight package_ground
 
-.PHONY: help uavobjects all_clean package package_flight package_fw package_bu package_ground
+.PHONY: help uavobjects all_clean package_flight package_ground package
 
 # Decide on a verbosity level based on the V= parameter
 export AT := @

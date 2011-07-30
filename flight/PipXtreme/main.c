@@ -163,8 +163,8 @@ void TIMER_INT_FUNC(void)
 		// Clear timer interrupt pending bit
 		TIM_ClearITPendingBit(TIMER_INT_TIMER, TIM_IT_Update);
 
-//		random32 = UpdateCRC32(random32, PIOS_DELAY_TIMER->CNT >> 8);
-//		random32 = UpdateCRC32(random32, PIOS_DELAY_TIMER->CNT);
+//		random32 = UpdateCRC32(random32, PIOS_DELAY_GetuS() >> 8);
+//		random32 = UpdateCRC32(random32, PIOS_DELAY_GetuS());
 
 		uptime_ms++;
 
@@ -785,8 +785,8 @@ int main()
 
     for (;;)
     {
-        random32 = updateCRC32(random32, PIOS_DELAY_TIMER->CNT >> 8);
-        random32 = updateCRC32(random32, PIOS_DELAY_TIMER->CNT);
+        random32 = updateCRC32(random32, PIOS_DELAY_GetuS() >> 8);
+        random32 = updateCRC32(random32, PIOS_DELAY_GetuS());
 
         if (second_tick)
         {

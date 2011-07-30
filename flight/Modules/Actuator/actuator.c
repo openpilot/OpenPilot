@@ -111,6 +111,7 @@ int32_t ActuatorInitialize()
 	ActuatorSettingsInitialize();
 	ActuatorDesiredInitialize();
 	MixerSettingsInitialize();
+	ActuatorCommandInitialize();
 #if defined(DIAGNOSTICS)
 	MixerStatusInitialize();
 #endif

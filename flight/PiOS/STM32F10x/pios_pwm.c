@@ -35,7 +35,7 @@
 #if defined(PIOS_INCLUDE_PWM)
 
 /* Provide a RCVR driver */
-static int32_t PIOS_PWM_Get(uint32_t rcvr_id, uint8_t chan_id);
+static int32_t PIOS_PWM_Get(uint32_t rcvr_id, uint8_t channel);
 
 const struct pios_rcvr_driver pios_pwm_rcvr_driver = {
 	.read = PIOS_PWM_Get,

@@ -38,17 +38,17 @@
 
 /* Provide a COM driver */
 static void PIOS_USART_ChangeBaud(uint32_t usart_id, uint32_t baud);
-static int32_t PIOS_USART_TxBufferPutMoreNonBlocking(uint32_t usart_id, const uint8_t *buffer, uint16_t len);
-static int32_t PIOS_USART_TxBufferPutMore(uint32_t usart_id, const uint8_t *buffer, uint16_t len);
-static int32_t PIOS_USART_RxBufferGet(uint32_t usart_id);
-static int32_t PIOS_USART_RxBufferUsed(uint32_t usart_id);
+static void PIOS_USART_RegisterRxCallback(uint32_t usart_id, pios_com_callback rx_in_cb, uint32_t context);
+static void PIOS_USART_RegisterTxCallback(uint32_t usart_id, pios_com_callback tx_out_cb, uint32_t context);
+static void PIOS_USART_TxStart(uint32_t usart_id, uint16_t tx_bytes_avail);
+static void PIOS_USART_RxStart(uint32_t usart_id, uint16_t rx_bytes_avail);
 
 const struct pios_com_driver pios_usart_com_driver = {
-	.set_baud = PIOS_USART_ChangeBaud,
-	.tx_nb    = PIOS_USART_TxBufferPutMoreNonBlocking,
-	.tx       = PIOS_USART_TxBufferPutMore,
-	.rx       = PIOS_USART_RxBufferGet,
-	.rx_avail = PIOS_USART_RxBufferUsed,
+	.set_baud   = PIOS_USART_ChangeBaud,
+	.tx_start   = PIOS_USART_TxStart,
+	.rx_start   = PIOS_USART_RxStart,
+	.bind_tx_cb = PIOS_USART_RegisterTxCallback,
+	.bind_rx_cb = PIOS_USART_RegisterRxCallback,
 };
 
 enum pios_usart_dev_magic {
@@ -59,13 +59,10 @@ struct pios_usart_dev {
 	enum pios_usart_dev_magic     magic;
 	const struct pios_usart_cfg * cfg;
 
-	// align to 32-bit to try and provide speed improvement;
-	uint8_t rx_buffer[PIOS_USART_RX_BUFFER_SIZE] __attribute__ ((aligned(4)));
-	t_fifo_buffer rx;
-
-	// align to 32-bit to try and provide speed improvement;
-        uint8_t tx_buffer[PIOS_USART_TX_BUFFER_SIZE] __attribute__ ((aligned(4)));
-	t_fifo_buffer tx;
+	pios_com_callback rx_in_cb;
+	uint32_t rx_in_context;
+	pios_com_callback tx_out_cb;
+	uint32_t tx_out_context;
 };
 
 static bool PIOS_USART_validate(struct pios_usart_dev * usart_dev)
@@ -147,10 +144,6 @@ int32_t PIOS_USART_Init(uint32_t * usart_id, const struct pios_usart_cfg * cfg)
 	/* Bind the configuration to the device instance */
 	usart_dev->cfg = cfg;
 
-	/* Clear buffer counters */
-	fifoBuf_init(&usart_dev->rx, usart_dev->rx_buffer, sizeof(usart_dev->rx_buffer));
-	fifoBuf_init(&usart_dev->tx, usart_dev->tx_buffer, sizeof(usart_dev->tx_buffer));
-
 	/* Enable the USART Pins Software Remapping */
 	if (usart_dev->cfg->remap) {
 		GPIO_PinRemapConfig(usart_dev->cfg->remap, ENABLE);
@@ -203,17 +196,23 @@ out_fail:
 	return(-1);
 }
 
-const struct pios_usart_cfg * PIOS_USART_GetConfig(uint32_t usart_id)
+static void PIOS_USART_RxStart(uint32_t usart_id, uint16_t rx_bytes_avail)
 {
 	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
 
 	bool valid = PIOS_USART_validate(usart_dev);
+	PIOS_Assert(valid);
 
-	if (!valid) {
-		return (NULL);
-	}
+	USART_ITConfig(usart_dev->cfg->regs, USART_IT_RXNE, ENABLE);
+}
+static void PIOS_USART_TxStart(uint32_t usart_id, uint16_t tx_bytes_avail)
+{
+	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
 
-	return usart_dev->cfg;
+	bool valid = PIOS_USART_validate(usart_dev);
+	PIOS_Assert(valid);
+
+	USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, ENABLE);
 }
 
 /**
@@ -240,170 +239,34 @@ static void PIOS_USART_ChangeBaud(uint32_t usart_id, uint32_t baud)
 	USART_Init(usart_dev->cfg->regs, &USART_InitStructure);
 }
 
-/**
-* Returns number of used bytes in receive buffer
-* \param[in] USART USART name
-* \return > 0: number of used bytes
-* \return 0 if USART not available
-*/
-static int32_t PIOS_USART_RxBufferUsed(uint32_t usart_id)
+static void PIOS_USART_RegisterRxCallback(uint32_t usart_id, pios_com_callback rx_in_cb, uint32_t context)
 {
 	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
 
 	bool valid = PIOS_USART_validate(usart_dev);
-	PIOS_Assert(valid)
+	PIOS_Assert(valid);
 
-	return (fifoBuf_getUsed(&usart_dev->rx));
+	/* 
+	 * Order is important in these assignments since ISR uses _cb
+	 * field to determine if it's ok to dereference _cb and _context
+	 */
+	usart_dev->rx_in_context = context;
+	usart_dev->rx_in_cb = rx_in_cb;
 }
 
-/**
-* Gets a byte from the receive buffer
-* \param[in] USART USART name
-* \return -1 if no new byte available
-* \return >= 0: actual byte received
-*/
-static int32_t PIOS_USART_RxBufferGet(uint32_t usart_id)
+static void PIOS_USART_RegisterTxCallback(uint32_t usart_id, pios_com_callback tx_out_cb, uint32_t context)
 {
 	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
 
 	bool valid = PIOS_USART_validate(usart_dev);
-	PIOS_Assert(valid)
+	PIOS_Assert(valid);
 
-	if (fifoBuf_getUsed(&usart_dev->rx) == 0) {
-		/* Nothing new in the buffer */
-		return -1;
-	}
-
-	/* get byte - this operation should be atomic! */
-	uint8_t b = fifoBuf_getByte(&usart_dev->rx);
-
-	/* Return received byte */
-	return b;
-}
-
-/**
-* puts a byte onto the receive buffer
-* \param[in] USART USART name
-* \param[in] b byte which should be put into Rx buffer
-* \return 0 if no error
-* \return -1 if buffer full (retry)
-*/
-static int32_t PIOS_USART_RxBufferPut(uint32_t usart_id, uint8_t b)
-{
-	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
-
-	bool valid = PIOS_USART_validate(usart_dev);
-	PIOS_Assert(valid)
-
-	if (fifoBuf_getFree(&usart_dev->rx) < 1) {
-		/* Buffer full (retry) */
-		return -1;
-	}
-
-	/* Copy received byte into receive buffer */
-	/* This operation should be atomic! */
-	fifoBuf_putByte(&usart_dev->rx, b);
-
-	/* No error */
-	return 0;
-}
-
-/**
-* returns number of used bytes in transmit buffer
-* \param[in] USART USART name
-* \return number of used bytes
-* \return 0 if USART not available
-*/
-static int32_t PIOS_USART_TxBufferUsed(uint32_t usart_id)
-{
-	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
-
-	bool valid = PIOS_USART_validate(usart_dev);
-	PIOS_Assert(valid)
-
-	return (fifoBuf_getUsed(&usart_dev->tx));
-}
-
-/**
-* gets a byte from the transmit buffer
-* \param[in] USART USART name
-* \return -1 if no new byte available
-* \return >= 0: transmitted byte
-*/
-static int32_t PIOS_USART_TxBufferGet(uint32_t usart_id)
-{
-	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
-
-	bool valid = PIOS_USART_validate(usart_dev);
-	PIOS_Assert(valid)
-
-	if (fifoBuf_getUsed(&usart_dev->tx) == 0) {
-		/* Nothing new in the buffer */
-		return -1;
-	}
-
-	/* get byte - this operation should be atomic! */
-	PIOS_IRQ_Disable();
-	uint8_t b = fifoBuf_getByte(&usart_dev->tx);
-	PIOS_IRQ_Enable();
-  
-	/* Return received byte */
-	return b;
-}
-
-/**
-* puts more than one byte onto the transmit buffer (used for atomic sends)
-* \param[in] USART USART name
-* \param[in] *buffer pointer to buffer to be sent
-* \param[in] len number of bytes to be sent
-* \return 0 if no error
-* \return -1 if buffer full or cannot get all requested bytes (retry)
-*/
-static int32_t PIOS_USART_TxBufferPutMoreNonBlocking(uint32_t usart_id, const uint8_t *buffer, uint16_t len)
-{
-	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
-
-	bool valid = PIOS_USART_validate(usart_dev);
-	PIOS_Assert(valid)
-
-	if (len >= fifoBuf_getFree(&usart_dev->tx)) {
-		/* Buffer cannot accept all requested bytes (retry) */
-		return -1;
-	}
-
-	/* Copy bytes to be transmitted into transmit buffer */
-	/* This operation should be atomic! */
-	PIOS_IRQ_Disable();
-
-	uint16_t used = fifoBuf_getUsed(&usart_dev->tx);
-	fifoBuf_putData(&usart_dev->tx,buffer,len);
-	
-	if (used == 0) {
-		/* enable sending when buffer was previously empty */
-		USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, ENABLE);
-	}
-
-	PIOS_IRQ_Enable();
-
-	/* No error */
-	return 0;
-}
-
-/**
-* puts more than one byte onto the transmit buffer (used for atomic sends)<BR>
-* (blocking function)
-* \param[in] USART USART name
-* \param[in] *buffer pointer to buffer to be sent
-* \param[in] len number of bytes to be sent
-* \return 0 if no error
-*/
-static int32_t PIOS_USART_TxBufferPutMore(uint32_t usart_id, const uint8_t *buffer, uint16_t len)
-{
-	int32_t rc;
-
-	while ((rc = PIOS_USART_TxBufferPutMoreNonBlocking(usart_id, buffer, len)) == -1);
-
-	return rc;
+	/* 
+	 * Order is important in these assignments since ISR uses _cb
+	 * field to determine if it's ok to dereference _cb and _context
+	 */
+	usart_dev->tx_out_context = context;
+	usart_dev->tx_out_cb = tx_out_cb;
 }
 
 static void PIOS_USART_generic_irq_handler(uint32_t usart_id)
@@ -413,41 +276,46 @@ static void PIOS_USART_generic_irq_handler(uint32_t usart_id)
 	bool valid = PIOS_USART_validate(usart_dev);
 	PIOS_Assert(valid);
 
-	/* Call any user provided callback function instead of processing
-	 * the interrupt ourselves.
-	 */
-	if (usart_dev->cfg->irq.handler) {
-		(usart_dev->cfg->irq.handler)(usart_id);
-		return;
-	}
-
 	/* Force read of dr after sr to make sure to clear error flags */
 	volatile uint16_t sr = usart_dev->cfg->regs->SR;
 	volatile uint8_t dr = usart_dev->cfg->regs->DR;
 
 	/* Check if RXNE flag is set */
+	bool rx_need_yield = false;
 	if (sr & USART_SR_RXNE) {
-		if (PIOS_USART_RxBufferPut(usart_id, dr) < 0) {
-			/* Here we could add some error handling */
+		uint8_t byte = dr;
+		if (usart_dev->rx_in_cb) {
+		  (void) (usart_dev->rx_in_cb)(usart_dev->rx_in_context, &byte, 1, NULL, &rx_need_yield);
 		}
 	}
 
 	/* Check if TXE flag is set */
+	bool tx_need_yield = false;
 	if (sr & USART_SR_TXE) {
-		if (PIOS_USART_TxBufferUsed(usart_id) > 0) {
-			int32_t b = PIOS_USART_TxBufferGet(usart_id);
+		if (usart_dev->tx_out_cb) {
+			uint8_t b;
+			uint16_t bytes_to_send;
 
-			if (b < 0) {
-				/* Here we could add some error handling */
-				usart_dev->cfg->regs->DR = 0xff;
+			bytes_to_send = (usart_dev->tx_out_cb)(usart_dev->tx_out_context, &b, 1, NULL, &tx_need_yield);
+
+			if (bytes_to_send > 0) {
+				/* Send the byte we've been given */
+				usart_dev->cfg->regs->DR = b;
 			} else {
-				usart_dev->cfg->regs->DR = b & 0xff;
+				/* No bytes to send, disable TXE interrupt */
+				USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, DISABLE);
 			}
 		} else {
-			/* Disable TXE interrupt (TXEIE=0) */
+			/* No bytes to send, disable TXE interrupt */
 			USART_ITConfig(usart_dev->cfg->regs, USART_IT_TXE, DISABLE);
 		}
 	}
+
+#if defined(PIOS_INCLUDE_FREERTOS)
+	if (rx_need_yield || tx_need_yield) {
+		vPortYieldFromISR();
+	}
+#endif	/* PIOS_INCLUDE_FREERTOS */
 }
 
 #endif

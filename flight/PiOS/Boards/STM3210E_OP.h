@@ -139,9 +139,6 @@ extern uint32_t pios_i2c_main_adapter_id;
 //-------------------------
 #define PIOS_USART_MAX_DEVS             3
 
-#define PIOS_USART_RX_BUFFER_SIZE       512
-#define PIOS_USART_TX_BUFFER_SIZE       512
-
 //-------------------------
 // PIOS_COM
 //
@@ -162,16 +159,6 @@ extern uint32_t pios_com_telem_usb_id;
 extern uint32_t pios_com_aux_id;
 #define PIOS_COM_AUX                    (pios_com_aux_id)
 #define PIOS_COM_DEBUG                  PIOS_COM_AUX
-#endif
-
-#ifdef PIOS_INCLUDE_SPEKTRUM
-extern uint32_t pios_com_spektrum_id;
-#define PIOS_COM_SPEKTRUM               (pios_com_spektrum_id)
-#endif
-
-#ifdef PIOS_INCLUDE_SBUS
-extern uint32_t pios_com_sbus_id;
-#define PIOS_COM_SBUS                   (pios_com_sbus_id)
 #endif
 
 //-------------------------
@@ -309,12 +296,11 @@ extern uint32_t pios_com_sbus_id;
 // USB
 //-------------------------
 #define PIOS_USB_ENABLED                        1
+#define PIOS_USB_HID_MAX_DEVS                   1
 #define PIOS_USB_DETECT_GPIO_PORT               GPIOC
 #define PIOS_USB_DETECT_GPIO_PIN                GPIO_Pin_4
 #define PIOS_USB_DETECT_EXTI_LINE               EXTI_Line4
 #define PIOS_IRQ_USB_PRIORITY                   PIOS_IRQ_PRIO_MID
-#define PIOS_USB_RX_BUFFER_SIZE                 512
-#define PIOS_USB_TX_BUFFER_SIZE                 512
 
 /**
  * glue macros for file IO

@@ -200,8 +200,10 @@ static void gpsTask(void *parameters)
 
 			while (PIOS_COM_ReceiveBufferUsed(gpsPort) > 0)
 			{
-				int res = GTOP_BIN_update_position(PIOS_COM_ReceiveBuffer(gpsPort), &numChecksumErrors, &numParsingErrors);
-				if (res >= 0)
+				uint8_t c;
+				PIOS_COM_ReceiveBuffer(gpsPort, &c, 1, 0);
+
+				if (GTOP_BIN_update_position(c, &numChecksumErrors, &numParsingErrors) >= 0)
 				{
 					numUpdates++;
 
@@ -217,7 +219,8 @@ static void gpsTask(void *parameters)
 			// This blocks the task until there is something on the buffer
 			while (PIOS_COM_ReceiveBufferUsed(gpsPort) > 0)
 			{
-				char c = PIOS_COM_ReceiveBuffer(gpsPort);
+				uint8_t c;
+				PIOS_COM_ReceiveBuffer(gpsPort, &c, 1, 0);
 			
 				// detect start while acquiring stream
 				if (!start_flag && (c == '$'))

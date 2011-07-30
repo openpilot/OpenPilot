@@ -56,7 +56,7 @@ static struct pios_rcvr_dev * PIOS_RCVR_alloc(void)
   * \param[in] id
   * \return < 0 if initialisation failed
   */
-int32_t PIOS_RCVR_Init(uint32_t * rcvr_id, const struct pios_rcvr_driver * driver, const uint32_t lower_id)
+int32_t PIOS_RCVR_Init(uint32_t * rcvr_id, const struct pios_rcvr_driver * driver, uint32_t lower_id)
 {
   PIOS_DEBUG_Assert(rcvr_id);
   PIOS_DEBUG_Assert(driver);
@@ -82,7 +82,7 @@ int32_t PIOS_RCVR_Read(uint32_t rcvr_id, uint8_t channel)
 
   if (!PIOS_RCVR_validate(rcvr_dev)) {
     /* Undefined RCVR port for this board (see pios_board.c) */
-    PIOS_DEBUG_Assert(0);
+    PIOS_Assert(0);
   }
 
   PIOS_DEBUG_Assert(rcvr_dev->driver->read);

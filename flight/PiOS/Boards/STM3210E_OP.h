@@ -195,6 +195,7 @@ extern uint32_t pios_com_aux_id;
 //-------------------------
 // Receiver SPEKTRUM input
 //-------------------------
+#define PIOS_SPEKTRUM_MAX_DEVS			1
 #define PIOS_SPEKTRUM_NUM_INPUTS                12
 
 //-------------------------

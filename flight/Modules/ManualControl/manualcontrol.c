@@ -141,7 +141,7 @@ static void manualControlTask(void *parameters)
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1) {
-		float scaledChannel[MANUALCONTROLCOMMAND_CHANNEL_NUMELEM];
+		float scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_NUMELEM];
 
 		// Wait until next update
 		vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD_MS / portTICK_RATE_MS);
@@ -165,22 +165,28 @@ static void manualControlTask(void *parameters)
 		if (!ManualControlCommandReadOnly(&cmd)) {
 
 			// Read channel values in us
-			for (int n = 0; n < MANUALCONTROLCOMMAND_CHANNEL_NUMELEM; ++n) {
-				if (pios_rcvr_channel_to_id_map[n].id) {
-					cmd.Channel[n] = PIOS_RCVR_Read(pios_rcvr_channel_to_id_map[n].id,
-									pios_rcvr_channel_to_id_map[n].channel);
-				} else {
+			for (uint8_t n = 0; 
+			     n < MANUALCONTROLSETTINGS_CHANNELGROUPS_NUMELEM && n < MANUALCONTROLCOMMAND_CHANNEL_NUMELEM;
+			     ++n) {
+				extern uint32_t pios_rcvr_group_map[];
+
+				if (settings.ChannelGroups[n] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
 					cmd.Channel[n] = -1;
+				} else if (!pios_rcvr_group_map[settings.ChannelGroups[n]]) {
+					cmd.Channel[n] = -2;
+				} else {
+					cmd.Channel[n] = PIOS_RCVR_Read(pios_rcvr_group_map[settings.ChannelGroups[n]],
+									settings.ChannelNumber[n]);
 				}
 				scaledChannel[n] = scaleChannel(cmd.Channel[n], settings.ChannelMax[n],	settings.ChannelMin[n], settings.ChannelNeutral[n]);
 			}
 
 			// Check settings, if error raise alarm
-			if (settings.Roll >= MANUALCONTROLSETTINGS_ROLL_NONE ||
-			    settings.Pitch >= MANUALCONTROLSETTINGS_PITCH_NONE ||
-			    settings.Yaw >= MANUALCONTROLSETTINGS_YAW_NONE ||
-			    settings.Throttle >= MANUALCONTROLSETTINGS_THROTTLE_NONE ||
-			    settings.FlightMode >= MANUALCONTROLSETTINGS_FLIGHTMODE_NONE) {
+			if (settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE ||
+				settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE ||
+				settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE ||
+				settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE ||
+				settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
 				AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
 				cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
 				ManualControlCommandSet(&cmd);
@@ -188,10 +194,10 @@ static void manualControlTask(void *parameters)
 			}
 
 			// decide if we have valid manual input or not
-			bool valid_input_detected = validInputRange(settings.ChannelMin[settings.Throttle], settings.ChannelMax[settings.Throttle], cmd.Channel[settings.Throttle]) &&
-			     validInputRange(settings.ChannelMin[settings.Roll], settings.ChannelMax[settings.Roll], cmd.Channel[settings.Roll]) &&
-			     validInputRange(settings.ChannelMin[settings.Yaw], settings.ChannelMax[settings.Yaw], cmd.Channel[settings.Yaw]) &&
-			     validInputRange(settings.ChannelMin[settings.Pitch], settings.ChannelMax[settings.Pitch], cmd.Channel[settings.Pitch]);
+			bool valid_input_detected = validInputRange(settings.ChannelMin[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE], settings.ChannelMax[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE], cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE]) &&
+			     validInputRange(settings.ChannelMin[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL], settings.ChannelMax[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL], cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL]) &&
+			     validInputRange(settings.ChannelMin[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW], settings.ChannelMax[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW], cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW]) &&
+			     validInputRange(settings.ChannelMin[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH], settings.ChannelMax[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH], cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH]);
 
 			// Implement hysteresis loop on connection status
 			if (valid_input_detected && (++connected_count > 10)) {
@@ -218,28 +224,31 @@ static void manualControlTask(void *parameters)
 				AlarmsClear(SYSTEMALARMS_ALARM_MANUALCONTROL);
 
 				// Scale channels to -1 -> +1 range
-				cmd.Roll           = scaledChannel[settings.Roll];
-				cmd.Pitch          = scaledChannel[settings.Pitch];
-				cmd.Yaw            = scaledChannel[settings.Yaw];
-				cmd.Throttle       = scaledChannel[settings.Throttle];
-				flightMode         = scaledChannel[settings.FlightMode];
+				cmd.Roll           = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL];
+				cmd.Pitch          = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH];
+				cmd.Yaw            = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW];
+				cmd.Throttle       = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE];
+				flightMode         = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE];
 
 				AccessoryDesiredData accessory;
 				// Set Accessory 0
-				if(settings.Accessory0 != MANUALCONTROLSETTINGS_ACCESSORY0_NONE) {
-					accessory.AccessoryVal = scaledChannel[settings.Accessory0];
+				if (settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_ACCESSORY0] != 
+					MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
+					accessory.AccessoryVal = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ACCESSORY0];
 					if(AccessoryDesiredInstSet(0, &accessory) != 0)
 						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
 				}
 				// Set Accessory 1
-				if(settings.Accessory1 != MANUALCONTROLSETTINGS_ACCESSORY1_NONE) {
-					accessory.AccessoryVal = scaledChannel[settings.Accessory1];
+				if (settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_ACCESSORY1] != 
+					MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
+					accessory.AccessoryVal = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ACCESSORY1];
 					if(AccessoryDesiredInstSet(1, &accessory) != 0)
 						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
 				}
-				// Set Accsesory 2
-				if(settings.Accessory2 != MANUALCONTROLSETTINGS_ACCESSORY2_NONE) {
-					accessory.AccessoryVal = scaledChannel[settings.Accessory2];
+				// Set Accessory 2
+				if (settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_ACCESSORY2] != 
+					MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
+					accessory.AccessoryVal = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ACCESSORY2];
 					if(AccessoryDesiredInstSet(2, &accessory) != 0)
 						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
 				}

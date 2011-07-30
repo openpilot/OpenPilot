@@ -168,16 +168,10 @@ SRC += $(OPUAVSYNTHDIR)/attitudesettings.c
 SRC += $(OPUAVSYNTHDIR)/camerastabsettings.c
 SRC += $(OPUAVSYNTHDIR)/hwsettings.c
 
-ifeq ($(DIAGNOISTCS),YES)
 SRC += $(OPUAVSYNTHDIR)/taskinfo.c
 SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
 SRC += $(OPUAVSYNTHDIR)/ratedesired.c
-endif
 
-#${wildcard ${OBJ}/$(shell echo $(VAR) | tr A-Z a-z)/*.c}
-#SRC += ${foreach OBJ, ${UAVOBJECTS}, $(UAVOBJECTS)/$(OBJ).c}
-# Cant use until i can automatically generate list of UAVObjects
-#SRC += ${OUTDIR}/InitObjects.c
 endif
 
 ## PIOS Hardware (STM32F10x)

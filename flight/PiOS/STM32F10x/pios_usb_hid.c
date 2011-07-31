@@ -36,76 +36,106 @@
 #include "usb_lib.h"
 #include "pios_usb_hid_desc.h"
 #include "stm32f10x.h"
-#include "fifo_buffer.h"
+
+#include "pios_usb_hid_priv.h"
 
 #if defined(PIOS_INCLUDE_USB_HID)
 
-#if defined(PIOS_INCLUDE_FREERTOS)
-#define USE_FREERTOS
-#endif
-
-static int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint32_t usbcom_id, const uint8_t *buffer, uint16_t len);
-static int32_t PIOS_USB_HID_TxBufferPutMore(uint32_t usbcom_id, const uint8_t *buffer, uint16_t len);
-static int32_t PIOS_USB_HID_RxBufferGet(uint32_t usbcom_id);
-static int32_t PIOS_USB_HID_RxBufferUsed(uint32_t usbcom_id);
+static void PIOS_USB_HID_TxStart(uint32_t usbcom_id, uint16_t tx_bytes_avail);
+static void PIOS_USB_HID_RxStart(uint32_t usbcom_id, uint16_t rx_bytes_avail);
+static void PIOS_USB_HID_RegisterTxCallback(uint32_t usbcom_id, pios_com_callback tx_out_cb, uint32_t context);
+static void PIOS_USB_HID_RegisterRxCallback(uint32_t usbcom_id, pios_com_callback rx_in_cb, uint32_t context);
 
 const struct pios_com_driver pios_usb_com_driver = {
-	.tx_nb = PIOS_USB_HID_TxBufferPutMoreNonBlocking,
-	.tx = PIOS_USB_HID_TxBufferPutMore,
-	.rx = PIOS_USB_HID_RxBufferGet,
-	.rx_avail = PIOS_USB_HID_RxBufferUsed,
+	.tx_start    = PIOS_USB_HID_TxStart,
+	.rx_start    = PIOS_USB_HID_RxStart,
+	.bind_tx_cb  = PIOS_USB_HID_RegisterTxCallback,
+	.bind_rx_cb  = PIOS_USB_HID_RegisterRxCallback,
 };
 
-// TODO: Eventually replace the transmit and receive buffers with bigger ring bufers
-// so there isn't hte 64 byte cap in place by the USB interrupt packet definition
+enum pios_usb_hid_dev_magic {
+	PIOS_USB_HID_DEV_MAGIC = 0xAABBCCDD,
+};
+
+struct pios_usb_hid_dev {
+	enum pios_usb_hid_dev_magic     magic;
+	const struct pios_usb_hid_cfg * cfg;
+
+	pios_com_callback rx_in_cb;
+	uint32_t rx_in_context;
+	pios_com_callback tx_out_cb;
+	uint32_t tx_out_context;
+
+	uint8_t rx_packet_buffer[PIOS_USB_HID_DATA_LENGTH + 2];
+	uint8_t tx_packet_buffer[PIOS_USB_HID_DATA_LENGTH + 2];
+};
+
+static bool PIOS_USB_HID_validate(struct pios_usb_hid_dev * usb_hid_dev)
+{
+	return (usb_hid_dev->magic == PIOS_USB_HID_DEV_MAGIC);
+}
+
+#if defined(PIOS_INCLUDE_FREERTOS) && 0
+static struct pios_usb_hid_dev * PIOS_USB_HID_alloc(void)
+{
+	struct pios_usb_hid_dev * usb_hid_dev;
+
+	usb_hid_dev = (struct pios_usb_hid_dev *)malloc(sizeof(*usb_hid_dev));
+	if (!usb_hid_dev) return(NULL);
+
+	usb_hid_dev->magic = PIOS_USB_HID_DEV_MAGIC;
+	return(usb_hid_dev);
+}
+#else
+static struct pios_usb_hid_dev pios_usb_hid_devs[PIOS_USB_HID_MAX_DEVS];
+static uint8_t pios_usb_hid_num_devs;
+static struct pios_usb_hid_dev * PIOS_USB_HID_alloc(void)
+{
+	struct pios_usb_hid_dev * usb_hid_dev;
+
+	if (pios_usb_hid_num_devs >= PIOS_USB_HID_MAX_DEVS) {
+		return (NULL);
+	}
+
+	usb_hid_dev = &pios_usb_hid_devs[pios_usb_hid_num_devs++];
+	usb_hid_dev->magic = PIOS_USB_HID_DEV_MAGIC;
+
+	return (usb_hid_dev);
+}
+#endif
 
 /* Rx/Tx status */
 static uint8_t transfer_possible = 0;
-static uint8_t rx_packet_buffer[PIOS_USB_HID_DATA_LENGTH + 2] = { 0 };
-static uint8_t tx_packet_buffer[PIOS_USB_HID_DATA_LENGTH + 2] = { 0 };
-
-uint8_t rx_pios_fifo_buf[PIOS_USB_RX_BUFFER_SIZE] __attribute__ ((aligned(4)));    // align to 32-bit to try and provide speed improvement
-t_fifo_buffer rx_pios_fifo_buffer;
-
-uint8_t tx_pios_fifo_buf[PIOS_USB_TX_BUFFER_SIZE] __attribute__ ((aligned(4)));    // align to 32-bit to try and provide speed improvement
-t_fifo_buffer tx_pios_fifo_buffer;
-
-#if defined(USE_FREERTOS)
-xSemaphoreHandle pios_usb_tx_semaphore;
-#endif
 
 /**
  * Initialises USB COM layer
- * \param[in] mode currently only mode 0 supported
  * \return < 0 if initialisation failed
  * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
  */
-int32_t PIOS_USB_HID_Init(uint32_t mode)
+static uint32_t pios_usb_hid_id;
+int32_t PIOS_USB_HID_Init(uint32_t * usb_hid_id, const struct pios_usb_hid_cfg * cfg)
 {
-	/* Currently only mode 0 supported */
-	if (mode != 0) {
-		/* Unsupported mode */
-		return -1;
-	}
+	PIOS_Assert(usb_hid_id);
+	PIOS_Assert(cfg);
 
-	fifoBuf_init(&rx_pios_fifo_buffer, rx_pios_fifo_buf, sizeof(rx_pios_fifo_buf));
-	fifoBuf_init(&tx_pios_fifo_buffer, tx_pios_fifo_buf, sizeof(tx_pios_fifo_buf));
+	struct pios_usb_hid_dev * usb_hid_dev;
+
+	usb_hid_dev = (struct pios_usb_hid_dev *) PIOS_USB_HID_alloc();
+	if (!usb_hid_dev) goto out_fail;
+
+	/* Bind the configuration to the device instance */
+	usb_hid_dev->cfg = cfg;
 
 	PIOS_USB_HID_Reenumerate();
 
-	/* Create semaphore before enabling interrupts */
-#if defined(USE_FREERTOS)	
-	vSemaphoreCreateBinary(pios_usb_tx_semaphore);
-#endif
-	
+	/*
+	 * This is a horrible hack to make this available to
+	 * the interrupt callbacks.  This should go away ASAP.
+	 */
+	pios_usb_hid_id = (uint32_t) usb_hid_dev;
+
 	/* Enable the USB Interrupts */
-	/* 2 bit for pre-emption priority, 2 bits for subpriority */
-	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure.NVIC_IRQChannel = USB_LP_CAN1_RX0_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
+	NVIC_Init(&usb_hid_dev->cfg->irq.init);
 
 	/* Select USBCLK source */
 	RCC_USBCLKConfig(RCC_USBCLKSource_PLLCLK_1Div5);
@@ -122,7 +152,12 @@ int32_t PIOS_USB_HID_Init(uint32_t mode)
 	USB_Init();
 	USB_SIL_Init();
 
+	*usb_hid_id = (uint32_t) usb_hid_dev;
+
 	return 0;		/* No error */
+
+out_fail:
+	return(-1);
 }
 
 /**
@@ -201,127 +236,118 @@ int32_t PIOS_USB_HID_CheckAvailable(uint8_t id)
 	return (PIOS_USB_DETECT_GPIO_PORT->IDR & PIOS_USB_DETECT_GPIO_PIN) != 0 && transfer_possible ? 1 : 0;
 }
 
-void sendChunk()
+static void PIOS_USB_HID_SendReport(struct pios_usb_hid_dev * usb_hid_dev)
 {
+	uint16_t bytes_to_tx;
 
-	uint32_t size = fifoBuf_getUsed(&tx_pios_fifo_buffer);
-	if ((size > 0) && (GetEPTxStatus(ENDP1) != EP_TX_VALID)) {
-		if (size > PIOS_USB_HID_DATA_LENGTH)
-			size = PIOS_USB_HID_DATA_LENGTH;
+	if (!usb_hid_dev->tx_out_cb) {
+		return;
+	}
+
+	bool need_yield = false;
 #ifdef USB_HID
-		fifoBuf_getData(&tx_pios_fifo_buffer, &tx_packet_buffer[1], size + 1);
-		tx_packet_buffer[0] = 1;	/* report ID */
+	bytes_to_tx = (usb_hid_dev->tx_out_cb)(usb_hid_dev->tx_out_context,
+					       &usb_hid_dev->tx_packet_buffer[1],
+					       sizeof(usb_hid_dev->tx_packet_buffer)-1,
+					       NULL,
+					       &need_yield);
 #else
-		fifoBuf_getData(&tx_pios_fifo_buffer, &tx_packet_buffer[2], size);
-		tx_packet_buffer[0] = 1;	/* report ID */
-		tx_packet_buffer[1] = size;	/* valid data length */
-
+	bytes_to_tx = (usb_hid_dev->tx_out_cb)(usb_hid_dev->tx_out_context,
+					       &usb_hid_dev->tx_packet_buffer[2],
+					       sizeof(usb_hid_dev->tx_packet_buffer)-2,
+					       NULL,
+					       &need_yield);
 #endif
-
-		UserToPMABufferCopy((uint8_t *) tx_packet_buffer, GetEPTxAddr(EP1_IN & 0x7F), size + 2);
-		SetEPTxCount((EP1_IN & 0x7F), PIOS_USB_HID_DATA_LENGTH + 2);
-
-		/* Send Buffer */
-		SetEPTxValid(ENDP1);
+	if (bytes_to_tx == 0) {
+		return;
 	}
 
-}
+	/* Always set type as report ID */
+	usb_hid_dev->tx_packet_buffer[0] = 1;
 
-/**
- * Puts more than one byte onto the transmit buffer (used for atomic sends)
- * \param[in] *buffer pointer to buffer which should be transmitted
- * \param[in] len number of bytes which should be transmitted
- * \return 0 if no error
- * \return -1 if port unavailable (disconnected)
- * \return -2 if too many bytes to be send
- * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
- */
-static int32_t PIOS_USB_HID_TxBufferPutMoreNonBlocking(uint32_t usbcom_id, const uint8_t * buffer, uint16_t len)
-{
-	uint16_t ret;
-
-	if(!transfer_possible)
-		return -1;
-
-	if (len > fifoBuf_getFree(&tx_pios_fifo_buffer)) {
-		sendChunk();    /* Try and send what's in the buffer though */
-		return -2;	/* Cannot send all requested bytes */
-	}
-
-	/* don't check returned bytes because it should always succeed  */
-	/* after previous thread and no meaningful way to deal with the */
-	/* case it only buffers half the bytes                          */
-#if defined(USE_FREERTOS)
-	if(!xSemaphoreTake(pios_usb_tx_semaphore,10 / portTICK_RATE_MS))
-		return -3;
+#ifdef USB_HID
+	UserToPMABufferCopy(usb_hid_dev->tx_packet_buffer, GetEPTxAddr(EP1_IN & 0x7F), bytes_to_tx + 1);
+#else
+	usb_hid_dev->tx_packet_buffer[1] = bytes_to_tx;
+	UserToPMABufferCopy(usb_hid_dev->tx_packet_buffer, GetEPTxAddr(EP1_IN & 0x7F), bytes_to_tx + 2);
 #endif
+	/* Is this correct?  Why do we always send the whole buffer? */
+	SetEPTxCount((EP1_IN & 0x7F), sizeof(usb_hid_dev->tx_packet_buffer));
+	SetEPTxValid(ENDP1);
 
-	ret = fifoBuf_putData(&tx_pios_fifo_buffer, buffer, len);
-
-#if defined(USE_FREERTOS)
-	xSemaphoreGive(pios_usb_tx_semaphore);
-#endif
-
-	sendChunk();
-
-	return 0;
-}
-
-/**
- * Puts more than one byte onto the transmit buffer (used for atomic sends)<br>
- * (Blocking Function)
- * \param[in] *buffer pointer to buffer which should be transmitted
- * \param[in] len number of bytes which should be transmitted
- * \return 0 if no error
- * \return -1 if too many bytes to be send
- * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
- */
-static int32_t PIOS_USB_HID_TxBufferPutMore(uint32_t usbcom_id, const uint8_t *buffer, uint16_t len)
-{
-	if(len > (fifoBuf_getUsed(&tx_pios_fifo_buffer) + fifoBuf_getFree(&tx_pios_fifo_buffer)))
-		return -1;
-
-	uint32_t error;
-	while ((error = PIOS_USB_HID_TxBufferPutMoreNonBlocking(usbcom_id, buffer, len)) == -2) {
 #if defined(PIOS_INCLUDE_FREERTOS)
-		taskYIELD();
-#endif
+	if (need_yield) {
+		vPortYieldFromISR();
 	}
-
-	return error;
+#endif	/* PIOS_INCLUDE_FREERTOS */
 }
 
-/**
- * Gets a byte from the receive buffer
- * \return -1 if no new byte available
- * \return >= 0: received byte
- * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
- */
-static int32_t PIOS_USB_HID_RxBufferGet(uint32_t usbcom_id)
-{
-	uint8_t read;
+static void PIOS_USB_HID_RxStart(uint32_t usbcom_id, uint16_t rx_bytes_avail) {
+	struct pios_usb_hid_dev * usb_hid_dev = (struct pios_usb_hid_dev *)usbcom_id;
 
-	if(fifoBuf_getUsed(&rx_pios_fifo_buffer) == 0)
-		return -1;
+	bool valid = PIOS_USB_HID_validate(usb_hid_dev);
+	PIOS_Assert(valid);
 
-	read = fifoBuf_getByte(&rx_pios_fifo_buffer);
+	if (!transfer_possible) {
+		return;
+	}
 
 	// If endpoint was stalled and there is now space make it valid
-	if ((GetEPRxStatus(ENDP1) != EP_RX_VALID) && (fifoBuf_getFree(&rx_pios_fifo_buffer) > 62)) {
+	PIOS_IRQ_Disable();
+	if ((GetEPRxStatus(ENDP1) != EP_RX_VALID) && 
+	    (rx_bytes_avail > PIOS_USB_HID_DATA_LENGTH)) {
 		SetEPRxStatus(ENDP1, EP_RX_VALID);
 	}
-	return read;
+	PIOS_IRQ_Enable();
 }
 
-/**
- * Returns number of used bytes in receive buffer
- * \return > 0: number of used bytes
- * \return 0 nothing available
- * \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
- */
-static int32_t PIOS_USB_HID_RxBufferUsed(uint32_t usbcom_id)
+static void PIOS_USB_HID_TxStart(uint32_t usbcom_id, uint16_t tx_bytes_avail)
 {
-	return fifoBuf_getUsed(&rx_pios_fifo_buffer);
+	struct pios_usb_hid_dev * usb_hid_dev = (struct pios_usb_hid_dev *)usbcom_id;
+
+	bool valid = PIOS_USB_HID_validate(usb_hid_dev);
+	PIOS_Assert(valid);
+
+	if (!transfer_possible) {
+		return;
+	}
+
+	if (GetEPTxStatus(ENDP1) == EP_TX_VALID) {
+		/* Endpoint is already transmitting */
+		return;
+	}
+
+	PIOS_USB_HID_SendReport(usb_hid_dev);
+}
+
+static void PIOS_USB_HID_RegisterRxCallback(uint32_t usbcom_id, pios_com_callback rx_in_cb, uint32_t context)
+{
+	struct pios_usb_hid_dev * usb_hid_dev = (struct pios_usb_hid_dev *)usbcom_id;
+
+	bool valid = PIOS_USB_HID_validate(usb_hid_dev);
+	PIOS_Assert(valid);
+
+	/* 
+	 * Order is important in these assignments since ISR uses _cb
+	 * field to determine if it's ok to dereference _cb and _context
+	 */
+	usb_hid_dev->rx_in_context = context;
+	usb_hid_dev->rx_in_cb = rx_in_cb;
+}
+
+static void PIOS_USB_HID_RegisterTxCallback(uint32_t usbcom_id, pios_com_callback tx_out_cb, uint32_t context)
+{
+	struct pios_usb_hid_dev * usb_hid_dev = (struct pios_usb_hid_dev *)usbcom_id;
+
+	bool valid = PIOS_USB_HID_validate(usb_hid_dev);
+	PIOS_Assert(valid);
+
+	/* 
+	 * Order is important in these assignments since ISR uses _cb
+	 * field to determine if it's ok to dereference _cb and _context
+	 */
+	usb_hid_dev->tx_out_context = context;
+	usb_hid_dev->tx_out_cb = tx_out_cb;
 }
 
 /**
@@ -330,7 +356,16 @@ static int32_t PIOS_USB_HID_RxBufferUsed(uint32_t usbcom_id)
  */
 void PIOS_USB_HID_EP1_IN_Callback(void)
 {
-	sendChunk();
+	struct pios_usb_hid_dev * usb_hid_dev = (struct pios_usb_hid_dev *)pios_usb_hid_id;
+
+	bool valid = PIOS_USB_HID_validate(usb_hid_dev);
+	PIOS_Assert(valid);
+
+	if (!transfer_possible) {
+		return;
+	}
+
+	PIOS_USB_HID_SendReport(usb_hid_dev);
 }
 
 /**
@@ -338,28 +373,58 @@ void PIOS_USB_HID_EP1_IN_Callback(void)
  */
 void PIOS_USB_HID_EP1_OUT_Callback(void)
 {
+	struct pios_usb_hid_dev * usb_hid_dev = (struct pios_usb_hid_dev *)pios_usb_hid_id;
+
+	bool valid = PIOS_USB_HID_validate(usb_hid_dev);
+	PIOS_Assert(valid);
+
 	uint32_t DataLength = 0;
 
 	/* Read received data (63 bytes) */
 	/* Get the number of received data on the selected Endpoint */
 	DataLength = GetEPRxCount(ENDP1 & 0x7F);
+	if (DataLength > sizeof(usb_hid_dev->rx_packet_buffer)) {
+		DataLength = sizeof(usb_hid_dev->rx_packet_buffer);
+	}
 
 	/* Use the memory interface function to write to the selected endpoint */
-	PMAToUserBufferCopy((uint8_t *) &rx_packet_buffer[0], GetEPRxAddr(ENDP1 & 0x7F), DataLength);
+	PMAToUserBufferCopy((uint8_t *) usb_hid_dev->rx_packet_buffer, GetEPRxAddr(ENDP1 & 0x7F), DataLength);
+
+	if (!usb_hid_dev->rx_in_cb) {
+		/* No Rx call back registered, disable the receiver */
+		SetEPRxStatus(ENDP1, EP_RX_NAK);
+		return;
+	}
 
 	/* The first byte is report ID (not checked), the second byte is the valid data length */
+	uint16_t headroom;
+	bool need_yield = false;
 #ifdef USB_HID
-	fifoBuf_putData(&rx_pios_fifo_buffer, &rx_packet_buffer[1], PIOS_USB_HID_DATA_LENGTH + 1);
+	(usb_hid_dev->rx_in_cb)(usb_hid_dev->rx_in_context,
+				&usb_hid_dev->rx_packet_buffer[1],
+				sizeof(usb_hid_dev->rx_packet_buffer)-1,
+				&headroom,
+				&need_yield);
 #else
-	fifoBuf_putData(&rx_pios_fifo_buffer, &rx_packet_buffer[2], rx_packet_buffer[1]);
+	(usb_hid_dev->rx_in_cb)(usb_hid_dev->rx_in_context,
+				&usb_hid_dev->rx_packet_buffer[2],
+				usb_hid_dev->rx_packet_buffer[1],
+				&headroom,
+				&need_yield);
 #endif
-
-	// Only reactivate endpoint if available space in buffer
-	if (fifoBuf_getFree(&rx_pios_fifo_buffer) > 62) {
+	if (headroom > PIOS_USB_HID_DATA_LENGTH) {
+		/* We have room for a maximum length message */
 		SetEPRxStatus(ENDP1, EP_RX_VALID);
 	} else {
+		/* Not enough room left for a message, apply backpressure */
 		SetEPRxStatus(ENDP1, EP_RX_NAK);
 	}
+
+#if defined(PIOS_INCLUDE_FREERTOS)
+	if (need_yield) {
+		vPortYieldFromISR();
+	}
+#endif	/* PIOS_INCLUDE_FREERTOS */
 }
 
 #endif

@@ -144,9 +144,6 @@ extern uint32_t pios_spi_port_id;
 //-------------------------
 #define PIOS_USART_MAX_DEVS             1
 
-#define PIOS_USART_RX_BUFFER_SIZE		512
-#define PIOS_USART_TX_BUFFER_SIZE		512
-
 //-------------------------
 // PIOS_COM
 //
@@ -396,12 +393,11 @@ extern uint32_t pios_com_telem_usb_id;
 
 #if defined(PIOS_INCLUDE_USB_HID)
 	#define PIOS_USB_ENABLED				1
+	#define PIOS_USB_HID_MAX_DEVS                   1
 	#define PIOS_USB_DETECT_GPIO_PORT		GPIO_IN_2_PORT
 	#define PIOS_USB_DETECT_GPIO_PIN		GPIO_IN_2_PIN
 	#define PIOS_USB_DETECT_EXTI_LINE		EXTI_Line4
 	#define PIOS_IRQ_USB_PRIORITY			8
-        #define PIOS_USB_RX_BUFFER_SIZE                 512
-        #define PIOS_USB_TX_BUFFER_SIZE                 512
 #endif
 
 // *****************************************************************

@@ -91,7 +91,8 @@ void trans_process(void)
 		int32_t bytes = PIOS_COM_ReceiveBufferUsed(PIOS_COM_SERIAL);
 		while (bytes > 0)
 		{
-			PIOS_COM_ReceiveBuffer(PIOS_COM_SERIAL);
+			uint8_t c;
+			PIOS_COM_ReceiveBuffer(PIOS_COM_SERIAL, &c, 1, 0);
 			bytes--;
 		}
 	}
@@ -134,8 +135,7 @@ void trans_process(void)
 
 		// copy data received down the comm-port into our temp buffer
 		register uint16_t bytes_saved = 0;
-		while (bytes_saved < com_num)
-			trans_temp_buffer1[bytes_saved++] = PIOS_COM_ReceiveBuffer(comm_port);
+		bytes_saved = PIOS_COM_ReceiveBuffer(comm_port, trans_temp_buffer1, com_num, 0);
 
 		// put the received comm-port data bytes into the RF packet handler TX buffer
 		if (bytes_saved > 0)
@@ -147,8 +147,11 @@ void trans_process(void)
 	else
 	{	// empty the comm-ports rx buffer
 		int32_t com_num = PIOS_COM_ReceiveBufferUsed(comm_port);
-		while (com_num > 0)
-			PIOS_COM_ReceiveBuffer(comm_port);
+		while (com_num > 0) {
+			uint8_t c;
+			PIOS_COM_ReceiveBuffer(comm_port, &c, 1, 0);
+			com_num--;
+		}
 	}
 
 	// ********************

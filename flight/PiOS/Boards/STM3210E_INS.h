@@ -125,9 +125,6 @@ extern uint32_t pios_i2c_gyro_adapter_id;
 //-------------------------
 #define PIOS_USART_MAX_DEVS             2
 
-#define PIOS_USART_RX_BUFFER_SIZE       256
-#define PIOS_USART_TX_BUFFER_SIZE       256
-
 //-------------------------
 // PIOS_COM
 //

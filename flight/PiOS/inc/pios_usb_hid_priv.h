@@ -1,14 +1,14 @@
-/**
+ /**
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS_SPEKTRUM SPEKTRUM Functions
- * @brief PIOS interface to read and write from spektrum port
+ * @addtogroup   PIOS_USB_HID USB_HID Functions
+ * @brief PIOS interface for USB_HID port
  * @{
  *
- * @file       pios_spektrum_priv.h
+ * @file       pios_usb_hid_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Servo private structures.
+ * @brief      USB_HID private definitions.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -28,25 +28,22 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_SPEKTRUM_PRIV_H
-#define PIOS_SPEKTRUM_PRIV_H
+#ifndef PIOS_USB_HID_PRIV_H
+#define PIOS_USB_HID_PRIV_H
 
 #include <pios.h>
 #include <pios_stm32.h>
-#include <pios_usart_priv.h>
 
-struct pios_spektrum_cfg {
-	struct stm32_gpio bind;
-	uint32_t remap;		/* GPIO_Remap_* */
+struct pios_usb_hid_cfg {
+	struct stm32_irq irq;
 };
 
-extern const struct pios_rcvr_driver pios_spektrum_rcvr_driver;
+extern int32_t PIOS_USB_HID_Init(uint32_t * usb_hid_id, const struct pios_usb_hid_cfg * cfg);
 
-extern int32_t PIOS_SPEKTRUM_Init(uint32_t * spektrum_id, const struct pios_spektrum_cfg *cfg, const struct pios_com_driver * driver, uint32_t lower_id, bool bind);
-
-#endif /* PIOS_PWM_PRIV_H */
+#endif /* PIOS_USB_HID_PRIV_H */
 
 /**
- * @}
- * @}
- */
+  * @}
+  * @}
+  */
+

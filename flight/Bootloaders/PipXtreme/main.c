@@ -193,11 +193,13 @@ void jump_to_app() {
 	}
 }
 uint32_t LedPWM(uint32_t pwm_period, uint32_t pwm_sweep_steps, uint32_t count) {
-	uint32_t pwm_duty = ((count / pwm_period) % pwm_sweep_steps)
-			/ (pwm_sweep_steps / pwm_period);
-	if ((count % (2 * pwm_period * pwm_sweep_steps)) > pwm_period
-			* pwm_sweep_steps)
-		pwm_duty = pwm_period - pwm_duty; // negative direction each 50*100 ticks
+	uint32_t curr_step = (count / pwm_period) % pwm_sweep_steps; /* 0 - pwm_sweep_steps */
+	uint32_t pwm_duty = pwm_period * curr_step / pwm_sweep_steps; /* fraction of pwm_period */
+
+	uint32_t curr_sweep = (count / (pwm_period * pwm_sweep_steps)); /* ticks once per full sweep */
+	if (curr_sweep & 1) {
+		pwm_duty = pwm_period - pwm_duty; /* reverse direction in odd sweeps */
+	}
 	return ((count % pwm_period) > pwm_duty) ? 1 : 0;
 }
 

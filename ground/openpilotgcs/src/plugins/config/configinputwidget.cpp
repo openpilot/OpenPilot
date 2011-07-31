@@ -698,7 +698,7 @@ void ConfigInputWidget::receiverHelp()
         unassigned.append("FlightMode");
     }
     if(unassigned.length()>0)
-        m_config->lblMissingInputs->setText(QString("Channels left to assign:")+unassigned);
+        m_config->lblMissingInputs->setText(QString("Channels left to assign: ")+unassigned);
     else
         m_config->lblMissingInputs->setText("");
 }

@@ -1,5 +1,10 @@
 Short summary of changes.  For a complete list see the git log.
 
+2011-07-29
+Added support for PPM receivers from James W. Now all 4 interfaces (R/C
+standard PWM, combined PPM (MK), Spektrum satellite, Futaba S.Bus) are
+supported and configurable through the GCS hardware configuration tab.
+
 2011-07-17
 Updated module initialization from Mathieu which separates the initialization
 from the task startup.  Also implements a method to reclaim unused ram from

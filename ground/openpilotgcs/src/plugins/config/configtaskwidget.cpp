@@ -211,6 +211,7 @@ void ConfigTaskWidget::enableControls(bool enable)
 
 void ConfigTaskWidget::widgetsContentsChanged()
 {
+    qDebug()<<"dirty!!!";
     dirty=true;
 }
 

@@ -82,6 +82,8 @@ public:
     ConfigccpmWidget(QWidget *parent = 0);
     ~ConfigccpmWidget();
 
+    friend class ConfigAirframeWidget;
+
 private:
         Ui_ccpmWidget *m_ccpm;
         QGraphicsSvgItem *SwashplateImg;

@@ -185,8 +185,10 @@ Section "Localization" InSecLocalization
 SectionEnd
 
 Section "Firmware" InSecFirmware
-  SetOutPath "$INSTDIR\firmware\${FIRMWARE_DIR}"
-  File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\*"
+; SetOutPath "$INSTDIR\firmware\${FIRMWARE_DIR}"
+; File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\*"
+  SetOutPath "$INSTDIR\firmware"
+  File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_coptercontrol-${PACKAGE_LBL}.opfw"
 SectionEnd
 
 Section "Shortcuts" InSecShortcuts

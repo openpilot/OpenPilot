@@ -50,9 +50,8 @@ private slots:
     void attitudeRawUpdated(UAVObject * obj);
     void timeout();
     void startAccelCalibration();
-    void saveAttitudeSettings();
-    void applyAttitudeSettings();
-    virtual void refreshValues();
+    void updateObjectsFromWidgets();
+    virtual void refreshWidgetsValues();
     void openHelp();
 
 private:
@@ -69,7 +68,6 @@ private:
 
     static const int NUM_ACCEL_UPDATES = 60;
     static const float ACCEL_SCALE = 0.004f * 9.81f;
-    virtual void enableControls(bool enable);
 
 };
 

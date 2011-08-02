@@ -37,9 +37,9 @@
 //#include <QtWebKit/QWebView>
 #include <QTextBrowser>
 #include "utils/pathutils.h"
-
+#include <QMessageBox>
 #include "fancytabwidget.h"
-
+#include "configtaskwidget.h"
 
 class ConfigGadgetWidget: public QWidget
 {
@@ -54,6 +54,7 @@ public:
 public slots:
     void onAutopilotConnect();
     void onAutopilotDisconnect();
+    void tabAboutToChange(bool *);
 
 signals:
     void autopilotConnected();

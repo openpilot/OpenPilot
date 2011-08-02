@@ -92,7 +92,7 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
     m_aircraft->setupUi(this);
 
     setupButtons(m_aircraft->saveAircraftToRAM,m_aircraft->saveAircraftToSD);
-    addToDirtyMonitor();
+
     addUAVObject("SystemSettings");
     addUAVObject("MixerSettings");
     addUAVObject("ActuatorSettings");
@@ -198,7 +198,7 @@ ConfigAirframeWidget::ConfigAirframeWidget(QWidget *parent) : ConfigTaskWidget(p
 
     // Connect the help button
     connect(m_aircraft->airframeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
-
+    addToDirtyMonitor();
 }
 
 ConfigAirframeWidget::~ConfigAirframeWidget()
@@ -443,6 +443,7 @@ void ConfigAirframeWidget::updateCustomThrottle2CurveValue(QList<double> list, d
   */
 void ConfigAirframeWidget::refreshWidgetsValues()
 {
+    bool dirty=isDirty();
     // Get the Airframe type from the system settings:
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
     Q_ASSERT(obj);
@@ -894,6 +895,7 @@ void ConfigAirframeWidget::refreshWidgetsValues()
      }
 
     updateCustomAirframeUI();
+    setDirty(dirty);
 }
 
 /**
@@ -902,6 +904,7 @@ void ConfigAirframeWidget::refreshWidgetsValues()
   */
 void ConfigAirframeWidget::setupAirframeUI(QString frameType)
 {
+    bool dirty=isDirty();
     if (frameType == "FixedWing" || frameType == "Elevator aileron rudder") {
         // Setup the UI
         m_aircraft->aircraftType->setCurrentIndex(m_aircraft->aircraftType->findText("Fixed Wing"));
@@ -1099,6 +1102,7 @@ void ConfigAirframeWidget::setupAirframeUI(QString frameType)
     }
     m_aircraft->quadShape->setSceneRect(quad->boundingRect());
     m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
+    setDirty(dirty);
 }
 
 /**

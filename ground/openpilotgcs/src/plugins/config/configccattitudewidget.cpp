@@ -40,33 +40,26 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->zeroBias,SIGNAL(clicked()),this,SLOT(startAccelCalibration()));
-    connect(ui->saveButton,SIGNAL(clicked()),this,SLOT(saveAttitudeSettings()));        
-    connect(ui->applyButton,SIGNAL(clicked()),this,SLOT(applyAttitudeSettings()));
 
-    // Make it smart:
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
-    connect(parent, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
 
-    enableControls(true);
-    refreshValues(); // The 1st time this panel is instanciated, the autopilot is already connected.
+    setupButtons(ui->applyButton,ui->saveButton);
+    addUAVObject("AttitudeSettings");
+
+    refreshWidgetsValues(); // The 1st time this panel is instanciated, the autopilot is already connected.
     UAVObject * settings = AttitudeSettings::GetInstance(getObjectManager());
-    connect(settings,SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
 
     // Connect the help button
     connect(ui->ccAttitudeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
-
-
+    addWidget(ui->rollBias);
+    addWidget(ui->pitchBias);
+    addWidget(ui->yawBias);
+    addWidget(ui->zeroBias);
+    addWidget(ui->zeroGyroBiasOnArming);
 }
 
 ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()
 {
     delete ui;
-}
-
-void ConfigCCAttitudeWidget::enableControls(bool enable)
-{
-    //ui->applyButton->setEnabled(enable);
-    ui->saveButton->setEnabled(enable);
 }
 
 void ConfigCCAttitudeWidget::attitudeRawUpdated(UAVObject * obj) {
@@ -130,7 +123,7 @@ void ConfigCCAttitudeWidget::timeout() {
 
 }
 
-void ConfigCCAttitudeWidget::applyAttitudeSettings() {
+void ConfigCCAttitudeWidget::updateObjectsFromWidgets() {
     AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(getObjectManager())->getData();
     attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_ROLL] = ui->rollBias->value();
     attitudeSettingsData.BoardRotation[AttitudeSettings::BOARDROTATION_PITCH] = ui->pitchBias->value();
@@ -140,14 +133,15 @@ void ConfigCCAttitudeWidget::applyAttitudeSettings() {
     AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
 }
 
-void ConfigCCAttitudeWidget::refreshValues() {
+void ConfigCCAttitudeWidget::refreshWidgetsValues() {
+    bool dirty=isDirty();
     AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(getObjectManager())->getData();
 
     ui->rollBias->setValue(attitudeSettingsData.BoardRotation[0]);
     ui->pitchBias->setValue(attitudeSettingsData.BoardRotation[1]);
     ui->yawBias->setValue(attitudeSettingsData.BoardRotation[2]);
     ui->zeroGyroBiasOnArming->setChecked(attitudeSettingsData.ZeroDuringArming == AttitudeSettings::ZERODURINGARMING_TRUE);
-
+    setDirty(dirty);
 }
 
 void ConfigCCAttitudeWidget::startAccelCalibration() {
@@ -182,13 +176,6 @@ void ConfigCCAttitudeWidget::startAccelCalibration() {
     mdata.flightTelemetryUpdatePeriod = 100;
     obj->setMetadata(mdata);
 
-}
-
-void ConfigCCAttitudeWidget::saveAttitudeSettings() {
-    applyAttitudeSettings();
-
-    UAVDataObject * obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AttitudeSettings")));
-    saveObjectToSD(obj);
 }
 
 void ConfigCCAttitudeWidget::openHelp()

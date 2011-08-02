@@ -88,6 +88,15 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     {
         connect(cb,SIGNAL(valueChanged(double)),this,SLOT(widgetsContentsChanged()));
     }
+    else if(QCheckBox * cb=qobject_cast<QCheckBox *>(widget))
+    {
+        connect(cb,SIGNAL(clicked()),this,SLOT(widgetsContentsChanged()));
+    }
+    else if(QPushButton * cb=qobject_cast<QPushButton *>(widget))
+    {
+        connect(cb,SIGNAL(clicked()),this,SLOT(widgetsContentsChanged()));
+    }
+
 }
 
 
@@ -137,6 +146,7 @@ void ConfigTaskWidget::onAutopilotConnect()
 
 void ConfigTaskWidget::populateWidgets()
 {
+    bool dirtyBack=dirty;
     foreach(objectToWidget * ow,objOfInterest)
     {
         if(ow->object==NULL || ow->field==NULL)
@@ -153,11 +163,12 @@ void ConfigTaskWidget::populateWidgets()
             cb->setText(ow->field->getValue().toString());
         }
     }
-    dirty=false;
+    setDirty(dirtyBack);
 }
 
 void ConfigTaskWidget::refreshWidgetsValues()
 {
+    bool dirtyBack=dirty;
     foreach(objectToWidget * ow,objOfInterest)
     {
         if(ow->object==NULL || ow->field==NULL)
@@ -173,6 +184,7 @@ void ConfigTaskWidget::refreshWidgetsValues()
             cb->setText(ow->field->getValue().toString());
         }
     }
+    setDirty(dirtyBack);
 }
 
 void ConfigTaskWidget::updateObjectsFromWidgets()
@@ -197,7 +209,7 @@ void ConfigTaskWidget::updateObjectsFromWidgets()
 void ConfigTaskWidget::setupButtons(QPushButton *update, QPushButton *save)
 {
     smartsave=new smartSaveButton(update,save);
-    connect(smartsave, SIGNAL(preProcessOperations()), this, SLOT(updateObjectsFromWidgets()));
+    connect(smartsave,SIGNAL(preProcessOperations()), this, SLOT(updateObjectsFromWidgets()));
     connect(smartsave,SIGNAL(saveSuccessfull()),this,SLOT(clearDirty()));
     connect(smartsave,SIGNAL(beginOp()),this,SLOT(disableObjUpdates()));
     connect(smartsave,SIGNAL(endOp()),this,SLOT(enableObjUpdates()));
@@ -211,15 +223,18 @@ void ConfigTaskWidget::enableControls(bool enable)
 
 void ConfigTaskWidget::widgetsContentsChanged()
 {
-    qDebug()<<"dirty!!!";
-    dirty=true;
+    setDirty(true);
 }
 
 void ConfigTaskWidget::clearDirty()
 {
-    dirty=false;
+    setDirty(false);
 }
-
+void ConfigTaskWidget::setDirty(bool value)
+{
+    qDebug()<<"dirty="<<value;
+    dirty=value;
+}
 bool ConfigTaskWidget::isDirty()
 {
     return dirty;

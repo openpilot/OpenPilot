@@ -52,9 +52,8 @@ private:
     virtual void enableControls(bool enable);
 
 private slots:
-    virtual void refreshValues();
-    void sendStabilizationUpdate();
-    void saveStabilizationUpdate();
+    virtual void refreshWidgetsValues();
+    void updateObjectsFromWidgets();
     void realtimeUpdateToggle(bool);
     void openHelp();
 

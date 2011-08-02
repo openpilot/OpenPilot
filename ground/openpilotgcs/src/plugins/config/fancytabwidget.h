@@ -91,6 +91,7 @@ public:
 
 signals:
     void currentChanged(int);
+    void aboutToChange(bool *);
 
 public slots:
     void updateHover();
@@ -116,7 +117,7 @@ class FancyTabWidget : public QWidget
 
 public:
     FancyTabWidget(QWidget *parent = 0, bool isVertical = false);
-
+    FancyTabBar *m_tabBar;
     void insertTab(int index, QWidget *tab, const QIcon &icon, const QString &label);
     void removeTab(int index);
     void setBackgroundBrush(const QBrush &brush);
@@ -132,6 +133,7 @@ public:
     int currentIndex() const;
     QStatusBar *statusBar() const;
 
+    QWidget * currentWidget();
 signals:
     void currentAboutToShow(int index);
     void currentChanged(int index);
@@ -143,7 +145,6 @@ private slots:
     void showWidget(int index);
 
 private:
-    FancyTabBar *m_tabBar;
     QWidget *m_cornerWidgetContainer;
     QStackedLayout *m_modesStack;
     QWidget *m_selectionWidget;

@@ -99,6 +99,8 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
         onAutopilotConnect();    
 
     help = 0;
+    connect(ftw->m_tabBar,SIGNAL(aboutToChange(bool*)),this,SLOT(tabAboutToChange(bool*)));//,Qt::BlockingQueuedConnection);
+
 }
 
 ConfigGadgetWidget::~ConfigGadgetWidget()
@@ -151,6 +153,24 @@ void ConfigGadgetWidget::onAutopilotConnect() {
         }
     }
     emit autopilotConnected();
+}
+
+void ConfigGadgetWidget::tabAboutToChange(bool * proceed)
+{
+    *proceed=true;
+    ConfigTaskWidget * wid=qobject_cast<ConfigTaskWidget *>(ftw->currentWidget());
+    if(!wid)
+        return;
+    if(wid->isDirty())
+    {
+        int ans=QMessageBox::warning(this,tr("Unsaved changes"),tr("The tab you are leaving has unsaved changes,"
+                                                           "if you proceed they will be lost."
+                                                           "Do you still want to proceed?"),QMessageBox::Yes,QMessageBox::No);
+        if(ans==QMessageBox::No)
+            *proceed=false;
+        else
+            wid->setDirty(false);
+    }
 }
 
 

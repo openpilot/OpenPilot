@@ -41,6 +41,9 @@
 #include <QTableWidget>
 #include <QDoubleSpinBox>
 #include <QSpinBox>
+#include <QCheckBox>
+#include <QPushButton>
+
 class ConfigTaskWidget: public QWidget
 {
     Q_OBJECT
@@ -63,6 +66,7 @@ public:
     void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget);
     void setupButtons(QPushButton * update,QPushButton * save);
     bool isDirty();
+    void setDirty(bool value);
 public slots:
     void onAutopilotDisconnect();
     void onAutopilotConnect();

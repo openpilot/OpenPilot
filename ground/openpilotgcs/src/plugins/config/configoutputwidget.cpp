@@ -46,6 +46,8 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 	UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+        setupButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
+        addUAVObject("ActuatorSettings");
 
 	// First of all, put all the channel widgets into lists, so that we can
     // manipulate those:
@@ -106,10 +108,7 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
           << m_config->ch7Link;
 
     // Register for ActuatorSettings changes:
-    UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
-    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
-
-    for (int i = 0; i < 8; i++) {
+     for (int i = 0; i < 8; i++) {
         connect(outMin[i], SIGNAL(editingFinished()), this, SLOT(setChOutRange()));
         connect(outMax[i], SIGNAL(editingFinished()), this, SLOT(setChOutRange()));
         connect(reversals[i], SIGNAL(toggled(bool)), this, SLOT(reverseChannel(bool)));
@@ -124,13 +123,8 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     for (int i = 0; i < links.count(); i++)
         connect(links[i], SIGNAL(toggled(bool)), this, SLOT(linkToggled(bool)));
 
-    connect(m_config->saveRCOutputToSD, SIGNAL(clicked()), this, SLOT(saveRCOutputObject()));
-    connect(m_config->saveRCOutputToRAM, SIGNAL(clicked()), this, SLOT(sendRCOutputUpdate()));
 
-    enableControls(false);
-    refreshValues();
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
-    connect(parent, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
+    refreshWidgetsValues();
 
     firstUpdate = true;
 
@@ -138,6 +132,43 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 
     // Connect the help button
     connect(m_config->outputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
+    addWidget(m_config->outputRate3);
+    addWidget(m_config->outputRate2);
+    addWidget(m_config->outputRate1);
+    addWidget(m_config->ch0OutMin);
+    addWidget(m_config->ch0OutSlider);
+    addWidget(m_config->ch0OutMax);
+    addWidget(m_config->ch0Rev);
+    addWidget(m_config->ch0Link);
+    addWidget(m_config->ch1OutMin);
+    addWidget(m_config->ch1OutSlider);
+    addWidget(m_config->ch1OutMax);
+    addWidget(m_config->ch1Rev);
+    addWidget(m_config->ch2OutMin);
+    addWidget(m_config->ch2OutSlider);
+    addWidget(m_config->ch2OutMax);
+    addWidget(m_config->ch2Rev);
+    addWidget(m_config->ch3OutMin);
+    addWidget(m_config->ch3OutSlider);
+    addWidget(m_config->ch3OutMax);
+    addWidget(m_config->ch3Rev);
+    addWidget(m_config->ch4OutMin);
+    addWidget(m_config->ch4OutSlider);
+    addWidget(m_config->ch4OutMax);
+    addWidget(m_config->ch4Rev);
+    addWidget(m_config->ch5OutMin);
+    addWidget(m_config->ch5OutSlider);
+    addWidget(m_config->ch5OutMax);
+    addWidget(m_config->ch5Rev);
+    addWidget(m_config->ch6OutMin);
+    addWidget(m_config->ch6OutSlider);
+    addWidget(m_config->ch6OutMax);
+    addWidget(m_config->ch6Rev);
+    addWidget(m_config->ch7OutMin);
+    addWidget(m_config->ch7OutSlider);
+    addWidget(m_config->ch7OutMax);
+    addWidget(m_config->ch7Rev);
+    addWidget(m_config->spinningArmed);
 }
 
 ConfigOutputWidget::~ConfigOutputWidget()
@@ -145,14 +176,6 @@ ConfigOutputWidget::~ConfigOutputWidget()
    // Do nothing
 }
 
-
-// ************************************
-
-void ConfigOutputWidget::enableControls(bool enable)
-{
-	m_config->saveRCOutputToSD->setEnabled(enable);
-        //m_config->saveRCOutputToRAM->setEnabled(enable);
-}
 
 // ************************************
 
@@ -355,8 +378,9 @@ void ConfigOutputWidget::sendChannelTest(int value)
 /**
   Request the current config from the board (RC Output)
   */
-void ConfigOutputWidget::refreshValues()
+void ConfigOutputWidget::refreshWidgetsValues()
 {
+    bool dirty=isDirty();
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
@@ -444,14 +468,14 @@ void ConfigOutputWidget::refreshValues()
         outSliders[i]->setValue(value);
         outLabels[i]->setText(QString::number(value));
     }
-
+    setDirty(dirty);
 
 }
 
 /**
   * Sends the config to the board, without saving to the SD card (RC Output)
   */
-void ConfigOutputWidget::sendRCOutputUpdate()
+void ConfigOutputWidget::updateObjectsFromWidgets()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -479,26 +503,7 @@ void ConfigOutputWidget::sendRCOutputUpdate()
     field->setValue(m_config->outputRate2->value(),1);
     field->setValue(m_config->outputRate3->value(),2);
     field->setValue(m_config->outputRate4->value(),3);
-
-    // ... and send to the OP Board
-    obj->updated();
-
 }
-
-
-/**
-  Sends the config to the board and request saving into the SD card (RC Output)
-  */
-void ConfigOutputWidget::saveRCOutputObject()
-{
-    // Send update so that the latest value is saved
-    sendRCOutputUpdate();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
-    Q_ASSERT(obj);
-    saveObjectToSD(obj);
-
-}
-
 
 /**
   Sets the minimum/maximum value of the channel 0 to seven output sliders.

@@ -111,6 +111,7 @@ void smartSaveButton::saving_finished(int id, bool result)
     if(id==current_objectID)
     {
         sv_result=result;
+        qDebug()<<"saving_finished result="<<result;
         loop.quit();
     }
 }

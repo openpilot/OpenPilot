@@ -43,6 +43,7 @@
 #include "flighttelemetrystats.h"
 #include "flightstatus.h"
 #include "accessorydesired.h"
+#include "receiveractivity.h"
 
 // Private constants
 #if defined(PIOS_MANUAL_STACK_SIZE)
@@ -86,6 +87,18 @@ static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutr
 static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time);
 static bool okToArm(void);
 static bool validInputRange(int16_t min, int16_t max, uint16_t value);
+
+#define RCVR_ACTIVITY_MONITOR_CHANNELS_PER_GROUP 12
+#define RCVR_ACTIVITY_MONITOR_MIN_RANGE 5
+struct rcvr_activity_fsm {
+	ManualControlSettingsChannelGroupsOptions group;
+	uint16_t prev[RCVR_ACTIVITY_MONITOR_CHANNELS_PER_GROUP];
+	uint8_t sample_count;
+};
+static struct rcvr_activity_fsm activity_fsm;
+
+static void resetRcvrActivity(struct rcvr_activity_fsm * fsm);
+static bool updateRcvrActivity(struct rcvr_activity_fsm * fsm);
 
 #define assumptions (assumptions1 && assumptions3 && assumptions5 && assumptions7 && assumptions8 && assumptions_flightmode)
 
@@ -138,6 +151,10 @@ static void manualControlTask(void *parameters)
 	flightStatus.Armed = FLIGHTSTATUS_ARMED_DISARMED;
 	armState = ARM_STATE_DISARMED;
 
+	/* Initialize the RcvrActivty FSM */
+	portTickType lastActivityTime = xTaskGetTickCount();
+	resetRcvrActivity(&activity_fsm);
+
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1) {
@@ -149,6 +166,18 @@ static void manualControlTask(void *parameters)
 
 		// Read settings
 		ManualControlSettingsGet(&settings);
+
+		/* Update channel activity monitor */
+		if (flightStatus.Armed == ARM_STATE_DISARMED) {
+			if (updateRcvrActivity(&activity_fsm)) {
+				/* Reset the aging timer because activity was detected */
+				lastActivityTime = lastSysTime;
+			}
+		}
+		if (timeDifferenceMs(lastActivityTime, lastSysTime) > 5000) {
+			resetRcvrActivity(&activity_fsm);
+			lastActivityTime = lastSysTime;
+		}
 
 		if (ManualControlCommandReadOnly(&cmd)) {
 			FlightTelemetryStatsData flightTelemStats;
@@ -266,7 +295,6 @@ static void manualControlTask(void *parameters)
 			ManualControlCommandGet(&cmd);	/* Under GCS control */
 		}
 
-
 		FlightStatusGet(&flightStatus);
 
 		// Depending on the mode update the Stabilization or Actuator objects
@@ -286,6 +314,122 @@ static void manualControlTask(void *parameters)
 				break;
 		}
 	}
+}
+
+static void resetRcvrActivity(struct rcvr_activity_fsm * fsm)
+{
+	ReceiverActivityData data;
+	bool updated = false;
+
+	/* Clear all channel activity flags */
+	ReceiverActivityGet(&data);
+	if (data.ActiveGroup != RECEIVERACTIVITY_ACTIVEGROUP_NONE &&
+		data.ActiveChannel != 255) {
+		data.ActiveGroup = RECEIVERACTIVITY_ACTIVEGROUP_NONE;
+		data.ActiveChannel = 255;
+		updated = true;
+	}
+	if (updated) {
+		ReceiverActivitySet(&data);
+	}
+
+	/* Reset the FSM state */
+	fsm->group        = 0;
+	fsm->sample_count = 0;
+}
+
+static bool updateRcvrActivity(struct rcvr_activity_fsm * fsm)
+{
+	bool activity_updated = false;
+
+	if (fsm->group >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
+		/* We're out of range, reset things */
+		resetRcvrActivity(fsm);
+	}
+
+	extern uint32_t pios_rcvr_group_map[];
+	if (!pios_rcvr_group_map[fsm->group]) {
+		/* Unbound group, skip it */
+		goto group_completed;
+	}
+
+	/* Sample the channel */
+	for (uint8_t channel = 0;
+	     channel < RCVR_ACTIVITY_MONITOR_CHANNELS_PER_GROUP;
+	     channel++) {
+		if (fsm->sample_count == 0) {
+			fsm->prev[channel] = PIOS_RCVR_Read(pios_rcvr_group_map[fsm->group], channel);
+		} else {
+			uint16_t delta;
+			uint16_t prev = fsm->prev[channel];
+			uint16_t curr = PIOS_RCVR_Read(pios_rcvr_group_map[fsm->group], channel);
+			if (curr > prev) {
+				delta = curr - prev;
+			} else {
+				delta = prev - curr;
+			}
+
+			if (delta > RCVR_ACTIVITY_MONITOR_MIN_RANGE) {
+				/* Mark this channel as active */
+				ReceiverActivityActiveGroupOptions group;
+
+				/* Don't assume manualcontrolsettings and receiveractivity are in the same order. */
+				switch (fsm->group) {
+				case MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM: 
+					group = RECEIVERACTIVITY_ACTIVEGROUP_PWM;
+					break;
+				case MANUALCONTROLSETTINGS_CHANNELGROUPS_PPM:
+					group = RECEIVERACTIVITY_ACTIVEGROUP_PPM;
+					break;
+				case MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM1:
+					group = RECEIVERACTIVITY_ACTIVEGROUP_SPEKTRUM1;
+					break;
+				case MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM2:
+					group = RECEIVERACTIVITY_ACTIVEGROUP_SPEKTRUM2;
+					break;
+				case MANUALCONTROLSETTINGS_CHANNELGROUPS_SBUS:
+					group = RECEIVERACTIVITY_ACTIVEGROUP_SBUS;
+					break;
+				case MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS:
+					group = RECEIVERACTIVITY_ACTIVEGROUP_GCS;
+					break;
+				default:
+					PIOS_Assert(0);
+					break;
+				}
+
+				ReceiverActivityActiveGroupSet(&group);
+				ReceiverActivityActiveChannelSet(&channel);
+				activity_updated = true;
+			}
+		}
+	}
+
+	if (++fsm->sample_count < 2) {
+		return (activity_updated);
+	}
+
+	/* Reset the sample counter */
+	fsm->sample_count = 0;
+
+	/*
+	 * Group Completed
+	 */
+
+group_completed:
+	/* Start over at channel zero */
+	if (++fsm->group < MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
+		return (activity_updated);
+	}
+
+	/*
+	 * All groups completed
+	 */
+
+	/* Start over at group zero */
+	fsm->group = 0;
+
+	return (activity_updated);
 }
 
 static void updateActuatorDesired(ManualControlCommandData * cmd)

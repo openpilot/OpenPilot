@@ -60,7 +60,6 @@
 #include "uniqueidmanager.h"
 #include "variablemanager.h"
 #include "versiondialog.h"
-#include "viewmanager.h"
 
 #include <coreplugin/settingsdatabase.h>
 #include <extensionsystem/pluginmanager.h>
@@ -123,7 +122,6 @@ MainWindow::MainWindow() :
     m_actionManager(new ActionManagerPrivate(this)),
     m_variableManager(new VariableManager(this)),
     m_threadManager(new ThreadManager(this)),
-    m_viewManager(0),
     m_modeManager(0),
     m_connectionManager(0),
     m_mimeDatabase(new MimeDatabase),
@@ -183,7 +181,6 @@ MainWindow::MainWindow() :
 
     m_connectionManager = new ConnectionManager(this, m_modeStack);
 
-    m_viewManager = new ViewManager(this);
     m_messageManager = new MessageManager;
     setCentralWidget(m_modeStack);
 
@@ -242,9 +239,6 @@ MainWindow::~MainWindow()
     delete m_uniqueIDManager;
     m_uniqueIDManager = 0;
 
-    delete m_viewManager;
-    m_viewManager = 0;
-
     pm->removeObject(m_coreImpl);
     delete m_coreImpl;
     m_coreImpl = 0;
@@ -264,7 +258,6 @@ bool MainWindow::init(QString *errorMessage)
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     pm->addObject(m_coreImpl);
-    m_viewManager->init();
     m_modeManager->init();
     m_connectionManager->init();
 
@@ -1062,7 +1055,6 @@ void MainWindow::readSettings(QSettings* qs)
         manager->readSettings(qs);
     }
 
-    m_viewManager->readSettings(qs);
 
 }
 
@@ -1096,7 +1088,6 @@ void MainWindow::saveSettings(QSettings* qs)
         manager->saveSettings(qs);
     }
 
-    m_viewManager->saveSettings(qs);
     m_actionManager->saveSettings(qs);
     m_generalSettings->saveSettings(qs);
 

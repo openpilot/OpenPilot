@@ -73,7 +73,6 @@ class FancyTabWidget;
 class GeneralSettings;
 class ShortcutSettings;
 class WorkspaceSettings;
-class ViewManager;
 class VersionDialog;
 class AuthorsDialog;
 class UAVGadgetMode;
@@ -183,7 +182,6 @@ private:
     MessageManager *m_messageManager;
     VariableManager *m_variableManager;
     ThreadManager *m_threadManager;
-    ViewManager *m_viewManager;
     ModeManager *m_modeManager;
     QList<UAVGadgetManager*> m_uavGadgetManagers;
     QList<UAVGadgetMode*> m_uavGadgetModes;

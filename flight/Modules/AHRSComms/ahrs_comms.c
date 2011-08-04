@@ -52,6 +52,8 @@
 
 #include "ahrs_comms.h"
 #include "ahrs_spi_comm.h"
+#include "ahrsstatus.h"
+#include "ahrscalibration.h"
 
 // Private constants
 #define STACK_SIZE configMINIMAL_STACK_SIZE-128
@@ -72,7 +74,7 @@ static void ahrscommsTask(void *parameters);
 int32_t AHRSCommsStart(void)
 {
 	// Start main task
-	AHRSStatusInitialize();
+	AhrsStatusInitialize();
 	AHRSCalibrationInitialize();
 	AttitudeRawInitialize();
 	

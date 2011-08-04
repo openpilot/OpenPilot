@@ -36,6 +36,8 @@ do
 	@executable_path/../Frameworks/${f}.framework/Versions/4/${f} \
 	"${APP}/Contents/Frameworks/${f}.framework/Versions/4/${f}"
 
+    rm "${APP}/Contents/Frameworks/${f}.framework/${f}"
+
     echo "Changing package linkages"
     for g in $QT_LIBS
     do
@@ -43,10 +45,6 @@ do
 	    "${QT_DIR}/${g}.framework/Versions/4/${g}" \
 	    @executable_path/../Frameworks/${g}.framework/Versions/4/${g} \
 	    "${APP}/Contents/Frameworks/${f}.framework/Versions/4/${f}"
-	install_name_tool -change \
-	    "${QT_DIR}/${g}.framework/Versions/4/${g}" \
-	    @executable_path/../Frameworks/${g}.framework/Versions/4/${g} \
-	    "${APP}/Contents/Frameworks/${f}.framework/${f}"
     done
 done
 

@@ -8,7 +8,6 @@
  *
  * @file       pios_spektrum.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      USART commands. Inits USARTs, controls USARTs & Interrupt handlers. (STM32 dependent)
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -172,9 +171,10 @@ static int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 			CaptureValue[7]=b;
 		}
 #endif
-		/* Known sync bytes, 0x01, 0x02, 0x12 */
+		/* Known sync bytes, 0x01, 0x02, 0x12, 0xb2 */
+		/* 0xb2 DX8 3bind pulses only */
 		if (bytecount == 2) {
-			if (b == 0x01) {
+			if ((b == 0x01) || (b == 0xb2)) {
 				datalength=0; // 10bit
 				//frames=1;
 				sync = 1;
@@ -234,17 +234,17 @@ static int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
  *@brief clears the channel values
  */
 static void PIOS_SPEKTRUM_Supervisor(uint32_t spektrum_id) {
-	/* 125hz */
+	/* 625hz */
 	supv_timer++;
-	if(supv_timer > 5) {
+	if(supv_timer > 4) {
 		/* sync between frames */
 		sync = 0;
 		bytecount = 0;
 		prev_byte = 0xFF;
 		frame_error = 0;
 		sync_of++;
-		/* watchdog activated after 100ms silence */
-		if (sync_of > 12) {
+		/* watchdog activated after 200ms silence */
+		if (sync_of > 30) {
 			/* signal lost */
 			sync_of = 0;
 			for (int i = 0; i < PIOS_SPEKTRUM_NUM_INPUTS; i++) {

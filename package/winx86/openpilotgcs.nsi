@@ -33,6 +33,7 @@
 ; Paths
 
   ; Tree root locations (relative to this script location)
+  !define PROJECT_ROOT   "..\.."
   !define NSIS_DATA_TREE "."
   !define GCS_BUILD_TREE "..\..\build\ground\openpilotgcs"
 
@@ -151,6 +152,8 @@ Section "Core files" InSecCore
   SectionIn RO
   SetOutPath "$INSTDIR\bin"
   File /r "${GCS_BUILD_TREE}\bin\*"
+  SetOutPath "$INSTDIR"
+  File "${PROJECT_ROOT}\HISTORY.txt"
 SectionEnd
 
 Section "Plugins" InSecPlugins
@@ -185,8 +188,10 @@ Section "Localization" InSecLocalization
 SectionEnd
 
 Section "Firmware" InSecFirmware
-  SetOutPath "$INSTDIR\firmware\${FIRMWARE_DIR}"
-  File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\*"
+; SetOutPath "$INSTDIR\firmware\${FIRMWARE_DIR}"
+; File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\*"
+  SetOutPath "$INSTDIR\firmware"
+  File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_coptercontrol-${PACKAGE_LBL}.opfw"
 SectionEnd
 
 Section "Shortcuts" InSecShortcuts
@@ -195,6 +200,14 @@ Section "Shortcuts" InSecShortcuts
   CreateDirectory "$SMPROGRAMS\OpenPilot"
   CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot GCS.lnk" "$INSTDIR\bin\openpilotgcs.exe" \
 	"" "$INSTDIR\bin\openpilotgcs.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
+  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot ChangeLog.lnk" "$INSTDIR\HISTORY.txt" \
+	"" "$INSTDIR\bin\openpilotgcs.exe" 0
+  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot Website.lnk" "http://www.openpilot.org" \
+	"" "$INSTDIR\bin\openpilotgcs.exe" 0
+  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot Wiki.lnk" "http://wiki.openpilot.org" \
+	"" "$INSTDIR\bin\openpilotgcs.exe" 0
+  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot Forums.lnk" "http://forums.openpilot.org" \
+	"" "$INSTDIR\bin\openpilotgcs.exe" 0
   CreateShortCut "$DESKTOP\OpenPilot GCS.lnk" "$INSTDIR\bin\openpilotgcs.exe" \
   	"" "$INSTDIR\bin\openpilotgcs.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
   CreateShortCut "$SMPROGRAMS\OpenPilot\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
@@ -245,6 +258,7 @@ Section "un.OpenPilot GCS" UnSecProgram
   RMDir /r /rebootok "$INSTDIR\lib"
   RMDir /r /rebootok "$INSTDIR\share"
   RMDir /r /rebootok "$INSTDIR\firmware"
+  Delete /rebootok "$INSTDIR\HISTORY.txt"
   Delete /rebootok "$INSTDIR\Uninstall.exe"
 
   ; Remove directory

@@ -113,10 +113,12 @@ int32_t ManualControlInitialize()
 		return -1;
 
 	AccessoryDesiredInitialize();
-	ManualControlSettingsInitialize();
 	ManualControlCommandInitialize();
 	FlightStatusInitialize();
 	StabilizationDesiredInitialize();
+
+	// ManualControlSettingsInitialize(); // this is initialized in
+	// pios_board.c
 
 	return 0;
 }

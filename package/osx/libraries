@@ -3,7 +3,7 @@
 APP="${1?}"
 PLUGINS="${APP}/Contents/Plugins"
 OP_PLUGINS="${APP}/Contents/Plugins/OpenPilot"
-QT_LIBS="QtGui QtCore QtSvg QtSql QtOpenGL QtNetwork QtXml QtDBus QtScript phonon"
+QT_LIBS="QtGui QtTest QtCore QtSvg QtSql QtOpenGL QtNetwork QtXml QtDBus QtScript phonon"
 QT_DIR=$(otool -L "${APP}/Contents/MacOS/OpenPilot GCS"  | sed -n -e 's/\/QtCore\.framework.*//p' | sed -n -E 's:^.::p')
 QT_EXTRA="accessible/libqtaccessiblewidgets.dylib bearer/libqgenericbearer.dylib codecs/libqcncodecs.dylib codecs/libqjpcodecs.dylib  codecs/libqkrcodecs.dylib codecs/libqtwcodecs.dylib graphicssystems/libqtracegraphicssystem.dylib imageformats/libqgif.dylib imageformats/libqico.dylib imageformats/libqjpeg.dylib imageformats/libqmng.dylib imageformats/libqtiff.dylib qmltooling/libqmldbg_inspector.dylib qmltooling/libqmldbg_tcp.dylib"
 

@@ -23,6 +23,8 @@ cp -r "${APP_PATH}" "/Volumes/${VOL_NAME}"
 #cp -r "${FW_DIR}" "/Volumes/${VOL_NAME}/firmware"
 cp "${FW_DIR}/fw_coptercontrol-${PACKAGE_LBL}.opfw" "/Volumes/${VOL_NAME}/firmware"
 
+cp "${ROOT_DIR}/HISTORY.txt" "/Volumes/${VOL_NAME}"
+
 "${ROOT_DIR}/package/osx/libraries" \
 	"/Volumes/${VOL_NAME}/OpenPilot GCS.app" || exit 1
 

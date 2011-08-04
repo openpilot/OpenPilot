@@ -13,7 +13,7 @@ osx_package: gcs package_flight
 	)
 
 gcs: uavobjects
-	$(V1) $(MAKE) -C $(ROOT_DIR) GCS_BUILD_CONF=release $@
+	$(V1) $(MAKE) -C $(ROOT_DIR) $@
 
 ground_package: | osx_package
 

@@ -206,7 +206,7 @@ extern uint32_t pios_com_telem_usb_id;
 // PIOS_RCVR
 // See also pios_board.c
 //------------------------
-#define PIOS_RCVR_MAX_DEVS                      1
+#define PIOS_RCVR_MAX_DEVS                      3
 #define PIOS_RCVR_MAX_CHANNELS			12
 
 //-------------------------
@@ -222,6 +222,7 @@ extern uint32_t pios_com_telem_usb_id;
 //-------------------------
 // Receiver SPEKTRUM input
 //-------------------------
+#define PIOS_SPEKTRUM_MAX_DEVS			2
 #define PIOS_SPEKTRUM_NUM_INPUTS                12
 
 //-------------------------

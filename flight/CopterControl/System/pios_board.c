@@ -856,11 +856,19 @@ void PIOS_I2C_main_adapter_er_irq_handler(void)
 
 #endif /* PIOS_INCLUDE_I2C */
 
+#if defined(PIOS_INCLUDE_GCSRCVR)
+#include "pios_gcsrcvr_priv.h"
+#endif	/* PIOS_INCLUDE_GCSRCVR */
+
 #if defined(PIOS_INCLUDE_RCVR)
 #include "pios_rcvr_priv.h"
 
-struct pios_rcvr_channel_map pios_rcvr_channel_to_id_map[PIOS_RCVR_MAX_CHANNELS];
-uint32_t pios_rcvr_max_channel;
+/* One slot per selectable receiver group.
+ *  eg. PWM, PPM, GCS, SPEKTRUM1, SPEKTRUM2, SBUS
+ * NOTE: No slot in this map for NONE.
+ */
+uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
+
 #endif /* PIOS_INCLUDE_RCVR */
 
 #if defined(PIOS_INCLUDE_USB_HID)
@@ -980,7 +988,8 @@ void PIOS_Board_Init(void) {
 		}
 #endif	/* PIOS_INCLUDE_GPS */
 		break;
-	case HWSETTINGS_CC_MAINPORT_SPEKTRUM:
+	case HWSETTINGS_CC_MAINPORT_SPEKTRUM1:
+	case HWSETTINGS_CC_MAINPORT_SPEKTRUM2:
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 		{
 			uint32_t pios_usart_spektrum_id;
@@ -991,6 +1000,16 @@ void PIOS_Board_Init(void) {
 			uint32_t pios_spektrum_id;
 			if (PIOS_SPEKTRUM_Init(&pios_spektrum_id, &pios_spektrum_main_cfg, &pios_usart_com_driver, pios_usart_spektrum_id, false)) {
 				PIOS_Assert(0);
+			}
+
+			uint32_t pios_spektrum_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_spektrum_rcvr_id, &pios_spektrum_rcvr_driver, pios_spektrum_id)) {
+				PIOS_Assert(0);
+			}
+			if (hwsettings_cc_mainport == HWSETTINGS_CC_MAINPORT_SPEKTRUM1) {
+				pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM1] = pios_spektrum_rcvr_id;
+			} else {
+				pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM2] = pios_spektrum_rcvr_id;
 			}
 		}
 #endif	/* PIOS_INCLUDE_SPEKTRUM */
@@ -1042,7 +1061,8 @@ void PIOS_Board_Init(void) {
 		}
 #endif	/* PIOS_INCLUDE_GPS */
 		break;
-	case HWSETTINGS_CC_FLEXIPORT_SPEKTRUM:
+	case HWSETTINGS_CC_FLEXIPORT_SPEKTRUM1:
+	case HWSETTINGS_CC_FLEXIPORT_SPEKTRUM2:
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 		{
 			uint32_t pios_usart_spektrum_id;
@@ -1053,6 +1073,16 @@ void PIOS_Board_Init(void) {
 			uint32_t pios_spektrum_id;
 			if (PIOS_SPEKTRUM_Init(&pios_spektrum_id, &pios_spektrum_flexi_cfg, &pios_usart_com_driver, pios_usart_spektrum_id, false)) {
 				PIOS_Assert(0);
+			}
+
+			uint32_t pios_spektrum_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_spektrum_rcvr_id, &pios_spektrum_rcvr_driver, pios_spektrum_id)) {
+				PIOS_Assert(0);
+			}
+			if (hwsettings_cc_flexiport == HWSETTINGS_CC_FLEXIPORT_SPEKTRUM1) {
+				pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM1] = pios_spektrum_rcvr_id;
+			} else {
+				pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM2] = pios_spektrum_rcvr_id;
 			}
 		}
 #endif	/* PIOS_INCLUDE_SPEKTRUM */
@@ -1070,79 +1100,43 @@ void PIOS_Board_Init(void) {
 		break;
 	}
 
-	/* Configure the selected receiver */
-	uint8_t manualcontrolsettings_inputmode;
-	ManualControlSettingsInputModeGet(&manualcontrolsettings_inputmode);
+	/* Configure the rcvr port */
+	uint8_t hwsettings_rcvrport;
+	HwSettingsRcvrPortGet(&hwsettings_rcvrport);
 
-	switch (manualcontrolsettings_inputmode) {
-	case MANUALCONTROLSETTINGS_INPUTMODE_PWM:
+	switch (hwsettings_rcvrport) {
+	case HWSETTINGS_RCVRPORT_DISABLED:
+		break;
+	case HWSETTINGS_RCVRPORT_PWM:
 #if defined(PIOS_INCLUDE_PWM)
 		PIOS_PWM_Init();
 		uint32_t pios_pwm_rcvr_id;
 		if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, 0)) {
 			PIOS_Assert(0);
 		}
-		for (uint8_t i = 0;
-		     i < PIOS_PWM_NUM_INPUTS && pios_rcvr_max_channel < NELEMENTS(pios_rcvr_channel_to_id_map);
-		     i++) {
-			pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].id = pios_pwm_rcvr_id;
-			pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].channel = i;
-			pios_rcvr_max_channel++;
-		}
+		pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM] = pios_pwm_rcvr_id;
 #endif	/* PIOS_INCLUDE_PWM */
 		break;
-	case MANUALCONTROLSETTINGS_INPUTMODE_PPM:
+	case HWSETTINGS_RCVRPORT_PPM:
 #if defined(PIOS_INCLUDE_PPM)
 		PIOS_PPM_Init();
 		uint32_t pios_ppm_rcvr_id;
 		if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, 0)) {
 			PIOS_Assert(0);
 		}
-		for (uint8_t i = 0;
-		     i < PIOS_PPM_NUM_INPUTS && pios_rcvr_max_channel < NELEMENTS(pios_rcvr_channel_to_id_map);
-		     i++) {
-			pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].id = pios_ppm_rcvr_id;
-			pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].channel = i;
-			pios_rcvr_max_channel++;
-		}
+		pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PPM] = pios_ppm_rcvr_id;
 #endif	/* PIOS_INCLUDE_PPM */
 		break;
-	case MANUALCONTROLSETTINGS_INPUTMODE_SPEKTRUM:
-#if defined(PIOS_INCLUDE_SPEKTRUM)
-		if (hwsettings_cc_mainport == HWSETTINGS_CC_MAINPORT_SPEKTRUM ||
-		    hwsettings_cc_flexiport == HWSETTINGS_CC_FLEXIPORT_SPEKTRUM) {
-			uint32_t pios_spektrum_rcvr_id;
-			if (PIOS_RCVR_Init(&pios_spektrum_rcvr_id, &pios_spektrum_rcvr_driver, 0)) {
-				PIOS_Assert(0);
-			}
-			for (uint8_t i = 0;
-			     i < PIOS_SPEKTRUM_NUM_INPUTS && pios_rcvr_max_channel < NELEMENTS(pios_rcvr_channel_to_id_map);
-			     i++) {
-				pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].id = pios_spektrum_rcvr_id;
-				pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].channel = i;
-				pios_rcvr_max_channel++;
-			}
-		}
-#endif	/* PIOS_INCLUDE_SPEKTRUM */
-		break;
-	case MANUALCONTROLSETTINGS_INPUTMODE_SBUS:
-#if defined(PIOS_INCLUDE_SBUS)
-		if (hwsettings_cc_mainport == HWSETTINGS_CC_MAINPORT_SBUS) {
-			uint32_t pios_sbus_rcvr_id;
-			if (PIOS_RCVR_Init(&pios_sbus_rcvr_id, &pios_sbus_rcvr_driver, 0)) {
-				PIOS_Assert(0);
-			}
-			for (uint8_t i = 0;
-			     i < SBUS_NUMBER_OF_CHANNELS && pios_rcvr_max_channel < NELEMENTS(pios_rcvr_channel_to_id_map);
-			     i++) {
-				pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].id = pios_sbus_rcvr_id;
-				pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].channel = i;
-				pios_rcvr_max_channel++;
-			}
-		}
-#endif  /* PIOS_INCLUDE_SBUS */
-		break;
 	}
+
+#if defined(PIOS_INCLUDE_GCSRCVR)
+	PIOS_GCSRCVR_Init();
+	uint32_t pios_gcsrcvr_rcvr_id;
+	if (PIOS_RCVR_Init(&pios_gcsrcvr_rcvr_id, &pios_gcsrcvr_rcvr_driver, 0)) {
+	  PIOS_Assert(0);
+	}
+	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS] = pios_gcsrcvr_rcvr_id;
+#endif	/* PIOS_INCLUDE_GCSRCVR */
 
 	/* Remap AFIO pin */
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);

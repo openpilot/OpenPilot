@@ -69,6 +69,8 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/sonaraltitude.h \
     $$UAVOBJECT_SYNTHETICS/flightstatus.h \
     $$UAVOBJECT_SYNTHETICS/hwsettings.h \
+    $$UAVOBJECT_SYNTHETICS/gcsreceiver.h \
+    $$UAVOBJECT_SYNTHETICS/receiveractivity.h \
     $$UAVOBJECT_SYNTHETICS/attitudesettings.h
 
 SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
@@ -118,4 +120,6 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/uavobjectsinit.cpp \
     $$UAVOBJECT_SYNTHETICS/flightstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/hwsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/gcsreceiver.cpp \
+    $$UAVOBJECT_SYNTHETICS/receiveractivity.cpp \
     $$UAVOBJECT_SYNTHETICS/attitudesettings.cpp

@@ -30,6 +30,7 @@
 #include <pios.h>
 #include <openpilot.h>
 #include <uavobjectsinit.h>
+#include <hwsettings.h>
 #include "manualcontrolsettings.h"
 
 //#define I2C_DEBUG_PIN			0
@@ -496,7 +497,6 @@ static const struct pios_usart_cfg pios_usart_spektrum_cfg = {
   },
 };
 
-#include <pios_spektrum_priv.h>
 static const struct pios_spektrum_cfg pios_spektrum_cfg = {
 	.bind = {
 		.gpio = GPIOA,
@@ -964,8 +964,12 @@ static const struct stm32_gpio pios_debug_pins[] = {
 #if defined(PIOS_INCLUDE_RCVR)
 #include "pios_rcvr_priv.h"
 
-struct pios_rcvr_channel_map pios_rcvr_channel_to_id_map[PIOS_RCVR_MAX_CHANNELS];
-uint32_t pios_rcvr_max_channel;
+/* One slot per selectable receiver group.
+ *  eg. PWM, PPM, GCS, SPEKTRUM1, SPEKTRUM2, SBUS
+ * NOTE: No slot in this map for NONE.
+ */
+uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
+
 #endif /* PIOS_INCLUDE_RCVR */
 
 #if defined(PIOS_INCLUDE_USB_HID)
@@ -1047,126 +1051,125 @@ void PIOS_Board_Init(void) {
 	/* Bind the AHRS comms layer to the AHRS SPI link */
 	AhrsConnect(pios_spi_ahrs_id);
 
-	/* Initialize the PiOS library */
-#if defined(PIOS_INCLUDE_COM)
+	/* Configure the main IO port */
+	uint8_t hwsettings_op_mainport;
+	HwSettingsOP_MainPortGet(&hwsettings_op_mainport);
+
+	switch (hwsettings_op_mainport) {
+	case HWSETTINGS_OP_MAINPORT_DISABLED:
+		break;
+	case HWSETTINGS_OP_MAINPORT_TELEMETRY:
 #if defined(PIOS_INCLUDE_TELEMETRY_RF)
-	{
-		uint32_t pios_usart_telem_rf_id;
-		if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_cfg)) {
-			PIOS_Assert(0);
-		}
+		{
+			uint32_t pios_usart_telem_rf_id;
+			if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_cfg)) {
+				PIOS_Assert(0);
+			}
 
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id,
-						  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
-						  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
-			PIOS_Assert(0);
+			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
+			PIOS_Assert(rx_buffer);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id,
+							  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
+							  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
 		}
-	}
 #endif /* PIOS_INCLUDE_TELEMETRY_RF */
-
-#if defined(PIOS_INCLUDE_GPS)
-	{
-		uint32_t pios_usart_gps_id;
-		if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
-			PIOS_Assert(0);
-		}
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
-				  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
-				  NULL, 0)) {
-			PIOS_Assert(0);
-		}
+		break;
 	}
+
+	/* Configure the flexi port */
+	uint8_t hwsettings_op_flexiport;
+	HwSettingsOP_FlexiPortGet(&hwsettings_op_flexiport);
+
+	switch (hwsettings_op_flexiport) {
+	case HWSETTINGS_OP_FLEXIPORT_DISABLED:
+		break;
+	case HWSETTINGS_OP_FLEXIPORT_GPS:
+#if defined(PIOS_INCLUDE_GPS)
+		{
+			uint32_t pios_usart_gps_id;
+			if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
+				PIOS_Assert(0);
+			}
+			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
+			PIOS_Assert(rx_buffer);
+			if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
+					  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
+					  NULL, 0)) {
+				PIOS_Assert(0);
+			}
+		}
 #endif	/* PIOS_INCLUDE_GPS */
-#endif
+		break;
+	}
 
 	PIOS_Servo_Init();
 	PIOS_ADC_Init();
 	PIOS_GPIO_Init();
 
-	/* Configure the selected receiver */
-	uint8_t manualcontrolsettings_inputmode;
-	ManualControlSettingsInputModeGet(&manualcontrolsettings_inputmode);
+	/* Configure the aux port */
+	uint8_t hwsettings_op_auxport;
+	HwSettingsOP_AuxPortGet(&hwsettings_op_auxport);
 
-	switch (manualcontrolsettings_inputmode) {
-		case MANUALCONTROLSETTINGS_INPUTMODE_PWM:
-#if defined(PIOS_INCLUDE_PWM)
-#if (PIOS_PWM_NUM_INPUTS > PIOS_RCVR_MAX_CHANNELS)
-#error More receiver inputs than available devices
-#endif
-			PIOS_PWM_Init();
-			uint32_t pios_pwm_rcvr_id;
-			if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, 0)) {
-			  PIOS_Assert(0);
-			}
-			for (uint8_t i = 0;
-			     i < PIOS_PWM_NUM_INPUTS && pios_rcvr_max_channel < NELEMENTS(pios_rcvr_channel_to_id_map);
-			     i++) {
-				pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].id = pios_pwm_rcvr_id;
-				pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].channel = i;
-				pios_rcvr_max_channel++;
-			}
-#endif  /* PIOS_INCLUDE_PWM */
-			break;
-		case MANUALCONTROLSETTINGS_INPUTMODE_PPM:
-#if defined(PIOS_INCLUDE_PPM)
-#if (PIOS_PPM_NUM_INPUTS > PIOS_RCVR_MAX_CHANNELS)
-#error More receiver inputs than available devices
-#endif
-			PIOS_PPM_Init();
-			uint32_t pios_ppm_rcvr_id;
-			if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, 0)) {
-			  PIOS_Assert(0);
-			}
-			for (uint8_t i = 0;
-			     i < PIOS_PPM_NUM_INPUTS && pios_rcvr_max_channel < NELEMENTS(pios_rcvr_channel_to_id_map);
-			     i++) {
-				pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].id = pios_ppm_rcvr_id;
-				pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].channel = i;
-				pios_rcvr_max_channel++;
-			}
-#endif	/* PIOS_INCLUDE_PPM */
-			break;
-		case MANUALCONTROLSETTINGS_INPUTMODE_SPEKTRUM:
+	switch (hwsettings_op_auxport) {
+	case HWSETTINGS_OP_AUXPORT_DISABLED:
+		break;
+	case HWSETTINGS_OP_AUXPORT_DEBUG:
+		/* Not supported yet */
+		break;
+	case HWSETTINGS_OP_AUXPORT_SPEKTRUM1:
 #if defined(PIOS_INCLUDE_SPEKTRUM)
-#if (PIOS_SPEKTRUM_NUM_INPUTS > PIOS_RCVR_MAX_CHANNELS)
-#error More receiver inputs than available devices
-#endif
-			{
-				uint32_t pios_usart_spektrum_id;
-				if (PIOS_USART_Init(&pios_usart_spektrum_id, &pios_usart_spektrum_cfg)) {
-					PIOS_Assert(0);
-				}
-
-				uint32_t pios_spektrum_id;
-				if (PIOS_SPEKTRUM_Init(&pios_spektrum_id, &pios_spektrum_cfg, &pios_usart_com_driver, pios_usart_spektrum_id, false)) {
-					PIOS_Assert(0);
-				}
-
-				uint32_t pios_spektrum_rcvr_id;
-				if (PIOS_RCVR_Init(&pios_spektrum_rcvr_id, &pios_spektrum_rcvr_driver, 0)) {
-					PIOS_Assert(0);
-				}
-				for (uint8_t i = 0;
-				     i < PIOS_SPEKTRUM_NUM_INPUTS && pios_rcvr_max_channel < NELEMENTS(pios_rcvr_channel_to_id_map);
-				     i++) {
-					pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].id = pios_spektrum_rcvr_id;
-					pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].channel = i;
-					pios_rcvr_max_channel++;
-				}
+		{
+			uint32_t pios_usart_spektrum_id;
+			if (PIOS_USART_Init(&pios_usart_spektrum_id, &pios_usart_spektrum_cfg)) {
+				PIOS_Assert(0);
 			}
+
+			uint32_t pios_spektrum_id;
+			if (PIOS_SPEKTRUM_Init(&pios_spektrum_id, &pios_spektrum_cfg, &pios_usart_com_driver, pios_usart_spektrum_id, false)) {
+				PIOS_Assert(0);
+			}
+
+			uint32_t pios_spektrum_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_spektrum_rcvr_id, &pios_spektrum_rcvr_driver, pios_spektrum_id)) {
+				PIOS_Assert(0);
+			}
+			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM1] = pios_spektrum_rcvr_id;
+		}
 #endif
-			break;
-		case MANUALCONTROLSETTINGS_INPUTMODE_SBUS:
-#if defined(PIOS_INCLUDE_SBUS)
-#error SBUS NOT ON OP YET
-#endif  /* PIOS_INCLUDE_SBUS */
-			break;
+		break;
+	}
+
+	/* Configure the rcvr port */
+	uint8_t hwsettings_rcvrport;
+	HwSettingsRcvrPortGet(&hwsettings_rcvrport);
+
+	switch (hwsettings_rcvrport) {
+	case HWSETTINGS_RCVRPORT_DISABLED:
+		break;
+	case HWSETTINGS_RCVRPORT_PWM:
+#if defined(PIOS_INCLUDE_PWM)
+		PIOS_PWM_Init();
+		uint32_t pios_pwm_rcvr_id;
+		if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, 0)) {
+			PIOS_Assert(0);
+		}
+		pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM] = pios_pwm_rcvr_id;
+#endif	/* PIOS_INCLUDE_PWM */
+		break;
+	case HWSETTINGS_RCVRPORT_PPM:
+#if defined(PIOS_INCLUDE_PPM)
+		PIOS_PPM_Init();
+		uint32_t pios_ppm_rcvr_id;
+		if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, 0)) {
+			PIOS_Assert(0);
+		}
+		pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PPM] = pios_ppm_rcvr_id;
+#endif	/* PIOS_INCLUDE_PPM */
+		break;
 	}
 
 #if defined(PIOS_INCLUDE_USB_HID)

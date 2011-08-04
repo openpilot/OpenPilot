@@ -34,7 +34,8 @@
 #include "uavobject.h"
 #include <QtGui/QWidget>
 #include <QList>
-
+#include "inputchannelform.h"
+#include "ui_inputchannelform.h"
 class Ui_InputWidget;
 
 class ConfigInputWidget: public ConfigTaskWidget
@@ -50,36 +51,9 @@ public slots:
 private:
         Ui_InputWidget *m_config;
 
-	QList<QSlider> sliders;
-
-        void updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, int value, bool reversed);
-
-	void assignChannel(UAVDataObject *obj, QString str);
-	void assignOutputChannel(UAVDataObject *obj, QString str);
-
-	int mccDataRate;
-
-	UAVObject::Metadata accInitialData;
-
-        QList<QSlider*> inSliders;
-	QList<QLabel*> inMaxLabels;
-	QList<QLabel*> inMinLabels;
-	QList<QLabel*> inNeuLabels;
-        QList<QCheckBox*> inRevCheckboxes;
-        QList<QComboBox*> inChannelAssign;
-
-	bool firstUpdate;
-
-        virtual void enableControls(bool enable);
-        void receiverHelp();
 private slots:
-	void updateChannels(UAVObject* obj);
-        virtual void refreshValues();
-	void sendRCInputUpdate();
-	void saveRCInputObject();
-        void reverseCheckboxClicked(bool state);
+
         void openHelp();
-        void updateTips(int);
 };
 
 #endif

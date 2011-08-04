@@ -35,7 +35,9 @@ void smartSaveButton::processClick()
             connect(&timer,SIGNAL(timeout()),&loop,SLOT(quit()));
             obj->updated();
             timer.start(1000);
+            qDebug()<<"begin loop";
             loop.exec();
+            qDebug()<<"end loop";
             timer.stop();
             disconnect(obj,SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(transaction_finished(UAVObject*, bool)));
             disconnect(&timer,SIGNAL(timeout()),&loop,SLOT(quit()));

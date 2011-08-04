@@ -43,13 +43,24 @@ void ConfigTaskWidget::addUAVObject(QString objectName)
 {
     addUAVObjectToWidgetRelation(objectName,"",NULL);
 }
-void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString field, QWidget * widget)
+void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString field, QWidget * widget, QString index)
+{
+    UAVObject *obj=NULL;
+    UAVObjectField *_field=NULL;
+    obj = objManager->getObject(QString(object));
+    _field = obj->getField(QString(field));
+    addUAVObjectToWidgetRelation(object,field,widget,_field->getElementNames().indexOf(index));
+}
+
+void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString field, QWidget * widget, int index,int scale)
 {
     UAVObject *obj=NULL;
     UAVObjectField *_field=NULL;
     if(!object.isEmpty())
+    {
         obj = objManager->getObject(QString(object));
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
+        connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
+    }
     //smartsave->addObject(obj);
     if(!field.isEmpty() && obj)
         _field = obj->getField(QString(field));
@@ -57,6 +68,8 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     ow->field=_field;
     ow->object=obj;
     ow->widget=widget;
+    ow->index=index;
+    ow->scale=scale;
     objOfInterest.append(ow);
     if(obj)
         smartsave->addObject(obj);
@@ -156,11 +169,15 @@ void ConfigTaskWidget::populateWidgets()
         else if(QComboBox * cb=qobject_cast<QComboBox *>(ow->widget))
         {
             cb->addItems(ow->field->getOptions());
-            cb->setCurrentIndex(cb->findText(ow->field->getValue().toString()));
+            cb->setCurrentIndex(cb->findText(ow->field->getValue(ow->index).toString()));
         }
         else if(QLabel * cb=qobject_cast<QLabel *>(ow->widget))
         {
-            cb->setText(ow->field->getValue().toString());
+            cb->setText(ow->field->getValue(ow->index).toString());
+        }
+        else if(QSpinBox * cb=qobject_cast<QSpinBox *>(ow->widget))
+        {
+            cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
         }
     }
     setDirty(dirtyBack);
@@ -177,11 +194,15 @@ void ConfigTaskWidget::refreshWidgetsValues()
         }
         else if(QComboBox * cb=qobject_cast<QComboBox *>(ow->widget))
         {
-            cb->setCurrentIndex(cb->findText(ow->field->getValue().toString()));
+            cb->setCurrentIndex(cb->findText(ow->field->getValue(ow->index).toString()));
         }
         else if(QLabel * cb=qobject_cast<QLabel *>(ow->widget))
         {
-            cb->setText(ow->field->getValue().toString());
+            cb->setText(ow->field->getValue(ow->index).toString());
+        }
+        else if(QSpinBox * cb=qobject_cast<QSpinBox *>(ow->widget))
+        {
+            cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
         }
     }
     setDirty(dirtyBack);
@@ -197,11 +218,15 @@ void ConfigTaskWidget::updateObjectsFromWidgets()
         }
         else if(QComboBox * cb=qobject_cast<QComboBox *>(ow->widget))
         {
-                ow->field->setValue(cb->currentText());
+                ow->field->setValue(cb->currentText(),ow->index);
         }
         else if(QLabel * cb=qobject_cast<QLabel *>(ow->widget))
         {
-            ow->field->setValue(cb->text());
+            ow->field->setValue(cb->text(),ow->index);
+        }
+        else if(QSpinBox * cb=qobject_cast<QSpinBox *>(ow->widget))
+        {
+            ow->field->setValue(cb->value()* ow->scale,ow->index);
         }
     }
 }

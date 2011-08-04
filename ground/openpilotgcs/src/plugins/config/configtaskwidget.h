@@ -54,6 +54,8 @@ public:
         UAVObject * object;
         UAVObjectField * field;
         QWidget * widget;
+        int index;
+        int scale;
     };
 
     ConfigTaskWidget(QWidget *parent = 0);
@@ -63,10 +65,12 @@ public:
     static double listMean(QList<double> list);
     void addUAVObject(QString objectName);
     void addWidget(QWidget * widget);
-    void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget);
+    void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget,int index=0,int scale=1);
+
     void setupButtons(QPushButton * update,QPushButton * save);
     bool isDirty();
     void setDirty(bool value);
+    void addUAVObjectToWidgetRelation(QString object, QString field, QWidget *widget, QString index);
 public slots:
     void onAutopilotDisconnect();
     void onAutopilotConnect();
@@ -75,6 +79,7 @@ private slots:
     virtual void refreshValues();
     virtual void updateObjectsFromWidgets();
 private:
+    QStringList objectsList;
     QList <objectToWidget*> objOfInterest;
     ExtensionSystem::PluginManager *pm;
     UAVObjectManager *objManager;

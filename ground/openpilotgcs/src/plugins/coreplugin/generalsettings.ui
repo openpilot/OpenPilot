@@ -178,61 +178,6 @@
         </property>
        </widget>
       </item>
-      <item row="12" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Tab bar placement:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="13" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Allow tab reordering:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="13" column="1">
-       <widget class="QCheckBox" name="checkBoxAllowTabMovement">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="12" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QComboBox" name="comboBoxTabBarPlacement">
-          <property name="currentIndex">
-           <number>1</number>
-          </property>
-          <item>
-           <property name="text">
-            <string>Top</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Bottom</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
      </layout>
     </widget>
    </item>

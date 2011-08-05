@@ -1284,10 +1284,6 @@ void ConfigccpmWidget::requestccpmUpdate()
             ServoCurve2[NumServos]=MixerDataFromHeli[i][1];//record the ThrottleCurve2 contribution to this servo
             ServoAngles[NumServos]=NumServos*45;//make this 0 for the final version
 
-            //if (NumServos==0)m_ccpm->ccpmServoWChannel->setCurrentIndex(i);
-            //if (NumServos==1)m_ccpm->ccpmServoXChannel->setCurrentIndex(i);
-            //if (NumServos==2)m_ccpm->ccpmServoYChannel->setCurrentIndex(i);
-            //if (NumServos==3)m_ccpm->ccpmServoZChannel->setCurrentIndex(i);
             NumServos++;
         }
 
@@ -1342,7 +1338,7 @@ void ConfigccpmWidget::sendccpmUpdate()
         //clear the output types
         for (i=0;i<8;i++)
         {
-            field = obj->getField(tr( "Mixer%1Type" ).arg( i+1 ));
+            field = obj->getField( QString( "Mixer%1Type" ).arg( i+1 ));
             //clear the mixer type
             field->setValue("Disabled");
         }
@@ -1363,7 +1359,7 @@ void ConfigccpmWidget::sendccpmUpdate()
             if (MixerChannelData[i]<8)
             {
                 //select the correct mixer for this config element
-                field = obj->getField(tr( "Mixer%1Type" ).arg( MixerChannelData[i]+1 ));
+                field = obj->getField(QString( "Mixer%1Type" ).arg( MixerChannelData[i]+1 ));
                 //set the mixer type
                 if (i==0)
                 {
@@ -1375,7 +1371,7 @@ void ConfigccpmWidget::sendccpmUpdate()
                 }
 
                 //select the correct mixer for this config element
-                field = obj->getField(tr( "Mixer%1Vector" ).arg( MixerChannelData[i]+1 ));
+                field = obj->getField(QString( "Mixer%1Vector" ).arg( MixerChannelData[i]+1 ));
                 //config the vector
                 for (j=0;j<5;j++)
                 {

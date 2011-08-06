@@ -27,5 +27,5 @@
 #define EXAMPLEMODPERIODIC_H
 
 int32_t ExampleModPeriodicInitialize();
-
+int32_t GuidanceInitialize(void);
 #endif // EXAMPLEMODPERIODIC_H

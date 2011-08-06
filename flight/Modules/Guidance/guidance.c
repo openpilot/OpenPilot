@@ -82,6 +82,19 @@ static void updateVtolDesiredAttitude();
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
+int32_t GuidanceStart()
+{
+	// Start main task
+	xTaskCreate(guidanceTask, (signed char *)"Guidance", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &guidanceTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_GUIDANCE, guidanceTaskHandle);
+
+	return 0;
+}
+
+/**
+ * Initialise the module, called on startup
+ * \returns 0 on success or -1 if initialisation failed
+ */
 int32_t GuidanceInitialize()
 {
 	// Create object queue
@@ -90,12 +103,9 @@ int32_t GuidanceInitialize()
 	// Listen for updates.
 	AttitudeRawConnectQueue(queue);
 	
-	// Start main task
-	xTaskCreate(guidanceTask, (signed char *)"Guidance", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &guidanceTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_GUIDANCE, guidanceTaskHandle);
-
 	return 0;
 }
+MODULE_INITCALL(GuidanceInitialize, GuidanceStart)
 
 static float northVelIntegral = 0;
 static float eastVelIntegral = 0;
@@ -236,7 +246,7 @@ void updateVtolDesiredVelocity()
 {
 	static portTickType lastSysTime;
 	portTickType thisSysTime = xTaskGetTickCount();;
-	float dT;
+	float dT = 0;
 
 	GuidanceSettingsData guidanceSettings;
 	PositionActualData positionActual;
@@ -304,7 +314,7 @@ static void updateVtolDesiredAttitude()
 {
 	static portTickType lastSysTime;
 	portTickType thisSysTime = xTaskGetTickCount();;
-	float dT;
+	float dT = 0;
 
 	VelocityDesiredData velocityDesired;
 	VelocityActualData velocityActual;

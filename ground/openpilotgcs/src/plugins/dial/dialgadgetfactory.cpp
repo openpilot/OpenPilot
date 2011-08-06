@@ -34,7 +34,7 @@
 
 DialGadgetFactory::DialGadgetFactory(QObject *parent) :
         IUAVGadgetFactory(QString("DialGadget"),
-                          tr("Analog Dial Gadget"),
+                          tr("Analog Dial"),
                           parent)
 {
 }

@@ -34,6 +34,7 @@
 #include "uavobject.h"
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
+#include <QGraphicsEllipseItem>
 #include <QtGui/QWidget>
 #include <QList>
 
@@ -48,6 +49,30 @@ typedef struct {
     int Neutral[CCPM_MAX_SWASH_SERVOS];
     int Min[CCPM_MAX_SWASH_SERVOS];
 } SwashplateServoSettingsStruct;
+
+typedef struct {
+    uint SwasplateType:3;
+    uint FirstServoIndex:2;
+    uint CorrectionAngle:9;
+    uint ccpmCollectivePassthroughState:1;
+    uint ccpmLinkCyclicState:1;
+    uint ccpmLinkRollState:1;
+    uint CollectiveChannel:3;//20bits
+    uint SliderValue0:7;
+    uint SliderValue1:7;
+    uint SliderValue2:7;//41bits
+    uint ServoIndexW:4;
+    uint ServoIndexX:4;
+    uint ServoIndexY:4;
+    uint ServoIndexZ:4;//57bits
+    uint padding:7;
+} __attribute__((packed))  heliGUISettingsStruct;
+
+typedef union
+{
+    uint                    UAVObject[2];//32bits * 2
+    heliGUISettingsStruct   heli;//64bits
+} GUIConfigDataUnion;
 
 class ConfigccpmWidget: public ConfigTaskWidget
 {
@@ -72,6 +97,7 @@ private:
         QGraphicsSvgItem *Servos[CCPM_MAX_SWASH_SERVOS];
         QGraphicsTextItem *ServosText[CCPM_MAX_SWASH_SERVOS];
         QGraphicsLineItem *ServoLines[CCPM_MAX_SWASH_SERVOS];
+        QGraphicsEllipseItem *ServosTextCircles[CCPM_MAX_SWASH_SERVOS];
         QSpinBox *SwashLvlSpinBoxes[CCPM_MAX_SWASH_SERVOS];
 
         bool SwashLvlConfigurationInProgress;
@@ -82,9 +108,14 @@ private:
         SwashplateServoSettingsStruct oldSwashLvlConfiguration;
         SwashplateServoSettingsStruct newSwashLvlConfiguration;
 
+        GUIConfigDataUnion GUIConfigData;
 
         int MixerChannelData[6];
         int ShowDisclaimer(int messageID);
+        virtual void enableControls(bool enable) { Q_UNUSED(enable)}; // Not used by this widget
+
+        bool updatingFromHardware;
+        bool updatingToHardware;
 
     private slots:
         void ccpmSwashplateUpdate();
@@ -103,14 +134,24 @@ private:
         void SwashLvlCancelButtonPressed();
         void SwashLvlFinishButtonPressed();
 
+        void UpdatCCPMOptionsFromUI();
+        void UpdatCCPMUIFromOptions();
+
+        void SetUIComponentVisibilities();
+        void ccpmChannelCheck();
+
         void enableSwashplateLevellingControl(bool state);
         void setSwashplateLevel(int percent);
         void SwashLvlSpinBoxChanged(int value);
         void FocusChanged(QWidget *oldFocus, QWidget *newFocus);
+
+        virtual void refreshValues() {}; // Not used
+
     public slots:
         void requestccpmUpdate();
         void sendccpmUpdate();
         void saveccpmUpdate();
+
 protected:
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);

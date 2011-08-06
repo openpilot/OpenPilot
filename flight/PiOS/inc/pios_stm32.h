@@ -32,7 +32,6 @@
 #define PIOS_STM32_H
 
 struct stm32_irq {
-	void (*handler) (void);
 	uint32_t flags;
 	NVIC_InitTypeDef init;
 };

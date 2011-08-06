@@ -37,7 +37,8 @@
 #include <QThread>
 #include <iostream>
 #include <Eigen/align-function.h>
-#include <QSignalMapper>
+#include <QDesktopServices>
+#include <QUrl>
 
 #include "assertions.h"
 #include "calibration.h"
@@ -215,38 +216,28 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     // Connect the signals
     connect(m_ahrs->ahrsCalibStart, SIGNAL(clicked()), this, SLOT(launchAHRSCalibration()));
     connect(m_ahrs->accelBiasStart, SIGNAL(clicked()), this, SLOT(launchAccelBiasCalibration()));
-    connect(m_ahrs->ahrsSettingsRequest, SIGNAL(clicked()), this, SLOT(ahrsSettingsRequest()));
-    /*
-    connect(m_ahrs->algorithm, SIGNAL(currentIndexChanged(int)), this, SLOT(ahrsSettingsSave()));
-    connect(m_ahrs->indoorFlight, SIGNAL(stateChanged(int)), this, SLOT(homeLocationSave()));
-    connect(m_ahrs->homeLocation, SIGNAL(clicked()), this, SLOT(homeLocationSaveSD()));
-    */
+
+    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
+    obj = getObjectManager()->getObject(QString("HomeLocation"));
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
+
     connect(m_ahrs->ahrsSettingsSaveRAM, SIGNAL(clicked()), this, SLOT(ahrsSettingsSaveRAM()));
     connect(m_ahrs->ahrsSettingsSaveSD, SIGNAL(clicked()), this, SLOT(ahrsSettingsSaveSD()));
     connect(m_ahrs->sixPointsStart, SIGNAL(clicked()), this, SLOT(multiPointCalibrationMode()));
     connect(m_ahrs->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
     connect(m_ahrs->startDriftCalib, SIGNAL(clicked()),this, SLOT(launchGyroDriftCalibration()));
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(ahrsSettingsRequest()));
 
-    // Connect all the help buttons to signal mapper that passes button name to SLOT function
-    QSignalMapper* signalMapper = new QSignalMapper(this);
-    connect( m_ahrs->multiPointHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_ahrs->multiPointHelp, m_ahrs->multiPointHelp->objectName());
-    connect( m_ahrs->sensorNoiseHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_ahrs->sensorNoiseHelp, m_ahrs->sensorNoiseHelp->objectName());
-    connect( m_ahrs->accelBiasHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_ahrs->accelBiasHelp, m_ahrs->accelBiasHelp->objectName());
-    connect( m_ahrs->gyroDriftHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_ahrs->gyroDriftHelp, m_ahrs->gyroDriftHelp->objectName());
-    connect( m_ahrs->commandHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_ahrs->commandHelp, QString("commandHelp"));
-    connect( m_ahrs->insAlgorithmHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_ahrs->insAlgorithmHelp, m_ahrs->insAlgorithmHelp->objectName());
-    connect( m_ahrs->homeLocationHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_ahrs->homeLocationHelp, m_ahrs->homeLocationHelp->objectName());
+    // Order is important: 1st request the settings (it will also enable the controls)
+    // then explicitely disable them. They will be re-enabled right afterwards by the
+    // configgadgetwidget if the autopilot is actually connected.
+    refreshValues();
+    // when the AHRS Widget is instanciated, the autopilot is always connected // enableControls(false);
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
+    connect(parent, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
 
-    connect(signalMapper, SIGNAL(mapped(const QString &)), parent, SLOT(showHelp(const QString &)));
-
+    // Connect the help button
+    connect(m_ahrs->ahrsHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 }
 
 ConfigAHRSWidget::~ConfigAHRSWidget()
@@ -272,6 +263,13 @@ void ConfigAHRSWidget::resizeEvent(QResizeEvent *event)
     m_ahrs->sixPointsHelp->fitInView(paperplane,Qt::KeepAspectRatio);
 }
 
+
+void ConfigAHRSWidget::enableControls(bool enable)
+{
+    //m_ahrs->ahrsSettingsSaveRAM->setEnabled(enable);
+    m_ahrs->ahrsSettingsSaveSD->setEnabled(enable);
+}
+
 /**
   Starts an accelerometer bias calibration.
   */
@@ -290,7 +288,7 @@ void ConfigAHRSWidget::launchAccelBiasCalibration()
     accel_accum_y.clear();
     accel_accum_z.clear();
 
-    UAVDataObject* ahrsCalib = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
+//    UAVDataObject* ahrsCalib = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
 //    ahrsCalib->getField("accel_bias")->setDouble(0,0);
 //    ahrsCalib->getField("accel_bias")->setDouble(0,1);
 //    ahrsCalib->getField("accel_bias")->setDouble(0,2);
@@ -425,6 +423,7 @@ void ConfigAHRSWidget::launchGyroDriftCalibration()
   */
 void ConfigAHRSWidget::driftCalibrationAttitudeRawUpdated(UAVObject* obj) {
 
+    Q_UNUSED(obj)
     // This is necessary to prevent a race condition on disconnect signal and another update
     if (collectingData == true) {
         /**
@@ -584,8 +583,7 @@ void ConfigAHRSWidget::saveAHRSCalibration()
     UAVObjectField *field = obj->getField(QString("measure_var"));
     field->setValue("SET");
     obj->updated();
-    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
-
+    saveObjectToSD(obj);
 }
 
 FORCE_ALIGN_FUNC
@@ -1152,17 +1150,16 @@ void ConfigAHRSWidget::drawVariancesGraph()
 /**
   Request current settings from the AHRS
   */
-void ConfigAHRSWidget::ahrsSettingsRequest()
+void ConfigAHRSWidget::refreshValues()
 {
 
-    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSSettings")));
-    obj->requestUpdate();
+    UAVObject *obj = getObjectManager()->getObject(QString("AHRSSettings"));
     UAVObjectField *field = obj->getField(QString("Algorithm"));
     if (field)
         m_ahrs->algorithm->setCurrentIndex(m_ahrs->algorithm->findText(field->getValue().toString()));
     drawVariancesGraph();
 
-    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("HomeLocation")));
+    obj = getObjectManager()->getObject(QString("HomeLocation"));
     field = obj->getField(QString("Set"));
     if (field)
         m_ahrs->homeLocationSet->setEnabled(field->getValue().toBool());
@@ -1222,6 +1219,11 @@ void ConfigAHRSWidget::ahrsSettingsSaveSD()
 
 }
 
+void ConfigAHRSWidget::openHelp()
+{
+
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/INS+Configuration", QUrl::StrictMode) );
+}
 
 /**
   @}

@@ -30,6 +30,7 @@
 #include "actioncontainer.h"
 #include "actionmanager_p.h"
 #include "basemode.h"
+#include "connectionmanager.h"
 #include "coreimpl.h"
 #include "coreconstants.h"
 #include "fancytabwidget.h"
@@ -39,35 +40,34 @@
 #include "mimedatabase.h"
 #include "outputpane.h"
 #include "plugindialog.h"
+#include "qxtlogger.h"
+#include "qxtbasicstdloggerengine.h"
 #include "shortcutsettings.h"
-#include "workspacesettings.h"
-#include "modemanager.h"
 #include "uavgadgetmode.h"
 #include "uavgadgetmanager.h"
 #include "uavgadgetinstancemanager.h"
-#include "connectionmanager.h"
-#include "qxtlogger.h"
-#include "qxtbasicstdloggerengine.h"
+#include "workspacesettings.h"
 
-#include "settingsdialog.h"
-#include "variablemanager.h"
-#include "threadmanager.h"
-#include "versiondialog.h"
 #include "authorsdialog.h"
-#include "viewmanager.h"
-#include "uniqueidmanager.h"
-#include "manhattanstyle.h"
-#include "dialogs/iwizard.h"
-#include "rightpane.h"
 #include "baseview.h"
 #include "ioutputpane.h"
 #include "icorelistener.h"
 #include "iconfigurableplugin.h"
+#include "manhattanstyle.h"
+#include "rightpane.h"
+#include "settingsdialog.h"
+#include "threadmanager.h"
+#include "uniqueidmanager.h"
+#include "variablemanager.h"
+#include "versiondialog.h"
+#include "viewmanager.h"
 
 #include <coreplugin/settingsdatabase.h>
+#include <extensionsystem/pluginmanager.h>
+#include "dialogs/iwizard.h"
 #include <utils/pathchooser.h>
 #include <utils/stylehelper.h>
-#include <extensionsystem/pluginmanager.h>
+#include <utils/xmlconfig.h>
 
 #include <QtCore/QDebug>
 #include <QtCore/QFileInfo>
@@ -112,9 +112,9 @@ MainWindow::MainWindow() :
     m_globalContext(QList<int>() << Constants::C_GLOBAL_ID),
     m_additionalContexts(m_globalContext),
     // keep this in sync with main() in app/main.cpp
-    m_settings(new QSettings(QSettings::IniFormat, QSettings::UserScope,
+    m_settings(new QSettings(XmlConfig::XmlSettingsFormat, QSettings::UserScope,
                              QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS"), this)),
-    m_globalSettings(new QSettings(QSettings::IniFormat, QSettings::SystemScope,
+    m_globalSettings(new QSettings(XmlConfig::XmlSettingsFormat, QSettings::SystemScope,
                                  QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS"), this)),
     m_settingsDatabase(new SettingsDatabase(QFileInfo(m_settings->fileName()).path(),
                                             QLatin1String("OpenPilotGCS"),
@@ -155,7 +155,7 @@ MainWindow::MainWindow() :
     QCoreApplication::setApplicationVersion(QLatin1String(Core::Constants::GCS_VERSION_LONG));
     QCoreApplication::setOrganizationName(QLatin1String("OpenPilot"));
     QCoreApplication::setOrganizationDomain(QLatin1String("openpilot.org"));
-    QSettings::setDefaultFormat(QSettings::IniFormat);
+    QSettings::setDefaultFormat(XmlConfig::XmlSettingsFormat);
     QString baseName = qApp->style()->objectName();
 #ifdef Q_WS_X11
     if (baseName == QLatin1String("windows")) {
@@ -284,18 +284,17 @@ void MainWindow::extensionsInitialized()
 {
 
     QSettings* qs = m_settings;
-    QSettings defaultSettings(":/core/OpenPilotGCS.ini", QSettings::IniFormat);
+    QSettings defaultSettings(":/core/OpenPilotGCS.xml", XmlConfig::XmlSettingsFormat);
+//    QSettings defaultSettings(":/core/OpenPilotGCS.ini", QSettings::IniFormat);
 
     if ( ! qs->allKeys().count() ){
         QMessageBox msgBox;
         msgBox.setText(tr("No configuration file could be found."));
-        msgBox.setInformativeText(tr("Do you want to load the default configuration?"));
-        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-        msgBox.setDefaultButton(QMessageBox::Yes);
-        if ( msgBox.exec() == QMessageBox::Yes ){
-            qDebug() << "Load default config from resource /core/OpenPilotGCS.ini";
-            qs = &defaultSettings;
-        }
+        msgBox.setInformativeText(tr("The default configuration will be loaded."));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+        qDebug() << "Load default config from resource /core/OpenPilotGCS.xml";
+        qs = &defaultSettings;
     }
 
     m_uavGadgetInstanceManager = new UAVGadgetInstanceManager(this);
@@ -871,6 +870,11 @@ ModeManager *MainWindow::modeManager() const
 MimeDatabase *MainWindow::mimeDatabase() const
 {
     return m_mimeDatabase;
+}
+
+GeneralSettings * MainWindow::generalSettings() const
+{
+    return m_generalSettings;
 }
 
 IContext *MainWindow::contextObject(QWidget *widget)

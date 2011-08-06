@@ -111,7 +111,7 @@ public:
     Core::ThreadManager *threadManager() const;
     Core::ModeManager *modeManager() const;
     Core::MimeDatabase *mimeDatabase() const;
-
+    Internal::GeneralSettings *generalSettings() const;
     QSettings *settings(QSettings::Scope scope) const;
     inline SettingsDatabase *settingsDatabase() const { return m_settingsDatabase; }
     IContext * currentContextObject() const;
@@ -177,8 +177,8 @@ private:
     QList<int> m_additionalContexts;
     QSettings *m_settings;
     QSettings *m_globalSettings;
-    bool m_dontSaveSettings; // In case of an Error or if we reset the settings, never save them.
     SettingsDatabase *m_settingsDatabase;
+    bool m_dontSaveSettings; // In case of an Error or if we reset the settings, never save them.
     ActionManagerPrivate *m_actionManager;
     MessageManager *m_messageManager;
     VariableManager *m_variableManager;

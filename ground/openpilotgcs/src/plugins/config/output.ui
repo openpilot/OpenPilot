@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>659</width>
-    <height>511</height>
+    <height>523</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -137,29 +137,6 @@ Leave at 50Hz for fixed wing.</string>
       <item row="0" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
-         <widget class="QPushButton" name="channelRateHelp">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>20</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="icon">
-           <iconset resource="configgadget.qrc">
-            <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-          </property>
-         </widget>
-        </item>
-        <item>
          <spacer name="horizontalSpacer_3">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -246,11 +223,6 @@ Leave at 50Hz for fixed wing.</string>
        <property name="enabled">
         <bool>true</bool>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="toolTip">
         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -280,11 +252,6 @@ p, li { white-space: pre-wrap; }
       <widget class="QSpinBox" name="ch0OutMax">
        <property name="enabled">
         <bool>true</bool>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
        </property>
        <property name="toolTip">
         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -364,11 +331,6 @@ p, li { white-space: pre-wrap; }
        <property name="enabled">
         <bool>true</bool>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -391,11 +353,6 @@ p, li { white-space: pre-wrap; }
       <widget class="QSpinBox" name="ch1OutMax">
        <property name="enabled">
         <bool>true</bool>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
        </property>
        <property name="maximum">
         <number>9999</number>
@@ -451,11 +408,6 @@ p, li { white-space: pre-wrap; }
        <property name="enabled">
         <bool>true</bool>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -478,11 +430,6 @@ p, li { white-space: pre-wrap; }
       <widget class="QSpinBox" name="ch2OutMax">
        <property name="enabled">
         <bool>true</bool>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
        </property>
        <property name="maximum">
         <number>9999</number>
@@ -538,11 +485,6 @@ p, li { white-space: pre-wrap; }
        <property name="enabled">
         <bool>true</bool>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -565,11 +507,6 @@ p, li { white-space: pre-wrap; }
       <widget class="QSpinBox" name="ch3OutMax">
        <property name="enabled">
         <bool>true</bool>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
        </property>
        <property name="maximum">
         <number>9999</number>
@@ -622,11 +559,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="5" column="2">
       <widget class="QSpinBox" name="ch4OutMin">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -644,11 +576,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="5" column="4">
       <widget class="QSpinBox" name="ch4OutMax">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -700,11 +627,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="6" column="2">
       <widget class="QSpinBox" name="ch5OutMin">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -722,11 +644,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="6" column="4">
       <widget class="QSpinBox" name="ch5OutMax">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -785,11 +702,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="7" column="2">
       <widget class="QSpinBox" name="ch6OutMin">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -807,11 +719,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="7" column="4">
       <widget class="QSpinBox" name="ch6OutMax">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -856,11 +763,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="8" column="2">
       <widget class="QSpinBox" name="ch7OutMin">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -878,11 +780,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="8" column="4">
       <widget class="QSpinBox" name="ch7OutMax">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -1052,29 +949,6 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </item>
-     <item row="0" column="0">
-      <widget class="QPushButton" name="channelValuesHelp">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="configgadget.qrc">
-         <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
    <item>
@@ -1092,29 +966,6 @@ p, li { white-space: pre-wrap; }
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QPushButton" name="spinningArmedlHelp">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="configgadget.qrc">
-         <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-       </property>
-      </widget>
-     </item>
      <item>
       <widget class="QCheckBox" name="spinningArmed">
        <property name="text">
@@ -1153,29 +1004,6 @@ p, li { white-space: pre-wrap; }
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="testOutputsHelp">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="configgadget.qrc">
-         <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QCheckBox" name="channelOutTest">
        <property name="enabled">
         <bool>true</bool>
@@ -1204,7 +1032,7 @@ p, li { white-space: pre-wrap; }
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="commandHelp">
+      <widget class="QPushButton" name="outputHelp">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -1213,26 +1041,25 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="maximumSize">
         <size>
-         <width>20</width>
-         <height>20</height>
+         <width>32</width>
+         <height>32</height>
         </size>
        </property>
        <property name="text">
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="configgadget.qrc">
-         <normaloff>:/configgadget/images/help2.png</normaloff>:/configgadget/images/help2.png</iconset>
+        <iconset resource="../coreplugin/core.qrc">
+         <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="getRCOutputCurrent">
-       <property name="toolTip">
-        <string>Retrieve settings from OpenPilot</string>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
        </property>
-       <property name="text">
-        <string>Get Current</string>
+       <property name="flat">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -1308,12 +1135,11 @@ Applies and Saves all settings to SD</string>
   <tabstop>ch7Rev</tabstop>
   <tabstop>ch7Link</tabstop>
   <tabstop>channelOutTest</tabstop>
-  <tabstop>getRCOutputCurrent</tabstop>
   <tabstop>saveRCOutputToRAM</tabstop>
   <tabstop>saveRCOutputToSD</tabstop>
  </tabstops>
  <resources>
-  <include location="configgadget.qrc"/>
+  <include location="../coreplugin/core.qrc"/>
  </resources>
  <connections/>
 </ui>

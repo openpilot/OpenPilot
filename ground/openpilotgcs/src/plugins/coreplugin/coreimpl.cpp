@@ -183,6 +183,7 @@ void CoreImpl::updateContext()
 
 void CoreImpl::openFiles(const QStringList &arguments)
 {
+    Q_UNUSED(arguments)
     //m_mainwindow->openFiles(arguments);
 }
 

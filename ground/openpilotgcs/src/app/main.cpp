@@ -27,6 +27,7 @@
  */
 
 #include "qtsingleapplication.h"
+#include "utils/xmlconfig.h"
 
 #include <extensionsystem/pluginmanager.h>
 #include <extensionsystem/pluginspec.h>
@@ -193,7 +194,7 @@ static inline QStringList getPluginPaths()
     // 2) "PlugIns" (OS X)
     pluginPath = rootDirPath;
     pluginPath += QLatin1Char('/');
-    pluginPath += QLatin1String("PlugIns");
+    pluginPath += QLatin1String("Plugins");
     rc.push_back(pluginPath);
     return rc;
 }
@@ -243,10 +244,10 @@ int main(int argc, char **argv)
     QString locale = QLocale::system().name();
 
     // Must be done before any QSettings class is created
-    QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope,
+    QSettings::setPath(XmlConfig::XmlSettingsFormat, QSettings::SystemScope,
             QCoreApplication::applicationDirPath()+QLatin1String(SHARE_PATH));
     // keep this in sync with the MainWindow ctor in coreplugin/mainwindow.cpp
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope,
+    QSettings settings(XmlConfig::XmlSettingsFormat, QSettings::UserScope,
                                  QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS"));
 
     overrideSettings(settings, argc, argv);

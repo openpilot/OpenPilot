@@ -64,7 +64,7 @@ int32_t $(NAME)Initialize(void)
 	}
 }
 
-uavobj_initcall($(NAME)Initialize);
+UAVOBJ_INITCALL($(NAME)Initialize);
 
 /**
  * Initialize object fields and metadata with the default values.
@@ -103,6 +103,11 @@ UAVObjHandle $(NAME)Handle()
 {
 	return handle;
 }
+
+/**
+ * Get/Set object Functions
+ */
+$(SETGETFIELDS)
 
 /**
  * @}

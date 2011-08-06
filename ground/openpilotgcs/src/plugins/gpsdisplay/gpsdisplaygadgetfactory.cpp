@@ -33,7 +33,7 @@
 
 GpsDisplayGadgetFactory::GpsDisplayGadgetFactory(QObject *parent) :
         IUAVGadgetFactory(QString("GpsDisplayGadget"),
-                          tr("GPS Display Gadget"),
+                          tr("GPS Display"),
                           parent)
 {
 }

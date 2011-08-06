@@ -52,11 +52,21 @@ equals(copydata, 1) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_PLUGINS]/sqldrivers/$$dll\") $$targetPath(\"$$GCS_APP_PATH/sqldrivers/$$dll\") $$addNewline()
         }
 
-        # copy SDL (if available) - Simple DirectMedia Layer (www.libsdl.org)
+        # copy SDL - Simple DirectMedia Layer (www.libsdl.org)
+        # Check the wiki for SDL installation, it should be copied first
+        # (make sure that the Qt installation path below is correct)
+        #
+        # - For qt-sdk-win-opensource-2010.05.exe:
+        #   xcopy /s /e <SDL>\bin\SDL.dll   C:\Qt\2010.05\mingw\bin\SDL.dll
+        #   xcopy /s /e <SDL>\include\SDL\* C:\Qt\2010.05\mingw\include\SDL
+        #   xcopy /s /e <SDL>\lib\*         C:\Qt\2010.05\mingw\lib
+        #
+        # - For Qt_SDK_Win_offline_v1_1_1_en.exe:
+        #   xcopy /s /e <SDL>\bin\SDL.dll   C:\QtSDK\Desktop\Qt\4.7.3\mingw\bin\SDL.dll
+        #   xcopy /s /e <SDL>\include\SDL\* C:\QtSDK\Desktop\Qt\4.7.3\mingw\include\SDL
+        #   xcopy /s /e <SDL>\lib\*         C:\QtSDK\Desktop\Qt\4.7.3\mingw\lib
         SDL_DLL = SDL.dll
-        exists($$targetPath(\"$$[QT_INSTALL_BINS]/../../mingw/bin/$$SDL_DLL\")) {
-            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_BINS]/../../mingw/bin/$$SDL_DLL\") $$targetPath(\"$$GCS_APP_PATH/$$SDL_DLL\") $$addNewline()
-        }
+        data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_BINS]/../../mingw/bin/$$SDL_DLL\") $$targetPath(\"$$GCS_APP_PATH/$$SDL_DLL\") $$addNewline()
 
         data_copy.target = FORCE
         QMAKE_EXTRA_TARGETS += data_copy

@@ -58,20 +58,8 @@ TIM4  |                     STOPWATCH                    |
 //------------------------
 // BOOTLOADER_SETTINGS
 //------------------------
-#define BOOTLOADER_VERSION	0
-#define BOARD_TYPE		0x03
-#define BOARD_REVISION		0x01
-#define MEM_SIZE		(0x20000 - 0x00400) // 128K - 1K (reserved for config data)
-#define SIZE_OF_DESCRIPTION	100
-#define START_OF_USER_CODE	(uint32_t)0x08003000
-#define SIZE_OF_CODE		(uint32_t)(MEM_SIZE-(START_OF_USER_CODE-0x08000000)-SIZE_OF_DESCRIPTION)
-#ifdef STM32F10X_HD
-		#define HW_TYPE			0 //0=high_density 1=medium_density;
-#elif STM32F10X_MD
-		#define HW_TYPE			1 //0=high_density 1=medium_density;
-#endif
 #define BOARD_READABLE	TRUE
-#define BOARD_WRITABLA	TRUE
+#define BOARD_WRITABLE	TRUE
 #define MAX_DEL_RETRYS	3
 
 
@@ -80,12 +68,6 @@ TIM4  |                     STOPWATCH                    |
 
 #define PIOS_MASTER_CLOCK                       72000000ul
 #define PIOS_PERIPHERAL_CLOCK                   (PIOS_MASTER_CLOCK / 2)
-
-#if defined(USE_BOOTLOADER)
-  #define PIOS_NVIC_VECTTAB_FLASH               (START_OF_USER_CODE)
-#else
-  #define PIOS_NVIC_VECTTAB_FLASH               ((uint32_t)0x08000000)
-#endif
 
 // *****************************************************************
 // Interrupt Priorities
@@ -136,14 +118,6 @@ TIM4  |                     STOPWATCH                    |
 #define TX_LED_TOGGLE					PIOS_LED_Toggle(LED4)
 
 // *****************************************************************
-// Delay Timer
-
-//#define PIOS_DELAY_TIMER				TIM2
-//#define PIOS_DELAY_TIMER_RCC_FUNC		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE)
-#define PIOS_DELAY_TIMER				TIM1
-#define PIOS_DELAY_TIMER_RCC_FUNC		RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE)
-
-// *****************************************************************
 // Timer interrupt
 
 #define TIMER_INT_TIMER					TIM3
@@ -169,9 +143,6 @@ extern uint32_t pios_spi_port_id;
 // See also pios_board.c
 //-------------------------
 #define PIOS_USART_MAX_DEVS             1
-
-#define PIOS_USART_RX_BUFFER_SIZE		512
-#define PIOS_USART_TX_BUFFER_SIZE		512
 
 //-------------------------
 // PIOS_COM
@@ -422,12 +393,11 @@ extern uint32_t pios_com_telem_usb_id;
 
 #if defined(PIOS_INCLUDE_USB_HID)
 	#define PIOS_USB_ENABLED				1
+	#define PIOS_USB_HID_MAX_DEVS                   1
 	#define PIOS_USB_DETECT_GPIO_PORT		GPIO_IN_2_PORT
 	#define PIOS_USB_DETECT_GPIO_PIN		GPIO_IN_2_PIN
 	#define PIOS_USB_DETECT_EXTI_LINE		EXTI_Line4
 	#define PIOS_IRQ_USB_PRIORITY			8
-        #define PIOS_USB_RX_BUFFER_SIZE                 512
-        #define PIOS_USB_TX_BUFFER_SIZE                 512
 #endif
 
 // *****************************************************************

@@ -166,6 +166,7 @@ SRC += $(PIOSWIN32)/pios_udp.c
 SRC += $(PIOSWIN32)/pios_com.c
 SRC += $(PIOSWIN32)/pios_servo.c
 SRC += $(PIOSWIN32)/pios_wdg.c
+SRC += $(PIOSWIN32)/pios_crc.c
 #
 ## RTOS
 SRC += $(RTOSSRCDIR)/list.c 

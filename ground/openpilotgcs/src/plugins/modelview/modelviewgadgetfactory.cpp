@@ -33,7 +33,7 @@
 #include <coreplugin/iuavgadget.h>
 
 ModelViewGadgetFactory::ModelViewGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("ModelViewGadget"), tr("ModelView Gadget"), parent)
+        IUAVGadgetFactory(QString("ModelViewGadget"), tr("ModelView"), parent)
 {
 }
 

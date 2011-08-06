@@ -34,10 +34,12 @@
 
 using namespace Core;
 
-UAVGadgetOptionsPageDecorator::UAVGadgetOptionsPageDecorator(IOptionsPage *page, IUAVGadgetConfiguration *config, QObject *parent) :
+UAVGadgetOptionsPageDecorator::UAVGadgetOptionsPageDecorator(IOptionsPage *page, IUAVGadgetConfiguration *config,
+                                                             bool isSingleConfigurationGadget, QObject *parent) :
     Core::IOptionsPage(parent),
     m_optionsPage(page),
     m_config(config),
+    m_isSingleConfigurationGadget(isSingleConfigurationGadget),
     m_id(config->name()),
     m_category(config->classId())
 {
@@ -64,6 +66,11 @@ QWidget *UAVGadgetOptionsPageDecorator::createPage(QWidget *parent)
     QWidget *wi = m_optionsPage->createPage(w);
     wi->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     m_page->verticalLayout_4->addWidget(wi);
+
+    // For some gadgets it might not make sense to have multiple configurations
+    if (m_isSingleConfigurationGadget) {
+        m_page->configurationBox->hide();
+    }
 
     connect(m_page->cloneButton, SIGNAL(clicked()), this, SLOT(cloneConfiguration()));
     connect(m_page->deleteButton, SIGNAL(clicked()), this, SLOT(deleteConfiguration()));

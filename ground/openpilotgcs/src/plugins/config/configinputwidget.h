@@ -46,19 +46,6 @@ public:
         ~ConfigInputWidget();
 
 public slots:
-	void onTelemetryStart();
-	void onTelemetryStop();
-	void onTelemetryConnect();
-	void onTelemetryDisconnect();
-
-	void onInSliderValueChanged0(int value);
-	void onInSliderValueChanged1(int value);
-	void onInSliderValueChanged2(int value);
-	void onInSliderValueChanged3(int value);
-	void onInSliderValueChanged4(int value);
-	void onInSliderValueChanged5(int value);
-	void onInSliderValueChanged6(int value);
-	void onInSliderValueChanged7(int value);
 
 private:
         Ui_InputWidget *m_config;
@@ -79,17 +66,20 @@ private:
 	QList<QLabel*> inMinLabels;
 	QList<QLabel*> inNeuLabels;
         QList<QCheckBox*> inRevCheckboxes;
+        QList<QComboBox*> inChannelAssign;
 
 	bool firstUpdate;
 
-	void enableControls(bool enable);
-
+        virtual void enableControls(bool enable);
+        void receiverHelp();
 private slots:
 	void updateChannels(UAVObject* obj);
-	void requestRCInputUpdate();
+        virtual void refreshValues();
 	void sendRCInputUpdate();
 	void saveRCInputObject();
         void reverseCheckboxClicked(bool state);
+        void openHelp();
+        void updateTips(int);
 };
 
 #endif

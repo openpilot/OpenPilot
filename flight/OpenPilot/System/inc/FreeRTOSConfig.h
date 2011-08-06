@@ -75,11 +75,17 @@ NVIC value of 255. */
 #if defined(DEBUG)
 #define configGENERATE_RUN_TIME_STATS 1
 #define INCLUDE_uxTaskGetRunTime 1
-#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() PIOS_RTC_Start()
-// Note: Using the tick count defeats the purpose here, need some timer on the scale of 10khz
-#define portGET_RUN_TIME_COUNTER_VALUE()  PIOS_RTC_Counter()
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()\
+do {\
+(*(unsigned long *)0xe000edfc) |= (1<<24);/* DEMCR |= DEMCR_TRCENA */\
+(*(unsigned long *)0xe0001000) |= 1; /* DWT_CTRL |= DWT_CYCCNT_ENA */\
+} while(0)
+#define portGET_RUN_TIME_COUNTER_VALUE() (*(unsigned long *)0xe0001004)/* DWT_CYCCNT */
 #endif
 
+#if !defined(ARCH_POSIX) && !defined(ARCH_WIN32)
+#define CHECK_IRQ_STACK
+#endif
 
 /**
   * @}

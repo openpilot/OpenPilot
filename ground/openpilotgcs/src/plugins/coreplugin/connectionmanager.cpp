@@ -36,15 +36,13 @@
 
 #include "fancytabwidget.h"
 #include "fancyactionbar.h"
-#include "mainwindow.h"
 #include "qextserialport/src/qextserialenumerator.h"
 #include "qextserialport/src/qextserialport.h"
-
 #include <QDebug>
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QComboBox>
-
+#include <QTimer>
 namespace Core {
 
 
@@ -52,9 +50,9 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, Internal:
 	QWidget(mainWindow),	// Pip
 	m_availableDevList(0),
     m_connectBtn(0),
-    m_ioDev(NULL)
+    m_ioDev(NULL),m_mainWindow(mainWindow)
 {
-    Q_UNUSED(mainWindow);
+ //   Q_UNUSED(mainWindow);
 
     QVBoxLayout *top = new QVBoxLayout;
     top->setSpacing(0);
@@ -221,8 +219,9 @@ void ConnectionManager::aboutToRemoveObject(QObject *obj)
 
 void ConnectionManager::onConnectionDestroyed(QObject *obj)	// Pip
 {
-        //onConnectionClosed(obj);
-        disconnectDevice();
+    Q_UNUSED(obj)
+    //onConnectionClosed(obj);
+    disconnectDevice();
 }
 
 /**
@@ -344,7 +343,7 @@ void ConnectionManager::devChanged(IConnection *connection)
 
     //and add them back in the list
     QList <IConnection::device> availableDev = connection->availableDevices();
-        foreach (IConnection::device dev, availableDev)
+    foreach (IConnection::device dev, availableDev)
     {
         QString cbName = connection->shortName() + ": " + dev.name;
         QString disp = connection->shortName() + " : " + dev.displayName;
@@ -352,11 +351,27 @@ void ConnectionManager::devChanged(IConnection *connection)
     }
 
     //add all the list again to the combobox
-	foreach (devListItem d, m_devList)
+    foreach (devListItem d, m_devList)
     {
         m_availableDevList->addItem(d.displayName);
         m_availableDevList->setItemData(m_availableDevList->count()-1,(const QString)d.devName,Qt::ToolTipRole);
+        if(!m_ioDev && d.displayName.startsWith("USB"))
+        {
+            if(m_mainWindow->generalSettings()->autoConnect() || m_mainWindow->generalSettings()->autoSelect())
+                m_availableDevList->setCurrentIndex(m_availableDevList->count()-1);
+            if(m_mainWindow->generalSettings()->autoConnect())
+                connectDevice();
+        }
     }
+    if(m_ioDev)//if a device is connected make it the one selected on the dropbox
+    {
+        for(int x=0;x<m_availableDevList->count();++x)
+        {
+            if(m_connectionDevice.devName==m_availableDevList->itemData(x,Qt::ToolTipRole).toString())
+                m_availableDevList->setCurrentIndex(x);
+        }
+    }
+
 
     //disable connection button if the liNameif (m_availableDevList->count() > 0)
     if (m_availableDevList->count() > 0)

@@ -33,7 +33,7 @@
 
 SystemHealthGadgetFactory::SystemHealthGadgetFactory(QObject *parent) :
         IUAVGadgetFactory(QString("SystemHealthGadget"),
-                          tr("System Health Gadget"),
+                          tr("System Health"),
                           parent)
 {
 }

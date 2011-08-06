@@ -36,7 +36,8 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 #include <QMessageBox>
-#include <QSignalMapper>
+#include <QDesktopServices>
+#include <QUrl>
 
 ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
@@ -96,18 +97,17 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
             << m_config->ch7Rev;
 
     links << m_config->ch0Link
-              << m_config->ch1Link
-              << m_config->ch2Link
-              << m_config->ch3Link
-              << m_config->ch4Link
-              << m_config->ch5Link
-              << m_config->ch6Link
-              << m_config->ch7Link;
+          << m_config->ch1Link
+          << m_config->ch2Link
+          << m_config->ch3Link
+          << m_config->ch4Link
+          << m_config->ch5Link
+          << m_config->ch6Link
+          << m_config->ch7Link;
 
     // Register for ActuatorSettings changes:
     UAVDataObject * obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
-    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(requestRCOutputUpdate()));
-
+    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
 
     for (int i = 0; i < 8; i++) {
         connect(outMin[i], SIGNAL(editingFinished()), this, SLOT(setChOutRange()));
@@ -119,55 +119,25 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
 
     connect(m_config->channelOutTest, SIGNAL(toggled(bool)), this, SLOT(runChannelTests(bool)));
 
-	for (int i = 0; i < links.count(); i++)
-		links[i]->setChecked(false);
-	for (int i = 0; i < links.count(); i++)
-		connect(links[i], SIGNAL(toggled(bool)), this, SLOT(linkToggled(bool)));
-
-	requestRCOutputUpdate();
+    for (int i = 0; i < links.count(); i++)
+        links[i]->setChecked(false);
+    for (int i = 0; i < links.count(); i++)
+        connect(links[i], SIGNAL(toggled(bool)), this, SLOT(linkToggled(bool)));
 
     connect(m_config->saveRCOutputToSD, SIGNAL(clicked()), this, SLOT(saveRCOutputObject()));
     connect(m_config->saveRCOutputToRAM, SIGNAL(clicked()), this, SLOT(sendRCOutputUpdate()));
 
-    // Actually, this is not really needed since we are subscribing to the object updates already
-    // TODO: remove those buttons on all config gadget panels.
-    connect(m_config->getRCOutputCurrent, SIGNAL(clicked()), this, SLOT(requestRCOutputUpdate()));
-
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestRCOutputUpdate()));
+    enableControls(false);
+    refreshValues();
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
+    connect(parent, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
 
     firstUpdate = true;
 
     connect(m_config->spinningArmed, SIGNAL(toggled(bool)), this, SLOT(setSpinningArmed(bool)));
 
-    enableControls(false);
-
-    // Listen to telemetry connection events
-    if (pm)
-    {
-        TelemetryManager *tm = pm->getObject<TelemetryManager>();
-        if (tm)
-        {
-            connect(tm, SIGNAL(myStart()), this, SLOT(onTelemetryStart()));
-            connect(tm, SIGNAL(myStop()), this, SLOT(onTelemetryStop()));
-            connect(tm, SIGNAL(connected()), this, SLOT(onTelemetryConnect()));
-            connect(tm, SIGNAL(disconnected()), this, SLOT(onTelemetryDisconnect()));
-        }
-    }
-
-    // Connect all the help buttons to signal mapper that passes button name to SLOT function
-    QSignalMapper* signalMapper = new QSignalMapper(this);
-    connect( m_config->channelRateHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_config->channelRateHelp, m_config->channelRateHelp->objectName());
-    connect( m_config->channelValuesHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_config->channelValuesHelp, m_config->channelValuesHelp->objectName());
-    connect( m_config->spinningArmedlHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_config->spinningArmedlHelp, m_config->spinningArmedlHelp->objectName());
-    connect( m_config->testOutputsHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_config->testOutputsHelp, m_config->testOutputsHelp->objectName());
-    connect( m_config->commandHelp, SIGNAL(clicked()), signalMapper, SLOT(map()) );
-    signalMapper->setMapping(m_config->commandHelp, QString("commandHelp"));
-
-    connect(signalMapper, SIGNAL(mapped(const QString &)), parent, SLOT(showHelp(const QString &)));
+    // Connect the help button
+    connect(m_config->outputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 }
 
 ConfigOutputWidget::~ConfigOutputWidget()
@@ -176,35 +146,12 @@ ConfigOutputWidget::~ConfigOutputWidget()
 }
 
 
-
-// ************************************
-// telemetry start/stop connect/disconnect signals
-
-void ConfigOutputWidget::onTelemetryStart()
-{
-}
-
-void ConfigOutputWidget::onTelemetryStop()
-{
-}
-
-void ConfigOutputWidget::onTelemetryConnect()
-{
-	enableControls(true);
-}
-
-void ConfigOutputWidget::onTelemetryDisconnect()
-{
-	enableControls(false);
-}
-
 // ************************************
 
 void ConfigOutputWidget::enableControls(bool enable)
 {
 	m_config->saveRCOutputToSD->setEnabled(enable);
-	m_config->saveRCOutputToRAM->setEnabled(enable);
-	m_config->getRCOutputCurrent->setEnabled(enable);
+        //m_config->saveRCOutputToRAM->setEnabled(enable);
 }
 
 // ************************************
@@ -214,29 +161,30 @@ void ConfigOutputWidget::enableControls(bool enable)
   */
 void ConfigOutputWidget::linkToggled(bool state)
 {
-	// find the minimum slider value for the linked ones
-	int min = 10000;
-	int linked_count = 0;
-	for (int i = 0; i < outSliders.count(); i++)
-	{
-		if (!links[i]->checkState()) continue;
-		int value = outSliders[i]->value();
-		if (min > value) min = value;
-		linked_count++;
-	}
+    Q_UNUSED(state)
+    // find the minimum slider value for the linked ones
+    int min = 10000;
+    int linked_count = 0;
+    for (int i = 0; i < outSliders.count(); i++)
+    {
+        if (!links[i]->checkState()) continue;
+        int value = outSliders[i]->value();
+        if (min > value) min = value;
+        linked_count++;
+    }
 
-	if (linked_count <= 0)
-		return;		// no linked channels
+    if (linked_count <= 0)
+        return;		// no linked channels
 
-	if (!m_config->channelOutTest->checkState())
-		return;	// we are not in Test Output mode
+    if (!m_config->channelOutTest->checkState())
+            return;	// we are not in Test Output mode
 
-	// set the linked channels to the same value
-	for (int i = 0; i < outSliders.count(); i++)
-	{
-		if (!links[i]->checkState()) continue;
-		outSliders[i]->setValue(min);
-	}
+    // set the linked channels to the same value
+    for (int i = 0; i < outSliders.count(); i++)
+    {
+        if (!links[i]->checkState()) continue;
+        outSliders[i]->setValue(min);
+    }
 }
 
 /**
@@ -248,7 +196,7 @@ void ConfigOutputWidget::runChannelTests(bool state)
     // Confirm this is definitely what they want
     if(state) {
         QMessageBox mbox;
-        mbox.setText(QString(tr("This option will requires you to be in the armed state and will start your motors by the amount selected on the sliders.  It is recommended to remove any blades from motors.  Are you sure you want to do this?")));
+        mbox.setText(QString(tr("This option will start your motors by the amount selected on the sliders regardless of transmitter.  It is recommended to remove any blades from motors.  Are you sure you want to do this?")));
         mbox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         int retval = mbox.exec();
         if(retval != QMessageBox::Yes) {
@@ -407,7 +355,7 @@ void ConfigOutputWidget::sendChannelTest(int value)
 /**
   Request the current config from the board (RC Output)
   */
-void ConfigOutputWidget::requestRCOutputUpdate()
+void ConfigOutputWidget::refreshValues()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -545,11 +493,9 @@ void ConfigOutputWidget::saveRCOutputObject()
 {
     // Send update so that the latest value is saved
     sendRCOutputUpdate();
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ActuatorSettings")));
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorSettings")));
     Q_ASSERT(obj);
-    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+    saveObjectToSD(obj);
 
 }
 
@@ -558,8 +504,8 @@ void ConfigOutputWidget::saveRCOutputObject()
   Sets the minimum/maximum value of the channel 0 to seven output sliders.
   Have to do it here because setMinimum is not a slot.
 
-  One added trick: if the slider is at either its max or its min when the value
-  is changed, then keep it on the max/min.
+  One added trick: if the slider is at its min when the value
+  is changed, then keep it on the min.
   */
 void ConfigOutputWidget::setChOutRange()
 {
@@ -572,7 +518,7 @@ void ConfigOutputWidget::setChOutRange()
     QSlider *slider = outSliders[index];
 
     int oldMini = slider->minimum();
-    int oldMaxi = slider->maximum();
+//    int oldMaxi = slider->maximum();
 
     if (outMin[index]->value()<outMax[index]->value())
     {
@@ -627,5 +573,10 @@ void ConfigOutputWidget::reverseChannel(bool state)
 
 }
 
+void ConfigOutputWidget::openHelp()
+{
+
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Output+Configuration", QUrl::StrictMode) );
+}
 
 

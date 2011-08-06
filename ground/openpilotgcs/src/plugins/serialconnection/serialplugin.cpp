@@ -165,8 +165,7 @@ void SerialConnection::closeDevice(const QString &deviceName)
     Q_UNUSED(deviceName);
     //we have to delete the serial connection we created
     if (serialHandle){
-        serialHandle->close ();
-        delete(serialHandle);
+        serialHandle->deleteLater();
         serialHandle = NULL;
         m_deviceOpened = false;
     }

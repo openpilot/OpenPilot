@@ -52,19 +52,21 @@
 #include <QThread>
 #include <QMessageBox>
 #include <QTimer>
-
+#include "devicedescriptorstruct.h"
+#include <QProgressDialog>
 
 using namespace OP_DFU;
+
 
 class UploaderGadgetWidget : public QWidget
 {
     Q_OBJECT
 
+
 public:
     UploaderGadgetWidget(QWidget *parent = 0);
    ~UploaderGadgetWidget();
     typedef enum { IAP_STATE_READY, IAP_STATE_STEP_1, IAP_STATE_STEP_2, IAP_STEP_RESET, IAP_STATE_BOOTLOADER} IAPStep;
-    typedef enum { RESCUE_STEP0, RESCUE_STEP1, RESCUE_STEP2, RESCUE_STEP3, RESCUE_POWER1, RESCUE_POWER2, RESCUE_DETECT } RescueStep;
     void log(QString str);
 
 public slots:
@@ -75,13 +77,13 @@ private:
      Ui_UploaderWidget *m_config;
      DFUObject *dfu;
      IAPStep currentStep;
-     RescueStep rescueStep;
      bool resetOnly;
      void clearLog();
      QString getPortDevice(const QString &friendName);
-
+     QProgressDialog* m_progress;
+     QTimer* m_timer;
      QLineEdit* openFileNameLE;
-
+     QEventLoop m_eventloop;
 private slots:
     void error(QString errorString,int errorNumber);
     void info(QString infoString,int infoNumber);
@@ -90,6 +92,8 @@ private slots:
     void systemBoot();
     void systemRescue();
     void getSerialPorts();
+    void perform();
+    void cancel();
 
 };
 

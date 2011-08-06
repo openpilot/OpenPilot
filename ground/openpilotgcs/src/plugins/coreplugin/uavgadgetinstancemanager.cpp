@@ -56,7 +56,9 @@ UAVGadgetInstanceManager::UAVGadgetInstanceManager(QObject *parent) :
             m_factories.append(f);
             QString classId = f->classId();
             QString name = f->name();
-            m_classIds.insert(classId, name);
+            QIcon icon = f->icon();
+            m_classIdNameMap.insert(classId, name);
+            m_classIdIconMap.insert(classId, icon);
         }
     }
 }
@@ -108,7 +110,7 @@ void UAVGadgetInstanceManager::readConfigs_1_2_0(QSettings *qs)
 {
     UAVConfigInfo configInfo;
 
-    foreach (QString classId, m_classIds.keys())
+    foreach (QString classId, m_classIdNameMap.keys())
     {
         IUAVGadgetFactory *f = factory(classId);
         qs->beginGroup(classId);
@@ -159,7 +161,7 @@ void UAVGadgetInstanceManager::readConfigs_1_1_0(QSettings *qs)
 {
     UAVConfigInfo configInfo;
 
-    foreach (QString classId, m_classIds.keys())
+    foreach (QString classId, m_classIdNameMap.keys())
     {
         IUAVGadgetFactory *f = factory(classId);
         qs->beginGroup(classId);
@@ -242,7 +244,8 @@ void UAVGadgetInstanceManager::createOptionsPages()
         IUAVGadgetFactory *f = factory(config->classId());
         IOptionsPage *p = f->createOptionsPage(config);
         if (p) {
-            IOptionsPage *page = new UAVGadgetOptionsPageDecorator(p, config);
+            IOptionsPage *page = new UAVGadgetOptionsPageDecorator(p, config, f->isSingleConfigurationGadget());
+            page->setIcon(f->icon());
             m_optionsPages.append(page);
             m_pm->addObject(page);
         }
@@ -334,6 +337,7 @@ void  UAVGadgetInstanceManager::cloneConfiguration(IUAVGadgetConfiguration *conf
     IUAVGadgetFactory *f = factory(config->classId());
     IOptionsPage *p = f->createOptionsPage(config);
     IOptionsPage *page = new UAVGadgetOptionsPageDecorator(p, config);
+    page->setIcon(f->icon());
     m_provisionalConfigs.append(config);
     m_provisionalOptionsPages.append(page);
     m_settingsDialog->insertPage(page);
@@ -452,7 +456,12 @@ QStringList UAVGadgetInstanceManager::configurationNames(QString classId) const
 
 QString UAVGadgetInstanceManager::gadgetName(QString classId) const
 {
-    return m_classIds.value(classId);
+    return m_classIdNameMap.value(classId);
+}
+
+QIcon UAVGadgetInstanceManager::gadgetIcon(QString classId) const
+{
+    return m_classIdIconMap.value(classId);
 }
 
 IUAVGadgetFactory *UAVGadgetInstanceManager::factory(QString classId) const

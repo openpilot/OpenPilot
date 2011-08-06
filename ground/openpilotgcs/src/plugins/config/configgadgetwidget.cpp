@@ -33,9 +33,10 @@
 #include "configinputwidget.h"
 #include "configoutputwidget.h"
 #include "configstabilizationwidget.h"
-#include "configtelemetrywidget.h"
+#include "config_pro_hw_widget.h"
+#include "config_cc_hw_widget.h"
 #include "defaultattitudewidget.h"
-
+#include "defaulthwsettingswidget.h"
 #include "uavobjectutilmanager.h"
 
 #include <QDebug>
@@ -62,23 +63,24 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     // *********************
     QWidget *qwd;
 
+    qwd = new DefaultHwSettingsWidget(this);
+    ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.svg"), QString("HW Settings"));
+
     qwd = new ConfigAirframeWidget(this);
-    ftw->insertTab(0, qwd, QIcon(":/configgadget/images/Airframe.png"), QString("Aircraft"));
+    ftw->insertTab(ConfigGadgetWidget::aircraft, qwd, QIcon(":/configgadget/images/Airframe.png"), QString("Aircraft"));
 
     qwd = new ConfigInputWidget(this);
-    ftw->insertTab(1, qwd, QIcon(":/configgadget/images/Transmitter.png"), QString("Input"));
+    ftw->insertTab(ConfigGadgetWidget::input, qwd, QIcon(":/configgadget/images/Transmitter.png"), QString("Input"));
 
     qwd = new ConfigOutputWidget(this);
-    ftw->insertTab(2, qwd, QIcon(":/configgadget/images/Servo.png"), QString("Output"));
+    ftw->insertTab(ConfigGadgetWidget::output, qwd, QIcon(":/configgadget/images/Servo.png"), QString("Output"));
 
     qwd = new DefaultAttitudeWidget(this);
-    ftw->insertTab(3, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+    ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
 
     qwd = new ConfigStabilizationWidget(this);
-    ftw->insertTab(4, qwd, QIcon(":/configgadget/images/gyroscope.svg"), QString("Stabilization"));
+    ftw->insertTab(ConfigGadgetWidget::stabilization, qwd, QIcon(":/configgadget/images/gyroscope.svg"), QString("Stabilization"));
 
-    qwd = new ConfigTelemetryWidget(this);
-    ftw->insertTab(5, qwd, QIcon(":/configgadget/images/XBee.svg"), QString("Telemetry"));
 
 
 //    qwd = new ConfigPipXtremeWidget(this);
@@ -90,10 +92,11 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
     connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
+    connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
 
     // And check whether by any chance we are not already connected
     if (telMngr->isConnected())
-        onAutopilotConnect();
+        onAutopilotConnect();    
 
     help = 0;
 }
@@ -111,6 +114,10 @@ void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
     QWidget::resizeEvent(event);
 }
 
+void ConfigGadgetWidget::onAutopilotDisconnect() {
+    emit autopilotDisconnected();
+}
+
 void ConfigGadgetWidget::onAutopilotConnect() {
 
     // First of all, check what Board type we are talking to, and
@@ -123,60 +130,28 @@ void ConfigGadgetWidget::onAutopilotConnect() {
         if ((board & 0xff00) == 1024) {
             // CopterControl family
             // Delete the INS panel, replace with CC Panel:
-            ftw->setCurrentIndex(0);
-            ftw->removeTab(3);
+            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+            ftw->removeTab(ConfigGadgetWidget::ins);
             QWidget *qwd = new ConfigCCAttitudeWidget(this);
-            ftw->insertTab(3, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("Attitude"));
+            ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("Attitude"));
+            ftw->removeTab(ConfigGadgetWidget::hardware);
+            qwd = new ConfigCCHWWidget(this);
+            ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.svg"), QString("HW Settings"));
+            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
         } else if ((board & 0xff00) == 256 ) {
             // Mainboard family
-            ftw->setCurrentIndex(0);
-            ftw->removeTab(3);
+            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+            ftw->removeTab(ConfigGadgetWidget::ins);
             QWidget *qwd = new ConfigAHRSWidget(this);
-            ftw->insertTab(3, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+            ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+            ftw->removeTab(ConfigGadgetWidget::hardware);
+            qwd = new ConfigProHWWidget(this);
+            ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.svg"), QString("HW Settings"));
+            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
         }
     }
-
-
     emit autopilotConnected();
 }
 
-void ConfigGadgetWidget::showHelp(const QString &helpName)
-{
-    // Close any previous help windows still open
-    if(help != 0) {
-        help->close();
-    }
-
-    // Make help windows with given filename and resize to config gadget width
-    help = new QTextBrowser(this);
-    help->setSource(QUrl::fromLocalFile( QString(Utils::PathUtils().InsertDataPath("%%DATAPATH%%help/")) +
-					 helpName + QString(".html") ));
-    QSize size = help->sizeHint();
-    size.setWidth(this->width());
-    help->resize(size);
-
-    // Now catch closing events, show the window and give it focus
-    help->installEventFilter(this);
-    help->show();
-    help->setFocus();
-}
-
-bool ConfigGadgetWidget::eventFilter(QObject *obj, QEvent *event)
-{
-    // If help is open and we get a close event, close the help window
-    // Close events currently are any key press and the mouse leaving the help window
-
-    //printf("event type: %d\n",event->type());
-    if(help != 0) {
-        if (event->type() == QEvent::Leave || event->type() == QEvent::KeyPress) {
-            help->close();
-            help=0;
-            return true;
-        }
-    } 
-
-    // standard event processing
-    return QObject::eventFilter(obj, event);
-}
 
 

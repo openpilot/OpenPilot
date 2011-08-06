@@ -26,6 +26,7 @@
  */
 
 #include "pathutils.h"
+#include "xmlconfig.h"
 #include <stdint.h>
 #include <QDebug>
 
@@ -97,7 +98,7 @@ QString PathUtils::GetStoragePath()
 {
     // This routine works with "/" as the standard:
     // Work out where the settings are stored on the machine
-    QSettings set(QSettings::IniFormat, QSettings::UserScope,QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS"));
+    QSettings set(XmlConfig::XmlSettingsFormat, QSettings::UserScope,QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS"));
     QFileInfo f(set.fileName());
     QDir dir(f.absoluteDir());
 

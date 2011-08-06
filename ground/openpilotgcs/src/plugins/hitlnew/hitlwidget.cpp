@@ -46,23 +46,23 @@ HITLWidget::HITLWidget(QWidget *parent)
 	: QWidget(parent),
 	simulator(0)
 {
-    widget = new Ui_HITLWidget();
-    widget->setupUi(this);
+	widget = new Ui_HITLWidget();
+	widget->setupUi(this);
 	widget->startButton->setEnabled(true);
 	widget->stopButton->setEnabled(false);
 
 	greenColor = "rgb(35, 221, 35)";
 
-	strAutopilotDisconnected = " Autopilot disconnected ";
-	strSimulatorDisconnected = " Simulator disconnected ";
-	strAutopilotConnected = " Autopilot connected ";
-	strSimulatorConnected = " Simulator connected ";
+	strAutopilotDisconnected = " Autopilot OFF ";
+	strSimulatorDisconnected = " Simulator OFF ";
+	strAutopilotConnected = " Autopilot ON ";
+	strSimulatorConnected = " Simulator ON ";
 
 	widget->apLabel->setText(strAutopilotDisconnected);
 	widget->simLabel->setText(strSimulatorDisconnected);
 
-    connect(widget->startButton, SIGNAL(clicked()), this, SLOT(startButtonClicked()));
-    connect(widget->stopButton, SIGNAL(clicked()), this, SLOT(stopButtonClicked()));
+	connect(widget->startButton, SIGNAL(clicked()), this, SLOT(startButtonClicked()));
+	connect(widget->stopButton, SIGNAL(clicked()), this, SLOT(stopButtonClicked()));
 	connect(widget->buttonClearLog, SIGNAL(clicked()), this, SLOT(buttonClearLogClicked()));
 
 }
@@ -188,10 +188,9 @@ void HITLWidget::buttonClearLogClicked()
 
 void HITLWidget::onAutopilotConnect()
 {
-	widget->simLabel->setStyleSheet(QString::fromUtf8("QFrame{\n""background-color: %1; color: white}").arg(greenColor));
-
+	widget->apLabel->setStyleSheet(QString::fromUtf8("QFrame{\n""background-color: %1; color: white}").arg(greenColor));
 	widget->apLabel->setText(strAutopilotConnected);
-    qxtLog->info("HITL: Autopilot connected, initializing for HITL simulation");
+	qxtLog->info("HITL: Autopilot connected, initializing for HITL simulation");
 }
 
 void HITLWidget::onAutopilotDisconnect()
@@ -214,5 +213,3 @@ void HITLWidget::onSimulatorDisconnect()
 	widget->simLabel->setText(" " + simulator->Name() +" disconnected ");
 	qxtLog->info(QString("HITL: %1 disconnected").arg(simulator->Name()));
 }
-
-

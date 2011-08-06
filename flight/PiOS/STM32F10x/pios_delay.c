@@ -7,10 +7,10 @@
  * @{
  *
  * @file       pios_delay.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
+ * @author     Michael Smith Copyright (C) 2011
  * @brief      Delay Functions 
- *                 - Provides a micro-second granular delay using a TIM 
+ *                 - Provides a micro-second granular delay using the CPU
+ *                   cycle counter.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -31,72 +31,97 @@
  */
 
 /* Project Includes */
-#include "pios.h"
+#include <pios.h>
 
 #if defined(PIOS_INCLUDE_DELAY)
 
+/* these should be defined by CMSIS, but they aren't */
+#define DWT_CTRL	(*(volatile uint32_t *)0xe0001000)
+#define CYCCNTENA	(1<<0)
+#define DWT_CYCCNT	(*(volatile uint32_t *)0xe0001004)
+
+
+/* cycles per microsecond */
+static uint32_t us_ticks;
+
 /**
-* Initialises the Timer used by PIOS_DELAY functions<BR>
-* This is called from pios.c as part of the main() function
-* at system start up.
-* \return < 0 if initialisation failed
-*/
+ * Initialises the Timer used by PIOS_DELAY functions.
+ *
+ * \return always zero (success)
+ */
 
 int32_t PIOS_DELAY_Init(void)
 {
-	/* Enable timer clock */
-	PIOS_DELAY_TIMER_RCC_FUNC;
+	RCC_ClocksTypeDef	clocks;
 
-	/* Time base configuration */
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-	TIM_TimeBaseStructure.TIM_Period = 65535;	// maximum value
-	TIM_TimeBaseStructure.TIM_Prescaler = 72 - 1;	// for 1 uS accuracy fixed to 72Mhz
-	TIM_TimeBaseStructure.TIM_ClockDivision = 0;
-	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_TimeBaseInit(PIOS_DELAY_TIMER, &TIM_TimeBaseStructure);
+	/* compute the number of system clocks per microsecond */
+	RCC_GetClocksFreq(&clocks);
+	us_ticks = clocks.SYSCLK_Frequency / 1000000;
+	PIOS_DEBUG_Assert(us_ticks > 1);
 
-	/* Enable counter */
-	TIM_Cmd(PIOS_DELAY_TIMER, ENABLE);
+	/* turn on access to the DWT registers */
+	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+
+	/* enable the CPU cycle counter */
+	DWT_CTRL |= CYCCNTENA;
+
+	return 0;
+}
+
+/**
+ * Waits for a specific number of uS
+ *
+ * Example:<BR>
+ * \code
+ *   // Wait for 500 uS
+ *   PIOS_DELAY_Wait_uS(500);
+ * \endcode
+ * \param[in] uS delay
+ * \return < 0 on errors
+ */
+int32_t PIOS_DELAY_WaituS(uint32_t uS)
+{
+	uint32_t	elapsed = 0;
+	uint32_t	last_count = DWT_CYCCNT;
+	
+	for (;;) {
+		uint32_t current_count = DWT_CYCCNT;
+		uint32_t elapsed_uS;
+
+		/* measure the time elapsed since the last time we checked */
+		elapsed += current_count - last_count;
+		last_count = current_count;
+
+		/* convert to microseconds */
+		elapsed_uS = elapsed / us_ticks;
+		if (elapsed_uS >= uS)
+			break;
+
+		/* reduce the delay by the elapsed time */
+		uS -= elapsed_uS;
+
+		/* keep fractional microseconds for the next iteration */
+		elapsed %= us_ticks;
+	}
 
 	/* No error */
 	return 0;
 }
 
 /**
-* Waits for a specific number of uS<BR>
-* Example:<BR>
-* \code
-*   // Wait for 500 uS
-*   PIOS_DELAY_Wait_uS(500);
-* \endcode
-* \param[in] uS delay (1..65535 microseconds)
-* \return < 0 on errors
-*/
-int32_t PIOS_DELAY_WaituS(uint16_t uS)
+ * Waits for a specific number of mS
+ *
+ * Example:<BR>
+ * \code
+ *   // Wait for 500 mS
+ *   PIOS_DELAY_Wait_mS(500);
+ * \endcode
+ * \param[in] mS delay
+ * \return < 0 on errors
+ */
+int32_t PIOS_DELAY_WaitmS(uint32_t mS)
 {
-	uint16_t start = PIOS_DELAY_TIMER->CNT;
-
-	/* Note that this event works on 16bit counter wrap-arounds */
-	while ((uint16_t) (PIOS_DELAY_TIMER->CNT - start) <= uS) ;
-
-	/* No error */
-	return 0;
-}
-
-/**
-* Waits for a specific number of mS<BR>
-* Example:<BR>
-* \code
-*   // Wait for 500 mS
-*   PIOS_DELAY_Wait_mS(500);
-* \endcode
-* \param[in] mS delay (1..65535 milliseconds)
-* \return < 0 on errors
-*/
-int32_t PIOS_DELAY_WaitmS(uint16_t mS)
-{
-	for (int i = 0; i < mS; i++) {
+	while (mS--) {
 		PIOS_DELAY_WaituS(1000);
 	}
 
@@ -108,22 +133,19 @@ int32_t PIOS_DELAY_WaitmS(uint16_t mS)
  * @brief Query the Delay timer for the current uS 
  * @return A microsecond value
  */
-uint16_t PIOS_DELAY_GetuS()
+uint32_t PIOS_DELAY_GetuS(void)
 {
-	return PIOS_DELAY_TIMER->CNT;
+	return DWT_CYCCNT / us_ticks;
 }
 
 /**
- * @brief Compute the difference between now and a reference time
- * @param[in] the reference time to compare now to
- * @return The number of uS since the delay
- * 
- * @note the user is responsible for worrying about rollover on the 16 bit uS counter
+ * @brief Calculate time in microseconds since a previous time
+ * @param[in] t previous time
+ * @return time in us since previous time t.
  */
-int32_t PIOS_DELAY_DiffuS(uint16_t ref)
+uint32_t PIOS_DELAY_GetuSSince(uint32_t t)
 {
-	int32_t ret_t = ref;
-	return (int16_t) (PIOS_DELAY_GetuS() - ret_t);
+	return (PIOS_DELAY_GetuS() - t);
 }
 
 #endif

@@ -35,13 +35,14 @@
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "objectpersistence.h"
-
+#include "devicedescriptorstruct.h"
 #include <QtGlobal>
 #include <QObject>
+#include <QTimer>
 #include <QMutex>
 #include <QQueue>
 #include <QComboBox>
-
+#include <QDateTime>
 class UAVOBJECTUTIL_EXPORT UAVObjectUtilManager: public QObject
 {
     Q_OBJECT
@@ -62,17 +63,29 @@ public:
 
         int getBoardModel();
         QByteArray getBoardCPUSerial();
+        quint32 getFirmwareCRC();
+        QByteArray getBoardDescription();
+        deviceDescriptorStruct getBoardDescriptionStruct();
+        static bool descriptionToStructure(QByteArray desc,deviceDescriptorStruct * struc);
+        UAVObjectManager* getObjectManager();
+        void saveObjectToSD(UAVObject *obj);
+
+signals:
+        void saveCompleted(int objectID, bool status);
 
 private:
 	QMutex *mutex;
-
 	QQueue<UAVObject *> queue;
-
+        enum {IDLE, AWAITING_ACK, AWAITING_COMPLETED} saveState;
 	void saveNextObject();
-	void saveObjectToSD(UAVObject *obj);
+        QTimer failureTimer;
 
 private slots:
-	void transactionCompleted(UAVObject *obj, bool success);
+        //void transactionCompleted(UAVObject *obj, bool success);
+        void objectPersistenceTransactionCompleted(UAVObject* obj, bool success);
+        void objectPersistenceUpdated(UAVObject * obj);
+        void objectPersistenceOperationFailed();
+
 
 };
 

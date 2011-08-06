@@ -33,9 +33,10 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     m_config = new Ui_UploaderWidget();
     m_config->setupUi(this);
     currentStep = IAP_STATE_READY;
-    rescueStep = RESCUE_STEP0;
     resetOnly=false;
     dfu = NULL;
+    m_timer = 0;
+    m_progress = 0;
 
     // Listen to autopilot connection events
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -393,89 +394,93 @@ void UploaderGadgetWidget::systemBoot()
 void UploaderGadgetWidget::systemRescue()
 {
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-    switch (rescueStep) {
-    case RESCUE_STEP0: {
-        cm->disconnectDevice();
-        // stop the polling thread: otherwise it will mess up DFU
-        cm->suspendPolling();
-        // Delete all previous tabs:
-        while (m_config->systemElements->count()) {
-             QWidget *qw = m_config->systemElements->widget(0);
-             m_config->systemElements->removeTab(0);
-             delete qw;
-        }
-        // Existing DFU objects will have a handle over USB and will
-        // disturb everything for the rescue process:
-        if (dfu) {
-            delete dfu;
-            dfu = NULL;
-        }
-        // Avoid dumb users pressing Rescue twice. It can happen.
-        m_config->rescueButton->setEnabled(false);
-
-        // Now we're good to go:
-        clearLog();
-        log("**********************************************************");
-        log("** Follow those instructions to attempt a system rescue **");
-        log("**********************************************************");
-        log("You will be prompted to first connect USB, then system power");
-        log ("Connect USB in 2 seconds...");
-        rescueStep = RESCUE_STEP1;
-        QTimer::singleShot(1000, this, SLOT(systemRescue()));
+    cm->disconnectDevice();
+    // stop the polling thread: otherwise it will mess up DFU
+    cm->suspendPolling();
+    // Delete all previous tabs:
+    while (m_config->systemElements->count()) {
+        QWidget *qw = m_config->systemElements->widget(0);
+        m_config->systemElements->removeTab(0);
+        delete qw;
     }
-        break;
-    case RESCUE_STEP1:
-        rescueStep = RESCUE_STEP2;
-        log ("            ...1...");
-        QTimer::singleShot(1000, this, SLOT(systemRescue()));
-        break;
-    case RESCUE_STEP2:
-        rescueStep = RESCUE_STEP3;
-        log("            ...Now!");
-        QTimer::singleShot(1000, this, SLOT(systemRescue()));
-        break;
-    case RESCUE_STEP3:
-        log("... Detecting First Board...");
-        repaint();
-        dfu = new DFUObject(DFU_DEBUG, false, QString());
-        dfu->AbortOperation();
-        if(!dfu->enterDFU(0))
+    // Existing DFU objects will have a handle over USB and will
+    // disturb everything for the rescue process:
+    if (dfu) {
+        delete dfu;
+        dfu = NULL;
+    }
+    // Avoid dumb users pressing Rescue twice. It can happen.
+    m_config->rescueButton->setEnabled(false);
+
+    // Now we're good to go:
+    clearLog();
+    log("**********************************************************");
+    log("** Follow those instructions to attempt a system rescue **");
+    log("**********************************************************");
+    log("You will be prompted to first connect USB, then system power");
+    if(USBMonitor::instance()->availableDevices(0x20a0,-1,-1,-1).length()>0)
+    {
+        if(QMessageBox::warning(this,tr("OpenPilot Uploader"),tr("Please disconnect all openpilot boards"),QMessageBox::Ok,QMessageBox::Cancel)==QMessageBox::Cancel)
         {
-            rescueStep = RESCUE_STEP0;
-            log("Could not enter DFU mode.");
-            delete dfu;
-            dfu = NULL;
-            cm->resumePolling();
             m_config->rescueButton->setEnabled(true);
             return;
         }
-        if(!dfu->findDevices() || (dfu->numberOfDevices != 1))
-        {
-            rescueStep = RESCUE_STEP0;
-            log("Could not detect a board, aborting!");
-            delete dfu;
-            dfu = NULL;
-            cm->resumePolling();
-            m_config->rescueButton->setEnabled(true);
-            return;
-        }
-        rescueStep = RESCUE_POWER1;
-        log("Connect Power in 2 second...");
-        log("(not required on CopterControl)");
-        QTimer::singleShot(1000, this, SLOT(systemRescue()));
-        break;
-    case RESCUE_POWER1:
-        rescueStep = RESCUE_POWER2;
-        log("            ...1...");
-        QTimer::singleShot(1000, this, SLOT(systemRescue()));
-        break;
-    case RESCUE_POWER2:
-        log("... NOW!\n***\nWaiting...");
-        rescueStep = RESCUE_DETECT;
-        QTimer::singleShot(5000, this, SLOT(systemRescue()));
-        break;
-    case RESCUE_DETECT:
-        rescueStep = RESCUE_STEP0;
+    }
+    // Now we're good to go:
+    clearLog();
+    log("**********************************************************");
+    log("** Follow those instructions to attempt a system rescue **");
+    log("**********************************************************");
+    log("You will be prompted to first connect USB, then system power");
+    m_progress = new QProgressDialog(tr("Please connect the board (USB only!)"), tr("Cancel"), 0, 20);
+    QProgressBar * bar=new QProgressBar(m_progress);
+    bar->setFormat("Timeout");
+    m_progress->setBar(bar);
+    m_progress->setMinimumDuration(0);
+    m_progress->setRange(0,20);
+    connect(m_progress, SIGNAL(canceled()), this, SLOT(cancel()));
+    m_timer = new QTimer(this);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(perform()));
+    m_timer->start(1000);
+    connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)),&m_eventloop, SLOT(quit()));
+    m_eventloop.exec();
+    if(!m_timer->isActive())
+    {
+        m_progress->close();
+        m_timer->stop();
+        QMessageBox::warning(this,tr("Openpilot Uploader"),tr("No board connection was detected!"));
+        m_config->rescueButton->setEnabled(true);
+        return;
+    }
+    m_progress->close();
+    m_timer->stop();
+    log("... Detecting First Board...");
+    repaint();
+    dfu = new DFUObject(DFU_DEBUG, false, QString());
+    dfu->AbortOperation();
+    if(!dfu->enterDFU(0))
+    {
+        log("Could not enter DFU mode.");
+        delete dfu;
+        dfu = NULL;
+        cm->resumePolling();
+        m_config->rescueButton->setEnabled(true);
+        return;
+    }
+    if(!dfu->findDevices() || (dfu->numberOfDevices != 1))
+    {
+        log("Could not detect a board, aborting!");
+        delete dfu;
+        dfu = NULL;
+        cm->resumePolling();
+        m_config->rescueButton->setEnabled(true);
+        return;
+    }
+    if(QMessageBox::question(this,tr("OpenPilot Uploader"),tr("If you want to search for other boards connect power now and press Yes"),QMessageBox::Yes,QMessageBox::No)==QMessageBox::Yes)
+    {
+        log("\nWaiting...");
+        QTimer::singleShot(3000, &m_eventloop, SLOT(quit()));
+        m_eventloop.exec();
         log("Detecting second board...");
         repaint();
         if(!dfu->findDevices())
@@ -489,28 +494,42 @@ void UploaderGadgetWidget::systemRescue()
             m_config->rescueButton->setEnabled(true);
             return;
         }
-        log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
-        if (dfu->numberOfDevices > 5) {
-            log("Inconsistent number of devices, aborting!");
-            delete dfu;
-            dfu = NULL;
-            cm->resumePolling();
-            m_config->rescueButton->setEnabled(true);
-            return;
-        }
-        for(int i=0;i<dfu->numberOfDevices;i++) {
-            deviceWidget* dw = new deviceWidget(this);
-            dw->setDeviceID(i);
-            dw->setDfu(dfu);
-            dw->populate();
-            m_config->systemElements->addTab(dw, QString("Device") + QString::number(i));
-        }
-        m_config->haltButton->setEnabled(false);
-        m_config->resetButton->setEnabled(false);
-        m_config->bootButton->setEnabled(true);
-        m_config->rescueButton->setEnabled(false);
-        currentStep = IAP_STATE_BOOTLOADER; // So that we can boot from the GUI afterwards.
     }
+    log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
+    if (dfu->numberOfDevices > 5) {
+        log("Inconsistent number of devices, aborting!");
+        delete dfu;
+        dfu = NULL;
+        cm->resumePolling();
+        m_config->rescueButton->setEnabled(true);
+        return;
+    }
+    for(int i=0;i<dfu->numberOfDevices;i++) {
+        deviceWidget* dw = new deviceWidget(this);
+        dw->setDeviceID(i);
+        dw->setDfu(dfu);
+        dw->populate();
+        m_config->systemElements->addTab(dw, QString("Device") + QString::number(i));
+    }
+    m_config->haltButton->setEnabled(false);
+    m_config->resetButton->setEnabled(false);
+    m_config->bootButton->setEnabled(true);
+    m_config->rescueButton->setEnabled(false);
+    currentStep = IAP_STATE_BOOTLOADER; // So that we can boot from the GUI afterwards.
+}
+void UploaderGadgetWidget::perform()
+{
+    if(m_progress->value()==19)
+    {
+        m_timer->stop();
+        m_eventloop.exit();
+    }
+    m_progress->setValue(m_progress->value()+1);
+}
+void UploaderGadgetWidget::cancel()
+{
+    m_timer->stop();
+    m_eventloop.exit();
 }
 
 /**
@@ -537,6 +556,15 @@ UploaderGadgetWidget::~UploaderGadgetWidget()
          QWidget *qw = m_config->systemElements->widget(0);
          m_config->systemElements->removeTab(0);
          delete qw;
+         qw = 0;
+    }
+    if (m_progress) {
+        delete m_progress;
+        m_progress = 0;
+    }
+    if (m_timer) {
+        delete m_timer;
+        m_timer = 0;
     }
 }
 

@@ -30,8 +30,4 @@
 #ifndef PIOS_PPM_H
 #define PIOS_PPM_H
 
-/* Public Functions */
-extern void PIOS_PPM_Init(void);
-extern int32_t PIOS_PPM_Get(int8_t Channel);
-
 #endif /* PIOS_PPM_H */

@@ -718,7 +718,7 @@ OP_DFU::Status DFUObject::UploadFirmwareT(const QString &sfile, const bool &veri
         return OP_DFU::abort;;
     }
 
-    quint32 crc=CRCFromQBArray(arr,devices[device].SizeOfCode);
+    quint32 crc=DFUObject::CRCFromQBArray(arr,devices[device].SizeOfCode);
     if (debug)
         qDebug() << "NEW FIRMWARE CRC=" << crc;
 
@@ -817,7 +817,7 @@ OP_DFU::Status DFUObject::CompareFirmware(const QString &sfile, const CompareTyp
     }
     if(type==OP_DFU::crccompare)
     {
-         quint32 crc=CRCFromQBArray(arr,devices[device].SizeOfCode);
+        quint32 crc=DFUObject::CRCFromQBArray(arr,devices[device].SizeOfCode);
          if(crc==devices[device].FW_CRC)
          {
              cout<<"Compare Successfull CRC MATCH!\n";
@@ -971,7 +971,7 @@ quint32 DFUObject::CRCFromQBArray(QByteArray array, quint32 Size)
         aux+=(char)array[x*4+0]&0xFF;
         t[x]=aux;
     }
-    return CRC32WideFast(0xFFFFFFFF,Size/4,(quint32*)t);
+    return DFUObject::CRC32WideFast(0xFFFFFFFF,Size/4,(quint32*)t);
 }
 
 

@@ -33,7 +33,7 @@
 
 PFDGadgetFactory::PFDGadgetFactory(QObject *parent) :
         IUAVGadgetFactory(QString("PFDGadget"),
-                          tr("Primary Flight Display Gadget"),
+                          tr("Primary Flight Display"),
                           parent)
 {
 }

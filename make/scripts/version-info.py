@@ -69,7 +69,7 @@ class Repo:
     def _get_tag(self):
         """Get and store git tag for the HEAD commit"""
         self._tag = None
-        self._exec('describe --exact-match HEAD')
+        self._exec('describe --tags --exact-match HEAD')
         if self._rc == 0:
             self._tag = self._out.strip(' \t\n\r')
 
@@ -235,6 +235,21 @@ def sha1(file):
         hex_stream = lambda s:",".join(['0x'+hex(ord(c))[2:].zfill(2) for c in s])
         return hex_stream(sha1.digest())
 
+def xtrim(string, suffix, length):
+    """Return string+suffix concatenated and trimmed up to length characters
+
+    This function appends suffix to the end of string and returns the result
+    up to length characters. If it does not fit then the string will be
+    truncated and the '+' will be put between it and the suffix.
+    """
+
+    if len(string) + len(suffix) <= length:
+        return ''.join([string, suffix])
+    else:
+        n = length-1-len(suffix)
+        assert n > 0, "length of truncated string+suffix exceeds maximum length"
+        return ''.join([string[:n], '+', suffix])
+
 def main():
     """This utility uses git repository in the current working directory
 or from the given path to extract some info about it and HEAD commit.
@@ -306,6 +321,7 @@ dependent targets.
         TAG_OR_BRANCH = r.tag(r.branch('unreleased')),
         TAG_OR_HASH8 = r.tag(r.hash(8, 'untagged')),
         DIRTY = r.dirty(),
+        FWTAG = xtrim(r.tag(r.branch('unreleased')), r.dirty(), 25),
         UNIXTIME = r.time(),
         DATE = r.time('%Y%m%d'),
         DATETIME = r.time('%Y%m%d %H:%M'),

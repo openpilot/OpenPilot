@@ -37,6 +37,9 @@
 #include <math.h>
 #include <QMessageBox>
 
+#include "mixersettings.h"
+#include "systemsettings.h"
+
 #define  Pi 3.14159265358979323846
 
 
@@ -1179,7 +1182,7 @@ void ConfigccpmWidget::requestccpmUpdate()
 {
 #define MaxAngleError 2
     int MixerDataFromHeli[8][5];
-    QString MixerOutputType[8];
+    quint8 MixerOutputType[8];
     int EngineChannel,TailRotorChannel,ServoChannels[4],ServoAngles[4],SortAngles[4],CalcAngles[4],ServoCurve2[4];
     int NumServos=0;
     double Collective=0.0;
@@ -1191,38 +1194,44 @@ void ConfigccpmWidget::requestccpmUpdate()
     if (updatingToHardware)return;
     updatingFromHardware=TRUE;
     
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     int i,j;
-    UAVObjectField *field;
-    UAVDataObject* obj;
     
-    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
-    field = obj->getField(QString("GUIConfigData"));
-    GUIConfigData.UAVObject[0]=field->getValue(0).toUInt();
-    GUIConfigData.UAVObject[1]=field->getValue(1).toUInt();
-    UpdatCCPMUIFromOptions();   
+    SystemSettings * systemSettings = SystemSettings::GetInstance(getObjectManager());
+    SystemSettings::DataFields systemSettingsData = systemSettings->getData();
 
+    Q_ASSERT(SystemSettings::GUICONFIGDATA_NUMELEM ==
+             (sizeof(GUIConfigData.UAVObject) / sizeof(GUIConfigData.UAVObject[0])));
+
+    for(i = 0; i < SystemSettings::GUICONFIGDATA_NUMELEM; i++)
+        GUIConfigData.UAVObject[i]=systemSettingsData.GUIConfigData[i];
+
+    UpdatCCPMUIFromOptions();
+
+    // Get existing mixer settings
+    MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
+    MixerSettings::DataFields mixerSettingsData = mixerSettings->getData();
     
-    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));
-    Q_ASSERT(obj);
-
     //go through the user data and update the mixer matrix
-    for (i=0;i<8;i++)
+    for (j=0;j<5;j++)
     {
-            field = obj->getField(tr( "Mixer%1Vector" ).arg(i+1));
-            //config the vector
-            for (j=0;j<5;j++)
-            {
-                MixerDataFromHeli[i][j] = field->getValue(j).toInt();
-                //field->setValue(m_ccpm->ccpmAdvancedSettingsTable->item(i,j+1)->text().toInt(),j);
-            }
+        MixerDataFromHeli[0][j] = mixerSettingsData.Mixer1Vector[j];
+        MixerDataFromHeli[1][j] = mixerSettingsData.Mixer2Vector[j];
+        MixerDataFromHeli[2][j] = mixerSettingsData.Mixer3Vector[j];
+        MixerDataFromHeli[3][j] = mixerSettingsData.Mixer4Vector[j];
+        MixerDataFromHeli[4][j] = mixerSettingsData.Mixer5Vector[j];
+        MixerDataFromHeli[5][j] = mixerSettingsData.Mixer6Vector[j];
+        MixerDataFromHeli[6][j] = mixerSettingsData.Mixer7Vector[j];
+        MixerDataFromHeli[7][j] = mixerSettingsData.Mixer8Vector[j];
     }
-    for (i=0;i<8;i++)
-    {
-            field = obj->getField(tr( "Mixer%1Type" ).arg(i+1));
-            MixerOutputType[i] = field->getValue().toString();
-    }
+
+    MixerOutputType[0] = mixerSettingsData.Mixer1Type;
+    MixerOutputType[1] = mixerSettingsData.Mixer2Type;
+    MixerOutputType[2] = mixerSettingsData.Mixer3Type;
+    MixerOutputType[3] = mixerSettingsData.Mixer4Type;
+    MixerOutputType[4] = mixerSettingsData.Mixer5Type;
+    MixerOutputType[5] = mixerSettingsData.Mixer6Type;
+    MixerOutputType[6] = mixerSettingsData.Mixer7Type;
+    MixerOutputType[7] = mixerSettingsData.Mixer8Type;
 
     EngineChannel =-1;
     TailRotorChannel =-1;
@@ -1239,7 +1248,7 @@ void ConfigccpmWidget::requestccpmUpdate()
     for (i=0;i<8;i++)
     {
         //check if this is the engine... Throttle only
-        if ((MixerOutputType[i].compare("Motor")==0)&&
+        if ((MixerOutputType[i] == MixerSettings::MIXER1TYPE_MOTOR)&&
             (MixerDataFromHeli[i][0]>0)&&//ThrottleCurve1
             (MixerDataFromHeli[i][1]==0)&&//ThrottleCurve2
             (MixerDataFromHeli[i][2]==0)&&//Roll
@@ -1251,7 +1260,7 @@ void ConfigccpmWidget::requestccpmUpdate()
 
         }
         //check if this is the tail rotor... REVO and YAW
-        if ((MixerOutputType[i].compare("Servo")==0)&&
+        if ((MixerOutputType[i] == MixerSettings::MIXER1TYPE_SERVO)&&
             //(MixerDataFromHeli[i][0]!=0)&&//ThrottleCurve1
             (MixerDataFromHeli[i][1]==0)&&//ThrottleCurve2
             (MixerDataFromHeli[i][2]==0)&&//Roll
@@ -1264,7 +1273,7 @@ void ConfigccpmWidget::requestccpmUpdate()
             m_ccpm->ccpmREVOspinBox->setValue((MixerDataFromHeli[i][0]*100)/127);
         }
         //check if this is a swashplate servo... Throttle is zero
-        if ((MixerOutputType[i].compare("Servo")==0)&&
+        if ((MixerOutputType[i] == MixerSettings::MIXER1TYPE_SERVO)&&
             (MixerDataFromHeli[i][0]==0)&&//ThrottleCurve1
             //(MixerDataFromHeli[i][1]==0)&&//ThrottleCurve2
             //(MixerDataFromHeli[i][2]==0)&&//Roll
@@ -1275,193 +1284,23 @@ void ConfigccpmWidget::requestccpmUpdate()
             ServoCurve2[NumServos]=MixerDataFromHeli[i][1];//record the ThrottleCurve2 contribution to this servo
             ServoAngles[NumServos]=NumServos*45;//make this 0 for the final version
 
-            //if (NumServos==0)m_ccpm->ccpmServoWChannel->setCurrentIndex(i);
-            //if (NumServos==1)m_ccpm->ccpmServoXChannel->setCurrentIndex(i);
-            //if (NumServos==2)m_ccpm->ccpmServoYChannel->setCurrentIndex(i);
-            //if (NumServos==3)m_ccpm->ccpmServoZChannel->setCurrentIndex(i);
             NumServos++;
         }
 
     }
 
-
-
-
-    //just call it user angles for now....
-    /*
-    m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("Custom - User Angles"));
-
-    if (NumServos>1)
-    {
-        if((ServoCurve2[0]==0)&&(ServoCurve2[1]==0)&&(ServoCurve2[2]==0)&&(ServoCurve2[3]==0))
-        {
-            //fixed pitch heli
-            isCCPM=0;
-            m_ccpm->ccpmCollectiveSlider->setValue(0);
-            Collective = 0.0;
-        }
-        if(ServoCurve2[0]==ServoCurve2[1])
-        {
-            if ((NumServos<3)||(ServoCurve2[1]==ServoCurve2[2]))
-            {
-                if ((NumServos<4)||(ServoCurve2[2]==ServoCurve2[3]))
-                {//all the servos have the same ThrottleCurve2 setting so this must be a CCPM config
-                    isCCPM=1;
-                    Collective = ((double)ServoCurve2[0]*100.00)/127.00;
-                    m_ccpm->ccpmCollectiveSlider->setValue((int)Collective);
-                    m_ccpm->ccpmCollectivespinBox->setValue((int)Collective);
-
-                 }
-            }
-        }
-    }
-    else
-    {//must be a custom config... "Custom - Advanced Settings"
-        m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("Custom - Advanced Settings"));
-    }
-    
-    HeadRotation=0;
-    
-    HeadRotation=m_ccpm->ccpmSingleServo->currentIndex();
-   //calculate the angles
-    for(j=0;j<NumServos;j++)
-    {
-        //MixerDataFromHeli[i][2]=(127.0*(1-CollectiveConstant)*sin((CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Roll
-        //MixerDataFromHeli[i][3]=(127.0*(1-CollectiveConstant)*cos((CorrectionAngle + ThisAngle[i])*Pi/180.00))));//Pitch
-        a1=((double)MixerDataFromHeli[ServoChannels[j]][2]/(1.27*(100.0-Collective)));
-        a2=((double)MixerDataFromHeli[ServoChannels[j]][3]/(1.27*(100.0-Collective)));
-        ServoAngles[j]=fmod(360.0+atan2(-a1,a2)/(Pi/180.00),360.0);
-        //check the angles for one being a multiple of 90deg
-        if (fmod(ServoAngles[j],90)<MaxAngleError)
-        {
-            HeadRotation=ServoAngles[j]/90;
-        }
-
-    }
-    //set the head rotation
-    //m_ccpm->ccpmSingleServo->setCurrentIndex(HeadRotation);
-
-    //calculate the un rotated angles
-    for(j=0;j<NumServos;j++)
-    {
-      CalcAngles[j] = fmod(360.0+ServoAngles[j]-(double)HeadRotation*90.0,360.0);
-    }
-    //sort the calc angles do the smallest is first...brute force...
-    for(i=0;i<5;i++)
-    for(j=0;j<NumServos-1;j++)
-    {
-      if (CalcAngles[SortAngles[j]] > CalcAngles[SortAngles[j+1]])
-      {//swap the sorted angles
-        temp = SortAngles[j];
-        SortAngles[j]=SortAngles[j+1];
-        SortAngles[j+1]=temp;
-      }
-
-    }
-
-    //m_ccpm->ccpmAngleW->setValue(ServoAngles[SortAngles[0]]);
-    //m_ccpm->ccpmAngleX->setValue(ServoAngles[SortAngles[1]]);
-    //m_ccpm->ccpmAngleY->setValue(ServoAngles[SortAngles[2]]);
-    //m_ccpm->ccpmAngleZ->setValue(ServoAngles[SortAngles[3]]);
-
-    //m_ccpm->ccpmServoWChannel->setCurrentIndex(ServoChannels[SortAngles[0]]);
-    //m_ccpm->ccpmServoXChannel->setCurrentIndex(ServoChannels[SortAngles[1]]);
-    //m_ccpm->ccpmServoYChannel->setCurrentIndex(ServoChannels[SortAngles[2]]);
-    //m_ccpm->ccpmServoZChannel->setCurrentIndex(ServoChannels[SortAngles[3]]);
-    m_ccpm->ccpmServoWChannel->setCurrentIndex(ServoChannels[0]);
-    m_ccpm->ccpmServoXChannel->setCurrentIndex(ServoChannels[1]);
-    m_ccpm->ccpmServoYChannel->setCurrentIndex(ServoChannels[2]);
-    m_ccpm->ccpmServoZChannel->setCurrentIndex(ServoChannels[3]);
-
-
-    //Types << "CCPM 2 Servo 90º" << "CCPM 3 Servo 120º" << "CCPM 3 Servo 140º" << "FP 2 Servo 90º"  << "Custom - User Angles" << "Custom - Advanced Settings"  ;
-
-
-    //check this against known combinations
-    if (NumServos==2)
-    {
-        if ((fabs(CalcAngles[SortAngles[0]])<MaxAngleError)&&
-            (fabs(CalcAngles[SortAngles[1]]-90)<MaxAngleError))
-        {// two servo 90º
-            if (isCCPM)
-            {
-                m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("CCPM 2 Servo 90º"));
-                UpdateType();
-            }
-            else
-            {
-                m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("FP 2 Servo 90º"));
-                UpdateType();
-            }
-
-        }
-    }
-    if (NumServos==3)
-    {
-        if ((fabs(CalcAngles[SortAngles[0]])<MaxAngleError)&&
-            (fabs(CalcAngles[SortAngles[1]]-120)<MaxAngleError)&&
-            (fabs(CalcAngles[SortAngles[2]]-240)<MaxAngleError))
-        {// three servo 120º
-            if (isCCPM)
-            {
-                m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("CCPM 3 Servo 120º"));
-                UpdateType();
-
-            }
-            else
-            {
-                m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("FP 3 Servo 120º"));
-                UpdateType();
-            }
-
-        }
-        else if ((fabs(CalcAngles[SortAngles[0]])<MaxAngleError)&&
-            (fabs(CalcAngles[SortAngles[1]]-140)<MaxAngleError)&&
-            (fabs(CalcAngles[SortAngles[2]]-220)<MaxAngleError))
-        {// three servo 140º
-            if (isCCPM)
-            {
-                m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("CCPM 3 Servo 140º"));
-                UpdateType();
-            }
-            else
-            {
-                m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->findText("FP 3 Servo 140º"));
-                UpdateType();
-            }
-
-        }
-
-    }
-    if (NumServos==4)
-    {
-
-    }
-*/
-
-
-
     //get the settings for the curve from the mixer settings
-    field = obj->getField(QString("ThrottleCurve1"));
     for (i=0;i<5;i++)
     {
-        m_ccpm->CurveSettings->item(i, 0)->setText(QString().sprintf("%.3f",field->getValue(i).toDouble()));
-        //m_ccpm->CurveSettings->item(i, 0)->setText(field->getValue(i).toString());
+        m_ccpm->CurveSettings->item(i, 0)->setText(QString().sprintf("%.3f",
+                                                                     mixerSettingsData.ThrottleCurve1[i]));
+        m_ccpm->CurveSettings->item(i, 1)->setText(QString().sprintf("%.3f",
+                                                                     mixerSettingsData.ThrottleCurve2[i]));
     }
-    field = obj->getField(QString("ThrottleCurve2"));
-    for (i=0;i<5;i++)
-    {
-        m_ccpm->CurveSettings->item(i, 1)->setText(QString().sprintf("%.3f",field->getValue(i).toDouble()));
-        //m_ccpm->CurveSettings->item(i, 1)->setText(field->getValue(i).toString());
-    }
-
-
-
 
     updatingFromHardware=FALSE;
     UpdatCCPMUIFromOptions();
     ccpmSwashplateUpdate();
-
 }
 
 
@@ -1499,7 +1338,7 @@ void ConfigccpmWidget::sendccpmUpdate()
         //clear the output types
         for (i=0;i<8;i++)
         {
-            field = obj->getField(tr( "Mixer%1Type" ).arg( i+1 ));
+            field = obj->getField( QString( "Mixer%1Type" ).arg( i+1 ));
             //clear the mixer type
             field->setValue("Disabled");
         }
@@ -1520,7 +1359,7 @@ void ConfigccpmWidget::sendccpmUpdate()
             if (MixerChannelData[i]<8)
             {
                 //select the correct mixer for this config element
-                field = obj->getField(tr( "Mixer%1Type" ).arg( MixerChannelData[i]+1 ));
+                field = obj->getField(QString( "Mixer%1Type" ).arg( MixerChannelData[i]+1 ));
                 //set the mixer type
                 if (i==0)
                 {
@@ -1532,7 +1371,7 @@ void ConfigccpmWidget::sendccpmUpdate()
                 }
 
                 //select the correct mixer for this config element
-                field = obj->getField(tr( "Mixer%1Vector" ).arg( MixerChannelData[i]+1 ));
+                field = obj->getField(QString( "Mixer%1Vector" ).arg( MixerChannelData[i]+1 ));
                 //config the vector
                 for (j=0;j<5;j++)
                 {

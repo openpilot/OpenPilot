@@ -58,7 +58,7 @@ uint8_t sync_of = 0;
 uint16_t supv_timer=0;
 
 static void PIOS_SPEKTRUM_Supervisor(uint32_t spektrum_id);
-static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg);
+static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg, uint8_t bind);
 static int32_t PIOS_SPEKTRUM_Decode(uint8_t b);
 
 static uint16_t PIOS_SPEKTRUM_RxInCallback(uint32_t context, uint8_t * buf, uint16_t buf_len, uint16_t * headroom, bool * need_yield)
@@ -84,11 +84,11 @@ static uint16_t PIOS_SPEKTRUM_RxInCallback(uint32_t context, uint8_t * buf, uint
 /**
 * Bind and Initialise Spektrum satellite receiver
 */
-int32_t PIOS_SPEKTRUM_Init(uint32_t * spektrum_id, const struct pios_spektrum_cfg *cfg, const struct pios_com_driver * driver, uint32_t lower_id, bool bind)
+int32_t PIOS_SPEKTRUM_Init(uint32_t * spektrum_id, const struct pios_spektrum_cfg *cfg, const struct pios_com_driver * driver, uint32_t lower_id, uint8_t bind)
 {
 	// TODO: need setting flag for bind on next powerup
 	if (bind) {
-		PIOS_SPEKTRUM_Bind(cfg);
+		PIOS_SPEKTRUM_Bind(cfg,bind);
 	}
 
 	(driver->bind_rx_cb)(lower_id, PIOS_SPEKTRUM_RxInCallback, 0);
@@ -120,9 +120,10 @@ static int32_t PIOS_SPEKTRUM_Get(uint32_t rcvr_id, uint8_t channel)
 * \output true Successful bind
 * \output false Bind failed
 */
-static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg)
+static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg, uint8_t bind)
 {
-#define BIND_PULSES 5
+	/* just to limit bind pulses */
+	bind=(bind<=10)?bind:10;
 
 	GPIO_Init(cfg->bind.gpio, &cfg->bind.init);
 	/* RX line, set high */
@@ -131,7 +132,7 @@ static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg)
 	/* on CC works upto 140ms, I guess bind window is around 20-140ms after powerup */
 	PIOS_DELAY_WaitmS(60);
 
-	for (int i = 0; i < BIND_PULSES ; i++) {
+	for (int i = 0; i < bind ; i++) {
 		/* RX line, drive low for 120us */
 		GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 		PIOS_DELAY_WaituS(120);

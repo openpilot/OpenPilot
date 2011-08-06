@@ -921,6 +921,8 @@ void PIOS_Board_Init(void) {
 	TaskMonitorInitialize();
 
 	/* Configure the main IO port */
+	uint8_t hwsettings_DSMxBind;
+	HwSettingsDSMxBindGet(&hwsettings_DSMxBind);
 	uint8_t hwsettings_cc_mainport;
 	HwSettingsCC_MainPortGet(&hwsettings_cc_mainport);
 
@@ -989,7 +991,7 @@ void PIOS_Board_Init(void) {
 			}
 
 			uint32_t pios_spektrum_id;
-			if (PIOS_SPEKTRUM_Init(&pios_spektrum_id, &pios_spektrum_main_cfg, &pios_usart_com_driver, pios_usart_spektrum_id, false)) {
+			if (PIOS_SPEKTRUM_Init(&pios_spektrum_id, &pios_spektrum_main_cfg, &pios_usart_com_driver, pios_usart_spektrum_id, 0)) {
 				PIOS_Assert(0);
 			}
 		}
@@ -1051,7 +1053,7 @@ void PIOS_Board_Init(void) {
 			}
 
 			uint32_t pios_spektrum_id;
-			if (PIOS_SPEKTRUM_Init(&pios_spektrum_id, &pios_spektrum_flexi_cfg, &pios_usart_com_driver, pios_usart_spektrum_id, false)) {
+			if (PIOS_SPEKTRUM_Init(&pios_spektrum_id, &pios_spektrum_flexi_cfg, &pios_usart_com_driver, pios_usart_spektrum_id, hwsettings_DSMxBind)) {
 				PIOS_Assert(0);
 			}
 		}

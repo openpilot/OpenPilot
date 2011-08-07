@@ -28,7 +28,7 @@
 #define PIOS_CONFIG_H
 
 #define STM32F2XX
-#define HSE_VALUE 8000000
+#define MEM_SIZE  1024000000
 
 /* Enable/Disable PiOS Modules */
 #define PIOS_INCLUDE_DELAY

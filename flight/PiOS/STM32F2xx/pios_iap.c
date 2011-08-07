@@ -83,7 +83,8 @@ void PIOS_IAP_Init( void )
  */
 uint32_t	PIOS_IAP_CheckRequest( void )
 {
-#if 0	uint32_t	retval = FALSE;
+#if 0	
+	uint32_t	retval = FALSE;
 	uint16_t	reg1;
 	uint16_t	reg2;
 
@@ -98,6 +99,7 @@ uint32_t	PIOS_IAP_CheckRequest( void )
 	}
 	return retval;
 #endif
+	return 0;
 }
 
 

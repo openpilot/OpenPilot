@@ -5,7 +5,7 @@ HW_TYPE             := 0x00
 
 MCU                 := cortex-m3
 CHIP                := STM32F205RGT
-BOARD               := STM3210E_INS
+BOARD               := STM32F2xx_INS
 MODEL               := HD
 MODEL_SUFFIX        := 
 
@@ -16,3 +16,5 @@ FW_BANK_BASE        := 0x08002000  # Start of firmware flash
 FW_BANK_SIZE        := 0x0001E000  # Should include FW_DESC_SIZE
 
 FW_DESC_SIZE        := 0x00000064
+
+OSCILLATOR_FREQ     := 8000000

@@ -1,8 +1,8 @@
  #####
- # Project: OpenPilot AHRS_BOOTLOADER
+ # Project: OpenPilot INS_BOOTLOADER
  #    
  #  
- # Makefile for OpenPilot AHRS_BOOTLOADER project
+ # Makefile for OpenPilot INS project
  #
  # The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
  #    
@@ -49,8 +49,8 @@ endif
 FLASH_TOOL = OPENOCD
 
 # Paths
-AHRS_BL = ./
-AHRS_BLINC = $(AHRS_BL)/inc
+INS_BL = ./
+INS_BLINC = $(INS_BL)/inc
 PIOS = ../../PiOS
 PIOSINC = $(PIOS)/inc
 FLIGHTLIB = ../Libraries
@@ -76,7 +76,7 @@ SRC += bl_fsm.c
 #SRC += insgps.c
 #SRC += $(FLIGHTLIB)/CoordinateConversions.c
 
-## PIOS Hardware (STM32F10x)
+## PIOS Hardware (STM32F2xx)
 SRC += $(PIOSSTM32FXX)/pios_sys.c
 SRC += $(PIOSSTM32FXX)/pios_led.c
 SRC += $(PIOSSTM32FXX)/pios_delay.c
@@ -86,6 +86,7 @@ SRC += $(PIOSSTM32FXX)/pios_irq.c
 SRC += $(PIOSSTM32FXX)/pios_gpio.c
 SRC += $(PIOSSTM32FXX)/pios_spi.c
 SRC += $(PIOSSTM32FXX)/pios_iap.c
+SRC += $(PIOSSTM32FXX)/pios_debug.c
 
 ## PIOS Hardware (Common)
 #SRC += $(PIOSCOMMON)/pios_com.c
@@ -97,24 +98,24 @@ SRC += $(PIOSCOMMON)/pios_bl_helper.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c
-SRC += $(CMSISDIR)/system_stm32f10x.c
+SRC += $(CMSISDIR)/system_stm32f2xx.c
 
 ## Used parts of the STM-Library
-SRC += $(STMSPDSRCDIR)/stm32f10x_adc.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_bkp.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_crc.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_dac.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_dma.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_exti.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_flash.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_gpio.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_i2c.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_pwr.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_rcc.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_rtc.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_spi.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_tim.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_usart.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_adc.c
+# SRC += $(STMSPDSRCDIR)/stm32f2xx_bkp.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_crc.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_dac.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_dma.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_exti.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_flash.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_gpio.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_i2c.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_pwr.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_rcc.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_rtc.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_spi.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_tim.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_usart.c
 SRC += $(STMSPDSRCDIR)/misc.c
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
@@ -153,7 +154,7 @@ EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(PIOSBOARDS)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
 EXTRAINCDIRS  += $(CMSISDIR)
-EXTRAINCDIRS  += $(AHRS_BLINC)
+EXTRAINCDIRS  += $(INS_BLINC)
 
 # List any extra directories to look for library files here.
 # Also add directories where the linker should search for
@@ -235,6 +236,8 @@ CSTANDARD = -std=gnu99
 ifeq ($(DEBUG),YES)
 CFLAGS = 
 endif
+
+CFLAGS += -DHSE_VALUE=$(OSCILLATOR_FREQ)
 
 CFLAGS += -g$(DEBUGF)
 CFLAGS += -O$(OPT)

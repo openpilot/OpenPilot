@@ -2,15 +2,15 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup PIOS_STM32 STM32 HAL
- * @brief STM32 specific global data structures 
+ * @defgroup   PIOS_DEBUG Debugging Functions
+ * @brief Debugging functionality
  * @{
  *
- * @file       pios_stm32.h
+ * @file       pios_debug.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Types that are specific to the STM32 peripherals
+ * @brief      Debugging Functions
  * @see        The GNU Public License (GPL) Version 3
- *
+ * 
  *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 
@@ -28,39 +28,68 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_STM32_H
-#define PIOS_STM32_H
+/* Project Includes */
+#include "pios.h"
 
-struct stm32_irq {
-	void (*handler) (uint32_t);
-	uint32_t flags;
-	NVIC_InitTypeDef init;
-};
+// Global variables
+const char *PIOS_DEBUG_AssertMsg = "ASSERT FAILED";
 
-struct stm32_dma_chan {
-#if defined(STM32F2XX)
-	DMA_Stream_TypeDef *channel;
-#else
-	DMA_Channel_TypeDef *channel;
+
+/* Private Function Prototypes */
+
+/**
+* Initialise Debug-features
+*/
+void PIOS_DEBUG_Init(void)
+{
+
+}
+
+/**
+* Set debug-pin high
+* \param pin 0 for S1 output
+*/
+void PIOS_DEBUG_PinHigh(uint8_t Pin)
+{
+
+}
+
+/**
+* Set debug-pin low
+* \param pin 0 for S1 output
+*/
+void PIOS_DEBUG_PinLow(uint8_t Pin)
+{
+
+}
+
+
+void PIOS_DEBUG_PinValue8Bit(uint8_t value)
+{
+
+}
+
+void PIOS_DEBUG_PinValue4BitL(uint8_t value)
+{
+
+}
+
+
+/**
+ * Report a serious error and halt
+ */
+void PIOS_DEBUG_Panic(const char *msg)
+{
+#ifdef PIOS_COM_DEBUG
+	register int *lr asm("lr");	// Link-register holds the PC of the caller
+	PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, "\r%s @0x%x\r", msg, lr);
 #endif
-	DMA_InitTypeDef init;
-};
 
-struct stm32_dma {
-	uint32_t ahb_clk;			/* ignored on STM32F2XX */
-	struct stm32_irq irq;
-	struct stm32_dma_chan rx;
-	struct stm32_dma_chan tx;
-};
-
-struct stm32_gpio {
-	GPIO_TypeDef *gpio;
-	GPIO_InitTypeDef init;
-};
+	// Stay put
+	while (1) ;
+}
 
 /**
   * @}
   * @}
   */
-
-#endif /* PIOS_STM32_H */

@@ -1,3 +1,3 @@
 include(scope_dependencies.pri)
 
-LIBS *= -l$$qtLibraryTarget(ScopeGadget)
+LIBS *= -l$$qtLibraryName(ScopeGadget)

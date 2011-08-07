@@ -1,2 +1,2 @@
 QT += opengl
-LIBS += -l$$qtLibraryTarget(GLC_lib)
+LIBS *= -l$$qtLibraryName(GLC_lib)

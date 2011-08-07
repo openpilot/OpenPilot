@@ -1,2 +1,2 @@
-LIBS += -l$$qtLibraryTarget(QExtSerialPort)
+LIBS *= -l$$qtLibraryName(QExtSerialPort)
 

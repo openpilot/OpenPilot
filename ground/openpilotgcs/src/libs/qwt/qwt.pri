@@ -1,2 +1,2 @@
-LIBS += -l$$qtLibraryTarget(Qwt)
+LIBS *= -l$$qtLibraryName(Qwt)
 

@@ -85,6 +85,7 @@ SRC += $(PIOSSTM32FXX)/pios_irq.c
 #SRC += $(PIOSSTM32FXX)/pios_i2c.c
 SRC += $(PIOSSTM32FXX)/pios_gpio.c
 SRC += $(PIOSSTM32FXX)/pios_spi.c
+SRC += $(PIOSSTM32FXX)/pios_iap.c
 
 ## PIOS Hardware (Common)
 #SRC += $(PIOSCOMMON)/pios_com.c
@@ -93,7 +94,6 @@ SRC += $(PIOSCOMMON)/pios_board_info.c
 SRC += $(PIOSCOMMON)/pios_opahrs_proto.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 SRC += $(PIOSCOMMON)/pios_bl_helper.c
-SRC += $(PIOSCOMMON)/pios_iap.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c

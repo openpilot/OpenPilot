@@ -29,22 +29,22 @@
 #include "ahrs_spi_program.h"
 #include "pios_spi.h"
 
-PROGERR TransferPacket(uint32_t spi_id, AhrsProgramPacket *txBuf, AhrsProgramPacket *rxBuf);
+PROGERR TransferPacket(uint32_t spi_id, AhrsProgramPacket *txBuf,
+		AhrsProgramPacket *rxBuf);
 
 #define MAX_CONNECT_TRIES 500 //half a second
-
-bool AhrsProgramConnect(uint32_t spi_id)
-{
+bool AhrsProgramConnect(uint32_t spi_id) {
 	AhrsProgramPacket rxBuf;
 	AhrsProgramPacket txBuf;
 	memset(&rxBuf, 0, sizeof(AhrsProgramPacket));
-	memcpy(&txBuf,SPI_PROGRAM_REQUEST,SPI_PROGRAM_REQUEST_LENGTH);
-	for(int ct = 0; ct < MAX_CONNECT_TRIES; ct++) {
+	memcpy(&txBuf, SPI_PROGRAM_REQUEST, SPI_PROGRAM_REQUEST_LENGTH);
+	for (int ct = 0; ct < MAX_CONNECT_TRIES; ct++) {
 		PIOS_SPI_RC_PinSet(spi_id, 0);
 		uint32_t res = PIOS_SPI_TransferBlock(spi_id, (uint8_t *) &txBuf,
-											  (uint8_t *) & rxBuf, SPI_PROGRAM_REQUEST_LENGTH +1, NULL);
+				(uint8_t *) &rxBuf, SPI_PROGRAM_REQUEST_LENGTH + 1, NULL);
 		PIOS_SPI_RC_PinSet(spi_id, 1);
-		if(res == 0 && memcmp(&rxBuf, SPI_PROGRAM_ACK, SPI_PROGRAM_REQUEST_LENGTH) == 0) {
+		if (res == 0 && memcmp(&rxBuf, SPI_PROGRAM_ACK,
+				SPI_PROGRAM_REQUEST_LENGTH) == 0) {
 			return (true);
 		}
 
@@ -53,25 +53,24 @@ bool AhrsProgramConnect(uint32_t spi_id)
 	return (false);
 }
 
-
-PROGERR AhrsProgramWrite(uint32_t spi_id, uint32_t address, void * data, uint32_t size)
-{
+PROGERR AhrsProgramWrite(uint32_t spi_id, uint32_t address, void * data,
+		uint32_t size) {
 	AhrsProgramPacket rxBuf;
 	AhrsProgramPacket txBuf;
 	memset(&rxBuf, 0, sizeof(AhrsProgramPacket));
-	memcpy(txBuf.data,data,size);
+	memcpy(txBuf.data, data, size);
 	txBuf.size = size;
 	txBuf.type = PROGRAM_WRITE;
 	txBuf.address = address;
 	PROGERR ret = TransferPacket(spi_id, &txBuf, &rxBuf);
-	if(ret != PROGRAM_ERR_OK) {
-		return(ret);
+	if (ret != PROGRAM_ERR_OK) {
+		return (ret);
 	}
-	return(PROGRAM_ERR_OK);
+	return (PROGRAM_ERR_OK);
 }
 
-PROGERR AhrsProgramRead(uint32_t spi_id, uint32_t address, void * data, uint32_t size)
-{
+PROGERR AhrsProgramRead(uint32_t spi_id, uint32_t address, void * data,
+		uint32_t size) {
 	AhrsProgramPacket rxBuf;
 	AhrsProgramPacket txBuf;
 	memset(&rxBuf, 0, sizeof(AhrsProgramPacket));
@@ -79,59 +78,54 @@ PROGERR AhrsProgramRead(uint32_t spi_id, uint32_t address, void * data, uint32_t
 	txBuf.type = PROGRAM_READ;
 	txBuf.address = address;
 	PROGERR ret = TransferPacket(spi_id, &txBuf, &rxBuf);
-	if(ret != PROGRAM_ERR_OK) {
-		return(ret);
+	if (ret != PROGRAM_ERR_OK) {
+		return (ret);
 	}
 	memcpy(data, rxBuf.data, size);
-	return(PROGRAM_ERR_OK);
+	return (PROGRAM_ERR_OK);
 }
 
-PROGERR AhrsProgramReboot(uint32_t spi_id)
-{
+PROGERR AhrsProgramReboot(uint32_t spi_id) {
 	AhrsProgramPacket rxBuf;
 	AhrsProgramPacket txBuf;
 	memset(&rxBuf, 0, sizeof(AhrsProgramPacket));
 	txBuf.type = PROGRAM_REBOOT;
-	memcpy(txBuf.data,REBOOT_CONFIRMATION,REBOOT_CONFIRMATION_LENGTH);
+	memcpy(txBuf.data, REBOOT_CONFIRMATION, REBOOT_CONFIRMATION_LENGTH);
 	PROGERR ret = TransferPacket(spi_id, &txBuf, &rxBuf);
 	//If AHRS has rebooted we will get comms errors
-	if(ret == PROGRAM_ERR_LINK) {
-		return(PROGRAM_ERR_OK);
+	if (ret == PROGRAM_ERR_LINK) {
+		return (PROGRAM_ERR_OK);
 	}
-	return(PROGRAM_ERR_FUNCTION);
+	return (PROGRAM_ERR_FUNCTION);
 }
 
-PROGERR TransferPacket(uint32_t spi_id, AhrsProgramPacket *txBuf, AhrsProgramPacket *rxBuf)
-{
+PROGERR TransferPacket(uint32_t spi_id, AhrsProgramPacket *txBuf,
+		AhrsProgramPacket *rxBuf) {
 	static uint32_t pktId = 0;
 	pktId++;
 	txBuf->packetId = pktId;
 	txBuf->crc = GenerateCRC(txBuf);
 	int ct = 0;
-	for(; ct < MAX_CONNECT_TRIES; ct++) {
+	for (; ct < MAX_CONNECT_TRIES; ct++) {
 		PIOS_SPI_RC_PinSet(spi_id, 0);
 		uint32_t res = PIOS_SPI_TransferBlock(spi_id, (uint8_t *) txBuf,
-											  (uint8_t *) rxBuf, sizeof(AhrsProgramPacket), NULL);
+				(uint8_t *) rxBuf, sizeof(AhrsProgramPacket), NULL);
 		PIOS_SPI_RC_PinSet(spi_id, 1);
-		if(res == 0) {
-			if(rxBuf->type != PROGRAM_NULL &&
-					rxBuf->crc == GenerateCRC(rxBuf) &&
-					rxBuf->packetId == pktId) {
+		if (res == 0) {
+			if (rxBuf->type != PROGRAM_NULL && rxBuf->crc == GenerateCRC(rxBuf)
+					&& rxBuf->packetId == pktId) {
 				break;
 			}
 		}
 
 		vTaskDelay(1 / portTICK_RATE_MS);
 	}
-	if(ct == MAX_CONNECT_TRIES) {
+	if (ct == MAX_CONNECT_TRIES) {
 		return (PROGRAM_ERR_LINK);
 	}
-	if(rxBuf->type  != PROGRAM_ACK) {
-		return(PROGRAM_ERR_FUNCTION);
+	if (rxBuf->type != PROGRAM_ACK) {
+		return (PROGRAM_ERR_FUNCTION);
 	}
-	return(PROGRAM_ERR_OK);
+	return (PROGRAM_ERR_OK);
 }
-
-
-
 

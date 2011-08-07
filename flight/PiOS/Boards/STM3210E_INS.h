@@ -134,12 +134,7 @@ extern uint32_t pios_i2c_gyro_adapter_id;
 //-------------------------
 #define PIOS_COM_MAX_DEVS               2
 
-extern uint32_t pios_com_gps_id;
-#define PIOS_COM_GPS                    (pios_com_gps_id)
-
-#ifdef PIOS_ENABLE_AUX_UART
 extern uint32_t pios_com_aux_id;
-#endif
 #define PIOS_COM_AUX                    (pios_com_aux_id)
 #define PIOS_COM_DEBUG                  PIOS_COM_AUX
 

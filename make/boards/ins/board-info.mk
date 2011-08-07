@@ -4,10 +4,10 @@ BOOTLOADER_VERSION  := 0x00
 HW_TYPE             := 0x00
 
 MCU                 := cortex-m3
-CHIP                := STM32F103RET
+CHIP                := STM32F205RGT
 BOARD               := STM3210E_INS
 MODEL               := HD
-MODEL_SUFFIX        := _OP
+MODEL_SUFFIX        := 
 
 # Note: These must match the values in link_$(BOARD)_memory.ld
 BL_BANK_BASE        := 0x08000000  # Start of bootloader flash

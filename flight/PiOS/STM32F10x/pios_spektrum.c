@@ -122,6 +122,11 @@ static int32_t PIOS_SPEKTRUM_Get(uint32_t rcvr_id, uint8_t channel)
 */
 static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg, uint8_t bind)
 {
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_InitStructure.GPIO_Pin = cfg->bind.init.GPIO_Pin;
+	GPIO_InitStructure.GPIO_Speed = cfg->bind.init.GPIO_Speed;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+
 	/* just to limit bind pulses */
 	bind=(bind<=10)?bind:10;
 
@@ -141,6 +146,7 @@ static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg, uint8_t bin
 		PIOS_DELAY_WaituS(120);
 	}
 	/* RX line, set input and wait for data, PIOS_SPEKTRUM_Init */
+	GPIO_Init(cfg->bind.gpio, &GPIO_InitStructure);
 
 	return true;
 }

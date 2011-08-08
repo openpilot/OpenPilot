@@ -56,9 +56,9 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
     top->setMargin(0);*/
 
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->setSpacing(0);
-    layout->setContentsMargins(5,0,5,0);
-    layout->addWidget(new QLabel("Connections: "));
+    layout->setSpacing(5);
+    layout->setContentsMargins(5,5,5,5);
+    layout->addWidget(new QLabel(tr("Connections:")));
 
     m_availableDevList = new QComboBox;
     //m_availableDevList->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -67,7 +67,7 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
     m_availableDevList->setContextMenuPolicy(Qt::CustomContextMenu);
     layout->addWidget(m_availableDevList);
 
-    m_connectBtn = new QPushButton("Connect");
+    m_connectBtn = new QPushButton(tr("Connect"));
     m_connectBtn->setEnabled(false);
     layout->addWidget(m_connectBtn);
 
@@ -78,7 +78,7 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
     setLayout(layout);
 
     //    modeStack->insertCornerWidget(modeStack->cornerWidgetCount()-1, this);
-    modeStack->setCornerWidget(this, Qt::BottomRightCorner);
+    modeStack->setCornerWidget(this, Qt::TopRightCorner);
 
 	QObject::connect(m_connectBtn, SIGNAL(pressed()), this, SLOT(onConnectPressed()));
 }

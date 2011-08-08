@@ -1,26 +1,26 @@
- #####
- # Project: OpenPilot INS
- #
- #
- # Makefile for OpenPilot INS project
- #
- # The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2011.
- #
- #
- # This program is free software; you can redistribute it and/or modify
- # it under the terms of the GNU General Public License as published by
- # the Free Software Foundation; either version 3 of the License, or
- # (at your option) any later version.
- #
- # This program is distributed in the hope that it will be useful, but
- # WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- # or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
- # for more details.
- #
- # You should have received a copy of the GNU General Public License along
- # with this program; if not, write to the Free Software Foundation, Inc.,
- # 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- #####
+#####
+# Project: OpenPilot INS
+#
+#
+# Makefile for OpenPilot INS project
+#
+# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
+#
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+#####
 
 WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
 TOP      := $(realpath $(WHEREAMI)/../../)
@@ -55,13 +55,12 @@ PIOS = ../PiOS
 PIOSINC = $(PIOS)/inc
 FLIGHTLIB = ../Libraries
 FLIGHTLIBINC = ../Libraries/inc
-PIOSSTM32F10X = $(PIOS)/STM32F10x
+PIOSSTM32FXX = $(PIOS)/STM32F2xx
 PIOSCOMMON = $(PIOS)/Common
 PIOSBOARDS = $(PIOS)/Boards
-APPLIBDIR = $(PIOSSTM32F10X)/Libraries
+APPLIBDIR = $(PIOSSTM32FXX)/Libraries
 STMLIBDIR = $(APPLIBDIR)
-STMSPDDIR = $(STMLIBDIR)/STM32F10x_StdPeriph_Driver
-STMUSBDIR = $(STMLIBDIR)/STM32_USB-FS-Device_Driver
+STMSPDDIR = $(STMLIBDIR)/STM32F2xx_StdPeriph_Driver
 STMSPDSRCDIR = $(STMSPDDIR)/src
 STMSPDINCDIR = $(STMSPDDIR)/inc
 CMSISDIR  = $(STMLIBDIR)/CMSIS/Core/CM3
@@ -80,7 +79,6 @@ OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 ## INS:
 SRC = ins.c
 SRC += pios_board.c
-SRC += ahrs_timer.c
 SRC += insgps13state.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(FLIGHTLIB)/fifo_buffer.c
@@ -91,16 +89,16 @@ SRC += $(BOOT)/ahrs_slave_test.c
 SRC += $(BOOT)/ahrs_spi_program.c
 
 ## PIOS Hardware (STM32F10x)
-SRC += $(PIOSSTM32F10X)/pios_sys.c
-SRC += $(PIOSSTM32F10X)/pios_led.c
-SRC += $(PIOSSTM32F10X)/pios_delay.c
-SRC += $(PIOSSTM32F10X)/pios_usart.c
-SRC += $(PIOSSTM32F10X)/pios_irq.c
-SRC += $(PIOSSTM32F10X)/pios_i2c.c
-SRC += $(PIOSSTM32F10X)/pios_debug.c
-SRC += $(PIOSSTM32F10X)/pios_gpio.c
-SRC += $(PIOSSTM32F10X)/pios_spi.c
-SRC += $(PIOSSTM32F10X)/pios_exti.c
+SRC += $(PIOSSTM32FXX)/pios_sys.c
+SRC += $(PIOSSTM32FXX)/pios_led.c
+SRC += $(PIOSSTM32FXX)/pios_delay.c
+SRC += $(PIOSSTM32FXX)/pios_usart.c
+SRC += $(PIOSSTM32FXX)/pios_irq.c
+SRC += $(PIOSSTM32FXX)/pios_i2c.c
+SRC += $(PIOSSTM32FXX)/pios_debug.c
+SRC += $(PIOSSTM32FXX)/pios_gpio.c
+SRC += $(PIOSSTM32FXX)/pios_spi.c
+SRC += $(PIOSSTM32FXX)/pios_exti.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_com.c
@@ -114,26 +112,24 @@ SRC += $(PIOSCOMMON)/pios_bl_helper.c
 
 ## CMSIS for STM32
 SRC += $(CMSISDIR)/core_cm3.c
-SRC += $(CMSISDIR)/system_stm32f10x.c
+SRC += $(CMSISDIR)/system_stm32f2xx.c
 
 ## Used parts of the STM-Library
-SRC += $(STMSPDSRCDIR)/stm32f10x_adc.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_bkp.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_crc.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_dac.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_dma.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_exti.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_flash.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_gpio.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_i2c.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_pwr.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_rcc.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_rtc.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_spi.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_tim.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_usart.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_adc.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_crc.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_dac.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_dma.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_exti.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_flash.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_gpio.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_i2c.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_pwr.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_rcc.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_rtc.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_spi.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_tim.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_usart.c
 SRC += $(STMSPDSRCDIR)/misc.c
-
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # use file-extension c for "c-only"-files
 ## just for testing, timer.c could be compiled in thumb-mode too
@@ -155,7 +151,7 @@ CPPSRCARM =
 # Even though the DOS/Win* filesystem matches both .s and .S the same,
 # it will preserve the spelling of the filenames, and gcc itself does
 # care about how the name is spelled on its command-line.
-ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL)$(MODEL_SUFFIX).S
+ASRC = $(PIOSSTM32FXX)/startup_stm32f2xx.S
 
 # List Assembler source files here which must be assembled in ARM-Mode..
 ASRCARM =
@@ -165,7 +161,7 @@ ASRCARM =
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)
-EXTRAINCDIRS  += $(PIOSSTM32F10X)
+EXTRAINCDIRS  += $(PIOSSTM32FXX)
 EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(PIOSBOARDS)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
@@ -201,6 +197,8 @@ CFLAGS += -DGENERAL_COV
 else
 CFLAGS += -Os
 endif
+
+CFLAGS += -DHSE_VALUE=$(OSCILLATOR_FREQ)
 
 # Output format. (can be ihex or binary or both)
 #  binary to create a load-image in raw-binary format i.e. for SAM-BA,
@@ -243,7 +241,6 @@ CSTANDARD = -std=gnu99
 #    -adhlns...: create assembler listing
 #
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
-
 
 CFLAGS += -g$(DEBUGF)
 
@@ -359,7 +356,7 @@ $(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
 $(eval $(call OPFW_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BOARD_TYPE),$(BOARD_REVISION)))
 
 # Add jtag targets (program and wipe)
-$(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(FW_BANK_BASE),$(FW_BANK_SIZE)))
+$(eval $(call JTAG_TEMPLATE_F2X,$(OUTDIR)/$(TARGET).bin,$(FW_BANK_BASE),$(FW_BANK_SIZE)))
 
 .PHONY: elf lss sym hex bin bino opfw
 elf: $(OUTDIR)/$(TARGET).elf
@@ -398,7 +395,7 @@ clean_list :
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).sym
 	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).lss
-	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin.o	
+	$(V1) $(REMOVE) $(OUTDIR)/$(TARGET).bin.o
 	$(V1) $(REMOVE) $(ALLOBJ)
 	$(V1) $(REMOVE) $(LSTFILES)
 	$(V1) $(REMOVE) $(DEPFILES)

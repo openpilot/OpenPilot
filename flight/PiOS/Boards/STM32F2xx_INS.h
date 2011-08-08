@@ -141,7 +141,7 @@ extern uint32_t pios_com_aux_id;
 //-------------------------
 // System Settings
 //-------------------------
-#define PIOS_MASTER_CLOCK                       72000000
+#define PIOS_MASTER_CLOCK                       120000000
 #define PIOS_PERIPHERAL_CLOCK                   (PIOS_MASTER_CLOCK / 2)
 
 //-------------------------

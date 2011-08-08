@@ -36,6 +36,8 @@
 #ifndef PIOS_CONFIG_H
 #define PIOS_CONFIG_H
 
+#define STM32F2XX
+
 /* Enable/Disable PiOS Modules */
 #define PIOS_INCLUDE_DELAY
 #define PIOS_INCLUDE_I2C
@@ -45,7 +47,7 @@
 #define PIOS_INCLUDE_SYS
 #define PIOS_INCLUDE_USART
 #define PIOS_INCLUDE_COM
-#define PIOS_INCLUDE_COM_AUX
+//#define PIOS_INCLUDE_COM_AUX
 #define PIOS_INCLUDE_GPS
 #define PIOS_INCLUDE_BMA180
 #define PIOS_INCLUDE_HMC5883

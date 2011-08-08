@@ -35,6 +35,21 @@
 #include <pios.h>
 #include <pios_stm32.h>
 
+/* XXX these two should be reconciled - separate for now to avoid breaking other targets */
+#ifdef STM32F2XX
+struct pios_spi_cfg {
+	SPI_TypeDef *regs;
+	uint32_t remap;				/* GPIO_Remap_* or GPIO_AF_* */
+	SPI_InitTypeDef init;
+	bool use_crc;
+	struct stm32_dma dma;
+	struct stm32_gpio sclk;
+	struct stm32_gpio miso;
+	struct stm32_gpio mosi;
+	uint32_t slave_count;
+	struct stm32_gpio ssel[];
+};
+#else
 struct pios_spi_cfg {
 	SPI_TypeDef *regs;
 	SPI_InitTypeDef init;
@@ -45,6 +60,7 @@ struct pios_spi_cfg {
 	struct stm32_gpio miso;
 	struct stm32_gpio mosi;
 };
+#endif
 
 struct pios_spi_dev {
 	const struct pios_spi_cfg * cfg;

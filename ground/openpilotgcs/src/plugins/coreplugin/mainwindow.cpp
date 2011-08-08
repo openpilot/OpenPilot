@@ -179,7 +179,9 @@ MainWindow::MainWindow() :
     m_modeStack->setIconSize(QSize(24,24));
     m_modeStack->setTabPosition(QTabWidget::South);
     m_modeStack->setMovable(false);
+#ifndef Q_WS_MAC
     m_modeStack->setDocumentMode(true);
+#endif
     m_modeManager = new ModeManager(this, m_modeStack);
 
     m_connectionManager = new ConnectionManager(this, m_modeStack);

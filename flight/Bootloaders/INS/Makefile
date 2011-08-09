@@ -237,7 +237,11 @@ ifeq ($(DEBUG),YES)
 CFLAGS = 
 endif
 
+# This is not the best place for these.  Really should abstract out
+# to the board file or something
 CFLAGS += -DHSE_VALUE=$(OSCILLATOR_FREQ)
+CFLAGS += -DSTM32F2XX
+CFLAGS += -DMEM_SIZE=1024000000
 
 CFLAGS += -g$(DEBUGF)
 CFLAGS += -O$(OPT)

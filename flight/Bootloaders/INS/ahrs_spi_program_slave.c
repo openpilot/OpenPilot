@@ -29,7 +29,7 @@
 
 #include "pios_opahrs_proto.h"
 #include "pios_spi.h"
-#include "STM32103CB_AHRS.h"
+#include "pios_board.h"
 
 #include "ahrs_bl.h"
 #include "ahrs_spi_program_slave.h"

@@ -198,7 +198,11 @@ else
 CFLAGS += -Os
 endif
 
+# This is not the best place for these.  Really should abstract out
+# to the board file or something
 CFLAGS += -DHSE_VALUE=$(OSCILLATOR_FREQ)
+CFLAGS += -DSTM32F2XX
+CFLAGS += -DMEM_SIZE=1024000000
 
 # Output format. (can be ihex or binary or both)
 #  binary to create a load-image in raw-binary format i.e. for SAM-BA,

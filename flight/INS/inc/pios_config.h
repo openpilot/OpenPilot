@@ -36,8 +36,6 @@
 #ifndef PIOS_CONFIG_H
 #define PIOS_CONFIG_H
 
-#define STM32F2XX
-
 /* Enable/Disable PiOS Modules */
 #define PIOS_INCLUDE_DELAY
 #define PIOS_INCLUDE_I2C

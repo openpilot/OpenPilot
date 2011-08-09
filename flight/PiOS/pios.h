@@ -46,14 +46,12 @@
 #include <string.h>
 #include <math.h>
 
+#include "pios_config.h"
 /* STM32 Std Perf Lib */
 #if defined(STM32F2XX)
 #include <stm32f2xx.h>
-// XXX probably don't need this (header above gets it)
-#include <stm32f2xx_conf.h>
 #else
 #include <stm32f10x.h>
-#include <stm32f10x_conf.h>
 #endif
 
 #if defined(PIOS_INCLUDE_SDCARD)

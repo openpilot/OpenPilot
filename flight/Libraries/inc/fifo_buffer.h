@@ -26,7 +26,7 @@
 #ifndef _FIFO_BUFFER_H_
 #define _FIFO_BUFFER_H_
 
-#include "pios.h"
+#include "stdint.h"
 
 // *********************
 

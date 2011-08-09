@@ -397,7 +397,6 @@ static uint8_t pios_com_gps_rx_buffer[PIOS_COM_GPS_RX_BUF_LEN];
 /*
  * I2C Adapters
  */
-
 void PIOS_I2C_pres_mag_adapter_ev_irq_handler(void);
 void PIOS_I2C_pres_mag_adapter_er_irq_handler(void);
 void I2C1_EV_IRQHandler()
@@ -407,6 +406,7 @@ __attribute__ ((alias("PIOS_I2C_pres_mag_adapter_er_irq_handler")));
 
 static const struct pios_i2c_adapter_cfg pios_i2c_pres_mag_adapter_cfg = {
 	.regs = I2C1,
+	.remap = GPIO_AF_I2C1,
 	.init = {
 		.I2C_Mode = I2C_Mode_I2C,
 		.I2C_OwnAddress1 = 0,
@@ -477,6 +477,7 @@ void I2C2_ER_IRQHandler() __attribute__ ((alias ("PIOS_I2C_gyro_adapter_er_irq_h
 
 static const struct pios_i2c_adapter_cfg pios_i2c_gyro_adapter_cfg = {
 	.regs = I2C2,
+	.remap = GPIO_AF_I2C2,
 	.init = {
 		.I2C_Mode                = I2C_Mode_I2C,
 		.I2C_OwnAddress1         = 0,

@@ -33,6 +33,7 @@
 
 struct pios_i2c_adapter_cfg {
 	I2C_TypeDef *regs;
+	uint32_t remap;
 	I2C_InitTypeDef init;
 
 	uint32_t transfer_timeout_ms;

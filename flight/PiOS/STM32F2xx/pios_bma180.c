@@ -7,8 +7,7 @@
  * @{
  *
  * @file       pios_bma180.h
- * @author     David "Buzz" Carlson (buzz@chebuzz.com)
- * 				The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
  * @brief      PiOS BMA180 digital accelerometer driver.
  *                 - Driver for the BMA180 digital accelerometer on the SPI bus.
  * @see        The GNU Public License (GPL) Version 3
@@ -62,7 +61,9 @@ void PIOS_BMA180_Init()
 	
 	/* Configure EOC pin as input floating */
 	GPIO_InitStructure.GPIO_Pin = PIOS_BMA180_DRDY_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(PIOS_BMA180_DRDY_GPIO_PORT, &GPIO_InitStructure);
 	
 	/* Configure the End Of Conversion (EOC) interrupt */

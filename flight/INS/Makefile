@@ -88,7 +88,7 @@ SRC += $(BOOT)/ahrs_spi_program_slave.c
 SRC += $(BOOT)/ahrs_slave_test.c
 SRC += $(BOOT)/ahrs_spi_program.c
 
-## PIOS Hardware (STM32F10x)
+## PIOS Hardware (STM32F2xx)
 SRC += $(PIOSSTM32FXX)/pios_sys.c
 SRC += $(PIOSSTM32FXX)/pios_led.c
 SRC += $(PIOSSTM32FXX)/pios_delay.c
@@ -98,13 +98,13 @@ SRC += $(PIOSSTM32FXX)/pios_i2c.c
 SRC += $(PIOSSTM32FXX)/pios_debug.c
 SRC += $(PIOSSTM32FXX)/pios_gpio.c
 SRC += $(PIOSSTM32FXX)/pios_spi.c
-SRC += $(PIOSSTM32FXX)/pios_exti.c
+#SRC += $(PIOSSTM32FXX)/pios_exti.c
+SRC += $(PIOSSTM32FXX)/pios_iap.c
+SRC += $(PIOSSTM32FXX)/pios_bma180.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
-SRC += $(PIOSCOMMON)/pios_iap.c
-SRC += $(PIOSCOMMON)/pios_bma180.c
 SRC += $(PIOSCOMMON)/pios_hmc5883.c
 SRC += $(PIOSCOMMON)/pios_bmp085.c
 SRC += $(PIOSCOMMON)/pios_imu3000.c

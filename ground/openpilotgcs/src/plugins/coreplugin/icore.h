@@ -88,7 +88,7 @@ public:
 
     virtual QSettings *settings(QSettings::Scope scope = QSettings::UserScope) const = 0;
     virtual SettingsDatabase *settingsDatabase() const = 0;
-    virtual void readMainSettings(QSettings* qs) = 0;
+    virtual void readMainSettings(QSettings* qs, bool workspaceDiffOnly = false) = 0;
     virtual void saveMainSettings(QSettings* qs) = 0;
     virtual void readSettings(IConfigurablePlugin* plugin, QSettings* qs = 0) = 0;
     virtual void saveSettings(IConfigurablePlugin* plugin, QSettings* qs = 0) = 0;

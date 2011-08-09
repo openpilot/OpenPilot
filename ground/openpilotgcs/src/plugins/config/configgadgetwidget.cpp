@@ -52,11 +52,11 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
-    ftw = new FancyTabWidget(this, true);
-
+    ftw = new MyTabbedStackWidget(this, true, true);
     ftw->setIconSize(64);
 
     QVBoxLayout *layout = new QVBoxLayout;
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(ftw);
     setLayout(layout);
 

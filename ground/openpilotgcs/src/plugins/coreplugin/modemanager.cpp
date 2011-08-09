@@ -30,6 +30,7 @@
 
 #include "fancytabwidget.h"
 #include "fancyactionbar.h"
+#include "utils/mytabwidget.h"
 #include "icore.h"
 #include "mainwindow.h"
 
@@ -59,18 +60,17 @@ using namespace Core::Internal;
 
 ModeManager *ModeManager::m_instance = 0;
 
-ModeManager::ModeManager(Internal::MainWindow *mainWindow, FancyTabWidget *modeStack) :
+ModeManager::ModeManager(Internal::MainWindow *mainWindow, MyTabWidget *modeStack) :
     m_mainWindow(mainWindow),
     m_modeStack(modeStack),
-    m_signalMapper(new QSignalMapper(this))
+    m_signalMapper(new QSignalMapper(this)),
+    m_isReprioritizing(false)
 {
     m_instance = this;
 
-    m_actionBar = new FancyActionBar(modeStack);
-//    m_modeStack->addCornerWidget(m_actionBar);
-
-    connect(m_modeStack, SIGNAL(currentAboutToShow(int)), SLOT(currentTabAboutToChange(int)));
-    connect(m_modeStack, SIGNAL(currentChanged(int)), SLOT(currentTabChanged(int)));
+//    connect((m_modeStack), SIGNAL(currentAboutToShow(int)), SLOT(currentTabAboutToChange(int)));
+    connect(m_modeStack, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
+    connect(m_modeStack, SIGNAL(tabMoved(int,int)), this, SLOT(tabMoved(int,int)));
     connect(m_signalMapper, SIGNAL(mapped(QString)), this, SLOT(activateMode(QString)));
 }
 
@@ -87,7 +87,7 @@ void ModeManager::addWidget(QWidget *widget)
     // We want the actionbar to stay on the bottom
     // so m_modeStack->cornerWidgetCount() -1 inserts it at the position immediately above
     // the actionbar
-    m_modeStack->insertCornerWidget(m_modeStack->cornerWidgetCount() -1, widget);
+//    m_modeStack->insertCornerWidget(m_modeStack->cornerWidgetCount() -1, widget);
 }
 
 IMode *ModeManager::currentMode() const
@@ -150,6 +150,14 @@ void ModeManager::objectAdded(QObject *obj)
 
     m_modeShortcuts.insert(index, cmd);
     connect(cmd, SIGNAL(keySequenceChanged()), this, SLOT(updateModeToolTip()));
+
+    setDefaultKeyshortcuts();
+
+    m_signalMapper->setMapping(shortcut, mode->uniqueModeName());
+    connect(shortcut, SIGNAL(activated()), m_signalMapper, SLOT(map()));
+}
+
+void ModeManager::setDefaultKeyshortcuts() {
     for (int i = 0; i < m_modeShortcuts.size(); ++i) {
         Command *currentCmd = m_modeShortcuts.at(i);
         bool currentlyHasDefaultSequence = (currentCmd->keySequence()
@@ -162,9 +170,6 @@ void ModeManager::objectAdded(QObject *obj)
         if (currentlyHasDefaultSequence)
             currentCmd->setKeySequence(currentCmd->defaultKeySequence());
     }
-
-    m_signalMapper->setMapping(shortcut, mode->uniqueModeName());
-    connect(shortcut, SIGNAL(activated()), m_signalMapper, SLOT(map()));
 }
 
 void ModeManager::updateModeToolTip()
@@ -182,7 +187,8 @@ void ModeManager::updateModeNameIcon(IMode *mode, const QIcon &icon, const QStri
     int index = indexOf(mode->uniqueModeName());
     if (index < 0)
         return;
-    m_modeStack->updateTabNameIcon(index, icon, label);
+    m_modeStack->setTabIcon(index, icon);
+    m_modeStack->setTabText(index, label);
 }
 
 void ModeManager::aboutToRemoveObject(QObject *obj)
@@ -194,7 +200,9 @@ void ModeManager::aboutToRemoveObject(QObject *obj)
     const int index = m_modes.indexOf(mode);
     m_modes.remove(index);
     m_modeShortcuts.remove(index);
+    disconnect(m_modeStack, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
     m_modeStack->removeTab(index);
+    connect(m_modeStack, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
 
     m_mainWindow->removeContextObject(mode);
 }
@@ -209,7 +217,7 @@ void ModeManager::addAction(Command *command, int priority, QMenu *menu)
         if (p > priority)
             ++index;
 
-    m_actionBar->insertAction(index, command->action(), menu);
+//    m_actionBar->insertAction(index, command->action(), menu);
 }
 
 void ModeManager::currentTabAboutToChange(int index)
@@ -223,6 +231,7 @@ void ModeManager::currentTabAboutToChange(int index)
 
 void ModeManager::currentTabChanged(int index)
 {
+//    qDebug() << "Current tab changed " << index;
     // Tab index changes to -1 when there is no tab left.
     if (index >= 0) {
         IMode *mode = m_modes.at(index);
@@ -241,6 +250,53 @@ void ModeManager::currentTabChanged(int index)
         core->updateContext();
     }
 }
+
+void ModeManager::tabMoved(int from, int to)
+{
+    IMode *mode = m_modes.at(from);
+    m_modes.remove(from);
+    m_modes.insert(to, mode);
+    Command *cmd = m_modeShortcuts.at(from);
+    m_modeShortcuts.remove(from);
+    m_modeShortcuts.insert(to, cmd);
+    setDefaultKeyshortcuts();
+    // Reprioritize, high priority means show to the left
+    if (!m_isReprioritizing) {
+        for (int i = 0; i < m_modes.count(); ++i) {
+            m_modes.at(i)->setPriority(100-i);
+        }
+        emit newModeOrder(m_modes);
+    }    
+}
+
+void ModeManager::reorderModes(QMap<QString, int> priorities)
+{
+    foreach (IMode *mode, m_modes)
+        mode->setPriority(priorities.value(QString(QLatin1String(mode->uniqueModeName())), mode->priority()));
+
+    m_isReprioritizing = true;
+    IMode *current = currentMode();
+    // Bubble sort
+    bool swapped = false;
+    do {
+        swapped = false;
+        for (int i = 0; i < m_modes.count()-1; ++i) {
+            IMode *mode1 = m_modes.at(i);
+            IMode *mode2 = m_modes.at(i+1);
+//            qDebug() << "Comparing " << i << " to " << i+1 << " p1 " << mode1->priority() << " p2 " << mode2->priority();
+            if (mode2->priority() > mode1->priority()) {
+                m_modeStack->moveTab(i, i+1);
+//                qDebug() << "Tab moved from " << i << " to " << i+1;
+                swapped = true;
+            }
+        }
+    } while (swapped);
+    m_isReprioritizing = false;
+    m_modeStack->setCurrentIndex(0);
+    activateMode(current->uniqueModeName());
+    emit newModeOrder(m_modes);
+}
+
 
 void ModeManager::setFocusToCurrentMode()
 {

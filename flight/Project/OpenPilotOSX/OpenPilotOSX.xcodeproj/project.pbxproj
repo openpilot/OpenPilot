@@ -2695,6 +2695,7 @@
 		65C9908E13AC5D8D0082BD60 /* uavobjectsinit_linker.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavobjectsinit_linker.c; sourceTree = "<group>"; };
 		65D2CA841248F9A400B1E7D6 /* mixersettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixersettings.xml; sourceTree = "<group>"; };
 		65D2CA851248F9A400B1E7D6 /* mixerstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixerstatus.xml; sourceTree = "<group>"; };
+		65DEA79113F2143B00095B06 /* cameradesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = cameradesired.xml; sourceTree = "<group>"; };
 		65E410AE12F65AEA00725888 /* attitudesettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = attitudesettings.xml; sourceTree = "<group>"; };
 		65E6D80713E3A4D0002A557A /* hwsettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = hwsettings.xml; sourceTree = "<group>"; };
 		65E6DF7112E02E8E00058553 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
@@ -7475,6 +7476,7 @@
 				65C35E7712EFB2F3004811C2 /* velocityactual.xml */,
 				65C35E7812EFB2F3004811C2 /* velocitydesired.xml */,
 				65C35E7912EFB2F3004811C2 /* watchdogstatus.xml */,
+				65DEA79113F2143B00095B06 /* cameradesired.xml */,
 			);
 			path = uavobjectdefinition;
 			sourceTree = "<group>";

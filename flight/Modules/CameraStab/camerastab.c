@@ -50,6 +50,7 @@
 #include "accessorydesired.h"
 #include "attitudeactual.h"
 #include "camerastabsettings.h"
+#include "cameradesired.h"
 
 //
 // Configuration
@@ -75,6 +76,7 @@ int32_t CameraStabInitialize(void)
 	ev.event = 0;
 
 	CameraStabSettingsInitialize();
+	CameraDesiredInitialize();
 
 	EventPeriodicCallbackCreate(&ev, attitudeUpdated, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
 
@@ -87,6 +89,7 @@ static void attitudeUpdated(UAVObjEvent* ev)
 		return;
 
 	float attitude;
+	float output;
 	AccessoryDesiredData accessory;
 
 	CameraStabSettingsData cameraStab;
@@ -108,26 +111,18 @@ static void attitudeUpdated(UAVObjEvent* ev)
 	}
 
 	// Set output channels
-	if(cameraStab.Outputs[CAMERASTABSETTINGS_OUTPUTS_ROLL] != CAMERASTABSETTINGS_OUTPUTS_NONE) {
-		AttitudeActualRollGet(&attitude);
-		accessory.AccessoryVal = (attitude + inputs[0]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL];
-		if(AccessoryDesiredInstSet(cameraStab.Outputs[CAMERASTABSETTINGS_OUTPUTS_ROLL] - CAMERASTABSETTINGS_OUTPUTS_ACCESSORY0, &accessory) != 0)
-			AccessoryDesiredCreateInstance();
-	}
+	AttitudeActualRollGet(&attitude);
+	output = (attitude + inputs[0]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL];
+	CameraDesiredRollSet(&output);
 
-	if(cameraStab.Outputs[CAMERASTABSETTINGS_OUTPUTS_PITCH] != CAMERASTABSETTINGS_OUTPUTS_NONE) {
-		AttitudeActualPitchGet(&attitude);
-		accessory.AccessoryVal = (attitude + inputs[1])  / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH];
-		if(AccessoryDesiredInstSet(cameraStab.Outputs[CAMERASTABSETTINGS_OUTPUTS_PITCH] - CAMERASTABSETTINGS_OUTPUTS_ACCESSORY0, &accessory) != 0)
-			AccessoryDesiredCreateInstance();
-	}
+	AttitudeActualPitchGet(&attitude);
+	output = (attitude + inputs[1])  / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH];
+	CameraDesiredPitchSet(&output);
 
-	if(cameraStab.Outputs[CAMERASTABSETTINGS_OUTPUTS_YAW] != CAMERASTABSETTINGS_OUTPUTS_NONE) {
-		AttitudeActualYawGet(&attitude);
-		accessory.AccessoryVal = (attitude + inputs[2])  / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_YAW];
-		if(AccessoryDesiredInstSet(cameraStab.Outputs[CAMERASTABSETTINGS_OUTPUTS_YAW] - CAMERASTABSETTINGS_OUTPUTS_ACCESSORY0, &accessory) != 0)
-			AccessoryDesiredCreateInstance();
-	}
+	AttitudeActualYawGet(&attitude);
+	output = (attitude + inputs[2])  / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_YAW];
+	CameraDesiredYawSet(&output);
+
 }
 
 /**

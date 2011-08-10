@@ -41,6 +41,7 @@
 #include "flightstatus.h"
 #include "mixersettings.h"
 #include "mixerstatus.h"
+#include "cameradesired.h"
 
 
 // Private constants
@@ -292,6 +293,28 @@ static void actuatorTask(void* parameters)
 			{
 				if(AccessoryDesiredInstGet(mixers[ct].type - MIXERSETTINGS_MIXER1TYPE_ACCESSORY0,&accessory) == 0)
 					status[ct] = accessory.AccessoryVal;
+				else
+					status[ct] = -1;
+			}
+			if( (mixers[ct].type >= MIXERSETTINGS_MIXER1TYPE_CAMERAROLL) &&
+			   (mixers[ct].type <= MIXERSETTINGS_MIXER1TYPE_CAMERAYAW))
+			{
+				CameraDesiredData cameraDesired;
+				if( CameraDesiredGet(&cameraDesired) == 0 ) {
+					switch(mixers[ct].type) {
+						case MIXERSETTINGS_MIXER1TYPE_CAMERAROLL:
+							status[ct] = cameraDesired.Roll;
+							break;
+						case MIXERSETTINGS_MIXER1TYPE_CAMERAPITCH:
+							status[ct] = cameraDesired.Pitch;
+							break;
+						case MIXERSETTINGS_MIXER1TYPE_CAMERAYAW:
+							status[ct] = cameraDesired.Yaw;
+							break;
+						default:
+							break;
+					}
+				}
 				else
 					status[ct] = -1;
 			}

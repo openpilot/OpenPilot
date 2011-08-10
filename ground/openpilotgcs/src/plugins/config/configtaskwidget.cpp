@@ -257,7 +257,6 @@ void ConfigTaskWidget::clearDirty()
 }
 void ConfigTaskWidget::setDirty(bool value)
 {
-    qDebug()<<"dirty="<<value;
     dirty=value;
 }
 bool ConfigTaskWidget::isDirty()

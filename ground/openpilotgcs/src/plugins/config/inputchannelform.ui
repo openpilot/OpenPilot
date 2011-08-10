@@ -6,14 +6,26 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>389</width>
-    <height>57</height>
+    <width>404</width>
+    <height>43</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <property name="topMargin">
+    <number>1</number>
+   </property>
+   <property name="bottomMargin">
+    <number>1</number>
+   </property>
+   <property name="horizontalSpacing">
+    <number>2</number>
+   </property>
+   <property name="verticalSpacing">
+    <number>0</number>
+   </property>
    <item row="0" column="3">
     <widget class="QLabel" name="legend2">
      <property name="enabled">
@@ -56,6 +68,18 @@
    </item>
    <item row="1" column="1">
     <widget class="QLabel" name="channelName">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>66</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="text">
       <string>TextLabel</string>
      </property>

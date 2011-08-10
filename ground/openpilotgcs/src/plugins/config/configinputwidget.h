@@ -36,24 +36,67 @@
 #include <QList>
 #include "inputchannelform.h"
 #include "ui_inputchannelform.h"
+#include <QRadioButton>
+#include "manualcontrolcommand.h"
+#include "manualcontrolsettings.h"
+#include "receiveractivity.h"
 class Ui_InputWidget;
 
 class ConfigInputWidget: public ConfigTaskWidget
 {
 	Q_OBJECT
-
 public:
         ConfigInputWidget(QWidget *parent = 0);
         ~ConfigInputWidget();
-
+        enum wizardSteps{wizardWelcome,wizardChooseMode,wizardIdentifySticks,wizardIdentifyCenter,wizardIdentifyLimits,wizardIdentifyInverted,wizardFinish};
+        enum txMode{mode1,mode2};
 public slots:
 
 private:
         Ui_InputWidget *m_config;
+        wizardSteps wizardStep;
+        void setupWizardWidget(int step);
+        QList<QWidget*> extraWidgets;
+        txMode transmitterMode;
+        struct channelsStruct
+        {
+            bool operator ==(const channelsStruct& rhs) const
+            {
+                return((group==rhs.group) &&(number==rhs.number));
+            }
+            int group;
+            int number;
+        }lastChannel;
+        channelsStruct currentChannel;
+        QList<channelsStruct> usedChannels;
+        QEventLoop * loop;
+        bool skipflag;
 
+        int currentCommand;
+
+        ManualControlCommand * manualCommandObj;
+        ManualControlCommand::DataFields manualCommandData;
+        ManualControlSettings * manualSettingsObj;
+        ManualControlSettings::DataFields manualSettingsData;
+        ReceiverActivity * receiverActivityObj;
+        ReceiverActivity::DataFields receiverActivityData;
+
+        /*
+        ManualControlCommand * manualCommandObj = ManualControlCommand::GetInstance(getObjectManager());
+        ManualControlCommand::DataFields manualCommandData = manualCommandObj->getData();
+        ManualControlSettings * manualSettingsObj = ManualControlSettings::GetInstance(getObjectManager());
+        ManualControlSettings::DataFields manualSettingsData;
+        ReceiverActivity * receiverActivityObj=ReceiverActivity::GetInstance(getObjectManager());
+        ReceiverActivity::DataFields receiverActivityData =receiverActivityObj->getData();
+*/
 private slots:
-
+        void wzNext();
+        void wzBack();
+        void wzCancel();
+        void goToWizard();
         void openHelp();
+        void identifyControls();
+        void identifyLimits();
 };
 
 #endif

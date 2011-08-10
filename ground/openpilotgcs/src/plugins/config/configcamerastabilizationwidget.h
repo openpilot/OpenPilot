@@ -56,6 +56,9 @@ private:
 
 private slots:
     void openHelp();
+    void applySettings();
+    void saveSettings();
+    void refreshValues();
 
 protected:
 

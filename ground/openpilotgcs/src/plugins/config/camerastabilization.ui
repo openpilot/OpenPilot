@@ -13,9 +13,327 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QCheckBox" name="enableCameraStabilization">
+     <property name="text">
+      <string>Enable CameraStabilization module</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Channel Ranges (number of degrees full range)</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <layout class="QFormLayout" name="formLayout_2">
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Pitch</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Yaw</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Roll</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="rollOutputRange">
+          <property name="maximum">
+           <number>180</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="pitchOutputRange">
+          <property name="maximum">
+           <number>180</number>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QSpinBox" name="yawOutputRange">
+          <property name="maximum">
+           <number>180</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>212</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Channel Mapping (select output channel or none to disable)</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <layout class="QFormLayout" name="formLayout">
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Roll</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QComboBox" name="rollChannel">
+          <item>
+           <property name="text">
+            <string>None</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 1</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 2</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 3</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 4</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 5</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 6</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 7</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 8</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QComboBox" name="yawChannel">
+          <item>
+           <property name="text">
+            <string>None</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 1</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 2</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 3</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 4</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 5</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 6</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 7</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 8</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Pitch</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QComboBox" name="pitchChannel">
+          <item>
+           <property name="text">
+            <string>None</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 1</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 2</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 3</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 4</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 5</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 6</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 7</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Channel 8</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Yaw</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_5">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>212</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
    <item>
     <layout class="QHBoxLayout" name="submitButtons">
+     <item>
+      <widget class="QFrame" name="frame">
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+      </widget>
+     </item>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -86,7 +404,7 @@ specific calibration button on top of the screen.</string>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="camerastabilizationSettingsSaveSD">
+      <widget class="QPushButton" name="camerastabilizationSaveSD">
        <property name="toolTip">
         <string>Send settings to the board, and save to the non-volatile memory.</string>
        </property>

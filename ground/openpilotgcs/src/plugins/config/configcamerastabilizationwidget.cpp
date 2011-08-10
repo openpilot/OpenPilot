@@ -1,8 +1,8 @@
 /**
  ******************************************************************************
  *
- * @file       configahrswidget.h
- * @author     E. Lafargue & The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @file       configcamerastabilizationwidget.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
@@ -38,12 +38,24 @@
 #include <QUrl>
 #include <QDesktopServices>
 
+#include "camerastabsettings.h"
+#include "hwsettings.h"
+#include "mixersettings.h"
+
 ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     m_camerastabilization = new Ui_CameraStabilizationWidget();
     m_camerastabilization->setupUi(this);
 
-    // Connect the help button
+    // Now connect the widget to the StabilizationSettings object
+    connect(MixerSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
+    connect(CameraStabSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
+    // TODO: This will need to support both CC and OP later
+    connect(HwSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
+
+    // Connect buttons
+    connect(m_camerastabilization->camerastabilizationSaveRAM,SIGNAL(clicked()),this,SLOT(applySettings()));
+    connect(m_camerastabilization->camerastabilizationSaveSD,SIGNAL(clicked()),this,SLOT(saveSettings()));
     connect(m_camerastabilization->camerastabilizationHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 }
 
@@ -52,9 +64,135 @@ ConfigCameraStabilizationWidget::~ConfigCameraStabilizationWidget()
    // Do nothing
 }
 
-void ConfigCameraStabilizationWidget::enableControls(bool enable)
+/**
+  * @brief Populate the gui settings into the appropriate
+  * UAV structures
+  */
+void ConfigCameraStabilizationWidget::applySettings()
 {
-    m_camerastabilization->camerastabilizationSettingsSaveSD->setEnabled(enable);
+    // Enable or disable the settings
+    HwSettings * hwSettings = HwSettings::GetInstance(getObjectManager());
+    HwSettings::DataFields hwSettingsData = hwSettings->getData();
+    hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTABILIZATION] =
+            m_camerastabilization->enableCameraStabilization->isChecked() ?
+                HwSettings::OPTIONALMODULES_ENABLED :
+                HwSettings::OPTIONALMODULES_DISABLED;
+
+    // Update the mixer settings
+    MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
+    MixerSettings::DataFields mixerSettingsData = mixerSettings->getData();
+    const int NUM_MIXERS = 8;
+
+    QComboBox * selectors[3] = {
+        m_camerastabilization->rollChannel,
+        m_camerastabilization->pitchChannel,
+        m_camerastabilization->yawChannel
+    };
+
+    // TODO: Need to reformat object so types are an
+    // array themselves.  This gets really awkward
+    quint8 * mixerTypes[NUM_MIXERS] = {
+        &mixerSettingsData.Mixer1Type,
+        &mixerSettingsData.Mixer2Type,
+        &mixerSettingsData.Mixer3Type,
+        &mixerSettingsData.Mixer4Type,
+        &mixerSettingsData.Mixer5Type,
+        &mixerSettingsData.Mixer6Type,
+        &mixerSettingsData.Mixer7Type,
+        &mixerSettingsData.Mixer8Type,
+    };
+
+    for (int i = 0; i < 3; i++)
+    {
+        // Channel 1 is second entry, so becomes zero
+        int mixerNum = selectors[i]->currentIndex() - 1;
+
+        if ( *mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_DISABLED &&
+             (*mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_CAMERAROLL + i) ) {
+            // If the mixer channel already to something that isn't what we are
+            // about to set it to reset to none
+            selectors[i]->setCurrentIndex(0);
+        } else {
+            // Make sure no other channels have this output set
+            for (int j = 0; j < NUM_MIXERS; j++)
+                if (*mixerTypes[j] == (MixerSettings::MIXER1TYPE_CAMERAROLL + i))
+                    *mixerTypes[j] = MixerSettings::MIXER1TYPE_DISABLED;
+
+            // If this channel is assigned to one of the outputs that is not disabled
+            // set it
+            if(mixerNum >= 0 && mixerNum < NUM_MIXERS)
+                *mixerTypes[mixerNum] = MixerSettings::MIXER1TYPE_CAMERAROLL + i;
+        }
+    }
+
+    // Update the ranges
+    CameraStabSettings * cameraStabSettings = CameraStabSettings::GetInstance(getObjectManager());
+    CameraStabSettings::DataFields cameraStab = cameraStabSettings->getData();
+    cameraStab.OutputRange[CameraStabSettings::OUTPUTRANGE_ROLL] = m_camerastabilization->rollOutputRange->value();
+    cameraStab.OutputRange[CameraStabSettings::OUTPUTRANGE_PITCH] = m_camerastabilization->pitchOutputRange->value();
+    cameraStab.OutputRange[CameraStabSettings::OUTPUTRANGE_YAW] = m_camerastabilization->yawOutputRange->value();
+}
+
+/**
+  * Push settings into UAV objects then save them
+  */
+void ConfigCameraStabilizationWidget::saveSettings()
+{
+    applySettings();
+    UAVObject * obj = HwSettings::GetInstance(getObjectManager());
+    saveObjectToSD(obj);
+    obj = MixerSettings::GetInstance(getObjectManager());
+    saveObjectToSD(obj);
+    obj = CameraStabSettings::GetInstance(getObjectManager());
+    saveObjectToSD(obj);
+}
+
+void ConfigCameraStabilizationWidget::refreshValues()
+{
+    HwSettings * hwSettings = HwSettings::GetInstance(getObjectManager());
+    HwSettings::DataFields hwSettingsData = hwSettings->getData();
+    m_camerastabilization->enableCameraStabilization->setChecked(
+                hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTABILIZATION] ==
+                HwSettings::OPTIONALMODULES_ENABLED);
+
+    CameraStabSettings * cameraStabSettings = CameraStabSettings::GetInstance(getObjectManager());
+    CameraStabSettings::DataFields cameraStab = cameraStabSettings->getData();
+    m_camerastabilization->rollOutputRange->setValue(cameraStab.OutputRange[CameraStabSettings::OUTPUTRANGE_ROLL]);
+    m_camerastabilization->pitchOutputRange->setValue(cameraStab.OutputRange[CameraStabSettings::OUTPUTRANGE_PITCH]);
+    m_camerastabilization->yawOutputRange->setValue(cameraStab.OutputRange[CameraStabSettings::OUTPUTRANGE_YAW]);
+
+    MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
+    MixerSettings::DataFields mixerSettingsData = mixerSettings->getData();
+    const int NUM_MIXERS = 8;
+    QComboBox * selectors[3] = {
+        m_camerastabilization->rollChannel,
+        m_camerastabilization->pitchChannel,
+        m_camerastabilization->yawChannel
+    };
+
+    // TODO: Need to reformat object so types are an
+    // array themselves.  This gets really awkward
+    quint8 * mixerTypes[NUM_MIXERS] = {
+        &mixerSettingsData.Mixer1Type,
+        &mixerSettingsData.Mixer2Type,
+        &mixerSettingsData.Mixer3Type,
+        &mixerSettingsData.Mixer4Type,
+        &mixerSettingsData.Mixer5Type,
+        &mixerSettingsData.Mixer6Type,
+        &mixerSettingsData.Mixer7Type,
+        &mixerSettingsData.Mixer8Type,
+    };
+
+    for (int i = 0; i < 3; i++)
+    {
+        // Default to none if not found.  Then search for any mixer channels set to
+        // this
+        selectors[i]->setCurrentIndex(0);
+        for (int j = 0; j < NUM_MIXERS; j++)
+            if (*mixerTypes[j] == (MixerSettings::MIXER1TYPE_CAMERAROLL + i) &&
+                    selectors[i]->currentIndex() != (j + 1))
+                selectors[i]->setCurrentIndex(j + 1);
+    }
 }
 
 void ConfigCameraStabilizationWidget::openHelp()

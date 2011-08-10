@@ -230,6 +230,8 @@ void ConfigStabilizationWidget::refreshValues()
     m_stabilization->maximumPitch->setValue(stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_PITCH]);
     m_stabilization->maximumYaw->setValue(stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_YAW]);
 
+    m_stabilization->lowThrottleZeroIntegral->setChecked(
+                stabData.LowThrottleZeroIntegral == StabilizationSettings::LOWTHROTTLEZEROINTEGRAL_TRUE);
 }
 
 
@@ -276,6 +278,10 @@ void ConfigStabilizationWidget::sendStabilizationUpdate()
     stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_ROLL] = m_stabilization->maximumRoll->value();
     stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_PITCH] = m_stabilization->maximumPitch->value();
     stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_YAW] = m_stabilization->maximumYaw->value();
+
+    stabData.LowThrottleZeroIntegral = m_stabilization->lowThrottleZeroIntegral->isChecked() ?
+                StabilizationSettings::LOWTHROTTLEZEROINTEGRAL_TRUE :
+                StabilizationSettings::LOWTHROTTLEZEROINTEGRAL_FALSE;
 
     stabSettings->setData(stabData); // this is atomic
 }

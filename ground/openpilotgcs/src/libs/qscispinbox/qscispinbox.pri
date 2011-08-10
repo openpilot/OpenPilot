@@ -1,1 +1,1 @@
-LIBS *= -l$$qtLibraryTarget(QScienceSpinBox)
+LIBS *= -l$$qtLibraryName(QScienceSpinBox)

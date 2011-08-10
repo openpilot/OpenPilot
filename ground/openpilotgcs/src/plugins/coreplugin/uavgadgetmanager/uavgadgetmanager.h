@@ -32,14 +32,15 @@
 #include "../core_global.h"
 
 #include <coreplugin/icorelistener.h>
+#include <coreplugin/imode.h>
 
 #include <QtGui/QWidget>
 #include <QtCore/QList>
 #include <QtCore/QPointer>
 #include <QtCore/QSettings>
+#include <QtGui/QIcon>
 
 QT_BEGIN_NAMESPACE
-class QSettings;
 class QModelIndex;
 QT_END_NAMESPACE
 
@@ -48,49 +49,33 @@ namespace Core {
 class IContext;
 class ICore;
 class IUAVGadget;
-class IMode;
-
-struct UAVGadgetManagerPrivate;
 
 namespace Internal {
 
-class UAVGadgetMode;
 class UAVGadgetView;
 class SplitterOrView;
 
-class UAVGadgetClosingCoreListener;
-
-
 } // namespace Internal
 
-class CORE_EXPORT UAVGadgetManagerPlaceHolder : public QWidget
-{
-    Q_OBJECT
-public:
-    UAVGadgetManagerPlaceHolder(Core::Internal::UAVGadgetMode *mode, QWidget *parent = 0);
-    ~UAVGadgetManagerPlaceHolder();
-//    static UAVGadgetManagerPlaceHolder* current();
-private slots:
-    void currentModeChanged(Core::IMode *);
-private:
-    Core::IMode *m_mode;
-    Core::Internal::UAVGadgetMode *m_uavGadgetMode;
-    UAVGadgetManagerPlaceHolder* m_current;
-};
-
-
-class CORE_EXPORT UAVGadgetManager : public QWidget
+class CORE_EXPORT UAVGadgetManager : public IMode
 {
     Q_OBJECT
 
 public:
 
-    explicit UAVGadgetManager(ICore *core, QWidget *parent);
+    explicit UAVGadgetManager(ICore *core, QString name, QIcon icon, int priority, QString uniqueName, QWidget *parent);
     virtual ~UAVGadgetManager();
+
+    // IMode
+    QString name() const { return m_name; }
+    QIcon icon() const { return m_icon; }
+    int priority() const { return m_priority; }
+    void setPriority(int priority) { m_priority = priority; }
+    const char *uniqueModeName() const { return m_uniqueModeName; }
+    QList<int> context() const;
+
     void init();
-    // setUAVGadgetMode should be called exactly once
-    // right after the mode has been created, and never thereafter
-    void setUAVGadgetMode(Core::Internal::UAVGadgetMode *mode) { m_uavGadgetMode = mode; }
+    QWidget *widget() { return m_widget; }
 
     void ensureUAVGadgetManagerVisible();
 
@@ -105,10 +90,14 @@ public:
 
 signals:
     void currentGadgetChanged(IUAVGadget *gadget);
+    void showUavGadgetMenus(bool show, bool hasSplitter);
+    void updateSplitMenus(bool hasSplitter);
 
 private slots:
     void handleContextChange(Core::IContext *context);
-    void updateActions();
+    void updateUavGadgetMenus();
+    void modeChanged(Core::IMode *mode);
+
 
 public slots:
     void split(Qt::Orientation orientation);
@@ -120,43 +109,30 @@ public slots:
     void showToolbars(bool show);
 
 private:
+    void setCurrentGadget(IUAVGadget *gadget);
     void addGadgetToContext(IUAVGadget *gadget);
     void removeGadget(IUAVGadget *gadget);
-    void setCurrentGadget(IUAVGadget *gadget);
     void closeView(Core::Internal::UAVGadgetView *view);
     void emptyView(Core::Internal::UAVGadgetView *view);
     Core::Internal::SplitterOrView *currentSplitterOrView() const;
 
     bool m_showToolbars;
-    UAVGadgetManagerPrivate *m_d;
-    Core::Internal::UAVGadgetMode *m_uavGadgetMode;
+    Core::Internal::SplitterOrView *m_splitterOrView;
+    Core::IUAVGadget *m_currentGadget;
+    Core::ICore *m_core;
+
+    QString m_name;
+    QIcon m_icon;
+    int m_priority;
+    QString m_uniqueName;
+    QByteArray m_uniqueNameBA;
+    const char* m_uniqueModeName;
+    QWidget *m_widget;
 
     friend class Core::Internal::SplitterOrView;
     friend class Core::Internal::UAVGadgetView;
 };
 
-} // namespace Core
-
-
-//===================UAVGadgetClosingCoreListener======================
-
-namespace Core {
-namespace Internal {
-
-class UAVGadgetClosingCoreListener : public ICoreListener
-{
-    Q_OBJECT
-
-public:
-    UAVGadgetClosingCoreListener(UAVGadgetManager *em);
-    bool uavGadgetAboutToClose(IUAVGadget *gadget);
-    bool coreAboutToClose();
-
-private:
-    UAVGadgetManager *m_em;
-};
-
-} // namespace Internal
 } // namespace Core
 
 #endif // UAVGADGETMANAGER_H

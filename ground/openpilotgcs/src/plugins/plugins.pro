@@ -70,6 +70,12 @@ plugin_modelview.subdir = modelview
 plugin_modelview.depends = plugin_coreplugin
 plugin_modelview.depends += plugin_uavobjects
 SUBDIRS += plugin_modelview
+
+#Notify gadget
+plugin_notify.subdir = notify
+plugin_notify.depends = plugin_coreplugin
+plugin_notify.depends += plugin_uavobjects
+SUBDIRS += plugin_notify
 }
 
 #Uploader gadget
@@ -96,12 +102,6 @@ plugin_systemhealth.subdir = systemhealth
 plugin_systemhealth.depends = plugin_coreplugin
 plugin_systemhealth.depends += plugin_uavobjects
 SUBDIRS += plugin_systemhealth
-
-#Notify gadget
-plugin_notify.subdir = notify
-plugin_notify.depends = plugin_coreplugin
-plugin_notify.depends += plugin_uavobjects
-SUBDIRS += plugin_notify
 
 #Config gadget
 plugin_config.subdir = config

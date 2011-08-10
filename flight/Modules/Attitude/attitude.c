@@ -333,6 +333,13 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 		q[1] = q[1] + qdot[1];
 		q[2] = q[2] + qdot[2];
 		q[3] = q[3] + qdot[3];
+		
+		if(q[0] < 0) {
+			q[0] = -q[0];
+			q[1] = -q[1];
+			q[2] = -q[2];
+			q[3] = -q[3];
+		}
 	}
 
 	// Renomalize

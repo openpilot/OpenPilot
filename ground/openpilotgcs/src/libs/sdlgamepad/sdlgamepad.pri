@@ -1,1 +1,1 @@
-LIBS += -l$$qtLibraryTarget(sdlgamepad)
+LIBS *= -l$$qtLibraryName(sdlgamepad)

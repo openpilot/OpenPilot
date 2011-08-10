@@ -32,36 +32,33 @@
 #include <coreplugin/iconnection.h>
 #include <extensionsystem/pluginmanager.h>
 
-#include <utils/styledbar.h>
-
-#include "fancytabwidget.h"
-#include "fancyactionbar.h"
 #include "qextserialport/src/qextserialenumerator.h"
 #include "qextserialport/src/qextserialport.h"
 #include <QDebug>
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QComboBox>
-#include <QTimer>
+
 namespace Core {
 
 
-ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, Internal::FancyTabWidget *modeStack) :
+ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidget *modeStack) :
 	QWidget(mainWindow),	// Pip
 	m_availableDevList(0),
     m_connectBtn(0),
-    m_ioDev(NULL),m_mainWindow(mainWindow)
+    m_ioDev(NULL),	
+	m_mainWindow(mainWindow)
 {
  //   Q_UNUSED(mainWindow);
 
-    QVBoxLayout *top = new QVBoxLayout;
+/*    QVBoxLayout *top = new QVBoxLayout;
     top->setSpacing(0);
-    top->setMargin(0);
+    top->setMargin(0);*/
 
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->setSpacing(0);
-    layout->setContentsMargins(5,0,5,0);
-    layout->addWidget(new QLabel("Connections: "));
+    layout->setSpacing(5);
+    layout->setContentsMargins(5,5,5,5);
+    layout->addWidget(new QLabel(tr("Connections:")));
 
     m_availableDevList = new QComboBox;
     //m_availableDevList->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -70,17 +67,18 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, Internal:
     m_availableDevList->setContextMenuPolicy(Qt::CustomContextMenu);
     layout->addWidget(m_availableDevList);
 
-    m_connectBtn = new QPushButton("Connect");
+    m_connectBtn = new QPushButton(tr("Connect"));
     m_connectBtn->setEnabled(false);
     layout->addWidget(m_connectBtn);
 
-    Utils::StyledBar *bar = new Utils::StyledBar;
+/*    Utils::StyledBar *bar = new Utils::StyledBar;
     bar->setLayout(layout);
 
-    top->addWidget(bar);
-    setLayout(top);
+    top->addWidget(bar);*/
+    setLayout(layout);
 
-    modeStack->insertCornerWidget(modeStack->cornerWidgetCount()-1, this);
+    //    modeStack->insertCornerWidget(modeStack->cornerWidgetCount()-1, this);
+    modeStack->setCornerWidget(this, Qt::TopRightCorner);
 
 	QObject::connect(m_connectBtn, SIGNAL(pressed()), this, SLOT(onConnectPressed()));
 }

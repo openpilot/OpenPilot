@@ -221,7 +221,7 @@ void ConfigCameraStabilizationWidget::refreshValues()
 
 void ConfigCameraStabilizationWidget::openHelp()
 {
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Camera+Configuration", QUrl::StrictMode) );
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Camera+Stabilization", QUrl::StrictMode) );
 }
 
 void ConfigCameraStabilizationWidget::enableControls(bool enable)

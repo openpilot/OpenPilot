@@ -121,7 +121,8 @@ void ConfigCameraStabilizationWidget::applySettings()
         // Channel 1 is second entry, so becomes zero
         int mixerNum = selectors[i]->currentIndex() - 1;
 
-        if ( *mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_DISABLED &&
+        if ( mixerNum >= 0 && // Short circuit in case of none
+             *mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_DISABLED &&
              (*mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_CAMERAROLL + i) ) {
             // If the mixer channel already to something that isn't what we are
             // about to set it to reset to none

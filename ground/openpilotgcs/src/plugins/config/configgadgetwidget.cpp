@@ -139,7 +139,7 @@ void ConfigGadgetWidget::onAutopilotConnect() {
             ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("Attitude"));
             ftw->removeTab(ConfigGadgetWidget::hardware);
             qwd = new ConfigCCHWWidget(this);
-            ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.svg"), QString("HW Settings"));
+            ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
         } else if ((board & 0xff00) == 256 ) {
             // Mainboard family
@@ -149,7 +149,7 @@ void ConfigGadgetWidget::onAutopilotConnect() {
             ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
             ftw->removeTab(ConfigGadgetWidget::hardware);
             qwd = new ConfigProHWWidget(this);
-            ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.svg"), QString("HW Settings"));
+            ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
         }
     }

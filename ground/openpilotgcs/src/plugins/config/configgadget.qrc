@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/configgadget">
         <file>images/help2.png</file>
-        <file>images/XBee.svg</file>
         <file>images/Airframe.png</file>
         <file>images/Servo.png</file>
         <file>images/ahrs-calib.svg</file>
@@ -11,11 +10,9 @@
         <file>images/quad-shapes.svg</file>
         <file>images/ccpm_setup.svg</file>
         <file>images/PipXtreme.png</file>
-        <file>images/gyroscope.svg</file>
         <file>images/Transmitter.png</file>
         <file>images/help.png</file>
         <file>images/coptercontrol.svg</file>
-        <file>images/hw_config.svg</file>
         <file>images/hw_config.png</file>
         <file>images/gyroscope.png</file>
         <file>images/camera.png</file>

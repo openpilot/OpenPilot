@@ -218,6 +218,8 @@ void Telemetry::transactionCompleted(UAVObject* obj, bool success)
         transPending = false;
         // Send signal
         obj->emitTransactionCompleted(success);
+        // Process new object updates from queue
+        processObjectQueue();
     } else
     {
   //      qDebug() << "Error: received a transaction completed when did not expect it.";

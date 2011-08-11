@@ -1,5 +1,5 @@
 <xml>
-    <object name="CameraDesired" singleinstance="false" settings="false">
+    <object name="CameraDesired" singleinstance="true" settings="false">
         <description>Desired camera outputs.  Comes from @ref CameraStabilization module.</description>
         <field name="Roll" units="" type="float" elements="1"/>
         <field name="Pitch" units="" type="float" elements="1"/>

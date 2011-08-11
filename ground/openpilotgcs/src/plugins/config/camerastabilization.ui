@@ -22,6 +22,20 @@
     </widget>
    </item>
    <item>
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>After enabling the module, you must power cycle before using and configuring.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Channel Ranges (number of degrees full range)</string>
@@ -424,7 +438,4 @@ specific calibration button on top of the screen.</string>
   <include location="../coreplugin/core.qrc"/>
  </resources>
  <connections/>
- <buttongroups>
-  <buttongroup name="buttonGroup"/>
- </buttongroups>
 </ui>

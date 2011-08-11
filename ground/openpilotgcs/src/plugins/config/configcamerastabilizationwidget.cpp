@@ -47,11 +47,7 @@ ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent
     m_camerastabilization = new Ui_CameraStabilizationWidget();
     m_camerastabilization->setupUi(this);
 
-    // Now connect the widget to the StabilizationSettings object
-    connect(MixerSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
-    connect(CameraStabSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
-    // TODO: This will need to support both CC and OP later
-    connect(HwSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
+    connectUpdates();
 
     // Connect buttons
     connect(m_camerastabilization->camerastabilizationSaveRAM,SIGNAL(clicked()),this,SLOT(applySettings()));
@@ -62,6 +58,24 @@ ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent
 ConfigCameraStabilizationWidget::~ConfigCameraStabilizationWidget()
 {
    // Do nothing
+}
+
+void ConfigCameraStabilizationWidget::connectUpdates()
+{
+    // Now connect the widget to the StabilizationSettings object
+    connect(MixerSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
+    connect(CameraStabSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
+    // TODO: This will need to support both CC and OP later
+    connect(HwSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
+}
+
+void ConfigCameraStabilizationWidget::disconnectUpdates()
+{
+    // Now connect the widget to the StabilizationSettings object
+    disconnect(MixerSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
+    disconnect(CameraStabSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
+    // TODO: This will need to support both CC and OP later
+    disconnect(HwSettings::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
 }
 
 /**
@@ -126,11 +140,21 @@ void ConfigCameraStabilizationWidget::applySettings()
     }
 
     // Update the ranges
-    CameraStabSettings * cameraStabSettings = CameraStabSettings::GetInstance(getObjectManager());
-    CameraStabSettings::DataFields cameraStab = cameraStabSettings->getData();
-    cameraStab.OutputRange[CameraStabSettings::OUTPUTRANGE_ROLL] = m_camerastabilization->rollOutputRange->value();
-    cameraStab.OutputRange[CameraStabSettings::OUTPUTRANGE_PITCH] = m_camerastabilization->pitchOutputRange->value();
-    cameraStab.OutputRange[CameraStabSettings::OUTPUTRANGE_YAW] = m_camerastabilization->yawOutputRange->value();
+    CameraStabSettings * cameraStab = CameraStabSettings::GetInstance(getObjectManager());
+    CameraStabSettings::DataFields cameraStabData = cameraStab->getData();
+    cameraStabData.OutputRange[CameraStabSettings::OUTPUTRANGE_ROLL] = m_camerastabilization->rollOutputRange->value();
+    cameraStabData.OutputRange[CameraStabSettings::OUTPUTRANGE_PITCH] = m_camerastabilization->pitchOutputRange->value();
+    cameraStabData.OutputRange[CameraStabSettings::OUTPUTRANGE_YAW] = m_camerastabilization->yawOutputRange->value();
+
+    // Because multiple objects are updated, and all of them trigger the callback
+    // they must be done together (if update one then load settings from second
+    // the first update would wipe the UI controls).  However to be extra cautious
+    // I'm also disabling updates during the setting to the UAVObjects
+    disconnectUpdates();
+    hwSettings->setData(hwSettingsData);
+    mixerSettings->setData(mixerSettingsData);
+    cameraStab->setData(cameraStabData);
+    connectUpdates();
 }
 
 /**
@@ -198,6 +222,12 @@ void ConfigCameraStabilizationWidget::refreshValues()
 void ConfigCameraStabilizationWidget::openHelp()
 {
     QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Camera+Configuration", QUrl::StrictMode) );
+}
+
+void ConfigCameraStabilizationWidget::enableControls(bool enable)
+{
+    m_camerastabilization->camerastabilizationSaveSD->setEnabled(enable);
+    m_camerastabilization->camerastabilizationSaveRAM->setEnabled(enable);
 }
 
 /**

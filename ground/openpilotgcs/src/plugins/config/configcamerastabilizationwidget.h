@@ -61,7 +61,8 @@ private slots:
     void refreshValues();
 
 protected:
-
+    void connectUpdates();
+    void disconnectUpdates();
 };
 
 #endif // ConfigCameraStabilization_H

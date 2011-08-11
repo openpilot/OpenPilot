@@ -63,6 +63,7 @@
 
 // Private functions
 static void attitudeUpdated(UAVObjEvent* ev);
+static float bound(float val);
 
 /**
  * Initialise the module, called on startup
@@ -112,19 +113,25 @@ static void attitudeUpdated(UAVObjEvent* ev)
 
 	// Set output channels
 	AttitudeActualRollGet(&attitude);
-	output = (attitude + inputs[0]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL];
+	output = bound((attitude + inputs[0]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL]);
 	CameraDesiredRollSet(&output);
 
 	AttitudeActualPitchGet(&attitude);
-	output = (attitude + inputs[1])  / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH];
+	output = bound((attitude + inputs[1])  / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH]);
 	CameraDesiredPitchSet(&output);
 
 	AttitudeActualYawGet(&attitude);
-	output = (attitude + inputs[2])  / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_YAW];
+	output = bound((attitude + inputs[2])  / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_YAW]);
 	CameraDesiredYawSet(&output);
 
 }
 
+float bound(float val)
+{
+	return (val > 1) ? 1 : 
+		(val < -1) ? -1 :
+		val;
+}
 /**
   * @}
   */

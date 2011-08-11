@@ -82,6 +82,7 @@ uint8_t max_axis_lock = 0;
 uint8_t max_axislock_rate = 0;
 float weak_leveling_kp = 0;
 uint8_t weak_leveling_max = 0;
+bool lowThrottleZeroIntegral;
 
 pid_type pids[PID_MAX];
 
@@ -335,6 +336,7 @@ static void stabilizationTask(void* parameters)
 		}
 
 		if(flightStatus.Armed != FLIGHTSTATUS_ARMED_ARMED ||
+		   (lowThrottleZeroIntegral && stabDesired.Throttle < 0) ||
 		   !shouldUpdate)
 		{
 			ZeroPids();
@@ -432,6 +434,9 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 	// Settings for weak leveling
 	weak_leveling_kp = settings.WeakLevelingKp;
 	weak_leveling_max = settings.MaxWeakLevelingRate;
+
+	// Whether to zero the PID integrals while throttle is low
+	lowThrottleZeroIntegral = settings.LowThrottleZeroIntegral == STABILIZATIONSETTINGS_LOWTHROTTLEZEROINTEGRAL_TRUE;
 
 	// The dT has some jitter iteration to iteration that we don't want to
 	// make thie result unpredictable.  Still, it's nicer to specify the constant

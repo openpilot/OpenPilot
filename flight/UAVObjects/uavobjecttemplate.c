@@ -68,8 +68,6 @@ int32_t $(NAME)Initialize(void)
 	}
 }
 
-UAVOBJ_INITCALL($(NAME)Initialize);
-
 /**
  * Initialize object fields and metadata with the default values.
  * If a default value is not specified the object fields

@@ -2692,7 +2692,6 @@
 		65C35F6812F0DC2D004811C2 /* attitude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = attitude.h; sourceTree = "<group>"; };
 		65C9903C13A871B90082BD60 /* camerastab.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = camerastab.c; sourceTree = "<group>"; };
 		65C9903E13A871B90082BD60 /* camerastab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = camerastab.h; sourceTree = "<group>"; };
-		65C9908E13AC5D8D0082BD60 /* uavobjectsinit_linker.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = uavobjectsinit_linker.c; sourceTree = "<group>"; };
 		65D2CA841248F9A400B1E7D6 /* mixersettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixersettings.xml; sourceTree = "<group>"; };
 		65D2CA851248F9A400B1E7D6 /* mixerstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixerstatus.xml; sourceTree = "<group>"; };
 		65DEA79113F2143B00095B06 /* cameradesired.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = cameradesired.xml; sourceTree = "<group>"; };
@@ -3521,7 +3520,6 @@
 		650D8E6A12DFE17500D05CC9 /* UAVObjects */ = {
 			isa = PBXGroup;
 			children = (
-				65C9908E13AC5D8D0082BD60 /* uavobjectsinit_linker.c */,
 				65C35E9E12F0A834004811C2 /* uavobjecttemplate.c */,
 				65C35E9F12F0A834004811C2 /* uavobjectsinittemplate.c */,
 				65C35EA112F0A834004811C2 /* uavobjectmanager.c */,

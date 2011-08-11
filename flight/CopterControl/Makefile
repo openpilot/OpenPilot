@@ -130,7 +130,6 @@ SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
-SRC += $(OPUAVOBJ)/uavobjectsinit_linker.c
 SRC += $(OPSYSTEM)/pios_usb_hid_desc.c
 else
 ## TESTCODE

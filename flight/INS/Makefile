@@ -101,11 +101,11 @@ SRC += $(PIOSSTM32FXX)/pios_spi.c
 #SRC += $(PIOSSTM32FXX)/pios_exti.c
 SRC += $(PIOSSTM32FXX)/pios_iap.c
 SRC += $(PIOSSTM32FXX)/pios_bma180.c
+SRC += $(PIOSSTM32FXX)/pios_hmc5883.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
-SRC += $(PIOSCOMMON)/pios_hmc5883.c
 SRC += $(PIOSCOMMON)/pios_bmp085.c
 SRC += $(PIOSCOMMON)/pios_imu3000.c
 SRC += $(PIOSCOMMON)/pios_bl_helper.c

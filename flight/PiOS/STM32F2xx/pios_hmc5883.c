@@ -56,34 +56,21 @@ static bool PIOS_HMC5883_Write(uint8_t address, uint8_t buffer);
  * @brief Initialize the HMC5883 magnetometer sensor.
  * @return none
  */
-void PIOS_HMC5883_Init(void)
+void PIOS_HMC5883_Init(const struct pios_hmc5883_cfg * cfg)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-	EXTI_InitTypeDef EXTI_InitStructure;
-	NVIC_InitTypeDef NVIC_InitStructure;
-
 	/* Enable DRDY GPIO clock */
-	RCC_APB2PeriphClockCmd(PIOS_HMC5883_DRDY_CLK | RCC_APB2Periph_AFIO, ENABLE);
+	// Started by pios_sys.c
+	// RCC_APB2PeriphClockCmd(PIOS_HMC5883_DRDY_CLK | RCC_APB2Periph_AFIO, ENABLE);
 
 	/* Configure EOC pin as input floating */
-	GPIO_InitStructure.GPIO_Pin = PIOS_HMC5883_DRDY_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-	GPIO_Init(PIOS_HMC5883_DRDY_GPIO_PORT, &GPIO_InitStructure);
-
+	GPIO_Init(cfg->drdy, &cfg->drdy.init);
+	
 	/* Configure the End Of Conversion (EOC) interrupt */
-	GPIO_EXTILineConfig(PIOS_HMC5883_DRDY_PORT_SOURCE, PIOS_HMC5883_DRDY_PIN_SOURCE);
-	EXTI_InitStructure.EXTI_Line = PIOS_HMC5883_DRDY_EXTI_LINE;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
-	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructure);
-
+	//GPIO_EXTILineConfig(cfg->eoc_exit.port_source, cfg->eoc_exit.pin_source);
+	EXTI_Init(&cfg->eoc_exti.init);
+	
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
-	NVIC_InitStructure.NVIC_IRQChannel = PIOS_HMC5883_DRDY_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_HMC5883_DRDY_PRIO;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
+	NVIC_Init(&cfg->eoc_irq.init);
 
 	/* Configure the HMC5883 Sensor */
 	PIOS_HMC5883_ConfigTypeDef HMC5883_InitStructure;

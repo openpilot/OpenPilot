@@ -58,6 +58,12 @@ struct stm32_gpio {
 	GPIO_InitTypeDef init;
 };
 
+struct stm32_exti {
+	uint8_t pin_source;
+	uint8_t port_source;
+	EXTI_InitTypeDef init;
+};
+
 /**
   * @}
   * @}

@@ -543,11 +543,49 @@ void PIOS_I2C_gyro_adapter_er_irq_handler(void)
 #endif /* PIOS_INCLUDE_I2C */
 
 
-
 extern const struct pios_com_driver pios_usart_com_driver;
 
 uint32_t pios_com_aux_id;
 uint32_t pios_com_gps_id;
+
+
+/**
+ * Sensor configurations 
+ */
+ #if defined (PIOS_INCLUDE_HMC5883)
+#include "pios_hmc5883.h"
+
+static const struct pios_hmc5883_cfg pios_hmc5883_mag_cfg = {
+	.drdy = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_8,
+			.GPIO_Speed = GPIO_Speed_100MHz,
+			.GPIO_Mode = GPIO_Mode_IN,
+			.GPIO_OType = GPIO_OType_OD,
+			.GPIO_PuPd = GPIO_PuPd_NOPULL,
+		},
+	},
+	.eoc_exti = {
+//		.pin_source = GPIO_PinSource8,
+//		.port_source = GPIO_PortSourceGPIOB,
+		.init = {
+			.EXTI_Line = EXTI_Line8, // matches above GPIO pin
+			.EXTI_Mode = EXTI_Mode_Interrupt,
+			.EXTI_Trigger = EXTI_Trigger_Rising,
+			.EXTI_LineCmd = ENABLE,
+		},
+	},
+	.eoc_irq = {
+		.init = {
+			.NVIC_IRQChannel = EXTI9_5_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+			.NVIC_IRQChannelSubPriority = 0,
+			.NVIC_IRQChannelCmd = ENABLE,
+		},
+	},
+};
+#endif
 
 /**
  * PIOS_Board_Init()
@@ -595,7 +633,7 @@ void PIOS_Board_Init(void) {
 	PIOS_BMP085_Init();
 #endif /* PIOS_INCLUDE_BMP085 */
 #if defined (PIOS_INCLUDE_HMC5883)
-	PIOS_HMC5883_Init();
+	PIOS_HMC5883_Init(&pios_hmc5883_mag_cfg);
 #endif /* PIOS_INCLUDE_HMC5883 */
 	
 #if defined(PIOS_INCLUDE_IMU3000)

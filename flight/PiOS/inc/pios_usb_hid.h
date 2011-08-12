@@ -41,7 +41,6 @@
 #define PIOS_USB_HID_DATA_LENGTH		62
 
 /* Global functions */
-extern int32_t PIOS_USB_HID_Init(uint32_t mode);
 extern int32_t PIOS_USB_HID_Reenumerate();
 extern int32_t PIOS_USB_HID_ChangeConnectionState(uint32_t Connected);
 extern int32_t PIOS_USB_HID_CheckAvailable(uint8_t id);

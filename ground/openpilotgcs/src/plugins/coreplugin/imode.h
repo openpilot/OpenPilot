@@ -49,6 +49,7 @@ public:
     virtual QString name() const = 0;
     virtual QIcon icon() const = 0;
     virtual int priority() const = 0;
+    virtual void setPriority(int priority) = 0;
     virtual const char *uniqueModeName() const = 0;
 };
 

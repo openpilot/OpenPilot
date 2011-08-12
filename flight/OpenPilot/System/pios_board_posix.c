@@ -29,6 +29,17 @@
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 
+#include "pios_rcvr_priv.h"
+
+struct pios_rcvr_channel_map pios_rcvr_channel_to_id_map[PIOS_RCVR_MAX_CHANNELS];
+uint32_t pios_rcvr_max_channel;
+
+void Stack_Change() {
+}
+
+void Stack_Change_Weak() {
+}
+
 /**
  * PIOS_Board_Init()
  * initializes all the core systems on this specific hardware

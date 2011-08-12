@@ -53,7 +53,6 @@ bool QextSerialPort::open(OpenMode mode) {
     DWORD dwFlagsAndAttributes = 0;
     if (queryMode() == QextSerialPort::EventDriven)
         dwFlagsAndAttributes += FILE_FLAG_OVERLAPPED;
-
     QMutexLocker lock(mutex);
     if (mode == QIODevice::NotOpen)
         return isOpen();
@@ -95,7 +94,10 @@ bool QextSerialPort::open(OpenMode mode) {
                 }
                 winEventNotifier = new QWinEventNotifier(overlap.hEvent, this);
                 connect(winEventNotifier, SIGNAL(activated(HANDLE)), this, SLOT(onWinEvent(HANDLE)));
+                connect(&fakeTxEmpty,SIGNAL(timeout()),this,SLOT(triggerTxEmpty()));
+                fakeTxEmpty.start(10000);
                 WaitCommEvent(Win_Handle, &eventMask, &overlap);
+
             }
         }
     } else {
@@ -111,8 +113,10 @@ is not currently open.
 void QextSerialPort::close()
 {
     QMutexLocker lock(mutex);
+    fakeTxEmpty.stop();
+    disconnect(&fakeTxEmpty,SIGNAL(timeout()),this,SLOT(triggerTxEmpty()));
     if (isOpen()) {
-        flush();
+         flush();
         QIODevice::close(); // mark ourselves as closed
         CancelIo(Win_Handle);
         if (CloseHandle(Win_Handle))
@@ -886,4 +890,38 @@ void QextSerialPort::setTimeout(long millisec) {
     if (queryMode() != QextSerialPort::EventDriven)
         SetCommTimeouts(Win_Handle, &Win_CommTimeouts);
 }
+/*!
+emulates the EV_TXEMPTY system event not present on some BT interfaces
+*/
+void QextSerialPort::triggerTxEmpty()
+{
+    if (bytesToWrite()>500)
+    {
+        QMutexLocker lock(mutex);
+        qint64 totalBytesWritten = 0;
+        QList<OVERLAPPED*> overlapsToDelete;
+        foreach(OVERLAPPED* o, pendingWrites) {
+            DWORD numBytes = 0;
+            if (GetOverlappedResult(Win_Handle, o, & numBytes, false)) {
+                overlapsToDelete.append(o);
+                totalBytesWritten += numBytes;
+            } else if( GetLastError() != ERROR_IO_INCOMPLETE ) {
+                overlapsToDelete.append(o);
+                qWarning() << "CommEvent overlapped write error:" << GetLastError();
+            }
+        }
 
+        if (totalBytesWritten > 0) {
+            QWriteLocker writelocker(bytesToWriteLock);
+            _bytesToWrite = 0;
+            //qDebug()<<"zeroed bytesToWrite";
+        }
+        //qDebug()<<"overlapsToDelete"<<overlapsToDelete.count();
+        foreach(OVERLAPPED* o, overlapsToDelete) {
+            OVERLAPPED *toDelete = pendingWrites.takeAt(pendingWrites.indexOf(o));
+            CloseHandle(toDelete->hEvent);
+            delete toDelete;
+        }
+    }
+
+}

@@ -31,9 +31,30 @@
 
 #include <pios_com_priv.h>
 
+#define PIOS_COM_TELEM_USB_RX_BUF_LEN 192
+#define PIOS_COM_TELEM_USB_TX_BUF_LEN 192
+
+static uint8_t pios_com_telem_usb_rx_buffer[PIOS_COM_TELEM_USB_RX_BUF_LEN];
+static uint8_t pios_com_telem_usb_tx_buffer[PIOS_COM_TELEM_USB_TX_BUF_LEN];
+
 #endif /* PIOS_INCLUDE_COM */
 
 // ***********************************************************************************
+
+#if defined(PIOS_INCLUDE_USB_HID)
+#include "pios_usb_hid_priv.h"
+
+static const struct pios_usb_hid_cfg pios_usb_hid_main_cfg = {
+  .irq = {
+    .init    = {
+      .NVIC_IRQChannel                   = USB_LP_CAN1_RX0_IRQn,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+      .NVIC_IRQChannelSubPriority        = 0,
+      .NVIC_IRQChannelCmd                = ENABLE,
+    },
+  },
+};
+#endif	/* PIOS_INCLUDE_USB_HID */
 
 extern const struct pios_com_driver pios_usb_com_driver;
 
@@ -44,7 +65,12 @@ uint32_t pios_com_telem_usb_id;
  * initializes all the core subsystems on this specific hardware
  * called from System/openpilot.c
  */
+static bool board_init_complete = false;
 void PIOS_Board_Init(void) {
+	if (board_init_complete) {
+		return;
+	}
+
 	/* Enable Prefetch Buffer */
 	FLASH_PrefetchBufferCmd(FLASH_PrefetchBuffer_Enable);
 
@@ -58,13 +84,20 @@ void PIOS_Board_Init(void) {
 	PIOS_GPIO_Init();
 
 #if defined(PIOS_INCLUDE_USB_HID)
-	PIOS_USB_HID_Init(0);
+	uint32_t pios_usb_hid_id;
+	if (PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_main_cfg)) {
+		PIOS_Assert(0);
+	}
 #if defined(PIOS_INCLUDE_COM)
-	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, 0)) {
-		PIOS_DEBUG_Assert(0);
+	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, pios_usb_hid_id,
+			  pios_com_telem_usb_rx_buffer, sizeof(pios_com_telem_usb_rx_buffer),
+			  pios_com_telem_usb_tx_buffer, sizeof(pios_com_telem_usb_tx_buffer))) {
+		PIOS_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_COM */
-#endif  /* PIOS_INCLUDE_USB_HID */
+#endif	/* PIOS_INCLUDE_USB_HID */
 
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);//TODO Tirar
+
+	board_init_complete = true;
 }

@@ -630,6 +630,13 @@ When you change one, the other is updated.</string>
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="lowThrottleZeroIntegral">
+     <property name="text">
+      <string>Zero the integral when throttle is low</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

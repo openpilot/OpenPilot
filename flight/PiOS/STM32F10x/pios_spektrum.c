@@ -60,20 +60,45 @@ uint16_t supv_timer=0;
 
 static void PIOS_SPEKTRUM_Supervisor(uint32_t spektrum_id);
 static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg);
+static int32_t PIOS_SPEKTRUM_Decode(uint8_t b);
+
+static uint16_t PIOS_SPEKTRUM_RxInCallback(uint32_t context, uint8_t * buf, uint16_t buf_len, uint16_t * headroom, bool * need_yield)
+{
+	/* process byte(s) and clear receive timer */
+	for (uint8_t i = 0; i < buf_len; i++) {
+		PIOS_SPEKTRUM_Decode(buf[i]);
+		supv_timer = 0;
+	}
+
+	/* Always signal that we can accept another byte */
+	if (headroom) {
+		*headroom = 1;
+	}
+
+	/* We never need a yield */
+	*need_yield = false;
+
+	/* Always indicate that all bytes were consumed */
+	return (buf_len);
+}
 
 /**
 * Bind and Initialise Spektrum satellite receiver
 */
-void PIOS_SPEKTRUM_Init(const struct pios_spektrum_cfg * cfg, bool bind)
+int32_t PIOS_SPEKTRUM_Init(uint32_t * spektrum_id, const struct pios_spektrum_cfg *cfg, const struct pios_com_driver * driver, uint32_t lower_id, bool bind)
 {
 	// TODO: need setting flag for bind on next powerup
 	if (bind) {
 		PIOS_SPEKTRUM_Bind(cfg);
 	}
 
+	(driver->bind_rx_cb)(lower_id, PIOS_SPEKTRUM_RxInCallback, 0);
+
 	if (!PIOS_RTC_RegisterTickCallback(PIOS_SPEKTRUM_Supervisor, 0)) {
 		PIOS_DEBUG_Assert(0);
 	}
+
+	return (0);
 }
 
 /**
@@ -202,32 +227,6 @@ static int32_t PIOS_SPEKTRUM_Decode(uint8_t b)
 	}
 	prev_byte = b;
 	return 0;
-}
-
-/* Custom interrupt handler for USART */
-void PIOS_SPEKTRUM_irq_handler(uint32_t usart_id) {
-	/* Grab the config for this device from the underlying USART device */
-	const struct pios_usart_cfg * cfg;
-	cfg = PIOS_USART_GetConfig(usart_id);
-	PIOS_Assert(cfg);
-  
-	/* by always reading DR after SR make sure to clear any error interrupts */
-	volatile uint16_t sr = cfg->regs->SR;
-	volatile uint8_t b = cfg->regs->DR;
-	
-	/* check if RXNE flag is set */
-	if (sr & USART_SR_RXNE) {
-		if (PIOS_SPEKTRUM_Decode(b) < 0) {
-			/* Here we could add some error handling */
-		}
-	} 
-
-	if (sr & USART_SR_TXE) {	// check if TXE flag is set
-		/* Disable TXE interrupt (TXEIE=0) */
-		USART_ITConfig(cfg->regs, USART_IT_TXE, DISABLE);
-	}
-	/* byte arrived so clear "watchdog" timer */
-	supv_timer=0;
 }
 
 /**

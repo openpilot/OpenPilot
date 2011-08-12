@@ -1,13 +1,14 @@
 /**
  ******************************************************************************
  *
- * @file       configtelemetrytwidget.h
+ * @file       mytabwidget.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @addtogroup GCSPlugins GCS Plugins
+ *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
+ * @brief
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup
  * @{
- * @addtogroup ConfigPlugin Config Plugin
- * @{
- * @brief Telemetry configuration panel
+ *
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,35 +25,24 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGTELEMETRYWIDGET_H
-#define CONFIGTELEMETRYWIDGET_H
+#include "mytabwidget.h"
+#include <QtGui/QTabBar>
 
-#include "ui_telemetry.h"
-#include "configtaskwidget.h"
-#include "extensionsystem/pluginmanager.h"
-#include "uavobjectmanager.h"
-#include "uavobject.h"
-#include <QtGui/QWidget>
-#include <QList>
-
-
-class ConfigTelemetryWidget: public ConfigTaskWidget
+MyTabWidget::MyTabWidget(QWidget *parent)
+    : QTabWidget(parent)
 {
-    Q_OBJECT
+    QTabBar *tabBar = QTabWidget::tabBar();
+    connect(tabBar, SIGNAL(tabMoved(int, int)), this, SLOT(myTabMoved(int,int)));
+}
 
-public:
-    ConfigTelemetryWidget(QWidget *parent = 0);
-    ~ConfigTelemetryWidget();
+void MyTabWidget::moveTab(int from, int to)
+{
+    QTabBar *tabBar = QTabWidget::tabBar();
+    tabBar->moveTab(from, to);
+}
 
-private:
-    Ui_TelemetryWidget *m_telemetry;
-    void enableControls(bool enable);
 
-private slots:
-    virtual void refreshValues();
-    void sendTelemetryUpdate();
-    void saveTelemetryUpdate();
-
-};
-
-#endif // ConfigTelemetryWidget_H
+void MyTabWidget::myTabMoved(int from, int to)
+{
+    emit tabMoved(from, to);
+}

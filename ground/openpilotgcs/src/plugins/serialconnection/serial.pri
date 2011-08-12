@@ -1,3 +1,3 @@
 include(serial_dependencies.pri)
 
-LIBS *= -l$$qtLibraryTarget(Serial)
+LIBS *= -l$$qtLibraryName(Serial)

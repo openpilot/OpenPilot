@@ -64,7 +64,6 @@ static const struct pios_spi_cfg pios_spi_sdcard_cfg = {
     .ahb_clk  = RCC_AHBPeriph_DMA1,
     
     .irq = {
-      .handler = NULL,
       .flags   = (DMA1_FLAG_TC2 | DMA1_FLAG_TE2 | DMA1_FLAG_HT2 | DMA1_FLAG_GL2),
       .init    = {
 	.NVIC_IRQChannel                   = DMA1_Channel2_IRQn,
@@ -163,7 +162,6 @@ static const struct pios_spi_cfg pios_spi_ahrs_cfg = {
     .ahb_clk  = RCC_AHBPeriph_DMA1,
     
     .irq = {
-      .handler = NULL,
       .flags   = (DMA1_FLAG_TC4 | DMA1_FLAG_TE4 | DMA1_FLAG_HT4 | DMA1_FLAG_GL4),
       .init    = {
 	.NVIC_IRQChannel                   = DMA1_Channel4_IRQn,
@@ -263,7 +261,6 @@ static const struct pios_adc_cfg pios_adc_cfg = {
 	.dma = {
 		.ahb_clk  = RCC_AHBPeriph_DMA1,
 		.irq = {
-			.handler = NULL,
 			.flags   = (DMA1_FLAG_TC1 | DMA1_FLAG_TE1 | DMA1_FLAG_HT1 | DMA1_FLAG_GL1),
 			.init    = {
 				.NVIC_IRQChannel                   = DMA1_Channel1_IRQn,
@@ -322,7 +319,6 @@ static const struct pios_usart_cfg pios_usart_telem_cfg = {
     .USART_Mode                = USART_Mode_Rx | USART_Mode_Tx,
   },
   .irq = {
-    .handler = NULL,
     .init    = {
       .NVIC_IRQChannel                   = USART2_IRQn,
       .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
@@ -363,7 +359,6 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
     .USART_Mode                = USART_Mode_Rx | USART_Mode_Tx,
   },
   .irq = {
-    .handler = NULL,
     .init    = {
       .NVIC_IRQChannel                   = USART3_IRQn,
       .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
@@ -404,7 +399,6 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
     .USART_Mode                = USART_Mode_Rx | USART_Mode_Tx,
   },
   .irq = {
-    .handler = NULL,
     .init    = {
       .NVIC_IRQChannel                   = USART1_IRQn,
       .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
@@ -444,7 +438,6 @@ static const struct pios_rtc_cfg pios_rtc_main_cfg = {
 	.clksrc = RCC_RTCCLKSource_HSE_Div128,
 	.prescaler = 100,
 	.irq = {
-		.handler = NULL,
 		.init = {
 			.NVIC_IRQChannel                   = RTC_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
@@ -461,7 +454,7 @@ void PIOS_RTC_IRQ_Handler (void)
 
 #endif
 
-#ifdef PIOS_COM_SPEKTRUM
+#if defined(PIOS_INCLUDE_SPEKTRUM)
 /*
  * SPEKTRUM USART
  */
@@ -478,7 +471,6 @@ static const struct pios_usart_cfg pios_usart_spektrum_cfg = {
     .USART_Mode                = USART_Mode_Rx,
   },
   .irq = {
-    .handler = PIOS_SPEKTRUM_irq_handler,
     .init    = {
       .NVIC_IRQChannel                   = USART1_IRQn,
       .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
@@ -505,12 +497,6 @@ static const struct pios_usart_cfg pios_usart_spektrum_cfg = {
 };
 
 #include <pios_spektrum_priv.h>
-static uint32_t pios_usart_spektrum_id;
-void PIOS_USART_spektrum_irq_handler(void)
-{
-	PIOS_SPEKTRUM_irq_handler(pios_usart_spektrum_id);
-}
-
 static const struct pios_spektrum_cfg pios_spektrum_cfg = {
 	.bind = {
 		.gpio = GPIOA,
@@ -534,6 +520,14 @@ static const struct pios_spektrum_cfg pios_spektrum_cfg = {
 #if defined(PIOS_INCLUDE_COM)
 
 #include "pios_com_priv.h"
+
+#define PIOS_COM_TELEM_RF_RX_BUF_LEN 192
+#define PIOS_COM_TELEM_RF_TX_BUF_LEN 192
+
+#define PIOS_COM_GPS_RX_BUF_LEN 96
+
+#define PIOS_COM_TELEM_USB_RX_BUF_LEN 192
+#define PIOS_COM_TELEM_USB_TX_BUF_LEN 192
 
 #endif	/* PIOS_INCLUDE_COM */
 
@@ -710,7 +704,6 @@ const struct pios_pwm_cfg pios_pwm_cfg = {
 	},
 	.remap = GPIO_PartialRemap_TIM3,
 	.irq = {
-		.handler = NULL,
 		.init    = {
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
 			.NVIC_IRQChannelSubPriority        = 0,
@@ -750,7 +743,6 @@ static const struct pios_ppmsv_cfg pios_ppmsv_cfg = {
 		.TIM_RepetitionCounter = 0x0000,
 	},
 	.irq = {
-		.handler = NULL,
 		.init    = {
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
 			.NVIC_IRQChannelSubPriority        = 0,
@@ -790,7 +782,6 @@ static const struct pios_ppm_cfg pios_ppm_cfg = {
 	},
 	.remap = 0,
 	.irq = {
-		.handler = NULL,
 		.init    = {
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
 			.NVIC_IRQChannelSubPriority        = 0,
@@ -851,7 +842,6 @@ static const struct pios_i2c_adapter_cfg pios_i2c_main_adapter_cfg = {
     },
   },
   .event = {
-    .handler = NULL,
     .flags   = 0,		/* FIXME: check this */
     .init = {
       .NVIC_IRQChannel                   = I2C2_EV_IRQn,
@@ -861,7 +851,6 @@ static const struct pios_i2c_adapter_cfg pios_i2c_main_adapter_cfg = {
     },
   },
   .error = {
-    .handler = NULL,
     .flags   = 0,		/* FIXME: check this */
     .init = {
       .NVIC_IRQChannel                   = I2C2_ER_IRQn,
@@ -979,6 +968,21 @@ struct pios_rcvr_channel_map pios_rcvr_channel_to_id_map[PIOS_RCVR_MAX_CHANNELS]
 uint32_t pios_rcvr_max_channel;
 #endif /* PIOS_INCLUDE_RCVR */
 
+#if defined(PIOS_INCLUDE_USB_HID)
+#include "pios_usb_hid_priv.h"
+
+static const struct pios_usb_hid_cfg pios_usb_hid_main_cfg = {
+  .irq = {
+    .init    = {
+      .NVIC_IRQChannel                   = USB_LP_CAN1_RX0_IRQn,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+      .NVIC_IRQChannelSubPriority        = 0,
+      .NVIC_IRQChannelCmd                = ENABLE,
+    },
+  },
+};
+#endif	/* PIOS_INCLUDE_USB_HID */
+
 extern const struct pios_com_driver pios_usb_com_driver;
 
 uint32_t pios_com_telem_rf_id;
@@ -1046,22 +1050,37 @@ void PIOS_Board_Init(void) {
 	/* Initialize the PiOS library */
 #if defined(PIOS_INCLUDE_COM)
 #if defined(PIOS_INCLUDE_TELEMETRY_RF)
-	uint32_t pios_usart_telem_rf_id;
-	if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_cfg)) {
-		PIOS_Assert(0);
-	}
-	if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id)) {
-		PIOS_Assert(0);
+	{
+		uint32_t pios_usart_telem_rf_id;
+		if (PIOS_USART_Init(&pios_usart_telem_rf_id, &pios_usart_telem_cfg)) {
+			PIOS_Assert(0);
+		}
+
+		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
+		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
+		PIOS_Assert(rx_buffer);
+		PIOS_Assert(tx_buffer);
+		if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id,
+						  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
+						  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
+			PIOS_Assert(0);
+		}
 	}
 #endif /* PIOS_INCLUDE_TELEMETRY_RF */
 
 #if defined(PIOS_INCLUDE_GPS)
-	uint32_t pios_usart_gps_id;
-	if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
-		PIOS_Assert(0);
-	}
-	if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id)) {
-		PIOS_Assert(0);
+	{
+		uint32_t pios_usart_gps_id;
+		if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
+			PIOS_Assert(0);
+		}
+		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
+		PIOS_Assert(rx_buffer);
+		if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
+				  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
+				  NULL, 0)) {
+			PIOS_Assert(0);
+		}
 	}
 #endif	/* PIOS_INCLUDE_GPS */
 #endif
@@ -1118,23 +1137,28 @@ void PIOS_Board_Init(void) {
 #if (PIOS_SPEKTRUM_NUM_INPUTS > PIOS_RCVR_MAX_CHANNELS)
 #error More receiver inputs than available devices
 #endif
-			/* SPEKTRUM init must come before comms */
-			PIOS_SPEKTRUM_Init(&pios_spektrum_cfg, false);
+			{
+				uint32_t pios_usart_spektrum_id;
+				if (PIOS_USART_Init(&pios_usart_spektrum_id, &pios_usart_spektrum_cfg)) {
+					PIOS_Assert(0);
+				}
 
-			uint32_t pios_usart_spektrum_id;
-			if (PIOS_USART_Init(&pios_usart_spektrum_id, &pios_usart_spektrum_cfg)) {
-				PIOS_Assert(0);
-			}
-			uint32_t pios_spektrum_rcvr_id;
-			if (PIOS_RCVR_Init(&pios_spektrum_rcvr_id, &pios_spektrum_rcvr_driver, 0)) {
-				PIOS_Assert(0);
-			}
-			for (uint8_t i = 0;
-			     i < PIOS_SPEKTRUM_NUM_INPUTS && pios_rcvr_max_channel < NELEMENTS(pios_rcvr_channel_to_id_map);
-			     i++) {
-				pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].id = pios_spektrum_rcvr_id;
-				pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].channel = i;
-				pios_rcvr_max_channel++;
+				uint32_t pios_spektrum_id;
+				if (PIOS_SPEKTRUM_Init(&pios_spektrum_id, &pios_spektrum_cfg, &pios_usart_com_driver, pios_usart_spektrum_id, false)) {
+					PIOS_Assert(0);
+				}
+
+				uint32_t pios_spektrum_rcvr_id;
+				if (PIOS_RCVR_Init(&pios_spektrum_rcvr_id, &pios_spektrum_rcvr_driver, 0)) {
+					PIOS_Assert(0);
+				}
+				for (uint8_t i = 0;
+				     i < PIOS_SPEKTRUM_NUM_INPUTS && pios_rcvr_max_channel < NELEMENTS(pios_rcvr_channel_to_id_map);
+				     i++) {
+					pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].id = pios_spektrum_rcvr_id;
+					pios_rcvr_channel_to_id_map[pios_rcvr_max_channel].channel = i;
+					pios_rcvr_max_channel++;
+				}
 			}
 #endif
 			break;
@@ -1145,15 +1169,21 @@ void PIOS_Board_Init(void) {
 			break;
 	}
 
-
 #if defined(PIOS_INCLUDE_USB_HID)
-	PIOS_USB_HID_Init(0);
+	uint32_t pios_usb_hid_id;
+	PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_main_cfg);
 #if defined(PIOS_INCLUDE_COM)
-	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, 0)) {
+	uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
+	uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
+	PIOS_Assert(rx_buffer);
+	PIOS_Assert(tx_buffer);
+	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, pios_usb_hid_id,
+			  rx_buffer, PIOS_COM_TELEM_USB_RX_BUF_LEN,
+			  tx_buffer, PIOS_COM_TELEM_USB_TX_BUF_LEN)) {
 		PIOS_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_COM */
-#endif  /* PIOS_INCLUDE_USB_HID */
+#endif	/* PIOS_INCLUDE_USB_HID */
 
 #if defined(PIOS_INCLUDE_I2C)
 	if (PIOS_I2C_Init(&pios_i2c_main_adapter_id, &pios_i2c_main_adapter_cfg)) {

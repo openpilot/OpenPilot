@@ -62,11 +62,7 @@ int32_t PIOS_DELAY_Init(void)
 int32_t PIOS_DELAY_WaituS(uint16_t uS)
 {
 	Sleep(uS/1000);
-	//uint16_t start = PIOS_DELAY_TIMER->CNT;
-	/* Note that this event works on 16bit counter wrap-arounds */
-	//while((uint16_t)(PIOS_DELAY_TIMER->CNT - start) <= uS);
 
-	/* No error */
 	return 0;
 }
 

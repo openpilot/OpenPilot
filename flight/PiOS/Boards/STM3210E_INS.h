@@ -125,9 +125,6 @@ extern uint32_t pios_i2c_gyro_adapter_id;
 //-------------------------
 #define PIOS_USART_MAX_DEVS             2
 
-#define PIOS_USART_RX_BUFFER_SIZE       256
-#define PIOS_USART_TX_BUFFER_SIZE       256
-
 //-------------------------
 // PIOS_COM
 //
@@ -143,12 +140,6 @@ extern uint32_t pios_com_aux_id;
 #define PIOS_COM_AUX                    (pios_com_aux_id)
 #define PIOS_COM_DEBUG                  PIOS_COM_AUX
 #endif
-
-//-------------------------
-// Delay Timer
-//-------------------------
-#define PIOS_DELAY_TIMER                        TIM2
-#define PIOS_DELAY_TIMER_RCC_FUNC               RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE)
 
 //-------------------------
 // System Settings

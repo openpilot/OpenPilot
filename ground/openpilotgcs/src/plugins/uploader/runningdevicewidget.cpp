@@ -110,7 +110,7 @@ void runningDeviceWidget::populate()
 
     QByteArray description = utilMngr->getBoardDescription();
     deviceDescriptorStruct devDesc;
-    if(UploaderGadgetWidget::descriptionToStructure(description,&devDesc))
+    if(UAVObjectUtilManager::descriptionToStructure(description,&devDesc))
     {
         if(devDesc.description.startsWith("release",Qt::CaseInsensitive))
         {

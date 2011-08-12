@@ -183,28 +183,6 @@ int32_t PIOS_USART_Init(uint32_t * usart_id, const struct pios_usart_cfg * cfg)
 	/* Initialize the USART Rx and Tx pins */
 	GPIO_Init(usart_dev->cfg->rx.gpio, (GPIO_InitTypeDef *)&usart_dev->cfg->rx.init);
 	GPIO_Init(usart_dev->cfg->tx.gpio, (GPIO_InitTypeDef *)&usart_dev->cfg->tx.init);
-
-	/* Enable USART clock */
-	switch ((uint32_t)usart_dev->cfg->regs) {
-		case (uint32_t)USART1:
-			RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
-			break;
-		case (uint32_t)USART2:
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
-			break;
-		case (uint32_t)USART3:
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
-			break;
-		case (uint32_t)UART4:
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART4, ENABLE);
-			break;
-		case (uint32_t)UART5:
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART5, ENABLE);
-			break;
-		case (uint32_t)USART6:
-			RCC_APB1PeriphClockCmd(RCC_APB2Periph_USART6, ENABLE);
-			break;
-	}
   
 	/* Configure the USART */
 	USART_Init(usart_dev->cfg->regs, (USART_InitTypeDef *)&usart_dev->cfg->init);

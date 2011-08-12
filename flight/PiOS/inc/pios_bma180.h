@@ -35,6 +35,8 @@
 #ifndef PIOS_BMA180_H
 #define PIOS_BMA180_H
 
+#include <pios.h>
+
 /* BMA180 Addresses */
 #define BMA_CHIPID_ADDR   0x00
 #define BMA_VERSION_ADDR  0x00

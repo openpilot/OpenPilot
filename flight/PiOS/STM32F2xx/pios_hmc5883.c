@@ -63,7 +63,7 @@ void PIOS_HMC5883_Init(const struct pios_hmc5883_cfg * cfg)
 	// RCC_APB2PeriphClockCmd(PIOS_HMC5883_DRDY_CLK | RCC_APB2Periph_AFIO, ENABLE);
 
 	/* Configure EOC pin as input floating */
-	GPIO_Init(cfg->drdy, &cfg->drdy.init);
+	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
 	
 	/* Configure the End Of Conversion (EOC) interrupt */
 	//GPIO_EXTILineConfig(cfg->eoc_exit.port_source, cfg->eoc_exit.pin_source);

@@ -552,7 +552,7 @@ uint32_t pios_com_gps_id;
 /**
  * Sensor configurations 
  */
- #if defined (PIOS_INCLUDE_HMC5883)
+#if defined (PIOS_INCLUDE_HMC5883)
 #include "pios_hmc5883.h"
 
 static const struct pios_hmc5883_cfg pios_hmc5883_mag_cfg = {

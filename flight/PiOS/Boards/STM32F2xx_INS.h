@@ -143,32 +143,6 @@ extern uint32_t pios_com_aux_id;
 //-------------------------
 
 
-//-------------------------
-// GPIO
-// Not used, but pios_gpio.c expects something
-//-------------------------
-#define PIOS_GPIO_1_PORT                        GPIOA
-#define PIOS_GPIO_1_PIN                         GPIO_Pin_1
-#define PIOS_GPIO_1_GPIO_CLK                    RCC_APB2Periph_GPIOA
-
-#define PIOS_GPIO_PORTS                         { PIOS_GPIO_1_PORT }
-#define PIOS_GPIO_PINS                          { PIOS_GPIO_1_PIN }
-#define PIOS_GPIO_CLKS                          { PIOS_GPIO_1_GPIO_CLK }
-#define PIOS_GPIO_NUM                           1
-
-//------------------------
-// PIOS_IMU3000
-//------------------------
-#define PIOS_IMU3000_INT_GPIO_PORT		GPIOB
-#define PIOS_IMU3000_INT_GPIO_PIN		GPIO_Pin_1
-#define PIOS_IMU3000_INT_PORT_SOURCE		GPIO_PortSourceGPIOB
-#define PIOS_IMU3000_INT_PIN_SOURCE		GPIO_PinSource1
-#define PIOS_IMU3000_INT_CLK			RCC_APB2Periph_GPIOB
-#define PIOS_IMU3000_INT_EXTI_LINE		EXTI_Line1
-#define PIOS_IMU3000_INT_IRQn			EXTI1_IRQn
-#define PIOS_IMU3000_INT_PRIO			PIOS_IRQ_PRIO_HIGH
-
-
 
 
 #endif /* STM3210E_INS_H_ */

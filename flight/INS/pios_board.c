@@ -616,6 +616,38 @@ static const struct pios_bma180_cfg pios_bma180_cfg = {
 	},
 };
 
+#include "pios_imu3000.h"
+static const struct pios_imu3000_cfg pios_imu3000_cfg = {
+	.drdy = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_1,
+			.GPIO_Speed = GPIO_Speed_100MHz,
+			.GPIO_Mode = GPIO_Mode_IN,
+			.GPIO_OType = GPIO_OType_OD,
+			.GPIO_PuPd = GPIO_PuPd_NOPULL,
+		},
+	},
+	.eoc_exti = {
+		//		.pin_source = GPIO_PinSource1,
+		//		.port_source = GPIO_PortSourceGPIOB,
+		.init = {
+			.EXTI_Line = EXTI_Line1, // matches above GPIO pin
+			.EXTI_Mode = EXTI_Mode_Interrupt,
+			.EXTI_Trigger = EXTI_Trigger_Rising,
+			.EXTI_LineCmd = ENABLE,
+		},
+	},
+	.eoc_irq = {
+		.init = {
+			.NVIC_IRQChannel = EXTI1_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+			.NVIC_IRQChannelSubPriority = 0,
+			.NVIC_IRQChannelCmd = ENABLE,
+		},
+	},
+};
+
 #include "pios_bmp085.h"
 static const struct pios_bmp085_cfg pios_bmp085_cfg = {
 	.drdy = {
@@ -707,7 +739,7 @@ void PIOS_Board_Init(void) {
 	if (PIOS_I2C_Init(&pios_i2c_gyro_adapter_id, &pios_i2c_gyro_adapter_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
-	PIOS_IMU3000_Init();
+	PIOS_IMU3000_Init(&pios_imu3000_cfg);
 	
 	/* Set up the SPI interface to the accelerometer*/
 	if (PIOS_SPI_Init(&pios_spi_accel_id, &pios_spi_accel_cfg)) {

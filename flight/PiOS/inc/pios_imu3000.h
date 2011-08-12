@@ -33,6 +33,8 @@
 #ifndef PIOS_IMU3000_H
 #define PIOS_IMU3000_H
 
+#include "pios.h"
+
 /* IMU3000 Addresses */
 #define PIOS_IMU3000_I2C_ADDR             0x69
 #define PIOS_IMU3000_I2C_READ_ADDR        0xD2
@@ -116,8 +118,14 @@ struct pios_imu3000_data {
 	int16_t z;
 };
 
+struct pios_imu3000_cfg {
+	struct stm32_gpio drdy;
+	struct stm32_exti eoc_exti;
+	struct stm32_irq eoc_irq;
+};
+
 /* Public Functions */
-extern void PIOS_IMU3000_Init(void);
+extern void PIOS_IMU3000_Init(const struct pios_imu3000_cfg * cfg);
 extern bool PIOS_IMU3000_NewDataAvailable(void);
 extern int32_t PIOS_IMU3000_ReadFifo(uint8_t * buffer, uint16_t len);
 extern int32_t PIOS_IMU3000_ReadGyros(int16_t * data);

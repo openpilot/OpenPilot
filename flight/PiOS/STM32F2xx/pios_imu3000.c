@@ -57,34 +57,17 @@ static int32_t PIOS_IMU3000_Write(uint8_t address, uint8_t buffer);
  * @brief Initialize the IMU3000 3-axis gyro sensor.
  * @return none
  */
-void PIOS_IMU3000_Init(void)
+void PIOS_IMU3000_Init(const struct pios_imu3000_cfg * cfg)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-	EXTI_InitTypeDef EXTI_InitStructure;
-	NVIC_InitTypeDef NVIC_InitStructure;
-
-	/* Enable INT GPIO clock */
-	RCC_APB2PeriphClockCmd(PIOS_IMU3000_INT_CLK | RCC_APB2Periph_AFIO, ENABLE);
-
-	/* Configure IMU3000 interrupt pin as input floating */
-	GPIO_InitStructure.GPIO_Pin = PIOS_IMU3000_INT_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-	GPIO_Init(PIOS_IMU3000_INT_GPIO_PORT, &GPIO_InitStructure);
-
+	/* Configure EOC pin as input floating */
+	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
+	
 	/* Configure the End Of Conversion (EOC) interrupt */
-	GPIO_EXTILineConfig(PIOS_IMU3000_INT_PORT_SOURCE, PIOS_IMU3000_INT_PIN_SOURCE);
-	EXTI_InitStructure.EXTI_Line = PIOS_IMU3000_INT_EXTI_LINE;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
-	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructure);
-
+	//GPIO_EXTILineConfig(cfg->eoc_exit.port_source, cfg->eoc_exit.pin_source);
+	EXTI_Init(&cfg->eoc_exti.init);
+	
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
-	NVIC_InitStructure.NVIC_IRQChannel = PIOS_IMU3000_INT_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IMU3000_INT_PRIO;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
+	NVIC_Init(&cfg->eoc_irq.init);
 
 	/* Configure the IMU3000 Sensor */
 	PIOS_IMU3000_ConfigTypeDef IMU3000_InitStructure;

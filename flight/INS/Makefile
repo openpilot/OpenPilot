@@ -55,10 +55,10 @@ PIOS = ../PiOS
 PIOSINC = $(PIOS)/inc
 FLIGHTLIB = ../Libraries
 FLIGHTLIBINC = ../Libraries/inc
-PIOSSTM32FXX = $(PIOS)/STM32F2xx
+PIOSSTM32F2XX = $(PIOS)/STM32F2xx
 PIOSCOMMON = $(PIOS)/Common
 PIOSBOARDS = $(PIOS)/Boards
-APPLIBDIR = $(PIOSSTM32FXX)/Libraries
+APPLIBDIR = $(PIOSSTM32F2XX)/Libraries
 STMLIBDIR = $(APPLIBDIR)
 STMSPDDIR = $(STMLIBDIR)/STM32F2xx_StdPeriph_Driver
 STMSPDSRCDIR = $(STMSPDDIR)/src
@@ -89,25 +89,26 @@ SRC += $(BOOT)/ahrs_slave_test.c
 SRC += $(BOOT)/ahrs_spi_program.c
 
 ## PIOS Hardware (STM32F2xx)
-SRC += $(PIOSSTM32FXX)/pios_sys.c
-SRC += $(PIOSSTM32FXX)/pios_led.c
-SRC += $(PIOSSTM32FXX)/pios_delay.c
-SRC += $(PIOSSTM32FXX)/pios_usart.c
-SRC += $(PIOSSTM32FXX)/pios_irq.c
-SRC += $(PIOSSTM32FXX)/pios_i2c.c
-SRC += $(PIOSSTM32FXX)/pios_debug.c
-SRC += $(PIOSSTM32FXX)/pios_gpio.c
-SRC += $(PIOSSTM32FXX)/pios_spi.c
-#SRC += $(PIOSSTM32FXX)/pios_exti.c
-SRC += $(PIOSSTM32FXX)/pios_iap.c
-SRC += $(PIOSSTM32FXX)/pios_bma180.c
-SRC += $(PIOSSTM32FXX)/pios_hmc5883.c
-SRC += $(PIOSSTM32FXX)/pios_bmp085.c
+SRC += $(PIOSSTM32F2XX)/pios_sys.c
+SRC += $(PIOSSTM32F2XX)/pios_led.c
+SRC += $(PIOSSTM32F2XX)/pios_delay.c
+SRC += $(PIOSSTM32F2XX)/pios_usart.c
+SRC += $(PIOSSTM32F2XX)/pios_irq.c
+SRC += $(PIOSSTM32F2XX)/pios_i2c.c
+SRC += $(PIOSSTM32F2XX)/pios_debug.c
+#SRC += $(PIOSSTM32F2XX)/pios_gpio.c
+SRC += $(PIOSSTM32F2XX)/pios_spi.c
+#SRC += $(PIOSSTM32F2XX)/pios_exti.c
+SRC += $(PIOSSTM32F2XX)/pios_iap.c
+SRC += $(PIOSSTM32F2XX)/pios_bma180.c
+SRC += $(PIOSSTM32F2XX)/pios_hmc5883.c
+SRC += $(PIOSSTM32F2XX)/pios_bmp085.c
+SRC += $(PIOSSTM32F2XX)/pios_imu3000.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
-SRC += $(PIOSCOMMON)/pios_imu3000.c
+
 SRC += $(PIOSCOMMON)/pios_bl_helper.c
 
 ## CMSIS for STM32
@@ -151,7 +152,7 @@ CPPSRCARM =
 # Even though the DOS/Win* filesystem matches both .s and .S the same,
 # it will preserve the spelling of the filenames, and gcc itself does
 # care about how the name is spelled on its command-line.
-ASRC = $(PIOSSTM32FXX)/startup_stm32f2xx.S
+ASRC = $(PIOSSTM32F2XX)/startup_stm32f2xx.S
 
 # List Assembler source files here which must be assembled in ARM-Mode..
 ASRCARM =
@@ -161,7 +162,7 @@ ASRCARM =
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)
-EXTRAINCDIRS  += $(PIOSSTM32FXX)
+EXTRAINCDIRS  += $(PIOSSTM32F2XX)
 EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(PIOSBOARDS)
 EXTRAINCDIRS  += $(STMSPDINCDIR)

@@ -39,10 +39,11 @@
   BMA180 interrupt
  */
 
+#define timer_rate() 100000
+#define timer_count() 1
 /* OpenPilot Includes */
 #include "ins.h"
 #include "pios.h"
-#include "ahrs_timer.h"
 #include "ahrs_spi_comm.h"
 #include "insgps.h"
 #include "CoordinateConversions.h"
@@ -129,7 +130,6 @@ static float mag_len = 0;
 
 typedef enum { INS_IDLE, INS_DATA_READY, INS_PROCESSING } states;
 volatile int32_t ekf_too_slow;
-volatile int32_t total_conversion_blocks;
 
 /**
  * @}
@@ -443,18 +443,12 @@ int16_t mag_data_glob[3];
 uint32_t pin;
 int16_t accel[3];
 
+uint32_t total_conversion_blocks;
+
 int main()
 {	
 	gps_data.quality = -1;
-	uint32_t up_time_real = 0;
-	uint32_t up_time = 0;
-	uint32_t last_up_time = 0;
 	static int8_t last_ahrs_algorithm;
-	uint32_t last_counter_idle_start = 0;
-	uint32_t last_counter_idle_end = 0;
-	uint32_t idle_counts = 0;
-	uint32_t running_counts = 0;
-	uint32_t counter_val = 0;
 	ahrs_algorithm = AHRSSETTINGS_ALGORITHM_SIMPLE;
 
 	reset_values();
@@ -490,7 +484,6 @@ int main()
 	// Flash warning light while trying to connect
 	uint16_t time_val = PIOS_DELAY_GetuS();
 	uint16_t ms_count = 0;
-	extern int32_t PIOS_DELAY_DiffuS(uint16_t ref);
 	while(!AhrsLinkReady()) {
 		AhrsPoll();
 		if(PIOS_DELAY_DiffuS(time_val) > 10000) {
@@ -514,8 +507,6 @@ int main()
 
 	calibration_callback(AHRSCalibrationHandle()); //force an update
 
-	timer_start();
-
 	/******************* Main EKF loop ****************************/
 	while(1) {
 
@@ -523,18 +514,7 @@ int main()
 		AhrsPoll();
 		AhrsStatusData status;
 		AhrsStatusGet(&status);
-		status.CPULoad = ((float)running_counts /
-						  (float)(idle_counts + running_counts)) * 100;
-		status.IdleTimePerCyle = idle_counts / (timer_rate() / 10000);
-		status.RunningTimePerCyle = running_counts / (timer_rate() / 10000);
 		status.DroppedUpdates = ekf_too_slow;
-		up_time = timer_count();
-		if(up_time >= last_up_time) // normal condition
-			up_time_real += ((up_time - last_up_time) * 1000) / timer_rate();
-		else
-			up_time_real += ((0xFFFF - last_up_time + up_time) * 1000) / timer_rate();
-		last_up_time = up_time;
-		status.RunningTime = up_time_real;
 		AhrsStatusSet(&status);
 
 		// Alive signal
@@ -543,22 +523,12 @@ int main()
 
 		// Delay for valid data
 
-		counter_val = timer_count();
-		running_counts = counter_val - last_counter_idle_end;
-		last_counter_idle_start = counter_val;
-
 		// This function blocks till data avilable
 		get_accel_gyro_data();
 
 		// Get any mag data available
 		process_mag_data();
 
-		total_conversion_blocks++;
-		
-		counter_val = timer_count();
-		idle_counts = counter_val - last_counter_idle_start;
-		last_counter_idle_end = counter_val;
-		
 		if(ISNAN(accel_data.filtered.x + accel_data.filtered.y + accel_data.filtered.z) ||
 		   ISNAN(gyro_data.filtered.x + gyro_data.filtered.y + gyro_data.filtered.z) ||
 		   ACCEL_OOB(accel_data.filtered.x + accel_data.filtered.y + accel_data.filtered.z) ||

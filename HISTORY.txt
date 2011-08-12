@@ -1,5 +1,9 @@
 Short summary of changes.  For a complete list see the git log.
 
+2011-08-04
+Fixed packaging aesthetic issues.  Also avoid runtime issues on OSX Lion by
+disabling the ModelView and Notify plugins for now (sorry).
+
 2011-07-29
 Added support for PPM receivers from James W. Now all 4 interfaces (R/C
 standard PWM, combined PPM (MK), Spektrum satellite, Futaba S.Bus) are

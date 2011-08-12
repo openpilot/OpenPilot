@@ -28,7 +28,7 @@
 #include "workspacesettings.h"
 #include <coreplugin/icore.h>
 #include <coreplugin/modemanager.h>
-#include <coreplugin/uavgadgetmode.h>
+#include <coreplugin/uavgadgetmanager/uavgadgetmanager.h>
 #include <QtCore/QSettings>
 
 #include "ui_workspacesettings.h"
@@ -95,26 +95,37 @@ QWidget *WorkspaceSettings::createPage(QWidget *parent)
     m_currentIndex = 0;
     selectWorkspace(m_currentIndex);
 
+    if (0 <= m_tabBarPlacementIndex && m_tabBarPlacementIndex < m_page->comboBoxTabBarPlacement->count())
+        m_page->comboBoxTabBarPlacement->setCurrentIndex(m_tabBarPlacementIndex);
+    m_page->checkBoxAllowTabMovement->setChecked(m_allowTabBarMovement);
+
     return w;
 }
 
 void WorkspaceSettings::readSettings(QSettings* qs)
 {
-    m_iconNames.clear();
     m_names.clear();
+    m_iconNames.clear();
+    m_modeNames.clear();
 
     qs->beginGroup(QLatin1String("Workspace"));
     m_numberOfWorkspaces = qs->value(QLatin1String("NumberOfWorkspaces"), 2).toInt();
+    m_previousNumberOfWorkspaces = m_numberOfWorkspaces;
     for (int i = 1; i <= MAX_WORKSPACES; ++i) {
         QString numberString = QString::number(i);
         QString defaultName = "Workspace" + numberString;
         QString defaultIconName = "Icon" + numberString;
-        const QString name = qs->value(defaultName, defaultName).toString();
-        const QString iconName = qs->value(defaultIconName, ":/core/images/openpilot_logo_64.png").toString();
-        m_iconNames.append(iconName);
+        QString name = qs->value(defaultName, defaultName).toString();
+        QString iconName = qs->value(defaultIconName, ":/core/images/openpilot_logo_64.png").toString();
         m_names.append(name);
+        m_iconNames.append(iconName);
+        m_modeNames.append(QString("Mode")+ QString::number(i));
     }
+    m_tabBarPlacementIndex = qs->value(QLatin1String("TabBarPlacementIndex"), 1).toInt(); // 1 == "Bottom"
+    m_allowTabBarMovement = qs->value(QLatin1String("AllowTabBarMovement"), false).toBool();
     qs->endGroup();
+    QTabWidget::TabPosition pos = m_tabBarPlacementIndex == 0 ? QTabWidget::North : QTabWidget::South;
+    emit tabBarSettingsApplied(pos, m_allowTabBarMovement);
 }
 
 void WorkspaceSettings::saveSettings(QSettings* qs)
@@ -122,12 +133,16 @@ void WorkspaceSettings::saveSettings(QSettings* qs)
     qs->beginGroup(QLatin1String("Workspace"));
     qs->setValue(QLatin1String("NumberOfWorkspaces"), m_numberOfWorkspaces);
     for (int i = 0; i < MAX_WORKSPACES; ++i) {
+        QString mode = QString("Mode")+ QString::number(i+1);
+        int j = m_modeNames.indexOf(mode);
         QString numberString = QString::number(i+1);
         QString defaultName = "Workspace" + numberString;
         QString defaultIconName = "Icon" + numberString;
-        qs->setValue(defaultName, m_names.at(i));
-        qs->setValue(defaultIconName, m_iconNames.at(i));
+        qs->setValue(defaultName, m_names.at(j));
+        qs->setValue(defaultIconName, m_iconNames.at(j));
     }
+    qs->setValue(QLatin1String("TabBarPlacementIndex"), m_tabBarPlacementIndex);
+    qs->setValue(QLatin1String("AllowTabBarMovement"), m_allowTabBarMovement);
     qs->endGroup();
 }
 
@@ -137,15 +152,23 @@ void WorkspaceSettings::apply()
 
     saveSettings(Core::ICore::instance()->settings());
 
+    if (m_numberOfWorkspaces != m_previousNumberOfWorkspaces) {
+        Core::ICore::instance()->readMainSettings(Core::ICore::instance()->settings(), true);
+        m_previousNumberOfWorkspaces = m_numberOfWorkspaces;
+    }
+
     ModeManager* modeManager = Core::ICore::instance()->modeManager();
     for (int i = 0; i < MAX_WORKSPACES; ++i) {
-        Core::Internal::UAVGadgetMode *mode =
-                qobject_cast<Core::Internal::UAVGadgetMode*>(modeManager->mode(modeName(i)));
+        IMode *baseMode = modeManager->mode(modeName(i));
+        Core::UAVGadgetManager *mode = qobject_cast<Core::UAVGadgetManager*>(baseMode);
         if (mode) {
             modeManager->updateModeNameIcon(mode, QIcon(iconName(i)), name(i));
         }
     }
-
+    m_tabBarPlacementIndex = m_page->comboBoxTabBarPlacement->currentIndex();
+    m_allowTabBarMovement = m_page->checkBoxAllowTabMovement->isChecked();
+    QTabWidget::TabPosition pos = m_tabBarPlacementIndex == 0 ? QTabWidget::North : QTabWidget::South;
+    emit tabBarSettingsApplied(pos, m_allowTabBarMovement);
 }
 
 void WorkspaceSettings::finish()
@@ -186,8 +209,8 @@ void WorkspaceSettings::selectWorkspace(int index, bool store)
         // write old values of workspace not shown anymore
         m_iconNames.replace(m_currentIndex, m_page->iconPathChooser->path());
         m_names.replace(m_currentIndex, m_page->nameEdit->text());
-        m_page->workspaceComboBox->setItemIcon(m_currentIndex, QIcon(m_page->iconPathChooser->path()));
-        m_page->workspaceComboBox->setItemText(m_currentIndex, m_page->nameEdit->text());
+        m_page->workspaceComboBox->setItemIcon(m_currentIndex, QIcon(m_iconNames.at(m_currentIndex)));
+        m_page->workspaceComboBox->setItemText(m_currentIndex, m_names.at(m_currentIndex));
     }
 
     // display current workspace   
@@ -195,4 +218,35 @@ void WorkspaceSettings::selectWorkspace(int index, bool store)
     m_page->iconPathChooser->setPath(iconName);
     m_page->nameEdit->setText(m_names.at(index));
     m_currentIndex = index;
+}
+
+void WorkspaceSettings::newModeOrder(QVector<IMode*> modes)
+{
+    QList<int> priorities;
+    QStringList modeNames;
+    for (int i = 0; i < modes.count(); ++i) {
+        Core::UAVGadgetManager *mode = qobject_cast<Core::UAVGadgetManager*>(modes.at(i));
+        if (mode) {
+            priorities.append(mode->priority());
+            modeNames.append(mode->uniqueModeName());
+        }
+    }
+    // Bubble sort
+    bool swapped = false;
+    do {
+        swapped = false;
+        for (int i = 0; i < m_names.count()-1; ++i) {
+            int j = i+1;
+            int p = modeNames.indexOf(m_modeNames.at(i));
+            int q = modeNames.indexOf(m_modeNames.at(j));
+            bool nonShowingMode = (p == -1 && q >=0);
+            bool pqBothFound = (p >= 0 && q >= 0);
+            if (nonShowingMode || (pqBothFound && (priorities.at(q) > priorities.at(p)))) {
+                m_names.swap(i, j);
+                m_iconNames.swap(i, j);
+                m_modeNames.swap(i, j);
+                swapped = true;
+            }
+        }
+    } while (swapped);
 }

@@ -1,13 +1,14 @@
 /**
  ******************************************************************************
  *
- * @file       configtelemetrytwidget.h
+ * @file       mytabwidget.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @addtogroup GCSPlugins GCS Plugins
+ *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
+ * @brief
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup
  * @{
- * @addtogroup ConfigPlugin Config Plugin
- * @{
- * @brief Telemetry configuration panel
+ *
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,32 +25,31 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGCCHWWIDGET_H
-#define CONFIGCCHWWIDGET_H
+#ifndef MYTABWIDGET_H
+#define MYTABWIDGET_H
 
-#include "ui_cc_hw_settings.h"
-#include "configtaskwidget.h"
-#include "extensionsystem/pluginmanager.h"
-#include "uavobjectmanager.h"
-#include "uavobject.h"
-#include <QtGui/QWidget>
-#include <QList>
-#include "smartsavebutton.h"
+#include "utils_global.h"
 
-class ConfigCCHWWidget: public ConfigTaskWidget
+#include <QtGui/QTabWidget>
+
+/*
+ * MyTabWidget is a plain QTabWidget with the addition of the signal
+ * tabMoved(int, int) which QTabBar has but for some reason is
+ * not made available from QTabWidget.
+ */
+class QTCREATOR_UTILS_EXPORT MyTabWidget : public QTabWidget
 {
     Q_OBJECT
 
 public:
-    ConfigCCHWWidget(QWidget *parent = 0);
-    ~ConfigCCHWWidget();
-private slots:
-    void openHelp();
-    void refreshValues();
-    void widgetsContentsChanged();
+    MyTabWidget(QWidget *parent = 0);
+    void moveTab(int from, int to);
 
-private:
-    Ui_CC_HW_Widget *m_telemetry;
+private slots:
+    void myTabMoved(int from, int to);
+
+signals:
+    void tabMoved(int from, int to);
 };
 
-#endif // CONFIGCCHWWIDGET_H
+#endif // MYTABWIDGET_H

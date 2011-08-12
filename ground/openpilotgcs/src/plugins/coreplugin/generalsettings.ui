@@ -17,75 +17,10 @@
       <string>General settings</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="2" column="0">
-       <widget class="QLabel" name="terminalLabel">
-        <property name="text">
-         <string>Terminal:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>External editor:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="10" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>When files are externally modified:</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="terminalEdit"/>
-      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="colorLabel">
         <property name="text">
          <string>User interface color:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="QToolButton" name="resetTerminalButton">
-        <property name="toolTip">
-         <string>Reset to default</string>
-        </property>
-        <property name="text">
-         <string>R</string>
-        </property>
-        <property name="icon">
-         <iconset resource="core.qrc">
-          <normaloff>:/core/images/reset.png</normaloff>:/core/images/reset.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="1">
-       <widget class="QLineEdit" name="externalEditorEdit"/>
-      </item>
-      <item row="8" column="2">
-       <widget class="QToolButton" name="resetEditorButton">
-        <property name="toolTip">
-         <string>Reset to default</string>
-        </property>
-        <property name="text">
-         <string>R</string>
-        </property>
-        <property name="icon">
-         <iconset resource="core.qrc">
-          <normaloff>:/core/images/reset.png</normaloff>:/core/images/reset.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="3">
-       <widget class="QToolButton" name="helpExternalEditorButton">
-        <property name="text">
-         <string>?</string>
         </property>
        </widget>
       </item>
@@ -144,53 +79,12 @@
         </layout>
        </widget>
       </item>
-      <item row="10" column="1">
+      <item row="8" column="1">
        <widget class="QWidget" name="widget_2" native="true">
         <layout class="QGridLayout" name="gridLayout_3">
          <property name="margin">
           <number>0</number>
          </property>
-         <item row="0" column="0">
-          <widget class="QComboBox" name="reloadBehavior">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="currentIndex">
-            <number>0</number>
-           </property>
-           <item>
-            <property name="text">
-             <string>Always ask</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Reload all modified files</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Ignore modifications</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>132</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
         </layout>
        </widget>
       </item>
@@ -221,7 +115,7 @@
         </item>
        </layout>
       </item>
-      <item row="11" column="1">
+      <item row="9" column="1">
        <widget class="QCheckBox" name="checkBoxSaveOnExit">
         <property name="text">
          <string/>
@@ -231,27 +125,27 @@
         </property>
        </widget>
       </item>
-      <item row="11" column="0">
+      <item row="9" column="0">
        <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>Save configuration settings on on exit</string>
+         <string>Save configuration settings on exit:</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="12" column="0">
+      <item row="10" column="0">
        <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>Automatically connect an OpenPilot USB device</string>
+         <string>Automatically connect an OpenPilot USB device:</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="12" column="1">
+      <item row="10" column="1">
        <widget class="QCheckBox" name="checkAutoConnect">
         <property name="text">
          <string/>
@@ -261,17 +155,17 @@
         </property>
        </widget>
       </item>
-      <item row="13" column="0">
+      <item row="11" column="0">
        <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>Automatically select an OpenPilot USB device</string>
+         <string>Automatically select an OpenPilot USB device:</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="13" column="1">
+      <item row="11" column="1">
        <widget class="QCheckBox" name="checkAutoSelect">
         <property name="enabled">
          <bool>false</bool>

@@ -1,13 +1,14 @@
 /**
  ******************************************************************************
  *
- * @file       configtelemetrytwidget.h
+ * @file       mylistwidget.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @addtogroup GCSPlugins GCS Plugins
+ *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
+ * @brief
+ * @see        The GNU Public License (GPL) Version 3
+ * @defgroup
  * @{
- * @addtogroup ConfigPlugin Config Plugin
- * @{
- * @brief Telemetry configuration panel
+ *
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,32 +25,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGCCHWWIDGET_H
-#define CONFIGCCHWWIDGET_H
+#include "mylistwidget.h"
 
-#include "ui_cc_hw_settings.h"
-#include "configtaskwidget.h"
-#include "extensionsystem/pluginmanager.h"
-#include "uavobjectmanager.h"
-#include "uavobject.h"
-#include <QtGui/QWidget>
-#include <QList>
-#include "smartsavebutton.h"
-
-class ConfigCCHWWidget: public ConfigTaskWidget
+QStyleOptionViewItem MyListWidget::viewOptions() const
 {
-    Q_OBJECT
-
-public:
-    ConfigCCHWWidget(QWidget *parent = 0);
-    ~ConfigCCHWWidget();
-private slots:
-    void openHelp();
-    void refreshValues();
-    void widgetsContentsChanged();
-
-private:
-    Ui_CC_HW_Widget *m_telemetry;
-};
-
-#endif // CONFIGCCHWWIDGET_H
+    QStyleOptionViewItem option = QListWidget::viewOptions();
+    if (m_iconAbove) {
+        option.decorationPosition = QStyleOptionViewItem::Top;
+        option.displayAlignment = Qt::AlignCenter;
+    }
+    return option;
+}

@@ -1,3 +1,3 @@
 include(ipconnection_dependencies.pri)
 
-LIBS *= -l$$qtLibraryTarget(IPconnection)
+LIBS *= -l$$qtLibraryName(IPconnection)

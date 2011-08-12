@@ -552,10 +552,8 @@ uint32_t pios_com_gps_id;
 /**
  * Sensor configurations 
  */
-#if defined (PIOS_INCLUDE_HMC5883)
 #include "pios_hmc5883.h"
-
-static const struct pios_hmc5883_cfg pios_hmc5883_mag_cfg = {
+static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
 	.drdy = {
 		.gpio = GPIOB,
 		.init = {
@@ -585,11 +583,8 @@ static const struct pios_hmc5883_cfg pios_hmc5883_mag_cfg = {
 		},
 	},
 };
-#endif
 
-#if defined (PIOS_INCLUDE_BMA180)
 #include "pios_bma180.h"
-
 static const struct pios_bma180_cfg pios_bma180_cfg = {
 	.drdy = {
 		.gpio = GPIOC,
@@ -602,8 +597,8 @@ static const struct pios_bma180_cfg pios_bma180_cfg = {
 		},
 	},
 	.eoc_exti = {
-		//		.pin_source = GPIO_PinSource8,
-		//		.port_source = GPIO_PortSourceGPIOB,
+		//		.pin_source = GPIO_PinSource4,
+		//		.port_source = GPIO_PortSourceGPIOC,
 		.init = {
 			.EXTI_Line = EXTI_Line4, // matches above GPIO pin
 			.EXTI_Mode = EXTI_Mode_Interrupt,
@@ -620,7 +615,49 @@ static const struct pios_bma180_cfg pios_bma180_cfg = {
 		},
 	},
 };
-#endif
+
+#include "pios_bmp085.h"
+static const struct pios_bmp085_cfg pios_bmp085_cfg = {
+	.drdy = {
+		.gpio = GPIOC,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_2,
+			.GPIO_Speed = GPIO_Speed_100MHz,
+			.GPIO_Mode = GPIO_Mode_IN,
+			.GPIO_OType = GPIO_OType_OD,
+			.GPIO_PuPd = GPIO_PuPd_NOPULL,
+		},
+	},
+	.eoc_exti = {
+		//		.pin_source = GPIO_PinSource2,
+		//		.port_source = GPIO_PortSourceGPIOC,
+		.init = {
+			.EXTI_Line = EXTI_Line2, // matches above GPIO pin
+			.EXTI_Mode = EXTI_Mode_Interrupt,
+			.EXTI_Trigger = EXTI_Trigger_Rising,
+			.EXTI_LineCmd = ENABLE,
+		},
+	},
+	.eoc_irq = {
+		.init = {
+			.NVIC_IRQChannel = EXTI15_10_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+			.NVIC_IRQChannelSubPriority = 0,
+			.NVIC_IRQChannelCmd = ENABLE,
+		},
+	},
+	.xclr = {
+		.gpio = GPIOC,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_1,
+			.GPIO_Speed = GPIO_Speed_100MHz,
+			.GPIO_Mode = GPIO_Mode_OUT,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd = GPIO_PuPd_NOPULL,
+		},
+	},
+	.oversampling = 3,
+};
 
 /**
  * PIOS_Board_Init()
@@ -664,8 +701,8 @@ void PIOS_Board_Init(void) {
 		PIOS_DEBUG_Assert(0);
 	}
 
-	PIOS_BMP085_Init();
-	PIOS_HMC5883_Init(&pios_hmc5883_mag_cfg);
+	PIOS_BMP085_Init(&pios_bmp085_cfg);
+	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
 	
 	if (PIOS_I2C_Init(&pios_i2c_gyro_adapter_id, &pios_i2c_gyro_adapter_cfg)) {
 		PIOS_DEBUG_Assert(0);

@@ -31,6 +31,8 @@
 #ifndef PIOS_BMP085_H
 #define PIOS_BMP085_H
 
+#include <pios.h>
+
 /* BMP085 Addresses */
 #define BMP085_I2C_ADDR			0x77
 #define BMP085_CALIB_ADDR		0xAA
@@ -69,8 +71,17 @@ extern xSemaphoreHandle PIOS_BMP085_EOC;
 extern int32_t PIOS_BMP085_EOC;
 #endif
 
+
+struct pios_bmp085_cfg {
+	struct stm32_gpio drdy;
+	struct stm32_gpio xclr;
+	struct stm32_exti eoc_exti;
+	struct stm32_irq eoc_irq;
+	uint32_t oversampling;
+};
+
 /* Public Functions */
-extern void PIOS_BMP085_Init(void);
+extern void PIOS_BMP085_Init(const struct pios_bmp085_cfg * cfg);
 extern void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type);
 extern void PIOS_BMP085_ReadADC(void);
 extern int16_t PIOS_BMP085_GetTemperature(void);

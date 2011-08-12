@@ -29,6 +29,9 @@
  */
 
 /* Project Includes */
+// TODO: Clean this up.  Getting around old constant.
+#define PIOS_BMP085_OVERSAMPLING oversampling
+
 #include "pios.h"
 
 #if defined(PIOS_INCLUDE_BMP085)
@@ -58,15 +61,14 @@ static volatile uint16_t Temperature;
 static int32_t PIOS_BMP085_Read(uint8_t address, uint8_t * buffer, uint8_t len);
 static int32_t PIOS_BMP085_Write(uint8_t address, uint8_t buffer);
 
+// Move into proper driver structure with cfg stored
+static uint32_t oversampling;
+
 /**
 * Initialise the BMP085 sensor
 */
-void PIOS_BMP085_Init(void)
+void PIOS_BMP085_Init(const struct pios_bmp085_cfg * cfg)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-	EXTI_InitTypeDef EXTI_InitStructure;
-	NVIC_InitTypeDef NVIC_InitStructure;
-
 #if defined(PIOS_INCLUDE_FREERTOS)
 	/* Semaphore used by ISR to signal End-Of-Conversion */
 	vSemaphoreCreateBinary(PIOS_BMP085_EOC);
@@ -76,34 +78,25 @@ void PIOS_BMP085_Init(void)
 	PIOS_BMP085_EOC = 0;
 #endif
 
-	/* Enable EOC GPIO clock */
-	RCC_APB2PeriphClockCmd(PIOS_BMP085_EOC_CLK | RCC_APB2Periph_AFIO, ENABLE);
-
 	/* Configure EOC pin as input floating */
-	GPIO_InitStructure.GPIO_Pin = PIOS_BMP085_EOC_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-	GPIO_Init(PIOS_BMP085_EOC_GPIO_PORT, &GPIO_InitStructure);
-
+	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
+	
 	/* Configure the End Of Conversion (EOC) interrupt */
-	GPIO_EXTILineConfig(PIOS_BMP085_EOC_PORT_SOURCE, PIOS_BMP085_EOC_PIN_SOURCE);
-	EXTI_InitStructure.EXTI_Line = PIOS_BMP085_EOC_EXTI_LINE;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
-	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructure);
-
+	EXTI_Init(&cfg->eoc_exti.init);
+	
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
-	NVIC_InitStructure.NVIC_IRQChannel = PIOS_BMP085_EOC_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_BMP085_EOC_PRIO;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
+	NVIC_Init(&cfg->eoc_irq.init);
 
-	/* Configure XCLR pin as push/pull alternate funtion output */
+	oversampling = cfg->oversampling;
+	
+	/* Configure anothing GPIO pin pin as input floating */
+/*  WHAT DID THIS DO?
+	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
+
 	GPIO_InitStructure.GPIO_Pin = PIOS_BMP085_XCLR_GPIO_PIN;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_Init(PIOS_BMP085_XCLR_GPIO_PORT, &GPIO_InitStructure);
-
+*/
 	/* Read all 22 bytes of calibration data in one transfer, this is a very optimized way of doing things */
 	uint8_t Data[BMP085_CALIB_LEN];
 	while (PIOS_BMP085_Read(BMP085_CALIB_ADDR, Data, BMP085_CALIB_LEN) != 0)
@@ -173,18 +166,18 @@ void PIOS_BMP085_ReadADC(void)
 		/* Read the pressure conversion */
 		while (PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 3) != 0)
 			continue;
-		RawPressure = ((Data[0] << 16) | (Data[1] << 8) | Data[2]) >> (8 - BMP085_OVERSAMPLING);
+		RawPressure = ((Data[0] << 16) | (Data[1] << 8) | Data[2]) >> (8 - oversampling);
 
 		B6 = B5 - 4000;
 		X1 = (CalibData.B2 * (B6 * B6 >> 12)) >> 11;
 		X2 = CalibData.AC2 * B6 >> 11;
 		X3 = X1 + X2;
-		B3 = ((((int32_t) CalibData.AC1 * 4 + X3) << BMP085_OVERSAMPLING) + 2) >> 2;
+		B3 = ((((int32_t) CalibData.AC1 * 4 + X3) << oversampling) + 2) >> 2;
 		X1 = CalibData.AC3 * B6 >> 13;
 		X2 = (CalibData.B1 * (B6 * B6 >> 12)) >> 16;
 		X3 = ((X1 + X2) + 2) >> 2;
 		B4 = (CalibData.AC4 * (uint32_t) (X3 + 32768)) >> 15;
-		B7 = ((uint32_t) RawPressure - B3) * (50000 >> BMP085_OVERSAMPLING);
+		B7 = ((uint32_t) RawPressure - B3) * (50000 >> oversampling);
 		P = B7 < 0x80000000 ? (B7 * 2) / B4 : (B7 / B4) * 2;
 
 		X1 = (P >> 8) * (P >> 8);

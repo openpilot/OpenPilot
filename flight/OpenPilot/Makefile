@@ -180,12 +180,12 @@ SRC += $(PIOSSTM32F10X)/pios_usb_hid_desc.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_prop.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
+SRC += $(PIOSSTM32F10X)/pios_bmp085.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_crc.c
 SRC += $(PIOSCOMMON)/pios_sdcard.c
 SRC += $(PIOSCOMMON)/pios_com.c
-SRC += $(PIOSCOMMON)/pios_bmp085.c
 SRC += $(PIOSCOMMON)/pios_hcsr04.c
 SRC += $(PIOSCOMMON)/pios_i2c_esc.c
 SRC += $(PIOSCOMMON)/pios_bl_helper.c

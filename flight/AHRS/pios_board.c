@@ -351,6 +351,49 @@ static const struct stm32_gpio pios_debug_pins[] = {
 
 #endif /* PIOS_ENABLE_DEBUG_PINS */
 
+#include "pios_bmp085.h"
+static const struct pios_bmp085_cfg pios_bmp085_cfg = {
+	.drdy = {
+		.gpio = GPIOC,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_2,
+			.GPIO_Speed = GPIO_Speed_100MHz,
+			.GPIO_Mode = GPIO_Mode_IN,
+			.GPIO_OType = GPIO_OType_OD,
+			.GPIO_PuPd = GPIO_PuPd_NOPULL,
+		},
+	},
+	.eoc_exti = {
+		//		.pin_source = GPIO_PinSource2,
+		//		.port_source = GPIO_PortSourceGPIOC,
+		.init = {
+			.EXTI_Line = EXTI_Line2, // matches above GPIO pin
+			.EXTI_Mode = EXTI_Mode_Interrupt,
+			.EXTI_Trigger = EXTI_Trigger_Rising,
+			.EXTI_LineCmd = ENABLE,
+		},
+	},
+	.eoc_irq = {
+		.init = {
+			.NVIC_IRQChannel = EXTI15_10_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+			.NVIC_IRQChannelSubPriority = 0,
+			.NVIC_IRQChannelCmd = ENABLE,
+		},
+	},
+	.xclr = {
+		.gpio = GPIOC,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_1,
+			.GPIO_Speed = GPIO_Speed_100MHz,
+			.GPIO_Mode = GPIO_Mode_OUT,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd = GPIO_PuPd_NOPULL,
+		},
+	},
+	.oversampling = 3,
+};
+
 extern const struct pios_com_driver pios_usart_com_driver;
 
 uint32_t pios_com_aux_id;
@@ -412,6 +455,8 @@ void PIOS_Board_Init(void) {
 	}
 	PIOS_HMC5843_Init();
 #endif
+
+	PIOS_BMP085_Init(&pios_bmp085_cfg);
 
 #if defined(PIOS_INCLUDE_SPI)
 #include "ahrs_spi_comm.h"

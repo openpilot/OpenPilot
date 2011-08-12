@@ -47,39 +47,20 @@ volatile bool pios_bma180_data_ready = false;
 static int16_t pios_bma180_buffer[PIOS_BMA180_MAX_DOWNSAMPLE * 3];
 static t_fifo_buffer pios_bma180_fifo;
 
+
 /**
  * @brief Initialize with good default settings
  */
-void PIOS_BMA180_Init()
-{
-	GPIO_InitTypeDef GPIO_InitStructure;
-	EXTI_InitTypeDef EXTI_InitStructure;
-	NVIC_InitTypeDef NVIC_InitStructure;
-	
-	/* Enable DRDY GPIO clock */
-	RCC_APB2PeriphClockCmd(PIOS_BMA180_DRDY_CLK | RCC_APB2Periph_AFIO, ENABLE);
-	
+void PIOS_BMA180_Init(const struct pios_bma180_cfg * cfg)
+{	
 	/* Configure EOC pin as input floating */
-	GPIO_InitStructure.GPIO_Pin = PIOS_BMA180_DRDY_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_Init(PIOS_BMA180_DRDY_GPIO_PORT, &GPIO_InitStructure);
+	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
 	
 	/* Configure the End Of Conversion (EOC) interrupt */
-	GPIO_EXTILineConfig(PIOS_BMA180_DRDY_PORT_SOURCE, PIOS_BMA180_DRDY_PIN_SOURCE);
-	EXTI_InitStructure.EXTI_Line = PIOS_BMA180_DRDY_EXTI_LINE;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;
-	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	EXTI_Init(&EXTI_InitStructure);
+	EXTI_Init(&cfg->eoc_exti.init);
 	
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
-	NVIC_InitStructure.NVIC_IRQChannel = PIOS_BMA180_DRDY_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_BMA180_DRDY_PRIO;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
+	NVIC_Init(&cfg->eoc_irq.init);
 	
 	pios_bma180_data_ready = false;
 	
@@ -100,7 +81,7 @@ int32_t PIOS_BMA180_ClaimBus()
 {
 	if(PIOS_SPI_ClaimBus(PIOS_SPI_ACCEL) != 0)
 		return -1;
-	PIOS_BMA180_ENABLE;
+	PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,0,0);
 	return 0;
 }
 
@@ -110,7 +91,7 @@ int32_t PIOS_BMA180_ClaimBus()
  */
 int32_t PIOS_BMA180_ReleaseBus()
 {
-	PIOS_BMA180_DISABLE;
+	PIOS_SPI_RC_PinSet(PIOS_SPI_ACCEL,0,1);
 	return PIOS_SPI_ReleaseBus(PIOS_SPI_ACCEL);
 }
 

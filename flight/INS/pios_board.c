@@ -587,6 +587,41 @@ static const struct pios_hmc5883_cfg pios_hmc5883_mag_cfg = {
 };
 #endif
 
+#if defined (PIOS_INCLUDE_BMA180)
+#include "pios_bma180.h"
+
+static const struct pios_bma180_cfg pios_bma180_cfg = {
+	.drdy = {
+		.gpio = GPIOC,
+		.init = {
+			.GPIO_Pin = GPIO_Pin_4,
+			.GPIO_Speed = GPIO_Speed_100MHz,
+			.GPIO_Mode = GPIO_Mode_IN,
+			.GPIO_OType = GPIO_OType_OD,
+			.GPIO_PuPd = GPIO_PuPd_NOPULL,
+		},
+	},
+	.eoc_exti = {
+		//		.pin_source = GPIO_PinSource8,
+		//		.port_source = GPIO_PortSourceGPIOB,
+		.init = {
+			.EXTI_Line = EXTI_Line4, // matches above GPIO pin
+			.EXTI_Mode = EXTI_Mode_Interrupt,
+			.EXTI_Trigger = EXTI_Trigger_Rising,
+			.EXTI_LineCmd = ENABLE,
+		},
+	},
+	.eoc_irq = {
+		.init = {
+			.NVIC_IRQChannel = EXTI4_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+			.NVIC_IRQChannelSubPriority = 0,
+			.NVIC_IRQChannelCmd = ENABLE,
+		},
+	},
+};
+#endif
+
 /**
  * PIOS_Board_Init()
  * initializes all the core subsystems on this specific hardware
@@ -625,33 +660,24 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_COM_AUX */
 #endif	/* PIOS_INCLUDE_COM */
 	
-#if defined (PIOS_INCLUDE_I2C)
 	if (PIOS_I2C_Init(&pios_i2c_pres_mag_adapter_id, &pios_i2c_pres_mag_adapter_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
-#if defined (PIOS_INCLUDE_BMP085)
+
 	PIOS_BMP085_Init();
-#endif /* PIOS_INCLUDE_BMP085 */
-#if defined (PIOS_INCLUDE_HMC5883)
 	PIOS_HMC5883_Init(&pios_hmc5883_mag_cfg);
-#endif /* PIOS_INCLUDE_HMC5883 */
 	
-#if defined(PIOS_INCLUDE_IMU3000)
 	if (PIOS_I2C_Init(&pios_i2c_gyro_adapter_id, &pios_i2c_gyro_adapter_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
 	PIOS_IMU3000_Init();
-#endif /* PIOS_INCLUDE_IMU3000 */
-#endif /* PIOS_INCLUDE_I2C */
 	
-#if defined(PIOS_INCLUDE_SPI)
 	/* Set up the SPI interface to the accelerometer*/
 	if (PIOS_SPI_Init(&pios_spi_accel_id, &pios_spi_accel_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
-	
 	PIOS_BMA180_Attach(pios_spi_accel_id);
-	PIOS_BMA180_Init();
+	PIOS_BMA180_Init(&pios_bma180_cfg);
 	
 	
 	/* Set up the SPI interface to the OP board */
@@ -662,7 +688,6 @@ void PIOS_Board_Init(void) {
 	}
 	
 	AhrsConnect(pios_spi_op_id);
-#endif /* PIOS_INCLUDE_SPI */
 }
 
 /**

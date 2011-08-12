@@ -86,9 +86,16 @@ struct pios_bma180_data {
 	int16_t z;
 };
 
+
+struct pios_bma180_cfg {
+	struct stm32_gpio drdy;
+	struct stm32_exti eoc_exti;
+	struct stm32_irq eoc_irq;
+};
+
 /* Public Functions */
+void PIOS_BMA180_Init(const struct pios_bma180_cfg * cfg);
 void PIOS_BMA180_Attach(uint32_t spi_id);
-void PIOS_BMA180_Init();
 float PIOS_BMA180_GetScale();
 int32_t PIOS_BMA180_ReadAccels(int16_t * data);
 int32_t PIOS_BMA180_Test();

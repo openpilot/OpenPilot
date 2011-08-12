@@ -8186,12 +8186,12 @@
 		65E8F03811EFF25C00BBF654 /* inc */ = {
 			isa = PBXGroup;
 			children = (
-				65DEA78613F1118400095B06 /* pios_bma180.h */,
 				65DEA78513F0FE6000095B06 /* stm32f2xx_conf.h */,
 				6528CCE212E40F6700CF5144 /* pios_adxl345.h */,
 				65E8C745139A6D1A00E1F979 /* pios_crc.h */,
 				65E8F03A11EFF25C00BBF654 /* pios_adc.h */,
 				65E6E09912E037C800058553 /* pios_adc_priv.h */,
+				65DEA78613F1118400095B06 /* pios_bma180.h */,
 				65E8F03B11EFF25C00BBF654 /* pios_bmp085.h */,
 				65E8F03C11EFF25C00BBF654 /* pios_com.h */,
 				65E8F03D11EFF25C00BBF654 /* pios_com_priv.h */,

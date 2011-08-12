@@ -58,10 +58,6 @@ static bool PIOS_HMC5883_Write(uint8_t address, uint8_t buffer);
  */
 void PIOS_HMC5883_Init(const struct pios_hmc5883_cfg * cfg)
 {
-	/* Enable DRDY GPIO clock */
-	// Started by pios_sys.c
-	// RCC_APB2PeriphClockCmd(PIOS_HMC5883_DRDY_CLK | RCC_APB2Periph_AFIO, ENABLE);
-
 	/* Configure EOC pin as input floating */
 	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
 	

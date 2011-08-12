@@ -291,16 +291,12 @@ void ModelViewGadgetWidget::updateAttitude()
 {
     AttitudeActual::DataFields data = attActual->getData(); // get attitude data
     GLC_StructOccurence* rootObject= m_World.rootOccurence(); // get the full 3D model
-    // create quaternions rotations for each axis
-    QQuaternion qX= QQuaternion::fromAxisAndAngle(QVector3D(1,0,0),data.Pitch);
-    QQuaternion qY= QQuaternion::fromAxisAndAngle(QVector3D(0,1,0),data.Roll);
-    QQuaternion qZ= QQuaternion::fromAxisAndAngle(QVector3D(0,0,1),data.Yaw);
-    QQuaternion quat= qX * qY * qZ; // create the quaternion of all the rotations
-    // pass values to simpler variables
-    double x= quat.vector().x();
-    double y= quat.vector().y();
-    double z= quat.vector().z();
-    double w= quat.scalar();
+    double x= data.q3;
+    double y= data.q2;
+    double z= data.q4;
+    double w= data.q1;
+    if (w == 0.0)
+        w = 1.0;
     // create and gives the product of 2 4x4 matrices to get the rotation of the 3D model's matrix
     QMatrix4x4 m1;
     m1.setRow(0, QVector4D(w,z,-y,x));

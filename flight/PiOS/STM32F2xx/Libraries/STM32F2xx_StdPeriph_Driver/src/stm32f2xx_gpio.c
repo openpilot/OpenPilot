@@ -198,7 +198,7 @@ void GPIO_DeInit(GPIO_TypeDef* GPIOx)
   *                        - Neither pull-up nor Pull-down: GPIO_PuPd_NOPULL
   * @retval None
   */
-void GPIO_Init(GPIO_TypeDef* GPIOx, GPIO_InitTypeDef* GPIO_InitStruct)
+void GPIO_Init(GPIO_TypeDef* GPIOx, const GPIO_InitTypeDef* GPIO_InitStruct)
 {
   uint32_t pinpos = 0x00, pos = 0x00 , currentpin = 0x00;
 

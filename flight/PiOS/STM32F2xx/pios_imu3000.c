@@ -63,7 +63,7 @@ void PIOS_IMU3000_Init(const struct pios_imu3000_cfg * cfg)
 	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
 	
 	/* Configure the End Of Conversion (EOC) interrupt */
-	//GPIO_EXTILineConfig(cfg->eoc_exit.port_source, cfg->eoc_exit.pin_source);
+	SYSCFG_EXTILineConfig(cfg->eoc_exti.port_source, cfg->eoc_exti.pin_source);
 	EXTI_Init(&cfg->eoc_exti.init);
 	
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
@@ -292,7 +292,21 @@ void PIOS_IMU3000_IRQHandler(void)
 {
 }
 
-#endif /* PIOS_INCLUDE_IMU3000 */
+/**
+ * The physical IRQ handler
+ * Soon this will be generic in pios_exti and the BMA180 will register
+ * against it.  Right now this is crap!
+ */
+void EXTI1_IRQHandler(void)
+{
+	if (EXTI_GetITStatus(EXTI_Line1) != RESET)
+	{
+		PIOS_IMU3000_IRQHandler();
+		EXTI_ClearITPendingBit(EXTI_Line1);
+	}
+}
+
+#endif
 
 /**
  * @}

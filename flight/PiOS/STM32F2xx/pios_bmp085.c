@@ -82,6 +82,7 @@ void PIOS_BMP085_Init(const struct pios_bmp085_cfg * cfg)
 	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
 	
 	/* Configure the End Of Conversion (EOC) interrupt */
+	SYSCFG_EXTILineConfig(cfg->eoc_exti.port_source, cfg->eoc_exti.pin_source);
 	EXTI_Init(&cfg->eoc_exti.init);
 	
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
@@ -290,4 +291,23 @@ int32_t PIOS_BMP085_Test()
 	return 0;
 }
 
-#endif /* PIOS_INCLUDE_BMP085 */
+/**
+ * Handle external lines 15 to 10 interrupt requests
+ */
+//void EXTI15_10_IRQHandler(void)
+//{
+//	if (EXTI_GetITStatus(EXTI15_10) != RESET) {
+//		/* Read the ADC Value */
+//		PIOS_BMP085_EOC=1;
+//		
+//		/* Clear the EXTI line pending bit */
+//		EXTI_ClearITPendingBit(EXTI15_10);
+//	}
+//}
+
+#endif
+
+/**
+ * @}
+ * @}
+ */

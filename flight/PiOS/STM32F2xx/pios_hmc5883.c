@@ -62,7 +62,7 @@ void PIOS_HMC5883_Init(const struct pios_hmc5883_cfg * cfg)
 	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
 	
 	/* Configure the End Of Conversion (EOC) interrupt */
-	//GPIO_EXTILineConfig(cfg->eoc_exit.port_source, cfg->eoc_exit.pin_source);
+	SYSCFG_EXTILineConfig(cfg->eoc_exti.port_source, cfg->eoc_exti.pin_source);
 	EXTI_Init(&cfg->eoc_exti.init);
 	
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
@@ -370,6 +370,20 @@ void PIOS_HMC5883_IRQHandler(void)
 {
 	pios_hmc5883_data_ready = true;
 }
+
+/**
+ * The physical IRQ handler
+ * Soon this will be generic in pios_exti and the BMA180 will register
+ * against it.  Right now this is crap!
+ */
+void EXTI9_5_IRQHandler(void)
+{
+	if (EXTI_GetITStatus(EXTI9_5_IRQn) != RESET) {
+		PIOS_HMC5883_IRQHandler();
+		EXTI_ClearITPendingBit(EXTI9_5_IRQn);
+	}
+}
+
 
 #endif /* PIOS_INCLUDE_HMC5883 */
 

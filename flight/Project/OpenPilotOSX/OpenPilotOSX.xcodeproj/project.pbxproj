@@ -2863,6 +2863,8 @@
 		65D1FBD813F51865006374A6 /* pios_bmp085.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_bmp085.c; sourceTree = "<group>"; };
 		65D1FBD913F51AB7006374A6 /* pios_imu3000.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_imu3000.c; sourceTree = "<group>"; };
 		65D1FBDA13F51AE1006374A6 /* pios_imu3000.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_imu3000.h; sourceTree = "<group>"; };
+		65D1FBE713F53477006374A6 /* pios_bl_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_bl_helper.h; sourceTree = "<group>"; };
+		65D1FC9C13F541D4006374A6 /* startup_stm32f2xx_INS.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = startup_stm32f2xx_INS.S; sourceTree = "<group>"; };
 		65D2CA841248F9A400B1E7D6 /* mixersettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixersettings.xml; sourceTree = "<group>"; };
 		65D2CA851248F9A400B1E7D6 /* mixerstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixerstatus.xml; sourceTree = "<group>"; };
 		65DEA78513F0FE6000095B06 /* stm32f2xx_conf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stm32f2xx_conf.h; sourceTree = "<group>"; };
@@ -3748,6 +3750,7 @@
 				6560A38A13EE26B700105DA5 /* pios_wdg.c */,
 				6560A38B13EE26B700105DA5 /* startup_stm32f2xx.S */,
 				6560A38C13EE26B700105DA5 /* startup_stm32f2xx_BL.S */,
+				65D1FC9C13F541D4006374A6 /* startup_stm32f2xx_INS.S */,
 				6560A38D13EE26B700105DA5 /* vectors_stm32f2xx.S */,
 			);
 			path = STM32F2xx;
@@ -8191,14 +8194,15 @@
 			isa = PBXGroup;
 			children = (
 				65DEA78513F0FE6000095B06 /* stm32f2xx_conf.h */,
-				6528CCE212E40F6700CF5144 /* pios_adxl345.h */,
-				65E8C745139A6D1A00E1F979 /* pios_crc.h */,
 				65E8F03A11EFF25C00BBF654 /* pios_adc.h */,
+				6528CCE212E40F6700CF5144 /* pios_adxl345.h */,
+				65D1FBE713F53477006374A6 /* pios_bl_helper.h */,
 				65E6E09912E037C800058553 /* pios_adc_priv.h */,
 				65DEA78613F1118400095B06 /* pios_bma180.h */,
 				65E8F03B11EFF25C00BBF654 /* pios_bmp085.h */,
 				65E8F03C11EFF25C00BBF654 /* pios_com.h */,
 				65E8F03D11EFF25C00BBF654 /* pios_com_priv.h */,
+				65E8C745139A6D1A00E1F979 /* pios_crc.h */,
 				65E8F03E11EFF25C00BBF654 /* pios_debug.h */,
 				65E8F03F11EFF25C00BBF654 /* pios_delay.h */,
 				65E8F04011EFF25C00BBF654 /* pios_exti.h */,

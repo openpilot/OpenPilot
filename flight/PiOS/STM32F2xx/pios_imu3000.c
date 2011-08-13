@@ -268,7 +268,7 @@ static int32_t PIOS_IMU3000_Write(uint8_t address, uint8_t buffer)
 
 /**
  * @brief Run self-test operation.
- * \return 0 if test failed
+ * \return 0 if test succeeded
  * \return non-zero value if test succeeded
  */
 uint8_t PIOS_IMU3000_Test(void)

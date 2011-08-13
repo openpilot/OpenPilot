@@ -42,8 +42,8 @@
  * .rodata section (ie. Flash) rather than in the .bss section (RAM).
  */
 void PIOS_SPI_op_irq_handler(void);
-void DMA1_Stream0_IRQ_Handler(void) __attribute__((alias("PIOS_SPI_op_irq_handler")));
-void DMA1_Stream5_IRQ_Handler(void) __attribute__((alias("PIOS_SPI_op_irq_handler")));
+void DMA1_Stream3_IRQ_Handler(void) __attribute__((alias("PIOS_SPI_op_irq_handler")));
+void DMA1_Stream4_IRQ_Handler(void) __attribute__((alias("PIOS_SPI_op_irq_handler")));
 static const struct pios_spi_cfg pios_spi_op_cfg = {
 	.regs = SPI2,
 	.init = {
@@ -71,8 +71,9 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
 		},
 		
 		.rx = {
-			.channel = DMA1_Stream0,
+			.channel = DMA1_Stream3,
 			.init = {
+				.DMA_Channel            = DMA_Channel_0,
 				.DMA_PeripheralBaseAddr = (uint32_t) & (SPI2->DR),
 				.DMA_DIR = DMA_DIR_PeripheralToMemory,
 				.DMA_PeripheralInc = DMA_PeripheralInc_Disable,
@@ -89,8 +90,9 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
 			},
 		},
 		.tx = {
-			.channel = DMA1_Stream5,
+			.channel = DMA1_Stream4,
 			.init = {
+				.DMA_Channel            = DMA_Channel_0,
 				.DMA_PeripheralBaseAddr = (uint32_t) & (SPI2->DR),
 				.DMA_DIR = DMA_DIR_MemoryToPeripheral,
 				.DMA_PeripheralInc = DMA_PeripheralInc_Disable,
@@ -206,7 +208,7 @@ static const struct pios_spi_cfg pios_spi_accel_cfg = {
 			},
 		},
 		.tx = {
-			.channel = DMA1_Stream3,
+			.channel = DMA2_Stream3,
 			.init    = {
                 .DMA_Channel            = DMA_Channel_3,
 				.DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR),

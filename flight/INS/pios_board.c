@@ -42,8 +42,8 @@
  * .rodata section (ie. Flash) rather than in the .bss section (RAM).
  */
 void PIOS_SPI_op_irq_handler(void);
-void DMA1_Channel5_IRQHandler() __attribute__ ((alias("PIOS_SPI_op_irq_handler")));
-void DMA1_Channel4_IRQHandler() __attribute__ ((alias("PIOS_SPI_op_irq_handler")));
+void DMA1_Stream0_IRQ_Handler(void) __attribute__((alias("PIOS_SPI_op_irq_handler")));
+void DMA1_Stream5_IRQ_Handler(void) __attribute__((alias("PIOS_SPI_op_irq_handler")));
 static const struct pios_spi_cfg pios_spi_op_cfg = {
 	.regs = SPI2,
 	.init = {
@@ -160,8 +160,8 @@ void PIOS_SPI_op_irq_handler(void)
  *    - Used for BMA180 accelerometer
  */
 void PIOS_SPI_accel_irq_handler(void);
-void DMA1_Channel2_IRQHandler() __attribute__ ((alias("PIOS_SPI_accel_irq_handler")));
-void DMA1_Channel3_IRQHandler() __attribute__ ((alias("PIOS_SPI_accel_irq_handler")));
+void DMA2_Stream0_IRQ_Handler(void) __attribute__((alias("PIOS_SPI_accel_irq_handler")));
+void DMA2_Stream3_IRQ_Handler(void) __attribute__((alias("PIOS_SPI_accel_irq_handler")));
 static const struct pios_spi_cfg pios_spi_accel_cfg = {
 	.regs = SPI1,
 	.init   = {
@@ -177,12 +177,10 @@ static const struct pios_spi_cfg pios_spi_accel_cfg = {
 	},
 	.use_crc = false,
 	.dma = {
-		.ahb_clk  = RCC_AHB1Periph_DMA1,
-		
 		.irq = {
 			.flags   = (DMA_IT_TCIF3 | DMA_IT_TEIF3 | DMA_IT_HTIF3),
 			.init    = {
-				.NVIC_IRQChannel                   = DMA1_Stream0_IRQn,
+				.NVIC_IRQChannel                   = DMA2_Stream0_IRQn,
 				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
 				.NVIC_IRQChannelSubPriority        = 0,
 				.NVIC_IRQChannelCmd                = ENABLE,
@@ -190,8 +188,9 @@ static const struct pios_spi_cfg pios_spi_accel_cfg = {
 		},
 		
 		.rx = {
-			.channel = DMA1_Stream2,
+			.channel = DMA2_Stream0,
 			.init    = {
+                .DMA_Channel            = DMA_Channel_3,
 				.DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR),
 				.DMA_DIR                = DMA_DIR_PeripheralToMemory,
 				.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
@@ -209,6 +208,7 @@ static const struct pios_spi_cfg pios_spi_accel_cfg = {
 		.tx = {
 			.channel = DMA1_Stream3,
 			.init    = {
+                .DMA_Channel            = DMA_Channel_3,
 				.DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR),
 				.DMA_DIR                = DMA_DIR_MemoryToPeripheral,
 				.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,

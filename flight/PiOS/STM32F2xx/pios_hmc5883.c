@@ -7,8 +7,7 @@
  * @{
  *
  * @file       pios_hmc5883.c
- * @author     David "Buzz" Carlson (buzz@chebuzz.com)
- * 				The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
  * @brief      HMC5883 Magnetic Sensor Functions from AHRS
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -48,9 +47,9 @@ typedef struct {
 /* Local Variables */
 volatile bool pios_hmc5883_data_ready;
 
-static void PIOS_HMC5883_Config(PIOS_HMC5883_ConfigTypeDef * HMC5883_Config_Struct);
-static bool PIOS_HMC5883_Read(uint8_t address, uint8_t * buffer, uint8_t len);
-static bool PIOS_HMC5883_Write(uint8_t address, uint8_t buffer);
+static int32_t PIOS_HMC5883_Config(PIOS_HMC5883_ConfigTypeDef * HMC5883_Config_Struct);
+static int32_t PIOS_HMC5883_Read(uint8_t address, uint8_t * buffer, uint8_t len);
+static int32_t PIOS_HMC5883_Write(uint8_t address, uint8_t buffer);
 
 static const struct pios_hmc5883_cfg * dev_cfg;
 
@@ -69,15 +68,17 @@ void PIOS_HMC5883_Init(const struct pios_hmc5883_cfg * cfg)
 	
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
 	NVIC_Init(&cfg->eoc_irq.init);
-
+	
 	/* Configure the HMC5883 Sensor */
 	PIOS_HMC5883_ConfigTypeDef HMC5883_InitStructure;
-	HMC5883_InitStructure.M_ODR = PIOS_HMC5883_ODR_15;
+	HMC5883_InitStructure.M_ODR = PIOS_HMC5883_ODR_75;
 	HMC5883_InitStructure.Meas_Conf = PIOS_HMC5883_MEASCONF_NORMAL;
 	HMC5883_InitStructure.Gain = PIOS_HMC5883_GAIN_1_9;
 	HMC5883_InitStructure.Mode = PIOS_HMC5883_MODE_CONTINUOUS;
-	PIOS_HMC5883_Config(&HMC5883_InitStructure);
-
+	int32_t val = PIOS_HMC5883_Config(&HMC5883_InitStructure);
+	
+	PIOS_Assert(val == 0);
+	
 	pios_hmc5883_data_ready = false;
 	
 	dev_cfg = cfg;
@@ -87,143 +88,142 @@ void PIOS_HMC5883_Init(const struct pios_hmc5883_cfg * cfg)
  * @brief Initialize the HMC5883 magnetometer sensor
  * \return none
  * \param[in] PIOS_HMC5883_ConfigTypeDef struct to be used to configure sensor.
-*
-* CTRL_REGA: Control Register A
-* Read Write
-* Default value: 0x10
-* 7:5  0   These bits must be cleared for correct operation.
-* 4:2 DO2-DO0: Data Output Rate Bits
-*             DO2 |  DO1 |  DO0 |   Minimum Data Output Rate (Hz)
-*            ------------------------------------------------------
-*              0  |  0   |  0   |            0.75
-*              0  |  0   |  1   |            1.5
-*              0  |  1   |  0   |            3
-*              0  |  1   |  1   |            7.5
-*              1  |  0   |  0   |           15 (default)
-*              1  |  0   |  1   |           30
-*              1  |  1   |  0   |           75
-*              1  |  1   |  1   |           Not Used
-* 1:0 MS1-MS0: Measurement Configuration Bits
-*             MS1 | MS0 |   MODE
-*            ------------------------------
-*              0  |  0   |  Normal
-*              0  |  1   |  Positive Bias
-*              1  |  0   |  Negative Bias
-*              1  |  1   |  Not Used
-*
-* CTRL_REGB: Control RegisterB
-* Read Write
-* Default value: 0x20
-* 7:5 GN2-GN0: Gain Configuration Bits.
-*             GN2 |  GN1 |  GN0 |   Mag Input   | Gain       | Output Range
-*                 |      |      |  Range[Ga]    | [LSB/mGa]  |
-*            ------------------------------------------------------
-*              0  |  0   |  0   |  ±0.88Ga      |   1370     | 0xF8000x07FF (-2048:2047)
-*              0  |  0   |  1   |  ±1.3Ga (def) |   1090     | 0xF8000x07FF (-2048:2047)
-*              0  |  1   |  0   |  ±1.9Ga       |   820      | 0xF8000x07FF (-2048:2047)
-*              0  |  1   |  1   |  ±2.5Ga       |   660      | 0xF8000x07FF (-2048:2047)
-*              1  |  0   |  0   |  ±4.0Ga       |   440      | 0xF8000x07FF (-2048:2047)
-*              1  |  0   |  1   |  ±4.7Ga       |   390      | 0xF8000x07FF (-2048:2047)
-*              1  |  1   |  0   |  ±5.6Ga       |   330      | 0xF8000x07FF (-2048:2047)
-*              1  |  1   |  1   |  ±8.1Ga       |   230      | 0xF8000x07FF (-2048:2047)
-*                               |Not recommended|
-*
-* 4:0 CRB4-CRB: 0 This bit must be cleared for correct operation.
-*
-* _MODE_REG: Mode Register
-* Read Write
-* Default value: 0x02
-* 7:2  0   These bits must be cleared for correct operation.
-* 1:0 MD1-MD0: Mode Select Bits
-*             MS1 | MS0 |   MODE
-*            ------------------------------
-*              0  |  0   |  Continuous-Conversion Mode.
-*              0  |  1   |  Single-Conversion Mode
-*              1  |  0   |  Negative Bias
-*              1  |  1   |  Sleep Mode
-*/
-static void PIOS_HMC5883_Config(PIOS_HMC5883_ConfigTypeDef * HMC5883_Config_Struct)
+ *
+ * CTRL_REGA: Control Register A
+ * Read Write
+ * Default value: 0x10
+ * 7:5  0   These bits must be cleared for correct operation.
+ * 4:2 DO2-DO0: Data Output Rate Bits
+ *             DO2 |  DO1 |  DO0 |   Minimum Data Output Rate (Hz)
+ *            ------------------------------------------------------
+ *              0  |  0   |  0   |            0.75
+ *              0  |  0   |  1   |            1.5
+ *              0  |  1   |  0   |            3
+ *              0  |  1   |  1   |            7.5
+ *              1  |  0   |  0   |           15 (default)
+ *              1  |  0   |  1   |           30
+ *              1  |  1   |  0   |           75
+ *              1  |  1   |  1   |           Not Used
+ * 1:0 MS1-MS0: Measurement Configuration Bits
+ *             MS1 | MS0 |   MODE
+ *            ------------------------------
+ *              0  |  0   |  Normal
+ *              0  |  1   |  Positive Bias
+ *              1  |  0   |  Negative Bias
+ *              1  |  1   |  Not Used
+ *
+ * CTRL_REGB: Control RegisterB
+ * Read Write
+ * Default value: 0x20
+ * 7:5 GN2-GN0: Gain Configuration Bits.
+ *             GN2 |  GN1 |  GN0 |   Mag Input   | Gain       | Output Range
+ *                 |      |      |  Range[Ga]    | [LSB/mGa]  |
+ *            ------------------------------------------------------
+ *              0  |  0   |  0   |  ±0.88Ga      |   1370     | 0xF8000x07FF (-2048:2047)
+ *              0  |  0   |  1   |  ±1.3Ga (def) |   1090     | 0xF8000x07FF (-2048:2047)
+ *              0  |  1   |  0   |  ±1.9Ga       |   820      | 0xF8000x07FF (-2048:2047)
+ *              0  |  1   |  1   |  ±2.5Ga       |   660      | 0xF8000x07FF (-2048:2047)
+ *              1  |  0   |  0   |  ±4.0Ga       |   440      | 0xF8000x07FF (-2048:2047)
+ *              1  |  0   |  1   |  ±4.7Ga       |   390      | 0xF8000x07FF (-2048:2047)
+ *              1  |  1   |  0   |  ±5.6Ga       |   330      | 0xF8000x07FF (-2048:2047)
+ *              1  |  1   |  1   |  ±8.1Ga       |   230      | 0xF8000x07FF (-2048:2047)
+ *                               |Not recommended|
+ *
+ * 4:0 CRB4-CRB: 0 This bit must be cleared for correct operation.
+ *
+ * _MODE_REG: Mode Register
+ * Read Write
+ * Default value: 0x02
+ * 7:2  0   These bits must be cleared for correct operation.
+ * 1:0 MD1-MD0: Mode Select Bits
+ *             MS1 | MS0 |   MODE
+ *            ------------------------------
+ *              0  |  0   |  Continuous-Conversion Mode.
+ *              0  |  1   |  Single-Conversion Mode
+ *              1  |  0   |  Negative Bias
+ *              1  |  1   |  Sleep Mode
+ */
+static uint8_t CTRLB = 0x00;
+static int32_t PIOS_HMC5883_Config(PIOS_HMC5883_ConfigTypeDef * HMC5883_Config_Struct)
 {
 	uint8_t CTRLA = 0x00;
-	uint8_t CTRLB = 0x00;
 	uint8_t MODE = 0x00;
-
+	CTRLB = 0;
+	
 	CTRLA |= (uint8_t) (HMC5883_Config_Struct->M_ODR | HMC5883_Config_Struct->Meas_Conf);
 	CTRLB |= (uint8_t) (HMC5883_Config_Struct->Gain);
 	MODE |= (uint8_t) (HMC5883_Config_Struct->Mode);
-
+	
 	// CRTL_REGA
-	while (!PIOS_HMC5883_Write(PIOS_HMC5883_CONFIG_REG_A, CTRLA)) ;
-
+	if (PIOS_HMC5883_Write(PIOS_HMC5883_CONFIG_REG_A, CTRLA) != 0)
+		return -1;
+	
 	// CRTL_REGB
-	while (!PIOS_HMC5883_Write(PIOS_HMC5883_CONFIG_REG_B, CTRLB)) ;
-
+	if (PIOS_HMC5883_Write(PIOS_HMC5883_CONFIG_REG_B, CTRLB) != 0)
+		return -1;
+	
 	// Mode register
-	while (!PIOS_HMC5883_Write(PIOS_HMC5883_MODE_REG, MODE)) ;
+	if (PIOS_HMC5883_Write(PIOS_HMC5883_MODE_REG, MODE) != 0) 
+		return -1;
+	
+	return 0;
 }
 
 /**
  * @brief Read current X, Z, Y values (in that order)
  * \param[out] int16_t array of size 3 to store X, Z, and Y magnetometer readings
- * \return none
-*/
-uint8_t buffer[6];
-void PIOS_HMC5883_ReadMag(int16_t out[3])
+ * \return 0 for success or -1 for failure
+ */
+int32_t PIOS_HMC5883_ReadMag(int16_t out[3])
 {
-	uint8_t ctrlB;
-
 	pios_hmc5883_data_ready = false;
-
-	while (!PIOS_HMC5883_Read(PIOS_HMC5883_CONFIG_REG_B, &ctrlB, 1)) ;
-	while (!PIOS_HMC5883_Read(PIOS_HMC5883_DATAOUT_XMSB_REG, buffer, 6)) ;
-
-	switch (ctrlB & 0xE0) {
-	case 0x00:
-		for (int i = 0; i < 3; i++)
-			out[i] = ((int16_t) ((uint16_t) buffer[2 * i] << 8)
-				  + buffer[2 * i + 1]) * 1000 / PIOS_HMC5883_Sensitivity_0_88Ga;
-		break;
-	case 0x20:
-		for (int i = 0; i < 3; i++)
-			out[i] = ((int16_t) ((uint16_t) buffer[2 * i] << 8)
-				  + buffer[2 * i + 1]) * 1000 / PIOS_HMC5883_Sensitivity_1_3Ga;
-		break;
-	case 0x40:
-		for (int i = 0; i < 3; i++)
-			out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
-					    + buffer[2 * i + 1]) * 1000 / PIOS_HMC5883_Sensitivity_1_9Ga;
-		break;
-	case 0x60:
-		for (int i = 0; i < 3; i++)
-			out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
-					    + buffer[2 * i + 1]) * 1000 / PIOS_HMC5883_Sensitivity_2_5Ga;
-		break;
-	case 0x80:
-		for (int i = 0; i < 3; i++)
-			out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
-					    + buffer[2 * i + 1]) * 1000 / PIOS_HMC5883_Sensitivity_4_0Ga;
-		break;
-	case 0xA0:
-		for (int i = 0; i < 3; i++)
-			out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
-					    + buffer[2 * i + 1]) * 1000 / PIOS_HMC5883_Sensitivity_4_7Ga;
-		break;
-	case 0xC0:
-		for (int i = 0; i < 3; i++)
-			out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
-					    + buffer[2 * i + 1]) * 1000 / PIOS_HMC5883_Sensitivity_5_6Ga;
-		break;
-	case 0xE0:
-		for (int i = 0; i < 3; i++)
-			out[i] = (int16_t) (((uint16_t) buffer[2 * i] << 8)
-					    + buffer[2 * i + 1]) * 1000 / PIOS_HMC5883_Sensitivity_8_1Ga;
-		break;
+	uint8_t buffer[6];
+	int32_t temp;
+	int32_t sensitivity;
+	
+	if (PIOS_HMC5883_Read(PIOS_HMC5883_DATAOUT_XMSB_REG, buffer, 6) != 0)
+		return -1;
+		
+	switch (CTRLB & 0xE0) {
+		case 0x00:
+			sensitivity =  PIOS_HMC5883_Sensitivity_0_88Ga;
+			break;
+		case 0x20:
+			sensitivity = PIOS_HMC5883_Sensitivity_1_3Ga;
+			break;
+		case 0x40:
+			sensitivity = PIOS_HMC5883_Sensitivity_1_9Ga;
+			break;
+		case 0x60:
+			sensitivity = PIOS_HMC5883_Sensitivity_2_5Ga;
+			break;
+		case 0x80:
+			sensitivity = PIOS_HMC5883_Sensitivity_4_0Ga;
+			break;
+		case 0xA0:
+			sensitivity = PIOS_HMC5883_Sensitivity_4_7Ga;
+			break;
+		case 0xC0:
+			sensitivity = PIOS_HMC5883_Sensitivity_5_6Ga;
+			break;
+		case 0xE0:
+			sensitivity = PIOS_HMC5883_Sensitivity_8_1Ga;
+			break;
+		default:
+			PIOS_Assert(0);
 	}
 	
+	for (int i = 0; i < 3; i++) {
+		temp = ((int16_t) ((uint16_t) buffer[2 * i] << 8)
+				+ buffer[2 * i + 1]) * 1000 / sensitivity;
+		out[i] = temp;
+	}
 	// Data reads out as X,Z,Y
-	int16_t temp = out[2];
+	temp = out[2];
 	out[2] = out[1];
 	out[1] = temp;
+	
+	return 0;
 }
 
 
@@ -231,7 +231,7 @@ void PIOS_HMC5883_ReadMag(int16_t out[3])
  * @brief Read the identification bytes from the HMC5883 sensor
  * \param[out] uint8_t array of size 4 to store HMC5883 ID.
  * \return 0 if successful, -1 if not
-*/
+ */
 uint8_t PIOS_HMC5883_ReadID(uint8_t out[4])
 {
 	uint8_t retval = PIOS_HMC5883_Read(PIOS_HMC5883_DATAOUT_IDA_REG, out, 3);
@@ -243,74 +243,74 @@ uint8_t PIOS_HMC5883_ReadID(uint8_t out[4])
  * @brief Tells whether new magnetometer readings are available
  * \return true if new data is available
  * \return false if new data is not available
-*/
+ */
 bool PIOS_HMC5883_NewDataAvailable(void)
 {
 	return (pios_hmc5883_data_ready);
 }
 
 /**
-* @brief Reads one or more bytes into a buffer
-* \param[in] address HMC5883 register address (depends on size)
-* \param[out] buffer destination buffer
-* \param[in] len number of bytes which should be read
-* \return 0 if operation was successful
-* \return -1 if error during I2C transfer
-* \return -4 if invalid length
-*/
-static bool PIOS_HMC5883_Read(uint8_t address, uint8_t * buffer, uint8_t len)
+ * @brief Reads one or more bytes into a buffer
+ * \param[in] address HMC5883 register address (depends on size)
+ * \param[out] buffer destination buffer
+ * \param[in] len number of bytes which should be read
+ * \return 0 if operation was successful
+ * \return -1 if error during I2C transfer
+ * \return -4 if invalid length
+ */
+static int32_t PIOS_HMC5883_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 {
 	uint8_t addr_buffer[] = {
 		address,
 	};
-
+	
 	const struct pios_i2c_txn txn_list[] = {
 		{
-		 .info = __func__,
-		 .addr = PIOS_HMC5883_I2C_ADDR,
-		 .rw = PIOS_I2C_TXN_WRITE,
-		 .len = sizeof(addr_buffer),
-		 .buf = addr_buffer,
-		 }
+			.info = __func__,
+			.addr = PIOS_HMC5883_I2C_ADDR,
+			.rw = PIOS_I2C_TXN_WRITE,
+			.len = sizeof(addr_buffer),
+			.buf = addr_buffer,
+		}
 		,
 		{
-		 .info = __func__,
-		 .addr = PIOS_HMC5883_I2C_ADDR,
-		 .rw = PIOS_I2C_TXN_READ,
-		 .len = len,
-		 .buf = buffer,
-		 }
+			.info = __func__,
+			.addr = PIOS_HMC5883_I2C_ADDR,
+			.rw = PIOS_I2C_TXN_READ,
+			.len = len,
+			.buf = buffer,
+		}
 	};
-
-	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+	
+	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list)) ? 0 : -1;
 }
 
 /**
-* @brief Writes one or more bytes to the HMC5883
-* \param[in] address Register address
-* \param[in] buffer source buffer
-* \return 0 if operation was successful
-* \return -1 if error during I2C transfer
-*/
-static bool PIOS_HMC5883_Write(uint8_t address, uint8_t buffer)
+ * @brief Writes one or more bytes to the HMC5883
+ * \param[in] address Register address
+ * \param[in] buffer source buffer
+ * \return 0 if operation was successful
+ * \return -1 if error during I2C transfer
+ */
+static int32_t PIOS_HMC5883_Write(uint8_t address, uint8_t buffer)
 {
 	uint8_t data[] = {
 		address,
 		buffer,
 	};
-
+	
 	const struct pios_i2c_txn txn_list[] = {
 		{
-		 .info = __func__,
-		 .addr = PIOS_HMC5883_I2C_ADDR,
-		 .rw = PIOS_I2C_TXN_WRITE,
-		 .len = sizeof(data),
-		 .buf = data,
-		 }
+			.info = __func__,
+			.addr = PIOS_HMC5883_I2C_ADDR,
+			.rw = PIOS_I2C_TXN_WRITE,
+			.len = sizeof(data),
+			.buf = data,
+		}
 		,
 	};
-
-	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+	
+	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list)) ? 0 : -1;
 }
 
 /**
@@ -319,20 +319,35 @@ static bool PIOS_HMC5883_Write(uint8_t address, uint8_t buffer)
  */
 int32_t PIOS_HMC5883_Test(void)
 {
+	int32_t failed = 0;
+	uint8_t registers[3] = {0,0,0};
+	uint8_t status;
+	uint8_t ctrl_a_read;
+	uint8_t ctrl_b_read;	
+	uint8_t mode_read;
+	int16_t values[3];
+	
+	
+	
 	/* Verify that ID matches (HMC5883 ID is null-terminated ASCII string "H43") */
 	char id[4];
 	PIOS_HMC5883_ReadID((uint8_t *)id);
-	if(strncmp("H43\0",id,4) != 0) // match H43
+	if((id[0] != 'H') || (id[1] != '4') || (id[2] != '3')) // Expect H43
 		return -1;
-
-	return 0;
 	
-	int32_t passed = 1;
-	uint8_t registers[3] = {0,0,0};
-
 	/* Backup existing configuration */
-	while (!PIOS_HMC5883_Read(PIOS_HMC5883_CONFIG_REG_A,registers,3) );
-
+	if (PIOS_HMC5883_Read(PIOS_HMC5883_CONFIG_REG_A,registers,3) != 0)
+		return -1;
+	
+	/* Stop the device and read out last value */
+	PIOS_DELAY_WaitmS(10);
+	if (PIOS_HMC5883_Write(PIOS_HMC5883_MODE_REG, PIOS_HMC5883_MODE_IDLE) != 0) 
+		return -1;
+	if( PIOS_HMC5883_Read(PIOS_HMC5883_DATAOUT_STATUS_REG, &status,1) != 0)
+		return -1;
+	if (PIOS_HMC5883_ReadMag(values) != 0)
+		return -1;
+	
 	/*
 	 * Put HMC5883 into self test mode
 	 * This is done by placing measurement config into positive (0x01) or negative (0x10) bias
@@ -344,34 +359,54 @@ int32_t PIOS_HMC5883_Test(void)
 	 *
 	 * Changing measurement config back to PIOS_HMC5883_MEASCONF_NORMAL will leave self-test mode.
 	 */
-	 while (!PIOS_HMC5883_Write(PIOS_HMC5883_CONFIG_REG_A, PIOS_HMC5883_MEASCONF_BIAS_POS | PIOS_HMC5883_ODR_15)) ;
-	 while (!PIOS_HMC5883_Write(PIOS_HMC5883_CONFIG_REG_B, PIOS_HMC5883_GAIN_2_5)) ;
-	 while (!PIOS_HMC5883_Write(PIOS_HMC5883_MODE_REG,     PIOS_HMC5883_MODE_SINGLE)) ;
-
-	 uint8_t values[6];
-	 while (!PIOS_HMC5883_Read(PIOS_HMC5883_DATAOUT_XMSB_REG, values, 6)) ;
-	 int16_t x = (int16_t) (((uint16_t) values[0] << 8) + values[1]);
-	 int16_t z = (int16_t) (((uint16_t) values[2] << 8) + values[3]);
-	 int16_t y = (int16_t) (((uint16_t) values[4] << 8) + values[5]);
-
-	 if(abs(abs(x) - 766) > 20)
-		 passed &= 0;
-	 if(abs(abs(y) - 766) > 20)
-		 passed &= 0;
-	 if(abs(abs(z) - 713) > 20)
-		 passed &= 0;
-
-	 /* Restore backup configuration */
-	 while (!PIOS_HMC5883_Write(PIOS_HMC5883_CONFIG_REG_A,registers[0]) );
-	 while (!PIOS_HMC5883_Write(PIOS_HMC5883_CONFIG_REG_B,registers[1]) );
-	 while (!PIOS_HMC5883_Write(PIOS_HMC5883_MODE_REG,registers[2]) );
-
-	 return passed;
+	PIOS_DELAY_WaitmS(10);
+	if (PIOS_HMC5883_Write(PIOS_HMC5883_CONFIG_REG_A, PIOS_HMC5883_MEASCONF_BIAS_POS | PIOS_HMC5883_ODR_15) != 0)
+		return -1;
+	PIOS_DELAY_WaitmS(10);
+	if (PIOS_HMC5883_Write(PIOS_HMC5883_CONFIG_REG_B, PIOS_HMC5883_GAIN_8_1) != 0) 
+		return -1;
+	PIOS_DELAY_WaitmS(10);
+	if (PIOS_HMC5883_Write(PIOS_HMC5883_MODE_REG, PIOS_HMC5883_MODE_SINGLE) != 0) 
+		return -1;
+	
+	/* Must wait for value to be updated */
+	PIOS_DELAY_WaitmS(200);
+	
+	if (PIOS_HMC5883_ReadMag(values) != 0)
+		return -1;
+	
+	/*
+	 if(abs(values[0] - 766) > 20)
+	 failed |= 1;
+	 if(abs(values[1] - 766) > 20)
+	 failed |= 1;
+	 if(abs(values[2] - 713) > 20)
+	 failed |= 1;
+	 */
+	
+	PIOS_HMC5883_Read(PIOS_HMC5883_CONFIG_REG_A, &ctrl_a_read,1);
+	PIOS_HMC5883_Read(PIOS_HMC5883_CONFIG_REG_B, &ctrl_b_read,1);
+	PIOS_HMC5883_Read(PIOS_HMC5883_MODE_REG, &mode_read,1);
+	PIOS_HMC5883_Read(PIOS_HMC5883_DATAOUT_STATUS_REG, &status,1);
+	
+	
+	/* Restore backup configuration */
+	PIOS_DELAY_WaitmS(10);
+	if (PIOS_HMC5883_Write(PIOS_HMC5883_CONFIG_REG_A, registers[0]) != 0)
+		return -1;
+	PIOS_DELAY_WaitmS(10);
+	if (PIOS_HMC5883_Write(PIOS_HMC5883_CONFIG_REG_B, registers[1]) != 0) 
+		return -1;
+	PIOS_DELAY_WaitmS(10);
+	if (PIOS_HMC5883_Write(PIOS_HMC5883_MODE_REG, registers[2]) != 0) 
+		return -1;
+	
+	return failed;
 }
 
 /**
-* @brief IRQ Handler
-*/
+ * @brief IRQ Handler
+ */
 void PIOS_HMC5883_IRQHandler(void)
 {
 	pios_hmc5883_data_ready = true;

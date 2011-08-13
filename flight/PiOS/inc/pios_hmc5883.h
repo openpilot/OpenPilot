@@ -102,7 +102,7 @@ struct pios_hmc5883_cfg {
 /* Public Functions */
 extern void PIOS_HMC5883_Init(const struct pios_hmc5883_cfg * cfg);
 extern bool PIOS_HMC5883_NewDataAvailable(void);
-extern void PIOS_HMC5883_ReadMag(int16_t out[3]);
+extern int32_t PIOS_HMC5883_ReadMag(int16_t out[3]);
 extern uint8_t PIOS_HMC5883_ReadID(uint8_t out[4]);
 extern int32_t PIOS_HMC5883_Test(void);
 

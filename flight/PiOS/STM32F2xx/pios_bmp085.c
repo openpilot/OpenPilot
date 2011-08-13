@@ -63,6 +63,7 @@ static int32_t PIOS_BMP085_Write(uint8_t address, uint8_t buffer);
 
 // Move into proper driver structure with cfg stored
 static uint32_t oversampling;
+const struct pios_bmp085_cfg * dev_cfg;
 
 /**
 * Initialise the BMP085 sensor
@@ -89,6 +90,7 @@ void PIOS_BMP085_Init(const struct pios_bmp085_cfg * cfg)
 	NVIC_Init(&cfg->eoc_irq.init);
 
 	oversampling = cfg->oversampling;
+	dev_cfg = cfg;	
 	
 	/* Configure anothing GPIO pin pin as input floating */
 /*  WHAT DID THIS DO?
@@ -294,16 +296,16 @@ int32_t PIOS_BMP085_Test()
 /**
  * Handle external lines 15 to 10 interrupt requests
  */
-//void EXTI15_10_IRQHandler(void)
-//{
-//	if (EXTI_GetITStatus(EXTI15_10) != RESET) {
-//		/* Read the ADC Value */
-//		PIOS_BMP085_EOC=1;
-//		
-//		/* Clear the EXTI line pending bit */
-//		EXTI_ClearITPendingBit(EXTI15_10);
-//	}
-//}
+void EXTI15_10_IRQHandler(void)
+{
+	if (EXTI_GetITStatus(dev_cfg->eoc_exti.init.EXTI_Line) != RESET) {
+		/* Read the ADC Value */
+		PIOS_BMP085_EOC=1;
+		
+		/* Clear the EXTI line pending bit */
+		EXTI_ClearITPendingBit(dev_cfg->eoc_exti.init.EXTI_Line);
+	}
+}
 
 #endif
 

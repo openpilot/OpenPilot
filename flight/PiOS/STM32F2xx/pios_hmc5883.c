@@ -52,6 +52,8 @@ static void PIOS_HMC5883_Config(PIOS_HMC5883_ConfigTypeDef * HMC5883_Config_Stru
 static bool PIOS_HMC5883_Read(uint8_t address, uint8_t * buffer, uint8_t len);
 static bool PIOS_HMC5883_Write(uint8_t address, uint8_t buffer);
 
+static const struct pios_hmc5883_cfg * dev_cfg;
+
 /**
  * @brief Initialize the HMC5883 magnetometer sensor.
  * @return none
@@ -77,6 +79,8 @@ void PIOS_HMC5883_Init(const struct pios_hmc5883_cfg * cfg)
 	PIOS_HMC5883_Config(&HMC5883_InitStructure);
 
 	pios_hmc5883_data_ready = false;
+	
+	dev_cfg = cfg;
 }
 
 /**
@@ -163,9 +167,9 @@ static void PIOS_HMC5883_Config(PIOS_HMC5883_ConfigTypeDef * HMC5883_Config_Stru
  * \param[out] int16_t array of size 3 to store X, Z, and Y magnetometer readings
  * \return none
 */
+uint8_t buffer[6];
 void PIOS_HMC5883_ReadMag(int16_t out[3])
 {
-	uint8_t buffer[6];
 	uint8_t ctrlB;
 
 	pios_hmc5883_data_ready = false;
@@ -226,12 +230,13 @@ void PIOS_HMC5883_ReadMag(int16_t out[3])
 /**
  * @brief Read the identification bytes from the HMC5883 sensor
  * \param[out] uint8_t array of size 4 to store HMC5883 ID.
- * \return none
+ * \return 0 if successful, -1 if not
 */
-void PIOS_HMC5883_ReadID(uint8_t out[4])
+uint8_t PIOS_HMC5883_ReadID(uint8_t out[4])
 {
-	while (!PIOS_HMC5883_Read(PIOS_HMC5883_DATAOUT_IDA_REG, out, 3)) ;
+	uint8_t retval = PIOS_HMC5883_Read(PIOS_HMC5883_DATAOUT_IDA_REG, out, 3);
 	out[3] = '\0';
+	return retval;
 }
 
 /**
@@ -321,6 +326,7 @@ int32_t PIOS_HMC5883_Test(void)
 		return -1;
 
 	return 0;
+	
 	int32_t passed = 1;
 	uint8_t registers[3] = {0,0,0};
 
@@ -376,11 +382,15 @@ void PIOS_HMC5883_IRQHandler(void)
  * Soon this will be generic in pios_exti and the BMA180 will register
  * against it.  Right now this is crap!
  */
+uint32_t count = 0;
+uint32_t count2 = 0;
 void EXTI9_5_IRQHandler(void)
 {
-	if (EXTI_GetITStatus(EXTI9_5_IRQn) != RESET) {
+	count++;
+	if (EXTI_GetITStatus(dev_cfg->eoc_exti.init.EXTI_Line) != RESET) {
+		count2++;
 		PIOS_HMC5883_IRQHandler();
-		EXTI_ClearITPendingBit(EXTI9_5_IRQn);
+		EXTI_ClearITPendingBit(dev_cfg->eoc_exti.init.EXTI_Line);
 	}
 }
 

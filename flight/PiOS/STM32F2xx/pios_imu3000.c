@@ -52,6 +52,7 @@ typedef struct {
 static void PIOS_IMU3000_Config(PIOS_IMU3000_ConfigTypeDef * IMU3000_Config_Struct);
 static int32_t PIOS_IMU3000_Read(uint8_t address, uint8_t * buffer, uint8_t len);
 static int32_t PIOS_IMU3000_Write(uint8_t address, uint8_t buffer);
+int32_t imu3000_id = 0;
 
 /**
  * @brief Initialize the IMU3000 3-axis gyro sensor.
@@ -134,8 +135,9 @@ int32_t PIOS_IMU3000_ReadGyros(int16_t * data)
 int32_t PIOS_IMU3000_ReadID()
 {
 	uint8_t id;
-	if(PIOS_IMU3000_Read(0x00, &id, 1) != 0)
+	if(PIOS_IMU3000_Read(0x00, (uint8_t *) &imu3000_id, 1) != 0)
 		return -1;
+	id = imu3000_id;
 	return id;
 }
 

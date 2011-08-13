@@ -47,6 +47,7 @@ volatile bool pios_bma180_data_ready = false;
 static int16_t pios_bma180_buffer[PIOS_BMA180_MAX_DOWNSAMPLE * 3];
 static t_fifo_buffer pios_bma180_fifo;
 
+static const struct pios_bma180_cfg * dev_cfg;
 
 /**
  * @brief Initialize with good default settings
@@ -72,6 +73,8 @@ void PIOS_BMA180_Init(const struct pios_bma180_cfg * cfg)
 	PIOS_BMA180_SetRange(BMA_RANGE_8G);
 	PIOS_DELAY_WaituS(50);
 	PIOS_BMA180_EnableIrq();
+	
+	dev_cfg = cfg;
 }
 
 /**

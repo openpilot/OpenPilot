@@ -49,7 +49,7 @@ struct pios_i2c_txn {
 	uint8_t *buf;
 };
 
-#define I2C_LOG_DEPTH 5
+#define I2C_LOG_DEPTH 20
 enum pios_i2c_error_type {
 	PIOS_I2C_ERROR_EVENT, 
 	PIOS_I2C_ERROR_FSM,

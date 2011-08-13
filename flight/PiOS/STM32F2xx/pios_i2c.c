@@ -907,8 +907,11 @@ out_fail:
 	return(-1);
 }
 
+uint32_t transfers = 0;
+uint32_t transfers_successful = 0;
 bool PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], uint32_t num_txns)
 {
+	transfers++;
 	struct pios_i2c_adapter * i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
 
 	bool valid = PIOS_I2C_validate(i2c_adapter);
@@ -962,6 +965,7 @@ bool PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], ui
 		i2c_timeout_counter++;
 #endif /* USE_FREERTOS */
 
+	transfers_successful+= (!i2c_adapter->bus_error) && semaphore_success;
 	return (!i2c_adapter->bus_error) && semaphore_success;
 }
 

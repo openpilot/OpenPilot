@@ -565,8 +565,8 @@ static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
 		},
 	},
 	.eoc_exti = {
-//		.pin_source = GPIO_PinSource8,
-//		.port_source = GPIO_PortSourceGPIOB,
+		.pin_source = EXTI_PinSource8,
+		.port_source = EXTI_PortSourceGPIOB,
 		.init = {
 			.EXTI_Line = EXTI_Line8, // matches above GPIO pin
 			.EXTI_Mode = EXTI_Mode_Interrupt,
@@ -597,8 +597,8 @@ static const struct pios_bma180_cfg pios_bma180_cfg = {
 		},
 	},
 	.eoc_exti = {
-		//		.pin_source = GPIO_PinSource4,
-		//		.port_source = GPIO_PortSourceGPIOC,
+		.pin_source = EXTI_PinSource4,
+		.port_source = EXTI_PortSourceGPIOC,
 		.init = {
 			.EXTI_Line = EXTI_Line4, // matches above GPIO pin
 			.EXTI_Mode = EXTI_Mode_Interrupt,
@@ -629,8 +629,8 @@ static const struct pios_imu3000_cfg pios_imu3000_cfg = {
 		},
 	},
 	.eoc_exti = {
-		//		.pin_source = GPIO_PinSource1,
-		//		.port_source = GPIO_PortSourceGPIOB,
+		.pin_source = EXTI_PinSource1,
+		.port_source = EXTI_PortSourceGPIOB,
 		.init = {
 			.EXTI_Line = EXTI_Line1, // matches above GPIO pin
 			.EXTI_Mode = EXTI_Mode_Interrupt,
@@ -733,20 +733,18 @@ void PIOS_Board_Init(void) {
 		PIOS_DEBUG_Assert(0);
 	}
 
-	PIOS_BMP085_Init(&pios_bmp085_cfg);
-	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
-	
 	if (PIOS_I2C_Init(&pios_i2c_gyro_adapter_id, &pios_i2c_gyro_adapter_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
-	PIOS_IMU3000_Init(&pios_imu3000_cfg);
-	
 	/* Set up the SPI interface to the accelerometer*/
 	if (PIOS_SPI_Init(&pios_spi_accel_id, &pios_spi_accel_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
 	PIOS_BMA180_Attach(pios_spi_accel_id);
 	PIOS_BMA180_Init(&pios_bma180_cfg);
+	PIOS_IMU3000_Init(&pios_imu3000_cfg);		
+	PIOS_BMP085_Init(&pios_bmp085_cfg);
+	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
 	
 	
 	/* Set up the SPI interface to the OP board */

@@ -128,6 +128,7 @@ SRC += $(STMSPDSRCDIR)/stm32f2xx_pwr.c
 SRC += $(STMSPDSRCDIR)/stm32f2xx_rcc.c
 SRC += $(STMSPDSRCDIR)/stm32f2xx_rtc.c
 SRC += $(STMSPDSRCDIR)/stm32f2xx_spi.c
+SRC += $(STMSPDSRCDIR)/stm32f2xx_syscfg.c
 SRC += $(STMSPDSRCDIR)/stm32f2xx_tim.c
 SRC += $(STMSPDSRCDIR)/stm32f2xx_usart.c
 SRC += $(STMSPDSRCDIR)/misc.c

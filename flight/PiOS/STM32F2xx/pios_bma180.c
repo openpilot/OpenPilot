@@ -53,18 +53,19 @@ static t_fifo_buffer pios_bma180_fifo;
  */
 void PIOS_BMA180_Init(const struct pios_bma180_cfg * cfg)
 {	
+	fifoBuf_init(&pios_bma180_fifo, (uint8_t *) pios_bma180_buffer, sizeof(pios_bma180_buffer));
+	
 	/* Configure EOC pin as input floating */
 	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
 	
 	/* Configure the End Of Conversion (EOC) interrupt */
+	SYSCFG_EXTILineConfig(cfg->eoc_exti.port_source, cfg->eoc_exti.pin_source);
 	EXTI_Init(&cfg->eoc_exti.init);
 	
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
 	NVIC_Init(&cfg->eoc_irq.init);
 	
 	pios_bma180_data_ready = false;
-	
-	fifoBuf_init(&pios_bma180_fifo, (uint8_t *) pios_bma180_buffer, sizeof(pios_bma180_buffer));
 	
 	PIOS_BMA180_Config();	
 	PIOS_BMA180_SelectBW(BMA_BW_600HZ);
@@ -311,6 +312,7 @@ int32_t PIOS_BMA180_Test()
 }
 
 uint32_t pios_bma180_count = 0;
+
 /**
  * @brief IRQ Handler
  */
@@ -326,6 +328,20 @@ void PIOS_BMA180_IRQHandler(void)
 	
 	fifoBuf_putData(&pios_bma180_fifo, accels, sizeof(accels));
 }
+
+/**
+ * The physical IRQ handler
+ * Soon this will be generic in pios_exti and the BMA180 will register
+ * against it
+ */
+void EXTI4_IRQHandler(void)
+{
+	if (EXTI_GetITStatus(EXTI_Line4) != RESET) {
+		PIOS_BMA180_IRQHandler();
+		EXTI_ClearITPendingBit(EXTI_Line4);
+	}
+}
+
 
 /**
  * @}

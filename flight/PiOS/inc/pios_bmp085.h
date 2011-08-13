@@ -82,8 +82,8 @@ struct pios_bmp085_cfg {
 
 /* Public Functions */
 extern void PIOS_BMP085_Init(const struct pios_bmp085_cfg * cfg);
-extern void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type);
-extern void PIOS_BMP085_ReadADC(void);
+extern int32_t PIOS_BMP085_StartADC(ConversionTypeTypeDef Type);
+extern int32_t PIOS_BMP085_ReadADC(void);
 extern int16_t PIOS_BMP085_GetTemperature(void);
 extern int32_t PIOS_BMP085_GetPressure(void);
 extern int32_t PIOS_BMP085_Test();

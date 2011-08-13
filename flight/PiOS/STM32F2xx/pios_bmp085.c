@@ -63,22 +63,18 @@ static int32_t PIOS_BMP085_Write(uint8_t address, uint8_t buffer);
 
 // Move into proper driver structure with cfg stored
 static uint32_t oversampling;
-const struct pios_bmp085_cfg * dev_cfg;
+static const struct pios_bmp085_cfg * dev_cfg;
 
 /**
 * Initialise the BMP085 sensor
 */
 void PIOS_BMP085_Init(const struct pios_bmp085_cfg * cfg)
 {
-#if defined(PIOS_INCLUDE_FREERTOS)
-	/* Semaphore used by ISR to signal End-Of-Conversion */
-	vSemaphoreCreateBinary(PIOS_BMP085_EOC);
-	/* Must start off empty so that first transfer waits for EOC */
-	xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
-#else
 	PIOS_BMP085_EOC = 0;
-#endif
 
+	oversampling = cfg->oversampling;
+	dev_cfg = cfg;	// Store cfg before enabling interrupt
+	
 	/* Configure EOC pin as input floating */
 	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
 	
@@ -89,17 +85,10 @@ void PIOS_BMP085_Init(const struct pios_bmp085_cfg * cfg)
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
 	NVIC_Init(&cfg->eoc_irq.init);
 
-	oversampling = cfg->oversampling;
-	dev_cfg = cfg;	
+	/* Configure anothing GPIO pin pin as output to set address */
+	GPIO_Init(cfg->xclr.gpio, &cfg->xclr.init);
+	GPIO_SetBits(cfg->xclr.gpio,cfg->xclr.init.GPIO_Pin);
 	
-	/* Configure anothing GPIO pin pin as input floating */
-/*  WHAT DID THIS DO?
-	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
-
-	GPIO_InitStructure.GPIO_Pin = PIOS_BMP085_XCLR_GPIO_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_Init(PIOS_BMP085_XCLR_GPIO_PORT, &GPIO_InitStructure);
-*/
 	/* Read all 22 bytes of calibration data in one transfer, this is a very optimized way of doing things */
 	uint8_t Data[BMP085_CALIB_LEN];
 	while (PIOS_BMP085_Read(BMP085_CALIB_ADDR, Data, BMP085_CALIB_LEN) != 0)
@@ -126,10 +115,13 @@ void PIOS_BMP085_Init(const struct pios_bmp085_cfg * cfg)
 /**
 * Start the ADC conversion
 * \param[in] PresOrTemp BMP085_PRES_ADDR or BMP085_TEMP_ADDR
-* \return Raw ADC value
+* \return 0 for success, -1 for failure (conversion completed and not read)
 */
-void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type)
+int32_t PIOS_BMP085_StartADC(ConversionTypeTypeDef Type)
 {
+	if(PIOS_BMP085_EOC)
+		return -1;
+
 	/* Start the conversion */
 	if (Type == TemperatureConv) {
 		while (PIOS_BMP085_Write(BMP085_CTRL_ADDR, BMP085_TEMP_ADDR) != 0)
@@ -140,25 +132,33 @@ void PIOS_BMP085_StartADC(ConversionTypeTypeDef Type)
 	}
 
 	CurrentRead = Type;
+	
+	return 0;
 }
 
 /**
 * Read the ADC conversion value (once ADC conversion has completed)
 * \param[in] PresOrTemp BMP085_PRES_ADDR or BMP085_TEMP_ADDR
-* \return Raw ADC value
+* \return 0 if successfully read the ADC, -1 if failed
 */
-void PIOS_BMP085_ReadADC(void)
+int32_t PIOS_BMP085_ReadADC(void)
 {
 	uint8_t Data[3];
 	Data[0] = 0;
 	Data[1] = 0;
 	Data[2] = 0;
-
+	
+	if(!PIOS_BMP085_EOC)
+		return -1;
+		
+	PIOS_BMP085_EOC = 0;
+		
 	/* Read and store the 16bit result */
 	if (CurrentRead == TemperatureConv) {
 		/* Read the temperature conversion */
-		while (PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 2) != 0)
-			continue;
+		if (PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 2) != 0)
+			return -1;
+
 		RawTemperature = ((Data[0] << 8) | Data[1]);
 
 		X1 = (RawTemperature - CalibData.AC6) * CalibData.AC5 >> 15;
@@ -167,8 +167,8 @@ void PIOS_BMP085_ReadADC(void)
 		Temperature = (B5 + 8) >> 4;
 	} else {
 		/* Read the pressure conversion */
-		while (PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 3) != 0)
-			continue;
+		if (PIOS_BMP085_Read(BMP085_ADC_MSB, Data, 3) != 0)
+			return -1;
 		RawPressure = ((Data[0] << 16) | (Data[1] << 8) | Data[2]) >> (8 - oversampling);
 
 		B6 = B5 - 4000;
@@ -188,6 +188,7 @@ void PIOS_BMP085_ReadADC(void)
 		X2 = (-7357 * P) >> 16;
 		Pressure = P + ((X1 + X2 + 3791) >> 4);
 	}
+	return 0;
 }
 
 int16_t PIOS_BMP085_GetTemperature(void)
@@ -294,13 +295,16 @@ int32_t PIOS_BMP085_Test()
 }
 
 /**
- * Handle external lines 15 to 10 interrupt requests
+ * Handle external line 2 interrupt requests
  */
-void EXTI15_10_IRQHandler(void)
+uint32_t bmp_eocs = 0;
+void EXTI2_IRQHandler(void)
 {
 	if (EXTI_GetITStatus(dev_cfg->eoc_exti.init.EXTI_Line) != RESET) {
 		/* Read the ADC Value */
 		PIOS_BMP085_EOC=1;
+		
+		bmp_eocs++;
 		
 		/* Clear the EXTI line pending bit */
 		EXTI_ClearITPendingBit(dev_cfg->eoc_exti.init.EXTI_Line);

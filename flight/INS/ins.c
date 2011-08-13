@@ -448,9 +448,11 @@ uint32_t total_conversion_blocks;
 
 
 int32_t gyro_error;
-int16_t gyro[3];	
+int16_t gyro[4];	
 int16_t mag[3];
+float altitude;
 int32_t pressure;
+
 int main()
 {	
 	gps_data.quality = -1;
@@ -481,18 +483,26 @@ int main()
 	//if(PIOS_BMA180_Test() != 0)
 	//	panic(2);
 
-	//if(PIOS_HMC5883_Test() != 0)
-	//	panic(3);	
+	if(PIOS_HMC5883_Test() != 0)
+		panic(3);	
 	
-	//if(PIOS_BMP085_Test() != 0)
-	//	panic(4); 
+	if(PIOS_BMP085_Test() != 0)
+		panic(4); 
 
 	uint32_t count = 500;
 	while(count--) {
-		gyro_error = PIOS_IMU3000_ReadGyros(gyro);
-	//	if(PIOS_HMC5883_NewDataAvailable())
-	//		PIOS_HMC5883_ReadMag(mag);
-	//	pressure = PIOS_BMP085_GetPressure();
+		// Update the pressure data
+		PIOS_BMP085_StartADC(PressureConv);
+		PIOS_DELAY_WaitmS(50);
+		if(PIOS_BMP085_ReadADC() == 0) {
+			pressure = PIOS_BMP085_GetPressure();
+			altitude = 44330.0 * (1.0 - powf((float) pressure / BMP085_P0, (1.0 / 5.255)));
+		}
+
+		PIOS_IMU3000_ReadGyros(gyro);		
+		PIOS_DELAY_WaitmS(50);
+		
+		PIOS_HMC5883_ReadMag(mag);
 		PIOS_DELAY_WaitmS(50);
 	}
 	

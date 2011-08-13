@@ -59,6 +59,8 @@ static const struct pios_hmc5883_cfg * dev_cfg;
  */
 void PIOS_HMC5883_Init(const struct pios_hmc5883_cfg * cfg)
 {
+	dev_cfg = cfg; // store config before enabling interrupt
+
 	/* Configure EOC pin as input floating */
 	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
 	
@@ -80,8 +82,6 @@ void PIOS_HMC5883_Init(const struct pios_hmc5883_cfg * cfg)
 	PIOS_Assert(val == 0);
 	
 	pios_hmc5883_data_ready = false;
-	
-	dev_cfg = cfg;
 }
 
 /**

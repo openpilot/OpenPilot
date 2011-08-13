@@ -663,8 +663,8 @@ static const struct pios_bmp085_cfg pios_bmp085_cfg = {
 		},
 	},
 	.eoc_exti = {
-		//		.pin_source = GPIO_PinSource2,
-		//		.port_source = GPIO_PortSourceGPIOC,
+		.pin_source = EXTI_PinSource2,
+		.port_source = EXTI_PortSourceGPIOC,
 		.init = {
 			.EXTI_Line = EXTI_Line2, // matches above GPIO pin
 			.EXTI_Mode = EXTI_Mode_Interrupt,
@@ -674,7 +674,7 @@ static const struct pios_bmp085_cfg pios_bmp085_cfg = {
 	},
 	.eoc_irq = {
 		.init = {
-			.NVIC_IRQChannel = EXTI15_10_IRQn,
+			.NVIC_IRQChannel = EXTI2_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
 			.NVIC_IRQChannelSubPriority = 0,
 			.NVIC_IRQChannelCmd = ENABLE,
@@ -745,8 +745,8 @@ void PIOS_Board_Init(void) {
 	/*PIOS_BMA180_Attach(pios_spi_accel_id);
 	PIOS_BMA180_Init(&pios_bma180_cfg);*/
 	PIOS_IMU3000_Init(&pios_imu3000_cfg);
-	/*PIOS_HMC5883_Init(&pios_hmc5883_cfg);
-	PIOS_BMP085_Init(&pios_bmp085_cfg);*/
+	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
+	PIOS_BMP085_Init(&pios_bmp085_cfg);
 	
 	
 	/* Set up the SPI interface to the OP board */

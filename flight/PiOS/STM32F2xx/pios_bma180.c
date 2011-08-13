@@ -54,6 +54,8 @@ static const struct pios_bma180_cfg * dev_cfg;
  */
 void PIOS_BMA180_Init(const struct pios_bma180_cfg * cfg)
 {	
+	dev_cfg = cfg; // store config before enabling interrupt
+	
 	fifoBuf_init(&pios_bma180_fifo, (uint8_t *) pios_bma180_buffer, sizeof(pios_bma180_buffer));
 	
 	/* Configure EOC pin as input floating */
@@ -73,8 +75,6 @@ void PIOS_BMA180_Init(const struct pios_bma180_cfg * cfg)
 	PIOS_BMA180_SetRange(BMA_RANGE_8G);
 	PIOS_DELAY_WaituS(50);
 	PIOS_BMA180_EnableIrq();
-	
-	dev_cfg = cfg;
 }
 
 /**
@@ -339,9 +339,9 @@ void PIOS_BMA180_IRQHandler(void)
  */
 void EXTI4_IRQHandler(void)
 {
-	if (EXTI_GetITStatus(EXTI_Line4) != RESET) {
+	if (EXTI_GetITStatus(dev_cfg->eoc_exti.init.EXTI_Line) != RESET) {
 		PIOS_BMA180_IRQHandler();
-		EXTI_ClearITPendingBit(EXTI_Line4);
+		EXTI_ClearITPendingBit(dev_cfg->eoc_exti.init.EXTI_Line);
 	}
 }
 

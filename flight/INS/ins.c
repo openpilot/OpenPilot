@@ -421,15 +421,16 @@ static void panic(int blinks)
 {
 	int blinked = 0;
 	while(1) {
-		blinked++;
-		if(blinked  > blinks) {
-			blinked = 0;
-			PIOS_DELAY_WaitmS(1000);
-		}			
 		PIOS_LED_On(LED2);
 		PIOS_DELAY_WaitmS(200);
 		PIOS_LED_Off(LED2);
 		PIOS_DELAY_WaitmS(200);
+
+		blinked++;
+		if(blinked >= blinks) {
+			blinked = 0;
+			PIOS_DELAY_WaitmS(1000);
+		}			
 	}
 }
 /**
@@ -445,6 +446,11 @@ int16_t accel[3];
 
 uint32_t total_conversion_blocks;
 
+
+int32_t gyro_error;
+int16_t gyro[3];	
+int16_t mag[3];
+int32_t pressure;
 int main()
 {	
 	gps_data.quality = -1;
@@ -472,15 +478,25 @@ int main()
 	if(PIOS_IMU3000_Test() != 0)
 		panic(1);
 	
-	if(PIOS_BMA180_Test() != 0)
-		panic(2);
+	//if(PIOS_BMA180_Test() != 0)
+	//	panic(2);
 
 	if(PIOS_HMC5883_Test() != 0)
 		panic(3);	
 	
 	if(PIOS_BMP085_Test() != 0)
 		panic(4); 
-	
+
+	while(1) {
+		gyro_error = PIOS_IMU3000_ReadFifo((uint8_t *) gyro, sizeof(gyro));
+		if(PIOS_HMC5883_NewDataAvailable())
+			PIOS_HMC5883_ReadMag(mag);
+		pressure = PIOS_BMP085_GetPressure();
+		PIOS_DELAY_WaitmS(5);
+	}
+	pressure++;
+	gyro[0]++;
+	mag[0]++;
 	// Flash warning light while trying to connect
 	uint16_t time_val = PIOS_DELAY_GetuS();
 	uint16_t ms_count = 0;

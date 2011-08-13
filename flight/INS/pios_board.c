@@ -744,9 +744,9 @@ void PIOS_Board_Init(void) {
 	}
 	PIOS_BMA180_Attach(pios_spi_accel_id);
 	PIOS_BMA180_Init(&pios_bma180_cfg);
-	PIOS_IMU3000_Init(&pios_imu3000_cfg);		
-	PIOS_BMP085_Init(&pios_bmp085_cfg);
+	PIOS_IMU3000_Init(&pios_imu3000_cfg);
 	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
+	PIOS_BMP085_Init(&pios_bmp085_cfg);
 	
 	
 	/* Set up the SPI interface to the OP board */

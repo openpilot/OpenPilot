@@ -212,11 +212,13 @@ extern uint32_t pios_com_telem_usb_id;
 //-------------------------
 // Receiver PPM input
 //-------------------------
+#define PIOS_PPM_MAX_DEVS			1
 #define PIOS_PPM_NUM_INPUTS                     12
 
 //-------------------------
 // Receiver PWM input
 //-------------------------
+#define PIOS_PWM_MAX_DEVS			1
 #define PIOS_PWM_NUM_INPUTS                     6
 
 //-------------------------
@@ -230,6 +232,11 @@ extern uint32_t pios_com_telem_usb_id;
 //-------------------------
 #define PIOS_SERVO_UPDATE_HZ                    50
 #define PIOS_SERVOS_INITIAL_POSITION            0 /* dont want to start motors, have no pulse till settings loaded */
+
+//--------------------------
+// Timer controller settings
+//--------------------------
+#define PIOS_TIM_MAX_DEVS			3
 
 //-------------------------
 // GPIO

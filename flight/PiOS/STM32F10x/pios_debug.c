@@ -34,39 +34,41 @@
 // Global variables
 const char *PIOS_DEBUG_AssertMsg = "ASSERT FAILED";
 
-#include <pios_servo_priv.h>
-extern const struct pios_servo_channel pios_servo_channels[];
-#define PIOS_SERVO_GPIO_PORT_1TO4 pios_servo_channels[0].port
-#define PIOS_SERVO_GPIO_PORT_5TO8 pios_servo_channels[4].port
-#define PIOS_SERVO_GPIO_PIN_1  pios_servo_channels[0].pin
-#define PIOS_SERVO_GPIO_PIN_2  pios_servo_channels[1].pin
-#define PIOS_SERVO_GPIO_PIN_3  pios_servo_channels[2].pin
-#define PIOS_SERVO_GPIO_PIN_4  pios_servo_channels[3].pin
-#define PIOS_SERVO_GPIO_PIN_5  pios_servo_channels[4].pin
-#define PIOS_SERVO_GPIO_PIN_6  pios_servo_channels[5].pin
-#define PIOS_SERVO_GPIO_PIN_7  pios_servo_channels[6].pin
-#define PIOS_SERVO_GPIO_PIN_8  pios_servo_channels[7].pin
-/* Private Function Prototypes */
+#ifdef PIOS_ENABLE_DEBUG_PINS
+static const struct pios_tim_channel * debug_channels;
+static uint8_t debug_num_channels;
+#endif	/* PIOS_ENABLE_DEBUG_PINS */
 
 /**
 * Initialise Debug-features
 */
-void PIOS_DEBUG_Init(void)
+void PIOS_DEBUG_Init(const struct pios_tim_channel * channels, uint8_t num_channels)
 {
 #ifdef PIOS_ENABLE_DEBUG_PINS
-	// Initialise Servo pins as standard output pins
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_StructInit(&GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_InitStructure.GPIO_Pin = PIOS_SERVO_GPIO_PIN_1 | PIOS_SERVO_GPIO_PIN_2 | PIOS_SERVO_GPIO_PIN_3 | PIOS_SERVO_GPIO_PIN_4;
-	GPIO_Init(PIOS_SERVO_GPIO_PORT_1TO4, &GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Pin = PIOS_SERVO_GPIO_PIN_5 | PIOS_SERVO_GPIO_PIN_6 | PIOS_SERVO_GPIO_PIN_7 | PIOS_SERVO_GPIO_PIN_8;
-	GPIO_Init(PIOS_SERVO_GPIO_PORT_5TO8, &GPIO_InitStructure);
+	PIOS_Assert(channels);
+	PIOS_Assert(num_channels);
 
-	// Drive all pins low
-	PIOS_SERVO_GPIO_PORT_1TO4->BRR = PIOS_SERVO_GPIO_PIN_1 | PIOS_SERVO_GPIO_PIN_2 | PIOS_SERVO_GPIO_PIN_3 | PIOS_SERVO_GPIO_PIN_4;
-	PIOS_SERVO_GPIO_PORT_5TO8->BRR = PIOS_SERVO_GPIO_PIN_5 | PIOS_SERVO_GPIO_PIN_6 | PIOS_SERVO_GPIO_PIN_7 | PIOS_SERVO_GPIO_PIN_8;
+	/* Store away the GPIOs we've been given */
+	debug_channels = channels;
+	debug_num_channels = num_channels;
+
+	/* Configure the GPIOs we've been given */
+	for (uint8_t i = 0; i < num_channels; i++) {
+		const struct pios_tim_channel * chan = &channels[i];
+
+		// Initialise pins as standard output pins
+		GPIO_InitTypeDef GPIO_InitStructure;
+		GPIO_StructInit(&GPIO_InitStructure);
+		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+		GPIO_InitStructure.GPIO_Pin = chan->init->GPIO_Pin;
+
+		/* Initialize the GPIO */
+		GPIO_Init(chan->init->port, &GPIO_InitStructure);
+
+		/* Set the pin low */
+		GPIO_WriteBit(chan->init->port, chan->init->GPIO_Pin, Bit_RESET);
+	}
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
 
@@ -74,14 +76,17 @@ void PIOS_DEBUG_Init(void)
 * Set debug-pin high
 * \param pin 0 for S1 output
 */
-void PIOS_DEBUG_PinHigh(uint8_t Pin)
+void PIOS_DEBUG_PinHigh(uint8_t pin)
 {
 #ifdef PIOS_ENABLE_DEBUG_PINS
-	if (Pin < 4) {
-		PIOS_SERVO_GPIO_PORT_1TO4->BSRR = (PIOS_SERVO_GPIO_PIN_1 << Pin);
-	} else if (Pin <= 7) {
-		PIOS_SERVO_GPIO_PORT_5TO8->BSRR = (PIOS_SERVO_GPIO_PIN_5 << (Pin - 4));
+	if (!debug_channels || pin >= debug_num_channels) {
+		return;
 	}
+
+	const struct pios_tim_channel * chan = &debug_channels[pin];
+
+	GPIO_WriteBit(chan->init->port, chan->init->GPIO_Pin, Bit_Set);
+
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
 
@@ -89,14 +94,17 @@ void PIOS_DEBUG_PinHigh(uint8_t Pin)
 * Set debug-pin low
 * \param pin 0 for S1 output
 */
-void PIOS_DEBUG_PinLow(uint8_t Pin)
+void PIOS_DEBUG_PinLow(uint8_t pin)
 {
 #ifdef PIOS_ENABLE_DEBUG_PINS
-	if (Pin < 4) {
-		PIOS_SERVO_GPIO_PORT_1TO4->BRR = (PIOS_SERVO_GPIO_PIN_1 << Pin);
-	} else if (Pin <= 7) {
-		PIOS_SERVO_GPIO_PORT_5TO8->BRR = (PIOS_SERVO_GPIO_PIN_5 << (Pin - 4));
+	if (!debug_channels || pin >= debug_num_channels) {
+		return;
 	}
+
+	const struct pios_tim_channel * chan = &debug_channels[pin];
+
+	GPIO_WriteBit(chan->init->port, chan->init->GPIO_Pin, Bit_RESET);
+
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
 
@@ -104,11 +112,22 @@ void PIOS_DEBUG_PinLow(uint8_t Pin)
 void PIOS_DEBUG_PinValue8Bit(uint8_t value)
 {
 #ifdef PIOS_ENABLE_DEBUG_PINS
+	if (!debug_channels) {
+		return;
+	}
+
 	uint32_t bsrr_l = ( ((~value)&0x0F)<<(16+6)   ) | ((value & 0x0F)<<6);
 	uint32_t bsrr_h = ( ((~value)&0xF0)<<(16+6-4) ) | ((value & 0xF0)<<(6-4));
+
 	PIOS_IRQ_Disable();
-	PIOS_SERVO_GPIO_PORT_1TO4->BSRR = bsrr_l;
-	PIOS_SERVO_GPIO_PORT_5TO8->BSRR = bsrr_h;
+
+	/* 
+	 * This is sketchy since it assumes a particular ordering
+	 * and bitwise layout of the channels provided to the debug code.
+	 */
+	debug_channels[0].init.port->BSRR = bsrr_l;
+	debug_channels[4].init.port->BSRR = bsrr_h;
+
 	PIOS_IRQ_Enable();
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
@@ -116,8 +135,16 @@ void PIOS_DEBUG_PinValue8Bit(uint8_t value)
 void PIOS_DEBUG_PinValue4BitL(uint8_t value)
 {
 #ifdef PIOS_ENABLE_DEBUG_PINS
+	if (!debug_channels) {
+		return;
+	}
+
+	/* 
+	 * This is sketchy since it assumes a particular ordering
+	 * and bitwise layout of the channels provided to the debug code.
+	 */
 	uint32_t bsrr_l = ((~(value & 0x0F)<<(16+6))) | ((value & 0x0F)<<6);
-	PIOS_SERVO_GPIO_PORT_1TO4->BSRR = bsrr_l;
+	debug_channels[0].init.port->BSRR = bsrr_l;
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
 

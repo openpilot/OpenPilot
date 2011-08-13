@@ -34,32 +34,17 @@
 #include <pios.h>
 #include <pios_stm32.h>
 
-struct pios_pwm_channel {
-	TIM_TypeDef * timer;
-	GPIO_TypeDef * port;
-	uint16_t ccr;
-	uint8_t channel;
-	uint16_t pin;
-};
+#include <pios_tim_priv.h>
 
 struct pios_pwm_cfg {
-	TIM_TimeBaseInitTypeDef tim_base_init;
 	TIM_ICInitTypeDef tim_ic_init;
-	GPIO_InitTypeDef gpio_init;
-	uint32_t remap;		/* GPIO_Remap_* */
-	struct stm32_irq irq;
-	const struct pios_pwm_channel *const channels;
+	const struct pios_tim_channel * channels;
 	uint8_t num_channels;
 };
 
-extern void PIOS_PWM_irq_handler(TIM_TypeDef * timer);
-
-extern uint8_t pios_pwm_num_channels;
-extern const struct pios_pwm_cfg pios_pwm_cfg;
-
 extern const struct pios_rcvr_driver pios_pwm_rcvr_driver;
 
-extern void PIOS_PWM_Init(void);
+extern int32_t PIOS_PWM_Init(uint32_t * pwm_id, const struct pios_pwm_cfg * cfg);
 
 #endif /* PIOS_PWM_PRIV_H */
 

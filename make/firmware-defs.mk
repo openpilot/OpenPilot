@@ -213,7 +213,7 @@ OOCD_EXE ?= openocd
 OOCD_JTAG_SETUP  = -d0
 # interface and board/target settings (using the OOCD target-library here)
 OOCD_JTAG_SETUP += -s $(TOP)/flight/Project/OpenOCD
-OOCD_JTAG_SETUP += -f foss-jtag.revb.cfg -f stm32.cfg
+OOCD_JTAG_SETUP += -f foss-jtag.revb.cfg -f stm32f1x.cfg
 
 # initialize
 OOCD_BOARD_RESET = -c init

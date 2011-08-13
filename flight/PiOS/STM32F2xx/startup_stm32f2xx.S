@@ -21,6 +21,7 @@
   .fpu softvfp
   .thumb
 
+.global  SystemInit_ExtMemCtl_Dummy
 .global  Default_Handler
 
 /* start address for the initialization values of the .data section. 
@@ -35,6 +36,7 @@ defined in linker script */
 /* end address for the .bss section. defined in linker script */
 .word  _ebss
 
+.equ  BootRAM, 0xF108F85F
 /**
  * @brief  This is the code that gets called when the processor first
  *          starts execution following a reset event. Only the absolutely
@@ -44,7 +46,7 @@ defined in linker script */
  * @retval : None
 */
 
-    .section  .text.Reset_Handler
+.section  .text.Reset_Handler
   .weak  Reset_Handler
   .type  Reset_Handler, %function
 Reset_Handler:
@@ -58,7 +60,7 @@ CopyDataInit:
   ldr  r3, [r3, r1]
   str  r3, [r0, r1]
   adds  r1, r1, #4
-    
+
 LoopCopyDataInit:
   ldr  r0, =_sdata
   ldr  r3, =_edata
@@ -71,14 +73,14 @@ LoopCopyDataInit:
 FillZerobss:
   movs  r3, #0
   str  r3, [r2], #4
-    
+
 LoopFillZerobss:
   ldr  r3, = _ebss
   cmp  r2, r3
   bcc  FillZerobss
 /* Call the application's entry point.*/
   bl  main
-  bx  lr
+  bx  lr    
 .size  Reset_Handler, .-Reset_Handler
 
 /**
@@ -88,8 +90,8 @@ LoopFillZerobss:
  *
  * @param  None     
  * @retval : None       
-*/
-    .section  .text.Default_Handler,"ax",%progbits
+ */
+.section  .text.Default_Handler,"ax",%progbits
 Default_Handler:
 Infinite_Loop:
   b  Infinite_Loop

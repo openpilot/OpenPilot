@@ -207,7 +207,6 @@
 		6560A38913EE26B700105DA5 /* pios_usart.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_usart.c; sourceTree = "<group>"; };
 		6560A38A13EE26B700105DA5 /* pios_wdg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_wdg.c; sourceTree = "<group>"; };
 		6560A38B13EE26B700105DA5 /* startup_stm32f2xx.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = startup_stm32f2xx.S; sourceTree = "<group>"; };
-		6560A38C13EE26B700105DA5 /* startup_stm32f2xx_BL.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = startup_stm32f2xx_BL.S; sourceTree = "<group>"; };
 		6560A38D13EE26B700105DA5 /* vectors_stm32f2xx.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = vectors_stm32f2xx.S; sourceTree = "<group>"; };
 		6560A38E13EE270C00105DA5 /* link_STM3210E_INS_BL_sections.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = link_STM3210E_INS_BL_sections.ld; sourceTree = "<group>"; };
 		6560A38F13EE270C00105DA5 /* link_STM3210E_INS_memory.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = link_STM3210E_INS_memory.ld; sourceTree = "<group>"; };
@@ -2864,7 +2863,6 @@
 		65D1FBD913F51AB7006374A6 /* pios_imu3000.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_imu3000.c; sourceTree = "<group>"; };
 		65D1FBDA13F51AE1006374A6 /* pios_imu3000.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_imu3000.h; sourceTree = "<group>"; };
 		65D1FBE713F53477006374A6 /* pios_bl_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_bl_helper.h; sourceTree = "<group>"; };
-		65D1FC9C13F541D4006374A6 /* startup_stm32f2xx_INS.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = startup_stm32f2xx_INS.S; sourceTree = "<group>"; };
 		65D2CA841248F9A400B1E7D6 /* mixersettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixersettings.xml; sourceTree = "<group>"; };
 		65D2CA851248F9A400B1E7D6 /* mixerstatus.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = mixerstatus.xml; sourceTree = "<group>"; };
 		65DEA78513F0FE6000095B06 /* stm32f2xx_conf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stm32f2xx_conf.h; sourceTree = "<group>"; };
@@ -3749,8 +3747,6 @@
 				6560A38913EE26B700105DA5 /* pios_usart.c */,
 				6560A38A13EE26B700105DA5 /* pios_wdg.c */,
 				6560A38B13EE26B700105DA5 /* startup_stm32f2xx.S */,
-				6560A38C13EE26B700105DA5 /* startup_stm32f2xx_BL.S */,
-				65D1FC9C13F541D4006374A6 /* startup_stm32f2xx_INS.S */,
 				6560A38D13EE26B700105DA5 /* vectors_stm32f2xx.S */,
 			);
 			path = STM32F2xx;
@@ -8265,8 +8261,6 @@
 				6560A39813EE270C00105DA5 /* link_STM32103CB_PIPXTREME_BL_sections.ld */,
 				6560A39913EE270C00105DA5 /* link_STM32103CB_PIPXTREME_memory.ld */,
 				6560A39A13EE270C00105DA5 /* link_STM32103CB_PIPXTREME_sections.ld */,
-				6560A39B13EE270C00105DA5 /* startup_stm32f10x_HD_OP.S */,
-				6560A39C13EE270C00105DA5 /* startup_stm32f10x_MD_CC.S */,
 				65E8F05911EFF25C00BBF654 /* Libraries */,
 				65E8F0D811EFF25C00BBF654 /* link_stm32f10x_HD.ld */,
 				65E8F0DB11EFF25C00BBF654 /* link_stm32f10x_MD.ld */,
@@ -8293,7 +8287,9 @@
 				651CF9E8120B5D8300EEFD70 /* pios_usb_hid_pwr.c */,
 				65003B31121249CA00C183DD /* pios_wdg.c */,
 				65E8F0EE11EFF25C00BBF654 /* startup_stm32f10x_HD.S */,
+				6560A39B13EE270C00105DA5 /* startup_stm32f10x_HD_OP.S */,
 				65E8F0F111EFF25C00BBF654 /* startup_stm32f10x_MD.S */,
+				6560A39C13EE270C00105DA5 /* startup_stm32f10x_MD_CC.S */,
 			);
 			name = STM32F10x;
 			path = ../../PiOS/STM32F10x;

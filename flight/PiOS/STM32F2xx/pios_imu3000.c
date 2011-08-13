@@ -148,60 +148,30 @@ int32_t PIOS_IMU3000_ReadID()
  * \return number of bytes transferred if operation was successful
  * \return -1 if error during I2C transfer
  */
+uint32_t imu_read = 0;
+
 int32_t PIOS_IMU3000_ReadFifo(uint8_t * buffer, uint16_t len)
 {
-	uint16_t fifo_level;
-
-	uint8_t addr_buffer[] = {
-		0x3A,
-	};
-	
-
-	const struct pios_i2c_txn txn_list[] = {
-		{
-			.info = __func__,
-			.addr = PIOS_IMU3000_I2C_ADDR,
-			.rw = PIOS_I2C_TXN_WRITE,
-			.len = sizeof(addr_buffer),
-			.buf = addr_buffer,
-		}
-		,
-		{
-			.info = __func__,
-			.addr = PIOS_IMU3000_I2C_ADDR,
-			.rw = PIOS_I2C_TXN_READ,
-			.len = 2,
-			.buf = (uint8_t *) &fifo_level,
-		}
-	};
-	
-	// Get the number of bytes in the fifo
-	PIOS_I2C_Transfer(PIOS_I2C_GYRO_ADAPTER, txn_list, NELEMENTS(txn_list));
-	addr_buffer[0] = 0x3C;
-	
+	uint16_t fifo_level;	
+	int8_t retval1, retval2;	
+		
+	// Get the number of bytes in the fifo	
+	retval1 = PIOS_IMU3000_Read(PIOS_IMU3000_FIFO_CNT_MSB, (uint8_t *) &fifo_level, sizeof(fifo_level));
+	if(retval1 != 0)
+		return -1;
 	
 	if(len > fifo_level)
 		len = fifo_level;
-	len &= 0x01f8; // only read chunks of 8 bytes (includes footer)
+	len -= (len % 10); // only read chunks of 10 bytes (includes footer and temperature measurement)
+
+	// No bytes available to transfer
+	if(len == 0) 
+		return 0;
+		
+	imu_read += len;
 	
-	const struct pios_i2c_txn txn_list2[] = {
-		{
-			.info = __func__,
-			.addr = PIOS_IMU3000_I2C_ADDR,
-			.rw = PIOS_I2C_TXN_WRITE,
-			.len = sizeof(addr_buffer),
-			.buf = addr_buffer,
-		}
-		,
-		{
-			.info = __func__,
-			.addr = PIOS_IMU3000_I2C_ADDR,
-			.rw = PIOS_I2C_TXN_READ,
-			.len = len,
-			.buf = buffer,
-		}
-	};	
-	return PIOS_I2C_Transfer(PIOS_I2C_GYRO_ADAPTER, txn_list2, NELEMENTS(txn_list)) ? len : -1;
+	retval2 = PIOS_IMU3000_Read(PIOS_IMU3000_FIFO_REG, (uint8_t *) &buffer, len);
+	return (retval2 < 0) ? -1 : len;
 }
 
 /**
@@ -290,8 +260,10 @@ uint8_t PIOS_IMU3000_Test(void)
 /**
 * @brief IRQ Handler
 */
+uint32_t imu3000_irq = 0;
 void PIOS_IMU3000_IRQHandler(void)
 {
+	imu3000_irq++;
 }
 
 /**

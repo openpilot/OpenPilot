@@ -481,19 +481,24 @@ int main()
 	//if(PIOS_BMA180_Test() != 0)
 	//	panic(2);
 
-	if(PIOS_HMC5883_Test() != 0)
-		panic(3);	
+	//if(PIOS_HMC5883_Test() != 0)
+	//	panic(3);	
 	
-	if(PIOS_BMP085_Test() != 0)
-		panic(4); 
+	//if(PIOS_BMP085_Test() != 0)
+	//	panic(4); 
 
-	while(1) {
-		gyro_error = PIOS_IMU3000_ReadFifo((uint8_t *) gyro, sizeof(gyro));
-		if(PIOS_HMC5883_NewDataAvailable())
-			PIOS_HMC5883_ReadMag(mag);
-		pressure = PIOS_BMP085_GetPressure();
-		PIOS_DELAY_WaitmS(5);
+	uint32_t count = 500;
+	while(count--) {
+		gyro_error = PIOS_IMU3000_ReadGyros(gyro);
+	//	if(PIOS_HMC5883_NewDataAvailable())
+	//		PIOS_HMC5883_ReadMag(mag);
+	//	pressure = PIOS_BMP085_GetPressure();
+		PIOS_DELAY_WaitmS(50);
 	}
+	
+	if(PIOS_IMU3000_Test() != 0)
+		panic(1);
+
 	pressure++;
 	gyro[0]++;
 	mag[0]++;

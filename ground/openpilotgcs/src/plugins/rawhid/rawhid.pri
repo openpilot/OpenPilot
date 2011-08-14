@@ -1,3 +1,3 @@
 include(rawhid_dependencies.pri)
 
-LIBS *= -l$$qtLibraryTarget(RawHID)
+LIBS *= -l$$qtLibraryName(RawHID)

@@ -1,1 +1,1 @@
-LIBS *= -l$$qtLibraryTarget(opmapwidget)
+LIBS *= -l$$qtLibraryName(opmapwidget)

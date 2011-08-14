@@ -40,6 +40,10 @@
 
 #include "core_global.h"
 
+QT_BEGIN_NAMESPACE
+class QTabWidget;
+QT_END_NAMESPACE
+
 namespace Core {
 
     class IConnection;
@@ -65,7 +69,7 @@ class CORE_EXPORT ConnectionManager : public QWidget
     Q_OBJECT
 
 public:
-    ConnectionManager(Internal::MainWindow *mainWindow, Internal::FancyTabWidget *modeStack);
+    ConnectionManager(Internal::MainWindow *mainWindow, QTabWidget *modeStack);
     virtual ~ConnectionManager();
 
     void init();

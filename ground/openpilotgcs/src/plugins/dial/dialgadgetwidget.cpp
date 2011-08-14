@@ -478,13 +478,13 @@ void DialGadgetWidget::setDialFont(QString fontProps)
 // this enables smooth rotation in rotateNeedles below
 void DialGadgetWidget::setNeedle1(double value) {
     if (rotateN1) {
-        needle1Target = 360*(value*n1Factor-n1MinValue)/(n1MaxValue-n1MinValue);
+        needle1Target = 360*(value*n1Factor)/(n1MaxValue-n1MinValue);
     }
     if (horizN1) {
-        needle1Target = (value*n1Factor-n1MinValue)/(n1MaxValue-n1MinValue);
+        needle1Target = (value*n1Factor)/(n1MaxValue-n1MinValue);
     }
     if (vertN1) {
-        needle1Target = (value*n1Factor-n1MinValue)/(n1MaxValue-n1MinValue);
+        needle1Target = (value*n1Factor)/(n1MaxValue-n1MinValue);
     }
     if (!dialTimer.isActive())
         dialTimer.start();
@@ -497,13 +497,13 @@ void DialGadgetWidget::setNeedle1(double value) {
 
 void DialGadgetWidget::setNeedle2(double value) {
     if (rotateN2) {
-        needle2Target = 360*(value*n2Factor-n2MinValue)/(n2MaxValue-n2MinValue);
+        needle2Target = 360*(value*n2Factor)/(n2MaxValue-n2MinValue);
     }
     if (horizN2) {
-        needle2Target = (value*n2Factor-n2MinValue)/(n2MaxValue-n2MinValue);
+        needle2Target = (value*n2Factor)/(n2MaxValue-n2MinValue);
     }
     if (vertN2) {
-        needle2Target = (value*n2Factor-n2MinValue)/(n2MaxValue-n2MinValue);
+        needle2Target = (value*n2Factor)/(n2MaxValue-n2MinValue);
     }
     if (!dialTimer.isActive())
         dialTimer.start();
@@ -517,13 +517,13 @@ void DialGadgetWidget::setNeedle2(double value) {
 
 void DialGadgetWidget::setNeedle3(double value) {
     if (rotateN3) {
-        needle3Target = 360*(value*n3Factor-n3MinValue)/(n3MaxValue-n3MinValue);
+        needle3Target = 360*(value*n3Factor)/(n3MaxValue-n3MinValue);
     }
     if (horizN3) {
-        needle3Target = (value*n3Factor-n3MinValue)/(n3MaxValue-n3MinValue);
+        needle3Target = (value*n3Factor)/(n3MaxValue-n3MinValue);
     }
     if (vertN3) {
-        needle3Target = (value*n3Factor-n3MinValue)/(n3MaxValue-n3MinValue);
+        needle3Target = (value*n3Factor)/(n3MaxValue-n3MinValue);
     }
     if (!dialTimer.isActive())
         dialTimer.start();

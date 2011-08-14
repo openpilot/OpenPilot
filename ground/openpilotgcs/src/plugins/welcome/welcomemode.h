@@ -61,6 +61,7 @@ public:
     void activated();
     QString contextHelpId() const { return QLatin1String("OpenPilot GCS"); }
     void initPlugins();
+    void setPriority(int priority) { m_priority = priority; }
 
 private slots:
     void slotFeedback();
@@ -69,6 +70,7 @@ private slots:
 
 private:
     WelcomeModePrivate *m_d;
+    int m_priority;
 };
 
 } // namespace Welcome

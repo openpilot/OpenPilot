@@ -44,6 +44,7 @@ public:
     ConfigCCHWWidget(QWidget *parent = 0);
     ~ConfigCCHWWidget();
 private slots:
+    void openHelp();
     void refreshValues();
     void widgetsContentsChanged();
 

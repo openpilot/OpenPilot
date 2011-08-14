@@ -32,7 +32,8 @@
 #include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
-
+#include <QDesktopServices>
+#include <QUrl>
 
 ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
@@ -43,6 +44,7 @@ ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addUAVObjectToWidgetRelation("HwSettings","CC_FlexiPort",m_telemetry->cbFlexi);
     addUAVObjectToWidgetRelation("HwSettings","CC_MainPort",m_telemetry->cbTele);
     addUAVObjectToWidgetRelation("HwSettings","RcvrPort",m_telemetry->cbRcvr);
+    connect(m_telemetry->cchwHelp,SIGNAL(clicked()),this,SLOT(openHelp()));
     enableControls(false);
     populateWidgets();
     refreshWidgetsValues();
@@ -71,4 +73,14 @@ void ConfigCCHWWidget::widgetsContentsChanged()
         enableControls(true);
     }
 }
+
+void ConfigCCHWWidget::openHelp()
+{
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/CopterControl+HW+Settings", QUrl::StrictMode) );
+}
+
+/**
+  * @}
+  * @}
+  */
 

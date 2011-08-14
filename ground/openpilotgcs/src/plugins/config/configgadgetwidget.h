@@ -38,7 +38,8 @@
 #include <QTextBrowser>
 #include "utils/pathutils.h"
 #include <QMessageBox>
-#include "fancytabwidget.h"
+//#include "fancytabwidget.h"
+#include "utils/mytabbedstackwidget.h"
 #include "configtaskwidget.h"
 
 class ConfigGadgetWidget: public QWidget
@@ -62,8 +63,7 @@ signals:
 
 protected:
         void resizeEvent(QResizeEvent * event);
-        FancyTabWidget *ftw;
-
+        MyTabbedStackWidget *ftw;
 };
 
 #endif // CONFIGGADGETWIDGET_H

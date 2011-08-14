@@ -177,11 +177,13 @@ int32_t PIOS_SPI_Init(uint32_t * spi_id, const struct pios_spi_cfg * cfg)
 	/* Enable SPI interrupts to DMA */
 	SPI_I2S_DMACmd(spi_dev->cfg->regs, SPI_I2S_DMAReq_Tx | SPI_I2S_DMAReq_Rx, ENABLE);
 
+	/* Must store this before enabling interrupt */
+	*spi_id = (uint32_t)spi_dev;
+
 	/* Configure DMA interrupt */
 	NVIC_Init((NVIC_InitTypeDef*)&(spi_dev->cfg->dma.irq.init));
 	DMA_ITConfig(spi_dev->cfg->dma.tx.channel, spi_dev->cfg->dma.irq.flags, ENABLE);	/* XXX is this correct? */
 
-	*spi_id = (uint32_t)spi_dev;
 	return(0);
 
 out_fail:

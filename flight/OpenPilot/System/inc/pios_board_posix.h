@@ -52,6 +52,7 @@
 //-------------------------
 //#define PIOS_USART_TX_BUFFER_SIZE		256
 #define PIOS_COM_BUFFER_SIZE 1024
+#define PIOS_COM_MAX_DEVS 256
 #define PIOS_UDP_RX_BUFFER_SIZE		PIOS_COM_BUFFER_SIZE
 
 #define PIOS_COM_TELEM_RF                       0

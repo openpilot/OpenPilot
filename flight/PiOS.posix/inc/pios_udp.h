@@ -31,21 +31,5 @@
 /* Global Types */
 
 /* Public Functions */
-//extern void PIOS_UDP_Init(void);
-void PIOS_UDP_Init(void);
-extern void PIOS_UDP_ChangeBaud(uint8_t usart, uint32_t baud);
-
-extern int32_t PIOS_UDP_RxBufferFree(uint8_t usart);
-extern int32_t PIOS_UDP_RxBufferUsed(uint8_t usart);
-extern int32_t PIOS_UDP_RxBufferGet(uint8_t usart);
-extern int32_t PIOS_UDP_RxBufferPeek(uint8_t usart);
-extern int32_t PIOS_UDP_RxBufferPut(uint8_t usart, uint8_t b);
-
-extern int32_t PIOS_UDP_TxBufferFree(uint8_t usart);
-extern int32_t PIOS_UDP_TxBufferGet(uint8_t usart);
-extern int32_t PIOS_UDP_TxBufferPutMoreNonBlocking(uint8_t usart, uint8_t *buffer, uint16_t len);
-extern int32_t PIOS_UDP_TxBufferPutMore(uint8_t usart, uint8_t *buffer, uint16_t len);
-extern int32_t PIOS_UDP_TxBufferPutNonBlocking(uint8_t usart, uint8_t b);
-extern int32_t PIOS_UDP_TxBufferPut(uint8_t usart, uint8_t b);
 
 #endif /* PIOS_UDP_H */

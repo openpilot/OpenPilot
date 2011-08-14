@@ -97,6 +97,22 @@ void PIOS_ADXL345_Init()
 }
 
 /**
+ * @brief Return number of entries in the fifo
+ */
+uint8_t  PIOS_ADXL345_FifoElements()
+{
+	uint8_t buf[2] = {0,0};
+	uint8_t rec[2] = {0,0};
+	buf[0] = ADXL_FIFOSTATUS_ADDR | ADXL_READ_BIT ; // Read fifo status
+	
+	PIOS_ADXL345_ClaimBus();
+	PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,&buf[0],&rec[0],sizeof(buf),NULL);
+	PIOS_ADXL345_ReleaseBus();
+	
+	return rec[1] & 0x3f;
+}
+
+/**
  * @brief Read a single set of values from the x y z channels
  * @returns The number of samples remaining in the fifo
  */

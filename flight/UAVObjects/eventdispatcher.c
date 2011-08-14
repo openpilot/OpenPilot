@@ -27,7 +27,11 @@
 #include "openpilot.h"
 
 // Private constants
+#if defined(PIOS_EVENTDISAPTCHER_QUEUE)
+#define MAX_QUEUE_SIZE PIOS_EVENTDISAPTCHER_QUEUE
+#else
 #define MAX_QUEUE_SIZE 20
+#endif
 
 #if defined(PIOS_EVENTDISPATCHER_STACK_SIZE)
 #define STACK_SIZE PIOS_EVENTDISPATCHER_STACK_SIZE

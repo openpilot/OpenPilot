@@ -76,7 +76,7 @@ static void AttitudeTask(void *parameters);
 static float gyro_correct_int[3] = {0,0,0};
 static xQueueHandle gyro_queue;
 
-static void updateSensors(AttitudeRawData *);
+static int8_t updateSensors(AttitudeRawData *);
 static void updateAttitude(AttitudeRawData *);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
 
@@ -166,14 +166,19 @@ static void AttitudeTask(void *parameters)
 	// Keep flash CS pin high while talking accel
 	PIOS_FLASH_DISABLE;
 	PIOS_ADXL345_Init();
-
-
+	
+	// Set critical error and wait until the accel is producing data
+	while(PIOS_ADXL345_FifoElements() == 0) {
+		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
+		PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
+	}
+	
 	// Force settings update to make sure rotation loaded
 	settingsUpdatedCb(AttitudeSettingsHandle());
 
 	// Main task loop
 	while (1) {
-
+	
 		FlightStatusData flightStatus;
 		FlightStatusGet(&flightStatus);
 
@@ -201,14 +206,24 @@ static void AttitudeTask(void *parameters)
 
 		AttitudeRawData attitudeRaw;
 		AttitudeRawGet(&attitudeRaw);
-		updateSensors(&attitudeRaw);
-		updateAttitude(&attitudeRaw);
-		AttitudeRawSet(&attitudeRaw);
+		if(updateSensors(&attitudeRaw) != 0)
+			AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
+		else {
+			// Only update attitude when sensor data is good
+			updateAttitude(&attitudeRaw);
+			AttitudeRawSet(&attitudeRaw);
+			AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
+		}
 
 	}
 }
 
-static void updateSensors(AttitudeRawData * attitudeRaw)
+/**
+ * Get an update from the sensors
+ * @param[in] attitudeRaw Populate the UAVO instead of saving right here
+ * @return 0 if successfull, -1 if not
+ */
+static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 {
 	struct pios_adxl345_data accel_data;
 	float gyro[4];
@@ -216,9 +231,12 @@ static void updateSensors(AttitudeRawData * attitudeRaw)
 	// Only wait the time for two nominal updates before setting an alarm
 	if(xQueueReceive(gyro_queue, (void * const) gyro, UPDATE_RATE * 2) == errQUEUE_EMPTY) {
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
-		return;
+		return -1;
 	}
 
+	// No accel data available
+	if(PIOS_ADXL345_FifoElements() == 0)
+		return -1;
 
 	// First sample is temperature
 	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = -(gyro[1] - GYRO_NEUTRAL) * gyroGain;
@@ -274,6 +292,8 @@ static void updateSensors(AttitudeRawData * attitudeRaw)
 	// Because most crafts wont get enough information from gravity to zero yaw gyro, we try
 	// and make it average zero (weakly)
 	gyro_correct_int[2] += - attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] * yawBiasRate;
+	
+	return 0;
 }
 
 static void updateAttitude(AttitudeRawData * attitudeRaw)
@@ -311,6 +331,7 @@ static void updateAttitude(AttitudeRawData * attitudeRaw)
 		// Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
 		gyro_correct_int[0] += accel_err[0] * accelKi;
 		gyro_correct_int[1] += accel_err[1] * accelKi;
+			
 		//gyro_correct_int[2] += accel_err[2] * settings.AccelKI * dT;
 
 		// Correct rates based on error, integral component dealt with in updateSensors

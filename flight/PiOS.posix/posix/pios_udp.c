@@ -32,6 +32,7 @@
 
 #if defined(PIOS_INCLUDE_UDP)
 
+#include <signal.h>
 #include <pios_udp_priv.h>
 
 /* We need a list of UDP devices */
@@ -75,6 +76,12 @@ static pios_udp_dev * find_udp_dev_by_id (uint8_t udp)
  */
 void * PIOS_UDP_RxThread(void * udp_dev_n)
 {
+
+	/* needed because of FreeRTOS.posix scheduling */
+	sigset_t set;
+	sigfillset(&set);
+	sigprocmask(SIG_BLOCK, &set, NULL);
+
 	pios_udp_dev * udp_dev = (pios_udp_dev*) udp_dev_n;
 
    /**
@@ -93,24 +100,25 @@ void * PIOS_UDP_RxThread(void * udp_dev_n)
 				PIOS_UDP_RX_BUFFER_SIZE,
 				0,
 				(struct sockaddr *) &udp_dev->client,
-				(socklen_t*)&udp_dev->clientLength)) < 0) {
+				(socklen_t*)&udp_dev->clientLength)) >= 0)
+		{
 
-			pthread_exit(NULL);
-		}
-
-		/* copy received data to buffer if possible */
-		/* we do NOT buffer data locally. If the com buffer can't receive, data is discarded! */
-		/* (thats what the USART driver does too!) */
-		bool rx_need_yield = false;
-		if (udp_dev->rx_in_cb) {
-		  (void) (udp_dev->rx_in_cb)(udp_dev->rx_in_context, udp_dev->rx_buffer, received, NULL, &rx_need_yield);
-		}
+			/* copy received data to buffer if possible */
+			/* we do NOT buffer data locally. If the com buffer can't receive, data is discarded! */
+			/* (thats what the USART driver does too!) */
+			bool rx_need_yield = false;
+			if (udp_dev->rx_in_cb) {
+			  (void) (udp_dev->rx_in_cb)(udp_dev->rx_in_context, udp_dev->rx_buffer, received, NULL, &rx_need_yield);
+			}
 
 #if defined(PIOS_INCLUDE_FREERTOS)
-		if (rx_need_yield) {
-			vPortYieldFromISR();
-		}
+			if (rx_need_yield) {
+				vPortYieldFromISR();
+			}
 #endif	/* PIOS_INCLUDE_FREERTOS */
+
+		}
+
 
 	}
 }
@@ -172,7 +180,7 @@ static void PIOS_UDP_TxStart(uint32_t udp_id, uint16_t tx_bytes_avail)
 
 	PIOS_Assert(udp_dev);
 
-	uint16_t length,len,rem;
+	int32_t length,len,rem;
 
 	/**
 	 * we send everything directly whenever notified of data to send (lazy!)
@@ -186,8 +194,11 @@ static void PIOS_UDP_TxStart(uint32_t udp_id, uint16_t tx_bytes_avail)
 				len = sendto(udp_dev->socket, udp_dev->tx_buffer, length, 0,
 						 (struct sockaddr *) &udp_dev->client,
 						 sizeof(udp_dev->client));
-				if (!len) return;
-				rem -= len;
+				if (len<=0) {
+					rem=0;
+				} else {
+					rem -= len;
+				}
 			}
 			tx_bytes_avail -= length;
 		}

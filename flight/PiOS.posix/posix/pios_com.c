@@ -92,14 +92,13 @@ static uint32_t PIOS_COM_create(void)
 	com_dev = &pios_com_devs[pios_com_num_devs++];
 	com_dev->magic = PIOS_COM_DEV_MAGIC;
 
-	return (pios_com_num_devs-1);
+	return (pios_com_num_devs);
 }
 static struct pios_com_dev * PIOS_COM_find_dev(uint32_t com_dev_id)
 {
-	if (com_dev_id>pios_com_num_devs) {
-		return NULL;
-	}
-	return &pios_com_devs[com_dev_id];
+	if (!com_dev_id) return NULL;
+	if (com_dev_id>pios_com_num_devs+1)	return NULL;
+	return &pios_com_devs[com_dev_id-1];
 }
 #endif
 

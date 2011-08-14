@@ -450,8 +450,14 @@ uint32_t total_conversion_blocks;
 int32_t gyro_error;
 int16_t gyro[4];	
 int16_t mag[3];
+int16_t accel[3];
 float altitude;
 int32_t pressure;
+
+int32_t dr;
+
+int32_t sclk, sclk_prev;
+int32_t sclk_count;
 
 int main()
 {	
@@ -480,8 +486,8 @@ int main()
 	if(PIOS_IMU3000_Test() != 0)
 		panic(1);
 	
-	//if(PIOS_BMA180_Test() != 0)
-	//	panic(2);
+	if(PIOS_BMA180_Test() != 0)
+		panic(2);
 
 	if(PIOS_HMC5883_Test() != 0)
 		panic(3);	
@@ -489,6 +495,19 @@ int main()
 	if(PIOS_BMP085_Test() != 0)
 		panic(4); 
 
+	PIOS_LED_On(LED1);
+	PIOS_LED_Off(LED2);
+
+/*	
+	while(1) {
+		sclk = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_15);
+		if(sclk_prev != sclk)
+			sclk_count++;
+		sclk_prev = sclk;
+		dr = SPI2->DR;
+	}
+*/	
+/*
 	uint32_t count = 500;
 	while(count--) {
 		// Update the pressure data
@@ -504,14 +523,11 @@ int main()
 		
 		PIOS_HMC5883_ReadMag(mag);
 		PIOS_DELAY_WaitmS(50);
+		
+		PIOS_BMA180_ReadAccels(accel);
+		PIOS_DELAY_WaitmS(50);;
 	}
-	
-	if(PIOS_IMU3000_Test() != 0)
-		panic(1);
-
-	pressure++;
-	gyro[0]++;
-	mag[0]++;
+*/	
 	// Flash warning light while trying to connect
 	uint16_t time_val = PIOS_DELAY_GetuS();
 	uint16_t ms_count = 0;

@@ -42,10 +42,11 @@
  * .rodata section (ie. Flash) rather than in the .bss section (RAM).
  */
 void PIOS_SPI_op_irq_handler(void);
-void DMA1_Stream3_IRQ_Handler(void) __attribute__((alias("PIOS_SPI_op_irq_handler")));
-void DMA1_Stream4_IRQ_Handler(void) __attribute__((alias("PIOS_SPI_op_irq_handler")));
+void DMA1_Stream3_IRQHandler(void) __attribute__((alias("PIOS_SPI_op_irq_handler")));
+void DMA1_Stream4_IRQHandler(void) __attribute__((alias("PIOS_SPI_op_irq_handler")));
 static const struct pios_spi_cfg pios_spi_op_cfg = {
 	.regs = SPI2,
+	.remap = GPIO_AF_SPI2,
 	.init = {
 		.SPI_Mode = SPI_Mode_Slave,
 		.SPI_Direction = SPI_Direction_2Lines_FullDuplex,
@@ -61,9 +62,9 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
 		.ahb_clk = RCC_AHB1Periph_DMA1,
 		
 		.irq = {
-			.flags = (DMA_IT_TCIF3 | DMA_IT_TEIF3 | DMA_IT_HTIF3),
+			.flags = (DMA_IT_TCIF4 | DMA_IT_TEIF4 | DMA_IT_HTIF4),
 			.init = {
-				.NVIC_IRQChannel = DMA1_Stream0_IRQn,
+				.NVIC_IRQChannel = DMA1_Stream3_IRQn,
 				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
 				.NVIC_IRQChannelSubPriority = 0,
 				.NVIC_IRQChannelCmd = ENABLE,
@@ -114,7 +115,7 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
 			.GPIO_Pin = GPIO_Pin_13,
 			.GPIO_Speed = GPIO_Speed_100MHz,
 			.GPIO_Mode = GPIO_Mode_AF,
-			.GPIO_OType = GPIO_OType_OD,
+			.GPIO_OType = GPIO_OType_PP,
 			.GPIO_PuPd = GPIO_PuPd_NOPULL
 		},
 	},
@@ -162,10 +163,11 @@ void PIOS_SPI_op_irq_handler(void)
  *    - Used for BMA180 accelerometer
  */
 void PIOS_SPI_accel_irq_handler(void);
-void DMA2_Stream0_IRQ_Handler(void) __attribute__((alias("PIOS_SPI_accel_irq_handler")));
-void DMA2_Stream3_IRQ_Handler(void) __attribute__((alias("PIOS_SPI_accel_irq_handler")));
+void DMA2_Stream0_IRQHandler(void) __attribute__((alias("PIOS_SPI_accel_irq_handler")));
+void DMA2_Stream3_IRQHandler(void) __attribute__((alias("PIOS_SPI_accel_irq_handler")));
 static const struct pios_spi_cfg pios_spi_accel_cfg = {
 	.regs = SPI1,
+	.remap = GPIO_AF_SPI1,
 	.init   = {
 		.SPI_Mode              = SPI_Mode_Master,
 		.SPI_Direction         = SPI_Direction_2Lines_FullDuplex,
@@ -742,8 +744,8 @@ void PIOS_Board_Init(void) {
 	if (PIOS_SPI_Init(&pios_spi_accel_id, &pios_spi_accel_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
-	/*PIOS_BMA180_Attach(pios_spi_accel_id);
-	PIOS_BMA180_Init(&pios_bma180_cfg);*/
+	PIOS_BMA180_Attach(pios_spi_accel_id);
+	PIOS_BMA180_Init(&pios_bma180_cfg);
 	PIOS_IMU3000_Init(&pios_imu3000_cfg);
 	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
 	PIOS_BMP085_Init(&pios_bmp085_cfg);

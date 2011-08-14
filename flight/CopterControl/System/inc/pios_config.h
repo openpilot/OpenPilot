@@ -99,9 +99,12 @@
 #define PIOS_SYSTEM_STACK_SIZE          460
 #define PIOS_STABILIZATION_STACK_SIZE   524
 #define PIOS_TELEM_STACK_SIZE           500
-#define PIOS_EVENTDISPATCHER_STACK_SIZE 96
+#define PIOS_EVENTDISPATCHER_STACK_SIZE 130
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 1995998
 //#define PIOS_QUATERNION_STABILIZATION
+
+// This can't be too high to stop eventdispatcher thread overflowing
+#define PIOS_EVENTDISAPTCHER_QUEUE      10
 
 #endif /* PIOS_CONFIG_H */
 /**

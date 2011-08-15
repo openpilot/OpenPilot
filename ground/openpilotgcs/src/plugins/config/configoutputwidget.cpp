@@ -45,7 +45,6 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     m_config->setupUi(this);
 
 	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-	UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
         setupButtons(m_config->saveRCOutputToRAM,m_config->saveRCOutputToSD);
         addUAVObject("ActuatorSettings");
 

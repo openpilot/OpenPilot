@@ -50,8 +50,6 @@ private slots:
     void attitudeRawUpdated(UAVObject * obj);
     void timeout();
     void startAccelCalibration();
-    void updateObjectsFromWidgets();
-    virtual void refreshWidgetsValues();
     void openHelp();
 
 private:

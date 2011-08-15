@@ -55,7 +55,7 @@ public:
 public slots:
     void onAutopilotConnect();
     void onAutopilotDisconnect();
-    void tabAboutToChange(bool *);
+    void tabAboutToChange(int i,bool *);
 
 signals:
     void autopilotConnected();

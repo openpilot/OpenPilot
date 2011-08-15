@@ -99,7 +99,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
         onAutopilotConnect();    
 
     help = 0;
-    connect(ftw->m_tabBar,SIGNAL(aboutToChange(bool*)),this,SLOT(tabAboutToChange(bool*)));//,Qt::BlockingQueuedConnection);
+    connect(ftw,SIGNAL(currentAboutToShow(int,bool*)),this,SLOT(tabAboutToChange(int,bool*)));//,Qt::BlockingQueuedConnection);
 
 }
 
@@ -155,7 +155,7 @@ void ConfigGadgetWidget::onAutopilotConnect() {
     emit autopilotConnected();
 }
 
-void ConfigGadgetWidget::tabAboutToChange(bool * proceed)
+void ConfigGadgetWidget::tabAboutToChange(int i,bool * proceed)
 {
     *proceed=true;
     ConfigTaskWidget * wid=qobject_cast<ConfigTaskWidget *>(ftw->currentWidget());

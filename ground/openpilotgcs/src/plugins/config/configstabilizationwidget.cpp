@@ -100,18 +100,13 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     addWidget(m_stabilization->maximumRoll);
     addWidget(m_stabilization->maximumPitch);
     addWidget(m_stabilization->maximumYaw);
+    addWidget(m_stabilization->lowThrottleZeroIntegral);
+
 }
 
 ConfigStabilizationWidget::~ConfigStabilizationWidget()
 {
    // Do nothing
-}
-
-
-void ConfigStabilizationWidget::enableControls(bool enable)
-{
-    //m_stabilization->saveStabilizationToRAM->setEnabled(enable);
-    m_stabilization->saveStabilizationToSD->setEnabled(enable);
 }
 
 void ConfigStabilizationWidget::updateRateRollKP(double val)
@@ -251,6 +246,8 @@ void ConfigStabilizationWidget::refreshWidgetsValues()
     m_stabilization->maximumRoll->setValue(stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_ROLL]);
     m_stabilization->maximumPitch->setValue(stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_PITCH]);
     m_stabilization->maximumYaw->setValue(stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_YAW]);
+    m_stabilization->lowThrottleZeroIntegral->setChecked(stabData.LowThrottleZeroIntegral==StabilizationSettings::LOWTHROTTLEZEROINTEGRAL_TRUE ? true : false);
+
     setDirty(dirty);
 }
 
@@ -298,6 +295,9 @@ void ConfigStabilizationWidget::updateObjectsFromWidgets()
     stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_ROLL] = m_stabilization->maximumRoll->value();
     stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_PITCH] = m_stabilization->maximumPitch->value();
     stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_YAW] = m_stabilization->maximumYaw->value();
+
+    stabData.LowThrottleZeroIntegral = (m_stabilization->lowThrottleZeroIntegral->isChecked() ? StabilizationSettings::LOWTHROTTLEZEROINTEGRAL_TRUE :StabilizationSettings::LOWTHROTTLEZEROINTEGRAL_FALSE);
+
 
     stabSettings->setData(stabData); // this is atomic
 }

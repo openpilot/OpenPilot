@@ -529,13 +529,13 @@ int main()
 	}
 */	
 	// Flash warning light while trying to connect
-	uint16_t time_val = PIOS_DELAY_GetuS();
-	uint16_t ms_count = 0;
+	uint32_t time_val = PIOS_DELAY_GetRaw();
+	uint32_t ms_count = 0;
 	while(!AhrsLinkReady()) {
 		AhrsPoll();
-		if(PIOS_DELAY_DiffuS(time_val) > 10000) {
-			ms_count += 10;
-			time_val = PIOS_DELAY_GetuS();
+		if(PIOS_DELAY_DiffuS(time_val) > 1000) {
+			ms_count += 1;
+			time_val = PIOS_DELAY_GetRaw();
 		}
 		if(ms_count > 100) {
 			PIOS_LED_Toggle(LED2);
@@ -544,6 +544,8 @@ int main()
 	}
 	PIOS_LED_Off(LED2);
 
+	panic(8);
+	
 	/* we didn't connect the callbacks before because we have to wait
 	for all data to be up to date before doing anything*/
 

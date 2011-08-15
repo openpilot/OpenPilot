@@ -59,10 +59,9 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
 	},
 	.use_crc = true,
 	.dma = {
-		.ahb_clk = RCC_AHB1Periph_DMA1,
-		
 		.irq = {
-			.flags = (DMA_IT_TCIF4 | DMA_IT_TEIF4 | DMA_IT_HTIF4),
+			// Note this is the stream ID that triggers interrupts (in this case RX)
+			.flags = (DMA_IT_TCIF3 | DMA_IT_TEIF3 | DMA_IT_HTIF3),
 			.init = {
 				.NVIC_IRQChannel = DMA1_Stream3_IRQn,
 				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
@@ -76,16 +75,16 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
 			.init = {
 				.DMA_Channel            = DMA_Channel_0,
 				.DMA_PeripheralBaseAddr = (uint32_t) & (SPI2->DR),
-				.DMA_DIR = DMA_DIR_PeripheralToMemory,
-				.DMA_PeripheralInc = DMA_PeripheralInc_Disable,
-				.DMA_MemoryInc = DMA_MemoryInc_Enable,
+				.DMA_DIR                = DMA_DIR_PeripheralToMemory,
+				.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
+				.DMA_MemoryInc          = DMA_MemoryInc_Enable,
 				.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
-				.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte,
-				.DMA_Mode = DMA_Mode_Normal,
-				.DMA_Priority = DMA_Priority_Medium,
+				.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
+				.DMA_Mode               = DMA_Mode_Normal,
+				.DMA_Priority           = DMA_Priority_Medium,
 				//TODO: Enable FIFO
 				.DMA_FIFOMode           = DMA_FIFOMode_Disable,
-                /* .DMA_FIFOThreshold */
+                .DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
                 .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
                 .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
 			},
@@ -95,15 +94,15 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
 			.init = {
 				.DMA_Channel            = DMA_Channel_0,
 				.DMA_PeripheralBaseAddr = (uint32_t) & (SPI2->DR),
-				.DMA_DIR = DMA_DIR_MemoryToPeripheral,
-				.DMA_PeripheralInc = DMA_PeripheralInc_Disable,
-				.DMA_MemoryInc = DMA_MemoryInc_Enable,
+				.DMA_DIR                = DMA_DIR_MemoryToPeripheral,
+				.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
+				.DMA_MemoryInc          = DMA_MemoryInc_Enable,
 				.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
-				.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte,
-				.DMA_Mode = DMA_Mode_Normal,
-				.DMA_Priority = DMA_Priority_Medium,
+				.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
+				.DMA_Mode               = DMA_Mode_Normal,
+				.DMA_Priority           = DMA_Priority_Medium,
 				.DMA_FIFOMode           = DMA_FIFOMode_Disable,
-                /* .DMA_FIFOThreshold */
+                .DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
                 .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
                 .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
 			},
@@ -182,7 +181,7 @@ static const struct pios_spi_cfg pios_spi_accel_cfg = {
 	.use_crc = false,
 	.dma = {
 		.irq = {
-			.flags   = (DMA_IT_TCIF3 | DMA_IT_TEIF3 | DMA_IT_HTIF3),
+			.flags   = (DMA_IT_TCIF0 | DMA_IT_TEIF0 | DMA_IT_HTIF0),
 			.init    = {
 				.NVIC_IRQChannel                   = DMA2_Stream0_IRQn,
 				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,

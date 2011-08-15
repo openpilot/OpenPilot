@@ -154,14 +154,17 @@ int32_t PIOS_SPI_Init(uint32_t * spi_id, const struct pios_spi_cfg * cfg)
 	}
 
 	/* Configure DMA for SPI Rx */
+	DMA_DeInit(spi_dev->cfg->dma.rx.channel);
 	DMA_Cmd(spi_dev->cfg->dma.rx.channel, DISABLE);
 	DMA_Init(spi_dev->cfg->dma.rx.channel, (DMA_InitTypeDef*)&(spi_dev->cfg->dma.rx.init));
 
 	/* Configure DMA for SPI Tx */
+	DMA_DeInit(spi_dev->cfg->dma.tx.channel);
 	DMA_Cmd(spi_dev->cfg->dma.tx.channel, DISABLE);
 	DMA_Init(spi_dev->cfg->dma.tx.channel, (DMA_InitTypeDef*)&(spi_dev->cfg->dma.tx.init));
 
 	/* Initialize the SPI block */
+	SPI_DeInit(spi_dev->cfg->regs);
 	SPI_Init(spi_dev->cfg->regs, (SPI_InitTypeDef*)&(spi_dev->cfg->init));
 
 	/* Configure CRC calculation */
@@ -366,7 +369,9 @@ static int32_t SPI_DMA_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer
 
 	/* Disable the DMA channels */
 	DMA_Cmd(spi_dev->cfg->dma.rx.channel, DISABLE);
+	while(DMA_GetCmdStatus(spi_dev->cfg->dma.rx.channel) != DISABLE);
 	DMA_Cmd(spi_dev->cfg->dma.tx.channel, DISABLE);
+	while(DMA_GetCmdStatus(spi_dev->cfg->dma.tx.channel) != DISABLE);
 
 	/* Set callback function */
 	spi_dev->callback = callback;
@@ -587,9 +592,22 @@ void PIOS_SPI_IRQ_Handler(uint32_t spi_id)
 	bool valid = PIOS_SPI_validate(spi_dev);
 	PIOS_Assert(valid)
 
+/*	// Check valid flag is set
+	if(DMA_GetITStatus(spi_dev->cfg->dma.rx.channel, spi_dev->cfg->dma.irq.flags) != SET) {
+//	if(spi_dev->cfg->dma.rx.channel != DMA1_Stream3) {
+		//flags = DMA_GetFlagStatus(spi_dev->cfg->dma.rx.channel);
+		while(1) {
+		PIOS_DELAY_WaitmS(50);
+		PIOS_LED_Toggle(LED1);
+		PIOS_LED_Toggle(LED2);
+		}
+	}*/
+	
+	flags++;
+	
 	// FIXME XXX Only RX channel or better clear flags for both channels?
-	DMA_ClearFlag(spi_dev->cfg->dma.rx.channel, spi_dev->cfg->dma.irq.flags);
-
+	DMA_ClearITPendingBit(spi_dev->cfg->dma.rx.channel, spi_dev->cfg->dma.irq.flags);
+	
 	/* Wait for the final bytes of the transfer to complete, including CRC byte(s). */
 	while (!(SPI_I2S_GetFlagStatus(spi_dev->cfg->regs, SPI_I2S_FLAG_TXE))) ;
 

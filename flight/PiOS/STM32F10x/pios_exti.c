@@ -48,9 +48,9 @@ void EXTI15_10_IRQHandler(void)
 	if (EXTI_GetITStatus(PIOS_BMP085_EOC_EXTI_LINE) != RESET) {
 		/* Read the ADC Value */
  #if defined(PIOS_INCLUDE_FREERTOS)
-		xSemaphoreGiveFromISR(PIOS_BMP085_EOC, &xHigherPriorityTaskWoken);
+//		xSemaphoreGiveFromISR(PIOS_BMP085_EOC, &xHigherPriorityTaskWoken);
  #else
-		PIOS_BMP085_EOC=1;
+//TOOD: Update BMP driver		PIOS_BMP085_EOC=1;
  #endif /* PIOS_INCLUDE_FREERTOS */
 
 		/* Clear the EXTI line pending bit */

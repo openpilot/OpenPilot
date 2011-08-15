@@ -56,7 +56,7 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-MODULES = Actuator Telemetry GPS ManualControl Altitude AHRSComms Stabilization Guidance FirmwareIAP
+MODULES = Actuator Telemetry GPS ManualControl AHRSComms Stabilization Guidance FirmwareIAP
 PYMODULES = FlightPlan
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
@@ -180,7 +180,7 @@ SRC += $(PIOSSTM32F10X)/pios_usb_hid_desc.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_prop.c
 SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
-SRC += $(PIOSSTM32F10X)/pios_bmp085.c
+#SRC += $(PIOSSTM32F10X)/pios_bmp085.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_crc.c

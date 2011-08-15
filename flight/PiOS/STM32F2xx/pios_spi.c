@@ -603,8 +603,6 @@ void PIOS_SPI_IRQ_Handler(uint32_t spi_id)
 		}
 	}*/
 	
-	flags++;
-	
 	// FIXME XXX Only RX channel or better clear flags for both channels?
 	DMA_ClearITPendingBit(spi_dev->cfg->dma.rx.channel, spi_dev->cfg->dma.irq.flags);
 	

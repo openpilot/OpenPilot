@@ -544,8 +544,6 @@ int main()
 	}
 	PIOS_LED_Off(LED2);
 
-	panic(8);
-	
 	/* we didn't connect the callbacks before because we have to wait
 	for all data to be up to date before doing anything*/
 
@@ -567,9 +565,9 @@ int main()
 		AhrsStatusSet(&status);
 
 		// Alive signal
-		if (((total_conversion_blocks % 100) & 0xFFFE) == 0)
+		if ((total_conversion_blocks % 300) == 0)
 			PIOS_LED_Toggle(LED1);
-
+		total_conversion_blocks++;
 		// Delay for valid data
 
 		// This function blocks till data avilable

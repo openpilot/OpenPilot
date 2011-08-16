@@ -134,7 +134,7 @@ static const struct pios_spi_cfg pios_spi_op_cfg = {
 			.GPIO_Pin = GPIO_Pin_15,
 			.GPIO_Speed = GPIO_Speed_50MHz,
 			.GPIO_Mode = GPIO_Mode_AF,
-			.GPIO_OType = GPIO_OType_OD,
+			.GPIO_OType = GPIO_OType_PP,
 			.GPIO_PuPd = GPIO_PuPd_NOPULL
 		},
 	},

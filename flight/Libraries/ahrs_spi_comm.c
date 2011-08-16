@@ -439,7 +439,9 @@ void AhrsSendObjects(void)
 
 void SendPacket(void)
 {
+#ifndef IN_AHRS
 	PIOS_SPI_RC_PinSet(opahrs_spi_id, 0);
+#endif
 	//no point checking if this failed. There isn't much we could do about it if it did fail
 	PIOS_SPI_TransferBlock(opahrs_spi_id, (uint8_t *) & txPacket, (uint8_t *) & rxPacket, sizeof(CommsDataPacket), &CommsCallback);
 }

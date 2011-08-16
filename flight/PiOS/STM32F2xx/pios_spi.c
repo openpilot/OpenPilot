@@ -346,6 +346,8 @@ int32_t PIOS_SPI_TransferByte(uint32_t spi_id, uint8_t b)
 * from DMA channel interrupt once the transfer is finished.
 * If NULL, no callback function will be used, and PIOS_SPI_TransferBlock() will
 * block until the transfer is finished.
+* \Note: If using CRC the last byte of the buffer is not transmitted or received but
+* is used for the CRC
 * \return >= 0 if no error during transfer
 * \return -1 if disabled SPI port selected
 * \return -3 if function has been called during an ongoing DMA transfer
@@ -399,6 +401,7 @@ static int32_t SPI_DMA_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer
 	}
 
 	dma_init.DMA_BufferSize = len;
+	DMA_DeInit(spi_dev->cfg->dma.rx.channel);
 	DMA_Init(spi_dev->cfg->dma.rx.channel, &(dma_init));
 
 	/*
@@ -426,6 +429,7 @@ static int32_t SPI_DMA_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer
 		dma_init.DMA_BufferSize = len;
 	}
 
+	DMA_DeInit(spi_dev->cfg->dma.tx.channel);
 	DMA_Init(spi_dev->cfg->dma.tx.channel, &(dma_init));
 
 	/* Enable DMA interrupt if callback function active */
@@ -445,9 +449,16 @@ static int32_t SPI_DMA_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer
 	}
 
 	/* Start DMA transfers */
-	DMA_Cmd(spi_dev->cfg->dma.rx.channel, ENABLE);
 	DMA_Cmd(spi_dev->cfg->dma.tx.channel, ENABLE);
+	DMA_Cmd(spi_dev->cfg->dma.rx.channel, ENABLE);
 
+	// TODO: Use real time here
+	uint32_t timeout = 0xfffff;
+	while((DMA_GetCmdStatus(spi_dev->cfg->dma.rx.channel) != ENABLE ||
+		  DMA_GetCmdStatus(spi_dev->cfg->dma.tx.channel) != ENABLE) && --timeout);
+	if(timeout == 0)
+		return -1;
+	
 	/* Reenable the SPI device */
 	SPI_Cmd(spi_dev->cfg->regs, ENABLE);
 
@@ -552,7 +563,9 @@ static int32_t SPI_PIO_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer
 */
 int32_t PIOS_SPI_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len, void *callback)
 {
-	if (callback || len > SPI_MAX_BLOCK_PIO) {
+	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
+	
+	if (callback || spi_dev->cfg->use_crc || len > SPI_MAX_BLOCK_PIO) {
 		return SPI_DMA_TransferBlock(spi_id, send_buffer, receive_buffer, len, callback);
 	}
 	return SPI_PIO_TransferBlock(spi_id, send_buffer, receive_buffer, len);
@@ -584,24 +597,12 @@ int32_t PIOS_SPI_Busy(uint32_t spi_id)
 	return(0);
 }
 
-
 void PIOS_SPI_IRQ_Handler(uint32_t spi_id)
 {
 	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
 
 	bool valid = PIOS_SPI_validate(spi_dev);
 	PIOS_Assert(valid)
-
-/*	// Check valid flag is set
-	if(DMA_GetITStatus(spi_dev->cfg->dma.rx.channel, spi_dev->cfg->dma.irq.flags) != SET) {
-//	if(spi_dev->cfg->dma.rx.channel != DMA1_Stream3) {
-		//flags = DMA_GetFlagStatus(spi_dev->cfg->dma.rx.channel);
-		while(1) {
-		PIOS_DELAY_WaitmS(50);
-		PIOS_LED_Toggle(LED1);
-		PIOS_LED_Toggle(LED2);
-		}
-	}*/
 	
 	// FIXME XXX Only RX channel or better clear flags for both channels?
 	DMA_ClearITPendingBit(spi_dev->cfg->dma.rx.channel, spi_dev->cfg->dma.irq.flags);

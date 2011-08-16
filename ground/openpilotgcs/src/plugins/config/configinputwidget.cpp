@@ -38,9 +38,14 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QMessageBox>
+#include <utils/stylehelper.h>
 
+#define ACCESS_MIN_MOVE -6
+#define ACCESS_MAX_MOVE 6
+#define STICK_MIN_MOVE -8
+#define STICK_MAX_MOVE 8
 
-ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent),wizardStep(wizardWelcome),skipflag(false),loop(NULL)
+ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent),wizardStep(wizardWelcome),loop(NULL),skipflag(false)
 {
     manualCommandObj = ManualControlCommand::GetInstance(getObjectManager());
     manualSettingsObj = ManualControlSettings::GetInstance(getObjectManager());
@@ -88,15 +93,155 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addUAVObjectToWidgetRelation("ManualControlSettings","Arming",m_config->armControl);
     addUAVObjectToWidgetRelation("ManualControlSettings","armTimeout",m_config->armTimeout,0,1000);
     enableControls(false);
+
     populateWidgets();
     refreshWidgetsValues();
     // Connect the help button
     connect(m_config->inputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
+
+    m_config->graphicsView->setScene(new QGraphicsScene(this));
+    m_config->graphicsView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    m_renderer = new QSvgRenderer();
+    QGraphicsScene *l_scene = m_config->graphicsView->scene();
+    m_config->graphicsView->setBackgroundBrush(QBrush(Utils::StyleHelper::baseColor()));
+    if (QFile::exists(":/configgadget/images/TX.svg") && m_renderer->load(QString(":/configgadget/images/TX.svg")) && m_renderer->isValid())
+    {
+        l_scene->clear(); // Deletes all items contained in the scene as well.
+
+        m_txBackground = new QGraphicsSvgItem();
+        // All other items will be clipped to the shape of the background
+        m_txBackground->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
+                                 QGraphicsItem::ItemClipsToShape);
+        m_txBackground->setSharedRenderer(m_renderer);
+        m_txBackground->setElementId("background");
+        l_scene->addItem(m_txBackground);
+
+        m_txMainBody = new QGraphicsSvgItem();
+        m_txMainBody->setParentItem(m_txBackground);
+        m_txMainBody->setSharedRenderer(m_renderer);
+        m_txMainBody->setElementId("body");
+        l_scene->addItem(m_txMainBody);
+
+        m_txLeftStick = new QGraphicsSvgItem();
+        m_txLeftStick->setParentItem(m_txBackground);
+        m_txLeftStick->setSharedRenderer(m_renderer);
+        m_txLeftStick->setElementId("ljoy");
+
+        m_txRightStick = new QGraphicsSvgItem();
+        m_txRightStick->setParentItem(m_txBackground);
+        m_txRightStick->setSharedRenderer(m_renderer);
+        m_txRightStick->setElementId("rjoy");
+
+        m_txAccess0 = new QGraphicsSvgItem();
+        m_txAccess0->setParentItem(m_txBackground);
+        m_txAccess0->setSharedRenderer(m_renderer);
+        m_txAccess0->setElementId("access0");
+
+        m_txAccess1 = new QGraphicsSvgItem();
+        m_txAccess1->setParentItem(m_txBackground);
+        m_txAccess1->setSharedRenderer(m_renderer);
+        m_txAccess1->setElementId("access1");
+
+        m_txAccess2 = new QGraphicsSvgItem();
+        m_txAccess2->setParentItem(m_txBackground);
+        m_txAccess2->setSharedRenderer(m_renderer);
+        m_txAccess2->setElementId("access2");
+
+        m_txFlightMode = new QGraphicsSvgItem();
+        m_txFlightMode->setParentItem(m_txBackground);
+        m_txFlightMode->setSharedRenderer(m_renderer);
+        m_txFlightMode->setElementId("flightModeCenter");
+        m_txFlightMode->setZValue(-10);
+
+        m_txArrows = new QGraphicsSvgItem();
+        m_txArrows->setParentItem(m_txBackground);
+        m_txArrows->setSharedRenderer(m_renderer);
+        m_txArrows->setElementId("arrows");
+        m_txArrows->setVisible(false);
+
+        QRectF orig=m_renderer->boundsOnElement("ljoy");
+        QMatrix Matrix = m_renderer->matrixForElement("ljoy");
+        orig=Matrix.mapRect(orig);
+        m_txLeftStickOrig.translate(orig.x(),orig.y());
+        m_txLeftStick->setTransform(m_txLeftStickOrig,false);
+
+        orig=m_renderer->boundsOnElement("arrows");
+        Matrix = m_renderer->matrixForElement("arrows");
+        orig=Matrix.mapRect(orig);
+        m_txArrowsOrig.translate(orig.x(),orig.y());
+        m_txArrows->setTransform(m_txArrowsOrig,false);
+
+        orig=m_renderer->boundsOnElement("body");
+        Matrix = m_renderer->matrixForElement("body");
+        orig=Matrix.mapRect(orig);
+        m_txMainBodyOrig.translate(orig.x(),orig.y());
+        m_txMainBody->setTransform(m_txMainBodyOrig,false);
+
+        orig=m_renderer->boundsOnElement("flightModeCenter");
+        Matrix = m_renderer->matrixForElement("flightModeCenter");
+        orig=Matrix.mapRect(orig);
+        m_txFlightModeCOrig.translate(orig.x(),orig.y());
+        m_txFlightMode->setTransform(m_txFlightModeCOrig,false);
+
+        orig=m_renderer->boundsOnElement("flightModeLeft");
+        Matrix = m_renderer->matrixForElement("flightModeLeft");
+        orig=Matrix.mapRect(orig);
+        m_txFlightModeLOrig.translate(orig.x(),orig.y());
+        orig=m_renderer->boundsOnElement("flightModeRight");
+        Matrix = m_renderer->matrixForElement("flightModeRight");
+        orig=Matrix.mapRect(orig);
+        m_txFlightModeROrig.translate(orig.x(),orig.y());
+
+        orig=m_renderer->boundsOnElement("rjoy");
+        Matrix = m_renderer->matrixForElement("rjoy");
+        orig=Matrix.mapRect(orig);
+        m_txRightStickOrig.translate(orig.x(),orig.y());
+        m_txRightStick->setTransform(m_txRightStickOrig,false);
+
+        orig=m_renderer->boundsOnElement("access0");
+        Matrix = m_renderer->matrixForElement("access0");
+        orig=Matrix.mapRect(orig);
+        m_txAccess0Orig.translate(orig.x(),orig.y());
+        m_txAccess0->setTransform(m_txAccess0Orig,false);
+
+        orig=m_renderer->boundsOnElement("access1");
+        Matrix = m_renderer->matrixForElement("access1");
+        orig=Matrix.mapRect(orig);
+        m_txAccess1Orig.translate(orig.x(),orig.y());
+        m_txAccess1->setTransform(m_txAccess1Orig,false);
+
+        orig=m_renderer->boundsOnElement("access2");
+        Matrix = m_renderer->matrixForElement("access2");
+        orig=Matrix.mapRect(orig);
+        m_txAccess2Orig.translate(orig.x(),orig.y());
+        m_txAccess2->setTransform(m_txAccess2Orig,true);
+    }
+    m_config->graphicsView->fitInView(m_txMainBody, Qt::KeepAspectRatio );
+    animate=new QTimer(this);
+    connect(animate,SIGNAL(timeout()),this,SLOT(moveTxControls()));
+}
+void ConfigInputWidget::resetTxControls()
+{
+
+    m_txLeftStick->setTransform(m_txLeftStickOrig,false);
+    m_txRightStick->setTransform(m_txRightStickOrig,false);
+    m_txAccess0->setTransform(m_txAccess0Orig,false);
+    m_txAccess1->setTransform(m_txAccess1Orig,false);
+    m_txAccess2->setTransform(m_txAccess2Orig,false);
+    m_txFlightMode->setElementId("flightModeCenter");
+    m_txFlightMode->setTransform(m_txFlightModeCOrig,false);
+    m_txArrows->setVisible(false);
 }
 
 ConfigInputWidget::~ConfigInputWidget()
 {
 
+}
+
+void ConfigInputWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    m_config->graphicsView->fitInView(m_txBackground, Qt::KeepAspectRatio );
 }
 
 void ConfigInputWidget::openHelp()
@@ -108,10 +253,12 @@ void ConfigInputWidget::openHelp()
 void ConfigInputWidget::goToWizard()
 {
     setupWizardWidget(wizardWelcome);
+    m_config->graphicsView->fitInView(m_txBackground, Qt::KeepAspectRatio );
 }
 
 void ConfigInputWidget::wzCancel()
 {
+    manualCommandObj->setMetadata(manualCommandObj->getDefaultMetadata());
     m_config->stackedWidget->setCurrentIndex(0);
     foreach (QWidget * wd, extraWidgets)
     {
@@ -133,7 +280,6 @@ void ConfigInputWidget::wzCancel()
     case wizardIdentifyLimits:
         disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyLimits()));
         manualSettingsObj->setData(manualSettingsData);
-        manualCommandObj->setMetadata(manualCommandObj->getDefaultMetadata());
         break;
     case wizardIdentifyInverted:
         break;
@@ -159,6 +305,7 @@ void ConfigInputWidget::setupWizardWidget(int step)
 {
     if(step==wizardWelcome)
     {
+        setTxMovement(nothing);
         if(wizardStep==wizardChooseMode)
         {
             delete extraWidgets.at(0);
@@ -178,6 +325,7 @@ void ConfigInputWidget::setupWizardWidget(int step)
     }
     else if(step==wizardChooseMode)
     {
+        setTxMovement(nothing);
         if(wizardStep==wizardIdentifySticks)
         {
             disconnect(receiverActivityObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyControls()));
@@ -213,6 +361,7 @@ void ConfigInputWidget::setupWizardWidget(int step)
         }
         wizardStep=wizardIdentifySticks;
         currentCommand=0;
+        setMoveFromCommand(currentCommand);
         m_config->wzText->setText(QString(tr("Please move each control once at a time according to the instructions and picture below.\n\n"
                                              "Move the %1 stick")).arg(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(currentCommand)));
         manualSettingsData=manualSettingsObj->getData();
@@ -221,6 +370,7 @@ void ConfigInputWidget::setupWizardWidget(int step)
     }
     else if(step==wizardIdentifyCenter)
     {
+        setTxMovement(centerAll);
         if(wizardStep==wizardIdentifySticks)
             disconnect(receiverActivityObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyControls()));
         else
@@ -234,12 +384,13 @@ void ConfigInputWidget::setupWizardWidget(int step)
     }
     else if(step==wizardIdentifyLimits)
     {
+        setTxMovement(moveAll);
         if(wizardStep==wizardIdentifyCenter)
         {
             wizardStep=wizardIdentifyLimits;
             manualCommandData=manualCommandObj->getData();
             manualSettingsData=manualSettingsObj->getData();
-            for(int i=0;i<ManualControlCommand::CHANNEL_NUMELEM;++i)
+            for(unsigned int i=0;i<ManualControlCommand::CHANNEL_NUMELEM;++i)
             {
                 manualSettingsData.ChannelNeutral[i]=manualCommandData.Channel[i];
             }
@@ -261,21 +412,25 @@ void ConfigInputWidget::setupWizardWidget(int step)
     }
     else if(step==wizardIdentifyInverted)
     {
+        setTxMovement(nothing);
         if(wizardStep==wizardIdentifyLimits)
         {
             disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyLimits()));
             manualSettingsObj->setData(manualSettingsData);
-            manualCommandObj->setMetadata(manualCommandObj->getDefaultMetadata());
         }
         extraWidgets.clear();
         foreach(QString name,manualSettingsObj->getFields().at(0)->getElementNames())
         {
-            QCheckBox * cb=new QCheckBox(name,this);
-            extraWidgets.append(cb);
-            m_config->checkBoxesLayout->layout()->addWidget(cb);
+            if(!name.contains("Access") &&  !name.contains("Flight"))
+            {
+                QCheckBox * cb=new QCheckBox(name,this);
+                extraWidgets.append(cb);
+                m_config->checkBoxesLayout->layout()->addWidget(cb);
+            }
         }
+        connect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
         wizardStep=wizardIdentifyInverted;
-        m_config->wzText->setText(QString(tr("Please check the picture below and check all controls which show an inverted movement  and press next when ready")));
+        m_config->wzText->setText(QString(tr("Please check the picture below and check all the sticks which show an inverted movement  and press next when ready")));
     }
     else if(step==wizardFinish)
     {
@@ -299,18 +454,21 @@ void ConfigInputWidget::setupWizardWidget(int step)
         wizardStep=wizardFinish;
         manualSettingsObj->setData(manualSettingsData);
         extraWidgets.clear();
-        m_config->wzText->setText(QString(tr("You have completed this wizard, please check below if the picture below mimics your controls movement.\n"
+        m_config->wzText->setText(QString(tr("You have completed this wizard, please check below if the picture below mimics your sticks movement.\n"
                                              "This new settings aren't saved to the board yet, after pressing next you will go to the initial screen where you can do that.")));
 
     }
 
     else if(step==wizardFinish+1)
     {
+        setTxMovement(nothing);
+        manualCommandObj->setMetadata(manualCommandObj->getDefaultMetadata());
+        disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
         manualSettingsData=manualSettingsObj->getData();
         manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE]=
                 manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]+
                 ((manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE]-
-                manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE])*0.02);
+                  manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE])*0.02);
         manualSettingsObj->setData(manualSettingsData);
         m_config->stackedWidget->setCurrentIndex(0);
         wizardStep=wizardWelcome;
@@ -346,6 +504,7 @@ void ConfigInputWidget::identifyControls()
             return;
     }
     ++currentCommand;
+    setMoveFromCommand(currentCommand);
     if(currentCommand>ManualControlSettings::CHANNELGROUPS_NUMELEM-1)
     {
         disconnect(receiverActivityObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyControls()));
@@ -368,6 +527,327 @@ void ConfigInputWidget::identifyLimits()
             manualSettingsData.ChannelMin[i]=manualCommandData.Channel[i];
         if(manualSettingsData.ChannelMax[i]<manualCommandData.Channel[i])
             manualSettingsData.ChannelMax[i]=manualCommandData.Channel[i];
+    }
+}
+void ConfigInputWidget::setMoveFromCommand(int command)
+{
+    //CHANNELNUMBER_ROLL=0, CHANNELNUMBER_PITCH=1, CHANNELNUMBER_YAW=2, CHANNELNUMBER_THROTTLE=3, CHANNELNUMBER_FLIGHTMODE=4, CHANNELNUMBER_ACCESSORY0=5, CHANNELNUMBER_ACCESSORY1=6, CHANNELNUMBER_ACCESSORY2=7 } ChannelNumberElem;
+    if(command==ManualControlSettings::CHANNELNUMBER_ROLL)
+    {
+        if(transmitterMode==mode2)
+            setTxMovement(moveRightHorizontalStick);
+        else
+            setTxMovement(moveLeftHorizontalStick);
+    }
+    else if(command==ManualControlSettings::CHANNELNUMBER_PITCH)
+    {
+        if(transmitterMode==mode2)
+            setTxMovement(moveRightVerticalStick);
+        else
+            setTxMovement(moveLeftVerticalStick);
+    }
+    else if(command==ManualControlSettings::CHANNELNUMBER_YAW)
+    {
+        if(transmitterMode==mode2)
+            setTxMovement(moveLeftHorizontalStick);
+        else
+            setTxMovement(moveRightHorizontalStick);
+    }
+    else if(command==ManualControlSettings::CHANNELNUMBER_THROTTLE)
+    {
+        if(transmitterMode==mode2)
+            setTxMovement(moveLeftVerticalStick);
+        else
+            setTxMovement(moveRightVerticalStick);
+    }
+    else if(command==ManualControlSettings::CHANNELNUMBER_FLIGHTMODE)
+    {
+        setTxMovement(moveFlightMode);
+    }
+    else if(command==ManualControlSettings::CHANNELNUMBER_ACCESSORY0)
+    {
+        setTxMovement(moveAccess0);
+    }
+    else if(command==ManualControlSettings::CHANNELNUMBER_ACCESSORY1)
+    {
+        setTxMovement(moveAccess1);
+    }
+    else if(command==ManualControlSettings::CHANNELNUMBER_ACCESSORY2)
+    {
+        setTxMovement(moveAccess2);
+    }
+
+}
+
+void ConfigInputWidget::setTxMovement(txMovements movement)
+{
+    resetTxControls();
+    switch(movement)
+    {
+    case moveLeftVerticalStick:
+        movePos=0;
+        growing=true;
+        currentMovement=moveLeftVerticalStick;
+        animate->start(100);
+        break;
+    case moveRightVerticalStick:
+        movePos=0;
+        growing=true;
+        currentMovement=moveRightVerticalStick;
+        animate->start(100);
+        break;
+    case moveLeftHorizontalStick:
+        movePos=0;
+        growing=true;
+        currentMovement=moveLeftHorizontalStick;
+        animate->start(100);
+        break;
+    case moveRightHorizontalStick:
+        movePos=0;
+        growing=true;
+        currentMovement=moveRightHorizontalStick;
+        animate->start(100);
+        break;
+    case moveAccess0:
+        movePos=0;
+        growing=true;
+        currentMovement=moveAccess0;
+        animate->start(100);
+        break;
+    case moveAccess1:
+        movePos=0;
+        growing=true;
+        currentMovement=moveAccess1;
+        animate->start(100);
+        break;
+    case moveAccess2:
+        movePos=0;
+        growing=true;
+        currentMovement=moveAccess2;
+        animate->start(100);
+        break;
+    case moveFlightMode:
+        movePos=0;
+        growing=true;
+        currentMovement=moveFlightMode;
+        animate->start(1000);
+        break;
+    case centerAll:
+        movePos=0;
+        currentMovement=centerAll;
+        animate->start(1000);
+        break;
+    case moveAll:
+        movePos=0;
+        growing=true;
+        currentMovement=moveAll;
+        animate->start(50);
+        break;
+    case nothing:
+        animate->stop();
+        break;
+    default:
+        break;
+    }
+}
+
+void ConfigInputWidget::moveTxControls()
+{
+    QTransform trans;
+    QGraphicsItem * item;
+    txMovementType move;
+    int limitMax;
+    int limitMin;
+    static bool auxFlag=false;
+    switch(currentMovement)
+    {
+    case moveLeftVerticalStick:
+        item=m_txLeftStick;
+        trans=m_txLeftStickOrig;
+        limitMax=STICK_MAX_MOVE;
+        limitMin=STICK_MIN_MOVE;
+        move=vertical;
+        break;
+    case moveRightVerticalStick:
+        item=m_txRightStick;
+        trans=m_txRightStickOrig;
+        limitMax=STICK_MAX_MOVE;
+        limitMin=STICK_MIN_MOVE;
+        move=vertical;
+        break;
+    case moveLeftHorizontalStick:
+        item=m_txLeftStick;
+        trans=m_txLeftStickOrig;
+        limitMax=STICK_MAX_MOVE;
+        limitMin=STICK_MIN_MOVE;
+        move=horizontal;
+        break;
+    case moveRightHorizontalStick:
+        item=m_txRightStick;
+        trans=m_txRightStickOrig;
+        limitMax=STICK_MAX_MOVE;
+        limitMin=STICK_MIN_MOVE;
+        move=horizontal;
+        break;
+    case moveAccess0:
+        item=m_txAccess0;
+        trans=m_txAccess0Orig;
+        limitMax=ACCESS_MAX_MOVE;
+        limitMin=ACCESS_MIN_MOVE;
+        move=horizontal;
+        break;
+    case moveAccess1:
+        item=m_txAccess1;
+        trans=m_txAccess1Orig;
+        limitMax=ACCESS_MAX_MOVE;
+        limitMin=ACCESS_MIN_MOVE;
+        move=horizontal;
+        break;
+    case moveAccess2:
+        item=m_txAccess2;
+        trans=m_txAccess2Orig;
+        limitMax=ACCESS_MAX_MOVE;
+        limitMin=ACCESS_MIN_MOVE;
+        move=horizontal;
+        break;
+    case moveFlightMode:
+        item=m_txFlightMode;
+        move=jump;
+        break;
+    case centerAll:
+        item=m_txArrows;
+        move=jump;
+        break;
+    case moveAll:
+        limitMax=STICK_MAX_MOVE;
+        limitMin=STICK_MIN_MOVE;
+        move=mix;
+        break;
+    default:
+        break;
+    }
+    if(move==vertical)
+        item->setTransform(trans.translate(0,movePos*10),false);
+    else if(move==horizontal)
+        item->setTransform(trans.translate(movePos*10,0),false);
+    else if(move==jump)
+    {
+        if(item==m_txArrows)
+        {
+            m_txArrows->setVisible(!m_txArrows->isVisible());
+        }
+        else if(item==m_txFlightMode)
+        {
+            QGraphicsSvgItem * svg;
+            svg=(QGraphicsSvgItem *)item;
+            if (svg)
+            {
+                if(svg->elementId()=="flightModeCenter")
+                {
+                    if(growing)
+                    {
+                        svg->setElementId("flightModeRight");
+                        m_txFlightMode->setTransform(m_txFlightModeROrig,false);
+                    }
+                    else
+                    {
+                        svg->setElementId("flightModeLeft");
+                        m_txFlightMode->setTransform(m_txFlightModeLOrig,false);
+                    }
+                }
+                else if(svg->elementId()=="flightModeRight")
+                {
+                    growing=false;
+                    svg->setElementId("flightModeCenter");
+                    m_txFlightMode->setTransform(m_txFlightModeCOrig,false);
+                }
+                else if(svg->elementId()=="flightModeLeft")
+                {
+                    growing=true;
+                    svg->setElementId("flightModeCenter");
+                    m_txFlightMode->setTransform(m_txFlightModeCOrig,false);
+                }
+            }
+        }
+    }
+    else if(move==mix)
+    {
+        trans=m_txAccess0Orig;
+        m_txAccess0->setTransform(trans.translate(movePos*10*ACCESS_MAX_MOVE/STICK_MAX_MOVE,0),false);
+        trans=m_txAccess1Orig;
+        m_txAccess1->setTransform(trans.translate(movePos*10*ACCESS_MAX_MOVE/STICK_MAX_MOVE,0),false);
+        trans=m_txAccess2Orig;
+        m_txAccess2->setTransform(trans.translate(movePos*10*ACCESS_MAX_MOVE/STICK_MAX_MOVE,0),false);
+
+        if(auxFlag)
+        {
+            trans=m_txLeftStickOrig;
+            m_txLeftStick->setTransform(trans.translate(0,movePos*10),false);
+            trans=m_txRightStickOrig;
+            m_txRightStick->setTransform(trans.translate(0,movePos*10),false);
+        }
+        else
+        {
+            trans=m_txLeftStickOrig;
+            m_txLeftStick->setTransform(trans.translate(movePos*10,0),false);
+            trans=m_txRightStickOrig;
+            m_txRightStick->setTransform(trans.translate(movePos*10,0),false);
+        }
+
+        if(movePos==0)
+        {
+            m_txFlightMode->setElementId("flightModeCenter");
+            m_txFlightMode->setTransform(m_txFlightModeCOrig,false);
+        }
+        else if(movePos==ACCESS_MAX_MOVE/2)
+        {
+            m_txFlightMode->setElementId("flightModeRight");
+            m_txFlightMode->setTransform(m_txFlightModeROrig,false);
+        }
+        else if(movePos==ACCESS_MIN_MOVE/2)
+        {
+            m_txFlightMode->setElementId("flightModeLeft");
+            m_txFlightMode->setTransform(m_txFlightModeLOrig,false);
+        }
+    }
+    if(move==horizontal || move==vertical ||move==mix)
+    {
+        if(movePos==0 && growing)
+            auxFlag=!auxFlag;
+        if(growing)
+            ++movePos;
+        else
+            --movePos;
+        if(movePos>limitMax)
+        {
+            movePos=movePos-2;
+            growing=false;
+        }
+        if(movePos<limitMin)
+        {
+            movePos=movePos+2;
+            growing=true;
+        }
+    }
+}
+
+void ConfigInputWidget::moveSticks()
+{
+    QTransform trans;
+    manualCommandData=manualCommandObj->getData();
+    if(transmitterMode==mode2)
+    {
+        trans=m_txLeftStickOrig;
+        m_txLeftStick->setTransform(trans.translate(manualCommandData.Yaw*STICK_MAX_MOVE*10,-manualCommandData.Throttle*STICK_MAX_MOVE*10),false);
+        trans=m_txRightStickOrig;
+        m_txRightStick->setTransform(trans.translate(manualCommandData.Roll*STICK_MAX_MOVE*10,-manualCommandData.Pitch*STICK_MAX_MOVE*10),false);
+    }
+    else
+    {
+        trans=m_txRightStickOrig;
+        m_txRightStick->setTransform(trans.translate(manualCommandData.Yaw*STICK_MAX_MOVE*10,-manualCommandData.Throttle*STICK_MAX_MOVE*10),false);
+        trans=m_txLeftStickOrig;
+        m_txLeftStick->setTransform(trans.translate(manualCommandData.Roll*STICK_MAX_MOVE*10,-manualCommandData.Pitch*STICK_MAX_MOVE*10),false);
     }
 }
 

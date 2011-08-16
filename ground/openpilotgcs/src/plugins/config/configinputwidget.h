@@ -40,6 +40,10 @@
 #include "manualcontrolcommand.h"
 #include "manualcontrolsettings.h"
 #include "receiveractivity.h"
+#include <QGraphicsView>
+#include <QtSvg/QSvgRenderer>
+#include <QtSvg/QGraphicsSvgItem>
+
 class Ui_InputWidget;
 
 class ConfigInputWidget: public ConfigTaskWidget
@@ -50,9 +54,15 @@ public:
         ~ConfigInputWidget();
         enum wizardSteps{wizardWelcome,wizardChooseMode,wizardIdentifySticks,wizardIdentifyCenter,wizardIdentifyLimits,wizardIdentifyInverted,wizardFinish};
         enum txMode{mode1,mode2};
+        enum txMovements{moveLeftVerticalStick,moveRightVerticalStick,moveLeftHorizontalStick,moveRightHorizontalStick,moveAccess0,moveAccess1,moveAccess2,moveFlightMode,centerAll,moveAll,nothing};
+        enum txMovementType{vertical,horizontal,jump,mix};
 public slots:
 
 private:
+        bool growing;
+        txMovements currentMovement;
+        int movePos;
+        void setTxMovement(txMovements movement);
         Ui_InputWidget *m_config;
         wizardSteps wizardStep;
         void setupWizardWidget(int step);
@@ -81,14 +91,31 @@ private:
         ReceiverActivity * receiverActivityObj;
         ReceiverActivity::DataFields receiverActivityData;
 
-        /*
-        ManualControlCommand * manualCommandObj = ManualControlCommand::GetInstance(getObjectManager());
-        ManualControlCommand::DataFields manualCommandData = manualCommandObj->getData();
-        ManualControlSettings * manualSettingsObj = ManualControlSettings::GetInstance(getObjectManager());
-        ManualControlSettings::DataFields manualSettingsData;
-        ReceiverActivity * receiverActivityObj=ReceiverActivity::GetInstance(getObjectManager());
-        ReceiverActivity::DataFields receiverActivityData =receiverActivityObj->getData();
-*/
+        QSvgRenderer *m_renderer;
+
+        // Background: background
+        QGraphicsSvgItem *m_txMainBody;
+        QGraphicsSvgItem *m_txLeftStick;
+        QGraphicsSvgItem *m_txRightStick;
+        QGraphicsSvgItem *m_txAccess0;
+        QGraphicsSvgItem *m_txAccess1;
+        QGraphicsSvgItem *m_txAccess2;
+        QGraphicsSvgItem *m_txFlightMode;
+        QGraphicsSvgItem *m_txBackground;
+        QGraphicsSvgItem *m_txArrows;
+        QTransform m_txLeftStickOrig;
+        QTransform m_txRightStickOrig;
+        QTransform m_txAccess0Orig;
+        QTransform m_txAccess1Orig;
+        QTransform m_txAccess2Orig;
+        QTransform m_txFlightModeCOrig;
+        QTransform m_txFlightModeLOrig;
+        QTransform m_txFlightModeROrig;
+        QTransform m_txMainBodyOrig;
+        QTransform m_txArrowsOrig;
+        QTimer * animate;
+        void resetTxControls();
+        void setMoveFromCommand(int command);
 private slots:
         void wzNext();
         void wzBack();
@@ -97,6 +124,11 @@ private slots:
         void openHelp();
         void identifyControls();
         void identifyLimits();
+        void moveTxControls();
+         void moveSticks();
+protected:
+        void resizeEvent(QResizeEvent *event);
+
 };
 
 #endif

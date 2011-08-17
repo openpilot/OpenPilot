@@ -173,6 +173,11 @@ static int32_t PIOS_BMA180_Config()
 	0x21 = 0x02  //new_data_int = 1
 	 */
 		
+	if(PIOS_BMA180_SetReg(BMA_RESET, BMA_RESET_CODE) < 0)
+		return -1;
+
+	PIOS_DELAY_WaituS(100);
+
 	if(PIOS_BMA180_SetReg(BMA_OFFSET_LSB1, 0x81) < 0)
 		return -1;
 	if(PIOS_BMA180_SetReg(BMA_GAIN_Y, 0x81) < 0)

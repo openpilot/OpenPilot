@@ -44,12 +44,15 @@
 #define BMA_Y_LSB_ADDR    0x04
 #define BMA_Z_LSB_ADDR    0x06
 #define BMA_WE_ADDR       0x0D
+#define BMA_RESET         0x10
 #define BMA_BW_ADDR       0x20
 #define BMA_RANGE_ADDR    0x35
 #define BMA_OFFSET_LSB1   0x35
 #define BMA_GAIN_Y        0x33
 #define BMA_CTRREG3       0x21
 #define BMA_CTRREG0       0x0D
+
+#define BMA_RESET_CODE    0x6B
 
 /* Accel range  */
 #define BMA_RANGE_MASK    0x0E          

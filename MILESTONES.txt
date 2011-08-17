@@ -137,6 +137,11 @@ C: Mat Wellington
 D: July 2011
 V: http://www.youtube.com/watch?v=YE4Fd9vdg1I
 
+M: First CopterControl Heli inverted flight, funnel, loop
+C: Maxim Izergin (Maximus43)
+D: August 2011
+V: http://www.youtube.com/watch?v=8SrfIS7OkB4
+
 M: First Altitude Hold using Sonar
 C: 
 D: 

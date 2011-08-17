@@ -238,6 +238,7 @@ void ConfigTaskWidget::setupButtons(QPushButton *update, QPushButton *save)
     connect(smartsave,SIGNAL(saveSuccessfull()),this,SLOT(clearDirty()));
     connect(smartsave,SIGNAL(beginOp()),this,SLOT(disableObjUpdates()));
     connect(smartsave,SIGNAL(endOp()),this,SLOT(enableObjUpdates()));
+    enableControls(false);
 }
 
 void ConfigTaskWidget::enableControls(bool enable)

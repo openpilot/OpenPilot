@@ -116,6 +116,7 @@ private:
         QTimer * animate;
         void resetTxControls();
         void setMoveFromCommand(int command);
+        QPushButton * goWizard;
 private slots:
         void wzNext();
         void wzBack();
@@ -125,9 +126,11 @@ private slots:
         void identifyControls();
         void identifyLimits();
         void moveTxControls();
-         void moveSticks();
+        void moveSticks();
+        void dimOtherControls(bool value);
 protected:
         void resizeEvent(QResizeEvent *event);
+        virtual void enableControls(bool enable);
 
 };
 

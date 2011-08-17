@@ -66,6 +66,8 @@ private:
 
     static const int NUM_ACCEL_UPDATES = 60;
     static const float ACCEL_SCALE = 0.004f * 9.81f;
+protected:
+    virtual void enableControls(bool enable);
 
 };
 

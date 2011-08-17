@@ -163,3 +163,10 @@ void ConfigCCAttitudeWidget::openHelp()
     QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/CopterControl+Attitude+Configuration", QUrl::StrictMode) );
 }
 
+void ConfigCCAttitudeWidget::enableControls(bool enable)
+{
+    if(ui->zeroBias)
+        ui->zeroBias->setEnabled(enable);
+    ConfigTaskWidget::enableControls(enable);
+
+}

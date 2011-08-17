@@ -92,7 +92,8 @@ void smartSaveButton::setObjects(QList<UAVObject *> list)
 
 void smartSaveButton::addObject(UAVObject * obj)
 {
-    objects.append(obj);
+    if(!objects.contains(obj))
+        objects.append(obj);
 }
 
 void smartSaveButton::clearObjects()

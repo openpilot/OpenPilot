@@ -45,7 +45,7 @@
 #define STICK_MIN_MOVE -8
 #define STICK_MAX_MOVE 8
 
-ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent),wizardStep(wizardWelcome),loop(NULL),skipflag(false)
+ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent),wizardStep(wizardWelcome),loop(NULL),skipflag(false),goWizard(NULL)
 {
     manualCommandObj = ManualControlCommand::GetInstance(getObjectManager());
     manualSettingsObj = ManualControlSettings::GetInstance(getObjectManager());
@@ -68,7 +68,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
         addUAVObjectToWidgetRelation("ManualControlSettings","ChannelMax",inp->ui->channelMax,index);
         ++index;
     }
-    QPushButton * goWizard=new QPushButton(tr("Start Wizard"),this);
+    goWizard=new QPushButton(tr("Start Wizard"),this);
     m_config->advancedPage->layout()->addWidget(goWizard);
     connect(goWizard,SIGNAL(clicked()),this,SLOT(goToWizard()));
     connect(m_config->wzNext,SIGNAL(clicked()),this,SLOT(wzNext()));
@@ -92,6 +92,8 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     addUAVObjectToWidgetRelation("ManualControlSettings","Arming",m_config->armControl);
     addUAVObjectToWidgetRelation("ManualControlSettings","armTimeout",m_config->armTimeout,0,1000);
+
+    addWidget(goWizard);
     enableControls(false);
 
     populateWidgets();
@@ -258,6 +260,7 @@ void ConfigInputWidget::goToWizard()
 
 void ConfigInputWidget::wzCancel()
 {
+    dimOtherControls(false);
     manualCommandObj->setMetadata(manualCommandObj->getDefaultMetadata());
     m_config->stackedWidget->setCurrentIndex(0);
     foreach (QWidget * wd, extraWidgets)
@@ -305,6 +308,7 @@ void ConfigInputWidget::setupWizardWidget(int step)
 {
     if(step==wizardWelcome)
     {
+        m_config->graphicsView->setVisible(false);
         setTxMovement(nothing);
         if(wizardStep==wizardChooseMode)
         {
@@ -317,7 +321,8 @@ void ConfigInputWidget::setupWizardWidget(int step)
         manualSettingsObj->setData(manualSettingsData);
         m_config->wzText->setText(tr("Welcome to the inputs configuration wizard.\n"
                                      "Please follow the instruction on the screen and only move your controls when asked to.\n"
-                                     "At any time you can press 'back' to return to the previous screeen or 'Cancel' to cancel the wizard"
+                                     "Make sure you already configured your hardware settings on the proper tab and restarted your board.\n"
+                                     "At any time you can press 'back' to return to the previous screeen or 'Cancel' to cancel the wizard \n"
                                      "For your safety your arming setting is now 'Always Disarmed' please reenable it after this wizard."));
         m_config->stackedWidget->setCurrentIndex(1);
         m_config->wzBack->setEnabled(false);
@@ -325,6 +330,7 @@ void ConfigInputWidget::setupWizardWidget(int step)
     }
     else if(step==wizardChooseMode)
     {
+        m_config->graphicsView->setVisible(true);
         setTxMovement(nothing);
         if(wizardStep==wizardIdentifySticks)
         {
@@ -384,6 +390,7 @@ void ConfigInputWidget::setupWizardWidget(int step)
     }
     else if(step==wizardIdentifyLimits)
     {
+        dimOtherControls(false);
         setTxMovement(moveAll);
         if(wizardStep==wizardIdentifyCenter)
         {
@@ -396,6 +403,13 @@ void ConfigInputWidget::setupWizardWidget(int step)
             }
             manualSettingsObj->setData(manualSettingsData);
         }
+        foreach (QWidget * wd, extraWidgets)
+        {
+            if(wd)
+                delete wd;
+        }
+        extraWidgets.clear();
+        disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
         wizardStep=wizardIdentifyLimits;
         m_config->wzText->setText(QString(tr("Please move all controls to their maximum extends on both directions and press next when ready")));
         UAVObject::Metadata mdata= manualCommandObj->getMetadata();
@@ -412,6 +426,7 @@ void ConfigInputWidget::setupWizardWidget(int step)
     }
     else if(step==wizardIdentifyInverted)
     {
+        dimOtherControls(true);
         setTxMovement(nothing);
         if(wizardStep==wizardIdentifyLimits)
         {
@@ -644,6 +659,7 @@ void ConfigInputWidget::setTxMovement(txMovements movement)
         animate->start(50);
         break;
     case nothing:
+        movePos=0;
         animate->stop();
         break;
     default:
@@ -840,14 +856,34 @@ void ConfigInputWidget::moveSticks()
         trans=m_txLeftStickOrig;
         m_txLeftStick->setTransform(trans.translate(manualCommandData.Yaw*STICK_MAX_MOVE*10,-manualCommandData.Throttle*STICK_MAX_MOVE*10),false);
         trans=m_txRightStickOrig;
-        m_txRightStick->setTransform(trans.translate(manualCommandData.Roll*STICK_MAX_MOVE*10,-manualCommandData.Pitch*STICK_MAX_MOVE*10),false);
+        m_txRightStick->setTransform(trans.translate(manualCommandData.Roll*STICK_MAX_MOVE*10,manualCommandData.Pitch*STICK_MAX_MOVE*10),false);
     }
     else
     {
         trans=m_txRightStickOrig;
         m_txRightStick->setTransform(trans.translate(manualCommandData.Yaw*STICK_MAX_MOVE*10,-manualCommandData.Throttle*STICK_MAX_MOVE*10),false);
         trans=m_txLeftStickOrig;
-        m_txLeftStick->setTransform(trans.translate(manualCommandData.Roll*STICK_MAX_MOVE*10,-manualCommandData.Pitch*STICK_MAX_MOVE*10),false);
+        m_txLeftStick->setTransform(trans.translate(manualCommandData.Roll*STICK_MAX_MOVE*10,manualCommandData.Pitch*STICK_MAX_MOVE*10),false);
     }
 }
 
+void ConfigInputWidget::dimOtherControls(bool value)
+{
+    qreal opac;
+    if(value)
+        opac=0.1;
+    else
+        opac=1;
+    m_txAccess0->setOpacity(opac);
+    m_txAccess1->setOpacity(opac);
+    m_txAccess2->setOpacity(opac);
+    m_txFlightMode->setOpacity(opac);
+}
+
+void ConfigInputWidget::enableControls(bool enable)
+{
+    if(goWizard)
+        goWizard->setEnabled(enable);
+    ConfigTaskWidget::enableControls(enable);
+
+}

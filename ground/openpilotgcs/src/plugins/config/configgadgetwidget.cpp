@@ -117,6 +117,15 @@ void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
 }
 
 void ConfigGadgetWidget::onAutopilotDisconnect() {
+    ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+    ftw->removeTab(ConfigGadgetWidget::ins);
+    QWidget *qwd = new DefaultAttitudeWidget(this);
+    ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+    ftw->removeTab(ConfigGadgetWidget::hardware);
+    qwd = new DefaultHwSettingsWidget(this);
+    ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
+    ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+
     emit autopilotDisconnected();
 }
 

@@ -61,15 +61,13 @@ public:
     void readSettings(QSettings* qs);
     void saveSettings(QSettings* qs);
 
+signals:
+
 private slots:
     void resetInterfaceColor();
     void resetLanguage();
-    void resetExternalEditor();
     void showHelpForExternalEditor();
     void slotAutoConnect(int);
-#ifdef Q_OS_UNIX
-    void resetTerminal();
-#endif
 
 private:
     void fillLanguageBox() const;

@@ -117,11 +117,45 @@ C: Sami Korhonen (Sambas)
 D: May 2011
 V: http://vimeo.com/24258192
 
-M: First CopterControl flip on a Flybarless Heli
+M: First Y6 CopterControl flight
+C: Michel Pet
+D: June 2011
+V: http://www.youtube.com/watch?v=QsE2MQELPZY
+
+M: First MoveCopter flight
+C: Werner Backes
+D: July 2011
+V: http://vimeo.com/25983655
+
+M: First Y4 CopterControl flight
+C: Mat Wellington
+D: July 2011
+V: http://www.youtube.com/watch?v=TxZ4MDGIj1o
+
+M: First V-Tail4 CopterControl flight
+C: Mat Wellington
+D: July 2011
+V: http://www.youtube.com/watch?v=YE4Fd9vdg1I
+
+M: First Altitude Hold using Sonar
 C: 
 D: 
 V: 
 
+M: First CopterControl Navigation on RC Ground Vechicle
+C: 
+D: 
+V: 
+
+M: First CopterControl Navigation on RC Water Vechicle
+C: 
+D: 
+V: 
+
+M: First CopterControl flip on a Flybarless Heli
+C: 
+D: 
+V: 
 
 
 An incomplete list of some future Milestones is below:
@@ -131,8 +165,7 @@ An incomplete list of some future Milestones is below:
 * First successful flight using the GCS only and no RC TX
 * First use of Magic Waypoint
 * First Flybarless Helicopter flight with OpenPilot
-* First flight with CopterControl
-* First fixed wing navigation flight
+* First fixed wing navigation flight 
 * First Multirotor navigation flight
 * First Helicopter navigation flight
 * First over 1km navigation flight

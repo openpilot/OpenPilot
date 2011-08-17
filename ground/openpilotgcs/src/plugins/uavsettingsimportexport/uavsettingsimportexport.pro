@@ -6,7 +6,7 @@ TARGET = UAVSettingsImportExport
  
 include(../../openpilotgcsplugin.pri)
 include(uavsettingsimportexport_dependencies.pri)
- 
+
 HEADERS += uavsettingsimportexport.h \
     importsummary.h
 SOURCES += uavsettingsimportexport.cpp \

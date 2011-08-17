@@ -9,7 +9,7 @@
  * application requirements.
  *
  * THESE PARAMETERS ARE DESCRIBED WITHIN THE 'CONFIGURATION' SECTION OF THE
- * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE. 
+ * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE.
  *
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
@@ -29,8 +29,8 @@
 #define configCPU_CLOCK_HZ		( ( unsigned long ) 72000000 )
 #define configTICK_RATE_HZ		( ( portTickType ) 1000 )
 #define configMAX_PRIORITIES		( ( unsigned portBASE_TYPE ) 5 )
-#define configMINIMAL_STACK_SIZE	( ( unsigned short ) 128 )
-#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 14 * 1024 ) )
+#define configMINIMAL_STACK_SIZE	( ( unsigned short ) 48 )
+#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 54 * 256) )
 #define configMAX_TASK_NAME_LEN		( 16 )
 #define configUSE_TRACE_FACILITY	0
 #define configUSE_16_BIT_TICKS		0
@@ -71,6 +71,10 @@ configKERNEL_INTERRUPT_PRIORITY setting.  Here 15 corresponds to the lowest
 NVIC value of 255. */
 #define configLIBRARY_KERNEL_INTERRUPT_PRIORITY	15
 
+#if !defined(ARCH_POSIX) && !defined(ARCH_WIN32)
+#define CHECK_IRQ_STACK
+#endif
+
 /* Enable run time stats collection */
 //#if defined(DEBUG)
 #define configGENERATE_RUN_TIME_STATS 1
@@ -82,6 +86,7 @@ do {\
 } while(0)
 #define portGET_RUN_TIME_COUNTER_VALUE() (*(unsigned long *)0xe0001004)/* DWT_CYCCNT */
 //#endif
+
 
 /**
   * @}

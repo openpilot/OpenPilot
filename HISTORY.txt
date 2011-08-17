@@ -1,0 +1,30 @@
+Short summary of changes.  For a complete list see the git log.
+
+2011-08-04
+Fixed packaging aesthetic issues.  Also avoid runtime issues on OSX Lion by
+disabling the ModelView and Notify plugins for now (sorry).
+
+2011-07-29
+Added support for PPM receivers from James W. Now all 4 interfaces (R/C
+standard PWM, combined PPM (MK), Spektrum satellite, Futaba S.Bus) are
+supported and configurable through the GCS hardware configuration tab.
+
+2011-07-17
+Updated module initialization from Mathieu which separates the initialization
+from the task startup.  Also implements a method to reclaim unused ram from
+initialization and end of memory for the FreeRTOS heap.
+
+2011-07-12
+Improvements to the stabilization code.  Included a LPF on the gyros to smooth
+out noise in high vibration environments.  Also two new modes: axis-lock and
+weak leveling.  Axis-lock will try and hold an axis at a fixed position and
+reject any disturbances.  This is like heading-hold on a heli for the tail but
+can be useful for other axes.  Weak leveling is rate mode with a weak
+correction to self level the craft - good for easier rate mode flying.
+
+2011-07-07
+Dynamic hardware configuration from Stac.  The input type is now
+selected from ManualControlSettings.InputMode and the aircraft must be rebooted
+after changing this.  Also for CopterControl the HwSettings object must
+indicate which modules are connected to which ports.  PPM currently not
+working.

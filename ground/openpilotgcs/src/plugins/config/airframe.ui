@@ -23,7 +23,7 @@
       <attribute name="title">
        <string>Mixer Settings</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0">
        <property name="margin">
         <number>5</number>
        </property>
@@ -44,11 +44,6 @@
          </item>
          <item>
           <widget class="QComboBox" name="aircraftType">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
            <property name="toolTip">
             <string>Select aircraft type here</string>
            </property>
@@ -163,122 +158,168 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_4">
                <item>
-                <layout class="QFormLayout" name="formLayout">
-                 <property name="fieldGrowthPolicy">
-                  <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                <widget class="QGroupBox" name="groupBox_2">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
                  </property>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="fwEngineLabel">
-                   <property name="text">
-                    <string>Engine</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QComboBox" name="fwEngineChannel"/>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="fwAileron1Label">
-                   <property name="minimumSize">
-                    <size>
-                     <width>60</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Aileron 1</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QComboBox" name="fwAileron1Channel"/>
-                 </item>
-                 <item row="2" column="0">
-                  <widget class="QLabel" name="fwAileron2Label">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>60</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Aileron 2</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QComboBox" name="fwAileron2Channel">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="0">
-                  <widget class="QLabel" name="fwElevator1Label">
-                   <property name="minimumSize">
-                    <size>
-                     <width>67</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Elevator 1</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="1">
-                  <widget class="QComboBox" name="fwElevator1Channel"/>
-                 </item>
-                 <item row="4" column="0">
-                  <widget class="QLabel" name="fwElevator2Label">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>67</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Elevator 2</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="1">
-                  <widget class="QComboBox" name="fwElevator2Channel">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="5" column="0">
-                  <widget class="QLabel" name="fwRudder1Label">
-                   <property name="text">
-                    <string>Rudder 1</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="5" column="1">
-                  <widget class="QComboBox" name="fwRudder1Channel"/>
-                 </item>
-                 <item row="6" column="0">
-                  <widget class="QLabel" name="fwRudder2Label">
-                   <property name="text">
-                    <string>Rudder 2</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="6" column="1">
-                  <widget class="QComboBox" name="fwRudder2Channel"/>
-                 </item>
-                </layout>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>100</height>
+                  </size>
+                 </property>
+                 <property name="title">
+                  <string>Output channel asignmets</string>
+                 </property>
+                 <layout class="QFormLayout" name="formLayout_3">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="fwEngineLabel">
+                    <property name="text">
+                     <string>Engine</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QComboBox" name="fwEngineChannel">
+                    <property name="toolTip">
+                     <string>Select output channel for the engine</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="fwAileron1Label">
+                    <property name="minimumSize">
+                     <size>
+                      <width>60</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Aileron 1</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QComboBox" name="fwAileron1Channel">
+                    <property name="toolTip">
+                     <string>Select output channel for the first aileron (or elevon)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="fwAileron2Label">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>60</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Aileron 2</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QComboBox" name="fwAileron2Channel">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="toolTip">
+                     <string>Select output channel for the second aileron (or elevon)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="fwElevator1Label">
+                    <property name="minimumSize">
+                     <size>
+                      <width>67</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Elevator 1</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QComboBox" name="fwElevator1Channel">
+                    <property name="toolTip">
+                     <string>Select output channel for the first elevator</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0">
+                   <widget class="QLabel" name="fwElevator2Label">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>67</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Elevator 2</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="1">
+                   <widget class="QComboBox" name="fwElevator2Channel">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                    <property name="toolTip">
+                     <string>Select output channel for a secondry elevator</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="0">
+                   <widget class="QLabel" name="fwRudder1Label">
+                    <property name="text">
+                     <string>Rudder 1</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QComboBox" name="fwRudder1Channel">
+                    <property name="toolTip">
+                     <string>Select output channel for the first rudder</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="0">
+                   <widget class="QLabel" name="fwRudder2Label">
+                    <property name="text">
+                     <string>Rudder 2</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="1">
+                   <widget class="QComboBox" name="fwRudder2Channel">
+                    <property name="toolTip">
+                     <string>Select output channel for a secondary rudder</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </item>
                <item>
                 <widget class="QGroupBox" name="elevonMixBox">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="title">
                   <string>Elevon Mix</string>
                  </property>
@@ -361,19 +402,6 @@
                     </item>
                    </layout>
                   </item>
-                  <item>
-                   <spacer name="verticalSpacer_2">
-                    <property name="orientation">
-                     <enum>Qt::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
                  </layout>
                 </widget>
                </item>
@@ -391,67 +419,61 @@
                 </spacer>
                </item>
                <item>
-                <layout class="QVBoxLayout" name="verticalLayout_7">
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_15">
-                   <item>
-                    <widget class="QLabel" name="label_13">
-                     <property name="font">
-                      <font>
-                       <weight>75</weight>
-                       <bold>true</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>Throttle Curve</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QPushButton" name="fwThrottleReset">
-                     <property name="text">
-                      <string>Reset</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <widget class="MixerCurveWidget" name="fixedWingThrottle" native="true">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>100</width>
-                     <height>100</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>200</width>
-                     <height>200</height>
-                    </size>
-                   </property>
-                   <property name="sizeIncrement">
-                    <size>
-                     <width>10</width>
-                     <height>10</height>
-                    </size>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="fwThrottleCurveItemValue">
-                   <property name="text">
-                    <string>Val: 0.00</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+                <widget class="QGroupBox" name="groupBox_3">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>100</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="title">
+                  <string>Throttle Curve</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_16">
+                  <item>
+                   <widget class="MixerCurveWidget" name="fixedWingThrottle" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>100</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>200</width>
+                      <height>200</height>
+                     </size>
+                    </property>
+                    <property name="sizeIncrement">
+                     <size>
+                      <width>10</width>
+                      <height>10</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="fwThrottleReset">
+                    <property name="text">
+                     <string>Reset</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="fwThrottleCurveItemValue">
+                    <property name="text">
+                     <string>Val: 0.00</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </item>
               </layout>
              </item>
@@ -507,7 +529,7 @@
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,0">
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,0">
+              <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,0,0">
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_24">
                  <item>
@@ -746,98 +768,65 @@ Typical value is 50% for + or X configuration on quads.</string>
                 </layout>
                </item>
                <item>
-                <layout class="QVBoxLayout" name="verticalLayout_12">
-                 <property name="sizeConstraint">
-                  <enum>QLayout::SetDefaultConstraint</enum>
+                <spacer name="horizontalSpacer_6">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
                  </property>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_11">
-                   <item>
-                    <spacer name="horizontalSpacer_13">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_24">
-                     <property name="font">
-                      <font>
-                       <weight>75</weight>
-                       <bold>true</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>Throttle Curve</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_6">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                   <item>
-                    <widget class="QPushButton" name="mrThrottleCurveReset">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="font">
-                      <font>
-                       <pointsize>10</pointsize>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>Reset</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <widget class="MixerCurveWidget" name="multiThrottleCurve" native="true">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>120</width>
-                     <height>120</height>
-                    </size>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">background:transparent</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="mrThrottleCurveItemValue">
-                   <property name="text">
-                    <string>Val: 0.00</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="groupBox_6">
+                 <property name="title">
+                  <string>Throtte Curve</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_9">
+                  <item>
+                   <widget class="MixerCurveWidget" name="multiThrottleCurve" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>120</width>
+                      <height>120</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">background:transparent</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="mrThrottleCurveReset">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>Reset</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="mrThrottleCurveItemValue">
+                    <property name="text">
+                     <string>Val: 0.00</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </item>
               </layout>
              </item>
@@ -922,7 +911,7 @@ Typical value is 50% for + or X configuration on quads.</string>
                <item>
                 <widget class="QGroupBox" name="groupBox">
                  <property name="title">
-                  <string>Motor output channels:</string>
+                  <string>Motor output channels</string>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_10">
                   <property name="spacing">
@@ -948,18 +937,8 @@ Typical value is 50% for + or X configuration on quads.</string>
                     </item>
                     <item row="0" column="1">
                      <widget class="QComboBox" name="multiMotor1">
-                      <property name="font">
-                       <font>
-                        <pointsize>8</pointsize>
-                       </font>
-                      </property>
                       <property name="toolTip">
-                       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans'; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Assign your motor channels using the drawing&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;on the right as a reference. Respect propeller rotation!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                       <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
                       </property>
                      </widget>
                     </item>
@@ -972,10 +951,8 @@ p, li { white-space: pre-wrap; }
                     </item>
                     <item row="1" column="1">
                      <widget class="QComboBox" name="multiMotor2">
-                      <property name="font">
-                       <font>
-                        <pointsize>8</pointsize>
-                       </font>
+                      <property name="toolTip">
+                       <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
                       </property>
                      </widget>
                     </item>
@@ -988,10 +965,8 @@ p, li { white-space: pre-wrap; }
                     </item>
                     <item row="2" column="1">
                      <widget class="QComboBox" name="multiMotor3">
-                      <property name="font">
-                       <font>
-                        <pointsize>8</pointsize>
-                       </font>
+                      <property name="toolTip">
+                       <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
                       </property>
                      </widget>
                     </item>
@@ -1004,10 +979,8 @@ p, li { white-space: pre-wrap; }
                     </item>
                     <item row="3" column="1">
                      <widget class="QComboBox" name="multiMotor4">
-                      <property name="font">
-                       <font>
-                        <pointsize>8</pointsize>
-                       </font>
+                      <property name="toolTip">
+                       <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
                       </property>
                      </widget>
                     </item>
@@ -1039,10 +1012,8 @@ p, li { white-space: pre-wrap; }
                         <verstretch>0</verstretch>
                        </sizepolicy>
                       </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>8</pointsize>
-                       </font>
+                      <property name="toolTip">
+                       <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
                       </property>
                      </widget>
                     </item>
@@ -1058,10 +1029,8 @@ p, li { white-space: pre-wrap; }
                       <property name="enabled">
                        <bool>false</bool>
                       </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>8</pointsize>
-                       </font>
+                      <property name="toolTip">
+                       <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
                       </property>
                      </widget>
                     </item>
@@ -1077,10 +1046,8 @@ p, li { white-space: pre-wrap; }
                       <property name="enabled">
                        <bool>false</bool>
                       </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>8</pointsize>
-                       </font>
+                      <property name="toolTip">
+                       <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
                       </property>
                      </widget>
                     </item>
@@ -1096,10 +1063,8 @@ p, li { white-space: pre-wrap; }
                       <property name="enabled">
                        <bool>false</bool>
                       </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>8</pointsize>
-                       </font>
+                      <property name="toolTip">
+                       <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
                       </property>
                      </widget>
                     </item>
@@ -1165,284 +1130,135 @@ p, li { white-space: pre-wrap; }
           </layout>
          </widget>
          <widget class="QWidget" name="custom">
-          <layout class="QVBoxLayout" name="verticalLayout_9">
+          <layout class="QHBoxLayout" name="horizontalLayout_15">
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout_16" stretch="1,2">
-             <property name="spacing">
-              <number>2</number>
-             </property>
-             <item>
+            <layout class="QGridLayout" name="gridLayout">
+             <item row="0" column="0">
               <layout class="QHBoxLayout" name="horizontalLayout_14">
                <item>
-                <layout class="QVBoxLayout" name="verticalLayout_17">
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_17">
-                   <item>
-                    <widget class="QLabel" name="label_39">
-                     <property name="font">
-                      <font>
-                       <pointsize>9</pointsize>
-                       <weight>75</weight>
-                       <bold>true</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>Throttle Curve 1</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_9">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                   <item>
-                    <widget class="QPushButton" name="customReset1">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="font">
-                      <font>
-                       <pointsize>9</pointsize>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>Reset</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <widget class="MixerCurveWidget" name="customThrottle1Curve" native="true">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>100</width>
-                     <height>100</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>200</width>
-                     <height>200</height>
-                    </size>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="customThrottleCurve1Value">
-                   <property name="text">
-                    <string>Val: 0.00</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+                <widget class="QGroupBox" name="groupBox_4">
+                 <property name="title">
+                  <string>Curve 1</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_7">
+                  <item>
+                   <widget class="MixerCurveWidget" name="customThrottle1Curve" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>100</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>200</width>
+                      <height>200</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="customReset1">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>Reset</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="customThrottleCurve1Value">
+                    <property name="text">
+                     <string>Val: 0.00</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </item>
                <item>
-                <layout class="QVBoxLayout" name="verticalLayout_18">
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_18">
-                   <item>
-                    <widget class="QLabel" name="label_41">
-                     <property name="font">
-                      <font>
-                       <pointsize>9</pointsize>
-                       <weight>75</weight>
-                       <bold>true</bold>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>Throttle Curve 2</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_10">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                   <item>
-                    <widget class="QPushButton" name="customReset2">
-                     <property name="font">
-                      <font>
-                       <pointsize>9</pointsize>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>Reset</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <widget class="MixerCurveWidget" name="customThrottle2Curve" native="true">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>100</width>
-                     <height>100</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>200</width>
-                     <height>200</height>
-                    </size>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="customThrottleCurve2Value">
-                   <property name="text">
-                    <string>Val: 0.00</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+                <spacer name="horizontalSpacer_9">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
                <item>
-                <layout class="QFormLayout" name="formLayout_12">
-                 <item row="0" column="0">
-                  <layout class="QHBoxLayout" name="horizontalLayout_AA">
-                   <item>
-                    <widget class="QLabel" name="label_CC">
-                     <property name="text">
-                      <string>FeedForward </string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="customFeedForwardValue">
-                     <property name="minimumSize">
-                      <size>
-                       <width>30</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="text">
-                      <string>000</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QSlider" name="customFFSlider">
-                   <property name="maximum">
-                    <number>100</number>
-                   </property>
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="label_35">
-                   <property name="text">
-                    <string>AccelTime</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QDoubleSpinBox" name="customFFaccel"/>
-                 </item>
-                 <item row="2" column="0">
-                  <widget class="QLabel" name="label_36">
-                   <property name="text">
-                    <string>DecelTime</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QDoubleSpinBox" name="customFFdecel"/>
-                 </item>
-                 <item row="3" column="0">
-                  <layout class="QHBoxLayout" name="horizontalLayout_SD">
-                   <item>
-                    <widget class="QLabel" name="label_37SDF">
-                     <property name="text">
-                      <string>MaxAccel</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_OSD">
-                     <property name="text">
-                      <string>1000</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item row="3" column="1">
-                  <widget class="QSlider" name="customFFMaxAccel">
-                   <property name="minimum">
-                    <number>500</number>
-                   </property>
-                   <property name="maximum">
-                    <number>2000</number>
-                   </property>
-                   <property name="value">
-                    <number>1000</number>
-                   </property>
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
+                <widget class="QGroupBox" name="groupBox_5">
+                 <property name="title">
+                  <string>Curve 2</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_17">
+                  <item>
+                   <widget class="MixerCurveWidget" name="customThrottle2Curve" native="true">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>100</width>
+                      <height>100</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>200</width>
+                      <height>200</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="customReset2">
+                    <property name="text">
+                     <string>Reset</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="customThrottleCurve2Value">
+                    <property name="text">
+                     <string>Val: 0.00</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </item>
               </layout>
              </item>
-             <item>
+             <item row="1" column="0">
               <widget class="QTableWidget" name="customMixerTable">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
-               </property>
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                </font>
                </property>
                <property name="alternatingRowColors">
                 <bool>true</bool>
@@ -1915,75 +1731,6 @@ p, li { white-space: pre-wrap; }
          </widget>
         </widget>
        </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="airframeHelp">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../coreplugin/core.qrc">
-             <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="saveAircraftToRAM">
-           <property name="toolTip">
-            <string>Send to board, but don't save permanently (flash or SD).</string>
-           </property>
-           <property name="text">
-            <string>Apply</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="saveAircraftToSD">
-           <property name="toolTip">
-            <string>Applies and Saves all settings to flash or SD depending on board.</string>
-           </property>
-           <property name="text">
-            <string>Save</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab">
@@ -1992,7 +1739,7 @@ p, li { white-space: pre-wrap; }
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_25">
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_11" stretch="0,1,0,0,0,0">
+        <layout class="QVBoxLayout" name="verticalLayout_11" stretch="0,1,0,0,0">
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_24">
            <item>
@@ -2266,15 +2013,14 @@ p, li { white-space: pre-wrap; }
             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
 &lt;tr&gt;
 &lt;td style=&quot;border: none;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#ff0000;&quot;&gt;SETTING UP FEED FORWARD IS DANGEROUS&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Beware&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;: Feed Forward Tuning will launch all engines around mid-throttle, you have been warned!&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Remove your props initially, and for fine-tuning, make sure your airframe is safely held in place. Wear glasses and protect your face and body.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Ubuntu'; font-size:14pt; font-weight:600; color:#ff0000;&quot;&gt;SETTING UP FEED FORWARD IS DANGEROUS&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Ubuntu'; font-size:11pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Lucida Grande'; font-size:13pt;&quot;&gt;Beware: Feed Forward Tuning will launch all engines around mid-throttle, you have been warned!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Lucida Grande'; font-size:13pt;&quot;&gt;Remove your props initially, and for fine-tuning, make sure your airframe is safely held in place. Wear glasses and protect your face and body.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
           </widget>
          </item>
@@ -2291,48 +2037,80 @@ p, li { white-space: pre-wrap; }
            </property>
           </spacer>
          </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_21">
-           <item>
-            <spacer name="horizontalSpacer_14">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="ffApply">
-             <property name="toolTip">
-              <string>Send to board, but don't save permanently (flash or SD).</string>
-             </property>
-             <property name="text">
-              <string>Apply</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="ffSave">
-             <property name="toolTip">
-              <string>Applies and Saves all settings to flash or SD depending on board.</string>
-             </property>
-             <property name="text">
-              <string>Save</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
         </layout>
        </item>
       </layout>
      </widget>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="airframeHelp">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../coreplugin/core.qrc">
+         <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveAircraftToRAM">
+       <property name="toolTip">
+        <string>Send to board, but don't save permanently (flash or SD).</string>
+       </property>
+       <property name="text">
+        <string>Apply</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveAircraftToSD">
+       <property name="toolTip">
+        <string>Applies and Saves all settings to flash or SD depending on board.</string>
+       </property>
+       <property name="text">
+        <string>Save</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
@@ -2387,54 +2165,6 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>mrRollMixLevel</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>label_43</receiver>
-   <slot>setNum(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>42</x>
-     <y>220</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>43</x>
-     <y>171</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>mrPitchMixLevel</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>label_44</receiver>
-   <slot>setNum(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>83</x>
-     <y>228</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>82</x>
-     <y>168</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>mrYawMixLevel</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>label_45</receiver>
-   <slot>setNum(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>120</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>121</x>
-     <y>172</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>elevonSlider1</sender>
    <signal>valueChanged(int)</signal>
    <receiver>label_18</receiver>
@@ -2467,34 +2197,50 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>customFFSlider</sender>
+   <sender>mrPitchMixLevel</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>customFeedForwardValue</receiver>
+   <receiver>label_44</receiver>
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>115</x>
-     <y>117</y>
+     <x>83</x>
+     <y>228</y>
     </hint>
     <hint type="destinationlabel">
-     <x>115</x>
-     <y>117</y>
+     <x>82</x>
+     <y>168</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>customFFMaxAccel</sender>
+   <sender>mrRollMixLevel</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>label_OSD</receiver>
+   <receiver>label_43</receiver>
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>115</x>
-     <y>117</y>
+     <x>42</x>
+     <y>220</y>
     </hint>
     <hint type="destinationlabel">
-     <x>115</x>
-     <y>117</y>
+     <x>43</x>
+     <y>171</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mrYawMixLevel</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>label_45</receiver>
+   <slot>setNum(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>120</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>121</x>
+     <y>172</y>
     </hint>
    </hints>
   </connection>

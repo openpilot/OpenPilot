@@ -251,6 +251,11 @@ void UAVObjectParser::calculateID(ObjectInfo* info)
         hash = updateHash(info->fields[n]->name, hash);
         hash = updateHash(info->fields[n]->numElements, hash);
         hash = updateHash(info->fields[n]->type, hash);
+        if(info->fields[n]->type == FIELDTYPE_ENUM) {
+            QStringList options = info->fields[n]->options;
+            for (int m = 0; m < options.length(); m++)
+                hash = updateHash(options[m], hash);
+        }
     }
     // Done
     info->id = hash & 0xFFFFFFFE;

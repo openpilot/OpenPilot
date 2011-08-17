@@ -62,11 +62,10 @@ static void TaskSDCard(void *pvParameters);
 int32_t CONSOLE_Parse(uint8_t port, char c);
 void OP_ADC_NotifyChange(uint32_t pin, uint32_t pin_value);
 
-/* Prototype of generated InitModules() function */
-extern void InitModules(void);
-
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
+extern void Stack_Change(void);
+static void Stack_Change_Weak () __attribute__ ((weakref ("Stack_Change")));
 
 /**
 * OpenPilot Main function:
@@ -85,47 +84,41 @@ int main()
 	/* Brings up System using CMSIS functions, enables the LEDs. */
 	PIOS_SYS_Init();
 	
-	/* Initialize the system thread */
-	SystemModInitialize();
-
-	/* Start the FreeRTOS scheduler */
-	vTaskStartScheduler();
-
-	/* If all is well we will never reach here as the scheduler will now be running. */
-	/* If we do get here, it will most likely be because we ran out of heap space. */
-	PIOS_LED_Off(LED1);
-	PIOS_LED_Off(LED2);
-	for(;;) {
-		PIOS_LED_Toggle(LED1);
-		PIOS_LED_Toggle(LED2);
-		PIOS_DELAY_WaitmS(100);
-	}
-
-	return 0;
-}
-
-/**
- * Initialize the hardware, libraries and modules (called by the System thread in systemmod.c)
- */
-void OpenPilotInit()
-{
-
 	/* Architecture dependant Hardware and
 	 * core subsystem initialisation
 	 * (see pios_board.c for your arch)
 	 * */
-	
 	PIOS_Board_Init();
 
 	/* Initialize modules */
-	InitModules();
+	MODULE_INITIALISE_ALL
 
+#if INCLUDE_TEST_TASKS
 	/* Create test tasks */
-	//xTaskCreate(TaskTesting, (signed portCHAR *)"Testing", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
-	//xTaskCreate(TaskHIDTest, (signed portCHAR *)"HIDTest", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
-	//xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
-	//xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
+	xTaskCreate(TaskTesting, (signed portCHAR *)"Testing", configMINIMAL_STACK_SIZE , NULL, 4, NULL);
+	xTaskCreate(TaskHIDTest, (signed portCHAR *)"HIDTest", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
+	xTaskCreate(TaskServos, (signed portCHAR *)"Servos", configMINIMAL_STACK_SIZE , NULL, 3, NULL);
+	xTaskCreate(TaskSDCard, (signed portCHAR *)"SDCard", configMINIMAL_STACK_SIZE, NULL, (tskIDLE_PRIORITY + 2), NULL);
+#endif
+
+	/* swap the stack to use the IRQ stack (does nothing in sim mode) */
+	Stack_Change_Weak();
+
+	/* Start the FreeRTOS scheduler which should never returns.*/
+	vTaskStartScheduler();
+
+	/* If all is well we will never reach here as the scheduler will now be running. */
+
+	/* Do some indication to user that something bad just happened */
+	PIOS_LED_Off(LED1); \
+	for(;;) { \
+		PIOS_LED_Toggle(LED1); \
+		PIOS_DELAY_WaitmS(100); \
+	};
+
+	return 0;
 }
+
 
 #if INCLUDE_TEST_TASKS
 static void TaskTesting(void *pvParameters)
@@ -152,6 +145,9 @@ static void TaskTesting(void *pvParameters)
 
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u,%u,%u,%u,%u,%u,%u,%u\r", PIOS_SPEKTRUM_Get(0), PIOS_SPEKTRUM_Get(1), PIOS_SPEKTRUM_Get(2), PIOS_SPEKTRUM_Get(3), PIOS_SPEKTRUM_Get(4), PIOS_SPEKTRUM_Get(5), PIOS_SPEKTRUM_Get(6), PIOS_SPEKTRUM_Get(7));
+#endif
+#if defined(PIOS_INCLUDE_SBUS)
+		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u,%u,%u,%u,%u,%u,%u,%u\r", PIOS_SBUS_Get(0), PIOS_SBUS_Get(1), PIOS_SBUS_Get(2), PIOS_SBUS_Get(3), PIOS_SBUS_Get(4), PIOS_SBUS_Get(5), PIOS_SBUS_Get(6), PIOS_SBUS_Get(7));
 #endif
 #if defined(PIOS_INCLUDE_PWM)
 		PIOS_COM_SendFormattedStringNonBlocking(COM_DEBUG_USART, "%u,%u,%u,%u,%u,%u,%u,%u uS\r", PIOS_PWM_Get(0), PIOS_PWM_Get(1), PIOS_PWM_Get(2), PIOS_PWM_Get(3), PIOS_PWM_Get(4), PIOS_PWM_Get(5), PIOS_PWM_Get(6), PIOS_PWM_Get(7));

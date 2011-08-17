@@ -86,9 +86,12 @@
 		6549E0D31279B3CF00C5476F /* fifo_buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fifo_buffer.h; sourceTree = "<group>"; };
 		655268BC121FBD2900410C6E /* ahrscalibration.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrscalibration.xml; sourceTree = "<group>"; };
 		656268C612DC1923007B0A0F /* nedaccel.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = nedaccel.xml; sourceTree = "<group>"; };
+		6562BE1713CCAD0600C823E8 /* pios_rcvr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_rcvr.c; sourceTree = "<group>"; };
 		65632DF51251650300469B77 /* pios_board.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_board.h; sourceTree = "<group>"; };
 		65632DF61251650300469B77 /* STM32103CB_AHRS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STM32103CB_AHRS.h; sourceTree = "<group>"; };
 		65632DF71251650300469B77 /* STM3210E_OP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STM3210E_OP.h; sourceTree = "<group>"; };
+		6572CB1613D0F2B200FC2972 /* link_STM32103CB_CC_Rev1_memory.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = link_STM32103CB_CC_Rev1_memory.ld; path = ../../PiOS/STM32F10x/link_STM32103CB_CC_Rev1_memory.ld; sourceTree = SOURCE_ROOT; };
+		6572CB1713D0F2B200FC2972 /* link_STM32103CB_CC_Rev1_sections.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = link_STM32103CB_CC_Rev1_sections.ld; path = ../../PiOS/STM32F10x/link_STM32103CB_CC_Rev1_sections.ld; sourceTree = SOURCE_ROOT; };
 		657CEEAD121DB6C8007A1FBE /* homelocation.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = homelocation.xml; sourceTree = "<group>"; };
 		657CEEB7121DBC63007A1FBE /* CoordinateConversions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CoordinateConversions.c; sourceTree = "<group>"; };
 		657CEEB9121DBC63007A1FBE /* CoordinateConversions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoordinateConversions.h; sourceTree = "<group>"; };
@@ -7664,6 +7667,7 @@
 				6528CCB412E406B800CF5144 /* pios_adxl345.c */,
 				6512D60712ED4CB8008175E5 /* pios_flash_w25x.c */,
 				65FF4D5E137EDEC100146BE4 /* pios_flashfs_objlist.c */,
+				6562BE1713CCAD0600C823E8 /* pios_rcvr.c */,
 				65E8C743139A6D0900E1F979 /* pios_crc.c */,
 			);
 			name = Common;
@@ -7759,6 +7763,8 @@
 		65E8F05911EFF25C00BBF654 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				6572CB1613D0F2B200FC2972 /* link_STM32103CB_CC_Rev1_memory.ld */,
+				6572CB1713D0F2B200FC2972 /* link_STM32103CB_CC_Rev1_sections.ld */,
 				65E8F05A11EFF25C00BBF654 /* CMSIS */,
 				65E8F06B11EFF25C00BBF654 /* dosfs */,
 				65E8F07111EFF25C00BBF654 /* FreeRTOS */,
@@ -8463,6 +8469,7 @@
 			};
 			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "OpenPilotOSX" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,

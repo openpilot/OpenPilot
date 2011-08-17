@@ -223,6 +223,7 @@ SECTIONS
          . = . + _irq_stack_size ;
          . = ALIGN(4);
          _irq_stack_top = . - 4 ;
+         _init_stack_top = _irq_stack_top;
          . = ALIGN(4);
     } >RAM
 	
@@ -364,5 +365,3 @@ SECTIONS
     .debug_typenames 0 : { *(.debug_typenames) }
     .debug_varnames  0 : { *(.debug_varnames) }
 }
-
-

@@ -29,7 +29,7 @@
 #define RUNNINGDEVICEWIDGET_H
 
 #include "ui_runningdevicewidget.h"
-#include "uploadergadgetwidget.h"
+
 #include <QWidget>
 #include <QErrorMessage>
 #include <QtSvg/QGraphicsSvgItem>
@@ -55,7 +55,7 @@ private:
     Ui_runningDeviceWidget *myDevice;
     int deviceID;
     QGraphicsSvgItem *devicePic;
-    void status(QString str, StatusIcon ic);
+    //void status(QString str, StatusIcon ic);
 
 
 signals:

@@ -261,18 +261,45 @@ QByteArray UAVObjectUtilManager::getBoardCPUSerial()
     loop.exec();
 
     UAVObjectField* cpuField = obj->getField("CPUSerial");
-    for (int i = 0; i < cpuField->getNumElements(); ++i) {
+    for (uint i = 0; i < cpuField->getNumElements(); ++i) {
         cpuSerial.append(cpuField->getValue(i).toUInt());
     }
     return cpuSerial;
 }
 
+quint32 UAVObjectUtilManager::getFirmwareCRC()
+{
+    quint32 fwCRC;
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    if (!pm)
+        return 0;
+    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+    if (!om)
+        return 0;
+
+    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
+    obj->getField("crc")->setValue(0);
+    obj->updated();
+    // The code below will ask for the object update and wait for the updated to be received,
+    // or the timeout of the timer, set to 1 second.
+    QEventLoop loop;
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
+    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
+    obj->requestUpdate();
+    loop.exec();
+
+    UAVObjectField* fwCRCField = obj->getField("crc");
+
+    fwCRC=(quint32)fwCRCField->getValue().toLongLong();
+    return fwCRC;
+}
+
 /**
   * Get the UAV Board Description, for anyone interested.
   */
-QString UAVObjectUtilManager::getBoardDescription()
+QByteArray UAVObjectUtilManager::getBoardDescription()
 {
-    QString description;
+    QByteArray ret;
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     if (!pm)
         return 0;
@@ -291,10 +318,10 @@ QString UAVObjectUtilManager::getBoardDescription()
 
     UAVObjectField* descriptionField = obj->getField("Description");
     // Description starts with an offset of
-    for (int i = 14; i < descriptionField->getNumElements(); ++i) {
-        description.append(descriptionField->getValue(i).toChar());
+    for (uint i = 0; i < descriptionField->getNumElements(); ++i) {
+        ret.append(descriptionField->getValue(i).toInt());
     }
-    return description;
+    return ret;
 }
 
 
@@ -623,6 +650,53 @@ int UAVObjectUtilManager::getTelemetrySerialPortSpeeds(QComboBox *comboBox)
 	comboBox->addItems(field->getOptions());
 
 	return 0;	// OK
+}
+
+deviceDescriptorStruct UAVObjectUtilManager::getBoardDescriptionStruct()
+{
+    deviceDescriptorStruct ret;
+    descriptionToStructure(getBoardDescription(),&ret);
+    return ret;
+}
+
+bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescriptorStruct *struc)
+{
+       if (desc.startsWith("OpFw")) {
+           // This looks like a binary with a description at the end
+           /*
+            #  4 bytes: header: "OpFw"
+            #  4 bytes: GIT commit tag (short version of SHA1)
+            #  4 bytes: Unix timestamp of compile time
+            #  2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
+            #  26 bytes: commit tag if it is there, otherwise "Unreleased". Zero-padded
+            #   ---- 40 bytes limit ---
+            #  20 bytes: SHA1 sum of the firmware.
+            #  40 bytes: free for now.
+            */
+
+           // Note: the ARM binary is big-endian:
+           quint32 gitCommitTag = desc.at(7)&0xFF;
+           for (int i=1;i<4;i++) {
+               gitCommitTag = gitCommitTag<<8;
+               gitCommitTag += desc.at(7-i) & 0xFF;
+           }
+           struc->gitTag=QString::number(gitCommitTag,16);
+           quint32 buildDate = desc.at(11)&0xFF;
+           for (int i=1;i<4;i++) {
+               buildDate = buildDate<<8;
+               buildDate += desc.at(11-i) & 0xFF;
+           }
+           struc->buildDate= QDateTime::fromTime_t(buildDate).toUTC().toString("yyyyMMdd HH:mm");
+           QByteArray targetPlatform = desc.mid(12,2);
+           // TODO: check platform compatibility
+           QString dscText = QString(desc.mid(14,26));
+           struc->boardType=(int)targetPlatform.at(0);
+           struc->boardRevision=(int)targetPlatform.at(1);
+           struc->description=dscText;
+           return true;
+       }
+       return false;
+
 }
 
 // ******************************

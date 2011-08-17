@@ -61,7 +61,6 @@ static const struct pios_spi_cfg pios_spi_op_mag_cfg = {
 		.ahb_clk = RCC_AHBPeriph_DMA1,
 
 		.irq = {
-			.handler = PIOS_SPI_op_mag_irq_handler,
 			.flags =
 			(DMA1_FLAG_TC4 | DMA1_FLAG_TE4 | DMA1_FLAG_HT4 |
 			 DMA1_FLAG_GL4),
@@ -175,7 +174,6 @@ static const struct pios_spi_cfg pios_spi_accel_cfg = {
 			.ahb_clk  = RCC_AHBPeriph_DMA1,
 
 			.irq = {
-					.handler = PIOS_SPI_accel_irq_handler,
 					.flags   = (DMA1_FLAG_TC2 | DMA1_FLAG_TE2 | DMA1_FLAG_HT2 | DMA1_FLAG_GL2),
 					.init    = {
 							.NVIC_IRQChannel                   = DMA1_Channel2_IRQn,
@@ -265,17 +263,10 @@ void PIOS_SPI_accel_irq_handler(void)
 /*
  * GPS USART
  */
-void PIOS_USART_gps_irq_handler(void);
-void USART1_IRQHandler()
-    __attribute__ ((alias("PIOS_USART_gps_irq_handler")));
-const struct pios_usart_cfg pios_usart_gps_cfg = {
+static const struct pios_usart_cfg pios_usart_gps_cfg = {
 	.regs = USART1,
 	.init = {
-#if defined (PIOS_USART_BAUDRATE)
-		 .USART_BaudRate = PIOS_USART_BAUDRATE,
-#else
 		 .USART_BaudRate = 57600,
-#endif
 		 .USART_WordLength = USART_WordLength_8b,
 		 .USART_Parity = USART_Parity_No,
 		 .USART_StopBits = USART_StopBits_1,
@@ -284,7 +275,6 @@ const struct pios_usart_cfg pios_usart_gps_cfg = {
 		 .USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
 		 },
 	.irq = {
-		.handler = PIOS_USART_gps_irq_handler,
 		.init = {
 			 .NVIC_IRQChannel = USART1_IRQn,
 			 .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
@@ -310,29 +300,16 @@ const struct pios_usart_cfg pios_usart_gps_cfg = {
 	       },
 };
 
-static uint32_t pios_usart_gps_id;
-void PIOS_USART_gps_irq_handler(void)
-{
-	PIOS_USART_IRQ_Handler(pios_usart_gps_id);
-}
-
 #endif /* PIOS_INCLUDE_GPS */
 
 #ifdef PIOS_COM_AUX
 /*
  * AUX USART
  */
-void PIOS_USART_aux_irq_handler(void);
-void USART4_IRQHandler()
-    __attribute__ ((alias("PIOS_USART_aux_irq_handler")));
-const struct pios_usart_cfg pios_usart_aux_cfg = {
+static const struct pios_usart_cfg pios_usart_aux_cfg = {
 	.regs = USART4,
 	.init = {
-#if defined (PIOS_USART_BAUDRATE)
-		 .USART_BaudRate = PIOS_USART_BAUDRATE,
-#else
 		 .USART_BaudRate = 57600,
-#endif
 		 .USART_WordLength = USART_WordLength_8b,
 		 .USART_Parity = USART_Parity_No,
 		 .USART_StopBits = USART_StopBits_1,
@@ -341,7 +318,6 @@ const struct pios_usart_cfg pios_usart_aux_cfg = {
 		 .USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
 		 },
 	.irq = {
-		.handler = PIOS_USART_aux_irq_handler,
 		.init = {
 			 .NVIC_IRQChannel = USART4_IRQn,
 			 .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
@@ -367,14 +343,23 @@ const struct pios_usart_cfg pios_usart_aux_cfg = {
 	       },
 };
 
-static uint32_t pios_usart_aux_id;
-void PIOS_USART_aux_irq_handler(void)
-{
-	PIOS_USART_IRQ_Handler(pios_usart_aux_id);
-}
-
 #endif /* PIOS_COM_AUX */
 
+
+#if defined(PIOS_INCLUDE_COM)
+
+#include <pios_com_priv.h>
+
+#if 0
+#define PIOS_COM_AUX_TX_BUF_LEN 192
+static uint8_t pios_com_aux_tx_buffer[PIOS_COM_AUX_TX_BUF_LEN];
+#endif
+
+#define PIOS_COM_GPS_RX_BUF_LEN 96
+static uint8_t pios_com_gps_rx_buffer[PIOS_COM_GPS_RX_BUF_LEN];
+
+
+#endif /* PIOS_INCLUDE_COM */
 
 #if defined(PIOS_INCLUDE_I2C)
 
@@ -391,7 +376,7 @@ void I2C1_EV_IRQHandler()
 void I2C1_ER_IRQHandler()
     __attribute__ ((alias("PIOS_I2C_pres_mag_adapter_er_irq_handler")));
 
-const struct pios_i2c_adapter_cfg pios_i2c_pres_mag_adapter_cfg = {
+static const struct pios_i2c_adapter_cfg pios_i2c_pres_mag_adapter_cfg = {
 	.regs = I2C1,
 	.init = {
 		 .I2C_Mode = I2C_Mode_I2C,
@@ -419,7 +404,6 @@ const struct pios_i2c_adapter_cfg pios_i2c_pres_mag_adapter_cfg = {
 			 },
 		},
 	.event = {
-		  .handler = PIOS_I2C_pres_mag_adapter_ev_irq_handler,
 		  .flags = 0,	/* FIXME: check this */
 		  .init = {
 			   .NVIC_IRQChannel = I2C1_EV_IRQn,
@@ -429,7 +413,6 @@ const struct pios_i2c_adapter_cfg pios_i2c_pres_mag_adapter_cfg = {
 			   },
 		  },
 	.error = {
-		  .handler = PIOS_I2C_pres_mag_adapter_er_irq_handler,
 		  .flags = 0,	/* FIXME: check this */
 		  .init = {
 			   .NVIC_IRQChannel = I2C1_ER_IRQn,
@@ -459,7 +442,7 @@ void PIOS_I2C_gyro_adapter_er_irq_handler(void);
 void I2C2_EV_IRQHandler() __attribute__ ((alias ("PIOS_I2C_gyro_adapter_ev_irq_handler")));
 void I2C2_ER_IRQHandler() __attribute__ ((alias ("PIOS_I2C_gyro_adapter_er_irq_handler")));
 
-const struct pios_i2c_adapter_cfg pios_i2c_gyro_adapter_cfg = {
+static const struct pios_i2c_adapter_cfg pios_i2c_gyro_adapter_cfg = {
   .regs = I2C2,
   .init = {
     .I2C_Mode                = I2C_Mode_I2C,
@@ -487,7 +470,6 @@ const struct pios_i2c_adapter_cfg pios_i2c_gyro_adapter_cfg = {
     },
   },
   .event = {
-    .handler = PIOS_I2C_gyro_adapter_ev_irq_handler,
     .flags   = 0,		/* FIXME: check this */
     .init = {
       .NVIC_IRQChannel                   = I2C2_EV_IRQn,
@@ -497,7 +479,6 @@ const struct pios_i2c_adapter_cfg pios_i2c_gyro_adapter_cfg = {
     },
   },
   .error = {
-    .handler = PIOS_I2C_gyro_adapter_er_irq_handler,
     .flags   = 0,		/* FIXME: check this */
     .init = {
       .NVIC_IRQChannel                   = I2C2_ER_IRQn,
@@ -547,10 +528,13 @@ void PIOS_Board_Init(void) {
 
 #if defined(PIOS_INCLUDE_COM)
 #if defined(PIOS_INCLUDE_GPS)
+	uint32_t pios_usart_gps_id;
 	if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
-	if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id)) {
+	if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
+			  pios_com_gps_rx_buffer, sizeof(pios_com_gps_rx_buffer),
+			  NULL, 0)) {
 		PIOS_DEBUG_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_GPS */

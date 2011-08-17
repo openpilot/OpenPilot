@@ -27,6 +27,10 @@ N: Pedro Assuncao
 E: pedro (dot) agda (plus) openpilot (at) gmail (dot) com
 D: Initial GCS Settings Gadget work
 
+N: Werner Backes
+E: werner (at) bit-1 (dot) de
+D: Port of CopterControl to PS3 Move Controller (MoveCopter)
+
 N: Jose Barros
 E: josembarros (at) hotmail (dot) com
 D: Next-Gen OP Map Lib, Y-Modem Library, Uploader Plugin

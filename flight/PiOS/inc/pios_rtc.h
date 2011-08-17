@@ -30,13 +30,15 @@
 #ifndef PIOS_RTC_H
 #define PIOS_RTC_H
 
+#include <stdbool.h>
+
 /* Public Functions */
-extern void PIOS_RTC_Init();
 extern uint32_t PIOS_RTC_Counter();
 extern float PIOS_RTC_Rate();
 extern float PIOS_RTC_MsPerTick();
+extern bool PIOS_RTC_RegisterTickCallback(void (*fn)(uint32_t id), uint32_t data);
 
-#endif /* PIOS_SERVO_H */
+#endif /* PIOS_RTC_H */
 
 /**
  * @}

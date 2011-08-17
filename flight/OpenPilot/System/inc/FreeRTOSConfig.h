@@ -83,6 +83,9 @@ do {\
 #define portGET_RUN_TIME_COUNTER_VALUE() (*(unsigned long *)0xe0001004)/* DWT_CYCCNT */
 #endif
 
+#if !defined(ARCH_POSIX) && !defined(ARCH_WIN32)
+#define CHECK_IRQ_STACK
+#endif
 
 /**
   * @}

@@ -52,14 +52,16 @@
 #include <QThread>
 #include <QMessageBox>
 #include <QTimer>
-
+#include "devicedescriptorstruct.h"
 #include <QProgressDialog>
 
 using namespace OP_DFU;
 
+
 class UploaderGadgetWidget : public QWidget
 {
     Q_OBJECT
+
 
 public:
     UploaderGadgetWidget(QWidget *parent = 0);

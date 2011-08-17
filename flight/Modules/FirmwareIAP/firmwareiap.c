@@ -88,7 +88,7 @@ static void resetTask(UAVObjEvent *);
  * \note
  *
  */
-
+MODULE_INITCALL(FirmwareIAPInitialize, 0)
 int32_t FirmwareIAPInitialize()
 {
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;
@@ -100,7 +100,7 @@ int32_t FirmwareIAPInitialize()
 	data.ArmReset=0;
 	data.crc = 0;
 	FirmwareIAPObjSet( &data );
-	FirmwareIAPObjConnectCallback( &FirmwareIAPCallback );
+	if(bdinfo->magic==PIOS_BOARD_INFO_BLOB_MAGIC) FirmwareIAPObjConnectCallback( &FirmwareIAPCallback );
 	return 0;
 }
 

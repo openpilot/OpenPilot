@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>659</width>
-    <height>511</height>
+    <height>523</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -223,11 +223,6 @@ Leave at 50Hz for fixed wing.</string>
        <property name="enabled">
         <bool>true</bool>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="toolTip">
         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -257,11 +252,6 @@ p, li { white-space: pre-wrap; }
       <widget class="QSpinBox" name="ch0OutMax">
        <property name="enabled">
         <bool>true</bool>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
        </property>
        <property name="toolTip">
         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -341,11 +331,6 @@ p, li { white-space: pre-wrap; }
        <property name="enabled">
         <bool>true</bool>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -368,11 +353,6 @@ p, li { white-space: pre-wrap; }
       <widget class="QSpinBox" name="ch1OutMax">
        <property name="enabled">
         <bool>true</bool>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
        </property>
        <property name="maximum">
         <number>9999</number>
@@ -428,11 +408,6 @@ p, li { white-space: pre-wrap; }
        <property name="enabled">
         <bool>true</bool>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -455,11 +430,6 @@ p, li { white-space: pre-wrap; }
       <widget class="QSpinBox" name="ch2OutMax">
        <property name="enabled">
         <bool>true</bool>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
        </property>
        <property name="maximum">
         <number>9999</number>
@@ -515,11 +485,6 @@ p, li { white-space: pre-wrap; }
        <property name="enabled">
         <bool>true</bool>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -542,11 +507,6 @@ p, li { white-space: pre-wrap; }
       <widget class="QSpinBox" name="ch3OutMax">
        <property name="enabled">
         <bool>true</bool>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
        </property>
        <property name="maximum">
         <number>9999</number>
@@ -599,11 +559,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="5" column="2">
       <widget class="QSpinBox" name="ch4OutMin">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -621,11 +576,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="5" column="4">
       <widget class="QSpinBox" name="ch4OutMax">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -677,11 +627,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="6" column="2">
       <widget class="QSpinBox" name="ch5OutMin">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -699,11 +644,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="6" column="4">
       <widget class="QSpinBox" name="ch5OutMax">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -762,11 +702,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="7" column="2">
       <widget class="QSpinBox" name="ch6OutMin">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -784,11 +719,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="7" column="4">
       <widget class="QSpinBox" name="ch6OutMax">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -833,11 +763,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="8" column="2">
       <widget class="QSpinBox" name="ch7OutMin">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>
@@ -855,11 +780,6 @@ p, li { white-space: pre-wrap; }
      </item>
      <item row="8" column="4">
       <widget class="QSpinBox" name="ch7OutMax">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-        </font>
-       </property>
        <property name="maximum">
         <number>9999</number>
        </property>

@@ -30,6 +30,11 @@
 // Buffer offset used by VBO
 #define BUFFER_OFFSET(i) ((char*)NULL + (i))
 
+#if defined(Q_OS_MAC)
+#include "gl.h"
+#include "glu.h"
+#endif
+
 #if !defined(Q_OS_MAC)
 // ARB_vertex_buffer_object
 extern PFNGLBINDBUFFERARBPROC			glBindBuffer;

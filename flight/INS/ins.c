@@ -49,13 +49,11 @@
 #include "CoordinateConversions.h"
 #include <stdbool.h>
 #include "fifo_buffer.h"
+#include "insgps_helper.h"
 
 #define DEG_TO_RAD         (M_PI / 180.0)
 #define RAD_TO_DEG         (180.0 / M_PI)
 
-#define INSGPS_GPS_TIMEOUT 2   /* 2 seconds triggers reinit of position */
-#define INSGPS_GPS_MINSAT  6   /* 2 seconds triggers reinit of position */
-#define INSGPS_GPS_MINPDOP 3.5 /* minimum PDOP for postition updates    */
 #define INSGPS_MAGLEN      1000
 #define INSGPS_MAGTOL      0.5 /* error in magnetic vector length to use  */
 
@@ -79,7 +77,6 @@ volatile int8_t ahrs_algorithm;
 
 /* Data accessors */
 void adc_callback(float *);
-bool get_accel_gyro_data();
 void process_mag_data();
 void reset_values();
 void calibrate_sensors(void);
@@ -94,6 +91,11 @@ void calibration_callback(AhrsObjHandle obj);
 void settings_callback(AhrsObjHandle obj);
 void affine_rotate(float scale[3][4], float rotation[3]);
 void calibration(float result[3], float scale[3][4], float arg[3]);
+
+extern void PIOS_Board_Init(void);
+static void panic(uint32_t blinks);
+void simple_update();
+bool get_accel_gyro_data();
 
 /* Bootloader related functions and var*/
 void firmwareiapobj_callback(AhrsObjHandle obj);
@@ -123,9 +125,6 @@ struct altitude_sensor altitude_data;
 //! Contains data from the GPS (via the SPI link)
 struct gps_sensor gps_data;
 
-//! Offset correction of barometric alt, to match gps data
-static float baro_offset = 0;
-
 static float mag_len = 0;
 
 typedef enum { INS_IDLE, INS_DATA_READY, INS_PROCESSING } states;
@@ -135,231 +134,153 @@ volatile int32_t ekf_too_slow;
  * @}
  */
 
-/* INS functions */
 /**
- * @brief Update the EKF when in outdoor mode.  The primary difference is using the GPS values.
+ * @brief INS Main function
  */
-void ins_outdoor_update()
-{
-	float gyro[3], accel[3], vel[3];
-	static uint32_t last_gps_time = 0;
-	uint16_t sensors;
 
-	// format data for INS algo
-	gyro[0] = gyro_data.filtered.x;
-	gyro[1] = gyro_data.filtered.y;
-	gyro[2] = gyro_data.filtered.z;
-	accel[0] = accel_data.filtered.x,
-	accel[1] = accel_data.filtered.y,
-	accel[2] = accel_data.filtered.z,
+int16_t accel_data_glob[3];
+int16_t gyro_data_glob[3];
+int16_t mag_data_glob[3];
 
-	INSStatePrediction(gyro, accel, 1 / (float)EKF_RATE);
-	attitude_data.quaternion.q1 = Nav.q[0];
-	attitude_data.quaternion.q2 = Nav.q[1];
-	attitude_data.quaternion.q3 = Nav.q[2];
-	attitude_data.quaternion.q4 = Nav.q[3];
-	send_attitude();  // get message out quickly
-	send_velocity();
-	send_position();
-	INSCovariancePrediction(1 / (float)EKF_RATE);
+uint32_t pin;
+int16_t accel[3];
 
-	sensors = 0;
+uint32_t total_conversion_blocks;
 
-	/*
-	 * Detect if greater than certain time since last gps update and if so
-	 * reset EKF to that position since probably drifted too far for safe
-	 * update
-	 */
-	uint32_t this_gps_time = timer_count();
-	float gps_delay;
 
-	if (this_gps_time < last_gps_time)
-		gps_delay = ((0xFFFF - last_gps_time) - this_gps_time) / timer_rate();
-	else
-		gps_delay = (this_gps_time - last_gps_time) / timer_rate();
-	last_gps_time = this_gps_time;
+int32_t gyro_error;
+int16_t gyro[4];	
+int16_t mag[3];
+int16_t accel[3];
+float altitude;
+int32_t pressure;
 
-	if (gps_data.updated)
-	{
-		vel[0] = gps_data.groundspeed * cos(gps_data.heading * DEG_TO_RAD);
-		vel[1] = gps_data.groundspeed * sin(gps_data.heading * DEG_TO_RAD);
-		vel[2] = 0;
+int32_t dr;
 
-		if(gps_delay > INSGPS_GPS_TIMEOUT)
-			INSPosVelReset(gps_data.NED,vel); // position stale, reset
-		else  {
-			sensors |= HORIZ_SENSORS | POS_SENSORS;
-		}
+int32_t sclk, sclk_prev;
+int32_t sclk_count;
 
-		/*
-		 * When using gps need to make sure that barometer is brought into NED frame
-		 * we should try and see if the altitude from the home location is good enough
-		 * to use for the offset but for now starting with this conservative filter
-		 */
-		if(fabs(gps_data.NED[2] + (altitude_data.altitude - baro_offset)) > 10) {
-			baro_offset = gps_data.NED[2] + altitude_data.altitude;
-		} else {
-			/* IIR filter with 100 second or so tau to keep them crudely in the same frame */
-			baro_offset = baro_offset * 0.999 + (gps_data.NED[2] + altitude_data.altitude) * 0.001;
-		}
-		gps_data.updated = false;
-	} else if (gps_delay > INSGPS_GPS_TIMEOUT) {
-		vel[0] = 0;
-		vel[1] = 0;
-		vel[2] = 0;
-		sensors |= VERT_SENSORS | HORIZ_SENSORS;
-	}
-
-	if(mag_data.updated) {
-		sensors |= MAG_SENSORS;
-		mag_data.updated = false;
-	}
-
-	if(altitude_data.updated) {
-		sensors |= BARO_SENSOR;
-		altitude_data.updated = false;
-	}
-
-	/*
-	 * TODO: Need to add a general sanity check for all the inputs to make sure their kosher
-	 * although probably should occur within INS itself
-	 */
-	INSCorrection(mag_data.scaled.axis, gps_data.NED, vel, altitude_data.altitude - baro_offset, sensors);
-}
-
-/**
- * @brief Update the EKF when in indoor mode
- */
-void ins_indoor_update()
-{
-	float gyro[3], accel[3], vel[3];
-	static uint32_t last_indoor_time = 0;
-	uint16_t sensors = 0;
-
-	// format data for INS algo
-	gyro[0] = gyro_data.filtered.x;
-	gyro[1] = gyro_data.filtered.y;
-	gyro[2] = gyro_data.filtered.z;
-	accel[0] = accel_data.filtered.x,
-	accel[1] = accel_data.filtered.y,
-	accel[2] = accel_data.filtered.z,
-
-	INSStatePrediction(gyro, accel, 1 / (float)EKF_RATE);
-	attitude_data.quaternion.q1 = Nav.q[0];
-	attitude_data.quaternion.q2 = Nav.q[1];
-	attitude_data.quaternion.q3 = Nav.q[2];
-	attitude_data.quaternion.q4 = Nav.q[3];
-	send_attitude();  // get message out quickly
-	send_velocity();
-	send_position();
-	INSCovariancePrediction(1 / (float)EKF_RATE);
-
-	/* Indoors, update with zero position and velocity and high covariance */
-	vel[0] = 0;
-	vel[1] = 0;
-	vel[2] = 0;
-
-	uint32_t this_indoor_time = timer_count();
-	float indoor_delay;
-
-	/*
-	 * Detect if greater than certain time since last gps update and if so
-	 * reset EKF to that position since probably drifted too far for safe
-	 * update
-	 */
-	if (this_indoor_time < last_indoor_time)
-		indoor_delay = ((0xFFFF - last_indoor_time) - this_indoor_time) / timer_rate();
-	else
-		indoor_delay = (this_indoor_time - last_indoor_time) / timer_rate();
-	last_indoor_time = this_indoor_time;
-
-	if(indoor_delay > INSGPS_GPS_TIMEOUT)
-		INSPosVelReset(vel,vel);
-	else
-		sensors = HORIZ_SENSORS | VERT_SENSORS;
-
-	if(mag_data.updated && (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
-		sensors |= MAG_SENSORS;
-		mag_data.updated = false;
-	}
-
-	if(altitude_data.updated) {
-		sensors |= BARO_SENSOR;
-		altitude_data.updated = false;
-	}
-
-	/*
-	 * TODO: Need to add a general sanity check for all the inputs to make sure their kosher
-	 * although probably should occur within INS itself
-	 */
-	INSCorrection(mag_data.scaled.axis, gps_data.NED, vel, altitude_data.altitude, sensors | HORIZ_SENSORS | VERT_SENSORS);
-}
-
-/**
- * @brief Initialize the EKF assuming stationary
- */
-void ins_init_algorithm()
-{
-	float Rbe[3][3], q[4], accels[3], rpy[3], mag;
-	float ge[3]={0,0,-9.81}, zeros[3]={0,0,0}, Pdiag[16]={25,25,25,5,5,5,1e-5,1e-5,1e-5,1e-5,1e-5,1e-5,1e-5,1e-4,1e-4,1e-4};
-	bool using_mags, using_gps;
-
-	INSGPSInit();
-
-	HomeLocationData home;
-	HomeLocationGet(&home);
-
-	accels[0]=accel_data.filtered.x;
-	accels[1]=accel_data.filtered.y;
-	accels[2]=accel_data.filtered.z;
-
-	using_mags = (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) || (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR);
-	using_mags &= (home.Be[0] != 0) || (home.Be[1] != 0) || (home.Be[2] != 0);  /* only use mags when valid home location */
-
-	using_gps = (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) && (gps_data.quality != 0);
-
-	/* Block till a data update */
-	get_accel_gyro_data();
-
-	/* Ensure we get mag data in a timely manner */
-	uint16_t fail_count = 50; // 50 at 200 Hz is up to 0.25 sec
-	while(using_mags && !mag_data.updated && fail_count--) {
-		get_accel_gyro_data();
+int main()
+{	
+	gps_data.quality = -1;
+	static int8_t last_ahrs_algorithm;
+	ahrs_algorithm = AHRSSETTINGS_ALGORITHM_SIMPLE;
+	
+	reset_values();
+	
+	PIOS_Board_Init();
+	PIOS_LED_Off(LED1);
+	PIOS_LED_On(LED2);
+	
+#if defined(PIOS_INCLUDE_HMC5883) && defined(PIOS_INCLUDE_I2C)
+	// Get 3 ID bytes
+	strcpy((char *)mag_data.id, "ZZZ");
+	PIOS_HMC5883_ReadID(mag_data.id);
+#endif
+	PIOS_LED_Off(LED1);
+	PIOS_LED_Off(LED2);
+	
+	// Sensors need a second to start
+	PIOS_DELAY_WaitmS(100);
+	
+	// Sensor test
+	if(PIOS_IMU3000_Test() != 0)
+		panic(1);
+	
+	if(PIOS_BMA180_Test() != 0)
+		panic(2);
+	
+	if(PIOS_HMC5883_Test() != 0)
+		panic(3);	
+	
+	if(PIOS_BMP085_Test() != 0)
+		panic(4); 
+	
+	PIOS_LED_On(LED1);
+	PIOS_LED_Off(LED2);
+	
+	// Flash warning light while trying to connect
+	uint32_t time_val = PIOS_DELAY_GetRaw();
+	uint32_t ms_count = 0;
+	while(!AhrsLinkReady()) {
 		AhrsPoll();
-	}
-	using_mags &= mag_data.updated;
-
-	if (using_mags) {
-		/* Spin waiting for mag data */
-		while(!mag_data.updated) {
-			get_accel_gyro_data();
-			AhrsPoll();
+		if(PIOS_DELAY_DiffuS(time_val) > 1000) {
+			ms_count += 1;
+			time_val = PIOS_DELAY_GetRaw();
 		}
-		mag_data.updated = false;
-
-		RotFrom2Vectors(accels, ge, mag_data.scaled.axis, home.Be, Rbe);
-		R2Quaternion(Rbe,q);
-		if (using_gps)
-			INSSetState(gps_data.NED, zeros, q, zeros, zeros);
-		else
-			INSSetState(zeros, zeros, q, zeros, zeros);
-	} else {
-		// assume yaw = 0
-		mag = VectorMagnitude(accels);
-		rpy[1] = asinf(-accels[0]/mag);
-		rpy[0] = atan2(accels[1]/mag,accels[2]/mag);
-		rpy[2] = 0;
-		RPY2Quaternion(rpy,q);
-		if (using_gps)
-			INSSetState(gps_data.NED, zeros, q, zeros, zeros);
-		else
-			INSSetState(zeros, zeros, q, zeros, zeros);
+		if(ms_count > 100) {
+			PIOS_LED_Toggle(LED2);
+			ms_count = 0;
+		}
 	}
-
-	INSResetP(Pdiag);
-
-	// TODO: include initial estimate of gyro bias?
+	PIOS_LED_Off(LED2);
+	
+	/* we didn't connect the callbacks before because we have to wait
+	 for all data to be up to date before doing anything*/
+	
+	AHRSCalibrationConnectCallback(calibration_callback);
+	AHRSSettingsConnectCallback(settings_callback);
+	HomeLocationConnectCallback(homelocation_callback);
+	FirmwareIAPObjConnectCallback(firmwareiapobj_callback);
+	
+	calibration_callback(AHRSCalibrationHandle()); //force an update
+	
+	/******************* Main EKF loop ****************************/
+	while(1) {
+		
+		
+		AhrsPoll();
+		AhrsStatusData status;
+		AhrsStatusGet(&status);
+		status.DroppedUpdates = ekf_too_slow;
+		AhrsStatusSet(&status);
+		
+		// Alive signal
+		if ((total_conversion_blocks % 300) == 0)
+			PIOS_LED_Toggle(LED1);
+		total_conversion_blocks++;
+		// Delay for valid data
+		
+		// This function blocks till data avilable
+		get_accel_gyro_data();
+		
+		// Get any mag data available
+		process_mag_data();
+		
+		if(ISNAN(accel_data.filtered.x + accel_data.filtered.y + accel_data.filtered.z) ||
+		   ISNAN(gyro_data.filtered.x + gyro_data.filtered.y + gyro_data.filtered.z) ||
+		   ACCEL_OOB(accel_data.filtered.x + accel_data.filtered.y + accel_data.filtered.z) ||
+		   GYRO_OOB(gyro_data.filtered.x + gyro_data.filtered.y + gyro_data.filtered.z)) {
+			// If any values are NaN or huge don't update
+			//TODO: add field to ahrs status to track number of these events
+			continue;
+		}
+		
+		//		print_ekf_binary();
+		
+		/* If algorithm changed reinit.  This could go in callback but wouldn't be synchronous */
+		if (ahrs_algorithm != last_ahrs_algorithm)
+			ins_init_algorithm(); 
+		last_ahrs_algorithm = ahrs_algorithm; 
+		
+		switch(ahrs_algorithm) {
+			case AHRSSETTINGS_ALGORITHM_SIMPLE:
+				simple_update();
+				break;
+			case AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR:
+				ins_outdoor_update();
+				break;
+			case AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR:
+			case AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR_NOMAG:
+				ins_indoor_update();
+				break;
+		}
+	}
+	
+	return 0;
 }
+
+
 
 /**
  * @brief Simple update using just mag and accel.  Yaw biased and big attitude changes.
@@ -415,9 +336,7 @@ void print_ekf_binary()
 void print_ekf_binary() {}
 #endif
 
-extern void PIOS_Board_Init(void);
-
-static void panic(int blinks) 
+static void panic(uint32_t blinks) 
 {
 	int blinked = 0;
 	while(1) {
@@ -433,181 +352,6 @@ static void panic(int blinks)
 		}			
 	}
 }
-/**
- * @brief INS Main function
- */
-
-int16_t accel_data_glob[3];
-int16_t gyro_data_glob[3];
-int16_t mag_data_glob[3];
-
-uint32_t pin;
-int16_t accel[3];
-
-uint32_t total_conversion_blocks;
-
-
-int32_t gyro_error;
-int16_t gyro[4];	
-int16_t mag[3];
-int16_t accel[3];
-float altitude;
-int32_t pressure;
-
-int32_t dr;
-
-int32_t sclk, sclk_prev;
-int32_t sclk_count;
-
-int main()
-{	
-	gps_data.quality = -1;
-	static int8_t last_ahrs_algorithm;
-	ahrs_algorithm = AHRSSETTINGS_ALGORITHM_SIMPLE;
-
-	reset_values();
-
-	PIOS_Board_Init();
-	PIOS_LED_Off(LED1);
-	PIOS_LED_On(LED2);
-
-#if defined(PIOS_INCLUDE_HMC5883) && defined(PIOS_INCLUDE_I2C)
-	// Get 3 ID bytes
-	strcpy((char *)mag_data.id, "ZZZ");
-	PIOS_HMC5883_ReadID(mag_data.id);
-#endif
-	PIOS_LED_Off(LED1);
-	PIOS_LED_Off(LED2);
-
-	// Sensors need a second to start
-	PIOS_DELAY_WaitmS(100);
-
-	// Sensor test
-	if(PIOS_IMU3000_Test() != 0)
-		panic(1);
-	
-	if(PIOS_BMA180_Test() != 0)
-		panic(2);
-
-	if(PIOS_HMC5883_Test() != 0)
-		panic(3);	
-	
-	if(PIOS_BMP085_Test() != 0)
-		panic(4); 
-
-	PIOS_LED_On(LED1);
-	PIOS_LED_Off(LED2);
-
-/*	
-	while(1) {
-		sclk = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_15);
-		if(sclk_prev != sclk)
-			sclk_count++;
-		sclk_prev = sclk;
-		dr = SPI2->DR;
-	}
-*/	
-/*
-	uint32_t count = 500;
-	while(count--) {
-		// Update the pressure data
-		PIOS_BMP085_StartADC(PressureConv);
-		PIOS_DELAY_WaitmS(50);
-		if(PIOS_BMP085_ReadADC() == 0) {
-			pressure = PIOS_BMP085_GetPressure();
-			altitude = 44330.0 * (1.0 - powf((float) pressure / BMP085_P0, (1.0 / 5.255)));
-		}
-
-		PIOS_IMU3000_ReadGyros(gyro);		
-		PIOS_DELAY_WaitmS(50);
-		
-		PIOS_HMC5883_ReadMag(mag);
-		PIOS_DELAY_WaitmS(50);
-		
-		PIOS_BMA180_ReadAccels(accel);
-		PIOS_DELAY_WaitmS(50);;
-	}
-*/	
-	// Flash warning light while trying to connect
-	uint32_t time_val = PIOS_DELAY_GetRaw();
-	uint32_t ms_count = 0;
-	while(!AhrsLinkReady()) {
-		AhrsPoll();
-		if(PIOS_DELAY_DiffuS(time_val) > 1000) {
-			ms_count += 1;
-			time_val = PIOS_DELAY_GetRaw();
-		}
-		if(ms_count > 100) {
-			PIOS_LED_Toggle(LED2);
-			ms_count = 0;
-		}
-	}
-	PIOS_LED_Off(LED2);
-
-	/* we didn't connect the callbacks before because we have to wait
-	for all data to be up to date before doing anything*/
-
-	AHRSCalibrationConnectCallback(calibration_callback);
-	AHRSSettingsConnectCallback(settings_callback);
-	HomeLocationConnectCallback(homelocation_callback);
-	FirmwareIAPObjConnectCallback(firmwareiapobj_callback);
-
-	calibration_callback(AHRSCalibrationHandle()); //force an update
-
-	/******************* Main EKF loop ****************************/
-	while(1) {
-
-
-		AhrsPoll();
-		AhrsStatusData status;
-		AhrsStatusGet(&status);
-		status.DroppedUpdates = ekf_too_slow;
-		AhrsStatusSet(&status);
-
-		// Alive signal
-		if ((total_conversion_blocks % 300) == 0)
-			PIOS_LED_Toggle(LED1);
-		total_conversion_blocks++;
-		// Delay for valid data
-
-		// This function blocks till data avilable
-		get_accel_gyro_data();
-
-		// Get any mag data available
-		process_mag_data();
-
-		if(ISNAN(accel_data.filtered.x + accel_data.filtered.y + accel_data.filtered.z) ||
-		   ISNAN(gyro_data.filtered.x + gyro_data.filtered.y + gyro_data.filtered.z) ||
-		   ACCEL_OOB(accel_data.filtered.x + accel_data.filtered.y + accel_data.filtered.z) ||
-		   GYRO_OOB(gyro_data.filtered.x + gyro_data.filtered.y + gyro_data.filtered.z)) {
-			// If any values are NaN or huge don't update
-//TODO: add field to ahrs status to track number of these events
-			continue;
-		}
-
-//		print_ekf_binary();
-
-		/* If algorithm changed reinit.  This could go in callback but wouldn't be synchronous */
-		if (ahrs_algorithm != last_ahrs_algorithm)
-			ins_init_algorithm(); 
-		last_ahrs_algorithm = ahrs_algorithm; 
-
-		switch(ahrs_algorithm) {
-			case AHRSSETTINGS_ALGORITHM_SIMPLE:
-				simple_update();
-				break;
-			case AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR:
-				ins_outdoor_update();
-				break;
-			case AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR:
-			case AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR_NOMAG:
-				ins_indoor_update();
-				break;
-		}
-	}
-
-	return 0;
-}
 
 /**
  * @brief Get the accel and gyro data from whichever source when available
@@ -615,6 +359,7 @@ int main()
  * This function will act as the HAL for the new INS sensors
  */
 uint16_t accel_samples = 0;
+uint8_t gyro_len;
 bool get_accel_gyro_data()
 {
 	int16_t accel[3];
@@ -635,9 +380,8 @@ bool get_accel_gyro_data()
 	accel[2] = accel_accum[2] / accel_samples;
 	
 	int16_t gyro_fifo[4 * 100];
-	uint8_t gyro_len;
 	int32_t gyro_accum[3] = {0, 0, 0};
-	int16_t gyro[3];	
+	int16_t gyro[3];
 	gyro_len = PIOS_IMU3000_ReadFifo((uint8_t *) gyro_fifo, sizeof(gyro_fifo));
 	gyro_len /= 8;
 	for(int i = 0; i < gyro_len; i++) {

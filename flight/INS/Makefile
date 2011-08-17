@@ -80,6 +80,7 @@ OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 SRC = ins.c
 SRC += pios_board.c
 SRC += insgps13state.c
+SRC += insgps_helper.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/ahrs_spi_comm.c

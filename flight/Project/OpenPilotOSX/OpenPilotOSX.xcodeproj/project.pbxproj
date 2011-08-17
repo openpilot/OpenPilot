@@ -2868,6 +2868,8 @@
 		65DEA78513F0FE6000095B06 /* stm32f2xx_conf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stm32f2xx_conf.h; sourceTree = "<group>"; };
 		65DEA78613F1118400095B06 /* pios_bma180.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_bma180.h; sourceTree = "<group>"; };
 		65DEA78813F111EA00095B06 /* pios_bma180.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_bma180.c; sourceTree = "<group>"; };
+		65E1039C13FBD5C4004B5FFE /* insgps_helper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = insgps_helper.c; sourceTree = "<group>"; };
+		65E1039D13FBD5CE004B5FFE /* insgps_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = insgps_helper.h; sourceTree = "<group>"; };
 		65E410AE12F65AEA00725888 /* attitudesettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = attitudesettings.xml; sourceTree = "<group>"; };
 		65E6DF7112E02E8E00058553 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		65E6DF7312E02E8E00058553 /* alarms.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = alarms.c; sourceTree = "<group>"; };
@@ -4038,6 +4040,7 @@
 				6560A3BA13EE2FCB00105DA5 /* Makefile */,
 				6560A3BB13EE2FCB00105DA5 /* pios_board.c */,
 				6560A3BC13EE2FCB00105DA5 /* test.c */,
+				65E1039C13FBD5C4004B5FFE /* insgps_helper.c */,
 			);
 			name = INS;
 			path = ../../INS;
@@ -4051,6 +4054,7 @@
 				6560A3B513EE2FCB00105DA5 /* ins_fsm.h */,
 				6560A3B613EE2FCB00105DA5 /* insgps.h */,
 				6560A3B713EE2FCB00105DA5 /* pios_config.h */,
+				65E1039D13FBD5CE004B5FFE /* insgps_helper.h */,
 			);
 			path = inc;
 			sourceTree = "<group>";

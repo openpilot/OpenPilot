@@ -248,7 +248,7 @@ static void updateI2Cstats()
 {
 #if defined(PIOS_INCLUDE_I2C)
 	I2CStatsData i2cStats;
-	I2CStatsGet(&i2cStats);
+	//I2CStatsGet(&i2cStats);
 	
 	struct pios_i2c_fault_history history;
 	PIOS_I2C_GetDiagnostics(&history, &i2cStats.event_errors);
@@ -260,7 +260,7 @@ static void updateI2Cstats()
 		i2cStats.state_log[i] = history.state[i];		
 	}
 	i2cStats.last_error_type = history.type;
-	I2CStatsSet(&i2cStats);
+	//I2CStatsSet(&i2cStats);
 #endif
 }
 #endif

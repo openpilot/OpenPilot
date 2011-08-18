@@ -175,7 +175,7 @@ static void stabilizationTask(void* parameters)
 		StabilizationDesiredGet(&stabDesired);
 		AttitudeActualGet(&attitudeActual);
 		AttitudeRawGet(&attitudeRaw);
-		RateDesiredGet(&rateDesired);
+		//RateDesiredGet(&rateDesired);
 		SystemSettingsGet(&systemSettings);
 
 #if defined(PIOS_QUATERNION_STABILIZATION)
@@ -273,7 +273,7 @@ static void stabilizationTask(void* parameters)
 		}
 
 		uint8_t shouldUpdate = 1;
-		RateDesiredSet(&rateDesired);
+		//RateDesiredSet(&rateDesired);
 		ActuatorDesiredGet(&actuatorDesired);
 		//Calculate desired command
 		for(int8_t ct=0; ct< MAX_AXES; ct++)

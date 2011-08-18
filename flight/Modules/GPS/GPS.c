@@ -77,9 +77,9 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 	#endif
 #else
 	#ifdef ENABLE_GPS_BINARY_GTOP
-		#define STACK_SIZE_BYTES            440
+		#define STACK_SIZE_BYTES            600
 	#else
-		#define STACK_SIZE_BYTES            440
+		#define STACK_SIZE_BYTES            600
 	#endif
 #endif
 

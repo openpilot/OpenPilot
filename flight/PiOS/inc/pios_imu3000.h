@@ -72,10 +72,10 @@
 #define PIOS_IMU3000_FIFO_FOOTER          0x01
 
 /* Gyro full-scale range */
-#define PIOS_IMU3000_SCALE_250_DEG        0x00
-#define PIOS_IMU3000_SCALE_500_DEG        0x01
-#define PIOS_IMU3000_SCALE_1000_DEG       0x02
-#define PIOS_IMU3000_SCALE_2000_DEG       0x03
+#define PIOS_IMU3000_SCALE_250_DEG        (0x00 << 3)
+#define PIOS_IMU3000_SCALE_500_DEG        (0x01 << 3)
+#define PIOS_IMU3000_SCALE_1000_DEG       (0x02 << 3)
+#define PIOS_IMU3000_SCALE_2000_DEG       (0x03 << 3)
 
 /* Digital low-pass filter configuration */
 #define PIOS_IMU3000_LOWPASS_256_HZ       0x00

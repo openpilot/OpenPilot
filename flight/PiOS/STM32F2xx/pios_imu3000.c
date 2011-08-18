@@ -74,9 +74,9 @@ void PIOS_IMU3000_Init(const struct pios_imu3000_cfg * cfg)
 	PIOS_IMU3000_ConfigTypeDef IMU3000_InitStructure;
 	IMU3000_InitStructure.Fifo_store = PIOS_IMU3000_FIFO_TEMP_OUT | PIOS_IMU3000_FIFO_GYRO_X_OUT |
 			PIOS_IMU3000_FIFO_GYRO_Y_OUT | PIOS_IMU3000_FIFO_GYRO_Z_OUT | PIOS_IMU3000_FIFO_FOOTER;
-	IMU3000_InitStructure.Smpl_rate_div = 8;
+	IMU3000_InitStructure.Smpl_rate_div = 7; // Clock at 8 khz, downsampled by 8 for 1khz
 	IMU3000_InitStructure.DigLPF_Scale = PIOS_IMU3000_LOWPASS_256_HZ | PIOS_IMU3000_SCALE_500_DEG;
-	IMU3000_InitStructure.Interrupt_cfg = PIOS_IMU3000_INT_CLR_ANYRD | PIOS_IMU3000_INT_DATA_RDY;
+	IMU3000_InitStructure.Interrupt_cfg = 0; //PIOS_IMU3000_INT_CLR_ANYRD | PIOS_IMU3000_INT_DATA_RDY;
 	IMU3000_InitStructure.User_ctl = PIOS_IMU3000_USERCTL_FIFO_EN;
 	IMU3000_InitStructure.Pwr_mgmt_clk = PIOS_IMU3000_PWRMGMT_PLL_X_CLK;
 	PIOS_IMU3000_Config(&IMU3000_InitStructure);
@@ -160,6 +160,7 @@ uint8_t fifo_level_data[2];
 int16_t footer_flush;
 uint8_t imu3000_read_buffer[10]; // Right now using temp,X,Y,Z,fifo
 bool first_read = true;
+uint32_t imu3000_readtime;
 int32_t PIOS_IMU3000_ReadFifo(int16_t * buffer)
 {
 	// Get the number of bytes in the fifo	
@@ -189,9 +190,13 @@ int32_t PIOS_IMU3000_ReadFifo(int16_t * buffer)
 		if(fifo_level < (sizeof(imu3000_read_buffer) + 2))
 			return -1;
 	
+		uint32_t timeval = PIOS_DELAY_GetRaw();
+		
 		// Leave footer in buffer
 		if(PIOS_IMU3000_Read(PIOS_IMU3000_FIFO_REG, imu3000_read_buffer, sizeof(imu3000_read_buffer)) != 0)
 			return -1;
+		
+		imu3000_readtime = PIOS_DELAY_DiffuS(timeval);
 		
 		// First two bytes are left over fifo from last call
 		buffer[0] = imu3000_read_buffer[4] << 8 | imu3000_read_buffer[5];

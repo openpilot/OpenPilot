@@ -235,6 +235,18 @@ int32_t PIOS_SPI_ClaimBus(uint32_t spi_id)
 
 	if (xSemaphoreTake(spi_dev->busy, 0xffff) != pdTRUE)
 		return -1;
+#else
+	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
+	uint32_t timeout = 0xffff;
+	while((PIOS_SPI_Busy(spi_id) || spi_dev->busy) && --timeout);
+	if(timeout == 0) //timed out
+		return -1;
+	
+	PIOS_IRQ_Disable();
+	if(spi_dev->busy)
+		return -1;
+	spi_dev->busy = 1;
+	PIOS_IRQ_Enable();
 #endif
 	return 0;
 }
@@ -253,6 +265,12 @@ int32_t PIOS_SPI_ReleaseBus(uint32_t spi_id)
 	PIOS_Assert(valid)
 
 	xSemaphoreGive(spi_dev->busy);
+#else
+	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
+	PIOS_IRQ_Disable();
+	spi_dev->busy = 0;
+	PIOS_IRQ_Enable();
+	
 #endif
 	return 0;
 }

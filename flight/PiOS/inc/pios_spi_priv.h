@@ -69,6 +69,8 @@ struct pios_spi_dev {
 	uint8_t rx_dummy_byte;
 #if defined(PIOS_INCLUDE_FREERTOS)
 	xSemaphoreHandle busy;
+#else
+	uint8_t busy;
 #endif
 };
 

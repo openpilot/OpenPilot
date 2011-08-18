@@ -92,6 +92,11 @@ static void PIOS_IMU3000_Config(PIOS_IMU3000_ConfigTypeDef * IMU3000_Config_Stru
 {
 	// TODO: Add checks against current config so we only update what has changed
 
+	// Reset chip and fifo
+	while (PIOS_IMU3000_Write(PIOS_IMU3000_USER_CTRL_REG, 0x01 | 0x02) != 0);
+	PIOS_DELAY_WaituS(20);
+	while (PIOS_IMU3000_Write(PIOS_IMU3000_USER_CTRL_REG, 0x00) != 0);
+
 	// FIFO storage
 	while (PIOS_IMU3000_Write(PIOS_IMU3000_FIFO_EN_REG, IMU3000_Config_Struct->Fifo_store) != 0);
 
@@ -142,36 +147,62 @@ int32_t PIOS_IMU3000_ReadID()
 }
 
 /**
- * @brief Reads the data from the IMU3000 FIFO
+ * \brief Reads the data from the IMU3000 FIFO
  * \param[out] buffer destination buffer
  * \param[in] len maximum number of bytes which should be read
+ * \note This returns the data as X, Y, Z the temperature
  * \return number of bytes transferred if operation was successful
  * \return -1 if error during I2C transfer
  */
 uint32_t imu_read = 0;
-
-int32_t PIOS_IMU3000_ReadFifo(uint8_t * buffer, uint16_t len)
+uint16_t fifo_level;
+uint8_t fifo_level_data[2];	
+int16_t footer_flush;
+uint8_t imu3000_read_buffer[10]; // Right now using temp,X,Y,Z,fifo
+bool first_read = true;
+int32_t PIOS_IMU3000_ReadFifo(int16_t * buffer)
 {
-	uint16_t fifo_level;	
-	int8_t retval1, retval2;	
-		
 	// Get the number of bytes in the fifo	
-	retval1 = PIOS_IMU3000_Read(PIOS_IMU3000_FIFO_CNT_MSB, (uint8_t *) &fifo_level, sizeof(fifo_level));
-	if(retval1 != 0)
+	if(PIOS_IMU3000_Read(PIOS_IMU3000_FIFO_CNT_MSB, (uint8_t *) &fifo_level_data, sizeof(fifo_level_data)) != 0)
 		return -1;
-	
-	if(len > fifo_level)
-		len = fifo_level;
-	len -= (len % 10); // only read chunks of 10 bytes (includes footer and temperature measurement)
 
-	// No bytes available to transfer
-	if(len == 0) 
-		return 0;
+	fifo_level = (fifo_level_data[0] << 8) + fifo_level_data[1];
+
+	if(first_read) {
+		// Stupid system for IMU3000.  If first read from buffer then we will read 4 sensors without fifo
+		// footer.  After this we will read out a fifo footer
+		if(fifo_level < sizeof(imu3000_read_buffer))
+			return -1;
+
+		// Leave footer in buffer
+		if(PIOS_IMU3000_Read(PIOS_IMU3000_FIFO_REG, imu3000_read_buffer, sizeof(imu3000_read_buffer) - 2) != 0)
+			return -1;
 		
-	imu_read += len;
+		buffer[0] = imu3000_read_buffer[2] << 8 | imu3000_read_buffer[3];
+		buffer[1] = imu3000_read_buffer[4] << 8 | imu3000_read_buffer[5];
+		buffer[2] = imu3000_read_buffer[6] << 8 | imu3000_read_buffer[7];
+		buffer[3] = imu3000_read_buffer[0] << 8 | imu3000_read_buffer[1];
+		
+		first_read = false;
+	} else {
+		// Stupid system for IMU3000.  Ensure something is left in buffer
+		if(fifo_level < (sizeof(imu3000_read_buffer) + 2))
+			return -1;
 	
-	retval2 = PIOS_IMU3000_Read(PIOS_IMU3000_FIFO_REG, (uint8_t *) &buffer, len);
-	return (retval2 < 0) ? -1 : len;
+		// Leave footer in buffer
+		if(PIOS_IMU3000_Read(PIOS_IMU3000_FIFO_REG, imu3000_read_buffer, sizeof(imu3000_read_buffer)) != 0)
+			return -1;
+		
+		// First two bytes are left over fifo from last call
+		buffer[0] = imu3000_read_buffer[4] << 8 | imu3000_read_buffer[5];
+		buffer[1] = imu3000_read_buffer[6] << 8 | imu3000_read_buffer[7];
+		buffer[2] = imu3000_read_buffer[8] << 8 | imu3000_read_buffer[9];
+		buffer[3] = imu3000_read_buffer[2] << 8 | imu3000_read_buffer[3];
+	}
+
+	imu_read += sizeof(imu3000_read_buffer);
+
+	return 0;
 }
 
 /**

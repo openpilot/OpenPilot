@@ -171,15 +171,7 @@ int main()
 	PIOS_Board_Init();
 	PIOS_LED_Off(LED1);
 	PIOS_LED_On(LED2);
-	
-#if defined(PIOS_INCLUDE_HMC5883) && defined(PIOS_INCLUDE_I2C)
-	// Get 3 ID bytes
-	strcpy((char *)mag_data.id, "ZZZ");
-	PIOS_HMC5883_ReadID(mag_data.id);
-#endif
-	PIOS_LED_Off(LED1);
-	PIOS_LED_Off(LED2);
-	
+		
 	// Sensors need a second to start
 	PIOS_DELAY_WaitmS(100);
 	
@@ -217,7 +209,6 @@ int main()
 	
 	/* we didn't connect the callbacks before because we have to wait
 	 for all data to be up to date before doing anything*/
-	
 	AHRSCalibrationConnectCallback(calibration_callback);
 	AHRSSettingsConnectCallback(settings_callback);
 	HomeLocationConnectCallback(homelocation_callback);
@@ -227,8 +218,6 @@ int main()
 	
 	/******************* Main EKF loop ****************************/
 	while(1) {
-		
-		
 		AhrsPoll();
 		AhrsStatusData status;
 		AhrsStatusGet(&status);
@@ -256,7 +245,7 @@ int main()
 			continue;
 		}
 		
-		//		print_ekf_binary();
+		//print_ekf_binary();
 		
 		/* If algorithm changed reinit.  This could go in callback but wouldn't be synchronous */
 		if (ahrs_algorithm != last_ahrs_algorithm)
@@ -360,6 +349,8 @@ static void panic(uint32_t blinks)
  */
 uint16_t accel_samples = 0;
 uint8_t gyro_len;
+int32_t gyro_accum[3];
+int16_t gyro_fifo[4];
 bool get_accel_gyro_data()
 {
 	int16_t accel[3];
@@ -379,15 +370,22 @@ bool get_accel_gyro_data()
 	accel[1] = accel_accum[1] / accel_samples;
 	accel[2] = accel_accum[2] / accel_samples;
 	
-	int16_t gyro_fifo[4 * 100];
-	int32_t gyro_accum[3] = {0, 0, 0};
+	gyro_accum[0] = 0;
+	gyro_accum[1] = 0;
+	gyro_accum[2] = 0;
 	int16_t gyro[3];
-	gyro_len = PIOS_IMU3000_ReadFifo((uint8_t *) gyro_fifo, sizeof(gyro_fifo));
-	gyro_len /= 8;
-	for(int i = 0; i < gyro_len; i++) {
-		gyro_accum[0] += gyro_fifo[i * 4];
-		gyro_accum[1] += gyro_fifo[1 + i * 4];
-		gyro_accum[2] += gyro_fifo[2 + i * 4];
+	gyro_len = 0;
+	int32_t read_good;
+	
+	// Make sure we get one sample
+	while((read_good = PIOS_IMU3000_ReadFifo(gyro_fifo)) != 0);
+	while(read_good == 0) {
+		gyro_len++;
+
+		gyro_accum[0] += gyro_fifo[0];
+		gyro_accum[1] += gyro_fifo[1];
+		gyro_accum[2] += gyro_fifo[2];
+		read_good = PIOS_IMU3000_ReadFifo(gyro_fifo);
 	}
 	gyro[0] = gyro_accum[0] / gyro_len;
 	gyro[1] = gyro_accum[1] / gyro_len;

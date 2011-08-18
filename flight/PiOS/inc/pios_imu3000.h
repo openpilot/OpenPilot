@@ -116,6 +116,7 @@ struct pios_imu3000_data {
 	int16_t x;
 	int16_t y;
 	int16_t z;
+	int16_t temp;
 };
 
 struct pios_imu3000_cfg {
@@ -127,7 +128,7 @@ struct pios_imu3000_cfg {
 /* Public Functions */
 extern void PIOS_IMU3000_Init(const struct pios_imu3000_cfg * cfg);
 extern bool PIOS_IMU3000_NewDataAvailable(void);
-extern int32_t PIOS_IMU3000_ReadFifo(uint8_t * buffer, uint16_t len);
+extern int32_t PIOS_IMU3000_ReadFifo(int16_t * buffer);
 extern int32_t PIOS_IMU3000_ReadGyros(int16_t * data);
 extern int32_t PIOS_IMU3000_ReadID();
 extern uint8_t PIOS_IMU3000_Test();

@@ -102,7 +102,6 @@ void PIOS_BMA180_Attach(uint32_t spi_id);
 float PIOS_BMA180_GetScale();
 int32_t PIOS_BMA180_ReadAccels(int16_t * data);
 int32_t PIOS_BMA180_Test();
-void PIOS_BMA180_IRQHandler(void);
 t_fifo_buffer * PIOS_BMA180_GetFifo();
 
 #endif /* PIOS_BMA180_H */

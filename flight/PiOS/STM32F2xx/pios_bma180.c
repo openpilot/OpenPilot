@@ -40,7 +40,7 @@ static int32_t PIOS_BMA180_SelectBW(enum bma180_bandwidth bw);
 static int32_t PIOS_BMA180_SetRange(enum bma180_range range);
 static int32_t PIOS_BMA180_Config();
 static int32_t PIOS_BMA180_EnableIrq();
-
+static void PIOS_BMA180_IRQHandler(void);
 volatile bool pios_bma180_data_ready = false;
 
 #define PIOS_BMA180_MAX_DOWNSAMPLE 10
@@ -319,23 +319,39 @@ int32_t PIOS_BMA180_Test()
 	return 0;
 }
 
-uint32_t pios_bma180_count = 0;
+static uint8_t pios_bma_180_dmabuf[7];
+static void PIOS_BMA180_SPI_Callback() 
+{		
+	// TODO: Make this conversion depend on configuration scale
+	int16_t data[3];
+	data[0] = (pios_bma_180_dmabuf[2] << 8) | pios_bma_180_dmabuf[1];
+	data[1] = (pios_bma_180_dmabuf[4] << 8) | pios_bma_180_dmabuf[3];
+	data[2] = (pios_bma_180_dmabuf[6] << 8) | pios_bma_180_dmabuf[5];
+	data[0] /= 4;
+	data[1] /= 4;
+	data[2] /= 4;
+
+	// Don't release bus till data has copied
+	PIOS_BMA180_ReleaseBus();	
+
+	// Must not return before releasing bus
+	if(fifoBuf_getFree(&pios_bma180_fifo) < sizeof(data))
+		return;
+	
+	fifoBuf_putData(&pios_bma180_fifo, data, sizeof(data));
+}
 
 /**
  * @brief IRQ Handler
  */
-void PIOS_BMA180_IRQHandler(void)
+const static uint8_t pios_bma180_req_buf[7] = {BMA_X_LSB_ADDR | 0x80,0,0,0,0,0};
+static void PIOS_BMA180_IRQHandler(void)
 {
-	int16_t accels[3];
-	pios_bma180_count++;
-	
-	if(PIOS_BMA180_ReadAccels(accels) < 0)
-		return;
-	if(fifoBuf_getFree(&pios_bma180_fifo) < sizeof(accels))
-		return;
-	
-	fifoBuf_putData(&pios_bma180_fifo, accels, sizeof(accels));
+	// If we can't get the bus then just move on for efficiency
+	if(PIOS_BMA180_ClaimBus() == 0)
+		PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,pios_bma180_req_buf,(uint8_t *) pios_bma_180_dmabuf, 7, PIOS_BMA180_SPI_Callback);	
 }
+
 
 /**
  * The physical IRQ handler

@@ -73,11 +73,7 @@ static void ahrscommsTask(void *parameters);
  */
 int32_t AHRSCommsStart(void)
 {
-	// Start main task
-	AhrsStatusInitialize();
-	AHRSCalibrationInitialize();
-	AttitudeRawInitialize();
-	
+	// Start main task	
 	xTaskCreate(ahrscommsTask, (signed char *)"AHRSComms", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_AHRSCOMMS, taskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_AHRS);
@@ -91,6 +87,11 @@ int32_t AHRSCommsStart(void)
  */
 int32_t AHRSCommsInitialize(void)
 {
+	AhrsStatusInitialize();
+	AHRSCalibrationInitialize();
+	AttitudeRawInitialize();
+	VelocityActualInitialize();
+	PositionActualInitialize();
 
 	return 0;
 }

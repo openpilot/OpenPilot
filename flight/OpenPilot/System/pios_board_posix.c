@@ -29,6 +29,10 @@
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 
+#include "attituderaw.h"
+#include "positionactual.h"
+#include "velocityactual.h"
+
 #include "pios_rcvr_priv.h"
 
 struct pios_rcvr_channel_map pios_rcvr_channel_to_id_map[PIOS_RCVR_MAX_CHANNELS];
@@ -171,6 +175,10 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_GPS */
 #endif
 
+	// Initialize these here as posix has no AHRSComms
+	AttitudeRawInitialize();
+	VelocityActualInitialize();
+	PositionActualInitialize();
 
 }
 

@@ -74,7 +74,11 @@ int32_t FlightPlanStart()
 int32_t FlightPlanInitialize()
 {
 	taskHandle = NULL;
-
+	
+	FlightPlanStatusInitialize();
+	FlightPlanControlInitialize();
+	FlightPlanSettingsInitialize();
+	
 	// Listen for object updates
 	FlightPlanControlConnectCallback(&objectUpdatedCb);
 

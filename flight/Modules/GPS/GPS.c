@@ -127,7 +127,7 @@ int32_t GPSInitialize(void)
 	GPSPositionInitialize();
 	GPSTimeInitialize();
 	HomeLocationInitialize();
-
+	
 	// TODO: Get gps settings object
 	gpsPort = PIOS_COM_GPS;
 

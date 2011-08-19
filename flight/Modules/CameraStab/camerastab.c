@@ -84,6 +84,12 @@ int32_t CameraStabInitialize(void)
 	return 0;
 }
 
+/* stub: module has no module thread */
+int32_t CameraStabStart(void)
+{
+	return 0;
+}
+
 static void attitudeUpdated(UAVObjEvent* ev)
 {
 	if (ev->obj != AttitudeActualHandle())

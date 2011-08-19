@@ -87,7 +87,7 @@ void ConfigCameraStabilizationWidget::applySettings()
     // Enable or disable the settings
     HwSettings * hwSettings = HwSettings::GetInstance(getObjectManager());
     HwSettings::DataFields hwSettingsData = hwSettings->getData();
-    hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTABILIZATION] =
+    hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTAB] =
             m_camerastabilization->enableCameraStabilization->isChecked() ?
                 HwSettings::OPTIONALMODULES_ENABLED :
                 HwSettings::OPTIONALMODULES_DISABLED;
@@ -177,7 +177,7 @@ void ConfigCameraStabilizationWidget::refreshValues()
     HwSettings * hwSettings = HwSettings::GetInstance(getObjectManager());
     HwSettings::DataFields hwSettingsData = hwSettings->getData();
     m_camerastabilization->enableCameraStabilization->setChecked(
-                hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTABILIZATION] ==
+                hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTAB] ==
                 HwSettings::OPTIONALMODULES_ENABLED);
 
     CameraStabSettings * cameraStabSettings = CameraStabSettings::GetInstance(getObjectManager());

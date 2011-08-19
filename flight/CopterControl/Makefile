@@ -64,8 +64,10 @@ endif
 
 FLASH_TOOL = OPENOCD
 
+OPTMODULES = CameraStab GPS
 # List of modules to include
-MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP CameraStab
+MODULES = ${OPTMODULES}
+MODULES += Attitude Stabilization Actuator ManualControl FirmwareIAP
 # Telemetry must be last to grab the optional modules
 MODULES += Telemetry
 
@@ -166,6 +168,7 @@ SRC += $(OPUAVSYNTHDIR)/firmwareiapobj.c
 SRC += $(OPUAVSYNTHDIR)/attitudesettings.c
 SRC += $(OPUAVSYNTHDIR)/camerastabsettings.c
 SRC += $(OPUAVSYNTHDIR)/cameradesired.c
+SRC += $(OPUAVSYNTHDIR)/gpsposition.c
 SRC += $(OPUAVSYNTHDIR)/hwsettings.c
 
 SRC += $(OPUAVSYNTHDIR)/taskinfo.c
@@ -511,6 +514,19 @@ endif
 endif
 endif
 
+gencode: ${OUTDIR}/InitOptMods.h
+
+# this is supposed to be  standard function, but apparently it is not
+uc = $(subst a,A,$(subst b,B,$(subst c,C,$(subst d,D,$(subst e,E,$(subst f,F,$(subst g,G,$(subst h,H,$(subst i,I,$(subst j,J,$(subst k,K,$(subst l,L,$(subst m,M,$(subst n,N,$(subst o,O,$(subst p,P,$(subst q,Q,$(subst r,R,$(subst s,S,$(subst t,T,$(subst u,U,$(subst v,V,$(subst w,W,$(subst x,X,$(subst y,Y,$(subst z,Z,$1))))))))))))))))))))))))))
+
+${OUTDIR}/InitOptMods.h:
+	@echo ${quote}${foreach MOD, ${OPTMODULES}, int32_t ${MOD}Initialize(); }${quote} > ${OUTDIR}/InitOptMods.h
+	@echo ${quote}${foreach MOD, ${OPTMODULES}, int32_t ${MOD}Start(); }${quote} >> ${OUTDIR}/InitOptMods.h
+	@echo ${quote}#define MODULE_INITIALISE_OPTIONAL(list) \${quote} >> ${OUTDIR}/InitOptMods.h
+	@echo ${quote}${foreach MOD, ${OPTMODULES}, OPTMODULE_INIT(list, $(call uc, ${MOD}), ${MOD});}${quote} >> ${OUTDIR}/InitOptMods.h
+	@echo ${quote}#define MODULE_TASKCREATE_OPTIONAL(list) \${quote} >> ${OUTDIR}/InitOptMods.h
+	@echo ${quote}${foreach MOD, ${OPTMODULES}, OPTMODULE_START(list, $(call uc, ${MOD}), ${MOD});}${quote} >> ${OUTDIR}/InitOptMods.h
+
 # Generate code for PyMite
 #$(OUTDIR)/pmlib_img.c $(OUTDIR)/pmlib_nat.c $(OUTDIR)/pmlibusr_img.c $(OUTDIR)/pmlibusr_nat.c $(OUTDIR)/pmfeatures.h: $(wildcard $(PYMITELIB)/*.py) $(wildcard $(PYMITEPLAT)/*.py) $(wildcard $(FLIGHTPLANLIB)/*.py) $(wildcard $(FLIGHTPLANS)/*.py)
 #	@echo $(MSG_PYMITEINIT) $(call toprel, $@)
@@ -553,13 +569,13 @@ $(eval $(call OPFW_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BOARD_TYPE),$(BOARD_REVISI
 $(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(FW_BANK_BASE),$(FW_BANK_SIZE)))
 
 .PHONY: elf lss sym hex bin bino opfw
-elf: $(OUTDIR)/$(TARGET).elf
-lss: $(OUTDIR)/$(TARGET).lss
-sym: $(OUTDIR)/$(TARGET).sym
-hex: $(OUTDIR)/$(TARGET).hex
-bin: $(OUTDIR)/$(TARGET).bin
-bino: $(OUTDIR)/$(TARGET).bin.o
-opfw: $(OUTDIR)/$(TARGET).opfw
+elf: gencode $(OUTDIR)/$(TARGET).elf
+lss: gencode $(OUTDIR)/$(TARGET).lss
+sym: gencode $(OUTDIR)/$(TARGET).sym
+hex: gencode $(OUTDIR)/$(TARGET).hex
+bin: gencode $(OUTDIR)/$(TARGET).bin
+bino: gencode $(OUTDIR)/$(TARGET).bin.o
+opfw: gencode $(OUTDIR)/$(TARGET).opfw
 
 # Display sizes of sections.
 $(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))

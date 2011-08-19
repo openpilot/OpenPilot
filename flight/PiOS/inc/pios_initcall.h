@@ -31,6 +31,8 @@
 #ifndef PIOS_INITCALL_H
 #define PIOS_INITCALL_H
 
+#include "InitOptMods.h"
+
 /* 
  * This implementation is heavily based on the Linux Kernel initcall
  * infrastructure:
@@ -76,6 +78,16 @@ extern initmodule_t __module_initcall_start[], __module_initcall_end[];
 #define MODULE_TASKCREATE_ALL  { for (initmodule_t *fn = __module_initcall_start; fn < __module_initcall_end; fn++) \
 									if (fn->fn_tinit) \
 									   (fn->fn_tinit)(); }
+
+#define OPTMODULE_INIT(list,moduc,mod) \
+	if(list[ HWSETTINGS_OPTIONALMODULES_##moduc ] == HWSETTINGS_OPTIONALMODULES_ENABLED) { \
+		mod##Initialize(); \
+	}
+
+#define OPTMODULE_START(list,moduc,mod) \
+	if(list[ HWSETTINGS_OPTIONALMODULES_##moduc ] == HWSETTINGS_OPTIONALMODULES_ENABLED) { \
+		mod##Start(); \
+	}
 
 #endif	/* PIOS_INITCALL_H */
 

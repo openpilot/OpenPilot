@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configgadgetwidget.h
+ * @file       configahrstwidget.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief The Configuration Gadget used to update settings in the firmware
+ * @brief Telemetry configuration panel
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,45 +24,45 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGGADGETWIDGET_H
-#define CONFIGGADGETWIDGET_H
+#ifndef CONFIGCAMERASTABILIZATIONWIDGET_H
+#define CONFIGCAMERASTABILIZATIONWIDGET_H
 
-#include "uavtalk/telemetrymanager.h"
+#include "ui_camerastabilization.h"
+#include "configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
-#include "objectpersistence.h"
 #include <QtGui/QWidget>
+#include <QtSvg/QSvgRenderer>
+#include <QtSvg/QGraphicsSvgItem>
 #include <QList>
-//#include <QtWebKit/QWebView>
-#include <QTextBrowser>
-#include "utils/pathutils.h"
+#include <QTimer>
+#include <QMutex>
 
-//#include "fancytabwidget.h"
-#include "utils/mytabbedstackwidget.h"
+#include "camerastabsettings.h"
 
-
-class ConfigGadgetWidget: public QWidget
+class ConfigCameraStabilizationWidget: public ConfigTaskWidget
 {
     Q_OBJECT
-    QTextBrowser* help;
 
 public:
-    ConfigGadgetWidget(QWidget *parent = 0);
-    ~ConfigGadgetWidget();
-    enum widgetTabs {hardware=0, aircraft, input, output, ins, stabilization, camerastabilization};
+    ConfigCameraStabilizationWidget(QWidget *parent = 0);
+    ~ConfigCameraStabilizationWidget();
+    
+private:
+    virtual void enableControls(bool enable);
 
-public slots:
-    void onAutopilotConnect();
-    void onAutopilotDisconnect();
+    Ui_CameraStabilizationWidget *m_camerastabilization;
 
-signals:
-    void autopilotConnected();
-    void autopilotDisconnected();
+private slots:
+    void openHelp();
+    void applySettings();
+    void saveSettings();
+    void refreshValues();
 
 protected:
-        void resizeEvent(QResizeEvent * event);
-        MyTabbedStackWidget *ftw;
+    void connectUpdates();
+    void disconnectUpdates();
 };
 
-#endif // CONFIGGADGETWIDGET_H
+#endif // ConfigCameraStabilization_H

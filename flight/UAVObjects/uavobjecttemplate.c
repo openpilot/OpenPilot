@@ -45,10 +45,14 @@ static UAVObjHandle handle;
 /**
  * Initialize object.
  * \return 0 Success
- * \return -1 Failure
+ * \return -1 Failure to initialize or -2 for already initialized
  */
 int32_t $(NAME)Initialize(void)
 {
+	// Don't set the handle to null if already registered
+	if(UAVObjGetByID($(NAMEUC)_OBJID) != NULL)
+		return -2;
+	
 	// Register object with the object manager
 	handle = UAVObjRegister($(NAMEUC)_OBJID, $(NAMEUC)_NAME, $(NAMEUC)_METANAME, 0,
 			$(NAMEUC)_ISSINGLEINST, $(NAMEUC)_ISSETTINGS, $(NAMEUC)_NUMBYTES, &$(NAME)SetDefaults);
@@ -63,8 +67,6 @@ int32_t $(NAME)Initialize(void)
 		return -1;
 	}
 }
-
-UAVOBJ_INITCALL($(NAME)Initialize);
 
 /**
  * Initialize object fields and metadata with the default values.

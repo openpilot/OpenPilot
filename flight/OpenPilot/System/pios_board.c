@@ -1023,7 +1023,6 @@ void PIOS_Board_Init(void) {
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
 	UAVObjInitialize();
-	UAVObjectsInitializeAll();
 
 #if defined(PIOS_INCLUDE_RTC)
 	/* Initialize the real-time clock and its associated tick */

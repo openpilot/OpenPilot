@@ -112,6 +112,10 @@ int32_t AttitudeStart(void)
  */
 int32_t AttitudeInitialize(void)
 {
+	AttitudeActualInitialize();
+	AttitudeRawInitialize();
+	AttitudeSettingsInitialize();
+
 	// Initialize quaternion
 	AttitudeActualData attitude;
 	AttitudeActualGet(&attitude);

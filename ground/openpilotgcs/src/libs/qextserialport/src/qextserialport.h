@@ -135,10 +135,11 @@ struct PortSettings
 #include <sys/select.h>
 #include <QSocketNotifier>
 #elif (defined Q_OS_WIN)
+#include <QTimer>
 #include <windows.h>
 #include <QThread>
 #include <QReadWriteLock>
-#include <QtCore/private/qwineventnotifier_p.h>
+#include "utils/qwineventnotifier_p.h"
 #endif
 
 /*!
@@ -308,6 +309,9 @@ class QEXTSERIALPORT_EXPORT QextSerialPort: public QIODevice
 #ifdef Q_OS_WIN
     private slots:
         void onWinEvent(HANDLE h);
+        void triggerTxEmpty();
+private:
+        QTimer fakeTxEmpty;
 #endif
 
     private:

@@ -25,11 +25,17 @@
 WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
 TOP      := $(realpath $(WHEREAMI)/../../)
 include $(TOP)/make/firmware-defs.mk
+include $(TOP)/make/boards/$(BOARD_NAME)/board-info.mk
+
+# Target file name (without extension).
+TARGET := fw_$(BOARD_NAME)
+
+# Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
+OUTDIR := $(TOP)/build/$(TARGET)
 
 # Set developer code and compile options
 # Set to YES for debugging
 DEBUG ?= YES
-USE_BOOTLOADER ?= NO
 
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= YES
@@ -41,26 +47,6 @@ REMOVE_CMD = rm
 endif
 
 FLASH_TOOL = OPENOCD
-
-# MCU name, submodel and board
-# - MCU used for compiler-option (-mcpu)
-# - MODEL used for linker-script name (-T) and passed as define
-# - BOARD just passed as define (optional)
-MCU      = cortex-m3
-CHIP     = STM32F103RET
-BOARD    = STM3210E_INS
-MODEL    = HD
-ifeq ($(USE_BOOTLOADER), YES)
-BOOT_MODEL    = $(MODEL)_BL
-else
-BOOT_MODEL    = $(MODEL)_NB
-endif
-
-# Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = $(TOP)/build/ins
-
-# Target file name (without extension).
-TARGET = INS
 
 # Paths
 INS = ./
@@ -168,7 +154,7 @@ CPPSRCARM =
 # Even though the DOS/Win* filesystem matches both .s and .S the same,
 # it will preserve the spelling of the filenames, and gcc itself does
 # care about how the name is spelled on its command-line.
-ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL).S
+ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL)$(MODEL_SUFFIX).S
 
 # List Assembler source files here which must be assembled in ARM-Mode..
 ASRCARM =
@@ -231,9 +217,7 @@ CDEFS = -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
 CDEFS += -DIN_INS
-ifeq ($(USE_BOOTLOADER), YES)
-CDEFS += -DUSE_BOOTLOADER
-endif
+
 # Place project-specific -D and/or -U options for
 # Assembler with preprocessor here.
 #ADEFS = -DUSE_IRQ_ASM_WRAPPER
@@ -311,22 +295,11 @@ LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc
 
 # Set linker-script name depending on selected submodel name
-LDFLAGS +=-T$(LINKERSCRIPTPATH)/link_$(BOARD)_$(BOOT_MODEL).ld
-
-OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).elf  
-# Program                                                                                                                                                                                                                            
-OOCD_CL+=-c "flash write_image $(OOCD_LOADFILE)"
-# Verify
-OOCD_CL+=-c "verify_image $(OOCD_LOADFILE)"
-# reset target
-OOCD_CL+=-c "reset run"
-# # terminate OOCD after programming
-OOCD_CL+=-c shutdown
+LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_memory.ld
+LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_sections.ld
 
 # Define programs and commands.
 REMOVE  = $(REMOVE_CMD) -f
-###SHELL   = sh
-###COPY    = cp
 
 # List of all source files.
 ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
@@ -358,21 +331,6 @@ endif
 endif
 endif
 
-# Program the device.
-ifeq ($(USE_BOOTLOADER), YES)
-# Program the device with OP Upload Tool".
-program: $(OUTDIR)/$(TARGET).bin
-	@echo ${quote}Programming with OP Upload Tool${quote}
-	../../ground/src/experimental/upload-build-desktop/debug/OPUploadTool -d 1 -p $(OUTDIR)/$(TARGET).bin
-else
-ifeq ($(FLASH_TOOL),OPENOCD)
-# Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
-program: $(OUTDIR)/$(TARGET).elf
-	@echo ${quote}Programming with OPENOCD${quote}
-	$(OOCD_EXE) $(OOCD_CL)
-endif
-endif
-
 # Link: create ELF output file from object files.
 $(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ)))
 
@@ -400,21 +358,38 @@ $(eval $(call PARTIAL_COMPILE_TEMPLATE, SRC))
 # Compile: create assembler files from C source files. ARM only
 $(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
 
-.PHONY: elf lss sym hex bin
+$(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
+
+$(eval $(call OPFW_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BOARD_TYPE),$(BOARD_REVISION)))
+
+# Add jtag targets (program and wipe)
+$(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(FW_BANK_BASE),$(FW_BANK_SIZE)))
+
+.PHONY: elf lss sym hex bin bino opfw
 elf: $(OUTDIR)/$(TARGET).elf
 lss: $(OUTDIR)/$(TARGET).lss
 sym: $(OUTDIR)/$(TARGET).sym
 hex: $(OUTDIR)/$(TARGET).hex
 bin: $(OUTDIR)/$(TARGET).bin
+bino: $(OUTDIR)/$(TARGET).bin.o
+opfw: $(OUTDIR)/$(TARGET).opfw
 
 # Display sizes of sections.
 $(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))
-.PHONY: size
-size: $(OUTDIR)/$(TARGET).elf_size
 
 # Generate Doxygen documents
 docs:
 	doxygen  $(DOXYGENDIR)/doxygen.cfg
+
+# Install: install binary file with prefix/suffix into install directory
+install: $(OUTDIR)/$(TARGET).opfw
+ifneq ($(INSTALL_DIR),)
+	@echo $(MSG_INSTALLING) $(call toprel, $<)
+	$(V1) mkdir -p $(INSTALL_DIR)
+	$(V1) $(INSTALL) $< $(INSTALL_DIR)/$(INSTALL_PFX)$(TARGET)$(INSTALL_SFX).opfw
+else
+	$(error INSTALL_DIR must be specified for $@)
+endif
 
 # Target: clean project.
 clean: clean_list
@@ -450,6 +425,5 @@ else
 -include $(shell mkdir $(OUTDIR) 2>/dev/null) $(shell mkdir $(OUTDIR)/dep 2>/dev/null) $(wildcard $(OUTDIR)/dep/*)
 endif
 
-
 # Listing of phony targets.
-.PHONY : all build clean clean_list program
+.PHONY : all build clean clean_list install

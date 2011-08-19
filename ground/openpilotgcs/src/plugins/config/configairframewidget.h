@@ -32,6 +32,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
+#include "uavtalk/telemetrymanager.h"
 #include <QtGui/QWidget>
 #include <QList>
 #include <QItemDelegate>
@@ -59,7 +60,7 @@ private:
     void setupMotors(QList<QString> motorList);
 
     void resetField(UAVObjectField * field);
-    void resetMixer (MixerCurveWidget *mixer, int numElements);
+    void resetMixer (MixerCurveWidget *mixer, int numElements, double maxvalue);
     void resetActuators();
     //void setMixerChannel(int channelNumber, bool channelIsMotor, QList<double> vector);
     void setupQuadMotor(int channel, double roll, double pitch, double yaw);
@@ -72,9 +73,9 @@ private:
     UAVObject::Metadata accInitialData;
 
 private slots:
-    void requestAircraftUpdate();
-    void sendAircraftUpdate();
-    void saveAircraftUpdate();
+    virtual void refreshWidgetsValues();
+    void updateObjectsFromWidgets();
+   // void saveAircraftUpdate();
     void setupAirframeUI(QString type);
     void toggleAileron2(int index);
     void toggleElevator2(int index);
@@ -89,6 +90,7 @@ private slots:
     void updateCustomThrottle1CurveValue(QList<double> list, double value);
     void updateCustomThrottle2CurveValue(QList<double> list, double value);
     void enableFFTest();
+    void openHelp();
 
 protected:
     void showEvent(QShowEvent *event);

@@ -33,26 +33,34 @@ It is expected that you have the following tools installed into the listed
 locations (but any other locations are fine as well):
 
  - Python            in C:\Python27
- - CodeSourcery G++  in C:\CodeSourcery
- - QtSDK             in C:\Qt\2010.05
+ - QtSDK             in C:\Qt\2010.05 or C:\QtSDK (depending on SDK version)
+ - CodeSourcery G++  in %ProgramFiles%\CodeSourcery\Sourcery G++ Lite
  - msysGit           in %ProgramFiles%\Git
  - Unicode NSIS      in %ProgramFiles%\NSIS\Unicode
+ - OpenOCD           in C:\OpenOCD\0.4.0\bin (optional)
+
+The SDL library and headers should be installed into Qt directories to build
+the GCS. Check the wiki or ground/openpilotgcs/copydata.pro for details.
 
 Also it is assumed that you have the C:\Program Files\Git\cmd\ directory in
 the PATH. Usually this is the case for msysGit installation if you have chosen
 the 2nd option: put only git and gitk in the PATH (it is recommended option).
 
-Now you need to copy two files to your msysGit installation folders.
+Now you need to copy few files to your msysGit installation folders.
 Assuming that you installed the msysGit into C:\Program Files\Git\,
 you have to copy:
 
-   make\winx86\make    ->  C:\Program Files\Git\bin\
-   make\winx86\sh.cmd  ->  C:\Program Files\Git\cmd\
+   make\winx86\bin\*  ->  C:\Program Files\Git\bin\
+   make\winx86\cmd\*  ->  C:\Program Files\Git\cmd\
 
 If you have msysGit installed into another directory, you need to update paths
 accordingly. Also if you have tools installed into different directories and
 they are not in the PATH, then you may want to update paths in the sh.cmd
 script too (it is self-documented).
+
+Note for Windows 64-bit users: 64-bit systems use %ProgramFiles(x86)% folder
+as default for program files instead of %ProgramFiles%. You have to check where
+your tools are installed and update paths above accordingly.
 
 
 3. How to use it?
@@ -93,7 +101,7 @@ software and flight firmware built in the end.
 4) To build parts of the system you can use, for example, such commands:
 
    user@pc /d/Work/OpenPilot/git (master)
-   $ make -j2 USE_BOOTLOADER=YES GCS_BUIL_CONF=release gcs coptercontrol bl_coptercontrol
+   $ make -j2 GCS_BUILD_CONF=release gcs coptercontrol
 
 or to completely remove the build directory:
 
@@ -109,7 +117,7 @@ or to completely remove the build directory:
    #!/bin/sh
    # This is the cc_make_release.sh file used to build CC release software
    cd D:/Work/OpenPilot/git
-   make -j2 USE_BOOTLOADER=YES GCS_BUIL_CONF=release gcs coptercontrol bl_coptercontrol
+   make -j2 GCS_BUILD_CONF=release gcs coptercontrol
    echo RC=$?
 
 2) Run it typing:
@@ -170,7 +178,7 @@ to get rid of git bash welcome message on every script invocation.
 
 Currently there may be some problems running scripts which contain spaces in
 file names or located in directories which contain spaces in full paths.
-It results in in strange "file not found" or other errors.
+It results in strange "file not found" or other errors.
 
 It is recommended to avoid using such names with spaces.
 

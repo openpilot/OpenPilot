@@ -27,9 +27,11 @@
 #include <stdint.h>
 
 #include "pios.h"
+#include <pios_board_info.h>
 #include "openpilot.h"
 #include "firmwareiap.h"
 #include "firmwareiapobj.h"
+#include "flightstatus.h"
 
 // Private constants
 #define IAP_CMD_STEP_1      1122
@@ -86,17 +88,22 @@ static void resetTask(UAVObjEvent *);
  * \note
  *
  */
-
+MODULE_INITCALL(FirmwareIAPInitialize, 0)
 int32_t FirmwareIAPInitialize()
 {
-	data.BoardType= BOARD_TYPE;
+	
+	FirmwareIAPObjInitialize();
+	
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+
+	data.BoardType= bdinfo->board_type;
 	PIOS_BL_HELPER_FLASH_Read_Description(data.Description,FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM);
 	PIOS_SYS_SerialNumberGetBinary(data.CPUSerial);
-	data.BoardRevision= BOARD_REVISION;
+	data.BoardRevision= bdinfo->board_rev;
 	data.ArmReset=0;
 	data.crc = 0;
 	FirmwareIAPObjSet( &data );
-	FirmwareIAPObjConnectCallback( &FirmwareIAPCallback );
+	if(bdinfo->magic==PIOS_BOARD_INFO_BLOB_MAGIC) FirmwareIAPObjConnectCallback( &FirmwareIAPCallback );
 	return 0;
 }
 
@@ -111,6 +118,7 @@ int32_t FirmwareIAPInitialize()
 static uint8_t    iap_state = IAP_STATE_READY;
 static void FirmwareIAPCallback(UAVObjEvent* ev)
 {
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
 	static uint32_t   last_time = 0;
 	uint32_t          this_time;
 	uint32_t          delta;
@@ -124,11 +132,11 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
 		this_time = get_time();
 		delta = this_time - last_time;
 		last_time = this_time;
-		if((data.BoardType==BOARD_TYPE)&&(data.crc != PIOS_BL_HELPER_CRC_Memory_Calc()))
+		if((data.BoardType==bdinfo->board_type)&&(data.crc != PIOS_BL_HELPER_CRC_Memory_Calc()))
 		{
 			PIOS_BL_HELPER_FLASH_Read_Description(data.Description,FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM);
 			PIOS_SYS_SerialNumberGetBinary(data.CPUSerial);
-			data.BoardRevision=BOARD_REVISION;
+			data.BoardRevision=bdinfo->board_rev;
 			data.crc = PIOS_BL_HELPER_CRC_Memory_Calc();
 			FirmwareIAPObjSet( &data );
 		}
@@ -156,6 +164,16 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
 			case IAP_STATE_STEP_2:
 				if( data.Command == IAP_CMD_STEP_3 ) {
 					if( delta > iap_time_3_low_end && delta < iap_time_3_high_end ) {
+						
+						FlightStatusData flightStatus;
+						FlightStatusGet(&flightStatus);
+						
+						if(flightStatus.Armed != FLIGHTSTATUS_ARMED_DISARMED) {
+							// Abort any attempts if not disarmed
+							iap_state = IAP_STATE_READY;
+							break;
+						}
+							
 						// we've met the three sequence of command numbers
 						// we've met the time requirements.
 						PIOS_IAP_SetRequest1();

@@ -47,6 +47,7 @@ Q_PROPERTY(QString accessMode READ accessMode WRITE setAccessMode)
 Q_PROPERTY(bool useMemoryCache READ useMemoryCache WRITE setUseMemoryCache)
 Q_PROPERTY(QString cacheLocation READ cacheLocation WRITE setCacheLocation)
 Q_PROPERTY(QString uavSymbol READ uavSymbol WRITE setUavSymbol)
+Q_PROPERTY(int maxUpdateRate READ maxUpdateRate WRITE setMaxUpdateRate)
 
 public:
     explicit OPMapGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
@@ -64,6 +65,7 @@ public:
     bool useMemoryCache() const { return m_useMemoryCache; }
     QString cacheLocation() const { return m_cacheLocation; }
     QString uavSymbol() const { return m_uavSymbol; }
+	int maxUpdateRate() const { return m_maxUpdateRate; }
 
 public slots:
     void setMapProvider(QString provider) { m_mapProvider = provider; }
@@ -76,6 +78,8 @@ public slots:
     void setUseMemoryCache(bool useMemoryCache) { m_useMemoryCache = useMemoryCache; }
     void setCacheLocation(QString cacheLocation);
     void setUavSymbol(QString symbol){m_uavSymbol=symbol;}
+	void setMaxUpdateRate(int update_rate){m_maxUpdateRate = update_rate;}
+
 private:
     QString m_mapProvider;
     int m_defaultZoom;
@@ -87,7 +91,7 @@ private:
     bool m_useMemoryCache;
     QString m_cacheLocation;
     QString m_uavSymbol;
-
+	int m_maxUpdateRate;
 };
 
 #endif // OPMAP_GADGETCONFIGURATION_H

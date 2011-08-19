@@ -1,5 +1,7 @@
 /* This is the size of the stack for early init and for all FreeRTOS IRQs */
 _irq_stack_size = 0x400;
+/* This is the size of the stack for early init: life span is until scheduler starts */
+_init_stack_size = 0x400;
 
 /* Check valid alignment for VTOR */
 ASSERT(ORIGIN(FLASH) == ALIGN(ORIGIN(FLASH), 0x80), "Start of memory region flash not aligned for startup vector table");
@@ -158,15 +160,16 @@ PROVIDE ( SysTick         = (SCS_BASE + 0x0010) ) ;
 PROVIDE ( NVIC            = (SCS_BASE + 0x0100) ) ;
 PROVIDE ( SCB             = (SCS_BASE + 0x0D00) ) ;
 
+PROVIDE(pios_board_info_blob = ORIGIN(BD_INFO));
 
 /* Sections Definitions */
 
 SECTIONS
 {
-     
     /* for Cortex devices, the beginning of the startup code is stored in the .isr_vector section, which goes to FLASH */
     .isr_vector :
     {
+        PROVIDE (pios_isr_vector_table_base = .);
         KEEP(*(.isr_vector))            /* Startup code */
         . = ALIGN(4);
     } >FLASH
@@ -178,16 +181,15 @@ SECTIONS
         *(.flashtext)            /* Startup code */
         . = ALIGN(4);
     } >FLASH
- 
-    
-    /* init sections */
-    .initcalluavobj.init :
+
+    /* module sections */
+    .initcallmodule.init :
     {
         . = ALIGN(4);
-	__uavobj_initcall_start = .;
-        KEEP(*(.initcalluavobj.init))
+	__module_initcall_start = .;
+        KEEP(*(.initcallmodule.init))
 	. = ALIGN(4);
-	__uavobj_initcall_end   = .;
+	__module_initcall_end   = .;
     } >FLASH
 
     /* the program code is stored in the .text section, which goes to Flash */
@@ -208,7 +210,6 @@ SECTIONS
          _sidata = _etext;
     } >FLASH
     
-
     /* 
      * This stack is used both as the initial sp during early init as well as ultimately
      * being used as the STM32's MSP (Main Stack Pointer) which is the same stack that
@@ -250,17 +251,44 @@ SECTIONS
     .bss :
     {
             . = ALIGN(4);
-        /* This is used by the startup in order to initialize the .bss secion */
+        /* This is used by the startup in order to initialize the .bss section */
         _sbss = .;
         
         *(.bss)
         *(COMMON)
-        
-            . = ALIGN(4);
-            /* This is used by the startup in order to initialize the .bss secion */
-         _ebss = . ;
     } >RAM
     
+    .heap (NOLOAD) :
+    {
+        . = ALIGN(4);
+        _sheap = . ;
+        _sheap_pre_rtos = . ;
+        *(.heap)
+        . = ALIGN(4);
+        _eheap = . ;
+        _eheap_pre_rtos = . ;
+        _init_stack_end = . ; 
+        _sheap_post_rtos = . ;
+        . = . + _init_stack_size ;
+        . = ALIGN(4);
+        _eheap_post_rtos = . ;
+        _init_stack_top = . - 4 ;
+    } > RAM
+
+    _free_ram = . ;
+    .free_ram (NOLOAD) :
+    {
+	. = ORIGIN(RAM) + LENGTH(RAM) - _free_ram ;
+        /* This is used by the startup in order to initialize the .bss section */
+	_ebss = . ;
+	_eram = . ;
+    } > RAM
+
+    /* keep the heap section at the end of the SRAM
+     * this will allow to claim the remaining bytes not used
+     * at run time! (done by the reset vector).
+     */
+
     PROVIDE ( end = _ebss );
     PROVIDE ( _end = _ebss );
 

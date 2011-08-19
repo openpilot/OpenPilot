@@ -38,7 +38,31 @@
  * and we cannot define a linker script for each of them atm
  */
 
-#define uavobj_initcall(fn)
+
+typedef int32_t (*initcall_t)(void);
+typedef struct {
+	initcall_t fn_minit;
+	initcall_t fn_tinit;
+} initmodule_t;
+
+/* Init module section */
+extern initmodule_t __module_initcall_start[], __module_initcall_end[];
+
+extern void InitModules();
+extern void StartModules();
+
+#define MODULE_INITCALL(ifn, sfn)
+
+#define MODULE_TASKCREATE_ALL { \
+	/* Start all module threads */ \
+	StartModules(); \
+	}
+
+#define MODULE_INITIALISE_ALL { \
+	/* Initialize modules */ \
+	InitModules(); \
+	/* Initialize the system thread */ \
+	SystemModInitialize();}
 
 #endif	/* PIOS_INITCALL_H */
 

@@ -27,7 +27,7 @@
  */
 /* Bootloader Includes */
 #include <pios.h>
-#include "stopwatch.h"
+#include <pios_board_info.h>
 #include "op_dfu.h"
 #include "usb_lib.h"
 #include "pios_iap.h"
@@ -46,9 +46,9 @@ pFunction Jump_To_Application;
 uint32_t JumpAddress;
 
 /// LEDs PWM
-uint32_t period1 = 50; // *100 uS -> 5 mS
+uint32_t period1 = 5000; // 5 mS
 uint32_t sweep_steps1 = 100; // * 5 mS -> 500 mS
-uint32_t period2 = 50; // *100 uS -> 5 mS
+uint32_t period2 = 5000; // 5 mS
 uint32_t sweep_steps2 = 100; // * 5 mS -> 500 mS
 
 
@@ -70,7 +70,6 @@ void jump_to_app();
 
 #define BLUE LED1
 #define RED	LED4
-#define LED_PWM_TIMER	TIM3
 int main() {
 	/* NOTE: Do NOT modify the following start-up sequence */
 	/* Any new initialization functions should be added in OpenPilotInit() */
@@ -97,35 +96,37 @@ int main() {
 			DeviceState = DFUidle;
 		else
 			DeviceState = BLidle;
-		STOPWATCH_Init(100, LED_PWM_TIMER);
 	} else
 		JumpToApp = TRUE;
 
-	STOPWATCH_Reset(LED_PWM_TIMER);
-
+	uint32_t stopwatch = 0;
+	uint32_t prev_ticks = PIOS_DELAY_GetuS();
 	while (TRUE) {
+		/* Update the stopwatch */
+		uint32_t elapsed_ticks = PIOS_DELAY_GetuSSince(prev_ticks);
+		prev_ticks += elapsed_ticks;
+		stopwatch += elapsed_ticks;
+
 		if (JumpToApp == TRUE)
 			jump_to_app();
-		//pwm_period = 50; // *100 uS -> 5 mS
-		//pwm_sweep_steps =100; // * 5 mS -> 500 mS
 
 		switch (DeviceState) {
 		case Last_operation_Success:
 		case uploadingStarting:
 		case DFUidle:
-			period1 = 50;
+			period1 = 5000;
 			sweep_steps1 = 100;
 			PIOS_LED_Off(RED);
 			period2 = 0;
 			break;
 		case uploading:
-			period1 = 50;
+			period1 = 5000;
 			sweep_steps1 = 100;
-			period2 = 25;
+			period2 = 2500;
 			sweep_steps2 = 50;
 			break;
 		case downloading:
-			period1 = 25;
+			period1 = 2500;
 			sweep_steps1 = 50;
 			PIOS_LED_Off(RED);
 			period2 = 0;
@@ -136,14 +137,14 @@ int main() {
 			period2 = 0;
 			break;
 		default://error
-			period1 = 50;
+			period1 = 5000;
 			sweep_steps1 = 100;
-			period2 = 50;
+			period2 = 5000;
 			sweep_steps2 = 100;
 		}
 
 		if (period1 != 0) {
-			if (LedPWM(period1, sweep_steps1, STOPWATCH_ValueGet(LED_PWM_TIMER)))
+			if (LedPWM(period1, sweep_steps1, stopwatch))
 				PIOS_LED_On(BLUE);
 			else
 				PIOS_LED_Off(BLUE);
@@ -151,16 +152,16 @@ int main() {
 			PIOS_LED_On(BLUE);
 
 		if (period2 != 0) {
-			if (LedPWM(period2, sweep_steps2, STOPWATCH_ValueGet(LED_PWM_TIMER)))
+			if (LedPWM(period2, sweep_steps2, stopwatch))
 				PIOS_LED_On(RED);
 			else
 				PIOS_LED_Off(RED);
 		} else
 			PIOS_LED_Off(RED);
 
-		if (STOPWATCH_ValueGet(LED_PWM_TIMER) > 100 * 50 * 100)
-			STOPWATCH_Reset(LED_PWM_TIMER);
-		if ((STOPWATCH_ValueGet(LED_PWM_TIMER) > 60000) && (DeviceState
+		if (stopwatch > 50 * 1000 * 1000)
+			stopwatch = 0;
+		if ((stopwatch > 6 * 1000 * 1000) && (DeviceState
 				== BLidle))
 			JumpToApp = TRUE;
 
@@ -170,7 +171,9 @@ int main() {
 }
 
 void jump_to_app() {
-	if (((*(__IO uint32_t*) START_OF_USER_CODE) & 0x2FFE0000) == 0x20000000) { /* Jump to user application */
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+
+	if (((*(__IO uint32_t*) bdinfo->fw_base) & 0x2FFE0000) == 0x20000000) { /* Jump to user application */
 		FLASH_Lock();
 		RCC_APB2PeriphResetCmd(0xffffffff, ENABLE);
 		RCC_APB1PeriphResetCmd(0xffffffff, ENABLE);
@@ -179,10 +182,10 @@ void jump_to_app() {
 		_SetCNTR(0); // clear interrupt mask
 		_SetISTR(0); // clear all requests
 
-		JumpAddress = *(__IO uint32_t*) (START_OF_USER_CODE + 4);
+		JumpAddress = *(__IO uint32_t*) (bdinfo->fw_base + 4);
 		Jump_To_Application = (pFunction) JumpAddress;
 		/* Initialize user application's Stack Pointer */
-		__set_MSP(*(__IO uint32_t*) START_OF_USER_CODE);
+		__set_MSP(*(__IO uint32_t*) bdinfo->fw_base);
 		Jump_To_Application();
 	} else {
 		DeviceState = failed_jump;
@@ -190,20 +193,21 @@ void jump_to_app() {
 	}
 }
 uint32_t LedPWM(uint32_t pwm_period, uint32_t pwm_sweep_steps, uint32_t count) {
-	uint32_t pwm_duty = ((count / pwm_period) % pwm_sweep_steps)
-			/ (pwm_sweep_steps / pwm_period);
-	if ((count % (2 * pwm_period * pwm_sweep_steps)) > pwm_period
-			* pwm_sweep_steps)
-		pwm_duty = pwm_period - pwm_duty; // negative direction each 50*100 ticks
+	uint32_t curr_step = (count / pwm_period) % pwm_sweep_steps; /* 0 - pwm_sweep_steps */
+	uint32_t pwm_duty = pwm_period * curr_step / pwm_sweep_steps; /* fraction of pwm_period */
+
+	uint32_t curr_sweep = (count / (pwm_period * pwm_sweep_steps)); /* ticks once per full sweep */
+	if (curr_sweep & 1) {
+		pwm_duty = pwm_period - pwm_duty; /* reverse direction in odd sweeps */
+	}
 	return ((count % pwm_period) > pwm_duty) ? 1 : 0;
 }
 
 uint8_t processRX() {
 	while (PIOS_COM_ReceiveBufferUsed(PIOS_COM_TELEM_USB) >= 63) {
-		for (int32_t x = 0; x < 63; ++x) {
-			mReceive_Buffer[x] = PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_USB);
+		if (PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_USB, mReceive_Buffer, 63, 0) == 63) {
+			processComand(mReceive_Buffer);
 		}
-		processComand(mReceive_Buffer);
 	}
 	return TRUE;
 }

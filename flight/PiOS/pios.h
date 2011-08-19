@@ -73,11 +73,14 @@
 #include <pios_irq.h>
 #include <pios_adc.h>
 #include <pios_servo.h>
+#include <pios_rtc.h>
 #include <pios_i2c.h>
 #include <pios_spi.h>
 #include <pios_ppm.h>
 #include <pios_pwm.h>
+#include <pios_rcvr.h>
 #include <pios_spektrum.h>
+#include <pios_sbus.h>
 #include <pios_usb_hid.h>
 #include <pios_debug.h>
 #include <pios_gpio.h>
@@ -119,6 +122,7 @@
 
 #if defined(PIOS_INCLUDE_FLASH)
 #include <pios_flash_w25x.h>
+#include <pios_flashfs_objlist.h>
 #endif
 
 #if defined(PIOS_INCLUDE_BL_HELPER)
@@ -129,6 +133,8 @@
 /* USB Libs */
 #include <usb_lib.h>
 #endif
+
+#include <pios_crc.h>
 
 #define NELEMENTS(x) (sizeof(x) / sizeof(*(x)))
 

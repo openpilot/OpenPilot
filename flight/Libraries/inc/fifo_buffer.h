@@ -26,7 +26,7 @@
 #ifndef _FIFO_BUFFER_H_
 #define _FIFO_BUFFER_H_
 
-#include "stm32f10x.h"
+#include <stdint.h>
 
 // *********************
 

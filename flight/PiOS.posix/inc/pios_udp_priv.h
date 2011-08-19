@@ -29,6 +29,7 @@
 
 #include <pios.h>
 #include <stdio.h>
+#include <pthread.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <stdlib.h>
@@ -37,30 +38,34 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 
-
-
 struct pios_udp_cfg {
   const char * ip;
   uint16_t port;
 };
 
-struct pios_udp_buffer {
-  uint8_t   buf[PIOS_UDP_RX_BUFFER_SIZE];
-  uint16_t  head;
-  uint16_t  tail;
-  uint16_t  size;
-};
+typedef struct {
+  const struct pios_udp_cfg * cfg;
+  pthread_t rxThread;
 
-struct pios_udp_dev {
-  const struct pios_udp_cfg * const cfg;
-  struct pios_udp_buffer      rx;
   int socket;
   struct sockaddr_in server;
   struct sockaddr_in client;
   uint32_t clientLength;
-};
 
-extern struct pios_udp_dev pios_udp_devs[];
-extern uint8_t             pios_udp_num_devices;
+  pthread_cond_t cond;
+  pthread_mutex_t mutex;
+
+  pios_com_callback tx_out_cb;
+  uint32_t tx_out_context;
+  pios_com_callback rx_in_cb;
+  uint32_t rx_in_context;
+
+  uint8_t rx_buffer[PIOS_UDP_RX_BUFFER_SIZE];
+  uint8_t tx_buffer[PIOS_UDP_RX_BUFFER_SIZE];
+} pios_udp_dev;
+
+extern int32_t PIOS_UDP_Init(uint32_t * udp_id, const struct pios_udp_cfg * cfg);
+
+
 
 #endif /* PIOS_UDP_PRIV_H */

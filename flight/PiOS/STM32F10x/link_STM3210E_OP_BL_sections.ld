@@ -2,7 +2,7 @@
 _irq_stack_size = 0x400;
 
 /* Check valid alignment for VTOR */
-ASSERT(ORIGIN(FLASH) == ALIGN(ORIGIN(FLASH), 0x80), "Start of memory region flash not aligned for startup vector table");
+ASSERT(ORIGIN(BL_FLASH) == ALIGN(ORIGIN(BL_FLASH), 0x80), "Start of memory region flash not aligned for startup vector table");
 
 /*
 this sends all unreferenced IRQHandlers to reset
@@ -163,10 +163,10 @@ PROVIDE ( SCB             = (SCS_BASE + 0x0D00) ) ;
 
 SECTIONS
 {
-     
     /* for Cortex devices, the beginning of the startup code is stored in the .isr_vector section, which goes to FLASH */
     .isr_vector :
     {
+        PROVIDE (pios_isr_vector_table_base = .);
         KEEP(*(.isr_vector))            /* Startup code */
         . = ALIGN(4);
     } > BL_FLASH
@@ -179,17 +179,6 @@ SECTIONS
         . = ALIGN(4);
     } > BL_FLASH
  
-    
-    /* init sections */
-    .initcalluavobj.init :
-    {
-        . = ALIGN(4);
-	__uavobj_initcall_start = .;
-        KEEP(*(.initcalluavobj.init))
-	. = ALIGN(4);
-	__uavobj_initcall_end   = .;
-    } > BL_FLASH
-
     /* the program code is stored in the .text section, which goes to Flash */
     .text :
     {
@@ -223,6 +212,7 @@ SECTIONS
          . = . + _irq_stack_size ;
          . = ALIGN(4);
          _irq_stack_top = . - 4 ;
+         _init_stack_top = _irq_stack_top;
          . = ALIGN(4);
     } >RAM
 	
@@ -313,6 +303,13 @@ SECTIONS
     __exidx_start = .;
     __exidx_end = .;
     
+    .boardinfo :
+    {
+	. = ALIGN(4);
+	KEEP(*(.boardinfo))
+	. = ALIGN(4);
+    } > BD_INFO
+
     /* after that it's only debugging information. */
     
     /* remove the debugging information from the standard libraries */
@@ -357,5 +354,3 @@ SECTIONS
     .debug_typenames 0 : { *(.debug_typenames) }
     .debug_varnames  0 : { *(.debug_varnames) }
 }
-
-

@@ -115,7 +115,8 @@ public:
     void setUseMemoryCache(bool useMemoryCache);
     void setCacheLocation(QString cacheLocation);
     void setMapMode(opMapModeType mode);
-     void SetUavPic(QString UAVPic);
+	void SetUavPic(QString UAVPic);
+	void setMaxUpdateRate(int update_rate);
 
 public slots:
     void homePositionUpdated(UAVObject *);
@@ -221,25 +222,31 @@ private slots:
     void onClearUAVtrailAct_triggered();
     void onUAVTrailTimeActGroup_triggered(QAction *action);
     void onUAVTrailDistanceActGroup_triggered(QAction *action);
+	void onMaxUpdateRateActGroup_triggered(QAction *action);
 
 private:
-    int min_zoom;
-    int max_zoom;
+
+	// *****
+
+	int m_min_zoom;
+	int m_max_zoom;
 
     double m_heading;	// uav heading
 
-    internals::PointLatLng mouse_lat_lon;
-    internals::PointLatLng context_menu_lat_lon;
+	internals::PointLatLng m_mouse_lat_lon;
+	internals::PointLatLng m_context_menu_lat_lon;
 
-    int prev_tile_number;
+	int m_prev_tile_number;
 
     opMapModeType m_map_mode;
 
-    t_home home_position;
+	int m_maxUpdateRate;
 
-    t_waypoint magic_waypoint;
+	t_home m_home_position;
 
-    QStringList findPlaceWordList;
+	t_waypoint m_magic_waypoint;
+
+	QStringList findPlaceWordList;
     QCompleter *findPlaceCompleter;
 
     QTimer *m_updateTimer;
@@ -266,14 +273,16 @@ private:
 
     QMutex m_map_mutex;
 
-    bool telemetry_connected;
+	bool m_telemetry_connected;
+
+	// *****
 
     void createActions();
 
     QAction *closeAct1;
     QAction *closeAct2;
     QAction *reloadAct;
-    QAction *copyMouseLatLonToClipAct;
+	QAction *copyMouseLatLonToClipAct;
     QAction *copyMouseLatToClipAct;
     QAction *copyMouseLonToClipAct;
     QAction *findPlaceAct;
@@ -319,7 +328,12 @@ private:
     QActionGroup *zoomActGroup;
     QList<QAction *> zoomAct;
 
-    void homeMagicWaypoint();
+	QActionGroup *maxUpdateRateActGroup;
+	QList<QAction *> maxUpdateRateAct;
+
+	// *****
+
+	void homeMagicWaypoint();
 
     void moveToMagicWaypointPosition();
 

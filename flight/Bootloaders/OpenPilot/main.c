@@ -27,6 +27,7 @@
  */
 /* Bootloader Includes */
 #include <pios.h>
+#include <pios_board_info.h>
 #include "pios_opahrs.h"
 #include "stopwatch.h"
 #include "op_dfu.h"
@@ -216,7 +217,9 @@ int main() {
 }
 
 void jump_to_app() {
-	if (((*(__IO uint32_t*) START_OF_USER_CODE) & 0x2FFE0000) == 0x20000000) { /* Jump to user application */
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+
+	if (((*(__IO uint32_t*) bdinfo->fw_base) & 0x2FFE0000) == 0x20000000) { /* Jump to user application */
 		FLASH_Lock();
 		RCC_APB2PeriphResetCmd(0xffffffff, ENABLE);
 		RCC_APB1PeriphResetCmd(0xffffffff, ENABLE);
@@ -225,10 +228,10 @@ void jump_to_app() {
 		_SetCNTR(0); // clear interrupt mask
 		_SetISTR(0); // clear all requests
 
-		JumpAddress = *(__IO uint32_t*) (START_OF_USER_CODE + 4);
+		JumpAddress = *(__IO uint32_t*) (bdinfo->fw_base + 4);
 		Jump_To_Application = (pFunction) JumpAddress;
 		/* Initialize user application's Stack Pointer */
-		__set_MSP(*(__IO uint32_t*) START_OF_USER_CODE);
+		__set_MSP(*(__IO uint32_t*) bdinfo->fw_base);
 		Jump_To_Application();
 	} else {
 		DeviceState = failed_jump;
@@ -247,10 +250,9 @@ uint32_t LedPWM(uint32_t pwm_period, uint32_t pwm_sweep_steps, uint32_t count) {
 uint8_t processRX() {
 	if (ProgPort == Usb) {
 		while (PIOS_COM_ReceiveBufferUsed(PIOS_COM_TELEM_USB) >= 63) {
-			for (int32_t x = 0; x < 63; ++x) {
-				mReceive_Buffer[x] = PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_USB);
+			if (PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_USB, mReceive_Buffer, 63, 0) == 63) {
+				processComand(mReceive_Buffer);
 			}
-			processComand(mReceive_Buffer);
 		}
 	} else if (ProgPort == Serial) {
 
@@ -276,7 +278,12 @@ void SSP_CallBack(uint8_t *buf, uint16_t len) {
 }
 int16_t SSP_SerialRead(void) {
 	if (PIOS_COM_ReceiveBufferUsed(PIOS_COM_TELEM_RF) > 0) {
-		return PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_RF);
+		uint8_t byte;
+		if (PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_RF, &byte, 1, 0) == 1) {
+			return byte;
+		} else {
+			return -1;
+		}	    
 	} else
 		return -1;
 }

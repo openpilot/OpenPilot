@@ -44,8 +44,10 @@ using namespace Utils;
 using namespace Core::Internal;
 
 GeneralSettings::GeneralSettings():
+    m_saveSettingsOnExit(true),
     m_dialog(0),
-    m_saveSettingsOnExit(true)
+    m_autoConnect(true),
+    m_autoSelect(true)
 {
 }
 
@@ -113,27 +115,14 @@ QWidget *GeneralSettings::createPage(QWidget *parent)
     m_page->setupUi(w);
 
     fillLanguageBox();
+    connect(m_page->checkAutoConnect,SIGNAL(stateChanged(int)),this,SLOT(slotAutoConnect(int)));
     m_page->checkBoxSaveOnExit->setChecked(m_saveSettingsOnExit);
-
+    m_page->checkAutoConnect->setChecked(m_autoConnect);
+    m_page->checkAutoSelect->setChecked(m_autoSelect);
     m_page->colorButton->setColor(StyleHelper::baseColor());
-#ifdef Q_OS_UNIX
-    m_page->terminalEdit->setText(ConsoleProcess::terminalEmulator(Core::ICore::instance()->settings()));
-#else
-    m_page->terminalLabel->hide();
-    m_page->terminalEdit->hide();
-    m_page->resetTerminalButton->hide();
-#endif
 
     connect(m_page->resetButton, SIGNAL(clicked()),
             this, SLOT(resetInterfaceColor()));
-    connect(m_page->resetEditorButton, SIGNAL(clicked()),
-            this, SLOT(resetExternalEditor()));
-    connect(m_page->helpExternalEditorButton, SIGNAL(clicked()),
-            this, SLOT(showHelpForExternalEditor()));
-#ifdef Q_OS_UNIX
-    connect(m_page->resetTerminalButton, SIGNAL(clicked()),
-            this, SLOT(resetTerminal()));
-#endif
 
     return w;
 }
@@ -146,11 +135,8 @@ void GeneralSettings::apply()
     StyleHelper::setBaseColor(m_page->colorButton->color());
 
     m_saveSettingsOnExit = m_page->checkBoxSaveOnExit->isChecked();
-#ifdef Q_OS_UNIX
-	ConsoleProcess::setTerminalEmulator(Core::ICore::instance()->settings(),
-                                        m_page->terminalEdit->text());
-#endif
-
+    m_autoConnect = m_page->checkAutoConnect->isChecked();
+    m_autoSelect = m_page->checkAutoSelect->isChecked();
 }
 
 void GeneralSettings::finish()
@@ -163,8 +149,9 @@ void GeneralSettings::readSettings(QSettings* qs)
     qs->beginGroup(QLatin1String("General"));
     m_language = qs->value(QLatin1String("OverrideLanguage"),QLocale::system().name()).toString();
     m_saveSettingsOnExit = qs->value(QLatin1String("SaveSettingsOnExit"),m_saveSettingsOnExit).toBool();
+    m_autoConnect = qs->value(QLatin1String("AutoConnect"),m_autoConnect).toBool();
+    m_autoSelect = qs->value(QLatin1String("AutoSelect"),m_autoSelect).toBool();
     qs->endGroup();
-
 }
 
 void GeneralSettings::saveSettings(QSettings* qs)
@@ -177,6 +164,8 @@ void GeneralSettings::saveSettings(QSettings* qs)
         qs->setValue(QLatin1String("OverrideLanguage"), m_language);
 
     qs->setValue(QLatin1String("SaveSettingsOnExit"), m_saveSettingsOnExit);
+    qs->setValue(QLatin1String("AutoConnect"), m_autoConnect);
+    qs->setValue(QLatin1String("AutoSelect"), m_autoSelect);
     qs->endGroup();
 }
 
@@ -184,17 +173,6 @@ void GeneralSettings::resetInterfaceColor()
 {
     m_page->colorButton->setColor(0x666666);
 }
-
-void GeneralSettings::resetExternalEditor()
-{
-}
-
-#ifdef Q_OS_UNIX
-void GeneralSettings::resetTerminal()
-{
-    m_page->terminalEdit->setText(ConsoleProcess::defaultTerminalEmulator() + QLatin1String(" -e"));
-}
-#endif
 
 void GeneralSettings::showHelpForExternalEditor()
 {
@@ -229,10 +207,11 @@ QString GeneralSettings::language() const
 
 void GeneralSettings::setLanguage(const QString &locale)
 {
-    if (m_language != locale)
-    {
+    if (m_language != locale) {
+        if (!locale.isEmpty()) {
         QMessageBox::information((QWidget*)Core::ICore::instance()->mainWindow(), tr("Restart required"),
                                  tr("The language change will take effect after a restart of the OpenPilot GCS."));
+        }
         m_language = locale;
     }
 }
@@ -240,4 +219,22 @@ void GeneralSettings::setLanguage(const QString &locale)
 bool GeneralSettings::saveSettingsOnExit() const
 {
     return m_saveSettingsOnExit;
+}
+
+bool GeneralSettings::autoConnect() const
+{
+    return m_autoConnect;
+}
+
+bool GeneralSettings::autoSelect() const
+{
+    return m_autoSelect;
+}
+
+void GeneralSettings::slotAutoConnect(int value)
+{
+    if (value==Qt::Checked)
+        m_page->checkAutoSelect->setEnabled(false);
+    else
+        m_page->checkAutoSelect->setEnabled(true);
 }

@@ -73,57 +73,6 @@ void SplitterOrView::mousePressEvent(QMouseEvent *e)
     }
 }
 
-//void SplitterOrView::paintEvent(QPaintEvent *event)
-//{
-//    if (m_uavGadgetManager->currentSplitterOrView() != this)
-//        return;
-//
-//    if (!m_view)
-//        return;
-//
-//    if (hasGadget())
-//        return;
-//
-//    if (m_uavGadgetManager->toolbarsShown())
-//        return;
-//
-//    // Discreet indication where an uavGadget would be if there is none
-//    QPainter painter(this);
-//    painter.setRenderHint(QPainter::Antialiasing, true);
-//    painter.setPen(Qt::NoPen);
-//    QColor shadeBrush(Qt::black);
-//    shadeBrush.setAlpha(25);
-//    painter.setBrush(shadeBrush);
-//    const int r = 3;
-//    painter.drawRoundedRect(rect().adjusted(r, r, -r, -r), r * 2, r * 2);
-//
-//#if 0
-//    if (hasFocus()) {
-//#ifdef Q_WS_MAC
-//        // With QMacStyle, we have to draw our own focus rect, since I didn't find
-//        // a way to draw the nice mac focus rect _inside_ this widget
-//        if (qobject_cast<QMacStyle *>(style())) {
-//            painter.setPen(Qt::DotLine);
-//            painter.setBrush(Qt::NoBrush);
-//            painter.setOpacity(0.75);
-//            painter.drawRect(rect());
-//        } else {
-//#endif
-//            QStyleOptionFocusRect option;
-//            option.initFrom(this);
-//            option.backgroundColor = palette().color(QPalette::Background);
-//
-//            // Some styles require a certain state flag in order to draw the focus rect
-//            option.state |= QStyle::State_KeyboardFocusChange;
-//
-//            style()->drawPrimitive(QStyle::PE_FrameFocusRect, &option, &painter);
-//#ifdef Q_WS_MAC
-//        }
-//#endif
-//    }
-//#endif
-//}
-
 /* Contract: return SplitterOrView that is not splitter, or 0 if not found.
  * Implications: must not return SplitterOrView that is splitter.
  */

@@ -50,7 +50,6 @@
         <file>images/optionsicon.png</file>
         <file>images/helpicon.png</file>
         <file>images/openpiloticon.png</file>
-        <file>OpenPilotGCS.ini</file>
         <file>CREDITS.html</file>
         <file>images/ah.png</file>
         <file>images/config.png</file>
@@ -60,5 +59,7 @@
         <file>images/scopes.png</file>
         <file>images/world.png</file>
         <file>images/cog.png</file>
+        <file>OpenPilotGCS.xml</file>
+        <file>images/helpicon.svg</file>
     </qresource>
 </RCC>

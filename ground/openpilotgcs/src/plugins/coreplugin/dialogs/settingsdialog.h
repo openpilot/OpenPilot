@@ -62,6 +62,7 @@ public:
 signals:
     void settingsDialogShown(Core::Internal::SettingsDialog*);
     void settingsDialogRemoved();
+    void categoryItemSelected();
 
 public slots:
     void done(int);
@@ -71,9 +72,13 @@ private slots:
     void accept();
     void reject();
     void apply();
+    void categoryItemSelectedShowChildInstead();
+
 
 private:
+
     QList<Core::IOptionsPage*> m_pages;
+    QMap<QString, QList<QTreeWidgetItem *> *> m_categoryItemsMap;
     UAVGadgetInstanceManager *m_instanceManager;
     bool m_applied;
     QString m_currentCategory;

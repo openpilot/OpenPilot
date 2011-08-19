@@ -21,6 +21,7 @@ alert
 altitude
 amps
 aquired
+armed
 autonomous flight
 battery
 camera
@@ -32,8 +33,10 @@ complete
 connected
 connection
 control
+coptercontrol
 critical
 disabled
+disarmed
 disconnected
 feet
 figure eight
@@ -58,11 +61,13 @@ lost
 low altitude
 low battery
 low gps quality
+magic
 manual flight
 maxium
 meters
 minimum 
 mode
+moved
 MPH
 navigation
 OpenPilot
@@ -122,8 +127,4 @@ hundread
 thousand
 
 
-Upto: OpenPilot
-critical
-battery
-point
 

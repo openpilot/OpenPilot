@@ -4,7 +4,7 @@
  * @file       importexportplugin.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @see        The GNU Public License (GPL) Version 3
- * @brief      Import/Export Plugin
+ * @brief      Import/Export Plugin for GCS Settings
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @defgroup   importexportplugin
@@ -28,7 +28,6 @@
  */
 
 #include "importexportplugin.h"
-#include "importexportgadgetfactory.h"
 #include "importexportdialog.h"
 #include <QDebug>
 #include <QtPlugin>
@@ -55,8 +54,6 @@ bool ImportExportPlugin::initialize(const QStringList& args, QString *errMsg)
 {
     Q_UNUSED(args);
     Q_UNUSED(errMsg);
-    mf = new ImportExportGadgetFactory(this);
-    addAutoReleasedObject(mf);
 
     // Add Menu entry
     Core::ActionManager* am = Core::ICore::instance()->actionManager();
@@ -66,7 +63,7 @@ bool ImportExportPlugin::initialize(const QStringList& args, QString *errMsg)
                                             "ImportExportPlugin.ImportExport",
                                             QList<int>() <<
                                             Core::Constants::C_GLOBAL_ID);
-    cmd->setDefaultKeySequence(QKeySequence("Ctrl+I"));
+    cmd->setDefaultKeySequence(QKeySequence("Ctrl+S"));
     cmd->action()->setText(tr("GCS Settings Import/Export..."));
 
 //    ac->menu()->addSeparator();
@@ -82,7 +79,7 @@ bool ImportExportPlugin::initialize(const QStringList& args, QString *errMsg)
 
 void ImportExportPlugin::importExport()
 {
-    ImportExportDialog(mf->getLastConfig()).exec();
+    ImportExportDialog().exec();
 }
 
 void ImportExportPlugin::extensionsInitialized()

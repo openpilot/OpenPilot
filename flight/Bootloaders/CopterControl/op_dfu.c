@@ -30,6 +30,7 @@
 #include "pios.h"
 #include "op_dfu.h"
 #include "pios_bl_helper.h"
+#include <pios_board_info.h>
 //programmable devices
 Device devicesTable[10];
 uint8_t numberOfDevices = 0;
@@ -382,16 +383,18 @@ void processComand(uint8_t *xReceive_Buffer) {
 	return;
 }
 void OPDfuIni(uint8_t discover) {
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
 	Device dev;
+
 	dev.programmingType = Self_flash;
-	dev.readWriteFlags = (BOARD_READABLE | (BOARD_WRITABLA << 1));
-	dev.startOfUserCode = START_OF_USER_CODE;
-	dev.sizeOfCode = SIZE_OF_CODE;
-	dev.sizeOfDescription = SIZE_OF_DESCRIPTION;
-	dev.BL_Version = BOOTLOADER_VERSION;
+	dev.readWriteFlags = (BOARD_READABLE | (BOARD_WRITABLE << 1));
+	dev.startOfUserCode = bdinfo->fw_base;
+	dev.sizeOfCode = bdinfo->fw_size;
+	dev.sizeOfDescription = bdinfo->desc_size;
+	dev.BL_Version = bdinfo->bl_rev;
 	dev.FW_Crc = CalcFirmCRC();
-	dev.devID = (BOARD_TYPE << 8) | BOARD_REVISION;
-	dev.devType = HW_TYPE;
+	dev.devID = (bdinfo->board_type << 8) | (bdinfo->board_rev);
+	dev.devType = bdinfo->hw_type;
 	numberOfDevices = 1;
 	devicesTable[0] = dev;
 	if (discover) {

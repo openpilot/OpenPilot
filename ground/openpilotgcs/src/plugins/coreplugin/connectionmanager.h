@@ -30,7 +30,8 @@
 #define CONNECTIONMANAGER_H
 
 #include <QWidget>
-
+#include "mainwindow.h"
+#include "generalsettings.h"
 #include <QtCore/QVector>
 #include <QtCore/QIODevice>
 #include <QtCore/QLinkedList>
@@ -38,6 +39,10 @@
 #include <QtGui/QComboBox>
 
 #include "core_global.h"
+
+QT_BEGIN_NAMESPACE
+class QTabWidget;
+QT_END_NAMESPACE
 
 namespace Core {
 
@@ -64,7 +69,7 @@ class CORE_EXPORT ConnectionManager : public QWidget
     Q_OBJECT
 
 public:
-    ConnectionManager(Internal::MainWindow *mainWindow, Internal::FancyTabWidget *modeStack);
+    ConnectionManager(Internal::MainWindow *mainWindow, QTabWidget *modeStack);
     virtual ~ConnectionManager();
 
     void init();
@@ -108,6 +113,7 @@ protected:
 
 private:
 	bool connectDevice();
+        Internal::MainWindow *m_mainWindow;
 
 };
 

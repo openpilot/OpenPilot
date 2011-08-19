@@ -29,10 +29,6 @@
 #ifndef UAVTALK_H
 #define UAVTALK_H
 
-// Public constants
-#define UAVTALK_WAITFOREVER -1
-#define UAVTALK_NOWAIT 0
-
 // Public types
 typedef int32_t (*UAVTalkOutputStream)(uint8_t* data, int32_t length);
 
@@ -47,14 +43,17 @@ typedef struct {
     uint32_t rxErrors;
 } UAVTalkStats;
 
+typedef void* UAVTalkConnection;
+
 // Public functions
-int32_t UAVTalkInitialize(UAVTalkOutputStream outputStream);
-int32_t UAVTalkSetOutputStream(UAVTalkOutputStream outputStream);
-int32_t UAVTalkSendObject(UAVObjHandle obj, uint16_t instId, uint8_t acked, int32_t timeoutMs);
-int32_t UAVTalkSendObjectRequest(UAVObjHandle obj, uint16_t instId, int32_t timeoutMs);
-int32_t UAVTalkProcessInputStream(uint8_t rxbyte);
-void UAVTalkGetStats(UAVTalkStats* stats);
-void UAVTalkResetStats();
+UAVTalkConnection UAVTalkInitialize(UAVTalkOutputStream outputStream, uint32_t maxPacketSize);
+int32_t UAVTalkSetOutputStream(UAVTalkConnection connection, UAVTalkOutputStream outputStream);
+UAVTalkOutputStream UAVTalkGetOutputStream(UAVTalkConnection connection);
+int32_t UAVTalkSendObject(UAVTalkConnection connection, UAVObjHandle obj, uint16_t instId, uint8_t acked, int32_t timeoutMs);
+int32_t UAVTalkSendObjectRequest(UAVTalkConnection connection, UAVObjHandle obj, uint16_t instId, int32_t timeoutMs);
+int32_t UAVTalkProcessInputStream(UAVTalkConnection connection, uint8_t rxbyte);
+void UAVTalkGetStats(UAVTalkConnection connection, UAVTalkStats *stats);
+void UAVTalkResetStats(UAVTalkConnection connection);
 
 #endif // UAVTALK_H
 /**

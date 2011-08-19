@@ -56,7 +56,9 @@ OP_DFU::OP_DFU(bool _debug,bool _use_serial,QString portname,bool umodereset): d
         {
             cout<<".";
             delay::msleep(500);
-            numDevices = hidHandle.open(1,0x20a0,0x4117,0,0); //0xff9c,0x0001);
+            numDevices = hidHandle.open(1,0x20a0,0x415A,0,0); //0xff9c,0x0001);
+            if(numDevices==0)
+                numDevices = hidHandle.open(1,0x20a0,0x415B,0,0); //0xff9c,0x0001);
             if(++count==10)
             {
                 cout<<"\r";

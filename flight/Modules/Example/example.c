@@ -49,9 +49,14 @@
 #include "examplemodperiodic.h"
 #include "examplemodthread.h"
 
-void ExampleInitialize(void)
+void ExampleStart(void)
 {
-	ExampleModEventInitialize();
 	ExampleModPeriodicInitialize();
 	ExampleModThreadInitialize();
 }
+
+void ExampleInitialize(void)
+{
+	ExampleModEventInitialize();
+}
+MODULE_INITCALL(ExampleInitialize, ExampleStart)

@@ -77,7 +77,8 @@ WelcomeModePrivate::WelcomeModePrivate()
 
 // ---  WelcomeMode
 WelcomeMode::WelcomeMode() :
-    m_d(new WelcomeModePrivate)
+    m_d(new WelcomeModePrivate),
+    m_priority(Core::Constants::P_MODE_WELCOME)
 {
     m_d->m_widget = new QWidget;
     QVBoxLayout *l = new QVBoxLayout(m_d->m_widget);
@@ -122,7 +123,7 @@ QIcon WelcomeMode::icon() const
 
 int WelcomeMode::priority() const
 {
-    return Core::Constants::P_MODE_WELCOME;
+    return m_priority;
 }
 
 QWidget* WelcomeMode::widget()

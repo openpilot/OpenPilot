@@ -25,6 +25,13 @@
 WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
 TOP      := $(realpath $(WHEREAMI)/../../../)
 include $(TOP)/make/firmware-defs.mk
+include $(TOP)/make/boards/$(BOARD_NAME)/board-info.mk
+
+# Target file name (without extension).
+TARGET := bl_$(BOARD_NAME)
+
+# Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
+OUTDIR := $(TOP)/build/$(TARGET)
 
 # Set developer code and compile options
 # Set to YES for debugging
@@ -40,23 +47,6 @@ REMOVE_CMD = rm
 endif
 
 FLASH_TOOL = OPENOCD
-
-# MCU name, submodel and board
-# - MCU used for compiler-option (-mcpu)
-# - MODEL used for linker-script name (-T) and passed as define
-# - BOARD just passed as define (optional)
-MCU      = cortex-m3
-CHIP     = STM32F103CBT
-BOARD    = STM32103CB_AHRS
-MODEL    = MD
-
-
-
-# Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR = $(TOP)/build/bl_ahrs
-
-# Target file name (without extension).
-TARGET = AHRS_BL
 
 # Paths
 AHRS_BL = ./
@@ -100,6 +90,7 @@ SRC += $(PIOSSTM32F10X)/pios_spi.c
 ## PIOS Hardware (Common)
 #SRC += $(PIOSCOMMON)/pios_com.c
 #SRC += $(PIOSCOMMON)/pios_hmc5843.c
+SRC += $(PIOSCOMMON)/pios_board_info.c
 SRC += $(PIOSCOMMON)/pios_opahrs_proto.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 SRC += $(PIOSCOMMON)/pios_bl_helper.c
@@ -148,7 +139,7 @@ CPPSRCARM =
 # Even though the DOS/Win* filesystem matches both .s and .S the same,
 # it will preserve the spelling of the filenames, and gcc itself does
 # care about how the name is spelled on its command-line.
-ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL).S
+ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL)$(MODEL_SUFFIX).S
 
 # List Assembler source files here which must be assembled in ARM-Mode..
 ASRCARM = 
@@ -208,6 +199,15 @@ CDEFS = -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
 
+# Provide (only) the bootloader with board-specific defines
+BLONLY_CDEFS += -DBOARD_TYPE=$(BOARD_TYPE)
+BLONLY_CDEFS += -DBOARD_REVISION=$(BOARD_REVISION)
+BLONLY_CDEFS += -DHW_TYPE=$(HW_TYPE)
+BLONLY_CDEFS += -DBOOTLOADER_VERSION=$(BOOTLOADER_VERSION)
+BLONLY_CDEFS += -DFW_BANK_BASE=$(FW_BANK_BASE)
+BLONLY_CDEFS += -DFW_BANK_SIZE=$(FW_BANK_SIZE)
+BLONLY_CDEFS += -DFW_DESC_SIZE=$(FW_DESC_SIZE)
+
 # Place project-specific -D and/or -U options for 
 # Assembler with preprocessor here.
 #ADEFS = -DUSE_IRQ_ASM_WRAPPER
@@ -242,8 +242,9 @@ CFLAGS += -O$(OPT)
 ifeq ($(DEBUG),NO)
 CFLAGS += -fdata-sections -ffunction-sections
 endif
-CFLAGS += -mcpu=$(MCU) -mthumb
+CFLAGS += -mcpu=$(MCU)
 CFLAGS += $(CDEFS)
+CFLAGS += $(BLONLY_CDEFS)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 
 CFLAGS += -mapcs-frame 
@@ -265,7 +266,7 @@ CONLYFLAGS += $(CSTANDARD)
 # Assembler flags.
 #  -Wa,...:    tell GCC to pass this to the assembler.
 #  -ahlns:     create listing
-ASFLAGS  = -mcpu=$(MCU) -mthumb -I. -x assembler-with-cpp
+ASFLAGS  = -mcpu=$(MCU) -I. -x assembler-with-cpp
 ASFLAGS += $(ADEFS)
 ASFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 ASFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
@@ -290,20 +291,8 @@ LDFLAGS += -lc -lgcc
 LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_memory.ld
 LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_BL_sections.ld
 
-OOCD_LOADFILE+=$(OUTDIR)/$(TARGET).bin
-# Program                                                                                                                                                                                                                            
-OOCD_CL+=-c "flash write_image erase $(OOCD_LOADFILE) 0x08000000 bin"
-# Verify
-OOCD_CL+=-c "verify_image $(OOCD_LOADFILE) 0x08000000 bin"
-# reset target
-OOCD_CL+=-c "reset run"
-# terminate OOCD after programming
-OOCD_CL+=-c shutdown
-
 # Define programs and commands.
 REMOVE  = $(REMOVE_CMD) -f
-###SHELL   = sh
-###COPY    = cp
 
 # List of all source files.
 ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
@@ -335,14 +324,6 @@ endif
 endif
 endif
 
-# Program the device.
-ifeq ($(FLASH_TOOL),OPENOCD)
-# Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
-program: $(OUTDIR)/$(TARGET).bin
-	@echo "Programming with OPENOCD"
-	$(OOCD_EXE) $(OOCD_CL)
-endif
-
 # Link: create ELF output file from object files.
 $(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ)))
 
@@ -372,6 +353,9 @@ $(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
 
 $(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
 
+# Add jtag targets (program and wipe)
+$(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BL_BANK_BASE),$(BL_BANK_SIZE)))
+
 .PHONY: elf lss sym hex bin bino
 elf: $(OUTDIR)/$(TARGET).elf
 lss: $(OUTDIR)/$(TARGET).lss 
@@ -382,12 +366,20 @@ bino: $(OUTDIR)/$(TARGET).bin.o
 
 # Display sizes of sections.
 $(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))
-.PHONY: size
-size: $(OUTDIR)/$(TARGET).elf_size
 
 # Generate Doxygen documents
 docs:
 	doxygen  $(DOXYGENDIR)/doxygen.cfg
+
+# Install: install binary file with prefix/suffix into install directory
+install: $(OUTDIR)/$(TARGET).bin
+ifneq ($(INSTALL_DIR),)
+	@echo $(MSG_INSTALLING) $(call toprel, $<)
+	$(V1) mkdir -p $(INSTALL_DIR)
+	$(V1) $(INSTALL) $< $(INSTALL_DIR)/$(INSTALL_PFX)$(TARGET)$(INSTALL_SFX).bin
+else
+	$(error INSTALL_DIR must be specified for $@)
+endif
 
 # Target: clean project.
 clean: clean_list
@@ -426,4 +418,4 @@ else
 endif
 
 # Listing of phony targets.
-.PHONY : all build clean clean_list program
+.PHONY : all build clean clean_list install

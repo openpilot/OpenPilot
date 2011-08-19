@@ -32,8 +32,8 @@
 #include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
-
-
+#include <QDesktopServices>
+#include <QUrl>
 
 ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
@@ -42,15 +42,18 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     m_stabilization = new Ui_StabilizationWidget();
     m_stabilization->setupUi(this);
 
-    // Now connect the widget to the ManualControlCommand / Channel UAVObject
-    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("StabilizationSettings")));
 
-    requestStabilizationUpdate();
     connect(m_stabilization->saveStabilizationToSD, SIGNAL(clicked()), this, SLOT(saveStabilizationUpdate()));
     connect(m_stabilization->saveStabilizationToRAM, SIGNAL(clicked()), this, SLOT(sendStabilizationUpdate()));
-    connect(m_stabilization->getStabilizationCurrent, SIGNAL(clicked()), this, SLOT(requestStabilizationUpdate()));
 
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestStabilizationUpdate()));
+    enableControls(false);
+    refreshValues();
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
+    connect(parent, SIGNAL(autopilotDisconnected()),this, SLOT(onAutopilotDisconnect()));
+
+    // Now connect the widget to the StabilizationSettings object
+    UAVObject *obj = getObjectManager()->getObject(QString("StabilizationSettings"));
+    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
 
     // Create a timer to regularly send the object update in case
     // we want realtime updates.
@@ -74,6 +77,8 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     connect(m_stabilization->pitchKi, SIGNAL(valueChanged(double)), this, SLOT(updatePitchKI(double)));
     connect(m_stabilization->pitchILimit, SIGNAL(valueChanged(double)), this, SLOT(updatePitchILimit(double)));
 
+    // Connect the help button
+    connect(m_stabilization->stabilizationHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 }
 
 ConfigStabilizationWidget::~ConfigStabilizationWidget()
@@ -81,6 +86,12 @@ ConfigStabilizationWidget::~ConfigStabilizationWidget()
    // Do nothing
 }
 
+
+void ConfigStabilizationWidget::enableControls(bool enable)
+{
+    //m_stabilization->saveStabilizationToRAM->setEnabled(enable);
+    m_stabilization->saveStabilizationToSD->setEnabled(enable);
+}
 
 void ConfigStabilizationWidget::updateRateRollKP(double val)
 {
@@ -176,22 +187,24 @@ void ConfigStabilizationWidget::updatePitchILimit(double val)
 /**
   Request stabilization settings from the board
   */
-void ConfigStabilizationWidget::requestStabilizationUpdate()
+void ConfigStabilizationWidget::refreshValues()
 {
-    stabSettings->requestUpdate();
+    // Not needed anymore as this slot is only called whenever we get
+    // a signal that the object was just updated
+    // stabSettings->requestUpdate();
     StabilizationSettings::DataFields stabData = stabSettings->getData();
     // Now fill in all the fields, this is fairly tedious:
-    m_stabilization->rateRollKp->setValue(stabData.RollRatePI[StabilizationSettings::ROLLRATEPI_KP]);
-    m_stabilization->rateRollKi->setValue(stabData.RollRatePI[StabilizationSettings::ROLLRATEPI_KI]);
-    m_stabilization->rateRollILimit->setValue(stabData.RollRatePI[StabilizationSettings::ROLLRATEPI_ILIMIT]);
+    m_stabilization->rateRollKp->setValue(stabData.RollRatePID[StabilizationSettings::ROLLRATEPID_KP]);
+    m_stabilization->rateRollKi->setValue(stabData.RollRatePID[StabilizationSettings::ROLLRATEPID_KI]);
+    m_stabilization->rateRollILimit->setValue(stabData.RollRatePID[StabilizationSettings::ROLLRATEPID_ILIMIT]);
 
-    m_stabilization->ratePitchKp->setValue(stabData.PitchRatePI[StabilizationSettings::PITCHRATEPI_KP]);
-    m_stabilization->ratePitchKi->setValue(stabData.PitchRatePI[StabilizationSettings::PITCHRATEPI_KI]);
-    m_stabilization->ratePitchILimit->setValue(stabData.PitchRatePI[StabilizationSettings::PITCHRATEPI_ILIMIT]);
+    m_stabilization->ratePitchKp->setValue(stabData.PitchRatePID[StabilizationSettings::PITCHRATEPID_KP]);
+    m_stabilization->ratePitchKi->setValue(stabData.PitchRatePID[StabilizationSettings::PITCHRATEPID_KI]);
+    m_stabilization->ratePitchILimit->setValue(stabData.PitchRatePID[StabilizationSettings::PITCHRATEPID_ILIMIT]);
 
-    m_stabilization->rateYawKp->setValue(stabData.YawRatePI[StabilizationSettings::YAWRATEPI_KP]);
-    m_stabilization->rateYawKi->setValue(stabData.YawRatePI[StabilizationSettings::YAWRATEPI_KI]);
-    m_stabilization->rateYawILimit->setValue(stabData.YawRatePI[StabilizationSettings::YAWRATEPI_ILIMIT]);
+    m_stabilization->rateYawKp->setValue(stabData.YawRatePID[StabilizationSettings::YAWRATEPID_KP]);
+    m_stabilization->rateYawKi->setValue(stabData.YawRatePID[StabilizationSettings::YAWRATEPID_KI]);
+    m_stabilization->rateYawILimit->setValue(stabData.YawRatePID[StabilizationSettings::YAWRATEPID_ILIMIT]);
 
     m_stabilization->rollKp->setValue(stabData.RollPI[StabilizationSettings::ROLLPI_KP]);
     m_stabilization->rollKi->setValue(stabData.RollPI[StabilizationSettings::ROLLPI_KI]);
@@ -209,6 +222,16 @@ void ConfigStabilizationWidget::requestStabilizationUpdate()
     m_stabilization->pitchMax->setValue(stabData.PitchMax);
     m_stabilization->yawMax->setValue(stabData.YawMax);
 
+    m_stabilization->manualRoll->setValue(stabData.ManualRate[StabilizationSettings::MANUALRATE_ROLL]);
+    m_stabilization->manualPitch->setValue(stabData.ManualRate[StabilizationSettings::MANUALRATE_PITCH]);
+    m_stabilization->manualYaw->setValue(stabData.ManualRate[StabilizationSettings::MANUALRATE_YAW]);
+
+    m_stabilization->maximumRoll->setValue(stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_ROLL]);
+    m_stabilization->maximumPitch->setValue(stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_PITCH]);
+    m_stabilization->maximumYaw->setValue(stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_YAW]);
+
+    m_stabilization->lowThrottleZeroIntegral->setChecked(
+                stabData.LowThrottleZeroIntegral == StabilizationSettings::LOWTHROTTLEZEROINTEGRAL_TRUE);
 }
 
 
@@ -220,17 +243,17 @@ void ConfigStabilizationWidget::sendStabilizationUpdate()
 {
     StabilizationSettings::DataFields stabData = stabSettings->getData();
 
-    stabData.RollRatePI[StabilizationSettings::ROLLRATEPI_KP] = m_stabilization->rateRollKp->value();
-    stabData.RollRatePI[StabilizationSettings::ROLLRATEPI_KI] = m_stabilization->rateRollKi->value();
-    stabData.RollRatePI[StabilizationSettings::ROLLRATEPI_ILIMIT] = m_stabilization->rateRollILimit->value();
+    stabData.RollRatePID[StabilizationSettings::ROLLRATEPID_KP] = m_stabilization->rateRollKp->value();
+    stabData.RollRatePID[StabilizationSettings::ROLLRATEPID_KI] = m_stabilization->rateRollKi->value();
+    stabData.RollRatePID[StabilizationSettings::ROLLRATEPID_ILIMIT] = m_stabilization->rateRollILimit->value();
 
-    stabData.PitchRatePI[StabilizationSettings::PITCHRATEPI_KP] = m_stabilization->ratePitchKp->value();
-    stabData.PitchRatePI[StabilizationSettings::PITCHRATEPI_KI] = m_stabilization->ratePitchKi->value();
-    stabData.PitchRatePI[StabilizationSettings::PITCHRATEPI_ILIMIT] = m_stabilization->ratePitchILimit->value();
+    stabData.PitchRatePID[StabilizationSettings::PITCHRATEPID_KP] = m_stabilization->ratePitchKp->value();
+    stabData.PitchRatePID[StabilizationSettings::PITCHRATEPID_KI] = m_stabilization->ratePitchKi->value();
+    stabData.PitchRatePID[StabilizationSettings::PITCHRATEPID_ILIMIT] = m_stabilization->ratePitchILimit->value();
 
-    stabData.YawRatePI[StabilizationSettings::YAWRATEPI_KP] = m_stabilization->rateYawKp->value();
-    stabData.YawRatePI[StabilizationSettings::YAWRATEPI_KI] = m_stabilization->rateYawKi->value();
-    stabData.YawRatePI[StabilizationSettings::YAWRATEPI_ILIMIT] = m_stabilization->rateYawILimit->value();
+    stabData.YawRatePID[StabilizationSettings::YAWRATEPID_KP] = m_stabilization->rateYawKp->value();
+    stabData.YawRatePID[StabilizationSettings::YAWRATEPID_KI] = m_stabilization->rateYawKi->value();
+    stabData.YawRatePID[StabilizationSettings::YAWRATEPID_ILIMIT] = m_stabilization->rateYawILimit->value();
 
     stabData.RollPI[StabilizationSettings::ROLLPI_KP] = m_stabilization->rollKp->value();
     stabData.RollPI[StabilizationSettings::ROLLPI_KI] = m_stabilization->rollKi->value();
@@ -248,6 +271,18 @@ void ConfigStabilizationWidget::sendStabilizationUpdate()
     stabData.PitchMax = m_stabilization->pitchMax->value();
     stabData.YawMax = m_stabilization->yawMax->value();
 
+    stabData.ManualRate[StabilizationSettings::MANUALRATE_ROLL] = m_stabilization->manualRoll->value();
+    stabData.ManualRate[StabilizationSettings::MANUALRATE_PITCH] = m_stabilization->manualPitch->value();
+    stabData.ManualRate[StabilizationSettings::MANUALRATE_YAW] = m_stabilization->manualYaw->value();
+
+    stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_ROLL] = m_stabilization->maximumRoll->value();
+    stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_PITCH] = m_stabilization->maximumPitch->value();
+    stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_YAW] = m_stabilization->maximumYaw->value();
+
+    stabData.LowThrottleZeroIntegral = m_stabilization->lowThrottleZeroIntegral->isChecked() ?
+                StabilizationSettings::LOWTHROTTLEZEROINTEGRAL_TRUE :
+                StabilizationSettings::LOWTHROTTLEZEROINTEGRAL_FALSE;
+
     stabSettings->setData(stabData); // this is atomic
 }
 
@@ -260,18 +295,24 @@ void ConfigStabilizationWidget::saveStabilizationUpdate()
 {
     // Send update so that the latest value is saved
     sendStabilizationUpdate();
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("StabilizationSettings")));
+    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("StabilizationSettings")));
     Q_ASSERT(obj);
-    updateObjectPersistance(ObjectPersistence::OPERATION_SAVE, obj);
+    saveObjectToSD(obj);
 }
 
 
 void ConfigStabilizationWidget::realtimeUpdateToggle(bool state)
 {
-    if (state)
+    if (state) {
         updateTimer.start(300);
-    else
+    } else {
         updateTimer.stop();
+    }
 }
+
+void ConfigStabilizationWidget::openHelp()
+{
+
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Stabilization+panel", QUrl::StrictMode) );
+}
+

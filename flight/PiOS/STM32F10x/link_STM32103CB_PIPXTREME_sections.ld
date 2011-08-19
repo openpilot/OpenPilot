@@ -3,6 +3,8 @@ PROVIDE (   vPortSVCHandler = 0 ) ;
 PROVIDE (   xPortPendSVHandler = 0 ) ;
 PROVIDE (   xPortSysTickHandler = 0 ) ;
 
+PROVIDE(pios_board_info_blob = ORIGIN(BD_INFO));
+
 _estack = 0x20004FF0;
 
 /* Section Definitions */
@@ -10,6 +12,7 @@ SECTIONS
 {
     .text :
     {
+        PROVIDE (pios_isr_vector_table_base = .);
         KEEP(*(.isr_vector .isr_vector.*))
         *(.text .text.* .gnu.linkonce.t.*)
         *(.glue_7t) *(.glue_7)

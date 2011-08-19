@@ -295,7 +295,7 @@ bool UAVTalk::processInputByte(quint8 rxbyte)
                 }
 
                 // Check the lengths match
-                if ((rxPacketLength + rxLength) != packetSize)
+                if ((rxPacketLength + rxLength + (rxObj->isSingleInstance() ? 0 : 2)) != packetSize)
                 {   // packet error - mismatched packet size
                     stats.rxErrors++;
                     rxState = STATE_SYNC;
@@ -805,17 +805,3 @@ quint8 UAVTalk::updateCRC(quint8 crc, const quint8* data, qint32 length)
         crc = crc_table[crc ^ *data++];
     return crc;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

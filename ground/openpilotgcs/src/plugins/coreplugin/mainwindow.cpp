@@ -30,44 +30,42 @@
 #include "actioncontainer.h"
 #include "actionmanager_p.h"
 #include "basemode.h"
+#include "connectionmanager.h"
 #include "coreimpl.h"
 #include "coreconstants.h"
-#include "fancytabwidget.h"
+#include "utils/mytabwidget.h"
 #include "generalsettings.h"
 #include "messagemanager.h"
 #include "modemanager.h"
 #include "mimedatabase.h"
 #include "outputpane.h"
 #include "plugindialog.h"
-#include "shortcutsettings.h"
-#include "workspacesettings.h"
-#include "modemanager.h"
-#include "uavgadgetmode.h"
-#include "uavgadgetmanager.h"
-#include "uavgadgetinstancemanager.h"
-#include "connectionmanager.h"
 #include "qxtlogger.h"
 #include "qxtbasicstdloggerengine.h"
+#include "shortcutsettings.h"
+#include "uavgadgetmanager.h"
+#include "uavgadgetinstancemanager.h"
+#include "workspacesettings.h"
 
-#include "settingsdialog.h"
-#include "variablemanager.h"
-#include "threadmanager.h"
-#include "versiondialog.h"
 #include "authorsdialog.h"
-#include "viewmanager.h"
-#include "uniqueidmanager.h"
-#include "manhattanstyle.h"
-#include "dialogs/iwizard.h"
-#include "rightpane.h"
 #include "baseview.h"
 #include "ioutputpane.h"
 #include "icorelistener.h"
 #include "iconfigurableplugin.h"
+#include "manhattanstyle.h"
+#include "rightpane.h"
+#include "settingsdialog.h"
+#include "threadmanager.h"
+#include "uniqueidmanager.h"
+#include "variablemanager.h"
+#include "versiondialog.h"
 
 #include <coreplugin/settingsdatabase.h>
+#include <extensionsystem/pluginmanager.h>
+#include "dialogs/iwizard.h"
 #include <utils/pathchooser.h>
 #include <utils/stylehelper.h>
-#include <extensionsystem/pluginmanager.h>
+#include <utils/xmlconfig.h>
 
 #include <QtCore/QDebug>
 #include <QtCore/QFileInfo>
@@ -112,9 +110,9 @@ MainWindow::MainWindow() :
     m_globalContext(QList<int>() << Constants::C_GLOBAL_ID),
     m_additionalContexts(m_globalContext),
     // keep this in sync with main() in app/main.cpp
-    m_settings(new QSettings(QSettings::IniFormat, QSettings::UserScope,
+    m_settings(new QSettings(XmlConfig::XmlSettingsFormat, QSettings::UserScope,
                              QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS"), this)),
-    m_globalSettings(new QSettings(QSettings::IniFormat, QSettings::SystemScope,
+    m_globalSettings(new QSettings(XmlConfig::XmlSettingsFormat, QSettings::SystemScope,
                                  QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS"), this)),
     m_settingsDatabase(new SettingsDatabase(QFileInfo(m_settings->fileName()).path(),
                                             QLatin1String("OpenPilotGCS"),
@@ -123,7 +121,6 @@ MainWindow::MainWindow() :
     m_actionManager(new ActionManagerPrivate(this)),
     m_variableManager(new VariableManager(this)),
     m_threadManager(new ThreadManager(this)),
-    m_viewManager(0),
     m_modeManager(0),
     m_connectionManager(0),
     m_mimeDatabase(new MimeDatabase),
@@ -155,7 +152,7 @@ MainWindow::MainWindow() :
     QCoreApplication::setApplicationVersion(QLatin1String(Core::Constants::GCS_VERSION_LONG));
     QCoreApplication::setOrganizationName(QLatin1String("OpenPilot"));
     QCoreApplication::setOrganizationDomain(QLatin1String("openpilot.org"));
-    QSettings::setDefaultFormat(QSettings::IniFormat);
+    QSettings::setDefaultFormat(XmlConfig::XmlSettingsFormat);
     QString baseName = qApp->style()->objectName();
 #ifdef Q_WS_X11
     if (baseName == QLatin1String("windows")) {
@@ -178,17 +175,27 @@ MainWindow::MainWindow() :
     registerDefaultContainers();
     registerDefaultActions();
 
-    m_modeStack = new FancyTabWidget(this);
+    m_modeStack = new MyTabWidget(this);
+    m_modeStack->setIconSize(QSize(24,24));
+    m_modeStack->setTabPosition(QTabWidget::South);
+    m_modeStack->setMovable(false);
+    m_modeStack->setMinimumWidth(512);
+    m_modeStack->setElideMode(Qt::ElideRight);
+#ifndef Q_WS_MAC
+    m_modeStack->setDocumentMode(true);
+#endif
     m_modeManager = new ModeManager(this, m_modeStack);
 
     m_connectionManager = new ConnectionManager(this, m_modeStack);
 
-    m_viewManager = new ViewManager(this);
     m_messageManager = new MessageManager;
     setCentralWidget(m_modeStack);
 
     connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*,QWidget*)),
             this, SLOT(updateFocusWidget(QWidget*,QWidget*)));
+    connect(m_workspaceSettings, SIGNAL(tabBarSettingsApplied(QTabWidget::TabPosition,bool)),
+            this, SLOT(applyTabBarSettings(QTabWidget::TabPosition,bool)));
+    connect(m_modeManager, SIGNAL(newModeOrder(QVector<IMode*>)), m_workspaceSettings, SLOT(newModeOrder(QVector<IMode*>)));
 
 //    setUnifiedTitleAndToolBarOnMac(true);
 #ifdef Q_OS_UNIX
@@ -218,8 +225,8 @@ MainWindow::~MainWindow()
     foreach (QString engine, qxtLog->allLoggerEngines())
         qxtLog->removeLoggerEngine(engine);
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    if (m_uavGadgetModes.count() > 0) {
-        foreach (UAVGadgetMode *mode, m_uavGadgetModes)
+    if (m_uavGadgetManagers.count() > 0) {
+        foreach (UAVGadgetManager *mode, m_uavGadgetManagers)
         {
             pm->removeObject(mode);
             delete mode;
@@ -242,9 +249,6 @@ MainWindow::~MainWindow()
     delete m_uniqueIDManager;
     m_uniqueIDManager = 0;
 
-    delete m_viewManager;
-    m_viewManager = 0;
-
     pm->removeObject(m_coreImpl);
     delete m_coreImpl;
     m_coreImpl = 0;
@@ -264,7 +268,6 @@ bool MainWindow::init(QString *errorMessage)
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     pm->addObject(m_coreImpl);
-    m_viewManager->init();
     m_modeManager->init();
     m_connectionManager->init();
 
@@ -284,18 +287,17 @@ void MainWindow::extensionsInitialized()
 {
 
     QSettings* qs = m_settings;
-    QSettings defaultSettings(":/core/OpenPilotGCS.ini", QSettings::IniFormat);
+    QSettings defaultSettings(":/core/OpenPilotGCS.xml", XmlConfig::XmlSettingsFormat);
+//    QSettings defaultSettings(":/core/OpenPilotGCS.ini", QSettings::IniFormat);
 
     if ( ! qs->allKeys().count() ){
         QMessageBox msgBox;
         msgBox.setText(tr("No configuration file could be found."));
-        msgBox.setInformativeText(tr("Do you want to load the default configuration?"));
-        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-        msgBox.setDefaultButton(QMessageBox::Yes);
-        if ( msgBox.exec() == QMessageBox::Yes ){
-            qDebug() << "Load default config from resource /core/OpenPilotGCS.ini";
-            qs = &defaultSettings;
-        }
+        msgBox.setInformativeText(tr("The default configuration will be loaded."));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+        qDebug() << "Load default config from resource /core/OpenPilotGCS.xml";
+        qs = &defaultSettings;
     }
 
     m_uavGadgetInstanceManager = new UAVGadgetInstanceManager(this);
@@ -394,7 +396,7 @@ IContext *MainWindow::currentContextObject() const
 
 QStatusBar *MainWindow::statusBar() const
 {
-    return m_modeStack->statusBar();
+    return new QStatusBar();// m_modeStack->statusBar();
 }
 
 void MainWindow::registerDefaultContainers()
@@ -670,6 +672,60 @@ void MainWindow::registerDefaultActions()
     connect(m_toggleFullScreenAction, SIGNAL(triggered(bool)), this, SLOT(setFullScreen(bool)));
 #endif
 
+    /*
+     * UavGadgetManager Actions
+     */
+    const QList<int> uavGadgetManagerContext =
+                QList<int>() << CoreImpl::instance()->uniqueIDManager()->uniqueIdentifier(Constants::C_UAVGADGETMANAGER);
+    //Window menu separators
+    QAction *tmpaction1 = new QAction(this);
+    tmpaction1->setSeparator(true);
+    cmd = am->registerAction(tmpaction1, QLatin1String("OpenPilot.Window.Sep.Split"), uavGadgetManagerContext);
+    mwindow->addAction(cmd, Constants::G_WINDOW_HIDE_TOOLBAR);
+
+    m_showToolbarsAction = new QAction(tr("Edit Gadgets Mode"), this);
+    m_showToolbarsAction->setCheckable(true);
+    cmd = am->registerAction(m_showToolbarsAction, Constants::HIDE_TOOLBARS, uavGadgetManagerContext);
+    cmd->setDefaultKeySequence(QKeySequence(tr("Ctrl+Shift+F10")));
+    mwindow->addAction(cmd, Constants::G_WINDOW_HIDE_TOOLBAR);
+
+    //Window menu separators
+    QAction *tmpaction2 = new QAction(this);
+    tmpaction2->setSeparator(true);
+    cmd = am->registerAction(tmpaction2, QLatin1String("OpenPilot.Window.Sep.Split2"), uavGadgetManagerContext);
+    mwindow->addAction(cmd, Constants::G_WINDOW_SPLIT);
+
+#ifdef Q_WS_MAC
+    QString prefix = tr("Meta+Shift");
+#else
+    QString prefix = tr("Ctrl+Shift");
+#endif
+
+    m_splitAction = new QAction(tr("Split"), this);
+    cmd = am->registerAction(m_splitAction, Constants::SPLIT, uavGadgetManagerContext);
+    cmd->setDefaultKeySequence(QKeySequence(tr("%1+Down").arg(prefix)));
+    mwindow->addAction(cmd, Constants::G_WINDOW_SPLIT);
+
+    m_splitSideBySideAction = new QAction(tr("Split Side by Side"), this);
+    cmd = am->registerAction(m_splitSideBySideAction, Constants::SPLIT_SIDE_BY_SIDE, uavGadgetManagerContext);
+    cmd->setDefaultKeySequence(QKeySequence(tr("%1+Right").arg(prefix)));
+    mwindow->addAction(cmd, Constants::G_WINDOW_SPLIT);
+
+    m_removeCurrentSplitAction = new QAction(tr("Close Current View"), this);
+    cmd = am->registerAction(m_removeCurrentSplitAction, Constants::REMOVE_CURRENT_SPLIT, uavGadgetManagerContext);
+    cmd->setDefaultKeySequence(QKeySequence(tr("%1+C").arg(prefix)));
+    mwindow->addAction(cmd, Constants::G_WINDOW_SPLIT);
+
+    m_removeAllSplitsAction = new QAction(tr("Close All Other Views"), this);
+    cmd = am->registerAction(m_removeAllSplitsAction, Constants::REMOVE_ALL_SPLITS, uavGadgetManagerContext);
+    cmd->setDefaultKeySequence(QKeySequence(tr("%1+A").arg(prefix)));
+    mwindow->addAction(cmd, Constants::G_WINDOW_SPLIT);
+
+    m_gotoOtherSplitAction = new QAction(tr("Goto Next View"), this);
+    cmd = am->registerAction(m_gotoOtherSplitAction, Constants::GOTO_OTHER_SPLIT, uavGadgetManagerContext);
+    cmd->setDefaultKeySequence(QKeySequence(tr("%1+N").arg(prefix)));
+    mwindow->addAction(cmd, Constants::G_WINDOW_SPLIT);
+
     //Help Action
     tmpaction = new QAction(QIcon(Constants::ICON_HELP), tr("&Help..."), this);
     cmd = am->registerAction(tmpaction, Constants::G_HELP_HELP, m_globalContext);
@@ -808,6 +864,12 @@ void MainWindow::openFileWith()
 
 }
 
+void MainWindow::applyTabBarSettings(QTabWidget::TabPosition pos, bool movable) {
+    if (m_modeStack->tabPosition() != pos)
+        m_modeStack->setTabPosition(pos);
+    m_modeStack->setMovable(movable);
+}
+
 ActionManager *MainWindow::actionManager() const
 {
     return m_actionManager;
@@ -846,12 +908,6 @@ ConnectionManager *MainWindow::connectionManager() const
     return m_connectionManager;
 }
 
-void MainWindow::addUAVGadgetManager(UAVGadgetManager *manager)
-{
-    if (!m_uavGadgetManagers.contains(manager))
-        m_uavGadgetManagers.append(manager);
-}
-
 QList<UAVGadgetManager*> MainWindow::uavGadgetManagers() const
 {
     return m_uavGadgetManagers;
@@ -871,6 +927,11 @@ ModeManager *MainWindow::modeManager() const
 MimeDatabase *MainWindow::mimeDatabase() const
 {
     return m_mimeDatabase;
+}
+
+GeneralSettings * MainWindow::generalSettings() const
+{
+    return m_generalSettings;
 }
 
 IContext *MainWindow::contextObject(QWidget *widget)
@@ -982,40 +1043,83 @@ void MainWindow::shutdown()
     uavGadgetInstanceManager()->removeAllGadgets();
 }
 
-void MainWindow::createWorkspaces() {
+/* Enable/disable menus for uavgadgets */
+void MainWindow::showUavGadgetMenus(bool show, bool hasSplitter)
+{
+    m_showToolbarsAction->setChecked(show);
+    m_splitAction->setEnabled(show);
+    m_splitSideBySideAction->setEnabled(show);
+    m_removeCurrentSplitAction->setEnabled(show && hasSplitter);
+    m_removeAllSplitsAction->setEnabled(show && hasSplitter);
+    m_gotoOtherSplitAction->setEnabled(show && hasSplitter);
+}
+
+inline int takeLeastPriorityUavGadgetManager(const QList<Core::UAVGadgetManager*> m_uavGadgetManagers) {
+    int index = 0;
+    int prio = m_uavGadgetManagers.at(0)->priority();
+    for (int i = 0; i < m_uavGadgetManagers.count(); i++) {
+        int prio2 = m_uavGadgetManagers.at(i)->priority();
+        if (prio2 < prio) {
+            prio = prio2;
+            index = i;
+        }
+    }
+    return index;
+}
+
+void MainWindow::createWorkspaces(QSettings* qs, bool diffOnly) {
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 
-    UAVGadgetMode *uavGadgetMode;
     Core::UAVGadgetManager *uavGadgetManager;
 
-    while (!m_uavGadgetModes.isEmpty()){
-        pm->removeObject(m_uavGadgetModes.takeFirst());
-    }
-    while (!m_uavGadgetManagers.isEmpty()){
-        Core::UAVGadgetManager* uavGadgetManager = m_uavGadgetManagers.takeLast();
-        uavGadgetManager->removeAllSplits();
-        // TODO Fixthis: This only happens, when settings are reloaded.
-        //      then the old GadgetManagers should be deleted, but if
-        //      I delete them the GCS segfaults.
-        //delete uavGadgetManager;
-    }
-    m_uavGadgetManagers.clear();
-    m_uavGadgetModes.clear();
-    for (int i = 0; i < m_workspaceSettings->numberOfWorkspaces(); ++i) {
+    // If diffOnly is true, we only add/remove the number of workspaces
+    // that has changed,
+    // otherwise a complete reload of workspaces is done
+    int toRemoveFirst = m_uavGadgetManagers.count();
+    int newWorkspacesNo = m_workspaceSettings->numberOfWorkspaces();
+    if (diffOnly && m_uavGadgetManagers.count() > newWorkspacesNo)
+        toRemoveFirst = m_uavGadgetManagers.count() - newWorkspacesNo;
+    else
+        toRemoveFirst = 0;
 
-        uavGadgetManager = new Core::UAVGadgetManager(CoreImpl::instance(), this);
-        uavGadgetManager->hide();
+    int removed = 0;
+
+    while (!m_uavGadgetManagers.isEmpty() && (toRemoveFirst > removed)) {
+        int index = takeLeastPriorityUavGadgetManager(m_uavGadgetManagers);
+        uavGadgetManager = m_uavGadgetManagers.takeAt(index);
+        uavGadgetManager->removeAllSplits();
+        pm->removeObject(uavGadgetManager);
+        delete uavGadgetManager;
+        removed++;
+    }
+
+    int start = 0;
+    if (diffOnly) {
+        start = m_uavGadgetManagers.count();
+    } else {
+        m_uavGadgetManagers.clear();
+    }
+    for (int i = start; i < newWorkspacesNo; ++i) {
+
         const QString name     = m_workspaceSettings->name(i);
         const QString iconName = m_workspaceSettings->iconName(i);
         const QString modeName = m_workspaceSettings->modeName(i);
+        uavGadgetManager = new Core::UAVGadgetManager(CoreImpl::instance(), name,
+                                                      QIcon(iconName), 90-i+1, modeName, this);
 
-        uavGadgetMode = new UAVGadgetMode(uavGadgetManager, name,
-                                          QIcon(iconName), 90-i+1, modeName);
-        uavGadgetManager->setUAVGadgetMode(uavGadgetMode);
-        m_uavGadgetModes.append(uavGadgetMode);
-        pm->addObject(uavGadgetMode);
-        addUAVGadgetManager(uavGadgetManager);
+        connect(uavGadgetManager, SIGNAL(showUavGadgetMenus(bool, bool)), this, SLOT(showUavGadgetMenus(bool, bool)));
+
+        connect(m_showToolbarsAction, SIGNAL(triggered(bool)), uavGadgetManager, SLOT(showToolbars(bool)));
+        connect(m_splitAction, SIGNAL(triggered()), uavGadgetManager, SLOT(split()));
+        connect(m_splitSideBySideAction, SIGNAL(triggered()), uavGadgetManager, SLOT(splitSideBySide()));
+        connect(m_removeCurrentSplitAction, SIGNAL(triggered()), uavGadgetManager, SLOT(removeCurrentSplit()));
+        connect(m_removeAllSplitsAction, SIGNAL(triggered()), uavGadgetManager, SLOT(removeAllSplits()));
+        connect(m_gotoOtherSplitAction, SIGNAL(triggered()), uavGadgetManager, SLOT(gotoOtherSplit()));
+
+        pm->addObject(uavGadgetManager);
+        m_uavGadgetManagers.append(uavGadgetManager);
+        uavGadgetManager->readSettings(qs);
     }
 }
 
@@ -1024,11 +1128,17 @@ static const char *geometryKey = "Geometry";
 static const char *colorKey = "Color";
 static const char *maxKey = "Maximized";
 static const char *fullScreenKey = "FullScreen";
+static const char *modePriorities = "ModePriorities";
 
-void MainWindow::readSettings(QSettings* qs)
+void MainWindow::readSettings(QSettings* qs, bool workspaceDiffOnly)
 {
     if ( !qs ){
         qs = m_settings;
+    }
+
+    if (workspaceDiffOnly) {
+        createWorkspaces(qs, workspaceDiffOnly);
+        return;
     }
 
     m_generalSettings->readSettings(qs);
@@ -1052,13 +1162,18 @@ void MainWindow::readSettings(QSettings* qs)
 
     m_workspaceSettings->readSettings(qs);
 
-    createWorkspaces();
+    createWorkspaces(qs);
 
-    foreach (UAVGadgetManager *manager, m_uavGadgetManagers) {
-        manager->readSettings(qs);
+    // Read tab ordering
+    qs->beginGroup(QLatin1String(modePriorities));
+    QStringList modeNames = qs->childKeys();
+    QMap<QString, int> map;
+    foreach (QString modeName, modeNames) {
+        map.insert(modeName, qs->value(modeName).toInt());
     }
+    m_modeManager->reorderModes(map);
 
-    m_viewManager->readSettings(qs);
+    qs->endGroup();
 
 }
 
@@ -1088,11 +1203,18 @@ void MainWindow::saveSettings(QSettings* qs)
 
     qs->endGroup();
 
+    // Write tab ordering
+    qs->beginGroup(QLatin1String(modePriorities));
+    QVector<IMode*> modes = m_modeManager->modes();
+    foreach (IMode *mode, modes) {
+        qs->setValue(QLatin1String(mode->uniqueModeName()), mode->priority());
+    }
+    qs->endGroup();
+
     foreach (UAVGadgetManager *manager, m_uavGadgetManagers) {
         manager->saveSettings(qs);
     }
 
-    m_viewManager->saveSettings(qs);
     m_actionManager->saveSettings(qs);
     m_generalSettings->saveSettings(qs);
 

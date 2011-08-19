@@ -2,7 +2,8 @@ TEMPLATE = lib
 TARGET = Utils
 
 QT += gui \
-    network
+    network \
+    xml
 
 DEFINES += QTCREATOR_UTILS_LIB
 
@@ -44,7 +45,11 @@ SOURCES += reloadpromptutils.cpp \
     coordinateconversions.cpp \
     pathutils.cpp \
 	worldmagmodel.cpp \
-	homelocationutil.cpp
+	homelocationutil.cpp \
+    mytabbedstackwidget.cpp \
+    mytabwidget.cpp \
+    mylistwidget.cpp
+SOURCES += xmlconfig.cpp
 
 win32 {
     SOURCES += abstractprocess_win.cpp \
@@ -94,7 +99,11 @@ HEADERS += utils_global.h \
     coordinateconversions.h \
     pathutils.h \
 	worldmagmodel.h \
-	homelocationutil.h
+	homelocationutil.h \
+    mytabbedstackwidget.h \
+    mytabwidget.h \
+    mylistwidget.h
+HEADERS += xmlconfig.h
 
 FORMS += filewizardpage.ui \
     projectintropage.ui \

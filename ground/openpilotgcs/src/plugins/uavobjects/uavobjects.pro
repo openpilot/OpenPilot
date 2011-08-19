@@ -23,13 +23,15 @@ SOURCES += uavobject.cpp \
 OTHER_FILES += UAVObjects.pluginspec
 
 # Add in all of the synthetic/generated uavobject files
-HEADERS += $$UAVOBJECT_SYNTHETICS/ahrsstatus.h \
+HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
+    $$UAVOBJECT_SYNTHETICS/ahrsstatus.h \
     $$UAVOBJECT_SYNTHETICS/ahrscalibration.h \
     $$UAVOBJECT_SYNTHETICS/baroaltitude.h \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.h \
     $$UAVOBJECT_SYNTHETICS/ahrssettings.h \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.h \
     $$UAVOBJECT_SYNTHETICS/attituderaw.h \
+    $$UAVOBJECT_SYNTHETICS/camerastabsettings.h \
     $$UAVOBJECT_SYNTHETICS/flighttelemetrystats.h \
     $$UAVOBJECT_SYNTHETICS/systemstats.h \
     $$UAVOBJECT_SYNTHETICS/systemalarms.h \
@@ -67,15 +69,19 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/ahrsstatus.h \
     $$UAVOBJECT_SYNTHETICS/nedaccel.h \
     $$UAVOBJECT_SYNTHETICS/sonaraltitude.h \
     $$UAVOBJECT_SYNTHETICS/flightstatus.h \
-    $$UAVOBJECT_SYNTHETICS/attitudesettings.h
+    $$UAVOBJECT_SYNTHETICS/hwsettings.h \
+    $$UAVOBJECT_SYNTHETICS/attitudesettings.h \
+    $$UAVOBJECT_SYNTHETICS/cameradesired.h
 
-SOURCES += $$UAVOBJECT_SYNTHETICS/ahrsstatus.cpp \
+SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
+    $$UAVOBJECT_SYNTHETICS/ahrsstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/ahrscalibration.cpp \
     $$UAVOBJECT_SYNTHETICS/baroaltitude.cpp \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.cpp \
     $$UAVOBJECT_SYNTHETICS/ahrssettings.cpp \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.cpp \
     $$UAVOBJECT_SYNTHETICS/attituderaw.cpp \
+    $$UAVOBJECT_SYNTHETICS/camerastabsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/flighttelemetrystats.cpp \
     $$UAVOBJECT_SYNTHETICS/systemstats.cpp \
     $$UAVOBJECT_SYNTHETICS/systemalarms.cpp \
@@ -114,4 +120,6 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/ahrsstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/sonaraltitude.cpp \
     $$UAVOBJECT_SYNTHETICS/uavobjectsinit.cpp \
     $$UAVOBJECT_SYNTHETICS/flightstatus.cpp \
-    $$UAVOBJECT_SYNTHETICS/attitudesettings.cpp
+    $$UAVOBJECT_SYNTHETICS/hwsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/attitudesettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/cameradesired.cpp

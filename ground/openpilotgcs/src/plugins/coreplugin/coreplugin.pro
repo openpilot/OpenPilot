@@ -24,10 +24,8 @@ SOURCES += mainwindow.cpp \
     uniqueidmanager.cpp \
     messagemanager.cpp \
     messageoutputwindow.cpp \
-    viewmanager.cpp \
     versiondialog.cpp \
     iuavgadget.cpp \
-    uavgadgetmode.cpp \
     uavgadgetmanager/uavgadgetmanager.cpp \
     uavgadgetmanager/uavgadgetview.cpp \
     uavgadgetmanager/splitterorview.cpp \
@@ -73,9 +71,7 @@ HEADERS += mainwindow.h \
     uniqueidmanager.h \
     messagemanager.h \
     messageoutputwindow.h \
-    viewmanager.h \
     iuavgadget.h \
-    uavgadgetmode.h \
     iuavgadgetfactory.h \
     uavgadgetmanager/uavgadgetmanager.h \
     uavgadgetmanager/uavgadgetview.h \
@@ -141,3 +137,5 @@ unix:!macx {
     INSTALLS += images
 }
 OTHER_FILES += Core.pluginspec
+
+include(gcsversioninfo.pri)

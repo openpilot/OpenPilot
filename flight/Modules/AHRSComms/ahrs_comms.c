@@ -52,6 +52,8 @@
 
 #include "ahrs_comms.h"
 #include "ahrs_spi_comm.h"
+#include "ahrsstatus.h"
+#include "ahrscalibration.h"
 
 // Private constants
 #define STACK_SIZE configMINIMAL_STACK_SIZE-128
@@ -69,15 +71,31 @@ static void ahrscommsTask(void *parameters);
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t AHRSCommsInitialize(void)
+int32_t AHRSCommsStart(void)
 {
-	// Start main task
+	// Start main task	
 	xTaskCreate(ahrscommsTask, (signed char *)"AHRSComms", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_AHRSCOMMS, taskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_AHRS);
 
 	return 0;
 }
+
+/**
+ * Initialise the module, called on startup
+ * \returns 0 on success or -1 if initialisation failed
+ */
+int32_t AHRSCommsInitialize(void)
+{
+	AhrsStatusInitialize();
+	AHRSCalibrationInitialize();
+	AttitudeRawInitialize();
+	VelocityActualInitialize();
+	PositionActualInitialize();
+
+	return 0;
+}
+MODULE_INITCALL(AHRSCommsInitialize, AHRSCommsStart)
 
 /**
  * Module thread, should not return.

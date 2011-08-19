@@ -52,20 +52,25 @@ private slots:
     void startAccelCalibration();
     void saveAttitudeSettings();
     void applyAttitudeSettings();
-    void getCurrentAttitudeSettings();
+    virtual void refreshValues();
+    void openHelp();
 
 private:
     QMutex startStop;
     Ui_ccattitude *ui;
     QTimer timer;
     UAVObject::Metadata initialMdata;
+    quint8 initialBiasCorrected;
 
     int updates;
 
     QList<double> x_accum, y_accum, z_accum;
+    QList<double> x_gyro_accum, y_gyro_accum, z_gyro_accum;
 
     static const int NUM_ACCEL_UPDATES = 60;
     static const float ACCEL_SCALE = 0.004f * 9.81f;
+    virtual void enableControls(bool enable);
+
 };
 
 #endif // CCATTITUDEWIDGET_H

@@ -1,12 +1,12 @@
-This is the Milestones file of the OpenPilot project, its intent is to record the major accomplishments achieved by people using the OpenPilot platform and who gets the karma for performing them.  
+This is the Milestones file of the OpenPilot project, its intent is to record the major accomplishments achieved by people using the OpenPilot platform and who gets the karma for performing them.
 
 
-The CREDITS.txt in SVN records the developers and the achievements made by each individual; this file is different as it is aimed at recording and giving credit to the people who achieve milestones in the use of OpenPilot. 
+The CREDITS.txt in SVN records the developers and the achievements made by each individual; this file is different as it is aimed at recording and giving credit to the people who achieve milestones in the use of OpenPilot.
 
 
-The fields are: 
+The fields are:
 
-Milestone description (M) 
+Milestone description (M)
 Credited to (C)
 Date (D)
 Video (V) - Optional link to video showing milestone
@@ -22,7 +22,7 @@ C: James Cotton
 D: September 2010
 
 M: First stabilised fixed wing flight
-C: Edouard Lafargue 
+C: Edouard Lafargue
 D: September 2010
 
 M: First stabilised Quad flight
@@ -38,7 +38,7 @@ C: Cathy Moss
 D: October 2010
 
 M: First OpenPilot night flight
-C: Dale Schintock
+C: Dale Schinstock
 D: October 2010
 V: http://www.youtube.com/watch?v=yk8ckeRMV8U
 
@@ -53,7 +53,7 @@ D: November 2010
 V: http://vimeo.com/17488702
 
 M: First solid OpenPilot Position Hold
-C: Dale Schintock
+C: Dale Schinstock
 D: December 2010
 V: http://www.youtube.com/watch?v=BBCGVP0Vpgw
 
@@ -94,38 +94,88 @@ V: http://vimeo.com/22221798
 
 M: First CopterControl flight on a Hexa
 C: Edouard Lafargue
-
 D: March 2011
-
 V: http://vimeo.com/21476466
-
 
 M: First CopterControl flight on a Tri
 C: Gary Mortimer and the Scorpion
 D: March 2011
 V: http://vimeo.com/22104334
 
+M: First Y6 OpenPilot flight
+C: Sami Korhonen (Sambas)
+D: May 2011
+V: http://www.vimeo.com/23637586
+
 M: First CopterControl flight on a Flybarless Heli
-C: ?
-D: ?
-V: 
+C: Oleg Semyonov (osnwt)
+D: May 2011
+V: http://www.youtube.com/watch?v=-J8cxqzxxWw
+
+M: First V8 Octo OpenPilot flight
+C: Sami Korhonen (Sambas)
+D: May 2011
+V: http://vimeo.com/24258192
 
 M: First Y6 CopterControl flight
-C: ?
-D: ?
+C: Michel Pet
+D: June 2011
+V: http://www.youtube.com/watch?v=QsE2MQELPZY
+
+M: First MoveCopter flight
+C: Werner Backes
+D: July 2011
+V: http://vimeo.com/25983655
+
+M: First Y4 CopterControl flight
+C: Mat Wellington
+D: July 2011
+V: http://www.youtube.com/watch?v=TxZ4MDGIj1o
+
+M: First V-Tail4 CopterControl flight
+C: Mat Wellington
+D: July 2011
+V: http://www.youtube.com/watch?v=YE4Fd9vdg1I
+
+M: First CopterControl Flybared Heli inverted flight (2:33)
+C: Maxim Izergin (Maximus43)
+D: August 2011
+V: http://www.youtube.com/watch?v=8SrfIS7OkB4
+
+M: First CopterControl Flybared Heli funnel (4:18), loop (5:35)
+C: Sergey Solodennikov (alconaft43)
+D: August 2011
+V: http://www.youtube.com/watch?v=8SrfIS7OkB4
+
+M: First Altitude Hold using Sonar
+C: 
+D: 
 V: 
 
+M: First CopterControl Navigation on RC Ground Vechicle
+C: 
+D: 
+V: 
+
+M: First CopterControl Navigation on RC Water Vechicle
+C: 
+D: 
+V: 
+
+M: First CopterControl flip on a Flybarless Heli
+C: 
+D: 
+V: 
 
 
 An incomplete list of some future Milestones is below:
 
-* First Helicopter flight with OpenPilot 
-* First Octo flight with OpenPilot
+* First Y6 CopterControl flight
+* First Helicopter flight with OpenPilot
 * First successful flight using the GCS only and no RC TX
 * First use of Magic Waypoint
 * First Flybarless Helicopter flight with OpenPilot
-* First flight with CopterControl
-* First fixed wing navigation flight
+* First fixed wing navigation flight 
 * First Multirotor navigation flight
 * First Helicopter navigation flight
 * First over 1km navigation flight

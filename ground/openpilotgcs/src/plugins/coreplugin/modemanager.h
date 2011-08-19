@@ -40,6 +40,7 @@ QT_BEGIN_NAMESPACE
 class QSignalMapper;
 class QMenu;
 class QIcon;
+class MyTabWidget;
 QT_END_NAMESPACE
 
 namespace Core {
@@ -58,7 +59,7 @@ class CORE_EXPORT ModeManager : public QObject
     Q_OBJECT
 
 public:
-    ModeManager(Internal::MainWindow *mainWindow, Internal::FancyTabWidget *modeStack);
+    ModeManager(Internal::MainWindow *mainWindow, MyTabWidget *modeStack);
 
     void init();
     static ModeManager *instance() { return m_instance; }
@@ -69,10 +70,13 @@ public:
     void addAction(Command *command, int priority, QMenu *menu = 0);
     void addWidget(QWidget *widget);
     void updateModeNameIcon(IMode *mode, const QIcon &icon, const QString &label);
+    QVector<IMode*> modes() const { return m_modes; }
+    void reorderModes(QMap<QString, int> priorities);
 
 signals:
     void currentModeAboutToChange(Core::IMode *mode);
     void currentModeChanged(Core::IMode *mode);
+    void newModeOrder(QVector<IMode*> modes);
 
 public slots:
     void activateMode(const QString &id);
@@ -84,19 +88,22 @@ private slots:
     void currentTabAboutToChange(int index);
     void currentTabChanged(int index);
     void updateModeToolTip();
+    void tabMoved(int from, int to);
 
 private:
     int indexOf(const QString &id) const;
+    void setDefaultKeyshortcuts();
 
     static ModeManager *m_instance;
     Internal::MainWindow *m_mainWindow;
-    Internal::FancyTabWidget *m_modeStack;
-    Internal::FancyActionBar *m_actionBar;
+    MyTabWidget *m_modeStack;
     QMap<Command*, int> m_actions;
     QVector<IMode*> m_modes;
     QVector<Command*> m_modeShortcuts;
     QSignalMapper *m_signalMapper;
     QList<int> m_addedContexts;
+    QList<int> m_tabOrder;
+    bool m_isReprioritizing;
 };
 
 } // namespace Core

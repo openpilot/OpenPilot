@@ -35,6 +35,7 @@
 // Private variables
 static xSemaphoreHandle lock;
 static xTaskHandle handles[TASKINFO_RUNNING_NUMELEM];
+static uint32_t lastMonitorTime;
 
 // Private functions
 
@@ -45,6 +46,10 @@ int32_t TaskMonitorInitialize(void)
 {
 	lock = xSemaphoreCreateRecursiveMutex();
 	memset(handles, 0, sizeof(xTaskHandle)*TASKINFO_RUNNING_NUMELEM);
+	lastMonitorTime = 0;
+#if defined(DIAGNOSTICS)
+	lastMonitorTime = portGET_RUN_TIME_COUNTER_VALUE();
+#endif
 	return 0;
 }
 
@@ -89,12 +94,27 @@ int32_t TaskMonitorRemove(TaskInfoRunningElem task)
  */
 void TaskMonitorUpdateAll(void)
 {
+#if defined(DIAGNOSTICS)
 	TaskInfoData data;
 	int n;
 
 	// Lock
 	xSemaphoreTakeRecursive(lock, portMAX_DELAY);
 
+#if ( configGENERATE_RUN_TIME_STATS == 1 )
+	uint32_t currentTime;
+	uint32_t deltaTime;
+	
+	/*
+	 * Calculate the amount of elapsed run time between the last time we
+	 * measured and now. Scale so that we can convert task run times
+	 * directly to percentages.
+	 */
+	currentTime = portGET_RUN_TIME_COUNTER_VALUE();
+	deltaTime = ((currentTime - lastMonitorTime) / 100) ? : 1; /* avoid divide-by-zero if the interval is too small */
+	lastMonitorTime = currentTime;			
+#endif
+	
 	// Update all task information
 	for (n = 0; n < TASKINFO_RUNNING_NUMELEM; ++n)
 	{
@@ -107,7 +127,8 @@ void TaskMonitorUpdateAll(void)
 			data.StackRemaining[n] = uxTaskGetStackHighWaterMark(handles[n]) * 4;
 #if ( configGENERATE_RUN_TIME_STATS == 1 )
 			/* Generate run time stats */
-			data.RunningTime[n] = 100 * (float) uxTaskGetRunTime(handles[n]) / portGET_RUN_TIME_COUNTER_VALUE();
+			data.RunningTime[n] = uxTaskGetRunTime(handles[n]) / deltaTime;
+			
 #endif
 #endif
 			
@@ -125,4 +146,5 @@ void TaskMonitorUpdateAll(void)
 
 	// Done
 	xSemaphoreGiveRecursive(lock);
+#endif
 }

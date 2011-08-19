@@ -40,6 +40,7 @@ QT_BEGIN_NAMESPACE
 class QSettings;
 class QShortcut;
 class QToolButton;
+class MyTabWidget;
 QT_END_NAMESPACE
 
 namespace Core {
@@ -73,10 +74,8 @@ class FancyTabWidget;
 class GeneralSettings;
 class ShortcutSettings;
 class WorkspaceSettings;
-class ViewManager;
 class VersionDialog;
 class AuthorsDialog;
-class UAVGadgetMode;
 
 class CORE_EXPORT MainWindow : public EventFilteringMainWindow
 {
@@ -94,7 +93,7 @@ public:
     void addContextObject(IContext *contex);
     void removeContextObject(IContext *contex);
     void resetContext();
-    void readSettings(QSettings* qs = 0);
+    void readSettings(QSettings* qs = 0, bool workspaceDiffOnly = false);
     void saveSettings(QSettings* qs = 0);
     void readSettings(IConfigurablePlugin* plugin, QSettings* qs = 0);
     void saveSettings(IConfigurablePlugin* plugin, QSettings* qs = 0);
@@ -111,7 +110,7 @@ public:
     Core::ThreadManager *threadManager() const;
     Core::ModeManager *modeManager() const;
     Core::MimeDatabase *mimeDatabase() const;
-
+    Internal::GeneralSettings *generalSettings() const;
     QSettings *settings(QSettings::Scope scope) const;
     inline SettingsDatabase *settingsDatabase() const { return m_settingsDatabase; }
     IContext * currentContextObject() const;
@@ -162,14 +161,14 @@ private slots:
     void destroyVersionDialog();
     void destroyAuthorsDialog();
     void modeChanged(Core::IMode *mode);
+    void showUavGadgetMenus(bool show, bool hasSplitter);
+    void applyTabBarSettings(QTabWidget::TabPosition pos, bool movable);
 
 private:
-    void addUAVGadgetManager(Core::UAVGadgetManager *manager);
     void updateContextObject(IContext *context);
     void registerDefaultContainers();
     void registerDefaultActions();
-
-    void createWorkspaces();
+    void createWorkspaces(QSettings* qs, bool diffOnly = false);
 
     CoreImpl *m_coreImpl;
     UniqueIDManager *m_uniqueIDManager;
@@ -177,21 +176,18 @@ private:
     QList<int> m_additionalContexts;
     QSettings *m_settings;
     QSettings *m_globalSettings;
-    bool m_dontSaveSettings; // In case of an Error or if we reset the settings, never save them.
     SettingsDatabase *m_settingsDatabase;
+    bool m_dontSaveSettings; // In case of an Error or if we reset the settings, never save them.
     ActionManagerPrivate *m_actionManager;
     MessageManager *m_messageManager;
     VariableManager *m_variableManager;
     ThreadManager *m_threadManager;
-    ViewManager *m_viewManager;
     ModeManager *m_modeManager;
     QList<UAVGadgetManager*> m_uavGadgetManagers;
-    QList<UAVGadgetMode*> m_uavGadgetModes;
     UAVGadgetInstanceManager *m_uavGadgetInstanceManager;
     ConnectionManager *m_connectionManager;
     MimeDatabase *m_mimeDatabase;
-    FancyTabWidget *m_modeStack;
-//    RightPaneWidget *m_rightPaneWidget;
+    MyTabWidget *m_modeStack;
     Core::BaseView *m_outputView;
     VersionDialog *m_versionDialog;
     AuthorsDialog *m_authorsDialog;
@@ -213,6 +209,14 @@ private:
     QAction *m_exitAction;
     QAction *m_optionsAction;
     QAction *m_toggleFullScreenAction;
+    // UavGadgetManager actions
+    QAction *m_showToolbarsAction;
+    QAction *m_splitAction;
+    QAction *m_splitSideBySideAction;
+    QAction *m_removeCurrentSplitAction;
+    QAction *m_removeAllSplitsAction;
+    QAction *m_gotoOtherSplitAction;
+
 #ifdef Q_WS_MAC
     QAction *m_minimizeAction;
     QAction *m_zoomAction;

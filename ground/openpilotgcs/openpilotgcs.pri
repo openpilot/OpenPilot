@@ -19,6 +19,19 @@ defineReplace(addNewline) {
     return($$escape_expand(\\n\\t))
 }
 
+defineReplace(qtLibraryName) {
+   unset(LIBRARY_NAME)
+   LIBRARY_NAME = $$1
+   CONFIG(debug, debug|release) {
+      !debug_and_release|build_pass {
+          mac:RET = $$member(LIBRARY_NAME, 0)_debug
+              else:win32:RET = $$member(LIBRARY_NAME, 0)d
+      }
+   }
+   isEmpty(RET):RET = $$LIBRARY_NAME
+   return($$RET)
+}
+
 # For use in custom compilers which just copy files
 win32:i_flag = i
 defineReplace(stripSrcDir) {
@@ -62,7 +75,7 @@ isEmpty(GCS_BUILD_TREE) {
 GCS_APP_PATH = $$GCS_BUILD_TREE/bin
 macx {
     GCS_APP_TARGET   = "OpenPilot GCS"
-    GCS_LIBRARY_PATH = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/PlugIns
+    GCS_LIBRARY_PATH = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Plugins
     GCS_PLUGIN_PATH  = $$GCS_LIBRARY_PATH
     GCS_LIBEXEC_PATH = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Resources
     GCS_DATA_PATH    = $$GCS_APP_PATH/$${GCS_APP_TARGET}.app/Contents/Resources

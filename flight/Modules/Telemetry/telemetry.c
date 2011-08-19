@@ -31,6 +31,7 @@
  */
 
 #include "openpilot.h"
+#include "telemetry.h"
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "telemetrysettings.h"
@@ -66,6 +67,7 @@ static uint32_t txErrors;
 static uint32_t txRetries;
 static TelemetrySettingsData settings;
 static uint32_t timeOfLastObjectUpdate;
+static UAVTalkConnection uavTalkCon;
 
 // Private functions
 static void telemetryTxTask(void *parameters);
@@ -85,38 +87,15 @@ static void updateSettings();
  * \return -1 if initialisation failed
  * \return 0 on success
  */
-int32_t TelemetryInitialize(void)
+int32_t TelemetryStart(void)
 {
-	UAVObjEvent ev;
-
-	// Initialize vars
-	timeOfLastObjectUpdate = 0;
-
-	// Create object queues
-	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
-#if defined(PIOS_TELEM_PRIORITY_QUEUE)
-	priorityQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
-#endif
-	
-	// Get telemetry settings object
-	updateSettings();
-
-	// Initialise UAVTalk
-	UAVTalkInitialize(&transmitData);
-
 	// Process all registered objects and connect queue for updates
 	UAVObjIterate(&registerObject);
-
-	// Create periodic event that will be used to update the telemetry stats
-	txErrors = 0;
-	txRetries = 0;
-	memset(&ev, 0, sizeof(UAVObjEvent));
-	EventPeriodicQueueCreate(&ev, priorityQueue, STATS_UPDATE_PERIOD_MS);
-
+    
 	// Listen to objects of interest
 	GCSTelemetryStatsConnectQueue(priorityQueue);
 	TelemetrySettingsConnectQueue(priorityQueue);
-
+    
 	// Start telemetry tasks
 	xTaskCreate(telemetryTxTask, (signed char *)"TelTx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
 	xTaskCreate(telemetryRxTask, (signed char *)"TelRx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_RX, &telemetryRxTaskHandle);
@@ -127,9 +106,49 @@ int32_t TelemetryInitialize(void)
 	xTaskCreate(telemetryTxPriTask, (signed char *)"TelPriTx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_TXPRI, &telemetryTxPriTaskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_TELEMETRYTXPRI, telemetryTxPriTaskHandle);
 #endif
-	
+
 	return 0;
 }
+
+/**
+ * Initialise the telemetry module
+ * \return -1 if initialisation failed
+ * \return 0 on success
+ */
+int32_t TelemetryInitialize(void)
+{
+	UAVObjEvent ev;
+    
+	FlightTelemetryStatsInitialize();
+	GCSTelemetryStatsInitialize();
+	TelemetrySettingsInitialize();
+
+	// Initialize vars
+	timeOfLastObjectUpdate = 0;
+
+	// Create object queues
+	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+#if defined(PIOS_TELEM_PRIORITY_QUEUE)
+	priorityQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+#endif
+
+    // Get telemetry settings object
+	updateSettings();
+    
+	// Initialise UAVTalk
+	uavTalkCon = UAVTalkInitialize(&transmitData,256);
+    
+	// Create periodic event that will be used to update the telemetry stats
+	txErrors = 0;
+	txRetries = 0;
+	memset(&ev, 0, sizeof(UAVObjEvent));
+	EventPeriodicQueueCreate(&ev, priorityQueue, STATS_UPDATE_PERIOD_MS);
+    
+
+	return 0;
+}
+
+MODULE_INITCALL(TelemetryInitialize, TelemetryStart)
 
 /**
  * Register a new object, adds object to local list and connects the queue depending on the object's
@@ -221,7 +240,7 @@ static void processObjEvent(UAVObjEvent * ev)
 			if (ev->event == EV_UPDATED || ev->event == EV_UPDATED_MANUAL) {
 				// Send update to GCS (with retries)
 				while (retries < MAX_RETRIES && success == -1) {
-					success = UAVTalkSendObject(ev->obj, ev->instId, metadata.telemetryAcked, REQ_TIMEOUT_MS);	// call blocks until ack is received or timeout
+					success = UAVTalkSendObject(uavTalkCon, ev->obj, ev->instId, metadata.telemetryAcked, REQ_TIMEOUT_MS);	// call blocks until ack is received or timeout
 					++retries;
 				}
 				// Update stats
@@ -232,7 +251,7 @@ static void processObjEvent(UAVObjEvent * ev)
 			} else if (ev->event == EV_UPDATE_REQ) {
 				// Request object update from GCS (with retries)
 				while (retries < MAX_RETRIES && success == -1) {
-					success = UAVTalkSendObjectRequest(ev->obj, ev->instId, REQ_TIMEOUT_MS);	// call blocks until update is received or timeout
+					success = UAVTalkSendObjectRequest(uavTalkCon, ev->obj, ev->instId, REQ_TIMEOUT_MS);	// call blocks until update is received or timeout
 					++retries;
 				}
 				// Update stats
@@ -291,7 +310,6 @@ static void telemetryTxPriTask(void *parameters)
 static void telemetryRxTask(void *parameters)
 {
 	uint32_t inputPort;
-	int32_t len;
 
 	// Task loop
 	while (1) {
@@ -305,14 +323,20 @@ static void telemetryRxTask(void *parameters)
 			inputPort = telemetryPort;
 		}
 
-		// Block until data are available
-		// TODO: Currently we periodically check the buffer for data, update once the PIOS_COM is made blocking
-		len = PIOS_COM_ReceiveBufferUsed(inputPort);
-		for (int32_t n = 0; n < len; ++n) {
-			UAVTalkProcessInputStream(PIOS_COM_ReceiveBuffer(inputPort));
-		}
-		vTaskDelay(5);	// <- remove when blocking calls are implemented
+		if (inputPort) {
+			// Block until data are available
+			uint8_t serial_data[1];
+			uint16_t bytes_to_process;
 
+			bytes_to_process = PIOS_COM_ReceiveBuffer(inputPort, serial_data, sizeof(serial_data), 500);
+			if (bytes_to_process > 0) {
+				for (uint8_t i = 0; i < bytes_to_process; i++) {
+					UAVTalkProcessInputStream(uavTalkCon,serial_data[i]);
+				}
+			}
+		} else {
+			vTaskDelay(5);
+		}
 	}
 }
 
@@ -336,7 +360,11 @@ static int32_t transmitData(uint8_t * data, int32_t length)
 		outputPort = telemetryPort;
 	}
 
-	return PIOS_COM_SendBufferNonBlocking(outputPort, data, length);
+	if (outputPort) {
+		return PIOS_COM_SendBufferNonBlocking(outputPort, data, length);
+	} else {
+		return -1;
+	}
 }
 
 /**
@@ -403,8 +431,8 @@ static void updateTelemetryStats()
 	uint32_t timeNow;
 
 	// Get stats
-	UAVTalkGetStats(&utalkStats);
-	UAVTalkResetStats();
+	UAVTalkGetStats(uavTalkCon, &utalkStats);
+	UAVTalkResetStats(uavTalkCon);
 
 	// Get object data
 	FlightTelemetryStatsGet(&flightStats);
@@ -492,20 +520,16 @@ static void updateSettings()
     // Retrieve settings
     TelemetrySettingsGet(&settings);
 
-    // Set port speed
-    if (settings.Speed == TELEMETRYSETTINGS_SPEED_2400) PIOS_COM_ChangeBaud(telemetryPort, 2400);
-    else
-    if (settings.Speed == TELEMETRYSETTINGS_SPEED_4800) PIOS_COM_ChangeBaud(telemetryPort, 4800);
-    else
-    if (settings.Speed == TELEMETRYSETTINGS_SPEED_9600) PIOS_COM_ChangeBaud(telemetryPort, 9600);
-    else
-    if (settings.Speed == TELEMETRYSETTINGS_SPEED_19200) PIOS_COM_ChangeBaud(telemetryPort, 19200);
-    else
-    if (settings.Speed == TELEMETRYSETTINGS_SPEED_38400) PIOS_COM_ChangeBaud(telemetryPort, 38400);
-    else
-    if (settings.Speed == TELEMETRYSETTINGS_SPEED_57600) PIOS_COM_ChangeBaud(telemetryPort, 57600);
-    else
-    if (settings.Speed == TELEMETRYSETTINGS_SPEED_115200) PIOS_COM_ChangeBaud(telemetryPort, 115200);
+    if (telemetryPort) {
+	// Set port speed
+	if (settings.Speed == TELEMETRYSETTINGS_SPEED_2400) PIOS_COM_ChangeBaud(telemetryPort, 2400);
+	else if (settings.Speed == TELEMETRYSETTINGS_SPEED_4800) PIOS_COM_ChangeBaud(telemetryPort, 4800);
+	else if (settings.Speed == TELEMETRYSETTINGS_SPEED_9600) PIOS_COM_ChangeBaud(telemetryPort, 9600);
+	else if (settings.Speed == TELEMETRYSETTINGS_SPEED_19200) PIOS_COM_ChangeBaud(telemetryPort, 19200);
+	else if (settings.Speed == TELEMETRYSETTINGS_SPEED_38400) PIOS_COM_ChangeBaud(telemetryPort, 38400);
+	else if (settings.Speed == TELEMETRYSETTINGS_SPEED_57600) PIOS_COM_ChangeBaud(telemetryPort, 57600);
+	else if (settings.Speed == TELEMETRYSETTINGS_SPEED_115200) PIOS_COM_ChangeBaud(telemetryPort, 115200);
+    }
 }
 
 /**

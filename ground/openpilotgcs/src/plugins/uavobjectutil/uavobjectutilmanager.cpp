@@ -41,6 +41,11 @@
 UAVObjectUtilManager::UAVObjectUtilManager()
 {
     mutex = new QMutex(QMutex::Recursive);
+    saveState = IDLE;
+    failureTimer.stop();
+    failureTimer.setSingleShot(true);
+    failureTimer.setInterval(1000);
+    connect(&failureTimer, SIGNAL(timeout()),this,SLOT(objectPersistenceOperationFailed()));
 }
 
 UAVObjectUtilManager::~UAVObjectUtilManager()
@@ -58,63 +63,153 @@ UAVObjectUtilManager::~UAVObjectUtilManager()
 	}
 }
 
+
+UAVObjectManager* UAVObjectUtilManager::getObjectManager() {
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager * objMngr = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objMngr);
+    return objMngr;
+}
+
+
 // ******************************
 // SD card saving
+//
 
+/*
+  Add a new object to save in the queue
+  */
 void UAVObjectUtilManager::saveObjectToSD(UAVObject *obj)
 {
-	QMutexLocker locker(mutex);
+    // Add to queue
+    queue.enqueue(obj);
+    qDebug() << "Enqueue object: " << obj->getName();
 
-	if (!obj) return;
 
-	// Add to queue
-	queue.enqueue(obj);
+    // If queue length is one, then start sending (call sendNextObject)
+    // Otherwise, do nothing, it's sending anyway
+    if (queue.length()==1)
+        saveNextObject();
 
-	// If queue length is one, then start sending (call sendNextObject)
-	// Otherwise, do nothing, it's sending anyway
-	if (queue.length() <= 1)
-		saveNextObject();
+
 }
 
 void UAVObjectUtilManager::saveNextObject()
 {
-	if (queue.isEmpty()) return;
+    if ( queue.isEmpty() )
+    {
+        return;
+    }
 
-	// Get next object from the queue
-	UAVObject *obj = queue.head();
-	if (!obj) return;
+    Q_ASSERT(saveState == IDLE);
 
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-	if (!pm) return;
+    // Get next object from the queue
+    UAVObject* obj = queue.head();
+    qDebug() << "Request board to save object " << obj->getName();
 
-	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-	if (!om) return;
-
-	ObjectPersistence *objper = dynamic_cast<ObjectPersistence *>(om->getObject(ObjectPersistence::NAME));
-	connect(objper, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(transactionCompleted(UAVObject *, bool)));
-
-	ObjectPersistence::DataFields data;
-	data.Operation = ObjectPersistence::OPERATION_SAVE;
-	data.Selection = ObjectPersistence::SELECTION_SINGLEOBJECT;
-	data.ObjectID = obj->getObjID();
-	data.InstanceID = obj->getInstID();
-	objper->setData(data);
-	objper->updated();
+    ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( getObjectManager()->getObject(ObjectPersistence::NAME) );
+    connect(objper, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(objectPersistenceTransactionCompleted(UAVObject*,bool)));
+    connect(objper, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(objectPersistenceUpdated(UAVObject *)));
+    saveState = AWAITING_ACK;
+    if (obj != NULL)
+    {
+        ObjectPersistence::DataFields data;
+        data.Operation = ObjectPersistence::OPERATION_SAVE;
+        data.Selection = ObjectPersistence::SELECTION_SINGLEOBJECT;
+        data.ObjectID = obj->getObjID();
+        data.InstanceID = obj->getInstID();
+        objper->setData(data);
+        objper->updated();
+    }
+    // Now: we are going to get two "objectUpdated" messages (one coming from GCS, one coming from Flight, which
+    // will confirm the object was properly received by both sides) and then one "transactionCompleted" indicating
+    // that the Flight side did not only receive the object but it did receive it without error. Last we will get
+    // a last "objectUpdated" message coming from flight side, where we'll get the results of the objectPersistence
+    // operation we asked for (saved, other).
 }
 
-void UAVObjectUtilManager::transactionCompleted(UAVObject *obj, bool success)
+/**
+  * @brief Process the transactionCompleted message from Telemetry indicating request sent successfully
+  * @param[in] The object just transsacted.  Must be ObjectPersistance
+  * @param[in] success Indicates that the transaction did not time out
+  *
+  * After a failed transaction (usually timeout) resends the save request.  After a succesful
+  * transaction will then wait for a save completed update from the autopilot.
+  */
+void UAVObjectUtilManager::objectPersistenceTransactionCompleted(UAVObject* obj, bool success)
 {
-	Q_UNUSED(success);
-
-	QMutexLocker locker(mutex);
-
-	if (!obj) return;
-
-	// Disconnect from sending object
-	obj->disconnect(this);
-	queue.dequeue();		// We can now remove the object, it's done.
-	saveNextObject();
+    if(success) {
+        Q_ASSERT(obj->getName().compare("ObjectPersistence") == 0);
+        Q_ASSERT(saveState == AWAITING_ACK);
+        // Two things can happen:
+        // Either the Object Save Request did actually go through, and then we should get in
+        // "AWAITING_COMPLETED" mode, or the Object Save Request did _not_ go through, for example
+        // because the object does not exist and then we will never get a subsequent update.
+        // For this reason, we will arm a 1 second timer to make provision for this and not block
+        // the queue:
+        saveState = AWAITING_COMPLETED;
+        disconnect(obj, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(objectPersistenceTransactionCompleted(UAVObject*,bool)));
+        failureTimer.start(1000); // Create a timeout
+    } else {
+        // Can be caused by timeout errors on sending.  Forget it and send next.
+        qDebug() << "objectPersistenceTranscationCompleted (error)";
+        UAVObject *obj = getObjectManager()->getObject(ObjectPersistence::NAME);
+        obj->disconnect(this);
+        queue.dequeue(); // We can now remove the object, it failed anyway.
+        saveState = IDLE;
+        emit saveCompleted(obj->getField("ObjectID")->getValue().toInt(), false);
+        saveNextObject();
+    }
 }
+
+/**
+  * @brief Object persistence operation failed, i.e. we never got an update
+  * from the board saying "completed".
+  */
+void UAVObjectUtilManager::objectPersistenceOperationFailed()
+{
+    qDebug() << "objectPersistenceOperationFailed";
+    if(saveState == AWAITING_COMPLETED) {
+        //TODO: some warning that this operation failed somehow
+        // We have to disconnect the object persistence 'updated' signal
+        // and ask to save the next object:
+        UAVObject *obj = getObjectManager()->getObject(ObjectPersistence::NAME);
+        obj->disconnect(this);
+        queue.dequeue(); // We can now remove the object, it failed anyway.
+        saveState = IDLE;
+        emit saveCompleted(obj->getField("ObjectID")->getValue().toInt(), false);
+        saveNextObject();
+    }
+}
+
+
+
+/**
+  * @brief Process the ObjectPersistence updated message to confirm the right object saved
+  * then requests next object be saved.
+  * @param[in] The object just received.  Must be ObjectPersistance
+  */
+void UAVObjectUtilManager::objectPersistenceUpdated(UAVObject * obj)
+{
+    qDebug() << "objectPersistenceUpdated: " << obj->getField("Operation")->getValue().toString();
+    Q_ASSERT(obj->getName().compare("ObjectPersistence") == 0);
+    if(saveState == AWAITING_COMPLETED) {
+        failureTimer.stop();
+        // Check flight is saying it completed.  This is the only thing flight should do to trigger an update.
+        Q_ASSERT( obj->getField("Operation")->getValue().toString().compare(QString("Completed")) == 0 );
+
+        // Check right object saved
+        UAVObject* savingObj = queue.head();
+        Q_ASSERT( obj->getField("ObjectID")->getValue() == savingObj->getObjID() );
+
+        obj->disconnect(this);
+        queue.dequeue(); // We can now remove the object, it's done.
+        saveState = IDLE;
+        emit saveCompleted(obj->getField("ObjectID")->getValue().toInt(), true);
+        saveNextObject();
+    }
+}
+
 
 /**
   * Get the UAV Board model, for anyone interested. Return format is:
@@ -142,6 +237,93 @@ int UAVObjectUtilManager::getBoardModel()
     boardType += obj->getField("BoardRevision")->getValue().toInt();
     return boardType;
 }
+
+/**
+  * Get the UAV Board CPU Serial Number, for anyone interested. Return format is a byte array
+  */
+QByteArray UAVObjectUtilManager::getBoardCPUSerial()
+{
+    QByteArray cpuSerial;
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    if (!pm)
+        return 0;
+    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+    if (!om)
+        return 0;
+
+    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
+    // The code below will ask for the object update and wait for the updated to be received,
+    // or the timeout of the timer, set to 1 second.
+    QEventLoop loop;
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
+    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
+    obj->requestUpdate();
+    loop.exec();
+
+    UAVObjectField* cpuField = obj->getField("CPUSerial");
+    for (uint i = 0; i < cpuField->getNumElements(); ++i) {
+        cpuSerial.append(cpuField->getValue(i).toUInt());
+    }
+    return cpuSerial;
+}
+
+quint32 UAVObjectUtilManager::getFirmwareCRC()
+{
+    quint32 fwCRC;
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    if (!pm)
+        return 0;
+    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+    if (!om)
+        return 0;
+
+    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
+    obj->getField("crc")->setValue(0);
+    obj->updated();
+    // The code below will ask for the object update and wait for the updated to be received,
+    // or the timeout of the timer, set to 1 second.
+    QEventLoop loop;
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
+    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
+    obj->requestUpdate();
+    loop.exec();
+
+    UAVObjectField* fwCRCField = obj->getField("crc");
+
+    fwCRC=(quint32)fwCRCField->getValue().toLongLong();
+    return fwCRC;
+}
+
+/**
+  * Get the UAV Board Description, for anyone interested.
+  */
+QByteArray UAVObjectUtilManager::getBoardDescription()
+{
+    QByteArray ret;
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    if (!pm)
+        return 0;
+    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
+    if (!om)
+        return 0;
+
+    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("FirmwareIAPObj")));
+    // The code below will ask for the object update and wait for the updated to be received,
+    // or the timeout of the timer, set to 1 second.
+    QEventLoop loop;
+    connect(obj, SIGNAL(objectUpdated(UAVObject*)), &loop, SLOT(quit()));
+    QTimer::singleShot(1000, &loop, SLOT(quit())); // Create a timeout
+    obj->requestUpdate();
+    loop.exec();
+
+    UAVObjectField* descriptionField = obj->getField("Description");
+    // Description starts with an offset of
+    for (uint i = 0; i < descriptionField->getNumElements(); ++i) {
+        ret.append(descriptionField->getValue(i).toInt());
+    }
+    return ret;
+}
+
 
 
 // ******************************
@@ -468,6 +650,53 @@ int UAVObjectUtilManager::getTelemetrySerialPortSpeeds(QComboBox *comboBox)
 	comboBox->addItems(field->getOptions());
 
 	return 0;	// OK
+}
+
+deviceDescriptorStruct UAVObjectUtilManager::getBoardDescriptionStruct()
+{
+    deviceDescriptorStruct ret;
+    descriptionToStructure(getBoardDescription(),&ret);
+    return ret;
+}
+
+bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescriptorStruct *struc)
+{
+       if (desc.startsWith("OpFw")) {
+           // This looks like a binary with a description at the end
+           /*
+            #  4 bytes: header: "OpFw"
+            #  4 bytes: GIT commit tag (short version of SHA1)
+            #  4 bytes: Unix timestamp of compile time
+            #  2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
+            #  26 bytes: commit tag if it is there, otherwise "Unreleased". Zero-padded
+            #   ---- 40 bytes limit ---
+            #  20 bytes: SHA1 sum of the firmware.
+            #  40 bytes: free for now.
+            */
+
+           // Note: the ARM binary is big-endian:
+           quint32 gitCommitTag = desc.at(7)&0xFF;
+           for (int i=1;i<4;i++) {
+               gitCommitTag = gitCommitTag<<8;
+               gitCommitTag += desc.at(7-i) & 0xFF;
+           }
+           struc->gitTag=QString::number(gitCommitTag,16);
+           quint32 buildDate = desc.at(11)&0xFF;
+           for (int i=1;i<4;i++) {
+               buildDate = buildDate<<8;
+               buildDate += desc.at(11-i) & 0xFF;
+           }
+           struc->buildDate= QDateTime::fromTime_t(buildDate).toUTC().toString("yyyyMMdd HH:mm");
+           QByteArray targetPlatform = desc.mid(12,2);
+           // TODO: check platform compatibility
+           QString dscText = QString(desc.mid(14,26));
+           struc->boardType=(int)targetPlatform.at(0);
+           struc->boardRevision=(int)targetPlatform.at(1);
+           struc->description=dscText;
+           return true;
+       }
+       return false;
+
 }
 
 // ******************************

@@ -64,25 +64,8 @@ TIM8  |           |           |           |
 //------------------------
 // BOOTLOADER_SETTINGS
 //------------------------
-//#define FUNC_ID				2
-//#define HW_VERSION			69
-
-#define BOOTLOADER_VERSION	0
-#define BOARD_TYPE		0x02
-#define BOARD_REVISION		0x01
-//#define HW_VERSION	(BOARD_TYPE << 8) | BOARD_REVISION
-
-#define MEM_SIZE			0x20000 //128K
-#define SIZE_OF_DESCRIPTION	100
-#define START_OF_USER_CODE	(uint32_t)0x08002000
-#define SIZE_OF_CODE		(uint32_t)(MEM_SIZE-(START_OF_USER_CODE-0x08000000)-SIZE_OF_DESCRIPTION)
-#ifdef STM32F10X_HD
-		#define HW_TYPE			0 //0=high_density 1=medium_density;
-#elif STM32F10X_MD
-		#define HW_TYPE			1 //0=high_density 1=medium_density;
-#endif
 #define BOARD_READABLE	TRUE
-#define BOARD_WRITABLA	TRUE
+#define BOARD_WRITABLE	TRUE
 #define MAX_DEL_RETRYS	3
 
 //------------------------
@@ -97,21 +80,10 @@ TIM8  |           |           |           |
 #define PIOS_LED_CLKS				{ PIOS_LED_LED1_GPIO_CLK }
 
 //-------------------------
-// Delay Timer
-//-------------------------
-#define PIOS_DELAY_TIMER			TIM2
-#define PIOS_DELAY_TIMER_RCC_FUNC		RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE)
-
-//-------------------------
 // System Settings
 //-------------------------
 #define PIOS_MASTER_CLOCK			72000000
 #define PIOS_PERIPHERAL_CLOCK			(PIOS_MASTER_CLOCK / 2)
-#if defined(USE_BOOTLOADER)
-#define PIOS_NVIC_VECTTAB_FLASH			(START_OF_USER_CODE)
-#else
-#define PIOS_NVIC_VECTTAB_FLASH			((uint32_t)0x08000000)
-#endif
 
 //-------------------------
 // Interrupt Priorities
@@ -140,9 +112,6 @@ extern uint32_t pios_i2c_main_adapter_id;
 // PIOS_USART
 //-------------------------
 #define PIOS_USART_MAX_DEVS			2
-#define PIOS_USART_RX_BUFFER_SIZE		256
-#define PIOS_USART_TX_BUFFER_SIZE		256
-#define PIOS_USART_BAUDRATE			230400
 
 //-------------------------
 // PIOS_COM
@@ -150,6 +119,7 @@ extern uint32_t pios_i2c_main_adapter_id;
 // See also pios_board.c
 //-------------------------
 #define PIOS_COM_MAX_DEVS			2
+
 extern uint32_t pios_com_aux_id;
 #define PIOS_COM_AUX				(pios_com_aux_id)
 #define PIOS_COM_DEBUG				PIOS_COM_AUX

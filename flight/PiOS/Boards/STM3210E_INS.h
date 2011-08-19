@@ -69,27 +69,8 @@ TIM8  |           |           |           |
 //------------------------
 // BOOTLOADER_SETTINGS
 //------------------------
-
-//#define FUNC_ID				1
-//#define HW_VERSION			01
-
-#define BOOTLOADER_VERSION	0
-#define BOARD_TYPE			0x05  // INS board
-#define BOARD_REVISION		0x01  // Beta version
-//#define HW_VERSION	(BOARD_TYPE << 8) | BOARD_REVISION
-
-#define MEM_SIZE			524288 //512K
-#define SIZE_OF_DESCRIPTION	(uint8_t) 100
-#define START_OF_USER_CODE	(uint32_t)0x08005000//REMEMBER SET ALSO IN link_stm32f10x_HD_BL.ld
-#define SIZE_OF_CODE		(uint32_t) (MEM_SIZE-(START_OF_USER_CODE-0x08000000)-SIZE_OF_DESCRIPTION)
-
-#ifdef STM32F10X_HD
-		#define HW_TYPE			0 //0=high_density 1=medium_density;
-#elif STM32F10X_MD
-		#define HW_TYPE			1 //0=high_density 1=medium_density;
-#endif
 #define BOARD_READABLE	TRUE
-#define BOARD_WRITABLA	TRUE
+#define BOARD_WRITABLE	TRUE
 #define MAX_DEL_RETRYS	3
 
 //------------------------
@@ -144,9 +125,6 @@ extern uint32_t pios_i2c_gyro_adapter_id;
 //-------------------------
 #define PIOS_USART_MAX_DEVS             2
 
-#define PIOS_USART_RX_BUFFER_SIZE       256
-#define PIOS_USART_TX_BUFFER_SIZE       256
-
 //-------------------------
 // PIOS_COM
 //
@@ -154,33 +132,20 @@ extern uint32_t pios_i2c_gyro_adapter_id;
 //-------------------------
 #define PIOS_COM_MAX_DEVS               2
 
-#define PIOS_COM_GPS_BAUDRATE           57600
 extern uint32_t pios_com_gps_id;
 #define PIOS_COM_GPS                    (pios_com_gps_id)
 
 #ifdef PIOS_ENABLE_AUX_UART
-#define PIOS_COM_AUX_BAUDRATE           57600
 extern uint32_t pios_com_aux_id;
 #define PIOS_COM_AUX                    (pios_com_aux_id)
 #define PIOS_COM_DEBUG                  PIOS_COM_AUX
 #endif
 
 //-------------------------
-// Delay Timer
-//-------------------------
-#define PIOS_DELAY_TIMER                        TIM2
-#define PIOS_DELAY_TIMER_RCC_FUNC               RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE)
-
-//-------------------------
 // System Settings
 //-------------------------
 #define PIOS_MASTER_CLOCK                       72000000
 #define PIOS_PERIPHERAL_CLOCK                   (PIOS_MASTER_CLOCK / 2)
-#if defined(USE_BOOTLOADER)
-#define PIOS_NVIC_VECTTAB_FLASH                 (START_OF_USER_CODE)
-#else
-#define PIOS_NVIC_VECTTAB_FLASH                 ((uint32_t)0x08000000)
-#endif
 
 //-------------------------
 // Interrupt Priorities

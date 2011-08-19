@@ -31,7 +31,7 @@
    <property name="title">
     <string>Sound Collection</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_2">
     <property name="geometry">
      <rect>
       <x>10</x>

@@ -1,5 +1,10 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_COM COM layer functions
+ * @brief Hardware communication layer
+ * @{
  *
  * @file       pios_com_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -29,13 +34,11 @@
 
 #include <pios.h>
 
-struct pios_com_dev {
-  uint8_t                              id;
-  const struct pios_com_driver * const driver;
-};
-
-extern struct pios_com_dev pios_com_devs[];
-extern const uint8_t             pios_com_num_devices;
+extern int32_t PIOS_COM_ReceiveHandler(uint32_t com_id);
 
 #endif /* PIOS_COM_PRIV_H */
 
+/**
+  * @}
+  * @}
+  */

@@ -183,12 +183,13 @@ void CoreImpl::updateContext()
 
 void CoreImpl::openFiles(const QStringList &arguments)
 {
+    Q_UNUSED(arguments)
     //m_mainwindow->openFiles(arguments);
 }
 
-void CoreImpl::readMainSettings(QSettings* qs)
+void CoreImpl::readMainSettings(QSettings* qs, bool workspaceDiffOnly)
 {
-    m_mainwindow->readSettings(qs);
+    m_mainwindow->readSettings(qs, workspaceDiffOnly);
 }
 
 void CoreImpl::saveMainSettings(QSettings* qs)

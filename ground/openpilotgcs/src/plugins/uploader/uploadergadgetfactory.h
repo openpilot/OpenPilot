@@ -46,7 +46,6 @@ public:
 
     Core::IUAVGadget *createGadget(QWidget *parent);
     IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
-    IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 };
 
 #endif // UPLOADERGADGETFACTORY_H

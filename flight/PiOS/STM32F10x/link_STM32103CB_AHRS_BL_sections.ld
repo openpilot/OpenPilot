@@ -5,6 +5,7 @@ SECTIONS
 {
     .text :
     {
+        PROVIDE (pios_isr_vector_table_base = .);
         KEEP(*(.isr_vector .isr_vector.*))
         *(.text .text.* .gnu.linkonce.t.*)
         *(.glue_7t) *(.glue_7)
@@ -45,4 +46,11 @@ SECTIONS
 
     . = ALIGN(4);
     _end = . ;
+
+    .boardinfo :
+    {
+	. = ALIGN(4);
+	KEEP(*(.boardinfo))
+	. = ALIGN(4);
+    } > BD_INFO
 }

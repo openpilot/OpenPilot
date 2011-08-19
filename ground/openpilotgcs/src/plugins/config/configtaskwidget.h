@@ -31,34 +31,60 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
-#include "objectpersistence.h"
+#include "uavobjectutilmanager.h"
 #include <QQueue>
 #include <QtGui/QWidget>
 #include <QList>
-
-
+#include <QLabel>
+#include "smartsavebutton.h"
+#include "mixercurvewidget.h"
+#include <QTableWidget>
+#include <QDoubleSpinBox>
+#include <QSpinBox>
 class ConfigTaskWidget: public QWidget
 {
     Q_OBJECT
 
 public:
+    struct objectToWidget
+    {
+        UAVObject * object;
+        UAVObjectField * field;
+        QWidget * widget;
+    };
+
     ConfigTaskWidget(QWidget *parent = 0);
     ~ConfigTaskWidget();
     void saveObjectToSD(UAVObject *obj);
-    void updateObjectPersistance(ObjectPersistence::OperationOptions op, UAVObject *obj);
     UAVObjectManager* getObjectManager();
-
     static double listMean(QList<double> list);
+    void addUAVObject(QString objectName);
+    void addWidget(QWidget * widget);
+    void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget);
+    void setupButtons(QPushButton * update,QPushButton * save);
+    bool isDirty();
+public slots:
+    void onAutopilotDisconnect();
+    void onAutopilotConnect();
 
 private slots:
-    void objectPersistenceTransactionCompleted(UAVObject* obj, bool success);
-    void objectPersistenceUpdated(UAVObject * obj);
-
+    virtual void refreshValues();
+    virtual void updateObjectsFromWidgets();
 private:
-    QQueue<UAVObject*> queue;
-    void saveNextObject();
-    enum {IDLE, AWAITING_ACK, AWAITING_COMPLETED} saveState;
-
+    QList <objectToWidget*> objOfInterest;
+    ExtensionSystem::PluginManager *pm;
+    UAVObjectManager *objManager;
+    smartSaveButton *smartsave;
+    bool dirty;
+protected slots:
+    virtual void disableObjUpdates();
+    virtual void enableObjUpdates();
+    virtual void clearDirty();
+    virtual void widgetsContentsChanged();
+    virtual void populateWidgets();
+    virtual void refreshWidgetsValues();
+protected:
+    virtual void enableControls(bool enable);
 
 };
 

@@ -71,36 +71,46 @@ help:
 	@echo "     qt_sdk_install       - Install the QT v4.6.2 tools"
 	@echo "     arm_sdk_install      - Install the Code Sourcery ARM gcc toolchain"
 	@echo "     openocd_install      - Install the OpenOCD JTAG daemon"
+	@echo "     stm32flash_install   - Install the stm32flash tool for unbricking boards"
 	@echo
 	@echo "   [Big Hammer]"
 	@echo "     all                  - Generate UAVObjects, build openpilot firmware and gcs"
 	@echo "     all_flight           - Build all firmware, bootloaders and bootloader updaters"
 	@echo "     all_fw               - Build only firmware for all boards"
 	@echo "     all_bl               - Build only bootloaders for all boards"
-	@echo "     all_blupd            - Build only bootloader updaters for all boards"
+	@echo "     all_bu               - Build only bootloader updaters for all boards"
 	@echo
 	@echo "     all_clean            - Remove your build directory ($(BUILD_DIR))"
 	@echo "     all_flight_clean     - Remove all firmware, bootloaders and bootloader updaters"
 	@echo "     all_fw_clean         - Remove firmware for all boards"
 	@echo "     all_bl_clean         - Remove bootlaoders for all boards"
-	@echo "     all_blupd_clean      - Remove bootloader updaters for all boards"
+	@echo "     all_bu_clean         - Remove bootloader updaters for all boards"
+	@echo
+	@echo "     all_<board>          - Build all available images for <board>"
+	@echo "     all_<board>_clean    - Remove all available images for <board>"
 	@echo
 	@echo "   [Firmware]"
 	@echo "     <board>              - Build firmware for <board>"
-	@echo "                            supported boards are ($(FW_TARGETS))"
-	@echo "     <board>_clean        - Remove firmware for <board>"
-	@echo "     <board>_program      - Use OpenOCD + JTAG to write firmware to <board>"
+	@echo "                            supported boards are ($(ALL_BOARDS))"
+	@echo "     fw_<board>           - Build firmware for <board>"
+	@echo "                            supported boards are ($(FW_BOARDS))"
+	@echo "     fw_<board>_clean     - Remove firmware for <board>"
+	@echo "     fw_<board>_program   - Use OpenOCD + JTAG to write firmware to <board>"
 	@echo
 	@echo "   [Bootloader]"
 	@echo "     bl_<board>           - Build bootloader for <board>"
-	@echo "                            supported boards are ($(BL_TARGETS))"
+	@echo "                            supported boards are ($(BL_BOARDS))"
 	@echo "     bl_<board>_clean     - Remove bootloader for <board>"
 	@echo "     bl_<board>_program   - Use OpenOCD + JTAG to write bootloader to <board>"
 	@echo
 	@echo "   [Bootloader Updater]"
-	@echo "     blupd_<board>        - Build bootloader updater for <board>"
-	@echo "                            supported boards are ($(BLUPD_TARGETS))"
-	@echo "     blupd_<board>_clean  - Remove bootloader updater for <board>"
+	@echo "     bu_<board>           - Build bootloader updater for <board>"
+	@echo "                            supported boards are ($(BU_BOARDS))"
+	@echo "     bu_<board>_clean     - Remove bootloader updater for <board>"
+	@echo
+	@echo "   [Unbrick a board]"
+	@echo "     unbrick_<board>      - Use the STM32's built in boot ROM to write a bootloader to <board>"
+	@echo "                            supported boards are ($(BL_BOARDS))"
 	@echo
 	@echo "   [Simulation]"
 	@echo "     sim_posix            - Build OpenPilot simulation firmware for"
@@ -170,10 +180,10 @@ qt_sdk_clean:
 	$(V1) [ ! -d "$(QT_SDK_DIR)" ] || $(RM) -rf $(QT_SDK_DIR)
 
 # Set up ARM (STM32) SDK
-ARM_SDK_DIR := $(TOOLS_DIR)/arm-2009q3
+ARM_SDK_DIR := $(TOOLS_DIR)/arm-2011.03
 
 .PHONY: arm_sdk_install
-arm_sdk_install: ARM_SDK_URL  := http://www.codesourcery.com/sgpp/lite/arm/portal/package5353/public/arm-none-eabi/arm-2009q3-68-arm-none-eabi-i686-pc-linux-gnu.tar.bz2
+arm_sdk_install: ARM_SDK_URL  := http://www.codesourcery.com/sgpp/lite/arm/portal/package8734/public/arm-none-eabi/arm-2011.03-42-arm-none-eabi-i686-pc-linux-gnu.tar.bz2
 arm_sdk_install: ARM_SDK_FILE := $(notdir $(ARM_SDK_URL))
 # order-only prereq on directory existance:
 arm_sdk_install: | $(DL_DIR) $(TOOLS_DIR)
@@ -221,6 +231,25 @@ openocd_install: openocd_clean
 openocd_clean:
 	$(V1) [ ! -d "$(OPENOCD_DIR)" ] || $(RM) -r "$(OPENOCD_DIR)"
 
+STM32FLASH_DIR := $(TOOLS_DIR)/stm32flash
+
+.PHONY: stm32flash_install
+stm32flash_install: STM32FLASH_URL := http://stm32flash.googlecode.com/svn/trunk
+stm32flash_install: STM32FLASH_REV := 52
+stm32flash_install: stm32flash_clean
+        # download the source
+	$(V0) @echo " DOWNLOAD     $(STM32FLASH_URL) @ r$(STM32FLASH_REV)"
+	$(V1) svn export -q -r "$(STM32FLASH_REV)" "$(STM32FLASH_URL)" "$(STM32FLASH_DIR)"
+
+        # build
+	$(V0) @echo " BUILD        $(STM32FLASH_DIR)"
+	$(V1) $(MAKE) --silent -C $(STM32FLASH_DIR) all
+
+.PHONY: stm32flash_clean
+stm32flash_clean:
+	$(V0) @echo " CLEAN        $(STM32FLASH_DIR)"
+	$(V1) [ ! -d "$(STM32FLASH_DIR)" ] || $(RM) -r "$(STM32FLASH_DIR)"
+
 ##############################
 #
 # Set up paths to tools
@@ -265,33 +294,21 @@ gcs_clean: openpilotgcs_clean
 .PHONY: openpilotgcs
 openpilotgcs:  uavobjects_gcs
 	$(V1) mkdir -p $(BUILD_DIR)/ground/$@
-	$(V1) ( cd $(BUILD_DIR)/ground/$@ ; \
-	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) ; \
+	$(V1) ( cd $(BUILD_DIR)/ground/$@ && \
+	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) && \
 	  $(MAKE) -w ; \
 	)
 
-.PHONY: gcs_installer
-gcs_installer: openpilotgcs
-ifeq ($(QT_SPEC), win32-g++)
-ifeq ($(GCS_BUILD_CONF), release)
-	$(V1) cd $(BUILD_DIR)/ground/openpilotgcs/packaging/winx86 && $(MAKE) -r --no-print-directory $@
-else
-	$(error $@ can be generated for release build only (GCS_BUILD_CONF=release))
-endif
-else
-	$(error $@ is currently only available on Windows)
-endif
-
 .PHONY: openpilotgcs_clean
 openpilotgcs_clean:
-	$(V0) @echo " CLEAN     $@"
+	$(V0) @echo " CLEAN      $@"
 	$(V1) [ ! -d "$(BUILD_DIR)/ground/openpilotgcs" ] || $(RM) -r "$(BUILD_DIR)/ground/openpilotgcs"
 
 .PHONY: uavobjgenerator
 uavobjgenerator:
 	$(V1) mkdir -p $(BUILD_DIR)/ground/$@
-	$(V1) ( cd $(BUILD_DIR)/ground/$@ ; \
-	  $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+=debug ; \
+	$(V1) ( cd $(BUILD_DIR)/ground/$@ && \
+	  $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+=debug && \
 	  $(MAKE) --no-print-directory -w ; \
 	)
 
@@ -306,7 +323,7 @@ $(UAVOBJ_OUT_DIR):
 	$(V1) mkdir -p $@
 
 uavobjects_%: $(UAVOBJ_OUT_DIR) uavobjgenerator
-	$(V1) ( cd $(UAVOBJ_OUT_DIR) ; \
+	$(V1) ( cd $(UAVOBJ_OUT_DIR) && \
 	  $(UAVOBJGENERATOR) -$* $(UAVOBJ_XML_DIR) $(ROOT_DIR) ; \
 	)
 
@@ -314,7 +331,7 @@ uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
 	$(V1) $(UAVOBJGENERATOR) -v -none $(UAVOBJ_XML_DIR) $(ROOT_DIR)
 
 uavobjects_clean:
-	$(V0) @echo " CLEAN     $@"
+	$(V0) @echo " CLEAN      $@"
 	$(V1) [ ! -d "$(UAVOBJ_OUT_DIR)" ] || $(RM) -r "$(UAVOBJ_OUT_DIR)"
 
 ##############################
@@ -323,254 +340,149 @@ uavobjects_clean:
 #
 ##############################
 
-FW_TARGETS    := openpilot ahrs coptercontrol pipxtreme ins
-BL_TARGETS    := $(addprefix bl_, $(FW_TARGETS))
-BLUPD_TARGETS := $(addprefix blupd_, $(FW_TARGETS))
+# $(1) = Canonical board name all in lower case (e.g. coptercontrol)
+# $(2) = Name of board used in source tree (e.g. CopterControl)
+define FW_TEMPLATE
+.PHONY: $(1) fw_$(1)
+$(1): fw_$(1)_opfw
+fw_$(1): fw_$(1)_opfw
+
+fw_$(1)_%: uavobjects_flight
+	$(V1) mkdir -p $(BUILD_DIR)/fw_$(1)/dep
+	$(V1) cd $(ROOT_DIR)/flight/$(2) && \
+		$$(MAKE) -r --no-print-directory \
+		BOARD_NAME=$(1) \
+		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
+		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
+		$$*
+
+.PHONY: $(1)_clean
+$(1)_clean: fw_$(1)_clean
+fw_$(1)_clean:
+	$(V0) @echo " CLEAN      $$@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/fw_$(1)
+endef
+
+# $(1) = Canonical board name all in lower case (e.g. coptercontrol)
+# $(2) = Name of board used in source tree (e.g. CopterControl)
+define BL_TEMPLATE
+.PHONY: bl_$(1)
+bl_$(1): bl_$(1)_bin
+bl_$(1)_bino: bl_$(1)_bin
+
+bl_$(1)_%:
+	$(V1) mkdir -p $(BUILD_DIR)/bl_$(1)/dep
+	$(V1) cd $(ROOT_DIR)/flight/Bootloaders/$(2) && \
+		$$(MAKE) -r --no-print-directory \
+		BOARD_NAME=$(1) \
+		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
+		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
+		$$*
+
+.PHONY: unbrick_$(1)
+unbrick_$(1): bl_$(1)_hex
+$(if $(filter-out undefined,$(origin UNBRICK_TTY)),
+	$(V0) @echo " UNBRICK    $(1) via $$(UNBRICK_TTY)"
+	$(V1) $(STM32FLASH_DIR)/stm32flash \
+		-w $(BUILD_DIR)/bl_$(1)/bl_$(1).hex \
+		-g 0x0 \
+		$$(UNBRICK_TTY)
+,
+	$(V0) @echo
+	$(V0) @echo "ERROR: You must specify UNBRICK_TTY=<serial-device> to use for unbricking."
+	$(V0) @echo "       eg. $$(MAKE) $$@ UNBRICK_TTY=/dev/ttyUSB0"
+)
+
+.PHONY: bl_$(1)_clean
+bl_$(1)_clean:
+	$(V0) @echo " CLEAN      $$@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/bl_$(1)
+endef
+
+# $(1) = Canonical board name all in lower case (e.g. coptercontrol)
+define BU_TEMPLATE
+.PHONY: bu_$(1)
+bu_$(1): bu_$(1)_opfw
+
+bu_$(1)_%: bl_$(1)_bino
+	$(V1) mkdir -p $(BUILD_DIR)/bu_$(1)/dep
+	$(V1) cd $(ROOT_DIR)/flight/Bootloaders/BootloaderUpdater && \
+		$$(MAKE) -r --no-print-directory \
+		BOARD_NAME=$(1) \
+		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
+		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
+		$$*
+
+.PHONY: bu_$(1)_clean
+bu_$(1)_clean:
+	$(V0) @echo " CLEAN      $$@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/bu_$(1)
+endef
+
+# $(1) = Canonical board name all in lower case (e.g. coptercontrol)
+define BOARD_PHONY_TEMPLATE
+.PHONY: all_$(1)
+all_$(1): $$(filter fw_$(1), $$(FW_TARGETS))
+all_$(1): $$(filter bl_$(1), $$(BL_TARGETS))
+all_$(1): $$(filter bu_$(1), $$(BU_TARGETS))
+
+.PHONY: all_$(1)_clean
+all_$(1)_clean: $$(addsuffix _clean, $$(filter fw_$(1), $$(FW_TARGETS)))
+all_$(1)_clean: $$(addsuffix _clean, $$(filter bl_$(1), $$(BL_TARGETS)))
+all_$(1)_clean: $$(addsuffix _clean, $$(filter bu_$(1), $$(BU_TARGETS)))
+endef
+
+ALL_BOARDS := openpilot ahrs coptercontrol pipxtreme ins
+
+# Friendly names of each board (used to find source tree)
+openpilot_friendly     := OpenPilot
+coptercontrol_friendly := CopterControl
+pipxtreme_friendly     := PipXtreme
+ins_friendly           := INS
+ahrs_friendly          := AHRS
+
+# Start out assuming that we'll build fw, bl and bu for all boards
+FW_BOARDS  := $(ALL_BOARDS)
+BL_BOARDS  := $(ALL_BOARDS)
+BU_BOARDS  := $(ALL_BOARDS)
 
 # FIXME: The INS build doesn't have a bootloader or bootloader
 #        updater yet so we need to filter them out to prevent errors.
-BL_TARGETS    := $(filter-out bl_ins, $(BL_TARGETS))
-BLUPD_TARGETS := $(filter-out blupd_ins, $(BLUPD_TARGETS))
+BL_BOARDS  := $(filter-out ins, $(ALL_BOARDS))
+BU_BOARDS  := $(filter-out ins, $(ALL_BOARDS))
+
+# Generate the targets for whatever boards are left in each list
+FW_TARGETS := $(addprefix fw_, $(FW_BOARDS))
+BL_TARGETS := $(addprefix bl_, $(BL_BOARDS))
+BU_TARGETS := $(addprefix bu_, $(BU_BOARDS))
 
 .PHONY: all_fw all_fw_clean
-all_fw:           $(addsuffix _bin,   $(FW_TARGETS))
-all_fw_clean:     $(addsuffix _clean, $(FW_TARGETS))
+all_fw:        $(addsuffix _opfw,  $(FW_TARGETS))
+all_fw_clean:  $(addsuffix _clean, $(FW_TARGETS))
 
 .PHONY: all_bl all_bl_clean
-all_bl:           $(addsuffix _bin,   $(BL_TARGETS))
-all_bl_clean:     $(addsuffix _clean, $(BL_TARGETS))
+all_bl:        $(addsuffix _bin,   $(BL_TARGETS))
+all_bl_clean:  $(addsuffix _clean, $(BL_TARGETS))
 
-.PHONY: all_blupd all_blupd_clean
-all_blupd:        $(addsuffix _bin,   $(BLUPD_TARGETS))
-all_blupd_clean:  $(addsuffix _clean, $(BLUPD_TARGETS))
+.PHONY: all_bu all_bu_clean
+all_bu:        $(addsuffix _opfw,  $(BU_TARGETS))
+all_bu_clean:  $(addsuffix _clean, $(BU_TARGETS))
 
 .PHONY: all_flight all_flight_clean
-all_flight:       all_fw all_bl all_blupd
-all_flight_clean: all_fw_clean all_bl_clean all_blupd_clean
+all_flight:       all_fw all_bl all_bu
+all_flight_clean: all_fw_clean all_bl_clean all_bu_clean
 
-.PHONY: openpilot
-openpilot: openpilot_bin
+# Expand the groups of targets for each board
+$(foreach board, $(ALL_BOARDS), $(eval $(call BOARD_PHONY_TEMPLATE,$(board))))
 
-openpilot_%: uavobjects_flight
-	$(V1) mkdir -p $(BUILD_DIR)/openpilot/dep
-	$(V1) cd $(ROOT_DIR)/flight/OpenPilot && \
-		$(MAKE) -r --no-print-directory \
-		OUTDIR="$(BUILD_DIR)/openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
-		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" $*
+# Expand the bootloader updater rules
+$(foreach board, $(ALL_BOARDS), $(eval $(call BU_TEMPLATE,$(board),$($(board)_friendly))))
 
-.PHONY: openpilot_clean
-openpilot_clean:
-	$(V0) @echo " CLEAN     $@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/openpilot
+# Expand the firmware rules
+$(foreach board, $(ALL_BOARDS), $(eval $(call FW_TEMPLATE,$(board),$($(board)_friendly))))
 
-.PHONY: bl_openpilot
-bl_openpilot: bl_openpilot_bin
-bl_openpilot_bino: bl_openpilot_bin
-
-bl_openpilot_%:
-	$(V1) mkdir -p $(BUILD_DIR)/bl_openpilot/dep
-	$(V1) cd $(ROOT_DIR)/flight/Bootloaders/OpenPilot && \
-		$(MAKE) -r --no-print-directory \
-		OUTDIR="$(BUILD_DIR)/bl_openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
-		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" $*
-
-.PHONY: bl_openpilot_clean
-bl_openpilot_clean:
-	$(V0) @echo " CLEAN     $@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/bl_openpilot
-
-.PHONY: blupd_openpilot
-blupd_openpilot: blupd_openpilot_bin
-
-blupd_openpilot_%: bl_openpilot_bino
-	$(V1) mkdir -p $(BUILD_DIR)/blupd_openpilot/dep
-	$(V1) cd $(ROOT_DIR)/flight/Bootloaders/BootloaderUpdater && \
-		$(MAKE) -r --no-print-directory \
-		OUTDIR="$(BUILD_DIR)/blupd_openpilot" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
-		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
-		BOARD=STM3210E_OP MODEL=HD MODEL_SUFFIX=_OP \
-		BLOBJ=$(BUILD_DIR)/bl_openpilot/OpenPilot_BL.bin.o $*
-
-.PHONY: blupd_openpilot_clean
-blupd_openpilot_clean:
-	$(V0) @echo " CLEAN     $@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/blupd_openpilot
-
-.PHONY: ahrs
-ahrs: ahrs_bin
-
-ahrs_%: uavobjects_flight
-	$(V1) mkdir -p $(BUILD_DIR)/ahrs/dep
-	$(V1) cd $(ROOT_DIR)/flight/AHRS && \
-		$(MAKE) -r --no-print-directory \
-		OUTDIR="$(BUILD_DIR)/ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
-		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" $*
-
-.PHONY: ahrs_clean
-ahrs_clean:
-	$(V0) @echo " CLEAN     $@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/ahrs
-
-.PHONY: bl_ahrs
-bl_ahrs: bl_ahrs_bin
-bl_ahrs_bino: bl_ahrs_bin
-
-bl_ahrs_%:
-	$(V1) mkdir -p $(BUILD_DIR)/bl_ahrs/dep
-	$(V1) cd $(ROOT_DIR)/flight/Bootloaders/AHRS && \
-		$(MAKE) -r --no-print-directory \
-		OUTDIR="$(BUILD_DIR)/bl_ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
-		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" $*
-
-.PHONY: bl_ahrs_clean
-bl_ahrs_clean:
-	$(V0) @echo " CLEAN     $@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/bl_ahrs
-
-.PHONY: blupd_ahrs
-blupd_ahrs: blupd_ahrs_bin
-
-blupd_ahrs_%: bl_ahrs_bino bl_ahrs
-	$(V1) mkdir -p $(BUILD_DIR)/blupd_ahrs/dep
-	$(V1) cd $(ROOT_DIR)/flight/Bootloaders/BootloaderUpdater && \
-		$(MAKE) -r --no-print-directory \
-		OUTDIR="$(BUILD_DIR)/blupd_ahrs" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
-		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
-		BOARD=STM32103CB_AHRS MODEL=MD \
-		BLOBJ=$(BUILD_DIR)/bl_ahrs/AHRS_BL.bin.o $*
-
-.PHONY: blupd_ahrs_clean
-blupd_ahrs_clean:
-	$(V0) @echo " CLEAN     $@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/blupd_ahrs
-
-.PHONY: coptercontrol
-coptercontrol: coptercontrol_bin
-
-coptercontrol_%: uavobjects_flight
-	$(V1) mkdir -p $(BUILD_DIR)/coptercontrol/dep
-	$(V1) cd $(ROOT_DIR)/flight/CopterControl && \
-		$(MAKE) -r --no-print-directory \
-		OUTDIR="$(BUILD_DIR)/coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
-		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" $*
-
-.PHONY: coptercontrol_clean
-coptercontrol_clean:
-	$(V0) @echo " CLEAN     $@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/coptercontrol
-
-.PHONY: bl_coptercontrol
-bl_coptercontrol: bl_coptercontrol_bin
-bl_coptercontrol_bino: bl_coptercontrol_bin
-
-bl_coptercontrol_%:
-	$(V1) mkdir -p $(BUILD_DIR)/bl_coptercontrol/dep
-	$(V1) cd $(ROOT_DIR)/flight/Bootloaders/CopterControl && \
-		$(MAKE) -r --no-print-directory \
-		OUTDIR="$(BUILD_DIR)/bl_coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
-		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" $*
-
-.PHONY: bl_coptercontrol_clean
-bl_coptercontrol_clean:
-	$(V0) @echo " CLEAN     $@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/bl_coptercontrol
-
-.PHONY: blupd_coptercontrol
-blupd_coptercontrol: blupd_coptercontrol_bin
-
-blupd_coptercontrol_%: bl_coptercontrol_bino
-	$(V1) mkdir -p $(BUILD_DIR)/blupd_coptercontrol/dep
-	$(V1) cd $(ROOT_DIR)/flight/Bootloaders/BootloaderUpdater && \
-		$(MAKE) -r --no-print-directory \
-		OUTDIR="$(BUILD_DIR)/blupd_coptercontrol" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
-		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
-		BOARD=STM32103CB_CC_Rev1 MODEL=MD MODEL_SUFFIX=_CC \
-		BLOBJ=$(BUILD_DIR)/bl_coptercontrol/CopterControl_BL.bin.o $*
-
-.PHONY: blupd_coptercontrol_clean
-blupd_coptercontrol_clean:
-	$(V0) @echo " CLEAN     $@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/blupd_coptercontrol
-
-.PHONY: pipxtreme
-pipxtreme: pipxtreme_bin
-
-pipxtreme_%: uavobjects_flight
-	$(V1) mkdir -p $(BUILD_DIR)/pipxtreme/dep
-	$(V1) cd $(ROOT_DIR)/flight/PipXtreme && \
-		$(MAKE) -r --no-print-directory \
-		OUTDIR="$(BUILD_DIR)/pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
-		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" $*
-
-.PHONY: pipxtreme_clean
-pipxtreme_clean:
-	$(V0) @echo " CLEAN     $@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/pipxtreme
-
-.PHONY: bl_pipxtreme
-bl_pipxtreme: bl_pipxtreme_bin
-bl_pipxtreme_bino: bl_pipxtreme_bin
-
-bl_pipxtreme_%:
-	$(V1) mkdir -p $(BUILD_DIR)/bl_pipxtreme/dep
-	$(V1) cd $(ROOT_DIR)/flight/Bootloaders/PipXtreme && \
-		$(MAKE) -r --no-print-directory \
-		OUTDIR="$(BUILD_DIR)/bl_pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
-		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" $*
-
-.PHONY: bl_pipxtreme_clean
-bl_pipxtreme_clean:
-	$(V0) @echo " CLEAN     $@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/bl_pipxtreme
-
-.PHONY: blupd_pipxtreme
-blupd_pipxtreme: blupd_pipxtreme_bin
-
-blupd_pipxtreme_%: bl_pipxtreme_bino
-	$(V1) mkdir -p $(BUILD_DIR)/blupd_pipxtreme/dep
-	$(V1) cd $(ROOT_DIR)/flight/Bootloaders/BootloaderUpdater && \
-		$(MAKE) -r --no-print-directory \
-		OUTDIR="$(BUILD_DIR)/blupd_pipxtreme" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
-		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
-		BOARD=STM32103CB_PIPXTREME MODEL=MD MODEL_SUFFIX=_CC \
-		BLOBJ=$(BUILD_DIR)/bl_pipxtreme/PipXtreme_BL.bin.o $*
-
-.PHONY: blupd_pipxtreme_clean
-blupd_pipxtreme_clean:
-	$(V0) @echo " CLEAN     $@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/blupd_pipxtreme
-
-
-.PHONY: ins
-ins: ins_bin
-
-ins_%: uavobjects_flight
-	$(V1) mkdir -p $(BUILD_DIR)/ins/dep
-	$(V1) cd $(ROOT_DIR)/flight/INS && \
-		$(MAKE) -r --no-print-directory \
-		OUTDIR="$(BUILD_DIR)/ins" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
-		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" $*
-
-.PHONY: ins_clean
-ins_clean:
-	$(V0) @echo " CLEAN     $@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/ins
-
-.PHONY: bl_ins
-bl_ins: bl_ins_elf
-
-bl_ins_%:
-	$(V1) mkdir -p $(BUILD_DIR)/bl_ins/dep
-	$(V1) cd $(ROOT_DIR)/flight/Bootloaders/INS && \
-		$(MAKE) -r --no-print-directory \
-		OUTDIR="$(BUILD_DIR)/bl_ins" TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
-		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" $*
-
-.PHONY: bl_ins_clean
-bl_ins_clean:
-	$(V0) @echo " CLEAN     $@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/bl_ins
-
+# Expand the bootloader rules
+$(foreach board, $(ALL_BOARDS), $(eval $(call BL_TEMPLATE,$(board),$($(board)_friendly))))
 
 .PHONY: sim_posix
 sim_posix: sim_posix_elf
@@ -587,3 +499,12 @@ sim_win32_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/sitl_win32
 	$(V1) $(MAKE) --no-print-directory \
 		-C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.win32 $*
+
+##############################
+#
+# Packaging components
+#
+##############################
+.PHONY: package
+package:
+	$(V1) cd $@ && $(MAKE) --no-print-directory $@

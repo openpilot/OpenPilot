@@ -41,10 +41,10 @@
  * List of event queues and the eventmask associated with the queue.
  */
 struct ObjectEventListStruct {
-	xQueueHandle queue;
-	UAVObjEventCallback cb;
-	int32_t eventMask;
-	struct ObjectEventListStruct* next;
+	  xQueueHandle queue;
+	  UAVObjEventCallback cb;
+	  int32_t eventMask;
+	  struct ObjectEventListStruct *next;
 };
 typedef struct ObjectEventListStruct ObjectEventList;
 
@@ -52,9 +52,9 @@ typedef struct ObjectEventListStruct ObjectEventList;
  * List of object instances, holds the actual data structure and instance ID
  */
 struct ObjectInstListStruct {
-	void* data;
-	uint16_t instId;
-	struct ObjectInstListStruct* next;
+	  void *data;
+	  uint16_t instId;
+	  struct ObjectInstListStruct *next;
 };
 typedef struct ObjectInstListStruct ObjectInstList;
 
@@ -62,34 +62,48 @@ typedef struct ObjectInstListStruct ObjectInstList;
  * List of objects registered in the object manager
  */
 struct ObjectListStruct {
-	uint32_t id; /** The object ID */
-	const char* name; /** The object name */
-	int8_t isMetaobject; /** Set to 1 if this is a metaobject */
-	int8_t isSingleInstance; /** Set to 1 if this object has a single instance */
-	int8_t isSettings; /** Set to 1 if this object is a settings object */
-	uint16_t numBytes; /** Number of data bytes contained in the object (for a single instance) */
-	uint16_t numInstances; /** Number of instances */
-	struct ObjectListStruct* linkedObj; /** Linked object, for regular objects this is the metaobject and for metaobjects it is the parent object */
-	ObjectInstList instances; /** List of object instances, instance 0 always exists */
-	ObjectEventList* events; /** Event queues registered on the object */
-	struct ObjectListStruct* next; /** Needed by linked list library (utlist.h) */
+	  uint32_t id;
+		     /** The object ID */
+	  const char *name;
+			  /** The object name */
+	  int8_t isMetaobject;
+			     /** Set to 1 if this is a metaobject */
+	  int8_t isSingleInstance;
+				 /** Set to 1 if this object has a single instance */
+	  int8_t isSettings;
+			   /** Set to 1 if this object is a settings object */
+	  uint16_t numBytes;
+			   /** Number of data bytes contained in the object (for a single instance) */
+	  uint16_t numInstances;
+			       /** Number of instances */
+	  struct ObjectListStruct *linkedObj;
+					    /** Linked object, for regular objects this is the metaobject and for metaobjects it is the parent object */
+	  ObjectInstList instances;
+				  /** List of object instances, instance 0 always exists */
+	  ObjectEventList *events;
+				 /** Event queues registered on the object */
+	  struct ObjectListStruct *next;
+				       /** Needed by linked list library (utlist.h) */
 };
 typedef struct ObjectListStruct ObjectList;
 
 // Private functions
-static int32_t sendEvent(ObjectList* obj, uint16_t instId, UAVObjEventType event);
-static ObjectInstList* createInstance(ObjectList* obj, uint16_t instId);
-static ObjectInstList* getInstance(ObjectList* obj, uint16_t instId);
-static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb, int32_t eventMask);
-static int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb);
+static int32_t sendEvent(ObjectList * obj, uint16_t instId,
+			 UAVObjEventType event);
+static ObjectInstList *createInstance(ObjectList * obj, uint16_t instId);
+static ObjectInstList *getInstance(ObjectList * obj, uint16_t instId);
+static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue,
+			  UAVObjEventCallback cb, int32_t eventMask);
+static int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue,
+			     UAVObjEventCallback cb);
 
 #if defined(PIOS_INCLUDE_SDCARD)
-static void objectFilename(ObjectList* obj, uint8_t* filename);
-static void customSPrintf(uint8_t* buffer, uint8_t* format, ...);
+static void objectFilename(ObjectList * obj, uint8_t * filename);
+static void customSPrintf(uint8_t * buffer, uint8_t * format, ...);
 #endif
 
 // Private variables
-static ObjectList* objList;
+static ObjectList *objList;
 static xSemaphoreHandle mutex;
 static UAVObjMetadata defMetadata;
 static UAVObjStats stats;
@@ -101,40 +115,40 @@ static UAVObjStats stats;
  */
 int32_t UAVObjInitialize()
 {
-	// Initialize variables
-	objList = NULL;
-	memset(&stats, 0, sizeof(UAVObjStats));
+	  // Initialize variables
+	  objList = NULL;
+	  memset(&stats, 0, sizeof(UAVObjStats));
 
-	// Create mutex
-	mutex = xSemaphoreCreateRecursiveMutex();
-	if (mutex == NULL)
-		return -1;
+	  // Create mutex
+	  mutex = xSemaphoreCreateRecursiveMutex();
+	  if (mutex == NULL)
+		    return -1;
 
-	// Initialize default metadata structure (metadata of metaobjects)
-	defMetadata.access = ACCESS_READWRITE;
-	defMetadata.gcsAccess = ACCESS_READWRITE;
-	defMetadata.telemetryAcked = 1;
-	defMetadata.telemetryUpdateMode = UPDATEMODE_ONCHANGE;
-	defMetadata.telemetryUpdatePeriod = 0;
-	defMetadata.gcsTelemetryAcked = 1;
-	defMetadata.gcsTelemetryUpdateMode = UPDATEMODE_ONCHANGE;
-	defMetadata.gcsTelemetryUpdatePeriod = 0;
-	defMetadata.loggingUpdateMode = UPDATEMODE_ONCHANGE;
-	defMetadata.loggingUpdatePeriod = 0;
+	  // Initialize default metadata structure (metadata of metaobjects)
+	  defMetadata.access = ACCESS_READWRITE;
+	  defMetadata.gcsAccess = ACCESS_READWRITE;
+	  defMetadata.telemetryAcked = 1;
+	  defMetadata.telemetryUpdateMode = UPDATEMODE_ONCHANGE;
+	  defMetadata.telemetryUpdatePeriod = 0;
+	  defMetadata.gcsTelemetryAcked = 1;
+	  defMetadata.gcsTelemetryUpdateMode = UPDATEMODE_ONCHANGE;
+	  defMetadata.gcsTelemetryUpdatePeriod = 0;
+	  defMetadata.loggingUpdateMode = UPDATEMODE_ONCHANGE;
+	  defMetadata.loggingUpdatePeriod = 0;
 
-	// Done
-	return 0;
+	  // Done
+	  return 0;
 }
 
 /**
  * Get the statistics counters
  * @param[out] statsOut The statistics counters will be copied there
  */
-void UAVObjGetStats(UAVObjStats* statsOut)
+void UAVObjGetStats(UAVObjStats * statsOut)
 {
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	memcpy(statsOut, &stats, sizeof(UAVObjStats));
-	xSemaphoreGiveRecursive(mutex);
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  memcpy(statsOut, &stats, sizeof(UAVObjStats));
+	  xSemaphoreGiveRecursive(mutex);
 }
 
 /**
@@ -142,9 +156,9 @@ void UAVObjGetStats(UAVObjStats* statsOut)
  */
 void UAVObjClearStats()
 {
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	memset(&stats, 0, sizeof(UAVObjStats));
-	xSemaphoreGiveRecursive(mutex);
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  memset(&stats, 0, sizeof(UAVObjStats));
+	  xSemaphoreGiveRecursive(mutex);
 }
 
 /**
@@ -160,91 +174,85 @@ void UAVObjClearStats()
  * \return Object handle, or NULL if failure.
  * \return
  */
-UAVObjHandle UAVObjRegister(uint32_t id, const char* name, const char* metaName, int32_t isMetaobject,
-		int32_t isSingleInstance, int32_t isSettings, uint32_t numBytes, UAVObjInitializeCallback initCb)
+UAVObjHandle UAVObjRegister(uint32_t id, const char *name,
+			    const char *metaName, int32_t isMetaobject,
+			    int32_t isSingleInstance, int32_t isSettings,
+			    uint32_t numBytes,
+			    UAVObjInitializeCallback initCb)
 {
-	ObjectList* objEntry;
-	ObjectInstList* instEntry;
-	ObjectList* metaObj;
+	  ObjectList *objEntry;
+	  ObjectInstList *instEntry;
+	  ObjectList *metaObj;
 
-	// Get lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Get lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Check that the object is not already registered
-	LL_FOREACH(objList, objEntry)
-	{
-		if (objEntry->id == id)
-		{
-			// Already registered, ignore
-			xSemaphoreGiveRecursive(mutex);
-			return NULL;
-		}
-	}
+	  // Check that the object is not already registered
+	  LL_FOREACH(objList, objEntry) {
+		    if (objEntry->id == id) {
+			      // Already registered, ignore
+			      xSemaphoreGiveRecursive(mutex);
+			      return NULL;
+		    }
+	  }
 
-	// Create and append entry
-	objEntry = (ObjectList*)pvPortMalloc(sizeof(ObjectList));
-	if (objEntry == NULL)
-	{
-		xSemaphoreGiveRecursive(mutex);
-		return NULL;
-	}
-	objEntry->id = id;
-	objEntry->name = name;
-	objEntry->isMetaobject = (int8_t)isMetaobject;
-	objEntry->isSingleInstance = (int8_t)isSingleInstance;
-	objEntry->isSettings = (int8_t)isSettings;
-	objEntry->numBytes = numBytes;
-	objEntry->events = NULL;
-	objEntry->numInstances = 0;
-	objEntry->instances.data = NULL;
-	objEntry->instances.instId = 0xFFFF;
-	objEntry->instances.next = NULL;	
-	objEntry->linkedObj = NULL; // will be set later
-	LL_APPEND(objList, objEntry);
+	  // Create and append entry
+	  objEntry = (ObjectList *) pvPortMalloc(sizeof(ObjectList));
+	  if (objEntry == NULL) {
+		    xSemaphoreGiveRecursive(mutex);
+		    return NULL;
+	  }
+	  objEntry->id = id;
+	  objEntry->name = name;
+	  objEntry->isMetaobject = (int8_t) isMetaobject;
+	  objEntry->isSingleInstance = (int8_t) isSingleInstance;
+	  objEntry->isSettings = (int8_t) isSettings;
+	  objEntry->numBytes = numBytes;
+	  objEntry->events = NULL;
+	  objEntry->numInstances = 0;
+	  objEntry->instances.data = NULL;
+	  objEntry->instances.instId = 0xFFFF;
+	  objEntry->instances.next = NULL;
+	  objEntry->linkedObj = NULL;	// will be set later
+	  LL_APPEND(objList, objEntry);
 
-	// Create instance zero
-	instEntry = createInstance(objEntry, 0);
-	if ( instEntry == NULL )
-	{
-		xSemaphoreGiveRecursive(mutex);
-		return NULL;
-	}
+	  // Create instance zero
+	  instEntry = createInstance(objEntry, 0);
+	  if (instEntry == NULL) {
+		    xSemaphoreGiveRecursive(mutex);
+		    return NULL;
+	  }
+	  // Create metaobject and update linkedObj
+	  if (isMetaobject) {
+		    objEntry->linkedObj = NULL;	// will be set later
+	  } else {
+		    // Create metaobject
+		    metaObj =
+			(ObjectList *) UAVObjRegister(id + 1, metaName,
+						      NULL, 1, 1, 0,
+						      sizeof
+						      (UAVObjMetadata),
+						      NULL);
+		    // Link two objects
+		    objEntry->linkedObj = metaObj;
+		    metaObj->linkedObj = objEntry;
+	  }
 
-	// Create metaobject and update linkedObj
-	if (isMetaobject)
-	{
-		objEntry->linkedObj = NULL; // will be set later
-	}
-	else
-	{
-		// Create metaobject
-		metaObj = (ObjectList*)UAVObjRegister(id+1, metaName, NULL, 1, 1, 0, sizeof(UAVObjMetadata), NULL);
-		// Link two objects
-		objEntry->linkedObj = metaObj;
-		metaObj->linkedObj = objEntry;
-	}
-
-	// Initialize object fields and metadata to default values
-	if ( initCb != NULL )
-	{
-		initCb((UAVObjHandle)objEntry, 0);
-	}
-
-	// Attempt to load object's metadata from the SD card (not done directly on the metaobject, but through the object)
-	if ( !objEntry->isMetaobject )
-	{
-		UAVObjLoad( (UAVObjHandle)objEntry->linkedObj, 0 );
-	}
-
-	// If this is a settings object, attempt to load from SD card
-	if ( objEntry->isSettings )
-	{
-		UAVObjLoad( (UAVObjHandle)objEntry, 0 );
-	}
-
-	// Release lock
-	xSemaphoreGiveRecursive(mutex);
-	return (UAVObjHandle)objEntry;
+	  // Initialize object fields and metadata to default values
+	  if (initCb != NULL) {
+		    initCb((UAVObjHandle) objEntry, 0);
+	  }
+	  // Attempt to load object's metadata from the SD card (not done directly on the metaobject, but through the object)
+	  if (!objEntry->isMetaobject) {
+		    UAVObjLoad((UAVObjHandle) objEntry->linkedObj, 0);
+	  }
+	  // If this is a settings object, attempt to load from SD card
+	  if (objEntry->isSettings) {
+		    UAVObjLoad((UAVObjHandle) objEntry, 0);
+	  }
+	  // Release lock
+	  xSemaphoreGiveRecursive(mutex);
+	  return (UAVObjHandle) objEntry;
 }
 
 /**
@@ -254,26 +262,24 @@ UAVObjHandle UAVObjRegister(uint32_t id, const char* name, const char* metaName,
  */
 UAVObjHandle UAVObjGetByID(uint32_t id)
 {
-	ObjectList* objEntry;
+	  ObjectList *objEntry;
 
-	// Get lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Get lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Look for object
-	LL_FOREACH(objList, objEntry)
-	{
-		if (objEntry->id == id)
-		{
-			// Release lock
-			xSemaphoreGiveRecursive(mutex);
-			// Done, object found
-			return (UAVObjHandle)objEntry;
-		}
-	}
+	  // Look for object
+	  LL_FOREACH(objList, objEntry) {
+		    if (objEntry->id == id) {
+			      // Release lock
+			      xSemaphoreGiveRecursive(mutex);
+			      // Done, object found
+			      return (UAVObjHandle) objEntry;
+		    }
+	  }
 
-	// Object not found, release lock and return error
-	xSemaphoreGiveRecursive(mutex);
-	return NULL;
+	  // Object not found, release lock and return error
+	  xSemaphoreGiveRecursive(mutex);
+	  return NULL;
 }
 
 /**
@@ -281,28 +287,27 @@ UAVObjHandle UAVObjGetByID(uint32_t id)
  * \param[in] name The name of the object
  * \return The object or NULL if not found.
  */
-UAVObjHandle UAVObjGetByName(char* name)
+UAVObjHandle UAVObjGetByName(char *name)
 {
-	ObjectList* objEntry;
+	  ObjectList *objEntry;
 
-	// Get lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Get lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Look for object
-	LL_FOREACH(objList, objEntry)
-	{
-		if (objEntry->name != NULL && strcmp(objEntry->name, name) == 0)
-		{
-			// Release lock
-			xSemaphoreGiveRecursive(mutex);
-			// Done, object found
-			return (UAVObjHandle)objEntry;
-		}
-	}
+	  // Look for object
+	  LL_FOREACH(objList, objEntry) {
+		    if (objEntry->name != NULL
+			&& strcmp(objEntry->name, name) == 0) {
+			      // Release lock
+			      xSemaphoreGiveRecursive(mutex);
+			      // Done, object found
+			      return (UAVObjHandle) objEntry;
+		    }
+	  }
 
-	// Object not found, release lock and return error
-	xSemaphoreGiveRecursive(mutex);
-	return NULL;
+	  // Object not found, release lock and return error
+	  xSemaphoreGiveRecursive(mutex);
+	  return NULL;
 }
 
 /**
@@ -312,7 +317,7 @@ UAVObjHandle UAVObjGetByName(char* name)
  */
 uint32_t UAVObjGetID(UAVObjHandle obj)
 {
-	return ((ObjectList*)obj)->id;
+	  return ((ObjectList *) obj)->id;
 }
 
 /**
@@ -320,9 +325,9 @@ uint32_t UAVObjGetID(UAVObjHandle obj)
  * \param[in] obj The object handle
  * \return The object's name
  */
-const char* UAVObjGetName(UAVObjHandle obj)
+const char *UAVObjGetName(UAVObjHandle obj)
 {
-	return ((ObjectList*)obj)->name;
+	  return ((ObjectList *) obj)->name;
 }
 
 /**
@@ -332,7 +337,7 @@ const char* UAVObjGetName(UAVObjHandle obj)
  */
 uint32_t UAVObjGetNumBytes(UAVObjHandle obj)
 {
-	return ((ObjectList*)obj)->numBytes;
+	  return ((ObjectList *) obj)->numBytes;
 }
 
 /**
@@ -344,7 +349,7 @@ uint32_t UAVObjGetNumBytes(UAVObjHandle obj)
  */
 UAVObjHandle UAVObjGetLinkedObj(UAVObjHandle obj)
 {
-	return (UAVObjHandle)(((ObjectList*)obj)->linkedObj);
+	  return (UAVObjHandle) (((ObjectList *) obj)->linkedObj);
 }
 
 /**
@@ -354,11 +359,11 @@ UAVObjHandle UAVObjGetLinkedObj(UAVObjHandle obj)
  */
 uint16_t UAVObjGetNumInstances(UAVObjHandle obj)
 {
-	uint32_t numInstances;
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	numInstances = ((ObjectList*)obj)->numInstances;
-	xSemaphoreGiveRecursive(mutex);
-	return numInstances;
+	  uint32_t numInstances;
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  numInstances = ((ObjectList *) obj)->numInstances;
+	  xSemaphoreGiveRecursive(mutex);
+	  return numInstances;
 }
 
 /**
@@ -366,32 +371,29 @@ uint16_t UAVObjGetNumInstances(UAVObjHandle obj)
  * \param[in] obj The object handle
  * \return The instance ID or 0 if an error
  */
-uint16_t UAVObjCreateInstance(UAVObjHandle obj, UAVObjInitializeCallback initCb)
+uint16_t UAVObjCreateInstance(UAVObjHandle obj,
+			      UAVObjInitializeCallback initCb)
 {
-	ObjectList* objEntry;
-	ObjectInstList* instEntry;
+	  ObjectList *objEntry;
+	  ObjectInstList *instEntry;
 
-	// Lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Create new instance
-	objEntry = (ObjectList*)obj;
-	instEntry = createInstance(objEntry, objEntry->numInstances);
-	if ( instEntry == NULL )
-	{
-		xSemaphoreGiveRecursive(mutex);
-		return -1;
-	}
-
-	// Initialize instance data
-	if ( initCb != NULL )
-	{
-		initCb(obj, instEntry->instId);
-	}
-
-	// Unlock
-	xSemaphoreGiveRecursive(mutex);
-	return instEntry->instId;
+	  // Create new instance
+	  objEntry = (ObjectList *) obj;
+	  instEntry = createInstance(objEntry, objEntry->numInstances);
+	  if (instEntry == NULL) {
+		    xSemaphoreGiveRecursive(mutex);
+		    return -1;
+	  }
+	  // Initialize instance data
+	  if (initCb != NULL) {
+		    initCb(obj, instEntry->instId);
+	  }
+	  // Unlock
+	  xSemaphoreGiveRecursive(mutex);
+	  return instEntry->instId;
 }
 
 /**
@@ -401,7 +403,7 @@ uint16_t UAVObjCreateInstance(UAVObjHandle obj, UAVObjInitializeCallback initCb)
  */
 int32_t UAVObjIsSingleInstance(UAVObjHandle obj)
 {
-	return ((ObjectList*)obj)->isSingleInstance;
+	  return ((ObjectList *) obj)->isSingleInstance;
 }
 
 /**
@@ -411,7 +413,7 @@ int32_t UAVObjIsSingleInstance(UAVObjHandle obj)
  */
 int32_t UAVObjIsMetaobject(UAVObjHandle obj)
 {
-	return ((ObjectList*)obj)->isMetaobject;
+	  return ((ObjectList *) obj)->isMetaobject;
 }
 
 /**
@@ -421,7 +423,7 @@ int32_t UAVObjIsMetaobject(UAVObjHandle obj)
  */
 int32_t UAVObjIsSettings(UAVObjHandle obj)
 {
-	return ((ObjectList*)obj)->isSettings;
+	  return ((ObjectList *) obj)->isSettings;
 }
 
 /**
@@ -431,41 +433,39 @@ int32_t UAVObjIsSettings(UAVObjHandle obj)
  * \param[in] dataIn The byte array
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjUnpack(UAVObjHandle obj, uint16_t instId, const uint8_t* dataIn)
+int32_t UAVObjUnpack(UAVObjHandle obj, uint16_t instId,
+		     const uint8_t * dataIn)
 {
-	ObjectList* objEntry;
-	ObjectInstList* instEntry;
+	  ObjectList *objEntry;
+	  ObjectInstList *instEntry;
 
-	// Lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Cast handle to object
-	objEntry = (ObjectList*)obj;
+	  // Cast handle to object
+	  objEntry = (ObjectList *) obj;
 
-	// Get the instance
-	instEntry = getInstance(objEntry, instId);
+	  // Get the instance
+	  instEntry = getInstance(objEntry, instId);
 
-	// If the instance does not exist create it and any other instances before it
-	if ( instEntry == NULL )
-	{
-		instEntry = createInstance(objEntry, instId);
-		if ( instEntry == NULL )
-		{
-			// Error, unlock and return
-			xSemaphoreGiveRecursive(mutex);
-			return -1;
-		}
-	}
+	  // If the instance does not exist create it and any other instances before it
+	  if (instEntry == NULL) {
+		    instEntry = createInstance(objEntry, instId);
+		    if (instEntry == NULL) {
+			      // Error, unlock and return
+			      xSemaphoreGiveRecursive(mutex);
+			      return -1;
+		    }
+	  }
+	  // Set the data
+	  memcpy(instEntry->data, dataIn, objEntry->numBytes);
 
-	// Set the data
-	memcpy(instEntry->data, dataIn, objEntry->numBytes);
+	  // Fire event
+	  sendEvent(objEntry, instId, EV_UNPACKED);
 
-	// Fire event
-	sendEvent(objEntry, instId, EV_UNPACKED);
-
-	// Unlock
-	xSemaphoreGiveRecursive(mutex);
-	return 0;
+	  // Unlock
+	  xSemaphoreGiveRecursive(mutex);
+	  return 0;
 }
 
 /**
@@ -475,32 +475,30 @@ int32_t UAVObjUnpack(UAVObjHandle obj, uint16_t instId, const uint8_t* dataIn)
  * \param[out] dataOut The byte array
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjPack(UAVObjHandle obj, uint16_t instId, uint8_t* dataOut)
+int32_t UAVObjPack(UAVObjHandle obj, uint16_t instId, uint8_t * dataOut)
 {
-	ObjectList* objEntry;
-	ObjectInstList* instEntry;
+	  ObjectList *objEntry;
+	  ObjectInstList *instEntry;
 
-	// Lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Cast handle to object
-	objEntry = (ObjectList*)obj;
+	  // Cast handle to object
+	  objEntry = (ObjectList *) obj;
 
-	// Get the instance
-	instEntry = getInstance(objEntry, instId);
-	if ( instEntry == NULL )
-	{
-		// Error, unlock and return
-		xSemaphoreGiveRecursive(mutex);
-		return -1;
-	}
+	  // Get the instance
+	  instEntry = getInstance(objEntry, instId);
+	  if (instEntry == NULL) {
+		    // Error, unlock and return
+		    xSemaphoreGiveRecursive(mutex);
+		    return -1;
+	  }
+	  // Pack data
+	  memcpy(dataOut, instEntry->data, objEntry->numBytes);
 
-	// Pack data
-	memcpy(dataOut, instEntry->data, objEntry->numBytes);
-
-	// Unlock
-	xSemaphoreGiveRecursive(mutex);
-	return 0;
+	  // Unlock
+	  xSemaphoreGiveRecursive(mutex);
+	  return 0;
 }
 
 /**
@@ -512,63 +510,51 @@ int32_t UAVObjPack(UAVObjHandle obj, uint16_t instId, uint8_t* dataOut)
  * @param[in] file File to append to
  * @return 0 if success or -1 if failure
  */
-int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId, FILEINFO* file)
+int32_t UAVObjSaveToFile(UAVObjHandle obj, uint16_t instId,
+			 FILEINFO * file)
 {
 #if defined(PIOS_INCLUDE_SDCARD)
-	uint32_t bytesWritten;
-	ObjectList* objEntry;
-	ObjectInstList* instEntry;
+	  uint32_t bytesWritten;
+	  ObjectList *objEntry;
+	  ObjectInstList *instEntry;
 
-	// Check for file system availability
-	if ( PIOS_SDCARD_IsMounted() == 0 )
-	{
-		return -1;
-	}
+	  // Check for file system availability
+	  if (PIOS_SDCARD_IsMounted() == 0) {
+		    return -1;
+	  }
+	  // Lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Cast to object
+	  objEntry = (ObjectList *) obj;
 
-	// Cast to object
-	objEntry = (ObjectList*)obj;
+	  // Get the instance information
+	  instEntry = getInstance(objEntry, instId);
+	  if (instEntry == NULL) {
+		    xSemaphoreGiveRecursive(mutex);
+		    return -1;
+	  }
+	  // Write the object ID
+	  PIOS_FWRITE(file, &objEntry->id, sizeof(objEntry->id),
+		      &bytesWritten);
 
-	// Get the instance information
-	instEntry = getInstance(objEntry, instId);
-	if ( instEntry == NULL )
-	{
-		xSemaphoreGiveRecursive(mutex);
-		return -1;
-	}
-
-	// Write the object ID
-	PIOS_FWRITE(file,&objEntry->id,sizeof(objEntry->id),&bytesWritten);
-
-	// Write the instance ID
-	if (!objEntry->isSingleInstance)
-	{
-		PIOS_FWRITE(file,&instEntry->instId,sizeof(instEntry->instId),&bytesWritten);
-	}
-
-	// Write the data and check that the write was successful
-	PIOS_FWRITE(file,instEntry->data,objEntry->numBytes,&bytesWritten);
-	if ( bytesWritten != objEntry->numBytes )
-	{
-		xSemaphoreGiveRecursive(mutex);
-		return -1;
-	}
-
-	// Done
-	xSemaphoreGiveRecursive(mutex);
+	  // Write the instance ID
+	  if (!objEntry->isSingleInstance) {
+		    PIOS_FWRITE(file, &instEntry->instId,
+				sizeof(instEntry->instId), &bytesWritten);
+	  }
+	  // Write the data and check that the write was successful
+	  PIOS_FWRITE(file, instEntry->data, objEntry->numBytes,
+		      &bytesWritten);
+	  if (bytesWritten != objEntry->numBytes) {
+		    xSemaphoreGiveRecursive(mutex);
+		    return -1;
+	  }
+	  // Done
+	  xSemaphoreGiveRecursive(mutex);
 #endif /* PIOS_INCLUDE_SDCARD */
-	return 0;
+	  return 0;
 }
-
-struct fileHeader {
-	uint32_t id;
-	uint16_t instId;
-	uint16_t size;
-} __attribute__((packed));
-
-#define FLASH_MASK 0x001ff000  /* Select a sector */
 
 /**
  * Save the data of the specified object to the file system (SD card).
@@ -583,71 +569,56 @@ struct fileHeader {
 int32_t UAVObjSave(UAVObjHandle obj, uint16_t instId)
 {
 #if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
-	ObjectList* objEntry = (ObjectList*)obj;
-	
-	if(objEntry == NULL)
-		return -1;
-	
-	ObjectInstList* instEntry = getInstance(objEntry, instId);
-	
-	if(instEntry == NULL)
-		return -1;
-	
-	if(instEntry->data == NULL)
-		return -1;
-	
+	  ObjectList *objEntry = (ObjectList *) obj;
 
-	struct fileHeader header = {
-		.id = objEntry->id,
-		.instId = instId,
-		.size = objEntry->numBytes
-	};
+	  if (objEntry == NULL)
+		    return -1;
 
-	uint32_t addr = (objEntry->id & FLASH_MASK);
-	PIOS_Flash_W25X_EraseSector(addr);
-	PIOS_Flash_W25X_WriteData(addr, (uint8_t *) &header, sizeof(header));
-	PIOS_Flash_W25X_WriteData(addr + sizeof(header), instEntry->data,objEntry->numBytes);
-#endif	
+	  ObjectInstList *instEntry = getInstance(objEntry, instId);
+
+	  if (instEntry == NULL)
+		    return -1;
+
+	  if (instEntry->data == NULL)
+		    return -1;
+
+	  if (PIOS_FLASHFS_ObjSave(obj, instId, instEntry->data) != 0)
+		    return -1;
+#endif
 #if defined(PIOS_INCLUDE_SDCARD)
-	FILEINFO file;
-	ObjectList* objEntry;
-	uint8_t filename[14];
+	  FILEINFO file;
+	  ObjectList *objEntry;
+	  uint8_t filename[14];
 
-	// Check for file system availability
-	if ( PIOS_SDCARD_IsMounted() == 0 )
-	{
-		return -1;
-	}
+	  // Check for file system availability
+	  if (PIOS_SDCARD_IsMounted() == 0) {
+		    return -1;
+	  }
+	  // Lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Cast to object
+	  objEntry = (ObjectList *) obj;
 
-	// Cast to object
-	objEntry = (ObjectList*)obj;
+	  // Get filename
+	  objectFilename(objEntry, filename);
 
-	// Get filename
-	objectFilename(objEntry, filename);
-
-	// Open file
-	if ( PIOS_FOPEN_WRITE(filename,file) )
-	{
-		xSemaphoreGiveRecursive(mutex);
-		return -1;
-	}
-
-	// Append object
-	if ( UAVObjSaveToFile(obj, instId, &file) == -1 )
-	{
-		PIOS_FCLOSE(file);
-		xSemaphoreGiveRecursive(mutex);
-		return -1;
-	}
-
-	// Done, close file and unlock
-	PIOS_FCLOSE(file);
-	xSemaphoreGiveRecursive(mutex);
+	  // Open file
+	  if (PIOS_FOPEN_WRITE(filename, file)) {
+		    xSemaphoreGiveRecursive(mutex);
+		    return -1;
+	  }
+	  // Append object
+	  if (UAVObjSaveToFile(obj, instId, &file) == -1) {
+		    PIOS_FCLOSE(file);
+		    xSemaphoreGiveRecursive(mutex);
+		    return -1;
+	  }
+	  // Done, close file and unlock
+	  PIOS_FCLOSE(file);
+	  xSemaphoreGiveRecursive(mutex);
 #endif /* PIOS_INCLUDE_SDCARD */
-	return 0;
+	  return 0;
 }
 
 /**
@@ -655,82 +626,71 @@ int32_t UAVObjSave(UAVObjHandle obj, uint16_t instId)
  * @param[in] file File to read from
  * @return The handle of the object loaded or NULL if a failure
  */
-UAVObjHandle UAVObjLoadFromFile(FILEINFO* file)
+UAVObjHandle UAVObjLoadFromFile(FILEINFO * file)
 {
 #if defined(PIOS_INCLUDE_SDCARD)
-	uint32_t bytesRead;
-	ObjectList* objEntry;
-	ObjectInstList* instEntry;
-	uint32_t objId;
-	uint16_t instId;
-	UAVObjHandle obj;
+	  uint32_t bytesRead;
+	  ObjectList *objEntry;
+	  ObjectInstList *instEntry;
+	  uint32_t objId;
+	  uint16_t instId;
+	  UAVObjHandle obj;
 
-	// Check for file system availability
-	if ( PIOS_SDCARD_IsMounted() == 0 )
-	{
-		return NULL;
-	}
+	  // Check for file system availability
+	  if (PIOS_SDCARD_IsMounted() == 0) {
+		    return NULL;
+	  }
+	  // Lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Read the object ID
+	  if (PIOS_FREAD(file, &objId, sizeof(objId), &bytesRead)) {
+		    xSemaphoreGiveRecursive(mutex);
+		    return NULL;
+	  }
+	  // Get the object
+	  obj = UAVObjGetByID(objId);
+	  if (obj == 0) {
+		    xSemaphoreGiveRecursive(mutex);
+		    return NULL;
+	  }
+	  objEntry = (ObjectList *) obj;
 
-	// Read the object ID
-	if ( PIOS_FREAD(file,&objId,sizeof(objId),&bytesRead) )
-	{
-		xSemaphoreGiveRecursive(mutex);
-		return NULL;
-	}
+	  // Get the instance ID
+	  instId = 0;
+	  if (!objEntry->isSingleInstance) {
+		    if (PIOS_FREAD
+			(file, &instId, sizeof(instId), &bytesRead)) {
+			      xSemaphoreGiveRecursive(mutex);
+			      return NULL;
+		    }
+	  }
+	  // Get the instance information
+	  instEntry = getInstance(objEntry, instId);
 
-	// Get the object
-	obj = UAVObjGetByID(objId);
-	if ( obj == 0 )
-	{
-		xSemaphoreGiveRecursive(mutex);
-		return NULL;
-	}
-	objEntry = (ObjectList*)obj;
+	  // If the instance does not exist create it and any other instances before it
+	  if (instEntry == NULL) {
+		    instEntry = createInstance(objEntry, instId);
+		    if (instEntry == NULL) {
+			      // Error, unlock and return
+			      xSemaphoreGiveRecursive(mutex);
+			      return NULL;
+		    }
+	  }
+	  // Read the instance data
+	  if (PIOS_FREAD
+	      (file, instEntry->data, objEntry->numBytes, &bytesRead)) {
+		    xSemaphoreGiveRecursive(mutex);
+		    return NULL;
+	  }
+	  // Fire event
+	  sendEvent(objEntry, instId, EV_UNPACKED);
 
-	// Get the instance ID
-	instId = 0;
-	if ( !objEntry->isSingleInstance )
-	{
-		if ( PIOS_FREAD(file,&instId,sizeof(instId),&bytesRead) )
-		{
-			xSemaphoreGiveRecursive(mutex);
-			return NULL;
-		}
-	}
-
-	// Get the instance information
-	instEntry = getInstance(objEntry, instId);
-
-	// If the instance does not exist create it and any other instances before it
-	if ( instEntry == NULL )
-	{
-		instEntry = createInstance(objEntry, instId);
-		if ( instEntry == NULL )
-		{
-			// Error, unlock and return
-			xSemaphoreGiveRecursive(mutex);
-			return NULL;
-		}
-	}
-
-	// Read the instance data
-	if ( PIOS_FREAD(file,instEntry->data,objEntry->numBytes,&bytesRead) )
-	{
-		xSemaphoreGiveRecursive(mutex);
-		return NULL;
-	}
-
-	// Fire event
-	sendEvent(objEntry, instId, EV_UNPACKED);
-
-	// Unlock
-	xSemaphoreGiveRecursive(mutex);
-	return obj;
+	  // Unlock
+	  xSemaphoreGiveRecursive(mutex);
+	  return obj;
 #else /* PIOS_INCLUDE_SDCARD */
-	return NULL;
+	  return NULL;
 #endif
 }
 
@@ -745,87 +705,70 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO* file)
 int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
 {
 #if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
-	ObjectList* objEntry = (ObjectList*)obj;
-	
-	if(objEntry == NULL)
-		return -1;
-	
-	ObjectInstList* instEntry = getInstance(objEntry, instId);
-	
-	if(instEntry == NULL)
-		return -1;
-	
-	if(instEntry->data == NULL)
-		return -1;
-	
-	struct fileHeader header;
-	uint32_t addr = (objEntry->id & FLASH_MASK);
+	ObjectList *objEntry = (ObjectList *) obj;
 
-	PIOS_Flash_W25X_ReadData(addr, (uint8_t *) &header, sizeof(header));
-	
-	if(header.id != objEntry->id)
+	if (objEntry == NULL)
 		return -1;
-	
-	// Read the instance data
-	if (PIOS_Flash_W25X_ReadData(addr + sizeof(header) ,instEntry->data, objEntry->numBytes) != 0)
+
+	ObjectInstList *instEntry = getInstance(objEntry, instId);
+
+	if (instEntry == NULL)
 		return -1;
-		
-	// Fire event
-	sendEvent(objEntry, instId, EV_UNPACKED);		
+
+	if (instEntry->data == NULL)
+		return -1;
+
+	// Fire event on success
+	if (PIOS_FLASHFS_ObjLoad(obj, instId, instEntry->data) == 0)
+		sendEvent(objEntry, instId, EV_UNPACKED);
+	else
+		return -1;
 #endif
-	
+
 #if defined(PIOS_INCLUDE_SDCARD)
-	FILEINFO file;
-	ObjectList* objEntry;
-	UAVObjHandle loadedObj;
-	ObjectList* loadedObjEntry;
-	uint8_t filename[14];
+	  FILEINFO file;
+	  ObjectList *objEntry;
+	  UAVObjHandle loadedObj;
+	  ObjectList *loadedObjEntry;
+	  uint8_t filename[14];
 
-	// Check for file system availability
-	if ( PIOS_SDCARD_IsMounted() == 0 )
-	{
-		return -1;
-	}
+	  // Check for file system availability
+	  if (PIOS_SDCARD_IsMounted() == 0) {
+		    return -1;
+	  }
+	  // Lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Cast to object
+	  objEntry = (ObjectList *) obj;
 
-	// Cast to object
-	objEntry = (ObjectList*)obj;
+	  // Get filename
+	  objectFilename(objEntry, filename);
 
-	// Get filename
-	objectFilename(objEntry, filename);
-
-	// Open file
-	if ( PIOS_FOPEN_READ(filename,file) )
-	{
-		xSemaphoreGiveRecursive(mutex);
-		return -1;
-	}
-
-	// Load object
-	loadedObj = UAVObjLoadFromFile(&file);
-	if (loadedObj == 0)
-	{
-		PIOS_FCLOSE(file);
-		xSemaphoreGiveRecursive(mutex);
-		return -1;
-	}
-
-	// Check that the IDs match
-	loadedObjEntry = (ObjectList*)loadedObj;
-	if ( loadedObjEntry->id != objEntry->id )
-	{
-		PIOS_FCLOSE(file);
-		xSemaphoreGiveRecursive(mutex);
-		return -1;
-	}
-
-	// Done, close file and unlock
-	PIOS_FCLOSE(file);
-	xSemaphoreGiveRecursive(mutex);
+	  // Open file
+	  if (PIOS_FOPEN_READ(filename, file)) {
+		    xSemaphoreGiveRecursive(mutex);
+		    return -1;
+	  }
+	  // Load object
+	  loadedObj = UAVObjLoadFromFile(&file);
+	  if (loadedObj == 0) {
+		    PIOS_FCLOSE(file);
+		    xSemaphoreGiveRecursive(mutex);
+		    return -1;
+	  }
+	  // Check that the IDs match
+	  loadedObjEntry = (ObjectList *) loadedObj;
+	  if (loadedObjEntry->id != objEntry->id) {
+		    PIOS_FCLOSE(file);
+		    xSemaphoreGiveRecursive(mutex);
+		    return -1;
+	  }
+	  // Done, close file and unlock
+	  PIOS_FCLOSE(file);
+	  xSemaphoreGiveRecursive(mutex);
 #endif /* PIOS_INCLUDE_SDCARD */
-	return 0;
+	  return 0;
 }
 
 /**
@@ -837,40 +780,32 @@ int32_t UAVObjLoad(UAVObjHandle obj, uint16_t instId)
 int32_t UAVObjDelete(UAVObjHandle obj, uint16_t instId)
 {
 #if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
-	ObjectList* objEntry = (ObjectList*)obj;
-	
-	if(objEntry == NULL)
-		return -1;
-		
-	uint32_t addr = (objEntry->id & FLASH_MASK);
-	PIOS_Flash_W25X_EraseSector(addr);
-#endif	
+	  PIOS_FLASHFS_ObjDelete(obj, instId);
+#endif
 #if defined(PIOS_INCLUDE_SDCARD)
-	ObjectList* objEntry;
-	uint8_t filename[14];
+	  ObjectList *objEntry;
+	  uint8_t filename[14];
 
-	// Check for file system availability
-	if ( PIOS_SDCARD_IsMounted() == 0 )
-	{
-		return -1;
-	}
+	  // Check for file system availability
+	  if (PIOS_SDCARD_IsMounted() == 0) {
+		    return -1;
+	  }
+	  // Lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Cast to object
+	  objEntry = (ObjectList *) obj;
 
-	// Cast to object
-	objEntry = (ObjectList*)obj;
+	  // Get filename
+	  objectFilename(objEntry, filename);
 
-	// Get filename
-	objectFilename(objEntry, filename);
+	  // Delete file
+	  PIOS_FUNLINK(filename);
 
-	// Delete file
-	PIOS_FUNLINK(filename);
-
-	// Done
-	xSemaphoreGiveRecursive(mutex);
+	  // Done
+	  xSemaphoreGiveRecursive(mutex);
 #endif /* PIOS_INCLUDE_SDCARD */
-	return 0;
+	  return 0;
 }
 
 /**
@@ -879,29 +814,27 @@ int32_t UAVObjDelete(UAVObjHandle obj, uint16_t instId)
  */
 int32_t UAVObjSaveSettings()
 {
-	ObjectList* objEntry;
+	  ObjectList *objEntry;
 
-	// Get lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Get lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Save all settings objects
-	LL_FOREACH(objList, objEntry)
-	{
-		// Check if this is a settings object
-		if ( objEntry->isSettings )
-		{
-			// Save object
-			if ( UAVObjSave( (UAVObjHandle)objEntry, 0 ) == -1 )
-			{
-				xSemaphoreGiveRecursive(mutex);
-				return -1;
-			}
-		}
-	}
+	  // Save all settings objects
+	  LL_FOREACH(objList, objEntry) {
+		    // Check if this is a settings object
+		    if (objEntry->isSettings) {
+			      // Save object
+			      if (UAVObjSave((UAVObjHandle) objEntry, 0) ==
+				  -1) {
+					xSemaphoreGiveRecursive(mutex);
+					return -1;
+			      }
+		    }
+	  }
 
-	// Done
-	xSemaphoreGiveRecursive(mutex);
-	return 0;
+	  // Done
+	  xSemaphoreGiveRecursive(mutex);
+	  return 0;
 }
 
 /**
@@ -910,29 +843,27 @@ int32_t UAVObjSaveSettings()
  */
 int32_t UAVObjLoadSettings()
 {
-	ObjectList* objEntry;
+	  ObjectList *objEntry;
 
-	// Get lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Get lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Load all settings objects
-	LL_FOREACH(objList, objEntry)
-	{
-		// Check if this is a settings object
-		if ( objEntry->isSettings )
-		{
-			// Load object
-			if ( UAVObjLoad( (UAVObjHandle)objEntry, 0 ) == -1 )
-			{
-				xSemaphoreGiveRecursive(mutex);
-				return -1;
-			}
-		}
-	}
+	  // Load all settings objects
+	  LL_FOREACH(objList, objEntry) {
+		    // Check if this is a settings object
+		    if (objEntry->isSettings) {
+			      // Load object
+			      if (UAVObjLoad((UAVObjHandle) objEntry, 0) ==
+				  -1) {
+					xSemaphoreGiveRecursive(mutex);
+					return -1;
+			      }
+		    }
+	  }
 
-	// Done
-	xSemaphoreGiveRecursive(mutex);
-	return 0;
+	  // Done
+	  xSemaphoreGiveRecursive(mutex);
+	  return 0;
 }
 
 /**
@@ -941,29 +872,27 @@ int32_t UAVObjLoadSettings()
  */
 int32_t UAVObjDeleteSettings()
 {
-	ObjectList* objEntry;
+	  ObjectList *objEntry;
 
-	// Get lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Get lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Save all settings objects
-	LL_FOREACH(objList, objEntry)
-	{
-		// Check if this is a settings object
-		if ( objEntry->isSettings )
-		{
-			// Save object
-			if ( UAVObjDelete( (UAVObjHandle)objEntry, 0 ) == -1 )
-			{
-				xSemaphoreGiveRecursive(mutex);
-				return -1;
-			}
-		}
-	}
+	  // Save all settings objects
+	  LL_FOREACH(objList, objEntry) {
+		    // Check if this is a settings object
+		    if (objEntry->isSettings) {
+			      // Save object
+			      if (UAVObjDelete((UAVObjHandle) objEntry, 0)
+				  == -1) {
+					xSemaphoreGiveRecursive(mutex);
+					return -1;
+			      }
+		    }
+	  }
 
-	// Done
-	xSemaphoreGiveRecursive(mutex);
-	return 0;
+	  // Done
+	  xSemaphoreGiveRecursive(mutex);
+	  return 0;
 }
 
 /**
@@ -972,29 +901,27 @@ int32_t UAVObjDeleteSettings()
  */
 int32_t UAVObjSaveMetaobjects()
 {
-	ObjectList* objEntry;
+	  ObjectList *objEntry;
 
-	// Get lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Get lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Save all settings objects
-	LL_FOREACH(objList, objEntry)
-	{
-		// Check if this is a settings object
-		if ( objEntry->isMetaobject )
-		{
-			// Save object
-			if ( UAVObjSave( (UAVObjHandle)objEntry, 0 ) == -1 )
-			{
-				xSemaphoreGiveRecursive(mutex);
-				return -1;
-			}
-		}
-	}
+	  // Save all settings objects
+	  LL_FOREACH(objList, objEntry) {
+		    // Check if this is a settings object
+		    if (objEntry->isMetaobject) {
+			      // Save object
+			      if (UAVObjSave((UAVObjHandle) objEntry, 0) ==
+				  -1) {
+					xSemaphoreGiveRecursive(mutex);
+					return -1;
+			      }
+		    }
+	  }
 
-	// Done
-	xSemaphoreGiveRecursive(mutex);
-	return 0;
+	  // Done
+	  xSemaphoreGiveRecursive(mutex);
+	  return 0;
 }
 
 /**
@@ -1003,29 +930,27 @@ int32_t UAVObjSaveMetaobjects()
  */
 int32_t UAVObjLoadMetaobjects()
 {
-	ObjectList* objEntry;
+	  ObjectList *objEntry;
 
-	// Get lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Get lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Load all settings objects
-	LL_FOREACH(objList, objEntry)
-	{
-		// Check if this is a settings object
-		if ( objEntry->isMetaobject )
-		{
-			// Load object
-			if ( UAVObjLoad( (UAVObjHandle)objEntry, 0 ) == -1 )
-			{
-				xSemaphoreGiveRecursive(mutex);
-				return -1;
-			}
-		}
-	}
+	  // Load all settings objects
+	  LL_FOREACH(objList, objEntry) {
+		    // Check if this is a settings object
+		    if (objEntry->isMetaobject) {
+			      // Load object
+			      if (UAVObjLoad((UAVObjHandle) objEntry, 0) ==
+				  -1) {
+					xSemaphoreGiveRecursive(mutex);
+					return -1;
+			      }
+		    }
+	  }
 
-	// Done
-	xSemaphoreGiveRecursive(mutex);
-	return 0;
+	  // Done
+	  xSemaphoreGiveRecursive(mutex);
+	  return 0;
 }
 
 /**
@@ -1034,29 +959,27 @@ int32_t UAVObjLoadMetaobjects()
  */
 int32_t UAVObjDeleteMetaobjects()
 {
-	ObjectList* objEntry;
+	  ObjectList *objEntry;
 
-	// Get lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Get lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Load all settings objects
-	LL_FOREACH(objList, objEntry)
-	{
-		// Check if this is a settings object
-		if ( objEntry->isMetaobject )
-		{
-			// Load object
-			if ( UAVObjDelete( (UAVObjHandle)objEntry, 0 ) == -1 )
-			{
-				xSemaphoreGiveRecursive(mutex);
-				return -1;
-			}
-		}
-	}
+	  // Load all settings objects
+	  LL_FOREACH(objList, objEntry) {
+		    // Check if this is a settings object
+		    if (objEntry->isMetaobject) {
+			      // Load object
+			      if (UAVObjDelete((UAVObjHandle) objEntry, 0)
+				  == -1) {
+					xSemaphoreGiveRecursive(mutex);
+					return -1;
+			      }
+		    }
+	  }
 
-	// Done
-	xSemaphoreGiveRecursive(mutex);
-	return 0;
+	  // Done
+	  xSemaphoreGiveRecursive(mutex);
+	  return 0;
 }
 
 /**
@@ -1065,9 +988,20 @@ int32_t UAVObjDeleteMetaobjects()
  * \param[in] dataIn The object's data structure
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjSetData(UAVObjHandle obj, const void* dataIn)
+int32_t UAVObjSetData(UAVObjHandle obj, const void *dataIn)
 {
-	return UAVObjSetInstanceData(obj, 0, dataIn);
+	  return UAVObjSetInstanceData(obj, 0, dataIn);
+}
+
+/**
+ * Set the object data
+ * \param[in] obj The object handle
+ * \param[in] dataIn The object's data structure
+ * \return 0 if success or -1 if failure
+ */
+int32_t UAVObjSetDataField(UAVObjHandle obj, const void* dataIn, uint32_t offset, uint32_t size)
+{
+	return UAVObjSetInstanceDataField(obj, 0, dataIn, offset, size);
 }
 
 /**
@@ -1076,9 +1010,20 @@ int32_t UAVObjSetData(UAVObjHandle obj, const void* dataIn)
  * \param[out] dataOut The object's data structure
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjGetData(UAVObjHandle obj, void* dataOut)
+int32_t UAVObjGetData(UAVObjHandle obj, void *dataOut)
 {
-	return UAVObjGetInstanceData(obj, 0, dataOut);
+	  return UAVObjGetInstanceData(obj, 0, dataOut);
+}
+
+/**
+ * Get the object data
+ * \param[in] obj The object handle
+ * \param[out] dataOut The object's data structure
+ * \return 0 if success or -1 if failure
+ */
+int32_t UAVObjGetDataField(UAVObjHandle obj, void* dataOut, uint32_t offset, uint32_t size)
+{
+	return UAVObjGetInstanceDataField(obj, 0, dataOut, offset, size);
 }
 
 /**
@@ -1088,7 +1033,55 @@ int32_t UAVObjGetData(UAVObjHandle obj, void* dataOut)
  * \param[in] dataIn The object's data structure
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint16_t instId, const void* dataIn)
+int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint16_t instId,
+			      const void *dataIn)
+{
+	  ObjectList *objEntry;
+	  ObjectInstList *instEntry;
+	  UAVObjMetadata *mdata;
+
+	  // Lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+
+	  // Cast to object info
+	  objEntry = (ObjectList *) obj;
+
+	  // Check access level
+	  if (!objEntry->isMetaobject) {
+		    mdata =
+			(UAVObjMetadata *) (objEntry->linkedObj->instances.
+					    data);
+		    if (mdata->access == ACCESS_READONLY) {
+			      xSemaphoreGiveRecursive(mutex);
+			      return -1;
+		    }
+	  }
+	  // Get instance information
+	  instEntry = getInstance(objEntry, instId);
+	  if (instEntry == NULL) {
+		    // Error, unlock and return
+		    xSemaphoreGiveRecursive(mutex);
+		    return -1;
+	  }
+	  // Set data
+	  memcpy(instEntry->data, dataIn, objEntry->numBytes);
+
+	  // Fire event
+	  sendEvent(objEntry, instId, EV_UPDATED);
+
+	  // Unlock
+	  xSemaphoreGiveRecursive(mutex);
+	  return 0;
+}
+
+/**
+ * Set the data of a specific object instance
+ * \param[in] obj The object handle
+ * \param[in] instId The object instance ID
+ * \param[in] dataIn The object's data structure
+ * \return 0 if success or -1 if failure
+ */
+int32_t UAVObjSetInstanceDataField(UAVObjHandle obj, uint16_t instId, const void* dataIn, uint32_t offset, uint32_t size)
 {
 	ObjectList* objEntry;
 	ObjectInstList* instEntry;
@@ -1120,8 +1113,15 @@ int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint16_t instId, const void* dat
 		return -1;
 	}
 
+	// return if we set too much of what we have
+	if ( (size + offset) > objEntry->numBytes) {
+		// Error, unlock and return
+		xSemaphoreGiveRecursive(mutex);		
+		return -1;
+	}
+
 	// Set data
-	memcpy(instEntry->data, dataIn, objEntry->numBytes);
+	memcpy(instEntry->data + offset, dataIn, size);
 
 	// Fire event
 	sendEvent(objEntry, instId, EV_UPDATED);
@@ -1138,7 +1138,41 @@ int32_t UAVObjSetInstanceData(UAVObjHandle obj, uint16_t instId, const void* dat
  * \param[out] dataOut The object's data structure
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjGetInstanceData(UAVObjHandle obj, uint16_t instId, void* dataOut)
+int32_t UAVObjGetInstanceData(UAVObjHandle obj, uint16_t instId,
+			      void *dataOut)
+{
+	  ObjectList *objEntry;
+	  ObjectInstList *instEntry;
+
+	  // Lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+
+	  // Cast to object info
+	  objEntry = (ObjectList *) obj;
+
+	  // Get instance information
+	  instEntry = getInstance(objEntry, instId);
+	  if (instEntry == NULL) {
+		    // Error, unlock and return
+		    xSemaphoreGiveRecursive(mutex);
+		    return -1;
+	  }
+	  // Set data
+	  memcpy(dataOut, instEntry->data, objEntry->numBytes);
+
+	  // Unlock
+	  xSemaphoreGiveRecursive(mutex);
+	  return 0;
+}
+
+/**
+ * Get the data of a specific object instance
+ * \param[in] obj The object handle
+ * \param[in] instId The object instance ID
+ * \param[out] dataOut The object's data structure
+ * \return 0 if success or -1 if failure
+ */
+int32_t UAVObjGetInstanceDataField(UAVObjHandle obj, uint16_t instId, void* dataOut, uint32_t offset, uint32_t size)
 {
 	ObjectList* objEntry;
 	ObjectInstList* instEntry;
@@ -1158,8 +1192,16 @@ int32_t UAVObjGetInstanceData(UAVObjHandle obj, uint16_t instId, void* dataOut)
 		return -1;
 	}
 
+	// return if we request too much of what we can give
+	if ( (size + offset) > objEntry->numBytes) 
+	{
+		// Error, unlock and return
+		xSemaphoreGiveRecursive(mutex);
+		return -1;
+	}
+	
 	// Set data
-	memcpy(dataOut, instEntry->data, objEntry->numBytes);
+	memcpy(dataOut, instEntry->data + offset, size);
 
 	// Unlock
 	xSemaphoreGiveRecursive(mutex);
@@ -1172,27 +1214,25 @@ int32_t UAVObjGetInstanceData(UAVObjHandle obj, uint16_t instId, void* dataOut)
  * \param[in] dataIn The object's metadata structure
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjSetMetadata(UAVObjHandle obj, const UAVObjMetadata* dataIn)
+int32_t UAVObjSetMetadata(UAVObjHandle obj, const UAVObjMetadata * dataIn)
 {
-	ObjectList* objEntry;
+	  ObjectList *objEntry;
 
-	// Lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Set metadata (metadata of metaobjects can not be modified)
-	objEntry = (ObjectList*)obj;
-	if (!objEntry->isMetaobject)
-	{
-		UAVObjSetData((UAVObjHandle)objEntry->linkedObj, dataIn);
-	}
-	else
-	{
-		return -1;
-	}
+	  // Set metadata (metadata of metaobjects can not be modified)
+	  objEntry = (ObjectList *) obj;
+	  if (!objEntry->isMetaobject) {
+		    UAVObjSetData((UAVObjHandle) objEntry->linkedObj,
+				  dataIn);
+	  } else {
+		    return -1;
+	  }
 
-	// Unlock
-	xSemaphoreGiveRecursive(mutex);
-	return 0;
+	  // Unlock
+	  xSemaphoreGiveRecursive(mutex);
+	  return 0;
 }
 
 /**
@@ -1201,27 +1241,25 @@ int32_t UAVObjSetMetadata(UAVObjHandle obj, const UAVObjMetadata* dataIn)
  * \param[out] dataOut The object's metadata structure
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjGetMetadata(UAVObjHandle obj, UAVObjMetadata* dataOut)
+int32_t UAVObjGetMetadata(UAVObjHandle obj, UAVObjMetadata * dataOut)
 {
-	ObjectList* objEntry;
+	  ObjectList *objEntry;
 
-	// Lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Get metadata
-	objEntry = (ObjectList*)obj;
-	if (objEntry->isMetaobject)
-	{
-		memcpy(dataOut, &defMetadata, sizeof(UAVObjMetadata));
-	}
-	else
-	{
-		UAVObjGetData((UAVObjHandle)objEntry->linkedObj, dataOut);
-	}
+	  // Get metadata
+	  objEntry = (ObjectList *) obj;
+	  if (objEntry->isMetaobject) {
+		    memcpy(dataOut, &defMetadata, sizeof(UAVObjMetadata));
+	  } else {
+		    UAVObjGetData((UAVObjHandle) objEntry->linkedObj,
+				  dataOut);
+	  }
 
-	// Unlock
-	xSemaphoreGiveRecursive(mutex);
-	return 0;
+	  // Unlock
+	  xSemaphoreGiveRecursive(mutex);
+	  return 0;
 }
 
 /**
@@ -1234,19 +1272,20 @@ int32_t UAVObjGetMetadata(UAVObjHandle obj, UAVObjMetadata* dataOut)
  */
 int8_t UAVObjReadOnly(UAVObjHandle obj)
 {
-    ObjectList* objEntry;
-    UAVObjMetadata* mdata;
-    
-    // Cast to object info
-    objEntry = (ObjectList*)obj;
-    
-    // Check access level
-    if ( !objEntry->isMetaobject )
-    {
-        mdata = (UAVObjMetadata*)(objEntry->linkedObj->instances.data);
-        return mdata->access == ACCESS_READONLY;
-    }
-    return -1;
+	  ObjectList *objEntry;
+	  UAVObjMetadata *mdata;
+
+	  // Cast to object info
+	  objEntry = (ObjectList *) obj;
+
+	  // Check access level
+	  if (!objEntry->isMetaobject) {
+		    mdata =
+			(UAVObjMetadata *) (objEntry->linkedObj->instances.
+					    data);
+		    return mdata->access == ACCESS_READONLY;
+	  }
+	  return -1;
 }
 
 /**
@@ -1257,13 +1296,14 @@ int8_t UAVObjReadOnly(UAVObjHandle obj)
  * \param[in] eventMask The event mask, if EV_MASK_ALL then all events are enabled (e.g. EV_UPDATED | EV_UPDATED_MANUAL)
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjConnectQueue(UAVObjHandle obj, xQueueHandle queue, int32_t eventMask)
+int32_t UAVObjConnectQueue(UAVObjHandle obj, xQueueHandle queue,
+			   int32_t eventMask)
 {
-	int32_t res;
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	res = connectObj(obj, queue, 0, eventMask);
-	xSemaphoreGiveRecursive(mutex);
-	return res;
+	  int32_t res;
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  res = connectObj(obj, queue, 0, eventMask);
+	  xSemaphoreGiveRecursive(mutex);
+	  return res;
 }
 
 /**
@@ -1274,11 +1314,11 @@ int32_t UAVObjConnectQueue(UAVObjHandle obj, xQueueHandle queue, int32_t eventMa
  */
 int32_t UAVObjDisconnectQueue(UAVObjHandle obj, xQueueHandle queue)
 {
-	int32_t res;
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	res = disconnectObj(obj, queue, 0);
-	xSemaphoreGiveRecursive(mutex);
-	return res;
+	  int32_t res;
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  res = disconnectObj(obj, queue, 0);
+	  xSemaphoreGiveRecursive(mutex);
+	  return res;
 }
 
 /**
@@ -1289,13 +1329,14 @@ int32_t UAVObjDisconnectQueue(UAVObjHandle obj, xQueueHandle queue)
  * \param[in] eventMask The event mask, if EV_MASK_ALL then all events are enabled (e.g. EV_UPDATED | EV_UPDATED_MANUAL)
  * \return 0 if success or -1 if failure
  */
-int32_t UAVObjConnectCallback(UAVObjHandle obj, UAVObjEventCallback cb, int32_t eventMask)
+int32_t UAVObjConnectCallback(UAVObjHandle obj, UAVObjEventCallback cb,
+			      int32_t eventMask)
 {
-	int32_t res;
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	res = connectObj(obj, 0, cb, eventMask);
-	xSemaphoreGiveRecursive(mutex);
-	return res;
+	  int32_t res;
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  res = connectObj(obj, 0, cb, eventMask);
+	  xSemaphoreGiveRecursive(mutex);
+	  return res;
 }
 
 /**
@@ -1306,13 +1347,12 @@ int32_t UAVObjConnectCallback(UAVObjHandle obj, UAVObjEventCallback cb, int32_t 
  */
 int32_t UAVObjDisconnectCallback(UAVObjHandle obj, UAVObjEventCallback cb)
 {
-	int32_t res;
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	res = disconnectObj(obj, 0, cb);
-	xSemaphoreGiveRecursive(mutex);
-	return res;
+	  int32_t res;
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  res = disconnectObj(obj, 0, cb);
+	  xSemaphoreGiveRecursive(mutex);
+	  return res;
 }
-
 
 /**
  * Request an update of the object's data from the GCS. The call will not wait for the response, a EV_UPDATED event
@@ -1321,7 +1361,7 @@ int32_t UAVObjDisconnectCallback(UAVObjHandle obj, UAVObjEventCallback cb)
  */
 void UAVObjRequestUpdate(UAVObjHandle obj)
 {
-	UAVObjRequestInstanceUpdate(obj, UAVOBJ_ALL_INSTANCES);
+	  UAVObjRequestInstanceUpdate(obj, UAVOBJ_ALL_INSTANCES);
 }
 
 /**
@@ -1332,9 +1372,9 @@ void UAVObjRequestUpdate(UAVObjHandle obj)
  */
 void UAVObjRequestInstanceUpdate(UAVObjHandle obj, uint16_t instId)
 {
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	sendEvent((ObjectList*)obj, instId, EV_UPDATE_REQ);
-	xSemaphoreGiveRecursive(mutex);
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  sendEvent((ObjectList *) obj, instId, EV_UPDATE_REQ);
+	  xSemaphoreGiveRecursive(mutex);
 }
 
 /**
@@ -1343,7 +1383,7 @@ void UAVObjRequestInstanceUpdate(UAVObjHandle obj, uint16_t instId)
  */
 void UAVObjUpdated(UAVObjHandle obj)
 {
-	UAVObjInstanceUpdated(obj, UAVOBJ_ALL_INSTANCES);
+	  UAVObjInstanceUpdated(obj, UAVOBJ_ALL_INSTANCES);
 }
 
 /**
@@ -1353,9 +1393,9 @@ void UAVObjUpdated(UAVObjHandle obj)
  */
 void UAVObjInstanceUpdated(UAVObjHandle obj, uint16_t instId)
 {
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	sendEvent((ObjectList*)obj, instId, EV_UPDATED_MANUAL);
-	xSemaphoreGiveRecursive(mutex);
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  sendEvent((ObjectList *) obj, instId, EV_UPDATED_MANUAL);
+	  xSemaphoreGiveRecursive(mutex);
 }
 
 /**
@@ -1363,143 +1403,133 @@ void UAVObjInstanceUpdated(UAVObjHandle obj, uint16_t instId)
  * \param iterator This function will be called once for each object,
  * the object will be passed as a parameter
  */
-void UAVObjIterate(void (*iterator)(UAVObjHandle obj))
+void UAVObjIterate(void (*iterator) (UAVObjHandle obj))
 {
-	ObjectList* objEntry;
+	  ObjectList *objEntry;
 
-	// Get lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	  // Get lock
+	  xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// Iterate through the list and invoke iterator for each object
-	LL_FOREACH(objList, objEntry)
-	{
-		(*iterator)((UAVObjHandle)objEntry);
-	}
+	  // Iterate through the list and invoke iterator for each object
+	  LL_FOREACH(objList, objEntry) {
+		    (*iterator) ((UAVObjHandle) objEntry);
+	  }
 
-	// Release lock
-	xSemaphoreGiveRecursive(mutex);
+	  // Release lock
+	  xSemaphoreGiveRecursive(mutex);
 }
 
 /**
  * Send an event to all event queues registered on the object.
  */
-static int32_t sendEvent(ObjectList* obj, uint16_t instId, UAVObjEventType event)
+static int32_t sendEvent(ObjectList * obj, uint16_t instId,
+			 UAVObjEventType event)
 {
-	ObjectEventList* eventEntry;
-	UAVObjEvent msg;
+	  ObjectEventList *eventEntry;
+	  UAVObjEvent msg;
 
-	// Setup event
-	msg.obj = (UAVObjHandle)obj;
-	msg.event = event;
-	msg.instId = instId;
+	  // Setup event
+	  msg.obj = (UAVObjHandle) obj;
+	  msg.event = event;
+	  msg.instId = instId;
 
-	// Go through each object and push the event message in the queue (if event is activated for the queue)
-	LL_FOREACH(obj->events, eventEntry)
-	{
-    	if ( eventEntry->eventMask == 0 || (eventEntry->eventMask & event) != 0 )
-    	{
-    		// Send to queue if a valid queue is registered
-    		if (eventEntry->queue != 0)
-    		{
-    			if ( xQueueSend(eventEntry->queue, &msg, 0) != pdTRUE ) // will not block
-    			{
-    				++stats.eventErrors;
-    			}
-    		}
-    		// Invoke callback (from event task) if a valid one is registered
-    		if (eventEntry->cb != 0)
-    		{
-    			if ( EventCallbackDispatch(&msg, eventEntry->cb) != pdTRUE ) // invoke callback from the event task, will not block
-    			{
-    				++stats.eventErrors;
-    			}
-    		}
-    	}
-    }
+	  // Go through each object and push the event message in the queue (if event is activated for the queue)
+	  LL_FOREACH(obj->events, eventEntry) {
+		    if (eventEntry->eventMask == 0
+			|| (eventEntry->eventMask & event) != 0) {
+			      // Send to queue if a valid queue is registered
+			      if (eventEntry->queue != 0) {
+					if (xQueueSend(eventEntry->queue, &msg, 0) != pdTRUE)	// will not block
+					{
+						  ++stats.eventErrors;
+					}
+			      }
+			      // Invoke callback (from event task) if a valid one is registered
+			      if (eventEntry->cb != 0) {
+					if (EventCallbackDispatch(&msg, eventEntry->cb) != pdTRUE)	// invoke callback from the event task, will not block
+					{
+						  ++stats.eventErrors;
+					}
+			      }
+		    }
+	  }
 
-    // Done
-    return 0;
+	  // Done
+	  return 0;
 }
 
 /**
  * Create a new object instance, return the instance info or NULL if failure.
  */
-static ObjectInstList* createInstance(ObjectList* obj, uint16_t instId)
+static ObjectInstList *createInstance(ObjectList * obj, uint16_t instId)
 {
-	ObjectInstList* instEntry;
-	int32_t n;
+	  ObjectInstList *instEntry;
+	  int32_t n;
 
-	// For single instance objects, only instance zero is allowed
-	if (obj->isSingleInstance && instId != 0)
-	{
-		return NULL;
-	}
+	  // For single instance objects, only instance zero is allowed
+	  if (obj->isSingleInstance && instId != 0) {
+		    return NULL;
+	  }
+	  // Make sure that the instance ID is within limits
+	  if (instId >= UAVOBJ_MAX_INSTANCES) {
+		    return NULL;
+	  }
+	  // Check if the instance already exists
+	  if (getInstance(obj, instId) != NULL) {
+		    return NULL;
+	  }
+	  // Create any missing instances (all instance IDs must be sequential)
+	  for (n = obj->numInstances; n < instId; ++n) {
+		    if (createInstance(obj, n) == NULL) {
+			      return NULL;
+		    }
+	  }
 
-	// Make sure that the instance ID is within limits
-	if (instId >= UAVOBJ_MAX_INSTANCES)
-	{
-		return NULL;
-	}
+	  if (instId == 0) {	/* Instance 0 ObjectInstList allocated with ObjectList element */
+		    instEntry = &obj->instances;
+		    instEntry->data = pvPortMalloc(obj->numBytes);
+		    if (instEntry->data == NULL)
+			      return NULL;
+		    memset(instEntry->data, 0, obj->numBytes);
+		    instEntry->instId = instId;
+	  } else {
+		    // Create the actual instance
+		    instEntry =
+			(ObjectInstList *)
+			pvPortMalloc(sizeof(ObjectInstList));
+		    if (instEntry == NULL)
+			      return NULL;
+		    instEntry->data = pvPortMalloc(obj->numBytes);
+		    if (instEntry->data == NULL)
+			      return NULL;
+		    memset(instEntry->data, 0, obj->numBytes);
+		    instEntry->instId = instId;
+		    LL_APPEND(obj->instances.next, instEntry);
+	  }
+	  ++obj->numInstances;
 
-	// Check if the instance already exists
-	if ( getInstance(obj, instId) != NULL )
-	{
-		return NULL;
-	}
+	  // Fire event
+	  UAVObjInstanceUpdated((UAVObjHandle) obj, instId);
 
-	// Create any missing instances (all instance IDs must be sequential)
-	for (n = obj->numInstances; n < instId; ++n)
-	{
-		if ( createInstance(obj, n) == NULL )
-		{
-			return NULL;
-		}
-	}
-
-	if(instId == 0)  /* Instance 0 ObjectInstList allocated with ObjectList element */
-	{		
-		instEntry = &obj->instances;
-		instEntry->data = pvPortMalloc(obj->numBytes);
-		if (instEntry->data == NULL) return NULL;
-		memset(instEntry->data, 0, obj->numBytes);
-		instEntry->instId = instId;
-	} else 
-	{	
-		// Create the actual instance
-		instEntry = (ObjectInstList*)pvPortMalloc(sizeof(ObjectInstList));
-		if (instEntry == NULL) return NULL;
-		instEntry->data = pvPortMalloc(obj->numBytes);
-		if (instEntry->data == NULL) return NULL;
-		memset(instEntry->data, 0, obj->numBytes);
-		instEntry->instId = instId;
-		LL_APPEND(obj->instances.next, instEntry);
-	}
-	++obj->numInstances;
-
-	// Fire event
-	UAVObjInstanceUpdated((UAVObjHandle)obj, instId);
-
-	// Done
-	return instEntry;
+	  // Done
+	  return instEntry;
 }
 
 /**
  * Get the instance information or NULL if the instance does not exist
  */
-static ObjectInstList* getInstance(ObjectList* obj, uint16_t instId)
+static ObjectInstList *getInstance(ObjectList * obj, uint16_t instId)
 {
-	ObjectInstList* instEntry;
+	  ObjectInstList *instEntry;
 
-	// Look for specified instance ID
-	LL_FOREACH(&(obj->instances), instEntry)
-	{
-		if (instEntry->instId == instId)
-		{
-			return instEntry;
-		}
-	}
-	// If this point is reached then instance id was not found
-	return NULL;
+	  // Look for specified instance ID
+	  LL_FOREACH(&(obj->instances), instEntry) {
+		    if (instEntry->instId == instId) {
+			      return instEntry;
+		    }
+	  }
+	  // If this point is reached then instance id was not found
+	  return NULL;
 }
 
 /**
@@ -1510,36 +1540,35 @@ static ObjectInstList* getInstance(ObjectList* obj, uint16_t instId)
  * \param[in] eventMask The event mask, if EV_MASK_ALL then all events are enabled (e.g. EV_UPDATED | EV_UPDATED_MANUAL)
  * \return 0 if success or -1 if failure
  */
-static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb, int32_t eventMask)
+static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue,
+			  UAVObjEventCallback cb, int32_t eventMask)
 {
-	ObjectEventList* eventEntry;
-	ObjectList* objEntry;
+	  ObjectEventList *eventEntry;
+	  ObjectList *objEntry;
 
-	// Check that the queue is not already connected, if it is simply update event mask
-	objEntry = (ObjectList*)obj;
-	LL_FOREACH(objEntry->events, eventEntry)
-	{
-		if ( eventEntry->queue == queue && eventEntry->cb == cb )
-		{
-			// Already connected, update event mask and return
-			eventEntry->eventMask = eventMask;
-			return 0;
-		}
-	}
+	  // Check that the queue is not already connected, if it is simply update event mask
+	  objEntry = (ObjectList *) obj;
+	  LL_FOREACH(objEntry->events, eventEntry) {
+		    if (eventEntry->queue == queue && eventEntry->cb == cb) {
+			      // Already connected, update event mask and return
+			      eventEntry->eventMask = eventMask;
+			      return 0;
+		    }
+	  }
 
-	// Add queue to list
-	eventEntry = (ObjectEventList*)pvPortMalloc(sizeof(ObjectEventList));
-	if (eventEntry == NULL)
-	{
-		return -1;
-	}
-	eventEntry->queue = queue;
-	eventEntry->cb = cb;
-	eventEntry->eventMask = eventMask;
-	LL_APPEND(objEntry->events, eventEntry);
+	  // Add queue to list
+	  eventEntry =
+	      (ObjectEventList *) pvPortMalloc(sizeof(ObjectEventList));
+	  if (eventEntry == NULL) {
+		    return -1;
+	  }
+	  eventEntry->queue = queue;
+	  eventEntry->cb = cb;
+	  eventEntry->eventMask = eventMask;
+	  LL_APPEND(objEntry->events, eventEntry);
 
-	// Done
-	return 0;
+	  // Done
+	  return 0;
 }
 
 /**
@@ -1549,59 +1578,43 @@ static int32_t connectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallb
  * \param[in] cb The event callback
  * \return 0 if success or -1 if failure
  */
-static int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue, UAVObjEventCallback cb)
+static int32_t disconnectObj(UAVObjHandle obj, xQueueHandle queue,
+			     UAVObjEventCallback cb)
 {
-	ObjectEventList* eventEntry;
-	ObjectList* objEntry;
+	  ObjectEventList *eventEntry;
+	  ObjectList *objEntry;
 
-	// Find queue and remove it
-	objEntry = (ObjectList*)obj;
-	LL_FOREACH(objEntry->events, eventEntry)
-	{
-		if ( ( eventEntry->queue == queue && eventEntry->cb == cb ) )
-		{
-			LL_DELETE(objEntry->events, eventEntry);
-			vPortFree(eventEntry);
-			return 0;
-		}
-	}
+	  // Find queue and remove it
+	  objEntry = (ObjectList *) obj;
+	  LL_FOREACH(objEntry->events, eventEntry) {
+		    if ((eventEntry->queue == queue
+			 && eventEntry->cb == cb)) {
+			      LL_DELETE(objEntry->events, eventEntry);
+			      vPortFree(eventEntry);
+			      return 0;
+		    }
+	  }
 
-	// If this point is reached the queue was not found
-	return -1;
+	  // If this point is reached the queue was not found
+	  return -1;
 }
 
 #if defined(PIOS_INCLUDE_SDCARD)
 /**
  * Wrapper for the sprintf function
  */
-static void customSPrintf(uint8_t* buffer, uint8_t* format, ...)
+static void customSPrintf(uint8_t * buffer, uint8_t * format, ...)
 {
-	va_list args;
-	va_start(args, format);
-	vsprintf((char *)buffer, (char *)format, args);
+	  va_list args;
+	  va_start(args, format);
+	  vsprintf((char *)buffer, (char *)format, args);
 }
 
 /**
  * Get an 8 character (plus extension) filename for the object.
  */
-static void objectFilename(ObjectList* obj, uint8_t* filename)
+static void objectFilename(ObjectList * obj, uint8_t * filename)
 {
-	customSPrintf(filename, (uint8_t*)"%X.obj", obj->id);
+	  customSPrintf(filename, (uint8_t *) "%X.obj", obj->id);
 }
 #endif /* PIOS_INCLUDE_SDCARD */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

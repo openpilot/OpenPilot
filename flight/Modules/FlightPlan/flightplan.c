@@ -31,6 +31,7 @@
 
 #include "openpilot.h"
 #include "pm.h"
+#include "flightplan.h"
 #include "flightplanstatus.h"
 #include "flightplancontrol.h"
 #include "flightplansettings.h"
@@ -56,10 +57,28 @@ extern unsigned char usrlib_img[];
 /**
  * Module initialization
  */
-int32_t FlightPlanInitialize()
+int32_t FlightPlanStart()
 {
 	taskHandle = NULL;
 
+	// Start VM thread
+	xTaskCreate(flightPlanTask, (signed char *)"FlightPlan", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_FLIGHTPLAN, taskHandle);
+
+	return 0;
+}
+
+/**
+ * Module initialization
+ */
+int32_t FlightPlanInitialize()
+{
+	taskHandle = NULL;
+	
+	FlightPlanStatusInitialize();
+	FlightPlanControlInitialize();
+	FlightPlanSettingsInitialize();
+	
 	// Listen for object updates
 	FlightPlanControlConnectCallback(&objectUpdatedCb);
 
@@ -69,13 +88,9 @@ int32_t FlightPlanInitialize()
 	// Listen for FlightPlanControl updates
 	FlightPlanControlConnectQueue(queue);
 
-	// Start VM thread
-	xTaskCreate(flightPlanTask, (signed char *)"FlightPlan", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_FLIGHTPLAN, taskHandle);
-
 	return 0;
 }
-
+MODULE_INITCALL(FlightPlanInitialize, FlightPlanStart)
 /**
  * Module task
  */

@@ -32,14 +32,8 @@
 #include <coreplugin/iconnection.h>
 #include <extensionsystem/pluginmanager.h>
 
-#include <utils/styledbar.h>
-
-#include "fancytabwidget.h"
-#include "fancyactionbar.h"
-#include "mainwindow.h"
 #include "qextserialport/src/qextserialenumerator.h"
 #include "qextserialport/src/qextserialport.h"
-
 #include <QDebug>
 #include <QLabel>
 #include <QHBoxLayout>
@@ -48,22 +42,23 @@
 namespace Core {
 
 
-ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, Internal::FancyTabWidget *modeStack) :
+ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidget *modeStack) :
 	QWidget(mainWindow),	// Pip
 	m_availableDevList(0),
     m_connectBtn(0),
-    m_ioDev(NULL)
+    m_ioDev(NULL),	
+	m_mainWindow(mainWindow)
 {
-    Q_UNUSED(mainWindow);
+ //   Q_UNUSED(mainWindow);
 
-    QVBoxLayout *top = new QVBoxLayout;
+/*    QVBoxLayout *top = new QVBoxLayout;
     top->setSpacing(0);
-    top->setMargin(0);
+    top->setMargin(0);*/
 
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->setSpacing(0);
-    layout->setContentsMargins(5,0,5,0);
-    layout->addWidget(new QLabel("Connections: "));
+    layout->setSpacing(5);
+    layout->setContentsMargins(5,5,5,5);
+    layout->addWidget(new QLabel(tr("Connections:")));
 
     m_availableDevList = new QComboBox;
     //m_availableDevList->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -72,17 +67,18 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, Internal:
     m_availableDevList->setContextMenuPolicy(Qt::CustomContextMenu);
     layout->addWidget(m_availableDevList);
 
-    m_connectBtn = new QPushButton("Connect");
+    m_connectBtn = new QPushButton(tr("Connect"));
     m_connectBtn->setEnabled(false);
     layout->addWidget(m_connectBtn);
 
-    Utils::StyledBar *bar = new Utils::StyledBar;
+/*    Utils::StyledBar *bar = new Utils::StyledBar;
     bar->setLayout(layout);
 
-    top->addWidget(bar);
-    setLayout(top);
+    top->addWidget(bar);*/
+    setLayout(layout);
 
-    modeStack->insertCornerWidget(modeStack->cornerWidgetCount()-1, this);
+    //    modeStack->insertCornerWidget(modeStack->cornerWidgetCount()-1, this);
+    modeStack->setCornerWidget(this, Qt::TopRightCorner);
 
 	QObject::connect(m_connectBtn, SIGNAL(pressed()), this, SLOT(onConnectPressed()));
 }
@@ -221,8 +217,9 @@ void ConnectionManager::aboutToRemoveObject(QObject *obj)
 
 void ConnectionManager::onConnectionDestroyed(QObject *obj)	// Pip
 {
-        //onConnectionClosed(obj);
-        disconnectDevice();
+    Q_UNUSED(obj)
+    //onConnectionClosed(obj);
+    disconnectDevice();
 }
 
 /**
@@ -344,7 +341,7 @@ void ConnectionManager::devChanged(IConnection *connection)
 
     //and add them back in the list
     QList <IConnection::device> availableDev = connection->availableDevices();
-        foreach (IConnection::device dev, availableDev)
+    foreach (IConnection::device dev, availableDev)
     {
         QString cbName = connection->shortName() + ": " + dev.name;
         QString disp = connection->shortName() + " : " + dev.displayName;
@@ -352,11 +349,27 @@ void ConnectionManager::devChanged(IConnection *connection)
     }
 
     //add all the list again to the combobox
-	foreach (devListItem d, m_devList)
+    foreach (devListItem d, m_devList)
     {
         m_availableDevList->addItem(d.displayName);
         m_availableDevList->setItemData(m_availableDevList->count()-1,(const QString)d.devName,Qt::ToolTipRole);
+        if(!m_ioDev && d.displayName.startsWith("USB"))
+        {
+            if(m_mainWindow->generalSettings()->autoConnect() || m_mainWindow->generalSettings()->autoSelect())
+                m_availableDevList->setCurrentIndex(m_availableDevList->count()-1);
+            if(m_mainWindow->generalSettings()->autoConnect())
+                connectDevice();
+        }
     }
+    if(m_ioDev)//if a device is connected make it the one selected on the dropbox
+    {
+        for(int x=0;x<m_availableDevList->count();++x)
+        {
+            if(m_connectionDevice.devName==m_availableDevList->itemData(x,Qt::ToolTipRole).toString())
+                m_availableDevList->setCurrentIndex(x);
+        }
+    }
+
 
     //disable connection button if the liNameif (m_availableDevList->count() > 0)
     if (m_availableDevList->count() > 0)

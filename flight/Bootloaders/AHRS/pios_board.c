@@ -55,7 +55,6 @@ static const struct pios_spi_cfg
 					.ahb_clk = RCC_AHBPeriph_DMA1,
 
 					.irq = {
-						.handler = PIOS_SPI_op_irq_handler,
 						.flags = (DMA1_FLAG_TC4 | DMA1_FLAG_TE4 | DMA1_FLAG_HT4 | DMA1_FLAG_GL4),
 						.init = {
 							.NVIC_IRQChannel = DMA1_Channel4_IRQn,
@@ -133,11 +132,18 @@ void PIOS_SPI_op_irq_handler(void) {
 
 #include "bl_fsm.h"		/* lfsm_* */
 
+static bool board_init_complete = false;
 void PIOS_Board_Init() {
+	if (board_init_complete) {
+		return;
+	}
+
 	/* Set up the SPI interface to the OP board */
 	if (PIOS_SPI_Init(&pios_spi_op_id, &pios_spi_op_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
 	lfsm_attach(pios_spi_op_id);
 	lfsm_init();
+
+	board_init_complete = true;
 }

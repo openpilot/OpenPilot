@@ -92,6 +92,8 @@ int32_t PIOS_SPI_Init(uint32_t * spi_id, const struct pios_spi_cfg * cfg)
 #if defined(PIOS_INCLUDE_FREERTOS)
 	vSemaphoreCreateBinary(spi_dev->busy);
 	xSemaphoreGive(spi_dev->busy);
+#else
+	spi_dev->busy = 0;
 #endif
 
 	/* Disable callback function */

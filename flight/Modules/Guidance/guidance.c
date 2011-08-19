@@ -97,6 +97,21 @@ int32_t GuidanceStart()
  */
 int32_t GuidanceInitialize()
 {
+	//initialize variables
+	GuidanceSettingsInitialize();
+	AttitudeRawInitialize();
+	AttitudeActualInitialize();
+	PositionDesiredInitialize();
+	PositionActualInitialize();
+	ManualControlCommandInitialize();
+	FlightStatusInitialize();
+	NedAccelInitialize();
+	StabilizationDesiredInitialize();
+	StabilizationSettingsInitialize();
+	SystemSettingsInitialize();
+	VelocityDesiredInitialize();
+	VelocityActualInitialize();
+
 	// Create object queue
 	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 	

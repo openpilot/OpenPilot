@@ -115,6 +115,8 @@ int32_t StabilizationInitialize()
 	// Initialize variables
 	StabilizationSettingsInitialize();
 	ActuatorDesiredInitialize();
+	AttitudeActualInitialize();
+	AttitudeRawInitialize();
 #if defined(DIAGNOSTICS)
 	RateDesiredInitialize();
 #endif

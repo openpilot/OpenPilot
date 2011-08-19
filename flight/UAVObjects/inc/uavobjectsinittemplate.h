@@ -29,4 +29,6 @@
 
 void UAVObjectsInitializeAll();
 
+#define UAVOBJECTS_LARGEST $(SIZECALCULATION)
+
 #endif // UAVOBJECTSINIT_H

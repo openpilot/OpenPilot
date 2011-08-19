@@ -40,7 +40,7 @@
 #include "$(NAMELC).h"
 
 // Private variables
-static UAVObjHandle handle;
+static UAVObjHandle handle = NULL;
 
 /**
  * Initialize object.
@@ -103,6 +103,7 @@ $(INITFIELDS)
  */
 UAVObjHandle $(NAME)Handle()
 {
+	if (!handle) PIOS_DEBUG_Panic("$(NAME) used uninitialized");
 	return handle;
 }
 

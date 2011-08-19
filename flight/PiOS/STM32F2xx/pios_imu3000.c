@@ -58,6 +58,10 @@ int32_t imu3000_id = 0;
 static int16_t pios_imu3000_buffer[PIOS_IMU3000_MAX_DOWNSAMPLE * 4];
 static t_fifo_buffer pios_imu3000_fifo;
 
+volatile bool imu3000_first_read = true;
+volatile bool imu3000_configured = false;
+volatile bool imu3000_cb_ready = true;
+
 /**
  * @brief Initialize the IMU3000 3-axis gyro sensor.
  * @return none
@@ -78,11 +82,11 @@ void PIOS_IMU3000_Init(const struct pios_imu3000_cfg * cfg)
 
 	/* Configure the IMU3000 Sensor */
 	PIOS_IMU3000_ConfigTypeDef IMU3000_InitStructure;
-	IMU3000_InitStructure.Fifo_store = PIOS_IMU3000_FIFO_TEMP_OUT | PIOS_IMU3000_FIFO_GYRO_X_OUT |
+	IMU3000_InitStructure.Fifo_store = PIOS_IMU3000_FIFO_GYRO_X_OUT |
 			PIOS_IMU3000_FIFO_GYRO_Y_OUT | PIOS_IMU3000_FIFO_GYRO_Z_OUT | PIOS_IMU3000_FIFO_FOOTER;
-	IMU3000_InitStructure.Smpl_rate_div = 7; // Clock at 8 khz, downsampled by 8 for 1khz
+	IMU3000_InitStructure.Smpl_rate_div = 3; // Clock at 8 khz, downsampled by 8 for 1khz
 	IMU3000_InitStructure.DigLPF_Scale = PIOS_IMU3000_LOWPASS_256_HZ | PIOS_IMU3000_SCALE_500_DEG;
-	IMU3000_InitStructure.Interrupt_cfg = 0; //PIOS_IMU3000_INT_CLR_ANYRD | PIOS_IMU3000_INT_DATA_RDY;
+	IMU3000_InitStructure.Interrupt_cfg = PIOS_IMU3000_INT_DATA_RDY | PIOS_IMU3000_INT_CLR_ANYRD;
 	IMU3000_InitStructure.User_ctl = PIOS_IMU3000_USERCTL_FIFO_EN;
 	IMU3000_InitStructure.Pwr_mgmt_clk = PIOS_IMU3000_PWRMGMT_PLL_X_CLK;
 	PIOS_IMU3000_Config(&IMU3000_InitStructure);
@@ -96,8 +100,9 @@ void PIOS_IMU3000_Init(const struct pios_imu3000_cfg * cfg)
 */
 static void PIOS_IMU3000_Config(PIOS_IMU3000_ConfigTypeDef * IMU3000_Config_Struct)
 {
-	// TODO: Add checks against current config so we only update what has changed
-
+	imu3000_first_read = true;
+	imu3000_cb_ready = true;
+	
 	// Reset chip and fifo
 	while (PIOS_IMU3000_Write(PIOS_IMU3000_USER_CTRL_REG, 0x01 | 0x02) != 0);
 	PIOS_DELAY_WaituS(20);
@@ -113,13 +118,15 @@ static void PIOS_IMU3000_Config(PIOS_IMU3000_ConfigTypeDef * IMU3000_Config_Stru
 	while (PIOS_IMU3000_Write(PIOS_IMU3000_DLPF_CFG_REG, IMU3000_Config_Struct->DigLPF_Scale) != 0) ;
 
 	// Interrupt configuration
-	while (PIOS_IMU3000_Write(PIOS_IMU3000_INT_CFG_REG, IMU3000_Config_Struct->Interrupt_cfg) != 0) ;
-
-	// Interrupt configuration
 	while (PIOS_IMU3000_Write(PIOS_IMU3000_USER_CTRL_REG, IMU3000_Config_Struct->User_ctl) != 0) ;
 
 	// Interrupt configuration
 	while (PIOS_IMU3000_Write(PIOS_IMU3000_PWR_MGMT_REG, IMU3000_Config_Struct->Pwr_mgmt_clk) != 0) ;
+	
+	// Interrupt configuration
+	while (PIOS_IMU3000_Write(PIOS_IMU3000_INT_CFG_REG, IMU3000_Config_Struct->Interrupt_cfg) != 0) ;
+	
+	imu3000_configured = true;
 }
 
 /**
@@ -160,59 +167,14 @@ int32_t PIOS_IMU3000_ReadID()
  * \return number of bytes transferred if operation was successful
  * \return -1 if error during I2C transfer
  */
-uint32_t imu_read = 0;
-uint16_t fifo_level;
-uint8_t fifo_level_data[2];	
-int16_t footer_flush;
-uint8_t imu3000_read_buffer[10]; // Right now using temp,X,Y,Z,fifo
-bool first_read = true;
-uint32_t imu3000_readtime;
+#define IMU3000_DATA_SIZE 6
 int32_t PIOS_IMU3000_ReadFifo(int16_t * buffer)
 {
-	// Get the number of bytes in the fifo	
-	if(PIOS_IMU3000_Read(PIOS_IMU3000_FIFO_CNT_MSB, (uint8_t *) &fifo_level_data, sizeof(fifo_level_data)) != 0)
+	if(fifoBuf_getUsed(&pios_imu3000_fifo) < IMU3000_DATA_SIZE)
 		return -1;
-
-	fifo_level = (fifo_level_data[0] << 8) + fifo_level_data[1];
-
-	if(first_read) {
-		// Stupid system for IMU3000.  If first read from buffer then we will read 4 sensors without fifo
-		// footer.  After this we will read out a fifo footer
-		if(fifo_level < sizeof(imu3000_read_buffer))
-			return -1;
-
-		// Leave footer in buffer
-		if(PIOS_IMU3000_Read(PIOS_IMU3000_FIFO_REG, imu3000_read_buffer, sizeof(imu3000_read_buffer) - 2) != 0)
-			return -1;
 		
-		buffer[0] = imu3000_read_buffer[2] << 8 | imu3000_read_buffer[3];
-		buffer[1] = imu3000_read_buffer[4] << 8 | imu3000_read_buffer[5];
-		buffer[2] = imu3000_read_buffer[6] << 8 | imu3000_read_buffer[7];
-		buffer[3] = imu3000_read_buffer[0] << 8 | imu3000_read_buffer[1];
-		
-		first_read = false;
-	} else {
-		// Stupid system for IMU3000.  Ensure something is left in buffer
-		if(fifo_level < (sizeof(imu3000_read_buffer) + 2))
-			return -1;
+	fifoBuf_getData(&pios_imu3000_fifo, (uint8_t *) buffer, IMU3000_DATA_SIZE);
 	
-		uint32_t timeval = PIOS_DELAY_GetRaw();
-		
-		// Leave footer in buffer
-		if(PIOS_IMU3000_Read(PIOS_IMU3000_FIFO_REG, imu3000_read_buffer, sizeof(imu3000_read_buffer)) != 0)
-			return -1;
-		
-		imu3000_readtime = PIOS_DELAY_DiffuS(timeval);
-		
-		// First two bytes are left over fifo from last call
-		buffer[0] = imu3000_read_buffer[4] << 8 | imu3000_read_buffer[5];
-		buffer[1] = imu3000_read_buffer[6] << 8 | imu3000_read_buffer[7];
-		buffer[2] = imu3000_read_buffer[8] << 8 | imu3000_read_buffer[9];
-		buffer[3] = imu3000_read_buffer[2] << 8 | imu3000_read_buffer[3];
-	}
-
-	imu_read += sizeof(imu3000_read_buffer);
-
 	return 0;
 }
 
@@ -250,6 +212,41 @@ static int32_t PIOS_IMU3000_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 	};
 
 	return PIOS_I2C_Transfer(PIOS_I2C_GYRO_ADAPTER, txn_list, NELEMENTS(txn_list)) ? 0 : -1;
+}
+
+// Must allocate on stack to be persistent
+static uint8_t cb_addr_buffer[] = {
+	0,
+};
+static struct pios_i2c_txn cb_txn_list[] = {
+	{
+		.addr = PIOS_IMU3000_I2C_ADDR,
+		.rw = PIOS_I2C_TXN_WRITE,
+		.len = sizeof(cb_addr_buffer),
+		.buf = cb_addr_buffer,
+	}
+	,
+	{
+		.addr = PIOS_IMU3000_I2C_ADDR,
+		.rw = PIOS_I2C_TXN_READ,
+		.len = 0,
+		.buf = 0,
+	}
+};
+
+
+
+static int32_t PIOS_IMU3000_Read_Callback(uint8_t address, uint8_t * buffer, uint8_t len, void *callback)
+{
+	cb_addr_buffer[0] = address;
+	cb_txn_list[0].info = __func__,
+	cb_txn_list[1].info = __func__;
+	cb_txn_list[1].len = len;
+	cb_txn_list[1].buf = buffer;
+	
+	PIOS_I2C_Transfer_Callback(PIOS_I2C_GYRO_ADAPTER, cb_txn_list, NELEMENTS(cb_txn_list), callback);
+	
+	return  0;
 }
 
 /**
@@ -299,13 +296,81 @@ uint8_t PIOS_IMU3000_Test(void)
 	return 0;
 }
 
+uint32_t cb_count = 0;
+uint8_t imu3000_read_buffer[IMU3000_DATA_SIZE + 2]; // Right now using ,Y,Z,fifo_footer
+int16_t imu3000_data_buffer[IMU3000_DATA_SIZE / sizeof(int16_t)];
+uint32_t imu_read = 0;
+static void imu3000_callback()
+{
+	imu3000_cb_ready = true;
+	cb_count++;
+	if(imu3000_first_read) {
+		imu3000_data_buffer[0] = imu3000_read_buffer[0] << 8 | imu3000_read_buffer[1];
+		imu3000_data_buffer[1] = imu3000_read_buffer[2] << 8 | imu3000_read_buffer[3];
+		imu3000_data_buffer[2] = imu3000_read_buffer[4] << 8 | imu3000_read_buffer[5];
+		
+		imu3000_first_read = false;
+	} else {
+		// First two bytes are left over fifo from last call
+		imu3000_data_buffer[0] = imu3000_read_buffer[2] << 8 | imu3000_read_buffer[3];
+		imu3000_data_buffer[1] = imu3000_read_buffer[4] << 8 | imu3000_read_buffer[5];
+		imu3000_data_buffer[2] = imu3000_read_buffer[6] << 8 | imu3000_read_buffer[7];
+
+	}
+	fifoBuf_putData(&pios_imu3000_fifo, (uint8_t *) imu3000_data_buffer, sizeof(imu3000_data_buffer));
+	imu_read += sizeof(imu3000_data_buffer);
+
+}
+
 /**
 * @brief IRQ Handler
 */
 uint32_t imu3000_irq = 0;
+uint16_t fifo_level;
+uint8_t fifo_level_data[2];
+uint32_t imu3000_readtime;
 void PIOS_IMU3000_IRQHandler(void)
 {
+	
 	imu3000_irq++;
+
+	if(!imu3000_configured)
+		return;
+		
+	PIOS_Assert(imu3000_cb_ready);
+
+	// If at least one read doesnt succeed then the irq not reset and we will stall
+	while(PIOS_IMU3000_Read(PIOS_IMU3000_FIFO_CNT_MSB, (uint8_t *) &fifo_level_data, sizeof(fifo_level_data)) != 0)
+		PIOS_DELAY_WaituS(10);
+				
+	fifo_level = (fifo_level_data[0] << 8) + fifo_level_data[1];
+	
+	PIOS_DELAY_WaituS(10);
+	
+	if(imu3000_first_read) {
+		// Stupid system for IMU3000.  If first read from buffer then we will read 4 sensors without fifo
+		// footer.  After this we will read out a fifo footer
+		if(fifo_level < sizeof(imu3000_read_buffer))
+			return;
+			
+		imu3000_cb_ready = false;
+		
+		// Leave footer in buffer
+		PIOS_IMU3000_Read_Callback(PIOS_IMU3000_FIFO_REG, imu3000_read_buffer, sizeof(imu3000_read_buffer) - 2, imu3000_callback);
+		
+	} else {
+		// Stupid system for IMU3000.  Ensure something is left in buffer
+		if(fifo_level < (sizeof(imu3000_read_buffer) + 2))
+			return;
+		
+		uint32_t timeval = PIOS_DELAY_GetRaw();
+		imu3000_cb_ready = false;
+		
+		// Leave footer in buffer
+		PIOS_IMU3000_Read_Callback(PIOS_IMU3000_FIFO_REG, imu3000_read_buffer, sizeof(imu3000_read_buffer), imu3000_callback);
+		
+		imu3000_readtime = PIOS_DELAY_DiffuS(timeval);		
+	}
 }
 
 /**

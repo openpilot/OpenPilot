@@ -77,9 +77,9 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 	#endif
 #else
 	#ifdef ENABLE_GPS_BINARY_GTOP
-		#define STACK_SIZE_BYTES            440
+		#define STACK_SIZE_BYTES            650
 	#else
-		#define STACK_SIZE_BYTES            440
+		#define STACK_SIZE_BYTES            650
 	#endif
 #endif
 
@@ -125,15 +125,18 @@ int32_t GPSStart(void)
 int32_t GPSInitialize(void)
 {
 	GPSPositionInitialize();
+#if !defined(PIOS_GPS_PURISTIC)
 	GPSTimeInitialize();
 	HomeLocationInitialize();
+#endif
 	
 	// TODO: Get gps settings object
 	gpsPort = PIOS_COM_GPS;
 
 	return 0;
 }
-MODULE_INITCALL(GPSInitialize, GPSStart)
+// optional module, gets initialized separately
+//MODULE_INITCALL(GPSInitialize, GPSStart)
 
 // ****************
 /**

@@ -31,6 +31,7 @@
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 #include "manualcontrolsettings.h"
+#include "hwsettings.h"
 
 //#define I2C_DEBUG_PIN			0
 //#define USART_GPS_DEBUG_PIN		1
@@ -1024,6 +1025,9 @@ void PIOS_Board_Init(void) {
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
 	UAVObjInitialize();
+
+	HwSettingsInitialize();
+	ManualControlSettingsInitialize();
 
 #if defined(PIOS_INCLUDE_RTC)
 	/* Initialize the real-time clock and its associated tick */

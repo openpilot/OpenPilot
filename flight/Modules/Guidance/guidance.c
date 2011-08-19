@@ -100,8 +100,6 @@ int32_t GuidanceInitialize()
 
 	GuidanceSettingsInitialize();
 	PositionDesiredInitialize();
-	ManualControlCommandInitialize();
-	FlightStatusInitialize();
 	NedAccelInitialize();
 	VelocityDesiredInitialize();
 

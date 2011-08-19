@@ -117,8 +117,7 @@ int32_t ManualControlInitialize()
 	FlightStatusInitialize();
 	StabilizationDesiredInitialize();
 
-	// ManualControlSettingsInitialize(); // this is initialized in
-	// pios_board.c
+	ManualControlSettingsInitialize();
 
 	return 0;
 }

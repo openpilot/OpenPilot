@@ -112,14 +112,10 @@ int32_t ManualControlInitialize()
 	if(!assumptions)
 		return -1;
 
-	ManualControlSettingsInitialize();
-	StabilizationSettingsInitialize();
-	ManualControlCommandInitialize();
-	ActuatorDesiredInitialize();
-	StabilizationDesiredInitialize();
-	FlightTelemetryStatsInitialize();
-	FlightStatusInitialize();
 	AccessoryDesiredInitialize();
+	ManualControlCommandInitialize();
+	FlightStatusInitialize();
+	StabilizationDesiredInitialize();
 
 	// ManualControlSettingsInitialize(); // this is initialized in
 	// pios_board.c

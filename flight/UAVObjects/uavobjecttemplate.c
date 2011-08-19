@@ -40,7 +40,7 @@
 #include "$(NAMELC).h"
 
 // Private variables
-static UAVObjHandle handle;
+static UAVObjHandle handle = NULL;
 
 /**
  * Initialize object.

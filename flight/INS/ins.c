@@ -159,7 +159,7 @@ int32_t dr;
 
 int32_t sclk, sclk_prev;
 int32_t sclk_count;
-
+uint32_t loop_time;
 int main()
 {	
 	gps_data.quality = -1;
@@ -174,6 +174,7 @@ int main()
 		
 	// Sensors need a second to start
 	PIOS_DELAY_WaitmS(100);
+	
 	
 	// Sensor test
 	if(PIOS_IMU3000_Test() != 0)
@@ -190,7 +191,7 @@ int main()
 	
 	PIOS_LED_On(LED1);
 	PIOS_LED_Off(LED2);
-	
+
 	// Flash warning light while trying to connect
 	uint32_t time_val = PIOS_DELAY_GetRaw();
 	uint32_t ms_count = 0;
@@ -225,10 +226,13 @@ int main()
 		AhrsStatusSet(&status);
 		
 		// Alive signal
-		if ((total_conversion_blocks % 300) == 0)
+		if ((total_conversion_blocks % 100) == 0)
 			PIOS_LED_Toggle(LED1);
 		total_conversion_blocks++;
 		// Delay for valid data
+		
+		loop_time = PIOS_DELAY_DiffuS(time_val);
+		time_val = PIOS_DELAY_GetRaw();
 		
 		// This function blocks till data avilable
 		get_accel_gyro_data();
@@ -347,10 +351,9 @@ static void panic(uint32_t blinks)
  *
  * This function will act as the HAL for the new INS sensors
  */
-uint16_t accel_samples = 0;
-uint8_t gyro_len;
-int32_t gyro_accum[3];
-int16_t gyro_fifo[4];
+ 
+uint8_t accel_samples;
+uint8_t gyro_samples;
 bool get_accel_gyro_data()
 {
 	int16_t accel[3];
@@ -369,28 +372,25 @@ bool get_accel_gyro_data()
 	accel[0] = accel_accum[0] / accel_samples;
 	accel[1] = accel_accum[1] / accel_samples;
 	accel[2] = accel_accum[2] / accel_samples;
-	
-	gyro_accum[0] = 0;
-	gyro_accum[1] = 0;
-	gyro_accum[2] = 0;
+
+	int32_t gyro_accum[3] = {0,0,0};
 	int16_t gyro[3];
-	gyro_len = 0;
 	int32_t read_good;
 	
 	// Make sure we get one sample
-	while((read_good = PIOS_IMU3000_ReadFifo(gyro_fifo)) != 0);
+	while((read_good = PIOS_IMU3000_ReadFifo(gyro)) != 0);
 	while(read_good == 0) {
-		gyro_len++;
+		gyro_samples++;
 
-		gyro_accum[0] += gyro_fifo[0];
-		gyro_accum[1] += gyro_fifo[1];
-		gyro_accum[2] += gyro_fifo[2];
-		read_good = PIOS_IMU3000_ReadFifo(gyro_fifo);
+		gyro_accum[0] += gyro[0];
+		gyro_accum[1] += gyro[1];
+		gyro_accum[2] += gyro[2];
+		read_good = PIOS_IMU3000_ReadFifo(gyro);
 	}
-	gyro[0] = gyro_accum[0] / gyro_len;
-	gyro[1] = gyro_accum[1] / gyro_len;
-	gyro[2] = gyro_accum[2] / gyro_len;
-	
+	gyro[0] = gyro_accum[0] / gyro_samples;
+	gyro[1] = gyro_accum[1] / gyro_samples;
+	gyro[2] = gyro_accum[2] / gyro_samples;
+
 	// Not the swaping of channel orders
 	accel_data.filtered.x = accel[0] * PIOS_BMA180_GetScale();
 	accel_data.filtered.y = accel[1] * PIOS_BMA180_GetScale();
@@ -398,7 +398,6 @@ bool get_accel_gyro_data()
 	gyro_data.filtered.x = -gyro[1] * 0.00763 * DEG_TO_RAD;;
 	gyro_data.filtered.y = -gyro[0] * 0.00763 * DEG_TO_RAD;;
 	gyro_data.filtered.z = -gyro[2] * 0.00763 * DEG_TO_RAD;;
-
 	
 	AttitudeRawData raw;
 		

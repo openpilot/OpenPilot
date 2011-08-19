@@ -90,6 +90,8 @@ struct pios_i2c_adapter {
 #ifdef PIOS_INCLUDE_FREERTOS
 	xSemaphoreHandle sem_busy;
 	xSemaphoreHandle sem_ready;
+#else
+	uint8_t busy;
 #endif
 
 	bool bus_error;

@@ -889,6 +889,8 @@ int32_t PIOS_I2C_Init(uint32_t * i2c_id, const struct pios_i2c_adapter_cfg * cfg
 	 */
 	vSemaphoreCreateBinary(i2c_adapter->sem_ready);
 	i2c_adapter->sem_busy = xSemaphoreCreateMutex();
+#else
+	i2c_adapter->busy = 0;
 #endif // USE_FREERTOS
 
 	/* Initialize the state machine */
@@ -927,6 +929,17 @@ bool PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], ui
 	portTickType timeout;
 	timeout = i2c_adapter->cfg->transfer_timeout_ms / portTICK_RATE_MS;
 	semaphore_success &= (xSemaphoreTake(i2c_adapter->sem_busy, timeout) == pdTRUE);
+#else
+	uint32_t timeout = 0xffff;
+	while(i2c_adapter->busy && --timeout);
+	if(timeout == 0) //timed out
+		return -1;
+	
+	PIOS_IRQ_Disable();
+	if(i2c_adapter->busy)
+		return -1;
+	i2c_adapter->busy = 1;
+	PIOS_IRQ_Enable();
 #endif /* USE_FREERTOS */
 
 	PIOS_DEBUG_Assert(i2c_adapter->curr_state == I2C_STATE_STOPPED);
@@ -963,6 +976,10 @@ bool PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], ui
 	xSemaphoreGive(i2c_adapter->sem_busy);
 	if(!semaphore_success)
 		i2c_timeout_counter++;
+#else
+	PIOS_IRQ_Disable();
+	i2c_adapter->busy = 0;
+	PIOS_IRQ_Enable();
 #endif /* USE_FREERTOS */
 
 	transfers_successful+= (!i2c_adapter->bus_error) && semaphore_success;
@@ -988,6 +1005,13 @@ void PIOS_I2C_EV_IRQ_Handler(uint32_t i2c_id)
 #define EVENT_MASK 0x000700FF
 	event &= EVENT_MASK;
 	
+	// This is very poor and inconsistent practice with the FSM since no other 
+	// throw event depends on the current state.  However when accelerated (-Os)
+	// we definitely catch this event twice and there is no clean way to do deal
+	// with that in the FMS short of a special state for it
+	if(i2c_adapter->curr_state == I2C_STATE_STARTING && event == 0x70084)
+		return;
+
 	
 	switch (event) { /* Mask out all the bits we don't care about */
 	case (I2C_EVENT_MASTER_MODE_SELECT | 0x40):

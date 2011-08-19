@@ -86,7 +86,6 @@ enum pios_i2c_adapter_magic {
 struct pios_i2c_adapter {
 	enum pios_i2c_adapter_magic         magic;
 	const struct pios_i2c_adapter_cfg * cfg;
-	void (*callback) (uint8_t, uint8_t);
 #ifdef PIOS_INCLUDE_FREERTOS
 	xSemaphoreHandle sem_busy;
 	xSemaphoreHandle sem_ready;
@@ -101,6 +100,8 @@ struct pios_i2c_adapter {
 	const struct pios_i2c_txn *active_txn;
 	const struct pios_i2c_txn *last_txn;
 
+	void (*callback) ();
+	
 	uint8_t *active_byte;
 	uint8_t *last_byte;
 };

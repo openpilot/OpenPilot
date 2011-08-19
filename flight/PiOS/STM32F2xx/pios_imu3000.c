@@ -54,12 +54,18 @@ static int32_t PIOS_IMU3000_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 static int32_t PIOS_IMU3000_Write(uint8_t address, uint8_t buffer);
 int32_t imu3000_id = 0;
 
+#define PIOS_IMU3000_MAX_DOWNSAMPLE 10
+static int16_t pios_imu3000_buffer[PIOS_IMU3000_MAX_DOWNSAMPLE * 4];
+static t_fifo_buffer pios_imu3000_fifo;
+
 /**
  * @brief Initialize the IMU3000 3-axis gyro sensor.
  * @return none
  */
 void PIOS_IMU3000_Init(const struct pios_imu3000_cfg * cfg)
 {
+	fifoBuf_init(&pios_imu3000_fifo, (uint8_t *) pios_imu3000_buffer, sizeof(pios_imu3000_buffer));
+
 	/* Configure EOC pin as input floating */
 	GPIO_Init(cfg->drdy.gpio, &cfg->drdy.init);
 	

@@ -132,6 +132,7 @@ static bool i2c_adapter_wait_for_stopped(struct pios_i2c_adapter *i2c_adapter);
 static void i2c_adapter_reset_bus(struct pios_i2c_adapter *i2c_adapter);
 
 static void i2c_adapter_log_fault(enum pios_i2c_error_type type);
+static bool i2c_adapter_callback_handler(struct pios_i2c_adapter *i2c_adapter);
 
 const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM_STATES] = {
 	[I2C_STATE_FSM_FAULT] = {
@@ -398,6 +399,9 @@ static void go_stopping(struct pios_i2c_adapter *i2c_adapter)
 	}
 	portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);	/* FIXME: is this the right place for this? */
 #endif /* USE_FREERTOS */
+
+	if(i2c_adapter->callback)
+		i2c_adapter_callback_handler(i2c_adapter);
 }
 
 static void go_stopped(struct pios_i2c_adapter *i2c_adapter)
@@ -770,6 +774,45 @@ static bool i2c_adapter_fsm_terminated(struct pios_i2c_adapter *i2c_adapter)
 	}
 }
 
+uint32_t i2c_cb_count = 0;
+static bool i2c_adapter_callback_handler(struct pios_i2c_adapter * i2c_adapter) 
+{
+	bool semaphore_success = true;
+	/* Wait for the transfer to complete */
+#ifdef USE_FREERTOS
+	semaphore_success &= (xSemaphoreTake(i2c_adapter->sem_ready, timeout) == pdTRUE);
+	xSemaphoreGive(i2c_adapter->sem_ready);
+#endif /* USE_FREERTOS */
+	
+	/* Spin waiting for the transfer to finish */
+	while (!i2c_adapter_fsm_terminated(i2c_adapter)) ;
+	
+	if (i2c_adapter_wait_for_stopped(i2c_adapter)) {
+		i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_STOPPED);
+	} else {
+		i2c_adapter_fsm_init(i2c_adapter);
+	}
+	
+	// Execute user supplied function
+	i2c_adapter->callback();
+	
+	i2c_cb_count++;
+
+#ifdef USE_FREERTOS
+	/* Unlock the bus */
+	xSemaphoreGive(i2c_adapter->sem_busy);
+	if(!semaphore_success)
+		i2c_timeout_counter++;
+#else
+	PIOS_IRQ_Disable();
+	i2c_adapter->busy = 0;
+	PIOS_IRQ_Enable();
+#endif /* USE_FREERTOS */
+	
+
+	return (!i2c_adapter->bus_error) && semaphore_success;
+}
+
 /**
  * Logs the last N state transitions and N IRQ events due to
  * an error condition
@@ -909,11 +952,8 @@ out_fail:
 	return(-1);
 }
 
-uint32_t transfers = 0;
-uint32_t transfers_successful = 0;
 bool PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], uint32_t num_txns)
 {
-	transfers++;
 	struct pios_i2c_adapter * i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
 
 	bool valid = PIOS_I2C_validate(i2c_adapter);
@@ -930,14 +970,14 @@ bool PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], ui
 	timeout = i2c_adapter->cfg->transfer_timeout_ms / portTICK_RATE_MS;
 	semaphore_success &= (xSemaphoreTake(i2c_adapter->sem_busy, timeout) == pdTRUE);
 #else
-	uint32_t timeout = 0xffff;
+	uint32_t timeout = 0xfff;
 	while(i2c_adapter->busy && --timeout);
 	if(timeout == 0) //timed out
-		return -1;
+		return false;
 	
 	PIOS_IRQ_Disable();
 	if(i2c_adapter->busy)
-		return -1;
+		return false;
 	i2c_adapter->busy = 1;
 	PIOS_IRQ_Enable();
 #endif /* USE_FREERTOS */
@@ -953,6 +993,7 @@ bool PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], ui
 	semaphore_success &= (xSemaphoreTake(i2c_adapter->sem_ready, timeout) == pdTRUE);
 #endif
 
+	i2c_adapter->callback = NULL;
 	i2c_adapter->bus_error = false;
 	i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_START);
 
@@ -982,10 +1023,57 @@ bool PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], ui
 	PIOS_IRQ_Enable();
 #endif /* USE_FREERTOS */
 
-	transfers_successful+= (!i2c_adapter->bus_error) && semaphore_success;
 	return (!i2c_adapter->bus_error) && semaphore_success;
 }
 
+bool PIOS_I2C_Transfer_Callback(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], uint32_t num_txns, void *callback)
+{
+	struct pios_i2c_adapter * i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
+	
+	bool valid = PIOS_I2C_validate(i2c_adapter);
+	PIOS_Assert(valid)
+	PIOS_Assert(callback);
+	
+	PIOS_DEBUG_Assert(txn_list);
+	PIOS_DEBUG_Assert(num_txns);
+	
+	bool semaphore_success = true;
+	
+#ifdef USE_FREERTOS
+	/* Lock the bus */
+	portTickType timeout;
+	timeout = i2c_adapter->cfg->transfer_timeout_ms / portTICK_RATE_MS;
+	semaphore_success &= (xSemaphoreTake(i2c_adapter->sem_busy, timeout) == pdTRUE);
+#else
+	uint32_t timeout = 0xfff;
+	while(i2c_adapter->busy && --timeout);
+	if(timeout == 0) //timed out
+		return false;
+	
+	PIOS_IRQ_Disable();
+	if(i2c_adapter->busy)
+		return false;
+	i2c_adapter->busy = 2;
+	PIOS_IRQ_Enable();
+#endif /* USE_FREERTOS */
+	
+	PIOS_DEBUG_Assert(i2c_adapter->curr_state == I2C_STATE_STOPPED);
+	
+	i2c_adapter->first_txn = &txn_list[0];
+	i2c_adapter->last_txn = &txn_list[num_txns - 1];
+	i2c_adapter->active_txn = i2c_adapter->first_txn;
+	
+#ifdef USE_FREERTOS
+	/* Make sure the done/ready semaphore is consumed before we start */
+	semaphore_success &= (xSemaphoreTake(i2c_adapter->sem_ready, timeout) == pdTRUE);
+#endif
+	
+	i2c_adapter->callback = callback;
+	i2c_adapter->bus_error = false;
+	i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_START);
+	
+	return semaphore_success;
+}
 
 void PIOS_I2C_EV_IRQ_Handler(uint32_t i2c_id)
 {
@@ -1012,7 +1100,6 @@ void PIOS_I2C_EV_IRQ_Handler(uint32_t i2c_id)
 	if(i2c_adapter->curr_state == I2C_STATE_STARTING && event == 0x70084)
 		return;
 
-	
 	switch (event) { /* Mask out all the bits we don't care about */
 	case (I2C_EVENT_MASTER_MODE_SELECT | 0x40):
 		/* Unexplained event: EV5 + RxNE : Extraneous Rx.  Probably a late NACK from previous read. */

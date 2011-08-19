@@ -164,7 +164,7 @@ void PIOS_Board_Init(void) {
 		PIOS_Assert(tx_buffer);
 		if (PIOS_COM_Init(&pios_com_gps_id, &pios_udp_com_driver, pios_udp_gps_id,
 				  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
-				  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN)) {
+				  tx_buffer, PIOS_COM_GPS_RX_BUF_LEN)) {
 			PIOS_Assert(0);
 		}
 	}

@@ -74,20 +74,34 @@ static float sphereCourse(float lat1,float long1,float lat2,float long2);
  * Initialise the module, called on startup
  * \returns 0 on success or -1 if initialisation failed
  */
-int32_t CCGuidanceInitialize()
+int32_t CCGuidanceStart()
 {
-	// Create object queue
-	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
-	
-	// Listen for updates.
-	GPSPositionConnectQueue(queue);
-	
 	// Start main task
 	xTaskCreate(ccguidanceTask, (signed char *)"Guidance", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &ccguidanceTaskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_GUIDANCE, ccguidanceTaskHandle);
 
 	return 0;
 }
+
+/**
+ * Initialise the module, called on startup
+ * \returns 0 on success or -1 if initialisation failed
+ */
+int32_t CCGuidanceInitialize()
+{
+	CCGuidanceSettingsInitialize();
+	PositionDesiredInitialize();
+
+	// Create object queue
+	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+	
+	// Listen for updates.
+	GPSPositionConnectQueue(queue);
+	
+	return 0;
+}
+// no macro - optional module
+
 
 /**
  * Module thread, should not return.

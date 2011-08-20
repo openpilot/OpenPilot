@@ -65,7 +65,7 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-OPTMODULES = CameraStab GPS
+OPTMODULES = CameraStab GPS CCGuidance
 MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
 # Telemetry must be last to grab the optional modules (why?)
 MODULES += Telemetry
@@ -169,6 +169,8 @@ SRC += $(OPUAVSYNTHDIR)/attitudesettings.c
 SRC += $(OPUAVSYNTHDIR)/camerastabsettings.c
 SRC += $(OPUAVSYNTHDIR)/cameradesired.c
 SRC += $(OPUAVSYNTHDIR)/gpsposition.c
+SRC += $(OPUAVSYNTHDIR)/positiondesired.c
+SRC += $(OPUAVSYNTHDIR)/ccguidancesettings.c
 SRC += $(OPUAVSYNTHDIR)/hwsettings.c
 
 SRC += $(OPUAVSYNTHDIR)/taskinfo.c

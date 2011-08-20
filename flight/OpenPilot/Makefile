@@ -37,6 +37,9 @@ OUTDIR := $(TOP)/build/$(TARGET)
 # Set to YES to compile for debugging
 DEBUG ?= YES
 
+# Include objects that are just nice information to show
+DIAGNOSTICS ?= YES
+
 # Set to YES to use the Servo output pins for debugging via scope or logic analyser
 ENABLE_DEBUG_PINS ?= NO
 
@@ -391,8 +394,9 @@ ifeq ($(DEBUG),YES)
 CFLAGS = -g$(DEBUGF) -DDEBUG
 endif
 
-# OP has enough memory to always enable optional objects
-CFLAGS += -DDIAGNOSTICS
+ifeq ($(DIAGNOSTICS),YES)
+CFLAGS = -DDIAGNOSTICS
+endif
 
 CFLAGS += -O$(OPT)
 CFLAGS += -mcpu=$(MCU)

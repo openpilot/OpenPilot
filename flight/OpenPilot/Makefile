@@ -391,13 +391,14 @@ CSTANDARD = -std=gnu99
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
 
 ifeq ($(DEBUG),YES)
-CFLAGS = -g$(DEBUGF) -DDEBUG
+CFLAGS = -DDEBUG
 endif
 
 ifeq ($(DIAGNOSTICS),YES)
 CFLAGS = -DDIAGNOSTICS
 endif
 
+CFLAGS += -g$(DEBUGF)
 CFLAGS += -O$(OPT)
 CFLAGS += -mcpu=$(MCU)
 CFLAGS += $(CDEFS)

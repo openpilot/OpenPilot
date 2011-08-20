@@ -46,6 +46,7 @@
 #include "positiondesired.h"	// object that will be updated by the module
 #include "manualcontrol.h"
 #include "manualcontrolcommand.h"
+#include "flightstatus.h"
 #include "stabilizationdesired.h"
 #include "systemsettings.h"
 
@@ -94,6 +95,7 @@ static void ccguidanceTask(void *parameters)
 	SystemSettingsData systemSettings;
 	CCGuidanceSettingsData ccguidanceSettings;
 	ManualControlCommandData manualControl;
+	FlightStatusData flightStatus;
 
 	portTickType thisTime;
 	portTickType lastUpdateTime;
@@ -123,9 +125,10 @@ static void ccguidanceTask(void *parameters)
 		lastUpdateTime = xTaskGetTickCount();
 		
 		ManualControlCommandGet(&manualControl);
+		FlightStatusGet(&flightStatus);
 		SystemSettingsGet(&systemSettings);
 		
-		if ((PARSE_FLIGHT_MODE(manualControl.FlightMode) == FLIGHTMODE_GUIDANCE) &&
+		if ((PARSE_FLIGHT_MODE(flightStatus.FlightMode) == FLIGHTMODE_GUIDANCE) &&
 		    ((systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWING) ||
 		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGELEVON) ||
 		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGVTAIL) ))

@@ -128,9 +128,12 @@ private slots:
         void moveTxControls();
         void moveSticks();
         void dimOtherControls(bool value);
+        void invertControls();
 protected:
         void resizeEvent(QResizeEvent *event);
         virtual void enableControls(bool enable);
+protected slots:
+        virtual void refreshWidgetsValues();
 
 };
 

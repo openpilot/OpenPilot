@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       configservowidget.cpp
+ * @file       configinputwidget.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -39,6 +39,7 @@
 #include <QUrl>
 #include <QMessageBox>
 #include <utils/stylehelper.h>
+#include <QMessageBox>
 
 #define ACCESS_MIN_MOVE -6
 #define ACCESS_MAX_MOVE 6
@@ -92,7 +93,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     addUAVObjectToWidgetRelation("ManualControlSettings","Arming",m_config->armControl);
     addUAVObjectToWidgetRelation("ManualControlSettings","armTimeout",m_config->armTimeout,0,1000);
-
+    addUAVObject("ManualControlCommand");
     addWidget(goWizard);
     enableControls(false);
 
@@ -254,6 +255,12 @@ void ConfigInputWidget::openHelp()
 
 void ConfigInputWidget::goToWizard()
 {
+    QMessageBox msgBox;
+    msgBox.setText(tr("Arming Settings are now set to Always Disarmed for your safety."));
+    msgBox.setDetailedText(tr("You will have to reconfigure arming settings yourself afterwards."));
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+    msgBox.exec();
     setupWizardWidget(wizardWelcome);
     m_config->graphicsView->fitInView(m_txBackground, Qt::KeepAspectRatio );
 }
@@ -320,10 +327,9 @@ void ConfigInputWidget::setupWizardWidget(int step)
         manualSettingsData.Arming=ManualControlSettings::ARMING_ALWAYSDISARMED;
         manualSettingsObj->setData(manualSettingsData);
         m_config->wzText->setText(tr("Welcome to the inputs configuration wizard.\n"
-                                     "Please follow the instruction on the screen and only move your controls when asked to.\n"
+                                     "Please follow the instructions on the screen and only move your controls when asked to.\n"
                                      "Make sure you already configured your hardware settings on the proper tab and restarted your board.\n"
-                                     "At any time you can press 'back' to return to the previous screeen or 'Cancel' to cancel the wizard \n"
-                                     "For your safety your arming setting is now 'Always Disarmed' please reenable it after this wizard."));
+                                     "At any time you can press 'back' to return to the previous screeen or 'Cancel' to cancel the wizard.\n"));
         m_config->stackedWidget->setCurrentIndex(1);
         m_config->wzBack->setEnabled(false);
         wizardStep=wizardWelcome;
@@ -386,7 +392,7 @@ void ConfigInputWidget::setupWizardWidget(int step)
             manualCommandObj->setMetadata(manualCommandObj->getDefaultMetadata());
         }
         wizardStep=wizardIdentifyCenter;
-        m_config->wzText->setText(QString(tr("Please center all control controls and press next when ready")));
+        m_config->wzText->setText(QString(tr("Please center all control controls and press next when ready (if your FlightMode switch has only two positions, leave it on either position)")));
     }
     else if(step==wizardIdentifyLimits)
     {
@@ -411,7 +417,7 @@ void ConfigInputWidget::setupWizardWidget(int step)
         extraWidgets.clear();
         disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
         wizardStep=wizardIdentifyLimits;
-        m_config->wzText->setText(QString(tr("Please move all controls to their maximum extends on both directions and press next when ready")));
+        m_config->wzText->setText(QString(tr("Please move all controls to their maximum extents on both directions and press next when ready")));
         UAVObject::Metadata mdata= manualCommandObj->getMetadata();
         mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
         mdata.flightTelemetryUpdatePeriod = 150;
@@ -441,33 +447,22 @@ void ConfigInputWidget::setupWizardWidget(int step)
                 QCheckBox * cb=new QCheckBox(name,this);
                 extraWidgets.append(cb);
                 m_config->checkBoxesLayout->layout()->addWidget(cb);
+                connect(cb,SIGNAL(toggled(bool)),this,SLOT(invertControls()));
             }
         }
         connect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
         wizardStep=wizardIdentifyInverted;
-        m_config->wzText->setText(QString(tr("Please check the picture below and check all the sticks which show an inverted movement  and press next when ready")));
+        m_config->wzText->setText(QString(tr("Please check the picture below and check all the sticks which show an inverted movement and press next when ready")));
     }
     else if(step==wizardFinish)
     {
-        manualSettingsData=manualSettingsObj->getData();
         foreach(QWidget * wd,extraWidgets)
         {
             QCheckBox * cb=qobject_cast<QCheckBox *>(wd);
             if(cb)
-            {
-                if(cb->isChecked())
-                {
-                    int index=manualSettingsObj->getFields().at(0)->getElementNames().indexOf(cb->text());
-                    qint16 aux;
-                    aux=manualSettingsData.ChannelMax[index];
-                    manualSettingsData.ChannelMax[index]=manualSettingsData.ChannelMin[index];
-                    manualSettingsData.ChannelMin[index]=aux;
-                }
-            }
-            delete cb;
+                delete cb;
         }
         wizardStep=wizardFinish;
-        manualSettingsObj->setData(manualSettingsData);
         extraWidgets.clear();
         m_config->wzText->setText(QString(tr("You have completed this wizard, please check below if the picture below mimics your sticks movement.\n"
                                              "This new settings aren't saved to the board yet, after pressing next you will go to the initial screen where you can do that.")));
@@ -484,6 +479,12 @@ void ConfigInputWidget::setupWizardWidget(int step)
                 manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]+
                 ((manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE]-
                   manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE])*0.02);
+        if((abs(manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_FLIGHTMODE]-manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_FLIGHTMODE])<100) ||
+                (abs(manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE]-manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_FLIGHTMODE])<100))
+        {
+            manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_FLIGHTMODE]=manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE]+
+                    (manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_FLIGHTMODE]-manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE])/2;
+        }
         manualSettingsObj->setData(manualSettingsData);
         m_config->stackedWidget->setCurrentIndex(0);
         wizardStep=wizardWelcome;
@@ -549,10 +550,7 @@ void ConfigInputWidget::setMoveFromCommand(int command)
     //CHANNELNUMBER_ROLL=0, CHANNELNUMBER_PITCH=1, CHANNELNUMBER_YAW=2, CHANNELNUMBER_THROTTLE=3, CHANNELNUMBER_FLIGHTMODE=4, CHANNELNUMBER_ACCESSORY0=5, CHANNELNUMBER_ACCESSORY1=6, CHANNELNUMBER_ACCESSORY2=7 } ChannelNumberElem;
     if(command==ManualControlSettings::CHANNELNUMBER_ROLL)
     {
-        if(transmitterMode==mode2)
             setTxMovement(moveRightHorizontalStick);
-        else
-            setTxMovement(moveLeftHorizontalStick);
     }
     else if(command==ManualControlSettings::CHANNELNUMBER_PITCH)
     {
@@ -563,10 +561,7 @@ void ConfigInputWidget::setMoveFromCommand(int command)
     }
     else if(command==ManualControlSettings::CHANNELNUMBER_YAW)
     {
-        if(transmitterMode==mode2)
             setTxMovement(moveLeftHorizontalStick);
-        else
-            setTxMovement(moveRightHorizontalStick);
     }
     else if(command==ManualControlSettings::CHANNELNUMBER_THROTTLE)
     {
@@ -861,9 +856,9 @@ void ConfigInputWidget::moveSticks()
     else
     {
         trans=m_txRightStickOrig;
-        m_txRightStick->setTransform(trans.translate(manualCommandData.Yaw*STICK_MAX_MOVE*10,-manualCommandData.Throttle*STICK_MAX_MOVE*10),false);
+        m_txRightStick->setTransform(trans.translate(manualCommandData.Roll*STICK_MAX_MOVE*10,-manualCommandData.Throttle*STICK_MAX_MOVE*10),false);
         trans=m_txLeftStickOrig;
-        m_txLeftStick->setTransform(trans.translate(manualCommandData.Roll*STICK_MAX_MOVE*10,manualCommandData.Pitch*STICK_MAX_MOVE*10),false);
+        m_txLeftStick->setTransform(trans.translate(manualCommandData.Yaw*STICK_MAX_MOVE*10,manualCommandData.Pitch*STICK_MAX_MOVE*10),false);
     }
 }
 
@@ -886,4 +881,62 @@ void ConfigInputWidget::enableControls(bool enable)
         goWizard->setEnabled(enable);
     ConfigTaskWidget::enableControls(enable);
 
+}
+
+void ConfigInputWidget::invertControls()
+{
+    manualSettingsData=manualSettingsObj->getData();
+    foreach(QWidget * wd,extraWidgets)
+    {
+        QCheckBox * cb=qobject_cast<QCheckBox *>(wd);
+        if(cb)
+        {
+            if(cb->isChecked())
+            {
+                int index=manualSettingsObj->getFields().at(0)->getElementNames().indexOf(cb->text());
+                qint16 aux;
+                aux=manualSettingsData.ChannelMax[index];
+                manualSettingsData.ChannelMax[index]=manualSettingsData.ChannelMin[index];
+                manualSettingsData.ChannelMin[index]=aux;
+            }
+        }
+    }
+    manualSettingsObj->setData(manualSettingsData);
+}
+void ConfigInputWidget::refreshWidgetsValues()
+{
+    ConfigTaskWidget::refreshWidgetsValues();
+    manualSettingsData = manualSettingsObj->getData();
+    manualCommandData=manualCommandObj->getData();
+    uint chIndex = manualSettingsData.ChannelNumber[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE];
+    if (chIndex < 8) {
+        float valueScaled;
+
+        int chMin = manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE];
+        int chMax = manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_FLIGHTMODE];
+        int chNeutral = manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_FLIGHTMODE];
+
+        int value = manualCommandData.Channel[chIndex];
+        if ((chMax > chMin && value >= chNeutral) || (chMin > chMax && value <= chNeutral))
+        {
+            if (chMax != chNeutral)
+                valueScaled = (float)(value - chNeutral) / (float)(chMax - chNeutral);
+            else
+                valueScaled = 0;
+        }
+        else
+        {
+            if (chMin != chNeutral)
+                valueScaled = (float)(value - chNeutral) / (float)(chNeutral - chMin);
+            else
+                valueScaled = 0;
+        }
+
+        if(valueScaled < -(1.0 / 3.0))
+            m_config->fmsSlider->setValue(-100);
+        else if (valueScaled > (1.0/3.0))
+            m_config->fmsSlider->setValue(100);
+        else
+            m_config->fmsSlider->setValue(0);
+    }
 }

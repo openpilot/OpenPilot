@@ -49,7 +49,8 @@
 #include "hwsettings.h"
 #include "watchdogstatus.h"
 #include "taskmonitor.h"
-#include "pios_config.h"
+//#include "pios_config.h" must not be included directly! - named differently on some platforms!
+#include "pios.h"
 
 
 // Private constants

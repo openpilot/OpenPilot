@@ -48,6 +48,7 @@ public:
     ConfigPlugin();
     ~ConfigPlugin();
 
+    UAVObjectManager * getObjectManager();
     void extensionsInitialized();
     bool initialize(const QStringList & arguments, QString * errorString);
     void shutdown();

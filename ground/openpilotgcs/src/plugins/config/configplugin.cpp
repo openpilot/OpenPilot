@@ -30,7 +30,7 @@
 #include <QStringList>
 #include <QTimer>
 #include <extensionsystem/pluginmanager.h>
-
+#include "objectpersistence.h"
 
 ConfigPlugin::ConfigPlugin()
 {
@@ -58,7 +58,7 @@ bool ConfigPlugin::initialize(const QStringList& args, QString *errMsg)
                                           "ConfigPlugin.EraseAll",
                                           QList<int>() <<
                                           Core::Constants::C_GLOBAL_ID);
-  cmd->action()->setText("Erase all settings from board...");
+  cmd->action()->setText(tr("Erase all settings from board..."));
 
   ac->menu()->addSeparator();
   ac->appendGroup("Utilities");
@@ -78,6 +78,17 @@ bool ConfigPlugin::initialize(const QStringList& args, QString *errMsg)
       onAutopilotConnect();
 
    return true;
+}
+
+/**
+  * @brief Return handle to object manager
+  */
+UAVObjectManager * ConfigPlugin::getObjectManager()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager * objMngr = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objMngr);
+    return objMngr;
 }
 
 void ConfigPlugin::extensionsInitialized()
@@ -122,18 +133,19 @@ void ConfigPlugin::eraseAllSettings()
             return;
 
     settingsErased = false;
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager * objMngr = pm->getObject<UAVObjectManager>();
-    Q_ASSERT(objMngr);
-    ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( objMngr->getObject(ObjectPersistence::NAME) );
+    ObjectPersistence* objper = ObjectPersistence::GetInstance(getObjectManager());
     Q_ASSERT(objper);
+
     connect(objper, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(eraseDone(UAVObject *)));
-    ObjectPersistence::DataFields data;
-    data.Operation = ObjectPersistence::OPERATION_DELETE;
-    data.Selection = ObjectPersistence::SELECTION_ALLSETTINGS;
+
+    ObjectPersistence::DataFields data = objper->getData();
+    data.Operation = ObjectPersistence::OPERATION_FULLERASE;
+
+    // No need for manual updated event, this is triggered by setData
+    // based on UAVO meta data
     objper->setData(data);
     objper->updated();
-    QTimer::singleShot(1500,this,SLOT(eraseFailed()));
+    QTimer::singleShot(6000,this,SLOT(eraseFailed()));
 
 }
 
@@ -141,37 +153,47 @@ void ConfigPlugin::eraseFailed()
 {
     if (settingsErased)
         return;
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager * objMngr = pm->getObject<UAVObjectManager>();
-    Q_ASSERT(objMngr);
-    ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( objMngr->getObject(ObjectPersistence::NAME));
-    disconnect(objper, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(eraseDone(UAVObject *)));
-    QMessageBox msgBox;
-    msgBox.setText(tr("Error trying to erase settings."));
-    msgBox.setInformativeText(tr("Power-cycle your board. Settings might be inconsistent."));
-    msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.setDefaultButton(QMessageBox::Ok);
-    msgBox.exec();
+
+    ObjectPersistence* objper = ObjectPersistence::GetInstance(getObjectManager());
+
+    ObjectPersistence::DataFields data = objper->getData();
+    if(data.Operation == ObjectPersistence::OPERATION_FULLERASE) {
+        // First attempt via flash erase failed.  Fall back on erase all settings
+        data.Operation = ObjectPersistence::OPERATION_DELETE;
+        data.Selection = ObjectPersistence::SELECTION_ALLSETTINGS;
+        objper->setData(data);
+        objper->updated();
+        QTimer::singleShot(1500,this,SLOT(eraseFailed()));
+    } else {
+        disconnect(objper, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(eraseDone(UAVObject *)));
+        QMessageBox msgBox;
+        msgBox.setText(tr("Error trying to erase settings."));
+        msgBox.setInformativeText(tr("Power-cycle your board after removing all blades. Settings might be inconsistent."));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.exec();
+    }
 }
 
 void ConfigPlugin::eraseDone(UAVObject * obj)
 {
     QMessageBox msgBox;
-    ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>(sender());
-    Q_ASSERT(obj->getName().compare("ObjectPersistence") == 0);
-    QString tmp = obj->getField("Operation")->getValue().toString();
-    if (obj->getField("Operation")->getValue().toString().compare(QString("Delete")) == 0 ) {
+    ObjectPersistence* objper = ObjectPersistence::GetInstance(getObjectManager());
+    ObjectPersistence::DataFields data = objper->getData();
+    Q_ASSERT(obj->getInstID() == objper->getInstID());
+
+    if(data.Operation != ObjectPersistence::OPERATION_COMPLETED) {
         return;
     }
 
     disconnect(objper, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(eraseDone(UAVObject *)));
-    if (obj->getField("Operation")->getValue().toString().compare(QString("Completed")) == 0) {
+    if (data.Operation == ObjectPersistence::OPERATION_COMPLETED) {
         settingsErased = true;
         msgBox.setText(tr("Settings are now erased."));
         msgBox.setInformativeText(tr("Please now power-cycle your board to complete reset."));
     } else {
         msgBox.setText(tr("Error trying to erase settings."));
-        msgBox.setInformativeText(tr("Power-cycle your board. Settings might be inconsistent."));
+        msgBox.setInformativeText(tr("Power-cycle your board after removing all blades. Settings might be inconsistent."));
     }
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.setDefaultButton(QMessageBox::Ok);

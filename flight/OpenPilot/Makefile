@@ -55,13 +55,16 @@ endif
 
 FLASH_TOOL = OPENOCD
 
+
 # List of modules to include
-MODULES = Actuator Telemetry GPS ManualControl Altitude AHRSComms Stabilization Guidance FirmwareIAP
+OPTMODULES = CameraStab GPS
+MODULES = Actuator ManualControl Altitude AHRSComms Stabilization Guidance FirmwareIAP
 PYMODULES = FlightPlan
 #MODULES = Telemetry Example
 #MODULES = Telemetry MK/MKSerial
 #MODULES = Telemetry
 #MODULES += Osd/OsdEtStd
+MODULES += Telemetry
 
 # Paths
 OPSYSTEM = ./System
@@ -125,6 +128,7 @@ PYSRC += ${foreach MOD, ${PYMODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 SRC += $(PYSRC)
 
 ## MODULES
+SRC += ${foreach MOD, ${OPTMODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 ## OPENPILOT CORE:
 SRC += ${OPMODULEDIR}/System/systemmod.c
@@ -306,7 +310,7 @@ EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/ARM_CM3
 EXTRAINCDIRS  += $(AHRSBOOTLOADERINC)
 EXTRAINCDIRS  += $(PYMITEINC)
 
-EXTRAINCDIRS += ${foreach MOD, ${MODULES} ${PYMODULES}, $(OPMODULEDIR)/${MOD}/inc} ${OPMODULEDIR}/System/inc
+EXTRAINCDIRS += ${foreach MOD, ${OPTMODULES} ${MODULES} ${PYMODULES}, $(OPMODULEDIR)/${MOD}/inc} ${OPMODULEDIR}/System/inc
 
 
 # List any extra directories to look for library files here.
@@ -471,9 +475,23 @@ endif
 endif
 
 # Generate intermediate code
-gencode: ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h 
+gencode: ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h ${OUTDIR}/InitOptMods.h
 
 $(PYSRC): gencode
+
+$(SRC): gencode
+
+# this is supposed to be  standard function, but apparently it is not
+uc = $(subst a,A,$(subst b,B,$(subst c,C,$(subst d,D,$(subst e,E,$(subst f,F,$(subst g,G,$(subst h,H,$(subst i,I,$(subst j,J,$(subst k,K,$(subst l,L,$(subst m,M,$(subst n,N,$(subst o,O,$(subst p,P,$(subst q,Q,$(subst r,R,$(subst s,S,$(subst t,T,$(subst u,U,$(subst v,V,$(subst w,W,$(subst x,X,$(subst y,Y,$(subst z,Z,$1))))))))))))))))))))))))))
+
+${OUTDIR}/InitOptMods.h:
+	@echo ${quote}${foreach MOD, ${OPTMODULES}, int32_t ${MOD}Initialize(); }${quote} > ${OUTDIR}/InitOptMods.h
+	@echo ${quote}${foreach MOD, ${OPTMODULES}, int32_t ${MOD}Start(); }${quote} >> ${OUTDIR}/InitOptMods.h
+	@echo ${quote}#define MODULE_INITIALISE_OPTIONAL(list) \${quote} >> ${OUTDIR}/InitOptMods.h
+	@echo ${quote}${foreach MOD, ${OPTMODULES}, OPTMODULE_INIT(list, $(call uc, ${MOD}), ${MOD});}${quote} >> ${OUTDIR}/InitOptMods.h
+	@echo ${quote}#define MODULE_TASKCREATE_OPTIONAL(list) \${quote} >> ${OUTDIR}/InitOptMods.h
+	@echo ${quote}${foreach MOD, ${OPTMODULES}, OPTMODULE_START(list, $(call uc, ${MOD}), ${MOD});}${quote} >> ${OUTDIR}/InitOptMods.h
+
 
 # Generate code for PyMite
 ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h: $(wildcard ${PYMITELIB}/*.py) $(wildcard ${PYMITEPLAT}/*.py) $(wildcard ${FLIGHTPLANLIB}/*.py) $(wildcard ${FLIGHTPLANS}/*.py) 

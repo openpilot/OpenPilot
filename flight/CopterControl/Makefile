@@ -64,11 +64,10 @@ endif
 
 FLASH_TOOL = OPENOCD
 
-OPTMODULES = CameraStab GPS
 # List of modules to include
-MODULES = ${OPTMODULES}
-MODULES += Attitude Stabilization Actuator ManualControl FirmwareIAP
-# Telemetry must be last to grab the optional modules
+OPTMODULES = CameraStab GPS
+MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
+# Telemetry must be last to grab the optional modules (why?)
 MODULES += Telemetry
 
 # Paths
@@ -122,6 +121,7 @@ OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 ifndef TESTAPP
 ## MODULES
+SRC += ${foreach MOD, ${OPTMODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 ## OPENPILOT CORE:
 SRC += ${OPMODULEDIR}/System/systemmod.c
@@ -332,7 +332,7 @@ EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/ARM_CM3
 EXTRAINCDIRS  += $(AHRSBOOTLOADERINC)
 EXTRAINCDIRS  += $(PYMITEINC)
 
-EXTRAINCDIRS += ${foreach MOD, ${MODULES}, ${OPMODULEDIR}/${MOD}/inc} ${OPMODULEDIR}/System/inc
+EXTRAINCDIRS += ${foreach MOD, ${OPTMODULES} ${MODULES}, ${OPMODULEDIR}/${MOD}/inc} ${OPMODULEDIR}/System/inc
 
 
 # List any extra directories to look for library files here.
@@ -514,6 +514,8 @@ endif
 endif
 endif
 
+$(SRC): gencode
+
 gencode: ${OUTDIR}/InitOptMods.h
 
 # this is supposed to be  standard function, but apparently it is not
@@ -569,13 +571,13 @@ $(eval $(call OPFW_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BOARD_TYPE),$(BOARD_REVISI
 $(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(FW_BANK_BASE),$(FW_BANK_SIZE)))
 
 .PHONY: elf lss sym hex bin bino opfw
-elf: gencode $(OUTDIR)/$(TARGET).elf
-lss: gencode $(OUTDIR)/$(TARGET).lss
-sym: gencode $(OUTDIR)/$(TARGET).sym
-hex: gencode $(OUTDIR)/$(TARGET).hex
-bin: gencode $(OUTDIR)/$(TARGET).bin
-bino: gencode $(OUTDIR)/$(TARGET).bin.o
-opfw: gencode $(OUTDIR)/$(TARGET).opfw
+elf: $(OUTDIR)/$(TARGET).elf
+lss: $(OUTDIR)/$(TARGET).lss
+sym: $(OUTDIR)/$(TARGET).sym
+hex: $(OUTDIR)/$(TARGET).hex
+bin: $(OUTDIR)/$(TARGET).bin
+bino: $(OUTDIR)/$(TARGET).bin.o
+opfw: $(OUTDIR)/$(TARGET).opfw
 
 # Display sizes of sections.
 $(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))

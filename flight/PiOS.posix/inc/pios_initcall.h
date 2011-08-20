@@ -66,13 +66,13 @@ extern void StartModules();
 	/* Initialize the system thread */ \
 	SystemModInitialize();}
 
-#define OPTMODULE_INIT(list,mod) \
-	if(list[HWSETTINGS_OPTIONALMODULES_##mod##] == HWSETTINGS_OPTIONALMODULES_ENABLED) { \
+#define OPTMODULE_INIT(list,moduc,mod) \
+	if(list[ HWSETTINGS_OPTIONALMODULES_##moduc ] == HWSETTINGS_OPTIONALMODULES_ENABLED) { \
 		mod##Initialize(); \
 	}
 
-#define OPTMODULE_START(list,mod) \
-	if(list[HWSETTINGS_OPTIONALMODULES_##mod##] == HWSETTINGS_OPTIONALMODULES_ENABLED) { \
+#define OPTMODULE_START(list,moduc,mod) \
+	if(list[ HWSETTINGS_OPTIONALMODULES_##moduc ] == HWSETTINGS_OPTIONALMODULES_ENABLED) { \
 		mod##Start(); \
 	}
 

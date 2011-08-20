@@ -479,9 +479,7 @@ endif
 endif
 
 # Generate intermediate code
-gencode: ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h ${OUTDIR}/InitOptMods.h
-
-$(PYSRC): gencode
+gencode: ${OUTDIR}/InitOptMods.h
 
 $(SRC): gencode
 

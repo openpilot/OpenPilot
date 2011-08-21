@@ -649,6 +649,16 @@ static const struct pios_imu3000_cfg pios_imu3000_cfg = {
 			.NVIC_IRQChannelCmd = ENABLE,
 		},
 	},
+	.Fifo_store = PIOS_IMU3000_FIFO_GYRO_X_OUT | PIOS_IMU3000_FIFO_GYRO_Y_OUT 
+	| PIOS_IMU3000_FIFO_GYRO_Z_OUT | PIOS_IMU3000_FIFO_FOOTER,
+	// Clock at 8 khz, downsampled by 4 for 2khz
+	.Smpl_rate_div = 3, 
+	.Interrupt_cfg = PIOS_IMU3000_INT_DATA_RDY | PIOS_IMU3000_INT_CLR_ANYRD,
+	.User_ctl = PIOS_IMU3000_USERCTL_FIFO_EN,
+	.Pwr_mgmt_clk = PIOS_IMU3000_PWRMGMT_PLL_X_CLK,
+	.range = PIOS_IMU3000_SCALE_500_DEG,
+	.filter = PIOS_IMU3000_LOWPASS_256_HZ
+
 };
 
 #include "pios_bmp085.h"

@@ -37,37 +37,30 @@
 
 /* Global Variables */
 
-/* Local Types */
-typedef struct {
-	uint8_t Fifo_store;		/* FIFO storage of different readings (See datasheet page 31 for more details) */
-	uint8_t Smpl_rate_div;	/* Sample rate divider to use (See datasheet page 32 for more details) */
-	uint8_t DigLPF_Scale;	/* Digital low-pass filter and full-range scale (See datasheet page 33 for more details)  */
-	uint8_t Interrupt_cfg;	/* Interrupt configuration (See datasheet page 35 for more details) */
-	uint8_t User_ctl;		/* User control settings (See datasheet page 41 for more details)  */
-	uint8_t Pwr_mgmt_clk;	/* Power management and clock selection (See datasheet page 32 for more details) */
-} PIOS_IMU3000_ConfigTypeDef;
-
 /* Local Variables */
-
-static void PIOS_IMU3000_Config(PIOS_IMU3000_ConfigTypeDef * IMU3000_Config_Struct);
+#define DEG_TO_RAD (M_PI / 180.0)
+static void PIOS_IMU3000_Config(struct pios_imu3000_cfg const * cfg);
 static int32_t PIOS_IMU3000_Read(uint8_t address, uint8_t * buffer, uint8_t len);
 static int32_t PIOS_IMU3000_Write(uint8_t address, uint8_t buffer);
-int32_t imu3000_id = 0;
 
 #define PIOS_IMU3000_MAX_DOWNSAMPLE 10
-static int16_t pios_imu3000_buffer[PIOS_IMU3000_MAX_DOWNSAMPLE * 4];
+static int16_t pios_imu3000_buffer[PIOS_IMU3000_MAX_DOWNSAMPLE * sizeof(struct pios_imu3000_data)];
 static t_fifo_buffer pios_imu3000_fifo;
 
 volatile bool imu3000_first_read = true;
 volatile bool imu3000_configured = false;
 volatile bool imu3000_cb_ready = true;
 
+static struct pios_imu3000_cfg const * cfg;
+
 /**
  * @brief Initialize the IMU3000 3-axis gyro sensor.
  * @return none
  */
-void PIOS_IMU3000_Init(const struct pios_imu3000_cfg * cfg)
+void PIOS_IMU3000_Init(const struct pios_imu3000_cfg * new_cfg)
 {
+	cfg = new_cfg;
+	
 	fifoBuf_init(&pios_imu3000_fifo, (uint8_t *) pios_imu3000_buffer, sizeof(pios_imu3000_buffer));
 
 	/* Configure EOC pin as input floating */
@@ -81,15 +74,7 @@ void PIOS_IMU3000_Init(const struct pios_imu3000_cfg * cfg)
 	NVIC_Init(&cfg->eoc_irq.init);
 
 	/* Configure the IMU3000 Sensor */
-	PIOS_IMU3000_ConfigTypeDef IMU3000_InitStructure;
-	IMU3000_InitStructure.Fifo_store = PIOS_IMU3000_FIFO_GYRO_X_OUT |
-			PIOS_IMU3000_FIFO_GYRO_Y_OUT | PIOS_IMU3000_FIFO_GYRO_Z_OUT | PIOS_IMU3000_FIFO_FOOTER;
-	IMU3000_InitStructure.Smpl_rate_div = 3; // Clock at 8 khz, downsampled by 8 for 1khz
-	IMU3000_InitStructure.DigLPF_Scale = PIOS_IMU3000_LOWPASS_256_HZ | PIOS_IMU3000_SCALE_500_DEG;
-	IMU3000_InitStructure.Interrupt_cfg = PIOS_IMU3000_INT_DATA_RDY | PIOS_IMU3000_INT_CLR_ANYRD;
-	IMU3000_InitStructure.User_ctl = PIOS_IMU3000_USERCTL_FIFO_EN;
-	IMU3000_InitStructure.Pwr_mgmt_clk = PIOS_IMU3000_PWRMGMT_PLL_X_CLK;
-	PIOS_IMU3000_Config(&IMU3000_InitStructure);
+	PIOS_IMU3000_Config(cfg);
 }
 
 /**
@@ -98,7 +83,7 @@ void PIOS_IMU3000_Init(const struct pios_imu3000_cfg * cfg)
  * \param[in] PIOS_IMU3000_ConfigTypeDef struct to be used to configure sensor.
 *
 */
-static void PIOS_IMU3000_Config(PIOS_IMU3000_ConfigTypeDef * IMU3000_Config_Struct)
+static void PIOS_IMU3000_Config(struct pios_imu3000_cfg const * cfg)
 {
 	imu3000_first_read = true;
 	imu3000_cb_ready = true;
@@ -109,22 +94,22 @@ static void PIOS_IMU3000_Config(PIOS_IMU3000_ConfigTypeDef * IMU3000_Config_Stru
 	while (PIOS_IMU3000_Write(PIOS_IMU3000_USER_CTRL_REG, 0x00) != 0);
 
 	// FIFO storage
-	while (PIOS_IMU3000_Write(PIOS_IMU3000_FIFO_EN_REG, IMU3000_Config_Struct->Fifo_store) != 0);
+	while (PIOS_IMU3000_Write(PIOS_IMU3000_FIFO_EN_REG, cfg->Fifo_store) != 0);
 
 	// Sample rate divider
-	while (PIOS_IMU3000_Write(PIOS_IMU3000_SMPLRT_DIV_REG, IMU3000_Config_Struct->Smpl_rate_div) != 0) ;
+	while (PIOS_IMU3000_Write(PIOS_IMU3000_SMPLRT_DIV_REG, cfg->Smpl_rate_div) != 0) ;
 
 	// Digital low-pass filter and scale
-	while (PIOS_IMU3000_Write(PIOS_IMU3000_DLPF_CFG_REG, IMU3000_Config_Struct->DigLPF_Scale) != 0) ;
+	while (PIOS_IMU3000_Write(PIOS_IMU3000_DLPF_CFG_REG, cfg->filter | (cfg->range << 3)) != 0) ;
 
 	// Interrupt configuration
-	while (PIOS_IMU3000_Write(PIOS_IMU3000_USER_CTRL_REG, IMU3000_Config_Struct->User_ctl) != 0) ;
+	while (PIOS_IMU3000_Write(PIOS_IMU3000_USER_CTRL_REG, cfg->User_ctl) != 0) ;
 
 	// Interrupt configuration
-	while (PIOS_IMU3000_Write(PIOS_IMU3000_PWR_MGMT_REG, IMU3000_Config_Struct->Pwr_mgmt_clk) != 0) ;
+	while (PIOS_IMU3000_Write(PIOS_IMU3000_PWR_MGMT_REG, cfg->Pwr_mgmt_clk) != 0) ;
 	
 	// Interrupt configuration
-	while (PIOS_IMU3000_Write(PIOS_IMU3000_INT_CFG_REG, IMU3000_Config_Struct->Interrupt_cfg) != 0) ;
+	while (PIOS_IMU3000_Write(PIOS_IMU3000_INT_CFG_REG, cfg->Interrupt_cfg) != 0) ;
 	
 	imu3000_configured = true;
 }
@@ -134,14 +119,14 @@ static void PIOS_IMU3000_Config(PIOS_IMU3000_ConfigTypeDef * IMU3000_Config_Stru
  * \param[out] int16_t array of size 3 to store X, Z, and Y magnetometer readings
  * \returns The number of samples remaining in the fifo
 */
-int32_t PIOS_IMU3000_ReadGyros(int16_t * data)
+int32_t PIOS_IMU3000_ReadGyros(struct pios_imu3000_data * data)
 {
 	uint8_t buf[6];
 	if(PIOS_IMU3000_Read(PIOS_IMU3000_GYRO_X_OUT_MSB, (uint8_t *) buf, sizeof(buf)) < 0)
 		return -1;
-	data[0] = buf[0] << 8 | buf[1];
-	data[1] = buf[2] << 8 | buf[3];
-	data[2] = buf[4] << 8 | buf[5];
+	data->x = buf[0] << 8 | buf[1];
+	data->y = buf[2] << 8 | buf[3];
+	data->z = buf[4] << 8 | buf[5];
 	return 0;
 }
 
@@ -152,11 +137,10 @@ int32_t PIOS_IMU3000_ReadGyros(int16_t * data)
 */
 int32_t PIOS_IMU3000_ReadID()
 {
-	uint8_t id;
+	uint8_t imu3000_id;
 	if(PIOS_IMU3000_Read(0x00, (uint8_t *) &imu3000_id, 1) != 0)
 		return -1;
-	id = imu3000_id;
-	return id;
+	return imu3000_id;
 }
 
 /**
@@ -167,13 +151,12 @@ int32_t PIOS_IMU3000_ReadID()
  * \return number of bytes transferred if operation was successful
  * \return -1 if error during I2C transfer
  */
-#define IMU3000_DATA_SIZE 6
-int32_t PIOS_IMU3000_ReadFifo(int16_t * buffer)
+int32_t PIOS_IMU3000_ReadFifo(struct pios_imu3000_data * buffer)
 {
-	if(fifoBuf_getUsed(&pios_imu3000_fifo) < IMU3000_DATA_SIZE)
+	if(fifoBuf_getUsed(&pios_imu3000_fifo) < sizeof(*buffer))
 		return -1;
 		
-	fifoBuf_getData(&pios_imu3000_fifo, (uint8_t *) buffer, IMU3000_DATA_SIZE);
+	fifoBuf_getData(&pios_imu3000_fifo, (uint8_t *) buffer, sizeof(*buffer));
 	
 	return 0;
 }
@@ -277,6 +260,20 @@ static int32_t PIOS_IMU3000_Write(uint8_t address, uint8_t buffer)
 	return PIOS_I2C_Transfer(PIOS_I2C_GYRO_ADAPTER, txn_list, NELEMENTS(txn_list)) ? 0 : -1;
 }
 
+float PIOS_IMU3000_GetScale() 
+{
+	switch (cfg->range) {
+		case PIOS_IMU3000_SCALE_250_DEG:
+			return DEG_TO_RAD / 131.0;
+		case PIOS_IMU3000_SCALE_500_DEG:
+			return DEG_TO_RAD / 65.5;
+		case PIOS_IMU3000_SCALE_1000_DEG:
+			return DEG_TO_RAD / 32.8;
+		case PIOS_IMU3000_SCALE_2000_DEG:
+			return DEG_TO_RAD / 16.4;
+	}
+	return 0;
+}
 /**
  * @brief Run self-test operation.
  * \return 0 if test succeeded
@@ -285,40 +282,42 @@ static int32_t PIOS_IMU3000_Write(uint8_t address, uint8_t buffer)
 uint8_t PIOS_IMU3000_Test(void)
 {
 	/* Verify that ID matches (IMU3000 ID is 0x69) */
-	int32_t id = 0;
-	id = PIOS_IMU3000_ReadID();
-	if(id < 0)
+	int32_t imu3000_id = PIOS_IMU3000_ReadID();
+	if(imu3000_id < 0)
 		return -1;
 	
-	if(id != PIOS_IMU3000_I2C_ADDR)
+	if(imu3000_id != PIOS_IMU3000_I2C_ADDR)
 		return -2;
 	
 	return 0;
 }
 
-uint32_t cb_count = 0;
-uint8_t imu3000_read_buffer[IMU3000_DATA_SIZE + 2]; // Right now using ,Y,Z,fifo_footer
-int16_t imu3000_data_buffer[IMU3000_DATA_SIZE / sizeof(int16_t)];
-uint32_t imu_read = 0;
+static uint8_t imu3000_read_buffer[sizeof(struct pios_imu3000_data) + 2]; // Right now using ,Y,Z,fifo_footer
 static void imu3000_callback()
 {
-	imu3000_cb_ready = true;
-	cb_count++;
+	struct pios_imu3000_data data;
+
+	if(fifoBuf_getFree(&pios_imu3000_fifo) < sizeof(data))
+		goto out;
+
 	if(imu3000_first_read) {
-		imu3000_data_buffer[0] = imu3000_read_buffer[0] << 8 | imu3000_read_buffer[1];
-		imu3000_data_buffer[1] = imu3000_read_buffer[2] << 8 | imu3000_read_buffer[3];
-		imu3000_data_buffer[2] = imu3000_read_buffer[4] << 8 | imu3000_read_buffer[5];
+		data.x = imu3000_read_buffer[0] << 8 | imu3000_read_buffer[1];
+		data.y = imu3000_read_buffer[2] << 8 | imu3000_read_buffer[3];
+		data.z = imu3000_read_buffer[4] << 8 | imu3000_read_buffer[5];
 		
 		imu3000_first_read = false;
 	} else {
 		// First two bytes are left over fifo from last call
-		imu3000_data_buffer[0] = imu3000_read_buffer[2] << 8 | imu3000_read_buffer[3];
-		imu3000_data_buffer[1] = imu3000_read_buffer[4] << 8 | imu3000_read_buffer[5];
-		imu3000_data_buffer[2] = imu3000_read_buffer[6] << 8 | imu3000_read_buffer[7];
+		data.x = imu3000_read_buffer[2] << 8 | imu3000_read_buffer[3];
+		data.y = imu3000_read_buffer[4] << 8 | imu3000_read_buffer[5];
+		data.z = imu3000_read_buffer[6] << 8 | imu3000_read_buffer[7];
 
 	}
-	fifoBuf_putData(&pios_imu3000_fifo, (uint8_t *) imu3000_data_buffer, sizeof(imu3000_data_buffer));
-	imu_read += sizeof(imu3000_data_buffer);
+	
+	fifoBuf_putData(&pios_imu3000_fifo, (uint8_t *) &data, sizeof(data));
+	
+out:
+	imu3000_cb_ready = true;
 
 }
 

@@ -71,20 +71,6 @@
 #define PIOS_IMU3000_FIFO_GYRO_Z_OUT      0x10
 #define PIOS_IMU3000_FIFO_FOOTER          0x01
 
-/* Gyro full-scale range */
-#define PIOS_IMU3000_SCALE_250_DEG        (0x00 << 3)
-#define PIOS_IMU3000_SCALE_500_DEG        (0x01 << 3)
-#define PIOS_IMU3000_SCALE_1000_DEG       (0x02 << 3)
-#define PIOS_IMU3000_SCALE_2000_DEG       (0x03 << 3)
-
-/* Digital low-pass filter configuration */
-#define PIOS_IMU3000_LOWPASS_256_HZ       0x00
-#define PIOS_IMU3000_LOWPASS_188_HZ       0x01
-#define PIOS_IMU3000_LOWPASS_98_HZ        0x02
-#define PIOS_IMU3000_LOWPASS_42_HZ        0x03
-#define PIOS_IMU3000_LOWPASS_20_HZ        0x04
-#define PIOS_IMU3000_LOWPASS_10_HZ        0x05
-#define PIOS_IMU3000_LOWPASS_5_HZ         0x06
 
 /* Interrupt Configuration */
 #define PIOS_IMU3000_INT_ACTL             0x80
@@ -112,26 +98,50 @@
 #define PIOS_IMU3000_PWRMGMT_PLL_Z_CLK    0X03
 #define PIOS_IMU3000_PWRMGMT_STOP_CLK     0X07
 
+enum pios_imu3000_range {
+	PIOS_IMU3000_SCALE_250_DEG  = 0x00,
+	PIOS_IMU3000_SCALE_500_DEG  = 0x01,
+	PIOS_IMU3000_SCALE_1000_DEG = 0x02,
+	PIOS_IMU3000_SCALE_2000_DEG = 0x03
+};
+
+enum pios_imu3000_filter {
+	PIOS_IMU3000_LOWPASS_256_HZ = 0x00,
+	PIOS_IMU3000_LOWPASS_188_HZ = 0x01,
+	PIOS_IMU3000_LOWPASS_98_HZ  = 0x02,
+	PIOS_IMU3000_LOWPASS_42_HZ  = 0x03,
+	PIOS_IMU3000_LOWPASS_20_HZ  = 0x04,
+	PIOS_IMU3000_LOWPASS_10_HZ  = 0x05,
+	PIOS_IMU3000_LOWPASS_5_HZ   = 0x06
+};
+
 struct pios_imu3000_data {
 	int16_t x;
 	int16_t y;
 	int16_t z;
-	int16_t temp;
 };
 
 struct pios_imu3000_cfg {
 	struct stm32_gpio drdy;
 	struct stm32_exti eoc_exti;
 	struct stm32_irq eoc_irq;
+	
+	uint8_t Fifo_store;		/* FIFO storage of different readings (See datasheet page 31 for more details) */
+	uint8_t Smpl_rate_div;	/* Sample rate divider to use (See datasheet page 32 for more details) */
+	uint8_t Interrupt_cfg;	/* Interrupt configuration (See datasheet page 35 for more details) */
+	uint8_t User_ctl;		/* User control settings (See datasheet page 41 for more details)  */
+	uint8_t Pwr_mgmt_clk;	/* Power management and clock selection (See datasheet page 32 for more details) */
+	enum pios_imu3000_range range;
+	enum pios_imu3000_filter filter;
 };
 
 /* Public Functions */
 extern void PIOS_IMU3000_Init(const struct pios_imu3000_cfg * cfg);
-extern bool PIOS_IMU3000_NewDataAvailable(void);
-extern int32_t PIOS_IMU3000_ReadFifo(int16_t * buffer);
-extern int32_t PIOS_IMU3000_ReadGyros(int16_t * data);
+extern int32_t PIOS_IMU3000_ReadFifo(struct pios_imu3000_data * buffer);
+extern int32_t PIOS_IMU3000_ReadGyros(struct pios_imu3000_data * buffer);
 extern int32_t PIOS_IMU3000_ReadID();
 extern uint8_t PIOS_IMU3000_Test();
+extern float PIOS_IMU3000_GetScale();
 
 #endif /* PIOS_IMU3000_H */
 

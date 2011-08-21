@@ -1093,6 +1093,7 @@ void PIOS_Board_Init(void) {
 
 	/* Configure the selected receiver */
 	uint8_t manualcontrolsettings_inputmode;
+	ManualControlSettingsInitialize();
 	ManualControlSettingsInputModeGet(&manualcontrolsettings_inputmode);
 
 	switch (manualcontrolsettings_inputmode) {

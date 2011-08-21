@@ -585,6 +585,11 @@ static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
 			.NVIC_IRQChannelCmd = ENABLE,
 		},
 	},
+	.M_ODR = PIOS_HMC5883_ODR_75,
+	.Meas_Conf = PIOS_HMC5883_MEASCONF_NORMAL,
+	.Gain = PIOS_HMC5883_GAIN_1_9,
+	.Mode = PIOS_HMC5883_MODE_CONTINUOUS,
+
 };
 
 #include "pios_bma180.h"

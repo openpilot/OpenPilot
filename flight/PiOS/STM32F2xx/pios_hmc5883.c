@@ -37,17 +37,11 @@
 /* Global Variables */
 
 /* Local Types */
-typedef struct {
-	uint8_t M_ODR;		/* OUTPUT DATA RATE --> here below the relative define (See datasheet page 11 for more details) */
-	uint8_t Meas_Conf;	/* Measurement Configuration,: Normal, positive bias, or negative bias --> here below the relative define */
-	uint8_t Gain;		/* Gain Configuration, select the full scale --> here below the relative define (See datasheet page 11 for more details) */
-	uint8_t Mode;
-} PIOS_HMC5883_ConfigTypeDef;
 
 /* Local Variables */
 volatile bool pios_hmc5883_data_ready;
 
-static int32_t PIOS_HMC5883_Config(PIOS_HMC5883_ConfigTypeDef * HMC5883_Config_Struct);
+static int32_t PIOS_HMC5883_Config(const struct pios_hmc5883_cfg * cfg);
 static int32_t PIOS_HMC5883_Read(uint8_t address, uint8_t * buffer, uint8_t len);
 static int32_t PIOS_HMC5883_Write(uint8_t address, uint8_t buffer);
 
@@ -71,13 +65,7 @@ void PIOS_HMC5883_Init(const struct pios_hmc5883_cfg * cfg)
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
 	NVIC_Init(&cfg->eoc_irq.init);
 	
-	/* Configure the HMC5883 Sensor */
-	PIOS_HMC5883_ConfigTypeDef HMC5883_InitStructure;
-	HMC5883_InitStructure.M_ODR = PIOS_HMC5883_ODR_75;
-	HMC5883_InitStructure.Meas_Conf = PIOS_HMC5883_MEASCONF_NORMAL;
-	HMC5883_InitStructure.Gain = PIOS_HMC5883_GAIN_1_9;
-	HMC5883_InitStructure.Mode = PIOS_HMC5883_MODE_CONTINUOUS;
-	int32_t val = PIOS_HMC5883_Config(&HMC5883_InitStructure);
+	int32_t val = PIOS_HMC5883_Config(cfg);
 	
 	PIOS_Assert(val == 0);
 	
@@ -144,15 +132,15 @@ void PIOS_HMC5883_Init(const struct pios_hmc5883_cfg * cfg)
  *              1  |  1   |  Sleep Mode
  */
 static uint8_t CTRLB = 0x00;
-static int32_t PIOS_HMC5883_Config(PIOS_HMC5883_ConfigTypeDef * HMC5883_Config_Struct)
+static int32_t PIOS_HMC5883_Config(const struct pios_hmc5883_cfg * cfg)
 {
 	uint8_t CTRLA = 0x00;
 	uint8_t MODE = 0x00;
 	CTRLB = 0;
 	
-	CTRLA |= (uint8_t) (HMC5883_Config_Struct->M_ODR | HMC5883_Config_Struct->Meas_Conf);
-	CTRLB |= (uint8_t) (HMC5883_Config_Struct->Gain);
-	MODE |= (uint8_t) (HMC5883_Config_Struct->Mode);
+	CTRLA |= (uint8_t) (cfg->M_ODR | cfg->Meas_Conf);
+	CTRLB |= (uint8_t) (cfg->Gain);
+	MODE |= (uint8_t) (cfg->Mode);
 	
 	// CRTL_REGA
 	if (PIOS_HMC5883_Write(PIOS_HMC5883_CONFIG_REG_A, CTRLA) != 0)
@@ -174,6 +162,8 @@ static int32_t PIOS_HMC5883_Config(PIOS_HMC5883_ConfigTypeDef * HMC5883_Config_S
  * \param[out] int16_t array of size 3 to store X, Z, and Y magnetometer readings
  * \return 0 for success or -1 for failure
  */
+uint32_t fail = 0;
+uint32_t succeed = 0;
 int32_t PIOS_HMC5883_ReadMag(int16_t out[3])
 {
 	pios_hmc5883_data_ready = false;
@@ -181,8 +171,11 @@ int32_t PIOS_HMC5883_ReadMag(int16_t out[3])
 	int32_t temp;
 	int32_t sensitivity;
 	
-	if (PIOS_HMC5883_Read(PIOS_HMC5883_DATAOUT_XMSB_REG, buffer, 6) != 0)
+	if (PIOS_HMC5883_Read(PIOS_HMC5883_DATAOUT_XMSB_REG, buffer, 6) != 0) {
+		fail++;
 		return -1;
+	}
+	succeed++;
 		
 	switch (CTRLB & 0xE0) {
 		case 0x00:
@@ -222,6 +215,9 @@ int32_t PIOS_HMC5883_ReadMag(int16_t out[3])
 	temp = out[2];
 	out[2] = out[1];
 	out[1] = temp;
+	
+	// This should not be necessary but for some reason it is coming out of continuous conversion mode
+	PIOS_HMC5883_Write(PIOS_HMC5883_MODE_REG, PIOS_HMC5883_MODE_CONTINUOUS);
 	
 	return 0;
 }
@@ -382,7 +378,7 @@ int32_t PIOS_HMC5883_Test(void)
 	 failed |= 1;
 	 if(abs(values[2] - 713) > 20)
 	 failed |= 1;
-	 */
+	*/
 	
 	PIOS_HMC5883_Read(PIOS_HMC5883_CONFIG_REG_A, &ctrl_a_read,1);
 	PIOS_HMC5883_Read(PIOS_HMC5883_CONFIG_REG_B, &ctrl_b_read,1);

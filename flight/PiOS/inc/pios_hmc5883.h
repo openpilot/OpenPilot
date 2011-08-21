@@ -97,6 +97,12 @@ struct pios_hmc5883_cfg {
 	struct stm32_gpio drdy;
 	struct stm32_exti eoc_exti;
 	struct stm32_irq eoc_irq;
+	
+	uint8_t M_ODR;		/* OUTPUT DATA RATE --> here below the relative define (See datasheet page 11 for more details) */
+	uint8_t Meas_Conf;	/* Measurement Configuration,: Normal, positive bias, or negative bias --> here below the relative define */
+	uint8_t Gain;		/* Gain Configuration, select the full scale --> here below the relative define (See datasheet page 11 for more details) */
+	uint8_t Mode;
+	
 };
 
 /* Public Functions */

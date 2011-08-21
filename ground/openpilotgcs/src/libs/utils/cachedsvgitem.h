@@ -28,12 +28,14 @@
 #include <QGraphicsSvgItem>
 #include <QGLContext>
 
+#include "utils_global.h"
+
 class QGLContext;
 
 //Cache Svg item as GL Texture.
 //Texture is regenerated each time item is scaled
 //but it's reused during rotation, unlike DeviceCoordinateCache mode
-class CachedSvgItem: public QGraphicsSvgItem
+class QTCREATOR_UTILS_EXPORT CachedSvgItem: public QGraphicsSvgItem
 {
     Q_OBJECT
 public:

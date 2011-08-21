@@ -26,6 +26,8 @@
 #include <QGLContext>
 #include <QDebug>
 
+#include <GL/glext.h>
+
 CachedSvgItem::CachedSvgItem(QGraphicsItem * parent) :
     QGraphicsSvgItem(parent),
     m_context(0),

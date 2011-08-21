@@ -72,7 +72,6 @@ TIM8  |           |           |           |
 #define BOARD_READABLE	TRUE
 #define BOARD_WRITABLE	TRUE
 #define MAX_DEL_RETRYS	3
-#define EKF_RATE		75
 
 
 //------------------------

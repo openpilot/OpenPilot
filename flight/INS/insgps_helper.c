@@ -43,16 +43,27 @@ extern void send_position(void);
 extern volatile int8_t ahrs_algorithm;
 extern void get_accel_gyro_data();
 
+static uint32_t ins_last_time;
+
 /* INS functions */
 /**
  * @brief Update the EKF when in outdoor mode.  The primary difference is using the GPS values.
  */
+
 void ins_outdoor_update()
 {
 	float gyro[3], accel[3], vel[3];
 	static uint32_t last_gps_time = 0;
+	float dT;
 	uint16_t sensors;
 	
+	dT = PIOS_DELAY_DiffuS(ins_last_time) / 1e6;
+	ins_last_time = PIOS_DELAY_GetRaw();
+	
+	// This should only happen at start up or at mode switches
+	if(dT > 0.01)
+		dT = 0.01;
+		
 	// format data for INS algo
 	gyro[0] = gyro_data.filtered.x;
 	gyro[1] = gyro_data.filtered.y;
@@ -61,7 +72,7 @@ void ins_outdoor_update()
 	accel[1] = accel_data.filtered.y,
 	accel[2] = accel_data.filtered.z,
 	
-	INSStatePrediction(gyro, accel, 1 / (float)EKF_RATE);
+	INSStatePrediction(gyro, accel, dT);
 	attitude_data.quaternion.q1 = Nav.q[0];
 	attitude_data.quaternion.q2 = Nav.q[1];
 	attitude_data.quaternion.q3 = Nav.q[2];
@@ -69,7 +80,7 @@ void ins_outdoor_update()
 	send_attitude();  // get message out quickly
 	send_velocity();
 	send_position();
-	INSCovariancePrediction(1 / (float)EKF_RATE);
+	INSCovariancePrediction(dT);
 	
 	sensors = 0;
 	
@@ -135,15 +146,27 @@ void ins_outdoor_update()
 	INSCorrection(mag_data.scaled.axis, gps_data.NED, vel, altitude_data.altitude - baro_offset, sensors);
 }
 
-
+uint32_t time_val_a;
+uint32_t indoor_time;
 /**
  * @brief Update the EKF when in indoor mode
  */
 void ins_indoor_update()
 {
+	time_val_a = PIOS_DELAY_GetRaw();
+	
 	float gyro[3], accel[3], vel[3];
 	static uint32_t last_indoor_time = 0;
 	uint16_t sensors = 0;
+	float dT;
+
+	dT = PIOS_DELAY_DiffuS(ins_last_time) / 1e6;
+	ins_last_time = PIOS_DELAY_GetRaw();
+	
+	// This should only happen at start up or at mode switches
+	if(dT > 0.01)
+		dT = 0.01;
+
 	
 	// format data for INS algo
 	gyro[0] = gyro_data.filtered.x;
@@ -153,7 +176,7 @@ void ins_indoor_update()
 	accel[1] = accel_data.filtered.y,
 	accel[2] = accel_data.filtered.z,
 	
-	INSStatePrediction(gyro, accel, 1 / (float)EKF_RATE);
+	INSStatePrediction(gyro, accel, dT);
 	attitude_data.quaternion.q1 = Nav.q[0];
 	attitude_data.quaternion.q2 = Nav.q[1];
 	attitude_data.quaternion.q3 = Nav.q[2];
@@ -161,7 +184,7 @@ void ins_indoor_update()
 	send_attitude();  // get message out quickly
 	send_velocity();
 	send_position();
-	INSCovariancePrediction(1 / (float)EKF_RATE);
+	INSCovariancePrediction(dT);
 	
 	/* Indoors, update with zero position and velocity and high covariance */
 	vel[0] = 0;
@@ -202,6 +225,7 @@ void ins_indoor_update()
 	 * although probably should occur within INS itself
 	 */
 	INSCorrection(mag_data.scaled.axis, gps_data.NED, vel, altitude_data.altitude, sensors | HORIZ_SENSORS | VERT_SENSORS);
+	indoor_time = PIOS_DELAY_DiffuS(time_val_a);
 }
 
 /**

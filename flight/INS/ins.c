@@ -128,7 +128,6 @@ struct gps_sensor gps_data;
 static float mag_len = 0;
 
 typedef enum { INS_IDLE, INS_DATA_READY, INS_PROCESSING } states;
-volatile int32_t ekf_too_slow;
 
 /**
  * @}
@@ -138,22 +137,10 @@ volatile int32_t ekf_too_slow;
  * @brief INS Main function
  */
 
-int16_t accel_data_glob[3];
-int16_t gyro_data_glob[3];
-int16_t mag_data_glob[3];
-
-uint32_t pin;
-int16_t accel[3];
-
 uint32_t total_conversion_blocks;
 
 
-int32_t gyro_error;
-int16_t gyro[4];	
-int16_t mag[3];
-int16_t accel[3];
 float altitude;
-int32_t pressure;
 
 int32_t dr;
 
@@ -174,8 +161,7 @@ int main()
 		
 	// Sensors need a second to start
 	PIOS_DELAY_WaitmS(100);
-	
-	
+
 	// Sensor test
 	if(PIOS_IMU3000_Test() != 0)
 		panic(1);
@@ -193,13 +179,14 @@ int main()
 	PIOS_LED_Off(LED2);
 
 	// Flash warning light while trying to connect
-	uint32_t time_val = PIOS_DELAY_GetRaw();
+	uint32_t time_val1 = PIOS_DELAY_GetRaw();
+	uint32_t time_val2;
 	uint32_t ms_count = 0;
 	while(!AhrsLinkReady()) {
 		AhrsPoll();
-		if(PIOS_DELAY_DiffuS(time_val) > 1000) {
+		if(PIOS_DELAY_DiffuS(time_val1) > 1000) {
 			ms_count += 1;
-			time_val = PIOS_DELAY_GetRaw();
+			time_val1 = PIOS_DELAY_GetRaw();
 		}
 		if(ms_count > 100) {
 			PIOS_LED_Toggle(LED2);
@@ -222,17 +209,13 @@ int main()
 		AhrsPoll();
 		AhrsStatusData status;
 		AhrsStatusGet(&status);
-		status.DroppedUpdates = ekf_too_slow;
-		AhrsStatusSet(&status);
 		
 		// Alive signal
-		if ((total_conversion_blocks % 100) == 0)
+		if ((total_conversion_blocks++ % 100) == 0)
 			PIOS_LED_Toggle(LED1);
-		total_conversion_blocks++;
-		// Delay for valid data
 		
-		loop_time = PIOS_DELAY_DiffuS(time_val);
-		time_val = PIOS_DELAY_GetRaw();
+		loop_time = PIOS_DELAY_DiffuS(time_val1);
+		time_val1 = PIOS_DELAY_GetRaw();
 		
 		// This function blocks till data avilable
 		get_accel_gyro_data();
@@ -240,13 +223,15 @@ int main()
 		// Get any mag data available
 		process_mag_data();
 		
+		status.IdleTimePerCyle = PIOS_DELAY_DiffuS(time_val1) / 10;
+		
 		if(ISNAN(accel_data.filtered.x + accel_data.filtered.y + accel_data.filtered.z) ||
 		   ISNAN(gyro_data.filtered.x + gyro_data.filtered.y + gyro_data.filtered.z) ||
 		   ACCEL_OOB(accel_data.filtered.x + accel_data.filtered.y + accel_data.filtered.z) ||
 		   GYRO_OOB(gyro_data.filtered.x + gyro_data.filtered.y + gyro_data.filtered.z)) {
 			// If any values are NaN or huge don't update
 			//TODO: add field to ahrs status to track number of these events
-			continue;
+			//continue;
 		}
 		
 		//print_ekf_binary();
@@ -255,6 +240,8 @@ int main()
 		if (ahrs_algorithm != last_ahrs_algorithm)
 			ins_init_algorithm(); 
 		last_ahrs_algorithm = ahrs_algorithm; 
+		
+		time_val2 = PIOS_DELAY_GetRaw();
 		
 		switch(ahrs_algorithm) {
 			case AHRSSETTINGS_ALGORITHM_SIMPLE:
@@ -268,6 +255,9 @@ int main()
 				ins_indoor_update();
 				break;
 		}
+		
+		status.RunningTimePerCyle = PIOS_DELAY_DiffuS(time_val2) / 10;
+		AhrsStatusSet(&status);
 	}
 	
 	return 0;
@@ -352,67 +342,75 @@ static void panic(uint32_t blinks)
  * This function will act as the HAL for the new INS sensors
  */
  
-uint8_t accel_samples;
-uint8_t gyro_samples;
+uint32_t accel_samples;
+uint32_t gyro_samples;
+struct pios_bma180_data accel;
+struct pios_imu3000_data gyro;
+AttitudeRawData raw;
+int32_t accel_accum[3] = {0, 0, 0};
+int32_t gyro_accum[3] = {0,0,0};
+float scaling;
+
 bool get_accel_gyro_data()
 {
-	int16_t accel[3];
-	int32_t accel_accum[3] = {0, 0, 0};
-	accel_samples = 0;
-	
-	t_fifo_buffer * accel_fifo = PIOS_BMA180_GetFifo();
-	while(fifoBuf_getUsed(accel_fifo) < sizeof(accel));
-	while(fifoBuf_getUsed(accel_fifo) >= sizeof(accel)) {	
-		accel_samples++;
-		fifoBuf_getData(accel_fifo, (uint8_t *) accel, sizeof(accel));
-		accel_accum[0] += accel[0];
-		accel_accum[1] += accel[1];
-		accel_accum[2] += accel[2];
-	}
-	accel[0] = accel_accum[0] / accel_samples;
-	accel[1] = accel_accum[1] / accel_samples;
-	accel[2] = accel_accum[2] / accel_samples;
-
-	int32_t gyro_accum[3] = {0,0,0};
-	int16_t gyro[3];
 	int32_t read_good;
+	int32_t count;
+	
+	for (int i = 0; i < 3; i++) {
+		accel_accum[i] = 0;
+		gyro_accum[i] = 0;
+	}
+	accel_samples = 0;
+	gyro_samples = 0;
 	
 	// Make sure we get one sample
-	while((read_good = PIOS_IMU3000_ReadFifo(gyro)) != 0);
-	while(read_good == 0) {
-		gyro_samples++;
+	count = 0;
+	while((read_good = PIOS_BMA180_ReadFifo(&accel)) != 0);
+	while(read_good == 0) {	
+		count++;
 
-		gyro_accum[0] += gyro[0];
-		gyro_accum[1] += gyro[1];
-		gyro_accum[2] += gyro[2];
-		read_good = PIOS_IMU3000_ReadFifo(gyro);
+		accel_accum[0] += accel.x;
+		accel_accum[1] += accel.y;
+		accel_accum[2] += accel.z;
+		
+		read_good = PIOS_BMA180_ReadFifo(&accel);
 	}
-	gyro[0] = gyro_accum[0] / gyro_samples;
-	gyro[1] = gyro_accum[1] / gyro_samples;
-	gyro[2] = gyro_accum[2] / gyro_samples;
+	accel_samples = count;
+
+	// Make sure we get one sample
+	count = 0;
+	while((read_good = PIOS_IMU3000_ReadFifo(&gyro)) != 0);
+	while(read_good == 0) {
+		count++;
+
+		gyro_accum[0] += gyro.x;
+		gyro_accum[1] += gyro.y;
+		gyro_accum[2] += gyro.z;
+		
+		read_good = PIOS_IMU3000_ReadFifo(&gyro);
+	}
+	gyro_samples = count;
 
 	// Not the swaping of channel orders
-	accel_data.filtered.x = accel[0] * PIOS_BMA180_GetScale();
-	accel_data.filtered.y = accel[1] * PIOS_BMA180_GetScale();
-	accel_data.filtered.z = accel[2] * PIOS_BMA180_GetScale();
-	gyro_data.filtered.x = -gyro[1] * 0.00763 * DEG_TO_RAD;;
-	gyro_data.filtered.y = -gyro[0] * 0.00763 * DEG_TO_RAD;;
-	gyro_data.filtered.z = -gyro[2] * 0.00763 * DEG_TO_RAD;;
-	
-	AttitudeRawData raw;
-		
-	raw.gyros[0] = gyro_data.filtered.x * RAD_TO_DEG;
-	raw.gyros[1] = gyro_data.filtered.y * RAD_TO_DEG;
-	raw.gyros[2] = gyro_data.filtered.z * RAD_TO_DEG;
+	scaling = PIOS_BMA180_GetScale() / accel_samples;
+	accel_data.filtered.x = -accel_accum[0] * scaling;
+	accel_data.filtered.y = accel_accum[1] * scaling;
+	accel_data.filtered.z = -accel_accum[2] * scaling;
+
+	scaling = PIOS_IMU3000_GetScale() / gyro_samples;
+	gyro_data.filtered.x = ((float) gyro_accum[1]) * scaling;
+	gyro_data.filtered.y = ((float) gyro_accum[0]) * scaling;
+	gyro_data.filtered.z = -((float) gyro_accum[2]) * scaling;
 	
 	raw.accels[0] = accel_data.filtered.x;
 	raw.accels[1] = accel_data.filtered.y;
 	raw.accels[2] = accel_data.filtered.z;
-	
+	raw.gyros[0] = gyro_data.filtered.x * RAD_TO_DEG;
+	raw.gyros[1] = gyro_data.filtered.y * RAD_TO_DEG;
+	raw.gyros[2] = gyro_data.filtered.z * RAD_TO_DEG;
 	raw.magnetometers[0] = mag_data.scaled.axis[0];
 	raw.magnetometers[1] = mag_data.scaled.axis[1];
 	raw.magnetometers[2] = mag_data.scaled.axis[2];
-	
 	AttitudeRawSet(&raw);
 	
 	return true;
@@ -733,16 +731,6 @@ void calibration_callback(AhrsObjHandle obj)
 		accel_data.calibration.scale[1][2] = cal.accel_ortho[2];
 		accel_data.calibration.scale[2][1] = cal.accel_ortho[2];
 
-#if 0
-		// TODO: Enable after v1.0 feature freeze.
-		float rotation[3] = { cal.accel_rotation[0],
-				cal.accel_rotation[1],
-				cal.accel_rotation[2],
-		};
-
-		affine_rotate(accel_data.calibration.scale, rotation);
-#endif
-
 		for(int ct=0; ct<3; ct++)
 		{
 			accel_data.calibration.scale[ct][ct] = cal.accel_scale[ct];
@@ -752,9 +740,7 @@ void calibration_callback(AhrsObjHandle obj)
 			gyro_data.calibration.scale[ct] = cal.gyro_scale[ct];
 			gyro_data.calibration.bias[ct] = cal.gyro_bias[ct];
 			gyro_data.calibration.variance[ct] = cal.gyro_var[ct];
-#if 1
-			gyro_data.calibration.tempcompfactor[ct] = cal.gyro_tempcompfactor[ct];
-#endif
+
 			mag_data.calibration.bias[ct] = cal.mag_bias[ct];
 			mag_data.calibration.scale[ct] = cal.mag_scale[ct];
 			mag_data.calibration.variance[ct] = cal.mag_var[ct];

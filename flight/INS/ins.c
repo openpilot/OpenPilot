@@ -223,7 +223,7 @@ int main()
 		// Get any mag data available
 		process_mag_data();
 		
-		status.IdleTimePerCyle = PIOS_DELAY_DiffuS(time_val1) / 10;
+		status.IdleTimePerCycle = PIOS_DELAY_DiffuS(time_val1);
 		
 		if(ISNAN(accel_data.filtered.x + accel_data.filtered.y + accel_data.filtered.z) ||
 		   ISNAN(gyro_data.filtered.x + gyro_data.filtered.y + gyro_data.filtered.z) ||
@@ -256,7 +256,7 @@ int main()
 				break;
 		}
 		
-		status.RunningTimePerCyle = PIOS_DELAY_DiffuS(time_val2) / 10;
+		status.RunningTimePerCycle = PIOS_DELAY_DiffuS(time_val2);
 		AhrsStatusSet(&status);
 	}
 	

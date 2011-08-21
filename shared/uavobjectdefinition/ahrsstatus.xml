@@ -4,9 +4,8 @@
         <field name="SerialNumber" units="" type="uint8" elements="8"/>
         <field name="CPULoad" units="count" type="uint8" elements="1"/>
         <field name="RunningTime" units="ms" type="uint32" elements="1"/>
-        <field name="IdleTimePerCyle" units="10x ms" type="uint8" elements="1"/>
-        <field name="RunningTimePerCyle" units="10x ms" type="uint8" elements="1"/>
-        <field name="DroppedUpdates" units="count" type="uint8" elements="1"/>
+        <field name="IdleTimePerCycle" units="us" type="uint16" elements="1"/>
+        <field name="RunningTimePerCycle" units="us" type="uint16" elements="1"/>
 
         <field name="LinkRunning" units="" type="enum" elements="1" options="FALSE,TRUE"/>
         <field name="AhrsKickstarts" units="count" type="uint8" elements="1"/>

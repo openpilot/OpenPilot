@@ -79,6 +79,7 @@ CREATEHANDLE(10, FirmwareIAPObj);
 static void ObjectUpdatedCb(UAVObjEvent * ev);
 
 #define ADDHANDLE(idx,obj) {\
+		obj##Initialize();\
 		int n = idx;\
 		objectHandles[n].data = &obj;\
 		objectHandles[n].uavHandle = obj##Handle();\

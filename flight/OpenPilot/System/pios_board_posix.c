@@ -30,6 +30,7 @@
 #include <uavobjectsinit.h>
 
 #include "attituderaw.h"
+#include "attitudeactual.h"
 #include "positionactual.h"
 #include "velocityactual.h"
 
@@ -177,6 +178,7 @@ void PIOS_Board_Init(void) {
 
 	// Initialize these here as posix has no AHRSComms
 	AttitudeRawInitialize();
+	AttitudeActualInitialize();
 	VelocityActualInitialize();
 	PositionActualInitialize();
 

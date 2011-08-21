@@ -181,16 +181,7 @@ SECTIONS
         . = ALIGN(4);
     } >FLASH
  
-    
-    /* init sections */
-    .initcalluavobj.init :
-    {
-        . = ALIGN(4);
-	__uavobj_initcall_start = .;
-        KEEP(*(.initcalluavobj.init))
-	. = ALIGN(4);
-	__uavobj_initcall_end   = .;
-    } >FLASH
+
 
     /* the program code is stored in the .text section, which goes to Flash */
     .text :

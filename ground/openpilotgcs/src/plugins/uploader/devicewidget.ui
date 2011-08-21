@@ -93,10 +93,10 @@
               <item>
                <widget class="QPushButton" name="pbLoad">
                 <property name="toolTip">
-                 <string>Loads the firmware</string>
+                 <string>Open a file with new firmware image to be flashed</string>
                 </property>
                 <property name="text">
-                 <string>Load...</string>
+                 <string>Open...</string>
                 </property>
                </widget>
               </item>
@@ -116,7 +116,7 @@
                  <bool>false</bool>
                 </property>
                 <property name="toolTip">
-                 <string>Update the firmware on this board.</string>
+                 <string>Write loaded firmware image to the board</string>
                 </property>
                 <property name="text">
                  <string>Flash</string>
@@ -126,7 +126,7 @@
               <item>
                <widget class="QPushButton" name="retrieveButton">
                 <property name="toolTip">
-                 <string>Download the current board firmware to your computer</string>
+                 <string>Read and save current board firmware to a file</string>
                 </property>
                 <property name="text">
                  <string>Retrieve...</string>
@@ -228,7 +228,7 @@
         <item>
          <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>GIT Tag:</string>
+           <string>Git tag:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

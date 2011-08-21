@@ -39,7 +39,6 @@
 #define configUSE_RECURSIVE_MUTEXES	1
 #define configUSE_COUNTING_SEMAPHORES	0
 #define configUSE_ALTERNATIVE_API	0
-#define configCHECK_FOR_STACK_OVERFLOW	2
 #define configQUEUE_REGISTRY_SIZE	10
 
 /* Co-routine definitions. */
@@ -76,7 +75,9 @@ NVIC value of 255. */
 #endif
 
 /* Enable run time stats collection */
-//#if defined(DEBUG)
+#if defined(DIAGNOSTICS)
+#define configCHECK_FOR_STACK_OVERFLOW	2
+
 #define configGENERATE_RUN_TIME_STATS 1
 #define INCLUDE_uxTaskGetRunTime 1
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()\
@@ -85,7 +86,9 @@ do {\
 (*(unsigned long *)0xe0001000) |= 1; /* DWT_CTRL |= DWT_CYCCNT_ENA */\
 } while(0)
 #define portGET_RUN_TIME_COUNTER_VALUE() (*(unsigned long *)0xe0001004)/* DWT_CYCCNT */
-//#endif
+#else
+#define configCHECK_FOR_STACK_OVERFLOW	1
+#endif
 
 
 /**

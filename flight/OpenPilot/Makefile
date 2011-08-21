@@ -135,7 +135,6 @@ SRC += $(OPSYSTEM)/taskmonitor.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
-SRC += $(OPUAVOBJ)/uavobjectsinit_linker.c
 else
 ## TESTCODE
 SRC += $(OPTESTS)/test_common.c
@@ -387,6 +386,9 @@ CSTANDARD = -std=gnu99
 ifeq ($(DEBUG),YES)
 CFLAGS = -g$(DEBUGF) -DDEBUG
 endif
+
+# OP has enough memory to always enable optional objects
+CFLAGS += -DDIAGNOSTICS
 
 CFLAGS += -O$(OPT)
 CFLAGS += -mcpu=$(MCU)

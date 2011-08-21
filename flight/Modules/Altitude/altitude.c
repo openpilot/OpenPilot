@@ -69,6 +69,12 @@ static void altitudeTask(void *parameters);
  */
 int32_t AltitudeStart()
 {
+	
+	BaroAltitudeInitialize();
+#if defined(PIOS_INCLUDE_HCSR04)
+	SonarAltitudeInitialze();
+#endif
+	
 	// Start main task
 	xTaskCreate(altitudeTask, (signed char *)"Altitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_ALTITUDE, taskHandle);

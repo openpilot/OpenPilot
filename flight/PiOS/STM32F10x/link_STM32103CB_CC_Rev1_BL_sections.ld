@@ -18,16 +18,6 @@ SECTIONS
         *(.rodata .rodata* .gnu.linkonce.r.*)
     } > BL_FLASH
 
-    /* init sections */
-    .initcalluavobj.init :
-    {
-        . = ALIGN(4);
-	__uavobj_initcall_start = .;
-        KEEP(*(.initcalluavobj.init))
-	. = ALIGN(4);
-	__uavobj_initcall_end   = .;
-    } > BL_FLASH
-
     .ARM.extab :
     {
         *(.ARM.extab* .gnu.linkonce.armextab.*)

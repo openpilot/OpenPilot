@@ -41,14 +41,15 @@ static int32_t PIOS_BMA180_SetRange(enum bma180_range range);
 static int32_t PIOS_BMA180_Config();
 static int32_t PIOS_BMA180_EnableIrq();
 static void PIOS_BMA180_IRQHandler(void);
-volatile bool pios_bma180_data_ready = false;
 
 #define PIOS_BMA180_MAX_DOWNSAMPLE 10
-static int16_t pios_bma180_buffer[PIOS_BMA180_MAX_DOWNSAMPLE * 3];
+static int16_t pios_bma180_buffer[PIOS_BMA180_MAX_DOWNSAMPLE * sizeof(struct pios_bma180_data)];
 static t_fifo_buffer pios_bma180_fifo;
 
 static const struct pios_bma180_cfg * dev_cfg;
+static enum bma180_range range;
 
+#define GRAV 9.81
 /**
  * @brief Initialize with good default settings
  */
@@ -67,8 +68,6 @@ void PIOS_BMA180_Init(const struct pios_bma180_cfg * cfg)
 	
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
 	NVIC_Init(&cfg->eoc_irq.init);
-	
-	pios_bma180_data_ready = false;
 	
 	PIOS_BMA180_Config();	
 	PIOS_BMA180_SelectBW(BMA_BW_600HZ);
@@ -209,9 +208,10 @@ static int32_t PIOS_BMA180_SelectBW(enum bma180_bandwidth bw)
  * @param rate[in] Range setting to be used
  *
  */
-static int32_t PIOS_BMA180_SetRange(enum bma180_range range) 
+static int32_t PIOS_BMA180_SetRange(enum bma180_range new_range) 
 {
 	uint8_t reg;
+	range = new_range;
 	reg = PIOS_BMA180_GetReg(BMA_RANGE_ADDR);
 	reg = (reg & ~BMA_RANGE_MASK) | ((range << BMA_RANGE_SHIFT) & BMA_RANGE_MASK);
 	return PIOS_BMA180_SetReg(BMA_RANGE_ADDR, reg);
@@ -247,7 +247,7 @@ void PIOS_BMA180_Attach(uint32_t spi_id)
  * @retval -1 unable to claim bus
  * @retval -2 unable to transfer data
  */
-int32_t PIOS_BMA180_ReadAccels(int16_t * data)
+int32_t PIOS_BMA180_ReadAccels(struct pios_bma180_data * data)
 {
 	// To save memory use same buffer for in and out but offset by
 	// a byte
@@ -261,12 +261,12 @@ int32_t PIOS_BMA180_ReadAccels(int16_t * data)
 	PIOS_BMA180_ReleaseBus();	
 	
 	//        |    MSB        |   LSB       | 0 | new_data |
-	data[0] = (rec[2] << 8) | rec[1];
-	data[1] = (rec[4] << 8) | rec[3];
-	data[2] = (rec[6] << 8) | rec[5];
-	data[0] /= 4;
-	data[1] /= 4;
-	data[2] /= 4;
+	data->x = ((rec[2] << 8) | rec[1]);
+	data->y = ((rec[4] << 8) | rec[3]);
+	data->z = ((rec[6] << 8) | rec[5]);
+	data->x /= 4;
+	data->y /= 4;
+	data->z /= 4;
 	
 	return 0; // return number of remaining entries
 }
@@ -277,12 +277,38 @@ int32_t PIOS_BMA180_ReadAccels(int16_t * data)
  */
 float PIOS_BMA180_GetScale()
 {
-	return 9.81 / 1024;
+	switch (range) {
+		case BMA_RANGE_1G:
+			return GRAV / 8192.0;
+		case BMA_RANGE_1_5G:
+			return GRAV / 5460.0;
+		case BMA_RANGE_2G:
+			return GRAV / 4096.0;
+		case BMA_RANGE_3G:
+			return GRAV / 2730.0;
+		case BMA_RANGE_4G:
+			return GRAV / 2048.0;
+		case BMA_RANGE_8G:
+			return GRAV / 1024.0;
+		case BMA_RANGE_16G:
+			return GRAV / 512.0;
+	}
+	return 0;
 }
 
-t_fifo_buffer * PIOS_BMA180_GetFifo()
+/**
+ * @brief Get data from fifo
+ * @param [out] buffer pointer to a @ref pios_bma180_data structure to receive data
+ * @return 0 for success, -1 for failure (no data available)
+ */
+int32_t PIOS_BMA180_ReadFifo(struct pios_bma180_data * buffer)
 {
-	return &pios_bma180_fifo;
+	if(fifoBuf_getUsed(&pios_bma180_fifo) < sizeof(*buffer))
+		return -1;
+	
+	fifoBuf_getData(&pios_bma180_fifo, (uint8_t *) buffer, sizeof(*buffer));
+	
+	return 0;
 }
 
 
@@ -306,8 +332,8 @@ int32_t PIOS_BMA180_Test()
 	if(retval != 0)
 		return -2;
 	
-	int16_t data[3];
-	if(PIOS_BMA180_ReadAccels(data) != 0)
+	struct pios_bma180_data data;
+	if(PIOS_BMA180_ReadAccels(&data) != 0)
 		return -3;
 	
 	if(rec[1] != 0x3)
@@ -319,26 +345,29 @@ int32_t PIOS_BMA180_Test()
 	return 0;
 }
 
-static uint8_t pios_bma_180_dmabuf[7];
+static uint8_t pios_bma180_dmabuf[7];
 static void PIOS_BMA180_SPI_Callback() 
 {		
 	// TODO: Make this conversion depend on configuration scale
-	int16_t data[3];
-	data[0] = (pios_bma_180_dmabuf[2] << 8) | pios_bma_180_dmabuf[1];
-	data[1] = (pios_bma_180_dmabuf[4] << 8) | pios_bma_180_dmabuf[3];
-	data[2] = (pios_bma_180_dmabuf[6] << 8) | pios_bma_180_dmabuf[5];
-	data[0] /= 4;
-	data[1] /= 4;
-	data[2] /= 4;
+	struct pios_bma180_data data;
 
 	// Don't release bus till data has copied
 	PIOS_BMA180_ReleaseBus();	
-
+	
 	// Must not return before releasing bus
 	if(fifoBuf_getFree(&pios_bma180_fifo) < sizeof(data))
 		return;
 	
-	fifoBuf_putData(&pios_bma180_fifo, data, sizeof(data));
+	// Bottom two bits indicate new data and are constant zeros.  Don't right 
+	// shift because it drops sign bit
+	data.x = ((pios_bma180_dmabuf[2] << 8) | pios_bma180_dmabuf[1]);
+	data.y = ((pios_bma180_dmabuf[4] << 8) | pios_bma180_dmabuf[3]);
+	data.z = ((pios_bma180_dmabuf[6] << 8) | pios_bma180_dmabuf[5]);
+	data.x /= 4;
+	data.y /= 4;
+	data.z /= 4;
+	
+	fifoBuf_putData(&pios_bma180_fifo, (uint8_t *) &data, sizeof(data));
 }
 
 /**
@@ -349,7 +378,8 @@ static void PIOS_BMA180_IRQHandler(void)
 {
 	// If we can't get the bus then just move on for efficiency
 	if(PIOS_BMA180_ClaimBus() == 0)
-		PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,pios_bma180_req_buf,(uint8_t *) pios_bma_180_dmabuf, 7, PIOS_BMA180_SPI_Callback);	
+		PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,pios_bma180_req_buf,(uint8_t *) pios_bma180_dmabuf, 
+							   7, PIOS_BMA180_SPI_Callback);	
 }
 
 

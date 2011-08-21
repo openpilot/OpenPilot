@@ -97,12 +97,12 @@ struct pios_bma180_cfg {
 };
 
 /* Public Functions */
-void PIOS_BMA180_Init(const struct pios_bma180_cfg * cfg);
-void PIOS_BMA180_Attach(uint32_t spi_id);
-float PIOS_BMA180_GetScale();
-int32_t PIOS_BMA180_ReadAccels(int16_t * data);
-int32_t PIOS_BMA180_Test();
-t_fifo_buffer * PIOS_BMA180_GetFifo();
+extern void PIOS_BMA180_Init(const struct pios_bma180_cfg * cfg);
+extern void PIOS_BMA180_Attach(uint32_t spi_id);
+extern float PIOS_BMA180_GetScale();
+extern int32_t PIOS_BMA180_ReadFifo(struct pios_bma180_data * buffer);
+extern int32_t PIOS_BMA180_ReadAccels(struct pios_bma180_data * data);
+extern int32_t PIOS_BMA180_Test();
 
 #endif /* PIOS_BMA180_H */
 

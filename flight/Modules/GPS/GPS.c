@@ -46,6 +46,7 @@
 #include "gpsposition.h"
 #include "homelocation.h"
 #include "gpstime.h"
+#include "gpssatellites.h"
 #include "WorldMagModel.h"
 #include "CoordinateConversions.h"
 
@@ -126,7 +127,10 @@ int32_t GPSInitialize(void)
 {
 	GPSPositionInitialize();
 	GPSTimeInitialize();
+	GPSSatellitesInitialize();
+#ifdef PIOS_GPS_SETS_HOMELOCATION
 	HomeLocationInitialize();
+#endif
 	
 	// TODO: Get gps settings object
 	gpsPort = PIOS_COM_GPS;

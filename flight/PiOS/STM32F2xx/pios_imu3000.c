@@ -328,6 +328,7 @@ uint32_t imu3000_irq = 0;
 uint16_t fifo_level;
 uint8_t fifo_level_data[2];
 uint32_t imu3000_readtime;
+uint32_t cb_not_ready = 0;
 void PIOS_IMU3000_IRQHandler(void)
 {
 	
@@ -336,7 +337,12 @@ void PIOS_IMU3000_IRQHandler(void)
 	if(!imu3000_configured)
 		return;
 		
-	PIOS_Assert(imu3000_cb_ready);
+	//PIOS_Assert(imu3000_cb_ready);
+	if(!imu3000_cb_ready) {
+		PIOS_LED_Toggle(LED2);
+		cb_not_ready++;
+		return;
+	}
 
 	// If at least one read doesnt succeed then the irq not reset and we will stall
 	while(PIOS_IMU3000_Read(PIOS_IMU3000_FIFO_CNT_MSB, (uint8_t *) &fifo_level_data, sizeof(fifo_level_data)) != 0)

@@ -66,7 +66,10 @@ volatile int8_t ahrs_algorithm;
 
 /* Data accessors */
 void adc_callback(float *);
-void process_mag_data();
+void get_mag_data();
+void get_baro_data();
+void get_accel_gyro_data();
+
 void reset_values();
 void calibrate_sensors(void);
 
@@ -84,7 +87,6 @@ void calibration(float result[3], float scale[3][4], float arg[3]);
 extern void PIOS_Board_Init(void);
 static void panic(uint32_t blinks);
 void simple_update();
-bool get_accel_gyro_data();
 
 /* Bootloader related functions and var*/
 void firmwareiapobj_callback(AhrsObjHandle obj);
@@ -129,7 +131,7 @@ typedef enum { INS_IDLE, INS_DATA_READY, INS_PROCESSING } states;
 uint32_t total_conversion_blocks;
 
 
-float altitude;
+float pressure, altitude;
 
 int32_t dr;
 
@@ -166,6 +168,9 @@ int main()
 	
 	PIOS_LED_On(LED1);
 	PIOS_LED_Off(LED2);
+	
+	// Kickstart BMP085 measurements until driver improved
+	PIOS_BMP085_StartADC(TemperatureConv);
 
 	// Flash warning light while trying to connect
 	uint32_t time_val1 = PIOS_DELAY_GetRaw();
@@ -206,11 +211,9 @@ int main()
 		loop_time = PIOS_DELAY_DiffuS(time_val1);
 		time_val1 = PIOS_DELAY_GetRaw();
 		
-		// This function blocks till data avilable
-		get_accel_gyro_data();
-		
-		// Get any mag data available
-		process_mag_data();
+		get_accel_gyro_data();   // This function blocks till data avilable
+		get_mag_data();
+		get_baro_data();
 		
 		status.IdleTimePerCycle = PIOS_DELAY_DiffuS(time_val1);
 		
@@ -340,7 +343,7 @@ int32_t accel_accum[3] = {0, 0, 0};
 int32_t gyro_accum[3] = {0,0,0};
 float scaling;
 
-bool get_accel_gyro_data()
+void get_accel_gyro_data()
 {
 	int32_t read_good;
 	int32_t count;
@@ -397,66 +400,24 @@ bool get_accel_gyro_data()
 	raw.gyros[0] = gyro_data.filtered.x * RAD_TO_DEG;
 	raw.gyros[1] = gyro_data.filtered.y * RAD_TO_DEG;
 	raw.gyros[2] = gyro_data.filtered.z * RAD_TO_DEG;
+	
+	AHRSSettingsData settings;
+	AHRSSettingsGet(&settings);
+	if (settings.BiasCorrectedRaw == AHRSSETTINGS_BIASCORRECTEDRAW_TRUE)
+	{
+		raw.gyros[0] -= Nav.gyro_bias[0] * RAD_TO_DEG;
+		raw.gyros[1] -= Nav.gyro_bias[1] * RAD_TO_DEG;
+		raw.gyros[2] -= Nav.gyro_bias[2] * RAD_TO_DEG;
+		
+		raw.accels[0] -= Nav.accel_bias[0];
+		raw.accels[1] -= Nav.accel_bias[1];
+		raw.accels[2] -= Nav.accel_bias[2];
+	}
+	
 	raw.magnetometers[0] = mag_data.scaled.axis[0];
 	raw.magnetometers[1] = mag_data.scaled.axis[1];
 	raw.magnetometers[2] = mag_data.scaled.axis[2];
 	AttitudeRawSet(&raw);
-	
-	return true;
-}
-
-/**
- * @brief Perform calibration of a 3-axis field sensor using an affine transformation
- * matrix.
- *
- * Computes result = scale * arg.
- *
- * @param result[out] The three-axis resultant field.
- * @param scale[in] The 4x4 affine transformation matrix.  The fourth row is implicitly
- * 	[0 0 0 1]
- * @param arg[in] The 3-axis input field.  The 'w' component is implicitly 1.
- */
-void calibration(float result[3], float scale[3][4], float arg[3])
-{
-	for (int row = 0; row < 3; ++row) {
-		result[row] = 0.0f;
-		int col;
-		for (col = 0; col < 3; ++col) {
-			result[row] += scale[row][col] * arg[col];
-		}
-		// fourth column: arg has an implicit w value of 1.0f.
-		result[row] += scale[row][col];
-	}
-}
-
-/**
- * @brief Scale an affine transformation matrix by a rotation, defined by a
- * rotation vector.  scale <- rotation * scale
- *
- * @param scale[in,out] The affine transformation matrix to be rotated
- * @param rotation[in] The rotation vector defining the rotation
- */
-void affine_rotate(float scale[3][4], float rotation[3])
-{
-	// Rotate the scale factor matrix in-place
-	float rmatrix[3][3];
-	Rv2Rot(rotation, rmatrix);
-
-	float ret[3][4];
-	for (int row = 0; row < 3; ++row) {
-		for (int col = 0; col < 4; ++col) {
-			ret[row][col] = 0.0f;
-			for (int i = 0; i < 3; ++i) {
-				ret[row][col] += rmatrix[row][i] * scale[i][col];
-			}
-		}
-	}
-	// copy output to argument
-	for (int row = 0; row < 3; ++row) {
-		for (int col = 0; col < 4; ++col) {
-			scale[row][col] = ret[row][col];
-		}
-	}
 }
 
 /**
@@ -468,7 +429,7 @@ void affine_rotate(float scale[3][4], float rotation[3])
  * cannot be interpreted.  In addition the mag data is not used for the first
  * five seconds to allow the filter to start to converge
  */
-void process_mag_data()
+void get_mag_data()
 {
 	// Get magnetic readings
 	// For now don't use mags until the magnetic field is set AND until 5 seconds
@@ -493,6 +454,34 @@ void process_mag_data()
 	}
 }
 
+/**
+ * @brief Get the barometer data
+ * @return none
+ */
+uint32_t baro_conversions = 0;
+void get_baro_data() 
+{
+	int32_t retval = PIOS_BMP085_ReadADC();
+	if (retval == 0) { // Conversion completed 
+		pressure = PIOS_BMP085_GetPressure();
+		altitude = 44330.0 * (1.0 - powf(pressure / BMP085_P0, (1.0 / 5.255)));
+		
+		BaroAltitudeData data;
+		BaroAltitudeGet(&data);
+		data.Altitude = altitude;
+		data.Pressure = pressure  / 1000.0f;
+		data.Temperature = PIOS_BMP085_GetTemperature() / 10.0f;  // Convert to deg C
+		BaroAltitudeSet(&data);
+		
+		if((baro_conversions++) % 2)
+			PIOS_BMP085_StartADC(PressureConv);
+		else
+			PIOS_BMP085_StartADC(TemperatureConv);
+			
+		altitude_data.altitude = data.Altitude;
+		altitude_data.updated = true;
+	}
+}
 
 /**
  * @brief Assumes board is not moving computes biases and variances of sensors

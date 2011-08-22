@@ -91,8 +91,14 @@ void PIOS_BMP085_Init(const struct pios_bmp085_cfg * cfg)
 	
 	/* Read all 22 bytes of calibration data in one transfer, this is a very optimized way of doing things */
 	uint8_t Data[BMP085_CALIB_LEN];
-	while (PIOS_BMP085_Read(BMP085_CALIB_ADDR, Data, BMP085_CALIB_LEN) != 0)
-		continue;
+	bool good_cal = false;
+	while(!good_cal) {
+		good_cal = (PIOS_BMP085_Read(BMP085_CALIB_ADDR, Data, BMP085_CALIB_LEN) == 0);
+		// Check none of the calibration is zero to ensure calibration is good
+		for(uint8_t i = 0; i < BMP085_CALIB_LEN; i += 2)
+			good_cal &= (Data[i] != 0) || (Data[i+1] != 0);
+	}
+			
 
 	/* Parameters AC1-AC6 */
 	CalibData.AC1 = (Data[0] << 8) | Data[1];

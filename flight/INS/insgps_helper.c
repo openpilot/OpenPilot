@@ -42,6 +42,7 @@ extern void send_velocity(void);
 extern void send_position(void);
 extern volatile int8_t ahrs_algorithm;
 extern void get_accel_gyro_data();
+extern void get_mag_data();
 
 static uint32_t ins_last_time;
 
@@ -257,19 +258,14 @@ void ins_init_algorithm()
 	/* Ensure we get mag data in a timely manner */
 	uint16_t fail_count = 50; // 50 at 200 Hz is up to 0.25 sec
 	while(using_mags && !mag_data.updated && fail_count--) {
+		get_mag_data();
 		get_accel_gyro_data();
 		AhrsPoll();
+		PIOS_DELAY_WaituS(2000);
 	}
 	using_mags &= mag_data.updated;
 	
-	if (using_mags) {
-		/* Spin waiting for mag data */
-		while(!mag_data.updated) {
-			get_accel_gyro_data();
-			AhrsPoll();
-		}
-		mag_data.updated = false;
-		
+	if (using_mags) {		
 		RotFrom2Vectors(accels, ge, mag_data.scaled.axis, home.Be, Rbe);
 		R2Quaternion(Rbe,q);
 		if (using_gps)

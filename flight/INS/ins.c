@@ -444,13 +444,7 @@ void get_mag_data()
 		mag_data.scaled.axis[1] = -(mag_data.raw.axis[1] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
 		mag_data.scaled.axis[2] = -(mag_data.raw.axis[1] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
 
-		// Only use if magnetic length reasonable
-		float Blen = sqrt(pow(mag_data.scaled.axis[0],2) + pow(mag_data.scaled.axis[1],2) + pow(mag_data.scaled.axis[2],2));
-
-		mag_data.updated =  (home.Set == HOMELOCATION_SET_TRUE) &&
-			((home.Be[0] != 0) || (home.Be[1] != 0) || (home.Be[2] != 0)) &&
-			((mag_data.raw.axis[0] != 0) || (mag_data.raw.axis[1] != 0) || (mag_data.raw.axis[2] != 0)) &&
-			((Blen < mag_len * (1 + INSGPS_MAGTOL)) && (Blen > mag_len * (1 - INSGPS_MAGTOL)));
+		mag_data.updated =  true;
 	}
 }
 

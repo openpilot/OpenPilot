@@ -28,7 +28,7 @@
 #include <QtGui/QWidget>
 
 
-ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),smartsave(NULL),dirty(false)
+ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnected(false),smartsave(NULL),dirty(false)
 {
     pm = ExtensionSystem::PluginManager::instance();
     objManager = pm->getObject<UAVObjectManager>();
@@ -72,7 +72,7 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     ow->scale=scale;
     objOfInterest.append(ow);
     if(obj)
-        smartsave->addObject(obj);
+        smartsave->addObject((UAVDataObject*)obj);
     if(widget==NULL)
     {
         // do nothing
@@ -148,13 +148,16 @@ double ConfigTaskWidget::listMean(QList<double> list)
 
 void ConfigTaskWidget::onAutopilotDisconnect()
 {
-        enableControls(false);
+    isConnected=false;
+    enableControls(false);
 }
 
 void ConfigTaskWidget::onAutopilotConnect()
 {
-        enableControls(true);
-        refreshWidgetsValues();
+    dirty=false;
+    isConnected=true;
+    enableControls(true);
+    refreshWidgetsValues();
 }
 
 void ConfigTaskWidget::populateWidgets()
@@ -262,7 +265,10 @@ void ConfigTaskWidget::setDirty(bool value)
 }
 bool ConfigTaskWidget::isDirty()
 {
-    return dirty;
+    if(isConnected)
+        return dirty;
+    else
+        return false;
 }
 
 void ConfigTaskWidget::refreshValues()

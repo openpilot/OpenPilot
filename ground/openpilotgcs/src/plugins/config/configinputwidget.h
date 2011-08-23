@@ -82,7 +82,7 @@ private:
         QEventLoop * loop;
         bool skipflag;
 
-        int currentCommand;
+        uint currentCommand;
 
         ManualControlCommand * manualCommandObj;
         ManualControlCommand::DataFields manualCommandData;
@@ -117,23 +117,27 @@ private:
         void resetTxControls();
         void setMoveFromCommand(int command);
         QPushButton * goWizard;
+        QPushButton * goSimpleWizard;
+        bool isSimple;
+        void goToWizard();
 private slots:
         void wzNext();
         void wzBack();
         void wzCancel();
-        void goToWizard();
+        void goToNormalWizard();
+        void goToSimpleWizard();
         void openHelp();
         void identifyControls();
         void identifyLimits();
         void moveTxControls();
         void moveSticks();
         void dimOtherControls(bool value);
+        void moveFMSlider();
         void invertControls();
 protected:
         void resizeEvent(QResizeEvent *event);
         virtual void enableControls(bool enable);
-protected slots:
-        virtual void refreshWidgetsValues();
+
 
 };
 

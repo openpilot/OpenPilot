@@ -71,7 +71,11 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     }
     goWizard=new QPushButton(tr("Start Wizard"),this);
     m_config->advancedPage->layout()->addWidget(goWizard);
-    connect(goWizard,SIGNAL(clicked()),this,SLOT(goToWizard()));
+    connect(goWizard,SIGNAL(clicked()),this,SLOT(goToNormalWizard()));
+    goSimpleWizard=new QPushButton(tr("Start Simple Wizard"),this);
+    m_config->advancedPage->layout()->addWidget(goSimpleWizard);
+    connect(goSimpleWizard,SIGNAL(clicked()),this,SLOT(goToSimpleWizard()));
+
     connect(m_config->wzNext,SIGNAL(clicked()),this,SLOT(wzNext()));
     connect(m_config->wzCancel,SIGNAL(clicked()),this,SLOT(wzCancel()));
     connect(m_config->wzBack,SIGNAL(clicked()),this,SLOT(wzBack()));
@@ -92,9 +96,10 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization3Settings",m_config->fmsSsPos3Yaw,"Yaw");
 
     addUAVObjectToWidgetRelation("ManualControlSettings","Arming",m_config->armControl);
-    addUAVObjectToWidgetRelation("ManualControlSettings","armTimeout",m_config->armTimeout,0,1000);
-    addUAVObject("ManualControlCommand");
+    addUAVObjectToWidgetRelation("ManualControlSettings","ArmedTimeout",m_config->armTimeout,0,1000);
+    connect( ManualControlCommand::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(moveFMSlider()));
     addWidget(goWizard);
+    addWidget(goSimpleWizard);
     enableControls(false);
 
     populateWidgets();
@@ -252,7 +257,16 @@ void ConfigInputWidget::openHelp()
 
     QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Input+Configuration", QUrl::StrictMode) );
 }
-
+void ConfigInputWidget::goToSimpleWizard()
+{
+    isSimple=true;
+    goToWizard();
+}
+void ConfigInputWidget::goToNormalWizard()
+{
+    isSimple=false;
+    goToWizard();
+}
 void ConfigInputWidget::goToWizard()
 {
     QMessageBox msgBox;
@@ -357,7 +371,7 @@ void ConfigInputWidget::setupWizardWidget(int step)
         m_config->checkBoxesLayout->layout()->addWidget(mode2);
         wizardStep=wizardChooseMode;
     }
-    else if(step==wizardIdentifySticks)
+    else if(step==wizardIdentifySticks && !isSimple)
     {
         usedChannels.clear();
         if(wizardStep==wizardChooseMode)
@@ -380,8 +394,19 @@ void ConfigInputWidget::setupWizardWidget(int step)
         connect(receiverActivityObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyControls()));
         m_config->wzNext->setEnabled(false);
     }
-    else if(step==wizardIdentifyCenter)
+    else if(step==wizardIdentifyCenter || (isSimple && step==wizardIdentifySticks))
     {
+        if(wizardStep==wizardChooseMode)
+        {
+            QRadioButton * mode=qobject_cast<QRadioButton *>(extraWidgets.at(0));
+            if(mode->isChecked())
+                transmitterMode=mode1;
+            else
+                transmitterMode=mode2;
+            delete extraWidgets.at(0);
+            delete extraWidgets.at(1);
+            extraWidgets.clear();
+        }
         setTxMovement(centerAll);
         if(wizardStep==wizardIdentifySticks)
             disconnect(receiverActivityObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyControls()));
@@ -409,10 +434,17 @@ void ConfigInputWidget::setupWizardWidget(int step)
             }
             manualSettingsObj->setData(manualSettingsData);
         }
-        foreach (QWidget * wd, extraWidgets)
+        if(wizardStep==wizardIdentifyInverted)
         {
-            if(wd)
-                delete wd;
+            foreach(QWidget * wd,extraWidgets)
+            {
+                QCheckBox * cb=qobject_cast<QCheckBox *>(wd);
+                if(cb)
+                {
+                    disconnect(cb,SIGNAL(toggled(bool)),this,SLOT(invertControls()));
+                    delete cb;
+                }
+            }
         }
         extraWidgets.clear();
         disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
@@ -423,7 +455,7 @@ void ConfigInputWidget::setupWizardWidget(int step)
         mdata.flightTelemetryUpdatePeriod = 150;
         manualCommandObj->setMetadata(mdata);
         manualSettingsData=manualSettingsObj->getData();
-        for(int i=0;i<ManualControlSettings::CHANNELMAX_NUMELEM;++i)
+        for(uint i=0;i<ManualControlSettings::CHANNELMAX_NUMELEM;++i)
         {
             manualSettingsData.ChannelMin[i]=manualSettingsData.ChannelNeutral[i];
             manualSettingsData.ChannelMax[i]=manualSettingsData.ChannelNeutral[i];
@@ -460,7 +492,10 @@ void ConfigInputWidget::setupWizardWidget(int step)
         {
             QCheckBox * cb=qobject_cast<QCheckBox *>(wd);
             if(cb)
+            {
+                disconnect(cb,SIGNAL(toggled(bool)),this,SLOT(invertControls()));
                 delete cb;
+            }
         }
         wizardStep=wizardFinish;
         extraWidgets.clear();
@@ -537,7 +572,7 @@ void ConfigInputWidget::identifyControls()
 void ConfigInputWidget::identifyLimits()
 {
     manualCommandData=manualCommandObj->getData();
-    for(int i=0;i<ManualControlSettings::CHANNELMAX_NUMELEM;++i)
+    for(uint i=0;i<ManualControlSettings::CHANNELMAX_NUMELEM;++i)
     {
         if(manualSettingsData.ChannelMin[i]>manualCommandData.Channel[i])
             manualSettingsData.ChannelMin[i]=manualCommandData.Channel[i];
@@ -878,7 +913,10 @@ void ConfigInputWidget::dimOtherControls(bool value)
 void ConfigInputWidget::enableControls(bool enable)
 {
     if(goWizard)
+    {
         goWizard->setEnabled(enable);
+        goSimpleWizard->setEnabled(enable);
+    }
     ConfigTaskWidget::enableControls(enable);
 
 }
@@ -891,9 +929,10 @@ void ConfigInputWidget::invertControls()
         QCheckBox * cb=qobject_cast<QCheckBox *>(wd);
         if(cb)
         {
-            if(cb->isChecked())
+            int index=manualSettingsObj->getFields().at(0)->getElementNames().indexOf(cb->text());
+            if((cb->isChecked() && (manualSettingsData.ChannelMax[index]>manualSettingsData.ChannelMin[index])) ||
+                    (!cb->isChecked() && (manualSettingsData.ChannelMax[index]<manualSettingsData.ChannelMin[index])))
             {
-                int index=manualSettingsObj->getFields().at(0)->getElementNames().indexOf(cb->text());
                 qint16 aux;
                 aux=manualSettingsData.ChannelMax[index];
                 manualSettingsData.ChannelMax[index]=manualSettingsData.ChannelMin[index];
@@ -903,20 +942,19 @@ void ConfigInputWidget::invertControls()
     }
     manualSettingsObj->setData(manualSettingsData);
 }
-void ConfigInputWidget::refreshWidgetsValues()
+void ConfigInputWidget::moveFMSlider()
 {
-    ConfigTaskWidget::refreshWidgetsValues();
-    manualSettingsData = manualSettingsObj->getData();
-    manualCommandData=manualCommandObj->getData();
-    uint chIndex = manualSettingsData.ChannelNumber[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE];
+    ManualControlSettings::DataFields manualSettingsDataPriv = manualSettingsObj->getData();
+    ManualControlCommand::DataFields manualCommandDataPriv=manualCommandObj->getData();
+    uint chIndex = manualSettingsDataPriv.ChannelNumber[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE];
     if (chIndex < 8) {
         float valueScaled;
 
-        int chMin = manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE];
-        int chMax = manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_FLIGHTMODE];
-        int chNeutral = manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_FLIGHTMODE];
+        int chMin = manualSettingsDataPriv.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE];
+        int chMax = manualSettingsDataPriv.ChannelMax[ManualControlSettings::CHANNELMAX_FLIGHTMODE];
+        int chNeutral = manualSettingsDataPriv.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_FLIGHTMODE];
 
-        int value = manualCommandData.Channel[chIndex];
+        int value = manualCommandDataPriv.Channel[chIndex];
         if ((chMax > chMin && value >= chNeutral) || (chMin > chMax && value <= chNeutral))
         {
             if (chMax != chNeutral)

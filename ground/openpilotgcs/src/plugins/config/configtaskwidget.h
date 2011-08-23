@@ -79,6 +79,7 @@ private slots:
     virtual void refreshValues();
     virtual void updateObjectsFromWidgets();
 private:
+    bool isConnected;
     QStringList objectsList;
     QList <objectToWidget*> objOfInterest;
     ExtensionSystem::PluginManager *pm;

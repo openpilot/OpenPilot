@@ -45,8 +45,6 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
     setupButtons(ui->applyButton,ui->saveButton);
     addUAVObject("AttitudeSettings");
 
-    UAVObject * settings = AttitudeSettings::GetInstance(getObjectManager());
-
     // Connect the help button
     connect(ui->ccAttitudeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
     addUAVObjectToWidgetRelation("AttitudeSettings","ZeroDuringArming",ui->zeroGyroBiasOnArming);

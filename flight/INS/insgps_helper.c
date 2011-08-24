@@ -211,7 +211,7 @@ void ins_indoor_update()
 	else
 		sensors = HORIZ_SENSORS | VERT_SENSORS;
 	
-	if(mag_data.updated && (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
+	if(mag_data.updated && (ahrs_algorithm == INSSETTINGS_ALGORITHM_INSGPS_INDOOR)) {
 		sensors |= MAG_SENSORS;
 		mag_data.updated = false;
 	}
@@ -247,10 +247,10 @@ void ins_init_algorithm()
 	accels[1]=accel_data.filtered.y;
 	accels[2]=accel_data.filtered.z;
 	
-	using_mags = (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) || (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR);
+	using_mags = (ahrs_algorithm == INSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) || (ahrs_algorithm == INSSETTINGS_ALGORITHM_INSGPS_INDOOR);
 	using_mags &= (home.Be[0] != 0) || (home.Be[1] != 0) || (home.Be[2] != 0);  /* only use mags when valid home location */
 	
-	using_gps = (ahrs_algorithm == AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) && (gps_data.quality != 0);
+	using_gps = (ahrs_algorithm == INSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) && (gps_data.quality != 0);
 	
 	/* Block till a data update */
 	get_accel_gyro_data();

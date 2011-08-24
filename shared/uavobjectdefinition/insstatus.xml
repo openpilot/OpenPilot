@@ -1,5 +1,5 @@
 <xml>
-    <object name="AhrsStatus" singleinstance="true" settings="false">
+    <object name="InsStatus" singleinstance="true" settings="false">
         <description>Status for the @ref AHRSCommsModule, including communication errors</description>
         <field name="SerialNumber" units="" type="uint8" elements="8"/>
         <field name="CPULoad" units="count" type="uint8" elements="1"/>

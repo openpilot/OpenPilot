@@ -298,13 +298,11 @@ int32_t AhrsConnectCallBack(AhrsObjHandle obj, AhrsEventCallback cb)
 	return (0);
 }
 
-AhrsCommStatus AhrsGetStatus()
+void AhrsGetStatus(AhrsCommStatus * status)
 {
-	AhrsCommStatus status;
-	status.remote = rxPacket.status;
-	status.local = txPacket.status;
-	status.linkOk = linkOk;
-	return (status);
+	status->remote = rxPacket.status;
+	status->local = txPacket.status;
+	status->linkOk = linkOk;
 }
 
 

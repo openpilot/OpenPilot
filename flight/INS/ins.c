@@ -74,12 +74,12 @@ void reset_values();
 void calibrate_sensors(void);
 
 /* Communication functions */
-void send_calibration(void);
+//void send_calibration(void);
 void send_attitude(void);
 void send_velocity(void);
 void send_position(void);
 void homelocation_callback(AhrsObjHandle obj);
-void calibration_callback(AhrsObjHandle obj);
+//void calibration_callback(AhrsObjHandle obj);
 void settings_callback(AhrsObjHandle obj);
 void affine_rotate(float scale[3][4], float rotation[3]);
 void calibration(float result[3], float scale[3][4], float arg[3]);
@@ -129,7 +129,7 @@ typedef enum { INS_IDLE, INS_DATA_READY, INS_PROCESSING } states;
  */
 
 uint32_t total_conversion_blocks;
-
+static bool bias_corrected_raw;
 
 float pressure, altitude;
 
@@ -142,7 +142,7 @@ int main()
 {	
 	gps_data.quality = -1;
 	static int8_t last_ahrs_algorithm;
-	ahrs_algorithm = AHRSSETTINGS_ALGORITHM_SIMPLE;
+	ahrs_algorithm = INSSETTINGS_ALGORITHM_SIMPLE;
 	
 	reset_values();
 	
@@ -191,18 +191,15 @@ int main()
 	
 	/* we didn't connect the callbacks before because we have to wait
 	 for all data to be up to date before doing anything*/
-	AHRSCalibrationConnectCallback(calibration_callback);
-	AHRSSettingsConnectCallback(settings_callback);
+	InsSettingsConnectCallback(settings_callback);
 	HomeLocationConnectCallback(homelocation_callback);
 	FirmwareIAPObjConnectCallback(firmwareiapobj_callback);
-	
-	calibration_callback(AHRSCalibrationHandle()); //force an update
 	
 	/******************* Main EKF loop ****************************/
 	while(1) {
 		AhrsPoll();
-		AhrsStatusData status;
-		AhrsStatusGet(&status);
+		InsStatusData status;
+		InsStatusGet(&status);
 		
 		// Alive signal
 		if ((total_conversion_blocks++ % 100) == 0)
@@ -236,20 +233,20 @@ int main()
 		time_val2 = PIOS_DELAY_GetRaw();
 		
 		switch(ahrs_algorithm) {
-			case AHRSSETTINGS_ALGORITHM_SIMPLE:
+			case INSSETTINGS_ALGORITHM_SIMPLE:
 				simple_update();
 				break;
-			case AHRSSETTINGS_ALGORITHM_INSGPS_OUTDOOR:
+			case INSSETTINGS_ALGORITHM_INSGPS_OUTDOOR:
 				ins_outdoor_update();
 				break;
-			case AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR:
-			case AHRSSETTINGS_ALGORITHM_INSGPS_INDOOR_NOMAG:
+			case INSSETTINGS_ALGORITHM_INSGPS_INDOOR:
+			case INSSETTINGS_ALGORITHM_INSGPS_INDOOR_NOMAG:
 				ins_indoor_update();
 				break;
 		}
 		
 		status.RunningTimePerCycle = PIOS_DELAY_DiffuS(time_val2);
-		AhrsStatusSet(&status);
+		InsStatusSet(&status);
 	}
 	
 	return 0;
@@ -401,9 +398,9 @@ void get_accel_gyro_data()
 	raw.gyros[1] = gyro_data.filtered.y * RAD_TO_DEG;
 	raw.gyros[2] = gyro_data.filtered.z * RAD_TO_DEG;
 	
-	AHRSSettingsData settings;
-	AHRSSettingsGet(&settings);
-	if (settings.BiasCorrectedRaw == AHRSSETTINGS_BIASCORRECTEDRAW_TRUE)
+	InsSettingsData settings;
+	InsSettingsGet(&settings);
+	if (bias_corrected_raw)
 	{
 		raw.gyros[0] -= Nav.gyro_bias[0] * RAD_TO_DEG;
 		raw.gyros[1] -= Nav.gyro_bias[1] * RAD_TO_DEG;
@@ -617,26 +614,22 @@ void reset_values()
 	mag_data.calibration.variance[1] = 50;
 	mag_data.calibration.variance[2] = 50;
 	
-	ahrs_algorithm = AHRSSETTINGS_ALGORITHM_SIMPLE;
+	ahrs_algorithm = INSSETTINGS_ALGORITHM_NONE;
 }
 
 void send_attitude(void)
 {
 	AttitudeActualData attitude;
-	AHRSSettingsData settings;
-	AHRSSettingsGet(&settings);
-
+	AttitudeActualGet(&attitude);
 	attitude.q1 = attitude_data.quaternion.q1;
 	attitude.q2 = attitude_data.quaternion.q2;
 	attitude.q3 = attitude_data.quaternion.q3;
 	attitude.q4 = attitude_data.quaternion.q4;
 	float rpy[3];
 	Quaternion2RPY(&attitude_data.quaternion.q1, rpy);
-	attitude.Roll = rpy[0] + settings.RollBias;
-	attitude.Pitch = rpy[1] + settings.PitchBias;
-	attitude.Yaw = rpy[2] + settings.YawBias;
-	if(attitude.Yaw > 360)
-		attitude.Yaw -= 360;
+	attitude.Roll = rpy[0];
+	attitude.Pitch = rpy[1];
+	attitude.Yaw = rpy[2];
 	AttitudeActualSet(&attitude);
 }
 
@@ -666,6 +659,7 @@ void send_position(void)
 	PositionActualSet(&positionActual);
 }
 
+/*
 void send_calibration(void)
 {
 	AHRSCalibrationData cal;
@@ -680,12 +674,14 @@ void send_calibration(void)
 	cal.measure_var = AHRSCALIBRATION_MEASURE_VAR_SET;
 	AHRSCalibrationSet(&cal);
 }
+*/
 
 /**
  * @brief INS calibration callback
  *
  * Called when the OP board sets the calibration
  */
+ /*
 void calibration_callback(AhrsObjHandle obj)
 {
 	AHRSCalibrationData cal;
@@ -732,13 +728,15 @@ void calibration_callback(AhrsObjHandle obj)
 	INSSetPosVelVar(cal.pos_var, cal.vel_var);
 
 }
+*/
 
 void settings_callback(AhrsObjHandle obj)
 {
-	AHRSSettingsData settings;
-	AHRSSettingsGet(&settings);
+	InsSettingsData settings;
+	InsSettingsGet(&settings);
 
 	ahrs_algorithm = settings.Algorithm;
+	bias_corrected_raw = settings.BiasCorrectedRaw == INSSETTINGS_BIASCORRECTEDRAW_TRUE;
 }
 
 void homelocation_callback(AhrsObjHandle obj)

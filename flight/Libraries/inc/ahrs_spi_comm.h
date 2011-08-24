@@ -110,7 +110,7 @@ int32_t AhrsConnectCallBack(AhrsObjHandle obj, AhrsEventCallback cb);
 Returns: the status.
 Note: the remote status will only be valid if the link is up and running
  */
-AhrsCommStatus AhrsGetStatus();
+void AhrsGetStatus(AhrsCommStatus * status);
 
 #ifdef IN_AHRS			//slave only
 /** Send the latest objects to the OP

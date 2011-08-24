@@ -989,29 +989,6 @@
       </default>
     </ImportExportGadget>
     <LineardialGadget>
-      <AHRS__PCT__20CPU>
-        <configInfo>
-          <locked>false</locked>
-          <version>0.0.0</version>
-        </configInfo>
-        <data>
-          <dFile>%%DATAPATH%%dials/default/lineardial-vertical.svg</dFile>
-          <decimalPlaces>0</decimalPlaces>
-          <factor>1</factor>
-          <font>Andale Mono,12,-1,5,75,0,0,0,0,0</font>
-          <greenMax>50</greenMax>
-          <greenMin>0</greenMin>
-          <maxValue>100</maxValue>
-          <minValue>0</minValue>
-          <redMax>100</redMax>
-          <redMin>80</redMin>
-          <sourceDataObject>AhrsStatus</sourceDataObject>
-          <sourceObjectField>CPULoad</sourceObjectField>
-          <useOpenGLFlag>false</useOpenGLFlag>
-          <yellowMax>80</yellowMax>
-          <yellowMin>50</yellowMin>
-        </data>
-      </AHRS__PCT__20CPU>
       <Accel__PCT__20Horizontal__PCT__20X>
         <configInfo>
           <locked>false</locked>

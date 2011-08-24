@@ -24,11 +24,10 @@ OTHER_FILES += UAVObjects.pluginspec
 
 # Add in all of the synthetic/generated uavobject files
 HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
-    $$UAVOBJECT_SYNTHETICS/ahrsstatus.h \
-    $$UAVOBJECT_SYNTHETICS/ahrscalibration.h \
+    $$UAVOBJECT_SYNTHETICS/insstatus.h \
     $$UAVOBJECT_SYNTHETICS/baroaltitude.h \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.h \
-    $$UAVOBJECT_SYNTHETICS/ahrssettings.h \
+    $$UAVOBJECT_SYNTHETICS/inssettings.h \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.h \
     $$UAVOBJECT_SYNTHETICS/attituderaw.h \
     $$UAVOBJECT_SYNTHETICS/camerastabsettings.h \
@@ -74,11 +73,10 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/cameradesired.h
 
 SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
-    $$UAVOBJECT_SYNTHETICS/ahrsstatus.cpp \
-    $$UAVOBJECT_SYNTHETICS/ahrscalibration.cpp \
+    $$UAVOBJECT_SYNTHETICS/insstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/baroaltitude.cpp \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.cpp \
-    $$UAVOBJECT_SYNTHETICS/ahrssettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/inssettings.cpp \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.cpp \
     $$UAVOBJECT_SYNTHETICS/attituderaw.cpp \
     $$UAVOBJECT_SYNTHETICS/camerastabsettings.cpp \

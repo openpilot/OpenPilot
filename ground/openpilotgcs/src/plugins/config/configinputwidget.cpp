@@ -542,7 +542,7 @@ void ConfigInputWidget::identifyControls()
             ++debounce;
         lastChannel.group= currentChannel.group;
         lastChannel.number=currentChannel.number;
-        if(!usedChannels.contains(lastChannel) && debounce>5)
+        if(!usedChannels.contains(lastChannel) && debounce>1)
         {
             debounce=0;
             usedChannels.append(lastChannel);

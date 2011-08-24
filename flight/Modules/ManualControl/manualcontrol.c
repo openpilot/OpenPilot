@@ -89,7 +89,7 @@ static bool okToArm(void);
 static bool validInputRange(int16_t min, int16_t max, uint16_t value);
 
 #define RCVR_ACTIVITY_MONITOR_CHANNELS_PER_GROUP 12
-#define RCVR_ACTIVITY_MONITOR_MIN_RANGE 5
+#define RCVR_ACTIVITY_MONITOR_MIN_RANGE 10
 struct rcvr_activity_fsm {
 	ManualControlSettingsChannelGroupsOptions group;
 	uint16_t prev[RCVR_ACTIVITY_MONITOR_CHANNELS_PER_GROUP];
@@ -347,6 +347,66 @@ static void resetRcvrActivity(struct rcvr_activity_fsm * fsm)
 	fsm->sample_count = 0;
 }
 
+static void updateRcvrActivitySample(uint32_t rcvr_id, uint16_t samples[], uint8_t max_channels) {
+	for (uint8_t channel = 0; channel < max_channels; channel++) {
+		samples[channel] = PIOS_RCVR_Read(rcvr_id, channel);
+	}
+}
+
+static bool updateRcvrActivityCompare(uint32_t rcvr_id, struct rcvr_activity_fsm * fsm)
+{
+	bool activity_updated = false;
+
+	/* Compare the current value to the previous sampled value */
+	for (uint8_t channel = 0;
+	     channel < RCVR_ACTIVITY_MONITOR_CHANNELS_PER_GROUP;
+	     channel++) {
+		uint16_t delta;
+		uint16_t prev = fsm->prev[channel];
+		uint16_t curr = PIOS_RCVR_Read(rcvr_id, channel);
+		if (curr > prev) {
+			delta = curr - prev;
+		} else {
+			delta = prev - curr;
+		}
+
+		if (delta > RCVR_ACTIVITY_MONITOR_MIN_RANGE) {
+			/* Mark this channel as active */
+			ReceiverActivityActiveGroupOptions group;
+
+			/* Don't assume manualcontrolsettings and receiveractivity are in the same order. */
+			switch (fsm->group) {
+			case MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM: 
+				group = RECEIVERACTIVITY_ACTIVEGROUP_PWM;
+				break;
+			case MANUALCONTROLSETTINGS_CHANNELGROUPS_PPM:
+				group = RECEIVERACTIVITY_ACTIVEGROUP_PPM;
+				break;
+			case MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM1:
+				group = RECEIVERACTIVITY_ACTIVEGROUP_SPEKTRUM1;
+				break;
+			case MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM2:
+				group = RECEIVERACTIVITY_ACTIVEGROUP_SPEKTRUM2;
+				break;
+			case MANUALCONTROLSETTINGS_CHANNELGROUPS_SBUS:
+				group = RECEIVERACTIVITY_ACTIVEGROUP_SBUS;
+				break;
+			case MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS:
+				group = RECEIVERACTIVITY_ACTIVEGROUP_GCS;
+				break;
+			default:
+				PIOS_Assert(0);
+				break;
+			}
+
+			ReceiverActivityActiveGroupSet(&group);
+			ReceiverActivityActiveChannelSet(&channel);
+			activity_updated = true;
+		}
+	}
+	return (activity_updated);
+}
+
 static bool updateRcvrActivity(struct rcvr_activity_fsm * fsm)
 {
 	bool activity_updated = false;
@@ -362,81 +422,43 @@ static bool updateRcvrActivity(struct rcvr_activity_fsm * fsm)
 		goto group_completed;
 	}
 
-	/* Sample the channel */
-	for (uint8_t channel = 0;
-	     channel < RCVR_ACTIVITY_MONITOR_CHANNELS_PER_GROUP;
-	     channel++) {
-		if (fsm->sample_count == 0) {
-			fsm->prev[channel] = PIOS_RCVR_Read(pios_rcvr_group_map[fsm->group], channel);
-		} else {
-			uint16_t delta;
-			uint16_t prev = fsm->prev[channel];
-			uint16_t curr = PIOS_RCVR_Read(pios_rcvr_group_map[fsm->group], channel);
-			if (curr > prev) {
-				delta = curr - prev;
-			} else {
-				delta = prev - curr;
-			}
-
-			if (delta > RCVR_ACTIVITY_MONITOR_MIN_RANGE) {
-				/* Mark this channel as active */
-				ReceiverActivityActiveGroupOptions group;
-
-				/* Don't assume manualcontrolsettings and receiveractivity are in the same order. */
-				switch (fsm->group) {
-				case MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM: 
-					group = RECEIVERACTIVITY_ACTIVEGROUP_PWM;
-					break;
-				case MANUALCONTROLSETTINGS_CHANNELGROUPS_PPM:
-					group = RECEIVERACTIVITY_ACTIVEGROUP_PPM;
-					break;
-				case MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM1:
-					group = RECEIVERACTIVITY_ACTIVEGROUP_SPEKTRUM1;
-					break;
-				case MANUALCONTROLSETTINGS_CHANNELGROUPS_SPEKTRUM2:
-					group = RECEIVERACTIVITY_ACTIVEGROUP_SPEKTRUM2;
-					break;
-				case MANUALCONTROLSETTINGS_CHANNELGROUPS_SBUS:
-					group = RECEIVERACTIVITY_ACTIVEGROUP_SBUS;
-					break;
-				case MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS:
-					group = RECEIVERACTIVITY_ACTIVEGROUP_GCS;
-					break;
-				default:
-					PIOS_Assert(0);
-					break;
-				}
-
-				ReceiverActivityActiveGroupSet(&group);
-				ReceiverActivityActiveChannelSet(&channel);
-				activity_updated = true;
-			}
-		}
+	if (fsm->sample_count == 0) {
+		/* Take a sample of each channel in this group */
+		updateRcvrActivitySample(pios_rcvr_group_map[fsm->group],
+					fsm->prev,
+					NELEMENTS(fsm->prev));
+		fsm->sample_count++;
+		return (false);
 	}
 
-	if (++fsm->sample_count < 2) {
-		return (activity_updated);
-	}
+	/* Compare with previous sample */
+	activity_updated = updateRcvrActivityCompare(pios_rcvr_group_map[fsm->group], fsm);
 
+group_completed:
 	/* Reset the sample counter */
 	fsm->sample_count = 0;
 
-	/*
-	 * Group Completed
-	 */
-
-group_completed:
-	/* Start over at channel zero */
-	if (++fsm->group < MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
-		return (activity_updated);
+	/* Find the next active group, but limit search so we can't loop forever here */
+	for (uint8_t i = 0; i < MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE; i++) {
+		/* Move to the next group */
+		fsm->group++;
+		if (fsm->group >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
+			/* Wrap back to the first group */
+			fsm->group = 0;
+		}
+		if (pios_rcvr_group_map[fsm->group]) {
+			/* 
+			 * Found an active group, take a sample here to avoid an
+			 * extra 20ms delay in the main thread so we can speed up
+			 * this algorithm.
+			 */
+			updateRcvrActivitySample(pios_rcvr_group_map[fsm->group],
+						fsm->prev,
+						NELEMENTS(fsm->prev));
+			fsm->sample_count++;
+			break;
+		}
 	}
-
-	/*
-	 * All groups completed
-	 */
-
-	/* Start over at group zero */
-	fsm->group = 0;
 
 	return (activity_updated);
 }

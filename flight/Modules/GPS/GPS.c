@@ -112,6 +112,7 @@ int32_t GPSInitialize(void)
 #if !defined(PIOS_GPS_PURISTIC)
 	GPSTimeInitialize();
 	GPSSatellitesInitialize();
+#endif
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 	HomeLocationInitialize();
 #endif

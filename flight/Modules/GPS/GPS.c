@@ -109,7 +109,7 @@ int32_t GPSStart(void)
 int32_t GPSInitialize(void)
 {
 	GPSPositionInitialize();
-#if !defined(PIOS_GPS_PURISTIC)
+#if !defined(PIOS_GPS_MINIMAL)
 	GPSTimeInitialize();
 	GPSSatellitesInitialize();
 #endif

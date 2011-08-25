@@ -52,7 +52,7 @@
 
 // Private constants
 #define MAX_QUEUE_SIZE 1
-#define STACK_SIZE_BYTES 256
+#define STACK_SIZE_BYTES 500
 #define TASK_PRIORITY (tskIDLE_PRIORITY+2)
 #define RAD2DEG (180.0/M_PI)
 #define DEG2RAD (M_PI/180.0)

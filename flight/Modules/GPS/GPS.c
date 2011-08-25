@@ -35,13 +35,7 @@
 
 #include <stdbool.h>
 
-#ifdef ENABLE_GPS_BINARY_GTOP
-	#include "GTOP_BIN.h"
-#endif
-
-#if defined(ENABLE_GPS_ONESENTENCE_GTOP) || defined(ENABLE_GPS_NMEA)
-	#include "NMEA.h"
-#endif
+#include "NMEA.h"
 
 #include "gpsposition.h"
 #include "homelocation.h"
@@ -63,25 +57,16 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 // ****************
 // Private constants
 
-//#define FULL_COLD_RESTART             // uncomment this to tell the GPS to do a FULL COLD restart
-//#define DISABLE_GPS_THRESHOLD          //
-
 #define GPS_TIMEOUT_MS                  500
-#define GPS_COMMAND_RESEND_TIMEOUT_MS   2000
+#define NMEA_MAX_PACKET_LENGTH          96 // 82 max NMEA msg size plus 12 margin (because some vendors add custom crap) plus CR plus Linefeed
+// same as in COM buffer
+
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 // Unfortunately need a good size stack for the WMM calculation
-	#ifdef ENABLE_GPS_BINARY_GTOP
-		#define STACK_SIZE_BYTES            800
-	#else
-		#define STACK_SIZE_BYTES            800
-	#endif
+	#define STACK_SIZE_BYTES            800
 #else
-	#ifdef ENABLE_GPS_BINARY_GTOP
-		#define STACK_SIZE_BYTES            440
-	#else
-		#define STACK_SIZE_BYTES            440
-	#endif
+	#define STACK_SIZE_BYTES            650
 #endif
 
 #define TASK_PRIORITY                   (tskIDLE_PRIORITY + 1)
@@ -93,9 +78,7 @@ static uint32_t gpsPort;
 
 static xTaskHandle gpsTaskHandle;
 
-#ifndef ENABLE_GPS_BINARY_GTOP
-	static char gps_rx_buffer[128];
-#endif
+static char* gps_rx_buffer;
 
 static uint32_t timeOfLastCommandMs;
 static uint32_t timeOfLastUpdateMs;
@@ -135,6 +118,8 @@ int32_t GPSInitialize(void)
 	// TODO: Get gps settings object
 	gpsPort = PIOS_COM_GPS;
 
+	gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
+
 	return 0;
 }
 MODULE_INITCALL(GPSInitialize, GPSStart)
@@ -150,45 +135,11 @@ static void gpsTask(void *parameters)
 	uint32_t timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;;
 	GPSPositionData GpsData;
 	
-#ifdef ENABLE_GPS_BINARY_GTOP
-	GTOP_BIN_init();
-#else
 	uint8_t rx_count = 0;
 	bool start_flag = false;
 	bool found_cr = false;
 	int32_t gpsRxOverflow = 0;
-#endif
 	
-#ifdef FULL_COLD_RESTART
-	// tell the GPS to do a FULL COLD restart
-	PIOS_COM_SendStringNonBlocking(gpsPort, "$PMTK104*37\r\n");
-	timeOfLastCommandMs = timeNowMs;
-	while (timeNowMs - timeOfLastCommandMs < 300)	// delay for 300ms to let the GPS sort itself out
-	{
-		vTaskDelay(xDelay);	// Block task until next update
-		timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;;
-	}
-#endif
-
-#ifdef DISABLE_GPS_THRESHOLD
-	PIOS_COM_SendStringNonBlocking(gpsPort, "$PMTK397,0*23\r\n");
-#endif
-
-#ifdef ENABLE_GPS_BINARY_GTOP
-	// switch to GTOP binary mode
-	PIOS_COM_SendStringNonBlocking(gpsPort ,"$PGCMD,21,1*6F\r\n");
-#endif
-	
-#ifdef ENABLE_GPS_ONESENTENCE_GTOP
-	// switch to single sentence mode
-	PIOS_COM_SendStringNonBlocking(gpsPort, "$PGCMD,21,2*6C\r\n");
-#endif
-
-#ifdef ENABLE_GPS_NMEA
-	// switch to NMEA mode
-	PIOS_COM_SendStringNonBlocking(gpsPort, "$PGCMD,21,3*6D\r\n");
-#endif
-
 	numUpdates = 0;
 	numChecksumErrors = 0;
 	numParsingErrors = 0;
@@ -200,103 +151,86 @@ static void gpsTask(void *parameters)
 	while (1)
 	{
 		uint8_t c;
-		#ifdef ENABLE_GPS_BINARY_GTOP
-			// GTOP BINARY GPS mode
+		// NMEA or SINGLE-SENTENCE GPS mode
 
-			while (PIOS_COM_ReceiveBuffer(gpsPort, &c, 1, xDelay) > 0)
+		// This blocks the task until there is something on the buffer
+		while (PIOS_COM_ReceiveBuffer(gpsPort, &c, 1, xDelay) > 0)
+		{
+		
+			// detect start while acquiring stream
+			if (!start_flag && (c == '$'))
 			{
-				if (GTOP_BIN_update_position(c, &numChecksumErrors, &numParsingErrors) >= 0)
-				{
-					numUpdates++;
+				start_flag = true;
+				found_cr = false;
+				rx_count = 0;
+			}
+			else
+			if (!start_flag)
+				continue;
+		
+			if (rx_count >= NMEA_MAX_PACKET_LENGTH)
+			{
+				// The buffer is already full and we haven't found a valid NMEA sentence.
+				// Flush the buffer and note the overflow event.
+				gpsRxOverflow++;
+				start_flag = false;
+				found_cr = false;
+				rx_count = 0;
+			}
+			else
+			{
+				gps_rx_buffer[rx_count] = c;
+				rx_count++;
+			}
+		
+			// look for ending '\r\n' sequence
+			if (!found_cr && (c == '\r') )
+				found_cr = true;
+			else
+			if (found_cr && (c != '\n') )
+				found_cr = false;  // false end flag
+			else
+			if (found_cr && (c == '\n') )
+			{
+				// The NMEA functions require a zero-terminated string
+				// As we detected \r\n, the string as for sure 2 bytes long, we will also strip the \r\n
+				gps_rx_buffer[rx_count-2] = 0;
+
+				// prepare to parse next sentence
+				start_flag = false;
+				found_cr = false;
+				rx_count = 0;
+				// Our rxBuffer must look like this now:
+				//   [0]           = '$'
+				//   ...           = zero or more bytes of sentence payload
+				//   [end_pos - 1] = '\r'
+				//   [end_pos]     = '\n'
+				//
+				// Prepare to consume the sentence from the buffer
+			
+				// Validate the checksum over the sentence
+				if (!NMEA_checksum(&gps_rx_buffer[1]))
+				{	// Invalid checksum.  May indicate dropped characters on Rx.
+					//PIOS_DEBUG_PinHigh(2);
+					++numChecksumErrors;
+					//PIOS_DEBUG_PinLow(2);
+				}
+				else
+				{	// Valid checksum, use this packet to update the GPS position
+					if (!NMEA_update_position(&gps_rx_buffer[1])) {
+						//PIOS_DEBUG_PinHigh(2);
+						++numParsingErrors;
+						//PIOS_DEBUG_PinLow(2);
+					}
+					else
+						++numUpdates;
 
 					timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
 					timeOfLastUpdateMs = timeNowMs;
 					timeOfLastCommandMs = timeNowMs;
 				}
 			}
-
-		#else
-			// NMEA or SINGLE-SENTENCE GPS mode
-
-			// This blocks the task until there is something on the buffer
-			while (PIOS_COM_ReceiveBuffer(gpsPort, &c, 1, xDelay) > 0)
-			{
-			
-				// detect start while acquiring stream
-				if (!start_flag && (c == '$'))
-				{
-					start_flag = true;
-					found_cr = false;
-					rx_count = 0;
-				}
-				else
-				if (!start_flag)
-					continue;
-			
-				if (rx_count >= sizeof(gps_rx_buffer))
-				{
-					// The buffer is already full and we haven't found a valid NMEA sentence.
-					// Flush the buffer and note the overflow event.
-					gpsRxOverflow++;
-					start_flag = false;
-					found_cr = false;
-					rx_count = 0;
-				}
-				else
-				{
-					gps_rx_buffer[rx_count] = c;
-					rx_count++;
-				}
-			
-				// look for ending '\r\n' sequence
-				if (!found_cr && (c == '\r') )
-					found_cr = true;
-				else
-				if (found_cr && (c != '\n') )
-					found_cr = false;  // false end flag
-				else
-				if (found_cr && (c == '\n') )
-				{
-					// The NMEA functions require a zero-terminated string
-					// As we detected \r\n, the string as for sure 2 bytes long, we will also strip the \r\n
-					gps_rx_buffer[rx_count-2] = 0;
-
-					// prepare to parse next sentence
-					start_flag = false;
-					found_cr = false;
-					rx_count = 0;
-					// Our rxBuffer must look like this now:
-					//   [0]           = '$'
-					//   ...           = zero or more bytes of sentence payload
-					//   [end_pos - 1] = '\r'
-					//   [end_pos]     = '\n'
-					//
-					// Prepare to consume the sentence from the buffer
-				
-					// Validate the checksum over the sentence
-					if (!NMEA_checksum(&gps_rx_buffer[1]))
-					{	// Invalid checksum.  May indicate dropped characters on Rx.
-						//PIOS_DEBUG_PinHigh(2);
-						++numChecksumErrors;
-						//PIOS_DEBUG_PinLow(2);
-					}
-					else
-					{	// Valid checksum, use this packet to update the GPS position
-						if (!NMEA_update_position(&gps_rx_buffer[1])) {
-							//PIOS_DEBUG_PinHigh(2);
-							++numParsingErrors;
-							//PIOS_DEBUG_PinLow(2);
-						}
-						else
-							++numUpdates;
-
-						timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
-						timeOfLastUpdateMs = timeNowMs;
-						timeOfLastCommandMs = timeNowMs;
-					}
-				}
-			}
-		#endif
+		}
 
 		// Check for GPS timeout
 		timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
@@ -309,30 +243,6 @@ static void gpsTask(void *parameters)
 			GPSPositionSet(&GpsData);
 			AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_ERROR);
 
-			if ((timeNowMs - timeOfLastCommandMs) >= GPS_COMMAND_RESEND_TIMEOUT_MS)
-			{	// resend the command .. just incase the gps has only just been plugged in or the gps did not get our last command
-				timeOfLastCommandMs = timeNowMs;
-
-				#ifdef ENABLE_GPS_BINARY_GTOP
-					GTOP_BIN_init();
-					// switch to binary mode
-					PIOS_COM_SendStringNonBlocking(gpsPort,"$PGCMD,21,1*6F\r\n");
-				#endif
-
-				#ifdef ENABLE_GPS_ONESENTENCE_GTOP
-					// switch to single sentence mode
-					PIOS_COM_SendStringNonBlocking(gpsPort,"$PGCMD,21,2*6C\r\n");
-				#endif
-
-				#ifdef ENABLE_GPS_NMEA
-					// switch to NMEA mode
-					PIOS_COM_SendStringNonBlocking(gpsPort,"$PGCMD,21,3*6D\r\n");
-				#endif
-
-				#ifdef DISABLE_GPS_TRESHOLD
-					PIOS_COM_SendStringNonBlocking(gpsPort,"$PMTK397,0*23\r\n");
-				#endif
-			}
 		}
 		else
 		{	// we appear to be receiving GPS sentences OK, we've had an update

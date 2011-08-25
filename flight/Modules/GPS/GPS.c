@@ -119,6 +119,7 @@ int32_t GPSInitialize(void)
 	gpsPort = PIOS_COM_GPS;
 
 	gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
+	PIOS_ASSERT(gps_rx_buffer);
 
 	return 0;
 }

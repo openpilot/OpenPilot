@@ -458,7 +458,7 @@ uc = $(subst a,A,$(subst b,B,$(subst c,C,$(subst d,D,$(subst e,E,$(subst f,F,$(s
 
 # Generate code for module initialization
 
-${OUTDIR}/InitOptMods.h:
+${OUTDIR}/InitOptMods.h: Makefile.posix
 	@echo ${quote}${foreach MOD, ${OPTMODULES}, int32_t ${MOD}Initialize(); }${quote} > ${OUTDIR}/InitOptMods.h
 	@echo ${quote}${foreach MOD, ${OPTMODULES}, int32_t ${MOD}Start(); }${quote} >> ${OUTDIR}/InitOptMods.h
 	@echo ${quote}#define MODULE_INITIALISE_OPTIONAL(list) \${quote} >> ${OUTDIR}/InitOptMods.h

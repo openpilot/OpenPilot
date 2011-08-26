@@ -3,6 +3,7 @@
         <description>Settings for the @ref CCGuidanceModule</description>
         <field name="Pitch" units="deg" type="float" elementnames="Climb,Sink" defaultvalue="15,-5"/>
         <field name="Roll" units="deg" type="float" elementnames="Kp,Max,Neutral" defaultvalue="2,35,0"/>
+        <field name="ReturnTobaseAltitudeOffset" units="meter" type="int16" elements="1" defaultvalue="75"/>
         <field name="UpdatePeriod" units="" type="int32" elements="1" defaultvalue="100"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>

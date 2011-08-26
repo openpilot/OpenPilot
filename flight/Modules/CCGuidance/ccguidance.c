@@ -47,6 +47,7 @@
 #include "manualcontrol.h"
 #include "manualcontrolcommand.h"
 #include "flightstatus.h"
+#include "homelocation.h"
 #include "stabilizationdesired.h"
 #include "systemsettings.h"
 
@@ -91,6 +92,7 @@ int32_t CCGuidanceInitialize()
 	CCGuidanceSettingsInitialize();
 	PositionDesiredInitialize();
 	GPSPositionInitialize();
+	HomeLocationInitialize();
 
 	// connect to GPSPosition
 	GPSPositionConnectCallback(&ccguidanceTask);
@@ -109,6 +111,7 @@ static void ccguidanceTask(UAVObjEvent * ev)
 	CCGuidanceSettingsData ccguidanceSettings;
 	ManualControlCommandData manualControl;
 	FlightStatusData flightStatus;
+	HomeLocationData homeLocation;
 
 	portTickType thisTime;
 
@@ -133,6 +136,7 @@ static void ccguidanceTask(UAVObjEvent * ev)
 	ManualControlCommandGet(&manualControl);
 	FlightStatusGet(&flightStatus);
 	SystemSettingsGet(&systemSettings);
+	HomeLocationGet(&homeLocation);
 	
 	if ((PARSE_FLIGHT_MODE(flightStatus.FlightMode) == FLIGHTMODE_GUIDANCE) &&
 		((systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWING) ||
@@ -146,13 +150,22 @@ static void ccguidanceTask(UAVObjEvent * ev)
 		GPSPositionData positionActual;
 		GPSPositionGet(&positionActual);
 
-		if(positionHoldLast == 0) {
+		if(positionHoldLast == 0 && (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD ||
+		  (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE && homeLocation.Set == HOMELOCATION_SET_FALSE)))
+		  {
 			/* When enter position hold mode save current position */
 			positionDesired.North = positionActual.Latitude;
 			positionDesired.East = positionActual.Longitude;
-			positionDesired.Down = positionActual.Altitude + 1;
+			positionDesired.Down = positionActual.Altitude + positionActual.GeoidSeparation + 1;
 			PositionDesiredSet(&positionDesired);
 			positionHoldLast = 1;
+		} else if (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE && homeLocation.Set == HOMELOCATION_SET_TRUE) {
+			/* When we RTB, safe home position */
+			positionHoldLast = 0;
+			positionDesired.North = homeLocation.Latitude;
+			positionDesired.East = homeLocation.Longitude;
+			positionDesired.Down = homeLocation.Altitude + ccguidanceSettings.ReturnTobaseAltitudeOffset ;
+			PositionDesiredSet(&positionDesired);
 		}
 
 		/* safety */
@@ -161,7 +174,7 @@ static void ccguidanceTask(UAVObjEvent * ev)
 			/* main position hold loop */
 			/* 1. Altitude */
 
-			if (positionActual.Altitude < positionDesired.Down) {
+			if ((positionActual.Altitude + positionActual.GeoidSeparation) < positionDesired.Down) {
 				stabDesired.Pitch = ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_CLIMB];
 			} else {
 				stabDesired.Pitch = ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_SINK];

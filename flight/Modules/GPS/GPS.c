@@ -276,7 +276,6 @@ static void gpsTask(void *parameters)
 }
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
-#if !defined(PIOS_GPS_MINIMAL)
 /*
  * Estimate the acceleration due to gravity for a particular location in LLA
  */
@@ -293,7 +292,6 @@ static float GravityAccel(float latitude, float longitude, float altitude)
 }
 
 // ****************
-#endif
 
 static void setHomeLocation(GPSPositionData * gpsData)
 {
@@ -326,6 +324,7 @@ static void setHomeLocation(GPSPositionData * gpsData)
 		// Compute magnetic flux direction at home location
 		if (WMM_GetMagVector(LLA[0], LLA[1], LLA[2], gps.Month, gps.Day, gps.Year, &home.Be[0]) >= 0)
 		{   // calculations appeared to go OK
+#endif
 
 			// Compute local acceleration due to gravity.  Vehicles that span a very large
 			// range of altitude (say, weather balloons) may need to update this during the
@@ -333,6 +332,7 @@ static void setHomeLocation(GPSPositionData * gpsData)
 			home.g_e = GravityAccel(LLA[0], LLA[1], LLA[2]);
 			home.Set = HOMELOCATION_SET_TRUE;
 			HomeLocationSet(&home);
+#if !defined(PIOS_GPS_MINIMAL)
 		}
 	}
 #endif

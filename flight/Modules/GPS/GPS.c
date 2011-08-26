@@ -51,7 +51,9 @@ static void gpsTask(void *parameters);
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 static void setHomeLocation(GPSPositionData * gpsData);
+#if !defined(PIOS_GPS_MINIMAL)
 static float GravityAccel(float latitude, float longitude, float altitude);
+#endif
 #endif
 
 // ****************
@@ -62,7 +64,7 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 // same as in COM buffer
 
 
-#ifdef PIOS_GPS_SETS_HOMELOCATION
+#if defined(PIOS_GPS_SETS_HOMELOCATION) && !defined(PIOS_GPS_SIMPLE)
 // Unfortunately need a good size stack for the WMM calculation
 	#define STACK_SIZE_BYTES            800
 #else
@@ -274,6 +276,7 @@ static void gpsTask(void *parameters)
 }
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
+#if !defined(PIOS_GPS_MINIMAL)
 /*
  * Estimate the acceleration due to gravity for a particular location in LLA
  */
@@ -290,16 +293,19 @@ static float GravityAccel(float latitude, float longitude, float altitude)
 }
 
 // ****************
+#endif
 
 static void setHomeLocation(GPSPositionData * gpsData)
 {
 	HomeLocationData home;
 	HomeLocationGet(&home);
+#if !defined(PIOS_GPS_MINIMAL)
 	GPSTimeData gps;
 	GPSTimeGet(&gps);
 
 	if (gps.Year >= 2000)
 	{
+#endif
 		// Store LLA
 		home.Latitude = gpsData->Latitude;
 		home.Longitude = gpsData->Longitude;
@@ -316,6 +322,7 @@ static void setHomeLocation(GPSPositionData * gpsData)
 		home.ECEF[1] = (int32_t) (ECEF[1] * 100);
 		home.ECEF[2] = (int32_t) (ECEF[2] * 100);
 
+#if !defined(PIOS_GPS_MINIMAL)
 		// Compute magnetic flux direction at home location
 		if (WMM_GetMagVector(LLA[0], LLA[1], LLA[2], gps.Month, gps.Day, gps.Year, &home.Be[0]) >= 0)
 		{   // calculations appeared to go OK
@@ -328,6 +335,7 @@ static void setHomeLocation(GPSPositionData * gpsData)
 			HomeLocationSet(&home);
 		}
 	}
+#endif
 }
 #endif
 

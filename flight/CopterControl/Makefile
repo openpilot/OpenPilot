@@ -169,6 +169,7 @@ SRC += $(OPUAVSYNTHDIR)/attitudesettings.c
 SRC += $(OPUAVSYNTHDIR)/camerastabsettings.c
 SRC += $(OPUAVSYNTHDIR)/cameradesired.c
 SRC += $(OPUAVSYNTHDIR)/gpsposition.c
+SRC += $(OPUAVSYNTHDIR)/homelocation.c
 SRC += $(OPUAVSYNTHDIR)/positiondesired.c
 SRC += $(OPUAVSYNTHDIR)/ccguidancesettings.c
 SRC += $(OPUAVSYNTHDIR)/hwsettings.c

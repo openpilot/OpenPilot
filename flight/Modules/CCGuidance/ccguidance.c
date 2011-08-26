@@ -60,12 +60,12 @@
 // Private types
 
 // Private variables
-static xTaskHandle ccguidanceTaskHandle;
-static xQueueHandle queue;
+//static xTaskHandle ccguidanceTaskHandle;
+//static xQueueHandle queue;
 static uint8_t positionHoldLast = 0;
 
 // Private functions
-static void ccguidanceTask(void *parameters);
+static void ccguidanceTask(UAVObjEvent * ev);
 static float bound(float val, float min, float max);
 static float sphereDistance(float lat1,float long1,float lat2,float long2);
 static float sphereCourse(float lat1,float long1,float lat2,float long2);
@@ -76,9 +76,8 @@ static float sphereCourse(float lat1,float long1,float lat2,float long2);
  */
 int32_t CCGuidanceStart()
 {
-	// Start main task
-	xTaskCreate(ccguidanceTask, (signed char *)"Guidance", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &ccguidanceTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_GUIDANCE, ccguidanceTaskHandle);
+	// indicate error - can only run correctly if GPSPosition is ever set, which will change the alarm state.
+	AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_ERROR);
 
 	return 0;
 }
@@ -91,12 +90,10 @@ int32_t CCGuidanceInitialize()
 {
 	CCGuidanceSettingsInitialize();
 	PositionDesiredInitialize();
+	GPSPositionInitialize();
 
-	// Create object queue
-	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
-	
-	// Listen for updates.
-	GPSPositionConnectQueue(queue);
+	// connect to GPSPosition
+	GPSPositionConnectCallback(&ccguidanceTask);
 	
 	return 0;
 }
@@ -104,9 +101,9 @@ int32_t CCGuidanceInitialize()
 
 
 /**
- * Module thread, should not return.
+ * Main module callback.
  */
-static void ccguidanceTask(void *parameters)
+static void ccguidanceTask(UAVObjEvent * ev)
 {
 	SystemSettingsData systemSettings;
 	CCGuidanceSettingsData ccguidanceSettings;
@@ -114,120 +111,115 @@ static void ccguidanceTask(void *parameters)
 	FlightStatusData flightStatus;
 
 	portTickType thisTime;
-	portTickType lastUpdateTime;
+
+	static portTickType lastUpdateTime = 0;
+	if (!lastUpdateTime) lastUpdateTime = xTaskGetTickCount();
+
 	float dT;
-	UAVObjEvent ev;
 
 	float courseError;
+
+	CCGuidanceSettingsGet(&ccguidanceSettings);
+
+	// Continue collecting data if not enough time
+	thisTime = xTaskGetTickCount();
+	if( (thisTime - lastUpdateTime) < (ccguidanceSettings.UpdatePeriod / portTICK_RATE_MS) )
+		return;
+
+	dT = (thisTime - lastUpdateTime) / portTICK_RATE_MS / 1000.0f;
+
+	lastUpdateTime = thisTime;
 	
-	// Main task loop
-	lastUpdateTime = xTaskGetTickCount();
-	while (1) {
-		CCGuidanceSettingsGet(&ccguidanceSettings);
+	ManualControlCommandGet(&manualControl);
+	FlightStatusGet(&flightStatus);
+	SystemSettingsGet(&systemSettings);
+	
+	if ((PARSE_FLIGHT_MODE(flightStatus.FlightMode) == FLIGHTMODE_GUIDANCE) &&
+		((systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWING) ||
+		 (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGELEVON) ||
+		 (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGVTAIL) ))
+	{
+		StabilizationDesiredData stabDesired;
+		StabilizationDesiredGet(&stabDesired);
+		PositionDesiredData positionDesired;
+		PositionDesiredGet(&positionDesired);
+		GPSPositionData positionActual;
+		GPSPositionGet(&positionActual);
 
-		// Wait until the GPSPosition object is updated, if a timeout then go to failsafe
-		if ( xQueueReceive(queue, &ev, ccguidanceSettings.UpdatePeriod / portTICK_RATE_MS) != pdTRUE )
-		{
-			AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_WARNING);
-		} else {
-			AlarmsClear(SYSTEMALARMS_ALARM_GUIDANCE);
+		if(positionHoldLast == 0) {
+			/* When enter position hold mode save current position */
+			positionDesired.North = positionActual.Latitude;
+			positionDesired.East = positionActual.Longitude;
+			positionDesired.Down = positionActual.Altitude + 1;
+			PositionDesiredSet(&positionDesired);
+			positionHoldLast = 1;
 		}
-				
-		// Continue collecting data if not enough time
-		thisTime = xTaskGetTickCount();
-		if( (thisTime - lastUpdateTime) < (ccguidanceSettings.UpdatePeriod / portTICK_RATE_MS) )
-			continue;
 
-		dT = (thisTime - lastUpdateTime) / portTICK_RATE_MS / 1000.0f;
+		/* safety */
+		if (positionActual.Status==GPSPOSITION_STATUS_FIX3D) {
+					
+			/* main position hold loop */
+			/* 1. Altitude */
 
-		lastUpdateTime = thisTime;
-		
-		ManualControlCommandGet(&manualControl);
-		FlightStatusGet(&flightStatus);
-		SystemSettingsGet(&systemSettings);
-		
-		if ((PARSE_FLIGHT_MODE(flightStatus.FlightMode) == FLIGHTMODE_GUIDANCE) &&
-		    ((systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWING) ||
-		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGELEVON) ||
-		     (systemSettings.AirframeType == SYSTEMSETTINGS_AIRFRAMETYPE_FIXEDWINGVTAIL) ))
-		{
-			StabilizationDesiredData stabDesired;
-			StabilizationDesiredGet(&stabDesired);
-			PositionDesiredData positionDesired;
-			PositionDesiredGet(&positionDesired);
-			GPSPositionData positionActual;
-			GPSPositionGet(&positionActual);
-
-			if(positionHoldLast == 0) {
-				/* When enter position hold mode save current position */
-				positionDesired.North = positionActual.Latitude;
-				positionDesired.East = positionActual.Longitude;
-				positionDesired.Down = positionActual.Altitude + 1;
-				PositionDesiredSet(&positionDesired);
-				positionHoldLast = 1;
-			}
-
-			/* safety */
-			if (positionActual.Status==GPSPOSITION_STATUS_FIX3D) {
-						
-				/* main position hold loop */
-				/* 1. Altitude */
-
-				if (positionActual.Altitude < positionDesired.Down) {
-					stabDesired.Pitch = ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_CLIMB];
-				} else {
-					stabDesired.Pitch = ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_SINK];
-				}
-
-				/* 2. Heading */
-				courseError = sphereCourse(
-					positionActual.Latitude * 1e-7,
-					positionActual.Longitude * 1e-7,
-					positionDesired.North * 1e-7,
-					positionDesired.East * 1e-7
-					) - positionActual.Heading;
-				if (courseError<-180.) courseError+=360.;
-				if (courseError>180.) courseError-=360.;
-
-				stabDesired.Roll = bound(
-					ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_NEUTRAL] +
-					ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_KP] * courseError,
-					-ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_MAX],
-					ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_MAX]);
-
-				if (positionActual.Groundspeed>0) {
-
-					stabDesired.Yaw = RAD2DEG * sinf(
-						( stabDesired.Roll - ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_NEUTRAL]
-						) / RAD2DEG
-						) * GEE / positionActual.Groundspeed;
-				} else {
-					stabDesired.Yaw = 0;
-				}
-
-			} else {
-				/* Fallback, no position data! */
-				stabDesired.Yaw = 0;
+			if (positionActual.Altitude < positionDesired.Down) {
 				stabDesired.Pitch = ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_CLIMB];
-				stabDesired.Roll = ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_MAX];
+			} else {
+				stabDesired.Pitch = ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_SINK];
 			}
 
-			/* 3. Throttle (manual) */
+			/* 2. Heading */
+			courseError = sphereCourse(
+				positionActual.Latitude * 1e-7,
+				positionActual.Longitude * 1e-7,
+				positionDesired.North * 1e-7,
+				positionDesired.East * 1e-7
+				) - positionActual.Heading;
+			if (courseError<-180.) courseError+=360.;
+			if (courseError>180.) courseError-=360.;
 
-			stabDesired.Throttle = manualControl.Throttle;
-			stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-			stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-			stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
-			
-			StabilizationDesiredSet(&stabDesired);
+			stabDesired.Roll = bound(
+				ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_NEUTRAL] +
+				ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_KP] * courseError,
+				-ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_MAX],
+				ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_MAX]);
 
+			if (positionActual.Groundspeed>0) {
+
+				stabDesired.Yaw = RAD2DEG * sinf(
+					( stabDesired.Roll - ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_NEUTRAL]
+					) / RAD2DEG
+					) * GEE / positionActual.Groundspeed;
+			} else {
+				stabDesired.Yaw = 0;
+			}
+
+			AlarmsClear(SYSTEMALARMS_ALARM_GUIDANCE);
 
 		} else {
-			// reset globals...
-			positionHoldLast = 0;
+			/* Fallback, no position data! */
+			stabDesired.Yaw = 0;
+			stabDesired.Pitch = ccguidanceSettings.Pitch[CCGUIDANCESETTINGS_PITCH_CLIMB];
+			stabDesired.Roll = ccguidanceSettings.Roll[CCGUIDANCESETTINGS_ROLL_MAX];
+
+			AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_WARNING);
 		}
+
+		/* 3. Throttle (manual) */
+
+		stabDesired.Throttle = manualControl.Throttle;
+		stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+		stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+		stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
 		
+		StabilizationDesiredSet(&stabDesired);
+
+
+	} else {
+		// reset globals...
+		positionHoldLast = 0;
+		AlarmsClear(SYSTEMALARMS_ALARM_GUIDANCE);
 	}
+		
 }
 
 

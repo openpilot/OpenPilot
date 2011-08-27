@@ -32,6 +32,7 @@
 #include <uavobjectsinit.h>
 #include <hwsettings.h>
 #include <manualcontrolsettings.h>
+#include <gcsreceiver.h>
 
 #if defined(PIOS_INCLUDE_SPI)
 
@@ -1134,6 +1135,7 @@ void PIOS_Board_Init(void) {
 	}
 
 #if defined(PIOS_INCLUDE_GCSRCVR)
+	GCSReceiverInitialize();
 	PIOS_GCSRCVR_Init();
 	uint32_t pios_gcsrcvr_rcvr_id;
 	if (PIOS_RCVR_Init(&pios_gcsrcvr_rcvr_id, &pios_gcsrcvr_rcvr_driver, 0)) {

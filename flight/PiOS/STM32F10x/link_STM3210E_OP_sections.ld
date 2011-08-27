@@ -181,17 +181,6 @@ SECTIONS
         *(.flashtext)            /* Startup code */
         . = ALIGN(4);
     } >FLASH
- 
-    
-    /* init sections */
-    .initcalluavobj.init :
-    {
-        . = ALIGN(4);
-	__uavobj_initcall_start = .;
-        KEEP(*(.initcalluavobj.init))
-	. = ALIGN(4);
-	__uavobj_initcall_end   = .;
-    } >FLASH
 
     /* module sections */
     .initcallmodule.init :

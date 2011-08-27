@@ -117,7 +117,7 @@ void runningDeviceWidget::populate()
             myDevice->lblFWTag->setText(QString("Firmware tag: ")+devDesc.description);
             QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
             myDevice->lblCertified->setPixmap(pix);
-            myDevice->lblCertified->setToolTip(tr("Official Firmware Build"));
+            myDevice->lblCertified->setToolTip(tr("Tagged officially released firmware build"));
 
         }
         else
@@ -125,7 +125,7 @@ void runningDeviceWidget::populate()
             myDevice->lblFWTag->setText(QString("Firmware tag: ")+devDesc.description);
             QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
             myDevice->lblCertified->setPixmap(pix);
-            myDevice->lblCertified->setToolTip(tr("Custom Firmware Build"));
+            myDevice->lblCertified->setToolTip(tr("Untagged or custom firmware build"));
         }
         myDevice->lblGitCommitTag->setText("Git commit tag: "+devDesc.gitTag);
         myDevice->lblFWDate->setText(QString("Firmware date: ") + devDesc.buildDate);

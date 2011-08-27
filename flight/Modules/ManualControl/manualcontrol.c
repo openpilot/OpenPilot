@@ -103,17 +103,15 @@ static bool updateRcvrActivity(struct rcvr_activity_fsm * fsm);
 #define assumptions (assumptions1 && assumptions3 && assumptions5 && assumptions7 && assumptions8 && assumptions_flightmode)
 
 /**
- * Module initialization
+ * Module starting
  */
 int32_t ManualControlStart()
 {
-	/* Check the assumptions about uavobject enum's are correct */
-	if(!assumptions)
-		return -1;
 	// Start main task
 	xTaskCreate(manualControlTask, (signed char *)"ManualControl", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_MANUALCONTROL, taskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_MANUAL);
+
 	return 0;
 }
 
@@ -122,6 +120,17 @@ int32_t ManualControlStart()
  */
 int32_t ManualControlInitialize()
 {
+
+	/* Check the assumptions about uavobject enum's are correct */
+	if(!assumptions)
+		return -1;
+
+	AccessoryDesiredInitialize();
+	ManualControlCommandInitialize();
+	FlightStatusInitialize();
+	StabilizationDesiredInitialize();
+
+	ManualControlSettingsInitialize();
 
 	return 0;
 }
@@ -737,4 +746,3 @@ bool validInputRange(int16_t min, int16_t max, uint16_t value)
   * @}
   * @}
   */
-

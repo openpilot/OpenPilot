@@ -8,7 +8,6 @@
  *
  * @file       pios_spektrum.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      USART commands. Inits USARTs, controls USARTs & Interrupt handlers. (STM32 dependent)
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -113,7 +112,7 @@ static struct pios_spektrum_dev * PIOS_SPEKTRUM_alloc(void)
 #endif
 
 static void PIOS_SPEKTRUM_Supervisor(uint32_t spektrum_id);
-static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg);
+static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg, uint8_t bind);
 static int32_t PIOS_SPEKTRUM_UpdateFSM(struct pios_spektrum_fsm * fsm, uint8_t b);
 
 static uint16_t PIOS_SPEKTRUM_RxInCallback(uint32_t context, uint8_t * buf, uint16_t buf_len, uint16_t * headroom, bool * need_yield)
@@ -221,7 +220,7 @@ static int32_t PIOS_SPEKTRUM_UpdateFSM(struct pios_spektrum_fsm * fsm, uint8_t b
 /**
 * Bind and Initialise Spektrum satellite receiver
 */
-int32_t PIOS_SPEKTRUM_Init(uint32_t * spektrum_id, const struct pios_spektrum_cfg *cfg, const struct pios_com_driver * driver, uint32_t lower_id, bool bind)
+int32_t PIOS_SPEKTRUM_Init(uint32_t * spektrum_id, const struct pios_spektrum_cfg *cfg, const struct pios_com_driver * driver, uint32_t lower_id, uint8_t bind)
 {
 	PIOS_DEBUG_Assert(spektrum_id);
 	PIOS_DEBUG_Assert(cfg);
@@ -236,7 +235,7 @@ int32_t PIOS_SPEKTRUM_Init(uint32_t * spektrum_id, const struct pios_spektrum_cf
 	spektrum_dev->cfg = cfg;
 
 	if (bind) {
-		PIOS_SPEKTRUM_Bind(cfg);
+		PIOS_SPEKTRUM_Bind(cfg,bind);
 	}
 
 	PIOS_SPEKTRUM_ResetFSM(&(spektrum_dev->fsm));
@@ -280,9 +279,15 @@ static int32_t PIOS_SPEKTRUM_Get(uint32_t rcvr_id, uint8_t channel)
 * \output true Successful bind
 * \output false Bind failed
 */
-static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg)
+static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg, uint8_t bind)
 {
-#define BIND_PULSES 5
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_InitStructure.GPIO_Pin = cfg->bind.init.GPIO_Pin;
+	GPIO_InitStructure.GPIO_Speed = cfg->bind.init.GPIO_Speed;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+
+	/* just to limit bind pulses */
+	bind=(bind<=10)?bind:10;
 
 	GPIO_Init(cfg->bind.gpio, &cfg->bind.init);
 	/* RX line, set high */
@@ -291,7 +296,7 @@ static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg)
 	/* on CC works upto 140ms, I guess bind window is around 20-140ms after powerup */
 	PIOS_DELAY_WaitmS(60);
 
-	for (int i = 0; i < BIND_PULSES ; i++) {
+	for (int i = 0; i < bind ; i++) {
 		/* RX line, drive low for 120us */
 		GPIO_ResetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 		PIOS_DELAY_WaituS(120);
@@ -300,6 +305,7 @@ static bool PIOS_SPEKTRUM_Bind(const struct pios_spektrum_cfg * cfg)
 		PIOS_DELAY_WaituS(120);
 	}
 	/* RX line, set input and wait for data, PIOS_SPEKTRUM_Init */
+	GPIO_Init(cfg->bind.gpio, &GPIO_InitStructure);
 
 	return true;
 }
@@ -328,6 +334,7 @@ static void PIOS_SPEKTRUM_Supervisor(uint32_t spektrum_id)
 		fsm->sync_of++;
 		/* watchdog activated after 100ms silence */
 		if (fsm->sync_of > 12) {
+
 			/* signal lost */
 			fsm->sync_of = 0;
 			for (int i = 0; i < PIOS_SPEKTRUM_NUM_INPUTS; i++) {

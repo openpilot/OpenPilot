@@ -29,6 +29,11 @@
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 
+#include "attituderaw.h"
+#include "attitudeactual.h"
+#include "positionactual.h"
+#include "velocityactual.h"
+
 #include "pios_rcvr_priv.h"
 
 struct pios_rcvr_channel_map pios_rcvr_channel_to_id_map[PIOS_RCVR_MAX_CHANNELS];
@@ -66,6 +71,7 @@ const struct pios_udp_cfg pios_udp_aux_cfg = {
 
 #define PIOS_COM_TELEM_RF_RX_BUF_LEN 192
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN 192
+#define PIOS_COM_GPS_RX_BUF_LEN 192
 
 /*
  * Board specific number of devices.
@@ -154,20 +160,27 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_GPS)
 	{
 		uint32_t pios_udp_gps_id;
-		if (PIOS_USART_Init(&pios_udp_gps_id, &pios_udp_gps_cfg)) {
+		if (PIOS_UDP_Init(&pios_udp_gps_id, &pios_udp_gps_cfg)) {
 			PIOS_Assert(0);
 		}
 		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
+		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
 		PIOS_Assert(rx_buffer);
+		PIOS_Assert(tx_buffer);
 		if (PIOS_COM_Init(&pios_com_gps_id, &pios_udp_com_driver, pios_udp_gps_id,
 				  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
-				  NULL, 0)) {
+				  tx_buffer, PIOS_COM_GPS_RX_BUF_LEN)) {
 			PIOS_Assert(0);
 		}
 	}
 #endif	/* PIOS_INCLUDE_GPS */
 #endif
 
+	// Initialize these here as posix has no AHRSComms
+	AttitudeRawInitialize();
+	AttitudeActualInitialize();
+	VelocityActualInitialize();
+	PositionActualInitialize();
 
 }
 

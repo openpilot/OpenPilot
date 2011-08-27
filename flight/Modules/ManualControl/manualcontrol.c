@@ -129,7 +129,7 @@ int32_t ManualControlInitialize()
 	ManualControlCommandInitialize();
 	FlightStatusInitialize();
 	StabilizationDesiredInitialize();
-
+	ReceiverActivityInitialize();
 	ManualControlSettingsInitialize();
 
 	return 0;

@@ -48,6 +48,7 @@
 #define PIOS_INCLUDE_RCVR
 
 /* Supported receiver interfaces */
+#define PIOS_INCLUDE_TELEMETRY_RF
 //#define PIOS_INCLUDE_SPEKTRUM
 //#define PIOS_INCLUDE_GPS
 //#define PIOS_INCLUDE_SBUS

@@ -225,21 +225,40 @@ static const struct pios_usart_cfg pios_usart_telem_main_cfg = {
     },
   },
   .rx   = {
+#ifdef MOVECOPTER
+    .gpio = GPIOB,
+#else
     .gpio = GPIOA,
+#endif
     .init = {
+#ifdef MOVECOPTER
+      .GPIO_Pin   = GPIO_Pin_7,
+#else
       .GPIO_Pin   = GPIO_Pin_10,
+#endif
       .GPIO_Speed = GPIO_Speed_2MHz,
       .GPIO_Mode  = GPIO_Mode_IPU,
     },
   },
   .tx   = {
+#ifdef MOVECOPTER
+    .gpio = GPIOB,
+#else
     .gpio = GPIOA,
+#endif
     .init = {
+#ifdef MOVECOPTER
+      .GPIO_Pin   = GPIO_Pin_6,
+#else
       .GPIO_Pin   = GPIO_Pin_9,
+#endif
       .GPIO_Speed = GPIO_Speed_2MHz,
       .GPIO_Mode  = GPIO_Mode_AF_PP,
     },
   },
+#ifdef MOVECOPTER
+  .remap = AFIO_MAPR_USART1_REMAP,
+#endif
 };
 
 static const struct pios_usart_cfg pios_usart_telem_flexi_cfg = {

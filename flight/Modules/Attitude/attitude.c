@@ -83,7 +83,7 @@ static void settingsUpdatedCb(UAVObjEvent * objEv);
 static float accelKi = 0;
 static float accelKp = 0;
 static float yawBiasRate = 0;
-static float gyroGain = 0.42;
+static float gyroGain[3] = {0.42,0.42,0.42};
 static int16_t accelbias[3];
 static float q[4] = {1,0,0,0};
 static float R[3][3];
@@ -239,9 +239,9 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 		return -1;
 
 	// First sample is temperature
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = -(gyro[1] - GYRO_NEUTRAL) * gyroGain;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] = (gyro[2] - GYRO_NEUTRAL) * gyroGain;
-	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = -(gyro[3] - GYRO_NEUTRAL) * gyroGain;
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_X] = -(gyro[1] - GYRO_NEUTRAL) * gyroGain[0];
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Y] = (gyro[2] - GYRO_NEUTRAL) * gyroGain[1];
+	attitudeRaw->gyros[ATTITUDERAW_GYROS_Z] = -(gyro[3] - GYRO_NEUTRAL) * gyroGain[2];
 
 	int32_t x = 0;
 	int32_t y = 0;
@@ -398,7 +398,9 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	accelKp = attitudeSettings.AccelKp;
 	accelKi = attitudeSettings.AccelKi;
 	yawBiasRate = attitudeSettings.YawBiasRate;
-	gyroGain = attitudeSettings.GyroGain;
+	gyroGain[0] = attitudeSettings.GyroGain[ATTITUDESETTINGS_GYROGAIN_X];
+	gyroGain[1] = attitudeSettings.GyroGain[ATTITUDESETTINGS_GYROGAIN_Y];
+	gyroGain[2] = attitudeSettings.GyroGain[ATTITUDESETTINGS_GYROGAIN_Z];
 
 	zero_during_arming = attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE;
 	bias_correct_gyro = attitudeSettings.BiasCorrectGyro == ATTITUDESETTINGS_BIASCORRECTGYRO_TRUE;

@@ -137,6 +137,12 @@ C: Mat Wellington
 D: July 2011
 V: http://www.youtube.com/watch?v=YE4Fd9vdg1I
 
+M: First CopterControl Return to Base Fixed Wing
+C: Eric Price (Corvus Corax)
+D: AUgust 2011
+V: http://www.youtube.com/watch?v=CugI0oBSQn8
+
+
 M: First Altitude Hold using Sonar
 C: 
 D: 

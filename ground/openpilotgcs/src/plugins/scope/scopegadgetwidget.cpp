@@ -385,8 +385,15 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
     UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject((plotData->uavObject)));
-
+    if(!obj) {
+        qDebug() << "Object " << plotData->uavObject << " is missing";
+        return;
+    }
     UAVObjectField* field = obj->getField(plotData->uavField);
+    if(!field) {
+        qDebug() << "Field " << plotData->uavField << " of object " << plotData->uavObject << " is missing";
+        return;
+    }
     QString units = field->getUnits();
 
     if(units == 0)

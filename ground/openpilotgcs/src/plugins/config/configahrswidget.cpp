@@ -35,6 +35,7 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 #include <QThread>
+#include <QErrorMessage>
 #include <iostream>
 #include <Eigen/align-function.h>
 #include <QDesktopServices>
@@ -49,7 +50,6 @@
 #define sign(x) ((x < 0) ? -1 : 1)
 
 const double ConfigAHRSWidget::maxVarValue = 0.1;
-const int ConfigAHRSWidget::calibrationDelay = 7; // Time to wait for the AHRS to do its calibration
 
 // *****************
 
@@ -221,7 +221,7 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_ahrs->sixPointsStart->setEnabled(homeLocationData.Set == HomeLocation::SET_TRUE);
 
     // Connect the signals
-    connect(m_ahrs->ahrsCalibStart, SIGNAL(clicked()), this, SLOT(launchAHRSCalibration()));
+    connect(m_ahrs->ahrsCalibStart, SIGNAL(clicked()), this, SLOT(measureNoise()));
     connect(m_ahrs->accelBiasStart, SIGNAL(clicked()), this, SLOT(launchAccelBiasCalibration()));
 
     connect(homeLocation, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
@@ -232,6 +232,9 @@ ConfigAHRSWidget::ConfigAHRSWidget(QWidget *parent) : ConfigTaskWidget(parent)
     connect(m_ahrs->sixPointsStart, SIGNAL(clicked()), this, SLOT(multiPointCalibrationMode()));
     connect(m_ahrs->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
     connect(m_ahrs->startDriftCalib, SIGNAL(clicked()),this, SLOT(launchGyroDriftCalibration()));
+
+    // Leave this timer permanently connected.  The timer itself is started and stopped.
+    connect(&progressBarTimer, SIGNAL(timeout()), this, SLOT(incrementProgress()));
 
     // Order is important: 1st request the settings (it will also enable the controls)
     // then explicitely disable them. They will be re-enabled right afterwards by the
@@ -492,80 +495,76 @@ void ConfigAHRSWidget::computeGyroDrift() {
 
 }
 
-
-
-
 /**
-  Launches the AHRS sensors calibration
+  Launches the INS sensors noise measurements
   */
-void ConfigAHRSWidget::launchAHRSCalibration()
+void ConfigAHRSWidget::measureNoise()
 {
+    if(collectingData) {
+        QErrorMessage err(this);
+        err.showMessage("Cannot start noise measurement as data already being gathered");
+        err.exec();
+        return;
+    }
     m_ahrs->calibInstructions->setText("Estimating sensor variance...");
     m_ahrs->ahrsCalibStart->setEnabled(false);
+    m_ahrs->calibProgress->setValue(0);
 
-    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
-    UAVObjectField *field = obj->getField(QString("measure_var"));
-    field->setValue("MEASURE");
-    obj->updated();
+    InsSettings * insSettings = InsSettings::GetInstance(getObjectManager());
+    InsSettings::DataFields insSettingsData = insSettings->getData();
+    algorithm = insSettingsData.Algorithm;
+    insSettingsData.Algorithm = InsSettings::ALGORITHM_CALIBRATION;
+    insSettings->setData(insSettingsData);
+    insSettings->updated();
+    collectingData = true;
 
-    QTimer::singleShot(calibrationDelay*1000, this, SLOT(calibPhase2()));
-    m_ahrs->calibProgress->setRange(0,calibrationDelay);
-    phaseCounter = 0;
-    progressBarIndex = 0;
-    connect(&progressBarTimer, SIGNAL(timeout()), this, SLOT(incrementProgress()));
-    progressBarTimer.start(1000);
+    connect(insSettings,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(noiseMeasured()));
+    m_ahrs->calibProgress->setRange(0,calibrationDelay*10);
+    progressBarTimer.start(100);
 }
 
 /**
-  Increment progress bar
+  Increment progress bar for noise measurements (not really based on feedback)
   */
 void ConfigAHRSWidget::incrementProgress()
 {
-    m_ahrs->calibProgress->setValue(progressBarIndex++);
-    if (progressBarIndex > m_ahrs->calibProgress->maximum()) {
+    m_ahrs->calibProgress->setValue(m_ahrs->calibProgress->value()+1);
+    if (m_ahrs->calibProgress->value() >= m_ahrs->calibProgress->maximum()) {
         progressBarTimer.stop();
-        progressBarIndex = 0;
+
+        InsSettings * insSettings = InsSettings::GetInstance(getObjectManager());
+        Q_ASSERT(insSettings);
+        disconnect(insSettings, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(noiseMeasured()));
+        collectingData = false;
+
+        QErrorMessage err(this);
+        err.showMessage("Noise measurement timed out.  State undetermined.  Please power cycle.");
+        err.exec();
     }
 }
 
-
 /**
-  Callback once calibration is done on the board.
-
-  Currently we don't have a way to tell if calibration is finished, so we
-  have to use a timer.
-
-  calibPhase2 is also connected to the AHRSCalibration object update signal.
-
-
+  *@brief Callback once calibration is done on the board.  Restores the original algorithm.
   */
-void ConfigAHRSWidget::calibPhase2()
+void ConfigAHRSWidget::noiseMeasured()
 {
+    Q_ASSERT(collectingData); // Let's catch any race conditions
 
-    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
-//    UAVObjectField *field = obj->getField(QString("measure_var"));
+    // Do all the clean stopping stuff
+    InsSettings * insSettings = InsSettings::GetInstance(getObjectManager());
+    Q_ASSERT(insSettings);
+    disconnect(insSettings, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(noiseMeasured()));
+    collectingData = false;
+    progressBarTimer.stop();
+    m_ahrs->calibProgress->setValue(m_ahrs->calibProgress->maximum());
 
-    //  This is a bit weird, but it is because we are expecting an update from the
-      // OP board with the correct calibration values, and those only arrive on the object update
-      // which comes back from the board, and not the first object update signal which is in fast
-      // the object update we did ourselves... Clear ?
-      switch (phaseCounter) {
-      case 0:
-          phaseCounter++;
-          m_ahrs->calibInstructions->setText("Getting results...");
-          connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(calibPhase2()));
-          //  We need to echo back the results of calibration before changing to set mode
-          obj->requestUpdate();
-          break;
-      case 1:  // This is the update with the right values (coming from the board)
-          disconnect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(calibPhase2()));
-          // Now update size of all the graphs
-          drawVariancesGraph();
-          saveAHRSCalibration();
-          m_ahrs->calibInstructions->setText(QString("Calibration saved."));
-          m_ahrs->ahrsCalibStart->setEnabled(true);
-          break;
-      }
+    InsSettings::DataFields insSettingsData = insSettings->getData();
+    insSettingsData.Algorithm = algorithm;
+    insSettings->setData(insSettingsData);
+    insSettings->updated();
+
+    m_ahrs->calibInstructions->setText(QString("Calibration complete."));
+    m_ahrs->ahrsCalibStart->setEnabled(true);
 }
 
 /**
@@ -573,11 +572,8 @@ void ConfigAHRSWidget::calibPhase2()
   */
 void ConfigAHRSWidget::saveAHRSCalibration()
 {
-    UAVObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("AHRSCalibration")));
-    UAVObjectField *field = obj->getField(QString("measure_var"));
-    field->setValue("SET");
-    obj->updated();
-    saveObjectToSD(obj);
+    InsSettings * insSettings = InsSettings::GetInstance(getObjectManager());
+    saveObjectToSD(insSettings);
 }
 
 FORCE_ALIGN_FUNC

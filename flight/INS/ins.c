@@ -71,7 +71,7 @@ void get_baro_data();
 void get_accel_gyro_data();
 
 void reset_values();
-void calibrate_sensors(void);
+void measure_noise(void);
 
 /* Communication functions */
 //void send_calibration(void);
@@ -193,7 +193,9 @@ int main()
 	 for all data to be up to date before doing anything*/
 	InsSettingsConnectCallback(settings_callback);
 	HomeLocationConnectCallback(homelocation_callback);
-	FirmwareIAPObjConnectCallback(firmwareiapobj_callback);
+	//FirmwareIAPObjConnectCallback(firmwareiapobj_callback);
+	
+	settings_callback(InsSettingsHandle());
 	
 	/******************* Main EKF loop ****************************/
 	while(1) {
@@ -242,6 +244,9 @@ int main()
 			case INSSETTINGS_ALGORITHM_INSGPS_INDOOR:
 			case INSSETTINGS_ALGORITHM_INSGPS_INDOOR_NOMAG:
 				ins_indoor_update();
+				break;
+			case INSSETTINGS_ALGORITHM_CALIBRATION:
+				measure_noise();
 				break;
 		}
 		
@@ -485,90 +490,73 @@ void get_baro_data()
  * sense for the z accel so make sure 6 point calibration is also run and those values set
  * after these read.
  */
-#define NBIAS 100
-#define NVAR  500
-void calibrate_sensors()
+#define NMEAN  500
+#define NVAR   1000
+#define CHANNELS 6
+static uint32_t calibrate_count = 0;
+float f_means[CHANNELS];
+float f_var[CHANNELS] = {0, 0, 0, 0, 0, 0};
+void measure_noise()
 {
-	int i,j;
-	float accel_bias[3] = {0, 0, 0};
-	float gyro_bias[3] = {0, 0, 0};
-	float mag_bias[3] = {0, 0, 0};
+	uint32_t i;
 
-
-	for (i = 0, j = 0; i < NBIAS; i++) {
-
-		get_accel_gyro_data();
-
-		gyro_bias[0] += gyro_data.filtered.x / NBIAS;
-		gyro_bias[1] += gyro_data.filtered.y / NBIAS;
-		gyro_bias[2] += gyro_data.filtered.z / NBIAS;
-		accel_bias[0] += accel_data.filtered.x / NBIAS;
-		accel_bias[1] += accel_data.filtered.y / NBIAS;
-		accel_bias[2] += accel_data.filtered.z / NBIAS;
-
-#if defined(PIOS_INCLUDE_HMC5883) && defined(PIOS_INCLUDE_I2C)
-		if(PIOS_HMC5883_NewDataAvailable()) {
-			j ++;
-			PIOS_HMC5883_ReadMag(mag_data.raw.axis);
-			mag_data.scaled.axis[0] = (mag_data.raw.axis[0] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
-			mag_data.scaled.axis[1] = (mag_data.raw.axis[1] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
-			mag_data.scaled.axis[2] = (mag_data.raw.axis[2] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
-			mag_bias[0] += mag_data.scaled.axis[0];
-			mag_bias[1] += mag_data.scaled.axis[1];
-			mag_bias[2] += mag_data.scaled.axis[2];
-		}
-#endif
-
-	}
-	mag_bias[0] /= j;
-	mag_bias[1] /= j;
-	mag_bias[2] /= j;
-
-	gyro_data.calibration.variance[0] = 0;
-	gyro_data.calibration.variance[1] = 0;
-	gyro_data.calibration.variance[2] = 0;
-	mag_data.calibration.variance[0] = 0;
-	mag_data.calibration.variance[1] = 0;
-	mag_data.calibration.variance[2] = 0;
-	accel_data.calibration.variance[0] = 0;
-	accel_data.calibration.variance[1] = 0;
-	accel_data.calibration.variance[2] = 0;
-
-	for (i = 0, j = 0; j < NVAR; j++) {
-		get_accel_gyro_data();
-
-		gyro_data.calibration.variance[0] += pow(gyro_data.filtered.x-gyro_bias[0],2) / NVAR;
-		gyro_data.calibration.variance[1] += pow(gyro_data.filtered.y-gyro_bias[1],2) / NVAR;
-		gyro_data.calibration.variance[2] += pow(gyro_data.filtered.z-gyro_bias[2],2) / NVAR;
-		accel_data.calibration.variance[0] += pow(accel_data.filtered.x-accel_bias[0],2) / NVAR;
-		accel_data.calibration.variance[1] += pow(accel_data.filtered.y-accel_bias[1],2) / NVAR;
-		accel_data.calibration.variance[2] += pow(accel_data.filtered.z-accel_bias[2],2) / NVAR;
-
-#if defined(PIOS_INCLUDE_HMC5883) && defined(PIOS_INCLUDE_I2C)
-		if(PIOS_HMC5883_NewDataAvailable()) {
-			j ++;
-			PIOS_HMC5883_ReadMag(mag_data.raw.axis);
-			mag_data.scaled.axis[0] = (mag_data.raw.axis[0] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
-			mag_data.scaled.axis[1] = (mag_data.raw.axis[1] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
-			mag_data.scaled.axis[2] = (mag_data.raw.axis[2] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
-			mag_data.calibration.variance[0] += pow(mag_data.scaled.axis[0]-mag_bias[0],2);
-			mag_data.calibration.variance[1] += pow(mag_data.scaled.axis[1]-mag_bias[1],2);
-			mag_data.calibration.variance[2] += pow(mag_data.scaled.axis[2]-mag_bias[2],2);
-		}
-#endif
-
-	}
-
-	mag_data.calibration.variance[0] /= j;
-	mag_data.calibration.variance[1] /= j;
-	mag_data.calibration.variance[2] /= j;
-
-	gyro_data.calibration.bias[0] -= gyro_bias[0];
-	gyro_data.calibration.bias[1] -= gyro_bias[1];
-	gyro_data.calibration.bias[2] -= gyro_bias[2];
+	float data[CHANNELS] = {accel_data.filtered.x, 
+		accel_data.filtered.y,
+		accel_data.filtered.z, 
+		gyro_data.filtered.x,
+		gyro_data.filtered.y,
+		gyro_data.filtered.z
+	};
 	
-	// Approximately how long the EKF takes to update
-	PIOS_DELAY_WaituS(1500);
+	// First step, zero all sufficient statistics
+	if(calibrate_count == 0) {
+		for (i = 0; i < CHANNELS; i++) {
+			f_means[i] = 0;
+			f_var[i] = 0;
+		}
+	}
+	
+	// Accumulate for an estimate of mean
+	if(calibrate_count < NMEAN)
+		for (i = 0; i < CHANNELS; i++)
+			f_means[i] += data[i];
+	
+	if(calibrate_count == NMEAN)
+		for (i = 0; i < CHANNELS; i++)
+			f_means[i] /= (float) NMEAN;
+	
+	// Accumulate for estimate of variance.  This needs to be done
+	// sequentially because storing second moment would go out of 
+	// float precision
+	if(calibrate_count >= NMEAN && calibrate_count < (NMEAN + NVAR))
+		for (i = 0; i < CHANNELS; i++)
+			f_var[i] += pow(f_means[i] - data[i],2);
+	
+	if(calibrate_count == (NMEAN + NVAR)) {
+		for (i = 0; i < CHANNELS; i++)
+			f_var[i] /= (float) (NVAR - 1);
+
+		calibrate_count = 0;
+
+		InsSettingsData settings;
+		InsSettingsGet(&settings);
+		
+		settings.Algorithm = INSSETTINGS_ALGORITHM_NONE;
+		settings.accel_var[0] = f_var[0];
+		settings.accel_var[1] = f_var[1];
+		settings.accel_var[2] = f_var[2];
+		settings.gyro_var[0] = f_var[3];
+		settings.gyro_var[1] = f_var[4];
+		settings.gyro_var[2] = f_var[5];
+		
+		InsSettingsSet(&settings);
+		settings_callback(InsSettingsHandle());
+	} else {
+		PIOS_DELAY_WaituS(3300);
+		calibrate_count++;
+	}
+
+
 }
 
 
@@ -577,33 +565,26 @@ void calibrate_sensors()
  */
 void reset_values()
 {
-	accel_data.calibration.scale[0][1] = 0;
-	accel_data.calibration.scale[1][0] = 0;
-	accel_data.calibration.scale[0][2] = 0;
-	accel_data.calibration.scale[2][0] = 0;
-	accel_data.calibration.scale[1][2] = 0;
-	accel_data.calibration.scale[2][1] = 0;
+	accel_data.calibration.scale[0] = 1;
+	accel_data.calibration.scale[1] = 1;
+	accel_data.calibration.scale[2] = 1;
+	accel_data.calibration.bias[0] = 0;
+	accel_data.calibration.bias[1] = 0;
+	accel_data.calibration.bias[2] = 0;
+	accel_data.calibration.variance[0] = 1;
+	accel_data.calibration.variance[1] = 1;
+	accel_data.calibration.variance[2] = 1;
 
-	accel_data.calibration.scale[0][0] = 0.0359;
-	accel_data.calibration.scale[1][1] = 0.0359;
-	accel_data.calibration.scale[2][2] = 0.0359;
-	accel_data.calibration.scale[0][3] = -73.5;
-	accel_data.calibration.scale[1][3] = -73.5;
-	accel_data.calibration.scale[2][3] = -73.5;
-
-	accel_data.calibration.variance[0] = 1e-4;
-	accel_data.calibration.variance[1] = 1e-4;
-	accel_data.calibration.variance[2] = 1e-4;
-
-	gyro_data.calibration.scale[0] = -0.014;
-	gyro_data.calibration.scale[1] = 0.014;
-	gyro_data.calibration.scale[2] = -0.014;
-	gyro_data.calibration.bias[0] = -24;
-	gyro_data.calibration.bias[1] = -24;
-	gyro_data.calibration.bias[2] = -24;
+	gyro_data.calibration.scale[0] = 1;
+	gyro_data.calibration.scale[1] = 1;
+	gyro_data.calibration.scale[2] = 1;
+	gyro_data.calibration.bias[0] = 0;
+	gyro_data.calibration.bias[1] = 0;
+	gyro_data.calibration.bias[2] = 0;
 	gyro_data.calibration.variance[0] = 1;
 	gyro_data.calibration.variance[1] = 1;
 	gyro_data.calibration.variance[2] = 1;
+	
 	mag_data.calibration.scale[0] = 1;
 	mag_data.calibration.scale[1] = 1;
 	mag_data.calibration.scale[2] = 1;
@@ -659,84 +640,45 @@ void send_position(void)
 	PositionActualSet(&positionActual);
 }
 
-/*
-void send_calibration(void)
-{
-	AHRSCalibrationData cal;
-	AHRSCalibrationGet(&cal);
-	for(int ct=0; ct<3; ct++)
-	{
-		cal.accel_var[ct] = accel_data.calibration.variance[ct];
-		cal.gyro_bias[ct] = gyro_data.calibration.bias[ct];
-		cal.gyro_var[ct] = gyro_data.calibration.variance[ct];
-		cal.mag_var[ct] = mag_data.calibration.variance[ct];
-	}
-	cal.measure_var = AHRSCALIBRATION_MEASURE_VAR_SET;
-	AHRSCalibrationSet(&cal);
-}
-*/
-
-/**
- * @brief INS calibration callback
- *
- * Called when the OP board sets the calibration
- */
- /*
-void calibration_callback(AhrsObjHandle obj)
-{
-	AHRSCalibrationData cal;
-	AHRSCalibrationGet(&cal);
-	if(cal.measure_var == AHRSCALIBRATION_MEASURE_VAR_SET){
-
-		accel_data.calibration.scale[0][1] = cal.accel_ortho[0];
-		accel_data.calibration.scale[1][0] = cal.accel_ortho[0];
-
-		accel_data.calibration.scale[0][2] = cal.accel_ortho[1];
-		accel_data.calibration.scale[2][0] = cal.accel_ortho[1];
-
-		accel_data.calibration.scale[1][2] = cal.accel_ortho[2];
-		accel_data.calibration.scale[2][1] = cal.accel_ortho[2];
-
-		for(int ct=0; ct<3; ct++)
-		{
-			accel_data.calibration.scale[ct][ct] = cal.accel_scale[ct];
-			accel_data.calibration.scale[ct][3] = cal.accel_bias[ct];
-			accel_data.calibration.variance[ct] = cal.accel_var[ct];
-
-			gyro_data.calibration.scale[ct] = cal.gyro_scale[ct];
-			gyro_data.calibration.bias[ct] = cal.gyro_bias[ct];
-			gyro_data.calibration.variance[ct] = cal.gyro_var[ct];
-
-			mag_data.calibration.bias[ct] = cal.mag_bias[ct];
-			mag_data.calibration.scale[ct] = cal.mag_scale[ct];
-			mag_data.calibration.variance[ct] = cal.mag_var[ct];
-		}
-		// Note: We need the divided by 1000^2 since we scale mags to have a norm of 1000 and they are scaled to
-		// one in code
-		float mag_var[3] = {mag_data.calibration.variance[0] / INSGPS_MAGLEN / INSGPS_MAGLEN,
-			mag_data.calibration.variance[1] / INSGPS_MAGLEN / INSGPS_MAGLEN,
-			mag_data.calibration.variance[2] / INSGPS_MAGLEN / INSGPS_MAGLEN};
-		INSSetMagVar(mag_var);
-		INSSetAccelVar(accel_data.calibration.variance);
-		INSSetGyroVar(gyro_data.calibration.variance);
-	}
-	else if(cal.measure_var == AHRSCALIBRATION_MEASURE_VAR_MEASURE) {
-		calibrate_sensors();
-		send_calibration();
-	}
-
-	INSSetPosVelVar(cal.pos_var, cal.vel_var);
-
-}
-*/
-
+int callback_count = 0;
 void settings_callback(AhrsObjHandle obj)
 {
+	callback_count ++;
 	InsSettingsData settings;
 	InsSettingsGet(&settings);
 
 	ahrs_algorithm = settings.Algorithm;
 	bias_corrected_raw = settings.BiasCorrectedRaw == INSSETTINGS_BIASCORRECTEDRAW_TRUE;
+
+	accel_data.calibration.scale[0] = settings.accel_scale[INSSETTINGS_ACCEL_SCALE_X];
+	accel_data.calibration.scale[1] = settings.accel_scale[INSSETTINGS_ACCEL_SCALE_Y];
+	accel_data.calibration.scale[2] = settings.accel_scale[INSSETTINGS_ACCEL_SCALE_Z];
+	accel_data.calibration.bias[0] = settings.accel_bias[INSSETTINGS_ACCEL_BIAS_X];
+	accel_data.calibration.bias[1] = settings.accel_bias[INSSETTINGS_ACCEL_BIAS_Y];
+	accel_data.calibration.bias[2] = settings.accel_bias[INSSETTINGS_ACCEL_BIAS_Z];
+	accel_data.calibration.variance[0] = settings.accel_var[INSSETTINGS_ACCEL_VAR_X];
+	accel_data.calibration.variance[1] = settings.accel_var[INSSETTINGS_ACCEL_VAR_Y];
+	accel_data.calibration.variance[2] = settings.accel_var[INSSETTINGS_ACCEL_VAR_Z];
+	
+	gyro_data.calibration.scale[0] = settings.gyro_scale[INSSETTINGS_GYRO_SCALE_X];
+	gyro_data.calibration.scale[1] = settings.gyro_scale[INSSETTINGS_GYRO_SCALE_Y];
+	gyro_data.calibration.scale[2] = settings.gyro_scale[INSSETTINGS_GYRO_SCALE_Z];
+	gyro_data.calibration.bias[0] = settings.gyro_bias[INSSETTINGS_GYRO_BIAS_X];
+	gyro_data.calibration.bias[1] = settings.gyro_bias[INSSETTINGS_GYRO_BIAS_Y];
+	gyro_data.calibration.bias[2] = settings.gyro_bias[INSSETTINGS_GYRO_BIAS_Z];
+	gyro_data.calibration.variance[0] = settings.gyro_var[INSSETTINGS_GYRO_VAR_X];
+	gyro_data.calibration.variance[1] = settings.gyro_var[INSSETTINGS_GYRO_VAR_Y];
+	gyro_data.calibration.variance[2] = settings.gyro_var[INSSETTINGS_GYRO_VAR_Z];
+	
+	mag_data.calibration.scale[0] = settings.mag_scale[INSSETTINGS_MAG_SCALE_X];
+	mag_data.calibration.scale[1] = settings.mag_scale[INSSETTINGS_MAG_SCALE_Y];
+	mag_data.calibration.scale[2] = settings.mag_scale[INSSETTINGS_MAG_SCALE_Z];
+	mag_data.calibration.bias[0] = settings.mag_bias[INSSETTINGS_MAG_BIAS_X];
+	mag_data.calibration.bias[1] = settings.mag_bias[INSSETTINGS_MAG_BIAS_Y];
+	mag_data.calibration.bias[2] = settings.mag_bias[INSSETTINGS_MAG_BIAS_Z];
+	mag_data.calibration.variance[0] = settings.mag_var[INSSETTINGS_MAG_VAR_X];
+	mag_data.calibration.variance[1] = settings.mag_var[INSSETTINGS_MAG_VAR_Y];
+	mag_data.calibration.variance[2] = settings.mag_var[INSSETTINGS_MAG_VAR_Z];
 }
 
 void homelocation_callback(AhrsObjHandle obj)

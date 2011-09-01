@@ -40,6 +40,7 @@
 #include <QList>
 #include <QTimer>
 #include <QMutex>
+#include <inssettings.h>
 
 #include <Eigen/Core>
 
@@ -75,7 +76,7 @@ private:
     int progressBarIndex;
     QTimer progressBarTimer;
     const static double maxVarValue;
-    const static int calibrationDelay;
+    const static int calibrationDelay = 10;
 
     bool collectingData;
 
@@ -88,6 +89,7 @@ private:
     QList<double> mag_accum_x;
     QList<double> mag_accum_y;
     QList<double> mag_accum_z;
+    quint8 algorithm;
 
     // TODO: Store these in std::vectors
     Eigen::Vector3f gyro_data[60];
@@ -125,11 +127,11 @@ private:
 
 private slots:
     void enableHomeLocSave(UAVObject *obj);
-    void launchAHRSCalibration();
+    void measureNoise();
+    void noiseMeasured();
     void saveAHRSCalibration();
     void openHelp();
     void launchAccelBiasCalibration();
-    void calibPhase2();
     void incrementProgress();
 
     virtual void refreshValues();

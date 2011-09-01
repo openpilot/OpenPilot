@@ -63,12 +63,12 @@ static bool PIOS_PWM_validate(struct pios_pwm_dev * pwm_dev)
 	return (pwm_dev->magic == PIOS_PWM_DEV_MAGIC);
 }
 
-#if defined(PIOS_INCLUDE_FREERTOS) && 0
+#if defined(PIOS_INCLUDE_FREERTOS)
 static struct pios_pwm_dev * PIOS_PWM_alloc(void)
 {
 	struct pios_pwm_dev * pwm_dev;
 
-	pwm_dev = (struct pios_pwm_dev *)malloc(sizeof(*pwm_dev));
+	pwm_dev = (struct pios_pwm_dev *)pvPortMalloc(sizeof(*pwm_dev));
 	if (!pwm_dev) return(NULL);
 
 	pwm_dev->magic = PIOS_PWM_DEV_MAGIC;

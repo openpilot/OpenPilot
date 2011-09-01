@@ -1069,19 +1069,20 @@ void PIOS_Board_Init(void) {
 #endif /* PIOS_INCLUDE_TELEMETRY_RF */
 
 #if defined(PIOS_INCLUDE_GPS)
-	{
-		uint32_t pios_usart_gps_id;
-		if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
-			PIOS_Assert(0);
-		}
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_TX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
-				  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
-				  tx_buffer, PIOS_COM_GPS_TX_BUF_LEN)) {
-			PIOS_Assert(0);
+		{
+			uint32_t pios_usart_gps_id;
+			if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
+				PIOS_Assert(0);
+			}
+			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_TX_BUF_LEN);
+			PIOS_Assert(rx_buffer);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
+						rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
+						tx_buffer, PIOS_COM_GPS_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
 		}
 	}
 #endif	/* PIOS_INCLUDE_GPS */

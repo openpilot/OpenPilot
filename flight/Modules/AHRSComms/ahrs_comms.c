@@ -119,7 +119,7 @@ static void ahrscommsTask(void *parameters)
 			AlarmsSet(SYSTEMALARMS_ALARM_AHRSCOMMS, SYSTEMALARMS_ALARM_WARNING);
 		}
 		InsStatusData sData;
-		InsStatusGet(&sData);
+//		InsStatusGet(&sData);
 
 		sData.LinkRunning = stat.linkOk;
 		sData.AhrsKickstarts = stat.remote.kickStarts;
@@ -130,7 +130,7 @@ static void ahrscommsTask(void *parameters)
 		sData.OpRetries = stat.local.retries;
 		sData.OpInvalidPackets = stat.local.invalidPacket;
 
-		InsStatusSet(&sData);
+//		InsStatusSet(&sData);
 		/* Wait for the next update interval */
 		vTaskDelayUntil(&lastSysTime, 1 / portTICK_RATE_MS);
 

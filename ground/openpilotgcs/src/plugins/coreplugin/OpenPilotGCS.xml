@@ -2228,7 +2228,7 @@
           <plotCurve0>
             <color>4289374847</color>
             <uavField>RunningTime</uavField>
-            <uavObject>AhrsStatus</uavObject>
+            <uavObject>InsStatus</uavObject>
             <yMaximum>0</yMaximum>
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>

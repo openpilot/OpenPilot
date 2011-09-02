@@ -34,6 +34,8 @@
 #include <QDebug>
 #include <QEventLoop>
 #include <QTimer>
+#include <QErrorMessage>
+#include <objectpersistence.h>
 
 // ******************************
 // constructor/destructor
@@ -168,18 +170,30 @@ void UAVObjectUtilManager::objectPersistenceTransactionCompleted(UAVObject* obj,
   */
 void UAVObjectUtilManager::objectPersistenceOperationFailed()
 {
-    qDebug() << "objectPersistenceOperationFailed";
     if(saveState == AWAITING_COMPLETED) {
         //TODO: some warning that this operation failed somehow
         // We have to disconnect the object persistence 'updated' signal
         // and ask to save the next object:
-        UAVObject *obj = getObjectManager()->getObject(ObjectPersistence::NAME);
-        obj->disconnect(this);
-        queue.dequeue(); // We can now remove the object, it failed anyway.
+
+        ObjectPersistence * objectPersistence = ObjectPersistence::GetInstance(getObjectManager());
+        Q_ASSERT(objectPersistence);
+
+        UAVObject* obj = queue.dequeue(); // We can now remove the object, it failed anyway.
+        Q_ASSERT(obj);
+
+        objectPersistence->disconnect(this);
+
         saveState = IDLE;
-        emit saveCompleted(obj->getField("ObjectID")->getValue().toInt(), false);
+        emit saveCompleted(obj->getObjID(), false);
+
+        // For now cause error message here to make sure user knows
+        QErrorMessage err;
+        err.showMessage("Saving object " + obj->getName() + " failed.  Please try again");
+        err.exec();
+
         saveNextObject();
     }
+
 }
 
 

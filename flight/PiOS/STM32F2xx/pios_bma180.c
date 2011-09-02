@@ -53,7 +53,7 @@ static enum bma180_range range;
 /**
  * @brief Initialize with good default settings
  */
-void PIOS_BMA180_Init(const struct pios_bma180_cfg * cfg)
+int32_t PIOS_BMA180_Init(const struct pios_bma180_cfg * cfg)
 {	
 	dev_cfg = cfg; // store config before enabling interrupt
 	
@@ -69,11 +69,11 @@ void PIOS_BMA180_Init(const struct pios_bma180_cfg * cfg)
 	/* Enable and set EOC EXTI Interrupt to the lowest priority */
 	NVIC_Init(&cfg->eoc_irq.init);
 	
-	PIOS_BMA180_Config();	
-	PIOS_BMA180_SelectBW(BMA_BW_600HZ);
-	PIOS_BMA180_SetRange(BMA_RANGE_8G);
+	if(PIOS_BMA180_Config() < 0)
+		return -1;
 	PIOS_DELAY_WaituS(50);
 	PIOS_BMA180_EnableIrq();
+	return 0;
 }
 
 /**
@@ -172,18 +172,24 @@ static int32_t PIOS_BMA180_Config()
 	0x21 = 0x02  //new_data_int = 1
 	 */
 		
+	PIOS_DELAY_WaituS(20);
+	
+	if(PIOS_BMA180_EnableEeprom() < 0)
+		return -1;
 	if(PIOS_BMA180_SetReg(BMA_RESET, BMA_RESET_CODE) < 0)
 		return -1;
-
-	PIOS_DELAY_WaituS(100);
-
 	if(PIOS_BMA180_SetReg(BMA_OFFSET_LSB1, 0x81) < 0)
 		return -1;
 	if(PIOS_BMA180_SetReg(BMA_GAIN_Y, 0x81) < 0)
 		return -1;
 	if(PIOS_BMA180_SetReg(BMA_CTRREG3, 0xFF) < 0)
 		return -1;
+	PIOS_BMA180_SelectBW(BMA_BW_600HZ);
+	PIOS_BMA180_SetRange(BMA_RANGE_8G);
 	
+	if(PIOS_BMA180_DisableEeprom() < 0)
+		return -1;
+
 	return 0;
 }
 

@@ -135,13 +135,14 @@ float pressure, altitude;
 
 int32_t dr;
 
+static volatile bool init_algorithm = false;
+
 int32_t sclk, sclk_prev;
 int32_t sclk_count;
 uint32_t loop_time;
 int main()
 {	
 	gps_data.quality = -1;
-	static int8_t last_ahrs_algorithm;
 	ahrs_algorithm = INSSETTINGS_ALGORITHM_SIMPLE;
 	
 	reset_values();
@@ -195,7 +196,12 @@ int main()
 	HomeLocationConnectCallback(homelocation_callback);
 	//FirmwareIAPObjConnectCallback(firmwareiapobj_callback);
 	
+	get_accel_gyro_data();   // This function blocks till data avilable
+	get_mag_data();
+	get_baro_data();
+
 	settings_callback(InsSettingsHandle());
+	ins_init_algorithm(); 
 	
 	/******************* Main EKF loop ****************************/
 	while(1) {
@@ -228,9 +234,10 @@ int main()
 		//print_ekf_binary();
 		
 		/* If algorithm changed reinit.  This could go in callback but wouldn't be synchronous */
-		if (ahrs_algorithm != last_ahrs_algorithm)
+		if (init_algorithm) {
 			ins_init_algorithm(); 
-		last_ahrs_algorithm = ahrs_algorithm; 
+			init_algorithm = false;
+		}
 		
 		time_val2 = PIOS_DELAY_GetRaw();
 		
@@ -645,6 +652,7 @@ void settings_callback(AhrsObjHandle obj)
 	InsSettingsData settings;
 	InsSettingsGet(&settings);
 
+	init_algorithm = ahrs_algorithm != settings.Algorithm;
 	ahrs_algorithm = settings.Algorithm;
 	bias_corrected_raw = settings.BiasCorrectedRaw == INSSETTINGS_BIASCORRECTEDRAW_TRUE;
 

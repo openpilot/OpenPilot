@@ -232,8 +232,10 @@ void ins_indoor_update()
 /**
  * @brief Initialize the EKF assuming stationary
  */
+bool inited = false;
 void ins_init_algorithm()
 {
+	inited = true;
 	float Rbe[3][3], q[4], accels[3], rpy[3], mag;
 	float ge[3]={0,0,-9.81}, zeros[3]={0,0,0}, Pdiag[16]={25,25,25,5,5,5,1e-5,1e-5,1e-5,1e-5,1e-5,1e-5,1e-5,1e-4,1e-4,1e-4};
 	bool using_mags, using_gps;

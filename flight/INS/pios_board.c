@@ -289,6 +289,7 @@ void PIOS_SPI_accel_irq_handler(void)
  */
 static const struct pios_usart_cfg pios_usart_gps_cfg = {
 	.regs = USART1,
+	.remap = GPIO_AF_USART1,
 	.init = {
 		.USART_BaudRate = 57600,
 		.USART_WordLength = USART_WordLength_8b,
@@ -328,6 +329,11 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
 	},
 };
 
+#define PIOS_COM_AUX_TX_BUF_LEN 255
+static uint8_t pios_com_aux_tx_buffer[PIOS_COM_AUX_TX_BUF_LEN];
+#define PIOS_COM_AUX_RX_BUF_LEN 255
+static uint8_t pios_com_aux_rx_buffer[PIOS_COM_AUX_RX_BUF_LEN];
+
 #endif /* PIOS_INCLUDE_GPS */
 
 #ifdef PIOS_INCLUDE_COM_AUX
@@ -335,7 +341,8 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
  * AUX USART
  */
 static const struct pios_usart_cfg pios_usart_aux_cfg = {
-	.regs = USART4,
+	.regs = UART4,
+	.remap = GPIO_AF_UART4,
 	.init = {
 		.USART_BaudRate = 57600,
 		.USART_WordLength = USART_WordLength_8b,
@@ -347,14 +354,14 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 	},
 	.irq = {
 		.init = {
-			.NVIC_IRQChannel = USART4_IRQn,
+			.NVIC_IRQChannel = UART4_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
 			.NVIC_IRQChannelSubPriority = 0,
 			.NVIC_IRQChannelCmd = ENABLE,
 		},
 	},
 	.rx = {
-		.gpio = GPIOB,
+		.gpio = GPIOC,
 		.init = {
 			.GPIO_Pin = GPIO_Pin_11,
 			.GPIO_Speed = GPIO_Speed_2MHz,
@@ -364,7 +371,7 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 		},
 	},
 	.tx = {
-		.gpio = GPIOB,
+		.gpio = GPIOC,
 		.init = {
 			.GPIO_Pin = GPIO_Pin_10,
 			.GPIO_Speed = GPIO_Speed_2MHz,
@@ -375,21 +382,17 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 	},
 };
 
+#define PIOS_COM_GPS_TX_BUF_LEN 192
+static uint8_t pios_com_gps_tx_buffer[PIOS_COM_GPS_TX_BUF_LEN];
+#define PIOS_COM_GPS_RX_BUF_LEN 96
+static uint8_t pios_com_gps_rx_buffer[PIOS_COM_GPS_RX_BUF_LEN];
+
 #endif /* PIOS_COM_AUX */
 
 
 #if defined(PIOS_INCLUDE_COM)
 
 #include <pios_com_priv.h>
-
-#if 0
-#define PIOS_COM_AUX_TX_BUF_LEN 192
-static uint8_t pios_com_aux_tx_buffer[PIOS_COM_AUX_TX_BUF_LEN];
-#endif
-
-#define PIOS_COM_GPS_RX_BUF_LEN 96
-static uint8_t pios_com_gps_rx_buffer[PIOS_COM_GPS_RX_BUF_LEN];
-
 
 #endif /* PIOS_INCLUDE_COM */
 
@@ -732,16 +735,20 @@ void PIOS_Board_Init(void) {
 	}
 	if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
 					  pios_com_gps_rx_buffer, sizeof(pios_com_gps_rx_buffer),
-					  NULL, 0)) {
+					  pios_com_gps_tx_buffer, sizeof(pios_com_gps_tx_buffer))) {
 		PIOS_DEBUG_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_GPS */
 	
 #if defined(PIOS_INCLUDE_COM_AUX)
+	uint32_t pios_usart_aux_id;
+
     if (PIOS_USART_Init(&pios_usart_aux_id, &pios_usart_aux_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
-	if (PIOS_COM_Init(&pios_com_aux_id, &pios_usart_com_driver, pios_usart_aux_id)) {
+	if (PIOS_COM_Init(&pios_com_aux_id, &pios_usart_com_driver, pios_usart_aux_id,
+					  pios_com_aux_rx_buffer, sizeof(pios_com_aux_rx_buffer),
+					  pios_com_aux_tx_buffer, sizeof(pios_com_aux_tx_buffer))) {
 		PIOS_DEBUG_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_COM_AUX */

@@ -387,14 +387,14 @@ void get_accel_gyro_data()
 
 	// Not the swaping of channel orders
 	scaling = PIOS_BMA180_GetScale() / accel_samples;
-	accel_data.filtered.x = accel_accum[0] * scaling;
-	accel_data.filtered.y = -accel_accum[1] * scaling;
-	accel_data.filtered.z = -accel_accum[2] * scaling;
+	accel_data.filtered.x = accel_accum[0] * scaling * accel_data.calibration.scale[0] + accel_data.calibration.bias[0];
+	accel_data.filtered.y = -accel_accum[1] * scaling * accel_data.calibration.scale[1] + accel_data.calibration.bias[1];
+	accel_data.filtered.z = -accel_accum[2] * scaling * accel_data.calibration.scale[2] + accel_data.calibration.bias[2];
 
 	scaling = PIOS_IMU3000_GetScale() / gyro_samples;
-	gyro_data.filtered.x = -((float) gyro_accum[1]) * scaling;
-	gyro_data.filtered.y = -((float) gyro_accum[0]) * scaling;
-	gyro_data.filtered.z = -((float) gyro_accum[2]) * scaling;
+	gyro_data.filtered.x = -((float) gyro_accum[1]) * scaling * gyro_data.calibration.scale[0] + gyro_data.calibration.bias[0];
+	gyro_data.filtered.y = -((float) gyro_accum[0]) * scaling * gyro_data.calibration.scale[1] + gyro_data.calibration.bias[1];
+	gyro_data.filtered.z = -((float) gyro_accum[2]) * scaling * gyro_data.calibration.scale[2] + gyro_data.calibration.bias[2];
 	
 	raw.accels[0] = accel_data.filtered.x;
 	raw.accels[1] = accel_data.filtered.y;
@@ -402,9 +402,7 @@ void get_accel_gyro_data()
 	raw.gyros[0] = gyro_data.filtered.x * RAD_TO_DEG;
 	raw.gyros[1] = gyro_data.filtered.y * RAD_TO_DEG;
 	raw.gyros[2] = gyro_data.filtered.z * RAD_TO_DEG;
-	
-	InsSettingsData settings;
-	InsSettingsGet(&settings);
+
 	if (bias_corrected_raw)
 	{
 		raw.gyros[0] -= Nav.gyro_bias[0] * RAD_TO_DEG;

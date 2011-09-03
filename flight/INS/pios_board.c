@@ -344,7 +344,7 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 	.regs = UART4,
 	.remap = GPIO_AF_UART4,
 	.init = {
-		.USART_BaudRate = 57600,
+		.USART_BaudRate = 230400,
 		.USART_WordLength = USART_WordLength_8b,
 		.USART_Parity = USART_Parity_No,
 		.USART_StopBits = USART_StopBits_1,
@@ -657,7 +657,7 @@ static const struct pios_imu3000_cfg pios_imu3000_cfg = {
 			.NVIC_IRQChannelCmd = ENABLE,
 		},
 	},
-	.Fifo_store = PIOS_IMU3000_FIFO_GYRO_X_OUT | PIOS_IMU3000_FIFO_GYRO_Y_OUT 
+	.Fifo_store = PIOS_IMU3000_FIFO_TEMP_OUT | PIOS_IMU3000_FIFO_GYRO_X_OUT | PIOS_IMU3000_FIFO_GYRO_Y_OUT 
 	| PIOS_IMU3000_FIFO_GYRO_Z_OUT | PIOS_IMU3000_FIFO_FOOTER,
 	// Clock at 8 khz, downsampled by 4 for 2khz
 	.Smpl_rate_div = 3, 

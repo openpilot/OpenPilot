@@ -1,7 +1,7 @@
 <xml>
     <object name="InsSettings" singleinstance="true" settings="true">
         <description>Settings for the INS to control the algorithm and what is updated</description>
-        <field name="Algorithm" units="" type="enum" elements="1" options="NONE,SIMPLE,CALIBRATION,INSGPS_INDOOR_NOMAG,INSGPS_INDOOR,INSGPS_OUTDOOR" defaultvalue="INSGPS_INDOOR_NOMAG"/>
+        <field name="Algorithm" units="" type="enum" elements="1" options="NONE,SIMPLE,CALIBRATION,INSGPS_INDOOR_NOMAG,INSGPS_INDOOR,INSGPS_OUTDOOR,SENSORRAW" defaultvalue="INSGPS_INDOOR_NOMAG"/>
         <field name="BiasCorrectedRaw" units="" type="enum" elements="1" options="TRUE,FALSE" defaultvalue="TRUE"/>
 
 	<!-- Sensor noises -->

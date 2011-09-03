@@ -351,7 +351,7 @@ int32_t PIOS_BMA180_Test()
 	return 0;
 }
 
-static uint8_t pios_bma180_dmabuf[7];
+static uint8_t pios_bma180_dmabuf[8];
 static void PIOS_BMA180_SPI_Callback() 
 {		
 	// TODO: Make this conversion depend on configuration scale
@@ -372,6 +372,7 @@ static void PIOS_BMA180_SPI_Callback()
 	data.x /= 4;
 	data.y /= 4;
 	data.z /= 4;
+	data.temperature = pios_bma180_dmabuf[7];
 	
 	fifoBuf_putData(&pios_bma180_fifo, (uint8_t *) &data, sizeof(data));
 }
@@ -385,7 +386,7 @@ static void PIOS_BMA180_IRQHandler(void)
 	// If we can't get the bus then just move on for efficiency
 	if(PIOS_BMA180_ClaimBus() == 0)
 		PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,pios_bma180_req_buf,(uint8_t *) pios_bma180_dmabuf, 
-							   7, PIOS_BMA180_SPI_Callback);	
+							   sizeof(pios_bma180_dmabuf), PIOS_BMA180_SPI_Callback);	
 }
 
 

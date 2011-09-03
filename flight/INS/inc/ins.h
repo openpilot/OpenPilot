@@ -66,6 +66,7 @@ struct accel_sensor {
 		float scale[3];
 		float variance[3];
 	} calibration;
+	float temperature;
 };
 
 //! Contains the data from the gyro
@@ -80,6 +81,7 @@ struct gyro_sensor {
 		float scale[3];
 		float variance[3];
 	} calibration;
+	float temperature;
 };
 
 //! Conains the current estimate of the attitude

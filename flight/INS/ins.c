@@ -39,6 +39,7 @@
   BMA180 interrupt
  */
 
+#define TYPICAL_PERIOD 3300
 #define timer_rate() 100000
 #define timer_count() 1
 /* OpenPilot Includes */
@@ -86,6 +87,7 @@ void calibration(float result[3], float scale[3][4], float arg[3]);
 
 extern void PIOS_Board_Init(void);
 static void panic(uint32_t blinks);
+static void print_ekf_binary();
 void simple_update();
 
 /* Bootloader related functions and var*/
@@ -255,6 +257,11 @@ int main()
 			case INSSETTINGS_ALGORITHM_CALIBRATION:
 				measure_noise();
 				break;
+			case INSSETTINGS_ALGORITHM_SENSORRAW:
+				print_ekf_binary();
+				// Run at standard rate
+				while(PIOS_DELAY_DiffuS(time_val1) < TYPICAL_PERIOD);
+				break;
 		}
 		
 		status.RunningTimePerCycle = PIOS_DELAY_DiffuS(time_val2);
@@ -289,36 +296,24 @@ void simple_update() {
 /**
  * @brief Output all the important inputs and states of the ekf through serial port
  */
-#ifdef DUMP_EKF
-
-extern float **P, *X;	// covariance matrix and state vector
-
-void print_ekf_binary()
+static void print_ekf_binary()
 {
-	uint16_t states = ins_get_num_states();
-	uint8_t framing[16] = { 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
+	uint8_t framing[2] = { 0xff, 0x00 };
 	// Dump raw buffer
-	PIOS_COM_SendBuffer(PIOS_COM_AUX, &framing[0], 16);                                                         // framing header (1:16)
-	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & total_conversion_blocks, sizeof(total_conversion_blocks));  // dump block number (17:20)
-
-	PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, (uint8_t *) & accel_data.filtered.x, 4*3);                     // accel data (21:32)
-	PIOS_COM_SendBufferNonBlocking(PIOS_COM_AUX, (uint8_t *) & gyro_data.filtered.x, 4*3);                      // gyro data (33:44)
-
-	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & mag_data.updated, 1);                                       // mag update (45)
-	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & mag_data.scaled.axis, 3*4);                                 // mag data (46:57)
-
-	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & gps_data, sizeof(gps_data));                                // gps data (58:85)
-
-	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & X, 4 * states);                                             // X (86:149)
-	for(uint8_t i = 0; i < states; i++)
-		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &((*P)[i + i * states]), 4);                         // diag(P) (150:213)
-
-	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & altitude_data.altitude, 4);                                 // BaroAlt (214:217)
-	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & baro_offset, 4);                                            // baro_offset (218:221)
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, &framing[0], sizeof(framing));
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & total_conversion_blocks, sizeof(total_conversion_blocks));
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & accel_data.filtered.x, 4*3);
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & gyro_data.filtered.x, 4*3);
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & mag_data.updated, 1);
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & mag_data.scaled.axis, 3*4);
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & altitude_data.updated, 1);
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & altitude_data.altitude, 4);
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &gyro_data.temperature, 4);
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &accel_data.temperature, 4);
+	
+	mag_data.updated = 0;
+	altitude_data.updated = 0;
 }
-#else
-void print_ekf_binary() {}
-#endif
 
 static void panic(uint32_t blinks) 
 {
@@ -410,6 +405,11 @@ void get_accel_gyro_data()
 	raw.gyros[1] = gyro_data.filtered.y * RAD_TO_DEG;
 	raw.gyros[2] = gyro_data.filtered.z * RAD_TO_DEG;
 
+	// From data sheet 35 deg C corresponds to -13200, and 280 LSB per C
+	gyro_data.temperature = 35.0f + ((float) gyro.temperature + 13200) / 280;
+	// From the data sheet 25 deg C corresponds to 2 and 2 LSB per C
+	accel_data.temperature = 25.0f + ((float) accel.temperature - 2) / 2;
+	
 	if (bias_corrected_raw)
 	{
 		raw.gyros[0] -= Nav.gyro_bias[0] * RAD_TO_DEG;
@@ -420,6 +420,9 @@ void get_accel_gyro_data()
 		raw.accels[1] -= Nav.accel_bias[1];
 		raw.accels[2] -= Nav.accel_bias[2];
 	}
+	
+	raw.temperature[ATTITUDERAW_TEMPERATURE_GYRO] = gyro_data.temperature;
+	raw.temperature[ATTITUDERAW_TEMPERATURE_ACCEL] = accel_data.temperature;
 	
 	raw.magnetometers[0] = mag_data.scaled.axis[0];
 	raw.magnetometers[1] = mag_data.scaled.axis[1];
@@ -557,7 +560,7 @@ void measure_noise()
 		InsSettingsSet(&settings);
 		settings_callback(InsSettingsHandle());
 	} else {
-		PIOS_DELAY_WaituS(3300);
+		PIOS_DELAY_WaituS(TYPICAL_PERIOD);
 		calibrate_count++;
 	}
 

@@ -301,17 +301,18 @@ static void imu3000_callback()
 		goto out;
 
 	if(imu3000_first_read) {
-		data.x = imu3000_read_buffer[0] << 8 | imu3000_read_buffer[1];
-		data.y = imu3000_read_buffer[2] << 8 | imu3000_read_buffer[3];
-		data.z = imu3000_read_buffer[4] << 8 | imu3000_read_buffer[5];
+		data.temperature = imu3000_read_buffer[0] << 8 | imu3000_read_buffer[1];
+		data.x = imu3000_read_buffer[2] << 8 | imu3000_read_buffer[3];
+		data.y = imu3000_read_buffer[4] << 8 | imu3000_read_buffer[5];
+		data.z = imu3000_read_buffer[6] << 8 | imu3000_read_buffer[7];
 		
 		imu3000_first_read = false;
 	} else {
 		// First two bytes are left over fifo from last call
-		data.x = imu3000_read_buffer[2] << 8 | imu3000_read_buffer[3];
-		data.y = imu3000_read_buffer[4] << 8 | imu3000_read_buffer[5];
-		data.z = imu3000_read_buffer[6] << 8 | imu3000_read_buffer[7];
-
+		data.temperature = imu3000_read_buffer[2] << 8 | imu3000_read_buffer[3];
+		data.x = imu3000_read_buffer[4] << 8 | imu3000_read_buffer[5];
+		data.y = imu3000_read_buffer[6] << 8 | imu3000_read_buffer[7];
+		data.z = imu3000_read_buffer[8] << 8 | imu3000_read_buffer[9];
 	}
 	
 	fifoBuf_putData(&pios_imu3000_fifo, (uint8_t *) &data, sizeof(data));

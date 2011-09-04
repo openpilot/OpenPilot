@@ -136,8 +136,8 @@ private:
         void SwashLvlCancelButtonPressed();
         void SwashLvlFinishButtonPressed();
 
-        void UpdatCCPMOptionsFromUI();
-        void UpdatCCPMUIFromOptions();
+        void UpdateCCPMOptionsFromUI();
+        void UpdateCCPMUIFromOptions();
 
         void SetUIComponentVisibilities();
         void ccpmChannelCheck();

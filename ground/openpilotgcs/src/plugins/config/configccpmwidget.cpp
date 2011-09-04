@@ -70,8 +70,6 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_ccpm->SwashplateImage->setSceneRect(-50,-30,500,500);
     //m_ccpm->SwashplateImage->scale(.85,.85);
 
-
-
     QSvgRenderer *renderer = new QSvgRenderer();
     renderer->load(QString(":/configgadget/images/ccpm_setup.svg"));
 
@@ -142,68 +140,22 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     }
 
-
-/*
-    Servos[0] = new QGraphicsSvgItem();
-    Servos[0]->setSharedRenderer(renderer);
-    Servos[0]->setElementId("ServoW");
-    m_ccpm->SwashplateImage->scene()->addItem(Servos[0]);
-
-    Servos[1] = new QGraphicsSvgItem();
-    Servos[1]->setSharedRenderer(renderer);
-    Servos[1]->setElementId("ServoX");
-    m_ccpm->SwashplateImage->scene()->addItem(Servos[1]);
-
-    Servos[2] = new QGraphicsSvgItem();
-    Servos[2]->setSharedRenderer(renderer);
-    Servos[2]->setElementId("ServoY");
-    m_ccpm->SwashplateImage->scene()->addItem(Servos[2]);
-
-    Servos[3] = new QGraphicsSvgItem();
-    Servos[3]->setSharedRenderer(renderer);
-    Servos[3]->setElementId("ServoZ");
-    m_ccpm->SwashplateImage->scene()->addItem(Servos[3]);
-
-
-    ServosText[0] = new QGraphicsTextItem();
-    ServosText[0]->setDefaultTextColor(Qt::red);
-    ServosText[0]->setPlainText(QString("-"));
-    ServosText[0]->setFont(serifFont);
-    m_ccpm->SwashplateImage->scene()->addItem(ServosText[0]);
-
-    ServosText[1] = new QGraphicsTextItem();
-    ServosText[1]->setDefaultTextColor(Qt::red);
-    ServosText[1]->setPlainText(QString("-"));
-    ServosText[1]->setFont(serifFont);
-    m_ccpm->SwashplateImage->scene()->addItem(ServosText[1]);
-
-    ServosText[2] = new QGraphicsTextItem();
-    ServosText[2]->setDefaultTextColor(Qt::red);
-    ServosText[2]->setPlainText(QString("-"));
-    ServosText[2]->setFont(serifFont);
-    m_ccpm->SwashplateImage->scene()->addItem(ServosText[2]);
-
-    ServosText[3] = new QGraphicsTextItem();
-    ServosText[3]->setDefaultTextColor(Qt::red);
-    ServosText[3]->setPlainText(QString("-"));
-    ServosText[3]->setFont(serifFont);
-    m_ccpm->SwashplateImage->scene()->addItem(ServosText[3]);
-*/
     m_ccpm->PitchCurve->setMin(-1);
 
     resetMixer(m_ccpm->PitchCurve, 5);
     resetMixer(m_ccpm->ThrottleCurve, 5);
 
+    MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
+    Q_ASSERT(mixerSettings);
+    UAVObjectField * curve2source = mixerSettings->getField("Curve2Source");
+    Q_ASSERT(curve2source);
 
-
-
+    m_ccpm->ccpmCollectiveChannel->addItems(curve2source->getOptions());
+    m_ccpm->ccpmCollectiveChannel->setCurrentIndex(0);
 
     QStringList channels;
-    channels << "Channel1" << "Channel2" <<
-    "Channel3" << "Channel4" << "Channel5" << "Channel6" << "Channel7" << "Channel8"  ;
-    m_ccpm->ccpmCollectiveChannel->addItems(channels);
-    m_ccpm->ccpmCollectiveChannel->setCurrentIndex(8);
-    channels << "None" ;
+    channels << "Channel1" << "Channel2" << "Channel3" << "Channel4" <<
+                "Channel5" << "Channel6" << "Channel7" << "Channel8" << "None";
     m_ccpm->ccpmEngineChannel->addItems(channels);
     m_ccpm->ccpmEngineChannel->setCurrentIndex(8);
     m_ccpm->ccpmTailChannel->addItems(channels);
@@ -277,8 +229,6 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     
    ccpmSwashplateRedraw(); 
-   // connect(parent, SIGNAL(autopilotConnected()),this, SLOT(requestccpmUpdate()));
-
 }
 
 ConfigccpmWidget::~ConfigccpmWidget()
@@ -292,7 +242,7 @@ void ConfigccpmWidget::UpdateType()
     QString TypeText;
     double AdjustmentAngle=0;
 
-    UpdatCCPMOptionsFromUI();
+    UpdateCCPMOptionsFromUI();
     SetUIComponentVisibilities();
     
     TypeInt = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
@@ -915,14 +865,10 @@ void ConfigccpmWidget::UpdateMixer()
     bool useCyclic;
     int i,j,ThisEnable[6];
     float CollectiveConstant,PitchConstant,RollConstant,ThisAngle[6];
-    //QTableWidgetItem *newItem;// = new QTableWidgetItem();
     QString Channel;
 
     ccpmChannelCheck();
-    //Type = m_ccpm->ccpmType->count() - m_ccpm->ccpmType->currentIndex()-1;
-    //CollectiveConstant=m_ccpm->ccpmCollectiveSlider->value()/100.0;
-    //CorrectionAngle=m_ccpm->ccpmCorrectionAngle->value();
-    UpdatCCPMOptionsFromUI();
+    UpdateCCPMOptionsFromUI();
  
     useCCPM = !(GUIConfigData.heli.ccpmCollectivePassthroughState || !GUIConfigData.heli.ccpmLinkCyclicState);
     useCyclic = GUIConfigData.heli.ccpmLinkRollState;
@@ -978,15 +924,6 @@ void ConfigccpmWidget::UpdateMixer()
         //go through the user data and update the mixer matrix
         for (i=0;i<6;i++)
         {
-            /*
-                data.Mixer0Type = 0;//Disabled,Motor,Servo
-                data.Mixer0Vector[0] = 0;//ThrottleCurve1
-                data.Mixer0Vector[1] = 0;//ThrottleCurve2
-                data.Mixer0Vector[2] = 0;//Roll
-                data.Mixer0Vector[3] = 0;//Pitch
-                data.Mixer0Vector[4] = 0;//Yaw
-
-            */
             if ((MixerChannelData[i]<8)&&((ThisEnable[i])||(i<2)))
             {
                 m_ccpm->ccpmAdvancedSettingsTable->item(i,0)->setText(QString("%1").arg( MixerChannelData[i]+1 ));
@@ -1055,7 +992,7 @@ void ConfigccpmWidget::UpdateMixer()
  } __attribute__((packed))  heliGUISettingsStruct;
 
  */
-void ConfigccpmWidget::UpdatCCPMOptionsFromUI()
+void ConfigccpmWidget::UpdateCCPMOptionsFromUI()
 {
     bool useCCPM;
     bool useCyclic;
@@ -1097,7 +1034,6 @@ void ConfigccpmWidget::UpdatCCPMOptionsFromUI()
         GUIConfigData.heli.SliderValue1 = m_ccpm->ccpmPitchScale->value();
     }    
     GUIConfigData.heli.SliderValue2 = m_ccpm->ccpmRollScale->value();
-    //GUIConfigData.heli.RevoSlider = m_ccpm->ccpmREVOScale->value();
     
     //servo assignments
     GUIConfigData.heli.ServoIndexW = m_ccpm->ccpmServoWChannel->currentIndex();
@@ -1106,7 +1042,7 @@ void ConfigccpmWidget::UpdatCCPMOptionsFromUI()
     GUIConfigData.heli.ServoIndexZ = m_ccpm->ccpmServoZChannel->currentIndex();
     
 }
-void ConfigccpmWidget::UpdatCCPMUIFromOptions()
+void ConfigccpmWidget::UpdateCCPMUIFromOptions()
 {
     //swashplate config
     m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->count() - (GUIConfigData.heli.SwasplateType +1));
@@ -1134,7 +1070,6 @@ void ConfigccpmWidget::UpdatCCPMUIFromOptions()
     m_ccpm->ccpmRollScaleBox->setValue(GUIConfigData.heli.SliderValue2);
     m_ccpm->ccpmCollectiveSlider->setValue(GUIConfigData.heli.SliderValue0);
     m_ccpm->ccpmCollectivespinBox->setValue(GUIConfigData.heli.SliderValue0);
-    //m_ccpm->ccpmREVOScale->setValue(GUIConfigData.heli.RevoSlider);
     
     //servo assignments
     m_ccpm->ccpmServoWChannel->setCurrentIndex(GUIConfigData.heli.ServoIndexW);
@@ -1147,7 +1082,7 @@ void ConfigccpmWidget::UpdatCCPMUIFromOptions()
 
 void ConfigccpmWidget::SetUIComponentVisibilities()
 {
-    UpdatCCPMOptionsFromUI();
+    UpdateCCPMOptionsFromUI();
     //set which sliders are user...
     m_ccpm->ccpmRevoMixingBox->setVisible(0);
     
@@ -1205,7 +1140,7 @@ void ConfigccpmWidget::requestccpmUpdate()
     for(i = 0; i < SystemSettings::GUICONFIGDATA_NUMELEM; i++)
         GUIConfigData.UAVObject[i]=systemSettingsData.GUIConfigData[i];
 
-    UpdatCCPMUIFromOptions();
+    UpdateCCPMUIFromOptions();
 
     // Get existing mixer settings
     MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
@@ -1299,7 +1234,7 @@ void ConfigccpmWidget::requestccpmUpdate()
     }
 
     updatingFromHardware=FALSE;
-    UpdatCCPMUIFromOptions();
+    UpdateCCPMUIFromOptions();
     ccpmSwashplateUpdate();
 }
 
@@ -1317,109 +1252,78 @@ void ConfigccpmWidget::sendccpmUpdate()
     updatingToHardware=TRUE;
     //ShowDisclaimer(1);
     
+    UpdateCCPMOptionsFromUI();
+
+    // Store the data required to reconstruct
+    SystemSettings * systemSettings = SystemSettings::GetInstance(getObjectManager());
+    Q_ASSERT(systemSettings);
+    SystemSettings::DataFields systemSettingsData = systemSettings->getData();
+    systemSettingsData.GUIConfigData[0] = GUIConfigData.UAVObject[0];
+    systemSettingsData.GUIConfigData[1] = GUIConfigData.UAVObject[1];
+    systemSettings->setData(systemSettingsData);
+    systemSettings->updated();
     
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
+    Q_ASSERT(mixerSettings);
+    MixerSettings::DataFields mixerSettingsData = mixerSettings->getData();
 
-    UpdatCCPMOptionsFromUI();
-    obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
-    field = obj->getField(QString("GUIConfigData"));
-    field->setValue(GUIConfigData.UAVObject[0],0);
-    field->setValue(GUIConfigData.UAVObject[1],1);
-    obj->updated();
-   
+    UpdateMixer();
 
-    
-    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("MixerSettings")));
-        Q_ASSERT(obj);
+    // Set up some helper pointers
+    qint8 * mixers[8] = {mixerSettingsData.Mixer1Vector,
+                         mixerSettingsData.Mixer2Vector,
+                         mixerSettingsData.Mixer3Vector,
+                         mixerSettingsData.Mixer4Vector,
+                         mixerSettingsData.Mixer5Vector,
+                         mixerSettingsData.Mixer6Vector,
+                         mixerSettingsData.Mixer7Vector,
+                         mixerSettingsData.Mixer8Vector
+    };
 
-        UpdateMixer();
+    quint8 * mixerTypes[8] = {
+        &mixerSettingsData.Mixer1Type,
+        &mixerSettingsData.Mixer2Type,
+        &mixerSettingsData.Mixer3Type,
+        &mixerSettingsData.Mixer4Type,
+        &mixerSettingsData.Mixer5Type,
+        &mixerSettingsData.Mixer6Type,
+        &mixerSettingsData.Mixer7Type,
+        &mixerSettingsData.Mixer8Type
+    };
 
-        //clear the output types
-        for (i=0;i<8;i++)
+    //go through the user data and update the mixer matrix
+    for (i=0;i<6;i++)
+    {
+        if (MixerChannelData[i]<8)
         {
-            field = obj->getField( QString( "Mixer%1Type" ).arg( i+1 ));
-            //clear the mixer type
-            field->setValue("Disabled");
+            //set the mixer type
+            *(mixerTypes[MixerChannelData[i]]) = i==0 ?
+                        MixerSettings::MIXER1TYPE_MOTOR :
+                        MixerSettings::MIXER1TYPE_SERVO;
+
+            //config the vector
+            for (j=0;j<5;j++)
+                mixers[MixerChannelData[i]][j] = m_ccpm->ccpmAdvancedSettingsTable->item(i,j+1)->text().toInt();
         }
+    }
 
+    //get the user data for the curve into the mixer settings
+    for (i=0;i<5;i++)
+        mixerSettingsData.ThrottleCurve1[i] = m_ccpm->CurveSettings->item(i, 0)->text().toDouble();
 
-        //go through the user data and update the mixer matrix
-        for (i=0;i<6;i++)
-        {
-            /*
-                data.Mixer0Type = 0;//Disabled,Motor,Servo
-                data.Mixer0Vector[0] = 0;//ThrottleCurve1
-                data.Mixer0Vector[1] = 0;//ThrottleCurve2
-                data.Mixer0Vector[2] = 0;//Roll
-                data.Mixer0Vector[3] = 0;//Pitch
-                data.Mixer0Vector[4] = 0;//Yaw
-
-            */
-            if (MixerChannelData[i]<8)
-            {
-                //select the correct mixer for this config element
-                field = obj->getField(QString( "Mixer%1Type" ).arg( MixerChannelData[i]+1 ));
-                //set the mixer type
-                if (i==0)
-                {
-                    field->setValue("Motor");
-                }
-                else
-                {
-                    field->setValue("Servo");
-                }
-
-                //select the correct mixer for this config element
-                field = obj->getField(QString( "Mixer%1Vector" ).arg( MixerChannelData[i]+1 ));
-                //config the vector
-                for (j=0;j<5;j++)
-                {
-                    field->setValue(m_ccpm->ccpmAdvancedSettingsTable->item(i,j+1)->text().toInt(),j);
-                }
-
-            }
-
-        }
-
-
- 		//get the user data for the curve into the mixer settings
-       field = obj->getField(QString("ThrottleCurve1"));
-        for (i=0;i<5;i++)
-        {
-            field->setValue(m_ccpm->CurveSettings->item(i, 0)->text().toDouble(),i);
-        }
-        field = obj->getField(QString("ThrottleCurve2"));
-        for (i=0;i<5;i++)
-        {
-            field->setValue(m_ccpm->CurveSettings->item(i, 1)->text().toDouble(),i);
-        }
-
-    obj->updated();
-    
-    field = obj->getField(QString("Curve2Source"));
+    for (i=0;i<5;i++)
+        mixerSettingsData.ThrottleCurve2[i] = m_ccpm->CurveSettings->item(i, 1)->text().toDouble();
     
     //mapping of collective input to curve 2...
     //MixerSettings.Curve2Source = Throttle,Roll,Pitch,Yaw,Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5
     //check if we are using throttle or directly from a channel...
     if (GUIConfigData.heli.ccpmCollectivePassthroughState)
-    {// input channel
-        field->setValue("Accessory0");
-        obj->updated();
- 
-        obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
-        Q_ASSERT(obj);
-        field = obj->getField(QString("Accessory0"));
-        field->setValue(tr( "Channel%1" ).arg(GUIConfigData.heli.CollectiveChannel+1));
-        
-    }
+        mixerSettingsData.Curve2Source = GUIConfigData.heli.CollectiveChannel;
     else
-    {// throttle
-        
-        field->setValue("Throttle");
-    }
+        mixerSettingsData.Curve2Source = MixerSettings::CURVE2SOURCE_THROTTLE;
     
-    obj->updated();
+    mixerSettings->setData(mixerSettingsData);
+    mixerSettings->updated();
     updatingToHardware=FALSE;
 
 }

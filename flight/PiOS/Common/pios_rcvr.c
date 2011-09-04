@@ -78,6 +78,9 @@ out_fail:
 
 int32_t PIOS_RCVR_Read(uint32_t rcvr_id, uint8_t channel)
 {
+  if (rcvr_id == 0) 
+    return PIOS_RCVR_NODRIVER;
+
   struct pios_rcvr_dev * rcvr_dev = (struct pios_rcvr_dev *)rcvr_id;
 
   if (!PIOS_RCVR_validate(rcvr_dev)) {

@@ -338,8 +338,8 @@ static void PIOS_SPEKTRUM_Supervisor(uint32_t spektrum_id)
 			/* signal lost */
 			fsm->sync_of = 0;
 			for (int i = 0; i < PIOS_SPEKTRUM_NUM_INPUTS; i++) {
-				fsm->CaptureValue[i] = 0;
-				fsm->CaptureValueTemp[i] = 0;
+				fsm->CaptureValue[i] = PIOS_RCVR_TIMEOUT;
+				fsm->CaptureValueTemp[i] = PIOS_RCVR_TIMEOUT;
 			}
 		}
 		spektrum_dev->supv_timer = 0;

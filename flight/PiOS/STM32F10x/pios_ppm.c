@@ -47,7 +47,6 @@ const struct pios_rcvr_driver pios_ppm_rcvr_driver = {
 #define PIOS_PPM_IN_MIN_SYNC_PULSE_US		3800	// microseconds
 #define PIOS_PPM_IN_MIN_CHANNEL_PULSE_US	750	// microseconds
 #define PIOS_PPM_IN_MAX_CHANNEL_PULSE_US	2250   // microseconds
-#define PIOS_PPM_INPUT_INVALID			0
 
 /* Local Variables */
 static TIM_ICInitTypeDef TIM_ICInitStructure;
@@ -290,7 +289,7 @@ static void PIOS_PPM_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t cha
 			}
 			for (uint32_t i = ppm_dev->NumChannels;
 			     i < PIOS_PPM_IN_MAX_NUM_CHANNELS; i++) {
-				ppm_dev->CaptureValue[i] = PIOS_PPM_INPUT_INVALID;
+				ppm_dev->CaptureValue[i] = PIOS_RCVR_TIMEOUT;
 			}
 		}
 
@@ -314,7 +313,7 @@ static void PIOS_PPM_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t cha
 			/* Not a valid pulse duration */
 			ppm_dev->Tracking = FALSE;
 			for (uint32_t i = 0; i < PIOS_PPM_IN_MAX_NUM_CHANNELS ; i++) {
-				ppm_dev->CaptureValueNewFrame[i] = PIOS_PPM_INPUT_INVALID;
+				ppm_dev->CaptureValueNewFrame[i] = PIOS_RCVR_TIMEOUT;
 			}
 		}
 	}
@@ -342,8 +341,8 @@ static void PIOS_PPM_Supervisor(uint32_t ppm_id) {
 		ppm_dev->Tracking = FALSE;
 
 		for (int32_t i = 0; i < PIOS_PPM_IN_MAX_NUM_CHANNELS ; i++) {
-			ppm_dev->CaptureValue[i] = PIOS_PPM_INPUT_INVALID;
-			ppm_dev->CaptureValueNewFrame[i] = PIOS_PPM_INPUT_INVALID;
+			ppm_dev->CaptureValue[i] = PIOS_RCVR_TIMEOUT;
+			ppm_dev->CaptureValueNewFrame[i] = PIOS_RCVR_TIMEOUT;
 		}
 	}
 

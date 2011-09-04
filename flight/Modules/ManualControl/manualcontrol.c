@@ -202,6 +202,8 @@ static void manualControlTask(void *parameters)
 
 		if (!ManualControlCommandReadOnly(&cmd)) {
 
+			bool valid_input_detected = true;
+			
 			// Read channel values in us
 			for (uint8_t n = 0; 
 			     n < MANUALCONTROLSETTINGS_CHANNELGROUPS_NUMELEM && n < MANUALCONTROLCOMMAND_CHANNEL_NUMELEM;
@@ -209,14 +211,20 @@ static void manualControlTask(void *parameters)
 				extern uint32_t pios_rcvr_group_map[];
 
 				if (settings.ChannelGroups[n] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
-					cmd.Channel[n] = -1;
-				} else if (!pios_rcvr_group_map[settings.ChannelGroups[n]]) {
-					cmd.Channel[n] = -2;
+					cmd.Channel[n] = PIOS_RCVR_INVALID;
 				} else {
 					cmd.Channel[n] = PIOS_RCVR_Read(pios_rcvr_group_map[settings.ChannelGroups[n]],
 									settings.ChannelNumber[n]);
 				}
-				scaledChannel[n] = scaleChannel(cmd.Channel[n], settings.ChannelMax[n],	settings.ChannelMin[n], settings.ChannelNeutral[n]);
+				
+				// If a channel has timed out this is not valid data and we shouldn't update anything
+				// until we decide to go to failsafe
+				if(cmd.Channel[n] == PIOS_RCVR_TIMEOUT)
+					valid_input_detected = false;
+				else if (cmd.Channel[n] == PIOS_RCVR_INVALID)
+					scaledChannel[n] = 0;
+				else
+					scaledChannel[n] = scaleChannel(cmd.Channel[n], settings.ChannelMax[n],	settings.ChannelMin[n], settings.ChannelNeutral[n]);
 			}
 
 			// Check settings, if error raise alarm
@@ -224,7 +232,20 @@ static void manualControlTask(void *parameters)
 				settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE ||
 				settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE ||
 				settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE ||
-				settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE) {
+				settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] >= MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE ||
+				// Check all channel mappings are valid
+				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL] == PIOS_RCVR_INVALID ||
+				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH] == PIOS_RCVR_INVALID ||
+				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW] == PIOS_RCVR_INVALID ||
+				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE] == PIOS_RCVR_INVALID ||
+				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] == PIOS_RCVR_INVALID ||
+				// Check the driver is exists
+				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL] == PIOS_RCVR_NODRIVER ||
+				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH] == PIOS_RCVR_NODRIVER ||
+				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW] == PIOS_RCVR_NODRIVER ||
+				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE] == PIOS_RCVR_NODRIVER ||
+				cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE] == PIOS_RCVR_NODRIVER) {
+
 				AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
 				cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
 				ManualControlCommandSet(&cmd);
@@ -232,7 +253,7 @@ static void manualControlTask(void *parameters)
 			}
 
 			// decide if we have valid manual input or not
-			bool valid_input_detected = validInputRange(settings.ChannelMin[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE], settings.ChannelMax[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE], cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE]) &&
+			valid_input_detected &= validInputRange(settings.ChannelMin[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE], settings.ChannelMax[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE], cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE]) &&
 			     validInputRange(settings.ChannelMin[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL], settings.ChannelMax[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL], cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_ROLL]) &&
 			     validInputRange(settings.ChannelMin[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW], settings.ChannelMax[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW], cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_YAW]) &&
 			     validInputRange(settings.ChannelMin[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH], settings.ChannelMax[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH], cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_PITCH]);

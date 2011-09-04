@@ -233,6 +233,7 @@ void ins_indoor_update()
  * @brief Initialize the EKF assuming stationary
  */
 bool inited = false;
+float init_q[4];
 void ins_init_algorithm()
 {
 	inited = true;
@@ -280,11 +281,15 @@ void ins_init_algorithm()
 		rpy[1] = asinf(-accels[0]/mag);
 		rpy[0] = atan2(accels[1]/mag,accels[2]/mag);
 		rpy[2] = 0;
-		RPY2Quaternion(rpy,q);
+		RPY2Quaternion(rpy,init_q);
 		if (using_gps)
-			INSSetState(gps_data.NED, zeros, q, zeros, zeros);
-		else
-			INSSetState(zeros, zeros, q, zeros, zeros);
+			INSSetState(gps_data.NED, zeros, init_q, zeros, zeros);
+		else {
+			for (uint32_t i = 0; i < 5; i++) {
+				INSSetState(zeros, zeros, init_q, zeros, zeros);
+				ins_indoor_update();
+			}
+		}
 	}
 	
 	INSResetP(Pdiag);

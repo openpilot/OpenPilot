@@ -83,13 +83,29 @@ void INSGPSInit()		//pretty much just a place holder for now
 	for (int i = 0; i < NUMX; i++) {
 		for (int j = 0; j < NUMX; j++) {
 			P[i][j] = 0; // zero all terms
+			F[i][j] = 0;
 		}
+		
+		for (int j = 0; j < NUMW; j++)
+			G[i][j] = 0;
+			
+		for (int j = 0; j < NUMV; j++) {
+			H[j][i] = 0;
+			K[i][j] = 0;
+		}
+			
+		X[i] = 0;
 	}
+	for (int i = 0; i < NUMW; i++)
+		Q[i] = 0;
+	for (int i = 0; i < NUMV; i++) 
+		R[i] = 0;
+
 	
 	P[0][0] = P[1][1] = P[2][2] = 25;	// initial position variance (m^2)
 	P[3][3] = P[4][4] = P[5][5] = 5;	// initial velocity variance (m/s)^2
 	P[6][6] = P[7][7] = P[8][8] = P[9][9] = 1e-5;	// initial quaternion variance
-	P[10][10] = P[11][11] = P[12][12] = 1e-5;	// initial gyro bias variance (rad/s)^2
+	P[10][10] = P[11][11] = P[12][12] = 1e-9;	// initial gyro bias variance (rad/s)^2
 
 	X[0] = X[1] = X[2] = X[3] = X[4] = X[5] = 0;	// initial pos and vel (m)
 	X[6] = 1;
@@ -98,7 +114,7 @@ void INSGPSInit()		//pretty much just a place holder for now
 
 	Q[0] = Q[1] = Q[2] = 50e-8;	// gyro noise variance (rad/s)^2
 	Q[3] = Q[4] = Q[5] = 0.01;	// accelerometer noise variance (m/s^2)^2
-	Q[6] = Q[7] = Q[8] = 2e-9;	// gyro bias random walk variance (rad/s^2)^2
+	Q[6] = Q[7] = Q[8] = 2e-15;	// gyro bias random walk variance (rad/s^2)^2
 
 	R[0] = R[1] = 0.004;	// High freq GPS horizontal position noise variance (m^2)
 	R[2] = 0.036;		// High freq GPS vertical position noise variance (m^2)

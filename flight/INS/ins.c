@@ -73,7 +73,7 @@ void get_accel_gyro_data();
 
 void reset_values();
 void measure_noise(void);
-
+void zero_gyros();
 /* Communication functions */
 //void send_calibration(void);
 void send_attitude(void);
@@ -138,7 +138,7 @@ float pressure, altitude;
 int32_t dr;
 
 static volatile bool init_algorithm = false;
-
+static bool zeroed_gyros = false;
 int32_t sclk, sclk_prev;
 int32_t sclk_count;
 uint32_t loop_time;
@@ -198,9 +198,12 @@ int main()
 	HomeLocationConnectCallback(homelocation_callback);
 	//FirmwareIAPObjConnectCallback(firmwareiapobj_callback);
 	
-	get_accel_gyro_data();   // This function blocks till data avilable
-	get_mag_data();
-	get_baro_data();
+	for(uint32_t i = 0; i < 200; i++) {
+		get_accel_gyro_data();   // This function blocks till data avilable
+		get_mag_data();
+		get_baro_data();
+		PIOS_DELAY_WaituS(TYPICAL_PERIOD);
+	}
 
 	settings_callback(InsSettingsHandle());
 	ins_init_algorithm(); 
@@ -233,8 +236,13 @@ int main()
 			continue;
 		}
 		
-		//print_ekf_binary();
-		
+		if(total_conversion_blocks <= 3000 && !zeroed_gyros) {
+			zero_gyros();
+			if(total_conversion_blocks == 3000)
+				zeroed_gyros = true;
+			PIOS_DELAY_WaituS(TYPICAL_PERIOD);
+			continue;
+		}
 		/* If algorithm changed reinit.  This could go in callback but wouldn't be synchronous */
 		if (init_algorithm) {
 			ins_init_algorithm(); 
@@ -242,6 +250,9 @@ int main()
 		}
 		
 		time_val2 = PIOS_DELAY_GetRaw();
+		
+		float zeros[3] = {0,0,0};
+		INSSetGyroBias(zeros);
 		
 		switch(ahrs_algorithm) {
 			case INSSETTINGS_ALGORITHM_SIMPLE:
@@ -259,6 +270,11 @@ int main()
 				break;
 			case INSSETTINGS_ALGORITHM_SENSORRAW:
 				print_ekf_binary();
+				// Run at standard rate
+				while(PIOS_DELAY_DiffuS(time_val1) < TYPICAL_PERIOD);
+				break;
+			case INSSETTINGS_ALGORITHM_ZEROGYROS:
+				zero_gyros();
 				// Run at standard rate
 				while(PIOS_DELAY_DiffuS(time_val1) < TYPICAL_PERIOD);
 				break;
@@ -563,10 +579,15 @@ void measure_noise()
 		PIOS_DELAY_WaituS(TYPICAL_PERIOD);
 		calibrate_count++;
 	}
-
-
 }
 
+void zero_gyros()
+{
+	const float rate = 1e-2;
+	gyro_data.calibration.bias[0] += -gyro_data.filtered.x * rate;
+	gyro_data.calibration.bias[1] += -gyro_data.filtered.y * rate;
+	gyro_data.calibration.bias[2] += -gyro_data.filtered.z * rate;
+}
 
 /**
  * @brief Populate fields with initial values

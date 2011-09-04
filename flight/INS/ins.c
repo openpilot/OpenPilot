@@ -73,7 +73,8 @@ void get_accel_gyro_data();
 
 void reset_values();
 void measure_noise(void);
-void zero_gyros();
+void zero_gyros(bool update_settings);
+
 /* Communication functions */
 //void send_calibration(void);
 void send_attitude(void);
@@ -237,7 +238,7 @@ int main()
 		}
 		
 		if(total_conversion_blocks <= 3000 && !zeroed_gyros) {
-			zero_gyros();
+			zero_gyros(total_conversion_blocks == 3000);
 			if(total_conversion_blocks == 3000)
 				zeroed_gyros = true;
 			PIOS_DELAY_WaituS(TYPICAL_PERIOD);
@@ -274,7 +275,7 @@ int main()
 				while(PIOS_DELAY_DiffuS(time_val1) < TYPICAL_PERIOD);
 				break;
 			case INSSETTINGS_ALGORITHM_ZEROGYROS:
-				zero_gyros();
+				zero_gyros(false);
 				// Run at standard rate
 				while(PIOS_DELAY_DiffuS(time_val1) < TYPICAL_PERIOD);
 				break;
@@ -581,12 +582,21 @@ void measure_noise()
 	}
 }
 
-void zero_gyros()
+void zero_gyros(bool update_settings)
 {
 	const float rate = 1e-2;
 	gyro_data.calibration.bias[0] += -gyro_data.filtered.x * rate;
 	gyro_data.calibration.bias[1] += -gyro_data.filtered.y * rate;
 	gyro_data.calibration.bias[2] += -gyro_data.filtered.z * rate;
+	
+	if(update_settings) {
+		InsSettingsData settings;
+		InsSettingsGet(&settings);
+		settings.gyro_bias[INSSETTINGS_GYRO_BIAS_X] = gyro_data.calibration.bias[0];
+		settings.gyro_bias[INSSETTINGS_GYRO_BIAS_Y] = gyro_data.calibration.bias[1];
+		settings.gyro_bias[INSSETTINGS_GYRO_BIAS_Z] = gyro_data.calibration.bias[2];
+		InsSettingsSet(&settings);
+	}
 }
 
 /**

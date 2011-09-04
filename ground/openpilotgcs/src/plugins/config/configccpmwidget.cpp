@@ -39,6 +39,7 @@
 
 #include "mixersettings.h"
 #include "systemsettings.h"
+#include "actuatorcommand.h"
 
 #define  Pi 3.14159265358979323846
 
@@ -130,10 +131,6 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
         SwashLvlSpinBoxes[i] = new QSpinBox(m_ccpm->SwashLvlSwashplateImage);       // use QGraphicsView
         m_ccpm->SwashLvlSwashplateImage->scene()->addWidget(SwashLvlSpinBoxes[i]);
-        //SwashLvlSpinBoxes[i]->move(i*50+50,20);
-        //SwashLvlSpinBoxes[i]->resize(40,20);
-        //SwashLvlSpinBoxes[i]->heightForWidth()
-        SwashLvlSpinBoxes[i]->setFixedSize(50,20);
         SwashLvlSpinBoxes[i]->setMaximum(10000);
         SwashLvlSpinBoxes[i]->setMinimum(0);
         SwashLvlSpinBoxes[i]->setValue(0);
@@ -455,6 +452,9 @@ void ConfigccpmWidget::UpdateCurveWidgets()
 
 void ConfigccpmWidget::updatePitchCurveValue(QList<double> curveValues0,double Value0)
 {
+    Q_UNUSED(curveValues0);
+    Q_UNUSED(Value0);
+
     int NumCurvePoints,i;
     double CurrentValue;
     QList<double> internalCurveValues;
@@ -476,6 +476,9 @@ void ConfigccpmWidget::updatePitchCurveValue(QList<double> curveValues0,double V
 
 void ConfigccpmWidget::updateThrottleCurveValue(QList<double> curveValues0,double Value0)
 {
+    Q_UNUSED(curveValues0);
+    Q_UNUSED(Value0);
+
     int NumCurvePoints,i;
     double CurrentValue;
     QList<double> internalCurveValues;
@@ -1118,20 +1121,17 @@ void ConfigccpmWidget::requestccpmUpdate()
 #define MaxAngleError 2
     int MixerDataFromHeli[8][5];
     quint8 MixerOutputType[8];
-    int EngineChannel,TailRotorChannel,ServoChannels[4],ServoAngles[4],SortAngles[4],CalcAngles[4],ServoCurve2[4];
+    int EngineChannel,TailRotorChannel,ServoChannels[4],ServoAngles[4],SortAngles[4],ServoCurve2[4];
     int NumServos=0;
-    double Collective=0.0;
-    double a1,a2;
-    int HeadRotation,temp;
-    int isCCPM=0;
 
     if (SwashLvlConfigurationInProgress)return;
     if (updatingToHardware)return;
     updatingFromHardware=TRUE;
     
-    int i,j;
+    unsigned int i,j;
     
     SystemSettings * systemSettings = SystemSettings::GetInstance(getObjectManager());
+    Q_ASSERT(systemSettings);
     SystemSettings::DataFields systemSettingsData = systemSettings->getData();
 
     Q_ASSERT(SystemSettings::GUICONFIGDATA_NUMELEM ==
@@ -1245,8 +1245,6 @@ void ConfigccpmWidget::requestccpmUpdate()
 void ConfigccpmWidget::sendccpmUpdate()
 {
     int i,j;
-    UAVObjectField *field;
-    UAVDataObject* obj;
 
     if (SwashLvlConfigurationInProgress)return;
     updatingToHardware=TRUE;
@@ -1724,7 +1722,6 @@ void ConfigccpmWidget::enableSwashplateLevellingControl(bool state)
         mdata.gcsTelemetryUpdateMode = UAVObject::UPDATEMODE_ONCHANGE;
         mdata.gcsTelemetryUpdatePeriod = 100;
         SwashLvlConfigurationInProgress=1;
-        connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)),this, SLOT(FocusChanged(QWidget*,QWidget*)));
         m_ccpm->TabObject->setTabEnabled(0,0);
         m_ccpm->TabObject->setTabEnabled(2,0);
         m_ccpm->TabObject->setTabEnabled(3,0);
@@ -1735,7 +1732,6 @@ void ConfigccpmWidget::enableSwashplateLevellingControl(bool state)
         mdata = SwashLvlaccInitialData; // Restore metadata
         SwashLvlConfigurationInProgress=0;
 
-        disconnect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)),this, SLOT(FocusChanged(QWidget*,QWidget*)));
         m_ccpm->TabObject->setTabEnabled(0,1);
         m_ccpm->TabObject->setTabEnabled(2,1);
         m_ccpm->TabObject->setTabEnabled(3,1);
@@ -1761,41 +1757,24 @@ void ConfigccpmWidget::setSwashplateLevel(int percent)
 
     SwashLvlServoInterlock=1;
 
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
-    UAVObjectField * channel = obj->getField("Channel");
+    ActuatorCommand * actuatorCommand = ActuatorCommand::GetInstance(getObjectManager());
+    ActuatorCommand::DataFields actuatorCommandData = actuatorCommand->getData();
 
-
-
-    if (level==0)
-    {
-        for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++)
-        {
-            channel->setValue(newSwashLvlConfiguration.Neutral[i],newSwashLvlConfiguration.ServoChannels[i]);
-            SwashLvlSpinBoxes[i]->setValue(newSwashLvlConfiguration.Neutral[i]);
-        }
-
-    }
-    else if (level>0)
-    {
-        for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++)
-        {
+    for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++) {
+        if (level==0)
+            value = newSwashLvlConfiguration.Neutral[i];
+        else if (level > 0)
             value = (newSwashLvlConfiguration.Max[i] - newSwashLvlConfiguration.Neutral[i])*level + newSwashLvlConfiguration.Neutral[i];
-            channel->setValue(value,newSwashLvlConfiguration.ServoChannels[i]);
-            SwashLvlSpinBoxes[i]->setValue(value);
-        }
-
-    }
-    else if (level<0)
-    {
-        for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++)
-        {
+        else if (level < 0)
             value = (newSwashLvlConfiguration.Neutral[i] - newSwashLvlConfiguration.Min[i])*level + newSwashLvlConfiguration.Neutral[i];
-            channel->setValue(value,newSwashLvlConfiguration.ServoChannels[i]);
-            SwashLvlSpinBoxes[i]->setValue(value);
-        }
 
+        actuatorCommandData.Channel[newSwashLvlConfiguration.ServoChannels[i]] = value;
+        SwashLvlSpinBoxes[i]->setValue(value);
     }
-    obj->updated();
+
+    actuatorCommand->setData(actuatorCommandData);
+    actuatorCommand->updated();
+
     SwashLvlServoInterlock=0;
 
 return;
@@ -1804,76 +1783,41 @@ return;
 
 void ConfigccpmWidget::SwashLvlSpinBoxChanged(int value)
 {
+    Q_UNUSED(value);
     int i;
     if (SwashLvlServoInterlock==1)return;
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
-    UAVObjectField * channel = obj->getField("Channel");
 
-    switch (SwashLvlState)
-    {
-    case 0:
-        break;
-    case 1: //Neutral levelling
-        for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++)
+    ActuatorCommand * actuatorCommand = ActuatorCommand::GetInstance(getObjectManager());
+    ActuatorCommand::DataFields actuatorCommandData = actuatorCommand->getData();
+
+    for (i = 0; i < CCPM_MAX_SWASH_SERVOS; i++) {
+        value = SwashLvlSpinBoxes[i]->value();
+
+        switch (SwashLvlState)
         {
-            newSwashLvlConfiguration.Neutral[i]=SwashLvlSpinBoxes[i]->value();
-            channel->setValue(newSwashLvlConfiguration.Neutral[i],newSwashLvlConfiguration.ServoChannels[i]);
+        case 1: //Neutral levelling
+            newSwashLvlConfiguration.Neutral[i]=value;
+            break;
+        case 2: //Max levelling
+            newSwashLvlConfiguration.Max[i] = value;
+            break;
+        case 3: //Min levelling
+            newSwashLvlConfiguration.Min[i]= value;
+            break;
+        case 4: //levelling verification
+            break;
+        case 5: //levelling complete
+            break;
+        default:
+            break;
         }
-        obj->updated();
-        break;
-    case 2: //Max levelling
-        for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++)
-        {
-            newSwashLvlConfiguration.Max[i]=SwashLvlSpinBoxes[i]->value();
-            channel->setValue(newSwashLvlConfiguration.Max[i],newSwashLvlConfiguration.ServoChannels[i]);
-        }
-        obj->updated();
-        break;
-    case 3: //Min levelling
-        for (i=0;i<CCPM_MAX_SWASH_SERVOS;i++)
-        {
-            newSwashLvlConfiguration.Min[i]=SwashLvlSpinBoxes[i]->value();
-            channel->setValue(newSwashLvlConfiguration.Min[i],newSwashLvlConfiguration.ServoChannels[i]);
-        }
-        obj->updated();
-        break;
-    case 4: //levelling verification
-        break;
-    case 5: //levelling complete
-        break;
-    default:
-        break;
+
+        actuatorCommandData.Channel[newSwashLvlConfiguration.ServoChannels[i]] = value;
     }
+
+
+    actuatorCommand->setData(actuatorCommandData);
+    actuatorCommand->updated();
+
     return;
-}
-
-
-void ConfigccpmWidget::FocusChanged(QWidget *oldFocus, QWidget *newFocus)
-{
-    if (SwashLvlConfigurationInProgress!=1) return;
-    QMessageBox msgBox;
-    int ret;
-    msgBox.setText("<h1>Warning!!!</h1>");
-
-    if ((this->isAncestorOf(oldFocus))&&(!this->isAncestorOf(newFocus)))
-    {
-        msgBox.setInformativeText("<b>You are in the middle of the levelling routine</b><br>Changing focus will cancel all levelling and return the OP hardware to the state it was in before levelling began.<p>Do you want to continue the levelling routine?");
-        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-        msgBox.setDefaultButton(QMessageBox::Yes);
-        msgBox.setIcon(QMessageBox::Information);
-        ret = msgBox.exec();
-
-        if (ret == QMessageBox::Yes)
-        {
-
-            //m_ccpm->TabObject->setCurrentIndex(1);
-            //m_ccpm->SwashPlateLevel->setFocus(Qt::MouseFocusReason);
-            //m_ccpm->SwashLvlInstructionsBox->setFocus(Qt::MouseFocusReason);
-            oldFocus->setFocus(Qt::MouseFocusReason);
-        }
-        if (ret == QMessageBox::No)
-        {
-            SwashLvlCancelButtonPressed();
-        }
-    }
 }

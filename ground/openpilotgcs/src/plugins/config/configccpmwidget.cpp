@@ -218,17 +218,17 @@ ConfigccpmWidget::ConfigccpmWidget(QWidget *parent) : ConfigTaskWidget(parent)
     m_ccpm->ccpmServoZChannel->setCurrentIndex(8);
 
     QStringList Types;
-    Types << "CCPM 2 Servo 90บ" << "CCPM 3 Servo 90บ" << "CCPM 4 Servo 90บ" << "CCPM 3 Servo 120บ" << "CCPM 3 Servo 140บ" << "FP 2 Servo 90บ"  << "Custom - User Angles" << "Custom - Advanced Settings"  ;
+    Types << QString::fromUtf8("CCPM 2 Servo 90ยบ") << QString::fromUtf8("CCPM 3 Servo 90ยบ") <<
+             QString::fromUtf8("CCPM 4 Servo 90ยบ") << QString::fromUtf8("CCPM 3 Servo 120ยบ") <<
+             QString::fromUtf8("CCPM 3 Servo 140ยบ") << QString::fromUtf8("FP 2 Servo 90ยบ")  <<
+             QString::fromUtf8("Custom - User Angles") << QString::fromUtf8("Custom - Advanced Settings");
     m_ccpm->ccpmType->addItems(Types);
     m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->count() - 1);
     requestccpmUpdate();
     UpdateCurveSettings();
 
-
     //disable changing number of points in curves until UAVObjects have more than 5
     m_ccpm->NumCurvePoints->setEnabled(0);
-    
-    
 
     UpdateType();
 
@@ -332,7 +332,7 @@ void ConfigccpmWidget::UpdateType()
 
     NumServosDefined=4;
     //set values for pre defined heli types
-        if (TypeText.compare(QString("CCPM 2 Servo 90บ"), Qt::CaseInsensitive)==0)
+        if (TypeText.compare(QString::fromUtf8("CCPM 2 Servo 90ยบ"), Qt::CaseInsensitive)==0)
         {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
@@ -348,7 +348,7 @@ void ConfigccpmWidget::UpdateType()
             NumServosDefined=2;
 
         }
-        if (TypeText.compare(QString("CCPM 3 Servo 90บ"), Qt::CaseInsensitive)==0)
+        if (TypeText.compare(QString::fromUtf8("CCPM 3 Servo 90ยบ"), Qt::CaseInsensitive)==0)
         {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
@@ -361,7 +361,7 @@ void ConfigccpmWidget::UpdateType()
             NumServosDefined=3;
         
         }
-        if (TypeText.compare(QString("CCPM 4 Servo 90บ"), Qt::CaseInsensitive)==0)
+        if (TypeText.compare(QString::fromUtf8("CCPM 4 Servo 90ยบ"), Qt::CaseInsensitive)==0)
         {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
@@ -373,7 +373,7 @@ void ConfigccpmWidget::UpdateType()
             NumServosDefined=4;
         
         }
-        if (TypeText.compare(QString("CCPM 3 Servo 120บ"), Qt::CaseInsensitive)==0)
+        if (TypeText.compare(QString::fromUtf8("CCPM 3 Servo 120ยบ"), Qt::CaseInsensitive)==0)
         {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 120,360));
@@ -386,7 +386,7 @@ void ConfigccpmWidget::UpdateType()
             NumServosDefined=3;
             
         }
-        if (TypeText.compare(QString("CCPM 3 Servo 140บ"), Qt::CaseInsensitive)==0)
+        if (TypeText.compare(QString::fromUtf8("CCPM 3 Servo 140ยบ"), Qt::CaseInsensitive)==0)
         {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 140,360));
@@ -399,7 +399,7 @@ void ConfigccpmWidget::UpdateType()
             NumServosDefined=3;
 
         }
-        if (TypeText.compare(QString("FP 2 Servo 90บ"), Qt::CaseInsensitive)==0)
+        if (TypeText.compare(QString::fromUtf8("FP 2 Servo 90ยบ"), Qt::CaseInsensitive)==0)
         {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));

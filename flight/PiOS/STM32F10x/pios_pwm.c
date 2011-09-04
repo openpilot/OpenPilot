@@ -181,12 +181,12 @@ static int32_t PIOS_PWM_Get(uint32_t rcvr_id, uint8_t channel)
 
 	if (!PIOS_PWM_validate(pwm_dev)) {
 		/* Invalid device specified */
-		return -1;
+		return PIOS_RCVR_INVALID;
 	}
 
 	if (channel >= PIOS_PWM_NUM_INPUTS) {
 		/* Channel out of range */
-		return -1;
+		return PIOS_RCVR_INVALID;
 	}
 	return pwm_dev->CaptureValue[channel];
 }

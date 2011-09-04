@@ -211,12 +211,12 @@ static int32_t PIOS_PPM_Get(uint32_t rcvr_id, uint8_t channel)
 
 	if (!PIOS_PPM_validate(ppm_dev)) {
 		/* Invalid device specified */
-		return -1;
+		return PIOS_RCVR_INVALID;
 	}
 
 	if (channel >= PIOS_PPM_IN_MAX_NUM_CHANNELS) {
 		/* Channel out of range */
-		return -1;
+		return PIOS_RCVR_INVALID;
 	}
 	return ppm_dev->CaptureValue[channel];
 }

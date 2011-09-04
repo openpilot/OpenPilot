@@ -40,8 +40,8 @@ struct pios_rcvr_driver {
 extern int32_t PIOS_RCVR_Read(uint32_t rcvr_id, uint8_t channel);
 
 #define PIOS_RCVR_TIMEOUT         0
-#define PIOS_RCVR_NODRIVER        65534
-#define PIOS_RCVR_INVALID         65535
+#define PIOS_RCVR_NODRIVER        -2
+#define PIOS_RCVR_INVALID         -1
 
 #endif /* PIOS_RCVR_H */
 

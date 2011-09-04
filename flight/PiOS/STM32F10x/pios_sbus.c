@@ -183,7 +183,7 @@ static int32_t PIOS_SBUS_Get(uint32_t rcvr_id, uint8_t channel)
 {
 	/* return error if channel is not available */
 	if (channel >= SBUS_NUMBER_OF_CHANNELS) {
-		return -1;
+		return PIOS_RCVR_INVALID;
 	}
 	return channel_data[channel];
 }

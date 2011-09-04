@@ -48,6 +48,7 @@
 #include "ahrs_spi_comm.h"
 #include "insgps.h"
 #include "CoordinateConversions.h"
+#include "NMEA.h"
 #include <stdbool.h>
 #include "fifo_buffer.h"
 #include "insgps_helper.h"
@@ -66,7 +67,7 @@
 volatile int8_t ahrs_algorithm;
 
 /* Data accessors */
-void adc_callback(float *);
+void get_gps_data();
 void get_mag_data();
 void get_baro_data();
 void get_accel_gyro_data();
@@ -225,6 +226,7 @@ int main()
 		get_accel_gyro_data();   // This function blocks till data avilable
 		get_mag_data();
 		get_baro_data();
+		get_gps_data();
 		
 		status.IdleTimePerCycle = PIOS_DELAY_DiffuS(time_val1);
 		
@@ -505,6 +507,126 @@ void get_baro_data()
 }
 
 /**
+ * @brief Process any data coming in the gps port
+ */
+void get_gps_data() 
+{
+	uint8_t c;
+	static bool start_flag = false;
+	static bool found_cr = false;
+	static char gps_rx_buffer[NMEA_MAX_PACKET_LENGTH];
+	static uint32_t rx_count = 0;
+	static uint32_t numChecksumErrors = 0;
+	static uint32_t numParsingErrors = 0;
+	static uint32_t numOverflowErrors = 0;
+	static uint32_t numUpdates = 0;
+	while(PIOS_COM_ReceiveBuffer(pios_com_gps_id, &c, 1, 0) == 1) 
+	{
+		// Echo data back out aux port
+		//PIOS_COM_SendBufferNonBlocking(pios_com_aux_id, &c, 1);
+		
+		// detect start while acquiring stream
+		if (!start_flag && (c == '$'))
+		{
+			start_flag = true;
+			found_cr = false;
+			rx_count = 0;
+		}
+		else if (!start_flag)
+			continue;
+		
+		if (rx_count >= NMEA_MAX_PACKET_LENGTH)
+		{
+			// The buffer is already full and we haven't found a valid NMEA sentence.
+			// Flush the buffer and note the overflow event.
+			start_flag = false;
+			found_cr = false;
+			rx_count = 0;
+			numOverflowErrors++;
+		}
+		else
+		{
+			gps_rx_buffer[rx_count] = c;
+			rx_count++;
+		}
+		
+		// look for ending '\r\n' sequence
+		if (!found_cr && (c == '\r') )
+			found_cr = true;
+		else if (found_cr && (c != '\n') )
+				found_cr = false;  // false end flag
+		else if (found_cr && (c == '\n') )
+		{
+			// The NMEA functions require a zero-terminated string
+			// As we detected \r\n, the string as for sure 2 bytes long, we will also strip the \r\n
+			gps_rx_buffer[rx_count-2] = 0;
+			
+			// prepare to parse next sentence
+			start_flag = false;
+			found_cr = false;
+			rx_count = 0;
+			// Our rxBuffer must look like this now:
+			//   [0]           = '$'
+			//   ...           = zero or more bytes of sentence payload
+			//   [end_pos - 1] = '\r'
+			//   [end_pos]     = '\n'
+			//
+			// Prepare to consume the sentence from the buffer
+			
+			// Validate the checksum over the sentence
+			if (!NMEA_checksum(&gps_rx_buffer[1]))
+			{	// Invalid checksum.  May indicate dropped characters on Rx.
+				//PIOS_DEBUG_PinHigh(2);
+				++numChecksumErrors;
+				//PIOS_DEBUG_PinLow(2);
+			}
+			else
+			{	// Valid checksum, use this packet to update the GPS position
+				if (!NMEA_update_position(&gps_rx_buffer[1])) {
+					//PIOS_DEBUG_PinHigh(2);
+					++numParsingErrors;
+					//PIOS_DEBUG_PinLow(2);
+				}
+				else {
+					++numUpdates;
+					
+					GPSPositionData pos;
+					GPSPositionGet(&pos);
+					HomeLocationData home;
+					HomeLocationGet(&home);
+					
+					// convert from cm back to meters
+					double LLA[3] = {(double) pos.Latitude / 1e7, (double) pos.Longitude / 1e7, (double) (pos.GeoidSeparation + pos.Altitude)};
+					// put in local NED frame
+					double ECEF[3] = {(double) (home.ECEF[0] / 100), (double) (home.ECEF[1] / 100), (double) (home.ECEF[2] / 100)};
+					LLA2Base(LLA, ECEF, (float (*)[3]) home.RNE, gps_data.NED);
+					
+					gps_data.heading = pos.Heading;
+					gps_data.groundspeed = pos.Groundspeed;
+					gps_data.quality = 1;  /* currently unused */
+					gps_data.updated = true;
+					
+					const uint32_t INSGPS_GPS_MINSAT = 6;
+					const float INSGPS_GPS_MINPDOP = 4;
+					
+					// if poor don't use this update
+					if((ahrs_algorithm != INSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) ||
+					   (pos.Satellites < INSGPS_GPS_MINSAT) || 
+					   (pos.PDOP >= INSGPS_GPS_MINPDOP) || 
+					   (home.Set == HOMELOCATION_SET_FALSE) ||
+					   ((home.ECEF[0] == 0) && (home.ECEF[1] == 0) && (home.ECEF[2] == 0)))
+					{
+						gps_data.quality = 0;
+						gps_data.updated = false;
+					}	
+				}
+			}
+		}
+	}
+	
+}
+
+/**
  * @brief Assumes board is not moving computes biases and variances of sensors
  * @returns None
  *
@@ -730,6 +852,8 @@ void homelocation_callback(AhrsObjHandle obj)
 	float Be[3] = {data.Be[0] / mag_len, data.Be[1] / mag_len, data.Be[2] / mag_len};
 
 	INSSetMagNorth(Be);
+	
+	init_algorithm = true;
 }
 
 void firmwareiapobj_callback(AhrsObjHandle obj) 

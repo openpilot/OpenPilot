@@ -37,6 +37,8 @@ static InsSettingsData InsSettings;
 static FirmwareIAPObjData FirmwareIAPObj;
 static PositionActualData PositionActual;
 static VelocityActualData VelocityActual;
+static GPSSatellitesData GPSSatellites;
+static GPSTimeData GPSTime;
 
 AhrsSharedObject objectHandles[MAX_AHRS_OBJECTS];
 
@@ -60,8 +62,10 @@ CREATEHANDLE(6, PositionActual);
 CREATEHANDLE(7, VelocityActual);
 CREATEHANDLE(8, HomeLocation);
 CREATEHANDLE(9, FirmwareIAPObj);
+CREATEHANDLE(10, GPSSatellites);
+CREATEHANDLE(11, GPSTime);
 
-#if 10 != MAX_AHRS_OBJECTS	//sanity check
+#if 12 != MAX_AHRS_OBJECTS	//sanity check
 #error We did not create the correct number of xxxHandle() functions
 #endif
 
@@ -102,6 +106,9 @@ void AhrsInitHandles(void)
 	ADDHANDLE(idx++, VelocityActual);
 	ADDHANDLE(idx++, HomeLocation);
 	ADDHANDLE(idx++, FirmwareIAPObj);
+	ADDHANDLE(idx++, GPSSatellites);
+	ADDHANDLE(idx++, GPSTime);
+
 	if (idx != MAX_AHRS_OBJECTS) {
 		PIOS_DEBUG_Assert(0);
 	}

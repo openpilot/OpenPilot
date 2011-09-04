@@ -255,6 +255,8 @@
 		65632DF51251650300469B77 /* pios_board.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_board.h; sourceTree = "<group>"; };
 		65632DF61251650300469B77 /* STM32103CB_AHRS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STM32103CB_AHRS.h; sourceTree = "<group>"; };
 		65632DF71251650300469B77 /* STM3210E_OP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STM3210E_OP.h; sourceTree = "<group>"; };
+		65643CEC141429A100A32F59 /* NMEA.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = NMEA.c; sourceTree = "<group>"; };
+		65643CEE141429AF00A32F59 /* NMEA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NMEA.h; sourceTree = "<group>"; };
 		6572CB1613D0F2B200FC2972 /* link_STM32103CB_CC_Rev1_memory.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = link_STM32103CB_CC_Rev1_memory.ld; path = ../../PiOS/STM32F10x/link_STM32103CB_CC_Rev1_memory.ld; sourceTree = SOURCE_ROOT; };
 		6572CB1713D0F2B200FC2972 /* link_STM32103CB_CC_Rev1_sections.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = link_STM32103CB_CC_Rev1_sections.ld; path = ../../PiOS/STM32F10x/link_STM32103CB_CC_Rev1_sections.ld; sourceTree = SOURCE_ROOT; };
 		657CEEAD121DB6C8007A1FBE /* homelocation.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = homelocation.xml; sourceTree = "<group>"; };
@@ -4096,6 +4098,7 @@
 		657CEEB6121DBC63007A1FBE /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				65643CEC141429A100A32F59 /* NMEA.c */,
 				6549E0D21279B3C800C5476F /* fifo_buffer.c */,
 				651913371256C5240039C0A3 /* ahrs_comm_objects.c */,
 				651913381256C5240039C0A3 /* ahrs_spi_comm.c */,
@@ -4110,6 +4113,7 @@
 		657CEEB8121DBC63007A1FBE /* inc */ = {
 			isa = PBXGroup;
 			children = (
+				65643CEE141429AF00A32F59 /* NMEA.h */,
 				6549E0D31279B3CF00C5476F /* fifo_buffer.h */,
 				6519133A1256C52B0039C0A3 /* ahrs_comm_objects.h */,
 				6519133B1256C52B0039C0A3 /* ahrs_spi_comm.h */,

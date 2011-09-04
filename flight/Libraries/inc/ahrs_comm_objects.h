@@ -37,7 +37,9 @@
 #include "positionactual.h"
 #include "velocityactual.h"
 #include "firmwareiapobj.h"
-
+#include "gpsposition.h"
+#include "gpssatellites.h"
+#include "gpstime.h"
 /** union that will fit any UAVObject.
 */
 
@@ -52,11 +54,13 @@ typedef union {
 	HomeLocationData HomeLocation;
 	InsSettingsData InsSettings;
 	FirmwareIAPObjData FirmwareIAPObj;
+	GPSSatellitesData GPSSatellites;
+	GPSTimeData GPSTime;
 } __attribute__ ((packed)) AhrsSharedData;
 
 /** The number of UAVObjects we will be dealing with.
 */
-#define MAX_AHRS_OBJECTS 10
+#define MAX_AHRS_OBJECTS 12
 
 /** Our own version of a UAVObject.
 */

@@ -85,6 +85,7 @@ SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/ahrs_spi_comm.c
 SRC += $(FLIGHTLIB)/ahrs_comm_objects.c
+SRC += $(FLIGHTLIB)/NMEA.c
 SRC += $(BOOT)/ahrs_spi_program_slave.c
 SRC += $(BOOT)/ahrs_slave_test.c
 SRC += $(BOOT)/ahrs_spi_program.c

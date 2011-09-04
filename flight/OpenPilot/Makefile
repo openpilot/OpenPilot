@@ -56,7 +56,7 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-MODULES = Actuator Telemetry GPS ManualControl AHRSComms Stabilization FirmwareIAP
+MODULES = Actuator Telemetry ManualControl AHRSComms Stabilization FirmwareIAP
 
 PYMODULES = FlightPlan
 #MODULES += Osd/OsdEtStd

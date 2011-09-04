@@ -53,7 +53,7 @@ typedef enum { COMMS_NULL, COMMS_OBJECT } COMMSCOMMAND;
 
 //The maximum number of objects that can be updated in one cycle.
 //Currently the link is capable of sending 3 packets per cycle but 2 is enough
-#define MAX_UPDATE_OBJECTS 1
+#define MAX_UPDATE_OBJECTS 2
 
 //Number of transmissions + 1 before we expect to see the data acknowledge
 //This is controlled by the SPI hardware.

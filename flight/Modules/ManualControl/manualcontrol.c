@@ -81,6 +81,7 @@ static void updateActuatorDesired(ManualControlCommandData * cmd);
 static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualControlSettingsData * settings);
 static void processFlightMode(ManualControlSettingsData * settings, float flightMode);
 static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData * settings);
+static void setArmedIfChanged(uint8_t val);
 
 static void manualControlTask(void *parameters);
 static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutral);
@@ -249,6 +250,11 @@ static void manualControlTask(void *parameters)
 				AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
 				cmd.Connected = MANUALCONTROLCOMMAND_CONNECTED_FALSE;
 				ManualControlCommandSet(&cmd);
+
+				// Need to do this here since we don't process armed status.  Since this shouldn't happen in flight (changed config) 
+				// immediately disarm
+				setArmedIfChanged(FLIGHTSTATUS_ARMED_DISARMED);
+
 				continue;
 			}
 

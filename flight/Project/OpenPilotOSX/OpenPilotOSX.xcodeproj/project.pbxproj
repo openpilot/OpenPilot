@@ -97,6 +97,7 @@
 		65643CAE1413322000A32F59 /* pios_sbus_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_sbus_priv.h; sourceTree = "<group>"; };
 		65643CAF1413322000A32F59 /* pios_sbus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_sbus.h; sourceTree = "<group>"; };
 		65643CB01413322000A32F59 /* pios_spektrum_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_spektrum_priv.h; sourceTree = "<group>"; };
+		65643CB91413456D00A32F59 /* pios_tim.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_tim.c; sourceTree = "<group>"; };
 		6572CB1613D0F2B200FC2972 /* link_STM32103CB_CC_Rev1_memory.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = link_STM32103CB_CC_Rev1_memory.ld; path = ../../PiOS/STM32F10x/link_STM32103CB_CC_Rev1_memory.ld; sourceTree = SOURCE_ROOT; };
 		6572CB1713D0F2B200FC2972 /* link_STM32103CB_CC_Rev1_sections.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = link_STM32103CB_CC_Rev1_sections.ld; path = ../../PiOS/STM32F10x/link_STM32103CB_CC_Rev1_sections.ld; sourceTree = SOURCE_ROOT; };
 		657CEEAD121DB6C8007A1FBE /* homelocation.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = homelocation.xml; sourceTree = "<group>"; };
@@ -7782,6 +7783,7 @@
 				65E8F0E711EFF25C00BBF654 /* pios_spektrum.c */,
 				65E8F0E811EFF25C00BBF654 /* pios_spi.c */,
 				65E8F0E911EFF25C00BBF654 /* pios_sys.c */,
+				65643CB91413456D00A32F59 /* pios_tim.c */,
 				65E8F0EA11EFF25C00BBF654 /* pios_usart.c */,
 				65E8F0ED11EFF25C00BBF654 /* pios_usb_hid.c */,
 				651CF9E5120B5D8300EEFD70 /* pios_usb_hid_desc.c */,

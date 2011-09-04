@@ -608,7 +608,6 @@ static const struct pios_spektrum_cfg pios_spektrum_cfg = {
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN 192
 
 #define PIOS_COM_GPS_RX_BUF_LEN 96
-#define PIOS_COM_GPS_TX_BUF_LEN 96
 
 #define PIOS_COM_TELEM_USB_RX_BUF_LEN 192
 #define PIOS_COM_TELEM_USB_TX_BUF_LEN 192
@@ -1174,14 +1173,24 @@ void PIOS_Board_Init(void) {
 				PIOS_Assert(0);
 			}
 			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
-			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_TX_BUF_LEN);
 			PIOS_Assert(rx_buffer);
-			PIOS_Assert(tx_buffer);
 			if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
 						rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
-						tx_buffer, PIOS_COM_GPS_TX_BUF_LEN)) {
+						0, 0)) {
 				PIOS_Assert(0);
 			}
+	{
+		uint32_t pios_usart_gps_id;
+		if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
+			PIOS_Assert(0);
+		}
+		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
+		PIOS_Assert(rx_buffer);
+		if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
+				  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
+				  NULL, 0)) {
+			PIOS_Assert(0);
+>>>>>>> origin/CorvusCorax_unidirectional-GPS-com
 		}
 #endif	/* PIOS_INCLUDE_GPS */
 		break;

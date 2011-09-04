@@ -34,8 +34,6 @@
 #ifndef GPS_H
 #define GPS_H
 
-#include "gps_mode.h"
-
 int32_t GPSInitialize(void);
 
 #endif // GPS_H

@@ -278,7 +278,6 @@ static void manualControlTask(void *parameters)
 				// Important: Throttle < 0 will reset Stabilization coefficients among other things. Either change this,
 				// or leave throttle at IDLE speed or above when going into AUTO-failsafe.
 				AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
-				ManualControlCommandSet(&cmd);
 			} else {
 				AlarmsClear(SYSTEMALARMS_ALARM_MANUALCONTROL);
 
@@ -314,12 +313,14 @@ static void manualControlTask(void *parameters)
 
 
 				processFlightMode(&settings, flightMode);
-				processArm(&cmd, &settings);
-
-				// Update cmd object
-				ManualControlCommandSet(&cmd);
 
 			}
+
+			// Process arming outside conditional so system will disarm when disconnected
+			processArm(&cmd, &settings);
+			
+			// Update cmd object
+			ManualControlCommandSet(&cmd);
 
 		} else {
 			ManualControlCommandGet(&cmd);	/* Under GCS control */
@@ -645,7 +646,7 @@ static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData
 	} else {
 		// Not really needed since this function not called when disconnected
 		if (cmd->Connected == MANUALCONTROLCOMMAND_CONNECTED_FALSE)
-			return;
+			lowThrottle = true;
 
 		// The throttle is not low, in case we where arming or disarming, abort
 		if (!lowThrottle) {

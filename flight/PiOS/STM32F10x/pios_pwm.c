@@ -42,6 +42,8 @@ const struct pios_rcvr_driver pios_pwm_rcvr_driver = {
 };
 
 /* Local Variables */
+/* 100 ms timeout without updates on channels */
+const static uint32_t PWM_SUPERVISOR_TIMEOUT = 100000;
 
 enum pios_pwm_dev_magic {
 	PIOS_PWM_DEV_MAGIC = 0xab30293c,
@@ -56,6 +58,7 @@ struct pios_pwm_dev {
 	uint16_t FallValue[PIOS_PWM_NUM_INPUTS];
 	uint32_t CaptureValue[PIOS_PWM_NUM_INPUTS];
 	uint32_t CapCounter[PIOS_PWM_NUM_INPUTS];
+	uint32_t us_since_update[PIOS_PWM_NUM_INPUTS];
 };
 
 static bool PIOS_PWM_validate(struct pios_pwm_dev * pwm_dev)
@@ -120,7 +123,7 @@ int32_t PIOS_PWM_Init(uint32_t * pwm_id, const struct pios_pwm_cfg * cfg)
 		pwm_dev->CaptureState[i] = 0;
 		pwm_dev->RiseValue[i] = 0;
 		pwm_dev->FallValue[i] = 0;
-		pwm_dev->CaptureValue[i] = 0;
+		pwm_dev->CaptureValue[i] = PIOS_RCVR_TIMEOUT;
 	}
 
 	uint32_t tim_id;
@@ -152,6 +155,10 @@ int32_t PIOS_PWM_Init(uint32_t * pwm_id, const struct pios_pwm_cfg * cfg)
 			TIM_ITConfig(chan->timer, TIM_IT_CC4, ENABLE);
 			break;
 		}
+
+		// Need the update event for that timer to detect timeouts
+		TIM_ITConfig(chan->timer, TIM_IT_Update, ENABLE);
+
 	}
 
 	*pwm_id = (uint32_t) pwm_dev;
@@ -193,6 +200,20 @@ static void PIOS_PWM_tim_overflow_cb (uint32_t tim_id, uint32_t context, uint8_t
 		return;
 	}
 
+	if (channel >= pwm_dev->cfg->num_channels) {
+		/* Channel out of range */
+		return;
+	}
+
+	pwm_dev->us_since_update[channel] += count;
+	if(pwm_dev->us_since_update[channel] >= PWM_SUPERVISOR_TIMEOUT) {
+		pwm_dev->CaptureState[channel] = 0;
+		pwm_dev->RiseValue[channel] = 0;
+		pwm_dev->FallValue[channel] = 0;
+		pwm_dev->CaptureValue[channel] = PIOS_RCVR_TIMEOUT;
+		pwm_dev->us_since_update[channel] = 0;
+	}
+
 	return;
 }
 
@@ -215,6 +236,7 @@ static void PIOS_PWM_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t cha
 
 	if (pwm_dev->CaptureState[chan_idx] == 0) {
 		pwm_dev->RiseValue[chan_idx] = count;
+		pwm_dev->us_since_update[chan_idx] = 0;
 	} else {
 		pwm_dev->FallValue[chan_idx] = count;
 	}

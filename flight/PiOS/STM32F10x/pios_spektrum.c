@@ -82,12 +82,12 @@ static bool PIOS_SPEKTRUM_validate(struct pios_spektrum_dev * spektrum_dev)
 	return (spektrum_dev->magic == PIOS_SPEKTRUM_DEV_MAGIC);
 }
 
-#if defined(PIOS_INCLUDE_FREERTOS) && 0
+#if defined(PIOS_INCLUDE_FREERTOS)
 static struct pios_spektrum_dev * PIOS_SPEKTRUM_alloc(void)
 {
 	struct pios_spektrum_dev * spektrum_dev;
 
-	spektrum_dev = (struct pios_spektrum_dev *)malloc(sizeof(*spektrum_dev));
+	spektrum_dev = (struct pios_spektrum_dev *)pvPortMalloc(sizeof(*spektrum_dev));
 	if (!spektrum_dev) return(NULL);
 
 	spektrum_dev->magic = PIOS_SPEKTRUM_DEV_MAGIC;

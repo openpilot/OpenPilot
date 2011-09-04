@@ -20,12 +20,12 @@ static bool PIOS_RCVR_validate(struct pios_rcvr_dev * rcvr_dev)
   return (rcvr_dev->magic == PIOS_RCVR_DEV_MAGIC);
 }
 
-#if defined(PIOS_INCLUDE_FREERTOS) && 0
+#if defined(PIOS_INCLUDE_FREERTOS)
 static struct pios_rcvr_dev * PIOS_RCVR_alloc(void)
 {
   struct pios_rcvr_dev * rcvr_dev;
 
-  rcvr_dev = (struct pios_rcvr_dev *)malloc(sizeof(*rcvr_dev));
+  rcvr_dev = (struct pios_rcvr_dev *)pvPortMalloc(sizeof(*rcvr_dev));
   if (!rcvr_dev) return (NULL);
 
   rcvr_dev->magic = PIOS_RCVR_DEV_MAGIC;

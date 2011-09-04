@@ -75,12 +75,12 @@ static bool PIOS_USB_HID_validate(struct pios_usb_hid_dev * usb_hid_dev)
 	return (usb_hid_dev->magic == PIOS_USB_HID_DEV_MAGIC);
 }
 
-#if defined(PIOS_INCLUDE_FREERTOS) && 0
+#if defined(PIOS_INCLUDE_FREERTOS)
 static struct pios_usb_hid_dev * PIOS_USB_HID_alloc(void)
 {
 	struct pios_usb_hid_dev * usb_hid_dev;
 
-	usb_hid_dev = (struct pios_usb_hid_dev *)malloc(sizeof(*usb_hid_dev));
+	usb_hid_dev = (struct pios_usb_hid_dev *)pvPortMalloc(sizeof(*usb_hid_dev));
 	if (!usb_hid_dev) return(NULL);
 
 	usb_hid_dev->magic = PIOS_USB_HID_DEV_MAGIC;

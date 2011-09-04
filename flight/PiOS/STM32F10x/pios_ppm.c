@@ -83,12 +83,12 @@ static bool PIOS_PPM_validate(struct pios_ppm_dev * ppm_dev)
 	return (ppm_dev->magic == PIOS_PPM_DEV_MAGIC);
 }
 
-#if defined(PIOS_INCLUDE_FREERTOS) && 0
+#if defined(PIOS_INCLUDE_FREERTOS)
 static struct pios_ppm_dev * PIOS_PPM_alloc(void)
 {
 	struct pios_ppm_dev * ppm_dev;
 
-	ppm_dev = (struct pios_ppm_dev *)malloc(sizeof(*ppm_dev));
+	ppm_dev = (struct pios_ppm_dev *)pvPortMalloc(sizeof(*ppm_dev));
 	if (!ppm_dev) return(NULL);
 
 	ppm_dev->magic = PIOS_PPM_DEV_MAGIC;

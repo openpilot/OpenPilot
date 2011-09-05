@@ -32,429 +32,213 @@
 
 #if defined(PIOS_INCLUDE_UDP)
 
+#include <signal.h>
 #include <pios_udp_priv.h>
 
+/* We need a list of UDP devices */
+
+#define PIOS_UDP_MAX_DEV 256
+static int8_t pios_udp_num_devices = 0;
+
+static pios_udp_dev pios_udp_devices[PIOS_UDP_MAX_DEV];
+
+
+
 /* Provide a COM driver */
+static void PIOS_UDP_ChangeBaud(uint32_t udp_id, uint32_t baud);
+static void PIOS_UDP_RegisterRxCallback(uint32_t udp_id, pios_com_callback rx_in_cb, uint32_t context);
+static void PIOS_UDP_RegisterTxCallback(uint32_t udp_id, pios_com_callback tx_out_cb, uint32_t context);
+static void PIOS_UDP_TxStart(uint32_t udp_id, uint16_t tx_bytes_avail);
+static void PIOS_UDP_RxStart(uint32_t udp_id, uint16_t rx_bytes_avail);
+
 const struct pios_com_driver pios_udp_com_driver = {
-  .set_baud = PIOS_UDP_ChangeBaud,
-  .tx_nb    = PIOS_UDP_TxBufferPutMoreNonBlocking,
-  .tx       = PIOS_UDP_TxBufferPutMore,
-  .rx       = PIOS_UDP_RxBufferGet,
-  .rx_avail = PIOS_UDP_RxBufferUsed,
+	.set_baud   = PIOS_UDP_ChangeBaud,
+	.tx_start   = PIOS_UDP_TxStart,
+	.rx_start   = PIOS_UDP_RxStart,
+	.bind_tx_cb = PIOS_UDP_RegisterTxCallback,
+	.bind_rx_cb = PIOS_UDP_RegisterRxCallback,
 };
 
-static struct pios_udp_dev * find_udp_dev_by_id (uint8_t udp)
+
+static pios_udp_dev * find_udp_dev_by_id (uint8_t udp)
 {
   if (udp >= pios_udp_num_devices) {
     /* Undefined UDP port for this board (see pios_board.c) */
+	PIOS_Assert(0);
     return NULL;
   }
 
   /* Get a handle for the device configuration */
-  return &(pios_udp_devs[udp]);
+  return &(pios_udp_devices[udp]);
 }
 
 /**
-* Open some UDP sockets
-*/
-void PIOS_UDP_Init(void)
-{
-  struct pios_udp_dev * udp_dev;
-  uint8_t                 i;
-
-  for (i = 0; i < pios_udp_num_devices; i++) {
-    /* Get a handle for the device configuration */
-    udp_dev = find_udp_dev_by_id(i);
-    //PIOS_DEBUG_Assert(udp_dev);
-
-    /* Clear buffer counters */
-    udp_dev->rx.head = udp_dev->rx.tail = udp_dev->rx.size = 0;
-
-    /* assign socket */
-    udp_dev->socket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    memset(&udp_dev->server,0,sizeof(udp_dev->server));
-    memset(&udp_dev->client,0,sizeof(udp_dev->client));
-    udp_dev->server.sin_family = AF_INET;
-    udp_dev->server.sin_addr.s_addr = inet_addr(udp_dev->cfg->ip);
-    udp_dev->server.sin_port = htons(udp_dev->cfg->port);
-    int res= bind(udp_dev->socket, (struct sockaddr *)&udp_dev->server,sizeof(udp_dev->server));
-    /* use nonblocking IO */
-    int flags = fcntl(udp_dev->socket, F_GETFL, 0);
-    fcntl(udp_dev->socket, F_SETFL, flags | O_NONBLOCK);
-    printf("udp dev %i - socket %i opened - result %i\n",i,udp_dev->socket,res);
-
-    /* TODO do some error handling - wait no, we can't - we are void anyway ;) */
-  }
-}
-
-
-/**
-* Changes the baud rate of the UDP peripheral without re-initialising.
-* \param[in] udp UDP name (GPS, TELEM, AUX)
-* \param[in] baud Requested baud rate
-*/
-void PIOS_UDP_ChangeBaud(uint8_t udp, uint32_t baud)
-{
-}
-
-
-/**
-* puts a byte onto the receive buffer
-* \param[in] UDP UDP name
-* \param[in] b byte which should be put into Rx buffer
-* \return 0 if no error
-* \return -1 if UDP not available
-* \return -2 if buffer full (retry)
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
-*/
-int32_t PIOS_UDP_RxBufferPut(uint8_t udp, uint8_t b)
-{
-  struct pios_udp_dev * udp_dev;
-
-  /* Get a handle for the device configuration */
-  udp_dev = find_udp_dev_by_id(udp);
-
-  if (!udp_dev) {
-    /* Undefined UDP port for this board (see pios_board.c) */
-    return -1;
-  }
-
-  if (udp_dev->rx.size >= sizeof(udp_dev->rx.buf)) {
-    /* Buffer full (retry) */
-    return -2;
-  }
-
-  /* Copy received byte into receive buffer */
-  udp_dev->rx.buf[udp_dev->rx.head++] = b;
-  if (udp_dev->rx.head >= sizeof(udp_dev->rx.buf)) {
-    udp_dev->rx.head = 0;
-  }
-  udp_dev->rx.size++;
-
-  /* No error */
-  return 0;
-}
-
-/**
- * attempt to receive
+ * RxThread
  */
-void PIOS_UDP_RECV(uint8_t udp) {
-
-  struct pios_udp_dev * udp_dev;
-  unsigned char localbuffer[PIOS_UDP_RX_BUFFER_SIZE];
-
-  /* Get a handle for the device configuration */
-  udp_dev = find_udp_dev_by_id(udp);
-
-  if (!udp_dev) {
-    /* Undefined UDP port for this board (see pios_board.c) */
-    return;
-  }
-
-  /* use nonblocking IO */
-  int flags = fcntl(udp_dev->socket, F_GETFL, 0);
-  fcntl(udp_dev->socket, F_SETFL, flags | O_NONBLOCK);
-  
-  /* receive data */
-  int received;
-  udp_dev->clientLength=sizeof(udp_dev->client);
-  if ((received = recvfrom(udp_dev->socket,
-  			localbuffer,
-			(PIOS_UDP_RX_BUFFER_SIZE - udp_dev->rx.size),
-			0,
-			(struct sockaddr *) &udp_dev->client,
-			(socklen_t*)&udp_dev->clientLength)) < 0) {
-
-    return;
-  }
-  /* copy received data to buffer */
-  int t;
-  for (t=0;t<received;t++) {
-    PIOS_UDP_RxBufferPut(udp,localbuffer[t]);
-  }
-
-
-}
-
-/**
-* Returns number of free bytes in receive buffer
-* \param[in] UDP UDP name
-* \return UDP number of free bytes
-* \return 1: UDP available
-* \return 0: UDP not available
-*/
-int32_t PIOS_UDP_RxBufferFree(uint8_t udp)
+void * PIOS_UDP_RxThread(void * udp_dev_n)
 {
-  struct pios_udp_dev * udp_dev;
 
-  /* Get a handle for the device configuration */
-  udp_dev = find_udp_dev_by_id(udp);
+	/* needed because of FreeRTOS.posix scheduling */
+	sigset_t set;
+	sigfillset(&set);
+	sigprocmask(SIG_BLOCK, &set, NULL);
 
-  if (!udp_dev) {
-    /* Undefined UDP port for this board (see pios_board.c) */
-    return -2;
-  }
+	pios_udp_dev * udp_dev = (pios_udp_dev*) udp_dev_n;
 
-  /* fill buffer */
-  PIOS_UDP_RECV(udp);
+   /**
+	* com devices never get closed except by application "reboot"
+	* we also never give up our mutex except for waiting
+	*/
+   while(1) {
 
-  return (sizeof(udp_dev->rx.buf) - udp_dev->rx.size);
-}
+		/**
+		 * receive 
+		 */
+		int received;
+		udp_dev->clientLength=sizeof(udp_dev->client);
+		if ((received = recvfrom(udp_dev->socket,
+				&udp_dev->rx_buffer,
+				PIOS_UDP_RX_BUFFER_SIZE,
+				0,
+				(struct sockaddr *) &udp_dev->client,
+				(socklen_t*)&udp_dev->clientLength)) >= 0)
+		{
 
-/**
-* Returns number of used bytes in receive buffer
-* \param[in] UDP UDP name
-* \return > 0: number of used bytes
-* \return 0 if UDP not available
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
-*/
-int32_t PIOS_UDP_RxBufferUsed(uint8_t udp)
-{
-  struct pios_udp_dev * udp_dev;
+			/* copy received data to buffer if possible */
+			/* we do NOT buffer data locally. If the com buffer can't receive, data is discarded! */
+			/* (thats what the USART driver does too!) */
+			bool rx_need_yield = false;
+			if (udp_dev->rx_in_cb) {
+			  (void) (udp_dev->rx_in_cb)(udp_dev->rx_in_context, udp_dev->rx_buffer, received, NULL, &rx_need_yield);
+			}
 
-  /* Get a handle for the device configuration */
-  udp_dev = find_udp_dev_by_id(udp);
+#if defined(PIOS_INCLUDE_FREERTOS)
+			if (rx_need_yield) {
+				vPortYieldFromISR();
+			}
+#endif	/* PIOS_INCLUDE_FREERTOS */
 
-  if (!udp_dev) {
-    /* Undefined UDP port for this board (see pios_board.c) */
-    return -2;
-  }
+		}
 
-  /* fill buffer */
-  PIOS_UDP_RECV(udp);
 
-  return (udp_dev->rx.size);
-}
-
-/**
-* Gets a byte from the receive buffer
-* \param[in] UDP UDP name
-* \return -1 if UDP not available
-* \return -2 if no new byte available
-* \return >= 0: number of received bytes
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
-*/
-int32_t PIOS_UDP_RxBufferGet(uint8_t udp)
-{
-  struct pios_udp_dev * udp_dev;
-
-  /* Get a handle for the device configuration */
-  udp_dev = find_udp_dev_by_id(udp);
-
-  if (!udp_dev) {
-    /* Undefined UDP port for this board (see pios_board.c) */
-    return -2;
-  }
-
-  /* fill buffer */
-  PIOS_UDP_RECV(udp);
-
-  if (!udp_dev->rx.size) {
-    /* Nothing new in the buffer */
-    return -1;
-  }
-
-  /* get byte */
-  uint8_t b = udp_dev->rx.buf[udp_dev->rx.tail++];
-  if (udp_dev->rx.tail >= sizeof(udp_dev->rx.buf)) {
-    udp_dev->rx.tail = 0;
-  }
-  udp_dev->rx.size--;
-  
-  /* Return received byte */
-  return b;
-}
-
-/**
-* Returns the next byte of the receive buffer without taking it
-* \param[in] UDP UDP name
-* \return -1 if UDP not available
-* \return -2 if no new byte available
-* \return >= 0: number of received bytes
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
-*/
-int32_t PIOS_UDP_RxBufferPeek(uint8_t udp)
-{
-  struct pios_udp_dev * udp_dev;
-
-  /* Get a handle for the device configuration */
-  udp_dev = find_udp_dev_by_id(udp);
-
-  if (!udp_dev) {
-    /* Undefined UDP port for this board (see pios_board.c) */
-    return -2;
-  }
-
-  /* fill buffer */
-  PIOS_UDP_RECV(udp);
-
-  if (!udp_dev->rx.size) {
-    /* Nothing new in the buffer */
-    return -1;
-  }
-
-  /* get byte */
-  uint8_t b = udp_dev->rx.buf[udp_dev->rx.tail];
-  
-  /* Return received byte */
-  return b;
-}
-
-/**
-* returns number of free bytes in transmit buffer
-* \param[in] UDP UDP name
-* \return number of free bytes
-* \return 0 if UDP not available
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
-*/
-int32_t PIOS_UDP_TxBufferFree(uint8_t udp)
-{
-  struct pios_udp_dev * udp_dev;
-
-  /* Get a handle for the device configuration */
-  udp_dev = find_udp_dev_by_id(udp);
-
-  if (!udp_dev) {
-    /* Undefined UDP port for this board (see pios_board.c) */
-    return 0;
-  }
-
-  return PIOS_UDP_RX_BUFFER_SIZE;
-}
-
-/**
-* returns number of used bytes in transmit buffer
-* \param[in] UDP UDP name
-* \return number of used bytes
-* \return 0 if UDP not available
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
-*/
-int32_t PIOS_UDP_TxBufferUsed(uint8_t udp)
-{
-  struct pios_udp_dev * udp_dev;
-
-  /* Get a handle for the device configuration */
-  udp_dev = find_udp_dev_by_id(udp);
-
-  if (!udp_dev) {
-    /* Undefined UDP port for this board (see pios_board.c) */
-    return 0;
-  }
-
-  return 0;
+	}
 }
 
 
 /**
-* puts more than one byte onto the transmit buffer (used for atomic sends)
-* \param[in] UDP UDP name
-* \param[in] *buffer pointer to buffer to be sent
-* \param[in] len number of bytes to be sent
-* \return 0 if no error
-* \return -1 if UDP not available
-* \return -2 if buffer full or cannot get all requested bytes (retry)
-* \return -3 if UDP not supported by UDPTxBufferPut Routine
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
+* Open UDP socket
 */
-int32_t PIOS_UDP_TxBufferPutMoreNonBlocking(uint8_t udp, uint8_t *buffer, uint16_t len)
+int32_t PIOS_UDP_Init(uint32_t * udp_id, const struct pios_udp_cfg * cfg)
 {
-  struct pios_udp_dev * udp_dev;
 
-  /* Get a handle for the device configuration */
-  udp_dev = find_udp_dev_by_id(udp);
+  pios_udp_dev * udp_dev = &pios_udp_devices[pios_udp_num_devices];
 
-  if (!udp_dev) {
-    /* Undefined UDP port for this board (see pios_board.c) */
-    return -1;
-  }
-
-  if (len >= PIOS_UDP_RX_BUFFER_SIZE) {
-    /* Buffer cannot accept all requested bytes (retry) */
-    return -2;
-  }
-  /* send data to client - non blocking*/
-
-  /* use nonblocking IO */
-  int flags = fcntl(udp_dev->socket, F_GETFL, 0);
-  fcntl(udp_dev->socket, F_SETFL, flags | O_NONBLOCK);
-  sendto(udp_dev->socket, buffer, len, 0,
-                         (struct sockaddr *) &udp_dev->client,
-                         (socklen_t)sizeof(udp_dev->client));
+  pios_udp_num_devices++;
 
 
-  /* No error */
-  return 0;
+  /* initialize */
+  udp_dev->rx_in_cb = NULL;
+  udp_dev->tx_out_cb = NULL;
+  udp_dev->cfg=cfg;
+
+  /* assign socket */
+  udp_dev->socket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+  memset(&udp_dev->server,0,sizeof(udp_dev->server));
+  memset(&udp_dev->client,0,sizeof(udp_dev->client));
+  udp_dev->server.sin_family = AF_INET;
+  udp_dev->server.sin_addr.s_addr = inet_addr(udp_dev->cfg->ip);
+  udp_dev->server.sin_port = htons(udp_dev->cfg->port);
+  int res= bind(udp_dev->socket, (struct sockaddr *)&udp_dev->server,sizeof(udp_dev->server));
+
+  /* Create transmit thread for this connection */
+  pthread_create(&udp_dev->rxThread, NULL, PIOS_UDP_RxThread, (void*)udp_dev);
+
+  printf("udp dev %i - socket %i opened - result %i\n",pios_udp_num_devices-1,udp_dev->socket,res);
+
+  *udp_id = pios_udp_num_devices-1;
+
+  return res;
 }
 
-/**
-* puts more than one byte onto the transmit buffer (used for atomic sends)<BR>
-* (blocking function)
-* \param[in] UDP UDP name
-* \param[in] *buffer pointer to buffer to be sent
-* \param[in] len number of bytes to be sent
-* \return 0 if no error
-* \return -1 if UDP not available
-* \return -3 if UDP not supported by UDPTxBufferPut Routine
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
-*/
-int32_t PIOS_UDP_TxBufferPutMore(uint8_t udp, uint8_t *buffer, uint16_t len)
+
+void PIOS_UDP_ChangeBaud(uint32_t udp_id, uint32_t baud)
 {
-  struct pios_udp_dev * udp_dev;
-
-  /* Get a handle for the device configuration */
-  udp_dev = find_udp_dev_by_id(udp);
-
-  if (!udp_dev) {
-    /* Undefined UDP port for this board (see pios_board.c) */
-    return -1;
-  }
-
-  if (len >= PIOS_UDP_RX_BUFFER_SIZE) {
-    /* Buffer cannot accept all requested bytes (retry) */
-    return -2;
-  }
-
-  /* send data to client - blocking*/
-  /* use blocking IO */
-  int flags = fcntl(udp_dev->socket, F_GETFL, 0);
-  fcntl(udp_dev->socket, F_SETFL, flags & ~O_NONBLOCK);
-  sendto(udp_dev->socket, buffer, len, 0,
-                         (struct sockaddr *) &udp_dev->client,
-                         sizeof(udp_dev->client));
-
-  /* No error */
-  return 0;
+	/**
+	 * doesn't apply!
+	 */
 }
 
-/**
-* puts a byte onto the transmit buffer
-* \param[in] UDP UDP name
-* \param[in] b byte which should be put into Tx buffer
-* \return 0 if no error
-* \return -1 if UDP not available
-* \return -2 if buffer full (retry)
-* \return -3 if UDP not supported by UDPTxBufferPut Routine
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
-*/
-int32_t PIOS_UDP_TxBufferPut_NonBlocking(uint8_t udp, uint8_t b)
+
+static void PIOS_UDP_RxStart(uint32_t udp_id, uint16_t rx_bytes_avail)
 {
-  return PIOS_UDP_TxBufferPutMoreNonBlocking(udp, &b, 1);
+	/**
+	 * lazy!
+	 */
 }
 
-/**
-* puts a byte onto the transmit buffer<BR>
-* (blocking function)
-* \param[in] UDP UDP name
-* \param[in] b byte which should be put into Tx buffer
-* \return 0 if no error
-* \return -1 if UDP not available
-* \return -3 if UDP not supported by UDPTxBufferPut Routine
-* \note Applications shouldn't call these functions directly, instead please use \ref PIOS_COM layer functions
-*/
-int32_t PIOS_UDP_TxBufferPut(uint8_t udp, uint8_t b)
+
+static void PIOS_UDP_TxStart(uint32_t udp_id, uint16_t tx_bytes_avail)
 {
-  return PIOS_UDP_TxBufferPutMore(udp, &b, 1);
+	pios_udp_dev * udp_dev = find_udp_dev_by_id(udp_id);
+
+	PIOS_Assert(udp_dev);
+
+	int32_t length,len,rem;
+
+	/**
+	 * we send everything directly whenever notified of data to send (lazy!)
+	 */
+	if (udp_dev->tx_out_cb) {
+		while (tx_bytes_avail>0) {
+			bool tx_need_yield = false;
+			length = (udp_dev->tx_out_cb)(udp_dev->tx_out_context, udp_dev->tx_buffer, PIOS_UDP_RX_BUFFER_SIZE, NULL, &tx_need_yield);
+			rem = length;
+			while (rem>0) {
+				len = sendto(udp_dev->socket, udp_dev->tx_buffer, length, 0,
+						 (struct sockaddr *) &udp_dev->client,
+						 sizeof(udp_dev->client));
+				if (len<=0) {
+					rem=0;
+				} else {
+					rem -= len;
+				}
+			}
+			tx_bytes_avail -= length;
+		}
+	}
+
 }
+
+static void PIOS_UDP_RegisterRxCallback(uint32_t udp_id, pios_com_callback rx_in_cb, uint32_t context)
+{
+	pios_udp_dev * udp_dev = find_udp_dev_by_id(udp_id);
+
+	PIOS_Assert(udp_dev);
+
+	/* 
+	 * Order is important in these assignments since ISR uses _cb
+	 * field to determine if it's ok to dereference _cb and _context
+	 */
+	udp_dev->rx_in_context = context;
+	udp_dev->rx_in_cb = rx_in_cb;
+}
+
+static void PIOS_UDP_RegisterTxCallback(uint32_t udp_id, pios_com_callback tx_out_cb, uint32_t context)
+{
+	pios_udp_dev * udp_dev = find_udp_dev_by_id(udp_id);
+
+	PIOS_Assert(udp_dev);
+
+	/* 
+	 * Order is important in these assignments since ISR uses _cb
+	 * field to determine if it's ok to dereference _cb and _context
+	 */
+	udp_dev->tx_out_context = context;
+	udp_dev->tx_out_cb = tx_out_cb;
+}
+
+
+
 
 
 #endif

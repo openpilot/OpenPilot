@@ -140,9 +140,6 @@ extern uint32_t pios_i2c_main_adapter_id;
 //-------------------------
 #define PIOS_USART_MAX_DEVS             3
 
-#define PIOS_USART_RX_BUFFER_SIZE       512
-#define PIOS_USART_TX_BUFFER_SIZE       512
-
 //-------------------------
 // PIOS_COM
 //
@@ -164,22 +161,6 @@ extern uint32_t pios_com_aux_id;
 #define PIOS_COM_AUX                    (pios_com_aux_id)
 #define PIOS_COM_DEBUG                  PIOS_COM_AUX
 #endif
-
-#ifdef PIOS_INCLUDE_SPEKTRUM
-extern uint32_t pios_com_spektrum_id;
-#define PIOS_COM_SPEKTRUM               (pios_com_spektrum_id)
-#endif
-
-#ifdef PIOS_INCLUDE_SBUS
-extern uint32_t pios_com_sbus_id;
-#define PIOS_COM_SBUS                   (pios_com_sbus_id)
-#endif
-
-//-------------------------
-// Delay Timer
-//-------------------------
-#define PIOS_DELAY_TIMER                        TIM2
-#define PIOS_DELAY_TIMER_RCC_FUNC               RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE)
 
 //-------------------------
 // System Settings
@@ -205,17 +186,19 @@ extern uint32_t pios_com_sbus_id;
 //-------------------------
 // Receiver PPM input
 //-------------------------
-#define PIOS_PPM_NUM_INPUTS                     8  //Could be more if needed
-#define PIOS_PPM_SUPV_ENABLED                   1
+#define PIOS_PPM_MAX_DEVS			1
+#define PIOS_PPM_NUM_INPUTS                     12
 
 //-------------------------
 // Receiver PWM input
 //-------------------------
+#define PIOS_PWM_MAX_DEVS			1
 #define PIOS_PWM_NUM_INPUTS                     8
 
 //-------------------------
 // Receiver SPEKTRUM input
 //-------------------------
+#define PIOS_SPEKTRUM_MAX_DEVS			1
 #define PIOS_SPEKTRUM_NUM_INPUTS                12
 
 //-------------------------
@@ -223,6 +206,11 @@ extern uint32_t pios_com_sbus_id;
 //-------------------------
 #define PIOS_SERVO_UPDATE_HZ                    50
 #define PIOS_SERVOS_INITIAL_POSITION            0 /* dont want to start motors, have no pulse till settings loaded */
+
+//--------------------------
+// Timer controller settings
+//--------------------------
+#define PIOS_TIM_MAX_DEVS			3
 
 //-------------------------
 // ADC
@@ -316,12 +304,11 @@ extern uint32_t pios_com_sbus_id;
 // USB
 //-------------------------
 #define PIOS_USB_ENABLED                        1
+#define PIOS_USB_HID_MAX_DEVS                   1
 #define PIOS_USB_DETECT_GPIO_PORT               GPIOC
 #define PIOS_USB_DETECT_GPIO_PIN                GPIO_Pin_4
 #define PIOS_USB_DETECT_EXTI_LINE               EXTI_Line4
 #define PIOS_IRQ_USB_PRIORITY                   PIOS_IRQ_PRIO_MID
-#define PIOS_USB_RX_BUFFER_SIZE                 512
-#define PIOS_USB_TX_BUFFER_SIZE                 512
 
 /**
  * glue macros for file IO

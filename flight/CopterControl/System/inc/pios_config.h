@@ -48,8 +48,9 @@
 /* Supported receiver interfaces */
 #define PIOS_INCLUDE_SPEKTRUM
 #define PIOS_INCLUDE_SBUS
-//#define PIOS_INCLUDE_PPM
+#define PIOS_INCLUDE_PPM
 #define PIOS_INCLUDE_PWM
+#define PIOS_INCLUDE_GCSRCVR
 
 /* Supported USART-based PIOS modules */
 #define PIOS_INCLUDE_TELEMETRY_RF
@@ -100,9 +101,13 @@
 #define PIOS_STABILIZATION_STACK_SIZE   524
 #define PIOS_TELEM_TX_STACK_SIZE        500
 #define PIOS_TELEM_RX_STACK_SIZE        500
-#define PIOS_EVENTDISPATCHER_STACK_SIZE 384
+#define PIOS_EVENTDISPATCHER_STACK_SIZE 130
+
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 1995998
 //#define PIOS_QUATERNION_STABILIZATION
+
+// This can't be too high to stop eventdispatcher thread overflowing
+#define PIOS_EVENTDISAPTCHER_QUEUE      10
 
 #endif /* PIOS_CONFIG_H */
 /**

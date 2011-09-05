@@ -43,21 +43,15 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     m_stabilization->setupUi(this);
 
 
-    connect(m_stabilization->saveStabilizationToSD, SIGNAL(clicked()), this, SLOT(saveStabilizationUpdate()));
-    connect(m_stabilization->saveStabilizationToRAM, SIGNAL(clicked()), this, SLOT(sendStabilizationUpdate()));
+    setupButtons(m_stabilization->saveStabilizationToRAM,m_stabilization->saveStabilizationToSD);
 
-    enableControls(false);
-    refreshValues();
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
-    connect(parent, SIGNAL(autopilotDisconnected()),this, SLOT(onAutopilotDisconnect()));
+    addUAVObject("StabilizationSettings");
 
-    // Now connect the widget to the StabilizationSettings object
-    UAVObject *obj = getObjectManager()->getObject(QString("StabilizationSettings"));
-    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
+    refreshWidgetsValues();
 
     // Create a timer to regularly send the object update in case
     // we want realtime updates.
-    connect(&updateTimer, SIGNAL(timeout()), this, SLOT(sendStabilizationUpdate()));
+    connect(&updateTimer, SIGNAL(timeout()), this, SLOT(updateObjectsFromWidgets()));
     connect(m_stabilization->realTimeUpdates, SIGNAL(toggled(bool)), this, SLOT(realtimeUpdateToggle(bool)));
 
     // Connect the updates of the stab values
@@ -79,18 +73,40 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
 
     // Connect the help button
     connect(m_stabilization->stabilizationHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
+    addWidget(m_stabilization->rateRollKp);
+    addWidget(m_stabilization->rateRollKi);
+    addWidget(m_stabilization->rateRollILimit);
+    addWidget(m_stabilization->ratePitchKp);
+    addWidget(m_stabilization->ratePitchKi);
+    addWidget(m_stabilization->ratePitchILimit);
+    addWidget(m_stabilization->rateYawKp);
+    addWidget(m_stabilization->rateYawKi);
+    addWidget(m_stabilization->rateYawILimit);
+    addWidget(m_stabilization->rollKp);
+    addWidget(m_stabilization->rollKi);
+    addWidget(m_stabilization->rollILimit);
+    addWidget(m_stabilization->yawILimit);
+    addWidget(m_stabilization->yawKi);
+    addWidget(m_stabilization->yawKp);
+    addWidget(m_stabilization->pitchKp);
+    addWidget(m_stabilization->pitchKi);
+    addWidget(m_stabilization->pitchILimit);
+    addWidget(m_stabilization->rollMax);
+    addWidget(m_stabilization->pitchMax);
+    addWidget(m_stabilization->yawMax);
+    addWidget(m_stabilization->manualRoll);
+    addWidget(m_stabilization->manualPitch);
+    addWidget(m_stabilization->manualYaw);
+    addWidget(m_stabilization->maximumRoll);
+    addWidget(m_stabilization->maximumPitch);
+    addWidget(m_stabilization->maximumYaw);
+    addWidget(m_stabilization->lowThrottleZeroIntegral);
+
 }
 
 ConfigStabilizationWidget::~ConfigStabilizationWidget()
 {
    // Do nothing
-}
-
-
-void ConfigStabilizationWidget::enableControls(bool enable)
-{
-    //m_stabilization->saveStabilizationToRAM->setEnabled(enable);
-    m_stabilization->saveStabilizationToSD->setEnabled(enable);
 }
 
 void ConfigStabilizationWidget::updateRateRollKP(double val)
@@ -187,8 +203,9 @@ void ConfigStabilizationWidget::updatePitchILimit(double val)
 /**
   Request stabilization settings from the board
   */
-void ConfigStabilizationWidget::refreshValues()
+void ConfigStabilizationWidget::refreshWidgetsValues()
 {
+    bool dirty=isDirty();
     // Not needed anymore as this slot is only called whenever we get
     // a signal that the object was just updated
     // stabSettings->requestUpdate();
@@ -229,7 +246,9 @@ void ConfigStabilizationWidget::refreshValues()
     m_stabilization->maximumRoll->setValue(stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_ROLL]);
     m_stabilization->maximumPitch->setValue(stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_PITCH]);
     m_stabilization->maximumYaw->setValue(stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_YAW]);
+    m_stabilization->lowThrottleZeroIntegral->setChecked(stabData.LowThrottleZeroIntegral==StabilizationSettings::LOWTHROTTLEZEROINTEGRAL_TRUE ? true : false);
 
+    setDirty(dirty);
 }
 
 
@@ -237,7 +256,7 @@ void ConfigStabilizationWidget::refreshValues()
   Send telemetry settings to the board
   */
 
-void ConfigStabilizationWidget::sendStabilizationUpdate()
+void ConfigStabilizationWidget::updateObjectsFromWidgets()
 {
     StabilizationSettings::DataFields stabData = stabSettings->getData();
 
@@ -277,23 +296,11 @@ void ConfigStabilizationWidget::sendStabilizationUpdate()
     stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_PITCH] = m_stabilization->maximumPitch->value();
     stabData.MaximumRate[StabilizationSettings::MAXIMUMRATE_YAW] = m_stabilization->maximumYaw->value();
 
+    stabData.LowThrottleZeroIntegral = (m_stabilization->lowThrottleZeroIntegral->isChecked() ? StabilizationSettings::LOWTHROTTLEZEROINTEGRAL_TRUE :StabilizationSettings::LOWTHROTTLEZEROINTEGRAL_FALSE);
+
+
     stabSettings->setData(stabData); // this is atomic
 }
-
-
-/**
-  Send telemetry settings to the board and request saving to SD card
-  */
-
-void ConfigStabilizationWidget::saveStabilizationUpdate()
-{
-    // Send update so that the latest value is saved
-    sendStabilizationUpdate();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("StabilizationSettings")));
-    Q_ASSERT(obj);
-    saveObjectToSD(obj);
-}
-
 
 void ConfigStabilizationWidget::realtimeUpdateToggle(bool state)
 {

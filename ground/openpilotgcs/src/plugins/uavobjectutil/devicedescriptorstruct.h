@@ -30,7 +30,7 @@ public:
                break;
            }
        }
-        deviceDescriptorStruct();
+        deviceDescriptorStruct(){}
 };
 
 #endif // DEVICEDESCRIPTORSTRUCT_H

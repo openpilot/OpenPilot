@@ -35,28 +35,66 @@
 #include <QQueue>
 #include <QtGui/QWidget>
 #include <QList>
-
+#include <QLabel>
+#include "smartsavebutton.h"
+#include "mixercurvewidget.h"
+#include <QTableWidget>
+#include <QDoubleSpinBox>
+#include <QSpinBox>
+#include <QCheckBox>
+#include <QPushButton>
 
 class ConfigTaskWidget: public QWidget
 {
     Q_OBJECT
 
 public:
+    struct objectToWidget
+    {
+        UAVObject * object;
+        UAVObjectField * field;
+        QWidget * widget;
+        int index;
+        int scale;
+    };
+
     ConfigTaskWidget(QWidget *parent = 0);
     ~ConfigTaskWidget();
     void saveObjectToSD(UAVObject *obj);
     UAVObjectManager* getObjectManager();
     static double listMean(QList<double> list);
+    void addUAVObject(QString objectName);
+    void addWidget(QWidget * widget);
+    void addUAVObjectToWidgetRelation(QString object,QString field,QWidget * widget,int index=0,int scale=1);
 
+    void setupButtons(QPushButton * update,QPushButton * save);
+    bool isDirty();
+    void setDirty(bool value);
+    void addUAVObjectToWidgetRelation(QString object, QString field, QWidget *widget, QString index);
 public slots:
     void onAutopilotDisconnect();
     void onAutopilotConnect();
 
 private slots:
-    virtual void refreshValues() = 0;
-
+    virtual void refreshValues();
+    virtual void updateObjectsFromWidgets();
 private:
-    virtual void enableControls(bool enable) = 0;
+    bool isConnected;
+    QStringList objectsList;
+    QList <objectToWidget*> objOfInterest;
+    ExtensionSystem::PluginManager *pm;
+    UAVObjectManager *objManager;
+    smartSaveButton *smartsave;
+    bool dirty;
+protected slots:
+    virtual void disableObjUpdates();
+    virtual void enableObjUpdates();
+    virtual void clearDirty();
+    virtual void widgetsContentsChanged();
+    virtual void populateWidgets();
+    virtual void refreshWidgetsValues();
+protected:
+    virtual void enableControls(bool enable);
 
 };
 

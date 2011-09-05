@@ -38,11 +38,20 @@
  * and we cannot define a linker script for each of them atm
  */
 
+
+typedef int32_t (*initcall_t)(void);
+typedef struct {
+	initcall_t fn_minit;
+	initcall_t fn_tinit;
+} initmodule_t;
+
+/* Init module section */
+extern initmodule_t __module_initcall_start[], __module_initcall_end[];
+
 extern void InitModules();
 extern void StartModules();
 
-#define UAVOBJ_INITCALL(fn)
-#define MODULE_INITCALL(ifn, iparam, sfn, sparam, flags)
+#define MODULE_INITCALL(ifn, sfn)
 
 #define MODULE_TASKCREATE_ALL { \
 	/* Start all module threads */ \

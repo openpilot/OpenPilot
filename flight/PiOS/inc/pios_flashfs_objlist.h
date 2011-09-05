@@ -32,6 +32,7 @@
 #include "uavobjectmanager.h"
 
 int32_t PIOS_FLASHFS_Init();
+int32_t PIOS_FLASHFS_Format();
 int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instId, uint8_t * data);
 int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instId, uint8_t * data);
 int32_t PIOS_FLASHFS_ObjDelete(UAVObjHandle obj, uint16_t instId);

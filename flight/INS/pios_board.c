@@ -61,7 +61,6 @@ static const struct pios_spi_cfg pios_spi_op_mag_cfg = {
 		.ahb_clk = RCC_AHBPeriph_DMA1,
 
 		.irq = {
-			.handler = NULL,
 			.flags =
 			(DMA1_FLAG_TC4 | DMA1_FLAG_TE4 | DMA1_FLAG_HT4 |
 			 DMA1_FLAG_GL4),
@@ -175,7 +174,6 @@ static const struct pios_spi_cfg pios_spi_accel_cfg = {
 			.ahb_clk  = RCC_AHBPeriph_DMA1,
 
 			.irq = {
-					.handler = NULL,
 					.flags   = (DMA1_FLAG_TC2 | DMA1_FLAG_TE2 | DMA1_FLAG_HT2 | DMA1_FLAG_GL2),
 					.init    = {
 							.NVIC_IRQChannel                   = DMA1_Channel2_IRQn,
@@ -277,7 +275,6 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
 		 .USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
 		 },
 	.irq = {
-		.handler = NULL,
 		.init = {
 			 .NVIC_IRQChannel = USART1_IRQn,
 			 .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
@@ -321,7 +318,6 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 		 .USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
 		 },
 	.irq = {
-		.handler = NULL,
 		.init = {
 			 .NVIC_IRQChannel = USART4_IRQn,
 			 .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
@@ -349,6 +345,21 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 
 #endif /* PIOS_COM_AUX */
 
+
+#if defined(PIOS_INCLUDE_COM)
+
+#include <pios_com_priv.h>
+
+#if 0
+#define PIOS_COM_AUX_TX_BUF_LEN 192
+static uint8_t pios_com_aux_tx_buffer[PIOS_COM_AUX_TX_BUF_LEN];
+#endif
+
+#define PIOS_COM_GPS_RX_BUF_LEN 96
+static uint8_t pios_com_gps_rx_buffer[PIOS_COM_GPS_RX_BUF_LEN];
+
+
+#endif /* PIOS_INCLUDE_COM */
 
 #if defined(PIOS_INCLUDE_I2C)
 
@@ -393,7 +404,6 @@ static const struct pios_i2c_adapter_cfg pios_i2c_pres_mag_adapter_cfg = {
 			 },
 		},
 	.event = {
-		  .handler = NULL,
 		  .flags = 0,	/* FIXME: check this */
 		  .init = {
 			   .NVIC_IRQChannel = I2C1_EV_IRQn,
@@ -403,7 +413,6 @@ static const struct pios_i2c_adapter_cfg pios_i2c_pres_mag_adapter_cfg = {
 			   },
 		  },
 	.error = {
-		  .handler = NULL,
 		  .flags = 0,	/* FIXME: check this */
 		  .init = {
 			   .NVIC_IRQChannel = I2C1_ER_IRQn,
@@ -461,7 +470,6 @@ static const struct pios_i2c_adapter_cfg pios_i2c_gyro_adapter_cfg = {
     },
   },
   .event = {
-    .handler = NULL,
     .flags   = 0,		/* FIXME: check this */
     .init = {
       .NVIC_IRQChannel                   = I2C2_EV_IRQn,
@@ -471,7 +479,6 @@ static const struct pios_i2c_adapter_cfg pios_i2c_gyro_adapter_cfg = {
     },
   },
   .error = {
-    .handler = NULL,
     .flags   = 0,		/* FIXME: check this */
     .init = {
       .NVIC_IRQChannel                   = I2C2_ER_IRQn,
@@ -525,7 +532,9 @@ void PIOS_Board_Init(void) {
 	if (PIOS_USART_Init(&pios_usart_gps_id, &pios_usart_gps_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
-	if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id)) {
+	if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
+			  pios_com_gps_rx_buffer, sizeof(pios_com_gps_rx_buffer),
+			  NULL, 0)) {
 		PIOS_DEBUG_Assert(0);
 	}
 #endif	/* PIOS_INCLUDE_GPS */

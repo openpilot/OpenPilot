@@ -132,10 +132,30 @@ static void process_byte(uint8_t b)
 	}
 }
 
+static uint16_t PIOS_SBUS_RxInCallback(uint32_t context, uint8_t * buf, uint16_t buf_len, uint16_t * headroom, bool * need_yield)
+{
+	/* process byte(s) and clear receive timer */
+	for (uint8_t i = 0; i < buf_len; i++) {
+		process_byte(buf[i]);
+		receive_timer = 0;
+	}
+
+	/* Always signal that we can accept another byte */
+	if (headroom) {
+		*headroom = SBUS_FRAME_LENGTH;
+	}
+
+	/* We never need a yield */
+	*need_yield = false;
+
+	/* Always indicate that all bytes were consumed */
+	return (buf_len);
+}
+
 /**
  * Initialise S.Bus receiver interface
  */
-void PIOS_SBUS_Init(const struct pios_sbus_cfg *cfg)
+int32_t PIOS_SBUS_Init(uint32_t * sbus_id, const struct pios_sbus_cfg *cfg, const struct pios_com_driver * driver, uint32_t lower_id)
 {
 	/* Enable inverter clock and enable the inverter */
 	(*cfg->gpio_clk_func)(cfg->gpio_clk_periph, ENABLE);
@@ -144,9 +164,13 @@ void PIOS_SBUS_Init(const struct pios_sbus_cfg *cfg)
 		      cfg->inv.init.GPIO_Pin,
 		      cfg->gpio_inv_enable);
 
+	(driver->bind_rx_cb)(lower_id, PIOS_SBUS_RxInCallback, 0);
+
 	if (!PIOS_RTC_RegisterTickCallback(PIOS_SBUS_Supervisor, 0)) {
 		PIOS_Assert(0);
 	}
+
+	return (0);
 }
 
 /**
@@ -162,34 +186,6 @@ static int32_t PIOS_SBUS_Get(uint32_t rcvr_id, uint8_t channel)
 		return -1;
 	}
 	return channel_data[channel];
-}
-
-/**
- * Interrupt handler for USART
- */
-void PIOS_SBUS_irq_handler(uint32_t usart_id)
-{
-	/* Grab the config for this device from the underlying USART device */
-	const struct pios_usart_cfg * cfg;
-	cfg = PIOS_USART_GetConfig(usart_id);
-	PIOS_Assert(cfg);
-  
-	/* by always reading DR after SR make sure to clear any error interrupts */
-	volatile uint16_t sr = cfg->regs->SR;
-	volatile uint8_t b = cfg->regs->DR;
-
-	/* process received byte if one has arrived */
-	if (sr & USART_SR_RXNE) {
-		/* process byte and clear receive timer */
-		process_byte(b);
-		receive_timer = 0;
-	} 
-
-	/* ignore TXE interrupts */
-	if (sr & USART_SR_TXE) {
-		/* disable TXE interrupt (TXEIE=0) */
-		USART_ITConfig(cfg->regs, USART_IT_TXE, DISABLE);
-	}
 }
 
 /**

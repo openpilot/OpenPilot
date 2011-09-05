@@ -33,11 +33,8 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "gps_mode.h"
 
-#if defined(ENABLE_GPS_NMEA) || defined(ENABLE_GPS_ONESENTENCE_GTOP)
-	extern bool NMEA_update_position(char *nmea_sentence);
-	extern bool NMEA_checksum(char *nmea_sentence);
-#endif
+extern bool NMEA_update_position(char *nmea_sentence);
+extern bool NMEA_checksum(char *nmea_sentence);
 
 #endif /* NMEA_H */

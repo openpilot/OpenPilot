@@ -1,15 +1,13 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{
- * @addtogroup GSPModule GPS Module
- * @brief Process GPS information
- * @{
  *
- * @file       GTOP_BIN.h
+ * @file       mytabwidget.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      GPS module, handles GPS and NMEA stream
+ *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
+ * @defgroup
+ * @{
  *
  *****************************************************************************/
 /*
@@ -27,16 +25,24 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#include "mytabwidget.h"
+#include <QtGui/QTabBar>
 
-#ifndef GTOP_BIN_H
-#define GTOP_BIN_H
+MyTabWidget::MyTabWidget(QWidget *parent)
+    : QTabWidget(parent)
+{
+    QTabBar *tabBar = QTabWidget::tabBar();
+    connect(tabBar, SIGNAL(tabMoved(int, int)), this, SLOT(myTabMoved(int,int)));
+}
 
-#include <stdint.h>
-#include "gps_mode.h"
+void MyTabWidget::moveTab(int from, int to)
+{
+    QTabBar *tabBar = QTabWidget::tabBar();
+    tabBar->moveTab(from, to);
+}
 
-#ifdef ENABLE_GPS_BINARY_GTOP
-	extern int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volatile uint32_t *parsing_errors);
-	extern void GTOP_BIN_init(void);
-#endif
 
-#endif
+void MyTabWidget::myTabMoved(int from, int to)
+{
+    emit tabMoved(from, to);
+}

@@ -41,106 +41,145 @@ const struct pios_rcvr_driver pios_ppm_rcvr_driver = {
 	.read = PIOS_PPM_Get,
 };
 
+#define PIOS_PPM_IN_MIN_NUM_CHANNELS		4
+#define PIOS_PPM_IN_MAX_NUM_CHANNELS		PIOS_PPM_NUM_INPUTS
+#define PIOS_PPM_STABLE_CHANNEL_COUNT		25	// frames
+#define PIOS_PPM_IN_MIN_SYNC_PULSE_US		3800	// microseconds
+#define PIOS_PPM_IN_MIN_CHANNEL_PULSE_US	750	// microseconds
+#define PIOS_PPM_IN_MAX_CHANNEL_PULSE_US	2250   // microseconds
+#define PIOS_PPM_INPUT_INVALID			0
+
 /* Local Variables */
 static TIM_ICInitTypeDef TIM_ICInitStructure;
-static uint8_t PulseIndex;
-static uint32_t PreviousValue;
-static uint32_t CurrentValue;
-static uint32_t CapturedValue;
-static uint32_t CaptureValue[PIOS_PPM_NUM_INPUTS];
-static uint32_t CapCounter[PIOS_PPM_NUM_INPUTS];
-static uint16_t TimerCounter;
-
-static uint8_t supv_timer = 0;
-static uint8_t SupervisorState = 0;
-static uint32_t CapCounterPrev[PIOS_PPM_NUM_INPUTS];
 
 static void PIOS_PPM_Supervisor(uint32_t ppm_id);
 
-void PIOS_PPM_Init(void)
+enum pios_ppm_dev_magic {
+	PIOS_PPM_DEV_MAGIC = 0xee014d8b,
+};
+
+struct pios_ppm_dev {
+	enum pios_ppm_dev_magic     magic;
+	const struct pios_ppm_cfg * cfg;
+
+	uint8_t PulseIndex;
+	uint32_t PreviousTime;
+	uint32_t CurrentTime;
+	uint32_t DeltaTime;
+	uint32_t CaptureValue[PIOS_PPM_IN_MAX_NUM_CHANNELS];
+	uint32_t CaptureValueNewFrame[PIOS_PPM_IN_MAX_NUM_CHANNELS];
+	uint32_t LargeCounter;
+	int8_t NumChannels;
+	int8_t NumChannelsPrevFrame;
+	uint8_t NumChannelCounter;
+
+	uint8_t supv_timer;
+	bool Tracking;
+	bool Fresh;
+};
+
+static bool PIOS_PPM_validate(struct pios_ppm_dev * ppm_dev)
 {
-	/* Flush counter variables */
-	int32_t i;
+	return (ppm_dev->magic == PIOS_PPM_DEV_MAGIC);
+}
 
-	PulseIndex = 0;
-	PreviousValue = 0;
-	CurrentValue = 0;
-	CapturedValue = 0;
-	TimerCounter = 0;
+#if defined(PIOS_INCLUDE_FREERTOS)
+static struct pios_ppm_dev * PIOS_PPM_alloc(void)
+{
+	struct pios_ppm_dev * ppm_dev;
 
-	for (i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
-		CaptureValue[i] = 0;
+	ppm_dev = (struct pios_ppm_dev *)pvPortMalloc(sizeof(*ppm_dev));
+	if (!ppm_dev) return(NULL);
+
+	ppm_dev->magic = PIOS_PPM_DEV_MAGIC;
+	return(ppm_dev);
+}
+#else
+static struct pios_ppm_dev pios_ppm_devs[PIOS_PPM_MAX_DEVS];
+static uint8_t pios_ppm_num_devs;
+static struct pios_ppm_dev * PIOS_PPM_alloc(void)
+{
+	struct pios_ppm_dev * ppm_dev;
+
+	if (pios_ppm_num_devs >= PIOS_PPM_MAX_DEVS) {
+		return (NULL);
 	}
 
-	NVIC_InitTypeDef NVIC_InitStructure = pios_ppm_cfg.irq.init;
+	ppm_dev = &pios_ppm_devs[pios_ppm_num_devs++];
+	ppm_dev->magic = PIOS_PPM_DEV_MAGIC;
 
-	/* Enable appropriate clock to timer module */
-	switch((int32_t) pios_ppm_cfg.timer) {
-		case (int32_t)TIM1:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM1_CC_IRQn;
-			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
-			break;
-		case (int32_t)TIM2:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
-			break;
-		case (int32_t)TIM3:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
-			break;
-		case (int32_t)TIM4:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
-			break;
-#ifdef STM32F10X_HD
-
-		case (int32_t)TIM5:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM5_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
-			break;
-		case (int32_t)TIM6:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM6_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
-			break;
-		case (int32_t)TIM7:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM7_IRQn;
-			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
-			break;
-		case (int32_t)TIM8:
-			NVIC_InitStructure.NVIC_IRQChannel = TIM8_CC_IRQn;
-			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
-			break;
+	return (ppm_dev);
+}
 #endif
+
+static void PIOS_PPM_tim_overflow_cb (uint32_t id, uint32_t context, uint8_t channel, uint16_t count);
+static void PIOS_PPM_tim_edge_cb (uint32_t id, uint32_t context, uint8_t channel, uint16_t count);
+const static struct pios_tim_callbacks tim_callbacks = {
+	.overflow = PIOS_PPM_tim_overflow_cb,
+	.edge     = PIOS_PPM_tim_edge_cb,
+};
+
+extern int32_t PIOS_PPM_Init(uint32_t * ppm_id, const struct pios_ppm_cfg * cfg)
+{
+	PIOS_DEBUG_Assert(ppm_id);
+	PIOS_DEBUG_Assert(cfg);
+
+	struct pios_ppm_dev * ppm_dev;
+
+	ppm_dev = (struct pios_ppm_dev *) PIOS_PPM_alloc();
+	if (!ppm_dev) goto out_fail;
+
+	/* Bind the configuration to the device instance */
+	ppm_dev->cfg = cfg;
+
+	/* Set up the state variables */
+	ppm_dev->PulseIndex = 0;
+	ppm_dev->PreviousTime = 0;
+	ppm_dev->CurrentTime = 0;
+	ppm_dev->DeltaTime = 0;
+	ppm_dev->LargeCounter = 0;
+	ppm_dev->NumChannels = -1;
+	ppm_dev->NumChannelsPrevFrame = -1;
+	ppm_dev->NumChannelCounter = 0;
+	ppm_dev->Tracking = FALSE;
+	ppm_dev->Fresh = FALSE;
+
+	for (uint8_t i = 0; i < PIOS_PPM_IN_MAX_NUM_CHANNELS; i++) {
+		/* Flush counter variables */
+		ppm_dev->CaptureValue[i] = 0;
+		ppm_dev->CaptureValueNewFrame[i] = 0;
+
 	}
-	/* Enable timer interrupts */
-	NVIC_Init(&NVIC_InitStructure);
 
-	/* Configure input pins */
-	GPIO_InitTypeDef GPIO_InitStructure = pios_ppm_cfg.gpio_init;
-	GPIO_Init(pios_ppm_cfg.port, &GPIO_InitStructure);
-
-	/* Configure timer for input capture */
-	TIM_ICInitStructure = pios_ppm_cfg.tim_ic_init;
-	TIM_ICInit(pios_ppm_cfg.timer, &TIM_ICInitStructure);
-
-	/* Configure timer clocks */
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = pios_ppm_cfg.tim_base_init;
-	TIM_InternalClockConfig(pios_ppm_cfg.timer);
-	TIM_TimeBaseInit(pios_ppm_cfg.timer, &TIM_TimeBaseStructure);
-
-	/* Enable the Capture Compare Interrupt Request */
-	TIM_ITConfig(pios_ppm_cfg.timer, pios_ppm_cfg.ccr | TIM_IT_Update, ENABLE);
-
-	/* Enable timers */
-	TIM_Cmd(pios_ppm_cfg.timer, ENABLE);
-
-	/* Supervisor Setup */
-	/* Flush counter variables */
-	for (i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
-		CapCounter[i] = 0;
+	uint32_t tim_id;
+	if (PIOS_TIM_InitChannels(&tim_id, cfg->channels, cfg->num_channels, &tim_callbacks, (uint32_t)ppm_dev)) {
+		return -1;
 	}
-	for (i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
-		CapCounterPrev[i] = 0;
+
+	/* Configure the channels to be in capture/compare mode */
+	for (uint8_t i = 0; i < cfg->num_channels; i++) {
+		const struct pios_tim_channel * chan = &cfg->channels[i];
+
+		/* Configure timer for input capture */
+		TIM_ICInitTypeDef TIM_ICInitStructure = cfg->tim_ic_init;
+		TIM_ICInitStructure.TIM_Channel = chan->timer_chan;
+		TIM_ICInit(chan->timer, &TIM_ICInitStructure);
+
+		/* Enable the Capture Compare Interrupt Request */
+		switch (chan->timer_chan) {
+		case TIM_Channel_1:
+			TIM_ITConfig(chan->timer, TIM_IT_CC1 | TIM_IT_Update, ENABLE);
+			break;
+		case TIM_Channel_2:
+			TIM_ITConfig(chan->timer, TIM_IT_CC2 | TIM_IT_Update, ENABLE);
+			break;
+		case TIM_Channel_3:
+			TIM_ITConfig(chan->timer, TIM_IT_CC3 | TIM_IT_Update, ENABLE);
+			break;
+		case TIM_Channel_4:
+			TIM_ITConfig(chan->timer, TIM_IT_CC4 | TIM_IT_Update, ENABLE);
+			break;
+		}
 	}
 
 	/* Setup local variable which stays in this scope */
@@ -149,9 +188,16 @@ void PIOS_PPM_Init(void)
 	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
 	TIM_ICInitStructure.TIM_ICFilter = 0x0;
 
-	if (!PIOS_RTC_RegisterTickCallback(PIOS_PPM_Supervisor, 0)) {
+	if (!PIOS_RTC_RegisterTickCallback(PIOS_PPM_Supervisor, (uint32_t)ppm_dev)) {
 		PIOS_DEBUG_Assert(0);
 	}
+
+	*ppm_id = (uint32_t)ppm_dev;
+
+	return(0);
+
+out_fail:
+	return(-1);
 }
 
 /**
@@ -162,105 +208,146 @@ void PIOS_PPM_Init(void)
 */
 static int32_t PIOS_PPM_Get(uint32_t rcvr_id, uint8_t channel)
 {
-	/* Return error if channel not available */
-	if (channel >= PIOS_PPM_NUM_INPUTS) {
+	struct pios_ppm_dev * ppm_dev = (struct pios_ppm_dev *)rcvr_id;
+
+	if (!PIOS_PPM_validate(ppm_dev)) {
+		/* Invalid device specified */
 		return -1;
 	}
-	return CaptureValue[channel];
+
+	if (channel >= PIOS_PPM_IN_MAX_NUM_CHANNELS) {
+		/* Channel out of range */
+		return -1;
+	}
+	return ppm_dev->CaptureValue[channel];
 }
 
-/**
-* Handle TIMx global interrupt request
-* Some work and testing still needed, need to detect start of frame and decode pulses
-*
-*/
-void PIOS_PPM_irq_handler(void)
+static void PIOS_PPM_tim_overflow_cb (uint32_t tim_id, uint32_t context, uint8_t channel, uint16_t count)
 {
-	if (TIM_GetITStatus(pios_ppm_cfg.timer, TIM_IT_Update) == SET) {
-		TimerCounter+=pios_ppm_cfg.timer->ARR;
-		TIM_ClearITPendingBit(pios_ppm_cfg.timer, TIM_IT_Update);
-		if (TIM_GetITStatus(pios_ppm_cfg.timer, pios_ppm_cfg.ccr) != SET) {
-			return;
-		}
+	struct pios_ppm_dev * ppm_dev = (struct pios_ppm_dev *)context;
+
+	if (!PIOS_PPM_validate(ppm_dev)) {
+		/* Invalid device specified */
+		return;
 	}
 
+	ppm_dev->LargeCounter += count;
 
-	/* Do this as it's more efficient */
-	if (TIM_GetITStatus(pios_ppm_cfg.timer, pios_ppm_cfg.ccr) == SET) {
-		PreviousValue = CurrentValue;
-		switch((int32_t) pios_ppm_cfg.ccr) {
-			case (int32_t)TIM_IT_CC1:
-				CurrentValue = TIM_GetCapture1(pios_ppm_cfg.timer);
-				break;
-			case (int32_t)TIM_IT_CC2:
-				CurrentValue = TIM_GetCapture2(pios_ppm_cfg.timer);
-				break;
-			case (int32_t)TIM_IT_CC3:
-				CurrentValue = TIM_GetCapture3(pios_ppm_cfg.timer);
-				break;
-			case (int32_t)TIM_IT_CC4:
-				CurrentValue = TIM_GetCapture4(pios_ppm_cfg.timer);
-				break;
-		}
-		CurrentValue+=TimerCounter;
-		if(CurrentValue > 0xFFFF) {
-			CurrentValue-=0xFFFF;
-		}
+	return;
+}
 
-		/* Clear TIMx Capture compare interrupt pending bit */
-		TIM_ClearITPendingBit(pios_ppm_cfg.timer, pios_ppm_cfg.ccr);
 
-		/* Capture computation */
-		if (CurrentValue > PreviousValue) {
-			CapturedValue = (CurrentValue - PreviousValue);
+static void PIOS_PPM_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t chan_idx, uint16_t count)
+{
+	/* Recover our device context */
+	struct pios_ppm_dev * ppm_dev = (struct pios_ppm_dev *)context;
+
+	if (!PIOS_PPM_validate(ppm_dev)) {
+		/* Invalid device specified */
+		return;
+	}
+
+	if (chan_idx >= ppm_dev->cfg->num_channels) {
+		/* Channel out of range */
+		return;
+	}
+
+	/* Shift the last measurement out */
+	ppm_dev->PreviousTime = ppm_dev->CurrentTime;
+
+	/* Grab the new count */
+	ppm_dev->CurrentTime = count;
+
+	/* Convert to 32-bit timer result */
+	ppm_dev->CurrentTime += ppm_dev->LargeCounter;
+
+	/* Capture computation */		
+	ppm_dev->DeltaTime = ppm_dev->CurrentTime - ppm_dev->PreviousTime;
+
+	ppm_dev->PreviousTime = ppm_dev->CurrentTime;
+
+	/* Sync pulse detection */
+	if (ppm_dev->DeltaTime > PIOS_PPM_IN_MIN_SYNC_PULSE_US) {
+		if (ppm_dev->PulseIndex == ppm_dev->NumChannelsPrevFrame
+			&& ppm_dev->PulseIndex >= PIOS_PPM_IN_MIN_NUM_CHANNELS
+			&& ppm_dev->PulseIndex <= PIOS_PPM_IN_MAX_NUM_CHANNELS)
+		{
+			/* If we see n simultaneous frames of the same
+			   number of channels we save it as our frame size */
+			if (ppm_dev->NumChannelCounter < PIOS_PPM_STABLE_CHANNEL_COUNT)
+				ppm_dev->NumChannelCounter++;
+			else
+				ppm_dev->NumChannels = ppm_dev->PulseIndex;
 		} else {
-			CapturedValue = ((0xFFFF - PreviousValue) + CurrentValue);
+			ppm_dev->NumChannelCounter = 0;
 		}
 
-		/* sync pulse */
-		if (CapturedValue > 8000) {
-			PulseIndex = 0;
-			/* trying to detect bad pulses, not sure this is working correctly yet. I need a scope :P */
-		} else if (CapturedValue > 750 && CapturedValue < 2500) {
-			if (PulseIndex < PIOS_PPM_NUM_INPUTS) {
-				CaptureValue[PulseIndex] = CapturedValue;
-				CapCounter[PulseIndex]++;
-				PulseIndex++;
+		/* Check if the last frame was well formed */
+		if (ppm_dev->PulseIndex == ppm_dev->NumChannels && ppm_dev->Tracking) {
+			/* The last frame was well formed */
+			for (uint32_t i = 0; i < ppm_dev->NumChannels; i++) {
+				ppm_dev->CaptureValue[i] = ppm_dev->CaptureValueNewFrame[i];
+			}
+			for (uint32_t i = ppm_dev->NumChannels;
+			     i < PIOS_PPM_IN_MAX_NUM_CHANNELS; i++) {
+				ppm_dev->CaptureValue[i] = PIOS_PPM_INPUT_INVALID;
+			}
+		}
+
+		ppm_dev->Fresh = TRUE;
+		ppm_dev->Tracking = TRUE;
+		ppm_dev->NumChannelsPrevFrame = ppm_dev->PulseIndex;
+		ppm_dev->PulseIndex = 0;
+
+		/* We rely on the supervisor to set CaptureValue to invalid
+		   if no valid frame is found otherwise we ride over it */
+
+	} else if (ppm_dev->Tracking) {
+		/* Valid pulse duration 0.75 to 2.5 ms*/
+		if (ppm_dev->DeltaTime > PIOS_PPM_IN_MIN_CHANNEL_PULSE_US
+			&& ppm_dev->DeltaTime < PIOS_PPM_IN_MAX_CHANNEL_PULSE_US
+			&& ppm_dev->PulseIndex < PIOS_PPM_IN_MAX_NUM_CHANNELS) {
+			
+			ppm_dev->CaptureValueNewFrame[ppm_dev->PulseIndex] = ppm_dev->DeltaTime;
+			ppm_dev->PulseIndex++;
+		} else {
+			/* Not a valid pulse duration */
+			ppm_dev->Tracking = FALSE;
+			for (uint32_t i = 0; i < PIOS_PPM_IN_MAX_NUM_CHANNELS ; i++) {
+				ppm_dev->CaptureValueNewFrame[i] = PIOS_PPM_INPUT_INVALID;
 			}
 		}
 	}
 }
 
 static void PIOS_PPM_Supervisor(uint32_t ppm_id) {
+	/* Recover our device context */
+	struct pios_ppm_dev * ppm_dev = (struct pios_ppm_dev *)ppm_id;
+
+	if (!PIOS_PPM_validate(ppm_dev)) {
+		/* Invalid device specified */
+		return;
+	}
+
 	/* 
 	 * RTC runs at 625Hz so divide down the base rate so
 	 * that this loop runs at 25Hz.
 	 */
-	if(++supv_timer < 25) {
+	if(++(ppm_dev->supv_timer) < 25) {
 		return;
 	}
-	supv_timer = 0;
+	ppm_dev->supv_timer = 0;
 
-	/* Simple state machine */
-	if (SupervisorState == 0) {
-		/* Save this states values */
-		for (int32_t i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
-			CapCounterPrev[i] = CapCounter[i];
+	if (!ppm_dev->Fresh) {
+		ppm_dev->Tracking = FALSE;
+
+		for (int32_t i = 0; i < PIOS_PPM_IN_MAX_NUM_CHANNELS ; i++) {
+			ppm_dev->CaptureValue[i] = PIOS_PPM_INPUT_INVALID;
+			ppm_dev->CaptureValueNewFrame[i] = PIOS_PPM_INPUT_INVALID;
 		}
-
-		/* Move to next state */
-		SupervisorState = 1;
-	} else {
-		/* See what channels have been updated */
-		for (int32_t i = 0; i < PIOS_PPM_NUM_INPUTS; i++) {
-			if (CapCounter[i] == CapCounterPrev[i]) {
-				CaptureValue[i] = 0;
-			}
-		}
-
-		/* Move to next state */
-		SupervisorState = 0;
 	}
+
+	ppm_dev->Fresh = FALSE;
 }
 
 #endif

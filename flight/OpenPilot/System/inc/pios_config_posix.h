@@ -36,9 +36,15 @@
 #define PIOS_INCLUDE_SDCARD
 #define PIOS_INCLUDE_FREERTOS
 #define PIOS_INCLUDE_COM
+#define PIOS_INCLUDE_GPS
+#define PIOS_INCLUDE_IRQ
+#define PIOS_INCLUDE_TELEMETRY_RF
 #define PIOS_INCLUDE_UDP
 #define PIOS_INCLUDE_SERVO
+#define PIOS_INCLUDE_RCVR
 
+#define PIOS_RCVR_MAX_CHANNELS			12
+#define PIOS_RCVR_MAX_DEVS              3
 
 /* Defaults for Logging */
 #define LOG_FILENAME 			"PIOS.LOG"

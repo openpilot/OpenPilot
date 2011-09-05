@@ -16,6 +16,7 @@
 #define ADXL_MULTI_BIT     0x40
 
 #define ADXL_X0_ADDR       0x32
+#define ADXL_FIFOSTATUS_ADDR 0x39
 
 #define ADXL_RATE_ADDR     0x2C
 #define ADXL_RATE_100      0x0A
@@ -52,5 +53,6 @@ void PIOS_ADXL345_FifoDepth(uint8_t depth);
 void PIOS_ADXL345_Attach(uint32_t spi_id);
 void PIOS_ADXL345_Init();
 uint8_t PIOS_ADXL345_Read(struct pios_adxl345_data * data);
+uint8_t  PIOS_ADXL345_FifoElements();
 
 #endif

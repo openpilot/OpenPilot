@@ -33,9 +33,11 @@
 #include "configinputwidget.h"
 #include "configoutputwidget.h"
 #include "configstabilizationwidget.h"
-#include "configtelemetrywidget.h"
+#include "configcamerastabilizationwidget.h"
+#include "config_pro_hw_widget.h"
+#include "config_cc_hw_widget.h"
 #include "defaultattitudewidget.h"
-
+#include "defaulthwsettingswidget.h"
 #include "uavobjectutilmanager.h"
 
 #include <QDebug>
@@ -51,34 +53,37 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 
-    ftw = new FancyTabWidget(this, true);
-
+    ftw = new MyTabbedStackWidget(this, true, true);
     ftw->setIconSize(64);
 
     QVBoxLayout *layout = new QVBoxLayout;
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(ftw);
     setLayout(layout);
 
     // *********************
     QWidget *qwd;
 
+    qwd = new DefaultHwSettingsWidget(this);
+    ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
+
     qwd = new ConfigAirframeWidget(this);
-    ftw->insertTab(0, qwd, QIcon(":/configgadget/images/Airframe.png"), QString("Aircraft"));
+    ftw->insertTab(ConfigGadgetWidget::aircraft, qwd, QIcon(":/configgadget/images/Airframe.png"), QString("Aircraft"));
 
     qwd = new ConfigInputWidget(this);
-    ftw->insertTab(1, qwd, QIcon(":/configgadget/images/Transmitter.png"), QString("Input"));
+    ftw->insertTab(ConfigGadgetWidget::input, qwd, QIcon(":/configgadget/images/Transmitter.png"), QString("Input"));
 
     qwd = new ConfigOutputWidget(this);
-    ftw->insertTab(2, qwd, QIcon(":/configgadget/images/Servo.png"), QString("Output"));
+    ftw->insertTab(ConfigGadgetWidget::output, qwd, QIcon(":/configgadget/images/Servo.png"), QString("Output"));
 
     qwd = new DefaultAttitudeWidget(this);
-    ftw->insertTab(3, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+    ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
 
     qwd = new ConfigStabilizationWidget(this);
-    ftw->insertTab(4, qwd, QIcon(":/configgadget/images/gyroscope.svg"), QString("Stabilization"));
+    ftw->insertTab(ConfigGadgetWidget::stabilization, qwd, QIcon(":/configgadget/images/gyroscope.png"), QString("Stabilization"));
 
-    qwd = new ConfigTelemetryWidget(this);
-    ftw->insertTab(5, qwd, QIcon(":/configgadget/images/XBee.svg"), QString("Telemetry"));
+    qwd = new ConfigCameraStabilizationWidget(this);
+    ftw->insertTab(ConfigGadgetWidget::camerastabilization, qwd, QIcon(":/configgadget/images/camera.png"), QString("Camera Stab"));
 
 
 //    qwd = new ConfigPipXtremeWidget(this);
@@ -97,6 +102,8 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
         onAutopilotConnect();    
 
     help = 0;
+    connect(ftw,SIGNAL(currentAboutToShow(int,bool*)),this,SLOT(tabAboutToChange(int,bool*)));//,Qt::BlockingQueuedConnection);
+
 }
 
 ConfigGadgetWidget::~ConfigGadgetWidget()
@@ -113,6 +120,15 @@ void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
 }
 
 void ConfigGadgetWidget::onAutopilotDisconnect() {
+    ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+    ftw->removeTab(ConfigGadgetWidget::ins);
+    QWidget *qwd = new DefaultAttitudeWidget(this);
+    ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+    ftw->removeTab(ConfigGadgetWidget::hardware);
+    qwd = new DefaultHwSettingsWidget(this);
+    ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
+    ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+
     emit autopilotDisconnected();
 }
 
@@ -128,19 +144,45 @@ void ConfigGadgetWidget::onAutopilotConnect() {
         if ((board & 0xff00) == 1024) {
             // CopterControl family
             // Delete the INS panel, replace with CC Panel:
-            ftw->setCurrentIndex(0);
-            ftw->removeTab(3);
+            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+            ftw->removeTab(ConfigGadgetWidget::ins);
             QWidget *qwd = new ConfigCCAttitudeWidget(this);
-            ftw->insertTab(3, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("Attitude"));
+            ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("Attitude"));
+            ftw->removeTab(ConfigGadgetWidget::hardware);
+            qwd = new ConfigCCHWWidget(this);
+            ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
+            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
         } else if ((board & 0xff00) == 256 ) {
             // Mainboard family
-            ftw->setCurrentIndex(0);
-            ftw->removeTab(3);
+            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+            ftw->removeTab(ConfigGadgetWidget::ins);
             QWidget *qwd = new ConfigAHRSWidget(this);
-            ftw->insertTab(3, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+            ftw->insertTab(ConfigGadgetWidget::ins, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+            ftw->removeTab(ConfigGadgetWidget::hardware);
+            qwd = new ConfigProHWWidget(this);
+            ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
+            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
         }
     }
     emit autopilotConnected();
+}
+
+void ConfigGadgetWidget::tabAboutToChange(int i,bool * proceed)
+{
+    *proceed=true;
+    ConfigTaskWidget * wid=qobject_cast<ConfigTaskWidget *>(ftw->currentWidget());
+    if(!wid)
+        return;
+    if(wid->isDirty())
+    {
+        int ans=QMessageBox::warning(this,tr("Unsaved changes"),tr("The tab you are leaving has unsaved changes,"
+                                                           "if you proceed they will be lost."
+                                                           "Do you still want to proceed?"),QMessageBox::Yes,QMessageBox::No);
+        if(ans==QMessageBox::No)
+            *proceed=false;
+        else
+            wid->setDirty(false);
+    }
 }
 
 

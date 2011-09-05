@@ -180,7 +180,7 @@ void deviceWidget::freeze()
   */
 bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
 {
-    if(UploaderGadgetWidget::descriptionToStructure(desc,&onBoardDescrition))
+    if(UAVObjectUtilManager::descriptionToStructure(desc,&onBoardDescrition))
     {
         myDevice->lblGitTag->setText(onBoardDescrition.gitTag);
         myDevice->lblBuildDate->setText(onBoardDescrition.buildDate);
@@ -189,7 +189,7 @@ bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
             myDevice->lblDescription->setText(QString("Firmware tag: ")+onBoardDescrition.description);
             QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
             myDevice->lblCertified->setPixmap(pix);
-            myDevice->lblCertified->setToolTip(tr("Official Firmware Build"));
+            myDevice->lblCertified->setToolTip(tr("Tagged officially released firmware build"));
 
         }
         else
@@ -197,7 +197,7 @@ bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
             myDevice->lblDescription->setText(onBoardDescrition.description);
             QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
             myDevice->lblCertified->setPixmap(pix);
-            myDevice->lblCertified->setToolTip(tr("Custom Firmware Build"));
+            myDevice->lblCertified->setToolTip(tr("Untagged or custom firmware build"));
         }
 
         myDevice->lblBrdName->setText(idToBoardName(onBoardDescrition.boardType<<8));
@@ -210,7 +210,7 @@ bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
 }
 bool deviceWidget::populateLoadedStructuredDescription(QByteArray desc)
 {
-    if(UploaderGadgetWidget::descriptionToStructure(desc,&LoadedDescrition))
+    if(UAVObjectUtilManager::descriptionToStructure(desc,&LoadedDescrition))
     {
         myDevice->lblGitTagL->setText(LoadedDescrition.gitTag);
         myDevice->lblBuildDateL->setText( LoadedDescrition.buildDate);
@@ -220,7 +220,7 @@ bool deviceWidget::populateLoadedStructuredDescription(QByteArray desc)
             myDevice->description->setText(LoadedDescrition.description);
             QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
             myDevice->lblCertifiedL->setPixmap(pix);
-            myDevice->lblCertifiedL->setToolTip(tr("Official Firmware Build"));
+            myDevice->lblCertifiedL->setToolTip(tr("Tagged officially released firmware build"));
         }
         else
         {
@@ -228,7 +228,7 @@ bool deviceWidget::populateLoadedStructuredDescription(QByteArray desc)
             myDevice->description->setText(LoadedDescrition.description);
             QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
             myDevice->lblCertifiedL->setPixmap(pix);
-            myDevice->lblCertifiedL->setToolTip(tr("Custom Firmware Build"));
+            myDevice->lblCertifiedL->setToolTip(tr("Untagged or custom firmware build"));
         }
         myDevice->lblBrdNameL->setText(deviceDescriptorStruct::idToBoardName(LoadedDescrition.boardType<<8));
 
@@ -303,7 +303,10 @@ void deviceWidget::loadFirmware()
     myDevice->youdont->setChecked(false);
     QByteArray desc = loadedFW.right(100);
     QPixmap px;
-    myDevice->lblCRCL->setText( QString::number(DFUObject::CRCFromQBArray(loadedFW,m_dfu->devices[deviceID].SizeOfCode)));
+    if(loadedFW.length()>m_dfu->devices[deviceID].SizeOfCode)
+        myDevice->lblCRCL->setText(tr("Can't calculate, file too big for device"));
+    else
+        myDevice->lblCRCL->setText( QString::number(DFUObject::CRCFromQBArray(loadedFW,m_dfu->devices[deviceID].SizeOfCode)));
     //myDevice->lblFirmwareSizeL->setText(QString("Firmware size: ")+QVariant(loadedFW.length()).toString()+ QString(" bytes"));
     if (populateLoadedStructuredDescription(desc))
     {
@@ -312,34 +315,34 @@ void deviceWidget::loadFirmware()
         myDevice->groupCustom->setVisible(false);
         if(myDevice->lblCRC->text()==myDevice->lblCRCL->text())
         {
-            myDevice->statusLabel->setText(tr("The loaded firmware the same as on the board. You should not upload it"));
+            myDevice->statusLabel->setText(tr("The board has the same firmware as loaded. No need to update"));
             px.load(QString(":/uploader/images/warning.svg"));
         }
         else if(myDevice->lblDevName->text()!=myDevice->lblBrdNameL->text())
         {
-            myDevice->statusLabel->setText(tr("The loaded firmware is not suited for the HW connected. You shouldn't upload it"));
-            px.load(QString(":/uploader/images/warning.svg"));
+            myDevice->statusLabel->setText(tr("WARNING: the loaded firmware is for different hardware. Do not update!"));
+            px.load(QString(":/uploader/images/error.svg"));
         }
         else if(QDateTime::fromString(onBoardDescrition.buildDate)>QDateTime::fromString(LoadedDescrition.buildDate))
         {
-            myDevice->statusLabel->setText(tr("The loaded firmware is older than the firmware on the board. You should not upload it"));
+            myDevice->statusLabel->setText(tr("The board has newer firmware than loaded. Are you sure you want to update?"));
             px.load(QString(":/uploader/images/warning.svg"));
         }
         else if(!LoadedDescrition.description.startsWith("release",Qt::CaseInsensitive))
         {
-            myDevice->statusLabel->setText(tr("The loaded firmware is not an oficial OpenPilot release. You should upload it only if you know what you are doing"));
+            myDevice->statusLabel->setText(tr("The loaded firmware is untagged or custom build. Update only if it was received from a trusted source (official website or your own build)"));
             px.load(QString(":/uploader/images/warning.svg"));
         }
         else
         {
-            myDevice->statusLabel->setText(tr("Everything seems OK. You should upload the loaded firmware by pressing 'Flash'"));
+            myDevice->statusLabel->setText(tr("This is the tagged officially released OpenPilot firmware"));
             px.load(QString(":/uploader/images/gtk-info.svg"));
         }
     }
     else
     {
-        myDevice->statusLabel->setText(tr("The loaded firmware was not packaged with the OpenPilot format. You should not upload it unless you know what you are doing."));
-        px.load(QString(":/uploader/images/warning.svg"));
+        myDevice->statusLabel->setText(tr("WARNING: the loaded firmware was not packaged with the OpenPilot format. Do not update unless you know what you are doing"));
+        px.load(QString(":/uploader/images/error.svg"));
         myDevice->youdont->setChecked(false);
         myDevice->youdont->setVisible(true);
         myDevice->verticalGroupBox_loaded->setVisible(false);
@@ -514,7 +517,7 @@ QString deviceWidget::setOpenFileName()
     QString fileName = QFileDialog::getOpenFileName(this,
                                                     tr("Select firmware file"),
                                                     "",
-                                                    tr("Firmware Files (*.bin *.opfw)"),
+                                                    tr("Firmware Files (*.opfw *.bin)"),
                                                     &selectedFilter,
                                                     options);
     return fileName;

@@ -794,7 +794,8 @@ void apiconfig_process(void)
 		int32_t bytes = PIOS_COM_ReceiveBufferUsed(PIOS_COM_SERIAL);
 		while (bytes > 0)
 		{
-			PIOS_COM_ReceiveBuffer(PIOS_COM_SERIAL);
+			uint8_t c;
+			PIOS_COM_ReceiveBuffer(PIOS_COM_SERIAL, &c, 1, 0);
 			bytes--;
 		}
 	}
@@ -812,9 +813,12 @@ void apiconfig_process(void)
 	if (com_num > sizeof(apiconfig_rx_buffer) - apiconfig_rx_buffer_wr)
 		com_num = sizeof(apiconfig_rx_buffer) - apiconfig_rx_buffer_wr;
 
+	
 	while (com_num > 0)
 	{	// fetch a byte from the comm-port RX buffer and save it into our RX buffer
-		apiconfig_rx_buffer[apiconfig_rx_buffer_wr++] = PIOS_COM_ReceiveBuffer(apiconfig_comm_port);
+		uint8_t c;
+		PIOS_COM_ReceiveBuffer(apiconfig_comm_port, &c, 1, 0);
+		apiconfig_rx_buffer[apiconfig_rx_buffer_wr++] = c;
 		com_num--;
 	}
 

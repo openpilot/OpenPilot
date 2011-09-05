@@ -28,13 +28,94 @@
 #include <QtGui/QWidget>
 
 
-ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent)
+ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnected(false),smartsave(NULL),dirty(false)
 {
+    pm = ExtensionSystem::PluginManager::instance();
+    objManager = pm->getObject<UAVObjectManager>();
+    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
+    connect(parent, SIGNAL(autopilotDisconnected()),this, SLOT(onAutopilotDisconnect()));
 }
+void ConfigTaskWidget::addWidget(QWidget * widget)
+{
+    addUAVObjectToWidgetRelation("","",widget);
+}
+void ConfigTaskWidget::addUAVObject(QString objectName)
+{
+    addUAVObjectToWidgetRelation(objectName,"",NULL);
+}
+void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString field, QWidget * widget, QString index)
+{
+    UAVObject *obj=NULL;
+    UAVObjectField *_field=NULL;
+    obj = objManager->getObject(QString(object));
+    _field = obj->getField(QString(field));
+    addUAVObjectToWidgetRelation(object,field,widget,_field->getElementNames().indexOf(index));
+}
+
+void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString field, QWidget * widget, int index,int scale)
+{
+    UAVObject *obj=NULL;
+    UAVObjectField *_field=NULL;
+    if(!object.isEmpty())
+    {
+        obj = objManager->getObject(QString(object));
+        connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
+    }
+    //smartsave->addObject(obj);
+    if(!field.isEmpty() && obj)
+        _field = obj->getField(QString(field));
+    objectToWidget * ow=new objectToWidget();
+    ow->field=_field;
+    ow->object=obj;
+    ow->widget=widget;
+    ow->index=index;
+    ow->scale=scale;
+    objOfInterest.append(ow);
+    if(obj)
+        smartsave->addObject((UAVDataObject*)obj);
+    if(widget==NULL)
+    {
+        // do nothing
+    }
+    else if(QComboBox * cb=qobject_cast<QComboBox *>(widget))
+    {
+        connect(cb,SIGNAL(currentIndexChanged(int)),this,SLOT(widgetsContentsChanged()));
+    }
+    else if(QSlider * cb=qobject_cast<QSlider *>(widget))
+    {
+        connect(cb,SIGNAL(sliderMoved(int)),this,SLOT(widgetsContentsChanged()));
+    }
+    else if(MixerCurveWidget * cb=qobject_cast<MixerCurveWidget *>(widget))
+    {
+        connect(cb,SIGNAL(curveUpdated(QList<double>,double)),this,SLOT(widgetsContentsChanged()));
+    }
+    else if(QTableWidget * cb=qobject_cast<QTableWidget *>(widget))
+    {
+        connect(cb,SIGNAL(cellChanged(int,int)),this,SLOT(widgetsContentsChanged()));
+    }
+    else if(QSpinBox * cb=qobject_cast<QSpinBox *>(widget))
+    {
+        connect(cb,SIGNAL(valueChanged(int)),this,SLOT(widgetsContentsChanged()));
+    }
+    else if(QDoubleSpinBox * cb=qobject_cast<QDoubleSpinBox *>(widget))
+    {
+        connect(cb,SIGNAL(valueChanged(double)),this,SLOT(widgetsContentsChanged()));
+    }
+    else if(QCheckBox * cb=qobject_cast<QCheckBox *>(widget))
+    {
+        connect(cb,SIGNAL(clicked()),this,SLOT(widgetsContentsChanged()));
+    }
+    else if(QPushButton * cb=qobject_cast<QPushButton *>(widget))
+    {
+        connect(cb,SIGNAL(clicked()),this,SLOT(widgetsContentsChanged()));
+    }
+
+}
+
 
 ConfigTaskWidget::~ConfigTaskWidget()
 {
-    // Do nothing
+    delete smartsave;
 }
 
 void ConfigTaskWidget::saveObjectToSD(UAVObject *obj)
@@ -67,14 +148,155 @@ double ConfigTaskWidget::listMean(QList<double> list)
 
 void ConfigTaskWidget::onAutopilotDisconnect()
 {
-        enableControls(false);
+    isConnected=false;
+    enableControls(false);
 }
 
 void ConfigTaskWidget::onAutopilotConnect()
 {
-        enableControls(true);
-        refreshValues();
+    dirty=false;
+    isConnected=true;
+    enableControls(true);
+    refreshWidgetsValues();
 }
+
+void ConfigTaskWidget::populateWidgets()
+{
+    bool dirtyBack=dirty;
+    foreach(objectToWidget * ow,objOfInterest)
+    {
+        if(ow->object==NULL || ow->field==NULL)
+        {
+            // do nothing
+        }
+        else if(QComboBox * cb=qobject_cast<QComboBox *>(ow->widget))
+        {
+            cb->addItems(ow->field->getOptions());
+            cb->setCurrentIndex(cb->findText(ow->field->getValue(ow->index).toString()));
+        }
+        else if(QLabel * cb=qobject_cast<QLabel *>(ow->widget))
+        {
+            cb->setText(ow->field->getValue(ow->index).toString());
+        }
+        else if(QSpinBox * cb=qobject_cast<QSpinBox *>(ow->widget))
+        {
+            cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
+        }
+    }
+    setDirty(dirtyBack);
+}
+
+void ConfigTaskWidget::refreshWidgetsValues()
+{
+    bool dirtyBack=dirty;
+    foreach(objectToWidget * ow,objOfInterest)
+    {
+        if(ow->object==NULL || ow->field==NULL)
+        {
+            //do nothing
+        }
+        else if(QComboBox * cb=qobject_cast<QComboBox *>(ow->widget))
+        {
+            cb->setCurrentIndex(cb->findText(ow->field->getValue(ow->index).toString()));
+        }
+        else if(QLabel * cb=qobject_cast<QLabel *>(ow->widget))
+        {
+            cb->setText(ow->field->getValue(ow->index).toString());
+        }
+        else if(QSpinBox * cb=qobject_cast<QSpinBox *>(ow->widget))
+        {
+            cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
+        }
+    }
+    setDirty(dirtyBack);
+}
+
+void ConfigTaskWidget::updateObjectsFromWidgets()
+{
+    foreach(objectToWidget * ow,objOfInterest)
+    {
+        if(ow->object==NULL || ow->field==NULL)
+        {
+            //do nothing
+        }
+        else if(QComboBox * cb=qobject_cast<QComboBox *>(ow->widget))
+        {
+                ow->field->setValue(cb->currentText(),ow->index);
+        }
+        else if(QLabel * cb=qobject_cast<QLabel *>(ow->widget))
+        {
+            ow->field->setValue(cb->text(),ow->index);
+        }
+        else if(QSpinBox * cb=qobject_cast<QSpinBox *>(ow->widget))
+        {
+            ow->field->setValue(cb->value()* ow->scale,ow->index);
+        }
+    }
+}
+
+void ConfigTaskWidget::setupButtons(QPushButton *update, QPushButton *save)
+{
+    smartsave=new smartSaveButton(update,save);
+    connect(smartsave,SIGNAL(preProcessOperations()), this, SLOT(updateObjectsFromWidgets()));
+    connect(smartsave,SIGNAL(saveSuccessfull()),this,SLOT(clearDirty()));
+    connect(smartsave,SIGNAL(beginOp()),this,SLOT(disableObjUpdates()));
+    connect(smartsave,SIGNAL(endOp()),this,SLOT(enableObjUpdates()));
+    enableControls(false);
+}
+
+void ConfigTaskWidget::enableControls(bool enable)
+{
+    if(smartsave)
+        smartsave->enableControls(enable);
+}
+
+void ConfigTaskWidget::widgetsContentsChanged()
+{
+    setDirty(true);
+}
+
+void ConfigTaskWidget::clearDirty()
+{
+    setDirty(false);
+}
+void ConfigTaskWidget::setDirty(bool value)
+{
+    dirty=value;
+}
+bool ConfigTaskWidget::isDirty()
+{
+    if(isConnected)
+        return dirty;
+    else
+        return false;
+}
+
+void ConfigTaskWidget::refreshValues()
+{
+}
+
+void ConfigTaskWidget::disableObjUpdates()
+{
+    foreach(objectToWidget * obj,objOfInterest)
+    {
+        if(obj->object)
+            disconnect(obj->object, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
+    }
+}
+
+void ConfigTaskWidget::enableObjUpdates()
+{
+    foreach(objectToWidget * obj,objOfInterest)
+    {
+        if(obj->object)
+            connect(obj->object, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
+    }
+}
+
+
+
+
+
 
 
 

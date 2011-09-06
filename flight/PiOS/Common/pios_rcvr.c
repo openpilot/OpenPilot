@@ -76,8 +76,20 @@ out_fail:
   return(-1);
 }
 
+/**
+ * @brief Reads an input channel from the appropriate driver
+ * @param[in] rcvr_id driver to read from
+ * @param[in] channel channel to read
+ * @returns Unitless input value
+ *  @retval PIOS_RCVR_TIMEOUT indicates a failsafe or timeout from that channel
+ *  @retval PIOS_RCVR_INVALID invalid channel for this driver (usually out of range supported)
+ *  @retval PIOS_RCVR_NODRIVER driver was not initialized
+ */
 int32_t PIOS_RCVR_Read(uint32_t rcvr_id, uint8_t channel)
 {
+  if (rcvr_id == 0) 
+    return PIOS_RCVR_NODRIVER;
+
   struct pios_rcvr_dev * rcvr_dev = (struct pios_rcvr_dev *)rcvr_id;
 
   if (!PIOS_RCVR_validate(rcvr_dev)) {

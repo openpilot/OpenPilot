@@ -260,12 +260,12 @@ static int32_t PIOS_SPEKTRUM_Get(uint32_t rcvr_id, uint8_t channel)
 {
 	struct pios_spektrum_dev * spektrum_dev = (struct pios_spektrum_dev *)rcvr_id;
 
-	bool valid = PIOS_SPEKTRUM_validate(spektrum_dev);
-	PIOS_Assert(valid);
+	if(!PIOS_SPEKTRUM_validate(spektrum_dev))
+		return PIOS_RCVR_INVALID;
 
 	/* Return error if channel not available */
 	if (channel >= PIOS_SPEKTRUM_NUM_INPUTS) {
-		return -1;
+		return PIOS_RCVR_INVALID;
 	}
 	return spektrum_dev->fsm.CaptureValue[channel];
 }
@@ -334,8 +334,8 @@ static void PIOS_SPEKTRUM_Supervisor(uint32_t spektrum_id)
 			/* signal lost */
 			fsm->sync_of = 0;
 			for (int i = 0; i < PIOS_SPEKTRUM_NUM_INPUTS; i++) {
-				fsm->CaptureValue[i] = 0;
-				fsm->CaptureValueTemp[i] = 0;
+				fsm->CaptureValue[i] = PIOS_RCVR_TIMEOUT;
+				fsm->CaptureValueTemp[i] = PIOS_RCVR_TIMEOUT;
 			}
 		}
 		spektrum_dev->supv_timer = 0;

@@ -2,16 +2,16 @@
     <object name="ManualControlSettings" singleinstance="true" settings="true">
         <description>Settings to indicate how to decode receiver input by @ref ManualControlModule.</description>
         <field name="ChannelGroups" units="Channel Group" type="enum" 
-	       elementnames="Roll,Pitch,Yaw,Throttle,FlightMode,Accessory0,Accessory1,Accessory2"
+	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Accessory0,Accessory1,Accessory2"
 	       options="PWM,PPM,Spektrum1,Spektrum2,S.Bus,GCS,None" defaultvalue="None"/>
 	<field name="ChannelNumber" units="channel" type="uint8" defaultvalue="255"
-	       elementnames="Roll,Pitch,Yaw,Throttle,FlightMode,Accessory0,Accessory1,Accessory2"/>
+	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Accessory0,Accessory1,Accessory2"/>
 	<field name="ChannelMin" units="us" type="int16" defaultvalue="1000"
-	       elementnames="Roll,Pitch,Yaw,Throttle,FlightMode,Accessory0,Accessory1,Accessory2"/>
+	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Accessory0,Accessory1,Accessory2"/>
 	<field name="ChannelNeutral" units="us" type="int16" defaultvalue="1500"
-	       elementnames="Roll,Pitch,Yaw,Throttle,FlightMode,Accessory0,Accessory1,Accessory2"/>
+	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Accessory0,Accessory1,Accessory2"/>
 	<field name="ChannelMax" units="us" type="int16" defaultvalue="2000"
-	       elementnames="Roll,Pitch,Yaw,Throttle,FlightMode,Accessory0,Accessory1,Accessory2"/>
+	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Accessory0,Accessory1,Accessory2"/>
 	       
         <field name="Arming" units="" type="enum" elements="1" options="Always Disarmed,Always Armed,Roll Left,Roll Right,Pitch Forward,Pitch Aft,Yaw Left,Yaw Right" defaultvalue="Always Disarmed"/>
 

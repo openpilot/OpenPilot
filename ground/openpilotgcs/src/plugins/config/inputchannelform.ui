@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>404</width>
-    <height>43</height>
+    <width>449</width>
+    <height>48</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,46 +26,6 @@
    <property name="verticalSpacing">
     <number>0</number>
    </property>
-   <item row="0" column="3">
-    <widget class="QLabel" name="legend2">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>Number</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="4">
-    <widget class="QLabel" name="legend3">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>Min</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLabel" name="legend0">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>Function</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QLabel" name="legend1">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>Group</string>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="1">
     <widget class="QLabel" name="channelName">
      <property name="sizePolicy">
@@ -95,16 +55,6 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="5">
-    <widget class="QLabel" name="legend4">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="text">
-      <string>Neutral</string>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="4">
     <widget class="QSpinBox" name="channelMin">
      <property name="maximum">
@@ -112,10 +62,40 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="5">
-    <widget class="QSpinBox" name="channelNeutral">
+   <item row="1" column="6">
+    <widget class="QSpinBox" name="channelMax">
      <property name="maximum">
       <number>9999</number>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="legend0">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Function</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3">
+    <widget class="QLabel" name="legend2">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Number</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLabel" name="legend1">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Receiver type</string>
      </property>
     </widget>
    </item>
@@ -129,10 +109,30 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="6">
-    <widget class="QSpinBox" name="channelMax">
-     <property name="maximum">
-      <number>9999</number>
+   <item row="0" column="4">
+    <widget class="QLabel" name="legend3">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Min</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="5">
+    <widget class="QLabel" name="legend4">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Neutral</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="5">
+    <widget class="QSlider" name="channelNeutral">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>

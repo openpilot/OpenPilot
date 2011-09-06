@@ -27,10 +27,41 @@
        <item row="0" column="0">
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="advancedPage">
-          <layout class="QVBoxLayout" name="verticalLayout_4"/>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <layout class="QVBoxLayout" name="channelSettings"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="configurationWizard">
+             <property name="text">
+              <string>Start Configuration Wizard</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="runCalibration">
+             <property name="text">
+              <string>Run Calibration</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </widget>
          <widget class="QWidget" name="wizard">
           <layout class="QVBoxLayout" name="verticalLayout_5">

@@ -116,8 +116,6 @@ private:
         QTimer * animate;
         void resetTxControls();
         void setMoveFromCommand(int command);
-        QPushButton * goWizard;
-        QPushButton * goSimpleWizard;
         bool isSimple;
         void goToWizard();
 private slots:

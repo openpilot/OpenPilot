@@ -46,7 +46,7 @@
 #define STICK_MIN_MOVE -8
 #define STICK_MAX_MOVE 8
 
-ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent),wizardStep(wizardWelcome),loop(NULL),skipflag(false),goWizard(NULL)
+ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent),wizardStep(wizardWelcome),loop(NULL),skipflag(false)
 {
     manualCommandObj = ManualControlCommand::GetInstance(getObjectManager());
     manualSettingsObj = ManualControlSettings::GetInstance(getObjectManager());
@@ -60,7 +60,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     foreach(QString name,manualSettingsObj->getFields().at(0)->getElementNames())
     {
         inputChannelForm * inp=new inputChannelForm(this,index==0);
-        m_config->advancedPage->layout()->addWidget(inp);
+        m_config->channelSettings->layout()->addWidget(inp);
         inp->ui->channelName->setText(name);
         addUAVObjectToWidgetRelation("ManualControlSettings","ChannelGroups",inp->ui->channelGroup,index);
         addUAVObjectToWidgetRelation("ManualControlSettings","ChannelNumber",inp->ui->channelNumber,index);
@@ -69,12 +69,8 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
         addUAVObjectToWidgetRelation("ManualControlSettings","ChannelMax",inp->ui->channelMax,index);
         ++index;
     }
-    goWizard=new QPushButton(tr("Start Wizard"),this);
-    m_config->advancedPage->layout()->addWidget(goWizard);
-    connect(goWizard,SIGNAL(clicked()),this,SLOT(goToNormalWizard()));
-    goSimpleWizard=new QPushButton(tr("Start Simple Wizard"),this);
-    m_config->advancedPage->layout()->addWidget(goSimpleWizard);
-    connect(goSimpleWizard,SIGNAL(clicked()),this,SLOT(goToSimpleWizard()));
+
+    connect(m_config->configurationWizard,SIGNAL(clicked()),this,SLOT(goToNormalWizard()));
 
     connect(m_config->wzNext,SIGNAL(clicked()),this,SLOT(wzNext()));
     connect(m_config->wzCancel,SIGNAL(clicked()),this,SLOT(wzCancel()));
@@ -98,8 +94,6 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addUAVObjectToWidgetRelation("ManualControlSettings","Arming",m_config->armControl);
     addUAVObjectToWidgetRelation("ManualControlSettings","ArmedTimeout",m_config->armTimeout,0,1000);
     connect( ManualControlCommand::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(moveFMSlider()));
-    addWidget(goWizard);
-    addWidget(goSimpleWizard);
     enableControls(false);
 
     populateWidgets();
@@ -912,11 +906,9 @@ void ConfigInputWidget::dimOtherControls(bool value)
 
 void ConfigInputWidget::enableControls(bool enable)
 {
-    if(goWizard)
-    {
-        goWizard->setEnabled(enable);
-        goSimpleWizard->setEnabled(enable);
-    }
+    m_config->configurationWizard->setEnabled(enable);
+    m_config->runCalibration->setEnabled(enable);
+
     ConfigTaskWidget::enableControls(enable);
 
 }

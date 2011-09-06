@@ -162,14 +162,10 @@ static int32_t PIOS_SPEKTRUM_UpdateFSM(struct pios_spektrum_fsm * fsm, uint8_t b
 {
 	fsm->bytecount++;
 	if (fsm->sync == 0) {
-		/* Known sync bytes, 0x01, 0x02, 0x12 */
+		/* Known sync bytes, 0x01, 0x02, 0x12, 0xb2 */
+		/* 0xb2 DX8 3bind pulses only */
 		if (fsm->bytecount == 2) {
-			if (b == 0x01) {
-				fsm->datalength=0; // 10bit
-				fsm->sync = 1;
-				fsm->bytecount = 2;
-			}
-			else if(b == 0x02) {
+			if ((b == 0x01) || (b == 0x02) || (b == 0xb2)) {
 				fsm->datalength=0; // 10bit
 				fsm->sync = 1;
 				fsm->bytecount = 2;
@@ -321,9 +317,9 @@ static void PIOS_SPEKTRUM_Supervisor(uint32_t spektrum_id)
 	bool valid = PIOS_SPEKTRUM_validate(spektrum_dev);
 	PIOS_Assert(valid);
 
-	/* 125hz */
+	/* 625hz */
 	spektrum_dev->supv_timer++;
-	if(spektrum_dev->supv_timer > 5) {
+	if(spektrum_dev->supv_timer > 4) {
 		/* sync between frames */
 		struct pios_spektrum_fsm * fsm = &(spektrum_dev->fsm);
 
@@ -332,8 +328,8 @@ static void PIOS_SPEKTRUM_Supervisor(uint32_t spektrum_id)
 		fsm->prev_byte = 0xFF;
 		fsm->frame_error = 0;
 		fsm->sync_of++;
-		/* watchdog activated after 100ms silence */
-		if (fsm->sync_of > 12) {
+		/* watchdog activated after 200ms silence */
+		if (fsm->sync_of > 30) {
 
 			/* signal lost */
 			fsm->sync_of = 0;

@@ -132,6 +132,9 @@ private slots:
         void dimOtherControls(bool value);
         void moveFMSlider();
         void invertControls();
+        void simpleCalibration(bool state);
+        void updateCalibration();
+        void settingsUpdated();
 protected:
         void resizeEvent(QResizeEvent *event);
         virtual void enableControls(bool enable);

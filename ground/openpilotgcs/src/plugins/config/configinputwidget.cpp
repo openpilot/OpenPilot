@@ -46,6 +46,8 @@
 #define STICK_MIN_MOVE -8
 #define STICK_MAX_MOVE 8
 
+QList<inputChannelForm*> inputList;
+
 ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent),wizardStep(wizardWelcome),loop(NULL),skipflag(false)
 {
     manualCommandObj = ManualControlCommand::GetInstance(getObjectManager());
@@ -56,9 +58,12 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     setupButtons(m_config->saveRCInputToRAM,m_config->saveRCInputToSD);
 
+    inputList.clear();
+
     int index=0;
     foreach(QString name,manualSettingsObj->getFields().at(0)->getElementNames())
     {
+        Q_ASSERT(index < ManualControlSettings::CHANNELGROUPS_NUMELEM);
         inputChannelForm * inp=new inputChannelForm(this,index==0);
         m_config->channelSettings->layout()->addWidget(inp);
         inp->ui->channelName->setText(name);
@@ -67,10 +72,13 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
         addUAVObjectToWidgetRelation("ManualControlSettings","ChannelMin",inp->ui->channelMin,index);
         addUAVObjectToWidgetRelation("ManualControlSettings","ChannelNeutral",inp->ui->channelNeutral,index);
         addUAVObjectToWidgetRelation("ManualControlSettings","ChannelMax",inp->ui->channelMax,index);
+        inputList.append(inp);
         ++index;
     }
 
     connect(m_config->configurationWizard,SIGNAL(clicked()),this,SLOT(goToNormalWizard()));
+    connect(m_config->runCalibration,SIGNAL(toggled(bool)),this, SLOT(simpleCalibration(bool)));
+    connect(manualSettingsObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(settingsUpdated()));
 
     connect(m_config->wzNext,SIGNAL(clicked()),this,SLOT(wzNext()));
     connect(m_config->wzCancel,SIGNAL(clicked()),this,SLOT(wzCancel()));
@@ -968,5 +976,90 @@ void ConfigInputWidget::moveFMSlider()
             m_config->fmsSlider->setValue(100);
         else
             m_config->fmsSlider->setValue(0);
+    }
+}
+
+void ConfigInputWidget::updateCalibration()
+{
+    bool changed = false;
+
+    manualCommandData=manualCommandObj->getData();
+    for(uint i=0;i<ManualControlSettings::CHANNELMAX_NUMELEM;++i)
+    {
+        if(manualSettingsData.ChannelMin[i]>manualCommandData.Channel[i])
+            manualSettingsData.ChannelMin[i]=manualCommandData.Channel[i];
+        if(manualSettingsData.ChannelMax[i]<manualCommandData.Channel[i])
+            manualSettingsData.ChannelMax[i]=manualCommandData.Channel[i];
+        manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
+    }
+
+    manualSettingsObj->setData(manualSettingsData);
+    manualSettingsObj->updated();
+    settingsUpdated();
+}
+
+void ConfigInputWidget::settingsUpdated()
+{
+    manualSettingsData=manualSettingsObj->getData();
+    Q_ASSERT(inputList.length() <= ManualControlSettings::CHANNELGROUPS_NUMELEM);
+
+    for(int i = 0; i < inputList.length(); i++) {
+        inputList[i]->ui->channelNeutral->setMaximum(manualSettingsData.ChannelMax[i]);
+        inputList[i]->ui->channelNeutral->setMinimum(manualSettingsData.ChannelMin[i]);
+        inputList[i]->ui->channelNeutral->setValue(manualSettingsData.ChannelNeutral[i]);
+    }
+}
+
+void ConfigInputWidget::simpleCalibration(bool enable)
+{
+    if (enable) {
+        QMessageBox msgBox;
+        msgBox.setText(tr("Arming Settings are now set to Always Disarmed for your safety."));
+        msgBox.setDetailedText(tr("You will have to reconfigure arming settings yourself afterwards."));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.exec();
+
+        manualCommandData = manualCommandObj->getData();
+
+        manualSettingsData=manualSettingsObj->getData();
+        manualSettingsData.Arming=ManualControlSettings::ARMING_ALWAYSDISARMED;
+        manualSettingsObj->setData(manualSettingsData);
+
+        for (int i = 0; i < ManualControlCommand::CHANNEL_NUMELEM; i++) {
+            manualSettingsData.ChannelMin[i] = manualCommandData.Channel[i];
+            manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
+            manualSettingsData.ChannelMax[i] = manualCommandData.Channel[i];
+        }
+
+        UAVObject::Metadata mdata= manualCommandObj->getMetadata();
+        mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+        mdata.flightTelemetryUpdatePeriod = 150;
+        manualCommandObj->setMetadata(mdata);
+
+        connect(manualCommandObj, SIGNAL(objectUnpacked(UAVObject*)), this, SLOT(updateCalibration()));
+    } else {
+        manualCommandData = manualCommandObj->getData();
+        manualSettingsData = manualSettingsObj->getData();
+
+        manualCommandObj->setMetadata(manualCommandObj->getDefaultMetadata());
+
+        for (int i = 0; i < ManualControlCommand::CHANNEL_NUMELEM; i++)
+            manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
+
+        // Force flight mode neutral to middle
+        manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE] =
+                (manualSettingsData.ChannelMax[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE] +
+                manualSettingsData.ChannelMin[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE]) / 2;
+
+        // Force throttle to be near min
+        manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE]=
+                manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]+
+                ((manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE]-
+                  manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE])*0.02);
+
+        manualSettingsObj->setData(manualSettingsData);
+
+        disconnect(manualCommandObj, SIGNAL(objectUnpacked(UAVObject*)), this, SLOT(updateCalibration()));
     }
 }

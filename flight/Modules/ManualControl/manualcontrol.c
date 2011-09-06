@@ -398,8 +398,9 @@ static void resetRcvrActivity(struct rcvr_activity_fsm * fsm)
 }
 
 static void updateRcvrActivitySample(uint32_t rcvr_id, uint16_t samples[], uint8_t max_channels) {
-	for (uint8_t channel = 0; channel < max_channels; channel++) {
-		samples[channel] = PIOS_RCVR_Read(rcvr_id, channel);
+	for (uint8_t channel = 1; channel <= max_channels; channel++) {
+		// Subtract 1 because channels are 1 indexed
+		samples[channel - 1] = PIOS_RCVR_Read(rcvr_id, channel);
 	}
 }
 
@@ -408,12 +409,12 @@ static bool updateRcvrActivityCompare(uint32_t rcvr_id, struct rcvr_activity_fsm
 	bool activity_updated = false;
 
 	/* Compare the current value to the previous sampled value */
-	for (uint8_t channel = 0;
-	     channel < RCVR_ACTIVITY_MONITOR_CHANNELS_PER_GROUP;
+	for (uint8_t channel = 1;
+	     channel <= RCVR_ACTIVITY_MONITOR_CHANNELS_PER_GROUP;
 	     channel++) {
 		uint16_t delta;
-		uint16_t prev = fsm->prev[channel];
-		uint16_t curr = PIOS_RCVR_Read(rcvr_id, channel);
+		uint16_t prev = fsm->prev[channel - 1];   // Subtract 1 because channels are 1 indexed
+		uint16_t curr = PIOS_RCVR_Read(rcvr_id, channel); 
 		if (curr > prev) {
 			delta = curr - prev;
 		} else {

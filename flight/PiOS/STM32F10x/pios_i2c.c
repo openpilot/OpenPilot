@@ -908,7 +908,13 @@ out_fail:
 	return(-1);
 }
 
-bool PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], uint32_t num_txns)
+/**
+ * @brief Perform a series of I2C transactions
+ * @returns 0 if success or error code
+ * @retval -1 for failed transaction 
+ * @retval -2 for failure to get semaphore
+ */
+int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], uint32_t num_txns)
 {
 	struct pios_i2c_adapter * i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
 
@@ -978,7 +984,9 @@ bool PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[], ui
 		i2c_timeout_counter++;
 #endif /* USE_FREERTOS */
 
-	return (!i2c_adapter->bus_error) && semaphore_success;
+	return !semaphore_success ? -2 :
+		i2c_adapter->bus_error ? -1 :
+		0;
 }
 
 

@@ -305,7 +305,7 @@ bool PIOS_HMC5843_NewDataAvailable(void)
 * \param[in] len number of bytes which should be read
 * \return 0 if operation was successful
 * \return -1 if error during I2C transfer
-* \return -4 if invalid length
+* \return -2 if unable to claim i2c device
 */
 static bool PIOS_HMC5843_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 {
@@ -331,7 +331,7 @@ static bool PIOS_HMC5843_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 		 }
 	};
 
-	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list)) == 0;
+	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
 }
 
 /**
@@ -339,7 +339,8 @@ static bool PIOS_HMC5843_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 * \param[in] address Register address
 * \param[in] buffer source buffer
 * \return 0 if operation was successful
-* \return -1 if error during I2C transfer
+* \retval -1 if error during I2C transfer
+* \retval -2 if unable to claim i2c device
 */
 static bool PIOS_HMC5843_Write(uint8_t address, uint8_t buffer)
 {
@@ -359,7 +360,7 @@ static bool PIOS_HMC5843_Write(uint8_t address, uint8_t buffer)
 		,
 	};
 
-	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list)) == 0;
+	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
 }
 
 void PIOS_HMC5843_IRQHandler(void)

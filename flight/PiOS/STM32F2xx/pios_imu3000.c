@@ -168,7 +168,7 @@ int32_t PIOS_IMU3000_ReadFifo(struct pios_imu3000_data * buffer)
 * \param[in] len number of bytes which should be read
 * \return 0 if operation was successful
 * \return -1 if error during I2C transfer
-* \return -4 if invalid length
+* \return -2 if unable to claim i2c device
 */
 static int32_t PIOS_IMU3000_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 {
@@ -194,7 +194,7 @@ static int32_t PIOS_IMU3000_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 		 }
 	};
 
-	return PIOS_I2C_Transfer(PIOS_I2C_GYRO_ADAPTER, txn_list, NELEMENTS(txn_list)) ? 0 : -1;
+	return PIOS_I2C_Transfer(PIOS_I2C_GYRO_ADAPTER, txn_list, NELEMENTS(txn_list));
 }
 
 // Must allocate on stack to be persistent
@@ -227,18 +227,17 @@ static int32_t PIOS_IMU3000_Read_Callback(uint8_t address, uint8_t * buffer, uin
 	cb_txn_list[1].len = len;
 	cb_txn_list[1].buf = buffer;
 	
-	PIOS_I2C_Transfer_Callback(PIOS_I2C_GYRO_ADAPTER, cb_txn_list, NELEMENTS(cb_txn_list), callback);
-	
-	return  0;
+	return PIOS_I2C_Transfer_Callback(PIOS_I2C_GYRO_ADAPTER, cb_txn_list, NELEMENTS(cb_txn_list), callback);
 }
 
 /**
-* @brief Writes one or more bytes to the IMU3000
-* \param[in] address Register address
-* \param[in] buffer source buffer
-* \return 0 if operation was successful
-* \return -1 if error during I2C transfer
-*/
+ * @brief Writes one or more bytes to the IMU3000
+ * \param[in] address Register address
+ * \param[in] buffer source buffer
+ * \return 0 if operation was successful
+ * \return -1 if error during I2C transfer
+ * \return -2 if unable to claim i2c device
+ */
 static int32_t PIOS_IMU3000_Write(uint8_t address, uint8_t buffer)
 {
 	uint8_t data[] = {
@@ -257,7 +256,7 @@ static int32_t PIOS_IMU3000_Write(uint8_t address, uint8_t buffer)
 		,
 	};
 
-	return PIOS_I2C_Transfer(PIOS_I2C_GYRO_ADAPTER, txn_list, NELEMENTS(txn_list)) ? 0 : -1;
+	return PIOS_I2C_Transfer(PIOS_I2C_GYRO_ADAPTER, txn_list, NELEMENTS(txn_list));
 }
 
 float PIOS_IMU3000_GetScale() 

@@ -52,10 +52,11 @@ class ConfigInputWidget: public ConfigTaskWidget
 public:
         ConfigInputWidget(QWidget *parent = 0);
         ~ConfigInputWidget();
-        enum wizardSteps{wizardWelcome,wizardChooseMode,wizardIdentifySticks,wizardIdentifyCenter,wizardIdentifyLimits,wizardIdentifyInverted,wizardFinish};
+        enum wizardSteps{wizardWelcome,wizardChooseMode,wizardChooseType,wizardIdentifySticks,wizardIdentifyCenter,wizardIdentifyLimits,wizardIdentifyInverted,wizardFinish};
         enum txMode{mode1,mode2};
         enum txMovements{moveLeftVerticalStick,moveRightVerticalStick,moveLeftHorizontalStick,moveRightHorizontalStick,moveAccess0,moveAccess1,moveAccess2,moveFlightMode,centerAll,moveAll,nothing};
         enum txMovementType{vertical,horizontal,jump,mix};
+        enum txType {acro, heli};
 public slots:
 
 private:
@@ -68,6 +69,7 @@ private:
         void setupWizardWidget(int step);
         QList<QWidget*> extraWidgets;
         txMode transmitterMode;
+        txType transmitterType;
         struct channelsStruct
         {
             bool operator ==(const channelsStruct& rhs) const
@@ -118,6 +120,7 @@ private:
         void setMoveFromCommand(int command);
         bool isSimple;
         void goToWizard();
+        int getChannelFromStep(int);
 private slots:
         void wzNext();
         void wzBack();

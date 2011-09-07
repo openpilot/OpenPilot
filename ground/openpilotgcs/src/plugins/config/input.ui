@@ -27,7 +27,7 @@
        <item row="0" column="0">
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="advancedPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -78,13 +78,6 @@
                <width>0</width>
                <height>70</height>
               </size>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
              </property>
              <property name="text">
               <string>TextLabel</string>

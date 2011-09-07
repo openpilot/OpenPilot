@@ -48,7 +48,7 @@
 
 QList<inputChannelForm*> inputList;
 
-ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent),wizardStep(wizardWelcome),loop(NULL),skipflag(false)
+ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent),wizardStep(wizardWelcome),loop(NULL),skipflag(false),transmitterType(heli)
 {
     manualCommandObj = ManualControlCommand::GetInstance(getObjectManager());
     manualSettingsObj = ManualControlSettings::GetInstance(getObjectManager());
@@ -296,6 +296,7 @@ void ConfigInputWidget::wzCancel()
     case wizardWelcome:
         break;
     case wizardChooseMode:
+    case wizardChooseType:
         break;
     case wizardIdentifySticks:
         disconnect(receiverActivityObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyControls()));
@@ -323,7 +324,12 @@ void ConfigInputWidget::wzNext()
 
 void ConfigInputWidget::wzBack()
 {
-    setupWizardWidget(wizardStep-1);
+    if(wizardStep == wizardIdentifySticks && currentCommand != 0) {
+        currentCommand --;
+        usedChannels.removeLast();
+        getChannelFromStep(currentCommand);
+    } else
+        setupWizardWidget(wizardStep-1);
 }
 
 void ConfigInputWidget::setupWizardWidget(int step)
@@ -372,9 +378,8 @@ void ConfigInputWidget::setupWizardWidget(int step)
         m_config->checkBoxesLayout->layout()->addWidget(mode2);
         wizardStep=wizardChooseMode;
     }
-    else if(step==wizardIdentifySticks && !isSimple)
+    else if(step==wizardChooseType)
     {
-        usedChannels.clear();
         if(wizardStep==wizardChooseMode)
         {
             QRadioButton * mode=qobject_cast<QRadioButton *>(extraWidgets.at(0));
@@ -382,32 +387,49 @@ void ConfigInputWidget::setupWizardWidget(int step)
                 transmitterMode=mode1;
             else
                 transmitterMode=mode2;
+            delete extraWidgets.at(0);
+            delete extraWidgets.at(1);
+            extraWidgets.clear();
+        }
+
+        m_config->wzText->setText(tr("Please choose your transmiter mode.\n"
+                                     "Acro means normal transmitter\n"
+                                     "Heli means there is a collective pitch and throttle input\n"));
+        m_config->wzBack->setEnabled(true);
+        QRadioButton * typeAcro=new QRadioButton(tr("Acro"),this);
+        QRadioButton * typeHeli=new QRadioButton(tr("Heli"),this);
+        typeAcro->setChecked(true);
+        typeHeli->setChecked(false);
+        extraWidgets.clear();
+        extraWidgets.append(typeAcro);
+        extraWidgets.append(typeHeli);
+        m_config->checkBoxesLayout->layout()->addWidget(typeAcro);
+        m_config->checkBoxesLayout->layout()->addWidget(typeHeli);
+        wizardStep=wizardChooseType;
+    } else if(step==wizardIdentifySticks && !isSimple) {
+        usedChannels.clear();
+        if(wizardStep==wizardChooseType)
+        {
+            qDebug() << "Chosing type";
+            QRadioButton * type=qobject_cast<QRadioButton *>(extraWidgets.at(0));
+            if(type->isChecked())
+                transmitterType=acro;
+            else
+                transmitterType=heli;
+            qDebug() << "Checked: " << type->isChecked() << " " << "type is" << transmitterType;
             delete extraWidgets.at(0);
             delete extraWidgets.at(1);
             extraWidgets.clear();
         }
         wizardStep=wizardIdentifySticks;
         currentCommand=0;
-        setMoveFromCommand(currentCommand);
-        m_config->wzText->setText(QString(tr("Please move each control once at a time according to the instructions and picture below.\n\n"
-                                             "Move the %1 stick")).arg(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(currentCommand)));
+        getChannelFromStep(currentCommand);
         manualSettingsData=manualSettingsObj->getData();
         connect(receiverActivityObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyControls()));
         m_config->wzNext->setEnabled(false);
     }
     else if(step==wizardIdentifyCenter || (isSimple && step==wizardIdentifySticks))
     {
-        if(wizardStep==wizardChooseMode)
-        {
-            QRadioButton * mode=qobject_cast<QRadioButton *>(extraWidgets.at(0));
-            if(mode->isChecked())
-                transmitterMode=mode1;
-            else
-                transmitterMode=mode2;
-            delete extraWidgets.at(0);
-            delete extraWidgets.at(1);
-            extraWidgets.clear();
-        }
         setTxMovement(centerAll);
         if(wizardStep==wizardIdentifySticks)
             disconnect(receiverActivityObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyControls()));
@@ -528,9 +550,41 @@ void ConfigInputWidget::setupWizardWidget(int step)
 
 }
 
+/**
+  * Unfortunately order of channel should be different in different conditions
+  */
+int ConfigInputWidget::getChannelFromStep(int currentStep)
+{
+    int channelToSet;
+    if(transmitterType == heli) {
+        // For heli swap order of collective to beginning
+        qDebug() << "Transmitter type: " << heli << " channelToSet: " << currentStep;
+        if(currentStep == 0)
+            channelToSet = ManualControlSettings::CHANNELGROUPS_COLLECTIVE;
+        else if(currentStep <= ManualControlSettings::CHANNELGROUPS_COLLECTIVE)
+            channelToSet = currentStep - 1;
+        else channelToSet = currentStep;
+        qDebug() << "Channel to set: " << channelToSet;
+    } else
+        channelToSet = currentStep;
+
+    Q_ASSERT(channelToSet >= 0 && channelToSet < ManualControlSettings::CHANNELGROUPS_NUMELEM);
+
+    if(channelToSet == ManualControlSettings::CHANNELGROUPS_COLLECTIVE)
+        m_config->wzText->setText(QString(tr("Please enable throttle hold mode and move the collective pitch stick")));
+    else
+        m_config->wzText->setText(QString(tr("Please move each control once at a time according to the instructions and picture below.\n\n"
+                                     "Move the %1 stick")).arg(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(channelToSet)));
+
+    return channelToSet;
+}
+
 void ConfigInputWidget::identifyControls()
 {
     static int debounce=0;
+
+    int channelToSet = getChannelFromStep(currentCommand);
+
     receiverActivityData=receiverActivityObj->getData();
     if(receiverActivityData.ActiveChannel==255)
         return;
@@ -548,22 +602,21 @@ void ConfigInputWidget::identifyControls()
             debounce=0;
             usedChannels.append(lastChannel);
             manualSettingsData=manualSettingsObj->getData();
-            manualSettingsData.ChannelGroups[currentCommand]=currentChannel.group;
-            manualSettingsData.ChannelNumber[currentCommand]=currentChannel.number;
+            manualSettingsData.ChannelGroups[channelToSet]=currentChannel.group;
+            manualSettingsData.ChannelNumber[channelToSet]=currentChannel.number;
             manualSettingsObj->setData(manualSettingsData);
         }
         else
             return;
     }
     ++currentCommand;
-    setMoveFromCommand(currentCommand);
+    channelToSet = getChannelFromStep(currentCommand);
+    setMoveFromCommand(channelToSet);
     if(currentCommand>ManualControlSettings::CHANNELGROUPS_NUMELEM-1)
     {
         disconnect(receiverActivityObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyControls()));
         m_config->wzNext->setEnabled(true);
     }
-    m_config->wzText->setText(QString(tr("Please move each control once at a time according to the instructions and picture below.\n\n"
-                                         "Move the %1 stick")).arg(manualSettingsObj->getFields().at(0)->getElementNames().at(currentCommand)));
     if(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(currentCommand).contains("Accessory") ||
        manualSettingsObj->getField("ChannelGroups")->getElementNames().at(currentCommand).contains("Collective"))
     {
@@ -601,6 +654,13 @@ void ConfigInputWidget::setMoveFromCommand(int command)
             setTxMovement(moveLeftHorizontalStick);
     }
     else if(command==ManualControlSettings::CHANNELNUMBER_THROTTLE)
+    {
+        if(transmitterMode==mode2)
+            setTxMovement(moveLeftVerticalStick);
+        else
+            setTxMovement(moveRightVerticalStick);
+    }
+    else if(command==ManualControlSettings::CHANNELNUMBER_COLLECTIVE)
     {
         if(transmitterMode==mode2)
             setTxMovement(moveLeftVerticalStick);

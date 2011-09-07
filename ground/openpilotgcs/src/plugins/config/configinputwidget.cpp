@@ -78,7 +78,6 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
     connect(m_config->configurationWizard,SIGNAL(clicked()),this,SLOT(goToNormalWizard()));
     connect(m_config->runCalibration,SIGNAL(toggled(bool)),this, SLOT(simpleCalibration(bool)));
-    connect(manualSettingsObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(settingsUpdated()));
 
     connect(m_config->wzNext,SIGNAL(clicked()),this,SLOT(wzNext()));
     connect(m_config->wzCancel,SIGNAL(clicked()),this,SLOT(wzCancel()));
@@ -565,7 +564,8 @@ void ConfigInputWidget::identifyControls()
     }
     m_config->wzText->setText(QString(tr("Please move each control once at a time according to the instructions and picture below.\n\n"
                                          "Move the %1 stick")).arg(manualSettingsObj->getFields().at(0)->getElementNames().at(currentCommand)));
-    if(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(currentCommand).contains("Accessory"))
+    if(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(currentCommand).contains("Accessory") ||
+       manualSettingsObj->getField("ChannelGroups")->getElementNames().at(currentCommand).contains("Collective"))
     {
         m_config->wzNext->setEnabled(true);
     }
@@ -981,8 +981,6 @@ void ConfigInputWidget::moveFMSlider()
 
 void ConfigInputWidget::updateCalibration()
 {
-    bool changed = false;
-
     manualCommandData=manualCommandObj->getData();
     for(uint i=0;i<ManualControlSettings::CHANNELMAX_NUMELEM;++i)
     {
@@ -995,19 +993,6 @@ void ConfigInputWidget::updateCalibration()
 
     manualSettingsObj->setData(manualSettingsData);
     manualSettingsObj->updated();
-    settingsUpdated();
-}
-
-void ConfigInputWidget::settingsUpdated()
-{
-    manualSettingsData=manualSettingsObj->getData();
-    Q_ASSERT(inputList.length() <= ManualControlSettings::CHANNELGROUPS_NUMELEM);
-
-    for(int i = 0; i < inputList.length(); i++) {
-        inputList[i]->ui->channelNeutral->setMaximum(manualSettingsData.ChannelMax[i]);
-        inputList[i]->ui->channelNeutral->setMinimum(manualSettingsData.ChannelMin[i]);
-        inputList[i]->ui->channelNeutral->setValue(manualSettingsData.ChannelNeutral[i]);
-    }
 }
 
 void ConfigInputWidget::simpleCalibration(bool enable)
@@ -1026,7 +1011,7 @@ void ConfigInputWidget::simpleCalibration(bool enable)
         manualSettingsData.Arming=ManualControlSettings::ARMING_ALWAYSDISARMED;
         manualSettingsObj->setData(manualSettingsData);
 
-        for (int i = 0; i < ManualControlCommand::CHANNEL_NUMELEM; i++) {
+        for (unsigned int i = 0; i < ManualControlCommand::CHANNEL_NUMELEM; i++) {
             manualSettingsData.ChannelMin[i] = manualCommandData.Channel[i];
             manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
             manualSettingsData.ChannelMax[i] = manualCommandData.Channel[i];

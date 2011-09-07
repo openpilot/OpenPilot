@@ -134,7 +134,6 @@ private slots:
         void invertControls();
         void simpleCalibration(bool state);
         void updateCalibration();
-        void settingsUpdated();
 protected:
         void resizeEvent(QResizeEvent *event);
         virtual void enableControls(bool enable);

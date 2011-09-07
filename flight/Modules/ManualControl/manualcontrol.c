@@ -278,6 +278,7 @@ static void manualControlTask(void *parameters)
 				cmd.Roll = 0;
 				cmd.Yaw = 0;
 				cmd.Pitch = 0;
+				cmd.Collective = 0;
 				//cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO; // don't do until AUTO implemented and functioning
 				// Important: Throttle < 0 will reset Stabilization coefficients among other things. Either change this,
 				// or leave throttle at IDLE speed or above when going into AUTO-failsafe.
@@ -316,6 +317,11 @@ static void manualControlTask(void *parameters)
 				cmd.Throttle       = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE];
 				flightMode         = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE];
 
+				if(cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_COLLECTIVE] != PIOS_RCVR_INVALID &&
+				   cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_COLLECTIVE] != PIOS_RCVR_NODRIVER &&
+				   cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_COLLECTIVE] != PIOS_RCVR_TIMEOUT)
+					cmd.Collective = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_COLLECTIVE];
+				   
 				AccessoryDesiredData accessory;
 				// Set Accessory 0
 				if (settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_ACCESSORY0] != 

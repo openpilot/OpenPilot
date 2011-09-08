@@ -29,6 +29,12 @@ typedef enum _HID_REQUESTS {
 	SET_PROTOCOL
 } HID_REQUESTS;
 
+typedef enum CDC_REQUESTS {
+	SET_LINE_CODING = 0x20,
+	GET_LINE_CODING = 0x21,
+	SET_CONTROL_LINE_STATE = 0x23,
+} CDC_REQUESTS;
+
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */

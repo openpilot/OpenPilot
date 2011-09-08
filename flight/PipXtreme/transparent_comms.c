@@ -74,7 +74,7 @@ void trans_process(void)
         if (PIOS_USB_HID_CheckAvailable(0))
         {	// USB comms is up, use the USB comm-port instead of the USART comm-port
             usb_comms = true;
-            comm_port = PIOS_COM_TELEM_USB;
+            comm_port = PIOS_COM_TELEM_USB_HID;
         }
     #endif
 

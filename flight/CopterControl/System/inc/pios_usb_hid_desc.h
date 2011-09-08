@@ -33,7 +33,7 @@
 #define PIOS_HID_OFF_HID_DESC                  0x12
 
 #define PIOS_HID_SIZ_DEVICE_DESC               18
-#define PIOS_HID_SIZ_CONFIG_DESC               41
+#define PIOS_HID_SIZ_CONFIG_DESC               107
 #define PIOS_HID_SIZ_REPORT_DESC               36
 #define PIOS_HID_SIZ_STRING_LANGID             4
 #define PIOS_HID_SIZ_STRING_VENDOR             28

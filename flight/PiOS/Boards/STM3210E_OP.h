@@ -152,8 +152,11 @@ extern uint32_t pios_com_telem_rf_id;
 extern uint32_t pios_com_gps_id;
 #define PIOS_COM_GPS                    (pios_com_gps_id)
 
-extern uint32_t pios_com_telem_usb_id;
-#define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
+extern uint32_t pios_com_telem_usb_hid_id;
+#define PIOS_COM_TELEM_USB_HID          (pios_com_telem_usb_hid_id)
+
+extern uint32_t pios_com_telem_usb_cdc_id;
+#define PIOS_COM_TELEM_USB_CDC          (pios_com_telem_usb_cdc_id)
 
 #ifdef PIOS_ENABLE_AUX_UART
 extern uint32_t pios_com_aux_id;
@@ -309,8 +312,9 @@ extern uint32_t pios_com_aux_id;
 // USB
 //-------------------------
 #define PIOS_USB_ENABLED                        1
-#define PIOS_USB_HID_MAX_DEVS                   1
 #define PIOS_USB_DETECT_GPIO_PORT               GPIOC
+#define PIOS_USB_MAX_DEVS                       1
+#define PIOS_USB_COM_MAX_DEVS                   1
 #define PIOS_USB_DETECT_GPIO_PIN                GPIO_Pin_4
 #define PIOS_USB_DETECT_EXTI_LINE               EXTI_Line4
 #define PIOS_IRQ_USB_PRIORITY                   PIOS_IRQ_PRIO_MID

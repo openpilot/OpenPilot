@@ -156,8 +156,8 @@ extern uint32_t pios_com_serial_id;
 //#define PIOS_COM_DEBUG                  PIOS_COM_SERIAL           // uncomment this to send debug info out the serial port
 
 #if defined(PIOS_INCLUDE_USB_HID)
-extern uint32_t pios_com_telem_usb_id;
-#define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
+extern uint32_t pios_com_telem_usb_hid_id;
+#define PIOS_COM_TELEM_USB_HID          (pios_com_telem_usb_hid_id)
 #endif
 
 #if defined(PIOS_COM_DEBUG)
@@ -393,12 +393,13 @@ extern uint32_t pios_com_telem_usb_id;
 
 #if defined(PIOS_INCLUDE_USB_HID)
 	#define PIOS_USB_ENABLED				1
-	#define PIOS_USB_HID_MAX_DEVS                   1
+	#define PIOS_USB_MAX_DEVS                       1
 	#define PIOS_USB_DETECT_GPIO_PORT		GPIO_IN_2_PORT
 	#define PIOS_USB_DETECT_GPIO_PIN		GPIO_IN_2_PIN
 	#define PIOS_USB_DETECT_EXTI_LINE		EXTI_Line4
 	#define PIOS_IRQ_USB_PRIORITY			8
 #endif
+#define PIOS_USB_COM_MAX_DEVS           1
 
 // *****************************************************************
 // RFM22

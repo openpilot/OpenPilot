@@ -32,9 +32,7 @@
 #ifndef PIOS_COM_PRIV_H
 #define PIOS_COM_PRIV_H
 
-#include <pios.h>
-
-extern int32_t PIOS_COM_ReceiveHandler(uint32_t com_id);
+//#include <pios.h>
 
 #endif /* PIOS_COM_PRIV_H */
 

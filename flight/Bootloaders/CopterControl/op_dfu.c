@@ -113,7 +113,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 #ifdef DEBUG_SSP
 	char str[63]= {0};
 	sprintf(str,"Received COMMAND:%d|",Command);
-	PIOS_COM_SendString(PIOS_COM_TELEM_USB,str);
+	PIOS_COM_SendString(PIOS_COM_TELEM_USB_HID,str);
 #endif
 	EchoReqFlag = (Command >> 7);
 	EchoAnsFlag = (Command >> 6) & 0x01;
@@ -324,11 +324,11 @@ void processComand(uint8_t *xReceive_Buffer) {
 	case Download_Req:
 #ifdef DEBUG_SSP
 		sprintf(str,"COMMAND:DOWNLOAD_REQ 1 Status=%d|",DeviceState);
-		PIOS_COM_SendString(PIOS_COM_TELEM_USB,str);
+		PIOS_COM_SendString(PIOS_COM_TELEM_USB_HID,str);
 #endif
 		if (DeviceState == DFUidle) {
 #ifdef DEBUG_SSP
-			PIOS_COM_SendString(PIOS_COM_TELEM_USB,"COMMAND:DOWNLOAD_REQ 1|");
+			PIOS_COM_SendString(PIOS_COM_TELEM_USB_HID,"COMMAND:DOWNLOAD_REQ 1|");
 #endif
 			downType = Data0;
 			downPacketTotal = Count;
@@ -442,7 +442,7 @@ uint32_t CalcFirmCRC() {
 
 }
 void sendData(uint8_t * buf, uint16_t size) {
-	PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB, buf, size);
+	PIOS_COM_SendBuffer(PIOS_COM_TELEM_USB_HID, buf, size);
 	if (DeviceState == downloading)
 		PIOS_DELAY_WaitmS(20);//this is an hack, we should check wtf is wrong with hid
 }

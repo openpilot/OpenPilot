@@ -27,9 +27,9 @@ const uint8_t PIOS_HID_DeviceDescriptor[PIOS_HID_SIZ_DEVICE_DESC] =
     USB_DEVICE_DESCRIPTOR_TYPE, // bDescriptorType
     0x00,                       // bcdUSB
     0x02,
-    0x00,                       // bDeviceClass
-    0x00,                       // bDeviceSubClass
-    0x00,                       // bDeviceProtocol
+    0xEF,                       // bDeviceClass (Misc)
+    0x02,                       // bDeviceSubClass (common)
+    0x01,                       // bDeviceProtocol (IAD)
     0x40,                       // bMaxPacketSize40
     (uint8_t)((PIOS_USB_VENDOR_ID) & 0xff),   // idVendor
     (uint8_t)((PIOS_USB_VENDOR_ID) >> 8),
@@ -51,17 +51,27 @@ const uint8_t PIOS_HID_ConfigDescriptor[PIOS_HID_SIZ_CONFIG_DESC] =
   {
     0x09,         // bLength: Configuation Descriptor size
     USB_CONFIGURATION_DESCRIPTOR_TYPE, // bDescriptorType: Configuration
-    PIOS_HID_SIZ_CONFIG_DESC,
-    // wTotalLength: Bytes returned
+    PIOS_HID_SIZ_CONFIG_DESC,	       // wTotalLength: Bytes returned
     0x00,
-    0x01,         // bNumInterfaces: 1 interface
+    0x03,         // bNumInterfaces: 3 interfaces
     0x01,         // bConfigurationValue: Configuration value
     0x00,         // iConfiguration: Index of string descriptor describing the configuration
     0xC0,         // bmAttributes: Bus powered
     0x7D,         // MaxPower 250 mA - needed to power the RF transmitter
 
+    // *************** Interface Association Descriptor *****************
+    // 9
+    0x08,	 /* bLength */
+    0x0B,	 /* bDescriptorType (IAD) */
+    0x01,	 /* bFirstInterface */
+    0x02,	 /* bInterfaceCount */
+    0x02,	 /* bFunctionClass (Communication Class) */
+    0x02,	 /* bFunctionSubClass (Abstract Control Model) */
+    0x00,	 /* bFunctionProtocol (V.25ter, Common AT commands) */
+    0x00,	 /* iInterface */
+
     // ************** Descriptor of Custom HID interface ****************
-    // 09
+    // 17
     0x09,         // bLength: Interface Descriptor size
     USB_INTERFACE_DESCRIPTOR_TYPE, // bDescriptorType: Interface descriptor type
     0x00,         // bInterfaceNumber: Number of Interface
@@ -73,19 +83,19 @@ const uint8_t PIOS_HID_ConfigDescriptor[PIOS_HID_SIZ_CONFIG_DESC] =
     0,            // iInterface: Index of string descriptor
 
     // ******************** Descriptor of Custom HID HID ********************
-    // 18
+    // 26
     0x09,         // bLength: HID Descriptor size
     HID_DESCRIPTOR_TYPE, // bDescriptorType: HID
     0x10,         // bcdHID: HID Class Spec release number
     0x01,
     0x00,         // bCountryCode: Hardware target country
-    0x01,         // bNumDescriptors: Number of HID class descriptors to follow
+    0x02,         // bNumDescriptors: Number of HID class descriptors to follow
     0x22,         // bDescriptorType
     PIOS_HID_SIZ_REPORT_DESC, // wItemLength: Total length of Report descriptor
     0x00,
 
     // ******************** Descriptor of Custom HID endpoints ******************
-    // 27
+    // 35
     0x07,          // bLength: Endpoint Descriptor size
     USB_ENDPOINT_DESCRIPTOR_TYPE, // bDescriptorType:
 
@@ -94,18 +104,102 @@ const uint8_t PIOS_HID_ConfigDescriptor[PIOS_HID_SIZ_CONFIG_DESC] =
     0x40,          // wMaxPacketSize: 2 Bytes max
     0x00,
     0x04,          // bInterval: Polling Interval in ms
-    // 34
-    	
+
+    // 42
     0x07,	// bLength: Endpoint Descriptor size
-    USB_ENDPOINT_DESCRIPTOR_TYPE,	// bDescriptorType:
-			// Endpoint descriptor type
-    0x01,	// bEndpointAddress:
-			//	Endpoint Address (OUT)
+    USB_ENDPOINT_DESCRIPTOR_TYPE,	// bDescriptorType: (Endpoint descriptor type)
+    0x01,	// bEndpointAddress: Endpoint Address (OUT)
     0x03,	// bmAttributes: Interrupt endpoint
     0x40,	// wMaxPacketSize: 2 Bytes max
     0x00,
     0x04,	// bInterval: Polling Interval in ms
-    // 41
+
+    // ************** Descriptor of CDC Control interface ****************
+    // 49
+    0x09,	/* bLength */
+    USB_INTERFACE_DESCRIPTOR_TYPE, /* bDescriptorType */
+    0x01,	/* bInterfaceNumber */
+    0x00,	/* bAlternateSetting */
+    0x01,	/* bNumEndpoints */
+    0x02,	/* bInterfaceClass (Communication Class) */
+    0x02,	/* bInterfaceSubClass (Abstract Control Model) */
+    0x01,	/* bFunctionProtocol (V.25ter, Common AT commands) */
+    0x00,	/* iInterface */
+
+    // ************** Header Functional Descriptor ****************
+    // 58
+    0x05,	/* bLength */
+    0x24,	/* bDescriptorType (Class Specific Interface) */
+    0x00,	/* bDescriptorSubtype (CDC Header Functional) */
+    0x10,	/* bcdCDC (CDC spec release number, 1.10 */
+    0x01,
+    
+    // ************** Call Management Functional Descriptor ****************
+    // 63
+    0x05,	/* bLength */
+    0x24,	/* bDescriptorType (Class Specific Interface) */
+    0x01,	/* bDescriptorSubtype (CDC Call Management) */
+    0x00,	/* bmCapabilities (No call handling) */
+    0x02,	/* bDataInterface (Interface number of Data Class Interface) */
+
+    // ************** Abstract Control Management Functional Descriptor ****************
+    // 68
+    0x04,	/* bLength */
+    0x24,	/* bDescriptorType (Class Specific Interface) */
+    0x02,	/* bDescriptorSubtype (CDC Abstract Control Management) */
+    0x00,	/* bmCapabilities */
+
+    // ************** Union Functional Descriptor ****************
+    // 72
+    0x05,	/* bLength */
+    0x24,	/* bDescriptorType (Class Specific Interface) */
+    0x06,	/* bDescriptorSubtype (CDC Union) */
+    0x01,	/* bMasterInterface (Interface number of master interface in the union) */
+    0x02,	/* bSlaveInterface (Interface number of slave interface in the union) */
+
+    // ************** Endpoint2 Functional Descriptor ****************
+    // 77
+    0x07,	/* bLength */
+    USB_ENDPOINT_DESCRIPTOR_TYPE,	// bDescriptorType (Endpoint)
+    0x82,	/* bEndpointAddress*/
+    0x03,	/* bmAttributes (Interrupt Endpoint) */
+    0x40,	/* wMaxPacketSize (bytes) */
+    0x00,
+    0x04,	/* bInterval (ms) */
+
+    // ************** Descriptor of CDC Data interface ****************
+    // 84
+    0x09,	/* bLength */
+    USB_INTERFACE_DESCRIPTOR_TYPE, /* bDescriptorType */
+    0x02,	/* bInterfaceNumber */
+    0x00,	/* bAlternateSetting */
+    0x02,	/* bNumEndpoints */
+    0x0A,	/* bInterfaceClass (Data Interface Class) */
+    0x00,	/* bInterfaceSubClass */
+    0x00,	/* bFunctionProtocol (No class specific protocol) */
+    0x00,	/* iInterface */
+
+    // ************** Endpoint3 Functional Descriptor ****************
+    // 93
+    0x07,	/* bLength */
+    USB_ENDPOINT_DESCRIPTOR_TYPE,	// bDescriptorType (Endpoint)
+    0x83,	/* bEndpointAddress*/
+    0x02,	/* bmAttributes (Bulk) */
+    0x40,	/* wMaxPacketSize (bytes) */
+    0x00,
+    0x00,	/* bInterval (ms) */
+
+    // ************** Endpoint3 Functional Descriptor ****************
+    // 100
+    0x07,	/* bLength */
+    USB_ENDPOINT_DESCRIPTOR_TYPE,	// bDescriptorType (Endpoint)
+    0x03,	/* bEndpointAddress*/
+    0x02,	/* bmAttributes (Bulk) */
+    0x40,	/* wMaxPacketSize (bytes) */
+    0x00,
+    0x00	/* bInterval (ms) */
+
+    // 107
   };
 
 // *************************************************
@@ -115,7 +209,7 @@ const uint8_t PIOS_HID_ConfigDescriptor[PIOS_HID_SIZ_CONFIG_DESC] =
     0x06, 0x9c, 0xff,      // USAGE_PAGE (Vendor Page: 0xFF00)
     0x09, 0x01,            // USAGE (Demo Kit)
     0xa1, 0x01,            // COLLECTION (Application)
-    // 6
+    // 7
     
     // Data 1
     0x85, 0x01,            //     REPORT_ID (1)
@@ -123,9 +217,9 @@ const uint8_t PIOS_HID_ConfigDescriptor[PIOS_HID_SIZ_CONFIG_DESC] =
     0x15, 0x00,            //     LOGICAL_MINIMUM (0)
     0x25, 0xff,            //     LOGICAL_MAXIMUM (255)
     0x75, 0x08,            //     REPORT_SIZE (8)
-    0x95, PIOS_USB_HID_DATA_LENGTH+1,            //     REPORT_COUNT (1)
+    0x95, PIOS_USB_COM_DATA_LENGTH+1,            //     REPORT_COUNT (1)
     0x81, 0x83,            //     INPUT (Const,Var,Array)
-    // 20
+    // 21
 	  
     // Data 1
     0x85, 0x02,            //     REPORT_ID (2)
@@ -133,9 +227,9 @@ const uint8_t PIOS_HID_ConfigDescriptor[PIOS_HID_SIZ_CONFIG_DESC] =
     0x15, 0x00,            //     LOGICAL_MINIMUM (0)
     0x25, 0xff,            //     LOGICAL_MAXIMUM (255)
     0x75, 0x08,            //     REPORT_SIZE (8)
-    0x95, PIOS_USB_HID_DATA_LENGTH+1,            //     REPORT_COUNT (1)
+    0x95, PIOS_USB_COM_DATA_LENGTH+1,            //     REPORT_COUNT (1)
     0x91, 0x82,            //     OUTPUT (Data,Var,Abs,Vol)
-    // 34
+    // 35
 	  
     0xc0 	          //     END_COLLECTION
   };

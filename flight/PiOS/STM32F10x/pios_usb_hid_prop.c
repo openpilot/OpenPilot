@@ -22,6 +22,7 @@
 #include "pios_usb_hid_desc.h"
 #include "pios_usb_hid_pwr.h"
 #include "pios_usb_hid.h"
+#include "pios_usb_com_priv.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -151,23 +152,46 @@ void PIOS_HID_Reset(void)
 #else
 	SetBTABLE(BTABLE_ADDRESS);
 
-	/* Initialize Endpoint 0 */
+	/* Initialize Endpoint 0 (Control) */
 	SetEPType(ENDP0, EP_CONTROL);
-	SetEPTxStatus(ENDP0, EP_TX_STALL);
-	SetEPRxAddr(ENDP0, ENDP0_RXADDR);
 	SetEPTxAddr(ENDP0, ENDP0_TXADDR);
+	SetEPTxStatus(ENDP0, EP_TX_STALL);
 	Clear_Status_Out(ENDP0);
+
+	SetEPRxAddr(ENDP0, ENDP0_RXADDR);
 	SetEPRxCount(ENDP0, Device_Property.MaxPacketSize);
 	SetEPRxValid(ENDP0);
 
-	/* Initialize Endpoint 1 */
+	/* Initialize Endpoint 1 (HID) */
 	SetEPType(ENDP1, EP_INTERRUPT);
 	SetEPTxAddr(ENDP1, ENDP1_TXADDR);
-	SetEPRxAddr(ENDP1, ENDP1_RXADDR);
-	SetEPTxCount(ENDP1, PIOS_USB_HID_DATA_LENGTH + 2);	/* add two for indicating report id and valid data length */
-	SetEPRxCount(ENDP1, PIOS_USB_HID_DATA_LENGTH + 2);
-	SetEPRxStatus(ENDP1, EP_RX_VALID);
+	SetEPTxCount(ENDP1, PIOS_USB_COM_DATA_LENGTH + 2);
 	SetEPTxStatus(ENDP1, EP_TX_NAK);
+
+	SetEPRxAddr(ENDP1, ENDP1_RXADDR);
+	SetEPRxCount(ENDP1, PIOS_USB_COM_DATA_LENGTH + 2);
+	SetEPRxStatus(ENDP1, EP_RX_VALID);
+
+#if defined(PIOS_INCLUDE_USB_COM_CDC)
+	/* Initialize Endpoint 2 (CDC Call Control) */
+	SetEPType(ENDP2, EP_INTERRUPT);
+	SetEPTxAddr(ENDP2, ENDP2_TXADDR);
+	SetEPTxStatus(ENDP2, EP_TX_NAK);
+
+	SetEPRxAddr(ENDP2, ENDP2_RXADDR);
+	SetEPRxCount(ENDP2, PIOS_USB_COM_DATA_LENGTH + 2);
+	SetEPRxStatus(ENDP2, EP_RX_DIS);
+
+	/* Initialize Endpoint 3 (CDC Data) */
+	SetEPType(ENDP3, EP_BULK);
+	SetEPTxAddr(ENDP3, ENDP3_TXADDR);
+	SetEPTxStatus(ENDP3, EP_TX_NAK);
+
+	SetEPRxAddr(ENDP3, ENDP3_RXADDR);
+	SetEPRxCount(ENDP3, PIOS_USB_COM_DATA_LENGTH + 2);
+	SetEPRxStatus(ENDP3, EP_RX_VALID);
+
+#endif	/* PIOS_INCLUDE_USB_COM_CDC */
 
 	/* Set this device to response on default address */
 	SetDeviceAddress(0);
@@ -178,8 +202,7 @@ void PIOS_HID_Reset(void)
 
 /*******************************************************************************
 * Function Name  : PIOS_HID_SetConfiguration.
-* Description    : Udpade the device state to configured and command the ADC 
-*                  conversion.
+* Description    : Update the device state to configured
 * Input          : None.
 * Output         : None.
 * Return         : None.
@@ -197,7 +220,7 @@ void PIOS_HID_SetConfiguration(void)
 
 /*******************************************************************************
 * Function Name  : PIOS_HID_SetConfiguration.
-* Description    : Udpade the device state to addressed.
+* Description    : Update the device state to addressed.
 * Input          : None.
 * Output         : None.
 * Return         : None.
@@ -242,23 +265,54 @@ RESULT PIOS_HID_Data_Setup(uint8_t RequestNo)
 
 	CopyRoutine = NULL;
 
-	if ((RequestNo == GET_DESCRIPTOR)
-	    && (Type_Recipient == (STANDARD_REQUEST | INTERFACE_RECIPIENT))
-	    && (pInformation->USBwIndex0 == 0)) {
-
-		if (pInformation->USBwValue1 == REPORT_DESCRIPTOR) {
-			CopyRoutine = PIOS_HID_GetReportDescriptor;
-		} else if (pInformation->USBwValue1 == HID_DESCRIPTOR_TYPE) {
-			CopyRoutine = PIOS_HID_GetHIDDescriptor;
+	switch (Type_Recipient) {
+	case (STANDARD_REQUEST | INTERFACE_RECIPIENT):
+		switch (pInformation->USBwIndex0) {
+		case 0:		/* HID Interface */
+			switch (RequestNo) {
+			case GET_DESCRIPTOR:
+				switch (pInformation->USBwValue1) {
+				case REPORT_DESCRIPTOR:
+					CopyRoutine = PIOS_HID_GetReportDescriptor;
+					break;
+				case HID_DESCRIPTOR_TYPE:
+					CopyRoutine = PIOS_HID_GetHIDDescriptor;
+					break;
+				}
+			}
 		}
+		break;
 
-	}
+	case (CLASS_REQUEST | INTERFACE_RECIPIENT):
+		switch (pInformation->USBwIndex0) {
+		case 0:		/* HID Interface */
+			switch (RequestNo) {
+			case GET_PROTOCOL:
+				CopyRoutine = PIOS_HID_GetProtocolValue;
+				break;
+			}
 
-	/* End of GET_DESCRIPTOR */
- /*** GET_PROTOCOL ***/
-	else if ((Type_Recipient == (CLASS_REQUEST | INTERFACE_RECIPIENT))
-		 && RequestNo == GET_PROTOCOL) {
-		CopyRoutine = PIOS_HID_GetProtocolValue;
+			break;
+#if defined(PIOS_INCLUDE_USB_COM_CDC)
+		case 1:		/* CDC Call Control Interface */
+			switch (RequestNo) {
+			case GET_LINE_CODING:
+				CopyRoutine = PIOS_CDC_GetLineCoding;
+				break;
+			}
+
+			break;
+
+		case 2:		/* CDC Data Interface */
+			switch (RequestNo) {
+			case 0:
+				break;
+			}
+
+			break;
+#endif	/* PIOS_INCLUDE_USB_COM_CDC */
+		}
+		break;
 	}
 
 	if (CopyRoutine == NULL) {
@@ -280,14 +334,37 @@ RESULT PIOS_HID_Data_Setup(uint8_t RequestNo)
 *******************************************************************************/
 RESULT PIOS_HID_NoData_Setup(uint8_t RequestNo)
 {
-	if ((Type_Recipient == (CLASS_REQUEST | INTERFACE_RECIPIENT))
-	    && (RequestNo == SET_PROTOCOL)) {
-		return PIOS_HID_SetProtocol();
+	switch (Type_Recipient) {
+	case (CLASS_REQUEST | INTERFACE_RECIPIENT):
+		switch (pInformation->USBwIndex0) {
+		case 0:		/* HID */
+			switch (RequestNo) {
+			case SET_PROTOCOL:
+				return PIOS_HID_SetProtocol();
+				break;
+			}
+
+			break;
+
+#if defined(PIOS_INCLUDE_USB_COM_CDC)
+		case 1:		/* CDC Call Control Interface */
+			switch (RequestNo) {
+			case SET_LINE_CODING:
+				return PIOS_CDC_SetLineCoding();
+				break;
+			case SET_CONTROL_LINE_STATE:
+				return PIOS_CDC_SetControlLineState();
+				break;
+			}
+
+			break;
+#endif	/* PIOS_INCLUDE_USB_COM_CDC */
+		}
+
+		break;
 	}
 
-	else {
-		return USB_UNSUPPORT;
-	}
+	return USB_UNSUPPORT;
 }
 
 /*******************************************************************************

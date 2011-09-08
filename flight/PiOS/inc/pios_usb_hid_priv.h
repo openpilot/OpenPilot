@@ -34,11 +34,11 @@
 #include <pios.h>
 #include <pios_stm32.h>
 
-struct pios_usb_hid_cfg {
+struct pios_usb_cfg {
 	struct stm32_irq irq;
 };
 
-extern int32_t PIOS_USB_HID_Init(uint32_t * usb_hid_id, const struct pios_usb_hid_cfg * cfg);
+extern int32_t PIOS_USB_Init(uint32_t * usb_id, const struct pios_usb_cfg * cfg);
 
 #endif /* PIOS_USB_HID_PRIV_H */
 

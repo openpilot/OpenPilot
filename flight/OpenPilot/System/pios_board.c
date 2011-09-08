@@ -1044,7 +1044,7 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 #if defined(PIOS_INCLUDE_USB_HID)
 #include "pios_usb_hid_priv.h"
 
-static const struct pios_usb_hid_cfg pios_usb_hid_main_cfg = {
+static const struct pios_usb_cfg pios_usb_main_cfg = {
   .irq = {
     .init    = {
       .NVIC_IRQChannel                   = USB_LP_CAN1_RX0_IRQn,
@@ -1056,10 +1056,21 @@ static const struct pios_usb_hid_cfg pios_usb_hid_main_cfg = {
 };
 #endif	/* PIOS_INCLUDE_USB_HID */
 
-extern const struct pios_com_driver pios_usb_com_driver;
+#if defined(PIOS_INCLUDE_USB_COM)
+#include <pios_usb_com_priv.h>
+
+const struct pios_usb_com_cfg pios_usb_com_hid_cfg = {
+	.type = PIOS_USB_COM_HID,
+	.data_if = 0,
+	.data_rx_ep = 1,
+	.data_tx_ep = 1,
+};
+
+#endif	/* PIOS_INCLUDE_USB_COM */
 
 uint32_t pios_com_telem_rf_id;
-uint32_t pios_com_telem_usb_id;
+uint32_t pios_com_telem_usb_hid_id;
+uint32_t pios_com_telem_usb_cdc_id;
 uint32_t pios_com_gps_id;
 uint32_t pios_com_aux_id;
 uint32_t pios_com_dsm_id;
@@ -1277,14 +1288,18 @@ void PIOS_Board_Init(void) {
 	}
 
 #if defined(PIOS_INCLUDE_USB_HID)
-	uint32_t pios_usb_hid_id;
-	PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_main_cfg);
+	uint32_t pios_usb_id;
+	PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);
 #if defined(PIOS_INCLUDE_COM)
+	uint32_t pios_usb_com_id;
+	if (PIOS_USB_COM_Init(&pios_usb_com_id, &pios_usb_com_hid_cfg, pios_usb_id)) {
+		PIOS_Assert(0);
+	}
 	uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
 	uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
 	PIOS_Assert(rx_buffer);
 	PIOS_Assert(tx_buffer);
-	if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_com_driver, pios_usb_hid_id,
+	if (PIOS_COM_Init(&pios_com_telem_usb_hid_id, &pios_usb_hid_com_driver, pios_usb_com_id,
 			  rx_buffer, PIOS_COM_TELEM_USB_RX_BUF_LEN,
 			  tx_buffer, PIOS_COM_TELEM_USB_TX_BUF_LEN)) {
 		PIOS_Assert(0);

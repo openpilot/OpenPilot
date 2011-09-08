@@ -55,7 +55,7 @@
 #endif
 
 /* Internal defines which are used by PIOS USB HID (don't touch) */
-#define PIOS_USB_EP_NUM			2
+#define PIOS_USB_EP_NUM			5
 
 /* Buffer table base address */
 #define PIOS_USB_BTABLE_ADDRESS		0x000

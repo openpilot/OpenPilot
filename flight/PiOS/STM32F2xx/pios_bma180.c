@@ -352,7 +352,12 @@ int32_t PIOS_BMA180_Test()
 }
 
 static uint8_t pios_bma180_dmabuf[8];
-static void PIOS_BMA180_SPI_Callback() 
+/**
+ * @brief Take data from BMA180 read and parse it into structure
+ * Leaving this function here in case I want to go back to using
+ * callback but at higher speed this it is faster to just transfer
+ */
+static inline void PIOS_BMA180_SPI_Callback() 
 {		
 	// TODO: Make this conversion depend on configuration scale
 	struct pios_bma180_data data;
@@ -381,12 +386,16 @@ static void PIOS_BMA180_SPI_Callback()
  * @brief IRQ Handler
  */
 const static uint8_t pios_bma180_req_buf[7] = {BMA_X_LSB_ADDR | 0x80,0,0,0,0,0};
+int32_t setup_time;
 static void PIOS_BMA180_IRQHandler(void)
 {
+	uint32_t timeval = PIOS_DELAY_GetRaw();
 	// If we can't get the bus then just move on for efficiency
 	if(PIOS_BMA180_ClaimBus() == 0)
 		PIOS_SPI_TransferBlock(PIOS_SPI_ACCEL,pios_bma180_req_buf,(uint8_t *) pios_bma180_dmabuf, 
-							   sizeof(pios_bma180_dmabuf), PIOS_BMA180_SPI_Callback);	
+							   sizeof(pios_bma180_dmabuf), NULL);	
+	setup_time = PIOS_DELAY_DiffuS(timeval);
+	PIOS_BMA180_SPI_Callback();
 }
 
 

@@ -490,7 +490,7 @@ static const struct pios_i2c_adapter_cfg pios_i2c_gyro_adapter_cfg = {
 		.I2C_Ack                 = I2C_Ack_Enable,
 		.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit,
 		.I2C_DutyCycle           = I2C_DutyCycle_2,
-		.I2C_ClockSpeed          = 1000000,	/* bits/s */
+		.I2C_ClockSpeed          = 400000,	/* bits/s */
 	},
 	.transfer_timeout_ms = 50,
 	.scl = {
@@ -660,7 +660,7 @@ static const struct pios_imu3000_cfg pios_imu3000_cfg = {
 	.Fifo_store = PIOS_IMU3000_FIFO_TEMP_OUT | PIOS_IMU3000_FIFO_GYRO_X_OUT | PIOS_IMU3000_FIFO_GYRO_Y_OUT 
 	| PIOS_IMU3000_FIFO_GYRO_Z_OUT | PIOS_IMU3000_FIFO_FOOTER,
 	// Clock at 8 khz, downsampled by 4 for 2khz
-	.Smpl_rate_div = 3, 
+	.Smpl_rate_div = 7, 
 	.Interrupt_cfg = PIOS_IMU3000_INT_DATA_RDY | PIOS_IMU3000_INT_CLR_ANYRD,
 	.User_ctl = PIOS_IMU3000_USERCTL_FIFO_EN,
 	.Pwr_mgmt_clk = PIOS_IMU3000_PWRMGMT_PLL_X_CLK,

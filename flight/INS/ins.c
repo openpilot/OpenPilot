@@ -317,6 +317,11 @@ void simple_update() {
  */
 static void print_ekf_binary()
 {
+	static uint32_t timeval;
+	uint16_t delay;
+	delay = PIOS_DELAY_DiffuS(timeval);
+	timeval = PIOS_DELAY_GetRaw();
+	
 	uint8_t framing[2] = { 0xff, 0x00 };
 	// Dump raw buffer
 	PIOS_COM_SendBuffer(PIOS_COM_AUX, &framing[0], sizeof(framing));
@@ -329,6 +334,7 @@ static void print_ekf_binary()
 	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & altitude_data.altitude, 4);
 	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &gyro_data.temperature, 4);
 	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &accel_data.temperature, 4);
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &delay, 2);
 	
 	mag_data.updated = 0;
 	altitude_data.updated = 0;

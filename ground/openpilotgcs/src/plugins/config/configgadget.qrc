@@ -15,6 +15,7 @@
         <file>images/coptercontrol.svg</file>
         <file>images/hw_config.png</file>
         <file>images/gyroscope.png</file>
+        <file>images/TX.svg</file>
         <file>images/camera.png</file>
     </qresource>
 </RCC>

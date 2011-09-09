@@ -69,12 +69,10 @@ private:
 
 	bool firstUpdate;
 
-        virtual void enableControls(bool enable);
 
 private slots:
-        virtual void refreshValues();
-	void sendRCOutputUpdate();
-	void saveRCOutputObject();
+        virtual void refreshWidgetsValues();
+        void updateObjectsFromWidgets();
 	void runChannelTests(bool state);
 	void sendChannelTest(int value);
 	void setChOutRange();

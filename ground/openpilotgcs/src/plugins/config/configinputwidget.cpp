@@ -1,8 +1,8 @@
 /**
  ******************************************************************************
  *
- * @file       configservowidget.cpp
- * @author     E. Lafargue & The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @file       configinputwidget.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
@@ -38,556 +38,923 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QMessageBox>
+#include <utils/stylehelper.h>
+#include <QMessageBox>
 
-#include "manualcontrolsettings.h"
+#define ACCESS_MIN_MOVE -6
+#define ACCESS_MAX_MOVE 6
+#define STICK_MIN_MOVE -8
+#define STICK_MAX_MOVE 8
 
-ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent)
+ConfigInputWidget::ConfigInputWidget(QWidget *parent) : ConfigTaskWidget(parent),wizardStep(wizardWelcome),loop(NULL),skipflag(false),goWizard(NULL)
 {
+    manualCommandObj = ManualControlCommand::GetInstance(getObjectManager());
+    manualSettingsObj = ManualControlSettings::GetInstance(getObjectManager());
+    receiverActivityObj=ReceiverActivity::GetInstance(getObjectManager());
     m_config = new Ui_InputWidget();
     m_config->setupUi(this);
 
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    setupButtons(m_config->saveRCInputToRAM,m_config->saveRCInputToSD);
 
-	// First of all, put all the channel widgets into lists, so that we can
-    // manipulate those:
-
-
-	inMaxLabels << m_config->ch0Max
-			<< m_config->ch1Max
-			<< m_config->ch2Max
-			<< m_config->ch3Max
-			<< m_config->ch4Max
-			<< m_config->ch5Max
-			<< m_config->ch6Max
-			<< m_config->ch7Max;
-
-	inMinLabels << m_config->ch0Min
-			<< m_config->ch1Min
-			<< m_config->ch2Min
-			<< m_config->ch3Min
-			<< m_config->ch4Min
-			<< m_config->ch5Min
-			<< m_config->ch6Min
-			<< m_config->ch7Min;
-
-	inSliders << m_config->inSlider0
-			  << m_config->inSlider1
-			  << m_config->inSlider2
-			  << m_config->inSlider3
-			  << m_config->inSlider4
-			  << m_config->inSlider5
-			  << m_config->inSlider6
-			  << m_config->inSlider7;
-
-        inRevCheckboxes << m_config->ch0Rev
-                        << m_config->ch1Rev
-                        << m_config->ch2Rev
-                        << m_config->ch3Rev
-                        << m_config->ch4Rev
-                        << m_config->ch5Rev
-                        << m_config->ch6Rev
-                        << m_config->ch7Rev;
-
-        inChannelAssign << m_config->ch0Assign
-                        << m_config->ch1Assign
-                        << m_config->ch2Assign
-                        << m_config->ch3Assign
-                        << m_config->ch4Assign
-                        << m_config->ch5Assign
-                        << m_config->ch6Assign
-                        << m_config->ch7Assign;
-
-    // Now connect the widget to the ManualControlCommand / Channel UAVObject
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlCommand")));
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateChannels(UAVObject*)));
-
-    // Register for ManualControlSettings changes:
-    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
-    connect(obj,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(refreshValues()));
-
-
-    // Get the receiver types supported by OpenPilot and fill the corresponding
-    // dropdown menu:
-    obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
-    UAVObjectField * field;
-    // Fill in the dropdown menus for the channel RC Input assignement.
-    QStringList channelsList;
-        channelsList << "None";
-    QList<UAVObjectField*> fieldList = obj->getFields();
-    foreach (UAVObjectField* field, fieldList) {
-        if (field->getUnits().contains("channel")) {
-            channelsList.append(field->getName());
-        }
+    int index=0;
+    foreach(QString name,manualSettingsObj->getFields().at(0)->getElementNames())
+    {
+        inputChannelForm * inp=new inputChannelForm(this,index==0);
+        m_config->advancedPage->layout()->addWidget(inp);
+        inp->ui->channelName->setText(name);
+        addUAVObjectToWidgetRelation("ManualControlSettings","ChannelGroups",inp->ui->channelGroup,index);
+        addUAVObjectToWidgetRelation("ManualControlSettings","ChannelNumber",inp->ui->channelNumber,index);
+        addUAVObjectToWidgetRelation("ManualControlSettings","ChannelMin",inp->ui->channelMin,index);
+        addUAVObjectToWidgetRelation("ManualControlSettings","ChannelNeutral",inp->ui->channelNeutral,index);
+        addUAVObjectToWidgetRelation("ManualControlSettings","ChannelMax",inp->ui->channelMax,index);
+        ++index;
     }
+    goWizard=new QPushButton(tr("Start Wizard"),this);
+    m_config->advancedPage->layout()->addWidget(goWizard);
+    connect(goWizard,SIGNAL(clicked()),this,SLOT(goToNormalWizard()));
+    goSimpleWizard=new QPushButton(tr("Start Simple Wizard"),this);
+    m_config->advancedPage->layout()->addWidget(goSimpleWizard);
+    connect(goSimpleWizard,SIGNAL(clicked()),this,SLOT(goToSimpleWizard()));
 
-    m_config->ch0Assign->addItems(channelsList);
-    m_config->ch1Assign->addItems(channelsList);
-    m_config->ch2Assign->addItems(channelsList);
-    m_config->ch3Assign->addItems(channelsList);
-    m_config->ch4Assign->addItems(channelsList);
-    m_config->ch5Assign->addItems(channelsList);
-    m_config->ch6Assign->addItems(channelsList);
-    m_config->ch7Assign->addItems(channelsList);
+    connect(m_config->wzNext,SIGNAL(clicked()),this,SLOT(wzNext()));
+    connect(m_config->wzCancel,SIGNAL(clicked()),this,SLOT(wzCancel()));
+    connect(m_config->wzBack,SIGNAL(clicked()),this,SLOT(wzBack()));
 
-    // And the flight mode settings:
-    field = obj->getField(QString("FlightModePosition"));
-    m_config->fmsModePos1->addItems(field->getOptions());
-    m_config->fmsModePos2->addItems(field->getOptions());
-    m_config->fmsModePos3->addItems(field->getOptions());
-    field = obj->getField(QString("Stabilization1Settings"));
-    channelsList.clear();
-    channelsList.append(field->getOptions());
-    m_config->fmsSsPos1Roll->addItems(channelsList);
-    m_config->fmsSsPos1Pitch->addItems(channelsList);
-    m_config->fmsSsPos1Yaw->addItems(channelsList);
-    m_config->fmsSsPos2Roll->addItems(channelsList);
-    m_config->fmsSsPos2Pitch->addItems(channelsList);
-    m_config->fmsSsPos2Yaw->addItems(channelsList);
-    m_config->fmsSsPos3Roll->addItems(channelsList);
-    m_config->fmsSsPos3Pitch->addItems(channelsList);
-    m_config->fmsSsPos3Yaw->addItems(channelsList);
+    m_config->stackedWidget->setCurrentIndex(0);
+    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos1,0);
+    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos2,1);
+    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos3,2);
 
-    // And the Armin configurations:
-    field = obj->getField(QString("Arming"));
-    m_config->armControl->clear();
-    m_config->armControl->addItems(field->getOptions());
+    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization1Settings",m_config->fmsSsPos1Roll,"Roll");
+    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization2Settings",m_config->fmsSsPos2Roll,"Roll");
+    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization3Settings",m_config->fmsSsPos3Roll,"Roll");
+    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization1Settings",m_config->fmsSsPos1Pitch,"Pitch");
+    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization2Settings",m_config->fmsSsPos2Pitch,"Pitch");
+    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization3Settings",m_config->fmsSsPos3Pitch,"Pitch");
+    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization1Settings",m_config->fmsSsPos1Yaw,"Yaw");
+    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization2Settings",m_config->fmsSsPos2Yaw,"Yaw");
+    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization3Settings",m_config->fmsSsPos3Yaw,"Yaw");
 
-
-    connect(m_config->saveRCInputToSD, SIGNAL(clicked()), this, SLOT(saveRCInputObject()));
-    connect(m_config->saveRCInputToRAM, SIGNAL(clicked()), this, SLOT(sendRCInputUpdate()));
-
+    addUAVObjectToWidgetRelation("ManualControlSettings","Arming",m_config->armControl);
+    addUAVObjectToWidgetRelation("ManualControlSettings","ArmedTimeout",m_config->armTimeout,0,1000);
+    connect( ManualControlCommand::GetInstance(getObjectManager()),SIGNAL(objectUpdated(UAVObject*)),this,SLOT(moveFMSlider()));
+    addWidget(goWizard);
+    addWidget(goSimpleWizard);
     enableControls(false);
-    refreshValues();
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
-    connect(parent, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
 
-    connect(m_config->ch0Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
-    connect(m_config->ch1Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
-    connect(m_config->ch2Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
-    connect(m_config->ch3Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
-    connect(m_config->ch4Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
-    connect(m_config->ch5Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
-    connect(m_config->ch6Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
-    connect(m_config->ch7Rev, SIGNAL(toggled(bool)), this, SLOT(reverseCheckboxClicked(bool)));
-    connect(m_config->doRCInputCalibration,SIGNAL(stateChanged(int)),this,SLOT(updateTips(int)));
-    firstUpdate = true;
-
+    populateWidgets();
+    refreshWidgetsValues();
     // Connect the help button
     connect(m_config->inputHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
-    updateTips(Qt::Unchecked);
 
+    m_config->graphicsView->setScene(new QGraphicsScene(this));
+    m_config->graphicsView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    m_renderer = new QSvgRenderer();
+    QGraphicsScene *l_scene = m_config->graphicsView->scene();
+    m_config->graphicsView->setBackgroundBrush(QBrush(Utils::StyleHelper::baseColor()));
+    if (QFile::exists(":/configgadget/images/TX.svg") && m_renderer->load(QString(":/configgadget/images/TX.svg")) && m_renderer->isValid())
+    {
+        l_scene->clear(); // Deletes all items contained in the scene as well.
+
+        m_txBackground = new QGraphicsSvgItem();
+        // All other items will be clipped to the shape of the background
+        m_txBackground->setFlags(QGraphicsItem::ItemClipsChildrenToShape|
+                                 QGraphicsItem::ItemClipsToShape);
+        m_txBackground->setSharedRenderer(m_renderer);
+        m_txBackground->setElementId("background");
+        l_scene->addItem(m_txBackground);
+
+        m_txMainBody = new QGraphicsSvgItem();
+        m_txMainBody->setParentItem(m_txBackground);
+        m_txMainBody->setSharedRenderer(m_renderer);
+        m_txMainBody->setElementId("body");
+        l_scene->addItem(m_txMainBody);
+
+        m_txLeftStick = new QGraphicsSvgItem();
+        m_txLeftStick->setParentItem(m_txBackground);
+        m_txLeftStick->setSharedRenderer(m_renderer);
+        m_txLeftStick->setElementId("ljoy");
+
+        m_txRightStick = new QGraphicsSvgItem();
+        m_txRightStick->setParentItem(m_txBackground);
+        m_txRightStick->setSharedRenderer(m_renderer);
+        m_txRightStick->setElementId("rjoy");
+
+        m_txAccess0 = new QGraphicsSvgItem();
+        m_txAccess0->setParentItem(m_txBackground);
+        m_txAccess0->setSharedRenderer(m_renderer);
+        m_txAccess0->setElementId("access0");
+
+        m_txAccess1 = new QGraphicsSvgItem();
+        m_txAccess1->setParentItem(m_txBackground);
+        m_txAccess1->setSharedRenderer(m_renderer);
+        m_txAccess1->setElementId("access1");
+
+        m_txAccess2 = new QGraphicsSvgItem();
+        m_txAccess2->setParentItem(m_txBackground);
+        m_txAccess2->setSharedRenderer(m_renderer);
+        m_txAccess2->setElementId("access2");
+
+        m_txFlightMode = new QGraphicsSvgItem();
+        m_txFlightMode->setParentItem(m_txBackground);
+        m_txFlightMode->setSharedRenderer(m_renderer);
+        m_txFlightMode->setElementId("flightModeCenter");
+        m_txFlightMode->setZValue(-10);
+
+        m_txArrows = new QGraphicsSvgItem();
+        m_txArrows->setParentItem(m_txBackground);
+        m_txArrows->setSharedRenderer(m_renderer);
+        m_txArrows->setElementId("arrows");
+        m_txArrows->setVisible(false);
+
+        QRectF orig=m_renderer->boundsOnElement("ljoy");
+        QMatrix Matrix = m_renderer->matrixForElement("ljoy");
+        orig=Matrix.mapRect(orig);
+        m_txLeftStickOrig.translate(orig.x(),orig.y());
+        m_txLeftStick->setTransform(m_txLeftStickOrig,false);
+
+        orig=m_renderer->boundsOnElement("arrows");
+        Matrix = m_renderer->matrixForElement("arrows");
+        orig=Matrix.mapRect(orig);
+        m_txArrowsOrig.translate(orig.x(),orig.y());
+        m_txArrows->setTransform(m_txArrowsOrig,false);
+
+        orig=m_renderer->boundsOnElement("body");
+        Matrix = m_renderer->matrixForElement("body");
+        orig=Matrix.mapRect(orig);
+        m_txMainBodyOrig.translate(orig.x(),orig.y());
+        m_txMainBody->setTransform(m_txMainBodyOrig,false);
+
+        orig=m_renderer->boundsOnElement("flightModeCenter");
+        Matrix = m_renderer->matrixForElement("flightModeCenter");
+        orig=Matrix.mapRect(orig);
+        m_txFlightModeCOrig.translate(orig.x(),orig.y());
+        m_txFlightMode->setTransform(m_txFlightModeCOrig,false);
+
+        orig=m_renderer->boundsOnElement("flightModeLeft");
+        Matrix = m_renderer->matrixForElement("flightModeLeft");
+        orig=Matrix.mapRect(orig);
+        m_txFlightModeLOrig.translate(orig.x(),orig.y());
+        orig=m_renderer->boundsOnElement("flightModeRight");
+        Matrix = m_renderer->matrixForElement("flightModeRight");
+        orig=Matrix.mapRect(orig);
+        m_txFlightModeROrig.translate(orig.x(),orig.y());
+
+        orig=m_renderer->boundsOnElement("rjoy");
+        Matrix = m_renderer->matrixForElement("rjoy");
+        orig=Matrix.mapRect(orig);
+        m_txRightStickOrig.translate(orig.x(),orig.y());
+        m_txRightStick->setTransform(m_txRightStickOrig,false);
+
+        orig=m_renderer->boundsOnElement("access0");
+        Matrix = m_renderer->matrixForElement("access0");
+        orig=Matrix.mapRect(orig);
+        m_txAccess0Orig.translate(orig.x(),orig.y());
+        m_txAccess0->setTransform(m_txAccess0Orig,false);
+
+        orig=m_renderer->boundsOnElement("access1");
+        Matrix = m_renderer->matrixForElement("access1");
+        orig=Matrix.mapRect(orig);
+        m_txAccess1Orig.translate(orig.x(),orig.y());
+        m_txAccess1->setTransform(m_txAccess1Orig,false);
+
+        orig=m_renderer->boundsOnElement("access2");
+        Matrix = m_renderer->matrixForElement("access2");
+        orig=Matrix.mapRect(orig);
+        m_txAccess2Orig.translate(orig.x(),orig.y());
+        m_txAccess2->setTransform(m_txAccess2Orig,true);
+    }
+    m_config->graphicsView->fitInView(m_txMainBody, Qt::KeepAspectRatio );
+    animate=new QTimer(this);
+    connect(animate,SIGNAL(timeout()),this,SLOT(moveTxControls()));
+}
+void ConfigInputWidget::resetTxControls()
+{
+
+    m_txLeftStick->setTransform(m_txLeftStickOrig,false);
+    m_txRightStick->setTransform(m_txRightStickOrig,false);
+    m_txAccess0->setTransform(m_txAccess0Orig,false);
+    m_txAccess1->setTransform(m_txAccess1Orig,false);
+    m_txAccess2->setTransform(m_txAccess2Orig,false);
+    m_txFlightMode->setElementId("flightModeCenter");
+    m_txFlightMode->setTransform(m_txFlightModeCOrig,false);
+    m_txArrows->setVisible(false);
 }
 
 ConfigInputWidget::~ConfigInputWidget()
 {
-   // Do nothing
-}
-
-/**
-  Slot called whenever we revert a signal
-  */
-void ConfigInputWidget::reverseCheckboxClicked(bool state)
-{
-    QObject* obj = sender();
-    int i = inRevCheckboxes.indexOf((QCheckBox*)obj);
-
-    inSliders[i]->setInvertedAppearance(state);
-    int max = inMaxLabels[i]->text().toInt();
-    int min = inMinLabels[i]->text().toInt();
-    if ((state && (max>min)) ||
-        (!state && (max < min))) {
-        inMaxLabels[i]->setText(QString::number(min));
-        inMinLabels[i]->setText(QString::number(max));
-    }
-}
-
-
-// ************************************
-
-/*
-  Enable or disable some controls depending on whether we are connected
-  or not to the board. Actually, this i mostly useless IMHO, I don't
-  know who added this into the code (Ed's note)
-  */
-void ConfigInputWidget::enableControls(bool enable)
-{
-        //m_config->saveRCInputToRAM->setEnabled(enable);
-	m_config->saveRCInputToSD->setEnabled(enable);
-	m_config->doRCInputCalibration->setEnabled(enable);
-}
-
-
-/********************************
-  *  Input settings
-  *******************************/
-
-/**
-  Request the current config from the board
-  */
-void ConfigInputWidget::refreshValues()
-{
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ManualControlSettings")));
-    Q_ASSERT(obj);
-    //obj->requestUpdate();
-    UAVObjectField *field;
-
-    // Now update all the slider values:
-
-    UAVObjectField *field_max = obj->getField(QString("ChannelMax"));
-    UAVObjectField *field_min = obj->getField(QString("ChannelMin"));
-    UAVObjectField *field_neu = obj->getField(QString("ChannelNeutral"));
-    Q_ASSERT(field_max);
-    Q_ASSERT(field_min);
-    Q_ASSERT(field_neu);
-    for (int i = 0; i < 8; i++) {
-        QVariant max = field_max->getValue(i);
-        QVariant min = field_min->getValue(i);
-        QVariant neutral = field_neu->getValue(i);
-        inMaxLabels[i]->setText(max.toString());
-        inMinLabels[i]->setText(min.toString());
-        if (max.toInt()> min.toInt()) {
-            inRevCheckboxes[i]->setChecked(false);
-            inSliders[i]->setMaximum(max.toInt());
-            inSliders[i]->setMinimum(min.toInt());
-        } else {
-            inRevCheckboxes[i]->setChecked(true);
-            inSliders[i]->setMaximum(min.toInt());
-            inSliders[i]->setMinimum(max.toInt());
-        }
-        inSliders[i]->setValue(neutral.toInt());
-    }
-
-    // Update receiver type
-    field = obj->getField(QString("InputMode"));
-    m_config->receiverType->setText(field->getValue().toString());
-
-    // Reset all channel assignement dropdowns:
-    foreach (QComboBox *combo, inChannelAssign) {
-        combo->setCurrentIndex(0);
-    }
-
-    // Update all channels assignements
-    QList<UAVObjectField *> fieldList = obj->getFields();
-    foreach (UAVObjectField *field, fieldList) {
-        if (field->getUnits().contains("channel"))
-            assignChannel(obj, field->getName());
-    }
-
-    // Update all the flight mode settingsin the relevant tab
-    field = obj->getField(QString("FlightModePosition"));
-    m_config->fmsModePos1->setCurrentIndex((m_config->fmsModePos1->findText(field->getValue(0).toString())));
-    m_config->fmsModePos2->setCurrentIndex((m_config->fmsModePos2->findText(field->getValue(1).toString())));
-    m_config->fmsModePos3->setCurrentIndex((m_config->fmsModePos3->findText(field->getValue(2).toString())));
-
-    field = obj->getField(QString("Stabilization1Settings"));
-	m_config->fmsSsPos1Roll->setCurrentIndex(m_config->fmsSsPos1Roll->findText(field->getValue(field->getElementNames().indexOf("Roll")).toString()));
-	m_config->fmsSsPos1Pitch->setCurrentIndex(m_config->fmsSsPos1Pitch->findText(field->getValue(field->getElementNames().indexOf("Pitch")).toString()));
-	m_config->fmsSsPos1Yaw->setCurrentIndex(m_config->fmsSsPos1Yaw->findText(field->getValue(field->getElementNames().indexOf("Yaw")).toString()));
-    field = obj->getField(QString("Stabilization2Settings"));
-	m_config->fmsSsPos2Roll->setCurrentIndex(m_config->fmsSsPos2Roll->findText(field->getValue(field->getElementNames().indexOf("Roll")).toString()));
-	m_config->fmsSsPos2Pitch->setCurrentIndex(m_config->fmsSsPos2Pitch->findText(field->getValue(field->getElementNames().indexOf("Pitch")).toString()));
-	m_config->fmsSsPos2Yaw->setCurrentIndex(m_config->fmsSsPos2Yaw->findText(field->getValue(field->getElementNames().indexOf("Yaw")).toString()));
-    field = obj->getField(QString("Stabilization3Settings"));
-	m_config->fmsSsPos3Roll->setCurrentIndex(m_config->fmsSsPos3Roll->findText(field->getValue(field->getElementNames().indexOf("Roll")).toString()));
-	m_config->fmsSsPos3Pitch->setCurrentIndex(m_config->fmsSsPos3Pitch->findText(field->getValue(field->getElementNames().indexOf("Pitch")).toString()));
-	m_config->fmsSsPos3Yaw->setCurrentIndex(m_config->fmsSsPos3Yaw->findText(field->getValue(field->getElementNames().indexOf("Yaw")).toString()));
-
-    // Load the arming settings
-    field = obj->getField(QString("Arming"));
-    m_config->armControl->setCurrentIndex(m_config->armControl->findText(field->getValue().toString()));
-    field = obj->getField(QString("ArmedTimeout"));
-    m_config->armTimeout->setValue(field->getValue().toInt()/1000);
-}
-
-
-/**
-  * Sends the config to the board, without saving to the SD card
-  */
-void ConfigInputWidget::sendRCInputUpdate()
-{
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
-    Q_ASSERT(obj);
-    // Now update all fields from the sliders:
-    QString fieldName = QString("ChannelMax");
-    UAVObjectField * field = obj->getField(fieldName);
-    for (int i = 0; i < 8; i++) {
-        field->setValue(inMaxLabels[i]->text().toInt(), i);
-    }
-
-    fieldName = QString("ChannelMin");
-    field = obj->getField(fieldName);
-    for (int i = 0; i < 8; i++) {
-        field->setValue(inMinLabels[i]->text().toInt(), i);
-    }
-
-    fieldName = QString("ChannelNeutral");
-    field = obj->getField(fieldName);
-    for (int i = 0; i < 8; i++)
-        field->setValue(inSliders[i]->value(), i);
-
-    // Set Roll/Pitch/Yaw/Etc assignement:
-    // Rule: if two channels have the same setting (which is wrong!) the higher channel
-    // will get the setting.
-
-    // First, reset all channel assignements:
-    QList<UAVObjectField*> fieldList = obj->getFields();
-    foreach (UAVObjectField* field, fieldList) {
-        if (field->getUnits().contains("channel")) {
-            field->setValue(field->getOptions().last());
-        }
-    }
-
-    // Then assign according to current GUI state:
-    if (m_config->ch0Assign->currentIndex() != 0) {
-        field = obj->getField(m_config->ch0Assign->currentText());
-        field->setValue(field->getOptions().at(0)); // -> This way we don't depend on channel naming convention
-    }
-    if (m_config->ch1Assign->currentIndex() != 0) {
-        field = obj->getField(m_config->ch1Assign->currentText());
-        field->setValue(field->getOptions().at(1));
-    }
-    if (m_config->ch2Assign->currentIndex() != 0) {
-        field = obj->getField(m_config->ch2Assign->currentText());
-        field->setValue(field->getOptions().at(2));
-    }
-    if (m_config->ch3Assign->currentIndex() != 0) {
-        field = obj->getField(m_config->ch3Assign->currentText());
-        field->setValue(field->getOptions().at(3));
-    }
-    if (m_config->ch4Assign->currentIndex() != 0) {
-        field = obj->getField(m_config->ch4Assign->currentText());
-        field->setValue(field->getOptions().at(4));
-    }
-    if (m_config->ch5Assign->currentIndex() != 0) {
-        field = obj->getField(m_config->ch5Assign->currentText());
-        field->setValue(field->getOptions().at(5));
-    }
-    if (m_config->ch6Assign->currentIndex() != 0) {
-        field = obj->getField(m_config->ch6Assign->currentText());
-        field->setValue(field->getOptions().at(6));
-    }
-    if (m_config->ch7Assign->currentIndex() != 0) {
-        field = obj->getField(m_config->ch7Assign->currentText());
-        field->setValue(field->getOptions().at(7));
-    }
-
-    // Send all the flight mode settings
-    field = obj->getField(QString("FlightModePosition"));
-    field->setValue(m_config->fmsModePos1->currentText(),0);
-    field->setValue(m_config->fmsModePos2->currentText(),1);
-    field->setValue(m_config->fmsModePos3->currentText(),2);
-
-    field = obj->getField(QString("Stabilization1Settings"));
-    field->setValue(m_config->fmsSsPos1Roll->currentText(), field->getElementNames().indexOf("Roll"));
-    field->setValue(m_config->fmsSsPos1Pitch->currentText(), field->getElementNames().indexOf("Pitch"));
-    field->setValue(m_config->fmsSsPos1Yaw->currentText(), field->getElementNames().indexOf("Yaw"));
-    field = obj->getField(QString("Stabilization2Settings"));
-    field->setValue(m_config->fmsSsPos2Roll->currentText(), field->getElementNames().indexOf("Roll"));
-    field->setValue(m_config->fmsSsPos2Pitch->currentText(), field->getElementNames().indexOf("Pitch"));
-    field->setValue(m_config->fmsSsPos2Yaw->currentText(), field->getElementNames().indexOf("Yaw"));
-    field = obj->getField(QString("Stabilization3Settings"));
-    field->setValue(m_config->fmsSsPos3Roll->currentText(), field->getElementNames().indexOf("Roll"));
-    field->setValue(m_config->fmsSsPos3Pitch->currentText(), field->getElementNames().indexOf("Pitch"));
-    field->setValue(m_config->fmsSsPos3Yaw->currentText(), field->getElementNames().indexOf("Yaw"));
-
-    // Save the arming settings
-    field = obj->getField(QString("Arming"));
-    field->setValue(m_config->armControl->currentText());
-    field = obj->getField(QString("ArmedTimeout"));
-    field->setValue(m_config->armTimeout->value()*1000);
-
-    // ... and send to the OP Board
-    obj->updated();
 
 }
 
-/**
-  Sends the config to the board and request saving into the SD card
-  */
-void ConfigInputWidget::saveRCInputObject()
+void ConfigInputWidget::resizeEvent(QResizeEvent *event)
 {
-    // Send update so that the latest value is saved
-    sendRCInputUpdate();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ManualControlSettings")));
-    Q_ASSERT(obj);
-    saveObjectToSD(obj);
+    QWidget::resizeEvent(event);
+    m_config->graphicsView->fitInView(m_txBackground, Qt::KeepAspectRatio );
 }
 
-
-/**
-  * Set the dropdown option for a channel Input assignement
-  */
-void ConfigInputWidget::assignChannel(UAVDataObject *obj, QString str)
+void ConfigInputWidget::openHelp()
 {
-    UAVObjectField* field = obj->getField(str);
-    QStringList options = field->getOptions();
-    switch (options.indexOf(field->getValue().toString())) {
-    case 0:
-        m_config->ch0Assign->setCurrentIndex(m_config->ch0Assign->findText(str));
-        break;
-    case 1:
-        m_config->ch1Assign->setCurrentIndex(m_config->ch0Assign->findText(str));
-        break;
-    case 2:
-        m_config->ch2Assign->setCurrentIndex(m_config->ch0Assign->findText(str));
-        break;
-    case 3:
-        m_config->ch3Assign->setCurrentIndex(m_config->ch0Assign->findText(str));
-        break;
-    case 4:
-        m_config->ch4Assign->setCurrentIndex(m_config->ch0Assign->findText(str));
-        break;
-    case 5:
-        m_config->ch5Assign->setCurrentIndex(m_config->ch0Assign->findText(str));
-        break;
-    case 6:
-        m_config->ch6Assign->setCurrentIndex(m_config->ch0Assign->findText(str));
-        break;
-    case 7:
-        m_config->ch7Assign->setCurrentIndex(m_config->ch0Assign->findText(str));
-        break;
-    }
+
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Input+Configuration", QUrl::StrictMode) );
+}
+void ConfigInputWidget::goToSimpleWizard()
+{
+    isSimple=true;
+    goToWizard();
+}
+void ConfigInputWidget::goToNormalWizard()
+{
+    isSimple=false;
+    goToWizard();
+}
+void ConfigInputWidget::goToWizard()
+{
+    QMessageBox msgBox;
+    msgBox.setText(tr("Arming Settings are now set to Always Disarmed for your safety."));
+    msgBox.setDetailedText(tr("You will have to reconfigure arming settings yourself afterwards."));
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+    msgBox.exec();
+    setupWizardWidget(wizardWelcome);
+    m_config->graphicsView->fitInView(m_txBackground, Qt::KeepAspectRatio );
 }
 
-/**
-  * Updates the slider positions and min/max values
-  *
-  */
-void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
+void ConfigInputWidget::wzCancel()
 {
-
-    QString fieldName = QString("Connected");
-    UAVObjectField *field = controlCommand->getField(fieldName);
-    if (field->getValue().toBool())
+    dimOtherControls(false);
+    manualCommandObj->setMetadata(manualCommandObj->getDefaultMetadata());
+    m_config->stackedWidget->setCurrentIndex(0);
+    foreach (QWidget * wd, extraWidgets)
     {
-        m_config->RCInputConnected->setText("RC Receiver connected");
-        m_config->lblMissingInputs->setText("");
+        if(wd)
+            delete wd;
+    }
+    extraWidgets.clear();
+    switch(wizardStep)
+    {
+    case wizardWelcome:
+        break;
+    case wizardChooseMode:
+        break;
+    case wizardIdentifySticks:
+        disconnect(receiverActivityObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyControls()));
+        break;
+    case wizardIdentifyCenter:
+        break;
+    case wizardIdentifyLimits:
+        disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyLimits()));
+        manualSettingsObj->setData(manualSettingsData);
+        break;
+    case wizardIdentifyInverted:
+        break;
+    case wizardFinish:
+        break;
+    default:
+        break;
+    }
+    wizardStep=wizardWelcome;
+}
+
+void ConfigInputWidget::wzNext()
+{
+    setupWizardWidget(wizardStep+1);
+}
+
+void ConfigInputWidget::wzBack()
+{
+    setupWizardWidget(wizardStep-1);
+}
+
+void ConfigInputWidget::setupWizardWidget(int step)
+{
+    if(step==wizardWelcome)
+    {
+        m_config->graphicsView->setVisible(false);
+        setTxMovement(nothing);
+        if(wizardStep==wizardChooseMode)
+        {
+            delete extraWidgets.at(0);
+            delete extraWidgets.at(1);
+            extraWidgets.clear();
+        }
+        manualSettingsData=manualSettingsObj->getData();
+        manualSettingsData.Arming=ManualControlSettings::ARMING_ALWAYSDISARMED;
+        manualSettingsObj->setData(manualSettingsData);
+        m_config->wzText->setText(tr("Welcome to the inputs configuration wizard.\n"
+                                     "Please follow the instructions on the screen and only move your controls when asked to.\n"
+                                     "Make sure you already configured your hardware settings on the proper tab and restarted your board.\n"
+                                     "At any time you can press 'back' to return to the previous screeen or 'Cancel' to cancel the wizard.\n"));
+        m_config->stackedWidget->setCurrentIndex(1);
+        m_config->wzBack->setEnabled(false);
+        wizardStep=wizardWelcome;
+    }
+    else if(step==wizardChooseMode)
+    {
+        m_config->graphicsView->setVisible(true);
+        setTxMovement(nothing);
+        if(wizardStep==wizardIdentifySticks)
+        {
+            disconnect(receiverActivityObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyControls()));
+            m_config->wzNext->setEnabled(true);
+        }
+        m_config->wzText->setText(tr("Please choose your transmiter type.\n"
+                                     "Mode 1 means your throttle stick is on the right\n"
+                                     "Mode 2 means your throttle stick is on the left\n"));
+        m_config->wzBack->setEnabled(true);
+        QRadioButton * mode1=new QRadioButton(tr("Mode 1"),this);
+        QRadioButton * mode2=new QRadioButton(tr("Mode 2"),this);
+        mode2->setChecked(true);
+        extraWidgets.clear();
+        extraWidgets.append(mode1);
+        extraWidgets.append(mode2);
+        m_config->checkBoxesLayout->layout()->addWidget(mode1);
+        m_config->checkBoxesLayout->layout()->addWidget(mode2);
+        wizardStep=wizardChooseMode;
+    }
+    else if(step==wizardIdentifySticks && !isSimple)
+    {
+        usedChannels.clear();
+        if(wizardStep==wizardChooseMode)
+        {
+            QRadioButton * mode=qobject_cast<QRadioButton *>(extraWidgets.at(0));
+            if(mode->isChecked())
+                transmitterMode=mode1;
+            else
+                transmitterMode=mode2;
+            delete extraWidgets.at(0);
+            delete extraWidgets.at(1);
+            extraWidgets.clear();
+        }
+        wizardStep=wizardIdentifySticks;
+        currentCommand=0;
+        setMoveFromCommand(currentCommand);
+        m_config->wzText->setText(QString(tr("Please move each control once at a time according to the instructions and picture below.\n\n"
+                                             "Move the %1 stick")).arg(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(currentCommand)));
+        manualSettingsData=manualSettingsObj->getData();
+        connect(receiverActivityObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyControls()));
+        m_config->wzNext->setEnabled(false);
+    }
+    else if(step==wizardIdentifyCenter || (isSimple && step==wizardIdentifySticks))
+    {
+        if(wizardStep==wizardChooseMode)
+        {
+            QRadioButton * mode=qobject_cast<QRadioButton *>(extraWidgets.at(0));
+            if(mode->isChecked())
+                transmitterMode=mode1;
+            else
+                transmitterMode=mode2;
+            delete extraWidgets.at(0);
+            delete extraWidgets.at(1);
+            extraWidgets.clear();
+        }
+        setTxMovement(centerAll);
+        if(wizardStep==wizardIdentifySticks)
+            disconnect(receiverActivityObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyControls()));
+        else
+        {
+            disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyLimits()));
+            manualSettingsObj->setData(manualSettingsData);
+            manualCommandObj->setMetadata(manualCommandObj->getDefaultMetadata());
+        }
+        wizardStep=wizardIdentifyCenter;
+        m_config->wzText->setText(QString(tr("Please center all control controls and press next when ready (if your FlightMode switch has only two positions, leave it on either position)")));
+    }
+    else if(step==wizardIdentifyLimits)
+    {
+        dimOtherControls(false);
+        setTxMovement(moveAll);
+        if(wizardStep==wizardIdentifyCenter)
+        {
+            wizardStep=wizardIdentifyLimits;
+            manualCommandData=manualCommandObj->getData();
+            manualSettingsData=manualSettingsObj->getData();
+            for(unsigned int i=0;i<ManualControlCommand::CHANNEL_NUMELEM;++i)
+            {
+                manualSettingsData.ChannelNeutral[i]=manualCommandData.Channel[i];
+            }
+            manualSettingsObj->setData(manualSettingsData);
+        }
+        if(wizardStep==wizardIdentifyInverted)
+        {
+            foreach(QWidget * wd,extraWidgets)
+            {
+                QCheckBox * cb=qobject_cast<QCheckBox *>(wd);
+                if(cb)
+                {
+                    disconnect(cb,SIGNAL(toggled(bool)),this,SLOT(invertControls()));
+                    delete cb;
+                }
+            }
+        }
+        extraWidgets.clear();
+        disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
+        wizardStep=wizardIdentifyLimits;
+        m_config->wzText->setText(QString(tr("Please move all controls to their maximum extents on both directions and press next when ready")));
+        UAVObject::Metadata mdata= manualCommandObj->getMetadata();
+        mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
+        mdata.flightTelemetryUpdatePeriod = 150;
+        manualCommandObj->setMetadata(mdata);
+        manualSettingsData=manualSettingsObj->getData();
+        for(uint i=0;i<ManualControlSettings::CHANNELMAX_NUMELEM;++i)
+        {
+            manualSettingsData.ChannelMin[i]=manualSettingsData.ChannelNeutral[i];
+            manualSettingsData.ChannelMax[i]=manualSettingsData.ChannelNeutral[i];
+        }
+        connect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyLimits()));
+    }
+    else if(step==wizardIdentifyInverted)
+    {
+        dimOtherControls(true);
+        setTxMovement(nothing);
+        if(wizardStep==wizardIdentifyLimits)
+        {
+            disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyLimits()));
+            manualSettingsObj->setData(manualSettingsData);
+        }
+        extraWidgets.clear();
+        foreach(QString name,manualSettingsObj->getFields().at(0)->getElementNames())
+        {
+            if(!name.contains("Access") &&  !name.contains("Flight"))
+            {
+                QCheckBox * cb=new QCheckBox(name,this);
+                extraWidgets.append(cb);
+                m_config->checkBoxesLayout->layout()->addWidget(cb);
+                connect(cb,SIGNAL(toggled(bool)),this,SLOT(invertControls()));
+            }
+        }
+        connect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
+        wizardStep=wizardIdentifyInverted;
+        m_config->wzText->setText(QString(tr("Please check the picture below and check all the sticks which show an inverted movement and press next when ready")));
+    }
+    else if(step==wizardFinish)
+    {
+        foreach(QWidget * wd,extraWidgets)
+        {
+            QCheckBox * cb=qobject_cast<QCheckBox *>(wd);
+            if(cb)
+            {
+                disconnect(cb,SIGNAL(toggled(bool)),this,SLOT(invertControls()));
+                delete cb;
+            }
+        }
+        wizardStep=wizardFinish;
+        extraWidgets.clear();
+        m_config->wzText->setText(QString(tr("You have completed this wizard, please check below if the picture below mimics your sticks movement.\n"
+                                             "This new settings aren't saved to the board yet, after pressing next you will go to the initial screen where you can do that.")));
+
+    }
+
+    else if(step==wizardFinish+1)
+    {
+        setTxMovement(nothing);
+        manualCommandObj->setMetadata(manualCommandObj->getDefaultMetadata());
+        disconnect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
+        manualSettingsData=manualSettingsObj->getData();
+        manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE]=
+                manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE]+
+                ((manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_THROTTLE]-
+                  manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_THROTTLE])*0.02);
+        if((abs(manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_FLIGHTMODE]-manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_FLIGHTMODE])<100) ||
+                (abs(manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE]-manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_FLIGHTMODE])<100))
+        {
+            manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_FLIGHTMODE]=manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE]+
+                    (manualSettingsData.ChannelMax[ManualControlSettings::CHANNELMAX_FLIGHTMODE]-manualSettingsData.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE])/2;
+        }
+        manualSettingsObj->setData(manualSettingsData);
+        m_config->stackedWidget->setCurrentIndex(0);
+        wizardStep=wizardWelcome;
+    }
+
+}
+
+void ConfigInputWidget::identifyControls()
+{
+    static int debounce=0;
+    receiverActivityData=receiverActivityObj->getData();
+    if(receiverActivityData.ActiveChannel==255)
+        return;
+    else
+    {
+        receiverActivityData=receiverActivityObj->getData();
+        currentChannel.group=receiverActivityData.ActiveGroup;
+        currentChannel.number=receiverActivityData.ActiveChannel;
+        if(currentChannel==lastChannel)
+            ++debounce;
+        lastChannel.group= currentChannel.group;
+        lastChannel.number=currentChannel.number;
+        if(!usedChannels.contains(lastChannel) && debounce>1)
+        {
+            debounce=0;
+            usedChannels.append(lastChannel);
+            manualSettingsData=manualSettingsObj->getData();
+            manualSettingsData.ChannelGroups[currentCommand]=currentChannel.group;
+            manualSettingsData.ChannelNumber[currentCommand]=currentChannel.number;
+            manualSettingsObj->setData(manualSettingsData);
+        }
+        else
+            return;
+    }
+    ++currentCommand;
+    setMoveFromCommand(currentCommand);
+    if(currentCommand>ManualControlSettings::CHANNELGROUPS_NUMELEM-1)
+    {
+        disconnect(receiverActivityObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(identifyControls()));
+        m_config->wzNext->setEnabled(true);
+    }
+    m_config->wzText->setText(QString(tr("Please move each control once at a time according to the instructions and picture below.\n\n"
+                                         "Move the %1 stick")).arg(manualSettingsObj->getFields().at(0)->getElementNames().at(currentCommand)));
+    if(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(currentCommand).contains("Accessory"))
+    {
+        m_config->wzNext->setEnabled(true);
+    }
+}
+
+void ConfigInputWidget::identifyLimits()
+{
+    manualCommandData=manualCommandObj->getData();
+    for(uint i=0;i<ManualControlSettings::CHANNELMAX_NUMELEM;++i)
+    {
+        if(manualSettingsData.ChannelMin[i]>manualCommandData.Channel[i])
+            manualSettingsData.ChannelMin[i]=manualCommandData.Channel[i];
+        if(manualSettingsData.ChannelMax[i]<manualCommandData.Channel[i])
+            manualSettingsData.ChannelMax[i]=manualCommandData.Channel[i];
+    }
+}
+void ConfigInputWidget::setMoveFromCommand(int command)
+{
+    //CHANNELNUMBER_ROLL=0, CHANNELNUMBER_PITCH=1, CHANNELNUMBER_YAW=2, CHANNELNUMBER_THROTTLE=3, CHANNELNUMBER_FLIGHTMODE=4, CHANNELNUMBER_ACCESSORY0=5, CHANNELNUMBER_ACCESSORY1=6, CHANNELNUMBER_ACCESSORY2=7 } ChannelNumberElem;
+    if(command==ManualControlSettings::CHANNELNUMBER_ROLL)
+    {
+            setTxMovement(moveRightHorizontalStick);
+    }
+    else if(command==ManualControlSettings::CHANNELNUMBER_PITCH)
+    {
+        if(transmitterMode==mode2)
+            setTxMovement(moveRightVerticalStick);
+        else
+            setTxMovement(moveLeftVerticalStick);
+    }
+    else if(command==ManualControlSettings::CHANNELNUMBER_YAW)
+    {
+            setTxMovement(moveLeftHorizontalStick);
+    }
+    else if(command==ManualControlSettings::CHANNELNUMBER_THROTTLE)
+    {
+        if(transmitterMode==mode2)
+            setTxMovement(moveLeftVerticalStick);
+        else
+            setTxMovement(moveRightVerticalStick);
+    }
+    else if(command==ManualControlSettings::CHANNELNUMBER_FLIGHTMODE)
+    {
+        setTxMovement(moveFlightMode);
+    }
+    else if(command==ManualControlSettings::CHANNELNUMBER_ACCESSORY0)
+    {
+        setTxMovement(moveAccess0);
+    }
+    else if(command==ManualControlSettings::CHANNELNUMBER_ACCESSORY1)
+    {
+        setTxMovement(moveAccess1);
+    }
+    else if(command==ManualControlSettings::CHANNELNUMBER_ACCESSORY2)
+    {
+        setTxMovement(moveAccess2);
+    }
+
+}
+
+void ConfigInputWidget::setTxMovement(txMovements movement)
+{
+    resetTxControls();
+    switch(movement)
+    {
+    case moveLeftVerticalStick:
+        movePos=0;
+        growing=true;
+        currentMovement=moveLeftVerticalStick;
+        animate->start(100);
+        break;
+    case moveRightVerticalStick:
+        movePos=0;
+        growing=true;
+        currentMovement=moveRightVerticalStick;
+        animate->start(100);
+        break;
+    case moveLeftHorizontalStick:
+        movePos=0;
+        growing=true;
+        currentMovement=moveLeftHorizontalStick;
+        animate->start(100);
+        break;
+    case moveRightHorizontalStick:
+        movePos=0;
+        growing=true;
+        currentMovement=moveRightHorizontalStick;
+        animate->start(100);
+        break;
+    case moveAccess0:
+        movePos=0;
+        growing=true;
+        currentMovement=moveAccess0;
+        animate->start(100);
+        break;
+    case moveAccess1:
+        movePos=0;
+        growing=true;
+        currentMovement=moveAccess1;
+        animate->start(100);
+        break;
+    case moveAccess2:
+        movePos=0;
+        growing=true;
+        currentMovement=moveAccess2;
+        animate->start(100);
+        break;
+    case moveFlightMode:
+        movePos=0;
+        growing=true;
+        currentMovement=moveFlightMode;
+        animate->start(1000);
+        break;
+    case centerAll:
+        movePos=0;
+        currentMovement=centerAll;
+        animate->start(1000);
+        break;
+    case moveAll:
+        movePos=0;
+        growing=true;
+        currentMovement=moveAll;
+        animate->start(50);
+        break;
+    case nothing:
+        movePos=0;
+        animate->stop();
+        break;
+    default:
+        break;
+    }
+}
+
+void ConfigInputWidget::moveTxControls()
+{
+    QTransform trans;
+    QGraphicsItem * item;
+    txMovementType move;
+    int limitMax;
+    int limitMin;
+    static bool auxFlag=false;
+    switch(currentMovement)
+    {
+    case moveLeftVerticalStick:
+        item=m_txLeftStick;
+        trans=m_txLeftStickOrig;
+        limitMax=STICK_MAX_MOVE;
+        limitMin=STICK_MIN_MOVE;
+        move=vertical;
+        break;
+    case moveRightVerticalStick:
+        item=m_txRightStick;
+        trans=m_txRightStickOrig;
+        limitMax=STICK_MAX_MOVE;
+        limitMin=STICK_MIN_MOVE;
+        move=vertical;
+        break;
+    case moveLeftHorizontalStick:
+        item=m_txLeftStick;
+        trans=m_txLeftStickOrig;
+        limitMax=STICK_MAX_MOVE;
+        limitMin=STICK_MIN_MOVE;
+        move=horizontal;
+        break;
+    case moveRightHorizontalStick:
+        item=m_txRightStick;
+        trans=m_txRightStickOrig;
+        limitMax=STICK_MAX_MOVE;
+        limitMin=STICK_MIN_MOVE;
+        move=horizontal;
+        break;
+    case moveAccess0:
+        item=m_txAccess0;
+        trans=m_txAccess0Orig;
+        limitMax=ACCESS_MAX_MOVE;
+        limitMin=ACCESS_MIN_MOVE;
+        move=horizontal;
+        break;
+    case moveAccess1:
+        item=m_txAccess1;
+        trans=m_txAccess1Orig;
+        limitMax=ACCESS_MAX_MOVE;
+        limitMin=ACCESS_MIN_MOVE;
+        move=horizontal;
+        break;
+    case moveAccess2:
+        item=m_txAccess2;
+        trans=m_txAccess2Orig;
+        limitMax=ACCESS_MAX_MOVE;
+        limitMin=ACCESS_MIN_MOVE;
+        move=horizontal;
+        break;
+    case moveFlightMode:
+        item=m_txFlightMode;
+        move=jump;
+        break;
+    case centerAll:
+        item=m_txArrows;
+        move=jump;
+        break;
+    case moveAll:
+        limitMax=STICK_MAX_MOVE;
+        limitMin=STICK_MIN_MOVE;
+        move=mix;
+        break;
+    default:
+        break;
+    }
+    if(move==vertical)
+        item->setTransform(trans.translate(0,movePos*10),false);
+    else if(move==horizontal)
+        item->setTransform(trans.translate(movePos*10,0),false);
+    else if(move==jump)
+    {
+        if(item==m_txArrows)
+        {
+            m_txArrows->setVisible(!m_txArrows->isVisible());
+        }
+        else if(item==m_txFlightMode)
+        {
+            QGraphicsSvgItem * svg;
+            svg=(QGraphicsSvgItem *)item;
+            if (svg)
+            {
+                if(svg->elementId()=="flightModeCenter")
+                {
+                    if(growing)
+                    {
+                        svg->setElementId("flightModeRight");
+                        m_txFlightMode->setTransform(m_txFlightModeROrig,false);
+                    }
+                    else
+                    {
+                        svg->setElementId("flightModeLeft");
+                        m_txFlightMode->setTransform(m_txFlightModeLOrig,false);
+                    }
+                }
+                else if(svg->elementId()=="flightModeRight")
+                {
+                    growing=false;
+                    svg->setElementId("flightModeCenter");
+                    m_txFlightMode->setTransform(m_txFlightModeCOrig,false);
+                }
+                else if(svg->elementId()=="flightModeLeft")
+                {
+                    growing=true;
+                    svg->setElementId("flightModeCenter");
+                    m_txFlightMode->setTransform(m_txFlightModeCOrig,false);
+                }
+            }
+        }
+    }
+    else if(move==mix)
+    {
+        trans=m_txAccess0Orig;
+        m_txAccess0->setTransform(trans.translate(movePos*10*ACCESS_MAX_MOVE/STICK_MAX_MOVE,0),false);
+        trans=m_txAccess1Orig;
+        m_txAccess1->setTransform(trans.translate(movePos*10*ACCESS_MAX_MOVE/STICK_MAX_MOVE,0),false);
+        trans=m_txAccess2Orig;
+        m_txAccess2->setTransform(trans.translate(movePos*10*ACCESS_MAX_MOVE/STICK_MAX_MOVE,0),false);
+
+        if(auxFlag)
+        {
+            trans=m_txLeftStickOrig;
+            m_txLeftStick->setTransform(trans.translate(0,movePos*10),false);
+            trans=m_txRightStickOrig;
+            m_txRightStick->setTransform(trans.translate(0,movePos*10),false);
+        }
+        else
+        {
+            trans=m_txLeftStickOrig;
+            m_txLeftStick->setTransform(trans.translate(movePos*10,0),false);
+            trans=m_txRightStickOrig;
+            m_txRightStick->setTransform(trans.translate(movePos*10,0),false);
+        }
+
+        if(movePos==0)
+        {
+            m_txFlightMode->setElementId("flightModeCenter");
+            m_txFlightMode->setTransform(m_txFlightModeCOrig,false);
+        }
+        else if(movePos==ACCESS_MAX_MOVE/2)
+        {
+            m_txFlightMode->setElementId("flightModeRight");
+            m_txFlightMode->setTransform(m_txFlightModeROrig,false);
+        }
+        else if(movePos==ACCESS_MIN_MOVE/2)
+        {
+            m_txFlightMode->setElementId("flightModeLeft");
+            m_txFlightMode->setTransform(m_txFlightModeLOrig,false);
+        }
+    }
+    if(move==horizontal || move==vertical ||move==mix)
+    {
+        if(movePos==0 && growing)
+            auxFlag=!auxFlag;
+        if(growing)
+            ++movePos;
+        else
+            --movePos;
+        if(movePos>limitMax)
+        {
+            movePos=movePos-2;
+            growing=false;
+        }
+        if(movePos<limitMin)
+        {
+            movePos=movePos+2;
+            growing=true;
+        }
+    }
+}
+
+void ConfigInputWidget::moveSticks()
+{
+    QTransform trans;
+    manualCommandData=manualCommandObj->getData();
+    if(transmitterMode==mode2)
+    {
+        trans=m_txLeftStickOrig;
+        m_txLeftStick->setTransform(trans.translate(manualCommandData.Yaw*STICK_MAX_MOVE*10,-manualCommandData.Throttle*STICK_MAX_MOVE*10),false);
+        trans=m_txRightStickOrig;
+        m_txRightStick->setTransform(trans.translate(manualCommandData.Roll*STICK_MAX_MOVE*10,manualCommandData.Pitch*STICK_MAX_MOVE*10),false);
     }
     else
     {
-        m_config->RCInputConnected->setText("RC Receiver not connected or invalid input configuration (missing channels)");
-        receiverHelp();
+        trans=m_txRightStickOrig;
+        m_txRightStick->setTransform(trans.translate(manualCommandData.Roll*STICK_MAX_MOVE*10,-manualCommandData.Throttle*STICK_MAX_MOVE*10),false);
+        trans=m_txLeftStickOrig;
+        m_txLeftStick->setTransform(trans.translate(manualCommandData.Yaw*STICK_MAX_MOVE*10,manualCommandData.Pitch*STICK_MAX_MOVE*10),false);
     }
-    if (m_config->doRCInputCalibration->isChecked()) {
-        if (firstUpdate) {
-            // Increase the data rate from the board so that the sliders
-            // move faster
-            UAVObject::Metadata mdata = controlCommand->getMetadata();
-            mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-            mccDataRate = mdata.flightTelemetryUpdatePeriod;
-            mdata.flightTelemetryUpdatePeriod = 150;
-            controlCommand->setMetadata(mdata);
+}
 
-            // Also protect the user by setting all values to zero
-            // and making the ActuatorCommand object readonly
-            UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
-            mdata = obj->getMetadata();
-            mdata.flightAccess = UAVObject::ACCESS_READONLY;
-            obj->setMetadata(mdata);
-            UAVObjectField *field = obj->getField("Channel");
-            for (uint i=0; i< field->getNumElements(); i++) {
-                field->setValue(0,i);
+void ConfigInputWidget::dimOtherControls(bool value)
+{
+    qreal opac;
+    if(value)
+        opac=0.1;
+    else
+        opac=1;
+    m_txAccess0->setOpacity(opac);
+    m_txAccess1->setOpacity(opac);
+    m_txAccess2->setOpacity(opac);
+    m_txFlightMode->setOpacity(opac);
+}
+
+void ConfigInputWidget::enableControls(bool enable)
+{
+    if(goWizard)
+    {
+        goWizard->setEnabled(enable);
+        goSimpleWizard->setEnabled(enable);
+    }
+    ConfigTaskWidget::enableControls(enable);
+
+}
+
+void ConfigInputWidget::invertControls()
+{
+    manualSettingsData=manualSettingsObj->getData();
+    foreach(QWidget * wd,extraWidgets)
+    {
+        QCheckBox * cb=qobject_cast<QCheckBox *>(wd);
+        if(cb)
+        {
+            int index=manualSettingsObj->getFields().at(0)->getElementNames().indexOf(cb->text());
+            if((cb->isChecked() && (manualSettingsData.ChannelMax[index]>manualSettingsData.ChannelMin[index])) ||
+                    (!cb->isChecked() && (manualSettingsData.ChannelMax[index]<manualSettingsData.ChannelMin[index])))
+            {
+                qint16 aux;
+                aux=manualSettingsData.ChannelMax[index];
+                manualSettingsData.ChannelMax[index]=manualSettingsData.ChannelMin[index];
+                manualSettingsData.ChannelMin[index]=aux;
             }
-            obj->updated();
-
-            // OP-534: make sure the airframe can NEVER arm
-            obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ManualControlSettings")));
-            field = obj->getField("Arming");
-            field->setValue("Always Disarmed");
-            obj->updated();
-
-            // Last, make sure the user won't apply/save during calibration
-            m_config->saveRCInputToRAM->setEnabled(false);
-            m_config->saveRCInputToSD->setEnabled(false);
-
-            // Reset all slider values to zero
-            field = controlCommand->getField(QString("Channel"));
-            for (int i = 0; i < 8; i++)
-                updateChannelInSlider(inSliders[i], inMinLabels[i], inMaxLabels[i], field->getValue(i).toInt(),inRevCheckboxes[i]->isChecked());
-            firstUpdate = false;
-            // Tell a few things to the user:
-            QMessageBox msgBox;
-            msgBox.setText(tr("Arming Settings are now set to Always Disarmed for your safety."));
-            msgBox.setDetailedText(tr("You will have to reconfigure arming settings yourself afterwards."));
-            msgBox.setStandardButtons(QMessageBox::Ok);
-            msgBox.setDefaultButton(QMessageBox::Ok);
-            msgBox.exec();
-
         }
-
-        field = controlCommand->getField(QString("Channel"));
-        for (int i = 0; i < 8; i++)
-            updateChannelInSlider(inSliders[i], inMinLabels[i], inMaxLabels[i], field->getValue(i).toInt(),inRevCheckboxes[i]->isChecked());
     }
-    else {
-        if (!firstUpdate) {           
-            // Restore original data rate from the board:
-            UAVObject::Metadata mdata = controlCommand->getMetadata();
-            mdata.flightTelemetryUpdateMode = UAVObject::UPDATEMODE_PERIODIC;
-            mdata.flightTelemetryUpdatePeriod = mccDataRate;
-            controlCommand->setMetadata(mdata);
-
-            UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("ActuatorCommand")));
-            mdata = obj->getMetadata();
-            mdata.flightAccess = UAVObject::ACCESS_READWRITE;
-            obj->setMetadata(mdata);
-
-            // Set some slider values to better defaults
-            // Find some channels first
-            int throttleChannel = -1;
-            int fmChannel = -1;
-            for (int i=0; i < inChannelAssign.length(); i++) {
-                if (inChannelAssign.at(i)->currentText() == "Throttle") {
-                    // TODO: this is very ugly, because this relies on the name of the
-                    // channel input, everywhere else in the gadget we don't rely on the
-                    // naming...
-                    throttleChannel = i;
-                }
-                if (inChannelAssign.at(i)->currentText() == "FlightMode") {
-                    // TODO: this is very ugly, because this relies on the name of the
-                    // channel input, everywhere else in the gadget we don't rely on the
-                    // naming...
-                    fmChannel = i;
-                }
-            }
-
-            // Throttle neutral defaults to 2% of range
-            if (throttleChannel > -1) {
-                inSliders.at(throttleChannel)->setValue(
-                            inSliders.at(throttleChannel)->minimum() +
-                            (inSliders.at(throttleChannel)->maximum()-
-                             inSliders.at(throttleChannel)->minimum())*0.02);
-            }
-
-            // Flight mode at 50% of range:
-            if (fmChannel > -1) {
-                inSliders.at(fmChannel)->setValue(
-                            inSliders.at(fmChannel)->minimum()+
-                            (inSliders.at(fmChannel)->maximum()-
-                             inSliders.at(fmChannel)->minimum())*0.5);
-            }
-
-            m_config->saveRCInputToRAM->setEnabled(true);
-            m_config->saveRCInputToSD->setEnabled(true);
-        }
-        firstUpdate = true;
-    }
-
-    //Update the Flight mode channel slider
-    ManualControlSettings * manualSettings = ManualControlSettings::GetInstance(getObjectManager());
-    ManualControlSettings::DataFields manualSettingsData = manualSettings->getData();
-    uint chIndex = manualSettingsData.FlightMode;
-    if (chIndex < manualSettings->FLIGHTMODE_NONE) {
+    manualSettingsObj->setData(manualSettingsData);
+}
+void ConfigInputWidget::moveFMSlider()
+{
+    ManualControlSettings::DataFields manualSettingsDataPriv = manualSettingsObj->getData();
+    ManualControlCommand::DataFields manualCommandDataPriv=manualCommandObj->getData();
+    uint chIndex = manualSettingsDataPriv.ChannelNumber[ManualControlSettings::CHANNELNUMBER_FLIGHTMODE];
+    if (chIndex < 8) {
         float valueScaled;
 
-        int chMin = manualSettingsData.ChannelMin[chIndex];
-        int chMax = manualSettingsData.ChannelMax[chIndex];
-        int chNeutral = manualSettingsData.ChannelNeutral[chIndex];
+        int chMin = manualSettingsDataPriv.ChannelMin[ManualControlSettings::CHANNELMIN_FLIGHTMODE];
+        int chMax = manualSettingsDataPriv.ChannelMax[ManualControlSettings::CHANNELMAX_FLIGHTMODE];
+        int chNeutral = manualSettingsDataPriv.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_FLIGHTMODE];
 
-        int value = controlCommand->getField("Channel")->getValue(chIndex).toInt();
+        int value = manualCommandDataPriv.Channel[chIndex];
         if ((chMax > chMin && value >= chNeutral) || (chMin > chMax && value <= chNeutral))
         {
             if (chMax != chNeutral)
@@ -609,121 +976,5 @@ void ConfigInputWidget::updateChannels(UAVObject* controlCommand)
             m_config->fmsSlider->setValue(100);
         else
             m_config->fmsSlider->setValue(0);
-
-    }
-}
-
-void ConfigInputWidget::updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, int value, bool reversed)
-{
-    if (!slider || !min || !max)
-        return;
-
-    if (firstUpdate) {
-        // Reset all the min/max values of the progress bar since we are starting the calibration.
-        slider->setMaximum(value);
-        slider->setMinimum(value);
-        slider->setValue(value);
-        max->setText(QString::number(value));
-        min->setText(QString::number(value));
-        return;
-    }
-
-    if (value > 0) {
-        // avoids glitches...
-        if (value > slider->maximum()) {
-            slider->setMaximum(value);
-            if (reversed)
-                min->setText(QString::number(value));
-            else
-                max->setText(QString::number(value));
-        }
-        if (value < slider->minimum()) {
-            slider->setMinimum(value);
-            if (reversed)
-                max->setText(QString::number(value));
-            else
-                min->setText(QString::number(value));
-        }
-        slider->setValue(value);
-    }
-}
-
-void ConfigInputWidget::openHelp()
-{
-
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Input+Configuration", QUrl::StrictMode) );
-}
-void ConfigInputWidget::receiverHelp()
-{
-    QString unassigned;
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* controlCommand = dynamic_cast<UAVDataObject*>(objManager->getObject(QString("ManualControlSettings")));
-
-    UAVObjectField *field;
-
-    field= controlCommand->getField("Roll");
-    if(field->getValue().toString()=="None")
-        unassigned.append("Roll");
-
-    field =controlCommand->getField("Pitch");
-    if(field->getValue().toString()=="None")
-    {
-        if(unassigned.length()>0)
-            unassigned.append(", ");
-        unassigned.append("Pitch");
-    }
-
-    field =controlCommand->getField("Yaw");
-    if(field->getValue().toString()=="None")
-    {
-        if(unassigned.length()>0)
-            unassigned.append(", ");
-        unassigned.append("Yaw");
-    }
-
-    field =controlCommand->getField("Throttle");
-    if(field->getValue().toString()=="None")
-    {
-        if(unassigned.length()>0)
-            unassigned.append(", ");
-        unassigned.append("Throttle");
-    }
-
-    field =controlCommand->getField("FlightMode");
-    if(field->getValue().toString()=="None")
-    {
-        if(unassigned.length()>0)
-            unassigned.append(", ");
-        unassigned.append("FlightMode");
-    }
-    if(unassigned.length()>0)
-        m_config->lblMissingInputs->setText(QString("Channels left to assign: ")+unassigned);
-    else
-        m_config->lblMissingInputs->setText("");
-}
-void ConfigInputWidget::updateTips(int value)
-{
-    if(value==Qt::Checked)
-    {
-        m_config->ch0Cur->setToolTip("Current channel value");
-        m_config->ch1Cur->setToolTip("Current channel value");
-        m_config->ch2Cur->setToolTip("Current channel value");
-        m_config->ch3Cur->setToolTip("Current channel value");
-        m_config->ch4Cur->setToolTip("Current channel value");
-        m_config->ch5Cur->setToolTip("Current channel value");
-        m_config->ch6Cur->setToolTip("Current channel value");
-        m_config->ch7Cur->setToolTip("Current channel value");
-    }
-    else
-    {
-        m_config->ch0Cur->setToolTip("Channel neutral point");
-        m_config->ch1Cur->setToolTip("Channel neutral point");
-        m_config->ch2Cur->setToolTip("Channel neutral point");
-        m_config->ch3Cur->setToolTip("Channel neutral point");
-        m_config->ch4Cur->setToolTip("Channel neutral point");
-        m_config->ch5Cur->setToolTip("Channel neutral point");
-        m_config->ch6Cur->setToolTip("Channel neutral point");
-        m_config->ch7Cur->setToolTip("Channel neutral point");
     }
 }

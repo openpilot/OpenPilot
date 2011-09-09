@@ -82,6 +82,8 @@ public:
     ConfigccpmWidget(QWidget *parent = 0);
     ~ConfigccpmWidget();
 
+    friend class ConfigAirframeWidget;
+
 private:
         Ui_ccpmWidget *m_ccpm;
         QGraphicsSvgItem *SwashplateImg;
@@ -134,8 +136,8 @@ private:
         void SwashLvlCancelButtonPressed();
         void SwashLvlFinishButtonPressed();
 
-        void UpdatCCPMOptionsFromUI();
-        void UpdatCCPMUIFromOptions();
+        void UpdateCCPMOptionsFromUI();
+        void UpdateCCPMUIFromOptions();
 
         void SetUIComponentVisibilities();
         void ccpmChannelCheck();
@@ -143,8 +145,6 @@ private:
         void enableSwashplateLevellingControl(bool state);
         void setSwashplateLevel(int percent);
         void SwashLvlSpinBoxChanged(int value);
-        void FocusChanged(QWidget *oldFocus, QWidget *newFocus);
-
         virtual void refreshValues() {}; // Not used
 
     public slots:

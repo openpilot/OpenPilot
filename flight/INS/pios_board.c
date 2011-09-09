@@ -723,6 +723,11 @@ void PIOS_Board_Init(void) {
 	
 	/* Delay system */
 	PIOS_DELAY_Init();
+
+#ifdef PIOS_DEBUG_ENABLE_DEBUG_PINS
+	PIOS_DEBUG_Init(&pios_tim_servo_all_channels, NELEMENTS(pios_tim_servo_all_channels));
+#endif	/* PIOS_DEBUG_ENABLE_DEBUG_PINS */
+	
 	
 	/* IAP System Setup */
 	PIOS_IAP_Init();

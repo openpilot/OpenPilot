@@ -1,16 +1,10 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{
- * @addtogroup GSPModule GPS Module
- * @brief Process GPS information
- * @{
  *
- * @file       GTOP_BIN.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      GPS module, handles GPS and NMEA stream
- * @see        The GNU Public License (GPL) Version 3
- *
+ * @file       cachedsvgitem.h
+ * @author     Dmytro Poplavskiy Copyright (C) 2011.
+ * @{
+ * @brief OpenGL texture cached SVG item
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -28,15 +22,33 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef GTOP_BIN_H
-#define GTOP_BIN_H
+#ifndef CACHEDSVGITEM_H
+#define CACHEDSVGITEM_H
 
-#include <stdint.h>
-#include "gps_mode.h"
+#include <QGraphicsSvgItem>
+#include <QGLContext>
 
-#ifdef ENABLE_GPS_BINARY_GTOP
-	extern int GTOP_BIN_update_position(uint8_t b, volatile uint32_t *chksum_errors, volatile uint32_t *parsing_errors);
-	extern void GTOP_BIN_init(void);
-#endif
+#include "utils_global.h"
+
+class QGLContext;
+
+//Cache Svg item as GL Texture.
+//Texture is regenerated each time item is scaled
+//but it's reused during rotation, unlike DeviceCoordinateCache mode
+class QTCREATOR_UTILS_EXPORT CachedSvgItem: public QGraphicsSvgItem
+{
+    Q_OBJECT
+public:
+    CachedSvgItem(QGraphicsItem * parent = 0);
+    CachedSvgItem(const QString & fileName, QGraphicsItem * parent = 0);
+    ~CachedSvgItem();
+
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+private:
+    QGLContext *m_context;
+    GLuint m_texture;
+    qreal m_scale;
+};
 
 #endif

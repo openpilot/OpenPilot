@@ -67,12 +67,12 @@ static bool PIOS_COM_validate(struct pios_com_dev * com_dev)
 	return (com_dev && (com_dev->magic == PIOS_COM_DEV_MAGIC));
 }
 
-#if defined(PIOS_INCLUDE_FREERTOS) && 0
+#if defined(PIOS_INCLUDE_FREERTOS)
 static struct pios_com_dev * PIOS_COM_alloc(void)
 {
 	struct pios_com_dev * com_dev;
 
-	com_dev = (struct pios_com_dev *)malloc(sizeof(*com_dev));
+	com_dev = (struct pios_com_dev *)pvPortMalloc(sizeof(*com_dev));
 	if (!com_dev) return (NULL);
 
 	com_dev->magic = PIOS_COM_DEV_MAGIC;

@@ -185,16 +185,19 @@ extern uint32_t pios_com_aux_id;
 //-------------------------
 // Receiver PPM input
 //-------------------------
+#define PIOS_PPM_MAX_DEVS			1
 #define PIOS_PPM_NUM_INPUTS                     12
 
 //-------------------------
 // Receiver PWM input
 //-------------------------
+#define PIOS_PWM_MAX_DEVS			1
 #define PIOS_PWM_NUM_INPUTS                     8
 
 //-------------------------
 // Receiver SPEKTRUM input
 //-------------------------
+#define PIOS_SPEKTRUM_MAX_DEVS			1
 #define PIOS_SPEKTRUM_NUM_INPUTS                12
 
 //-------------------------
@@ -202,6 +205,11 @@ extern uint32_t pios_com_aux_id;
 //-------------------------
 #define PIOS_SERVO_UPDATE_HZ                    50
 #define PIOS_SERVOS_INITIAL_POSITION            0 /* dont want to start motors, have no pulse till settings loaded */
+
+//--------------------------
+// Timer controller settings
+//--------------------------
+#define PIOS_TIM_MAX_DEVS			3
 
 //-------------------------
 // ADC

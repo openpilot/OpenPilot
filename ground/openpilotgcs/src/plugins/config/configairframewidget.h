@@ -58,7 +58,7 @@ private:
     void updateCustomAirframeUI();
     bool setupMixer(double mixerFactors[8][3]);
     void setupMotors(QList<QString> motorList);
-
+    void addToDirtyMonitor();
     void resetField(UAVObjectField * field);
     void resetMixer (MixerCurveWidget *mixer, int numElements, double maxvalue);
     void resetActuators();

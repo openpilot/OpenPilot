@@ -28,7 +28,7 @@
 #include <QtGui/QWidget>
 
 
-ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),smartsave(NULL),dirty(false)
+ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnected(false),smartsave(NULL),dirty(false)
 {
     pm = ExtensionSystem::PluginManager::instance();
     objManager = pm->getObject<UAVObjectManager>();
@@ -43,13 +43,24 @@ void ConfigTaskWidget::addUAVObject(QString objectName)
 {
     addUAVObjectToWidgetRelation(objectName,"",NULL);
 }
-void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString field, QWidget * widget)
+void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString field, QWidget * widget, QString index)
+{
+    UAVObject *obj=NULL;
+    UAVObjectField *_field=NULL;
+    obj = objManager->getObject(QString(object));
+    _field = obj->getField(QString(field));
+    addUAVObjectToWidgetRelation(object,field,widget,_field->getElementNames().indexOf(index));
+}
+
+void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString field, QWidget * widget, int index,int scale)
 {
     UAVObject *obj=NULL;
     UAVObjectField *_field=NULL;
     if(!object.isEmpty())
+    {
         obj = objManager->getObject(QString(object));
-    connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
+        connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
+    }
     //smartsave->addObject(obj);
     if(!field.isEmpty() && obj)
         _field = obj->getField(QString(field));
@@ -57,9 +68,11 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     ow->field=_field;
     ow->object=obj;
     ow->widget=widget;
+    ow->index=index;
+    ow->scale=scale;
     objOfInterest.append(ow);
     if(obj)
-        smartsave->addObject(obj);
+        smartsave->addObject((UAVDataObject*)obj);
     if(widget==NULL)
     {
         // do nothing
@@ -88,6 +101,15 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     {
         connect(cb,SIGNAL(valueChanged(double)),this,SLOT(widgetsContentsChanged()));
     }
+    else if(QCheckBox * cb=qobject_cast<QCheckBox *>(widget))
+    {
+        connect(cb,SIGNAL(clicked()),this,SLOT(widgetsContentsChanged()));
+    }
+    else if(QPushButton * cb=qobject_cast<QPushButton *>(widget))
+    {
+        connect(cb,SIGNAL(clicked()),this,SLOT(widgetsContentsChanged()));
+    }
+
 }
 
 
@@ -126,17 +148,21 @@ double ConfigTaskWidget::listMean(QList<double> list)
 
 void ConfigTaskWidget::onAutopilotDisconnect()
 {
-        enableControls(false);
+    isConnected=false;
+    enableControls(false);
 }
 
 void ConfigTaskWidget::onAutopilotConnect()
 {
-        enableControls(true);
-        refreshWidgetsValues();
+    dirty=false;
+    isConnected=true;
+    enableControls(true);
+    refreshWidgetsValues();
 }
 
 void ConfigTaskWidget::populateWidgets()
 {
+    bool dirtyBack=dirty;
     foreach(objectToWidget * ow,objOfInterest)
     {
         if(ow->object==NULL || ow->field==NULL)
@@ -146,18 +172,23 @@ void ConfigTaskWidget::populateWidgets()
         else if(QComboBox * cb=qobject_cast<QComboBox *>(ow->widget))
         {
             cb->addItems(ow->field->getOptions());
-            cb->setCurrentIndex(cb->findText(ow->field->getValue().toString()));
+            cb->setCurrentIndex(cb->findText(ow->field->getValue(ow->index).toString()));
         }
         else if(QLabel * cb=qobject_cast<QLabel *>(ow->widget))
         {
-            cb->setText(ow->field->getValue().toString());
+            cb->setText(ow->field->getValue(ow->index).toString());
+        }
+        else if(QSpinBox * cb=qobject_cast<QSpinBox *>(ow->widget))
+        {
+            cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
         }
     }
-    dirty=false;
+    setDirty(dirtyBack);
 }
 
 void ConfigTaskWidget::refreshWidgetsValues()
 {
+    bool dirtyBack=dirty;
     foreach(objectToWidget * ow,objOfInterest)
     {
         if(ow->object==NULL || ow->field==NULL)
@@ -166,13 +197,18 @@ void ConfigTaskWidget::refreshWidgetsValues()
         }
         else if(QComboBox * cb=qobject_cast<QComboBox *>(ow->widget))
         {
-            cb->setCurrentIndex(cb->findText(ow->field->getValue().toString()));
+            cb->setCurrentIndex(cb->findText(ow->field->getValue(ow->index).toString()));
         }
         else if(QLabel * cb=qobject_cast<QLabel *>(ow->widget))
         {
-            cb->setText(ow->field->getValue().toString());
+            cb->setText(ow->field->getValue(ow->index).toString());
+        }
+        else if(QSpinBox * cb=qobject_cast<QSpinBox *>(ow->widget))
+        {
+            cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
         }
     }
+    setDirty(dirtyBack);
 }
 
 void ConfigTaskWidget::updateObjectsFromWidgets()
@@ -185,11 +221,15 @@ void ConfigTaskWidget::updateObjectsFromWidgets()
         }
         else if(QComboBox * cb=qobject_cast<QComboBox *>(ow->widget))
         {
-                ow->field->setValue(cb->currentText());
+                ow->field->setValue(cb->currentText(),ow->index);
         }
         else if(QLabel * cb=qobject_cast<QLabel *>(ow->widget))
         {
-            ow->field->setValue(cb->text());
+            ow->field->setValue(cb->text(),ow->index);
+        }
+        else if(QSpinBox * cb=qobject_cast<QSpinBox *>(ow->widget))
+        {
+            ow->field->setValue(cb->value()* ow->scale,ow->index);
         }
     }
 }
@@ -197,10 +237,11 @@ void ConfigTaskWidget::updateObjectsFromWidgets()
 void ConfigTaskWidget::setupButtons(QPushButton *update, QPushButton *save)
 {
     smartsave=new smartSaveButton(update,save);
-    connect(smartsave, SIGNAL(preProcessOperations()), this, SLOT(updateObjectsFromWidgets()));
+    connect(smartsave,SIGNAL(preProcessOperations()), this, SLOT(updateObjectsFromWidgets()));
     connect(smartsave,SIGNAL(saveSuccessfull()),this,SLOT(clearDirty()));
     connect(smartsave,SIGNAL(beginOp()),this,SLOT(disableObjUpdates()));
     connect(smartsave,SIGNAL(endOp()),this,SLOT(enableObjUpdates()));
+    enableControls(false);
 }
 
 void ConfigTaskWidget::enableControls(bool enable)
@@ -211,17 +252,23 @@ void ConfigTaskWidget::enableControls(bool enable)
 
 void ConfigTaskWidget::widgetsContentsChanged()
 {
-    dirty=true;
+    setDirty(true);
 }
 
 void ConfigTaskWidget::clearDirty()
 {
-    dirty=false;
+    setDirty(false);
 }
-
+void ConfigTaskWidget::setDirty(bool value)
+{
+    dirty=value;
+}
 bool ConfigTaskWidget::isDirty()
 {
-    return dirty;
+    if(isConnected)
+        return dirty;
+    else
+        return false;
 }
 
 void ConfigTaskWidget::refreshValues()

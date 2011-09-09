@@ -1,9 +1,18 @@
 <xml>
 	<object name="HwSettings" singleinstance="true" settings="true">
 		<description>Selection of optional hardware configurations.</description>
-		<field name="CC_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,Spektrum,ComAux,I2C" defaultvalue="Disabled"/>
-		<field name="CC_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,S.Bus,GPS,Spektrum,ComAux" defaultvalue="Telemetry"/>
+		<field name="CC_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,Spektrum1,Spektrum2,ComAux,I2C" defaultvalue="Disabled"/>
+		<field name="CC_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,S.Bus,GPS,Spektrum1,Spektrum2,ComAux" defaultvalue="Telemetry"/>
+
+		<field name="OP_FlexiPort" units="function" type="enum" elements="1" options="Disabled,GPS" defaultvalue="GPS"/>
+		<field name="OP_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry" defaultvalue="Telemetry"/>
+		<field name="OP_AuxPort" units="function" type="enum" elements="1" options="Disabled,Debug,Spektrum1" defaultvalue="Disabled"/>
+
+		<field name="RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM" defaultvalue="PWM"/>
+
 		<field name="OptionalModules" units="" type="enum" elementnames="CameraStabilization,GPS" options="Disabled,Enabled" defaultvalue="Disabled"/>
+		<field name="DSMxBind" units=""  type="uint8"  elements="1" defaultvalue="0"/>
+
 		<access gcs="readwrite" flight="readwrite"/>
 		<telemetrygcs acked="true" updatemode="onchange" period="0"/>
 		<telemetryflight acked="true" updatemode="onchange" period="0"/>

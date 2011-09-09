@@ -284,6 +284,10 @@ void FancyTabBar::paintTab(QPainter *painter, int tabIndex) const
 }
 
 void FancyTabBar::setCurrentIndex(int index) {
+    bool proceed=true;
+    emit aboutToChange(&proceed);
+    if(!proceed)
+        return;
     m_currentIndex = index;
     update();
     emit currentChanged(index);
@@ -319,7 +323,6 @@ FancyTabWidget::FancyTabWidget(QWidget *parent, bool isVertical)
     : QWidget(parent)
 {
     m_tabBar = new FancyTabBar(this, isVertical);
-
     m_selectionWidget = new QWidget(this);
     QBoxLayout *selectionLayout;
     if (isVertical) {
@@ -476,4 +479,8 @@ void FancyTabWidget::showWidget(int index)
 void FancyTabWidget::setTabToolTip(int index, const QString &toolTip)
 {
     m_tabBar->setTabToolTip(index, toolTip);
+}
+QWidget * FancyTabWidget::currentWidget()
+{
+    return m_modesStack->currentWidget();
 }

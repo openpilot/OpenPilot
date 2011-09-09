@@ -59,7 +59,7 @@ static void PIOS_SBUS_Supervisor(uint32_t sbus_id);
 static void reset_channels(void)
 {
 	for (int i = 0; i < SBUS_NUMBER_OF_CHANNELS; i++) {
-		channel_data[i] = 0;
+		channel_data[i] = PIOS_RCVR_TIMEOUT;
 	}
 }
 
@@ -183,7 +183,7 @@ static int32_t PIOS_SBUS_Get(uint32_t rcvr_id, uint8_t channel)
 {
 	/* return error if channel is not available */
 	if (channel >= SBUS_NUMBER_OF_CHANNELS) {
-		return -1;
+		return PIOS_RCVR_INVALID;
 	}
 	return channel_data[channel];
 }

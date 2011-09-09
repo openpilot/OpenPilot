@@ -479,7 +479,7 @@ void get_mag_data()
 
 		mag_data.scaled.axis[0] = -(mag_data.raw.axis[0] * mag_data.calibration.scale[0]) + mag_data.calibration.bias[0];
 		mag_data.scaled.axis[1] = -(mag_data.raw.axis[1] * mag_data.calibration.scale[1]) + mag_data.calibration.bias[1];
-		mag_data.scaled.axis[2] = -(mag_data.raw.axis[1] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
+		mag_data.scaled.axis[2] = -(mag_data.raw.axis[2] * mag_data.calibration.scale[2]) + mag_data.calibration.bias[2];
 
 		mag_data.updated =  true;
 	}

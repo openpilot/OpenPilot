@@ -969,7 +969,6 @@ void PIOS_Board_Init(void) {
 	UAVObjInitialize();
 
 	HwSettingsInitialize();
-	ManualControlSettingsInitialize();
 	
 #if defined(PIOS_INCLUDE_RTC)
 	/* Initialize the real-time clock and its associated tick */

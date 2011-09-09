@@ -88,7 +88,7 @@ void affine_rotate(float scale[3][4], float rotation[3]);
 void calibration(float result[3], float scale[3][4], float arg[3]);
 
 extern void PIOS_Board_Init(void);
-static void panic(uint32_t blinks);
+void panic(uint32_t blinks);
 static void print_ekf_binary();
 void simple_update();
 
@@ -158,6 +158,7 @@ int main()
 	// Sensors need a second to start
 	PIOS_DELAY_WaitmS(100);
 
+#if 0
 	// Sensor test
 	if(PIOS_IMU3000_Test() != 0)
 		panic(1);
@@ -169,8 +170,9 @@ int main()
 		panic(3);	
 	
 	if(PIOS_BMP085_Test() != 0)
-		panic(4); 
-	
+		panic(4); 	
+#endif
+
 	PIOS_LED_On(LED1);
 	PIOS_LED_Off(LED2);
 	
@@ -340,7 +342,7 @@ static void print_ekf_binary()
 	altitude_data.updated = 0;
 }
 
-static void panic(uint32_t blinks) 
+void panic(uint32_t blinks) 
 {
 	int blinked = 0;
 	while(1) {

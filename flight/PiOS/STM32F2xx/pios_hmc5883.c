@@ -162,8 +162,6 @@ static int32_t PIOS_HMC5883_Config(const struct pios_hmc5883_cfg * cfg)
  * \param[out] int16_t array of size 3 to store X, Z, and Y magnetometer readings
  * \return 0 for success or -1 for failure
  */
-uint32_t fail = 0;
-uint32_t succeed = 0;
 int32_t PIOS_HMC5883_ReadMag(int16_t out[3])
 {
 	pios_hmc5883_data_ready = false;
@@ -172,10 +170,8 @@ int32_t PIOS_HMC5883_ReadMag(int16_t out[3])
 	int32_t sensitivity;
 	
 	if (PIOS_HMC5883_Read(PIOS_HMC5883_DATAOUT_XMSB_REG, buffer, 6) != 0) {
-		fail++;
 		return -1;
 	}
-	succeed++;
 		
 	switch (CTRLB & 0xE0) {
 		case 0x00:
@@ -414,13 +410,9 @@ void PIOS_HMC5883_IRQHandler(void)
  * Soon this will be generic in pios_exti and the BMA180 will register
  * against it.  Right now this is crap!
  */
-uint32_t count = 0;
-uint32_t count2 = 0;
 void EXTI9_5_IRQHandler(void)
 {
-	count++;
 	if (EXTI_GetITStatus(dev_cfg->eoc_exti.init.EXTI_Line) != RESET) {
-		count2++;
 		PIOS_HMC5883_IRQHandler();
 		EXTI_ClearITPendingBit(dev_cfg->eoc_exti.init.EXTI_Line);
 	}

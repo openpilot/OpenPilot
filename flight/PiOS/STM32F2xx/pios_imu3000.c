@@ -327,7 +327,6 @@ out:
 uint32_t imu3000_irq = 0;
 uint16_t fifo_level;
 uint8_t fifo_level_data[2];
-uint32_t imu3000_readtime;
 uint32_t cb_not_ready = 0;
 void PIOS_IMU3000_IRQHandler(void)
 {
@@ -368,13 +367,11 @@ void PIOS_IMU3000_IRQHandler(void)
 		if(fifo_level < (sizeof(imu3000_read_buffer) + 2))
 			return;
 		
-		uint32_t timeval = PIOS_DELAY_GetRaw();
 		imu3000_cb_ready = false;
 		
 		// Leave footer in buffer
 		PIOS_IMU3000_Read_Callback(PIOS_IMU3000_FIFO_REG, imu3000_read_buffer, sizeof(imu3000_read_buffer), imu3000_callback);
 		
-		imu3000_readtime = PIOS_DELAY_DiffuS(timeval);		
 	}
 }
 

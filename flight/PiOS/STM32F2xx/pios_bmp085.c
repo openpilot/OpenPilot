@@ -303,15 +303,11 @@ int32_t PIOS_BMP085_Test()
 /**
  * Handle external line 2 interrupt requests
  */
-uint32_t bmp_eocs = 0;
 void EXTI2_IRQHandler(void)
 {
 	if (EXTI_GetITStatus(dev_cfg->eoc_exti.init.EXTI_Line) != RESET) {
 		/* Read the ADC Value */
 		PIOS_BMP085_EOC=1;
-		
-		bmp_eocs++;
-		
 		/* Clear the EXTI line pending bit */
 		EXTI_ClearITPendingBit(dev_cfg->eoc_exti.init.EXTI_Line);
 	}

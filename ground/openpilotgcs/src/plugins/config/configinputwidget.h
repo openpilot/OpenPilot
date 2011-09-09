@@ -61,6 +61,7 @@ public slots:
 
 private:
         bool growing;
+        bool reverse[ManualControlSettings::CHANNELNEUTRAL_NUMELEM];
         txMovements currentMovement;
         int movePos;
         void setTxMovement(txMovements movement);

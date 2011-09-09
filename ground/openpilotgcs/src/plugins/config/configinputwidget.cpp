@@ -1044,9 +1044,11 @@ void ConfigInputWidget::updateCalibration()
     manualCommandData=manualCommandObj->getData();
     for(uint i=0;i<ManualControlSettings::CHANNELMAX_NUMELEM;++i)
     {
-        if(manualSettingsData.ChannelMin[i]>manualCommandData.Channel[i])
+        if((!reverse[i] && manualSettingsData.ChannelMin[i]>manualCommandData.Channel[i]) ||
+                (reverse[i] && manualSettingsData.ChannelMin[i]<manualCommandData.Channel[i]))
             manualSettingsData.ChannelMin[i]=manualCommandData.Channel[i];
-        if(manualSettingsData.ChannelMax[i]<manualCommandData.Channel[i])
+        if((!reverse[i] && manualSettingsData.ChannelMax[i]<manualCommandData.Channel[i]) ||
+                (reverse[i] && manualSettingsData.ChannelMax[i]>manualCommandData.Channel[i]))
             manualSettingsData.ChannelMax[i]=manualCommandData.Channel[i];
         manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
     }
@@ -1072,6 +1074,7 @@ void ConfigInputWidget::simpleCalibration(bool enable)
         manualSettingsObj->setData(manualSettingsData);
 
         for (unsigned int i = 0; i < ManualControlCommand::CHANNEL_NUMELEM; i++) {
+            reverse[i] = manualSettingsData.ChannelMax[i] < manualSettingsData.ChannelMin[i];
             manualSettingsData.ChannelMin[i] = manualCommandData.Channel[i];
             manualSettingsData.ChannelNeutral[i] = manualCommandData.Channel[i];
             manualSettingsData.ChannelMax[i] = manualCommandData.Channel[i];

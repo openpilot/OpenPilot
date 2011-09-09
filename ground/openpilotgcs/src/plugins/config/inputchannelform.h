@@ -17,8 +17,8 @@ public:
     friend class ConfigInputWidget;
 
 private slots:
-    void minUpdated(int);
-    void maxUpdated(int);
+    void minMaxUpdated();
+    void neutralUpdated(int);
     void groupUpdated();
     void channelDropdownUpdated(int);
     void channelNumberUpdated(int);

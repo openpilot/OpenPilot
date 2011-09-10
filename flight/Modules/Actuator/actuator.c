@@ -240,7 +240,8 @@ static void actuatorTask(void* parameters)
 				break;
 			case MIXERSETTINGS_CURVE2SOURCE_COLLECTIVE:
 				ManualControlCommandCollectiveGet(&curve2);
-				curve2 = MixerCurve(curve2,mixerSettings.ThrottleCurve2);
+				curve2 = MixerCurve(curve2,mixerSettings.ThrottleCurve2,
+				MIXERSETTINGS_THROTTLECURVE2_NUMELEM);
 				break;
 			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY0:
 			case MIXERSETTINGS_CURVE2SOURCE_ACCESSORY1:

@@ -255,8 +255,8 @@ static int8_t updateSensors(AttitudeRawData * attitudeRaw)
 		y += -accel_data.y;
 		z += -accel_data.z;
 	} while ( (i < 32) && (samples_remaining > 0) );
-	attitudeRaw->gyrotemp[0] = samples_remaining;
-	attitudeRaw->gyrotemp[1] = i;
+	attitudeRaw->temperature[ATTITUDERAW_TEMPERATURE_GYRO] = samples_remaining;
+	attitudeRaw->temperature[ATTITUDERAW_TEMPERATURE_ACCEL] = i;
 
 	float accel[3] = {(float) x / i, (float) y / i, (float) z / i};
 

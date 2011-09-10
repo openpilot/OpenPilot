@@ -736,7 +736,7 @@ const struct pios_servo_cfg pios_servo_cfg = {
 /* 
  * PWM Inputs 
  */
-#if defined(PIOS_INCLUDE_PWM)
+#if defined(PIOS_INCLUDE_PWM) || defined(PIOS_INCLUDE_PPM)
 #include <pios_pwm_priv.h>
 static const struct pios_tim_channel pios_tim_rcvrport_all_channels[] = {
 	{
@@ -1099,6 +1099,8 @@ void PIOS_Board_Init(void) {
 	EventDispatcherInitialize();
 	UAVObjInitialize();
 
+	HwSettingsInitialize();
+
 #if defined(PIOS_INCLUDE_RTC)
 	/* Initialize the real-time clock and its associated tick */
 	PIOS_RTC_Init(&pios_rtc_main_cfg);
@@ -1191,17 +1193,18 @@ void PIOS_Board_Init(void) {
 	PIOS_ADC_Init();
 	PIOS_GPIO_Init();
 
-	/* Configure the aux port */
-	uint8_t hwsettings_op_auxport;
-	HwSettingsOP_AuxPortGet(&hwsettings_op_auxport);
+	/* Configure the rcvr port */
+	uint8_t hwsettings_rcvrport;
+	HwSettingsOP_RcvrPortGet(&hwsettings_rcvrport);
 
-	switch (hwsettings_op_auxport) {
-	case HWSETTINGS_OP_AUXPORT_DISABLED:
+
+	switch (hwsettings_rcvrport) {
+	case HWSETTINGS_OP_RCVRPORT_DISABLED:
 		break;
-	case HWSETTINGS_OP_AUXPORT_DEBUG:
+	case HWSETTINGS_OP_RCVRPORT_DEBUG:
 		/* Not supported yet */
 		break;
-	case HWSETTINGS_OP_AUXPORT_SPEKTRUM1:
+	case HWSETTINGS_OP_RCVRPORT_SPEKTRUM1:
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 		{
 			uint32_t pios_usart_spektrum_id;
@@ -1222,16 +1225,7 @@ void PIOS_Board_Init(void) {
 		}
 #endif
 		break;
-	}
-
-	/* Configure the rcvr port */
-	uint8_t hwsettings_rcvrport;
-	HwSettingsRcvrPortGet(&hwsettings_rcvrport);
-
-	switch (hwsettings_rcvrport) {
-	case HWSETTINGS_RCVRPORT_DISABLED:
-		break;
-	case HWSETTINGS_RCVRPORT_PWM:
+	case HWSETTINGS_OP_RCVRPORT_PWM:
 #if defined(PIOS_INCLUDE_PWM)
 		{
 			uint32_t pios_pwm_id;
@@ -1245,7 +1239,7 @@ void PIOS_Board_Init(void) {
 		}
 #endif	/* PIOS_INCLUDE_PWM */
 		break;
-	case HWSETTINGS_RCVRPORT_PPM:
+	case HWSETTINGS_OP_RCVRPORT_PPM:
 #if defined(PIOS_INCLUDE_PPM)
 		{
 			uint32_t pios_ppm_id;

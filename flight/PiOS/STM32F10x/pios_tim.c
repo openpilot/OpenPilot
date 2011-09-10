@@ -365,17 +365,23 @@ static void PIOS_TIM_generic_irq_handler(TIM_TypeDef * timer)
  * Map all valid TIM IRQs to the common interrupt handler
  * and give it enough context to properly demux the various timers
  */
-static void PIOS_TIM_1_irq_handler (void)
+void TIM1_UP_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_1_UP_irq_handler")));
+static void PIOS_TIM_1_UP_irq_handler (void)
 {
 	PIOS_TIM_generic_irq_handler (TIM1);
 }
-void TIM1_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_1_irq_handler")));
 
+void TIM1_CC_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_1_CC_irq_handler")));
+static void PIOS_TIM_1_CC_irq_handler (void)
+{
+	PIOS_TIM_generic_irq_handler (TIM1);
+}
+
+void TIM2_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_2_irq_handler")));
 static void PIOS_TIM_2_irq_handler (void)
 {
 	PIOS_TIM_generic_irq_handler (TIM2);
 }
-void TIM2_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_2_irq_handler")));
 
 void TIM3_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_3_irq_handler")));
 static void PIOS_TIM_3_irq_handler (void)
@@ -387,5 +393,35 @@ void TIM4_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_4_irq_handler")));
 static void PIOS_TIM_4_irq_handler (void)
 {
 	PIOS_TIM_generic_irq_handler (TIM4);
+}
+
+void TIM5_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_5_irq_handler")));
+static void PIOS_TIM_5_irq_handler (void)
+{
+	PIOS_TIM_generic_irq_handler (TIM5);
+}
+
+void TIM6_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_6_irq_handler")));
+static void PIOS_TIM_6_irq_handler (void)
+{
+	PIOS_TIM_generic_irq_handler (TIM6);
+}
+
+void TIM7_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_7_irq_handler")));
+static void PIOS_TIM_7_irq_handler (void)
+{
+	PIOS_TIM_generic_irq_handler (TIM7);
+}
+
+void TIM8_UP_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_8_UP_irq_handler")));
+static void PIOS_TIM_8_UP_irq_handler (void)
+{
+	PIOS_TIM_generic_irq_handler (TIM8);
+}
+
+void TIM8_CC_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_8_CC_irq_handler")));
+static void PIOS_TIM_8_CC_irq_handler (void)
+{
+	PIOS_TIM_generic_irq_handler (TIM8);
 }
 

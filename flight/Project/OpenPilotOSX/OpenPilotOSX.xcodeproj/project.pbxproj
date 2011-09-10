@@ -255,8 +255,6 @@
 		65632DF51251650300469B77 /* pios_board.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_board.h; sourceTree = "<group>"; };
 		65632DF61251650300469B77 /* STM32103CB_AHRS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STM32103CB_AHRS.h; sourceTree = "<group>"; };
 		65632DF71251650300469B77 /* STM3210E_OP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STM3210E_OP.h; sourceTree = "<group>"; };
-		65643CEC141429A100A32F59 /* NMEA.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = NMEA.c; sourceTree = "<group>"; };
-		65643CEE141429AF00A32F59 /* NMEA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NMEA.h; sourceTree = "<group>"; };
 		65643CAB1413322000A32F59 /* pios_rcvr_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_rcvr_priv.h; sourceTree = "<group>"; };
 		65643CAC1413322000A32F59 /* pios_rcvr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_rcvr.h; sourceTree = "<group>"; };
 		65643CAD1413322000A32F59 /* pios_rtc_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_rtc_priv.h; sourceTree = "<group>"; };
@@ -265,6 +263,8 @@
 		65643CB01413322000A32F59 /* pios_spektrum_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_spektrum_priv.h; sourceTree = "<group>"; };
 		65643CB91413456D00A32F59 /* pios_tim.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_tim.c; sourceTree = "<group>"; };
 		65643CBA141350C200A32F59 /* pios_sbus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_sbus.c; sourceTree = "<group>"; };
+		65643CEC141429A100A32F59 /* NMEA.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = NMEA.c; sourceTree = "<group>"; };
+		65643CEE141429AF00A32F59 /* NMEA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NMEA.h; sourceTree = "<group>"; };
 		6572CB1613D0F2B200FC2972 /* link_STM32103CB_CC_Rev1_memory.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = link_STM32103CB_CC_Rev1_memory.ld; path = ../../PiOS/STM32F10x/link_STM32103CB_CC_Rev1_memory.ld; sourceTree = SOURCE_ROOT; };
 		6572CB1713D0F2B200FC2972 /* link_STM32103CB_CC_Rev1_sections.ld */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = link_STM32103CB_CC_Rev1_sections.ld; path = ../../PiOS/STM32F10x/link_STM32103CB_CC_Rev1_sections.ld; sourceTree = SOURCE_ROOT; };
 		657CEEAD121DB6C8007A1FBE /* homelocation.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = homelocation.xml; sourceTree = "<group>"; };
@@ -8280,6 +8280,8 @@
 				6560A39513EE270C00105DA5 /* link_STM32103CB_AHRS_memory.ld */,
 				6560A39613EE270C00105DA5 /* link_STM32103CB_AHRS_sections.ld */,
 				6560A39713EE270C00105DA5 /* link_STM32103CB_CC_Rev1_BL_sections.ld */,
+				6572CB1613D0F2B200FC2972 /* link_STM32103CB_CC_Rev1_memory.ld */,
+				6572CB1713D0F2B200FC2972 /* link_STM32103CB_CC_Rev1_sections.ld */,
 				6560A39813EE270C00105DA5 /* link_STM32103CB_PIPXTREME_BL_sections.ld */,
 				6560A39913EE270C00105DA5 /* link_STM32103CB_PIPXTREME_memory.ld */,
 				6560A39A13EE270C00105DA5 /* link_STM32103CB_PIPXTREME_sections.ld */,
@@ -8322,8 +8324,6 @@
 		65E8F05911EFF25C00BBF654 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				6572CB1613D0F2B200FC2972 /* link_STM32103CB_CC_Rev1_memory.ld */,
-				6572CB1713D0F2B200FC2972 /* link_STM32103CB_CC_Rev1_sections.ld */,
 				65E8F05A11EFF25C00BBF654 /* CMSIS */,
 				65E8F06B11EFF25C00BBF654 /* dosfs */,
 				65E8F07111EFF25C00BBF654 /* FreeRTOS */,

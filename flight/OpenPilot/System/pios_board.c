@@ -736,7 +736,7 @@ const struct pios_servo_cfg pios_servo_cfg = {
 /* 
  * PWM Inputs 
  */
-#if defined(PIOS_INCLUDE_PWM)
+#if defined(PIOS_INCLUDE_PWM) || defined(PIOS_INCLUDE_PPM)
 #include <pios_pwm_priv.h>
 static const struct pios_tim_channel pios_tim_rcvrport_all_channels[] = {
 	{

@@ -1193,17 +1193,18 @@ void PIOS_Board_Init(void) {
 	PIOS_ADC_Init();
 	PIOS_GPIO_Init();
 
-	/* Configure the aux port */
-	uint8_t hwsettings_op_auxport;
-	HwSettingsOP_AuxPortGet(&hwsettings_op_auxport);
+	/* Configure the rcvr port */
+	uint8_t hwsettings_rcvrport;
+	HwSettingsOP_RcvrPortGet(&hwsettings_rcvrport);
 
-	switch (hwsettings_op_auxport) {
-	case HWSETTINGS_OP_AUXPORT_DISABLED:
+
+	switch (hwsettings_rcvrport) {
+	case HWSETTINGS_OP_RCVRPORT_DISABLED:
 		break;
-	case HWSETTINGS_OP_AUXPORT_DEBUG:
+	case HWSETTINGS_OP_RCVRPORT_DEBUG:
 		/* Not supported yet */
 		break;
-	case HWSETTINGS_OP_AUXPORT_SPEKTRUM1:
+	case HWSETTINGS_OP_RCVRPORT_SPEKTRUM1:
 #if defined(PIOS_INCLUDE_SPEKTRUM)
 		{
 			uint32_t pios_usart_spektrum_id;
@@ -1224,16 +1225,7 @@ void PIOS_Board_Init(void) {
 		}
 #endif
 		break;
-	}
-
-	/* Configure the rcvr port */
-	uint8_t hwsettings_rcvrport;
-	HwSettingsRcvrPortGet(&hwsettings_rcvrport);
-
-	switch (hwsettings_rcvrport) {
-	case HWSETTINGS_RCVRPORT_DISABLED:
-		break;
-	case HWSETTINGS_RCVRPORT_PWM:
+	case HWSETTINGS_OP_RCVRPORT_PWM:
 #if defined(PIOS_INCLUDE_PWM)
 		{
 			uint32_t pios_pwm_id;
@@ -1247,7 +1239,7 @@ void PIOS_Board_Init(void) {
 		}
 #endif	/* PIOS_INCLUDE_PWM */
 		break;
-	case HWSETTINGS_RCVRPORT_PPM:
+	case HWSETTINGS_OP_RCVRPORT_PPM:
 #if defined(PIOS_INCLUDE_PPM)
 		{
 			uint32_t pios_ppm_id;

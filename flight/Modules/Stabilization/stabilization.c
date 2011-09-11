@@ -235,6 +235,9 @@ static void stabilizationTask(void* parameters)
 			{
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
 					rateDesiredAxis[i] = attitudeDesiredAxis[i];
+
+					// Zero attitude and axis lock accumulators
+					pids[PID_ROLL + i] = 0;
 					axis_lock_accum[i] = 0;
 					break;
 
@@ -249,6 +252,8 @@ static void stabilizationTask(void* parameters)
 
 					rateDesiredAxis[i] = attitudeDesiredAxis[i] + weak_leveling;
 
+					// Zero attitude and axis lock accumulators
+					pids[PID_ROLL + i] = 0;
 					axis_lock_accum[i] = 0;
 					break;
 				}
@@ -314,14 +319,20 @@ static void stabilizationTask(void* parameters)
 					case ROLL:
 						actuatorDesiredAxis[ct] = bound(attitudeDesiredAxis[ct]);
 						shouldUpdate = 1;
+						pids[PID_RATE_ROLL].iAccumulator = 0;
+						pids[PID_ROLL].iAccumulator = 0;
 						break;
 					case PITCH:
 						actuatorDesiredAxis[ct] = bound(attitudeDesiredAxis[ct]);
 						shouldUpdate = 1;
+						pids[PID_RATE_PITCH].iAccumulator = 0;
+						pids[PID_PITCH].iAccumulator = 0;
 						break;
 					case YAW:
 						actuatorDesiredAxis[ct] = bound(attitudeDesiredAxis[ct]);
 						shouldUpdate = 1;
+						pids[PID_RATE_YAW].iAccumulator = 0;
+						pids[PID_YAW].iAccumulator = 0;
 						break;
 				}
 					break;

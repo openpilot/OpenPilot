@@ -254,6 +254,13 @@ static void stabilizationTask(void* parameters)
 				}
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE:
 					rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], local_error[i]);
+					
+					if(rateDesiredAxis[i] > settings.MaximumRate[i])
+						rateDesiredAxis[i] = settings.MaximumRate[i];
+					else if(rateDesiredAxis[ct] < -settings.MaximumRate[ct])
+						rateDesiredAxis[i] = -settings.MaximumRate[i];
+					
+					
 					axis_lock_accum[i] = 0;
 					break;
 
@@ -272,6 +279,12 @@ static void stabilizationTask(void* parameters)
 
 						rateDesiredAxis[i] = ApplyPid(&pids[PID_ROLL + i], axis_lock_accum[i]);
 					}
+					
+					if(rateDesiredAxis[i] > settings.MaximumRate[i])
+						rateDesiredAxis[i] = settings.MaximumRate[i];
+					else if(rateDesiredAxis[ct] < -settings.MaximumRate[ct])
+						rateDesiredAxis[i] = -settings.MaximumRate[i];
+
 					break;
 			}
 		}
@@ -284,11 +297,6 @@ static void stabilizationTask(void* parameters)
 		//Calculate desired command
 		for(int8_t ct=0; ct< MAX_AXES; ct++)
 		{
-			if(rateDesiredAxis[ct] > settings.MaximumRate[ct])
-				rateDesiredAxis[ct] = settings.MaximumRate[ct];
-			else if(rateDesiredAxis[ct] < -settings.MaximumRate[ct])
-				rateDesiredAxis[ct] = -settings.MaximumRate[ct];
-
 			switch(stabDesired.StabilizationMode[ct])
 			{
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:

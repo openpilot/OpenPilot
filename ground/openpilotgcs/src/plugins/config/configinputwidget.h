@@ -122,8 +122,6 @@ private:
         QTimer * animate;
         void resetTxControls();
         void setMoveFromCommand(int command);
-        bool isSimple;
-        void goToWizard();
 
         void fastMdata();
         void restoreMdata();
@@ -138,8 +136,8 @@ private slots:
         void wzNext();
         void wzBack();
         void wzCancel();
-        void goToNormalWizard();
-        void goToSimpleWizard();
+        void goToWizard();
+
         void openHelp();
         void identifyControls();
         void identifyLimits();

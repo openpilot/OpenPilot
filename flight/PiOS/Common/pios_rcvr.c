@@ -87,6 +87,12 @@ out_fail:
  */
 int32_t PIOS_RCVR_Read(uint32_t rcvr_id, uint8_t channel)
 {
+	// Publicly facing API uses channel 1 for first channel
+	if(channel == 0)
+		return PIOS_RCVR_INVALID;
+	else
+		channel--;
+
   if (rcvr_id == 0) 
     return PIOS_RCVR_NODRIVER;
 

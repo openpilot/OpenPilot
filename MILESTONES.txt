@@ -82,7 +82,7 @@ C: Sami Korhonen (Sambas)
 D: February 2011
 V: http://vimeo.com/20159015
 
-M: First Position Hold on a Fixed Wing
+M: First CopterControl Position Hold on a Fixed Wing
 C: Eric Price (Corvus Corax)
 D: March 2011
 V: http://www.youtube.com/watch?v=QtaefhmGbio
@@ -147,6 +147,12 @@ C: Sergey Solodennikov (alconaft43)
 D: August 2011
 V: http://www.youtube.com/watch?v=8SrfIS7OkB4
 
+M: First CopterControl Return to Base Fixed Wing
+C: Eric Price (Corvus Corax)
+D: AUgust 2011
+V: http://www.youtube.com/watch?v=CugI0oBSQn8
+
+
 M: First Altitude Hold using Sonar
 C: 
 D: 
@@ -170,11 +176,11 @@ V:
 
 An incomplete list of some future Milestones is below:
 
-* First Y6 CopterControl flight
-* First Helicopter flight with OpenPilot
+* First Helicopter flight with OpenPilot Pro
+* First fixed wing navigation flight on CopterControl 
 * First successful flight using the GCS only and no RC TX
 * First use of Magic Waypoint
-* First Flybarless Helicopter flight with OpenPilot
+* First Flybarless Helicopter flight with OpenPilot Pro
 * First fixed wing navigation flight 
 * First Multirotor navigation flight
 * First Helicopter navigation flight
@@ -182,5 +188,4 @@ An incomplete list of some future Milestones is below:
 * First over 5km navigation flight
 * First "Follow Me" navigation flight
 * First Channel Crossing with OpenPilot
-
 

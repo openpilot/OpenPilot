@@ -169,6 +169,7 @@ void ConfigGadgetWidget::onAutopilotConnect() {
 
 void ConfigGadgetWidget::tabAboutToChange(int i,bool * proceed)
 {
+    Q_UNUSED(i);
     *proceed=true;
     ConfigTaskWidget * wid=qobject_cast<ConfigTaskWidget *>(ftw->currentWidget());
     if(!wid)

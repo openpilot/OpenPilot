@@ -85,10 +85,12 @@ void inputChannelForm::groupUpdated()
         count = 8; // Need to make this 6 for CC
         break;
     case ManualControlSettings::CHANNELGROUPS_PPM:
-    case ManualControlSettings::CHANNELGROUPS_SBUS:
     case ManualControlSettings::CHANNELGROUPS_SPEKTRUM1:
     case ManualControlSettings::CHANNELGROUPS_SPEKTRUM2:
         count = 12;
+        break;
+    case ManualControlSettings::CHANNELGROUPS_SBUS:
+        count = 18;
         break;
     case ManualControlSettings::CHANNELGROUPS_GCS:
         count = 5;

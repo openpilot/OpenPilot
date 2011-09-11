@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>482</width>
-    <height>48</height>
+    <width>543</width>
+    <height>49</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,7 +49,7 @@
     <widget class="QComboBox" name="channelGroup">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-       <horstretch>5</horstretch>
+       <horstretch>6</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
@@ -63,15 +63,27 @@
    </item>
    <item row="2" column="4">
     <widget class="QSpinBox" name="channelMin">
+     <property name="buttonSymbols">
+      <enum>QAbstractSpinBox::NoButtons</enum>
+     </property>
      <property name="maximum">
       <number>9999</number>
      </property>
+     <property name="value">
+      <number>1000</number>
+     </property>
     </widget>
    </item>
-   <item row="2" column="6">
+   <item row="2" column="8">
     <widget class="QSpinBox" name="channelMax">
+     <property name="buttonSymbols">
+      <enum>QAbstractSpinBox::NoButtons</enum>
+     </property>
      <property name="maximum">
       <number>9999</number>
+     </property>
+     <property name="value">
+      <number>1000</number>
      </property>
     </widget>
    </item>
@@ -105,7 +117,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="6">
+   <item row="0" column="8">
     <widget class="QLabel" name="legend5">
      <property name="enabled">
       <bool>true</bool>
@@ -125,7 +137,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="5">
+   <item row="0" column="6">
     <widget class="QLabel" name="legend4">
      <property name="enabled">
       <bool>true</bool>
@@ -135,7 +147,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="5">
+   <item row="2" column="6">
     <widget class="QSlider" name="channelNeutral">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -174,7 +186,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="8">
+   <item row="2" column="10">
     <widget class="QCheckBox" name="channelRev">
      <property name="enabled">
       <bool>false</bool>
@@ -184,12 +196,62 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="7">
+   <item row="2" column="9">
     <widget class="QLabel" name="neutral">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>30</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>30</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <property name="text">
-      <string>TextLabel</string>
+      <string/>
      </property>
     </widget>
+   </item>
+   <item row="2" column="5">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>10</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="7">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>10</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

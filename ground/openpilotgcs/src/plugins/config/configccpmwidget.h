@@ -57,7 +57,6 @@ typedef struct {
     uint ccpmCollectivePassthroughState:1;
     uint ccpmLinkCyclicState:1;
     uint ccpmLinkRollState:1;
-    uint CollectiveChannel:3;//20bits
     uint SliderValue0:7;
     uint SliderValue1:7;
     uint SliderValue2:7;//41bits

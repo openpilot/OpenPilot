@@ -2173,7 +2173,6 @@ void ConfigAirframeWidget::addToDirtyMonitor()
     addWidget(m_aircraft->widget_3->m_ccpm->ccpmCollectivePassthrough);
     addWidget(m_aircraft->widget_3->m_ccpm->ccpmLinkRoll);
     addWidget(m_aircraft->widget_3->m_ccpm->ccpmLinkCyclic);
-    addWidget(m_aircraft->widget_3->m_ccpm->ccpmCollectiveChannel);
     addWidget(m_aircraft->widget_3->m_ccpm->ccpmRevoSlider);
     addWidget(m_aircraft->widget_3->m_ccpm->ccpmREVOspinBox);
     addWidget(m_aircraft->widget_3->m_ccpm->ccpmCollectiveSlider);

@@ -101,7 +101,7 @@ static struct rcvr_activity_fsm activity_fsm;
 static void resetRcvrActivity(struct rcvr_activity_fsm * fsm);
 static bool updateRcvrActivity(struct rcvr_activity_fsm * fsm);
 
-#define assumptions (assumptions1 && assumptions3 && assumptions5 && assumptions7 && assumptions8 && assumptions_flightmode)
+#define assumptions (assumptions1 && assumptions3 && assumptions5 && assumptions7 && assumptions8 && assumptions_flightmode && assumptions_channelcount)
 
 /**
  * Module starting
@@ -278,6 +278,7 @@ static void manualControlTask(void *parameters)
 				cmd.Roll = 0;
 				cmd.Yaw = 0;
 				cmd.Pitch = 0;
+				cmd.Collective = 0;
 				//cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO; // don't do until AUTO implemented and functioning
 				// Important: Throttle < 0 will reset Stabilization coefficients among other things. Either change this,
 				// or leave throttle at IDLE speed or above when going into AUTO-failsafe.
@@ -316,6 +317,11 @@ static void manualControlTask(void *parameters)
 				cmd.Throttle       = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_THROTTLE];
 				flightMode         = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE];
 
+				if(cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_COLLECTIVE] != PIOS_RCVR_INVALID &&
+				   cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_COLLECTIVE] != PIOS_RCVR_NODRIVER &&
+				   cmd.Channel[MANUALCONTROLSETTINGS_CHANNELGROUPS_COLLECTIVE] != PIOS_RCVR_TIMEOUT)
+					cmd.Collective = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_COLLECTIVE];
+				   
 				AccessoryDesiredData accessory;
 				// Set Accessory 0
 				if (settings.ChannelGroups[MANUALCONTROLSETTINGS_CHANNELGROUPS_ACCESSORY0] != 
@@ -398,8 +404,9 @@ static void resetRcvrActivity(struct rcvr_activity_fsm * fsm)
 }
 
 static void updateRcvrActivitySample(uint32_t rcvr_id, uint16_t samples[], uint8_t max_channels) {
-	for (uint8_t channel = 0; channel < max_channels; channel++) {
-		samples[channel] = PIOS_RCVR_Read(rcvr_id, channel);
+	for (uint8_t channel = 1; channel <= max_channels; channel++) {
+		// Subtract 1 because channels are 1 indexed
+		samples[channel - 1] = PIOS_RCVR_Read(rcvr_id, channel);
 	}
 }
 
@@ -408,12 +415,12 @@ static bool updateRcvrActivityCompare(uint32_t rcvr_id, struct rcvr_activity_fsm
 	bool activity_updated = false;
 
 	/* Compare the current value to the previous sampled value */
-	for (uint8_t channel = 0;
-	     channel < RCVR_ACTIVITY_MONITOR_CHANNELS_PER_GROUP;
+	for (uint8_t channel = 1;
+	     channel <= RCVR_ACTIVITY_MONITOR_CHANNELS_PER_GROUP;
 	     channel++) {
 		uint16_t delta;
-		uint16_t prev = fsm->prev[channel];
-		uint16_t curr = PIOS_RCVR_Read(rcvr_id, channel);
+		uint16_t prev = fsm->prev[channel - 1];   // Subtract 1 because channels are 1 indexed
+		uint16_t curr = PIOS_RCVR_Read(rcvr_id, channel); 
 		if (curr > prev) {
 			delta = curr - prev;
 		} else {

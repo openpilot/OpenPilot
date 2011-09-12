@@ -16,6 +16,13 @@ public:
     ~inputChannelForm();
     friend class ConfigInputWidget;
 
+private slots:
+    void minMaxUpdated();
+    void neutralUpdated(int);
+    void groupUpdated();
+    void channelDropdownUpdated(int);
+    void channelNumberUpdated(int);
+
 private:
     Ui::inputChannelForm *ui;
 };

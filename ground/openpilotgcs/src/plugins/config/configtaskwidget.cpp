@@ -48,7 +48,9 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     UAVObject *obj=NULL;
     UAVObjectField *_field=NULL;
     obj = objManager->getObject(QString(object));
+    Q_ASSERT(obj);
     _field = obj->getField(QString(field));
+    Q_ASSERT(_field);
     addUAVObjectToWidgetRelation(object,field,widget,_field->getElementNames().indexOf(index));
 }
 
@@ -59,6 +61,7 @@ void ConfigTaskWidget::addUAVObjectToWidgetRelation(QString object, QString fiel
     if(!object.isEmpty())
     {
         obj = objManager->getObject(QString(object));
+        Q_ASSERT(obj);
         connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshWidgetsValues()));
     }
     //smartsave->addObject(obj);
@@ -182,6 +185,10 @@ void ConfigTaskWidget::populateWidgets()
         {
             cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
         }
+        else if(QSlider * cb=qobject_cast<QSlider *>(ow->widget))
+        {
+            cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
+        }
     }
     setDirty(dirtyBack);
 }
@@ -207,6 +214,10 @@ void ConfigTaskWidget::refreshWidgetsValues()
         {
             cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
         }
+        else if(QSlider * cb=qobject_cast<QSlider *>(ow->widget))
+        {
+            cb->setValue(ow->field->getValue(ow->index).toInt()/ow->scale);
+        }
     }
     setDirty(dirtyBack);
 }
@@ -228,6 +239,10 @@ void ConfigTaskWidget::updateObjectsFromWidgets()
             ow->field->setValue(cb->text(),ow->index);
         }
         else if(QSpinBox * cb=qobject_cast<QSpinBox *>(ow->widget))
+        {
+            ow->field->setValue(cb->value()* ow->scale,ow->index);
+        }
+        else if(QSlider * cb=qobject_cast<QSlider *>(ow->widget))
         {
             ow->field->setValue(cb->value()* ow->scale,ow->index);
         }

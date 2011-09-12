@@ -83,16 +83,16 @@ void ins_outdoor_update()
 
 	PositionActualData positionActual;
 	PositionActualGet(&positionActual);
-	positionActual.North = Nav.Pos[0] * 100;
-	positionActual.East = Nav.Pos[1] * 100;
-	positionActual.Down = Nav.Pos[2] * 100;
+	positionActual.North = Nav.Pos[0];
+	positionActual.East = Nav.Pos[1];
+	positionActual.Down = Nav.Pos[2];
 	PositionActualSet(&positionActual);
 	
 	VelocityActualData velocityActual;
 	VelocityActualGet(&velocityActual);
-	velocityActual.North = Nav.Vel[0] * 100;
-	velocityActual.East = Nav.Vel[1] * 100;
-	velocityActual.Down = Nav.Vel[2] * 100;
+	velocityActual.North = Nav.Vel[0];
+	velocityActual.East = Nav.Vel[1];
+	velocityActual.Down = Nav.Vel[2];
 	VelocityActualSet(&velocityActual);
 
 	sensors = 0;
@@ -234,30 +234,32 @@ void ins_indoor_update()
 	if(gps_data.updated) {
 		PositionActualData positionActual;
 		PositionActualGet(&positionActual);
-		positionActual.North = gps_data.NED[0] * 100;
-		positionActual.East = gps_data.NED[1] * 100;
-		positionActual.Down = Nav.Pos[2] * 100;
+		positionActual.North = gps_data.NED[0];
+		positionActual.East = gps_data.NED[1];
+		positionActual.Down = Nav.Pos[2];
 		PositionActualSet(&positionActual);
 		
 		VelocityActualData velocityActual;
 		VelocityActualGet(&velocityActual);
 		velocityActual.North = gps_data.groundspeed * cos(gps_data.heading * DEG_TO_RAD);
 		velocityActual.East = gps_data.groundspeed * sin(gps_data.heading * DEG_TO_RAD);
-		velocityActual.Down = Nav.Vel[2] * 100;
+		velocityActual.Down = Nav.Vel[2];
 		VelocityActualSet(&velocityActual);
 
 		gps_data.updated = false;
 	} else {
 		PositionActualData positionActual;
 		PositionActualGet(&positionActual);
-		positionActual.Down = Nav.Pos[2] * 100;
+		positionActual.North = NAN;
+		positionActual.East = NAN;
+		positionActual.Down = Nav.Pos[2];
 		PositionActualSet(&positionActual);
 
 		VelocityActualData velocityActual;
 		VelocityActualGet(&velocityActual);
-		velocityActual.North = 0;
-		velocityActual.East = 0;
-		velocityActual.Down = Nav.Vel[2] * 100;
+		velocityActual.North = NAN;
+		velocityActual.East = NAN;
+		velocityActual.Down = Nav.Vel[2];
 		VelocityActualSet(&velocityActual);
 	}
 	

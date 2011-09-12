@@ -27,9 +27,9 @@ const uint8_t PIOS_HID_DeviceDescriptor[PIOS_HID_SIZ_DEVICE_DESC] =
     USB_DEVICE_DESCRIPTOR_TYPE, // bDescriptorType
     0x00,                       // bcdUSB
     0x02,
-    0xEF,                       // bDeviceClass (Misc)
-    0x02,                       // bDeviceSubClass (common)
-    0x01,                       // bDeviceProtocol (IAD)
+    0x02,                       // bDeviceClass (Communication Device)
+    0x00,                       // bDeviceSubClass (Use Interface SubClass)
+    0x00,                       // bDeviceProtocol
     0x40,                       // bMaxPacketSize40
     (uint8_t)((PIOS_USB_VENDOR_ID) & 0xff),   // idVendor
     (uint8_t)((PIOS_USB_VENDOR_ID) >> 8),

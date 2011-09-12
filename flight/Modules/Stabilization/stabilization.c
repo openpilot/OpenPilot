@@ -237,7 +237,7 @@ static void stabilizationTask(void* parameters)
 					rateDesiredAxis[i] = attitudeDesiredAxis[i];
 
 					// Zero attitude and axis lock accumulators
-					pids[PID_ROLL + i] = 0;
+					pids[PID_ROLL + i].iAccumulator = 0;
 					axis_lock_accum[i] = 0;
 					break;
 
@@ -253,7 +253,7 @@ static void stabilizationTask(void* parameters)
 					rateDesiredAxis[i] = attitudeDesiredAxis[i] + weak_leveling;
 
 					// Zero attitude and axis lock accumulators
-					pids[PID_ROLL + i] = 0;
+					pids[PID_ROLL + i].iAccumulator = 0;
 					axis_lock_accum[i] = 0;
 					break;
 				}
@@ -262,7 +262,7 @@ static void stabilizationTask(void* parameters)
 					
 					if(rateDesiredAxis[i] > settings.MaximumRate[i])
 						rateDesiredAxis[i] = settings.MaximumRate[i];
-					else if(rateDesiredAxis[ct] < -settings.MaximumRate[ct])
+					else if(rateDesiredAxis[i] < -settings.MaximumRate[i])
 						rateDesiredAxis[i] = -settings.MaximumRate[i];
 					
 					
@@ -287,7 +287,7 @@ static void stabilizationTask(void* parameters)
 					
 					if(rateDesiredAxis[i] > settings.MaximumRate[i])
 						rateDesiredAxis[i] = settings.MaximumRate[i];
-					else if(rateDesiredAxis[ct] < -settings.MaximumRate[ct])
+					else if(rateDesiredAxis[i] < -settings.MaximumRate[i])
 						rateDesiredAxis[i] = -settings.MaximumRate[i];
 
 					break;

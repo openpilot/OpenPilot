@@ -80,7 +80,6 @@ void zero_gyros(bool update_settings);
 //void send_calibration(void);
 void send_attitude(void);
 void send_velocity(void);
-void send_position(void);
 void homelocation_callback(AhrsObjHandle obj);
 //void calibration_callback(AhrsObjHandle obj);
 void settings_callback(AhrsObjHandle obj);
@@ -89,7 +88,7 @@ void calibration(float result[3], float scale[3][4], float arg[3]);
 
 extern void PIOS_Board_Init(void);
 void panic(uint32_t blinks);
-static void print_ekf_binary();
+static void print_ekf_binary(bool ekf);
 void simple_update();
 
 /* Bootloader related functions and var*/
@@ -256,9 +255,8 @@ int main()
 		
 		time_val2 = PIOS_DELAY_GetRaw();
 		
-		float zeros[3] = {0,0,0};
-		INSSetGyroBias(zeros);
-		
+		//print_ekf_binary(true);
+
 		switch(ahrs_algorithm) {
 			case INSSETTINGS_ALGORITHM_SIMPLE:
 				simple_update();
@@ -274,7 +272,7 @@ int main()
 				measure_noise();
 				break;
 			case INSSETTINGS_ALGORITHM_SENSORRAW:
-				print_ekf_binary();
+				print_ekf_binary(false);
 				// Run at standard rate
 				while(PIOS_DELAY_DiffuS(time_val1) < TYPICAL_PERIOD);
 				break;
@@ -317,7 +315,7 @@ void simple_update() {
 /**
  * @brief Output all the important inputs and states of the ekf through serial port
  */
-static void print_ekf_binary()
+static void print_ekf_binary(bool ekf)
 {
 	static uint32_t timeval;
 	uint16_t delay;
@@ -337,9 +335,15 @@ static void print_ekf_binary()
 	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &gyro_data.temperature, 4);
 	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &accel_data.temperature, 4);
 	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) &delay, 2);
-	
-	mag_data.updated = 0;
-	altitude_data.updated = 0;
+	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & gps_data, sizeof(gps_data));
+
+	if(ekf)
+		PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & Nav, sizeof(Nav));                                             // X (86:149)
+	else {
+		mag_data.updated = 0;
+		altitude_data.updated = 0;
+		gps_data.updated = 0;
+	}
 }
 
 void panic(uint32_t blinks) 
@@ -794,19 +798,6 @@ void send_velocity(void)
 	velocityActual.Down = Nav.Vel[2] * 100;
 
 	VelocityActualSet(&velocityActual);
-}
-
-void send_position(void)
-{
-	PositionActualData positionActual;
-	PositionActualGet(&positionActual);
-
-	// convert into cm
-	positionActual.North = Nav.Pos[0] * 100;
-	positionActual.East = Nav.Pos[1] * 100;
-	positionActual.Down = Nav.Pos[2] * 100;
-
-	PositionActualSet(&positionActual);
 }
 
 int callback_count = 0;

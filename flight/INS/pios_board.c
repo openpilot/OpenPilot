@@ -329,9 +329,9 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
 	},
 };
 
-#define PIOS_COM_AUX_TX_BUF_LEN 255
+#define PIOS_COM_AUX_TX_BUF_LEN 512
 static uint8_t pios_com_aux_tx_buffer[PIOS_COM_AUX_TX_BUF_LEN];
-#define PIOS_COM_AUX_RX_BUF_LEN 255
+#define PIOS_COM_AUX_RX_BUF_LEN 512
 static uint8_t pios_com_aux_rx_buffer[PIOS_COM_AUX_RX_BUF_LEN];
 
 #endif /* PIOS_INCLUDE_GPS */

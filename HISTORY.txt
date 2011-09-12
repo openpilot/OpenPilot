@@ -1,5 +1,10 @@
 Short summary of changes.  For a complete list see the git log.
 
+2011-09-12
+Max rate now ONLY applies to attitude and axis lock mode.  Manual rate is the
+only term that limits the rate mode now (and in axis lock when you push stick
+only manual rate applies).  Also integrals are reset when unused.
+
 2011-09-09
 Some large updates to the input system.  Now multiple receivers can be
 connected at once.  A wizard was added for configuring the input channels.  A

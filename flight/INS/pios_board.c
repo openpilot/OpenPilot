@@ -329,9 +329,9 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
 	},
 };
 
-#define PIOS_COM_AUX_TX_BUF_LEN 512
+#define PIOS_COM_AUX_TX_BUF_LEN 150
 static uint8_t pios_com_aux_tx_buffer[PIOS_COM_AUX_TX_BUF_LEN];
-#define PIOS_COM_AUX_RX_BUF_LEN 512
+#define PIOS_COM_AUX_RX_BUF_LEN 10
 static uint8_t pios_com_aux_rx_buffer[PIOS_COM_AUX_RX_BUF_LEN];
 
 #endif /* PIOS_INCLUDE_GPS */
@@ -382,9 +382,9 @@ static const struct pios_usart_cfg pios_usart_aux_cfg = {
 	},
 };
 
-#define PIOS_COM_GPS_TX_BUF_LEN 192
+#define PIOS_COM_GPS_TX_BUF_LEN 10
 static uint8_t pios_com_gps_tx_buffer[PIOS_COM_GPS_TX_BUF_LEN];
-#define PIOS_COM_GPS_RX_BUF_LEN 96
+#define PIOS_COM_GPS_RX_BUF_LEN 192
 static uint8_t pios_com_gps_rx_buffer[PIOS_COM_GPS_RX_BUF_LEN];
 
 #endif /* PIOS_COM_AUX */

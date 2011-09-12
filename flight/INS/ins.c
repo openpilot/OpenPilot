@@ -233,18 +233,23 @@ int main()
 		
 		if(ISNAN(accel_data.filtered.x + accel_data.filtered.y + accel_data.filtered.z) ||
 		   ISNAN(gyro_data.filtered.x + gyro_data.filtered.y + gyro_data.filtered.z) ||
-		   ACCEL_OOB(accel_data.filtered.x + accel_data.filtered.y + accel_data.filtered.z) ||
-		   GYRO_OOB(gyro_data.filtered.x + gyro_data.filtered.y + gyro_data.filtered.z)) {
+		   ACCEL_OOB(accel_data.filtered.x) || ACCEL_OOB(accel_data.filtered.y) || ACCEL_OOB(accel_data.filtered.z) ||
+		   GYRO_OOB(gyro_data.filtered.x) || GYRO_OOB(gyro_data.filtered.y) || GYRO_OOB(gyro_data.filtered.z)) {
 			// If any values are NaN or huge don't update
 			//TODO: add field to ahrs status to track number of these events
 			continue;
 		}
 		
-		if(total_conversion_blocks <= 3000 && !zeroed_gyros) {
-			zero_gyros(total_conversion_blocks == 3000);
-			if(total_conversion_blocks == 3000)
+		if(total_conversion_blocks <= 100 && !zeroed_gyros) {
+			// TODO: Replace this with real init
+			zero_gyros(total_conversion_blocks == 100);
+			if(total_conversion_blocks == 100)
 				zeroed_gyros = true;
 			PIOS_DELAY_WaituS(TYPICAL_PERIOD);
+
+			float zeros[3] = {0,0,0};
+			INSSetGyroBias(zeros);
+
 			continue;
 		}
 		/* If algorithm changed reinit.  This could go in callback but wouldn't be synchronous */
@@ -255,8 +260,9 @@ int main()
 		
 		time_val2 = PIOS_DELAY_GetRaw();
 		
-		//print_ekf_binary(true);
-
+		print_ekf_binary(true);
+		
+		
 		switch(ahrs_algorithm) {
 			case INSSETTINGS_ALGORITHM_SIMPLE:
 				simple_update();
@@ -322,8 +328,11 @@ static void print_ekf_binary(bool ekf)
 	delay = PIOS_DELAY_DiffuS(timeval);
 	timeval = PIOS_DELAY_GetRaw();
 	
+	PIOS_DELAY_WaituS(500);
+	
 	uint8_t framing[2] = { 0xff, 0x00 };
 	// Dump raw buffer
+	
 	PIOS_COM_SendBuffer(PIOS_COM_AUX, &framing[0], sizeof(framing));
 	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & total_conversion_blocks, sizeof(total_conversion_blocks));
 	PIOS_COM_SendBuffer(PIOS_COM_AUX, (uint8_t *) & accel_data.filtered.x, 4*3);
@@ -615,7 +624,7 @@ void get_gps_data()
 					
 					gps_data.heading = pos.Heading;
 					gps_data.groundspeed = pos.Groundspeed;
-					gps_data.quality = 1;  /* currently unused */
+					gps_data.quality = pos.Satellites;
 					gps_data.updated = true;
 					
 					const uint32_t INSGPS_GPS_MINSAT = 6;
@@ -628,7 +637,6 @@ void get_gps_data()
 					   (home.Set == HOMELOCATION_SET_FALSE) ||
 					   ((home.ECEF[0] == 0) && (home.ECEF[1] == 0) && (home.ECEF[2] == 0)))
 					{
-						gps_data.quality = 0;
 						gps_data.updated = false;
 					}	
 				}

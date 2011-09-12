@@ -11,7 +11,9 @@
 #define INSGPS_GPS_TIMEOUT 2   /* 2 seconds triggers reinit of position */
 #define INSGPS_GPS_MINSAT  6   /* 2 seconds triggers reinit of position */
 #define INSGPS_GPS_MINPDOP 3.5 /* minimum PDOP for postition updates    */
-
+ /* If GPS is more than this distance on any dimension then wait a few updates */
+ /* and reinitialize there */
+#define INSGPS_GPS_FAR     10 
 #define timer_rate() 100000
 #define timer_count() 1
 
@@ -50,13 +52,14 @@ static uint32_t ins_last_time;
 /**
  * @brief Update the EKF when in outdoor mode.  The primary difference is using the GPS values.
  */
-
+uint32_t total_far_count = 0;
+uint32_t relocated = 0;
 void ins_outdoor_update()
 {
 	float gyro[3], accel[3], vel[3];
-	static uint32_t last_gps_time = 0;
 	float dT;
 	uint16_t sensors;
+	static uint32_t gps_far_count = 0;
 	
 	dT = PIOS_DELAY_DiffuS(ins_last_time) / 1e6;
 	ins_last_time = PIOS_DELAY_GetRaw();
@@ -97,49 +100,42 @@ void ins_outdoor_update()
 
 	sensors = 0;
 	
-	/*
-	 * Detect if greater than certain time since last gps update and if so
-	 * reset EKF to that position since probably drifted too far for safe
-	 * update
-	 */
-	uint32_t this_gps_time = timer_count();
-	float gps_delay;
-	
-	if (this_gps_time < last_gps_time)
-		gps_delay = ((0xFFFF - last_gps_time) - this_gps_time) / timer_rate();
-	else
-		gps_delay = (this_gps_time - last_gps_time) / timer_rate();
-	last_gps_time = this_gps_time;
-	
 	if (gps_data.updated)
 	{
 		vel[0] = gps_data.groundspeed * cos(gps_data.heading * DEG_TO_RAD);
 		vel[1] = gps_data.groundspeed * sin(gps_data.heading * DEG_TO_RAD);
 		vel[2] = 0;
 		
-		if(gps_delay > INSGPS_GPS_TIMEOUT)
-			INSPosVelReset(gps_data.NED,vel); // position stale, reset
-		else  {
+		if (abs(gps_data.NED[0] - Nav.Pos[0]) > INSGPS_GPS_FAR ||
+		    abs(gps_data.NED[1] - Nav.Pos[1]) > INSGPS_GPS_FAR ||
+		    abs(gps_data.NED[2] - Nav.Pos[2]) > INSGPS_GPS_FAR ||
+		    abs(vel[0] - Nav.Vel[0]) > INSGPS_GPS_FAR ||
+		    abs(vel[1] - Nav.Vel[1]) > INSGPS_GPS_FAR) {
+			gps_far_count++;
+			total_far_count++;
+			gps_data.updated = false;
+			
+			if(gps_far_count > 30) {
+				INSPosVelReset(gps_data.NED,vel);
+				relocated++;
+			}
+		}
+		else {			
 			sensors |= HORIZ_SENSORS | POS_SENSORS;
+			
+			/*
+			 * When using gps need to make sure that barometer is brought into NED frame
+			 * we should try and see if the altitude from the home location is good enough
+			 * to use for the offset but for now starting with this conservative filter
+			 */
+			if(fabs(gps_data.NED[2] + (altitude_data.altitude - baro_offset)) > 10) {
+				baro_offset = gps_data.NED[2] + altitude_data.altitude;
+			} else {
+				/* IIR filter with 100 second or so tau to keep them crudely in the same frame */
+				baro_offset = baro_offset * 0.999 + (gps_data.NED[2] + altitude_data.altitude) * 0.001;
+			}
+			gps_data.updated = false;
 		}
-		
-		/*
-		 * When using gps need to make sure that barometer is brought into NED frame
-		 * we should try and see if the altitude from the home location is good enough
-		 * to use for the offset but for now starting with this conservative filter
-		 */
-		if(fabs(gps_data.NED[2] + (altitude_data.altitude - baro_offset)) > 10) {
-			baro_offset = gps_data.NED[2] + altitude_data.altitude;
-		} else {
-			/* IIR filter with 100 second or so tau to keep them crudely in the same frame */
-			baro_offset = baro_offset * 0.999 + (gps_data.NED[2] + altitude_data.altitude) * 0.001;
-		}
-		gps_data.updated = false;
-	} else if (gps_delay > INSGPS_GPS_TIMEOUT) {
-		vel[0] = 0;
-		vel[1] = 0;
-		vel[2] = 0;
-		sensors |= VERT_SENSORS | HORIZ_SENSORS;
 	}
 	
 	if(mag_data.updated) {
@@ -157,6 +153,11 @@ void ins_outdoor_update()
 	 * although probably should occur within INS itself
 	 */
 	INSCorrection(mag_data.scaled.axis, gps_data.NED, vel, altitude_data.altitude - baro_offset, sensors);
+	
+	if(fabs(Nav.gyro_bias[0]) > 0.1 || fabs(Nav.gyro_bias[1]) > 0.1 || fabs(Nav.gyro_bias[2]) > 0.1) {
+		float zeros[3] = {0,0,0};
+		INSSetGyroBias(zeros);
+	}
 }
 
 uint32_t time_val_a;
@@ -166,6 +167,8 @@ uint32_t indoor_time;
  */
 void ins_indoor_update()
 {
+	static uint32_t updated_without_gps = 0;
+	
 	time_val_a = PIOS_DELAY_GetRaw();
 	
 	float gyro[3], accel[3], vel[3];
@@ -180,7 +183,6 @@ void ins_indoor_update()
 	if(dT > 0.01)
 		dT = 0.01;
 
-	
 	// format data for INS algo
 	gyro[0] = gyro_data.filtered.x;
 	gyro[1] = gyro_data.filtered.y;
@@ -245,21 +247,29 @@ void ins_indoor_update()
 		velocityActual.East = gps_data.groundspeed * sin(gps_data.heading * DEG_TO_RAD);
 		velocityActual.Down = Nav.Vel[2];
 		VelocityActualSet(&velocityActual);
-
+		
+		updated_without_gps = 0;
 		gps_data.updated = false;
 	} else {
 		PositionActualData positionActual;
 		PositionActualGet(&positionActual);
-		positionActual.North = NAN;
-		positionActual.East = NAN;
-		positionActual.Down = Nav.Pos[2];
-		PositionActualSet(&positionActual);
 
 		VelocityActualData velocityActual;
 		VelocityActualGet(&velocityActual);
-		velocityActual.North = NAN;
-		velocityActual.East = NAN;
+
+		positionActual.Down = Nav.Pos[2];
 		velocityActual.Down = Nav.Vel[2];
+
+		if(updated_without_gps > 500) {
+			// After 2-3 seconds without a GPS update set velocity estimate to NAN
+			positionActual.North = NAN;
+			positionActual.East = NAN;
+			velocityActual.North = NAN;
+			velocityActual.East = NAN;
+		} else
+			updated_without_gps++;
+
+		PositionActualSet(&positionActual);
 		VelocityActualSet(&velocityActual);
 	}
 	
@@ -269,6 +279,12 @@ void ins_indoor_update()
 	 */
 	INSCorrection(mag_data.scaled.axis, gps_data.NED, vel, altitude_data.altitude, sensors | HORIZ_SENSORS | VERT_SENSORS);
 	indoor_time = PIOS_DELAY_DiffuS(time_val_a);
+	
+	if(fabs(Nav.gyro_bias[0]) > 0.1 || fabs(Nav.gyro_bias[1]) > 0.1 || fabs(Nav.gyro_bias[2]) > 0.1) {
+		float zeros[3] = {0,0,0};
+		INSSetGyroBias(zeros);
+	}
+
 }
 
 /**
@@ -295,7 +311,7 @@ void ins_init_algorithm()
 	using_mags = (ahrs_algorithm == INSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) || (ahrs_algorithm == INSSETTINGS_ALGORITHM_INSGPS_INDOOR);
 	using_mags &= (home.Be[0] != 0) || (home.Be[1] != 0) || (home.Be[2] != 0);  /* only use mags when valid home location */
 	
-	using_gps = (ahrs_algorithm == INSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) && (gps_data.quality != 0);
+	using_gps = (ahrs_algorithm == INSSETTINGS_ALGORITHM_INSGPS_OUTDOOR) && (gps_data.quality >= INSGPS_GPS_MINSAT);
 	
 	/* Block till a data update */
 	get_accel_gyro_data();

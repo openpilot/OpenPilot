@@ -1,5 +1,15 @@
 Short summary of changes.  For a complete list see the git log.
 
+2011-09-09
+Some large updates to the input system.  Now multiple receivers can be
+connected at once.  A wizard was added for configuring the input channels.  A
+specific collective pitch channel was added.
+
+2011-09-04
+Improvements to the failsafe handling code for inputs.  PWM power off is now
+detected properly.  Powering on transmitter for Spektrum Satellite no longer
+causes a glitch on servos.
+
 2011-08-10
 Added Camera Stabilization and a gui to configure this.  This is a software
 selectable module from the GUI.  However, a restart is required to make it

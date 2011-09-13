@@ -61,6 +61,7 @@ MODULES = Actuator Telemetry ManualControl AHRSComms Stabilization FirmwareIAP
 PYMODULES = FlightPlan
 #MODULES += Osd/OsdEtStd
 #MODULES += Guidance
+MODULES += AltitudeHold
 
 # Paths
 OPSYSTEM = ./System

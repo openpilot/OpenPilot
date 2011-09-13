@@ -279,6 +279,10 @@
 		6589A9DB131DEE76006BD67C /* pios_rtc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = pios_rtc.c; sourceTree = "<group>"; };
 		6589A9E2131DF1C7006BD67C /* pios_rtc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pios_rtc.h; sourceTree = "<group>"; };
 		659ED317122226B60011010E /* ahrssettings.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ahrssettings.xml; sourceTree = "<group>"; };
+		65A47983141F123F00AECBDD /* altitudehold.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = altitudehold.c; sourceTree = "<group>"; };
+		65A47985141F123F00AECBDD /* altitudehold.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = altitudehold.h; sourceTree = "<group>"; };
+		65A47987141F146F00AECBDD /* camerastab.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = camerastab.c; sourceTree = "<group>"; };
+		65A47989141F146F00AECBDD /* camerastab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = camerastab.h; sourceTree = "<group>"; };
 		65B35D7F121C261E003EAD18 /* bin.pro */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bin.pro; sourceTree = "<group>"; };
 		65B35D80121C261E003EAD18 /* openpilotgcs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = openpilotgcs; sourceTree = "<group>"; };
 		65B35D81121C261E003EAD18 /* openpilotgcs.pri */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = openpilotgcs.pri; sourceTree = "<group>"; };
@@ -3393,8 +3397,10 @@
 				650D8E2012DFE16400D05CC9 /* Actuator */,
 				650D8E2412DFE16400D05CC9 /* AHRSComms */,
 				650D8E2812DFE16400D05CC9 /* Altitude */,
+				65A47982141F123F00AECBDD /* AltitudeHold */,
 				65C35F6512F0DC2D004811C2 /* Attitude */,
 				650D8E2E12DFE16400D05CC9 /* Battery */,
+				65A47986141F146F00AECBDD /* CameraStab */,
 				650D8E3212DFE16400D05CC9 /* Example */,
 				650D8E3B12DFE16400D05CC9 /* FirmwareIAP */,
 				650D8E3F12DFE16400D05CC9 /* FlightPlan */,
@@ -4128,6 +4134,41 @@
 				657CF024121F49CD007A1FBE /* WMMInternal.h */,
 				657CEEB9121DBC63007A1FBE /* CoordinateConversions.h */,
 				657CEEBA121DBC63007A1FBE /* WorldMagModel.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		65A47982141F123F00AECBDD /* AltitudeHold */ = {
+			isa = PBXGroup;
+			children = (
+				65A47983141F123F00AECBDD /* altitudehold.c */,
+				65A47984141F123F00AECBDD /* inc */,
+			);
+			name = AltitudeHold;
+			path = /Users/jcotton81/Documents/Programming/OpenPilot/flight/Modules/AltitudeHold;
+			sourceTree = "<absolute>";
+		};
+		65A47984141F123F00AECBDD /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65A47985141F123F00AECBDD /* altitudehold.h */,
+			);
+			path = inc;
+			sourceTree = "<group>";
+		};
+		65A47986141F146F00AECBDD /* CameraStab */ = {
+			isa = PBXGroup;
+			children = (
+				65A47987141F146F00AECBDD /* camerastab.c */,
+				65A47988141F146F00AECBDD /* inc */,
+			);
+			path = CameraStab;
+			sourceTree = "<group>";
+		};
+		65A47988141F146F00AECBDD /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				65A47989141F146F00AECBDD /* camerastab.h */,
 			);
 			path = inc;
 			sourceTree = "<group>";

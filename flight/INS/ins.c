@@ -260,7 +260,7 @@ int main()
 		
 		time_val2 = PIOS_DELAY_GetRaw();
 		
-		print_ekf_binary(true);
+		//print_ekf_binary(true);
 		
 		
 		switch(ahrs_algorithm) {

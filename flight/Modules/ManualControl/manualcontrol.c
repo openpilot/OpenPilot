@@ -600,8 +600,8 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
 // TODO: Need compile flag to exclude this from copter control
 static void altitudeHoldDesired(ManualControlCommandData * cmd)
 {
-	const float DEADBAND_HIGH = 0.45;
-	const float DEADBAND_LOW = 0.55;
+	const float DEADBAND_HIGH = 0.55;
+	const float DEADBAND_LOW = 0.45;
 	
 	static portTickType lastSysTime;
 	static bool zeroed = false;
